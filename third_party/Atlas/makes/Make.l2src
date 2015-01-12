@@ -1,0 +1,235 @@
+include Make.inc
+
+sobj = ATL_sktrmvLNN.o ATL_sktrmvLNU.o ATL_sktrmvLTN.o ATL_sktrmvLTU.o \
+       ATL_sktrmvUNN.o ATL_sktrmvUNU.o ATL_sktrmvUTN.o ATL_sktrmvUTU.o \
+       ATL_strmv.o ATL_strmvLN.o ATL_strmvLT.o ATL_strmvUN.o ATL_strmvUT.o
+
+dobj = ATL_dktrmvLNN.o ATL_dktrmvLNU.o ATL_dktrmvLTN.o ATL_dktrmvLTU.o \
+       ATL_dktrmvUNN.o ATL_dktrmvUNU.o ATL_dktrmvUTN.o ATL_dktrmvUTU.o \
+       ATL_dtrmv.o ATL_dtrmvLN.o ATL_dtrmvLT.o ATL_dtrmvUN.o ATL_dtrmvUT.o
+
+cobj = ATL_cktrmvLCN.o ATL_cktrmvLCU.o ATL_cktrmvLNN.o ATL_cktrmvLNU.o \
+       ATL_cktrmvLNcN.o ATL_cktrmvLNcU.o ATL_cktrmvLTN.o ATL_cktrmvLTU.o \
+       ATL_cktrmvUCN.o ATL_cktrmvUCU.o ATL_cktrmvUNN.o ATL_cktrmvUNU.o \
+       ATL_cktrmvUNcN.o ATL_cktrmvUNcU.o ATL_cktrmvUTN.o ATL_cktrmvUTU.o \
+       ATL_ctrmv.o ATL_ctrmvLC.o ATL_ctrmvLN.o ATL_ctrmvLNc.o ATL_ctrmvLT.o \
+       ATL_ctrmvUC.o ATL_ctrmvUN.o ATL_ctrmvUNc.o ATL_ctrmvUT.o
+
+zobj = ATL_zktrmvLCN.o ATL_zktrmvLCU.o ATL_zktrmvLNN.o ATL_zktrmvLNU.o \
+       ATL_zktrmvLNcN.o ATL_zktrmvLNcU.o ATL_zktrmvLTN.o ATL_zktrmvLTU.o \
+       ATL_zktrmvUCN.o ATL_zktrmvUCU.o ATL_zktrmvUNN.o ATL_zktrmvUNU.o \
+       ATL_zktrmvUNcN.o ATL_zktrmvUNcU.o ATL_zktrmvUTN.o ATL_zktrmvUTU.o \
+       ATL_ztrmv.o ATL_ztrmvLC.o ATL_ztrmvLN.o ATL_ztrmvLNc.o ATL_ztrmvLT.o \
+       ATL_ztrmvUC.o ATL_ztrmvUN.o ATL_ztrmvUNc.o ATL_ztrmvUT.o
+
+
+all : slib dlib clib zlib
+clean : sclean dclean cclean zclean
+
+slvl2 : slib
+slib : 
+	$(PMAKE) slib.grd
+slib.grd : $(sobj)
+	$(ARCHIVER) $(ARFLAGS) $(ATLASlib) $(sobj)
+	$(RANLIB) $(ATLASlib)
+	touch slib.grd
+sclean :
+	rm -f $(sobj) s*.grd
+dlvl2 : dlib
+dlib : 
+	$(PMAKE) dlib.grd
+dlib.grd : $(dobj)
+	$(ARCHIVER) $(ARFLAGS) $(ATLASlib) $(dobj)
+	$(RANLIB) $(ATLASlib)
+	touch dlib.grd
+dclean :
+	rm -f $(dobj) d*.grd
+clvl2 : clib
+clib : 
+	$(PMAKE) clib.grd
+clib.grd : $(cobj)
+	$(ARCHIVER) $(ARFLAGS) $(ATLASlib) $(cobj)
+	$(RANLIB) $(ATLASlib)
+	touch clib.grd
+cclean :
+	rm -f $(cobj) c*.grd
+zlvl2 : zlib
+zlib : 
+	$(PMAKE) zlib.grd
+zlib.grd : $(zobj)
+	$(ARCHIVER) $(ARFLAGS) $(ATLASlib) $(zobj)
+	$(RANLIB) $(ATLASlib)
+	touch zlib.grd
+zclean :
+	rm -f $(zobj) z*.grd
+
+ATL_strmv.o : $(mySRCdir)/ATL_trmv.c
+	$(SKC) -o $@ -c $(sKCFLAGS) -DSREAL $(mySRCdir)/ATL_trmv.c
+ATL_sktrmvUTU.o : $(mySRCdir)/kernel/ATL_ktrmvUTU.c
+	$(SKC) -o $@ -c $(sKCFLAGS) -DSREAL $(mySRCdir)/kernel/ATL_ktrmvUTU.c
+ATL_sktrmvUTN.o : $(mySRCdir)/kernel/ATL_ktrmvUTN.c
+	$(SKC) -o $@ -c $(sKCFLAGS) -DSREAL $(mySRCdir)/kernel/ATL_ktrmvUTN.c
+ATL_sktrmvUNU.o : $(mySRCdir)/kernel/ATL_ktrmvUNU.c
+	$(SKC) -o $@ -c $(sKCFLAGS) -DSREAL $(mySRCdir)/kernel/ATL_ktrmvUNU.c
+ATL_sktrmvUNN.o : $(mySRCdir)/kernel/ATL_ktrmvUNN.c
+	$(SKC) -o $@ -c $(sKCFLAGS) -DSREAL $(mySRCdir)/kernel/ATL_ktrmvUNN.c
+ATL_sktrmvLTU.o : $(mySRCdir)/kernel/ATL_ktrmvLTU.c
+	$(SKC) -o $@ -c $(sKCFLAGS) -DSREAL $(mySRCdir)/kernel/ATL_ktrmvLTU.c
+ATL_sktrmvLTN.o : $(mySRCdir)/kernel/ATL_ktrmvLTN.c
+	$(SKC) -o $@ -c $(sKCFLAGS) -DSREAL $(mySRCdir)/kernel/ATL_ktrmvLTN.c
+ATL_sktrmvLNU.o : $(mySRCdir)/kernel/ATL_ktrmvLNU.c
+	$(SKC) -o $@ -c $(sKCFLAGS) -DSREAL $(mySRCdir)/kernel/ATL_ktrmvLNU.c
+ATL_sktrmvLNN.o : $(mySRCdir)/kernel/ATL_ktrmvLNN.c
+	$(SKC) -o $@ -c $(sKCFLAGS) -DSREAL $(mySRCdir)/kernel/ATL_ktrmvLNN.c
+ATL_strmvLT.o : $(mySRCdir)/kernel/ATL_trmvLT.c
+	$(SKC) -o $@ -c $(sKCFLAGS) -DSREAL $(mySRCdir)/kernel/ATL_trmvLT.c
+ATL_strmvLN.o : $(mySRCdir)/kernel/ATL_trmvLN.c
+	$(SKC) -o $@ -c $(sKCFLAGS) -DSREAL $(mySRCdir)/kernel/ATL_trmvLN.c
+ATL_strmvUT.o : $(mySRCdir)/kernel/ATL_trmvUT.c
+	$(SKC) -o $@ -c $(sKCFLAGS) -DSREAL $(mySRCdir)/kernel/ATL_trmvUT.c
+ATL_strmvUN.o : $(mySRCdir)/kernel/ATL_trmvUN.c
+	$(SKC) -o $@ -c $(sKCFLAGS) -DSREAL $(mySRCdir)/kernel/ATL_trmvUN.c
+
+
+ATL_dtrmv.o : $(mySRCdir)/ATL_trmv.c
+	$(DKC) -o $@ -c $(dKCFLAGS) -DDREAL $(mySRCdir)/ATL_trmv.c
+ATL_dktrmvUTU.o : $(mySRCdir)/kernel/ATL_ktrmvUTU.c
+	$(DKC) -o $@ -c $(dKCFLAGS) -DDREAL $(mySRCdir)/kernel/ATL_ktrmvUTU.c
+ATL_dktrmvUTN.o : $(mySRCdir)/kernel/ATL_ktrmvUTN.c
+	$(DKC) -o $@ -c $(dKCFLAGS) -DDREAL $(mySRCdir)/kernel/ATL_ktrmvUTN.c
+ATL_dktrmvUNU.o : $(mySRCdir)/kernel/ATL_ktrmvUNU.c
+	$(DKC) -o $@ -c $(dKCFLAGS) -DDREAL $(mySRCdir)/kernel/ATL_ktrmvUNU.c
+ATL_dktrmvUNN.o : $(mySRCdir)/kernel/ATL_ktrmvUNN.c
+	$(DKC) -o $@ -c $(dKCFLAGS) -DDREAL $(mySRCdir)/kernel/ATL_ktrmvUNN.c
+ATL_dktrmvLTU.o : $(mySRCdir)/kernel/ATL_ktrmvLTU.c
+	$(DKC) -o $@ -c $(dKCFLAGS) -DDREAL $(mySRCdir)/kernel/ATL_ktrmvLTU.c
+ATL_dktrmvLTN.o : $(mySRCdir)/kernel/ATL_ktrmvLTN.c
+	$(DKC) -o $@ -c $(dKCFLAGS) -DDREAL $(mySRCdir)/kernel/ATL_ktrmvLTN.c
+ATL_dktrmvLNU.o : $(mySRCdir)/kernel/ATL_ktrmvLNU.c
+	$(DKC) -o $@ -c $(dKCFLAGS) -DDREAL $(mySRCdir)/kernel/ATL_ktrmvLNU.c
+ATL_dktrmvLNN.o : $(mySRCdir)/kernel/ATL_ktrmvLNN.c
+	$(DKC) -o $@ -c $(dKCFLAGS) -DDREAL $(mySRCdir)/kernel/ATL_ktrmvLNN.c
+ATL_dtrmvLT.o : $(mySRCdir)/kernel/ATL_trmvLT.c
+	$(DKC) -o $@ -c $(dKCFLAGS) -DDREAL $(mySRCdir)/kernel/ATL_trmvLT.c
+ATL_dtrmvLN.o : $(mySRCdir)/kernel/ATL_trmvLN.c
+	$(DKC) -o $@ -c $(dKCFLAGS) -DDREAL $(mySRCdir)/kernel/ATL_trmvLN.c
+ATL_dtrmvUT.o : $(mySRCdir)/kernel/ATL_trmvUT.c
+	$(DKC) -o $@ -c $(dKCFLAGS) -DDREAL $(mySRCdir)/kernel/ATL_trmvUT.c
+ATL_dtrmvUN.o : $(mySRCdir)/kernel/ATL_trmvUN.c
+	$(DKC) -o $@ -c $(dKCFLAGS) -DDREAL $(mySRCdir)/kernel/ATL_trmvUN.c
+
+
+ATL_ctrmv.o : $(mySRCdir)/ATL_trmv.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DSCPLX $(mySRCdir)/ATL_trmv.c
+
+ATL_cktrmvUTU.o : $(mySRCdir)/kernel/ATL_ktrmvUTU.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DSCPLX $(mySRCdir)/kernel/ATL_ktrmvUTU.c
+ATL_cktrmvUTN.o : $(mySRCdir)/kernel/ATL_ktrmvUTN.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DSCPLX $(mySRCdir)/kernel/ATL_ktrmvUTN.c
+ATL_cktrmvUNU.o : $(mySRCdir)/kernel/ATL_ktrmvUNU.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DSCPLX $(mySRCdir)/kernel/ATL_ktrmvUNU.c
+ATL_cktrmvUNN.o : $(mySRCdir)/kernel/ATL_ktrmvUNN.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DSCPLX $(mySRCdir)/kernel/ATL_ktrmvUNN.c
+ATL_cktrmvLTU.o : $(mySRCdir)/kernel/ATL_ktrmvLTU.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DSCPLX $(mySRCdir)/kernel/ATL_ktrmvLTU.c
+ATL_cktrmvLTN.o : $(mySRCdir)/kernel/ATL_ktrmvLTN.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DSCPLX $(mySRCdir)/kernel/ATL_ktrmvLTN.c
+ATL_cktrmvLNU.o : $(mySRCdir)/kernel/ATL_ktrmvLNU.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DSCPLX $(mySRCdir)/kernel/ATL_ktrmvLNU.c
+ATL_cktrmvLNN.o : $(mySRCdir)/kernel/ATL_ktrmvLNN.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DSCPLX $(mySRCdir)/kernel/ATL_ktrmvLNN.c
+ATL_cktrmvUNcU.o : $(mySRCdir)/kernel/ATL_ktrmvUNcU.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DSCPLX $(mySRCdir)/kernel/ATL_ktrmvUNcU.c
+ATL_cktrmvUNcN.o : $(mySRCdir)/kernel/ATL_ktrmvUNcN.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DSCPLX $(mySRCdir)/kernel/ATL_ktrmvUNcN.c
+ATL_cktrmvUCU.o : $(mySRCdir)/kernel/ATL_ktrmvUCU.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DSCPLX $(mySRCdir)/kernel/ATL_ktrmvUCU.c
+ATL_cktrmvUCN.o : $(mySRCdir)/kernel/ATL_ktrmvUCN.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DSCPLX $(mySRCdir)/kernel/ATL_ktrmvUCN.c
+ATL_cktrmvLNcU.o : $(mySRCdir)/kernel/ATL_ktrmvLNcU.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DSCPLX $(mySRCdir)/kernel/ATL_ktrmvLNcU.c
+ATL_cktrmvLNcN.o : $(mySRCdir)/kernel/ATL_ktrmvLNcN.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DSCPLX $(mySRCdir)/kernel/ATL_ktrmvLNcN.c
+ATL_cktrmvLCU.o : $(mySRCdir)/kernel/ATL_ktrmvLCU.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DSCPLX $(mySRCdir)/kernel/ATL_ktrmvLCU.c
+ATL_cktrmvLCN.o : $(mySRCdir)/kernel/ATL_ktrmvLCN.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DSCPLX $(mySRCdir)/kernel/ATL_ktrmvLCN.c
+ATL_ctrmvLT.o : $(mySRCdir)/kernel/ATL_trmvLT.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DSCPLX $(mySRCdir)/kernel/ATL_trmvLT.c
+ATL_ctrmvLN.o : $(mySRCdir)/kernel/ATL_trmvLN.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DSCPLX $(mySRCdir)/kernel/ATL_trmvLN.c
+ATL_ctrmvUT.o : $(mySRCdir)/kernel/ATL_trmvUT.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DSCPLX $(mySRCdir)/kernel/ATL_trmvUT.c
+ATL_ctrmvUN.o : $(mySRCdir)/kernel/ATL_trmvUN.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DSCPLX $(mySRCdir)/kernel/ATL_trmvUN.c
+ATL_ctrmvLNc.o : $(mySRCdir)/kernel/ATL_trmvLN.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DConj_ -DSCPLX \
+              $(mySRCdir)/kernel/ATL_trmvLN.c
+ATL_ctrmvLC.o : $(mySRCdir)/kernel/ATL_trmvLT.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DConj_ -DSCPLX \
+              $(mySRCdir)/kernel/ATL_trmvLT.c
+ATL_ctrmvUNc.o : $(mySRCdir)/kernel/ATL_trmvUN.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DConj_ -DSCPLX \
+              $(mySRCdir)/kernel/ATL_trmvUN.c
+ATL_ctrmvUC.o : $(mySRCdir)/kernel/ATL_trmvUT.c
+	$(CKC) -o $@ -c $(cKCFLAGS) -DConj_ -DSCPLX \
+              $(mySRCdir)/kernel/ATL_trmvUT.c
+
+
+ATL_ztrmv.o : $(mySRCdir)/ATL_trmv.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DDCPLX $(mySRCdir)/ATL_trmv.c
+
+ATL_zktrmvUTU.o : $(mySRCdir)/kernel/ATL_ktrmvUTU.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DDCPLX $(mySRCdir)/kernel/ATL_ktrmvUTU.c
+ATL_zktrmvUTN.o : $(mySRCdir)/kernel/ATL_ktrmvUTN.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DDCPLX $(mySRCdir)/kernel/ATL_ktrmvUTN.c
+ATL_zktrmvUNU.o : $(mySRCdir)/kernel/ATL_ktrmvUNU.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DDCPLX $(mySRCdir)/kernel/ATL_ktrmvUNU.c
+ATL_zktrmvUNN.o : $(mySRCdir)/kernel/ATL_ktrmvUNN.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DDCPLX $(mySRCdir)/kernel/ATL_ktrmvUNN.c
+ATL_zktrmvLTU.o : $(mySRCdir)/kernel/ATL_ktrmvLTU.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DDCPLX $(mySRCdir)/kernel/ATL_ktrmvLTU.c
+ATL_zktrmvLTN.o : $(mySRCdir)/kernel/ATL_ktrmvLTN.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DDCPLX $(mySRCdir)/kernel/ATL_ktrmvLTN.c
+ATL_zktrmvLNU.o : $(mySRCdir)/kernel/ATL_ktrmvLNU.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DDCPLX $(mySRCdir)/kernel/ATL_ktrmvLNU.c
+ATL_zktrmvLNN.o : $(mySRCdir)/kernel/ATL_ktrmvLNN.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DDCPLX $(mySRCdir)/kernel/ATL_ktrmvLNN.c
+ATL_zktrmvUNcU.o : $(mySRCdir)/kernel/ATL_ktrmvUNcU.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DDCPLX $(mySRCdir)/kernel/ATL_ktrmvUNcU.c
+ATL_zktrmvUNcN.o : $(mySRCdir)/kernel/ATL_ktrmvUNcN.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DDCPLX $(mySRCdir)/kernel/ATL_ktrmvUNcN.c
+ATL_zktrmvUCU.o : $(mySRCdir)/kernel/ATL_ktrmvUCU.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DDCPLX $(mySRCdir)/kernel/ATL_ktrmvUCU.c
+ATL_zktrmvUCN.o : $(mySRCdir)/kernel/ATL_ktrmvUCN.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DDCPLX $(mySRCdir)/kernel/ATL_ktrmvUCN.c
+ATL_zktrmvLNcU.o : $(mySRCdir)/kernel/ATL_ktrmvLNcU.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DDCPLX $(mySRCdir)/kernel/ATL_ktrmvLNcU.c
+ATL_zktrmvLNcN.o : $(mySRCdir)/kernel/ATL_ktrmvLNcN.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DDCPLX $(mySRCdir)/kernel/ATL_ktrmvLNcN.c
+ATL_zktrmvLCU.o : $(mySRCdir)/kernel/ATL_ktrmvLCU.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DDCPLX $(mySRCdir)/kernel/ATL_ktrmvLCU.c
+ATL_zktrmvLCN.o : $(mySRCdir)/kernel/ATL_ktrmvLCN.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DDCPLX $(mySRCdir)/kernel/ATL_ktrmvLCN.c
+ATL_ztrmvLT.o : $(mySRCdir)/kernel/ATL_trmvLT.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DDCPLX $(mySRCdir)/kernel/ATL_trmvLT.c
+ATL_ztrmvLN.o : $(mySRCdir)/kernel/ATL_trmvLN.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DDCPLX $(mySRCdir)/kernel/ATL_trmvLN.c
+ATL_ztrmvUT.o : $(mySRCdir)/kernel/ATL_trmvUT.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DDCPLX $(mySRCdir)/kernel/ATL_trmvUT.c
+ATL_ztrmvUN.o : $(mySRCdir)/kernel/ATL_trmvUN.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DDCPLX $(mySRCdir)/kernel/ATL_trmvUN.c
+ATL_ztrmvLNc.o : $(mySRCdir)/kernel/ATL_trmvLN.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DConj_ -DDCPLX \
+              $(mySRCdir)/kernel/ATL_trmvLN.c
+ATL_ztrmvLC.o : $(mySRCdir)/kernel/ATL_trmvLT.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DConj_ -DDCPLX \
+              $(mySRCdir)/kernel/ATL_trmvLT.c
+ATL_ztrmvUNc.o : $(mySRCdir)/kernel/ATL_trmvUN.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DConj_ -DDCPLX \
+              $(mySRCdir)/kernel/ATL_trmvUN.c
+ATL_ztrmvUC.o : $(mySRCdir)/kernel/ATL_trmvUT.c
+	$(ZKC) -o $@ -c $(zKCFLAGS) -DConj_ -DDCPLX \
+              $(mySRCdir)/kernel/ATL_trmvUT.c
+
+

@@ -37,7 +37,7 @@ namespace HeatBalanceIntRadExchange {
   extern int count;
   //  extern int MaxNumOfZoneSurfaces; // Max saved to get large enough space for user input view factors
   extern std::vector< size_t > LoadBalanceVector;
-  extern std::forward_list< EppPerformance::genPerTArray* > WriteVectors;
+  //  extern std::forward_list< EppPerformance::genPerTArray* > WriteVectors;
   extern std::vector<std::pair< std::vector< ReSurface >::iterator,
 			       std::vector< ReSurface >::iterator >> threadSurfIterators;
 
@@ -45,13 +45,13 @@ namespace HeatBalanceIntRadExchange {
 
 	// Functions
 
-	struct badLU : std::exception{
-		const char* what() const noexcept {return "LU Decomposition in CalcScriptF failed\n";}
-	};
+	// struct badLU : std::exception{
+	// 	const char* what() const noexcept {return "LU Decomposition in CalcScriptF failed\n";}
+	// };
 	 
-	struct noMoreMemCalcSF : std::exception{
-		const char* what() const noexcept {return "'new' failed in CalcScript\n";}
-	};
+	// struct noMoreMemCalcSF : std::exception{
+	// 	const char* what() const noexcept {return "'new' failed in CalcScript\n";}
+	// };
 
         inline 
 	std::vector< ReSurface >::iterator surfBegin(int tid, int ZoneToResimulate){
@@ -76,23 +76,29 @@ namespace HeatBalanceIntRadExchange {
         //load balancing semantics for them, so we will manage them from here and release from
         //our collection once InitInteriorRadExchange has been called
         template<typename T>
-        EppPerformance::perTArray< T >&
+        EppPerformance::perTArray< T >
 	GetHBREWriteVector( size_t size ){
 	  using namespace EppPerformance;
-	  perTArray< T > *retVal;
+	  //	  perTArray< T > *retVal;
 	  if(LoadBalanceVector.size() == Perf_Thread_Count){
-	    retVal =  new perTArray< T >( Perf_Thread_Count,   
-						      LoadBalanceVector );
-	    assert(size <= std::accumulate(LoadBalanceVector.begin(), LoadBalanceVector.end(), std::plus<size_t>()));
-				    
+	    perTArray< T > retVal( Perf_Thread_Count, LoadBalanceVector );
+	    assert(size <= std::accumulate(LoadBalanceVector.begin(), 
+					   LoadBalanceVector.end(), std::plus<size_t>()));
+	    //	    WriteVectors.push_front(&retVal);
+	    //	    return std::move(retVal);
+	    return retVal;
 	  }else{
-	    size_t cellSize = size / Perf_Thread_Count;
-	    if (cellSize * Perf_Thread_Count < size)
-	      cellSize = ( cellSize + 1 ) * Perf_Thread_Count / Perf_Thread_Count;
-	    retVal = new perTArray< T >(Perf_Thread_Count, cellSize);
+	    size_t cellSize = size / Perf_Thread_Count + (size % Perf_Thread_Count > 0 ? 1: 0);
+	    // size_t cellSize = size % Perf_Thread_Count == 0 ? size / Perf_Thread_Count :
+	    //   size / Perf_Thread_Count = 1;
+	    // if (cellSize * Perf_Thread_Count < size)
+	    //   cellSize = ( cellSize + 1 ) * Perf_Thread_Count / Perf_Thread_Count;
+	    perTArray< T > retVal (Perf_Thread_Count, cellSize);
+	    //	    WriteVectors.push_front(&retVal);
+	    //	    return std::move(retVal);
+	    return retVal;
 	  }
-	  WriteVectors.push_front(retVal);
-	  return dynamic_cast<perTArray< T >&>(*WriteVectors.front());
+	  // return dynamic_cast<perTArray< T >&>(*WriteVectors.front());
 	  //return WriteVectors.front();
 	}
 

@@ -1,0 +1,152 @@
+
+topd = /home/whaley/git/math-atlas/AtlasBase
+ext  = /home/whaley/git/math-atlas/STAB/xextract
+extF = $(ext) -langF -lnlen71 -Remtblank -llwarn2 -LAPACK1 $(incs)
+ext9 = $(ext) -langF -lnlen132 -RemtBlank $(incs)
+extC = $(ext) -langC -lnlen79 -Remtblank -llwarn2 $(incs)
+extM = $(ext) -langM -lnlen79 -llwarn2 $(incs)
+incs = -def topd /home/whaley/git/math-atlas/AtlasBase \
+       -def incd /home/whaley/git/math-atlas/AtlasBase/Clint \
+       -def ext  /home/whaley/git/math-atlas/STAB/xextract \
+       -def BASEdir /home/whaley/git/math-atlas/AtlasBase/Antoine/ \
+       -def basd /home/whaley/git/math-atlas/AtlasBase/Clint
+
+default: all
+force_build:
+basd = /home/whaley/git/math-atlas/AtlasBase/Clint
+basdRCW = /home/whaley/git/math-atlas/AtlasBase/Clint
+basdAPP = /home/whaley/git/math-atlas/AtlasBase/Antoine
+basdSTU = /home/whaley/git/math-atlas/AtlasBase/Students
+incf = /home/whaley/git/math-atlas/AtlasBase/gen.inc
+
+files = Make.C2Flp Make.Clp Make.Clptst Make.EXtst Make.Flp Make.Flptst \
+        Make.aux Make.bin Make.cblas Make.cblastst Make.dummy Make.f77blas \
+        Make.f77blastst Make.f77refblas Make.gpmm Make.l1ref Make.l1src \
+        Make.l1tune Make.l2 Make.l2aux Make.l2kern Make.l2ref Make.l2src \
+        Make.l2thr Make.l3 Make.l3aux Make.l3kern Make.l3ref Make.l3thr \
+        Make.l3tune Make.lathr Make.latune Make.lib Make.lpsrc Make.mmsrc \
+        Make.mmtune Make.mvsrc Make.mvtune Make.pkl3 Make.plinc Make.r1src \
+        Make.r1tune Make.res_chart Make.res_new Make.res_raw Make.res_tvec \
+        Make.sprk Make.sysinfo Make.thr Make.tstsrc Make.ttune atlas_trsmNB.h
+
+all : $(files)
+
+#
+# Clint's extractors
+#
+Make.res_raw : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.res_tvec : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.res_chart : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.res_new : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.plinc : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.EXtst : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.res : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.ttune : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.lathr : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.l2aux : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.thr : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.l2thr : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.l3thr : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.f77refblas : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.dummy : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.sprk : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.gpmm : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.pkl3 : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.lib : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.l2kern : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.Flptst : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.Clptst : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.Clp : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.lpsrc : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.f77blastst : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.cblastst : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.cblas : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.r1tune : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.mvtune : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.l3kern : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.latune : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.l3tune : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.l1tune : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.mmtune : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.sysinfo : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.bin : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.r1src : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.mvsrc : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.l2src : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.l1src : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.tstsrc : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.kbmm : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.mmsrc : $(basdRCW)/atlas-make.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-make.base -o $@ rout=$@
+Make.C2Flp : $(basdRCW)/atlas-c2flp.base
+	$(extM) -b $(basdRCW)/atlas-c2flp.base -o $@ rout=$@
+Make.Flp : $(basdRCW)/atlas-fint.base
+	$(extM) -b $(basdRCW)/atlas-fint.base -o $@ rout=$@
+Make.aux : $(basdRCW)/atlas-maux.base
+	$(extM) -b $(basdRCW)/atlas-maux.base -o $@ rout=$@
+atlas_trsmNB.h : $(basdRCW)/atlas-tlp.base $(incf)
+	$(extM) -b $(basdRCW)/atlas-tlp.base -o $@ rout=$@
+Make.goto : $(basdRCW)/atlas-umm.base
+	$(extM) -b $(basdRCW)/atlas-umm.base -o $@ rout=Makefile which=goto
+Make.ext : $(topd)/make.base
+	$(extM) -b $(topd)/make.base -o Make.ext rout=atlas/makes
+#
+# Antoine's extractors
+#
+Make.l3aux : $(basdAPP)/atlrc3blas.base $(incf)
+	$(extM) -b $(basdAPP)/atlrc3blas.base -o $@ rout=$@ type=none
+Make.l3 : $(basdAPP)/atllv3blas.base $(incf)
+	$(extM) -b $(basdAPP)/atllv3blas.base -o $@ rout=$@ type=none
+Make.l2 : $(basdAPP)/atllv2blas.base $(incf)
+	$(extM) -b $(basdAPP)/atllv2blas.base -o $@ rout=$@ type=none
+Make.l3ref : $(basdAPP)/atlrefblas.base $(incf)
+	$(extM) -b $(basdAPP)/atlrefblas.base -o $@ rout=$@ type=none
+Make.l2ref : $(basdAPP)/atlrefblas.base $(incf)
+	$(extM) -b $(basdAPP)/atlrefblas.base -o $@ rout=$@ type=none
+Make.l1ref : $(basdAPP)/atlrefblas.base $(incf)
+	$(extM) -b $(basdAPP)/atlrefblas.base -o $@ rout=$@ type=none
+Make.f77blas : $(basdAPP)/atlF77blas.base $(incf)
+	$(extM) -b $(basdAPP)/atlF77blas.base -o $@ rout=$@ type=none
+

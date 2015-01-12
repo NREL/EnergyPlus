@@ -1,0 +1,2 @@
+These are the exact F77 reference BLAS for which ATLAS provides a complete
+replacement.  They are used in ATLAS only for testing.

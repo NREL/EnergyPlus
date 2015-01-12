@@ -1,0 +1,90 @@
+<ID> <flag> <mb> <nb> <kb> <muladd> <lat> <mu> <nu> <ku> <rout> "<Contributer>"
+31
+306 192 4 3 8 0 4 4 3 8 ATL_mm4x3x8p.c     "R. Clint Whaley" \
+gcc
+-mcpu=ultrasparc -mtune=ultrasparc -fomit-frame-pointer -O -fno-schedule-insns -fno-schedule-insns2
+308 192 4 4 8 0 4 4 4 8 ATL_mm4x4x8p.c     "R. Clint Whaley" \
+gcc
+-O -fno-schedule-insns -fno-schedule-insns2 -fomit-frame-pointer
+309 192 4 4 -56 1 0 4 4 56 ATL_mm4x4x56_av.c  "R. Clint Whaley"
+310 192 4 4 8 1 0 4 4 8   ATL_mm4x4x8_av.c    "R. Clint Whaley"
+311 192 4 4 4 1 0 4 4 4   ATL_mm4x4x4_av.c    "R. Clint Whaley"
+312 496 4 4 2 1 0 4 4 2   ATL_mm4x4x4_av.c    "R. Clint Whaley"
+313   8 6 8 8 1 1 6 8 8 ATL_mm6x8x8_1p.c       "R. Clint Whaley" \
+gcc
+-fomit-frame-pointer -O2 -fno-schedule-insns -fno-schedule-insns2
+314 496 0 0 0 1 1 6 8 8 ATL_mm6x8x8_1p.c       "R. Clint Whaley" \
+gcc
+-fomit-frame-pointer -O2 -fno-schedule-insns -fno-schedule-insns2
+317 192 4 1 -40 0 4 2 1 40 ATL_dmm2x1x40_5pABC.c  "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp
+318 480 4 4 2 1 1 4 4 2    ATL_dmm4x4x2pf_av.c    "R. Clint Whaley" \
+/usr/bin/gcc
+-x assembler-with-cpp -maltivec -mabi=altivec
+319 128 6 0 1 0 1 6 1 30 ATL_dmm6x1x30_x87.c "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp
+320   8 120 120 120 1 1 8 8 2 ATL_mm8x8x2.c  "R. Clint Whaley" \
+gcc
+-fomit-frame-pointer -O2 -fno-schedule-insns -fno-schedule-insns2 -fno-expensive-optimizations -falign-loops=64
+321 480 8 8 2 1 1 8 8 2 ATL_mm8x8x2.c  "R. Clint Whaley" \
+gcc
+-fomit-frame-pointer -O2 -fno-schedule-insns -fno-schedule-insns2 -fno-expensive-optimizations -falign-loops=64
+322 448 4 4 8 1 1 4 4 8 ATL_dmm4x4x8_US.c "R. Clint Whaley" \
+gcc
+-mcpu=ultrasparc -x assembler-with-cpp
+323 8 -120 -120 -120 1 1 4 4 8 ATL_dmm4x4x16r8_US.c "R. Clint Whaley" \
+gcc
+-mcpu=ultrasparc -x assembler-with-cpp
+324 448 4 4 8 1 1 4 4 8 ATL_dmm4x4x2_US.c "R. Clint Whaley" \
+gcc
+-mcpu=ultrasparc -x assembler-with-cpp
+325 192 4 4 16 1 1 4 4 16 ATL_dmm4x4x16_hppa.c "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp
+326 192 4 4 1 1 16 4 4 32 ATL_dmm4x4x32_ppc.c "R. Clint Whaley" \
+gcc
+-mcpu=970 -x assembler-with-cpp
+327 224 4 0 1 0 1 4 1 60 ATL_dmm4x1x90_x87.c "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp
+328 224 8 0 2 0 1 4 1 2 ATL_dmm8x1x120_sse2.c "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp
+329   8 6 8 8 1 1 6 8 8 ATL_mm6x8x8_1p.c       "R. Clint Whaley" \
+gcc
+-fomit-frame-pointer -O2 -fno-tree-loop-optimize
+330 496 0 0 0 1 1 6 8 8 ATL_mm6x8x8_1p.c       "R. Clint Whaley" \
+gcc
+-fomit-frame-pointer -O2 -fno-tree-loop-optimize
+331   8 120 120 120 1 1 8 8 2 ATL_mm8x8x2.c  "R. Clint Whaley" \
+gcc
+-fomit-frame-pointer -O2 -fno-tree-loop-optimize
+332 480 8 8 2 1 1 8 8 2 ATL_mm8x8x2.c  "R. Clint Whaley" \
+gcc
+-fomit-frame-pointer -O2 -fno-tree-loop-optimize
+333 192 4 4 2 1 1 4 4 2 ATL_dmm4x4xUR2_mips.c  "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp -mips4
+334 480 4 4 2 1 1 4 4 2 ATL_dmm4x4x2_mips.c  "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp -mips4
+335 192 4 4 3 1 1 4 4 3 ATL_dmm4x4xUR3_mips.c  "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp -mips4
+336 192 4 4 1 1 1 4 4 1 ATL_dmm4x4xURx_mips.c  "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp -mips4
+337 192 4 4 1 1 16 4 4 1 ATL_dmm4x4x80_ppc.c "Whaley & Castaldo" \
+gcc
+-x assembler-with-cpp
+338 192 8 4 2 1 0 8 4 2  ATL_dmm8x4x2_vsx.c  "IBM" \
+gcc
+-O3 -mvsx
+339 448 4 4 2 1 1 4 4 2 ATL_dmm4x4x2pf_arm.c "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp -mfpu=vfpv3
+
+# NB = 80 and NB = 120 are to force UltraSparc to try NB > L1 Cache,
+# needed for optimal performance on Ultra2 and Ultra4, respectively

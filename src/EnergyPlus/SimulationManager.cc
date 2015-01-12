@@ -262,6 +262,20 @@ namespace SimulationManager {
 		// Formats
 		static gio::Fmt Format_700( "('Environment:WarmupDays,',I3)" );
 
+		//CreateSQLiteDatabase();
+		try {
+			EnergyPlus::sqlite = std::unique_ptr<SQLite>(new SQLite());
+		} catch(const std::runtime_error& error) {
+			// Maybe this could be higher in the call stack, and then handle all runtime exceptions this way.
+			ShowFatalError(error.what());
+		}
+
+		if ( sqlite->writeOutputToSQLite() ) {
+			sqlite->sqliteBegin();
+			sqlite->createSQLiteSimulationsRecord( 1 );
+			sqlite->sqliteCommit();
+		}
+
 		// FLOW:
 		PostIPProcessing();
 
@@ -378,7 +392,7 @@ namespace SimulationManager {
 
 		if ( sqlite->writeOutputToSQLite() ) {
 			sqlite->sqliteBegin();
-			sqlite->createSQLiteSimulationsRecord( 1 );
+			sqlite->updateSQLiteSimulationRecord( 1 );
 			sqlite->sqliteCommit();
 		}
 
@@ -430,7 +444,7 @@ namespace SimulationManager {
 				strip( DayOfSimChr );
 				if ( ! WarmupFlag ) {
 					++CurrentOverallSimDay;
-					DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays ); 
+					DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays );
 				} else {
 					DayOfSimChr = "0";
 				}
@@ -2349,14 +2363,6 @@ namespace SimulationManager {
 
 		DoingInputProcessing = false;
 
-		//CreateSQLiteDatabase();
-		try {
-			EnergyPlus::sqlite = std::unique_ptr<SQLite>(new SQLite());
-		} catch(const std::runtime_error& error) {
-			// Maybe this could be higher in the call stack, and then handle all runtime exceptions this way.
-			ShowFatalError(error.what());
-		}
-
 		PreProcessorCheck( PreP_Fatal ); // Check Preprocessor objects for warning, severe, etc errors.
 
 		CheckCachedIPErrors();
@@ -2779,7 +2785,7 @@ Resimulate(
 }
 
 //     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted

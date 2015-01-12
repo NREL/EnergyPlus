@@ -1,0 +1,110 @@
+include ../Make.inc
+mySRCdir = $(SRCdir)/results
+PLOT = ploticus
+RK=168
+sep=0.17
+#
+# Set this path to a 2nd ATLAS install you want to compare against
+#
+AT2dir=/home/whaley/TEST/ATLAS3.9.39.0/obj64/lib
+ext = $(BINdir)/xextract
+cmp=MKL
+
+$(ext) :
+	cd $(BINdir) ; make xextract
+
+xatl2tvec : $(mySRCdir)/atl2tvec.c
+	$(XCC) $(XCCFLAGS) -o $@ $(mySRCdir)/atl2tvec.c -lm
+xstattime : $(mySRCdir)/stattime.c
+	$(XCC) $(XCCFLAGS) -o $@ $(mySRCdir)/stattime.c -lm
+xperctvecs : $(mySRCdir)/perctvecs.c $(INCSdir)/atlas_tvec.h
+	$(XCC) $(XCCFLAGS) -o $@ $(mySRCdir)/perctvecs.c -lm
+xcattvecs : $(mySRCdir)/cattvecs.c $(INCSdir)/atlas_tvec.h
+	$(XCC) $(XCCFLAGS) -o $@ $(mySRCdir)/cattvecs.c -lm
+xtvec2plp : $(mySRCdir)/tvec2plp.c $(INCSdir)/atlas_tvec.h
+	$(XCC) $(XCCFLAGS) -o $@ $(mySRCdir)/tvec2plp.c -lm
+xreducetvec : $(mySRCdir)/reducetvec.c $(INCSdir)/atlas_tvec.h
+	$(XCC) $(XCCFLAGS) -o $@ $(mySRCdir)/reducetvec.c -lm
+xmergetvecs : $(mySRCdir)/mergetvecs.c $(INCSdir)/atlas_tvec.h
+	$(XCC) $(XCCFLAGS) -o $@ $(mySRCdir)/mergetvecs.c -lm
+eps2pdf :
+	epstopdf $fin $fout
+clx=1
+cl1=2
+cl2=3
+cl3=4
+cl4=5
+cl5=6
+cl6=7
+cl7=8
+cl8=9
+cl9=10
+#
+#MUST DEFINE: dataf, title, outf, nm1, nm2, ylab
+#
+plot2lines_perc:
+	$(PLOT) -prefab lines data=$(dataf) dilim=tab x=$(clx) y=$(cl1) \
+           y2=$(cl2) title="$(title)" name=$(nm1) name2=$(nm2) yinc=10 \
+           xlbl="Problem Order" ylbl="$(ylab)" xlbldistance=0.6 ygrid=yes \
+           legend="2.6 2.2" "yrange=0 100" legendfmt=across -eps -o $(outf)
+#
+#MUST DEFINE: dataf, title, outf, nm1, nm2, nm3, ylab
+#
+plot3lines_perc:
+	$(PLOT) -prefab lines data=$(dataf) dilim=tab x=$(clx) y=$(cl1) \
+           y2=$(cl2) y3=$(cl3) \
+           title="$(title)" name=$(nm1) name2=$(nm2) name3=$(nm3) yinc=10 \
+           xlbl="Problem Order" ylbl="$(ylab)" xlbldistance=0.6 ygrid=yes \
+           legend="2.4 2.2" "yrange=0 100" legendfmt=across -eps -o $(outf)
+#
+#MUST DEFINE: dataf, title, outf, nm1, nm2, nm3, nm4, ylab
+#
+plot4lines_perc:
+	$(PLOT) -prefab lines data=$(dataf) dilim=tab x=$(clx) y=$(cl1) \
+           y2=$(cl2) y3=$(cl3) y4=$(cl4) \
+           title="$(title)" name=$(nm1) name2=$(nm2) name3=$(nm3) name4=$(nm4) \
+           yinc=10 xlbl="Problem Order" ylbl="$(ylab)" xlbldistance=0.6 \
+           ygrid=yes legend="1.0 1.2" "yrange=0 100" legendfmt=across \
+           -eps -o $(outf)
+#
+#MUST DEFINE: dataf, title, outf, nm1, nm2, nm3, nm4
+#
+plot4lines:
+	$(PLOT) -prefab lines data=$(dataf) dilim=tab  x=$(clx) y=$(cl1) \
+           y2=$(cl2) y3=$(cl3) y4=$(cl4) \
+           title="$(title)" name=$(nm1) name2=$(nm2) name3=$(nm3) name4=$(nm4) \
+           xlbl="Problem Order" ylbl="MFLOPS" xlbldistance=0.6 ygrid=yes \
+           ylbldistance=0.6 legend="2.0 max" yrange=0 legendfmt=across \
+           -eps -o $(outf)
+#
+#MUST DEFINE: dataf, title, outf, nm1, nm2, nm3, nm4, nm5
+#
+plot5lines:
+	$(PLOT) -prefab lines data=$(dataf) dilim=tab x=$(clx) y=$(cl1) \
+           y2=$(cl2) y3=$(cl3) y4=$(cl4) y5=$(cl5) \
+           title="$(title)" name=$(nm1) name2=$(nm2) name3=$(nm3) \
+           name4=$(nm4) name5=$(nm5) \
+           xlbl="Problem Order" ylbl="MFLOPS" xlbldistance=0.6 ygrid=yes \
+           ylbldistance=0.6 legend="2.0 max" yrange=0 legendfmt=across \
+           -eps -o $(outf)
+#MUST DEFINE: dataf, title, outf, nm1, nm2
+#CAN DEFINED: sep
+plot2bars :
+	$(PLOT) -prefab vbars data=$(dataf) delim=tab x=$(clx) y=$(cl1) \
+           y2=3 barwidth=0.1 title="$(title)" name=$(nm1) name2=$(nm2) \
+           stubvert=yes ygrid=yes sep=$(sep) yrange=0 legframe=yes \
+           xlbl="Problem Order" ylbl="MFLOPS" legendfmt=across \
+           ylbldistance=0.6 xlbldistance=0.6 legend="2.7 max" \
+           -eps -o $(outf)
+force_build :
+#
+# General targets to change mflops to percentages of first column
+#
+pcmm4 : xperctvecs
+	./xperctvecs -i $(inf) -b MFLOP_avg -C 1 N -o $(outf) \
+           -R 4 MFLOP_avg_1 MFLOP_avg_2 MFLOP_avg_3 MFLOP_avg_4
+pcmm8 : xperctvecs
+	./xperctvecs -i $(inf) -b MFLOP_avg -C 1 N -o $(outf) \
+           -R 8 MFLOP_avg_1 MFLOP_avg_2 MFLOP_avg_3 MFLOP_avg_4 \
+                MFLOP_avg_5 MFLOP_avg_6 MFLOP_avg_7 MFLOP_avg_8 \
+	

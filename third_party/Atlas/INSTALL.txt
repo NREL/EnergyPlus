@@ -1,0 +1,349 @@
+This file is outdated and not very comprehensive.  ATLAS installation is
+covered in detail in ATLAS/doc/atlas_install.pdf.
+
+Before doing anything, scope the ATLAS errata file for known errors/problems:
+   http://math-atlas.sourceforge.net/errata.html
+and apply any bug fixes/workarounds you find there.
+
+Note that the documentation on the website will repeat most of this
+information, and will be much more current.  The docs in this tarfile
+are here mainly for convenience and for users not connected to the net.
+Others should scope the website for the most current documentation:
+   http://math-atlas.sourceforge.net/faq.html#doc
+
+If you are a Windows user please read ATLAS/doc/Windows.txt before proceeding.
+
+There are two mandatory steps to ATLAS installation (config & build), as
+well as three optional steps (test, time, install) and these steps are
+described in detail below.  For the impatient, here is the basic outline:
+**************************************************
+   mkdir my_build_dir ; cd my_build_dir
+   /path/to/ATLAS/configure [flags]
+   make              ! tune and compile library
+   make check        ! perform sanity tests
+   make ptcheck      ! checks of threaded code for multiprocessor systems
+   make time         ! provide performance summary as % of clock rate
+   make install      ! Copy library and include files to other directories
+**************************************************
+
+If you want to build a dynamic/shared library, see below at header:
+                       BUILDING DYNAMIC/SHARED LIBRARIES
+If you want to build a full LAPACK library (i.e. all of the lapack library,
+including those lapack routines not natively provided by ATLAS), see:
+                   NOTE ON BUILDING A FULL LAPACK LIBRARY
+
+********** Important Install Information: CPU THROTTLING ***********
+Most OSes (including Linux) now turn on CPU throttling for power management
+**even if you are using a desktop**.  CPU throttling makes pretty much all
+timings completely random, and so any ATLAS install will be junk.  Therefore,
+before installing ATLAS, turn off CPU throttling.  For most PCs, you can
+switch it off in the BIOS (eg., on my Athlon-64 machine, I can say "No" to
+"Cool and Quiet" under "Power Management").  Most OSes also provide a way
+to do switch off CPU throttling, but that varies from OS to OS.  Under Fedora,
+at any rate, the following command seemed to work:
+     /usr/bin/cpufreq-selector -g performance
+On my Core2Duo, cpufreq-selector only changes the parameters of the first CPU,
+regardless if which cpu you specify.  I suspect this is a bug, because on
+earlier systems, the remaining CPUs were controlled via a logical link to
+/sys/devices/system/cpu/cpu0/.  In this case, the only way I found to force
+the second processor to also run at its peak frequency was to issue the
+following as root after setting CPU0 to performance:
+   cp /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor \
+      /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
+
+For non-broken systems, you instead issue the above command with -c <#> appended
+to change the performance of each core in turn.  For example, to speedup both
+processors of a dual system you would issue:
+     /usr/bin/cpufreq-selector -g performance -c 0
+     /usr/bin/cpufreq-selector -g performance -c 1
+
+On Kubuntu, I had problems with this not working because scaling_max_freq
+was set to the minimal speed.  To fix, I had to first increase the max scaling
+frequency, which you can do (as root) by (where <#> below is replaced by each processor
+number eg., 0 and 1 for dual processor system):
+   cd /sys/devices/system/cpu/cpu<#>/cpufreq
+   cp cpuinfo_max_freq scaling_max_freq
+
+In Kubuntu 9.10, the only fix I found was to issue:
+   sudo echo "performance" > \
+        /sys/devices/system/cpu/cpuX/cpufreq/scaling_governor
+Where 'X' is replaced by each of your cpu numbers in turn (eg., if you have
+a quad processor, you would issue this command four times, using X=[0,1,2,3]).
+
+Under MacOS or Windows, you may be able to change this under the power settings.
+I have reports that issuing "powercfg /q" in cmd.exe under windows will tell
+you whether windows is throttling or not.
+
+ATLAS config tries to detect if CPU throttling is enabled, but it may not
+always detect it, and sometimes may detect it after you have disabled it.
+In the latter case, to force the configure to continue regardless of the
+results of the CPU throttling probe, pass this flag to configure:
+   -Si cputhrchk 0
+
+********************************** CONFIG *************************************
+First, create a directory where you will build ATLAS.  It can be anywhere in
+your filesystem, and does not need to be under the ATLAS/ subdirectory
+(though it can be if you like).  In general, giving it a descriptive name
+is good, for instance:
+   mkdir ATLAS_Linux_P4E ; cd ATLAS_Linux_P4E
+
+From this directory, configure the new directory to build atlas with the
+command:
+   /path/to/ATLAS/configure [flags]
+Obviously, "/path/to/ATLAS" is the full or relative path from where you are
+to the directory created by the ATLAS tarfile.  To see a list of available
+flags to configure type "path/to/ATLAS/configure --help".  In general, no
+flags are required, but there are many useful flags for helping with various
+problems, in particular changing compilers, setting 32 or 64 bit libraries,
+etc.  To ensure building 32 bit libraries, add the flag -b 32, and -b 64
+to force 64 bit libraries (must be using a 64 bit-capable compiler on a
+64-bit Operating System).
+
+If the machine you are using is not heavily loaded, then you can vastly
+improve the accuracy of ATLAS's timings by using the wall timer rather
+than the CPU timer.  If you are on a x86, you can get cycle accurate timings
+by throwing the flag:
+   -D c -DPentiumCPS=<your Mhz>
+
+So, for my 2.4Ghz machine, I would specify:
+   -D c -DPentiumCPS=2400
+
+Under Linux, you can find a decent estimate of your clock rate by
+   cat /proc/cpuinfo
+
+If you can't use the cycle-accurate wall timer, the normal WALL timer
+is still much more accurate than the CPU timer, and you can use it by
+adding this to configure:
+   -D c -DWALL
+
+************ Important Compiler Advice **************
+For most systems, ATLAS defaults to using the Gnu compiler collection for
+its ATLAS install.  This means configure will automatically search for
+either g77/gcc or gfortran/gcc.  If it can't find them, it will typically
+stop with an error message.  For some platforms, ATLAS knows good flags
+to use for multiple compilers, and so you may get good flags by simply
+changing the compiler name.  If this doesn't work, you'll need to specify
+both the compiler name and the flags to use.  For the fortran compiler,
+you can switch the fortran compiler without performance or install penalty
+on all platforms.  To do so, simply add the flags:
+  -C if <fortran compiler with path> -F if 'fortran flags'
+to the configure command.  If you need to install ATLAS on a platform that
+doesn't have a working fortran compiler, you can do so by adding the flag:
+   --nof77
+instead.  Note that the fortran interface to BLAS and LAPACK cannot be built
+without a fortran compiler.
+
+Note that all compilers used in an ATLAS install must be able to interoperate.
+For more compiler-controlling flags, add --help to the configure command.
+
+*********** Important CLANG Compiler Advice ***********
+I have never succesfully built ATLAS with clang.  Clang produces the wrong
+answer on many kernels, and poorer performance than gcc on every kernel
+I've timed.  I strongly recommend GNU gcc over Clang/LLVM.
+
+********************************** BUILD **************************************
+If config finishes without error, start the build/tuning process by:
+   make build
+(or just "make")
+
+Install times vary widely, depending on whether ATLAS has architectural
+defaults for your platform, and the speed of your compiler and computer.
+Under gcc/linux, an install may take as little as 15 minutes for all four
+types/precisions.  On a slow machine lacking architectural defaults, it
+However, the user is not required to enter any input during
+the build phase, and all operations are logged, so it is safe to start the
+install and ignore it until completion.
+
+If you experience problems, read the TROUBLESHOOTING section in
+ATLAS/doc/TroubleShoot.txt.  ATLAS/README provides an index of all
+included ATLAS documentation files.
+
+You should then read ATLAS/doc/TestTime.txt for instructions on testing
+and timing your installation.
+
+******************************* SANITY TEST ***********************************
+This optional step merely verifies that the built ATLAS libraries are able
+to pass basic correctness tests.  The standard BLAS testers (i.e. those
+that go with the API, as opposed to those written by the ATLAS group) are
+written in Fortran77, and so you will need a Fortran compiler installed to
+run them.  If you have no Fortran77, you can amend the directions below by
+prepending "C_" to all target names (eg., "make C_test") to run only those
+testers that require a C compiler, but note that in so doing you will get
+a less rigorously tested library.
+
+you can run all the sequential sanity tests by:
+   make check
+
+If you have elected to build the threaded library, you can run the same tests
+with the threaded library with:
+   make ptcheck
+
+A successful sanity test will dump a lot of compilation to the window, followed
+with something like:
+
+===========================================================================
+DONE BUILDING TESTERS, RUNNING:
+SCOPING FOR FAILURES IN BIN TESTS:
+fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+        bin/Linux_PIIISSE1/sanity.out
+8 cases: 8 passed, 0 skipped, 0 failed
+4 cases: 4 passed, 0 skipped, 0 failed
+8 cases: 8 passed, 0 skipped, 0 failed
+4 cases: 4 passed, 0 skipped, 0 failed
+8 cases: 8 passed, 0 skipped, 0 failed
+4 cases: 4 passed, 0 skipped, 0 failed
+8 cases: 8 passed, 0 skipped, 0 failed
+4 cases: 4 passed, 0 skipped, 0 failed
+DONE
+SCOPING FOR FAILURES IN CBLAS TESTS:
+fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+        interfaces/blas/C/testing/Linux_PIIISSE1/sanity.out | \
+                fgrep -v PASSED
+make[1]: [sanity_test] Error 1 (ignored)
+DONE
+SCOPING FOR FAILURES IN F77BLAS TESTS:
+fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+        interfaces/blas/F77/testing/Linux_PIIISSE1/sanity.out | \
+                fgrep -v PASSED
+make[1]: [sanity_test] Error 1 (ignored)
+DONE
+make[1]: Leaving directory `/home/rwhaley/TEST/TEST/ATLAS3.3.15'
+===========================================================================
+
+Note that the "Error 1 (ignored)" is coming from grepping for failure, and
+grep is saying it doesn't find any . . .
+
+Assuming you have a fortran compiler, you can also run the full ATLAS
+testing scripts, which may take over a day to run.  If you have
+installed a full LAPACK library, you can also run the standard LAPACK
+testers.  Please see "EXTENDED ATLAS TESTING" below for more information.
+
+******************* INSTALLING ATLAS FOR MULTIPLE ARCHITECTURES ***************
+You can install ATLAS from the same source tree on multiple machines at once
+by simply creating different build directories for each architecture.
+
+********************** BUILDING DYNAMIC/SHARED LIBRARIES **********************
+ATLAS natively builds to a static library (i.e. libs that usually end in
+".a" under unix and ".lib" under windows).  ATLAS always builds such a library,
+but it can also optionally be requested to build a dynamic/shared library
+(typically ending in .so for unix or .dll windows and .dylib for OS X).
+To do this for GNU compilers, you typically just need to add
+   --shared
+flag to your configure line.
+If you use non-gnu compilers, you'll need to use -Fa to
+pass the correct flag(s) to append to force position independent code for
+each compiler (don't forget the gcc compiler used in the index files).
+NOTE: Since gcc uses one less int register when compiling with this flag, this
+      could potentially impact performance of the architectural defaults,
+      but we have not seen it so far.
+
+****************** NOTE ON BUILDING A FULL LAPACK LIBRARY *********************
+To build lapack, first download the lapack tarfile from
+   www.netlib.org/lapack
+Then, pass the flag to configure:
+   --with-netlib-lapack-tarfile=/path/to/downloaded/tarfile
+
+***************************** EXTENDED ATLAS TESTING **************************
+ATLAS has two extended testers beyond the sanity checks that can be
+automatically invoked from the BLDdir.  These tests are longer running and
+more complex to interpret than the sanity tests, and so not every user will
+want to run them.  They are particularly recommended for installers who wish
+to use a developer release for production code.
+
+--------------------------------- full_test -----------------------------------
+The first is a set of testing scripts written by Antoine Petitet, that
+randomly generate testcases for a host of ATLAS's testers.  This testing
+phase may take as long as two days to complete (and almost always takes
+at least 4 hours).  To perform this long-running test, simply issue:
+   make full_test
+If you are logged into the host machine remotely, chances are good your
+connection will go down before the install completes.  Therefore, you
+should consider running the above command with nohup.
+
+At the completion of the tests, the extensive output files will be searched
+for errors (much as with the sanity tests), and the output sent to the screen.
+If you have lost this screen of data, you can regenerate it with the command:
+   make scope_full_test
+
+Running these tests will create a directory BLDdir/bin/AtlasTest where the
+tester resides, and your output files will be stored a $(ARCH) subdir.
+If you want to rerun the testers from scratch (rather than just searching
+old output), you can simply delete the entire BLDdir/bin/AtlasTest
+directory tree, and do "make full_test" again.
+
+----------------------------- lapack_test -------------------------------------
+If you have installed the full LAPACK library, then you can run the standard
+lapack testers as well.  The command you give is:
+   make lapack_test_[a,s,f]l_[ab,sb,fb,pt]
+The first choice (choose one of three) controls which LAPACK library macro is
+used in the link for testing:
+
+   _l    LINK FOR LAPACK       Make.inc MACRO
+   ==    ===================   ==============
+   a     ATLAS's LAPACK        $(LAPACKlib)
+   s     system LAPACK         $(SLAPACKlib)
+   f     F77 reference LAPACK  $(FLAPACKlib)
+
+The second choice (choose one of three) controls which BLAS macros are
+used in the link for testing:
+  _b/pt  LINK FOR BLAS           Make.inc MACRO
+  ====   =====================   =========================================
+  ab     ATLAS BLAS              $(F77BLASlib) $(CBLASlib) $(ATLASlib)
+  sb     system BLAS             $(BLASlib)
+  fb     F77 reference BLAS      $(FBLASlib)
+  pt     ATLAS' threaded BLAS    $(PTF77BLASlib) $(PTCBLASlib) $(ATLASlib)
+
+Not all of these combinations will work without user modification of Make.inc.
+You will need to fill in values for
+   $(BLASlib)
+   $(SLAPACKlib)
+   $(FLAPACKlib)
+if you want to run the lapack tester against these libraries.
+
+Usually, you will want to test your newly install ATLAS LAPACK & BLAS:
+   make lapack_test_al_ab
+
+As before, once the testing is complete, you will get the output of a search
+for errors though all output files, and you can search them again with:
+   make scope_lapack_test_al_ab
+
+Unfortunately, the lapack testers always show errors on almost all platforms.
+So, how do you know if you have a real error?  Real errors will usually
+have residuals in the 10^6 range, rather than O(1) (smaller residuals mean
+less error).  If you are unsure, the best way is to contrast ATLAS with an
+all-F77 install:
+   make lapack_test_fl_fb
+(To run this test, you will have to build a stock netlib LAPACK library,
+and fill out Make.inc's FLAPACKlib macro appropriately.)  You can then see
+how the errors reported by ATLAS stack up against the all-F77 version:
+if they  are roughly the same, then you are usually OK.
+
+All the lapack testers create a directory BLDdir/bin/LAPACK_TEST.  For
+each test you run there will be a subdirectory
+   LAOUT_[A,S,F]L_[AB,SB,FB,PT]
+where all your output files will be located.  Additionally, the results
+of the scope (search for error) will be stored in
+   BLDdir/bin/LAPACK_TEST/SUMMARY_<lapack>_<blas>
+
+Therefore, a typical round of testing might be:
+   make lapack_test_al_ab
+   make lapack_test_fl_fb
+   # compare SUMMARY_al_ab with SUMMARY_fl_fb to check for error
+   make lapack_test_al_pt
+   # compare SUMMARY_al_pt with SUMMARY_fl_fb to check for error in parallel lib
+
+If you had an error, you might want to be sure the error was in ATLAS's BLAS
+and not lapack, so you could do "make lapack_test_fl_ab", and see if the
+error went away.  If you filled in the GotoBLAS for the SLAPACKlib & BLASlib
+macros, you could scope the error properties of Goto's BLAS and LAPACK.
+Many system/vendor LAPACK/BLAS do not provide all of the routines required
+to run the LAPACK testers, and some ATLAS testers call ATLAS internal
+routines.  Therefore, the safest thing if you have missing symbol errors
+when building system/vendor tests, is to use ATLAS to pick up any missing
+symbols.  For instance, here is an example Make.inc output that makes all of
+ATLAS testers work with the GotoBLAS on my Athlon-64 workstation:
+   BLASlib = /opt/lib/libgoto_opteronp-r1.26.a \
+             $(F77BLASlib) $(CBLASlib) $(ATLASlib)
+   SLAPACKlib = /opt/lib/libgoto_opteronp-r1.26.a $(FLAPACKlib)
+
+

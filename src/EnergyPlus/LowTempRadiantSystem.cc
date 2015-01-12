@@ -1887,6 +1887,7 @@ namespace LowTempRadiantSystem {
 		//       DATE WRITTEN   February 2002
 		//       MODIFIED       August 2013 Daeho Kang, add component sizing table entries
 		//                      August 2014 Bereket Nigusse, added scalable sizing
+		//                      March 2014 Daeho Kang, add constant flow system autosizing
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1920,6 +1921,10 @@ namespace LowTempRadiantSystem {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeLowTempRadiantSystem" );
+		static int const OFF = 0;
+		static int const ClgHtg = 1;
+		static int const ClgOnly = 2;
+		static int const HtgOnly = 3;
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1952,7 +1957,12 @@ namespace LowTempRadiantSystem {
 		int SizingMethod; // Integer representation of sizing method name (e.g. CoolingCapacitySizing, HeatingCapacitySizing)
 		bool PrintFlag; // TRUE when sizing information is reported in the eio file
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
-		Real64 DesCoilLoad; // design autosized or user specified capacity   
+		Real64 DesCoilLoad; // design autosized or user specified capacity
+		int OpMode;				// System operating mode
+		int HeatNode;			// Hot water inlet node to determine system operating mode
+		int CoolNode;			// Chilled water inlet node to determine system operating mode
+		Real64 WaterVolFlowMaxDes;		// Design water volume flow rate for reproting
+		Real64 WaterVolFlowMaxUser;		// User hard-sized water volume flow rate for reproting
 
 		ErrorsFound = false;
 		IsAutoSize = false;
@@ -1965,6 +1975,7 @@ namespace LowTempRadiantSystem {
 		TubeLengthDes = 0.0;
 		TubeLengthUser = 0.0;
 		DataScalableCapSizingON = false;
+		OpMode = 1;
 
 		if ( SystemType == ElectricSystem ) {
 
@@ -2247,6 +2258,154 @@ namespace LowTempRadiantSystem {
 		}
 
 		if ( SystemType == ConstantFlowSystem ) {
+			// Check which operating system it is
+			HeatNode = CFloRadSys( RadSysNum ).HotWaterInNode;
+			CoolNode = CFloRadSys( RadSysNum ).ColdWaterInNode;
+			if ( HeatNode > 0 && CoolNode > 0 ) {
+				OpMode = ClgHtg;
+			} else if ( HeatNode > 0 && CoolNode <= 0 ) {
+				OpMode = HtgOnly;
+			} else if ( CoolNode > 0 && HeatNode <= 0 ) {
+				OpMode = ClgOnly;
+			} else {
+				OpMode = OFF; // It shouldn't happen here
+			}
+
+			if ( CFloRadSys( RadSysNum ).WaterVolFlowMax == AutoSize ) {
+				IsAutoSize = true;
+			}
+
+			if ( CurZoneEqNum > 0 ) {
+				if ( !IsAutoSize && !ZoneSizingRunDone ) { // simulation continue
+					if ( CFloRadSys( RadSysNum ).WaterVolFlowMax > 0.0 ) {
+						ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name, 
+							"User-Specified Maximum Water Flow [m3/s]", CFloRadSys( RadSysNum ).WaterVolFlowMax );
+					}
+				} else { // Autosize or hard-size with sizing run
+					CheckZoneSizing( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name );
+					// Estimate hot water and chilled water flows
+					// Index only if it provides heating to avoid severe error 
+					if ( OpMode == ClgHtg || OpMode == HtgOnly ) {
+						PltSizHeatNum = MyPlantSizingIndex( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name,
+											CFloRadSys( RadSysNum ).HotWaterInNode, CFloRadSys( RadSysNum ).HotWaterOutNode, ErrorsFound );
+					}
+					if ( PltSizHeatNum > 0 ) {
+						if ( ( CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor ) >= SmallLoad ) {
+							rho = GetDensityGlycol( PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidName,
+								60.0, PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidIndex, "SizeLowTempRadiantSystem" );
+							Cp = GetSpecificHeatGlycol( PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidName, 
+								60.0, PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidIndex, "SizeLowTempRadiantSystem" );
+							WaterVolFlowMaxHeatDes = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatAirDesMethod  / 
+                                                        ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
+						} else {
+							WaterVolFlowMaxHeatDes = 0.0;
+						}
+					} else {
+						if ( OpMode == ClgHtg || OpMode == HtgOnly ) {
+							ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
+							ShowContinueError( "Occurs in ZoneHVAC:LowTemperatureRadiant:ConstantFlow \nObject=" + CFloRadSys( RadSysNum ).Name );
+							ErrorsFound = true;
+						}
+					}
+
+					// Index only if it provides cooling system to avoid severe error 
+					if ( OpMode == ClgHtg || OpMode == ClgOnly ) {
+						PltSizCoolNum = MyPlantSizingIndex( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name,
+							CFloRadSys( RadSysNum ).ColdWaterInNode, CFloRadSys( RadSysNum ).ColdWaterOutNode, ErrorsFound );
+					}
+					if ( PltSizCoolNum > 0 ) {
+						if ( ( CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor ) >= SmallLoad ) {
+							rho = GetDensityGlycol( PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidName, 5.0, 
+                             PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidIndex, "SizeLowTempRadiantSystem" );
+							Cp  = GetSpecificHeatGlycol( PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidName, 5.0, 
+								PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidIndex, "SizeLowTempRadiantSystem" );
+							WaterVolFlowMaxCoolDes = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor / 
+								( PlantSizData(PltSizCoolNum).DeltaT * Cp * rho );
+						} else {
+							WaterVolFlowMaxCoolDes = 0.0;
+						}
+					} else {
+						if ( OpMode == ClgHtg || OpMode == ClgOnly ) {
+							ShowSevereError( "Autosizing of water flow requires a cooling loop Sizing:Plant object" );
+							ShowContinueError( "Occurs in ZoneHVAC:LowTemperatureRadiant:ConstantFlow \n Object=" + CFloRadSys( RadSysNum ).Name );
+							ErrorsFound = true;
+						}
+					}
+					
+					// Determine maximum water flow rate depending upon system type
+					if ( OpMode == ClgHtg ) {
+						WaterVolFlowMaxDes = std::max( WaterVolFlowMaxHeatDes, WaterVolFlowMaxCoolDes );
+					} else if ( OpMode == ClgOnly ) {
+						WaterVolFlowMaxDes = WaterVolFlowMaxCoolDes;
+					} else if ( OpMode == HtgOnly ) {
+						WaterVolFlowMaxDes = WaterVolFlowMaxHeatDes   ;
+					} else {
+						WaterVolFlowMaxDes = 0.0;
+					}
+
+					if ( IsAutoSize ) {
+						CFloRadSys( RadSysNum ).WaterVolFlowMax = WaterVolFlowMaxDes;
+						ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name,
+							"Design Size Maximum Water Flow [m3/s]", WaterVolFlowMaxDes );
+					} else { // hard-size with sizing data
+						if ( CFloRadSys( RadSysNum ).WaterVolFlowMax > 0.0 && WaterVolFlowMaxDes > 0.0 ) {
+							WaterVolFlowMaxUser = CFloRadSys( RadSysNum ).WaterVolFlowMax;
+							ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name,
+								"Design Size Maximum Water Flow [m3/s]", WaterVolFlowMaxDes, "User-Specified Maximum Water Flow [m3/s]", WaterVolFlowMaxUser );
+							if ( DisplayExtraWarnings ) {
+								if ( ( std::abs( WaterVolFlowMaxDes - WaterVolFlowMaxUser ) / WaterVolFlowMaxUser ) > AutoVsHardSizingThreshold ) {
+									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for \nZoneHVAC:LowTemperatureRadiant:Constant = \" " + 
+										CFloRadSys( RadSysNum ).Name + "\"." );
+									ShowContinueError( "User-Specified Maximum Water Flow of " + RoundSigDigits( WaterVolFlowMaxUser, 5 ) + " [m3/s]" );
+									ShowContinueError( "differs from Design Size Maximum Water Flow of " + RoundSigDigits(WaterVolFlowMaxDes, 5 ) + " [m3/s]" );
+									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+								}
+							}
+						}
+					}
+				}
+			}
+
+			IsAutoSize = false;
+			if ( CFloRadSys( RadSysNum ).TubeLength == AutoSize ) {
+				IsAutoSize = true;
+			}
+
+			if ( CurZoneEqNum > 0 ) {
+				if ( !IsAutoSize && !ZoneSizingRunDone ) { // simulation continue
+					if ( CFloRadSys( RadSysNum ).TubeLength > 0.0 ) {
+						ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name,
+							"User-Specified Hydronic Tubing Length [m]", CFloRadSys( RadSysNum ).TubeLength );
+					}
+				} else {	// Autosize or hard-size with sizing run
+					// assume tube spacing of 15 cm
+					CheckZoneSizing( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name );
+					TubeLengthDes = CFloRadSys( RadSysNum ).TotalSurfaceArea / 0.15;
+					if (IsAutoSize ) {
+						CFloRadSys( RadSysNum ).TubeLength = TubeLengthDes;
+						ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name,
+							"Design Size Hydronic Tubing Length [m]", TubeLengthDes );
+					} else { // hard-size with sizing data
+						if ( CFloRadSys( RadSysNum ).TubeLength > 0.0 && TubeLengthDes > 0.0 ) {
+							TubeLengthUser = CFloRadSys( RadSysNum ).TubeLength;
+							ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name,
+								"Design Size Hydronic Tubing Length [m]", TubeLengthDes, 
+								"User-Specified Hydronic Tubing Length [m]", TubeLengthUser );
+							if ( DisplayExtraWarnings ) {
+								if ( ( std::abs( TubeLengthDes - TubeLengthUser ) / TubeLengthUser ) > AutoVsHardSizingThreshold ) {
+									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for \nZoneHVAC:LowTemperatureRadiant:Constant = \" " + CFloRadSys( RadSysNum ).Name + "\"." );
+									ShowContinueError( "User-Specified Hydronic Tubing Length of " + RoundSigDigits( TubeLengthUser, 5 ) + " [m]" );
+									ShowContinueError( "differs from Design Size Hydronic Tubing Length of " + RoundSigDigits( TubeLengthDes, 5 ) + " [m]" );
+									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+								}
+							}
+						}
+					}
+				}
+			}
+ 
 			for ( SurfNum = 1; SurfNum <= CFloRadSys( RadSysNum ).NumOfSurfaces; ++SurfNum ) {
 				if ( CFloRadSys( RadSysNum ).NumCircCalcMethod == CalculateFromLength ) {
 					CFloRadSys( RadSysNum ).NumCircuits( SurfNum ) = ( CFloRadSys( RadSysNum ).SurfaceFlowFrac( SurfNum ) * CFloRadSys( RadSysNum ).TubeLength ) / CFloRadSys( RadSysNum ).CircLength;

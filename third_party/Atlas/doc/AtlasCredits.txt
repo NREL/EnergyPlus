@@ -1,0 +1,174 @@
+********************************* ATLAS TEAM **********************************
+ATLAS is currently developed and maintained by R. Clint Whaley at the
+University of Texas at San Antonio.  Several UTSA students/staff have made
+strong contributions, including Tony Castaldo and Siju Samuel.  The
+present ATLAS team is:
+   Clint Whaley, PI
+   Tony Castaldo, Research Professor
+   Md. Rakib Hasan, PhD candidate: parallel algorithms
+   Md. Majedul Haque Sujon, PhD candidate: iterative compilation
+
+ATLAS was originally developed at the Innovative Computing Laboratory (ICL),
+at the University of Tennessee, though no team members remain there now.
+The original ATLAS team was:
+
+                                Antoine Petitet
+                              petitet@cs.utk.edu
+       ** Recursive Level 3 BLAS
+       ** Codeveloped Level 2 gemv- & ger-based BLAS
+       ** Codeveloped ATLAS level 2 blas tester
+       ** Reference BLAS
+       ** BLAS F77 interface
+       ** Developed original pthreads implementation
+       ** Level 2 packed and banded gemv- and ger-based BLAS
+       ** Level 1 BLAS tester/timer
+
+                                R. Clint Whaley
+                              whaley@cs.utsa.edu
+       ** General ATLAS design
+       ** config, install & tuning routines
+       ** Matrix multiply
+       ** Code generators for real & complex matrix multiply
+       ** Kernel routines used in the recursive Level 3 BLAS
+       ** Codeveloped Level 2 gemv- & ger-based BLAS
+       ** Codeveloped ATLAS level 2 blas tester
+       ** GEMV & GER and associated files
+       ** C interface to BLAS
+       ** Recursive LU, Cholesky, xLAUUM and xGETRI routines and testers
+       ** LAPACK interfaces
+       ** ATLAS Level 1 BLAS routines
+       ** Tools and docs necessary to allow user contribution of all kernels
+       ** Quite a few GEMV, GER, and GEMM kernels
+       ** New threading infrastructure (as of 3.9.5)
+       ** Help with new QR design and some coding, some help with qr tester,
+          and wrote the C/F77 interface files for all QR variants (see
+          Siju Samuel for more details on QR)
+       -> Pretty much anything not attributed to someone else :)
+
+During the original development at UTK, Jeff and Peter also helped out:
+
+                                  Jeff Horner
+                              jhorner@cs.utk.edu
+       ** Level 3 BLAS tester/timer
+       ** Beta versions of
+          ** Non-generated complex matrix multiply code
+          ** C interface to the Level 3 BLAS
+
+                              Peter Soendergaard
+                              soender@cs.utk.edu
+       ** Recursive xTRTRI and tester
+
+
+ATLAS has been modified to allow for outside contribution, and the
+following people have contributed to ATLAS (alphabetic order):
+
+                                 Doug Aberdeen
+       ** Work on emmerald (an SSE-enabled SGEMM) was the starting point
+          for a lot of the people doing SSE-enabled kernels.
+
+                                 Matthew Brett
+       ** Help with getting ATLAS to build dynamic libraries.
+       ** Lots of help in switching from CVS/sourceforge to git/github
+       ** Provided basis for ATLAS/git documentation by creating
+          first version gitwash subdir now in AtlasBase/TexDoc/gitwash
+
+                                 Tony Castaldo (2008, 2009, 2012)
+       ** UTSA student and research professor.
+       ** Figured out PowerPC970 required issuing 4 inst of same type in a row,
+          and intermixing of M-loop iterations for full performance.
+       ** Discovered the importance of master-last, leading to full threading
+          rewrite.
+       ** Did main prototyping and helped with design of the of ATLAS
+          QR variants.  See Siju Samuel entry for more details.
+       ** Main developer of PCA QR panel factorization prototype code
+
+                                 Nicholas Coult
+       ** Initial version of AltiVec enabled SGEMM.
+
+                                 Markus Dittrich
+       ** Provided the trick needed to get configure to pass multiple words
+          as a single flag in configure.
+
+                                 Saurabh Garg
+       ** Help with building MSVC++ compatible shared libraries.  See:
+          https://sf.net/projects/math-atlas/forums/forum/1026734/topic/5349864
+
+                                 Dean Gaudet
+       ** CPUID for config (see ATLAS/CONFIG/archinfo_x86.c), Efficeon tuning
+          information, and many informative atlas-devel discussions.
+
+                                 Kazushige Goto
+       ** Assembly language GEMM for Compaq/DEC ev5x and ev6 machines. See
+          ATLAS/src/blas/gemm/GOTO for details.  Code no longer in ATLAS
+          v > 3.7.12, as we have dropped support for alphas.
+
+                                 Md. Rakib Hasan
+       ** UTSA student.  Wrote ARM NEON kernels for GER2K.
+          See ATLAS/tune/blas/gemv/MVTCASES/ATL_sger2K_NEON*.S for details.
+
+                                 Camm Maguire
+       ** SSE enabled [S,D,C,Z]GEMM, [S,D,C,Z]GEMV and [S,D,C,Z]GER kernels,
+          see ATLAS/tune/blas/gemm/CASES, ATLAS/tune/blas/gemv/CASES
+          and ATLAS/tune/blas/ger/CASES for details.
+
+                                 Ryan Moon (2009)
+       ** Wrote the first version of the OpenMP Level 3 threaded BLAS
+          based on the new threading framework while an undergrad at UTSA.
+          See ATLAS/src/threads/blas/level3/omp for details.
+
+
+                             Tim Mattox and Hank Dietz
+       ** Extremely efficient 3DNow! kernel for Athlon, see
+          ATLAS/tune/blas/gemm/CASES/ATL_smm_3dnow_90.c for details.
+
+                       Viet Nguyen and Peter Strazdins
+       ** UltraSparc-optimized [D,Z]GEMM kernels, see
+          ATLAS/tune/blas/gemm/CASES for details.
+
+                           Pearu Peterson
+       ** A lot of 3.6 stable testing.
+       ** Initial work on building ATLAS to dynamic libraries.
+
+                              Julian Ruhe
+       ** Excellent Athlon-optimized assembly kernels, see
+          ATLAS/tune/blas/gemm/CASES/objs/ for details.
+
+                              Siju Samuel (2009)
+       ** UTSA student.  Took prototype QR factorization written by Tony
+          Castaldo (mostly based on the Elmroth & Gustavson recursive QR, see
+          www.cs.utsa.edu/~whaley/papers/ppopp143-castaldo.pdf for details)
+          and wrote native implementations of all required QR variants.
+          See ATLAS/src/lapack for all the QR/RQ/QL/LQ related files,
+          and ATLAS/bin/qrtst.c for their tester.
+       ** Took Tony Castaldo's prototype QR PCA code and produced versions for
+          QR and LQ for all precisions for parallel lapack
+
+
+                              Peter Soendergaard
+       ** SSE and 3DNow! GEMM routines.  See ATLAS/tune/blas/gemm/CASES
+          for details.  Also, translation of Julian Ruhe's Athlon kernels
+          from NASM to gnu assembler, and extension to all precisions.
+          See ATLAS/tune/blas/gemm/CASES/ATL_dmm_julian_gas_30.c for details.
+
+                              Carl Staelin
+       ** Initial work on parallelizing ATLAS make.
+
+                              Md. Majedul Haque Sujon
+       ** UTSA student.  Wrote ARM NEON kernel for transpose GEMV.
+          See ATLAS/tune/blas/gemv/MVTCASES/ATL_sgemvT_8x4_neon.S for details.
+
+                              Yevgen Voronenko
+       ** Provided code template for Core2Duo-friendly 2-D register block
+          which allowed us to greatly increase our Core2Duo GEMM performance.
+          See ATLAS/tune/blas/gemm/CASES/ATL_dmm4x2x128_sse2.c for details.
+
+                             Tom Wallace (2011, 2012)
+      ** Did a lot of work on adding ARM support to ATLAS's configure, as
+         well as some tuning for the ARM.   Also, a lot of testing and
+         submission of patches.  Provided ARM NEON s/c GEMM kernel.
+
+                             Chad Zalkin (2009)
+      ** Wrote code generator which uses gcc intrinsics to autovectorize and
+         tune matrix multiply.  Contributed to the search over the same.
+         See ATLAS/tune/blas/gemm/mmgen_sse.c and
+         ATLAS/tune/blas/gemm/mmksearch_sse.c for details.

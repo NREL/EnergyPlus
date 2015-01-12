@@ -1,0 +1,59 @@
+
+topd = /home/whaley/git/math-atlas/AtlasBase
+ext  = /home/whaley/git/math-atlas/STAB/xextract
+extF = $(ext) -langF -lnlen71 -Remtblank -llwarn2 -LAPACK1 $(incs)
+ext9 = $(ext) -langF -lnlen132 -RemtBlank $(incs)
+extC = $(ext) -langC -lnlen79 -Remtblank -llwarn2 $(incs)
+extM = $(ext) -langM -lnlen79 -llwarn2 $(incs)
+incs = -def topd /home/whaley/git/math-atlas/AtlasBase \
+       -def incd /home/whaley/git/math-atlas/AtlasBase/Clint \
+       -def ext  /home/whaley/git/math-atlas/STAB/xextract \
+       -def BASEdir /home/whaley/git/math-atlas/AtlasBase/Antoine/ \
+       -def basd /home/whaley/git/math-atlas/AtlasBase/Clint
+
+default: all
+force_build:
+basd = /home/whaley/git/math-atlas/AtlasBase/Clint
+basdRCW = /home/whaley/git/math-atlas/AtlasBase/Clint
+basdAPP = /home/whaley/git/math-atlas/AtlasBase/Antoine
+basdSTU = /home/whaley/git/math-atlas/AtlasBase/Students
+incf = /home/whaley/git/math-atlas/AtlasBase/gen.inc
+
+basfn = $(basdRCW)/atlas-mvtk.base
+files = ATL_cgemvT_8x4_avx.c ATL_cgemvT_8x4_sse3.c ATL_cgemvT_dot.c \
+        ATL_dgemvT_2x8_sse3.c ATL_gemvT_8xv3_vsx.c ATL_gemvT_dot.c \
+        ATL_sgemvT_8x4_neon.S ATL_sgemvT_8x4_sse.c cmvtcases.idx \
+        dmvtcases.idx smvtcases.idx zmvtcases.idx
+
+all : $(files)
+kill : 
+	rm -f $(files)
+
+ATL_gemvT_8xv3_vsx.c : $(topd)/kernel/external/ATL_gemvT_8xv3_vsx.c
+	cp -f $(topd)/kernel/external/ATL_gemvT_8xv3_vsx.c .
+ATL_gemvT_dot.c : $(basfn)
+	$(extC) -b $(basfn) -o $@ rout=$*
+ATL_cgemvT_dot.c : $(basfn)
+	$(extC) -b $(basfn) -o $@ rout=$*
+ATL_dgemvT_2x8_sse3.c : $(basfn)
+	$(extC) -b $(basfn) -o $@ rout=$*
+ATL_sgemvT_8x4_sse.c : $(basfn)
+	$(extC) -b $(basfn) -o $@ rout=$*
+ATL_cgemvT_8x4_sse3.c : $(basfn)
+	$(extC) -b $(basfn) -o $@ rout=$*
+ATL_cgemvT_8x4_avx.c : $(basfn)
+	$(extC) -b $(basfn) -o $@ rout=$*
+smvtcases.idx : $(basfn)
+	$(extC) -b $(basfn) -o $@ rout=$@
+dmvtcases.idx : $(basfn)
+	$(extC) -b $(basfn) -o $@ rout=$@
+cmvtcases.idx : $(basfn)
+	$(extC) -b $(basfn) -o $@ rout=$@
+zmvtcases.idx : $(basfn)
+	$(extC) -b $(basfn) -o $@ rout=$@
+
+Make.ext : $(topd)/make.base
+	$(extM) -b $(topd)/make.base -o $@ rout=atlas/tune/blas/gemv/mvtcases
+ATL_sgemvT_8x4_neon.S : /home/whaley/git/math-atlas/AtlasBase/kernel/external/extern.base /home/whaley/git/math-atlas/AtlasBase/kernel/external/ATL_sgemvT_8x4_neon.S
+	$(extC) -b /home/whaley/git/math-atlas/AtlasBase/kernel/external/extern.base -o $@ rout=$@ \
+                -def rout $@

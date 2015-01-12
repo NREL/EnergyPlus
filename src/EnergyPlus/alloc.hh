@@ -7,6 +7,7 @@
 //#include <cstddef>
 #include <memory>
 #include <new>
+#include <iostream>
 
 #include <utility.hh>
 
@@ -32,6 +33,7 @@ struct AlignedAlloc{
   //   alignment = a.alignment;
   // }
   static T* allocate (std::size_t n, size_t alignment) { //return static_cast<T*>(::new(n*sizeof(T))); }
+    std::cout << "called allocate with alignment: " << alignment << std::endl;
     void **ptr;
     void *raw;
     size_t toUse = sizeof(T) * n;
@@ -40,15 +42,15 @@ struct AlignedAlloc{
     //	 ptr = (void**)std::align(alignment, toUse, raw, toUse);  NOT IMPLEMENTED in GCC 4.8.1 :P
     size_t temp = ((size_t)raw + offset) & ~(alignment - 1);
     ptr = (void**)temp;
-    void** tmpp = ptr - 1;
-    *tmpp = raw;
+    ptr[ -1 ] = raw;
+    //    *tmpp = raw;
     // if(posix_memalign(&ptr, alignment, n * sizeof(T)) != 0){
     //   throw std::bad_alloc(;
     // }
     return static_cast<T*>((void*)ptr);
   }
 
-  static void deallocate (T* ptr) { ::operator delete(((void**)ptr) - 1);} //::delete(p); }
+  static void deallocate (T* ptr) { ::operator delete(((void**)ptr)[-1]);} //::delete(p); }
 };
 
 // template <class T, class U>

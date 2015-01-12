@@ -1,0 +1,72 @@
+#
+# In this file, any line beginning with a '#' is ignored, but the # must be in
+# column 0.  All multiple whitespace is reduced to one space (i.e. used only
+# to distinguish where words begin/end).  Lines may be extended by putting '\'
+# as the *last* character of line.
+#
+# The file has the following format:
+# ROUT='routine name' AUTH='author names' COMP='compiler name' FLAGS='flags'
+# ID=<id> MU=<mu> NU=<nu> KU=<ku> KBMIN=<#> KBMAX=<#> BETAN1=[0,1]
+# TA='[t,n,c]' TB='[t,n,c]' SSE=[0,1,2,3],
+# MFLOP=<#> mbB=<#> nbB=<#> kbB=<#>, AOUTER=[0,1]
+# X87=[0,1] LDBOT=[0,1], RTKU=[0,1], RTMN=[0,1] ldKB=[0,1], ldab=[0,1]
+# ASM=[asmlist], eg., asmlist is "GAS_x8664,GAS_x8632" or "GAS_SPARC"
+# ASM defaults to no assembly dialect required.
+#
+# All routines are assumed to handle any runtime value of M (N) that is a
+# multiple of MU (NU).  Routines are assumed to require K to be fixed using
+# the KB cpp macro, and can take any
+# Some of the less obvious keywords:
+# LDBOT: set to 1 if you add C to A*B only after doing product (less error).
+# RTKU : KU is a runtime, rather than compile time constraint
+# RTMN : MU & NU are runtime not compile-time constrants
+# ldKB : lda = ldb = KB assumed by kernel
+# ldab : if set, lda must equal ldb, but they need not be equal to KB
+# AOUTER: M is not/is outer loop of kernel
+# BETAN1: kernel does not/does have special case for BETA=-1
+#
+# For most [0,1] choices, 0 means 'No', or 'False', 1 means opposite.
+#
+# ID, ROUT, AUTH, MU, NU, KU, are mandatory, and if COMP is given, so is FLAGS.
+# Defaults: TA='t', TB='n', SSE=0, X87=0, LDBOT=1, RTKU=0, AOUTER=0,
+#           KBMAX=KU, KBMIN=KU, BETAN1=0, RTMN=1
+#
+ID=1  ROUT='ATL_dmm6x1x72_sse2.c' AUTH='R. Clint Whaley' MU=6 NU=1 KU=2 \
+      LDKB=1 LDBOT=0 KBMIN=2 KBMAX=80 SSE=2 ASM=GAS_x8664,GAS_x8632 \
+      COMP='gcc' FLAGS='-x assembler-with-cpp'
+ID=2  ROUT='ATL_dmm6x1x60_sse2_32.c' AUTH='R. Clint Whaley' \
+      MU=6 NU=1 KU=60 LDKB=1 LDBOT=0 SSE=2 ASM=GAS_x8664 \
+      COMP='gcc' FLAGS='-m64 -x assembler-with-cpp'
+# This routine actually has restriction MB <= 14 at moment
+#ID=3  ROUT='ATL_dmm14x1x56_sse2pABC_MN.c' AUTH='R. Clint Whaley' \
+#      MU=14 NU=1 KU=56 KLDKB=1 BMAX=56 LDBOT=0 SSE=2 ASM=GAS_x8664 \
+#      COMP='gcc' FLAGS='-m64 -x assembler-with-cpp'
+ID=4  ROUT='ATL_dmm1x14x56_sse2pABC.c' AUTH='R. Clint Whaley' \
+      MU=1 NU=14 KU=56 LDKB=1 LDBOT=0 SSE=2 ASM=GAS_x8664 \
+      COMP='gcc' FLAGS='-m64 -x assembler-with-cpp'
+ID=5  ROUT='ATL_dmm4x1x44_4_sse2.c' AUTH='R. Clint Whaley' \
+      MU=4 NU=1, KU=44 SSE=2 ASM=GAS_x8632 \
+      COMP='gcc' FLAGS='-m32 -x assembler-with-cpp'
+ID=6  ROUT='ATL_dmm4x1x90_x87.c' AUTH='R. Clint Whaley' \
+      MU=4 NU=1 KU=1 KBMAX=90 X87=1 ASM=GAS_x8664,GAS_x8632 \
+      COMP='gcc' FLAGS='-x assembler-with-cpp'
+ID=7  ROUT='ATL_dmm8x1x120_sse2.c' AUTH='R. Clint Whaley' \
+      MU=8 NU=1 KU=1 KBMAX=512 ASM=GAS_x8664 BETAN1=1 \
+      COMP='gcc' FLAGS='-m64 -x assembler-with-cpp'
+ID=70 ROUT='ATL_dmm4x4x80_ppc.c' AUTH='R. Clint Whaley' TA='T', TB='N' \
+      MU=4 NU=4 KU=1 KBMIN=1 KBMAX=80 ASM=GAS_PPC BETAN1=0 LDBOT=0 \
+      LDAB=0 LDISKB=1 RTN=1 RTM=1 RTK=0 \
+      COMP='gcc' FLAGS='-x assembler-with-cpp'
+ID=80 ROUT='ATL_dmm4x4x16r8_US.c' AUTH='R. Clint Whaley' TA='T', TB='N' \
+      MU=4 NU=4 KU=24 KBMIN=24 KBMAX=512 ASM=GAS_SPARC BETAN1=0 \
+      LDAB=0 RTK=1 RTN=1 RTM=1 LDBOT=0 LDISKB=1 LDAB=1 \
+      COMP='gcc' FLAGS='-mcpu=ultrasparc -x assembler-with-cpp'
+ID=81 ROUT='ATL_dmm4x4x2_US.c' AUTH='R. Clint Whaley' TA='T', TB='N' \
+      MU=4 NU=4 KU=2 KBMIN=2 KBMAX=512 ASM=GAS_SPARC BETAN1=0 \
+      LDAB=0 RTK=1 RTN=1 RTM=1 LDBOT=0 LDISKB=1 \
+      COMP='gcc' FLAGS='-mcpu=ultrasparc -x assembler-with-cpp'
+ID=90 ROUT='ATL_mm8x8x2.c' AUTH='R. Clint Whaley' TA='T', TB='N' \
+      KU=2 NU=8 MU=8 KBMAX=512 KBMIN=1 LDAB=0 RTK=1 RTN=1 RTM=1 LDBOT=0
+#
+#     RCW: just included the x86 files.  Add other later.
+#

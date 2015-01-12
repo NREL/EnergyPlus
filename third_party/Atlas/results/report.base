@@ -1,0 +1,629 @@
+@ROUT repsys.tex
+   @define sf  @avs@
+   @define lib @sys@
+   @ifdef ! sys
+      @define sys @MKL@
+   @endifdef
+@ROUT repf77.tex
+   @define sys @f77@
+   @define sf  @avf@
+   @define lib @f77@
+@ROUT repat2.tex
+   @ifdef ! sys
+      @define sys @at2@
+   @endifdef
+   @define lib @at2@
+   @define sf  @ava@
+@ROUT l3cmp.tex repsys.tex repf77.tex repat2.tex
+@BEGINPROC typecharts scl chname chname2 label
+\begin{figure}[hbp!]
+\begin{minipage}[t]{3.0in}
+   @define lab @(d) Double precision complex@
+   @define lab @(c) Single precision complex@
+   @define lab @(b) Double precision real@
+   @define lab @(a) Single precision real@
+   @whiledef pre z c d s
+\includegraphics[scale=@(scl),trim=0 20 0 0]{charts/@(pre)@(chname)}
+\centerline{@(lab)}
+\vspace*{0.02in}
+
+      @undef lab
+   @endwhile
+\end{minipage}
+\hfill
+\begin{minipage}[t]{3.0in}
+   @define lab @(h) Double precision complex@
+   @define lab @(g) Single precision complex@
+   @define lab @(f) Double precision real@
+   @define lab @(e) Single precision real@
+   @whiledef pre z c d s
+\includegraphics[scale=@(scl),trim=0 20 0 0]{charts/@(pre)@(chname2)}
+\centerline{@(lab)}
+\vspace*{0.02in}
+
+      @undef lab
+   @endwhile
+\end{minipage}
+@ifdef caption
+\caption{@(caption)}
+@undef caption
+@endifdef
+\label{@(label)}
+\end{figure}
+@ENDPROC
+\documentclass[11pt]{article}
+
+\usepackage{url}
+\usepackage{fixltx2e}
+%\usepackage{stfloats}
+\usepackage{graphicx}
+\usepackage{epsfig}
+\usepackage[caption=false,font=footnotesize]{subfig}
+
+\newcommand{\Wskip}[1]{ }
+\newcommand{\Wceil}[1]{\lceil #1 \rceil}
+\newcommand{\Wfloor}[1]{\lfloor #1 \rfloor}
+
+\newenvironment{routdef}[1]
+{
+   \begin{list}{BLANK}
+   {
+      \setlength{\parsep}{0in}
+      \setlength{\itemsep}{.01in}
+      \setlength{\partopsep}{0in}
+      \setlength{\topsep}{0.1in}
+      \setlength{\labelsep}{0in}
+      \setlength{\labelwidth}{#1in}
+      \setlength{\leftmargin}{#1in}
+   }
+} {\end{list}}
+\newcommand{\rditem}[2]{\item[#1\hfill(~]#2 )}
+
+
+
+\textwidth=6in
+\textheight=8.7in
+\hoffset = -.6in
+\voffset = -.6in
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lfoot{}
+\cfoot{}
+\rfoot{}
+
+\begin{document}
+\headheight=25.3pt
+
+\begin{titlepage}
+\title{ATLAS timing report}
+\vspace{.4in}
+\author
+{
+ R. Clint Whaley \thanks { {\tt rwhaley@users.sourceforge.net}, 
+ {\tt www.cs.utsa.edu/$\sim$whaley}}
+}
+\end{titlepage}
+\maketitle
+
+\fancypagestyle{plain}{}
+
+\begin{abstract}
+This is an auto-generated timing report skeleton, made to be filled out
+with commentary after an ATLAS install.
+\end{abstract}
+
+\headheight=12.5pt
+\rhead{\footnotesize CONTENTS}
+\begin{small}
+\tableofcontents
+%\listoftables
+\listoffigures
+\end{small}
+
+\newpage
+\setcounter{page}{1}
+@ROUT l3cmp.tex
+\rhead{{\footnotesize\bf L3Time Report}~~~~~~\thepage}
+\section{GEMM}
+\section{Symmetric Routines (SYMM, SYRK, SYR2K, HERK, HER2K)}
+\subsection{SYMM}
+@define caption @ATLAS vs @(sys) SYMM, Side=Left, Uplo=Lower, serial (left) parallel (right).@
+@CALLPROC typecharts .45 symm_LLN_mlr_@(sf).eps symm_LLN_mlr_@(sf)_pt.eps fig-symm
+
+@define caption @Serial SYMM variants as \% of GEMM, ATLAS (left) @(sys) (right)@
+@CALLPROC typecharts .45 pcmm_symm_atl.eps pcmm_symm_@(lib).eps fig-symmV
+
+@define caption @Parallel SYMM variants as \% of GEMM, ATLAS (left) @(sys) (right)@
+@CALLPROC typecharts .45 pcmm_symm_atl_pt.eps pcmm_symm_@(lib)_pt.eps fig-symmV_pt
+\subsection{SYRK}
+
+@define caption @Serial SYRK variants as \% of GEMM, ATLAS (left) @(sys) (right)@
+@CALLPROC typecharts .45 pcmm_syrk_atl.eps pcmm_syrk_@(lib).eps fig-syrkV
+@define caption @Parallel SYRK variants as \% of GEMM, ATLAS (left) @(sys) (right)@
+@CALLPROC typecharts .45 pcmm_syrk_atl_pt.eps pcmm_syrk_@(lib)_pt.eps fig-syrkV_pt
+
+\subsection{HERK}
+
+\subsection{SYR2K}
+@CALLPROC typecharts .45 pcmm_syr2k_atl.eps pcmm_syr2k_@(lib).eps fig-syr2kV
+@define caption @Parallel SYR2K variants as \% of GEMM, ATLAS (left) @(sys) (right)@
+@CALLPROC typecharts .45 pcmm_syr2k_atl_pt.eps pcmm_syr2k_@(lib)_pt.eps fig-syr2kV_pt
+
+\subsection{HER2K}
+\section{Triangular Routines (TRMM, TRSM)}
+\subsection{TRMM}
+@define caption @Serial TRMM\_N variants as \% of GEMM, ATLAS (left) @(sys) (right)@
+@CALLPROC typecharts pcmm_trmm_N_atl.eps pcmm_trmm_N_@(lib).eps fig-trmmNV
+@define caption @Parallel TRMM\_N variants as \% of GEMM, ATLAS (left) @(sys) (right)@
+@CALLPROC typecharts pcmm_trmm_N_atl_pt.eps pcmm_trmm_N_@(lib)_pt.eps fig-trmmNV_pt
+
+@define caption @Serial TRMM\_T variants as \% of GEMM, ATLAS (left) @(sys) (right)@
+@CALLPROC typecharts pcmm_trmm_T_atl.eps pcmm_trmm_T_@(lib).eps fig-trmmNV
+@define caption @Parallel TRMM\_T variants as \% of GEMM, ATLAS (left) @(sys) (right)@
+@CALLPROC typecharts pcmm_trmm_T_atl_pt.eps pcmm_trmm_T_@(lib)_pt.eps fig-trmmNV_pt
+\subsection{TRSM}
+@define caption @Serial TRSM\_N variants as \% of GEMM, ATLAS (left) @(sys) (right)@
+@CALLPROC typecharts pcmm_trsm_N_atl.eps pcmm_trsm_N_@(lib).eps fig-trsmNV
+@define caption @Parallel TRSM\_N variants as \% of GEMM, ATLAS (left) @(sys) (right)@
+@CALLPROC typecharts pcmm_trsm_N_atl_pt.eps pcmm_trsm_N_@(lib)_pt.eps fig-trsmNV_pt
+
+@define caption @Serial TRSM\_T variants as \% of GEMM, ATLAS (left) @(sys) (right)@
+@CALLPROC typecharts pcmm_trsm_T_atl.eps pcmm_trsm_T_@(lib).eps fig-trsmNV
+@define caption @Parallel TRSM\_T variants as \% of GEMM, ATLAS (left) @(sys) (right)@
+@CALLPROC typecharts pcmm_trsm_T_atl_pt.eps pcmm_trsm_T_@(lib)_pt.eps fig-trsmNV_pt
+
+@ROUT repsys.tex repf77.tex repat2.tex
+\rhead{{\footnotesize\bf Time Report}~~~~~~\thepage}
+\section{BLAS performance}
+
+%\subsection{Level 1 BLAS}
+%Not yet autotimed, not sure worth it anyway.
+%
+%\subsection{Level 2 BLAS}
+%Not yet autotimed.
+
+\subsection{GEMM}
+%Figure~\ref{fig-mmsq} (Figure~\ref{fig-mmsq_tiny}) contrasts ATLAS and 
+%@up@(sys) square GEMM performance for midrange (tiny) problems,
+%while Figure~\ref{fig-mmrk} (Figure~\ref{fig-mmrk_tiny}) does the same
+%for rank-K update.
+
+\chead{\bf GEMM}
+\vspace*{-0.25in}
+@define caption @ATLAS vs @(sys) square GEMM, serial (left) parallel (right).@
+@CALLPROC typecharts .5 mmsq_NN_mlr_@(sf).eps mmsq_NN_mlr_@(sf)_pt.eps fig-mmsq
+@define caption @ATLAS vs @(sys) square GEMM, tiny range serial (left) parallel (right).@
+@CALLPROC typecharts .5 mmsq_NN_tin_@(sf).eps mmsq_NN_tin_@(sf)_pt.eps fig-mmsq_tiny
+@define caption @ATLAS vs @(sys) rank-K GEMM, serial (left) parallel (right).@
+@CALLPROC typecharts .5 mmrk_NN_mlr_@(sf).eps mmrk_NN_mlr_@(sf)_pt.eps fig-mmrk
+@define caption @ATLAS vs @(sys) rank-K GEMM, tiny range serial (left) parallel (right).@
+@CALLPROC typecharts .5 mmrk_NN_tin_@(sf).eps mmrk_NN_tin_@(sf)_pt.eps fig-mmrk_tiny
+
+\clearpage
+\subsection{Other Level 3 BLAS}
+%\ref{fig-sy,fig-tr,fig-sy_pt,fig-tr_pt}
+\chead{\bf Symmetric Summary}
+\vspace*{-0.25in}
+@define caption @Serial Symmetric Summary, Si=Left, Up=Lower, ATLAS (left) @(sys) (right).@
+@CALLPROC typecharts .45 pcmm_l3sy_LLN_atl.eps pcmm_l3sy_LLN_@(lib).eps fig-sy
+@define caption @Parallel Symmetric Summary, Si=Left, Up=Lower, ATLAS (left) @(sys) (right).@
+@CALLPROC typecharts .45 pcmm_l3sy_LLN_atl_pt.eps pcmm_l3sy_LLN_@(lib)_pt.eps fig-sy_pt
+
+\chead{\bf Triangular Summary}
+\vspace*{-0.25in}
+@define caption @Serial Triangular Summary, Si=Left, Up=Lower, TA=NoT ATLAS (left) @(sys) (right).@
+@CALLPROC typecharts .45 pcmm_l3tr_LLN_atl.eps pcmm_l3tr_LLN_@(lib).eps fig-tr
+@define caption @Parallel Triangular Summary, Si=Left, Up=Lower, TA=NoT ATLAS (left) @(sys) (right).@
+@CALLPROC typecharts .45 pcmm_l3tr_LLN_atl_pt.eps pcmm_l3tr_LLN_@(lib)_pt.eps fig-tr_pt
+
+\clearpage
+\subsubsection{SYMM}
+%\ref{fig-symm,fig-symmV,fig-symmV_pt}
+\chead{\bf SYMM}
+\vspace*{-0.25in}
+@define caption @ATLAS vs @(sys) SYMM, Side=Left, Uplo=Lower, serial (left) parallel (right).@
+@CALLPROC typecharts .5 symm_LLN_mlr_@(sf).eps symm_LLN_mlr_@(sf)_pt.eps fig-symm
+
+\clearpage
+\subsubsection{SYRK}
+\chead{\bf SYRK}
+\vspace*{-0.25in}
+%\ref{fig-syrk,fig-syrkV,fig-syrkV_pt}
+@define caption @ATLAS vs @(sys) SYRK, Uplo=Lower, TA=NoTrans serial (left) parallel (right).@
+@CALLPROC typecharts .5 syrk_LLN_mlr_@(sf).eps syrk_LLN_mlr_@(sf)_pt.eps fig-syrk
+
+\clearpage
+\subsubsection{SYR2K}
+\chead{\bf SYR2K}
+\vspace*{-0.25in}
+%\ref{fig-syr2k,fig-syr2kV,fig-syr2kV_pt}
+@define caption @ATLAS vs @(sys) SYR2K, Uplo=Lower, TA=NoTrans serial (left) parallel (right).@
+@CALLPROC typecharts .5 syr2k_LLN_mlr_@(sf).eps syr2k_LLN_mlr_@(sf)_pt.eps fig-syr2k
+@define caption @Serial SYR2K variants as \% of GEMM, ATLAS (left) @(sys) (right)@
+
+\clearpage
+\subsubsection{TRMM}
+\chead{\bf TRMM}
+\vspace*{-0.25in}
+%\ref{fig-trmm,fig-trmmNV,fig-trmmNV_pt,fig-trmmTV,fig-trmmTV_pt}
+@define caption @ATLAS vs @(sys) TRMM, Side=Left, Uplo=Lower, TA=NoTrans serial (left) parallel (right).@
+@CALLPROC typecharts .5 trmm_LLN_mlr_@(sf).eps trmm_LLN_mlr_@(sf)_pt.eps fig-trmm
+@define caption @ATLAS vs @(sys) TRMM, tiny problems, Side=Left, Uplo=Lower, TA=NoTrans serial (left) parallel (right).@
+@CALLPROC typecharts .5 trmm_LLN_tin_@(sf).eps trmm_LLN_tin_@(sf)_pt.eps fig-trmm-tiny
+
+\clearpage
+\subsubsection{TRSM}
+%\ref{fig-trsm,fig-trsmNV,fig-trsmNV_pt,fig-trsmTV,fig-trsmTV_pt}
+\chead{\bf TRSM}
+\vspace*{-0.25in}
+@define caption @ATLAS vs @(sys) TRSM, Side=Left, Uplo=Lower, TA=NoTrans serial (left) parallel (right).@
+@CALLPROC typecharts .5 trsm_LLN_mlr_@(sf).eps trsm_LLN_mlr_@(sf)_pt.eps fig-trsm
+@define caption @ATLAS vs @(sys) TRSM, tiny problems, Side=Left, Uplo=Lower, TA=NoTrans serial (left) parallel (right).@
+@CALLPROC typecharts .5 trsm_LLN_tin_@(sf).eps trsm_LLN_tin_@(sf)_pt.eps fig-trsm-tiny
+
+%\subsubsection{HERK}
+%\chead{\bf HERK}
+%\vspace*{-0.25in}
+%\subsubsection{HER2K}
+
+\clearpage
+\section{LAPACK performance}
+
+%Figure~\ref{fig-mmla} shows the MFLOPS achieved for serial square GEMM,
+%and the LU, QR and Cholesky factorizations, while Figure~\ref{fig-mmla_pt}
+%charts the same data for parallel operations.
+%Figures~\ref{fig-pcmm} and~\ref{fig-pcmm_pt} show this same data, where
+\chead{\bf LAPACK Summary}
+\vspace*{-0.25in}
+@define caption  @Serial Factorization Summation for ATLAS (left) and @(sys) (right) in MFLOP.@
+@CALLPROC typecharts 0.40 factor_cmb_atl.eps factor_cmb_@(lib).eps fig-mmla
+@define caption  @Parallel Factorization Summation for ATLAS (left) and @(sys) (right) in MFLOP.@
+@CALLPROC typecharts 0.40 factor_cmb_atl_pt.eps factor_cmb_@(lib)_pt.eps fig-mmla_pt
+
+@define caption @Serial Factorization as a percentage of square GEMM speed for ATLAS (left) and @(sys) (right).@
+@CALLPROC typecharts 0.4 pcmm_factor_cmb_atl.eps pcmm_factor_cmb_@(lib).eps fig-pcmmla
+@define caption @Parallel Factorization as a percentage of square tGEMM speed for ATLAS (left) and @(sys) (right).@
+@CALLPROC typecharts 0.4 pcmm_factor_cmb_atl_pt.eps pcmm_factor_cmb_@(lib)_pt.eps fig-pcmmla_pt
+
+\clearpage
+\subsection{LU in detail}
+%Figure~\ref{fig-lalu}~(\ref{fig-lalu_tiny}) contrasts ATLAS and 
+%@up@(sys) performance for midrange (tiny) problems.
+
+\chead{\bf LU Factorization}
+\vspace*{-0.25in}
+@define caption @ATLAS vs @(sys) LU, serial (left) parallel (right).@
+@CALLPROC typecharts 0.5 getrf_LLN_mlr_@(sf).eps getrf_LLN_mlr_@(sf)_pt.eps fig-lalu
+@define caption @ATLAS vs @(sys) LU, tiny range serial (left) parallel (right).@
+@CALLPROC typecharts 0.5 getrf_LLN_tin_@(sf).eps getrf_LLN_tin_@(sf)_pt.eps fig-lalu_tiny
+
+\clearpage
+\subsection{QR in detail}
+%Figure~\ref{fig-laqrs}~(\ref{fig-laqrs_pt}) contrasts ATLAS and 
+%@up@(sys) performance for all serial (parallel) QR variants.
+\chead{\bf QR Factorization}
+\vspace*{-0.25in}
+@define caption @Serial QR variant overview for ATLAS (left) and @(sys) (right)@
+@CALLPROC typecharts .4 qrvar_cmb_atl.eps qrvar_cmb_@(lib).eps fig-laqrs
+@define caption @Parallel QR variant overview for ATLAS (left) and @(sys) (right)@
+@CALLPROC typecharts .4 qrvar_cmb_atl_pt.eps qrvar_cmb_@(lib)_pt.eps fig-laqrs_pt
+
+%Figures~\ref{fig-laqr}~(\ref{fig-laqr_tiny}) contrasts ATLAS and 
+%@up@(sys) performance for midrange (tiny) QR problems, respectively,
+%while figures~\ref{fig-lalq} and~\ref{fig-lalq_tiny} do the same for LQ.
+
+@define caption @ATLAS vs @(sys) QR, serial (left) parallel (right).@
+@CALLPROC typecharts 0.50 geqrf_RUN_mlr_@(sf).eps geqrf_RUN_mlr_@(sf)_pt.eps fig-laqr
+@define caption @ATLAS vs @(sys) QR, tiny range serial (left) parallel (right).@
+@CALLPROC typecharts 0.50 geqrf_RUN_tin_@(sf).eps geqrf_RUN_tin_@(sf)_pt.eps fig-laqr_tiny
+
+@define caption @ATLAS vs @(sys) LQ, serial (left) parallel (right).@
+@CALLPROC typecharts 0.50 geqrf_LLN_mlr_@(sf).eps geqrf_LLN_mlr_@(sf)_pt.eps fig-lalq
+@define caption @ATLAS vs @(sys) LQ, tiny range serial (left) parallel (right).@
+@CALLPROC typecharts 0.50 geqrf_LLN_tin_@(sf).eps geqrf_LLN_tin_@(sf)_pt.eps fig-lalq_tiny
+
+\clearpage
+\subsection{Cholesky in detail}
+%Figure~\ref{fig-laut}~(\ref{fig-laut_tiny}) contrasts ATLAS and 
+%@up@(sys) performance for midrange (tiny) problems for
+%the Upper case, while figure~\ref{fig-lalt}~(\ref{fig-lalt_tiny})
+%does the same for the Lower.
+\chead{\bf Cholesky Factorization}
+\vspace*{-0.25in}
+@define caption @ATLAS vs @(sys) $U^HU$, serial (left) parallel (right).@
+@CALLPROC typecharts .5 potrf_LUN_mlr_@(sf).eps potrf_LUN_mlr_@(sf)_pt.eps fig-laut
+@define caption @ATLAS vs @(sys) $U^HU$, tiny range serial (left) parallel (right).@
+@CALLPROC typecharts .5 potrf_LUN_tin_@(sf).eps potrf_LUN_tin_@(sf)_pt.eps fig-laut_tiny
+
+@define caption @ATLAS vs @(sys) $LL^H$, serial (left) parallel (right).@
+@CALLPROC typecharts .5 potrf_LLN_mlr_@(sf).eps potrf_LLN_mlr_@(sf)_pt.eps fig-lalt
+@define caption @ATLAS vs @(sys) $LL^H$, tiny range serial (left) parallel (right).@
+@CALLPROC typecharts .5 potrf_LLN_tin_@(sf).eps potrf_LLN_tin_@(sf)_pt.eps fig-lalt_tiny
+\end{document}
+@ROUT pclinechart linechart
+@define flds @2@
+@iexp i 1 0 +
+@iwhile i < nlines
+   @iexp j @(i) 2 +
+   @define tmp @@(flds)@
+   @undef flds
+   @define flds @@(tmp),@(j)@
+   @undef tmp
+   @iexp i @(i) 1 +
+@endiwhile
+@iif nlines < 2
+   @define xoff @2.5@
+@endiif
+@ifdef ! xoff
+   @iif nlines > 5
+      @define xoff @0.5@
+   @endiif
+@endifdef
+@ifdef ! xoff
+    @define xoff @1.75@
+@endifdef
+@ifdef ! tsz 
+   @define tsz @12@
+@endifdef
+
+#proc getdata
+   file @(datf)
+
+#proc page
+   textsize: 12
+
+#proc areadef
+@ifdef title
+   title: @(title)
+@endifdef
+   rectangle: 1 1 7 4
+@ROUT pclinechart `   yaxis.stubs: incremental 10`
+   yaxis.grid:
+   yautorange datafield=@(flds) lowfix=0
+   xrange 0 4000
+
+#proc xaxis
+   label: N
+   stubs: inc
+   labeldistance: 0.5
+
+#proc yaxis
+@ROUT pclinechart
+   label: % of GEMM
+   labeldistance: 0.6
+   stubs: inc 10
+@ROUT linechart
+   label: MFLOPS
+   labeldistance: 0.8
+   stubs: inc
+@ROUT pclinechart linechart
+
+@multidef shp 
+  pentagon leftriangle righttriangle circle downtriangle triangle diamond square
+@endmultidef
+@multidef clr
+  claret   powderblue  orange        purple black        red      blue    green
+@endmultidef
+@whiledef tmp @(labs)
+   @define lab @@(tmp)@
+@endwhile
+@define i @0@
+@iwhile i < nlines
+#proc lineplot
+   @iexp j @(i) 2 +
+   xfield: 1
+   yfield: @(j)
+   linedetails: color=@(clr)
+   pointsymbol: shape=@(shp) style=fill fillcolor=@(clr) radius=0.08
+   legendlabel: @(lab)
+   @undef lab
+   @undef clr
+   @undef shp
+   @iexp i @(i) 1 + 
+@endiwhile
+
+#proc legend
+  location: min+@(xoff) min+0.25
+  format: singleline
+
+@ROUT Make.res_lapack
+include Make.plinc
+#
+# List of macros that we need
+#
+pre=d           # precision [s,d,c,z]
+rt=getrf        # routine [getrf,geqrf,potrf]
+sd=L            # side [L,R]
+up=U            # uplo [U,L]
+pt=             # if _pt, then do threaded, if blank do serial
+lib=atl         # library [atl,at2,sys,f77]
+AT2dir=         # path to 2nd ATLAS install to compare against
+
+tvecs/$(pre)mmsq_cmb_$(lib)$(pt).tvec :
+	$(MAKE) -f Make.l3blas tvecs/$(pre)mmsq_cmb_$(lib)$(pt).tvec
+@multidef lpr a   s   f   2
+@whiledef lib atl sys f77 at2
+$(BINdir)/x$(pre)slatime_@(lpre)l_@(lpr)b :
+	cd $(BINdir) ; make x$(pre)slatime_@(lpre)l_@(lpr)b
+$(BINdir)/x$(pre)tlatime_@(lpre)l_@(lpr)b :
+	cd $(BINdir) ; make x$(pre)tlatime_@(lpre)l_@(lpr)b
+x$(pre)latime_@(lib) : $(BINdir)/x$(pre)slatime_@(lpre)l_@(lpr)b
+	ln -s $(BINdir)/x$(pre)slatime_@(lpr)l_@(lpr)b $@
+x$(pre)latime_@(lib)_pt : $(BINdir)/x$(pre)tlatime_@(lpr)l_@(lpr)b
+	ln -s $(BINdir)/x$(pre)tlatime_@(lpr)l_@(lpr)b $@
+   @undef lpr
+@endwhile
+
+@multidef szargs -N@^10@^100@^10 -N@^200@^2000@^200 -N@^2400@^4000@^400
+@multidef rp 9   6   1
+@whiledef sz tin med lrg
+raw/$(pre)$(rt)_$(sd)$(up)_@(sz)_$(lib)$(pt).out : x$(pre)latime_@(lib)@(pt) \
+	./x$(pre)latime_$(lib)@(pt) -F 40 -R 1 $(rt) -S 1 @(sd) \
+           -U 1 $(up) @(szargs) -# @(rp) > $@
+tvecs/$(pre)$(rt)_$(sd)$(up)_@(sz)_$(lib)$(pt).tvec : xatl2tvec \
+   xreducetvec raw/$(pre)$(rt)_$(sd)$(up)_@(sz)_$(lib)$(pt).out
+	./xatl2tvec -# @(rp) -H 2 N MFLOP \
+           -i raw/$(pre)$(rt)_$(sd)$(up)_@(sz)_$(lib)$(pt).out |
+        ./xreducetvec -o $@ -R 1 N -C 1 MFLOP
+   @undef szargs
+   @undef rp
+@endwhile
+#
+# Merge medium and large runs into one combined range
+#
+tvecs/$(pre)$(rt)_$(sd)$(up)_mlr_$(lib)$(pt).tvec : xmergetvecs \
+   tvecs/$(pre)$(rt)_$(sd)$(up)_med_$(lib)$(pt).tvec \
+   tvecs/$(pre)$(rt)_$(sd)$(up)_lrg_$(lib)$(pt).tvec \
+	./xmergetvecs -r N -C 2 N MFLOP_avg -o $@ \
+           -i1 tvecs/$(pre)$(rt)_$(sd)$(up)_med_$(lib)$(pt).tvec \
+           -i2 tvecs/$(pre)$(rt)_$(sd)$(up)_lrg_$(lib)$(pt).tvec 
+#
+# Merge tiny, medium, and large runs into one combined range
+#
+tvecs/$(pre)$(rt)_$(sd)$(up)_cmb_$(lib)$(pt).tvec : xmergetvecs \
+   tvecs/$(pre)$(rt)_$(sd)$(up)_tin_$(lib)$(pt).tvec \
+   tvecs/$(pre)$(rt)_$(sd)$(up)_med_$(lib)$(pt).tvec \
+   tvecs/$(pre)$(rt)_$(sd)$(up)_lrg_$(lib)$(pt).tvec \
+	./xmergetvecs -r N -C 2 N MFLOP_avg \
+           -i1 tvecs/$(pre)$(rt)_$(sd)$(up)_tin_$(lib)$(pt).tvec \
+           -i2 tvecs/$(pre)$(rt)_$(sd)$(up)_med_$(lib)$(pt).tvec | \
+        ./xmergetvecs -r N -C 2 N MFLOP_avg -o $@ \
+           -i2 tvecs/$(pre)$(rt)_$(sd)$(up)$(ta)_lrg_$(lib)$(pt).tvec
+tvecs/$(pre)mmsq_cmb_$(lib)$(pt).tvec : xmergetvecs \
+   tvecs/$(pre)mmsq_tin_$(lib)$(pt).tvec \
+   tvecs/$(pre)mmsq_med_$(lib)$(pt).tvec \
+   tvecs/$(pre)mmsq_lrg_$(lib)$(pt).tvec \
+	./xmergetvecs -r N -C 2 N MFLOP_avg \
+           -i1 tvecs/$(pre)mmsq_tin_$(lib)$(pt).tvec \
+           -i2 tvecs/$(pre)mmsq_med_$(lib)$(pt).tvec | \
+        ./xmergetvecs -r N -C 2 N MFLOP_avg -o $@ \
+           -i2 tvecs/$(pre)mmsq_lrg_$(lib)$(pt).tvec
+#
+# Create master file with all factorizations, in this order: 
+#    MM,LU,LL,UU,QR,QL,RQ,LQ
+#
+tvecs/$(pre)factor_cmb_$(lib)$(pt).tvec : xcattvecs force_build \
+   tvecs/$(pre)mmsq_cmb_$(lib)$(pt).tvec
+	$(MAKE) tvecs/$(pre)getrf_LU_cmb_$(lib)$(pt).tvec sd=L up=U \
+                rt=getrf pre=$(pre) pt="$(pt)" lib=$(lib)
+	$(MAKE) tvecs/$(pre)potrf_LU_cmb_$(lib)$(pt).tvec sd=L up=U \
+                rt=potrf pre=$(pre) pt="$(pt)" lib=$(lib)
+	$(MAKE) tvecs/$(pre)potrf_LL_cmb_$(lib)$(pt).tvec sd=L up=L \
+                rt=potrf pre=$(pre) pt="$(pt)" lib=$(lib)
+	$(MAKE) tvecs/$(pre)geqrf_RU_cmb_$(lib)$(pt).tvec sd=R up=U \
+                rt=geqrf pre=$(pre) pt="$(pt)" lib=$(lib)
+	$(MAKE) tvecs/$(pre)geqrf_RL_cmb_$(lib)$(pt).tvec sd=R up=L \
+                rt=geqrf pre=$(pre) pt="$(pt)" lib=$(lib)
+	$(MAKE) tvecs/$(pre)geqrf_LU_cmb_$(lib)$(pt).tvec sd=L up=U \
+                rt=geqrf pre=$(pre) pt="$(pt)" lib=$(lib)
+	$(MAKE) tvecs/$(pre)geqrf_LL_cmb_$(lib)$(pt).tvec sd=L up=L \
+                rt=geqrf pre=$(pre) pt="$(pt)" lib=$(lib)
+	cat tvecs/$(pre)mmsq_cmb_$(lib)$(pt).tvec \
+            tvecs/$(pre)getrf_LU_cmb_$(lib)$(pt).tvec \
+            tvecs/$(pre)potrf_LU_cmb_$(lib)$(pt).tvec \
+            tvecs/$(pre)potrf_LL_cmb_$(lib)$(pt).tvec \
+            tvecs/$(pre)geqrf_RU_cmb_$(lib)$(pt).tvec \ 
+            tvecs/$(pre)geqrf_RL_cmb_$(lib)$(pt).tvec \
+            tvecs/$(pre)geqrf_LU_cmb_$(lib)$(pt).tvec \
+            tvecs/$(pre)geqrf_LL_cmb_$(lib)$(pt).tvec | \
+        ./xcattvecs -# 8 -o $@ -C 2 N MFLOP_avg
+# 
+# Create Triangular variant file
+#
+tvecs/$(pre)trvar_cmb_$(lib)$(pt).tvec : xcattvecs force_build \
+   tvecs/$(pre)mmsq_cmb_$(lib)$(pt).tvec
+	$(MAKE) tvecs/$(pre)getrf_LU_cmb_$(lib)$(pt).tvec sd=L up=U \
+                rt=getrf pre=$(pre) pt="$(pt)" lib=$(lib)
+	$(MAKE) tvecs/$(pre)potrf_LU_cmb_$(lib)$(pt).tvec sd=L up=U \
+                rt=potrf pre=$(pre) pt="$(pt)" lib=$(lib)
+	$(MAKE) tvecs/$(pre)potrf_LL_cmb_$(lib)$(pt).tvec sd=L up=L \
+                rt=potrf pre=$(pre) pt="$(pt)" lib=$(lib)
+	cat tvecs/$(pre)mmsq_cmb_$(lib)$(pt).tvec \
+            tvecs/$(pre)getrf_LU_cmb_$(lib)$(pt).tvec \
+            tvecs/$(pre)potrf_LU_cmb_$(lib)$(pt).tvec \
+            tvecs/$(pre)potrf_LL_cmb_$(lib)$(pt).tvec | \
+        ./xcattvecs -# 4 -o $@ -C 2 N MFLOP_avg
+
+#
+# Create QR variant combined file
+#
+tvecs/$(pre)qrvar_cmb_$(lib)$(pt).tvec : xcattvecs force_build \
+   tvecs/$(pre)mmsq_cmb_$(lib)$(pt).tvec
+	$(MAKE) tvecs/$(pre)geqrf_RU_cmb_$(lib)$(pt).tvec sd=R up=U \
+                rt=geqrf pre=$(pre) pt="$(pt)" lib=$(lib)
+	$(MAKE) tvecs/$(pre)geqrf_RL_cmb_$(lib)$(pt).tvec sd=R up=L \
+                rt=geqrf pre=$(pre) pt="$(pt)" lib=$(lib)
+	$(MAKE) tvecs/$(pre)geqrf_LU_cmb_$(lib)$(pt).tvec sd=L up=U \
+                rt=geqrf pre=$(pre) pt="$(pt)" lib=$(lib)
+	$(MAKE) tvecs/$(pre)geqrf_LL_cmb_$(lib)$(pt).tvec sd=L up=L \
+                rt=geqrf pre=$(pre) pt="$(pt)" lib=$(lib)
+	cat tvecs/$(pre)mmsq_cmb_$(lib)$(pt).tvec \
+            tvecs/$(pre)geqrf_RU_cmb_$(lib)$(pt).tvec \ 
+            tvecs/$(pre)geqrf_RL_cmb_$(lib)$(pt).tvec \
+            tvecs/$(pre)geqrf_LU_cmb_$(lib)$(pt).tvec \
+            tvecs/$(pre)geqrf_LL_cmb_$(lib)$(pt).tvec | \
+        ./xcattvecs -# 5 -o $@ -C 2 N MFLOP_avg
+#
+# Cat combined Uplo&Trans variants together with sqmm
+#
+tvecs/$(pre)$(rt)_UpTr_cmb_$(lib)$(pt).tvec : xcattvecs force_build \
+   tvecs/$(pre)mmsq_cmb_$(lib)$(pt).tvec
+	$(MAKE) tvecs/$(pre)$(rt)_LUN_cmb_$(lib)$(pt).tvec up=U ta=N \
+                rt=$(rt) pre=$(pre) pt="$(pt)" lib=$(lib)
+	$(MAKE) tvecs/$(pre)$(rt)_LUT_cmb_$(lib)$(pt).tvec up=U ta=T \
+                rt=$(rt) pre=$(pre) pt="$(pt)" lib=$(lib)
+	$(MAKE) tvecs/$(pre)$(rt)_LLN_cmb_$(lib)$(pt).tvec up=L ta=N \
+                rt=$(rt) pre=$(pre) pt="$(pt)" lib=$(lib)
+	$(MAKE) tvecs/$(pre)$(rt)_LLT_cmb_$(lib)$(pt).tvec up=L ta=T \
+                rt=$(rt) pre=$(pre) pt="$(pt)" lib=$(lib)
+	cat tvecs/$(pre)mmsq_cmb_$(lib)$(pt).tvec \
+            tvecs/$(pre)$(rt)_LUN_cmb_$(lib)$(pt).tvec \ 
+            tvecs/$(pre)$(rt)_LUT_cmb_$(lib)$(pt).tvec \
+            tvecs/$(pre)$(rt)_LLN_cmb_$(lib)$(pt).tvec \
+            tvecs/$(pre)$(rt)_LLT_cmb_$(lib)$(pt).tvec | \
+        ./xcattvecs -# 5 -o $@ -C 2 N MFLOP_avg
+#
+# Cat combined Side,Uplo,Trans, variants together with sqmm
+#
+tvecs/$(pre)$(rt)_SdUpTr_cmb_$(lib)$(pt).tvec : xcattvecs force_build \
+   tvecs/$(pre)mmsq_cmb_$(lib)$(pt).tvec
+	$(MAKE) tvecs/$(pre)$(rt)_LUN_cmb_$(lib)$(pt).tvec sd=L up=U ta=N \
+                rt=$(rt) pre=$(pre) pt="$(pt)" lib=$(lib)
+	$(MAKE) tvecs/$(pre)$(rt)_LUT_cmb_$(lib)$(pt).tvec sd=L up=U ta=T \
+                rt=$(rt) pre=$(pre) pt="$(pt)" lib=$(lib)
+	$(MAKE) tvecs/$(pre)$(rt)_LLN_cmb_$(lib)$(pt).tvec sd=L up=L ta=N \
+                rt=$(rt) pre=$(pre) pt="$(pt)" lib=$(lib)
+	$(MAKE) tvecs/$(pre)$(rt)_LLT_cmb_$(lib)$(pt).tvec sd=L up=L ta=T \
+                rt=$(rt) pre=$(pre) pt="$(pt)" lib=$(lib)
+	$(MAKE) tvecs/$(pre)$(rt)_RUN_cmb_$(lib)$(pt).tvec sd=R up=U ta=N \
+                rt=$(rt) pre=$(pre) pt="$(pt)" lib=$(lib)
+	$(MAKE) tvecs/$(pre)$(rt)_RUT_cmb_$(lib)$(pt).tvec sd=R up=U ta=T \
+                rt=$(rt) pre=$(pre) pt="$(pt)" lib=$(lib)
+	$(MAKE) tvecs/$(pre)$(rt)_RLN_cmb_$(lib)$(pt).tvec sd=R up=L ta=N \
+                rt=$(rt) pre=$(pre) pt="$(pt)" lib=$(lib)
+	$(MAKE) tvecs/$(pre)$(rt)_RLT_cmb_$(lib)$(pt).tvec sd=R up=L ta=T \
+                rt=$(rt) pre=$(pre) pt="$(pt)" lib=$(lib)
+	cat tvecs/$(pre)mmsq_cmb_$(lib)$(pt).tvec \
+            tvecs/$(pre)$(rt)_LUN_cmb_$(lib)$(pt).tvec \ 
+            tvecs/$(pre)$(rt)_LUT_cmb_$(lib)$(pt).tvec \
+            tvecs/$(pre)$(rt)_LLN_cmb_$(lib)$(pt).tvec \
+            tvecs/$(pre)$(rt)_LLT_cmb_$(lib)$(pt).tvec \
+            tvecs/$(pre)$(rt)_RUN_cmb_$(lib)$(pt).tvec \ 
+            tvecs/$(pre)$(rt)_RUT_cmb_$(lib)$(pt).tvec \
+            tvecs/$(pre)$(rt)_RLN_cmb_$(lib)$(pt).tvec \
+            tvecs/$(pre)$(rt)_RLT_cmb_$(lib)$(pt).tvec | \
+        ./xcattvecs -# 9 -o $@ -C 2 N MFLOP_avg
+#
+# Change to percentage of GEMM speed
+#
+tvecs/$(pre)pcmm_$(rt)_SdUp_cmb_$(lib)$(pt).tvec : \
+   tvecs/$(pre)$(rt)_SdUp_cmb_$(lib)$(pt).tvec
+	$(MAKE) pcmm4 inf=tvecs/$(pre)$(rt)_SdUp_cmb_$(lib)$(pt).tvec outf=$@
+tvecs/$(pre)pcmm_$(rt)_UpTr_cmb_$(lib)$(pt).tvec : \
+   tvecs/$(pre)$(rt)_UpTr_cmb_$(lib)$(pt).tvec
+	$(MAKE) pcmm4 inf=tvecs/$(pre)$(rt)_UpTr_cmb_$(lib)$(pt).tvec outf=$@
+tvecs/$(pre)pcmm_$(rt)_SdUpTr_cmb_$(lib)$(pt).tvec : \
+   tvecs/$(pre)$(rt)_SdUpTr_cmb_$(lib)$(pt).tvec
+	$(MAKE) pcmm8 inf=tvecs/$(pre)$(rt)_UpTr_cmb_$(lib)$(pt).tvec outf=$@
+@ROUT !

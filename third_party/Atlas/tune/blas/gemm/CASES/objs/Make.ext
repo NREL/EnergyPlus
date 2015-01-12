@@ -1,0 +1,55 @@
+
+topd = /home/whaley/git/math-atlas/AtlasBase
+ext  = /home/whaley/git/math-atlas/STAB/xextract
+extF = $(ext) -langF -lnlen71 -Remtblank -llwarn2 -LAPACK1 $(incs)
+ext9 = $(ext) -langF -lnlen132 -RemtBlank $(incs)
+extC = $(ext) -langC -lnlen79 -Remtblank -llwarn2 $(incs)
+extM = $(ext) -langM -lnlen79 -llwarn2 $(incs)
+incs = -def topd /home/whaley/git/math-atlas/AtlasBase \
+       -def incd /home/whaley/git/math-atlas/AtlasBase/Clint \
+       -def ext  /home/whaley/git/math-atlas/STAB/xextract \
+       -def BASEdir /home/whaley/git/math-atlas/AtlasBase/Antoine/ \
+       -def basd /home/whaley/git/math-atlas/AtlasBase/Clint
+
+default: all
+force_build:
+basd = /home/whaley/git/math-atlas/AtlasBase/Clint
+basdRCW = /home/whaley/git/math-atlas/AtlasBase/Clint
+basdAPP = /home/whaley/git/math-atlas/AtlasBase/Antoine
+basdSTU = /home/whaley/git/math-atlas/AtlasBase/Students
+incf = /home/whaley/git/math-atlas/AtlasBase/gen.inc
+
+basjr = $(topd)/kernel/JulianRuhe/julian.base
+
+files = ATL_dJIK30x30x30TN30x30x0_a1.cfg ATL_dJIK30x30x30TN30x30x0_a1.mcr \
+        ATL_dJIK30x30x30TN30x30x0_a1_b0.asm \
+        ATL_dJIK30x30x30TN30x30x0_a1_b1.asm \
+        ATL_dJIK30x30x30TN30x30x0_a1_bX.asm ATL_sJIK48x48x48TN48x48x0_a1.cfg \
+        ATL_sJIK48x48x48TN48x48x0_a1.mcr ATL_sJIK48x48x48TN48x48x0_a1_b0.asm \
+        ATL_sJIK48x48x48TN48x48x0_a1_b1.asm \
+        ATL_sJIK48x48x48TN48x48x0_a1_bX.asm Makefile
+
+all : $(files)
+
+Makefile :$(basjr) $(incf)
+	$(extM) -b $(basjr) -o $@ rout=$@ -def rout $@
+ATL_dJIK30x30x30TN30x30x0_a1_b0.asm : $(basjr) $(incf)
+	$(extC) -b $(basjr) -o $@ rout=$@ -def rout $@
+ATL_sJIK48x48x48TN48x48x0_a1_b0.asm : $(basjr) $(incf)
+	$(extC) -b $(basjr) -o $@ rout=$@ -def rout $@
+ATL_dJIK30x30x30TN30x30x0_a1_b1.asm : $(basjr) $(incf)
+	$(extC) -b $(basjr) -o $@ rout=$@ -def rout $@
+ATL_sJIK48x48x48TN48x48x0_a1_b1.asm : $(basjr) $(incf)
+	$(extC) -b $(basjr) -o $@ rout=$@ -def rout $@
+ATL_dJIK30x30x30TN30x30x0_a1_bX.asm : $(basjr) $(incf)
+	$(extC) -b $(basjr) -o $@ rout=$@ -def rout $@
+ATL_sJIK48x48x48TN48x48x0_a1_bX.asm : $(basjr) $(incf)
+	$(extC) -b $(basjr) -o $@ rout=$@ -def rout $@
+ATL_sJIK48x48x48TN48x48x0_a1.mcr : $(basjr) $(incf)
+	$(extC) -b $(basjr) -o $@ rout=$@ -def rout $@
+ATL_sJIK48x48x48TN48x48x0_a1.cfg : $(basjr) $(incf)
+	$(extC) -b $(basjr) -o $@ rout=$@ -def rout $@
+ATL_dJIK30x30x30TN30x30x0_a1.mcr : $(basjr) $(incf)
+	$(extC) -b $(basjr) -o $@ rout=$@ -def rout $@
+ATL_dJIK30x30x30TN30x30x0_a1.cfg : $(basjr) $(incf)
+	$(extC) -b $(basjr) -o $@ rout=$@ -def rout $@

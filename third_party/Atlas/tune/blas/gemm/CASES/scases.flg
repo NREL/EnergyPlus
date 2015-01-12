@@ -1,0 +1,69 @@
+<ID> <flag> <mb> <nb> <kb> <muladd> <lat> <mu> <nu> <ku> <rout> "<Contributer>"
+25
+304 192 4 3 8 0 4 4 3 8 ATL_mm4x3x8p.c     "R. Clint Whaley" \
+gcc
+-mcpu=ultrasparc -mtune=ultrasparc -fomit-frame-pointer -O
+306 192 4 4 8 0 4 4 4 8 ATL_mm4x4x8p.c     "R. Clint Whaley" \
+gcc
+-O -fomit-frame-pointer -fno-schedule-insns -fno-schedule-insns2
+307 192 4 4 16 1 0 4 4 16 ATL_smm4x4x16_av.c  "R. Clint Whaley"
+308 192 4 4  4 1 0 4 4  4 ATL_smm4x4x4_av.c  "R. Clint Whaley"
+309  16 0 0  4 1 0 4 4  4 ATL_smmMNCU_av.c  "R. Clint Whaley"
+310   8 6 8 8 1 1 6 8 8 ATL_mm6x8x8_1p.c       "R. Clint Whaley" \
+gcc
+-fomit-frame-pointer -O2 -fno-schedule-insns -fno-schedule-insns2
+311 496 0 0 0 1 1 6 8 8 ATL_mm6x8x8_1p.c       "R. Clint Whaley" \
+gcc
+-fomit-frame-pointer -O2 -fno-schedule-insns -fno-schedule-insns2
+317 448 4 4 2 0 4 4 4 2 ATL_smm4x4x2_US.c "R. Clint Whaley" \
+gcc
+-mcpu=ultrasparc -x assembler-with-cpp
+319 128 6 0 1 0 1 6 1 60 ATL_smm6x1x60_x87.c "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp
+320   8 120 120 120 1 1 8 8 2 ATL_mm8x8x2.c  "R. Clint Whaley" \
+gcc
+-fomit-frame-pointer -O2 -fno-schedule-insns -fno-schedule-insns2 -fno-expensive-optimizations -falign-loops=64
+321 480 8 8 2 1 1 8 8 2 ATL_mm8x8x2.c  "R. Clint Whaley" \
+gcc
+-fomit-frame-pointer -O2 -fno-schedule-insns -fno-schedule-insns2 -fno-expensive-optimizations -falign-loops=64
+322 448 4 4 16 1 1 4 4 16 ATL_smm4x4x16_US.c "R. Clint Whaley" \
+gcc
+-mcpu=ultrasparc -x assembler-with-cpp
+323 192 4 4 -72 1 1 4 4 72 ATL_smm4x4x72_US.c "R. Clint Whaley" \
+gcc
+-mcpu=ultrasparc -x assembler-with-cpp
+324 192 4 4 16 1 1 4 4 16 ATL_smm4x4x16_hppa.c "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp
+325   8 6 8 8 1 1 6 8 8 ATL_mm6x8x8_1p.c       "R. Clint Whaley" \
+gcc
+-fomit-frame-pointer -O2 -fno-tree-loop-optimize
+326 496 0 0 0 1 1 6 8 8 ATL_mm6x8x8_1p.c       "R. Clint Whaley" \
+gcc
+-fomit-frame-pointer -O2 -fno-tree-loop-optimize
+327   8 120 120 120 1 1 8 8 2 ATL_mm8x8x2.c  "R. Clint Whaley" \
+gcc
+-fomit-frame-pointer -O2 -fno-tree-loop-optimize
+328 480 8 8 2 1 1 8 8 2 ATL_mm8x8x2.c  "R. Clint Whaley" \
+gcc
+-fomit-frame-pointer -O2 -fno-tree-loop-optimize
+329 192 4 4 4 1 16 4 4 4 ATL_smm4x4x128_av.c "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp
+330 200 92 92 92 1 16 92 92 92 ATL_smm4x4x128_av.c "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp
+331 192 4 4 1 1 1 4 4 1 ATL_smm4x4xURx_mips.c  "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp -mips4
+332 192 8 2 4 1 0 8 2 4 ATL_smm8x2x4_av.c  "IBM"
+333 448 4 4 2 1 1 4 4 2 ATL_smm4x4x2pf_arm.c "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp -mfpu=vfpv3
+334 448 4 4 2 1 1 4 4 2 ATL_smm4x4x2dld_arm.c "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp -mfpu=vfpv3
+335 480 4 4 4 1 1 4 4 4 ATL_smm4x4x4_neon.c "Vesperix Corporation" \
+gcc
+-march=armv7 -mfpu=neon -O2

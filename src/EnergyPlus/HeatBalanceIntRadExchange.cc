@@ -126,15 +126,15 @@ namespace HeatBalanceIntRadExchange {
 		}else{
 		  std::forward_list<std::thread> threads;
 		  std::cout << "Thread count in CalcIntRadExchange is: " << EppPerformance::Perf_Thread_Count << std::endl;
-		  for(int x = 1; x < EppPerformance::Perf_Thread_Count; ++x){
+		  for(int x = 0; x < EppPerformance::Perf_Thread_Count; ++x){
 		    threads.push_front(std::thread(DoCalcInteriorRadExchange,
 						   SurfIterations,
 						   ZoneToResimulate,
 						   x));
 		    
 		  }
-		  DoCalcInteriorRadExchange(SurfIterations, -1,
-					    0);
+		  // DoCalcInteriorRadExchange(SurfIterations, -1,
+		  // 			    0);
 		  for( auto& t: threads ){
 		    t.join();
 		  }
@@ -157,8 +157,8 @@ namespace HeatBalanceIntRadExchange {
 			ReSurface& recv = ( *s );
 			//if(!s.isHeatTransSurf) continue; //I think this is superfluous, as it should have been checked before adding the surface
 			ZoneViewFactorInformation& zone = ZoneInfo[ ( *s ).zone ];
-			std::cout << "In DCIRE, zone: " << zone() << ", recv s: " << recv() <<
-			  ", tid: " << tid << ", zone.owner: " << zone.owner << std::endl;
+			// std::cout << "In DCIRE, zone: " << zone() << ", recv s: " << recv() <<
+			//   ", tid: " << tid << ", zone.owner: " << zone.owner << std::endl;
 			if( ZoneToResimulate == -1 ){
 			  if( !ZoneChecked[ zone() ]){
 			    if( zone.owner == tid ){
@@ -168,10 +168,12 @@ namespace HeatBalanceIntRadExchange {
 			      }
 			      CalcSurfaceTemp( zone, SurfIterations );
 			      zone.ready = true;
+			      std::cout << "thread " << tid << " signalled ready on zone " << zone() << std::endl;
 			      //zone.lock.clear( std::memory_order_release);
 			    }else{
 			      while(zone.ready == false){} //zone.lock.test_and_set( std::memory_order_acquire )){}
 			      //zone.lock.clear();
+			      std::cout << "thread " << tid << " received ready for zone " << zone() << std::endl;
 			    }
 			  }
 			}else{
@@ -179,7 +181,7 @@ namespace HeatBalanceIntRadExchange {
 			  CalcSurfaceEmiss( zone );
 			}
 	
-			ZoneChecked[ zone() ] == true;
+			ZoneChecked[ zone() ] = true;
 			Real64 tIR, tLWR;
 			tIR = tLWR = 0;
 			for( auto send : zone.surfaces ){
@@ -980,11 +982,15 @@ namespace HeatBalanceIntRadExchange {
 			ZoneInfo[ (*threadSurfIterators[ t ].first).zone ].owner = t;
 		}
 
-		for(auto vect: WriteVectors){
-			if(!vect->isOptimized()){
-				vect->optimize(LoadBalanceVector);
-			}
-		}
+		// for(auto vect: WriteVectors){
+		// 	if(!vect->isOptimized()){
+		// 		vect->optimize(LoadBalanceVector);
+		// 	}
+		// }
+		DataSurfaces::IRfromParentZone.optimize( LoadBalanceVector );
+
+		DataHeatBalSurface::NetLWRadToSurf.optimize( LoadBalanceVector );
+		
 		// int thread = 0;
 		// int firstSurf = 0;
 		// int zone = 0;

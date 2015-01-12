@@ -1,0 +1,29 @@
+      SUBROUTINE DWRAPNRM2( N, X, INCX, NRM2 )
+      INTEGER            N, INCX
+      DOUBLE PRECISION   NRM2
+      DOUBLE PRECISION   X( * )
+      EXTERNAL           DNRM2
+      DOUBLE PRECISION   DNRM2
+      NRM2 = DNRM2( N, X, INCX )
+      RETURN
+      END
+*
+      SUBROUTINE DWRAPASUM( N, X, INCX, ASUM )
+      INTEGER            N, INCX
+      DOUBLE PRECISION   ASUM
+      DOUBLE PRECISION   X( * )
+      EXTERNAL           DASUM
+      DOUBLE PRECISION   DASUM
+      ASUM = DASUM( N, X, INCX )
+      RETURN
+      END
+*
+      SUBROUTINE DWRAPDOT( N, X, INCX, Y, INCY, DOT )
+      INTEGER            N, INCX, INCY
+      DOUBLE PRECISION   DOT
+      DOUBLE PRECISION   X( * ), Y( * )
+      EXTERNAL           DDOT
+      DOUBLE PRECISION   DDOT
+      DOT = DDOT( N, X, INCX, Y, INCY )
+      RETURN
+      END

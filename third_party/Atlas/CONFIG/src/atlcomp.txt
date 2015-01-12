@@ -1,0 +1,279 @@
+#
+# In this file, any line beginning with a '#' is ignored, but the # must be in
+# column 0.  All multiple whitespace is reduced to one space (i.e. used only
+# to distinguish where words begin/end)
+#
+# The file has the following format:
+# MACH=<#>,...,<#> OS=<#>,...,<#> LVL=<#> COMPS=[icc,smc,dmc,skc,dkc,xccf77]
+#  'compiler' 'flags'
+# Where MACH indicates the MACHTYPE(s) that the compiler should be available
+# on, the OS indicates which Operating systems that compiler is available on,
+# and both of these can take the value of 0, which means the compiler and
+# associated flags can be used for any machine/OS.  There should be no
+# space in the #,# strings.
+#
+# LVL gives a priority, and the highest available priority compiler is used
+# by ATLAS by default.  If the user overrides to a compiler that's listed
+# as a possiblity, the flags given in this line will be used (if the user
+# does not also override flags) regardless of priority.  In general, here
+# are some reserved priorities:
+#   1000: Default compiler for particular OS/flag
+#    500: Alternative compiler getting roughly same performance
+#    100: Alternative compiler getting crappier performance
+#     50: Default compiler for particular OS / general family
+#     10: Default compiler for particular OS / completely unknown arch
+#      0: Fallback compiler when nothing is known
+#
+# COMPS is a list saying which of ATLAS's compiler this comp/flag combo are
+#  to be used for:
+#  icc: Used to compiler interface; perf neutral, so set to anything user
+#       uses for interoperability
+#  f77: Same as above but for f77 interface.
+#  dkc: Used to compile all non-matmul double prec computational kernels.
+#  skc: Used to compile all non-matmul single prec computational kernels.
+#  dmc: Used to compile all matmul single prec computational kernels.
+#  smc: Used to compile all matmul single prec computational kernels.
+#*****************************************************************************
+#
+# All non-core x86 like these params for MMFLAGS (probably want -O3 for
+# Level 1 & 2, but must confirm)
+#
+# Core2/Corei1/Corei2/Corei3
+MACH=Corei3 OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc,icc,gcc,xcc
+   'gcc' '-fomit-frame-pointer -mfpmath=sse -O2'
+MACH=Corei2 OS=Win9x,WinNT,Win64 LVL=1005 COMPS=smc,dmc,skc,dkc,icc
+   'gcc-4' '-fomit-frame-pointer -mfpmath=sse -O2 -fno-schedule-insns2'
+MACH=Corei2 OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc,icc,gcc,xcc
+   'gcc' '-fomit-frame-pointer -mfpmath=sse -O2 -fno-schedule-insns2'
+MACH=Corei2 OS=ALL LVL=50 COMPS=skc,dkc,icc,xcc
+    'clang' '-fomit-frame-pointer -mavx -O2 -m64 -Wno-parentheses'
+MACH=Corei1 OS=Win9x,WinNT,Win64 LVL=1005 COMPS=smc,dmc,skc,dkc,icc,gcc
+   'gcc-4' '-fomit-frame-pointer -mfpmath=sse -O2 -fno-schedule-insns2'
+MACH=Corei1 OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc,icc,gcc
+   'gcc' '-fomit-frame-pointer -mfpmath=sse -O2 -fno-schedule-insns2'
+MACH=Core2 OS=Win9x,WinNT,Win64 LVL=1005 COMPS=smc,dmc,skc,dkc,icc
+   'gcc-4' '-fomit-frame-pointer -mfpmath=sse -O2'
+MACH=Core2 OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc,icc,gcc
+   'gcc' '-fomit-frame-pointer -mfpmath=sse -O2'
+MACH=Atom OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc
+   'gcc' '-O3 -fno-schedule-insns2 -funroll-all-loops -fno-tree-ch'
+MACH=Atom OS=ALL LVL=1000 COMPS=icc,gcc
+   'gcc' '-O'
+# Generic x86 defaults for building portable, low-performance libs
+MACH=x86x87 OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc,icc,gcc
+   'gcc' '-fomit-frame-pointer -mfpmath=387 -O2 -falign-loops=4'
+MACH=x86x87,x86SSE1 OS=ALL LVL=1000 COMPS=f77
+   'gfortran' '-fomit-frame-pointer -mfpmath=387 -O2 -falign-loops=4'
+MACH=x86SSE1 OS=ALL LVL=1000 COMPS=dmc,dkc,icc,gcc
+   'gcc' '-fomit-frame-pointer -mfpmath=387 -O2 -falign-loops=4'
+MACH=x86SSE1 OS=ALL LVL=1000 COMPS=smc,skc
+   'gcc' '-fomit-frame-pointer -mfpmath=sse -O2'
+MACH=x86SSE1 OS=ALL LVL=1000 COMPS=f77
+   'gfortran' '-fomit-frame-pointer -mfpmath=387 -O2 -falign-loops=4'
+MACH=x86SSE2 OS=ALL LVL=1000 COMPS=smc,skc,dmc,dkc,icc,gcc
+   'gcc' '-fomit-frame-pointer -mfpmath=sse -O2'
+MACH=x86SSE2 OS=ALL LVL=1000 COMPS=f77
+   'gfortran' '-fomit-frame-pointer -mfpmath=sse -O2'
+MACH=x86SSE3 OS=ALL LVL=1000 COMPS=dmc,smc,dkc,skc,icc,gcc
+   'gcc' '-fomit-frame-pointer -mfpmath=sse -O2'
+MACH=x86SSE3 OS=ALL LVL=1000 COMPS=f77
+   'gfortran' '-fomit-frame-pointer -mfpmath=sse -O2'
+# P4E, P4
+MACH=P4E,P4 OS=ALL LVL=1000 COMPS=f77
+   'gfortran' '-O2 -fomit-frame-pointer -mfpmath=sse'
+MACH=P4E OS=ALL LVL=1000 COMPS=skc,dkc,icc
+   'gcc' '-O2 -fomit-frame-pointer -mfpmath=sse'
+MACH=P4E,P4 OS=ALL LVL=1000 COMPS=smc,dmc
+   'gcc' '-O2 -fomit-frame-pointer -mfpmath=sse -fno-schedule-insns -fno-optimize-register-move'
+MACH=P4E,P4 OS=Win9x,WinNT,Win64 LVL=1005 COMPS=smc,dmc
+   'gcc-4' '-O2 -fomit-frame-pointer -mfpmath=sse -fno-schedule-insns -fno-optimize-register-move'
+MACH=P4E,P4 OS=ALL LVL=1000 COMPS=skc,dkc,icc
+   'gcc-4' '-O2 -fomit-frame-pointer -mfpmath=sse'
+# Hammer
+MACH=HAMMER OS=ALL LVL=1000 COMPS=f77
+   'gfortran' '-fomit-frame-pointer -mfpmath=387 -O2'
+MACH=HAMMER OS=Win9x,WinNT,Win64 LVL=1005 COMPS=smc,dmc,skc,dkc,icc
+   'gcc-4' '-fomit-frame-pointer -mfpmath=387 -O2'
+MACH=HAMMER OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc,icc,gcc
+   'gcc' '-fomit-frame-pointer -mfpmath=387 -O2'
+# PPRO,PII,PIII,K7
+MACH=PPRO,PII,PIII,K7 OS=ALL LVL=1000 COMPS=f77
+   'gfortran' '-fomit-frame-pointer -mfpmath=387 -O2 -falign-loops=4'
+MACH=PPRO,PII,PIII,K7 OS=Win9x,WinNT,Win64 LVL=1005 COMPS=smc,dmc,skc,dkc,icc
+   'gcc-4' '-fomit-frame-pointer -mfpmath=387 -O2 -falign-loops=4'
+MACH=PPRO,PII,PIII,P4,P4E,K7 OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc,icc,gcc
+   'gcc' '-fomit-frame-pointer -mfpmath=387 -O2 -falign-loops=4'
+# CoreSolo,CoreDuo
+MACH=CoreSolo,CoreDuo OS=WinNT,Win9x,Win64 LVL=1005 COMPS=smc,dmc,skc,dkc,icc
+   'gcc-4' '-fomit-frame-pointer -O3 -mfpmath=387'
+MACH=CoreSolo,CoreDuo OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc,icc,gcc
+   'gcc' '-fomit-frame-pointer -O3 -mfpmath=387'
+# 3rd generation opteron (Barcelona and descendents)
+MACH=AMD64K10h OS=ALL LVL=1000 COMPS=f77
+   'gfortran' '-fomit-frame-pointer -mfpmath=sse -O2'
+MACH=AMD64K10h OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc,icc,gcc
+   'gcc' '-fomit-frame-pointer -mfpmath=sse -O2'
+MACH=AMD64K10h OS=Win9x,WinNT,Win64 LVL=1005 COMPS=smc,dmc,skc,dkc,icc,gcc
+   'gcc' '-fomit-frame-pointer -mfpmath=sse -O2'
+MACH=AMDDRIVER OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc,icc,gcc
+   'gcc' '-Os -fomit-frame-pointer'
+MACH=AMDDOZER OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc,icc,gcc
+   'gcc' '-fomit-frame-pointer -mfpmath=sse -mfma4 -O2 -fno-tree-loop-optimize'
+# UltraSPARC T2
+MACH=UST2 OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc,icc,xcc,gcc
+   'gcc' '-mcpu=niagara2 -mtune=niagara2 -Os'
+MACH=UST2 OS=ALL LVL=1000 COMPS=f77
+   'gfortran' '-mcpu=niagara2 -mtune=niagara2 -Os'
+# UltraSPARC III & IV
+MACH=USIII,USIV OS=ALL LVL=1000 COMPS=smc,
+   'gcc' '-O1 -mcpu=ultrasparc3 -mtune=ultrasparc3 -fschedule-insns -fmodulo-sched'
+MACH=USIII,USIV OS=ALL LVL=1000 COMPS=dmc,skc,dkc,icc
+   'gcc' '-O3 -mcpu=ultrasparc3 -mtune=ultrasparc3 -fno-schedule-insns2 -fschedule-insns'
+MACH=USIII,USIV OS=ALL LVL=1000 COMPS=xcc,gcc
+   'gcc' '-mcpu=ultrasparc3 -mtune=ultrasparc3 -O'
+MACH=USIII,USIV OS=ALL LVL=1000 COMPS=f77
+   'f77' '-dalign -native -xO5'
+MACH=USIII,USIV OS=ALL LVL=100 COMPS=f77
+   'gfortran' '-O -mcpu=ultrasparc3 -mtune=ultrasparc3'
+MACH=USIII,USIV OS=ALL LVL=10 COMPS=f77
+   'g77' '-O -mcpu=ultrasparc3 -mtune=ultrasparc3'
+#
+# Itanium & Itanium 2
+#
+# These gcc 4 default flags will die on gcc3, allowing gcc3's flags to be used
+MACH=IA64Itan,IA64Itan2 OS=ALL LVL=1010 COMPS=smc,dmc,skc,dkc
+   'gcc' '-fomit-frame-pointer -O2 -fno-tree-loop-optimize'
+MACH=IA64Itan,IA64Itan2 OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc
+   'gcc' '-fomit-frame-pointer -O2'
+MACH=IA64Itan,IA64Itan2 OS=ALL LVL=1010 COMPS=f77
+   'gfortran' '-fomit-frame-pointer -O2 -fno-tree-loop-optimize'
+#
+# IRIX/MIPS
+#
+MACH=MIPSR1xK OS=IRIX LVL=1000 COMPS=smc,dmc,skc,dkc
+   'cc' '-O3 -OPT:Olimit=15000 -LNO:blocking=OFF -LOPT:alias=typed'
+MACH=MIPSR1xK OS=IRIX LVL=1000 COMPS=icc,xcc,gcc
+   'cc' '-O2 -OPT:Olimit=15000 -LNO:blocking=OFF'
+MACH=MIPSR1xK OS=IRIX LVL=1000 COMPS=f77
+   'f77' '-O2'
+#
+# Linux/MIPSICE9
+# pathcc priorities set below gcc because threaded syrk won't work with
+# pathcc at -O2 -- seems to be a compiler error
+#
+MACH=MIPSICE9 OS=ALL LVL=500 COMPS=icc,smc,dmc,skc,dkc,xcc,gcc
+   'gcc' '-O2 -mips64 -march=5kf -mtune=5kf -fno-schedule-insns -fschedule-insns2 -fno-peephole -fno-peephole2'
+MACH=MIPSICE9 OS=ALL LVL=1000 COMPS=f77
+   'pathf95' '-march=auto -O2'
+MACH=MIPSICE9 OS=ALL LVL=1 COMPS=skc,dkc
+   'pathcc' '-O3 -OPT:Olimit=15000 -LNO:blocking=OFF -LOPT:alias=typed -march=auto'
+MACH=MIPSICE9 OS=ALL LVL=1 COMPS=smc,dmc
+   'pathcc' '-O3 -OPT:Olimit=15000 -LNO:blocking=OFF -LOPT:alias=typed -march=auto -LNO:opt=0 -LNO:full_unroll_outer=OFF -LNO:fusion=0 -LNO:prefetch=2'
+MACH=MIPSICE9 OS=ALL LVL=1 COMPS=icc,xcc
+   'pathcc' '-march=auto -O2 -OPT:Olimit=15000 -LNO:blocking=OFF'
+#
+# G4 flags, has a slightly less important case of the gcc perf bug of the POWER5
+# confirmed in gcc 4.3.2.
+#
+MACH=PPCG4 OS=ALL LVL=1000 COMPS=dmc
+   'gcc' '-Os -maltivec -mabi=altivec -mcpu=7400 -mtune=7400'
+MACH=PPCG4 OS=ALL LVL=1000 COMPS=smc
+   'gcc' '-Os -maltivec -mabi=altivec -mcpu=7400 -mtune=7400'
+MACH=PPCG4 OS=ALL LVL=1000 COMPS=icc,skc,dkc,xcc,gcc
+   'gcc' '-O3 -maltivec -mabi=altivec -mcpu=7400 -mtune=7400 -fno-schedule-insns -fschedule-insns2'
+#
+# PowerPC970
+#
+MACH=PPCG5 OS=ALL LVL=1000 COMPS=smc
+   'gcc' '-Os -mpowerpc64 -maltivec -mabi=altivec -mcpu=970 -mtune=970 -mvrsave -fno-schedule-insns2 -fno-schedule-insns'
+MACH=PPCG5 OS=ALL LVL=1000 COMPS=dmc,icc,dkc,xcc,gcc
+   'gcc' '-mpowerpc64 -maltivec -mabi=altivec -mcpu=970 -mtune=970 -O2'
+MACH=PPCG5 OS=ALL LVL=1000 COMPS=skc
+   'gcc' '-mpowerpc64 -maltivec -mabi=altivec -mcpu=970 -mtune=970 -O2 -mvrsave'
+MACH=POWER7 OS=ALL LVL=1010 COMPS=icc,smc,dmc,skc,dkc,xcc,gcc
+   'gcc' '-O2 -mvsx -mcpu=power7 -mtune=power7 -m64 -mvrsave -funroll-all-loops'
+MACH=POWER7 OS=ALL LVL=1010 COMPS=f77
+   'gfortran' '-O2 -mvsx -mcpu=power7 -mtune=power7 -m64 -mvrsave -funroll-all-loops'
+MACH=POWER6 OS=ALL LVL=1010 COMPS=icc,smc,dmc,skc,dkc,xcc,gcc
+   'gcc' '-mcpu=power6 -mtune=power6 -maltivec -O3 -fno-schedule-insns -fschedule-insns2 -minsert-sched-nops=2'
+MACH=POWER5 OS=ALL LVL=1010 COMPS=icc,smc,dmc,skc,dkc,xcc,gcc
+   'gcc' '-mcpu=power5 -mtune=power5 -O3 -fno-schedule-insns -fno-rerun-loop-opt'
+MACH=POWER6 OS=ALL LVL=1010 COMPS=f77
+   'gfortran' '-mcpu=power6 -mtune=power6 -maltivec -O3 -fno-schedule-insns -fschedule-insns2 -minsert-sched-nops=2'
+MACH=POWER5 OS=ALL LVL=1010 COMPS=f77
+   'gfortran' '-mcpu=power5 -mtune=power5 -O3 -fno-schedule-insns -fno-rerun-loop-opt'
+MACH=POWER7 OS=ALL LVL=1010 COMPS=f77
+   'xlf' '-qtune=pwr7 -qarch=pwr7 -O3 -qmaxmem=-1 -qfloat=hsflt'
+MACH=POWER5 OS=ALL LVL=1010 COMPS=f77
+   'xlf' '-qtune=pwr5 -qarch=pwr5 -O3 -qmaxmem=-1 -qfloat=hsflt'
+MACH=POWER4 OS=ALL LVL=1010 COMPS=icc,dmc,smc,dkc,skc,xcc,gcc
+   'gcc' '-mcpu=power4 -mtune=power4 -O3 -fno-schedule-insns -fno-rerun-loop-opt'
+MACH=POWER4 OS=ALL LVL=1010 COMPS=f77
+   'xlf' '-qtune=pwr4 -qarch=pwr4 -O3 -qmaxmem=-1 -qfloat=hsflt'
+#
+# IBM System z or zEnterprise.
+# These compiler flags given by IBM; -O3 -funroll-loops are chosen because
+# its what their compiler group supports, not necessarily because they are best
+MACH=IBMz9 OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc,icc,xcc,gcc
+   'gcc' '-march=z9-109 -O3 -funroll-loops'
+MACH=IBMz10 OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc,icc,xcc,gcc
+   'gcc' '-march=z10 -O3 -funroll-loops -fno-prefetch-loop-arrays'
+# Try to fallback to z9 for older compilers
+MACH=IBMz10 OS=ALL LVL=600 COMPS=f77
+   'gfortran' '-march=z9-109 -O3 -funroll-loops'
+MACH=IBMz10 OS=ALL LVL=600 COMPS=smc,dmc,skc,dkc,icc,xcc,gcc
+   'gcc' '-march=z9-109 -O3 -funroll-loops -fno-prefetch-loop-arrays'
+# z196
+MACH=IBMz196 OS=ALL LVL=1000 COMPS=f77
+   'gfortran' '-march=z196 -O3 -funroll-loops -fno-prefetch-loop-arrays'
+MACH=IBMz196 OS=ALL LVL=1000 COMPS=smc,dmc,skc,dkc,icc,xcc,gcc
+   'gcc' '-march=z196 -O3 -funroll-loops -fno-prefetch-loop-arrays'
+# We also try to fallback to z10 or z9 for older compilers
+MACH=IBMz196 OS=ALL LVL=800 COMPS=smc,dmc,skc,dkc,icc,xcc,gcc
+   'gcc' '-march=z10 -O3 -funroll-loops -fno-prefetch-loop-arrays'
+MACH=IBMz196 OS=ALL LVL=800 COMPS=f77
+   'gfortran' '-march=z10 -O3 -funroll-loops -fno-prefetch-loop-arrays'
+MACH=IBMz196 OS=ALL LVL=600 COMPS=smc,dmc,skc,dkc,icc,xcc,gcc
+   'gcc' '-march=z9-109 -O3 -funroll-loops'
+MACH=IBMz196 OS=ALL LVL=600 COMPS=f77
+   'gfortran' '-march=z9-109 -O3 -funroll-loops'
+# ALL march options failed, go back to conservative defaults
+MACH=IBMz9,IBMz10,IBMz196 OS=ALL LVL=500 COMPS=f77
+   'gfortran' '-O3 -funroll-loops'
+MACH=IBMz9,IBMz10,IBMz196 OS=ALL LVL=500 COMPS=smc,dmc,skc,dkc,icc,xcc,gcc
+   'gcc' '-O3 -funroll-loops'
+#
+# Windows defaults ; need to make SSE/SSE2 arch dep.
+#
+MACH=P5,P5MMX,PPRO,PII OS=WinNT,Win64 LVL=4 COMPS=icc,dmc,smc,dkc,skc,xcc
+   'cl' '-Oy -Ox'
+MACH=PIII,K7 OS=WinNT,Win64 LVL=4 COMPS=icc,dmc,smc,dkc,skc,xcc
+   'cl' '-Oy -Ox -arch:SSE -nologo'
+MACH=ALL OS=WinNT,Win64 LVL=0 COMPS=icc,dmc,smc,dkc,skc,xcc
+   'cl' '-Oy -Ox -arch:SSE2 -nologo'
+MACH=ALL OS=WinNT,Win64 LVL=0 COMPS=f77
+   'ifort' '-O2 -fltconsistency -nologo'
+MACH=P4,PM OS=WinNT,Win64 LVL=0 COMPS=icc,dmc,smc,dkc,skc,xcc
+   'icl' '-QxN -O3 -Qprec -fp:extended -fp:except -nologo -Oy'
+#
+# ARM defaults
+#
+MACH=ARMv7 OS=ALL LVL=1000 COMPS=xcc
+   'gcc' '-mcpu=cortex-a8 -O1 -mfpu=vfpv3 -mfloat-abi=softfp '
+MACH=ARMv7 OS=ALL LVL=1000 COMPS=smc,skc,gcc,icc
+   'gcc' '-O1 -mcpu=cortex-a8 -mtune=cortex-a8 -mfpu=vfpv3 -mfloat-abi=softfp -fno-expensive-optimizations'
+MACH=ARMv7 OS=ALL LVL=1000 COMPS=dmc,dkc
+   'gcc' '-O1 -mcpu=cortex-a8 -mtune=cortex-a8 -mfpu=vfpv3 -mfloat-abi=softfp -fno-schedule-insns2'
+MACH=ARMv7 OS=ALL LVL=1000 COMPS=f77
+   'gfortran' '-mcpu=cortex-a8 -mfpu=vfpv3 -mfloat-abi=softfp -O'
+#
+# Generic defaults
+#
+MACH=ALL OS=ALL LVL=5 COMPS=icc,smc,dmc,skc,dkc,xcc,gcc
+   'gcc' '-O -fomit-frame-pointer'
+MACH=ALL OS=ALL LVL=5 COMPS=f77
+   'gfortran' '-O'
+MACH=ALL OS=ALL LVL=4 COMPS=f77
+   'g77' '-O'
+MACH=ALL OS=ALL LVL=0 COMPS=f77
+   'f77' '-O'

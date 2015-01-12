@@ -1,0 +1,151 @@
+
+topd = /home/whaley/git/math-atlas/AtlasBase
+ext  = /home/whaley/git/math-atlas/STAB/xextract
+extF = $(ext) -langF -lnlen71 -Remtblank -llwarn2 -LAPACK1 $(incs)
+ext9 = $(ext) -langF -lnlen132 -RemtBlank $(incs)
+extC = $(ext) -langC -lnlen79 -Remtblank -llwarn2 $(incs)
+extM = $(ext) -langM -lnlen79 -llwarn2 $(incs)
+incs = -def topd /home/whaley/git/math-atlas/AtlasBase \
+       -def incd /home/whaley/git/math-atlas/AtlasBase/Clint \
+       -def ext  /home/whaley/git/math-atlas/STAB/xextract \
+       -def BASEdir /home/whaley/git/math-atlas/AtlasBase/Antoine/ \
+       -def basd /home/whaley/git/math-atlas/AtlasBase/Clint
+
+default: all
+force_build:
+basd = /home/whaley/git/math-atlas/AtlasBase/Clint
+basdRCW = /home/whaley/git/math-atlas/AtlasBase/Clint
+basdAPP = /home/whaley/git/math-atlas/AtlasBase/Antoine
+basdSTU = /home/whaley/git/math-atlas/AtlasBase/Students
+incf = /home/whaley/git/math-atlas/AtlasBase/gen.inc
+
+basf = $(basdRCW)/atlconf.base
+basA = $(basdRCW)/atlarch.base
+
+
+files = archinfo_aix.c archinfo_freebsd.c archinfo_irix.c archinfo_linux.c \
+        archinfo_sfu.c archinfo_sunos.c archinfo_win.c archinfo_x86.c \
+        c2cmaster.c c2cslave.c comptestC.c comptestF.f cpuid.S f2cintC.c \
+        f2cintF.f f2cnameC.c f2cnameF.f f2cstrC.c f2cstrF.f flibchkC.c \
+        flibchkF.f probe_3DNow.S probe_AVX.S probe_AVXFMA4.S probe_AVXMAC.S \
+        probe_AltiVec.S probe_NEON.S probe_SSE1.S probe_SSE2.S probe_SSE3.S \
+        probe_VSX.S probe_aff_BINDP.c probe_aff_CPUSET.c probe_aff_PBIND.c \
+        probe_aff_PLPA.c probe_aff_RUNON.c probe_aff_SCHED.c \
+        probe_aff_SETAFFNP.c probe_aff_SETPROCNP.c probe_aff_WIN.c \
+        probe_aff_WIN64.c probe_dAVX.c probe_dSSE3.c probe_dvec.c \
+        probe_gas_arm.S probe_gas_mips.S probe_gas_parisc.S probe_gas_ppc.S \
+        probe_gas_s390.S probe_gas_sparc.S probe_gas_x8632.S \
+        probe_gas_x8664.S probe_svec.c probe_this_asm.c
+
+all : $(files)
+
+Make.ext : $(topd)/make.base
+	$(extM) -b $(topd)/make.base -o Make.ext rout=atlas/config/src/backend
+probe_gas_x8664.S : $(basf)
+	$(extC) -b $(basf) -o probe_gas_x8664.S rout=probe_gas_x8664.S
+probe_gas_x8632.S : $(basf)
+	$(extC) -b $(basf) -o probe_gas_x8632.S rout=probe_gas_x8632.S
+probe_gas_ppc.S : $(basf)
+	$(extC) -b $(basf) -o probe_gas_ppc.S rout=probe_gas_ppc.S
+probe_gas_sparc.S : $(basf)
+	$(extC) -b $(basf) -o probe_gas_sparc.S rout=probe_gas_sparc.S
+probe_gas_parisc.S : $(basf)
+	$(extC) -b $(basf) -o probe_gas_parisc.S rout=probe_gas_parisc.S
+probe_gas_mips.S : $(basf)
+	$(extC) -b $(basf) -o probe_gas_mips.S rout=probe_gas_mips.S
+probe_gas_arm.S : $(basf)
+	$(extC) -b $(basf) -o probe_gas_arm.S rout=probe_gas_arm.S
+probe_gas_s390.S : $(basf)
+	$(extC) -b $(basf) -o probe_gas_s390.S rout=probe_gas_s390.S
+probe_AVXMAC.S : $(basf)
+	$(extC) -b $(basf) -o probe_AVXMAC.S rout=probe_AVXMAC.S
+probe_AVXFMA4.S : $(basf)
+	$(extC) -b $(basf) -o probe_AVXFMA4.S rout=probe_AVXFMA4.S
+probe_AVX.S : $(basf)
+	$(extC) -b $(basf) -o probe_AVX.S rout=probe_AVX.S
+probe_SSE3.S : $(basf)
+	$(extC) -b $(basf) -o probe_SSE3.S rout=probe_SSE3.S
+probe_SSE2.S : $(basf)
+	$(extC) -b $(basf) -o probe_SSE2.S rout=probe_SSE2.S
+probe_SSE1.S : $(basf)
+	$(extC) -b $(basf) -o probe_SSE1.S rout=probe_SSE1.S
+probe_AltiVec.S : $(basf)
+	$(extC) -b $(basf) -o probe_AltiVec.S rout=probe_AltiVec.S
+probe_3DNow.S : $(basf)
+	$(extC) -b $(basf) -o probe_3DNow.S rout=probe_3DNow.S
+probe_VSX.S : $(basf)
+	$(extC) -b $(basf) -o probe_VSX.S rout=probe_VSX.S
+probe_NEON.S : $(basf)
+	$(extC) -b $(basf) -o probe_NEON.S rout=probe_NEON.S
+f2cnameF.f : $(basf)
+	$(extF) -b $(basf) -o f2cnameF.f rout=f2cnameF.f
+f2cintF.f : $(basf)
+	$(extF) -b $(basf) -o f2cintF.f rout=f2cintF.f
+f2cstrF.f : $(basf)
+	$(extF) -b $(basf) -o f2cstrF.f rout=f2cstrF.f
+comptestF.f : $(basf)
+	$(extF) -b $(basf) -o comptestF.f rout=comptestF.f
+flibchkF.f : $(basf)
+	$(extF) -b $(basf) -o flibchkF.f rout=flibchkF.f
+probe_aff_SETAFFNP.c : $(basf)
+	$(extC) -b $(basf) -o probe_aff_SETAFFNP.c rout=probe_aff_SETAFFNP
+probe_aff_SETPROCNP.c : $(basf)
+	$(extC) -b $(basf) -o probe_aff_SETPROCNP.c rout=probe_aff_SETPROCNP
+probe_aff_PLPA.c : $(basf)
+	$(extC) -b $(basf) -o probe_aff_PLPA.c rout=probe_aff_PLPA
+probe_aff_SCHED.c : $(basf)
+	$(extC) -b $(basf) -o probe_aff_SCHED.c rout=probe_aff_SCHED
+probe_aff_PBIND.c : $(basf)
+	$(extC) -b $(basf) -o probe_aff_PBIND.c rout=probe_aff_PBIND
+probe_aff_BINDP.c : $(basf)
+	$(extC) -b $(basf) -o probe_aff_BINDP.c rout=probe_aff_BINDP
+probe_aff_RUNON.c : $(basf)
+	$(extC) -b $(basf) -o probe_aff_RUNON.c rout=probe_aff_RUNON
+probe_aff_CPUSET.c : $(basf)
+	$(extC) -b $(basf) -o probe_aff_CPUSET.c rout=probe_aff_CPUSET
+probe_aff_WIN.c : $(basf)
+	$(extC) -b $(basf) -o probe_aff_WIN.c rout=probe_aff_WIN
+probe_aff_WIN64.c : $(basf)
+	$(extC) -b $(basf) -o probe_aff_WIN64.c rout=probe_aff_WIN64
+probe_this_asm.c : $(basf)
+	$(extC) -b $(basf) -o probe_this_asm.c rout=probe_this_asm
+probe_svec.c : $(basf)
+	$(extC) -b $(basf) -o probe_svec.c rout=probe_svec
+probe_dvec.c : $(basf)
+	$(extC) -b $(basf) -o probe_dvec.c rout=probe_dvec
+probe_dSSE3.c : $(basf)
+	$(extC) -b $(basf) -o probe_dSSE3.c rout=probe_dSSE3
+probe_dAVX.c : $(basf)
+	$(extC) -b $(basf) -o probe_dAVX.c rout=probe_dAVX
+f2cnameC.c : $(basf)
+	$(extC) -b $(basf) -o f2cnameC.c rout=f2cnameC
+f2cintC.c : $(basf)
+	$(extC) -b $(basf) -o f2cintC.c rout=f2cintC
+f2cstrC.c : $(basf)
+	$(extC) -b $(basf) -o f2cstrC.c rout=f2cstrC
+comptestC.c : $(basf)
+	$(extC) -b $(basf) -o comptestC.c rout=comptestC
+c2cslave.c : $(basf)
+	$(extC) -b $(basf) -o c2cslave.c rout=c2cslave
+c2cmaster.c : $(basf)
+	$(extC) -b $(basf) -o c2cmaster.c rout=c2cmaster
+flibchkC.c : $(basf)
+	$(extC) -b $(basf) -o flibchkC.c rout=flibchkC
+archinfo_x86.c : $(basA)
+	$(extC) -b $(basA) -o archinfo_x86.c rout=archinfo_x86
+archinfo_linux.c : $(basA)
+	$(extC) -b $(basA) -o archinfo_linux.c rout=archinfo_linux
+archinfo_freebsd.c : $(basA)
+	$(extC) -b $(basA) -o archinfo_freebsd.c rout=archinfo_freebsd
+archinfo_sunos.c : $(basA)
+	$(extC) -b $(basA) -o archinfo_sunos.c rout=archinfo_sunos
+archinfo_irix.c : $(basA)
+	$(extC) -b $(basA) -o archinfo_irix.c rout=archinfo_irix
+archinfo_aix.c : $(basA)
+	$(extC) -b $(basA) -o archinfo_aix.c rout=archinfo_aix
+archinfo_win.c : $(basA)
+	$(extC) -b $(basA) -o archinfo_win.c rout=archinfo_win
+archinfo_sfu.c : $(basA)
+	$(extC) -b $(basA) -o archinfo_sfu.c rout=archinfo_sfu
+cpuid.S : $(basf)
+	$(extC) -b $(basA) -o cpuid.S rout=cpuid.S

@@ -1,0 +1,42 @@
+
+topd = /home/whaley/git/math-atlas/AtlasBase
+ext  = /home/whaley/git/math-atlas/STAB/xextract
+extF = $(ext) -langF -lnlen71 -Remtblank -llwarn2 -LAPACK1 $(incs)
+ext9 = $(ext) -langF -lnlen132 -RemtBlank $(incs)
+extC = $(ext) -langC -lnlen79 -Remtblank -llwarn2 $(incs)
+extM = $(ext) -langM -lnlen79 -llwarn2 $(incs)
+incs = -def topd /home/whaley/git/math-atlas/AtlasBase \
+       -def incd /home/whaley/git/math-atlas/AtlasBase/Clint \
+       -def ext  /home/whaley/git/math-atlas/STAB/xextract \
+       -def BASEdir /home/whaley/git/math-atlas/AtlasBase/Antoine/ \
+       -def basd /home/whaley/git/math-atlas/AtlasBase/Clint
+
+default: all
+force_build:
+basd = /home/whaley/git/math-atlas/AtlasBase/Clint
+basdRCW = /home/whaley/git/math-atlas/AtlasBase/Clint
+basdAPP = /home/whaley/git/math-atlas/AtlasBase/Antoine
+basdSTU = /home/whaley/git/math-atlas/AtlasBase/Students
+incf = /home/whaley/git/math-atlas/AtlasBase/gen.inc
+
+files = ATL_gemv_ger_SSE.h SSE3Dnow.h camm_dpa.h camm_pipe3.h camm_scale.h \
+        camm_strat1.h camm_tpipe.h camm_util.h
+
+all : $(files)
+
+camm_strat1.h : $(topd)/kernel/CammMaguire/camm_strat1.h
+	cp $(topd)/kernel/CammMaguire/camm_strat1.h .
+camm_tpipe.h : $(topd)/kernel/CammMaguire/camm_tpipe.h
+	cp $(topd)/kernel/CammMaguire/camm_tpipe.h .
+camm_pipe3.h : $(topd)/kernel/CammMaguire/camm_pipe3.h
+	cp $(topd)/kernel/CammMaguire/camm_pipe3.h .
+ATL_gemv_ger_SSE.h : $(topd)/kernel/CammMaguire/ATL_gemv_ger_SSE.h
+	cp $(topd)/kernel/CammMaguire/ATL_gemv_ger_SSE.h .
+camm_util.h : $(topd)/kernel/CammMaguire/camm_util.h
+	cp $(topd)/kernel/CammMaguire/camm_util.h .
+camm_scale.h : $(topd)/kernel/CammMaguire/camm_scale.h
+	cp $(topd)/kernel/CammMaguire/camm_scale.h .
+camm_dpa.h : $(topd)/kernel/CammMaguire/camm_dpa.h
+	cp $(topd)/kernel/CammMaguire/camm_dpa.h .
+SSE3Dnow.h : $(topd)/kernel/PeterSoendergaard/SSE3Dnow.h
+	cp $(topd)/kernel/PeterSoendergaard/SSE3Dnow.h .

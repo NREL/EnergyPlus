@@ -1,0 +1,675 @@
+include Make.inc
+
+error_report:
+	- uname -a 2>&1 >> bin/INSTALL_LOG/ERROR.LOG
+	- $(KC) -v 2>&1  >> bin/INSTALL_LOG/ERROR.LOG
+	- $(KC) -V 2>&1  >> bin/INSTALL_LOG/ERROR.LOG
+	- $(KC) --version 2>&1  >> bin/INSTALL_LOG/ERROR.LOG
+	$(TAR) cf error_$(ARCH).tar Make.inc bin/INSTALL_LOG/*
+	$(BZIP) error_$(ARCH).tar
+
+leafstart:
+	cd $(leaf) ; ln -s $(BLDdir)/Make.inc Make.inc
+
+build:
+	cd bin/ ; $(MAKE) xatlas_build
+	cd bin/ ; ./xatlas_build $(INSTFLAGS)
+time: 
+	./xatlbench -dc $(BLDdir)/bin/INSTALL_LOG -dp $(BLDdir)/ARCHS/$(ARCH)
+C_sanity_test:
+	@ echo "BUILDING C TESTERS ONLY (GET F77 FOR MORE COMPLETE TESTING):"
+	cd bin ; $(MAKE) sanity_test
+	@ echo "SCOPING FOR FAILURES IN BIN TESTS:"
+	- fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+	        bin/sanity.out
+	@ echo "DONE"
+sanity_test :
+	@ echo "BUILDING TESTERS:"
+	cd bin ; $(MAKE) sanity_test
+	cd interfaces/blas/C/testing ; $(MAKE) sanity_test
+	cd interfaces/blas/F77/testing ; $(MAKE) sanity_test
+	@ echo "   "
+	@ echo "DONE BUILDING TESTERS, RUNNING:"
+	@ echo "SCOPING FOR FAILURES IN BIN TESTS:"
+	- fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+	        bin/sanity.out
+	@ echo "DONE"
+	@ echo "SCOPING FOR FAILURES IN CBLAS TESTS:"
+	- fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+	        interfaces/blas/C/testing/sanity.out | \
+                fgrep -v PASSED
+	@ echo "DONE"
+	@ echo "SCOPING FOR FAILURES IN F77BLAS TESTS:"
+	- fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+	        interfaces/blas/F77/testing/sanity.out | \
+                fgrep -v PASSED
+	@ echo "DONE"
+C_ptsanity_test:
+	@ echo "BUILDING C TESTERS ONLY (GET F77 FOR MORE COMPLETE TESTING):"
+	cd bin ; $(MAKE) ptsanity_test
+	@ echo "SCOPING FOR FAILURES IN PTBIN TESTS:"
+	- fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+	        bin/ptsanity.out
+	@ echo "DONE"
+ptsanity_test :
+	@ echo "BUILDING TESTERS:"
+	cd bin ; $(MAKE) ptsanity_test
+	cd interfaces/blas/C/testing ; $(MAKE) ptsanity_test
+	cd interfaces/blas/F77/testing ; $(MAKE) ptsanity_test
+	@ echo "   "
+	@ echo "DONE BUILDING TESTERS, RUNNING:"
+	@ echo "SCOPING FOR FAILURES IN PTBIN TESTS:"
+	- fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+	        bin/ptsanity.out
+	@ echo "DONE"
+	@ echo "SCOPING FOR FAILURES IN PTCBLAS TESTS:"
+	- fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+	        interfaces/blas/C/testing/ptsanity.out | \
+                fgrep -v PASSED
+	@ echo "DONE"
+	@ echo "SCOPING FOR FAILURES IN PTF77BLAS TESTS:"
+	- fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+	        interfaces/blas/F77/testing/ptsanity.out | \
+                fgrep -v PASSED
+	@ echo "DONE"
+$(BINdir)/AtlasTest : $(SRCdir)/CONFIG/ARCHS/atlas_test1.1.3.tar.bz2
+	cd $(BINdir) ; $(BUNZIP) -c \
+           $(SRCdir)/CONFIG/ARCHS/atlas_test1.1.3.tar.bz2 | tar xf -
+
+force_build:
+lapack_test : lapack_test_al_ab
+$(BINdir)/LAPACK_TEST : $(SRCdir)/CONFIG/ARCHS/lapack_test.tar.bz2
+	cd $(BINdir) ; $(BUNZIP) -c \
+           $(SRCdir)/CONFIG/ARCHS/lapack_test.tar.bz2 | tar xf -
+scope_lapack_test_pt_pt :
+	cd $(BINdir)/LAPACK_TEST/LAOUT_PT_PT ; \
+           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+           | fgrep -v "error exits"
+lapack_test_pt_pt: $(BINdir)/LAPACK_TEST
+	cd $(BINdir)/LAPACK_TEST ; make cleanup
+	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_PT_PT \
+                 $(BINdir)/LAPACK_TEST/SUMMARY_pt_pt.txt
+	mkdir $(BINdir)/LAPACK_TEST/LAOUT_PT_PT
+	cd $(BINdir)/LAPACK_TEST ; make ATL_all LAPACKLIB="$(PTLAPACKlib)" \
+           BLASLIB="$(PTF77BLASlib) $(PTCBLASlib) $(ATLASlib) $(LIBS)" \
+           | tee LAOUT_PT_PT/$(ARCH).out 2>&1
+	mv $(BINdir)/LAPACK_TEST/*.out $(BINdir)/LAPACK_TEST/LAOUT_PT_PT/.
+	$(MAKE) -f Make.top scope_lapack_test_pt_pt | tee \
+                $(BINdir)/LAPACK_TEST/SUMMARY_pt_pt.txt 2>&1
+scope_lapack_test_pt_ab :
+	cd $(BINdir)/LAPACK_TEST/LAOUT_PT_AB ; \
+           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+           | fgrep -v "error exits"
+lapack_test_pt_ab: $(BINdir)/LAPACK_TEST
+	cd $(BINdir)/LAPACK_TEST ; make cleanup
+	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_PT_AB \
+                 $(BINdir)/LAPACK_TEST/SUMMARY_pt_ab.txt
+	mkdir $(BINdir)/LAPACK_TEST/LAOUT_PT_AB
+	cd $(BINdir)/LAPACK_TEST ; make ATL_all LAPACKLIB="$(PTLAPACKlib)" \
+           BLASLIB="$(F77BLASlib) $(CBLASlib) $(ATLASlib) $(LIBS)" \
+           | tee LAOUT_PT_AB/$(ARCH).out 2>&1
+	mv $(BINdir)/LAPACK_TEST/*.out $(BINdir)/LAPACK_TEST/LAOUT_PT_AB/.
+	$(MAKE) -f Make.top scope_lapack_test_pt_ab | tee \
+                $(BINdir)/LAPACK_TEST/SUMMARY_pt_ab.txt 2>&1
+scope_lapack_test_pt_sb :
+	cd $(BINdir)/LAPACK_TEST/LAOUT_PT_SB ; \
+           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+           | fgrep -v "error exits"
+lapack_test_pt_sb: $(BINdir)/LAPACK_TEST
+	cd $(BINdir)/LAPACK_TEST ; make cleanup
+	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_PT_SB \
+                 $(BINdir)/LAPACK_TEST/SUMMARY_pt_sb.txt
+	mkdir $(BINdir)/LAPACK_TEST/LAOUT_PT_SB
+	cd $(BINdir)/LAPACK_TEST ; make ATL_all LAPACKLIB="$(PTLAPACKlib)" \
+           BLASLIB="$(BLASlib) $(ATLASlib) $(LIBS)" \
+           | tee LAOUT_PT_SB/$(ARCH).out 2>&1
+	mv $(BINdir)/LAPACK_TEST/*.out $(BINdir)/LAPACK_TEST/LAOUT_PT_SB/.
+	$(MAKE) -f Make.top scope_lapack_test_pt_sb | tee \
+                $(BINdir)/LAPACK_TEST/SUMMARY_pt_sb.txt 2>&1
+scope_lapack_test_pt_fb :
+	cd $(BINdir)/LAPACK_TEST/LAOUT_PT_FB ; \
+           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+           | fgrep -v "error exits"
+lapack_test_pt_fb: $(BINdir)/LAPACK_TEST
+	cd $(BINdir)/LAPACK_TEST ; make cleanup
+	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_PT_FB \
+                 $(BINdir)/LAPACK_TEST/SUMMARY_pt_fb.txt
+	mkdir $(BINdir)/LAPACK_TEST/LAOUT_PT_FB
+	cd $(BINdir)/LAPACK_TEST ; make ATL_all LAPACKLIB="$(PTLAPACKlib)" \
+           BLASLIB="$(FBLASlib) $(ATLASlib) $(LIBS)" \
+           | tee LAOUT_PT_FB/$(ARCH).out 2>&1
+	mv $(BINdir)/LAPACK_TEST/*.out $(BINdir)/LAPACK_TEST/LAOUT_PT_FB/.
+	$(MAKE) -f Make.top scope_lapack_test_pt_fb | tee \
+                $(BINdir)/LAPACK_TEST/SUMMARY_pt_fb.txt 2>&1
+scope_lapack_test_al_pt :
+	cd $(BINdir)/LAPACK_TEST/LAOUT_AL_PT ; \
+           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+           | fgrep -v "error exits"
+lapack_test_al_pt: $(BINdir)/LAPACK_TEST
+	cd $(BINdir)/LAPACK_TEST ; make cleanup
+	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_AL_PT \
+                 $(BINdir)/LAPACK_TEST/SUMMARY_al_pt.txt
+	mkdir $(BINdir)/LAPACK_TEST/LAOUT_AL_PT
+	cd $(BINdir)/LAPACK_TEST ; make ATL_all LAPACKLIB="$(LAPACKlib)" \
+           BLASLIB="$(PTF77BLASlib) $(PTCBLASlib) $(ATLASlib) $(LIBS)" \
+           | tee LAOUT_AL_PT/$(ARCH).out 2>&1
+	mv $(BINdir)/LAPACK_TEST/*.out $(BINdir)/LAPACK_TEST/LAOUT_AL_PT/.
+	$(MAKE) -f Make.top scope_lapack_test_al_pt | tee \
+                $(BINdir)/LAPACK_TEST/SUMMARY_al_pt.txt 2>&1
+scope_lapack_test_al_ab :
+	cd $(BINdir)/LAPACK_TEST/LAOUT_AL_AB ; \
+           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+           | fgrep -v "error exits"
+lapack_test_al_ab: $(BINdir)/LAPACK_TEST
+	cd $(BINdir)/LAPACK_TEST ; make cleanup
+	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_AL_AB \
+                 $(BINdir)/LAPACK_TEST/SUMMARY_al_ab.txt
+	mkdir $(BINdir)/LAPACK_TEST/LAOUT_AL_AB
+	cd $(BINdir)/LAPACK_TEST ; make ATL_all LAPACKLIB="$(LAPACKlib)" \
+           BLASLIB="$(F77BLASlib) $(CBLASlib) $(ATLASlib) $(LIBS)" \
+           | tee LAOUT_AL_AB/$(ARCH).out 2>&1
+	mv $(BINdir)/LAPACK_TEST/*.out $(BINdir)/LAPACK_TEST/LAOUT_AL_AB/.
+	$(MAKE) -f Make.top scope_lapack_test_al_ab | tee \
+                $(BINdir)/LAPACK_TEST/SUMMARY_al_ab.txt 2>&1
+scope_lapack_test_al_sb :
+	cd $(BINdir)/LAPACK_TEST/LAOUT_AL_SB ; \
+           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+           | fgrep -v "error exits"
+lapack_test_al_sb: $(BINdir)/LAPACK_TEST
+	cd $(BINdir)/LAPACK_TEST ; make cleanup
+	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_AL_SB \
+                 $(BINdir)/LAPACK_TEST/SUMMARY_al_sb.txt
+	mkdir $(BINdir)/LAPACK_TEST/LAOUT_AL_SB
+	cd $(BINdir)/LAPACK_TEST ; make ATL_all LAPACKLIB="$(LAPACKlib)" \
+           BLASLIB="$(BLASlib) $(ATLASlib) $(LIBS)" \
+           | tee LAOUT_AL_SB/$(ARCH).out 2>&1
+	mv $(BINdir)/LAPACK_TEST/*.out $(BINdir)/LAPACK_TEST/LAOUT_AL_SB/.
+	$(MAKE) -f Make.top scope_lapack_test_al_sb | tee \
+                $(BINdir)/LAPACK_TEST/SUMMARY_al_sb.txt 2>&1
+scope_lapack_test_al_fb :
+	cd $(BINdir)/LAPACK_TEST/LAOUT_AL_FB ; \
+           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+           | fgrep -v "error exits"
+lapack_test_al_fb: $(BINdir)/LAPACK_TEST
+	cd $(BINdir)/LAPACK_TEST ; make cleanup
+	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_AL_FB \
+                 $(BINdir)/LAPACK_TEST/SUMMARY_al_fb.txt
+	mkdir $(BINdir)/LAPACK_TEST/LAOUT_AL_FB
+	cd $(BINdir)/LAPACK_TEST ; make ATL_all LAPACKLIB="$(LAPACKlib)" \
+           BLASLIB="$(FBLASlib) $(ATLASlib) $(LIBS)" \
+           | tee LAOUT_AL_FB/$(ARCH).out 2>&1
+	mv $(BINdir)/LAPACK_TEST/*.out $(BINdir)/LAPACK_TEST/LAOUT_AL_FB/.
+	$(MAKE) -f Make.top scope_lapack_test_al_fb | tee \
+                $(BINdir)/LAPACK_TEST/SUMMARY_al_fb.txt 2>&1
+scope_lapack_test_sl_pt :
+	cd $(BINdir)/LAPACK_TEST/LAOUT_SL_PT ; \
+           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+           | fgrep -v "error exits"
+lapack_test_sl_pt: $(BINdir)/LAPACK_TEST
+	cd $(BINdir)/LAPACK_TEST ; make cleanup
+	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_SL_PT \
+                 $(BINdir)/LAPACK_TEST/SUMMARY_sl_pt.txt
+	mkdir $(BINdir)/LAPACK_TEST/LAOUT_SL_PT
+	cd $(BINdir)/LAPACK_TEST ; make ATL_all LAPACKLIB="$(SLAPACKlib)" \
+           BLASLIB="$(PTF77BLASlib) $(PTCBLASlib) $(ATLASlib) $(LIBS)" \
+           | tee LAOUT_SL_PT/$(ARCH).out 2>&1
+	mv $(BINdir)/LAPACK_TEST/*.out $(BINdir)/LAPACK_TEST/LAOUT_SL_PT/.
+	$(MAKE) -f Make.top scope_lapack_test_sl_pt | tee \
+                $(BINdir)/LAPACK_TEST/SUMMARY_sl_pt.txt 2>&1
+scope_lapack_test_sl_ab :
+	cd $(BINdir)/LAPACK_TEST/LAOUT_SL_AB ; \
+           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+           | fgrep -v "error exits"
+lapack_test_sl_ab: $(BINdir)/LAPACK_TEST
+	cd $(BINdir)/LAPACK_TEST ; make cleanup
+	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_SL_AB \
+                 $(BINdir)/LAPACK_TEST/SUMMARY_sl_ab.txt
+	mkdir $(BINdir)/LAPACK_TEST/LAOUT_SL_AB
+	cd $(BINdir)/LAPACK_TEST ; make ATL_all LAPACKLIB="$(SLAPACKlib)" \
+           BLASLIB="$(F77BLASlib) $(CBLASlib) $(ATLASlib) $(LIBS)" \
+           | tee LAOUT_SL_AB/$(ARCH).out 2>&1
+	mv $(BINdir)/LAPACK_TEST/*.out $(BINdir)/LAPACK_TEST/LAOUT_SL_AB/.
+	$(MAKE) -f Make.top scope_lapack_test_sl_ab | tee \
+                $(BINdir)/LAPACK_TEST/SUMMARY_sl_ab.txt 2>&1
+scope_lapack_test_sl_sb :
+	cd $(BINdir)/LAPACK_TEST/LAOUT_SL_SB ; \
+           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+           | fgrep -v "error exits"
+lapack_test_sl_sb: $(BINdir)/LAPACK_TEST
+	cd $(BINdir)/LAPACK_TEST ; make cleanup
+	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_SL_SB \
+                 $(BINdir)/LAPACK_TEST/SUMMARY_sl_sb.txt
+	mkdir $(BINdir)/LAPACK_TEST/LAOUT_SL_SB
+	cd $(BINdir)/LAPACK_TEST ; make ATL_all LAPACKLIB="$(SLAPACKlib)" \
+           BLASLIB="$(BLASlib) $(ATLASlib) $(LIBS)" \
+           | tee LAOUT_SL_SB/$(ARCH).out 2>&1
+	mv $(BINdir)/LAPACK_TEST/*.out $(BINdir)/LAPACK_TEST/LAOUT_SL_SB/.
+	$(MAKE) -f Make.top scope_lapack_test_sl_sb | tee \
+                $(BINdir)/LAPACK_TEST/SUMMARY_sl_sb.txt 2>&1
+scope_lapack_test_sl_fb :
+	cd $(BINdir)/LAPACK_TEST/LAOUT_SL_FB ; \
+           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+           | fgrep -v "error exits"
+lapack_test_sl_fb: $(BINdir)/LAPACK_TEST
+	cd $(BINdir)/LAPACK_TEST ; make cleanup
+	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_SL_FB \
+                 $(BINdir)/LAPACK_TEST/SUMMARY_sl_fb.txt
+	mkdir $(BINdir)/LAPACK_TEST/LAOUT_SL_FB
+	cd $(BINdir)/LAPACK_TEST ; make ATL_all LAPACKLIB="$(SLAPACKlib)" \
+           BLASLIB="$(FBLASlib) $(ATLASlib) $(LIBS)" \
+           | tee LAOUT_SL_FB/$(ARCH).out 2>&1
+	mv $(BINdir)/LAPACK_TEST/*.out $(BINdir)/LAPACK_TEST/LAOUT_SL_FB/.
+	$(MAKE) -f Make.top scope_lapack_test_sl_fb | tee \
+                $(BINdir)/LAPACK_TEST/SUMMARY_sl_fb.txt 2>&1
+scope_lapack_test_fl_pt :
+	cd $(BINdir)/LAPACK_TEST/LAOUT_FL_PT ; \
+           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+           | fgrep -v "error exits"
+lapack_test_fl_pt: $(BINdir)/LAPACK_TEST
+	cd $(BINdir)/LAPACK_TEST ; make cleanup
+	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_FL_PT \
+                 $(BINdir)/LAPACK_TEST/SUMMARY_fl_pt.txt
+	mkdir $(BINdir)/LAPACK_TEST/LAOUT_FL_PT
+	cd $(BINdir)/LAPACK_TEST ; make ATL_all LAPACKLIB="$(FLAPACKlib)" \
+           BLASLIB="$(PTF77BLASlib) $(PTCBLASlib) $(ATLASlib) $(LIBS)" \
+           | tee LAOUT_FL_PT/$(ARCH).out 2>&1
+	mv $(BINdir)/LAPACK_TEST/*.out $(BINdir)/LAPACK_TEST/LAOUT_FL_PT/.
+	$(MAKE) -f Make.top scope_lapack_test_fl_pt | tee \
+                $(BINdir)/LAPACK_TEST/SUMMARY_fl_pt.txt 2>&1
+scope_lapack_test_fl_ab :
+	cd $(BINdir)/LAPACK_TEST/LAOUT_FL_AB ; \
+           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+           | fgrep -v "error exits"
+lapack_test_fl_ab: $(BINdir)/LAPACK_TEST
+	cd $(BINdir)/LAPACK_TEST ; make cleanup
+	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_FL_AB \
+                 $(BINdir)/LAPACK_TEST/SUMMARY_fl_ab.txt
+	mkdir $(BINdir)/LAPACK_TEST/LAOUT_FL_AB
+	cd $(BINdir)/LAPACK_TEST ; make ATL_all LAPACKLIB="$(FLAPACKlib)" \
+           BLASLIB="$(F77BLASlib) $(CBLASlib) $(ATLASlib) $(LIBS)" \
+           | tee LAOUT_FL_AB/$(ARCH).out 2>&1
+	mv $(BINdir)/LAPACK_TEST/*.out $(BINdir)/LAPACK_TEST/LAOUT_FL_AB/.
+	$(MAKE) -f Make.top scope_lapack_test_fl_ab | tee \
+                $(BINdir)/LAPACK_TEST/SUMMARY_fl_ab.txt 2>&1
+scope_lapack_test_fl_sb :
+	cd $(BINdir)/LAPACK_TEST/LAOUT_FL_SB ; \
+           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+           | fgrep -v "error exits"
+lapack_test_fl_sb: $(BINdir)/LAPACK_TEST
+	cd $(BINdir)/LAPACK_TEST ; make cleanup
+	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_FL_SB \
+                 $(BINdir)/LAPACK_TEST/SUMMARY_fl_sb.txt
+	mkdir $(BINdir)/LAPACK_TEST/LAOUT_FL_SB
+	cd $(BINdir)/LAPACK_TEST ; make ATL_all LAPACKLIB="$(FLAPACKlib)" \
+           BLASLIB="$(BLASlib) $(ATLASlib) $(LIBS)" \
+           | tee LAOUT_FL_SB/$(ARCH).out 2>&1
+	mv $(BINdir)/LAPACK_TEST/*.out $(BINdir)/LAPACK_TEST/LAOUT_FL_SB/.
+	$(MAKE) -f Make.top scope_lapack_test_fl_sb | tee \
+                $(BINdir)/LAPACK_TEST/SUMMARY_fl_sb.txt 2>&1
+scope_lapack_test_fl_fb :
+	cd $(BINdir)/LAPACK_TEST/LAOUT_FL_FB ; \
+           fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL *.out \
+           | fgrep -v "error exits"
+lapack_test_fl_fb: $(BINdir)/LAPACK_TEST
+	cd $(BINdir)/LAPACK_TEST ; make cleanup
+	- rm -rf $(BINdir)/LAPACK_TEST/LAOUT_FL_FB \
+                 $(BINdir)/LAPACK_TEST/SUMMARY_fl_fb.txt
+	mkdir $(BINdir)/LAPACK_TEST/LAOUT_FL_FB
+	cd $(BINdir)/LAPACK_TEST ; make ATL_all LAPACKLIB="$(FLAPACKlib)" \
+           BLASLIB="$(FBLASlib) $(ATLASlib) $(LIBS)" \
+           | tee LAOUT_FL_FB/$(ARCH).out 2>&1
+	mv $(BINdir)/LAPACK_TEST/*.out $(BINdir)/LAPACK_TEST/LAOUT_FL_FB/.
+	$(MAKE) -f Make.top scope_lapack_test_fl_fb | tee \
+                $(BINdir)/LAPACK_TEST/SUMMARY_fl_fb.txt 2>&1
+$(BINdir)/AtlasTest/$(ARCH) : force_build
+	if [ -d "$(BINdir)/AtlasTest/$(ARCH)" ]; then \
+           rm -rf $(BINdir)/AtlasTest/$(ARCH)/* ; \
+        else \
+           mkdir $(BINdir)/AtlasTest/$(ARCH) ; \
+        fi
+	cd $(BINdir)/AtlasTest/$(ARCH) ; ../configure --atldir=$(BLDdir)
+scope_full_results: force_build
+	cd $(BINdir)/AtlasTest/$(ARCH) ;  ../scope.sh
+	- fgrep -e fault -e FAULT -e error -e ERROR -e fail -e FAIL \
+                 $(BINdir)/AtlasTest/$(ARCH)/$(ARCH).out | fgrep -v PASSED
+
+full_test : $(BINdir)/AtlasTest
+	$(MAKE) -f Make.top $(BINdir)/AtlasTest/$(ARCH)
+	cd $(BINdir)/AtlasTest/$(ARCH) ; make | tee $(ARCH).out 2>&1
+	$(MAKE) -f Make.top scope_full_results
+           
+full_test_nh :$(BINdir)/AtlasTest
+	$(MAKE) -f Make.top $(BINdir)/AtlasTest/$(ARCH)
+	cd $(BINdir)/AtlasTest/$(ARCH) ; nohup make | tee $(ARCH).out 2>&1
+	$(MAKE) -f Make.top scope_full_results
+
+$(ARCH)_defs : $(SRCdir)/CONFIG/$(ARCH).tar.bz2
+	cd $(BLDdir) ; \
+           $(BUNZIP) -c $(SRCdir)/CONFIG/$(ARCH).tar.bz2 | $(TAR) xvf -
+ISetL1 : 
+	rm -f $(SYSdir)/res/L1CacheSize
+	echo $(L1Size) > $(SYSdir)/res/L1CacheSize
+
+results:
+	mkdir results
+	mkdir results/charts
+	mkdir results/tvecs
+	mkdir results/raw
+EXtest:
+	mkdir EXtest
+startup : lib include results EXtest
+	$(MAKE) -f Make.top leafstart leaf=interfaces/lapack/C2F/src
+	$(MAKE) -f Make.top leafstart leaf=interfaces/lapack/F77/src
+	$(MAKE) -f Make.top leafstart leaf=interfaces/lapack/C/src
+	$(MAKE) -f Make.top leafstart leaf=interfaces/blas/F77/testing
+	$(MAKE) -f Make.top leafstart leaf=interfaces/blas/F77/src
+	$(MAKE) -f Make.top leafstart leaf=interfaces/blas/C/testing
+	$(MAKE) -f Make.top leafstart leaf=interfaces/blas/C/src
+	$(MAKE) -f Make.top leafstart leaf=tune/threads
+	$(MAKE) -f Make.top leafstart leaf=tune/sysinfo
+	$(MAKE) -f Make.top leafstart leaf=tune/lapack
+	$(MAKE) -f Make.top leafstart leaf=tune/blas/level3
+	$(MAKE) -f Make.top leafstart leaf=tune/blas/level1
+	$(MAKE) -f Make.top leafstart leaf=tune/blas/ger
+	$(MAKE) -f Make.top leafstart leaf=tune/blas/gemv
+	$(MAKE) -f Make.top leafstart leaf=tune/blas/gemm
+	$(MAKE) -f Make.top leafstart leaf=results
+	$(MAKE) -f Make.top leafstart leaf=results/charts
+	$(MAKE) -f Make.top leafstart leaf=results/tvecs
+	$(MAKE) -f Make.top leafstart leaf=results/raw
+	$(MAKE) -f Make.top leafstart leaf=EXtest
+	$(MAKE) -f Make.top leafstart leaf=src/threads
+	$(MAKE) -f Make.top leafstart leaf=src/threads/lapack
+	$(MAKE) -f Make.top leafstart leaf=src/threads/blas/level2
+	$(MAKE) -f Make.top leafstart leaf=src/threads/blas/level3
+	$(MAKE) -f Make.top leafstart leaf=src/lapack
+	$(MAKE) -f Make.top leafstart leaf=src/blas/level3/kernel
+	$(MAKE) -f Make.top leafstart leaf=src/blas/level3/rblas
+	$(MAKE) -f Make.top leafstart leaf=src/blas/level3
+	$(MAKE) -f Make.top leafstart leaf=src/blas/pklevel3/sprk
+	$(MAKE) -f Make.top leafstart leaf=src/blas/pklevel3/gpmm
+	$(MAKE) -f Make.top leafstart leaf=src/blas/pklevel3
+	$(MAKE) -f Make.top leafstart leaf=src/blas/level2/kernel
+	$(MAKE) -f Make.top leafstart leaf=src/blas/level2
+	$(MAKE) -f Make.top leafstart leaf=src/blas/level1
+	$(MAKE) -f Make.top leafstart leaf=src/blas/gemm
+	$(MAKE) -f Make.top leafstart leaf=src/blas/ger
+	$(MAKE) -f Make.top leafstart leaf=src/blas/gemv
+	$(MAKE) -f Make.top leafstart leaf=src/blas/f77reference
+	$(MAKE) -f Make.top leafstart leaf=src/blas/reference/level3
+	$(MAKE) -f Make.top leafstart leaf=src/blas/reference/level2
+	$(MAKE) -f Make.top leafstart leaf=src/blas/reference/level1
+	$(MAKE) -f Make.top leafstart leaf=src/auxil
+	$(MAKE) -f Make.top leafstart leaf=src/testing
+	$(MAKE) -f Make.top leafstart leaf=lib
+	$(MAKE) -f Make.top leafstart leaf=bin
+	cd src/threads ; touch atomic.inc
+	cd src/blas/gemm ; mkdir KERNEL
+	cd tune/blas/gemm ; mkdir KERNEL
+	cd tune/blas/gemm ; mkdir res
+	cd tune/blas/gemv ; mkdir res
+	cd tune/blas/ger ; mkdir res
+	cd tune/blas/level1 ; mkdir res
+	cd tune/blas/level1 ; mkdir GEN
+	cd tune/blas/level3 ; mkdir res
+	cd tune/sysinfo ; mkdir res
+	cd tune/lapack  ; mkdir res
+	cd tune/threads ; mkdir res
+	cd bin ; mkdir INSTALL_LOG
+	cd tune/blas/gemv ; ln -s $(SRCdir)/tune/blas/gemv/MVTCASES MVTCASES
+	cd tune/blas/gemv ; ln -s $(SRCdir)/tune/blas/gemv/MVNCASES MVNCASES
+	cd tune/blas/ger ; ln -s $(SRCdir)/tune/blas/ger/R1CASES R1CASES
+	cd tune/blas/ger ; ln -s $(SRCdir)/tune/blas/ger/R2CASES R2CASES
+	cd tune/blas/gemv ; ln -s $(SRCdir)/tune/blas/gemv/CASES CASES
+	cd tune/blas/gemm ; ln -s $(SRCdir)/tune/blas/gemm/CASES CASES
+	cd tune/blas/level1 ; ln -s $(SRCdir)/tune/blas/level1/SWAP SWAP
+	cd tune/blas/level1 ; ln -s $(SRCdir)/tune/blas/level1/SET SET
+	cd tune/blas/level1 ; ln -s $(SRCdir)/tune/blas/level1/SCAL SCAL
+	cd tune/blas/level1 ; ln -s $(SRCdir)/tune/blas/level1/ROT ROT
+	cd tune/blas/level1 ; ln -s $(SRCdir)/tune/blas/level1/NRM2 NRM2
+	cd tune/blas/level1 ; ln -s $(SRCdir)/tune/blas/level1/IAMAX IAMAX
+	cd tune/blas/level1 ; ln -s $(SRCdir)/tune/blas/level1/DOT DOT
+	cd tune/blas/level1 ; ln -s $(SRCdir)/tune/blas/level1/CPSC CPSC
+	cd tune/blas/level1 ; ln -s $(SRCdir)/tune/blas/level1/COPY COPY
+	cd tune/blas/level1 ; ln -s $(SRCdir)/tune/blas/level1/AXPY AXPY
+	cd tune/blas/level1 ; ln -s $(SRCdir)/tune/blas/level1/AXPBY AXPBY
+	cd tune/blas/level1 ; ln -s $(SRCdir)/tune/blas/level1/ASUM ASUM
+	$(MAKE) -f Make.top refresh arch=$(arch)
+
+refresh :
+	cp $(SRCdir)/makes/Make.res_chart results/charts/Makefile
+	cp $(SRCdir)/makes/Make.res_tvec results/tvecs/Makefile
+	cp $(SRCdir)/makes/Make.res_raw results/raw/Makefile
+	cp $(SRCdir)/makes/Make.res_new results/Makefile
+	cp $(SRCdir)/makes/Make.plinc results/.
+	cp $(SRCdir)/makes/Make.EXtst EXtest/Makefile
+	cp $(SRCdir)/makes/Make.bin bin/Makefile
+	cat $(SRCdir)/makes/Make.lib >> lib/Makefile
+	cp $(SRCdir)/makes/Make.aux src/auxil/Makefile
+	cp $(SRCdir)/makes/Make.l1ref src/blas/reference/level1/Makefile
+	cp $(SRCdir)/makes/Make.l2ref src/blas/reference/level2/Makefile
+	cp $(SRCdir)/makes/Make.l3ref src/blas/reference/level3/Makefile
+	cp $(SRCdir)/makes/Make.f77refblas src/blas/f77reference/Makefile
+	cp $(SRCdir)/makes/Make.tstsrc src/testing/Makefile
+	cp $(SRCdir)/makes/Make.mvsrc src/blas/gemv/Makefile
+	cp $(SRCdir)/makes/Make.r1src src/blas/ger/Makefile
+	cp $(SRCdir)/makes/Make.mmsrc src/blas/gemm/Makefile
+	cp $(SRCdir)/makes/Make.l1src src/blas/level1/Makefile
+	cp $(SRCdir)/makes/Make.l2 src/blas/level2/Makefile
+	cp $(SRCdir)/makes/Make.l2aux src/blas/level2/kernel/Makefile
+	cp $(SRCdir)/makes/Make.lpsrc src/lapack/Makefile
+	cp $(SRCdir)/makes/Make.l3tune tune/blas/level3/Makefile
+	cp $(SRCdir)/makes/Make.mmtune tune/blas/gemm/Makefile
+	cp $(SRCdir)/makes/Make.mvtune tune/blas/gemv/Makefile
+	cp $(SRCdir)/makes/Make.r1tune tune/blas/ger/Makefile
+	cp $(SRCdir)/makes/Make.l1tune tune/blas/level1/Makefile
+	cp $(SRCdir)/makes/Make.sysinfo tune/sysinfo/Makefile
+	cp $(SRCdir)/makes/Make.ttune tune/threads/Makefile
+	cp $(SRCdir)/makes/Make.latune  tune/lapack/Makefile
+	cp $(SRCdir)/makes/Make.cblas interfaces/blas/C/src/Makefile
+	cp $(SRCdir)/makes/Make.f77blas interfaces/blas/F77/src/Makefile
+	cp $(SRCdir)/makes/Make.cblastst interfaces/blas/C/testing/Makefile
+	cp $(SRCdir)/makes/Make.f77blastst interfaces/blas/F77/testing/Makefile
+	cp $(SRCdir)/makes/Make.Clp interfaces/lapack/C/src/Makefile
+	cp $(SRCdir)/makes/Make.Flp interfaces/lapack/F77/src/Makefile
+	cp $(SRCdir)/makes/Make.C2Flp interfaces/lapack/C2F/src/Makefile
+	cp $(SRCdir)/makes/Make.thr src/threads/Makefile
+	cp $(SRCdir)/makes/Make.lathr src/threads/lapack/Makefile
+	cp $(SRCdir)/makes/Make.l3thr src/threads/blas/level3/Makefile
+	cp $(SRCdir)/makes/Make.l2thr src/threads/blas/level2/Makefile
+	cp $(SRCdir)/makes/Make.pkl3 src/blas/pklevel3/Makefile
+	cp $(SRCdir)/makes/Make.gpmm src/blas/pklevel3/gpmm/Makefile
+	cp $(SRCdir)/makes/Make.sprk src/blas/pklevel3/sprk/Makefile
+	cp $(SRCdir)/makes/Make.l3 src/blas/level3/Makefile
+	cp $(SRCdir)/makes/Make.l3aux src/blas/level3/rblas/Makefile
+	cp $(SRCdir)/makes/Make.l3kern src/blas/level3/kernel/Makefile
+#	cp $(SRCdir)/makes/Make.Clptst interfaces/lapack/C/testing/Makefile
+#	cp $(SRCdir)/makes/Make.Flptst interfaces/lapack/F77/testing/Makefile
+	cp $(SRCdir)/makes/atlas_trsmNB.h include/.
+	cp $(SRCdir)/CONFIG/ARCHS/Makefile ARCHS/.
+
+clean :
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+	cd $(archdir) ; $(MAKE) clean
+
+kill :
+	rm -rf src bin tune interfaces
+
+killall :
+	$(MAKE) -f Make.top kill
+	rm -rf include lib
+
+killgrd :
+	cd interfaces/lapack/C2F/src ; rm -f *.grd
+	cd interfaces/lapack/F77/src ; rm -f *.grd
+	cd interfaces/lapack/C/src ; rm -f *.grd
+	cd interfaces/blas/F77/testing ; rm -f *.grd
+	cd interfaces/blas/F77/src ; rm -f *.grd
+	cd interfaces/blas/C/testing ; rm -f *.grd
+	cd interfaces/blas/C/src ; rm -f *.grd
+	cd tune/threads ; rm -f *.grd
+	cd tune/sysinfo ; rm -f *.grd
+	cd tune/lapack ; rm -f *.grd
+	cd tune/blas/level3 ; rm -f *.grd
+	cd tune/blas/level1 ; rm -f *.grd
+	cd tune/blas/ger ; rm -f *.grd
+	cd tune/blas/gemv ; rm -f *.grd
+	cd tune/blas/gemm ; rm -f *.grd
+	cd results ; rm -f *.grd
+	cd results/charts ; rm -f *.grd
+	cd results/tvecs ; rm -f *.grd
+	cd results/raw ; rm -f *.grd
+	cd EXtest ; rm -f *.grd
+	cd src/threads ; rm -f *.grd
+	cd src/threads/lapack ; rm -f *.grd
+	cd src/threads/blas/level2 ; rm -f *.grd
+	cd src/threads/blas/level3 ; rm -f *.grd
+	cd src/lapack ; rm -f *.grd
+	cd src/blas/level3/kernel ; rm -f *.grd
+	cd src/blas/level3/rblas ; rm -f *.grd
+	cd src/blas/level3 ; rm -f *.grd
+	cd src/blas/pklevel3/sprk ; rm -f *.grd
+	cd src/blas/pklevel3/gpmm ; rm -f *.grd
+	cd src/blas/pklevel3 ; rm -f *.grd
+	cd src/blas/level2/kernel ; rm -f *.grd
+	cd src/blas/level2 ; rm -f *.grd
+	cd src/blas/level1 ; rm -f *.grd
+	cd src/blas/gemm ; rm -f *.grd
+	cd src/blas/ger ; rm -f *.grd
+	cd src/blas/gemv ; rm -f *.grd
+	cd src/blas/f77reference ; rm -f *.grd
+	cd src/blas/reference/level3 ; rm -f *.grd
+	cd src/blas/reference/level2 ; rm -f *.grd
+	cd src/blas/reference/level1 ; rm -f *.grd
+	cd src/auxil ; rm -f *.grd
+	cd src/testing ; rm -f *.grd
+	cd lib ; rm -f *.grd
+	cd bin ; rm -f *.grd
+
+lib :
+	mkdir lib
+
+include:
+	mkdir include
+	touch include/atlas_ssyr2NX.h
+	touch include/atlas_ssyrNX.h
+	touch include/atlas_dsyr2NX.h
+	touch include/atlas_dsyrNX.h
+	touch include/atlas_csyr2NX.h
+	touch include/atlas_csyrNX.h
+	touch include/atlas_zsyr2NX.h
+	touch include/atlas_zsyrNX.h
+	touch include/atlas_tsumm.h
+	touch include/atlas_taffinity.h
+	touch include/atlas_ssyrNX.h
+	touch include/atlas_ssyrNX.h
+	touch include/atlas_ssyrNX.h
+	touch include/atlas_tcacheedge.h
+	touch include/atlas_cacheedge.h
+	touch include/atlas_zdNKB.h
+	touch include/atlas_csNKB.h
+	touch include/atlas_stGetNB_gelqf.h
+	touch include/atlas_dtGetNB_gelqf.h
+	touch include/atlas_ctGetNB_gelqf.h
+	touch include/atlas_ztGetNB_gelqf.h
+	touch include/atlas_stGetNB_gerqf.h
+	touch include/atlas_dtGetNB_gerqf.h
+	touch include/atlas_ctGetNB_gerqf.h
+	touch include/atlas_ztGetNB_gerqf.h
+	touch include/atlas_stGetNB_geqlf.h
+	touch include/atlas_dtGetNB_geqlf.h
+	touch include/atlas_ctGetNB_geqlf.h
+	touch include/atlas_ztGetNB_geqlf.h
+	touch include/atlas_stGetNB_geqrf.h
+	touch include/atlas_dtGetNB_geqrf.h
+	touch include/atlas_ctGetNB_geqrf.h
+	touch include/atlas_ztGetNB_geqrf.h
+	touch include/atlas_sGetNB_gelqf.h
+	touch include/atlas_dGetNB_gelqf.h
+	touch include/atlas_cGetNB_gelqf.h
+	touch include/atlas_zGetNB_gelqf.h
+	touch include/atlas_sGetNB_gerqf.h
+	touch include/atlas_dGetNB_gerqf.h
+	touch include/atlas_cGetNB_gerqf.h
+	touch include/atlas_zGetNB_gerqf.h
+	touch include/atlas_sGetNB_geqlf.h
+	touch include/atlas_dGetNB_geqlf.h
+	touch include/atlas_cGetNB_geqlf.h
+	touch include/atlas_zGetNB_geqlf.h
+	touch include/atlas_sGetNB_geqrf.h
+	touch include/atlas_dGetNB_geqrf.h
+	touch include/atlas_cGetNB_geqrf.h
+	touch include/atlas_zGetNB_geqrf.h
+	touch include/zXover.h
+	touch include/cXover.h
+	touch include/dXover.h
+	touch include/sXover.h
+
+install_inc:
+	cp $(INCSdir)/cblas.h $(INSTdir)/.
+	cp $(INCSdir)/clapack.h $(INSTdir)/.
+	chmod 0644 $(INSTdir)/cblas.h $(INSTdir)/clapack.h
+	cp $(INCAdir)/* $(INSTdir)/atlas/.
+	- chmod 0644 $(INSTdir)/atlas/*
+install_lib:
+	cp $(LIBdir)/libatlas.a $(INSTdir)/.
+	cp $(LIBdir)/libcblas.a $(INSTdir)/.
+	cp $(LIBdir)/liblapack.a $(INSTdir)/.
+	chmod 0644 $(INSTdir)/libatlas.a  $(INSTdir)/liblapack.a \
+                   $(INSTdir)/libcblas.a 
+	- cp $(LIBdir)/libf77blas.a $(INSTdir)/.
+	- chmod 0644 $(INSTdir)/libf77blas.a
+	- cp $(LIBdir)/libptcblas.a $(INSTdir)/.
+	- chmod 0644 $(INSTdir)/libptcblas.a 
+	- cp $(LIBdir)/libptf77blas.a $(INSTdir)/.
+	- chmod 0644 $(INSTdir)/libptf77blas.a
+	- cp $(LIBdir)/libsatlas.dylib $(INSTdir)/.
+	- cp $(LIBdir)/libtatlas.dylib $(INSTdir)/.
+	- cp $(LIBdir)/libsatlas.dll $(INSTdir)/.
+	- cp $(LIBdir)/libtatlas.dll $(INSTdir)/.
+	- cp $(LIBdir)/libsatlas.so $(INSTdir)/.
+	- cp $(LIBdir)/libtatlas.so $(INSTdir)/.
+

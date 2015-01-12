@@ -1,0 +1,159 @@
+<ID> <flag> <mb> <nb> <kb> <muladd> <lat> <mu> <nu> <ku> <rout> "<Contributer>"
+53
+100  8    2    2 -100 1 1 2 2 16 ATL_smm_3dnow_100.c    "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+101 16    0    2 -100 1 1 2 2 16 ATL_smm_3dnow_100M.c   "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+102 16    2    0 -100 1 1 2 2 16 ATL_smm_3dnow_100N.c   "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+103 16    2    2  -98 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+104 16    2    2  -96 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+105 16    2    2  -94 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+106 16    2    2  -92 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+107 16    2    2  -90 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+108 16    2    2  -88 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+109 16    2    2  -86 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+110 16    2    2  -84 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+111 16    2    2  -82 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+112 16    2    2  -80 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+113 16    2    2  -78 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+114 16    2    2  -76 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+115 16    2    2  -74 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+116 16    2    2  -72 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+117 16    2    2  -70 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+118 16    2    2  -68 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+119 16    2    2  -66 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+120 16    2    2  -64 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+121 16    2    2  -62 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+122 16    2    2  -60 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+123 16    2    2  -58 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+124 16    2    2  -56 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+125 16    2    2  -54 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+126 16    2    2  -52 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+127 16    2    2  -50 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+128 16    2    2  -48 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+129 16    2    2  -46 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+130 16    2    2  -44 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+131 16    2    2  -42 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+132 16    2    2  -40 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+133 16    2    2  -38 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+134 16    2    2  -36 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+135 16    2    2  -34 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+136 16    2    2  -32 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+137 16    2    2  -30 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+138 16    2    2  -28 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+139 16    2    2  -26 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+140 16    2    2  -24 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+141 16    2    2  -22 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+142 16    2    2  -20 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+143 16    2    2  -18 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+144 16    2    2  -16 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+145 16    2    2  -14 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+146 16    2    2  -12 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+147 16    2    2  -10 1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+148 16    2    2  -8  1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+149 16    2    2  -6  1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+150 16    2    2  -4  1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+151 16    2    2  -2  1 1 2 2 16 ATL_smm_3dnow_K.c      "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+152  0 -90  -90 -90 0 1 6 1 90 ATL_smm_3dnow_90.c  "Tim Mattox & Hank Dietz"

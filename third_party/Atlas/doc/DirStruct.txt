@@ -1,0 +1,48 @@
+***************************** DIRECTORY STRUCTURE ******************************
+NOTE: This graphic is *way* out of date (for instance, the pthreads directory is
+      not shown), but still gives the general idea, so I leave it in.
+
+The directory structure of ATLAS can be summarized by the following graphic:
+      ---------------------------------------------------------
+      |       |        |                |          |          |
+     bin  interfaces  tune             lib      include      src
+              |        |                                      |
+              |   -----------------------       ----------------------------
+              |   |                     |       |       |     |            |
+              |   |                    blas   auxil  testing  |          lapack
+              |   |                     |                     |
+              |   |      ------------------------------     blas
+              |sysinfo   |           |        |       |       |
+              |          gemm       gemv     ger     level3   |
+              |                                               |
+        ----------------------           -----------------------------------
+        |                    |           |       |       |      |     |    |
+      blas                 lapack      level1  level2  level3  gemm  ger  gemv
+        |                    |
+    ---------            ---------
+    |       |            |       |
+   src    testing       src    testing
+
+This directory structure is duplicated in the SRCdir and BLDdir directories,
+with SRCdir containing the original source files (obtained from the ATLAS
+tarfile) and BLDdir (created by the configure step) containing the generated
+libraries, headers, objects, and executables.
+
+A summary of each of the main directories is given below:
+
+** interfaces : The official C and Fortran77 interfaces that ATLAS supplies.
+                Users needing to examine the API can go to the appropriate
+                src subdirectory.  If it exists, the official API tester is
+                available in the appropriate testing subdirectory.
+** bin        : ATLAS's user-runnable testers & timers are built here
+** lib        : Libraries are compiled by default into this directory
+** tune       : The code generators and timing programs that allow ATLAS to
+                tune itself to specific architectures are here
+** include    : All of atlas's include files.  Architecture-dependent include
+                files appear in the appropriate <arch> subdirectory.
+** src        : Stores the routines supported by atlas; once optimal cases have
+                been found, this is also where the generated code is stored.
+
+In addition to those shown above, the user should be aware of the directories:
+   ATLAS/doc                    : ATLAS documentation
+   BLDdir/bin/INSTALL_LOG : Log of the build step for each architecture

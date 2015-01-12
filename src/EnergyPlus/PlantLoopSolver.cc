@@ -1145,7 +1145,7 @@ namespace PlantLoopSolver {
 			if ( NumBranchesInRegion > LastComponentSimulated.isize() ) { //Tuned Changed to grow-only strategy
 				LastComponentSimulated.allocate( NumBranchesInRegion );
 			}
-			for ( int i = 1; i <= NumBranchesInRegion; ++i ) LastComponentSimulated = 0; // Only zero the active elements
+			for ( int i = 1; i <= NumBranchesInRegion; ++i ) LastComponentSimulated( i ) = 0; // Only zero the active elements
 //			AccessibleBranches.allocate( NumBranchesInRegion );
 
 //			BranchIndex = 0;

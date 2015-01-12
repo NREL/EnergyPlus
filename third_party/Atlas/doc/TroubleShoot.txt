@@ -1,0 +1,79 @@
+This file is rudementary and out of date.  See ATLAS/doc/atlas_install.pdf
+for more accurate information.
+
+You should always first check the ATLAS errata file at:
+   http://math-atlas.sourceforge.net/errata.html
+This file contains info about any known bugs and their fixes, compiler errors
+that effect ATLAS, etc.
+
+
+********************************* CONFIG **************************************
+If your configure command fails because it can't compile config.c, you may
+need to point configure at your ANSI C compiler (usually gcc).  Add the flags
+   --cc=<ANSI C Compiler> --cflags='<flags>'
+If you need to throw a flag to cause your compiler to assume ANSI C, include
+this as well.  For instance, on an old HP systems I would pass:
+   --cc=cc --cflags='-Aa'
+This assumes you understand configure and what it is doing, as explained in
+   ATLAS/doc/atlas_install.pdf
+
+******************************** INSTALL **************************************
+Most problems occur during installation.  If you have built the library as
+recommended in atlas_install.pdf, a complete log of the installation process
+will have been kept in BLDdir/bin/INSTALL_LOG.  If an error occurred which
+prevented installation from completing, this directory should contain a file
+ERROR.LOG, which provides some information, and perhaps points to another log
+file where more details are available.  Typical problems would be invalid
+compilers, compile flags, out of disk space, etc.
+
+The user should examine the indicated log files for error messages.  If install
+does not point the user at a specific log file, do an ls -l, and examine
+the newest file aside from ERROR.LOG & SUMMARY.LOG.
+
+Under Unix, you may want to do
+   fgrep -i error *
+in your INSTALL_LOG directory to look for problems (though some errors occur
+naturally in an ATLAS install, since ATLAS tests things that are only legal
+on some platforms).
+
+If you are able to correct the problem (or it was a one-time thing, for
+instance filesystem problems), you can restart the install.  To restart where
+you left off, first edit your Make.inc file, and if the INSTFLAG macro contains
+the flags '-a 1' change that to '-a 0' (this will prevent ATLAS from
+overwriting your intermediate results with the architectural defaults again),
+and then issue make in your BLDdir, and the ATLAS build will continue
+where it left off before.  If you wish to restart the install from scratch, the
+easiest method is to simply do a 'rm -rf BLDdir', and reconfigure in a new
+BLDdir.
+
+If the problem is inadequate performance, the file
+   BLDdir/bin/INSTALL_LOG/SUMMARY.LOG
+should be examined in detail.  Make sure that ATLAS detected the correct
+level 1 cache size, number of registers, etc.
+
+If after these steps you are unable to fix the problem, you can submit a
+support request as discussed here:
+   http://math-atlas.sourceforge.net/faq.html#help
+
+Include a thorough description of your system, what problem you are
+encountering, what you were doing when it happened, etc.  All questions and
+bug reports should minimally include the Make.inc file you were using, and
+the contents of your INSTALL_LOG directory.  If ATLAS's install detected the
+error, and was not killed, it will have created a file containing all this
+information in BLDdir/error_<arch>.tar.bz2.  If it has not, you can create it
+from your BLDdir directory with:
+   make error_report
+
+MAKE SURE TO ATTATCH THIS ERROR REPORT WHEN REPORTING PROBLEMS!!!
+
+******************************  LINKING  **************************************
+If you have missing symbols on link make sure you are linking in all of the
+libraries you need.  For instance, a code calling the Fortran77 interface
+to the BLAS would need:
+   -L$(MY_HOME)/ATLAS/lib/$(MY_ARCH)/ -lf77blas -latlas
+
+The full LAPACK library created by merging ATLAS and netlib LAPACK requires
+both C and Fortran77 interfaces, and thus that link line would be:
+   -L$(MY_HOME)/ATLAS/lib/$(MY_ARCH)/ -llapack -lf77blas -lcblas -latlas
+
+REMEMBER: Order *is* important, so -latlas -lcblas will *not* work.

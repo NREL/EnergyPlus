@@ -1,0 +1,41 @@
+This file documents the order in which files are generated in ATLAS.  If you
+are crazy enough, it can be used as a starting point for building ATLAS
+by hand, rather than letting install do it.  This document was out of date
+before it was stored to disk, so don't bust a vein if it seems to be wrong.
+
+Stage 1 : System discovery/aux compile
+  (1) cd BLDdir/src/auxil/ ; make lib
+      HEADERS                       RESULTS
+      atlas_type.h                  res/[s,d]MULADD
+      atlas_[s,d,c,z]sysinfo.h      res/[s,d]nreg
+                                    res/L1CacheSize
+Stage 2 : Type-dependent tuning (pre = d, s, z, c)
+  NOTE: right now, the Level 3 are tuned first, followed by Level 2
+        because the Level 2 can call the Level 3 for gemv.  It should be
+        the other way around, but it ain't :)
+  (1) Run ATLAS/tune/blas/gemm/<arch>/xmmsearch -p <pre>, creating
+      BLDdir/include/<pre>mm.h & ATL_<pre>NCmm.h, and
+      res/:
+         dgMMRES.sum : generated NBmm kernel results
+         dMMKSSE.sum : results of search of Chad Zalkin's SSE generator
+         deMMRES.sum : best of external searches
+         dMMRES.sum  : generated & user NBmm kernel results
+         dClean[M,N,K] : generated cleanup results
+         duMMRES : User-supplied kernel NBmm results
+         duClean[M,N,K]: Best user-supplied cleanups
+         duClean[M,N,K]F : User supplied cleanups that beat generated cases
+         dbest[N,T][N,T]_0x0x0: best no-copy case with no fixed loop dimension
+         dbest[N,T][N,T]_0x0x<nb>: best no-copy case with M and N loop
+            parameters variable, but K-loop fixed at <nb>
+         dbest[N,T][N,T]_<nb>x<nb>x<nb>: best no-copy case with all loop
+            dimensions fixed to <nb>
+  (2) if first precision, run BLDdir/tune/blas/gemm/x<pre>findCE,
+      creating BLDdir/include/atlas_cacheedge.h
+  (3) Run BLDdir/tune/blas/gemm/x<pre>Run_tfc, creating
+      BLDdir/include/<pre>Xover.h
+  (4) GEMV tune, creating BLDdir/include/atlas_<pre>mv.h,
+      atlas_<pre>mv[N,T].h
+  (5) GER tune, creating BLDdir/include/atlas_<pre>r1.h
+
+Stage 3: General library build
+  (1) Finish all compilation

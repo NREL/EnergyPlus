@@ -1,0 +1,124 @@
+include Make.inc
+
+sobj = ATL_sgpmvUN_a1_x1_b0_y1.o ATL_sgpmvLN_a1_x1_b0_y1.o \
+            ATL_sgpmvUN_a1_x1_b1_y1.o ATL_sgpmvLN_a1_x1_b1_y1.o \
+            ATL_sgpmvUN_a1_x1_bX_y1.o ATL_sgpmvLN_a1_x1_bX_y1.o
+slib : $(sobj)
+	$(ARCHIVER) $(ARFLAGS) $(ATLASlib) $(sobj)
+	$(RANLIB) $(ATLASlib)
+
+ATL_sgpmvLN_a1_x1_bX_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(SKC) $(sKCFLAGS) -c -o $@ -DSREAL -DLower_ -DBETAX \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_sgpmvLN_a1_x1_b1_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(SKC) $(sKCFLAGS) -c -o $@ -DSREAL -DLower_ -DBETA1 \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_sgpmvLN_a1_x1_b0_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(SKC) $(sKCFLAGS) -c -o $@ -DSREAL -DLower_ -DBETA0 \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_sgpmvUN_a1_x1_bX_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(SKC) $(sKCFLAGS) -c -o $@ -DSREAL -DUpper_ -DBETAX \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_sgpmvUN_a1_x1_b1_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(SKC) $(sKCFLAGS) -c -o $@ -DSREAL -DUpper_ -DBETA1 \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_sgpmvUN_a1_x1_b0_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(SKC) $(sKCFLAGS) -c -o $@ -DSREAL -DUpper_ -DBETA0 \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+
+
+dobj = ATL_dgpmvUN_a1_x1_b0_y1.o ATL_dgpmvLN_a1_x1_b0_y1.o \
+            ATL_dgpmvUN_a1_x1_b1_y1.o ATL_dgpmvLN_a1_x1_b1_y1.o \
+            ATL_dgpmvUN_a1_x1_bX_y1.o ATL_dgpmvLN_a1_x1_bX_y1.o
+dlib : $(dobj)
+	$(ARCHIVER) $(ARFLAGS) $(ATLASlib) $(dobj)
+	$(RANLIB) $(ATLASlib)
+
+ATL_dgpmvLN_a1_x1_bX_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(DKC) $(dKCFLAGS) -c -o $@ -DDREAL -DLower_ -DBETAX \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_dgpmvLN_a1_x1_b1_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(DKC) $(dKCFLAGS) -c -o $@ -DDREAL -DLower_ -DBETA1 \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_dgpmvLN_a1_x1_b0_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(DKC) $(dKCFLAGS) -c -o $@ -DDREAL -DLower_ -DBETA0 \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_dgpmvUN_a1_x1_bX_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(DKC) $(dKCFLAGS) -c -o $@ -DDREAL -DUpper_ -DBETAX \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_dgpmvUN_a1_x1_b1_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(DKC) $(dKCFLAGS) -c -o $@ -DDREAL -DUpper_ -DBETA1 \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_dgpmvUN_a1_x1_b0_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(DKC) $(dKCFLAGS) -c -o $@ -DDREAL -DUpper_ -DBETA0 \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+
+
+cobj = ATL_cgpmvUN_a1_x1_b0_y1.o ATL_cgpmvLN_a1_x1_b0_y1.o \
+            ATL_cgpmvUN_a1_x1_b1_y1.o ATL_cgpmvLN_a1_x1_b1_y1.o \
+            ATL_cgpmvUN_a1_x1_bX_y1.o ATL_cgpmvLN_a1_x1_bX_y1.o \
+            ATL_cgpmvUN_a1_x1_bXi0_y1.o ATL_cgpmvLN_a1_x1_bXi0_y1.o
+clib : $(cobj)
+	$(ARCHIVER) $(ARFLAGS) $(ATLASlib) $(cobj)
+	$(RANLIB) $(ATLASlib)
+
+ATL_cgpmvLN_a1_x1_bXi0_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(CKC) $(cKCFLAGS) -c -o $@ -DSCPLX -DLower_ -DBETAXI0 \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_cgpmvLN_a1_x1_bX_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(CKC) $(cKCFLAGS) -c -o $@ -DSCPLX -DLower_ -DBETAX \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_cgpmvLN_a1_x1_b1_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(CKC) $(cKCFLAGS) -c -o $@ -DSCPLX -DLower_ -DBETA1 \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_cgpmvLN_a1_x1_b0_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(CKC) $(cKCFLAGS) -c -o $@ -DSCPLX -DLower_ -DBETA0 \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_cgpmvUN_a1_x1_bXi0_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(CKC) $(cKCFLAGS) -c -o $@ -DSCPLX -DUpper_ -DBETAXI0 \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_cgpmvUN_a1_x1_bX_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(CKC) $(cKCFLAGS) -c -o $@ -DSCPLX -DUpper_ -DBETAX \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_cgpmvUN_a1_x1_b1_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(CKC) $(cKCFLAGS) -c -o $@ -DSCPLX -DUpper_ -DBETA1 \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_cgpmvUN_a1_x1_b0_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(CKC) $(cKCFLAGS) -c -o $@ -DSCPLX -DUpper_ -DBETA0 \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+
+
+zobj = ATL_zgpmvUN_a1_x1_b0_y1.o ATL_zgpmvLN_a1_x1_b0_y1.o \
+            ATL_zgpmvUN_a1_x1_b1_y1.o ATL_zgpmvLN_a1_x1_b1_y1.o \
+            ATL_zgpmvUN_a1_x1_bX_y1.o ATL_zgpmvLN_a1_x1_bX_y1.o \
+            ATL_zgpmvUN_a1_x1_bXi0_y1.o ATL_zgpmvLN_a1_x1_bXi0_y1.o
+zlib : $(zobj)
+	$(ARCHIVER) $(ARFLAGS) $(ATLASlib) $(zobj)
+	$(RANLIB) $(ATLASlib)
+
+ATL_zgpmvLN_a1_x1_bXi0_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(ZKC) $(zKCFLAGS) -c -o $@ -DDCPLX -DLower_ -DBETAXI0 \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_zgpmvLN_a1_x1_bX_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(ZKC) $(zKCFLAGS) -c -o $@ -DDCPLX -DLower_ -DBETAX \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_zgpmvLN_a1_x1_b1_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(ZKC) $(zKCFLAGS) -c -o $@ -DDCPLX -DLower_ -DBETA1 \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_zgpmvLN_a1_x1_b0_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(ZKC) $(zKCFLAGS) -c -o $@ -DDCPLX -DLower_ -DBETA0 \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_zgpmvUN_a1_x1_bXi0_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(ZKC) $(zKCFLAGS) -c -o $@ -DDCPLX -DUpper_ -DBETAXI0 \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_zgpmvUN_a1_x1_bX_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(ZKC) $(zKCFLAGS) -c -o $@ -DDCPLX -DUpper_ -DBETAX \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_zgpmvUN_a1_x1_b1_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(ZKC) $(zKCFLAGS) -c -o $@ -DDCPLX -DUpper_ -DBETA1 \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+ATL_zgpmvUN_a1_x1_b0_y1.o : $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+	$(ZKC) $(zKCFLAGS) -c -o $@ -DDCPLX -DUpper_ -DBETA0 \
+              $(mySRCdir)/ATL_gpmv_a1_x1_y1.c
+
+

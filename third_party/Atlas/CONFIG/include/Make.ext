@@ -1,0 +1,40 @@
+
+topd = /home/whaley/git/math-atlas/AtlasBase
+ext  = /home/whaley/git/math-atlas/STAB/xextract
+extF = $(ext) -langF -lnlen71 -Remtblank -llwarn2 -LAPACK1 $(incs)
+ext9 = $(ext) -langF -lnlen132 -RemtBlank $(incs)
+extC = $(ext) -langC -lnlen79 -Remtblank -llwarn2 $(incs)
+extM = $(ext) -langM -lnlen79 -llwarn2 $(incs)
+incs = -def topd /home/whaley/git/math-atlas/AtlasBase \
+       -def incd /home/whaley/git/math-atlas/AtlasBase/Clint \
+       -def ext  /home/whaley/git/math-atlas/STAB/xextract \
+       -def BASEdir /home/whaley/git/math-atlas/AtlasBase/Antoine/ \
+       -def basd /home/whaley/git/math-atlas/AtlasBase/Clint
+
+default: all
+force_build:
+basd = /home/whaley/git/math-atlas/AtlasBase/Clint
+basdRCW = /home/whaley/git/math-atlas/AtlasBase/Clint
+basdAPP = /home/whaley/git/math-atlas/AtlasBase/Antoine
+basdSTU = /home/whaley/git/math-atlas/AtlasBase/Students
+incf = /home/whaley/git/math-atlas/AtlasBase/gen.inc
+
+basf = $(basdRCW)/atlconf.base
+
+files = atlas_asm.h atlas_sys.h atlconf.h atlconf_misc.h
+
+all : $(files)
+
+atlas_asm.h : $(basf)
+	$(extC) -b $(basf) -o atlas_asm.h rout=atlas_asm.h
+atlconf_misc.h : $(basf)
+	$(extC) -b $(basf) -o atlconf_misc.h rout=atlconf_misc.h
+atlconf.h : $(basf)
+	$(extC) -b $(basf) -o atlconf.h rout=atlconf.h
+atlas_service.h : $(basdRCW)/atlas-parse.base
+	$(extC) -b $(basdRCW)/atlas-parse.base -o $@ rout=$@
+atlas_sys.h : $(basdRCW)/atlconf.base
+	$(extC) -b $(basdRCW)/atlconf.base -o $@ rout=$@
+
+Make.ext : $(topd)/make.base
+	$(extM) -b $(topd)/make.base -o Make.ext rout=atlas/config/include

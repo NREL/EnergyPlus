@@ -1,0 +1,25 @@
+#
+# In this file, any line beginning with a '#' is ignored, but the # must be in
+# column 0.  All multiple whitespace is reduced to one space (i.e. used only
+# to distinguish where words begin/end).  Lines may be extended by putting '\'
+# as the *last* character of line.
+#
+# The file has the following format:
+# ROUT='routine name' AUTH='author names' COMP='compiler name' CFLAGS='flags'
+# ID=<id> MU=<mu> NU=<nu> minY=<#> minX=<#> alignX=<#> alignY=<#> alignA=<#>,
+# SSE=[0,1,2,3] X87=[0,1] PREF[a,x,y]=[DIST,INSTDIST, INST] LDAMUL=<#>
+# ALLALIGNXY=[0,1] GEMMBASED=[0,1] CONJDEF=[0,1] FNU=[0,1]
+# ASM=[asmlist], eg., asmlist is "GAS_x8664,GAS_x8632" or "GAS_SPARC"
+# ASM defaults to no assembly dialect required.
+# If MU/NU is negative, then the routine can only handle multiples of MU/NU.
+#
+# Some less-obvious keywords:
+# LDAMUL    : Kernel will only work if lda is a multiple of # (in bytes)
+# PFTUNEx   : Kernel uses pref_x(mem) macro for each op=x (A,y,x).  prefetch
+#             inst can be varied wt this macro, as can fetch distance.
+#             If set to INSTDIST, tune both distance and instruction type;
+#             If set to INST, tune instruction type only
+#             If set to DIST, tune distance only
+# FNU       : if set, kernel can only handle N where N%NU == 0
+ID=1 TA='N' NU=16 MU=1 AUTH='R. Clint Whaley', ROUT='ATL_cgemvN_axpy.c' \
+     AXPYBASED=1

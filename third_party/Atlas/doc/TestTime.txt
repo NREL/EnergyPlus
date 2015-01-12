@@ -1,0 +1,502 @@
+************************  TIMING AND TESTING ATLAS  ***************************
+
+The ATLAS distribution has several different testing and timing methods.  For
+testing, the most important testers are the standard API testers for the
+C and Fortran77 BLAS libraries, and the Fortran77 lapack tester.  Sections
+1, 2, and 3 deal with performing these tests.
+
+ATLAS also provides its own timer programs that do some rudimentary testing
+as well as performing relatively sophisticated timings (involving cache
+flushing, etc).  The remaining sections deal with using these timer/testers.
+
+1. THE FORTRAN77 INTERFACE BLAS TESTERS
+
+   The official BLAS testers for the Fortran77 interface to the legacy BLAS
+   can be ran in BLDdir/interfaces/blas/F77/testing/.  Typing "make" with
+   no arguments will compile all of the testers (all levels & precisions).
+   The user may then run the testers by:
+
+   ./xsblat1
+   ./xdblat1
+   ./xcblat1
+   ./xzblat1
+
+   ./xsblat2 < SRCdir/interfaces/blas/F77/sblat2.dat
+   ./xdblat2 < SRCdir/interfaces/blas/F77/dblat2.dat
+   ./xcblat2 < SRCdir/interfaces/blas/F77/cblat2.dat
+   ./xzblat2 < SRCdir/interfaces/blas/F77/zblat2.dat
+
+   ./xsblat3 < SRCdir/interfaces/blas/F77/sblat3.dat
+   ./xdblat3 < SRCdir/interfaces/blas/F77/dblat3.dat
+   ./xcblat3 < SRCdir/interfaces/blas/F77/cblat3.dat
+   ./xzblat3 < SRCdir/interfaces/blas/F77/zblat3.dat
+
+   The user may edit the input files to perform more or less comprehensive
+   tests. For more information on the legacy BLAS testers, go to :
+
+   www.netlib.org/blas/faq.html
+
+2. THE ANSI/ISO C INTERFACE BLAS TESTERS
+
+   The official BLAS testers for the ANSI/ISO C interface to the legacy BLAS
+   can be ran in BLDdir/interfaces/blas/C/testing/.  Typing "make" with
+   no arguments will compile all of the testers (all levels & precisions).
+   The user may then run the testers by:
+
+   ./xscblat1
+   ./xdcblat1
+   ./xccblat1
+   ./xzcblat1
+
+   ./xscblat2 < SRCdir/interfaces/blas/C/testing/c_sblat2.dat
+   ./xdcblat2 < SRCdir/interfaces/blas/C/testing/c_dblat2.dat
+   ./xccblat2 < SRCdir/interfaces/blas/C/testing/c_cblat2.dat
+   ./xzcblat2 < SRCdir/interfaces/blas/C/testing/c_zblat2.dat
+
+   ./xscblat3 < SRCdir/interfaces/blas/C/testing/c_sblat3.dat
+   ./xdcblat3 < SRCdir/interfaces/blas/C/testing/c_dblat3.dat
+   ./xccblat3 < SRCdir/interfaces/blas/C/testing/c_cblat3.dat
+   ./xzcblat3 < SRCdir/interfaces/blas/C/testing/c_zblat3.dat
+
+   The user may edit the input files to perform more or less comprehensive
+   tests. For more information on the legacy BLAS testers, go to :
+
+   www.netlib.org/blas/faq.html
+
+3. TESTING THE FORTRAN77 INTERFACE TO LAPACK
+
+   You will need to throw the --with-netlib-lapack-tarfile=<lapack.tgz>
+   flag to use this feature, since ATLAS does not natively provide a complete
+   LAPACK implementation.  Here are some important targets, all of which can
+   be issued from the BLDdir directory:
+      make lapack_test_al_ab : test ATLAS's serial lapack
+      make lapack_test_pt_pt : test ATLAS's threaded lapack
+      make lapack_test_fl_fb : test the F77 LAPACK wt F77 BLAS
+   To get a summary of the output of such tests, add "scope_" to the name, eg.:
+      make scope_test_fl_fb
+   Since the lapack testers always fail tests when using any blas, it is
+   typical to contrast an optimized install with a reference install to
+   narrows down the cases that must be investigated for true errors.
+   See atlas_install.pdf for a few more details.
+
+4. USING ATLAS BLAS TIMER/TESTERS WITH A SYSTEM BLAS LIBRARY
+
+   The ATLAS Level 1-3 tester/timers programs all test one BLAS
+   implementation against another.  These programs compute the Mflop/s
+   rate for each routine called. In addition, they check the result
+   matrices computed by calls to the system BLAS and ATLAS library
+   routines.  For more information about the testing implementation in
+   the Level 3 programs, read section 6.1.
+
+   To properly build the programs with your BLAS library, make sure to
+   set the BLASlib variable in the BLDdir/Make.inc include file correctly:
+
+   BLASlib = /path/to/library/libblas.a
+
+   By default, this will be set to $(FBLASlib), which means ATLAS will
+   test and time itself against the Fortran reference BLAS which ATLAS
+   autocompiles during the install.  You can reset this to a vendor-supplied
+   BLAS if you like.
+
+   On some machines, the compiler will recognize certain flags that link
+   in the vendor-optimized BLAS library. You can place these in the BLASlib
+   variable as well.  There are too many of these to list in detail here, but
+   here are a few examples of vendor-supplied BLAS:
+
+   BLASlib = -xlic_lib=sunperf    # on sun machines using Sun workshop compiler
+
+   BLASlib = -ldxml               # Using Dec/Compaq's compiler
+   BLASlib = -lcxml               # Using Compaq/Dec's compiler
+
+   BLASlib = -lessl               # IBM machines using IBM compiler
+   BLASlib = -lesslp2             # IBM Power2 machines using IBM compiler
+   BLASlib = -lesslp3             # IBM Power3 machines using IBM compiler
+
+   BLASlib = -lblas               # IRIX using SGI's compiler
+
+   After you're sure that the BLASlib variable is set properly, read section
+   3 and 4 on the ATLAS LEVEL 3 TIMER/TESTER PROGRAMS to learn how to build
+   and run them.
+
+5. TESTING _WITHOUT_ A BLAS LIBRARY
+
+   You may still build and run the ATLAS TESTER/TIMERs programs without a
+   system BLAS library by testing against the ATLAS provided C reference BLAS.
+   Just leave the BLASlib variable in the ATLAS/Make.<arch> makefile blank:
+
+   BLASlib =
+
+   Then, edit ATLAS/bin/l3blastst.c, and change line 87 from:
+#define USE_F77_BLAS
+   to:
+#define USE_L3_REFERENCE
+
+   Edit ATLAS/bin/l2blastst.c and change line 56 from:
+#define USE_F77_BLAS
+   to:
+#define USE_L2_REFERENCE
+
+6. THE ATLAS LEVEL 3 TIMER/TESTER PROGRAMS
+
+   To make the single, double, single complex, and double complex
+   programs, type:
+
+   make xsl3blastst
+   make xdl3blastst
+   make xcl3blastst
+   make xzl3blastst
+
+   Running the programs without arguments will time _GEMM with square
+   problem sizes from 100 to 1000 by 100,  alpha=1.0 and beta=1.0, and A
+   and B are non-transpose:
+
+   ./xdl3blastst
+
+DGEMM
+TEST  TA  TB    M    N    K  alpha   beta    Time  Mflop  SpUp  PASS
+====  ==  ==  ===  ===  ===  =====  =====  ======  =====  ====  ====
+
+   1   N   N  100  100  100    1.0    0.0    0.02  200.0  1.00   ---
+   1   N   N  100  100  100    1.0    0.0    0.01  200.0  1.00   YES
+   2   N   N  200  200  200    1.0    0.0    0.09  177.8  1.00   ---
+   2   N   N  200  200  200    1.0    0.0    0.09  177.8  1.00   YES
+   3   N   N  300  300  300    1.0    0.0    0.35  154.3  1.00   ---
+   3   N   N  300  300  300    1.0    0.0    0.29  186.2  1.21   YES
+   4   N   N  400  400  400    1.0    0.0    0.73  175.3  1.00   ---
+   4   N   N  400  400  400    1.0    0.0    0.68  188.2  1.07   YES
+   5   N   N  500  500  500    1.0    0.0    1.48  168.9  1.00   ---
+   5   N   N  500  500  500    1.0    0.0    1.35  185.2  1.10   YES
+   6   N   N  600  600  600    1.0    0.0    2.47  174.9  1.00   ---
+   6   N   N  600  600  600    1.0    0.0    2.30  187.8  1.07   YES
+   7   N   N  700  700  700    1.0    0.0    4.01  171.1  1.00   ---
+   7   N   N  700  700  700    1.0    0.0    3.65  187.9  1.10   YES
+   8   N   N  800  800  800    1.0    0.0    5.74  178.4  1.00   ---
+   8   N   N  800  800  800    1.0    0.0    5.43  188.6  1.06   YES
+   9   N   N  900  900  900    1.0    0.0    8.38  174.0  1.00   ---
+   9   N   N  900  900  900    1.0    0.0    7.68  189.8  1.09   YES
+  10   N   N 1000 1000 1000    1.0    0.0   11.25  177.8  1.00   ---
+  10   N   N 1000 1000 1000    1.0    0.0   10.58  189.0  1.06   YES
+
+NTEST=10, NUMBER PASSED=10, NUMBER FAILURES=0
+
+
+   Notice that there are two entries for each run. The first entry
+   corresponds to a call to the library that you supply, and the second
+   entry corresponds to a call to the ATLAS library.
+
+   An explanation of each argument follows:
+
+   ./xd3blastst -help
+   USAGE: ./xd3blastst -R <rout> -Side <nsides> L/R -Uplo <nuplo> L/U
+   -Atrans <ntrans> n/t/c -Btrans <ntrans> n/t/c -Diag <ndiags> N/U
+   -M <m1> <mN> <minc> -N <n1> <nN> <ninc> -K <k1> <kN> <kinc>
+   -n <n> -m <m> -k <k> -a <nalphas> <alpha1> ... <alphaN>
+   -b <nbetas> <beta1> ... <betaN> -Test <0/1>
+
+   -R <rout>    Specifies the routines which you would like to
+                test/time. The routines for the single and double
+                precision programs are gemm, symm, syrk, syr2k, trmm,
+                and trsm (note the omission of the prefix s and d). The
+                additional routines for the single complex and double
+                complex programs are hemm, herk, and her2k. You can
+                also specify the argument like this:
+
+                ./xd3blastst -R all
+
+                which will time all the routines. Or you can specify
+                some of the routines like this:
+
+                ./xd3blastst -R 1 symm
+                ./xd3blastst -R 4 syrk trsm symm gemm
+
+                but NOT like this:
+
+                ./xd3blastst -R 2 syr2k all
+
+   -Side <nsides> L/R
+                Specifies the number of Side parameters you would like
+                to test for the appropriate routines. If a routine does
+                not take the side parameter, then the argument is ignored.
+                You can specify the argument like this:
+
+                ./xd3blastst -R symm -Side 1 L
+                ./xd3blastst -R symm -Side 2 L R
+                ./xd3blastst -R symm -Side 3 R R L
+
+                The <nsides> argument is not optional; it must be present.
+
+   -Uplo <nuplo> L/U
+                Specifies the number of Uplo parameters you would like to
+                test. It's use follows the same behavior as -Side, like this:
+
+                ./xd3blastst -R 2 syrk syr2k -Uplo 1 U
+                ./xd3blastst -R 2 syrk syr2k -Uplo 2 U L
+                ./xd3blastst -R 2 syrk syr2k -Uplo 4 U U U U
+
+   -Diag <ndiag> N/U
+                Specifies the number of Diag parameters you would like to
+                test. It's use follows the same behavior as -Side, like this:
+
+                ./xd3blastst -R trmm -Diag 1 N
+                ./xd3blastst -R trmm -Diag 2 U N
+                ./xd3blastst -R trmm -Diag 4 U N U U
+
+   -Btrans <ntrans> N/T/C
+                Specifies the number of Btrans parameters you would like to
+                test (only used with gemm). It's use follows the same
+                behavior as -Side, like this:
+
+                ./xd3blastst -R gemm -Btrans 1 N
+                ./xd3blastst -R gemm -Btrans 2 T N
+                ./xd3blastst -R gemm -Btrans 4 T N T T
+
+   -Atrans <ntrans> N/T/C
+                Specifies the number of Atrans parameters you would like to
+                test. It's use follows the same behavior as -Side, like this:
+
+                ./xd3blastst -R gemm -Atrans 1 N
+                ./xd3blastst -R gemm -Atrans 2 T N
+                ./xd3blastst -R gemm -Atrans 4 T N N T
+
+                Also, use -Atrans for routines which only take one TRANS
+                argument:
+
+                ./xd3blastst -R trmm -Atrans 2 T N
+
+   -M <m1> <mN> <mInc>
+   -N <n1> <nM> <nInc>
+   -K <k1> <kK> <kInc>
+                Specifies the combination of problem sizes to run.
+                To specify square problem sizes, use -N:
+
+                ./xd3blastst -R gemm -N 1 10 1
+
+                will time all square matrices from dimension 1 to 10.
+
+                ./xd3blastst -R gemm -M 10 100 10 -N 10 100 10 -K 10 100 10
+
+                will time every single problem size imaginable between
+                10 and 100 incrementing by 10.
+
+   -m <m>
+   -n <n>
+   -k <k>
+                Fixes the dimension in question to one value:
+
+                ./xd3blastst -R gemm -K 1 100 1 -m 100 -n 100
+
+   -a <nalphas> <alpha1> ... <alphan>
+   -b <nbetas> <beta1> ... <betan>
+                Specifies the number and the value of alphas/betas to try.
+
+                ./xd3blastst -R gemm -a 4 -1.0 0.0 1.0 2.0 -b 1 0.0
+
+                For the complex precision programs, you must specify both
+                the real and imaginary parts for alpha and beta.
+
+                ./xz3blastst -R gemm -a 2 -1.0 0.0 1.0 0.0 -b 1 0.0 0.0
+
+               For those complex routines that take a real scalar
+               alpha/beta instead of a complex scalar alpha/beta, the
+               imaginary part must still be specified, but is
+               ignored.
+
+                ./xz3blastst -R her2k -a 1 2.0 3.0
+
+                will time her2k with alpha=2.0.
+
+   -Test 0/1
+                Specifies whether or not to test the results of each run.
+                A brief explanation of testing is provided below.
+
+6.1 TESTING IMPLEMENTATION
+
+   The LEVEL 3 TESTER/TIMER programs were created to make performance
+   analysis easier, not as a validation tool, thus the testing
+   implementation is modest. For a complete test of ATLAS's LEVEL 3
+   BLAS implementation, run the CBLAS TESTER described in section 5.
+
+   For all routines, except _TRSM, we compute:
+
+
+                          ||C-D||
+      x = -----------------------------------------
+         ||A|| * ||B|| * |alpha| * eps * max(M,N,K)
+
+   where A, B, and alpha are arguments to the routine, C is the result
+   matrix from the call to a trusted BLAS library, D is the result matrix from
+   the call to ATLAS, eps is the epsilon value for the machine, and
+   max(M,N,K) is the largest value of M, N, K which describe the
+   dimensions for the argument and result matrices to the routine. The
+   operation ||N|| is the column norm of matrix N, and x <= O(1).
+
+   For _TRSM, we compute:
+
+                           ||B-A*X||
+       x =  ----------------------------------------
+            ||A|| * ||X|| * |alpha| * eps * max(M,N)
+
+   where A, B, and alpha are arguments to the routine, X is the result
+   matrix from the ATLAS _TRSM call, and max(M,N) is the larger
+   value of M an K.
+
+   The data for the argument matrices are generated internally, using the
+   ANSI C rand() function, and are distributed over the interval (-.5,+.5).
+   In any case, if x > 1 then an error will be output:
+
+   DGEMM
+   TEST  TA  TB    M    N    K  alpha   beta    Time  Mflop  SpUp  PASS
+   ====  ==  ==  ===  ===  ===  =====  =====  ======  =====  ====  ====
+
+      1   N   N  100  100  100    1.0    0.0    0.01  259.7  1.00   ---
+   ERROR: ferr is 4860974538.606986
+      1   N   N  100  100  100    1.0    0.0    0.01  227.9  0.88    NO
+      2   N   N  200  200  200    1.0    0.0    0.05  291.6  1.00   ---
+   ERROR: ferr is 8411267408.031064
+      2   N   N  200  200  200    1.0    0.0    0.06  274.5  0.94    NO
+      3   N   N  300  300  300    1.0    0.0    0.17  327.2  1.00   ---
+   ERROR: ferr is 2895940442.476244
+      3   N   N  300  300  300    1.0    0.0    0.20  272.5  0.83    NO
+
+   Ferr is the value of x.
+
+   What can we infer from the error?  Not much. If the two result
+   matrices are 'roughly the same', then no error is
+   produced. Otherwise, the result matrices are 'not roughly the same'.
+
+   However, if you see this error message it's best to test both
+   libraries (if ATLAS doesn't fail, test your ``trusted'' BLAS)
+   with the BLAS testers from netlib:
+
+   www.netlib.org/blas/sblat3
+   www.netlib.org/blas/dblat3
+   www.netlib.org/blas/cblat3
+   www.netlib.org/blas/zblat3
+
+7. Timing the Level 2 BLAS
+
+   The level 2 timer/tester is very similar in action to the level 3 timer.
+   to make, in BLDdir/bin/, type:
+
+   make xsl2blastst
+   make xdl2blastst
+   make xcl2blastst
+   make xzl2blastst
+
+   The flags are very similar to those accepted by the level 3 BLAS timer.
+   For usage help, type
+   ./xdl2blastst -h
+
+8. Timing the Level 1 BLAS
+   The level 1 timer/tester is very similar in action to the level 2 timer.
+   to make, in BLDdir/bin/, type:
+
+   make xsl1blastst
+   make xdl1blastst
+   make xcl1blastst
+   make xzl1blastst
+
+   The flags are very similar to those accepted by the level 2 BLAS timer.
+   For usage help, type
+   ./xdl1blastst -h
+
+9. Timing the factorization/solves
+
+   You can time and test the factor and solve of square linear systems by:
+
+   make xsslvtst
+   make xdslvtst
+   make xcslvtst
+   make xzslvtst
+
+   You can vary the type of factor timed by setting the -U flag:
+      l/u : perform Cholesky factor of Lower or Upper positive def matrix
+      g   : perform a LU factor and solve
+      q   : perform a QR factor and solve
+   You can test all factors at once using this flag, i.e.
+      -U 4 l u g q
+
+   If you want to test/time non-square cases, then you will need to use
+   the individal factorization testers described next.
+
+10.Timing ATLAS LU, QR and Cholesky
+
+   The factor timers may be built in ATLAS/bin/<arch> by:
+
+   make xslutst
+   make xdlutst
+   make xclutst
+   make xzlutst
+
+   make xsqrtst
+   make xdqrtst
+   make xcqrtst
+   make xzqrtst
+
+   make xsllttst
+   make xdllttst
+   make xcllttst
+   make xzllttst
+
+   These timers time ATLAS's LU and Cholesky.  If you wish to time LAPACK or
+   some other library's LU and Cholesky for comparison purposes, set your
+   Make.inc macro FLAPACKlib to point to the appropriate library, and then
+
+   make xslutstF
+   make xdlutstF
+   make xclutstF
+   make xzlutstF
+
+   make xsllttstF
+   make xdllttstF
+   make xcllttstF
+   make xzllttstF
+
+   Both LU and Cholesky testers will run default cases between 100 and 1000
+   if no arguments are supplied.  Both will supply terse usage information
+   if the -h flag is thrown.  These testers are similar to the level 3 tester
+   in the flags they accept (i.e., -m, -M, -n -N, etc. all work the same).  In
+   addition, the user may pass:
+   -O <norders> <order1>...<orderN> :
+      Whether Row-Major or Column-major storage LU/LLt is to be tested
+      (i.e., R and C are the only legal values for orderX).  Note that
+      non-ATLAS implementations (such as provided by x<pre>lutstF) can only
+      test Column-major arrays (the default).
+   -T <thresh> :
+      supply a floating point threshhold the residual must pass.  If set to
+      negative, no testing is done (saving time and space).  If set to zero,
+      all tests will be flagged as failed.
+    The QR tester is similar.
+
+11. More detailed LAPACK timings with latime.
+    The factor/solve timers above are relatively crude.  We have a general
+    LAPACK timer which is more sophisticated, but does only timing and no
+    testing.  The most important targets are:
+       x<pre>[s,t]latime
+       x<pre>[s,t]latime_al_ab
+       x<pre>[s,t]latime_sl_sb
+       x<pre>[s,t]latime_fl_fb
+    Where:
+       <pre> : selectcs type/precision: s/d/c/z
+       [s,t]: s: serial, t: threaded
+       _al : ATLAS's lapack
+       _sl : The system LAPACK
+       _fl : F77 reference LAPACK
+       _ab : ATLAS's BLAS
+       _sb : The system BLAS
+       _fb : F77 reference BLAS
+
+    There are many more variants, as you can fin in BLDdir/bin/Makefile.
+
+12. Other timers/testers, including threading.
+   ATLAS provides other timer/testers.  In particular, note that the timers
+   in the bin directory have versions to test the threaded interface.  To
+   build these, one simply adds the "_pt" suffix to the timer/tester name
+   (eg., "make xdlutst_pt" rather than "make xdlutst").  Many of these
+   timers also have a "_dyn" suffix, which allows you to test against
+   the dynamically-linked ATLAS libs, assuming you have built them.
+   In addition to the lu and llt tests mentioned above, we also have
+   an inversion tester ("make xdinvtst"), an U*U' tester ("make xduumtst").
+   and a solver tester ("make xdslvtst").  These work similarly to the
+   LU and LLt testers covered above.  The solve tester allows for testing
+   LU, Cholesky, and for some cases, QR solves.

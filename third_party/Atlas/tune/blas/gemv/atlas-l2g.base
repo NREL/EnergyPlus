@@ -1,0 +1,2979 @@
+@define NU @@(@nu)@
+@iexp NUm1 @(NU) -1 +
+@TYPE SREAL
+   @define pre @s@
+   @define type @float@
+   @define sizeof @4@
+   @define shv @2@
+@TYPE DREAL
+   @define pre @d@
+   @define type @double@
+   @define sizeof @8@
+   @define shv @3@
+@TYPE SCPLX
+   @define pre @c@
+   @define type @float@
+   @define sizeof @8@
+   @define shv @3@
+@TYPE DCPLX
+   @define pre @z@
+   @define type @double@
+   @define sizeof @16@
+   @define shv @4@
+@TYPE SREAL DREAL
+   @define mu2 @@(MU)@
+   @define nu2 @@(NU)@
+@TYPE SCPLX DCPLX
+   @iexp mu2 @(MU) @(MU) +
+   @iexp nu2 @(NU) @(NU) +
+@TYPE !
+@ifdef ! CL
+   @iexp CL @(sizeof) 64 /
+@endifdef
+@ROUT r1_C mvT_C mvN_C r2_C
+#include "atlas_misc.h"
+#ifndef PFYDIST
+   #define PFYDIST @(NU)
+#endif
+@TYPE SREAL DREAL
+@whiledef op A X
+#ifndef PF@(op)DIST
+   #define PF@(op)DIST 0
+#endif
+@endwhile
+@TYPE SCPLX DXPLX
+@whiledef op A X
+#ifndef PF@(op)DIST
+   #define PF@(op)DIST 256
+#endif
+@endwhile
+@TYPE !
+
+#if !defined(ATL_3DNow) && !defined(ATL_SSE1) && \
+    (PFADIST != 0 || PFXDIST != 0 || PFYDIST != 0)
+   #include "atlas_prefetch.h"
+#endif
+
+#if defined(ATL_3DNow) || defined(ATL_SSE1)
+   #ifndef PFIY
+      #define PFIY prefetchnta
+   #endif
+   #ifndef PFIX
+      #define PFIX prefetchnta
+   #endif
+   #ifndef PFIA
+      #ifdef ATL_3DNow
+         #define PFIA prefetchw
+      #else
+         #define PFIA prefetcht0
+      #endif
+   #endif
+#endif
+/*
+ * X & A are prefetched in M loop PF[A,X]DIST (in bytes) ahead
+ */
+#if PFADIST == 0                /* flag for no prefetch */
+   #define prefA(mem)
+#else
+   #if defined(ATL_3DNow) || defined(ATL_SSE1)
+      #define prefA(mem) __asm__ __volatile__ \
+         (Mstr(PFIA) " %0" : : "m" (*(((char *)(mem))+PFADIST)))
+   #else
+      #if PFLVL == 2
+         #define prefA(mem) ATL_pfl2W(((char*)mem)+PFADIST)
+      #else
+         #define prefA(mem) ATL_pfl1W(((char*)mem)+PFADIST)
+      #endif
+   #endif
+#endif
+#if PFXDIST == 0                /* flag for no prefetch */
+   #define prefX(mem)
+#else
+   #if defined(ATL_3DNow) || defined(ATL_SSE1)
+      #define prefX(mem) __asm__ __volatile__ \
+         (Mstr(PFIX) " %0" : : "m" (*(((char *)(mem))+PFXDIST)))
+   #else
+      #if PFLVL == 2
+         #define prefX(mem) ATL_pfl2R(((char*)mem)+PFXDIST)
+      #else
+         #define prefX(mem) ATL_pfl1R(((char*)mem)+PFXDIST)
+      #endif
+   #endif
+#endif
+/*
+ * Y is prefetched in N-loop, and always fetches next NU piece
+ */
+#if PFYDIST == 0                /* flag for no prefetch */
+   #define prefY(mem)
+#else
+   #if defined(ATL_3DNow) || defined(ATL_SSE1)
+      #define prefY(mem) \
+         __asm__ __volatile__ (Mstr(PFIY) " %0" : : "m" (*(((char *)(mem)))))
+   #else
+      #if PFLVL == 2
+         #define prefY(mem) ATL_pfl2R(mem)
+      #else
+         #define prefY(mem) ATL_pfl1R(mem)
+      #endif
+   #endif
+#endif
+@skip #define TYPE double
+#ifndef ATL_CINT
+   #define ATL_CINT const int
+#endif
+#ifndef ATL_INT
+   #define ATL_INT int
+#endif
+@ROUT r1_C mvT_C r2_C
+   @define nV @Y@
+   @define mV @X@
+   @define nv @y@
+   @define mv @x@
+@ROUT mvN_C
+   @define nV @X@
+   @define mV @Y@
+   @define nv @x@
+   @define mv @y@
+@ROUT mvN_C  
+/* Need to handle BETA=0 case by assigning y to zero outside of loop */
+   @TYPE SREAL DREAL
+@BEGINPROC MLOOP mu nu
+      @declare "      const @(type) " y n ";"
+          *A0=A
+         @iexp j 1 0 +
+         @iwhile j < @(nu)
+            @iexp i @(j) -1 +
+            *A@(j)=A@(i)+lda
+            @iexp j @(j) 1 +
+         @endiwhile
+      @enddeclare
+      @declare "      const register @(type) " y n ";"
+         @iexp j 0 0 +
+         @iwhile j < @(nu)
+            x@(j)=X[@(j)]
+            @iexp j @(j) 1 +
+         @endiwhile
+      @enddeclare
+      ATL_INT i;
+      prefY(Y+@(nu)+@(nu)-1);
+      for (i=0; i < M@(mu); i += @(mu))
+      {
+         @declare "         const @(type) " y n ";"
+            @iexp j 0 0 +
+            @iwhile j < @(nu)
+               @iexp i 0 0 +
+               @iwhile i < @(mu)
+                  a@(i)_@(j)=A@(j)[i+@(i)]
+                  @iexp i @(i) 1 +
+               @endiwhile
+               @iexp j @(j) 1 +
+            @endiwhile
+         @enddeclare
+         @declare "         register @(type) " y n ";"
+            @iexp i 0 0 +
+            @iwhile i < @(mu)
+               y@(i)=Y[i+@(i)]
+               @iexp i @(i) 1 +
+            @endiwhile
+         @enddeclare
+
+         prefX(X);
+         @iexp j 0 0 +
+         @iwhile j < @(nu)
+            @iexp i 0 0 +
+            @iwhile i < @(mu)
+         y@(i) += a@(i)_@(j) * x@(j);
+               @iexp k @(CL) @(i) /
+               @iexp k @(CL) @(k) *
+               @iif i = k
+         prefA(A@(j));
+               @endiif
+               @iexp i @(i) 1 +
+            @endiwhile
+            @iexp j @(j) 1 +
+         @endiwhile
+      @iexp i 0 0 +
+      @iwhile i < @(mu)
+         Y[i+@(i)] = y@(i);
+            @iexp i @(i) 1 +
+      @endiwhile
+      }
+      @iexp j @(mu) -1 +
+      @iif mu > 2
+      for (i=M@(mu); i < M; i++)
+      @endiif
+      @iif mu = 2
+      if (M != M2)
+      @endiif
+      @iif j > 0
+      {
+         @declare "         const @(type) " y n ";"
+            @iexp j 0 0 +
+            @iwhile j < @(nu)
+               a0_@(j)=A@(j)[i]
+               @iexp j @(j) 1 +
+            @endiwhile
+         @enddeclare
+         register @(type) y0 = Y[i];
+
+         @iexp j 0 0 +
+         @iwhile j < @(nu)
+         y0 += a0_@(j) * x@(j);
+            @iexp j @(j) 1 +
+         @endiwhile
+         Y[i] = y0;
+      }
+      @endiif
+@ENDPROC
+   @TYPE SCPLX DCPLX
+@BEGINPROC MLOOP mu nu
+      @declare "      const @(type) " y n ";"
+          *A0=A
+         @iexp j 1 0 +
+         @iwhile j < @(nu)
+            @iexp i @(j) -1 +
+            *A@(j)=A@(i)+lda
+            @iexp j @(j) 1 +
+         @endiwhile
+      @enddeclare
+      @declare "      register @(type) " y n ";"
+         @iexp j 0 0 +
+         @iexp k 0 0 +
+         @iwhile j < @(nu)
+            rx@(j)=X[@(k)]
+            @iexp k @(k) 1 +
+            ix@(j)=X[@(k)]
+            @iexp k @(k) 1 +
+            @iexp j @(j) 1 +
+         @endiwhile
+      @enddeclare
+      ATL_INT i;
+      prefY(X+@(nu2)+@(nu2)-1);
+      for (i=0; i < M@(mu); i += @(mu2))
+      {
+         @declare "         const @(type) " y n ";"
+            @iexp j 0 0 +
+            @iwhile j < @(nu)
+               @iexp i 0 0 +
+               @iexp k 0 0 +
+               @iwhile i < @(mu)
+                  ra@(i)_@(j)=A@(j)[i+@(k)]
+                  @iexp k @(k) 1 +
+                  ia@(i)_@(j)=A@(j)[i+@(k)]
+                  @iexp k @(k) 1 +
+                  @iexp i @(i) 1 +
+               @endiwhile
+               @iexp j @(j) 1 +
+            @endiwhile
+         @enddeclare
+         @declare "         register @(type) " y n ";"
+            @iexp i 0 0 +
+            @iexp k 0 0 +
+            @iwhile i < @(mu)
+               ry@(i)=Y[i+@(k)]
+               @iexp k @(k) 1 +
+               iy@(i)=Y[i+@(k)]
+               @iexp k @(k) 1 +
+               @iexp i @(i) 1 +
+            @endiwhile
+         @enddeclare
+
+         prefY(Y);
+         @iexp j 0 0 +
+         @iwhile j < @(nu)
+            @iexp i 0 0 +
+            @iwhile i < @(mu)
+         ry@(i) += ra@(i)_@(j) * rx@(j);
+         iy@(i) += ra@(i)_@(j) * ix@(j);
+               @iexp i @(i) 1 +
+            @endiwhile
+            @iexp i 0 0 +
+            @iwhile i < @(mu)
+         ry@(i) -= ia@(i)_@(j) * ix@(j);
+         iy@(i) += ia@(i)_@(j) * rx@(j);
+               @iexp k @(CL) @(i) /
+               @iexp k @(CL) @(k) *
+               @iif i = k
+         prefA(A@(j));
+               @endiif
+               @iexp i @(i) 1 +
+            @endiwhile
+
+            @iexp j @(j) 1 +
+         @endiwhile
+
+         @iexp i 0 0 +
+         @iexp k 0 0 +
+         @iwhile i < @(mu)
+         Y[i+@(k)] = ry@(i);
+            @iexp k @(k) 1 +
+         Y[i+@(k)] = iy@(i);
+            @iexp k @(k) 1 +
+            @iexp i @(i) 1 +
+         @endiwhile
+      }
+      @iexp j @(mu) -1 +
+      @iif mu > 2
+      for (i=M@(mu); i < M; i += 2)
+      @endiif
+      @iif mu = 2
+      if (M != M2)
+      @endiif
+      @iif j > 0
+      {
+         register @(type) ry0 = Y[i], iy0 = Y[i+1];
+         @declare "         const @(type) " y n ";"
+            @iexp j 0 0 +
+            @iwhile j < @(nu)
+               ra0_@(j)=A@(j)[i]
+               ia0_@(j)=A@(j)[i+1]
+               @iexp j @(j) 1 +
+            @endiwhile
+         @enddeclare
+         @iexp j 0 0 +
+         @iwhile j < @(nu)
+         ry0 += ra0_@(j) * rx@(j);
+         iy0 += ra0_@(j) * ix@(j);
+         ry0 -= ia0_@(j) * ix@(j);
+         iy0 += ia0_@(j) * rx@(j);
+            @iexp j @(j) 1 +
+         @endiwhile
+         Y[i] = ry0;
+         Y[i+1] = iy0;
+      }
+      @endiif
+@ENDPROC
+   @TYPE !
+@ROUT mvT_C
+   @TYPE SREAL DREAL
+@BEGINPROC MLOOP mu nu
+      @declare "      const @(type) " y n ";"
+          *A0=A
+         @iexp j 1 0 +
+         @iwhile j < @(nu)
+            @iexp i @(j) -1 +
+            *A@(j)=A@(i)+lda
+            @iexp j @(j) 1 +
+         @endiwhile
+      @enddeclare
+      @declare "      register @(type) " y n ";"
+         @iexp j 0 0 +
+         @iwhile j < @(nu)
+            y@(j)=ATL_rzero
+            @iexp j @(j) 1 +
+         @endiwhile
+      @enddeclare
+      ATL_INT i;
+      prefY(Y+@(nu)+@(nu)-1);
+      for (i=0; i < M@(mu); i += @(mu))
+      {
+         @declare "         const register @(type) " y n ";"
+            @iexp i 0 0 +
+            @iwhile i < @(mu)
+               x@(i)=X[i+@(i)]
+               @iexp i @(i) 1 +
+            @endiwhile
+         @enddeclare
+
+         prefX(X);
+         @iexp i 0 0 +
+         @iwhile i < @(mu)
+            @iexp j 0 0 +
+            @iwhile j < @(nu)
+         y@(j) += A@(j)[i+@(i)] * x@(i);
+               @iexp k @(CL) @(i) /
+               @iexp k @(CL) @(k) *
+               @iif i = k
+         prefA(A@(j));
+               @endiif
+               @iexp j @(j) 1 +
+            @endiwhile
+            @iexp i @(i) 1 +
+         @endiwhile
+      }
+      @iexp j @(mu) -1 +
+      @iif mu > 2
+      for (i=M@(mu); i < M; i++)
+      @endiif
+      @iif mu = 2
+      if (M != M2)
+      @endiif
+      @iif j > 0
+      {
+         const register @(type) x0 = X[i];
+         @iexp j 0 0 +
+         @iwhile j < @(nu)
+         y@(j) += A@(j)[i] * x0;
+            @iexp j @(j) 1 +
+         @endiwhile
+      }
+      @endiif
+      #ifdef BETA0
+      @iexp j 0 0 +
+      @iwhile j < @(nu)
+         Y[@(j)] = y@(j);
+            @iexp j @(j) 1 +
+      @endiwhile
+      #else
+      @iexp j 0 0 +
+      @iwhile j < @(nu)
+         Y[@(j)] += y@(j);
+            @iexp j @(j) 1 +
+      @endiwhile
+      #endif
+@ENDPROC
+   @TYPE SCPLX DCPLX
+@BEGINPROC MLOOP mu nu
+      @declare "      const @(type) " y n ";"
+          *A0=A
+         @iexp j 1 0 +
+         @iwhile j < @(nu)
+            @iexp i @(j) -1 +
+            *A@(j)=A@(i)+lda
+            @iexp j @(j) 1 +
+         @endiwhile
+      @enddeclare
+      @declare "      register @(type) " y n ";"
+         @iexp j 0 0 +
+         @iwhile j < @(nu)
+            ry@(j)=ATL_rzero
+            iy@(j)=ATL_rzero
+            @iexp j @(j) 1 +
+         @endiwhile
+      @enddeclare
+      ATL_INT i;
+      prefY(Y+@(nu2)+@(nu2)-1);
+      for (i=0; i < M@(mu); i += @(mu2))
+      {
+         @declare "         const register @(type) " y n ";"
+            @iexp j 0 0 +
+            @iwhile j < @(nu)
+               @iexp i 0 0 +
+               @iexp k 0 0 +
+               @iwhile i < @(mu)
+                  ra@(i)_@(j)=A@(j)[i+@(k)]
+                  @iexp k @(k) 1 +
+                  ia@(i)_@(j)=A@(j)[i+@(k)]
+                  @iexp k @(k) 1 +
+                  @iexp i @(i) 1 +
+               @endiwhile
+               @iexp j @(j) 1 +
+            @endiwhile
+         @enddeclare
+         @declare "         const register @(type) " y n ";"
+            @iexp i 0 0 +
+            @iexp k 0 0 +
+            @iwhile i < @(mu)
+               rx@(i)=X[i+@(k)]
+               @iexp k @(k) 1 +
+               ix@(i)=X[i+@(k)]
+               @iexp k @(k) 1 +
+               @iexp i @(i) 1 +
+            @endiwhile
+         @enddeclare
+
+         prefX(X);
+         @iexp i 0 0 +
+         @iwhile i < @(mu)
+            @iexp j 0 0 +
+            @iwhile j < @(nu)
+         ry@(j) += ra@(i)_@(j) * rx@(i);
+         iy@(j) += ra@(i)_@(j) * ix@(i);
+               @iexp j @(j) 1 +
+            @endiwhile
+            @iexp i @(i) 1 +
+         @endiwhile
+
+         @iexp i 0 0 +
+         @iwhile i < @(mu)
+            @iexp j 0 0 +
+            @iwhile j < @(nu)
+         ry@(j) -= ia@(i)_@(j) * ix@(i);
+         iy@(j) += ia@(i)_@(j) * rx@(i);
+               @iexp k @(CL) @(i) /
+               @iexp k @(CL) @(k) *
+               @iif i = k
+         prefA(A@(j));
+               @endiif
+               @iexp j @(j) 1 +
+            @endiwhile
+            @iexp i @(i) 1 +
+         @endiwhile
+      }
+      @iexp j @(mu) -1 +
+      @iif mu > 2
+      for (i=M@(mu); i < M; i += 2)
+      @endiif
+      @iif mu = 2
+      if (M != M2)
+      @endiif
+      @iif j > 0
+      {
+         const register @(type) rx0 = X[i], ix0 = X[i+1];
+         @declare "         const register @(type) " y n ";"
+            @iexp j 0 0 +
+            @iwhile j < @(nu)
+               ra0_@(j)=A@(j)[i]
+               ia0_@(j)=A@(j)[i+1]
+               @iexp j @(j) 1 +
+            @endiwhile
+         @enddeclare
+         @iexp j 0 0 +
+         @iwhile j < @(nu)
+         ry@(j) += ra0_@(j) * rx0;
+         iy@(j) += ra0_@(j) * ix0;
+            @iexp j @(j) 1 +
+         @endiwhile
+         @iexp j 0 0 +
+         @iwhile j < @(nu)
+         ry@(j) -= ia0_@(j) * ix0;
+         iy@(j) += ia0_@(j) * rx0;
+            @iexp j @(j) 1 +
+         @endiwhile
+      }
+      @endiif
+      #ifdef BETA0
+      @iexp k 0 0 +
+      @iexp j 0 0 +
+      @iwhile j < @(nu)
+         Y[@(k)] = ry@(j);
+         @iexp k @(k) 1 +
+         Y[@(k)] = iy@(j);
+         @iexp k @(k) 1 +
+         @iexp j @(j) 1 +
+      @endiwhile
+      #else
+      @iexp j 0 0 +
+      @iexp k 0 0 +
+      @iwhile j < @(nu)
+         Y[@(k)] += ry@(j);
+         @iexp k @(k) 1 +
+         Y[@(k)] += iy@(j);
+         @iexp k @(k) 1 +
+         @iexp j @(j) 1 +
+      @endiwhile
+      #endif
+@ENDPROC
+   @TYPE !
+@ROUT r1_C
+   @TYPE SREAL DREAL
+@BEGINPROC MLOOP mu nu
+      @declare "      @(type) " y n ";"
+          *A0=A
+         @iexp j 1 0 +
+         @iwhile j < @(nu)
+            @iexp i @(j) -1 +
+            *A@(j)=A@(i)+lda
+            @iexp j @(j) 1 +
+         @endiwhile
+      @enddeclare
+      @declare "      const register @(type) " y n ";"
+         @iexp j 0 0 +
+         @iwhile j < @(nu)
+            y@(j)=Y[@(j)]
+            @iexp j @(j) 1 +
+         @endiwhile
+      @enddeclare
+      ATL_INT i;
+      prefY(Y+@(nu)+@(nu)-1);
+      for (i=0; i < M@(mu); i += @(mu))
+      {
+         @declare "         const register @(type) " y n ";"
+            @iexp i 0 0 +
+            @iwhile i < @(mu)
+               x@(i)=X[i+@(i)]
+               @iexp i @(i) 1 +
+            @endiwhile
+         @enddeclare
+
+         prefX(X);
+         @iexp i 0 0 +
+         @iwhile i < @(mu)
+            @iexp j 0 0 +
+            @iwhile j < @(nu)
+         A@(j)[i+@(i)] += y@(j) * x@(i);
+               @iexp k @(CL) @(i) /
+               @iexp k @(CL) @(k) *
+               @iif i = k
+         prefA(A@(j));
+               @endiif
+               @iexp j @(j) 1 +
+            @endiwhile
+            @iexp i @(i) 1 +
+         @endiwhile
+      }
+      @iexp j @(mu) -1 +
+      @iif mu > 2
+      for (i=M@(mu); i < M; i++)
+      @endiif
+      @iif mu = 2
+      if (M != M2)
+      @endiif
+      @iif j > 0
+      {
+         const register @(type) x0 = X[i];
+         @iexp j 0 0 +
+         @iwhile j < @(nu)
+         A@(j)[i] += y@(j) * x0;
+            @iexp j @(j) 1 +
+         @endiwhile
+      }
+      @endiif
+@ENDPROC
+   @TYPE SCPLX DCPLX
+@BEGINPROC MLOOP mu nu
+      @declare "      @(type) " y n ";"
+          *A0=A
+         @iexp j 1 0 +
+         @iwhile j < @(nu)
+            @iexp i @(j) -1 +
+            *A@(j)=A@(i)+lda
+            @iexp j @(j) 1 +
+         @endiwhile
+      @enddeclare
+      @declare "      const register @(type) " y n ";"
+         @iexp j 0 0 +
+         @iexp k 0 0 +
+         @iwhile j < @(nu)
+            ry@(j)=Y[@(k)]
+            @iexp k @(k) 1 +
+            iy@(j)=Y[@(k)]
+            @iexp j @(j) 1 +
+            @iexp k @(k) 1 +
+         @endiwhile
+      @enddeclare
+      ATL_INT i;
+      prefY(Y+@(nu2)+@(nu2)-1);
+      for (i=0; i < M@(mu); i += @(mu2))
+      {
+         @declare "         const register @(type) " y n ";"
+            @iexp i 0 0 +
+            @iexp k 0 0 +
+            @iwhile i < @(mu)
+               rx@(i)=X[i+@(k)]
+               @iexp k @(k) 1 +
+               ix@(i)=X[i+@(k)]
+               @iexp k @(k) 1 +
+               @iexp i @(i) 1 +
+            @endiwhile
+         @enddeclare
+
+         prefX(X);
+         @iexp i 0 0 +
+         @iwhile i < @(mu)
+            @iexp ii @(i) @(i) +
+            @iexp j 0 0 +
+            @iwhile j < @(nu)
+         A@(j)[i+@(ii)] += ry@(j)*rx@(i) - iy@(j)*ix@(i);
+               @iexp k @(CL) @(i) /
+               @iexp k @(CL) @(k) *
+               @iif i = k
+         prefA(A@(j));
+               @endiif
+         A@(j)[i+@(ii)+1] += ry@(j)*ix@(i) + iy@(j)*rx@(i);
+               @iexp j @(j) 1 +
+            @endiwhile
+            @iexp i @(i) 1 +
+         @endiwhile
+      }
+      @iexp j @(mu) -1 +
+      @iif mu > 2
+      for (i=M@(mu); i < M; i += 2)
+      @endiif
+      @iif mu = 2
+      if (M != M2)
+      @endiif
+      @iif j > 0
+      {
+         const register @(type) rx0 = X[i], ix0 = X[i+1];
+         @iexp j 0 0 +
+         @iwhile j < @(nu)
+         A@(j)[i] += ry@(j) * rx0 - iy@(j) * ix0;
+         A@(j)[i+1] += ry@(j) * ix0 + iy@(j) * rx0;
+            @iexp j @(j) 1 +
+         @endiwhile
+      }
+      @endiif
+@ENDPROC
+   @TYPE !
+@ROUT r2_C
+   @TYPE SREAL DREAL
+@BEGINPROC MLOOP mu nu
+      @declare "      @(type) " y n ";"
+          *A0=A
+         @iexp j 1 0 +
+         @iwhile j < @(nu)
+            @iexp i @(j) -1 +
+            *A@(j)=A@(i)+lda
+            @iexp j @(j) 1 +
+         @endiwhile
+      @enddeclare
+      @declare "      const register @(type) " y n ";"
+         @iexp j 0 0 +
+         @iwhile j < @(nu)
+            y@(j)=Y[@(j)]
+            z@(j)=Z[@(j)]
+            @iexp j @(j) 1 +
+         @endiwhile
+      @enddeclare
+      ATL_INT i;
+      prefY(Y+@(nu)+@(nu)-1);
+      prefY(Z+@(nu)+@(nu)-1);
+      for (i=0; i < M@(mu); i += @(mu))
+      {
+         @declare "         register @(type) " y n ";"
+            @iexp j 0 0 +
+            @iwhile j < @(nu)
+               a@(j)
+               @iexp j @(j) 1 +
+            @endiwhile
+         @enddeclare
+         @declare "         const @(type) " y n ";"
+            @iexp i 0 0 +
+            @iwhile i < @(mu)
+               x@(i)=X[i+@(i)]
+               w@(i)=W[i+@(i)]
+               @iexp i @(i) 1 +
+            @endiwhile
+         @enddeclare
+
+         prefX(X);
+         @iexp i 0 0 +
+         @iwhile i < @(mu)
+            @iexp j 0 0 +
+            @iwhile j < @(nu)
+         a@(j) = A@(j)[i+@(i)];
+         a@(j) += x@(i) * y@(j);
+               @iexp j @(j) 1 +
+            @endiwhile
+            @iif i = 0
+         prefX(W);
+            @endiif
+            @iexp j 0 0 +
+            @iwhile j < @(nu)
+         a@(j) += w@(i) * z@(j);
+               @iexp k @(CL) @(i) /
+               @iexp k @(CL) @(k) *
+               @iif i = k
+         prefA(A@(j));
+               @endiif
+         A@(j)[i+@(i)] = a@(j);
+               @iexp j @(j) 1 +
+            @endiwhile
+            @iexp i @(i) 1 +
+         @endiwhile
+
+      }
+      @iexp j @(mu) -1 +
+      @iif mu > 2
+      for (i=M@(mu); i < M; i++)
+      @endiif
+      @iif mu = 2
+      if (M != M2)
+      @endiif
+      @iif j > 0
+      {
+         const register @(type) x0 = X[i], w0 = W[i];
+         @declare "         register @(type) " y n ";"
+            @iexp j 0 0 +
+            @iwhile j < @(nu)
+               a@(j)=A@(j)[i]
+               @iexp j @(j) 1 +
+            @endiwhile
+         @enddeclare
+
+         @iexp j 0 0 +
+         @iwhile j < @(nu)
+         a@(j) += x0 * y@(j);
+            @iexp j @(j) 1 +
+         @endiwhile
+         @iexp j 0 0 +
+         @iwhile j < @(nu)
+         a@(j) += w0 * z@(j);
+         A@(j)[i] = a@(j);
+            @iexp j @(j) 1 +
+         @endiwhile
+      }
+      @endiif
+@ENDPROC
+   @TYPE SCPLX DCPLX
+@BEGINPROC MLOOP mu nu
+      @declare "      @(type) " y n ";"
+          *A0=A
+         @iexp j 1 0 +
+         @iwhile j < @(nu)
+            @iexp i @(j) -1 +
+            *A@(j)=A@(i)+lda
+            @iexp j @(j) 1 +
+         @endiwhile
+      @enddeclare
+      @declare "      const register @(type) " y n ";"
+         @iexp j 0 0 +
+         @iexp k 0 0 +
+         @iwhile j < @(nu)
+            ry@(j)=Y[@(k)]
+            rz@(j)=Z[@(k)]
+            @iexp k @(k) 1 +
+            iy@(j)=Y[@(k)]
+            iz@(j)=Z[@(k)]
+            @iexp j @(j) 1 +
+            @iexp k @(k) 1 +
+         @endiwhile
+      @enddeclare
+      ATL_INT i;
+      prefY(Y+@(nu2)+@(nu2)-1);
+      for (i=0; i < M@(mu); i += @(mu2))
+      {
+         register @(type) ra00, ia00, ra10, ia10;
+         @declare "         const @(type) " y n ";"
+            @iexp i 0 0 +
+            @iexp k 0 0 +
+            @iwhile i < @(mu)
+               rx@(i)=X[i+@(k)]
+               rw@(i)=W[i+@(k)]
+               @iexp k @(k) 1 +
+               ix@(i)=X[i+@(k)]
+               iw@(i)=W[i+@(k)]
+               @iexp k @(k) 1 +
+               @iexp i @(i) 1 +
+            @endiwhile
+         @enddeclare
+
+         prefX(X);
+         @iexp mu22 2 @(mu) /
+         @iexp mu22 2 @(mu22) *
+         @iexp j 0 0 +
+         @iwhile j < @(nu)
+            @iexp i 0 0 +
+            @iwhile i < @(mu22)
+            @iexp ii @(i) @(i) +
+            @iexp ip1 @(i) 1 +
+         ra00 = A@(j)[i+@(ii)];
+         ia00 = A@(j)[i+@(ii)+1];
+         ra10 = A@(j)[i+@(ii)+2];
+         ia10 = A@(j)[i+@(ii)+3];
+         ra00 += rx@(i) * ry@(j);
+         ia00 += rx@(i) * iy@(j);
+         ra10 += rx@(ip1) * ry@(j);
+         ia10 += rx@(ip1) * iy@(j);
+               @iexp k @(CL) @(i) /
+               @iexp k @(CL) @(k) *
+               @iif i = k
+         prefA(A@(j));
+               @endiif
+         ra00 -= ix@(i) * iy@(j);
+         ia00 += ix@(i) * ry@(j);
+         ra10 -= ix@(ip1) * iy@(j);
+         ia10 += ix@(ip1) * ry@(j);
+         @iif j = 0
+            @iif i = 0
+         prefX(W);
+            @endiif
+         @endiif
+         ra00 += rw@(i) * rz@(j);
+         ia00 += rw@(i) * iz@(j);
+         ra10 += rw@(ip1) * rz@(j);
+         ia10 += rw@(ip1) * iz@(j);
+         ra00 -= iw@(i) * iz@(j);
+         A@(j)[i+@(ii)] = ra00;
+         ia00 += iw@(i) * rz@(j);
+         A@(j)[i+@(ii)+1] = ia00;
+         ra10 -= iw@(ip1) * iz@(j);
+         A@(j)[i+@(ii)+2] = ra10;
+         ia10 += iw@(ip1) * rz@(j);
+         A@(j)[i+@(ii)+3] = ia10;
+               @iexp i @(i) 2 +
+            @endiwhile
+            @iwhile i < @(mu)
+            @iexp ii @(i) @(i) +
+
+         ra00 = A@(j)[i+@(ii)];
+         ia00 = A@(j)[i+@(ii)+1];
+         ra00 += rx@(i) * ry@(j);
+         ia00 += rx@(i) * iy@(j);
+         ra00 -= ix@(i) * iy@(j);
+         ia00 += ix@(i) * ry@(j);
+         ra00 += rw@(i) * rz@(j);
+         ia00 += rw@(i) * iz@(j);
+         ra00 -= iw@(i) * iz@(j);
+         A@(j)[i+@(ii)] = ra00;
+         ia00 += iw@(i) * rz@(j);
+         A@(j)[i+@(ii)+1] = ia00;
+               @iexp i @(i) 1 +
+            @endiwhile
+
+            @iexp j @(j) 1 +
+         @endiwhile
+      }
+      @iexp j @(mu) -1 +
+      @iif mu > 2
+      for (i=M@(mu); i < M; i += 2)
+      @endiif
+      @iif mu = 2
+      if (M != M2)
+      @endiif
+      @iif j > 0
+      {
+         const @(type) rx0 = X[i], ix0 = X[i+1], rw0 = W[i], iw0 = W[i+1];
+         @iexp j 0 0 +
+         @iwhile j < @(nu)
+         A@(j)[i] += rx0 * ry@(j) - ix0 * iy@(j) + rw0 * rz@(j) - iw0 * iz@(j) ;
+         A@(j)[i+1] += ix0 * ry@(j) + rx0 * iy@(j) + iw0 * rz@(j) + rw0 * iz@(j);
+            @iexp j @(j) 1 +
+         @endiwhile
+      }
+      @endiif
+@ENDPROC
+   @TYPE !
+@ROUT mvT_C mvN_C
+   @TYPE SREAL DREAL
+void ATL_UGEMV(ATL_CINT M, ATL_CINT N, const TYPE *A, ATL_CINT lda,
+               const TYPE *X, TYPE *Y)
+   @TYPE SCPLX DCPLX
+void ATL_UGEMV(ATL_CINT M0, ATL_CINT N, const TYPE *A, ATL_CINT lda0,
+               const TYPE *X, TYPE *Y)
+   @TYPE !
+@ROUT r2_C
+   @TYPE SREAL DREAL
+void ATL_UGER2K(ATL_CINT M, ATL_CINT N, const @(type) *X, const @(type) *Y, 
+                const @(type) *W, const @(type) *Z, @(type) *A, ATL_CINT lda)
+   @TYPE SCPLX DCPLX
+void ATL_UGER2K(ATL_CINT M0, ATL_CINT N, const @(type) *X, const @(type) *Y, 
+                const @(type) *W, const @(type) *Z, @(type) *A, ATL_CINT lda0)
+   @TYPE !
+@ROUT r1_C
+   @TYPE SREAL DREAL
+void ATL_UGERK(ATL_CINT M, ATL_CINT N, const @(type) *X, const @(type) *Y, 
+               @(type) *A, ATL_CINT lda)
+   @TYPE SCPLX DCPLX
+void ATL_UGERK(ATL_CINT M0, ATL_CINT N, const @(type) *X, const @(type) *Y, 
+               @(type) *A, ATL_CINT lda0)
+   @TYPE !
+@ROUT r1_C mvT_C mvN_C r2_C
+/*
+ * @(MU)x@(NU) unrolled @(@rout).
+ * Extracted from ATLAS/tune/blas/gemv/atlas-l2g.base
+ */
+{
+   @TYPE SREAL DREAL
+   ATL_CINT N@(NU)=(N/@(NU))*@(NU), M@(MU)=(M/@(MU))*@(MU), lda@(NU)=lda*@(NU);
+   @TYPE SCPLX DCPLX
+   ATL_CINT N@(NU)=(N/@(NU))*@(NU), M=M0+M0, M@(MU)=((M0/@(MU))*@(MU))<<1,
+            lda=lda0+lda0, lda@(NU)=lda*@(NU);
+   @TYPE !
+   ATL_INT j;
+
+@ROUT mvN_C
+   #ifdef BETA0
+      for (j=0; j < M; j++)
+         Y[j] = ATL_rzero;
+   #endif
+@ROUT r1_C mvT_C mvN_C r2_C
+   for (j=N@(NU); j; j -= @(NU), A += lda@(NU), @(nV) += @(nu2))
+   {
+      @CALLPROC MLOOP @(MU) @(NU)
+@ROUT r2_C `      Z += @(nu2);`
+   }
+   @iif NU > 1
+/*
+ * Do remaining columns with NU=1 cleanup
+ */
+@TYPE SREAL DREAL `   for (j=N-N@(NU); j; j--, A += lda, @(nV)++)`
+@TYPE SCPLX DCPLX `   for (j=N-N@(NU); j; j--, A += lda, @(nV) += 2)`
+   {
+      @CALLPROC MLOOP @(MU) 1
+@TYPE SREAL DREAL
+   @ROUT r2_C `      Z++;`
+@TYPE SCPLX DCPLX
+   @ROUT r2_C `      Z += 2;`
+@TYPE !
+   }
+   @endiif
+}
+@ROUT mvN_sse mvT_sse
+   @define kn @ATL_UGEMV@
+@ROUT r1_sse
+   @define kn @ATL_UGERK@
+@ROUT r2_sse
+   @define kn @ATL_UGER2K@
+@ROUT mvN_sse mvT_sse r1_sse r2_sse
+@BEGINSKIP
+   This basefile is used as a crude SSE GEMV generator.  It takes 3 params:
+   * CL : elts in a cache line; M always unrolled at least this amount
+   * MU : unroll M (inner) loop by MU*CL
+   * nopf[A,X,Y]: turn off prefetching of this operand
+   It takes the following keylines:
+   ** @ORDER:
+      CLMAJOR : deref all cache line beginnings first, then within CL
+      FORWARD : in-order deref
+   ** @NU : 1, 2:14,2 : unroll N (outer) loop by this factor; 
+      - NU must be either 1 or even
+   ** @TYPE SREAL DREAL SCPLX DXPLX
+@ENDSKIP
+@SKIP
+@SKIP This procedure reverses the order of the macro mac
+@BEGINPROC RevMacro mac
+   @ifdef mac0zz
+      @error Cannot have mac0zz defined!
+   @endifdef
+   @ifdef mac1zz
+      @error Cannot have mac1zz defined!
+   @endifdef
+   @whiledef @(mac)
+      @define mac0zz @@(@(mac))@
+   @endwhile
+   @whiledef mac0zz
+      @define mac1zz @@(mac0zz)@
+   @endwhile
+   @whiledef mac1zz
+      @define @(mac) @@(mac1zz)@
+   @endwhile
+@ENDPROC
+@SKIP
+@BEGINPROC getIndices mac Ixs
+   @ifdef mac0zz
+      @error Cannot have mac0zz defined!
+   @endifdef
+   @define indx @0@
+   @whiledef @(mac)
+      @define mac0zz @@(@(mac))@
+      @iexp indx @(indx) 1 +
+   @endwhile
+   @whiledef mac0zz
+      @iexp indx @(indx) -1 +
+      @define @(mac) @@(mac0zz)@
+      @define @(Ixs) @@(indx)@
+   @endwhile
+   @undef indx
+@ENDPROC 
+@SKIP
+@SKIP  This procedure defines all col addresses in macro aptr
+@SKIP
+@BEGINPROC getcoladdr
+   @iif NU > 13
+      @define aptr @(pA0,lda13)@
+   @endiif
+   @iif NU > 12
+      @define aptr @(pA0,lda3,4)@
+   @endiif
+   @iif NU > 11
+      @define aptr @(pA0,lda11)@
+   @endiif
+   @iif NU > 10
+      @define aptr @(pA0,lda5,2)@
+   @endiif
+   @iif NU > 9
+      @define aptr @(pA0,lda9)@
+   @endiif
+   @iif NU > 8
+      @define aptr @(pA0,lda,8)@
+   @endiif
+   @iif NU > 7
+      @define aptr @(pA0,lda7)@
+   @endiif
+   @iif NU > 6
+      @define aptr @(pA0,lda3,2)@
+   @endiif
+   @iif NU > 5
+      @define aptr @(pA0,lda5)@
+   @endiif
+   @iif NU > 4
+      @define aptr @(pA0,lda,4)@
+   @endiif
+   @iif NU > 3
+      @define aptr @(pA0,lda3)@
+   @endiif
+   @iif NU > 2
+      @define aptr @(pA0,lda,2)@
+   @endiif
+   @iif NU > 1
+      @define aptr @(pA0,lda)@
+   @endiif
+   @iif NU > 0
+      @define aptr @(pA0)@
+   @endiif
+@ENDPROC
+@SKIP
+@iexp npf @(MU) @(NU) *
+@define tnpf @@(npf)@
+@iexp maxI @(CL) @(MU) *
+@iexp maxI @(maxI) @(sizeof) *
+@ROUT mvN_sse
+   @define v @Y@
+@ROUT mvT_sse r1_sse r2_sse
+   @define v @X@
+@ROUT mvT_sse mvN_sse r1_sse r2_sse
+#include "atlas_asm.h"
+/*
+ * This file does a @(MU)x@(NU) unrolled @(@rout) with these params:
+ *    CL=@(CL), ORDER=@(@order)
+ */
+#ifndef ATL_GAS_x8664
+   #error "This kernel requires x86-64 assembly!"
+#endif
+/*
+ * Integer register assignment
+ */
+#define M       %rdi
+@NU ! 14 `#define N       %rsi`
+@ROUT r2_sse
+#define pA0     %r10
+#define lda     %rax
+#define pX      %rdx
+#define pY      %rbp
+#define pW      %r8
+#define pZ      %r9
+#define II      %rbx
+#define M0      %r11
+#define Mr      %rcx
+#define incM    $-@(maxI)
+@ROUT r1_sse
+#define pA0     %r8
+#define lda     %rax
+#define pX      %rdx
+#define pY      %r9
+#define II      %rbx
+#define pX0     %r11
+#define Mr      %rcx
+@ROUT mvT_sse mvN_sse
+#define pA0     %rdx
+#define lda     %rax
+#define pX      %r8
+#define pY      %r9
+#define II      %rbx
+#define p@(v)0     %r11
+#define Mr      %rcx
+@ROUT mvT_sse mvN_sse r1_sse r2_sse
+@NU ! 12 14 
+@ROUT mvT_sse mvN_sse r1_sse `#define incA@(v)m  %r10`
+@NU ! 10 12 14 
+#define incII   %r15
+#define incAn   %r14
+@NU 10 12 14 
+#define incAn   %r15
+#define incII   $@(CL)*@(MU)
+@NU 4 5 6 8 10 12 14
+#define lda3    %r12
+@NU 6 8 10 12 14
+#define lda5    %r13
+@NU 8 10 12 14
+#define lda7    %rbp
+@NU 10 12 14
+#define lda9    %r14
+@NU 12 14
+#define lda11   %r10
+#define incA@(v)m $-@(maxI)
+@NU 14
+#define lda13   %rsi
+#define N -56(%rsp)
+@NU !
+/*
+ * SSE register assignment
+ */
+@ROUT mvN_sse
+   @TYPE SREAL DREAL
+#define rA0     %xmm0
+#define rY      %xmm1
+@define j @0@
+      @iwhile j < @(NU)
+         @iexp i 2 @(j) +
+#define rX@(j)     %xmm@(i)
+         @iexp j 1 @(j) +
+      @endiwhile
+   @TYPE SCPLX DCPLX
+#define rA      %xmm0
+#define ra      %xmm1
+#define rY      %xmm2
+#define ry      %xmm3
+@define j @0@
+@iexp i 3 0 +
+      @iwhile j < @(NU)
+         @iexp i 1 @(i) +
+#define rX@(j)     %xmm@(i)
+         @iexp i 1 @(i) +
+#define iX@(j)     %xmm@(i)
+         @iexp j 1 @(j) +
+      @endiwhile
+#define NONEPONEOFF -72
+#define NONEPONE %xmm15
+   @TYPE !
+@ROUT mvT_sse
+   @TYPE SCPLX DCPLX
+      @NU 1 2 3 4 5 6
+#define rA0     %xmm0
+#define rX0     %xmm1
+#define rx0     %xmm2
+#define rt0     %xmm3
+@define j @0@
+@iexp i 3 0 +
+@iwhile j < @(NU)
+   @iexp i @(i) 1 +
+#define rY@(j)r    %xmm@(i)
+   @iexp i @(i) 1 +
+#define rY@(j)i    %xmm@(i)
+   @iexp j @(j) 1 +
+@endiwhile
+#define NONEPONEOFF -72
+      @NU 1 2 3 4 5
+#define NONEPONE %xmm15
+      @NU 6
+#define NONEPONE rt0
+      @NU 7 8 9 10 11 12
+      @NU !
+   @TYPE SREAL DREAL
+#define rA0     %xmm0
+#define rX0     %xmm1
+@define j @0@
+@iwhile j < @(NU)
+   @iexp i 2 @(j) +
+#define rY@(j)     %xmm@(i)
+   @iexp j 1 @(j) +
+@endiwhile
+
+   @TYPE !
+@ROUT r2_sse
+   @TYPE SREAL DREAL
+#define rA0     %xmm0
+#define rX0     %xmm1
+#define rW0     %xmm2
+#define ryt     %xmm3
+      @iexp i 4 0 +
+      @define j @0@
+      @iwhile j < @(NU)
+#define rY@(j)     %xmm@(i)
+         @iexp i @(i) 1 +
+#define rZ@(j)     %xmm@(i)
+         @iexp i @(i) 1 +
+         @iexp j 1 @(j) +
+      @endiwhile
+   @TYPE DCPLX
+#define rA0      %xmm0
+#define rX0      %xmm1
+#define rW0      %xmm2
+#define rxt      %xmm3
+#define ra0      %xmm4
+      @define j @0@
+      @iexp i 5 0 +
+      @iwhile j < @(NU)
+#define rYr@(j)     %xmm@(i)
+         @iexp i 1 @(i) +
+#define rYi@(j)     %xmm@(i)
+         @iexp i 1 @(i) +
+#define rZr@(j)     %xmm@(i)
+         @iexp i 1 @(i) +
+#define rZi@(j)     %xmm@(i)
+         @iexp i 1 @(i) +
+         @iexp j 1 @(j) +
+      @endiwhile
+#define rponenone %xmm15
+#define PONENONEOFF -72
+   @TYPE SCPLX
+      @NU 2 1
+#define rA0     %xmm0
+#define ra0     %xmm1
+#define rXr     %xmm2
+#define rXi     %xmm3
+#define rWr     %xmm4
+#define rWi     %xmm5
+#define rY0     %xmm6
+#define rYh0    %xmm7
+#define rZ0     %xmm8
+#define rZh0    %xmm9
+#define rY1     %xmm10
+#define rYh1    %xmm11
+#define rZ1     %xmm12
+#define rZh1    %xmm13
+#define rneg    %xmm15
+#define NONEPONEOFF -72
+      @NU !
+   @TYPE !
+@ROUT r1_sse
+   @TYPE SREAL DREAL
+#define rA0     %xmm0
+#define rX0     %xmm1
+      @ifdef ALIGNED
+         @iexp k 0 2 +
+      @endifdef
+      @ifdef ! ALIGNED
+#define ryt     %xmm2
+         @iexp k 0 3 +
+      @endifdef
+      @define j @0@
+      @iwhile j < @(NU)
+         @iexp i @(k) @(j) +
+#define rY@(j)     %xmm@(i)
+         @iexp j 1 @(j) +
+      @endiwhile
+   @TYPE DCPLX
+#define rA0      %xmm0
+#define rX0      %xmm1
+#define rxt      %xmm2
+      @define j @0@
+      @iexp i 3 0 +
+      @iwhile j < @(NU)
+#define rYr@(j)     %xmm@(i)
+         @iexp i 1 @(i) +
+#define rYi@(j)     %xmm@(i)
+         @iexp i 1 @(i) +
+         @iexp j 1 @(j) +
+      @endiwhile
+@IFDEF ! ALIGNED
+   @NU 6
+#define ra0     %xmm15
+   @NU 1 2 3 4 5
+#define ra0     %xmm14
+   @NU !
+@ENDIFDEF
+#define rponenone %xmm15
+#define PONENONEOFF -72
+   @TYPE SCPLX
+#define rXr     %xmm0
+#define rXi     %xmm1
+#define ra0     %xmm2
+#define rA0     %xmm3
+      @define j @0@
+      @iexp i 4 0 +
+      @iwhile j < @(NU)
+#define rY@(j)      %xmm@(i)
+         @iexp i 1 @(i) +
+#define rYh@(j)     %xmm@(i)
+         @iexp i 1 @(i) +
+         @iexp j 1 @(j) +
+      @endiwhile
+#define NONEPONEOFF -72
+      @NU 1 2 3 4 5
+#define rneg %xmm15
+      @NU 6
+#define rneg ra0
+      @NU !
+   @TYPE !
+
+@ROUT mvT_sse mvN_sse r1_sse r2_sse
+/*
+ * macros
+ */
+@ifdef ALIGNED
+#ifndef MOVA
+   #define MOVA movaps
+#endif
+@endifdef
+@ifdef ! ALIGNED
+#ifndef MOVA
+   #define MOVA movups
+#endif
+@endifdef
+#define movapd movaps
+#define movupd movups
+#define xorpd xorps
+@TYPE SREAL SCPLX
+#define addpd addps
+#define mulpd mulps
+#define addsd addss
+#define mulsd mulss
+#define movsd movss
+#define haddpd haddps
+@TYPE !
+/*
+ * Define macros controlling prefetch
+ */
+#ifndef PFDIST
+   #define PFDIST 256
+#endif
+#ifndef PFADIST
+   #define PFADIST PFDIST
+#endif
+#ifndef PFYDIST
+   #define PFYDIST 64
+#endif
+#ifndef PFXDIST
+   #define PFXDIST 64
+#endif
+@ROUT r1_sse r2_sse
+#ifndef PFIY
+   #define PFIY prefetchnta
+#endif
+#ifndef PFIA
+   #ifdef ATL_3DNow
+      #define PFIA prefetchw
+   #else
+      #define PFIA prefetcht0
+   #endif
+#endif
+@ROUT mvT_sse
+#ifndef PFIY
+   #ifdef ATL_3DNow
+      #define PFIY prefetchw
+   #else
+      #define PFIY prefetchnta
+   #endif
+#endif
+#ifndef PFIX
+   #define PFIX prefetcht0
+#endif
+@ROUT mvN_sse
+#ifndef PFIY
+   #ifdef ATL_3DNow
+      #define PFIY prefetchw
+   #else
+      #define PFIY prefetcht0
+   #endif
+#endif
+#ifndef PFIX
+   #define PFIX prefetchnta
+#endif
+@ROUT mvT_sse mvN_sse
+#ifndef PFIA
+   #define PFIA prefetchnta
+#endif
+@ROUT mvT_sse mvN_sse r1_sse r2_sse
+#if PFADIST == 0                /* flag for no prefetch */
+   #define prefA(mem)
+#else
+   #define prefA(mem) PFIA mem
+#endif
+#if PFYDIST == 0                /* flag for no prefetch */
+   #define prefY(mem)
+#else
+   #define prefY(mem) PFIY mem
+#endif
+#if PFXDIST == 0                /* flag for no prefetch */
+   #define prefX(mem)
+#else
+   #define prefX(mem) PFIX mem
+#endif
+@ROUT mvT_sse mvN_sse
+/*
+ *                      %rdi        %rsi           %rdx          %rcx
+ * void ATL_UGEMV(ATL_CINT M, ATL_CINT N, const TYPE *A, ATL_CINT lda,
+ *                          %r8      %r9
+ *                const TYPE *X, TYPE *Y)
+ */
+@ROUT r2_sse
+/*
+ *                       %rdi        %rsi           %rdx          %rcx
+ * void ATL_UGER2K(ATL_CINT M, ATL_CINT N, const TYPE *X, const TYPE *Y,
+ *                     %r8                  %r9  8(%rsp)       16(%rsp)
+ *                 const TYPE *W, const TYPE *Z, TYPE *A, ATL_CINT lda)
+ */
+@ROUT mvT_sse mvN_sse r1_sse r2_sse
+.text
+@ROUT r1_sse
+/*
+ *                      %rdi        %rsi           %rdx          %rcx
+ * void ATL_UGERK(ATL_CINT M, ATL_CINT N, const TYPE *X, const TYPE *Y,
+ *                    %r8      %r9
+ *                TYPE *A, ATL_CINT lda)
+ */
+@ROUT mvT_sse mvN_sse r1_sse r2_sse
+.text
+.global ATL_asmdecor(@(kn))
+ALIGN64
+@SKIP get rid of any i defs
+@undefall i
+@SKIP Figure all column addresses that could be accessed
+@SKIP figure prefetch targets; NU for each col, do each col first
+@iexp i @(MU) -1 +
+@iwhile i ! -1
+   @iexp off @(i) @(CL) *
+   @iexp off @(off) @(sizeof) *
+   @CALLPROC getcoladdr
+   @CALLPROC RevMacro aptr
+   @iexp j @(NU) -1 +
+   @iwhile j ! -1
+      @define pfA @@(off)@(aptr)@
+      @undef aptr
+      @iexp j @(j) -1 +
+   @endiwhile
+   @iexp i @(i) -1 +
+@endiwhile
+   @iexp i @(maxI) -16 +
+@ORDER FORWARD
+   @iwhile i ! 0
+      @define ii @@(i)@
+      @iexp i @(i) 16 +
+   @endiwhile
+   @define ii @0@
+@ORDER CLMAJOR
+   @iexp j @(CL) @(sizeof) *
+   @iexp icl @(maxI) -@(j) +
+   @iwhile i ! 0
+      @iif i ! icl
+         @define ii @@(i)@
+      @endiif
+      @iif i = icl
+         @iexp icl @(icl) -@(j) +
+      @endiif
+      @iexp i @(i) -16 +
+   @endiwhile
+   @iexp icl @(maxI) 0 +
+   @iwhile icl ! 0
+      @iexp icl @(icl) -@(j) +
+      @define ii @@(icl)@
+   @endiwhile
+@ORDER !
+ATL_asmdecor(@(kn)):
+
+/*
+ * Save callee-saved iregs
+ */
+   movq %rbp, -8(%rsp)
+   movq %rbx, -16(%rsp)
+   movq %r12, -24(%rsp)
+   movq %r13, -32(%rsp)
+   movq %r14, -40(%rsp)
+   movq %r15, -48(%rsp)
+@SKIP
+@SKIP For common powers of two, compute Mr/M using shifts
+@SKIP
+@iexp j 0 0 +
+@iexp i @(MU) @(CL) *
+@iif i = 2
+   @iexp j 1 0 +
+@endiif
+@iif i = 4
+   @iexp j 2 0 +
+@endiif
+@iif i = 8
+   @iexp j 3 0 +
+@endiif
+@iif i = 16
+   @iexp j 4 0 +
+@endiif
+@iif i = 32
+   @iexp j 5 0 +
+@endiif
+@iif i = 64
+   @iexp j 6 0 +
+@endiif
+@iif i = 128
+   @iexp j 7 0 +
+@endiif
+@iif i = 256
+   @iexp j 8 0 +
+@endiif
+/*
+ * Compute M = (M/MU)*MU, Mr = M - (M/MU)*MU
+ * NOTE: Mr is %rcx reg, so we can use jcx to go to cleanup loop
+ */
+@ROUT r2_sse
+   movq   8(%rsp), pA0   /* load A ptr */
+   movslq 16(%rsp), lda /* move lda to assigned register, rax */
+   mov %rcx, pY         /* move pY to assigned register, rbp */
+   mov M, M0            /* save full M for W/X restoration */
+   shl $@(shv), M0           /* M0 *= sizeof */
+@ROUT r1_sse
+   mov  %r9, lda        /* move lda to assigned register, rax */
+   mov  %rcx, pY        /* move pY to assigned register, r9 */
+@ROUT mvT_sse mvN_sse
+   mov  %rcx, lda       /* move lda to assigned register, rax */
+@ROUT mvT_sse mvN_sse r1_sse r2_sse
+@iif j ! 0
+   mov  M, Mr           /* Mr = M */
+   shr $@(j), M            /* M = M / MU */
+   shl $@(j), M            /* M = (M/MU)*MU */
+   sub M, Mr            /* Mr = M - (M/MU)*MU */
+@endiif
+@iif j = 0
+   movl   $@(MU)*@(CL), -56(%rsp)       /* mem = MU */
+   fildl  -56(%rsp)                     /* ST = MU */
+   movl   %edi, -56(%rsp)               /* mem = M */
+   fidivrl -56(%rsp)                    /* ST = M/MU */
+   fisttpl -60(%rsp)                    /* mem = TRUNC(M/MU) */
+   movl    -60(%rsp), %ebx              /* rbx = TRUNC(M/MU) */
+   imul    $@(MU)*@(CL), %ebx, %ebx     /* rbx = MU*TRUNC(M/MU) */
+   mov     M, Mr                        /* Mr = M */
+   sub     %rbx, Mr                     /* Mr = M - MU*TRUNC(M/MU) */
+   mov     %rbx, M                      /* M  = MU*TRUNC(M/MU) */
+@endiif
+@TYPE DCPLX SCPLX
+/*
+@ROUT mvT_sse r1_sse r2_sse
+@TYPE DCPLX ` * Construct ponenone = {-1.0,1.0}`
+@ROUT mvT_sse
+@TYPE SCPLX ` * Construct ponenone = {-1.0,1.0,-1.0,1.0}`
+@ROUT r1_sse r2_sse
+@TYPE SCPLX ` * Construct nonepone = {1.0,-1.0,1.0,-1.0}`
+@ROUT mvN_sse
+@TYPE DCPLX ` * Construct nonepone = {1.0,-1.0}`
+@TYPE SCPLX ` * Construct nonepone = {1.0,-1.0,1.0,-1.0}`
+@ROUT mvT_sse mvN_sse r1_sse r2_sse
+ */
+   finit
+   fld1                                 /* ST =  1.0 */
+   fldz                                 /* ST =  0.0 1.0 */
+   fsub %st(1), %st                     /* ST = -1.0 1.0 */
+@TYPE DCPLX
+   @ROUT r1_sse r2_sse
+   fstpl PONENONEOFF(%rsp)              /* ST = 1.0, mem=-1.0 */
+   fstpl PONENONEOFF+8(%rsp)            /* mem= +1.0, -1.0 */
+   @ROUT mvT_sse
+   fstpl NONEPONEOFF+8(%rsp)            /* ST = 1.0, mem=-1.0 */
+   fstpl NONEPONEOFF(%rsp)              /* mem= -1.0, +1.0 */
+   @ROUT mvN_sse
+   fstpl NONEPONEOFF(%rsp)              /* ST = 1.0, mem=-1.0 */
+   fstpl NONEPONEOFF+8(%rsp)            /* mem= +1.0, -1.0 */
+   @ROUT mvN_sse mvT_sse r1_sse r2_sse
+@TYPE SCPLX
+   @ROUT mvN_sse r1_sse r2_sse
+   fsts NONEPONEOFF(%rsp)               /* ST= -1.0 1.0 */
+   fstps NONEPONEOFF+8(%rsp)            /* ST=1.0 */
+   fsts NONEPONEOFF+4(%rsp)             /* ST=1.0 */
+   fstps NONEPONEOFF+12(%rsp)          /* ST=NULL, mem={1.0, -1.0, 1.0, -1.0}*/
+   @ROUT mvT_sse
+   fsts NONEPONEOFF+4(%rsp)
+   fstps NONEPONEOFF+12(%rsp)           /* ST = 1.0 */
+   fsts NONEPONEOFF(%rsp)
+   fstps NONEPONEOFF+8(%rsp)            /* ST=NULL, mem=-1,1,-1,1*/
+   @ROUT mvT_sse mvN_sse r1_sse r2_sse
+@TYPE !
+@ROUT r1_sse r2_sse
+   @TYPE DCPLX `   movapd PONENONEOFF(%rsp), rponenone`
+   @TYPE SCPLX `   movaps NONEPONEOFF(%rsp), rneg`
+@ROUT mvT_sse mvN_sse
+   @TYPE DCPLX SCPLX
+      @NU 1 2 3 4 5
+@ROUT mvT_sse `   movapd NONEPONEOFF(%rsp), NONEPONE`
+@ROUT mvN_sse `   movapd NONEPONEOFF(%rsp), NONEPONE`
+      @NU !
+   @TYPE !
+@ROUT mvT_sse mvN_sse r1_sse r2_sse
+/*
+ * Setup constants
+ */
+@NU 14
+   movq %rsi, N         /* save value of N to memory */
+@NU !
+   mov lda, incAn       /* incAn = lda */
+   sub M, incAn         /* incAn = lda - (M/MU)*MU */
+   sub Mr, incAn        /* incAn = lda - M */
+   shl $@(shv), incAn        /* incAn = (lda-M)*sizeof */
+   shl $@(shv), lda          /* lda *= sizeof */
+   sub $-128, pA0       /* code compaction by using signed 1-byte offsets */
+   sub $-128, p@(v)        /* code compaction by using signed 1-byte offsets */
+   @ROUT r2_sse `   sub $-128, pW`
+   @ROUT mvT_sse mvN_sse r1_sse `   mov p@(v), p@(v)0          /* save for restore after M loops */`
+@NU ! 12 14 
+@ROUT mvT_sse mvN_sse r1_sse `   mov $-@(maxI), incA@(v)m     /* code comp: use reg rather than constant */`
+@NU 4 5 6 8 10 12 14
+   lea (lda, lda,2), lda3       /* lda3 = 3*lda */
+@NU 6 8 10 12 14
+   lea (lda, lda,4), lda5       /* lda5 = 5*lda */
+@NU 8 10 12 14
+   lea (lda3,lda,4), lda7       /* lda7 = 7*lda */
+@NU 10 12 14
+   lea (lda5,lda,4), lda9       /* lda9 = 9*lda */
+@NU 12 14
+   lea (lda,lda5,2), lda11      /* lda11 = 11*lda */
+@NU 14
+   lea (lda3,lda5,2), lda13     /* lda13 = 13*lda */
+@NU 3
+   lea (incAn, lda,2), incAn    /* incAn = (3*lda-M)*sizeof */
+@NU 2 
+   add lda, incAn               /* incAn = (2*lda-M)*sizeof */
+@NU 4
+   lea (incAn, lda3), incAn     /* incAn = (4*lda-M)*sizeof */
+@NU 5
+   lea (incAn, lda,4), incAn    /* incAn = (5*lda-M)*sizeof */
+@NU 6
+   add lda5, incAn              /* incAn = (6*lda-M)*sizeof */
+@NU 8
+   add lda7, incAn              /* incAn = (8*lda-M)*sizeof */
+@NU 10
+   add lda9, incAn              /* incAn = (10*lda-M)*sizeof */
+@NU 12
+   add lda11, incAn             /* incAn = (12*lda-M)*sizeof */
+@NU 14
+   add lda13, incAn             /* incAn = (14*lda-M)*sizeof */
+@NU ! 10 12 14
+   mov $@(CL)*@(MU), incII      /* code comp: use reg rather than constant */
+@NU !
+   mov M, II
+@ROUT mvN_sse
+/*
+ * Zero Y if beta = 0;  Has error if there is Mr and/or M isn't mul of veclen
+ */
+   #ifdef BETA0
+       add Mr, II
+@TYPE DREAL SCPLX `      shr $1, II`
+@TYPE SREAL `      shr $2, II`
+@ROUT mvN_sse
+   @TYPE DCPLX SCPLX
+      @define zr @rY@
+   @TYPE SREAL DREAL
+      @define zr @rY@
+   @TYPE !
+      xorpd @(zr), @(zr)
+      LOOPZERO:
+         movapd @(zr), -128(pY)
+         add $16, pY
+      dec II
+      jnz LOOPZERO
+@TYPE DREAL SCPLX SREAL
+      lea (M, Mr), II
+@TYPE SREAL
+      bt $1, II
+      jnc DONE_ZERO_2
+      movlps @(zr), -128(pY)
+      add $8, pY
+DONE_ZERO_2:
+@TYPE DREAL SCPLX SREAL
+      bt $0, II
+      jnc DONE_ZERO_CLEAN
+@TYPE DREAL SREAL `      movsd @(zr), -128(pY)`
+@TYPE SCPLX `      movlps @(zr), -128(pY)`
+DONE_ZERO_CLEAN:
+@TYPE !
+      mov pY0, pY
+      mov M, II
+   #endif
+
+@ROUT mvN_sse mvT_sse
+   ALIGN32
+   LOOPN:
+@ROUT mvN_sse
+   @TYPE DREAL
+      @iexp i 0 0 +
+      @iexp j 0 0 +
+      @iwhile j < @(NU)
+      movddup @(i)(pX), rX@(j)
+         @iexp j @(j) 1 +
+         @iexp i @(i) @(sizeof) +
+      @endiwhile
+   @TYPE SREAL
+      @NU 1
+      movss (pX), rX0
+      pshufd $0x00, rX0, rX0    /* rX0 = {X0, X0, X0, X0} */
+      @NU 2
+      movlps (pX), rX1          /* rX1 = {xx, xx, X1, X0} */
+      pshufd $0x00, rX1, rX0    /* rX0 = {X0, X0, X0, X0} */
+      pshufd $0x55, rX1, rX1    /* rX1 = {X1, X1, X1, X1} */
+      @NU 14
+      #define movaps movups
+      @NU 4 8 12 14
+      movaps (pX), rX3          /* rX3 = {X3, X2, X1, X0} */
+      pshufd $0x00, rX3, rX0    /* rX0 = {X0, X0, X0, X0} */
+      @NU 8 12 14 `      movaps 16(pX), rX7        /* rX7 = {X3, X2, X1, X0} */`
+      pshufd $0x55, rX3, rX1    /* rX1 = {X1, X1, X1, X1} */
+      @NU 12 14 `      movaps 32(pX), rX11       /* rX11= {X3, X2, X1, X0} */`
+      pshufd $0xAA, rX3, rX2    /* rX2 = {X2, X2, X2, X2} */
+      @NU 14 `      movlps 48(pX), rX13       /* rX13= {X3, X2, X1, X0} */`
+      pshufd $0xFF, rX3, rX3    /* rX3 = {X3, X3, X3, X3} */
+      @NU 14
+      #undef movaps
+      @NU 8 12 14
+
+      pshufd $0x00, rX7, rX4    /* rX0 = {X0, X0, X0, X0} */
+      pshufd $0x55, rX7, rX5    /* rX1 = {X1, X1, X1, X1} */
+      pshufd $0xAA, rX7, rX6    /* rX2 = {X2, X2, X2, X2} */
+      pshufd $0xFF, rX7, rX7    /* rX3 = {X3, X3, X3, X3} */
+      @NU 12 14
+
+      pshufd $0x00, rX11, rX8   /* rX8 = {X0, X0, X0, X0} */
+      pshufd $0x55, rX11, rX9   /* rX9 = {X1, X1, X1, X1} */
+      pshufd $0xAA, rX11, rX10  /* rX10= {X2, X2, X2, X2} */
+      pshufd $0xFF, rX11, rX11  /* rX11= {X3, X3, X3, X3} */
+      @NU 14
+
+      pshufd $0x00, rX13, rX12  /* rX12= {X0, X0, X0, X0} */
+      pshufd $0x55, rX13, rX13  /* rX13= {X1, X1, X1, X1} */
+      @NU !
+   @TYPE DCPLX SCPLX
+      @iif NU = 6
+      movapd NONEPONEOFF(%rsp), rA
+         @define neg @rA@
+      @endiif
+      @iif NU < 6
+         @define neg @NONEPONE@
+      @endiif
+   @TYPE SCPLX
+      @NU 14 3
+      #define movaps movups
+      @NU 1
+      movlps (pX), iX0       /* iX0 = {xxx, xxx, iX0, rX0} */
+      pshufd $0x00, iX0, rX0 /* rX0 = {rX0, rX0, rX0, rX0} */
+      pshufd $0x55, iX0, iX0 /* iX0 = {iX0, iX0, iX0, iX0} */
+      mulps @(neg), iX0          /* iX0 = {iX0,-iX0, iX0,-iX0} */
+      @NU 2 3 4 6 8 10 12 14
+      movaps (pX), iX1       /* iX1 = {iX1, rX1, iX0, rX0} */
+      pshufd $0x00, iX1, rX0 /* rX0 = {rX0, rX0, rX0, rX0} */
+      pshufd $0x55, iX1, iX0 /* iX0 = {iX0, iX0, iX0, iX0} */
+      mulps @(neg), iX0          /* iX0 = {iX0,-iX0, iX0,-iX0} */
+      pshufd $0xAA, iX1, rX1 /* rX1 = {rX1, rX1, rX1, rX1} */
+      pshufd $0xFF, iX1, iX1 /* iX1 = {iX1, iX1, iX1, iX1} */
+      mulps @(neg), iX1          /* iX1 = {iX1,-iX1, iX1,-iX1} */
+      @NU 3
+      movlps 16(pX), iX2     /* iX2 = {xxx, xxx, iX2, rX2} */
+      pshufd $0x00, iX2, rX2 /* rX2 = {rX2, rX2, rX2, rX2} */
+      pshufd $0x55, iX2, iX2 /* iX2 = {iX2, iX2, iX2, iX2} */
+      mulps @(neg), iX2          /* iX2 = {iX2,-iX2, iX2,-iX2} */
+      @NU 4 6 8 10 12 14
+      movaps 16(pX), iX3     /* iX3 = {iX3, rX3, iX2, rX2} */
+      pshufd $0x00, iX3, rX2 /* rX2 = {rX2, rX2, rX2, rX2} */
+      pshufd $0x55, iX3, iX2 /* iX2 = {iX2, iX2, iX2, iX2} */
+      mulps @(neg), iX2          /* iX2 = {iX2,-iX2, iX2,-iX2} */
+      pshufd $0xAA, iX3, rX3 /* rX3 = {rX3, rX3, rX3, rX3} */
+      pshufd $0xFF, iX3, iX3 /* iX3 = {iX3, iX3, iX3, iX3} */
+      mulps @(neg), iX3          /* iX3 = {iX3,-iX3, iX3,-iX3} */
+      @NU 6 8 10 12 14
+      movaps 32(pX), iX5     /* iX5 = {iX5, rX5, iX4, rX4} */
+      pshufd $0x00, iX5, rX4 /* rX4 = {rX4, rX4, rX4, rX4} */
+      pshufd $0x55, iX5, iX4 /* iX4 = {iX4, iX4, iX4, iX4} */
+      mulps @(neg), iX4          /* iX4 = {iX4,-iX4, iX4,-iX4} */
+      pshufd $0xAA, iX5, rX5 /* rX5 = {rX5, rX5, rX5, rX5} */
+      pshufd $0xFF, iX5, iX5 /* iX5 = {iX5, iX5, iX5, iX5} */
+      mulps @(neg), iX5          /* iX5 = {iX5,-iX5, iX5,-iX5} */
+      @NU 8 10 12 14
+#error "Not written yet!"
+      @NU !
+   @TYPE DCPLX
+      @iexp i 0 0 +
+      @iexp j 0 0 +
+      @iwhile j < @(NU)
+      movddup @(i)(pX), rX@(j)
+         @iexp i @(i) 8 +
+      movddup @(i)(pX), iX@(j)
+      mulpd @(neg), iX@(j)
+         @iexp i @(i) 8 +
+      @iexp j @(j) 1 +
+      @endiwhile
+   @TYPE !
+@ROUT mvT_sse
+   @TYPE SREAL DREAL `      #ifdef BETA0`
+   @iexp j 0 0 +
+   @iwhile j < @(NU)
+   @TYPE SREAL DREAL 
+         xorpd rY@(j), rY@(j)
+   @TYPE SCPLX DCPLX 
+      xorpd rY@(j)r, rY@(j)r
+      xorpd rY@(j)i, rY@(j)i
+   @TYPE !
+      @iexp j @(j) 1 +
+   @endiwhile
+   @TYPE SREAL DREAL
+      #else
+   @iexp j 0 0 +
+   @iwhile j < @(NU)
+      @iexp i @(j) @(sizeof) *
+         movsd @(i)(pY), rY@(j)
+      @iexp j @(j) 1 +
+   @endiwhile
+      #endif
+   @TYPE !
+@ROUT mvN_sse mvT_sse
+
+      LOOPM:
+   @whiledef ii
+      @ROUT mvN_sse
+         @TYPE SREAL DREAL
+         MOVA   @(ii)-128(pA0), rY
+         mulpd rX0, rY
+         addpd @(ii)-128(pY), rY
+         @TYPE SCPLX
+            @define shufc @0xB1@
+         @TYPE DCPLX
+            @define shufc @0x4E@
+         @TYPE DCPLX SCPLX
+         MOVA   @(ii)-128(pA0), rY         /* rY = {iA0, rA0} */
+         pshufd $@(shufc), rY, ry           /* ry = {rA0, iA0} */
+         mulpd rX0, rY                  /* rY = {rX0*iA0, rX0*rA0} */
+         addpd @(ii)-128(pY), rY       
+         @TYPE !
+         @iif tnpf > 2
+            @ifdef pfA
+         prefA(PFADIST+@(pfA))
+            @undef pfA
+            @endifdef
+         @endiif
+         @TYPE DCPLX SCPLX
+         mulpd iX0, ry                  /* ry = {iX0*rA0, -iX0*iA0} */
+         @TYPE !
+      @ROUT mvT_sse
+         @TYPE SREAL DREAL
+         movapd @(ii)-128(pX), rX0
+         MOVA   @(ii)-128(pA0), rA0
+         mulpd rX0, rA0
+         addpd rA0, rY0
+         @TYPE SCPLX
+            @define shufc @0xB1@
+         @TYPE DCPLX
+            @define shufc @0x4E@
+         @TYPE SCPLX DCPLX
+         movapd @(ii)-128(pX), rX0              /* rX0 = Xi,    Xr */
+         pshufd $@(shufc), rX0, rx0                 /* rx0 = Xr,    Xi */
+         MOVA   @(ii)-128(pA0), rA0             /* rA0 = Ai,    Ar */
+         movapd rA0, rt0                        /* rt0 = Ai,    Ar */
+         mulpd rx0, rA0                         /* rA0 = Ai*Xr, Ar*Xi */
+         addpd rA0, rY0i
+         @TYPE !
+         @iif tnpf > 2
+            @ifdef pfA
+         prefA(PFADIST+@(pfA))
+            @undef pfA
+            @endifdef
+         @endiif
+         @TYPE SCPLX DCPLX
+         mulpd rX0, rt0                         /* rt0 = Ai*Xi, Ar*Xr */
+         addpd rt0, rY0r
+         @TYPE !
+      @ROUT mvN_sse mvT_sse
+
+      @CALLPROC getcoladdr
+      @CALLPROC getIndices aptr j
+      @undef aptr
+      @undef j
+      @whiledef aptr
+         @ROUT mvN_sse
+            @TYPE SREAL DREAL
+         MOVA   @(ii)-128@(aptr), rA0
+         mulpd rX@(j), rA0
+         addpd rA0, rY
+            @TYPE DCPLX SCPLX
+         MOVA   @(ii)-128@(aptr), rA    /* rA = {iA, rA} */
+         pshufd $@(shufc), rA, ra           /* ra = {rA, iA} */
+         mulpd rX@(j), rA               /* rA = {rX*iA, rX*rA} */
+         addpd rA, rY
+            @TYPE !
+               @iif tnpf > 2
+                  @ifdef pfA
+         prefA(PFADIST+@(pfA))
+                  @undef pfA
+                  @endifdef
+               @endiif
+            @TYPE DCPLX SCPLX
+         mulpd iX@(j), ra               /* ra = {iX*rA, -iX*iA} */
+         addpd ra, ry
+            @TYPE !
+         @ROUT mvT_sse
+            @TYPE SREAL DREAL
+         MOVA   @(ii)-128@(aptr), rA0
+         mulpd rX0, rA0
+         addpd rA0, rY@(j)
+            @TYPE SCPLX DCPLX
+         MOVA   @(ii)-128@(aptr), rA0           /* rA0 = Ai,    Ar */ 
+         movapd rA0, rt0                        /* rt0 = Ai,    Ar */
+         mulpd rx0, rA0                         /* rA0 = Ai*Xr, Ar*Xi */
+         addpd rA0, rY@(j)i
+            @TYPE !
+               @iif tnpf > 2
+                  @ifdef pfA
+         prefA(PFADIST+@(pfA))
+                  @undef pfA
+                  @endifdef
+               @endiif
+            @TYPE SCPLX DCPLX
+         mulpd rX0, rt0                         /* rt0 = Ai*Xi, Ar*Xr */
+         addpd rt0, rY@(j)r
+            @TYPE !
+         @ROUT mvN_sse mvT_sse
+         @undef j
+      @endwhile
+      @ROUT mvN_sse 
+         @TYPE SREAL DREAL
+         movapd rY, @(ii)-128(pY)
+         @TYPE DCPLX SCPLX
+         addpd ry, rY
+         movapd rY, @(ii)-128(pY)
+         @TYPE !
+      @ROUT mvN_sse mvT_sse 
+
+   @endwhile
+      @iif tnpf < 3
+         prefA(PFADIST+@(pfA))
+         @undef pfA
+      @endiif
+         sub incA@(v)m, p@(v)
+      @iif tnpf < 3
+         @ifdef pfA
+         prefA(PFADIST+@(pfA))
+         @undef pfA
+         @endifdef
+      @endiif
+         sub incA@(v)m, pA0
+      sub incII, II
+      jnz LOOPM
+@TYPE SREAL DREAL `   @define OKNU @1 2 3 4 5 6@`
+@TYPE DCPLX SCPLX `   @define OKNU @1 2 3@`
+
+@NU @(OKNU)
+      #ifdef ATL_OS_OSX     /* workaround retarded OS X assembly */
+         cmp $0, Mr
+         jz  MCLEANED
+      #else
+         jecxz MCLEANED        /* skip cleanup loop if Mr == 0 */
+      #endif
+@NU ! @(OKNU)
+      cmp $0, Mr
+      jz  MCLEANED
+@NU !
+
+      mov Mr, II
+   @ROUT mvT_sse
+      @TYPE SCPLX
+      xorps rA0, rA0
+      xorps rX0, rX0
+      xorps rx0, rx0
+      @TYPE !
+   @ROUT mvN_sse mvT_sse
+      LOOPMCU:
+      @TYPE SREAL DREAL
+         @ROUT mvT_sse
+         movsd -128(pX), rX0
+         movsd -128(pA0), rA0
+         mulsd rX0, rA0
+         addsd rA0, rY0
+         @ROUT mvN_sse
+         movsd -128(pY), rY
+         movsd -128(pA0), rA0
+         mulsd rX0, rA0
+         addsd rA0, rY
+         @ROUT mvN_sse mvT_sse
+      @TYPE !
+      @ROUT mvT_sse
+         @TYPE SCPLX
+         movlps -128(pX), rX0           /* rX0 = {0, 0, Xi, Xr} */
+         pshufd $@(shufc), rX0, rx0     /* rx0 = {0, 0, Xr, Xi} */
+         movlps -128(pA0), rA0          /* rA0 = {0, 0, Ai, Ar} */
+         movaps rA0, rt0                /* rt0 = {0, 0, Ai, Ar} */
+         mulps rx0, rA0                 /* rA0 = {0, 0, Xr*Ai, Xi*Ar} */
+         addps rA0, rY0i
+         mulps rX0, rt0                 /* rt0 = {0, 0, Xi*Ai, Xr*Ar} */
+         addps rt0, rY0r
+         @TYPE DCPLX
+         movapd -128(pX), rX0                   /* rX0 = Xi,    Xr */
+         pshufd $@(shufc), rX0, rx0                 /* rx0 = Xr,    Xi */
+         MOVA   -128(pA0), rA0                  /* rA0 = Ai,    Ar */
+         movapd rA0, rt0                        /* rt0 = Ai,    Ar */
+         mulpd rx0, rA0                         /* rA0 = Ai*Xr, Ar*Xi */
+         addpd rA0, rY0i
+         mulpd rX0, rt0                         /* rt0 = Ai*Xi, Ar*Xr */
+         addpd rt0, rY0r
+         @TYPE !
+      @ROUT mvN_sse
+         @TYPE DCPLX
+            @define movA @MOVA@
+            @define movY @movaps@
+         @TYPE SCPLX
+            @define movA @movlps@
+            @define movY @movlps@
+            @define shufc @0x11@
+         @TYPE DCPLX SCPLX
+         @(movA)   -128(pA0), rY         /* rY = {iA0, rA0} */
+         pshufd $@(shufc), rY, ry           /* ry = {rA0, iA0} */
+         mulpd rX0, rY                  /* rY = {rX0*iA0, rX0*rA0} */
+         @TYPE SCPLX
+         movddup -128(pY), rA
+         addps rA, rY
+         @TYPE DCPLX
+         addpd -128(pY), rY       
+         @TYPE DCPLX SCPLX
+         mulpd iX0, ry                  /* ry = {iX0*rA0, -iX0*iA0} */
+         @TYPE !
+      @ROUT mvN_sse mvT_sse
+      @CALLPROC getcoladdr
+      @CALLPROC getIndices aptr j
+      @undef aptr
+      @undef j
+      @whiledef aptr
+         @TYPE SREAL DREAL
+            @ROUT mvT_sse
+         movsd -128@(aptr), rA0
+         mulsd rX0, rA0
+         addsd rA0, rY@(j)
+            @ROUT mvN_sse
+         movsd  -128@(aptr), rA0
+         mulsd rX@(j), rA0
+         addsd rA0, rY
+            @ROUT mvT_sse mvN_sse
+         @TYPE SCPLX DCPLX
+            @ROUT mvT_sse
+               @TYPE SCPLX
+         movlps -128@(aptr), rA0        /* rA0 = {0, 0, Ai, Ar} */
+         movaps rA0, rt0                /* rt0 = {0, 0, Ai, Ar} */
+         mulps rx0, rA0                 /* rA0 = {0, 0, Xr*Ai, Xi*Ar} */
+         addps rA0, rY@(j)i
+         mulps rX0, rt0                 /* rt0 = {0, 0, Xi*Ai, Xr*Ar} */
+         addps rt0, rY@(j)r
+               @TYPE DCPLX
+         MOVA   -128@(aptr), rA0                /* rA0 = Ai,    Ar */
+         movapd rA0, rt0                        /* rt0 = Ai,    Ar */
+         mulpd rx0, rA0                         /* rA0 = Ai*Xr, Ar*Xi */
+         addpd rA0, rY@(j)i
+         mulpd rX0, rt0                         /* rt0 = Ai*Xi, Ar*Xr */
+         addpd rt0, rY@(j)r
+               @TYPE SCPLX DCPLX
+            @ROUT mvN_sse
+         @(movA) -128@(aptr), rA
+         pshufd $@(shufc), rA, ra
+         mulpd rX@(j), rA
+         addpd rA, rY
+         mulpd iX@(j), ra
+         addpd ra, ry
+            @ROUT mvT_sse mvN_sse
+         @TYPE !
+         @undef j
+      @endwhile
+@ROUT mvN_sse 
+   @TYPE SREAL DREAL
+         movsd rY, -128(pY)
+   @TYPE SCPLX DCPLX
+         addpd ry, rY
+   @TYPE DCPLX 
+         movapd rY, -128(pY)
+   @TYPE SCPLX 
+         movlps rY, -128(pY)
+   @TYPE !
+@ROUT mvN_sse mvT_sse
+         add $@(sizeof), p@(v)
+         add $@(sizeof), pA0
+      dec II
+      jnz LOOPMCU
+
+MCLEANED:
+@ROUT mvT_sse
+   @TYPE SCPLX
+                                /* rYr0 = {-rY0d, rY0c, -rY0b, rY0a} */
+                                /* rYi0 = { iY0d, iY0c,  iY0b, iY0a} */
+      @NU 1
+      mulps NONEPONE, rY0r      /* rYr0 = { rY0d,  rY0c, rY0b, rY0a} */
+      haddps rY0i, rY0r         /* rY0r = { rY0cd ,iY0ab,rY0cd,rY0ab} */
+      haddps rY0r, rY0r         /* rY0r = {XX,XX,    iY0abcd,rY0abcd} */
+      #ifndef BETA0
+         movlps (pY), rY0i
+         addps rY0i, rY0r
+      #endif
+      movlps rY0r, (pY)
+      @NU ! 1 2 4 6 
+      #error "SCPLX non-1 NU must be even!"
+      @NU 6
+      movaps NONEPONEOFF(%rsp), NONEPONE
+      @NU 2 4 6
+         @iexp j 0 0 +
+         @iexp i 0 0 +
+         @define NN @@(NU)@
+         @iexp NN @(NN) -1 +
+         @iwhile j < @(NN)
+         @iexp k @(j) 1 +
+      mulps NONEPONE, rY@(j)r   /* rYr = {rY0d,  rY0c,    rY0b,   rY0a} */
+      mulps NONEPONE, rY@(k)r   /* rYr = {rY1d,  rY1c,    rY1b,   rY1a} */
+      haddps rY@(j)i, rY@(j)r   /* rYr = {iY0cd  ,iY0ab,  rY0cd,  rY0ab} */
+      haddps rY@(k)i, rY@(k)r   /* rYr = {iY1cd  ,iY1ab,  rY1cd,  rY1ab} */
+      haddps rY@(k)r, rY@(j)r   /* rYr = {iY1abcd,rY1abcd,iY0abcd,rY0abcd} */
+      #ifndef BETA0
+         addpd @(i)(pY), rY@(j)r
+      #endif
+      movaps rY@(j)r, @(i)(pY)
+         @iexp j @(j) 2 +
+         @iexp i @(i) 16 +
+         @endiwhile
+      @NU !
+   @TYPE DCPLX
+                                /* rYr = {Ai*Xi, Ar*Xr} */
+                                /* rYi = {Ai*Xr, Ar*Xi} */
+      @NU 6
+      movaps NONEPONEOFF(%rsp), NONEPONE
+      @NU 1 2 3 4 5 6
+         @iexp j 0 0 +
+         @iexp i 0 0 +
+         @iwhile j < @(NU)
+
+      mulpd NONEPONE, rY@(j)r   /* rYr = {-Ai*Xi, Ar*Xr} */
+      haddpd rY@(j)i, rY@(j)r   /* rYr = {Ai*Xr+Ar*Xi, Ar*Xr-Ai*Xi} */
+      #ifndef BETA0
+         addpd @(i)(pY), rY@(j)r
+      #endif
+      movapd rY@(j)r, @(i)(pY)
+         @iexp j @(j) 1 +
+         @iexp i @(i) 16 +
+         @endiwhile
+      @NU !
+   @TYPE SREAL
+      @NU 1
+      haddps rY0, rY0
+      haddps rY0, rY0
+      movss rY0, (pY)
+      @NU 2
+      haddps rY1, rY0
+      haddps rY0, rY0
+      movlps rY0, (pY)
+      @NU 14
+      #define movaps movups
+         @define NN @9@
+      @NU ! 2 14 1
+         @iexp NN @(NU) -3 +
+      @NU ! 2 1
+         @iexp j 0 0 +
+         @iwhile j < @(NN)
+            @iexp i @(j) 1 +
+      haddps rY@(i), rY@(j)
+            @iexp k @(j) 2 +
+            @iexp i @(j) 3 +
+      haddps rY@(i), rY@(k)
+      haddps rY@(k), rY@(j)
+            @iexp i @(j) @(sizeof) *
+      movaps rY@(j), @(i)(pY)
+            @iexp j @(j) 4 +
+         @endiwhile
+      @NU 14
+      #undef movaps
+      haddps rY13, rY12
+      haddps rY12, rY12
+      movlps rY12, 48(pY)
+      @NU !
+   @TYPE DREAL
+      @NU 1
+      haddpd rY0, rY0
+      movsd rY0, (pY)
+      @NU ! 1
+         @iexp j 0 0 +
+         @iwhile j < @(NU)
+            @iexp i @(j) 1 +
+      haddpd rY@(i), rY@(j)
+            @iexp i @(j) @(sizeof) *
+      movapd rY@(j), @(i)(pY)
+            @iexp j @(j) 2 +
+         @endiwhile
+      @NU !
+   @TYPE !
+      prefY(@(NU)*@(sizeof)+PFYDIST(pY))
+      add $@(NU)*@(sizeof), pY
+@ROUT mvN_sse
+      prefX(@(NU)*@(sizeof)+PFXDIST(pX))
+      add $@(NU)*@(sizeof), pX
+@ROUT mvN_sse mvT_sse
+      add incAn, pA0
+      mov p@(v)0, p@(v)
+      mov M, II
+   sub $@(NU), N
+   jnz LOOPN
+@SKIP Here we have the M/N Loops ripped out for GER;
+@SKIP MV & R1 share only preamble & epilogue
+@ROUT r1_sse
+
+   ALIGN32
+   LOOPN:
+   @TYPE DREAL
+      @iexp i 0 0 +
+      @iexp j 0 0 +
+      @iwhile j < @(NU)
+      movddup @(i)(pY), rY@(j)
+         @iexp j @(j) 1 +
+         @iexp i @(i) @(sizeof) +
+      @endiwhile
+   @TYPE SREAL
+      @NU 1
+      movss (pY), rY0
+      pshufd $0x00, rY0, rY0    /* rY0 = {Y0, Y0, Y0, Y0} */
+      @NU 2
+      movlps (pY), rY1          /* rY1 = {xx, xx, Y1, Y0} */
+      pshufd $0x00, rY1, rY0    /* rY0 = {Y0, Y0, Y0, Y0} */
+      pshufd $0x55, rY1, rY1    /* rY1 = {Y1, Y1, Y1, Y1} */
+      @NU 14
+      #define movaps movups
+      @NU 4 8 12 14
+      movaps (pY), rY3          /* rY3 = {Y3, Y2, Y1, Y0} */
+      pshufd $0x00, rY3, rY0    /* rY0 = {Y0, Y0, Y0, Y0} */
+      @NU 8 12 14 `      movaps 16(pY), rY7        /* rY7 = {Y3, Y2, Y1, Y0} */`
+      pshufd $0x55, rY3, rY1    /* rY1 = {Y1, Y1, Y1, Y1} */
+      @NU 12 14 `      movaps 32(pY), rY11       /* rY11= {Y3, Y2, Y1, Y0} */`
+      pshufd $0xAA, rY3, rY2    /* rY2 = {Y2, Y2, Y2, Y2} */
+      @NU 14 `      movlps 48(pY), rY13       /* rY13= {Y3, Y2, Y1, Y0} */`
+      pshufd $0xFF, rY3, rY3    /* rY3 = {Y3, Y3, Y3, Y3} */
+      @NU 14
+      #undef movaps
+      @NU 8 12 14
+
+      pshufd $0x00, rY7, rY4    /* rY0 = {Y0, Y0, Y0, Y0} */
+      pshufd $0x55, rY7, rY5    /* rY1 = {Y1, Y1, Y1, Y1} */
+      pshufd $0xAA, rY7, rY6    /* rY2 = {Y2, Y2, Y2, Y2} */
+      pshufd $0xFF, rY7, rY7    /* rY3 = {Y3, Y3, Y3, Y3} */
+      @NU 12 14
+
+      pshufd $0x00, rY11, rY8   /* rY8 = {Y0, Y0, Y0, Y0} */
+      pshufd $0x55, rY11, rY9   /* rY9 = {Y1, Y1, Y1, Y1} */
+      pshufd $0xAA, rY11, rY10  /* rY10= {Y2, Y2, Y2, Y2} */
+      pshufd $0xFF, rY11, rY11  /* rY11= {Y3, Y3, Y3, Y3} */
+      @NU 14
+
+      pshufd $0x00, rY13, rY12  /* rY12= {Y0, Y0, Y0, Y0} */
+      pshufd $0x55, rY13, rY13  /* rY13= {Y1, Y1, Y1, Y1} */
+      @NU !
+   @TYPE DCPLX
+      @NU 6
+      movapd PONENONEOFF(%rsp), rponenone
+      @NU !
+      @iexp j 0 0 +
+      @iwhile j < @(NU)
+      movapd @(j)*16(pY), rYr@(j)  /* rYr@(j) = {Yi,  Yr} */
+      pshufd $0xEE, rYr@(j), rYi@(j)  /* rYi@(j) = {Yi,  Yi} */
+      mulpd  rponenone, rYi@(j)    /* rYi@(j) = {Yi, -Yi} */
+      unpcklpd rYr@(j), rYr@(j)    /* rYr@(j) = {Yr, Yr} */
+         @iexp j @(j) 1 +
+      @endiwhile
+   @TYPE SCPLX
+      @NU 6
+      movapd NONEPONEOFF(%rsp), rneg
+      @NU !
+      @iexp j 0 0 +
+      @iwhile j < @(NU)
+      movlps @(j)*8(pY), rY@(j)   /* rY@(j) = {xx,xx, Y@(j)i, Y@(j)r} */
+      movlhps rY@(j), rY@(j)      /* rY@(j) = {Y@(j)i, Y@(j)r, Y@(j)i, Y@(j)r} */
+      pshufd $0x11, rY@(j), rYh@(j) /* rYh@(j) = {Y@(j)r, Y@(j)i, Y@(j)r, Y@(j)i} */
+      mulps rneg, rYh@(j)  /* rYh@(j) = {Y@(j)r,-Y@(j)i, Y@(j)r,-Y@(j)i} */
+         @iexp j @(j) 1 +
+      @endiwhile
+   @TYPE !
+
+      LOOPM:
+   @whiledef ii
+      @TYPE SREAL DREAL
+         movapd @(ii)-128(pX), rX0
+         @IFDEF ALIGNED
+         movapd rX0, rA0
+         mulpd rY0, rA0
+         addpd @(ii)-128(pA0), rA0
+         movapd rA0, @(ii)-128(pA0)
+         @ENDIFDEF
+         @IFDEF ! ALIGNED
+         movapd rY0, ryt
+         MOVA   @(ii)-128(pA0), rA0
+         mulpd rX0, ryt
+         addpd ryt, rA0
+         MOVA   rA0, @(ii)-128(pA0)
+         @ENDIFDEF
+      @TYPE SCPLX
+         movsldup @(ii)-128(pX), rXr /* rXr = { X1r, X1r, X0r, X0r} */
+         movaps rY0, rA0   /* rA0 = {Y0i, Y0r,Y0i, Y0r} */
+         mulps  rXr, rA0   /* rA0 = {X1r*Y0i,X1r*Y0r,X0r*Y0i,X0r*Y0r} */
+         @IFDEF ! ALIGNED
+         MOVA   @(ii)-128(pA0), ra0
+         addps ra0, rA0
+         @ENDIFDEF
+         @IFDEF ALIGNED
+         addps  @(ii)-128(pA0), rA0
+         @ENDIFDEF
+         movshdup @(ii)-128(pX), rXi /* rXi = {X1i, X1i, X0i, X0i} */
+         movaps rYh0, ra0  /* ra0 = {Y0r,-Y0i,Y0r,-Y0i} */
+         mulps  rXi, ra0   /* ra0 = {X1i*Y0r,-X1i*Y0i,X0i*Y0r,-X0i*Y0i} */
+         addps  ra0, rA0
+         MOVA   rA0, @(ii)-128(pA0)
+      @TYPE DCPLX
+         movapd @(ii)-128(pX), rX0      /* rX0 = {Xi, Xr} */
+         pshufd $0x4E, rX0, rxt         /* rxt = {Xr, Xi} */
+         movapd rYr0, rA0               /* rA0 = {Yr, Yr} */
+         mulpd  rX0, rA0                /* rA0 = {Xi*Yr, Xr*Yr} */
+         @IFDEF ! ALIGNED
+         MOVA    @(ii)-128(pA0), ra0    /* ra0 = present A */
+         addpd   ra0, rA0               /* rA0 += present A */
+         @ENDIFDEF
+         @IFDEF ALIGNED
+         addpd  @(ii)-128(pA0), rA0     /* rA0 += present A */
+         @ENDIFDEF
+         mulpd  rYi0, rxt               /* rxt = {Xr*Yi, -xi*Yi} */
+         addpd  rxt, rA0                /* rA0 = {Xi*Yr+Xr*Yi, Xr*Yr-Xi*Yi} */
+         MOVA rA0, @(ii)-128(pA0)
+      @TYPE !
+      @iif tnpf > 2
+         @ifdef pfA
+         prefA(PFADIST+@(pfA))
+         @undef pfA
+         @endifdef
+      @endiif
+      @CALLPROC getcoladdr
+      @CALLPROC getIndices aptr j
+      @undef aptr
+      @undef j
+      @whiledef aptr
+         @TYPE SREAL DREAL
+            @IFDEF ALIGNED
+         movapd rX0, rA0
+         mulpd rY@(j), rA0
+         addpd @(ii)-128@(aptr), rA0
+         movapd rA0, @(ii)-128@(aptr)
+            @ENDIFDEF
+            @IFDEF ! ALIGNED
+         movapd rY@(j), ryt
+         MOVA   @(ii)-128@(aptr), rA0
+         mulpd rX0, ryt
+         addpd ryt, rA0
+         MOVA   rA0, @(ii)-128@(aptr)
+            @ENDIFDEF
+         @TYPE !
+         @iif tnpf > 2
+            @ifdef pfA
+         prefA(PFADIST+@(pfA))
+            @undef pfA
+            @endifdef
+         @endiif
+         @TYPE DCPLX
+         pshufd $0x4E, rX0, rxt         /* rxt = {Xr, Xi} */
+         movapd rYr@(j), rA0               /* rA0 = {Yr, Yr} */
+         mulpd  rX0, rA0                /* rA0 = {Xi*Yr, Xr*Yr} */
+         @IFDEF ! ALIGNED
+         MOVA    @(ii)-128@(aptr), ra0    /* ra0 = present A */
+         addpd   ra0, rA0               /* rA0 += present A */
+         @ENDIFDEF
+         @IFDEF ALIGNED
+         addpd  @(ii)-128@(aptr), rA0     /* rA0 += present A */
+         @ENDIFDEF
+         mulpd  rYi@(j), rxt               /* rxt = {Xr*Yi, -xi*Yi} */
+         addpd  rxt, rA0                /* rA0 = {Xi*Yr+Xr*Yi, Xr*Yr-Xi*Yi} */
+         MOVA rA0, @(ii)-128@(aptr)
+         @TYPE SCPLX
+         movaps rY@(j), rA0   /* rA0 = {Y@(j)i, Y@(j)r,Y@(j)i, Y@(j)r} */
+         mulps  rXr, rA0   /* rA0 = {X1r*Y@(j)i,X1r*Y@(j)r,X0r*Y@(j)i,X0r*Y@(j)r} */
+         @IFDEF ! ALIGNED
+         MOVA   @(ii)-128@(aptr), ra0
+         addps ra0, rA0
+         @ENDIFDEF
+         @IFDEF ALIGNED
+         addps  @(ii)-128@(aptr), rA0
+         @ENDIFDEF
+         movaps rYh@(j), ra0  /* ra0 = {Y@(j)r,-Y@(j)i,Y@(j)r,-Y@(j)i} */
+         mulps  rXi, ra0   /* ra0 = {X1i*Y0r,-X1i*Y0i,X0i*Y0r,-X0i*Y0i} */
+         addps  ra0, rA0
+         MOVA   rA0, @(ii)-128@(aptr)
+         @TYPE !
+         @undef j
+      @endwhile
+
+   @endwhile
+   @iif tnpf < 3
+         prefA(PFADIST+@(pfA))
+      @undef pfA
+   @endiif
+         sub incAXm, pX
+   @iif tnpf < 3
+         @ifdef pfA
+         prefA(PFADIST+@(pfA))
+      @undef pfA
+      @endifdef
+   @endiif
+         sub incAXm, pA0
+      sub incII, II
+      jnz LOOPM
+   @TYPE DREAL
+      @define OKNU @1 2 3 4 5@
+   @TYPE SREAL
+      @define OKNU @1 2 3 4 5 6@
+   @TYPE DCPLX SCPLX
+      @define OKNU @1@
+   @TYPE !
+
+   @NU @(OKNU)
+      #ifdef ATL_OS_OSX     /* workaround retarded OS X assembly */
+         cmp $0, Mr
+         jz  MCLEANED
+      #else
+         jecxz MCLEANED        /* skip cleanup loop if Mr == 0 */
+      #endif
+   @NU ! @(OKNU)
+      cmp $0, Mr
+      jz  MCLEANED
+   @NU !
+
+      mov Mr, II
+   @TYPE SCPLX
+      xorps rXr, rXr
+      movaps rXr, rXi
+      xorps ra0, ra0
+   @TYPE !
+      LOOPMCU:
+   @TYPE SREAL DREAL
+         movsd -128(pX), rX0
+         movsd rX0, rA0
+         mulsd rY0, rA0
+         addsd -128(pA0), rA0
+         movsd rA0, -128(pA0)
+   @TYPE DCPLX
+         movapd -128(pX), rX0           /* rX0 = {Xi, Xr} */
+         pshufd $0x4E, rX0, rxt         /* rxt = {Xr, Xi} */
+         movapd rYr0, rA0               /* rA0 = {Yr, Yr} */
+         mulpd  rX0, rA0                /* rA0 = {Xi*Yr, Xr*Yr} */
+      @IFDEF ! ALIGNED
+         MOVA    -128(pA0), ra0         /* ra0 = present A */
+         addpd   ra0, rA0               /* rA0 += present A */
+      @ENDIFDEF
+      @IFDEF ALIGNED
+         addpd  -128(pA0), rA0          /* rA0 += present A */
+      @ENDIFDEF
+         mulpd  rYi0, rxt               /* rxt = {Xr*Yi, -xi*Yi} */
+         addpd  rxt, rA0                /* rA0 = {Xi*Yr+Xr*Yi, Xr*Yr-Xi*Yi} */
+         MOVA rA0, -128(pA0)
+   @TYPE SCPLX
+         movlps -128(pX), rXi           /* rXr = {0, 0, X0i, X0r} */
+         pshufd $0xE0, rXi, rXr         /* rXr = {0, 0, X0r, X0r} */
+         movaps rY0, rA0                /* rA0 = {Y0i, Y0r, Y0i, Y0r} */
+         mulps  rXr, rA0                /* rA0 = {0, 0, X0r*Y0i, X0r*Y0r} */
+         movlps -128(pA0), ra0
+         addps ra0, rA0
+         shufps $0xE5, rXi, rXi         /* rXi = {0, 0, X0i, X0i} */
+         movaps rYh0, ra0               /* ra0 = {Y0r, -Y0i, Y0r,-Y0i} */
+         mulps  rXi, ra0                /* ra0 = {0, 0, X0i*Y0r,-X0i*Y0i} */
+         addps  ra0, rA0
+         movlps rA0, -128(pA0)
+   @TYPE !
+      @CALLPROC getcoladdr
+      @CALLPROC getIndices aptr j
+      @undef aptr
+      @undef j
+      @whiledef aptr
+         @TYPE SREAL DREAL
+         movsd rX0, rA0
+         mulsd rY@(j), rA0
+         addsd -128@(aptr), rA0
+         movsd rA0, -128@(aptr)
+         @TYPE DCPLX
+         pshufd $0x4E, rX0, rxt         /* rxt = {Xr, Xi} */
+         movapd rYr@(j), rA0               /* rA0 = {Yr, Yr} */
+         mulpd  rX0, rA0                /* rA0 = {Xi*Yr, Xr*Yr} */
+         @IFDEF ! ALIGNED
+         MOVA    -128@(aptr), ra0       /* ra0 = present A */
+         addpd   ra0, rA0               /* rA0 += present A */
+         @ENDIFDEF
+         @IFDEF ALIGNED
+         addpd  -128@(aptr), rA0        /* rA0 += present A */
+         @ENDIFDEF
+         mulpd  rYi@(j), rxt               /* rxt = {Xr*Yi, -xi*Yi} */
+         addpd  rxt, rA0                /* rA0 = {Xi*Yr+Xr*Yi, Xr*Yr-Xi*Yi} */
+         MOVA rA0, -128@(aptr)
+         @TYPE SCPLX
+         movlps -128(pX), rXi           /* rXr = {0, 0, X0i, X0r} */
+         pshufd $0xE0, rXi, rXr         /* rXr = {0, 0, X0r, X0r} */
+         movaps rY@(j), rA0                /* rA0 = {Y@(j)i, Y@(j)r, Y@(j)i, Y@(j)r} */
+         mulps  rXr, rA0                /* rA0 = {0, 0, X0r*Y@(j)i, X0r*Y@(j)r} */
+         movlps -128@(aptr), ra0
+         addps ra0, rA0
+         shufps $0xE5, rXi, rXi         /* rXi = {0, 0, X0i, X0i} */
+         movaps rYh@(j), ra0               /* ra0 = {Y@(j)r, -Y@(j)i, Y@(j)r,-Y@(j)i} */
+         mulps  rXi, ra0                /* ra0 = {0, 0, X0i*Y0r,-X0i*Y0i} */
+         addps  ra0, rA0
+         movlps rA0, -128@(aptr)
+         @TYPE !
+         @undef j
+      @endwhile
+         add $@(sizeof), pX
+         add $@(sizeof), pA0
+      dec II
+      jnz LOOPMCU
+
+MCLEANED:
+      prefY(@(NU)*@(sizeof)+PFYDIST(pY))
+      add $@(NU)*@(sizeof), pY
+      add incAn, pA0
+      mov p@(v)0, p@(v)
+      mov M, II
+   sub $@(NU), N
+   jnz LOOPN
+@SKIP Here we have the M/N Loops ripped out for GER2;
+@SKIP MV & R1 share only preamble & epilogue
+@ROUT r2_sse
+
+   ALIGN32
+   LOOPN:
+   @TYPE DREAL
+      @iexp i 0 0 +
+      @iexp j 0 0 +
+      @iwhile j < @(NU)
+      movddup @(i)(pY), rY@(j)
+      movddup @(i)(pZ), rZ@(j)
+         @iexp j @(j) 1 +
+         @iexp i @(i) @(sizeof) +
+      @endiwhile
+   @TYPE SREAL
+      @NU 1
+      movss (pY), rY0
+      shufps $0x00, rY0, rY0    /* rY0 = {Y0, Y0, Y0, Y0} */
+      movss (pZ), rZ0
+      shufps $0x00, rZ0, rZ0    /* rZ0 = {Z0, Z0, Z0, Z0} */
+      @NU 2 3
+      movlps (pY), rY1          /* rY1 = {xx, xx, Y1, Y0} */
+      pshufd $0x00, rY1, rY0    /* rY0 = {Y0, Y0, Y0, Y0} */
+      shufps $0x55, rY1, rY1    /* rY1 = {Y1, Y1, Y1, Y1} */
+      movlps (pZ), rZ1          /* rZ1 = {xx, xx, Z1, Z0} */
+      pshufd $0x00, rZ1, rZ0    /* rZ0 = {Z0, Z0, Z0, Z0} */
+      shufps $0x55, rZ1, rZ1    /* rZ1 = {Z1, Z1, Z1, Z1} */
+      @NU 3
+      movss 8(pY), rY2
+      shufps $0x00, rY2, rY2    /* rY2 = {Y2, Y2, Y2, Y2} */
+      movss 8(pZ), rZ2
+      shufps $0x00, rZ2, rZ2    /* rZ2 = {Z2, Z2, Z2, Z2} */
+      @NU 5 6
+      #define movaps movups
+      @NU 4 5 6
+      movaps (pY), rY3          /* rY3 = {Y3, Y2, Y1, Y0} */
+      pshufd $0x00, rY3, rY0    /* rY0 = {Y0, Y0, Y0, Y0} */
+      pshufd $0x55, rY3, rY1    /* rY1 = {Y1, Y1, Y1, Y1} */
+      pshufd $0xAA, rY3, rY2    /* rY2 = {Y2, Y2, Y2, Y2} */
+      shufps $0xFF, rY3, rY3    /* rY3 = {Y3, Y3, Y3, Y3} */
+      movaps (pZ), rZ3          /* rZ3 = {Z3, Z2, Z1, Z0} */
+      pshufd $0x00, rZ3, rZ0    /* rZ0 = {Z0, Z0, Z0, Z0} */
+      pshufd $0x55, rZ3, rZ1    /* rZ1 = {Z1, Z1, Z1, Z1} */
+      pshufd $0xAA, rZ3, rZ2    /* rZ2 = {Z2, Z2, Z2, Z2} */
+      shufps $0xFF, rZ3, rZ3    /* rZ3 = {Z3, Z3, Z3, Z3} */
+      @NU 5 6
+      #undef  movaps
+      @NU 5
+      movss 16(pY), rY4
+      shufps $0x00, rY4, rY4    /* rY4 = {Y4, Y4, Y4, Y4} */
+      movss 16(pZ), rZ4
+      shufps $0x00, rZ4, rZ4    /* rZ4 = {Z4, Z4, Z4, Z4} */
+      @NU 6
+      movlps 16(pY), rY5        /* rY5 = {xx, xx, Y5, Y4} */
+      pshufd $0x00, rY5, rY4    /* rY4 = {Y4, Y4, Y4, Y4} */
+      shufps $0x55, rY5, rY5    /* rY5 = {Y5, Y5, Y5, Y5} */
+      movlps 16(pZ), rZ5        /* rZ1 = {xx, xx, Z5, Z4} */
+      pshufd $0x00, rZ5, rZ4    /* rZ4 = {Z4, Z4, Z4, Z4} */
+      shufps $0x55, rZ5, rZ5    /* rZ5 = {Z5, Z5, Z5, Z5} */
+      @NU !
+   @TYPE DCPLX
+      @NU 3
+      movapd PONENONEOFF(%rsp), rponenone
+      @NU !
+      @iexp j 0 0 +
+      @iwhile j < @(NU)
+      movapd @(j)*16(pY), rYr@(j)  /* rYr@(j) = {Yi,  Yr} */
+      pshufd $0xEE, rYr@(j), rYi@(j)  /* rYi@(j) = {Yi,  Yi} */
+      mulpd  rponenone, rYi@(j)    /* rYi@(j) = {Yi, -Yi} */
+      unpcklpd rYr@(j), rYr@(j)    /* rYr@(j) = {Yr, Yr} */
+      movapd @(j)*16(pZ), rZr@(j)  /* rZr@(j) = {Zi,  Zr} */
+      pshufd $0xEE, rZr@(j), rZi@(j)  /* rZi@(j) = {Zi,  Zi} */
+      mulpd  rponenone, rZi@(j)    /* rZi@(j) = {Zi, -Zi} */
+      unpcklpd rZr@(j), rZr@(j)    /* rZr@(j) = {Zr, Zr} */
+         @iexp j @(j) 1 +
+      @endiwhile
+   @TYPE SCPLX
+      @NU 1 2
+         @iexp j 0 0 +
+         @iwhile j < @(NU)
+      movlps @(j)*8(pY), rY@(j)   /* rY@(j) = {xx,xx, Y@(j)i, Y@(j)r} */
+      movlhps rY@(j), rY@(j)      /* rY@(j) = {Y@(j)i, Y@(j)r, Y@(j)i, Y@(j)r} */
+      pshufd $0x11, rY@(j), rYh@(j) /* rYh@(j) = {Y@(j)r, Y@(j)i, Y@(j)r, Y@(j)i} */
+      mulps rneg, rYh@(j)  /* rYh@(j) = {Y@(j)r,-Y@(j)i, Y@(j)r,-Y@(j)i} */
+      movlps @(j)*8(pZ), rZ@(j)   /* rZ@(j) = {xx,xx, Z@(j)i, Z@(j)r} */
+      movlhps rZ@(j), rZ@(j)      /* rZ@(j) = {Z@(j)i, Z@(j)r, Z@(j)i, Z@(j)r} */
+      pshufd $0x11, rZ@(j), rZh@(j) /* rZh@(j) = {Z@(j)r, Z@(j)i, Z@(j)r, Z@(j)i} */
+      mulps rneg, rZh@(j)  /* rZh@(j) = {Z@(j)r,-Z@(j)i, Z@(j)r,-Z@(j)i} */
+         @iexp j @(j) 1 +
+      @endiwhile
+   @TYPE !
+
+      LOOPM:
+   @whiledef ii
+      @TYPE SREAL DREAL
+         movapd @(ii)-128(pX), rX0
+         @IFDEF ALIGNED
+         movapd rX0, rA0
+         mulpd rY0, rA0
+         addpd @(ii)-128(pA0), rA0
+         @ENDIFDEF
+         @IFDEF ! ALIGNED
+         movapd rY0, ryt
+         MOVA   @(ii)-128(pA0), rA0
+         mulpd rX0, ryt
+         addpd ryt, rA0
+         @ENDIFDEF
+         movapd @(ii)-128(pW), rW0
+         movapd rZ0, ryt
+         mulpd  rW0, ryt
+         addpd  ryt, rA0
+         MOVA   rA0, @(ii)-128(pA0)
+      @TYPE SCPLX
+         movsldup @(ii)-128(pX), rXr /* rXr = { X1r, X1r, X0r, X0r} */
+         movaps rY0, rA0   /* rA0 = {Y0i, Y0r,Y0i, Y0r} */
+         mulps  rXr, rA0   /* rA0 = {X1r*Y0i,X1r*Y0r,X0r*Y0i,X0r*Y0r} */
+         @IFDEF ! ALIGNED
+         MOVA   @(ii)-128(pA0), ra0
+         addps ra0, rA0
+         @ENDIFDEF
+         @IFDEF ALIGNED
+         addps  @(ii)-128(pA0), rA0
+         @ENDIFDEF
+         movshdup @(ii)-128(pX), rXi /* rXi = {X1i, X1i, X0i, X0i} */
+         movaps rYh0, ra0  /* ra0 = {Y0r,-Y0i,Y0r,-Y0i} */
+         mulps  rXi, ra0   /* ra0 = {X1i*Y0r,-X1i*Y0i,X0i*Y0r,-X0i*Y0i} */
+         addps  ra0, rA0
+         movsldup @(ii)-128(pW), rWr /* rWr = { W1r, W1r, W0r, W0r} */
+         movaps rZ0, ra0   /* ra0 = {Z0i, Z0r,Z0i, Z0r} */
+         mulps  rWr, ra0   /* ra0 = {W1r*Z0i,W1r*Z0r,W0r*Z0i,W0r*Z0r} */
+         addps  ra0, rA0
+         movshdup @(ii)-128(pW), rWi /* rWi = {W1i, W1i, W0i, W0i} */
+         movaps rZh0, ra0  /* ra0 = {Z0r,-Z0i,Z0r,-Z0i} */
+         mulps  rWi, ra0   /* ra0 = {W1i*Z0r,-W1i*Z0i,W0i*Z0r,-W0i*Z0i} */
+         addps  ra0, rA0
+         MOVA   rA0, @(ii)-128(pA0)
+      @TYPE DCPLX
+         movapd @(ii)-128(pX), rX0      /* rX0 = {Xi, Xr} */
+         pshufd $0x4E, rX0, rxt         /* rxt = {Xr, Xi} */
+         movapd rYr0, rA0               /* rA0 = {Yr, Yr} */
+         mulpd  rX0, rA0                /* rA0 = {Xi*Yr, Xr*Yr} */
+         @IFDEF ! ALIGNED
+         MOVA    @(ii)-128(pA0), ra0    /* ra0 = present A */
+         addpd   ra0, rA0               /* rA0 += present A */
+         @ENDIFDEF
+         @IFDEF ALIGNED
+         addpd  @(ii)-128(pA0), rA0     /* rA0 += present A */
+         @ENDIFDEF
+         mulpd  rYi0, rxt               /* rxt = {Xr*Yi, -xi*Yi} */
+         addpd  rxt, rA0                /* rA0 = {Xi*Yr+Xr*Yi, Xr*Yr-Xi*Yi} */
+         movapd @(ii)-128(pW), rW0      /* rW0 = {Wi, Wr} */
+         movapd rZr0, ra0               /* ra0 = {Zr, Zr} */
+         mulpd  rW0, ra0                /* ra0 = {Wi*Zr, Wr*Zr} */
+         addpd  ra0, rA0
+         pshufd $0x4E, rW0, ra0         /* ra0 = {Wr, Wi} */
+         mulpd  rZi0, ra0               /* ra0 = {Wr*Zi, -Wi*Zi} */
+         addpd  ra0, rA0
+         MOVA rA0, @(ii)-128(pA0)
+      @TYPE !
+      @iif tnpf > 2
+         @ifdef pfA
+         prefA(PFADIST+@(pfA))
+         @undef pfA
+         @endifdef
+      @endiif
+      @CALLPROC getcoladdr
+      @CALLPROC getIndices aptr j
+      @undef aptr
+      @undef j
+      @whiledef aptr
+         @TYPE SREAL DREAL
+            @IFDEF ALIGNED
+         movapd rX0, rA0
+         mulpd rY@(j), rA0
+         addpd @(ii)-128@(aptr), rA0
+            @ENDIFDEF
+            @IFDEF ! ALIGNED
+         movapd rY@(j), ryt
+         MOVA   @(ii)-128@(aptr), rA0
+         mulpd rX0, ryt
+         addpd ryt, rA0
+            @ENDIFDEF
+         movapd rZ@(j), ryt
+         mulpd rW0, ryt
+         addpd ryt, rA0
+         MOVA   rA0, @(ii)-128@(aptr)
+         @TYPE !
+         @iif tnpf > 2
+            @ifdef pfA
+         prefA(PFADIST+@(pfA))
+            @undef pfA
+            @endifdef
+         @endiif
+         @TYPE DCPLX
+         pshufd $0x4E, rX0, rxt         /* rxt = {Xr, Xi} */
+         movapd rYr@(j), rA0               /* rA0 = {Yr, Yr} */
+         mulpd  rX0, rA0                /* rA0 = {Xi*Yr, Xr*Yr} */
+            @IFDEF ! ALIGNED
+         MOVA    @(ii)-128@(aptr), ra0    /* ra0 = present A */
+         addpd   ra0, rA0               /* rA0 += present A */
+            @ENDIFDEF
+            @IFDEF ALIGNED
+         addpd  @(ii)-128@(aptr), rA0     /* rA0 += present A */
+            @ENDIFDEF
+         mulpd  rYi@(j), rxt               /* rxt = {Xr*Yi, -xi*Yi} */
+         addpd  rxt, rA0                /* rA0 = {Xi*Yr+Xr*Yi, Xr*Yr-Xi*Yi} */
+         movapd rZr@(j), ra0               /* ra0 = {Zr, Zr} */
+         mulpd  rW0, ra0                /* ra0 = {Wi*Zr, Wr*Zr} */
+         addpd  ra0, rA0
+         pshufd $0x4E, rW0, ra0         /* ra0 = {Wr, Wi} */
+         mulpd  rZi@(j), ra0               /* ra0 = {Wr*Zi, -Wi*Zi} */
+         addpd  ra0, rA0
+         MOVA rA0, @(ii)-128@(aptr)
+         @TYPE SCPLX
+         movaps rY@(j), rA0   /* rA0 = {Y@(j)i, Y@(j)r,Y@(j)i, Y@(j)r} */
+         mulps  rXr, rA0   /* rA0 = {X1r*Y@(j)i,X1r*Y@(j)r,X0r*Y@(j)i,X0r*Y@(j)r} */
+            @IFDEF ! ALIGNED
+         MOVA   @(ii)-128@(aptr), ra0
+         addps ra0, rA0
+            @ENDIFDEF
+            @IFDEF ALIGNED
+         addps  @(ii)-128@(aptr), rA0
+            @ENDIFDEF
+         movaps rYh@(j), ra0  /* ra0 = {Y@(j)r,-Y@(j)i,Y@(j)r,-Y@(j)i} */
+         mulps  rXi, ra0   /* ra0 = {X1i*Y0r,-X1i*Y0i,X0i*Y0r,-X0i*Y0i} */
+         addps  ra0, rA0
+         movaps rZ@(j), ra0   /* ra0 = {Z@(j)i, Z@(j)r,Z@(j)i, Z@(j)r} */
+         mulps  rWr, ra0   /* rA0 = {W1r*Z@(j)i,W1r*Z@(j)r,W0r*Z@(j)i,W0r*Y@(j)r} */
+         addps ra0, rA0
+         movaps rZh@(j), ra0  /* ra0 = {Z@(j)r,-Z@(j)i,Z@(j)r,-Z@(j)i} */
+         mulps  rWi, ra0   /* ra0 = {W1i*Z0r,-W1i*Z0i,W0i*Z0r,-W0i*Z0i} */
+         addps  ra0, rA0
+         MOVA   rA0, @(ii)-128@(aptr)
+         @TYPE !
+         @undef j
+      @endwhile
+
+   @endwhile
+   @iif tnpf < 3
+         prefA(PFADIST+@(pfA))
+      @undef pfA
+   @endiif
+         sub incM, pX
+   @iif tnpf < 3
+         @ifdef pfA
+         prefA(PFADIST+@(pfA))
+      @undef pfA
+      @endifdef
+   @endiif
+         sub incM, pW
+         sub incM, pA0
+      sub incII, II
+      jnz LOOPM
+   @TYPE DREAL SREAL
+      @define OKNU @1 2@
+   @TYPE DCPLX SCPLX
+      @define OKNU @1@
+   @TYPE !
+
+   @NU @(OKNU)
+      #ifdef ATL_OS_OSX     /* workaround retarded OS X assembly */
+         cmp $0, Mr
+         jz  MCLEANED
+      #else
+         jecxz MCLEANED        /* skip cleanup loop if Mr == 0 */
+      #endif
+   @NU ! @(OKNU)
+      cmp $0, Mr
+      jz  MCLEANED
+   @NU !
+
+      mov Mr, II
+   @TYPE SCPLX
+      xorps rXr, rXr
+      movaps rXr, rXi
+      xorps ra0, ra0
+   @TYPE !
+      LOOPMCU:
+   @TYPE SREAL DREAL
+         movsd -128(pX), rX0
+         movsd rX0, rA0
+         mulsd rY0, rA0
+         addsd -128(pA0), rA0
+         movsd -128(pW), rW0
+         movsd rZ0, ryt
+         mulsd rW0, ryt
+         addsd ryt, rA0
+         movsd rA0, -128(pA0)
+   @TYPE DCPLX
+         movapd -128(pX), rX0           /* rX0 = {Xi, Xr} */
+         pshufd $0x4E, rX0, rxt         /* rxt = {Xr, Xi} */
+         movapd rYr0, rA0               /* rA0 = {Yr, Yr} */
+         mulpd  rX0, rA0                /* rA0 = {Xi*Yr, Xr*Yr} */
+      @IFDEF ! ALIGNED
+         MOVA    -128(pA0), ra0         /* ra0 = present A */
+         addpd   ra0, rA0               /* rA0 += present A */
+      @ENDIFDEF
+      @IFDEF ALIGNED
+         addpd  -128(pA0), rA0          /* rA0 += present A */
+      @ENDIFDEF
+         mulpd  rYi0, rxt               /* rxt = {Xr*Yi, -xi*Yi} */
+         addpd  rxt, rA0                /* rA0 = {Xi*Yr+Xr*Yi, Xr*Yr-Xi*Yi} */
+         movapd -128(pW), rW0           /* rW0 = {Wi, Wr} */
+         movapd rZr0, ra0               /* ra0 = {Zr, Zr} */
+         mulpd  rW0, ra0                /* ra0 = {Wi*Zr, Wr*Zr} */
+         addpd  ra0, rA0
+         pshufd $0x4E, rW0, ra0         /* ra0 = {Wr, Wi} */
+         mulpd  rZi0, ra0               /* ra0 = {Wr*Zi, -Wi*Zi} */
+         addpd  ra0, rA0
+         MOVA rA0, -128(pA0)
+   @TYPE SCPLX
+         movlps -128(pX), rXi           /* rXr = {0, 0, X0i, X0r} */
+         pshufd $0xE0, rXi, rXr         /* rXr = {0, 0, X0r, X0r} */
+         movaps rY0, rA0                /* rA0 = {Y0i, Y0r, Y0i, Y0r} */
+         mulps  rXr, rA0                /* rA0 = {0, 0, X0r*Y0i, X0r*Y0r} */
+         movlps -128(pA0), ra0
+         addps ra0, rA0
+         shufps $0xE5, rXi, rXi         /* rXi = {0, 0, X0i, X0i} */
+         movaps rYh0, ra0               /* ra0 = {Y0r, -Y0i, Y0r,-Y0i} */
+         mulps  rXi, ra0                /* ra0 = {0, 0, X0i*Y0r,-X0i*Y0i} */
+         addps  ra0, rA0
+
+         movlps -128(pW), rWi           /* rWr = {0, 0, W0i, W0r} */
+         pshufd $0xE0, rWi, rWr         /* rWr = {0, 0, W0r, W0r} */
+         movaps rZ0, ra0                /* ra0 = {Z0i, Z0r, Z0i, Z0r} */
+         mulps  rWr, ra0                /* ra0 = {0, 0, W0r*Z0i, W0r*Z0r} */
+         addps  ra0, rA0
+         shufps $0xE5, rWi, rWi         /* rWi = {0, 0, W0i, W0i} */
+         movaps rZh0, ra0               /* ra0 = {Z0r, -Z0i, Z0r,-Z0i} */
+         mulps  rWi, ra0                /* ra0 = {0, 0, W0i*Z0r,-W0i*Z0i} */
+         addps  ra0, rA0
+         movlps rA0, -128(pA0)
+   @TYPE !
+      @CALLPROC getcoladdr
+      @CALLPROC getIndices aptr j
+      @undef aptr
+      @undef j
+      @whiledef aptr
+         @TYPE SREAL DREAL
+         movsd rX0, rA0
+         mulsd rY@(j), rA0
+         addsd -128@(aptr), rA0
+         movsd rZ@(j), ryt
+         mulsd rW0, ryt
+         addsd ryt, rA0
+         movsd rA0, -128@(aptr)
+         @TYPE DCPLX
+         pshufd $0x4E, rX0, rxt         /* rxt = {Xr, Xi} */
+         movapd rYr@(j), rA0               /* rA0 = {Yr, Yr} */
+         mulpd  rX0, rA0                /* rA0 = {Xi*Yr, Xr*Yr} */
+            @IFDEF ! ALIGNED
+         MOVA    -128@(aptr), ra0       /* ra0 = present A */
+         addpd   ra0, rA0               /* rA0 += present A */
+            @ENDIFDEF
+            @IFDEF ALIGNED
+         addpd  -128@(aptr), rA0        /* rA0 += present A */
+            @ENDIFDEF
+         mulpd  rYi@(j), rxt               /* rxt = {Xr*Yi, -xi*Yi} */
+         addpd  rxt, rA0                /* rA0 = {Xi*Yr+Xr*Yi, Xr*Yr-Xi*Yi} */
+         movapd rZr@(j), ra0               /* ra0 = {Zr, Zr} */
+         mulpd  rW0, ra0                /* ra0 = {Wi*Zr, Wr*Zr} */
+         addpd  ra0, rA0
+         pshufd $0x4E, rW0, ra0         /* ra0 = {Wr, Wi} */
+         mulpd  rZi@(j), ra0               /* ra0 = {Wr*Zi, -Wi*Zi} */
+         addpd  ra0, rA0
+         MOVA rA0, -128@(aptr)
+         @TYPE SCPLX
+         movaps rY@(j), rA0                /* rA0 = {Y@(j)i, Y@(j)r, Y@(j)i, Y@(j)r} */
+         mulps  rXr, rA0                /* rA0 = {0, 0, X0r*Y@(j)i, X0r*Y@(j)r} */
+         movlps -128@(aptr), ra0
+         addps ra0, rA0
+         movaps rYh@(j), ra0               /* ra0 = {Y@(j)r, -Y@(j)i, Y@(j)r,-Y@(j)i} */
+         mulps  rXi, ra0                /* ra0 = {0, 0, X0i*Y0r,-X0i*Y0i} */
+         addps  ra0, rA0
+         movaps rZ@(j), ra0                /* ra0 = {Z@(j)i, Z@(j)r, Z@(j)i, Z@(j)r} */
+         mulps  rWr, ra0                /* ra0 = {0, 0, W0r*Z@(j)i, W0r*Z@(j)r} */
+         addps  ra0, rA0
+         movaps rZh@(j), ra0               /* ra0 = {Z@(j)r, -Z@(j)i, Z@(j)r,-Z@(j)i} */
+         mulps  rWi, ra0                /* ra0 = {0, 0, W0i*Z0r,-W0i*Z0i} */
+         addps  ra0, rA0
+         movlps rA0, -128@(aptr)
+         @TYPE !
+         @undef j
+      @endwhile
+         add $@(sizeof), pX
+         add $@(sizeof), pW
+         add $@(sizeof), pA0
+      dec II
+      jnz LOOPMCU
+
+MCLEANED:
+      prefY(@(NU)*@(sizeof)+PFYDIST(pY))
+      add $@(NU)*@(sizeof), pY
+      sub M0, pX
+      prefY(@(NU)*@(sizeof)+PFYDIST(pZ))
+      add $@(NU)*@(sizeof), pZ
+      add incAn, pA0
+      sub M0, pW
+      mov M, II
+   sub $@(NU), N
+   jnz LOOPN
+@ROUT mvN_sse mvT_sse r1_sse r2_sse
+/*
+ * EPILOGUE: restore registers and return
+ */
+   movq -8(%rsp), %rbp
+   movq -16(%rsp), %rbx
+   movq -24(%rsp), %r12
+   movq -32(%rsp), %r13
+   movq -40(%rsp), %r14
+   movq -48(%rsp), %r15
+   ret

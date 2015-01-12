@@ -1,0 +1,53 @@
+
+topd = /home/whaley/git/math-atlas/AtlasBase
+ext  = /home/whaley/git/math-atlas/STAB/xextract
+extF = $(ext) -langF -lnlen71 -Remtblank -llwarn2 -LAPACK1 $(incs)
+ext9 = $(ext) -langF -lnlen132 -RemtBlank $(incs)
+extC = $(ext) -langC -lnlen79 -Remtblank -llwarn2 $(incs)
+extM = $(ext) -langM -lnlen79 -llwarn2 $(incs)
+incs = -def topd /home/whaley/git/math-atlas/AtlasBase \
+       -def incd /home/whaley/git/math-atlas/AtlasBase/Clint \
+       -def ext  /home/whaley/git/math-atlas/STAB/xextract \
+       -def BASEdir /home/whaley/git/math-atlas/AtlasBase/Antoine/ \
+       -def basd /home/whaley/git/math-atlas/AtlasBase/Clint
+
+default: all
+force_build:
+basd = /home/whaley/git/math-atlas/AtlasBase/Clint
+basdRCW = /home/whaley/git/math-atlas/AtlasBase/Clint
+basdAPP = /home/whaley/git/math-atlas/AtlasBase/Antoine
+basdSTU = /home/whaley/git/math-atlas/AtlasBase/Students
+incf = /home/whaley/git/math-atlas/AtlasBase/gen.inc
+
+basfn = $(basdRCW)/atlas-mvnk.base
+files = ATL_cgemvN_8x4_sse3.c ATL_cgemvN_axpy.c ATL_gemvN_axpy.c \
+        ATL_gemvN_v6x8_vsx.c ATL_mvnk_28x1_dot.c ATL_sgemvN_8x4_sse.c \
+        cmvncases.idx dmvncases.idx smvncases.idx zmvncases.idx
+
+all : $(files)
+kill : 
+	rm -f $(files)
+
+ATL_gemvN_v6x8_vsx.c : $(topd)/kernel/external/ATL_gemvN_v6x8_vsx.c
+	cp -f $(topd)/kernel/external/ATL_gemvN_v6x8_vsx.c .
+ATL_gemvN_axpy.c : $(basfn)
+	$(extC) -b $(basfn) -o $@ rout=$*
+ATL_cgemvN_axpy.c : $(basfn)
+	$(extC) -b $(basfn) -o $@ rout=$*
+ATL_mvnk_28x1_dot.c : $(basfn)
+	$(extC) -b $(basfn) -o $@ rout=$*
+ATL_sgemvN_8x4_sse.c : $(basfn)
+	$(extC) -b $(basfn) -o $@ rout=$*
+ATL_cgemvN_8x4_sse3.c : $(basfn)
+	$(extC) -b $(basfn) -o $@ rout=$*
+smvncases.idx : $(basfn)
+	$(extC) -b $(basfn) -o $@ rout=$@
+dmvncases.idx : $(basfn)
+	$(extC) -b $(basfn) -o $@ rout=$@
+cmvncases.idx : $(basfn)
+	$(extC) -b $(basfn) -o $@ rout=$@
+zmvncases.idx : $(basfn)
+	$(extC) -b $(basfn) -o $@ rout=$@
+
+Make.ext : $(topd)/make.base
+	$(extM) -b $(topd)/make.base -o $@ rout=atlas/tune/blas/gemv/mvncases

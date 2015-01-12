@@ -1,0 +1,81 @@
+<ID> <flag> <mb> <nb> <kb> <muladd> <lat> <mu> <nu> <ku> <rout> "<Contributer>"
+27
+200   8   4   1    4 1 1 4  1 4 ATL_gemm_SSE.c       "Camm Maguire" \
+gcc
+-fomit-frame-pointer -O
+201 208   1   1    4 1 1 1  1 4 ATL_gemm_SSE.c       "Camm Maguire" \
+gcc
+-fomit-frame-pointer -O
+202   8   4   1  -56 1 1 4  1 56 ATL_smm_sse1_56.c   "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+203   8   4   1  -60 1 1 4  1 56 ATL_smm_sse1_60.c   "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+204   8   4   1  -64 1 1 4  1 56 ATL_smm_sse1_64.c   "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+205  16   0   2  -56 1 1 4  1 56 ATL_smm_sse1_56M.c  "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+206  16   2   0  -56 1 1 4  1 56 ATL_smm_sse1_56N.c  "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+207  16   0   2  -60 1 1 4  1 60 ATL_smm_sse1_60M.c  "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+208  16   2   0  -60 1 1 4  1 60 ATL_smm_sse1_60N.c  "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+209  16   0   2  -64 1 1 4  1 64 ATL_smm_sse1_64M.c  "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+210  16   2   0  -64 1 1 4  1 64 ATL_smm_sse1_64N.c  "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+211  16   4   1    4 1 1 4  1  4 ATL_smm_sse1_K.c "P. Soendergaard & C. Maguire" \
+gcc
+-fomit-frame-pointer -O
+212   8   4   1 -112 1 1 4  1 16 ATL_smm_sse2_112.c  "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+213  16   0   1 -112 1 1 4  1 16 ATL_smm_sse2_112M.c "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+214  16   4   0 -112 1 1 4  1 16 ATL_smm_sse2_112N.c "Peter Soendergaard" \
+gcc
+-fomit-frame-pointer -O
+215  16   4   1    4 1 1 4  1  4 ATL_smm_sse2_112N.c "P. Soendergaard & C. Maguire" \
+gcc
+-fomit-frame-pointer -O
+216   8   6   1 -60 0 1 6  1 60 ATL_smm6x1x60_sse.c "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp
+217   8  14   1 -84 0 1 14  1 84 ATL_smm14x1x84_sse.c "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp
+218 208  14   1   4 0 1 14  1 84 ATL_smm14x1x84_sseCU.c "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp
+219 128 6 1 -120 1 1 6 1 120  ATL_smm6x1x120_sse.c "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp
+220 192   6   1   4 0 1 6  1 80 ATL_smm6x1x80_sse.c    "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp
+221 192  10   1   4 0 1 10 1 120 ATL_smm10x1x120_sse.c  "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp
+222 192   4   1   4 0 1  4 1 256 ATL_smm4x1x256_sse.c   "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp
+223 224   2   2   4 0 1  2 2   4 ATL_smm2x2x256_sse.c  "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp
+224 192   4   2   8 0 1  4 2   8 ATL_smm4x2x8_avx.c  "R. Clint Whaley"
+225 224   4   2   8 0 1  4 2   8 ATL_smm4x2x256_avx.c "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp -mavx
+226 192 2 4 4 0 1 2 4 4 ATL_smm2x4x256_fma4.c "R. Clint Whaley" \
+gcc
+-x assembler-with-cpp -m64

@@ -1,0 +1,512 @@
+#!/bin/sh
+#
+# BFI configure-like script to bootstrap ATLAS's C-based config scripts
+# dependencies: sed, pwd
+# shell built-in deps: echo, test
+#
+cc=gcc
+cflags="-g -w"
+prefix=/usr/local/atlas
+incinstdir=ATL_NoOverride
+libinstdir=ATL_NoOverride
+flapack=ATL_NoOverride
+flapacktar=ATL_NoOverride
+f77=1
+fulllapack=0
+#
+# path is configure path without trailing configure :)
+#
+path=`echo $0 | sed -e "s/configure$//"`
+#
+# blddir is present directory
+#
+blddir=`pwd`
+#
+# If on cygwin, prefix blddir with /cygdrive/[c,d]/
+#
+if [ -d /cygdrive ]
+then
+   if [ -d /cygdrive/c/cygwin/$blddir ]
+   then
+        blddir=/cygdrive/c/cygwin/$blddir
+   else
+      if [ -d /cygdrive/d/cygwin/$blddir ]
+      then
+        blddir=/cygdrive/d/cygwin/$blddir
+      fi
+   fi
+fi
+#
+# topdir is simply path if the line does not begin with "../" and is
+#  blddir/path otherwise
+chk=`echo "$path" | sed -e "s/^\.\.\///"`
+if test "$chk" = "$path"
+then
+   topdir="$path"
+else
+   topdir="$blddir"/"$path"
+fi
+#
+# Error out if topdir == blddir
+#
+touch $blddir/TstBld973.txt
+if [ -f "$topdir/TstBld973.txt" ]
+then
+   echo "ATLAS can no longer be  configured in the exact source directory,"
+   echo "create a subdir such as MyObj.  See ATLAS/INSTALL.txt for help."
+   rm $blddir/TstBld973.txt
+   exit 1
+fi
+rm $blddir/TstBld973.txt
+
+#
+# grab --cc=<c comp> and --cflags=<flags> to be used to build ATLAS's ANSI C
+# config.c, and save the rest of the arguments to by passed to the 
+# soon-to-be-built xconfig
+#
+#echo other args=$*
+bitwidth=0
+rdbitwidth=0
+dylib=0
+for arg in "$@"
+do
+   handled=0
+   flag=`echo "$arg" | sed -e "s/--help//"`
+   if test "$flag" != "$arg"
+   then
+      echo "ATLAS config includes this script, and probes written in C."
+      echo "Therefore, configure flags are union of script and probe flags."
+      echo "This configure script accepts the following flags:"
+      echo "   --cc=<C compiler> : compiler to compile configure probes"
+      echo "   --cflags='<flags>' : flags for above"
+      echo "   --prefix=<dirname> : Toplevel installation directory."
+      echo "                        Default: /usr/local/atlas"
+      echo "   --incdir=<dirname> : Installation dir for include files"
+      echo "                        Default: $prefix/include"
+      echo "   --libdir=<dirname> : Installation dir for libraries"
+      echo "                        Default: $prefix/lib"
+      echo "   --shared : same as --dylibs"
+      echo "   --dylibs : build dynamic/shared libs in addition to static libs"
+      echo '   --force-tids="<#> threadIDlist"'
+      echo "   --nof77 : You have no Fortran compiler installed.  Note that"
+      echo "             this will disallow building the F77 interface, and"
+      echo "             some of the tests (eg, standard BLAS testers)"
+      echo "  --with-netlib-lapack-tarfile=<path to lapack tarfile>"
+      echo "  --gcc3pass=<gcc for frontend>,<assembler>:<linker>"
+      echo "     Provide full paths for all compilers/assemblers"
+      echo "Attempting to build xconfig to get probe flags:"
+      rm -f Makefile > /dev/null 2>&1
+      echo BLDdir="$blddir" > Makefile
+      echo TOPdir="$topdir" >> Makefile
+      echo CC="$cc" >> Makefile
+      echo CFLAGS="$cflags" >> Makefile
+      cat "$path"/CONFIG/src/Makefile >> Makefile
+      make xconfig > /dev/null 2>&1
+      ./xconfig --help
+      rm -f Makefile xconfig atlconf_misc.o > /dev/null 2>&1
+      exit 1
+   fi
+#
+# Look for config flag -b <bidwidth>, if we find it set bitwidth to read next
+# args val, but don't set handled, since flag must be passed to config as well
+#
+   if test $rdbitwidth -eq 1
+   then
+      rdbitwidth=0
+      if test "$arg" -eq "64"
+      then
+         bitwidth=64
+      fi
+      if test "$arg" -eq "32"
+      then
+         bitwidth=32
+      fi
+   fi
+   if test "$arg" = "-b"
+   then
+      rdbitwidth=1
+   fi
+#
+   flag=`echo "$arg" | sed -e "s/--prefix=//"`
+   if test "$flag" != "$arg"
+   then
+      prefix="$flag"
+      handled=1
+   fi
+#
+   flag=`echo "$arg" | sed -e "s/--libdir=//"`
+   if test "$flag" != "$arg"
+   then
+      libinstdir="$flag"
+      handled=1
+   fi
+#
+   flag=`echo "$arg" | sed -e "s/--incdir=//"`
+   if test "$flag" != "$arg"
+   then
+      incinstdir="$flag"
+      handled=1
+   fi
+   flag=`echo "$arg" | sed -e "s/--force-tids=//"`
+   if test "$flag" != "$arg"
+   then
+      pass="$pass -tl $flag"
+      handled=1
+   fi
+   flag=`echo "$arg" | sed -e "s/--shared//"`
+   if test "$flag" != "$arg"
+   then
+      dylib=1
+      pass="$pass -D c -DATL_DYLIBS"
+      cflags="$cflags -DATL_DYLIBS"
+      handled=1
+   fi
+   flag=`echo "$arg" | sed -e "s/--dylibs//"`
+   if test "$flag" != "$arg"
+   then
+      dylib=1
+      pass="$pass -D c -DATL_DYLIBS"
+      cflags="$cflags -DATL_DYLIBS"
+      handled=1
+   fi
+#  --gcc3pass=gcc,as:lnk
+   flag=`echo "$arg" | sed -e "s/--gcc3pass=//"`
+   if test "$flag" != "$arg"
+   then
+      ccC=`echo "$flag" | sed -e "s/,.*//"`
+      ccA=`echo "$flag" | sed -e "s/.*,//" -e "s/:.*//"`
+      ccL=`echo "$flag" | sed -e "s/.*://"`
+      echo "#define MYGCC \"$ccC\"" > $blddir/gcc3p.c
+      echo "#define MYASM \"$ccA\"" >> $blddir/gcc3p.c
+      echo "#define MYLNK \"$ccL\"" >> $blddir/gcc3p.c
+      cat $topdir/CONFIG/src/gcc3p.c >> $blddir/gcc3p.c
+      $ccL -O -o $blddir/gcc3p $blddir/gcc3p.c
+      cc=$blddir/gcc3p
+      cflags="$cflags -DATL_GCC3P"
+      handled=1
+   fi
+#
+   flag=`echo "$arg" | sed -e "s/--apple-is-evil=//"`
+   if test "$flag" != "$arg"
+   then
+      ccF=`echo "$flag" | sed -e "s/,.*//"`
+      ccB=`echo "$flag" | sed -e "s/.*,//"`
+      echo "#define MYGCC \"$ccF\"" > $blddir/gccclang.c
+      echo "#define MYASM \"$ccB\"" >> $blddir/gccclang.c
+      echo "#define MYLNK \"$ccB\"" >> $blddir/gccclang.c
+      cat $topdir/CONFIG/src/gnuccw.c >> $blddir/gccclang.c
+      $ccB -O -o $blddir/gccclang $blddir/gccclang.c
+      cc=$blddir/gccclang
+      cflags="$cflags -DATL_GCCCLANG"
+      handled=1
+   fi
+#
+   flag=`echo "$arg" | sed -e "s/--with-netlib-lapack-tarfile=//"`
+   if test "$flag" != "$arg"
+   then
+      flapacktar="$flag"
+      pass="$pass -Si lapackref 1"
+      handled=1
+      fulllapack=1
+   fi
+#
+#
+   flag=`echo "$arg" | sed -e "s/--nof77//"`
+   if test "$flag" != "$arg"
+   then
+      f77=0
+      pass="$pass -Si nof77 1"
+      handled=1
+      fulllapack=0
+   fi
+#
+   flag=`echo "$arg" | sed -e "s/--cc=//"`
+   if test "$flag" != "$arg"
+   then
+      cc="$flag"
+       handled=1
+   else
+      flag=`echo "$arg" | sed -e "s/--cflags=//"`
+      if test "$flag" != "$arg"
+      then
+         handled=1
+         if test $dylib -eq 0
+         then
+            cflags="$flag"
+         else
+            cflags="$flag -DATL_DYLIBS"
+         fi
+      fi
+   fi
+   if test $handled -eq 0
+   then
+#
+#     Get rid of leading and trailing spaces
+#
+      arg=`echo "$arg" | sed -e "s/^ +//"`
+      arg=`echo "$arg" | sed -e "s/ +$//"`
+# 
+#     If flag have internal spaces, surround it with ''
+#
+      flag=`echo "$arg" | sed -e "s/ //"`
+      if (test "$flag" != "$arg")
+      then
+         pass="$pass '`echo "$arg"`'"
+      else
+         pass="$pass $arg"
+      fi
+   fi
+done
+OSGUESS=`uname`
+#
+# Need to do some special crap for AIX installs
+#
+flag=`echo "$OSGUESS" | sed -e "s/AIX//"`
+if test "$flag" != "$OSGUESS"
+then
+   if test $bitwidth -eq 64
+   then
+      export OBJECT_MODE=64
+      if test $cc = "gcc"
+      then
+         flag=`echo "$cflags" | sed -e "s/-maix//"`
+         if test "$flag" = "$cflags"
+         then
+             cflags="$cflags -maix64"
+         fi
+      fi
+   else
+      export OBJECT_MODE=32
+   fi
+fi
+if test $incinstdir = "ATL_NoOverride"
+then
+   incinstdir='$(DESTDIR)/include'
+fi
+if test $libinstdir = "ATL_NoOverride"
+then
+   libinstdir='$(DESTDIR)/lib'
+fi
+#
+# Create the Makefile and copy the compiler info file
+#
+echo BLDdir="$blddir" > Makefile
+echo TOPdir="$topdir" >> Makefile
+echo DESTDIR="$prefix" >> Makefile
+echo INCINSTdir="$incinstdir" >> Makefile
+echo LIBINSTdir="$libinstdir" >> Makefile
+echo CC="$cc" >> Makefile
+echo CFLAGS="$cflags" >> Makefile
+if test $f77 -eq 0
+then
+   fulllapack=0
+   echo TESTS=C_test >> Makefile
+   echo PTTESTS=C_pttest >> Makefile
+else
+   echo TESTS=test >> Makefile
+   echo PTTESTS=pttest >> Makefile
+fi
+#
+# Setup targets to build dynamic/shared libs if user has requested it
+#
+echo "def : build" >> Makefile
+echo "shared : dylibs" >> Makefile
+echo "dylibs:" >> Makefile
+if test $dylib -ne 0
+then
+   echo "	cd lib ; \$(MAKE) shared_all" >> Makefile
+fi
+#
+# OS X/Darwin 10.5 or later needs special clean commands to get rid of *.dSYM
+# directories that gcc creates whenever -g is thrown
+# If we are doing dynamic/shared libs, we also need to look for Apple's libtool
+# in preference to the gnu version
+#
+LIBTOOL=libtool
+flag=`echo "$OSGUESS" | sed -e "s/Darwin//"`
+if test "$flag" != "$OSGUESS"
+then
+   echo "CLEANdep = OSXClean" >> Makefile
+   if test $dylib -eq 1
+   then
+      OUTTMP=`$LIBTOOL -V`
+      flag=`echo "$OUTTMP" | sed -e "s/Apple//"`
+      if test "$flag" != "$OUTTMP"
+      then
+         OUTTMP=`/usr/bin/libtool -V`
+         flag=`echo "$OUTTMP" | sed -e "s/Apple//"`
+         if test "$flag" != "$OUTTMP"
+         then
+            LIBTOOL=/usr/bin/libtool
+         else
+            echo "Cannot find Apple libtool for making shared libraries!"
+            exit 10 
+         fi
+      fi
+   fi
+else
+   echo "CLEANdep = " >> Makefile
+fi
+cat "$path"/CONFIG/src/Makefile >> Makefile
+flag=`echo "$OSGUESS" | sed -e "s/Darwin//"`
+if test "$flag" != "$OSGUESS"
+then
+   echo "OSXClean:" >> Makefile
+   echo "	rm -rf *.dSYM" >> Makefile
+fi
+cp "$path"/CONFIG/src/atlcomp.txt .
+#
+# Build and run xconfig
+#
+make -f Makefile xconfig
+echo ./xconfig -d s "$topdir" -d b "$blddir" "$pass"
+#./xconfig -d s "$topdir" -d b "$blddir" `echo "$pass"`
+if test $fulllapack -eq 0
+then
+   echo ./xconfig -d s "$topdir" -d b "$blddir" "$pass" | /bin/sh
+else
+   echo ./xconfig -d s "$topdir" -d b "$blddir" "$pass" \
+        -D c -DATL_FULL_LAPACK | /bin/sh
+fi
+ierr=$?
+if test $ierr -ne 0
+then
+   echo xconfig exited with $ierr
+   exit $ierr
+fi
+#
+# Build subdirectory structure and copy all makefiles
+#
+make -f Makefile make_subdirs
+cp -f "$path"/Make.top .
+cp -f "$path"/CONFIG/src/ATLrun.sh bin/.
+make -f Makefile startup
+if test $flapacktar != "ATL_NoOverride"
+then
+    chk=`echo "$flapacktar" | sed -e "s/^\.\.\///"`
+    if test "$chk" = "$flapacktar"
+    then
+       flatar="$flapacktar"
+    else
+       flatar="$blddir"/"$flapacktar"
+    fi
+    if [ -f "$flatar" ]
+    then
+#
+#      Unpack the LAPACK tarfile into $blddir/src/lapack/reftmp
+#
+       mkdir $blddir/src/lapack/reftmp
+       cd  $blddir/src/lapack/reftmp
+       flag=`echo "$flatar" | sed -e "s/\.bz2//"`
+       if (test "$flag" != "$flatar")
+       then
+          bunzip2 -c $blddir/$flatar | tar xf -
+       else
+          flag=`echo "$flatar" | sed -e "s/\.gz//"`
+          if (test "$flag" != "$flatar")
+          then
+             gunzip -c $flatar | tar xf -
+          else
+             flag=`echo "$flatar" | sed -e "s/\.tgz//"`
+             if (test "$flag" != "$flatar")
+             then
+                gunzip -c $flatar | tar xf -
+             else
+                tar xf $flatar
+             fi
+          fi
+       fi
+#
+#      LAPACK directory name changes with version, so we untar it to a temp
+#      directory, and then move it to a  fixed name (reference).  We don't
+#      use tar's ability to ignore the first directory, because this doesn't
+#      port to all OSes tars (would require gnu-tar specifically)
+#      Should only be one file!
+#
+       for file in *
+       do
+          if [ -d "$file" ]
+          then
+             mv $file ../reference
+          fi
+       done
+       cd ..
+       rm -rf reftmp
+    else
+       echo "Cannot find '$flatar'"
+       exit -1
+    fi
+fi
+cd $blddir
+if test $flapack != "ATL_NoOverride"
+then
+   cp -f $flapack lib/liblapack.a
+   ar d lib/liblapack.a lsame.o xerbla.o csrot.o zdrot.o
+fi
+#
+# Provide INSTALL directories to lib/Makefile
+#
+mv lib/Makefile lib/Make.tmp
+echo LIBTOOL="$LIBTOOL" > lib/Makefile
+echo DESTDIR="$prefix" >> lib/Makefile
+echo INCINSTdir="$incinstdir" >> lib/Makefile
+echo LIBINSTdir="$libinstdir" >> lib/Makefile
+#
+# Create standard target for making dynamic/shared according to flags
+#
+if test $dylib -eq 1
+then
+#
+#  OS X uses the dylib/libtool targets
+#
+   flag=`echo "$OSGUESS" | sed -e "s/Darwin//"`
+   if test "$flag" != "$OSGUESS"
+   then
+      if test $f77 -eq 0
+      then
+         echo "shared_all :" >> lib/Makefile
+         echo "	\$(MAKE) cdylib" >> lib/Makefile
+         echo "	- \$(MAKE) ptcdylib" >> lib/Makefile
+      else
+         echo "shared_all :" >> lib/Makefile
+         echo "	\$(MAKE) dylib" >> lib/Makefile
+         echo "	- \$(MAKE) ptdylib" >> lib/Makefile
+      fi
+   else
+#
+#     Cygwin uses dll targets
+#
+      flag=`echo "$OSGUESS" | sed -e "s/CYGWIN//"`
+      if test "$flag" != "$OSGUESS"
+      then
+         if test $f77 -eq 0
+         then
+            echo "shared_all :" >> lib/Makefile
+            echo "	\$(MAKE) cdlls" >> lib/Makefile
+            echo "	- \$(MAKE) ptcdlls" >> lib/Makefile
+         else
+            echo "shared_all :" >> lib/Makefile
+            echo "	\$(MAKE) dlls" >> lib/Makefile
+            echo "	- \$(MAKE) ptdlls" >> lib/Makefile
+         fi
+#
+#     For everybody else, we use the .so/shared targets (only tested on Linux)
+#
+      else
+         if test $f77 -eq 0
+         then
+            echo "shared_all :" >> lib/Makefile
+            echo "	\$(MAKE) cshared" >> lib/Makefile
+            echo "	- \$(MAKE) cptshared" >> lib/Makefile
+         else
+            echo "shared_all :" >> lib/Makefile
+            echo "	\$(MAKE) shared" >> lib/Makefile
+            echo "	- \$(MAKE) ptshared" >> lib/Makefile
+         fi
+     fi
+   fi
+fi
+cat lib/Make.tmp >> lib/Makefile
+rm -f lib/Make.tmp
+echo "DONE configure"
+#

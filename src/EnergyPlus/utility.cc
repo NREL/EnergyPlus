@@ -410,24 +410,25 @@ void cpuid( int whichlp )
 //int main( int argc, char * argv[] )
 int getPhysicalProCount()
 {
-   int nlp, num_processors, i, j, current;
-   /* if (argc>1 && !strcmp( argv[1], "-more" )) */
-   /*    more = 1; */
-   /* else */
-   /*    printf( "( %s -more gives you more details. )\n\n", argv[0] ); */
-   memset( (void *) &LogicalProcessorMap, 0, sizeof( LogicalProcessorMap ) );
-   memset( (void *) &PhysProcIds, 0, sizeof( PhysProcIds ) );
-   nlp = QueryNumLogicalProcessors();
-   current = whichcpu();
-   for ( i = 0; i < nlp; i++ )
-      cpuid( i );
-   LockToLogicalProcessor( current );
-   num_processors = 0;
-   for ( i = 0; i < nlp; i++ )
-      PhysProcIds[LogicalProcessorMap[i].nProcId]++;
-   for ( i = 0; i < (MAX_NUMBER_OF_PHYSICAL_PROCESSORS+MAX_NUMBER_OF_IOAPICS); i++ )
-      if (PhysProcIds[i]) 
-         num_processors++;      
+  return 4;
+   // int nlp, num_processors, i, j, current;
+   // /* if (argc>1 && !strcmp( argv[1], "-more" )) */
+   // /*    more = 1; */
+   // /* else */
+   // /*    printf( "( %s -more gives you more details. )\n\n", argv[0] ); */
+   // memset( (void *) &LogicalProcessorMap, 0, sizeof( LogicalProcessorMap ) );
+   // memset( (void *) &PhysProcIds, 0, sizeof( PhysProcIds ) );
+   // nlp = QueryNumLogicalProcessors();
+   // current = whichcpu();
+   // for ( i = 0; i < nlp; i++ )
+   //    cpuid( i );
+   // LockToLogicalProcessor( current );
+   // num_processors = 0;
+   // for ( i = 0; i < nlp; i++ )
+   //    PhysProcIds[LogicalProcessorMap[i].nProcId]++;
+   // for ( i = 0; i < (MAX_NUMBER_OF_PHYSICAL_PROCESSORS+MAX_NUMBER_OF_IOAPICS); i++ )
+   //    if (PhysProcIds[i]) 
+   //       num_processors++;      
 
    /* for ( i = 0; i < (MAX_NUMBER_OF_PHYSICAL_PROCESSORS+MAX_NUMBER_OF_IOAPICS); i++ ) */
    /* { */
@@ -449,8 +450,8 @@ int getPhysicalProCount()
    /* printf( "Number of threads per processor core: %d\n", LogicalProcessorMap[0].nThreadsperCPUCore ); */
   
    //   return( 0 ) ;
-   std::cout << "detected " << num_processors << " physical processors." << std::endl;
-   return num_processors;
+   // std::cout << "detected " << num_processors << " physical processors." << std::endl;
+   // return num_processors;
 }
   
   //  const int Perf_Thread_Count = 4; //Utility::getProcElementCount();
@@ -482,11 +483,10 @@ int getPhysicalProCount()
   //the memory allocation fails because it isn't a power of 2, this is a place to check
 long
 Utility::getL1CacheLineSize(){
-  //  int ax, bx ,cx, dx;
-  int regs[4];
-  //mycpuid(0x1, regs); //ax, bx, cx, dx);
-  mycpuid(regs, 0x1);
-  return ((0xFFFF & regs[1]) >> 8);
+  return 64;
+  // int regs[4];
+  // mycpuid(regs, 0x1);
+  // return ((0xFFFF & regs[1]) >> 8);
 }
 
 // int

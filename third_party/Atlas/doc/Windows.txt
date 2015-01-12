@@ -1,0 +1,34 @@
+
+                               IMPORTANT:
+Windows 95/98/ME does a remarkably poor job of process load balance.  If you
+change the focus from the cygnus window, performance will immediately drop by
+at least 1/3, and the timings will be inaccurate.  It is recommended that you
+leave the focus on the install window throughout the entire install procedure.
+This is not necessary for Windows NT/2K/XP.
+
+ATLAS requires unix-style make and /bin/sh commands in order to install on a
+windows system.  A fairly complete unix-style environment is available free of
+charge at:
+   http://www.cygwin.com/
+
+From this website, you can download the package, get installation instructions,
+etc.  You will want to download the "full" version of cygwin, which includes
+compilers, shells, make, etc.  Be sure you get all the compilers you are
+interested in (ATLAS requires gcc, and you will probably want g77 or gfortran
+as well).
+
+The cygwin installation is quite simple, involving downloading an executable
+and installing with Windows' usual install procedure (you can remove it from
+your machine with Windows' ADD/REMOVE if you later decide you don't want it).
+
+After this is done, simply follow the instructions given in atlas_install.pdf,
+running all command in a cygwin window.  By default, ATLAS will be compiled
+with the gnu gcc compiler that comes with cygnus.  Gnu gcc provides better
+ATLAS performance than does MSVC++, Watcom C, or Intel icl, so we recommend
+that you leave gcc as the compiler.  If you need to interoperate with Native
+windows compilers like Intel icl or MSVC++, we suggest you build using the
+MinGW compilers.  See the install guide for further details, and check
+the errata file at:
+   http://math-atlas.sourceforge.net/errata.html#WinBuild
+
+

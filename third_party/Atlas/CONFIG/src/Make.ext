@@ -1,0 +1,98 @@
+
+topd = /home/whaley/git/math-atlas/AtlasBase
+ext  = /home/whaley/git/math-atlas/STAB/xextract
+extF = $(ext) -langF -lnlen71 -Remtblank -llwarn2 -LAPACK1 $(incs)
+ext9 = $(ext) -langF -lnlen132 -RemtBlank $(incs)
+extC = $(ext) -langC -lnlen79 -Remtblank -llwarn2 $(incs)
+extM = $(ext) -langM -lnlen79 -llwarn2 $(incs)
+incs = -def topd /home/whaley/git/math-atlas/AtlasBase \
+       -def incd /home/whaley/git/math-atlas/AtlasBase/Clint \
+       -def ext  /home/whaley/git/math-atlas/STAB/xextract \
+       -def BASEdir /home/whaley/git/math-atlas/AtlasBase/Antoine/ \
+       -def basd /home/whaley/git/math-atlas/AtlasBase/Clint
+
+default: all
+force_build:
+basd = /home/whaley/git/math-atlas/AtlasBase/Clint
+basdRCW = /home/whaley/git/math-atlas/AtlasBase/Clint
+basdAPP = /home/whaley/git/math-atlas/AtlasBase/Antoine
+basdSTU = /home/whaley/git/math-atlas/AtlasBase/Students
+incf = /home/whaley/git/math-atlas/AtlasBase/gen.inc
+
+basf = $(basdRCW)/atlconf.base
+
+
+files = ATLrun.sh CompMake.txt IsGcc.c Makefile SpewMakeInc.c atlbench.c \
+        atlcomp.txt atlconf_misc.c config.c gcc3p.c gnuccw.c gnuf90w.c \
+        mgwcmp.c print_enums.c probe_OS.c probe_aff.c probe_arch.c \
+        probe_asm.c probe_comp.c probe_f2c.c probe_pmake.c probe_vec.c \
+        wincc.c winf77.c
+
+all : $(files)
+force_build:
+dirall : all force_build
+	$(extM) -o ../include/Make.ext -langM -b $(topd)/make.base \
+                rout=ATLAS/CONFIG/include
+	cd ../include ; $(MAKE) -f Make.ext all
+	$(extM) -o backend/Make.ext -langM -b $(topd)/make.base \
+                rout=ATLAS/CONFIG/src/backend
+	cd backend ; $(MAKE) -f Make.ext all
+killall :
+	rm -f ../include/* backend/* $(files) x* *.o
+
+../../configure : $(basf)
+	$(extM) -b $(basf) -o ../../configure rout=configure
+	chmod a+x ../../configure
+ATLrun.sh: $(basf)
+	$(extM) -b $(basf) -o ATLrun.sh rout=ATLrun.sh
+	chmod a+x ATLrun.sh
+Make.ext : $(topd)/make.base
+	$(extM) -b $(topd)/make.base -o Make.ext rout=atlas/config/src
+Makefile : $(basf)
+	$(extM) -b $(basf) -o Makefile rout=Makefile
+atlcomp.txt : $(basf)
+	$(extC) -b $(basf) -o atlcomp.txt rout=atlcomp.txt
+CompMake.txt : $(basf)
+	$(extC) -b $(basf) -o CompMake.txt rout=CompMake.txt
+
+atlconf_misc.c : $(basf)
+	$(extC) -b $(basf) -o atlconf_misc.c rout=atlconf_misc
+probe_OS.c : $(basf)
+	$(extC) -b $(basf) -o probe_OS.c rout=probe_OS
+probe_asm.c : $(basf)
+	$(extC) -b $(basf) -o probe_asm.c rout=probe_asm
+config.c : $(basf)
+	$(extC) -b $(basf) -o config.c rout=config
+probe_vec.c : $(basf)
+	$(extC) -b $(basf) -o probe_vec.c rout=probe_vec
+probe_arch.c : $(basf)
+	$(extC) -b $(basf) -o probe_arch.c rout=probe_arch
+print_enums.c : $(basf)
+	$(extC) -b $(basf) -o print_enums.c rout=print_enums
+probe_comp.c : $(basf)
+	$(extC) -b $(basf) -o probe_comp.c rout=probe_comp
+SpewMakeInc.c : $(basf)
+	$(extC) -b $(basf) -o SpewMakeInc.c rout=SpewMakeInc
+probe_f2c.c : $(basf)
+	$(extC) -b $(basf) -o probe_f2c.c rout=probe_f2c
+probe_pmake.c : $(basf)
+	$(extC) -b $(basf) -o probe_pmake.c rout=probe_pmake
+atlbench.c : $(basf)
+	$(extC) -b $(basf) -o atlbench.c rout=atlbench
+wincc.c : $(basf)
+	$(extC) -b $(basf) -o wincc.c rout=wincc
+winf77.c : $(basf)
+	$(extC) -b $(basf) -o winf77.c rout=winf77
+mgwcmp.c : $(basf)
+	$(extC) -b $(basf) -o mgwcmp.c rout=mgwcmp
+probe_aff.c : $(basf)
+	$(extC) -b $(basf) -o probe_aff.c rout=probe_aff
+IsGcc.c : $(basf)
+	$(extC) -b $(basf) -o IsGcc.c rout=IsGcc
+gnuccw.c : $(basf)
+	$(extC) -b $(basf) -o gnuccw.c rout=gnuccw
+gnuf90w.c : $(basf)
+	$(extC) -b $(basf) -o gnuf90w.c rout=gnuf90w
+gcc3p.c : $(basf)
+	$(extC) -b $(basf) -o gcc3p.c rout=gcc3p
+	

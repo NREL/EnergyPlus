@@ -1,0 +1,17 @@
+#  ---------------------------------------------------------------------------
+#  Various compilers and linkers.  The compilers recognized by ATLAS are:
+#    F77 :  Compiler to compile f77 interface code with -- Should match what
+#           user compile's his own code with; has no affect on ATLAS
+#           performance
+#    ICC :  Compiler to used to compile all non-kernels in ATLAS, including
+#           C interface codes.  Should match whatever compiler user compiles
+#           with.  Impact on performance should be minimal.
+#    SMC :  Compiler to use to compile single precision matmul kernels
+#    DMC :  Compiler to use to compile double precision matmul kernels
+#    SKC :  Compiler to use to compile single precision non-matmul kernels
+#    DKC :  Compiler to use to compile double precision non-matmul kernels
+#    XCC :  Compiler to be used on the compile engine of a cross-compiler
+#  These C compiler are mostly the same, but flags are often different.
+#  Note that if you specify no F77 compiler, F77 will be set to a C compiler
+#  to aid in linking.
+#  ---------------------------------------------------------------------------

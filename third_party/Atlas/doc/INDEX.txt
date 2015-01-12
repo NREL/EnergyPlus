@@ -1,0 +1,35 @@
+This is the README index file.  If you want install intructions,
+read ATLAS/INSTALL.txt.  Windows users should read
+ATLAS/doc/Windows.txt as well.  Note that all of this documentation is
+probably out of date.  The website always contains the most current versions:
+   http://math-atlas.sourceforge.net/faq.html#doc
+
+
+A listing of the ATLAS documentation files is:
+
+                                 in ATLAS/
+INSTALL.txt       : Basic ATLAS installation instructions as text
+README            : This file
+
+
+                              in ATLAS/doc/
+AtlasCredits.txt : The ATLAS team
+atlas_install.pdf: Relatively complete guide to configuring, building,
+                   installing and testing ATLAS.
+BootSequence.txt : Rough outline of how the ATLAS install works, and what
+                   files it creates.
+ChangeLog.txt    : Brief summmary of changes from previous releases.
+DirStruct.txt    : A graphic of the general organization of the ATLAS files
+INDEX.txt        : This index file again
+LibReadme.txt    : Information on generated libraries.
+TestTime.txt     : Information on using the ATLAS testing and timing programs
+TroubleShoot.txt : Help with troubleshooting your installation, including
+                   where to find more help
+Windows.txt      : Special information users of Microsoft Windows (95/98/NT/2K)
+                   should read
+atlas_contrib.pdf: Information on how users can speedup and contribute to
+                   ATLAS by providing low-level kernel routines
+altas_over.pdf   : Paper describing ideas and basic methods of ATLAS
+cblas.pdf        : Extract of the BLAST standard document, describing the
+                   standard C interface to the BLAS.
+fblasqr.pdf      : Quick reference to the F77 interface to the BLAS.

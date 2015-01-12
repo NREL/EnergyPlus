@@ -328,6 +328,7 @@ namespace DataHeatBalance {
 	int NumHotWaterEqStatements( 0 ); // number of Hot Water Equipment objects in input. - possibly global assignments
 	int NumSteamEqStatements( 0 ); // number of Steam Equipment objects in input. - possibly global assignments
 	int NumOtherEqStatements( 0 ); // number of Other Equipment objects in input. - possibly global assignments
+	int NumZoneITEqStatements( 0 ); // number of Other Equipment objects in input. - possibly global assignments
 	int TotPeople( 0 ); // Total People Statements in input and extrapolated from global assignments
 	int TotLights( 0 ); // Total Lights Statements in input and extrapolated from global assignments
 	int TotElecEquip( 0 ); // Total Electric Equipment Statements in input and extrapolated from global assignments
@@ -585,6 +586,7 @@ namespace DataHeatBalance {
   std::vector< GenZone > ZoneSpecs;
 	FArray1D< ZoneEquipData > ZoneHWEq;
 	FArray1D< ZoneEquipData > ZoneSteamEq;
+	FArray1D< ITEquipData > ZoneITEq;
 	FArray1D< BBHeatData > ZoneBBHeat;
 	FArray1D< InfiltrationData > Infiltration;
 	FArray1D< VentilationData > Ventilation;
