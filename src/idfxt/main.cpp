@@ -17,26 +17,27 @@ using namespace idfx;
 
 const std::string VERSION_TEXT = "0.0.1";
 const std::string HELP_TEXT =
-        "\n'idfxt' is a command-line tool for translating IDF files\nto a format suitable for EnergyPlus (version > 8.3).\n"
-        "\nUSAGE:\n\tidfxt [option] [value]\n\nOPTIONS:\n"
-        "  --idf \t -i <input_filename>\n\t\t\t Translate an IDF (.IDF) file to JSON (.IDFj),\n\t\t\t and validate.\n\n"
-        "  --json\t -j <input_filename>\n\t\t\t Validate a JSON (.IDFj) file,\n\t\t\t and show results.\n\n"
-        "  --json\t -t <input_filename>\n\t\t\t Test - dump to console all the objects' property maps\n\n"
-        "  --version\t -v      Display idfxt version information.\n"
-        "  --help\t -h      Display usage information.\n"
-        "\nExamples:\n"
-        "  idfxt -i example.idf  \n\t\tTranslate and import IDF file.\n\n"
-        "  idfxt -j example.idfj \n\t\tValidate IDFj file.\n\n"
-        "Note:\n  'idfxt' is primarily a tool for updating legacy IDF files.\n"
-        "  Application developers should use the standard C++ library,\n  that idfxt is built upon, for building their own applications.\n"
-        "  Information can be found at : <url here>\n\n" ;
+    "\n'idfxt' is a command-line tool for translating IDF files\nto a format suitable for EnergyPlus (version > 8.3).\n"
+    "\nUSAGE:\n\tidfxt [option] [value]\n\nOPTIONS:\n"
+    "  --idf \t -i <input_filename>\n\t\t\t Translate an IDF (.IDF) file to JSON (.IDFj),\n\t\t\t and validate.\n\n"
+    "  --json\t -j <input_filename>\n\t\t\t Validate a JSON (.IDFj) file,\n\t\t\t and show results.\n\n"
+    "  --json\t -t <input_filename>\n\t\t\t Test - dump to console all the objects' property maps\n\n"
+    "  --version\t -v      Display idfxt version information.\n"
+    "  --help\t -h      Display usage information.\n"
+    "\nExamples:\n"
+    "  idfxt -i example.idf  \n\t\tTranslate and import IDF file.\n\n"
+    "  idfxt -j example.idfj \n\t\tValidate IDFj file.\n\n"
+    "Note:\n  'idfxt' is primarily a tool for updating legacy IDF files.\n"
+    "  Application developers should use the standard C++ library,\n  that idfxt is built upon, for building their own applications.\n"
+    "  Information can be found at : <url here>\n\n" ;
 
 JSONDataInterface *Data;
 
 //utility function
 
-std::string replaceString(std::string subject, const std::string& search,
-                          const std::string& replace) {
+std::string replaceString(std::string subject, const std::string &search,
+                          const std::string &replace)
+{
     size_t pos = 0;
     while ((pos = subject.find(search, pos)) != std::string::npos) {
         subject.replace(pos, search.length(), replace);
@@ -83,12 +84,21 @@ void test_DumpPropertyMaps(string in_file)
     Data->importIDFModel(in_file);  //load Data
     auto allobjects = Data->getModelObjects();
     while (!allobjects.empty()) {
-        auto oneObject(allobjects.front());
-        auto onePropertyMap = oneObject->getProperties();
-        for (const auto& one : onePropertyMap) {
+        auto one_object(allobjects.front());
+        //cout << oneObject->print();
+        for (const auto & one : one_object->getProperties()) {
             cout << one.first << " : " << one.second << endl;
         }
-        cout << endl;
+        for (const auto & child : one_object->getExtensions()) {
+            if (child) {
+                //	  cout << endl << " ---  " << child->print();
+                cout << " ---------------- \n";
+                for (const auto & key_val : child->getProperties()) {
+                    cout << " ---  " << key_val.first << " : " << key_val.second << endl;
+                }
+            }
+        }
+        cout << endl << endl;
         allobjects.pop_front();
     }
 }

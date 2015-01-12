@@ -43,14 +43,18 @@ public:
 //    void setPropertyValue(std::string, int);
 //    void setPropertyValue(std::string, double);
 
-    std::list<JSONDataObject> getChildren();
+    std::list<std::shared_ptr<JSONDataObject> > getExtensions();
 
+    
+    std::string print();
     //friend access private constructor to avoid conversion to/from strings internally
 //    friend std::list<JSONDataObject> JSONDataInterface::getModelObjects(std::string);
+
 
 private:
     cJSON *data_j;
 
+    void c_getChildren(std::list< std::shared_ptr< idfx::JSONDataObject > > &return_object_list, cJSON *subitem);
 //    JSONDataObject(cJSON &cjson); //to hide cJSON pointer
 };
 
