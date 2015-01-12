@@ -110,6 +110,17 @@ macro( CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES )
   endif()
 endmacro()
 
+# Named arguments 
+# IDF_FILE <filename> IDF input file
+# EPW_FILE <filename> EPW weather file
+# 
+# Optional Arguments
+# DESIGN_DAY_ONLY force design day simulation
+# ANNUAL_SIMULATION force annual simulation
+# EXPECT_FATAL Expect simulation to fail
+# COST <integer> Cost of this simulation relative to other simulations.
+#                Higher cost simulations run earlier in an attempt to enhance
+#                test parallelization and reduce overall test run time.
 function( ADD_SIMULATION_TEST )
   set(options ANNUAL_SIMULATION DESIGN_DAY_ONLY EXPECT_FATAL)
   set(oneValueArgs IDF_FILE EPW_FILE COST)
