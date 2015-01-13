@@ -88,8 +88,8 @@ namespace HighTempRadiantSystem {
 		Real64 GasEnergy; // system gas consumption in Joules
 		Real64 HeatPower; // actual heating sent to zone (convective and radiative) in Watts
 		Real64 HeatEnergy; // actual heating sent to zone (convective and radiative) in Joules
-		int HeatingCapMethod; // - Method for High Temperature Radiant heating capacity scalable sizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
-		Real64 ScaledHeatingCapacity; // - High Temperature Radiant scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2} 
+		int HeatingCapMethod; // - Method for High Temperature Radiant heating capacity scalable sizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
+		Real64 ScaledHeatingCapacity; // - High Temperature Radiant scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2}
 
 		// Default Constructor
 		HighTempRadiantSystemData() :
@@ -146,8 +146,8 @@ namespace HighTempRadiantSystem {
 			Real64 const GasEnergy, // system gas consumption in Joules
 			Real64 const HeatPower, // actual heating sent to zone (convective and radiative) in Watts
 			Real64 const HeatEnergy, // actual heating sent to zone (convective and radiative) in Joules
-			int const HeatingCapMethod, // - Method for High Temperature Radiant heating capacity scalable sizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
-			Real64 const ScaledHeatingCapacity // - High Temperature Radiant scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2} 
+			int const HeatingCapMethod, // - Method for High Temperature Radiant heating capacity scalable sizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
+			Real64 const ScaledHeatingCapacity // - High Temperature Radiant scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2}
 		) :
 			Name( Name ),
 			SchedName( SchedName ),

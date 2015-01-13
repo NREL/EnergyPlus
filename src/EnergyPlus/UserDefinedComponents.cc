@@ -200,7 +200,7 @@ namespace UserDefinedComponents {
 
 			} else {
 				// throw warning
-				ShowFatalError( "SimUserDefinedPlantComponent: did not find where called from" " loop number called from =" + TrimSigDigits( LoopNum ) + " , loop side called from =" + TrimSigDigits( LoopSideNum ) );
+				ShowFatalError( "SimUserDefinedPlantComponent: did not find where called from loop number called from =" + TrimSigDigits( LoopNum ) + " , loop side called from =" + TrimSigDigits( LoopSideNum ) );
 			}
 			return;
 		}

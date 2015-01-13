@@ -655,7 +655,7 @@ namespace HVACUnitaryBypassVAV {
 			if ( CBVAV( CBVAVNum ).MixerInletAirNode != OANodeNums( 3 ) ) {
 				ShowSevereError( CurrentModuleObject + ": " + CBVAV( CBVAVNum ).Name );
 				ShowContinueError( "Illegal " + cAlphaFields( 5 ) + " = " + MixerInletNodeName + '.' );
-				ShowContinueError( cAlphaFields( 5 ) + " must be the same as" " the return air stream node specified in the OutdoorAir:Mixer object." );
+				ShowContinueError( cAlphaFields( 5 ) + " must be the same as the return air stream node specified in the OutdoorAir:Mixer object." );
 				ErrorsFound = true;
 			}
 
@@ -710,13 +710,13 @@ namespace HVACUnitaryBypassVAV {
 			if ( FanVolFlow != AutoSize ) {
 				if ( FanVolFlow < CBVAV( CBVAVNum ).MaxCoolAirVolFlow && CBVAV( CBVAVNum ).MaxCoolAirVolFlow != AutoSize ) {
 					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( FanVolFlow, 7 ) + " in " + cAlphaFields( 11 ) + " = " + CBVAV( CBVAVNum ).FanName + " is less than the " + cNumericFields( 1 ) );
-					ShowContinueError( " " + cNumericFields( 1 ) + " is reset to the" " fan flow rate and the simulation continues." );
+					ShowContinueError( ' ' + cNumericFields( 1 ) + " is reset to the fan flow rate and the simulation continues." );
 					ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + CBVAV( CBVAVNum ).Name );
 					CBVAV( CBVAVNum ).MaxCoolAirVolFlow = FanVolFlow;
 				}
 				if ( FanVolFlow < CBVAV( CBVAVNum ).MaxHeatAirVolFlow && CBVAV( CBVAVNum ).MaxHeatAirVolFlow != AutoSize ) {
 					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( FanVolFlow, 7 ) + " in " + cAlphaFields( 11 ) + " = " + CBVAV( CBVAVNum ).FanName + " is less than the " + cNumericFields( 2 ) );
-					ShowContinueError( " " + cNumericFields( 2 ) + " is reset to the" " fan flow rate and the simulation continues." );
+					ShowContinueError( ' ' + cNumericFields( 2 ) + " is reset to the fan flow rate and the simulation continues." );
 					ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + CBVAV( CBVAVNum ).Name );
 					CBVAV( CBVAVNum ).MaxHeatAirVolFlow = FanVolFlow;
 				}
@@ -725,7 +725,7 @@ namespace HVACUnitaryBypassVAV {
 			//   only check that OA flow in cooling is >= SA flow in cooling when they are not autosized
 			if ( CBVAV( CBVAVNum ).CoolOutAirVolFlow > CBVAV( CBVAVNum ).MaxCoolAirVolFlow && CBVAV( CBVAVNum ).CoolOutAirVolFlow != AutoSize && CBVAV( CBVAVNum ).MaxCoolAirVolFlow != AutoSize ) {
 				ShowWarningError( CurrentModuleObject + ": " + cNumericFields( 4 ) + " cannot be greater than " + cNumericFields( 1 ) );
-				ShowContinueError( " " + cNumericFields( 4 ) + " is reset to the" " fan flow rate and the simulation continues." );
+				ShowContinueError( ' ' + cNumericFields( 4 ) + " is reset to the fan flow rate and the simulation continues." );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + CBVAV( CBVAVNum ).Name );
 				CBVAV( CBVAVNum ).CoolOutAirVolFlow = FanVolFlow;
 			}
@@ -733,7 +733,7 @@ namespace HVACUnitaryBypassVAV {
 			//   only check that SA flow in heating is >= OA flow in heating when they are not autosized
 			if ( CBVAV( CBVAVNum ).HeatOutAirVolFlow > CBVAV( CBVAVNum ).MaxHeatAirVolFlow && CBVAV( CBVAVNum ).HeatOutAirVolFlow != AutoSize && CBVAV( CBVAVNum ).MaxHeatAirVolFlow != AutoSize ) {
 				ShowWarningError( CurrentModuleObject + ": " + cNumericFields( 5 ) + " cannot be greater than " + cNumericFields( 2 ) );
-				ShowContinueError( " " + cNumericFields( 5 ) + " is reset to the" " fan flow rate and the simulation continues." );
+				ShowContinueError( ' ' + cNumericFields( 5 ) + " is reset to the fan flow rate and the simulation continues." );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + CBVAV( CBVAVNum ).Name );
 				CBVAV( CBVAVNum ).HeatOutAirVolFlow = FanVolFlow;
 			}
@@ -848,7 +848,7 @@ namespace HVACUnitaryBypassVAV {
 			if ( FanVolFlow != AutoSize ) {
 				if ( FanVolFlow < CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow && CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow != AutoSize && CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow != 0.0 ) {
 					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( FanVolFlow, 7 ) + " in " + cAlphaFields( 11 ) + " = " + CBVAV( CBVAVNum ).FanName + " is less than " + cNumericFields( 3 ) );
-					ShowContinueError( " " + cNumericFields( 3 ) + " is reset to the" " fan flow rate and the simulation continues." );
+					ShowContinueError( ' ' + cNumericFields( 3 ) + " is reset to the fan flow rate and the simulation continues." );
 					ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + CBVAV( CBVAVNum ).Name );
 					CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow = FanVolFlow;
 				}
@@ -857,7 +857,7 @@ namespace HVACUnitaryBypassVAV {
 			//   that MaxNoCoolHeatAirVolFlow is /= 0 (trigger to use compressor ON flow, see AirFlowControl variable initialization above)
 			if ( CBVAV( CBVAVNum ).NoCoolHeatOutAirVolFlow > CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow && CBVAV( CBVAVNum ).NoCoolHeatOutAirVolFlow != AutoSize && CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow != AutoSize && CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow != 0.0 ) {
 				ShowWarningError( CurrentModuleObject + ": " + cNumericFields( 6 ) + " cannot be greater than " + cNumericFields( 3 ) );
-				ShowContinueError( " " + cNumericFields( 6 ) + " is reset to" " the fan flow rate and the simulation continues." );
+				ShowContinueError( ' ' + cNumericFields( 6 ) + " is reset to the fan flow rate and the simulation continues." );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + CBVAV( CBVAVNum ).Name );
 				CBVAV( CBVAVNum ).NoCoolHeatOutAirVolFlow = FanVolFlow;
 			}
@@ -934,12 +934,12 @@ namespace HVACUnitaryBypassVAV {
 				if ( CBVAV( CBVAVNum ).SplitterOutletAirNode != CBVAV( CBVAVNum ).HeatingCoilOutletNode ) {
 					ShowSevereError( CurrentModuleObject + ": " + CBVAV( CBVAVNum ).Name );
 					ShowContinueError( "Illegal " + cAlphaFields( 6 ) + " = " + SplitterOutletNodeName + '.' );
-					ShowContinueError( cAlphaFields( 6 ) + " must be the same as the outlet node specified" " in the heating coil object = " + CBVAV( CBVAVNum ).HeatCoilType + ": " + CBVAV( CBVAVNum ).HeatCoilName + " when blow through " + cAlphaFields( 12 ) + " is selected." );
+					ShowContinueError( cAlphaFields( 6 ) + " must be the same as the outlet node specified in the heating coil object = " + CBVAV( CBVAVNum ).HeatCoilType + ": " + CBVAV( CBVAVNum ).HeatCoilName + " when blow through " + cAlphaFields( 12 ) + " is selected." );
 					ErrorsFound = true;
 				}
 				if ( CBVAV( CBVAVNum ).MixerMixedAirNode != CBVAV( CBVAVNum ).FanInletNodeNum ) {
 					ShowSevereError( CurrentModuleObject + ": " + CBVAV( CBVAVNum ).Name );
-					ShowContinueError( "Illegal " + cAlphaFields( 11 ) + ". The fan inlet node name must be the same as the mixed" " air node specified in the " + cAlphaFields( 9 ) + " = " + CBVAV( CBVAVNum ).OAMixName + " when blow through " + cAlphaFields( 12 ) + " is selected." );
+					ShowContinueError( "Illegal " + cAlphaFields( 11 ) + ". The fan inlet node name must be the same as the mixed air node specified in the " + cAlphaFields( 9 ) + " = " + CBVAV( CBVAVNum ).OAMixName + " when blow through " + cAlphaFields( 12 ) + " is selected." );
 					ErrorsFound = true;
 				}
 			}
@@ -947,7 +947,7 @@ namespace HVACUnitaryBypassVAV {
 			if ( CBVAV( CBVAVNum ).FanPlace == DrawThru ) {
 				if ( CBVAV( CBVAVNum ).MixerMixedAirNode != CBVAV( CBVAVNum ).DXCoilInletNode ) {
 					ShowSevereError( CurrentModuleObject + ": " + CBVAV( CBVAVNum ).Name );
-					ShowContinueError( "Illegal cooling coil placement. The cooling coil inlet node name must be the same as the mixed" " air node specified in the " + cAlphaFields( 9 ) + " = " + CBVAV( CBVAVNum ).OAMixName + " when draw through " + cAlphaFields( 12 ) + " is selected." );
+					ShowContinueError( "Illegal cooling coil placement. The cooling coil inlet node name must be the same as the mixed air node specified in the " + cAlphaFields( 9 ) + " = " + CBVAV( CBVAVNum ).OAMixName + " when draw through " + cAlphaFields( 12 ) + " is selected." );
 					ErrorsFound = true;
 				}
 			}
@@ -1401,39 +1401,39 @@ namespace HVACUnitaryBypassVAV {
 			if ( CBVAV( CBVAVNum ).FanVolFlow != AutoSize ) {
 				//     Check fan versus system supply air flow rates
 				if ( CBVAV( CBVAVNum ).FanVolFlow < CBVAV( CBVAVNum ).MaxCoolAirVolFlow ) {
-					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( CBVAV( CBVAVNum ).FanVolFlow, 7 ) + " in fan object " + CBVAV( CBVAVNum ).FanName + " is less than the maximum CBVAV system air flow rate" " when cooling is required (" + TrimSigDigits( CBVAV( CBVAVNum ).MaxCoolAirVolFlow, 7 ) + ")." );
-					ShowContinueError( " The CBVAV system flow rate when cooling is required is reset to the" " fan flow rate and the simulation continues." );
+					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( CBVAV( CBVAVNum ).FanVolFlow, 7 ) + " in fan object " + CBVAV( CBVAVNum ).FanName + " is less than the maximum CBVAV system air flow rate when cooling is required (" + TrimSigDigits( CBVAV( CBVAVNum ).MaxCoolAirVolFlow, 7 ) + ")." );
+					ShowContinueError( " The CBVAV system flow rate when cooling is required is reset to the fan flow rate and the simulation continues." );
 					ShowContinueError( " Occurs in Changeover-bypass VAV system = " + CBVAV( CBVAVNum ).Name );
 					CBVAV( CBVAVNum ).MaxCoolAirVolFlow = CBVAV( CBVAVNum ).FanVolFlow;
 				}
 				if ( CBVAV( CBVAVNum ).FanVolFlow < CBVAV( CBVAVNum ).MaxHeatAirVolFlow ) {
-					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( CBVAV( CBVAVNum ).FanVolFlow, 7 ) + " in fan object " + CBVAV( CBVAVNum ).FanName + " is less than the maximum CBVAV system air flow rate" " when heating is required (" + TrimSigDigits( CBVAV( CBVAVNum ).MaxHeatAirVolFlow, 7 ) + ")." );
-					ShowContinueError( " The CBVAV system flow rate when heating is required is reset to the" " fan flow rate and the simulation continues." );
+					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( CBVAV( CBVAVNum ).FanVolFlow, 7 ) + " in fan object " + CBVAV( CBVAVNum ).FanName + " is less than the maximum CBVAV system air flow rate when heating is required (" + TrimSigDigits( CBVAV( CBVAVNum ).MaxHeatAirVolFlow, 7 ) + ")." );
+					ShowContinueError( " The CBVAV system flow rate when heating is required is reset to the fan flow rate and the simulation continues." );
 					ShowContinueError( " Occurs in Changeover-bypass VAV system = " + CBVAV( CBVAVNum ).Name );
 					CBVAV( CBVAVNum ).MaxHeatAirVolFlow = CBVAV( CBVAVNum ).FanVolFlow;
 				}
 				if ( CBVAV( CBVAVNum ).FanVolFlow < CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow && CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow != 0.0 ) {
-					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( CBVAV( CBVAVNum ).FanVolFlow, 7 ) + " in fan object " + CBVAV( CBVAVNum ).FanName + " is less than the maximum CBVAV system air flow rate when no " "heating or cooling is needed (" + TrimSigDigits( CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow, 7 ) + ")." );
-					ShowContinueError( " The CBVAV system flow rate when no heating or cooling is needed is reset to the" " fan flow rate and the simulation continues." );
+					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( CBVAV( CBVAVNum ).FanVolFlow, 7 ) + " in fan object " + CBVAV( CBVAVNum ).FanName + " is less than the maximum CBVAV system air flow rate when no heating or cooling is needed (" + TrimSigDigits( CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow, 7 ) + ")." );
+					ShowContinueError( " The CBVAV system flow rate when no heating or cooling is needed is reset to the fan flow rate and the simulation continues." );
 					ShowContinueError( " Occurs in Changeover-bypass VAV system = " + CBVAV( CBVAVNum ).Name );
 					CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow = CBVAV( CBVAVNum ).FanVolFlow;
 				}
 				//     Check fan versus outdoor air flow rates
 				if ( CBVAV( CBVAVNum ).FanVolFlow < CBVAV( CBVAVNum ).CoolOutAirVolFlow ) {
-					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( CBVAV( CBVAVNum ).FanVolFlow, 7 ) + " in fan object " + CBVAV( CBVAVNum ).FanName + " is less than the maximum CBVAV outdoor air flow rate" " when cooling is required (" + TrimSigDigits( CBVAV( CBVAVNum ).CoolOutAirVolFlow, 7 ) + ")." );
-					ShowContinueError( " The CBVAV outdoor flow rate when cooling is required is reset to the" " fan flow rate and the simulation continues." );
+					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( CBVAV( CBVAVNum ).FanVolFlow, 7 ) + " in fan object " + CBVAV( CBVAVNum ).FanName + " is less than the maximum CBVAV outdoor air flow rate when cooling is required (" + TrimSigDigits( CBVAV( CBVAVNum ).CoolOutAirVolFlow, 7 ) + ")." );
+					ShowContinueError( " The CBVAV outdoor flow rate when cooling is required is reset to the fan flow rate and the simulation continues." );
 					ShowContinueError( " Occurs in Changeover-bypass VAV system = " + CBVAV( CBVAVNum ).Name );
 					CBVAV( CBVAVNum ).CoolOutAirVolFlow = CBVAV( CBVAVNum ).FanVolFlow;
 				}
 				if ( CBVAV( CBVAVNum ).FanVolFlow < CBVAV( CBVAVNum ).HeatOutAirVolFlow ) {
-					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( CBVAV( CBVAVNum ).FanVolFlow, 7 ) + " in fan object " + CBVAV( CBVAVNum ).FanName + " is less than the maximum CBVAV outdoor air flow rate" " when heating is required (" + TrimSigDigits( CBVAV( CBVAVNum ).HeatOutAirVolFlow, 7 ) + ")." );
-					ShowContinueError( " The CBVAV outdoor flow rate when heating is required is reset to the" " fan flow rate and the simulation continues." );
+					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( CBVAV( CBVAVNum ).FanVolFlow, 7 ) + " in fan object " + CBVAV( CBVAVNum ).FanName + " is less than the maximum CBVAV outdoor air flow rate when heating is required (" + TrimSigDigits( CBVAV( CBVAVNum ).HeatOutAirVolFlow, 7 ) + ")." );
+					ShowContinueError( " The CBVAV outdoor flow rate when heating is required is reset to the fan flow rate and the simulation continues." );
 					ShowContinueError( " Occurs in Changeover-bypass VAV system = " + CBVAV( CBVAVNum ).Name );
 					CBVAV( CBVAVNum ).HeatOutAirVolFlow = CBVAV( CBVAVNum ).FanVolFlow;
 				}
 				if ( CBVAV( CBVAVNum ).FanVolFlow < CBVAV( CBVAVNum ).NoCoolHeatOutAirVolFlow ) {
-					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( CBVAV( CBVAVNum ).FanVolFlow, 7 ) + " in fan object " + CBVAV( CBVAVNum ).FanName + " is less than the maximum CBVAV outdoor air flow rate when no " "heating or cooling is needed (" + TrimSigDigits( CBVAV( CBVAVNum ).NoCoolHeatOutAirVolFlow, 7 ) + ")." );
-					ShowContinueError( " The CBVAV outdoor flow rate when no heating or cooling is needed is reset to the" " fan flow rate and the simulation continues." );
+					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( CBVAV( CBVAVNum ).FanVolFlow, 7 ) + " in fan object " + CBVAV( CBVAVNum ).FanName + " is less than the maximum CBVAV outdoor air flow rate when no heating or cooling is needed (" + TrimSigDigits( CBVAV( CBVAVNum ).NoCoolHeatOutAirVolFlow, 7 ) + ")." );
+					ShowContinueError( " The CBVAV outdoor flow rate when no heating or cooling is needed is reset to the fan flow rate and the simulation continues." );
 					ShowContinueError( " Occurs in Changeover-bypass VAV system = " + CBVAV( CBVAVNum ).Name );
 					CBVAV( CBVAVNum ).NoCoolHeatOutAirVolFlow = CBVAV( CBVAVNum ).FanVolFlow;
 				}
@@ -1545,7 +1545,7 @@ namespace HVACUnitaryBypassVAV {
 				if ( Node( OutNode ).HumRatMax == SensedNodeFlagValue ) {
 					if ( ! AnyEnergyManagementSystemInModel ) {
 						ShowWarningError( "Unitary System:VAV:ChangeOverBypass = " + CBVAV( CBVAVNum ).Name );
-						ShowContinueError( "Use SetpointManager:SingleZone:Humidity:Maximum to place a humidity setpoint at" " the air outlet node of the unitary system." );
+						ShowContinueError( "Use SetpointManager:SingleZone:Humidity:Maximum to place a humidity setpoint at the air outlet node of the unitary system." );
 						ShowContinueError( "Setting Dehumidification Control Type to None and simulation continues." );
 						CBVAV( CBVAVNum ).DehumidControlType = 0;
 					} else {
@@ -1554,8 +1554,8 @@ namespace HVACUnitaryBypassVAV {
 						CheckIfNodeSetPointManagedByEMS( OutNode, iHumidityRatioMaxSetPoint, EMSSetPointCheck );
 						if ( EMSSetPointCheck ) {
 							ShowWarningError( "Unitary System:VAV:ChangeOverBypass = " + CBVAV( CBVAVNum ).Name );
-							ShowContinueError( "Use SetpointManager:SingleZone:Humidity:Maximum to place a humidity setpoint at" " the air outlet node of the unitary system." );
-							ShowContinueError( "Or use an EMS Actuator to place a maximum humidity setpoint at" " the air outlet node of the unitary system." );
+							ShowContinueError( "Use SetpointManager:SingleZone:Humidity:Maximum to place a humidity setpoint at the air outlet node of the unitary system." );
+							ShowContinueError( "Or use an EMS Actuator to place a maximum humidity setpoint at the air outlet node of the unitary system." );
 							ShowContinueError( "Setting Dehumidification Control Type to None and simulation continues." );
 							CBVAV( CBVAVNum ).DehumidControlType = 0;
 						}
@@ -1712,8 +1712,8 @@ namespace HVACUnitaryBypassVAV {
 				if ( CBVAV( CBVAVNum ).FanVolFlow < CBVAV( CBVAVNum ).MaxCoolAirVolFlow && CBVAV( CBVAVNum ).FanVolFlow != AutoSize ) {
 					CBVAV( CBVAVNum ).MaxCoolAirVolFlow = CBVAV( CBVAVNum ).FanVolFlow;
 					ShowWarningError( CBVAV( CBVAVNum ).UnitType + " \"" + CBVAV( CBVAVNum ).Name + "\"" );
-					ShowContinueError( "The CBVAV system supply air fan air flow rate is less than the autosized value" " for the maximum air flow rate in cooling mode. Consider autosizing the fan for" " this simulation." );
-					ShowContinueError( "The maximum air flow rate in cooling mode " "is reset to the supply air fan flow rate and the simulation continues." );
+					ShowContinueError( "The CBVAV system supply air fan air flow rate is less than the autosized value for the maximum air flow rate in cooling mode. Consider autosizing the fan for this simulation." );
+					ShowContinueError( "The maximum air flow rate in cooling mode is reset to the supply air fan flow rate and the simulation continues." );
 				}
 				if ( CBVAV( CBVAVNum ).MaxCoolAirVolFlow < SmallAirVolFlow ) {
 					CBVAV( CBVAVNum ).MaxCoolAirVolFlow = 0.0;
@@ -1733,8 +1733,8 @@ namespace HVACUnitaryBypassVAV {
 				if ( CBVAV( CBVAVNum ).FanVolFlow < CBVAV( CBVAVNum ).MaxHeatAirVolFlow && CBVAV( CBVAVNum ).FanVolFlow != AutoSize ) {
 					CBVAV( CBVAVNum ).MaxHeatAirVolFlow = CBVAV( CBVAVNum ).FanVolFlow;
 					ShowWarningError( CBVAV( CBVAVNum ).UnitType + " \"" + CBVAV( CBVAVNum ).Name + "\"" );
-					ShowContinueError( "The CBVAV system supply air fan air flow rate is less than the autosized value" " for the maximum air flow rate in heating mode. Consider autosizing the fan for" " this simulation." );
-					ShowContinueError( "The maximum air flow rate in heating mode " "is reset to the supply air fan flow rate and the simulation continues." );
+					ShowContinueError( "The CBVAV system supply air fan air flow rate is less than the autosized value for the maximum air flow rate in heating mode. Consider autosizing the fan for this simulation." );
+					ShowContinueError( "The maximum air flow rate in heating mode is reset to the supply air fan flow rate and the simulation continues." );
 				}
 				if ( CBVAV( CBVAVNum ).MaxHeatAirVolFlow < SmallAirVolFlow ) {
 					CBVAV( CBVAVNum ).MaxHeatAirVolFlow = 0.0;
@@ -1754,8 +1754,8 @@ namespace HVACUnitaryBypassVAV {
 				if ( CBVAV( CBVAVNum ).FanVolFlow < CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow && CBVAV( CBVAVNum ).FanVolFlow != AutoSize ) {
 					CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow = CBVAV( CBVAVNum ).FanVolFlow;
 					ShowWarningError( CBVAV( CBVAVNum ).UnitType + " \"" + CBVAV( CBVAVNum ).Name + "\"" );
-					ShowContinueError( "The CBVAV system supply air fan air flow rate is less than the autosized value" " for the maximum air flow rate when no heating or cooling is needed. Consider" " autosizing the fan for this simulation." );
-					ShowContinueError( "The maximum air flow rate when no heating or cooling is needed " "is reset to the supply air fan flow rate and the simulation continues." );
+					ShowContinueError( "The CBVAV system supply air fan air flow rate is less than the autosized value for the maximum air flow rate when no heating or cooling is needed. Consider autosizing the fan for this simulation." );
+					ShowContinueError( "The maximum air flow rate when no heating or cooling is needed is reset to the supply air fan flow rate and the simulation continues." );
 				}
 				if ( CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow < SmallAirVolFlow ) {
 					CBVAV( CBVAVNum ).MaxNoCoolHeatAirVolFlow = 0.0;
@@ -1776,8 +1776,8 @@ namespace HVACUnitaryBypassVAV {
 				if ( CBVAV( CBVAVNum ).FanVolFlow < CBVAV( CBVAVNum ).CoolOutAirVolFlow && CBVAV( CBVAVNum ).FanVolFlow != AutoSize ) {
 					CBVAV( CBVAVNum ).CoolOutAirVolFlow = CBVAV( CBVAVNum ).FanVolFlow;
 					ShowWarningError( CBVAV( CBVAVNum ).UnitType + " \"" + CBVAV( CBVAVNum ).Name + "\"" );
-					ShowContinueError( "The CBVAV system supply air fan air flow rate is less than the autosized value" " for the outdoor air flow rate in cooling mode. Consider autosizing the fan for" " this simulation." );
-					ShowContinueError( "The outdoor air flow rate in cooling mode " "is reset to the supply air fan flow rate and the simulation continues." );
+					ShowContinueError( "The CBVAV system supply air fan air flow rate is less than the autosized value for the outdoor air flow rate in cooling mode. Consider autosizing the fan for this simulation." );
+					ShowContinueError( "The outdoor air flow rate in cooling mode is reset to the supply air fan flow rate and the simulation continues." );
 				}
 				if ( CBVAV( CBVAVNum ).CoolOutAirVolFlow < SmallAirVolFlow ) {
 					CBVAV( CBVAVNum ).CoolOutAirVolFlow = 0.0;
@@ -1796,8 +1796,8 @@ namespace HVACUnitaryBypassVAV {
 				CBVAV( CBVAVNum ).HeatOutAirVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
 				if ( CBVAV( CBVAVNum ).FanVolFlow < CBVAV( CBVAVNum ).HeatOutAirVolFlow && CBVAV( CBVAVNum ).FanVolFlow != AutoSize ) {
 					CBVAV( CBVAVNum ).HeatOutAirVolFlow = CBVAV( CBVAVNum ).FanVolFlow;
-					ShowContinueError( "The CBVAV system supply air fan air flow rate is less than the autosized value" " for the outdoor air flow rate in heating mode. Consider autosizing the fan for" " this simulation." );
-					ShowContinueError( "The outdoor air flow rate in heating mode " "is reset to the supply air fan flow rate and the simulation continues." );
+					ShowContinueError( "The CBVAV system supply air fan air flow rate is less than the autosized value for the outdoor air flow rate in heating mode. Consider autosizing the fan for this simulation." );
+					ShowContinueError( "The outdoor air flow rate in heating mode is reset to the supply air fan flow rate and the simulation continues." );
 				}
 				if ( CBVAV( CBVAVNum ).HeatOutAirVolFlow < SmallAirVolFlow ) {
 					CBVAV( CBVAVNum ).HeatOutAirVolFlow = 0.0;
@@ -1816,8 +1816,8 @@ namespace HVACUnitaryBypassVAV {
 				CBVAV( CBVAVNum ).NoCoolHeatOutAirVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
 				if ( CBVAV( CBVAVNum ).FanVolFlow < CBVAV( CBVAVNum ).NoCoolHeatOutAirVolFlow && CBVAV( CBVAVNum ).FanVolFlow != AutoSize ) {
 					CBVAV( CBVAVNum ).NoCoolHeatOutAirVolFlow = CBVAV( CBVAVNum ).FanVolFlow;
-					ShowContinueError( "The CBVAV system supply air fan air flow rate is less than the autosized value" " for the outdoor air flow rate when no heating or cooling is needed. Consider" " autosizing the fan for this simulation." );
-					ShowContinueError( "The outdoor air flow rate when no heating or cooling is needed " "is reset to the supply air fan flow rate and the simulation continues." );
+					ShowContinueError( "The CBVAV system supply air fan air flow rate is less than the autosized value for the outdoor air flow rate when no heating or cooling is needed. Consider autosizing the fan for this simulation." );
+					ShowContinueError( "The outdoor air flow rate when no heating or cooling is needed is reset to the supply air fan flow rate and the simulation continues." );
 				}
 				if ( CBVAV( CBVAVNum ).NoCoolHeatOutAirVolFlow < SmallAirVolFlow ) {
 					CBVAV( CBVAVNum ).NoCoolHeatOutAirVolFlow = 0.0;
@@ -2023,7 +2023,7 @@ namespace HVACUnitaryBypassVAV {
 							PartLoadFrac = max( 0.0, min( 1.0, ( Node( CBVAV( CBVAVNum ).DXCoilInletNode ).Temp - CBVAV( CBVAVNum ).CoilTempSetPoint ) / ( Node( CBVAV( CBVAVNum ).DXCoilInletNode ).Temp - Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).Temp ) ) );
 							if ( CBVAV( CBVAVNum ).HXDXIterationFailed < 1 ) {
 								++CBVAV( CBVAVNum ).HXDXIterationFailed;
-								ShowSevereError( "HX assisted DX unit part-load ratio calculation failed: part-load ratio limits exceeded, " "for unit = " + CBVAV( CBVAVNum ).DXCoolCoilName );
+								ShowSevereError( "HX assisted DX unit part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + CBVAV( CBVAVNum ).DXCoolCoilName );
 								ShowContinueErrorTimeStamp( "An estimated part-load ratio of " + RoundSigDigits( PartLoadFrac, 3 ) + "will be used and the simulation continues. Occurrence info:" );
 							} else {
 								ShowRecurringWarningErrorAtEnd( CBVAV( CBVAVNum ).Name + ", Part-load ratio calculation failed for HX assisted DX unit error continues.", CBVAV( CBVAVNum ).HXDXIterationFailedIndex, PartLoadFrac, PartLoadFrac );
@@ -2134,17 +2134,17 @@ namespace HVACUnitaryBypassVAV {
 							if ( SolFla == -1 ) {
 								if ( CBVAV( CBVAVNum ).DMDXIterationExceeded < 1 ) {
 									++CBVAV( CBVAVNum ).DMDXIterationExceeded;
-									ShowWarningError( "Iteration limit exceeded calculating DX unit dehumidifying part-load ratio, " "for unit = " + CBVAV( CBVAVNum ).Name );
+									ShowWarningError( "Iteration limit exceeded calculating DX unit dehumidifying part-load ratio, for unit = " + CBVAV( CBVAVNum ).Name );
 									ShowContinueErrorTimeStamp( "Part-load ratio returned=" + RoundSigDigits( PartLoadFrac, 2 ) );
 									ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation continues. Occurrence info:" );
 								} else {
-									ShowRecurringWarningErrorAtEnd( CBVAV( CBVAVNum ).Name + ", Iteration limit exceeded calculating DX unit dehumidifying part-load ratio error " "continues.", CBVAV( CBVAVNum ).DMDXIterationExceededIndex, PartLoadFrac, PartLoadFrac );
+									ShowRecurringWarningErrorAtEnd( CBVAV( CBVAVNum ).Name + ", Iteration limit exceeded calculating DX unit dehumidifying part-load ratio error continues.", CBVAV( CBVAVNum ).DMDXIterationExceededIndex, PartLoadFrac, PartLoadFrac );
 								}
 							} else if ( SolFla == -2 ) {
 								PartLoadFrac = max( 0.0, min( 1.0, ( Node( CBVAV( CBVAVNum ).DXCoilInletNode ).Temp - CBVAV( CBVAVNum ).CoilTempSetPoint ) / ( Node( CBVAV( CBVAVNum ).DXCoilInletNode ).Temp - Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).Temp ) ) );
 								if ( CBVAV( CBVAVNum ).DMDXIterationFailed < 1 ) {
 									++CBVAV( CBVAVNum ).DMDXIterationFailed;
-									ShowSevereError( "DX unit dehumidifying part-load ratio calculation failed: part-load ratio " "limits exceeded, for unit = " + CBVAV( CBVAVNum ).Name );
+									ShowSevereError( "DX unit dehumidifying part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + CBVAV( CBVAVNum ).Name );
 									ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
 									ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
 								} else {
@@ -2189,9 +2189,9 @@ namespace HVACUnitaryBypassVAV {
 							if ( SolFla == -1 ) {
 								if ( CBVAV( CBVAVNum ).CRDXIterationExceeded < 1 ) {
 									++CBVAV( CBVAVNum ).CRDXIterationExceeded;
-									ShowWarningError( "Iteration limit exceeded calculating DX unit cool reheat part-load ratio, " "for unit = " + CBVAV( CBVAVNum ).Name );
+									ShowWarningError( "Iteration limit exceeded calculating DX unit cool reheat part-load ratio, for unit = " + CBVAV( CBVAVNum ).Name );
 									ShowContinueErrorTimeStamp( "Part-load ratio returned = " + RoundSigDigits( PartLoadFrac, 2 ) );
-									ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation " "continues. Occurrence info:" );
+									ShowContinueErrorTimeStamp( "The calculated part-load ratio will be used and the simulation continues. Occurrence info:" );
 								} else {
 									ShowRecurringWarningErrorAtEnd( CBVAV( CBVAVNum ).Name + ", Iteration limit exceeded calculating cool reheat part-load ratio DX unit error continues.", CBVAV( CBVAVNum ).CRDXIterationExceededIndex, PartLoadFrac, PartLoadFrac );
 								}
@@ -2199,9 +2199,9 @@ namespace HVACUnitaryBypassVAV {
 								PartLoadFrac = max( 0.0, min( 1.0, ( Node( CBVAV( CBVAVNum ).DXCoilInletNode ).Temp - CBVAV( CBVAVNum ).CoilTempSetPoint ) / ( Node( CBVAV( CBVAVNum ).DXCoilInletNode ).Temp - Node( CBVAV( CBVAVNum ).DXCoilOutletNode ).Temp ) ) );
 								if ( CBVAV( CBVAVNum ).CRDXIterationFailed < 1 ) {
 									++CBVAV( CBVAVNum ).CRDXIterationFailed;
-									ShowSevereError( "DX unit cool reheat part-load ratio calculation failed: part-load ratio limits " "exceeded, for unit = " + CBVAV( CBVAVNum ).Name );
+									ShowSevereError( "DX unit cool reheat part-load ratio calculation failed: part-load ratio limits exceeded, for unit = " + CBVAV( CBVAVNum ).Name );
 									ShowContinueError( "Estimated part-load ratio = " + RoundSigDigits( PartLoadFrac, 3 ) );
-									ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation " "continues. Occurrence info:" );
+									ShowContinueErrorTimeStamp( "The estimated part-load ratio will be used and the simulation continues. Occurrence info:" );
 								} else {
 									ShowRecurringWarningErrorAtEnd( CBVAV( CBVAVNum ).Name + ", Dehumidifying part-load ratio calculation failed for DX unit error continues.", CBVAV( CBVAVNum ).DMDXIterationFailedIndex, PartLoadFrac, PartLoadFrac );
 								}

@@ -432,8 +432,8 @@ namespace IceThermalStorage {
 		Real64 const TankChargeToler( 0.999 ); // Above this fraction, we don't have anything left to charge
 		Real64 const TemperatureToler( 0.1 ); // Temperature difference between iterations that indicates convergence [C]
 		Real64 const SIEquiv100GPMinMassFlowRate( 6.31 ); // Used to non-dimensionalize flow rate for use in CubicLinear charging equation
-														  // Flow rate divided by nominal 100GPM used to non-dimensionalize volume flow rate
-														  // Assumes approximate density of 1000 kg/m3 to get an estimate for mass flow rate
+														// Flow rate divided by nominal 100GPM used to non-dimensionalize volume flow rate
+														// Assumes approximate density of 1000 kg/m3 to get an estimate for mass flow rate
 		static std::string const RoutineName( "SimDetailedIceStorage" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -1844,7 +1844,7 @@ namespace IceThermalStorage {
 		using DataPlant::DualSetPointDeadBand;
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::SetComponentFlowRate;
-		
+
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 

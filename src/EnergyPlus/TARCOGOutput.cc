@@ -468,7 +468,7 @@ namespace TARCOGOutput {
 			//if (mgas.eq.0) then ! show received gass properties:
 			for ( j = 1; j <= nmix( i ); ++j ) {
 				//if (iprop(i, j).eq.1) write(InArgumentsFile, 1115) iprop(i, j), ' ' 100*frct(i, j) ! Air
-				gio::write( InArgumentsFile, Format_1115 ) << iprop( i, j ) << " " << 100 * frct( i, j ); // gas
+				gio::write( InArgumentsFile, Format_1115 ) << iprop( i, j ) << ' ' << 100 * frct( i, j ); // gas
 				//if (iprop(i, j).eq.2) write(InArgumentsFile, 1116) iprop(i, j), 100*frct(i, j) ! Argon
 				//if (iprop(i, j).eq.3) write(InArgumentsFile, 1117) iprop(i, j), 100*frct(i, j) ! Krypton
 				//if (iprop(i, j).eq.4) write(InArgumentsFile, 1118) iprop(i, j), 100*frct(i, j) ! Xenon
