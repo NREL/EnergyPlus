@@ -18,11 +18,12 @@ extern "C" {
 #include <unistd.h>
 }
 
-const int Perf_Thread_Count = Utility::getProcElementCount();
+  const int Perf_Thread_Count = 4; //Utility::getProcElementCount();
 
 long
 Utility::getL1CacheLineSize(){
-  return sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
+  return 64;
+  //  return sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
 }
 
 int

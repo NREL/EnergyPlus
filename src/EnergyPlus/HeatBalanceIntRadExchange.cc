@@ -7,9 +7,9 @@
 #include <vector>
 #include <forward_list>
 #include <thread>
-#ifdef DEBUG_CI
+//#ifdef DEBUG_CI
 #include <iostream>
-#endif
+//#endif
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
@@ -150,13 +150,17 @@ namespace HeatBalanceIntRadExchange {
 			const int MAX_RUNS(1000);
 #endif    
 		//tid will be -1 when ZoneToResimulate != -1
-		for(auto s = surfBegin(tid, ZoneToResimulate); s != surfEnd(tid, ZoneToResimulate); s++){
-			ReSurface& recv = (*s);
+			auto irpz = DataSurfaces::IRfromParentZone.begin_t(tid);
+			auto lwr = DataHeatBalSurface::NetLWRadToSurf.begin_t(tid); 		
+			for(auto s = surfBegin(tid, ZoneToResimulate);      
+			    s != surfEnd(tid, ZoneToResimulate); 
+			    ++s, ++irpz, ++lwr){
+			  ReSurface& recv = (*s);
 			//if(!s.isHeatTransSurf) continue; //I think this is superfluous, as it should have been checked before adding the surface
 			ZoneViewFactorInformation& zone = ZoneInfo[ (*s).zone ];
 			if(ZoneToResimulate == -1){
 				if(!ZoneChecked[zone()]){
-					if(zone.ready == false){
+				  if(zone.ready == false){
 						if(zone.owner == tid){
 							if(SurfIterations == 0 && (zone.shadeChanged || BeginEnvrnFlag)){
 								CalcScriptF(zone); //calls CalcSurfaceEmiss
@@ -164,17 +168,19 @@ namespace HeatBalanceIntRadExchange {
 							}
 							CalcSurfaceTemp(zone, SurfIterations);
 							zone.ready = true;
+							//std::cout << "tid " << tid << " zone " << zone() << " set ready" << std::endl;
 						}else{
 							while(zone.ready == false){}
+							//std::cout << "tid " << tid << " zone " << zone() << " received ready" << std::endl;
 						}
-					}
+				  }
+						ZoneChecked[zone()] == true;
 				}
 			}else{
 				CalcSurfaceTemp(zone, SurfIterations);
 				CalcSurfaceEmiss(zone);
 			}
 	
-			ZoneChecked[zone()] == true;
 			Real64 tIR, tLWR;
 			tIR = tLWR = 0;
 			for(auto send : zone.surfaces){
@@ -184,7 +190,8 @@ namespace HeatBalanceIntRadExchange {
 				// 					<< std::endl;
 				//end delme
 				if (recv.isWindow){
-					tIR += zone.ScriptF(recv(false) + 1, send(false) + 1) * 
+					tIR += zone.ScriptF(send(false) + 1, recv(false) + 1) * 
+					  //					tIR += zone.ScriptF(recv(false) + 1, send(false) + 1) * 
 						send.temperature / recv.emissivity;
 					// std::cout << "scriptF@ " << recv(false) << "," 
 					// 	  << send(false) << ": " << 
@@ -192,13 +199,16 @@ namespace HeatBalanceIntRadExchange {
 					//   std::endl;
 				}
 				if(recv() != send()){
-					tLWR += zone.ScriptF(recv(false) + 1, send(false) + 1) * 
+					tLWR += zone.ScriptF(send(false) + 1, recv(false) + 1) * 
+					  //					tLWR += zone.ScriptF(recv(false) + 1, send(false) + 1) * 
 						(send.temperature - recv.temperature);
 				}
 			}
-			DataSurfaces::IRfromParentZone[ recv() ] = tIR;
+			*irpz = tIR;
+			*lwr = tLWR;
+			// DataSurfaces::IRfromParentZone[ recv() ] = tIR;
 
-			DataHeatBalSurface::NetLWRadToSurf[ recv() ] = tLWR;
+			// DataHeatBalSurface::NetLWRadToSurf[ recv() ] = tLWR;
 #ifdef DEBUG_CI
 			if (ranCount < MAX_RUNS ){
 			std::cout << "cire, z:" << zone() << " s:" << recv(false) 
@@ -246,113 +256,343 @@ namespace HeatBalanceIntRadExchange {
 	  }
 	}
 
-	void
-	CalcScriptF(ZoneViewFactorInformation& Zone){
-		using EppPerformance::Timer;
-		//		thread_local static Timer timer(__PRETTY_FUNCTION__);
-		//timer.startTimer();
+ 	void
+	CalcMatrixInverse(
+		FArray2< Real64 > & A, // Matrix: Gets reduced to L\U form
+		FArray2< Real64 > & I // Returned as inverse matrix
+	)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Jakob Asmundsson
+		//       DATE WRITTEN   January 1999
+		//       MODIFIED       September 2000 (RKS for EnergyPlus)
+		//       RE-ENGINEERED  June 2014 (Stuart Mentzer): Performance/memory tuning rewrite
 
-		CalcSurfaceEmiss(Zone);
-		Real64 const StefanBoltzmannConst( 5.6697e-8 ); // Stefan-Boltzmann constant in W/(m2*K4)
-		Real64 const MAX_EMISS( 0.9999 );
-		Real64 *jMatrix, *cMatrix;
-		int surfCount = Zone.NumOfSurfaces;
-		cMatrix = new Real64[surfCount * surfCount];
-		jMatrix = new Real64[surfCount * surfCount];
+		// PURPOSE OF THIS SUBROUTINE:
+		// To find the inverse of Matrix, using partial pivoting.
 
+		// METHODOLOGY EMPLOYED:
+		// Inverse is found using partial pivoting and Gauss elimination
 
+		// REFERENCES:
+		// Any Linear Algebra book
 
-		if(cMatrix == nullptr || jMatrix == nullptr){
-			throw noMoreMemCalcSF();
-		}
+		// Validation
+		assert( A.square() );
+		assert( A.I1() == A.I2() );
+		assert( equal_dimensions( A, I ) );
 
-		//calculate and load cMatrix and jMatrix
-		for(auto i: Zone.surfaces){
-			for(auto j: Zone.surfaces){
-				Real64 cmTemp = Zone.F(i(false) + 1, j(false) + 1) * Zone.Area(i(false) +1);
-				if(i(false) == j(false)){
-					Real64 area = Zone.Area(i(false) + 1);
-					Real64 emiss = Zone.Emissivity( i(false) + 1 ); //i.emissivity;
-					emiss = emiss >  MAX_EMISS ? MAX_EMISS : emiss;
-					jMatrix[i(false) * surfCount + i(false)] = -area * emiss
-						/ (1.0 - emiss);
-					cmTemp -= area / (1.0 - emiss);
-				}else{
-					jMatrix[i(false) * surfCount + j(false)] = 0;
+		// Initialization
+		int const l( A.l1() );
+		int const u( A.u1() );
+		int const n( u - l + 1 );
+		I.to_identity(); // I starts out as identity
+
+		// Could do row scaling here to improve condition and then check min pivot isn't too small
+
+		// Compute in-place LU decomposition of [A|I] with row pivoting
+		for ( int i = l; i <= u; ++i ) {
+
+			// Find pivot row in column i below diagonal
+			int iPiv = i;
+			Real64 aPiv( std::abs( A( i, i ) ) );
+			auto ki( A.index( i + 1, i ) );
+			for ( int k = i + 1; k <= u; ++k, ++ki ) {
+				Real64 const aAki( std::abs( A[ ki ] ) ); // [ ki ] == ( k, i )
+				if ( aAki > aPiv ) {
+					iPiv = k;
+					aPiv = aAki;
 				}
-				cMatrix[i(false) * surfCount + j(false)] = cmTemp;
 			}
-		}
+			assert( aPiv != 0.0 ); //? Is zero pivot possible for some user inputs? If so if test/handler needed
 
-		int *ipiv = new int[surfCount];
-// #ifdef DEBUG_CI
-// 		std::cout << "Dumping prelims in CalcScriptF Zone:" << Zone() << std::endl;
-// 		std::cout << "jMatrix first." << std::endl;
-// 		for(int x = 0; x < Zone.NumOfSurfaces; ++x){
-// 			for(int y = 0; y < Zone.NumOfSurfaces; ++y){
-// 				std::cout << jMatrix[ x * surfCount + y] << " ";
-// 			}
-// 			std::cout << std::endl;
-// 		}
-// 		std::cout << "Now cMatrix." << std::endl;
-// 		for(int x = 0; x < Zone.NumOfSurfaces; ++x){
-// 			for(int y = 0; y < Zone.NumOfSurfaces; ++y){
-// 				std::cout << cMatrix[ x * surfCount + y] << " ";
-// 			}
-// 			std::cout << std::endl;
-// 		}
+			// Swap row i with pivot row
+			if ( iPiv != i ) {
+				auto ij( A.index( i, l ) ); // [ ij ] == ( i, j )
+				auto pj( A.index( iPiv, l ) ); // [ pj ] == ( iPiv, j )
+				for ( int j = l; j <= u; ++j, ij += n, pj += n ) {
+					Real64 const Aij( A[ ij ] );
+					A[ ij ] = A[ pj ];
+					A[ pj ] = Aij;
+					Real64 const Iij( I[ ij ] );
+					I[ ij ] = I[ pj ];
+					I[ pj ] = Iij;
+				}
+			}
 
-// #endif
-		int result = clapack_dgesv(CblasRowMajor, surfCount, 
-															 surfCount, cMatrix, surfCount, 
-															 ipiv, jMatrix, surfCount);
-		delete[] cMatrix; //made this as early as possible -- it appears that having 8 threads allocate NxN all at once for large zones 
-		//is having an acute impact on system memory
-		delete[] ipiv;
-
-		if( result == 0){ //success
-// #ifdef DEBUG_CI
-// 			std::cout << "Finished calculating linear system.  Here's the result: " << 
-// 				std::endl;
-// 			for(int x = 0; x < Zone.NumOfSurfaces; ++x){
-// 				for(int y = 0; y < Zone.NumOfSurfaces; ++y){
-// 					std::cout << jMatrix[ y * surfCount + x] << " ";
-// 				}
-// 				std::cout << std::endl;
-// 			}
-
-// #endif
-			for(auto i: Zone.surfaces){
-				Real64 emiss = Zone.Emissivity( i(false) + 1 );
-				emiss = emiss > MAX_EMISS ? MAX_EMISS : emiss;
-				for(auto j: Zone.surfaces){
-					Real64 temp;
-					if(i(false) != j(false)){
-						//dgesv seems to return transposed matrices!  s/b i * sc + j 
-						temp = emiss / (1.0 - emiss) * jMatrix[j(false) * surfCount + i(false)];
-					}else{
-						temp = emiss / (1.0 - emiss) * (jMatrix[j(false) * surfCount + i(false)]
-																						- emiss);
+			// Put multipliers in column i and reduce block below A(i,i)
+			Real64 const Aii_inv( 1.0 / A( i, i ) );
+			for ( int k = i + 1; k <= u; ++k ) {
+				Real64 const multiplier( A( k, i ) * Aii_inv );
+				A( k, i ) = multiplier;
+				if ( multiplier != 0.0 ) {
+					auto ij( A.index( i, i + 1 ) ); // [ ij ] == ( i, j )
+					auto kj( A.index( k, i + 1 ) ); // [ kj ] == ( k, j )
+					for ( int j = i + 1; j <= u; ++j, ij += n, kj += n ) {
+						A[ kj ] -= multiplier * A[ ij ];
 					}
-					Zone.ScriptF(i(false) + 1, j(false) + 1) = temp * StefanBoltzmannConst;
+					ij = A.index( i, l );
+					kj = A.index( k, l );
+					for ( int j = l; j <= u; ++j, ij += n, kj += n ) {
+						Real64 const Iij( I[ ij ] );
+						if ( Iij != 0.0 ) {
+							I[ kj ] -= multiplier * Iij;
+						}
+					}
 				}
 			}
-		}else{
-			throw badLU();
+
 		}
-		delete[] jMatrix;
-// #ifdef DEBUG_CI
-// 		std::cout << "Finished an iteration of CSF.  Here's ScriptF in zone " <<
-// 			Zone() << ":" << std::endl;
-// 		for(int x = 1; x <= Zone.NumOfSurfaces; ++x){
-// 			for(int y = 1; y <= Zone.NumOfSurfaces; ++y){
-// 				std::cout << Zone.ScriptF( x, y ) << " ";
-// 			}
-// 			std::cout << std::endl; 
-// 		}
-// #endif
-//		timer.stopTimer();
+
+		// Perform back-substitution on [U|I] to put inverse in I
+		for ( int k = u; k >= l; --k ) {
+			Real64 const Akk_inv( 1.0 / A( k, k ) );
+			auto kj( A.index( k, l ) ); // [ kj ] == ( k, j )
+			for ( int j = l; j <= u; ++j, kj += n ) {
+				I[ kj ] *= Akk_inv;
+			}
+			auto ik( A.index( l, k ) ); // [ ik ] == ( i, k )
+			for ( int i = l; i < k; ++i, ++ik ) { // Eliminate kth column entries from I in rows above k
+				Real64 const Aik( A[ ik ] );
+				auto ij( A.index( i, l ) ); // [ ij ] == ( i, j )
+				auto kj( A.index( k, l ) ); // [ kj ] == ( k, j )
+				for ( int j = l; j <= u; ++j, ij += n, kj += n ) {
+					I[ ij ] -= Aik * I[ kj ];
+				}
+			}
+		}
+
 	}
+
+	void
+	CalcScriptF(ZoneViewFactorInformation& Zone)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Curt Pedersen
+		//       DATE WRITTEN   1980
+		//       MODIFIED       July 2000 (COP for the ASHRAE Loads Toolkit)
+		//       RE-ENGINEERED  September 2000 (RKS for EnergyPlus)
+		//       RE-ENGINEERED  June 2014 (Stuart Mentzer): Performance tuned
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Determines Hottel's ScriptF coefficients which account for the total
+		// grey interchange between surfaces in an enclosure.
+
+		// METHODOLOGY EMPLOYED:
+		// See reference
+
+		// REFERENCES:
+		// Hottel, H. C. and A. F. Sarofim, Radiative Transfer, Ch 3, McGraw Hill, 1967.
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENTS:
+		// --Must satisfy reciprocity and completeness:
+		//  A(i)*F(i,j)=A(j)*F(j,i); F(i,i)=0.; SUM(F(i,j)=1.0, j=1,N)
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+	  Real64 const StefanBoltzmannConst( 5.6697e-8 ); // Stefan-Boltzmann constant in W/(m2*K4)
+	  Real64 const MaxEmissLimit( 0.99999 ); // Limit the emissivity internally/avoid a divide by zero error
+	  int const N(Zone.NumOfSurfaces); // Number of surfaces
+	  FArray1< Real64 > const & A(Zone.Area); // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+	  FArray2< Real64 > const & F(Zone.F); // DIRECT VIEW FACTOR MATRIX (N X N)
+	  FArray1< Real64 > & EMISS(Zone.Emissivity); // VECTOR OF SURFACE EMISSIVITIES
+	  FArray2< Real64 > & ScriptF(Zone.ScriptF); // MATRIX OF SCRIPT F FACTORS (N X N) //Tuned Transposed
+	   
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// Validate argument array dimensions
+		assert( N >= 0 ); // Do we need to allow for N==0?
+		assert( ( A.l() == 1 ) && ( A.u() == N ) );
+		assert( ( F.l1() == 1 ) && ( F.u1() == N ) );
+		assert( ( F.l2() == 1 ) && ( F.u2() == N ) );
+		assert( ( EMISS.l() == 1 ) && ( EMISS.u() == N ) );
+		assert( equal_dimensions( F, ScriptF ) );
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+		// FLOW:
+
+#ifdef EP_Count_Calls
+		++NumCalcScriptF_Calls;
+#endif
+		CalcSurfaceEmiss(Zone);
+
+		// Load Cmatrix with AF (AREA * DIRECT VIEW FACTOR) matrix
+		FArray2D< Real64 > Cmatrix( N, N ); // = (AF - EMISS/REFLECTANCE) matrix (but plays other roles)
+		assert( equal_dimensions( Cmatrix, F ) ); // For linear indexing
+		FArray2D< Real64 >::size_type l( 0u );
+		for ( int j = 1; j <= N; ++j ) {
+			for ( int i = 1; i <= N; ++i, ++l ) {
+				Cmatrix[ l ] = A( i ) * F[ l ]; // [ l ] == ( i, j )
+			}
+		}
+
+		// Load Cmatrix with (AF - EMISS/REFLECTANCE) matrix
+		FArray1D< Real64 > Excite( N ); // Excitation vector = A*EMISS/REFLECTANCE
+		l = 0u;
+		for ( int i = 1; i <= N; ++i, l += N + 1 ) {
+			Real64 EMISS_i( EMISS( i ) );
+			if ( EMISS_i > MaxEmissLimit ) { // Check/limit EMISS for this surface to avoid divide by zero below
+				EMISS_i = EMISS( i ) = MaxEmissLimit;
+				ShowWarningError( "A thermal emissivity above 0.99999 was detected. This is not allowed. Value was reset to 0.99999" );
+			}
+			Real64 const EMISS_i_fac( A( i ) / ( 1.0 - EMISS_i ) );
+			Excite( i ) = -EMISS_i * EMISS_i_fac; // Set up matrix columns for partial radiosity calculation
+			Cmatrix[ l ] -= EMISS_i_fac; // Coefficient matrix for partial radiosity calculation // [ l ] == ( i, i )
+		}
+
+		FArray2D< Real64 > Cinverse( N, N ); // Inverse of Cmatrix
+		CalcMatrixInverse( Cmatrix, Cinverse ); // SOLVE THE LINEAR SYSTEM
+		Cmatrix.clear(); // Release memory ASAP
+
+		// Scale Cinverse colums by excitation to get partial radiosity matrix
+		l = 0u;
+		for ( int j = 1; j <= N; ++j ) {
+			Real64 const e_j( Excite( j ) );
+			for ( int i = 1; i <= N; ++i, ++l ) {
+				Cinverse[ l ] *= e_j; // [ l ] == ( i, j )
+			}
+		}
+		Excite.clear(); // Release memory ASAP
+
+		// Form Script F matrix transposed
+		assert( equal_dimensions( Cinverse, ScriptF ) ); // For linear indexing
+		FArray2D< Real64 >::size_type m( 0u );
+		for ( int i = 1; i <= N; ++i ) { // Inefficient order for cache but can reuse multiplier so faster choice depends on N
+			Real64 const EMISS_i( EMISS( i ) );
+			Real64 const EMISS_fac( EMISS_i / ( 1.0 - EMISS_i ) );
+			l = static_cast< FArray2D< Real64 >::size_type >( i - 1 );
+			for ( int j = 1; j <= N; ++j, l += N, ++m ) {
+				if ( i == j ) {
+					//        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=1
+					ScriptF[ m ] = EMISS_fac * ( Cinverse[ l ] - EMISS_i ) *
+					  StefanBoltzmannConst; // [ l ] = ( i, j ), [ m ] == ( j, i )
+				} else {
+					//        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=0
+					ScriptF[ m ] = EMISS_fac * Cinverse[ l ] *
+					  StefanBoltzmannConst; // [ l ] == ( i, j ), [ m ] == ( j, i )
+				}
+			}
+		}
+
+	}
+
+// 	void
+// 	CalcScriptF(ZoneViewFactorInformation& Zone){
+// 		using EppPerformance::Timer;
+// 		//		thread_local static Timer timer(__PRETTY_FUNCTION__);
+// 		//timer.startTimer();
+
+// 		CalcSurfaceEmiss(Zone);
+// 		Real64 const StefanBoltzmannConst( 5.6697e-8 ); // Stefan-Boltzmann constant in W/(m2*K4)
+// 		Real64 const MAX_EMISS( 0.9999 );
+// 		Real64 *jMatrix, *cMatrix;
+// 		int surfCount = Zone.NumOfSurfaces;
+// 		cMatrix = new Real64[surfCount * surfCount];
+// 		jMatrix = new Real64[surfCount * surfCount];
+
+
+
+// 		if(cMatrix == nullptr || jMatrix == nullptr){
+// 			throw noMoreMemCalcSF();
+// 		}
+
+// 		//calculate and load cMatrix and jMatrix
+// 		for(auto i: Zone.surfaces){
+// 			for(auto j: Zone.surfaces){
+// 				Real64 cmTemp = Zone.F(i(false) + 1, j(false) + 1) * Zone.Area(i(false) +1);
+// 				if(i(false) == j(false)){
+// 					Real64 area = Zone.Area(i(false) + 1);
+// 					Real64 emiss = Zone.Emissivity( i(false) + 1 ); //i.emissivity;
+// 					emiss = emiss >  MAX_EMISS ? MAX_EMISS : emiss;
+// 					jMatrix[i(false) * surfCount + i(false)] = -area * emiss
+// 						/ (1.0 - emiss);
+// 					cmTemp -= area / (1.0 - emiss);
+// 				}else{
+// 					jMatrix[i(false) * surfCount + j(false)] = 0;
+// 				}
+// 				cMatrix[i(false) * surfCount + j(false)] = cmTemp;
+// 			}
+// 		}
+
+// 		int *ipiv = new int[surfCount];
+// // #ifdef DEBUG_CI
+// // 		std::cout << "Dumping prelims in CalcScriptF Zone:" << Zone() << std::endl;
+// // 		std::cout << "jMatrix first." << std::endl;
+// // 		for(int x = 0; x < Zone.NumOfSurfaces; ++x){
+// // 			for(int y = 0; y < Zone.NumOfSurfaces; ++y){
+// // 				std::cout << jMatrix[ x * surfCount + y] << " ";
+// // 			}
+// // 			std::cout << std::endl;
+// // 		}
+// // 		std::cout << "Now cMatrix." << std::endl;
+// // 		for(int x = 0; x < Zone.NumOfSurfaces; ++x){
+// // 			for(int y = 0; y < Zone.NumOfSurfaces; ++y){
+// // 				std::cout << cMatrix[ x * surfCount + y] << " ";
+// // 			}
+// // 			std::cout << std::endl;
+// // 		}
+
+// // #endif
+// 		int result = clapack_dgesv(CblasRowMajor, surfCount, 
+// 															 surfCount, cMatrix, surfCount, 
+// 															 ipiv, jMatrix, surfCount);
+// 		delete[] cMatrix; //made this as early as possible -- it appears that having 8 threads allocate NxN all at once for large zones 
+// 		//is having an acute impact on system memory
+// 		delete[] ipiv;
+
+// 		if( result == 0){ //success
+// // #ifdef DEBUG_CI
+// // 			std::cout << "Finished calculating linear system.  Here's the result: " << 
+// // 				std::endl;
+// // 			for(int x = 0; x < Zone.NumOfSurfaces; ++x){
+// // 				for(int y = 0; y < Zone.NumOfSurfaces; ++y){
+// // 					std::cout << jMatrix[ y * surfCount + x] << " ";
+// // 				}
+// // 				std::cout << std::endl;
+// // 			}
+
+// // #endif
+// 			for(auto i: Zone.surfaces){
+// 				Real64 emiss = Zone.Emissivity( i(false) + 1 );
+// 				emiss = emiss > MAX_EMISS ? MAX_EMISS : emiss;
+// 				for(auto j: Zone.surfaces){
+// 					Real64 temp;
+// 					if(i(false) != j(false)){
+// 						//dgesv seems to return transposed matrices!  s/b i * sc + j 
+// 						temp = emiss / (1.0 - emiss) * jMatrix[j(false) * surfCount + i(false)];
+// 					}else{
+// 						temp = emiss / (1.0 - emiss) * (jMatrix[j(false) * surfCount + i(false)]
+// 																						- emiss);
+// 					}
+// 					Zone.ScriptF(i(false) + 1, j(false) + 1) = temp * StefanBoltzmannConst;
+// 				}
+// 			}
+// 		}else{
+// 			throw badLU();
+// 		}
+// 		delete[] jMatrix;
+// // #ifdef DEBUG_CI
+// // 		std::cout << "Finished an iteration of CSF.  Here's ScriptF in zone " <<
+// // 			Zone() << ":" << std::endl;
+// // 		for(int x = 1; x <= Zone.NumOfSurfaces; ++x){
+// // 			for(int y = 1; y <= Zone.NumOfSurfaces; ++y){
+// // 				std::cout << Zone.ScriptF( x, y ) << " ";
+// // 			}
+// // 			std::cout << std::endl; 
+// // 		}
+// // #endif
+// //		timer.stopTimer();
+// 	}
 	void
 	InitInteriorRadExchange()
 	{
@@ -741,11 +981,14 @@ namespace HeatBalanceIntRadExchange {
 			ZoneInfo[ (*threadSurfIterators[ t ].first).zone ].owner = t;
 		}
 
-		for(auto vect: WriteVectors){
-			if(!vect->isOptimized()){
-				vect->optimize(LoadBalanceVector);
-			}
-		}
+		DataSurfaces::IRfromParentZone.optimize( LoadBalanceVector );
+		DataHeatBalSurface::NetLWRadToSurf.optimize( LoadBalanceVector );
+
+		// for(auto vect: WriteVectors){
+		// 	if(!vect->isOptimized()){
+		// 		vect->optimize(LoadBalanceVector);
+		// 	}
+		// }
 		// int thread = 0;
 		// int firstSurf = 0;
 		// int zone = 0;

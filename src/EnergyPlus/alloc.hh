@@ -27,7 +27,7 @@ struct AlignedAlloc{
   typedef T value_type;
   AlignedAlloc(int alignment) noexcept : alignment(alignment){}
   AlignedAlloc() noexcept {
-    alignment = Utility::getL1CacheLineSize();
+    alignment = 64; //Utility::getL1CacheLineSize();
   }
   template <class U> AlignedAlloc (const AlignedAlloc<U>&a) noexcept {
     alignment = a.alignment;
