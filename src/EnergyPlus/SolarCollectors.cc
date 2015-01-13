@@ -1109,7 +1109,7 @@ namespace SolarCollectors {
 				if ( qEquation < 0.0 ) {
 					if ( Collector( CollectorNum ).ErrIndex == 0 ) {
 						ShowSevereMessage( "CalcSolarCollector: " + ccSimPlantEquipTypes( Collector( CollectorNum ).TypeNum ) + "=\"" + Collector( CollectorNum ).Name + "\", possible bad input coefficients." );
-						ShowContinueError( "...coefficients cause negative quadratic equation part in " "calculating temperature of stagnant fluid." );
+						ShowContinueError( "...coefficients cause negative quadratic equation part in calculating temperature of stagnant fluid." );
 						ShowContinueError( "...examine input coefficients for accuracy. Calculation will be treated as linear." );
 					}
 					ShowRecurringSevereErrorAtEnd( "CalcSolarCollector: " + ccSimPlantEquipTypes( Collector( CollectorNum ).TypeNum ) + "=\"" + Collector( CollectorNum ).Name + "\", coefficient error continues.", Collector( CollectorNum ).ErrIndex, qEquation, qEquation );
@@ -1466,7 +1466,7 @@ namespace SolarCollectors {
 				TempWater = r1 * ConstantC1 * std::exp( lamda1 * SecInTimeStep ) + r2 * ConstantC2 * std::exp( lamda2 * SecInTimeStep ) + ConstOfTwSln;
 
 			} else { // this should never occur
-				ShowSevereError( "ICSCollectorAnalyticalSoluton: Unanticipated differential equation coefficient - " "report to EnergyPlus Development Team" );
+				ShowSevereError( "ICSCollectorAnalyticalSoluton: Unanticipated differential equation coefficient - report to EnergyPlus Development Team" );
 				ShowFatalError( "Program terminates due to above conditions." );
 			}
 		} else {
@@ -2265,7 +2265,7 @@ namespace SolarCollectors {
 		}
 
 		if ( ! Found ) {
-			ShowFatalError( "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, " "Surface name = " + Surface( SurfacePtr ).Name );
+			ShowFatalError( "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, Surface name = " + Surface( SurfacePtr ).Name );
 		} else {
 
 			VentCavIndex = CavNum;
