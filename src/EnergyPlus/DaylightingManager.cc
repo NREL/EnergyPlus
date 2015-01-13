@@ -690,7 +690,7 @@ namespace DaylightingManager {
 				gio::write( OutputFileDFS, fmtA ) << "This file contains daylight factors for all exterior windows of daylight zones.";
 				gio::write( OutputFileDFS, fmtA ) << "If only one reference point the last 4 columns in the data will be zero.";
 				gio::write( OutputFileDFS, fmtA ) << "MonthAndDay,Zone Name,Window Name,Window State";
-				gio::write( OutputFileDFS, fmtA ) << "Hour,Daylight Factor for Clear Sky at Reference point 1," "Daylight Factor for Clear Turbid Sky at Reference point 1,Daylight Factor for Intermediate Sky at Reference point 1," "Daylight Factor for Overcast Sky at Reference point 1,Daylight Factor for Clear Sky at Reference point 2," "Daylight Factor for Clear Turbid Sky at Reference point 2,Daylight Factor for Intermediate Sky at Reference point 2," "Daylight Factor for Overcast Sky at Reference point 2";
+				gio::write( OutputFileDFS, fmtA ) << "Hour,Daylight Factor for Clear Sky at Reference point 1,Daylight Factor for Clear Turbid Sky at Reference point 1,Daylight Factor for Intermediate Sky at Reference point 1,Daylight Factor for Overcast Sky at Reference point 1,Daylight Factor for Clear Sky at Reference point 2,Daylight Factor for Clear Turbid Sky at Reference point 2,Daylight Factor for Intermediate Sky at Reference point 2,Daylight Factor for Overcast Sky at Reference point 2";
 			}
 			CreateDFSReportFile = false;
 		}
@@ -832,7 +832,7 @@ namespace DaylightingManager {
 			}
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "Not all TubularDaylightDome objects have corresponding DaylightingDevice:Tubular objects." " Program terminates." );
+				ShowFatalError( "Not all TubularDaylightDome objects have corresponding DaylightingDevice:Tubular objects. Program terminates." );
 			}
 			VeryFirstTime = false;
 		}
@@ -4405,7 +4405,7 @@ namespace DaylightingManager {
 				}
 				if ( IllumMap( MapNum ).Xnum * IllumMap( MapNum ).Ynum > MaxMapRefPoints ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", too many map points specified." );
-					ShowContinueError( "..." + cNumericFieldNames( 4 ) + '[' + RoundSigDigits( IllumMap( MapNum ).Xnum ) + "] * " + cNumericFieldNames( 7 ) + '[' + RoundSigDigits( IllumMap( MapNum ).Ynum ) + "]." "= [" + RoundSigDigits( IllumMap( MapNum ).Xnum * IllumMap( MapNum ).Ynum ) + "] must be <= [" + RoundSigDigits( MaxMapRefPoints ) + "]." );
+					ShowContinueError( "..." + cNumericFieldNames( 4 ) + '[' + RoundSigDigits( IllumMap( MapNum ).Xnum ) + "] * " + cNumericFieldNames( 7 ) + '[' + RoundSigDigits( IllumMap( MapNum ).Ynum ) + "].= [" + RoundSigDigits( IllumMap( MapNum ).Xnum * IllumMap( MapNum ).Ynum ) + "] must be <= [" + RoundSigDigits( MaxMapRefPoints ) + "]." );
 					ErrorsFound = true;
 				}
 			} // MapNum
@@ -4818,7 +4818,7 @@ namespace DaylightingManager {
 		ZoneMsgDone.deallocate();
 
 		if ( TotIllumMaps > 0 ) {
-			gio::write( OutputFileInits, fmtA ) << "! <Daylighting:Illuminance Maps:Detail>,Name,Zone,XMin {m},XMax {m},Xinc {m},#X Points," "YMin {m},YMax {m},Yinc {m},#Y Points,Z {m}";
+			gio::write( OutputFileInits, fmtA ) << "! <Daylighting:Illuminance Maps:Detail>,Name,Zone,XMin {m},XMax {m},Xinc {m},#X Points,YMin {m},YMax {m},Yinc {m},#Y Points,Z {m}";
 		}
 		for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
 			gio::write( OutputFileInits, "('Daylighting:Illuminance Maps:Detail',11(',',A))" ) << IllumMap( MapNum ).Name << Zone( IllumMap( MapNum ).Zone ).Name << RoundSigDigits( IllumMap( MapNum ).Xmin, 2 ) << RoundSigDigits( IllumMap( MapNum ).Xmax, 2 ) << RoundSigDigits( IllumMap( MapNum ).Xinc, 2 ) << RoundSigDigits( IllumMap( MapNum ).Xnum ) << RoundSigDigits( IllumMap( MapNum ).Ymin, 2 ) << RoundSigDigits( IllumMap( MapNum ).Ymax, 2 ) << RoundSigDigits( IllumMap( MapNum ).Yinc, 2 ) << RoundSigDigits( IllumMap( MapNum ).Ynum ) << RoundSigDigits( IllumMap( MapNum ).Z, 2 );
@@ -4930,7 +4930,7 @@ namespace DaylightingManager {
 			if ( SurfNum > 0 ) {
 				if ( ZoneDaylight( Surface( SurfNum ).Zone ).DaylightType == NoDaylighting ) {
 					ShowSevereError( "DaylightingDevice:Tubular = " + TDDPipe( PipeNum ).Name + ":  is not connected to a Zone that has Daylighting.  " );
-					ShowContinueError( "Add Daylighting:Controls (or Daylighting:DELight:Controls) " "to Zone named:  " + Zone( Surface( SurfNum ).Zone ).Name );
+					ShowContinueError( "Add Daylighting:Controls (or Daylighting:DELight:Controls) to Zone named:  " + Zone( Surface( SurfNum ).Zone ).Name );
 					ShowContinueError( "A sufficient control is provided on the .dbg file." );
 					ErrorsFound = true;
 					if ( CheckTDDZone( Surface( SurfNum ).Zone ) ) {
@@ -9512,8 +9512,8 @@ Label903: ;
 			}
 
 			if ( ! mapResultsReported && ! AbortProcessing ) {
-				ShowSevereError( "CloseReportIllumMaps: Illuminance maps requested but no data ever reported. " "Likely cause is no solar." );
-				gio::write( MapOutputFile, FmtA ) << "CloseReportIllumMaps: Illuminance maps requested but no data ever reported. " "Likely cause is no solar.";
+				ShowSevereError( "CloseReportIllumMaps: Illuminance maps requested but no data ever reported. Likely cause is no solar." );
+				gio::write( MapOutputFile, FmtA ) << "CloseReportIllumMaps: Illuminance maps requested but no data ever reported. Likely cause is no solar.";
 			}
 
 			gio::close( MapOutputFile );
@@ -9939,7 +9939,7 @@ Label903: ;
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints == 0 ) continue;
 			gio::write( OutputFileInits, Format_703 ) << Zone( ZoneNum ).Name << RoundSigDigits( ZoneDaylight( ZoneNum ).NumOfIntWinAdjZones );
-			for( int loop = 1, loop_end = min( ZoneDaylight( ZoneNum ).NumOfIntWinAdjZones, 100 ); loop <= loop_end; ++loop ) {
+			for ( int loop = 1, loop_end = min( ZoneDaylight( ZoneNum ).NumOfIntWinAdjZones, 100 ); loop <= loop_end; ++loop ) {
 				gio::write( OutputFileInits, fmtCommaA ) << Zone( ZoneDaylight( ZoneNum ).AdjIntWinZoneNums( loop ) ).Name;
 			} gio::write( OutputFileInits );
 		}

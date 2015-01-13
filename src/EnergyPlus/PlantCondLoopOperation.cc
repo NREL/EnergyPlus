@@ -445,7 +445,7 @@ namespace PlantCondLoopOperation {
 						if ( plantLoopOperation == "LOAD RANGE BASED OPERATION" ) { // Deprecated
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = LoadRBOpSchemeType; // Deprecated
 							ShowSevereError( CurrentModuleObject + " = \"" + cAlphaArgs( 1 ) + "\" deprecated field value =\"" + PlantLoop( LoopNum ).OpScheme( Num ).TypeOf + "\"." );
-							ShowContinueError( "... should be replaced with PlantEquipmentOperation:CoolingLoad or " "PlantEquipmentOperation:HeatingLoad" );
+							ShowContinueError( "... should be replaced with PlantEquipmentOperation:CoolingLoad or PlantEquipmentOperation:HeatingLoad" );
 						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:COOLINGLOAD" ) {
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = CoolingRBOpSchemeType;
 						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:HEATINGLOAD" ) {
@@ -496,7 +496,7 @@ namespace PlantCondLoopOperation {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting input for PlantEquipmentOperationSchemes or " "CondenserEquipmentOperationSchemes" );
+			ShowFatalError( RoutineName + "Errors found in getting input for PlantEquipmentOperationSchemes or CondenserEquipmentOperationSchemes" );
 		}
 
 	}
@@ -907,14 +907,14 @@ namespace PlantCondLoopOperation {
 								if ( InnerListNumLowerLimit > OuterListNumLowerLimit && InnerListNumLowerLimit < OuterListNumUpperLimit ) {
 									ShowWarningError( LoopOpSchemeObj + " = \"" + PlantLoop( LoopNum ).OperationScheme + "\", detected overlapping ranges in " + CurrentModuleObject + " = \"" + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\"." );
 									ShowContinueError( "Range # " + RoundSigDigits( InnerListNum ) + " Lower limit = " + RoundSigDigits( InnerListNumLowerLimit, 1 ) + " lies within the Range # " + RoundSigDigits( ListNum ) + " (" + RoundSigDigits( OuterListNumLowerLimit, 1 ) + " to " + RoundSigDigits( OuterListNumUpperLimit, 1 ) + ")." );
-									ShowContinueError( "Check that input for load range limit values do not overlap, " "and the simulation continues..." );
+									ShowContinueError( "Check that input for load range limit values do not overlap, and the simulation continues..." );
 
 								}
 								// Check if inner list has an upper limit that is between an outer's lower and upper limit
 								if ( InnerListNumUpperLimit > OuterListNumLowerLimit && InnerListNumUpperLimit < OuterListNumUpperLimit ) {
 									ShowWarningError( LoopOpSchemeObj + " = \"" + PlantLoop( LoopNum ).OperationScheme + "\", detected overlapping ranges in " + CurrentModuleObject + " = \"" + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\"." );
 									ShowContinueError( "Range # " + RoundSigDigits( InnerListNum ) + " Upper limit = " + RoundSigDigits( InnerListNumUpperLimit, 1 ) + " lies within Range # " + RoundSigDigits( ListNum ) + " (" + RoundSigDigits( OuterListNumLowerLimit, 1 ) + " to " + RoundSigDigits( OuterListNumUpperLimit, 1 ) + ")." );
-									ShowContinueError( "Check that input for load range limit values do not overlap, " "and the simulation continues..." );
+									ShowContinueError( "Check that input for load range limit values do not overlap, and the simulation continues..." );
 
 								}
 							}
@@ -1423,7 +1423,7 @@ namespace PlantCondLoopOperation {
 												ShowContinueError( "PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband" );
 											} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) { // not applicable to Condenser loops
 											}
-											ShowContinueError( " Use a setpoint manager or EMS actuator to place a dual or high temperature" " setpoint on node" );
+											ShowContinueError( " Use a setpoint manager or EMS actuator to place a dual or high temperature setpoint on node" );
 											ErrorsFound = true;
 										}
 									}
@@ -1451,7 +1451,7 @@ namespace PlantCondLoopOperation {
 												ShowContinueError( "PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband" );
 											} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) { // not applicable to Condenser loops
 											}
-											ShowContinueError( " Use a setpoint manager or EMS actuator to place a dual or low temperature" " setpoint on node" );
+											ShowContinueError( " Use a setpoint manager or EMS actuator to place a dual or low temperature setpoint on node" );
 											ErrorsFound = true;
 										}
 									}
@@ -1478,7 +1478,7 @@ namespace PlantCondLoopOperation {
 												ShowContinueError( "PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband" );
 											} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) { // not applicable to Condenser loops
 											}
-											ShowContinueError( " Use a setpoint manager or EMS actuator to place a dual temperature" " setpoint on node" );
+											ShowContinueError( " Use a setpoint manager or EMS actuator to place a dual temperature setpoint on node" );
 											ErrorsFound = true;
 										}
 									}
@@ -1726,7 +1726,7 @@ namespace PlantCondLoopOperation {
 						auto & this_equip_list( this_op_scheme.EquipList( ListNum ) );
 						for ( int EquipNum = 1, EquipNum_end = this_equip_list.NumComps; EquipNum <= EquipNum_end; ++EquipNum ) {
 							auto & this_equip( this_equip_list.Comp( EquipNum ) );
-							ThisTypeOfNum = FindItem( trim( this_equip.TypeOf ), SimPlantEquipTypes, NumSimPlantEquipTypes );
+							ThisTypeOfNum = FindItem( this_equip.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes );
 							errFlag1 = false;
 							ScanPlantLoopsForObject( this_equip.Name, ThisTypeOfNum, DummyLoopNum, LoopSideNum, BranchNum, CompNum, _, _, NumSearchResults, _, LoopNum, errFlag1 );
 
@@ -2123,8 +2123,8 @@ namespace PlantCondLoopOperation {
 						BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
 						CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
-                        // create a reference to the component itself
-                        auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
+						// create a reference to the component itself
+						auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 						if ( ! this_component.Available ) continue;
 
@@ -2268,7 +2268,7 @@ namespace PlantCondLoopOperation {
 
 					PlantCapacity += this_component.MaxLoad;
 
-					if ( this_component.MaxLoad < SmallLoad ){
+					if ( this_component.MaxLoad < SmallLoad ) {
 						ShowWarningMessage( "Plant component " + this_component.Name + " has zero available capacity. Check component controls." );
 						MinCompPLR = 0.0;
 					} else {
@@ -2364,14 +2364,14 @@ namespace PlantCondLoopOperation {
 					BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
 					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
-                    // create a reference to the component itself
-                    auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
+					// create a reference to the component itself
+					auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 					if ( ! this_component.Available ) continue;
 
 					PlantCapacity += this_component.MaxLoad;
 
-					if ( this_component.MaxLoad < SmallLoad ){
+					if ( this_component.MaxLoad < SmallLoad ) {
 						ShowWarningMessage( "Plant component " + this_component.Name + " has zero available capacity. Check component controls." );
 						MinCompPLR = 0.0;
 					} else {
@@ -2401,8 +2401,8 @@ namespace PlantCondLoopOperation {
 					BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
 					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
-                    // create a reference to the component itself
-                    auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
+					// create a reference to the component itself
+					auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 					if ( ! this_component.Available ) continue;
 
