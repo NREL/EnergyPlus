@@ -1016,7 +1016,7 @@ namespace DataSizing {
 			CoolingCapacity( false ), // TRUE if AirloopHVAC system cooling capacity is calculated
 			HeatingCapacity( false ), // TRUE if AirloopHVAC system heating capacity is calculated
 			SystemCapacity( false ), // TRUE if AirloopHVAC system heating capacity is calculated
-			DesignSizeFromParent( true ) // TRUE if design size is set by parent object - normally false, set to true for special cases e.g. ERV
+			DesignSizeFromParent( false ) // TRUE if design size is set by parent object - normally false, set to true for special cases e.g. ERV
 		{}
 
 		// Member Constructor

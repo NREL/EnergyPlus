@@ -2722,6 +2722,28 @@ namespace ZoneEquipmentManager {
 				LatOutputProvided = 0.0;
 				DataCoolCoilCap = 0.0; // reset global variable used only for heat pumps (i.e., DX cooling and heating coils)
 
+//MJW-Testing - Start - Reset ZoneEqSizing data
+				ZoneEqSizing(ControlledZoneNum).AirVolFlow = 0.0;
+				ZoneEqSizing(ControlledZoneNum).MaxHWVolFlow = 0.0;
+				ZoneEqSizing(ControlledZoneNum).MaxCWVolFlow = 0.0;
+				ZoneEqSizing(ControlledZoneNum).OAVolFlow = 0.0;
+				ZoneEqSizing(ControlledZoneNum).DesCoolingLoad = 0.0;
+				ZoneEqSizing(ControlledZoneNum).DesHeatingLoad = 0.0;
+				ZoneEqSizing(ControlledZoneNum).CoolingAirVolFlow = 0.0;
+				ZoneEqSizing(ControlledZoneNum).HeatingAirVolFlow = 0.0;
+				ZoneEqSizing(ControlledZoneNum).SystemAirVolFlow = 0.0;
+				ZoneEqSizing(ControlledZoneNum).AirFlow = false;
+				ZoneEqSizing(ControlledZoneNum).CoolingAirFlow = false;
+				ZoneEqSizing(ControlledZoneNum).HeatingAirFlow = false;
+				ZoneEqSizing(ControlledZoneNum).SystemAirFlow = false;
+				ZoneEqSizing(ControlledZoneNum).Capacity = false;
+				ZoneEqSizing(ControlledZoneNum).CoolingCapacity = false;
+				ZoneEqSizing(ControlledZoneNum).HeatingCapacity = false;
+				ZoneEqSizing(ControlledZoneNum).SystemCapacity = false;
+				ZoneEqSizing(ControlledZoneNum).DesignSizeFromParent = false;
+
+//MJW Testing - End - Reset ZoneEqSizing data
+
 				ZoneEquipTypeNum = PrioritySimOrder( EquipTypeNum ).EquipType_Num;
 
 				ZoneCompNum = ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr );

@@ -328,6 +328,7 @@ namespace ReportSizingManager {
 		bool HardSizeNoDesRun; // Indicator to hardsize with no sizing runs for reporting
 		bool SizingDesRunThisAirSys; // true if a particular air system had a Sizing : System object and system sizing done
 		bool SizingDesRunThisZone; // true if a particular zone had a Sizing : Zone object and zone sizing was done
+		bool SizingDesValueFromParent; // true if the parent set the design size (whether or not there is a sizing run)
 		bool OASysFlag; // Logical flag determines if parent object set OA Sys coil property
 		bool AirLoopSysFlag; // Logical flag determines if parent object set air loop coil property
 		bool bCheckForZero; // logical to flag whether or not to check for very small autosized values
@@ -385,6 +386,7 @@ namespace ReportSizingManager {
 		SupFanNum = 0;
 		RetFanNum = 0;
 		FanCoolLoad = 0;
+		SizingDesValueFromParent = false;
 
 		if ( SysSizingRunDone || ZoneSizingRunDone ) {
 			HardSizeNoDesRun = false;
@@ -401,7 +403,9 @@ namespace ReportSizingManager {
 		}
 
 		if ( CurZoneEqNum > 0 ) {
+			SizingDesValueFromParent = ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent;
 			CheckThisZoneForSizing( CurZoneEqNum, SizingDesRunThisZone );
+			HardSizeNoDesRun = false;
 		} else {
 			SizingDesRunThisZone = false;
 		}
@@ -410,7 +414,7 @@ namespace ReportSizingManager {
 			IsAutoSize = true;
 			HardSizeNoDesRun = false;
 			if ( !SizingDesRunThisAirSys && CurSysNum > 0 )CheckSysSizing( CompType, CompName );
-			if ( !SizingDesRunThisZone && CurZoneEqNum > 0 && !ZoneEqSizing( CurZoneEqNum ).DesignSizeFromParent )CheckZoneSizing( CompType, CompName );
+			if ( !SizingDesRunThisZone && CurZoneEqNum > 0 && !SizingDesValueFromParent )CheckZoneSizing( CompType, CompName );
 		}
 
 		if ( SizingType == AutoCalculateSizing ) {
@@ -423,7 +427,7 @@ namespace ReportSizingManager {
 				ShowFatalError( "Preceding conditions cause termination." );
 			}
 		} else if ( CurZoneEqNum > 0 ) {
-			if ( !IsAutoSize && !SizingDesRunThisZone ) {
+			if ( !IsAutoSize && !SizingDesRunThisZone && !SizingDesValueFromParent ) {
 				HardSizeNoDesRun = true;
 				AutosizeUser = SizingResult;
 				if ( PrintWarningFlag && SizingResult > 0.0 ) {
