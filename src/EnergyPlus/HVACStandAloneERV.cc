@@ -1285,30 +1285,9 @@ namespace HVACStandAloneERV {
 				StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow = SupplyAirVolFlowDes;
 				ReportSizingOutput( "ZoneHVAC:EnergyRecoveryVentilator", StandAloneERV( StandAloneERVNum ).Name, "Design Size Supply Air Flow Rate [m3/s]", SupplyAirVolFlowDes );
 
-				// Need to set this now to avoid errors when there are not sizing objects in the input
-				//SetFanData( StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex, ErrorsFound, StandAloneERV( StandAloneERVNum ).SupplyAirFanName, StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio, 0.0 );
-
-				//StandAloneERV( StandAloneERVNum ).DesignSAFanVolFlowRate = SupplyAirVolFlowDes * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio;
-
-				//ReportSizingOutput( cFanTypes( StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num ), StandAloneERV( StandAloneERVNum ).SupplyAirFanName, "Design Size Maximum Supply Air Flow Rate [m3/s]", SupplyAirVolFlowDes * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio );
-
-				//      ERV fan type must be Fan:OnOff, min flow rate is assumed 0. Do not report min flow sizing.
-				//      CALL ReportSizingOutput(TRIM(cFanTypes(StandAloneERV(StandAloneERVNum)%SupplyAirFanType_Num)), &
-				//                              StandAloneERV(StandAloneERVNum)%SupplyAirFanName, &
-				//                               'Min Flow Rate [m3/s]', 0.0)
-
 				if ( StandAloneERV( StandAloneERVNum ).ControllerNameDefined ) {
 					SetOAControllerData( StandAloneERV( StandAloneERVNum ).ControllerIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, SupplyAirVolFlowDes * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio );
-
-					//        MaxOA is not an input for CONTROLLER:STAND ALONE ERV, do not report sizing
-					//        CALL ReportSizingOutput('ZoneHVAC:EnergyRecoveryVentilator:Controller',StandAloneERV(StandAloneERVNum)%ControllerName,&
-					//                                'maximum outside air flow rate [m3/s]',StandAloneERV(StandAloneERVNum)%SupplyAirVolFlow)
-
 					SetOAControllerData( StandAloneERV( StandAloneERVNum ).ControllerIndex, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, SupplyAirVolFlowDes );
-
-					//        MinOA is not an input for CONTROLLER:STAND ALONE ERV, do not report sizing
-					//        CALL ReportSizingOutput('ZoneHVAC:EnergyRecoveryVentilator:Controller',StandAloneERV(StandAloneERVNum)%ControllerName,&
-					//                                'minimum outside air flow rate [m3/s]',StandAloneERV(StandAloneERVNum)%SupplyAirVolFlow)
 				}
 			} else {
 				if ( StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow > 0.0 && SupplyAirVolFlowDes > 0.0 ) {
@@ -1324,17 +1303,6 @@ namespace HVACStandAloneERV {
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
 						}
-
-						//ReportSizingOutput( cFanTypes( StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num ), StandAloneERV( StandAloneERVNum ).SupplyAirFanName, "Design Size Maximum Supply Air Flow Rate [m3/s]", SupplyAirVolFlowDes * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio, "User-Specified Maximum Supply Air Flow Rate [m3/s]", SupplyAirVolFlowUser );
-						//if ( DisplayExtraWarnings ) {
-						//	if ( ( std::abs( SupplyAirVolFlowDes - SupplyAirVolFlowUser ) / SupplyAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-						//		ShowMessage( "SizeStandAloneERV: Potential issue with equipment sizing for ZoneHVAC:EnergyRecoveryVentilator " + cFanTypes( StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num ) + ' ' + StandAloneERV( StandAloneERVNum ).SupplyAirFanName );
-						//		ShowContinueError( "User-Specified Maximum Supply Air Flow Rate of " + RoundSigDigits( SupplyAirVolFlowUser, 5 ) + " [m3/s]" );
-						//		ShowContinueError( "differs from Design Size Maximum Supply Air Flow Rate of " + RoundSigDigits( SupplyAirVolFlowDes, 5 ) + " [m3/s]" );
-						//		ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-						//		ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-						//	}
-						//}
 					}
 				}
 			}
@@ -1354,12 +1322,9 @@ namespace HVACStandAloneERV {
 		DesignSAFanVolFlowRateDes = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio;
 		if ( IsAutoSize ) {
 			StandAloneERV( StandAloneERVNum ).DesignSAFanVolFlowRate = DesignSAFanVolFlowRateDes;
-			//SetFanData( StandAloneERV( StandAloneERVNum ).SupplyAirFanIndex, ErrorsFound, StandAloneERV( StandAloneERVNum ).SupplyAirFanName, DesignSAFanVolFlowRateDes, 0.0 );
-			//ReportSizingOutput( cFanTypes( StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num ), StandAloneERV( StandAloneERVNum ).SupplyAirFanName, "Design Size Maximum Flow Rate [m3/s]", DesignSAFanVolFlowRateDes );
 		} else {
 			if ( StandAloneERV( StandAloneERVNum ).DesignSAFanVolFlowRate > 0.0 && DesignSAFanVolFlowRateDes > 0.0 ) {
 				DesignSAFanVolFlowRateUser = StandAloneERV( StandAloneERVNum ).DesignSAFanVolFlowRate;
-				//ReportSizingOutput( cFanTypes( StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num ), StandAloneERV( StandAloneERVNum ).SupplyAirFanName, "Design Size Maximum Flow Rate [m3/s]", DesignSAFanVolFlowRateDes, "User-Specified Maximum Flow Rate [m3/s]", DesignSAFanVolFlowRateUser );
 				if ( DisplayExtraWarnings ) {
 					if ( ( std::abs( DesignSAFanVolFlowRateDes - DesignSAFanVolFlowRateUser ) / DesignSAFanVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
 						ShowMessage( "SizeStandAloneERV: Potential issue with equipment sizing for ZoneHVAC:EnergyRecoveryVentilator " + cFanTypes( StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num ) + ' ' + StandAloneERV( StandAloneERVNum ).SupplyAirFanName );
@@ -1423,17 +1388,6 @@ namespace HVACStandAloneERV {
 
 				ReportSizingOutput( "ZoneHVAC:EnergyRecoveryVentilator", StandAloneERV( StandAloneERVNum ).Name, "Design Size Exhaust Air Flow Rate [m3/s]", ExhaustAirVolFlowDes );
 
-				//SetHeatExchangerData( StandAloneERV( StandAloneERVNum ).HeatExchangerIndex, ErrorsFound, StandAloneERV( StandAloneERVNum ).HeatExchangerName, _, ExhaustAirVolFlowDes );
-				//ReportSizingOutput( cHXTypes( StandAloneERV( StandAloneERVNum ).HeatExchangerTypeNum ), StandAloneERV( StandAloneERVNum ).HeatExchangerName, "Design Size Exhaust Air Flow Rate [m3/s]", ExhaustAirVolFlowDes );
-
-				//SetFanData( StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex, ErrorsFound, StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, StandAloneERV( StandAloneERVNum ).ExhaustAirVolFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio, 0.0 );
-
-				//ReportSizingOutput( cFanTypes( StandAloneERV( StandAloneERVNum ).ExhaustAirFanType_Num ), StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, "Design Size Maximum Exhaust Air Flow Rate [m3/s]", ExhaustAirVolFlowDes * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio );
-
-				//      ERV fan type must be Fan:OnOff, min flow rate is assumed 0. Do not report min flow sizing.
-				//      CALL ReportSizingOutput(TRIM(cFanTypes(StandAloneERV(StandAloneERVNum)%ExhaustAirFanType_Num)), &
-				//                              StandAloneERV(StandAloneERVNum)%ExhaustAirFanName, &
-				//                               'Min Flow Rate [m3/s]', 0.0)
 			} else {
 				if ( StandAloneERV( StandAloneERVNum ).ExhaustAirVolFlow > 0.0 && ExhaustAirVolFlowDes > 0.0 ) {
 					ExhaustAirVolFlowUser = StandAloneERV( StandAloneERVNum ).ExhaustAirVolFlow;
@@ -1448,28 +1402,6 @@ namespace HVACStandAloneERV {
 							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 						}
 					}
-
-					//ReportSizingOutput( cHXTypes( StandAloneERV( StandAloneERVNum ).HeatExchangerTypeNum ), StandAloneERV( StandAloneERVNum ).HeatExchangerName, "Design Size Exhaust Air Flow Rate [m3/s]", ExhaustAirVolFlowDes, "User-Specified Exhaust Air Flow Rate [m3/s]", ExhaustAirVolFlowUser );
-					//if ( DisplayExtraWarnings ) {
-					//	if ( ( std::abs( ExhaustAirVolFlowDes - ExhaustAirVolFlowUser ) / ExhaustAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-					//		ShowMessage( "SizeStandAloneERV: Potential issue with equipment sizing for ZoneHVAC:EnergyRecoveryVentilator " + cHXTypes( StandAloneERV( StandAloneERVNum ).HeatExchangerTypeNum ) + ' ' + StandAloneERV( StandAloneERVNum ).HeatExchangerName );
-					//		ShowContinueError( "User-Specified Exhaust Air Flow Rate of " + RoundSigDigits( ExhaustAirVolFlowUser, 5 ) + " [m3/s]" );
-					//		ShowContinueError( "differs from Design Size Exhaust Air Flow Rate of " + RoundSigDigits( ExhaustAirVolFlowDes, 5 ) + " [m3/s]" );
-					//		ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-					//		ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-					//	}
-					//}
-
-					//ReportSizingOutput( cFanTypes( StandAloneERV( StandAloneERVNum ).ExhaustAirFanType_Num ), StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, "Design Size Maximum Exhaust Air Flow Rate [m3/s]", ExhaustAirVolFlowDes * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio, "User-Specified Maximum Exhaust Air Flow Rate [m3/s]", ExhaustAirVolFlowUser );
-					//if ( DisplayExtraWarnings ) {
-					//	if ( ( std::abs( ExhaustAirVolFlowDes - ExhaustAirVolFlowUser ) / ExhaustAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-					//		ShowMessage( "SizeStandAloneERV: Potential issue with equipment sizing for ZoneHVAC:EnergyRecoveryVentilator " + cFanTypes( StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num ) + ' ' + StandAloneERV( StandAloneERVNum ).ExhaustAirFanName );
-					//		ShowContinueError( "User-Specified Maximum Exhaust Air Flow Rate of " + RoundSigDigits( ExhaustAirVolFlowUser, 5 ) + " [m3/s]" );
-					//		ShowContinueError( "differs from Design Size Maximum Exhaust Air Flow Rate of " + RoundSigDigits( ExhaustAirVolFlowDes, 5 ) + " [m3/s]" );
-					//		ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-					//		ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-					//	}
-					//}
 				}
 			}
 		}
@@ -1482,12 +1414,9 @@ namespace HVACStandAloneERV {
 		DesignEAFanVolFlowRateDes = StandAloneERV( StandAloneERVNum ).ExhaustAirVolFlow * StandAloneERV( StandAloneERVNum ).HighRHOAFlowRatio;
 		if ( IsAutoSize ) {
 			StandAloneERV( StandAloneERVNum ).DesignEAFanVolFlowRate = DesignEAFanVolFlowRateDes;
-			//SetFanData( StandAloneERV( StandAloneERVNum ).ExhaustAirFanIndex, ErrorsFound, StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, DesignEAFanVolFlowRateDes, 0.0 );
-			//ReportSizingOutput( cFanTypes( StandAloneERV( StandAloneERVNum ).ExhaustAirFanType_Num ), StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, "Design Size Maximum Flow Rate [m3/s]", DesignEAFanVolFlowRateDes );
 		} else {
 			if ( StandAloneERV( StandAloneERVNum ).DesignEAFanVolFlowRate > 0.0 && DesignEAFanVolFlowRateDes > 0.0 ) {
 				DesignEAFanVolFlowRateUser = StandAloneERV( StandAloneERVNum ).DesignEAFanVolFlowRate;
-				//ReportSizingOutput( cFanTypes( StandAloneERV( StandAloneERVNum ).ExhaustAirFanType_Num ), StandAloneERV( StandAloneERVNum ).ExhaustAirFanName, "Design Size Maximum Flow Rate [m3/s]", DesignEAFanVolFlowRateDes, "User-Specified Maximum Flow Rate [m3/s]", DesignEAFanVolFlowRateUser );
 				if ( DisplayExtraWarnings ) {
 					if ( ( std::abs( DesignEAFanVolFlowRateDes - DesignEAFanVolFlowRateUser ) / DesignEAFanVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
 						ShowMessage( "SizeStandAloneERV: Potential issue with equipment sizing for ZoneHVAC:EnergyRecoveryVentilator " + cFanTypes( StandAloneERV( StandAloneERVNum ).SupplyAirFanType_Num ) + ' ' + StandAloneERV( StandAloneERVNum ).SupplyAirFanName );

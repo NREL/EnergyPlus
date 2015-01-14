@@ -1062,7 +1062,7 @@ namespace DataSizing {
 			DesignSizeFromParent( DesignSizeFromParent ),
 			SizingMethod( SizingMethod ),
 			CapSizingMethod( CapSizingMethod )
-			{}
+		{}
 
 	};
 
