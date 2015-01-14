@@ -1129,7 +1129,7 @@ namespace HeatBalFiniteDiffManager {
 						ExteriorBCEqns( Delt, i, Lay, Surf, T, TT, Rhov, RhoT, RH, TD, TDT, EnthOld, EnthNew, TotNodes, HMovInsul );
 					}
 
-					// For the Layer Interior nodes.  Arrive here after exterior surface node or interface node
+					//For the Layer Interior nodes.  Arrive here after exterior surface node or interface node
 
 					if ( TotNodes != 1 ) {
 						for ( int ctr = 2, ctr_end = ConstructFD( ConstrNum ).NodeNumPoint( Lay ); ctr <= ctr_end; ++ctr ) {
@@ -1448,6 +1448,8 @@ namespace HeatBalFiniteDiffManager {
 		using DataHeatBalSurface::QRadOutReport;
 		using DataSurfaces::Construction;
 
+		// Argument array dimensioning
+
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1472,7 +1474,9 @@ namespace HeatBalFiniteDiffManager {
 			//CR8046 switch modeled rad temp for sky temp.
 			Tsky = OSCM( surface.OSCMPtr ).TRad;
 			QRadSWOutFD = 0.0; // eliminate incident shortwave on underlying surface
-		} else { // Set the external conditions to local variables
+
+		} else {
+			//Set the external conditions to local variables
 			QRadSWOutFD = QRadSWOutAbs( Surf );
 			QRadSWOutMvInsulFD = QRadSWOutMvIns( Surf );
 			Tsky = SkyTemp;
@@ -1488,7 +1492,7 @@ namespace HeatBalFiniteDiffManager {
 			// this is actually the inside face of another surface, or maybe this same surface if adiabatic
 			// switch around arguments for the other surf and call routines as for interior side BC from opposite face
 
-			int const ext_bound_construction( Construction[ surface_ExtBoundCond  - 1 ] );
+			int const ext_bound_construction( Construction[ Surface( Surf ).ExtBoundCond  - 1] );
 			int const LayIn( Construct( ext_bound_construction ).TotLayers ); // layer number for call to interior eqs
 			int const NodeIn( ConstructFD( ext_bound_construction ).TotNodes + 1 ); // node number "I" for call to interior eqs
 			int const TotNodesPlusOne( TotNodes + 1 );
@@ -1626,7 +1630,7 @@ namespace HeatBalFiniteDiffManager {
 					} else { // HMovInsul > 0.0: Transparent insulation on outside
 						// Transparent insulaton additions
 
-						// Movable Insulation Layer Outside surface temp
+						//Movable Insulation Layer Outside surface temp
 
 						Real64 const TInsulOut( ( QRadSWOutMvInsulFD + hgnd * Tgnd + HMovInsul * TDT_i + ( hconvo + hrad ) * Toa + hsky * Tsky ) / ( hconvo + hgnd + HMovInsul + hrad + hsky ) ); // Temperature of outisde face of Outside Insulation
 						Real64 const Two_Delt_DelX( 2.0 * Delt_DelX );
@@ -1856,8 +1860,8 @@ namespace HeatBalFiniteDiffManager {
 
 		if ( surface.HeatTransferAlgorithm == HeatTransferModel_CondFD ) { // HT Algo issue
 
-		  int const ConstrNum( DataSurfaces::Construction[ Surf - 1 ] );
-		  auto const & construct( Construct( ConstrNum ) );
+			int const ConstrNum( DataSurfaces::Construction[ Surf - 1 ]);
+			auto const & construct( Construct( ConstrNum ) );
 
 			int const MatLay( construct.LayerPoint( Lay ) );
 			auto const & mat( Material( MatLay ) );
@@ -2027,7 +2031,6 @@ namespace HeatBalFiniteDiffManager {
 
 					} else if ( ( matFD_sum > 0.0 ) && ( matFD2_sum < 0.0 ) ) { // Phase change material Layer1, Use TempEnth Data
 
-
 						Real64 const Enth1Old( terpld( matFD_TempEnth, TD_i, 1, 2 ) ); // 1: Temperature, 2: Thermal conductivity
 						Real64 const Enth1New( terpld( matFD_TempEnth, TDT_i, 1, 2 ) ); // 1: Temperature, 2: Thermal conductivity
 						EnthNew( i ) = Enth1New; // This node really doesn't have an enthalpy, this gives it a value
@@ -2046,7 +2049,7 @@ namespace HeatBalFiniteDiffManager {
 							Cp2 = max( Cpo2, ( Enth2New - Enth2Old ) / ( TDT_i - TD_i ) );
 						}
 
-					} // Phase change material check
+				} // Phase change material check
 
 					Real64 const Delt_Delx1( Delt * Delx1 );
 					Real64 const Delt_Delx2( Delt * Delx2 );
@@ -2080,7 +2083,7 @@ namespace HeatBalFiniteDiffManager {
 
 			}
 
-		} // End of the CondFD if block
+		} //End of the CondFD if block
 
 	}
 

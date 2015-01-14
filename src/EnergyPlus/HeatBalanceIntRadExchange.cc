@@ -116,96 +116,99 @@ namespace HeatBalanceIntRadExchange {
 		// timer.startTimer();
 
 		static bool firstTime( true );
-		if( firstTime ){
-		  InitInteriorRadExchange();
-		  firstTime = false;
+		if(firstTime){
+			InitInteriorRadExchange();
+			firstTime = false;
 		}
-		if( KickOffSimulation || KickOffSizing ) return;
-		if( ZoneToResimulate != -1 ){
-		  DoCalcInteriorRadExchange(SurfIterations, ZoneToResimulate);
+		if( KickOffSimulation || KickOffSizing) return;
+		if(ZoneToResimulate != -1){
+			DoCalcInteriorRadExchange(SurfIterations, ZoneToResimulate);
 		}else{
-		  std::forward_list<std::thread> threads;
-		  std::cout << "Thread count in CalcIntRadExchange is: " << EppPerformance::Perf_Thread_Count << std::endl;
-		  for(int x = 0; x < EppPerformance::Perf_Thread_Count; ++x){
-		    threads.push_front(std::thread(DoCalcInteriorRadExchange,
-						   SurfIterations,
-						   ZoneToResimulate,
-						   x));
-		    
-		  }
-		  // DoCalcInteriorRadExchange(SurfIterations, -1,
-		  // 			    0);
-		  for( auto& t: threads ){
-		    t.join();
-		  }
-		  for( auto& z: ZoneInfo ){z.ready = false; }//lock.test_and_set();}
+			std::forward_list<std::thread> threads;
+			for(int x = 0; x < EppPerformance::Perf_Thread_Count; ++x){
+				threads.push_front(std::thread(DoCalcInteriorRadExchange,
+							       SurfIterations,
+							       ZoneToResimulate,
+							       x));
+				     
+			}
+			for(auto& t: threads){
+				t.join();
+			}
+			for(auto& z: ZoneInfo){z.ready = false;}
 		}
     //		timer.stopTimer();
 	}
 
 	void
-	DoCalcInteriorRadExchange( const int SurfIterations, 
+	DoCalcInteriorRadExchange(const int SurfIterations, 
 														const int ZoneToResimulate,
-														const int tid ){
-		std::vector<bool> ZoneChecked( NumOfZones, false );
+														const int tid){
+		std::vector<bool> ZoneChecked(NumOfZones, false);
 #ifdef DEBUG_CI
 			static int ranCount = 0;
-			const int MAX_RUNS( 1000 );
+			const int MAX_RUNS(1000);
 #endif    
 		//tid will be -1 when ZoneToResimulate != -1
-		for(auto s = surfBegin( tid, ZoneToResimulate ); s != surfEnd( tid, ZoneToResimulate ); s++){
-			ReSurface& recv = ( *s );
+			auto irpz = DataSurfaces::IRfromParentZone.begin_t(tid);
+			auto lwr = DataHeatBalSurface::NetLWRadToSurf.begin_t(tid); 		
+			for(auto s = surfBegin(tid, ZoneToResimulate);      
+			    s != surfEnd(tid, ZoneToResimulate); 
+			    ++s, ++irpz, ++lwr){
+			  ReSurface& recv = (*s);
 			//if(!s.isHeatTransSurf) continue; //I think this is superfluous, as it should have been checked before adding the surface
-			ZoneViewFactorInformation& zone = ZoneInfo[ ( *s ).zone ];
-			// std::cout << "In DCIRE, zone: " << zone() << ", recv s: " << recv() <<
-			//   ", tid: " << tid << ", zone.owner: " << zone.owner << std::endl;
-			if( ZoneToResimulate == -1 ){
-			  if( !ZoneChecked[ zone() ]){
-			    if( zone.owner == tid ){
-			      if( SurfIterations == 0 && ( zone.shadeChanged || BeginEnvrnFlag )){
-				CalcScriptF( zone ); //calls CalcSurfaceEmiss
-				zone.shadeChanged = false;
-			      }
-			      CalcSurfaceTemp( zone, SurfIterations );
-			      zone.ready = true;
-			      std::cout << "thread " << tid << " signalled ready on zone " << zone() << std::endl;
-			      //zone.lock.clear( std::memory_order_release);
-			    }else{
-			      while(zone.ready == false){} //zone.lock.test_and_set( std::memory_order_acquire )){}
-			      //zone.lock.clear();
-			      std::cout << "thread " << tid << " received ready for zone " << zone() << std::endl;
-			    }
-			  }
+			ZoneViewFactorInformation& zone = ZoneInfo[ (*s).zone ];
+			if(ZoneToResimulate == -1){
+				if(!ZoneChecked[zone()]){
+				  if(zone.ready == false){
+						if(zone.owner == tid){
+							if(SurfIterations == 0 && (zone.shadeChanged || BeginEnvrnFlag)){
+								CalcScriptF(zone); //calls CalcSurfaceEmiss
+								zone.shadeChanged = false;
+							}
+							CalcSurfaceTemp(zone, SurfIterations);
+							zone.ready = true;
+							//std::cout << "tid " << tid << " zone " << zone() << " set ready" << std::endl;
+						}else{
+							while(zone.ready == false){}
+							//std::cout << "tid " << tid << " zone " << zone() << " received ready" << std::endl;
+						}
+				  }
+						ZoneChecked[zone()] == true;
+				}
 			}else{
-			  CalcSurfaceTemp( zone, SurfIterations );
-			  CalcSurfaceEmiss( zone );
+				CalcSurfaceTemp(zone, SurfIterations);
+				CalcSurfaceEmiss(zone);
 			}
 	
-			ZoneChecked[ zone() ] = true;
 			Real64 tIR, tLWR;
 			tIR = tLWR = 0;
-			for( auto send : zone.surfaces ){
+			for(auto send : zone.surfaces){
 				//delme
 				// std::cout << "count " << count << " rec surf: " << recv() <<
 				// 	" temp: " << recv.temperature
 				// 					<< std::endl;
 				//end delme
-				if ( recv.isWindow ){
-					tIR += zone.ScriptF( recv( false ) + 1, send( false ) + 1) * 
+				if (recv.isWindow){
+					tIR += zone.ScriptF(send(false) + 1, recv(false) + 1) * 
+					  //					tIR += zone.ScriptF(recv(false) + 1, send(false) + 1) * 
 						send.temperature / recv.emissivity;
 					// std::cout << "scriptF@ " << recv(false) << "," 
 					// 	  << send(false) << ": " << 
 					//   zone.ScriptF(recv(false), send(false)) <<
 					//   std::endl;
 				}
-				if( recv() != send()){
-					tLWR += zone.ScriptF(recv(false) + 1, send(false) + 1) * 
+				if(recv() != send()){
+					tLWR += zone.ScriptF(send(false) + 1, recv(false) + 1) * 
+					  //					tLWR += zone.ScriptF(recv(false) + 1, send(false) + 1) * 
 						(send.temperature - recv.temperature);
 				}
 			}
-			DataSurfaces::IRfromParentZone[ recv() ] = tIR;
+			*irpz = tIR;
+			*lwr = tLWR;
+			// DataSurfaces::IRfromParentZone[ recv() ] = tIR;
 
-			DataHeatBalSurface::NetLWRadToSurf[ recv() ] = tLWR;
+			// DataHeatBalSurface::NetLWRadToSurf[ recv() ] = tLWR;
 #ifdef DEBUG_CI
 			if (ranCount < MAX_RUNS ){
 			std::cout << "cire, z:" << zone() << " s:" << recv(false) 
@@ -253,7 +256,7 @@ namespace HeatBalanceIntRadExchange {
 	  }
 	}
 
-	void
+ 	void
 	CalcMatrixInverse(
 		FArray2< Real64 > & A, // Matrix: Gets reduced to L\U form
 		FArray2< Real64 > & I // Returned as inverse matrix
@@ -345,7 +348,7 @@ namespace HeatBalanceIntRadExchange {
 		for ( int k = u; k >= l; --k ) {
 			Real64 const Akk_inv( 1.0 / A( k, k ) );
 			auto kj( A.index( k, l ) ); // [ kj ] == ( k, j )
-			for( int j = l; j <= u; ++j, kj += n ) {
+			for ( int j = l; j <= u; ++j, kj += n ) {
 				I[ kj ] *= Akk_inv;
 			}
 			auto ik( A.index( l, k ) ); // [ ik ] == ( i, k )
@@ -353,7 +356,7 @@ namespace HeatBalanceIntRadExchange {
 				Real64 const Aik( A[ ik ] );
 				auto ij( A.index( i, l ) ); // [ ij ] == ( i, j )
 				auto kj( A.index( k, l ) ); // [ kj ] == ( k, j )
-				for( int j = l; j <= u; ++j, ij += n, kj += n ) {
+				for ( int j = l; j <= u; ++j, ij += n, kj += n ) {
 					I[ ij ] -= Aik * I[ kj ];
 				}
 			}
@@ -362,22 +365,8 @@ namespace HeatBalanceIntRadExchange {
 	}
 
 	void
-	CalcScriptF(
-		    ZoneViewFactorInformation& Zone
-		// int const N, // Number of surfaces
-		// FArray1< Real64 > const & A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-		// FArray2< Real64 > const & F, // DIRECT VIEW FACTOR MATRIX (N X N)
-		// FArray1< Real64 > & EMISS, // VECTOR OF SURFACE EMISSIVITIES
-		// FArray2< Real64 > & ScriptF // MATRIX OF SCRIPT F FACTORS (N X N)
-	)
+	CalcScriptF(ZoneViewFactorInformation& Zone)
 	{
-	  auto& A( Zone.Area );
-	  auto& F( Zone.F );
-	  auto& EMISS( Zone.Emissivity );
-	  const int N = Zone.NumOfSurfaces;
-	  auto& ScriptF( Zone.ScriptF );
-	  Real64 const StefanBoltzmannConst( 5.6697e-8 ); // Stefan-Boltzmann
-	  CalcSurfaceEmiss(Zone);
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Curt Pedersen
@@ -405,7 +394,14 @@ namespace HeatBalanceIntRadExchange {
 		//  A(i)*F(i,j)=A(j)*F(j,i); F(i,i)=0.; SUM(F(i,j)=1.0, j=1,N)
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const MaxEmissLimit( 0.99999 ); // Limit the emissivity internally/avoid a divide by zero error
+	  Real64 const StefanBoltzmannConst( 5.6697e-8 ); // Stefan-Boltzmann constant in W/(m2*K4)
+	  Real64 const MaxEmissLimit( 0.99999 ); // Limit the emissivity internally/avoid a divide by zero error
+	  int const N(Zone.NumOfSurfaces); // Number of surfaces
+	  FArray1< Real64 > const & A(Zone.Area); // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+	  FArray2< Real64 > const & F(Zone.F); // DIRECT VIEW FACTOR MATRIX (N X N)
+	  FArray1< Real64 > & EMISS(Zone.Emissivity); // VECTOR OF SURFACE EMISSIVITIES
+	  FArray2< Real64 > & ScriptF(Zone.ScriptF); // MATRIX OF SCRIPT F FACTORS (N X N) //Tuned Transposed
+	   
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -428,6 +424,7 @@ namespace HeatBalanceIntRadExchange {
 #ifdef EP_Count_Calls
 		++NumCalcScriptF_Calls;
 #endif
+		CalcSurfaceEmiss(Zone);
 
 		// Load Cmatrix with AF (AREA * DIRECT VIEW FACTOR) matrix
 		FArray2D< Real64 > Cmatrix( N, N ); // = (AF - EMISS/REFLECTANCE) matrix (but plays other roles)
@@ -467,19 +464,22 @@ namespace HeatBalanceIntRadExchange {
 		}
 		Excite.clear(); // Release memory ASAP
 
-		// Form Script F matrix
+		// Form Script F matrix transposed
 		assert( equal_dimensions( Cinverse, ScriptF ) ); // For linear indexing
+		FArray2D< Real64 >::size_type m( 0u );
 		for ( int i = 1; i <= N; ++i ) { // Inefficient order for cache but can reuse multiplier so faster choice depends on N
 			Real64 const EMISS_i( EMISS( i ) );
 			Real64 const EMISS_fac( EMISS_i / ( 1.0 - EMISS_i ) );
 			l = static_cast< FArray2D< Real64 >::size_type >( i - 1 );
-			for ( int j = 1; j <= N; ++j, l += N ) {
+			for ( int j = 1; j <= N; ++j, l += N, ++m ) {
 				if ( i == j ) {
 					//        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=1
-				  ScriptF[ l ] = EMISS_fac * ( Cinverse[ l ] - EMISS_i ) * StefanBoltzmannConst;
+					ScriptF[ m ] = EMISS_fac * ( Cinverse[ l ] - EMISS_i ) *
+					  StefanBoltzmannConst; // [ l ] = ( i, j ), [ m ] == ( j, i )
 				} else {
 					//        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=0
-				  ScriptF[ l ] = EMISS_fac * Cinverse[ l ]  * StefanBoltzmannConst;// [ l ] == ( i, j )
+					ScriptF[ m ] = EMISS_fac * Cinverse[ l ] *
+					  StefanBoltzmannConst; // [ l ] == ( i, j ), [ m ] == ( j, i )
 				}
 			}
 		}
@@ -977,20 +977,18 @@ namespace HeatBalanceIntRadExchange {
 		//first to do the pre-calcs (i.e. surface temp ^4 + calcScriptF) -- this 
 		//way for the crossover zones (where more than one thread is involved) one
 		//that hits first will calc (there can be multiple but only one will be the owner)
-		for(int t = Perf_Thread_Count - 1; t >= 0; --t){
-		// for(int t = 0; t < Perf_Thread_Count; ++t){
+		for(int t = 0; t < Perf_Thread_Count; ++t){
 			ZoneInfo[ (*threadSurfIterators[ t ].first).zone ].owner = t;
 		}
+
+		DataSurfaces::IRfromParentZone.optimize( LoadBalanceVector );
+		DataHeatBalSurface::NetLWRadToSurf.optimize( LoadBalanceVector );
 
 		// for(auto vect: WriteVectors){
 		// 	if(!vect->isOptimized()){
 		// 		vect->optimize(LoadBalanceVector);
 		// 	}
 		// }
-		DataSurfaces::IRfromParentZone.optimize( LoadBalanceVector );
-
-		DataHeatBalSurface::NetLWRadToSurf.optimize( LoadBalanceVector );
-		
 		// int thread = 0;
 		// int firstSurf = 0;
 		// int zone = 0;

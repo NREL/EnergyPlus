@@ -4515,8 +4515,6 @@ namespace HeatBalanceManager {
 		//  Allocate variables in DataHeatBalSys
 		SumConvHTRadSys.dimension( NumOfZones, 0.0 );
 		SumLatentHTRadSys.dimension( NumOfZones, 0.0 );
-		SumConvPool.dimension( NumOfZones, 0.0 );
-		SumLatentPool.dimension( NumOfZones, 0.0 );
 		QHTRadSysToPerson.dimension( NumOfZones, 0.0 );
 		QHWBaseboardToPerson.dimension( NumOfZones, 0.0 );
 		QSteamBaseboardToPerson.dimension( NumOfZones, 0.0 );

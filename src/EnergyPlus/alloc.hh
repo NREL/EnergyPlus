@@ -4,7 +4,7 @@
 //allocation library for alignment on cache line boundaries
 //Geof Sawaya, 2014, LBL & DOE 
 
-//#include <cstddef>
+#include <cstddef>
 #include <memory>
 #include <new>
 #include <iostream>
@@ -19,49 +19,43 @@
 
 namespace EppPerformance{
 
-// extern "C" {
-// #include <malloc.h>
-// }
+extern "C" {
+#include <malloc.h>
+}
 
 template <typename T>
 struct AlignedAlloc{
-  // AlignedAlloc(int alignment) noexcept : alignment(alignment){}
-  // AlignedAlloc() noexcept {
-  //   alignment = Utility::getL1CacheLineSize();
-  // }
-  // template <class U> AlignedAlloc (const AlignedAlloc<U>&a) noexcept {
-  //   alignment = a.alignment;
-  // }
-  static T* allocate (std::size_t n, size_t alignment) { //return static_cast<T*>(::new(n*sizeof(T))); }
-    std::cout << "called allocate with alignment: " << alignment << std::endl;
-    void **ptr;
-    void *raw;
-    size_t toUse = sizeof(T) * n;
-    size_t offset = alignment - 1 + sizeof(void*);
-    raw = ::operator new(toUse + offset);
-    //	 ptr = (void**)std::align(alignment, toUse, raw, toUse);  NOT IMPLEMENTED in GCC 4.8.1 :P
-    size_t temp = ((size_t)raw + offset) & ~(alignment - 1);
-    ptr = (void**)temp;
-    ptr[ -1 ] = raw;
-    //    *tmpp = raw;
-    // if(posix_memalign(&ptr, alignment, n * sizeof(T)) != 0){
-    //   throw std::bad_alloc(;
-    // }
-    return static_cast<T*>((void*)ptr);
+  typedef T value_type;
+  AlignedAlloc(int alignment) noexcept : alignment(alignment){}
+  AlignedAlloc() noexcept {
+    alignment = 64; //Utility::getL1CacheLineSize();
+  }
+  template <class U> AlignedAlloc (const AlignedAlloc<U>&a) noexcept {
+    alignment = a.alignment;
+  }
+  T* allocate (std::size_t n) { //return static_cast<T*>(::new(n*sizeof(T))); }
+    void *ptr;
+    if(posix_memalign(&ptr, alignment, n * sizeof(T)) != 0){
+      throw new std::bad_alloc;
+    }
+    return static_cast<T*>(ptr);
   }
 
-  static void deallocate (T* ptr) { ::operator delete(((void**)ptr)[-1]);} //::delete(p); }
+  void deallocate (T* p, std::size_t n) { free(p);} //::delete(p); }
+
+private:
+  int alignment;
 };
 
-// template <class T, class U>
-// constexpr bool operator== (const AlignedAlloc<T>&, const AlignedAlloc<U>&) 
-//   noexcept
-// {return true;}
+template <class T, class U>
+constexpr bool operator== (const AlignedAlloc<T>&, const AlignedAlloc<U>&) 
+  noexcept
+{return true;}
 
-// template <class T, class U>
-// constexpr bool operator!= (const AlignedAlloc<T>&, const AlignedAlloc<U>&) 
-//   noexcept
-// {return false;} 
+template <class T, class U>
+constexpr bool operator!= (const AlignedAlloc<T>&, const AlignedAlloc<U>&) 
+  noexcept
+{return false;} 
 
 }
 

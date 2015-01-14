@@ -1679,10 +1679,10 @@ void SQLite::createSQLiteTimeIndexRecord(
 		case LocalReportMonthly: {
 			++m_sqlDBTimeIndex;
 
-			intervalInMinutes = 60*24*lastDayOfMonth[month() - 1];
+			intervalInMinutes = 60*24*lastDayOfMonth[month()];
 			sqliteBindInteger(m_timeIndexInsertStmt, 1, m_sqlDBTimeIndex);
 			sqliteBindInteger(m_timeIndexInsertStmt, 2, month());
-			sqliteBindInteger(m_timeIndexInsertStmt, 3, lastDayOfMonth[month() - 1]);
+			sqliteBindInteger(m_timeIndexInsertStmt, 3, lastDayOfMonth[month()]);
 			sqliteBindInteger(m_timeIndexInsertStmt, 4, 24);
 			sqliteBindInteger(m_timeIndexInsertStmt, 5, 0);
 			sqliteBindNULL(m_timeIndexInsertStmt, 6);
