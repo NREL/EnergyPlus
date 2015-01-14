@@ -78,7 +78,6 @@ public:
 		threads(threads),
 		el_size(size)
 	{
-	  AlignedAlloc<T> a(64);//Utility::getL1CacheLineSize());
     data_ = new T*[threads];
     sizes = vector<size_t>(threads, size);
     doAllocation();
@@ -98,7 +97,7 @@ public:
   ~perTArray(){
     if(data_ != nullptr){
       for(int x = 0; x < threads; ++x){
-	free(data_[x]);
+	AlignedAlloc<T>::deallocate( data_[x] );
       }
       delete[] data_;
       data_ = nullptr;
@@ -110,10 +109,9 @@ public:
   void
   optimize(vector<size_t>& sizes){
     auto temp = new T*[threads];
-    AlignedAlloc<T> a(64);//Utility::getL1CacheLineSize());
     size_t newLength = 0;
     for(int x = 0; x < threads; ++x){
-      temp[x] = a.allocate(sizes[x]);
+      temp[x] = AlignedAlloc<T>::allocate(sizes[x], Utility::getL1CacheLineSize());
       newLength += sizes[x];
     }
     //ya, could have done this with a copy constructor
@@ -121,7 +119,7 @@ public:
     copyData(temp, sizes);
     this->sizes = sizes;
     length = newLength;
-    for(int x = 0; x < threads; ++x) free(data_[x]);
+    for(int x = 0; x < threads; ++x) AlignedAlloc<T>::deallocate( data_[x] );
     delete[] data_;
     data_ = temp;
     setFirstIndex();
@@ -157,10 +155,9 @@ private:
   void
   doAllocation(){
     length = 0;
-    AlignedAlloc<T> a(64);//Utility::getL1CacheLineSize());
     data_ = new T*[threads];
     for(int x = 0; x < threads; ++x){
-      data_[x] = a.allocate(sizes[x]);
+      data_[x] = AlignedAlloc<T>::allocate(sizes[x], Utility::getL1CacheLineSize());
       length += sizes[x];
     }
   }
