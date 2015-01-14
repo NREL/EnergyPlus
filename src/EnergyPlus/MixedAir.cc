@@ -868,7 +868,7 @@ namespace MixedAir {
 					}
 				} else {
 					ShowSevereError( "For " + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" invalid " + cAlphaFields( AlphaNum ) );
-					ShowContinueError( "...entered=\"" + AlphArray( AlphaNum ) + "\", should be Controller:WaterCoil " " or Controller:OutdoorAir." );
+					ShowContinueError( "...entered=\"" + AlphArray( AlphaNum ) + "\", should be Controller:WaterCoil or Controller:OutdoorAir." );
 					ErrorsFound = true;
 				}
 				AlphaNum += 2;
@@ -1051,7 +1051,7 @@ namespace MixedAir {
 				} else if ( SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = EvapCooler;
 				} else {
-					ShowSevereError( CurrentModuleObject + " = \"" + AlphArray( 1 ) + "\" invalid " "Outside Air Component=\"" + OutsideAirSys( OASysNum ).ComponentType( CompNum ) + "\"." );
+					ShowSevereError( CurrentModuleObject + " = \"" + AlphArray( 1 ) + "\" invalid Outside Air Component=\"" + OutsideAirSys( OASysNum ).ComponentType( CompNum ) + "\"." );
 					ErrorsFound = true;
 
 				}}
@@ -1287,7 +1287,7 @@ namespace MixedAir {
 				OAController( OutAirNum ).OANode = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Actuator, 1, ObjectIsNotParent );
 				if ( ! CheckOutAirNodeNumber( OAController( OutAirNum ).OANode ) ) {
 					ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" invalid field " );
-					ShowContinueError( cAlphaFields( 5 ) + "=\"" + AlphArray( 5 ) + "\"," " must be an OutdoorAir:Node for outdoor air to be effective." );
+					ShowContinueError( cAlphaFields( 5 ) + "=\"" + AlphArray( 5 ) + "\", must be an OutdoorAir:Node for outdoor air to be effective." );
 					ErrorsFound = true;
 				}
 				if ( SameString( AlphArray( 6 ), "NoEconomizer" ) ) {
@@ -1470,7 +1470,7 @@ namespace MixedAir {
 						if ( ! AirNodeFound ) {
 							ShowSevereError( "Did not find Air Node (Zone with Humidistat), " + OAController( OutAirNum ).ControllerType + " = \"" + OAController( OutAirNum ).Name + "\"" );
 							ShowContinueError( "Specified " + cAlphaFields( 17 ) + " = " + AlphArray( 17 ) );
-							ShowContinueError( "Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Humidistat object" " must be specified for this zone." );
+							ShowContinueError( "Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Humidistat object must be specified for this zone." );
 							ErrorsFound = true;
 						}
 						if ( ! AirLoopFound ) {
@@ -1481,15 +1481,15 @@ namespace MixedAir {
 					} else {
 						ShowSevereError( "Did not find Air Node (Zone with Humidistat), " + OAController( OutAirNum ).ControllerType + " = \"" + OAController( OutAirNum ).Name + "\"" );
 						ShowContinueError( "Specified " + cAlphaFields( 17 ) + " = " + AlphArray( 17 ) );
-						ShowContinueError( "Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Humidistat object" " must be specified for this zone." );
+						ShowContinueError( "Both a ZoneHVAC:EquipmentConnections object and a ZoneControl:Humidistat object must be specified for this zone." );
 						ErrorsFound = true;
 					}
 
 					OAController( OutAirNum ).HighRHOAFlowRatio = NumArray( 7 );
 					if ( OAController( OutAirNum ).HighRHOAFlowRatio <= 0.0 && NumNums > 6 ) {
 						ShowWarningError( CurrentModuleObject + " \"" + OAController( OutAirNum ).Name + "\"" );
-						ShowContinueError( " " + cNumericFields( 7 ) + " must be greater than 0." );
-						ShowContinueError( " " + cNumericFields( 7 ) + " is reset to 1 and the simulation continues." );
+						ShowContinueError( ' ' + cNumericFields( 7 ) + " must be greater than 0." );
+						ShowContinueError( ' ' + cNumericFields( 7 ) + " is reset to 1 and the simulation continues." );
 						OAController( OutAirNum ).HighRHOAFlowRatio = 1.0;
 					}
 
@@ -1499,7 +1499,7 @@ namespace MixedAir {
 							if ( OAController( OutAirNum ).HighRHOAFlowRatio < OAFlowRatio ) {
 								ShowWarningError( CurrentModuleObject + " \"" + OAController( OutAirNum ).Name + "\"" );
 								ShowContinueError( "... A fixed minimum outside air flow rate and high humidity control have been specified." );
-								ShowContinueError( "... The " + cNumericFields( 7 ) + " is less than the ratio of" " the outside air controllers minimum to maximum outside air flow rate." );
+								ShowContinueError( "... The " + cNumericFields( 7 ) + " is less than the ratio of the outside air controllers minimum to maximum outside air flow rate." );
 								ShowContinueError( "... Controller " + cNumericFields( 1 ) + " = " + TrimSigDigits( OAController( OutAirNum ).MinOA, 4 ) + " m3/s." );
 								ShowContinueError( "... Controller " + cNumericFields( 2 ) + " = " + TrimSigDigits( OAController( OutAirNum ).MaxOA, 4 ) + " m3/s." );
 								ShowContinueError( "... Controller minimum to maximum flow ratio = " + TrimSigDigits( OAFlowRatio, 4 ) + '.' );
@@ -1576,7 +1576,7 @@ namespace MixedAir {
 															if ( ( OAController( OutAirNum ).MinOA - DesSupplyVolFlowRate ) > 0.0001 ) {
 																ShowWarningError( "Minimum outside air flow rate for OA Controller \"" + OAController( OutAirNum ).Name + "\" is greater than maximum supply flow rate for Air Loop \"" + PrimaryAirSystem( AirLoopNumber ).Name + "\"" );
 																ShowContinueError( "...Min for OA Controller=[" + RoundSigDigits( OAController( OutAirNum ).MinOA, 6 ) + "], Max Supply Flow Rate=[" + RoundSigDigits( DesSupplyVolFlowRate, 6 ) + "]." );
-																ShowContinueError( "...Minimum outside air flow " "rate will be reset to equal maximum supply flow rate" );
+																ShowContinueError( "...Minimum outside air flow rate will be reset to equal maximum supply flow rate" );
 																OAController( OutAirNum ).MinOA = DesSupplyVolFlowRate;
 															} else if ( ( OAController( OutAirNum ).MinOA - DesSupplyVolFlowRate ) > 0.0 ) {
 																OAController( OutAirNum ).MinOA = DesSupplyVolFlowRate;
@@ -1740,14 +1740,14 @@ namespace MixedAir {
 					VentilationMechanical( VentMechNum ).SystemOAMethod = SOAM_IAQPGC;
 					if ( ! Contaminant.GenericContamSimulation ) {
 						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" valid " + cAlphaFields( 2 ) + "=\"" + AlphArray( 2 ) + "\" requires generic contaminant simulation." );
-						ShowContinueError( "The choice must be Yes for the field Generic Contaminant Concentration in " " ZoneAirContaminantBalance" );
+						ShowContinueError( "The choice must be Yes for the field Generic Contaminant Concentration in ZoneAirContaminantBalance" );
 						ErrorsFound = true;
 					}
 				} else if ( SELECT_CASE_var == "INDOORAIRQUALITYPROCEDURECOMBINED" ) { // Indoor Air Quality Procedure based on both generic contaminant and CO2 setpoint
 					VentilationMechanical( VentMechNum ).SystemOAMethod = SOAM_IAQPCOM;
 					if ( ! Contaminant.GenericContamSimulation ) {
 						ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" valid " + cAlphaFields( 2 ) + "=\"" + AlphArray( 2 ) + "\" requires generic contaminant simulation." );
-						ShowContinueError( "The choice must be Yes for the field Generic Contaminant Concentration in " " ZoneAirContaminantBalance" );
+						ShowContinueError( "The choice must be Yes for the field Generic Contaminant Concentration in ZoneAirContaminantBalance" );
 						ErrorsFound = true;
 					}
 					if ( ! Contaminant.CO2Simulation ) {
@@ -2175,7 +2175,7 @@ namespace MixedAir {
 							ShowWarningError( CurrentModuleObject + "=\"" + VentilationMechanical( VentMechNum ).Name + "\", inappropriate outdoor air method" );
 							ShowContinueError( "Inappropriate method for Design Specification Outdoor Air Object Name=\"" + VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( jZone ) + "\"." );
 							ShowContinueError( "For Zone=\"" + Zone( VentilationMechanical( VentMechNum ).Zone( jZone ) ).Name + "\"." );
-							ShowContinueError( "Since System Outdoor Air Method=\"ProportionalControl\", " "AirChanges/Hour or Flow/Zone outdoor air methods are not valid. Simulation continues.... " );
+							ShowContinueError( "Since System Outdoor Air Method=\"ProportionalControl\", AirChanges/Hour or Flow/Zone outdoor air methods are not valid. Simulation continues.... " );
 						}
 					}
 
@@ -2228,7 +2228,7 @@ namespace MixedAir {
 					if ( VentilationMechanical( VentMechNum ).ZoneOAPeopleRate( jZone ) <= 0.0 && VentilationMechanical( VentMechNum ).DCVFlag ) {
 						ShowWarningError( CurrentModuleObject + "=\"" + VentilationMechanical( VentMechNum ).Name + "\", Zone OA/person rate" );
 						ShowContinueError( "For Zone=\"" + Zone( VentilationMechanical( VentMechNum ).Zone( jZone ) ).Name + "\"." );
-						ShowContinueError( "Zone outside air per person rate not set in Design " "Specification Outdoor Air Object=\"" + VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( jZone ) + "\"." );
+						ShowContinueError( "Zone outside air per person rate not set in Design Specification Outdoor Air Object=\"" + VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( jZone ) + "\"." );
 					}
 
 					if ( VentilationMechanical( VentMechNum ).ZoneOAAreaRate( jZone ) < 0.0 ) {
@@ -2667,7 +2667,7 @@ namespace MixedAir {
 							if ( ! AnyEnergyManagementSystemInModel ) {
 								ShowSevereError( "MixedAir: Missing temperature setpoint for economizer controller " + OAController( OAControllerIndex ).Name );
 								ShowSevereError( "Node Referenced (by Controller)=" + NodeID( MixedAirNode ) );
-								ShowContinueError( "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish " "a setpoint at the mixed air node." );
+								ShowContinueError( "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at the mixed air node." );
 								SetPointErrorFlag = true;
 							} else {
 								// add call to check node in EMS
@@ -2675,7 +2675,7 @@ namespace MixedAir {
 								if ( SetPointErrorFlag ) {
 									ShowSevereError( "MixedAir: Missing temperature setpoint for economizer controller " + OAController( OAControllerIndex ).Name );
 									ShowSevereError( "Node Referenced (by Controller)=" + NodeID( MixedAirNode ) );
-									ShowContinueError( "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish " "a setpoint at the mixed air node." );
+									ShowContinueError( "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at the mixed air node." );
 									ShowContinueError( "Or add EMS Actuator to provide temperature setpoint at this node" );
 								}
 							}
@@ -2709,7 +2709,7 @@ namespace MixedAir {
 			if ( ( OAController( OAControllerNum ).MaxOA - OAController( OAControllerNum ).MinOA ) < -SmallAirVolFlow ) {
 				ShowSevereError( "For Controller:OutdoorAir: " + OAController( OAControllerNum ).Name );
 				ShowContinueError( "  maximum outdoor air flow rate (" + RoundSigDigits( OAController( OAControllerNum ).MaxOA, 4 ) + ") < minimum outdoor air flow rate (" + RoundSigDigits( OAController( OAControllerNum ).MinOA, 4 ) + ')' );
-				ShowContinueError( "  To set the minimum outside air flow rate use the " "\"Design (minimum) outdoor air flow rate\" field in the Sizing:System object" );
+				ShowContinueError( "  To set the minimum outside air flow rate use the \"Design (minimum) outdoor air flow rate\" field in the Sizing:System object" );
 				ErrorsFound = true;
 			}
 			MySizeFlag( OAControllerNum ) = false;
@@ -2888,7 +2888,7 @@ namespace MixedAir {
 									//              ELSE
 									//             If the zone was not found, then the PEOPLE objects are not accounted for
 									ShowWarningError( "PEOPLE object for zone = " + Zone( NumZone ).Name + " is not accounted for by " + CurrentModuleObjects( CMO_MechVentilation ) + " object name = " + OAController( OAControllerNum ).VentilationMechanicalName );
-									ShowContinueError( "A \"PEOPLE\" object has been specified in the idf for this zone, but it is not included " "in this " + CurrentModuleObjects( CMO_MechVentilation ) + " Object." );
+									ShowContinueError( "A \"PEOPLE\" object has been specified in the idf for this zone, but it is not included in this " + CurrentModuleObjects( CMO_MechVentilation ) + " Object." );
 									ShowContinueError( "Check " + CurrentModuleObjects( CMO_MechVentilation ) + " object. Simulation will continue." );
 								}
 							}
@@ -2902,8 +2902,8 @@ namespace MixedAir {
 						}
 						if ( ! FoundAreaZone ) {
 							ShowWarningError( CurrentModuleObjects( CMO_MechVentilation ) + " = \"" + OAController( OAControllerNum ).VentilationMechanicalName + "\", Zone=\"" + Zone( NumZone ).Name + "\"." );
-							ShowContinueError( "No \"PEOPLE\" object has been specified in the idf for this zone, " "but the ventilation rate is > 0 in this Controller:MechanicalVentilation Object." );
-							ShowContinueError( "Check ventilation rate in Controller:MechanicalVentilation object. " " Simulation will continue." );
+							ShowContinueError( "No \"PEOPLE\" object has been specified in the idf for this zone, but the ventilation rate is > 0 in this Controller:MechanicalVentilation Object." );
+							ShowContinueError( "Check ventilation rate in Controller:MechanicalVentilation object.  Simulation will continue." );
 						}
 					}
 				}
@@ -3669,11 +3669,11 @@ namespace MixedAir {
 													++VentilationMechanical( VentMechObjectNum ).CO2MaxMinLimitErrorCount;
 													if ( VentilationMechanical( VentMechObjectNum ).CO2MaxMinLimitErrorCount < 2 ) {
 														ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\"." );
-														ShowContinueError( "For System Outdoor Air Method = ProportionalControl," " maximum target CO2 concentration (" + RoundSigDigits( ZoneMaxCO2, 2 ) + "), is not greater than minimum target CO2 concentration (" + RoundSigDigits( ZoneMinCO2, 2 ) + ")." );
-														ShowContinueError( "\"ProportionalControl\" will not be modeled. " "Default \"VentilationRateProcedure\" will be modeled. Simulation continues..." );
+														ShowContinueError( "For System Outdoor Air Method = ProportionalControl, maximum target CO2 concentration (" + RoundSigDigits( ZoneMaxCO2, 2 ) + "), is not greater than minimum target CO2 concentration (" + RoundSigDigits( ZoneMinCO2, 2 ) + ")." );
+														ShowContinueError( "\"ProportionalControl\" will not be modeled. Default \"VentilationRateProcedure\" will be modeled. Simulation continues..." );
 														ShowContinueErrorTimeStamp( "" );
 													} else {
-														ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\", For System Outdoor Air Method = ProportionalControl," " maximum target CO2 concentration is not greater than " " minimum target CO2 concentration. Error continues...", VentilationMechanical( VentMechObjectNum ).CO2MaxMinLimitErrorIndex );
+														ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\", For System Outdoor Air Method = ProportionalControl, maximum target CO2 concentration is not greater than minimum target CO2 concentration. Error continues...", VentilationMechanical( VentMechObjectNum ).CO2MaxMinLimitErrorIndex );
 													}
 
 													ZoneOA = ZoneOABZ / ZoneEz;
@@ -3698,11 +3698,11 @@ namespace MixedAir {
 													++VentilationMechanical( VentMechObjectNum ).CO2GainErrorCount;
 													if ( VentilationMechanical( VentMechObjectNum ).CO2GainErrorCount < 2 ) {
 														ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\"." );
-														ShowContinueError( "For System Outdoor Air Method = ProportionalControl," " CO2 generation from people is not greater than zero." " Occurs in Zone =\"" + Zone( ZoneNum ).Name + "\". " );
-														ShowContinueError( "\"ProportionalControl\" will not be modeled. " "Default \"VentilationRateProcedure\" will be modeled. Simulation continues..." );
+														ShowContinueError( "For System Outdoor Air Method = ProportionalControl, CO2 generation from people is not greater than zero. Occurs in Zone =\"" + Zone( ZoneNum ).Name + "\". " );
+														ShowContinueError( "\"ProportionalControl\" will not be modeled. Default \"VentilationRateProcedure\" will be modeled. Simulation continues..." );
 														ShowContinueErrorTimeStamp( "" );
 													} else {
-														ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\", For System Outdoor Air Method = ProportionalControl," " CO2 generation from people is not greater than zero " " Error continues...", VentilationMechanical( VentMechObjectNum ).CO2GainErrorIndex );
+														ShowRecurringWarningErrorAtEnd( CurrentModuleObject + " = \"" + VentilationMechanical( VentMechObjectNum ).Name + "\", For System Outdoor Air Method = ProportionalControl, CO2 generation from people is not greater than zero. Error continues...", VentilationMechanical( VentMechObjectNum ).CO2GainErrorIndex );
 													}
 												}
 												ZoneOA = ZoneOABZ / ZoneEz;
@@ -4433,7 +4433,7 @@ namespace MixedAir {
 					if ( OAController( OAControllerNum ).HighRHOAFlowRatio < OAFlowRatio ) {
 						ShowWarningError( CurrentModuleObject + " \"" + OAController( OAControllerNum ).Name + "\"" );
 						ShowContinueError( "... A fixed minimum outdoor air flow rate and high humidity control have been specified." );
-						ShowContinueError( "... The High Humidity Outdoor Air Flow Ratio is less than the ratio of" " the outdoor air controllers minimum to maximum outside air flow rate." );
+						ShowContinueError( "... The High Humidity Outdoor Air Flow Ratio is less than the ratio of the outdoor air controllers minimum to maximum outside air flow rate." );
 						ShowContinueError( "... Controller minimum flow rate = " + TrimSigDigits( OAController( OAControllerNum ).MinOA, 4 ) + " m3/s." );
 						ShowContinueError( "... Controller maximum flow rate = " + TrimSigDigits( OAController( OAControllerNum ).MaxOA, 4 ) + " m3/s." );
 						ShowContinueError( "... Controller minimum to maximum flow ratio = " + TrimSigDigits( OAFlowRatio, 4 ) + '.' );
@@ -5678,10 +5678,10 @@ namespace MixedAir {
 			}
 
 			if ( Count == 0 ) {
-				ShowSevereError( CurrentModuleObject + "=\"" + ControllerListName + "\" is not referenced on a " "AirLoopHVAC or AirLoopHVAC:OutdoorAirSystem object." );
+				ShowSevereError( CurrentModuleObject + "=\"" + ControllerListName + "\" is not referenced on a AirLoopHVAC or AirLoopHVAC:OutdoorAirSystem object." );
 				ErrFound = true;
 			} else if ( Count > 1 ) {
-				ShowSevereError( CurrentModuleObject + "=\"" + ControllerListName + "\" has too many references on " "AirLoopHVAC or AirLoopHVAC:OutdoorAirSystem objects." );
+				ShowSevereError( CurrentModuleObject + "=\"" + ControllerListName + "\" has too many references on AirLoopHVAC or AirLoopHVAC:OutdoorAirSystem objects." );
 				if ( Found > 0 ) {
 					ShowContinueError( "...AirLoopHVAC:OutdoorAirSystem=\"" + OutsideAirSys( Found ).Name + "\"." );
 				}

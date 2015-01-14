@@ -2035,7 +2035,7 @@ namespace StandardRatings {
 				MyCoolOneTimeFlag = false;
 			}
 
-			gio::write( OutputFileInits, Format_995 ) << CompType << CompName << RoundSigDigits( CoolCapVal, 1 ) << " " << " " << RoundSigDigits( SEERValueIP, 2 ) << " ";
+			gio::write( OutputFileInits, Format_995 ) << CompType << CompName << RoundSigDigits( CoolCapVal, 1 ) << ' ' << ' ' << RoundSigDigits( SEERValueIP, 2 ) << ' ';
 
 			PreDefTableEntry( pdchDXCoolCoilType, CompName, CompType );
 			PreDefTableEntry( pdchDXCoolCoilNetCapSI, CompName, CoolCapVal, 1 );
@@ -2383,7 +2383,7 @@ namespace StandardRatings {
 
 				if ( DisplayExtraWarnings ) {
 					ShowContinueError( RoutineName + "The max and/or min limits specified in the corresponding curve objects" );
-					ShowContinueError( " do not include the AHRI test conditions required to calculate one or more of" " the Standard Rating values." );
+					ShowContinueError( " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values." );
 				}
 
 				// For Standard Rating Cooling Capacity:

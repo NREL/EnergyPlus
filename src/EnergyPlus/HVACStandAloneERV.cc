@@ -513,7 +513,7 @@ namespace HVACStandAloneERV {
 			if ( ZoneInletNodeFound && ZoneExhaustNodeFound ) {
 				if ( ZoneInletCZN != ZoneExhaustCZN ) {
 					ShowSevereError( "For " + CurrentModuleObject + " \"" + StandAloneERV( StandAloneERVNum ).Name + "\"" );
-					ShowContinueError( "... Node name of supply air outlet node and exhasut air inlet node must appear in the same " "ZoneHVAC:EquipmentConnections object." );
+					ShowContinueError( "... Node name of supply air outlet node and exhasut air inlet node must appear in the same ZoneHVAC:EquipmentConnections object." );
 					ShowContinueError( "... Supply air outlet node = " + NodeID( StandAloneERV( StandAloneERVNum ).SupplyAirOutletNode ) );
 					ShowContinueError( "... ZoneHVAC:EquipmentConnections Zone Name = " + ZoneEquipConfig( ZoneInletCZN ).ZoneName );
 					ShowContinueError( "... Exhaust air inlet node = " + NodeID( StandAloneERV( StandAloneERVNum ).ExhaustAirInletNode ) );
@@ -536,7 +536,7 @@ namespace HVACStandAloneERV {
 				}
 
 				if ( GetObjectItemNum( "ZoneHVAC:EnergyRecoveryVentilator:Controller", StandAloneERV( StandAloneERVNum ).ControllerName ) <= 0 ) {
-					ShowSevereError( CurrentModuleObject + " controller " "type ZoneHVAC:EnergyRecoveryVentilator:Controller not found = " + Alphas( 6 ) );
+					ShowSevereError( CurrentModuleObject + " controller type ZoneHVAC:EnergyRecoveryVentilator:Controller not found = " + Alphas( 6 ) );
 					ErrorsFound = true;
 				}
 			}
@@ -565,12 +565,12 @@ namespace HVACStandAloneERV {
 
 			if ( StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow == AutoSize && HXSupAirFlowRate != AutoSize ) {
 				ShowSevereError( CurrentModuleObject + " \"" + StandAloneERV( StandAloneERVNum ).Name + "\"" );
-				ShowContinueError( "... When autosizing ERV " + cNumericFields( 1 ) + ", nominal supply air flow rate for heat " "exchanger with name = " + StandAloneERV( StandAloneERVNum ).HeatExchangerName + " must also be autosized." );
+				ShowContinueError( "... When autosizing ERV " + cNumericFields( 1 ) + ", nominal supply air flow rate for heat exchanger with name = " + StandAloneERV( StandAloneERVNum ).HeatExchangerName + " must also be autosized." );
 			}
 
 			if ( StandAloneERV( StandAloneERVNum ).ExhaustAirVolFlow == AutoSize && HXSupAirFlowRate != AutoSize ) {
 				ShowSevereError( CurrentModuleObject + " \"" + StandAloneERV( StandAloneERVNum ).Name + "\"" );
-				ShowContinueError( "... When autosizing ERV " + cNumericFields( 2 ) + ", nominal supply air flow rate for heat " "exchanger with name = " + StandAloneERV( StandAloneERVNum ).HeatExchangerName + " must also be autosized." );
+				ShowContinueError( "... When autosizing ERV " + cNumericFields( 2 ) + ", nominal supply air flow rate for heat exchanger with name = " + StandAloneERV( StandAloneERVNum ).HeatExchangerName + " must also be autosized." );
 			}
 
 			// Compare the ERV SA flow rates to SA fan object.
@@ -578,7 +578,7 @@ namespace HVACStandAloneERV {
 				if ( StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow > SAFanVolFlowRate ) {
 					ShowWarningError( CurrentModuleObject + " = " + StandAloneERV( StandAloneERVNum ).Name + " has a " + cNumericFields( 1 ) + " > Max Volume Flow Rate defined in the associated fan object, should be <=" );
 					ShowContinueError( "... Entered value=" + RoundSigDigits( StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow, 2 ) + "... Fan [" + cFanTypes( SAFanTypeNum ) + " \"" + StandAloneERV( StandAloneERVNum ).SupplyAirFanName + "\"] Max Value = " + RoundSigDigits( SAFanVolFlowRate, 2 ) );
-					ShowContinueError( " The ERV " + cNumericFields( 1 ) + " is reset to the" " supply air fan flow rate and the simulation continues." );
+					ShowContinueError( " The ERV " + cNumericFields( 1 ) + " is reset to the supply air fan flow rate and the simulation continues." );
 					StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow = SAFanVolFlowRate;
 				}
 			}
@@ -607,7 +607,7 @@ namespace HVACStandAloneERV {
 				if ( StandAloneERV( StandAloneERVNum ).ExhaustAirVolFlow > EAFanVolFlowRate ) {
 					ShowWarningError( CurrentModuleObject + " = " + StandAloneERV( StandAloneERVNum ).Name + " has an " + cNumericFields( 2 ) + " > Max Volume Flow Rate defined in the associated fan object, should be <=" );
 					ShowContinueError( "... Entered value=" + RoundSigDigits( StandAloneERV( StandAloneERVNum ).ExhaustAirVolFlow, 2 ) + "... Fan [" + cFanTypes( EAFanTypeNum ) + ':' + StandAloneERV( StandAloneERVNum ).ExhaustAirFanName + "] Max Value = " + RoundSigDigits( EAFanVolFlowRate, 2 ) );
-					ShowContinueError( " The ERV " + cNumericFields( 2 ) + " is reset to the" " exhaust air fan flow rate and the simulation continues." );
+					ShowContinueError( " The ERV " + cNumericFields( 2 ) + " is reset to the exhaust air fan flow rate and the simulation continues." );
 					StandAloneERV( StandAloneERVNum ).ExhaustAirVolFlow = EAFanVolFlowRate;
 				}
 			}
@@ -649,18 +649,18 @@ namespace HVACStandAloneERV {
 
 			// Verify HX name in Stand Alone ERV object matches name of valid HX object
 			if ( GetObjectItemNum( "HeatExchanger:AirToAir:SensibleAndLatent", StandAloneERV( StandAloneERVNum ).HeatExchangerName ) <= 0 ) {
-				ShowSevereError( CurrentModuleObject + " heat exchanger " "type HeatExchanger:AirToAir:SensibleAndLatent not found = " + StandAloneERV( StandAloneERVNum ).HeatExchangerName );
+				ShowSevereError( CurrentModuleObject + " heat exchanger type HeatExchanger:AirToAir:SensibleAndLatent not found = " + StandAloneERV( StandAloneERVNum ).HeatExchangerName );
 				ErrorsFound = true;
 			}
 			// Verify supply air fan name in Stand Alone ERV object matches name of valid fan object
 			if ( GetObjectItemNum( "Fan:OnOff", StandAloneERV( StandAloneERVNum ).SupplyAirFanName ) <= 0 ) {
-				ShowSevereError( CurrentModuleObject + " supply fan " "type Fan:OnOff not found = " + StandAloneERV( StandAloneERVNum ).SupplyAirFanName );
+				ShowSevereError( CurrentModuleObject + " supply fan type Fan:OnOff not found = " + StandAloneERV( StandAloneERVNum ).SupplyAirFanName );
 				ErrorsFound = true;
 			}
 
 			// Verify exhaust air fan name in Stand Alone ERV object matches name of valid fan object
 			if ( GetObjectItemNum( "Fan:OnOff", StandAloneERV( StandAloneERVNum ).ExhaustAirFanName ) <= 0 ) {
-				ShowSevereError( CurrentModuleObject + " exhaust fan " "type Fan:OnOff not found = " + StandAloneERV( StandAloneERVNum ).ExhaustAirFanName );
+				ShowSevereError( CurrentModuleObject + " exhaust fan type Fan:OnOff not found = " + StandAloneERV( StandAloneERVNum ).ExhaustAirFanName );
 				ErrorsFound = true;
 			}
 
@@ -909,11 +909,11 @@ namespace HVACStandAloneERV {
 						if ( StandAloneERV( WhichERV ).SupplyAirVolFlow * HighRHOARatio > SAFanVolFlowRate ) {
 							ShowWarningError( CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 							ShowContinueError( "... A " + cNumericFields( 5 ) + " was entered as " + RoundSigDigits( HighRHOARatio, 4 ) );
-							ShowContinueError( "... This flow ratio results in a Supply Air Volume Flow Rate through the ERV which is " "greater than the Max Volume specified in the supply air fan object." );
+							ShowContinueError( "... This flow ratio results in a Supply Air Volume Flow Rate through the ERV which is greater than the Max Volume specified in the supply air fan object." );
 							ShowContinueError( "... Associated fan object = " + cFanTypes( SAFanTypeNum ) + " \"" + StandAloneERV( WhichERV ).SupplyAirFanName + "\"" );
 							ShowContinueError( "... Modified value                   = " + RoundSigDigits( StandAloneERV( WhichERV ).SupplyAirVolFlow * HighRHOARatio, 2 ) );
 							ShowContinueError( " ... Supply Fan Max Volume Flow Rate = " + RoundSigDigits( SAFanVolFlowRate, 2 ) );
-							ShowContinueError( "... The ERV supply air fan will limit the air flow through the ERV" " and the simulation continues." );
+							ShowContinueError( "... The ERV supply air fan will limit the air flow through the ERV and the simulation continues." );
 						}
 					}
 				} else {
@@ -929,11 +929,11 @@ namespace HVACStandAloneERV {
 						if ( StandAloneERV( WhichERV ).ExhaustAirVolFlow * HighRHOARatio > EAFanVolFlowRate ) {
 							ShowWarningError( "ZoneHVAC:EnergyRecoveryVentilator:Controller \"" + Alphas( 1 ) + "\"" );
 							ShowContinueError( "... A " + cNumericFields( 5 ) + " was entered as " + RoundSigDigits( HighRHOARatio, 4 ) );
-							ShowContinueError( "... This flow ratio results in an Exhaust Air Volume Flow Rate through the ERV which is " "greater than the Max Volume specified in the exhaust air fan object." );
+							ShowContinueError( "... This flow ratio results in an Exhaust Air Volume Flow Rate through the ERV which is greater than the Max Volume specified in the exhaust air fan object." );
 							ShowContinueError( "... Associated fan object = " + cFanTypes( EAFanTypeNum ) + " \"" + StandAloneERV( WhichERV ).ExhaustAirFanName + "\"" );
 							ShowContinueError( "... Modified value                    = " + RoundSigDigits( StandAloneERV( WhichERV ).ExhaustAirVolFlow * HighRHOARatio, 2 ) );
 							ShowContinueError( " ... Exhaust Fan Max Volume Flow Rate = " + RoundSigDigits( EAFanVolFlowRate, 2 ) );
-							ShowContinueError( "... The ERV exhaust air fan will limit the air flow through the ERV" " and the simulation continues." );
+							ShowContinueError( "... The ERV exhaust air fan will limit the air flow through the ERV and the simulation continues." );
 						}
 					}
 				} else {

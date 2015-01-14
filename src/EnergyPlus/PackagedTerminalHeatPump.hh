@@ -337,7 +337,7 @@ namespace PackagedTerminalHeatPump {
 			CompSpeedRatio( 0.0 ),
 			ErrIndexCyc( 0 ),
 			ErrIndexVar( 0 ),
-			ZonePtr(0), 
+			ZonePtr(0),
 			HVACSizingIndex(0)
 		{}
 
@@ -637,7 +637,7 @@ namespace PackagedTerminalHeatPump {
 
 	// Object Data
 	extern FArray1D< PTUnitData > PTUnit;
-	extern FArray1D< PTUnitNumericFieldData > PTUnitUNumericFields; // holds PT unit numeric input fields character field name 
+	extern FArray1D< PTUnitNumericFieldData > PTUnitUNumericFields; // holds PT unit numeric input fields character field name
 
 	// Functions
 

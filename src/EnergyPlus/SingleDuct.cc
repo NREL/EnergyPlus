@@ -423,7 +423,7 @@ namespace SingleDuct {
 
 			CurrentModuleObject = "AirTerminal:SingleDuct:VAV:Reheat";
 
-			GetObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			SysNum = SysIndex;
 			IsNotOK = false;
@@ -634,7 +634,7 @@ namespace SingleDuct {
 
 			CurrentModuleObject = "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat";
 
-			GetObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			SysNum = SysIndex + NumVAVSys;
 			IsNotOK = false;
@@ -689,12 +689,12 @@ namespace SingleDuct {
 			Sys( SysNum ).ZoneMinAirFrac = Numbers( 2 );
 			if ( Sys( SysNum ).ZoneMinAirFrac < 0.0 ) {
 				ShowWarningError( Sys( SysNum ).SysType + " \"" + Sys( SysNum ).SysName + "\"" );
-				ShowContinueError( cNumericFields( 2 ) + " must be greater than or equal to 0. Resetting to 0 and" " the simulation continues." );
+				ShowContinueError( cNumericFields( 2 ) + " must be greater than or equal to 0. Resetting to 0 and the simulation continues." );
 				Sys( SysNum ).ZoneMinAirFrac = 0.0;
 			}
 			if ( Sys( SysNum ).ZoneMinAirFrac > 1.0 ) {
 				ShowWarningError( Sys( SysNum ).SysType + " \"" + Sys( SysNum ).SysName + "\"" );
-				ShowContinueError( cNumericFields( 2 ) + " must be less than or equal to 1. Resetting to 1 and" " the simulation continues." );
+				ShowContinueError( cNumericFields( 2 ) + " must be less than or equal to 1. Resetting to 1 and the simulation continues." );
 				Sys( SysNum ).ZoneMinAirFrac = 1.0;
 			}
 			// The reheat coil control node is necessary for hot water and steam reheat, but not necessary for
@@ -797,7 +797,7 @@ namespace SingleDuct {
 
 		for ( SysIndex = 1; SysIndex <= NumConstVolSys; ++SysIndex ) {
 
-			GetObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			SysNum = SysIndex + NumVAVSys + NumCBVAVSys;
 			IsNotOK = false;
@@ -946,7 +946,7 @@ namespace SingleDuct {
 
 			CurrentModuleObject = "AirTerminal:SingleDuct:VAV:NoReheat";
 
-			GetObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			SysNum = SysIndex + NumVAVSys + NumCBVAVSys + NumConstVolSys;
 			IsNotOK = false;
@@ -1073,7 +1073,7 @@ namespace SingleDuct {
 
 			CurrentModuleObject = "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat";
 
-			GetObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			SysNum = SysIndex + NumVAVSys + NumCBVAVSys + NumConstVolSys + NumNoRHVAVSys;
 			IsNotOK = false;
@@ -1105,12 +1105,12 @@ namespace SingleDuct {
 			Sys( SysNum ).ZoneMinAirFrac = Numbers( 2 );
 			if ( Sys( SysNum ).ZoneMinAirFrac < 0.0 ) {
 				ShowWarningError( Sys( SysNum ).SysType + " = \"" + Sys( SysNum ).SysName );
-				ShowContinueError( cNumericFields( 2 ) + " must be greater than or equal to 0. Resetting to 0 and" " the simulation continues." );
+				ShowContinueError( cNumericFields( 2 ) + " must be greater than or equal to 0. Resetting to 0 and the simulation continues." );
 				Sys( SysNum ).ZoneMinAirFrac = 0.0;
 			}
 			if ( Sys( SysNum ).ZoneMinAirFrac > 1.0 ) {
 				ShowWarningError( Sys( SysNum ).SysType + " = \"" + Sys( SysNum ).SysName );
-				ShowContinueError( cNumericFields( 2 ) + " must be less than or equal to 1. Resetting to 1 and" " the simulation continues." );
+				ShowContinueError( cNumericFields( 2 ) + " must be less than or equal to 1. Resetting to 1 and the simulation continues." );
 				Sys( SysNum ).ZoneMinAirFrac = 1.0;
 			}
 
@@ -1155,7 +1155,7 @@ namespace SingleDuct {
 
 			CurrentModuleObject = "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan";
 
-			GetObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, SysIndex, Alphas, NumAlphas, Numbers, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			SysNum = SysIndex + NumVAVSys + NumCBVAVSys + NumConstVolSys + NumNoRHVAVSys + NumNoRHCBVAVSys;
 			IsNotOK = false;
@@ -2172,7 +2172,7 @@ namespace SingleDuct {
 			if ( Sys( SysNum ).MaxAirVolFlowRateDuringReheat < ( Sys( SysNum ).ZoneMinAirFrac * Sys( SysNum ).MaxAirVolFlowRate ) ) {
 				// Only warn when really out of bounds
 				if ( ( Sys( SysNum ).ZoneMinAirFrac * Sys( SysNum ).MaxAirVolFlowRate ) - Sys( SysNum ).MaxAirVolFlowRateDuringReheat > 1.e-8 ) {
-					ShowWarningError( "SingleDuctSystem:SizeSys: Air Terminal Unit flow limits are not consistent, " "minimum flow limit is larger than reheat maximum" );
+					ShowWarningError( "SingleDuctSystem:SizeSys: Air Terminal Unit flow limits are not consistent, minimum flow limit is larger than reheat maximum" );
 					ShowContinueError( "Air Terminal Unit name = " + Sys( SysNum ).SysName );
 					ShowContinueError( "Maximum terminal flow during reheat = " + RoundSigDigits( Sys( SysNum ).MaxAirVolFlowRateDuringReheat, 6 ) + " [m3/s] or flow fraction = " + RoundSigDigits( ( Sys( SysNum ).MaxAirVolFlowRateDuringReheat / Sys( SysNum ).MaxAirVolFlowRate ), 4 ) );
 					ShowContinueError( "Minimum terminal flow = " + RoundSigDigits( ( Sys( SysNum ).ZoneMinAirFrac * Sys( SysNum ).MaxAirVolFlowRate ), 6 ) + " [m3/s] or flow fraction = " + RoundSigDigits( Sys( SysNum ).ZoneMinAirFrac, 4 ) );
@@ -4260,7 +4260,7 @@ namespace SingleDuct {
 		} else {
 			if ( ( Sys( SDSIndex ).SysType_Num != SingleDuctConstVolReheat ) && ( Sys( SDSIndex ).SysType_Num != SingleDuctVAVReheat ) ) {
 				ShowSevereError( ThisObjectType() + ", GetHVACSingleDuctSysIndex: Could not find allowed types=" + SDSName );
-				ShowContinueError( "The allowed types are: AirTerminal:SingleDuct:ConstantVolume:Reheat and " "AirTerminal:SingleDuct:VAV:Reheat" );
+				ShowContinueError( "The allowed types are: AirTerminal:SingleDuct:ConstantVolume:Reheat and AirTerminal:SingleDuct:VAV:Reheat" );
 				ErrorsFound = true;
 			}
 			if ( Sys( SDSIndex ).SysType_Num == SingleDuctVAVReheat ) {
@@ -4469,7 +4469,7 @@ namespace SingleDuct {
 			}
 			ControlledZoneLoop_exit: ;
 			if ( ZoneNodeNotFound ) {
-				ShowSevereError( cCurrentModuleObject + " = \"" + SysATMixer( InletATMixerNum ).Name + "\"." " Inlet Side Air Terminal Mixer air inlet node name must be the same as a zone exhaust node name." );
+				ShowSevereError( cCurrentModuleObject + " = \"" + SysATMixer( InletATMixerNum ).Name + "\". Inlet Side Air Terminal Mixer air inlet node name must be the same as a zone exhaust node name." );
 				ShowContinueError( "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
 				ShowContinueError( "..Inlet Side Air Terminal Mixer inlet node name = " + NodeID( SysATMixer( InletATMixerNum ).SecInNode ) );
 				ErrorsFound = true;
@@ -4544,7 +4544,7 @@ namespace SingleDuct {
 			}
 			ControlZoneLoop_exit: ;
 			if ( ZoneNodeNotFound ) {
-				ShowSevereError( cCurrentModuleObject + " = \"" + SysATMixer( SupplyATMixerNum ).Name + "\"." " Supply Side Air Terminal Mixer air outlet node name must be the same as a zone inlet node name." );
+				ShowSevereError( cCurrentModuleObject + " = \"" + SysATMixer( SupplyATMixerNum ).Name + "\". Supply Side Air Terminal Mixer air outlet node name must be the same as a zone inlet node name." );
 				ShowContinueError( "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
 				ShowContinueError( "..Inlet Side Air Terminal Mixer inlet node name = " + NodeID( SysATMixer( SupplyATMixerNum ).SecInNode ) );
 				ErrorsFound = true;
