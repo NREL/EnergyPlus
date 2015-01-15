@@ -380,7 +380,7 @@ namespace RootFinder {
 			if ( XMax == 0.0 ) {
 				XMinReset = XMax;
 			} else {
-				ShowFatalError( "InitializeRootFinder: Invalid min/max bounds " "XMin=" + TrimSigDigits( XMin, 6 ) + " must be smaller than " "XMax=" + TrimSigDigits( XMax, 6 ) );
+				ShowFatalError( "InitializeRootFinder: Invalid min/max bounds XMin=" + TrimSigDigits( XMin, 6 ) + " must be smaller than XMax=" + TrimSigDigits( XMax, 6 ) );
 			}
 		}
 
@@ -1598,8 +1598,8 @@ namespace RootFinder {
 					} else {
 						// Should never happen if CheckLowerUpperBracket() is called before
 						ShowSevereError( "UpdateBracket: Current iterate is smaller than the lower bracket." );
-						ShowContinueError( "UpdateBracket: " "X=" + TrimSigDigits( X, 15 ) + ", " "Y=" + TrimSigDigits( Y, 15 ) );
-						ShowContinueError( "UpdateBracket: " "XLower=" + TrimSigDigits( RootFinderData.LowerPoint.X, 15 ) + ", " "YLower=" + TrimSigDigits( RootFinderData.LowerPoint.Y, 15 ) );
+						ShowContinueError( "UpdateBracket: X=" + TrimSigDigits( X, 15 ) + ", Y=" + TrimSigDigits( Y, 15 ) );
+						ShowContinueError( "UpdateBracket: XLower=" + TrimSigDigits( RootFinderData.LowerPoint.X, 15 ) + ", YLower=" + TrimSigDigits( RootFinderData.LowerPoint.Y, 15 ) );
 						ShowFatalError( "UpdateBracket: Preceding error causes program termination." );
 					}
 				}
@@ -1623,8 +1623,8 @@ namespace RootFinder {
 					} else {
 						// Should never happen if CheckLowerUpperBracket() is called before
 						ShowSevereError( "UpdateBracket: Current iterate is greater than the upper bracket." );
-						ShowContinueError( "UpdateBracket: " "X=" + TrimSigDigits( X, 15 ) + ", " "Y=" + TrimSigDigits( Y, 15 ) );
-						ShowContinueError( "UpdateBracket: " "XUpper=" + TrimSigDigits( RootFinderData.UpperPoint.X, 15 ) + ", " "YUpper=" + TrimSigDigits( RootFinderData.UpperPoint.Y, 15 ) );
+						ShowContinueError( "UpdateBracket: X=" + TrimSigDigits( X, 15 ) + ", Y=" + TrimSigDigits( Y, 15 ) );
+						ShowContinueError( "UpdateBracket: XUpper=" + TrimSigDigits( RootFinderData.UpperPoint.X, 15 ) + ", YUpper=" + TrimSigDigits( RootFinderData.UpperPoint.Y, 15 ) );
 						ShowFatalError( "UpdateBracket: Preceding error causes program termination." );
 					}
 				}
@@ -1651,8 +1651,8 @@ namespace RootFinder {
 					} else {
 						// Should never happen if CheckLowerUpperBracket() is called before
 						ShowSevereError( "UpdateBracket: Current iterate is smaller than the lower bracket." );
-						ShowContinueError( "UpdateBracket: " "X=" + TrimSigDigits( X, 15 ) + ", " "Y=" + TrimSigDigits( Y, 15 ) );
-						ShowContinueError( "UpdateBracket: " "XLower=" + TrimSigDigits( RootFinderData.LowerPoint.X, 15 ) + ", " "YLower=" + TrimSigDigits( RootFinderData.LowerPoint.Y, 15 ) );
+						ShowContinueError( "UpdateBracket: X=" + TrimSigDigits( X, 15 ) + ", Y=" + TrimSigDigits( Y, 15 ) );
+						ShowContinueError( "UpdateBracket: XLower=" + TrimSigDigits( RootFinderData.LowerPoint.X, 15 ) + ", YLower=" + TrimSigDigits( RootFinderData.LowerPoint.Y, 15 ) );
 						ShowFatalError( "UpdateBracket: Preceding error causes program termination." );
 					}
 				}
@@ -1676,8 +1676,8 @@ namespace RootFinder {
 					} else {
 						// Should never happen if CheckLowerUpperBracket() is called before
 						ShowSevereError( "UpdateBracket: Current iterate is greater than the upper bracket." );
-						ShowContinueError( "UpdateBracket: " "X=" + TrimSigDigits( X, 15 ) + ", " "Y=" + TrimSigDigits( Y, 15 ) );
-						ShowContinueError( "UpdateBracket: " "XUpper=" + TrimSigDigits( RootFinderData.UpperPoint.X, 15 ) + ", " "YUpper=" + TrimSigDigits( RootFinderData.UpperPoint.Y, 15 ) );
+						ShowContinueError( "UpdateBracket: X=" + TrimSigDigits( X, 15 ) + ", Y=" + TrimSigDigits( Y, 15 ) );
+						ShowContinueError( "UpdateBracket: XUpper=" + TrimSigDigits( RootFinderData.UpperPoint.X, 15 ) + ", YUpper=" + TrimSigDigits( RootFinderData.UpperPoint.Y, 15 ) );
 						ShowFatalError( "UpdateBracket: Preceding error causes program termination." );
 					}
 				}

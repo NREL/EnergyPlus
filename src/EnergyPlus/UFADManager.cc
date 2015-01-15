@@ -372,7 +372,7 @@ namespace UFADManager {
 				ZoneUCSDUI( UINum ).E_Kc = 0.0;
 			} else if ( ZoneUCSDUI( UINum ).DiffuserType == DisplVent ) {
 				if ( ZoneUCSDUI( UINum ).A_Kc != AutoCalculate || ZoneUCSDUI( UINum ).B_Kc != AutoCalculate || ZoneUCSDUI( UINum ).C_Kc != AutoCalculate || ZoneUCSDUI( UINum ).D_Kc != AutoCalculate || ZoneUCSDUI( UINum ).E_Kc != AutoCalculate ) {
-					ShowWarningError( "For RoomAirSettings:UnderFloorAirDistributionInterior for Zone " + ZoneUCSDUI( UINum ).ZoneName + ", input for " "Coefficients A - E will be ignored when Floor Diffuser Type = HorizontalDisplacement." );
+					ShowWarningError( "For RoomAirSettings:UnderFloorAirDistributionInterior for Zone " + ZoneUCSDUI( UINum ).ZoneName + ", input for Coefficients A - E will be ignored when Floor Diffuser Type = HorizontalDisplacement." );
 					ShowContinueError( "  To input these Coefficients, use Floor Diffuser Type = Custom." );
 				}
 				ZoneUCSDUI( UINum ).A_Kc = 0.0;
@@ -1061,6 +1061,9 @@ namespace UFADManager {
 			SumReturnAirConvectionGainsByTypes( ZoneNum, IntGainTypesOccupied, RetAirGains );
 			ConvGainsOccSubzone += RetAirGains;
 		}
+		
+		// Add convection from pool cover to occupied region
+		ConvGainsOccSubzone += SumConvPool( ZoneNum );
 
 		// gains from lights (ceiling), tubular daylighting devices, high temp radiant heaters
 
@@ -1483,6 +1486,9 @@ namespace UFADManager {
 			ConvGainsOccSubzone += RetAirGains;
 		}
 
+		// Add convection from pool cover to occupied region
+		ConvGainsOccSubzone += SumConvPool( ZoneNum );
+		
 		// gains from lights (ceiling), tubular daylighting devices, high temp radiant heaters
 		SumInternalConvectionGainsByTypes( ZoneNum, IntGainTypesUpSubzone, ConvGainsUpSubzone );
 		ConvGainsUpSubzone += SumConvHTRadSys( ZoneNum );
@@ -1793,7 +1799,7 @@ namespace UFADManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

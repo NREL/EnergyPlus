@@ -667,7 +667,7 @@ namespace DisplacementVentMgr {
 		}
 
 		SumInternalConvectionGainsByTypes( ZoneNum, IntGainTypesMixedSubzone, ConvGainsMixedSubzone );
-		ConvGainsMixedSubzone += SumConvHTRadSys( ZoneNum ) + 0.5 * SysDepZoneLoadsLagged( ZoneNum );
+		ConvGainsMixedSubzone += SumConvHTRadSys( ZoneNum ) + SumConvPool( ZoneNum ) + 0.5 * SysDepZoneLoadsLagged( ZoneNum );
 		if ( Zone( ZoneNum ).NoHeatToReturnAir ) {
 			SumReturnAirConvectionGainsByTypes( ZoneNum, IntGainTypesMixedSubzone, RetAirGain );
 			ConvGainsMixedSubzone += RetAirGain;

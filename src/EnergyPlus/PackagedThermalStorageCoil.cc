@@ -1571,7 +1571,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + cCurrentModuleObject + " input. " "Preceding condition(s) causes termination." );
+			ShowFatalError( RoutineName + "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition(s) causes termination." );
 		}
 
 		// setup reporting

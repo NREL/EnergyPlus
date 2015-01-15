@@ -290,7 +290,7 @@ namespace WindTurbine {
 		// Flow
 		for ( WindTurbineNum = 1; WindTurbineNum <= NumWindTurbines; ++WindTurbineNum ) {
 
-			GetObjectItem( CurrentModuleObject, WindTurbineNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, WindTurbineNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( cAlphaArgs( 1 ), WindTurbineSys.Name(), WindTurbineNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
@@ -655,14 +655,14 @@ namespace WindTurbine {
 									}
 								} else { // blank field
 									if ( ! warningShown ) {
-										ShowWarningError( "InitWindTurbine: read from in.stat file shows <365 days in weather file. " "Annual average wind speed used will be inaccurate." );
+										ShowWarningError( "InitWindTurbine: read from in.stat file shows <365 days in weather file. Annual average wind speed used will be inaccurate." );
 										lineIn.erase( 0, lnPtr + 1 );
 										warningShown = true;
 									}
 								}
 							} else { // two tabs in succession
 								if ( ! warningShown ) {
-									ShowWarningError( "InitWindTurbine: read from in.stat file shows <365 days in weather file. " "Annual average wind speed used will be inaccurate." );
+									ShowWarningError( "InitWindTurbine: read from in.stat file shows <365 days in weather file. Annual average wind speed used will be inaccurate." );
 									lineIn.erase( 0, lnPtr + 1 );
 									warningShown = true;
 								}
@@ -676,10 +676,10 @@ namespace WindTurbine {
 				if ( wsStatFound ) {
 					AnnualTMYWS = sum( MonthWS ) / 12.0;
 				} else {
-					ShowWarningError( "InitWindTurbine: stat file did not include Wind Speed statistics. " "TMY Wind Speed adjusted at the height is used." );
+					ShowWarningError( "InitWindTurbine: stat file did not include Wind Speed statistics. TMY Wind Speed adjusted at the height is used." );
 				}
 			} else { // No stat file
-				ShowWarningError( "InitWindTurbine: stat file missing. " "TMY Wind Speed adjusted at the height is used." );
+				ShowWarningError( "InitWindTurbine: stat file missing. TMY Wind Speed adjusted at the height is used." );
 			}
 
 			MyOneTimeFlag = false;

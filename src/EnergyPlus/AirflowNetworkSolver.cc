@@ -764,12 +764,12 @@ namespace AirflowNetworkSolver {
 		ShowSevereError( "Too many iterations (SOLVZP) in Airflow Network simulation" );
 		++AirflowNetworkSimu.ExtLargeOpeningErrCount;
 		if ( AirflowNetworkSimu.ExtLargeOpeningErrCount < 2 ) {
-			ShowWarningError( "AirflowNetwork: SOLVER, Changing values for initialization flag, Relative airflow convergence, " "Absolute airflow convergence, Convergence acceleration limit or Maximum Iteration Number may solve the problem." );
+			ShowWarningError( "AirflowNetwork: SOLVER, Changing values for initialization flag, Relative airflow convergence, Absolute airflow convergence, Convergence acceleration limit or Maximum Iteration Number may solve the problem." );
 			ShowContinueErrorTimeStamp( "" );
 			ShowContinueError( "..Iterations=" + RoundSigDigits( ITER ) + ", Max allowed=" + RoundSigDigits( AirflowNetworkSimu.MaxIteration ) );
 			ShowFatalError( "AirflowNetwork: SOLVER, The previous error causes termination." );
 		} else {
-			ShowRecurringWarningErrorAtEnd( "AirFlowNetwork: Too many iterations (SOLVZP) in AirflowNetwork " " simulation continues.", AirflowNetworkSimu.ExtLargeOpeningErrIndex );
+			ShowRecurringWarningErrorAtEnd( "AirFlowNetwork: Too many iterations (SOLVZP) in AirflowNetwork simulation continues.", AirflowNetworkSimu.ExtLargeOpeningErrIndex );
 		}
 
 	}
@@ -3493,10 +3493,10 @@ Label999: ;
 			if ( AD( k ) - SUMD == 0.0 ) {
 				ShowSevereError( "AirflowNetworkSolver: L-U factorization in Subroutine FACSKY." );
 				ShowContinueError( "The denominator used in L-U factorizationis equal to 0.0 at node = " + AirflowNetworkNodeData( k ).Name + '.' );
-				ShowContinueError( "One possible cause is that this node may not be connected directly, or indirectly via airflow " "network connections " );
-				ShowContinueError( "(e.g., AirflowNetwork:Multizone:SurfaceCrack, AirflowNetwork:Multizone:Component:" "SimpleOpening, etc.), to an external" );
+				ShowContinueError( "One possible cause is that this node may not be connected directly, or indirectly via airflow network connections " );
+				ShowContinueError( "(e.g., AirflowNetwork:Multizone:SurfaceCrack, AirflowNetwork:Multizone:Component:SimpleOpening, etc.), to an external" );
 				ShowContinueError( "node (AirflowNetwork:MultiZone:Surface)." );
-				ShowContinueError( "Please send your input file and weather file to EnergyPlus support/development team" " for further investigation." );
+				ShowContinueError( "Please send your input file and weather file to EnergyPlus support/development team for further investigation." );
 				ShowFatalError( "Preceding condition causes termination." );
 			}
 			AD( k ) = 1.0 / ( AD( k ) - SUMD );
@@ -3948,7 +3948,7 @@ Label999: ;
 				HFact = MultizoneCompDetOpeningData( CompNum ).HeightFac1 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac1 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac2 - MultizoneCompDetOpeningData( CompNum ).OpenFac1 ) * ( MultizoneCompDetOpeningData( CompNum ).HeightFac2 - MultizoneCompDetOpeningData( CompNum ).HeightFac1 );
 				Cfact = MultizoneCompDetOpeningData( CompNum ).DischCoeff1 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac1 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac2 - MultizoneCompDetOpeningData( CompNum ).OpenFac1 ) * ( MultizoneCompDetOpeningData( CompNum ).DischCoeff2 - MultizoneCompDetOpeningData( CompNum ).DischCoeff1 );
 			} else {
-				ShowFatalError( "Open Factor is above the maximum input range for opening factors in " "AirflowNetwork:MultiZone:Component:DetailedOpening = " + MultizoneCompDetOpeningData( CompNum ).Name );
+				ShowFatalError( "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " + MultizoneCompDetOpeningData( CompNum ).Name );
 			}
 		}
 
@@ -3962,7 +3962,7 @@ Label999: ;
 				HFact = MultizoneCompDetOpeningData( CompNum ).HeightFac2 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac2 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac3 - MultizoneCompDetOpeningData( CompNum ).OpenFac2 ) * ( MultizoneCompDetOpeningData( CompNum ).HeightFac3 - MultizoneCompDetOpeningData( CompNum ).HeightFac2 );
 				Cfact = MultizoneCompDetOpeningData( CompNum ).DischCoeff2 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac2 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac3 - MultizoneCompDetOpeningData( CompNum ).OpenFac2 ) * ( MultizoneCompDetOpeningData( CompNum ).DischCoeff3 - MultizoneCompDetOpeningData( CompNum ).DischCoeff2 );
 			} else {
-				ShowFatalError( "Open Factor is above the maximum input range for opening factors in " "AirflowNetwork:MultiZone:Component:DetailedOpening = " + MultizoneCompDetOpeningData( CompNum ).Name );
+				ShowFatalError( "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " + MultizoneCompDetOpeningData( CompNum ).Name );
 			}
 		}
 
@@ -3980,7 +3980,7 @@ Label999: ;
 				HFact = MultizoneCompDetOpeningData( CompNum ).HeightFac3 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac3 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac4 - MultizoneCompDetOpeningData( CompNum ).OpenFac3 ) * ( MultizoneCompDetOpeningData( CompNum ).HeightFac4 - MultizoneCompDetOpeningData( CompNum ).HeightFac3 );
 				Cfact = MultizoneCompDetOpeningData( CompNum ).DischCoeff3 + ( Fact - MultizoneCompDetOpeningData( CompNum ).OpenFac3 ) / ( MultizoneCompDetOpeningData( CompNum ).OpenFac4 - MultizoneCompDetOpeningData( CompNum ).OpenFac3 ) * ( MultizoneCompDetOpeningData( CompNum ).DischCoeff4 - MultizoneCompDetOpeningData( CompNum ).DischCoeff3 );
 			} else {
-				ShowFatalError( "Open Factor is above the maximum input range for opening factors in " "AirflowNetwork:MultiZone:Component:DetailedOpening = " + MultizoneCompDetOpeningData( CompNum ).Name );
+				ShowFatalError( "Open Factor is above the maximum input range for opening factors in AirflowNetwork:MultiZone:Component:DetailedOpening = " + MultizoneCompDetOpeningData( CompNum ).Name );
 			}
 		}
 
@@ -4029,7 +4029,7 @@ Label999: ;
 					ShowContinueError( "The actual width is set to 1.0E-6 m." );
 					ShowContinueErrorTimeStamp( "Occurrence info:" );
 				} else {
-					ShowRecurringWarningErrorAtEnd( "The actual width of the " "AirflowNetwork:MultiZone:Component:DetailedOpening of " + MultizoneCompDetOpeningData( CompNum ).Name + " is 0 error continues.", MultizoneCompDetOpeningData( CompNum ).WidthErrIndex, ActLw, ActLw );
+					ShowRecurringWarningErrorAtEnd( "The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + MultizoneCompDetOpeningData( CompNum ).Name + " is 0 error continues.", MultizoneCompDetOpeningData( CompNum ).WidthErrIndex, ActLw, ActLw );
 				}
 				ActLw = 1.0e-6;
 			}
@@ -4040,7 +4040,7 @@ Label999: ;
 					ShowContinueError( "The actual height is set to 1.0E-6 m." );
 					ShowContinueErrorTimeStamp( "Occurrence info:" );
 				} else {
-					ShowRecurringWarningErrorAtEnd( "The actual width of the " "AirflowNetwork:MultiZone:Component:DetailedOpening of " + MultizoneCompDetOpeningData( CompNum ).Name + " is 0 error continues.", MultizoneCompDetOpeningData( CompNum ).HeightErrIndex, ActLh, ActLh );
+					ShowRecurringWarningErrorAtEnd( "The actual width of the AirflowNetwork:MultiZone:Component:DetailedOpening of " + MultizoneCompDetOpeningData( CompNum ).Name + " is 0 error continues.", MultizoneCompDetOpeningData( CompNum ).HeightErrIndex, ActLh, ActLh );
 				}
 				ActLh = 1.0e-6;
 			}
