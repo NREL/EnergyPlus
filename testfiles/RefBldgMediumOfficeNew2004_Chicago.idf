@@ -7585,7 +7585,7 @@
     0.556;                   !- Tolerance for Time Cooling Setpoint Not Met {deltaC}
 
   Output:SQLite,
-    Simple;                  !- Option Type
+    SimpleAndTabular;        !- Option Type
 
   Output:VariableDictionary,IDF,Unsorted;
 
