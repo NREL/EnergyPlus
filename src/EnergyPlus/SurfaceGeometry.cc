@@ -7440,7 +7440,7 @@ namespace EnergyPlus {
 		bool WrongSurfaceType; // True if associated surface is not 2- or 3-pane exterior window
 		int Loop;
 		int SurfNum; // Surface number
-		int ConstrNum; // Construction number
+		int ConstrNum( 0 ); // Construction number
 		int ConstrNumSh; // Shaded Construction number
 		int WSCPtr; // Window shading control pointer
 		int MatGapFlow; // Material number of gas in airflow gap of window's construction
@@ -10498,9 +10498,8 @@ namespace EnergyPlus {
 		Real64 LastTheta; // Angle between edge vectors
 		Real64 V1len; // Edge vector length
 		Real64 V2len; // Edge vector length
-		bool SignFlag; // Direction of edge turn : .TRUE. is right, .FALSE. is left
-		bool PrevSignFlag; // Container for the sign of the previous iteration's edge turn
-		bool FirstTimeFlag; // Flag indicating first iteration
+		bool SignFlag; // Direction of edge turn : true is right, false is left
+		bool PrevSignFlag( false ); // Container for the sign of the previous iteration's edge turn
 		static FArray1D< Real64 > X; // containers for x,y,z vertices of the surface
 		static FArray1D< Real64 > Y;
 		static FArray1D< Real64 > Z;
@@ -10596,66 +10595,65 @@ namespace EnergyPlus {
 		}
 
 		M = 0;
-		FirstTimeFlag = true;
 		SurfCollinearWarning = false;
 		for ( n = 1; n <= NSides; ++n ) { // perform convexity test in the plane determined above.
-        DotProd = ( A( n + 1 ) - A( n ) ) * ( B( n + 2 ) - B( n + 1 ) ) - ( B( n + 1 ) - B( n ) ) * ( A( n + 2 ) - A( n + 1 ) );
-        V1len = std::sqrt( pow_2( A( n + 1 ) - A( n ) ) + pow_2( B( n + 1 ) - B( n ) ) );
-        V2len = std::sqrt( pow_2( A( n + 2 ) - A( n + 1 ) ) + pow_2( B( n + 2 ) - B( n + 1 ) ) );
-        if ( V1len <= 1.e-8 || V2len <= 1.e-8 ) continue;
-        cosarg = DotProd / ( V1len * V2len );
-        if ( cosarg < -1.0 ) {
-          cosarg = -1.0;
-        } else if ( cosarg > 1.0 ) {
-          cosarg = 1.0;
-        }
-        Theta = std::acos( cosarg );
-        if ( Theta < ( ACosZero - TurnThreshold ) ) {
-          SignFlag = true;
-        } else {
-          if ( Theta > ( ACosZero + TurnThreshold ) ) {
-            SignFlag = false;
-          } else { // Store the index of the collinear vertex for removal
-            if ( ! SurfCollinearWarning ) {
-              if ( DisplayExtraWarnings ) {
-                ShowWarningError( "CheckConvexity: Surface=\"" + SurfaceTmp( SurfNum ).Name + "\", Collinear points have been removed." );
-              }
-              SurfCollinearWarning = true;
-            }
-            ++TotalCoincidentVertices;
-            ++M;
-            SurfCollinearVerts( M ) = n + 1;
-            continue;
-          }
-        }
+			V1len = std::sqrt( pow_2( A( n + 1 ) - A( n ) ) + pow_2( B( n + 1 ) - B( n ) ) );
+			V2len = std::sqrt( pow_2( A( n + 2 ) - A( n + 1 ) ) + pow_2( B( n + 2 ) - B( n + 1 ) ) );
+			if ( V1len <= 1.e-8 || V2len <= 1.e-8 ) continue;
+			DotProd = ( A( n + 1 ) - A( n ) ) * ( B( n + 2 ) - B( n + 1 ) ) - ( B( n + 1 ) - B( n ) ) * ( A( n + 2 ) - A( n + 1 ) );
+			cosarg = DotProd / ( V1len * V2len );
+			if ( cosarg < -1.0 ) {
+				cosarg = -1.0;
+			} else if ( cosarg > 1.0 ) {
+				cosarg = 1.0;
+			}
+			Theta = std::acos( cosarg );
+			if ( Theta < ( ACosZero - TurnThreshold ) ) {
+				SignFlag = true;
+			} else {
+				if ( Theta > ( ACosZero + TurnThreshold ) ) {
+					SignFlag = false;
+				} else { // Store the index of the collinear vertex for removal
+					if ( ! SurfCollinearWarning ) {
+						if ( DisplayExtraWarnings ) {
+							ShowWarningError( "CheckConvexity: Surface=\"" + SurfaceTmp( SurfNum ).Name + "\", Collinear points have been removed." );
+						}
+						SurfCollinearWarning = true;
+					}
+					++TotalCoincidentVertices;
+					++M;
+					SurfCollinearVerts( M ) = n + 1;
+					continue;
+				}
+			}
 
-        if ( FirstTimeFlag ) {
-          PrevSignFlag = SignFlag;
-          FirstTimeFlag = false;
-          continue;
-        }
+			if ( n == 1 ) {
+				PrevSignFlag = SignFlag;
+				LastTheta = Theta;
+				continue;
+			}
 
-        if ( SignFlag != PrevSignFlag ) {
-          if ( SolarDistribution != MinimalShadowing && SurfaceTmp( SurfNum ).ExtSolar ) {
-            if ( DisplayExtraWarnings ) {
-              ShowWarningError( "CheckConvexity: Zone=\"" + Zone( SurfaceTmp( SurfNum ).Zone ).Name + "\", Surface=\"" + SurfaceTmp( SurfNum ).Name + "\" is non-convex." );
-              Np1 = n + 1;
-              if ( Np1 > NSides ) Np1 -= NSides;
-              Np2 = n + 2;
-              if ( Np2 > NSides ) Np2 -= NSides;
-              ShowContinueError( "...vertex " + RoundSigDigits( n ) + " to vertex " + RoundSigDigits( Np1 ) + " to vertex " + RoundSigDigits( Np2 ) );
-              ShowContinueError( "...vertex " + RoundSigDigits( n ) + "=[" + RoundSigDigits( X( n ), 2 ) + ',' + RoundSigDigits( Y( n ), 2 ) + ',' + RoundSigDigits( Z( n ), 2 ) + ']' );
-              ShowContinueError( "...vertex " + RoundSigDigits( Np1 ) + "=[" + RoundSigDigits( X( n + 1 ), 2 ) + ',' + RoundSigDigits( Y( n + 1 ), 2 ) + ',' + RoundSigDigits( Z( n + 1 ), 2 ) + ']' );
-              ShowContinueError( "...vertex " + RoundSigDigits( Np2 ) + "=[" + RoundSigDigits( X( n + 2 ), 2 ) + ',' + RoundSigDigits( Y( n + 2 ), 2 ) + ',' + RoundSigDigits( Z( n + 2 ), 2 ) + ']' );
-              //          CALL ShowContinueError('...theta angle=['//TRIM(RoundSigDigits(Theta,6))//']')
-              //          CALL ShowContinueError('...last theta angle=['//TRIM(RoundSigDigits(LastTheta,6))//']')
-            }
-            SurfaceTmp( SurfNum ).IsConvex = false;
-            break;
-          }
-        }
-        PrevSignFlag = SignFlag;
-        LastTheta = Theta;
+			if ( SignFlag != PrevSignFlag ) {
+				if ( SolarDistribution != MinimalShadowing && SurfaceTmp( SurfNum ).ExtSolar ) {
+					if ( DisplayExtraWarnings ) {
+						ShowWarningError( "CheckConvexity: Zone=\"" + Zone( SurfaceTmp( SurfNum ).Zone ).Name + "\", Surface=\"" + SurfaceTmp( SurfNum ).Name + "\" is non-convex." );
+						Np1 = n + 1;
+						if ( Np1 > NSides ) Np1 -= NSides;
+						Np2 = n + 2;
+						if ( Np2 > NSides ) Np2 -= NSides;
+						ShowContinueError( "...vertex " + RoundSigDigits( n ) + " to vertex " + RoundSigDigits( Np1 ) + " to vertex " + RoundSigDigits( Np2 ) );
+						ShowContinueError( "...vertex " + RoundSigDigits( n ) + "=[" + RoundSigDigits( X( n ), 2 ) + ',' + RoundSigDigits( Y( n ), 2 ) + ',' + RoundSigDigits( Z( n ), 2 ) + ']' );
+						ShowContinueError( "...vertex " + RoundSigDigits( Np1 ) + "=[" + RoundSigDigits( X( n + 1 ), 2 ) + ',' + RoundSigDigits( Y( n + 1 ), 2 ) + ',' + RoundSigDigits( Z( n + 1 ), 2 ) + ']' );
+						ShowContinueError( "...vertex " + RoundSigDigits( Np2 ) + "=[" + RoundSigDigits( X( n + 2 ), 2 ) + ',' + RoundSigDigits( Y( n + 2 ), 2 ) + ',' + RoundSigDigits( Z( n + 2 ), 2 ) + ']' );
+						//          CALL ShowContinueError('...theta angle=['//TRIM(RoundSigDigits(Theta,6))//']')
+						//          CALL ShowContinueError('...last theta angle=['//TRIM(RoundSigDigits(LastTheta,6))//']')
+					}
+					SurfaceTmp( SurfNum ).IsConvex = false;
+					break;
+				}
+			}
+			PrevSignFlag = SignFlag;
+			LastTheta = Theta;
 		}
 
 		// must check to make sure don't remove NSides below 3

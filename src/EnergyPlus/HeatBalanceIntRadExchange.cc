@@ -370,6 +370,7 @@ namespace EnergyPlus {
     CalcScriptF(ZoneViewFactorInformation& Zone)
     {
 
+
       // SUBROUTINE INFORMATION:
       //       AUTHOR         Curt Pedersen
       //       DATE WRITTEN   1980
