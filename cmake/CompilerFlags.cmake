@@ -58,6 +58,12 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
       set(LINKER_FLAGS "${LINKER_FLAGS} -fsanitize=undefined -ggdb")
     endif()
 
+    option(ENABLE_COVERAGE "Enable Coverage Reporting in GCC" FALSE)
+    if(ENABLE_COVERAGE)
+      add_definitions(--coverage -O0)
+      set(LINKER_FLAGS "${LINKER_FLAGS} --coverage")
+    endif()
+
     mark_as_advanced(ENABLE_THREAD_SANITIZER ENABLE_ADDRESS_SANITIZER ENABLE_UNDEFINED_SANITIZER)
 
     if(CMAKE_HOST_UNIX)
