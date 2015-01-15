@@ -3402,7 +3402,7 @@ namespace ManageElectricPower {
 						ShowSevereError( "Transformer Overloaded" );
 						ShowContinueError( "Entered in ElectricLoadCenter:Transformer =" + Transformer( TransfNum ).Name );
 					}
-					ShowRecurringSevereErrorAtEnd( "Transformer Overloaded: " "Entered in ElectricLoadCenter:Transformer =" + Transformer( TransfNum ).Name, Transformer( TransfNum ).OverloadErrorIndex );
+					ShowRecurringSevereErrorAtEnd( "Transformer Overloaded: Entered in ElectricLoadCenter:Transformer =" + Transformer( TransfNum ).Name, Transformer( TransfNum ).OverloadErrorIndex );
 				}
 
 				TempChange = std::pow( PUL, 1.6 ) * Transformer( TransfNum ).TempRise;

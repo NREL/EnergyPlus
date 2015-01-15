@@ -3282,7 +3282,7 @@ namespace HeatBalanceSurfaceManager {
 				// That's probably not correct, but how correct is it to assume that no solar is absorbed anywhere
 				// in the zone?
 				if ( FirstCalcZone( ZoneNum ) ) {
-					ShowWarningError( "ComputeIntSWAbsorbFactors: Sum of area times inside solar absorption " "for all surfaces is zero in Zone: " + Zone( ZoneNum ).Name );
+					ShowWarningError( "ComputeIntSWAbsorbFactors: Sum of area times inside solar absorption for all surfaces is zero in Zone: " + Zone( ZoneNum ).Name );
 					FirstCalcZone( ZoneNum ) = false;
 				}
 				VMULT( ZoneNum ) = 0.0;
@@ -3595,7 +3595,7 @@ namespace HeatBalanceSurfaceManager {
 							EMSConstructActuatorChecked( SurfNum, Surface( SurfNum ).EMSConstructionOverrideValue ) = true;
 							if ( Construct( Surface( SurfNum ).Construction ).NumHistories != Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).NumHistories ) {
 								//thow warning, but allow
-								ShowWarningError( "InitEMSControlledConstructions: EMS Construction State Actuator may be unrealistic, " "incompatible CTF timescales are being used." );
+								ShowWarningError( "InitEMSControlledConstructions: EMS Construction State Actuator may be unrealistic, incompatible CTF timescales are being used." );
 								ShowContinueError( "Construction named = " + Construct( Surface( SurfNum ).Construction ).Name + " has CTF timesteps = " + TrimSigDigits( Construct( Surface( SurfNum ).Construction ).NumHistories ) );
 								ShowContinueError( "While construction named = " + Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).Name + " has CTF timesteps = " + TrimSigDigits( Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).NumHistories ) );
 								ShowContinueError( "Transient heat transfer modeling may not be valid for surface name = " + Surface( SurfNum ).Name + ", and the simulation continues" );
@@ -3603,10 +3603,10 @@ namespace HeatBalanceSurfaceManager {
 							}
 							if ( Construct( Surface( SurfNum ).Construction ).NumCTFTerms != Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).NumCTFTerms ) {
 								//thow warning, but allow
-								ShowWarningError( "InitEMSControlledConstructions: EMS Construction State Actuator may be unrealistic, " "incompatible CTF terms are being used." );
+								ShowWarningError( "InitEMSControlledConstructions: EMS Construction State Actuator may be unrealistic, incompatible CTF terms are being used." );
 								ShowContinueError( "Construction named = " + Construct( Surface( SurfNum ).Construction ).Name + " has number of CTF terms = " + TrimSigDigits( Construct( Surface( SurfNum ).Construction ).NumCTFTerms ) );
 								ShowContinueError( "While construction named = " + Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).Name + " has number of CTF terms = " + TrimSigDigits( Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).NumCTFTerms ) );
-								ShowContinueError( "The actuator is allowed but the transient heat transfer modeling may not be valid for" " surface name = " + Surface( SurfNum ).Name + ", and the simulation continues" );
+								ShowContinueError( "The actuator is allowed but the transient heat transfer modeling may not be valid for surface name = " + Surface( SurfNum ).Name + ", and the simulation continues" );
 
 							}
 
@@ -3658,7 +3658,7 @@ namespace HeatBalanceSurfaceManager {
 							}
 
 						} else if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_HAMT ) { // don't allow
-							ShowSevereError( "InitEMSControlledConstructions: EMS Construction State Actuator not available with " "Heat transfer algorithm CombinedHeatAndMoistureFiniteElement." );
+							ShowSevereError( "InitEMSControlledConstructions: EMS Construction State Actuator not available with Heat transfer algorithm CombinedHeatAndMoistureFiniteElement." );
 							ShowContinueError( "This actuator is not allowed for surface name = " + Surface( SurfNum ).Name + ", and the simulation continues without the override" );
 							EMSConstructActuatorChecked( SurfNum, Surface( SurfNum ).EMSConstructionOverrideValue ) = true;
 							EMSConstructActuatorIsOkay( SurfNum, Surface( SurfNum ).EMSConstructionOverrideValue ) = false;

@@ -924,7 +924,7 @@ DXFOutLines( std::string const & ColorScheme )
 
 	gio::write( unit, Format_708 ) << "Program Version" << "," << VerString;
 
-	gio::write( unit, Format_708 ) << "DXF using Lines" << " " << " ";
+	gio::write( unit, Format_708 ) << "DXF using Lines" << ' ' << ' ';
 
 	if ( ColorScheme == "" ) {
 		gio::write( unit, Format_708 ) << "Color Scheme" << "," << "Default";
@@ -1351,7 +1351,7 @@ DXFOutWireFrame( std::string const & ColorScheme )
 
 	gio::write( unit, Format_708 ) << "Program Version" << "," << VerString;
 
-	gio::write( unit, Format_708 ) << "DXF using Wireframe" << " " << " ";
+	gio::write( unit, Format_708 ) << "DXF using Wireframe" << ' ' << ' ';
 
 	if ( ColorScheme == "" ) {
 		gio::write( unit, Format_708 ) << "Color Scheme" << "," << "Default";
@@ -1770,7 +1770,7 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 					cSchedMin = "0.0";
 					cSchedMax = "0.0";
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7044, flags ) << ScheduleName << cSchedMin << cSchedMax << " " << RoundSigDigits( Surface( surf ).Area, 2 ) << RoundSigDigits( Surface( surf ).GrossArea, 2 ) << RoundSigDigits( Surface( surf ).NetAreaShadowCalc, 2 ) << RoundSigDigits( Surface( surf ).Azimuth, 2 ) << RoundSigDigits( Surface( surf ).Tilt, 2 ) << RoundSigDigits( Surface( surf ).Width, 2 ) << RoundSigDigits( Surface( surf ).Height, 2 ); }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7044, flags ) << ScheduleName << cSchedMin << cSchedMax << ' ' << RoundSigDigits( Surface( surf ).Area, 2 ) << RoundSigDigits( Surface( surf ).GrossArea, 2 ) << RoundSigDigits( Surface( surf ).NetAreaShadowCalc, 2 ) << RoundSigDigits( Surface( surf ).Azimuth, 2 ) << RoundSigDigits( Surface( surf ).Tilt, 2 ) << RoundSigDigits( Surface( surf ).Width, 2 ) << RoundSigDigits( Surface( surf ).Height, 2 ); }
 				gio::write( unit, Format_7061 ) << TrimSigDigits( Surface( surf ).Sides );
 			} else if ( RptType == 1 ) {
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7042, flags ) << TrimSigDigits( Surface( surf ).Sides ); }
@@ -1784,7 +1784,7 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 					cSchedMin = "0.0";
 					cSchedMax = "0.0";
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7044, flags ) << ScheduleName << cSchedMin << cSchedMax << " " << RoundSigDigits( Surface( surf ).Area, 2 ) << RoundSigDigits( Surface( surf ).GrossArea, 2 ) << RoundSigDigits( Surface( surf ).NetAreaShadowCalc, 2 ) << RoundSigDigits( Surface( surf ).Azimuth, 2 ) << RoundSigDigits( Surface( surf ).Tilt, 2 ) << RoundSigDigits( Surface( surf ).Width, 2 ) << RoundSigDigits( Surface( surf ).Height, 2 ); }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7044, flags ) << ScheduleName << cSchedMin << cSchedMax << ' ' << RoundSigDigits( Surface( surf ).Area, 2 ) << RoundSigDigits( Surface( surf ).GrossArea, 2 ) << RoundSigDigits( Surface( surf ).NetAreaShadowCalc, 2 ) << RoundSigDigits( Surface( surf ).Azimuth, 2 ) << RoundSigDigits( Surface( surf ).Tilt, 2 ) << RoundSigDigits( Surface( surf ).Width, 2 ) << RoundSigDigits( Surface( surf ).Height, 2 ); }
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7061, flags ) << TrimSigDigits( Surface( surf ).Sides ); }
 			}
 			if ( RptType == 10 ) continue;
@@ -2313,7 +2313,7 @@ VRMLOut(
 			for ( vert = 1; vert <= Surface( surf ).Sides; ++vert ) {
 				gio::write( csidenumber, fmtLD ) << vert - 1;
 				strip( csidenumber );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 				if ( vert == Surface( surf ).Sides ) gio::write( unit, Format_804 ) << " -1";
 			}
 			gio::write( unit, Format_805 );
@@ -2323,15 +2323,15 @@ VRMLOut(
 				vv0 = mytriangles( svert ).vv0;
 				gio::write( csidenumber, fmtLD ) << vv0 - 1;
 				strip( csidenumber );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 				vv1 = mytriangles( svert ).vv1;
 				gio::write( csidenumber, fmtLD ) << vv1 - 1;
 				strip( csidenumber );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 				vv2 = mytriangles( svert ).vv2;
 				gio::write( csidenumber, fmtLD ) << vv2 - 1;
 				strip( csidenumber );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 				gio::write( unit, Format_804 ) << " -1";
 			}
 			gio::write( unit, Format_805 );
@@ -2372,7 +2372,7 @@ VRMLOut(
 				for ( vert = 1; vert <= Surface( surf ).Sides; ++vert ) {
 					gio::write( csidenumber, fmtLD ) << vert - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					if ( vert == Surface( surf ).Sides ) gio::write( unit, Format_804 ) << " -1";
 				}
 				gio::write( unit, Format_805 );
@@ -2382,15 +2382,15 @@ VRMLOut(
 					vv0 = mytriangles( svert ).vv0;
 					gio::write( csidenumber, fmtLD ) << vv0 - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					vv1 = mytriangles( svert ).vv1;
 					gio::write( csidenumber, fmtLD ) << vv1 - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					vv2 = mytriangles( svert ).vv2;
 					gio::write( csidenumber, fmtLD ) << vv2 - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					gio::write( unit, Format_804 ) << " -1";
 				}
 				gio::write( unit, Format_805 );
@@ -2414,7 +2414,7 @@ VRMLOut(
 				for ( vert = 1; vert <= Surface( surf ).Sides; ++vert ) {
 					gio::write( csidenumber, fmtLD ) << vert - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					if ( vert == Surface( surf ).Sides ) gio::write( unit, Format_804 ) << " -1";
 				}
 				gio::write( unit, Format_805 );
@@ -2424,15 +2424,15 @@ VRMLOut(
 					vv0 = mytriangles( svert ).vv0;
 					gio::write( csidenumber, fmtLD ) << vv0 - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					vv1 = mytriangles( svert ).vv1;
 					gio::write( csidenumber, fmtLD ) << vv1 - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					vv2 = mytriangles( svert ).vv2;
 					gio::write( csidenumber, fmtLD ) << vv2 - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					gio::write( unit, Format_804 ) << " -1";
 				}
 				gio::write( unit, Format_805 );

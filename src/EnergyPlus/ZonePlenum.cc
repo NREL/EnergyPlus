@@ -328,7 +328,7 @@ namespace ZonePlenum {
 
 			CurrentModuleObject = "AirLoopHVAC:ReturnPlenum";
 
-			GetObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( AlphArray( 1 ), ZoneRetPlenCond.ZonePlenumName(), ZonePlenumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
@@ -357,7 +357,7 @@ namespace ZonePlenum {
 			//  Check if this zone is used as a controlled zone
 			ZoneEquipConfigLoop = FindItemInList( AlphArray( 2 ), ZoneEquipConfig.ZoneName(), NumOfZones );
 			if ( ZoneEquipConfigLoop != 0 ) {
-				ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is a controlled zone." " It cannot be used as a " + CurrentModuleObject );
+				ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is a controlled zone. It cannot be used as a " + CurrentModuleObject );
 				ShowContinueError( "..occurs in " + CurrentModuleObject + " = " + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
@@ -454,7 +454,7 @@ namespace ZonePlenum {
 
 			CurrentModuleObject = "AirLoopHVAC:SupplyPlenum";
 
-			GetObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -477,7 +477,7 @@ namespace ZonePlenum {
 				IOStat = FindItemInList( AlphArray( 2 ), ZoneRetPlenCond.ZoneName(), NumZoneReturnPlenums );
 				if ( IOStat != 0 ) {
 					ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is used more than once as a " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum." );
-					ShowContinueError( "..Only one " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum object" " may be connected to a given zone." );
+					ShowContinueError( "..Only one " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum object may be connected to a given zone." );
 					ShowContinueError( "..occurs in " + CurrentModuleObject + " = " + AlphArray( 1 ) );
 					ErrorsFound = true;
 				}
@@ -494,7 +494,7 @@ namespace ZonePlenum {
 			if ( any( ZoneEquipConfig.IsControlled() ) ) {
 				ZoneEquipConfigLoop = FindItemInList( AlphArray( 2 ), ZoneEquipConfig.ZoneName(), NumOfZones );
 				if ( ZoneEquipConfigLoop != 0 ) {
-					ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is a controlled zone." " It cannot be used as a " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum." );
+					ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is a controlled zone. It cannot be used as a " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum." );
 					ShowContinueError( "..occurs in " + CurrentModuleObject + " = " + AlphArray( 1 ) );
 					ErrorsFound = true;
 				}
