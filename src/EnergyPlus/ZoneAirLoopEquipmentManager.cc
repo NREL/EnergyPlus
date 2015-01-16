@@ -239,7 +239,7 @@ namespace ZoneAirLoopEquipmentManager {
 		if ( NumAirDistUnits > 0 ) {
 
 			for ( AirDistUnitNum = 1; AirDistUnitNum <= NumAirDistUnits; ++AirDistUnitNum ) {
-				GetObjectItem( CurrentModuleObject, AirDistUnitNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ; //  data for one zone
+				GetObjectItem( CurrentModuleObject, AirDistUnitNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); //  data for one zone
 
 				IsNotOK = false;
 				IsBlank = false;

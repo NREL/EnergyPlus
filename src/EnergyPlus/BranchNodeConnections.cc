@@ -482,7 +482,7 @@ namespace BranchNodeConnections {
 			}
 			if ( ! IsValid && ! MatchedAtLeastOne ) {
 				ShowSevereError( "Node Connection Error, Node=\"" + NodeConnections( Loop1 ).NodeName + "\", Inlet node did not find an appropriate matching \"outlet\" node." );
-				ShowContinueError( "If this is an outdoor air inlet node, " "it must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object." );
+				ShowContinueError( "If this is an outdoor air inlet node, it must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object." );
 				ShowContinueError( "Reference Object=" + NodeConnections( Loop1 ).ObjectType + ", Name=" + NodeConnections( Loop1 ).ObjectName );
 				++ErrorCounter;
 				//      ErrorsFound=.TRUE.
@@ -548,7 +548,7 @@ namespace BranchNodeConnections {
 			}
 			if ( ! IsValid ) {
 				ShowSevereError( "Node Connection Error, Node=\"" + NodeConnections( Loop1 ).NodeName + "\", Outdoor Air Reference did not find an appropriate \"outdoor air\" node." );
-				ShowContinueError( "This node must be listed in an OutdoorAir:Node or OutdoorAir:NodeList " "object in order to set its conditions." );
+				ShowContinueError( "This node must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object in order to set its conditions." );
 				ShowContinueError( "Reference Object=" + NodeConnections( Loop1 ).ObjectType + ", Name=" + NodeConnections( Loop1 ).ObjectName );
 				++ErrorCounter;
 				//      ErrorsFound=.TRUE.

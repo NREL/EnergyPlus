@@ -250,7 +250,7 @@ namespace SplitterComponent {
 		NumArray.dimension( NumNums, 0.0 );
 
 		for ( SplitterNum = 1; SplitterNum <= NumSplitters; ++SplitterNum ) {
-			GetObjectItem( CurrentModuleObject, SplitterNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, SplitterNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;

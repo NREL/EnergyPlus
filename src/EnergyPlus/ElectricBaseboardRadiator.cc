@@ -326,8 +326,7 @@ namespace ElectricBaseboardRadiator {
 						ShowContinueError( "Input for " + cAlphaFieldNames( iHeatCAPMAlphaNum ) + " = " + cAlphaArgs( iHeatCAPMAlphaNum ) );
 						ShowContinueError( "Illegal " + cNumericFieldNames (iHeatCapacityPerFloorAreaNumericNum ) + " = " + TrimSigDigits( rNumericArgs( iHeatCapacityPerFloorAreaNumericNum ), 7 ) );
 						ErrorsFound = true;
-					}
-					else if ( ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize ) {
+					} else if ( ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize ) {
 						ShowSevereError( cCurrentModuleObject + " = " + ElecBaseboard( BaseboardNum ).EquipName );
 						ShowContinueError( "Input for " + cAlphaFieldNames( iHeatCAPMAlphaNum ) + " = " + cAlphaArgs( iHeatCAPMAlphaNum ) );
 						ShowContinueError( "Illegal " + cNumericFieldNames( iHeatCapacityPerFloorAreaNumericNum ) + " = Autosize" );
@@ -339,8 +338,7 @@ namespace ElectricBaseboardRadiator {
 					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatCapacityPerFloorAreaNumericNum ) );
 					ErrorsFound = true;
 				}
-			}
-			else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ){
+			} else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ) {
 				ElecBaseboard( BaseboardNum ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
 				if ( !lNumericFieldBlanks( iHeatFracOfAutosizedCapacityNumericNum ) ) {
 					ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs( iHeatFracOfAutosizedCapacityNumericNum );
@@ -685,7 +683,7 @@ namespace ElectricBaseboardRadiator {
 			CapSizingMethod = ElecBaseboard( BaseboardNum ).HeatingCapMethod;
 			ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
 			if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
-				if ( CapSizingMethod == HeatingDesignCapacity ){
+				if ( CapSizingMethod == HeatingDesignCapacity ) {
 					if ( ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize ) {
 						CheckZoneSizing(CompType, CompName);
 						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
@@ -694,12 +692,12 @@ namespace ElectricBaseboardRadiator {
 					}
 					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 					TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
-				} else if ( CapSizingMethod == CapacityPerFloorArea ){
+				} else if ( CapSizingMethod == CapacityPerFloorArea ) {
 					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
 					TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
 					DataScalableCapSizingON = true;
-				} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
+				} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
 					CheckZoneSizing(CompType, CompName);
 					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 					DataFracOfAutosizedHeatingCapacity = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity;

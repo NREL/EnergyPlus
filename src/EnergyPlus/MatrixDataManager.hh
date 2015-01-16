@@ -21,7 +21,7 @@ namespace MatrixDataManager {
 	//INTEGER, PARAMETER :: OneDimensional = 1
 	extern int const TwoDimensional;
 	//INTEGER, PARAMETER :: ThreeDimensional = 3
-	
+
 	// DERIVED TYPE DEFINITIONS:
 	// na
 
