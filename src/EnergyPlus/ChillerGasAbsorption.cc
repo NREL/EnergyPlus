@@ -554,8 +554,8 @@ namespace ChillerGasAbsorption {
 		using DataPlant::TypeOf_Chiller_DFAbsorption;
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantSizeNotComplete;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizeCompleted;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::InterConnectTwoPlantLoopSides;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
@@ -691,8 +691,8 @@ namespace ChillerGasAbsorption {
 		HeatInletNode = GasAbsorber( ChillNum ).HeatReturnNodeNum;
 		HeatOutletNode = GasAbsorber( ChillNum ).HeatSupplyNodeNum;
 
-		if ( MyEnvrnFlag( ChillNum ) && BeginEnvrnFlag && ( PlantSizesOkayToFinalize ) ) {
-			if ( PlantSizeNotComplete ) SizeGasAbsorber( ChillNum );
+		if ( MyEnvrnFlag( ChillNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
+			if ( ! PlantFirstSizeCompleted ) SizeGasAbsorber( ChillNum );
 			if ( GasAbsorber( ChillNum ).isWaterCooled ) {
 				// init max available condenser water flow rate
 				if ( GasAbsorber( ChillNum ).CDLoopNum > 0 ) {
@@ -782,7 +782,7 @@ namespace ChillerGasAbsorption {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
@@ -857,12 +857,12 @@ namespace ChillerGasAbsorption {
 				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizCoolNum ).DeltaT * PlantSizData( PltSizCoolNum ).DesVolFlowRate * GasAbsorber( ChillNum ).SizFac;
 				if ( ! IsAutoSize ) tmpNomCap = GasAbsorber( ChillNum ).NomCoolingCap;
-				//IF (PlantSizesOkayToFinalize) GasAbsorber(ChillNum)%NomCoolingCap = tmpNomCap
+				//IF (PlantFirstSizesOkayToFinalize) GasAbsorber(ChillNum)%NomCoolingCap = tmpNomCap
 			} else {
 				if ( IsAutoSize ) tmpNomCap = 0.0;
-				//IF (PlantSizesOkayToFinalize) GasAbsorber(ChillNum)%NomCoolingCap = tmpNomCap
+				//IF (PlantFirstSizesOkayToFinalize) GasAbsorber(ChillNum)%NomCoolingCap = tmpNomCap
 			}
-			if ( PlantSizesOkayToFinalize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
 				if ( IsAutoSize ) {
 					GasAbsorber( ChillNum ).NomCoolingCap = tmpNomCap;
 					if ( ! GasAbsorber( ChillNum ).IsThisSized ) {
@@ -910,12 +910,12 @@ namespace ChillerGasAbsorption {
 			if ( PlantSizData( PltSizCoolNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				tmpEvapVolFlowRate = PlantSizData( PltSizCoolNum ).DesVolFlowRate * GasAbsorber( ChillNum ).SizFac;
 				if ( ! IsAutoSize ) tmpEvapVolFlowRate = GasAbsorber( ChillNum ).EvapVolFlowRate;
-				//IF (PlantSizesOkayToFinalize) GasAbsorber(ChillNum)%EvapVolFlowRate = tmpEvapVolFlowRate
+				//IF (PlantFirstSizesOkayToFinalize) GasAbsorber(ChillNum)%EvapVolFlowRate = tmpEvapVolFlowRate
 			} else {
 				if ( IsAutoSize ) tmpEvapVolFlowRate = 0.0;
-				//IF (PlantSizesOkayToFinalize) GasAbsorber(ChillNum)%EvapVolFlowRate = tmpEvapVolFlowRate
+				//IF (PlantFirstSizesOkayToFinalize) GasAbsorber(ChillNum)%EvapVolFlowRate = tmpEvapVolFlowRate
 			}
-			if ( PlantSizesOkayToFinalize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
 				if ( IsAutoSize ) {
 					GasAbsorber( ChillNum ).EvapVolFlowRate = tmpEvapVolFlowRate;
 					if ( ! GasAbsorber( ChillNum ).IsThisSized ) {
@@ -965,12 +965,12 @@ namespace ChillerGasAbsorption {
 			if ( PlantSizData( PltSizHeatNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				tmpHeatRecVolFlowRate = PlantSizData( PltSizHeatNum ).DesVolFlowRate * GasAbsorber( ChillNum ).SizFac;
 				if ( ! IsAutoSize ) tmpHeatRecVolFlowRate = GasAbsorber( ChillNum ).HeatVolFlowRate;
-				//IF (PlantSizesOkayToFinalize) GasAbsorber(ChillNum)%HeatVolFlowRate = tmpHeatRecVolFlowRate
+				//IF (PlantFirstSizesOkayToFinalize) GasAbsorber(ChillNum)%HeatVolFlowRate = tmpHeatRecVolFlowRate
 			} else {
 				if ( IsAutoSize ) tmpHeatRecVolFlowRate = 0.0;
-				//IF (PlantSizesOkayToFinalize) GasAbsorber(ChillNum)%HeatVolFlowRate = tmpHeatRecVolFlowRate
+				//IF (PlantFirstSizesOkayToFinalize) GasAbsorber(ChillNum)%HeatVolFlowRate = tmpHeatRecVolFlowRate
 			}
-			if ( PlantSizesOkayToFinalize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
 				if ( IsAutoSize ) {
 					GasAbsorber( ChillNum ).HeatVolFlowRate = tmpHeatRecVolFlowRate;
 					if ( ! GasAbsorber( ChillNum ).IsThisSized ) {
@@ -1023,12 +1023,12 @@ namespace ChillerGasAbsorption {
 				rho = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, GasAbsorber( ChillNum ).TempDesCondReturn, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 				tmpCondVolFlowRate = tmpNomCap * ( 1.0 + GasAbsorber( ChillNum ).FuelCoolRatio ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
 				if ( ! IsAutoSize ) tmpCondVolFlowRate = GasAbsorber( ChillNum ).CondVolFlowRate;
-				//IF (PlantSizesOkayToFinalize) GasAbsorber(ChillNum)%CondVolFlowRate = tmpCondVolFlowRate
+				//IF (PlantFirstSizesOkayToFinalize) GasAbsorber(ChillNum)%CondVolFlowRate = tmpCondVolFlowRate
 			} else {
 				if ( IsAutoSize ) tmpCondVolFlowRate = 0.0;
-				//IF (PlantSizesOkayToFinalize) GasAbsorber(ChillNum)%CondVolFlowRate = tmpCondVolFlowRate
+				//IF (PlantFirstSizesOkayToFinalize) GasAbsorber(ChillNum)%CondVolFlowRate = tmpCondVolFlowRate
 			}
-			if ( PlantSizesOkayToFinalize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
 				if ( IsAutoSize ) {
 					GasAbsorber( ChillNum ).CondVolFlowRate = tmpCondVolFlowRate;
 					if ( ! GasAbsorber( ChillNum ).IsThisSized ) {
@@ -1075,7 +1075,7 @@ namespace ChillerGasAbsorption {
 			ShowFatalError( "Preceding sizing errors cause program termination" );
 		}
 
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFirstSizesOkayToFinalize ) {
 			//create predefined report
 			equipName = GasAbsorber( ChillNum ).Name;
 			PreDefTableEntry( pdchMechType, equipName, "ChillerHeater:Absorption:DirectFired" );

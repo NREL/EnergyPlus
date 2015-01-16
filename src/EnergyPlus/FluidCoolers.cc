@@ -178,7 +178,7 @@ namespace FluidCoolers {
 
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -230,7 +230,7 @@ namespace FluidCoolers {
 		if ( SELECT_CASE_var == FluidCooler_SingleSpeed ) {
 			if ( InitLoopEquip ) {
 				InitFluidCooler( FluidCoolerNum, RunFlag );
-				if ( ! PlantSizesOkayToFinalize ) SizeFluidCooler( FluidCoolerNum );
+				if ( ! PlantFirstSizesOkayToFinalize ) SizeFluidCooler( FluidCoolerNum );
 				MinCap = 0.0;
 				MaxCap = SimpleFluidCooler( FluidCoolerNum ).FluidCoolerNominalCapacity;
 				OptCap = SimpleFluidCooler( FluidCoolerNum ).FluidCoolerNominalCapacity;
@@ -244,7 +244,7 @@ namespace FluidCoolers {
 		} else if ( SELECT_CASE_var == FluidCooler_TwoSpeed ) {
 			if ( InitLoopEquip ) {
 				InitFluidCooler( FluidCoolerNum, RunFlag );
-				if ( ! PlantSizesOkayToFinalize ) SizeFluidCooler( FluidCoolerNum );
+				if ( ! PlantFirstSizesOkayToFinalize ) SizeFluidCooler( FluidCoolerNum );
 				MinCap = 0.0; // signifies non-load based model (i.e. forward
 				MaxCap = SimpleFluidCooler( FluidCoolerNum ).FluidCoolerNominalCapacity;
 				OptCap = SimpleFluidCooler( FluidCoolerNum ).FluidCoolerNominalCapacity;
@@ -725,8 +725,8 @@ namespace FluidCoolers {
 		using DataPlant::TypeOf_FluidCooler_SingleSpd;
 		using DataPlant::TypeOf_FluidCooler_TwoSpd;
 		using DataPlant::ScanPlantLoopsForObject;
-		using DataPlant::PlantSizeNotComplete;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizeCompleted;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
 		using PlantUtilities::RegulateCondenserCompFlowReqOp;
@@ -790,8 +790,8 @@ namespace FluidCoolers {
 		}
 
 		// Begin environment initializations
-		if ( MyEnvrnFlag( FluidCoolerNum ) && BeginEnvrnFlag && ( PlantSizesOkayToFinalize ) ) {
-			if ( PlantSizeNotComplete ) SizeFluidCooler( FluidCoolerNum );
+		if ( MyEnvrnFlag( FluidCoolerNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
+			if ( ! PlantFirstSizeCompleted ) SizeFluidCooler( FluidCoolerNum );
 			rho = GetDensityGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, RoutineName );
 			SimpleFluidCooler( FluidCoolerNum ).DesWaterMassFlowRate = SimpleFluidCooler( FluidCoolerNum ).DesignWaterFlowRate * rho;
 			InitComponentNodes( 0.0, SimpleFluidCooler( FluidCoolerNum ).DesWaterMassFlowRate, SimpleFluidCooler( FluidCoolerNum ).WaterInletNodeNum, SimpleFluidCooler( FluidCoolerNum ).WaterOutletNodeNum, SimpleFluidCooler( FluidCoolerNum ).LoopNum, SimpleFluidCooler( FluidCoolerNum ).LoopSideNum, SimpleFluidCooler( FluidCoolerNum ).BranchNum, SimpleFluidCooler( FluidCoolerNum ).CompNum );
@@ -852,7 +852,7 @@ namespace FluidCoolers {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 
 		using namespace DataIPShortCuts; // Data for field names, blank numerics
 		using General::SolveRegulaFalsi;
@@ -908,12 +908,12 @@ namespace FluidCoolers {
 			if ( PltSizCondNum > 0 ) {
 				if ( PlantSizData( PltSizCondNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 					tmpDesignWaterFlowRate = PlantSizData( PltSizCondNum ).DesVolFlowRate;
-					if ( PlantSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).DesignWaterFlowRate = tmpDesignWaterFlowRate;
+					if ( PlantFirstSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).DesignWaterFlowRate = tmpDesignWaterFlowRate;
 				} else {
 					tmpDesignWaterFlowRate = 0.0;
-					if ( PlantSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).DesignWaterFlowRate = tmpDesignWaterFlowRate;
+					if ( PlantFirstSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).DesignWaterFlowRate = tmpDesignWaterFlowRate;
 				}
-				if ( PlantSizesOkayToFinalize ) ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "Autosized design water flow rate [m3/s]", SimpleFluidCooler( FluidCoolerNum ).DesignWaterFlowRate );
+				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "Autosized design water flow rate [m3/s]", SimpleFluidCooler( FluidCoolerNum ).DesignWaterFlowRate );
 			} else {
 				ShowSevereError( "Autosizing error for fluid cooler object = " + SimpleFluidCooler( FluidCoolerNum ).Name );
 				ShowFatalError( "Autosizing of fluid cooler condenser flow rate requires a loop Sizing:Plant object." );
@@ -946,11 +946,11 @@ namespace FluidCoolers {
 			// We assume the nominal fan power is 0.0105 times the design load
 			if ( SimpleFluidCooler( FluidCoolerNum ).PerformanceInputMethod_Num == PIM_NominalCapacity ) {
 				tmpHighSpeedFanPower = 0.0105 * SimpleFluidCooler( FluidCoolerNum ).FluidCoolerNominalCapacity;
-				if ( PlantSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower = tmpHighSpeedFanPower;
+				if ( PlantFirstSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower = tmpHighSpeedFanPower;
 			} else {
 				if ( DesFluidCoolerLoad > 0.0 ) {
 					tmpHighSpeedFanPower = 0.0105 * DesFluidCoolerLoad;
-					if ( PlantSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower = tmpHighSpeedFanPower;
+					if ( PlantFirstSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower = tmpHighSpeedFanPower;
 				} else if ( PltSizCondNum > 0 ) {
 					if ( PlantSizData( PltSizCondNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 						// This conditional statement is to trap when the user specified Condenser/Fluid Cooler water design setpoint
@@ -966,10 +966,10 @@ namespace FluidCoolers {
 						Cp = GetSpecificHeatGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 						DesFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * PlantSizData( PltSizCondNum ).DeltaT;
 						tmpHighSpeedFanPower = 0.0105 * DesFluidCoolerLoad;
-						if ( PlantSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower = tmpHighSpeedFanPower;
+						if ( PlantFirstSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower = tmpHighSpeedFanPower;
 					} else {
 						tmpHighSpeedFanPower = 0.0;
-						if ( PlantSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower = tmpHighSpeedFanPower;
+						if ( PlantFirstSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower = tmpHighSpeedFanPower;
 					}
 				} else {
 					ShowSevereError( "Autosizing of fluid cooler fan power requires a loop Sizing:Plant object." );
@@ -977,20 +977,20 @@ namespace FluidCoolers {
 				}
 			}
 			if ( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType_Num == FluidCooler_SingleSpeed ) {
-				if ( PlantSizesOkayToFinalize ) ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "Fan Power at Design Air Flow Rate [W]", SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower );
+				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "Fan Power at Design Air Flow Rate [W]", SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower );
 			} else if ( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType_Num == FluidCooler_TwoSpeed ) {
-				if ( PlantSizesOkayToFinalize ) ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "Fan Power at High Fan Speed [W]", SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower );
+				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "Fan Power at High Fan Speed [W]", SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower );
 			}
 		}
 
 		if ( SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate == AutoSize ) {
 			if ( SimpleFluidCooler( FluidCoolerNum ).PerformanceInputMethod_Num == PIM_NominalCapacity ) {
 				tmpHighSpeedAirFlowRate = SimpleFluidCooler( FluidCoolerNum ).FluidCoolerNominalCapacity / ( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringWaterTemp - SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp ) * 4.0;
-				if ( PlantSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
+				if ( PlantFirstSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
 			} else {
 				if ( DesFluidCoolerLoad > 0.0 ) {
 					tmpHighSpeedAirFlowRate = DesFluidCoolerLoad / ( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringWaterTemp - SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp ) * 4.0;
-					if ( PlantSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
+					if ( PlantFirstSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
 				} else if ( PltSizCondNum > 0 ) {
 					if ( PlantSizData( PltSizCondNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 						// This conditional statement is to trap when the user specified Condenser/Fluid Cooler water design setpoint
@@ -1006,10 +1006,10 @@ namespace FluidCoolers {
 						Cp = GetSpecificHeatGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 						DesFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * PlantSizData( PltSizCondNum ).DeltaT;
 						tmpHighSpeedAirFlowRate = DesFluidCoolerLoad / ( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringWaterTemp - SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp ) * 4.0;
-						if ( PlantSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
+						if ( PlantFirstSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
 					} else {
 						tmpHighSpeedAirFlowRate = 0.0;
-						if ( PlantSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
+						if ( PlantFirstSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
 					}
 				} else {
 					ShowSevereError( "Autosizing of fluid cooler air flow rate requires a loop Sizing:Plant object" );
@@ -1017,9 +1017,9 @@ namespace FluidCoolers {
 				}
 			}
 			if ( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType_Num == FluidCooler_SingleSpeed ) {
-				if ( PlantSizesOkayToFinalize ) ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "Design Air Flow Rate [m3/s]", SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate );
+				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "Design Air Flow Rate [m3/s]", SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate );
 			} else if ( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType == "FluidCooler:TwoSpeed" ) {
-				if ( PlantSizesOkayToFinalize ) ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "Air Flow Rate at High Fan Speed [m3/s]", SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate );
+				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "Air Flow Rate at High Fan Speed [m3/s]", SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate );
 			}
 		}
 
@@ -1084,16 +1084,16 @@ namespace FluidCoolers {
 						ShowFatalError( "Autosizing of Fluid Cooler UA failed for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name );
 					}
 					tmpHighSpeedEvapFluidCoolerUA = UA;
-					if ( PlantSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA = tmpHighSpeedEvapFluidCoolerUA;
+					if ( PlantFirstSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA = tmpHighSpeedEvapFluidCoolerUA;
 					SimpleFluidCooler( FluidCoolerNum ).FluidCoolerNominalCapacity = DesFluidCoolerLoad;
 				} else {
 					tmpHighSpeedEvapFluidCoolerUA = 0.0;
-					if ( PlantSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA = tmpHighSpeedEvapFluidCoolerUA;
+					if ( PlantFirstSizesOkayToFinalize ) SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA = tmpHighSpeedEvapFluidCoolerUA;
 				}
 				if ( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType_Num == FluidCooler_SingleSpeed ) {
-					if ( PlantSizesOkayToFinalize ) ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "U-factor Times Area Value at Design Air Flow Rate [W/K]", SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA );
+					if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "U-factor Times Area Value at Design Air Flow Rate [W/K]", SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA );
 				} else if ( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType_Num == FluidCooler_TwoSpeed ) {
-					if ( PlantSizesOkayToFinalize ) ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "U-factor Times Area Value at High Fan Speed [W/K]", SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA );
+					if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "U-factor Times Area Value at High Fan Speed [W/K]", SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA );
 				}
 			} else {
 				ShowSevereError( "Autosizing error for fluid cooler object = " + SimpleFluidCooler( FluidCoolerNum ).Name );
@@ -1156,23 +1156,23 @@ namespace FluidCoolers {
 				SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA = 0.0;
 			}
 			if ( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType_Num == FluidCooler_SingleSpeed ) {
-				if ( PlantSizesOkayToFinalize ) ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "Fluid cooler UA value at design air flow rate based on nominal capacity input [W/K]", SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA );
+				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "Fluid cooler UA value at design air flow rate based on nominal capacity input [W/K]", SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA );
 			} else if ( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType_Num == FluidCooler_TwoSpeed ) {
-				if ( PlantSizesOkayToFinalize ) ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "Fluid cooler UA value at high fan speed based on nominal capacity input [W/K]", SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA );
+				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "Fluid cooler UA value at high fan speed based on nominal capacity input [W/K]", SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA );
 			}
 		}
 
-		if ( SimpleFluidCooler( FluidCoolerNum ).LowSpeedAirFlowRate == AutoSize && PlantSizesOkayToFinalize ) {
+		if ( SimpleFluidCooler( FluidCoolerNum ).LowSpeedAirFlowRate == AutoSize && PlantFirstSizesOkayToFinalize ) {
 			SimpleFluidCooler( FluidCoolerNum ).LowSpeedAirFlowRate = SimpleFluidCooler( FluidCoolerNum ).LowSpeedAirFlowRateSizingFactor * SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate;
 			ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "Air Flow Rate at Low Fan Speed [m3/s]", SimpleFluidCooler( FluidCoolerNum ).LowSpeedAirFlowRate );
 		}
 
-		if ( SimpleFluidCooler( FluidCoolerNum ).LowSpeedFanPower == AutoSize && PlantSizesOkayToFinalize ) {
+		if ( SimpleFluidCooler( FluidCoolerNum ).LowSpeedFanPower == AutoSize && PlantFirstSizesOkayToFinalize ) {
 			SimpleFluidCooler( FluidCoolerNum ).LowSpeedFanPower = SimpleFluidCooler( FluidCoolerNum ).LowSpeedFanPowerSizingFactor * SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower;
 			ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "Fan Power at Low Fan Speed [W]", SimpleFluidCooler( FluidCoolerNum ).LowSpeedFanPower );
 		}
 
-		if ( SimpleFluidCooler( FluidCoolerNum ).LowSpeedFluidCoolerUA == AutoSize && PlantSizesOkayToFinalize ) {
+		if ( SimpleFluidCooler( FluidCoolerNum ).LowSpeedFluidCoolerUA == AutoSize && PlantFirstSizesOkayToFinalize ) {
 			SimpleFluidCooler( FluidCoolerNum ).LowSpeedFluidCoolerUA = SimpleFluidCooler( FluidCoolerNum ).LowSpeedFluidCoolerUASizingFactor * SimpleFluidCooler( FluidCoolerNum ).HighSpeedFluidCoolerUA;
 			ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "U-factor Times Area Value at Low Fan Speed [W/K]", SimpleFluidCooler( FluidCoolerNum ).LowSpeedFluidCoolerUA );
 		}
@@ -1236,12 +1236,12 @@ namespace FluidCoolers {
 			} else {
 				SimpleFluidCooler( FluidCoolerNum ).LowSpeedFluidCoolerUA = 0.0;
 			}
-			if ( PlantSizesOkayToFinalize ) ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "U-factor Times Area Value at Low Fan Speed [W/C]", SimpleFluidCooler( FluidCoolerNum ).LowSpeedFluidCoolerUA );
+			if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType, SimpleFluidCooler( FluidCoolerNum ).Name, "U-factor Times Area Value at Low Fan Speed [W/C]", SimpleFluidCooler( FluidCoolerNum ).LowSpeedFluidCoolerUA );
 		}
 
 		ErrorsFound = false;
 
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFirstSizesOkayToFinalize ) {
 			//create predefined report
 			equipName = SimpleFluidCooler( FluidCoolerNum ).Name;
 			PreDefTableEntry( pdchMechType, equipName, SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType );

@@ -174,6 +174,8 @@ namespace DataGlobals {
 	bool MetersHaveBeenInitialized( false );
 	bool KickOffSimulation( false ); // Kick off simulation -- meaning run each environment for 1 or 2 time steps.
 	bool KickOffSizing( false ); // Kick off sizing -- meaning run each environment for 1 or 2 time steps.
+	bool RedoSizesHVACSimulation( false ); // doing kick off simulation for redoing sizes as part of sizing
+	bool FinalSizingHVACSizingSimIteration( false ); //when doing HVAC sizing Simulation
 	bool AnyEnergyManagementSystemInModel( false ); // true if there is any EMS or Erl in model.  otherwise false
 	bool AnyPlantInModel( false ); // true if there are any plant or condenser loops in model, otherwise false
 	int CacheIPErrorFile( 0 ); // Cache IP errors until IDF processing done.

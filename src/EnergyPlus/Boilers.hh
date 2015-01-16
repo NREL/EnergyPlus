@@ -68,12 +68,14 @@ namespace Boilers {
 		bool Available; // TRUE if machine available in current time step
 		bool ON; // TRUE: simulate the machine at it's operating part load ratio
 		Real64 NomCap; // W - design nominal capacity of Boiler
+		bool NomCapWasAutoSized; // true if previous was set to autosize input
 		Real64 Effic; // boiler efficiency at design conditions
 		Real64 TempDesBoilerOut; // C - Boiler design outlet temperature
 		int FlowMode; // one of 3 modes for componet flow during operation
 		bool ModulatedFlowSetToLoop; // True if the setpoint is missing at the outlet node
 		bool ModulatedFlowErrDone; // true if setpoint warning issued
 		Real64 VolFlowRate; // m3/s - Boiler water design volumetric flow rate
+		bool VolFlowRateWasAutoSized; // true if previous was set to autosize input
 		Real64 DesMassFlowRate; // kg/s - Boiler water design mass flow rate
 		Real64 MassFlowRate; // kg/s - Boiler water mass flow rate
 		Real64 SizFac; // sizing factor
@@ -105,12 +107,14 @@ namespace Boilers {
 			Available( false ),
 			ON( false ),
 			NomCap( 0.0 ),
+			NomCapWasAutoSized( false ),
 			Effic( 0.0 ),
 			TempDesBoilerOut( 0.0 ),
 			FlowMode( FlowModeNotSet ),
 			ModulatedFlowSetToLoop( false ),
 			ModulatedFlowErrDone( false ),
 			VolFlowRate( 0.0 ),
+			VolFlowRateWasAutoSized( false ),
 			DesMassFlowRate( 0.0 ),
 			MassFlowRate( 0.0 ),
 			SizFac( 0.0 ),
@@ -144,12 +148,14 @@ namespace Boilers {
 			bool const Available, // TRUE if machine available in current time step
 			bool const ON, // TRUE: simulate the machine at it's operating part load ratio
 			Real64 const NomCap, // W - design nominal capacity of Boiler
+			bool const NomCapWasAutoSized,  // true if previous was set to autosize input
 			Real64 const Effic, // boiler efficiency at design conditions
 			Real64 const TempDesBoilerOut, // C - Boiler design outlet temperature
 			int const FlowMode, // one of 3 modes for componet flow during operation
 			bool const ModulatedFlowSetToLoop, // True if the setpoint is missing at the outlet node
 			bool const ModulatedFlowErrDone, // true if setpoint warning issued
 			Real64 const VolFlowRate, // m3/s - Boiler water design volumetric flow rate
+			bool const VolFlowRateWasAutoSized, // true if previous was set to autosize input
 			Real64 const DesMassFlowRate, // kg/s - Boiler water design mass flow rate
 			Real64 const MassFlowRate, // kg/s - Boiler water mass flow rate
 			Real64 const SizFac, // sizing factor
@@ -180,12 +186,14 @@ namespace Boilers {
 			Available( Available ),
 			ON( ON ),
 			NomCap( NomCap ),
+			NomCapWasAutoSized( NomCapWasAutoSized ),
 			Effic( Effic ),
 			TempDesBoilerOut( TempDesBoilerOut ),
 			FlowMode( FlowMode ),
 			ModulatedFlowSetToLoop( ModulatedFlowSetToLoop ),
 			ModulatedFlowErrDone( ModulatedFlowErrDone ),
 			VolFlowRate( VolFlowRate ),
+			VolFlowRateWasAutoSized( VolFlowRateWasAutoSized ),
 			DesMassFlowRate( DesMassFlowRate ),
 			MassFlowRate( MassFlowRate ),
 			SizFac( SizFac ),

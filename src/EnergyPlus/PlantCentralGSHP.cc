@@ -269,7 +269,7 @@ namespace PlantCentralGSHP {
 
 		// Using/Aliasing
 		using namespace DataSizing;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using DataHVACGlobals::SmallWaterVolFlow;
@@ -368,15 +368,15 @@ namespace PlantCentralGSHP {
 						tmpEvapVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate * Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).SizFac;
 						Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).tmpEvapVolFlowRate = tmpEvapVolFlowRate;
 						if ( ! IsAutoSize ) tmpEvapVolFlowRate = Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).EvapVolFlowRate;
-						//IF (PlantSizesOkayToFinalize) Wrapper(WrapperNum)%ChillerHeater(NumChillerHeater)%EvapVolFlowRate = &
+						//IF (PlantFirstSizesOkayToFinalize) Wrapper(WrapperNum)%ChillerHeater(NumChillerHeater)%EvapVolFlowRate = &
 						//tmpEvapVolFlowRate
 					} else {
 						if ( IsAutoSize ) tmpEvapVolFlowRate = 0.0;
 						Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).tmpEvapVolFlowRate = tmpEvapVolFlowRate;
-						//IF (PlantSizesOkayToFinalize) Wrapper(WrapperNum)%ChillerHeater(NumChillerHeater)%EvapVolFlowRate = &
+						//IF (PlantFirstSizesOkayToFinalize) Wrapper(WrapperNum)%ChillerHeater(NumChillerHeater)%EvapVolFlowRate = &
 						//tmpEvapVolFlowRate
 					}
-					if ( PlantSizesOkayToFinalize ) {
+					if ( PlantFirstSizesOkayToFinalize ) {
 						if ( IsAutoSize ) {
 							Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).EvapVolFlowRate = tmpEvapVolFlowRate;
 							ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name, "Design Size Reference Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate );
@@ -422,12 +422,12 @@ namespace PlantCentralGSHP {
 						rho = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
 						tmpNomCap = Cp * rho * PlantSizData( PltSizNum ).DeltaT * tmpEvapVolFlowRate;
 						if ( ! IsAutoSize ) tmpNomCap = Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).RefCapCooling;
-						//IF (PlantSizesOkayToFinalize) Wrapper(WrapperNum)%ChillerHeater(NumChillerHeater)%RefCapCooling = tmpNomCap
+						//IF (PlantFirstSizesOkayToFinalize) Wrapper(WrapperNum)%ChillerHeater(NumChillerHeater)%RefCapCooling = tmpNomCap
 					} else {
 						if ( IsAutoSize ) tmpNomCap = 0.0;
-						//IF (PlantSizesOkayToFinalize) Wrapper(WrapperNum)%ChillerHeater(NumChillerHeater)%RefCapCooling = tmpNomCap
+						//IF (PlantFirstSizesOkayToFinalize) Wrapper(WrapperNum)%ChillerHeater(NumChillerHeater)%RefCapCooling = tmpNomCap
 					}
-					if ( PlantSizesOkayToFinalize ) {
+					if ( PlantFirstSizesOkayToFinalize ) {
 						if ( IsAutoSize ) {
 							Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).RefCapCooling = tmpNomCap;
 							ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name, "Design Size Reference Capacity [W]", tmpNomCap );
@@ -475,15 +475,15 @@ namespace PlantCentralGSHP {
 						tmpCondVolFlowRate = tmpNomCap * ( 1.0 + ( 1.0 / Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).RefCOPCooling ) * Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).OpenMotorEff ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
 						Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).tmpCondVolFlowRate = tmpCondVolFlowRate;
 						if ( ! IsAutoSize ) tmpCondVolFlowRate = Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).CondVolFlowRate;
-						//IF (PlantSizesOkayToFinalize) Wrapper(WrapperNum)%ChillerHeater(NumChillerHeater)%CondVolFlowRate = &
+						//IF (PlantFirstSizesOkayToFinalize) Wrapper(WrapperNum)%ChillerHeater(NumChillerHeater)%CondVolFlowRate = &
 						//     tmpCondVolFlowRate
 					} else {
 						if ( IsAutoSize ) tmpCondVolFlowRate = 0.0;
 						Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).tmpCondVolFlowRate = tmpCondVolFlowRate;
-						//IF (PlantSizesOkayToFinalize) Wrapper(WrapperNum)%ChillerHeater(NumChillerHeater)%CondVolFlowRate = &
+						//IF (PlantFirstSizesOkayToFinalize) Wrapper(WrapperNum)%ChillerHeater(NumChillerHeater)%CondVolFlowRate = &
 						//     tmpCondVolFlowRate
 					}
-					if ( PlantSizesOkayToFinalize ) {
+					if ( PlantFirstSizesOkayToFinalize ) {
 						if ( IsAutoSize ) {
 							Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).CondVolFlowRate = tmpCondVolFlowRate;
 							ReportSizingOutput( "ChillerHeaterPerformance:Electric:EIR", Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name, "Design Size Reference Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate );
@@ -516,7 +516,7 @@ namespace PlantCentralGSHP {
 					}
 				}
 
-				if ( PlantSizesOkayToFinalize ) {
+				if ( PlantFirstSizesOkayToFinalize ) {
 					//create predefined report
 					equipName = Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).Name;
 					PreDefTableEntry( pdchMechType, equipName, "ChillerHeaterPerformance:Electric:EIR" );
@@ -1252,8 +1252,8 @@ namespace PlantCentralGSHP {
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_CentralGroundSourceHeatPump;
 		using DataPlant::ScanPlantLoopsForObject;
-		using DataPlant::PlantSizesOkayToFinalize;
-		using DataPlant::PlantSizeNotComplete;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizeCompleted;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 		using InputProcessor::SameString;
 		using DataEnvironment::StdBaroPress;
@@ -1404,8 +1404,8 @@ namespace PlantCentralGSHP {
 		GLHEInletNodeNum = Wrapper( WrapperNum ).GLHEInletNodeNum;
 		GLHEOutletNodeNum = Wrapper( WrapperNum ).GLHEOutletNodeNum;
 
-		if ( MyWrapperEnvrnFlag( WrapperNum ) && BeginEnvrnFlag && ( PlantSizesOkayToFinalize ) ) {
-			if ( PlantSizeNotComplete ) SizeWrapper( WrapperNum );
+		if ( MyWrapperEnvrnFlag( WrapperNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
+			if ( ! PlantFirstSizeCompleted ) SizeWrapper( WrapperNum );
 			if ( Wrapper( WrapperNum ).ControlMode == SmartMixing ) {
 
 				Wrapper( WrapperNum ).CHWVolFlowRate = 0.0;

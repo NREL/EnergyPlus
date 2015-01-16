@@ -418,8 +418,8 @@ namespace BoilerSteam {
 		using DataPlant::TypeOf_Boiler_Steam;
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantSizesOkayToFinalize;
-		using DataPlant::PlantSizeNotComplete;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizeCompleted;
 		using DataPlant::SingleSetPoint;
 		using DataPlant::DualSetPointDeadBand;
 		using PlantUtilities::InitComponentNodes;
@@ -477,8 +477,8 @@ namespace BoilerSteam {
 		BoilerInletNode = Boiler( BoilerNum ).BoilerInletNodeNum;
 		BoilerOutletNode = Boiler( BoilerNum ).BoilerOutletNodeNum;
 
-		if ( BeginEnvrnFlag && MyEnvrnFlag( BoilerNum ) && ( PlantSizesOkayToFinalize ) ) {
-			if ( PlantSizeNotComplete ) SizeBoiler( BoilerNum );
+		if ( BeginEnvrnFlag && MyEnvrnFlag( BoilerNum ) && ( PlantFirstSizesOkayToFinalize ) ) {
+			if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
 
 			//BoilerOutletTemp     = Node(BoilerOutletNode)%TempSetPoint
 			//TempUpLimitBoilerOut =Boiler(BoilerNum)%TempUpLimitBoilerOut
@@ -576,7 +576,7 @@ namespace BoilerSteam {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using FluidProperties::GetSatDensityRefrig;
 		using FluidProperties::GetSatEnthalpyRefrig;
 		using FluidProperties::GetSatSpecificHeatRefrig;
@@ -631,12 +631,12 @@ namespace BoilerSteam {
 				CpWater = GetSatSpecificHeatRefrig( FluidNameSteam, SizingTemp, 0.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
 				tmpNomCap = ( CpWater * SteamDensity * Boiler( BoilerNum ).SizFac * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate + PlantSizData( PltSizNum ).DesVolFlowRate * SteamDensity * LatentEnthSteam );
 				if ( ! IsAutoSize ) tmpNomCap = Boiler( BoilerNum ).NomCap;
-				//IF (PlantSizesOkayToFinalize) Boiler(BoilerNum)%NomCap =tmpNomCap
+				//IF (PlantFirstSizesOkayToFinalize) Boiler(BoilerNum)%NomCap =tmpNomCap
 			} else {
 				if ( IsAutoSize ) tmpNomCap = 0.0;
-				//IF (PlantSizesOkayToFinalize) Boiler(BoilerNum)%NomCap = tmpNomCap
+				//IF (PlantFirstSizesOkayToFinalize) Boiler(BoilerNum)%NomCap = tmpNomCap
 			}
-			if ( PlantSizesOkayToFinalize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
 				if ( IsAutoSize ) {
 					Boiler( BoilerNum ).NomCap = tmpNomCap;
 					if ( ! Boiler( BoilerNum ).IsThisSized ) {
@@ -678,7 +678,7 @@ namespace BoilerSteam {
 		//  model has no volume flow rate, may need something else for steam loop sizing DSU??
 		//DSU?      CALL RegisterPlantCompDesignFlow(Boiler(BoilerNum)%BoilerInletNodeNum,Boiler(BoilerNum)%VolFlowRate)
 
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFirstSizesOkayToFinalize ) {
 			//create predefined report
 			equipName = Boiler( BoilerNum ).Name;
 			PreDefTableEntry( pdchMechType, equipName, "Boiler:Steam" );

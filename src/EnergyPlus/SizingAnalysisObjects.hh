@@ -12,6 +12,7 @@
 #include <OutputProcessor.hh>
 #include <DataSizing.hh>
 #include <DataHVACGlobals.hh>
+#include <DataPlant.hh>
 
 namespace EnergyPlus {
 
@@ -98,18 +99,23 @@ public:
 
 	// name of analysis object
 	std::string name = "";
-	int PlantLoop = 0; // index in plant loop data structure.
+	int PlantLoopIndex = 0; // index in plant loop data structure.
 	int SupplySideInletNodeNum = 0;
 	Real64 DensityForSizing = 0.0;
+	Real64 PlantSizingFraction = 0.0;
 	Real64 previousVolDesignFlowRate = 0.0;
 	Real64 newVolDesignFlowRate = 0.0;
+	Real64 newAdjustedMassFlowRate = 0.0; // with sizing factor included...
 	Real64 newFoundMassFlowRate = 0.0;
 	zoneTimestepObject newFoundMassFlowRateTimeStamp;
-	int LogIndex;
+	const Real64 SignificantNormalizedChange = 0.01 ;
+	bool AnotherIterationDesired = false ;
+
+	int LogIndex; //the index in the vector of log objects in the logger framework.
 
 	void initialize();
 
-	void DetermineMaxFlowRate();
+	void ResolveDesignFlowRate();
 	
 };
 

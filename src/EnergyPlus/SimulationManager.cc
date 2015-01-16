@@ -403,7 +403,6 @@ namespace SimulationManager {
 		if (DoHVACSizingSimulation){
 
 			ManageAdvancedSizing(ErrorsFound);
-			
 		}
 
 		ShowMessage( "Beginning Simulation" );

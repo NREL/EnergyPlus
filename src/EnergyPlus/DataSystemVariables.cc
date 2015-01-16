@@ -62,7 +62,7 @@ namespace DataSystemVariables {
 	std::string const cDisplayZoneAirHeatBalanceOffBalance( "DisplayZoneAirHeatBalanceOffBalance" );
 	std::string const cSortIDD( "SortIDD" );
 	std::string const cReportDuringWarmup( "ReportDuringWarmup" );
-	std::string const cReportDuringHVACSizingSimulation ( "ReportDuringHVACSizingSimulation" );
+	std::string const cReportDuringHVACSizingSimulation ( "REPORTDURINGHVACSIZINGSIMULATION" );
 	std::string const cIgnoreSolarRadiation( "IgnoreSolarRadiation" );
 	std::string const cIgnoreBeamRadiation( "IgnoreBeamRadiation" );
 	std::string const cIgnoreDiffuseRadiation( "IgnoreDiffuseRadiation" );

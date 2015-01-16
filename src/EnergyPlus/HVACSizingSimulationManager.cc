@@ -24,7 +24,8 @@
 #include <DataSizing.hh>
 #include <DataPlant.hh>
 #include <FluidProperties.hh>
-
+#include <PlantManager.hh>
+#include <SimulationManager.hh>
 
 
 namespace EnergyPlus { 
@@ -80,7 +81,7 @@ namespace EnergyPlus {
 			for (int i = 1; i <= TotNumLoops; i++ ){
 			
 				if (PlantLoopName == PlantLoop( i ).Name) { //found it
-					tmpAnalysisObj.PlantLoop = i;
+					tmpAnalysisObj.PlantLoopIndex = i;
 					tmpAnalysisObj.SupplySideInletNodeNum = PlantLoop( i ).LoopSide( SupplySide ).NodeNumIn;
 					tmpAnalysisObj.DensityForSizing = GetDensityGlycol( PlantLoop( i ).FluidName, 
 						InitConvTemp, PlantLoop( i ).FluidIndex, 
@@ -102,15 +103,40 @@ namespace EnergyPlus {
 
 	void HVACSizingSimulationManager::processCoincidentPlantSizeAdjustments(){
 
+		using namespace DataPlant;
+		using namespace PlantManager;
+		using DataGlobals::FinalSizingHVACSizingSimIteration;
+
+		//first pass through coincident plant objects to check new sizes and see if more iteration needed
+		PlantCoinAnalyRequestsAnotherIteration = false;
 		for ( auto &P : this -> PlantCoincAnalyObjs ) {
-		
 			P.newFoundMassFlowRateTimeStamp = SizingLogger.logObjs[ P.LogIndex ].GetLogVariableDataMax( );
-
-			P.DetermineMaxFlowRate();
-
+			P.ResolveDesignFlowRate();
+			if (P.AnotherIterationDesired){
+				PlantCoinAnalyRequestsAnotherIteration = true;
+			}
 		}
+
+		// as more sizing adjustments are added this will need to change to consider all not just plant coincident
+		FinalSizingHVACSizingSimIteration = PlantCoinAnalyRequestsAnotherIteration;
+
 	}
-		
+	void HVACSizingSimulationManager::RedoKickOffAndResize(){
+	
+		using DataGlobals::KickOffSimulation;
+		using DataGlobals::RedoSizesHVACSimulation;
+		using namespace WeatherManager;
+		using namespace SimulationManager;
+		bool ErrorsFound( false );
+		KickOffSimulation = true;
+		RedoSizesHVACSimulation = true;
+
+		ResetEnvironmentCounter();
+		SetupSimulation( ErrorsFound );
+
+		KickOffSimulation = false;
+		RedoSizesHVACSimulation = false;
+	}
 
 
 
@@ -308,10 +334,19 @@ namespace EnergyPlus {
 
 
 			} // ... End environment loop.
+			SizeSimManagerObj.processCoincidentPlantSizeAdjustments();
+
+			SizeSimManagerObj.RedoKickOffAndResize();
+
+			if ( ! SizeSimManagerObj.PlantCoinAnalyRequestsAnotherIteration ) {
+				// jump out of for loop, or change for to a while
+				break;
+			}
+
 		} // End HVAC Sizing Iteration loop
 
 		//
-		SizeSimManagerObj.processCoincidentPlantSizeAdjustments();
+
 
 		WarmupFlag = false;
 		DoOutputReporting = true;

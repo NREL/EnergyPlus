@@ -322,8 +322,8 @@ namespace PlantComponentTemperatureSources {
 		using DataGlobals::WarmupFlag;
 		using DataPlant::PlantLoop;
 		using DataPlant::ScanPlantLoopsForObject;
-		using DataPlant::PlantSizeNotComplete;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizeCompleted;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
 		using FluidProperties::GetDensityGlycol;
@@ -361,8 +361,8 @@ namespace PlantComponentTemperatureSources {
 		}
 
 		//Initialize critical Demand Side Variables at the beginning of each environment
-		if ( WaterSource( SourceNum ).MyEnvironFlag && BeginEnvrnFlag && ( PlantSizesOkayToFinalize ) ) {
-			if ( PlantSizeNotComplete ) SizeWaterSource( SourceNum );
+		if ( WaterSource( SourceNum ).MyEnvironFlag && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
+			if ( ! PlantFirstSizeCompleted ) SizeWaterSource( SourceNum );
 			rho = GetDensityGlycol( PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidName, InitConvTemp, PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidIndex, RoutineName );
 			WaterSource( SourceNum ).MassFlowRateMax = WaterSource( SourceNum ).DesVolFlowRate * rho;
 			InitComponentNodes( 0.0, WaterSource( SourceNum ).MassFlowRateMax, WaterSource( SourceNum ).InletNodeNum, WaterSource( SourceNum ).OutletNodeNum, WaterSource( SourceNum ).Location.LoopNum, WaterSource( SourceNum ).Location.LoopSideNum, WaterSource( SourceNum ).Location.BranchNum, WaterSource( SourceNum ).Location.CompNum );
@@ -449,7 +449,7 @@ namespace PlantComponentTemperatureSources {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
@@ -490,12 +490,12 @@ namespace PlantComponentTemperatureSources {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				tmpVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate; //* WaterSource(SourceNum)%SizFac
 				if ( ! IsAutoSize ) tmpVolFlowRate = WaterSource( SourceNum ).DesVolFlowRate;
-				//IF (PlantSizesOkayToFinalize) WaterSource(SourceNum)%DesVolFlowRate = tmpVolFlowRate
+				//IF (PlantFirstSizesOkayToFinalize) WaterSource(SourceNum)%DesVolFlowRate = tmpVolFlowRate
 			} else {
 				if ( IsAutoSize ) tmpVolFlowRate = 0.0;
-				//IF (PlantSizesOkayToFinalize)  WaterSource(SourceNum)%DesVolFlowRate = tmpVolFlowRate
+				//IF (PlantFirstSizesOkayToFinalize)  WaterSource(SourceNum)%DesVolFlowRate = tmpVolFlowRate
 			}
-			if ( PlantSizesOkayToFinalize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
 				if ( IsAutoSize ) {
 					WaterSource( SourceNum ).DesVolFlowRate = tmpVolFlowRate;
 					if ( ! WaterSource( SourceNum ).IsThisSized ) {

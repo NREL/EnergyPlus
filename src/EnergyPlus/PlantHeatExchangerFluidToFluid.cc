@@ -671,8 +671,8 @@ namespace PlantHeatExchangerFluidToFluid {
 			MyFlag( CompNum ) = false;
 		} // plant setup
 
-		if ( BeginEnvrnFlag && MyEnvrnFlag( CompNum ) && ( PlantSizesOkayToFinalize ) ) {
-			if ( PlantSizeNotComplete ) SizeFluidHeatExchanger( CompNum );
+		if ( BeginEnvrnFlag && MyEnvrnFlag( CompNum ) && ( PlantFirstSizesOkayToFinalize ) ) {
+			if ( PlantFirstSizeCompleted ) SizeFluidHeatExchanger( CompNum );
 			rho = GetDensityGlycol( PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidName, InitConvTemp, PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).FluidIndex, RoutineNameNoColon );
 			FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax = rho * FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate;
 			InitComponentNodes( FluidHX( CompNum ).DemandSideLoop.MassFlowRateMin, FluidHX( CompNum ).DemandSideLoop.MassFlowRateMax, FluidHX( CompNum ).DemandSideLoop.InletNodeNum, FluidHX( CompNum ).DemandSideLoop.OutletNodeNum, FluidHX( CompNum ).DemandSideLoop.LoopNum, FluidHX( CompNum ).DemandSideLoop.LoopSideNum, FluidHX( CompNum ).DemandSideLoop.BranchNum, FluidHX( CompNum ).DemandSideLoop.CompNum );
@@ -771,12 +771,12 @@ namespace PlantHeatExchangerFluidToFluid {
 			if ( PltSizNumSupSide > 0 ) {
 				if ( PlantSizData( PltSizNumSupSide ).DesVolFlowRate >= SmallWaterVolFlow ) {
 					tmpSupSideDesignVolFlowRate = PlantSizData( PltSizNumSupSide ).DesVolFlowRate * FluidHX( CompNum ).SizingFactor;
-					if ( PlantSizesOkayToFinalize ) FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate = tmpSupSideDesignVolFlowRate;
+					if ( PlantFirstSizesOkayToFinalize ) FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate = tmpSupSideDesignVolFlowRate;
 				} else {
 					tmpSupSideDesignVolFlowRate = 0.0;
-					if ( PlantSizesOkayToFinalize ) FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate = tmpSupSideDesignVolFlowRate;
+					if ( PlantFirstSizesOkayToFinalize ) FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate = tmpSupSideDesignVolFlowRate;
 				}
-				if ( PlantSizesOkayToFinalize ) ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, "Loop Supply Side Design Fluid Flow Rate [m3/s]", FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate );
+				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, "Loop Supply Side Design Fluid Flow Rate [m3/s]", FluidHX( CompNum ).SupplySideLoop.DesignVolumeFlowRate );
 			} else {
 				ShowSevereError( "SizeFluidHeatExchanger: Autosizing of requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in heat exchanger object=" + FluidHX( CompNum ).Name );
@@ -790,12 +790,12 @@ namespace PlantHeatExchangerFluidToFluid {
 		if ( FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate == AutoSize ) {
 			if ( tmpSupSideDesignVolFlowRate > SmallWaterVolFlow ) {
 				tmpDmdSideDesignVolFlowRate = tmpSupSideDesignVolFlowRate;
-				if ( PlantSizesOkayToFinalize ) FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate = tmpDmdSideDesignVolFlowRate;
+				if ( PlantFirstSizesOkayToFinalize ) FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate = tmpDmdSideDesignVolFlowRate;
 			} else {
 				tmpDmdSideDesignVolFlowRate = 0.0;
-				if ( PlantSizesOkayToFinalize ) FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate = tmpDmdSideDesignVolFlowRate;
+				if ( PlantFirstSizesOkayToFinalize ) FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate = tmpDmdSideDesignVolFlowRate;
 			}
-			if ( PlantSizesOkayToFinalize ) ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, "Loop Demand Side Design Fluid Flow Rate [m3/s]", FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate );
+			if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, "Loop Demand Side Design Fluid Flow Rate [m3/s]", FluidHX( CompNum ).DemandSideLoop.DesignVolumeFlowRate );
 		}
 		RegisterPlantCompDesignFlow( FluidHX( CompNum ).DemandSideLoop.InletNodeNum, tmpDmdSideDesignVolFlowRate );
 
@@ -829,12 +829,12 @@ namespace PlantHeatExchangerFluidToFluid {
 
 					tmpDesCap = Cp * rho * tmpDeltaTSupLoop * tmpSupSideDesignVolFlowRate;
 					tmpUA = tmpDesCap / tmpDeltaTloopToLoop;
-					if ( PlantSizesOkayToFinalize ) FluidHX( CompNum ).UA = tmpUA;
+					if ( PlantFirstSizesOkayToFinalize ) FluidHX( CompNum ).UA = tmpUA;
 				} else {
 					tmpUA = 0.0;
-					if ( PlantSizesOkayToFinalize ) FluidHX( CompNum ).UA = tmpUA;
+					if ( PlantFirstSizesOkayToFinalize ) FluidHX( CompNum ).UA = tmpUA;
 				}
-				if ( PlantSizesOkayToFinalize ) {
+				if ( PlantFirstSizesOkayToFinalize ) {
 					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, "Heat Exchanger U-Factor Times Area Value [W/C]", FluidHX( CompNum ).UA );
 					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, "Loop-to-loop Temperature Difference Used to Size Heat Exchanger U-Factor Times Area Value [C]", tmpDeltaTloopToLoop );
 				}
@@ -847,7 +847,7 @@ namespace PlantHeatExchangerFluidToFluid {
 		}
 
 		// size capacities for load range based op schemes
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFirstSizesOkayToFinalize ) {
 
 			if ( PltSizNumSupSide > 0 ) {
 				{ auto const SELECT_CASE_var( PlantSizData( PltSizNumSupSide ).LoopType );
@@ -891,7 +891,7 @@ namespace PlantHeatExchangerFluidToFluid {
 			FluidHX( CompNum ).SupplySideLoop.MaxLoad = std::abs( FluidHX( CompNum ).HeatTransferRate );
 
 		}
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFirstSizesOkayToFinalize ) {
 			PreDefTableEntry( pdchMechType, FluidHX( CompNum ).Name, "HeatExchanger:FluidToFluid" );
 			PreDefTableEntry( pdchMechNomCap, FluidHX( CompNum ).Name, FluidHX( CompNum ).SupplySideLoop.MaxLoad );
 		}

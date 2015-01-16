@@ -26,6 +26,8 @@
 #include <DataSizing.hh>
 #include <DataPlant.hh>
 #include <FluidProperties.hh>
+#include <PlantManager.hh>
+#include <SimulationManager.hh>
 
 namespace EnergyPlus {
 
@@ -33,9 +35,11 @@ namespace EnergyPlus {
 	public:
 		static std::string objectName() { return "Advanced Sizing Manager for HVAC Sizing Simulations"; }
 		bool oneTimeInit = true;
+
 		int NumCoincidentPlantLoops;
 		std::vector< PlantCoinicidentAnalyis > PlantCoincAnalyObjs ;
-		
+		bool PlantCoinAnalyRequestsAnotherIteration;
+
 		SizingLoggerFramework SizingLogger;
 
 		void initialize();
@@ -50,6 +54,7 @@ namespace EnergyPlus {
 
 		void processCoincidentPlantSizeAdjustments();
 
+		void RedoKickOffAndResize();
 
 	};
 

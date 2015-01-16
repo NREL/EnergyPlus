@@ -9,6 +9,7 @@
 #include <OutputProcessor.hh>
 #include <DataSizing.hh>
 #include <DataHVACGlobals.hh>
+#include <DataPlant.hh>
 
 namespace EnergyPlus {
 
@@ -22,12 +23,14 @@ namespace EnergyPlus {
 	//find which sizing envrn index
 
 	if (tmpztStepStamp.KindofSim == ksHVACSizeDesignDay) {
-		for (int i = 0; i <= NumOfDesignDaysInLogSet; i++ ){
+		for (int i = 0; i < NumOfDesignDaysInLogSet; i++ ){
 			if ( tmpztStepStamp.EnvrnNum == EnvrnIndexMapByEnvrn[ logCounter ] ){
 				logEnvrnIndex = logCounter;
-				logCounter++;
+
 				break;
 			}
+			logCounter++;
+
 		}
 	}
 
@@ -68,6 +71,7 @@ namespace EnergyPlus {
 	Real64 MaxVal;
 	zoneTimestepObject tmpztStepStamp;
 	MaxVal = 0.0;
+
 		for ( auto &Zt : this -> ztStepObj ){
 			
 			if ( Zt.LogDataValue > MaxVal) {
@@ -112,7 +116,7 @@ namespace EnergyPlus {
 			tmpLog.EnvrnStartZtStepIndex.resize( tmpLog.NumOfEnvironmentsInLogSet );
 			tmpLog.EnvrnIndexMapByEnvrn.resize(  tmpLog.NumOfEnvironmentsInLogSet );
 		//
-			for (int i = 0; i<tmpLog.NumOfEnvironmentsInLogSet; i++) {
+			for (int i = 0; i < tmpLog.NumOfEnvironmentsInLogSet; i++) {
 
 				tmpLog.ztStepCountByEnvrn[ i ] = HoursPerDay * NumOfTimeStepInHour;
 				tmpLog.EnvrnStartZtStepIndex[ i ] = i * HoursPerDay * NumOfTimeStepInHour ;
@@ -120,7 +124,7 @@ namespace EnergyPlus {
 			mapIndexCounter = 0;
 			for (int i = 1; i <= NumOfEnvrn; i++ ){
 				if ( Environment( i ).KindOfEnvrn == ksDesignDay ) {
-					tmpLog.EnvrnIndexMapByEnvrn[ mapIndexCounter ] = NumOfEnvrn + mapIndexCounter; //known offset for first iteration, what about subsequent iterations?
+					tmpLog.EnvrnIndexMapByEnvrn[ mapIndexCounter ] = NumOfEnvrn + mapIndexCounter + 1; //known offset for first iteration, what about subsequent iterations?
 					mapIndexCounter++;
 
 				}
@@ -180,17 +184,62 @@ namespace EnergyPlus {
 		}
 	}
 	
-	void PlantCoinicidentAnalyis::DetermineMaxFlowRate(){
+	void PlantCoinicidentAnalyis::ResolveDesignFlowRate(){
 	
+		using DataGlobals::TimeStepZone;
+		using DataGlobals::SecInHour;
 		using DataSizing::PlantSizData;
+		using namespace DataPlant;
 		using DataHVACGlobals::SmallWaterVolFlow;
+		bool SetNewSizes;
+		Real64 NormalizedChange;
 
-		previousVolDesignFlowRate = PlantSizData( PlantLoop ).DesVolFlowRate;
-		newFoundMassFlowRate = newFoundMassFlowRateTimeStamp.LogDataValue;
-		newVolDesignFlowRate = newFoundMassFlowRate / DensityForSizing;
+
+		//this is for a loop level sizing factor which is assumed to not need to change for resizing
+		PlantSizingFraction = PlantLoop( PlantLoopIndex ).LoopSide( SupplySide ).Branch( 1 ).PumpSizFac;
+
+		previousVolDesignFlowRate	= PlantSizData( PlantLoopIndex ).DesVolFlowRate;
+
+		if (newFoundMassFlowRateTimeStamp.LogDataValue > 0.0 ) {
+			newFoundMassFlowRate		= newFoundMassFlowRateTimeStamp.LogDataValue;	
+		} else {
+			newFoundMassFlowRate		= 0.0;
+		}
 		
+		newAdjustedMassFlowRate		= newFoundMassFlowRate * PlantSizingFraction; //indlude sizing fraction multiplier, often 1.0
+		newVolDesignFlowRate		= newAdjustedMassFlowRate / DensityForSizing;
+
+
+
+		//compare threshold, store TODO 
+		SetNewSizes = false;
 		if (newVolDesignFlowRate > SmallWaterVolFlow && newVolDesignFlowRate < previousVolDesignFlowRate ) {
-			PlantSizData( PlantLoop ).DesVolFlowRate = newVolDesignFlowRate;
+			SetNewSizes = true;
+			NormalizedChange = std::abs((newVolDesignFlowRate - previousVolDesignFlowRate) 
+									/ previousVolDesignFlowRate);
+			if (NormalizedChange > SignificantNormalizedChange ) {
+				AnotherIterationDesired = true;
+			} else {
+				AnotherIterationDesired = false;
+			}
+
+
+		}
+
+		if ( SetNewSizes ) {
+		// set new size values for rest of simulation
+			PlantSizData( PlantLoopIndex ).DesVolFlowRate = newVolDesignFlowRate;
+
+			if (PlantLoop( PlantLoopIndex ).MaxVolFlowRateWasAutoSized ) {
+				PlantLoop( PlantLoopIndex ).MaxVolFlowRate = newVolDesignFlowRate;
+				PlantLoop( PlantLoopIndex ).MaxMassFlowRate =  newAdjustedMassFlowRate;
+			}
+			if ( PlantLoop( PlantLoopIndex ).VolumeWasAutoSized ) {
+				PlantLoop( PlantLoopIndex ).Volume = PlantLoop( PlantLoopIndex ).MaxVolFlowRate * TimeStepZone * SecInHour / 0.8;
+				PlantLoop( PlantLoopIndex ).Mass = PlantLoop( PlantLoopIndex ).Volume* DensityForSizing;
+			}
+
+
 		}
 	
 	}

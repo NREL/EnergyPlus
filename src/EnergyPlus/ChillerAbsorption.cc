@@ -526,8 +526,8 @@ namespace ChillerAbsorption {
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_Chiller_Absorption;
 		using DataPlant::ScanPlantLoopsForObject;
-		using DataPlant::PlantSizeNotComplete;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizeCompleted;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 		using InputProcessor::SameString;
 		using PlantUtilities::InterConnectTwoPlantLoopSides;
@@ -657,8 +657,8 @@ namespace ChillerAbsorption {
 		//  IF((MyEnvrnFlag(ChillNum) .and. BeginEnvrnFlag) &
 		//     .OR. (Node(CondInletNode)%MassFlowrate <= 0.0 .AND. RunFlag)) THEN
 
-		if ( MyEnvrnFlag( ChillNum ) && BeginEnvrnFlag && ( PlantSizesOkayToFinalize ) ) {
-			if ( PlantSizeNotComplete ) SizeAbsorpChiller( ChillNum );
+		if ( MyEnvrnFlag( ChillNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
+			if ( ! PlantFirstSizeCompleted ) SizeAbsorpChiller( ChillNum );
 			rho = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 			BLASTAbsorber( ChillNum ).EvapMassFlowRateMax = BLASTAbsorber( ChillNum ).EvapVolFlowRate * rho;
@@ -758,7 +758,7 @@ namespace ChillerAbsorption {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::MyPlantSizingIndex;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
@@ -876,12 +876,12 @@ namespace ChillerAbsorption {
 				rho = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate * BLASTAbsorber( ChillNum ).SizFac;
 				if ( ! IsAutoSize ) tmpNomCap = BLASTAbsorber( ChillNum ).NomCap;
-				//IF (PlantSizesOkayToFinalize)  BLASTAbsorber(ChillNum)%NomCap = tmpNomCap
+				//IF (PlantFirstSizesOkayToFinalize)  BLASTAbsorber(ChillNum)%NomCap = tmpNomCap
 			} else {
 				if ( IsAutoSize ) tmpNomCap = 0.0;
-				//IF (PlantSizesOkayToFinalize)  BLASTAbsorber(ChillNum)%NomCap = tmpNomCap
+				//IF (PlantFirstSizesOkayToFinalize)  BLASTAbsorber(ChillNum)%NomCap = tmpNomCap
 			}
-			if ( PlantSizesOkayToFinalize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
 				if ( IsAutoSize ) {
 					BLASTAbsorber( ChillNum ).NomCap = tmpNomCap;
 					if ( ! BLASTAbsorber( ChillNum ).IsThisSized ) {
@@ -926,7 +926,7 @@ namespace ChillerAbsorption {
 		}
 		tmpNomPumpPower = 0.0045 * BLASTAbsorber( ChillNum ).NomCap;
 
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFirstSizesOkayToFinalize ) {
 			// the DOE-2 EIR for single stage absorption chiller
 			if ( IsAutoSize ) {
 				BLASTAbsorber( ChillNum ).NomPumpPower = tmpNomPumpPower;
@@ -962,12 +962,12 @@ namespace ChillerAbsorption {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				tmpEvapVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate * BLASTAbsorber( ChillNum ).SizFac;
 				if ( ! IsAutoSize ) tmpEvapVolFlowRate = BLASTAbsorber( ChillNum ).EvapVolFlowRate;
-				//IF (PlantSizesOkayToFinalize) BLASTAbsorber(ChillNum)%EvapVolFlowRate = tmpEvapVolFlowRate
+				//IF (PlantFirstSizesOkayToFinalize) BLASTAbsorber(ChillNum)%EvapVolFlowRate = tmpEvapVolFlowRate
 			} else {
 				if ( IsAutoSize ) tmpEvapVolFlowRate = 0.0;
-				//IF (PlantSizesOkayToFinalize)   BLASTAbsorber(ChillNum)%EvapVolFlowRate = tmpEvapVolFlowRate
+				//IF (PlantFirstSizesOkayToFinalize)   BLASTAbsorber(ChillNum)%EvapVolFlowRate = tmpEvapVolFlowRate
 			}
-			if ( PlantSizesOkayToFinalize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
 				if ( IsAutoSize ) {
 					BLASTAbsorber( ChillNum ).EvapVolFlowRate = tmpEvapVolFlowRate;
 					if ( ! BLASTAbsorber( ChillNum ).IsThisSized ) {
@@ -1021,12 +1021,12 @@ namespace ChillerAbsorption {
 				rho = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CDLoopNum ).FluidName, InitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 				tmpCondVolFlowRate = tmpNomCap * ( 1.0 + SteamInputRatNom + tmpNomPumpPower / tmpNomCap ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
 				if ( ! IsAutoSize ) tmpCondVolFlowRate = BLASTAbsorber( ChillNum ).CondVolFlowRate;
-				//IF (PlantSizesOkayToFinalize)  BLASTAbsorber(ChillNum)%CondVolFlowRate = tmpCondVolFlowRate
+				//IF (PlantFirstSizesOkayToFinalize)  BLASTAbsorber(ChillNum)%CondVolFlowRate = tmpCondVolFlowRate
 			} else {
 				if ( IsAutoSize ) tmpCondVolFlowRate = 0.0;
-				//IF (PlantSizesOkayToFinalize)  BLASTAbsorber(ChillNum)%CondVolFlowRate = 0.0d0
+				//IF (PlantFirstSizesOkayToFinalize)  BLASTAbsorber(ChillNum)%CondVolFlowRate = 0.0d0
 			}
-			if ( PlantSizesOkayToFinalize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
 				if ( IsAutoSize ) {
 					BLASTAbsorber( ChillNum ).CondVolFlowRate = tmpCondVolFlowRate;
 					if ( ! BLASTAbsorber( ChillNum ).IsThisSized ) {
@@ -1081,7 +1081,7 @@ namespace ChillerAbsorption {
 					RhoWater = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidName, ( PlantSizData( PltSizHeatingNum ).ExitTemp - SteamDeltaT ), PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
 					tmpGeneratorVolFlowRate = ( BLASTAbsorber( ChillNum ).NomCap * SteamInputRatNom ) / ( CpWater * SteamDeltaT * RhoWater );
 					if ( ! IsAutoSize ) tmpGeneratorVolFlowRate = BLASTAbsorber( ChillNum ).GeneratorVolFlowRate;
-					if ( PlantSizesOkayToFinalize ) {
+					if ( PlantFirstSizesOkayToFinalize ) {
 						if ( IsAutoSize ) {
 							BLASTAbsorber( ChillNum ).GeneratorVolFlowRate = tmpGeneratorVolFlowRate;
 							if ( ! BLASTAbsorber( ChillNum ).IsThisSized ) {
@@ -1119,7 +1119,7 @@ namespace ChillerAbsorption {
 					tmpGeneratorVolFlowRate = SteamMassFlowRate / SteamDensity;
 
 					if ( ! IsAutoSize ) tmpGeneratorVolFlowRate = BLASTAbsorber( ChillNum ).GeneratorVolFlowRate;
-					if ( PlantSizesOkayToFinalize ) {
+					if ( PlantFirstSizesOkayToFinalize ) {
 						BLASTAbsorber( ChillNum ).GeneratorVolFlowRate = tmpGeneratorVolFlowRate;
 						if ( IsAutoSize ) {
 							if ( ! BLASTAbsorber( ChillNum ).IsThisSized ) {
@@ -1147,7 +1147,7 @@ namespace ChillerAbsorption {
 				}
 			} else {
 				if ( IsAutoSize ) {
-					if ( PlantSizesOkayToFinalize ) {
+					if ( PlantFirstSizesOkayToFinalize ) {
 						BLASTAbsorber( ChillNum ).GeneratorVolFlowRate = 0.0;
 					} else {
 						tmpGeneratorVolFlowRate = 0.0;
@@ -1171,7 +1171,7 @@ namespace ChillerAbsorption {
 		}
 
 		// save the design steam or hot water volumetric flow rate for use by the steam or hot water loop sizing algorithms
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFirstSizesOkayToFinalize ) {
 			RegisterPlantCompDesignFlow( BLASTAbsorber( ChillNum ).GeneratorInletNodeNum, BLASTAbsorber( ChillNum ).GeneratorVolFlowRate );
 		} else {
 			RegisterPlantCompDesignFlow( BLASTAbsorber( ChillNum ).GeneratorInletNodeNum, tmpGeneratorVolFlowRate );
@@ -1184,7 +1184,7 @@ namespace ChillerAbsorption {
 				Cp = GetSpecificHeatGlycol( PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidName, InitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
 				rho = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidName, InitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
 
-				if ( PlantSizesOkayToFinalize ) {
+				if ( PlantFirstSizesOkayToFinalize ) {
 					BLASTAbsorber( ChillNum ).GeneratorDeltaTemp = ( SteamInputRatNom * BLASTAbsorber( ChillNum ).NomCap ) / ( Cp * rho * BLASTAbsorber( ChillNum ).GeneratorVolFlowRate );
 				}
 			}
@@ -1194,7 +1194,7 @@ namespace ChillerAbsorption {
 			ShowFatalError( "Preceding sizing errors cause program termination" );
 		}
 
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFirstSizesOkayToFinalize ) {
 			//create predefined report
 			equipName = BLASTAbsorber( ChillNum ).Name;
 			PreDefTableEntry( pdchMechType, equipName, moduleObjectType );

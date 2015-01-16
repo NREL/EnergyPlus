@@ -538,8 +538,8 @@ namespace ChillerExhaustAbsorption {
 		using DataPlant::TypeOf_Chiller_ExhFiredAbsorption;
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantSizeNotComplete;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizeCompleted;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::InterConnectTwoPlantLoopSides;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::SetComponentFlowRate;
@@ -675,8 +675,8 @@ namespace ChillerExhaustAbsorption {
 		HeatInletNode = ExhaustAbsorber( ChillNum ).HeatReturnNodeNum;
 		HeatOutletNode = ExhaustAbsorber( ChillNum ).HeatSupplyNodeNum;
 
-		if ( MyEnvrnFlag( ChillNum ) && BeginEnvrnFlag && ( PlantSizesOkayToFinalize ) ) {
-			if ( PlantSizeNotComplete ) SizeExhaustAbsorber( ChillNum );
+		if ( MyEnvrnFlag( ChillNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
+			if ( ! PlantFirstSizeCompleted ) SizeExhaustAbsorber( ChillNum );
 			if ( ExhaustAbsorber( ChillNum ).isWaterCooled ) {
 				// init max available condenser water flow rate
 				if ( ExhaustAbsorber( ChillNum ).CDLoopNum > 0 ) {
@@ -765,7 +765,7 @@ namespace ChillerExhaustAbsorption {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
@@ -841,12 +841,12 @@ namespace ChillerExhaustAbsorption {
 				rho = GetDensityGlycol( PlantLoop( ExhaustAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ExhaustAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizCoolNum ).DeltaT * PlantSizData( PltSizCoolNum ).DesVolFlowRate * ExhaustAbsorber( ChillNum ).SizFac;
 				if ( ! IsAutoSize ) tmpNomCap = ExhaustAbsorber( ChillNum ).NomCoolingCap;
-				//IF (PlantSizesOkayToFinalize) ExhaustAbsorber(ChillNum)%NomCoolingCap = tmpNomCap
+				//IF (PlantFirstSizesOkayToFinalize) ExhaustAbsorber(ChillNum)%NomCoolingCap = tmpNomCap
 			} else {
 				if ( IsAutoSize ) tmpNomCap = 0.0;
-				//IF (PlantSizesOkayToFinalize) ExhaustAbsorber(ChillNum)%NomCoolingCap = tmpNomCap
+				//IF (PlantFirstSizesOkayToFinalize) ExhaustAbsorber(ChillNum)%NomCoolingCap = tmpNomCap
 			}
-			if ( PlantSizesOkayToFinalize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
 				if ( IsAutoSize ) {
 					ExhaustAbsorber( ChillNum ).NomCoolingCap = tmpNomCap;
 					if ( ! ExhaustAbsorber( ChillNum ).IsThisSized ) {
@@ -894,12 +894,12 @@ namespace ChillerExhaustAbsorption {
 			if ( PlantSizData( PltSizCoolNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				tmpEvapVolFlowRate = PlantSizData( PltSizCoolNum ).DesVolFlowRate * ExhaustAbsorber( ChillNum ).SizFac;
 				if ( ! IsAutoSize ) tmpEvapVolFlowRate = ExhaustAbsorber( ChillNum ).EvapVolFlowRate;
-				//IF (PlantSizesOkayToFinalize) ExhaustAbsorber(ChillNum)%EvapVolFlowRate = tmpEvapVolFlowRate
+				//IF (PlantFirstSizesOkayToFinalize) ExhaustAbsorber(ChillNum)%EvapVolFlowRate = tmpEvapVolFlowRate
 			} else {
 				if ( IsAutoSize ) tmpEvapVolFlowRate = 0.0;
-				//IF (PlantSizesOkayToFinalize) ExhaustAbsorber(ChillNum)%EvapVolFlowRate = tmpEvapVolFlowRate
+				//IF (PlantFirstSizesOkayToFinalize) ExhaustAbsorber(ChillNum)%EvapVolFlowRate = tmpEvapVolFlowRate
 			}
-			if ( PlantSizesOkayToFinalize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
 				if ( IsAutoSize ) {
 					ExhaustAbsorber( ChillNum ).EvapVolFlowRate = tmpEvapVolFlowRate;
 					if ( ! ExhaustAbsorber( ChillNum ).IsThisSized ) {
@@ -949,12 +949,12 @@ namespace ChillerExhaustAbsorption {
 			if ( PlantSizData( PltSizHeatNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				tmpHeatRecVolFlowRate = PlantSizData( PltSizHeatNum ).DesVolFlowRate * ExhaustAbsorber( ChillNum ).SizFac;
 				if ( ! IsAutoSize ) tmpHeatRecVolFlowRate = ExhaustAbsorber( ChillNum ).HeatVolFlowRate;
-				//IF (PlantSizesOkayToFinalize) ExhaustAbsorber(ChillNum)%HeatVolFlowRate = tmpHeatRecVolFlowRate
+				//IF (PlantFirstSizesOkayToFinalize) ExhaustAbsorber(ChillNum)%HeatVolFlowRate = tmpHeatRecVolFlowRate
 			} else {
 				if ( IsAutoSize ) tmpHeatRecVolFlowRate = 0.0;
-				//IF (PlantSizesOkayToFinalize) ExhaustAbsorber(ChillNum)%HeatVolFlowRate = tmpHeatRecVolFlowRate
+				//IF (PlantFirstSizesOkayToFinalize) ExhaustAbsorber(ChillNum)%HeatVolFlowRate = tmpHeatRecVolFlowRate
 			}
-			if ( PlantSizesOkayToFinalize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
 				if ( IsAutoSize ) {
 					ExhaustAbsorber( ChillNum ).HeatVolFlowRate = tmpHeatRecVolFlowRate;
 					if ( ! ExhaustAbsorber( ChillNum ).IsThisSized ) {
@@ -1007,12 +1007,12 @@ namespace ChillerExhaustAbsorption {
 				rho = GetDensityGlycol( PlantLoop( ExhaustAbsorber( ChillNum ).CDLoopNum ).FluidName, ExhaustAbsorber( ChillNum ).TempDesCondReturn, PlantLoop( ExhaustAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 				tmpCondVolFlowRate = tmpNomCap * ( 1.0 + ExhaustAbsorber( ChillNum ).ThermalEnergyCoolRatio ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
 				if ( ! IsAutoSize ) tmpCondVolFlowRate = ExhaustAbsorber( ChillNum ).CondVolFlowRate;
-				//IF (PlantSizesOkayToFinalize) ExhaustAbsorber(ChillNum)%CondVolFlowRate = tmpCondVolFlowRate
+				//IF (PlantFirstSizesOkayToFinalize) ExhaustAbsorber(ChillNum)%CondVolFlowRate = tmpCondVolFlowRate
 			} else {
 				if ( IsAutoSize ) tmpCondVolFlowRate = 0.0;
-				//IF (PlantSizesOkayToFinalize) ExhaustAbsorber(ChillNum)%CondVolFlowRate = tmpCondVolFlowRate
+				//IF (PlantFirstSizesOkayToFinalize) ExhaustAbsorber(ChillNum)%CondVolFlowRate = tmpCondVolFlowRate
 			}
-			if ( PlantSizesOkayToFinalize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
 				if ( IsAutoSize ) {
 					ExhaustAbsorber( ChillNum ).CondVolFlowRate = tmpCondVolFlowRate;
 					if ( ! ExhaustAbsorber( ChillNum ).IsThisSized ) {
@@ -1059,7 +1059,7 @@ namespace ChillerExhaustAbsorption {
 			ShowFatalError( "Preceding sizing errors cause program termination" );
 		}
 
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFirstSizesOkayToFinalize ) {
 			//create predefined report
 			equipName = ExhaustAbsorber( ChillNum ).Name;
 			PreDefTableEntry( pdchMechType, equipName, "ChillerHeater:Absorption:DoubleEffect" );
