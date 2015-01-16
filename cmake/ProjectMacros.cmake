@@ -110,9 +110,20 @@ macro( CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES )
   endif()
 endmacro()
 
+# Named arguments 
+# IDF_FILE <filename> IDF input file
+# EPW_FILE <filename> EPW weather file
+# 
+# Optional Arguments
+# DESIGN_DAY_ONLY force design day simulation
+# ANNUAL_SIMULATION force annual simulation
+# EXPECT_FATAL Expect simulation to fail
+# COST <integer> Cost of this simulation relative to other simulations.
+#                Higher cost simulations run earlier in an attempt to enhance
+#                test parallelization and reduce overall test run time.
 function( ADD_SIMULATION_TEST )
   set(options ANNUAL_SIMULATION DESIGN_DAY_ONLY EXPECT_FATAL)
-  set(oneValueArgs IDF_FILE EPW_FILE)
+  set(oneValueArgs IDF_FILE EPW_FILE COST)
   set(multiValueArgs "")
   cmake_parse_arguments(ADD_SIM_TEST "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
@@ -147,6 +158,10 @@ function( ADD_SIMULATION_TEST )
   #if( MSVC AND PROFILE_GENERATE )
     #set_tests_properties("integration.${IDF_NAME}" PROPERTIES RUN_SERIAL true)
   #endif()
+
+  if (ADD_SIM_TEST_COST AND NOT ADD_SIM_TEST_COST STREQUAL "" )
+    set_tests_properties("integration.${IDF_NAME}" PROPERTIES COST ${ADD_SIM_TEST_COST})
+  endif()
 
   # Added the expect_fatal here to detect files that are expected to fatal error properly
   if( ADD_SIM_TEST_EXPECT_FATAL )
