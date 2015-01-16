@@ -978,7 +978,7 @@ namespace OutputReportTabular {
 						ShowWarningError( "Processing Monthly Tabular Reports: " + MonthlyInput( TabNum ).name );
 						ShowContinueError( "..Variable name=" + curVariMeter + " not valid for this simulation." );
 						if ( VarWarning ) {
-							ShowContinueError( "..Variables not valid for this simulation will have \"[Invalid/Undefined]\"" " in the Units Column of the Table Report." );
+							ShowContinueError( "..Variables not valid for this simulation will have \"[Invalid/Undefined]\" in the Units Column of the Table Report." );
 							VarWarning = false;
 						}
 					}
@@ -1133,7 +1133,7 @@ namespace OutputReportTabular {
 							ShowContinueError( "..Variable name=" + curVariMeter + " not valid for this simulation." );
 							ShowContinueError( "..i.e., Variable name=" + UniqueKeyNames( kUniqueKey ) + ':' + curVariMeter + " not valid for this simulation." );
 							if ( VarWarning ) {
-								ShowContinueError( "..Variables not valid for this simulation will have \"[Invalid/Undefined]\"" " in the Units Column of the Table Report." );
+								ShowContinueError( "..Variables not valid for this simulation will have \"[Invalid/Undefined]\" in the Units Column of the Table Report." );
 								VarWarning = false;
 							}
 						}
@@ -2107,7 +2107,7 @@ namespace OutputReportTabular {
 		} else {
 			for ( xcount = 1; xcount <= numNamedMonthly; ++xcount ) {
 				if ( ! SameString( MonthlyNamedReports( xcount ), namedMonthly( xcount ).title ) ) {
-					ShowSevereError( "InitializePredefinedMonthlyTitles: Monthly Report Titles in OutputReportTabular do not match" " titles in DataOutput." );
+					ShowSevereError( "InitializePredefinedMonthlyTitles: Monthly Report Titles in OutputReportTabular do not match titles in DataOutput." );
 					ShowContinueError( "first mismatch at ORT [" + RoundSigDigits( numNamedMonthly ) + "] =\"" + namedMonthly( xcount ).title + "\"." );
 					ShowContinueError( "same location in DO =\"" + MonthlyNamedReports( xcount ) + "\"." );
 					ShowFatalError( "Preceding condition causes termination." );
@@ -3108,7 +3108,7 @@ namespace OutputReportTabular {
 					if ( ! tbl_stream ) {
 						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.htm\" for output (write)." );
 					}
-					tbl_stream << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"" "\"http://www.w3.org/TR/html4/loose.dtd\">\n";
+					tbl_stream << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/html4/loose.dtd\">\n";
 					tbl_stream << "<html>\n";
 					tbl_stream << "<head>\n";
 					if ( EnvironmentName == WeatherFileLocationTitle ) {
@@ -9489,7 +9489,7 @@ namespace OutputReportTabular {
 				pdiff = std::abs( ( wallAreaN + wallAreaS + wallAreaE + wallAreaW ) - ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) + sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) ) ) / ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) + sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) );
 				if ( pdiff > 0.019 ) {
 					ShowWarningError( "WriteVeriSumTable: InputVerificationsAndResultsSummary: Wall area based on [>=60,<=120] degrees (tilt) as walls" );
-					ShowContinueError( "differs ~" + RoundSigDigits( pdiff * 100.0, 1 ) + "% from user entered Wall class surfaces. " "Degree calculation based on ASHRAE 90.1 wall definitions." );
+					ShowContinueError( "differs ~" + RoundSigDigits( pdiff * 100.0, 1 ) + "% from user entered Wall class surfaces. Degree calculation based on ASHRAE 90.1 wall definitions." );
 					//      CALL ShowContinueError('Calculated based on degrees=['//  &
 					//         TRIM(ADJUSTL(RealToStr((wallAreaN + wallAreaS + wallAreaE + wallAreaW),3)))//  &
 					//         '] m2, Calculated from user entered Wall class surfaces=['//  &
@@ -10217,7 +10217,7 @@ namespace OutputReportTabular {
 				}
 				//write the table
 				WriteSubtitle( CompSizeTableEntry( foundEntry ).typeField );
-				WriteTable( tableBody, rowHead, columnHead, columnWidth, false, "User-Specified values were used. " "Design Size values were used if no User-Specified values were provided." );
+				WriteTable( tableBody, rowHead, columnHead, columnWidth, false, "User-Specified values were used. Design Size values were used if no User-Specified values were provided." );
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ComponentSizingSummary", "Entire Facility", CompSizeTableEntry( foundEntry ).typeField );
 				//deallocate these arrays since they are used to create the next
 				//table
@@ -11212,8 +11212,8 @@ namespace OutputReportTabular {
 
 			// show the line definition for the decay curves
 			if ( ShowDecayCurvesInEIO ) {
-				gio::write( OutputFileInits, fmtA ) << "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time " "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
-				gio::write( OutputFileInits, fmtA ) << "! <Radiant to Convective Decay Curves for Heating>,Zone Name, Surface Name, Time " "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
+				gio::write( OutputFileInits, fmtA ) << "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
+				gio::write( OutputFileInits, fmtA ) << "! <Radiant to Convective Decay Curves for Heating>,Zone Name, Surface Name, Time 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
 			}
 
 			for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
@@ -13220,7 +13220,7 @@ namespace OutputReportTabular {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static FArray1D< gio::Fmt > const formDigits( {0,9}, { "(F12.0)", "(F12.1)", "(F12.2)", "(F12.3)", "(F12.4)", "(F12.5)", "(F12.6)", "(F12.7)", "(F12.8)", "(F12.9)" } ); // formDigits(0) | formDigits(1) | formDigits(2) | formDigits(3) | formDigits(4) | formDigits(5) | formDigits(6) | formDigits(7) | formDigits(8) | formDigits(9)
+		static FArray1D< gio::Fmt > formDigits( {0,9}, { "(F12.0)", "(F12.1)", "(F12.2)", "(F12.3)", "(F12.4)", "(F12.5)", "(F12.6)", "(F12.7)", "(F12.8)", "(F12.9)" } ); // formDigits(0) | formDigits(1) | formDigits(2) | formDigits(3) | formDigits(4) | formDigits(5) | formDigits(6) | formDigits(7) | formDigits(8) | formDigits(9)
 		static FArray1D< Real64 > const maxvalDigits( {0,9}, { 9999999999.0, 999999999.0, 99999999.0, 9999999.0, 999999.0, 99999.0, 9999.0, 999.0, 99.0, 9.0 } ); // maxvalDigits(0) | maxvalDigits(1) | maxvalDigits(2) | maxvalDigits(3) | maxvalDigits(4) | maxvalDigits(5) | maxvalDigits(6) | maxvalDigits(7) | maxvalDigits(8) | maxvalDigits(9)
 		static gio::Fmt fmtd( "(E12.6)" );
 

@@ -1339,7 +1339,7 @@ namespace DaylightingDevices {
 		FindTDDPipe = 0;
 
 		if ( NumOfTDDPipes <= 0 ) {
-			ShowFatalError( "FindTDDPipe: Surface=" + Surface( WinNum ).Name + ", TDD:Dome object does not reference a valid Diffuser object." "...needs DaylightingDevice:Tubular of same name as Surface." );
+			ShowFatalError( "FindTDDPipe: Surface=" + Surface( WinNum ).Name + ", TDD:Dome object does not reference a valid Diffuser object....needs DaylightingDevice:Tubular of same name as Surface." );
 		}
 
 		for ( PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum ) {
