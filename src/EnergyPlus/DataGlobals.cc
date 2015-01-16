@@ -63,7 +63,6 @@ namespace DataGlobals {
 	Real64 const TwoPi( 2.0 * Pi ); // 2*Pi 6.2831853071795864769252868
 	Real64 const GravityConstant( 9.807 );
 	Real64 const DegToRadians( Pi / 180.0 ); // Conversion for Degrees to Radians
-	Real64 const DegToRad( Pi / 180.0 ); // Conversion for Degrees to Radians
 	Real64 const RadToDeg( 180.0 / Pi ); // Conversion for Radians to Degrees
 	Real64 const SecInHour( 3600.0 ); // Conversion for hours to seconds
 	Real64 const HoursInDay( 24.0 ); // Number of Hourse in Day
