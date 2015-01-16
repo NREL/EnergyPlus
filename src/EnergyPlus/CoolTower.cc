@@ -506,7 +506,7 @@ namespace CoolTower {
 				}
 
 				if ( OutletTemp < OutWetBulbTemp ) {
-					ShowSevereError( "Cooltower outlet temperature exceed the outdoor wet bulb temperature " "reset to input values" );
+					ShowSevereError( "Cooltower outlet temperature exceed the outdoor wet bulb temperature reset to input values" );
 					ShowContinueError( "Occurs in Cooltower =" + CoolTowerSys( CoolTowerNum ).Name );
 				}
 

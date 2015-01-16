@@ -839,7 +839,7 @@ namespace PlantHeatExchangerFluidToFluid {
 					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, "Loop-to-loop Temperature Difference Used to Size Heat Exchanger U-Factor Times Area Value [C]", tmpDeltaTloopToLoop );
 				}
 			} else {
-				ShowSevereError( "SizeFluidHeatExchanger: Autosizing of heat " "Exchanger UA requires a loop Sizing:Plant objects for both loops" );
+				ShowSevereError( "SizeFluidHeatExchanger: Autosizing of heat Exchanger UA requires a loop Sizing:Plant objects for both loops" );
 				ShowContinueError( "Occurs in heat exchanger object=" + FluidHX( CompNum ).Name );
 				ErrorsFound = true;
 			}

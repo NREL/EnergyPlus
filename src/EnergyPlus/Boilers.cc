@@ -597,7 +597,7 @@ namespace Boilers {
 					if ( ! AnyEnergyManagementSystemInModel ) {
 						if ( ! Boiler( BoilerNum ).ModulatedFlowErrDone ) {
 							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + Boiler( BoilerNum ).Name );
-							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a boiler " "in variable flow mode, use a SetpointManager" );
+							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a boiler in variable flow mode, use a SetpointManager" );
 							ShowContinueError( "  The overall loop setpoint will be assumed for Boiler. The simulation continues ... " );
 							Boiler( BoilerNum ).ModulatedFlowErrDone = true;
 						}
@@ -608,7 +608,7 @@ namespace Boilers {
 						if ( FatalError ) {
 							if ( ! Boiler( BoilerNum ).ModulatedFlowErrDone ) {
 								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + Boiler( BoilerNum ).Name );
-								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a boiler " "in variable flow mode" );
+								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a boiler in variable flow mode" );
 								ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the boiler outlet node " );
 								ShowContinueError( "  or use an EMS actuator to establish a setpoint at the boiler outlet node " );
 								ShowContinueError( "  The overall loop setpoint will be assumed for Boiler. The simulation continues ... " );

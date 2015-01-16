@@ -359,7 +359,7 @@ namespace BoilerSteam {
 				SteamFluidIndex = FindRefrigerant( "Steam" );
 				if ( SteamFluidIndex == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
-					ShowContinueError( "Steam Properties not found; " "Steam Fluid Properties must be included in the input file." );
+					ShowContinueError( "Steam Properties not found; Steam Fluid Properties must be included in the input file." );
 					ErrorsFound = true;
 				}
 			}
@@ -507,7 +507,7 @@ namespace BoilerSteam {
 				if ( ! AnyEnergyManagementSystemInModel ) {
 					if ( ! Boiler( BoilerNum ).MissingSetPointErrDone ) {
 						ShowWarningError( "Missing temperature setpoint for Boiler:Steam = " + Boiler( BoilerNum ).Name );
-						ShowContinueError( " A temperature setpoint is needed at the outlet node of the boiler," " use a SetpointManager" );
+						ShowContinueError( " A temperature setpoint is needed at the outlet node of the boiler, use a SetpointManager" );
 						ShowContinueError( " The overall loop setpoint will be assumed for this boiler. The simulation continues ..." );
 						Boiler( BoilerNum ).MissingSetPointErrDone = true;
 					}

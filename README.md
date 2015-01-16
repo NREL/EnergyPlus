@@ -5,7 +5,7 @@ This is the EnergyPlus Development Repository.
 
 # Contact/Support
 
- - The Department of Energy maintains a [public website for EnergyPlus](www.energyplus.gov) where you can find much more information about the program.  
+ - The Department of Energy maintains a [public website for EnergyPlus](http://www.energyplus.gov) where you can find much more information about the program.  
  - For detailed developer information, consult the [wiki](https://github.com/nrel/EnergyPlusTeam/wiki).  
  - For support questions, please utilize the [EnergyPlus Helpdesk](http://energyplus.helpserve.com/).
 

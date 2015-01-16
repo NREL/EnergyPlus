@@ -160,15 +160,16 @@ namespace HeatBalanceManager {
 	ProcessZoneData(
 		std::string const & cCurrentModuleObject,
 		int const ZoneLoop,
-		FArray1S_string cAlphaArgs,
+		FArray1_string const & cAlphaArgs,
 		int & NumAlphas,
-		FArray1S< Real64 > rNumericArgs,
+		FArray1< Real64 > const & rNumericArgs,
 		int & NumNumbers,
-		FArray1S_bool lNumericFieldBlanks,
-		FArray1S_bool lAlphaFieldBlanks,
-		FArray1S_string cAlphaFieldNames,
-		FArray1S_string cNumericFieldNames,
-		bool & ErrorsFound ); // If errors found in input
+		FArray1_bool const & lNumericFieldBlanks, //Unused
+		FArray1_bool const & lAlphaFieldBlanks,
+		FArray1_string const & cAlphaFieldNames,
+		FArray1_string const & cNumericFieldNames, //Unused
+		bool & ErrorsFound // If errors found in input
+	);
 
 	// End of Get Input subroutines for the HB Module
 	//******************************************************************************
