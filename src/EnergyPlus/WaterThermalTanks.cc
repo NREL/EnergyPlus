@@ -4959,10 +4959,10 @@ namespace WaterThermalTanks {
 		Real64 Efuel; // Energy change for fuel consumed over the timestep (J)
 		bool SetPointRecovered; // Flag to indicate when setpoint is recovered for the first time
 		Real64 rho;
-        Real64 HPWHCondenserDeltaT; // Temperature difference across the condenser for a heat pump water heater
+		Real64 HPWHCondenserDeltaT; // Temperature difference across the condenser for a heat pump water heater
 		static int DummyWaterIndex( 1 );
-        
-        // Reference to objects
+
+		// Reference to objects
 		WaterThermalTankData &Tank = WaterThermalTank( WaterThermalTankNum ); // Reference to the tank object to save typing
 		
 		// FLOW:
@@ -5049,14 +5049,14 @@ namespace WaterThermalTanks {
 
 		// Calculate the heating rate from the heat pump.
 		if ( Tank.HeatPumpNum > 0 ) {
-            HeatPumpWaterHeaterData const &HeatPump = HPWaterHeater(Tank.HeatPumpNum);
+			HeatPumpWaterHeaterData const &HeatPump = HPWaterHeater(Tank.HeatPumpNum);
 			DataLoopNode::NodeData const &HPWHCondWaterInletNode = DataLoopNode::Node(HeatPump.CondWaterInletNode);
 			DataLoopNode::NodeData const &HPWHCondWaterOutletNode = DataLoopNode::Node(HeatPump.CondWaterOutletNode);
 			HPWHCondenserDeltaT = HPWHCondWaterOutletNode.Temp - HPWHCondWaterInletNode.Temp;
 		} else {
 			HPWHCondenserDeltaT = 0.0;
 		}
-        assert( HPWHCondenserDeltaT >= 0 );
+		assert( HPWHCondenserDeltaT >= 0 );
 		
 		CalcMixedTankSourceSideHeatTransferRate(HPWHCondenserDeltaT, SourceInletTemp, Cp, SetPointTemp,
 												SourceMassFlowRate, Qheatpump, Qsource);

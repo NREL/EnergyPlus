@@ -1,5 +1,4 @@
 // EnergyPlus::WaterThermalTank Unit Tests
-#include <cmath>
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -30,21 +29,21 @@ TEST( HeatPumpWaterHeaterTests, TestQsourceCalcs )
 	// Test case without HPWH
 	WaterThermalTanks::CalcMixedTankSourceSideHeatTransferRate(DeltaT, SourceInletTemp, Cp, SetPointTemp, SourceMassFlowRate, Qheatpump, Qsource);
 	// Qsource is non zero and calculated relative to the tank setpoint.
-	EXPECT_TRUE(FloatEqualTest(SourceMassFlowRate * Cp * (SourceInletTemp - SetPointTemp), Qsource));
+	EXPECT_DOUBLE_EQ(SourceMassFlowRate * Cp * (SourceInletTemp - SetPointTemp), Qsource);
 	// Qheatpump is zero
-	EXPECT_TRUE(FloatEqualTest(Qheatpump, 0.0));
+	EXPECT_DOUBLE_EQ(Qheatpump, 0.0);
 	// SourceMassFlowRate is unchanged
-	EXPECT_TRUE(FloatEqualTest(SourceMassFlowRateOrig, SourceMassFlowRate));
+	EXPECT_DOUBLE_EQ(SourceMassFlowRateOrig, SourceMassFlowRate);
 	
 	// Test case with HPWH
 	DeltaT = 5.0;
 	WaterThermalTanks::CalcMixedTankSourceSideHeatTransferRate(DeltaT, SourceInletTemp, Cp, SetPointTemp, SourceMassFlowRate, Qheatpump, Qsource);
 	// Qsource is Qheatpump
-	EXPECT_TRUE(FloatEqualTest(Qsource, Qheatpump));
+	EXPECT_DOUBLE_EQ(Qsource, Qheatpump);
 	// Qheatpump is the heat transfer rate from the input DeltaT
-	EXPECT_TRUE(FloatEqualTest(SourceMassFlowRateOrig * Cp * DeltaT, Qheatpump));
+	EXPECT_DOUBLE_EQ(SourceMassFlowRateOrig * Cp * DeltaT, Qheatpump);
 	// SourceMassFlowRate is zero
-	EXPECT_TRUE(FloatEqualTest(SourceMassFlowRate, 0.0));
+	EXPECT_DOUBLE_EQ(SourceMassFlowRate, 0.0);
 	
 	// Stratified Tank
 	SourceMassFlowRate = SourceMassFlowRateOrig;
@@ -53,25 +52,11 @@ TEST( HeatPumpWaterHeaterTests, TestQsourceCalcs )
 	// Test case without HPWH
 	DeltaT = 0.0;
 	Qsource = WaterThermalTanks::CalcStratifiedTankSourceSideHeatTransferRate(DeltaT, SourceInletTemp, Cp, SourceMassFlowRate, NodeTemp);
-	EXPECT_TRUE(FloatEqualTest(Qsource, SourceMassFlowRate * Cp * (SourceInletTemp - NodeTemp)));
+	EXPECT_DOUBLE_EQ(Qsource, SourceMassFlowRate * Cp * (SourceInletTemp - NodeTemp));
 	
 	// Test case with HPWH
 	DeltaT = 5.0;
 	Qsource = WaterThermalTanks::CalcStratifiedTankSourceSideHeatTransferRate(DeltaT, SourceInletTemp, Cp, SourceMassFlowRate, NodeTemp);
-	EXPECT_TRUE(FloatEqualTest(Qsource, SourceMassFlowRate * Cp * DeltaT));
+	EXPECT_DOUBLE_EQ(Qsource, SourceMassFlowRate * Cp * DeltaT);
 	
-}
-
-TEST( HeatPumpWaterHeaterTests, TestStratifiedTankQSource)
-{
-	Real64 DeltaT = 0.0;
-	Real64 const SourceInletTemp = 62.0;
-	Real64 const Cp = 4178.; // water, J/(kg * K)
-	Real64 const SetPointTemp = 60.0;
-	Real64 const SourceMassFlowRateOrig = 0.378529822165; // water, 6 gal/min
-	Real64 SourceMassFlowRate = SourceMassFlowRateOrig;
-	Real64 Qheatpump (0.0);
-	Real64 Qsource (0.0);
-	
-
 }
