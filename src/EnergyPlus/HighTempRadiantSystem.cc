@@ -538,7 +538,7 @@ namespace HighTempRadiantSystem {
 					ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				} else if ( Surface( HighTempRadSys( Item ).SurfacePtr( SurfNum ) ).Zone != HighTempRadSys( Item ).ZonePtr ) {
-					ShowWarningError( "Surface referenced in ZoneHVAC:HighTemperatureRadiant not in same zone as Radiant System," "surface=" + HighTempRadSys( Item ).SurfaceName( SurfNum ) );
+					ShowWarningError( "Surface referenced in ZoneHVAC:HighTemperatureRadiant not in same zone as Radiant System, surface=" + HighTempRadSys( Item ).SurfaceName( SurfNum ) );
 					ShowContinueError( "Surface is in Zone=" + Zone( Surface( HighTempRadSys( Item ).SurfacePtr( SurfNum ) ).Zone ).Name + " ZoneHVAC:HighTemperatureRadiant in Zone=" + cAlphaArgs( 3 ) );
 					ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				}

@@ -60,9 +60,9 @@ namespace DataHeatBalance {
 	// Parameters for the definition and limitation of arrays:
 	int const MaxLayersInConstruct( 11 ); // Maximum number of layers allowed in a single construction
 	int const MaxCTFTerms( 19 ); // Maximum number of CTF terms allowed to still allow stability
-	int MaxSolidWinLayers( 0 ); // Maximum number of solid layers in a window construction 
-	                                   // ** has to be big enough to hold no matter what window model
-	                                   //    each window model should validate layers individually
+	int MaxSolidWinLayers( 0 ); // Maximum number of solid layers in a window construction
+										// ** has to be big enough to hold no matter what window model
+										//    each window model should validate layers individually
 	int const MaxSpectralDataElements( 800 ); // Maximum number in Spectral Data arrays.
 
 	// Parameters to indicate material group type for use with the Material
@@ -328,6 +328,7 @@ namespace DataHeatBalance {
 	int NumHotWaterEqStatements( 0 ); // number of Hot Water Equipment objects in input. - possibly global assignments
 	int NumSteamEqStatements( 0 ); // number of Steam Equipment objects in input. - possibly global assignments
 	int NumOtherEqStatements( 0 ); // number of Other Equipment objects in input. - possibly global assignments
+	int NumZoneITEqStatements( 0 ); // number of Other Equipment objects in input. - possibly global assignments
 	int TotPeople( 0 ); // Total People Statements in input and extrapolated from global assignments
 	int TotLights( 0 ); // Total Lights Statements in input and extrapolated from global assignments
 	int TotElecEquip( 0 ); // Total Electric Equipment Statements in input and extrapolated from global assignments
@@ -585,6 +586,7 @@ namespace DataHeatBalance {
   std::vector< GenZone > ZoneSpecs;
 	FArray1D< ZoneEquipData > ZoneHWEq;
 	FArray1D< ZoneEquipData > ZoneSteamEq;
+	FArray1D< ITEquipData > ZoneITEq;
 	FArray1D< BBHeatData > ZoneBBHeat;
 	FArray1D< InfiltrationData > Infiltration;
 	FArray1D< VentilationData > Ventilation;
@@ -778,7 +780,7 @@ namespace DataHeatBalance {
 			} else if ( TotLayers == 1 ) {
 
 				if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group == Shade || Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group == WindowGas || Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group == WindowGasMixture || Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group == WindowBlind || Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group == Screen || Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group == ComplexWindowShade || Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group == ComplexWindowGap ) {
-					ShowSevereError( "CheckAndSetConstructionProperties: The single-layer window construction=" + Construct( ConstrNum ).Name + " has a gas, complex gap, shade, complex shade, screen or blind material; " "it should be glass of simple glazing system." );
+					ShowSevereError( "CheckAndSetConstructionProperties: The single-layer window construction=" + Construct( ConstrNum ).Name + " has a gas, complex gap, shade, complex shade, screen or blind material; it should be glass of simple glazing system." );
 					ErrorsFound = true;
 				}
 			}
@@ -1014,7 +1016,7 @@ namespace DataHeatBalance {
 		if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group == IRTMaterial ) {
 			Construct( ConstrNum ).TypeIsIRT = true;
 			if ( Construct( ConstrNum ).TotLayers != 1 ) {
-				ShowSevereError( "CheckAndSetConstructionProperties: " "Infrared Transparent (IRT) Construction is limited to 1 layer " + Construct( ConstrNum ).Name );
+				ShowSevereError( "CheckAndSetConstructionProperties: Infrared Transparent (IRT) Construction is limited to 1 layer " + Construct( ConstrNum ).Name );
 				ShowContinueError( "  Too many layers in referenced construction." );
 				ErrorsFound = true;
 			}
@@ -1211,7 +1213,7 @@ namespace DataHeatBalance {
 			if ( Blind( TotBlinds ).MaxSlatAngle < Blind( TotBlinds ).MinSlatAngle ) {
 				errFlag = true;
 				ShowSevereError( "WindowMaterial:Blind=\"" + Blind( inBlindNumber ).Name + "\", Illegal value combination." );
-				ShowContinueError( "Minimum Slat Angle=[" + RoundSigDigits( Blind( TotBlinds ).MinSlatAngle, 1 ) + "], is greater than " "Maximum Slat Angle=[" + RoundSigDigits( Blind( TotBlinds ).MaxSlatAngle, 1 ) + "] deg." );
+				ShowContinueError( "Minimum Slat Angle=[" + RoundSigDigits( Blind( TotBlinds ).MinSlatAngle, 1 ) + "], is greater than Maximum Slat Angle=[" + RoundSigDigits( Blind( TotBlinds ).MaxSlatAngle, 1 ) + "] deg." );
 			}
 
 			// Error if input slat angle not in input min/max range

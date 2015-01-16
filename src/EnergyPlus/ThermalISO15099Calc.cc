@@ -2419,7 +2419,7 @@ namespace ThermalISO15099Calc {
 				Nu2 = 0.242 * std::pow( ra / asp, 0.272 ); //equation 52
 				Nu1 = 1.0 + 1.7596678e-10 * std::pow( ra, 2.2984755 ); //equation 51
 				nperr = 1003; // Rayleigh number is less than 100
-				ErrorMessage = "Rayleigh number is less than 100 in Nusselt number calculations for gaps " "(angle between 60 and 90 degrees).";
+				ErrorMessage = "Rayleigh number is less than 100 in Nusselt number calculations for gaps (angle between 60 and 90 degrees).";
 			} else if ( ra > 2.0e7 ) {
 				G = 0.5 / std::pow( 1.0 + std::pow( ra / 3160.0, 20.6 ), 0.1 ); //equation 47
 				Nu1 = std::pow( 1.0 + pow_7( ( 0.0936 * std::pow( ra, 0.314 ) ) / ( 1.0 + G ) ), 0.1428571 ); //equation 45
@@ -2428,7 +2428,7 @@ namespace ThermalISO15099Calc {
 				Nu2 = 0.242 * std::pow( ra / asp, 0.272 ); //equation 52
 				Nu1 = 0.0673838 * std::pow( ra, 1.0 / 3.0 ); //equation 49
 				nperr = 1004; // Rayleigh number is great from 2e7
-				ErrorMessage = "Rayleigh number is greater than 2e7 in Nusselt number calculations for gaps" " (angle between 60 and 90 degrees).";
+				ErrorMessage = "Rayleigh number is greater than 2e7 in Nusselt number calculations for gaps (angle between 60 and 90 degrees).";
 			} else if ( ( asp <= 5.0 ) || ( asp >= 100.0 ) ) {
 				G = 0.5 / std::pow( 1.0 + std::pow( ra / 3160.0, 20.6 ), 0.1 ); //equation 47
 				Nu1 = std::pow( 1.0 + pow_7( ( 0.0936 * std::pow( ra, 0.314 ) ) / ( 1.0 + G ) ), 0.1428571 ); //equation 45

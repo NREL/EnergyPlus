@@ -776,7 +776,7 @@ namespace ZoneEquipmentManager {
 					}
 				}
 			} else {
-				ShowSevereError( "SetUpZoneSizingArrays: Zone Sizing is requested " "but there are no ZoneHVAC:EquipmentConnections statements." );
+				ShowSevereError( "SetUpZoneSizingArrays: Zone Sizing is requested but there are no ZoneHVAC:EquipmentConnections statements." );
 				ErrorsFound = true;
 			}
 		}
@@ -2044,9 +2044,9 @@ namespace ZoneEquipmentManager {
 						// check for low delta T to avoid very high flow rates
 						if ( std::abs( DeltaTemp ) < 5.0 && std::abs( DeltaTemp ) > SmallTempDiff ) { // Vdot exceeds 1200 cfm/ton @ DT=5
 							if ( std::abs( DeltaTemp ) >= 2.0 ) { // Vdot exceeds 3000 cfm/ton @ DT=2
-								ShowWarningError( "UpdateZoneSizing: Cooling supply air temperature (calculated) within 5C of" " zone temperature" );
+								ShowWarningError( "UpdateZoneSizing: Cooling supply air temperature (calculated) within 5C of zone temperature" );
 							} else {
-								ShowSevereError( "UpdateZoneSizing: Cooling supply air temperature (calculated) within 2C of" " zone temperature" );
+								ShowSevereError( "UpdateZoneSizing: Cooling supply air temperature (calculated) within 2C of zone temperature" );
 							}
 							ShowContinueError( "...check zone thermostat set point and design supply air temperatures" );
 							ShowContinueError( "...zone name = " + CalcFinalZoneSizing( I ).ZoneName );
@@ -2057,9 +2057,9 @@ namespace ZoneEquipmentManager {
 							ShowContinueError( "...temperature difference       = " + RoundSigDigits( DeltaTemp, 5 ) + " C" );
 							ShowContinueError( "...calculated volume flow rate  = " + RoundSigDigits( ( CalcFinalZoneSizing( I ).DesCoolVolFlow ), 5 ) + " m3/s" );
 							ShowContinueError( "...calculated mass flow rate    = " + RoundSigDigits( ( CalcFinalZoneSizing( I ).DesCoolMassFlow ), 5 ) + " kg/s" );
-							if ( SupplyTemp > CalcFinalZoneSizing( I ).ZoneTempAtCoolPeak ) ShowContinueError( "...Note: supply air temperature should be less than zone" " temperature during cooling air flow calculations" );
+							if ( SupplyTemp > CalcFinalZoneSizing( I ).ZoneTempAtCoolPeak ) ShowContinueError( "...Note: supply air temperature should be less than zone temperature during cooling air flow calculations" );
 						} else if ( std::abs( DeltaTemp ) > SmallTempDiff && SupplyTemp > CalcFinalZoneSizing( I ).ZoneTempAtCoolPeak ) {
-							ShowSevereError( "UpdateZoneSizing: Supply air temperature is greater than zone" " temperature during cooling air flow calculations" );
+							ShowSevereError( "UpdateZoneSizing: Supply air temperature is greater than zone temperature during cooling air flow calculations" );
 							ShowContinueError( "...zone temperature            = " + RoundSigDigits( CalcFinalZoneSizing( I ).ZoneTempAtCoolPeak, 3 ) + " C" );
 							ShowContinueError( "...supply air temperature      = " + RoundSigDigits( SupplyTemp, 3 ) + " C" );
 							ShowContinueError( "...occurs in zone              = " + CalcFinalZoneSizing( I ).ZoneName );
@@ -2078,9 +2078,9 @@ namespace ZoneEquipmentManager {
 
 						if ( std::abs( DeltaTemp ) < 5.0 && std::abs( DeltaTemp ) > SmallTempDiff ) { // Vdot exceeds 1200 cfm/ton @ DT=5
 							if ( std::abs( DeltaTemp ) >= 2.0 ) { // Vdot exceeds 3000 cfm/ton @ DT=2
-								ShowWarningError( "UpdateZoneSizing: Heating supply air temperature (calculated) within 5C of" " zone temperature" );
+								ShowWarningError( "UpdateZoneSizing: Heating supply air temperature (calculated) within 5C of zone temperature" );
 							} else {
-								ShowSevereError( "UpdateZoneSizing: Heating supply air temperature (calculated) within 2C of" " zone temperature" );
+								ShowSevereError( "UpdateZoneSizing: Heating supply air temperature (calculated) within 2C of zone temperature" );
 							}
 							ShowContinueError( "...check zone thermostat set point and design supply air temperatures" );
 							ShowContinueError( "...zone name = " + CalcFinalZoneSizing( I ).ZoneName );
@@ -2091,9 +2091,9 @@ namespace ZoneEquipmentManager {
 							ShowContinueError( "...temperature difference      = " + RoundSigDigits( DeltaTemp, 5 ) + " C" );
 							ShowContinueError( "...calculated volume flow rate = " + RoundSigDigits( ( CalcFinalZoneSizing( I ).DesHeatVolFlow ), 5 ) + " m3/s" );
 							ShowContinueError( "...calculated mass flow rate   = " + RoundSigDigits( ( CalcFinalZoneSizing( I ).DesHeatMassFlow ), 5 ) + " kg/s" );
-							if ( SupplyTemp < CalcFinalZoneSizing( I ).ZoneTempAtHeatPeak ) ShowContinueError( "...Note: supply air temperature should be greater than zone" " temperature during heating air flow calculations" );
+							if ( SupplyTemp < CalcFinalZoneSizing( I ).ZoneTempAtHeatPeak ) ShowContinueError( "...Note: supply air temperature should be greater than zone temperature during heating air flow calculations" );
 						} else if ( std::abs( DeltaTemp ) > SmallTempDiff && SupplyTemp < CalcFinalZoneSizing( I ).ZoneTempAtHeatPeak ) {
-							ShowSevereError( "UpdateZoneSizing: Supply air temperature is less than zone" " temperature during heating air flow calculations" );
+							ShowSevereError( "UpdateZoneSizing: Supply air temperature is less than zone temperature during heating air flow calculations" );
 							ShowContinueError( "...zone temperature            = " + RoundSigDigits( CalcFinalZoneSizing( I ).ZoneTempAtHeatPeak, 3 ) + " C" );
 							ShowContinueError( "...supply air temperature      = " + RoundSigDigits( SupplyTemp, 3 ) + " C" );
 							ShowContinueError( "...occurs in zone              = " + CalcFinalZoneSizing( I ).ZoneName );
@@ -2682,7 +2682,7 @@ namespace ZoneEquipmentManager {
 		// and controllers
 
 		if ( ZoneAirMassFlow.EnforceZoneMassBalance ) {
-			 CalcAirFlowSimple( 0, AdjustZoneMixingFlowFlag );
+			CalcAirFlowSimple( 0, AdjustZoneMixingFlowFlag );
 		}
 
 		for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
@@ -2902,7 +2902,7 @@ namespace ZoneEquipmentManager {
 					// zone has both AirTerminal:SingleDuct:Uncontrolled and another kind of Air terminal unit which is not supported
 					if ( ! DirectAirAndAirTerminalWarningIssued( ActualZoneNum ) ) {
 						ShowSevereError( "In zone \"" + ZoneEquipConfig( ControlledZoneNum ).ZoneName + "\" there are too many air terminals served by AirLoopHVAC systems." );
-						ShowContinueError( "A single zone cannot have both an AirTerminal:SingleDuct:Uncontrolled " "and also a second AirTerminal:* object." );
+						ShowContinueError( "A single zone cannot have both an AirTerminal:SingleDuct:Uncontrolled and also a second AirTerminal:* object." );
 
 						DirectAirAndAirTerminalWarningIssued( ActualZoneNum ) = true;
 						ErrorFlag = true;
@@ -3415,8 +3415,7 @@ namespace ZoneEquipmentManager {
 				if ( ZoneMassBalanceFlag( ZoneNum ) ) {
 					if (Iteration == 0) {
 						ZoneMixingAirMassFlowRate = MixingMassFlowZone( ZoneNum );
-					}
-					else {
+					} else {
 						RetNode = ZoneEquipConfig( ZoneNum ).ReturnAirNode;
 						if (RetNode > 0) {
 							ZoneMixingAirMassFlowRate = max(0.0, Node(RetNode).MassFlowRate + TotExhaustAirMassFlowRate - TotInletAirMassFlowRate + MassConservation(ZoneNum).MixingSourceMassFlowRate);
@@ -3434,8 +3433,7 @@ namespace ZoneEquipmentManager {
 									MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
 									Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate = ZoneInfiltrationMassFlowRate;
 									MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 1;
-								}
-								else {
+								} else {
 									MassConservation(ZoneNum).InfiltrationMassFlowRate = Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
 								}
 							}
@@ -3445,13 +3443,11 @@ namespace ZoneEquipmentManager {
 									ZoneInfiltrationFlag(ZoneNum) = true;
 									MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
 									MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 1;
-								}
-								else {
+								} else {
 									MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
 								}
 							}
-						}
-						else {
+						} else {
 
 							if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
 								MassConservation(ZoneNum).InfiltrationMassFlowRate = Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
@@ -3460,12 +3456,10 @@ namespace ZoneEquipmentManager {
 								MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
 							}
 						}
-					}
-					else {
+					} else {
 						if (MassConservation(ZoneNum).InfiltrationPtr > 0) {
 							MassConservation(ZoneNum).InfiltrationMassFlowRate = Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
-						}
-						else {
+						} else {
 							MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
 						}
 					}
@@ -3486,9 +3480,9 @@ namespace ZoneEquipmentManager {
 
 				// Update Return Air Node Conditions; If one Exists
 				RetNode = ZoneEquipConfig(ZoneNum).ReturnAirNode;
-				if (RetNode > 0) {
+				if ( RetNode > 0 ) {
 					Node(RetNode).MassFlowRate = max(Node(ZoneNode).MassFlowRate + ZoneMixingNetAirMassFlowRate - (TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExhBalanced), 0.0);
-					if (AirLoopNum > 0) {
+					if ( AirLoopNum > 0 ) {
 						if (!PrimaryAirSystem(AirLoopNum).OASysExists) {
 							Node(RetNode).MassFlowRate = max(Node(ZoneNode).MassFlowRate + ZoneMixingNetAirMassFlowRate - (TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExh), 0.0);
 						}
@@ -3502,7 +3496,7 @@ namespace ZoneEquipmentManager {
 
 				TotSupplyAirMassFlowRate = TotInletAirMassFlowRate - (TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExh) - ZoneEquipConfig(ZoneNum).PlenumMassFlow;
 
-				if (AirLoopNum > 0) {
+				if ( AirLoopNum > 0 ) {
 					AirLoopFlow(AirLoopNum).ZoneExhaust += ZoneEquipConfig(ZoneNum).ZoneExh;
 					AirLoopFlow(AirLoopNum).ZoneExhaustBalanced += ZoneEquipConfig(ZoneNum).ZoneExhBalanced;
 					AirLoopFlow(AirLoopNum).SupFlow += TotSupplyAirMassFlowRate;
@@ -3512,31 +3506,30 @@ namespace ZoneEquipmentManager {
 				BuildingZoneMixingFlow += MassConservation(ZoneNum).MixingMassFlowRate;
 			}
 			// Calculate an air loop return air flow rate
-			for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-				if ((AirLoopFlow(AirLoopNum).ZoneExhaust > (AirLoopFlow(AirLoopNum).SupFlow + AirLoopFlow(AirLoopNum).ZoneExhaustBalanced) || AirLoopFlow(AirLoopNum).ZoneExhaust > (AirLoopFlow(AirLoopNum).MaxOutAir + AirLoopFlow(AirLoopNum).ZoneExhaustBalanced)) && !AirLoopFlow(AirLoopNum).FlowError && AirLoopsSimOnce) {
-					if (!isPulseZoneSizing && !ZoneAirMassFlow.EnforceZoneMassBalance) {
-						ShowWarningError("In AirLoopHVAC " + PrimaryAirSystem(AirLoopNum).Name + " there is unbalanced exhaust air flow.");
-						ShowContinueErrorTimeStamp(" ");
-						ShowContinueError("  Unless there is balancing infiltration / ventilation air flow, this will result in");
-						ShowContinueError("  load due to induced outdoor air being neglected in the simulation.");
+			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
+				if ( ( AirLoopFlow(AirLoopNum).ZoneExhaust > ( AirLoopFlow(AirLoopNum).SupFlow + AirLoopFlow(AirLoopNum).ZoneExhaustBalanced ) || AirLoopFlow(AirLoopNum).ZoneExhaust > ( AirLoopFlow(AirLoopNum).MaxOutAir + AirLoopFlow(AirLoopNum).ZoneExhaustBalanced ) ) && !AirLoopFlow(AirLoopNum).FlowError && AirLoopsSimOnce ) {
+					if ( !isPulseZoneSizing && !ZoneAirMassFlow.EnforceZoneMassBalance ) {
+						ShowWarningError( "In AirLoopHVAC " + PrimaryAirSystem(AirLoopNum).Name + " there is unbalanced exhaust air flow." );
+						ShowContinueErrorTimeStamp( "" );
+						ShowContinueError( "  Unless there is balancing infiltration / ventilation air flow, this will result in" );
+						ShowContinueError( "  load due to induced outdoor air being neglected in the simulation." );
 						AirLoopFlow(AirLoopNum).FlowError = true;
 					}
 				}
 				AirLoopFlow(AirLoopNum).ZoneExhaust = min(AirLoopFlow(AirLoopNum).ZoneExhaust, (AirLoopFlow(AirLoopNum).SupFlow + AirLoopFlow(AirLoopNum).ZoneExhaustBalanced + AirLoopFlow(AirLoopNum).ZoneMixingFlow));
 				AirLoopFlow(AirLoopNum).ZoneExhaust = min(AirLoopFlow(AirLoopNum).ZoneExhaust, (AirLoopFlow(AirLoopNum).MaxOutAir + AirLoopFlow(AirLoopNum).ZoneExhaustBalanced + AirLoopFlow(AirLoopNum).ZoneMixingFlow));
 
-				if (AirLoopFlow(AirLoopNum).ZoneMixingFlow < 0.0) {
+				if ( AirLoopFlow(AirLoopNum).ZoneMixingFlow < 0.0 ) {
 					// the source zone and the recieving zone are in different air loops
 					AirLoopFlow(AirLoopNum).ZoneExhaust = max(0.0, (AirLoopFlow(AirLoopNum).ZoneExhaust - AirLoopFlow(AirLoopNum).ZoneMixingFlow));
 					AirLoopFlow(AirLoopNum).RetFlow = AirLoopFlow(AirLoopNum).SupFlow - (AirLoopFlow(AirLoopNum).ZoneExhaust - AirLoopFlow(AirLoopNum).ZoneExhaustBalanced) + AirLoopFlow(AirLoopNum).RecircFlow;
-				}
-				else {
+				} else {
 					AirLoopFlow(AirLoopNum).RetFlow = AirLoopFlow(AirLoopNum).SupFlow - (AirLoopFlow(AirLoopNum).ZoneExhaust - AirLoopFlow(AirLoopNum).ZoneExhaustBalanced) + AirLoopFlow(AirLoopNum).RecircFlow + AirLoopFlow(AirLoopNum).ZoneMixingFlow;
 				}
 			}
 
 			// adjust the zone return air flow rates to match the air loop return air flow rate
-			for (ZoneNum1 = 1; ZoneNum1 <= NumOfZones; ++ZoneNum1) {
+			for ( ZoneNum1 = 1; ZoneNum1 <= NumOfZones; ++ZoneNum1 ) {
 				ZoneNum = ZoneNum1;
 				if (ZoneAirMassFlow.EnforceZoneMassBalance) ZoneNum = ZoneReOrder(ZoneNum1);
 				if (!ZoneEquipConfig(ZoneNum).IsControlled) continue;
@@ -3546,8 +3539,7 @@ namespace ZoneEquipmentManager {
 					if (PrimaryAirSystem(AirLoopNum).OASysExists) {
 						if (AirLoopFlow(AirLoopNum).RetFlow0 > 0.0) {
 							Node(RetNode).MassFlowRate *= (AirLoopFlow(AirLoopNum).RetFlow / AirLoopFlow(AirLoopNum).RetFlow0);
-						}
-						else {
+						} else {
 							Node(RetNode).MassFlowRate = 0.0;
 						}
 					}
@@ -3560,19 +3552,18 @@ namespace ZoneEquipmentManager {
 				//       ENDIF
 			}
 			// update the
-			if (Iteration > 0) {
-				if (abs(BuildingZoneMixingFlow - BuildingZoneMixingFlowOld) < ConvergenceTolerance) {
+			if ( Iteration > 0 ) {
+				if ( abs(BuildingZoneMixingFlow - BuildingZoneMixingFlowOld) < ConvergenceTolerance ) {
 					ZoneMassBalanceHVACReSim = false;
 					break;
-				}
-				else {
+				} else {
 					ZoneMassBalanceHVACReSim = true;
 				}
 			}
-			if (!ZoneAirMassFlow.EnforceZoneMassBalance) break;
+			if ( !ZoneAirMassFlow.EnforceZoneMassBalance ) break;
 			Iteration += 1;
 
-		} while (Iteration < IterMax);
+		} while ( Iteration < IterMax );
 
 	}
 
@@ -4145,11 +4136,11 @@ namespace ZoneEquipmentManager {
 				if ( Ventilation( I ).MinIndoorTemperature > Ventilation( I ).MaxIndoorTemperature ) {
 					++Ventilation( I ).IndoorTempErrCount;
 					if ( Ventilation( I ).IndoorTempErrCount < 2 ) {
-						ShowWarningError( "Ventilation indoor temperature control: The minimum indoor temperature is above " "the maximum indoor temperature in " + Ventilation( I ).Name );
-						ShowContinueError( "The minimum indoor temperature is set to the maximum indoor temperature. " "Simulation continues." );
+						ShowWarningError( "Ventilation indoor temperature control: The minimum indoor temperature is above the maximum indoor temperature in " + Ventilation( I ).Name );
+						ShowContinueError( "The minimum indoor temperature is set to the maximum indoor temperature. Simulation continues." );
 						ShowContinueErrorTimeStamp( " Occurrence info:" );
 					} else {
-						ShowRecurringWarningErrorAtEnd( "The minimum indoor temperature is still above " "the maximum indoor temperature", Ventilation( I ).IndoorTempErrIndex, Ventilation( I ).MinIndoorTemperature, Ventilation( I ).MinIndoorTemperature );
+						ShowRecurringWarningErrorAtEnd( "The minimum indoor temperature is still above the maximum indoor temperature", Ventilation( I ).IndoorTempErrIndex, Ventilation( I ).MinIndoorTemperature, Ventilation( I ).MinIndoorTemperature );
 					}
 					Ventilation( I ).MinIndoorTemperature = Ventilation( I ).MaxIndoorTemperature;
 				}
@@ -4165,11 +4156,11 @@ namespace ZoneEquipmentManager {
 				if ( Ventilation( I ).MinOutdoorTemperature > Ventilation( I ).MaxOutdoorTemperature ) {
 					++Ventilation( I ).OutdoorTempErrCount;
 					if ( Ventilation( I ).OutdoorTempErrCount < 2 ) {
-						ShowWarningError( "Ventilation outdoor temperature control: The minimum outdoor temperature is above " "the maximum outdoor temperature in " + Ventilation( I ).Name );
-						ShowContinueError( "The minimum outdoor temperature is set to the maximum outdoor temperature. " "Simulation continues." );
+						ShowWarningError( "Ventilation outdoor temperature control: The minimum outdoor temperature is above the maximum outdoor temperature in " + Ventilation( I ).Name );
+						ShowContinueError( "The minimum outdoor temperature is set to the maximum outdoor temperature. Simulation continues." );
 						ShowContinueErrorTimeStamp( " Occurrence info:" );
 					} else {
-						ShowRecurringWarningErrorAtEnd( "The minimum outdoor temperature is still above " "the maximum outdoor temperature", Ventilation( I ).OutdoorTempErrIndex, Ventilation( I ).MinOutdoorTemperature, Ventilation( I ).MinOutdoorTemperature );
+						ShowRecurringWarningErrorAtEnd( "The minimum outdoor temperature is still above the maximum outdoor temperature", Ventilation( I ).OutdoorTempErrIndex, Ventilation( I ).MinOutdoorTemperature, Ventilation( I ).MinOutdoorTemperature );
 					}
 					Ventilation( I ).MinIndoorTemperature = Ventilation( I ).MaxIndoorTemperature;
 				}
@@ -4320,11 +4311,11 @@ namespace ZoneEquipmentManager {
 					if ( MixingTmin > MixingTmax ) {
 						++Mixing( j ).IndoorTempErrCount;
 						if ( Mixing( j ).IndoorTempErrCount < 2 ) {
-							ShowWarningError( "Mixing zone temperature control: The minimum zone temperature is above " "the maximum zone temperature in " + Mixing( j ).Name );
-							ShowContinueError( "The minimum zone temperature is set to the maximum zone temperature. " "Simulation continues." );
+							ShowWarningError( "Mixing zone temperature control: The minimum zone temperature is above the maximum zone temperature in " + Mixing( j ).Name );
+							ShowContinueError( "The minimum zone temperature is set to the maximum zone temperature. Simulation continues." );
 							ShowContinueErrorTimeStamp( " Occurrence info:" );
 						} else {
-							ShowRecurringWarningErrorAtEnd( "The minimum zone temperature is still above " "the maximum zone temperature", Mixing( j ).IndoorTempErrIndex, MixingTmin, MixingTmin );
+							ShowRecurringWarningErrorAtEnd( "The minimum zone temperature is still above the maximum zone temperature", Mixing( j ).IndoorTempErrIndex, MixingTmin, MixingTmin );
 						}
 						MixingTmin = MixingTmax;
 					}
@@ -4342,11 +4333,11 @@ namespace ZoneEquipmentManager {
 					if ( MixingTmin > MixingTmax ) {
 						++Mixing( j ).SourceTempErrCount;
 						if ( Mixing( j ).SourceTempErrCount < 2 ) {
-							ShowWarningError( "Mixing source temperature control: The minimum source temperature is above " "the maximum source temperature in " + Mixing( j ).Name );
-							ShowContinueError( "The minimum source temperature is set to the maximum source temperature. " "Simulation continues." );
+							ShowWarningError( "Mixing source temperature control: The minimum source temperature is above the maximum source temperature in " + Mixing( j ).Name );
+							ShowContinueError( "The minimum source temperature is set to the maximum source temperature. Simulation continues." );
 							ShowContinueErrorTimeStamp( " Occurrence info:" );
 						} else {
-							ShowRecurringWarningErrorAtEnd( "The minimum source temperature is still above " "the maximum source temperature", Mixing( j ).SourceTempErrIndex, MixingTmin, MixingTmin );
+							ShowRecurringWarningErrorAtEnd( "The minimum source temperature is still above the maximum source temperature", Mixing( j ).SourceTempErrIndex, MixingTmin, MixingTmin );
 						}
 						MixingTmin = MixingTmax;
 					}
@@ -4365,11 +4356,11 @@ namespace ZoneEquipmentManager {
 					if ( MixingTmin > MixingTmax ) {
 						++Mixing( j ).OutdoorTempErrCount;
 						if ( Mixing( j ).OutdoorTempErrCount < 2 ) {
-							ShowWarningError( "Mixing outdoor temperature control: The minimum outdoor temperature is above " "the maximum outdoor temperature in " + Mixing( j ).Name );
-							ShowContinueError( "The minimum outdoor temperature is set to the maximum source temperature. " "Simulation continues." );
+							ShowWarningError( "Mixing outdoor temperature control: The minimum outdoor temperature is above the maximum outdoor temperature in " + Mixing( j ).Name );
+							ShowContinueError( "The minimum outdoor temperature is set to the maximum source temperature. Simulation continues." );
 							ShowContinueErrorTimeStamp( " Occurrence info:" );
 						} else {
-							ShowRecurringWarningErrorAtEnd( "The minimum outdoor temperature is still above " "the maximum outdoor temperature", Mixing( j ).OutdoorTempErrIndex, MixingTmin, MixingTmin );
+							ShowRecurringWarningErrorAtEnd( "The minimum outdoor temperature is still above the maximum outdoor temperature", Mixing( j ).OutdoorTempErrIndex, MixingTmin, MixingTmin );
 						}
 						MixingTmin = MixingTmax;
 					}
@@ -4504,11 +4495,11 @@ namespace ZoneEquipmentManager {
 					if ( MixingTmin > MixingTmax ) {
 						++CrossMixing( j ).IndoorTempErrCount;
 						if ( CrossMixing( j ).IndoorTempErrCount < 2 ) {
-							ShowWarningError( "CrossMixing zone temperature control: The minimum zone temperature is above " "the maximum zone temperature in " + CrossMixing( j ).Name );
-							ShowContinueError( "The minimum zone temperature is set to the maximum zone temperature. " "Simulation continues." );
+							ShowWarningError( "CrossMixing zone temperature control: The minimum zone temperature is above the maximum zone temperature in " + CrossMixing( j ).Name );
+							ShowContinueError( "The minimum zone temperature is set to the maximum zone temperature. Simulation continues." );
 							ShowContinueErrorTimeStamp( " Occurrence info:" );
 						} else {
-							ShowRecurringWarningErrorAtEnd( "The minimum zone temperature is still above " "the maximum zone temperature", CrossMixing( j ).IndoorTempErrIndex, MixingTmin, MixingTmin );
+							ShowRecurringWarningErrorAtEnd( "The minimum zone temperature is still above the maximum zone temperature", CrossMixing( j ).IndoorTempErrIndex, MixingTmin, MixingTmin );
 						}
 						MixingTmin = MixingTmax;
 					}
@@ -4526,11 +4517,11 @@ namespace ZoneEquipmentManager {
 					if ( MixingTmin > MixingTmax ) {
 						++CrossMixing( j ).SourceTempErrCount;
 						if ( CrossMixing( j ).SourceTempErrCount < 2 ) {
-							ShowWarningError( "CrossMixing source temperature control: The minimum source temperature is above " "the maximum source temperature in " + CrossMixing( j ).Name );
-							ShowContinueError( "The minimum source temperature is set to the maximum source temperature. " "Simulation continues." );
+							ShowWarningError( "CrossMixing source temperature control: The minimum source temperature is above the maximum source temperature in " + CrossMixing( j ).Name );
+							ShowContinueError( "The minimum source temperature is set to the maximum source temperature. Simulation continues." );
 							ShowContinueErrorTimeStamp( " Occurrence info:" );
 						} else {
-							ShowRecurringWarningErrorAtEnd( "The minimum source temperature is still above " "the maximum source temperature", CrossMixing( j ).SourceTempErrIndex, MixingTmin, MixingTmin );
+							ShowRecurringWarningErrorAtEnd( "The minimum source temperature is still above the maximum source temperature", CrossMixing( j ).SourceTempErrIndex, MixingTmin, MixingTmin );
 						}
 						MixingTmin = MixingTmax;
 					}
@@ -4549,11 +4540,11 @@ namespace ZoneEquipmentManager {
 					if ( MixingTmin > MixingTmax ) {
 						++CrossMixing( j ).OutdoorTempErrCount;
 						if ( CrossMixing( j ).OutdoorTempErrCount < 2 ) {
-							ShowWarningError( "CrossMixing outdoor temperature control: The minimum outdoor temperature is above " "the maximum outdoor temperature in " + Mixing( j ).Name );
-							ShowContinueError( "The minimum outdoor temperature is set to the maximum source temperature. " "Simulation continues." );
+							ShowWarningError( "CrossMixing outdoor temperature control: The minimum outdoor temperature is above the maximum outdoor temperature in " + Mixing( j ).Name );
+							ShowContinueError( "The minimum outdoor temperature is set to the maximum source temperature. Simulation continues." );
 							ShowContinueErrorTimeStamp( " Occurrence info:" );
 						} else {
-							ShowRecurringWarningErrorAtEnd( "The minimum outdoor temperature is still above " "the maximum outdoor temperature", CrossMixing( j ).OutdoorTempErrIndex, MixingTmin, MixingTmin );
+							ShowRecurringWarningErrorAtEnd( "The minimum outdoor temperature is still above the maximum outdoor temperature", CrossMixing( j ).OutdoorTempErrIndex, MixingTmin, MixingTmin );
 						}
 						MixingTmin = MixingTmax;
 					}

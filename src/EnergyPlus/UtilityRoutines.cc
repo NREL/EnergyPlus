@@ -1701,8 +1701,8 @@ ShowRecurringErrors()
 	// Using/Aliasing
 	using namespace DataErrorTracking;
 	using General::RoundSigDigits;
-    using General::strip_trailing_zeros;
-	
+	using General::strip_trailing_zeros;
+
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 	// na

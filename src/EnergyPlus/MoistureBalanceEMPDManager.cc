@@ -210,7 +210,7 @@ namespace MoistureBalanceEMPDManager {
 					ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces." );
 				}
 				if ( DisplayExtraWarnings ) {
-					ShowMessage( "GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the " "inside layer in Surface=" + Surface( SurfNum ).Name );
+					ShowMessage( "GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the inside layer in Surface=" + Surface( SurfNum ).Name );
 					ShowContinueError( "with Construction=" + Construct( ConstrNum ).Name );
 				}
 			}
@@ -218,14 +218,14 @@ namespace MoistureBalanceEMPDManager {
 				continue;
 			} else { // Multiple layer construction
 				if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).EMPDMaterialProps && Surface( SurfNum ).ExtBoundCond <= 0 ) { // The external layer is not exposed to zone
-					ShowSevereError( "GetMoistureBalanceEMPDInput: EMPD properties are assigned to the " "outside layer in Construction=" + Construct( ConstrNum ).Name );
+					ShowSevereError( "GetMoistureBalanceEMPDInput: EMPD properties are assigned to the outside layer in Construction=" + Construct( ConstrNum ).Name );
 					ShowContinueError( "..Outside layer material with EMPD properties = " + Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Name );
 					ShowContinueError( "..A material with EMPD properties must be assigned to the inside layer of a construction." );
 					ErrorsFound = true;
 				}
 				for ( Layer = 2; Layer <= Construct( ConstrNum ).TotLayers - 1; ++Layer ) {
 					if ( Material( Construct( ConstrNum ).LayerPoint( Layer ) ).EMPDMaterialProps ) {
-						ShowSevereError( "GetMoistureBalanceEMPDInput: EMPD properties are assigned to a " "middle layer in Construction=" + Construct( ConstrNum ).Name );
+						ShowSevereError( "GetMoistureBalanceEMPDInput: EMPD properties are assigned to a middle layer in Construction=" + Construct( ConstrNum ).Name );
 						ShowContinueError( "..Middle layer material with EMPD properties = " + Material( Construct( ConstrNum ).LayerPoint( Layer ) ).Name );
 						ShowContinueError( "..A material with EMPD properties must be assigned to the inside layer of a construction." );
 						ErrorsFound = true;
@@ -635,7 +635,7 @@ namespace MoistureBalanceEMPDManager {
 
 		if ( ! DoReport ) return;
 		//   Write Descriptions
-		gio::write( OutputFileInits, fmtA ) << "! <Construction EMPD>, Construction Name, Inside Layer Material Name, " "Penetration Depth {m}, a, b, c, d";
+		gio::write( OutputFileInits, fmtA ) << "! <Construction EMPD>, Construction Name, Inside Layer Material Name, Penetration Depth {m}, a, b, c, d";
 
 		for ( ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum ) {
 			if ( ConstrWin[ ConstrNum - 1 ].TypeIsWindow ) continue;

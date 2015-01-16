@@ -2632,7 +2632,7 @@ namespace Fans {
 		FanIndex = FindItemInList( FanName, Fan.FanName(), NumFans );
 		if ( FanIndex == 0 ) {
 			if ( present( ThisObjectType ) && present( ThisObjectName ) ) {
-				ShowSevereError( "GetFanType: " + ThisObjectType() + "=\"" + ThisObjectName() + "\"," " invalid Fan specified=\"" + FanName + "\"." );
+				ShowSevereError( "GetFanType: " + ThisObjectType() + "=\"" + ThisObjectName() + "\", invalid Fan specified=\"" + FanName + "\"." );
 			} else if ( present( ThisObjectType ) ) {
 				ShowSevereError( ThisObjectType() + ", GetFanType: Fan not found=" + FanName );
 			} else {
@@ -3101,8 +3101,7 @@ namespace Fans {
 		//
 		if ( FanNum == 0 ) {
 			DesignDeltaT = 0.0;
-		}
-		else if ( Fan( FanNum ).FanType_Num != FanType_ComponentModel ) {
+		} else if ( Fan( FanNum ).FanType_Num != FanType_ComponentModel ) {
 			DeltaP = Fan( FanNum ).DeltaPress;
 			TotEff = Fan( FanNum ).FanEff;
 			MotEff = Fan( FanNum ).MotEff;
@@ -3110,8 +3109,7 @@ namespace Fans {
 			RhoAir = StdRhoAir;
 			CpAir = PsyCpAirFnWTdb( constant_zero, constant_twenty );
 			DesignDeltaT = ( DeltaP / ( RhoAir * CpAir * TotEff ) ) * ( MotEff + MotInAirFrac * ( 1.0 - MotEff ) );
-		}
-		else {
+		} else {
 			DesignDeltaT = 0.0;
 		}
 	

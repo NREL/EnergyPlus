@@ -313,6 +313,7 @@ namespace DataHeatBalance {
 	extern int NumHotWaterEqStatements; // number of Hot Water Equipment objects in input. - possibly global assignments
 	extern int NumSteamEqStatements; // number of Steam Equipment objects in input. - possibly global assignments
 	extern int NumOtherEqStatements; // number of Other Equipment objects in input. - possibly global assignments
+	extern int NumZoneITEqStatements; // Number of ElectricEquipment:ITE:AirCooled objects in input (ZoneList not supported for this object)
 	extern int TotPeople; // Total People Statements in input and extrapolated from global assignments
 	extern int TotLights; // Total Lights Statements in input and extrapolated from global assignments
 	extern int TotElecEquip; // Total Electric Equipment Statements in input and extrapolated from global assignments
@@ -2672,6 +2673,295 @@ namespace DataHeatBalance {
 
 	};
 
+	struct ITEquipData // IT Equipment
+	{
+		// Members
+		std::string Name; // EQUIPMENT object name
+		int ZonePtr; // Which zone internal gain is in
+		Real64 DesignTotalPower; // Design level for internal gain [W]
+		Real64 NomMinDesignLevel; // Nominal Minimum Design Level (min sch X design level)
+		Real64 NomMaxDesignLevel; // Nominal Maximum Design Level (max sch X design level)
+		Real64 DesignFanPowerFrac; // Fraction (0.0-1.0) of design power level that is fans
+		int OperSchedPtr; // Schedule pointer for design power input or operating schedule
+		int CPULoadSchedPtr; // Schedule pointer for CPU loading schedule
+		Real64 DesignTAirIn; // Design entering air dry-bulb temperature [C]
+		Real64 DesignFanPower; // Design fan power input [W]
+		Real64 DesignCPUPower; // Design CPU power input [W]
+		Real64 DesignAirVolFlowRate; // Design air volume flow rate [m3/s]
+		int Class; // Environmental class index (A1=1, A2=2, A3=3, A4=4, B=5, C=6)
+		int AirFlowFLTCurve; // Index for airflow function of CPULoadFrac (x) and TAirIn (y) curve
+		int CPUPowerFLTCurve; // Index for CPU power function of CPULoadFrac (x) and TAirIn (y) curve
+		int FanPowerFFCurve; // Index for fan power function of flow fraction curve
+		int AirConnectionType; // Air connection type (AdjustedSupply, ZoneAirNode, RoomAirModel)
+		int InletRoomAirNodeNum; // Room air model node number for air inlet
+		int OutletRoomAirNodeNum; // Room air model node number for air outlet
+		int SupplyAirNodeNum; // Node number for supply air inlet
+		Real64 DesignRecircFrac; // Design recirculation fraction (0.0-0.5)
+		int RecircFLTCurve; // Index for recirculation function of CPULoadFrac (x) and TSupply (y) curve
+		Real64 DesignUPSEfficiency; // Design power supply efficiency (>0.0 - 1.0)
+		int UPSEfficFPLRCurve; // Index for recirculation function of part load ratio
+		Real64 UPSLossToZoneFrac; // Fraction of UPS power loss to zone (0.0 - 1.0); remainder is lost
+		std::string EndUseSubcategoryCPU; // User defined name for the end use category for the CPU
+		std::string EndUseSubcategoryFan; // User defined name for the end use category for the Fans
+		std::string EndUseSubcategoryUPS; // User defined name for the end use category for the power supply
+		bool EMSCPUPowerOverrideOn; // EMS actuating CPU power if .TRUE.
+		Real64 EMSCPUPower; // Value EMS is directing to use for override of CPU power [W]
+		bool EMSFanPowerOverrideOn; // EMS actuating Fan power if .TRUE.
+		Real64 EMSFanPower; // Value EMS is directing to use for override of Fan power [W]
+		bool EMSUPSPowerOverrideOn; // EMS actuating UPS power if .TRUE.
+		Real64 EMSUPSPower; // Value EMS is directing to use for override of UPS power [W]
+		// Report variables
+		Real64 CPUPower; // ITE CPU Electric Power [W]
+		Real64 FanPower; // ITE Fan Electric Power [W]
+		Real64 UPSPower; // ITE UPS Electric Power [W]
+		Real64 CPUPowerAtDesign; // ITE CPU Electric Power at Design Inlet Conditions [W]
+		Real64 FanPowerAtDesign; // ITE Fan Electric Power at Design Inlet Conditions [W]
+		Real64 UPSGainRateToZone; // ITE UPS Heat Gain to Zone Rate [W] - convective gain
+		Real64 ConGainRateToZone; // ITE Total Heat Gain to Zone Rate [W] - convective gain - includes heat gain from UPS, plus CPU and Fans if room air model not used
+		Real64 CPUConsumption; // ITE CPU Electric Energy [J]
+		Real64 FanConsumption; // ITE Fan Electric Energy [J]
+		Real64 UPSConsumption; // ITE UPS Electric Energy [J]
+		Real64 CPUEnergyAtDesign; // ITE CPU Electric Energy at Design Inlet Conditions [J]
+		Real64 FanEnergyAtDesign; // ITE Fan Electric Energy at Design Inlet Conditions [J]
+		Real64 UPSGainEnergyToZone; // ITE UPS Heat Gain to Zone Energy [J] - convective gain
+		Real64 ConGainEnergyToZone; // ITE Total Heat Gain to Zone Energy [J] - convective gain - includes heat gain from UPS, plus CPU and Fans if room air model not used
+		Real64 AirVolFlowStdDensity; // Air volume flow rate at standard density [m3/s]
+		Real64 AirVolFlowCurDensity; // Air volume flow rate at current density [m3/s]
+		Real64 AirMassFlow; // Air mass flow rate [kg/s]
+		Real64 AirInletDryBulbT; // Air inlet dry-bulb temperature [C]
+		Real64 AirInletDewpointT; // Air inlet dewpoit temperature [C]
+		Real64 AirInletRelHum; // Air inlet relative humidity [%]
+		Real64 AirOutletDryBulbT; // Air outlet dry-bulb temperature [C]
+		Real64 SHI; // Supply Heat Index []
+		Real64 TimeOutOfOperRange; // ITE Air Inlet Operating Range Exceeded Time [hr]
+		Real64 TimeAboveDryBulbT; // ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time [hr]
+		Real64 TimeBelowDryBulbT; // ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time [hr]
+		Real64 TimeAboveDewpointT; // ITE Air Inlet Dewpoint Temperature Above Operating Range Time [hr]
+		Real64 TimeBelowDewpointT; // ITE Air Inlet Dewpoint Temperature Below Operating Range Time [hr]
+		Real64 TimeAboveRH; // ITE Air Inlet Relative Humidity Above Operating Range Time [hr]
+		Real64 TimeBelowRH; // ITE Air Inlet Relative Humidity Below Operating Range Time [hr]
+		Real64 DryBulbTAboveDeltaT; // ITE Air Inlet Dry-Bulb Temperature Difference Above Operating Range [deltaC]
+		Real64 DryBulbTBelowDeltaT; // ITE Air Inlet Dry-Bulb Temperature Difference Below Operating Range [deltaC]
+		Real64 DewpointTAboveDeltaT; // ITE Air Inlet Dewpoint Temperature Difference Above Operating Range [deltaC]
+		Real64 DewpointTBelowDeltaT; // ITE Air Inlet Dewpoint Temperature Difference Below Operating Range [deltaC]
+		Real64 RHAboveDeltaRH; // ITE Air Inlet Relative Humidity Difference Above Operating Range [%]
+		Real64 RHBelowDeltaRH; // ITE Air Inlet Relative Humidity Difference Below Operating Range [%]
+
+		// Default Constructor
+		ITEquipData( ) :
+			ZonePtr( 0 ),
+			DesignTotalPower( 0.0 ),
+			NomMinDesignLevel( 0.0 ),
+			NomMaxDesignLevel( 0.0 ),
+			DesignFanPowerFrac( 0.0 ),
+			OperSchedPtr( 0 ),
+			CPULoadSchedPtr( 0 ),
+			DesignTAirIn( 0.0 ),
+			DesignFanPower( 0.0 ),
+			DesignCPUPower( 0.0 ),
+			DesignAirVolFlowRate( 0.0 ),
+			Class ( 0 ),
+			AirFlowFLTCurve( 0 ),
+			CPUPowerFLTCurve( 0 ),
+			FanPowerFFCurve( 0 ),
+			AirConnectionType( 0 ),
+			InletRoomAirNodeNum( 0 ),
+			OutletRoomAirNodeNum( 0 ),
+			SupplyAirNodeNum( 0 ),
+			DesignRecircFrac( 0.0 ),
+			RecircFLTCurve( 0 ),
+			DesignUPSEfficiency( 0.0 ),
+			UPSEfficFPLRCurve( 0 ),
+			UPSLossToZoneFrac( 0.0 ),
+			EMSCPUPowerOverrideOn( false ),
+			EMSCPUPower( 0.0 ),
+			EMSFanPowerOverrideOn( false ),
+			EMSFanPower( 0.0 ),
+			EMSUPSPowerOverrideOn( false ),
+			EMSUPSPower( 0.0 ),
+			CPUPower( 0.0 ),
+			FanPower( 0.0 ),
+			UPSPower( 0.0 ),
+			CPUPowerAtDesign( 0.0 ),
+			FanPowerAtDesign( 0.0 ),
+			UPSGainRateToZone( 0.0 ),
+			ConGainRateToZone( 0.0 ),
+			CPUConsumption( 0.0 ),
+			FanConsumption( 0.0 ),
+			UPSConsumption( 0.0 ),
+			CPUEnergyAtDesign( 0.0 ),
+			FanEnergyAtDesign( 0.0 ),
+			UPSGainEnergyToZone( 0.0 ),
+			ConGainEnergyToZone( 0.0 ),
+			AirVolFlowStdDensity( 0.0 ),
+			AirVolFlowCurDensity( 0.0 ),
+			AirMassFlow( 0.0 ),
+			AirInletDryBulbT( 0.0 ),
+			AirInletDewpointT( 0.0 ),
+			AirInletRelHum( 0.0 ),
+			AirOutletDryBulbT( 0.0 ),
+			SHI( 0.0 ),
+			TimeOutOfOperRange( 0.0 ),
+			TimeAboveDryBulbT( 0.0 ),
+			TimeBelowDryBulbT( 0.0 ),
+			TimeAboveDewpointT( 0.0 ),
+			TimeAboveRH( 0.0 ),
+			TimeBelowRH( 0.0 ),
+			TimeBelowDewpointT( 0.0 ),
+			DryBulbTAboveDeltaT( 0.0 ),
+			DryBulbTBelowDeltaT( 0.0 ),
+			DewpointTAboveDeltaT( 0.0 ),
+			DewpointTBelowDeltaT( 0.0 ),
+			RHAboveDeltaRH( 0.0 ),
+			RHBelowDeltaRH( 0.0 )
+		{}
+
+		// Member Constructor
+		ITEquipData(
+			std::string const & Name, // EQUIPMENT object name
+			int const ZonePtr, // Which zone internal gain is in
+			Real64 const DesignTotalPower, // Design level for internal gain [W]
+			Real64 const NomMinDesignLevel, // Nominal Minimum Design Level (min sch X design level)
+			Real64 const NomMaxDesignLevel, // Nominal Maximum Design Level (max sch X design level)
+			Real64 const DesignFanPowerFrac, // Fraction (0.0-1.0) of design power level that is fans
+			int const OperSchedPtr, // Schedule pointer for design power input or operating schedule
+			int const CPULoadSchedPtr, // Schedule pointer for CPU loading schedule
+			Real64 const DesignTAirIn, // Design entering air temperature [C]
+			Real64 const DesignFanPower, // Design fan power input [W]
+			Real64 const DesignCPUPower, // Design CPU power input [W]
+			Real64 const DesignAirVolFlowRate, // Design air volume flow rate [m3/s]
+			int const Class, // Environmental class index (A1=1, A2=2, A3=3, A4=4, B=5, C=6)
+			int const AirFlowFLTCurve, // Index for airflow function of CPULoadFrac (x) and TAirIn (y) curve
+			int const CPUPowerFLTCurve, // Index for CPU power function of CPULoadFrac (x) and TAirIn (y) curve
+			int const FanPowerFFCurve, // Index for fan power function of flow fraction curve
+			int const AirConnectionType, // Air connection type (AdjustedSupply, ZoneAirNode, RoomAirModel)
+			int InletRoomAirNodeNum, // Room air model node number for air inlet
+			int OutletRoomAirNodeNum, // Room air model node number for air outlet
+			int SupplyAirNodeNum, // Node number for supply air inlet
+			Real64 const DesignRecircFrac, // Design recirculation fraction (0.0-0.5)
+			int const RecircFLTCurve, // Index for recirculation function of CPULoadFrac (x) and TAirIn (y) curve
+			Real64 const DesignUPSEfficiency, // Design power supply efficiency (>0.0 - 1.0)
+			int const UPSEfficFPLRCurve, // Index for recirculation function of part load ratio
+			Real64 const UPSLossToZoneFrac, // Fraction of UPS power loss to zone (0.0 - 1.0), remainder is lost
+			std::string const & EndUseSubcategoryCPU, // user defined name for the end use category for the CPU
+			std::string const & EndUseSubcategoryFan, // user defined name for the end use category for the Fans
+			std::string const & EndUseSubcategoryUPS, // user defined name for the end use category for the power supply
+			bool const EMSCPUPowerOverrideOn, // EMS actuating CPU power if .TRUE.
+			Real64 const EMSCPUPower, // Value EMS is directing to use for override of CPU power [W]
+			bool const EMSFanPowerOverrideOn, // EMS actuating Fan power if .TRUE.
+			Real64 const EMSFanPower, // Value EMS is directing to use for override of Fan power [W]
+			bool const EMSUPSPowerOverrideOn, // EMS actuating UPS power if .TRUE.
+			Real64 const EMSUPSPower, // Value EMS is directing to use for override of UPS power [W]
+			// Report variables
+			Real64 const CPUPower, // ITE CPU Electric Power [W]
+			Real64 const FanPower, // ITE Fan Electric Power [W]
+			Real64 const UPSPower, // ITE UPS Electric Power [W]
+			Real64 const CPUPowerAtDesign, // ITE CPU Electric Power at Design Inlet Conditions [W]
+			Real64 const FanPowerAtDesign, // ITE Fan Electric Power at Design Inlet Conditions [W]
+			Real64 const UPSGainRateToZone, // ITE UPS Heat Gain to Zone Rate [W] - convective gain
+			Real64 const ConGainRateToZone, // ITE Total Heat Gain to Zone Rate [W] - convective gain - includes heat gain from UPS, plus CPU and Fans if room air model not used
+			Real64 const CPUConsumption, // ITE CPU Electric Energy [J]
+			Real64 const FanConsumption, // ITE Fan Electric Energy [J]
+			Real64 const UPSConsumption, // ITE UPS Electric Energy [J]
+			Real64 const CPUEnergyAtDesign, // ITE CPU Electric Energy at Design Inlet Conditions [J]
+			Real64 const FanEnergyAtDesign, // ITE Fan Electric Energy at Design Inlet Conditions [J]
+			Real64 const UPSGainEnergyToZone, // ITE UPS Heat Gain to Zone Energy [J] - convective gain
+			Real64 const ConGainEnergyToZone, // ITE Total Heat Gain to Zone Energy [J] - convective gain - includes heat gain from UPS, plus CPU and Fans if room air model not used
+			Real64 const AirVolFlowStdDensity, // Air volume flow rate at standard density [m3/s]
+			Real64 const AirVolFlowCurDensity, // Air volume flow rate at current density [m3/s]
+			Real64 const AirMassFlow, // Air mass flow rate [kg/s]
+			Real64 const AirInletDryBulbT, // Air inlet dry-bulb temperature [C]
+			Real64 const AirInletDewpointT, // Air inlet dewpoit temperature [C]
+			Real64 const AirInletRelHum, // Air inlet relative humidity [%]
+			Real64 const AirOutletDryBulbT, // Air outlet dry-bulb temperature [C]
+			Real64 const SHI, // Supply Heat Index []
+			Real64 const TimeOutOfOperRange, // ITE Air Inlet Operating Range Exceeded Time [hr]
+			Real64 const TimeAboveDryBulbT, // ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time [hr]
+			Real64 const TimeBelowDryBulbT, // ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time [hr]
+			Real64 const TimeAboveDewpointT, // ITE Air Inlet Dewpoint Temperature Above Operating Range Time [hr]
+			Real64 const TimeBelowDewpointT, // ITE Air Inlet Dewpoint Temperature Below Operating Range Time [hr]
+			Real64 const TimeAboveRH, // ITE Air Inlet Relative Humidity Above Operating Range Time [hr]
+			Real64 const TimeBelowRH, // ITE Air Inlet Relative Humidity Below Operating Range Time [hr]
+			Real64 const DryBulbTAboveDeltaT, // ITE Air Inlet Dry-Bulb Temperature Difference Above Operating Range [deltaC]
+			Real64 const DryBulbTBelowDeltaT, // ITE Air Inlet Dry-Bulb Temperature Difference Below Operating Range [deltaC]
+			Real64 const DewpointTAboveDeltaT, // ITE Air Inlet Dewpoint Temperature Difference Above Operating Range [deltaC]
+			Real64 const DewpointTBelowDeltaT, // ITE Air Inlet Dewpoint Temperature Difference Below Operating Range [deltaC]
+			Real64 RHAboveDeltaRH, // ITE Air Inlet Relative Humidity Difference Above Operating Range [%]
+			Real64 RHBelowDeltaRH // ITE Air Inlet Relative Humidity Difference Below Operating Range [%]
+			) :
+			Name( Name ),
+			ZonePtr( ZonePtr ),
+			DesignTotalPower( DesignTotalPower ),
+			NomMinDesignLevel( NomMinDesignLevel ),
+			NomMaxDesignLevel( NomMaxDesignLevel ),
+			DesignFanPowerFrac( DesignFanPowerFrac ),
+			OperSchedPtr( OperSchedPtr ),
+			CPULoadSchedPtr( CPULoadSchedPtr ),
+			DesignTAirIn( DesignTAirIn ),
+			DesignFanPower( DesignFanPower ),
+			DesignCPUPower( DesignCPUPower ),
+			DesignAirVolFlowRate( DesignAirVolFlowRate ),
+			Class( Class ),
+			AirFlowFLTCurve( AirFlowFLTCurve ),
+			CPUPowerFLTCurve( CPUPowerFLTCurve ),
+			FanPowerFFCurve( FanPowerFFCurve ),
+			AirConnectionType( AirConnectionType ),
+			InletRoomAirNodeNum( InletRoomAirNodeNum ),
+			OutletRoomAirNodeNum( OutletRoomAirNodeNum ),
+			SupplyAirNodeNum( SupplyAirNodeNum ),
+			DesignRecircFrac( DesignRecircFrac ),
+			RecircFLTCurve( RecircFLTCurve ),
+			DesignUPSEfficiency( DesignUPSEfficiency ),
+			UPSEfficFPLRCurve( UPSEfficFPLRCurve ),
+			UPSLossToZoneFrac( UPSLossToZoneFrac ),
+			EndUseSubcategoryCPU( EndUseSubcategoryCPU ),
+			EndUseSubcategoryFan( EndUseSubcategoryFan ),
+			EndUseSubcategoryUPS( EndUseSubcategoryUPS ),
+			EMSCPUPowerOverrideOn( EMSCPUPowerOverrideOn ),
+			EMSCPUPower( EMSCPUPower ),
+			EMSFanPowerOverrideOn( EMSFanPowerOverrideOn ),
+			EMSFanPower( EMSFanPower ),
+			EMSUPSPowerOverrideOn( EMSUPSPowerOverrideOn ),
+			EMSUPSPower( EMSUPSPower ),
+			CPUPower( CPUPower ),
+			FanPower( FanPower ),
+			UPSPower( UPSPower ),
+			CPUPowerAtDesign( CPUPowerAtDesign ),
+			FanPowerAtDesign( FanPowerAtDesign ),
+			UPSGainRateToZone( UPSGainRateToZone ),
+			ConGainRateToZone( ConGainRateToZone ),
+			CPUConsumption( CPUConsumption ),
+			FanConsumption( FanConsumption ),
+			UPSConsumption( UPSConsumption ),
+			CPUEnergyAtDesign( CPUEnergyAtDesign ),
+			FanEnergyAtDesign( FanEnergyAtDesign ),
+			UPSGainEnergyToZone( UPSGainEnergyToZone ),
+			ConGainEnergyToZone( ConGainEnergyToZone ),
+			AirVolFlowStdDensity( AirVolFlowStdDensity ),
+			AirVolFlowCurDensity( AirVolFlowCurDensity ),
+			AirMassFlow( AirMassFlow ),
+			AirInletDryBulbT( AirInletDryBulbT ),
+			AirInletDewpointT( AirInletDewpointT ),
+			AirInletRelHum( AirInletRelHum ),
+			AirOutletDryBulbT( AirOutletDryBulbT ),
+			SHI( SHI ),
+			TimeOutOfOperRange( TimeOutOfOperRange ),
+			TimeAboveDryBulbT( TimeAboveDryBulbT ),
+			TimeBelowDryBulbT( TimeBelowDryBulbT ),
+			TimeAboveDewpointT( TimeAboveDewpointT ),
+			TimeBelowDewpointT( TimeBelowDewpointT ),
+			TimeAboveRH( TimeAboveRH ),
+			TimeBelowRH( TimeBelowRH ),
+			DryBulbTAboveDeltaT( DryBulbTAboveDeltaT ),
+			DryBulbTBelowDeltaT( DryBulbTBelowDeltaT ),
+			DewpointTAboveDeltaT( DewpointTAboveDeltaT ),
+			DewpointTBelowDeltaT( DewpointTBelowDeltaT ),
+			RHAboveDeltaRH( RHAboveDeltaRH ),
+			RHBelowDeltaRH( RHBelowDeltaRH )
+			{}
+
+	};
+
 	struct BBHeatData
 	{
 		// Members
@@ -4931,6 +5221,31 @@ namespace DataHeatBalance {
 		Real64 OtherLatGainRate;
 		Real64 OtherLostRate;
 		Real64 OtherTotGainRate;
+		// IT Equipment
+		Real64 ITEqCPUPower; // Zone ITE CPU Electric Power [W]
+		Real64 ITEqFanPower; // Zone ITE Fan Electric Power [W]
+		Real64 ITEqUPSPower; // Zone ITE UPS Electric Power [W]
+		Real64 ITEqCPUPowerAtDesign; // Zone ITE CPU Electric Power at Design Inlet Conditions [W]
+		Real64 ITEqFanPowerAtDesign; // Zone ITE Fan Electric Power at Design Inlet Conditions [W]
+		Real64 ITEqUPSGainRateToZone; // Zone ITE UPS Heat Gain toZone Rate [W] - convective gain
+		Real64 ITEqConGainRateToZone; // Zone ITE Total Heat Gain toZone Rate [W] - convective gain - includes heat gain from UPS, plus CPU and Fans if room air model not used
+		Real64 ITEqCPUConsumption; // Zone ITE CPU Electric Energy [J]
+		Real64 ITEqFanConsumption; // Zone ITE Fan Electric Energy [J]
+		Real64 ITEqUPSConsumption; // Zone ITE UPS Electric Energy [J]
+		Real64 ITEqCPUEnergyAtDesign; // Zone ITE CPU Electric Energy at Design Inlet Conditions [J]
+		Real64 ITEqFanEnergyAtDesign; // Zone ITE Fan Electric Energy at Design Inlet Conditions [J]
+		Real64 ITEqUPSGainEnergyToZone; // Zone ITE UPS Heat Gain toZone Energy [J] - convective gain
+		Real64 ITEqConGainEnergyToZone; // Zone ITE Total Heat Gain toZone Energy [J] - convective gain - includes heat gain from UPS, plus CPU and Fans if room air model not used
+		Real64 ITEqAirVolFlowStdDensity; // Zone Air volume flow rate at standard density [m3/s]
+		Real64 ITEqAirMassFlow; // Zone Air mass flow rate [kg/s]
+		Real64 ITEqSHI; // Zone Supply Heat Index []
+		Real64 ITEqTimeOutOfOperRange; // Zone ITE Air Inlet Operating Range Exceeded Time [hr]
+		Real64 ITEqTimeAboveDryBulbT; // Zone ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time [hr]
+		Real64 ITEqTimeBelowDryBulbT; // Zone ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time [hr]
+		Real64 ITEqTimeAboveDewpointT; // Zone ITE Air Inlet Dewpoint Temperature Above Operating Range Time [hr]
+		Real64 ITEqTimeBelowDewpointT; // Zone ITE Air Inlet Dewpoint Temperature Below Operating Range Time [hr]
+		Real64 ITEqTimeAboveRH; // Zone ITE Air Inlet Relative Humidity Above Operating Range Time [hr]
+		Real64 ITEqTimeBelowRH; // Zone ITE Air Inlet Relative Humidity Below Operating Range Time [hr]
 		// Overall Zone Variables
 		Real64 TotRadiantGain;
 		Real64 TotVisHeatGain;
@@ -5037,6 +5352,30 @@ namespace DataHeatBalance {
 			OtherLatGainRate( 0.0 ),
 			OtherLostRate( 0.0 ),
 			OtherTotGainRate( 0.0 ),
+			ITEqCPUPower( 0.0 ),
+			ITEqFanPower( 0.0 ),
+			ITEqUPSPower( 0.0 ),
+			ITEqCPUPowerAtDesign( 0.0 ),
+			ITEqFanPowerAtDesign( 0.0 ),
+			ITEqUPSGainRateToZone( 0.0 ),
+			ITEqConGainRateToZone( 0.0 ),
+			ITEqCPUConsumption( 0.0 ),
+			ITEqFanConsumption( 0.0 ),
+			ITEqUPSConsumption( 0.0 ),
+			ITEqCPUEnergyAtDesign( 0.0 ),
+			ITEqFanEnergyAtDesign( 0.0 ),
+			ITEqUPSGainEnergyToZone( 0.0 ),
+			ITEqConGainEnergyToZone( 0.0 ),
+			ITEqAirVolFlowStdDensity( 0.0 ),
+			ITEqAirMassFlow( 0.0 ),
+			ITEqSHI( 0.0 ),
+			ITEqTimeOutOfOperRange( 0.0 ),
+			ITEqTimeAboveDryBulbT( 0.0 ),
+			ITEqTimeBelowDryBulbT( 0.0 ),
+			ITEqTimeAboveDewpointT( 0.0 ),
+			ITEqTimeBelowDewpointT( 0.0 ),
+			ITEqTimeAboveRH( 0.0 ),
+			ITEqTimeBelowRH( 0.0 ),
 			TotRadiantGain( 0.0 ),
 			TotVisHeatGain( 0.0 ),
 			TotConvectiveGain( 0.0 ),
@@ -5142,6 +5481,30 @@ namespace DataHeatBalance {
 			Real64 const OtherLatGainRate,
 			Real64 const OtherLostRate,
 			Real64 const OtherTotGainRate,
+			Real64 const ITEqCPUPower, // Zone ITE CPU Electric Power [W]
+			Real64 const ITEqFanPower, // Zone ITE Fan Electric Power [W]
+			Real64 const ITEqUPSPower, // Zone ITE UPS Electric Power [W]
+			Real64 const ITEqCPUPowerAtDesign, // Zone ITE CPU Electric Power at Design Inlet Conditions [W]
+			Real64 const ITEqFanPowerAtDesign, // Zone ITE Fan Electric Power at Design Inlet Conditions [W]
+			Real64 const ITEqUPSGainRateToZone, // Zone ITE UPS Heat Gain toZone Rate [W] - convective gain
+			Real64 const ITEqConGainRateToZone, // Zone ITE Total Heat Gain toZone Rate [W] - convective gain - includes heat gain from UPS, plus CPU and Fans if room air model not used
+			Real64 const ITEqCPUConsumption, // Zone ITE CPU Electric Energy [J]
+			Real64 const ITEqFanConsumption, // Zone ITE Fan Electric Energy [J]
+			Real64 const ITEqUPSConsumption, // Zone ITE UPS Electric Energy [J]
+			Real64 const ITEqCPUEnergyAtDesign, // Zone ITE CPU Electric Energy at Design Inlet Conditions [J]
+			Real64 const ITEqFanEnergyAtDesign, // Zone ITE Fan Electric Energy at Design Inlet Conditions [J]
+			Real64 const ITEqUPSGainEnergyToZone, // Zone ITE UPS Heat Gain toZone Energy [J] - convective gain
+			Real64 const ITEqConGainEnergyToZone, // Zone ITE Total Heat Gain toZone Energy [J] - convective gain - includes heat gain from UPS, plus CPU and Fans if room air model not used
+			Real64 const ITEqAirVolFlowStdDensity, // Zone Air volume flow rate at standard density [m3/s]
+			Real64 const ITEqAirMassFlow, // Zone Air mass flow rate [kg/s]
+			Real64 const ITEqSHI, // Zone Supply Heat Index []
+			Real64 const ITEqTimeOutOfOperRange, // Zone ITE Air Inlet Operating Range Exceeded Time [hr]
+			Real64 const ITEqTimeAboveDryBulbT, // Zone ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time [hr]
+			Real64 const ITEqTimeBelowDryBulbT, // Zone ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time [hr]
+			Real64 const ITEqTimeAboveDewpointT, // Zone ITE Air Inlet Dewpoint Temperature Above Operating Range Time [hr]
+			Real64 const ITEqTimeBelowDewpointT, // Zone ITE Air Inlet Dewpoint Temperature Below Operating Range Time [hr]
+			Real64 const ITEqTimeAboveRH, // Zone ITE Air Inlet Relative Humidity Above Operating Range Time [hr]
+			Real64 const ITEqTimeBelowRH, // Zone ITE Air Inlet Relative Humidity Below Operating Range Time [hr]
 			Real64 const TotRadiantGain,
 			Real64 const TotVisHeatGain,
 			Real64 const TotConvectiveGain,
@@ -5244,6 +5607,30 @@ namespace DataHeatBalance {
 			OtherLatGainRate( OtherLatGainRate ),
 			OtherLostRate( OtherLostRate ),
 			OtherTotGainRate( OtherTotGainRate ),
+			ITEqCPUPower( ITEqCPUPower ),
+			ITEqFanPower( ITEqFanPower ),
+			ITEqUPSPower( ITEqUPSPower ),
+			ITEqCPUPowerAtDesign( ITEqCPUPowerAtDesign ),
+			ITEqFanPowerAtDesign( ITEqFanPowerAtDesign ),
+			ITEqUPSGainRateToZone( ITEqUPSGainRateToZone ),
+			ITEqConGainRateToZone( ITEqConGainRateToZone ),
+			ITEqCPUConsumption( ITEqCPUConsumption ),
+			ITEqFanConsumption( ITEqFanConsumption ),
+			ITEqUPSConsumption( ITEqUPSConsumption ),
+			ITEqCPUEnergyAtDesign( ITEqCPUEnergyAtDesign ),
+			ITEqFanEnergyAtDesign( ITEqFanEnergyAtDesign ),
+			ITEqUPSGainEnergyToZone( ITEqUPSGainEnergyToZone ),
+			ITEqConGainEnergyToZone( ITEqConGainEnergyToZone ),
+			ITEqAirVolFlowStdDensity( ITEqAirVolFlowStdDensity ),
+			ITEqAirMassFlow( ITEqAirMassFlow ),
+			ITEqSHI( ITEqSHI ),
+			ITEqTimeOutOfOperRange( ITEqTimeOutOfOperRange ),
+			ITEqTimeAboveDryBulbT( ITEqTimeAboveDryBulbT ),
+			ITEqTimeBelowDryBulbT( ITEqTimeBelowDryBulbT ),
+			ITEqTimeAboveDewpointT( ITEqTimeAboveDewpointT ),
+			ITEqTimeBelowDewpointT( ITEqTimeBelowDewpointT ),
+			ITEqTimeAboveRH( ITEqTimeAboveRH ),
+			ITEqTimeBelowRH( ITEqTimeBelowRH ),
 			TotRadiantGain( TotRadiantGain ),
 			TotVisHeatGain( TotVisHeatGain ),
 			TotConvectiveGain( TotConvectiveGain ),
@@ -5281,6 +5668,7 @@ namespace DataHeatBalance {
 	extern FArray1D< ZoneEquipData > ZoneOtherEq;
 	extern FArray1D< ZoneEquipData > ZoneHWEq;
 	extern FArray1D< ZoneEquipData > ZoneSteamEq;
+	extern FArray1D< ITEquipData > ZoneITEq;
 	extern FArray1D< BBHeatData > ZoneBBHeat;
 	extern FArray1D< InfiltrationData > Infiltration;
 	extern FArray1D< VentilationData > Ventilation;

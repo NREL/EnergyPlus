@@ -1,5 +1,6 @@
 // C++ Headers
 #include <iostream>
+#include <sstream>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
@@ -8,7 +9,6 @@
 #include <DisplayRoutines.hh>
 #include <DataGlobals.hh>
 #include <DataSystemVariables.hh>
-#include <sstream>
 
 namespace EnergyPlus {
 
@@ -90,7 +90,7 @@ DisplayString( char const * String ) // String to be displayed
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	// na
 
-	if ( fMessagePtr ) fMessagePtr(String);
+	if ( fMessagePtr ) fMessagePtr( String );
 
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
 	std::cout << String << '\n';
@@ -124,7 +124,7 @@ DisplayNumberAndString(
 	using DataGlobals::KickOffSimulation;
 	using DataSystemVariables::DeveloperFlag;
 	using DataGlobals::fMessagePtr;
-	
+
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -138,9 +138,9 @@ DisplayNumberAndString(
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	std::stringstream sstm;
-	sstm << String << " " << Number;
+	sstm << String << ' ' << Number;
 	if ( fMessagePtr ) fMessagePtr( sstm.str() );
-	
+
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
 	std::cout << String << ' ' << Number << '\n';
 }

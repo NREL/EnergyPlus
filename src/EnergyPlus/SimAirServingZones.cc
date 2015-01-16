@@ -501,7 +501,7 @@ namespace SimAirServingZones {
 
 			CurrentModuleObject = "AirLoopHVAC";
 
-			GetObjectItem( CurrentModuleObject, AirSysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ; // get all the input data for the air system
+			GetObjectItem( CurrentModuleObject, AirSysNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields ); // get all the input data for the air system
 
 			// Assign the air system data to the simulation variables.
 			// Data needed to simulate the system goes into PrimaryAirSystem.
@@ -1180,7 +1180,7 @@ namespace SimAirServingZones {
 						ShowContinueError( "..Invalid Air Loop Component Type = \"" + PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf + "\"." );
 						ShowContinueError( "..Air Loop Component Name = \"" + PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).Name + "\"." );
 						ShowContinueError( "..reference Branch = \"" + PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Name + "\"." );
-						ShowContinueError( "...This component may only be referenced by a parent component " "such as AirLoopHVAC:Unitary:Furnace:HeatCool or similar." );
+						ShowContinueError( "...This component may only be referenced by a parent component such as AirLoopHVAC:Unitary:Furnace:HeatCool or similar." );
 						ErrorsFound = true;
 
 					} else {
@@ -1208,7 +1208,7 @@ namespace SimAirServingZones {
 						if ( NodeNotFound ) {
 							ErrorsFound = true;
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).Name + "\", invalid actuator." );
-							ShowContinueError( "...this coil requires a water coil controller " "and the inlet node of a water coil must also be an actuator node of a water coil controller." );
+							ShowContinueError( "...this coil requires a water coil controller and the inlet node of a water coil must also be an actuator node of a water coil controller." );
 						}
 					}
 				}
@@ -1226,7 +1226,7 @@ namespace SimAirServingZones {
 					if ( NodeNotFound ) {
 						ErrorsFound = true;
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + GetOACompName( OASysNum, OACompNum ) + "\", invalid actuator." );
-						ShowContinueError( "...this coil requires a water coil controller " "and the inlet node of a water coil must also be an actuator node of a water coil controller." );
+						ShowContinueError( "...this coil requires a water coil controller and the inlet node of a water coil must also be an actuator node of a water coil controller." );
 					}
 				}
 			}
@@ -1793,34 +1793,32 @@ namespace SimAirServingZones {
 				ShowFatalError( "Preceding errors cause termination" );
 			}
 
-			for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 
 				SupFanIndex = 0;
 				RetFanIndex = 0;
 				FoundOASys = false;
 				PrimaryAirSystem(AirLoopNum).FanDesCoolLoad = 0.0;
-				
-				for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
-				
-					for (CompNum = 1; CompNum <= PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
-					    CompTypeNum = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
-						if (PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num == OAMixer_Num) {
+
+				for ( BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum ) {
+
+					for ( CompNum = 1; CompNum <= PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum ) {
+						CompTypeNum = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
+						if ( PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num == OAMixer_Num ) {
 							FoundOASys = true;
 						}
-						if (CompTypeNum == Fan_Simple_CV || CompTypeNum == Fan_Simple_VAV || CompTypeNum == Fan_ComponentModel) {
-							if (PrimaryAirSystem(AirLoopNum).OASysExists) {
-								if (FoundOASys) {
-									if (PrimaryAirSystem(AirLoopNum).Branch(BranchNum).DuctType != 3) {
-										GetFanIndex(PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
+						if ( CompTypeNum == Fan_Simple_CV || CompTypeNum == Fan_Simple_VAV || CompTypeNum == Fan_ComponentModel ) {
+							if ( PrimaryAirSystem(AirLoopNum).OASysExists ) {
+								if ( FoundOASys ) {
+									if ( PrimaryAirSystem(AirLoopNum).Branch(BranchNum).DuctType != 3 ) {
+										GetFanIndex( PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound );
 										goto EndOfAirLoop;
 									}
+								} else {
+									GetFanIndex( PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, RetFanIndex, ErrorsFound );
 								}
-								else {
-									GetFanIndex(PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, RetFanIndex, ErrorsFound);
-								}
-							}
-							else {
-								GetFanIndex(PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,SupFanIndex,ErrorsFound);
+							} else {
+								GetFanIndex( PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,SupFanIndex,ErrorsFound );
 								goto EndOfAirLoop;
 							}
 						}
@@ -1834,7 +1832,7 @@ namespace SimAirServingZones {
 
 			} // end of AirLoop loop
 
-		} //one time flag
+		} // one time flag
 
 		// Size the air loop branch air flows
 		if ( ! SysSizingCalc && MyBranchSizingFlag ) {
@@ -3374,11 +3372,11 @@ namespace SimAirServingZones {
 				PrimaryAirSystem( AirLoopNum ).DesignVolFlowRate = FinalSysSizing( AirLoopNum ).DesMainVolFlow;
 
 				{ auto const SELECT_CASE_var( FinalSysSizing( AirLoopNum ).ScaleCoolSAFMethod );
-				if( SELECT_CASE_var == FlowPerFloorArea ) {
+				if ( SELECT_CASE_var == FlowPerFloorArea ) {
 					ScalableSM = "User-Specified(scaled by flow / area) ";
-				} else if( SELECT_CASE_var == FractionOfAutosizedCoolingAirflow ) {
+				} else if ( SELECT_CASE_var == FractionOfAutosizedCoolingAirflow ) {
 					ScalableSM = "User-Specified(scaled by fractional multiplier) ";
-				} else if( SELECT_CASE_var == FlowPerCoolingCapacity ) {
+				} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) {
 					ScalableSM = "User-Specified(scaled by flow / capacity) ";
 				} else {
 						ScalableSM = "Design ";
@@ -3948,7 +3946,7 @@ namespace SimAirServingZones {
 							if ( ! ( ZoneOAUnc > 0.0 ) ) {
 								ShowSevereError( "Sizing:System - The system outdoor air method is set to VRP in " + FinalSysSizing( AirLoopNum ).AirPriLoopName );
 								ShowContinueError( "But zone \"" + FinalZoneSizing( CtrlZoneNum ).ZoneName + "\" associated with system does not have OA flow/person" );
-								ShowContinueError( "or flow/area values specified in DesignSpecification:OutdoorAir " "object associated with the zone" );
+								ShowContinueError( "or flow/area values specified in DesignSpecification:OutdoorAir object associated with the zone" );
 							}
 
 							//Save Std 62.1 cooling ventilation required by zone
@@ -4044,9 +4042,9 @@ namespace SimAirServingZones {
 					if ( Ep > 1.0 ) Ep = 1.0;
 					FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFraction = Ep;
 					FinalZoneSizing(CtrlZoneNum).ZoneOAFracCooling = ZoneOAFracCooling;
-				
-				    // determined cooled zone floor area in an airloop
-					if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == AirLoopNum) {							
+
+					// determined cooled zone floor area in an airloop
+					if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == AirLoopNum) {
 						FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled += Zone( ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum ).FloorArea;
 					}			
 				}
@@ -6003,23 +6001,23 @@ namespace SimAirServingZones {
 
 			// scalable sizing option for cooling supply air flow rate
 			{ auto const SELECT_CASE_var( FinalSysSizing( AirLoopNum ).ScaleCoolSAFMethod );
-			if( SELECT_CASE_var == FlowPerFloorArea ) {
+			if ( SELECT_CASE_var == FlowPerFloorArea ) {
 				TempSize = FinalSysSizing( AirLoopNum ).FlowPerFloorAreaCooled * FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
 				CalcSysSizing( AirLoopNum ).InpDesCoolAirFlow = TempSize;
 				FinalSysSizing( AirLoopNum ).InpDesCoolAirFlow = TempSize;
-			} else if( SELECT_CASE_var == FractionOfAutosizedCoolingAirflow ) {
+			} else if ( SELECT_CASE_var == FractionOfAutosizedCoolingAirflow ) {
 				FractionOfAutosize = FinalSysSizing( AirLoopNum ).FractionOfAutosizedCoolingAirflow;
 				CalcSysSizing( AirLoopNum ).InpDesCoolAirFlow = CalcSysSizing( AirLoopNum ).DesCoolVolFlow * FractionOfAutosize;
 				FinalSysSizing( AirLoopNum ).InpDesCoolAirFlow = FinalSysSizing( AirLoopNum ).DesCoolVolFlow * FractionOfAutosize;
-			} else if( SELECT_CASE_var == FlowPerCoolingCapacity ) {
-				if( FinalSysSizing( AirLoopNum ).CoolingCapMethod == FractionOfAutosizedCoolingCapacity ) {
+			} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) {
+				if ( FinalSysSizing( AirLoopNum ).CoolingCapMethod == FractionOfAutosizedCoolingCapacity ) {
 					FractionOfAutosize = FinalSysSizing( AirLoopNum ).ScaledCoolingCapacity;
 				}
-				if( PrimaryAirSystem( AirLoopNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
+				if ( PrimaryAirSystem( AirLoopNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
 					CoilInTemp = FinalSysSizing( AirLoopNum ).CoolMixTemp;
 					CoilInHumRat = FinalSysSizing( AirLoopNum ).CoolMixHumRat;
 				} else { // there is precooling of OA stream
-					if( FinalSysSizing( AirLoopNum ).DesCoolVolFlow > 0.0 ) {
+					if ( FinalSysSizing( AirLoopNum ).DesCoolVolFlow > 0.0 ) {
 						OutAirFrac = FinalSysSizing( AirLoopNum ).DesOutAirVolFlow / FinalSysSizing( AirLoopNum ).DesCoolVolFlow;
 					} else {
 						OutAirFrac = 1.0;
@@ -6040,24 +6038,24 @@ namespace SimAirServingZones {
 
 			// scalable sizing option for heating supply air flow rate
 			{ auto const SELECT_CASE_var( FinalSysSizing( AirLoopNum ).ScaleHeatSAFMethod );
-			if( SELECT_CASE_var == FlowPerFloorArea ) {
+			if ( SELECT_CASE_var == FlowPerFloorArea ) {
 				TempSize = FinalSysSizing( AirLoopNum ).FlowPerFloorAreaHeated * FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopHeated;
 				CalcSysSizing( AirLoopNum ).InpDesHeatAirFlow = TempSize;
 				FinalSysSizing( AirLoopNum ).InpDesHeatAirFlow = TempSize;
-			} else if( SELECT_CASE_var == FractionOfAutosizedHeatingAirflow ) {
+			} else if ( SELECT_CASE_var == FractionOfAutosizedHeatingAirflow ) {
 				FractionOfAutosize = FinalSysSizing( AirLoopNum ).FractionOfAutosizedHeatingAirflow;
 				CalcSysSizing( AirLoopNum ).InpDesHeatAirFlow = CalcSysSizing( AirLoopNum ).DesHeatVolFlow * FractionOfAutosize;
 				FinalSysSizing( AirLoopNum ).InpDesHeatAirFlow = FinalSysSizing( AirLoopNum ).DesHeatVolFlow * FractionOfAutosize;
-			} else if( SELECT_CASE_var == FractionOfAutosizedCoolingAirflow ) {
+			} else if ( SELECT_CASE_var == FractionOfAutosizedCoolingAirflow ) {
 				FractionOfAutosize = FinalSysSizing( AirLoopNum ).FractionOfAutosizedCoolingAirflow;
 				CalcSysSizing( AirLoopNum ).InpDesHeatAirFlow = CalcSysSizing( AirLoopNum ).DesHeatVolFlow * FractionOfAutosize;
 				FinalSysSizing( AirLoopNum ).InpDesHeatAirFlow = FinalSysSizing( AirLoopNum ).DesHeatVolFlow * FractionOfAutosize;
-			} else if( SELECT_CASE_var == FlowPerHeatingCapacity ) {
-				if( FinalSysSizing( AirLoopNum ).HeatingCapMethod == FractionOfAutosizedHeatingCapacity ) {
+			} else if ( SELECT_CASE_var == FlowPerHeatingCapacity ) {
+				if ( FinalSysSizing( AirLoopNum ).HeatingCapMethod == FractionOfAutosizedHeatingCapacity ) {
 					FractionOfAutosize = FinalSysSizing( AirLoopNum ).ScaledHeatingCapacity;
 				}
-				if( FinalSysSizing( AirLoopNum ).HeatOAOption == MinOA ) {
-					if( FinalSysSizing( AirLoopNum ).DesHeatVolFlow > 0.0 ) {
+				if ( FinalSysSizing( AirLoopNum ).HeatOAOption == MinOA ) {
+					if ( FinalSysSizing( AirLoopNum ).DesHeatVolFlow > 0.0 ) {
 						OutAirFrac = FinalSysSizing( AirLoopNum ).DesOutAirVolFlow / FinalSysSizing( AirLoopNum ).DesHeatVolFlow;
 					} else {
 						OutAirFrac = 1.0;
@@ -6066,7 +6064,7 @@ namespace SimAirServingZones {
 				} else {
 					OutAirFrac = 1.0;
 				}
-				if( CurOASysNum == 0 && PrimaryAirSystem( AirLoopNum ).NumOAHeatCoils > 0 ) {
+				if ( CurOASysNum == 0 && PrimaryAirSystem( AirLoopNum ).NumOAHeatCoils > 0 ) {
 					CoilInTemp = OutAirFrac * FinalSysSizing( AirLoopNum ).PreheatTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( AirLoopNum ).HeatRetTemp;
 				} else {
 					CoilInTemp = OutAirFrac * FinalSysSizing( AirLoopNum ).HeatOutTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( AirLoopNum ).HeatRetTemp;
@@ -6081,31 +6079,31 @@ namespace SimAirServingZones {
 
 			// save the total cooling capacity sizing data for scalable sizing
 			{ auto const SELECT_CASE_var( FinalSysSizing( AirLoopNum ).CoolingCapMethod );
-			if( SELECT_CASE_var == CoolingDesignCapacity ){
-				if( CalcSysSizing( AirLoopNum ).ScaledCoolingCapacity > 0.0 ) {
+			if ( SELECT_CASE_var == CoolingDesignCapacity ) {
+				if ( CalcSysSizing( AirLoopNum ).ScaledCoolingCapacity > 0.0 ) {
 					CalcSysSizing( AirLoopNum ).CoolingTotalCapacity = CalcSysSizing( AirLoopNum ).ScaledCoolingCapacity;
 					FinalSysSizing( AirLoopNum ).CoolingTotalCapacity = CalcSysSizing( AirLoopNum ).ScaledCoolingCapacity;
 				} else {
 					FinalSysSizing( AirLoopNum ).CoolingTotalCapacity = 0.0;  // autosized, set to zero initially
 				}
-			} else if( SELECT_CASE_var == CapacityPerFloorArea ) {
+			} else if ( SELECT_CASE_var == CapacityPerFloorArea ) {
 				FinalSysSizing( AirLoopNum ).CoolingTotalCapacity = CalcSysSizing( AirLoopNum ).ScaledCoolingCapacity * CalcSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
-			} else if( SELECT_CASE_var == FractionOfAutosizedCoolingCapacity ) {
+			} else if ( SELECT_CASE_var == FractionOfAutosizedCoolingCapacity ) {
 				CalcSysSizing( AirLoopNum ).FractionOfAutosizedCoolingCapacity = CalcSysSizing( AirLoopNum ).ScaledCoolingCapacity;
 				FinalSysSizing( AirLoopNum ).FractionOfAutosizedCoolingCapacity = CalcSysSizing( AirLoopNum ).ScaledCoolingCapacity;
 			}}
 
 			// save the total heating capacity sizing data for scalable sizing
 			{ auto const SELECT_CASE_var( FinalSysSizing( AirLoopNum ).HeatingCapMethod );
-			if( SELECT_CASE_var == HeatingDesignCapacity ){
-				if( CalcSysSizing( AirLoopNum ).ScaledHeatingCapacity > 0.0 ) {
+			if ( SELECT_CASE_var == HeatingDesignCapacity ) {
+				if ( CalcSysSizing( AirLoopNum ).ScaledHeatingCapacity > 0.0 ) {
 					FinalSysSizing( AirLoopNum ).HeatingTotalCapacity = CalcSysSizing( AirLoopNum ).ScaledHeatingCapacity;
 				} else {
 					FinalSysSizing( AirLoopNum ).HeatingTotalCapacity = 0.0; // autosized, set to zero initially
 				}
-			} else if( SELECT_CASE_var == CapacityPerFloorArea ) {
+			} else if ( SELECT_CASE_var == CapacityPerFloorArea ) {
 				FinalSysSizing( AirLoopNum ).HeatingTotalCapacity = CalcSysSizing( AirLoopNum ).ScaledHeatingCapacity * CalcSysSizing( AirLoopNum ).FloorAreaOnAirLoopHeated;
-			} else if( SELECT_CASE_var == FractionOfAutosizedHeatingCapacity ) {
+			} else if ( SELECT_CASE_var == FractionOfAutosizedHeatingCapacity ) {
 				FinalSysSizing( AirLoopNum ).FractionOfAutosizedHeatingCapacity = CalcSysSizing( AirLoopNum ).ScaledHeatingCapacity;
 			}}
 		}

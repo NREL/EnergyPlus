@@ -378,8 +378,8 @@ namespace PlantLoopSolver {
 		bool EncounteredLRB;
 		bool EncounteredNonLRBAfterLRB;
 
-        // set up a loopside reference
-        auto & this_loop_side( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
+		// set up a loopside reference
+		auto & this_loop_side( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
 
 		//~ Initialze
 		ValidLoopSide.Valid = true;
@@ -396,7 +396,7 @@ namespace PlantLoopSolver {
 		BranchIndex = 1;
 		for ( CompIndex = 1; CompIndex <= this_loop_side.Branch( BranchIndex ).TotalComponents; ++CompIndex ) {
 
-            auto & this_component( this_loop_side.Branch( BranchIndex ).Comp( CompIndex ) );
+			auto & this_component( this_loop_side.Branch( BranchIndex ).Comp( CompIndex ) );
 
 			{ auto const SELECT_CASE_var( this_component.CurOpSchemeType );
 
@@ -408,7 +408,7 @@ namespace PlantLoopSolver {
 					ValidLoopSide.ErrorPoint.LoopSideNum = LoopSideNum;
 					ValidLoopSide.ErrorPoint.BranchNum = BranchIndex;
 					ValidLoopSide.ErrorPoint.CompNum = CompIndex;
-					ValidLoopSide.Reason = "Invalid: Load range based components are separated by other control type components. " "Load Range Based should be grouped together on each flow path.";
+					ValidLoopSide.Reason = "Invalid: Load range based components are separated by other control type components. Load Range Based should be grouped together on each flow path.";
 					return ValidLoopSide;
 				} else {
 					EncounteredLRB = true;
@@ -455,10 +455,10 @@ namespace PlantLoopSolver {
 					BranchIndex = this_loop_side.TotalBranches;
 				}
 
-                //Now that we have the branch index, let's do the control type check over all the components
+				// Now that we have the branch index, let's do the control type check over all the components
 				for ( CompIndex = 1; CompIndex <= this_loop_side.Branch( BranchIndex ).TotalComponents; ++CompIndex ) {
 
-                    auto & this_component( this_loop_side.Branch( BranchIndex ).Comp( CompIndex ) );
+					auto & this_component( this_loop_side.Branch( BranchIndex ).Comp( CompIndex ) );
 
 					{ auto const SELECT_CASE_var( this_component.CurOpSchemeType );
 
@@ -470,7 +470,7 @@ namespace PlantLoopSolver {
 							ValidLoopSide.ErrorPoint.LoopSideNum = LoopSideNum;
 							ValidLoopSide.ErrorPoint.BranchNum = BranchIndex;
 							ValidLoopSide.ErrorPoint.CompNum = CompIndex;
-							ValidLoopSide.Reason = "Invalid: Load range based components are separated by other control type components. " "Load Range Based should be grouped together on each flow path.";
+							ValidLoopSide.Reason = "Invalid: Load range based components are separated by other control type components. Load Range Based should be grouped together on each flow path.";
 							return ValidLoopSide;
 						} else {
 							EncounteredLRB = true;
@@ -906,7 +906,7 @@ namespace PlantLoopSolver {
 						auto const SELECT_CASE_var( component.TypeOf_Num );
 						if ( ( SELECT_CASE_var == TypeOf_PumpVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpBankVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpCondensate ) ) {
 							CompIndex = component.CompNum;
-							if ( CompIndex > 0 ){
+							if ( CompIndex > 0 ) {
 								auto & this_pump( PumpEquip( CompIndex ) );
 								this_pump.LoopSolverOverwriteFlag = true;
 							}
@@ -1145,7 +1145,7 @@ namespace PlantLoopSolver {
 			if ( NumBranchesInRegion > LastComponentSimulated.isize() ) { //Tuned Changed to grow-only strategy
 				LastComponentSimulated.allocate( NumBranchesInRegion );
 			}
-			for ( int i = 1; i <= NumBranchesInRegion; ++i ) LastComponentSimulated = 0; // Only zero the active elements
+			for ( int i = 1; i <= NumBranchesInRegion; ++i ) LastComponentSimulated( i ) = 0; // Only zero the active elements
 //			AccessibleBranches.allocate( NumBranchesInRegion );
 
 //			BranchIndex = 0;
@@ -1181,7 +1181,7 @@ namespace PlantLoopSolver {
 			EndingComponent = branch.TotalComponents;
 			for ( CompCounter = StartingComponent; CompCounter <= EndingComponent; ++CompCounter ) {
 
-			   auto & this_comp( branch.Comp( CompCounter ) );
+				auto & this_comp( branch.Comp( CompCounter ) );
 
 				{ auto const SELECT_CASE_var( this_comp.CurOpSchemeType );
 				if ( SELECT_CASE_var == WSEconOpSchemeType ) { //~ coils
@@ -1647,8 +1647,8 @@ namespace PlantLoopSolver {
 					// 4  LoadToHeatingSetPoint  >  LoadToCoolingSetPoint       -->  Not Feasible if LoopSetPointHi >= LoopSetPointLo
 					// First trap bad set-points
 					if ( LoadToHeatingSetPoint > LoadToCoolingSetPoint ) {
-						ShowSevereError( "Plant Loop: the Plant Loop Demand Calculation Scheme is set to DualSetPointDeadBand, " "but the heating-related low setpoint appears to be above the cooling-related high setpoint." );
-						ShowContinueError( "For example, if using SetpointManager:Scheduled:DualSetpoint, then check that the" " low setpoint is below the high setpoint." );
+						ShowSevereError( "Plant Loop: the Plant Loop Demand Calculation Scheme is set to DualSetPointDeadBand, but the heating-related low setpoint appears to be above the cooling-related high setpoint." );
+						ShowContinueError( "For example, if using SetpointManager:Scheduled:DualSetpoint, then check that the low setpoint is below the high setpoint." );
 						ShowContinueError( "Occurs in PlantLoop=" + PlantLoop( LoopNum ).Name );
 						ShowContinueError( "LoadToHeatingSetPoint=" + RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
 						ShowContinueError( "Loop Heating Low Setpoint=" + RoundSigDigits( LoopSetPointTemperatureLo, 2 ) );
@@ -1663,7 +1663,7 @@ namespace PlantLoopSolver {
 					} else if ( LoadToHeatingSetPoint <= 0.0 && LoadToCoolingSetPoint >= 0.0 ) { // deadband includes zero loads
 						LoadToLoopSetPoint = 0.0;
 					} else {
-						ShowSevereError( "DualSetPointWithDeadBand: Unanticipated combination of heating and cooling loads - " "report to EnergyPlus Development Team" );
+						ShowSevereError( "DualSetPointWithDeadBand: Unanticipated combination of heating and cooling loads - report to EnergyPlus Development Team" );
 						ShowContinueError( "occurs in PlantLoop=" + PlantLoop( LoopNum ).Name );
 						ShowContinueError( "LoadToHeatingSetPoint=" + RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
 						ShowContinueError( "Loop Heating Setpoint=" + RoundSigDigits( LoopSetPointTemperatureLo, 2 ) );
@@ -2840,7 +2840,7 @@ namespace PlantLoopSolver {
 		if ( ! FirstHVACIteration && ! WarmupFlag ) {
 			if ( std::abs( Node( LoopOutlet ).MassFlowRate - Node( LoopInlet ).MassFlowRate ) > MassFlowTolerance ) {
 				if ( PlantLoop( LoopNum ).MFErrIndex == 0 ) {
-					ShowWarningError( "PlantSupplySide: PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\", Error (CheckLoopExitNode) -- Mass Flow Rate Calculation. " "Outlet and Inlet differ by more than tolerance." );
+					ShowWarningError( "PlantSupplySide: PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\", Error (CheckLoopExitNode) -- Mass Flow Rate Calculation. Outlet and Inlet differ by more than tolerance." );
 					ShowContinueErrorTimeStamp( "" );
 					ShowContinueError( "Loop inlet node=" + NodeID( LoopInlet ) + ", flowrate=" + RoundSigDigits( Node( LoopInlet ).MassFlowRate, 4 ) + " kg/s" );
 					ShowContinueError( "Loop outlet node=" + NodeID( LoopOutlet ) + ", flowrate=" + RoundSigDigits( Node( LoopOutlet ).MassFlowRate, 4 ) + " kg/s" );
