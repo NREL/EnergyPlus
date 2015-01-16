@@ -13,13 +13,13 @@
 namespace EppPerformance
 {
   extern const int Perf_Thread_Count;
-class Utility
-{
-public:
-  static long getL1CacheLineSize();
-  static int getProcElementCount();
-  static void doDataDump();
-};
+  extern const long L1_DCache_L_Size;
+// {
+// public:
+//   static long getL1CacheLineSize();
+//   static int getProcElementCount();
+//   static void doDataDump();
+// };
 }
 
 #endif

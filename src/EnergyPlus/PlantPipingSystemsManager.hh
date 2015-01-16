@@ -99,14 +99,14 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
-	
+
 	void
 	InitAndSimGroundDomains();
 
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
-	
+
 	void
 	CheckIfAnySlabs();
 
@@ -143,7 +143,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
-	
+
 	void
 		ReadZoneCoupledDomainInputs(
 		int const StartingDomainNumForZone,
@@ -279,8 +279,8 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 
-	FArray1D <ZoneCoupledSurfaceData>
-		GetSurfaceDataForOSCM(
+	FArray1D< ZoneCoupledSurfaceData >
+	GetSurfaceDataForOSCM(
 		int const OSCMIndex,
 		int const SurfCount
 		);
@@ -367,7 +367,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	void
-	MeshPartition_SelectionSort( FArray1D< MeshPartition > & X );
+	MeshPartition_SelectionSort( FArray1< MeshPartition > & X );
 
 	//*********************************************************************************************!
 
@@ -677,8 +677,6 @@ namespace PlantPipingSystemsManager {
 		Optional_int ZIndex = _,
 		Optional_int ZWallIndex = _,
 		Optional_int InsulationZIndex = _
-		
-		
 	);
 
 	//*********************************************************************************************!
@@ -713,7 +711,7 @@ namespace PlantPipingSystemsManager {
 		int const DomainNum,
 		FArray1D< Real64 > const & XBoundaryPoints,
 		FArray1D< Real64 > const & YBoundaryPoints,
-		FArray1D< Real64 > const & ZBoundaryPoints		
+		FArray1D< Real64 > const & ZBoundaryPoints
 	);
 
 	//*********************************************************************************************!
@@ -857,7 +855,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
-	
+
 	Real64
 		GetZoneInterfaceHeatFlux( int const DomainNum );
 
@@ -884,7 +882,7 @@ namespace PlantPipingSystemsManager {
 		int const CellType,
 		int const CellType2
 	);
-	
+
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!

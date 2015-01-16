@@ -289,7 +289,7 @@ namespace EcoRoofManager {
 
 		if ( EcoRoofbeginFlag ) {
 			EcoRoofbeginFlag = false;
-			if ( Surface( SurfNum ).HeatTransferAlgorithm != HeatTransferModel_CTF ) ShowWarningError( "CalcEcoRoof: EcoRoof simulation but HeatBalanceAlgorithm is not ConductionTransferFunction(CTF)." " Has not been tested under other solution approaches." );
+			if ( Surface( SurfNum ).HeatTransferAlgorithm != HeatTransferModel_CTF ) ShowWarningError( "CalcEcoRoof: EcoRoof simulation but HeatBalanceAlgorithm is not ConductionTransferFunction(CTF). Has not been tested under other solution approaches." );
 			// ONLY READ ECOROOF PROPERTIES IN THE FIRST TIME
 			Zf = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).HeightOfPlants; // Plant height (m)
 			LAI = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).LAI; // Leaf Area Index

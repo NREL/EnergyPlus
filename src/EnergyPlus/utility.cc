@@ -5,11 +5,11 @@
 #include <iostream>
 namespace EppPerformance
 {
-
+  namespace{
 // extern "C" {
 // #include <unistd.h>
 // }
-//This file is adapted from the AMD example, AMD copyright info left in tact
+//This file is adapted from the AMD example, AMD copyright info left intact
 
 /***************************************************************************  
  File:    enum.c
@@ -280,6 +280,19 @@ void LockToLogicalProcessor( int n )
                       );
 }
 #else
+ void ClearAffinity()
+ {
+   int rc, i;
+   cpu_set_t full_set;
+   memset( &full_set, 0, sizeof( cpu_set_t ) );
+   for ( i = 0; i < (MAX_NUMBER_OF_PHYSICAL_PROCESSORS+MAX_NUMBER_OF_IOAPICS); i++ )
+     {
+       CPU_SET( i, &full_set );
+     }
+   rc = sched_setaffinity( 0, sizeof( cpu_set_t ),
+			   &full_set );
+}
+
 void LockToLogicalProcessor( int n )
 // I want to just stick onto one particular core
 {
@@ -428,34 +441,35 @@ int getPhysicalProCount()
    for ( i = 0; i < (MAX_NUMBER_OF_PHYSICAL_PROCESSORS+MAX_NUMBER_OF_IOAPICS); i++ )
       if (PhysProcIds[i]) 
          num_processors++;      
+   int phys_procs = 0;
+   for ( i = 0; i < (MAX_NUMBER_OF_PHYSICAL_PROCESSORS+MAX_NUMBER_OF_IOAPICS); i++ )
+   {
+      if (PhysProcIds[i])
+      {
+	phys_procs += LogicalProcessorMap[i].nCPUCoresperProcessor;
+         // printf( "Physical Processor ID %i has %i cores \n", i, PhysProcIds[i] );
+         // printf( "as logical processors " );
+         // for ( j = 0; j < nlp; j++ )
+         //    if (LogicalProcessorMap[j].nProcId == i)
+         //       printf( "%i ", j );
+         // printf( "\n" );
+      }
+   }
+   // printf( "\n" );
 
-   /* for ( i = 0; i < (MAX_NUMBER_OF_PHYSICAL_PROCESSORS+MAX_NUMBER_OF_IOAPICS); i++ ) */
-   /* { */
-   /*    if (PhysProcIds[i]) */
-   /*    { */
-   /*       printf( "Physical Processor ID %i has %i cores \n", i, PhysProcIds[i] ); */
-   /*       printf( "as logical processors " ); */
-   /*       for ( j = 0; j < nlp; j++ ) */
-   /*          if (LogicalProcessorMap[j].nProcId == i) */
-   /*             printf( "%i ", j ); */
-   /*       printf( "\n" ); */
-   /*    } */
-   /* } */
-   /* printf( "\n" ); */
-
-   /* printf( "Number of active logical processors: %d\n", nlp ); */
-   /* printf( "Number of active physical processors: %d\n", num_processors ); */
-   /* printf( "Number of cores per processor: %d\n", LogicalProcessorMap[0].nCPUCoresperProcessor ); */
-   /* printf( "Number of threads per processor core: %d\n", LogicalProcessorMap[0].nThreadsperCPUCore ); */
+   // printf( "Number of active logical processors: %d\n", nlp );
+   // printf( "Number of active physical processors: %d\n", num_processors );
+   // printf( "Number of cores per processor: %d\n", LogicalProcessorMap[0].nCPUCoresperProcessor );
+   // printf( "Number of threads per processor core: %d\n", LogicalProcessorMap[0].nThreadsperCPUCore );
   
    //   return( 0 ) ;
-   std::cout << "detected " << num_processors << " physical processors." << std::endl;
-   return num_processors;
+   ClearAffinity();
+   std::cout << "detected " << phys_procs << " physical processors." << std::endl;
+   return phys_procs;
 }
   
   //  const int Perf_Thread_Count = 4; //Utility::getProcElementCount();
   //const int Perf_Thread_Count = Utility::getProcElementCount();
-  const int Perf_Thread_Count = getPhysicalProCount();
 
 // #ifdef __WIN32__
 
@@ -481,15 +495,18 @@ int getPhysicalProCount()
   //the information that the 'cpuid' instruction may return with AMD -- if
   //the memory allocation fails because it isn't a power of 2, this is a place to check
 long
-Utility::getL1CacheLineSize(){
+getL1CacheLineSize(){
   //  int ax, bx ,cx, dx;
   int regs[4];
   //mycpuid(0x1, regs); //ax, bx, cx, dx);
   mycpuid(regs, 0x1);
-  long retval = ((0xFFFF & regs[1]) >> 8) * 8;
-  std::cout << "detected l1 data line size: " << retval << std::endl;
-  return retval;
+  long retVal = ((0xFFFF & regs[1]) >> 8) * 8;
+  std::cout << "detected l1 dcache line size of " << retVal << std::endl;
+  return retVal;
 }
+}
+  const long L1_DCache_L_Size = getL1CacheLineSize();
+  const int Perf_Thread_Count = getPhysicalProCount();
 
 // int
 // Utility::getProcElementCount(){

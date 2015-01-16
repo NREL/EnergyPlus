@@ -529,7 +529,7 @@ namespace WaterManager {
 						if ( GetScheduleMaxValue( RainCollector( Item ).LossFactorSchedID ) > 1.0 ) {
 							ShowWarningError( "Potentially invalid " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
 							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
-							ShowContinueError( "found rain water collection loss factor schedule value greater than 1.0, " "simulation continues" );
+							ShowContinueError( "found rain water collection loss factor schedule value greater than 1.0, simulation continues" );
 							// allowing it to continue
 						}
 					}
@@ -714,7 +714,7 @@ namespace WaterManager {
 				} else if ( SameString( cAlphaArgs( 1 ), "SmartSchedule" ) ) {
 					Irrigation.ModeID = IrrSmartSched;
 				} else {
-					ShowSevereError( "Type of " + cCurrentModuleObject + " is incorrect. Options are " "Schedule or SmartSchedule" );
+					ShowSevereError( "Type of " + cCurrentModuleObject + " is incorrect. Options are Schedule or SmartSchedule" );
 					ErrorsFound = true;
 				}
 				Irrigation.IrrSchedID = GetScheduleIndex( cAlphaArgs( 2 ) );

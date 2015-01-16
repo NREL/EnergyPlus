@@ -647,7 +647,7 @@ namespace DataPlant {
 				ShowContinueError( "during sizing: called by " + CallerName );
 			}
 			if ( outFoundCount > 0 ) ShowContinueError( "Node was found as outlet node (for component) " + RoundSigDigits( outFoundCount ) + " time(s)." );
-			ShowContinueError( "Possible error in Branch inputs.  " "For more information, look for other error messages related to this node name." );
+			ShowContinueError( "Possible error in Branch inputs.  For more information, look for other error messages related to this node name." );
 			// fatal?
 		}
 

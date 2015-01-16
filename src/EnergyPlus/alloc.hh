@@ -40,10 +40,7 @@ struct AlignedAlloc{
     //	 ptr = (void**)std::align(alignment, toUse, raw, toUse);  NOT IMPLEMENTED in GCC 4.8.1 :P
     size_t temp = ((size_t)raw + offset) & ~(alignment - 1);
     ptr = (void**)temp;
-    ptr[ - 1 ] = raw;
-    // if(posix_memalign(&ptr, alignment, n * sizeof(T)) != 0){
-    //   throw std::bad_alloc(;
-    // }
+    ptr[ -1 ] = raw;
     return static_cast<T*>((void*)ptr);
   }
 

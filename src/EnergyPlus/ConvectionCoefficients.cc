@@ -276,7 +276,7 @@ namespace ConvectionCoefficients {
 				for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 					if ( Zone( ZoneNum ).InsideConvectionAlgo != CeilingDiffuser ) continue;
 					if ( Zone( ZoneNum ).SystemZoneNodeNumber != 0 ) continue;
-					ShowSevereError( "InitInteriorConvectionCoeffs: Inside Convection=CeilingDiffuser, " "but no system inlet node defined, Zone=" + Zone( ZoneNum ).Name );
+					ShowSevereError( "InitInteriorConvectionCoeffs: Inside Convection=CeilingDiffuser, but no system inlet node defined, Zone=" + Zone( ZoneNum ).Name );
 					ShowContinueError( "Defaulting inside convection to TARP. Check ZoneHVAC:EquipmentConnections for Zone=" + Zone( ZoneNum ).Name );
 					Zone( ZoneNum ).InsideConvectionAlgo = ASHRAETARP;
 				}
@@ -1353,11 +1353,11 @@ namespace ConvectionCoefficients {
 				++TotExtConvCoeff;
 			}
 			if ( NumAlphas >= 2 && lAlphaFieldBlanks( 2 ) ) {
-				ShowWarningError( "GetUserConvectionCoefficients: " + CurrentModuleObject + ", " " for " + cAlphaFieldNames( 1 ) + '=' + Alphas( 1 ) );
+				ShowWarningError( "GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + cAlphaFieldNames( 1 ) + '=' + Alphas( 1 ) );
 				ShowContinueError( cAlphaFieldNames( 2 ) + " is blank and rest of fields will not be processed." );
 			}
 			if ( NumAlphas >= 6 && lAlphaFieldBlanks( 6 ) ) {
-				ShowWarningError( "GetUserConvectionCoefficients: " + CurrentModuleObject + ", " " for " + cAlphaFieldNames( 1 ) + '=' + Alphas( 1 ) );
+				ShowWarningError( "GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + cAlphaFieldNames( 1 ) + '=' + Alphas( 1 ) );
 				ShowContinueError( cAlphaFieldNames( 6 ) + " is blank and rest of fields will not be processed." );
 			}
 		}
@@ -1378,11 +1378,11 @@ namespace ConvectionCoefficients {
 				++TotExtConvCoeff;
 			}
 			if ( NumAlphas >= 2 && lAlphaFieldBlanks( 2 ) ) {
-				ShowWarningError( "GetUserConvectionCoefficients: " + CurrentModuleObject + ", " " for " + cAlphaFieldNames( 1 ) + '=' + Alphas( 1 ) );
+				ShowWarningError( "GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + cAlphaFieldNames( 1 ) + '=' + Alphas( 1 ) );
 				ShowContinueError( cAlphaFieldNames( 2 ) + " is blank and rest of fields will not be processed." );
 			}
 			if ( NumAlphas >= 6 && lAlphaFieldBlanks( 6 ) ) {
-				ShowWarningError( "GetUserConvectionCoefficients: " + CurrentModuleObject + ", " " for " + cAlphaFieldNames( 1 ) + '=' + Alphas( 1 ) );
+				ShowWarningError( "GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + cAlphaFieldNames( 1 ) + '=' + Alphas( 1 ) );
 				ShowContinueError( cAlphaFieldNames( 6 ) + " is blank and rest of fields will not be processed." );
 			}
 		}
@@ -1400,7 +1400,7 @@ namespace ConvectionCoefficients {
 			GetObjectItem( CurrentModuleObject, Loop, Alphas, NumAlphas, Numbers, NumNumbers, Status, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			Found = FindItemInList( Alphas( 1 ), Surface.Name(), TotSurfaces );
 			if ( Found == 0 ) {
-				ShowSevereError( "GetUserConvectionCoefficients: " + CurrentModuleObject + ", " "illegal value for " + cAlphaFieldNames( 1 ) + '=' + Alphas( 1 ) );
+				ShowSevereError( "GetUserConvectionCoefficients: " + CurrentModuleObject + ", illegal value for " + cAlphaFieldNames( 1 ) + '=' + Alphas( 1 ) );
 				ErrorsFound = true;
 				continue;
 			}
@@ -1413,7 +1413,7 @@ namespace ConvectionCoefficients {
 				{ auto const SELECT_CASE_var( Alphas( Ptr ) );
 				if ( SELECT_CASE_var == "OUTSIDE" ) {
 					if ( Surface( Found ).OSCPtr > 0 ) {
-						ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ", " "OUTSIDE " + CurrentModuleObject + " cannot be specified for OtherSideCoefficient Surface=" + Alphas( 1 ) );
+						ShowSevereError( "GetUserSuppliedConvectionCoefficients: " + CurrentModuleObject + ", OUTSIDE " + CurrentModuleObject + " cannot be specified for OtherSideCoefficient Surface=" + Alphas( 1 ) );
 						ErrorsFound = true;
 					}
 					IsValidType = false;
@@ -1435,7 +1435,7 @@ namespace ConvectionCoefficients {
 						if ( Numbers( NumField ) < LowHConvLimit || Numbers( NumField ) > HighHConvLimit ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", out of range value" );
 							ShowContinueError( cAlphaFieldNames( Ptr ) + '=' + Alphas( Ptr ) + ", " + cNumericFieldNames( NumField ) + "=[" + RoundSigDigits( Numbers( NumField ), 5 ) + "]." );
-							ShowContinueError( "Out-of-range from low/high limits=[>=" + RoundSigDigits( LowHConvLimit, 9 ) + ", " "<=" + RoundSigDigits( HighHConvLimit, 1 ) + "]." );
+							ShowContinueError( "Out-of-range from low/high limits=[>=" + RoundSigDigits( LowHConvLimit, 9 ) + ", <=" + RoundSigDigits( HighHConvLimit, 1 ) + "]." );
 							//            CALL RangeCheck(errFlag,'"'//TRIM(cAlphaFieldNames(FieldNo+1))//'"','object',  &
 							//                       'SEVERE','>='//TRIM(RoundSigDigits(LowHConvLimit,9)),(Numbers(NumField)>=LowHConvLimit),&
 							//                       '<='//TRIM(RoundSigDigits(HighHConvLimit,1)),(Numbers(NumField)<=HighHConvLimit))
@@ -1519,7 +1519,7 @@ namespace ConvectionCoefficients {
 						if ( Numbers( NumField ) < LowHConvLimit || Numbers( NumField ) > HighHConvLimit ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", out of range value" );
 							ShowContinueError( cAlphaFieldNames( Ptr ) + '=' + Alphas( Ptr ) + ", " + cNumericFieldNames( NumField ) + "=[" + RoundSigDigits( Numbers( NumField ), 5 ) + "]." );
-							ShowContinueError( "Out-of-range from low/high limits=[>=" + RoundSigDigits( LowHConvLimit, 9 ) + ", " "<=" + RoundSigDigits( HighHConvLimit, 1 ) + "]." );
+							ShowContinueError( "Out-of-range from low/high limits=[>=" + RoundSigDigits( LowHConvLimit, 9 ) + ", <=" + RoundSigDigits( HighHConvLimit, 1 ) + "]." );
 							//            CALL RangeCheck(errFlag,'"'//TRIM(cAlphaFieldNames(FieldNo+1))//'"','object',  &
 							//                       'SEVERE','>='//TRIM(RoundSigDigits(LowHConvLimit,9)),(Numbers(NumField)>=LowHConvLimit),&
 							//                       '<='//TRIM(RoundSigDigits(HighHConvLimit,1)),(Numbers(NumField)<=HighHConvLimit))
@@ -1647,7 +1647,7 @@ namespace ConvectionCoefficients {
 						if ( Numbers( NumField ) < LowHConvLimit || Numbers( NumField ) > HighHConvLimit ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", out of range value" );
 							ShowContinueError( cAlphaFieldNames( Ptr ) + '=' + Alphas( Ptr ) + ", " + cNumericFieldNames( NumField ) + "=[" + RoundSigDigits( Numbers( NumField ), 5 ) + "]." );
-							ShowContinueError( "Out-of-range from low/high limits=[>=" + RoundSigDigits( LowHConvLimit, 9 ) + ", " "<=" + RoundSigDigits( HighHConvLimit, 1 ) + "]." );
+							ShowContinueError( "Out-of-range from low/high limits=[>=" + RoundSigDigits( LowHConvLimit, 9 ) + ", <=" + RoundSigDigits( HighHConvLimit, 1 ) + "]." );
 							//            CALL RangeCheck(errFlag,'"'//TRIM(cAlphaFieldNames(FieldNo+1))//'"','object',  &
 							//                       'SEVERE','>='//TRIM(RoundSigDigits(LowHConvLimit,9)),(Numbers(NumField)>=LowHConvLimit),&
 							//                       '<='//TRIM(RoundSigDigits(HighHConvLimit,1)),(Numbers(NumField)<=HighHConvLimit))
@@ -1724,7 +1724,7 @@ namespace ConvectionCoefficients {
 						if ( Numbers( NumField ) < LowHConvLimit || Numbers( NumField ) > HighHConvLimit ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", out of range value" );
 							ShowContinueError( cAlphaFieldNames( Ptr ) + '=' + Alphas( Ptr ) + ", " + cNumericFieldNames( NumField ) + "=[" + RoundSigDigits( Numbers( NumField ), 5 ) + "]." );
-							ShowContinueError( "Out-of-range from low/high limits=[>=" + RoundSigDigits( LowHConvLimit, 9 ) + ", " "<=" + RoundSigDigits( HighHConvLimit, 1 ) + "]." );
+							ShowContinueError( "Out-of-range from low/high limits=[>=" + RoundSigDigits( LowHConvLimit, 9 ) + ", <=" + RoundSigDigits( HighHConvLimit, 1 ) + "]." );
 							//            CALL RangeCheck(errFlag,'"'//TRIM(cAlphaFieldNames(FieldNo+1))//'"','object',  &
 							//                       'SEVERE','>='//TRIM(RoundSigDigits(LowHConvLimit,9)),(Numbers(NumField)>=LowHConvLimit),&
 							//                       '<='//TRIM(RoundSigDigits(HighHConvLimit,1)),(Numbers(NumField)<=HighHConvLimit))
@@ -1838,13 +1838,13 @@ namespace ConvectionCoefficients {
 					++Count;
 					if ( DisplayExtraWarnings ) {
 						ShowSevereError( RoutineName + "Surface=\"" + UserExtConvectionCoeffs( Loop ).SurfaceName + "\", mixed algorithms." );
-						ShowContinueError( "Zone Outside Convection Algorithm specifies \"SimpleCombined\". " "SimpleCombined will be used for this surface." );
+						ShowContinueError( "Zone Outside Convection Algorithm specifies \"SimpleCombined\". SimpleCombined will be used for this surface." );
 					}
 				}
 			}
 			if ( Count > 0 ) {
 				ShowSevereMessage( RoutineName + RoundSigDigits( Count ) + " surfaces had different outside convection algorithms specified when" );
-				ShowContinueError( "the Zone Outside Convection Algorithm specifies \"SimpleCombined\"." "SimpleCombined will be used for these surfaces." );
+				ShowContinueError( "the Zone Outside Convection Algorithm specifies \"SimpleCombined\". SimpleCombined will be used for these surfaces." );
 				if ( ! DisplayExtraWarnings ) {
 					ShowContinueError( "Use OutputDiagnostics,DisplayExtraWarnings; to see specific instances." );
 					TotalSevereErrors += Count;
@@ -7780,7 +7780,7 @@ namespace ConvectionCoefficients {
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 
 			}
-			ShowRecurringSevereErrorAtEnd( "CalcAlamdariHammondUnstableHorizontal: Convection model not evaluated because zero" " hydraulic diameter and set to 9.999 [W/m2-K]", ErrorIndex );
+			ShowRecurringSevereErrorAtEnd( "CalcAlamdariHammondUnstableHorizontal: Convection model not evaluated because zero hydraulic diameter and set to 9.999 [W/m2-K]", ErrorIndex );
 		}
 
 		return Hn;
@@ -7843,7 +7843,7 @@ namespace ConvectionCoefficients {
 				ShowContinueError( "Effective hydraulic diameter is zero, convection model not applicable for surface =" + Surface( SurfNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
-			ShowRecurringSevereErrorAtEnd( "CalcAlamdariHammondStableHorizontal: Convection model not evaluated because zero" " hydraulic diameter and set to 9.999 [W/m2-K]", ErrorIndex );
+			ShowRecurringSevereErrorAtEnd( "CalcAlamdariHammondStableHorizontal: Convection model not evaluated because zero hydraulic diameter and set to 9.999 [W/m2-K]", ErrorIndex );
 		}
 
 		return Hn;
@@ -7906,7 +7906,7 @@ namespace ConvectionCoefficients {
 				ShowContinueError( "Effective hydraulic diameter is zero, convection model not applicable for surface =" + Surface( SurfNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
-			ShowRecurringSevereErrorAtEnd( "CalcAlamdariHammondVerticalWall: Convection model not evaluated because zero" " hydraulic diameter and set to 9.999 [W/m2-K]", ErrorIndex );
+			ShowRecurringSevereErrorAtEnd( "CalcAlamdariHammondVerticalWall: Convection model not evaluated because zero hydraulic diameter and set to 9.999 [W/m2-K]", ErrorIndex );
 		}
 
 		return Hn;
@@ -8414,7 +8414,7 @@ namespace ConvectionCoefficients {
 					ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 
 				}
-				ShowRecurringSevereErrorAtEnd( "CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated because " " of zero height and set to 9.999 [W/m2-K]", ErrorIndex2 );
+				ShowRecurringSevereErrorAtEnd( "CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated because of zero height and set to 9.999 [W/m2-K]", ErrorIndex2 );
 
 			}
 			HcTmp3 = 0.8 * ( ( SurfTemp - SupplyAirTemp ) / std::abs( DeltaTemp ) ) * ( -0.199 + 0.190 * std::pow( AirChangeRate, 0.8 ) );
@@ -8430,7 +8430,7 @@ namespace ConvectionCoefficients {
 					ShowContinueError( "Occurs for zone named = " + Zone( ZoneNum ).Name );
 					ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 				}
-				ShowRecurringSevereErrorAtEnd( "CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated because " "of zero temperature difference and set to 9.999 [W/m2-K]", ErrorIndex );
+				ShowRecurringSevereErrorAtEnd( "CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated because of zero temperature difference and set to 9.999 [W/m2-K]", ErrorIndex );
 			}
 		}
 
@@ -8505,7 +8505,7 @@ namespace ConvectionCoefficients {
 					ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 				}
 
-				ShowRecurringWarningErrorAtEnd( "CalcBeausoleilMorrisonMixedStableFloor: Convection model not evaluated because" " of zero temperature difference and set to 9.999 [W/m2-K]", ErrorIndex );
+				ShowRecurringWarningErrorAtEnd( "CalcBeausoleilMorrisonMixedStableFloor: Convection model not evaluated because of zero temperature difference and set to 9.999 [W/m2-K]", ErrorIndex );
 			}
 
 		}
@@ -8580,7 +8580,7 @@ namespace ConvectionCoefficients {
 					ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 				}
 
-				ShowRecurringWarningErrorAtEnd( "CalcBeausoleilMorrisonMixedUnstableFloor: Convection model not evaluated because" " of zero temperature difference and set to 9.999 [W/m2-K]", ErrorIndex );
+				ShowRecurringWarningErrorAtEnd( "CalcBeausoleilMorrisonMixedUnstableFloor: Convection model not evaluated because of zero temperature difference and set to 9.999 [W/m2-K]", ErrorIndex );
 			}
 
 		}
@@ -8656,7 +8656,7 @@ namespace ConvectionCoefficients {
 					ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 				}
 
-				ShowRecurringWarningErrorAtEnd( "CalcBeausoleilMorrisonMixedStableCeiling: Convection model not evaluated because" " of zero temperature difference and set to 9.999 [W/m2-K]", ErrorIndex );
+				ShowRecurringWarningErrorAtEnd( "CalcBeausoleilMorrisonMixedStableCeiling: Convection model not evaluated because of zero temperature difference and set to 9.999 [W/m2-K]", ErrorIndex );
 			}
 
 		}
@@ -8731,7 +8731,7 @@ namespace ConvectionCoefficients {
 					ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 				}
 
-				ShowRecurringWarningErrorAtEnd( "CalcBeausoleilMorrisonMixedUnstableCeiling: Convection model not evaluated because" " of zero temperature difference and set to 9.999 [W/m2-K]", ErrorIndex );
+				ShowRecurringWarningErrorAtEnd( "CalcBeausoleilMorrisonMixedUnstableCeiling: Convection model not evaluated because of zero temperature difference and set to 9.999 [W/m2-K]", ErrorIndex );
 			}
 		}
 		return Hc;
@@ -8807,7 +8807,7 @@ namespace ConvectionCoefficients {
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 
 			}
-			ShowRecurringSevereErrorAtEnd( "CalcFohannoPolidoriVerticalWall: Convection model not evaluated because zero" " height and set to 9.999 [W/m2-K]", ErrorIndex );
+			ShowRecurringSevereErrorAtEnd( "CalcFohannoPolidoriVerticalWall: Convection model not evaluated because zero height and set to 9.999 [W/m2-K]", ErrorIndex );
 		}
 
 		return Hn;
@@ -8924,12 +8924,12 @@ namespace ConvectionCoefficients {
 					//shouldn'tcome
 					Hc = 9.999;
 					if ( ErrorIndex == 0 ) {
-						ShowSevereMessage( "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated " "( bad relative window location)" );
+						ShowSevereMessage( "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated (bad relative window location)" );
 						ShowContinueError( "Value for window location = " + RoundSigDigits( WindowLocationType ) );
 						ShowContinueError( "Occurs for zone named = " + Zone( ZoneNum ).Name );
 						ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 					}
-					ShowRecurringSevereErrorAtEnd( "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated because " "bad window location and set to 9.999 [W/m2-K]", ErrorIndex );
+					ShowRecurringSevereErrorAtEnd( "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated because bad window location and set to 9.999 [W/m2-K]", ErrorIndex );
 				}
 			} else {
 				Hc = 0.103 * std::pow( AirSystemFlowRate / ZoneExtPerimLength, 0.8 );
@@ -8937,12 +8937,12 @@ namespace ConvectionCoefficients {
 		} else {
 			Hc = 9.999;
 			if ( ErrorIndex2 == 0 ) {
-				ShowSevereMessage( "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated " "(zero zone exterior perimeter length)" );
+				ShowSevereMessage( "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated (zero zone exterior perimeter length)" );
 				ShowContinueError( "Value for zone exterior perimeter length = " + RoundSigDigits( ZoneExtPerimLength, 5 ) );
 				ShowContinueError( "Occurs for zone named = " + Zone( ZoneNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
-			ShowRecurringSevereErrorAtEnd( "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated because " " bad perimeter length and set to 9.999 [W/m2-K]", ErrorIndex2 );
+			ShowRecurringSevereErrorAtEnd( "CalcGoldsteinNovoselacCeilingDiffuserWindow: Convection model not evaluated because bad perimeter length and set to 9.999 [W/m2-K]", ErrorIndex2 );
 		}
 		return Hc;
 
@@ -9005,23 +9005,23 @@ namespace ConvectionCoefficients {
 			} else {
 				Hc = 9.999;
 				if ( ErrorIndex == 0 ) {
-					ShowSevereMessage( "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated " "( bad relative window location)" );
+					ShowSevereMessage( "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated (bad relative window location)" );
 					ShowContinueError( "Value for window location = " + RoundSigDigits( WindowLocationType ) );
 					ShowContinueError( "Occurs for zone named = " + Zone( ZoneNum ).Name );
 					ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 				}
-				ShowRecurringSevereErrorAtEnd( "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated because " "bad window location and set to 9.999 [W/m2-K]", ErrorIndex );
+				ShowRecurringSevereErrorAtEnd( "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated because bad window location and set to 9.999 [W/m2-K]", ErrorIndex );
 
 			}
 		} else {
 			Hc = 9.999;
 			if ( ErrorIndex2 == 0 ) {
-				ShowSevereMessage( "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated " "(zero zone exterior perimeter length)" );
+				ShowSevereMessage( "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated (zero zone exterior perimeter length)" );
 				ShowContinueError( "Value for zone exterior perimeter length = " + RoundSigDigits( ZoneExtPerimLength, 5 ) );
 				ShowContinueError( "Occurs for zone named = " + Zone( ZoneNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
-			ShowRecurringSevereErrorAtEnd( "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated because " " bad perimeter length and set to 9.999 [W/m2-K]", ErrorIndex2 );
+			ShowRecurringSevereErrorAtEnd( "CalcGoldsteinNovoselacCeilingDiffuserWall: Convection model not evaluated because bad perimeter length and set to 9.999 [W/m2-K]", ErrorIndex2 );
 
 		}
 		return Hc;
@@ -9077,12 +9077,12 @@ namespace ConvectionCoefficients {
 			Hc = 0.048 * std::pow( AirSystemFlowRate / ZoneExtPerimLength, 0.8 );
 		} else {
 			if ( ErrorIndex == 0 ) {
-				ShowSevereMessage( "CalcGoldsteinNovoselacCeilingDiffuserFloor: Convection model not evaluated " "(zero zone exterior perimeter length)" );
+				ShowSevereMessage( "CalcGoldsteinNovoselacCeilingDiffuserFloor: Convection model not evaluated (zero zone exterior perimeter length)" );
 				ShowContinueError( "Value for zone exterior perimeter length = " + RoundSigDigits( ZoneExtPerimLength, 5 ) );
 				ShowContinueError( "Occurs for zone named = " + Zone( ZoneNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
-			ShowRecurringSevereErrorAtEnd( "CalcGoldsteinNovoselacCeilingDiffuserFloor: Convection model not evaluated because " " bad perimeter length and set to 9.999 [W/m2-K]", ErrorIndex );
+			ShowRecurringSevereErrorAtEnd( "CalcGoldsteinNovoselacCeilingDiffuserFloor: Convection model not evaluated because bad perimeter length and set to 9.999 [W/m2-K]", ErrorIndex );
 
 			Hc = 9.999; // safe but noticeable
 		}
@@ -9154,7 +9154,7 @@ namespace ConvectionCoefficients {
 				ShowContinueError( "Occurs for surface named = " + Surface( SurfNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
-			ShowRecurringSevereErrorAtEnd( "CalcSparrowWindward: Convection model not evaluated because " "bad face area and set to 9.999 [W/m2-k]", ErrorIndex );
+			ShowRecurringSevereErrorAtEnd( "CalcSparrowWindward: Convection model not evaluated because bad face area and set to 9.999 [W/m2-k]", ErrorIndex );
 			Hf = 9.999; // safe but noticeable
 		}
 		return Hf;
@@ -9224,7 +9224,7 @@ namespace ConvectionCoefficients {
 				ShowContinueError( "Occurs for surface named = " + Surface( SurfNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
-			ShowRecurringSevereErrorAtEnd( "CalcSparrowLeeward: Convection model not evaluated because " "bad face area and set to 9.999 [W/m2-k]", ErrorIndex );
+			ShowRecurringSevereErrorAtEnd( "CalcSparrowLeeward: Convection model not evaluated because bad face area and set to 9.999 [W/m2-k]", ErrorIndex );
 
 			Hf = 9.999; // safe but noticeable
 		}
@@ -9620,7 +9620,7 @@ namespace ConvectionCoefficients {
 				ShowContinueError( "Occurs for surface named = " + Surface( SurfNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
-			ShowRecurringSevereErrorAtEnd( "CalcMitchell: Convection model not evaluated because " "bad length scale and set to 9.999 [W/m2-k]", ErrorIndex );
+			ShowRecurringSevereErrorAtEnd( "CalcMitchell: Convection model not evaluated because bad length scale and set to 9.999 [W/m2-k]", ErrorIndex );
 			Hf = 9.999; // safe but noticeable
 		}
 		return Hf;
@@ -9758,12 +9758,12 @@ namespace ConvectionCoefficients {
 
 		} else {
 			if ( ErrorIndex == 0 ) {
-				ShowSevereMessage( "CalcEmmelVertical: Convection model wind angle calculation suspect" "(developer issue)" );
+				ShowSevereMessage( "CalcEmmelVertical: Convection model wind angle calculation suspect (developer issue)" );
 				ShowContinueError( "Value for theta angle = " + RoundSigDigits( Theta, 5 ) );
 				ShowContinueError( "Occurs for surface named = " + Surface( SurfNum ).Name );
 				ShowContinueError( "Convection model uses high theta correlation and the simulation continues" );
 			}
-			ShowRecurringSevereErrorAtEnd( "CalcEmmelVertical: Convection model wind angle calculation suspect" " and high theta correlation", ErrorIndex );
+			ShowRecurringSevereErrorAtEnd( "CalcEmmelVertical: Convection model wind angle calculation suspect and high theta correlation", ErrorIndex );
 			Hf = 3.54 * std::pow( WindAt10m, 0.76 );
 		}
 		return Hf;
@@ -9835,12 +9835,12 @@ namespace ConvectionCoefficients {
 
 		} else {
 			if ( ErrorIndex == 0 ) {
-				ShowSevereMessage( "CalcEmmelRoof: Convection model wind angle calculation suspect" "(developer issue)" );
+				ShowSevereMessage( "CalcEmmelRoof: Convection model wind angle calculation suspect (developer issue)" );
 				ShowContinueError( "Value for theta angle = " + RoundSigDigits( Theta, 5 ) );
 				ShowContinueError( "Occurs for surface named = " + Surface( SurfNum ).Name );
 				ShowContinueError( "Convection model uses high theta correlation and the simulation continues" );
 			}
-			ShowRecurringSevereErrorAtEnd( "CalcEmmelRoof: Convection model wind angle calculation suspect" " and high theta correlation", ErrorIndex );
+			ShowRecurringSevereErrorAtEnd( "CalcEmmelRoof: Convection model wind angle calculation suspect and high theta correlation", ErrorIndex );
 
 			Hf = 3.54 * std::pow( WindAt10m, 0.76 );
 		}
@@ -9947,7 +9947,7 @@ namespace ConvectionCoefficients {
 				ShowContinueError( "Occurs for surface named = " + Surface( SurfNum ).Name );
 				ShowContinueError( "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues" );
 			}
-			ShowRecurringSevereErrorAtEnd( "CalcClearRoof: Convection model not evaluated because " "bad value for distance to roof edge and set to 9.999 [W/m2-k]", ErrorIndex );
+			ShowRecurringSevereErrorAtEnd( "CalcClearRoof: Convection model not evaluated because bad value for distance to roof edge and set to 9.999 [W/m2-k]", ErrorIndex );
 			Hc = 9.9999; // safe but noticeable
 		}
 		return Hc;

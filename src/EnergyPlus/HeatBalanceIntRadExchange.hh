@@ -169,11 +169,6 @@ namespace HeatBalanceIntRadExchange {
 	void
 	CalcScriptF(
 		    ZoneViewFactorInformation & zone
-		// int const N, // Number of surfaces
-		// FArray1A< Real64 > const A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-		// FArray2A< Real64 > const F, // DIRECT VIEW FACTOR MATRIX (N X N)
-		// FArray1A< Real64 > EMISS, // VECTOR OF SURFACE EMISSIVITIES
-		// FArray2A< Real64 > ScriptF // MATRIX OF SCRIPT F FACTORS (N X N)
 	);
 
 	// void

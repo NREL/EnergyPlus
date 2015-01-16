@@ -162,7 +162,7 @@ namespace MundtSimMgr {
 			// setup Mundt model
 			ErrorsFound = false;
 			SetupMundtModel( ZoneNum, ErrorsFound );
-			if ( ErrorsFound ) ShowFatalError( "ManageMundtModel: Errors in setting up Mundt Model. " "Preceding condition(s) cause termination." );
+			if ( ErrorsFound ) ShowFatalError( "ManageMundtModel: Errors in setting up Mundt Model. Preceding condition(s) cause termination." );
 
 			// perform Mundt model calculations
 			CalcMundtModel( ZoneNum );

@@ -1052,45 +1052,37 @@ namespace HeatBalanceManager {
 		CurrentModuleObject = "ZoneAirMassFlowConservation";
 		NumObjects = GetNumObjectsFound(CurrentModuleObject);
 
-		if (NumObjects > 0) {
-			GetObjectItem(CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
-			if (NumAlpha > 0) {
-				{ auto const SELECT_CASE_var(AlphaName(1));
-				if (SELECT_CASE_var == "YES") {
+		if ( NumObjects > 0 ) {
+			GetObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			if ( NumAlpha > 0 ) {
+				{ auto const SELECT_CASE_var( AlphaName( 1 ) );
+				if ( SELECT_CASE_var == "YES" ) {
 					ZoneAirMassFlow.EnforceZoneMassBalance = true;
-				}
-				else if (SELECT_CASE_var == "NO") {
+				} else if ( SELECT_CASE_var == "NO" ) {
 					ZoneAirMassFlow.EnforceZoneMassBalance = false;
-				}
-				else {
+				} else {
 					ZoneAirMassFlow.EnforceZoneMassBalance = false;
 					AlphaName(1) = "NO";
-					ShowWarningError(trim(CurrentModuleObject) + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = NO");
-				} }
+					ShowWarningError( CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = NO" );
+				}}
 			}
-			if (NumAlpha > 1) {
-				{ auto const SELECT_CASE_var(AlphaName(2));
-				if (SELECT_CASE_var == "ADDINFILTRATIONFLOW") {
+			if ( NumAlpha > 1 ) {
+				{ auto const SELECT_CASE_var( AlphaName( 2 ) );
+				if ( SELECT_CASE_var == "ADDINFILTRATIONFLOW" ) {
 					ZoneAirMassFlow.InfiltrationTreatment = true;
-					if (!Contaminant.CO2Simulation) Contaminant.SimulateContaminants = true;
-				}
-				else if (SELECT_CASE_var == "ADJUSTINFILTRATIONFLOW") {
+					if ( !Contaminant.CO2Simulation ) Contaminant.SimulateContaminants = true;
+				} else if ( SELECT_CASE_var == "ADJUSTINFILTRATIONFLOW" ) {
 					ZoneAirMassFlow.InfiltrationTreatment = 2;
-				}
-				else {
+				} else {
 					ZoneAirMassFlow.InfiltrationTreatment = 1;
 					AlphaName(2) = "ADDINFILTRATIONFLOW";
-					ShowWarningError(trim(CurrentModuleObject) + ": Invalid input of " + cAlphaFieldNames(2) + ". The default choice is assigned = NO");
-				} }
-			}
-			else {
+					ShowWarningError( CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(2) + ". The default choice is assigned = NO" );
+				}}
+			} else {
 				ZoneAirMassFlow.InfiltrationTreatment = 1;
 				AlphaName(2) = "ADDINFILTRATIONFLOW";
 			}
-
-
-		}
-		else{
+		} else {
 			ZoneAirMassFlow.EnforceZoneMassBalance = false;
 			AlphaName(1) = "NO";
 		}
@@ -1099,12 +1091,11 @@ namespace HeatBalanceManager {
 		//	MassConservation.allocate( NumOfZones );
 		//}
 
-		gio::write(OutputFileInits, Format_732);
-		if (ZoneAirMassFlow.EnforceZoneMassBalance) {
-			gio::write(OutputFileInits, Format_733) << "Yes";
-		}
-		else {
-			gio::write(OutputFileInits, Format_733) << "No";
+		gio::write( OutputFileInits, Format_732 );
+		if ( ZoneAirMassFlow.EnforceZoneMassBalance ) {
+			gio::write( OutputFileInits, Format_733 ) << "Yes";
+		} else {
+			gio::write( OutputFileInits, Format_733 ) << "No";
 		}
 
 	}
@@ -4028,7 +4019,7 @@ namespace HeatBalanceManager {
 			//    Make sure Zone Name is unique
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Zone.Name( ), ZoneLoop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Zone.Name(), ZoneLoop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -4174,18 +4165,19 @@ namespace HeatBalanceManager {
 	}
 
 	void
-		ProcessZoneData( 
+	ProcessZoneData(
 		std::string const & cCurrentModuleObject,
 		int const ZoneLoop,
-		FArray1S_string cAlphaArgs,
+		FArray1_string const & cAlphaArgs,
 		int & NumAlphas,
-		FArray1S< Real64 > rNumericArgs,
+		FArray1< Real64 > const & rNumericArgs,
 		int & NumNumbers,
-		FArray1S_bool lNumericFieldBlanks,
-		FArray1S_bool lAlphaFieldBlanks,
-		FArray1S_string cAlphaFieldNames,
-		FArray1S_string cNumericFieldNames,
-		bool & ErrorsFound ) // If errors found in input
+		FArray1_bool const & lNumericFieldBlanks, //Unused
+		FArray1_bool const & lAlphaFieldBlanks,
+		FArray1_string const & cAlphaFieldNames,
+		FArray1_string const & cNumericFieldNames, //Unused
+		bool & ErrorsFound // If errors found in input
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
