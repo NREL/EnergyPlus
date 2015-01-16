@@ -15,6 +15,8 @@ SUBROUTINE SetThisVersionVariables()
       RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 1-1-0-020 to 1-1-1.csv'
 END SUBROUTINE
 
+END MODULE
+
 SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFileName,ArgFile,ArgIDFExtension)
           ! SUBROUTINE INFORMATION:
           !       AUTHOR         Linda Lawrie
