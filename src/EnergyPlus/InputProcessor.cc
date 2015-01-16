@@ -315,7 +315,7 @@ namespace InputProcessor {
 
 		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File (in.idf) -- Start";
 		if ( !DisplayInputInAudit ){
-			gio::write( EchoInputFile, fmtLD ) << " Echo of input lines is off. May be activated by setting the environmental variable DisplayInputInAudit=YES";
+			gio::write( EchoInputFile, fmtLD ) << " Echo of input lines is off. May be activated by setting the environmental variable DISPLAYINPUTINAUDIT=YES";
 		}
 
 		{ IOFlags flags; gio::inquire( "in.idf", flags ); FileExists = flags.exists(); }
