@@ -57,7 +57,7 @@ namespace OutsideEnergySources {
 	using DataPlant::TypeOf_PurchHotWater;
 	using DataPlant::TypeOf_PurchChilledWater;
 	using DataPlant::ScanPlantLoopsForObject;
-	using DataPlant::PlantSizesOkayToFinalize;
+	using DataPlant::PlantFirstSizesOkayToFinalize;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
@@ -407,8 +407,8 @@ namespace OutsideEnergySources {
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using DataGlobals::BeginEnvrnFlag;
-		using DataPlant::PlantSizesOkayToFinalize;
-		using DataPlant::PlantSizeNotComplete;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizeCompleted;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -456,7 +456,7 @@ namespace OutsideEnergySources {
 			// component model has not design flow rates, using data for overall plant loop
 			InitComponentNodes( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).MinMassFlowRate, PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).MaxMassFlowRate, EnergySource( EnergySourceNum ).InletNodeNum, EnergySource( EnergySourceNum ).OutletNodeNum, EnergySource( EnergySourceNum ).LoopNum, EnergySource( EnergySourceNum ).LoopSideNum, EnergySource( EnergySourceNum ).BranchNum, EnergySource( EnergySourceNum ).CompNum );
 			EnergySource( EnergySourceNum ).BeginEnvrnInitFlag = false;
-			if ( PlantSizesOkayToFinalize && PlantSizeNotComplete ) SizeDistrictEnergy( EnergySourceNum );
+			if ( PlantFirstSizesOkayToFinalize && ! PlantFirstSizeCompleted ) SizeDistrictEnergy( EnergySourceNum );
 		}
 		if ( ! BeginEnvrnFlag ) EnergySource( EnergySourceNum ).BeginEnvrnInitFlag = true;
 
@@ -536,7 +536,7 @@ namespace OutsideEnergySources {
 			rho = GetDensityGlycol( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidIndex, "SizeDistrict" + typeName );
 			Cp = GetSpecificHeatGlycol( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop(EnergySource( EnergySourceNum).LoopNum ).FluidIndex, "SizeDistrict" + typeName );
 			NomCapDes = Cp * rho * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate;
-			if ( PlantSizesOkayToFinalize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
 				if ( IsAutoSize ) {
 					EnergySource( EnergySourceNum ).NomCap = NomCapDes;
 					ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name, "Design Size Nominal Capacity [W]", NomCapDes );
