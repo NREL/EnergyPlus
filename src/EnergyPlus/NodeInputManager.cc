@@ -933,7 +933,7 @@ namespace NodeInputManager {
 				Found = FindItemInList( NodeID( CheckNumber ), UniqueNodeNames, NumCheckNodes );
 				if ( Found != 0 ) {
 					ShowSevereError( CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found." );
-					ShowContinueError("...for Node Type(s)=" + NodeTypes + ", duplicate node name=\"" + NodeID( CheckNumber ) + "\".");
+					ShowContinueError( "...for Node Type(s)=" + NodeTypes + ", duplicate node name=\"" + NodeID( CheckNumber ) + "\"." );
 					ShowContinueError( "...Nodes must be unique across instances of this object." );
 					//          CALL ShowSevereError('Node Types='//TRIM(NodeTypes)//', Non Unique Name found='//TRIM(NodeID(CheckNumber)))
 					//          CALL ShowContinueError('Context='//TRIM(CurCheckContextName))
