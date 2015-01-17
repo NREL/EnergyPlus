@@ -7,9 +7,6 @@
 #include <vector>
 #include <forward_list>
 #include <thread>
-//#ifdef DEBUG_CI
-#include <iostream>
-//#endif
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
@@ -35,14 +32,6 @@
 #include <WindowEquivalentLayer.hh>
 #include <Timer.h>
 
-// SpeedupHelpers
-#include <timers.hh>
-
-// Linear LU Solver
-extern "C"{
-#include <clapack.h>
-}
-
 namespace EnergyPlus {
 
 #define EP_HBIRE_SEQ
@@ -60,6 +49,8 @@ namespace EnergyPlus {
     //                       exchange between surfaces, depends on inside surface emissivities,
     //                       which, for a window, depends on whether or not an interior
     //                       shade or blind is in place.
+    //                      January 2015, GSawaya, reengineered CalcIntRadExchange for 
+    //                       multithreaded execution.
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
@@ -102,18 +93,12 @@ namespace EnergyPlus {
 
     std::vector<size_t> LoadBalanceVector;
 
-    std::forward_list<EppPerformance::genPerTArray*> WriteVectors;
-
     std::vector<std::pair<std::vector< ReSurface >::iterator,
 			  std::vector< ReSurface >::iterator>> threadSurfIterators;	// SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceIntRadExchange
 
     void
     CalcInteriorRadExchange(const int SurfIterations,
 			    const int ZoneToResimulate){
-      using EppPerformance::Timer;
-    
-      // static Timer timer(__PRETTY_FUNCTION__);
-      // timer.startTimer();
 
       static bool firstTime( true );
       if(firstTime){
@@ -125,32 +110,25 @@ namespace EnergyPlus {
 	DoCalcInteriorRadExchange(SurfIterations, ZoneToResimulate);
       }else{
 	std::forward_list<std::thread> threads;
-	// std::cout << "In CIRE -- thread count is " <<
-	//   EppPerformance::Perf_Thread_Count << std::endl;
 	for(int x = 0; x < EppPerformance::Perf_Thread_Count; ++x){
 	  threads.push_front(std::thread(DoCalcInteriorRadExchange,
 					 SurfIterations,
 					 ZoneToResimulate,
 					 x));
-				     
 	}
 	for(auto& t: threads){
 	  t.join();
 	}
 	for(auto& z: ZoneInfo){z.ready = false;}
       }
-      //		timer.stopTimer();
     }
 
+#include <iostream>
     void
     DoCalcInteriorRadExchange(const int SurfIterations, 
 			      const int ZoneToResimulate,
 			      const int tid){
       std::vector<bool> ZoneChecked(NumOfZones, false);
-#ifdef DEBUG_CI
-      static int ranCount = 0;
-      const int MAX_RUNS(1000);
-#endif    
       //tid will be -1 when ZoneToResimulate != -1
       auto irpz = DataSurfaces::IRfromParentZone.begin_t( tid );
       auto lwr = DataHeatBalSurface::NetLWRadToSurf.begin_t( tid ); 		
@@ -158,7 +136,10 @@ namespace EnergyPlus {
 	  s != surfEnd(tid, ZoneToResimulate); 
 	  ++s, ++irpz, ++lwr){
 	ReSurface& recv = (*s);
-	//if(!s.isHeatTransSurf) continue; //I think this is superfluous, as it should have been checked before adding the surface
+	if(irpz.i() != recv()){ irpz.i() = recv(); lwr.i() = recv(); }
+	// while(irpz.i() != recv()){
+	//   std::cout << "syncing: i is " << irpz.i() << " and recv is " << recv() << std::endl;
+	//   ++irpz; ++lwr;}
 	ZoneViewFactorInformation& zone = ZoneInfo[ (*s).zone ];
 	if(ZoneToResimulate == -1){
 	  if(!ZoneChecked[zone()]){
@@ -170,10 +151,8 @@ namespace EnergyPlus {
 		}
 		CalcSurfaceTemp(zone, SurfIterations);
 		zone.ready = true;
-		//		std::cout << "tid " << tid << " zone " << zone() << " set ready" << std::endl;
 	      }else{
 		while(zone.ready == false){}
-		//		std::cout << "tid " << tid << " zone " << zone() << " received ready" << std::endl;
 	      }
 	    }
 	    ZoneChecked[zone()] = true;
@@ -186,38 +165,19 @@ namespace EnergyPlus {
 	Real64 tIR, tLWR;
 	tIR = tLWR = 0;
 	for(auto send : zone.surfaces){
-	  //delme
-	  // std::cout << "count " << count << " rec surf: " << recv() <<
-	  // 	" temp: " << recv.temperature
-	  // 					<< std::endl;
-	  //end delme
 	  if (recv.isWindow){
 	    tIR += zone.ScriptF(send(false) + 1, recv(false) + 1) * 
-	      //					tIR += zone.ScriptF(recv(false) + 1, send(false) + 1) * 
 	      send.temperature / recv.emissivity;
-	    // std::cout << "scriptF@ " << recv(false) << "," 
-	    // 	  << send(false) << ": " << 
-	    //   zone.ScriptF(recv(false), send(false)) <<
-	    //   std::endl;
 	  }
 	  if(recv() != send()){
 	    tLWR += zone.ScriptF(send(false) + 1, recv(false) + 1) * 
-	      //					tLWR += zone.ScriptF(recv(false) + 1, send(false) + 1) * 
 	      (send.temperature - recv.temperature);
 	  }
 	}
 	*irpz = tIR;
 	*lwr = tLWR;
 	// DataSurfaces::IRfromParentZone[ recv() ] = tIR;
-
 	// DataHeatBalSurface::NetLWRadToSurf[ recv() ] = tLWR;
-#ifdef DEBUG_CI
-	if (ranCount < MAX_RUNS ){
-	  std::cout << "cire, z:" << zone() << " s:" << recv(false) 
-		    << " ir:" << tIR << " lwr:"
-		    << tLWR << std::endl;
-	}
-#endif
 	tIR = tLWR = 0;
       }
     }
@@ -247,8 +207,8 @@ namespace EnergyPlus {
 	  int shadeFlag = SurfaceRadiantWin[ surf() ].getShadingFlag();
 	  if(SurfIterations == 0 && 
 	     shadeFlag <= 0){
-	    surf.temperature = std::pow(SurfaceRadiantWin[ surf() ].ThetaFace( 2 * ConstrWin[ Construction[ surf() ] - 1 ].
-									       TotGlassLayers ), 4); //ThetaFace already Kelvin
+	    surf.temperature = std::pow(SurfaceRadiantWin[ surf() ].
+					ThetaFace( 2 * ConstrWin[ Construction[ surf() ] - 1 ].TotGlassLayers ), 4); //ThetaFace already Kelvin
 	  }else if(shadeFlag == IntShadeOn || shadeFlag == IntBlindOn){
 	    surf.temperature = std::pow(SurfaceRadiantWin[ surf() ].EffInsSurfTemp + KelvinConv, 4);
 	  }else{
@@ -489,113 +449,6 @@ namespace EnergyPlus {
 
     }
 
-    // 	void
-    // 	CalcScriptF(ZoneViewFactorInformation& Zone){
-    // 		using EppPerformance::Timer;
-    // 		//		thread_local static Timer timer(__PRETTY_FUNCTION__);
-    // 		//timer.startTimer();
-
-    // 		CalcSurfaceEmiss(Zone);
-    // 		Real64 const StefanBoltzmannConst( 5.6697e-8 ); // Stefan-Boltzmann constant in W/(m2*K4)
-    // 		Real64 const MAX_EMISS( 0.9999 );
-    // 		Real64 *jMatrix, *cMatrix;
-    // 		int surfCount = Zone.NumOfSurfaces;
-    // 		cMatrix = new Real64[surfCount * surfCount];
-    // 		jMatrix = new Real64[surfCount * surfCount];
-
-
-
-    // 		if(cMatrix == nullptr || jMatrix == nullptr){
-    // 			throw noMoreMemCalcSF();
-    // 		}
-
-    // 		//calculate and load cMatrix and jMatrix
-    // 		for(auto i: Zone.surfaces){
-    // 			for(auto j: Zone.surfaces){
-    // 				Real64 cmTemp = Zone.F(i(false) + 1, j(false) + 1) * Zone.Area(i(false) +1);
-    // 				if(i(false) == j(false)){
-    // 					Real64 area = Zone.Area(i(false) + 1);
-    // 					Real64 emiss = Zone.Emissivity( i(false) + 1 ); //i.emissivity;
-    // 					emiss = emiss >  MAX_EMISS ? MAX_EMISS : emiss;
-    // 					jMatrix[i(false) * surfCount + i(false)] = -area * emiss
-    // 						/ (1.0 - emiss);
-    // 					cmTemp -= area / (1.0 - emiss);
-    // 				}else{
-    // 					jMatrix[i(false) * surfCount + j(false)] = 0;
-    // 				}
-    // 				cMatrix[i(false) * surfCount + j(false)] = cmTemp;
-    // 			}
-    // 		}
-
-    // 		int *ipiv = new int[surfCount];
-    // // #ifdef DEBUG_CI
-    // // 		std::cout << "Dumping prelims in CalcScriptF Zone:" << Zone() << std::endl;
-    // // 		std::cout << "jMatrix first." << std::endl;
-    // // 		for(int x = 0; x < Zone.NumOfSurfaces; ++x){
-    // // 			for(int y = 0; y < Zone.NumOfSurfaces; ++y){
-    // // 				std::cout << jMatrix[ x * surfCount + y] << " ";
-    // // 			}
-    // // 			std::cout << std::endl;
-    // // 		}
-    // // 		std::cout << "Now cMatrix." << std::endl;
-    // // 		for(int x = 0; x < Zone.NumOfSurfaces; ++x){
-    // // 			for(int y = 0; y < Zone.NumOfSurfaces; ++y){
-    // // 				std::cout << cMatrix[ x * surfCount + y] << " ";
-    // // 			}
-    // // 			std::cout << std::endl;
-    // // 		}
-
-    // // #endif
-    // 		int result = clapack_dgesv(CblasRowMajor, surfCount, 
-    // 															 surfCount, cMatrix, surfCount, 
-    // 															 ipiv, jMatrix, surfCount);
-    // 		delete[] cMatrix; //made this as early as possible -- it appears that having 8 threads allocate NxN all at once for large zones 
-    // 		//is having an acute impact on system memory
-    // 		delete[] ipiv;
-
-    // 		if( result == 0){ //success
-    // // #ifdef DEBUG_CI
-    // // 			std::cout << "Finished calculating linear system.  Here's the result: " << 
-    // // 				std::endl;
-    // // 			for(int x = 0; x < Zone.NumOfSurfaces; ++x){
-    // // 				for(int y = 0; y < Zone.NumOfSurfaces; ++y){
-    // // 					std::cout << jMatrix[ y * surfCount + x] << " ";
-    // // 				}
-    // // 				std::cout << std::endl;
-    // // 			}
-
-    // // #endif
-    // 			for(auto i: Zone.surfaces){
-    // 				Real64 emiss = Zone.Emissivity( i(false) + 1 );
-    // 				emiss = emiss > MAX_EMISS ? MAX_EMISS : emiss;
-    // 				for(auto j: Zone.surfaces){
-    // 					Real64 temp;
-    // 					if(i(false) != j(false)){
-    // 						//dgesv seems to return transposed matrices!  s/b i * sc + j 
-    // 						temp = emiss / (1.0 - emiss) * jMatrix[j(false) * surfCount + i(false)];
-    // 					}else{
-    // 						temp = emiss / (1.0 - emiss) * (jMatrix[j(false) * surfCount + i(false)]
-    // 																						- emiss);
-    // 					}
-    // 					Zone.ScriptF(i(false) + 1, j(false) + 1) = temp * StefanBoltzmannConst;
-    // 				}
-    // 			}
-    // 		}else{
-    // 			throw badLU();
-    // 		}
-    // 		delete[] jMatrix;
-    // // #ifdef DEBUG_CI
-    // // 		std::cout << "Finished an iteration of CSF.  Here's ScriptF in zone " <<
-    // // 			Zone() << ":" << std::endl;
-    // // 		for(int x = 1; x <= Zone.NumOfSurfaces; ++x){
-    // // 			for(int y = 1; y <= Zone.NumOfSurfaces; ++y){
-    // // 				std::cout << Zone.ScriptF( x, y ) << " ";
-    // // 			}
-    // // 			std::cout << std::endl; 
-    // // 		}
-    // // #endif
-    // //		timer.stopTimer();
-    // 	}
     void
     InitInteriorRadExchange()
     {
@@ -658,10 +511,6 @@ namespace EnergyPlus {
       int NumIterations;
       std::string Option1; //Fstring Option1( MaxNameLength ); // view factor report option
 
-      using EppPerformance::Timer;
-    
-      // static Timer timer(__PRETTY_FUNCTION__);
-      // timer.startTimer();
 
       // FLOW:
 
@@ -682,7 +531,7 @@ namespace EnergyPlus {
       NumZonesWithUserFbyS = GetNumObjectsFound( cCurrentModuleObject );
 
       MaxNumOfZoneSurfaces = 0;
-      LoadBalanceVector.resize(Perf_Thread_Count);
+      LoadBalanceVector.resize(Perf_Thread_Count, 0);
       int totalSurfZoneDensity = 0;
       int totalHTSurfaces = 0;
       for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
@@ -884,8 +733,8 @@ namespace EnergyPlus {
 	    gio::write( OutputFileInits, "(A,',',A,$)" )
 	      << "Script F Factor"
 	      << Surface( ZoneInfo[ ZoneNum - 1 ].SurfacePtr( Findex ) ).Name;
-	    for ( SurfNum = 1; SurfNum <= ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces; ++SurfNum ) { //TODO: This may need to be reinstated?  It causes an unneccessary call to CalcScriptF -- expensive
-	      gio::write( OutputFileInits, "(',',A,$)" ) //TODO: PLUS I don't know if it's initialized now 
+	    for ( SurfNum = 1; SurfNum <= ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces; ++SurfNum ) { 	     
+	      gio::write( OutputFileInits, "(',',A,$)" ) 
 		<< RoundSigDigits( ZoneInfo[ ZoneNum - 1 ].ScriptF( Findex, SurfNum ), 4 );
 	    }
 	    gio::write( OutputFileInits );
@@ -925,56 +774,75 @@ namespace EnergyPlus {
       int tSurfIndexEnd = 0;
       int tSurfIndexBeg = 0;
       int zSurfIndex = 0;
+      int lastSurfCheck = 1;
       threadSurfIterators.resize(Perf_Thread_Count);
       VfSurfaces.resize(totalHTSurfaces);
       //so we're setting the thread surface iterators,
       //the thread zone owners, and the surface
       //data for HBIRE
+
+      //this step is necessary to account for non-zone/ht surfs
+      //in the write HBIRE write collections
+      // for(int gs = 1; gs <= TotSurfaces; ++gs){
+      // 	if( !Surface( gs ).HeatTransSurf ){
+      // 	}
+      // }
       for(int z = 1; z <= NumOfZones; ++ z){
 	ZoneInfo[ z - 1 ].surfBegin = VfSurfaces.begin() + 
 	  zSurfIndex;
 	ZoneInfo[ z - 1 ].setIndex(z - 1);
 	ZoneInfo[ z - 1 ].owner = curThread; //may move this to end of loop for latest thread
-	for(int s = ZoneSpecs[z - 1].SurfaceFirst; 
-	    s <= ZoneSpecs[z - 1].SurfaceLast; 
+	for(int s = ZoneSpecs[ z - 1 ].SurfaceFirst; 
+	    s <= ZoneSpecs[ z - 1 ].SurfaceLast; 
 	    ++s){
-	  if(Surface( s ).HeatTransSurf){
-	    curDensity += ZoneInfo[ z - 1].NumOfSurfaces; 
-	    ++surfCount;
-	    ++tSurfIndexEnd;
-	    if(curDensity > calcsPerT && curThread < Perf_Thread_Count - 1){
-	      LoadBalanceVector[ curThread ] = surfCount;
-	      threadSurfIterators[ curThread ].first = VfSurfaces.begin() + 
-		tSurfIndexBeg;
-	      threadSurfIterators[ curThread ].second = VfSurfaces.begin() + 
-		tSurfIndexEnd;
-	      ++curThread;
-	      surfCount = curDensity = 0;
-	      tSurfIndexBeg = tSurfIndexEnd;
-	    }
-	    VfSurfaces[ tSurfIndexEnd - 1 ].zone =  z - 1;
-	    VfSurfaces[ tSurfIndexEnd - 1 ].globalIndex = s - 1;
-	    // ZoneInfo[ zoneIndex ].index = zoneIndex;
-	    VfSurfaces[ tSurfIndexEnd - 1 ].zoneIndex = zoneIndex++;
-	    VfSurfaces[ tSurfIndexEnd - 1 ].isWindow = ConstrWin[ Construction[ s - 1 ] - 1].TypeIsWindow;
-	    SurfaceRadiantWin[ s - 1 ].shadeChangedCallback = //is it better to store zone and call directly??
-	      //but then that would introduce a source code dependency from DataSurfaces -> DataViewFactorInformation
-	      //ZoneInfo[ z - 1 ].setShadeChanged( s );
-	      std::bind(&ZoneViewFactorInformation::setShadeChanged, 
-			std::ref( ZoneInfo [ z - 1 ] ),
-			s );
-	    ++zSurfIndex;
+	  if( s > lastSurfCheck + 1 ){
+	    LoadBalanceVector[ curThread ] += s - lastSurfCheck;
 	  }
+	  lastSurfCheck = s;
+	  //	  if(Surface( s ).HeatTransSurf){ //	  if( Surface( s ).HeatTransSurf ) curDensity += ZoneInfo[ z - 1].NumOfSurfaces; 
+	  curDensity += ZoneInfo[ z - 1 ].NumOfSurfaces; 
+	  ++surfCount;
+	  ++tSurfIndexEnd;
+	  if(curDensity > calcsPerT && curThread < Perf_Thread_Count - 1){
+	    LoadBalanceVector[ curThread ] += surfCount;
+	    threadSurfIterators[ curThread ].first = VfSurfaces.begin() + 
+	      tSurfIndexBeg;
+	    threadSurfIterators[ curThread ].second = VfSurfaces.begin() + 
+	      tSurfIndexEnd;
+	    ++curThread;
+	    surfCount = curDensity = 0;
+	    tSurfIndexBeg = tSurfIndexEnd;
+	  }
+	  VfSurfaces[ tSurfIndexEnd - 1 ].zone =  z - 1;
+	  VfSurfaces[ tSurfIndexEnd - 1 ].globalIndex = s - 1;
+	  VfSurfaces[ tSurfIndexEnd - 1 ].zoneIndex = zoneIndex++;
+	  VfSurfaces[ tSurfIndexEnd - 1 ].isWindow = ConstrWin[ Construction[ s - 1 ] - 1].TypeIsWindow;
+	  SurfaceRadiantWin[ s - 1 ].shadeChangedCallback = 
+	    std::bind(&ZoneViewFactorInformation::setShadeChanged, 
+		      std::ref( ZoneInfo [ z - 1 ] ),
+		      s );
+	  ++zSurfIndex;
 	}
 	ZoneInfo[ z - 1 ].surfEnd = VfSurfaces.begin() + zSurfIndex;
 	zoneIndex = 0;
-	// ZoneInfo[ z - 1 ].surfaces.zone = ZoneInfo[ z - 1 ];
       }
-      LoadBalanceVector[curThread] = surfCount;
+      LoadBalanceVector[ curThread ] += surfCount;
+      if ( ZoneSpecs[ NumOfZones - 1 ].SurfaceLast < TotSurfaces ){
+	LoadBalanceVector[ curThread ] += TotSurfaces - ZoneSpecs[ NumOfZones - 1 ].SurfaceLast;
+      }
       threadSurfIterators[curThread].first = VfSurfaces.begin() + 
 	tSurfIndexBeg;
       threadSurfIterators[curThread].second = VfSurfaces.begin() + 
 	tSurfIndexEnd;
+      // //kind of hackish, but sometimes there are surfaces that aren't
+      // //included here, and they'll get shaved off of our optimized collections
+      // //without this fix
+      // int lbSurfCount = 0;
+      // std::for_each( LoadBalanceVector.begin(), LoadBalanceVector.end(),
+      // 		     [&lbSurfCount](int v){lbSurfCount += v;});
+      // if( lbSurfCount < DataSurfaces::TotSurfaces ){
+      // 	LoadBalanceVector[ curThread ] += DataSurfaces::TotSurfaces - lbSurfCount;
+      // }
 		
       //this is an optimizing step -- its best for the thread that hits the zone 
       //first to do the pre-calcs (i.e. surface temp ^4 + calcScriptF) -- this 
@@ -982,39 +850,15 @@ namespace EnergyPlus {
       //that hits first will calc (there can be multiple but only one will be the owner)
       // for(int t = 0; t < Perf_Thread_Count; ++t){
       for( int t = Perf_Thread_Count - 1; t >= 0; --t ){
-	ZoneInfo[ (*threadSurfIterators[ t ].first).zone ].owner = t;
+	ZoneInfo[ ( *threadSurfIterators[ t ].first ).zone ].owner = t;
       }
 
       DataSurfaces::IRfromParentZone.optimize( LoadBalanceVector );
       DataHeatBalSurface::NetLWRadToSurf.optimize( LoadBalanceVector );
 
-      // for(auto vect: WriteVectors){
-      // 	if(!vect->isOptimized()){
-      // 		vect->optimize(LoadBalanceVector);
-      // 	}
-      // }
-      // int thread = 0;
-      // int firstSurf = 0;
-      // int zone = 0;
-      // std::cout << "looking at surface distribution and zone ownership (are they optimal?)" << std::endl;
-      // for(auto ts: LoadBalanceVector){
-      // 	std::cout << "thread: " << thread++ << " surfaces: " << ts <<
-      // 		" first surf: " << firstSurf << " last surf: " << (firstSurf + ts) - 1 << std::endl;
-      // 	firstSurf += ts;
-      // }
-      // for(auto zone: ZoneInfo){
-      // 	std::cout << "zone : " << zone() << " owner: " << zone.owner
-      // 						<< " firstSurf: " << (*zone.surfBegin)()
-      // 						<< " lastSurf: " << (*zone.surfEnd)() << std::endl;
-      // }
-      // for ( ZoneNum = 1; ZoneNum <= Numofzones; ++ZoneNum ) {
-      // 	CalcScriptF( ZoneInfo[ ZoneNum - 1 ]); //this is from the commented out version above in this function -- it was only used for a report (also commented out above in this func)
-      // }
-
       if ( ErrorsFound ) {
 	ShowFatalError( "InitInteriorRadExchange: Errors found during initialization of radiant exchange.  Program terminated." );
       }
-      //		timer.stopTimer();
     }
 
     void

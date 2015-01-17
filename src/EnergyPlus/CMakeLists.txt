@@ -19,6 +19,8 @@ SET( SRC
   AirflowNetworkBalanceManager.hh
   AirflowNetworkSolver.cc
   AirflowNetworkSolver.hh
+  AnalyzeHardware.cc
+  AnalyzeHardware.hh
   BaseboardElectric.cc
   BaseboardElectric.hh
   BaseboardRadiator.cc
@@ -325,6 +327,8 @@ SET( SRC_2
   MoistureBalanceEMPDManager.hh
   MundtSimMgr.cc
   MundtSimMgr.hh
+  NanoTimers.cc
+  NanoTimers.hh
   NodeInputManager.cc
   NodeInputManager.hh
   NonZoneEquipmentManager.cc
@@ -347,8 +351,6 @@ SET( SRC_2
   PackagedTerminalHeatPump.hh
   PackagedThermalStorageCoil.cc
   PackagedThermalStorageCoil.hh
-	perTArray.cc
-	perTArray.hh
   PhotovoltaicThermalCollectors.cc
   PhotovoltaicThermalCollectors.hh
   Photovoltaics.cc
@@ -473,8 +475,8 @@ SET( SRC_2
   ThermalEN673Calc.hh
   ThermalISO15099Calc.cc
   ThermalISO15099Calc.hh
-	timers.cc
-	timers.hh
+  ThreadArray.cc
+  ThreadArray.hh
   TranspiredCollector.cc
   TranspiredCollector.hh
   UFADManager.cc
@@ -487,8 +489,6 @@ SET( SRC_2
   UserDefinedComponents.hh
   UtilityRoutines.cc
   UtilityRoutines.hh
-	utility.cc
-	utility.hh
   VariableSpeedCoils.cc
   VariableSpeedCoils.hh
   Vectors.cc
@@ -541,7 +541,7 @@ endif()
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( EnergyPlusLib STATIC ${SRC} )
-target_link_libraries( EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport DElight lapack_atlas rt )
+target_link_libraries( EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport DElight )
 if(UNIX AND NOT APPLE)
   target_link_libraries( EnergyPlusLib dl )
 endif()

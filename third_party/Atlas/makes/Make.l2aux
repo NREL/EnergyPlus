@@ -1,4 +1,0 @@
-slib :
-dlib :
-clib :
-zlib :

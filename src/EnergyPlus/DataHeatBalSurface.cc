@@ -2,7 +2,7 @@
 #include <DataHeatBalSurface.hh>
 #include <DataPrecisionGlobals.hh>
 
-#include <perTArray.hh>
+#include <ThreadArray.hh>
 
 namespace EnergyPlus {
 

@@ -32,9 +32,8 @@ namespace DataViewFactorInformation {
 
   struct ReSurface {
   public:
-    ReSurface(): zone( 0 ), temperature( 23.0 ),
-								 emissivity( 0 ), isWindow( false ), globalIndex( 0 ), 
-								 zoneIndex( 0 ){}
+    ReSurface(): zone( -1 ), temperature( 23.0 ),								 emissivity( 0 ), isWindow( false ), globalIndex( 0 ), 
+		 zoneIndex( 0 ){} //isHTSurf( false ),  zoneIndex( 0 ){}
     int zone; //compiles with &&, but chokes on it running at InitInteriorRadExchange assigning zone
     inline const int&
     operator ()( bool global = true ){ return global ? globalIndex : zoneIndex;}
@@ -43,6 +42,7 @@ namespace DataViewFactorInformation {
     bool isWindow;
     int globalIndex;
     int zoneIndex;
+    //    bool IsHTSurf;
   };
 
 	struct ZoneViewFactorInformation

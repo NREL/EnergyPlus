@@ -17,7 +17,7 @@
 #include <DataViewFactorInformation.hh>
 
 //Speedup Helpers
-#include <perTArray.hh>
+#include <ThreadArray.hh>
 
 namespace EnergyPlus {
 

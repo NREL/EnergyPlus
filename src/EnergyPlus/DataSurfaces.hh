@@ -18,7 +18,7 @@
 
 
 // SpeedupHelpers
-#include <perTArray.hh>
+#include <ThreadArray.hh>
 
 namespace EnergyPlus {
 
