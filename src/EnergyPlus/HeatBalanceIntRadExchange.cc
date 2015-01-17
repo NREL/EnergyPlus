@@ -123,7 +123,6 @@ namespace EnergyPlus {
       }
     }
 
-#include <iostream>
     void
     DoCalcInteriorRadExchange(const int SurfIterations, 
 			      const int ZoneToResimulate,
@@ -176,8 +175,6 @@ namespace EnergyPlus {
 	}
 	*irpz = tIR;
 	*lwr = tLWR;
-	// DataSurfaces::IRfromParentZone[ recv() ] = tIR;
-	// DataHeatBalSurface::NetLWRadToSurf[ recv() ] = tLWR;
 	tIR = tLWR = 0;
       }
     }
