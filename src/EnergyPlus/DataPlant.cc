@@ -348,7 +348,7 @@ namespace DataPlant {
 	int TotNumHalfLoops( 0 ); // number of half loops (2 * TotNumLoops)
 	bool PlantFirstSizeCompleted( false );
 	bool PlantFirstSizesOkayToFinalize( false ); // true if plant sizing is finishing and can save results
-	bool PlantReSizingNotComplete( false );
+	bool PlantReSizingCompleted( false );
 	bool PlantSizesOkayToReport( false );
 	bool AnyEMSPlantOpSchemesInModel( false );
 

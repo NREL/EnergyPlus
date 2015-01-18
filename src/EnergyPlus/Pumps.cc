@@ -371,8 +371,14 @@ namespace Pumps {
 			}
 
 			PumpEquip( PumpNum ).NomVolFlowRate = rNumericArgs( 1 );
+			if ( PumpEquip( PumpNum ).NomVolFlowRate ==  AutoSize ) {
+				PumpEquip( PumpNum ).NomVolFlowRateWasAutoSized = true;
+			}
 			PumpEquip( PumpNum ).NomPumpHead = rNumericArgs( 2 );
 			PumpEquip( PumpNum ).NomPowerUse = rNumericArgs( 3 );
+			if (PumpEquip( PumpNum ).NomPowerUse == AutoSize ) {
+				PumpEquip( PumpNum ).NomPowerUseWasAutoSized = true;
+			}
 			PumpEquip( PumpNum ).MotorEffic = rNumericArgs( 4 );
 			PumpEquip( PumpNum ).FracMotorLossToFluid = rNumericArgs( 5 );
 			PumpEquip( PumpNum ).PartLoadCoef( 1 ) = rNumericArgs( 6 );
@@ -490,8 +496,14 @@ namespace Pumps {
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Water Nodes" );
 
 			PumpEquip( PumpNum ).NomVolFlowRate = rNumericArgs( 1 );
+			if ( PumpEquip( PumpNum ).NomVolFlowRate ==  AutoSize ) {
+				PumpEquip( PumpNum ).NomVolFlowRateWasAutoSized = true;
+			}
 			PumpEquip( PumpNum ).NomPumpHead = rNumericArgs( 2 );
 			PumpEquip( PumpNum ).NomPowerUse = rNumericArgs( 3 );
+			if (PumpEquip( PumpNum ).NomPowerUse == AutoSize ) {
+				PumpEquip( PumpNum ).NomPowerUseWasAutoSized = true;
+			}
 			PumpEquip( PumpNum ).MotorEffic = rNumericArgs( 4 );
 			PumpEquip( PumpNum ).FracMotorLossToFluid = rNumericArgs( 5 );
 			PumpEquip( PumpNum ).PartLoadCoef( 1 ) = 1.0;
@@ -626,6 +638,7 @@ namespace Pumps {
 
 			if ( PumpEquip( PumpNum ).NomSteamVolFlowRate == AutoSize ) {
 				PumpEquip( PumpNum ).NomVolFlowRate = AutoSize;
+				PumpEquip( PumpNum ).NomVolFlowRateWasAutoSized = true;
 			} else {
 				// Calc Condensate Pump Water Volume Flow Rate
 				SteamDensity = GetSatDensityRefrig( fluidNameSteam, StartTemp, 1.0, PumpEquip( PumpNum ).FluidIndex, RoutineNameNoColon );
@@ -689,9 +702,15 @@ namespace Pumps {
 			}
 
 			PumpEquip( PumpNum ).NomVolFlowRate = rNumericArgs( 1 );
+			if ( PumpEquip( PumpNum ).NomVolFlowRate ==  AutoSize ) {
+				PumpEquip( PumpNum ).NomVolFlowRateWasAutoSized = true;
+			}
 			PumpEquip( PumpNum ).NumPumpsInBank = rNumericArgs( 2 );
 			PumpEquip( PumpNum ).NomPumpHead = rNumericArgs( 3 );
 			PumpEquip( PumpNum ).NomPowerUse = rNumericArgs( 4 );
+			if (PumpEquip( PumpNum ).NomPowerUse == AutoSize ) {
+				PumpEquip( PumpNum ).NomPowerUseWasAutoSized = true;
+			}
 			PumpEquip( PumpNum ).MotorEffic = rNumericArgs( 5 );
 			PumpEquip( PumpNum ).FracMotorLossToFluid = rNumericArgs( 6 );
 			PumpEquip( PumpNum ).PartLoadCoef( 1 ) = rNumericArgs( 7 );
@@ -771,9 +790,15 @@ namespace Pumps {
 			}
 
 			PumpEquip( PumpNum ).NomVolFlowRate = rNumericArgs( 1 );
+			if ( PumpEquip( PumpNum ).NomVolFlowRate ==  AutoSize ) {
+				PumpEquip( PumpNum ).NomVolFlowRateWasAutoSized = true;
+			}
 			PumpEquip( PumpNum ).NumPumpsInBank = rNumericArgs( 2 );
 			PumpEquip( PumpNum ).NomPumpHead = rNumericArgs( 3 );
 			PumpEquip( PumpNum ).NomPowerUse = rNumericArgs( 4 );
+			if (PumpEquip( PumpNum ).NomPowerUse == AutoSize ) {
+				PumpEquip( PumpNum ).NomPowerUseWasAutoSized = true;
+			}
 			PumpEquip( PumpNum ).MotorEffic = rNumericArgs( 5 );
 			PumpEquip( PumpNum ).FracMotorLossToFluid = rNumericArgs( 6 );
 			PumpEquip( PumpNum ).PartLoadCoef( 1 ) = 1.0;
@@ -892,6 +917,8 @@ namespace Pumps {
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
 		using DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
+		using DataPlant::PlantReSizingCompleted;
+		using DataGlobals::RedoSizesHVACSimulation;
 		using FluidProperties::GetSatDensityRefrig;
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::InitComponentNodes;
@@ -991,6 +1018,12 @@ namespace Pumps {
 
 			PumpEquip( PumpNum ).PumpOneTimeFlag = false;
 		}
+
+		//HVAC Sizing Simulation resizing calls if needed
+		if ( RedoSizesHVACSimulation && ! PlantReSizingCompleted ) {
+			SizePump( PumpNum );
+		}
+
 
 		// Begin environment inits
 		//DSU? Still need to clean this up and update condensate pump stuff -
@@ -1529,6 +1562,7 @@ namespace Pumps {
 		using DataSizing::AutoSize;
 		using DataSizing::PlantSizData;
 		using DataPlant::PlantLoop;
+		using DataPlant::PlantSizesOkayToReport;
 		using General::RoundSigDigits;
 		using ReportSizingManager::ReportSizingOutput;
 		using FluidProperties::GetSatDensityRefrig;
@@ -1599,7 +1633,7 @@ namespace Pumps {
 			SideLoop_exit: ;
 		}
 
-		if ( PumpEquip( PumpNum ).NomVolFlowRate == AutoSize ) {
+		if ( PumpEquip( PumpNum ).NomVolFlowRateWasAutoSized ) {
 
 			if ( PlantSizNum > 0 ) {
 				if ( PlantSizData( PlantSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
@@ -1627,28 +1661,37 @@ namespace Pumps {
 					}
 
 				} else {
-					PumpEquip( PumpNum ).NomVolFlowRate = 0.0;
-					ShowWarningError( "SizePump: Calculated Pump Nominal Volume Flow Rate=[" + RoundSigDigits( PlantSizData( PlantSizNum ).DesVolFlowRate, 2 ) + "] is too small. Set to 0.0" );
-					ShowContinueError( "..occurs for Pump=" + PumpEquip( PumpNum ).Name );
+					if (PlantSizesOkayToReport) {
+						PumpEquip( PumpNum ).NomVolFlowRate = 0.0;
+						ShowWarningError( "SizePump: Calculated Pump Nominal Volume Flow Rate=[" + RoundSigDigits( PlantSizData( PlantSizNum ).DesVolFlowRate, 2 ) + "] is too small. Set to 0.0" );
+						ShowContinueError( "..occurs for Pump=" + PumpEquip( PumpNum ).Name );
+					}
 				}
-				ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name, "Rated Flow Rate [m3/s]", PumpEquip( PumpNum ).NomVolFlowRate );
+				if (PlantSizesOkayToReport) {
+					ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name, "Rated Flow Rate [m3/s]", PumpEquip( PumpNum ).NomVolFlowRate );
+				}
 			} else {
-				ShowSevereError( "Autosizing of plant loop pump flow rate requires a loop Sizing:Plant object" );
-				ShowContinueError( "Occurs in plant pump object=" + PumpEquip( PumpNum ).Name );
-				ErrorsFound = true;
+				if (PlantSizesOkayToReport) {
+					ShowSevereError( "Autosizing of plant loop pump flow rate requires a loop Sizing:Plant object" );
+					ShowContinueError( "Occurs in plant pump object=" + PumpEquip( PumpNum ).Name );
+					ErrorsFound = true;
+				}
 			}
 
 		}
 
 		// Note that autocalculation of power is based on nominal volume flow, regardless of whether the flow was
 		//  auto sized or manually sized.  Thus, this must go after the flow sizing block above.
-		if ( PumpEquip( PumpNum ).NomPowerUse == AutoSize ) {
+		if ( PumpEquip( PumpNum ).NomPowerUseWasAutoSized ) {
 			if ( PumpEquip( PumpNum ).NomVolFlowRate >= SmallWaterVolFlow ) {
 				PumpEquip( PumpNum ).NomPowerUse = ( PumpEquip( PumpNum ).NomPumpHead * PumpEquip( PumpNum ).NomVolFlowRate ) / TotalEffic;
 			} else {
 				PumpEquip( PumpNum ).NomPowerUse = 0.0;
 			}
-			ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name, "Rated Power Consumption [W]", PumpEquip( PumpNum ).NomPowerUse );
+			if ( PlantSizesOkayToReport ) {
+				ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name, "Rated Power Consumption [W]", PumpEquip( PumpNum ).NomPowerUse );
+			}
+
 		}
 
 		if ( ErrorsFound ) {

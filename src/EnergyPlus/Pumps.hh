@@ -152,6 +152,7 @@ namespace Pumps {
 		int PowerErrIndex2; // for recurring errors
 		Real64 MinVolFlowRateFrac; // minimum schedule value fraction modifier
 		Real64 NomVolFlowRate; // design nominal capacity of Pump
+		bool NomVolFlowRateWasAutoSized; //true if previous was autosize on input
 		Real64 MassFlowRateMax; // design nominal capacity of Pump
 		bool EMSMassFlowOverrideOn; // if true, then EMS is calling to override flow requests.
 		Real64 EMSMassFlowValue; // EMS value to use for mass flow rate [kg/s]
@@ -162,6 +163,7 @@ namespace Pumps {
 		bool EMSPressureOverrideOn; // if true, EMS is calling to override pump pressure
 		Real64 EMSPressureOverrideValue; // EMS value to use for pressure [Pa]
 		Real64 NomPowerUse; // design nominal capacity of Pump
+		bool NomPowerUseWasAutoSized; //true if power was autosize on input
 		Real64 MotorEffic; // efficiency of the motor
 		Real64 PumpEffic; // efficiency of the pump
 		Real64 FracMotorLossToFluid; // ?????
@@ -206,6 +208,7 @@ namespace Pumps {
 			PowerErrIndex2( 0 ),
 			MinVolFlowRateFrac( 0.0 ),
 			NomVolFlowRate( 0.0 ),
+			NomVolFlowRateWasAutoSized( false ),
 			MassFlowRateMax( 0.0 ),
 			EMSMassFlowOverrideOn( false ),
 			EMSMassFlowValue( 0.0 ),
@@ -216,6 +219,7 @@ namespace Pumps {
 			EMSPressureOverrideOn( false ),
 			EMSPressureOverrideValue( 0.0 ),
 			NomPowerUse( 0.0 ),
+			NomPowerUseWasAutoSized( false ),
 			MotorEffic( 0.0 ),
 			PumpEffic( 0.0 ),
 			FracMotorLossToFluid( 0.0 ),
@@ -263,6 +267,7 @@ namespace Pumps {
 			int const PowerErrIndex2, // for recurring errors
 			Real64 const MinVolFlowRateFrac, // minimum schedule value fraction modifier
 			Real64 const NomVolFlowRate, // design nominal capacity of Pump
+			bool const NomVolFlowRateWasAutoSized, //true if nom vol flow rate was autosize
 			Real64 const MassFlowRateMax, // design nominal capacity of Pump
 			bool const EMSMassFlowOverrideOn, // if true, then EMS is calling to override flow requests.
 			Real64 const EMSMassFlowValue, // EMS value to use for mass flow rate [kg/s]
@@ -273,6 +278,7 @@ namespace Pumps {
 			bool const EMSPressureOverrideOn, // if true, EMS is calling to override pump pressure
 			Real64 const EMSPressureOverrideValue, // EMS value to use for pressure [Pa]
 			Real64 const NomPowerUse, // design nominal capacity of Pump
+			bool const NomPowerUseWasAutoSized, // true if previous is autosize on input
 			Real64 const MotorEffic, // efficiency of the motor
 			Real64 const PumpEffic, // efficiency of the pump
 			Real64 const FracMotorLossToFluid, // ?????
@@ -318,6 +324,7 @@ namespace Pumps {
 			PowerErrIndex2( PowerErrIndex2 ),
 			MinVolFlowRateFrac( MinVolFlowRateFrac ),
 			NomVolFlowRate( NomVolFlowRate ),
+			NomVolFlowRateWasAutoSized( NomVolFlowRateWasAutoSized ),
 			MassFlowRateMax( MassFlowRateMax ),
 			EMSMassFlowOverrideOn( EMSMassFlowOverrideOn ),
 			EMSMassFlowValue( EMSMassFlowValue ),
@@ -328,6 +335,7 @@ namespace Pumps {
 			EMSPressureOverrideOn( EMSPressureOverrideOn ),
 			EMSPressureOverrideValue( EMSPressureOverrideValue ),
 			NomPowerUse( NomPowerUse ),
+			NomPowerUseWasAutoSized( NomPowerUseWasAutoSized ),
 			MotorEffic( MotorEffic ),
 			PumpEffic( PumpEffic ),
 			FracMotorLossToFluid( FracMotorLossToFluid ),

@@ -98,6 +98,7 @@ namespace PlantChillers {
 		std::string Name; // user identifier
 		int CondenserType; // Type of Condenser - Air or Water Cooled
 		Real64 NomCap; // design nominal capacity of chiller
+		bool NomCapWasAutoSized; // true if NomCap was autosize on input
 		Real64 COP; // COP
 		int FlowMode; // one of 3 modes for componet flow during operation
 		bool ModulatedFlowSetToLoop; // True if the setpoint is missing at the outlet node
@@ -108,8 +109,10 @@ namespace PlantChillers {
 		int CondInletNodeNum; // Node number on the inlet side of the condenser
 		int CondOutletNodeNum; // Node number on the outlet side of the condenser
 		Real64 EvapVolFlowRate; // m**3/s - design nominal water volumetric flow rate through the evaporator
+		bool EvapVolFlowRateWasAutoSized; //true if autosized design evap flow rate on input
 		Real64 EvapMassFlowRateMax; // kg/s - design water mass flow rate through evaporator
 		Real64 CondVolFlowRate; // m**3/s - design nominal water volumetric flow rate through the condenser
+		bool CondVolFlowRateWasAutoSized; // true if previous was autosized
 		Real64 CondMassFlowRateMax; // kg/s - design water mass flow rate through condenser
 		int CWLoopNum; // chilled water plant loop index number
 		int CWLoopSideNum; // chilled water plant loop side index
@@ -139,6 +142,7 @@ namespace PlantChillers {
 		BaseChillerSpecs() :
 			CondenserType( 0 ),
 			NomCap( 0.0 ),
+			NomCapWasAutoSized( false ),
 			COP( 0.0 ),
 			FlowMode( FlowModeNotSet ),
 			ModulatedFlowSetToLoop( false ),
@@ -149,8 +153,10 @@ namespace PlantChillers {
 			CondInletNodeNum( 0 ),
 			CondOutletNodeNum( 0 ),
 			EvapVolFlowRate( 0.0 ),
+			EvapVolFlowRateWasAutoSized( false ),
 			EvapMassFlowRateMax( 0.0 ),
 			CondVolFlowRate( 0.0 ),
+			CondVolFlowRateWasAutoSized( false ),
 			CondMassFlowRateMax( 0.0 ),
 			CWLoopNum( 0 ),
 			CWLoopSideNum( 0 ),
@@ -180,6 +186,7 @@ namespace PlantChillers {
 			std::string const & Name, // user identifier
 			int const CondenserType, // Type of Condenser - Air or Water Cooled
 			Real64 const NomCap, // design nominal capacity of chiller
+			bool const NomCapWasAutosized, //true if NomCap was input as autosize
 			Real64 const COP, // COP
 			int const FlowMode, // one of 3 modes for componet flow during operation
 			bool const ModulatedFlowSetToLoop, // True if the setpoint is missing at the outlet node
@@ -190,8 +197,10 @@ namespace PlantChillers {
 			int const CondInletNodeNum, // Node number on the inlet side of the condenser
 			int const CondOutletNodeNum, // Node number on the outlet side of the condenser
 			Real64 const EvapVolFlowRate, // m**3/s - design nominal water volumetric flow rate through the evaporator
+			bool const EvapVolFlowRateWasAutoSized, // true if previous was autosize on input
 			Real64 const EvapMassFlowRateMax, // kg/s - design water mass flow rate through evaporator
 			Real64 const CondVolFlowRate, // m**3/s - design nominal water volumetric flow rate through the condenser
+			bool const CondVolFlowRateWasAutoSized, // true if previous was autosized on input
 			Real64 const CondMassFlowRateMax, // kg/s - design water mass flow rate through condenser
 			int const CWLoopNum, // chilled water plant loop index number
 			int const CWLoopSideNum, // chilled water plant loop side index
@@ -220,6 +229,7 @@ namespace PlantChillers {
 			Name( Name ),
 			CondenserType( CondenserType ),
 			NomCap( NomCap ),
+			NomCapWasAutoSized( NomCapWasAutosized ),
 			COP( COP ),
 			FlowMode( FlowMode ),
 			ModulatedFlowSetToLoop( ModulatedFlowSetToLoop ),
@@ -230,8 +240,10 @@ namespace PlantChillers {
 			CondInletNodeNum( CondInletNodeNum ),
 			CondOutletNodeNum( CondOutletNodeNum ),
 			EvapVolFlowRate( EvapVolFlowRate ),
+			EvapVolFlowRateWasAutoSized( EvapVolFlowRateWasAutoSized ),
 			EvapMassFlowRateMax( EvapMassFlowRateMax ),
 			CondVolFlowRate( CondVolFlowRate ),
+			CondVolFlowRateWasAutoSized( CondVolFlowRateWasAutoSized ),
 			CondMassFlowRateMax( CondMassFlowRateMax ),
 			CWLoopNum( CWLoopNum ),
 			CWLoopSideNum( CWLoopSideNum ),
@@ -277,6 +289,7 @@ namespace PlantChillers {
 		FArray1D< Real64 > FullLoadCoef; // (Electric RPWRC() ) coeff of full load poly. fit
 		Real64 TempLowLimitEvapOut; // C - low temperature shut off
 		Real64 DesignHeatRecVolFlowRate; // m3/s, Design Water mass flow rate through heat recovery loop
+		bool DesignHeatRecVolFlowRateWasAutoSized; // true if previous was input autosize.
 		Real64 DesignHeatRecMassFlowRate; // kg/s, Design Water mass flow rate through heat recovery loop
 		bool HeatRecActive; // True entered Heat Rec Vol Flow Rate >0
 		int HeatRecInletNodeNum; // Node number on the heat recovery inlet side of the condenser
@@ -304,6 +317,7 @@ namespace PlantChillers {
 			FullLoadCoef( 3, 0.0 ),
 			TempLowLimitEvapOut( 0.0 ),
 			DesignHeatRecVolFlowRate( 0.0 ),
+			DesignHeatRecVolFlowRateWasAutoSized( false ),
 			DesignHeatRecMassFlowRate( 0.0 ),
 			HeatRecActive( false ),
 			HeatRecInletNodeNum( 0 ),
@@ -333,6 +347,7 @@ namespace PlantChillers {
 			FArray1< Real64 > const & FullLoadCoef, // (Electric RPWRC() ) coeff of full load poly. fit
 			Real64 const TempLowLimitEvapOut, // C - low temperature shut off
 			Real64 const DesignHeatRecVolFlowRate, // m3/s, Design Water mass flow rate through heat recovery loop
+			bool const DesignHeatRecVolFlowRateWasAutoSized, // true if previous input was autosize
 			Real64 const DesignHeatRecMassFlowRate, // kg/s, Design Water mass flow rate through heat recovery loop
 			bool const HeatRecActive, // True entered Heat Rec Vol Flow Rate >0
 			int const HeatRecInletNodeNum, // Node number on the heat recovery inlet side of the condenser
@@ -359,6 +374,7 @@ namespace PlantChillers {
 			FullLoadCoef( 3, FullLoadCoef ),
 			TempLowLimitEvapOut( TempLowLimitEvapOut ),
 			DesignHeatRecVolFlowRate( DesignHeatRecVolFlowRate ),
+			DesignHeatRecVolFlowRateWasAutoSized( DesignHeatRecVolFlowRateWasAutoSized ),
 			DesignHeatRecMassFlowRate( DesignHeatRecMassFlowRate ),
 			HeatRecActive( HeatRecActive ),
 			HeatRecInletNodeNum( HeatRecInletNodeNum ),

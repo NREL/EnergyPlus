@@ -257,9 +257,9 @@ namespace PlantChillers {
 			if ( InitLoopEquip ) {
 				TempEvapOutDesign = ElectricChiller( ChillNum ).TempDesEvapOut;
 				TempCondInDesign = ElectricChiller( ChillNum ).TempDesCondIn;
-				ElectricChiller( ChillNum ).IsThisSized = false;
+//				ElectricChiller( ChillNum ).IsThisSized = false;
 				InitElectricChiller( ChillNum, RunFlag, MyLoad );
-				ElectricChiller( ChillNum ).IsThisSized = true;
+//				ElectricChiller( ChillNum ).IsThisSized = true;
 				SizeElectricChiller( ChillNum );
 				if ( LoopNum == ElectricChiller( ChillNum ).Base.CWLoopNum ) { // chilled water loop
 					MinCap = ElectricChiller( ChillNum ).Base.NomCap * ElectricChiller( ChillNum ).MinPartLoadRat;
@@ -568,6 +568,9 @@ namespace PlantChillers {
 			}
 
 			ElectricChiller( ChillerNum ).Base.NomCap = rNumericArgs( 1 );
+			if ( ElectricChiller( ChillerNum ).Base.NomCap == AutoSize ) {
+				ElectricChiller( ChillerNum ).Base.NomCapWasAutoSized = true;
+			}
 			if ( rNumericArgs( 1 ) == 0.0 ) {
 				ShowSevereError( "Invalid " + cNumericFieldNames( 1 ) + '=' + RoundSigDigits( rNumericArgs( 1 ), 2 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -647,7 +650,15 @@ namespace PlantChillers {
 			ElectricChiller( ChillerNum ).TempRiseCoef = rNumericArgs( 7 );
 			ElectricChiller( ChillerNum ).TempDesEvapOut = rNumericArgs( 8 );
 			ElectricChiller( ChillerNum ).Base.EvapVolFlowRate = rNumericArgs( 9 );
+			if ( ElectricChiller( ChillerNum ).Base.EvapVolFlowRate == AutoSize ) {
+				ElectricChiller( ChillerNum ).Base.EvapVolFlowRateWasAutoSized = true;
+			}
 			ElectricChiller( ChillerNum ).Base.CondVolFlowRate = rNumericArgs( 10 );
+			if ( ElectricChiller( ChillerNum ).Base.CondVolFlowRate == AutoSize ) {
+				if ( ElectricChiller( ChillerNum ).Base.CondenserType == WaterCooled  ) {
+					ElectricChiller( ChillerNum ).Base.CondVolFlowRateWasAutoSized = true;
+				}
+			}
 			ElectricChiller( ChillerNum ).CapRatCoef( 1 ) = rNumericArgs( 11 );
 			ElectricChiller( ChillerNum ).CapRatCoef( 2 ) = rNumericArgs( 12 );
 			ElectricChiller( ChillerNum ).CapRatCoef( 3 ) = rNumericArgs( 13 );
@@ -687,6 +698,10 @@ namespace PlantChillers {
 
 			// These are the Heat Recovery Inputs
 			ElectricChiller( ChillerNum ).DesignHeatRecVolFlowRate = rNumericArgs( 21 );
+			if ( ElectricChiller( ChillerNum ).DesignHeatRecVolFlowRate == AutoSize ) {
+				ElectricChiller( ChillerNum ).DesignHeatRecVolFlowRateWasAutoSized = true;
+			}
+
 			if ( ( ElectricChiller( ChillerNum ).DesignHeatRecVolFlowRate > 0.0 ) || ( ElectricChiller( ChillerNum ).DesignHeatRecVolFlowRate == AutoSize ) ) {
 				ElectricChiller( ChillerNum ).HeatRecActive = true;
 				ElectricChiller( ChillerNum ).HeatRecInletNodeNum = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
@@ -2096,7 +2111,7 @@ namespace PlantChillers {
 		}
 
 		if ( MyEnvrnFlag( ChillNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
-			if ( ! PlantFirstSizeCompleted ) SizeElectricChiller( ChillNum );
+//			if ( ! PlantFirstSizeCompleted ) SizeElectricChiller( ChillNum );
 			rho = GetDensityGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
 
 			ElectricChiller( ChillNum ).Base.EvapMassFlowRateMax = rho * ElectricChiller( ChillNum ).Base.EvapVolFlowRate;
@@ -2952,6 +2967,7 @@ namespace PlantChillers {
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantSizesOkayToReport;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
@@ -3010,28 +3026,27 @@ namespace PlantChillers {
 
 		PltSizNum = PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).PlantSizNum;
 
-		if ( ElectricChiller( ChillNum ).Base.NomCap == AutoSize ) {
-			IsAutoSize = true;
-		}
+
+
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				rho = GetDensityGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
 				Cp = GetSpecificHeatGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate * ElectricChiller( ChillNum ).Base.SizFac;
-				if ( ! IsAutoSize ) tmpNomCap = ElectricChiller( ChillNum ).Base.NomCap;
+				if ( ! ElectricChiller( ChillNum ).Base.NomCapWasAutoSized ) tmpNomCap = ElectricChiller( ChillNum ).Base.NomCap;
 			} else {
-				if ( IsAutoSize ) tmpNomCap = 0.0;
+				if ( ElectricChiller( ChillNum ).Base.NomCapWasAutoSized ) tmpNomCap = 0.0;
 			} 
 			if ( PlantFirstSizesOkayToFinalize ) {
-				if ( IsAutoSize ) {
+				if ( ElectricChiller( ChillNum ).Base.NomCapWasAutoSized ) {
 					ElectricChiller( ChillNum ).Base.NomCap = tmpNomCap;
-					if ( ! ElectricChiller( ChillNum ).Base.IsThisSized ) {
+					if ( PlantSizesOkayToReport ) {
 						ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "Design Size Nominal Capacity [W]", tmpNomCap );
 					}
 				} else {
 					if ( ElectricChiller( ChillNum ).Base.NomCap > 0.0 && tmpNomCap > 0.0 ) {
 						NomCapUser = ElectricChiller( ChillNum ).Base.NomCap;
-						if ( ! ElectricChiller( ChillNum ).Base.IsThisSized ) {
+						if ( PlantSizesOkayToReport ) {
 							ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "Design Size Nominal Capacity [W]", tmpNomCap, "User-Specified Nominal Capacity [W]", NomCapUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpNomCap - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
@@ -3048,12 +3063,12 @@ namespace PlantChillers {
 				}
 			}
 		} else {
-			if ( IsAutoSize ) {
+			if ( ElectricChiller( ChillNum ).Base.NomCapWasAutoSized && PlantSizesOkayToReport ) {
 				ShowSevereError( "Autosizing of Electric Chiller nominal capacity requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Electric Chiller object=" + ElectricChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
 			} else {
-				if ( ! ElectricChiller( ChillNum ).Base.IsThisSized ) {
+				if ( PlantSizesOkayToReport ) {
 					if ( ElectricChiller( ChillNum ).Base.NomCap > 0.0 ) {
 						ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "User-Specified Nominal Capacity [W]", ElectricChiller( ChillNum ).Base.NomCap );
 					}
@@ -3061,27 +3076,23 @@ namespace PlantChillers {
 			}
 		}
 
-		IsAutoSize = false;
-		if ( ElectricChiller( ChillNum ).Base.EvapVolFlowRate == AutoSize ) {
-			IsAutoSize = true;
-		}
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				tmpEvapVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate * ElectricChiller( ChillNum ).Base.SizFac;
-				if ( ! IsAutoSize ) tmpEvapVolFlowRate = ElectricChiller( ChillNum ).Base.EvapVolFlowRate;
+				if ( !  ElectricChiller( ChillNum ).Base.EvapVolFlowRateWasAutoSized ) tmpEvapVolFlowRate = ElectricChiller( ChillNum ).Base.EvapVolFlowRate;
 			} else {
-				if ( IsAutoSize ) tmpEvapVolFlowRate = 0.0;
+				if (  ElectricChiller( ChillNum ).Base.EvapVolFlowRateWasAutoSized ) tmpEvapVolFlowRate = 0.0;
 			}
 			if ( PlantFirstSizesOkayToFinalize ) {
-				if ( IsAutoSize ) {
+				if (  ElectricChiller( ChillNum ).Base.EvapVolFlowRateWasAutoSized ) {
 					ElectricChiller( ChillNum ).Base.EvapVolFlowRate = tmpEvapVolFlowRate;
-					if ( ! ElectricChiller( ChillNum ).Base.IsThisSized ) {
+					if ( PlantSizesOkayToReport) {
 						ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate );
 					}
 				} else {
 					if ( ElectricChiller( ChillNum ).Base.EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0 ) {
 						EvapVolFlowRateUser = ElectricChiller( ChillNum ).Base.EvapVolFlowRate;
-						if ( ! ElectricChiller( ChillNum ).Base.IsThisSized ) {
+						if ( PlantSizesOkayToReport ) {
 							ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate, "User-Specified Design Chilled Water Flow Rate [m3/s]", EvapVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpEvapVolFlowRate - EvapVolFlowRateUser ) / EvapVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
@@ -3098,12 +3109,12 @@ namespace PlantChillers {
 				}
 			}
 		} else {
-			if ( IsAutoSize ) {
+			if (  ElectricChiller( ChillNum ).Base.EvapVolFlowRateWasAutoSized && PlantSizesOkayToReport) {
 				ShowSevereError( "Autosizing of Electric Chiller evap flow rate requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Electric Chiller object=" + ElectricChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
 			} else {
-				if ( ! ElectricChiller( ChillNum ).Base.IsThisSized ) {
+				if ( PlantSizesOkayToReport ) {
 					if ( ElectricChiller( ChillNum ).Base.EvapVolFlowRate > 0.0 ) {
 						ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "User-Specified Design Chilled Water Flow Rate [m3/s]", ElectricChiller( ChillNum ).Base.EvapVolFlowRate );
 					}
@@ -3113,30 +3124,26 @@ namespace PlantChillers {
 
 		RegisterPlantCompDesignFlow( ElectricChiller( ChillNum ).Base.EvapInletNodeNum, tmpEvapVolFlowRate );
 
-		IsAutoSize = false;
-		if ( ElectricChiller( ChillNum ).Base.CondVolFlowRate == AutoSize ) {
-			IsAutoSize = true;
-		}
 		if ( PltSizCondNum > 0 && PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow && tmpNomCap > 0.0 ) {
 				rho = GetDensityGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).FluidName, ElectricChiller( ChillNum ).TempDesCondIn, PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, RoutineName );
 
 				Cp = GetSpecificHeatGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).FluidName, ElectricChiller( ChillNum ).TempDesCondIn, PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, RoutineName );
 				tmpCondVolFlowRate = tmpNomCap * ( 1.0 + 1.0 / ElectricChiller( ChillNum ).Base.COP ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
-				if ( ! IsAutoSize ) tmpCondVolFlowRate = ElectricChiller( ChillNum ).Base.CondVolFlowRate;
+				if ( ! ElectricChiller( ChillNum ).Base.CondVolFlowRateWasAutoSized ) tmpCondVolFlowRate = ElectricChiller( ChillNum ).Base.CondVolFlowRate;
 			} else {
-				if ( IsAutoSize ) tmpCondVolFlowRate = 0.0;
+				if ( ElectricChiller( ChillNum ).Base.CondVolFlowRateWasAutoSized ) tmpCondVolFlowRate = 0.0;
 			} 
 			if ( PlantFirstSizesOkayToFinalize ) {
-				if ( IsAutoSize ) {
+				if ( ElectricChiller( ChillNum ).Base.CondVolFlowRateWasAutoSized ) {
 					ElectricChiller( ChillNum ).Base.CondVolFlowRate = tmpCondVolFlowRate;
-					if ( ! ElectricChiller( ChillNum ).Base.IsThisSized ) {
+					if (PlantSizesOkayToReport) {
 						ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate );
 					}
 				} else {
 					if ( ElectricChiller( ChillNum ).Base.CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0 ) {
 						CondVolFlowRateUser = ElectricChiller( ChillNum ).Base.CondVolFlowRate;
-						if ( ! ElectricChiller( ChillNum ).Base.IsThisSized ) {
+						if ( PlantSizesOkayToReport ) {
 							ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate, "User-Specified Design Condenser Water Flow Rate [m3/s]", CondVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpCondVolFlowRate - CondVolFlowRateUser ) / CondVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
@@ -3153,13 +3160,13 @@ namespace PlantChillers {
 				}
 			}
 		} else {
-			if ( IsAutoSize ) {
+			if ( ElectricChiller( ChillNum ).Base.CondVolFlowRateWasAutoSized && PlantSizesOkayToReport ) {
 				ShowSevereError( "Autosizing of Electric Chiller condenser flow rate requires a condenser" );
 				ShowContinueError( "loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Electric Chiller object=" + ElectricChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
 			} else {
-				if ( ! ElectricChiller( ChillNum ).Base.IsThisSized ) {
+				if ( PlantSizesOkayToReport ) {
 					if ( ElectricChiller( ChillNum ).Base.CondVolFlowRate > 0.0 ) {
 						ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "User-Specified Design Condenser Water Flow Rate [m3/s]", ElectricChiller( ChillNum ).Base.CondVolFlowRate );
 					}
@@ -3177,22 +3184,19 @@ namespace PlantChillers {
 
 		if ( ElectricChiller( ChillNum ).HeatRecActive ) {
 			tmpHeatRecVolFlowRate = ElectricChiller( ChillNum ).DesignHeatRecVolFlowRate;
-			IsAutoSize = false;
-			if ( ElectricChiller( ChillNum ).DesignHeatRecVolFlowRate == AutoSize ) {
-				IsAutoSize = true;
-			}
+
 			tmpHeatRecVolFlowRate = ElectricChiller( ChillNum ).Base.CondVolFlowRate * ElectricChiller( ChillNum ).HeatRecCapacityFraction;
-			if ( ! IsAutoSize ) tmpHeatRecVolFlowRate = ElectricChiller( ChillNum ).DesignHeatRecVolFlowRate;
+			if ( ! ElectricChiller( ChillNum ).DesignHeatRecVolFlowRateWasAutoSized ) tmpHeatRecVolFlowRate = ElectricChiller( ChillNum ).DesignHeatRecVolFlowRate;
 			if ( PlantFirstSizesOkayToFinalize ) {
-				if ( IsAutoSize ) {
+				if ( ElectricChiller( ChillNum ).DesignHeatRecVolFlowRateWasAutoSized ) {
 					ElectricChiller( ChillNum ).DesignHeatRecVolFlowRate = tmpHeatRecVolFlowRate;
-					if ( ! ElectricChiller( ChillNum ).Base.IsThisSized ) {
+					if ( PlantSizesOkayToReport ) {
 						ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate );
 					}
 				} else {
 					if ( ElectricChiller( ChillNum ).DesignHeatRecVolFlowRate > 0.0 && tmpHeatRecVolFlowRate > 0.0 ) {
 						DesignHeatRecVolFlowRateUser = ElectricChiller( ChillNum ).DesignHeatRecVolFlowRate;
-						if ( ! ElectricChiller( ChillNum ).Base.IsThisSized ) {
+						if ( PlantSizesOkayToReport ) {
 							ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate, "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]", DesignHeatRecVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpHeatRecVolFlowRate - DesignHeatRecVolFlowRateUser ) / DesignHeatRecVolFlowRateUser ) > AutoVsHardSizingThreshold ) {

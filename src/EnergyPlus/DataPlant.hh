@@ -336,7 +336,7 @@ namespace DataPlant {
 	extern int TotNumHalfLoops; // number of half loops (2 * TotNumLoops)
 	extern bool PlantFirstSizeCompleted; //true if first-pass sizing is still going on and not finished
 	extern bool PlantFirstSizesOkayToFinalize; // true if first-pass plant sizing is finish and can save results for simulation
-	extern bool PlantReSizingNotComplete;
+	extern bool PlantReSizingCompleted;
 	extern bool PlantSizesOkayToReport; // true if plant sizing is really all done and results reported
 
 	extern bool AnyEMSPlantOpSchemesInModel;

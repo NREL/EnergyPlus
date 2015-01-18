@@ -195,9 +195,9 @@ namespace Boilers {
 
 		// Initialize Loop Equipment
 		if ( InitLoopEquip ) {
-			Boiler( BoilerNum ).IsThisSized = false;
+//			Boiler( BoilerNum ).IsThisSized = false;
 			InitBoiler( BoilerNum );
-			Boiler( BoilerNum ).IsThisSized = true;
+//			Boiler( BoilerNum ).IsThisSized = true;
 			SizeBoiler( BoilerNum );
 			MinCap = Boiler( BoilerNum ).NomCap * Boiler( BoilerNum ).MinPartLoadRat;
 			MaxCap = Boiler( BoilerNum ).NomCap * Boiler( BoilerNum ).MaxPartLoadRat;
@@ -531,7 +531,7 @@ namespace Boilers {
 		using DataPlant::TypeOf_Boiler_Simple;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::PlantFirstSizeCompleted;
-		using DataPlant::PlantReSizingNotComplete;
+		using DataPlant::PlantReSizingCompleted;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 		using DataPlant::SingleSetPoint;
 		using DataPlant::DualSetPointDeadBand;
@@ -586,7 +586,7 @@ namespace Boilers {
 		}
 
 		if (  MyEnvrnFlag( BoilerNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize )  ) {
-			if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
+			//if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
 			rho = GetDensityGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
 			Boiler( BoilerNum ).DesMassFlowRate = Boiler( BoilerNum ).VolFlowRate * rho;
 
@@ -667,7 +667,7 @@ namespace Boilers {
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
-		using DataPlant::PlantReSizingNotComplete;
+		using DataPlant::PlantReSizingCompleted;
 		using DataPlant::PlantSizesOkayToReport;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
