@@ -68,6 +68,7 @@ namespace EnergyPlus {
 			while ( SQLITE_ROW == sqlite3_step( sqlStmtPtr ) ) {
 				rowCount++;
 			}
+			sqlite3_finalize(sqlStmtPtr);
 			return rowCount;
 		}
 
@@ -91,12 +92,13 @@ namespace EnergyPlus {
 				}
 				queryVector.push_back(valueVector);
 			}
+			sqlite3_finalize(sqlStmtPtr);
 			return queryVector;
 		}
 	};
 
 
-	TEST_F( SQLiteFixture, SimulationRecord )
+	TEST_F( SQLiteFixture, createSQLiteSimulationsRecord )
 	{
 		sqlite->sqliteBegin();
 		sqlite->createSQLiteSimulationsRecord( 1 );
@@ -111,7 +113,7 @@ namespace EnergyPlus {
 		EXPECT_EQ(1, result.second);
 
 		result = executeAndReturnFirstInt( "SELECT count(*) FROM Simulations WHERE SimulationIndex = 2;", 0 );
-		EXPECT_FALSE(result.first);
+		EXPECT_TRUE(result.first);
 		EXPECT_EQ(0, result.second);
 	}
 
@@ -269,20 +271,4 @@ namespace EnergyPlus {
 	// void createZoneExtendedOutput();
 
 	// void initializeIndexes();
-
-	// TEST_F( SQLiteFixture, SimulationRecord )
-	// {
-	// 	sqlite->sqliteBegin();
-	// 	sqlite->createSQLiteSimulationsRecord( 1 );
-	// 	sqlite->sqliteCommit();
-	// 	EXPECT_EQ(SQLITE_OK, executeSQL("SELECT * FROM Simulations WHERE SimulationIndex = 1;"));
-	// }
-
-	// TEST_F( SQLiteFixture, SimulationRecord )
-	// {
-	// 	sqlite->sqliteBegin();
-	// 	sqlite->createSQLiteSimulationsRecord( 1 );
-	// 	sqlite->sqliteCommit();
-	// 	EXPECT_EQ(SQLITE_OK, executeSQL("SELECT * FROM Simulations WHERE SimulationIndex = 1;"));
-	// }
 }
