@@ -1022,6 +1022,8 @@ namespace Pumps {
 		//HVAC Sizing Simulation resizing calls if needed
 		if ( RedoSizesHVACSimulation && ! PlantReSizingCompleted ) {
 			SizePump( PumpNum );
+
+			PumpDataForTable( PumpNum );
 		}
 
 

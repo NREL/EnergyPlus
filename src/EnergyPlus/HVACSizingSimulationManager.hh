@@ -52,7 +52,9 @@ namespace EnergyPlus {
 
 		void setupSizingAnalyses();
 
-		void processCoincidentPlantSizeAdjustments();
+		void processCoincidentPlantSizeAdjustments(
+			int const HVACSizingIterCount
+		);
 
 		void RedoKickOffAndResize();
 
@@ -64,7 +66,7 @@ namespace EnergyPlus {
 
 		extern bool stillNeedToSetupOnce;
 
-		void ManageAdvancedSizing(
+		void ManageHVACSizingSimulation(
 			bool & ErrorsFound
 		);
 

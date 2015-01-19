@@ -255,6 +255,15 @@ namespace OutputReportPredefined {
 	extern int pdchSysSizUserClAir;
 	extern int pdchSysSizCalcHtAir;
 	extern int pdchSysSizUserHtAir;
+	extern int pdstPlantSize;
+	extern int pdchPlantSizCalcVdot;
+	extern int pdchPlantSizPrevVdot;
+	extern int pdchPlantSizPass;
+	extern int pdchPlantSizCoincYesNo;
+	extern int pdchPlantSizDesDay;
+	extern int pdchPlantSizPkTimeDayOfSim;
+	extern int pdchPlantSizPkTimeHour;
+	extern int pdchPlantSizPkTimeMin;
 
 	//System summary
 	extern int pdrSystem;

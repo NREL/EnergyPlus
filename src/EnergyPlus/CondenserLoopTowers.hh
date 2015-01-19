@@ -103,25 +103,34 @@ namespace CondenserLoopTowers {
 		bool Available; // need an array of logicals--load identifiers of available equipment
 		bool ON; // Simulate the machine at it's operating part load ratio
 		Real64 DesignWaterFlowRate; // Design water flow rate through the tower [m3/s]
+		bool DesignWaterFlowRateWasAutoSized; //true if previous was autosize on input
 		Real64 DesignWaterFlowPerUnitNomCap; // scalable sizing factor for water flow per capacity [m3/s/W]
 		Real64 DesWaterMassFlowRate; // Design water flow rate through the entire tower [kg/s]
 		Real64 DesWaterMassFlowRatePerCell; // Design water flow rate per cell [Kg/s]
 		Real64 HighSpeedAirFlowRate; // Air flow rate through tower at high speed [m3/s]
+		bool HighSpeedAirFlowRateWasAutoSized; //true if previous was autosize on input
 		Real64 DesignAirFlowPerUnitNomCap; // scalable sizing factor for air flow per capacity [m3/s/W]
 		bool DefaultedDesignAirFlowScalingFactor; // true if user left input field blank for DesignAirFlowPerUnitNomCap
 		Real64 HighSpeedFanPower; // Fan power at high fan speed [W]
+		bool HighSpeedFanPowerWasAutoSized; //true if fan power was autosize on input
 		Real64 DesignFanPowerPerUnitNomCap; // scalable sizing factor for fan power per capacity [W/W]
 		bool UAvaluesCompleted;
 		Real64 HighSpeedTowerUA; // UA of tower at high fan speed [W/C]
+		Real64 HighSpeedTowerUAWasAutoSized; // true if previous was autosize on input
 		Real64 LowSpeedAirFlowRate; // Air flow rate through tower at low speed [m3/s]
+		bool LowSpeedAirFlowRateWasAutoSized; // true if previous was autosize on input
 		Real64 LowSpeedAirFlowRateSizingFactor; // sizing factor for low speed flow rate [ ]
 		Real64 LowSpeedFanPower; // Fan power at low fan speed [W]
+		bool LowSpeedFanPowerWasAutoSized;// true if low speed fan power was autosized on input
 		Real64 LowSpeedFanPowerSizingFactor; // sizing factor for low speed fan power []
 		Real64 LowSpeedTowerUA; // UA of tower at low fan speed [W/C]
+		bool LowSpeedTowerUAWasAutoSized; //ture if low speed UA was autosize on input
 		Real64 LowSpeedTowerUASizingFactor; // sizing factor for UA at low fan speed []
 		Real64 FreeConvAirFlowRate; // Air flow rate through tower with fan off [m3/s]
+		bool FreeConvAirFlowRateWasAutoSized; //true if previous was autosize on input
 		Real64 FreeConvAirFlowRateSizingFactor; // sizing factor for air flow at free conv []
 		Real64 FreeConvTowerUA; // UA of tower with fan off [W/C]
+		bool FreeConvTowerUAWasAutoSized; // true if previous was autosize on input
 		Real64 FreeConvTowerUASizingFactor; // sizing factor for UA at fre convection []
 		Real64 DesignInletWB; // Design inlet air wet-bulb temperature (C)
 		Real64 DesignApproach; // Design approach (outlet water temp minus inlet air wet-bulb temp (C)
@@ -138,15 +147,18 @@ namespace CondenserLoopTowers {
 		//  leaving water at 29.44C (85F), entering air at 25.56C (78F) wet-bulb
 		//  temp and 35C (95F) dry-bulb temp, and water flow
 		//  rate of 5.382E-8 m3/s per watt (3 gpm/ton)
+		bool TowerNominalCapacityWasAutoSized; //true if tower nominal capacity was autosized on input
 		Real64 TowerLowSpeedNomCap; // Nominal capacity of the tower [W] with entering water at 35C (95F),
 		//  leaving water at 29.44C (85F), entering air at 25.56C (78F) wet-bulb
 		//  temp and 35C (95F) dry-bulb temp, and water flow
 		//  rate of 5.382E-8 m3/s per nominal capacity watt (3 gpm/ton)
+		bool TowerLowSpeedNomCapWasAutoSized; // true if previous was autosize on input
 		Real64 TowerLowSpeedNomCapSizingFactor; // sizing factor for low speed capacity []
 		Real64 TowerFreeConvNomCap; // Nominal capacity of the tower [W] with entering water at 35C (95F),
 		//  leaving water at 29.44C (85F), entering air at 25.56C (78F) wet-bulb
 		//  temp and 35C (95F) dry-bulb temp, and water flow
 		//  rate of 5.382E-8 m3/s per nominal capacity watt (3 gpm/ton)
+		bool TowerFreeConvNomCapWasAutoSized; // true if previous was autosize on Input
 		Real64 TowerFreeConvNomCapSizingFactor; // sizing factor for free conv capacity []
 		Real64 SizFac; // sizing factor
 		int WaterInletNodeNum; // Node number on the water inlet side of the tower
@@ -213,25 +225,34 @@ namespace CondenserLoopTowers {
 			Available( true ),
 			ON( true ),
 			DesignWaterFlowRate( 0.0 ),
+			DesignWaterFlowRateWasAutoSized( false ),
 			DesignWaterFlowPerUnitNomCap( 0.0 ),
 			DesWaterMassFlowRate( 0.0 ),
 			DesWaterMassFlowRatePerCell( 0.0 ),
 			HighSpeedAirFlowRate( 0.0 ),
+			HighSpeedAirFlowRateWasAutoSized( false ),
 			DesignAirFlowPerUnitNomCap( 0.0 ),
 			DefaultedDesignAirFlowScalingFactor( false ),
 			HighSpeedFanPower( 0.0 ),
+			HighSpeedFanPowerWasAutoSized( false ),
 			DesignFanPowerPerUnitNomCap( 0.0 ),
 			UAvaluesCompleted( false ),
 			HighSpeedTowerUA( 0.0 ),
+			HighSpeedTowerUAWasAutoSized( false ),
 			LowSpeedAirFlowRate( 0.0 ),
+			LowSpeedAirFlowRateWasAutoSized( false ),
 			LowSpeedAirFlowRateSizingFactor( 0.0 ),
 			LowSpeedFanPower( 0.0 ),
+			LowSpeedFanPowerWasAutoSized( false ),
 			LowSpeedFanPowerSizingFactor( 0.0 ),
 			LowSpeedTowerUA( 0.0 ),
+			LowSpeedTowerUAWasAutoSized( false ),
 			LowSpeedTowerUASizingFactor( 0.0 ),
 			FreeConvAirFlowRate( 0.0 ),
+			FreeConvAirFlowRateWasAutoSized( false ),
 			FreeConvAirFlowRateSizingFactor( 0.0 ),
 			FreeConvTowerUA( 0.0 ),
+			FreeConvTowerUAWasAutoSized( false ),
 			FreeConvTowerUASizingFactor( 0.0 ),
 			DesignInletWB( 0.0 ),
 			DesignApproach( 0.0 ),
@@ -309,25 +330,34 @@ namespace CondenserLoopTowers {
 			bool const Available, // need an array of logicals--load identifiers of available equipment
 			bool const ON, // Simulate the machine at it's operating part load ratio
 			Real64 const DesignWaterFlowRate, // Design water flow rate through the tower [m3/s]
+			bool const DesignWaterFlowRateWasAutoSized,
 			Real64 const DesignWaterFlowPerUnitNomCap, // scalable sizing factor for water flow per capacity [m3/s/W]
 			Real64 const DesWaterMassFlowRate, // Design water flow rate through the entire tower [kg/s]
 			Real64 const DesWaterMassFlowRatePerCell, // Design water flow rate per cell [Kg/s]
 			Real64 const HighSpeedAirFlowRate, // Air flow rate through tower at high speed [m3/s]
+			bool const HighSpeedAirFlowRateWasAutoSized,
 			Real64 const DesignAirFlowPerUnitNomCap, // scalable sizing factor for air flow per capacity [m3/s/W]
 			bool const DefaultedDesignAirFlowScalingFactor, // true if user left input field blank for DesignAirFlowPerUnitNomCap
 			Real64 const HighSpeedFanPower, // Fan power at high fan speed [W]
+			bool const HighSpeedFanPowerWasAutoSized,
 			Real64 const DesignFanPowerPerUnitNomCap, // scalable sizing factor for fan power per capacity [W/W]
 			bool const UAvaluesCompleted,
 			Real64 const HighSpeedTowerUA, // UA of tower at high fan speed [W/C]
+			bool const HighSpeedTowerUAWasAutoSized,
 			Real64 const LowSpeedAirFlowRate, // Air flow rate through tower at low speed [m3/s]
+			bool const LowSpeedAirFlowRateWasAutoSized,
 			Real64 const LowSpeedAirFlowRateSizingFactor, // sizing factor for low speed flow rate [ ]
 			Real64 const LowSpeedFanPower, // Fan power at low fan speed [W]
+			bool const LowSpeedFanPowerWasAutoSized,
 			Real64 const LowSpeedFanPowerSizingFactor, // sizing factor for low speed fan power []
 			Real64 const LowSpeedTowerUA, // UA of tower at low fan speed [W/C]
+			bool const LowSpeedTowerUAWasAutoSized,
 			Real64 const LowSpeedTowerUASizingFactor, // sizing factor for UA at low fan speed []
 			Real64 const FreeConvAirFlowRate, // Air flow rate through tower with fan off [m3/s]
+			bool const FreeConvAirFlowRateWasAutoSized,
 			Real64 const FreeConvAirFlowRateSizingFactor, // sizing factor for air flow at free conv []
 			Real64 const FreeConvTowerUA, // UA of tower with fan off [W/C]
+			bool const FreeConvTowerUAWasAutoSized,
 			Real64 const FreeConvTowerUASizingFactor, // sizing factor for UA at fre convection []
 			Real64 const DesignInletWB, // Design inlet air wet-bulb temperature (C)
 			Real64 const DesignApproach, // Design approach (outlet water temp minus inlet air wet-bulb temp (C)
@@ -403,25 +433,34 @@ namespace CondenserLoopTowers {
 			Available( Available ),
 			ON( ON ),
 			DesignWaterFlowRate( DesignWaterFlowRate ),
+			DesignWaterFlowRateWasAutoSized( DesignWaterFlowRateWasAutoSized ),
 			DesignWaterFlowPerUnitNomCap( DesignWaterFlowPerUnitNomCap ),
 			DesWaterMassFlowRate( DesWaterMassFlowRate ),
 			DesWaterMassFlowRatePerCell( DesWaterMassFlowRatePerCell ),
 			HighSpeedAirFlowRate( HighSpeedAirFlowRate ),
+			HighSpeedAirFlowRateWasAutoSized( HighSpeedAirFlowRateWasAutoSized ),
 			DesignAirFlowPerUnitNomCap( DesignAirFlowPerUnitNomCap ),
 			DefaultedDesignAirFlowScalingFactor( DefaultedDesignAirFlowScalingFactor ),
 			HighSpeedFanPower( HighSpeedFanPower ),
+			HighSpeedFanPowerWasAutoSized( HighSpeedFanPowerWasAutoSized ),
 			DesignFanPowerPerUnitNomCap( DesignFanPowerPerUnitNomCap ),
 			UAvaluesCompleted( UAvaluesCompleted ),
 			HighSpeedTowerUA( HighSpeedTowerUA ),
+			HighSpeedTowerUAWasAutoSized( HighSpeedTowerUAWasAutoSized ),
 			LowSpeedAirFlowRate( LowSpeedAirFlowRate ),
+			LowSpeedAirFlowRateWasAutoSized( LowSpeedAirFlowRateWasAutoSized ),
 			LowSpeedAirFlowRateSizingFactor( LowSpeedAirFlowRateSizingFactor ),
 			LowSpeedFanPower( LowSpeedFanPower ),
+			LowSpeedFanPowerWasAutoSized( LowSpeedFanPowerWasAutoSized ),
 			LowSpeedFanPowerSizingFactor( LowSpeedFanPowerSizingFactor ),
 			LowSpeedTowerUA( LowSpeedTowerUA ),
+			LowSpeedTowerUAWasAutoSized( LowSpeedTowerUAWasAutoSized ),
 			LowSpeedTowerUASizingFactor( LowSpeedTowerUASizingFactor ),
 			FreeConvAirFlowRate( FreeConvAirFlowRate ),
+			FreeConvAirFlowRateWasAutoSized( FreeConvAirFlowRateWasAutoSized ),
 			FreeConvAirFlowRateSizingFactor( FreeConvAirFlowRateSizingFactor ),
 			FreeConvTowerUA( FreeConvTowerUA ),
+			FreeConvTowerUAWasAutoSized( FreeConvTowerUAWasAutoSized ),
 			FreeConvTowerUASizingFactor( FreeConvTowerUASizingFactor ),
 			DesignInletWB( DesignInletWB ),
 			DesignApproach( DesignApproach ),

@@ -478,16 +478,40 @@ namespace CondenserLoopTowers {
 			SimpleTower( TowerNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			TestCompSet( cCurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Chilled Water Nodes" );
 			SimpleTower( TowerNum ).DesignWaterFlowRate = NumArray( 1 );
+			if (SimpleTower( TowerNum ).DesignWaterFlowRate == AutoSize ){
+				SimpleTower( TowerNum ).DesignWaterFlowRateWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).HighSpeedAirFlowRate = NumArray( 2 );
+			if ( SimpleTower( TowerNum ).HighSpeedAirFlowRate == AutoSize ) {
+				SimpleTower( TowerNum ).HighSpeedAirFlowRateWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).HighSpeedFanPower = NumArray( 3 );
+			if ( SimpleTower( TowerNum ).HighSpeedFanPower == AutoSize ) {
+				SimpleTower( TowerNum ).HighSpeedFanPowerWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).HighSpeedTowerUA = NumArray( 4 );
+			if (SimpleTower( TowerNum ).HighSpeedTowerUA == AutoSize ) {
+				SimpleTower( TowerNum ).HighSpeedTowerUAWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).FreeConvAirFlowRate = NumArray( 5 );
+			if ( SimpleTower( TowerNum ).FreeConvAirFlowRate == AutoSize ) {
+				SimpleTower( TowerNum ).FreeConvAirFlowRateWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).FreeConvAirFlowRateSizingFactor = NumArray( 6 );
 			SimpleTower( TowerNum ).FreeConvTowerUA = NumArray( 7 );
+			if ( SimpleTower( TowerNum ).FreeConvTowerUA == AutoSize ) {
+				SimpleTower( TowerNum ).FreeConvTowerUAWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).FreeConvTowerUASizingFactor = NumArray( 8 );
 			SimpleTower( TowerNum ).HeatRejectCapNomCapSizingRatio = NumArray( 9 );
 			SimpleTower( TowerNum ).TowerNominalCapacity = NumArray( 10 );
+			if ( SimpleTower( TowerNum ).TowerNominalCapacity == AutoSize ) {
+				SimpleTower( TowerNum ).TowerNominalCapacityWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).TowerFreeConvNomCap = NumArray( 11 );
+			if ( SimpleTower( TowerNum ).TowerFreeConvNomCap == AutoSize ) {
+				SimpleTower( TowerNum ).TowerFreeConvNomCapWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).TowerFreeConvNomCapSizingFactor = NumArray( 12 );
 			if ( NumAlphas >= 4 ) {
 				if ( SameString( AlphArray( 4 ), "UFactorTimesAreaAndDesignWaterFlowRate" ) ) {
@@ -757,24 +781,59 @@ namespace CondenserLoopTowers {
 				SimpleTower( TowerNum ).PerformanceInputMethod_Num = PIM_UFactor;
 			}
 			SimpleTower( TowerNum ).DesignWaterFlowRate = NumArray( 1 );
+			if (SimpleTower( TowerNum ).DesignWaterFlowRate == AutoSize ){
+				SimpleTower( TowerNum ).DesignWaterFlowRateWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).HighSpeedAirFlowRate = NumArray( 2 );
+			if ( SimpleTower( TowerNum ).HighSpeedAirFlowRate == AutoSize ) {
+				SimpleTower( TowerNum ).HighSpeedAirFlowRateWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).HighSpeedFanPower = NumArray( 3 );
+			if ( SimpleTower( TowerNum ).HighSpeedFanPower == AutoSize ) {
+				SimpleTower( TowerNum ).HighSpeedFanPowerWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).HighSpeedTowerUA = NumArray( 4 );
+			if ( SimpleTower( TowerNum ).HighSpeedTowerUA == AutoSize ) {
+				SimpleTower( TowerNum ).HighSpeedTowerUAWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).LowSpeedAirFlowRate = NumArray( 5 );
+			if ( SimpleTower( TowerNum ).LowSpeedAirFlowRate == AutoSize ){
+				SimpleTower( TowerNum ).LowSpeedAirFlowRateWasAutoSized = true;
+			}
+			
 			SimpleTower( TowerNum ).LowSpeedAirFlowRateSizingFactor = NumArray( 6 );
 			SimpleTower( TowerNum ).LowSpeedFanPower = NumArray( 7 );
+			if ( SimpleTower( TowerNum ).LowSpeedFanPower == AutoSize ) {
+				SimpleTower( TowerNum ).LowSpeedFanPowerWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).LowSpeedFanPowerSizingFactor = NumArray( 8 );
 			SimpleTower( TowerNum ).LowSpeedTowerUA = NumArray( 9 );
+			if ( SimpleTower( TowerNum ).LowSpeedTowerUA == AutoSize ) {
+				SimpleTower( TowerNum ).LowSpeedTowerUAWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).LowSpeedTowerUASizingFactor = NumArray( 10 );
 			SimpleTower( TowerNum ).FreeConvAirFlowRate = NumArray( 11 );
+			if ( SimpleTower( TowerNum ).FreeConvAirFlowRate == AutoSize ) {
+				SimpleTower( TowerNum ).FreeConvAirFlowRateWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).FreeConvAirFlowRateSizingFactor = NumArray( 12 );
 			SimpleTower( TowerNum ).FreeConvTowerUA = NumArray( 13 );
+			if ( SimpleTower( TowerNum ).FreeConvTowerUA == AutoSize ) {
+				SimpleTower( TowerNum ).FreeConvTowerUAWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).FreeConvTowerUASizingFactor = NumArray( 14 );
 			SimpleTower( TowerNum ).HeatRejectCapNomCapSizingRatio = NumArray( 15 );
 			SimpleTower( TowerNum ).TowerNominalCapacity = NumArray( 16 );
+
 			SimpleTower( TowerNum ).TowerLowSpeedNomCap = NumArray( 17 );
+			if ( SimpleTower( TowerNum ).TowerLowSpeedNomCap == AutoSize ) {
+				SimpleTower( TowerNum ).TowerLowSpeedNomCapWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).TowerLowSpeedNomCapSizingFactor = NumArray( 18 );
 			SimpleTower( TowerNum ).TowerFreeConvNomCap = NumArray( 19 );
+			if ( SimpleTower( TowerNum ).TowerFreeConvNomCap == AutoSize ) {
+				SimpleTower( TowerNum ).TowerFreeConvNomCapWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).TowerFreeConvNomCapSizingFactor = NumArray( 20 );
 
 			//   Basin heater power as a function of temperature must be greater than or equal to 0
@@ -1635,11 +1694,23 @@ namespace CondenserLoopTowers {
 
 			SimpleTower( TowerNum ).HeatRejectCapNomCapSizingRatio = NumArray( 1 );
 			SimpleTower( TowerNum ).TowerNominalCapacity = NumArray( 2 );
+			if ( SimpleTower( TowerNum ).TowerNominalCapacity == AutoSize ) {
+				SimpleTower( TowerNum ).TowerNominalCapacityWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).TowerFreeConvNomCap = NumArray( 3 );
+			if ( SimpleTower( TowerNum ).TowerFreeConvNomCap == AutoSize ) {
+				SimpleTower( TowerNum ).TowerFreeConvNomCapWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).TowerFreeConvNomCapSizingFactor = NumArray( 4 );
 			SimpleTower( TowerNum ).DesignWaterFlowRate = NumArray( 5 );
+			if (SimpleTower( TowerNum ).DesignWaterFlowRate == AutoSize ){
+				SimpleTower( TowerNum ).DesignWaterFlowRateWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).DesignWaterFlowPerUnitNomCap = NumArray( 6 );
 			SimpleTower( TowerNum ).HighSpeedAirFlowRate = NumArray( 7 );
+			if ( SimpleTower( TowerNum ).HighSpeedAirFlowRate == AutoSize ) {
+				SimpleTower( TowerNum ).HighSpeedAirFlowRateWasAutoSized = true;
+			}
 			if ( lNumericFieldBlanks( 8 ) ) {
 				SimpleTower( TowerNum ).DefaultedDesignAirFlowScalingFactor = true;
 			} else {
@@ -1648,11 +1719,23 @@ namespace CondenserLoopTowers {
 			SimpleTower( TowerNum ).DesignAirFlowPerUnitNomCap = NumArray( 8 );
 			SimpleTower( TowerNum ).MinimumVSAirFlowFrac = NumArray( 9 );
 			SimpleTower( TowerNum ).HighSpeedFanPower = NumArray( 10 );
+			if ( SimpleTower( TowerNum ).HighSpeedFanPower == AutoSize ) {
+				SimpleTower( TowerNum ).HighSpeedFanPowerWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).DesignFanPowerPerUnitNomCap = NumArray( 11 );
 			SimpleTower( TowerNum ).FreeConvAirFlowRate = NumArray( 12 );
+			if ( SimpleTower( TowerNum ).FreeConvAirFlowRate == AutoSize ) {
+				SimpleTower( TowerNum ).FreeConvAirFlowRateWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).FreeConvAirFlowRateSizingFactor = NumArray( 13 );
 			SimpleTower( TowerNum ).HighSpeedTowerUA = NumArray( 14 );
+			if (SimpleTower( TowerNum ).HighSpeedTowerUA == AutoSize ) {
+				SimpleTower( TowerNum ).HighSpeedTowerUAWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).FreeConvTowerUA = NumArray( 15 );
+			if ( SimpleTower( TowerNum ).FreeConvTowerUA == AutoSize ) {
+				SimpleTower( TowerNum ).FreeConvTowerUAWasAutoSized = true;
+			}
 			SimpleTower( TowerNum ).FreeConvTowerUASizingFactor = NumArray( 16 );
 
 			SimpleTower( TowerNum ).UAModFuncAirFlowRatioCurvePtr = GetCurveIndex( AlphArray( 6 ) );
@@ -2090,15 +2173,7 @@ namespace CondenserLoopTowers {
 
 		// Begin environment initializations
 		if ( MyEnvrnFlag( TowerNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
-			if ( ! PlantFirstSizeCompleted ) {
-				{ auto const SELECT_CASE_var( SimpleTower( TowerNum ).TowerType_Num );
-				if ( ( SELECT_CASE_var == CoolingTower_SingleSpeed ) || ( SELECT_CASE_var == CoolingTower_TwoSpeed ) || ( SELECT_CASE_var == CoolingTower_VariableSpeed ) ) {
-					SizeTower( TowerNum );
-				} else if ( SELECT_CASE_var == CoolingTower_VariableSpeedMerkel ) {
-					SizeVSMerkelTower( TowerNum );
-				}}
 
-			}
 			rho = GetDensityGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
 
 			SimpleTower( TowerNum ).DesWaterMassFlowRate = SimpleTower( TowerNum ).DesignWaterFlowRate * rho;
@@ -2171,6 +2246,7 @@ namespace CondenserLoopTowers {
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantSizesOkayToReport;
 		using General::SolveRegulaFalsi;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
@@ -2238,7 +2314,7 @@ namespace CondenserLoopTowers {
 		// Find the appropriate Plant Sizing object
 		PltSizCondNum = PlantLoop( SimpleTower( TowerNum ).LoopNum ).PlantSizNum;
 
-		if ( SimpleTower( TowerNum ).PerformanceInputMethod_Num == PIM_UFactor && SimpleTower( TowerNum ).HighSpeedTowerUA != AutoSize ) {
+		if ( SimpleTower( TowerNum ).PerformanceInputMethod_Num == PIM_UFactor && (! SimpleTower( TowerNum ).HighSpeedTowerUAWasAutoSized )) {
 			if ( PltSizCondNum > 0 ) {
 				rho = GetDensityGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
 				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
@@ -2255,7 +2331,7 @@ namespace CondenserLoopTowers {
 			}
 		}
 
-		if ( SimpleTower( TowerNum ).DesignWaterFlowRate == AutoSize ) {
+		if ( SimpleTower( TowerNum ).DesignWaterFlowRateWasAutoSized ) {
 			if ( PltSizCondNum > 0 ) {
 				if ( PlantSizData( PltSizCondNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 					tmpDesignWaterFlowRate = PlantSizData( PltSizCondNum ).DesVolFlowRate * SimpleTower( TowerNum ).SizFac;
@@ -2264,10 +2340,13 @@ namespace CondenserLoopTowers {
 					tmpDesignWaterFlowRate = 0.0;
 					if ( PlantFirstSizesOkayToFinalize ) SimpleTower( TowerNum ).DesignWaterFlowRate = tmpDesignWaterFlowRate;
 				}
-				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Design Water Flow Rate [m3/s]", SimpleTower( TowerNum ).DesignWaterFlowRate );
+				if ( PlantSizesOkayToReport ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Design Water Flow Rate [m3/s]", SimpleTower( TowerNum ).DesignWaterFlowRate );
 			} else {
-				ShowSevereError( "Autosizing error for cooling tower object = " + SimpleTower( TowerNum ).Name );
-				ShowFatalError( "Autosizing of cooling tower condenser flow rate requires a loop Sizing:Plant object." );
+				if ( PlantSizesOkayToReport ) {
+					ShowSevereError( "Autosizing error for cooling tower object = " + SimpleTower( TowerNum ).Name );
+					ShowFatalError( "Autosizing of cooling tower condenser flow rate requires a loop Sizing:Plant object." );
+				}
+
 			}
 		}
 
@@ -2276,15 +2355,15 @@ namespace CondenserLoopTowers {
 			SimpleTower( TowerNum ).DesignWaterFlowRate = 5.382e-8 * SimpleTower( TowerNum ).TowerNominalCapacity;
 			tmpDesignWaterFlowRate = SimpleTower( TowerNum ).DesignWaterFlowRate;
 			if ( SameString( SimpleTower( TowerNum ).TowerType, "CoolingTower:SingleSpeed" ) ) {
-				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Design water flow rate based on tower nominal capacity [m3/s]", SimpleTower( TowerNum ).DesignWaterFlowRate );
+				if ( PlantSizesOkayToReport ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Design water flow rate based on tower nominal capacity [m3/s]", SimpleTower( TowerNum ).DesignWaterFlowRate );
 			} else if ( SameString( SimpleTower( TowerNum ).TowerType, "CoolingTower:TwoSpeed" ) ) {
-				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Design water flow rate based on tower high-speed nominal capacity [m3/s]", SimpleTower( TowerNum ).DesignWaterFlowRate );
+				if ( PlantSizesOkayToReport ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Design water flow rate based on tower high-speed nominal capacity [m3/s]", SimpleTower( TowerNum ).DesignWaterFlowRate );
 			}
 		}
 
 		RegisterPlantCompDesignFlow( SimpleTower( TowerNum ).WaterInletNodeNum, tmpDesignWaterFlowRate );
 
-		if ( SimpleTower( TowerNum ).HighSpeedFanPower == AutoSize ) {
+		if ( SimpleTower( TowerNum ).HighSpeedFanPowerWasAutoSized ) {
 			// We assume the nominal fan power is 0.0105 times the design load
 			if ( SimpleTower( TowerNum ).PerformanceInputMethod_Num == PIM_NominalCapacity ) {
 				SimpleTower( TowerNum ).HighSpeedFanPower = 0.0105 * SimpleTower( TowerNum ).TowerNominalCapacity;
@@ -2301,30 +2380,32 @@ namespace CondenserLoopTowers {
 						if ( PlantFirstSizesOkayToFinalize ) SimpleTower( TowerNum ).HighSpeedFanPower = tmpHighSpeedFanPower;
 					}
 				} else {
-					ShowSevereError( "Autosizing of cooling tower fan power requires a loop Sizing:Plant object." );
-					ShowFatalError( " Occurs in cooling tower object= " + SimpleTower( TowerNum ).Name );
+				if ( PlantSizesOkayToReport ) {
+						ShowSevereError( "Autosizing of cooling tower fan power requires a loop Sizing:Plant object." );
+						ShowFatalError( " Occurs in cooling tower object= " + SimpleTower( TowerNum ).Name );
+					}
 				}
 			}
 			if ( SimpleTower( TowerNum ).TowerType_Num == CoolingTower_SingleSpeed || SimpleTower( TowerNum ).TowerType_Num == CoolingTower_VariableSpeed ) {
-				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Fan Power at Design Air Flow Rate [W]", SimpleTower( TowerNum ).HighSpeedFanPower );
+				if ( PlantSizesOkayToReport ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Fan Power at Design Air Flow Rate [W]", SimpleTower( TowerNum ).HighSpeedFanPower );
 			} else if ( SimpleTower( TowerNum ).TowerType_Num == CoolingTower_TwoSpeed ) {
-				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Fan Power at High Fan Speed [W]", SimpleTower( TowerNum ).HighSpeedFanPower );
+				if ( PlantSizesOkayToReport ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Fan Power at High Fan Speed [W]", SimpleTower( TowerNum ).HighSpeedFanPower );
 			}
 		}
 
-		if ( SimpleTower( TowerNum ).HighSpeedAirFlowRate == AutoSize ) {
+		if ( SimpleTower( TowerNum ).HighSpeedAirFlowRateWasAutoSized ) {
 			// Plant Sizing Object is not required to AUTOSIZE this field since its simply a multiple of another field.
 			tmpHighSpeedAirFlowRate = tmpHighSpeedFanPower * 0.5 * ( 101325.0 / StdBaroPress ) / 190.0;
 			if ( PlantFirstSizesOkayToFinalize ) SimpleTower( TowerNum ).HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
 
 			if ( SimpleTower( TowerNum ).TowerType_Num == CoolingTower_SingleSpeed || SimpleTower( TowerNum ).TowerType_Num == CoolingTower_VariableSpeed ) {
-				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Design Air Flow Rate [m3/s]", SimpleTower( TowerNum ).HighSpeedAirFlowRate );
+				if ( PlantSizesOkayToReport ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Design Air Flow Rate [m3/s]", SimpleTower( TowerNum ).HighSpeedAirFlowRate );
 			} else if ( SimpleTower( TowerNum ).TowerType_Num == CoolingTower_TwoSpeed ) {
-				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Air Flow Rate at High Fan Speed [m3/s]", SimpleTower( TowerNum ).HighSpeedAirFlowRate );
+				if ( PlantSizesOkayToReport ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Air Flow Rate at High Fan Speed [m3/s]", SimpleTower( TowerNum ).HighSpeedAirFlowRate );
 			}
 		}
 
-		if ( SimpleTower( TowerNum ).HighSpeedTowerUA == AutoSize ) {
+		if ( SimpleTower( TowerNum ).HighSpeedTowerUAWasAutoSized ) {
 			if ( PltSizCondNum > 0 ) {
 				if ( PlantSizData( PltSizCondNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 					rho = GetDensityGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
@@ -2377,13 +2458,16 @@ namespace CondenserLoopTowers {
 					}
 				}
 				if ( SimpleTower( TowerNum ).TowerType_Num == CoolingTower_SingleSpeed ) {
-					if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "U-Factor Times Area Value at Design Air Flow Rate [W/C]", SimpleTower( TowerNum ).HighSpeedTowerUA );
+					if ( PlantSizesOkayToReport ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "U-Factor Times Area Value at Design Air Flow Rate [W/C]", SimpleTower( TowerNum ).HighSpeedTowerUA );
 				} else if ( SimpleTower( TowerNum ).TowerType_Num == CoolingTower_TwoSpeed ) {
-					if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "U-Factor Times Area Value at High Fan Speed [W/C]", SimpleTower( TowerNum ).HighSpeedTowerUA );
+					if ( PlantSizesOkayToReport ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "U-Factor Times Area Value at High Fan Speed [W/C]", SimpleTower( TowerNum ).HighSpeedTowerUA );
 				}
 			} else {
-				ShowSevereError( "Autosizing error for cooling tower object= " + SimpleTower( TowerNum ).Name );
-				ShowFatalError( "Autosizing of cooling tower UA requires a loop Sizing:Plant object." );
+				if ( PlantSizesOkayToReport ) {
+					ShowSevereError( "Autosizing error for cooling tower object= " + SimpleTower( TowerNum ).Name );
+					ShowFatalError( "Autosizing of cooling tower UA requires a loop Sizing:Plant object." );
+				}
+
 			}
 		}
 
@@ -2420,14 +2504,14 @@ namespace CondenserLoopTowers {
 				SimpleTower( TowerNum ).HighSpeedTowerUA = 0.0;
 			}
 			if ( SimpleTower( TowerNum ).TowerType_Num == CoolingTower_SingleSpeed ) {
-				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "U-Factor Times Area Value at Design Air Flow Rate [W/C]", SimpleTower( TowerNum ).HighSpeedTowerUA );
+				if ( PlantSizesOkayToReport ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "U-Factor Times Area Value at Design Air Flow Rate [W/C]", SimpleTower( TowerNum ).HighSpeedTowerUA );
 			} else if ( SimpleTower( TowerNum ).TowerType_Num == CoolingTower_TwoSpeed ) {
-				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "U-Factor Times Area Value at High Fan Speed [W/C]", SimpleTower( TowerNum ).HighSpeedTowerUA );
+				if ( PlantSizesOkayToReport ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "U-Factor Times Area Value at High Fan Speed [W/C]", SimpleTower( TowerNum ).HighSpeedTowerUA );
 			}
 		}
 
 		if ( SimpleTower( TowerNum ).LowSpeedAirFlowRate == AutoSize ) {
-			if ( PlantFirstSizesOkayToFinalize ) {
+			if ( PlantSizesOkayToReport ) {
 				SimpleTower( TowerNum ).LowSpeedAirFlowRate = SimpleTower( TowerNum ).LowSpeedAirFlowRateSizingFactor * SimpleTower( TowerNum ).HighSpeedAirFlowRate;
 				tmpLowSpeedAirFlowRate = SimpleTower( TowerNum ).LowSpeedAirFlowRate;
 				ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Low Fan Speed Air Flow Rate [m3/s]", SimpleTower( TowerNum ).LowSpeedAirFlowRate );
@@ -2439,26 +2523,34 @@ namespace CondenserLoopTowers {
 		if ( SimpleTower( TowerNum ).LowSpeedFanPower == AutoSize ) {
 			if ( PlantFirstSizesOkayToFinalize ) {
 				SimpleTower( TowerNum ).LowSpeedFanPower = SimpleTower( TowerNum ).LowSpeedFanPowerSizingFactor * SimpleTower( TowerNum ).HighSpeedFanPower;
-				ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Fan Power at Low Fan Speed [W]", SimpleTower( TowerNum ).LowSpeedFanPower );
+				if ( PlantSizesOkayToReport ) {
+					ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Fan Power at Low Fan Speed [W]", SimpleTower( TowerNum ).LowSpeedFanPower );
+				}
 			}
 		}
 
 		if ( SimpleTower( TowerNum ).LowSpeedTowerUA == AutoSize && PlantFirstSizesOkayToFinalize ) {
 			SimpleTower( TowerNum ).LowSpeedTowerUA = SimpleTower( TowerNum ).LowSpeedTowerUASizingFactor * SimpleTower( TowerNum ).HighSpeedTowerUA;
-			ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "U-Factor Times Area Value at Low Fan Speed [W/K]", SimpleTower( TowerNum ).LowSpeedTowerUA );
+			if ( PlantSizesOkayToReport ) {
+				ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "U-Factor Times Area Value at Low Fan Speed [W/K]", SimpleTower( TowerNum ).LowSpeedTowerUA );
+			}
 		}
 
 		if ( SimpleTower( TowerNum ).PerformanceInputMethod_Num == PIM_NominalCapacity ) {
 			if ( SimpleTower( TowerNum ).TowerLowSpeedNomCap == AutoSize ) {
 				if ( PlantFirstSizesOkayToFinalize ) {
 					SimpleTower( TowerNum ).TowerLowSpeedNomCap = SimpleTower( TowerNum ).TowerLowSpeedNomCapSizingFactor * SimpleTower( TowerNum ).TowerNominalCapacity;
-					ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Low Speed Nominal Capacity [W]", SimpleTower( TowerNum ).TowerLowSpeedNomCap );
+					if ( PlantSizesOkayToReport ) {
+						ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Low Speed Nominal Capacity [W]", SimpleTower( TowerNum ).TowerLowSpeedNomCap );
+					}
 				}
 			}
 			if ( SimpleTower( TowerNum ).TowerFreeConvNomCap == AutoSize ) {
 				if ( PlantFirstSizesOkayToFinalize ) {
 					SimpleTower( TowerNum ).TowerFreeConvNomCap = SimpleTower( TowerNum ).TowerFreeConvNomCapSizingFactor * SimpleTower( TowerNum ).TowerNominalCapacity;
-					ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Free Convection Nominal Capacity [W]", SimpleTower( TowerNum ).TowerFreeConvNomCap );
+					if ( PlantSizesOkayToReport ) {
+						ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Free Convection Nominal Capacity [W]", SimpleTower( TowerNum ).TowerFreeConvNomCap );
+					}
 				}
 			}
 
@@ -2500,14 +2592,18 @@ namespace CondenserLoopTowers {
 		if ( SimpleTower( TowerNum ).FreeConvAirFlowRate == AutoSize ) {
 			if ( PlantFirstSizesOkayToFinalize ) {
 				SimpleTower( TowerNum ).FreeConvAirFlowRate = SimpleTower( TowerNum ).FreeConvAirFlowRateSizingFactor * SimpleTower( TowerNum ).HighSpeedAirFlowRate;
-				ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Free Convection Regime Air Flow Rate [m3/s]", SimpleTower( TowerNum ).FreeConvAirFlowRate );
+				if ( PlantSizesOkayToReport ) {
+					ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Free Convection Regime Air Flow Rate [m3/s]", SimpleTower( TowerNum ).FreeConvAirFlowRate );
+				}
 			}
 		}
 
 		if ( SimpleTower( TowerNum ).FreeConvTowerUA == AutoSize ) {
 			if ( PlantFirstSizesOkayToFinalize ) {
 				SimpleTower( TowerNum ).FreeConvTowerUA = SimpleTower( TowerNum ).FreeConvTowerUASizingFactor * SimpleTower( TowerNum ).HighSpeedTowerUA;
-				ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Free Convection U-Factor Times Area Value [W/K]", SimpleTower( TowerNum ).FreeConvTowerUA );
+				if ( PlantSizesOkayToReport ) { 
+					ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Free Convection U-Factor Times Area Value [W/K]", SimpleTower( TowerNum ).FreeConvTowerUA );
+				}
 			}
 		}
 
@@ -2541,7 +2637,7 @@ namespace CondenserLoopTowers {
 			} else {
 				SimpleTower( TowerNum ).FreeConvTowerUA = 0.0;
 			}
-			if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]", SimpleTower( TowerNum ).FreeConvTowerUA );
+			if ( PlantSizesOkayToReport ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "U-Factor Times Area Value at Free Convection Air Flow Rate [W/C]", SimpleTower( TowerNum ).FreeConvTowerUA );
 		}
 
 		// calibrate variable speed tower model based on user input by finding calibration water flow rate ratio that
@@ -2613,18 +2709,18 @@ namespace CondenserLoopTowers {
 			Cp = GetSpecificHeatGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, ( Twb + Ta + Tr ), PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
 
 			SimpleTower( TowerNum ).TowerNominalCapacity = ( ( rho * tmpDesignWaterFlowRate ) * Cp * Tr );
-			if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Nominal Capacity [W]", SimpleTower( TowerNum ).TowerNominalCapacity );
+			if ( PlantSizesOkayToReport ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Nominal Capacity [W]", SimpleTower( TowerNum ).TowerNominalCapacity );
 
 			SimpleTower( TowerNum ).FreeConvAirFlowRate = SimpleTower( TowerNum ).MinimumVSAirFlowFrac * SimpleTower( TowerNum ).HighSpeedAirFlowRate;
 
-			if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Air flow rate in free convection regime [m3/s]", SimpleTower( TowerNum ).FreeConvAirFlowRate );
+			if ( PlantSizesOkayToReport ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Air flow rate in free convection regime [m3/s]", SimpleTower( TowerNum ).FreeConvAirFlowRate );
 
 			SimpleTower( TowerNum ).TowerFreeConvNomCap = SimpleTower( TowerNum ).TowerNominalCapacity * SimpleTower( TowerNum ).FreeConvectionCapacityFraction;
 
-			if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Tower capacity in free convection regime at design conditions [W]", SimpleTower( TowerNum ).TowerFreeConvNomCap );
+			if ( PlantSizesOkayToReport ) ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Tower capacity in free convection regime at design conditions [W]", SimpleTower( TowerNum ).TowerFreeConvNomCap );
 
 		}
-		if ( PlantFirstSizesOkayToFinalize ) {
+		if ( PlantSizesOkayToReport ) {
 			//create predefined report
 			equipName = SimpleTower( TowerNum ).Name;
 			PreDefTableEntry( pdchMechType, equipName, SimpleTower( TowerNum ).TowerType );
@@ -2633,7 +2729,7 @@ namespace CondenserLoopTowers {
 
 		// input error checking
 		ErrorsFound = false;
-		if ( PlantFirstSizesOkayToFinalize ) {
+		if ( PlantSizesOkayToReport ) {
 			if ( SimpleTower( TowerNum ).TowerType_Num == CoolingTower_SingleSpeed ) {
 				if ( SimpleTower( TowerNum ).DesignWaterFlowRate > 0.0 ) {
 					if ( SimpleTower( TowerNum ).FreeConvAirFlowRate >= SimpleTower( TowerNum ).HighSpeedAirFlowRate ) {
@@ -2747,7 +2843,7 @@ namespace CondenserLoopTowers {
 
 		if ( SimpleTower( TowerNum ).PerformanceInputMethod_Num == PIM_NominalCapacity ) {
 
-			if ( SimpleTower( TowerNum ).TowerNominalCapacity == AutoSize ) {
+			if ( SimpleTower( TowerNum ).TowerNominalCapacityWasAutoSized ) {
 				// get nominal capacity from PlantSizData(PltSizCondNum)%DeltaT and PlantSizData(PltSizCondNum)%DesVolFlowRate
 				if ( PltSizCondNum > 0 ) {
 					if ( PlantSizData( PltSizCondNum ).DesVolFlowRate >= SmallWaterVolFlow ) {

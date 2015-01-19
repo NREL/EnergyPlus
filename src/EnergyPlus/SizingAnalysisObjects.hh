@@ -13,6 +13,7 @@
 #include <DataSizing.hh>
 #include <DataHVACGlobals.hh>
 #include <DataPlant.hh>
+#include <OutputReportPredefined.hh>
 
 namespace EnergyPlus {
 
@@ -115,7 +116,9 @@ public:
 
 	void initialize();
 
-	void ResolveDesignFlowRate();
+	void ResolveDesignFlowRate(
+		int const HVACSizingIterCount
+	);
 	
 };
 

@@ -235,7 +235,7 @@ namespace SimulationManager {
 		using PlantPipingSystemsManager::InitAndSimGroundDomains;
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
-		using HVACSizingSimulationManagerNamespace::ManageAdvancedSizing;
+		using HVACSizingSimulationManagerNamespace::ManageHVACSizingSimulation;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -402,7 +402,7 @@ namespace SimulationManager {
 		// if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
 		if (DoHVACSizingSimulation){
 
-			ManageAdvancedSizing(ErrorsFound);
+			ManageHVACSizingSimulation(ErrorsFound);
 		}
 
 		ShowMessage( "Beginning Simulation" );

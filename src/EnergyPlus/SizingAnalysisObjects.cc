@@ -10,6 +10,7 @@
 #include <DataSizing.hh>
 #include <DataHVACGlobals.hh>
 #include <DataPlant.hh>
+#include <OutputReportPredefined.hh>
 
 namespace EnergyPlus {
 
@@ -150,6 +151,7 @@ namespace EnergyPlus {
 		using DataGlobals::NumOfTimeStepInHour;
 		using namespace WeatherManager;
 		using namespace OutputProcessor;
+
 		int const ZoneIndex ( 1 );
 		Real64 const MinutesPerHour( 60.0 );
 		int const HoursPerDay( 24 );
@@ -184,12 +186,16 @@ namespace EnergyPlus {
 		}
 	}
 	
-	void PlantCoinicidentAnalyis::ResolveDesignFlowRate(){
+	void PlantCoinicidentAnalyis::ResolveDesignFlowRate(
+		int const HVACSizingIterCount
+	){
 	
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::SecInHour;
 		using DataSizing::PlantSizData;
 		using namespace DataPlant;
+		using namespace OutputReportPredefined;
+		using WeatherManager::Environment;
 		using DataHVACGlobals::SmallWaterVolFlow;
 		bool SetNewSizes;
 		Real64 NormalizedChange;
@@ -241,6 +247,21 @@ namespace EnergyPlus {
 
 
 		}
+				//report to sizing summary table called Plant Loop Coincident Design Fluid Flow Rates
+		PreDefTableEntry( pdchPlantSizPass, PlantLoop( PlantLoopIndex ).Name, HVACSizingIterCount );
+		PreDefTableEntry( pdchPlantSizPrevVdot, PlantLoop( PlantLoopIndex ).Name, previousVolDesignFlowRate , 4 );
+		PreDefTableEntry( pdchPlantSizCalcVdot, PlantLoop( PlantLoopIndex ).Name, newVolDesignFlowRate , 4 );
+
+		if (SetNewSizes) {
+			PreDefTableEntry( pdchPlantSizCoincYesNo, PlantLoop( PlantLoopIndex ).Name, "Yes" );
+		} else {
+			PreDefTableEntry( pdchPlantSizCoincYesNo, PlantLoop( PlantLoopIndex ).Name, "No" );
+		}
+
+		PreDefTableEntry( pdchPlantSizDesDay, PlantLoop( PlantLoopIndex ).Name, Environment(newFoundMassFlowRateTimeStamp.EnvrnNum).Title );
+		PreDefTableEntry( pdchPlantSizPkTimeDayOfSim, PlantLoop( PlantLoopIndex ).Name, newFoundMassFlowRateTimeStamp.DayOfSim );
+		PreDefTableEntry( pdchPlantSizPkTimeHour, PlantLoop( PlantLoopIndex ).Name, newFoundMassFlowRateTimeStamp.HourOfDay );
+		PreDefTableEntry( pdchPlantSizPkTimeMin, PlantLoop( PlantLoopIndex ).Name, newFoundMassFlowRateTimeStamp.stepStartMinute );
 	
 	}
 }

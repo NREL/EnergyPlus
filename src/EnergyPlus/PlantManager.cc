@@ -82,7 +82,7 @@ namespace PlantManager {
 	int const TempSetPt( 1001 );
 	int const FlowSetPt( 1007 );
 	bool InitLoopEquip( true );
-	static bool GetCompSizFac( true );
+	bool GetCompSizFac( true );
 
 	static std::string const fluidNameSteam( "STEAM" );
 

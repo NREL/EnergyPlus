@@ -67,13 +67,16 @@ namespace ChillerReformulatedEIR {
 		std::string EIRFPLRName; // EIRPLR curve name
 		int CondenserType; // Type of Condenser. Water Cooled is the only available option for now
 		Real64 RefCap; // Reference capacity of the chiller [W]
+		bool RefCapWasAutoSized; //reference capacity was autosized on input
 		Real64 RefCOP; // Reference coefficient of performance [W/W]
 		int FlowMode; // one of 3 modes for componet flow during operation
 		bool ModulatedFlowSetToLoop; // True if the setpoint is missing at the outlet node
 		bool ModulatedFlowErrDone; // true if setpoint warning issued
 		Real64 EvapVolFlowRate; // Reference water volumetric flow rate through the evaporator [m3/s]
+		bool EvapVolFlowRateWasAutoSized; // true if previous was autosize input
 		Real64 EvapMassFlowRateMax; // Reference water mass flow rate through evaporator [kg/s]
 		Real64 CondVolFlowRate; // Reference water volumetric flow rate through the condenser [m3/s]
+		bool CondVolFlowRateWasAutoSized; // true if previous was set to autosize on input
 		Real64 CondMassFlowRateMax; // Reference water mass flow rate through condenser [kg/s]
 		Real64 CompPowerToCondenserFrac; // Fraction of compressor electric power rejected by condenser [0 to 1]
 		int EvapInletNodeNum; // Node number on the inlet side of the plant (evaporator side)
@@ -92,6 +95,7 @@ namespace ChillerReformulatedEIR {
 		// temperature at the chiller evaporator side outlet [C]
 		Real64 TempLowLimitEvapOut; // Low temperature shut off [C]
 		Real64 DesignHeatRecVolFlowRate; // Design water volumetric flow rate through heat recovery loop [m3/s]
+		bool DesignHeatRecVolFlowRateWasAutoSized; //true if previous input was autosize
 		Real64 DesignHeatRecMassFlowRate; // Design water mass flow rate through heat recovery loop [kg/s]
 		Real64 SizFac; // sizing factor
 		bool HeatRecActive; // True when entered Heat Rec Vol Flow Rate > 0
@@ -171,13 +175,16 @@ namespace ChillerReformulatedEIR {
 			TypeNum( 0 ),
 			CondenserType( 0 ),
 			RefCap( 0.0 ),
+			RefCapWasAutoSized( false ),
 			RefCOP( 0.0 ),
 			FlowMode( FlowModeNotSet ),
 			ModulatedFlowSetToLoop( false ),
 			ModulatedFlowErrDone( false ),
 			EvapVolFlowRate( 0.0 ),
+			EvapVolFlowRateWasAutoSized( false ),
 			EvapMassFlowRateMax( 0.0 ),
 			CondVolFlowRate( 0.0 ),
+			CondVolFlowRateWasAutoSized( false ),
 			CondMassFlowRateMax( 0.0 ),
 			CompPowerToCondenserFrac( 0.0 ),
 			EvapInletNodeNum( 0 ),
@@ -193,6 +200,7 @@ namespace ChillerReformulatedEIR {
 			TempRefEvapOut( 0.0 ),
 			TempLowLimitEvapOut( 0.0 ),
 			DesignHeatRecVolFlowRate( 0.0 ),
+			DesignHeatRecVolFlowRateWasAutoSized( false ),
 			DesignHeatRecMassFlowRate( 0.0 ),
 			SizFac( 0.0 ),
 			HeatRecActive( false ),
@@ -267,13 +275,16 @@ namespace ChillerReformulatedEIR {
 			std::string const & EIRFPLRName, // EIRPLR curve name
 			int const CondenserType, // Type of Condenser. Water Cooled is the only available option for now
 			Real64 const RefCap, // Reference capacity of the chiller [W]
+			bool const RefCapWasAutoSized, //reference capacity was autosized on input
 			Real64 const RefCOP, // Reference coefficient of performance [W/W]
 			int const FlowMode, // one of 3 modes for componet flow during operation
 			bool const ModulatedFlowSetToLoop, // True if the setpoint is missing at the outlet node
 			bool const ModulatedFlowErrDone, // true if setpoint warning issued
 			Real64 const EvapVolFlowRate, // Reference water volumetric flow rate through the evaporator [m3/s]
+			bool const EvapVolFlowRateWasAutoSized, // true if previous was autosize input
 			Real64 const EvapMassFlowRateMax, // Reference water mass flow rate through evaporator [kg/s]
 			Real64 const CondVolFlowRate, // Reference water volumetric flow rate through the condenser [m3/s]
+			bool const CondVolFlowRateWasAutoSized, // true if previous was set to autosize on input
 			Real64 const CondMassFlowRateMax, // Reference water mass flow rate through condenser [kg/s]
 			Real64 const CompPowerToCondenserFrac, // Fraction of compressor electric power rejected by condenser [0 to 1]
 			int const EvapInletNodeNum, // Node number on the inlet side of the plant (evaporator side)
@@ -289,6 +300,7 @@ namespace ChillerReformulatedEIR {
 			Real64 const TempRefEvapOut, // The reference primary loop fluid
 			Real64 const TempLowLimitEvapOut, // Low temperature shut off [C]
 			Real64 const DesignHeatRecVolFlowRate, // Design water volumetric flow rate through heat recovery loop [m3/s]
+			bool const DesignHeatRecVolFlowRateWasAutoSized, //true if previous input was autosize
 			Real64 const DesignHeatRecMassFlowRate, // Design water mass flow rate through heat recovery loop [kg/s]
 			Real64 const SizFac, // sizing factor
 			bool const HeatRecActive, // True when entered Heat Rec Vol Flow Rate > 0
@@ -360,13 +372,16 @@ namespace ChillerReformulatedEIR {
 			EIRFPLRName( EIRFPLRName ),
 			CondenserType( CondenserType ),
 			RefCap( RefCap ),
+			RefCapWasAutoSized( RefCapWasAutoSized ),
 			RefCOP( RefCOP ),
 			FlowMode( FlowMode ),
 			ModulatedFlowSetToLoop( ModulatedFlowSetToLoop ),
 			ModulatedFlowErrDone( ModulatedFlowErrDone ),
 			EvapVolFlowRate( EvapVolFlowRate ),
+			EvapVolFlowRateWasAutoSized( EvapVolFlowRateWasAutoSized ),
 			EvapMassFlowRateMax( EvapMassFlowRateMax ),
 			CondVolFlowRate( CondVolFlowRate ),
+			CondVolFlowRateWasAutoSized( CondVolFlowRateWasAutoSized ),
 			CondMassFlowRateMax( CondMassFlowRateMax ),
 			CompPowerToCondenserFrac( CompPowerToCondenserFrac ),
 			EvapInletNodeNum( EvapInletNodeNum ),
@@ -382,6 +397,7 @@ namespace ChillerReformulatedEIR {
 			TempRefEvapOut( TempRefEvapOut ),
 			TempLowLimitEvapOut( TempLowLimitEvapOut ),
 			DesignHeatRecVolFlowRate( DesignHeatRecVolFlowRate ),
+			DesignHeatRecVolFlowRateWasAutoSized( DesignHeatRecVolFlowRateWasAutoSized ),
 			DesignHeatRecMassFlowRate( DesignHeatRecMassFlowRate ),
 			SizFac( SizFac ),
 			HeatRecActive( HeatRecActive ),

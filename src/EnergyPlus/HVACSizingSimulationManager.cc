@@ -101,7 +101,9 @@ namespace EnergyPlus {
 		}
 	}
 
-	void HVACSizingSimulationManager::processCoincidentPlantSizeAdjustments(){
+	void HVACSizingSimulationManager::processCoincidentPlantSizeAdjustments(
+		int const HVACSizingIterCount
+	){
 
 		using namespace DataPlant;
 		using namespace PlantManager;
@@ -111,8 +113,8 @@ namespace EnergyPlus {
 		PlantCoinAnalyRequestsAnotherIteration = false;
 		for ( auto &P : this -> PlantCoincAnalyObjs ) {
 			P.newFoundMassFlowRateTimeStamp = SizingLogger.logObjs[ P.LogIndex ].GetLogVariableDataMax( );
-			P.ResolveDesignFlowRate();
-			if (P.AnotherIterationDesired){
+			P.ResolveDesignFlowRate( HVACSizingIterCount );
+			if ( P.AnotherIterationDesired ){
 				PlantCoinAnalyRequestsAnotherIteration = true;
 			}
 		}
@@ -152,7 +154,7 @@ namespace EnergyPlus {
 
 		HVACSizingSimulationManager SizeSimManagerObj;
 
-		void ManageAdvancedSizing(
+		void ManageHVACSizingSimulation(
 			bool & ErrorsFound
 		) {
 			using DataGlobals::DoOutputReporting;
@@ -334,7 +336,7 @@ namespace EnergyPlus {
 
 
 			} // ... End environment loop.
-			SizeSimManagerObj.processCoincidentPlantSizeAdjustments();
+			SizeSimManagerObj.processCoincidentPlantSizeAdjustments( HVACSizingIterCount );
 
 			SizeSimManagerObj.RedoKickOffAndResize();
 
