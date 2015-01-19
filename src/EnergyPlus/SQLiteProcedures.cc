@@ -35,10 +35,41 @@ const int SQLite::UnitsId             =  6;
 
 std::unique_ptr<SQLite> sqlite;
 
-SQLite::SQLite()
+void CreateSQLiteDatabase() {
+	try 
+	{
+		int numberOfSQLiteObjects = InputProcessor::GetNumObjectsFound("Output:SQLite");
+		bool writeOutputToSQLite = false;
+		bool writeTabularDataToSQLite = false;
+
+		if((numberOfSQLiteObjects == 1) && (! DataSystemVariables::DDOnly)) {
+			FArray1D_string alphas(5);
+			int numAlphas;
+			FArray1D< Real64 > numbers(2);
+			int numNumbers;
+			int status;
+
+			InputProcessor::GetObjectItem("Output:SQLite",1,alphas,numAlphas,numbers,numNumbers,status);
+			if( numAlphas > 0 ) {
+				std::string option = alphas(1);
+				if( InputProcessor::SameString(option,"SimpleAndTabular") ) {
+					writeTabularDataToSQLite = true;
+					writeOutputToSQLite = true;
+				} else if( InputProcessor::SameString(option,"Simple") ) {
+					writeOutputToSQLite = true;
+				}
+			}
+		}
+		EnergyPlus::sqlite = std::unique_ptr<SQLite>(new SQLite( writeOutputToSQLite, writeTabularDataToSQLite ));
+	} catch( const std::runtime_error& error ) {
+		ShowFatalError(error.what());
+	}
+}
+
+SQLite::SQLite( bool writeOutputToSQLite, bool writeTabularDataToSQLite )
 	:
-	m_writeOutputToSQLite(false),
-	m_writeTabularDataToSQLite(false),
+	m_writeOutputToSQLite(writeOutputToSQLite),
+	m_writeTabularDataToSQLite(writeTabularDataToSQLite),
 	m_sqlDBTimeIndex(0),
 	m_db(nullptr),
 	m_dbName("eplusout.sql"),
@@ -83,27 +114,6 @@ SQLite::SQLite()
 	m_simulationUpdateStmt(nullptr),
 	m_simulationDataUpdateStmt(nullptr)
 {
-	int numberOfSQLiteObjects = InputProcessor::GetNumObjectsFound("Output:SQLite");
-
-	if((numberOfSQLiteObjects == 1) && (! DataSystemVariables::DDOnly)) {
-		FArray1D_string alphas(5);
-		int numAlphas;
-		FArray1D< Real64 > numbers(2);
-		int numNumbers;
-		int status;
-
-		InputProcessor::GetObjectItem("Output:SQLite",1,alphas,numAlphas,numbers,numNumbers,status);
-		if( numAlphas > 0 ) {
-			std::string option = alphas(1);
-			if( InputProcessor::SameString(option,"SimpleAndTabular") ) {
-				m_writeTabularDataToSQLite = true;
-				m_writeOutputToSQLite = true;
-			} else if( InputProcessor::SameString(option,"Simple") ) {
-				m_writeOutputToSQLite = true;
-			}
-		}
-	}
-
 	if( m_writeOutputToSQLite ) {
 		int rc = -1;
 		bool ok = true;

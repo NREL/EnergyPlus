@@ -16,12 +16,17 @@
 
 namespace EnergyPlus {
 
+	void CreateSQLiteDatabase();
+
 class SQLite {
 public:
+	// Friend SQLiteFixture which is the gtest fixture class for testing SQLite
+	// This allows for testing of private methods in SQLite
+	friend class SQLiteFixture;
 
 	// Open the DB and prepare for writing data
 	// Create all of the tables on construction
-	SQLite();
+	SQLite( bool writeOutputToSQLite = false, bool writeTabularDataToSQLite = false );
 
 	// Close database and free prepared statements
 	virtual ~SQLite();

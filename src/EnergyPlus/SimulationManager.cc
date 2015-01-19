@@ -262,12 +262,7 @@ namespace SimulationManager {
 		static gio::Fmt Format_700( "('Environment:WarmupDays,',I3)" );
 
 		//CreateSQLiteDatabase();
-		try {
-			EnergyPlus::sqlite = std::unique_ptr<SQLite>(new SQLite());
-		} catch(const std::runtime_error& error) {
-			// Maybe this could be higher in the call stack, and then handle all runtime exceptions this way.
-			ShowFatalError(error.what());
-		}
+		EnergyPlus::CreateSQLiteDatabase();
 
 		if ( sqlite->writeOutputToSQLite() ) {
 			sqlite->sqliteBegin();
