@@ -10,6 +10,7 @@ set( test_src
   ExteriorEnergyUse.unit.cc
   HeatBalanceManager.unit.cc
   SortAndStringUtilities.unit.cc
+  SQLite.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
 )
