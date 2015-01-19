@@ -42,7 +42,7 @@ void CreateSQLiteDatabase() {
 		bool writeOutputToSQLite = false;
 		bool writeTabularDataToSQLite = false;
 
-		if((numberOfSQLiteObjects == 1) && (! DataSystemVariables::DDOnly)) {
+		if( numberOfSQLiteObjects == 1 ) {
 			FArray1D_string alphas(5);
 			int numAlphas;
 			FArray1D< Real64 > numbers(2);
