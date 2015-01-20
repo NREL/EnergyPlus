@@ -145,7 +145,7 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.add("", 0, 0, 0, "Force annual simulation", "-a", "--annual");
 
-	opt.add("", 0, 1, 0, "Output directory path (default: INPUTFILE-output in current directory)", "-d", "--output-directory");
+	opt.add("", 0, 1, 0, "Output directory path (default: current directory)", "-d", "--output-directory");
 
 	opt.add("", 0, 0, 0, "Force design-day-only simulation", "-D", "--design-day");
 
@@ -155,9 +155,11 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.add("", 0, 0, 0, "Run EPMacro prior to simulation", "-m", "--epmacro");
 
-	opt.add("", 0, 1, 0, "Prefix for output file names (default: ep)", "-p", "--output-prefix");
+	opt.add("", 0, 1, 0, "Prefix for output file names (default: eplus)", "-p", "--output-prefix");
 
 	opt.add("", 0, 0, 0, "Run ReadVarsESO after simulation", "-r", "--readvars");
+
+	opt.add("L", 0, 1, 0, "Suffix style for output file names (default: L)\n   L: Legacy (e.g., eplustbl.csv)\n   C: Capital (e.g., eplusTable.csv)\n   D: Dash (e.g., eplus-table.csv)", "-s", "--output-suffix");
 
 	opt.add("", 0, 0, 0, "Display version information", "-v", "--version");
 
@@ -272,12 +274,6 @@ ProcessArgs(int argc, const char * argv[])
 		// Create directory if it doesn't already exist
 		makeDirectory(dirPathName);
 	}
-	else if (!legacyMode)
-	{
-		dirPathName = idfFileNameOnly + "-output" + pathChar;
-		// Create directory if it doesn't already exist
-		makeDirectory(dirPathName);
-	}
 
 	// File naming scheme
 	std::string outputFilePrefix;
@@ -287,10 +283,11 @@ ProcessArgs(int argc, const char * argv[])
 		makeNativePath(prefixOutName);
 		outputFilePrefix = dirPathName + prefixOutName;
 	}
-	else if (!legacyMode)
-		outputFilePrefix = dirPathName + "ep";
 	else
 		outputFilePrefix = dirPathName + "eplus";
+
+	std::string suffixType;
+	opt.get("-s")->getString(suffixType);
 
 
 	std::string outputEpmdetFileName;
@@ -299,128 +296,121 @@ ProcessArgs(int argc, const char * argv[])
 	std::string outputExpidfFileName;
 	std::string outputExperrFileName;
 
-	if (legacyMode)	{
-		// EnergyPlus files
-		outputAuditFileName = outputFilePrefix + "out.audit";
-		outputBndFileName = outputFilePrefix + "out.bnd";
-		outputDxfFileName = outputFilePrefix + "out.dxf";
-		outputEioFileName = outputFilePrefix + "out.eio";
-		outputEndFileName = outputFilePrefix + "out.end";
-		outputErrFileName = outputFilePrefix + "out.err";
-		outputEsoFileName = outputFilePrefix + "out.eso";
-		outputMtdFileName = outputFilePrefix + "out.mtd";
-		outputMddFileName = outputFilePrefix + "out.mdd";
-		outputMtrFileName = outputFilePrefix + "out.mtr";
-		outputRddFileName = outputFilePrefix + "out.rdd";
-		outputShdFileName = outputFilePrefix + "out.shd";
-		outputTblCsvFileName = outputFilePrefix + "tbl.csv";
-		outputTblHtmFileName = outputFilePrefix + "tbl.htm";
-		outputTblTabFileName = outputFilePrefix + "tbl.tab";
-		outputTblTxtFileName = outputFilePrefix + "tbl.txt";
-		outputTblXmlFileName = outputFilePrefix + "tbl.xml";
-		outputAdsFileName = outputFilePrefix + "ADS.out";
-		outputDfsFileName = outputFilePrefix + "out.dfs";
-		outputDelightInFileName = "eplusout.delightin";
-		outputDelightOutFileName = "eplusout.delightout";
-		outputDelightEldmpFileName = "eplusout.delighteldmp";
-		outputDelightDfdmpFileName = "eplusout.delightdfdmp";
-		outputMapTabFileName = outputFilePrefix + "map.tab";
-		outputMapCsvFileName = outputFilePrefix + "map.csv";
-		outputMapTxtFileName = outputFilePrefix + "map.txt";
-		outputEddFileName = outputFilePrefix + "out.edd";
-		outputIperrFileName = outputFilePrefix + "out.iperr";
-		outputSlnFileName = outputFilePrefix + "out.sln";
-		outputSciFileName = outputFilePrefix + "out.sci";
-		outputWrlFileName = outputFilePrefix + "out.wrl";
-		outputZszCsvFileName = outputFilePrefix + "zsz.csv";
-		outputZszTabFileName = outputFilePrefix + "zsz.tab";
-		outputZszTxtFileName = outputFilePrefix + "zsz.txt";
-		outputSszCsvFileName = outputFilePrefix + "ssz.csv";
-		outputSszTabFileName = outputFilePrefix + "ssz.tab";
-		outputSszTxtFileName = outputFilePrefix + "ssz.txt";
-		outputScreenCsvFileName = outputFilePrefix + "screen.csv";
-		outputSqlFileName = outputFilePrefix + "out.sql";
-		outputSqliteErrFileName = dirPathName + "sqlite.err";
-		outputDbgFileName = outputFilePrefix + "out.dbg";
-		EnergyPlusIniFileName = "Energy+.ini";
-		inStatFileName = weatherFilePathWithoutExtension + ".stat";
-		TarcogIterationsFileName = "TarcogIterations.dbg";
-		eplusADSFileName = idfDirPathName+"eplusADS.inp";
+	std::string normalSuffix;
+	std::string tableSuffix;
+	std::string mapSuffix;
+	std::string zszSuffix;
+	std::string sszSuffix;
+	std::string meterSuffix;
+	std::string sqliteSuffix;
+	std::string adsSuffix;
+	std::string screenSuffix;
 
-		// Readvars files
-		outputCsvFileName = outputFilePrefix + "out.csv";
-		outputMtrCsvFileName = outputFilePrefix + "mtr.csv";
-		outputRvauditFileName = outputFilePrefix + "out.rvaudit";
+	if (suffixType == "L" || suffixType == "l")	{
 
-		// EPMacro files
-		outputEpmdetFileName = outputFilePrefix + "out.epmdet";
-		outputEpmidfFileName = outputFilePrefix + "out.epmidf";
+		normalSuffix = "out";
+		tableSuffix = "tbl";
+		mapSuffix = "map";
+		zszSuffix = "zsz";
+		sszSuffix = "ssz";
+		meterSuffix = "mtr";
+		sqliteSuffix = "sqlite";
+		adsSuffix = "ADS";
+		screenSuffix = "screen";
 
-		// ExpandObjects files
-		outputExpidfFileName = outputFilePrefix + "out.expidf";
-		outputExperrFileName = outputFilePrefix + "out.experr";
+	}
+	else if (suffixType == "D" || suffixType == "d") {
+
+		normalSuffix = "";
+		tableSuffix = "-table";
+		mapSuffix = "-map";
+		zszSuffix = "-zsz";
+		sszSuffix = "-ssz";
+		meterSuffix = "-meter";
+		sqliteSuffix = "-sqlite";
+		adsSuffix = "-ads";
+		screenSuffix = "-screen";
+
+	}
+	else if (suffixType == "C" || suffixType == "c") {
+
+		normalSuffix = "";
+		tableSuffix = "Table";
+		mapSuffix = "Map";
+		zszSuffix = "Zsz";
+		sszSuffix = "Ssz";
+		meterSuffix = "Meter";
+		sqliteSuffix = "Sqlite";
+		adsSuffix = "Ads";
+		screenSuffix = "Screen";
+
 	}
 	else {
-		// EnergyPlus files
-		outputAuditFileName = outputFilePrefix + ".audit";
-		outputBndFileName = outputFilePrefix + ".bnd";
-		outputDxfFileName = outputFilePrefix + ".dxf";
-		outputEioFileName = outputFilePrefix + ".eio";
-		outputEndFileName = outputFilePrefix + ".end";
-		outputErrFileName = outputFilePrefix + ".err";
-		outputEsoFileName = outputFilePrefix + ".eso";
-		outputMtdFileName = outputFilePrefix + ".mtd";
-		outputMddFileName = outputFilePrefix + ".mdd";
-		outputMtrFileName = outputFilePrefix + ".mtr";
-		outputRddFileName = outputFilePrefix + ".rdd";
-		outputShdFileName = outputFilePrefix + ".shd";
-		outputTblCsvFileName = outputFilePrefix + "-table.csv";
-		outputTblHtmFileName = outputFilePrefix + "-table.htm";
-		outputTblTabFileName = outputFilePrefix + "-table.tab";
-		outputTblTxtFileName = outputFilePrefix + "-table.txt";
-		outputTblXmlFileName = outputFilePrefix + "-table.xml";
-		outputAdsFileName = outputFilePrefix + "-ads.out";
-		outputDfsFileName = outputFilePrefix + ".dfs";
-		outputDelightInFileName = "eplusout.delightin";
-		outputDelightOutFileName = "eplusout.delightout";
-		outputDelightEldmpFileName = "eplusout.delighteldmp";
-		outputDelightDfdmpFileName = "eplusout.delightdfdmp";
-		outputMapTabFileName = outputFilePrefix + "-map.tab";
-		outputMapCsvFileName = outputFilePrefix + "-map.csv";
-		outputMapTxtFileName = outputFilePrefix + "-map.txt";
-		outputEddFileName = outputFilePrefix + ".edd";
-		outputIperrFileName = outputFilePrefix + ".iperr";
-		outputSlnFileName = outputFilePrefix + ".sln";
-		outputSciFileName = outputFilePrefix + ".sci";
-		outputWrlFileName = outputFilePrefix + ".wrl";
-		outputZszCsvFileName = outputFilePrefix + "-zsz.csv";
-		outputZszTabFileName = outputFilePrefix + "-zsz.tab";
-		outputZszTxtFileName = outputFilePrefix + "-zsz.txt";
-		outputSszCsvFileName = outputFilePrefix + "-ssz.csv";
-		outputSszTabFileName = outputFilePrefix + "-ssz.tab";
-		outputSszTxtFileName = outputFilePrefix + "-ssz.txt";
-		outputScreenCsvFileName = outputFilePrefix + "-screen.csv";
-		outputSqlFileName = outputFilePrefix + ".sql";
-		outputSqliteErrFileName = outputFilePrefix + "-sqlite.err";
-		outputDbgFileName = outputFilePrefix + ".dbg";
-		EnergyPlusIniFileName = "Energy+.ini";
-		inStatFileName = weatherFilePathWithoutExtension + ".stat";
-		TarcogIterationsFileName = "TarcogIterations.dbg";
-		eplusADSFileName = idfDirPathName+"eplusADS.inp";
-
-		// Readvars files
-		outputCsvFileName = outputFilePrefix + ".csv";
-		outputMtrCsvFileName = outputFilePrefix + "Meter.csv";
-		outputRvauditFileName = outputFilePrefix + ".rvaudit";
-
-		// EPMacro files
-		outputEpmdetFileName = outputFilePrefix + ".epmdet";
-		outputEpmidfFileName = outputFilePrefix + ".epmidf";
-
-		// ExpandObjects files
-		outputExpidfFileName = outputFilePrefix + ".expidf";
-		outputExperrFileName = outputFilePrefix + ".experr";
+		DisplayString("ERROR: Unrecognized argument for output suffix style: " + suffixType);
+		DisplayString(errorFollowUp);
+		exit(EXIT_FAILURE);
 	}
+
+	// EnergyPlus files
+	outputAuditFileName = outputFilePrefix + normalSuffix + ".audit";
+	outputBndFileName = outputFilePrefix + normalSuffix + ".bnd";
+	outputDxfFileName = outputFilePrefix + normalSuffix + ".dxf";
+	outputEioFileName = outputFilePrefix + normalSuffix + ".eio";
+	outputEndFileName = outputFilePrefix + normalSuffix + ".end";
+	outputErrFileName = outputFilePrefix + normalSuffix + ".err";
+	outputEsoFileName = outputFilePrefix + normalSuffix + ".eso";
+	outputMtdFileName = outputFilePrefix + normalSuffix + ".mtd";
+	outputMddFileName = outputFilePrefix + normalSuffix + ".mdd";
+	outputMtrFileName = outputFilePrefix + normalSuffix + ".mtr";
+	outputRddFileName = outputFilePrefix + normalSuffix + ".rdd";
+	outputShdFileName = outputFilePrefix + normalSuffix + ".shd";
+	outputDfsFileName = outputFilePrefix + normalSuffix + ".dfs";
+	outputEddFileName = outputFilePrefix + normalSuffix + ".edd";
+	outputIperrFileName = outputFilePrefix + normalSuffix + ".iperr";
+	outputSlnFileName = outputFilePrefix + normalSuffix + ".sln";
+	outputSciFileName = outputFilePrefix + normalSuffix + ".sci";
+	outputWrlFileName = outputFilePrefix + normalSuffix + ".wrl";
+	outputSqlFileName = outputFilePrefix + normalSuffix + ".sql";
+	outputDbgFileName = outputFilePrefix + normalSuffix + ".dbg";
+	outputTblCsvFileName = outputFilePrefix + tableSuffix + ".csv";
+	outputTblHtmFileName = outputFilePrefix + tableSuffix + ".htm";
+	outputTblTabFileName = outputFilePrefix + tableSuffix + ".tab";
+	outputTblTxtFileName = outputFilePrefix + tableSuffix + ".txt";
+	outputTblXmlFileName = outputFilePrefix + tableSuffix + ".xml";
+	outputMapTabFileName = outputFilePrefix + mapSuffix + ".tab";
+	outputMapCsvFileName = outputFilePrefix + mapSuffix + ".csv";
+	outputMapTxtFileName = outputFilePrefix + mapSuffix + ".txt";
+	outputZszCsvFileName = outputFilePrefix + zszSuffix + ".csv";
+	outputZszTabFileName = outputFilePrefix + zszSuffix + ".tab";
+	outputZszTxtFileName = outputFilePrefix + zszSuffix + ".txt";
+	outputSszCsvFileName = outputFilePrefix + sszSuffix + ".csv";
+	outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
+	outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
+	outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
+	outputSqliteErrFileName = dirPathName + sqliteSuffix + ".err";
+	outputScreenCsvFileName = outputFilePrefix + screenSuffix + ".csv";
+	outputDelightInFileName = "eplusout.delightin";
+	outputDelightOutFileName = "eplusout.delightout";
+	outputDelightEldmpFileName = "eplusout.delighteldmp";
+	outputDelightDfdmpFileName = "eplusout.delightdfdmp";
+	EnergyPlusIniFileName = "Energy+.ini";
+	inStatFileName = weatherFilePathWithoutExtension + ".stat";
+	TarcogIterationsFileName = "TarcogIterations.dbg";
+	eplusADSFileName = idfDirPathName+"eplusADS.inp";
+
+	// Readvars files
+	outputCsvFileName = outputFilePrefix + normalSuffix + ".csv";
+	outputMtrCsvFileName = outputFilePrefix + meterSuffix + ".csv";
+	outputRvauditFileName = outputFilePrefix + normalSuffix + ".rvaudit";
+
+	// EPMacro files
+	outputEpmdetFileName = outputFilePrefix + normalSuffix + ".epmdet";
+	outputEpmidfFileName = outputFilePrefix + normalSuffix + ".epmidf";
+
+	// ExpandObjects files
+	outputExpidfFileName = outputFilePrefix + normalSuffix + ".expidf";
+	outputExperrFileName = outputFilePrefix + normalSuffix + ".experr";
+
 
 	// Handle bad options
 	if(!opt.gotExpected(badOptions)) {

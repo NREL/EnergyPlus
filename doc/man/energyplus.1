@@ -35,7 +35,7 @@ Force annual simulation
 .RE
 .TP
 .B \-d, \-\-output\-directory \f[I]ARG\f[]
-Output directory path (default: \f[I]INPUTFILE\f[]-output in current directory)
+Output directory path (default: current directory)
 .RS
 .RE
 .TP
@@ -60,12 +60,20 @@ Run EPMacro prior to simulation
 .RE
 .TP
 .B \-p, \-\-output\-prefix \f[I]ARG\f[]
-Prefix for output file names (default: ep)
+Prefix for output file names (default: eplus)
 .RS
 .RE
 .TP
 .B \-r, \-\-readvars
 Run ReadVarsESO after simulation
+.RS
+.RE
+.TP
+.B \-s, \-\-output\-suffix \f[I]ARG\f[]
+Suffix style for output file names (default: L)
+   L: Legacy (e.g., eplustbl.csv)
+   C: Capital (e.g., eplusTable.csv)
+   D: Dash (e.g., eplus-table.csv)
 .RS
 .RE
 .TP
@@ -81,3 +89,13 @@ Weather file path (default: in.epw in current directory)
 .TP
 .B \-x, \-\-expandobjects
 Run ExpandObjects prior to simulation
+.SH EXAMPLES
+.SS Using a custom IDD file:
+energyplus -i custom.idd -w weather.epw input.idf
+.SS Pre-processing using EPMacro and ExpandObjects:
+
+energyplus -w weather.epw -m -x input.imf
+
+.SS Forcing design-day only simulations:
+
+energyplus -D input.idf
