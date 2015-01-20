@@ -30,6 +30,7 @@ namespace HeatBalanceIntRadExchange {
 
 	// Functions
 
+  extern int count;
 	void
 	CalcInteriorRadExchange(
 		FArray1S< Real64 > const SurfaceTemp, // Current surface temperatures

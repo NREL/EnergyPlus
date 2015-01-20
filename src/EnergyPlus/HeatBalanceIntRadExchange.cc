@@ -24,6 +24,7 @@
 #include <UtilityRoutines.hh>
 #include <WindowEquivalentLayer.hh>
 #include <Timer.h>
+#include <DataHeatBalSurface.hh>
 
 namespace EnergyPlus {
 
@@ -86,6 +87,8 @@ namespace HeatBalanceIntRadExchange {
 
 	// Functions
 
+  int count = 0;
+
 	void
 	CalcInteriorRadExchange(
 		FArray1S< Real64 > const SurfaceTemp, // Current surface temperatures
@@ -123,6 +126,7 @@ namespace HeatBalanceIntRadExchange {
 		using namespace DataTimings;
 		using WindowEquivalentLayer::EQLWindowInsideEffectiveEmiss;
 		using InputProcessor::SameString;
+		using namespace dd; //dataDump
 
 		// Argument array dimensioning
 
@@ -331,7 +335,27 @@ namespace HeatBalanceIntRadExchange {
 				//      IF (ABS(RecSurfTempInKTo4th) > 1.d100) THEN
 				//        SendZoneSurfNum=0
 				//      ENDIF
+				//DELME GEOF
+				const int MAX_DEBUG_COUNT = 125;
+				auto lRS( zone_ScriptF.index( RecZoneSurfNum, 1 ) );
 
+				// if(count <= MAX_DEBUG_COUNT){
+				//   std::cout << "count " << count << " rec surf: " << RecSurfNum - 1 << std::endl;
+				//   std::cout << " temp: " << RecSurfTempInKTo4th << " emis: " << RecSurfEmiss << " surfCount: " 
+				// 	    << n_zone_Surfaces << std::endl;
+				//   std::cout << " is window " << construct.TypeIessWindow << " is TDD Dif " << 
+				//     (surface_window.OriginalClass == SurfaceClass_TDD_Diffuser) <<
+				//     " is WindowTypeEQL " << construct.WindowTypeEQL << " shadeFlag IntShadeOn " << 
+				//     (surface_window.ShadingFlag == IntShadeOn) <<
+				//     " shadeFlag IntBlindOn " << (surface_window.ShadingFlag == IntBlindOn) << std::endl;
+				//   std::cout << " script_f: ";
+				//   for(int x = 1;  x <= n_zone_Surfaces; ++x, lRS += sizeR){
+				//     std::cout << x -1 << "::" << zone_ScriptF[ lRS ] << ":";
+				//   }
+				//   std::cout << std::endl;
+					
+				// }
+				// //END DELME
 				// Calculate net long-wave radiation for opaque surfaces and incident
 				// long-wave radiation for windows.
 				if ( construct.TypeIsWindow ) { // Window
@@ -383,6 +407,20 @@ namespace HeatBalanceIntRadExchange {
 				}
 			}
 		}
+		// static dataDump<decltype(DataHeatBalSurface::NetLWRadToSurf)>
+		// 	LWRdumper("NetLWRadToSurf", &DataHeatBalSurface::NetLWRadToSurf);
+		// dataDumpS::doIteration<decltype(SurfaceWindow.IRfromParentZone())>(SurfaceWindow.IRfromParentZone(), "IRfromParentZone");
+		// LWRdumper.doIteration();
+		// std::cout << "printing scriptf" << std::endl;
+		// for(int z = 1; z <= NumOfZones; ++z){
+		//   for(int x = 1; x <= ZoneInfo(z).NumOfSurfaces; ++x){
+		//     for(int y =1 y <= ZoneInfo(z).NumOfSurfaces; ++y){
+		//       std::cout << ZoneInfo(z).ScriptF(x, y) << "\t";
+		//     }
+		//     std::cout << std::endl;
+		//   }
+		// }
+		++count;
 
 #ifdef EP_Detailed_Timings
 		epStopTime( "CalcInteriorRadExchange=" );
@@ -1433,7 +1471,7 @@ namespace HeatBalanceIntRadExchange {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
