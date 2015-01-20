@@ -1,4 +1,23 @@
-!SUBROUTINE CreateNewIDFUsingRulesV1_1_1(EndOfFile,DiffOnly,InLfn,AskForInput,InputFileName,ArgFile,ArgIDFExtension)
+MODULE SetVersion
+
+USE DataStringGlobals
+USE DataVCompareGlobals
+
+PUBLIC
+
+CONTAINS
+
+SUBROUTINE SetThisVersionVariables()
+      VerString='Conversion 1.1 => 1.1.1'
+      VersionNum=1.0
+      IDDFileNameWithPath=TRIM(ProgramPath)//'V1-1-0-Energy+.idd'
+      NewIDDFileNameWithPath=TRIM(ProgramPath)//'V1-1-1-Energy+.idd'
+      RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 1-1-0-020 to 1-1-1.csv'
+END SUBROUTINE
+
+END MODULE
+
+SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFileName,ArgFile,ArgIDFExtension)
           ! SUBROUTINE INFORMATION:
           !       AUTHOR         Linda Lawrie
           !       DATE WRITTEN   July 2002
@@ -869,4 +888,4 @@
 
   RETURN
 
-!END SUBROUTINE CreateNewIDFUsingRulesV1_1_1
+END SUBROUTINE CreateNewIDFUsingRules

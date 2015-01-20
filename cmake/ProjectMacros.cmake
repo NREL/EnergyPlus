@@ -110,9 +110,20 @@ macro( CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES )
   endif()
 endmacro()
 
+# Named arguments 
+# IDF_FILE <filename> IDF input file
+# EPW_FILE <filename> EPW weather file
+# 
+# Optional Arguments
+# DESIGN_DAY_ONLY force design day simulation
+# ANNUAL_SIMULATION force annual simulation
+# EXPECT_FATAL Expect simulation to fail
+# COST <integer> Cost of this simulation relative to other simulations.
+#                Higher cost simulations run earlier in an attempt to enhance
+#                test parallelization and reduce overall test run time.
 function( ADD_SIMULATION_TEST )
   set(options ANNUAL_SIMULATION DESIGN_DAY_ONLY EXPECT_FATAL)
-  set(oneValueArgs IDF_FILE EPW_FILE)
+  set(oneValueArgs IDF_FILE EPW_FILE COST)
   set(multiValueArgs "")
   cmake_parse_arguments(ADD_SIM_TEST "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
@@ -124,8 +135,14 @@ function( ADD_SIMULATION_TEST )
     set(ANNUAL_SIMULATION false)
   endif()
 
+
   get_filename_component(IDF_NAME "${ADD_SIM_TEST_IDF_FILE}" NAME_WE)
-  
+
+  if ( PROFILE_GENERATE AND IDF_NAME MATCHES "^(ChilledWaterStorage-Mixed|AirflowNetwork3zVent|AirflowNetwork3zVentAutoWPC|DElightCFSWindow|PipeHeatTransfer_Outair|RadHiTempElecTermReheat|RadLoTempCFloTermReheat|RadLoTempHydrMulti10|RefBldgSmallOfficeNew2004_Chicago|WindowTestsSimple|.*CentralChillerHeaterSystem.*|EMSCustomOutputVariable|EMSTestMathAndKill)$")
+    message("Setting ANNUAL_SIMULATION to true for ${IDF_NAME} for the purpose of PGO training")
+    set(ANNUAL_SIMULATION true)
+  endif()
+
   add_test(NAME "integration.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}
     -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
     -DBINARY_DIR=${CMAKE_BINARY_DIR}
@@ -137,14 +154,28 @@ function( ADD_SIMULATION_TEST )
     -P ${CMAKE_SOURCE_DIR}/cmake/RunSimulation.cmake
   )  
 
+  # MSVC's profile generator does not work with parallel runs
+  #if( MSVC AND PROFILE_GENERATE )
+    #set_tests_properties("integration.${IDF_NAME}" PROPERTIES RUN_SERIAL true)
+  #endif()
+
+  if (ADD_SIM_TEST_COST AND NOT ADD_SIM_TEST_COST STREQUAL "" )
+    set_tests_properties("integration.${IDF_NAME}" PROPERTIES COST ${ADD_SIM_TEST_COST})
+  endif()
+
   # Added the expect_fatal here to detect files that are expected to fatal error properly
   if( ADD_SIM_TEST_EXPECT_FATAL )
-    SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Failed")
-    SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Passed")
+    set_tests_properties("integration.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Failed")
+    set_tests_properties("integration.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Passed")
   else()
-    SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
-    SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
+    set_tests_properties("integration.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
+    set_tests_properties("integration.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
   endif()
+
+  if ( PROFILE_GENERATE AND ANNUAL_SIMULATION )
+    set_tests_properties("integration.${IDF_NAME}" PROPERTIES TIMEOUT 4500)
+  endif()
+
 
   if( DO_REGRESSION_TESTING AND (NOT ADD_SIM_TEST_EXPECT_FATAL) )
     add_test(NAME "regression.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}

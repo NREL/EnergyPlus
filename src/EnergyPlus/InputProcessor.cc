@@ -66,6 +66,7 @@ namespace InputProcessor {
 	using DataSystemVariables::SortedIDD;
 	using DataSystemVariables::iASCII_CR;
 	using DataSystemVariables::iUnicode_end;
+	using DataGlobals::DisplayInputInAudit;
 
 	// Use statements for access to subroutines in other modules
 
@@ -313,6 +314,9 @@ namespace InputProcessor {
 		gio::write( EchoInputFile, fmtLD ) << " Total Number of Fields=" << NumAlphaArgsFound + NumNumericArgsFound;
 
 		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File (in.idf) -- Start";
+		if ( !DisplayInputInAudit ){
+			gio::write( EchoInputFile, fmtLD ) << " Echo of input lines is off. May be activated by setting the environmental variable DISPLAYINPUTINAUDIT=YES";
+		}
 
 		{ IOFlags flags; gio::inquire( "in.idf", flags ); FileExists = flags.exists(); }
 		if ( ! FileExists ) {
@@ -398,7 +402,7 @@ namespace InputProcessor {
 		}
 
 		if ( TotalAuditErrors > 0 ) {
-			ShowWarningError( "IP: Note -- Some missing fields have been filled with defaults." " See the audit output file for details." );
+			ShowWarningError( "IP: Note -- Some missing fields have been filled with defaults. See the audit output file for details." );
 		}
 
 		if ( NumOutOfRangeErrorsFound > 0 ) {
@@ -872,7 +876,7 @@ namespace InputProcessor {
 						Pos = std::string::npos;
 					}
 					if ( Pos == std::string::npos ) {
-						ShowSevereError( "IP: IDD line~" + IPTrimSigDigits( NumLines ) + " , or ; expected on this line" ",position=\"" + InputLine.substr( CurPos ) + "\"", EchoInputFile );
+						ShowSevereError( "IP: IDD line~" + IPTrimSigDigits( NumLines ) + " , or ; expected on this line,position=\"" + InputLine.substr( CurPos ) + "\"", EchoInputFile );
 						errFlag = true;
 						ErrorsFound = true;
 					}
@@ -1852,7 +1856,7 @@ namespace InputProcessor {
 
 		for ( int Count = 1; Count <= NumIDFSections; ++Count ) {
 			if ( SectionsOnFile( Count ).FirstRecord > SectionsOnFile( Count ).LastRecord ) {
-				gio::write( EchoInputFile, fmtLD ) << " Section " << Count << " " << SectionsOnFile( Count ).Name << " had no object records";
+				gio::write( EchoInputFile, fmtLD ) << " Section " << Count << ' ' << SectionsOnFile( Count ).Name << " had no object records";
 				SectionsOnFile( Count ).FirstRecord = -1;
 				SectionsOnFile( Count ).LastRecord = -1;
 			}
@@ -2639,7 +2643,9 @@ namespace InputProcessor {
 		} else {
 			if ( EchoInputLine ) {
 				++NumLines;
-				if ( echo_stream ) *echo_stream << std::setw( 7 ) << NumLines << ' ' << InputLine << NL;
+				if ( DisplayInputInAudit ) {
+					if ( echo_stream ) *echo_stream << std::setw(7) << NumLines << ' ' << InputLine << NL;
+				}
 			}
 			EchoInputLine = true;
 			InputLineLength = static_cast< int >( len_trim( InputLine ) );
@@ -2818,7 +2824,9 @@ namespace InputProcessor {
 		} else {
 			if ( EchoInputLine ) {
 				++NumLines;
-				if ( echo_stream ) *echo_stream << std::setw( 7 ) << NumLines << ' ' << InputLine << NL;
+				if ( DisplayInputInAudit ) {
+					if ( echo_stream ) *echo_stream << std::setw( 7 ) << NumLines << ' ' << InputLine << NL;
+				}
 			}
 			EchoInputLine = true;
 			InputLineLength = static_cast< int >( len_trim( InputLine ) );
@@ -4374,7 +4382,7 @@ namespace InputProcessor {
 			gio::write( EchoInputFile, fmtLD ) << "Unused Objects -- Objects in IDF that were never \"gotten\"";
 			for ( Count = 1; Count <= NumOrphObjNames; ++Count ) {
 				if ( ! OrphanNames( Count ).empty() ) {
-					gio::write( EchoInputFile, fmtA ) << " " + OrphanObjectNames( Count ) + '=' + OrphanNames( Count );
+					gio::write( EchoInputFile, fmtA ) << ' ' + OrphanObjectNames( Count ) + '=' + OrphanNames( Count );
 				} else {
 					gio::write( EchoInputFile, fmtLD ) << OrphanObjectNames( Count );
 				}
@@ -4382,7 +4390,7 @@ namespace InputProcessor {
 			ShowWarningError( "The following lines are \"Unused Objects\".  These objects are in the idf" );
 			ShowContinueError( " file but are never obtained by the simulation and therefore are NOT used." );
 			if ( ! DisplayAllWarnings ) {
-				ShowContinueError( " Only the first unused named object of an object class is shown.  " "Use Output:Diagnostics,DisplayAllWarnings to see all." );
+				ShowContinueError( " Only the first unused named object of an object class is shown.  Use Output:Diagnostics,DisplayAllWarnings to see all." );
 			} else {
 				ShowContinueError( " Each unused object is shown." );
 			}

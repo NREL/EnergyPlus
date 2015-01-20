@@ -261,6 +261,20 @@ namespace SimulationManager {
 		// Formats
 		static gio::Fmt Format_700( "('Environment:WarmupDays,',I3)" );
 
+		//CreateSQLiteDatabase();
+		try {
+			EnergyPlus::sqlite = std::unique_ptr<SQLite>(new SQLite());
+		} catch(const std::runtime_error& error) {
+			// Maybe this could be higher in the call stack, and then handle all runtime exceptions this way.
+			ShowFatalError(error.what());
+		}
+
+		if ( sqlite->writeOutputToSQLite() ) {
+			sqlite->sqliteBegin();
+			sqlite->createSQLiteSimulationsRecord( 1 );
+			sqlite->sqliteCommit();
+		}
+
 		// FLOW:
 		PostIPProcessing();
 
@@ -377,7 +391,7 @@ namespace SimulationManager {
 
 		if ( sqlite->writeOutputToSQLite() ) {
 			sqlite->sqliteBegin();
-			sqlite->createSQLiteSimulationsRecord( 1 );
+			sqlite->updateSQLiteSimulationRecord( 1 );
 			sqlite->sqliteCommit();
 		}
 
@@ -429,7 +443,7 @@ namespace SimulationManager {
 				strip( DayOfSimChr );
 				if ( ! WarmupFlag ) {
 					++CurrentOverallSimDay;
-					DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays ); 
+					DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays );
 				} else {
 					DayOfSimChr = "0";
 				}
@@ -454,7 +468,7 @@ namespace SimulationManager {
 					EndHourFlag = false;
 
 					for ( TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep ) {
-						if ( AnySlabsInModel || AnyBasementsInModel ){
+						if ( AnySlabsInModel || AnyBasementsInModel ) {
 							InitAndSimGroundDomains();
 						}
 
@@ -515,13 +529,13 @@ namespace SimulationManager {
 		WarmupFlag = false;
 		if ( ! SimsDone && DoDesDaySim ) {
 			if ( ( TotDesDays + TotRunDesPersDays ) == 0 ) { // if sum is 0, then there was no sizing done.
-				ShowWarningError( "ManageSimulation: SizingPeriod:* were requested in SimulationControl  " "but no SizingPeriod:* objects in input." );
+				ShowWarningError( "ManageSimulation: SizingPeriod:* were requested in SimulationControl but no SizingPeriod:* objects in input." );
 			}
 		}
 
 		if ( ! SimsDone && DoWeathSim ) {
 			if ( ! RunPeriodsInInput ) { // if no run period requested, and sims not done
-				ShowWarningError( "ManageSimulation: Weather Simulation was requested in SimulationControl " "but no RunPeriods in input." );
+				ShowWarningError( "ManageSimulation: Weather Simulation was requested in SimulationControl but no RunPeriods in input." );
 			}
 		}
 
@@ -1054,49 +1068,49 @@ namespace SimulationManager {
 			if ( DoZoneSizing ) {
 				if ( NumZoneSizing > 0 && NumSizingDays == 0 ) {
 					ErrorsFound = true;
-					ShowSevereError( "CheckEnvironmentSpecifications: Sizing for Zones has been requested but there are no " "design environments specified." );
+					ShowSevereError( "CheckEnvironmentSpecifications: Sizing for Zones has been requested but there are no design environments specified." );
 					ShowContinueError( "...Add appropriate SizingPeriod:* objects for your simulation." );
 				}
 				if ( NumZoneSizing > 0 && NumRunPeriodDesign > 0 && ! WeatherFileAttached ) {
 					ErrorsFound = true;
-					ShowSevereError( "CheckEnvironmentSpecifications: Sizing for Zones has been requested; Design period from " "the weather file requested; but no weather file specified." );
+					ShowSevereError( "CheckEnvironmentSpecifications: Sizing for Zones has been requested; Design period from the weather file requested; but no weather file specified." );
 				}
 			}
 			if ( DoSystemSizing ) {
 				if ( NumSystemSizing > 0 && NumSizingDays == 0 ) {
 					ErrorsFound = true;
-					ShowSevereError( "CheckEnvironmentSpecifications: Sizing for Systems has been requested but there are no " "design environments specified." );
+					ShowSevereError( "CheckEnvironmentSpecifications: Sizing for Systems has been requested but there are no design environments specified." );
 					ShowContinueError( "...Add appropriate SizingPeriod:* objects for your simulation." );
 				}
 				if ( NumSystemSizing > 0 && NumRunPeriodDesign > 0 && ! WeatherFileAttached ) {
 					ErrorsFound = true;
-					ShowSevereError( "CheckEnvironmentSpecifications: Sizing for Systems has been requested; Design period from " "the weather file requested; but no weather file specified." );
+					ShowSevereError( "CheckEnvironmentSpecifications: Sizing for Systems has been requested; Design period from the weather file requested; but no weather file specified." );
 				}
 			}
 			if ( DoPlantSizing ) {
 				if ( NumPlantSizing > 0 && NumSizingDays == 0 ) {
 					ErrorsFound = true;
-					ShowSevereError( "CheckEnvironmentSpecifications: Sizing for Equipment/Plants has been requested but there are no " "design environments specified." );
+					ShowSevereError( "CheckEnvironmentSpecifications: Sizing for Equipment/Plants has been requested but there are no design environments specified." );
 					ShowContinueError( "...Add appropriate SizingPeriod:* objects for your simulation." );
 				}
 				if ( NumPlantSizing > 0 && NumRunPeriodDesign > 0 && ! WeatherFileAttached ) {
 					ErrorsFound = true;
-					ShowSevereError( "CheckEnvironmentSpecifications: Sizing for Equipment/Plants has been requested; " "Design period from the weather file requested; but no weather file specified." );
+					ShowSevereError( "CheckEnvironmentSpecifications: Sizing for Equipment/Plants has been requested; Design period from the weather file requested; but no weather file specified." );
 				}
 			}
 			if ( DoDesDaySim && NumSizingDays == 0 ) {
-				ShowWarningError( "CheckEnvironmentSpecifications: SimulationControl specified doing design day simulations, but " "no design environments specified." );
-				ShowContinueError( "...No design environment results produced. For these results, " "add appropriate SizingPeriod:* objects for your simulation." );
+				ShowWarningError( "CheckEnvironmentSpecifications: SimulationControl specified doing design day simulations, but no design environments specified." );
+				ShowContinueError( "...No design environment results produced. For these results, add appropriate SizingPeriod:* objects for your simulation." );
 			}
 			if ( DoDesDaySim && NumRunPeriodDesign > 0 && ! WeatherFileAttached ) {
 				ErrorsFound = true;
-				ShowSevereError( "CheckEnvironmentSpecifications: SimulationControl specified doing design day simulations; weather " "file design environments specified; but no weather file specified." );
+				ShowSevereError( "CheckEnvironmentSpecifications: SimulationControl specified doing design day simulations; weather file design environments specified; but no weather file specified." );
 			}
 			if ( DoWeathSim && ! RunPeriodsInInput ) {
-				ShowWarningError( "CheckEnvironmentSpecifications: SimulationControl specified doing weather simulations, but " "no run periods for weather file specified.  No annual results produced." );
+				ShowWarningError( "CheckEnvironmentSpecifications: SimulationControl specified doing weather simulations, but no run periods for weather file specified.  No annual results produced." );
 			}
 			if ( DoWeathSim && RunPeriodsInInput && ! WeatherFileAttached ) {
-				ShowWarningError( "CheckEnvironmentSpecifications: SimulationControl specified doing weather simulations; " "run periods for weather file specified; but no weather file specified." );
+				ShowWarningError( "CheckEnvironmentSpecifications: SimulationControl specified doing weather simulations; run periods for weather file specified; but no weather file specified." );
 			}
 		}
 		if ( ! DoDesDaySim && ! DoWeathSim ) {
@@ -1306,7 +1320,7 @@ namespace SimulationManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt EndOfDataFormat( "(\"End of Data\")" ); // Signifies the end of the data block in the output file
-		static std::string const ThreadingHeader( "! <Program Control Information:Threads/Parallel Sims>, " "Threading Supported,Maximum Number of Threads, Env Set Threads (OMP_NUM_THREADS), " "EP Env Set Threads (EP_OMP_NUM_THREADS), IDF Set Threads, Number of Threads Used (Interior Radiant Exchange), " "Number Nominal Surfaces, Number Parallel Sims" );
+		static std::string const ThreadingHeader( "! <Program Control Information:Threads/Parallel Sims>, Threading Supported,Maximum Number of Threads, Env Set Threads (OMP_NUM_THREADS), EP Env Set Threads (EP_OMP_NUM_THREADS), IDF Set Threads, Number of Threads Used (Interior Radiant Exchange), Number Nominal Surfaces, Number Parallel Sims" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1388,7 +1402,7 @@ namespace SimulationManager {
 		eso_stream = nullptr;
 
 		if ( any_eq( HeatTransferAlgosUsed, UseCondFD ) ) { // echo out relaxation factor, it may have been changed by the program
-			gio::write( OutputFileInits, fmtA ) << "! <ConductionFiniteDifference Numerical Parameters>, " "Starting Relaxation Factor, Final Relaxation Factor";
+			gio::write( OutputFileInits, fmtA ) << "! <ConductionFiniteDifference Numerical Parameters>, Starting Relaxation Factor, Final Relaxation Factor";
 			gio::write( OutputFileInits, fmtA ) << "ConductionFiniteDifference Numerical Parameters, " + RoundSigDigits( CondFDRelaxFactorInput, 3 ) + ", " + RoundSigDigits( CondFDRelaxFactor, 3 );
 		}
 		// Report number of threads to eio file
@@ -1413,15 +1427,15 @@ namespace SimulationManager {
 				gio::write( OutputFileInits, fmtA ) << "Program Control:Threads/Parallel Sims, Yes," + RoundSigDigits( MaxNumberOfThreads ) + ", " + cEnvSetThreads + ", " + cepEnvSetThreads + ", " + cIDFSetThreads + ", " + RoundSigDigits( NumberIntRadThreads ) + ", " + RoundSigDigits( iNominalTotSurfaces ) + ", " + RoundSigDigits( inumActiveSims );
 			} else {
 				gio::write( OutputFileInits, fmtA ) << ThreadingHeader;
-				gio::write( OutputFileInits, fmtA ) << "Program Control:Threads/Parallel Sims, Yes," + RoundSigDigits( MaxNumberOfThreads ) + ", " + cEnvSetThreads + ", " + cepEnvSetThreads + ", " + cIDFSetThreads + ", " + RoundSigDigits( NumberIntRadThreads ) + ", " + RoundSigDigits( iNominalTotSurfaces ) + ", " "N/A";
+				gio::write( OutputFileInits, fmtA ) << "Program Control:Threads/Parallel Sims, Yes," + RoundSigDigits( MaxNumberOfThreads ) + ", " + cEnvSetThreads + ", " + cepEnvSetThreads + ", " + cIDFSetThreads + ", " + RoundSigDigits( NumberIntRadThreads ) + ", " + RoundSigDigits( iNominalTotSurfaces ) + ", N/A";
 			}
 		} else { // no threading
 			if ( lnumActiveSims ) {
 				gio::write( OutputFileInits, fmtA ) << ThreadingHeader;
-				gio::write( OutputFileInits, fmtA ) << "Program Control:Threads/Parallel Sims, No," + RoundSigDigits( MaxNumberOfThreads ) + ", " "N/A, N/A, N/A, N/A, N/A, " + RoundSigDigits( inumActiveSims );
+				gio::write( OutputFileInits, fmtA ) << "Program Control:Threads/Parallel Sims, No," + RoundSigDigits( MaxNumberOfThreads ) + ", N/A, N/A, N/A, N/A, N/A, " + RoundSigDigits( inumActiveSims );
 			} else {
 				gio::write( OutputFileInits, fmtA ) << ThreadingHeader;
-				gio::write( OutputFileInits, fmtA ) << "Program Control:Threads/Parallel Sims, No," + RoundSigDigits( MaxNumberOfThreads ) + ", " "N/A, N/A, N/A, N/A, N/A, N/A";
+				gio::write( OutputFileInits, fmtA ) << "Program Control:Threads/Parallel Sims, No," + RoundSigDigits( MaxNumberOfThreads ) + ", N/A, N/A, N/A, N/A, N/A, N/A";
 			}
 		}
 
@@ -1818,7 +1832,7 @@ namespace SimulationManager {
 
 			if ( CompSets( Count ).ParentCType == "UNDEFINED" || CompSets( Count ).InletNodeName == "UNDEFINED" || CompSets( Count ).OutletNodeName == "UNDEFINED" ) {
 				if ( AbortProcessing && WarningOut ) {
-					ShowWarningError( "Node Connection errors shown during \"fatal error\" processing may be false " "because not all inputs may have been retrieved." );
+					ShowWarningError( "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have been retrieved." );
 					WarningOut = false;
 				}
 				ShowWarningError( "Node Connection Error for object " + CompSets( Count ).CType + ", name=" + CompSets( Count ).CName );
@@ -1832,7 +1846,7 @@ namespace SimulationManager {
 			}
 			if ( CompSets( Count ).Description == "UNDEFINED" ) {
 				if ( AbortProcessing && WarningOut ) {
-					ShowWarningError( "Node Connection errors shown during \"fatal error\" processing may be false " "because not all inputs may have been retrieved." );
+					ShowWarningError( "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have been retrieved." );
 					WarningOut = false;
 				}
 				ShowWarningError( "Potential Node Connection Error for object " + CompSets( Count ).CType + ", name=" + CompSets( Count ).CName );
@@ -1851,7 +1865,7 @@ namespace SimulationManager {
 				if ( CompSets( Count ).InletNodeName != CompSets( Count1 ).InletNodeName ) continue;
 				if ( CompSets( Count ).OutletNodeName != CompSets( Count1 ).OutletNodeName ) continue;
 				if ( AbortProcessing && WarningOut ) {
-					ShowWarningError( "Node Connection errors shown during \"fatal error\" processing may be false " "because not all inputs may have been retrieved." );
+					ShowWarningError( "Node Connection errors shown during \"fatal error\" processing may be false because not all inputs may have been retrieved." );
 					WarningOut = false;
 				}
 				ShowWarningError( "Component plus inlet/outlet node pair used more than once:" );
@@ -2348,14 +2362,6 @@ namespace SimulationManager {
 
 		DoingInputProcessing = false;
 
-		//CreateSQLiteDatabase();
-		try {
-			EnergyPlus::sqlite = std::unique_ptr<SQLite>(new SQLite());
-		} catch(const std::runtime_error& error) {
-			// Maybe this could be higher in the call stack, and then handle all runtime exceptions this way.
-			ShowFatalError(error.what());
-		}
-
 		PreProcessorCheck( PreP_Fatal ); // Check Preprocessor objects for warning, severe, etc errors.
 
 		CheckCachedIPErrors();
@@ -2778,7 +2784,7 @@ Resimulate(
 }
 
 //     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted

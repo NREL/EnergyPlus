@@ -323,7 +323,7 @@ namespace PollutionModule {
 			{ auto const SELECT_CASE_var( MakeUPPERCase( FuelType.FuelTypeNames( Loop ) ) );
 			if ( ( SELECT_CASE_var == "NATURALGAS" ) || ( SELECT_CASE_var == "NATURAL GAS" ) || ( SELECT_CASE_var == "GAS" ) ) {
 				if ( Pollution.NatGasCoef.FuelFactorUsed ) {
-					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered. Previous entry will be used." );
 					continue;
 				}
 				Pollution.NatGasCoef.FuelFactorUsed = true;
@@ -399,7 +399,7 @@ namespace PollutionModule {
 
 			} else if ( ( SELECT_CASE_var == "RESIDUALOIL" ) || ( SELECT_CASE_var == "RESIDUAL OIL" ) || ( SELECT_CASE_var == "FUEL OIL #2" ) || ( SELECT_CASE_var == "FUELOIL#2" ) ) {
 				if ( Pollution.FuelOil2Coef.FuelFactorUsed ) {
-					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered. Previous entry will be used." );
 					continue;
 				}
 				Pollution.FuelOil2Coef.FuelFactorUsed = true;
@@ -475,7 +475,7 @@ namespace PollutionModule {
 
 			} else if ( ( SELECT_CASE_var == "DISTILLATEOIL" ) || ( SELECT_CASE_var == "DISTILLATE OIL" ) || ( SELECT_CASE_var == "FUEL OIL #1" ) || ( SELECT_CASE_var == "FUELOIL#1" ) || ( SELECT_CASE_var == "FUEL OIL" ) ) {
 				if ( Pollution.FuelOil1Coef.FuelFactorUsed ) {
-					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered. Previous entry will be used." );
 					continue;
 				}
 				Pollution.FuelOil1Coef.FuelFactorUsed = true;
@@ -551,7 +551,7 @@ namespace PollutionModule {
 
 			} else if ( SELECT_CASE_var == "COAL" ) {
 				if ( Pollution.CoalCoef.FuelFactorUsed ) {
-					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered. Previous entry will be used." );
 					continue;
 				}
 				Pollution.CoalCoef.FuelFactorUsed = true;
@@ -627,7 +627,7 @@ namespace PollutionModule {
 
 			} else if ( ( SELECT_CASE_var == "ELECTRICITY" ) || ( SELECT_CASE_var == "ELECTRIC" ) || ( SELECT_CASE_var == "ELEC" ) ) {
 				if ( Pollution.ElecCoef.FuelFactorUsed ) {
-					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered. Previous entry will be used." );
 					continue;
 				}
 				Pollution.ElecCoef.FuelFactorUsed = true;
@@ -703,7 +703,7 @@ namespace PollutionModule {
 
 			} else if ( SELECT_CASE_var == "GASOLINE" ) {
 				if ( Pollution.GasolineCoef.FuelFactorUsed ) {
-					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered. Previous entry will be used." );
 					continue;
 				}
 				Pollution.GasolineCoef.FuelFactorUsed = true;
@@ -779,7 +779,7 @@ namespace PollutionModule {
 
 			} else if ( ( SELECT_CASE_var == "PROPANE" ) || ( SELECT_CASE_var == "LPG" ) || ( SELECT_CASE_var == "PROPANEGAS" ) || ( SELECT_CASE_var == "PROPANE GAS" ) ) {
 				if ( Pollution.PropaneCoef.FuelFactorUsed ) {
-					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered. Previous entry will be used." );
 					continue;
 				}
 				Pollution.PropaneCoef.FuelFactorUsed = true;
@@ -855,7 +855,7 @@ namespace PollutionModule {
 
 			} else if ( SELECT_CASE_var == "DIESEL" ) {
 				if ( Pollution.DieselCoef.FuelFactorUsed ) {
-					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered. Previous entry will be used." );
 					continue;
 				}
 				Pollution.DieselCoef.FuelFactorUsed = true;
@@ -931,7 +931,7 @@ namespace PollutionModule {
 
 			} else if ( SELECT_CASE_var == "OTHERFUEL1" ) {
 				if ( Pollution.OtherFuel1Coef.FuelFactorUsed ) {
-					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered. Previous entry will be used." );
 					continue;
 				}
 				Pollution.OtherFuel1Coef.FuelFactorUsed = true;
@@ -1007,7 +1007,7 @@ namespace PollutionModule {
 
 			} else if ( SELECT_CASE_var == "OTHERFUEL2" ) {
 				if ( Pollution.OtherFuel2Coef.FuelFactorUsed ) {
-					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered. Previous entry will be used." );
 					continue;
 				}
 				Pollution.OtherFuel2Coef.FuelFactorUsed = true;
@@ -1465,8 +1465,8 @@ namespace PollutionModule {
 		// in progress
 		if ( NumFuelFactors == 0 || NumEnvImpactFactors == 0 ) {
 			if ( ReportingThisVariable( "Environmental Impact Total N2O Emissions Carbon Equivalent Mass" ) || ReportingThisVariable( "Environmental Impact Total CH4 Emissions Carbon Equivalent Mass" ) || ReportingThisVariable( "Environmental Impact Total CO2 Emissions Carbon Equivalent Mass" ) || ReportingThisVariable( "Carbon Equivalent:Facility" ) || ReportingThisVariable( "CarbonEquivalentEmissions:Carbon Equivalent" ) ) {
-				ShowWarningError( "GetPollutionFactorInput: Requested reporting for Carbon Equivalent Pollution, " "but insufficient information is entered." );
-				ShowContinueError( "Both \"FuelFactors\" and \"EnvironmentalImpactFactors\" must be entered or the " "displayed carbon pollution will all be zero." );
+				ShowWarningError( "GetPollutionFactorInput: Requested reporting for Carbon Equivalent Pollution, but insufficient information is entered." );
+				ShowContinueError( "Both \"FuelFactors\" and \"EnvironmentalImpactFactors\" must be entered or the displayed carbon pollution will all be zero." );
 			}
 		}
 

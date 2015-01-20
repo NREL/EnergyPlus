@@ -252,7 +252,7 @@ namespace ThermalEN673Calc {
 
 		if ( ibc( 1 ) != 1 ) {
 			nperr = 38;
-			ErrorMessage = "Boundary conditions for EN673 can be combined hout for outdoor and either convective (hcin) " "or combined (hin) for indoor.  Others are not supported currently.";
+			ErrorMessage = "Boundary conditions for EN673 can be combined hout for outdoor and either convective (hcin) or combined (hin) for indoor.  Others are not supported currently.";
 			return;
 		}
 

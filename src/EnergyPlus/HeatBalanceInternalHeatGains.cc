@@ -80,7 +80,7 @@ SetupZoneInternalGain(
 
 	// Check if IntGainComp_TypeOfNum and cComponentObject are consistent
 	if ( ! SameString( UpperCaseObjectType, ZoneIntGainDeviceTypes( IntGainComp_TypeOfNum ) ) ) {
-		ShowSevereError( "SetupZoneInternalGain: developer error, trapped inconsistent internal gains object types" " sent to SetupZoneInternalGain" );
+		ShowSevereError( "SetupZoneInternalGain: developer error, trapped inconsistent internal gains object types sent to SetupZoneInternalGain" );
 		ShowContinueError( "Object type character = " + cComponentObject );
 		ShowContinueError( "Type of Num object name = " + ZoneIntGainDeviceTypes( IntGainComp_TypeOfNum ) );
 		return;

@@ -3004,11 +3004,11 @@ namespace General {
 
 				} else if ( SELECT_CASE_var == "" ) {
 					ShowWarningError( cCurrentModuleObject + ": No " + cAlphaFieldNames( 1 ) + " supplied." );
-					ShowContinueError( " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", " "\"CostInfo\", \"ViewFactorIinfo\"." );
+					ShowContinueError( " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", \"CostInfo\", \"ViewFactorIinfo\"." );
 
 				} else {
 					ShowWarningError( cCurrentModuleObject + ": Invalid " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) + "\" supplied." );
-					ShowContinueError( " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", " "\"CostInfo\", \"ViewFactorIinfo\"." );
+					ShowContinueError( " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", \"CostInfo\", \"ViewFactorIinfo\"." );
 
 				}}
 			}
@@ -3310,7 +3310,7 @@ namespace General {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

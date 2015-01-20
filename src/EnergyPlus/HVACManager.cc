@@ -836,7 +836,7 @@ namespace HVACManager {
 					ShowContinueError( "The solution for on-site electric generators did not appear to converge" );
 				}
 				if ( ErrCount == 1 && ! DisplayExtraWarnings ) {
-					ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; " "  to show more details on each max iteration exceeded." );
+					ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on each max iteration exceeded." );
 				}
 				if ( DisplayExtraWarnings ) {
 
@@ -2521,13 +2521,13 @@ namespace HVACManager {
 				}
 				if ( ZoneEquipConfig( ControlledZoneNum ).ZonalSystemOnly || CyclingFan ) {
 					if ( Zone( ZoneNum ).RefrigCaseRA ) {
-						ShowWarningError( "For zone=" + Zone( ZoneNum ).Name + " return air cooling by refrigerated cases will be" " applied to the zone air." );
+						ShowWarningError( "For zone=" + Zone( ZoneNum ).Name + " return air cooling by refrigerated cases will be applied to the zone air." );
 						ShowContinueError( "  This zone has no return air or is served by an on/off HVAC system." );
 					}
 					for ( LightNum = 1; LightNum <= TotLights; ++LightNum ) {
 						if ( Lights( LightNum ).ZonePtr != ZoneNum ) continue;
 						if ( Lights( LightNum ).FractionReturnAir > 0.0 ) {
-							ShowWarningError( "For zone=" + Zone( ZoneNum ).Name + " return air heat gain from lights will be" " applied to the zone air." );
+							ShowWarningError( "For zone=" + Zone( ZoneNum ).Name + " return air heat gain from lights will be applied to the zone air." );
 							ShowContinueError( "  This zone has no return air or is served by an on/off HVAC system." );
 							break;
 						}

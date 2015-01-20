@@ -290,7 +290,7 @@ namespace HVACControllers {
 		if ( ControllerIndex == 0 ) {
 			ControlNum = FindItemInList( ControllerName, ControllerProps.ControllerName(), NumControllers );
 			if ( ControlNum == 0 ) {
-				ShowFatalError( "ManageControllers: Invalid controller=" + ControllerName + ". The only valid controller type" " for an AirLoopHVAC is Controller:WaterCoil." );
+				ShowFatalError( "ManageControllers: Invalid controller=" + ControllerName + ". The only valid controller type for an AirLoopHVAC is Controller:WaterCoil." );
 			}
 			ControllerIndex = ControlNum;
 		} else {
@@ -641,7 +641,7 @@ namespace HVACControllers {
 						// the sensor node is not on the water coil air outlet node
 						ShowWarningError( RoutineName + ControllerProps( Num ).ControllerType + "=\"" + ControllerProps( Num ).ControllerName + "\". " );
 						ShowContinueError( " ..Sensor node not found on water coil air outlet node." );
-						ShowContinueError( " ..The sensor node may have been placed on a node downstream of the coil" " or on an airloop outlet node." );
+						ShowContinueError( " ..The sensor node may have been placed on a node downstream of the coil or on an airloop outlet node." );
 					} else {
 						// check if the setpoint is also on the same node where the sensor is placed on
 						EMSSetPointErrorFlag = false;
@@ -651,7 +651,7 @@ namespace HVACControllers {
 							if ( EMSSetPointErrorFlag ) {
 								if ( ! NodeHasSPMCtrlVarType( ControllerProps( Num ).SensedNode, iCtrlVarType_Temp ) ) {
 									ShowContinueError( " ..Temperature setpoint not found on coil air outlet node." );
-									ShowContinueError( " ..The setpoint may have been placed on a node downstream of the coil" " or on an airloop outlet node." );
+									ShowContinueError( " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node." );
 									ShowContinueError( " ..Specify the setpoint and the sensor on the coil air outlet node when possible." );
 								}
 							}
@@ -660,7 +660,7 @@ namespace HVACControllers {
 							if ( EMSSetPointErrorFlag ) {
 								if ( ! NodeHasSPMCtrlVarType( ControllerProps( Num ).SensedNode, iCtrlVarType_MaxHumRat ) ) {
 									ShowContinueError( " ..Humidity ratio setpoint not found on coil air outlet node." );
-									ShowContinueError( " ..The setpoint may have been placed on a node downstream of the coil" " or on an airloop outlet node." );
+									ShowContinueError( " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node." );
 									ShowContinueError( " ..Specify the setpoint and the sensor on the coil air outlet node when possible." );
 								}
 							}
@@ -669,7 +669,7 @@ namespace HVACControllers {
 							if ( EMSSetPointErrorFlag ) {
 								if ( ! NodeHasSPMCtrlVarType( ControllerProps( Num ).SensedNode, iCtrlVarType_Temp ) ) {
 									ShowContinueError( " ..Temperature setpoint not found on coil air outlet node." );
-									ShowContinueError( " ..The setpoint may have been placed on a node downstream of the coil" " or on an airloop outlet node." );
+									ShowContinueError( " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node." );
 									ShowContinueError( " ..Specify the setpoint and the sensor on the coil air outlet node when possible." );
 								}
 							}
@@ -678,7 +678,7 @@ namespace HVACControllers {
 							if ( EMSSetPointErrorFlag ) {
 								if ( ! NodeHasSPMCtrlVarType( ControllerProps( Num ).SensedNode, iCtrlVarType_MaxHumRat ) ) {
 									ShowContinueError( " ..Humidity ratio setpoint not found on coil air outlet node." );
-									ShowContinueError( " ..The setpoint may have been placed on a node downstream of the coil" " or on an airloop outlet node." );
+									ShowContinueError( " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node." );
 									ShowContinueError( " ..Specify the setpoint and the sensor on the coil air outlet node when possible." );
 								}
 							}
@@ -947,7 +947,7 @@ namespace HVACControllers {
 						if ( ! AnyEnergyManagementSystemInModel ) {
 							ShowSevereError( "HVACControllers: Missing temperature setpoint for controller type=" + ControllerProps( ControllerIndex ).ControllerType + " Name=\"" + ControllerProps( ControllerIndex ).ControllerName + "\"" );
 							ShowContinueError( "Node Referenced (by Controller)=" + NodeID( SensedNode ) );
-							ShowContinueError( "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish " "a setpoint at the controller sensed node." );
+							ShowContinueError( "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at the controller sensed node." );
 							SetPointErrorFlag = true;
 						} else {
 							// call to check node is actuated by EMS
@@ -955,16 +955,16 @@ namespace HVACControllers {
 							if ( SetPointErrorFlag ) {
 								ShowSevereError( "HVACControllers: Missing temperature setpoint for controller type=" + ControllerProps( ControllerIndex ).ControllerType + " Name=\"" + ControllerProps( ControllerIndex ).ControllerName + "\"" );
 								ShowContinueError( "Node Referenced (by Controller)=" + NodeID( SensedNode ) );
-								ShowContinueError( "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish " "a setpoint at the controller sensed node." );
+								ShowContinueError( "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at the controller sensed node." );
 								ShowContinueError( "Or add EMS Actuator to provide temperature setpoint at this node" );
 							}
 						}
 					} else {
 						//           Warn if humidity setpoint is detected (only for cooling coils) and control varible is TEMP.
 						if ( Node( SensedNode ).HumRatMax != SensedNodeFlagValue && ControllerProps( ControllerIndex ).Action == iReverseAction ) {
-							ShowWarningError( "HVACControllers: controller type=" + ControllerProps( ControllerIndex ).ControllerType + " Name=\"" + ControllerProps( ControllerIndex ).ControllerName + "\"" " has detected a maximum humidity ratio setpoint at the control node." );
+							ShowWarningError( "HVACControllers: controller type=" + ControllerProps( ControllerIndex ).ControllerType + " Name=\"" + ControllerProps( ControllerIndex ).ControllerName + "\" has detected a maximum humidity ratio setpoint at the control node." );
 							ShowContinueError( "Node referenced (by controller)=" + NodeID( SensedNode ) );
-							ShowContinueError( "  set the controller control variable to TemperatureAndHumidityRatio" " if humidity control is desired." );
+							ShowContinueError( "  set the controller control variable to TemperatureAndHumidityRatio if humidity control is desired." );
 							//              SetPointErrorFlag = .TRUE.
 						}
 					}
@@ -974,7 +974,7 @@ namespace HVACControllers {
 						if ( ! AnyEnergyManagementSystemInModel ) {
 							ShowSevereError( "HVACControllers: Missing humidity ratio setpoint for controller type=" + ControllerProps( ControllerIndex ).ControllerType + " Name=\"" + ControllerProps( ControllerIndex ).ControllerName + "\"" );
 							ShowContinueError( "Node referenced (by controller)=" + NodeID( SensedNode ) );
-							ShowContinueError( "  use a SetpointManager with the field Control Variable = \"MaximumHumidityRatio\" " "to establish a setpoint at the controller sensed node." );
+							ShowContinueError( "  use a SetpointManager with the field Control Variable = \"MaximumHumidityRatio\" to establish a setpoint at the controller sensed node." );
 							SetPointErrorFlag = true;
 						} else {
 							CheckIfNodeSetPointManagedByEMS( SensedNode, iHumidityRatioSetPoint, SetPointErrorFlag );
@@ -990,7 +990,7 @@ namespace HVACControllers {
 					} else if ( ControllerProps( ControlNum ).HumRatCntrlType == iCtrlVarType_MinHumRat ) {
 						ShowSevereError( "HVACControllers: incorrect humidity ratio setpoint for controller type=" + ControllerProps( ControllerIndex ).ControllerType + " Name=\"" + ControllerProps( ControllerIndex ).ControllerName + "\"" );
 						ShowContinueError( "Node referenced (by controller)=" + NodeID( SensedNode ) );
-						ShowContinueError( "  use a SetpointManager with the field Control Variable = \"MaximumHumidityRatio\" " "to establish a setpoint at the controller sensed node." );
+						ShowContinueError( "  use a SetpointManager with the field Control Variable = \"MaximumHumidityRatio\" to establish a setpoint at the controller sensed node." );
 						SetPointErrorFlag = true;
 					}
 				} else if ( SELECT_CASE_var == iTemperatureAndHumidityRatio ) { // 'TemperatureAndHumidityRatio'
@@ -998,7 +998,7 @@ namespace HVACControllers {
 						if ( ! AnyEnergyManagementSystemInModel ) {
 							ShowSevereError( "HVACControllers: Missing temperature setpoint for controller type=" + ControllerProps( ControllerIndex ).ControllerType + " Name=\"" + ControllerProps( ControllerIndex ).ControllerName + "\"" );
 							ShowContinueError( "Node Referenced (by Controller)=" + NodeID( SensedNode ) );
-							ShowContinueError( "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish " "a setpoint at the controller sensed node." );
+							ShowContinueError( "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at the controller sensed node." );
 							SetPointErrorFlag = true;
 						} else {
 							// call to check node is actuated by EMS
@@ -1006,7 +1006,7 @@ namespace HVACControllers {
 							if ( SetPointErrorFlag ) {
 								ShowSevereError( "HVACControllers: Missing temperature setpoint for controller type=" + ControllerProps( ControllerIndex ).ControllerType + " Name=\"" + ControllerProps( ControllerIndex ).ControllerName + "\"" );
 								ShowContinueError( "Node Referenced (by Controller)=" + NodeID( SensedNode ) );
-								ShowContinueError( "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish " "a setpoint at the controller sensed node." );
+								ShowContinueError( "  use a Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at the controller sensed node." );
 								ShowContinueError( "Or add EMS Actuator to provide temperature setpoint at this node" );
 							}
 						}
@@ -1033,7 +1033,7 @@ namespace HVACControllers {
 						if ( ! AnyEnergyManagementSystemInModel ) {
 							ShowSevereError( "HVACControllers: Missing mass flow rate setpoint for controller type=" + ControllerProps( ControllerIndex ).ControllerType + " Name=\"" + ControllerProps( ControllerIndex ).ControllerName + "\"" );
 							ShowContinueError( "Node Referenced (in Controller)=" + NodeID( SensedNode ) );
-							ShowContinueError( "  use a SetpointManager with the field Control Variable = \"MassFlowRate\" to establish " "a setpoint at the controller sensed node." );
+							ShowContinueError( "  use a SetpointManager with the field Control Variable = \"MassFlowRate\" to establish a setpoint at the controller sensed node." );
 							SetPointErrorFlag = true;
 						} else {
 							// call to check node is actuated by EMS
@@ -1041,7 +1041,7 @@ namespace HVACControllers {
 							if ( SetPointErrorFlag ) {
 								ShowSevereError( "HVACControllers: Missing mass flow rate setpoint for controller type=" + ControllerProps( ControllerIndex ).ControllerType + " Name=\"" + ControllerProps( ControllerIndex ).ControllerName + "\"" );
 								ShowContinueError( "Node Referenced (in Controller)=" + NodeID( SensedNode ) );
-								ShowContinueError( "  use a SetpointManager with the field Control Variable = \"MassFlowRate\" to establish " "a setpoint at the controller sensed node." );
+								ShowContinueError( "  use a SetpointManager with the field Control Variable = \"MassFlowRate\" to establish a setpoint at the controller sensed node." );
 								ShowContinueError( "Or add EMS Actuator to provide Mass Flow Rate setpoint at this node" );
 							}
 						}
@@ -1077,7 +1077,7 @@ namespace HVACControllers {
 			} else if ( SELECT_CASE_var == iReverseAction ) {
 				SetupRootFinder( RootFinders( ControlNum ), iSlopeDecreasing, iMethodBrent, constant_zero, 1.0e-6, ControllerProps( ControlNum ).Offset ); // Slope type | Method type | TolX: no relative tolerance for X variables | ATolX: absolute tolerance for X variables | ATolY: absolute tolerance for Y variables
 			} else {
-				ShowFatalError( "InitController: Invalid controller action. " "Valid choices are \"Normal\" or \"Reverse\"" );
+				ShowFatalError( "InitController: Invalid controller action. Valid choices are \"Normal\" or \"Reverse\"" );
 			}} // SelectAction
 
 			MySizeFlag( ControlNum ) = false;
@@ -1698,16 +1698,16 @@ namespace HVACControllers {
 					if ( ControllerProps( ControlNum ).ControlVar == iTemperature ) {
 						ShowContinueError( "Controller actuator temperature = " + TrimSigDigits( Node( ControllerProps( ControlNum ).ActuatedNode ).Temp, 2 ) + " [C]" );
 						ShowContinueError( "  Note: Chilled water coils should be reverse action and the entering chilled" );
-						ShowContinueError( "        water temperature (controller actuator temperature) should be " "below the setpoint temperature" );
+						ShowContinueError( "        water temperature (controller actuator temperature) should be below the setpoint temperature" );
 						ShowContinueError( "  Note: Hot water coils should be normal action and the entering hot" );
-						ShowContinueError( "        water temperature (controller actuator temperature) should be " "above the setpoint temperature" );
+						ShowContinueError( "        water temperature (controller actuator temperature) should be above the setpoint temperature" );
 					}
 				} else {
 					// bad actuator variable input checked in input routine
 				}
 			} else if ( ! WarmupFlag ) {
 				++ControllerProps( ControlNum ).BadActionErrCount;
-				ShowRecurringSevereErrorAtEnd( "FindRootSimpleController: Previous controller action error" " continues for controller = " + ControllerName, ControllerProps( ControlNum ).BadActionErrIndex );
+				ShowRecurringSevereErrorAtEnd( "FindRootSimpleController: Previous controller action error continues for controller = " + ControllerName, ControllerProps( ControlNum ).BadActionErrIndex );
 			} else {
 				// do nothing
 			}
@@ -3117,7 +3117,7 @@ Label100: ;
 
 			// Masss flow rate
 			// Convergence analysis
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(3(A,A),3(A,A),2(A,A),2(A,A),1(A,A))", flags ) << TrimSigDigits( Node( SensedNode ).MassFlowRate, 10 ) << TrimSigDigits( Node( ActuatedNode ).MassFlowRateMinAvail, 10 ) << TrimSigDigits( Node( ActuatedNode ).MassFlowRateMaxAvail, 10 ) << TrimSigDigits( ControllerProps( ControlNum ).ActuatedValue, 10 ) << TrimSigDigits( Node( SensedNode ).Temp, 10 ) << TrimSigDigits( ControllerProps( ControlNum ).SetPointValue, 10 ) << " " << " " << TrimSigDigits( ControllerProps( ControlNum ).Mode ) << TrimSigDigits( LogicalToInteger( IsConvergedFlag ) ) << TrimSigDigits( ControllerProps( ControlNum ).NextActuatedValue, 10 ); } // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( TraceFileUnit, "(3(A,A),3(A,A),2(A,A),2(A,A),1(A,A))", flags ) << TrimSigDigits( Node( SensedNode ).MassFlowRate, 10 ) << TrimSigDigits( Node( ActuatedNode ).MassFlowRateMinAvail, 10 ) << TrimSigDigits( Node( ActuatedNode ).MassFlowRateMaxAvail, 10 ) << TrimSigDigits( ControllerProps( ControlNum ).ActuatedValue, 10 ) << TrimSigDigits( Node( SensedNode ).Temp, 10 ) << TrimSigDigits( ControllerProps( ControlNum ).SetPointValue, 10 ) << ' ' << ' ' << TrimSigDigits( ControllerProps( ControlNum ).Mode ) << TrimSigDigits( LogicalToInteger( IsConvergedFlag ) ) << TrimSigDigits( ControllerProps( ControlNum ).NextActuatedValue, 10 ); } // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
 
 			// No trace available for root finder yet
 			// Skip call to WriteRootFinderTrace()
@@ -3398,8 +3398,8 @@ Label100: ;
 								// we have a flow order problem with water coil controllers
 								ShowSevereError( "CheckControllerListOrder: A water coil controller list has the wrong order" );
 								ShowContinueError( "Check the AirLoopHVAC:ControllerList for the air loop called \"" + PrimaryAirSystem( AirSysNum ).Name + "\"" );
-								ShowContinueError( "When there are multiple Controller:WaterCoil objects for the same air loop, " "they need to be listed in the proper order." );
-								ShowContinueError( "The controllers should be listed in natural flow order with those for upstream" " coils listed before those for downstream coils." );
+								ShowContinueError( "When there are multiple Controller:WaterCoil objects for the same air loop, they need to be listed in the proper order." );
+								ShowContinueError( "The controllers should be listed in natural flow order with those for upstream coils listed before those for downstream coils." );
 								ShowContinueError( "The sensed nodes specified for the respective controllers should also reflect this order." );
 
 							}

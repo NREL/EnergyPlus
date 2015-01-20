@@ -3276,7 +3276,7 @@ namespace HeatBalanceSurfaceManager {
 				// That's probably not correct, but how correct is it to assume that no solar is absorbed anywhere
 				// in the zone?
 				if ( FirstCalcZone( ZoneNum ) ) {
-					ShowWarningError( "ComputeIntSWAbsorbFactors: Sum of area times inside solar absorption " "for all surfaces is zero in Zone: " + Zone( ZoneNum ).Name );
+					ShowWarningError( "ComputeIntSWAbsorbFactors: Sum of area times inside solar absorption for all surfaces is zero in Zone: " + Zone( ZoneNum ).Name );
 					FirstCalcZone( ZoneNum ) = false;
 				}
 				VMULT( ZoneNum ) = 0.0;
@@ -3339,10 +3339,7 @@ namespace HeatBalanceSurfaceManager {
 
 		RecDifShortFromZ = false;
 		FractDifShortZtoZ = 0.0;
-		D = 0.0;
-		for ( NZ = 1; NZ <= NumberOfZones; ++NZ ) {
-			D( NZ, NZ ) = 1.0;
-		}
+		D.to_identity();
 
 		//      IF (.not. ANY(Zone%HasInterZoneWindow)) RETURN  ! this caused massive diffs
 		if ( KickOffSimulation || KickOffSizing ) return;
@@ -3362,12 +3359,16 @@ namespace HeatBalanceSurfaceManager {
 		}
 		//          Compute fractions for multiple passes.
 
-		for ( NZ = 1; NZ <= NumberOfZones; ++NZ ) {
-			for ( MZ = 1; MZ <= NumberOfZones; ++MZ ) {
+		FArray2D< Real64 >::size_type l( 0u ), m( 0u ), d( 0u );
+		for ( NZ = 1; NZ <= NumberOfZones; ++NZ, d += NumberOfZones + 1 ) {
+			m = NZ - 1;
+			Real64 D_d( 0.0 ); // Local accumulator
+			for ( MZ = 1; MZ <= NumberOfZones; ++MZ, ++l, m += NumberOfZones ) {
 				if ( MZ == NZ ) continue;
-				D( MZ, NZ ) = FractDifShortZtoZ( MZ, NZ ) / ( 1.0 - FractDifShortZtoZ( MZ, NZ ) * FractDifShortZtoZ( NZ, MZ ) );
-				D( NZ, NZ ) += FractDifShortZtoZ( NZ, MZ ) * D( MZ, NZ );
+				D[ l ] = FractDifShortZtoZ[ l ] / ( 1.0 - FractDifShortZtoZ[ l ] * FractDifShortZtoZ[ m ] ); // [ l ] == ( MZ, NZ ), [ m ] == ( NZ, MZ )
+				D_d += FractDifShortZtoZ[ m ] * D[ l ];
 			}
+			D[ d ] += D_d; // [ d ] == ( NZ, NZ )
 		}
 
 		FractDifShortZtoZ = D;
@@ -3494,7 +3495,6 @@ namespace HeatBalanceSurfaceManager {
 			} else {
 				Material( MaterNum ).AbsorpVisible = Material( MaterNum ).AbsorpVisibleInput;
 			}
-
 		} // loop over materials
 
 		// second, loop over constructions
@@ -3515,7 +3515,6 @@ namespace HeatBalanceSurfaceManager {
 				Construct( ConstrNum ).OutsideAbsorpSolar = Material( OutsideMaterNum ).AbsorpSolar;
 				Construct( ConstrNum ).OutsideAbsorpThermal = Material( OutsideMaterNum ).AbsorpThermal;
 			}
-
 		}
 
 	}
@@ -3590,7 +3589,7 @@ namespace HeatBalanceSurfaceManager {
 							EMSConstructActuatorChecked( SurfNum, Surface( SurfNum ).EMSConstructionOverrideValue ) = true;
 							if ( Construct( Surface( SurfNum ).Construction ).NumHistories != Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).NumHistories ) {
 								//thow warning, but allow
-								ShowWarningError( "InitEMSControlledConstructions: EMS Construction State Actuator may be unrealistic, " "incompatible CTF timescales are being used." );
+								ShowWarningError( "InitEMSControlledConstructions: EMS Construction State Actuator may be unrealistic, incompatible CTF timescales are being used." );
 								ShowContinueError( "Construction named = " + Construct( Surface( SurfNum ).Construction ).Name + " has CTF timesteps = " + TrimSigDigits( Construct( Surface( SurfNum ).Construction ).NumHistories ) );
 								ShowContinueError( "While construction named = " + Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).Name + " has CTF timesteps = " + TrimSigDigits( Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).NumHistories ) );
 								ShowContinueError( "Transient heat transfer modeling may not be valid for surface name = " + Surface( SurfNum ).Name + ", and the simulation continues" );
@@ -3598,10 +3597,10 @@ namespace HeatBalanceSurfaceManager {
 							}
 							if ( Construct( Surface( SurfNum ).Construction ).NumCTFTerms != Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).NumCTFTerms ) {
 								//thow warning, but allow
-								ShowWarningError( "InitEMSControlledConstructions: EMS Construction State Actuator may be unrealistic, " "incompatible CTF terms are being used." );
+								ShowWarningError( "InitEMSControlledConstructions: EMS Construction State Actuator may be unrealistic, incompatible CTF terms are being used." );
 								ShowContinueError( "Construction named = " + Construct( Surface( SurfNum ).Construction ).Name + " has number of CTF terms = " + TrimSigDigits( Construct( Surface( SurfNum ).Construction ).NumCTFTerms ) );
 								ShowContinueError( "While construction named = " + Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).Name + " has number of CTF terms = " + TrimSigDigits( Construct( Surface( SurfNum ).EMSConstructionOverrideValue ).NumCTFTerms ) );
-								ShowContinueError( "The actuator is allowed but the transient heat transfer modeling may not be valid for" " surface name = " + Surface( SurfNum ).Name + ", and the simulation continues" );
+								ShowContinueError( "The actuator is allowed but the transient heat transfer modeling may not be valid for surface name = " + Surface( SurfNum ).Name + ", and the simulation continues" );
 
 							}
 
@@ -3653,7 +3652,7 @@ namespace HeatBalanceSurfaceManager {
 							}
 
 						} else if ( Surface( SurfNum ).HeatTransferAlgorithm == HeatTransferModel_HAMT ) { // don't allow
-							ShowSevereError( "InitEMSControlledConstructions: EMS Construction State Actuator not available with " "Heat transfer algorithm CombinedHeatAndMoistureFiniteElement." );
+							ShowSevereError( "InitEMSControlledConstructions: EMS Construction State Actuator not available with Heat transfer algorithm CombinedHeatAndMoistureFiniteElement." );
 							ShowContinueError( "This actuator is not allowed for surface name = " + Surface( SurfNum ).Name + ", and the simulation continues without the override" );
 							EMSConstructActuatorChecked( SurfNum, Surface( SurfNum ).EMSConstructionOverrideValue ) = true;
 							EMSConstructActuatorIsOkay( SurfNum, Surface( SurfNum ).EMSConstructionOverrideValue ) = false;
