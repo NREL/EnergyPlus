@@ -2011,12 +2011,12 @@ int SQLite::createSQLiteStringTableRecord(std::string const & stringValue, int c
 	return rowId;
 }
 
-void SQLite::createSQLiteSimulationsRecord( int const id )
+void SQLite::createSQLiteSimulationsRecord( int const id, const std::string& verString, const std::string& currentDateTime )
 {
 	if( m_writeOutputToSQLite ) {
 		sqliteBindInteger(m_simulationsInsertStmt, 1, id);
-		sqliteBindText(m_simulationsInsertStmt, 2, DataStringGlobals::VerString);
-		sqliteBindText(m_simulationsInsertStmt, 3, DataStringGlobals::CurrentDateTime);
+		sqliteBindText(m_simulationsInsertStmt, 2, verString);
+		sqliteBindText(m_simulationsInsertStmt, 3, currentDateTime);
 
 		sqliteStepCommand(m_simulationsInsertStmt);
 		sqliteResetCommand(m_simulationsInsertStmt);
@@ -2486,13 +2486,13 @@ void SQLite::createZoneExtendedOutput()
 	}
 }
 
-void SQLite::createSQLiteEnvironmentPeriodRecord()
+void SQLite::createSQLiteEnvironmentPeriodRecord( const int curEnvirNum, const std::string& environmentName, const int kindOfSim, const int simulationIndex )
 {
 	if( m_writeOutputToSQLite ) {
-		sqliteBindInteger(m_environmentPeriodInsertStmt, 1, DataEnvironment::CurEnvirNum);
-		sqliteBindForeignKey(m_environmentPeriodInsertStmt, 2, 1);
-		sqliteBindText(m_environmentPeriodInsertStmt, 3, DataEnvironment::EnvironmentName);
-		sqliteBindInteger(m_environmentPeriodInsertStmt, 4, DataGlobals::KindOfSim);
+		sqliteBindInteger(m_environmentPeriodInsertStmt, 1, curEnvirNum);
+		sqliteBindForeignKey(m_environmentPeriodInsertStmt, 2, simulationIndex);
+		sqliteBindText(m_environmentPeriodInsertStmt, 3, environmentName);
+		sqliteBindInteger(m_environmentPeriodInsertStmt, 4, kindOfSim);
 
 		sqliteStepCommand(m_environmentPeriodInsertStmt);
 		sqliteResetCommand(m_environmentPeriodInsertStmt);

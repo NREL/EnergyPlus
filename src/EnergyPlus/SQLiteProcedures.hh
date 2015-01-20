@@ -137,7 +137,7 @@ public:
 		std::string const & TableName
 	);
 
-	void createSQLiteSimulationsRecord( int const ID );
+	void createSQLiteSimulationsRecord( int const ID, const std::string& verString, const std::string& currentDateTime );
 
 	void createSQLiteErrorRecord(
 		int const simulationIndex,
@@ -157,7 +157,7 @@ public:
 		int const id
 	);
 
-	void createSQLiteEnvironmentPeriodRecord();
+	void createSQLiteEnvironmentPeriodRecord( const int curEnvirNum, const std::string& environmentName, const int kindOfSim, const int simulationIndex = 1 );
 
 	void sqliteWriteMessage(const std::string & message);
 

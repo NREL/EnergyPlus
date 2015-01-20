@@ -266,7 +266,7 @@ namespace SimulationManager {
 
 		if ( sqlite->writeOutputToSQLite() ) {
 			sqlite->sqliteBegin();
-			sqlite->createSQLiteSimulationsRecord( 1 );
+			sqlite->createSQLiteSimulationsRecord( 1, DataStringGlobals::VerString, DataStringGlobals::CurrentDateTime );
 			sqlite->sqliteCommit();
 		}
 
@@ -411,7 +411,7 @@ namespace SimulationManager {
 
 			if ( sqlite->writeOutputToSQLite() ) {
 				sqlite->sqliteBegin();
-				sqlite->createSQLiteEnvironmentPeriodRecord();
+				sqlite->createSQLiteEnvironmentPeriodRecord( DataEnvironment::CurEnvirNum, DataEnvironment::EnvironmentName, DataGlobals::KindOfSim );
 				sqlite->sqliteCommit();
 			}
 

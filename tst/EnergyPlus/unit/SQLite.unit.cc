@@ -32,6 +32,18 @@ namespace EnergyPlus {
 
 		virtual void TearDown() { }
 
+		std::string storageType( const int storageTypeIndex ) {
+			return sqlite->storageType( storageTypeIndex );
+		}
+
+		std::string timestepTypeName( const int timestepType ) {
+			return sqlite->timestepTypeName( timestepType );
+		}
+
+		std::string reportingFreqName( const int reportingFreqIndex ) {
+			return sqlite->reportingFreqName( reportingFreqIndex );
+		}
+
 	public:
 		// static std::unique_ptr<SQLite> sqlite;
 
@@ -59,11 +71,30 @@ namespace EnergyPlus {
 			return std::make_pair( success, result );
 		}
 
+		bool indexExists( const std::string& indexName ) {
+			sqlite3_stmt* sqlStmtPtr;
+			std::string sql("pragma index_info(" + indexName + ");");
+			bool success = false;
+			int rc = sqlite3_prepare_v2(sqlite->m_db, sql.c_str(), -1, &sqlStmtPtr, nullptr);
+			if ( SQLITE_OK != rc ) {
+				sqlite3_finalize(sqlStmtPtr);
+				return success;
+			}
+			if ( SQLITE_ROW == sqlite3_step( sqlStmtPtr ) ) {
+				success = true;
+			}
+			sqlite3_finalize(sqlStmtPtr);
+			return success;
+		}
+
 		int columnCount( const std::string& tableName ) {
 			sqlite3_stmt* sqlStmtPtr;
 			std::string sql("pragma table_info(" + tableName + ");");
 			int rc = sqlite3_prepare_v2(sqlite->m_db, sql.c_str(), -1, &sqlStmtPtr, nullptr);
-			if ( SQLITE_OK != rc ) return -1;
+			if ( SQLITE_OK != rc ) {
+				sqlite3_finalize(sqlStmtPtr);
+				return -1;
+			}
 			int rowCount = 0;
 			while ( SQLITE_ROW == sqlite3_step( sqlStmtPtr ) ) {
 				rowCount++;
@@ -74,10 +105,11 @@ namespace EnergyPlus {
 
 		std::vector<std::vector<std::string>> queryResult( const std::string& statement, const std::string& tableName ) {
 			std::vector < std::vector < std::string > > queryVector;
-			sqlite3_stmt* sqlStmtPtr;
 
 			int rowCount = columnCount( tableName );
 			if( rowCount < 1 ) return queryVector;
+
+			sqlite3_stmt* sqlStmtPtr;
 
 			int code = sqlite3_prepare_v2(sqlite->m_db, statement.c_str(), -1, &sqlStmtPtr, nullptr);
 			while ( SQLITE_ROW == sqlite3_step( sqlStmtPtr ) ) {
@@ -98,23 +130,59 @@ namespace EnergyPlus {
 	};
 
 
-	TEST_F( SQLiteFixture, createSQLiteSimulationsRecord )
-	{
+	TEST_F( SQLiteFixture, createSQLiteSimulationsRecord ) {
 		sqlite->sqliteBegin();
-		sqlite->createSQLiteSimulationsRecord( 1 );
+		sqlite->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+		auto result = queryResult("SELECT * FROM Simulations;", "Simulations");
 		sqlite->sqliteCommit();
 
-		auto result = executeAndReturnFirstInt( "SELECT count(*) FROM Simulations;", 0 );
-		EXPECT_TRUE(result.first);
-		EXPECT_EQ(1, result.second);
+		ASSERT_EQ(1, result.size());
+		std::vector<std::string> testResult0 {"1", "EnergyPlus Version", "Current Time", "", "FALSE", "FALSE"};
+		EXPECT_EQ(testResult0, result[0]);
 
-		result = executeAndReturnFirstInt( "SELECT count(*) FROM Simulations WHERE SimulationIndex = 1;", 0 );
-		EXPECT_TRUE(result.first);
-		EXPECT_EQ(1, result.second);
+		auto countResult = executeAndReturnFirstInt( "SELECT count(*) FROM Simulations;", 0 );
+		EXPECT_TRUE(countResult.first);
+		EXPECT_EQ(1, countResult.second);
 
-		result = executeAndReturnFirstInt( "SELECT count(*) FROM Simulations WHERE SimulationIndex = 2;", 0 );
-		EXPECT_TRUE(result.first);
-		EXPECT_EQ(0, result.second);
+		countResult = executeAndReturnFirstInt( "SELECT count(*) FROM Simulations WHERE SimulationIndex = 1;", 0 );
+		EXPECT_TRUE(countResult.first);
+		EXPECT_EQ(1, countResult.second);
+
+		countResult = executeAndReturnFirstInt( "SELECT count(*) FROM Simulations WHERE SimulationIndex = 2;", 0 );
+		EXPECT_TRUE(countResult.first);
+		EXPECT_EQ(0, countResult.second);
+	}
+
+	TEST_F( SQLiteFixture, createSQLiteEnvironmentPeriodRecord ) {
+		sqlite->sqliteBegin();
+		// There needs to be a simulation record otherwise the foreign key constraint will fail
+		sqlite->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+		sqlite->createSQLiteEnvironmentPeriodRecord( 1, "CHICAGO ANN HTG 99.6% CONDNS DB", 1 );
+		sqlite->createSQLiteEnvironmentPeriodRecord( 2, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", 1, 1 );
+		sqlite->createSQLiteEnvironmentPeriodRecord( 3, "CHICAGO ANN HTG 99.6% CONDNS DB", 2 );
+		sqlite->createSQLiteEnvironmentPeriodRecord( 4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", 3, 1 );
+		auto result = queryResult("SELECT * FROM EnvironmentPeriods;", "EnvironmentPeriods");
+		sqlite->sqliteCommit();
+
+		ASSERT_EQ(4, result.size());
+		std::vector<std::string> testResult0 {"1", "1", "CHICAGO ANN HTG 99.6% CONDNS DB", "1"};
+		std::vector<std::string> testResult1 {"2", "1", "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "1"};
+		std::vector<std::string> testResult2 {"3", "1", "CHICAGO ANN HTG 99.6% CONDNS DB", "2"};
+		std::vector<std::string> testResult3 {"4", "1", "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "3"};
+		EXPECT_EQ(testResult0, result[0]);
+		EXPECT_EQ(testResult1, result[1]);
+		EXPECT_EQ(testResult2, result[2]);
+		EXPECT_EQ(testResult3, result[3]);
+
+		sqlite->sqliteBegin();
+		// This should fail to insert due to foreign key constraint
+		sqlite->createSQLiteEnvironmentPeriodRecord( 5, "CHICAGO ANN HTG 99.6% CONDNS DB", 1, 2 );
+		// This should fail to insert due to duplicate primary key
+		sqlite->createSQLiteEnvironmentPeriodRecord( 4, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", 1, 1 );
+		result = queryResult("SELECT * FROM EnvironmentPeriods;", "EnvironmentPeriods");
+		sqlite->sqliteCommit();
+
+		EXPECT_EQ(4, result.size());
 	}
 
 	TEST_F( SQLiteFixture, createSQLiteReportDictionaryRecord )
@@ -139,6 +207,67 @@ namespace EnergyPlus {
 		EXPECT_EQ(testResult2, result[2]);
 		EXPECT_EQ(testResult3, result[3]);
 		EXPECT_EQ(testResult4, result[4]);
+
+		sqlite->sqliteBegin();
+		sqlite->createSQLiteReportDictionaryRecord( 6, 3, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+		sqlite->createSQLiteReportDictionaryRecord( 7, 2, "Facility:Electricity", "", "Facility:Electricity", 3, "J", 1, true, _ );
+		sqlite->createSQLiteReportDictionaryRecord( 8, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 7, true, _ );
+		sqlite->createSQLiteReportDictionaryRecord( 9, 1, "HVAC", "", "AHU-1", 2, "", -2, false, _ );
+		result = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
+		sqlite->sqliteCommit();
+
+		ASSERT_EQ(9, result.size());
+		std::vector<std::string> testResult5 {"6", "0", "Unknown!!!", "Zone", "HVAC System", "Environment", "Site Outdoor Air Drybulb Temperature", "Hourly", "", "C"};
+		std::vector<std::string> testResult6 {"7", "1", "Sum", "Facility:Electricity", "Unknown!!!", "", "Facility:Electricity", "Hourly", "", "J"};
+		std::vector<std::string> testResult7 {"8", "1", "Sum", "Facility:Electricity", "HVAC System", "", "Facility:Electricity", "Unknown!!!", "", "J"};
+		std::vector<std::string> testResult8 {"9", "0", "Avg", "HVAC", "Zone", "", "AHU-1", "Unknown!!!", "", ""};
+		EXPECT_EQ(testResult5, result[5]);
+		EXPECT_EQ(testResult6, result[6]);
+		EXPECT_EQ(testResult7, result[7]);
+		EXPECT_EQ(testResult8, result[8]);
+
+		sqlite->sqliteBegin();
+		// This should fail to insert due to duplicate primary key
+		sqlite->createSQLiteReportDictionaryRecord( 9, 3, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
+		result = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
+		sqlite->sqliteCommit();
+		EXPECT_EQ(9, result.size());
+	}
+
+	TEST_F( SQLiteFixture, initializeIndexes ) {
+		sqlite->sqliteBegin();
+		sqlite->initializeIndexes();
+		sqlite->sqliteCommit();
+
+		EXPECT_TRUE(indexExists("rddMTR"));
+		EXPECT_TRUE(indexExists("redRD"));
+		EXPECT_FALSE(indexExists("dmhdHRI"));
+		EXPECT_FALSE(indexExists("dmhrMNI"));
+		EXPECT_FALSE(indexExists("tdI"));
+	}
+
+	TEST_F( SQLiteFixture, privateMethods ) {
+		// test storageType
+		EXPECT_EQ( "Avg", storageType( 1 ) );
+		EXPECT_EQ( "Sum", storageType( 2 ) );
+		EXPECT_EQ( "Unknown!!!", storageType( 3 ) );
+		EXPECT_EQ( "Unknown!!!", storageType( -1 ) );
+
+		// test timestepTypeName
+		EXPECT_EQ( "HVAC System", timestepTypeName( 1 ) );
+		EXPECT_EQ( "Zone", timestepTypeName( 2 ) );
+		EXPECT_EQ( "Unknown!!!", timestepTypeName( 3 ) );
+		EXPECT_EQ( "Unknown!!!", timestepTypeName( -1 ) );
+
+		// test reportingFreqName
+		EXPECT_EQ( "HVAC System Timestep", reportingFreqName( -1 ) );
+		EXPECT_EQ( "Zone Timestep", reportingFreqName( 0 ) );
+		EXPECT_EQ( "Hourly", reportingFreqName( 1 ) );
+		EXPECT_EQ( "Daily", reportingFreqName( 2 ) );
+		EXPECT_EQ( "Monthly", reportingFreqName( 3 ) );
+		EXPECT_EQ( "Run Period", reportingFreqName( 4 ) );
+		EXPECT_EQ( "Unknown!!!", reportingFreqName( 5 ) );
+		EXPECT_EQ( "Unknown!!!", reportingFreqName( -2 ) );
 	}
 
 	// // Begin a transaction
@@ -264,11 +393,7 @@ namespace EnergyPlus {
 	// 	int const id
 	// );
 
-	// void createSQLiteEnvironmentPeriodRecord();
-
 	// void sqliteWriteMessage(const std::string & message);
 
 	// void createZoneExtendedOutput();
-
-	// void initializeIndexes();
 }
