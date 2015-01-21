@@ -9392,7 +9392,7 @@ namespace PlantPipingSystemsManager {
 		} else if ( ( CellTemp <= frzLiqTrans ) && ( CellTemp >= frzIceTrans ) ) {
 			rhoCP_soil = rhoCP_soil_transient;
 		} else if ( ( CellTemp < frzIceTrans ) && ( CellTemp > frzAllIce ) ) {
-			rhoCP_soil = rhoCP_soil_transient + ( rhoCP_soil_transient - rhoCP_soil_ice ) / ( frzIceTrans - frzAllIce ) * ( CellTemp - frzAllIce );
+			rhoCP_soil = rhoCP_soil_ice + ( rhoCP_soil_transient - rhoCP_soil_ice ) / ( frzIceTrans - frzAllIce ) * ( CellTemp - frzAllIce );
 		}
 		rhoCp = rhoCP_soil;
 
