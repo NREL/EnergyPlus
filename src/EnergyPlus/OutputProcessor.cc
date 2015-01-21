@@ -3774,23 +3774,23 @@ namespace OutputProcessor {
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) ) {
 			std::sprintf( stamp, "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), Hour(), StartMinute(), EndMinute(), DayType().c_str() );
 			out_stream << stamp << NL;
-			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, EndMinute, StartMinute, DST, DayType );
+			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, DataEnvironment::CurEnvirNum, Month, DayOfMonth, Hour, EndMinute, StartMinute, DST, DayType, DataGlobals::WarmupFlag );
 		} else if ( reportingInterval == ReportHourly ) {
 			std::sprintf( stamp, "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), Hour(), 0.0, 60.0, DayType().c_str() );
 			out_stream << stamp << NL;
-			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, _, _, DST, DayType );
+			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, DataEnvironment::CurEnvirNum, Month, DayOfMonth, Hour, _, _, DST, DayType, DataGlobals::WarmupFlag );
 		} else if ( reportingInterval == ReportDaily ) {
 			std::sprintf( stamp, "%s,%s,%2d,%2d,%2d,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), DayType().c_str() );
 			out_stream << stamp << NL;
-			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, _, _, _, DST, DayType );
+			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, DataEnvironment::CurEnvirNum, Month, DayOfMonth, _, _, _, DST, DayType, DataGlobals::WarmupFlag );
 		} else if ( reportingInterval == ReportMonthly ) {
 			std::sprintf( stamp, "%s,%s,%2d", reportIDString.c_str(), DayOfSimChr.c_str(), Month() );
 			out_stream << stamp << NL;
-			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( ReportMonthly, reportID, DayOfSim, Month );
+			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( ReportMonthly, reportID, DayOfSim, DataEnvironment::CurEnvirNum, Month );
 		} else if ( reportingInterval == ReportSim ) {
 			std::sprintf( stamp, "%s,%s", reportIDString.c_str(), DayOfSimChr.c_str() );
 			out_stream << stamp << NL;
-			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim );
+			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, DataEnvironment::CurEnvirNum );
 		} else {
 			std::ostringstream ss;
 			ss << "Illegal reportingInterval passed to WriteTimeStampFormatData: " << reportingInterval;

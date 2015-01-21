@@ -12,6 +12,7 @@
 #include <sqlite3.h>
 
 #include <fstream>
+#include <iostream>
 #include <memory>
 
 namespace EnergyPlus {
@@ -26,7 +27,7 @@ public:
 
 	// Open the DB and prepare for writing data
 	// Create all of the tables on construction
-	SQLite( bool writeOutputToSQLite = false, bool writeTabularDataToSQLite = false );
+	SQLite( std::ostream & errorStream, bool writeOutputToSQLite = false, bool writeTabularDataToSQLite = false, std::string const & dbName = "eplusout.sql" );
 
 	// Close database and free prepared statements
 	virtual ~SQLite();
@@ -68,13 +69,15 @@ public:
 		int const reportingInterval,
 		int const recordIndex,
 		int const CumlativeSimulationDays,
+		int const curEnvirNum,
 		Optional_int_const Month = _,
 		Optional_int_const DayOfMonth = _,
 		Optional_int_const Hour = _,
 		Optional< Real64 const > EndMinute = _,
 		Optional< Real64 const > StartMinute = _,
 		Optional_int_const DST = _,
-		Optional_string_const DayType = _
+		Optional_string_const DayType = _,
+		bool const warmupFlag = false
 	);
 
 	void addSQLiteZoneSizingRecord(
@@ -103,8 +106,6 @@ public:
 		std::string const & VarDesc, // the description of the input variable
 		Real64 const VarValue // the value from the sizing calculation
 	);
-
-	void createSQLiteRoomAirModelTable();
 
 	void createSQLiteDaylightMapTitle(
 		int const mapNum,
@@ -148,14 +149,9 @@ public:
 
 	void updateSQLiteErrorRecord( std::string const & errorMessage );
 
-	void updateSQLiteSimulationRecord(
-		bool const completed,
-		bool const completedSuccessfully
-	);
+	void updateSQLiteSimulationRecord( bool const completed, bool const completedSuccessfully, int const id = 1 );
 
-	void updateSQLiteSimulationRecord(
-		int const id
-	);
+	void updateSQLiteSimulationRecord( int const id, int const numOfTimeStepInHour );
 
 	void createSQLiteEnvironmentPeriodRecord( const int curEnvirNum, const std::string& environmentName, const int kindOfSim, const int simulationIndex = 1 );
 
@@ -184,6 +180,7 @@ private:
 	void createSQLiteZoneListTable();
 	void createSQLiteZoneGroupTable();
 	void createSQLiteSchedulesTable();
+	void createSQLiteRoomAirModelTable();
 
 	int sqliteExecuteCommand(const std::string & commandBuffer);
 	int sqlitePrepareStatement(sqlite3_stmt* & stmt, const std::string & stmtBuffer);
@@ -251,7 +248,7 @@ private:
 	bool m_writeOutputToSQLite;
 	bool m_writeTabularDataToSQLite;
 	int m_sqlDBTimeIndex;
-	std::ofstream m_errorStream;
+	std::ostream & m_errorStream;
 	sqlite3 * m_db;
 	std::string m_dbName;
 	sqlite3_stmt * m_reportDataInsertStmt;

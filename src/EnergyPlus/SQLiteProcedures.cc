@@ -60,19 +60,22 @@ void CreateSQLiteDatabase() {
 				}
 			}
 		}
-		EnergyPlus::sqlite = std::unique_ptr<SQLite>(new SQLite( writeOutputToSQLite, writeTabularDataToSQLite ));
+		std::ofstream errorStream;
+		errorStream.open("sqlite.err", std::ofstream::out | std::ofstream::trunc);
+		EnergyPlus::sqlite = std::unique_ptr<SQLite>(new SQLite( errorStream, writeOutputToSQLite, writeTabularDataToSQLite ));
 	} catch( const std::runtime_error& error ) {
 		ShowFatalError(error.what());
 	}
 }
 
-SQLite::SQLite( bool writeOutputToSQLite, bool writeTabularDataToSQLite )
+SQLite::SQLite( std::ostream & errorStream, bool writeOutputToSQLite, bool writeTabularDataToSQLite, std::string const & dbName )
 	:
 	m_writeOutputToSQLite(writeOutputToSQLite),
 	m_writeTabularDataToSQLite(writeTabularDataToSQLite),
 	m_sqlDBTimeIndex(0),
 	m_db(nullptr),
-	m_dbName("eplusout.sql"),
+	m_dbName(dbName),
+	m_errorStream(errorStream),
 	m_reportDataInsertStmt(nullptr),
 	m_reportExtendedDataInsertStmt(nullptr),
 	m_reportDictionaryInsertStmt(nullptr),
@@ -117,18 +120,18 @@ SQLite::SQLite( bool writeOutputToSQLite, bool writeTabularDataToSQLite )
 	if( m_writeOutputToSQLite ) {
 		int rc = -1;
 		bool ok = true;
-		m_errorStream.open("sqlite.err", std::ofstream::out | std::ofstream::trunc);
+		// m_errorStream.open("sqlite.err", std::ofstream::out | std::ofstream::trunc);
 
 		// Test if we can write to the sqlite error file
 		//  Does there need to be a seperate sqlite.err file at all?  Consider using eplusout.err
-		if( m_errorStream.is_open() ) {
+		if( m_errorStream ) {
 			m_errorStream << "SQLite3 message, sqlite.err open for processing!" << std::endl;
 		} else {
 			ok = false;
 		}
 
 		// Test if we can create a new file named m_dbName
-		if( ok ) {
+		if( ok && m_dbName != ":memory:" ) {
 			std::ofstream test(m_dbName, std::ofstream::out | std::ofstream::trunc);
 			if( test.is_open() ) {
 				test.close();
@@ -148,11 +151,13 @@ SQLite::SQLite( bool writeOutputToSQLite, bool writeTabularDataToSQLite )
 				m_errorStream << "SQLite3 message, can't get exclusive lock on existing database: " << sqlite3_errmsg(m_db) << std::endl;
 				ok = false;
 			} else {
-				// Remove test db
-				rc = remove( m_dbName.c_str() );
-				if( rc ) {
-					m_errorStream << "SQLite3 message, can't remove old database: " << sqlite3_errmsg(m_db) << std::endl;
-					ok = false;
+				if (m_dbName != ":memory:") {
+					// Remove test db
+					rc = remove( m_dbName.c_str() );
+					if( rc ) {
+						m_errorStream << "SQLite3 message, can't remove old database: " << sqlite3_errmsg(m_db) << std::endl;
+						ok = false;
+					}
 				}
 			}
 			sqlite3_free(zErrMsg);
@@ -1601,13 +1606,15 @@ void SQLite::createSQLiteTimeIndexRecord(
 	int const reportingInterval,
 	int const recordIndex,
 	int const cumlativeSimulationDays,
+	int const curEnvirNum,
 	Optional_int_const month,
 	Optional_int_const dayOfMonth,
 	Optional_int_const hour,
 	Optional< Real64 const > endMinute,
 	Optional< Real64 const > startMinute,
 	Optional_int_const dst,
-	Optional_string_const dayType
+	Optional_string_const dayType,
+	bool const warmupFlag
 )
 {
 	if( m_writeOutputToSQLite ) {
@@ -1619,6 +1626,10 @@ void SQLite::createSQLiteTimeIndexRecord(
 		switch(reportingInterval) {
 		case LocalReportEach:
 		case LocalReportTimeStep: {
+			if ( !month.present() || !dayOfMonth.present() || !hour.present() || 
+				 !endMinute.present() || !startMinute.present() || !dst.present() || !dayType.present() ) {
+				break;
+			}
 			++m_sqlDBTimeIndex;
 
 			int intEndMinute = static_cast<int>(endMinute() + 0.5);
@@ -1637,8 +1648,8 @@ void SQLite::createSQLiteTimeIndexRecord(
 			sqliteBindInteger(m_timeIndexInsertStmt, 8, reportingInterval);
 			sqliteBindInteger(m_timeIndexInsertStmt, 9, cumlativeSimulationDays);
 			sqliteBindText(m_timeIndexInsertStmt, 10, dayType());
-			sqliteBindInteger(m_timeIndexInsertStmt, 11, DataEnvironment::CurEnvirNum);
-			sqliteBindLogical(m_timeIndexInsertStmt, 12, DataGlobals::WarmupFlag);
+			sqliteBindInteger(m_timeIndexInsertStmt, 11, curEnvirNum);
+			sqliteBindLogical(m_timeIndexInsertStmt, 12, warmupFlag);
 
 			sqliteStepCommand(m_timeIndexInsertStmt);
 			sqliteResetCommand(m_timeIndexInsertStmt);
@@ -1646,6 +1657,9 @@ void SQLite::createSQLiteTimeIndexRecord(
 			break;
 		}
 		case LocalReportHourly: {
+			if ( !month.present() || !dayOfMonth.present() || !hour.present() || !dst.present() || !dayType.present() ) {
+				break;
+			}
 			++m_sqlDBTimeIndex;
 
 			sqliteBindInteger(m_timeIndexInsertStmt, 1, m_sqlDBTimeIndex);
@@ -1658,7 +1672,7 @@ void SQLite::createSQLiteTimeIndexRecord(
 			sqliteBindInteger(m_timeIndexInsertStmt, 8, reportingInterval);
 			sqliteBindInteger(m_timeIndexInsertStmt, 9, cumlativeSimulationDays);
 			sqliteBindText(m_timeIndexInsertStmt, 10, dayType());
-			sqliteBindInteger(m_timeIndexInsertStmt, 11, DataEnvironment::CurEnvirNum);
+			sqliteBindInteger(m_timeIndexInsertStmt, 11, curEnvirNum);
 
 			sqliteStepCommand(m_timeIndexInsertStmt);
 			sqliteResetCommand(m_timeIndexInsertStmt);
@@ -1666,6 +1680,9 @@ void SQLite::createSQLiteTimeIndexRecord(
 			break;
 		}
 		case LocalReportDaily: {
+			if ( !month.present() || !dayOfMonth.present() || !hour.present() || !dst.present() || !dayType.present() ) {
+				break;
+			}
 			++m_sqlDBTimeIndex;
 
 			intervalInMinutes = 60*24;
@@ -1679,7 +1696,7 @@ void SQLite::createSQLiteTimeIndexRecord(
 			sqliteBindInteger(m_timeIndexInsertStmt, 8, reportingInterval);
 			sqliteBindInteger(m_timeIndexInsertStmt, 9, cumlativeSimulationDays);
 			sqliteBindText(m_timeIndexInsertStmt, 10, dayType());
-			sqliteBindInteger(m_timeIndexInsertStmt, 11, DataEnvironment::CurEnvirNum);
+			sqliteBindInteger(m_timeIndexInsertStmt, 11, curEnvirNum);
 
 			sqliteStepCommand(m_timeIndexInsertStmt);
 			sqliteResetCommand(m_timeIndexInsertStmt);
@@ -1687,6 +1704,9 @@ void SQLite::createSQLiteTimeIndexRecord(
 			break;
 		}
 		case LocalReportMonthly: {
+			if ( !month.present() ) {
+				break;
+			}
 			++m_sqlDBTimeIndex;
 
 			intervalInMinutes = 60*24*lastDayOfMonth[month() - 1];
@@ -1700,7 +1720,7 @@ void SQLite::createSQLiteTimeIndexRecord(
 			sqliteBindInteger(m_timeIndexInsertStmt, 8, reportingInterval);
 			sqliteBindInteger(m_timeIndexInsertStmt, 9, cumlativeSimulationDays);
 			sqliteBindNULL(m_timeIndexInsertStmt, 10);
-			sqliteBindInteger(m_timeIndexInsertStmt, 11, DataEnvironment::CurEnvirNum);
+			sqliteBindInteger(m_timeIndexInsertStmt, 11, curEnvirNum);
 
 			sqliteStepCommand(m_timeIndexInsertStmt);
 			sqliteResetCommand(m_timeIndexInsertStmt);
@@ -1721,7 +1741,7 @@ void SQLite::createSQLiteTimeIndexRecord(
 			sqliteBindInteger(m_timeIndexInsertStmt, 8, reportingInterval);
 			sqliteBindInteger(m_timeIndexInsertStmt, 9, cumlativeSimulationDays);
 			sqliteBindNULL(m_timeIndexInsertStmt, 10);
-			sqliteBindInteger(m_timeIndexInsertStmt, 11, DataEnvironment::CurEnvirNum);
+			sqliteBindInteger(m_timeIndexInsertStmt, 11, curEnvirNum);
 
 			sqliteStepCommand (m_timeIndexInsertStmt);
 			sqliteResetCommand (m_timeIndexInsertStmt);
@@ -2056,12 +2076,10 @@ void SQLite::updateSQLiteErrorRecord( std::string const & errorMessage )
 	}
 }
 
-void SQLite::updateSQLiteSimulationRecord(
-	int const id
-)
+void SQLite::updateSQLiteSimulationRecord( int const id, int const numOfTimeStepInHour )
 {
 	if( m_writeOutputToSQLite ) {
-		sqliteBindInteger(m_simulationDataUpdateStmt, 1, DataGlobals::NumOfTimeStepInHour);
+		sqliteBindInteger(m_simulationDataUpdateStmt, 1, numOfTimeStepInHour);
 		sqliteBindForeignKey(m_simulationDataUpdateStmt, 2, id);
 
 		sqliteStepCommand(m_simulationDataUpdateStmt);
@@ -2069,15 +2087,12 @@ void SQLite::updateSQLiteSimulationRecord(
 	}
 }
 
-void SQLite::updateSQLiteSimulationRecord(
-bool const completed,
-bool const completedSuccessfully
-)
+void SQLite::updateSQLiteSimulationRecord( bool const completed, bool const completedSuccessfully, int const id )
 {
 	if( m_writeOutputToSQLite ) {
 		sqliteBindLogical(m_simulationUpdateStmt, 1, completed);
 		sqliteBindLogical(m_simulationUpdateStmt, 2, completedSuccessfully);
-		sqliteBindForeignKey(m_simulationUpdateStmt, 3, 1); // seems to always be 1, SimulationManager::ManageSimulation()
+		sqliteBindForeignKey(m_simulationUpdateStmt, 3, id); // seems to always be 1, SimulationManager::ManageSimulation()
 
 		sqliteStepCommand(m_simulationUpdateStmt);
 		sqliteResetCommand(m_simulationUpdateStmt);

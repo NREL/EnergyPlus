@@ -386,7 +386,7 @@ namespace SimulationManager {
 
 		if ( sqlite->writeOutputToSQLite() ) {
 			sqlite->sqliteBegin();
-			sqlite->updateSQLiteSimulationRecord( 1 );
+			sqlite->updateSQLiteSimulationRecord( 1, DataGlobals::NumOfTimeStepInHour );
 			sqlite->sqliteCommit();
 		}
 
