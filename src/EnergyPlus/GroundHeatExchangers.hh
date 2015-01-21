@@ -141,7 +141,8 @@ namespace GroundHeatExchangers {
 		Real64 BoreholeRadius;
 		Real64 KGrout; // Grout thermal conductivity                [W/(mK)]
 		Real64 UtubeDist; // Distance between the legs of the Utube    [m]
-		//Real64 ResistanceBhole; // The thermal resistance of the borehole, (K per W/m)
+		Real64 ResistanceBhole; // The thermal resistance of the borehole, (K per W/m)
+		bool RunFlag;
 
 
 		// Default Constructor
@@ -152,8 +153,9 @@ namespace GroundHeatExchangers {
 			BoreholeLength( 0.0 ),
 			BoreholeRadius( 0.0 ),
 			KGrout( 0.0 ),
-			UtubeDist( 0.0 )
-			//ResistanceBhole( 0.0 )
+			UtubeDist( 0.0 ),
+			ResistanceBhole( 0.0 ),
+			RunFlag( false )
 
 		{}
 
@@ -163,16 +165,43 @@ namespace GroundHeatExchangers {
 		void
 		CalcVerticalGroundHeatExchanger();
 
+		void
+		BoreholeResistance();
+
+		Real64
+		InterpVert(
+		//int const GLHENum, // Ground loop heat exchanger ID number
+		Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
+		//Real64 & GfuncVal // The value of the g-function at LnTTsVal; found by
+		);
+
+		void
+		InitBoreholeHXSimVars();
+
 	};
 
 	struct GLHESlinky:GLHEBase
 	{
 		// Members
-		Real64 NumLoops; // [°C]
+		bool VerticalHX;		// Vertical HX Configuration Flag
+		bool HorizontalHX;		// Horizontal HX Configuration Flag
+		Real64 CoilDiameter;	// Diameter of the slinky coils [m]
+		Real64 CoilPitch;		// Center-to-center slinky coil spacing [m]
+		Real64 TrenchDepth;		// Trench depth from ground surface to trench bottom [m]
+		Real64 TrenchLength;	// Length of single trench [m]
+		int NumTrenches;		// Number of parallel trenches [m]
+		Real64 TrenchSpacing;	// Spacing between parallel trenches [m]
 
 		// Default Constructor
 		GLHESlinky() :
-			NumLoops( 0.0 )
+			VerticalHX( false ),
+			HorizontalHX( false ),
+			CoilDiameter( 0.0 ),
+			CoilPitch( 0.0 ),
+			TrenchDepth( 0.0 ),
+			TrenchLength( 0.0 ),
+			NumTrenches( 0 ),
+			TrenchSpacing( 0.0 )
 
 		{}
 
@@ -198,31 +227,6 @@ namespace GroundHeatExchangers {
 
 	void
 	GetGroundHeatExchangerInput();
-
-	//******************************************************************************
-
-	void
-	BoreholeResistance(
-		int const GLHENum,
-		Real64 & ResistanceBhole
-	);
-
-	//******************************************************************************
-
-	void
-	INTERP(
-		int const GLHENum, // Ground loop heat exchanger ID number
-		Real64 const LnTTsVal, // The value of LN(t/TimeSS) that a g-function
-		Real64 & GfuncVal // The value of the g-function at LnTTsVal; found by
-	);
-
-	//******************************************************************************
-
-	void
-	InitBoreholeHXSimVars(
-		int const GLHENum,
-		bool const RunFlag
-	);
 
 
 	//     NOTICE

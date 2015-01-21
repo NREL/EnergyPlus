@@ -193,12 +193,12 @@ namespace GroundHeatExchangers {
 		auto & thisGLHE( VerticalGLHE( GLHENum ) );
 
 		if ( InitLoopEquip ) {
-			InitBoreholeHXSimVars( GLHENum, RunFlag );
+			thisGLHE.InitBoreholeHXSimVars();
 			return;
 		}
 
 		//INITIALIZE
-		InitBoreholeHXSimVars( GLHENum, RunFlag );
+		thisGLHE.InitBoreholeHXSimVars();
 
 		//SIMULATE HEAT EXCHANGER
 		thisGLHE.CalcVerticalGroundHeatExchanger();
@@ -294,34 +294,34 @@ namespace GroundHeatExchangers {
 		int LoopNum;
 		int LoopSideNum;
 
-		auto & thisGLHE( VerticalGLHE( GLHENum ) );
+		//auto & thisGLHE( VerticalGLHE( GLHENum ) );
 
 		//Autodesk:Uninit Initialize variables used uninitialized
 		SumTotal = 0.0; //Autodesk:Uninit Force default initialization
 
 		//set local glhe parameters
 
-		NumBholes = thisGLHE.NumBoreholes;
-		BholeLength = thisGLHE.BoreholeLength;
-		GLHEInletNode = thisGLHE.GLHEInletNodeNum;
+		NumBholes = this->NumBoreholes;
+		BholeLength = this->BoreholeLength;
+		GLHEInletNode = this->GLHEInletNodeNum;
 		GLHEInletTemp = Node( GLHEInletNode ).Temp;
-		Cp_Fluid = GetSpecificHeatGlycol( PlantLoop( thisGLHE.LoopNum ).FluidName, GLHEInletTemp, PlantLoop( thisGLHE.LoopNum ).FluidIndex, RoutineName );
+		Cp_Fluid = GetSpecificHeatGlycol( PlantLoop( this->LoopNum ).FluidName, GLHEInletTemp, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
 
-		Tground = thisGLHE.TempGround;
-		FluidDensity = GetDensityGlycol( PlantLoop( thisGLHE.LoopNum ).FluidName, GLHEInletTemp, PlantLoop( thisGLHE.LoopNum ).FluidIndex, RoutineName );
-		K_Ground = thisGLHE.KGround;
+		Tground = this->TempGround;
+		FluidDensity = GetDensityGlycol( PlantLoop( this->LoopNum ).FluidName, GLHEInletTemp, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
+		K_Ground = this->KGround;
 		K_Ground_Factor = 2.0 * Pi * K_Ground;
-		AGG = thisGLHE.AGG;
-		SubAGG = thisGLHE.SubAGG;
-		GroundDiffusivity = thisGLHE.KGround / thisGLHE.CpRhoGround;
+		AGG = this->AGG;
+		SubAGG = this->SubAGG;
+		GroundDiffusivity = this->KGround / this->CpRhoGround;
 
 		// calculate annual time constant for ground conduction
-		TimeSS = ( pow_2( thisGLHE.BoreholeLength ) / ( 9.0 * GroundDiffusivity ) ) / SecInHour / 8760.0;
+		TimeSS = ( pow_2( this->BoreholeLength ) / ( 9.0 * GroundDiffusivity ) ) / SecInHour / 8760.0;
 		TimeSS_Factor = TimeSS * 8760.0;
 
-		GLHEOutletNode = thisGLHE.GLHEOutletNodeNum;
-		LoopNum = thisGLHE.LoopNum;
-		LoopSideNum = thisGLHE.LoopSideNum;
+		GLHEOutletNode = this->GLHEOutletNodeNum;
+		LoopNum = this->LoopNum;
+		LoopSideNum = this->LoopSideNum;
 
 		GLHEMassFlowRate = MDotActual;
 
@@ -356,7 +356,7 @@ namespace GroundHeatExchangers {
 			PrevTimeSteps = 0.0; // this resets history when rounding 24:00 hours during warmup avoids hard crash later
 			GLHEOutletTemp = GLHEInletTemp;
 			GLHEMassFlowRate = MDotActual;
-			thisGLHE.CalcAggregateLoad(); //Just allocates and initializes PrevHour array
+			this->CalcAggregateLoad(); //Just allocates and initializes PrevHour array
 			return;
 		}
 
@@ -374,10 +374,10 @@ namespace GroundHeatExchangers {
 			}
 		}
 
-		thisGLHE.CalcAggregateLoad();
+		this->CalcAggregateLoad();
 
 		// Update the borehole resistance each time
-		BoreholeResistance( GLHENum, ResistanceBhole );
+		this->BoreholeResistance();
 
 		if ( N == 1 ) {
 			if ( MDotActual <= 0.0 ) {
@@ -386,12 +386,12 @@ namespace GroundHeatExchangers {
 				ToutNew = GLHEInletTemp;
 			} else {
 				XI = std::log( CurrentSimTime / ( TimeSS_Factor ) );
-				INTERP( GLHENum, XI, GfuncVal );
+				GfuncVal = this->InterpVert( XI );
 
 				C_1 = ( BholeLength * NumBholes ) / ( 2.0 * MDotActual * Cp_Fluid );
-				tmpQnSubHourly = ( Tground - GLHEInletTemp ) / ( GfuncVal / ( K_Ground_Factor ) + ResistanceBhole + C_1 );
-				FluidAveTemp = Tground - tmpQnSubHourly * ResistanceBhole;
-				ToutNew = Tground - tmpQnSubHourly * ( GfuncVal / ( K_Ground_Factor ) + ResistanceBhole - C_1 );
+				tmpQnSubHourly = ( Tground - GLHEInletTemp ) / ( GfuncVal / ( K_Ground_Factor ) + this->ResistanceBhole + C_1 );
+				FluidAveTemp = Tground - tmpQnSubHourly * this->ResistanceBhole;
+				ToutNew = Tground - tmpQnSubHourly * ( GfuncVal / ( K_Ground_Factor ) + this->ResistanceBhole - C_1 );
 			}
 		} else {
 			// no monthly super position
@@ -404,28 +404,28 @@ namespace GroundHeatExchangers {
 				} else {
 					IndexN = SubAGG + 1;
 				}
-				SubHourlyLimit = N - thisGLHE.LastHourN( IndexN ); //Check this when running simulation
+				SubHourlyLimit = N - this->LastHourN( IndexN ); //Check this when running simulation
 
 				SUBHRLY_LOOP: for ( I = 1; I <= SubHourlyLimit; ++I ) {
 					if ( I == SubHourlyLimit ) {
 						if ( int( CurrentSimTime ) >= SubAGG ) {
 							XI = std::log( ( CurrentSimTime - PrevTimeSteps( I + 1 ) ) / ( TimeSS_Factor ) );
-							INTERP( GLHENum, XI, GfuncVal );
+							GfuncVal = this->InterpVert( XI );
 							RQSubHr = GfuncVal / ( K_Ground_Factor );
-							SumQnSubHourly += ( thisGLHE.QnSubHr( I ) - thisGLHE.QnHr( IndexN ) ) * RQSubHr;
+							SumQnSubHourly += ( this->QnSubHr( I ) - this->QnHr( IndexN ) ) * RQSubHr;
 						} else {
 							XI = std::log( ( CurrentSimTime - PrevTimeSteps( I + 1 ) ) / ( TimeSS_Factor ) );
-							INTERP( GLHENum, XI, GfuncVal );
+							GfuncVal = this->InterpVert( XI );
 							RQSubHr = GfuncVal / ( K_Ground_Factor );
-							SumQnSubHourly += thisGLHE.QnSubHr( I ) * RQSubHr;
+							SumQnSubHourly += this->QnSubHr( I ) * RQSubHr;
 						}
 						goto SUBHRLY_LOOP_exit;
 					}
 					//PrevTimeSteps(I+1) This is "I+1" because PrevTimeSteps(1) = CurrentTimestep
 					XI = std::log( ( CurrentSimTime - PrevTimeSteps( I + 1 ) ) / ( TimeSS_Factor ) );
-					INTERP( GLHENum, XI, GfuncVal );
+					GfuncVal = this->InterpVert( XI );
 					RQSubHr = GfuncVal / ( K_Ground_Factor );
-					SumQnSubHourly += ( thisGLHE.QnSubHr( I ) - thisGLHE.QnSubHr( I + 1 ) ) * RQSubHr;
+					SumQnSubHourly += ( this->QnSubHr( I ) - this->QnSubHr( I + 1 ) ) * RQSubHr;
 					SUBHRLY_LOOP_loop: ;
 				}
 				SUBHRLY_LOOP_exit: ;
@@ -437,15 +437,15 @@ namespace GroundHeatExchangers {
 				HOURLY_LOOP: for ( I = SubAGG + 1; I <= HourlyLimit; ++I ) {
 					if ( I == HourlyLimit ) {
 						XI = std::log( CurrentSimTime / ( TimeSS_Factor ) );
-						INTERP( GLHENum, XI, GfuncVal );
+						GfuncVal = this->InterpVert( XI );
 						RQHour = GfuncVal / ( K_Ground_Factor );
-						SumQnHourly += thisGLHE.QnHr( I ) * RQHour;
+						SumQnHourly += this->QnHr( I ) * RQHour;
 						goto HOURLY_LOOP_exit;
 					}
 					XI = std::log( ( CurrentSimTime - int( CurrentSimTime ) + I ) / ( TimeSS_Factor ) );
-					INTERP( GLHENum, XI, GfuncVal );
+					GfuncVal = this->InterpVert( XI );
 					RQHour = GfuncVal / ( K_Ground_Factor );
-					SumQnHourly += ( thisGLHE.QnHr( I ) - thisGLHE.QnHr( I + 1 ) ) * RQHour;
+					SumQnHourly += ( this->QnHr( I ) - this->QnHr( I + 1 ) ) * RQHour;
 					HOURLY_LOOP_loop: ;
 				}
 				HOURLY_LOOP_exit: ;
@@ -455,7 +455,7 @@ namespace GroundHeatExchangers {
 
 				//Calulate the subhourly temperature due the Last Time steps Load
 				XI = std::log( ( CurrentSimTime - PrevTimeSteps( 2 ) ) / ( TimeSS_Factor ) );
-				INTERP( GLHENum, XI, GfuncVal );
+				GfuncVal = this->InterpVert( XI );
 				RQSubHr = GfuncVal / ( K_Ground_Factor );
 
 				if ( MDotActual <= 0.0 ) {
@@ -465,12 +465,12 @@ namespace GroundHeatExchangers {
 				} else {
 					//Dr.Spitler's Explicit set of equations to calculate the New Outlet Temperature of the U-Tube
 					C0 = RQSubHr;
-					C1 = Tground - ( SumTotal - thisGLHE.QnSubHr( 1 ) * RQSubHr );
+					C1 = Tground - ( SumTotal - this->QnSubHr( 1 ) * RQSubHr );
 					C2 = BholeLength * NumBholes / ( 2.0 * MDotActual * Cp_Fluid );
 					C3 = MDotActual * Cp_Fluid / ( BholeLength * NumBholes );
-					tmpQnSubHourly = ( C1 - GLHEInletTemp ) / ( ResistanceBhole + C0 - C2 + ( 1 / C3 ) );
-					FluidAveTemp = C1 - ( C0 + ResistanceBhole ) * tmpQnSubHourly;
-					ToutNew = C1 + ( C2 - C0 - ResistanceBhole ) * tmpQnSubHourly;
+					tmpQnSubHourly = ( C1 - GLHEInletTemp ) / ( this->ResistanceBhole + C0 - C2 + ( 1 / C3 ) );
+					FluidAveTemp = C1 - ( C0 + this->ResistanceBhole ) * tmpQnSubHourly;
+					ToutNew = C1 + ( C2 - C0 - this->ResistanceBhole ) * tmpQnSubHourly;
 				}
 
 			} else { // Monthly Aggregation and super position
@@ -488,15 +488,15 @@ namespace GroundHeatExchangers {
 				SUMMONTHLY: for ( I = 1; I <= CurrentMonth; ++I ) {
 					if ( I == 1 ) {
 						XI = std::log( CurrentSimTime / ( TimeSS_Factor ) );
-						INTERP( GLHENum, XI, GfuncVal );
+						GfuncVal = this->InterpVert( XI );
 						RQMonth = GfuncVal / ( K_Ground_Factor );
-						SumQnMonthly += thisGLHE.QnMonthlyAgg( I ) * RQMonth;
+						SumQnMonthly += this->QnMonthlyAgg( I ) * RQMonth;
 						goto SUMMONTHLY_loop;
 					}
 					XI = std::log( ( CurrentSimTime - ( I - 1 ) * HrsPerMonth ) / ( TimeSS_Factor ) );
-					INTERP( GLHENum, XI, GfuncVal );
+					GfuncVal = this->InterpVert( XI );
 					RQMonth = GfuncVal / ( K_Ground_Factor );
-					SumQnMonthly += ( thisGLHE.QnMonthlyAgg( I ) - thisGLHE.QnMonthlyAgg( I - 1 ) ) * RQMonth;
+					SumQnMonthly += ( this->QnMonthlyAgg( I ) - this->QnMonthlyAgg( I - 1 ) ) * RQMonth;
 					SUMMONTHLY_loop: ;
 				}
 				SUMMONTHLY_exit: ;
@@ -507,34 +507,34 @@ namespace GroundHeatExchangers {
 				HOURLYLOOP: for ( I = 1 + SubAGG; I <= HourlyLimit; ++I ) {
 					if ( I == HourlyLimit ) {
 						XI = std::log( ( CurrentSimTime - int( CurrentSimTime ) + I ) / ( TimeSS_Factor ) );
-						INTERP( GLHENum, XI, GfuncVal );
+						GfuncVal = this->InterpVert( XI );
 						RQHour = GfuncVal / ( K_Ground_Factor );
-						SumQnHourly += ( thisGLHE.QnHr( I ) - thisGLHE.QnMonthlyAgg( CurrentMonth ) ) * RQHour;
+						SumQnHourly += ( this->QnHr( I ) - this->QnMonthlyAgg( CurrentMonth ) ) * RQHour;
 						goto HOURLYLOOP_exit;
 					}
 					XI = std::log( ( CurrentSimTime - int( CurrentSimTime ) + I ) / ( TimeSS_Factor ) );
-					INTERP( GLHENum, XI, GfuncVal );
+					GfuncVal = this->InterpVert( XI );
 					RQHour = GfuncVal / ( K_Ground_Factor );
-					SumQnHourly += ( thisGLHE.QnHr( I ) - thisGLHE.QnHr( I + 1 ) ) * RQHour;
+					SumQnHourly += ( this->QnHr( I ) - this->QnHr( I + 1 ) ) * RQHour;
 					HOURLYLOOP_loop: ;
 				}
 				HOURLYLOOP_exit: ;
 
 				// Subhourly Superposition
-				SubHourlyLimit = N - thisGLHE.LastHourN( SubAGG + 1 );
+				SubHourlyLimit = N - this->LastHourN( SubAGG + 1 );
 				SumQnSubHourly = 0.0;
 				SUBHRLOOP: for ( I = 1; I <= SubHourlyLimit; ++I ) {
 					if ( I == SubHourlyLimit ) {
 						XI = std::log( ( CurrentSimTime - PrevTimeSteps( I + 1 ) ) / ( TimeSS_Factor ) );
-						INTERP( GLHENum, XI, GfuncVal );
+						GfuncVal = this->InterpVert( XI );
 						RQSubHr = GfuncVal / ( K_Ground_Factor );
-						SumQnSubHourly += ( thisGLHE.QnSubHr( I ) - thisGLHE.QnHr( SubAGG + 1 ) ) * RQSubHr;
+						SumQnSubHourly += ( this->QnSubHr( I ) - this->QnHr( SubAGG + 1 ) ) * RQSubHr;
 						goto SUBHRLOOP_exit;
 					}
 					XI = std::log( ( CurrentSimTime - PrevTimeSteps( I + 1 ) ) / ( TimeSS_Factor ) );
-					INTERP( GLHENum, XI, GfuncVal );
+					GfuncVal = this->InterpVert( XI );
 					RQSubHr = GfuncVal / ( K_Ground_Factor );
-					SumQnSubHourly += ( thisGLHE.QnSubHr( I ) - thisGLHE.QnSubHr( I + 1 ) ) * RQSubHr;
+					SumQnSubHourly += ( this->QnSubHr( I ) - this->QnSubHr( I + 1 ) ) * RQSubHr;
 					SUBHRLOOP_loop: ;
 				}
 				SUBHRLOOP_exit: ;
@@ -544,7 +544,7 @@ namespace GroundHeatExchangers {
 				//Calulate the subhourly temperature due the Last Time steps Load
 
 				XI = std::log( ( CurrentSimTime - PrevTimeSteps( 2 ) ) / ( TimeSS_Factor ) );
-				INTERP( GLHENum, XI, GfuncVal );
+				GfuncVal = this->InterpVert( XI );
 				RQSubHr = GfuncVal / ( K_Ground_Factor );
 
 				if ( MDotActual <= 0.0 ) {
@@ -554,12 +554,12 @@ namespace GroundHeatExchangers {
 				} else {
 					// Explicit set of equations to calculate the New Outlet Temperature of the U-Tube
 					C0 = RQSubHr;
-					C1 = Tground - ( SumTotal - thisGLHE.QnSubHr( 1 ) * RQSubHr );
+					C1 = Tground - ( SumTotal - this->QnSubHr( 1 ) * RQSubHr );
 					C2 = BholeLength * NumBholes / ( 2 * MDotActual * Cp_Fluid );
 					C3 = MDotActual * Cp_Fluid / ( BholeLength * NumBholes );
-					tmpQnSubHourly = ( C1 - GLHEInletTemp ) / ( ResistanceBhole + C0 - C2 + ( 1 / C3 ) );
-					FluidAveTemp = C1 - ( C0 + ResistanceBhole ) * tmpQnSubHourly;
-					ToutNew = C1 + ( C2 - C0 - ResistanceBhole ) * tmpQnSubHourly;
+					tmpQnSubHourly = ( C1 - GLHEInletTemp ) / ( this->ResistanceBhole + C0 - C2 + ( 1 / C3 ) );
+					FluidAveTemp = C1 - ( C0 + this->ResistanceBhole ) * tmpQnSubHourly;
+					ToutNew = C1 + ( C2 - C0 - this->ResistanceBhole ) * tmpQnSubHourly;
 				}
 			} //  end of AGG OR NO AGG
 		} // end of N  = 1 branch
@@ -567,12 +567,12 @@ namespace GroundHeatExchangers {
 		//Load the QnSubHourly Array with a new value at end of every timestep
 
 		//Load the report vars
-		LastQnSubHr( GLHENum ) = tmpQnSubHourly;
-		GLHEOutletTemp = ToutNew;
-		QGLHE = tmpQnSubHourly;
-		GLHEAveFluidTemp = FluidAveTemp;
-		GLHERB = ResistanceBhole;
-		GLHEMassFlowRate = MDotActual;
+		//this->LastQnSubHr = tmpQnSubHourly;
+		this->GLHEOutletTemp = ToutNew;
+		this->QGLHE = tmpQnSubHourly;
+		this->GLHEAveFluidTemp = FluidAveTemp;
+		//this->GLHERB = ResistanceBhole;
+		this->GLHEMassFlowRate = MDotActual;
 
 	}
 
@@ -828,10 +828,7 @@ namespace GroundHeatExchangers {
 	//******************************************************************************
 
 	void
-	BoreholeResistance(
-		int const GLHENum,
-		Real64 & ResistanceBhole
-	)
+	GLHEVert::BoreholeResistance()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -902,25 +899,25 @@ namespace GroundHeatExchangers {
 		Real64 DistanceRatio;
 
 		//assign local variables
-		NumBholes = VerticalGLHE( GLHENum ).NumBoreholes;
-		BholeLength = VerticalGLHE( GLHENum ).BoreholeLength;
-		BholeRadius = VerticalGLHE( GLHENum ).BoreholeRadius;
-		K_Ground = VerticalGLHE( GLHENum ).KGround;
-		Cp_Ground = VerticalGLHE( GLHENum ).CpRhoGround;
+		NumBholes = this->NumBoreholes;
+		BholeLength = this->BoreholeLength;
+		BholeRadius = this->BoreholeRadius;
+		K_Ground = this->KGround;
+		Cp_Ground = this->CpRhoGround;
 
-		Cp_Fluid = GetSpecificHeatGlycol( PlantLoop( VerticalGLHE( GLHENum ).LoopNum ).FluidName, GLHEInletTemp, PlantLoop( VerticalGLHE( GLHENum ).LoopNum ).FluidIndex, RoutineName );
+		Cp_Fluid = GetSpecificHeatGlycol( PlantLoop( this->LoopNum ).FluidName, GLHEInletTemp, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
 
-		Tground = VerticalGLHE( GLHENum ).TempGround;
-		K_Grout = VerticalGLHE( GLHENum ).KGrout;
-		K_Pipe = VerticalGLHE( GLHENum ).KPipe;
-		K_Fluid = GetConductivityGlycol( PlantLoop( VerticalGLHE( GLHENum ).LoopNum ).FluidName, GLHEInletTemp, PlantLoop( VerticalGLHE( GLHENum ).LoopNum ).FluidIndex, RoutineName );
-		FluidDensity = GetDensityGlycol( PlantLoop( VerticalGLHE( GLHENum ).LoopNum ).FluidName, GLHEInletTemp, PlantLoop( VerticalGLHE( GLHENum ).LoopNum ).FluidIndex, RoutineName );
+		Tground = this->TempGround;
+		K_Grout = this->KGrout;
+		K_Pipe = this->KPipe;
+		K_Fluid = GetConductivityGlycol( PlantLoop( this->LoopNum ).FluidName, GLHEInletTemp, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
+		FluidDensity = GetDensityGlycol( PlantLoop( this->LoopNum ).FluidName, GLHEInletTemp, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
 
-		FluidViscosity = GetViscosityGlycol( PlantLoop( VerticalGLHE( GLHENum ).LoopNum ).FluidName, GLHEInletTemp, PlantLoop( VerticalGLHE( GLHENum ).LoopNum ).FluidIndex, RoutineName );
+		FluidViscosity = GetViscosityGlycol( PlantLoop( this->LoopNum ).FluidName, GLHEInletTemp, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
 
-		PipeOuterDia = VerticalGLHE( GLHENum ).PipeOutDia;
-		DistUtube = VerticalGLHE( GLHENum ).UtubeDist;
-		ThickPipe = VerticalGLHE( GLHENum ).PipeThick;
+		PipeOuterDia = this->PipeOutDia;
+		DistUtube = this->UtubeDist;
+		ThickPipe = this->PipeThick;
 
 		//calculate mass flow rate
 		BholeMdot = GLHEMassFlowRate / NumBholes; //VerticalGLHE(GLHENum)%DesignFlow*FluidDensity /NumBholes
@@ -962,16 +959,16 @@ namespace GroundHeatExchangers {
 		}
 
 		Rgrout = 1.0 / ( K_Grout * ( B0 * std::pow( BholeRadius / PipeOuterRad, B1 ) ) );
-		ResistanceBhole = Rcond + Rconv + Rgrout;
+		this->ResistanceBhole = Rcond + Rconv + Rgrout;
 	}
 
 	//******************************************************************************
 
-	void
-	INTERP(
-		int const GLHENum, // Ground loop heat exchanger ID number
-		Real64 const LnTTsVal, // The value of LN(t/TimeSS) that a g-function
-		Real64 & GfuncVal // The value of the g-function at LnTTsVal; found by
+	Real64
+	GLHEVert::InterpVert(
+		//int const GLHENum, // Ground loop heat exchanger ID number
+		Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
+		//Real64 & GfuncVal // The value of the g-function at LnTTsVal; found by
 	)
 	{
 
@@ -1011,6 +1008,7 @@ namespace GroundHeatExchangers {
 		int NumPairs;
 		Real64 RATIO;
 		Real64 ReferenceRatio;
+		Real64 GfuncVal;
 
 		//Binary Search Algorithms Variables
 		// REFERENCE      :  DATA STRUCTURES AND ALGORITHM ANALYSIS IN C BY MARK ALLEN WEISS
@@ -1019,16 +1017,16 @@ namespace GroundHeatExchangers {
 		int High;
 		bool Found;
 
-		NumPairs = VerticalGLHE( GLHENum ).NPairs;
-		RATIO = VerticalGLHE( GLHENum ).BoreholeRadius / VerticalGLHE( GLHENum ).BoreholeLength;
-		ReferenceRatio = VerticalGLHE( GLHENum ).gReferenceRatio;
+		NumPairs = this->NPairs;
+		RATIO = this->BoreholeRadius / this->BoreholeLength;
+		ReferenceRatio = this->gReferenceRatio;
 
 		// The following IF loop determines the g-function for the case
 		// when LnTTsVal is less than the first element of the LnTTs array.
 		// In this case, the g-function must be found by extrapolation.
 
-		if ( LnTTsVal <= VerticalGLHE( GLHENum ).LNTTS( 1 ) ) {
-			GfuncVal = ( ( LnTTsVal - VerticalGLHE( GLHENum ).LNTTS( 1 ) ) / ( VerticalGLHE( GLHENum ).LNTTS( 2 ) - VerticalGLHE( GLHENum ).LNTTS( 1 ) ) ) * ( VerticalGLHE( GLHENum ).GFNC( 2 ) - VerticalGLHE( GLHENum ).GFNC( 1 ) ) + VerticalGLHE( GLHENum ).GFNC( 1 );
+		if ( LnTTsVal <= this->LNTTS( 1 ) ) {
+			GfuncVal = ( ( LnTTsVal - this->LNTTS( 1 ) ) / ( this->LNTTS( 2 ) - this->LNTTS( 1 ) ) ) * ( this->GFNC( 2 ) - this->GFNC( 1 ) ) + this->GFNC( 1 );
 
 			// The following IF statement determines the condition of the ratio
 			// between the borehole radius and the active borehole length.
@@ -1036,25 +1034,25 @@ namespace GroundHeatExchangers {
 			// the g-function must be used.
 
 			if ( RATIO != ReferenceRatio ) {
-				GfuncVal -= std::log( VerticalGLHE( GLHENum ).BoreholeRadius / ( VerticalGLHE( GLHENum ).BoreholeLength * ReferenceRatio ) );
+				GfuncVal -= std::log( this->BoreholeRadius / ( this->BoreholeLength * ReferenceRatio ) );
 			}
 
-			return;
+			return GfuncVal;
 		}
 
 		// The following IF loop determines the g-function for the case
 		// when LnTTsVal is greater than the last element of the LnTTs array.
 		// In this case, the g-function must be found by extrapolation.
 
-		if ( LnTTsVal > VerticalGLHE( GLHENum ).LNTTS( NumPairs ) ) {
-			GfuncVal = ( ( LnTTsVal - VerticalGLHE( GLHENum ).LNTTS( NumPairs ) ) / ( VerticalGLHE( GLHENum ).LNTTS( NumPairs - 1 ) - VerticalGLHE( GLHENum ).LNTTS( NumPairs ) ) ) * ( VerticalGLHE( GLHENum ).GFNC( NumPairs - 1 ) - VerticalGLHE( GLHENum ).GFNC( NumPairs ) ) + VerticalGLHE( GLHENum ).GFNC( NumPairs );
+		if ( LnTTsVal > this->LNTTS( NumPairs ) ) {
+			GfuncVal = ( ( LnTTsVal - this->LNTTS( NumPairs ) ) / ( this->LNTTS( NumPairs - 1 ) - this->LNTTS( NumPairs ) ) ) * ( this->GFNC( NumPairs - 1 ) - this->GFNC( NumPairs ) ) + this->GFNC( NumPairs );
 
 			// Apply correction factor if necessary
 			if ( RATIO != ReferenceRatio ) {
-				GfuncVal -= std::log( VerticalGLHE( GLHENum ).BoreholeRadius / ( VerticalGLHE( GLHENum ).BoreholeLength * ReferenceRatio ) );
+				GfuncVal -= std::log( this->BoreholeRadius / ( this->BoreholeLength * ReferenceRatio ) );
 			}
 
-			return;
+			return GfuncVal;
 		}
 
 		// The following DO loop is for the case when LnTTsVal falls within
@@ -1067,10 +1065,10 @@ namespace GroundHeatExchangers {
 		High = NumPairs;
 		LOOP: while ( Low <= High ) {
 			Mid = ( Low + High ) / 2;
-			if ( VerticalGLHE( GLHENum ).LNTTS( Mid ) < LnTTsVal ) {
+			if ( this->LNTTS( Mid ) < LnTTsVal ) {
 				Low = Mid + 1;
 			} else {
-				if ( VerticalGLHE( GLHENum ).LNTTS( Mid ) > LnTTsVal ) {
+				if ( this->LNTTS( Mid ) > LnTTsVal ) {
 					High = Mid - 1;
 				} else {
 					Found = true;
@@ -1080,39 +1078,36 @@ namespace GroundHeatExchangers {
 			LOOP_loop: ;
 		}
 		LOOP_exit: ;
-		//LnTTsVal is identical to one of the LnTTS array elements return
+		//LnTTsVal is identical to one of the LnTTS array elements return GfuncVal
 		//the GfuncVal after applying the correction
 		if ( Found ) {
-			GfuncVal = VerticalGLHE( GLHENum ).GFNC( Mid );
+			GfuncVal = this->GFNC( Mid );
 			// Apply correction factor if necessary
 			if ( RATIO != ReferenceRatio ) {
-				GfuncVal -= std::log( VerticalGLHE( GLHENum ).BoreholeRadius / ( VerticalGLHE( GLHENum ).BoreholeLength * ReferenceRatio ) );
+				GfuncVal -= std::log( this->BoreholeRadius / ( this->BoreholeLength * ReferenceRatio ) );
 			}
-			return;
+			return GfuncVal;
 		}
 
 		//LnTTsVal is in between any of the two LnTTS array elements find the
-		// gfunction value by interplation and apply the correction and return
+		// gfunction value by interplation and apply the correction and return GfuncVal
 		if ( ! Found ) {
-			if ( VerticalGLHE( GLHENum ).LNTTS( Mid ) < LnTTsVal ) ++Mid;
+			if ( this->LNTTS( Mid ) < LnTTsVal ) ++Mid;
 
-			GfuncVal = ( ( LnTTsVal - VerticalGLHE( GLHENum ).LNTTS( Mid ) ) / ( VerticalGLHE( GLHENum ).LNTTS( Mid - 1 ) - VerticalGLHE( GLHENum ).LNTTS( Mid ) ) ) * ( VerticalGLHE( GLHENum ).GFNC( Mid - 1 ) - VerticalGLHE( GLHENum ).GFNC( Mid ) ) + VerticalGLHE( GLHENum ).GFNC( Mid );
+			GfuncVal = ( ( LnTTsVal - this->LNTTS( Mid ) ) / ( this->LNTTS( Mid - 1 ) - this->LNTTS( Mid ) ) ) * ( this->GFNC( Mid - 1 ) - this->GFNC( Mid ) ) + this->GFNC( Mid );
 
 			// Apply correction factor if necessary
 			if ( RATIO != ReferenceRatio ) {
-				GfuncVal -= std::log( VerticalGLHE( GLHENum ).BoreholeRadius / ( VerticalGLHE( GLHENum ).BoreholeLength * ReferenceRatio ) );
+				GfuncVal -= std::log( this->BoreholeRadius / ( this->BoreholeLength * ReferenceRatio ) );
 			}
-			return;
+			return GfuncVal;
 		}
 	}
 
 	//******************************************************************************
 
 	void
-	InitBoreholeHXSimVars(
-		int const GLHENum,
-		bool const RunFlag
-	)
+	GLHEVert::InitBoreholeHXSimVars()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1168,41 +1163,41 @@ namespace GroundHeatExchangers {
 		}
 
 		// Init more variables
-		if ( MyFlag( GLHENum ) ) {
+		if ( MyFlag( this->GLHEInletNodeNum ) ) {
 			// Locate the hx on the plant loops for later usage
 			errFlag = false;
-			ScanPlantLoopsForObject( VerticalGLHE( GLHENum ).Name, TypeOf_GrndHtExchgVertical, VerticalGLHE( GLHENum ).LoopNum, VerticalGLHE( GLHENum ).LoopSideNum, VerticalGLHE( GLHENum ).BranchNum, VerticalGLHE( GLHENum ).CompNum, _, _, _, _, _, errFlag );
+			ScanPlantLoopsForObject( this->Name, TypeOf_GrndHtExchgVertical, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
 				ShowFatalError( "InitBoreholeHXSimVars: Program terminated due to previous condition(s)." );
 			}
-			MyFlag( GLHENum ) = false;
+			MyFlag( this->GLHEInletNodeNum ) = false;
 		}
 
-		if ( MyEnvrnFlag( GLHENum ) && BeginEnvrnFlag ) {
-			MyEnvrnFlag( GLHENum ) = false;
+		if ( MyEnvrnFlag( this->GLHEInletNodeNum ) && BeginEnvrnFlag ) {
+			MyEnvrnFlag( this->GLHEInletNodeNum ) = false;
 
 			if ( ! allocated( LastQnSubHr ) ) LastQnSubHr.allocate( NumVerticalGLHEs );
-			FluidDensity = GetDensityGlycol( PlantLoop( VerticalGLHE( GLHENum ).LoopNum ).FluidName, 20.0, PlantLoop( VerticalGLHE( GLHENum ).LoopNum ).FluidIndex, RoutineName );
-			VerticalGLHE( GLHENum ).DesignMassFlow = VerticalGLHE( GLHENum ).DesignFlow * FluidDensity;
-			InitComponentNodes( 0.0, VerticalGLHE( GLHENum ).DesignMassFlow, VerticalGLHE( GLHENum ).GLHEInletNodeNum, VerticalGLHE( GLHENum ).GLHEOutletNodeNum, VerticalGLHE( GLHENum ).LoopNum, VerticalGLHE( GLHENum ).LoopSideNum, VerticalGLHE( GLHENum ).BranchNum, VerticalGLHE( GLHENum ).CompNum );
+			FluidDensity = GetDensityGlycol( PlantLoop( this->LoopNum ).FluidName, 20.0, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
+			this->DesignMassFlow = this->DesignFlow * FluidDensity;
+			InitComponentNodes( 0.0, this->DesignMassFlow, this->GLHEInletNodeNum, this->GLHEOutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum );
 
 			LastQnSubHr = 0.0;
-			Node( VerticalGLHE( GLHENum ).GLHEInletNodeNum ).Temp = VerticalGLHE( GLHENum ).TempGround;
-			Node( VerticalGLHE( GLHENum ).GLHEOutletNodeNum ).Temp = VerticalGLHE( GLHENum ).TempGround;
+			Node( this->GLHEInletNodeNum ).Temp = this->TempGround;
+			Node( this->GLHEOutletNodeNum ).Temp = this->TempGround;
 
 			// zero out all history arrays
 
-			VerticalGLHE( GLHENum ).QnHr = 0.0;
-			VerticalGLHE( GLHENum ).QnMonthlyAgg = 0.0;
-			VerticalGLHE( GLHENum ).QnSubHr = 0.0;
-			VerticalGLHE( GLHENum ).LastHourN = 0;
+			this->QnHr = 0.0;
+			this->QnMonthlyAgg = 0.0;
+			this->QnSubHr = 0.0;
+			this->LastHourN = 0;
 			PrevTimeSteps = 0.0;
 			CurrentSimTime = 0.0;
 		}
 
-		MDotActual = RegulateCondenserCompFlowReqOp( VerticalGLHE( GLHENum ).LoopNum, VerticalGLHE( GLHENum ).LoopSideNum, VerticalGLHE( GLHENum ).BranchNum, VerticalGLHE( GLHENum ).CompNum, VerticalGLHE( GLHENum ).DesignMassFlow );
+		MDotActual = RegulateCondenserCompFlowReqOp( this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, this->DesignMassFlow );
 
-		SetComponentFlowRate( MDotActual, VerticalGLHE( GLHENum ).GLHEInletNodeNum, VerticalGLHE( GLHENum ).GLHEOutletNodeNum, VerticalGLHE( GLHENum ).LoopNum, VerticalGLHE( GLHENum ).LoopSideNum, VerticalGLHE( GLHENum ).BranchNum, VerticalGLHE( GLHENum ).CompNum );
+		SetComponentFlowRate( MDotActual, this->GLHEInletNodeNum, this->GLHEOutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum );
 
 		// Resent local environment init flag
 		if ( ! BeginEnvrnFlag ) MyEnvrnFlag = true;
