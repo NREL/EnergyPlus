@@ -11,15 +11,18 @@ This will give the following display of options:
     Usage: energyplus [options] [input-file]
     Options:
       -a, --annual                 Force annual simulation
-      -d, --output-directory ARG   Output directory path (default: INPUTFILE-output
-                                   in current directory)
+      -d, --output-directory ARG   Output directory path (default: current directory)
       -D, --design-day             Force design-day-only simulation
       -h, --help                   Display help information
       -i, --idd ARG                Input data dictionary path (default: Energy+.idd
                                    in executable directory)
       -m, --epmacro                Run EPMacro prior to simulation
-      -p, --output-prefix ARG      Prefix for output file names (default: ep)
+      -p, --output-prefix ARG      Prefix for output file names (default: eplus)
       -r, --readvars               Run ReadVarsESO after simulation
+      -s, --output-suffix ARG      Suffix style for output file names (default: L)
+                                      L: Legacy (e.g., eplustbl.csv)
+                                      C: Capital (e.g., eplusTable.csv)
+                                      D: Dash (e.g., eplus-table.csv)
       -v, --version                Display version information
       -w, --weather ARG            Weather file path (default: in.epw in current
                                    directory))
@@ -40,6 +43,7 @@ The options generally fall into four categories:
    - `weather`
    - `output-directory`
    - `output-prefix`
+   - `output-suffix`
 3. Pre- and post-processing switches:
    - `epmacro`
    - `expandobjects`
@@ -53,11 +57,11 @@ Examples
 
 1. Using a custom IDD file:
 
-    `energyplus -i custom.idd -w weather input.idf`
+    `energyplus -i custom.idd -w weather.epw input.idf`
 
 2. Pre-processing using EPMacro and ExpandObjects:
 
-    `energyplus -w weather -m -x input.imf`
+    `energyplus -w weather.epw -m -x input.imf`
 
 3. Forcing design-day only simulations:
 
