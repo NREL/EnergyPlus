@@ -2,6 +2,7 @@
 #define CommandLineInterface_hh_INCLUDED
 
 #include <string>
+#include <EnergyPlusAPI.hh>
 namespace EnergyPlus{
 
 namespace CommandLineInterface {
@@ -69,7 +70,7 @@ namespace CommandLineInterface {
 
  // Process command line arguments
  int
- ProcessArgs( int argc, const char * argv[] );
+ ENERGYPLUSLIB_API ProcessArgs( int argc, const char * argv[] );
 
  void
  ReadINIFile(

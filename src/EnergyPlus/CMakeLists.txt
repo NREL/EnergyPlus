@@ -44,8 +44,8 @@ SET( SRC
   ChillerIndirectAbsorption.hh
   ChillerReformulatedEIR.cc
   ChillerReformulatedEIR.hh
-  CommandLineInterface.cc
-  CommandLineInterface.hh
+  #CommandLineInterface.cc
+  #CommandLineInterface.hh
   CondenserLoopTowers.cc
   CondenserLoopTowers.hh
   ConductionTransferFunctionCalc.cc
@@ -556,7 +556,7 @@ endif()
 
 
 # second we will create the shared library that is actually packaged with EnergyPlus
-add_library( energyplusapi SHARED  "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
+add_library( energyplusapi SHARED  CommandLineInterface.hh CommandLineInterface.cc EnergyPlusPgm.cc public/EnergyPlusPgm.hh )
 target_link_libraries( energyplusapi energypluslib energypluslib2 )
 
 
