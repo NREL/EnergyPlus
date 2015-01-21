@@ -84,7 +84,7 @@ namespace EnergyPlus {
 	}
 
 	int const SizingLoggerFramework::SetupVariableSizingLog(
-		int const & SupplySideInletNodeNum  // change to pointer setup 
+		int const SupplySideInletNodeNum  // change to pointer setup 
 	){
 		using DataGlobals::NumOfTimeStepInHour;
 		using DataGlobals::ksDesignDay;
@@ -193,33 +193,53 @@ namespace EnergyPlus {
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::SecInHour;
 		using DataSizing::PlantSizData;
+		using DataSizing::NoSizingFactorMode;
+		using DataSizing::GlobalHeatingSizingFactorMode;
+		using DataSizing::GlobalCoolingSizingFactorMode;
+		using DataSizing::LoopComponentSizingFactorMode;
+		using DataSizing::GlobalHeatSizingFactor;
+		using DataSizing::GlobalCoolSizingFactor;
 		using namespace DataPlant;
 		using namespace OutputReportPredefined;
 		using WeatherManager::Environment;
 		using DataHVACGlobals::SmallWaterVolFlow;
 		bool SetNewSizes;
+		Real64 SizingFac;
 		Real64 NormalizedChange;
+		Real64 newFoundVolFlowRate;
 
-
-		//this is for a loop level sizing factor which is assumed to not need to change for resizing
-		PlantSizingFraction = PlantLoop( PlantLoopIndex ).LoopSide( SupplySide ).Branch( 1 ).PumpSizFac;
 
 		previousVolDesignFlowRate	= PlantSizData( PlantLoopIndex ).DesVolFlowRate;
 
 		if (newFoundMassFlowRateTimeStamp.LogDataValue > 0.0 ) {
-			newFoundMassFlowRate		= newFoundMassFlowRateTimeStamp.LogDataValue;	
+			newFoundMassFlowRate		= newFoundMassFlowRateTimeStamp.LogDataValue;
 		} else {
 			newFoundMassFlowRate		= 0.0;
 		}
-		
-		newAdjustedMassFlowRate		= newFoundMassFlowRate * PlantSizingFraction; //indlude sizing fraction multiplier, often 1.0
+
+		newFoundVolFlowRate = newFoundMassFlowRate / DensityForSizing;
+
+		// now apply the correct sizing factor depending on input option
+		if ( PlantSizData( PlantLoopIndex ).SizingFactorOption == NoSizingFactorMode ) {
+			SizingFac = 1.0;
+		} else if ( PlantSizData( PlantLoopIndex ).SizingFactorOption == GlobalHeatingSizingFactorMode ) { 
+			SizingFac = GlobalHeatSizingFactor;
+		} else if ( PlantSizData( PlantLoopIndex ).SizingFactorOption == GlobalCoolingSizingFactorMode ) {
+			SizingFac = GlobalCoolSizingFactor;
+		} else if (  PlantSizData( PlantLoopIndex ).SizingFactorOption == LoopComponentSizingFactorMode ) {
+			//multiplier used for pumps, often 1.0, from component level sizing fractions
+			SizingFac = PlantLoop( PlantLoopIndex ).LoopSide( SupplySide ).Branch( 1 ).PumpSizFac;
+		}
+
+		newAdjustedMassFlowRate		= newFoundMassFlowRate * SizingFac; // apply overall heating or cooling sizing factor
+
 		newVolDesignFlowRate		= newAdjustedMassFlowRate / DensityForSizing;
 
-
-
-		//compare threshold, store TODO 
+		//compare threshold, 
 		SetNewSizes = false;
-		if (newVolDesignFlowRate > SmallWaterVolFlow && newVolDesignFlowRate < previousVolDesignFlowRate ) {
+		if (   ( newVolDesignFlowRate > SmallWaterVolFlow ) // do not use zero size
+//			&& ( newVolDesignFlowRate < previousVolDesignFlowRate )// assume only shrink size from noncoincident? nah
+			)  { 
 			SetNewSizes = true;
 			NormalizedChange = std::abs((newVolDesignFlowRate - previousVolDesignFlowRate) 
 									/ previousVolDesignFlowRate);
@@ -228,8 +248,6 @@ namespace EnergyPlus {
 			} else {
 				AnotherIterationDesired = false;
 			}
-
-
 		}
 
 		if ( SetNewSizes ) {
@@ -249,8 +267,9 @@ namespace EnergyPlus {
 		}
 				//report to sizing summary table called Plant Loop Coincident Design Fluid Flow Rates
 		PreDefTableEntry( pdchPlantSizPass, PlantLoop( PlantLoopIndex ).Name, HVACSizingIterCount );
-		PreDefTableEntry( pdchPlantSizPrevVdot, PlantLoop( PlantLoopIndex ).Name, previousVolDesignFlowRate , 4 );
-		PreDefTableEntry( pdchPlantSizCalcVdot, PlantLoop( PlantLoopIndex ).Name, newVolDesignFlowRate , 4 );
+		PreDefTableEntry( pdchPlantSizPrevVdot, PlantLoop( PlantLoopIndex ).Name, previousVolDesignFlowRate , 6 );
+		PreDefTableEntry( pdchPlantSizMeasVdot, PlantLoop( PlantLoopIndex ).Name, newFoundVolFlowRate , 6 );
+		PreDefTableEntry( pdchPlantSizCalcVdot, PlantLoop( PlantLoopIndex ).Name, newVolDesignFlowRate , 6 );
 
 		if (SetNewSizes) {
 			PreDefTableEntry( pdchPlantSizCoincYesNo, PlantLoop( PlantLoopIndex ).Name, "Yes" );
@@ -261,7 +280,7 @@ namespace EnergyPlus {
 		PreDefTableEntry( pdchPlantSizDesDay, PlantLoop( PlantLoopIndex ).Name, Environment(newFoundMassFlowRateTimeStamp.EnvrnNum).Title );
 		PreDefTableEntry( pdchPlantSizPkTimeDayOfSim, PlantLoop( PlantLoopIndex ).Name, newFoundMassFlowRateTimeStamp.DayOfSim );
 		PreDefTableEntry( pdchPlantSizPkTimeHour, PlantLoop( PlantLoopIndex ).Name, newFoundMassFlowRateTimeStamp.HourOfDay );
-		PreDefTableEntry( pdchPlantSizPkTimeMin, PlantLoop( PlantLoopIndex ).Name, newFoundMassFlowRateTimeStamp.stepStartMinute );
+		PreDefTableEntry( pdchPlantSizPkTimeMin, PlantLoop( PlantLoopIndex ).Name, newFoundMassFlowRateTimeStamp.stepStartMinute, 0 );
 	
 	}
 }

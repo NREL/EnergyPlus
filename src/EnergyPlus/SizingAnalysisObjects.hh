@@ -85,7 +85,7 @@ public:
 
 
 	int const SetupVariableSizingLog(
-		int const & SupplySideInletNodeNum  //change to pointers for generality later
+		int const SupplySideInletNodeNum  //change to pointers for generality later
 	);
 
 	void UpdateSizingLogValuesZoneStep();

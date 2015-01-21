@@ -106,6 +106,12 @@ namespace DataSizing {
 	extern int const FractionOfAutosizedCoolingCapacity;
 	extern int const FractionOfAutosizedHeatingCapacity;
 
+	// Plant Coincident sizing factor options
+	extern int const NoSizingFactorMode;
+	extern int const GlobalHeatingSizingFactorMode;
+	extern int const GlobalCoolingSizingFactorMode;
+	extern int const LoopComponentSizingFactorMode;
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// INTERFACE BLOCK SPECIFICATIONS
@@ -1689,6 +1695,7 @@ namespace DataSizing {
 		Real64 DeltaT; // loop design temperature drop (or rise) [DelK]
 		int ConcurrenceOption; // sizing option for coincident or noncoincident
 		int NumTimeStepsInAvg; // number of zone timesteps in the averaging window for coincident plant flow 
+		int SizingFactorOption; // option for what sizing factor to apply
 		// Calculated
 		Real64 DesVolFlowRate; // loop design flow rate in m3/s
 		bool VolFlowSizingDone; // flag to indicate when this loop has finished sizing flow rate
@@ -1700,6 +1707,7 @@ namespace DataSizing {
 			DeltaT( 0.0 ),
 			ConcurrenceOption( 0 ),
 			NumTimeStepsInAvg( 0 ),
+			SizingFactorOption( 101 ),
 			DesVolFlowRate( 0.0 ),
 			VolFlowSizingDone( false )
 		{}
@@ -1712,6 +1720,7 @@ namespace DataSizing {
 			Real64 const DeltaT, // loop design temperature drop (or rise) [DelK]
 			int const ConcurrenceOption,
 			int const NumTimeStepsInAvg,
+			int const SizingFactorOption,
 			Real64 const DesVolFlowRate, // loop design flow rate in m3/s
 			bool const VolFlowSizingDone // flag to indicate when this loop has finished sizing flow rate
 		) :
@@ -1721,6 +1730,7 @@ namespace DataSizing {
 			DeltaT( DeltaT ),
 			ConcurrenceOption( ConcurrenceOption ),
 			NumTimeStepsInAvg( NumTimeStepsInAvg ),
+			SizingFactorOption( SizingFactorOption ),
 			DesVolFlowRate( DesVolFlowRate ),
 			VolFlowSizingDone( VolFlowSizingDone )
 		{}

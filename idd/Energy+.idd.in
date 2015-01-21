@@ -31045,10 +31045,16 @@ Sizing:Plant,
       \key Coincident
       \key NonCoincident
       \default NonCoincident
-  N3; \field Zone Timesteps in Averaging Window
+  N3, \field Zone Timesteps in Averaging Window
       \type integer
       \minimum 0
       \default 1
+  A4; \field Coincident Sizing Factor Mode
+      \type choice
+      \key None
+      \key GlobalHeatingSizingFactor
+      \key GlobalCoolingSizingFactor
+      \key LoopComponentSizingFactor
 
 OutputControl:Sizing:Style,
        \memo Default style for the Sizing output files is comma -- this works well for
