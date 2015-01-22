@@ -7,6 +7,7 @@ endif()
 
 set( test_src
   DataPlant.unit.cc
+  DXCoils.unit.cc
   SortAndStringUtilities.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
