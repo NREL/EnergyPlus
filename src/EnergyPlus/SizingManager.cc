@@ -786,10 +786,15 @@ namespace SizingManager {
 				if ( NumNumbers > 0 ) {
 					OARequirements( OAIndex ).OAFlowPerPerson = Numbers( 1 );
 				} else {
-					// default value for Outdoor Air Flow per Person
+					// default value for Outdoor Air Flow per Person when per person flow is counted 
 					OARequirements( OAIndex ).OAFlowPerPerson = 0.00944;
 				}
-				// remaining fields default to 0
+				// if one of the methods that should not use the flow per person field is chosen then zero out the flow per person to avoid it 
+				// being counted later #4378
+				if ( OARequirements( OAIndex ).OAFlowMethod != OAFlowPPer && OARequirements( OAIndex ).OAFlowMethod != OAFlowSum && OARequirements( OAIndex ).OAFlowMethod != OAFlowMax ){
+					OARequirements( OAIndex ).OAFlowPerPerson = 0.0;
+				}
+			   // remaining fields default to 0
 				if ( NumNumbers > 1 ) {
 					OARequirements( OAIndex ).OAFlowPerArea = Numbers( 2 );
 				}

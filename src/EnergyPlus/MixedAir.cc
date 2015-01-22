@@ -2010,7 +2010,12 @@ namespace MixedAir {
 											VentilationMechanical( VentMechNum ).ZoneOAACH = OARequirements( ObjIndex ).OAFlowACH;
 										} else { // use defaults
 											VentilationMechanical( VentMechNum ).ZoneOAAreaRate( MechVentZoneCount ) = 0.0;
-											VentilationMechanical( VentMechNum ).ZoneOAPeopleRate( MechVentZoneCount ) = 0.00944;
+
+											if ( OARequirements( ObjIndex ).OAFlowMethod != OAFlowPPer && OARequirements( ObjIndex ).OAFlowMethod != OAFlowSum && OARequirements( ObjIndex ).OAFlowMethod != OAFlowMax ){
+												VentilationMechanical( VentMechNum ).ZoneOAPeopleRate( MechVentZoneCount ) = 0.0;
+											} else {
+												VentilationMechanical( VentMechNum ).ZoneOAPeopleRate( MechVentZoneCount ) = 0.00944;
+											}
 											VentilationMechanical( VentMechNum ).ZoneOAFlow( MechVentZoneCount ) = 0.0;
 											VentilationMechanical( VentMechNum ).ZoneOAACH = 0.0;
 										}
