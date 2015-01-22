@@ -1871,9 +1871,10 @@ void ezOptionParser::getUsageDescriptions(std::string & usage, int width, Layout
     // All the following split-fu could be optimized by just using substring (offset, length) tuples, but just to get it done, we'll do some not-too expensive string copying.
     SplitDelim(groups[k]->help, '\n', desc);
     // Split lines longer than allowable help width.
-    for(insertionIter=desc.begin(), cIter=insertionIter++; 
+    for(insertionIter=desc.begin(), cIter=insertionIter; 
         cIter != desc.end(); 
-        cIter=insertionIter++) {
+        cIter=insertionIter) {
+	  insertionIter++;
       if ((long int)((*cIter)->size()) > helpwidth) {
         // Get pointer to next string to insert new strings before it.
         std::string *rem = *cIter;
