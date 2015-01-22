@@ -129,6 +129,18 @@ namespace GroundHeatExchangers {
 		void
 		CalcAggregateLoad();
 
+		virtual void
+		CalcGroundHeatExchanger()=0;
+
+		virtual void
+		UpdateGroundHeatExchanger()=0;
+
+		virtual void
+		InitGLHESimVars()=0;
+
+		virtual Real64
+		InterpGFunc( Real64 )=0;
+
 	};
 
 	struct GLHEVert:GLHEBase
@@ -160,23 +172,21 @@ namespace GroundHeatExchangers {
 		{}
 
 		void
-		UpdateVerticalGroundHeatExchanger();
+		UpdateGroundHeatExchanger();
 
 		void
-		CalcVerticalGroundHeatExchanger();
+		CalcGroundHeatExchanger();
 
 		void
 		BoreholeResistance();
 
-		Real64
-		InterpVert(
-		//int const GLHENum, // Ground loop heat exchanger ID number
-		Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
-		//Real64 & GfuncVal // The value of the g-function at LnTTsVal; found by
-		);
-
 		void
-		InitBoreholeHXSimVars();
+		InitGLHESimVars();
+
+		Real64
+		InterpGFunc(
+		Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
+		);
 
 	};
 
@@ -204,6 +214,20 @@ namespace GroundHeatExchangers {
 			TrenchSpacing( 0.0 )
 
 		{}
+
+		void
+		CalcGroundHeatExchanger();
+
+		void
+		CalcGFunctions();
+
+		void
+		InitGLHESimVars();
+
+		Real64
+		InterpGFunc(
+		Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
+		);
 
 	};
 

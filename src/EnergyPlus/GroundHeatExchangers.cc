@@ -193,23 +193,26 @@ namespace GroundHeatExchangers {
 		auto & thisGLHE( VerticalGLHE( GLHENum ) );
 
 		if ( InitLoopEquip ) {
-			thisGLHE.InitBoreholeHXSimVars();
+			thisGLHE.InitGLHESimVars();
 			return;
 		}
 
 		//INITIALIZE
-		thisGLHE.InitBoreholeHXSimVars();
+		thisGLHE.InitGLHESimVars();
 
 		//SIMULATE HEAT EXCHANGER
-		thisGLHE.CalcVerticalGroundHeatExchanger();
-		thisGLHE.UpdateVerticalGroundHeatExchanger();
+		thisGLHE.CalcGroundHeatExchanger();
+		thisGLHE.UpdateGroundHeatExchanger();
 
 	}
 
 	//******************************************************************************
 
 	void
-	GLHEVert::CalcVerticalGroundHeatExchanger()
+	GLHESlinky::CalcGroundHeatExchanger(){};
+
+	void
+	GLHEVert::CalcGroundHeatExchanger()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Dan Fisher
@@ -386,7 +389,7 @@ namespace GroundHeatExchangers {
 				ToutNew = GLHEInletTemp;
 			} else {
 				XI = std::log( CurrentSimTime / ( TimeSS_Factor ) );
-				GfuncVal = this->InterpVert( XI );
+				GfuncVal = this->InterpGFunc( XI );
 
 				C_1 = ( BholeLength * NumBholes ) / ( 2.0 * MDotActual * Cp_Fluid );
 				tmpQnSubHourly = ( Tground - GLHEInletTemp ) / ( GfuncVal / ( K_Ground_Factor ) + this->ResistanceBhole + C_1 );
@@ -410,12 +413,12 @@ namespace GroundHeatExchangers {
 					if ( I == SubHourlyLimit ) {
 						if ( int( CurrentSimTime ) >= SubAGG ) {
 							XI = std::log( ( CurrentSimTime - PrevTimeSteps( I + 1 ) ) / ( TimeSS_Factor ) );
-							GfuncVal = this->InterpVert( XI );
+							GfuncVal = this->InterpGFunc( XI );
 							RQSubHr = GfuncVal / ( K_Ground_Factor );
 							SumQnSubHourly += ( this->QnSubHr( I ) - this->QnHr( IndexN ) ) * RQSubHr;
 						} else {
 							XI = std::log( ( CurrentSimTime - PrevTimeSteps( I + 1 ) ) / ( TimeSS_Factor ) );
-							GfuncVal = this->InterpVert( XI );
+							GfuncVal = this->InterpGFunc( XI );
 							RQSubHr = GfuncVal / ( K_Ground_Factor );
 							SumQnSubHourly += this->QnSubHr( I ) * RQSubHr;
 						}
@@ -423,7 +426,7 @@ namespace GroundHeatExchangers {
 					}
 					//PrevTimeSteps(I+1) This is "I+1" because PrevTimeSteps(1) = CurrentTimestep
 					XI = std::log( ( CurrentSimTime - PrevTimeSteps( I + 1 ) ) / ( TimeSS_Factor ) );
-					GfuncVal = this->InterpVert( XI );
+					GfuncVal = this->InterpGFunc( XI );
 					RQSubHr = GfuncVal / ( K_Ground_Factor );
 					SumQnSubHourly += ( this->QnSubHr( I ) - this->QnSubHr( I + 1 ) ) * RQSubHr;
 					SUBHRLY_LOOP_loop: ;
@@ -437,13 +440,13 @@ namespace GroundHeatExchangers {
 				HOURLY_LOOP: for ( I = SubAGG + 1; I <= HourlyLimit; ++I ) {
 					if ( I == HourlyLimit ) {
 						XI = std::log( CurrentSimTime / ( TimeSS_Factor ) );
-						GfuncVal = this->InterpVert( XI );
+						GfuncVal = this->InterpGFunc( XI );
 						RQHour = GfuncVal / ( K_Ground_Factor );
 						SumQnHourly += this->QnHr( I ) * RQHour;
 						goto HOURLY_LOOP_exit;
 					}
 					XI = std::log( ( CurrentSimTime - int( CurrentSimTime ) + I ) / ( TimeSS_Factor ) );
-					GfuncVal = this->InterpVert( XI );
+					GfuncVal = this->InterpGFunc( XI );
 					RQHour = GfuncVal / ( K_Ground_Factor );
 					SumQnHourly += ( this->QnHr( I ) - this->QnHr( I + 1 ) ) * RQHour;
 					HOURLY_LOOP_loop: ;
@@ -455,7 +458,7 @@ namespace GroundHeatExchangers {
 
 				//Calulate the subhourly temperature due the Last Time steps Load
 				XI = std::log( ( CurrentSimTime - PrevTimeSteps( 2 ) ) / ( TimeSS_Factor ) );
-				GfuncVal = this->InterpVert( XI );
+				GfuncVal = this->InterpGFunc( XI );
 				RQSubHr = GfuncVal / ( K_Ground_Factor );
 
 				if ( MDotActual <= 0.0 ) {
@@ -488,13 +491,13 @@ namespace GroundHeatExchangers {
 				SUMMONTHLY: for ( I = 1; I <= CurrentMonth; ++I ) {
 					if ( I == 1 ) {
 						XI = std::log( CurrentSimTime / ( TimeSS_Factor ) );
-						GfuncVal = this->InterpVert( XI );
+						GfuncVal = this->InterpGFunc( XI );
 						RQMonth = GfuncVal / ( K_Ground_Factor );
 						SumQnMonthly += this->QnMonthlyAgg( I ) * RQMonth;
 						goto SUMMONTHLY_loop;
 					}
 					XI = std::log( ( CurrentSimTime - ( I - 1 ) * HrsPerMonth ) / ( TimeSS_Factor ) );
-					GfuncVal = this->InterpVert( XI );
+					GfuncVal = this->InterpGFunc( XI );
 					RQMonth = GfuncVal / ( K_Ground_Factor );
 					SumQnMonthly += ( this->QnMonthlyAgg( I ) - this->QnMonthlyAgg( I - 1 ) ) * RQMonth;
 					SUMMONTHLY_loop: ;
@@ -507,13 +510,13 @@ namespace GroundHeatExchangers {
 				HOURLYLOOP: for ( I = 1 + SubAGG; I <= HourlyLimit; ++I ) {
 					if ( I == HourlyLimit ) {
 						XI = std::log( ( CurrentSimTime - int( CurrentSimTime ) + I ) / ( TimeSS_Factor ) );
-						GfuncVal = this->InterpVert( XI );
+						GfuncVal = this->InterpGFunc( XI );
 						RQHour = GfuncVal / ( K_Ground_Factor );
 						SumQnHourly += ( this->QnHr( I ) - this->QnMonthlyAgg( CurrentMonth ) ) * RQHour;
 						goto HOURLYLOOP_exit;
 					}
 					XI = std::log( ( CurrentSimTime - int( CurrentSimTime ) + I ) / ( TimeSS_Factor ) );
-					GfuncVal = this->InterpVert( XI );
+					GfuncVal = this->InterpGFunc( XI );
 					RQHour = GfuncVal / ( K_Ground_Factor );
 					SumQnHourly += ( this->QnHr( I ) - this->QnHr( I + 1 ) ) * RQHour;
 					HOURLYLOOP_loop: ;
@@ -526,13 +529,13 @@ namespace GroundHeatExchangers {
 				SUBHRLOOP: for ( I = 1; I <= SubHourlyLimit; ++I ) {
 					if ( I == SubHourlyLimit ) {
 						XI = std::log( ( CurrentSimTime - PrevTimeSteps( I + 1 ) ) / ( TimeSS_Factor ) );
-						GfuncVal = this->InterpVert( XI );
+						GfuncVal = this->InterpGFunc( XI );
 						RQSubHr = GfuncVal / ( K_Ground_Factor );
 						SumQnSubHourly += ( this->QnSubHr( I ) - this->QnHr( SubAGG + 1 ) ) * RQSubHr;
 						goto SUBHRLOOP_exit;
 					}
 					XI = std::log( ( CurrentSimTime - PrevTimeSteps( I + 1 ) ) / ( TimeSS_Factor ) );
-					GfuncVal = this->InterpVert( XI );
+					GfuncVal = this->InterpGFunc( XI );
 					RQSubHr = GfuncVal / ( K_Ground_Factor );
 					SumQnSubHourly += ( this->QnSubHr( I ) - this->QnSubHr( I + 1 ) ) * RQSubHr;
 					SUBHRLOOP_loop: ;
@@ -544,7 +547,7 @@ namespace GroundHeatExchangers {
 				//Calulate the subhourly temperature due the Last Time steps Load
 
 				XI = std::log( ( CurrentSimTime - PrevTimeSteps( 2 ) ) / ( TimeSS_Factor ) );
-				GfuncVal = this->InterpVert( XI );
+				GfuncVal = this->InterpGFunc( XI );
 				RQSubHr = GfuncVal / ( K_Ground_Factor );
 
 				if ( MDotActual <= 0.0 ) {
@@ -965,10 +968,16 @@ namespace GroundHeatExchangers {
 	//******************************************************************************
 
 	Real64
-	GLHEVert::InterpVert(
-		//int const GLHENum, // Ground loop heat exchanger ID number
+	GLHESlinky::InterpGFunc(
 		Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
-		//Real64 & GfuncVal // The value of the g-function at LnTTsVal; found by
+		)
+	{
+		return 0;
+	}
+
+	Real64
+	GLHEVert::InterpGFunc(
+		Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
 	)
 	{
 
@@ -1091,7 +1100,7 @@ namespace GroundHeatExchangers {
 
 		//LnTTsVal is in between any of the two LnTTS array elements find the
 		// gfunction value by interplation and apply the correction and return GfuncVal
-		if ( ! Found ) {
+		else {
 			if ( this->LNTTS( Mid ) < LnTTsVal ) ++Mid;
 
 			GfuncVal = ( ( LnTTsVal - this->LNTTS( Mid ) ) / ( this->LNTTS( Mid - 1 ) - this->LNTTS( Mid ) ) ) * ( this->GFNC( Mid - 1 ) - this->GFNC( Mid ) ) + this->GFNC( Mid );
@@ -1107,7 +1116,7 @@ namespace GroundHeatExchangers {
 	//******************************************************************************
 
 	void
-	GLHEVert::InitBoreholeHXSimVars()
+	GLHEVert::InitGLHESimVars()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1138,7 +1147,7 @@ namespace GroundHeatExchangers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "InitBoreholeHXSimVars" );
+		static std::string const RoutineName( "InitGLHESimVars" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1153,6 +1162,7 @@ namespace GroundHeatExchangers {
 		static bool MyOneTimeFlag( true );
 		static FArray1D_bool MyEnvrnFlag;
 		bool errFlag;
+		static int GLHENum( 0 );
 
 		if ( MyOneTimeFlag ) {
 			MyEnvrnFlag.allocate( NumVerticalGLHEs );
@@ -1163,18 +1173,18 @@ namespace GroundHeatExchangers {
 		}
 
 		// Init more variables
-		if ( MyFlag( this->GLHEInletNodeNum ) ) {
+		if ( MyFlag( GLHENum ) ) {
 			// Locate the hx on the plant loops for later usage
 			errFlag = false;
 			ScanPlantLoopsForObject( this->Name, TypeOf_GrndHtExchgVertical, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
-				ShowFatalError( "InitBoreholeHXSimVars: Program terminated due to previous condition(s)." );
+				ShowFatalError( "InitGLHESimVars: Program terminated due to previous condition(s)." );
 			}
-			MyFlag( this->GLHEInletNodeNum ) = false;
+			MyFlag( GLHENum ) = false;
 		}
 
-		if ( MyEnvrnFlag( this->GLHEInletNodeNum ) && BeginEnvrnFlag ) {
-			MyEnvrnFlag( this->GLHEInletNodeNum ) = false;
+		if ( MyEnvrnFlag( GLHENum ) && BeginEnvrnFlag ) {
+			MyEnvrnFlag( GLHENum ) = false;
 
 			if ( ! allocated( LastQnSubHr ) ) LastQnSubHr.allocate( NumVerticalGLHEs );
 			FluidDensity = GetDensityGlycol( PlantLoop( this->LoopNum ).FluidName, 20.0, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
@@ -1207,7 +1217,7 @@ namespace GroundHeatExchangers {
 	//******************************************************************************
 
 	void
-	GLHEVert::UpdateVerticalGroundHeatExchanger()
+	GLHEVert::UpdateGroundHeatExchanger()
 	{
 
 		// SUBROUTINE INFORMATION:
