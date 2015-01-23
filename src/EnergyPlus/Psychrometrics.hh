@@ -9,7 +9,6 @@
 #include <ObjexxFCL/bit.hh>
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -176,7 +175,7 @@ namespace Psychrometrics {
 		Real64 const tdb, // dry bulb temperature (Celsius)
 		Real64 const dw, // humidity ratio (kgWater/kgDryAir)
 		Real64 const rhoair, // density of air
-		std::string const & CalledFrom // routine this function was called from (error messages) !unused1208
+		std::string const & CalledFrom = blank_string // routine this function was called from (error messages) !unused1208
 	);
 #endif
 
@@ -211,6 +210,23 @@ namespace Psychrometrics {
 		Real64 const rhoair( pb / ( 287.0 * ( tdb + KelvinConv ) * ( 1.0 + 1.6077687 * max( dw, 1.0e-5 ) ) ) );
 #ifdef EP_psych_errors
 		if ( rhoair < 0.0 ) PsyRhoAirFnPbTdbW_error( pb, tdb, dw, rhoair, CalledFrom );
+#endif
+		return rhoair;
+	}
+
+	inline
+	Real64
+	PsyRhoAirFnPbTdbW_fast(
+		Real64 const pb, // barometric pressure (Pascals)
+		Real64 const tdb, // dry bulb temperature (Celsius)
+		Real64 const dw // humidity ratio (kgWater/kgDryAir)
+	)
+	{
+		// Faster version with humidity ratio already adjusted
+		assert( dw >= 1.0e-5 );
+		Real64 const rhoair( pb / ( 287.0 * ( tdb + KelvinConv ) * ( 1.0 + 1.6077687 * dw ) ) );
+#ifdef EP_psych_errors
+		if ( rhoair < 0.0 ) PsyRhoAirFnPbTdbW_error( pb, tdb, dw, rhoair );
 #endif
 		return rhoair;
 	}
@@ -301,6 +317,20 @@ namespace Psychrometrics {
 
 	inline
 	Real64
+	PsyHFnTdbW_fast(
+		Real64 const TDB, // dry-bulb temperature {C}
+		Real64 const dW // humidity ratio
+	)
+	{
+		// Faster version with humidity ratio already adjusted
+		assert( dW >= 1.0e-5 );
+
+		// calculate enthalpy
+		return 1.00484e3 * TDB + dW * ( 2.50094e6 + 1.85895e3 * TDB ); // enthalpy {J/kg}
+	}
+
+	inline
+	Real64
 	PsyCpAirFnWTdb(
 		Real64 const dw, // humidity ratio {kgWater/kgDryAir}
 		Real64 const T // input temperature {Celsius}
@@ -333,6 +363,35 @@ namespace Psychrometrics {
 		// compute heat capacity of air
 		Real64 const w( max( dw, 1.0e-5 ) );
 		Real64 const cpa( ( PsyHFnTdbW( T + 0.1, w ) - PsyHFnTdbW( T, w ) ) * 10.0 ); // result => heat capacity of air {J/kg-C}
+
+		// save values for next call
+		dwSave = dw;
+		Tsave = T;
+		cpaSave = cpa;
+
+		return cpa;
+	}
+
+	inline
+	Real64
+	PsyCpAirFnWTdb_fast(
+		Real64 const dw, // humidity ratio {kgWater/kgDryAir}
+		Real64 const T // input temperature {Celsius}
+	)
+	{
+		// Faster version with humidity ratio already adjusted
+		assert( dw >= 1.0e-5 );
+
+		// Static locals
+		static Real64 dwSave( -100.0 );
+		static Real64 Tsave( -100.0 );
+		static Real64 cpaSave( -100.0 );
+
+		// check if last call had the same input and if it did just use the saved output
+		if ( ( Tsave == T ) && ( dwSave == dw ) ) return cpaSave;
+
+		// compute heat capacity of air
+		Real64 const cpa( ( PsyHFnTdbW_fast( T + 0.1, dw ) - PsyHFnTdbW_fast( T, dw ) ) * 10.0 ); // result => heat capacity of air {J/kg-C}
 
 		// save values for next call
 		dwSave = dw;
@@ -421,6 +480,19 @@ namespace Psychrometrics {
 
 		Real64 const W( max( dW, 1.0e-5 ) ); // humidity ratio
 		return W * PB / ( 461.52 * ( Tdb + KelvinConv ) * ( W + 0.62198 ) );
+	}
+
+	inline
+	Real64
+	PsyRhovFnTdbWPb_fast(
+		Real64 const Tdb, // dry-bulb temperature {C}
+		Real64 const dW, // humidity ratio
+		Real64 const PB // Barometric Pressure {Pascals}
+	)
+	{
+		// Faster version with humidity ratio already adjusted
+		assert( dW >= 1.0e-5 );
+		return dW * PB / ( 461.52 * ( Tdb + KelvinConv ) * ( dW + 0.62198 ) );
 	}
 
 #ifdef EP_psych_errors

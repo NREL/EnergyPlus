@@ -22,18 +22,18 @@ namespace ObjexxFCL {
 template< typename T, std::size_t N >
 inline
 T *
-begin( T (&array)[N] )
+begin( T (&a)[N] )
 {
-	return array + 0;
+	return a + 0;
 }
 
 // End Iterator for C Array
 template< typename T, std::size_t N >
 inline
 T *
-end( T (&array)[N] )
+end( T (&a)[N] )
 {
-	return array + N;
+	return a + N;
 }
 
 } // ObjexxFCL

@@ -104,6 +104,7 @@ namespace OutputReportTabular {
 	using DataGlobals::TimeStep;
 	using DataGlobals::SecInHour;
 	using DataGlobals::TimeStepZone;
+	using DataGlobals::TimeStepZoneSec;
 	using DataGlobals::CurrentTime;
 	using DataGlobals::NumOfZones;
 	using DataGlobals::OutputFileDebug;
@@ -716,7 +717,7 @@ namespace OutputReportTabular {
 			++MonthlyFieldSetInputCount;
 			// if larger than current size grow the array
 			if ( MonthlyFieldSetInputCount > sizeMonthlyFieldSetInput ) {
-				MonthlyFieldSetInput.redimension( sizeMonthlyFieldSetInput += sizeIncrement );
+				MonthlyFieldSetInput.redimension( sizeMonthlyFieldSetInput *= 2 ); //Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
 			}
 		}
 		// initialize new record)
@@ -3639,7 +3640,7 @@ namespace OutputReportTabular {
 							if ( IndexTypeKey == HVACTSReporting ) {
 								curValue /= ( TimeStepSys * SecInHour );
 							} else {
-								curValue /= ( TimeStepZone * SecInHour );
+								curValue /= TimeStepZoneSec;
 							}
 						}
 						if ( curValue > oldResultValue ) {
@@ -3656,7 +3657,7 @@ namespace OutputReportTabular {
 							if ( IndexTypeKey == HVACTSReporting ) {
 								curValue /= ( TimeStepSys * SecInHour );
 							} else {
-								curValue /= ( TimeStepZone * SecInHour );
+								curValue /= TimeStepZoneSec;
 							}
 						}
 						if ( curValue < oldResultValue ) {
@@ -3751,7 +3752,7 @@ namespace OutputReportTabular {
 									if ( IndexTypeKey == HVACTSReporting ) {
 										scanValue /= ( TimeStepSys * SecInHour );
 									} else {
-										scanValue /= ( TimeStepZone * SecInHour );
+										scanValue /= TimeStepZoneSec;
 									}
 								}
 								MonthlyColumns( scanColumn ).reslt( Month ) = scanValue;
@@ -3793,7 +3794,7 @@ namespace OutputReportTabular {
 									if ( IndexTypeKey == HVACTSReporting ) {
 										scanValue /= ( TimeStepSys * SecInHour );
 									} else {
-										scanValue /= ( TimeStepZone * SecInHour );
+										scanValue /= TimeStepZoneSec;
 									}
 								}
 								if ( scanValue > oldScanValue ) {
@@ -3805,7 +3806,7 @@ namespace OutputReportTabular {
 									if ( IndexTypeKey == HVACTSReporting ) {
 										scanValue /= ( TimeStepSys * SecInHour );
 									} else {
-										scanValue /= ( TimeStepZone * SecInHour );
+										scanValue /= TimeStepZoneSec;
 									}
 								}
 								if ( scanValue < oldScanValue ) {
@@ -4195,7 +4196,7 @@ namespace OutputReportTabular {
 			for ( iResource = 1; iResource <= numResourceTypes; ++iResource ) {
 				curMeterNumber = meterNumTotalsBEPS( iResource );
 				if ( curMeterNumber > 0 ) {
-					curDemandValue = GetCurrentMeterValue( curMeterNumber ) / ( TimeStepZone * SecInHour );
+					curDemandValue = GetCurrentMeterValue( curMeterNumber ) / TimeStepZoneSec;
 					// check if current value is greater than existing peak demand value
 					if ( curDemandValue > gatherDemandTotal( iResource ) ) {
 						gatherDemandTotal( iResource ) = curDemandValue;
@@ -4209,12 +4210,12 @@ namespace OutputReportTabular {
 						for ( jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse ) {
 							curMeterNumber = meterNumEndUseBEPS( jEndUse, iResource );
 							if ( curMeterNumber > 0 ) {
-								curDemandValue = GetCurrentMeterValue( curMeterNumber ) / ( TimeStepZone * SecInHour );
+								curDemandValue = GetCurrentMeterValue( curMeterNumber ) / TimeStepZoneSec;
 								gatherDemandEndUse( jEndUse, iResource ) = curDemandValue;
 								for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
 									curMeterNumber = meterNumEndUseSubBEPS( iResource, jEndUse, kEndUseSub );
 									if ( curMeterNumber > 0 ) {
-										curDemandValue = GetCurrentMeterValue( curMeterNumber ) / ( TimeStepZone * SecInHour );
+										curDemandValue = GetCurrentMeterValue( curMeterNumber ) / TimeStepZoneSec;
 										gatherDemandEndUseSub( iResource, jEndUse, kEndUseSub ) = curDemandValue;
 									}
 								}

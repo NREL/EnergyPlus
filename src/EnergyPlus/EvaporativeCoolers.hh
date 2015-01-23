@@ -3,8 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -719,7 +717,7 @@ namespace EvaporativeCoolers {
 	Real64
 	VSEvapUnitLoadResidual(
 		Real64 const FanSpeedRatio,
-		Optional< FArray1S< Real64 > const > Par = _ // parameters
+		FArray1< Real64 > const & Par // parameters
 	);
 
 	void

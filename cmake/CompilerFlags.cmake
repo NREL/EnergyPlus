@@ -1,7 +1,7 @@
 
 # Compiler-agnostic compiler flags first
-ADD_CXX_DEBUG_DEFINITIONS("-DOBJEXXFCL_FARRAY_INIT -DOBJEXXFCL_FARRAY_INIT_DEBUG") # Objexx DEFinition
-    
+ADD_CXX_DEBUG_DEFINITIONS("-DOBJEXXFCL_FARRAY_INIT_DEBUG") # Objexx DEFinition
+
 # Make sure expat is compiled as a static library
 ADD_DEFINITIONS("-DXML_STATIC")
 
@@ -14,7 +14,7 @@ IF ( MSVC ) # visual c++ (VS 2013)
     #  4996  Deprecated" STL functions (that MS has safer, non-std alternatives for)
 
     # need to figure out how to set this to avoid the major slow-down in debugging:
-    # Configuration Properties ->Debugging -> Environment, use drop-down list to choose <Edit> and type _NO_DEBUG_HEAP=1 then click OK 
+    # Configuration Properties ->Debugging -> Environment, use drop-down list to choose <Edit> and type _NO_DEBUG_HEAP=1 then click OK
 
     # COMPILER FLAGS
     ADD_CXX_DEFINITIONS("-MP") # Enables multi-processor compilation of source within a single project
@@ -22,7 +22,7 @@ IF ( MSVC ) # visual c++ (VS 2013)
     # Za must be set in the individual projects because gtest uses win.h and cannot compile with it
     #ADD_DEFINITIONS("-Za") # Disables MS language extensions
 
-    ADD_CXX_DEFINITIONS("-wd4244 -wd4258 -wd4355 -wd4996") # Disables warning messages listed above 
+    ADD_CXX_DEFINITIONS("-wd4244 -wd4258 -wd4355 -wd4996") # Disables warning messages listed above
     ADD_CXX_DEFINITIONS("-DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
     ADD_CXX_DEFINITIONS("-W1")
 
@@ -87,9 +87,9 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
     ADD_CXX_DEBUG_DEFINITIONS("-fsignaling-nans") # Disable optimizations that may have concealed NaN behavior
     ADD_CXX_DEBUG_DEFINITIONS("-ggdb") # Produces debugging information specifically for gdb
-             
+
 ELSEIF ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
-    
+
     # Warnings ignored:
     #  1786: Use of deprecated items
     #  2259: Non-pointer conversion from "type" to "type" may lose significant bits

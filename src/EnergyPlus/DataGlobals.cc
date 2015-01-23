@@ -165,7 +165,8 @@ namespace DataGlobals {
 	bool CreateMinimalSurfaceVariables( false ); // True when selection for  "CreateMinimalSurfaceVariables" is entered
 	Real64 CurrentTime( 0.0 ); // CurrentTime, in fractional hours, from start of day. Uses Loads time step.
 	int SimTimeSteps( 0 ); // Number of (Loads) timesteps since beginning of run period (environment).
-	int MinutesPerTimeStep; // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
+	int MinutesPerTimeStep( 0 ); // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
+	Real64 TimeStepZoneSec( 0.0 ); // Seconds per time step
 	bool MetersHaveBeenInitialized( false );
 	bool KickOffSimulation( false ); // Kick off simulation -- meaning run each environment for 1 or 2 time steps.
 	bool KickOffSizing( false ); // Kick off sizing -- meaning run each environment for 1 or 2 time steps.
@@ -187,7 +188,7 @@ namespace DataGlobals {
 	void ( *fMessagePtr )( std::string const & );
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
