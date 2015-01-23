@@ -13,6 +13,7 @@
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
 #include <DataGlobals.hh>
+#include <DataStringGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
@@ -47,7 +48,6 @@ namespace EMSManager {
 	// METHODOLOGY EMPLOYED:
 
 	// Using/Aliasing
-    using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using namespace DataRuntimeLanguage;
 
@@ -191,9 +191,9 @@ namespace EMSManager {
 			if ( OutputEDDFile ) {
 				// open up output file for EMS EDD file  EMS Data and Debug
 				OutputEMSFileUnitNum = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputEMSFileUnitNum, outputEddFileName, flags ); write_stat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputEMSFileUnitNum, DataStringGlobals::outputEddFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( "CheckIFAnyEMS: Could not open file "+ outputEddFileName +" for output (write)." );
+					ShowFatalError( "CheckIFAnyEMS: Could not open file "+ DataStringGlobals::outputEddFileName +" for output (write)." );
 				}
 			}
 		} else {

@@ -47,7 +47,6 @@ namespace ScheduleManager {
 	// OTHER NOTES:
 
 	// Using/Aliasing
-    using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::HourOfDay;
 	using DataGlobals::OutputFileInits;
@@ -465,7 +464,7 @@ namespace ScheduleManager {
 		Schedule( 0 ).ScheduleTypePtr = 0;
 		Schedule( 0 ).WeekSchedulePointer = 0;
 
-		UnitNumber = FindUnitNumber( outputAuditFileName );
+		UnitNumber = FindUnitNumber( DataStringGlobals::outputAuditFileName );
 		gio::write( UnitNumber, fmtLD ) << " Processing Schedule Input -- Start";
 
 		//!! Get Schedule Types

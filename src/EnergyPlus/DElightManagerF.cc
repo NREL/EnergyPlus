@@ -82,7 +82,6 @@ namespace DElightManagerF {
 		// This subroutine creates a DElight input file from EnergyPlus processed input.
 
 		// USE STATEMENTS:
-		using namespace CommandLineInterface;
 		using namespace DataGlobals; // Gives access to too many things to keep track of
 		using namespace DataHeatBalance; // Gives access to Building, Zone(izone)%var and Lights(ilights) data
 		using namespace DataEnvironment; // Gives access to Site data

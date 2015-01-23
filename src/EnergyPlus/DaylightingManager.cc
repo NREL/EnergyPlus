@@ -92,7 +92,6 @@ namespace DaylightingManager {
 	// DLUMEF      DayltgLuminousEfficacy          WeatherManager     WeatherManager
 
 	// Using/Aliasing
-    using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
 	using namespace DataHeatBalance;
@@ -685,9 +684,9 @@ namespace DaylightingManager {
 		// open a new file eplusout.dfs for saving the daylight factors
 		if ( CreateDFSReportFile ) {
 			OutputFileDFS = GetNewUnitNumber();
-			{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileDFS, outputDfsFileName, flags ); write_stat = flags.ios(); }
+			{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileDFS, DataStringGlobals::outputDfsFileName, flags ); write_stat = flags.ios(); }
 			if ( write_stat != 0 ) {
-				ShowFatalError( "CalcDayltgCoefficients: Could not open file "+outputDfsFileName+" for output (write)." );
+				ShowFatalError( "CalcDayltgCoefficients: Could not open file "+DataStringGlobals::outputDfsFileName+" for output (write)." );
 			} else {
 				gio::write( OutputFileDFS, fmtA ) << "This file contains daylight factors for all exterior windows of daylight zones.";
 				gio::write( OutputFileDFS, fmtA ) << "If only one reference point the last 4 columns in the data will be zero.";
@@ -4188,7 +4187,7 @@ namespace DaylightingManager {
 			if ( iErrorFlag != 0 ) {
 				// Open DElight Daylight Factors Error File for reading
 				iDElightErrorFile = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, outputDelightDfdmpFileName, flags ); }
+				{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags ); }
 
 				// Sequentially read lines in DElight Daylight Factors Error File
 				// and process them using standard EPlus warning/error handling calls
@@ -4229,7 +4228,7 @@ namespace DaylightingManager {
 			} else {
 				// Open, Close, and Delete DElight Daylight Factors Error File for reading
 				iDElightErrorFile = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, outputDelightDfdmpFileName, flags ); }
+				{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags ); }
 				{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( iDElightErrorFile, flags ); }
 			}
 			SetupDElightOutput4EPlus();
@@ -9309,13 +9308,13 @@ namespace DaylightingManager {
 			IllumMap( MapNum ).UnitNo = GetNewUnitNumber();
 			MapNoString = RoundSigDigits( MapNum );
 			if ( MapColSep == CharTab ) {
-				{ IOFlags flags; flags.ACTION( "readwrite" ); flags.STATUS( "UNKNOWN" ); gio::open( IllumMap( MapNum ).UnitNo, outputMapTabFileName + MapNoString, flags ); if ( flags.err() ) goto Label901; }
+				{ IOFlags flags; flags.ACTION( "readwrite" ); flags.STATUS( "UNKNOWN" ); gio::open( IllumMap( MapNum ).UnitNo, DataStringGlobals::outputMapTabFileName + MapNoString, flags ); if ( flags.err() ) goto Label901; }
 				CommaDelimited = false;
 			} else if ( MapColSep == CharComma ) {
-				{ IOFlags flags; flags.ACTION( "readwrite" ); flags.STATUS( "UNKNOWN" ); gio::open( IllumMap( MapNum ).UnitNo, outputMapCsvFileName + MapNoString, flags ); if ( flags.err() ) goto Label902; }
+				{ IOFlags flags; flags.ACTION( "readwrite" ); flags.STATUS( "UNKNOWN" ); gio::open( IllumMap( MapNum ).UnitNo, DataStringGlobals::outputMapCsvFileName + MapNoString, flags ); if ( flags.err() ) goto Label902; }
 				CommaDelimited = true;
 			} else {
-				{ IOFlags flags; flags.ACTION( "readwrite" ); flags.STATUS( "UNKNOWN" ); gio::open( IllumMap( MapNum ).UnitNo, outputMapTxtFileName + MapNoString, flags ); if ( flags.err() ) goto Label903; }
+				{ IOFlags flags; flags.ACTION( "readwrite" ); flags.STATUS( "UNKNOWN" ); gio::open( IllumMap( MapNum ).UnitNo, DataStringGlobals::outputMapTxtFileName + MapNoString, flags ); if ( flags.err() ) goto Label903; }
 				CommaDelimited = false;
 			}
 
@@ -9421,15 +9420,15 @@ namespace DaylightingManager {
 		return;
 
 Label901: ;
-		ShowFatalError( "ReportIllumMap: Could not open file "+ outputMapTabFileName + MapNoString + "\" for output (write)." );
+		ShowFatalError( "ReportIllumMap: Could not open file "+ DataStringGlobals::outputMapTabFileName + MapNoString + "\" for output (write)." );
 		return;
 
 Label902: ;
-		ShowFatalError( "ReportIllumMap: Could not open file "+ outputMapCsvFileName + MapNoString + "\" for output (write)." );
+		ShowFatalError( "ReportIllumMap: Could not open file "+ DataStringGlobals::outputMapCsvFileName + MapNoString + "\" for output (write)." );
 		return;
 
 Label903: ;
-		ShowFatalError( "ReportIllumMap: Could not open file "+ outputMapTxtFileName + MapNoString + "\" for output (write)." );
+		ShowFatalError( "ReportIllumMap: Could not open file "+ DataStringGlobals::outputMapTxtFileName + MapNoString + "\" for output (write)." );
 
 	}
 
@@ -9485,11 +9484,11 @@ Label903: ;
 
 			// Write map header
 			if ( MapColSep == CharTab ) {
-				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( MapOutputFile, outputMapTabFileName, flags ); if ( flags.err() ) goto Label901; }
+				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( MapOutputFile, DataStringGlobals::outputMapTabFileName, flags ); if ( flags.err() ) goto Label901; }
 			} else if ( MapColSep == CharComma ) {
-				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( MapOutputFile, outputMapCsvFileName, flags ); if ( flags.err() ) goto Label902; }
+				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( MapOutputFile, DataStringGlobals::outputMapCsvFileName, flags ); if ( flags.err() ) goto Label902; }
 			} else {
-				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( MapOutputFile, outputMapTxtFileName, flags ); if ( flags.err() ) goto Label903; }
+				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( MapOutputFile, DataStringGlobals::outputMapTxtFileName, flags ); if ( flags.err() ) goto Label903; }
 			}
 
 			for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
@@ -9525,15 +9524,15 @@ Label903: ;
 		return;
 
 Label901: ;
-		ShowFatalError( "CloseReportIllumMaps: Could not open file "+outputMapTabFileName+" for output (write)." );
+		ShowFatalError( "CloseReportIllumMaps: Could not open file "+DataStringGlobals::outputMapTabFileName+" for output (write)." );
 		return;
 
 Label902: ;
-		ShowFatalError( "CloseReportIllumMaps: Could not open file "+outputMapCsvFileName+" for output (write)." );
+		ShowFatalError( "CloseReportIllumMaps: Could not open file "+DataStringGlobals::outputMapCsvFileName+" for output (write)." );
 		return;
 
 Label903: ;
-		ShowFatalError( "CloseReportIllumMaps: Could not open file "+outputMapTxtFileName+" for output (write)." );
+		ShowFatalError( "CloseReportIllumMaps: Could not open file "+DataStringGlobals::outputMapTxtFileName+" for output (write)." );
 
 	}
 

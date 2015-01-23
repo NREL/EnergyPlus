@@ -41,7 +41,6 @@ namespace DataTimings {
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using namespace CommandLineInterface;
 	using DataSystemVariables::tabchar;
 	using DataSystemVariables::DeveloperFlag;
 

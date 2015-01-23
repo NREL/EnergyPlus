@@ -55,7 +55,6 @@ namespace InputProcessor {
 	// Use statements for data only modules
 	// Using/Aliasing
     
-    using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using namespace DataStringGlobals;
 	using DataGlobals::MaxNameLength;

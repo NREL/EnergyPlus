@@ -67,7 +67,6 @@ AbortEnergyPlus()
 	// na
 
 	// Using/Aliasing
-	using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using namespace DataSystemVariables;
 	using namespace DataTimings;
@@ -191,9 +190,9 @@ AbortEnergyPlus()
 	ShowMessage( "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed );
 	DisplayString( "EnergyPlus Run Time=" + Elapsed );
 	tempfl = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, outputEndFileName, flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, DataStringGlobals::outputEndFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		DisplayString( "AbortEnergyPlus: Could not open file "+ outputEndFileName +" for output (write)." );
+		DisplayString( "AbortEnergyPlus: Could not open file "+ DataStringGlobals::outputEndFileName +" for output (write)." );
 	}
 	gio::write( tempfl, fmtLD ) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 
@@ -346,7 +345,6 @@ EndEnergyPlus()
 	// na
 
 	// Using/Aliasing
-	using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using namespace DataSystemVariables;
 	using namespace DataTimings;
@@ -424,9 +422,9 @@ EndEnergyPlus()
 	ShowMessage( "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed );
 	DisplayString( "EnergyPlus Run Time=" + Elapsed );
 	tempfl = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, outputEndFileName, flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, DataStringGlobals::outputEndFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		DisplayString( "EndEnergyPlus: Could not open file " + outputEndFileName + " for output (write)." );
+		DisplayString( "EndEnergyPlus: Could not open file " + DataStringGlobals::outputEndFileName + " for output (write)." );
 	}
 	gio::write( tempfl, fmtA ) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 	gio::close( tempfl );
@@ -789,7 +787,6 @@ ShowFatalError(
 	// na
 
 	// Using/Aliasing
-	using namespace CommandLineInterface;
 	using namespace DataErrorTracking;
 	using General::RoundSigDigits;
 
@@ -1536,7 +1533,6 @@ ShowErrorMessage(
 	// na
 
 	// Using/Aliasing
-	using namespace CommandLineInterface;
 	using DataStringGlobals::VerString;
 	using DataStringGlobals::IDDVerString;
 	using DataGlobals::DoingInputProcessing;
@@ -1563,10 +1559,10 @@ ShowErrorMessage(
 
 	if ( TotalErrors == 0 && ! ErrFileOpened ) {
 		StandardErrorOutput = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( StandardErrorOutput, outputErrFileName, flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( StandardErrorOutput, DataStringGlobals::outputErrFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
 			DisplayString( "Trying to display error: \"" + ErrorMessage + "\"" );
-			ShowFatalError( "ShowErrorMessage: Could not open file "+outputErrFileName+" for output (write)." );
+			ShowFatalError( "ShowErrorMessage: Could not open file "+DataStringGlobals::outputErrFileName+" for output (write)." );
 		}
 		gio::write( StandardErrorOutput, fmtA ) << "Program Version," + VerString + ',' + IDDVerString;
 		ErrFileOpened = true;

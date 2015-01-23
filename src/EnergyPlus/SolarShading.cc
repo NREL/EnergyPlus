@@ -18,6 +18,7 @@
 #include <DataEnvironment.hh>
 #include <DataErrorTracking.hh>
 #include <DataGlobals.hh>
+#include <DataStringGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalSurface.hh>
@@ -82,7 +83,6 @@ namespace SolarShading {
 	// na
 
 	// Using/Aliasing
-    using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
 	using namespace DataEnvironment;
@@ -255,9 +255,9 @@ namespace SolarShading {
 #endif
 		if ( BeginSimFlag ) {
 
-			shd_stream.open( outputShdFileName );
+			shd_stream.open( DataStringGlobals::outputShdFileName );
 			if ( ! shd_stream ) {
-				ShowFatalError( "InitSolarCalculations: Could not open file \"" + outputShdFileName + "\" for output (write)." );
+				ShowFatalError( "InitSolarCalculations: Could not open file \"" + DataStringGlobals::outputShdFileName + "\" for output (write)." );
 			}
 
 			if ( GetInputFlag ) {

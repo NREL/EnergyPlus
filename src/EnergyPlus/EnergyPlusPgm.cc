@@ -220,7 +220,6 @@ EnergyPlusPgm( std::string filepath )
 	using DataEnvironment::IgnoreBeamRadiation;
 	using DataEnvironment::IgnoreDiffuseRadiation;
 	// routine modules
-	using namespace CommandLineInterface;
 	using namespace FileSystem;
 	using namespace InputProcessor;
 	using namespace OutputProcessor;
@@ -368,7 +367,7 @@ EnergyPlusPgm( std::string filepath )
 		ProgramPath = filepath + pathChar;
 		int dummy_argc = 0;
 		const char * dummy_argv[] = { NULL };
-		ProcessArgs( dummy_argc, dummy_argv );
+		CommandLineInterface::ProcessArgs( dummy_argc, dummy_argv );
 	}
 
 	TestAllPaths = true;

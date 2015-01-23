@@ -126,7 +126,6 @@ namespace SimulationManager {
 
 	// Using/Aliasing
 
-    using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
 	using namespace DataSizing;
@@ -1065,7 +1064,7 @@ namespace SimulationManager {
 		NumDesignDays = GetNumObjectsFound( "SizingPeriod:DesignDay" );
 		NumRunPeriodDesign = GetNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
 		NumSizingDays = NumDesignDays + NumRunPeriodDesign;
-		{ IOFlags flags; gio::inquire( inputWeatherFileName, flags ); WeatherFileAttached = flags.exists(); }
+		{ IOFlags flags; gio::inquire( DataStringGlobals::inputWeatherFileName, flags ); WeatherFileAttached = flags.exists(); }
 
 		if ( RunControlInInput ) {
 			if ( DoZoneSizing ) {
@@ -1228,36 +1227,36 @@ namespace SimulationManager {
 		// FLOW:
 		OutputFileStandard = GetNewUnitNumber();
 		StdOutputRecordCount = 0;
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileStandard, outputEsoFileName, flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileStandard, DataStringGlobals::outputEsoFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "OpenOutputFiles: Could not open file "+outputEsoFileName+" for output (write)." );
+			ShowFatalError( "OpenOutputFiles: Could not open file "+DataStringGlobals::outputEsoFileName+" for output (write)." );
 		}
 		eso_stream = gio::out_stream( OutputFileStandard );
 		gio::write( OutputFileStandard, fmtA ) << "Program Version," + VerString;
 
 		// Open the Initialization Output File
 		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, outputEioFileName, flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, DataStringGlobals::outputEioFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "OpenOutputFiles: Could not open file "+outputEioFileName+" for output (write)." );
+			ShowFatalError( "OpenOutputFiles: Could not open file "+DataStringGlobals::outputEioFileName+" for output (write)." );
 		}
 		gio::write( OutputFileInits, fmtA ) << "Program Version," + VerString;
 
 		// Open the Meters Output File
 		OutputFileMeters = GetNewUnitNumber();
 		StdMeterRecordCount = 0;
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileMeters, outputMtrFileName, flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileMeters, DataStringGlobals::outputMtrFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "OpenOutputFiles: Could not open file "+outputMtrFileName+" for output (write)." );
+			ShowFatalError( "OpenOutputFiles: Could not open file "+DataStringGlobals::outputMtrFileName+" for output (write)." );
 		}
 		mtr_stream = gio::out_stream( OutputFileMeters );
 		gio::write( OutputFileMeters, fmtA ) << "Program Version," + VerString;
 
 		// Open the Branch-Node Details Output File
 		OutputFileBNDetails = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileBNDetails, outputBndFileName, flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileBNDetails, DataStringGlobals::outputBndFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "OpenOutputFiles: Could not open file "+outputBndFileName+" for output (write)." );
+			ShowFatalError( "OpenOutputFiles: Could not open file "+DataStringGlobals::outputBndFileName+" for output (write)." );
 		}
 		gio::write( OutputFileBNDetails, fmtA ) << "Program Version," + VerString;
 
@@ -1337,7 +1336,7 @@ namespace SimulationManager {
 		std::string cepEnvSetThreads;
 		std::string cIDFSetThreads;
 
-		EchoInputFile = FindUnitNumber( outputAuditFileName );
+		EchoInputFile = FindUnitNumber( DataStringGlobals::outputAuditFileName );
 		// Record some items on the audit file
 		gio::write( EchoInputFile, fmtLD ) << "NumOfRVariable=" << NumOfRVariable_Setup;
 		gio::write( EchoInputFile, fmtLD ) << "NumOfRVariable(Total)=" << NumTotalRVariable;

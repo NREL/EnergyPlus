@@ -55,7 +55,6 @@ namespace SizingManager {
 	// OTHER NOTES: none
 
 	// Using/Aliasing
-    using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
 	using namespace HeatBalanceManager;
@@ -223,19 +222,19 @@ namespace SizingManager {
 			Available = true;
 			OutputFileZoneSizing = GetNewUnitNumber();
 			if ( SizingFileColSep == CharComma ) {
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileZoneSizing, outputZszCsvFileName, flags ); write_stat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileZoneSizing, DataStringGlobals::outputZszCsvFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file "+ outputZszCsvFileName +" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+ DataStringGlobals::outputZszCsvFileName +" for output (write)." );
 				}
 			} else if ( SizingFileColSep == CharTab ) {
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileZoneSizing, outputZszTabFileName, flags ); write_stat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileZoneSizing, DataStringGlobals::outputZszTabFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file "+outputZszTabFileName+" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+DataStringGlobals::outputZszTabFileName+" for output (write)." );
 				}
 			} else {
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileZoneSizing, outputZszTxtFileName, flags ); write_stat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileZoneSizing, DataStringGlobals::outputZszTxtFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file "+ outputZszTxtFileName +" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+ DataStringGlobals::outputZszTxtFileName +" for output (write)." );
 				}
 			}
 
@@ -435,19 +434,19 @@ namespace SizingManager {
 			Available = true;
 			OutputFileSysSizing = GetNewUnitNumber();
 			if ( SizingFileColSep == CharComma ) {
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileSysSizing, outputSszCsvFileName, flags ); write_stat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileSysSizing, DataStringGlobals::outputSszCsvFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file "+ outputSszCsvFileName +" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+ DataStringGlobals::outputSszCsvFileName +" for output (write)." );
 				}
 			} else if ( SizingFileColSep == CharTab ) {
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileSysSizing, outputSszTabFileName, flags ); write_stat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileSysSizing, DataStringGlobals::outputSszTabFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file "+ outputSszTabFileName +" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+ DataStringGlobals::outputSszTabFileName +" for output (write)." );
 				}
 			} else {
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileSysSizing, outputSszTxtFileName, flags ); write_stat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileSysSizing, DataStringGlobals::outputSszTxtFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file "+outputSszTxtFileName+ " for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+DataStringGlobals::outputSszTxtFileName+ " for output (write)." );
 				}
 			}
 			SimAir = true;

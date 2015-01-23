@@ -72,6 +72,62 @@ namespace DataStringGlobals {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
+	std::string outputAuditFileName;
+	std::string outputBndFileName;
+	std::string outputDxfFileName;
+	std::string outputEioFileName;
+	std::string outputEndFileName;
+	std::string outputErrFileName;
+	std::string outputEsoFileName;
+	std::string outputMtdFileName;
+	std::string outputMddFileName;
+	std::string outputMtrFileName;
+	std::string outputRddFileName;
+	std::string outputShdFileName;
+	std::string outputTblCsvFileName;
+	std::string outputTblHtmFileName;
+	std::string outputTblTabFileName;
+	std::string outputTblTxtFileName;
+	std::string outputTblXmlFileName;
+	std::string inputIdfFileName;
+	std::string inputIddFileName;
+	std::string inputWeatherFileName;
+	std::string outputAdsFileName;
+	std::string outputDfsFileName;
+	std::string outputDelightInFileName;
+	std::string outputDelightOutFileName;
+	std::string outputDelightEldmpFileName;
+	std::string outputDelightDfdmpFileName;
+	std::string outputMapTabFileName;
+	std::string outputMapCsvFileName;
+	std::string outputMapTxtFileName;
+	std::string outputEddFileName;
+	std::string outputIperrFileName;
+	std::string outputDbgFileName;
+	std::string outputSlnFileName;
+	std::string outputSciFileName;
+	std::string outputWrlFileName;
+	std::string outputZszCsvFileName;
+	std::string outputZszTabFileName;
+	std::string outputZszTxtFileName;
+	std::string outputSszCsvFileName;
+	std::string outputSszTabFileName;
+	std::string outputSszTxtFileName;
+	std::string outputScreenCsvFileName;
+	std::string outputSqlFileName;
+	std::string outputSqliteErrFileName;
+	std::string EnergyPlusIniFileName;
+	std::string inStatFileName;
+	std::string TarcogIterationsFileName;
+	std::string eplusADSFileName;
+	std::string outputCsvFileName;
+	std::string outputMtrCsvFileName;
+	std::string outputRvauditFileName;
+	
+	std::string idfFileNameOnly;
+	std::string idfDirPathName;
+	std::string exeDirectory;
+
 	std::string ProgramPath; // Path for Program from INI file
 	std::string CurrentWorkingFolder; // Current working directory for run
 	std::string IDDVerString; // Version information from the IDD (line 1)

@@ -35,7 +35,6 @@ namespace DataSystemVariables {
 	// na
 
 	// Using/Aliasing
-    using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using DataStringGlobals::pathChar;
 	using DataStringGlobals::altpathChar;
@@ -189,7 +188,7 @@ namespace DataSystemVariables {
 		std::string::size_type pos;
 
 		if ( firstTime ) {
-			EchoInputFile = FindUnitNumber( outputAuditFileName );
+			EchoInputFile = FindUnitNumber( DataStringGlobals::outputAuditFileName );
 			get_environment_variable( cInputPath1, envinputpath1 );
 			if ( envinputpath1 != blank ) {
 				pos = index( envinputpath1, pathChar, true ); // look backwards for pathChar
@@ -215,14 +214,14 @@ namespace DataSystemVariables {
 		}
 
 		// Look relative to input file path
-		{ IOFlags flags; gio::inquire( idfDirPathName + InputFileName, flags ); FileExist = flags.exists(); }
+		{ IOFlags flags; gio::inquire( DataStringGlobals::idfDirPathName + InputFileName, flags ); FileExist = flags.exists(); }
 		if ( FileExist ) {
 			FileFound = true;
-			CheckedFileName = idfDirPathName + InputFileName;
+			CheckedFileName = DataStringGlobals::idfDirPathName + InputFileName;
 			gio::write(EchoInputFile, fmtA) << "found (idf)=" + getAbsolutePath(CheckedFileName);
 			return;
 		} else {
-			gio::write(EchoInputFile, fmtA) << "not found (idf)=" + getAbsolutePath(idfDirPathName + InputFileName);
+			gio::write(EchoInputFile, fmtA) << "not found (idf)=" + getAbsolutePath(DataStringGlobals::idfDirPathName + InputFileName);
 		}
 
 		// Look relative to input path

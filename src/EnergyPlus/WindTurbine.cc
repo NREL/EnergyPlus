@@ -14,6 +14,7 @@
 #include <DataEnvironment.hh>
 #include <DataGenerators.hh>
 #include <DataGlobalConstants.hh>
+#include <DataStringGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
@@ -52,7 +53,6 @@ namespace WindTurbine {
 	// OTHER NOTES: none
 
 	// Using/Aliasing
-    using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using namespace DataGenerators;
 	using DataGlobals::Pi;
@@ -624,13 +624,13 @@ namespace WindTurbine {
 		// Estimate average annual wind speed once
 		if ( MyOneTimeFlag ) {
 			wsStatFound = false;
-			{ IOFlags flags; gio::inquire( inStatFileName, flags ); fileExists = flags.exists(); }
+			{ IOFlags flags; gio::inquire( DataStringGlobals::inStatFileName, flags ); fileExists = flags.exists(); }
 			if ( fileExists ) {
 				statFile = GetNewUnitNumber();
 				ReadStatus = 0;
-				{ IOFlags flags; flags.ACTION( "READ" ); gio::open( statFile, inStatFileName, flags ); ReadStatus = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "READ" ); gio::open( statFile, DataStringGlobals::inStatFileName, flags ); ReadStatus = flags.ios(); }
 				if ( ReadStatus != 0 ) {
-					ShowFatalError( "InitWindTurbine: Could not open file "+inStatFileName+" for input (read)." );
+					ShowFatalError( "InitWindTurbine: Could not open file "+DataStringGlobals::inStatFileName+" for input (read)." );
 				}
 				while ( ReadStatus == 0 ) { //end of file
 					{ IOFlags flags; gio::read( statFile, fmtA, flags ) >> lineIn; ReadStatus = flags.ios(); }
@@ -657,14 +657,14 @@ namespace WindTurbine {
 									}
 								} else { // blank field
 									if ( ! warningShown ) {
-										ShowWarningError( "InitWindTurbine: read from "+ inStatFileName +" file shows <365 days in weather file. " "Annual average wind speed used will be inaccurate." );
+										ShowWarningError( "InitWindTurbine: read from "+ DataStringGlobals::inStatFileName +" file shows <365 days in weather file. " "Annual average wind speed used will be inaccurate." );
 										lineIn.erase( 0, lnPtr + 1 );
 										warningShown = true;
 									}
 								}
 							} else { // two tabs in succession
 								if ( ! warningShown ) {
-									ShowWarningError( "InitWindTurbine: read from "+ inStatFileName +" file shows <365 days in weather file. " "Annual average wind speed used will be inaccurate." );
+									ShowWarningError( "InitWindTurbine: read from "+ DataStringGlobals::inStatFileName +" file shows <365 days in weather file. " "Annual average wind speed used will be inaccurate." );
 									lineIn.erase( 0, lnPtr + 1 );
 									warningShown = true;
 								}

@@ -51,7 +51,6 @@ namespace Psychrometrics {
 	// more research on hfg calc
 
 	// Using/Aliasing
-    using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 #ifdef EP_psych_errors
 	using namespace DataGlobals;
