@@ -23,27 +23,27 @@ namespace GroundHeatExchangers {
 	extern int const MaxTSinHr; // Max number of time step in a hour
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern int NumVerticalGLHEs;
-	extern int N; // COUNTER OF TIME STEP
-	extern Real64 CurrentSimTime; // Current simulation time in hours
-	extern Real64 GLHEOutletTemp; // Outlet temperature of the fluid  [°C]
-	extern Real64 GLHEInletTemp; // Inlet temperature of the fluid   [°C]
-	extern Real64 GLHEMassFlowRate; // Mass flowrate of the fluid       [Kg/s]
-	extern Real64 QGLHE; // The normalized heat transfer rate[W/m]
-	extern Real64 GLHERB; // [K per W/m] Just for Analyis will be removed later
-	extern Real64 GLHEAveFluidTemp; // The average fluid temperature    [°C]
-	extern Real64 GLHEBoreholeTemp; // The average borehole tempreature [°C]
-	extern int LocHourOfDay;
-	extern int LocDayOfSim;
-	extern FArray1D< Real64 > LastQnSubHr; // Previous time step Qn subhourly value
-	extern Real64 MDotActual;
+	//extern int NumVerticalGLHEs;
+	//extern int N; // COUNTER OF TIME STEP
+	//extern Real64 CurrentSimTime; // Current simulation time in hours
+	//extern Real64 GLHEOutletTemp; // Outlet temperature of the fluid  [°C]
+	//extern Real64 GLHEInletTemp; // Inlet temperature of the fluid   [°C]
+	//extern Real64 GLHEMassFlowRate; // Mass flowrate of the fluid       [Kg/s]
+	//extern Real64 QGLHE; // The normalized heat transfer rate[W/m]
+	////extern Real64 GLHERB; // [K per W/m] Just for Analyis will be removed later
+	//extern Real64 GLHEAveFluidTemp; // The average fluid temperature    [°C]
+	//extern Real64 GLHEBoreholeTemp; // The average borehole tempreature [°C]
+	//extern int LocHourOfDay;
+	//extern int LocDayOfSim;
+	//extern FArray1D< Real64 > LastQnSubHr; // Previous time step Qn subhourly value
+	//extern Real64 MDotActual;
 
-	extern FArray1D< Real64 > PrevTimeSteps; // This is used to store only the Last Few time step's time
+	//extern FArray1D< Real64 > PrevTimeSteps; // This is used to store only the Last Few time step's time
 	// to enable the calculation of the subhouly contribution..
 	// Recommended size, the product of Minimum subhourly history required and
 	// the maximum no of system time steps in an hour
 
-	extern FArray1D_bool CheckEquipName;
+	//extern FArray1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE CondenserTowers
 
@@ -91,6 +91,8 @@ namespace GroundHeatExchangers {
 		Real64 GLHEInletTemp; // [°C]
 		Real64 GLHEAveFluidTemp; // [°C]
 		Real64 QGLHE; // [W] heat transfer rate
+		bool MyFlag;
+		bool MyEnvrnFlag;
 
 		// Default Constructor
 		GLHEBase() :
@@ -122,7 +124,9 @@ namespace GroundHeatExchangers {
 			GLHEOutletTemp( 0.0 ),
 			GLHEInletTemp( 0.0 ),
 			GLHEAveFluidTemp( 0.0 ),
-			QGLHE( 0.0 )
+			QGLHE( 0.0 ),
+			MyFlag( true ),
+			MyEnvrnFlag( true )
 
 		{}
 
@@ -155,6 +159,7 @@ namespace GroundHeatExchangers {
 		Real64 UtubeDist; // Distance between the legs of the Utube    [m]
 		Real64 ResistanceBhole; // The thermal resistance of the borehole, (K per W/m)
 		bool RunFlag;
+		Real64 LastQnSubHr;
 
 
 		// Default Constructor
@@ -167,7 +172,8 @@ namespace GroundHeatExchangers {
 			KGrout( 0.0 ),
 			UtubeDist( 0.0 ),
 			ResistanceBhole( 0.0 ),
-			RunFlag( false )
+			RunFlag( false ),
+			LastQnSubHr( 0.0 )
 
 		{}
 

@@ -88,12 +88,12 @@ namespace GroundHeatExchangers {
 	Real64 GLHEInletTemp( 0.0 ); // Inlet temperature of the fluid   [°C]
 	Real64 GLHEMassFlowRate( 0.0 ); // Mass flowrate of the fluid       [Kg/s]
 	Real64 QGLHE( 0.0 ); // The normalized heat transfer rate[W/m]
-	Real64 GLHERB( 0.0 ); // [K per W/m] Just for Analyis will be removed later
+	//Real64 GLHERB( 0.0 ); // [K per W/m] Just for Analyis will be removed later
 	Real64 GLHEAveFluidTemp( 0.0 ); // The average fluid temperature    [°C]
 	Real64 GLHEBoreholeTemp( 0.0 ); // The average borehole tempreature [°C]
 	int LocHourOfDay( 0 );
 	int LocDayOfSim( 0 );
-	FArray1D< Real64 > LastQnSubHr; // Previous time step Qn subhourly value
+	//FArray1D< Real64 > LastQnSubHr; // Previous time step Qn subhourly value
 	Real64 MDotActual;
 
 	FArray1D< Real64 > PrevTimeSteps; // This is used to store only the Last Few time step's time
@@ -373,7 +373,7 @@ namespace GroundHeatExchangers {
 		if ( N != PrevN ) {
 			PrevN = N;
 			for ( I = 1; I <= NumVerticalGLHEs; ++I ) {
-				VerticalGLHE( I ).QnSubHr = eoshift( VerticalGLHE( I ).QnSubHr, -1, LastQnSubHr( I ) );
+				VerticalGLHE( I ).QnSubHr = eoshift( VerticalGLHE( I ).QnSubHr, -1, this->LastQnSubHr );
 			}
 		}
 
@@ -570,7 +570,7 @@ namespace GroundHeatExchangers {
 		//Load the QnSubHourly Array with a new value at end of every timestep
 
 		//Load the report vars
-		//this->LastQnSubHr = tmpQnSubHourly;
+		this->LastQnSubHr = tmpQnSubHourly;
 		this->GLHEOutletTemp = ToutNew;
 		this->QGLHE = tmpQnSubHourly;
 		this->GLHEAveFluidTemp = FluidAveTemp;
@@ -1156,42 +1156,29 @@ namespace GroundHeatExchangers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyEnvironFlag( true );
 		Real64 FluidDensity;
-		static FArray1D_bool MyFlag;
-		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
 		bool errFlag;
-		static int GLHENum( 0 );
-
-		if ( MyOneTimeFlag ) {
-			MyEnvrnFlag.allocate( NumVerticalGLHEs );
-			MyFlag.allocate( NumVerticalGLHEs );
-			MyOneTimeFlag = false;
-			MyEnvrnFlag = true;
-			MyFlag = true;
-		}
 
 		// Init more variables
-		if ( MyFlag( GLHENum ) ) {
+		if ( this->MyFlag ) {
 			// Locate the hx on the plant loops for later usage
 			errFlag = false;
 			ScanPlantLoopsForObject( this->Name, TypeOf_GrndHtExchgVertical, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
 				ShowFatalError( "InitGLHESimVars: Program terminated due to previous condition(s)." );
 			}
-			MyFlag( GLHENum ) = false;
+			this->MyFlag = false;
 		}
 
-		if ( MyEnvrnFlag( GLHENum ) && BeginEnvrnFlag ) {
-			MyEnvrnFlag( GLHENum ) = false;
+		if ( this->MyEnvrnFlag && BeginEnvrnFlag ) {
+			this->MyEnvrnFlag = false;
 
-			if ( ! allocated( LastQnSubHr ) ) LastQnSubHr.allocate( NumVerticalGLHEs );
+			//if ( ! allocated( LastQnSubHr ) ) LastQnSubHr.allocate( NumVerticalGLHEs );
 			FluidDensity = GetDensityGlycol( PlantLoop( this->LoopNum ).FluidName, 20.0, PlantLoop( this->LoopNum ).FluidIndex, RoutineName );
 			this->DesignMassFlow = this->DesignFlow * FluidDensity;
 			InitComponentNodes( 0.0, this->DesignMassFlow, this->GLHEInletNodeNum, this->GLHEOutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum );
 
-			LastQnSubHr = 0.0;
+			this->LastQnSubHr = 0.0;
 			Node( this->GLHEInletNodeNum ).Temp = this->TempGround;
 			Node( this->GLHEOutletNodeNum ).Temp = this->TempGround;
 
@@ -1275,7 +1262,7 @@ namespace GroundHeatExchangers {
 		this->GLHEBoreholeTemp = GLHEBoreholeTemp;
 		this->GLHEOutletTemp = GLHEOutletTemp;
 		// calc load from load per unit length.
-		this->QGLHE = QGLHE * this->BoreholeLength * this->NumBoreholes;
+		this->QGLHE = this->QGLHE * this->BoreholeLength * this->NumBoreholes;
 		this->GLHEInletTemp = GLHEInletTemp;
 		this->GLHEMassFlowRate = GLHEMassFlowRate;
 		this->GLHEAveFluidTemp = GLHEAveFluidTemp;
