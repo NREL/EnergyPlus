@@ -1705,7 +1705,7 @@ namespace DataSizing {
 			LoopType( 0 ),
 			ExitTemp( 0.0 ),
 			DeltaT( 0.0 ),
-			ConcurrenceOption( 0 ),
+			ConcurrenceOption( 1 ),
 			NumTimeStepsInAvg( 0 ),
 			SizingFactorOption( 101 ),
 			DesVolFlowRate( 0.0 ),

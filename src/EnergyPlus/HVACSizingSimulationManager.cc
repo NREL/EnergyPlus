@@ -345,6 +345,8 @@ namespace EnergyPlus {
 				break;
 			}
 
+			SizeSimManagerObj.SizingLogger.IncrementSizingPeriodSet ( HVACSizingIterCount );
+
 		} // End HVAC Sizing Iteration loop
 
 		//

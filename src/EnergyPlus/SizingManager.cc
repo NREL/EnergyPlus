@@ -2295,14 +2295,9 @@ namespace SizingManager {
 			PlantSizData.LoopType() = 0;
 			PlantSizData.DesVolFlowRate() = 0.0;
 			for (int i=1; i<=NumPltSizInput; i++ ){
-				PlantSizData(i).ConcurrenceOption = 0;
-				PlantSizData(i).NumTimeStepsInAvg = 0;
+				PlantSizData(i).ConcurrenceOption = NonCoincident;
+				PlantSizData(i).NumTimeStepsInAvg = 1;
 			}
-		//	for (auto &P : PlantSizData ){  //TODO why doesn't this work
-		//		P.ConcurrenceOption = 0;
-		//		P.NumTimeStepsInAvg = 0;
-		//	}
-
 		}
 
 		for ( PltSizIndex = 1; PltSizIndex <= NumPltSizInput; ++PltSizIndex ) {

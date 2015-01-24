@@ -259,7 +259,7 @@ namespace OutputReportPredefined {
 	extern int pdchPlantSizCalcVdot;
 	extern int pdchPlantSizMeasVdot;
 	extern int pdchPlantSizPrevVdot;
-	extern int pdchPlantSizPass;
+//	extern int pdchPlantSizPass;
 	extern int pdchPlantSizCoincYesNo;
 	extern int pdchPlantSizDesDay;
 	extern int pdchPlantSizPkTimeDayOfSim;

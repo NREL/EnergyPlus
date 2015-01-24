@@ -268,7 +268,7 @@ namespace OutputReportPredefined {
 	int pdchPlantSizCalcVdot;
 	int pdchPlantSizMeasVdot;
 	int pdchPlantSizPrevVdot;
-	int pdchPlantSizPass;
+//	int pdchPlantSizPass;
 	int pdchPlantSizCoincYesNo;
 	int pdchPlantSizDesDay;
 	int pdchPlantSizPkTimeHour;
@@ -971,7 +971,7 @@ namespace OutputReportPredefined {
 		pdchSysSizUserHtAir = newPreDefColumn( pdstSystemSize, "User heating [m3/s]" );
 
 		pdstPlantSize = newPreDefSubTable( pdrSizing, "Plant Loop Coincident Design Fluid Flow Rate Adjustments");
-		pdchPlantSizPass = newPreDefColumn( pdstPlantSize, "Sizing Pass" );
+//		pdchPlantSizPass = newPreDefColumn( pdstPlantSize, "Sizing Pass" );
 		pdchPlantSizPrevVdot = newPreDefColumn( pdstPlantSize, "Previous Design Volume Flow Rate [m3/s]" );
 		pdchPlantSizMeasVdot = newPreDefColumn( pdstPlantSize, "Measured Volume Flow Rate [m3/s]" );
 		pdchPlantSizCalcVdot = newPreDefColumn( pdstPlantSize, "Coincident Design Volume Flow Rate [m3/s]" );

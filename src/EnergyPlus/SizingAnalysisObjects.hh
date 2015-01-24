@@ -14,6 +14,7 @@
 #include <DataHVACGlobals.hh>
 #include <DataPlant.hh>
 #include <OutputReportPredefined.hh>
+#include <General.hh>
 
 namespace EnergyPlus {
 
@@ -74,6 +75,14 @@ public:
 	void fillSysStep( zoneTimestepObject tmpztStepStamp );
 
 	zoneTimestepObject GetLogVariableDataMax( );
+
+	void AdjustEnvrnIndexMapForIteration(
+		int const HVACSizingIterCount
+	);
+
+	void ReInitLogForIteration();
+
+
 };
 
 
@@ -89,6 +98,10 @@ public:
 	);
 
 	void UpdateSizingLogValuesZoneStep();
+
+	void IncrementSizingPeriodSet(
+		int const HVACSizingIterCount
+	);
 
 };
 

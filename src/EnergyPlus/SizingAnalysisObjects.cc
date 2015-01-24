@@ -11,6 +11,7 @@
 #include <DataHVACGlobals.hh>
 #include <DataPlant.hh>
 #include <OutputReportPredefined.hh>
+#include <General.hh>
 
 namespace EnergyPlus {
 
@@ -69,9 +70,9 @@ namespace EnergyPlus {
 	zoneTimestepObject SizingLog::GetLogVariableDataMax( 
 
 	){
-	Real64 MaxVal;
-	zoneTimestepObject tmpztStepStamp;
-	MaxVal = 0.0;
+		Real64 MaxVal;
+		zoneTimestepObject tmpztStepStamp;
+		MaxVal = 0.0;
 
 		for ( auto &Zt : this -> ztStepObj ){
 			
@@ -81,6 +82,22 @@ namespace EnergyPlus {
 				}
 		}
 	return tmpztStepStamp;
+	}
+
+	void SizingLog::AdjustEnvrnIndexMapForIteration(
+		int const HVACSizingIterCount
+	){
+		for ( int i = 0; i < NumOfEnvironmentsInLogSet; i++ ) {
+			EnvrnIndexMapByEnvrn[ i ] = EnvrnIndexMapByEnvrn[ i ] + NumOfEnvironmentsInLogSet;
+		}
+	}
+
+	void SizingLog::ReInitLogForIteration(){
+		zoneTimestepObject tmpNullztStepObj;
+
+		for ( auto &Zt : this -> ztStepObj ){
+			Zt = tmpNullztStepObj;
+		}
 	}
 
 	int const SizingLoggerFramework::SetupVariableSizingLog(
@@ -185,6 +202,18 @@ namespace EnergyPlus {
 			L.fillZoneStep(tmpztStepStamp);
 		}
 	}
+
+	void SizingLoggerFramework::IncrementSizingPeriodSet( 
+		int const HVACSizingIterCount 
+		){
+	
+
+
+		for ( auto &L : this -> logObjs ) {
+			L.AdjustEnvrnIndexMapForIteration( HVACSizingIterCount );
+			L.ReInitLogForIteration();
+		}
+	}
 	
 	void PlantCoinicidentAnalyis::ResolveDesignFlowRate(
 		int const HVACSizingIterCount
@@ -199,6 +228,7 @@ namespace EnergyPlus {
 		using DataSizing::LoopComponentSizingFactorMode;
 		using DataSizing::GlobalHeatSizingFactor;
 		using DataSizing::GlobalCoolSizingFactor;
+		using General::TrimSigDigits;
 		using namespace DataPlant;
 		using namespace OutputReportPredefined;
 		using WeatherManager::Environment;
@@ -207,6 +237,9 @@ namespace EnergyPlus {
 		Real64 SizingFac;
 		Real64 NormalizedChange;
 		Real64 newFoundVolFlowRate;
+		std::string chIteration;
+
+
 
 
 		previousVolDesignFlowRate	= PlantSizData( PlantLoopIndex ).DesVolFlowRate;
@@ -240,11 +273,12 @@ namespace EnergyPlus {
 		if (   ( newVolDesignFlowRate > SmallWaterVolFlow ) // do not use zero size
 //			&& ( newVolDesignFlowRate < previousVolDesignFlowRate )// assume only shrink size from noncoincident? nah
 			)  { 
-			SetNewSizes = true;
+
 			NormalizedChange = std::abs((newVolDesignFlowRate - previousVolDesignFlowRate) 
 									/ previousVolDesignFlowRate);
 			if (NormalizedChange > SignificantNormalizedChange ) {
 				AnotherIterationDesired = true;
+				SetNewSizes = true;
 			} else {
 				AnotherIterationDesired = false;
 			}
@@ -266,21 +300,22 @@ namespace EnergyPlus {
 
 		}
 				//report to sizing summary table called Plant Loop Coincident Design Fluid Flow Rates
-		PreDefTableEntry( pdchPlantSizPass, PlantLoop( PlantLoopIndex ).Name, HVACSizingIterCount );
-		PreDefTableEntry( pdchPlantSizPrevVdot, PlantLoop( PlantLoopIndex ).Name, previousVolDesignFlowRate , 6 );
-		PreDefTableEntry( pdchPlantSizMeasVdot, PlantLoop( PlantLoopIndex ).Name, newFoundVolFlowRate , 6 );
-		PreDefTableEntry( pdchPlantSizCalcVdot, PlantLoop( PlantLoopIndex ).Name, newVolDesignFlowRate , 6 );
+//		PreDefTableEntry( pdchPlantSizPass, PlantLoop( PlantLoopIndex ).Name, HVACSizingIterCount );
+		chIteration = TrimSigDigits(HVACSizingIterCount);
+		PreDefTableEntry( pdchPlantSizPrevVdot, PlantLoop( PlantLoopIndex ).Name + " Sizing Pass " + chIteration , previousVolDesignFlowRate , 6 );
+		PreDefTableEntry( pdchPlantSizMeasVdot, PlantLoop( PlantLoopIndex ).Name + " Sizing Pass " + chIteration , newFoundVolFlowRate , 6 );
+		PreDefTableEntry( pdchPlantSizCalcVdot, PlantLoop( PlantLoopIndex ).Name + " Sizing Pass " + chIteration , newVolDesignFlowRate , 6 );
 
 		if (SetNewSizes) {
-			PreDefTableEntry( pdchPlantSizCoincYesNo, PlantLoop( PlantLoopIndex ).Name, "Yes" );
+			PreDefTableEntry( pdchPlantSizCoincYesNo, PlantLoop( PlantLoopIndex ).Name + " Sizing Pass " + chIteration , "Yes" );
 		} else {
-			PreDefTableEntry( pdchPlantSizCoincYesNo, PlantLoop( PlantLoopIndex ).Name, "No" );
+			PreDefTableEntry( pdchPlantSizCoincYesNo, PlantLoop( PlantLoopIndex ).Name + " Sizing Pass " + chIteration , "No" );
 		}
 
-		PreDefTableEntry( pdchPlantSizDesDay, PlantLoop( PlantLoopIndex ).Name, Environment(newFoundMassFlowRateTimeStamp.EnvrnNum).Title );
-		PreDefTableEntry( pdchPlantSizPkTimeDayOfSim, PlantLoop( PlantLoopIndex ).Name, newFoundMassFlowRateTimeStamp.DayOfSim );
-		PreDefTableEntry( pdchPlantSizPkTimeHour, PlantLoop( PlantLoopIndex ).Name, newFoundMassFlowRateTimeStamp.HourOfDay );
-		PreDefTableEntry( pdchPlantSizPkTimeMin, PlantLoop( PlantLoopIndex ).Name, newFoundMassFlowRateTimeStamp.stepStartMinute, 0 );
+		PreDefTableEntry( pdchPlantSizDesDay, PlantLoop( PlantLoopIndex ).Name + " Sizing Pass " + chIteration , Environment(newFoundMassFlowRateTimeStamp.EnvrnNum).Title );
+		PreDefTableEntry( pdchPlantSizPkTimeDayOfSim, PlantLoop( PlantLoopIndex ).Name + " Sizing Pass " + chIteration , newFoundMassFlowRateTimeStamp.DayOfSim );
+		PreDefTableEntry( pdchPlantSizPkTimeHour, PlantLoop( PlantLoopIndex ).Name + " Sizing Pass " + chIteration , newFoundMassFlowRateTimeStamp.HourOfDay - 1 );
+		PreDefTableEntry( pdchPlantSizPkTimeMin, PlantLoop( PlantLoopIndex ).Name + " Sizing Pass " + chIteration , newFoundMassFlowRateTimeStamp.stepStartMinute, 0 );
 	
 	}
 }
