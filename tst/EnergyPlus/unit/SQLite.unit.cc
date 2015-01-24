@@ -128,6 +128,10 @@ namespace EnergyPlus {
 			sqlite3_finalize(sqlStmtPtr);
 			return queryVector;
 		}
+
+		void createSQLiteZoneTable( std::map<int, DataHeatBalance::ZoneData> const & zones ) {
+			sqlite_test->createSQLiteZoneTable( zones );
+		}
 	};
 
 	TEST_F( SQLiteFixture, sqliteWriteMessage ) {
@@ -476,27 +480,55 @@ namespace EnergyPlus {
 		EXPECT_EQ( "Unknown!!!", reportingFreqName( -2 ) );
 	}
 
-	// void createSQLiteDaylightMapTitle(
-	// 	int const mapNum,
-	// 	std::string const & mapName,
-	// 	std::string const & environmentName,
-	// 	int const zone,
-	// 	std::string const & refPt1,
-	// 	std::string const & refPt2,
-	// 	Real64 const zCoord
-	// );
+	TEST_F( SQLiteFixture, DaylightMaping ) {
+		// void createSQLiteDaylightMap(
+		// 	int const mapNum,
+		// 	int const month,
+		// 	int const dayOfMonth,
+		// 	int const hourOfDay,
+		// 	int const nX,
+		// 	FArray1S< Real64 > const & x,
+		// 	int const nY,
+		// 	FArray1S< Real64 > const & y,
+		// 	FArray2S< Real64 > const & illuminance
+		// );
 
-	// void createSQLiteDaylightMap(
-	// 	int const mapNum,
-	// 	int const month,
-	// 	int const dayOfMonth,
-	// 	int const hourOfDay,
-	// 	int const nX,
-	// 	FArray1S< Real64 > const & x,
-	// 	int const nY,
-	// 	FArray1S< Real64 > const & y,
-	// 	FArray2S< Real64 > const & illuminance
-	// );
+		// void createSQLiteDaylightMapTitle(
+		// 	int const mapNum,
+		// 	std::string const & mapName,
+		// 	std::string const & environmentName,
+		// 	int const zone,
+		// 	std::string const & refPt1,
+		// 	std::string const & refPt2,
+		// 	Real64 const zCoord
+		// );
+
+		auto zone = std::unique_ptr<DataHeatBalance::ZoneData>(new DataHeatBalance::ZoneData());
+		zone->Name = "DAYLIT ZONE";
+		// zone->Centroid.x = 2.5;
+		// zone->Centroid.y = 9.92;
+		// zone->Centroid.z = 1.50;
+		// zone->MaximumX = 5;
+		// zone->MaximumY = 20;
+		// zone->MaximumZ = 3;
+		// zone->CeilingHeight = 3;
+		// zone->Volume = 302;
+		// zone->FloorArea = 100;
+		// zone->ExtGrossWallArea = 150;
+		// zone->ExtNetWallArea = 144.6;
+		// zone->ExtWindowArea = 5.4;
+
+		std::map<int, DataHeatBalance::ZoneData> zones;
+		zones.insert(std::map<int, DataHeatBalance::ZoneData>::value_type(1, *zone));
+
+		sqlite_test->sqliteBegin();
+		createSQLiteZoneTable( zones );
+		sqlite_test->createSQLiteDaylightMapTitle( 1, "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", 1, "RefPt1=(2.50:2.00:0.80)", "RefPt2=(2.50:18.00:0.80)", 0.8 );
+		sqlite_test->addSQLiteComponentSizingRecord( "Coil:Heating:Electric", "CORE_BOTTOM VAV BOX REHEAT COIL", "Design Size Nominal Capacity", 38689.18 );
+		auto result = queryResult("SELECT * FROM ComponentSizes;", "ComponentSizes");
+		sqlite_test->sqliteCommit();
+
+	}
 
 	// void createSQLiteTabularDataRecords(
 	// 	FArray2D_string const & body, // row,column

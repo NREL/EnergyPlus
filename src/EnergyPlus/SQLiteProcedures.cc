@@ -35,7 +35,7 @@ const int SQLite::UnitsId             =  6;
 
 std::unique_ptr<SQLite> sqlite;
 
-void CreateSQLiteDatabase() {
+std::unique_ptr<SQLite> CreateSQLiteDatabase() {
 	try 
 	{
 		int numberOfSQLiteObjects = InputProcessor::GetNumObjectsFound("Output:SQLite");
@@ -62,9 +62,10 @@ void CreateSQLiteDatabase() {
 		}
 		std::ofstream errorStream;
 		errorStream.open("sqlite.err", std::ofstream::out | std::ofstream::trunc);
-		EnergyPlus::sqlite = std::unique_ptr<SQLite>(new SQLite( errorStream, writeOutputToSQLite, writeTabularDataToSQLite ));
+		return std::unique_ptr<SQLite>(new SQLite( errorStream, writeOutputToSQLite, writeTabularDataToSQLite ));
 	} catch( const std::runtime_error& error ) {
 		ShowFatalError(error.what());
+		return nullptr;
 	}
 }
 
@@ -2099,7 +2100,7 @@ void SQLite::updateSQLiteSimulationRecord( bool const completed, bool const comp
 	}
 }
 
-void SQLite::createSQLiteZoneTable()
+void SQLite::createSQLiteZoneTable( std::map<int, DataHeatBalance::ZoneData> const & zones )
 {
 	for( int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
 		auto const & zoneHB = DataHeatBalance::Zone(zoneNum);
@@ -2480,7 +2481,11 @@ void SQLite::createSQLiteSchedulesTable()
 void SQLite::createZoneExtendedOutput()
 {
 	if( m_writeOutputToSQLite ) {
-		createSQLiteZoneTable();
+		std::map<int, DataHeatBalance::ZoneData> zones;
+		for( int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+			zones.insert(std::map<int, DataHeatBalance::ZoneData>::value_type(zoneNum, DataHeatBalance::Zone(zoneNum)));
+		}
+		createSQLiteZoneTable( zones );
 		createSQLiteZoneListTable();
 		createSQLiteZoneGroupTable();
 		createSQLiteSchedulesTable();
@@ -2512,6 +2517,18 @@ void SQLite::createSQLiteEnvironmentPeriodRecord( const int curEnvirNum, const s
 		sqliteStepCommand(m_environmentPeriodInsertStmt);
 		sqliteResetCommand(m_environmentPeriodInsertStmt);
 	}
+}
+
+bool SQLite::Schedule::insertIntoSQLite() {
+	sqliteBindInteger(m_scheduleInsertStmt, 1, number);
+	sqliteBindText(m_scheduleInsertStmt, 2, name);
+	sqliteBindText(m_scheduleInsertStmt, 3, type);
+	sqliteBindDouble(m_scheduleInsertStmt, 4, minValue);
+	sqliteBindDouble(m_scheduleInsertStmt, 5, maxValue);
+
+	sqliteStepCommand(m_scheduleInsertStmt);
+	sqliteResetCommand(m_scheduleInsertStmt);
+	return true;
 }
 
 namespace SQLiteProcedures {

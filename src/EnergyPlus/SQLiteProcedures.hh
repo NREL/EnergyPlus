@@ -8,22 +8,131 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
+#include "DataHeatBalance.hh"
 
 #include <sqlite3.h>
 
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <map>
 
 namespace EnergyPlus {
-
-	void CreateSQLiteDatabase();
 
 class SQLite {
 public:
 	// Friend SQLiteFixture which is the gtest fixture class for testing SQLite
 	// This allows for testing of private methods in SQLite
 	friend class SQLiteFixture;
+
+	class SQLiteData
+	{
+		public:
+			SQLiteData() {};
+
+		protected:
+			virtual bool insertIntoSQLite() = 0;
+	};
+
+	class Schedule : SQLiteData
+	{
+		public:
+			Schedule( int & scheduleNumber, std::string & scheduleName, std::string & scheduleType, double & scheduleMinValue, double & scheduleMaxValue ) :
+				number(& scheduleNumber),
+				name(& scheduleName),
+				type(& scheduleType),
+				minValue(& scheduleMinValue),
+				maxValue(& scheduleMaxValue)
+			{}
+
+		protected:
+			virtual bool insertIntoSQLite();
+
+		private:
+			int * const number;
+			std::string * const name;
+			std::string * const type;
+			double * const minValue;
+			double * const maxValue;
+	};
+
+	class Zone : SQLiteData
+	{
+		public:
+			Zone( int & zoneNumber, DataHeatBalance::ZoneData & zoneData ) :
+				number( & zoneNumber ),
+				name( & zoneData.Name ),
+				relNorth( & zoneData.RelNorth ),
+				originX( & zoneData.OriginX ),
+				originY( & zoneData.OriginY ),
+				originZ( & zoneData.OriginZ ),
+				centroidX( & zoneData.Centroid.x ),
+				centroidY( & zoneData.Centroid.y ),
+				centroidZ( & zoneData.Centroid.z ),
+				ofType( & zoneData.OfType ),
+				multiplier( & zoneData.Multiplier ),
+				listMultiplier( & zoneData.ListMultiplier ),
+				minimumX( & zoneData.MinimumX ),
+				maximumX( & zoneData.MaximumX ),
+				minimumY( & zoneData.MinimumY ),
+				maximumY( & zoneData.MaximumY ),
+				minimumZ( & zoneData.MinimumZ ),
+				maximumZ( & zoneData.MaximumZ ),
+				ceilingHeight( & zoneData.CeilingHeight ),
+				volume( & zoneData.Volume ),
+				insideConvectionAlgo( & zoneData.InsideConvectionAlgo ),
+				outsideConvectionAlgo( & zoneData.OutsideConvectionAlgo ),
+				floorArea( & zoneData.FloorArea ),
+				extGrossWallArea( & zoneData.ExtGrossWallArea ),
+				extNetWallArea( & zoneData.ExtNetWallArea ),
+				extWindowArea( & zoneData.ExtWindowArea ),
+				isPartOfTotalArea( & zoneData.isPartOfTotalArea )
+			{}
+
+		protected:
+			virtual bool insertIntoSQLite();
+
+		private:
+			int * const number;
+			std::string * const name;
+			double * const relNorth;
+			double * const originX;
+			double * const originY;
+			double * const originZ;
+			double * const centroidX;
+			double * const centroidY;
+			double * const centroidZ;
+			int * const ofType;
+			int * const multiplier;
+			int * const listMultiplier;
+			double * const minimumX;
+			double * const maximumX;
+			double * const minimumY;
+			double * const maximumY;
+			double * const minimumZ;
+			double * const maximumZ;
+			double * const ceilingHeight;
+			double * const volume;
+			int * const insideConvectionAlgo;
+			int * const outsideConvectionAlgo;
+			double * const floorArea;
+			double * const extGrossWallArea;
+			double * const extNetWallArea;
+			double * const extWindowArea;
+			bool * const isPartOfTotalArea;
+	};
+
+	// static enum class ZoneExtendedOutput { ZoneTable, ZoneListTable, ZoneGroupTable, SchedulesTable, MaterialsTable, ConstructionTable, 
+	// 	SurfacesTable, NominalLightingTable, NominalPeopleTable, NominalElectricEquipmentTable, NominalGasEquipmentTable, 
+	// 	NominalHotWaterEquipmentTable, NominalOtherEquipmentTable, NominalBaseboardHeatTable, InfiltrationTable, VentilationTable, 
+	// 	RoomAirModelTable };
+
+	// typedef std::tuple< std::map<int, DataHeatBalance::ZoneData>, std::map<int, DataHeatBalance::ZoneList>, std::map<int, DataHeatBalance::ZoneGroup>, 
+	// std::map<int, std::tuple<std::string, std::string, double, double> >, std::map<int, DataHeatBalance::Material>, std::map<int, DataHeatBalance::ZoneData>, 
+	// std::map<int, DataHeatBalance::ZoneData>, 
+	// std::map<int, DataHeatBalance::ZoneData>, std::map<int, DataHeatBalance::ZoneData>, std::map<int, DataHeatBalance::ZoneData>, std::map<int, DataHeatBalance::ZoneData>, 
+	// std::map<int, DataHeatBalance::ZoneData>, std::map<int, DataHeatBalance::ZoneData>, std::map<int, DataHeatBalance::ZoneData>, std::map<int, DataHeatBalance::ZoneData>, 
+	// std::map<int, DataHeatBalance::ZoneData>, std::map<int, DataHeatBalance::ZoneData>, std::map<int, DataHeatBalance::ZoneData> > ZoneExtendedOutput;
 
 	// Open the DB and prepare for writing data
 	// Create all of the tables on construction
@@ -163,7 +272,7 @@ public:
 
 private:
 
-	void createSQLiteZoneTable();
+	void createSQLiteZoneTable( std::map<int, DataHeatBalance::ZoneData> const & zones );
 	void createSQLiteNominalLightingTable();
 	void createSQLiteNominalPeopleTable();
 	void createSQLiteNominalElectricEquipmentTable();
@@ -307,6 +416,8 @@ private:
 };
 
 extern std::unique_ptr<SQLite> sqlite;
+
+std::unique_ptr<SQLite> CreateSQLiteDatabase();
 
 } // EnergyPlus
 

@@ -262,7 +262,7 @@ namespace SimulationManager {
 		static gio::Fmt Format_700( "('Environment:WarmupDays,',I3)" );
 
 		//CreateSQLiteDatabase();
-		EnergyPlus::CreateSQLiteDatabase();
+		sqlite = EnergyPlus::CreateSQLiteDatabase();
 
 		if ( sqlite->writeOutputToSQLite() ) {
 			sqlite->sqliteBegin();
