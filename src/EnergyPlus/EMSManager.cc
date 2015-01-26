@@ -1142,7 +1142,7 @@ namespace EMSManager {
 					if ( OutputEDDFile ) {
 						ShowContinueError( "Review edd file for valid component control types." );
 					} else {
-						ShowContinueError( "Use Output:EnergyManagementSystem object to create " ".edd file for valid component control types." );
+						ShowContinueError( "Use Output:EnergyManagementSystem object to create .edd file for valid component control types." );
 					}
 					ErrorsFound = true;
 				}

@@ -2031,7 +2031,7 @@ TestReturnAirPathIntegrity(
 		for ( Count1 = 1; Count1 <= NumMixers; ++Count1 ) {
 			if ( FoundZoneMixer( Count1 ) ) continue;
 			ShowSevereError( "AirLoopHVAC:ZoneMixer=\"" + MixerCond( Count1 ).MixerName + "\", not found on any AirLoopHVAC:ReturnPath, AirTerminal:SingleDuct:SeriesPIU:Reheat," );
-			ShowContinueError( "AirTerminal:SingleDuct:ParallelPIU:Reheat or " "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction." );
+			ShowContinueError( "AirTerminal:SingleDuct:ParallelPIU:Reheat or AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction." );
 			//      ErrFound=.TRUE.
 		}
 	}

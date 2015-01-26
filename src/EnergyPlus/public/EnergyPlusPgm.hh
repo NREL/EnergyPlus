@@ -12,12 +12,12 @@
 	CreateCurrentDateTimeString( std::string & CurrentDateTimeString );
 
 	void ENERGYPLUSLIB_API
-	EnergyPlusPgm( std::string filepath = std::string() );
+	EnergyPlusPgm( std::string const & filepath = std::string() );
 
 	void ENERGYPLUSLIB_API
-	StoreProgressCallback( void ( *f )( int ) );
+	StoreProgressCallback( void ( *f )( int const ) );
 
 	void ENERGYPLUSLIB_API
-	StoreMessageCallback( void ( *f )( std::string ) );
+	StoreMessageCallback( void ( *f )( std::string const & ) );
 
 #endif

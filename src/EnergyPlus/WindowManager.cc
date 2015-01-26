@@ -2927,7 +2927,7 @@ namespace WindowManager {
 				hr( i ) = emis( i ) * sigma * pow_3( thetas( i ) );
 				// Following line is redundant since thetas is being relaxed;
 				// removed by FCW, 3/4/03
-				//!fw if(iter >= 1) hr(i) = 0.5*(hrprev(i)+hr(i))
+				//!fw if ( iter >= 1 ) hr(i) = 0.5*(hrprev(i)+hr(i))
 				hrprev( i ) = hr( i );
 			}
 
@@ -6793,7 +6793,7 @@ namespace WindowManager {
 		while ( iter < MaxIterations && errtemp > errtemptol ) {
 			for ( i = 1; i <= nglface; ++i ) {
 				hr( i ) = emis( i ) * sigma * pow_3( thetas( i ) );
-				//!fw 3/4/03 if(iter >= 1) hr(i) = 0.5*(hrprev(i)+hr(i))
+				//!fw 3/4/03 if ( iter >= 1 ) hr(i) = 0.5*(hrprev(i)+hr(i))
 				hrprev( i ) = hr( i );
 			}
 

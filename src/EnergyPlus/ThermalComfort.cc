@@ -1734,7 +1734,7 @@ namespace ThermalComfort {
 			AngleFactorList( Item ).ZoneName = cAlphaArgs( 2 );
 			AngleFactorList( Item ).ZonePtr = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
 			if ( AngleFactorList( Item ).ZonePtr == 0 ) {
-				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " "invalid - not found" );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid - not found" );
 				ShowContinueError( "...invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 				ErrorsFound = true;
 			}

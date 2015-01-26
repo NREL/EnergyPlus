@@ -688,7 +688,7 @@ namespace InternalHeatGains {
 									if ( SchMax > 1.0 ) {
 										if ( Item1 == 1 ) {
 											ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 9 ) + ", maximum is > 1.0" );
-											ShowContinueError( "Schedule=\"" + AlphaName( 9 ) + "\"; " "Entered min/max range=[" + RoundSigDigits( SchMin, 1 ) + ',' + RoundSigDigits( SchMax, 1 ) + "] Work Efficiency." );
+											ShowContinueError( "Schedule=\"" + AlphaName( 9 ) + "\"; Entered min/max range=[" + RoundSigDigits( SchMin, 1 ) + ',' + RoundSigDigits( SchMax, 1 ) + "] Work Efficiency." );
 										}
 									}
 								}
@@ -731,7 +731,7 @@ namespace InternalHeatGains {
 										if ( SchMax > 2.0 ) {
 											if ( Item1 == 1 ) {
 												ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", " + cAlphaFieldNames( 12 ) + ", maximum is > 2.0" );
-												ShowContinueError( "Schedule=\"" + AlphaName( 12 ) + "\"; " "Entered min/max range=[" + RoundSigDigits( SchMin, 1 ) + ',' + RoundSigDigits( SchMax, 1 ) + "] Clothing." );
+												ShowContinueError( "Schedule=\"" + AlphaName( 12 ) + "\"; Entered min/max range=[" + RoundSigDigits( SchMin, 1 ) + ',' + RoundSigDigits( SchMax, 1 ) + "] Clothing." );
 											}
 										}
 									}
@@ -760,7 +760,7 @@ namespace InternalHeatGains {
 
 								} else {
 									ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + People( Loop ).Name + "\", invalid " + cAlphaFieldNames( 10 ) + ", value  =" + AlphaName( 10 ) );
-									ShowContinueError( "...Valid values are \"ClothingInsulationSchedule\"," "\"DynamicClothingModelASHRAE55a\", \"CalculationMethodSchedule\"." );
+									ShowContinueError( "...Valid values are \"ClothingInsulationSchedule\",\"DynamicClothingModelASHRAE55a\", \"CalculationMethodSchedule\"." );
 									ErrorsFound = true;
 								}}
 							}
@@ -2754,10 +2754,10 @@ namespace InternalHeatGains {
 			}
 		}
 		for ( Loop = 1; Loop <= TotPeople; ++Loop ) {
-			if ( Loop == 1 ) { IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_723, flags ) << "People" << "Number of People {}," "People/Floor Area {person/m2},Floor Area per person {m2/person}," "Fraction Radiant,Fraction Convected,Sensible Fraction Calculation,Activity level," "ASHRAE 55 Warnings,Carbon Dioxide Generation Rate,Nominal Minimum Number of People,Nominal Maximum Number of People"; };
+			if ( Loop == 1 ) { IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_723, flags ) << "People" << "Number of People {},People/Floor Area {person/m2},Floor Area per person {m2/person},Fraction Radiant,Fraction Convected,Sensible Fraction Calculation,Activity level,ASHRAE 55 Warnings,Carbon Dioxide Generation Rate,Nominal Minimum Number of People,Nominal Maximum Number of People"; };
 			if ( Loop == 1 ) {
 				if ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) {
-					gio::write( OutputFileInits, fmtA ) << ",MRT Calculation Type,Work Efficiency, Clothing Insulation Calculation Method," "Clothing Insulation Calculation Method Schedule,Clothing,Air Velocity,Fanger Calculation,Pierce Calculation," "KSU Calculation";
+					gio::write( OutputFileInits, fmtA ) << ",MRT Calculation Type,Work Efficiency, Clothing Insulation Calculation Method,Clothing Insulation Calculation Method Schedule,Clothing,Air Velocity,Fanger Calculation,Pierce Calculation,KSU Calculation";
 				} else {
 					gio::write( OutputFileInits );
 				}
@@ -2868,7 +2868,7 @@ namespace InternalHeatGains {
 			}
 		}
 		for ( Loop = 1; Loop <= TotLights; ++Loop ) {
-			if ( Loop == 1 ) gio::write( OutputFileInits, Format_723 ) << "Lights" << "Lighting Level {W}," "Lights/Floor Area {W/m2},Lights per person {W/person}," "Fraction Return Air,Fraction Radiant,Fraction Short Wave,Fraction Convected,Fraction Replaceable,End-Use Category," "Nominal Minimum Lighting Level {W},Nominal Maximum Lighting Level {W}";
+			if ( Loop == 1 ) gio::write( OutputFileInits, Format_723 ) << "Lights" << "Lighting Level {W},Lights/Floor Area {W/m2},Lights per person {W/person},Fraction Return Air,Fraction Radiant,Fraction Short Wave,Fraction Convected,Fraction Replaceable,End-Use Category,Nominal Minimum Lighting Level {W},Nominal Maximum Lighting Level {W}";
 
 			ZoneNum = Lights( Loop ).ZonePtr;
 
@@ -2909,7 +2909,7 @@ namespace InternalHeatGains {
 			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 		for ( Loop = 1; Loop <= TotElecEquip; ++Loop ) {
-			if ( Loop == 1 ) gio::write( OutputFileInits, Format_723 ) << "ElectricEquipment" << "Equipment Level {W}," "Equipment/Floor Area {W/m2},Equipment per person {W/person}," "Fraction Latent,Fraction Radiant,Fraction Lost,Fraction Convected,End-Use SubCategory," "Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
+			if ( Loop == 1 ) gio::write( OutputFileInits, Format_723 ) << "ElectricEquipment" << "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
 
 			ZoneNum = ZoneElectric( Loop ).ZonePtr;
 
@@ -2948,7 +2948,7 @@ namespace InternalHeatGains {
 			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 		for ( Loop = 1; Loop <= TotGasEquip; ++Loop ) {
-			if ( Loop == 1 ) gio::write( OutputFileInits, Format_723 ) << "GasEquipment" << "Equipment Level {W}," "Equipment/Floor Area {W/m2},Equipment per person {W/person}," "Fraction Latent,Fraction Radiant,Fraction Lost,Fraction Convected,End-Use SubCategory," "Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
+			if ( Loop == 1 ) gio::write( OutputFileInits, Format_723 ) << "GasEquipment" << "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
 
 			ZoneNum = ZoneGas( Loop ).ZonePtr;
 
@@ -2989,7 +2989,7 @@ namespace InternalHeatGains {
 		}
 
 		for ( Loop = 1; Loop <= TotHWEquip; ++Loop ) {
-			if ( Loop == 1 ) gio::write( OutputFileInits, Format_723 ) << "HotWaterEquipment" << "Equipment Level {W}," "Equipment/Floor Area {W/m2},Equipment per person {W/person}," "Fraction Latent,Fraction Radiant,Fraction Lost,Fraction Convected,End-Use SubCategory," "Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
+			if ( Loop == 1 ) gio::write( OutputFileInits, Format_723 ) << "HotWaterEquipment" << "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
 
 			ZoneNum = ZoneHWEq( Loop ).ZonePtr;
 
@@ -3030,7 +3030,7 @@ namespace InternalHeatGains {
 		}
 
 		for ( Loop = 1; Loop <= TotStmEquip; ++Loop ) {
-			if ( Loop == 1 ) gio::write( OutputFileInits, Format_723 ) << "SteamEquipment" << "Equipment Level {W}," "Equipment/Floor Area {W/m2},Equipment per person {W/person}," "Fraction Latent,Fraction Radiant,Fraction Lost,Fraction Convected,End-Use SubCategory," "Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
+			if ( Loop == 1 ) gio::write( OutputFileInits, Format_723 ) << "SteamEquipment" << "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
 
 			ZoneNum = ZoneSteamEq( Loop ).ZonePtr;
 
@@ -3071,7 +3071,7 @@ namespace InternalHeatGains {
 		}
 
 		for ( Loop = 1; Loop <= TotOthEquip; ++Loop ) {
-			if ( Loop == 1 ) gio::write( OutputFileInits, Format_723 ) << "OtherEquipment" << "Equipment Level {W}," "Equipment/Floor Area {W/m2},Equipment per person {W/person}," "Fraction Latent,Fraction Radiant,Fraction Lost,Fraction Convected," "Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
+			if ( Loop == 1 ) gio::write( OutputFileInits, Format_723 ) << "OtherEquipment" << "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction Lost,Fraction Convected,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
 			ZoneNum = ZoneOtherEq( Loop ).ZonePtr;
 
 			if ( ZoneNum == 0 ) {
@@ -3147,7 +3147,7 @@ namespace InternalHeatGains {
 		}
 
 		for ( Loop = 1; Loop <= TotBBHeat; ++Loop ) {
-			if ( Loop == 1 ) gio::write( OutputFileInits, Format_723 ) << "Outdoor Controlled Baseboard Heat" << "Capacity at Low Temperature {W}," "Low Temperature {C},Capacity at High Temperature {W},High Temperature {C}," "Fraction Radiant,Fraction Convected,End-Use Subcategory";
+			if ( Loop == 1 ) gio::write( OutputFileInits, Format_723 ) << "Outdoor Controlled Baseboard Heat" << "Capacity at Low Temperature {W},Low Temperature {C},Capacity at High Temperature {W},High Temperature {C},Fraction Radiant,Fraction Convected,End-Use Subcategory";
 
 			ZoneNum = ZoneBBHeat( Loop ).ZonePtr;
 
@@ -4342,7 +4342,7 @@ namespace InternalHeatGains {
 			LightsRepMax = max( LightsRepMax, Lights( Loop ).FractionReplaceable );
 			++NumLights;
 			if ( ( ZoneDaylight( Lights( Loop ).ZonePtr ).DaylightType == DetailedDaylighting || ZoneDaylight( Lights( Loop ).ZonePtr ).DaylightType == DElightDaylighting ) && ( Lights( Loop ).FractionReplaceable > 0.0 && Lights( Loop ).FractionReplaceable < 1.0 ) ) {
-				ShowWarningError( "CheckLightsReplaceableMinMaxForZone: " "Fraction Replaceable must be 0.0 or 1.0 if used with daylighting." );
+				ShowWarningError( "CheckLightsReplaceableMinMaxForZone: Fraction Replaceable must be 0.0 or 1.0 if used with daylighting." );
 				ShowContinueError( "..Lights=\"" + Lights( Loop ).Name + "\", Fraction Replaceable will be reset to 1.0 to allow dimming controls" );
 				ShowContinueError( "..in Zone=" + Zone( WhichZone ).Name );
 				Lights( Loop ).FractionReplaceable = 1.0;

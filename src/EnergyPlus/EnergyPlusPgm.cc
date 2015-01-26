@@ -43,8 +43,8 @@
  #include <unistd.h>
 #endif
 
-void 
-EnergyPlusPgm( std::string filepath )
+void
+EnergyPlusPgm( std::string const & filepath )
 {
 	// Using/Aliasing
 	using namespace EnergyPlus;
@@ -248,7 +248,7 @@ EnergyPlusPgm( std::string filepath )
 	// Locals
 	// PROGRAM PARAMETER DEFINITIONS:
 	// Note: General Parameters for the entire EnergyPlus program are contained
-	// in "DataGlobals.f90"
+	// in "DataGlobals.cc"
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -352,18 +352,18 @@ EnergyPlusPgm( std::string filepath )
 		// if filepath is not empty, then we are using E+ as a library API call
 		// change the directory to the specified folder, and pass in dummy args to command line parser
 		// this will initialize the paths throughout E+ to the defaults
+		DisplayString( "EnergyPlus Library: Changing directory to: " + filepath );
 #ifdef _WIN32
 		int status = _chdir( filepath.c_str() );
 #else
-		DisplayString( "EnergyPlus Library: Changing directory to: " + filepath );
 		int status = chdir( filepath.c_str() );
+#endif
 		if ( status == 0 ) {
 			DisplayString( "Directory change successful." );
 		} else {
 			DisplayString( "Couldn't change directory; aborting EnergyPlus" );
 			exit(EXIT_FAILURE);
 		}
-#endif
 		ProgramPath = filepath + pathChar;
 		int dummy_argc = 0;
 		const char * dummy_argv[] = { NULL };
@@ -451,12 +451,12 @@ EnergyPlusPgm( std::string filepath )
 	EndEnergyPlus();
 }
 
-void StoreProgressCallback(void(*f)(int))
+void StoreProgressCallback( void(*f)( int const ) )
 {
 	using namespace EnergyPlus::DataGlobals;
 	fProgressPtr = f;
 }
-void StoreMessageCallback(void(*f)(std::string))
+void StoreMessageCallback( void(*f)( std::string const & ) )
 {
 	using namespace EnergyPlus::DataGlobals;
 	fMessagePtr = f;

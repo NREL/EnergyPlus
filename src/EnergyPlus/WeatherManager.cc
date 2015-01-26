@@ -579,7 +579,7 @@ namespace WeatherManager {
 					MaxNumberSimYears = max( MaxNumberSimYears, Environment( Loop ).NumSimYears );
 				}
 			}
-			DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays ); 
+			DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays );
 		}
 
 		CloseWeatherFile(); // will only close if opened.
@@ -685,7 +685,7 @@ namespace WeatherManager {
 								RunStJDay = DataPeriods( Loop ).DataStJDay;
 								RunEnJDay = DataPeriods( Loop ).DataEnJDay;
 								if ( ! DataPeriods( Loop ).HasYearData ) {
-									ShowSevereError( "GetNextEnvironment: Runperiod:CustomRange has been entered but weatherfile " " DATA PERIOD does not have year included in start/end date." );
+									ShowSevereError( "GetNextEnvironment: Runperiod:CustomRange has been entered but weatherfile DATA PERIOD does not have year included in start/end date." );
 									ShowContinueError( "...to match the RunPeriod, the DATA PERIOD should be mm/dd/yyyy for both." );
 								}
 								if ( ! BetweenDates( Environment( Envrn ).StartDate, RunStJDay, RunEnJDay ) ) continue;
@@ -818,7 +818,7 @@ namespace WeatherManager {
 										ErrorsFound = true;
 									}
 									if ( NumIntervalsPerHour != 1 ) {
-										ShowSevereError( RoutineName + "AdaptiveComfort Reporting does not work correctly with weather files " "that have multiple interval records per hour." );
+										ShowSevereError( RoutineName + "AdaptiveComfort Reporting does not work correctly with weather files that have multiple interval records per hour." );
 										ErrorsFound = true;
 									}
 								}
@@ -2559,7 +2559,7 @@ namespace WeatherManager {
 								InterpretWeatherDataLine( WeatherDataLine, ErrorFound, WYear, WMonth, WDay, WHour, WMinute, DryBulb, DewPoint, RelHum, AtmPress, ETHoriz, ETDirect, IRHoriz, GLBHoriz, DirectRad, DiffuseRad, GLBHorizIllum, DirectNrmIllum, DiffuseHorizIllum, ZenLum, WindDir, WindSpeed, TotalSkyCover, OpaqueSkyCover, Visibility, CeilHeight, PresWeathObs, PresWeathConds, PrecipWater, AerosolOptDepth, SnowDepth, DaysSinceLastSnow, Albedo, LiquidPrecip );
 							} else {
 								BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
-								ShowFatalError( "End-of-File encountered after " + BadRecord + ", starting from first day of " "Weather File would not be \"next day\"" );
+								ShowFatalError( "End-of-File encountered after " + BadRecord + ", starting from first day of Weather File would not be \"next day\"" );
 							}
 						} else {
 							BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
@@ -2620,7 +2620,7 @@ namespace WeatherManager {
 							TryAgain = true;
 							ShowWarningError( "ReadEPlusWeatherForDay: Feb29 data encountered but will not be processed." );
 							if ( ! WFAllowsLeapYears ) {
-								ShowContinueError( "...WeatherFile does not allow Leap Years. " "HOLIDAYS/DAYLIGHT SAVINGS header must indicate \"Yes\"." );
+								ShowContinueError( "...WeatherFile does not allow Leap Years. HOLIDAYS/DAYLIGHT SAVINGS header must indicate \"Yes\"." );
 							}
 							continue;
 						} else if ( WMonth == 2 && WDay == 29 && CurrentYearIsLeapYear && WFAllowsLeapYears ) {
@@ -4489,7 +4489,7 @@ Label9997: ;
 		ShowFatalError( "Program terminates due to previous condition." );
 
 Label9998: ;
-		ShowFatalError( "OpenWeatherFile: Unexpected End-of-File on EPW Weather file, " "while reading header information, looking for header=" + Header( HdLine ), OutputFileStandard );
+		ShowFatalError( "OpenWeatherFile: Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" + Header( HdLine ), OutputFileStandard );
 
 Label9999: ;
 		ShowFatalError( "OpenWeatherFile: Could not OPEN EPW Weather File", OutputFileStandard );
@@ -4593,7 +4593,7 @@ Label9999: ;
 					ShowContinueError( "..Location object=" + LocationTitle );
 					ShowContinueError( "..Weather File Location=" + WeatherFileLocationTitle );
 					ShowContinueError( "..due to location differences, Latitude difference=[" + RoundSigDigits( std::abs( Latitude - WeatherFileLatitude ), 2 ) + "] degrees, Longitude difference=[" + RoundSigDigits( std::abs( Longitude - WeatherFileLongitude ), 2 ) + "] degrees." );
-					ShowContinueError( "..Time Zone difference=[" + RoundSigDigits( std::abs( TimeZoneNumber - WeatherFileTimeZone ), 1 ) + "] hour(s), Elevation difference=[" + RoundSigDigits( std::abs( ( Elevation - WeatherFileElevation ) / max( Elevation, 1.0 ) ) * 100.0, 2 ) + "] percent," " [" + RoundSigDigits( std::abs( Elevation - WeatherFileElevation ), 2 ) + "] meters." );
+					ShowContinueError( "..Time Zone difference=[" + RoundSigDigits( std::abs( TimeZoneNumber - WeatherFileTimeZone ), 1 ) + "] hour(s), Elevation difference=[" + RoundSigDigits( std::abs( ( Elevation - WeatherFileElevation ) / max( Elevation, 1.0 ) ) * 100.0, 2 ) + "] percent, [" + RoundSigDigits( std::abs( Elevation - WeatherFileElevation ), 2 ) + "] meters." );
 				}
 			}
 
@@ -4705,10 +4705,10 @@ Label9999: ;
 				DiffCalc = std::abs( TimeZoneNumber - StdTimeMerid );
 				if ( DiffCalc > 1.0 && DiffCalc < 24.0 ) {
 					if ( DiffCalc < 3.0 ) {
-						ShowWarningError( "Standard Time Meridian and Time Zone differ by more than 1, " "Difference=\"" + RoundSigDigits( DiffCalc, 1 ) + "\"" );
+						ShowWarningError( "Standard Time Meridian and Time Zone differ by more than 1, Difference=\"" + RoundSigDigits( DiffCalc, 1 ) + "\"" );
 						ShowContinueError( "Solar Positions may be incorrect" );
 					} else {
-						ShowSevereError( "Standard Time Meridian and Time Zone differ by more than 2, " "Difference=\"" + RoundSigDigits( DiffCalc, 1 ) + "\"" );
+						ShowSevereError( "Standard Time Meridian and Time Zone differ by more than 2, Difference=\"" + RoundSigDigits( DiffCalc, 1 ) + "\"" );
 						ShowContinueError( "Solar Positions will be incorrect" );
 						//          LocationError=.TRUE.
 					}
@@ -4735,7 +4735,7 @@ Label9999: ;
 		CosLatitude = std::cos( DegToRadians * Latitude );
 
 		if ( Latitude == 0.0 && Longitude == 0.0 && TimeZoneNumber == 0.0 ) {
-			ShowWarningError( "Did you realize that you have Latitude=0.0, Longitude=0.0 and TimeZone=0.0?" "  Your building site is in the middle of the Atlantic Ocean." );
+			ShowWarningError( "Did you realize that you have Latitude=0.0, Longitude=0.0 and TimeZone=0.0?  Your building site is in the middle of the Atlantic Ocean." );
 		}
 
 	}
@@ -4847,11 +4847,11 @@ Label9999: ;
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// Format descriptor for the environment title
-		static gio::Fmt EnvironmentFormat( "(a,',5,Environment Title[],Latitude[deg]," "Longitude[deg],Time Zone[],Elevation[m]')" );
-		static gio::Fmt TimeStepFormat( "(a,',6,Day of Simulation[],Month[],Day of Month[]," "DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType')" );
-		static gio::Fmt DailyFormat( "(a,',3,Cumulative Day of Simulation[],Month[],Day of Month[]," "DST Indicator[1=yes 0=no],DayType  ! When Daily ',A,' Requested')" );
-		static gio::Fmt MonthlyFormat( "(a,',2,Cumulative Days of Simulation[],Month[]" "  ! When Monthly ',A,' Requested')" );
-		static gio::Fmt RunPeriodFormat( "(a,',1,Cumulative Days of Simulation[]" " ! When Run Period ',A,' Requested')" );
+		static gio::Fmt EnvironmentFormat( "(a,',5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]')" );
+		static gio::Fmt TimeStepFormat( "(a,',6,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType')" );
+		static gio::Fmt DailyFormat( "(a,',3,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily ',A,' Requested')" );
+		static gio::Fmt MonthlyFormat( "(a,',2,Cumulative Days of Simulation[],Month[]  ! When Monthly ',A,' Requested')" );
+		static gio::Fmt RunPeriodFormat( "(a,',1,Cumulative Days of Simulation[] ! When Run Period ',A,' Requested')" );
 
 		// FLOW:
 
@@ -6770,7 +6770,7 @@ Label9999: ;
 			if ( DesDayInput( EnvrnNum ).DayType == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + DesDayInput( EnvrnNum ).Title + "\", invalid data." );
 				ShowContinueError( "..invalid field: " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
-				ShowContinueError( "Valid values are Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday," "Holiday,SummerDesignDay,WinterDesignDay,CustomDay1,CustomDay2." );
+				ShowContinueError( "Valid values are Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Holiday,SummerDesignDay,WinterDesignDay,CustomDay1,CustomDay2." );
 				ErrorsFound = true;
 			}
 
@@ -7023,7 +7023,7 @@ Label9999: ;
 				units = "[deltaC]";
 			} else {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + '.' );
-				ShowContinueError( "...entered value=\"" + cAlphaArgs( 2 ) + "\", should be one of: " "ScheduleValue, DifferenceScheduleDryBulbValue, DifferenceScheduleDewPointValue." );
+				ShowContinueError( "...entered value=\"" + cAlphaArgs( 2 ) + "\", should be one of: ScheduleValue, DifferenceScheduleDryBulbValue, DifferenceScheduleDewPointValue." );
 				ErrorsFound = true;
 			}
 
@@ -7035,7 +7035,7 @@ Label9999: ;
 				if ( Found == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + '.' );
 					ShowContinueError( "...Entered name=\"" + cAlphaArgs( 3 ) + "\"." );
-					ShowContinueError( "...Should be a full year schedule (\"Schedule:Year\", \"Schedule:Compact\"," " \"Schedule:File\", or \"Schedule:Constant\" objects." );
+					ShowContinueError( "...Should be a full year schedule (\"Schedule:Year\", \"Schedule:Compact\", \"Schedule:File\", or \"Schedule:Constant\" objects." );
 					ErrorsFound = true;
 				} else {
 					WPSkyTemperature( Item ).IsSchedule = true;
@@ -7046,7 +7046,7 @@ Label9999: ;
 				if ( Found == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + '.' );
 					ShowContinueError( "...Entered name=\"" + cAlphaArgs( 3 ) + "\"." );
-					ShowContinueError( "...Should be a single day schedule (\"Schedule:Day:Hourly\"," " \"Schedule:Day:Interval\", or \"Schedule:Day:List\" objects." );
+					ShowContinueError( "...Should be a single day schedule (\"Schedule:Day:Hourly\", \"Schedule:Day:Interval\", or \"Schedule:Day:List\" objects." );
 					ErrorsFound = true;
 				} else {
 					if ( envFound != 0 ) {
@@ -7639,7 +7639,7 @@ Label9999: ;
 		WeatherFileTempModCoeff = AtmosphericTempGradient * EarthRadius * WeatherFileTempSensorHeight / ( EarthRadius + WeatherFileTempSensorHeight );
 
 		// Write to the initialization output file
-		gio::write( OutputFileInits, fmtA ) << "! <Environment:Weather Station>,Wind Sensor Height Above Ground {m}," "Wind Speed Profile Exponent {},Wind Speed Profile Boundary Layer Thickness {m}," "Air Temperature Sensor Height Above Ground {m},Wind Speed Modifier Coefficient [Internal]," "Temperature Modifier Coefficient [Internal]";
+		gio::write( OutputFileInits, fmtA ) << "! <Environment:Weather Station>,Wind Sensor Height Above Ground {m},Wind Speed Profile Exponent {},Wind Speed Profile Boundary Layer Thickness {m},Air Temperature Sensor Height Above Ground {m},Wind Speed Modifier Coefficient [Internal],Temperature Modifier Coefficient [Internal]";
 
 		gio::write( OutputFileInits, Format_720 ) << RoundSigDigits( WeatherFileWindSensorHeight, 3 ) << RoundSigDigits( WeatherFileWindExp, 3 ) << RoundSigDigits( WeatherFileWindBLHeight, 3 ) << RoundSigDigits( WeatherFileTempSensorHeight, 3 ) << RoundSigDigits( WeatherFileWindModCoeff, 3 ) << RoundSigDigits( WeatherFileTempModCoeff, 3 );
 

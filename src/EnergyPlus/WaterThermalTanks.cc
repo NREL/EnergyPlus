@@ -1082,7 +1082,7 @@ namespace WaterThermalTanks {
 					} else {
 						ShowSevereError( cCurrentModuleObject + " = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ':' );
 						ShowContinueError( " desuperheater can only be used with Coil:Cooling:DX:SingleSpeed, " );
-						ShowContinueError( " Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:TwoStageWithHumidityControlMode, " "Refrigeration:CompressorRack," );
+						ShowContinueError( " Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:TwoStageWithHumidityControlMode, Refrigeration:CompressorRack," );
 						ShowContinueError( " Refrigeration:Condenser:AirCooled ,Refrigeration:Condenser:EvaporativeCooled, " );
 						ShowContinueError( " or Refrigeration:Condenser:WaterCooled." );
 						ErrorsFound = true;
@@ -1193,7 +1193,7 @@ namespace WaterThermalTanks {
 					}
 
 					if ( ( WaterHeaterDesuperheater( DesuperheaterNum ).PumpElecPower / WaterHeaterDesuperheater( DesuperheaterNum ).OperatingWaterFlowRate ) > 7.9264e6 ) {
-						ShowWarningError( cCurrentModuleObject + " = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ": " + cNumericFieldNames( 7 ) + " to " + cNumericFieldNames( 6 ) + " ratio > 7.9264E6." " " + cNumericFieldNames( 7 ) + " to " + cNumericFieldNames( 6 ) + " = " + TrimSigDigits( ( WaterHeaterDesuperheater( DesuperheaterNum ).PumpElecPower / WaterHeaterDesuperheater( DesuperheaterNum ).OperatingWaterFlowRate ), 3 ) );
+						ShowWarningError( cCurrentModuleObject + " = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ": " + cNumericFieldNames( 7 ) + " to " + cNumericFieldNames( 6 ) + " ratio > 7.9264E6. " + cNumericFieldNames( 7 ) + " to " + cNumericFieldNames( 6 ) + " = " + TrimSigDigits( ( WaterHeaterDesuperheater( DesuperheaterNum ).PumpElecPower / WaterHeaterDesuperheater( DesuperheaterNum ).OperatingWaterFlowRate ), 3 ) );
 						ShowContinueError( " Suggest reducing " + cNumericFieldNames( 7 ) + " or increasing " + cNumericFieldNames( 6 ) + '.' );
 						ShowContinueError( " The simulation will continue using the user defined values." );
 					}
@@ -1322,7 +1322,7 @@ namespace WaterThermalTanks {
 							} else {
 								if ( ! CheckScheduleValueMinMax( HPWaterHeater( HPWaterHeaterNum ).AmbientRHSchedule, ">=", 0.0, "<=", 1.0 ) ) {
 									ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", invalid values" );
-									ShowContinueError( cAlphaFieldNames( 12 ) + "=\"" + cAlphaArgs( 12 ) + "\"," " schedule values must be (>=0., <=1.)" );
+									ShowContinueError( cAlphaFieldNames( 12 ) + "=\"" + cAlphaArgs( 12 ) + "\", schedule values must be (>=0., <=1.)" );
 									ErrorsFound = true;
 								}
 							}
@@ -1447,12 +1447,12 @@ namespace WaterThermalTanks {
 						}
 
 						if ( ! lAlphaFieldBlanks( 21 ) ) {
-							ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  " + cAlphaFieldNames( 21 ) + " was provided but will not be used based" " on compressor location input=\"" + cAlphaArgs( 20 ) + "\"." );
+							ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  " + cAlphaFieldNames( 21 ) + " was provided but will not be used based on compressor location input=\"" + cAlphaArgs( 20 ) + "\"." );
 						}
 					} else if ( SELECT_CASE_var == "OUTDOORS" ) {
 						HPWaterHeater( HPWaterHeaterNum ).CrankcaseTempIndicator = CrankcaseTempExterior;
 						if ( ! lAlphaFieldBlanks( 21 ) ) {
-							ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  " + cAlphaFieldNames( 21 ) + " was provided but will not be used based" " on " + cAlphaFieldNames( 21 ) + "=\"" + cAlphaArgs( 20 ) + "\"." );
+							ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  " + cAlphaFieldNames( 21 ) + " was provided but will not be used based on " + cAlphaFieldNames( 21 ) + "=\"" + cAlphaArgs( 20 ) + "\"." );
 						}
 
 					}}
@@ -1519,7 +1519,7 @@ namespace WaterThermalTanks {
 						HPWaterHeater( HPWaterHeaterNum ).DXCoilPLFFPLR = DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).PLFFPLR( 1 );
 						//         check the range of condenser pump power to be <= 5 gpm/ton
 						if ( DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).HPWHCondPumpElecNomPower / DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).RatedTotCap2 > 0.1422 ) {
-							ShowWarningError( DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).DXCoilType + "= " + DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).Name + ": Rated condenser pump power per watt of rated heating capacity has exceeded the recommended" " maximum of 0.1422 W/W (41.67 watt/MBH). Condenser pump power per watt = " + TrimSigDigits( ( DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).HPWHCondPumpElecNomPower / DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).RatedTotCap2 ), 4 ) );
+							ShowWarningError( DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).DXCoilType + "= " + DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).Name + ": Rated condenser pump power per watt of rated heating capacity has exceeded the recommended maximum of 0.1422 W/W (41.67 watt/MBH). Condenser pump power per watt = " + TrimSigDigits( ( DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).HPWHCondPumpElecNomPower / DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).RatedTotCap2 ), 4 ) );
 						}
 					}
 
@@ -1570,11 +1570,11 @@ namespace WaterThermalTanks {
 							HPWaterHeater( HPWaterHeaterNum ).InletAirMixerNode = GetOnlySingleNode( cAlphaArgs( 26 ), ErrorsFound, "WaterHeater:HeatPump inlet air mixer", cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 						} else {
 							ShowWarningError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
-							ShowContinueError( "Inlet air mixer node name specified but only required " "when Inlet Air Configuration is selected" " as Zone and OutdoorAir. Node name disregarded and simulation continues." );
+							ShowContinueError( "Inlet air mixer node name specified but only required when Inlet Air Configuration is selected as Zone and OutdoorAir. Node name disregarded and simulation continues." );
 						}
 					} else if ( lAlphaFieldBlanks( 26 ) && HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempZoneAndOA ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
-						ShowContinueError( "Inlet air mixer node name required " "when Inlet Air Configuration is selected as ZoneAndOutdoorAir." );
+						ShowContinueError( "Inlet air mixer node name required when Inlet Air Configuration is selected as ZoneAndOutdoorAir." );
 						ErrorsFound = true;
 					}
 
@@ -1584,11 +1584,11 @@ namespace WaterThermalTanks {
 							HPWaterHeater( HPWaterHeaterNum ).OutletAirSplitterNode = GetOnlySingleNode( cAlphaArgs( 27 ), ErrorsFound, cCurrentModuleObject + "-OUTLET AIR SPLITTER", cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 						} else {
 							ShowWarningError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
-							ShowContinueError( "Outlet air splitter node name specified but only required when " "Inlet Air Configuration is selected" " as ZoneAndOutdoorAir. Node name disregarded and simulation continues." );
+							ShowContinueError( "Outlet air splitter node name specified but only required when Inlet Air Configuration is selected as ZoneAndOutdoorAir. Node name disregarded and simulation continues." );
 						}
 					} else if ( lAlphaFieldBlanks( 27 ) && HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempZoneAndOA ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
-						ShowContinueError( "Outlet air splitter node name required when " "Inlet Air Configuration is selected as ZoneAndOutdoorAir." );
+						ShowContinueError( "Outlet air splitter node name required when Inlet Air Configuration is selected as ZoneAndOutdoorAir." );
 						ErrorsFound = true;
 					}
 
@@ -1663,19 +1663,19 @@ namespace WaterThermalTanks {
 								if ( ! FoundInletNode ) {
 									ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
 									ShowContinueError( "The HPWH's air inlet node name = " + cAlphaArgs( 7 ) + " was not properly specified " );
-									ShowContinueError( "as an exhaust air node for zone = " + cAlphaArgs( 13 ) + " in a " "ZoneHVAC:EquipmentConnections object." );
+									ShowContinueError( "as an exhaust air node for zone = " + cAlphaArgs( 13 ) + " in a ZoneHVAC:EquipmentConnections object." );
 									ErrorsFound = true;
 								}
 								if ( ! FoundOutletNode ) {
 									ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
 									ShowContinueError( "The HPWH's air outlet node name = " + cAlphaArgs( 8 ) + " was not properly specified " );
-									ShowContinueError( "as an inlet air node for zone = " + cAlphaArgs( 13 ) + " in a " "ZoneHVAC:EquipmentConnections object." );
+									ShowContinueError( "as an inlet air node for zone = " + cAlphaArgs( 13 ) + " in a ZoneHVAC:EquipmentConnections object." );
 									ErrorsFound = true;
 								}
 							}
 						} else {
 							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
-							ShowContinueError( "Heat pump water heater air inlet node name and air outlet node name must be" " listed in a ZoneHVAC:EquipmentConnections object when Inlet Air Configuration" " is equal to ZoneAirOnly or ZoneAndOutdoorAir." );
+							ShowContinueError( "Heat pump water heater air inlet node name and air outlet node name must be listed in a ZoneHVAC:EquipmentConnections object when Inlet Air Configuration is equal to ZoneAirOnly or ZoneAndOutdoorAir." );
 							ErrorsFound = true;
 						}
 					}
@@ -2100,7 +2100,7 @@ namespace WaterThermalTanks {
 							}
 						} else {
 							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
-							ShowContinueError( "An Ambient Outdoor Air Node name must be used when" " the Ambient Temperature Indicator is Outdoors." );
+							ShowContinueError( "An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors." );
 							ErrorsFound = true;
 						}
 
@@ -2550,7 +2550,7 @@ namespace WaterThermalTanks {
 							}
 						} else {
 							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
-							ShowContinueError( "An Ambient Outdoor Air Node name must be used when" " the Ambient Temperature Indicator is Outdoors." );
+							ShowContinueError( "An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors." );
 							ErrorsFound = true;
 						}
 
@@ -2860,7 +2860,7 @@ namespace WaterThermalTanks {
 							}
 						} else {
 							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
-							ShowContinueError( "An Ambient Outdoor Air Node name must be used when" " the Ambient Temperature Indicator is Outdoors." );
+							ShowContinueError( "An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors." );
 							ErrorsFound = true;
 						}
 
@@ -3092,7 +3092,7 @@ namespace WaterThermalTanks {
 							}
 						} else {
 							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
-							ShowContinueError( "An Ambient Outdoor Air Node name must be used when" " the Ambient Temperature Indicator is Outdoors." );
+							ShowContinueError( "An Ambient Outdoor Air Node name must be used when the Ambient Temperature Indicator is Outdoors." );
 							ErrorsFound = true;
 						}
 
@@ -3275,7 +3275,7 @@ namespace WaterThermalTanks {
 						//         verify Desuperheater/tank source node connections
 						if ( WaterHeaterDesuperheater( DesuperheaterNum ).WaterInletNode != WaterThermalTank( CheckWaterHeaterNum ).SourceOutletNode ) {
 							ShowSevereError( cCurrentModuleObject + " = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ':' );
-							ShowContinueError( "Desuperheater inlet node name does not match " " thermal tank source outlet node name." );
+							ShowContinueError( "Desuperheater inlet node name does not match thermal tank source outlet node name." );
 							ShowContinueError( "Desuperheater water inlet and outlet node names = " + CoilSaveNodeNames( DesuperheaterNum ).InletNodeName1 + " and " + CoilSaveNodeNames( DesuperheaterNum ).OutletNodeName1 );
 							ShowContinueError( "Thermal tank source side inlet and outlet node names      = " + WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 + " and " + WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 );
 							ErrorsFound = true;
@@ -3283,7 +3283,7 @@ namespace WaterThermalTanks {
 
 						if ( WaterHeaterDesuperheater( DesuperheaterNum ).WaterOutletNode != WaterThermalTank( CheckWaterHeaterNum ).SourceInletNode ) {
 							ShowSevereError( cCurrentModuleObject + " = " + WaterHeaterDesuperheater( DesuperheaterNum ).Name + ':' );
-							ShowContinueError( "Desuperheater water outlet node name does not match thermal" " tank source inlet node name." );
+							ShowContinueError( "Desuperheater water outlet node name does not match thermal tank source inlet node name." );
 							ShowContinueError( "Desuperheater water inlet and outlet node names = " + CoilSaveNodeNames( DesuperheaterNum ).InletNodeName1 + " and " + CoilSaveNodeNames( DesuperheaterNum ).OutletNodeName1 );
 							ShowContinueError( "Thermal tank source side inlet and outlet node names      = " + WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 + " and " + WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 );
 							ErrorsFound = true;
@@ -3361,7 +3361,7 @@ namespace WaterThermalTanks {
 
 						if ( HPWaterHeater( HPWaterHeaterNum ).WHUseInletNode != WaterThermalTank( CheckWaterHeaterNum ).UseInletNode || HPWaterHeater( HPWaterHeaterNum ).WHUseOutletNode != WaterThermalTank( CheckWaterHeaterNum ).UseOutletNode ) {
 							ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
-							ShowContinueError( "Heat pump water heater tank use side inlet and outlet node names must match" " the use side inlet and outlet node names for water heater tank = " + HPWaterHeater( HPWaterHeaterNum ).TankType + ": " + HPWaterHeater( HPWaterHeaterNum ).TankName );
+							ShowContinueError( "Heat pump water heater tank use side inlet and outlet node names must match the use side inlet and outlet node names for water heater tank = " + HPWaterHeater( HPWaterHeaterNum ).TankType + ": " + HPWaterHeater( HPWaterHeaterNum ).TankName );
 							ShowContinueError( "Heat pump water heater use side inlet and outlet node names = " + HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName2 + " and " + HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName2 );
 							ShowContinueError( "Water heater tank use side inlet and outlet node names      = " + WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName1 + " and " + WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName1 );
 							ErrorsFound = true;
@@ -3379,7 +3379,7 @@ namespace WaterThermalTanks {
 						//         verify HP/tank source node connections
 						if ( HPWaterHeater( HPWaterHeaterNum ).CondWaterInletNode != WaterThermalTank( CheckWaterHeaterNum ).SourceOutletNode ) {
 							ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
-							ShowContinueError( "Heat Pump condenser water inlet node name does not match water" " heater tank source outlet node name." );
+							ShowContinueError( "Heat Pump condenser water inlet node name does not match water heater tank source outlet node name." );
 							ShowContinueError( "Heat pump condenser water inlet and outlet node names = " + HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName1 + " and " + HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName1 );
 							ShowContinueError( "Water heater tank source side inlet and outlet node names      = " + WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 + " and " + WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 );
 							ErrorsFound = true;
@@ -3387,7 +3387,7 @@ namespace WaterThermalTanks {
 
 						if ( HPWaterHeater( HPWaterHeaterNum ).CondWaterOutletNode != WaterThermalTank( CheckWaterHeaterNum ).SourceInletNode ) {
 							ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
-							ShowContinueError( "Heat Pump condenser water outlet node name does not match water heater" " tank source inlet node name." );
+							ShowContinueError( "Heat Pump condenser water outlet node name does not match water heater tank source inlet node name." );
 							ShowContinueError( "Heat pump condenser water inlet and outlet node names = " + HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName1 + " and " + HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName1 );
 							ShowContinueError( "Water heater tank source side inlet and outlet node names      = " + WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 + " and " + WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 );
 							ErrorsFound = true;
@@ -3415,7 +3415,7 @@ namespace WaterThermalTanks {
 												} // EquipmentTypeNum
 												if ( ! FoundTankInList ) {
 													ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
-													ShowContinueError( "Heat pump water heater type and name must be listed in the correct" " ZoneHVAC:EquipmentList object when Inlet Air Configuration is equal" " to ZoneAirOnly or ZoneAndOutdoorAir." );
+													ShowContinueError( "Heat pump water heater type and name must be listed in the correct ZoneHVAC:EquipmentList object when Inlet Air Configuration is equal to ZoneAirOnly or ZoneAndOutdoorAir." );
 													ErrorsFound = true;
 												}
 												//                     check that tank has lower priority than all other non-HPWH objects in Zone Equipment List
@@ -3427,7 +3427,7 @@ namespace WaterThermalTanks {
 												} // EquipmentTypeNum
 												if ( TankNotLowestPriority && FoundTankInList ) {
 													ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
-													ShowContinueError( "Heat pump water heaters must have lower priorities than" " all other equipment types in a ZoneHVAC:EquipmentList." );
+													ShowContinueError( "Heat pump water heaters must have lower priorities than all other equipment types in a ZoneHVAC:EquipmentList." );
 													ErrorsFound = true;
 												}
 												break;
@@ -3438,7 +3438,7 @@ namespace WaterThermalTanks {
 								} // ZoneEquipConfigNum
 							} else {
 								ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
-								ShowContinueError( "ZoneHVAC:EquipmentList and ZoneHVAC:EquipmentConnections objects are " " required when Inlet Air Configuration is either ZoneAirOnly or ZoneAndOutdoorAir." );
+								ShowContinueError( "ZoneHVAC:EquipmentList and ZoneHVAC:EquipmentConnections objects are required when Inlet Air Configuration is either ZoneAirOnly or ZoneAndOutdoorAir." );
 								ErrorsFound = true;
 							} // ALLOCATED
 						} //InletAirConfiguration
@@ -3472,7 +3472,7 @@ namespace WaterThermalTanks {
 					WaterThermalTankNum = FindItemInList( cAlphaArgs( 1 ), WaterThermalTank.Name(), NumWaterThermalTank );
 					if ( WaterThermalTankNum == 0 ) {
 						// did not match name throw warning.
-						ShowSevereError( cCurrentModuleObject + " object name: " + cAlphaArgs( 1 ) + " does not match " "any of the water heaters defined in the file" );
+						ShowSevereError( cCurrentModuleObject + " object name: " + cAlphaArgs( 1 ) + " does not match any of the water heaters defined in the file" );
 						ErrorsFound = true;
 						continue;
 					} else { // we have a match
@@ -4438,7 +4438,7 @@ namespace WaterThermalTanks {
 							ShowContinueError( "Tank use side volume flow rate = " + RoundSigDigits( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate, 4 ) + " [m3/s]" );
 							ShowContinueError( "Tank source side volume flow rate = " + RoundSigDigits( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate, 4 ) + " [m3/s]" );
 							ShowContinueError( "Nominal tank change over rate = " + RoundSigDigits( TankChangeRateScale, 2 ) + " [s]" );
-							ShowContinueError( "Change over rate is too fast, increase tank volume, decrease connection flow rates" " or use mixed tank model" );
+							ShowContinueError( "Change over rate is too fast, increase tank volume, decrease connection flow rates or use mixed tank model" );
 
 							ShowFatalError( "InitWaterThermalTank: Simulation halted because of sizing problem in stratified tank model." );
 						}
@@ -6373,10 +6373,10 @@ namespace WaterThermalTanks {
 				MinTemp = SetPointTemp - DeadBandTempDiff;
 				++WaterHeaterDesuperheater( DesuperheaterNum ).SetPointError;
 				if ( WaterHeaterDesuperheater( DesuperheaterNum ).SetPointError < 5 ) {
-					ShowWarningError( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\":  Water heater tank set point temperature is greater than or equal to the cut-in temperature" " of the desuperheater. Desuperheater will be disabled." );
+					ShowWarningError( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\":  Water heater tank set point temperature is greater than or equal to the cut-in temperature of the desuperheater. Desuperheater will be disabled." );
 					ShowContinueErrorTimeStamp( " ...Desuperheater cut-in temperature = " + RoundSigDigits( MinTemp, 2 ) );
 				} else {
-					ShowRecurringWarningErrorAtEnd( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\":  Water heater tank set point temperature is greater than or equal to the cut-in temperature" " of the desuperheater. Desuperheater will be disabled warning continues...", WaterHeaterDesuperheater( DesuperheaterNum ).SetPointErrIndex1, MinTemp, MinTemp );
+					ShowRecurringWarningErrorAtEnd( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\":  Water heater tank set point temperature is greater than or equal to the cut-in temperature of the desuperheater. Desuperheater will be disabled warning continues...", WaterHeaterDesuperheater( DesuperheaterNum ).SetPointErrIndex1, MinTemp, MinTemp );
 				}
 			}
 
@@ -6502,7 +6502,7 @@ namespace WaterThermalTanks {
 							++WaterHeaterDesuperheater( DesuperheaterNum ).IterLimitExceededNum1;
 							if ( WaterHeaterDesuperheater( DesuperheaterNum ).IterLimitExceededNum1 == 1 ) {
 								ShowWarningError( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\"" );
-								ShowContinueError( "Iteration limit exceeded calculating desuperheater unit part-load ratio, " "maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits( PartLoadRatio, 3 ) );
+								ShowContinueError( "Iteration limit exceeded calculating desuperheater unit part-load ratio, maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits( PartLoadRatio, 3 ) );
 								ShowContinueErrorTimeStamp( "This error occurred in heating mode." );
 							} else {
 								ShowRecurringWarningErrorAtEnd( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\":  Iteration limit exceeded in heating mode warning continues. Part-load ratio statistics follow.", WaterHeaterDesuperheater( DesuperheaterNum ).IterLimitErrIndex1, PartLoadRatio, PartLoadRatio );
@@ -6514,7 +6514,7 @@ namespace WaterThermalTanks {
 							++WaterHeaterDesuperheater( DesuperheaterNum ).RegulaFalsiFailedNum1;
 							if ( WaterHeaterDesuperheater( DesuperheaterNum ).RegulaFalsiFailedNum1 == 1 ) {
 								ShowWarningError( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\"" );
-								ShowContinueError( "Desuperheater unit part-load ratio calculation failed: PLR limits " "of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( PartLoadRatio, 3 ) );
+								ShowContinueError( "Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( PartLoadRatio, 3 ) );
 								ShowContinueError( "Please send this information to the EnergyPlus support group." );
 								ShowContinueErrorTimeStamp( "This error occured in heating mode." );
 							} else {
@@ -6582,7 +6582,7 @@ namespace WaterThermalTanks {
 								++WaterHeaterDesuperheater( DesuperheaterNum ).IterLimitExceededNum2;
 								if ( WaterHeaterDesuperheater( DesuperheaterNum ).IterLimitExceededNum2 == 1 ) {
 									ShowWarningError( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\"" );
-									ShowContinueError( "Iteration limit exceeded calculating desuperheater unit part-load ratio, " "maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits( PartLoadRatio, 3 ) );
+									ShowContinueError( "Iteration limit exceeded calculating desuperheater unit part-load ratio, maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits( PartLoadRatio, 3 ) );
 									ShowContinueErrorTimeStamp( "This error occurred in float mode." );
 								} else {
 									ShowRecurringWarningErrorAtEnd( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\":  Iteration limit exceeded in float mode warning continues. Part-load ratio statistics follow.", WaterHeaterDesuperheater( DesuperheaterNum ).IterLimitErrIndex2, PartLoadRatio, PartLoadRatio );
@@ -6594,7 +6594,7 @@ namespace WaterThermalTanks {
 								++WaterHeaterDesuperheater( DesuperheaterNum ).RegulaFalsiFailedNum2;
 								if ( WaterHeaterDesuperheater( DesuperheaterNum ).RegulaFalsiFailedNum2 == 1 ) {
 									ShowWarningError( WaterHeaterDesuperheater( DesuperheaterNum ).Type + " \"" + WaterHeaterDesuperheater( DesuperheaterNum ).Name + "\"" );
-									ShowContinueError( "Desuperheater unit part-load ratio calculation failed: PLR limits " "of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( PartLoadRatio, 3 ) );
+									ShowContinueError( "Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( PartLoadRatio, 3 ) );
 									ShowContinueError( "Please send this information to the EnergyPlus support group." );
 									ShowContinueErrorTimeStamp( "This error occured in float mode." );
 								} else {
@@ -6816,10 +6816,10 @@ namespace WaterThermalTanks {
 					++HPWaterHeater( HPNum ).HPSetPointError;
 					//!add logic for warmup, kickoffsimulation and doing sizing here
 					if ( HPWaterHeater( HPNum ).HPSetPointError == 1 ) {
-						ShowWarningError( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + ":  Water heater tank set point temperature is greater than or equal to the cut-in temperature" " of the heat pump water heater. Heat Pump will be disabled and simulation continues." );
+						ShowWarningError( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + ":  Water heater tank set point temperature is greater than or equal to the cut-in temperature of the heat pump water heater. Heat Pump will be disabled and simulation continues." );
 						ShowContinueErrorTimeStamp( " ...Heat Pump cut-in temperature=" + HPMinTempChar );
 					} else {
-						ShowRecurringWarningErrorAtEnd( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + ":  Water heater tank set point temperature is greater than or equal to the cut-in temperature" " of the heat pump water heater. Heat Pump will be disabled error continues...", HPWaterHeater( HPNum ).HPSetPointErrIndex1, HPMinTemp, HPMinTemp );
+						ShowRecurringWarningErrorAtEnd( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + ":  Water heater tank set point temperature is greater than or equal to the cut-in temperature of the heat pump water heater. Heat Pump will be disabled error continues...", HPWaterHeater( HPNum ).HPSetPointErrIndex1, HPMinTemp, HPMinTemp );
 					}
 				}
 			}
@@ -6911,7 +6911,7 @@ namespace WaterThermalTanks {
 						++HPWaterHeater( HPNum ).IterLimitExceededNum1;
 						if ( HPWaterHeater( HPNum ).IterLimitExceededNum1 == 1 ) {
 							ShowWarningError( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\"" );
-							ShowContinueError( "Iteration limit exceeded calculating heat pump water heater compressor" " part-load ratio, maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
+							ShowContinueError( "Iteration limit exceeded calculating heat pump water heater compressor part-load ratio, maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
 							ShowContinueErrorTimeStamp( "This error occurred in heating mode." );
 						} else {
 							ShowRecurringWarningErrorAtEnd( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\":  Iteration limit exceeded in heating mode warning continues. Part-load ratio statistics follow.", HPWaterHeater( HPNum ).IterLimitErrIndex1, HPPartLoadRatio, HPPartLoadRatio );
@@ -6923,7 +6923,7 @@ namespace WaterThermalTanks {
 						++HPWaterHeater( HPNum ).RegulaFalsiFailedNum1;
 						if ( HPWaterHeater( HPNum ).RegulaFalsiFailedNum1 == 1 ) {
 							ShowWarningError( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\"" );
-							ShowContinueError( "Heat pump water heater compressor part-load ratio calculation failed: PLR limits " "of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
+							ShowContinueError( "Heat pump water heater compressor part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
 							ShowContinueError( "Please send this information to the EnergyPlus support group." );
 							ShowContinueErrorTimeStamp( "This error occured in heating mode." );
 						} else {
@@ -7054,7 +7054,7 @@ namespace WaterThermalTanks {
 							++HPWaterHeater( HPNum ).IterLimitExceededNum2;
 							if ( HPWaterHeater( HPNum ).IterLimitExceededNum2 == 1 ) {
 								ShowWarningError( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\"" );
-								ShowContinueError( "Iteration limit exceeded calculating heat pump water heater compressor" " part-load ratio, maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
+								ShowContinueError( "Iteration limit exceeded calculating heat pump water heater compressor part-load ratio, maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
 								ShowContinueErrorTimeStamp( "This error occurred in float mode." );
 							} else {
 								ShowRecurringWarningErrorAtEnd( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\":  Iteration limit exceeded in float mode warning continues. Part-load ratio statistics follow.", HPWaterHeater( HPNum ).IterLimitErrIndex2, HPPartLoadRatio, HPPartLoadRatio );
@@ -7066,7 +7066,7 @@ namespace WaterThermalTanks {
 							++HPWaterHeater( HPNum ).RegulaFalsiFailedNum2;
 							if ( HPWaterHeater( HPNum ).RegulaFalsiFailedNum2 == 1 ) {
 								ShowWarningError( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\"" );
-								ShowContinueError( "Heat pump water heater compressor part-load ratio calculation failed: PLR limits " "of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
+								ShowContinueError( "Heat pump water heater compressor part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
 								ShowContinueError( "Please send this information to the EnergyPlus support group." );
 								ShowContinueErrorTimeStamp( "This error occured in float mode." );
 							} else {
@@ -8444,11 +8444,11 @@ namespace WaterThermalTanks {
 						} else {
 							if ( ! WaterThermalTank( WaterThermalTankNum ).IsChilledWaterTank ) {
 								// plant sizing object design temperature is set too low throw warning.
-								ShowSevereError( "Autosizing of Use side water heater design flow rate requires " "Sizing:Plant object to have an exit temperature >= 58C" );
+								ShowSevereError( "Autosizing of Use side water heater design flow rate requires Sizing:Plant object to have an exit temperature >= 58C" );
 								ShowContinueError( "Occurs for water heater object=" + WaterThermalTank( WaterThermalTankNum ).Name );
 							} else {
 								// plant sizing object design temperature is set too hi throw warning.
-								ShowSevereError( "Autosizing of Use side chilled water tank design flow rate requires " "Sizing:Plant object to have an exit temperature <= 8C" );
+								ShowSevereError( "Autosizing of Use side chilled water tank design flow rate requires Sizing:Plant object to have an exit temperature <= 8C" );
 								ShowContinueError( "Occurs for chilled water storage tank object=" + WaterThermalTank( WaterThermalTankNum ).Name );
 
 							}
@@ -8509,11 +8509,11 @@ namespace WaterThermalTanks {
 						} else {
 							if ( ! WaterThermalTank( WaterThermalTankNum ).IsChilledWaterTank ) {
 								// plant sizing object design temperature is set too low throw warning.
-								ShowSevereError( "Autosizing of Source side water heater design flow rate requires " "Sizing:Plant object to have an exit temperature >= 58C" );
+								ShowSevereError( "Autosizing of Source side water heater design flow rate requires Sizing:Plant object to have an exit temperature >= 58C" );
 								ShowContinueError( "Occurs for WaterHeater:Mixed object=" + WaterThermalTank( WaterThermalTankNum ).Name );
 							} else {
 								// plant sizing object design temperature is set too hi throw warning.
-								ShowSevereError( "Autosizing of Source side chilled water tank design flow rate requires " "Sizing:Plant object to have an exit temperature <= 8C" );
+								ShowSevereError( "Autosizing of Source side chilled water tank design flow rate requires Sizing:Plant object to have an exit temperature <= 8C" );
 								ShowContinueError( "Occurs for chilled water storage tank object=" + WaterThermalTank( WaterThermalTankNum ).Name );
 							}
 							ErrorsFound = true;
