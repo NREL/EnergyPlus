@@ -993,6 +993,7 @@ namespace DataSizing {
 		bool CoolingCapacity; // TRUE if AirloopHVAC system cooling capacity is calculated
 		bool HeatingCapacity; // TRUE if AirloopHVAC system heating capacity is calculated
 		bool SystemCapacity; // TRUE if AirloopHVAC system heating capacity is calculated
+		bool DesignSizeFromParent; // TRUE if design size is set by parent object - normally false, set to true for special cases e.g. ERV
 		FArray1D_int SizingMethod; // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow and FractionOfAutosizedHeatingAirflow)
 		FArray1D_int CapSizingMethod; // capacity sizing methods (HeatingDesignCapacity, CoolingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity and FractionOfAutosizedHeatingCapacity )
 
@@ -1014,7 +1015,8 @@ namespace DataSizing {
 			Capacity( false ), // TRUE if AirloopHVAC system capacity is calculated
 			CoolingCapacity( false ), // TRUE if AirloopHVAC system cooling capacity is calculated
 			HeatingCapacity( false ), // TRUE if AirloopHVAC system heating capacity is calculated
-			SystemCapacity( false ) // TRUE if AirloopHVAC system heating capacity is calculated
+			SystemCapacity( false ), // TRUE if AirloopHVAC system heating capacity is calculated
+			DesignSizeFromParent( false ) // TRUE if design size is set by parent object - normally false, set to true for special cases e.g. ERV
 		{}
 
 		// Member Constructor
@@ -1036,7 +1038,9 @@ namespace DataSizing {
 			bool const  CoolingCapacity, // TRUE if AirloopHVAC system cooling capacity is calculated
 			bool const  HeatingCapacity, // TRUE if AirloopHVAC system heating capacity is calculated
 			bool const  SystemCapacity, // TRUE if AirloopHVAC system heating capacity is calculated
-			FArray1_int const & SizingMethod  // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow and FractionOfAutosizedHeatingAirflow)
+			bool const  DesignSizeFromParent, // TRUE if design size is set by parent object - normally false, set to true for special cases e.g. ERV
+			FArray1_int const & SizingMethod,  // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow and FractionOfAutosizedHeatingAirflow)
+			FArray1D_int const CapSizingMethod // capacity sizing methods (HeatingDesignCapacity, CoolingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity and FractionOfAutosizedHeatingCapacity )
 		) :
 			AirVolFlow( AirVolFlow ),
 			MaxHWVolFlow( MaxHWVolFlow ),
@@ -1055,7 +1059,9 @@ namespace DataSizing {
 			CoolingCapacity( CoolingCapacity ),
 			HeatingCapacity( HeatingCapacity ),
 			SystemCapacity( SystemCapacity ),
-			SizingMethod( SizingMethod )
+			DesignSizeFromParent( DesignSizeFromParent ),
+			SizingMethod( SizingMethod ),
+			CapSizingMethod( CapSizingMethod )
 		{}
 
 	};
