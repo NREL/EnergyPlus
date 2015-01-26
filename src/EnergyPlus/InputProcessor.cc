@@ -273,7 +273,7 @@ namespace InputProcessor {
 		NumLines = 0;
 
 		DoingInputProcessing = true;
-		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary ("+inputIddFileName+") File -- Start";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary (" + inputIddFileName + ") File -- Start";
 		DisplayString( "Processing Data Dictionary" );
 		ProcessingIDD = true;
 		ProcessDataDicFile( idd_stream, ErrorsInIDD );
