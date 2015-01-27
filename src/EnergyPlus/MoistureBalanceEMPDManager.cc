@@ -111,6 +111,7 @@ namespace MoistureBalanceEMPDManager {
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::FindItemInList;
 		using DataSurfaces::HeatTransferModel_EMPD;
+		using DataSurfaces::Construction;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -198,7 +199,7 @@ namespace MoistureBalanceEMPDManager {
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			if ( ! Surface( SurfNum ).HeatTransSurf || Surface( SurfNum ).Class == SurfaceClass_Window ) continue; // Heat transfer surface only and not a window
 			if ( Surface( SurfNum ).HeatTransferAlgorithm != HeatTransferModel_EMPD ) continue;
-			ConstrNum = Surface( SurfNum ).Construction;
+			ConstrNum = Construction[ SurfNum - 1 ];
 			MatNum = Construct( ConstrNum ).LayerPoint( Construct( ConstrNum ).TotLayers );
 			if ( Material( MatNum ).EMPDVALUE > 0.0 && Surface( SurfNum ).Zone > 0 ) {
 				EMPDzone( Surface( SurfNum ).Zone ) = true;
@@ -360,6 +361,7 @@ namespace MoistureBalanceEMPDManager {
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using Psychrometrics::PsyCpAirFnWTdb;
 		using Psychrometrics::PsyRhovFnTdbWPb;
+		using DataSurfaces::Construction;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -418,7 +420,7 @@ namespace MoistureBalanceEMPDManager {
 		if ( ! Surface( SurfNum ).HeatTransSurf ) {
 			return;
 		}
-		ConstrNum = Surface( SurfNum ).Construction;
+		ConstrNum = Construction[ SurfNum - 1 ];
 		MatNum = Construct( ConstrNum ).LayerPoint( Construct( ConstrNum ).TotLayers ); // Then find the material pointer
 
 		ZoneNum = Surface( SurfNum ).Zone;
@@ -636,7 +638,7 @@ namespace MoistureBalanceEMPDManager {
 		gio::write( OutputFileInits, fmtA ) << "! <Construction EMPD>, Construction Name, Inside Layer Material Name, Penetration Depth {m}, a, b, c, d";
 
 		for ( ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum ) {
-			if ( Construct( ConstrNum ).TypeIsWindow ) continue;
+			if ( ConstrWin[ ConstrNum - 1 ].TypeIsWindow ) continue;
 			MatNum = Construct( ConstrNum ).LayerPoint( Construct( ConstrNum ).TotLayers );
 			if ( Material( MatNum ).EMPDMaterialProps ) {
 				gio::write( OutputFileInits, Format_700 ) << Construct( ConstrNum ).Name << Material( MatNum ).Name << Material( MatNum ).EMPDVALUE << Material( MatNum ).MoistACoeff << Material( MatNum ).MoistBCoeff << Material( MatNum ).MoistCCoeff << Material( MatNum ).MoistDCoeff;

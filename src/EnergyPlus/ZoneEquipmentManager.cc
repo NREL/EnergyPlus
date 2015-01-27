@@ -56,7 +56,6 @@
 #include <ScheduleManager.hh>
 #include <SplitterComponent.hh>
 #include <SteamBaseboardRadiator.hh>
-#include <SwimmingPool.hh>
 #include <SystemAvailabilityManager.hh>
 #include <ThermalChimney.hh>
 #include <UnitHeater.hh>
@@ -301,7 +300,7 @@ namespace ZoneEquipmentManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int NumOfSizingTypes = 24; // number of sizing types
+		int NumOfSizingTypes = 24; // number of sizing types 
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -344,6 +343,7 @@ namespace ZoneEquipmentManager {
 				ZoneSysMoistureDemand( ControlledZoneNum ).SequencedOutputRequiredToDehumidSP.allocate( ZoneEquipCount );
 				ZoneEqSizing( ControlledZoneNum ).SizingMethod.allocate( NumOfSizingTypes );
 				ZoneEqSizing( ControlledZoneNum ).SizingMethod = 0;
+
 			}
 		}
 
@@ -433,7 +433,8 @@ namespace ZoneEquipmentManager {
 						Node( ZoneReturnAirNode ).GenContam = OutdoorGC;
 					}
 				}
-
+			
+			
 			}
 
 			MyEnvrnFlag = false;
@@ -2602,7 +2603,6 @@ namespace ZoneEquipmentManager {
 		using HVACUnitarySystem::SimUnitarySystem;
 		using DataHeatBalance::Mixing;
 		using DataHeatBalance::ZoneAirMassFlow;
-		using SwimmingPool::SimSwimmingPool;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2678,10 +2678,6 @@ namespace ZoneEquipmentManager {
 		}
 
 		FirstCall = false;
-		
-		// Simulate all of the pools. These have a potential impact on surface heat balances, zone air heat balances, and moisture balances.
-		// These should be simulated first so that any systems or zone equipment devices deal with the effects of the pool properly.
-		SimSwimmingPool( FirstHVACIteration );
 
 		// Loop over all the primary air loop; simulate their components (equipment)
 		// and controllers
@@ -3635,6 +3631,7 @@ namespace ZoneEquipmentManager {
 		using InternalHeatGains::SumAllReturnAirLatentGains;
 		using DataHVACGlobals::RetTempMax;
 		using DataHVACGlobals::RetTempMin;
+		using DataHeatBalance::ZoneSpecs;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3711,7 +3708,7 @@ namespace ZoneEquipmentManager {
 				WinGapTtoRA = 0.0;
 				WinGapFlowTtoRA = 0.0;
 
-				for ( SurfNum = Zone( ActualZoneNum ).SurfaceFirst; SurfNum <= Zone( ActualZoneNum ).SurfaceLast; ++SurfNum ) {
+				for ( SurfNum = ZoneSpecs[ ActualZoneNum  - 1 ].SurfaceFirst; SurfNum <= ZoneSpecs[ ActualZoneNum  - 1 ].SurfaceLast; ++SurfNum ) {
 					if ( SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 && SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_ReturnAir ) {
 						FlowThisTS = PsyRhoAirFnPbTdbW( OutBaroPress, SurfaceWindow( SurfNum ).TAirflowGapOutlet, Node( ZoneNode ).HumRat ) * SurfaceWindow( SurfNum ).AirflowThisTS * Surface( SurfNum ).Width;
 						WinGapFlowToRA += FlowThisTS;
@@ -4831,7 +4828,7 @@ namespace ZoneEquipmentManager {
 	}
 
 	void
-	GetStandAloneERVNodes(int const OutdoorNum) // Zone Air Balance Outdoor index
+		GetStandAloneERVNodes(int const OutdoorNum) // Zone Air Balance Outdoor index
 	{
 
 			// SUBROUTINE INFORMATION:
@@ -4901,8 +4898,8 @@ namespace ZoneEquipmentManager {
 
 	}
 
-	void
-	CalcZoneMixingFlowRateOfReceivingZone(int const ZoneNum, Real64 & ZoneMixingMassFlowRate)
+	void 
+	    CalcZoneMixingFlowRateOfReceivingZone(int const ZoneNum, Real64 & ZoneMixingMassFlowRate)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4920,7 +4917,7 @@ namespace ZoneEquipmentManager {
 
 		// REFERENCES:
 		// na
-		//
+		// 
 
 		// Using/Aliasing
 		using DataZoneEquipment::ZoneEquipConfig;
@@ -4965,8 +4962,8 @@ namespace ZoneEquipmentManager {
 		ZoneMixingMassFlowRate = MixingMassFlowRate;
 	}
 
-	void
-	CalcZoneMixingFlowRateOfSourceZone(int const ZoneNum)
+	void 
+		CalcZoneMixingFlowRateOfSourceZone(int const ZoneNum) 
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4984,7 +4981,7 @@ namespace ZoneEquipmentManager {
 
 		// REFERENCES:
 		// na
-		//
+		// 
 
 		// Using/Aliasing
 		using DataZoneEquipment::ZoneEquipConfig;
@@ -5033,7 +5030,7 @@ namespace ZoneEquipmentManager {
 
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

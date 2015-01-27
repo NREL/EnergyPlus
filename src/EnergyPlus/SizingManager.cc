@@ -2647,7 +2647,7 @@ namespace SizingManager {
 			int iCoolCapacityPerFloorAreaNumericNum; // get input index to Zone HVAC sizing cooling capacity per floor area
 			int iCoolFracOfAutosizedCapacityNumericNum;  // get input index to Zone HVAC sizing capacity as fraction autozized cooling capacity
 
-			int iHeatCAPMAlphaNum; // get input index to Zone HVAC sizing heating capacity
+			int iHeatCAPMAlphaNum; // get input index to Zone HVAC sizing heating capacity 
 			int iHeatDesignCapacityNumericNum; // get input index to Zone HVAC sizing heating design capacity
 			int iHeatCapacityPerFloorAreaNumericNum; // get input index to Zone HVAC sizing heating capacity per floor area
 			int iHeatFracOfAutosizedCapacityNumericNum; // get input index to Zone HVAC sizing capacity as fraction autozized cooling capacity
@@ -2687,7 +2687,7 @@ namespace SizingManager {
 			int NumNumbers; // Number of Numbers for each GetObjectItem call
 			int TotalArgs; // Total number of alpha and numeric arguments (max) for a
 			int IOStatus; // Used in GetObjectItem
-			int zSIndex;  // index of "DesignSpecification:ZoneHVAC:Sizing" objects
+			int zSIndex;  // index of "DesignSpecification:ZoneHVAC:Sizing" objects 
 			static bool ErrorsFound( false ); // If errors detected in input
 			bool IsNotOK; // Flag to verify name
 			bool IsBlank; // Flag for blank name
@@ -2832,7 +2832,7 @@ namespace SizingManager {
 					} else if ( SameString( Alphas( iCoolSAFMAlphaNum ), "None" ) || lAlphaBlanks( iCoolSAFMAlphaNum ) ) {
 						ZoneHVACSizing( zSIndex ).CoolingSAFMethod = None;
 						ZoneHVACSizing( zSIndex ).MaxCoolAirVolFlow = 0.0;
-						// cooling supply air flow rate will not be sized, may be cooling coil does not exist
+						// cooling supply air flow rate will not be sized, may be cooling coil does not exist 
 					} else {
 						ShowSevereError( CurrentModuleObject + " = " + ZoneHVACSizing( zSIndex ).Name );
 						ShowContinueError( "Illegal " + cAlphaFields( iCoolSAFMAlphaNum ) + " = " + Alphas( iCoolSAFMAlphaNum ) );

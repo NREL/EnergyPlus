@@ -572,6 +572,7 @@ namespace DataHeatBalance {
 	FArray1D< MaterialProperties > Material;
 	FArray1D< GapSupportPillar > SupportPillar;
 	FArray1D< GapDeflectionState > DeflectionState;
+  std::vector< WindowAbsThermLay > ConstrWin;
 	FArray1D< ConstructionData > Construct;
 	FArray1D< SpectralDataProperties > SpectralData;
 	FArray1D< ZoneData > Zone;
@@ -582,6 +583,7 @@ namespace DataHeatBalance {
 	FArray1D< ZoneEquipData > ZoneElectric;
 	FArray1D< ZoneEquipData > ZoneGas;
 	FArray1D< ZoneEquipData > ZoneOtherEq;
+  std::vector< GenZone > ZoneSpecs;
 	FArray1D< ZoneEquipData > ZoneHWEq;
 	FArray1D< ZoneEquipData > ZoneSteamEq;
 	FArray1D< ITEquipData > ZoneITEq;
@@ -703,13 +705,13 @@ namespace DataHeatBalance {
 		}
 
 		Construct( ConstrNum ).TotSolidLayers = 0;
-		Construct( ConstrNum ).TotGlassLayers = 0;
+		ConstrWin[ ConstrNum  - 1 ].TotGlassLayers = 0;
 		Construct( ConstrNum ).AbsDiffShade = 0.0;
 
 		// Check if any layer is glass, gas, shade, screen or blind; if so it is considered a window construction for
 		// purposes of error checking.
 
-		Construct( ConstrNum ).TypeIsWindow = false;
+		ConstrWin[ ConstrNum  - 1 ].TypeIsWindow = false;
 		for ( Layer = 1; Layer <= TotLayers; ++Layer ) {
 			MaterNum = Construct( ConstrNum ).LayerPoint( Layer );
 			if ( MaterNum == 0 ) continue; // error -- has been caught will stop program later
@@ -729,14 +731,14 @@ namespace DataHeatBalance {
 				case ScreenEquivalentLayer:
 				case BlindEquivalentLayer:
 				case GapEquivalentLayer:
-					Construct( ConstrNum ).TypeIsWindow = true;
+				  ConstrWin[ ConstrNum - 1 ].TypeIsWindow = true;
 			}
 		}
 
 		if ( InsideMaterNum == 0 ) return;
 		if ( OutsideMaterNum == 0 ) return;
 
-		if ( Construct( ConstrNum ).TypeIsWindow ) {
+		if ( ConstrWin[ ConstrNum  - 1 ].TypeIsWindow ) {
 
 			Construct( ConstrNum ).NumCTFTerms = 0;
 			Construct( ConstrNum ).NumHistories = 0;
@@ -806,15 +808,15 @@ namespace DataHeatBalance {
 			// It is not necessary to check rest of BSDF window structure since that is performed inside TARCOG90 routine.
 			// That routine also allow structures which are not allowed in rest of this routine
 			if ( Construct( ConstrNum ).WindowTypeBSDF ) {
-				Construct( ConstrNum ).TotGlassLayers = TotGlassLayers;
+				ConstrWin[ ConstrNum  - 1 ].TotGlassLayers = TotGlassLayers;
 				Construct( ConstrNum ).TotSolidLayers = TotGlassLayers + TotShadeLayers;
-				Construct( ConstrNum ).InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( InsideLayer ) ).AbsorpThermalBack;
+				ConstrWin[ ConstrNum  - 1 ].InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( InsideLayer ) ).AbsorpThermalBack;
 				Construct( ConstrNum ).OutsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermalFront;
 				return;
 			}
 
 			if ( Construct( ConstrNum ).WindowTypeEQL ) {
-				Construct( ConstrNum ).InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( InsideLayer ) ).AbsorpThermalBack;
+				ConstrWin[ ConstrNum - 1 ].InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( InsideLayer ) ).AbsorpThermalBack;
 				Construct( ConstrNum ).OutsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermalFront;
 				return;
 			}
@@ -955,7 +957,7 @@ namespace DataHeatBalance {
 				ErrorsFound = true;
 			}
 
-			Construct( ConstrNum ).TotGlassLayers = TotGlassLayers;
+			ConstrWin[ ConstrNum  - 1 ].TotGlassLayers = TotGlassLayers;
 			Construct( ConstrNum ).TotSolidLayers = TotGlassLayers + TotShadeLayers;
 
 			// In following, InsideLayer is layer number of inside glass and InsideAbsorpThermal applies
@@ -966,7 +968,7 @@ namespace DataHeatBalance {
 			}
 			if ( InsideLayer > 0 ) {
 				InsideMaterNum = Construct( ConstrNum ).LayerPoint( InsideLayer );
-				Construct( ConstrNum ).InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( InsideLayer ) ).AbsorpThermalBack;
+				ConstrWin[ ConstrNum  - 1 ].InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( InsideLayer ) ).AbsorpThermalBack;
 			}
 			if ( InsideMaterNum != 0 ) {
 				Construct( ConstrNum ).InsideAbsorpVis = Material( InsideMaterNum ).AbsorpVisible;
@@ -980,7 +982,7 @@ namespace DataHeatBalance {
 			}
 
 		} else { //Opaque surface
-			Construct( ConstrNum ).InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( InsideLayer ) ).AbsorpThermal;
+			ConstrWin[ ConstrNum  - 1 ].InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( InsideLayer ) ).AbsorpThermal;
 			Construct( ConstrNum ).OutsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermal;
 		}
 
@@ -1104,6 +1106,7 @@ namespace DataHeatBalance {
 		if ( NewConstrNum == 0 ) {
 			++TotConstructs;
 			Construct.redimension( TotConstructs );
+			ConstrWin.resize( TotConstructs );
 			NominalRforNominalUCalculation.redimension( TotConstructs );
 			NominalRforNominalUCalculation( TotConstructs ) = 0.0;
 			NominalU.redimension( TotConstructs );
@@ -1112,6 +1115,7 @@ namespace DataHeatBalance {
 			NewConstrNum = TotConstructs;
 			Construct( NewConstrNum ).IsUsed = true;
 			Construct( TotConstructs ) = Construct( ConstrNum ); // preserve some of the attributes.
+			ConstrWin[ TotConstructs - 1 ] = ConstrWin[ ConstrNum - 1 ];
 			// replace others...
 			Construct( TotConstructs ).Name = "iz-" + Construct( ConstrNum ).Name;
 			Construct( TotConstructs ).TotLayers = Construct( ConstrNum ).TotLayers;
@@ -1663,6 +1667,7 @@ namespace DataHeatBalance {
 		using DataSurfaces::Ground;
 		using DataSurfaces::GroundFCfactorMethod;
 		using DataSurfaces::SurfaceClass_Door;
+		using DataSurfaces::Construction;
 
 		// Return value
 		Real64 NominalUwithConvCoeffs; // return value
@@ -1708,7 +1713,7 @@ namespace DataHeatBalance {
 			}
 		}}
 		// interior conditions
-		if ( NominalU( Surface( numSurf ).Construction ) > 0.0 ) {
+		if ( NominalU( Construction[ numSurf - 1 ] ) > 0.0 ) {
 			{ auto const SELECT_CASE_var( Surface( numSurf ).Class );
 			if ( ( SELECT_CASE_var == SurfaceClass_Wall ) || ( SELECT_CASE_var == SurfaceClass_Door ) ) { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
 				insideFilm = 0.1197548;
@@ -1720,10 +1725,10 @@ namespace DataHeatBalance {
 				insideFilm = 0.0;
 				outsideFilm = 0.0;
 			}}
-			NominalUwithConvCoeffs = 1.0 / ( insideFilm + ( 1.0 / NominalU( Surface( numSurf ).Construction ) ) + outsideFilm );
+			NominalUwithConvCoeffs = 1.0 / ( insideFilm + ( 1.0 / NominalU( Construction[ numSurf - 1 ] ) ) + outsideFilm );
 		} else {
 			isValid = false;
-			NominalUwithConvCoeffs = NominalU( Surface( numSurf ).Construction );
+			NominalUwithConvCoeffs = NominalU( Construction[ numSurf - 1 ] );
 		}
 
 		return NominalUwithConvCoeffs;
@@ -1731,7 +1736,7 @@ namespace DataHeatBalance {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

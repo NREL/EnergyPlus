@@ -40,8 +40,6 @@ namespace DataHeatBalFanSys {
 	// MODULE VARIABLE DECLARATIONS:
 	FArray1D< Real64 > SumConvHTRadSys; // Sum of convection to zone air from hi temp radiant heaters
 	FArray1D< Real64 > SumLatentHTRadSys; // Sum of latent gains from hi temp radiant heaters
-	FArray1D< Real64 > SumConvPool; // Sum of convection to zone air from pools
-	FArray1D< Real64 > SumLatentPool; // Sum of latent gains from pools
 	FArray1D< Real64 > QHTRadSysToPerson; // Sum of radiant gains to people from hi temp radiant heaters
 	FArray1D< Real64 > QHWBaseboardToPerson; // Sum of radiant gains to people from hot water baseboard heaters
 	FArray1D< Real64 > QSteamBaseboardToPerson; // Sum of radiant gains to people from steam baseboard heaters
@@ -140,8 +138,6 @@ namespace DataHeatBalFanSys {
 	// of steam baseboard heaters
 	FArray1D< Real64 > QElecBaseboardSurf; // Current radiant heat flux at a surface due to the presence
 	// of electric baseboard heaters
-	FArray1D< Real64 > QPoolSurfNumerator; // Current pool heat flux impact at the surface (numerator of surface heat balance)
-	FArray1D< Real64 > PoolHeatTransCoefs; // Current pool heat transfer coefficients (denominator of surface heat balance)
 	FArray1D< Real64 > RadSysTiHBConstCoef; // Inside heat balance coefficient that is constant
 	FArray1D< Real64 > RadSysTiHBToutCoef; // Inside heat balance coefficient that modifies Toutside
 	FArray1D< Real64 > RadSysTiHBQsrcCoef; // Inside heat balance coefficient that modifies source/sink
@@ -191,7 +187,7 @@ namespace DataHeatBalFanSys {
 	FArray1D< ZoneComfortControlsFangerData > ZoneComfortControlsFanger;
 
 	//     NOTICE
-	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

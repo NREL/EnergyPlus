@@ -199,7 +199,7 @@ namespace ConvectionCoefficients {
 	void
 	InitInteriorConvectionCoeffs(
 		FArray1S< Real64 > const SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
-		Optional_int_const ZoneToResimulate // if passed in, then only calculate surfaces that have this zone
+		int ZoneToResimulate // if not -1, then only calculate surfs in this zone
 	)
 	{
 
@@ -342,14 +342,15 @@ namespace ConvectionCoefficients {
 
 			ZoneLoop1_loop: ;
 		}
+    //gotos considered harmful
 		ZoneLoop1_exit: ;
 		ZoneLoop2: for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
-			SurfLoop: for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+			SurfLoop: for ( SurfNum = ZoneSpecs[ ZoneNum  - 1].SurfaceFirst; SurfNum <= ZoneSpecs[ ZoneNum  - 1].SurfaceLast; ++SurfNum ) {
 
 				if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 
-				if ( present( ZoneToResimulate ) ) {
+				if ( ZoneToResimulate != -1 ){ //present( ZoneToResimulate ) ) {
 					if ( ( ZoneNum != ZoneToResimulate ) && ( AdjacentZoneToSurface( SurfNum ) != ZoneToResimulate ) ) {
 						continue; // skip surfaces that are not associated with this zone
 					}
@@ -367,7 +368,7 @@ namespace ConvectionCoefficients {
 						if ( HConvIn( SurfNum ) < LowHConvLimit ) HConvIn( SurfNum ) = LowHConvLimit;
 
 					} else if ( SELECT_CASE_var1 == ASHRAETARP ) {
-						if ( ! Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) {
+						if ( ! ConstrWin[ Construction[ SurfNum  - 1]  - 1 ].TypeIsWindow ) {
 							CalcASHRAEDetailedIntConvCoeff( SurfNum, SurfaceTemperatures( SurfNum ), MAT( ZoneNum ) );
 						} else {
 							CalcISO15099WindowIntConvCoeff( SurfNum, SurfaceTemperatures( SurfNum ), MAT( ZoneNum ) );
@@ -394,7 +395,7 @@ namespace ConvectionCoefficients {
 						if ( HConvIn( SurfNum ) < LowHConvLimit ) HConvIn( SurfNum ) = LowHConvLimit;
 
 					} else if ( SELECT_CASE_var1 == ASHRAETARP ) {
-						if ( ! Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) {
+						if ( ! ConstrWin[ Construction[ SurfNum  - 1]  - 1 ].TypeIsWindow ) {
 							CalcASHRAEDetailedIntConvCoeff( SurfNum, SurfaceTemperatures( SurfNum ), MAT( ZoneNum ) );
 						} else {
 							CalcISO15099WindowIntConvCoeff( SurfNum, SurfaceTemperatures( SurfNum ), MAT( ZoneNum ) );
@@ -509,7 +510,8 @@ namespace ConvectionCoefficients {
 
 		if ( ! Surface( SurfNum ).ExtWind ) {
 			SurfWindSpeed = 0.0; // No wind exposure
-		} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && SurfaceWindow( SurfNum ).ShadingFlag == ExtShadeOn ) {
+		} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && 
+                SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() == ExtShadeOn ) {
 			SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
 		} else {
 			SurfWindSpeed = Surface( SurfNum ).WindSpeed;
@@ -3152,7 +3154,7 @@ namespace ConvectionCoefficients {
 			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 				if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 				if ( Surface( SurfNum ).ExtBoundCond > 0 ) continue; // Interior surfaces
-				if ( ! Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) continue;
+				if ( ! ConstrWin[ Construction[ SurfNum  - 1] - 1 ].TypeIsWindow ) continue;
 				SurfacesOfType = true;
 				if ( ConvectionType == "OUTSIDE" ) {
 					if ( Surface( SurfNum ).OSCPtr > 0 ) continue;
@@ -3361,7 +3363,7 @@ namespace ConvectionCoefficients {
 			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 				if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 				if ( Surface( SurfNum ).ExtBoundCond <= 0 ) continue; // Exterior surfaces
-				if ( ! Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) continue;
+				if ( ! ConstrWin[ Construction[ SurfNum  - 1 ]  - 1 ].TypeIsWindow ) continue;
 				SurfacesOfType = true;
 				if ( ConvectionType == "OUTSIDE" ) {
 					if ( Surface( SurfNum ).OSCPtr > 0 ) continue;
@@ -3956,7 +3958,9 @@ namespace ConvectionCoefficients {
 		// The correlations shown below differ from (and are less accurate than) those shown in reference 4 because they have been
 		// reformulated with an outlet temperature reference in order to accomodate the structure of the
 		// EnergyPlus code.
-		for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+		for ( SurfNum = ZoneSpecs[ ZoneNum  - 1 ].SurfaceFirst; 
+          SurfNum <= ZoneSpecs[ ZoneNum  - 1 ].SurfaceLast; 
+          ++SurfNum ) {
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 
 			// Set HConvIn using the proper correlation based on Surface Tilt
@@ -4045,11 +4049,13 @@ namespace ConvectionCoefficients {
 			}
 		}
 
-		for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+		for ( SurfNum = ZoneSpecs[ ZoneNum  - 1 ].SurfaceFirst; 
+          SurfNum <= ZoneSpecs[ ZoneNum  - 1 ].SurfaceLast; 
+          ++SurfNum ) {
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 
 			if ( ACH <= 3.0 ) { // Use the other convection algorithm
-				if ( ! Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) {
+				if ( ! ConstrWin[ Construction[ SurfNum  - 1 ]  - 1 ].TypeIsWindow ) {
 					CalcASHRAEDetailedIntConvCoeff( SurfNum, SurfaceTemperatures( SurfNum ), MAT( ZoneNum ) );
 				} else {
 					CalcISO15099WindowIntConvCoeff( SurfNum, SurfaceTemperatures( SurfNum ), MAT( ZoneNum ) );
@@ -4159,7 +4165,9 @@ namespace ConvectionCoefficients {
 		HConvNet = 0.0;
 
 		// determine major width and minor width
-		for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+		for ( SurfNum = ZoneSpecs[ ZoneNum  - 1 ].SurfaceFirst; 
+          SurfNum <= ZoneSpecs[ ZoneNum  - 1].SurfaceLast; 
+          ++SurfNum ) {
 			if ( Surface( SurfNum ).Class != SurfaceClass_Wall ) continue;
 
 			if ( Surface( SurfNum ).Width > majorW ) {
@@ -4172,7 +4180,9 @@ namespace ConvectionCoefficients {
 		}
 
 		// assign major surfaces
-		for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+		for ( SurfNum = ZoneSpecs[ ZoneNum  - 1 ].SurfaceFirst; 
+          SurfNum <= ZoneSpecs[ ZoneNum  - 1].SurfaceLast; 
+          ++SurfNum ) {
 			if ( Surface( SurfNum ).Class != SurfaceClass_Wall ) continue;
 
 			if ( Surface( SurfNum ).Width == majorW ) {
@@ -4214,7 +4224,9 @@ namespace ConvectionCoefficients {
 		}
 
 		// Assign convection coefficients
-		for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+		for ( SurfNum = ZoneSpecs[ ZoneNum  - 1 ].SurfaceFirst; 
+          SurfNum <= ZoneSpecs[ ZoneNum  - 1].SurfaceLast; 
+          ++SurfNum ) {
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 
 			// Use ASHRAESimple correlation to give values for all the minor surfaces
@@ -4822,7 +4834,9 @@ namespace ConvectionCoefficients {
 				thisWWR = -999.0; //throw error?
 			}
 			// first pass thru this zones surfaces to gather data
-			for ( SurfLoop = Zone( ZoneLoop ).SurfaceFirst; SurfLoop <= Zone( ZoneLoop ).SurfaceLast; ++SurfLoop ) {
+			for ( SurfLoop = ZoneSpecs[ ZoneLoop  - 1 ].SurfaceFirst; 
+            SurfLoop <= ZoneSpecs[ ZoneLoop  - 1].SurfaceLast; 
+            ++SurfLoop ) {
 				//first catch exterior walls and do summations
 				if ( ( Surface( SurfLoop ).ExtBoundCond == ExternalEnvironment ) && ( Surface( SurfLoop ).Class == SurfaceClass_Wall ) ) {
 					PerimExtLengthSum += Surface( SurfLoop ).Width;
@@ -4834,7 +4848,9 @@ namespace ConvectionCoefficients {
 			}
 
 			//second pass thru zone surfs to fill data
-			for ( SurfLoop = Zone( ZoneLoop ).SurfaceFirst; SurfLoop <= Zone( ZoneLoop ).SurfaceLast; ++SurfLoop ) {
+			for ( SurfLoop = ZoneSpecs[ ZoneLoop  - 1 ].SurfaceFirst; 
+            SurfLoop <= ZoneSpecs[ ZoneLoop  - 1].SurfaceLast; 
+            ++SurfLoop ) {
 				//now fill values
 				Surface( SurfLoop ).IntConvZoneWallHeight = Zone( ZoneLoop ).CeilingHeight;
 				Surface( SurfLoop ).IntConvZonePerimLength = PerimExtLengthSum;
@@ -4844,7 +4860,9 @@ namespace ConvectionCoefficients {
 
 			//third pass for window locations
 			if ( ( ExtWindowCount > 0 ) && ( ExtWallCount > 0 ) ) {
-				for ( SurfLoop = Zone( ZoneLoop ).SurfaceFirst; SurfLoop <= Zone( ZoneLoop ).SurfaceLast; ++SurfLoop ) {
+				for ( SurfLoop = ZoneSpecs[ ZoneLoop  - 1 ].SurfaceFirst; 
+              SurfLoop <= ZoneSpecs[ ZoneLoop  - 1].SurfaceLast; 
+              ++SurfLoop ) {
 					if ( ( Surface( SurfLoop ).ExtBoundCond == ExternalEnvironment ) && ( ( Surface( SurfLoop ).Class == SurfaceClass_Window ) || ( Surface( SurfLoop ).Class == SurfaceClass_GlassDoor ) ) ) {
 						if ( Surface( SurfLoop ).IntConvWindowWallRatio < 0.5 ) {
 							if ( Surface( SurfLoop ).Centroid.z < Zone( ZoneLoop ).Centroid.z ) {
@@ -5298,6 +5316,7 @@ namespace ConvectionCoefficients {
 
 		// Using/Aliasing
 		using namespace DataZoneEquipment;
+		using DataHeatBalance::ZoneSpecs;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5330,7 +5349,9 @@ namespace ConvectionCoefficients {
 			ActiveFloorCount = 0;
 			ActiveFloorArea = 0.0;
 
-			for ( SurfLoop = Zone( ZoneLoop ).SurfaceFirst; SurfLoop <= Zone( ZoneLoop ).SurfaceLast; ++SurfLoop ) {
+			for ( SurfLoop = ZoneSpecs[ ZoneLoop  - 1 ].SurfaceFirst; 
+            SurfLoop <= ZoneSpecs[ ZoneLoop  - 1 ].SurfaceLast; 
+            ++SurfLoop ) {
 				if ( ! Surface( SurfLoop ).IntConvSurfHasActiveInIt ) continue;
 				if ( Surface( SurfLoop ).Class == SurfaceClass_Wall || Surface( SurfLoop ).Class == SurfaceClass_Door ) {
 					++ActiveWallCount;
@@ -5975,10 +5996,11 @@ namespace ConvectionCoefficients {
 		} else if ( SELECT_CASE_var == HcExt_UserCurve ) {
 			CalcUserDefinedOutsideHcModel( SurfNum, Surface( SurfNum ).OutConvHfUserCurveIndex, Hf );
 		} else if ( SELECT_CASE_var == HcExt_SparrowWindward ) {
-			ConstructNum = Surface( SurfNum ).Construction;
+			ConstructNum = Construction[ SurfNum  - 1 ];
 			if ( ! Surface( SurfNum ).ExtWind ) {
 				SurfWindSpeed = 0.0; // No wind exposure
-			} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && SurfaceWindow( SurfNum ).ShadingFlag == ExtShadeOn ) {
+			} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && 
+                  SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() == ExtShadeOn ) {
 				SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
 			} else {
 				SurfWindSpeed = Surface( SurfNum ).WindSpeed;
@@ -5986,10 +6008,11 @@ namespace ConvectionCoefficients {
 			Hf = CalcSparrowWindward( Material( Construct( ConstructNum ).LayerPoint( 1 ) ).Roughness, Surface( SurfNum ).OutConvFacePerimeter, Surface( SurfNum ).OutConvFaceArea, SurfWindSpeed, SurfNum );
 
 		} else if ( SELECT_CASE_var == HcExt_SparrowLeeward ) {
-			ConstructNum = Surface( SurfNum ).Construction;
+			ConstructNum = Construction[ SurfNum  - 1 ];
 			if ( ! Surface( SurfNum ).ExtWind ) {
 				SurfWindSpeed = 0.0; // No wind exposure
-			} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && SurfaceWindow( SurfNum ).ShadingFlag == ExtShadeOn ) {
+			} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && 
+                  SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() == ExtShadeOn ) {
 				SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
 			} else {
 				SurfWindSpeed = Surface( SurfNum ).WindSpeed;
@@ -5998,7 +6021,7 @@ namespace ConvectionCoefficients {
 		} else if ( SELECT_CASE_var == HcExt_MoWiTTWindward ) {
 			if ( ! Surface( SurfNum ).ExtWind ) {
 				SurfWindSpeed = 0.0; // No wind exposure
-			} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && SurfaceWindow( SurfNum ).ShadingFlag == ExtShadeOn ) {
+			} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() == ExtShadeOn ) {
 				SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
 			} else {
 				SurfWindSpeed = Surface( SurfNum ).WindSpeed;
@@ -6007,36 +6030,41 @@ namespace ConvectionCoefficients {
 		} else if ( SELECT_CASE_var == HcExt_MoWiTTLeeward ) {
 			if ( ! Surface( SurfNum ).ExtWind ) {
 				SurfWindSpeed = 0.0; // No wind exposure
-			} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && SurfaceWindow( SurfNum ).ShadingFlag == ExtShadeOn ) {
+			} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && 
+                  SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() == ExtShadeOn ) {
 				SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
 			} else {
 				SurfWindSpeed = Surface( SurfNum ).WindSpeed;
 			}
 			Hf = CalcMoWITTLeeward( ( TH( SurfNum, 1, 1 ) - Surface( SurfNum ).OutDryBulbTemp ), SurfWindSpeed );
 		} else if ( SELECT_CASE_var == HcExt_DOE2Windward ) {
-			ConstructNum = Surface( SurfNum ).Construction;
+			ConstructNum = Construction[ SurfNum  - 1 ];
 			if ( ! Surface( SurfNum ).ExtWind ) {
 				SurfWindSpeed = 0.0; // No wind exposure
-			} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && SurfaceWindow( SurfNum ).ShadingFlag == ExtShadeOn ) {
+			} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && 
+                  SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() == ExtShadeOn ) {
 				SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
 			} else {
 				SurfWindSpeed = Surface( SurfNum ).WindSpeed;
 			}
 			Hf = CalcDOE2Windward( TH( SurfNum, 1, 1 ), Surface( SurfNum ).OutDryBulbTemp, Surface( SurfNum ).CosTilt, SurfWindSpeed, Material( Construct( ConstructNum ).LayerPoint( 1 ) ).Roughness );
 		} else if ( SELECT_CASE_var == HcExt_DOE2Leeward ) {
-			ConstructNum = Surface( SurfNum ).Construction;
+			ConstructNum = Construction[ SurfNum  - 1 ];
 			if ( ! Surface( SurfNum ).ExtWind ) {
 				SurfWindSpeed = 0.0; // No wind exposure
-			} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && SurfaceWindow( SurfNum ).ShadingFlag == ExtShadeOn ) {
+			} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && 
+                  SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() == ExtShadeOn ) {
 				SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
 			} else {
 				SurfWindSpeed = Surface( SurfNum ).WindSpeed;
 			}
-			Hf = CalcDOE2Leeward( TH( SurfNum, 1, 1 ), Surface( SurfNum ).OutDryBulbTemp, Surface( SurfNum ).CosTilt, SurfWindSpeed, Material( Construct( ConstructNum ).LayerPoint( 1 ) ).Roughness );
+			Hf = CalcDOE2Leeward( TH( SurfNum, 1, 1 ), Surface( SurfNum ).OutDryBulbTemp, Surface( SurfNum ).CosTilt, 
+                            SurfWindSpeed, Material( Construct( ConstructNum ).LayerPoint( 1 ) ).Roughness );
 		} else if ( SELECT_CASE_var == HcExt_NusseltJurges ) {
 			if ( ! Surface( SurfNum ).ExtWind ) {
 				SurfWindSpeed = 0.0; // No wind exposure
-			} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && SurfaceWindow( SurfNum ).ShadingFlag == ExtShadeOn ) {
+			} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && 
+                  SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() == ExtShadeOn ) {
 				SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
 			} else {
 				SurfWindSpeed = Surface( SurfNum ).WindSpeed;
@@ -6046,7 +6074,8 @@ namespace ConvectionCoefficients {
 		} else if ( SELECT_CASE_var == HcExt_McAdams ) {
 			if ( ! Surface( SurfNum ).ExtWind ) {
 				SurfWindSpeed = 0.0; // No wind exposure
-			} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && SurfaceWindow( SurfNum ).ShadingFlag == ExtShadeOn ) {
+			} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && 
+                  SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() == ExtShadeOn ) {
 				SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
 			} else {
 				SurfWindSpeed = Surface( SurfNum ).WindSpeed;
@@ -6055,7 +6084,8 @@ namespace ConvectionCoefficients {
 		} else if ( SELECT_CASE_var == HcExt_Mitchell ) {
 			if ( ! Surface( SurfNum ).ExtWind ) {
 				SurfWindSpeed = 0.0; // No wind exposure
-			} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && SurfaceWindow( SurfNum ).ShadingFlag == ExtShadeOn ) {
+			} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && 
+                  SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() == ExtShadeOn ) {
 				SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
 			} else {
 				SurfWindSpeed = Surface( SurfNum ).WindSpeed;
@@ -6065,7 +6095,8 @@ namespace ConvectionCoefficients {
 		} else if ( SELECT_CASE_var == HcExt_ClearRoof ) {
 			if ( ! Surface( SurfNum ).ExtWind ) {
 				SurfWindSpeed = 0.0; // No wind exposure
-			} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && SurfaceWindow( SurfNum ).ShadingFlag == ExtShadeOn ) {
+			} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && 
+                  SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() == ExtShadeOn ) {
 				SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
 			} else {
 				SurfWindSpeed = Surface( SurfNum ).WindSpeed;
@@ -6363,7 +6394,9 @@ namespace ConvectionCoefficients {
 					} else if ( ( SELECT_CASE_var == VentilatedSlab_Num ) || ( SELECT_CASE_var == LoTempRadiant_Num ) ) {
 
 						if ( ZoneEquipConfig( ZoneNum ).InFloorActiveElement ) {
-							for ( SurfLoop = Zone( ZoneNum ).SurfaceFirst; SurfLoop <= Zone( ZoneNum ).SurfaceLast; ++SurfLoop ) {
+							for ( SurfLoop = ZoneSpecs[ ZoneNum  - 1 ].SurfaceFirst; 
+                    SurfLoop <= ZoneSpecs[ ZoneNum  - 1].SurfaceLast; 
+                    ++SurfLoop ) {
 								if ( ! Surface( SurfLoop ).IntConvSurfHasActiveInIt ) continue;
 								if ( Surface( SurfLoop ).Class == SurfaceClass_Floor ) {
 									DeltaTemp = TH( SurfLoop, 1, 2 ) - MAT( ZoneNum );
@@ -6380,7 +6413,9 @@ namespace ConvectionCoefficients {
 						}
 
 						if ( ZoneEquipConfig( ZoneNum ).InCeilingActiveElement ) {
-							for ( SurfLoop = Zone( ZoneNum ).SurfaceFirst; SurfLoop <= Zone( ZoneNum ).SurfaceLast; ++SurfLoop ) {
+							for ( SurfLoop = ZoneSpecs[ ZoneNum  - 1 ].SurfaceFirst; 
+                    SurfLoop <= ZoneSpecs[ ZoneNum  - 1 ].SurfaceLast; 
+                    ++SurfLoop ) {
 								if ( ! Surface( SurfLoop ).IntConvSurfHasActiveInIt ) continue;
 								if ( Surface( SurfLoop ).Class == SurfaceClass_Roof ) {
 									DeltaTemp = TH( SurfLoop, 1, 2 ) - MAT( ZoneNum );
@@ -6397,7 +6432,9 @@ namespace ConvectionCoefficients {
 						}
 
 						if ( ZoneEquipConfig( ZoneNum ).InWallActiveElement ) {
-							for ( SurfLoop = Zone( ZoneNum ).SurfaceFirst; SurfLoop <= Zone( ZoneNum ).SurfaceLast; ++SurfLoop ) {
+							for ( SurfLoop = ZoneSpecs[ ZoneNum  - 1 ].SurfaceFirst; 
+                    SurfLoop <= ZoneSpecs[ ZoneNum  - 1 ].SurfaceLast; 
+                    ++SurfLoop ) {
 								if ( ! Surface( SurfLoop ).IntConvSurfHasActiveInIt ) continue;
 								if ( Surface( SurfLoop ).Class == SurfaceClass_Wall || Surface( SurfLoop ).Class == SurfaceClass_Door ) {
 									DeltaTemp = TH( SurfLoop, 1, 2 ) - MAT( ZoneNum );
@@ -6452,8 +6489,8 @@ namespace ConvectionCoefficients {
 
 			//Calculate Grashof, Reynolds, and Richardson numbers for the zone
 			//Grashof for zone air based on largest delta T between surfaces and zone height
-			Tmin = minval( TH( {Zone( ZoneNum ).SurfaceFirst,Zone( ZoneNum ).SurfaceLast}, 1, 2 ) );
-			Tmax = maxval( TH( {Zone( ZoneNum ).SurfaceFirst,Zone( ZoneNum ).SurfaceLast}, 1, 2 ) );
+			Tmin = minval( TH( {ZoneSpecs[ ZoneNum  - 1 ].SurfaceFirst,ZoneSpecs[ ZoneNum  - 1 ].SurfaceLast}, 1, 2 ) );
+			Tmax = maxval( TH( {ZoneSpecs[ ZoneNum  - 1 ].SurfaceFirst,ZoneSpecs[ ZoneNum  - 1 ].SurfaceLast}, 1, 2 ) );
 			GrH = ( g * ( Tmax - Tmin ) * pow_3( Zone( ZoneNum ).CeilingHeight ) ) / ( ( MAT( ZoneNum ) + KelvinConv ) * pow_2( v ) );
 
 			// Reynolds number = Vdot supply / v * cube root of zone volume (Goldstein and Noveselac 2010)
@@ -9451,7 +9488,7 @@ namespace ConvectionCoefficients {
 		// 1. Nusselt, W., W. Jurges. 1922. Die Kuhlung einer ebenen Wand durch einen Luftstrom
 		//     (The cooling of a plane wall by an air flow). Gesundheits Ingenieur 52, Heft, 45, Jargang.
 		// 2. Palyvos, J.A., 2008. A survey of wind convection coefficient correlations for building
-		//     envelope energy systems’ modeling. Applied Thermal Engineering 28 (2008) 801-808. Elsevier.
+		//     envelope energy systemsÂ’ modeling. Applied Thermal Engineering 28 (2008) 801-808. Elsevier.
 
 		// USE STATEMENTS:
 		// na
@@ -9499,7 +9536,7 @@ namespace ConvectionCoefficients {
 		// REFERENCES:
 		// 1. McAdams, W.H., 1954. Heat Transmission, third ed., McGraw-Hill, New York.
 		// 2. Palyvos, J.A., 2008. A survey of wind convection coefficient correlations for building
-		//     envelope energy systems’ modeling. Applied Thermal Engineering 28 (2008) 801-808. Elsevier.
+		//     envelope energy systemsÂ’ modeling. Applied Thermal Engineering 28 (2008) 801-808. Elsevier.
 
 		// USE STATEMENTS:
 		// na
@@ -9551,7 +9588,7 @@ namespace ConvectionCoefficients {
 		// REFERENCES:
 		// 1. Mitchell, J.W., 1976. Heat transfer from spheres and other animal forms. Biophy. J. 16 (1976) 561
 		// 2. Palyvos, J.A., 2008. A survey of wind convection coefficient correlations for building
-		//     envelope energy systems’ modeling. Applied Thermal Engineering 28 (2008) 801-808. Elsevier.
+		//     envelope energy systemsÂ’ modeling. Applied Thermal Engineering 28 (2008) 801-808. Elsevier.
 
 		// USE STATEMENTS:
 		// na
@@ -9614,7 +9651,7 @@ namespace ConvectionCoefficients {
 		// Blocken, B., T. Defraeye, D. Derome, J. Carmeliet. 2009.
 		//  High-Resolution CFD Simulations for Forced Convection
 		//   Heat Transfer Coefficients at the Facade of a Low-Rise Building.
-		//   Building and Environment 44 (2009) 2396 – 2412.
+		//   Building and Environment 44 (2009) 2396 Â– 2412.
 
 		// USE STATEMENTS:
 		// na
@@ -9877,7 +9914,7 @@ namespace ConvectionCoefficients {
 
 		RfARR = { 2.10, 1.67, 1.52, 1.13, 1.11, 1.0 };
 
-		Rf = RfARR( Material( Construct( Surface( SurfNum ).Construction ).LayerPoint( 1 ) ).Roughness );
+		Rf = RfARR( Material( Construct( Construction[ SurfNum  - 1 ] ).LayerPoint( 1 ) ).Roughness );
 		//find x, don't know x. avoid time consuming geometry algorithm
 		x = std::sqrt( RoofArea ) / 2.0; // quick simplification, geometry routines to develop
 
@@ -9919,7 +9956,7 @@ namespace ConvectionCoefficients {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

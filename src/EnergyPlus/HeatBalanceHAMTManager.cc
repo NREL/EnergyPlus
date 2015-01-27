@@ -684,7 +684,7 @@ namespace HeatBalanceHAMTManager {
 		for ( sid = 1; sid <= TotSurfaces; ++sid ) {
 			if ( Surface( sid ).Class == SurfaceClass_Window ) continue;
 			if ( Surface( sid ).HeatTransferAlgorithm != HeatTransferModel_HAMT ) continue;
-			conid = Surface( sid ).Construction;
+			conid = Construction[ sid  - 1];
 			if ( conid == 0 ) continue;
 			for ( lid = 1; lid <= Construct( conid ).TotLayers; ++lid ) {
 				matid = Construct( conid ).LayerPoint( lid );
@@ -821,7 +821,7 @@ namespace HeatBalanceHAMTManager {
 			runor += cells( cid ).length( 1 );
 
 			// Material Cells
-			conid = Surface( sid ).Construction;
+			conid = Construction[ sid  - 1];
 			for ( lid = 1; lid <= Construct( conid ).TotLayers; ++lid ) {
 				matid = Construct( conid ).LayerPoint( lid );
 
@@ -932,7 +932,7 @@ namespace HeatBalanceHAMTManager {
 			SetupOutputVariable( "HAMT Surface Outside Face Relative Humidity [%]", surfextrh( sid ), "Zone", "State", Surface( sid ).Name );
 
 			// write cell origins to initilisation output file
-			conid = Surface( sid ).Construction;
+			conid = Construction[ sid  - 1];
 			gio::write( OutputFileInits, "('HAMT cells, ',A,',',A,$)" ) << Surface( sid ).Name << Construct( conid ).Name;
 			for ( int concell = 1, concell_end = Intcell( sid ) - Extcell( sid ) + 1; concell <= concell_end; ++concell ) {
 				gio::write( OutputFileInits, "(',',i4,$)" ) << concell;
@@ -1116,7 +1116,7 @@ namespace HeatBalanceHAMTManager {
 
 		cells( IntConcell( sid ) ).htc = HConvInFD( sid );
 
-		cells( Intcell( sid ) ).Qadds = Surface( sid ).Area * ( QRadSWInAbs( sid ) + NetLWRadToSurf( sid ) + QHTRadSysSurf( sid ) + QHWBaseboardSurf( sid ) + QSteamBaseboardSurf( sid ) + QElecBaseboardSurf( sid ) + QRadThermInAbs( sid ) );
+		cells( Intcell( sid ) ).Qadds = Surface( sid ).Area * ( QRadSWInAbs( sid ) + NetLWRadToSurf[ sid - 1 ] + QHTRadSysSurf( sid ) + QHWBaseboardSurf( sid ) + QSteamBaseboardSurf( sid ) + QElecBaseboardSurf( sid ) + QRadThermInAbs( sid ) );
 		// Check, Is this per unit area or for the whole wall.
 		//    cells(Intcell(sid))%Qadds=QRadSWInAbs(sid)+NetLWRadToSurf(sid)+QHtRadSysSurf(sid)+QRadThermInAbs(sid)
 
@@ -1675,7 +1675,7 @@ namespace HeatBalanceHAMTManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of
 	//     Illinois and The Regents of the University of California through
 	//     Ernest Orlando Lawrence Berkeley National Laboratory.  All rights
 	//     reserved.

@@ -1,6 +1,10 @@
 #ifndef DataSurfaces_hh_INCLUDED
 #define DataSurfaces_hh_INCLUDED
 
+// C++ Headers
+#include <vector>
+#include <functional>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray2D.hh>
@@ -10,6 +14,11 @@
 #include <DataBSDFWindow.hh>
 #include <DataGlobals.hh>
 #include <DataVectorTypes.hh>
+#include <DataViewFactorInformation.hh>
+
+
+// SpeedupHelpers
+#include <ThreadArray.hh>
 
 namespace EnergyPlus {
 
@@ -403,6 +412,7 @@ namespace DataSurfaces {
 	extern FArray1D< Real64 > WinShadingAbsorbedSolarEnergy; // Energy of WinShadingAbsorbedSolar [J]
 	extern FArray1D< Real64 > WinGapConvHtFlowRepEnergy; // Energy of WinGapConvHtFlowRep [J]
 
+	extern std::vector< int > Construction;  // Pointer to the construction in the Construct derived type
 	// SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
 
 	// Types
@@ -411,7 +421,6 @@ namespace DataSurfaces {
 	{
 		// Members
 		std::string Name; // User supplied name of the surface (must be unique)
-		int Construction; // Pointer to the construction in the Construct derived type
 		bool EMSConstructionOverrideON; // if true, EMS is calling to override the construction value
 		int EMSConstructionOverrideValue; // pointer value to use for Construction when overridden
 		int ConstructionStoredInputValue; // holds the original value for Construction per surface input
@@ -549,7 +558,6 @@ namespace DataSurfaces {
 		int ExtCavNum; // index for this surface in ExtVentedCavity structure (if any)
 		bool IsPV; // true if this is a photovoltaic surface (dxf output)
 		bool IsICS; // true if this is an ICS collector
-		bool IsPool; // true if this is a pool
 		int ICSPtr; // Index to ICS collector
 		// TH added 3/26/2010
 		bool MirroredSurf; // Ture if it is a mirrored surface
@@ -579,7 +587,6 @@ namespace DataSurfaces {
 
 		// Default Constructor
 		SurfaceData() :
-			Construction( 0 ),
 			EMSConstructionOverrideON( false ),
 			EMSConstructionOverrideValue( 0 ),
 			ConstructionStoredInputValue( 0 ),
@@ -670,7 +677,6 @@ namespace DataSurfaces {
 			ExtCavNum( 0 ),
 			IsPV( false ),
 			IsICS( false ),
-			IsPool( false ),
 			ICSPtr( 0 ),
 			MirroredSurf( false ),
 			IntConvClassification( 0 ),
@@ -698,7 +704,6 @@ namespace DataSurfaces {
 		// Member Constructor
 		SurfaceData(
 			std::string const & Name, // User supplied name of the surface (must be unique)
-			int const Construction, // Pointer to the construction in the Construct derived type
 			bool const EMSConstructionOverrideON, // if true, EMS is calling to override the construction value
 			int const EMSConstructionOverrideValue, // pointer value to use for Construction when overridden
 			int const ConstructionStoredInputValue, // holds the original value for Construction per surface input
@@ -793,7 +798,6 @@ namespace DataSurfaces {
 			int const ExtCavNum, // index for this surface in ExtVentedCavity structure (if any)
 			bool const IsPV, // true if this is a photovoltaic surface (dxf output)
 			bool const IsICS, // true if this is an ICS collector
-			bool const IsPool, // true if this is a pool
 			int const ICSPtr, // Index to ICS collector
 			bool const MirroredSurf, // Ture if it is a mirrored surface
 			int const IntConvClassification, // current classification for inside face air flow regime and surface orientation
@@ -818,7 +822,6 @@ namespace DataSurfaces {
 			Real64 const GenericContam // [ppm] Surface generic contaminant as a storage term for
 		) :
 			Name( Name ),
-			Construction( Construction ),
 			EMSConstructionOverrideON( EMSConstructionOverrideON ),
 			EMSConstructionOverrideValue( EMSConstructionOverrideValue ),
 			ConstructionStoredInputValue( ConstructionStoredInputValue ),
@@ -913,7 +916,6 @@ namespace DataSurfaces {
 			ExtCavNum( ExtCavNum ),
 			IsPV( IsPV ),
 			IsICS( IsICS ),
-			IsPool( IsPool ),
 			ICSPtr( ICSPtr ),
 			MirroredSurf( MirroredSurf ),
 			IntConvClassification( IntConvClassification ),
@@ -940,9 +942,9 @@ namespace DataSurfaces {
 
 	};
 
-	struct SurfaceWindowCalc // Calculated window-related values
+	struct SurfaceWinRad
 	{
-		// Members
+	private:
 		int ShadingFlag; // -1: window has no shading device
 		//   0: shading device is off
 		//   1: interior shade is on
@@ -967,6 +969,48 @@ namespace DataSurfaces {
 		//       triggered on later to control daylight glare
 		//  90: window has a between-glass blind that is off but may be
 		//       triggered on later to control daylight glare
+	public:
+		bool MovableSlats; // True if window has a blind with movable slats
+		FArray1D< Real64 > EffGlassEmiss; // Effective emissivity of glass adjacent to interior blind or shade
+		int OriginalClass; // 0 or if entered originally as:
+		// Window - SurfaceClass_Window
+		// Glass Door - SurfaceClass_GlassDoor
+		// tubular daylighting device dome - SurfaceClass_TDD_Dome
+		// tubular daylighting device diffuser - SurfaceClass_TDD_Diffuser
+		FArray1D< Real64 > ThetaFace; // Face temperatures of window layers (K)
+	  //		Real64 IRfromParentZone; // Incident IR from parent zone (W/m2)
+		FArray1D< Real64 > EffShBlindEmiss; // Effective emissivity of interior blind or shade
+		Real64 SlatAngThisTS; // Slat angle this time step for window with blind on (radians)
+		Real64 EffInsSurfTemp; // Effective inside surface temperature for window with interior blind or
+		//  shade; combination of shade/blind and glass temperatures (C)
+       	        std::function<void()> shadeChangedCallback = nullptr;
+	        inline void
+		setShadingFlag(int val){
+		  ShadingFlag = val;
+		  if(shadeChangedCallback != nullptr){
+		    shadeChangedCallback();
+		  }
+		}
+		inline const int&
+		getShadingFlag(){return ShadingFlag;}
+		SurfaceWinRad():
+			ShadingFlag( ShadeOff ),
+			//put this back in SurfaceWindowCalc, trade with EffInsSurfTemp
+			MovableSlats( false ),
+			EffGlassEmiss( MaxSlatAngs, 0.0 ),
+			OriginalClass( 0),
+			ThetaFace( 10, 296.15 ),
+			EffShBlindEmiss( MaxSlatAngs, 0.0 ),
+			SlatAngThisTS(0.0),
+			EffInsSurfTemp( 23.0 )
+	  {}
+	};
+
+	struct SurfaceWindowCalc // Calculated window-related values
+	{
+		// Members
+		int ExtIntShadePrevTS; // 1 if exterior or interior blind or shade in place previous time step;
+		// 0 otherwise
 		bool ShadingFlagEMSOn; // EMS control flag, true if EMS is controlling ShadingFlag with ShadingFlagEMSValue
 		int ShadingFlagEMSValue; // EMS control value for Shading Flag
 		int StormWinFlag; // -1: Storm window not applicable
@@ -977,8 +1021,6 @@ namespace DataSurfaces {
 		//                         = 1.0 if shading device is on;
 		// For time intervals longer than a time step, = fraction of time that shading
 		// device is on.
-		int ExtIntShadePrevTS; // 1 if exterior or interior blind or shade in place previous time step;
-		// 0 otherwise
 		int ShadedConstruction; // For windows with shading, the construction with shading
 		bool SurfDayLightInit; // surface has been initialized for following 5 arrays
 		FArray1D< Real64 > SolidAngAtRefPt; // Solid angle subtended by window from daylit ref points 1 and 2
@@ -1002,8 +1044,6 @@ namespace DataSurfaces {
 		Real64 FractionUpgoing; // Fraction light entering window that goes upward
 		Real64 VisTransRatio; // For windows with switchable glazing, ratio of normal transmittance
 		//  in switched state to that in unswitched state
-		FArray1D< Real64 > ThetaFace; // Face temperatures of window layers (K)
-		Real64 IRfromParentZone; // Incident IR from parent zone (W/m2)
 		int IRErrCount; // For recurring error counts
 		int IRErrCountC; // For recurring error counts (continuation)
 		Real64 FrameArea; // Frame projected area (m2)
@@ -1059,11 +1099,6 @@ namespace DataSurfaces {
 		Real64 CenterGlArea; // Center of glass area (m2); area of glass where 1-D conduction dominates
 		Real64 EdgeGlCorrFac; // Correction factor to center-of-glass conductance to account for
 		//  2-D glass conduction thermal bridging effects near frame and divider
-		int OriginalClass; // 0 or if entered originally as:
-		// Window - SurfaceClass_Window
-		// Glass Door - SurfaceClass_GlassDoor
-		// tubular daylighting device dome - SurfaceClass_TDD_Dome
-		// tubular daylighting device diffuser - SurfaceClass_TDD_Diffuser
 		Real64 ExtBeamAbsByShade; // Exterior beam solar absorbed by window shade (W/m2)
 		Real64 ExtDiffAbsByShade; // Exterior diffuse solar absorbed by window shade (W/m2)
 		Real64 IntBeamAbsByShade; // Interior beam solar absorbed by window shade (W/m2)
@@ -1081,13 +1116,7 @@ namespace DataSurfaces {
 		Real64 DividerConduction; // Conduction through divider from outside to inside face (W)
 		Real64 OtherConvHeatGain; // other convective = total conv - standard model prediction for EQL window model (W)
 		int BlindNumber; // Blind number for a window with a blind
-		FArray1D< Real64 > EffShBlindEmiss; // Effective emissivity of interior blind or shade
-		FArray1D< Real64 > EffGlassEmiss; // Effective emissivity of glass adjacent to interior blind or shade
-		Real64 EffInsSurfTemp; // Effective inside surface temperature for window with interior blind or
-		//  shade; combination of shade/blind and glass temperatures (C)
-		bool MovableSlats; // True if window has a blind with movable slats
-		Real64 SlatAngThisTS; // Slat angle this time step for window with blind on (radians)
-		Real64 SlatAngThisTSDeg; // Slat angle this time step for window with blind on (deg)
+		Real64 SlatAngThisTSDeg;
 		bool SlatAngThisTSDegEMSon; // flag that indicate EMS system is actuating SlatAngThisTSDeg
 		Real64 SlatAngThisTSDegEMSValue; // value that EMS sets for slat angle in degrees
 		bool SlatsBlockBeam; // True if blind slats block incident beam solar
@@ -1196,13 +1225,12 @@ namespace DataSurfaces {
 
 		// Default Constructor
 		SurfaceWindowCalc() :
-			ShadingFlag( ShadeOff ),
+			ExtIntShadePrevTS( 0 ), 
 			ShadingFlagEMSOn( false ),
 			ShadingFlagEMSValue( 0 ),
 			StormWinFlag( -1 ),
 			StormWinFlagPrevDay( -1 ),
 			FracTimeShadingDeviceOn( 0.0 ),
-			ExtIntShadePrevTS( 0 ),
 			ShadedConstruction( 0 ),
 			SurfDayLightInit( false ),
 			DaylFacPoint( 0 ),
@@ -1215,8 +1243,6 @@ namespace DataSurfaces {
 			RhoFloorWall( 0.0 ),
 			FractionUpgoing( 0.0 ),
 			VisTransRatio( 0.0 ),
-			ThetaFace( 10, 296.15 ),
-			IRfromParentZone( 0.0 ),
 			IRErrCount( 0 ),
 			IRErrCountC( 0 ),
 			FrameArea( 0.0 ),
@@ -1263,7 +1289,6 @@ namespace DataSurfaces {
 			InOutProjSLFracMult( 24, 1.0 ),
 			CenterGlArea( 0.0 ),
 			EdgeGlCorrFac( 1.0 ),
-			OriginalClass( 0 ),
 			ExtBeamAbsByShade( 0.0 ),
 			ExtDiffAbsByShade( 0.0 ),
 			IntBeamAbsByShade( 0.0 ),
@@ -1278,11 +1303,6 @@ namespace DataSurfaces {
 			DividerConduction( 0.0 ),
 			OtherConvHeatGain( 0.0 ),
 			BlindNumber( 0 ),
-			EffShBlindEmiss( MaxSlatAngs, 0.0 ),
-			EffGlassEmiss( MaxSlatAngs, 0.0 ),
-			EffInsSurfTemp( 23.0 ),
-			MovableSlats( false ),
-			SlatAngThisTS( 0.0 ),
 			SlatAngThisTSDeg( 0.0 ),
 			SlatAngThisTSDegEMSon( false ),
 			SlatAngThisTSDegEMSValue( 0.0 ),
@@ -1366,13 +1386,12 @@ namespace DataSurfaces {
 
 		// Member Constructor
 		SurfaceWindowCalc(
-			int const ShadingFlag, // -1: window has no shading device
+			int const ExtIntShadePrevTS, 
 			bool const ShadingFlagEMSOn, // EMS control flag, true if EMS is controlling ShadingFlag with ShadingFlagEMSValue
 			int const ShadingFlagEMSValue, // EMS control value for Shading Flag
 			int const StormWinFlag, // -1: Storm window not applicable
 			int const StormWinFlagPrevDay, // Previous time step value of StormWinFlag
 			Real64 const FracTimeShadingDeviceOn, // For a single time step, = 0.0 if no shading device or shading device is off,
-			int const ExtIntShadePrevTS, // 1 if exterior or interior blind or shade in place previous time step;
 			int const ShadedConstruction, // For windows with shading, the construction with shading
 			bool const SurfDayLightInit, // surface has been initialized for following 5 arrays
 			FArray1< Real64 > const & SolidAngAtRefPt, // Solid angle subtended by window from daylit ref points 1 and 2
@@ -1390,8 +1409,6 @@ namespace DataSurfaces {
 			Real64 const RhoFloorWall, // Same as above, but for light moving down
 			Real64 const FractionUpgoing, // Fraction light entering window that goes upward
 			Real64 const VisTransRatio, // For windows with switchable glazing, ratio of normal transmittance
-			FArray1< Real64 > const & ThetaFace, // Face temperatures of window layers (K)
-			Real64 const IRfromParentZone, // Incident IR from parent zone (W/m2)
 			int const IRErrCount, // For recurring error counts
 			int const IRErrCountC, // For recurring error counts (continuation)
 			Real64 const FrameArea, // Frame projected area (m2)
@@ -1438,7 +1455,6 @@ namespace DataSurfaces {
 			FArray1< Real64 > const & InOutProjSLFracMult, // Multiplier on sunlit fraction due to shadowing of glass by frame
 			Real64 const CenterGlArea, // Center of glass area (m2); area of glass where 1-D conduction dominates
 			Real64 const EdgeGlCorrFac, // Correction factor to center-of-glass conductance to account for
-			int const OriginalClass, // 0 or if entered originally as:
 			Real64 const ExtBeamAbsByShade, // Exterior beam solar absorbed by window shade (W/m2)
 			Real64 const ExtDiffAbsByShade, // Exterior diffuse solar absorbed by window shade (W/m2)
 			Real64 const IntBeamAbsByShade, // Interior beam solar absorbed by window shade (W/m2)
@@ -1453,11 +1469,6 @@ namespace DataSurfaces {
 			Real64 const DividerConduction, // Conduction through divider from outside to inside face (W)
 			Real64 const OtherConvHeatGain, // other convective = total conv - standard model prediction for EQL window model (W)
 			int const BlindNumber, // Blind number for a window with a blind
-			FArray1< Real64 > const & EffShBlindEmiss, // Effective emissivity of interior blind or shade
-			FArray1< Real64 > const & EffGlassEmiss, // Effective emissivity of glass adjacent to interior blind or shade
-			Real64 const EffInsSurfTemp, // Effective inside surface temperature for window with interior blind or
-			bool const MovableSlats, // True if window has a blind with movable slats
-			Real64 const SlatAngThisTS, // Slat angle this time step for window with blind on (radians)
 			Real64 const SlatAngThisTSDeg, // Slat angle this time step for window with blind on (deg)
 			bool const SlatAngThisTSDegEMSon, // flag that indicate EMS system is actuating SlatAngThisTSDeg
 			Real64 const SlatAngThisTSDegEMSValue, // value that EMS sets for slat angle in degrees
@@ -1539,13 +1550,12 @@ namespace DataSurfaces {
 			int const WindowModelType, // if set to WindowBSDFModel, then uses BSDF methods
 			BSDFWindowDescript const & ComplexFen // Data for complex fenestration, see DataBSDFWindow.cc for declaration
 		) :
-			ShadingFlag( ShadingFlag ),
+			ExtIntShadePrevTS( ExtIntShadePrevTS ), 
 			ShadingFlagEMSOn( ShadingFlagEMSOn ),
 			ShadingFlagEMSValue( ShadingFlagEMSValue ),
 			StormWinFlag( StormWinFlag ),
 			StormWinFlagPrevDay( StormWinFlagPrevDay ),
 			FracTimeShadingDeviceOn( FracTimeShadingDeviceOn ),
-			ExtIntShadePrevTS( ExtIntShadePrevTS ),
 			ShadedConstruction( ShadedConstruction ),
 			SurfDayLightInit( SurfDayLightInit ),
 			SolidAngAtRefPt( SolidAngAtRefPt ),
@@ -1563,8 +1573,6 @@ namespace DataSurfaces {
 			RhoFloorWall( RhoFloorWall ),
 			FractionUpgoing( FractionUpgoing ),
 			VisTransRatio( VisTransRatio ),
-			ThetaFace( 10, ThetaFace ),
-			IRfromParentZone( IRfromParentZone ),
 			IRErrCount( IRErrCount ),
 			IRErrCountC( IRErrCountC ),
 			FrameArea( FrameArea ),
@@ -1611,7 +1619,6 @@ namespace DataSurfaces {
 			InOutProjSLFracMult( 24, InOutProjSLFracMult ),
 			CenterGlArea( CenterGlArea ),
 			EdgeGlCorrFac( EdgeGlCorrFac ),
-			OriginalClass( OriginalClass ),
 			ExtBeamAbsByShade( ExtBeamAbsByShade ),
 			ExtDiffAbsByShade( ExtDiffAbsByShade ),
 			IntBeamAbsByShade( IntBeamAbsByShade ),
@@ -1626,11 +1633,6 @@ namespace DataSurfaces {
 			DividerConduction( DividerConduction ),
 			OtherConvHeatGain( OtherConvHeatGain ),
 			BlindNumber( BlindNumber ),
-			EffShBlindEmiss( MaxSlatAngs, EffShBlindEmiss ),
-			EffGlassEmiss( MaxSlatAngs, EffGlassEmiss ),
-			EffInsSurfTemp( EffInsSurfTemp ),
-			MovableSlats( MovableSlats ),
-			SlatAngThisTS( SlatAngThisTS ),
 			SlatAngThisTSDeg( SlatAngThisTSDeg ),
 			SlatAngThisTSDegEMSon( SlatAngThisTSDegEMSon ),
 			SlatAngThisTSDegEMSValue( SlatAngThisTSDegEMSValue ),
@@ -2464,7 +2466,9 @@ namespace DataSurfaces {
 
 	// Object Data
 	extern FArray1D< SurfaceData > Surface;
+	extern std::vector < SurfaceWinRad > SurfaceRadiantWin; //allocated in SurfaceGeometry.cc
 	extern FArray1D< SurfaceWindowCalc > SurfaceWindow;
+	extern EppPerformance::perTArray< Real64 > IRfromParentZone;
 	extern FArray1D< FrameDividerProperties > FrameDivider;
 	extern FArray1D< StormWindowData > StormWindow;
 	extern FArray1D< WindowShadingControlData > WindowShadingControl;
@@ -2484,7 +2488,7 @@ namespace DataSurfaces {
 
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

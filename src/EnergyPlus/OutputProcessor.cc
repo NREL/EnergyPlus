@@ -1137,6 +1137,7 @@ namespace OutputProcessor {
 			StandardIndexTypeKey = "Zone";
 		} else if ( IndexType == 2 ) {
 			StandardIndexTypeKey = "HVAC";
+
 		} else {
 			StandardIndexTypeKey = "UNKW";
 		}
@@ -1260,6 +1261,7 @@ namespace OutputProcessor {
 			StandardVariableTypeKey = "Average";
 		} else if ( VariableType == 2 ) {
 			StandardVariableTypeKey = "Sum";
+
 		} else {
 			StandardVariableTypeKey = "Unknown";
 		}

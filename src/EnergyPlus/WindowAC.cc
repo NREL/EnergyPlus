@@ -122,7 +122,7 @@ namespace WindowAC {
 
 	// Object Data
 	FArray1D< WindACData > WindAC;
-	FArray1D< WindACNumericFieldData > WindACNumericFields; // holds window AC numeric input fields character field name
+	FArray1D< WindACNumericFieldData > WindACNumericFields; // holds window AC numeric input fields character field name 
 
 	// Functions
 
@@ -959,7 +959,7 @@ namespace WindowAC {
 				}
 			} else {
 				// no scalble sizing method has been specified. Sizing proceeds using the method
-				// specified in the zoneHVAC object
+				// specified in the zoneHVAC object 
 				// N1 , \field Maximum Supply Air Flow Rate
 				SizingMethod = SystemAirflowSizing;
 				FieldNum = 1;

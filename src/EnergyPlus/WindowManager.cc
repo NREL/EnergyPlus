@@ -2,6 +2,7 @@
 #include <cassert>
 #include <cmath>
 #include <string>
+#include <algorithm>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
@@ -423,7 +424,7 @@ namespace WindowManager {
 		//   shade, screen or blind
 		// Loop over constructions and find those that are glazing constructions
 		for ( ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum ) {
-			if ( ! Construct( ConstrNum ).TypeIsWindow ) continue;
+			if ( ! ConstrWin[ ConstrNum  - 1 ].TypeIsWindow ) continue;
 			if ( Construct( ConstrNum ).WindowTypeBSDF ) continue; //Skip Complex Fenestrations, they have separate
 			if ( Construct( ConstrNum ).WindowTypeEQL ) continue; //skip Equivalent Layer Fenestration
 			//handling of optical properties
@@ -527,7 +528,7 @@ namespace WindowManager {
 				}
 				RhoGlIR = max( 0.0, 1.0 - EpsGlIR );
 				Construct( ConstrNum ).ShadeAbsorpThermal = EpsShIR * ( 1.0 + TauShIR * RhoGlIR / ( 1.0 - RhoShIR * RhoGlIR ) );
-				if ( IntShade ) Construct( ConstrNum ).InsideAbsorpThermal *= TauShIR / ( 1.0 - RhoShIR * RhoGlIR );
+				if ( IntShade ) ConstrWin[ ConstrNum  - 1 ].InsideAbsorpThermal *= TauShIR / ( 1.0 - RhoShIR * RhoGlIR );
 			}
 
 			// From the individual glass layer properties, get the glazing system optical properties
@@ -540,7 +541,7 @@ namespace WindowManager {
 			// a correction is made for the effect of a shade, screen or blind if one of these
 			// is present in the construction.
 
-			NGlass = Construct( ConstrNum ).TotGlassLayers;
+			NGlass = ConstrWin[ ConstrNum  - 1 ].TotGlassLayers;
 
 			//--------------------------------------------------------------------------------------------
 			// Front calculation (solar incident from outside of room); bare glass portion of construction
@@ -1300,9 +1301,9 @@ namespace WindowManager {
 
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
-			if ( ! Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) continue;
+			if ( ! ConstrWin[ Construction[ SurfNum  - 1 ]  - 1 ].TypeIsWindow ) continue;
 			if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) continue; //Irrelevant for Complex Fen
-			if ( Construct( Surface( SurfNum ).Construction ).WindowTypeEQL ) continue; // not required
+			if ( Construct( Construction[ SurfNum - 1 ] ).WindowTypeEQL ) continue; // not required
 			ConstrNumSh = SurfaceWindow( SurfNum ).ShadedConstruction;
 			if ( ConstrNumSh == 0 ) continue;
 			TotLay = Construct( ConstrNumSh ).TotLayers;
@@ -1327,15 +1328,15 @@ namespace WindowManager {
 						TauShIR = Material( ShadeLayPtr ).TransThermal;
 						EpsShIR = Material( ShadeLayPtr ).AbsorpThermal;
 						RhoShIR = max( 0.0, 1.0 - TauShIR - EpsShIR );
-						SurfaceWindow( SurfNum ).EffShBlindEmiss( 1 ) = EpsShIR * ( 1.0 + RhoGlIR * TauShIR / ( 1.0 - RhoGlIR * RhoShIR ) );
-						SurfaceWindow( SurfNum ).EffGlassEmiss( 1 ) = EpsGlIR * TauShIR / ( 1.0 - RhoGlIR * RhoShIR );
+						SurfaceRadiantWin[ SurfNum  - 1 ].EffShBlindEmiss( 1 ) = EpsShIR * ( 1.0 + RhoGlIR * TauShIR / ( 1.0 - RhoGlIR * RhoShIR ) );
+						SurfaceRadiantWin[ SurfNum  - 1 ].EffGlassEmiss( 1 ) = EpsGlIR * TauShIR / ( 1.0 - RhoGlIR * RhoShIR );
 					}
 					if ( IntBlind ) {
 						TauShIR = Blind( BlNum ).IRFrontTrans( ISlatAng );
 						EpsShIR = Blind( BlNum ).IRBackEmiss( ISlatAng );
 						RhoShIR = max( 0.0, 1.0 - TauShIR - EpsShIR );
-						SurfaceWindow( SurfNum ).EffShBlindEmiss( ISlatAng ) = EpsShIR * ( 1.0 + RhoGlIR * TauShIR / ( 1.0 - RhoGlIR * RhoShIR ) );
-						SurfaceWindow( SurfNum ).EffGlassEmiss( ISlatAng ) = EpsGlIR * TauShIR / ( 1.0 - RhoGlIR * RhoShIR );
+						SurfaceRadiantWin[ SurfNum  - 1 ].EffShBlindEmiss( ISlatAng ) = EpsShIR * ( 1.0 + RhoGlIR * TauShIR / ( 1.0 - RhoGlIR * RhoShIR ) );
+						SurfaceRadiantWin[ SurfNum  - 1 ].EffGlassEmiss( ISlatAng ) = EpsGlIR * TauShIR / ( 1.0 - RhoGlIR * RhoShIR );
 					}
 					// Loop over remaining slat angles only if blind with movable slats
 					if ( IntShade ) break; // Loop over remaining slat angles only if blind
@@ -1347,9 +1348,9 @@ namespace WindowManager {
 		} // End of surface loop
 
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
-			if ( Surface( SurfNum ).Construction <= 0 ) continue;
-			if ( ! Construct( Surface( SurfNum ).Construction ).TypeIsWindow ) continue;
-			ConstrNum = Surface( SurfNum ).Construction;
+			if ( Construction[ SurfNum  - 1 ] <= 0 ) continue;
+			if ( ! ConstrWin[ Construction[ SurfNum  - 1 ]  - 1 ].TypeIsWindow ) continue;
+			ConstrNum = Construction[ SurfNum  - 1 ];
 			// Total thickness of glazing system (used in calculation of inside reveal reflection/absorption
 			SurfaceWindow( SurfNum ).TotGlazingThickness = 0.0;
 			for ( LayNum = 1; LayNum <= Construct( ConstrNum ).TotLayers; ++LayNum ) {
@@ -1490,7 +1491,7 @@ namespace WindowManager {
 				//    SurfaceWindow(SurfNum)%BlindNumber = Material(MatNum)%BlindDataPtr
 				// Between glass blind is layer 3 for double glazing and layer 5 for triple glazing.
 				//  ELSE IF(ShadingType == WSC_ST_BetweenGlassBlind) THEN
-				//    IF(Construct(ConstrNumSh)%TotGlassLayers == 2) THEN
+				//    IF(ConstrWin[ConstrNumSh - 1 ].TotGlassLayers == 2) THEN
 				//      SurfaceWindow(SurfNum)%BlindNumber = Material(Construct(ConstrNumSh)%LayerPoint(3))%BlindDataPtr
 				//    ELSE
 				//      SurfaceWindow(SurfNum)%BlindNumber = Material(Construct(ConstrNumSh)%LayerPoint(5))%BlindDataPtr
@@ -1549,7 +1550,7 @@ namespace WindowManager {
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			SurfaceWindow( SurfNum ).SolarDiffusing = false;
 			if ( Surface( SurfNum ).Class == SurfaceClass_Window && Surface( SurfNum ).ExtBoundCond == ExternalEnvironment && Surface( SurfNum ).StormWinConstruction == 0 ) {
-				ConstrNum = Surface( SurfNum ).Construction;
+				ConstrNum = Construction[ SurfNum  - 1 ];
 				MatNum = Construct( ConstrNum ).LayerPoint( Construct( ConstrNum ).TotLayers );
 				if ( Material( MatNum ).SolarDiffusing ) {
 					if ( Surface( SurfNum ).WindowShadingControlPtr == 0 ) {
@@ -2107,12 +2108,12 @@ namespace WindowManager {
 			//Simon: Complex fenestration state works only with tarcog
 			CalcComplexWindowThermal( SurfNum, temp, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, noCondition );
 
-			ConstrNum = surface.Construction;
-			TotGlassLay = Construct( ConstrNum ).TotGlassLayers;
+			ConstrNum = Construction[ SurfNum  - 1 ];
+			TotGlassLay = ConstrWin[ ConstrNum  - 1 ].TotGlassLayers;
 			ngllayer = Construct( ConstrNum ).TotSolidLayers; // Simon: This is necessary to keep for frame calculations
 			// Simon: need to transfer surface temperatures because of frames calculation
 			for ( i = 1; i <= 2 * Construct( ConstrNum ).TotSolidLayers; ++i ) {
-				thetas( i ) = window.ThetaFace( i );
+				thetas( i ) = SurfaceRadiantWin[ SurfNum - 1 ].ThetaFace( i );
 			}
 			hcout = HextConvCoeff;
 
@@ -2145,7 +2146,7 @@ namespace WindowManager {
 
 		} else { // regular window, not BSDF, not EQL Window
 
-			ConstrNum = surface.Construction;
+			ConstrNum = Construction[ SurfNum  - 1 ];
 			if ( window.StormWinFlag > 0 ) ConstrNum = surface.StormWinConstruction;
 
 			// Added for thermochromic windows
@@ -2177,7 +2178,7 @@ namespace WindowManager {
 						iMinDT = minloc( deltaTemp, deltaTemp > 0.0 );
 						// Use the new TC window construction
 						ConstrNum = IDConst( iMinDT( 1 ) );
-						surface.Construction = ConstrNum;
+						Construction[ SurfNum  - 1 ] = ConstrNum;
 						window.SpecTemp = Material( Construct( ConstrNum ).TCLayer ).SpecTemp;
 					}
 				}
@@ -2186,10 +2187,10 @@ namespace WindowManager {
 
 			ZoneNum = surface.Zone;
 			TotLay = Construct( ConstrNum ).TotLayers;
-			TotGlassLay = Construct( ConstrNum ).TotGlassLayers;
+			TotGlassLay = ConstrWin[ ConstrNum  - 1 ].TotGlassLayers;
 			ngllayer = TotGlassLay;
 			nglface = 2 * ngllayer;
-			ShadeFlag = window.ShadingFlag;
+			ShadeFlag = SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag();
 			tilt = surface.Tilt;
 			tiltr = tilt * DegToRadians;
 			SurfNumAdj = surface.ExtBoundCond;
@@ -2253,7 +2254,7 @@ namespace WindowManager {
 			}
 
 			// IR incident on window from zone surfaces and high-temp radiant sources
-			Rmir = window.IRfromParentZone + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum );
+			Rmir = IRfromParentZone[ SurfNum - 1 ] + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum );
 
 			// Short-wave radiation (from interior and exterior solar and zone lights)
 			// absorbed at each face. Assumes equal split between faces of short-wave absorbed in glass layer.
@@ -2362,10 +2363,10 @@ namespace WindowManager {
 						BlNum = window.BlindNumber;
 						thick( TotGlassLay + 1 ) = Blind( BlNum ).SlatThickness;
 						scon( TotGlassLay + 1 ) = Blind( BlNum ).SlatConductivity / Blind( BlNum ).SlatThickness;
-						emis( nglface + 1 ) = InterpSlatAng( window.SlatAngThisTS, window.MovableSlats, Blind( BlNum ).IRFrontEmiss );
-						emis( nglface + 2 ) = InterpSlatAng( window.SlatAngThisTS, window.MovableSlats, Blind( BlNum ).IRBackEmiss );
-						tir( nglface + 1 ) = InterpSlatAng( window.SlatAngThisTS, window.MovableSlats, Blind( BlNum ).IRFrontTrans );
-						tir( nglface + 2 ) = InterpSlatAng( window.SlatAngThisTS, window.MovableSlats, Blind( BlNum ).IRBackTrans );
+						emis( nglface + 1 ) = InterpSlatAng( SurfaceRadiantWin[ SurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ SurfNum  - 1 ].MovableSlats, Blind( BlNum ).IRFrontEmiss );
+						emis( nglface + 2 ) = InterpSlatAng( SurfaceRadiantWin[ SurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ SurfNum  - 1 ].MovableSlats, Blind( BlNum ).IRBackEmiss );
+						tir( nglface + 1 ) = InterpSlatAng( SurfaceRadiantWin[ SurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ SurfNum  - 1 ].MovableSlats, Blind( BlNum ).IRFrontTrans );
+						tir( nglface + 2 ) = InterpSlatAng( SurfaceRadiantWin[ SurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ SurfNum  - 1 ].MovableSlats, Blind( BlNum ).IRBackTrans );
 					}
 				}
 
@@ -2462,7 +2463,9 @@ namespace WindowManager {
 				// The IR radiance of this window's "exterior" surround is the IR radiance
 				// from surfaces and high-temp radiant sources in the adjacent zone
 
-				Outir = SurfaceWindow( SurfNumAdj ).IRfromParentZone + QHTRadSysSurf( SurfNumAdj ) + QHWBaseboardSurf( SurfNumAdj ) + QSteamBaseboardSurf( SurfNumAdj ) + QElecBaseboardSurf( SurfNumAdj );
+				Outir = IRfromParentZone[ SurfNumAdj - 1 ] + QHTRadSysSurf( SurfNumAdj ) + 
+					QHWBaseboardSurf( SurfNumAdj ) + QSteamBaseboardSurf( SurfNumAdj ) + 
+					QElecBaseboardSurf( SurfNumAdj );
 
 			} else { // Exterior window (ExtBoundCond = 0)
 
@@ -2518,9 +2521,9 @@ namespace WindowManager {
 
 			if ( ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn ) {
 				SurfInsideTemp = thetas( 2 * ngllayer + 2 ) - TKelvin;
-				EffShBlEmiss = InterpSlatAng( window.SlatAngThisTS, window.MovableSlats, window.EffShBlindEmiss );
-				EffGlEmiss = InterpSlatAng( window.SlatAngThisTS, window.MovableSlats, window.EffGlassEmiss );
-				window.EffInsSurfTemp = ( EffShBlEmiss * SurfInsideTemp + EffGlEmiss * ( thetas( 2 * ngllayer ) - TKelvin ) ) / ( EffShBlEmiss + EffGlEmiss );
+				EffShBlEmiss = InterpSlatAng( SurfaceRadiantWin[ SurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ SurfNum  - 1 ].MovableSlats, SurfaceRadiantWin[ SurfNum  - 1 ].EffShBlindEmiss );
+				EffGlEmiss = InterpSlatAng( SurfaceRadiantWin[ SurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ SurfNum  - 1 ].MovableSlats, SurfaceRadiantWin[ SurfNum  - 1 ].EffGlassEmiss );
+				SurfaceRadiantWin[ SurfNum - 1 ].EffInsSurfTemp = ( EffShBlEmiss * SurfInsideTemp + EffGlEmiss * ( thetas( 2 * ngllayer ) - TKelvin ) ) / ( EffShBlEmiss + EffGlEmiss );
 			} else {
 				SurfInsideTemp = thetas( 2 * ngllayer ) - TKelvin;
 			}
@@ -2536,7 +2539,7 @@ namespace WindowManager {
 			// Save temperatures for use next time step
 
 			for ( k = 1; k <= nglfacep; ++k ) {
-				window.ThetaFace( k ) = thetas( k );
+				SurfaceRadiantWin[ SurfNum  - 1 ].ThetaFace( k ) = thetas( k );
 			}
 
 			// Added TH 12/23/2008 for thermochromic windows to save the current TC layer temperature
@@ -2547,7 +2550,7 @@ namespace WindowManager {
 
 		// Set condensation flag to 1 if condensation expected to occur on the innermost glass face,
 		// or, for airflow windows, on either or the two glass faces in the airflow gap
-		if ( ! Construct( surface.Construction ).WindowTypeEQL ) {
+		if ( ! Construct( Construction[ SurfNum - 1 ] ).WindowTypeEQL ) {
 			InsideGlassTemp = thetas( 2 * ngllayer ) - TKelvin;
 			RoomHumRat = ZoneAirHumRat( surface.Zone );
 			RoomDewPoint = PsyTdpFnWPb( RoomHumRat, OutBaroPress );
@@ -2881,8 +2884,8 @@ namespace WindowManager {
 		ConvHeatFlowNatural = 0.0;
 		ConvHeatFlowForced = 0.0;
 		nglfacep = nglface;
-		ShadeFlag = SurfaceWindow( SurfNum ).ShadingFlag;
-		ZoneNum = Surface( SurfNum ).Zone;
+		ShadeFlag = SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag(); 
+		ZoneNum = Surface( SurfNum ).Zone; 
 		AbsRadShadeFace = 0.0;
 		TGapNew = 0.0;
 
@@ -3437,7 +3440,7 @@ namespace WindowManager {
 
 			// Correct WinHeatGain for interior diffuse shortwave (solar and shortwave from lights) transmitted
 			// back out window
-			ConstrNum = Surface( SurfNum ).Construction;
+			ConstrNum = Construction[ SurfNum  - 1 ];
 			ConstrNumSh = Surface( SurfNum ).ShadedConstruction;
 			if ( SurfaceWindow( SurfNum ).StormWinFlag == 1 ) {
 				ConstrNum = Surface( SurfNum ).StormWinConstruction;
@@ -3450,8 +3453,8 @@ namespace WindowManager {
 			} else if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) {
 				TransDiff = Construct( ConstrNumSh ).TransDiff;
 			} else if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
-				TransDiff = InterpSlatAng( SurfaceWindow( SurfNum ).SlatAngThisTS, SurfaceWindow( SurfNum ).MovableSlats, Construct( ConstrNumSh ).BlTransDiff );
-			} else if ( ShadeFlag == SwitchableGlazing ) {
+			  TransDiff = InterpSlatAng( SurfaceRadiantWin[ SurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ SurfNum  - 1 ].MovableSlats, Construct( ConstrNumSh ).BlTransDiff );
+			    } else if ( ShadeFlag == SwitchableGlazing ) {
 				TransDiff = InterpSw( SurfaceWindow( SurfNum ).SwitchingFactor, Construct( ConstrNum ).TransDiff, Construct( ConstrNumSh ).TransDiff );
 			}
 			WinHeatGain( SurfNum ) -= QS( Surface( SurfNum ).Zone ) * Surface( SurfNum ).Area * TransDiff;
@@ -3591,9 +3594,9 @@ namespace WindowManager {
 
 		ConstrNumSh = SurfaceWindow( SurfNum ).ShadedConstruction;
 		if ( SurfaceWindow( SurfNum ).StormWinFlag == 1 ) ConstrNumSh = Surface( SurfNum ).StormWinShadedConstruction;
-		ShadeFlag = SurfaceWindow( SurfNum ).ShadingFlag;
-		nglassfaces = 2 * Construct( ConstrNumSh ).TotGlassLayers;
-		TotGaps = Construct( ConstrNumSh ).TotGlassLayers;
+		ShadeFlag = SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag();
+		nglassfaces = 2 * ConstrWin[ ConstrNumSh  - 1 ].TotGlassLayers;
+		TotGaps = ConstrWin[ ConstrNumSh  - 1 ].TotGlassLayers;
 
 		if ( ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn ) { // Interior shade or blind
 			MatNumSh = Construct( ConstrNumSh ).LayerPoint( nglassfaces );
@@ -3806,10 +3809,10 @@ namespace WindowManager {
 		int IGapInc; // Gap increment (0 or 1)
 
 		ConstrNumSh = Surface( SurfNum ).ShadedConstruction;
-		ShadeFlag = SurfaceWindow( SurfNum ).ShadingFlag;
-		nglassfaces = 2 * Construct( ConstrNumSh ).TotGlassLayers;
+		ShadeFlag = SurfaceRadiantWin[ SurfNum - 1 ].getShadingFlag();
+		nglassfaces = 2 * ConstrWin[ ConstrNumSh - 1 ].TotGlassLayers;
 
-		if ( Construct( ConstrNumSh ).TotGlassLayers == 2 ) { // Double glazing
+		if ( ConstrWin[ ConstrNumSh - 1 ].TotGlassLayers == 2 ) { // Double glazing
 			MatNumSh = Construct( ConstrNumSh ).LayerPoint( 3 );
 			IGapInc = 0;
 			for ( IGap = 1; IGap <= 2; ++IGap ) {
@@ -3958,6 +3961,7 @@ namespace WindowManager {
 		// Using/Aliasing
 		using ScheduleManager::GetCurrentScheduleValue;
 		using InputProcessor::SameString;
+		using DataSurfaces::Construction;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3999,8 +4003,8 @@ namespace WindowManager {
 		//               Dens  dDens/dT  Con    dCon/dT   Vis    dVis/dT Prandtl dPrandtl/dT
 		//DATA AirProps / 1.29, -0.4d-2, 2.41d-2, 7.6d-5, 1.73d-5, 1.0d-7, 0.72,   1.8d-3  /
 
-		ConstrNum = Surface( SurfNum ).Construction;
-		NGlass = Construct( ConstrNum ).TotGlassLayers;
+		ConstrNum = Construction[ SurfNum - 1 ];
+		NGlass = ConstrWin[ ConstrNum - 1 ].TotGlassLayers;
 		TGlassFace1 = thetas( 2 * NGlass - 2 );
 		TGlassFace2 = thetas( 2 * NGlass - 1 );
 		GapNum = NGlass - 1;
@@ -4134,9 +4138,9 @@ namespace WindowManager {
 		//DATA AirProps / 1.29, -0.4d-2, 2.41d-2, 7.6d-5, 1.73d-5, 1.0d-7, 0.72,   1.8d-3  /
 
 		ConstrNumSh = Surface( SurfNum ).ShadedConstruction;
-		ShadeFlag = SurfaceWindow( SurfNum ).ShadingFlag;
+		ShadeFlag = SurfaceRadiantWin[ SurfNum - 1 ].getShadingFlag();
 
-		if ( Construct( ConstrNumSh ).TotGlassLayers == 2 ) { // Double glazing
+		if ( ConstrWin[ ConstrNumSh - 1 ].TotGlassLayers == 2 ) { // Double glazing
 			MatNumSh = Construct( ConstrNumSh ).LayerPoint( 3 );
 			IGapInc = 0;
 			for ( IGap = 1; IGap <= 2; ++IGap ) {
@@ -4756,14 +4760,14 @@ namespace WindowManager {
 		} else {
 			// Use previous time step values
 			for ( i = 1; i <= nglface; ++i ) {
-				thetas( i ) = SurfaceWindow( SurfNum ).ThetaFace( i );
+				thetas( i ) = SurfaceRadiantWin[ SurfNum  - 1 ].ThetaFace( i );
 			}
 
 		}
 
 		// Initialize face temperatures of shade or blind, if present
 
-		ShadeFlag = SurfaceWindow( SurfNum ).ShadingFlag;
+		ShadeFlag = SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag();
 		if ( SurfaceWindow( SurfNum ).ExtIntShadePrevTS == IntShadeOn || SurfaceWindow( SurfNum ).ExtIntShadePrevTS == IntBlindOn || SurfaceWindow( SurfNum ).ExtIntShadePrevTS == ExtShadeOn || SurfaceWindow( SurfNum ).ExtIntShadePrevTS == ExtBlindOn || SurfaceWindow( SurfNum ).ExtIntShadePrevTS == BGShadeOn || SurfaceWindow( SurfNum ).ExtIntShadePrevTS == BGBlindOn ) {
 			// Shade or blind is on during the previous TS; use previous-TS values of shade/blind face temps.
 			// Note that if shade or blind is NOT on in the current TS the following two
@@ -4773,8 +4777,8 @@ namespace WindowManager {
 			nglfacePrevDay = nglface;
 			if ( StormWinFlagPrevDay == 0 && StormWinFlagThisDay == 1 ) nglfacePrevDay = nglface - 2;
 			if ( StormWinFlagPrevDay == 1 && StormWinFlagThisDay == 0 ) nglfacePrevDay = nglface + 2;
-			thetas( nglface + 1 ) = SurfaceWindow( SurfNum ).ThetaFace( nglfacePrevDay + 1 );
-			thetas( nglface + 2 ) = SurfaceWindow( SurfNum ).ThetaFace( nglfacePrevDay + 2 );
+			thetas( nglface + 1 ) = SurfaceRadiantWin[ SurfNum  - 1 ].ThetaFace( nglfacePrevDay + 1 );
+			thetas( nglface + 2 ) = SurfaceRadiantWin[ SurfNum  - 1 ].ThetaFace( nglfacePrevDay + 2 );
 		} else {
 			// No shade or blind previous time step; guess starting values of shade/blind
 			// taking into account short- and long-wave radiation (from solar, lights and zone equipment)
@@ -6050,9 +6054,9 @@ namespace WindowManager {
 		Real64 DividerRadHeatGain; // Convective IR radiative gain from divider to zone (W)
 		Real64 DividerHeatGain; // Heat gain from divider to zone (W)
 
-		TInRad = root_4( SurfaceWindow( SurfNum ).IRfromParentZone / sigma );
+		TInRad = root_4( IRfromParentZone[ SurfNum - 1 ] / sigma );
 		TOutRad = root_4( Outir / sigma );
-		ShadeFlag = SurfaceWindow( SurfNum ).ShadingFlag;
+		ShadeFlag = SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag();
 		FrDivNum = Surface( SurfNum ).FrameDivider;
 		TotLayers = Construct( ConstrNum ).TotLayers;
 		TotGlassLayers = Construct( ConstrNum ).TotSolidLayers;
@@ -6081,13 +6085,13 @@ namespace WindowManager {
 				HOutRad *= ( 1.0 + ProjCorrFrOut );
 				HOutConvFr = HOutConv * ( 1.0 + ProjCorrFrOut );
 				// Add long-wave from outside window surface absorbed by frame outside projection
-				SurfaceWindow( SurfNum ).FrameQRadOutAbs += 0.5 * SurfaceWindow( SurfNum ).ProjCorrFrOut * FrameDivider( FrDivNum ).FrameEmis * EmisGlassOut * sigma * pow_4( SurfaceWindow( SurfNum ).ThetaFace( 1 ) );
+					SurfaceWindow( SurfNum ).FrameQRadOutAbs += 0.5 * SurfaceWindow( SurfNum ).ProjCorrFrOut * FrameDivider( FrDivNum ).FrameEmis * EmisGlassOut * sigma * pow_4( SurfaceRadiantWin[ SurfNum  - 1 ].ThetaFace( 1 ) );
 			}
 			if ( FrameDivider( FrDivNum ).FrameProjectionIn > 0.0 ) {
 				HInRad *= ( 1.0 + ProjCorrFrIn );
 				HInConvFr = HInConv * ( 1.0 + ProjCorrFrIn );
 				// Add long-wave from inside window surface absorbed by frame inside projection
-				SurfaceWindow( SurfNum ).FrameQRadInAbs += 0.5 * SurfaceWindow( SurfNum ).ProjCorrFrIn * FrameDivider( FrDivNum ).FrameEmis * EmisGlassIn * sigma * pow_4( SurfaceWindow( SurfNum ).ThetaFace( 2 * TotGlassLayers ) );
+				SurfaceWindow( SurfNum ).FrameQRadInAbs += 0.5 * SurfaceWindow( SurfNum ).ProjCorrFrIn * FrameDivider( FrDivNum ).FrameEmis * EmisGlassIn * sigma * pow_4( SurfaceRadiantWin[ SurfNum  - 1 ].ThetaFace( 2 * TotGlassLayers ) );
 			}
 			Afac = ( HOutRad * TOutRadFr + HOutConvFr * tout + SurfaceWindow( SurfNum ).FrameQRadOutAbs ) / ( HOutRad + FrameCon + HOutConvFr );
 			Bfac = FrameCon / ( HOutRad + FrameCon + HOutConvFr );
@@ -6137,20 +6141,20 @@ namespace WindowManager {
 
 			if ( FrameDivider( FrDivNum ).DividerProjectionOut > 0.0 ) {
 				HOutRad *= ( 1.0 + 2.0 * SurfaceWindow( SurfNum ).ProjCorrDivOut );
-				if ( SurfaceWindow( SurfNum ).ShadingFlag == ExtShadeOn ) HOutConvDiv = SurfaceWindow( SurfNum ).ConvCoeffWithShade;
+				if ( SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() == ExtShadeOn ) HOutConvDiv = SurfaceWindow( SurfNum ).ConvCoeffWithShade;
 				HOutConvDiv *= ( 1.0 + 2.0 * SurfaceWindow( SurfNum ).ProjCorrDivOut );
 				// Add long-wave from outside window surface absorbed by divider outside projection
-				SurfaceWindow( SurfNum ).DividerQRadOutAbs += SurfaceWindow( SurfNum ).ProjCorrDivOut * FrameDivider( FrDivNum ).DividerEmis * EmisGlassOut * sigma * pow_4( SurfaceWindow( SurfNum ).ThetaFace( 1 ) );
+				SurfaceWindow( SurfNum ).DividerQRadOutAbs += SurfaceWindow( SurfNum ).ProjCorrDivOut * FrameDivider( FrDivNum ).DividerEmis * EmisGlassOut * sigma * pow_4( SurfaceRadiantWin[ SurfNum  - 1 ].ThetaFace( 1 ) );
 			}
 
 			HInConvDiv = HInConv;
 
 			if ( FrameDivider( FrDivNum ).DividerProjectionIn > 0.0 ) {
 				HInRad *= ( 1.0 + 2.0 * SurfaceWindow( SurfNum ).ProjCorrDivIn );
-				if ( SurfaceWindow( SurfNum ).ShadingFlag == IntShadeOn ) HInConvDiv = SurfaceWindow( SurfNum ).ConvCoeffWithShade;
+				if ( SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() == IntShadeOn ) HInConvDiv = SurfaceWindow( SurfNum ).ConvCoeffWithShade;
 				HInConvDiv *= ( 1.0 + 2.0 * SurfaceWindow( SurfNum ).ProjCorrDivIn );
 				// Add long-wave from inside window surface absorbed by divider inside projection
-				SurfaceWindow( SurfNum ).DividerQRadInAbs += SurfaceWindow( SurfNum ).ProjCorrDivIn * FrameDivider( FrDivNum ).DividerEmis * EmisGlassIn * sigma * pow_4( SurfaceWindow( SurfNum ).ThetaFace( 2 * TotGlassLayers ) );
+				SurfaceWindow( SurfNum ).DividerQRadInAbs += SurfaceWindow( SurfNum ).ProjCorrDivIn * FrameDivider( FrDivNum ).DividerEmis * EmisGlassIn * sigma * pow_4( SurfaceRadiantWin[ SurfNum  - 1 ].ThetaFace( 2 * TotGlassLayers ) );
 			}
 			Afac = ( HOutRad * TOutRadDiv + HOutConvDiv * tout + SurfaceWindow( SurfNum ).DividerQRadOutAbs ) / ( HOutRad + DivCon + HOutConvDiv );
 			Bfac = DivCon / ( HOutRad + DivCon + HOutConvDiv );
@@ -6176,7 +6180,7 @@ namespace WindowManager {
 			// from the inside surface of the divider goes directly into the zone air -- i.e., the IR radiative
 			// interaction between divider and shade is ignored due to the difficulty of calculating this interaction
 			// at the same time that the interaction between glass and shade is calculated.
-			if ( SurfaceWindow( SurfNum ).ShadingFlag == IntShadeOn || SurfaceWindow( SurfNum ).ShadingFlag == IntBlindOn ) SurfaceWindow( SurfNum ).DividerConduction = DividerConduction;
+			if ( SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() == IntShadeOn || SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() == IntBlindOn ) SurfaceWindow( SurfNum ).DividerConduction = DividerConduction;
 			DivTempOut = SurfaceWindow( SurfNum ).DividerTempSurfOut + TKelvin;
 		} // End of check if window has dividers
 
@@ -6360,7 +6364,7 @@ namespace WindowManager {
 
 		errFlag = 0;
 		TotLay = Construct( ConstrNum ).TotLayers;
-		TotGlassLay = Construct( ConstrNum ).TotGlassLayers;
+		TotGlassLay = ConstrWin[ ConstrNum  - 1 ].TotGlassLayers;
 		ngllayer = TotGlassLay; //Autodesk:Uninit This routine needs to check/enforce 1<=ngllayer<=4
 		//EPTeam - believe that is done on input.
 		nglface = 2 * ngllayer;
@@ -6453,7 +6457,7 @@ namespace WindowManager {
 			// Find unshaded construction that goes with this construction w/blind or screen
 			ConstrNumBare = 0;
 			for ( ConstrNum1 = 1; ConstrNum1 <= TotConstructs; ++ConstrNum1 ) {
-				if ( ConstrNum1 != ConstrNum && Construct( ConstrNum1 ).TypeIsWindow && Construct( ConstrNum1 ).TotGlassLayers == Construct( ConstrNum1 ).TotSolidLayers && Construct( ConstrNum1 ).TotGlassLayers == Construct( ConstrNum ).TotGlassLayers ) {
+			  if ( ConstrNum1 != ConstrNum && ConstrWin[ ConstrNum1 - 1 ].TypeIsWindow && ConstrWin[ ConstrNum1 - 1 ].TotGlassLayers == Construct( ConstrNum1 ).TotSolidLayers && ConstrWin[ ConstrNum1 - 1 ].TotGlassLayers == ConstrWin[ ConstrNum  - 1 ].TotGlassLayers ) {
 					// We have an unshaded window construction with the same number of glass layers as ConstrNum;
 					// see if the glass and gas layers match
 					ConstrNumBare = ConstrNum1;
@@ -7155,17 +7159,21 @@ namespace WindowManager {
 		ScanForReports( "Constructions", DoReport, "Constructions" );
 
 		//  DO ThisNum=1,TotConstructs
-		//    IF (.not. Construct(ThisNum)%TypeIsWindow) CYCLE
-		//    HasWindows=.TRUE.
+		//    IF (.not. ConstrWin[ThisNum - 1 ].TypeIsWindow) CYCLE
+		//    HasWindows=.true.
 		//    EXIT
 		//  ENDDO
-
-		if ( any( Construct.TypeIsWindow() ) ) HasWindows = true;
+		if ( std::any_of (ConstrWin.begin(), 
+				  ConstrWin.end(), 
+				  [](WindowAbsThermLay e)
+				  {return e.TypeIsWindow == true;})) 
+		  HasWindows = true;
+		// if ( any( Construct.TypeIsWindow() ) ) HasWindows = true;
 		if ( any( Construct.WindowTypeBSDF() ) ) HasComplexWindows = true; // Yes, this is a bit different than actually using them.
 		if ( any( Construct.WindowTypeEQL() ) ) HasEQLWindows = true; // for reporting purpose only
 
 		//  DO ThisNum=1,TotSurfaces
-		//    SurfConstr = Surface(ThisNum)%Construction
+		//    SurfConstr = Construction[ThisNum - 1 ]
 		//    IF (SurfConstr /= 0) THEN
 		//      IF (Construct(SurfConstr)%WindowTypeBSDF) THEN
 		//        HasComplexWindows=.TRUE.
@@ -7206,10 +7214,9 @@ namespace WindowManager {
 
 					gio::write( OutputFileInits, Format_800 ) << Construct( ThisNum ).Name << RoundSigDigits( ThisNum ) << RoundSigDigits( Construct( ThisNum ).TotSolidLayers ) << RoundSigDigits( NominalU( ThisNum ), 3 ) << RoundSigDigits( Construct( ThisNum ).SummerSHGC, 3 );
 
-				} else if ( Construct( ThisNum ).TypeIsWindow ) {
-					// Calculate for ASHRAE winter and summer conditions:
-					// (1) nominal center-of-glass conductance, including inside and outside air films,
-					// (2) solar heat gain coefficient (SHGC),
+				} else if ( ConstrWin[ ThisNum  - 1 ].TypeIsWindow ) {
+					// Calculate for ASHRAE winter and summer conditions: (1)nominal center-of-glass conductance,
+					// (2) solar heat gain coefficient (SHGC), including inside and outside air films,
 					// (3) solar transmittance at normal incidence, and (4) visible transmittance at normal incidence.
 
 					if ( Construct( ThisNum ).WindowTypeEQL ) {
@@ -7321,7 +7328,7 @@ namespace WindowManager {
 
 			for ( ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum ) {
 
-				if ( ! Construct( ThisNum ).TypeIsWindow ) continue;
+				if ( ! ConstrWin[ ThisNum  - 1 ].TypeIsWindow ) continue;
 				if ( Construct( ThisNum ).WindowTypeEQL ) continue; // skip if equivalent layer window
 
 				// Calculate for ASHRAE winter and summer conditions: (1)nominal center-of-glass conductance,
@@ -7339,7 +7346,7 @@ namespace WindowManager {
 
 		//IF (HasComplexWindows) THEN
 		//DO ThisNum=1,TotSurfaces
-		//  SurfConstr = Surface(ThisNum)%Construction
+		//  SurfConstr = Construction[ThisNum - 1 ]
 		//  IF (SurfConstr /= 0) THEN
 		//    IF (Construct(SurfConstr)%WindowTypeBSDF) THEN
 		//      Write(OutputFileInits,'(A)') '! <WindowConstructionComplex>,Construction Name,Index,#Layers,'//  &
@@ -8871,7 +8878,7 @@ Label99999: ;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

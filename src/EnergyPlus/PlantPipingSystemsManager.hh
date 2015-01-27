@@ -145,11 +145,11 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	void
-	ReadZoneCoupledDomainInputs(
+		ReadZoneCoupledDomainInputs(
 		int const StartingDomainNumForZone,
 		int const NumZoneCoupledDomains,
 		bool & ErrorsFound
-	);
+		);
 
 	//*********************************************************************************************!
 
@@ -283,7 +283,7 @@ namespace PlantPipingSystemsManager {
 	GetSurfaceDataForOSCM(
 		int const OSCMIndex,
 		int const SurfCount
-	);
+		);
 
 	//*********************************************************************************************!
 
@@ -847,17 +847,17 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	Real64
-	EvaluateZoneInterfaceTemperature(
+		EvaluateZoneInterfaceTemperature(
 		int const DomainNum,
 		CartesianCell const & cell
-	);
+		);
 
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
 
 	Real64
-	GetZoneInterfaceHeatFlux( int const DomainNum );
+		GetZoneInterfaceHeatFlux( int const DomainNum );
 
 	//*********************************************************************************************!
 

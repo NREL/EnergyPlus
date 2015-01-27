@@ -1492,7 +1492,7 @@ namespace UnitVentilator {
 								HeatingAirVolFlowScalable = TempSize;
 							}
 						}
-						//DataScalableSizingON = false;
+						//DataScalableSizingON = false;	
 					} else {        // if ( UnitVent (UnitVentNum ).CoilOption /= NoneOption )
 
 						PrintFlag = true;
@@ -1513,7 +1513,7 @@ namespace UnitVentilator {
 
 			} else {
 				// no scalble sizing method has been specified. Sizing proceeds using the method
-				// specified in the zoneHVAC object
+				// specified in the zoneHVAC object 
 				// N1 , \field Maximum Supply Air Flow Rate
 				PrintFlag = true;
 				FieldNum = 1;

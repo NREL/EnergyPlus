@@ -414,7 +414,8 @@ namespace DaylightingDevices {
 		using DataDaylighting::ZoneDaylight;
 		using General::RoundSigDigits;
 		using General::SafeDivide;
-
+		using DataSurfaces::Construction;
+		using DataHeatBalance::ConstrWin;
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS: na
 
@@ -470,8 +471,8 @@ namespace DaylightingDevices {
 						ErrorsFound = true;
 					}
 
-					if ( Construct( Surface( SurfNum ).Construction ).TotGlassLayers > 1 ) {
-						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Dome " + cAlphaArgs( 2 ) + " construction (" + Construct( Surface( SurfNum ).Construction ).Name + ") must have only 1 glass layer." );
+					if ( ConstrWin[ Construction[ SurfNum - 1 ] - 1 ].TotGlassLayers > 1 ) {
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Dome " + cAlphaArgs( 2 ) + " construction (" + Construct( Construction[ SurfNum - 1 ] ).Name + ") must have only 1 glass layer." );
 						ErrorsFound = true;
 					}
 
@@ -485,7 +486,7 @@ namespace DaylightingDevices {
 						ErrorsFound = true;
 					}
 
-					if ( Construct( Surface( SurfNum ).Construction ).WindowTypeEQL ) {
+					if ( Construct( Construction[ SurfNum - 1 ] ).WindowTypeEQL ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Dome " + cAlphaArgs( 2 ) + " Equivalent Layer Window is not supported." );
 						ErrorsFound = true;
 					}
@@ -510,19 +511,19 @@ namespace DaylightingDevices {
 						ErrorsFound = true;
 					}
 
-					if ( SurfaceWindow( SurfNum ).OriginalClass != SurfaceClass_TDD_Diffuser ) {
+					if (  DataSurfaces::SurfaceRadiantWin[ SurfNum  - 1].OriginalClass != SurfaceClass_TDD_Diffuser ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Diffuser " + cAlphaArgs( 3 ) + " is not of surface type TubularDaylightDiffuser." );
 						ErrorsFound = true;
 					}
 
-					if ( Construct( Surface( SurfNum ).Construction ).TotGlassLayers > 1 ) {
-						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Diffuser " + cAlphaArgs( 3 ) + " construction (" + Construct( Surface( SurfNum ).Construction ).Name + ") must have only 1 glass layer." );
+					if ( DataHeatBalance::ConstrWin[ Construction[ SurfNum  - 1]  - 1 ].TotGlassLayers > 1 ) {
+						ShowSevereError( cCurrentModuleObject  + " = " +  cAlphaArgs( 1 ) + ":  Diffuser " + trim( cAlphaArgs( 3 ) ) + " construction (" + Construct( Construction[ SurfNum  - 1] ) .Name  + ") must have only 1 glass layer." );
 						ErrorsFound = true;
 					}
 
-					if ( Construct( Surface( SurfNum ).Construction ).TransDiff <= 1.0e-10 ) {
-						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Diffuser " + cAlphaArgs( 3 ) + " construction (" + Construct( Surface( SurfNum ).Construction ).Name + ") invalid value." );
-						ShowContinueError( "Diffuse solar transmittance of construction [" + RoundSigDigits( Construct( Surface( SurfNum ).Construction ).TransDiff, 4 ) + "] too small for calculations." );
+					if ( Construct( Construction[ SurfNum  - 1] ).TransDiff <= 1.0e-10 ) {
+						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Diffuser " + cAlphaArgs( 3 ) + " construction (" + Construct( Construction[ SurfNum  - 1] ).Name  + ") invalid value." );
+						ShowContinueError( "Diffuse solar transmittance of construction [" + RoundSigDigits( Construct( Construction[ SurfNum  - 1] ).TransDiff, 4 ) + "] too small for calculations." );
 						ErrorsFound = true;
 					}
 
@@ -547,7 +548,7 @@ namespace DaylightingDevices {
 						ErrorsFound = true;
 					}
 
-					if ( Construct( Surface( SurfNum ).Construction ).WindowTypeEQL ) {
+					if ( Construct( Construction[ SurfNum - 1 ] ).WindowTypeEQL ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Diffuser " + cAlphaArgs( 2 ) + " Equivalent Layer Window is not supported." );
 						ErrorsFound = true;
 					}
@@ -664,6 +665,8 @@ namespace DaylightingDevices {
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts;
+		using DataSurfaces::Construction;
+		using DataHeatBalance::ConstrWin;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS: na
@@ -729,7 +732,7 @@ namespace DaylightingDevices {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Window " + cAlphaArgs( 2 ) + " must have 4 sides." );
 						ErrorsFound = true;
 					}
-					if ( Construct( Surface( SurfNum ).Construction ).WindowTypeEQL ) {
+					if ( Construct( Construction[ SurfNum - 1 ] ).WindowTypeEQL ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Window " + cAlphaArgs( 2 ) + " Equivalent Layer Window is not supported." );
 						ErrorsFound = true;
 					}
@@ -794,7 +797,7 @@ namespace DaylightingDevices {
 							if ( ConstrNum == 0 ) {
 								ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Outside shelf construction " + cAlphaArgs( 5 ) + " not found." );
 								ErrorsFound = true;
-							} else if ( Construct( ConstrNum ).TypeIsWindow ) {
+							} else if ( ConstrWin[ ConstrNum - 1 ].TypeIsWindow ) {
 								ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Outside shelf construction " + cAlphaArgs( 5 ) + " must not have WindowMaterial:Glazing." );
 								ErrorsFound = true;
 							} else {
@@ -823,7 +826,7 @@ namespace DaylightingDevices {
 						// Normally this would be done during initialization, but that's not early enough for some shading calculations
 						Surface( SurfNum ).BaseSurf = SurfNum;
 						Surface( SurfNum ).HeatTransSurf = true;
-						Surface( SurfNum ).Construction = ConstrNum; // Kludge to allow shading surface to be a heat transfer surface
+						Construction[ SurfNum  - 1] = ConstrNum; // Kludge to allow shading surface to be a heat transfer surface
 						Construct( ConstrNum ).IsUsed = true;
 					}
 				}
@@ -1199,6 +1202,7 @@ namespace DaylightingDevices {
 
 		// Using/Aliasing
 		using General::POLYF;
+		using DataSurfaces::Construction;
 
 		// Return value
 		Real64 TransTDD;
@@ -1217,8 +1221,8 @@ namespace DaylightingDevices {
 		TransTDD = 0.0;
 
 		// Get constructions of each TDD component
-		constDome = Surface( TDDPipe( PipeNum ).Dome ).Construction;
-		constDiff = Surface( TDDPipe( PipeNum ).Diffuser ).Construction;
+		constDome = Construction[ TDDPipe( PipeNum ).Dome  - 1];
+		constDiff = Construction[ TDDPipe( PipeNum ).Diffuser  - 1];
 
 		// Get the transmittance of each component and of total TDD
 		{ auto const SELECT_CASE_var( RadiationType );
@@ -1400,7 +1404,7 @@ namespace DaylightingDevices {
 		// FLOW:
 		for ( PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum ) {
 			DiffSurf = TDDPipe( PipeNum ).Diffuser;
-			transDiff = Construct( Surface( DiffSurf ).Construction ).TransDiff;
+			transDiff = Construct( DataSurfaces::Construction[ DiffSurf  - 1] ).TransDiff;
 
 			// Calculate diffuse solar reflected back up the pipe by the inside surface of the TDD:DIFFUSER
 			// All solar arriving at the diffuser is assumed to be isotropically diffuse by this point
@@ -1555,7 +1559,7 @@ namespace DaylightingDevices {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

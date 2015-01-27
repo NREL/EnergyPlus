@@ -173,7 +173,7 @@ namespace WaterManager {
 
 		// Using/Aliasing
 		// na
-
+		
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
 
@@ -188,7 +188,7 @@ namespace WaterManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
-
+		
 		if ( ! ( AnyWaterSystemsInModel ) ) return;
 
 		UpdateWaterManager();

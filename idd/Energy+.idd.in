@@ -20132,7 +20132,6 @@ ZoneBaseboard:OutdoorTemperatureControlled,
        \retaincase
        \default General
 
-
 SwimmingPool:Indoor,
   A1,  \field Name
        \required-field
@@ -20217,6 +20216,7 @@ SwimmingPool:Indoor,
        \type object-list
        \object-list ScheduleNames
 
+>>>>>>> bac6848730c14fc21f4294135bb72acfbc65e10c
 ZoneContaminantSourceAndSink:CarbonDioxide,
    \memo Represents internal CO2 gains and sinks in the zone.
   A1 , \field Name
@@ -91855,3 +91855,4 @@ Output:PreprocessorMessage,
         \retaincase
    A12; \field Message Line 10
         \retaincase
+

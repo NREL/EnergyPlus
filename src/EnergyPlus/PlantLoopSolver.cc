@@ -629,8 +629,8 @@ namespace PlantLoopSolver {
 		EachSideFlowRequestFinal = 0.0;
 		//  AtLeastOneNonLRBRequested       = .FALSE.
 
-		// reference
-		auto & loop( PlantLoop( LoopNum ) );
+        // reference
+        auto & loop( PlantLoop( LoopNum ) );
 
 		//~ First we need to set up the flow requests on each LoopSide
 		for ( LoopSideCounter = DemandSide; LoopSideCounter <= SupplySide; ++LoopSideCounter ) {
@@ -644,8 +644,8 @@ namespace PlantLoopSolver {
 			EachSideFlowRequestNeedAndTurnOn( LoopSideCounter ) = 0.0;
 			EachSideFlowRequestNeedIfOn( LoopSideCounter ) = 0.0;
 
-			// reference
-			auto & loop_side( loop.LoopSide( LoopSideCounter ) );
+            // reference
+            auto & loop_side( loop.LoopSide( LoopSideCounter ) );
 
 			// Now loop through all the branches on this LoopSide and get flow requests
 			NumBranchesOnThisLoopSide = loop_side.TotalBranches;
@@ -654,21 +654,21 @@ namespace PlantLoopSolver {
 				ThisBranchFlowRequestNeedAndTurnOn = 0.0;
 				ThisBranchFlowRequestNeedIfOn = 0.0;
 
-				// reference
-				auto & branch( loop_side.Branch( BranchCounter ) );
+                // reference
+                auto & branch( loop_side.Branch( BranchCounter ) );
 
 				if ( BranchCounter > 1 && BranchCounter < NumBranchesOnThisLoopSide ) ++ParallelBranchIndex;
 				NumCompsOnThisBranch = branch.TotalComponents;
 				for ( CompCounter = 1; CompCounter <= NumCompsOnThisBranch; ++CompCounter ) {
 
-					// reference
-					auto & component( branch.Comp( CompCounter ) );
+                    // reference
+                    auto & component( branch.Comp( CompCounter ) );
 
 					NodeToCheckRequest = component.NodeNumIn;
 					FlowPriorityStatus = component.FlowPriority;
 
-					// reference
-					auto & node_with_request( Node( NodeToCheckRequest ) );
+                    // reference
+                    auto & node_with_request( Node( NodeToCheckRequest ) );
 
 					if ( component.GeneralEquipType != GenEquipTypes_Pump ) {
 
@@ -689,6 +689,7 @@ namespace PlantLoopSolver {
 							{ auto const SELECT_CASE_var( component.TypeOf_Num );
 							// remove var speed pumps from this case statement if can set MassFlowRateRequest
 							if ( ( SELECT_CASE_var == TypeOf_PumpConstantSpeed ) || ( SELECT_CASE_var == TypeOf_PumpVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpBankVariableSpeed ) ) {
+
 								if ( CompIndex > 0 ) {
 									ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, PumpEquip( CompIndex ).MassFlowRateMax );
 								}
@@ -718,6 +719,7 @@ namespace PlantLoopSolver {
 						} else {
 							CompIndex = component.CompNum;
 							{ auto const SELECT_CASE_var( component.TypeOf_Num );
+
 							if ( SELECT_CASE_var == TypeOf_PumpConstantSpeed ) {
 								if ( CompIndex > 0 ) {
 									auto & this_pump( PumpEquip( CompIndex ) );
@@ -736,7 +738,7 @@ namespace PlantLoopSolver {
 								}
 							} else if ( SELECT_CASE_var == TypeOf_PumpBankConstantSpeed ) {
 								if ( CompIndex > 0 ) {
-									auto & this_pump( PumpEquip( CompIndex ) );
+                                    auto & this_pump( PumpEquip( CompIndex ) );
 									if ( ParallelBranchIndex >= 1 ) { // branch pump
 										if ( branch.max_abs_Comp_MyLoad() > SmallLoad ) { //Autdesk:Tuned any( abs( Comp.MyLoad() ) > SmallLoad ) replaced for efficiency
 											ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax / this_pump.NumPumpsInBank );
@@ -751,7 +753,7 @@ namespace PlantLoopSolver {
 									}
 								}
 							}
-
+						
 							//overwrite here for branch pumps
 							if ( ( SELECT_CASE_var == TypeOf_PumpVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpBankVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpCondensate ) ) {
 								CompIndex = component.CompNum;
@@ -759,11 +761,11 @@ namespace PlantLoopSolver {
 									auto & this_pump(PumpEquip( CompIndex ) );
 									this_pump.LoopSolverOverwriteFlag = false;
 								}
-
+								
 
 							}}
 						}
-
+						
 					}
 
 				}
@@ -2196,14 +2198,14 @@ namespace PlantLoopSolver {
 				//DSU? didn't take the time to figure out what this should be... SplitterFlowIn = SplitterInletFlow(SplitNum)
 				// 1) apportion flow based on requested fraction of total
 				for ( OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum ) {
-
+					
 					SplitterBranchOut = this_loopside.Splitter( SplitNum ).BranchNumOut( OutletNum );
 					ThisBranchRequest = DetermineBranchFlowRequest( LoopNum, LoopSideNum, SplitterBranchOut );
 					FirstNodeOnBranch = this_loopside.Branch( SplitterBranchOut ).NodeNumIn;
 					auto & this_splitter_outlet_branch( this_loopside.Branch( SplitterBranchOut ) );
-
+				
 					if ( ( this_splitter_outlet_branch.ControlType == ControlType_Active ) || ( this_splitter_outlet_branch.ControlType == ControlType_SeriesActive ) ) {
-
+						
 						// since we are calculating this fraction based on the total parallel request calculated above, we must mimic the logic to make sure the math works every time
 						// that means we must make the variable speed pump correction here as well.
 						for ( CompCounter = 1; CompCounter <= this_splitter_outlet_branch.TotalComponents; ++CompCounter ) {
@@ -2219,16 +2221,16 @@ namespace PlantLoopSolver {
 							ThisBranchRequest = max( ThisBranchRequest, Node( CompInletNode ).MassFlowRateRequest );
 
 						}
-
+						
 						ThisBranchRequestFrac = ThisBranchRequest / TotParallelBranchFlowReq;
 						//    FracFlow = Node(FirstNodeOnBranch)%MassFlowRate/TotParallelBranchFlowReq
 						//    Node(FirstNodeOnBranch)%MassFlowRate = MIN((FracFlow * Node(FirstNodeOnBranch)%MassFlowRate),FlowRemaining)
 						Node( FirstNodeOnBranch ).MassFlowRate = ThisBranchRequestFrac * ThisLoopSideFlow;
 						PushBranchFlowCharacteristics( LoopNum, LoopSideNum, SplitterBranchOut, Node( FirstNodeOnBranch ).MassFlowRate, FirstHVACIteration );
 						FlowRemaining -= Node( FirstNodeOnBranch ).MassFlowRate;
-
+						
 					}
-
+					
 				}
 
 				// 1b) check if flow all apportioned

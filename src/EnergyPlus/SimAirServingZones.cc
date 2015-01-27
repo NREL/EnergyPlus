@@ -4046,7 +4046,7 @@ namespace SimAirServingZones {
 					// determined cooled zone floor area in an airloop
 					if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == AirLoopNum) {
 						FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled += Zone( ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum ).FloorArea;
-					}
+					}			
 				}
 
 				NumZonesHeated = AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
@@ -5974,7 +5974,7 @@ namespace SimAirServingZones {
 		std::string CompName; // component name
 		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
-		Real64 TempSize; // autosized value
+		Real64 TempSize; // autosized value 
 		Real64 CoilInTemp; // entering coil air temperature [C]
 		Real64 CoilInHumRat; // entering coil air humidity ratio [kg/kg]
 		Real64 CoilInEnth; // entering coil air enthalpy [J/kg]
@@ -5984,7 +5984,7 @@ namespace SimAirServingZones {
 		Real64 OutAirFrac; // outdoor air fraction [-]
 		Real64 CpAirStd; // specific heat of air at standard condition
 		Real64 FractionOfAutosize; // user specified autosized fraction for capacity and supply air flow
-		Real64 AutosizedCapacity; // autosized heating and cooling capacity
+		Real64 AutosizedCapacity; // autosized heating and cooling capacity  
 		int NumZonesHeated; // number of zones heated by a system
 		int NumZonesCooled; // numberof zones cooled by a system
 		int ZonesHeatedNum; // loop index of zones heated in a system

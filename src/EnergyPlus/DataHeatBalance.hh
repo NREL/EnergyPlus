@@ -18,6 +18,9 @@
 #include <DataVectorTypes.hh>
 #include <DataWindowEquivalentLayer.hh>
 
+// C++ stdlib
+#include <vector>
+
 namespace EnergyPlus {
 
 namespace DataHeatBalance {
@@ -1240,6 +1243,18 @@ namespace DataHeatBalance {
 
 	};
 
+  struct WindowAbsThermLay
+	{
+	  bool TypeIsWindow;
+	  Real64 InsideAbsorpThermal;
+	  int TotGlassLayers;
+	  WindowAbsThermLay() :
+	    TypeIsWindow(false),
+	    InsideAbsorpThermal(0.0),
+	    TotGlassLayers(0)
+	  {}
+	};
+
 	struct ConstructionData
 	{
 		// Members
@@ -1247,7 +1262,6 @@ namespace DataHeatBalance {
 		int TotLayers; // Total number of layers for the construction; for windows
 		//  this is the total of the glass, gas and shade layers
 		int TotSolidLayers; // Total number of solid (glass or shade) layers (windows only)
-		int TotGlassLayers; // Total number of glass layers (windows only)
 		FArray1D_int LayerPoint; // Pointer array which refers back to
 		// the Material structure; LayerPoint(i)=j->Material(j)%Name,etc
 		bool IsUsed; // Marked true when the construction is used
@@ -1255,7 +1269,6 @@ namespace DataHeatBalance {
 		Real64 OutsideAbsorpVis; // Outside Layer visible absorptance of an opaque surface; not used for windows.
 		Real64 InsideAbsorpSolar; // Inside Layer solar absorptance of an opaque surface; not used for windows.
 		Real64 OutsideAbsorpSolar; // Outside Layer solar absorptance of an opaque surface; not used for windows.
-		Real64 InsideAbsorpThermal; // Inside Layer Thermal absorptance for opaque surfaces or windows;
 		// for windows, applies to innermost glass layer
 		Real64 OutsideAbsorpThermal; // Outside Layer Thermal absorptance
 		int OutsideRoughness; // Outside Surface roughness index (6=very smooth, 5=smooth,
@@ -1374,7 +1387,6 @@ namespace DataHeatBalance {
 		Real64 VisTransNorm; // The normal visible transmittance
 		Real64 SolTransNorm; // the normal solar transmittance
 		bool SourceSinkPresent; // .TRUE. if there is a source/sink within this construction
-		bool TypeIsWindow; // True if a window construction, false otherwise
 		bool WindowTypeBSDF; // True for complex window, false otherwise
 		bool TypeIsEcoRoof; // -- true for construction with ecoRoof outside, the flag
 		//-- is turned on when the outside layer is of type EcoRoof
@@ -1411,14 +1423,12 @@ namespace DataHeatBalance {
 		ConstructionData() :
 			TotLayers( 0 ),
 			TotSolidLayers( 0 ),
-			TotGlassLayers( 0 ),
 			LayerPoint( MaxLayersInConstruct, 0 ),
 			IsUsed( false ),
 			InsideAbsorpVis( 0.0 ),
 			OutsideAbsorpVis( 0.0 ),
 			InsideAbsorpSolar( 0.0 ),
 			OutsideAbsorpSolar( 0.0 ),
-			InsideAbsorpThermal( 0.0 ),
 			OutsideAbsorpThermal( 0.0 ),
 			OutsideRoughness( 0 ),
 			DayltPropPtr( 0 ),
@@ -1503,7 +1513,6 @@ namespace DataHeatBalance {
 			VisTransNorm( 0.0 ),
 			SolTransNorm( 0.0 ),
 			SourceSinkPresent( false ),
-			TypeIsWindow( false ),
 			WindowTypeBSDF( false ),
 			TypeIsEcoRoof( false ),
 			TypeIsIRT( false ),
@@ -1534,14 +1543,12 @@ namespace DataHeatBalance {
 			std::string const & Name, // Name of construction
 			int const TotLayers, // Total number of layers for the construction; for windows
 			int const TotSolidLayers, // Total number of solid (glass or shade) layers (windows only)
-			int const TotGlassLayers, // Total number of glass layers (windows only)
 			FArray1_int const & LayerPoint, // Pointer array which refers back to
 			bool const IsUsed, // Marked true when the construction is used
 			Real64 const InsideAbsorpVis, // Inside Layer visible absorptance of an opaque surface; not used for windows.
 			Real64 const OutsideAbsorpVis, // Outside Layer visible absorptance of an opaque surface; not used for windows.
 			Real64 const InsideAbsorpSolar, // Inside Layer solar absorptance of an opaque surface; not used for windows.
 			Real64 const OutsideAbsorpSolar, // Outside Layer solar absorptance of an opaque surface; not used for windows.
-			Real64 const InsideAbsorpThermal, // Inside Layer Thermal absorptance for opaque surfaces or windows;
 			Real64 const OutsideAbsorpThermal, // Outside Layer Thermal absorptance
 			int const OutsideRoughness, // Outside Surface roughness index (6=very smooth, 5=smooth,
 			int const DayltPropPtr, // Pointer to Daylight Construction Properties
@@ -1627,7 +1634,6 @@ namespace DataHeatBalance {
 			Real64 const VisTransNorm, // The normal visible transmittance
 			Real64 const SolTransNorm, // the normal solar transmittance
 			bool const SourceSinkPresent, // .TRUE. if there is a source/sink within this construction
-			bool const TypeIsWindow, // True if a window construction, false otherwise
 			bool const WindowTypeBSDF, // True for complex window, false otherwise
 			bool const TypeIsEcoRoof, // -- true for construction with ecoRoof outside, the flag
 			bool const TypeIsIRT, // -- true for construction with IRT material
@@ -1656,14 +1662,12 @@ namespace DataHeatBalance {
 			Name( Name ),
 			TotLayers( TotLayers ),
 			TotSolidLayers( TotSolidLayers ),
-			TotGlassLayers( TotGlassLayers ),
 			LayerPoint( MaxLayersInConstruct, LayerPoint ),
 			IsUsed( IsUsed ),
 			InsideAbsorpVis( InsideAbsorpVis ),
 			OutsideAbsorpVis( OutsideAbsorpVis ),
 			InsideAbsorpSolar( InsideAbsorpSolar ),
 			OutsideAbsorpSolar( OutsideAbsorpSolar ),
-			InsideAbsorpThermal( InsideAbsorpThermal ),
 			OutsideAbsorpThermal( OutsideAbsorpThermal ),
 			OutsideRoughness( OutsideRoughness ),
 			DayltPropPtr( DayltPropPtr ),
@@ -1749,7 +1753,6 @@ namespace DataHeatBalance {
 			VisTransNorm( VisTransNorm ),
 			SolTransNorm( SolTransNorm ),
 			SourceSinkPresent( SourceSinkPresent ),
-			TypeIsWindow( TypeIsWindow ),
 			WindowTypeBSDF( WindowTypeBSDF ),
 			TypeIsEcoRoof( TypeIsEcoRoof ),
 			TypeIsIRT( TypeIsIRT ),
@@ -1812,6 +1815,14 @@ namespace DataHeatBalance {
 
 	};
 
+	struct GenZone{
+		int SurfaceFirst; // First Surface in Zone
+		int SurfaceLast; // Last Surface in Zone
+		GenZone(): //default construct
+			SurfaceFirst( 0 ),
+			SurfaceLast( 0 )
+	  {}
+	};
 	struct ZoneData
 	{
 		// Members
@@ -1851,8 +1862,6 @@ namespace DataHeatBalance {
 		bool IsControlled; // True when this is a controlled zone.
 		int TempControlledZoneIndex; // this is the index number for TempControlledZone structure for lookup
 		//            Pointers to Surface Data Structure
-		int SurfaceFirst; // First Surface in Zone
-		int SurfaceLast; // Last Surface in Zone
 		int InsideConvectionAlgo; // Ref: appropriate values for Inside Convection solution
 		int NumSurfaces; // Number of surfaces for this zone
 		int NumSubSurfaces; // Number of subsurfaces for this zone (windows, doors, tdd dome and diffusers)
@@ -1919,8 +1928,8 @@ namespace DataHeatBalance {
 			SystemZoneNodeNumber( 0 ),
 			IsControlled( false ),
 			TempControlledZoneIndex( 0 ),
-			SurfaceFirst( 0 ),
-			SurfaceLast( 0 ),
+			// SurfaceFirst( 0 ),
+			// SurfaceLast( 0 ),
 			InsideConvectionAlgo( ASHRAESimple ),
 			NumSurfaces( 0 ),
 			NumSubSurfaces( 0 ),
@@ -1986,8 +1995,6 @@ namespace DataHeatBalance {
 			int const SystemZoneNodeNumber, // This is the zone node number for the system for a controlled zone
 			bool const IsControlled, // True when this is a controlled zone.
 			int const TempControlledZoneIndex, // this is the index number for TempControlledZone structure for lookup
-			int const SurfaceFirst, // First Surface in Zone
-			int const SurfaceLast, // Last Surface in Zone
 			int const InsideConvectionAlgo, // Ref: appropriate values for Inside Convection solution
 			int const NumSurfaces, // Number of surfaces for this zone
 			int const NumSubSurfaces, // Number of subsurfaces for this zone (windows, doors, tdd dome and diffusers)
@@ -2050,8 +2057,6 @@ namespace DataHeatBalance {
 			SystemZoneNodeNumber( SystemZoneNodeNumber ),
 			IsControlled( IsControlled ),
 			TempControlledZoneIndex( TempControlledZoneIndex ),
-			SurfaceFirst( SurfaceFirst ),
-			SurfaceLast( SurfaceLast ),
 			InsideConvectionAlgo( InsideConvectionAlgo ),
 			NumSurfaces( NumSurfaces ),
 			NumSubSurfaces( NumSubSurfaces ),
@@ -5648,10 +5653,12 @@ namespace DataHeatBalance {
 	extern FArray1D< ZoneSimData > ZoneIntGain;
 	extern FArray1D< MaterialProperties > Material;
 	extern FArray1D< GapSupportPillar > SupportPillar;
-	extern FArray1D< GapDeflectionState > DeflectionState;
+  extern FArray1D< GapDeflectionState > DeflectionState;
+  extern std::vector< WindowAbsThermLay > ConstrWin;
 	extern FArray1D< ConstructionData > Construct;
 	extern FArray1D< SpectralDataProperties > SpectralData;
 	extern FArray1D< ZoneData > Zone;
+	extern std::vector< GenZone > ZoneSpecs;
 	extern FArray1D< ZoneListData > ZoneList;
 	extern FArray1D< ZoneGroupData > ZoneGroup;
 	extern FArray1D< PeopleData > People;
@@ -5735,7 +5742,7 @@ namespace DataHeatBalance {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

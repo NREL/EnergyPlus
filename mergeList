@@ -1,0 +1,90 @@
+gsawaya@eplus-accel:~/dev/eplus-git/EnergyPlusTeam$ git pull origin develop
+remote: Counting objects: 333, done.
+remote: Compressing objects: 100% (278/278), done.
+remote: Total 333 (delta 124), reused 82 (delta 55)
+Receiving objects: 100% (333/333), 5.42 MiB | 3.06 MiB/s, done.
+Resolving deltas: 100% (124/124), done.
+From https://github.com/NREL/EnergyPlusTeam
+ * branch            develop    -> FETCH_HEAD
+Auto-merging testfiles/CMakeLists.txt
+Auto-merging src/EnergyPlus/ZoneTempPredictorCorrector.cc
+!!! CONFLICT (content): Merge conflict in src/EnergyPlus/ZoneTempPredictorCorrector.cc
+Auto-merging src/EnergyPlus/ZoneEquipmentManager.cc
+Auto-merging src/EnergyPlus/WindowManager.cc
+Auto-merging src/EnergyPlus/WindowAC.cc
+Auto-merging src/EnergyPlus/WaterManager.cc
+Auto-merging src/EnergyPlus/VentilatedSlab.cc
+!!!CONFLICT (content): Merge conflict in src/EnergyPlus/VentilatedSlab.cc
+Auto-merging src/EnergyPlus/UtilityRoutines.cc
+!!!CONFLICT (content): Merge conflict in src/EnergyPlus/UtilityRoutines.cc
+Auto-merging src/EnergyPlus/UnitVentilator.cc
+Auto-merging src/EnergyPlus/UFADManager.cc
+Auto-merging src/EnergyPlus/TranspiredCollector.cc
+Auto-merging src/EnergyPlus/ThermalChimney.cc
+Auto-merging src/EnergyPlus/SystemReports.cc
+Auto-merging src/EnergyPlus/SurfaceGeometry.cc
+!!!CONFLICT (content): Merge conflict in src/EnergyPlus/SurfaceGeometry.cc
+Auto-merging src/EnergyPlus/SteamBaseboardRadiator.cc
+Auto-merging src/EnergyPlus/SolarShading.cc
+Auto-merging src/EnergyPlus/SizingManager.cc
+!!!CONFLICT (content): Merge conflict in src/EnergyPlus/SizingManager.cc
+Auto-merging src/EnergyPlus/SimulationManager.cc
+Auto-merging src/EnergyPlus/SimAirServingZones.cc
+!!!CONFLICT (content): Merge conflict in src/EnergyPlus/SimAirServingZones.cc
+Auto-merging src/EnergyPlus/SQLiteProcedures.cc
+!!!CONFLICT (content): Merge conflict in src/EnergyPlus/SQLiteProcedures.cc
+Auto-merging src/EnergyPlus/RoomAirModelManager.cc
+Auto-merging src/EnergyPlus/ReportSizingManager.cc
+!!!CONFLICT (content): Merge conflict in src/EnergyPlus/ReportSizingManager.cc
+Auto-merging src/EnergyPlus/PlantPipingSystemsManager.hh
+!!!CONFLICT (content): Merge conflict in src/EnergyPlus/PlantPipingSystemsManager.hh
+Auto-merging src/EnergyPlus/PlantManager.cc
+Auto-merging src/EnergyPlus/PlantLoopSolver.cc
+Auto-merging src/EnergyPlus/PlantCondLoopOperation.cc
+Auto-merging src/EnergyPlus/Photovoltaics.cc
+Auto-merging src/EnergyPlus/PackagedTerminalHeatPump.cc
+Auto-merging src/EnergyPlus/OutputReports.cc
+Auto-merging src/EnergyPlus/OutputReportTabular.cc
+Auto-merging src/EnergyPlus/OutputProcessor.cc
+Auto-merging src/EnergyPlus/NodeInputManager.cc
+Auto-merging src/EnergyPlus/MundtSimMgr.cc
+Auto-merging src/EnergyPlus/MoistureBalanceEMPDManager.cc
+Auto-merging src/EnergyPlus/MixedAir.cc
+Auto-merging src/EnergyPlus/LowTempRadiantSystem.cc
+!!!CONFLICT (content): Merge conflict in src/EnergyPlus/LowTempRadiantSystem.cc
+Auto-merging src/EnergyPlus/InputProcessor.cc
+Auto-merging src/EnergyPlus/IceThermalStorage.cc
+Auto-merging src/EnergyPlus/HighTempRadiantSystem.cc
+Auto-merging src/EnergyPlus/HeatBalanceSurfaceManager.cc
+!!!CONFLICT (content): Merge conflict in src/EnergyPlus/HeatBalanceSurfaceManager.cc
+Auto-merging src/EnergyPlus/HeatBalanceManager.cc
+Auto-merging src/EnergyPlus/HeatBalanceHAMTManager.cc
+Auto-merging src/EnergyPlus/HeatBalanceAirManager.cc
+Auto-merging src/EnergyPlus/HeatBalFiniteDiffManager.cc
+Auto-merging src/EnergyPlus/HWBaseboardRadiator.cc
+Auto-merging src/EnergyPlus/HVACManager.cc
+Auto-merging src/EnergyPlus/GeneralRoutines.cc
+Auto-merging src/EnergyPlus/Fans.cc
+Auto-merging src/EnergyPlus/FanCoilUnits.cc
+Auto-merging src/EnergyPlus/EnergyPlusPgm.cc
+Auto-merging src/EnergyPlus/ElectricBaseboardRadiator.cc
+Auto-merging src/EnergyPlus/EcoRoofManager.cc
+Auto-merging src/EnergyPlus/EMSManager.cc
+Auto-merging src/EnergyPlus/DaylightingManager.cc
+!!!CONFLICT (content): Merge conflict in src/EnergyPlus/DaylightingManager.cc
+Auto-merging src/EnergyPlus/DaylightingDevices.cc
+Auto-merging src/EnergyPlus/DataPlant.cc
+Auto-merging src/EnergyPlus/DataHeatBalance.hh
+Auto-merging src/EnergyPlus/DataHeatBalance.cc
+Auto-merging src/EnergyPlus/CurveManager.cc
+Auto-merging src/EnergyPlus/CrossVentMgr.cc
+Auto-merging src/EnergyPlus/ConvectionCoefficients.cc
+Auto-merging src/EnergyPlus/ConductionTransferFunctionCalc.cc
+Auto-merging src/EnergyPlus/BoilerSteam.cc
+Auto-merging src/EnergyPlus/AirflowNetworkBalanceManager.cc
+!!!CONFLICT (content): Merge conflict in src/EnergyPlus/AirflowNetworkBalanceManager.cc
+Auto-merging idd/Energy+.idd.in
+Auto-merging CMakeLists.txt
+!!!CONFLICT (content): Merge conflict in CMakeLists.txt
+Automatic merge failed; fix conflicts and then commit the result.
+

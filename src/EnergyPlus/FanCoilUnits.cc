@@ -1187,12 +1187,12 @@ namespace FanCoilUnits {
 				} else {
 					MaxAirVolFlowDes = 0.0;
 				}
-
+				
 			}
 		}
 
 		if ( CurZoneEqNum > 0 ) {
-
+			
 			if ( !IsAutoSize && !ZoneSizingRunDone ) {
 
 			} else {
@@ -1298,7 +1298,7 @@ namespace FanCoilUnits {
 				}
 			} else {
 				CoilWaterInletNode = GetCoilWaterInletNode( "Coil:Heating:Water", FanCoil( FanCoilNum ).HCoilName, ErrorsFound );
-				CoilWaterOutletNode = GetCoilWaterOutletNode( "Coil:Heating:Water", FanCoil( FanCoilNum ).HCoilName, ErrorsFound );
+				CoilWaterOutletNode = GetCoilWaterOutletNode( "Coil:Heating:Water", FanCoil( FanCoilNum ).HCoilName, ErrorsFound );				
 				if ( IsAutoSize ) {
 					PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", FanCoil( FanCoilNum ).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
 					if ( PltSizHeatNum > 0 ) {
@@ -1338,7 +1338,7 @@ namespace FanCoilUnits {
 							PrintFlag = false;
 							TempSize = AutoSize;
 							RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-							DesCoilLoad = TempSize;
+							DesCoilLoad = TempSize;						
 						}
 						FanCoil( FanCoilNum ).DesHeatingLoad = DesCoilLoad;
 						if ( DesCoilLoad >= SmallLoad ) {
@@ -1429,7 +1429,7 @@ namespace FanCoilUnits {
 									TempSize = AutoSize;
 									DataScalableCapSizingON = true;
 								}
-							}
+							}	
 							SizingString = "";
 							PrintFlag = false;
 							RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);

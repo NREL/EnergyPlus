@@ -31,3 +31,6 @@ Builds
 *.geany
 .project
 .cproject
+
+#miscellaneous helper app data
+cscope.*

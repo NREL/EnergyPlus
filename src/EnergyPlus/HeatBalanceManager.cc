@@ -546,14 +546,14 @@ namespace HeatBalanceManager {
 		// then process the rest of the relevant constructions
 		std::string constructName( "Construction:WindowEquivalentLayer" );
 		int numConstructions( GetNumObjectsFound( constructName ) );
-		for ( int constructionNum = 1; constructionNum <= numConstructions; ++constructionNum ) {
+		for ( int constructionNum = 1; constructionNum <= numConstructions; ++ constructionNum ) {
 			GetObjectItem( constructName, constructionNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			int numLayersInThisConstruct( NumAlpha - 1 );
 			MaxSolidWinLayers = max( MaxSolidWinLayers, numLayersInThisConstruct );
 		}
-
+		
 		// construction types being ignored as they are opaque: Construction:CfactorUndergroundWall, Construction:FfactorGroundFloor, Construction:InternalSource
-
+		
 
 	}
 
@@ -1086,7 +1086,7 @@ namespace HeatBalanceManager {
 			ZoneAirMassFlow.EnforceZoneMassBalance = false;
 			AlphaName(1) = "NO";
 		}
-		//// allocate if the global variable ZoneAirMassFlow is ON
+		//// allocate if the global variable ZoneAirMassFlow is ON 
 		//if ( ZoneAirMassFlow.EnforceZoneMassBalance ) {
 		//	MassConservation.allocate( NumOfZones );
 		//}
@@ -3572,6 +3572,7 @@ namespace HeatBalanceManager {
 
 		//Allocate the array to the number of constructions/initialize selected variables
 		Construct.allocate( TotConstructs );
+		ConstrWin.resize( TotConstructs );
 		//Note: If TotWindow5Constructs > 0, additional constructions are created in
 		//subr. SearchWindow5DataFile corresponding to those found on the data file.
 		//Initialize CTF and History terms.
@@ -3640,7 +3641,7 @@ namespace HeatBalanceManager {
 						Construct( ConstrNum ).TCMasterConst = ConstrNum;
 						Construct( ConstrNum ).TCGlassID = iMatGlass; // the TC glass layer ID
 						Construct( ConstrNum ).TCLayerID = Layer;
-						Construct( ConstrNum ).TypeIsWindow = true;
+						ConstrWin[ ConstrNum  - 1 ].TypeIsWindow = true;
 					}
 				}
 
@@ -3994,6 +3995,7 @@ namespace HeatBalanceManager {
 		NumOfZones = GetNumObjectsFound( cCurrentModuleObject );
 
 		Zone.allocate( NumOfZones );
+		ZoneSpecs.resize( NumOfZones );
 
 		ZoneDaylight.allocate( NumOfZones );
 
@@ -4422,8 +4424,8 @@ namespace HeatBalanceManager {
 			MaxLoadZoneRpt = 0.0;
 			CountWarmupDayPoints = 0;
 
-			SurfaceWindow.ThetaFace() = 296.15;
-			SurfaceWindow.EffInsSurfTemp() = 23.0;
+			for(auto& srw : DataSurfaces::SurfaceRadiantWin){ srw.EffInsSurfTemp = 23.0; srw.ThetaFace = 296.15;}
+			
 
 		}
 
@@ -4505,8 +4507,6 @@ namespace HeatBalanceManager {
 		//  Allocate variables in DataHeatBalSys
 		SumConvHTRadSys.dimension( NumOfZones, 0.0 );
 		SumLatentHTRadSys.dimension( NumOfZones, 0.0 );
-		SumConvPool.dimension( NumOfZones, 0.0 );
-		SumLatentPool.dimension( NumOfZones, 0.0 );
 		QHTRadSysToPerson.dimension( NumOfZones, 0.0 );
 		QHWBaseboardToPerson.dimension( NumOfZones, 0.0 );
 		QSteamBaseboardToPerson.dimension( NumOfZones, 0.0 );
@@ -5733,6 +5733,7 @@ Label20: ;
 			// reallocate Construct types
 			TotConstructs += NGlSys;
 			Construct.redimension( TotConstructs );
+			ConstrWin.resize( TotConstructs );
 			NominalRforNominalUCalculation.redimension( TotConstructs );
 			NominalU.redimension( TotConstructs );
 
@@ -5796,7 +5797,7 @@ Label20: ;
 				Construct( ConstrNum ).ReflSolBeamBackCoef = 0.0;
 				Construct( ConstrNum ).W5FrameDivider = 0;
 				Construct( ConstrNum ).TotLayers = NGlass( IGlSys ) + NGaps( IGlSys );
-				Construct( ConstrNum ).TotGlassLayers = NGlass( IGlSys );
+				ConstrWin[ ConstrNum  - 1 ].TotGlassLayers = NGlass( IGlSys );
 				Construct( ConstrNum ).TotSolidLayers = NGlass( IGlSys );
 
 				for ( IGlass = 1; IGlass <= NGlass( IGlSys ); ++IGlass ) {
@@ -5805,9 +5806,9 @@ Label20: ;
 				}
 
 				Construct( ConstrNum ).OutsideRoughness = VerySmooth;
-				Construct( ConstrNum ).InsideAbsorpThermal = Material( TotMaterialsPrev + NGlass( IGlSys ) ).AbsorpThermalBack;
+				ConstrWin[ ConstrNum  - 1 ].InsideAbsorpThermal = Material( TotMaterialsPrev + NGlass( IGlSys ) ).AbsorpThermalBack;
 				Construct( ConstrNum ).OutsideAbsorpThermal = Material( TotMaterialsPrev + 1 ).AbsorpThermalFront;
-				Construct( ConstrNum ).TypeIsWindow = true;
+				ConstrWin[ ConstrNum  - 1 ].TypeIsWindow = true;
 				Construct( ConstrNum ).FromWindow5DataFile = true;
 				Construct( ConstrNum ).W5FileGlazingSysHeight = WinHeight( IGlSys );
 				Construct( ConstrNum ).W5FileGlazingSysWidth = WinWidth( IGlSys );
@@ -6604,14 +6605,14 @@ Label1000: ;
 		ZoneUnscheduled = false;
 		ZoneScheduled = false;
 
-		for ( iSurf = Zone( ZoneNum ).SurfaceFirst; iSurf <= Zone( ZoneNum ).SurfaceLast; ++iSurf ) {
-			iConst = Surface( iSurf ).Construction;
+		for ( iSurf = ZoneSpecs[ ZoneNum - 1 ].SurfaceFirst; iSurf <= ZoneSpecs[ ZoneNum - 1 ].SurfaceLast; ++iSurf ) {
+			iConst = Construction[ iSurf - 1];
 			if ( Surface( iSurf ).Class == SurfaceClass_Window ) {
 				SchedPtr = WindowScheduledSolarAbs( iSurf, iConst );
 			} else {
 				SchedPtr = SurfaceScheduledSolarInc( iSurf, iConst );
 			}
-			if ( iSurf == Zone( ZoneNum ).SurfaceFirst ) {
+			if ( iSurf == ZoneSpecs[ ZoneNum - 1 ].SurfaceFirst ) {
 				if ( SchedPtr != 0 ) {
 					ZoneScheduled = true;
 					ZoneUnscheduled = false;
@@ -6637,8 +6638,8 @@ Label1000: ;
 		}
 
 		if ( ( ! ZoneScheduled ) && ( ! ZoneUnscheduled ) ) {
-			for ( iSurf = Zone( ZoneNum ).SurfaceFirst; iSurf <= Zone( ZoneNum ).SurfaceLast; ++iSurf ) {
-				iConst = Surface( iSurf ).Construction;
+			for ( iSurf = ZoneSpecs[ ZoneNum - 1 ].SurfaceFirst; iSurf <= ZoneSpecs[ ZoneNum - 1 ].SurfaceLast; ++iSurf ) {
+				iConst = Construction[ iSurf - 1 ];
 				if ( Surface( iSurf ).Class == SurfaceClass_Window ) {
 					SchedPtr = WindowScheduledSolarAbs( iSurf, iConst );
 				} else {
@@ -6717,6 +6718,7 @@ Label1000: ;
 
 		// Increase Construct() and copy the extra constructions
 		Construct.redimension( TotConstructs + NumNewConst );
+		ConstrWin.resize( TotConstructs + NumNewConst );
 		NominalRforNominalUCalculation.redimension( TotConstructs + NumNewConst );
 		NominalU.redimension( TotConstructs + NumNewConst );
 
@@ -6736,7 +6738,8 @@ Label1000: ;
 					Construct( NumNewConst ).TCMasterConst = Loop;
 					Construct( NumNewConst ).TCLayerID = Construct( Loop ).TCLayerID;
 					Construct( NumNewConst ).TCGlassID = Construct( Loop ).TCGlassID;
-					Construct( NumNewConst ).TypeIsWindow = true;
+          ConstrWin[ NumNewConst - 1 ] = ConstrWin[ Loop - 1 ];
+					ConstrWin[ NumNewConst  - 1 ].TypeIsWindow = true;
 				}
 			}
 		}
@@ -7983,7 +7986,7 @@ Label1000: ;
 
 				BSDFTempMtrx.deallocate();
 			}
-			Construct( ConstrNum ).TypeIsWindow = true;
+			ConstrWin[ ConstrNum  - 1 ].TypeIsWindow = true;
 			Construct( ConstrNum ).WindowTypeBSDF = true;
 		}
 
@@ -8003,7 +8006,7 @@ Label1000: ;
 
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

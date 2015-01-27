@@ -436,6 +436,9 @@ EnergyPlusPgm( std::string const & filepath )
 	ReportOrphanRecordObjects();
 	ReportOrphanFluids();
 	ReportOrphanSchedules();
+#ifdef EPPERF_PRINT
+	EppPerformance::Timer::printTimerData();
+#endif
 
 	EndEnergyPlus();
 }

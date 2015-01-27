@@ -1243,10 +1243,6 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_PackagedTESCoolingCoil;
 							this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( this_comp_type, "SwimmingPool:Indoor" ) ) {
-							this_comp.TypeOf_Num = TypeOf_SwimmingPool_Indoor;
-							this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
-							this_comp.CurOpSchemeType = DemandOpSchemeType;
 						} else {
 							//discover unsupported equipment on branches.
 							ShowSevereError( "GetPlantInput: Branch=\"" + BranchNames( BranchNum ) + "\", invalid component on branch." );
@@ -4029,10 +4025,6 @@ namespace PlantManager {
 						} else if ( SELECT_CASE_var == TypeOf_PackagedTESCoolingCoil ) { // 88
 							this_component.FlowCtrl = ControlType_Active;
 							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
-							this_component.HowLoadServed = HowMet_NoneDemand;
-						} else if ( SELECT_CASE_var == TypeOf_SwimmingPool_Indoor ) { // 90
-							this_component.FlowCtrl = ControlType_Active;
-							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
 							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else {
 							ShowSevereError( "SetBranchControlTypes: Caught unexpected equipment type of number" );

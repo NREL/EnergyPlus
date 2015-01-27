@@ -380,6 +380,7 @@ namespace AirflowNetworkBalanceManager {
 		using DataHeatBalance::People;
 		using DataHeatBalance::TotPeople;
 		using ThermalComfort::ThermalComfortData;
+		using DataSurfaces::SurfaceRadiantWin;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2680,11 +2681,14 @@ namespace AirflowNetworkBalanceManager {
 							ShowContinueError( "10 deg of being horizontal. Airflows through large horizontal openings are poorly" );
 							ShowContinueError( "modeled in the AirflowNetwork model resulting in only one-way airflow." );
 						}
-						if ( ! ( SurfaceWindow( MultizoneSurfaceData( count ).SurfNum ).OriginalClass == SurfaceClass_Window || SurfaceWindow( MultizoneSurfaceData( count ).SurfNum ).OriginalClass == SurfaceClass_GlassDoor || SurfaceWindow( MultizoneSurfaceData( count ).SurfNum ).OriginalClass == SurfaceClass_Door ) ) {
+						if ( ! ( SurfaceRadiantWin[ MultizoneSurfaceData( count ).SurfNum  - 1 ].OriginalClass == SurfaceClass_Window || 
+							 SurfaceRadiantWin[ MultizoneSurfaceData( count ).SurfNum  - 1 ].OriginalClass == SurfaceClass_GlassDoor || 
+							 SurfaceRadiantWin[ MultizoneSurfaceData( count ).SurfNum  - 1 ].OriginalClass == SurfaceClass_Door ) ) {
 							ShowSevereError( RoutineName + "AirflowNetworkComponent: The opening must be assigned to a window, door or glassdoor at " + AirflowNetworkLinkageData( count ).Name );
 							ErrorsFound = true;
 						}
-						if ( SurfaceWindow( MultizoneSurfaceData( count ).SurfNum ).OriginalClass == SurfaceClass_Door || SurfaceWindow( MultizoneSurfaceData( count ).SurfNum ).OriginalClass == SurfaceClass_GlassDoor ) {
+						if ( SurfaceRadiantWin[ MultizoneSurfaceData( count ).SurfNum  - 1 ].OriginalClass == SurfaceClass_Door || 
+                 SurfaceRadiantWin[ MultizoneSurfaceData( count ).SurfNum  - 1 ].OriginalClass == SurfaceClass_GlassDoor ) {
 							if ( MultizoneCompDetOpeningData( AirflowNetworkCompData( i ).TypeNum ).LVOType == 2 ) {
 								ShowSevereError( RoutineName + "AirflowNetworkComponent: The opening with horizontally pivoted type must be assigned to a window surface at " + AirflowNetworkLinkageData( count ).Name );
 								ErrorsFound = true;
@@ -2700,7 +2704,9 @@ namespace AirflowNetworkBalanceManager {
 							ShowContinueError( "AirflowNetwork:Multizone:Component:SimpleOpening = " + AirflowNetworkCompData( i ).Name );
 							ErrorsFound = true;
 						}
-						if ( ! ( SurfaceWindow( MultizoneSurfaceData( count ).SurfNum ).OriginalClass == SurfaceClass_Window || SurfaceWindow( MultizoneSurfaceData( count ).SurfNum ).OriginalClass == SurfaceClass_GlassDoor || SurfaceWindow( MultizoneSurfaceData( count ).SurfNum ).OriginalClass == SurfaceClass_Door ) ) {
+						if ( ! ( SurfaceRadiantWin[ MultizoneSurfaceData( count ).SurfNum  - 1 ].OriginalClass == SurfaceClass_Window || 
+							 SurfaceRadiantWin[ MultizoneSurfaceData( count ).SurfNum  - 1 ].OriginalClass == SurfaceClass_GlassDoor || 
+							 SurfaceRadiantWin[ MultizoneSurfaceData( count ).SurfNum  - 1 ].OriginalClass == SurfaceClass_Door ) ) {
 							ShowSevereError( RoutineName + "AirflowNetworkComponent: The opening must be assigned to a window, door or glassdoor at " + AirflowNetworkLinkageData( count ).Name );
 							ErrorsFound = true;
 						}
@@ -2732,7 +2738,9 @@ namespace AirflowNetworkBalanceManager {
 							ShowContinueError( "10 deg of being horizontal. Airflows through non-horizontal openings are not modeled" );
 							ShowContinueError( "with the object of AirflowNetwork:Multizone:Component:HorizontalOpening = " + AirflowNetworkCompData( i ).Name );
 						}
-						if ( ! ( SurfaceWindow( MultizoneSurfaceData( count ).SurfNum ).OriginalClass == SurfaceClass_Window || SurfaceWindow( MultizoneSurfaceData( count ).SurfNum ).OriginalClass == SurfaceClass_GlassDoor || SurfaceWindow( MultizoneSurfaceData( count ).SurfNum ).OriginalClass == SurfaceClass_Door ) ) {
+						if ( ! ( SurfaceRadiantWin[ MultizoneSurfaceData( count ).SurfNum  - 1 ].OriginalClass == SurfaceClass_Window || 
+                     SurfaceRadiantWin[ MultizoneSurfaceData( count ).SurfNum  - 1 ].OriginalClass == SurfaceClass_GlassDoor || 
+                     SurfaceRadiantWin[ MultizoneSurfaceData( count ).SurfNum  - 1 ].OriginalClass == SurfaceClass_Door ) ) {
 							ShowSevereError( RoutineName + "AirflowNetworkComponent: The opening must be assigned to a window, door or glassdoor at " + AirflowNetworkLinkageData( count ).Name );
 							ErrorsFound = true;
 						}
@@ -3394,6 +3402,7 @@ namespace AirflowNetworkBalanceManager {
 		using DataHVACGlobals::TurnFansOn;
 		using DataHVACGlobals::TurnFansOff;
 		using InputProcessor::SameString; // NEEDS TO BE CHANGED after V1.3 release!!!
+		using DataSurfaces::SurfaceRadiantWin;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3448,7 +3457,9 @@ namespace AirflowNetworkBalanceManager {
 		for ( i = 1; i <= AirflowNetworkNumOfSurfaces; ++i ) {
 			MultizoneSurfaceData( i ).OpenFactor = 0.0;
 			j = MultizoneSurfaceData( i ).SurfNum;
-			if ( SurfaceWindow( j ).OriginalClass == SurfaceClass_Window || SurfaceWindow( j ).OriginalClass == SurfaceClass_Door || SurfaceWindow( j ).OriginalClass == SurfaceClass_GlassDoor ) {
+			if ( SurfaceRadiantWin[ j  - 1 ].OriginalClass == SurfaceClass_Window || 
+           SurfaceRadiantWin[ j  - 1 ].OriginalClass == SurfaceClass_Door || 
+           SurfaceRadiantWin[ j  - 1 ].OriginalClass == SurfaceClass_GlassDoor ) {
 				AirflowNetworkVentingControl( i, MultizoneSurfaceData( i ).OpenFactor );
 				MultizoneSurfaceData( i ).OpenFactor *= MultizoneSurfaceData( i ).WindModifier;
 				if ( MultizoneSurfaceData( i ).HybridVentClose ) MultizoneSurfaceData( i ).OpenFactor = 0.0;
@@ -3486,7 +3497,9 @@ namespace AirflowNetworkBalanceManager {
 		if ( GlobalOpenFactor >= 0.0 ) {
 			for ( i = 1; i <= AirflowNetworkNumOfSurfaces; ++i ) {
 				j = MultizoneSurfaceData( i ).SurfNum;
-				if ( SurfaceWindow( j ).OriginalClass == SurfaceClass_Window || SurfaceWindow( j ).OriginalClass == SurfaceClass_Door || SurfaceWindow( j ).OriginalClass == SurfaceClass_GlassDoor ) {
+				if ( SurfaceRadiantWin[ j  - 1 ].OriginalClass == 
+             SurfaceClass_Window || SurfaceRadiantWin[ j  - 1 ].OriginalClass == SurfaceClass_Door || 
+             SurfaceRadiantWin[ j  - 1 ].OriginalClass == SurfaceClass_GlassDoor ) {
 					if ( MultizoneSurfaceData( i ).HybridCtrlGlobal ) {
 						MultizoneSurfaceData( i ).OpenFactor = GlobalOpenFactor;
 					}
@@ -6672,6 +6685,7 @@ Label90: ;
 		using DataHVACGlobals::HybridVentSysAvailWindModifier;
 		using DataHVACGlobals::HybridVentSysAvailActualZoneNum;
 		using DataZoneEquipment::ZoneEquipConfig;
+		using DataSurfaces::SurfaceRadiantWin;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6740,7 +6754,10 @@ Label90: ;
 								if ( ControlType == GlobalCtrlType ) {
 									MultizoneSurfaceData( ANSurfaceNum ).HybridCtrlGlobal = true;
 									if ( HybridVentSysAvailMaster( SysAvailNum ) == ActualZoneNum ) {
-										if ( ( SurfaceWindow( SurfNum ).OriginalClass == SurfaceClass_Window || SurfaceWindow( SurfNum ).OriginalClass == SurfaceClass_Door || SurfaceWindow( SurfNum ).OriginalClass == SurfaceClass_GlassDoor ) && Surface( SurfNum ).ExtBoundCond == ExternalEnvironment ) {
+										if ( ( SurfaceRadiantWin[ SurfNum - 1 ].OriginalClass == SurfaceClass_Window || 
+													 SurfaceRadiantWin[ SurfNum - 1 ].OriginalClass == SurfaceClass_Door || 
+													 SurfaceRadiantWin[ SurfNum - 1 ].OriginalClass == SurfaceClass_GlassDoor ) && 
+												 Surface( SurfNum ).ExtBoundCond == ExternalEnvironment ) {
 											MultizoneSurfaceData( ANSurfaceNum ).HybridCtrlMaster = true;
 											Found = true;
 										}
@@ -7229,7 +7246,7 @@ Label90: ;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

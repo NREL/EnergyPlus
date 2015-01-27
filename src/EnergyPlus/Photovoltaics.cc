@@ -692,7 +692,7 @@ namespace Photovoltaics {
 				if ( ! Surface( PVarray( PVnum ).SurfacePtr ).HeatTransSurf ) {
 					ShowSevereError( "Must use a surface with heat transfer for IntegratedSurfaceOutsideFace mode in " + PVarray( PVnum ).Name );
 					ErrorsFound = true;
-				} else if ( ! Construct( Surface( PVarray( PVnum ).SurfacePtr ).Construction ).SourceSinkPresent ) {
+				} else if ( ! Construct( DataSurfaces::Construction[ PVarray( PVnum ).SurfacePtr  - 1 ] ).SourceSinkPresent ) {
 					ShowSevereError( "Must use a surface with internal source construction for IntegratedSurfaceOutsideFace mode in " + PVarray( PVnum ).Name );
 					ErrorsFound = true;
 				}
@@ -1405,7 +1405,7 @@ namespace Photovoltaics {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Ø. Ulleberg, IFE Norway for Hydrogems
+		//       AUTHOR         Ã˜. Ulleberg, IFE Norway for Hydrogems
 		//       DATE WRITTEN   March 2001
 		//       MODIFIED       D. Bradley for use with EnergyPlus
 		//       RE-ENGINEERED  na
@@ -1464,7 +1464,7 @@ namespace Photovoltaics {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Ø. Ulleberg, IFE Norway for Hydrogems
+		//       AUTHOR         Ã˜. Ulleberg, IFE Norway for Hydrogems
 		//       DATE WRITTEN   March 2001
 		//       MODIFIED       D. Bradley for use with EnergyPlus
 		//       RE-ENGINEERED  na
@@ -1526,7 +1526,7 @@ namespace Photovoltaics {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Ø. Ulleberg, IFE Norway for Hydrogems
+		//       AUTHOR         Ã˜. Ulleberg, IFE Norway for Hydrogems
 		//       DATE WRITTEN   March 2001
 		//       MODIFIED       D. Bradley for use with EnergyPlus
 		//       RE-ENGINEERED  na
@@ -1635,7 +1635,7 @@ namespace Photovoltaics {
 	{
 
 		// FUNCTION INFORMATION:
-		//       AUTHOR         Ø. Ulleberg, IFE Norway for Hydrogems
+		//       AUTHOR         Ã˜. Ulleberg, IFE Norway for Hydrogems
 		//       DATE WRITTEN   March 2001
 		//       MODIFIED       D. Bradley for EnergyPlus
 		//       RE-ENGINEERED
@@ -1696,7 +1696,7 @@ namespace Photovoltaics {
 	{
 
 		// FUNCTION INFORMATION:
-		//       AUTHOR         Ø. Ulleberg, IFE Norway for Hydrogems
+		//       AUTHOR         Ã˜. Ulleberg, IFE Norway for Hydrogems
 		//       DATE WRITTEN   March 2001
 		//       MODIFIED       D. Bradley for EnergyPlus
 		//       RE-ENGINEERED
@@ -1756,7 +1756,7 @@ namespace Photovoltaics {
 	{
 
 		// FUNCTION INFORMATION:
-		//       AUTHOR         Ø. Ulleberg, IFE Norway for Hydrogems
+		//       AUTHOR         Ã˜. Ulleberg, IFE Norway for Hydrogems
 		//       DATE WRITTEN   March 2001
 		//       MODIFIED       D. Bradley for EnergyPlus
 		//       RE-ENGINEERED
@@ -2756,7 +2756,7 @@ namespace Photovoltaics {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

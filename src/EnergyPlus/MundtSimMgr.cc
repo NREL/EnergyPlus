@@ -208,6 +208,7 @@ namespace MundtSimMgr {
 		using DataRoomAirModel::FloorAirNode;
 		using DataSurfaces::Surface;
 		using DataHeatBalance::Zone;
+		using DataHeatBalance::ZoneSpecs;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -262,8 +263,8 @@ namespace MundtSimMgr {
 				// find number of zones using the Mundt model
 				++NumOfMundtZones;
 				// find maximum number of surfaces in zones using the Mundt model
-				SurfFirst = Zone( ZoneIndex ).SurfaceFirst;
-				NumOfSurfs = Zone( ZoneIndex ).SurfaceLast - SurfFirst + 1;
+				SurfFirst = ZoneSpecs[ ZoneIndex  - 1].SurfaceFirst;
+				NumOfSurfs = ZoneSpecs[ ZoneIndex  - 1].SurfaceLast - SurfFirst + 1;
 				MaxNumOfSurfs = max( MaxNumOfSurfs, NumOfSurfs );
 				// fine maximum number of air nodes in zones using the Mundt model
 				NumOfAirNodes = TotNumOfZoneAirNodes( ZoneIndex );
@@ -406,7 +407,6 @@ namespace MundtSimMgr {
 		using DataHeatBalFanSys::MCPI;
 		using DataHeatBalFanSys::MAT;
 		using DataHeatBalFanSys::SumConvHTRadSys;
-		using DataHeatBalFanSys::SumConvPool;
 		using DataHeatBalFanSys::SysDepZoneLoadsLagged;
 		using DataHeatBalFanSys::NonAirSystemResponse;
 		using DataHeatBalSurface::TempSurfIn;
@@ -496,7 +496,7 @@ namespace MundtSimMgr {
 		}
 		// determine heat gains
 		SumAllInternalConvectionGains( ZoneNum, ConvIntGain );
-		ConvIntGain += SumConvHTRadSys( ZoneNum ) + SumConvPool( ZoneNum ) + SysDepZoneLoadsLagged( ZoneNum ) + NonAirSystemResponse( ZoneNum ) / ZoneMult;
+		ConvIntGain += SumConvHTRadSys( ZoneNum ) + SysDepZoneLoadsLagged( ZoneNum ) + NonAirSystemResponse( ZoneNum ) / ZoneMult;
 
 		// Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
 		// low or zero)
@@ -951,7 +951,7 @@ namespace MundtSimMgr {
 
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

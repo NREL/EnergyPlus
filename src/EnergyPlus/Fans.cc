@@ -3061,7 +3061,7 @@ namespace Fans {
 		}
 
 	}
-
+	
 	Real64
 	FanDesDT(
 		int const FanNum, // index of fan in Fan array
@@ -3071,7 +3071,7 @@ namespace Fans {
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Fred Buhl
 		//       DATE WRITTEN   August 2014
-		//       MODIFIED
+		//       MODIFIED       
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
@@ -3083,7 +3083,7 @@ namespace Fans {
 		//              Qdot,air = cp,air*rho,air*Vdot*deltaT
 
 		// REFERENCES: EnergyPlus Engineering Reference
-
+		
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 
@@ -3112,9 +3112,9 @@ namespace Fans {
 		} else {
 			DesignDeltaT = 0.0;
 		}
-
+	
 		return DesignDeltaT;
-
+	
 	} // FanDesDT
 
 	Real64
@@ -3126,7 +3126,7 @@ namespace Fans {
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Fred Buhl
 		//       DATE WRITTEN   August 2014
-		//       MODIFIED
+		//       MODIFIED       
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
@@ -3157,14 +3157,16 @@ namespace Fans {
 		//
 		if ( FanNum == 0 ) {
 			DesignHeatGain = 0.0;
-		} else if ( Fan( FanNum ).FanType_Num != FanType_ComponentModel ) {
+		}
+		else if ( Fan( FanNum ).FanType_Num != FanType_ComponentModel ) {
 			DeltaP = Fan( FanNum ).DeltaPress;
 			TotEff = Fan( FanNum ).FanEff;
 			MotEff = Fan( FanNum ).MotEff;
 			MotInAirFrac = Fan( FanNum ).MotInAirFrac;
 			FanPowerTot = ( FanVolFlow * DeltaP ) / TotEff;
 			DesignHeatGain = MotEff*FanPowerTot + ( FanPowerTot - MotEff * FanPowerTot ) * MotInAirFrac;
-		} else {
+		}
+		else {
 			if ( !SysSizingCalc && MySizeFlag( FanNum ) ) {
 				SizeFan( FanNum );
 				MySizeFlag( FanNum ) = false;

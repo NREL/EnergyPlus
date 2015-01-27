@@ -3083,8 +3083,8 @@ INTEGER, INTENT(IN)   :: possCol
           ! na
 
           ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-INTEGER :: increaseRow = 0
-INTEGER :: increaseCol = 0
+INTEGER :: increaseRow
+INTEGER :: increaseCol
 LOGICAL :: needIncrease
 
 ! first assume that no increase in size is needed

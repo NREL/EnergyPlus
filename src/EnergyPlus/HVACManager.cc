@@ -2457,6 +2457,7 @@ namespace HVACManager {
 		using ScheduleManager::GetScheduleMaxValue;
 		using DataSurfaces::SurfaceWindow;
 		using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
+		using DataHeatBalance::ZoneSpecs;
 
 		// Locals
 		// SUBROUTINE ARGUMENTS:
@@ -2532,7 +2533,7 @@ namespace HVACManager {
 							break;
 						}
 					}
-					for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+					for ( SurfNum = ZoneSpecs[ ZoneNum  - 1 ].SurfaceFirst; SurfNum <= ZoneSpecs[ ZoneNum  - 1 ].SurfaceLast; ++SurfNum ) {
 						if ( SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_ReturnAir ) {
 							ShowWarningError( "For zone=" + Zone( ZoneNum ).Name + " return air heat gain from air flow windows will be applied to the zone air." );
 							ShowContinueError( "  This zone has no return air or is served by an on/off HVAC system." );
@@ -2641,7 +2642,7 @@ namespace HVACManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

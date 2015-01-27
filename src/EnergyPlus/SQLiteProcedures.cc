@@ -1679,10 +1679,10 @@ void SQLite::createSQLiteTimeIndexRecord(
 		case LocalReportMonthly: {
 			++m_sqlDBTimeIndex;
 
-			intervalInMinutes = 60*24*lastDayOfMonth[month() - 1];
+			intervalInMinutes = 60*24*lastDayOfMonth[month()];
 			sqliteBindInteger(m_timeIndexInsertStmt, 1, m_sqlDBTimeIndex);
 			sqliteBindInteger(m_timeIndexInsertStmt, 2, month());
-			sqliteBindInteger(m_timeIndexInsertStmt, 3, lastDayOfMonth[month() - 1]);
+			sqliteBindInteger(m_timeIndexInsertStmt, 3, lastDayOfMonth[month()]);
 			sqliteBindInteger(m_timeIndexInsertStmt, 4, 24);
 			sqliteBindInteger(m_timeIndexInsertStmt, 5, 0);
 			sqliteBindNULL(m_timeIndexInsertStmt, 6);
@@ -2319,25 +2319,25 @@ void SQLite::createSQLiteSurfacesTable()
 	for(int surfaceNumber = 1; surfaceNumber <= DataSurfaces::TotSurfaces; ++surfaceNumber) {
 		auto const & surface = DataSurfaces::Surface(surfaceNumber);
 		sqliteBindInteger(m_surfaceInsertStmt, 1, surfaceNumber);
-		sqliteBindText(m_surfaceInsertStmt, 2, surface.Name);
-		sqliteBindForeignKey(m_surfaceInsertStmt, 3, surface.Construction);
-		sqliteBindText(m_surfaceInsertStmt, 4, DataSurfaces::cSurfaceClass(surface.Class));
-		sqliteBindDouble(m_surfaceInsertStmt, 5, surface.Area);
-		sqliteBindDouble(m_surfaceInsertStmt, 6, surface.GrossArea);
-		sqliteBindDouble(m_surfaceInsertStmt, 7, surface.Perimeter);
-		sqliteBindDouble(m_surfaceInsertStmt, 8, surface.Azimuth);
-		sqliteBindDouble(m_surfaceInsertStmt, 9, surface.Height);
-		sqliteBindDouble(m_surfaceInsertStmt, 10, surface.Reveal);
-		sqliteBindInteger(m_surfaceInsertStmt, 11, surface.Shape);
-		sqliteBindInteger(m_surfaceInsertStmt, 12, surface.Sides);
-		sqliteBindDouble(m_surfaceInsertStmt, 13, surface.Tilt);
-		sqliteBindDouble(m_surfaceInsertStmt, 14, surface.Width);
-		sqliteBindLogical(m_surfaceInsertStmt, 15, surface.HeatTransSurf);
-		sqliteBindForeignKey(m_surfaceInsertStmt, 16, surface.BaseSurf);
-		sqliteBindForeignKey(m_surfaceInsertStmt, 17, surface.Zone);
-		sqliteBindInteger(m_surfaceInsertStmt, 18, surface.ExtBoundCond);
-		sqliteBindLogical(m_surfaceInsertStmt, 19, surface.ExtSolar);
-		sqliteBindLogical(m_surfaceInsertStmt, 20, surface.ExtWind);
+		sqliteBindText(m_surfaceInsertStmt, 2, DataSurfaces::Surface(surfaceNumber).Name);
+		sqliteBindInteger(m_surfaceInsertStmt, 3, DataSurfaces::Construction[ surfaceNumber - 1 ]);
+		sqliteBindText(m_surfaceInsertStmt, 4, DataSurfaces::cSurfaceClass(DataSurfaces::Surface(surfaceNumber).Class));
+		sqliteBindDouble(m_surfaceInsertStmt, 5, DataSurfaces::Surface(surfaceNumber).Area);
+		sqliteBindDouble(m_surfaceInsertStmt, 6, DataSurfaces::Surface(surfaceNumber).GrossArea);
+		sqliteBindDouble(m_surfaceInsertStmt, 7, DataSurfaces::Surface(surfaceNumber).Perimeter);
+		sqliteBindDouble(m_surfaceInsertStmt, 8, DataSurfaces::Surface(surfaceNumber).Azimuth);
+		sqliteBindDouble(m_surfaceInsertStmt, 9, DataSurfaces::Surface(surfaceNumber).Height);
+		sqliteBindDouble(m_surfaceInsertStmt, 10, DataSurfaces::Surface(surfaceNumber).Reveal);
+		sqliteBindInteger(m_surfaceInsertStmt, 11, DataSurfaces::Surface(surfaceNumber).Shape);
+		sqliteBindInteger(m_surfaceInsertStmt, 12, DataSurfaces::Surface(surfaceNumber).Sides);
+		sqliteBindDouble(m_surfaceInsertStmt, 13, DataSurfaces::Surface(surfaceNumber).Tilt);
+		sqliteBindDouble(m_surfaceInsertStmt, 14, DataSurfaces::Surface(surfaceNumber).Width);
+		sqliteBindLogical(m_surfaceInsertStmt, 15, DataSurfaces::Surface(surfaceNumber).HeatTransSurf);
+		sqliteBindInteger(m_surfaceInsertStmt, 16, DataSurfaces::Surface(surfaceNumber).BaseSurf);
+		sqliteBindInteger(m_surfaceInsertStmt, 17, DataSurfaces::Surface(surfaceNumber).Zone);
+		sqliteBindInteger(m_surfaceInsertStmt, 18, DataSurfaces::Surface(surfaceNumber).ExtBoundCond);
+		sqliteBindLogical(m_surfaceInsertStmt, 19, DataSurfaces::Surface(surfaceNumber).ExtSolar);
+		sqliteBindLogical(m_surfaceInsertStmt, 20, DataSurfaces::Surface(surfaceNumber).ExtWind);
 
 		sqliteStepCommand(m_surfaceInsertStmt);
 		sqliteResetCommand(m_surfaceInsertStmt);
@@ -2349,22 +2349,33 @@ void SQLite::createSQLiteConstructionsTable()
 	static int constructionLayerIndex = 0;
 	for(int constructNum = 1; constructNum <= DataHeatBalance::TotConstructs; ++constructNum) {
 		auto const & construction = DataHeatBalance::Construct(constructNum);
+		auto const & constrwin = DataHeatBalance::ConstrWin[ constructNum - 1];
 		sqliteBindInteger(m_constructionInsertStmt, 1, constructNum);
-		sqliteBindText(m_constructionInsertStmt, 2, construction.Name);
-		sqliteBindInteger(m_constructionInsertStmt, 3, construction.TotLayers);
-		sqliteBindInteger(m_constructionInsertStmt, 4, construction.TotSolidLayers);
-		sqliteBindInteger(m_constructionInsertStmt, 5, construction.TotGlassLayers);
-		sqliteBindDouble(m_constructionInsertStmt, 6, construction.InsideAbsorpVis);
-		sqliteBindDouble(m_constructionInsertStmt, 7, construction.OutsideAbsorpVis);
-		sqliteBindDouble(m_constructionInsertStmt, 8, construction.InsideAbsorpSolar);
-		sqliteBindDouble(m_constructionInsertStmt, 9, construction.OutsideAbsorpSolar);
-		sqliteBindDouble(m_constructionInsertStmt, 10, construction.InsideAbsorpThermal);
-		sqliteBindDouble(m_constructionInsertStmt, 11, construction.OutsideAbsorpThermal);
-		sqliteBindInteger(m_constructionInsertStmt, 12, construction.OutsideRoughness);
-		sqliteBindLogical(m_constructionInsertStmt, 13, construction.TypeIsWindow);
+		sqliteBindText(m_constructionInsertStmt, 2, DataHeatBalance::Construct(constructNum).Name);
+		sqliteBindInteger(m_constructionInsertStmt, 3, DataHeatBalance::Construct(constructNum).TotLayers);
+		sqliteBindInteger(m_constructionInsertStmt, 4, DataHeatBalance::Construct(constructNum).TotSolidLayers);
+		sqliteBindInteger(m_constructionInsertStmt, 5, DataHeatBalance::ConstrWin[ constructNum - 1 ].TotGlassLayers);
 
-		if(construction.TotGlassLayers == 0) {
-			sqliteBindDouble(m_constructionInsertStmt, 14, construction.UValue);
+		for(int layerNum = 1; layerNum <= DataHeatBalance::Construct(constructNum).TotLayers; ++layerNum) {
+			sqliteBindInteger(m_constructionLayerInsertStmt, 1, constructNum);
+			sqliteBindInteger(m_constructionLayerInsertStmt, 2, layerNum);
+			sqliteBindInteger(m_constructionLayerInsertStmt, 3, DataHeatBalance::Construct(constructNum).LayerPoint(layerNum));
+
+			sqliteStepCommand(m_constructionLayerInsertStmt);
+			sqliteResetCommand(m_constructionLayerInsertStmt);
+		}
+
+		sqliteBindDouble(m_constructionInsertStmt, 6, DataHeatBalance::Construct(constructNum).InsideAbsorpVis);
+		sqliteBindDouble(m_constructionInsertStmt, 7, DataHeatBalance::Construct(constructNum).OutsideAbsorpVis);
+		sqliteBindDouble(m_constructionInsertStmt, 8, DataHeatBalance::Construct(constructNum).InsideAbsorpSolar);
+		sqliteBindDouble(m_constructionInsertStmt, 9, DataHeatBalance::Construct(constructNum).OutsideAbsorpSolar);
+		sqliteBindDouble(m_constructionInsertStmt, 10, DataHeatBalance::ConstrWin[ constructNum - 1 ].InsideAbsorpThermal);
+		sqliteBindDouble(m_constructionInsertStmt, 11, DataHeatBalance::Construct(constructNum).OutsideAbsorpThermal);
+		sqliteBindInteger(m_constructionInsertStmt, 12, DataHeatBalance::Construct(constructNum).OutsideRoughness);
+		sqliteBindLogical(m_constructionInsertStmt, 13, DataHeatBalance::ConstrWin[ constructNum - 1 ].TypeIsWindow);
+
+		if(DataHeatBalance::ConstrWin[ constructNum - 1 ].TotGlassLayers == 0) {
+			sqliteBindDouble(m_constructionInsertStmt, 14, DataHeatBalance::Construct(constructNum).UValue);
 		} else {
 			sqliteBindDouble(m_constructionInsertStmt, 14, DataHeatBalance::NominalU(constructNum));
 		}

@@ -2,6 +2,8 @@
 #include <DataHeatBalSurface.hh>
 #include <DataPrecisionGlobals.hh>
 
+#include <ThreadArray.hh>
+
 namespace EnergyPlus {
 
 namespace DataHeatBalSurface {
@@ -166,7 +168,8 @@ namespace DataHeatBalSurface {
 	FArray1D< Real64 > TCONV; // Fraction Of Radiated Thermal Converted To Convection In Interior Shades
 	FArray1D< Real64 > VMULT; // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
 	FArray1D< Real64 > VCONV; // Fraction Of Short-Wave Radiation From Lights Converted To Convection
-	FArray1D< Real64 > NetLWRadToSurf; // Net interior long wavelength radiation to a surface from other surfaces
+  //FArray1D< Real64 > NetLWRadToSurf; // Net interior long wavelength radiation to a surface from other surfaces
+  EppPerformance::perTArray< Real64 > NetLWRadToSurf;
 	FArray1D< Real64 > ZoneMRT; // Zone Mean Radiant Temperature
 	FArray1D< Real64 > QRadSWLightsInAbs; // Short wave from Lights radiation absorbed on inside of opaque surface
 	// Variables that are used in both the Surface Heat Balance and the Moisture Balance
@@ -194,7 +197,7 @@ namespace DataHeatBalSurface {
 	bool InterZoneWindow( false ); // True if there is an interzone window
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

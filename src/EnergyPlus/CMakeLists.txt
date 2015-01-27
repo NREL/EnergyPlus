@@ -1,4 +1,5 @@
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
+INCLUDE_DIRECTORIES(  /usr/include/atlas )
 
 # public API headers go in the src/EnergyPlus/public folder
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/public )
@@ -18,6 +19,8 @@ SET( SRC
   AirflowNetworkBalanceManager.hh
   AirflowNetworkSolver.cc
   AirflowNetworkSolver.hh
+  AnalyzeHardware.cc
+  AnalyzeHardware.hh
   BaseboardElectric.cc
   BaseboardElectric.hh
   BaseboardRadiator.cc
@@ -324,6 +327,8 @@ SET( SRC_2
   MoistureBalanceEMPDManager.hh
   MundtSimMgr.cc
   MundtSimMgr.hh
+  NanoTimers.cc
+  NanoTimers.hh
   NodeInputManager.cc
   NodeInputManager.hh
   NonZoneEquipmentManager.cc
@@ -440,8 +445,6 @@ SET( SRC_2
   SurfaceGeometry.hh
   SurfaceGroundHeatExchanger.cc
   SurfaceGroundHeatExchanger.hh
-  SwimmingPool.cc
-  SwimmingPool.hh
   SystemAvailabilityManager.cc
   SystemAvailabilityManager.hh
   SystemReports.cc
@@ -472,6 +475,8 @@ SET( SRC_2
   ThermalEN673Calc.hh
   ThermalISO15099Calc.cc
   ThermalISO15099Calc.hh
+  ThreadArray.cc
+  ThreadArray.hh
   TranspiredCollector.cc
   TranspiredCollector.hh
   UFADManager.cc

@@ -331,7 +331,7 @@ namespace ReportSizingManager {
 		bool SizingDesValueFromParent; // true if the parent set the design size (whether or not there is a sizing run)
 		bool OASysFlag; // Logical flag determines if parent object set OA Sys coil property
 		bool AirLoopSysFlag; // Logical flag determines if parent object set air loop coil property
-		bool bCheckForZero; // logical to flag whether or not to check for very small autosized values
+		bool bCheckForZero; // logical to flag whether or not to check for very small autosized values 
 		Real64 AutosizeDes; // autosized value
 		Real64 AutosizeUser; // user sized value
 		Real64 OutTemp; // outdoor air temperature [C]
@@ -442,7 +442,7 @@ namespace ReportSizingManager {
 				}
 			} else {
 				if ( SizingType == SystemAirflowSizing ) {
-
+				
 					{ auto const SELECT_CASE_var( ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingType) );
 					if ( ( SELECT_CASE_var == SupplyAirFlowRate ) || ( SELECT_CASE_var == None ) ) {
 
@@ -1394,7 +1394,7 @@ namespace ReportSizingManager {
 						DesVolFlow = DataFlowUsedForSizing;
 						if ( FinalSysSizing( CurSysNum ).CoolingCapMethod == FractionOfAutosizedCoolingCapacity ) {
 							DataFracOfAutosizedCoolingCapacity = FinalSysSizing( CurSysNum ).FractionOfAutosizedCoolingCapacity;
-						}
+						}						
 						if (FinalSysSizing( CurSysNum ).CoolingCapMethod == CapacityPerFloorArea) {
 							NominalCapacityDes = FinalSysSizing( CurSysNum ).CoolingTotalCapacity;
 						} else if (FinalSysSizing( CurSysNum ).CoolingCapMethod == CoolingDesignCapacity && FinalSysSizing( CurSysNum ).CoolingTotalCapacity > 0.0 ) {
@@ -1464,7 +1464,7 @@ namespace ReportSizingManager {
 					} else {
 						if (FinalSysSizing( CurSysNum ).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
 							DataFracOfAutosizedHeatingCapacity = FinalSysSizing(CurSysNum).FractionOfAutosizedHeatingCapacity;
-						}
+						} 
 						if ( DataFlowUsedForSizing > 0.0 ) {
 							DesVolFlow = DataFlowUsedForSizing;
 						} else if ( UnitarySysEqSizing( CurSysNum ).HeatingAirFlow ) {
@@ -1714,7 +1714,7 @@ namespace ReportSizingManager {
 				}}
 			}
 		}
-
+			
 		if ( DataScalableCapSizingON ) {
 			{ auto const SELECT_CASE_var( ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingType ) );
 			if ( SELECT_CASE_var == HeatingDesignCapacity || SELECT_CASE_var == CoolingDesignCapacity ) {

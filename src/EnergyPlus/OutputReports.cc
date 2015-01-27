@@ -306,6 +306,7 @@ DXFOut(
 	using DataStringGlobals::VerString;
 	using namespace DXFEarClipping;
 	using General::TrimSigDigits;
+	using DataHeatBalance::ZoneSpecs;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -610,7 +611,7 @@ DXFOut(
 			TempZoneName[ pos ] = '_';
 			pos = index( TempZoneName, ':' );
 		}
-		for ( surf = max( Zone( zones ).SurfaceFirst, 1 ); surf <= Zone( zones ).SurfaceLast; ++surf ) {
+		for ( surf = max( ZoneSpecs[ zones  - 1].SurfaceFirst, 1 ); surf <= ZoneSpecs[ zones  - 1].SurfaceLast; ++surf ) {
 			if ( Surface( surf ).Sides == 0 ) continue;
 			if ( Surface( surf ).Class == SurfaceClass_IntMass ) continue;
 			if ( Surface( surf ).Class == SurfaceClass_Wall ) colorindex = ColorNo_Wall;
@@ -618,10 +619,10 @@ DXFOut(
 			if ( Surface( surf ).Class == SurfaceClass_Floor ) colorindex = ColorNo_Floor;
 			if ( Surface( surf ).Class == SurfaceClass_Door ) colorindex = ColorNo_Door;
 			if ( Surface( surf ).Class == SurfaceClass_Window ) {
-				if ( SurfaceWindow( surf ).OriginalClass == SurfaceClass_Window ) colorindex = ColorNo_Window;
-				if ( SurfaceWindow( surf ).OriginalClass == SurfaceClass_GlassDoor ) colorindex = ColorNo_GlassDoor;
-				if ( SurfaceWindow( surf ).OriginalClass == SurfaceClass_TDD_Dome ) colorindex = ColorNo_TDDDome;
-				if ( SurfaceWindow( surf ).OriginalClass == SurfaceClass_TDD_Diffuser ) colorindex = ColorNo_TDDDiffuser;
+				if ( SurfaceRadiantWin[ surf  - 1].OriginalClass == SurfaceClass_Window ) colorindex = ColorNo_Window;
+				if ( SurfaceRadiantWin[ surf  - 1].OriginalClass == SurfaceClass_GlassDoor ) colorindex = ColorNo_GlassDoor;
+				if ( SurfaceRadiantWin[ surf  - 1].OriginalClass == SurfaceClass_TDD_Dome ) colorindex = ColorNo_TDDDome;
+				if ( SurfaceRadiantWin[ surf  - 1].OriginalClass == SurfaceClass_TDD_Diffuser ) colorindex = ColorNo_TDDDiffuser;
 			}
 			if ( Surface( surf ).IsPV ) colorindex = ColorNo_PV;
 
@@ -835,6 +836,7 @@ DXFOutLines( std::string const & ColorScheme )
 	using DataGlobals::NumOfZones;
 	using DataStringGlobals::VerString;
 	using General::TrimSigDigits;
+	using DataHeatBalance::ZoneSpecs;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1087,17 +1089,17 @@ DXFOutLines( std::string const & ColorScheme )
 		}
 
 		surfcount = 0;
-		for ( surf = max( Zone( zones ).SurfaceFirst, 1 ); surf <= Zone( zones ).SurfaceLast; ++surf ) {
+		for ( surf = max( ZoneSpecs[ zones  - 1].SurfaceFirst, 1 ); surf <= ZoneSpecs[ zones  - 1].SurfaceLast; ++surf ) {
 			if ( Surface( surf ).Class == SurfaceClass_IntMass ) continue;
 			if ( Surface( surf ).Class == SurfaceClass_Wall ) colorindex = ColorNo_Wall;
 			if ( Surface( surf ).Class == SurfaceClass_Roof ) colorindex = ColorNo_Roof;
 			if ( Surface( surf ).Class == SurfaceClass_Floor ) colorindex = ColorNo_Floor;
 			if ( Surface( surf ).Class == SurfaceClass_Door ) colorindex = ColorNo_Door;
 			if ( Surface( surf ).Class == SurfaceClass_Window ) {
-				if ( SurfaceWindow( surf ).OriginalClass == SurfaceClass_Window ) colorindex = ColorNo_Window;
-				if ( SurfaceWindow( surf ).OriginalClass == SurfaceClass_GlassDoor ) colorindex = ColorNo_GlassDoor;
-				if ( SurfaceWindow( surf ).OriginalClass == SurfaceClass_TDD_Dome ) colorindex = ColorNo_TDDDome;
-				if ( SurfaceWindow( surf ).OriginalClass == SurfaceClass_TDD_Diffuser ) colorindex = ColorNo_TDDDiffuser;
+				if ( SurfaceRadiantWin[ surf  - 1].OriginalClass == SurfaceClass_Window ) colorindex = ColorNo_Window;
+				if ( SurfaceRadiantWin[ surf  - 1].OriginalClass == SurfaceClass_GlassDoor ) colorindex = ColorNo_GlassDoor;
+				if ( SurfaceRadiantWin[ surf  - 1].OriginalClass == SurfaceClass_TDD_Dome ) colorindex = ColorNo_TDDDome;
+				if ( SurfaceRadiantWin[ surf  - 1].OriginalClass == SurfaceClass_TDD_Diffuser ) colorindex = ColorNo_TDDDiffuser;
 			}
 			if ( Surface( surf ).IsPV ) colorindex = ColorNo_PV;
 			++surfcount;
@@ -1261,6 +1263,7 @@ DXFOutWireFrame( std::string const & ColorScheme )
 	using DataGlobals::NumOfZones;
 	using DataStringGlobals::VerString;
 	using General::TrimSigDigits;
+	using DataHeatBalance::ZoneSpecs;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1506,17 +1509,17 @@ DXFOutWireFrame( std::string const & ColorScheme )
 		}
 
 		surfcount = 0;
-		for ( surf = max( Zone( zones ).SurfaceFirst, 1 ); surf <= Zone( zones ).SurfaceLast; ++surf ) {
+		for ( surf = max( ZoneSpecs[ zones  - 1].SurfaceFirst, 1 ); surf <= ZoneSpecs[ zones  - 1].SurfaceLast; ++surf ) {
 			if ( Surface( surf ).Class == SurfaceClass_IntMass ) continue;
 			if ( Surface( surf ).Class == SurfaceClass_Wall ) colorindex = ColorNo_Wall;
 			if ( Surface( surf ).Class == SurfaceClass_Roof ) colorindex = ColorNo_Roof;
 			if ( Surface( surf ).Class == SurfaceClass_Floor ) colorindex = ColorNo_Floor;
 			if ( Surface( surf ).Class == SurfaceClass_Door ) colorindex = ColorNo_Door;
 			if ( Surface( surf ).Class == SurfaceClass_Window ) {
-				if ( SurfaceWindow( surf ).OriginalClass == SurfaceClass_Window ) colorindex = ColorNo_Window;
-				if ( SurfaceWindow( surf ).OriginalClass == SurfaceClass_GlassDoor ) colorindex = ColorNo_GlassDoor;
-				if ( SurfaceWindow( surf ).OriginalClass == SurfaceClass_TDD_Dome ) colorindex = ColorNo_TDDDome;
-				if ( SurfaceWindow( surf ).OriginalClass == SurfaceClass_TDD_Diffuser ) colorindex = ColorNo_TDDDiffuser;
+				if ( SurfaceRadiantWin[ surf  - 1].OriginalClass == SurfaceClass_Window ) colorindex = ColorNo_Window;
+				if ( SurfaceRadiantWin[ surf  - 1].OriginalClass == SurfaceClass_GlassDoor ) colorindex = ColorNo_GlassDoor;
+				if ( SurfaceRadiantWin[ surf  - 1].OriginalClass == SurfaceClass_TDD_Dome ) colorindex = ColorNo_TDDDome;
+				if ( SurfaceRadiantWin[ surf  - 1].OriginalClass == SurfaceClass_TDD_Diffuser ) colorindex = ColorNo_TDDDiffuser;
 			}
 			if ( Surface( surf ).IsPV ) colorindex = ColorNo_PV;
 			++surfcount;
@@ -1801,7 +1804,7 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 	}
 
 	for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-		gio::write( unit, Format_703 ) << "Zone_Surfaces" << Zone( ZoneNum ).Name << ( Zone( ZoneNum ).SurfaceLast - Zone( ZoneNum ).SurfaceFirst + 1 );
+		gio::write( unit, Format_703 ) << "Zone_Surfaces" << Zone( ZoneNum ).Name << ( ZoneSpecs[ZoneNum - 1].SurfaceLast - ZoneSpecs[ZoneNum - 1].SurfaceFirst + 1 );
 		for ( surf = 1; surf <= TotSurfaces; ++surf ) {
 			if ( Surface( surf ).Zone != ZoneNum ) continue;
 			SolarDiffusing = "";
@@ -1838,36 +1841,36 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 				// NOTE - THIS CODE IS REPEATED IN SurfaceGeometry.cc IN SetupZoneGeometry
 				// Calculate Nominal U-value with convection/film coefficients for reporting by adding on
 				// prescribed R-values for interior and exterior convection coefficients as found in ASHRAE 90.1-2004, Appendix A
-				if ( Surface( surf ).Construction > 0 && Surface( surf ).Construction <= TotConstructs ) {
+				if ( Construction[ surf  - 1] > 0 && Construction[ surf  - 1] <= TotConstructs ) {
 					cNominalUwithConvCoeffs = "";
 					{ auto const SELECT_CASE_var( Surface( surf ).Class );
 					if ( SELECT_CASE_var == SurfaceClass_Wall ) {
 						// Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
 						// Exterior:  vertical, exterior wind exposure, Rcout = 0.17 ft2-F-hr/BTU
-						if ( NominalU( Surface( surf ).Construction ) > 0.0 ) {
-							NominalUwithConvCoeffs = 1.0 / ( 0.1197548 + ( 1.0 / NominalU( Surface( surf ).Construction ) ) + 0.0299387 );
+						if ( NominalU( Construction[ surf  - 1] ) > 0.0 ) {
+							NominalUwithConvCoeffs = 1.0 / ( 0.1197548 + ( 1.0 / NominalU( Construction[ surf  - 1] ) ) + 0.0299387 );
 						} else {
 							cNominalUwithConvCoeffs = "[invalid]";
 						}
 					} else if ( SELECT_CASE_var == SurfaceClass_Floor ) {
 						// Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
 						// Exterior:  horizontal, semi-exterior (crawlspace), Rcout = 0.46 ft2-F-hr/BTU
-						if ( NominalU( Surface( surf ).Construction ) > 0.0 ) {
-							NominalUwithConvCoeffs = 1.0 / ( 0.1620212 + ( 1.0 / NominalU( Surface( surf ).Construction ) ) + 0.0810106 );
+						if ( NominalU( Construction[ surf  - 1] ) > 0.0 ) {
+							NominalUwithConvCoeffs = 1.0 / ( 0.1620212 + ( 1.0 / NominalU( Construction[ surf  - 1] ) ) + 0.0810106 );
 						} else {
 							cNominalUwithConvCoeffs = "[invalid]";
 						}
 					} else if ( SELECT_CASE_var == SurfaceClass_Roof ) {
 						// Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
 						// Exterior:  horizontal, semi-exterior (attic), Rcout = 0.46 ft2-F-hr/BTU
-						if ( NominalU( Surface( surf ).Construction ) > 0.0 ) {
-							NominalUwithConvCoeffs = 1.0 / ( 0.1074271 + ( 1.0 / NominalU( Surface( surf ).Construction ) ) + 0.0810106 );
+						if ( NominalU( Construction[ surf  - 1] ) > 0.0 ) {
+							NominalUwithConvCoeffs = 1.0 / ( 0.1074271 + ( 1.0 / NominalU( Construction[ surf  - 1] ) ) + 0.0810106 );
 						} else {
 							cNominalUwithConvCoeffs = "[invalid]";
 						}
 					} else {
-						if ( NominalU( Surface( surf ).Construction ) > 0.0 ) {
-							NominalUwithConvCoeffs = NominalU( Surface( surf ).Construction );
+						if ( NominalU( Construction[ surf  - 1] ) > 0.0 ) {
+							NominalUwithConvCoeffs = NominalU( Construction[ surf  - 1] );
 						} else {
 							cNominalUwithConvCoeffs = "[invalid]";
 						}
@@ -1886,7 +1889,7 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 							SolarDiffusing = "No";
 						}
 					} else {
-						cNominalU = RoundSigDigits( NominalU( Surface( surf ).Construction ), 3 );
+						cNominalU = RoundSigDigits( NominalU( Construction[ surf  - 1] ), 3 );
 					}
 				} else {
 					cNominalUwithConvCoeffs = "**";
@@ -2108,7 +2111,7 @@ CostInfoOut()
 			}
 
 		}
-		if ( Surface( surf ).Construction == 0 ) { //throw out others for now
+		if ( Construction[ surf  - 1] == 0 ) { //throw out others for now
 			uniqueSurf( surf ) = false;
 		}
 	}
@@ -2127,8 +2130,8 @@ CostInfoOut()
 		//if (surface(surf)%class .eq. SurfaceClass_IntMass) CYCLE
 		if ( ! uniqueSurf( surf ) ) continue;
 		// why the heck are constructions == 0 ?
-		if ( Surface( surf ).Construction != 0 ) {
-			gio::write( unit, Format_801 ) << surf << Surface( surf ).Name << Construct( Surface( surf ).Construction ).Name << cSurfaceClass( Surface( surf ).Class ) << Surface( surf ).Area << Surface( surf ).GrossArea;
+		if ( Construction[ surf - 1 ] != 0 ) {
+			gio::write( unit, Format_801 ) << surf << Surface( surf ).Name << Construct( Construction[ surf - 1 ] ).Name << cSurfaceClass( Surface( surf ).Class ) << Surface( surf ).Area << Surface( surf ).GrossArea;
 		}
 
 	}
@@ -2172,6 +2175,7 @@ VRMLOut(
 	using DataGlobals::NumOfZones;
 	using DataStringGlobals::VerString;
 	using namespace DXFEarClipping;
+	using DataHeatBalance::ZoneSpecs;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2351,7 +2355,7 @@ VRMLOut(
 			TempZoneName[ pos ] = '_';
 			pos = index( TempZoneName, ':' );
 		}
-		for ( surf = max( Zone( zones ).SurfaceFirst, 1 ); surf <= Zone( zones ).SurfaceLast; ++surf ) {
+		for ( surf = max( ZoneSpecs[ zones  - 1].SurfaceFirst, 1 ); surf <= ZoneSpecs[ zones  - 1].SurfaceLast; ++surf ) {
 			if ( Surface( surf ).Sides == 0 ) continue;
 			if ( Surface( surf ).Class == SurfaceClass_IntMass ) continue;
 			if ( Surface( surf ).Class == SurfaceClass_Wall ) colorindex = 1;
@@ -2448,7 +2452,7 @@ VRMLOut(
 }
 
 //     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted

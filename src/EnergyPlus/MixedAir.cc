@@ -831,7 +831,7 @@ namespace MixedAir {
 		ControllerLists.allocate( NumControllerLists );
 
 		for ( Item = 1; Item <= NumControllerLists; ++Item ) {
-
+			
 			// create a reference for convenience
 			auto & thisControllerList( ControllerLists( Item ) );
 			GetObjectItem( CurrentModuleObject, Item, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
@@ -1697,7 +1697,7 @@ namespace MixedAir {
 					}
 				}
 
-				// Adding new flag for DCV
+				//   Adding new flag for DCV
 				if ( SameString( AlphArray( 3 ), "Yes" ) ) {
 					VentilationMechanical( VentMechNum ).DCVFlag = true;
 				} else if ( SameString( AlphArray( 3 ), "No" ) || lAlphaBlanks( 3 ) ) {
@@ -3383,7 +3383,7 @@ namespace MixedAir {
 		ZoneOAMin = 0.0;
 		ZoneOAMax = 0.0;
 		ZoneContamControllerSched = 0.0;
-
+		
 		if ( AirLoopNum > 0 ) {
 			AirLoopEconoLockout = AirLoopControlInfo( AirLoopNum ).EconoLockout;
 			AirLoopNightVent = AirLoopControlInfo( AirLoopNum ).NightVent;
@@ -3813,9 +3813,10 @@ namespace MixedAir {
 						if ( SysEv <= 0.0 ) SysEv = 1.0;
 
 						// Calc system outdoor air requirement
-						if ( VentilationMechanical(VentMechObjectNum).SystemOAMethod == SOAM_ProportionalControl ) {
+						if (VentilationMechanical(VentMechObjectNum).SystemOAMethod == SOAM_ProportionalControl) {
 							SysOA = SysOA / SysEv;
-						} else {
+						}
+						else {
 							SysOA = SysOAuc / SysEv;
 						}
 					}
