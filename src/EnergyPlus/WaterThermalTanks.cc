@@ -134,7 +134,7 @@ namespace WaterThermalTanks {
 	// integer parameter for water heater
 	int const MixedWaterHeater( TypeOf_WtrHeaterMixed ); // WaterHeater:Mixed
 	int const StratifiedWaterHeater( TypeOf_WtrHeaterStratified ); // WaterHeater:Stratified
-	int const HeatPumpWaterHeater( TypeOf_HeatPumpWtrHeater ); // WaterHeater:HeatPump
+	int const HeatPumpWaterHeater( TypeOf_HeatPumpWtrHeater ); // WaterHeater:HeatPumpPumpedCondenser
 	//stovall, next line never used because all desuperheater coils used in mixed water heater types
 	int const CoilWaterDesuperHeater( 4 ); // Coil:WaterHeating:Desuperheater
 	int const MixedChilledWaterStorage( TypeOf_ChilledWaterTankMixed ); // 'ThermalStorage:ChilledWater:Mixed'
@@ -935,7 +935,7 @@ namespace WaterThermalTanks {
 			NumChilledWaterMixed = GetNumObjectsFound( cMixedCWTankModuleObj );
 			NumChilledWaterStratified = GetNumObjectsFound( cStratifiedCWTankModuleObj );
 			NumWaterThermalTank = NumWaterHeaterMixed + NumWaterHeaterStratified + NumChilledWaterMixed + NumChilledWaterStratified;
-			NumHeatPumpWaterHeater = GetNumObjectsFound( "WaterHeater:HeatPump" );
+			NumHeatPumpWaterHeater = GetNumObjectsFound( "WaterHeater:HeatPumpPumpedCondenser" );
 			NumWaterHeaterDesuperheater = GetNumObjectsFound( "Coil:WaterHeating:Desuperheater" );
 
 			if ( NumWaterThermalTank > 0 ) {
@@ -1228,7 +1228,7 @@ namespace WaterThermalTanks {
 
 			//   get input for heat pump water heater object
 			if ( NumHeatPumpWaterHeater > 0 ) {
-				cCurrentModuleObject = "WaterHeater:HeatPump";
+				cCurrentModuleObject = "WaterHeater:HeatPumpPumpedCondenser";
 				for ( HPWaterHeaterNum = 1; HPWaterHeaterNum <= NumHeatPumpWaterHeater; ++HPWaterHeaterNum ) {
 
 					GetObjectItem( cCurrentModuleObject, HPWaterHeaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -1405,7 +1405,7 @@ namespace WaterThermalTanks {
 					DXCoilErrFlag = false;
 					GetDXCoilIndex( HPWaterHeater( HPWaterHeaterNum ).DXCoilName, HPWaterHeater( HPWaterHeaterNum ).DXCoilNum, DXCoilErrFlag, cCurrentModuleObject );
 					if ( DXCoilErrFlag ) {
-						ShowContinueError( "...occurs in WaterHeater:HeatPump =" + HPWaterHeater( HPWaterHeaterNum ).Name );
+						ShowContinueError( "...occurs in WaterHeater:HeatPumpPumpedCondenser =" + HPWaterHeater( HPWaterHeaterNum ).Name );
 						ShowContinueError( "...entered DX CoilType=" + HPWaterHeater( HPWaterHeaterNum ).DXCoilType );
 						ErrorsFound = true;
 					}
@@ -1567,7 +1567,7 @@ namespace WaterThermalTanks {
 					if ( ! lAlphaFieldBlanks( 26 ) ) {
 						//         For the inlet air mixer node, NodeConnectionType is outlet from the HPWH inlet air node
 						if ( HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempZoneAndOA ) {
-							HPWaterHeater( HPWaterHeaterNum ).InletAirMixerNode = GetOnlySingleNode( cAlphaArgs( 26 ), ErrorsFound, "WaterHeater:HeatPump inlet air mixer", cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+							HPWaterHeater( HPWaterHeaterNum ).InletAirMixerNode = GetOnlySingleNode( cAlphaArgs( 26 ), ErrorsFound, "WaterHeater:HeatPumpPumpedCondenser inlet air mixer", cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 						} else {
 							ShowWarningError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
 							ShowContinueError( "Inlet air mixer node name specified but only required when Inlet Air Configuration is selected as Zone and OutdoorAir. Node name disregarded and simulation continues." );
@@ -3303,7 +3303,7 @@ namespace WaterThermalTanks {
 			//   Loop through HPWH's and then search all water heaters for the tank connected to the HPWH
 			if ( NumHeatPumpWaterHeater > 0 ) {
 
-				cCurrentModuleObject = "WaterHeater:HeatPump";
+				cCurrentModuleObject = "WaterHeater:HeatPumpPumpedCondenser";
 
 				for ( HPWaterHeaterNum = 1; HPWaterHeaterNum <= NumHeatPumpWaterHeater; ++HPWaterHeaterNum ) {
 
@@ -3322,7 +3322,7 @@ namespace WaterThermalTanks {
 
 						if ( WaterThermalTank( CheckWaterHeaterNum ).Type == "WATER HEATER:SIMPLE" ) { // name change issue here.
 							ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
-							ShowContinueError( "WaterHeater:HeatPump cannot be used with WATER HEATER:SIMPLE." );
+							ShowContinueError( "WaterHeater:HeatPumpPumpedCondenser cannot be used with WATER HEATER:SIMPLE." );
 							ErrorsFound = true;
 						} else if ( ( WaterThermalTank( CheckWaterHeaterNum ).Type == cMixedWHModuleObj ) || ( WaterThermalTank( CheckWaterHeaterNum ).Type == cStratifiedWHModuleObj ) ) {
 							HPWaterHeater( HPWaterHeaterNum ).TankTypeNum = WaterThermalTank( CheckWaterHeaterNum ).TypeNum;
@@ -3724,7 +3724,7 @@ namespace WaterThermalTanks {
 						SetupOutputVariable( "Water Heater Mains Water Volume [m3]", WaterThermalTank( WaterThermalTankNum ).VolumeConsumed, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, "MainsWater", "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
 
 						if ( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum > 0 ) {
-							//CurrentModuleObject='WaterHeater:HeatPump'
+							//CurrentModuleObject='WaterHeater:HeatPumpPumpedCondenser'
 							SetupOutputVariable( "Water Heater Compressor Part Load Ratio []", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).HeatingPLR, "System", "Average", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Name );
 							SetupOutputVariable( "Water Heater Off Cycle Ancillary Electric Power [W]", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).OffCycParaFuelRate, "System", "Average", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Name );
 							SetupOutputVariable( "Water Heater Off Cycle Ancillary Electric Energy [J]", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).OffCycParaFuelEnergy, "System", "Sum", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Name, _, "Electric", "DHW", "Water Heater Parasitic", "Plant" );

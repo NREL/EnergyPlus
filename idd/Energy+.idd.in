@@ -38863,7 +38863,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPumpPumpedCondenser
        \required-field
   A3 , \field Zone Equipment 1 Name
        \required-field
@@ -38907,7 +38907,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPumpPumpedCondenser
   A5 , \field Zone Equipment 2 Name
   N3 , \field Zone Equipment 2 Cooling Sequence
        \type integer
@@ -38947,7 +38947,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPumpPumpedCondenser
   A7 , \field Zone Equipment 3 Name
   N5 , \field Zone Equipment 3 Cooling Sequence
        \type integer
@@ -38987,7 +38987,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPumpPumpedCondenser
   A9 , \field Zone Equipment 4 Name
   N7 , \field Zone Equipment 4 Cooling Sequence
        \type integer
@@ -39027,7 +39027,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPumpPumpedCondenser
   A11, \field Zone Equipment 5 Name
   N9 , \field Zone Equipment 5 Cooling Sequence
        \type integer
@@ -39067,7 +39067,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPumpPumpedCondenser
   A13, \field Zone Equipment 6 Name
   N11, \field Zone Equipment 6 Cooling Sequence
        \type integer
@@ -39107,7 +39107,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPumpPumpedCondenser
   A15, \field Zone Equipment 7 Name
   N13, \field Zone Equipment 7 Cooling Sequence
        \type integer
@@ -39147,7 +39147,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPumpPumpedCondenser
   A17, \field Zone Equipment 8 Name
   N15, \field Zone Equipment 8 Cooling Sequence
        \type integer
@@ -39187,7 +39187,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPumpPumpedCondenser
   A19, \field Zone Equipment 9 Name
   N17, \field Zone Equipment 9 Cooling Sequence
        \type integer
@@ -39227,7 +39227,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPumpPumpedCondenser
   A21, \field Zone Equipment 10 Name
   N19, \field Zone Equipment 10 Cooling Sequence
        \type integer
@@ -39267,7 +39267,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPumpPumpedCondenser
   A23, \field Zone Equipment 11 Name
   N21, \field Zone Equipment 11 Cooling Sequence
        \type integer
@@ -39307,7 +39307,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPumpPumpedCondenser
   A25, \field Zone Equipment 12 Name
   N23, \field Zone Equipment 12 Cooling Sequence
        \type integer
@@ -39347,7 +39347,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPumpPumpedCondenser
   A27, \field Zone Equipment 13 Name
   N25, \field Zone Equipment 13 Cooling Sequence
        \type integer
@@ -39387,7 +39387,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPumpPumpedCondenser
   A29, \field Zone Equipment 14 Name
   N27, \field Zone Equipment 14 Cooling Sequence
        \type integer
@@ -39427,7 +39427,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPumpPumpedCondenser
   A31, \field Zone Equipment 15 Name
   N29, \field Zone Equipment 15 Cooling Sequence
        \type integer
@@ -39467,7 +39467,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPumpPumpedCondenser
   A33, \field Zone Equipment 16 Name
   N31, \field Zone Equipment 16 Cooling Sequence
        \type integer
@@ -39507,7 +39507,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPumpPumpedCondenser
   A35, \field Zone Equipment 17 Name
   N33, \field Zone Equipment 17 Cooling Sequence
        \type integer
@@ -39547,7 +39547,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:IdealLoadsAirSystem
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
-       \key WaterHeater:HeatPump
+       \key WaterHeater:HeatPumpPumpedCondenser
   A37, \field Zone Equipment 18 Name
   N35, \field Zone Equipment 18 Cooling Sequence
        \type integer
@@ -46468,7 +46468,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
 Coil:WaterHeating:AirToWaterHeatPump,
        \memo Heat pump water heater (HPWH) heating coil, air-to-water direct-expansion (DX)
        \memo system which includes a water heating coil, evaporator air coil, evaporator
-       \memo fan, electric compressor, and water pump. Part of a WaterHeater:HeatPump system.
+       \memo fan, electric compressor, and water pump. Part of a WaterHeater:HeatPumpPumpedCondenser system.
        \min-fields 21
   A1 , \field Name
        \required-field
@@ -46604,7 +46604,7 @@ Coil:WaterHeating:AirToWaterHeatPump,
        \note The compressor crankcase heater only operates when the dry-bulb temperature of air
        \note surrounding the compressor is below the Maximum Ambient Temperature for Crankcase
        \note Heater Operation and the DX coil is off.  The ambient temperature surrounding the
-       \note compressor is set by the WaterHeater:HeatPump parent object (field Compressor Location).
+       \note compressor is set by the WaterHeater:HeatPumpPumpedCondenser parent object (field Compressor Location).
   N12, \field Maximum Ambient Temperature for Crankcase Heater Operation
        \type real
        \minimum 0
@@ -46613,7 +46613,7 @@ Coil:WaterHeating:AirToWaterHeatPump,
        \note The compressor crankcase heater only operates when the dry-bulb temperature of air
        \note surrounding the compressor is below the Maximum Outdoor Temperature for Crankcase
        \note Heater Operation and the unit is off. The ambient temperature surrounding the
-       \note compressor is set by the WaterHeater:HeatPump parent object (field Compressor Location).
+       \note compressor is set by the WaterHeater:HeatPumpPumpedCondenser parent object (field Compressor Location).
   A9 , \field Evaporator Air Temperature Type for Curve Objects
        \type choice
        \key DryBulbTemperature
@@ -62266,7 +62266,7 @@ HeatExchanger:FluidToFluid,
 WaterHeater:Mixed,
        \memo Water heater with well-mixed, single-node water tank. May be used to model a tankless
        \memo water heater (small tank volume), a hot water storage tank (zero heater capacity), or
-       \memo a heat pump water heater (see WaterHeater:HeatPump.)
+       \memo a heat pump water heater (see WaterHeater:HeatPumpPumpedCondenser.)
   A1 , \field Name
        \required-field
        \type alpha
@@ -62494,7 +62494,7 @@ WaterHeater:Mixed,
 WaterHeater:Stratified,
        \memo Water heater with stratified, multi-node water tank. May be used to model a tankless
        \memo water heater (small tank volume), a hot water storage tank (zero heater capacity), or
-       \memo a heat pump water heater (see WaterHeater:HeatPump.)
+       \memo a heat pump water heater (see WaterHeater:HeatPumpPumpedCondenser.)
   A1 , \field Name
        \required-field
        \type alpha
@@ -62925,10 +62925,10 @@ WaterHeater:Sizing,
        \note only used if for WaterHeater:Stratified
        \minimum 0.0
 
-WaterHeater:HeatPump,
+WaterHeater:HeatPumpPumpedCondenser,
        \min-fields 31
        \memo This object models an air-source heat pump for water heating.
-       \memo WaterHeater:HeatPump is a compound object that references other component objects -
+       \memo WaterHeater:HeatPumpPumpedCondenser is a compound object that references other component objects -
        \memo Coil:WaterHeating:AirToWaterHeatPump, Fan:OnOff, WaterHeater:Mixed
   A1 , \field Name
        \required-field

@@ -553,7 +553,7 @@ namespace DataZoneEquipment {
 					} else if ( SELECT_CASE_var == "ZONEHVAC:ENERGYRECOVERYVENTILATOR" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = ERVStandAlone_Num;
 
-					} else if ( SELECT_CASE_var == "WATERHEATER:HEATPUMP" ) {
+					} else if ( SELECT_CASE_var == "WATERHEATER:HEATPUMPPUMPEDCONDENSER" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = HPWaterHeater_Num;
 
 					} else if ( SELECT_CASE_var == "ZONEHVAC:VENTILATEDSLAB" ) { // Ventilated Slab
