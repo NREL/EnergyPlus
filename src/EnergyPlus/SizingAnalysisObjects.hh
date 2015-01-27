@@ -36,14 +36,15 @@ public:
 	int KindofSim			= 0;
 	int EnvrnNum			= 0;
 	int DesignDayNum		= 0;
-	int DayOfSim			= 0; // since start of simulation
+	int DayOfSim			= 0;    // since start of simulation
 	int HourOfDay			= 0; 
-	int ztStepsIntoPeriod	= 0; //count of zone timesteps into period
+	int ztStepsIntoPeriod	= 0;    //count of zone timesteps into period
 	Real64 stepStartMinute	= 0.0;  //minutes at beginning of zone timestep
-	Real64 stepEndMinute	= 0.0;    //minutes at end of zone timestep
-	Real64 TimeStepDuration = 0.0; //in fractional hours, length of timestep
+	Real64 stepEndMinute	= 0.0;  //minutes at end of zone timestep
+	Real64 TimeStepDuration = 0.0;  //in fractional hours, length of timestep
 
-	Real64 LogDataValue;
+	Real64 LogDataValue		= 0.0;
+	Real64 RunningAvgDataValue = 0.0;
 	int NumSubSteps;
 	std::vector< systemTimestepObject > subSteps; //nested object array for system timesteps inside here.
 	
@@ -57,8 +58,8 @@ public:
 	std::vector <int> ztStepCountByEnvrn ; // array of how many zone timesteps are in each environment period, sized to number of environments in sizing set
 	std::vector <int> EnvrnIndexMapByEnvrn ; //sized to number of environments in sizing set
 	std::vector <int> EnvrnStartZtStepIndex ; //sized to number of environments in sizing set
-//	std::vector <int> EnvrnEndIndex ; //sized to number of environments in sizing set
 
+	int NumOfStepsInLogSet; // sum of all zone timestep steps in log
 	std::vector< zoneTimestepObject > ztStepObj; //will be sized to the sum of all steps, eg. timesteps in hour * 24 hours * 2 design days.  
 
 
@@ -73,6 +74,10 @@ public:
 	);
 
 	void fillSysStep( zoneTimestepObject tmpztStepStamp );
+
+	void ProcessRunningAverage( 
+		int const TimeStepsInAverage
+	);
 
 	zoneTimestepObject GetLogVariableDataMax( );
 
@@ -114,7 +119,9 @@ public:
 	// name of analysis object
 	std::string name = "";
 	int PlantLoopIndex = 0; // index in plant loop data structure.
+	int PlantSizingIndex = 0;
 	int SupplySideInletNodeNum = 0;
+	int NumTimeStepsInAvg = 0;
 	Real64 DensityForSizing = 0.0;
 	Real64 PlantSizingFraction = 0.0;
 	Real64 previousVolDesignFlowRate = 0.0;

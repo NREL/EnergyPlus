@@ -47,7 +47,8 @@ namespace EnergyPlus {
 		void determineSizingAnalysesNeeded();
 
 		void createNewCoincidentPlantAnalysisObject(
-			std::string const & PlantLoopName
+			std::string const & PlantLoopName,
+			int const PlantSizingIndex
 		);
 
 		void setupSizingAnalyses();

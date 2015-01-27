@@ -58,7 +58,7 @@ namespace EnergyPlus {
 			if (PlantSizData(i).ConcurrenceOption == Coincident ){
 
 				//create an instance of analysis object for each loop
-				this->createNewCoincidentPlantAnalysisObject ( PlantSizData(i).PlantLoopName );
+				createNewCoincidentPlantAnalysisObject ( PlantSizData(i).PlantLoopName, i );
 				anyAdvancedSizingNeeded = true;
 			}
 		}
@@ -66,13 +66,15 @@ namespace EnergyPlus {
 	}
 
 	void HVACSizingSimulationManager::createNewCoincidentPlantAnalysisObject(
-			std::string const & PlantLoopName
+			std::string const & PlantLoopName,
+			int const PlantSizingIndex
 		) {
 			using DataPlant::PlantLoop;
 			using DataPlant::TotNumLoops;
 			using DataPlant::SupplySide;
 			using DataGlobals::InitConvTemp;
 			using namespace FluidProperties;
+			using DataSizing::PlantSizData;
 
 			PlantCoinicidentAnalyis tmpAnalysisObj;
 
@@ -86,7 +88,8 @@ namespace EnergyPlus {
 					tmpAnalysisObj.DensityForSizing = GetDensityGlycol( PlantLoop( i ).FluidName, 
 						InitConvTemp, PlantLoop( i ).FluidIndex, 
 						"createNewCoincidentPlantAnalysisObject" );
-					//tmpAnalysisObj.SizingLogger = this -> SizingLogger;
+					tmpAnalysisObj.NumTimeStepsInAvg =   PlantSizData( PlantSizingIndex ).NumTimeStepsInAvg;
+					tmpAnalysisObj.PlantSizingIndex = PlantSizingIndex;
 				}
 			}
 
@@ -111,7 +114,8 @@ namespace EnergyPlus {
 
 		//first pass through coincident plant objects to check new sizes and see if more iteration needed
 		PlantCoinAnalyRequestsAnotherIteration = false;
-		for ( auto &P : this -> PlantCoincAnalyObjs ) {
+		for ( auto &P : PlantCoincAnalyObjs ) {
+		    SizingLogger.logObjs[ P.LogIndex ].ProcessRunningAverage( P.NumTimeStepsInAvg );
 			P.newFoundMassFlowRateTimeStamp = SizingLogger.logObjs[ P.LogIndex ].GetLogVariableDataMax( );
 			P.ResolveDesignFlowRate( HVACSizingIterCount );
 			if ( P.AnotherIterationDesired ){
