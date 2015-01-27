@@ -9,6 +9,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include "DataHeatBalance.hh"
+#include "DataRoomAirModel.hh"
 
 #include <sqlite3.h>
 
@@ -19,113 +20,285 @@
 
 namespace EnergyPlus {
 
-class SQLite {
+class SQLiteProcedures
+{
+protected:
+	SQLiteProcedures( std::ostream & errorStream, std::shared_ptr<sqlite3> & db );
+	SQLiteProcedures( std::ostream & errorStream, bool writeOutputToSQLite, std::string const & dbName );
+	~SQLiteProcedures();
+
+	int sqliteExecuteCommand(const std::string & commandBuffer);
+	int sqlitePrepareStatement(sqlite3_stmt* & stmt, const std::string & stmtBuffer);
+
+	int sqliteBindText(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const std::string & textBuffer);
+	int sqliteBindInteger(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const int intToInsert);
+	int sqliteBindDouble(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const double doubleToInsert);
+	int sqliteBindNULL(sqlite3_stmt * stmt, const int stmtInsertLocationIndex);
+	int sqliteBindLogical(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const bool valueToInsert);
+
+	// This assumes a Foreign Key must be greater than 0 to be a valid Foreign Key, otherwise it sets the field to NULL.
+	int sqliteBindForeignKey(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const int intToInsert);
+
+	bool sqliteStepValidity( int const rc );
+	int sqliteStepCommand(sqlite3_stmt * stmt);
+	int sqliteResetCommand(sqlite3_stmt * stmt);
+	int sqliteClearBindings(sqlite3_stmt * stmt);
+	int sqliteFinalizeCommand(sqlite3_stmt * stmt);
+
+	bool m_writeOutputToSQLite;
+	std::ostream & m_errorStream;
+	sqlite3 * m_connection;
+	std::shared_ptr<sqlite3> m_db;
+	std::string m_dbName;
+};
+
+class SQLite : SQLiteProcedures {
 public:
 	// Friend SQLiteFixture which is the gtest fixture class for testing SQLite
 	// This allows for testing of private methods in SQLite
 	friend class SQLiteFixture;
 
-	class SQLiteData
-	{
-		public:
-			SQLiteData() {};
+	void addScheduleData( int const number, std::string const & name, std::string const & type, double const & minValue, double const & maxValue );
+	void addZoneData( int const number, DataHeatBalance::ZoneData const & zoneData );
+	void addZoneListData( int const number, DataHeatBalance::ZoneListData const & zoneListData );
+	void addSurfaceData( int const number, DataSurfaces::SurfaceData const & surfaceData, std::string const & surfaceClass );
+	void addZoneGroupData( int const number, DataHeatBalance::ZoneGroupData const & zoneGroupData );
+	void addMaterialData( int const number, DataHeatBalance::MaterialProperties const & materialData );
+	void addConstructionData( int const number, DataHeatBalance::ConstructionData const & constructionData );
+	void addNominalLightingData( int const number, DataHeatBalance::LightsData const & nominalLightingData );
+	void addNominalPeopleData( int const number, DataHeatBalance::PeopleData const & nominalPeopleData );
+	void addNominalElectricEquipmentData( int const number, DataHeatBalance::ZoneEquipData const & nominalElectricEquipmentData );
+	void addNominalGasEquipmentData( int const number, DataHeatBalance::ZoneEquipData const & nominalGasEquipmentData );
+	void addNominalSteamEquipmentData( int const number, DataHeatBalance::ZoneEquipData const & nominalSteamEquipmentData );
+	void addNominalHotWaterEquipmentData( int const number, DataHeatBalance::ZoneEquipData const & nominalHotWaterEquipmentData );
+	void addNominalOtherEquipmentData( int const number, DataHeatBalance::ZoneEquipData const & nominalOtherEquipmentData );
+	void addNominalBaseboardData( int const number, DataHeatBalance::BBHeatData const & nominalBaseboardData );
+	void addInfiltrationData( int const number, DataHeatBalance::InfiltrationData const & infiltrationData );
+	void addVentilationData( int const number, DataHeatBalance::VentilationData const & ventilationData );
+	void addRoomAirModelData( int const number, DataRoomAirModel::AirModelData const & roomAirModelData );
 
-		protected:
-			virtual bool insertIntoSQLite() = 0;
-	};
+	// class ZoneExtendedOutput {
+	// public:
+	// 	ZoneExtendedOutput( std::ostream & errorStream, std::shared_ptr<sqlite3> & db );
 
-	class Schedule : SQLiteData
-	{
-		public:
-			Schedule( int & scheduleNumber, std::string & scheduleName, std::string & scheduleType, double & scheduleMinValue, double & scheduleMaxValue ) :
-				number(& scheduleNumber),
-				name(& scheduleName),
-				type(& scheduleType),
-				minValue(& scheduleMinValue),
-				maxValue(& scheduleMaxValue)
-			{}
+	// 	void addFromGlobalData();
 
-		protected:
-			virtual bool insertIntoSQLite();
+	// private:
+	// 	std::ostream & m_errorStream;
+	// 	std::shared_ptr<sqlite3> m_db;
 
-		private:
-			int * const number;
-			std::string * const name;
-			std::string * const type;
-			double * const minValue;
-			double * const maxValue;
-	};
+	// 	class Schedule;
+	// 	class Zone;
 
-	class Zone : SQLiteData
-	{
-		public:
-			Zone( int & zoneNumber, DataHeatBalance::ZoneData & zoneData ) :
-				number( & zoneNumber ),
-				name( & zoneData.Name ),
-				relNorth( & zoneData.RelNorth ),
-				originX( & zoneData.OriginX ),
-				originY( & zoneData.OriginY ),
-				originZ( & zoneData.OriginZ ),
-				centroidX( & zoneData.Centroid.x ),
-				centroidY( & zoneData.Centroid.y ),
-				centroidZ( & zoneData.Centroid.z ),
-				ofType( & zoneData.OfType ),
-				multiplier( & zoneData.Multiplier ),
-				listMultiplier( & zoneData.ListMultiplier ),
-				minimumX( & zoneData.MinimumX ),
-				maximumX( & zoneData.MaximumX ),
-				minimumY( & zoneData.MinimumY ),
-				maximumY( & zoneData.MaximumY ),
-				minimumZ( & zoneData.MinimumZ ),
-				maximumZ( & zoneData.MaximumZ ),
-				ceilingHeight( & zoneData.CeilingHeight ),
-				volume( & zoneData.Volume ),
-				insideConvectionAlgo( & zoneData.InsideConvectionAlgo ),
-				outsideConvectionAlgo( & zoneData.OutsideConvectionAlgo ),
-				floorArea( & zoneData.FloorArea ),
-				extGrossWallArea( & zoneData.ExtGrossWallArea ),
-				extNetWallArea( & zoneData.ExtNetWallArea ),
-				extWindowArea( & zoneData.ExtWindowArea ),
-				isPartOfTotalArea( & zoneData.isPartOfTotalArea )
-			{}
+	// 	std::vector< std::unique_ptr<SQLite::ZoneExtendedOutput::Zone> > zones;
+	// 	std::vector< std::unique_ptr<SQLite::ZoneExtendedOutput::Schedule> > schedules;
 
-		protected:
-			virtual bool insertIntoSQLite();
+	// 	void addScheduleData( int const & number, std::string const & name, std::string const & type, double const & minValue, double const & maxValue );
+	// 	void addZoneData( int const & number, DataHeatBalance::ZoneData const & zoneData );
 
-		private:
-			int * const number;
-			std::string * const name;
-			double * const relNorth;
-			double * const originX;
-			double * const originY;
-			double * const originZ;
-			double * const centroidX;
-			double * const centroidY;
-			double * const centroidZ;
-			int * const ofType;
-			int * const multiplier;
-			int * const listMultiplier;
-			double * const minimumX;
-			double * const maximumX;
-			double * const minimumY;
-			double * const maximumY;
-			double * const minimumZ;
-			double * const maximumZ;
-			double * const ceilingHeight;
-			double * const volume;
-			int * const insideConvectionAlgo;
-			int * const outsideConvectionAlgo;
-			double * const floorArea;
-			double * const extGrossWallArea;
-			double * const extNetWallArea;
-			double * const extWindowArea;
-			bool * const isPartOfTotalArea;
-	};
+	// 	class SQLiteData : public SQLiteProcedures
+	// 	{
+	// 		protected:
+	// 			SQLiteData( std::ostream & errorStream, std::shared_ptr<sqlite3> & db );
+	// 			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt ) = 0;
+	// 	};
+
+	// 	class Schedule : SQLiteData
+	// 	{
+	// 		public:
+	// 			Schedule( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const & scheduleNumber, std::string const & scheduleName, 
+	// 					std::string const & scheduleType, double const & scheduleMinValue, double const & scheduleMaxValue ) :
+	// 				SQLiteData( errorStream, db ),
+	// 				number( scheduleNumber ),
+	// 				name( scheduleName ),
+	// 				type( scheduleType ),
+	// 				minValue( scheduleMinValue ),
+	// 				maxValue( scheduleMaxValue )
+	// 			{}
+
+	// 		protected:
+	// 			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+
+	// 		private:
+	// 			int const & number;
+	// 			std::string const & name;
+	// 			std::string const & type;
+	// 			double const & minValue;
+	// 			double const & maxValue;
+	// 	};
+
+	// 	class Zone : SQLiteData
+	// 	{
+	// 		public:
+	// 			Zone( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const & zoneNumber, DataHeatBalance::ZoneData const & zoneData ) :
+	// 				SQLiteData( errorStream, db ),
+	// 				number( zoneNumber ),
+	// 				name( zoneData.Name ),
+	// 				relNorth( zoneData.RelNorth ),
+	// 				originX( zoneData.OriginX ),
+	// 				originY( zoneData.OriginY ),
+	// 				originZ( zoneData.OriginZ ),
+	// 				centroidX( zoneData.Centroid.x ),
+	// 				centroidY( zoneData.Centroid.y ),
+	// 				centroidZ( zoneData.Centroid.z ),
+	// 				ofType( zoneData.OfType ),
+	// 				multiplier( zoneData.Multiplier ),
+	// 				listMultiplier( zoneData.ListMultiplier ),
+	// 				minimumX( zoneData.MinimumX ),
+	// 				maximumX( zoneData.MaximumX ),
+	// 				minimumY( zoneData.MinimumY ),
+	// 				maximumY( zoneData.MaximumY ),
+	// 				minimumZ( zoneData.MinimumZ ),
+	// 				maximumZ( zoneData.MaximumZ ),
+	// 				ceilingHeight( zoneData.CeilingHeight ),
+	// 				volume( zoneData.Volume ),
+	// 				insideConvectionAlgo( zoneData.InsideConvectionAlgo ),
+	// 				outsideConvectionAlgo( zoneData.OutsideConvectionAlgo ),
+	// 				floorArea( zoneData.FloorArea ),
+	// 				extGrossWallArea( zoneData.ExtGrossWallArea ),
+	// 				extNetWallArea( zoneData.ExtNetWallArea ),
+	// 				extWindowArea( zoneData.ExtWindowArea ),
+	// 				isPartOfTotalArea( zoneData.isPartOfTotalArea )
+	// 			{}
+
+	// 		protected:
+	// 			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+
+	// 		private:
+	// 			int const & number;
+	// 			std::string const & name;
+	// 			double const & relNorth;
+	// 			double const & originX;
+	// 			double const & originY;
+	// 			double const & originZ;
+	// 			double const & centroidX;
+	// 			double const & centroidY;
+	// 			double const & centroidZ;
+	// 			int const & ofType;
+	// 			int const & multiplier;
+	// 			int const & listMultiplier;
+	// 			double const & minimumX;
+	// 			double const & maximumX;
+	// 			double const & minimumY;
+	// 			double const & maximumY;
+	// 			double const & minimumZ;
+	// 			double const & maximumZ;
+	// 			double const & ceilingHeight;
+	// 			double const & volume;
+	// 			int const & insideConvectionAlgo;
+	// 			int const & outsideConvectionAlgo;
+	// 			double const & floorArea;
+	// 			double const & extGrossWallArea;
+	// 			double const & extNetWallArea;
+	// 			double const & extWindowArea;
+	// 			bool const & isPartOfTotalArea;
+	// 	};
+	// };
+
+	// class SQLiteData : public SQLiteProcedures
+	// {
+	// 	protected:
+	// 		SQLiteData( std::ostream & errorStream, std::shared_ptr<sqlite3> & db );
+	// 		virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt ) = 0;
+	// };
+
+	// class Schedule : SQLiteData
+	// {
+	// 	public:
+	// 		Schedule( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int & scheduleNumber, std::string && scheduleName, 
+	// 				std::string && scheduleType, double && scheduleMinValue, double && scheduleMaxValue ) :
+	// 			SQLiteData( errorStream, db ),
+	// 			number(& scheduleNumber),
+	// 			name(& scheduleName),
+	// 			type(& scheduleType),
+	// 			minValue(& scheduleMinValue),
+	// 			maxValue(& scheduleMaxValue)
+	// 		{}
+
+	// 	protected:
+	// 		virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+
+	// 	private:
+	// 		int * const number;
+	// 		std::string * const name;
+	// 		std::string * const type;
+	// 		double * const minValue;
+	// 		double * const maxValue;
+	// };
+
+	// class Zone : SQLiteData
+	// {
+	// 	public:
+	// 		Zone( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int & zoneNumber, DataHeatBalance::ZoneData & zoneData ) :
+	// 			SQLiteData( errorStream, db ),
+	// 			number( & zoneNumber ),
+	// 			name( & zoneData.Name ),
+	// 			relNorth( & zoneData.RelNorth ),
+	// 			originX( & zoneData.OriginX ),
+	// 			originY( & zoneData.OriginY ),
+	// 			originZ( & zoneData.OriginZ ),
+	// 			centroidX( & zoneData.Centroid.x ),
+	// 			centroidY( & zoneData.Centroid.y ),
+	// 			centroidZ( & zoneData.Centroid.z ),
+	// 			ofType( & zoneData.OfType ),
+	// 			multiplier( & zoneData.Multiplier ),
+	// 			listMultiplier( & zoneData.ListMultiplier ),
+	// 			minimumX( & zoneData.MinimumX ),
+	// 			maximumX( & zoneData.MaximumX ),
+	// 			minimumY( & zoneData.MinimumY ),
+	// 			maximumY( & zoneData.MaximumY ),
+	// 			minimumZ( & zoneData.MinimumZ ),
+	// 			maximumZ( & zoneData.MaximumZ ),
+	// 			ceilingHeight( & zoneData.CeilingHeight ),
+	// 			volume( & zoneData.Volume ),
+	// 			insideConvectionAlgo( & zoneData.InsideConvectionAlgo ),
+	// 			outsideConvectionAlgo( & zoneData.OutsideConvectionAlgo ),
+	// 			floorArea( & zoneData.FloorArea ),
+	// 			extGrossWallArea( & zoneData.ExtGrossWallArea ),
+	// 			extNetWallArea( & zoneData.ExtNetWallArea ),
+	// 			extWindowArea( & zoneData.ExtWindowArea ),
+	// 			isPartOfTotalArea( & zoneData.isPartOfTotalArea )
+	// 		{}
+
+	// 	protected:
+	// 		virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+
+	// 	private:
+	// 		int * const number;
+	// 		std::string * const name;
+	// 		double * const relNorth;
+	// 		double * const originX;
+	// 		double * const originY;
+	// 		double * const originZ;
+	// 		double * const centroidX;
+	// 		double * const centroidY;
+	// 		double * const centroidZ;
+	// 		int * const ofType;
+	// 		int * const multiplier;
+	// 		int * const listMultiplier;
+	// 		double * const minimumX;
+	// 		double * const maximumX;
+	// 		double * const minimumY;
+	// 		double * const maximumY;
+	// 		double * const minimumZ;
+	// 		double * const maximumZ;
+	// 		double * const ceilingHeight;
+	// 		double * const volume;
+	// 		int * const insideConvectionAlgo;
+	// 		int * const outsideConvectionAlgo;
+	// 		double * const floorArea;
+	// 		double * const extGrossWallArea;
+	// 		double * const extNetWallArea;
+	// 		double * const extWindowArea;
+	// 		bool * const isPartOfTotalArea;
+	// };
 
 	// static enum class ZoneExtendedOutput { ZoneTable, ZoneListTable, ZoneGroupTable, SchedulesTable, MaterialsTable, ConstructionTable, 
 	// 	SurfacesTable, NominalLightingTable, NominalPeopleTable, NominalElectricEquipmentTable, NominalGasEquipmentTable, 
 	// 	NominalHotWaterEquipmentTable, NominalOtherEquipmentTable, NominalBaseboardHeatTable, InfiltrationTable, VentilationTable, 
 	// 	RoomAirModelTable };
+
+	// typedef std::tuple< std::vector< std::unique_ptr<SQLite::Zone> >, std::vector< std::unique_ptr<SQLite::Schedule> > > ZoneExtendedOutput;
 
 	// typedef std::tuple< std::map<int, DataHeatBalance::ZoneData>, std::map<int, DataHeatBalance::ZoneList>, std::map<int, DataHeatBalance::ZoneGroup>, 
 	// std::map<int, std::tuple<std::string, std::string, double, double> >, std::map<int, DataHeatBalance::Material>, std::map<int, DataHeatBalance::ZoneData>, 
@@ -291,22 +464,22 @@ private:
 	void createSQLiteSchedulesTable();
 	void createSQLiteRoomAirModelTable();
 
-	int sqliteExecuteCommand(const std::string & commandBuffer);
-	int sqlitePrepareStatement(sqlite3_stmt* & stmt, const std::string & stmtBuffer);
+	// int sqliteExecuteCommand(const std::string & commandBuffer);
+	// int sqlitePrepareStatement(sqlite3_stmt* & stmt, const std::string & stmtBuffer);
 
-	int sqliteBindText(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const std::string & textBuffer);
-	int sqliteBindInteger(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const int intToInsert);
-	int sqliteBindDouble(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const double doubleToInsert);
-	int sqliteBindNULL(sqlite3_stmt * stmt, const int stmtInsertLocationIndex);
-	int sqliteBindLogical(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const bool valueToInsert);
+	// int sqliteBindText(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const std::string & textBuffer);
+	// int sqliteBindInteger(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const int intToInsert);
+	// int sqliteBindDouble(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const double doubleToInsert);
+	// int sqliteBindNULL(sqlite3_stmt * stmt, const int stmtInsertLocationIndex);
+	// int sqliteBindLogical(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const bool valueToInsert);
 
-	// This assumes a Foreign Key must be greater than 0 to be a valid Foreign Key, otherwise it sets the field to NULL.
-	int sqliteBindForeignKey(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const int intToInsert);
+	// // This assumes a Foreign Key must be greater than 0 to be a valid Foreign Key, otherwise it sets the field to NULL.
+	// int sqliteBindForeignKey(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const int intToInsert);
 
-	int sqliteStepCommand(sqlite3_stmt * stmt);
-	int sqliteResetCommand(sqlite3_stmt * stmt);
-	int sqliteClearBindings(sqlite3_stmt * stmt);
-	int sqliteFinalizeCommand(sqlite3_stmt * stmt);
+	// int sqliteStepCommand(sqlite3_stmt * stmt);
+	// int sqliteResetCommand(sqlite3_stmt * stmt);
+	// int sqliteClearBindings(sqlite3_stmt * stmt);
+	// int sqliteFinalizeCommand(sqlite3_stmt * stmt);
 
 	int createSQLiteStringTableRecord(std::string const & stringValue, int const stringType);
 
@@ -354,12 +527,12 @@ private:
 	void initializeTabularDataTable();
 	void initializeTabularDataView();
 
-	bool m_writeOutputToSQLite;
+	// bool m_writeOutputToSQLite;
 	bool m_writeTabularDataToSQLite;
 	int m_sqlDBTimeIndex;
-	std::ostream & m_errorStream;
-	sqlite3 * m_db;
-	std::string m_dbName;
+	// std::ostream & m_errorStream;
+	// sqlite3 * m_db;
+	// std::string m_dbName;
 	sqlite3_stmt * m_reportDataInsertStmt;
 	sqlite3_stmt * m_reportExtendedDataInsertStmt;
 	sqlite3_stmt * m_reportDictionaryInsertStmt;
@@ -413,11 +586,436 @@ private:
 	static const int RowNameId;
 	static const int ColumnNameId;
 	static const int UnitsId;
+
+	class SQLiteData : public SQLiteProcedures
+	{
+		protected:
+			SQLiteData( std::ostream & errorStream, std::shared_ptr<sqlite3> & db );
+			// ~SQLiteData();
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt ) = 0;
+			// virtual void initializeTable() = 0;
+			// sqlite3_stmt * m_insertStmt;
+	};
+
+	class Schedule : SQLiteData
+	{
+		public:
+			Schedule( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const scheduleNumber, std::string const & scheduleName, 
+					std::string const & scheduleType, double const & scheduleMinValue, double const & scheduleMaxValue ) :
+				SQLiteData( errorStream, db ),
+				number( scheduleNumber ),
+				name( scheduleName ),
+				type( scheduleType ),
+				minValue( scheduleMinValue ),
+				maxValue( scheduleMaxValue )
+			{}
+
+		// protected:
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+			// virtual void initializeTable();
+
+		private:
+			// sqlite3_stmt * m_insertStmt;
+			// std::unique_ptr<sqlite3_stmt> insertStmt(m_insertStmt, sqlite3_finalize);
+			// sqlite3 * m_insertStmt;
+			// std::unique_ptr<sqlite3_stmt> m_insert;
+			int const number;
+			std::string const & name;
+			std::string const & type;
+			double const & minValue;
+			double const & maxValue;
+	};
+
+	class Surface : SQLiteData
+	{
+		public:
+			Surface( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const surfaceNumber, DataSurfaces::SurfaceData const & surfaceData, std::string const & surfaceClass ) :
+				SQLiteData( errorStream, db ),
+				number( surfaceNumber ),
+				name( surfaceData.Name ),
+				construction( surfaceData.Construction ),
+				surfaceClass( surfaceClass ),
+				area( surfaceData.Area ),
+				grossArea( surfaceData.GrossArea ),
+				perimeter( surfaceData.Perimeter ),
+				azimuth( surfaceData.Azimuth ),
+				height( surfaceData.Height ),
+				reveal( surfaceData.Reveal ),
+				shape( surfaceData.Shape ),
+				sides( surfaceData.Sides ),
+				tilt( surfaceData.Tilt ),
+				width( surfaceData.Width ),
+				heatTransSurf( surfaceData.HeatTransSurf ),
+				baseSurf( surfaceData.BaseSurf ),
+				zone( surfaceData.Zone ),
+				extBoundCond( surfaceData.ExtBoundCond ),
+				extSolar( surfaceData.ExtSolar ),
+				extWind( surfaceData.ExtWind )
+			{}
+
+		// protected:
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+
+		private:
+			int const number;
+			std::string const & name;
+			int const & construction;
+			std::string const & surfaceClass;
+			double const & area;
+			double const & grossArea;
+			double const & perimeter;
+			double const & azimuth;
+			double const & height;
+			double const & reveal;
+			int const & shape;
+			int const & sides;
+			double const & tilt;
+			double const & width;
+			bool const & heatTransSurf;
+			int const & baseSurf;
+			int const & zone;
+			int const & extBoundCond;
+			bool const & extSolar;
+			bool const & extWind;
+	};
+
+	class Zone : SQLiteData
+	{
+		public:
+			Zone( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const zoneNumber, DataHeatBalance::ZoneData const & zoneData ) :
+				SQLiteData( errorStream, db ),
+				number( zoneNumber ),
+				name( zoneData.Name ),
+				relNorth( zoneData.RelNorth ),
+				originX( zoneData.OriginX ),
+				originY( zoneData.OriginY ),
+				originZ( zoneData.OriginZ ),
+				centroidX( zoneData.Centroid.x ),
+				centroidY( zoneData.Centroid.y ),
+				centroidZ( zoneData.Centroid.z ),
+				ofType( zoneData.OfType ),
+				multiplier( zoneData.Multiplier ),
+				listMultiplier( zoneData.ListMultiplier ),
+				minimumX( zoneData.MinimumX ),
+				maximumX( zoneData.MaximumX ),
+				minimumY( zoneData.MinimumY ),
+				maximumY( zoneData.MaximumY ),
+				minimumZ( zoneData.MinimumZ ),
+				maximumZ( zoneData.MaximumZ ),
+				ceilingHeight( zoneData.CeilingHeight ),
+				volume( zoneData.Volume ),
+				insideConvectionAlgo( zoneData.InsideConvectionAlgo ),
+				outsideConvectionAlgo( zoneData.OutsideConvectionAlgo ),
+				floorArea( zoneData.FloorArea ),
+				extGrossWallArea( zoneData.ExtGrossWallArea ),
+				extNetWallArea( zoneData.ExtNetWallArea ),
+				extWindowArea( zoneData.ExtWindowArea ),
+				isPartOfTotalArea( zoneData.isPartOfTotalArea )
+			{}
+
+		// protected:
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+			// virtual void initializeTable();
+
+		private:
+			int const number;
+			std::string const & name;
+			double const & relNorth;
+			double const & originX;
+			double const & originY;
+			double const & originZ;
+			double const & centroidX;
+			double const & centroidY;
+			double const & centroidZ;
+			int const & ofType;
+			int const & multiplier;
+			int const & listMultiplier;
+			double const & minimumX;
+			double const & maximumX;
+			double const & minimumY;
+			double const & maximumY;
+			double const & minimumZ;
+			double const & maximumZ;
+			double const & ceilingHeight;
+			double const & volume;
+			int const & insideConvectionAlgo;
+			int const & outsideConvectionAlgo;
+			double const & floorArea;
+			double const & extGrossWallArea;
+			double const & extNetWallArea;
+			double const & extWindowArea;
+			bool const & isPartOfTotalArea;
+	};
+
+	class ZoneList : SQLiteData
+	{
+		public:
+			ZoneList( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const zoneListNumber, DataHeatBalance::ZoneListData const & zoneListData ) :
+				SQLiteData( errorStream, db ),
+				number( zoneListNumber ),
+				name( zoneListData.Name )
+				// zoneId( zoneListData.Zone(zoneListNumber) )
+			{}
+
+		// protected:
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+			// virtual void initializeTable();
+
+		private:
+			int const number;
+			std::string const & name;
+			// double const & zoneId;
+	};
+
+	class ZoneGroup : SQLiteData
+	{
+		public:
+			ZoneGroup( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const zoneGroupNumber, DataHeatBalance::ZoneGroupData const & zoneGroupData ) :
+				SQLiteData( errorStream, db ),
+				number( zoneGroupNumber ),
+				name( zoneGroupData.Name )
+			{}
+
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+
+		private:
+			int const number;
+			std::string const & name;
+	};
+
+	class Material : SQLiteData
+	{
+		public:
+			Material( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const materialNumber, DataHeatBalance::MaterialProperties const & materialData ) :
+				SQLiteData( errorStream, db ),
+				number( materialNumber ),
+				name( materialData.Name )
+			{}
+
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+
+		private:
+			int const number;
+			std::string const & name;
+	};
+
+	class Construction : SQLiteData
+	{
+		public:
+			Construction( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const constructionNumber, DataHeatBalance::ConstructionData const & constructionData ) :
+				SQLiteData( errorStream, db ),
+				number( constructionNumber ),
+				name( constructionData.Name )
+			{}
+
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+
+		private:
+			int const number;
+			std::string const & name;
+	};
+
+	class NominalLighting : SQLiteData
+	{
+		public:
+			NominalLighting( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const nominalLightingNumber, DataHeatBalance::LightsData const & nominalLightingData ) :
+				SQLiteData( errorStream, db ),
+				number( nominalLightingNumber ),
+				name( nominalLightingData.Name )
+			{}
+
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+
+		private:
+			int const number;
+			std::string const & name;
+	};
+
+	class NominalPeople : SQLiteData
+	{
+		public:
+			NominalPeople( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const nominalPeopleNumber, DataHeatBalance::PeopleData const & nominalPeopleData ) :
+				SQLiteData( errorStream, db ),
+				number( nominalPeopleNumber ),
+				name( nominalPeopleData.Name )
+			{}
+
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+
+		private:
+			int const number;
+			std::string const & name;
+	};
+
+	class NominalElectricEquipment : SQLiteData
+	{
+		public:
+			NominalElectricEquipment( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const nominalElectricEquipmentNumber, DataHeatBalance::ZoneEquipData const & nominalElectricEquipmentData ) :
+				SQLiteData( errorStream, db ),
+				number( nominalElectricEquipmentNumber ),
+				name( nominalElectricEquipmentData.Name )
+			{}
+
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+
+		private:
+			int const number;
+			std::string const & name;
+	};
+
+	class NominalGasEquipment : SQLiteData
+	{
+		public:
+			NominalGasEquipment( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const nominalGasEquipmentNumber, DataHeatBalance::ZoneEquipData const & nominalGasEquipmentData ) :
+				SQLiteData( errorStream, db ),
+				number( nominalGasEquipmentNumber ),
+				name( nominalGasEquipmentData.Name )
+			{}
+
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+
+		private:
+			int const number;
+			std::string const & name;
+	};
+
+	class NominalSteamEquipment : SQLiteData
+	{
+		public:
+			NominalSteamEquipment( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const nominalSteamEquipmentNumber, DataHeatBalance::ZoneEquipData const & nominalSteamEquipmentData ) :
+				SQLiteData( errorStream, db ),
+				number( nominalSteamEquipmentNumber ),
+				name( nominalSteamEquipmentData.Name )
+			{}
+
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+
+		private:
+			int const number;
+			std::string const & name;
+	};
+
+	class NominalHotWaterEquipment : SQLiteData
+	{
+		public:
+			NominalHotWaterEquipment( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const nominalHotWaterEquipmentNumber, DataHeatBalance::ZoneEquipData const & nominalHotWaterEquipmentData ) :
+				SQLiteData( errorStream, db ),
+				number( nominalHotWaterEquipmentNumber ),
+				name( nominalHotWaterEquipmentData.Name )
+			{}
+
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+
+		private:
+			int const number;
+			std::string const & name;
+	};
+
+	class NominalOtherEquipment : SQLiteData
+	{
+		public:
+			NominalOtherEquipment( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const nominalOtherEquipmentNumber, DataHeatBalance::ZoneEquipData const & nominalOtherEquipmentData ) :
+				SQLiteData( errorStream, db ),
+				number( nominalOtherEquipmentNumber ),
+				name( nominalOtherEquipmentData.Name )
+			{}
+
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+
+		private:
+			int const number;
+			std::string const & name;
+	};
+
+	class NominalBaseboardHeat : SQLiteData
+	{
+		public:
+			NominalBaseboardHeat( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const nominalBaseboardHeatNumber, DataHeatBalance::BBHeatData const & nominalBaseboardHeatData ) :
+				SQLiteData( errorStream, db ),
+				number( nominalBaseboardHeatNumber ),
+				name( nominalBaseboardHeatData.Name )
+			{}
+
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+
+		private:
+			int const number;
+			std::string const & name;
+	};
+
+	class Infiltration : SQLiteData
+	{
+		public:
+			Infiltration( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const infiltrationNumber, DataHeatBalance::InfiltrationData const & infiltrationData ) :
+				SQLiteData( errorStream, db ),
+				number( infiltrationNumber ),
+				name( infiltrationData.Name )
+			{}
+
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+
+		private:
+			int const number;
+			std::string const & name;
+	};
+
+	class Ventilation : SQLiteData
+	{
+		public:
+			Ventilation( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const ventilationNumber, DataHeatBalance::VentilationData const & ventilationData ) :
+				SQLiteData( errorStream, db ),
+				number( ventilationNumber ),
+				name( ventilationData.Name )
+			{}
+
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+
+		private:
+			int const number;
+			std::string const & name;
+	};
+
+	class RoomAirModel : SQLiteData
+	{
+		public:
+			RoomAirModel( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const roomAirModelNumber, DataRoomAirModel::AirModelData const & roomAirModelData ) :
+				SQLiteData( errorStream, db ),
+				number( roomAirModelNumber )
+				// name( roomAirModelData.Name )
+			{}
+
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+
+		private:
+			int const number;
+			// std::string const & name;
+	};
+
+	std::vector< std::unique_ptr<SQLite::Zone> > zones;
+	std::vector< std::unique_ptr<SQLite::ZoneList> > zoneLists;
+	std::vector< std::unique_ptr<SQLite::ZoneGroup> > zoneGroups;
+	std::vector< std::unique_ptr<SQLite::Schedule> > schedules;
+	std::vector< std::unique_ptr<SQLite::Surface> > surfaces;
+	std::vector< std::unique_ptr<SQLite::Material> > materials;
+	std::vector< std::unique_ptr<SQLite::Construction> > constructions;
+	std::vector< std::unique_ptr<SQLite::NominalLighting> > nominalLightings;
+	std::vector< std::unique_ptr<SQLite::NominalPeople> > nominalPeoples;
+	std::vector< std::unique_ptr<SQLite::NominalElectricEquipment> > nominalElectricEquipments;
+	std::vector< std::unique_ptr<SQLite::NominalGasEquipment> > nominalGasEquipments;
+	std::vector< std::unique_ptr<SQLite::NominalSteamEquipment> > nominalSteamEquipments;
+	std::vector< std::unique_ptr<SQLite::NominalHotWaterEquipment> > nominalHotWaterEquipments;
+	std::vector< std::unique_ptr<SQLite::NominalOtherEquipment> > nominalOtherEquipments;
+	std::vector< std::unique_ptr<SQLite::NominalBaseboardHeat> > nominalBaseboardHeats;
+	std::vector< std::unique_ptr<SQLite::Infiltration> > infiltrations;
+	std::vector< std::unique_ptr<SQLite::Ventilation> > ventilations;
+	std::vector< std::unique_ptr<SQLite::RoomAirModel> > roomAirModels;
 };
 
 extern std::unique_ptr<SQLite> sqlite;
 
 std::unique_ptr<SQLite> CreateSQLiteDatabase();
+
+void CreateSQLiteZoneExtendedOutput();
 
 } // EnergyPlus
 

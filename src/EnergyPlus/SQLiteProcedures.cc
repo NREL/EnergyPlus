@@ -69,14 +69,32 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase() {
 	}
 }
 
+void CreateSQLiteZoneExtendedOutput() {
+	if( sqlite ) {
+		for( int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+			sqlite->addZoneData( zoneNum, DataHeatBalance::Zone(zoneNum) );
+		}
+		for( int scheduleNumber = 1, numberOfSchedules = ScheduleManager::GetNumberOfSchedules(); scheduleNumber <= numberOfSchedules; ++scheduleNumber) {
+			sqlite->addScheduleData( scheduleNumber, ScheduleManager::GetScheduleName(scheduleNumber), ScheduleManager::GetScheduleType(scheduleNumber), 
+				ScheduleManager::GetScheduleMinValue(scheduleNumber), ScheduleManager::GetScheduleMaxValue(scheduleNumber) );
+		}
+		for( int surfaceNumber = 1; surfaceNumber <= DataSurfaces::TotSurfaces; ++surfaceNumber ) {
+			auto const & surface = DataSurfaces::Surface(surfaceNumber);
+			sqlite->addSurfaceData( surfaceNumber, surface, DataSurfaces::cSurfaceClass(surface.Class) );
+		}
+		sqlite->createZoneExtendedOutput();
+	}
+}
+
 SQLite::SQLite( std::ostream & errorStream, bool writeOutputToSQLite, bool writeTabularDataToSQLite, std::string const & dbName )
-	:
-	m_writeOutputToSQLite(writeOutputToSQLite),
+	: 
+	SQLiteProcedures(errorStream, writeTabularDataToSQLite, dbName),
+	// m_writeOutputToSQLite(writeOutputToSQLite),
 	m_writeTabularDataToSQLite(writeTabularDataToSQLite),
 	m_sqlDBTimeIndex(0),
-	m_db(nullptr),
-	m_dbName(dbName),
-	m_errorStream(errorStream),
+	// m_db(nullptr),
+	// m_dbName(dbName),
+	// m_errorStream(errorStream),
 	m_reportDataInsertStmt(nullptr),
 	m_reportExtendedDataInsertStmt(nullptr),
 	m_reportDictionaryInsertStmt(nullptr),
@@ -119,62 +137,62 @@ SQLite::SQLite( std::ostream & errorStream, bool writeOutputToSQLite, bool write
 	m_simulationDataUpdateStmt(nullptr)
 {
 	if( m_writeOutputToSQLite ) {
-		int rc = -1;
-		bool ok = true;
-		// m_errorStream.open("sqlite.err", std::ofstream::out | std::ofstream::trunc);
+		// int rc = -1;
+		// bool ok = true;
+		// // m_errorStream.open("sqlite.err", std::ofstream::out | std::ofstream::trunc);
 
-		// Test if we can write to the sqlite error file
-		//  Does there need to be a seperate sqlite.err file at all?  Consider using eplusout.err
-		if( m_errorStream ) {
-			m_errorStream << "SQLite3 message, sqlite.err open for processing!" << std::endl;
-		} else {
-			ok = false;
-		}
+		// // Test if we can write to the sqlite error file
+		// //  Does there need to be a seperate sqlite.err file at all?  Consider using eplusout.err
+		// if( m_errorStream ) {
+		// 	m_errorStream << "SQLite3 message, sqlite.err open for processing!" << std::endl;
+		// } else {
+		// 	ok = false;
+		// }
 
-		// Test if we can create a new file named m_dbName
-		if( ok && m_dbName != ":memory:" ) {
-			std::ofstream test(m_dbName, std::ofstream::out | std::ofstream::trunc);
-			if( test.is_open() ) {
-				test.close();
-			} else {
-				ok = false;
-			}
-		}
+		// // Test if we can create a new file named m_dbName
+		// if( ok && m_dbName != ":memory:" ) {
+		// 	std::ofstream test(m_dbName, std::ofstream::out | std::ofstream::trunc);
+		// 	if( test.is_open() ) {
+		// 		test.close();
+		// 	} else {
+		// 		ok = false;
+		// 	}
+		// }
 
-		// Test if we can write to the database
-		// If we can't then there are probably locks on the database
-		if( ok ) {
-			sqlite3_open_v2(m_dbName.c_str(), &m_db, SQLITE_OPEN_READWRITE, nullptr);
-			char * zErrMsg = nullptr;
-			rc = sqlite3_exec(m_db, "CREATE TABLE Test(x INTEGER PRIMARY KEY)", nullptr, 0, &zErrMsg);
-			sqlite3_close(m_db);
-			if( rc ) {
-				m_errorStream << "SQLite3 message, can't get exclusive lock on existing database: " << sqlite3_errmsg(m_db) << std::endl;
-				ok = false;
-			} else {
-				if (m_dbName != ":memory:") {
-					// Remove test db
-					rc = remove( m_dbName.c_str() );
-					if( rc ) {
-						m_errorStream << "SQLite3 message, can't remove old database: " << sqlite3_errmsg(m_db) << std::endl;
-						ok = false;
-					}
-				}
-			}
-			sqlite3_free(zErrMsg);
-		}
+		// // Test if we can write to the database
+		// // If we can't then there are probably locks on the database
+		// if( ok ) {
+		// 	sqlite3_open_v2(m_dbName.c_str(), &m_db, SQLITE_OPEN_READWRITE, nullptr);
+		// 	char * zErrMsg = nullptr;
+		// 	rc = sqlite3_exec(m_db, "CREATE TABLE Test(x INTEGER PRIMARY KEY)", nullptr, 0, &zErrMsg);
+		// 	sqlite3_close(m_db);
+		// 	if( rc ) {
+		// 		m_errorStream << "SQLite3 message, can't get exclusive lock on existing database: " << sqlite3_errmsg(m_db) << std::endl;
+		// 		ok = false;
+		// 	} else {
+		// 		if (m_dbName != ":memory:") {
+		// 			// Remove test db
+		// 			rc = remove( m_dbName.c_str() );
+		// 			if( rc ) {
+		// 				m_errorStream << "SQLite3 message, can't remove old database: " << sqlite3_errmsg(m_db) << std::endl;
+		// 				ok = false;
+		// 			}
+		// 		}
+		// 	}
+		// 	sqlite3_free(zErrMsg);
+		// }
 
-		if( ok ) {
-			// Now open the output db for the duration of the simulation
-			rc = sqlite3_open_v2(m_dbName.c_str(), &m_db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
-			if( rc ) {
-				m_errorStream << "SQLite3 message, can't open new database: " << sqlite3_errmsg(m_db) << std::endl;
-				sqlite3_close(m_db);
-				ok = false;
-			}
-		}
+		// if( ok ) {
+		// 	// Now open the output db for the duration of the simulation
+		// 	rc = sqlite3_open_v2(m_dbName.c_str(), &m_db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
+		// 	if( rc ) {
+		// 		m_errorStream << "SQLite3 message, can't open new database: " << sqlite3_errmsg(m_db) << std::endl;
+		// 		sqlite3_close(m_db);
+		// 		ok = false;
+		// 	}
+		// }
 
-		if( ok ) {
+		// if( ok ) {
 			sqliteExecuteCommand("PRAGMA locking_mode = EXCLUSIVE;");
 			sqliteExecuteCommand("PRAGMA journal_mode = OFF;");
 			sqliteExecuteCommand("PRAGMA synchronous = OFF;");
@@ -218,9 +236,9 @@ SQLite::SQLite( std::ostream & errorStream, bool writeOutputToSQLite, bool write
 				initializeTabularDataTable();
 				initializeTabularDataView();
 			}
-		} else {
-			throw std::runtime_error("The SQLite database failed to open.");
-		}
+		// } else {
+		// 	throw std::runtime_error("The SQLite database failed to open.");
+		// }
 	}
 }
 
@@ -267,7 +285,7 @@ SQLite::~SQLite()
 	sqlite3_finalize(m_simulationUpdateStmt);
 	sqlite3_finalize(m_simulationDataUpdateStmt);
 
-	sqlite3_close(m_db);
+	// sqlite3_close(m_db);
 }
 
 bool SQLite::writeOutputToSQLite() const
@@ -294,120 +312,120 @@ void SQLite::sqliteCommit()
 	}
 }
 
-int SQLite::sqliteExecuteCommand(const std::string & commandBuffer)
-{
-	char *zErrMsg = 0;
+// int SQLite::sqliteExecuteCommand(const std::string & commandBuffer)
+// {
+// 	char *zErrMsg = 0;
 
-	int rc = sqlite3_exec(m_db, commandBuffer.c_str(), NULL, 0, &zErrMsg);
-	if( rc != SQLITE_OK ) {
-		m_errorStream << zErrMsg;
-	}
-	sqlite3_free(zErrMsg);
+// 	int rc = sqlite3_exec(m_db, commandBuffer.c_str(), NULL, 0, &zErrMsg);
+// 	if( rc != SQLITE_OK ) {
+// 		m_errorStream << zErrMsg;
+// 	}
+// 	sqlite3_free(zErrMsg);
 
-	return rc;
-}
+// 	return rc;
+// }
 
-int SQLite::sqlitePrepareStatement(sqlite3_stmt* & stmt, const std::string & stmtBuffer)
-{
-	int rc = sqlite3_prepare_v2(m_db, stmtBuffer.c_str(), -1, &stmt, nullptr);
-	if( rc != SQLITE_OK ) {
-		m_errorStream << "SQLite3 message, sqlite3_prepare_v2 message: " << stmtBuffer << std::endl;
-	}
+// int SQLite::sqlitePrepareStatement(sqlite3_stmt* & stmt, const std::string & stmtBuffer)
+// {
+// 	int rc = sqlite3_prepare_v2(m_db, stmtBuffer.c_str(), -1, &stmt, nullptr);
+// 	if( rc != SQLITE_OK ) {
+// 		m_errorStream << "SQLite3 message, sqlite3_prepare_v2 message: " << stmtBuffer << std::endl;
+// 	}
 
-	return rc;
-}
+// 	return rc;
+// }
 
-int SQLite::sqliteBindText(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const std::string & textBuffer)
-{
-	int rc = sqlite3_bind_text(stmt, stmtInsertLocationIndex, textBuffer.c_str(), -1, SQLITE_TRANSIENT);
-	if( rc != SQLITE_OK ) {
-		m_errorStream << "SQLite3 message, sqlite3_bind_text failed: " << textBuffer << std::endl;
-	}
+// int SQLite::sqliteBindText(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const std::string & textBuffer)
+// {
+// 	int rc = sqlite3_bind_text(stmt, stmtInsertLocationIndex, textBuffer.c_str(), -1, SQLITE_TRANSIENT);
+// 	if( rc != SQLITE_OK ) {
+// 		m_errorStream << "SQLite3 message, sqlite3_bind_text failed: " << textBuffer << std::endl;
+// 	}
 
-	return rc;
-}
+// 	return rc;
+// }
 
-int SQLite::sqliteBindInteger(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const int intToInsert)
-{
-	int rc = sqlite3_bind_int(stmt, stmtInsertLocationIndex, intToInsert);
-	if( rc != SQLITE_OK ) {
-		m_errorStream << "SQLite3 message, sqlite3_bind_int failed: " << intToInsert << std::endl;
-	}
+// int SQLite::sqliteBindInteger(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const int intToInsert)
+// {
+// 	int rc = sqlite3_bind_int(stmt, stmtInsertLocationIndex, intToInsert);
+// 	if( rc != SQLITE_OK ) {
+// 		m_errorStream << "SQLite3 message, sqlite3_bind_int failed: " << intToInsert << std::endl;
+// 	}
 
-	return rc;
-}
+// 	return rc;
+// }
 
-int SQLite::sqliteBindDouble(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const double doubleToInsert)
-{
-	int rc = sqlite3_bind_double(stmt, stmtInsertLocationIndex, doubleToInsert);
-	if( rc != SQLITE_OK ) {
-		m_errorStream << "SQLite3 message, sqlite3_bind_double failed: " << doubleToInsert << std::endl;
-	}
+// int SQLite::sqliteBindDouble(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const double doubleToInsert)
+// {
+// 	int rc = sqlite3_bind_double(stmt, stmtInsertLocationIndex, doubleToInsert);
+// 	if( rc != SQLITE_OK ) {
+// 		m_errorStream << "SQLite3 message, sqlite3_bind_double failed: " << doubleToInsert << std::endl;
+// 	}
 
-	return rc;
-}
+// 	return rc;
+// }
 
-int SQLite::sqliteBindNULL(sqlite3_stmt * stmt, const int stmtInsertLocationIndex)
-{
-	int rc = sqlite3_bind_null(stmt, stmtInsertLocationIndex);
-	if( rc != SQLITE_OK ) {
-		m_errorStream << "SQLite3 message, sqlite3_bind_null failed" << std::endl;
-	}
+// int SQLite::sqliteBindNULL(sqlite3_stmt * stmt, const int stmtInsertLocationIndex)
+// {
+// 	int rc = sqlite3_bind_null(stmt, stmtInsertLocationIndex);
+// 	if( rc != SQLITE_OK ) {
+// 		m_errorStream << "SQLite3 message, sqlite3_bind_null failed" << std::endl;
+// 	}
 
-	return rc;
-}
+// 	return rc;
+// }
 
-int SQLite::sqliteBindForeignKey(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const int intToInsert)
-{
-	int rc = -1;
-	if ( intToInsert > 0 ) {
-		rc = sqlite3_bind_int(stmt, stmtInsertLocationIndex, intToInsert);
-	} else {
-		rc = sqlite3_bind_null(stmt, stmtInsertLocationIndex);
-	}
-	if( rc != SQLITE_OK ) {
-		m_errorStream << "SQLite3 message, sqliteBindForeignKey failed: " << intToInsert << std::endl;
-	}
+// int SQLite::sqliteBindForeignKey(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const int intToInsert)
+// {
+// 	int rc = -1;
+// 	if ( intToInsert > 0 ) {
+// 		rc = sqlite3_bind_int(stmt, stmtInsertLocationIndex, intToInsert);
+// 	} else {
+// 		rc = sqlite3_bind_null(stmt, stmtInsertLocationIndex);
+// 	}
+// 	if( rc != SQLITE_OK ) {
+// 		m_errorStream << "SQLite3 message, sqliteBindForeignKey failed: " << intToInsert << std::endl;
+// 	}
 
-	return rc;
-}
+// 	return rc;
+// }
 
-int SQLite::sqliteBindLogical(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const bool valueToInsert)
-{
-	return sqliteBindInteger(stmt,stmtInsertLocationIndex, valueToInsert ? 1 : 0);
-}
+// int SQLite::sqliteBindLogical(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const bool valueToInsert)
+// {
+// 	return sqliteBindInteger(stmt,stmtInsertLocationIndex, valueToInsert ? 1 : 0);
+// }
 
-int SQLite::sqliteStepCommand(sqlite3_stmt * stmt)
-{
-	int rc = sqlite3_step(stmt);
-	switch(rc) {
-	case SQLITE_DONE:
-	case SQLITE_OK:
-	case SQLITE_ROW:
-		break;
+// int SQLite::sqliteStepCommand(sqlite3_stmt * stmt)
+// {
+// 	int rc = sqlite3_step(stmt);
+// 	switch(rc) {
+// 	case SQLITE_DONE:
+// 	case SQLITE_OK:
+// 	case SQLITE_ROW:
+// 		break;
 
-	default:
-		m_errorStream << "SQLite3 message, sqlite3_step message: " << sqlite3_errmsg(m_db) << std::endl;
-		break;
-	}
+// 	default:
+// 		m_errorStream << "SQLite3 message, sqlite3_step message: " << sqlite3_errmsg(m_db) << std::endl;
+// 		break;
+// 	}
 
-	return rc;
-}
+// 	return rc;
+// }
 
-int SQLite::sqliteResetCommand(sqlite3_stmt * stmt)
-{
-	return sqlite3_reset(stmt);
-}
+// int SQLite::sqliteResetCommand(sqlite3_stmt * stmt)
+// {
+// 	return sqlite3_reset(stmt);
+// }
 
-int SQLite::sqliteClearBindings(sqlite3_stmt * stmt)
-{
-	return sqlite3_clear_bindings(stmt);
-}
+// int SQLite::sqliteClearBindings(sqlite3_stmt * stmt)
+// {
+// 	return sqlite3_clear_bindings(stmt);
+// }
 
-int SQLite::sqliteFinalizeCommand(sqlite3_stmt * stmt)
-{
-	return sqlite3_finalize(stmt);
-}
+// int SQLite::sqliteFinalizeCommand(sqlite3_stmt * stmt)
+// {
+// 	return sqlite3_finalize(stmt);
+// }
 
 void SQLite::sqliteWriteMessage(const std::string & message)
 {
@@ -2102,40 +2120,40 @@ void SQLite::updateSQLiteSimulationRecord( bool const completed, bool const comp
 
 void SQLite::createSQLiteZoneTable( std::map<int, DataHeatBalance::ZoneData> const & zones )
 {
-	for( int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
-		auto const & zoneHB = DataHeatBalance::Zone(zoneNum);
+	// for( int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+	// 	auto const & zoneHB = DataHeatBalance::Zone(zoneNum);
 
-		sqliteBindInteger(m_zoneInfoInsertStmt, 1, zoneNum);
-		sqliteBindText(m_zoneInfoInsertStmt, 2, zoneHB.Name);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 3, zoneHB.RelNorth);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 4, zoneHB.OriginX);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 5, zoneHB.OriginY);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 6, zoneHB.OriginZ);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 7, zoneHB.Centroid.x);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 8, zoneHB.Centroid.y);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 9, zoneHB.Centroid.z);
-		sqliteBindInteger(m_zoneInfoInsertStmt, 10, zoneHB.OfType);
-		sqliteBindInteger(m_zoneInfoInsertStmt, 11, zoneHB.Multiplier);
-		sqliteBindInteger(m_zoneInfoInsertStmt, 12, zoneHB.ListMultiplier);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 13, zoneHB.MinimumX);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 14, zoneHB.MaximumX);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 15, zoneHB.MinimumY);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 16, zoneHB.MaximumY);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 17, zoneHB.MinimumZ);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 18, zoneHB.MaximumZ);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 19, zoneHB.CeilingHeight);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 20, zoneHB.Volume);
-		sqliteBindInteger(m_zoneInfoInsertStmt, 21, zoneHB.InsideConvectionAlgo);
-		sqliteBindInteger(m_zoneInfoInsertStmt, 22, zoneHB.OutsideConvectionAlgo);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 23, zoneHB.FloorArea);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 24, zoneHB.ExtGrossWallArea);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 25, zoneHB.ExtNetWallArea);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 26, zoneHB.ExtWindowArea);
-		sqliteBindLogical(m_zoneInfoInsertStmt, 27, zoneHB.isPartOfTotalArea);
+	// 	sqliteBindInteger(m_zoneInfoInsertStmt, 1, zoneNum);
+	// 	sqliteBindText(m_zoneInfoInsertStmt, 2, zoneHB.Name);
+	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 3, zoneHB.RelNorth);
+	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 4, zoneHB.OriginX);
+	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 5, zoneHB.OriginY);
+	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 6, zoneHB.OriginZ);
+	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 7, zoneHB.Centroid.x);
+	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 8, zoneHB.Centroid.y);
+	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 9, zoneHB.Centroid.z);
+	// 	sqliteBindInteger(m_zoneInfoInsertStmt, 10, zoneHB.OfType);
+	// 	sqliteBindInteger(m_zoneInfoInsertStmt, 11, zoneHB.Multiplier);
+	// 	sqliteBindInteger(m_zoneInfoInsertStmt, 12, zoneHB.ListMultiplier);
+	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 13, zoneHB.MinimumX);
+	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 14, zoneHB.MaximumX);
+	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 15, zoneHB.MinimumY);
+	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 16, zoneHB.MaximumY);
+	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 17, zoneHB.MinimumZ);
+	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 18, zoneHB.MaximumZ);
+	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 19, zoneHB.CeilingHeight);
+	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 20, zoneHB.Volume);
+	// 	sqliteBindInteger(m_zoneInfoInsertStmt, 21, zoneHB.InsideConvectionAlgo);
+	// 	sqliteBindInteger(m_zoneInfoInsertStmt, 22, zoneHB.OutsideConvectionAlgo);
+	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 23, zoneHB.FloorArea);
+	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 24, zoneHB.ExtGrossWallArea);
+	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 25, zoneHB.ExtNetWallArea);
+	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 26, zoneHB.ExtWindowArea);
+	// 	sqliteBindLogical(m_zoneInfoInsertStmt, 27, zoneHB.isPartOfTotalArea);
 
-		sqliteStepCommand(m_zoneInfoInsertStmt);
-		sqliteResetCommand(m_zoneInfoInsertStmt);
-	}
+	// 	sqliteStepCommand(m_zoneInfoInsertStmt);
+	// 	sqliteResetCommand(m_zoneInfoInsertStmt);
+	// }
 }
 
 void SQLite::createSQLiteNominalLightingTable()
@@ -2481,28 +2499,31 @@ void SQLite::createSQLiteSchedulesTable()
 void SQLite::createZoneExtendedOutput()
 {
 	if( m_writeOutputToSQLite ) {
-		std::map<int, DataHeatBalance::ZoneData> zones;
-		for( int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
-			zones.insert(std::map<int, DataHeatBalance::ZoneData>::value_type(zoneNum, DataHeatBalance::Zone(zoneNum)));
+		for(auto const & zone : zones) {
+			zone->insertIntoSQLite( m_zoneInfoInsertStmt );
 		}
-		createSQLiteZoneTable( zones );
-		createSQLiteZoneListTable();
-		createSQLiteZoneGroupTable();
-		createSQLiteSchedulesTable();
-		createSQLiteMaterialsTable();
-		createSQLiteConstructionsTable();
-		createSQLiteSurfacesTable();
-		createSQLiteNominalLightingTable();
-		createSQLiteNominalPeopleTable();
-		createSQLiteNominalElectricEquipmentTable();
-		createSQLiteNominalGasEquipmentTable();
-		createSQLiteNominalSteamEquipmentTable();
-		createSQLiteNominalHotWaterEquipmentTable();
-		createSQLiteNominalOtherEquipmentTable();
-		createSQLiteNominalBaseboardHeatTable();
-		createSQLiteInfiltrationTable();
-		createSQLiteVentilationTable();
-		createSQLiteRoomAirModelTable();
+		for(auto const & schedule : schedules) {
+			schedule->insertIntoSQLite( m_scheduleInsertStmt );
+		}
+
+		// createSQLiteZoneTable( zones );
+		// createSQLiteZoneListTable();
+		// createSQLiteZoneGroupTable();
+		// createSQLiteSchedulesTable();
+		// createSQLiteMaterialsTable();
+		// createSQLiteConstructionsTable();
+		// createSQLiteSurfacesTable();
+		// createSQLiteNominalLightingTable();
+		// createSQLiteNominalPeopleTable();
+		// createSQLiteNominalElectricEquipmentTable();
+		// createSQLiteNominalGasEquipmentTable();
+		// createSQLiteNominalSteamEquipmentTable();
+		// createSQLiteNominalHotWaterEquipmentTable();
+		// createSQLiteNominalOtherEquipmentTable();
+		// createSQLiteNominalBaseboardHeatTable();
+		// createSQLiteInfiltrationTable();
+		// createSQLiteVentilationTable();
+		// createSQLiteRoomAirModelTable();
 	}
 }
 
@@ -2519,24 +2540,556 @@ void SQLite::createSQLiteEnvironmentPeriodRecord( const int curEnvirNum, const s
 	}
 }
 
-bool SQLite::Schedule::insertIntoSQLite() {
-	sqliteBindInteger(m_scheduleInsertStmt, 1, number);
-	sqliteBindText(m_scheduleInsertStmt, 2, name);
-	sqliteBindText(m_scheduleInsertStmt, 3, type);
-	sqliteBindDouble(m_scheduleInsertStmt, 4, minValue);
-	sqliteBindDouble(m_scheduleInsertStmt, 5, maxValue);
-
-	sqliteStepCommand(m_scheduleInsertStmt);
-	sqliteResetCommand(m_scheduleInsertStmt);
-	return true;
+void SQLite::addScheduleData( int const number, std::string const & name, std::string const & type, double const & minValue, double const & maxValue ) {
+	schedules.push_back(
+		std::unique_ptr<Schedule>(new Schedule(m_errorStream, m_db, number, name, type, minValue, maxValue))
+	);
 }
 
-namespace SQLiteProcedures {
+void SQLite::addZoneData( int const number, DataHeatBalance::ZoneData const & zoneData ) {
+	zones.push_back(
+		std::unique_ptr<Zone>(new Zone(m_errorStream, m_db, number, zoneData))
+	);
+}
+
+void SQLite::addZoneListData( int const number, DataHeatBalance::ZoneListData const & zoneListData ) {
+	zoneLists.push_back(
+		std::unique_ptr<ZoneList>(new ZoneList(m_errorStream, m_db, number, zoneListData))
+	);
+}
+
+void SQLite::addSurfaceData( int const number, DataSurfaces::SurfaceData const & surfaceData, std::string const & surfaceClass ) {
+	surfaces.push_back(
+		std::unique_ptr<Surface>(new Surface(m_errorStream, m_db, number, surfaceData, surfaceClass))
+	);
+}
+
+void SQLite::addZoneGroupData( int const number, DataHeatBalance::ZoneGroupData const & zoneGroupData ) {
+	zoneGroups.push_back(
+		std::unique_ptr<ZoneGroup>(new ZoneGroup(m_errorStream, m_db, number, zoneGroupData))
+	);
+}
+
+void SQLite::addMaterialData( int const number, DataHeatBalance::MaterialProperties const & materialData ) {
+	materials.push_back(
+		std::unique_ptr<Material>(new Material(m_errorStream, m_db, number, materialData))
+	);
+}
+void SQLite::addConstructionData( int const number, DataHeatBalance::ConstructionData const & constructionData ) {
+	constructions.push_back(
+		std::unique_ptr<Construction>(new Construction(m_errorStream, m_db, number, constructionData))
+	);
+}
+void SQLite::addNominalLightingData( int const number, DataHeatBalance::LightsData const & nominalLightingData ) {
+	nominalLightings.push_back(
+		std::unique_ptr<NominalLighting>(new NominalLighting(m_errorStream, m_db, number, nominalLightingData))
+	);
+}
+void SQLite::addNominalPeopleData( int const number, DataHeatBalance::PeopleData const & nominalPeopleData ) {
+	nominalPeoples.push_back(
+		std::unique_ptr<NominalPeople>(new NominalPeople(m_errorStream, m_db, number, nominalPeopleData))
+	);
+}
+void SQLite::addNominalElectricEquipmentData( int const number, DataHeatBalance::ZoneEquipData const & nominalElectricEquipmentData ) {
+	nominalElectricEquipments.push_back(
+		std::unique_ptr<NominalElectricEquipment>(new NominalElectricEquipment(m_errorStream, m_db, number, nominalElectricEquipmentData))
+	);
+}
+void SQLite::addNominalGasEquipmentData( int const number, DataHeatBalance::ZoneEquipData const & nominalGasEquipmentData ) {
+	nominalGasEquipments.push_back(
+		std::unique_ptr<NominalGasEquipment>(new NominalGasEquipment(m_errorStream, m_db, number, nominalGasEquipmentData))
+	);
+}
+void SQLite::addNominalSteamEquipmentData( int const number, DataHeatBalance::ZoneEquipData const & nominalSteamEquipmentData ) {
+	nominalSteamEquipments.push_back(
+		std::unique_ptr<NominalSteamEquipment>(new NominalSteamEquipment(m_errorStream, m_db, number, nominalSteamEquipmentData))
+	);
+}
+void SQLite::addNominalHotWaterEquipmentData( int const number, DataHeatBalance::ZoneEquipData const & nominalHotWaterEquipmentData ) {
+	nominalHotWaterEquipments.push_back(
+		std::unique_ptr<NominalHotWaterEquipment>(new NominalHotWaterEquipment(m_errorStream, m_db, number, nominalHotWaterEquipmentData))
+	);
+}
+void SQLite::addNominalOtherEquipmentData( int const number, DataHeatBalance::ZoneEquipData const & nominalOtherEquipmentData ) {
+	nominalOtherEquipments.push_back(
+		std::unique_ptr<NominalOtherEquipment>(new NominalOtherEquipment(m_errorStream, m_db, number, nominalOtherEquipmentData))
+	);
+}
+void SQLite::addNominalBaseboardData( int const number, DataHeatBalance::BBHeatData const & nominalBaseboardData ) {
+	nominalBaseboardHeats.push_back(
+		std::unique_ptr<NominalBaseboardHeat>(new NominalBaseboardHeat(m_errorStream, m_db, number, nominalBaseboardData))
+	);
+}
+void SQLite::addInfiltrationData( int const number, DataHeatBalance::InfiltrationData const & infiltrationData ) {
+	infiltrations.push_back(
+		std::unique_ptr<Infiltration>(new Infiltration(m_errorStream, m_db, number, infiltrationData))
+	);
+}
+void SQLite::addVentilationData( int const number, DataHeatBalance::VentilationData const & ventilationData ) {
+	ventilations.push_back(
+		std::unique_ptr<Ventilation>(new Ventilation(m_errorStream, m_db, number, ventilationData))
+	);
+}
+void SQLite::addRoomAirModelData( int const number, DataRoomAirModel::AirModelData const & roomAirModelData ) {
+	roomAirModels.push_back(
+		std::unique_ptr<RoomAirModel>(new RoomAirModel(m_errorStream, m_db, number, roomAirModelData))
+	);
+}
+
+bool SQLite::ZoneGroup::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+	sqliteBindInteger(insertStmt, 1, number);
+	sqliteBindText(insertStmt, 2, name);
+
+	int rc = sqliteStepCommand(insertStmt);
+	bool validInsert = sqliteStepValidity( rc );
+	sqliteResetCommand(insertStmt);
+	return validInsert;
+}
+bool SQLite::Material::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+	sqliteBindInteger(insertStmt, 1, number);
+	sqliteBindText(insertStmt, 2, name);
+
+	int rc = sqliteStepCommand(insertStmt);
+	bool validInsert = sqliteStepValidity( rc );
+	sqliteResetCommand(insertStmt);
+	return validInsert;
+}
+bool SQLite::Construction::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+	sqliteBindInteger(insertStmt, 1, number);
+	sqliteBindText(insertStmt, 2, name);
+
+	int rc = sqliteStepCommand(insertStmt);
+	bool validInsert = sqliteStepValidity( rc );
+	sqliteResetCommand(insertStmt);
+	return validInsert;
+}
+bool SQLite::NominalLighting::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+	sqliteBindInteger(insertStmt, 1, number);
+	sqliteBindText(insertStmt, 2, name);
+
+	int rc = sqliteStepCommand(insertStmt);
+	bool validInsert = sqliteStepValidity( rc );
+	sqliteResetCommand(insertStmt);
+	return validInsert;
+}
+bool SQLite::NominalPeople::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+	sqliteBindInteger(insertStmt, 1, number);
+	sqliteBindText(insertStmt, 2, name);
+
+	int rc = sqliteStepCommand(insertStmt);
+	bool validInsert = sqliteStepValidity( rc );
+	sqliteResetCommand(insertStmt);
+	return validInsert;
+}
+bool SQLite::NominalElectricEquipment::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+	sqliteBindInteger(insertStmt, 1, number);
+	sqliteBindText(insertStmt, 2, name);
+
+	int rc = sqliteStepCommand(insertStmt);
+	bool validInsert = sqliteStepValidity( rc );
+	sqliteResetCommand(insertStmt);
+	return validInsert;
+}
+bool SQLite::NominalGasEquipment::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+	sqliteBindInteger(insertStmt, 1, number);
+	sqliteBindText(insertStmt, 2, name);
+
+	int rc = sqliteStepCommand(insertStmt);
+	bool validInsert = sqliteStepValidity( rc );
+	sqliteResetCommand(insertStmt);
+	return validInsert;
+}
+bool SQLite::NominalSteamEquipment::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+	sqliteBindInteger(insertStmt, 1, number);
+	sqliteBindText(insertStmt, 2, name);
+
+	int rc = sqliteStepCommand(insertStmt);
+	bool validInsert = sqliteStepValidity( rc );
+	sqliteResetCommand(insertStmt);
+	return validInsert;
+}
+bool SQLite::NominalHotWaterEquipment::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+	sqliteBindInteger(insertStmt, 1, number);
+	sqliteBindText(insertStmt, 2, name);
+
+	int rc = sqliteStepCommand(insertStmt);
+	bool validInsert = sqliteStepValidity( rc );
+	sqliteResetCommand(insertStmt);
+	return validInsert;
+}
+bool SQLite::NominalOtherEquipment::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+	sqliteBindInteger(insertStmt, 1, number);
+	sqliteBindText(insertStmt, 2, name);
+
+	int rc = sqliteStepCommand(insertStmt);
+	bool validInsert = sqliteStepValidity( rc );
+	sqliteResetCommand(insertStmt);
+	return validInsert;
+}
+bool SQLite::NominalBaseboardHeat::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+	sqliteBindInteger(insertStmt, 1, number);
+	sqliteBindText(insertStmt, 2, name);
+
+	int rc = sqliteStepCommand(insertStmt);
+	bool validInsert = sqliteStepValidity( rc );
+	sqliteResetCommand(insertStmt);
+	return validInsert;
+}
+bool SQLite::Infiltration::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+	sqliteBindInteger(insertStmt, 1, number);
+	sqliteBindText(insertStmt, 2, name);
+
+	int rc = sqliteStepCommand(insertStmt);
+	bool validInsert = sqliteStepValidity( rc );
+	sqliteResetCommand(insertStmt);
+	return validInsert;
+}
+bool SQLite::Ventilation::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+	sqliteBindInteger(insertStmt, 1, number);
+	sqliteBindText(insertStmt, 2, name);
+
+	int rc = sqliteStepCommand(insertStmt);
+	bool validInsert = sqliteStepValidity( rc );
+	sqliteResetCommand(insertStmt);
+	return validInsert;
+}
+bool SQLite::RoomAirModel::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+	sqliteBindInteger(insertStmt, 1, number);
+	// sqliteBindText(insertStmt, 2, name);
+
+	int rc = sqliteStepCommand(insertStmt);
+	bool validInsert = sqliteStepValidity( rc );
+	sqliteResetCommand(insertStmt);
+	return validInsert;
+}
+
+bool SQLite::Surface::insertIntoSQLite( sqlite3_stmt * insertStmt ) {
+	sqliteBindInteger(insertStmt, 1, number);
+	sqliteBindText(insertStmt, 2, name);
+	sqliteBindForeignKey(insertStmt, 3, construction);
+	sqliteBindText(insertStmt, 4, surfaceClass);
+	sqliteBindDouble(insertStmt, 5, area);
+	sqliteBindDouble(insertStmt, 6, grossArea);
+	sqliteBindDouble(insertStmt, 7, perimeter);
+	sqliteBindDouble(insertStmt, 8, azimuth);
+	sqliteBindDouble(insertStmt, 9, height);
+	sqliteBindDouble(insertStmt, 10, reveal);
+	sqliteBindInteger(insertStmt, 11, shape);
+	sqliteBindInteger(insertStmt, 12, sides);
+	sqliteBindDouble(insertStmt, 13, tilt);
+	sqliteBindDouble(insertStmt, 14, width);
+	sqliteBindLogical(insertStmt, 15, heatTransSurf);
+	sqliteBindForeignKey(insertStmt, 16, baseSurf);
+	sqliteBindForeignKey(insertStmt, 17, zone);
+	sqliteBindInteger(insertStmt, 18, extBoundCond);
+	sqliteBindLogical(insertStmt, 19, extSolar);
+	sqliteBindLogical(insertStmt, 20, extWind);
+
+	int rc = sqliteStepCommand(insertStmt);
+	bool validInsert = sqliteStepValidity( rc );
+	sqliteResetCommand(insertStmt);
+	return validInsert;
+}
+
+bool SQLite::ZoneList::insertIntoSQLite( sqlite3_stmt * insertStmt ) {
+	// this is bad, table is bad...
+	sqliteBindInteger(insertStmt, 1, number);
+	sqliteBindText(insertStmt, 2, name);
+	// sqliteBindForeignKey(insertStmt, 3, zoneList.Zone(zoneNum));
+
+	int rc = sqliteStepCommand(insertStmt);
+	bool validInsert = sqliteStepValidity( rc );
+	sqliteResetCommand(insertStmt);
+	return validInsert;
+
+	// for(int listNum = 1; listNum <= DataHeatBalance::NumOfZoneLists; ++listNum) {
+	// 	auto const & zoneList = DataHeatBalance::ZoneList(listNum);
+	// 	for(int zoneNum = 1; zoneNum <= zoneList.NumOfZones; ++zoneNum) {
+	// 		sqliteBindInteger(m_zoneListInsertStmt, 1, listNum);
+	// 		sqliteBindText(m_zoneListInsertStmt, 2, zoneList.Name);
+	// 		sqliteBindForeignKey(m_zoneListInsertStmt, 3, zoneList.Zone(zoneNum));
+
+	// 		sqliteStepCommand(m_zoneListInsertStmt);
+	// 		sqliteResetCommand(m_zoneListInsertStmt);
+	// 	}
+	
+}
+
+bool SQLite::Schedule::insertIntoSQLite( sqlite3_stmt * insertStmt ) {
+	sqliteBindInteger(insertStmt, 1, number);
+	sqliteBindText(insertStmt, 2, name);
+	sqliteBindText(insertStmt, 3, type);
+	sqliteBindDouble(insertStmt, 4, minValue);
+	sqliteBindDouble(insertStmt, 5, maxValue);
+
+	int rc = sqliteStepCommand(insertStmt);
+	bool validInsert = sqliteStepValidity( rc );
+	sqliteResetCommand(insertStmt);
+	return validInsert;
+}
+
+bool SQLite::Zone::insertIntoSQLite( sqlite3_stmt * insertStmt ) {
+	sqliteBindInteger(insertStmt, 1, number);
+	sqliteBindText(insertStmt, 2, name);
+	sqliteBindDouble(insertStmt, 3, relNorth);
+	sqliteBindDouble(insertStmt, 4, originX);
+	sqliteBindDouble(insertStmt, 5, originY);
+	sqliteBindDouble(insertStmt, 6, originZ);
+	sqliteBindDouble(insertStmt, 7, centroidX);
+	sqliteBindDouble(insertStmt, 8, centroidY);
+	sqliteBindDouble(insertStmt, 9, centroidZ);
+	sqliteBindInteger(insertStmt, 10, ofType);
+	sqliteBindInteger(insertStmt, 11, multiplier);
+	sqliteBindInteger(insertStmt, 12, listMultiplier);
+	sqliteBindDouble(insertStmt, 13, minimumX);
+	sqliteBindDouble(insertStmt, 14, maximumX);
+	sqliteBindDouble(insertStmt, 15, minimumY);
+	sqliteBindDouble(insertStmt, 16, maximumY);
+	sqliteBindDouble(insertStmt, 17, minimumZ);
+	sqliteBindDouble(insertStmt, 18, maximumZ);
+	sqliteBindDouble(insertStmt, 19, ceilingHeight);
+	sqliteBindDouble(insertStmt, 20, volume);
+	sqliteBindInteger(insertStmt, 21, insideConvectionAlgo);
+	sqliteBindInteger(insertStmt, 22, outsideConvectionAlgo);
+	sqliteBindDouble(insertStmt, 23, floorArea);
+	sqliteBindDouble(insertStmt, 24, extGrossWallArea);
+	sqliteBindDouble(insertStmt, 25, extNetWallArea);
+	sqliteBindDouble(insertStmt, 26, extWindowArea);
+	sqliteBindLogical(insertStmt, 27, isPartOfTotalArea);
+
+	int rc = sqliteStepCommand(insertStmt);
+	bool validInsert = sqliteStepValidity( rc );
+	sqliteResetCommand(insertStmt);
+	return validInsert;
+}
+
+SQLite::SQLiteData::SQLiteData( std::ostream & errorStream, std::shared_ptr<sqlite3> & db )
+	:
+	SQLiteProcedures( errorStream, db )
+	// m_insertStmt(nullptr)
+	{}
+
+// SQLite::SQLiteData::~SQLiteData() {
+// 	sqlite3_finalize(m_insertStmt);
+// }
+
+SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, std::shared_ptr<sqlite3> & db )
+	:
+	m_db(db),
+	m_errorStream(errorStream)
+	{}
+
+SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, bool writeOutputToSQLite, std::string const & dbName )
+	:
+	m_writeOutputToSQLite(writeOutputToSQLite),
+	m_connection(nullptr),
+	m_dbName(dbName),
+	m_errorStream(errorStream)
+{
+	if( m_writeOutputToSQLite ) {
+		int rc = -1;
+		bool ok = true;
+		// m_errorStream.open("sqlite.err", std::ofstream::out | std::ofstream::trunc);
+
+		// Test if we can write to the sqlite error file
+		//  Does there need to be a seperate sqlite.err file at all?  Consider using eplusout.err
+		if( m_errorStream ) {
+			m_errorStream << "SQLite3 message, sqlite.err open for processing!" << std::endl;
+		} else {
+			ok = false;
+		}
+
+		// Test if we can create a new file named m_dbName
+		if( ok && m_dbName != ":memory:" ) {
+			std::ofstream test(m_dbName, std::ofstream::out | std::ofstream::trunc);
+			if( test.is_open() ) {
+				test.close();
+			} else {
+				ok = false;
+			}
+		}
+
+		// Test if we can write to the database
+		// If we can't then there are probably locks on the database
+		if( ok ) {
+			sqlite3_open_v2(m_dbName.c_str(), &m_connection, SQLITE_OPEN_READWRITE, nullptr);
+			char * zErrMsg = nullptr;
+			rc = sqlite3_exec(m_connection, "CREATE TABLE Test(x INTEGER PRIMARY KEY)", nullptr, 0, &zErrMsg);
+			sqlite3_close(m_connection);
+			if( rc ) {
+				m_errorStream << "SQLite3 message, can't get exclusive lock on existing database: " << sqlite3_errmsg(m_connection) << std::endl;
+				ok = false;
+			} else {
+				if (m_dbName != ":memory:") {
+					// Remove test db
+					rc = remove( m_dbName.c_str() );
+					if( rc ) {
+						m_errorStream << "SQLite3 message, can't remove old database: " << sqlite3_errmsg(m_connection) << std::endl;
+						ok = false;
+					}
+				}
+			}
+			sqlite3_free(zErrMsg);
+		}
+
+		if( ok ) {
+			// Now open the output db for the duration of the simulation
+			rc = sqlite3_open_v2(m_dbName.c_str(), &m_connection, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
+			// std::shared_ptr db(m_connection, sqlite3_close);
+			// m_db = db;
+			m_db = std::shared_ptr<sqlite3>(m_connection, sqlite3_close);
+			if( rc ) {
+				m_errorStream << "SQLite3 message, can't open new database: " << sqlite3_errmsg(m_connection) << std::endl;
+				// sqlite3_close(m_connection);
+				ok = false;
+			}
+		}
+
+		if( !ok ) {
+			throw std::runtime_error("The SQLite database failed to open.");
+		}
+	}
+}
+
+SQLiteProcedures::~SQLiteProcedures()
+{
+	// sqlite3_close(m_db);
+}
+
+int SQLiteProcedures::sqliteExecuteCommand(const std::string & commandBuffer)
+{
+	char *zErrMsg = 0;
+
+	int rc = sqlite3_exec(m_db.get(), commandBuffer.c_str(), NULL, 0, &zErrMsg);
+	if( rc != SQLITE_OK ) {
+		m_errorStream << zErrMsg;
+	}
+	sqlite3_free(zErrMsg);
+
+	return rc;
+}
+
+int SQLiteProcedures::sqlitePrepareStatement(sqlite3_stmt* & stmt, const std::string & stmtBuffer)
+{
+	int rc = sqlite3_prepare_v2(m_db.get(), stmtBuffer.c_str(), -1, &stmt, nullptr);
+	if( rc != SQLITE_OK ) {
+		m_errorStream << "SQLite3 message, sqlite3_prepare_v2 message: " << stmtBuffer << std::endl;
+	}
+
+	return rc;
+}
+
+int SQLiteProcedures::sqliteBindText(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const std::string & textBuffer)
+{
+	int rc = sqlite3_bind_text(stmt, stmtInsertLocationIndex, textBuffer.c_str(), -1, SQLITE_TRANSIENT);
+	if( rc != SQLITE_OK ) {
+		m_errorStream << "SQLite3 message, sqlite3_bind_text failed: " << textBuffer << std::endl;
+	}
+
+	return rc;
+}
+
+int SQLiteProcedures::sqliteBindInteger(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const int intToInsert)
+{
+	int rc = sqlite3_bind_int(stmt, stmtInsertLocationIndex, intToInsert);
+	if( rc != SQLITE_OK ) {
+		m_errorStream << "SQLite3 message, sqlite3_bind_int failed: " << intToInsert << std::endl;
+	}
+
+	return rc;
+}
+
+int SQLiteProcedures::sqliteBindDouble(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const double doubleToInsert)
+{
+	int rc = sqlite3_bind_double(stmt, stmtInsertLocationIndex, doubleToInsert);
+	if( rc != SQLITE_OK ) {
+		m_errorStream << "SQLite3 message, sqlite3_bind_double failed: " << doubleToInsert << std::endl;
+	}
+
+	return rc;
+}
+
+int SQLiteProcedures::sqliteBindNULL(sqlite3_stmt * stmt, const int stmtInsertLocationIndex)
+{
+	int rc = sqlite3_bind_null(stmt, stmtInsertLocationIndex);
+	if( rc != SQLITE_OK ) {
+		m_errorStream << "SQLite3 message, sqlite3_bind_null failed" << std::endl;
+	}
+
+	return rc;
+}
+
+int SQLiteProcedures::sqliteBindForeignKey(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const int intToInsert)
+{
+	int rc = -1;
+	if ( intToInsert > 0 ) {
+		rc = sqlite3_bind_int(stmt, stmtInsertLocationIndex, intToInsert);
+	} else {
+		rc = sqlite3_bind_null(stmt, stmtInsertLocationIndex);
+	}
+	if( rc != SQLITE_OK ) {
+		m_errorStream << "SQLite3 message, sqliteBindForeignKey failed: " << intToInsert << std::endl;
+	}
+
+	return rc;
+}
+
+int SQLiteProcedures::sqliteBindLogical(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const bool valueToInsert)
+{
+	return sqliteBindInteger(stmt,stmtInsertLocationIndex, valueToInsert ? 1 : 0);
+}
+
+bool SQLiteProcedures::sqliteStepValidity( int const rc ) {
+	bool isValid = false;
+	switch(rc) {
+		case SQLITE_DONE:
+		case SQLITE_OK:
+		case SQLITE_ROW:
+			isValid = true;
+			break;
+		default:
+			break;
+	}
+	return isValid;
+}
+
+int SQLiteProcedures::sqliteStepCommand(sqlite3_stmt * stmt)
+{
+	int rc = sqlite3_step(stmt);
+	switch(rc) {
+	case SQLITE_DONE:
+	case SQLITE_OK:
+	case SQLITE_ROW:
+		break;
+	default:
+		m_errorStream << "SQLite3 message, sqlite3_step message: " << sqlite3_errmsg(m_db.get()) << std::endl;
+		break;
+	}
+
+	return rc;
+}
+
+int SQLiteProcedures::sqliteResetCommand(sqlite3_stmt * stmt)
+{
+	return sqlite3_reset(stmt);
+}
+
+int SQLiteProcedures::sqliteClearBindings(sqlite3_stmt * stmt)
+{
+	return sqlite3_clear_bindings(stmt);
+}
+
+int SQLiteProcedures::sqliteFinalizeCommand(sqlite3_stmt * stmt)
+{
+	return sqlite3_finalize(stmt);
+}
+
+// namespace SQLiteProcedures {
 
 //// Data
 //bool WriteOutputToSQLite( false );
 //bool WriteTabularDataToSQLite( false );
 
-} // SQLiteProcedures
+// } // SQLiteProcedures
 
 } // EnergyPlus
