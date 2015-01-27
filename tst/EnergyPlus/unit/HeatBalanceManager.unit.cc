@@ -39,8 +39,6 @@ TEST( ProcessZoneDataTest, Test1 )
 	int NumNumbers ( 9 );
 
 	cCurrentModuleObject = "Zone";
-	DataStringGlobals::outputErrFileName = "eplusout.err";
-	DataStringGlobals::outputMtdFileName = "eplusout.mtd";
 	NumOfZones = 2;
 	Zone.allocate( NumOfZones );
 
