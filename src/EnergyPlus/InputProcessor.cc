@@ -66,6 +66,7 @@ namespace InputProcessor {
 	using DataSystemVariables::SortedIDD;
 	using DataSystemVariables::iASCII_CR;
 	using DataSystemVariables::iUnicode_end;
+	using DataGlobals::DisplayInputInAudit;
 
 	// Use statements for access to subroutines in other modules
 
@@ -313,6 +314,9 @@ namespace InputProcessor {
 		gio::write( EchoInputFile, fmtLD ) << " Total Number of Fields=" << NumAlphaArgsFound + NumNumericArgsFound;
 
 		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File (in.idf) -- Start";
+		if ( !DisplayInputInAudit ){
+			gio::write( EchoInputFile, fmtLD ) << " Echo of input lines is off. May be activated by setting the environmental variable DISPLAYINPUTINAUDIT=YES";
+		}
 
 		{ IOFlags flags; gio::inquire( "in.idf", flags ); FileExists = flags.exists(); }
 		if ( ! FileExists ) {
@@ -2639,7 +2643,9 @@ namespace InputProcessor {
 		} else {
 			if ( EchoInputLine ) {
 				++NumLines;
-				if ( echo_stream ) *echo_stream << std::setw( 7 ) << NumLines << ' ' << InputLine << NL;
+				if ( DisplayInputInAudit ) {
+					if ( echo_stream ) *echo_stream << std::setw(7) << NumLines << ' ' << InputLine << NL;
+				}
 			}
 			EchoInputLine = true;
 			InputLineLength = static_cast< int >( len_trim( InputLine ) );
@@ -2818,7 +2824,9 @@ namespace InputProcessor {
 		} else {
 			if ( EchoInputLine ) {
 				++NumLines;
-				if ( echo_stream ) *echo_stream << std::setw( 7 ) << NumLines << ' ' << InputLine << NL;
+				if ( DisplayInputInAudit ) {
+					if ( echo_stream ) *echo_stream << std::setw( 7 ) << NumLines << ' ' << InputLine << NL;
+				}
 			}
 			EchoInputLine = true;
 			InputLineLength = static_cast< int >( len_trim( InputLine ) );

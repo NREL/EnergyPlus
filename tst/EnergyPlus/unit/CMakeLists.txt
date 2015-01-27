@@ -9,9 +9,12 @@ set( test_src
   DataPlant.unit.cc
   ExteriorEnergyUse.unit.cc
   HeatBalanceManager.unit.cc
+  HVACStandaloneERV.unit.cc
+  SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
+  WaterThermalTanks.unit.cc
 )
 
 set( test_dependencies
