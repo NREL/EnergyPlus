@@ -1,10 +1,11 @@
 ! HeatPumpWaterHeater.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
-! Highlights:              Examples of 5 heat pump water heaters. 1 HPWH in Zone 5 using both zone air and outdoor air,
+! Highlights:              Examples of 5 heat pump water heaters using stratified tanks. 
+!                          1 HPWH in Zone 5 using both zone air and outdoor air,
 !                          1 HPWH in Zone 4 using only zone air, 1 outdoors, 1 located outdoors and connected to a hot
 !                          water plant loop, and 1 HPWH is scheduled with no connection to a zone or plant.
-!                          1 Water Heater:Mixed example is included for comparison (this water heater is scheduled)
+!                          1 Water Heater:Stratified example is included for comparison (this water heater is scheduled)
 !
 ! Simulation Location/Run: Miami Intl Ap FL USA WMO=722020, 2 design days, 2 run periods.
 !                          Run Control executes the design days
@@ -105,7 +106,7 @@
 !                                 The scheduled HPWH is an example of a self-standing water heater with all
 !                                 performance aspects simulated through scheduling.
 !
-! Water Heater:Mixed:             1 ea.
+! Water Heater:Stratified:        1 ea.
 !                                 Scheduled - example of a water heater using an electric element to heat the water
 !
 ! Zonal Equipment:                AirTerminal:SingleDuct:VAV:Reheat
@@ -2146,7 +2147,7 @@
     ,                        !- Inlet Air Temperature Schedule Name
     ,                        !- Inlet Air Humidity Schedule Name
     SPACE5-1,                !- Inlet Air Zone Name
-    WaterHeater:Mixed,       !- Tank Object Type
+    WaterHeater:Stratified,       !- Tank Object Type
     HPWHTank,                !- Tank Name
     ,                        !- Tank Use Side Inlet Node Name
     ,                        !- Tank Use Side Outlet Node Name
@@ -2163,46 +2164,75 @@
     Zone,                    !- Parasitic Heat Rejection Location
     HPWHInletAirMixerNode,   !- Inlet Air Mixer Node Name
     HPWHOutletAirSplitterNode,  !- Outlet Air Splitter Node Name
-    HPWHMixerInletAirSch;    !- Inlet Air Mixer Schedule Name
+    HPWHMixerInletAirSch,    !- Inlet Air Mixer Schedule Name
+    Heater2;                 !- Control Sensor Location In Stratified Tank
 
-  WaterHeater:Mixed,
-    HPWHTank,                !- Name
-    0.3785,                  !- Tank Volume {m3}
-    Hot Water Setpoint Temp Schedule,  !- Setpoint Temperature Schedule Name
-    2.0,                     !- Deadband Temperature Difference {deltaC}
-    82.2222,                 !- Maximum Temperature Limit {C}
-    CYCLE,                   !- Heater Control Type
-    5000,                    !- Heater Maximum Capacity {W}
-    0,                       !- Heater Minimum Capacity {W}
-    ,                        !- Heater Ignition Minimum Flow Rate {m3/s}
-    ,                        !- Heater Ignition Delay {s}
-    ELECTRICITY,             !- Heater Fuel Type
-    0.95,                    !- Heater Thermal Efficiency
-    ,                        !- Part Load Factor Curve Name
-    10,                      !- Off Cycle Parasitic Fuel Consumption Rate {W}
-    ELECTRICITY,             !- Off Cycle Parasitic Fuel Type
-    0,                       !- Off Cycle Parasitic Heat Fraction to Tank
-    30,                      !- On Cycle Parasitic Fuel Consumption Rate {W}
-    ELECTRICITY,             !- On Cycle Parasitic Fuel Type
-    0,                       !- On Cycle Parasitic Heat Fraction to Tank
-    ZONE,                    !- Ambient Temperature Indicator
-    ,                        !- Ambient Temperature Schedule Name
-    SPACE5-1,                !- Ambient Temperature Zone Name
-    ,                        !- Ambient Temperature Outdoor Air Node Name
-    2.0,                     !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}
-    1.0,                     !- Off Cycle Loss Fraction to Zone
-    2.0,                     !- On Cycle Loss Coefficient to Ambient Temperature {W/K}
-    1.0,                     !- On Cycle Loss Fraction to Zone
-    0.00379,                 !- Peak Use Flow Rate {m3/s}
-    Hot Water Demand Schedule,  !- Use Flow Rate Fraction Schedule Name
-    ,                        !- Cold Water Supply Temperature Schedule Name
-    ,                        !- Use Side Inlet Node Name
-    ,                        !- Use Side Outlet Node Name
-    ,                        !- Use Side Effectiveness
-    HPWHWaterOutletNode,     !- Source Side Inlet Node Name
-    HPWHWaterInletNode,      !- Source Side Outlet Node Name
-    0.95;                    !- Source Side Effectiveness
-
+  WaterHeater:Stratified,
+  HPWHTank,                           !- Name
+  ,                                   !- End-Use Subcategory
+  0.3785,                             !- Tank Volume
+  0.514882,                           !- Tank Height
+  VerticalCylinder,                   !- Tank Shape
+  ,                                   !- Tank Perimeter
+  82.2222,                            !- Maximum Temperature Limit
+  MasterSlave,                        !- Heater Priority Control
+  Hot Water Setpoint Temp Schedule,   !- Heater 1 Setpoint Temperature Schedule Name
+  2.0,                                !- Heater 1 Deadband Temperature Difference
+  5000,                               !- Heater 1 Capacity
+  0.360417,                           !- Heater 1 Height
+  Hot Water Setpoint Temp Schedule,   !- Heater 2 Setpoint Temperature Schedule Name
+  2.0,                                !- Heater 2 Deadband Temperature Difference
+  0,                                  !- Heater 2 Capacity
+  0.154465,                           !- Heater 2 Height
+  ELECTRICITY,                        !- Heater Fuel Type
+  0.95,                               !- Heater Thermal Efficiency
+  10,                                 !- Off Cycle Parasitic Fuel Consumption Rate
+  ELECTRICITY,                        !- Off Cycle Parasitic Fuel Type
+  0,                                  !- Off Cycle Parasitic Heat Fraction to Tank
+  0.308929,                           !- Off Cycle Parasitic Height
+  30,                                 !- On Cycle Parasitic Fuel Consumption Rate
+  ELECTRICITY,                        !- On Cycle Parasitic Fuel Type
+  0,                                  !- On Cycle Parasitic Heat Fraction to Tank
+  0.308929,                           !- On Cycle Parasitic Height
+  ZONE,                               !- Ambient Temperature Indicator
+  ,                                   !- Ambient Temperature Schedule Name
+  SPACE5-1,                           !- Ambient Temperature Zone Name
+  ,                                   !- Ambient Temperature Outdoor Air Node Name
+  0.658944,                           !- Uniform Skin Loss Coefficient per Unit Area to Ambient Temperature
+  1.000000,                           !- Skin Loss Fraction to Zone
+  ,                                   !- Off Cycle Flue Loss Coefficient to Ambient Temperature
+  ,                                   !- Off Cycle Flue Loss Fraction to Zone
+  0.00379,                            !- Peak Use Flow Rate
+  Hot Water Demand Schedule,          !- Use Flow Rate Fraction Schedule Name
+  ,                                   !- Cold Water Supply Temperature Schedule Name
+  ,                                   !- Use Side Inlet Node Name
+  ,                                   !- Use Side Outlet Node Name
+  ,                                   !- Use Side Effectiveness
+  0,                                  !- Use Side Inlet Height
+  autocalculate,                      !- Use Side Outlet Height
+  HPWHWaterOutletNode,                !- Source Side Inlet Node Name
+  HPWHWaterInletNode,                 !- Source Side Outlet Node Name
+  0.95,                               !- Source Side Effectiveness
+  0,                                  !- Source Side Inlet Height
+  0.257441,                           !- Source Side Outlet Height
+  Fixed,                              !- Inlet Mode
+  ,                                   !- Use Side Design Flow Rate
+  ,                                   !- Source Side Design Flow Rate
+  ,                                   !- Indirect Water Heating Recovery Time
+  10,                                 !- Number of Nodes
+  ,                                   !- Additional Destratification Conductivity
+  ,                                   !- Node 1 Additional Loss Coefficient
+  ,                                   !- Node 2 Additional Loss Coefficient
+  ,                                   !- Node 3 Additional Loss Coefficient
+  ,                                   !- Node 4 Additional Loss Coefficient
+  ,                                   !- Node 5 Additional Loss Coefficient
+  ,                                   !- Node 6 Additional Loss Coefficient
+  ,                                   !- Node 7 Additional Loss Coefficient
+  ,                                   !- Node 8 Additional Loss Coefficient
+  ,                                   !- Node 9 Additional Loss Coefficient
+  ,                                   !- Node 10 Additional Loss Coefficient
+  ,                                   !- Source Side Flow Control Mode
+  ;                                   !- Indirect Alternate Setpoint Temperature Schedule Name
   Coil:WaterHeating:AirToWaterHeatPump,
     HPWHDXCoil,              !- Name
     4000.0,                  !- Rated Heating Capacity {W}
@@ -2364,7 +2394,7 @@
     ,                        !- Inlet Air Temperature Schedule Name
     ,                        !- Inlet Air Humidity Schedule Name
     SPACE4-1,                !- Inlet Air Zone Name
-    WaterHeater:Mixed,       !- Tank Object Type
+    WaterHeater:Stratified,       !- Tank Object Type
     Zone4HPWHTank,           !- Tank Name
     ,                        !- Tank Use Side Inlet Node Name
     ,                        !- Tank Use Side Outlet Node Name
@@ -2378,46 +2408,78 @@
     DrawThrough,             !- Fan Placement
     15.0,                    !- On Cycle Parasitic Electric Load {W}
     5.0,                     !- Off Cycle Parasitic Electric Load {W}
-    Zone;                    !- Parasitic Heat Rejection Location
+    Zone,                    !- Parasitic Heat Rejection Location
+    ,                        !- Inlet Air Mixer Node Name
+    ,                        !- Outlet Air Splitter Node Name
+    ,                        !- Inlet Air Mixer Schedule Name
+    Heater2;                 !- Control Sensor Location In Stratified Tank
 
-  WaterHeater:Mixed,
-    Zone4HPWHTank,           !- Name
-    0.3785,                  !- Tank Volume {m3}
-    Hot Water Setpoint Temp Schedule,  !- Setpoint Temperature Schedule Name
-    2.0,                     !- Deadband Temperature Difference {deltaC}
-    82.2222,                 !- Maximum Temperature Limit {C}
-    CYCLE,                   !- Heater Control Type
-    5000,                    !- Heater Maximum Capacity {W}
-    0,                       !- Heater Minimum Capacity {W}
-    ,                        !- Heater Ignition Minimum Flow Rate {m3/s}
-    ,                        !- Heater Ignition Delay {s}
-    ELECTRICITY,             !- Heater Fuel Type
-    0.95,                    !- Heater Thermal Efficiency
-    ,                        !- Part Load Factor Curve Name
-    10,                      !- Off Cycle Parasitic Fuel Consumption Rate {W}
-    ELECTRICITY,             !- Off Cycle Parasitic Fuel Type
-    0,                       !- Off Cycle Parasitic Heat Fraction to Tank
-    30,                      !- On Cycle Parasitic Fuel Consumption Rate {W}
-    ELECTRICITY,             !- On Cycle Parasitic Fuel Type
-    0,                       !- On Cycle Parasitic Heat Fraction to Tank
-    ZONE,                    !- Ambient Temperature Indicator
-    ,                        !- Ambient Temperature Schedule Name
-    SPACE4-1,                !- Ambient Temperature Zone Name
-    ,                        !- Ambient Temperature Outdoor Air Node Name
-    2.0,                     !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}
-    1.0,                     !- Off Cycle Loss Fraction to Zone
-    2.0,                     !- On Cycle Loss Coefficient to Ambient Temperature {W/K}
-    1.0,                     !- On Cycle Loss Fraction to Zone
-    0.00379,                 !- Peak Use Flow Rate {m3/s}
-    Hot Water Demand Schedule,  !- Use Flow Rate Fraction Schedule Name
-    ,                        !- Cold Water Supply Temperature Schedule Name
-    ,                        !- Use Side Inlet Node Name
-    ,                        !- Use Side Outlet Node Name
-    ,                        !- Use Side Effectiveness
-    Zone4WaterOutletNode,    !- Source Side Inlet Node Name
-    Zone4WaterInletNode,     !- Source Side Outlet Node Name
-    0.95;                    !- Source Side Effectiveness
-
+  WaterHeater:Stratified,
+  Zone4HPWHTank,                      !- Name
+  ,                                   !- End-Use Subcategory
+  0.3785,                             !- Tank Volume
+  0.514882,                           !- Tank Height
+  VerticalCylinder,                   !- Tank Shape
+  ,                                   !- Tank Perimeter
+  82.2222,                            !- Maximum Temperature Limit
+  MasterSlave,                        !- Heater Priority Control
+  Hot Water Setpoint Temp Schedule,   !- Heater 1 Setpoint Temperature Schedule Name
+  2.0,                                !- Heater 1 Deadband Temperature Difference
+  5000,                               !- Heater 1 Capacity
+  0.360417,                           !- Heater 1 Height
+  Hot Water Setpoint Temp Schedule,   !- Heater 2 Setpoint Temperature Schedule Name
+  2.0,                                !- Heater 2 Deadband Temperature Difference
+  0,                                  !- Heater 2 Capacity
+  0.154465,                           !- Heater 2 Height
+  ELECTRICITY,                        !- Heater Fuel Type
+  0.95,                               !- Heater Thermal Efficiency
+  10,                                 !- Off Cycle Parasitic Fuel Consumption Rate
+  ELECTRICITY,                        !- Off Cycle Parasitic Fuel Type
+  0,                                  !- Off Cycle Parasitic Heat Fraction to Tank
+  0.308929,                           !- Off Cycle Parasitic Height
+  30,                                 !- On Cycle Parasitic Fuel Consumption Rate
+  ELECTRICITY,                        !- On Cycle Parasitic Fuel Type
+  0,                                  !- On Cycle Parasitic Heat Fraction to Tank
+  0.308929,                           !- On Cycle Parasitic Height
+  ZONE,                               !- Ambient Temperature Indicator
+  ,                                   !- Ambient Temperature Schedule Name
+  SPACE4-1,                           !- Ambient Temperature Zone Name
+  ,                                   !- Ambient Temperature Outdoor Air Node Name
+  0.658944,                           !- Uniform Skin Loss Coefficient per Unit Area to Ambient Temperature
+  1.000000,                           !- Skin Loss Fraction to Zone
+  ,                                   !- Off Cycle Flue Loss Coefficient to Ambient Temperature
+  ,                                   !- Off Cycle Flue Loss Fraction to Zone
+  0.00379,                            !- Peak Use Flow Rate
+  Hot Water Demand Schedule,          !- Use Flow Rate Fraction Schedule Name
+  ,                                   !- Cold Water Supply Temperature Schedule Name
+  ,                                   !- Use Side Inlet Node Name
+  ,                                   !- Use Side Outlet Node Name
+  ,                                   !- Use Side Effectiveness
+  0,                                  !- Use Side Inlet Height
+  autocalculate,                      !- Use Side Outlet Height
+  Zone4WaterOutletNode,               !- Source Side Inlet Node Name
+  Zone4WaterInletNode,                !- Source Side Outlet Node Name
+  0.95,                               !- Source Side Effectiveness
+  0,                                  !- Source Side Inlet Height
+  0.257441,                           !- Source Side Outlet Height
+  Fixed,                              !- Inlet Mode
+  ,                                   !- Use Side Design Flow Rate
+  ,                                   !- Source Side Design Flow Rate
+  ,                                   !- Indirect Water Heating Recovery Time
+  10,                                 !- Number of Nodes
+  ,                                   !- Additional Destratification Conductivity
+  ,                                   !- Node 1 Additional Loss Coefficient
+  ,                                   !- Node 2 Additional Loss Coefficient
+  ,                                   !- Node 3 Additional Loss Coefficient
+  ,                                   !- Node 4 Additional Loss Coefficient
+  ,                                   !- Node 5 Additional Loss Coefficient
+  ,                                   !- Node 6 Additional Loss Coefficient
+  ,                                   !- Node 7 Additional Loss Coefficient
+  ,                                   !- Node 8 Additional Loss Coefficient
+  ,                                   !- Node 9 Additional Loss Coefficient
+  ,                                   !- Node 10 Additional Loss Coefficient
+  ,                                   !- Source Side Flow Control Mode
+  ;                                   !- Indirect Alternate Setpoint Temperature Schedule Name
   Coil:WaterHeating:AirToWaterHeatPump,
     Zone4HPWHDXCoil,         !- Name
     4000.0,                  !- Rated Heating Capacity {W}
@@ -2479,7 +2541,7 @@
     ,                        !- Inlet Air Temperature Schedule Name
     ,                        !- Inlet Air Humidity Schedule Name
     SPACE4-1,                !- Inlet Air Zone Name
-    WaterHeater:Mixed,       !- Tank Object Type
+    WaterHeater:Stratified,       !- Tank Object Type
     Zone4bHPWHTank,           !- Tank Name
     Water Heater Use Inlet Node,                        !- Tank Use Side Inlet Node Name
     Water Heater Use Outlet Node,                        !- Tank Use Side Outlet Node Name
@@ -2493,47 +2555,78 @@
     DrawThrough,             !- Fan Placement
     15.0,                    !- On Cycle Parasitic Electric Load {W}
     5.0,                     !- Off Cycle Parasitic Electric Load {W}
-    Zone;                    !- Parasitic Heat Rejection Location
+    Zone,                    !- Parasitic Heat Rejection Location
+    ,                        !- Inlet Air Mixer Node Name
+    ,                        !- Outlet Air Splitter Node Name
+    ,                        !- Inlet Air Mixer Schedule Name
+    Heater2;                 !- Control Sensor Location In Stratified Tank
 
-  WaterHeater:Mixed,
-    Zone4bHPWHTank,           !- Name
-    0.3785,                  !- Tank Volume {m3}
-    Hot Water Setpoint Temp Schedule,  !- Setpoint Temperature Schedule Name
-    2.0,                     !- Deadband Temperature Difference {deltaC}
-    82.2222,                 !- Maximum Temperature Limit {C}
-    CYCLE,                   !- Heater Control Type
-    4000,                    !- Heater Maximum Capacity {W}
-    0,                       !- Heater Minimum Capacity {W}
-    ,                        !- Heater Ignition Minimum Flow Rate {m3/s}
-    ,                        !- Heater Ignition Delay {s}
-    ELECTRICITY,             !- Heater Fuel Type
-    0.95,                    !- Heater Thermal Efficiency
-    ,                        !- Part Load Factor Curve Name
-    10,                      !- Off Cycle Parasitic Fuel Consumption Rate {W}
-    ELECTRICITY,             !- Off Cycle Parasitic Fuel Type
-    0,                       !- Off Cycle Parasitic Heat Fraction to Tank
-    30,                      !- On Cycle Parasitic Fuel Consumption Rate {W}
-    ELECTRICITY,             !- On Cycle Parasitic Fuel Type
-    0,                       !- On Cycle Parasitic Heat Fraction to Tank
-    ZONE,                    !- Ambient Temperature Indicator
-    ,                        !- Ambient Temperature Schedule Name
-    SPACE4-1,                !- Ambient Temperature Zone Name
-    ,                        !- Ambient Temperature Outdoor Air Node Name
-    2.0,                     !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}
-    1.0,                     !- Off Cycle Loss Fraction to Zone
-    2.0,                     !- On Cycle Loss Coefficient to Ambient Temperature {W/K}
-    1.0,                     !- On Cycle Loss Fraction to Zone
-    ,                 !- Peak Use Flow Rate {m3/s}
-    ,  !- Use Flow Rate Fraction Schedule Name
-    ,                        !- Cold Water Supply Temperature Schedule Name
-    Water Heater Use Inlet Node,                        !- Use Side Inlet Node Name
-    Water Heater Use Outlet Node,    !- Use Side Outlet Node Name
-    1,                        !- Use Side Effectiveness
-    Zone4bWaterOutletNode,    !- Source Side Inlet Node Name
-    Zone4bWaterInletNode,     !- Source Side Outlet Node Name
-    1.0,                    !- Source Side Effectiveness
-	autosize;                !- Use Side Design Flow Rate {m3/s}
-
+  WaterHeater:Stratified,
+  Zone4bHPWHTank,                     !- Name
+  ,                                   !- End-Use Subcategory
+  0.3785,                             !- Tank Volume
+  0.514882,                           !- Tank Height
+  VerticalCylinder,                   !- Tank Shape
+  ,                                   !- Tank Perimeter
+  82.2222,                            !- Maximum Temperature Limit
+  MasterSlave,                        !- Heater Priority Control
+  Hot Water Setpoint Temp Schedule,   !- Heater 1 Setpoint Temperature Schedule Name
+  2.0,                                !- Heater 1 Deadband Temperature Difference
+  4000,                               !- Heater 1 Capacity
+  0.360417,                           !- Heater 1 Height
+  Hot Water Setpoint Temp Schedule,   !- Heater 2 Setpoint Temperature Schedule Name
+  2.0,                                !- Heater 2 Deadband Temperature Difference
+  0,                                  !- Heater 2 Capacity
+  0.154465,                           !- Heater 2 Height
+  ELECTRICITY,                        !- Heater Fuel Type
+  0.95,                               !- Heater Thermal Efficiency
+  10,                                 !- Off Cycle Parasitic Fuel Consumption Rate
+  ELECTRICITY,                        !- Off Cycle Parasitic Fuel Type
+  0,                                  !- Off Cycle Parasitic Heat Fraction to Tank
+  0.308929,                           !- Off Cycle Parasitic Height
+  30,                                 !- On Cycle Parasitic Fuel Consumption Rate
+  ELECTRICITY,                        !- On Cycle Parasitic Fuel Type
+  0,                                  !- On Cycle Parasitic Heat Fraction to Tank
+  0.308929,                           !- On Cycle Parasitic Height
+  ZONE,                               !- Ambient Temperature Indicator
+  ,                                   !- Ambient Temperature Schedule Name
+  SPACE4-1,                           !- Ambient Temperature Zone Name
+  ,                                   !- Ambient Temperature Outdoor Air Node Name
+  0.658944,                           !- Uniform Skin Loss Coefficient per Unit Area to Ambient Temperature
+  1.000000,                           !- Skin Loss Fraction to Zone
+  ,                                   !- Off Cycle Flue Loss Coefficient to Ambient Temperature
+  ,                                   !- Off Cycle Flue Loss Fraction to Zone
+  ,                                   !- Peak Use Flow Rate
+  ,                                   !- Use Flow Rate Fraction Schedule Name
+  ,                                   !- Cold Water Supply Temperature Schedule Name
+  Water Heater Use Inlet Node,        !- Use Side Inlet Node Name
+  Water Heater Use Outlet Node,       !- Use Side Outlet Node Name
+  1,                                  !- Use Side Effectiveness
+  0,                                  !- Use Side Inlet Height
+  autocalculate,                      !- Use Side Outlet Height
+  Zone4bWaterOutletNode,              !- Source Side Inlet Node Name
+  Zone4bWaterInletNode,               !- Source Side Outlet Node Name
+  1.0,                                !- Source Side Effectiveness
+  0,                                  !- Source Side Inlet Height
+  0.257441,                           !- Source Side Outlet Height
+  Fixed,                              !- Inlet Mode
+  autosize,                           !- Use Side Design Flow Rate
+  ,                                   !- Source Side Design Flow Rate
+  ,                                   !- Indirect Water Heating Recovery Time
+  10,                                 !- Number of Nodes
+  ,                                   !- Additional Destratification Conductivity
+  ,                                   !- Node 1 Additional Loss Coefficient
+  ,                                   !- Node 2 Additional Loss Coefficient
+  ,                                   !- Node 3 Additional Loss Coefficient
+  ,                                   !- Node 4 Additional Loss Coefficient
+  ,                                   !- Node 5 Additional Loss Coefficient
+  ,                                   !- Node 6 Additional Loss Coefficient
+  ,                                   !- Node 7 Additional Loss Coefficient
+  ,                                   !- Node 8 Additional Loss Coefficient
+  ,                                   !- Node 9 Additional Loss Coefficient
+  ,                                   !- Node 10 Additional Loss Coefficient
+  ,                                   !- Source Side Flow Control Mode
+  ;                                   !- Indirect Alternate Setpoint Temperature Schedule Name
   Coil:WaterHeating:AirToWaterHeatPump,
     Zone4bHPWHDXCoil,         !- Name
     4000,                  !- Rated Heating Capacity {W}
@@ -2595,7 +2688,7 @@
     ,                        !- Inlet Air Temperature Schedule Name
     ,                        !- Inlet Air Humidity Schedule Name
     ,                        !- Inlet Air Zone Name
-    WaterHeater:Mixed,       !- Tank Object Type
+    WaterHeater:Stratified,       !- Tank Object Type
     HPWHOutdoorTank,         !- Tank Name
     ,                        !- Tank Use Side Inlet Node Name
     ,                        !- Tank Use Side Outlet Node Name
@@ -2609,46 +2702,78 @@
     BlowThrough,             !- Fan Placement
     ,                        !- On Cycle Parasitic Electric Load {W}
     ,                        !- Off Cycle Parasitic Electric Load {W}
-    ;                        !- Parasitic Heat Rejection Location
+    ,                        !- Parasitic Heat Rejection Location
+    ,                        !- Inlet Air Mixer Node Name
+    ,                        !- Outlet Air Splitter Node Name
+    ,                        !- Inlet Air Mixer Schedule Name
+    Heater2;                 !- Control Sensor Location In Stratified Tank
 
-  WaterHeater:Mixed,
-    HPWHOutdoorTank,         !- Name
-    0.3785,                  !- Tank Volume {m3}
-    Hot Water Setpoint Temp Schedule,  !- Setpoint Temperature Schedule Name
-    2.0,                     !- Deadband Temperature Difference {deltaC}
-    82.2222,                 !- Maximum Temperature Limit {C}
-    CYCLE,                   !- Heater Control Type
-    5000,                    !- Heater Maximum Capacity {W}
-    0,                       !- Heater Minimum Capacity {W}
-    ,                        !- Heater Ignition Minimum Flow Rate {m3/s}
-    ,                        !- Heater Ignition Delay {s}
-    ELECTRICITY,             !- Heater Fuel Type
-    0.95,                    !- Heater Thermal Efficiency
-    ,                        !- Part Load Factor Curve Name
-    10,                      !- Off Cycle Parasitic Fuel Consumption Rate {W}
-    ELECTRICITY,             !- Off Cycle Parasitic Fuel Type
-    0,                       !- Off Cycle Parasitic Heat Fraction to Tank
-    30,                      !- On Cycle Parasitic Fuel Consumption Rate {W}
-    ELECTRICITY,             !- On Cycle Parasitic Fuel Type
-    0,                       !- On Cycle Parasitic Heat Fraction to Tank
-    Outdoors,                !- Ambient Temperature Indicator
-    ,                        !- Ambient Temperature Schedule Name
-    ,                        !- Ambient Temperature Zone Name
-    HPWHOutdoorTank OA Node, !- Ambient Temperature Outdoor Air Node Name
-    2.0,                     !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}
-    1.0,                     !- Off Cycle Loss Fraction to Zone
-    2.0,                     !- On Cycle Loss Coefficient to Ambient Temperature {W/K}
-    1.0,                     !- On Cycle Loss Fraction to Zone
-    0.000379,                !- Peak Use Flow Rate {m3/s}
-    Hot Water Demand Schedule,  !- Use Flow Rate Fraction Schedule Name
-    ,                        !- Cold Water Supply Temperature Schedule Name
-    ,                        !- Use Side Inlet Node Name
-    ,                        !- Use Side Outlet Node Name
-    ,                        !- Use Side Effectiveness
-    HPOutdoorWaterOutletNode,!- Source Side Inlet Node Name
-    HPOutdoorWaterInletNode, !- Source Side Outlet Node Name
-    0.95;                    !- Source Side Effectiveness
-
+  WaterHeater:Stratified,
+  HPWHOutdoorTank,                    !- Name
+  ,                                   !- End-Use Subcategory
+  0.3785,                             !- Tank Volume
+  0.514882,                           !- Tank Height
+  VerticalCylinder,                   !- Tank Shape
+  ,                                   !- Tank Perimeter
+  82.2222,                            !- Maximum Temperature Limit
+  MasterSlave,                        !- Heater Priority Control
+  Hot Water Setpoint Temp Schedule,   !- Heater 1 Setpoint Temperature Schedule Name
+  2.0,                                !- Heater 1 Deadband Temperature Difference
+  5000,                               !- Heater 1 Capacity
+  0.360417,                           !- Heater 1 Height
+  Hot Water Setpoint Temp Schedule,   !- Heater 2 Setpoint Temperature Schedule Name
+  2.0,                                !- Heater 2 Deadband Temperature Difference
+  0,                                  !- Heater 2 Capacity
+  0.154465,                           !- Heater 2 Height
+  ELECTRICITY,                        !- Heater Fuel Type
+  0.95,                               !- Heater Thermal Efficiency
+  10,                                 !- Off Cycle Parasitic Fuel Consumption Rate
+  ELECTRICITY,                        !- Off Cycle Parasitic Fuel Type
+  0,                                  !- Off Cycle Parasitic Heat Fraction to Tank
+  0.308929,                           !- Off Cycle Parasitic Height
+  30,                                 !- On Cycle Parasitic Fuel Consumption Rate
+  ELECTRICITY,                        !- On Cycle Parasitic Fuel Type
+  0,                                  !- On Cycle Parasitic Heat Fraction to Tank
+  0.308929,                           !- On Cycle Parasitic Height
+  Outdoors,                           !- Ambient Temperature Indicator
+  ,                                   !- Ambient Temperature Schedule Name
+  ,                                   !- Ambient Temperature Zone Name
+  HPWHOutdoorTank OA Node,            !- Ambient Temperature Outdoor Air Node Name
+  0.658944,                           !- Uniform Skin Loss Coefficient per Unit Area to Ambient Temperature
+  1.000000,                           !- Skin Loss Fraction to Zone
+  ,                                   !- Off Cycle Flue Loss Coefficient to Ambient Temperature
+  ,                                   !- Off Cycle Flue Loss Fraction to Zone
+  0.000379,                           !- Peak Use Flow Rate
+  Hot Water Demand Schedule,          !- Use Flow Rate Fraction Schedule Name
+  ,                                   !- Cold Water Supply Temperature Schedule Name
+  ,                                   !- Use Side Inlet Node Name
+  ,                                   !- Use Side Outlet Node Name
+  ,                                   !- Use Side Effectiveness
+  0,                                  !- Use Side Inlet Height
+  autocalculate,                      !- Use Side Outlet Height
+  HPOutdoorWaterOutletNode,           !- Source Side Inlet Node Name
+  HPOutdoorWaterInletNode,            !- Source Side Outlet Node Name
+  0.95,                               !- Source Side Effectiveness
+  0,                                  !- Source Side Inlet Height
+  0.257441,                           !- Source Side Outlet Height
+  Fixed,                              !- Inlet Mode
+  ,                                   !- Use Side Design Flow Rate
+  ,                                   !- Source Side Design Flow Rate
+  ,                                   !- Indirect Water Heating Recovery Time
+  10,                                 !- Number of Nodes
+  ,                                   !- Additional Destratification Conductivity
+  ,                                   !- Node 1 Additional Loss Coefficient
+  ,                                   !- Node 2 Additional Loss Coefficient
+  ,                                   !- Node 3 Additional Loss Coefficient
+  ,                                   !- Node 4 Additional Loss Coefficient
+  ,                                   !- Node 5 Additional Loss Coefficient
+  ,                                   !- Node 6 Additional Loss Coefficient
+  ,                                   !- Node 7 Additional Loss Coefficient
+  ,                                   !- Node 8 Additional Loss Coefficient
+  ,                                   !- Node 9 Additional Loss Coefficient
+  ,                                   !- Node 10 Additional Loss Coefficient
+  ,                                   !- Source Side Flow Control Mode
+  ;                                   !- Indirect Alternate Setpoint Temperature Schedule Name
   OutdoorAir:Node,
     HPWHOutdoorTank OA Node; !- Name
 
@@ -2741,7 +2866,7 @@
     ScheduledAmbientTemp,    !- Inlet Air Temperature Schedule Name
     ScheduledAmbientRH,      !- Inlet Air Humidity Schedule Name
     ,                        !- Inlet Air Zone Name
-    WaterHeater:Mixed,       !- Tank Object Type
+    WaterHeater:Stratified,       !- Tank Object Type
     HPWHScheduledTank,       !- Tank Name
     ,                        !- Tank Use Side Inlet Node Name
     ,                        !- Tank Use Side Outlet Node Name
@@ -2755,46 +2880,78 @@
     BlowThrough,             !- Fan Placement
     ,                        !- On Cycle Parasitic Electric Load {W}
     ,                        !- Off Cycle Parasitic Electric Load {W}
-    ;                        !- Parasitic Heat Rejection Location
+    ,                        !- Parasitic Heat Rejection Location
+    ,                        !- Inlet Air Mixer Node Name
+    ,                        !- Outlet Air Splitter Node Name
+    ,                        !- Inlet Air Mixer Schedule Name
+    Heater2;                 !- Control Sensor Location In Stratified Tank
 
-  WaterHeater:Mixed,
-    HPWHScheduledTank,       !- Name
-    0.3785,                  !- Tank Volume {m3}
-    Hot Water Setpoint Temp Schedule,  !- Setpoint Temperature Schedule Name
-    2.0,                     !- Deadband Temperature Difference {deltaC}
-    82.2222,                 !- Maximum Temperature Limit {C}
-    CYCLE,                   !- Heater Control Type
-    5000,                    !- Heater Maximum Capacity {W}
-    0,                       !- Heater Minimum Capacity {W}
-    ,                        !- Heater Ignition Minimum Flow Rate {m3/s}
-    ,                        !- Heater Ignition Delay {s}
-    ELECTRICITY,             !- Heater Fuel Type
-    0.95,                    !- Heater Thermal Efficiency
-    ,                        !- Part Load Factor Curve Name
-    10,                      !- Off Cycle Parasitic Fuel Consumption Rate {W}
-    ELECTRICITY,             !- Off Cycle Parasitic Fuel Type
-    0,                       !- Off Cycle Parasitic Heat Fraction to Tank
-    30,                      !- On Cycle Parasitic Fuel Consumption Rate {W}
-    ELECTRICITY,             !- On Cycle Parasitic Fuel Type
-    0,                       !- On Cycle Parasitic Heat Fraction to Tank
-    SCHEDULE,                !- Ambient Temperature Indicator
-    ScheduledAmbientTemp,    !- Ambient Temperature Schedule Name
-    ,                        !- Ambient Temperature Zone Name
-    ,                        !- Ambient Temperature Outdoor Air Node Name
-    2.0,                     !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}
-    1.0,                     !- Off Cycle Loss Fraction to Zone
-    2.0,                     !- On Cycle Loss Coefficient to Ambient Temperature {W/K}
-    1.0,                     !- On Cycle Loss Fraction to Zone
-    0.000379,                !- Peak Use Flow Rate {m3/s}
-    Hot Water Demand Schedule,  !- Use Flow Rate Fraction Schedule Name
-    ,                        !- Cold Water Supply Temperature Schedule Name
-    ,                        !- Use Side Inlet Node Name
-    ,                        !- Use Side Outlet Node Name
-    ,                        !- Use Side Effectiveness
-    HPScheduledWaterOutletNode,  !- Source Side Inlet Node Name
-    HPScheduledWaterInletNode,  !- Source Side Outlet Node Name
-    0.95;                    !- Source Side Effectiveness
-
+  WaterHeater:Stratified,
+  HPWHScheduledTank,                  !- Name
+  ,                                   !- End-Use Subcategory
+  0.3785,                             !- Tank Volume
+  0.514882,                           !- Tank Height
+  VerticalCylinder,                   !- Tank Shape
+  ,                                   !- Tank Perimeter
+  82.2222,                            !- Maximum Temperature Limit
+  MasterSlave,                        !- Heater Priority Control
+  Hot Water Setpoint Temp Schedule,   !- Heater 1 Setpoint Temperature Schedule Name
+  2.0,                                !- Heater 1 Deadband Temperature Difference
+  5000,                               !- Heater 1 Capacity
+  0.360417,                           !- Heater 1 Height
+  Hot Water Setpoint Temp Schedule,   !- Heater 2 Setpoint Temperature Schedule Name
+  2.0,                                !- Heater 2 Deadband Temperature Difference
+  0,                                  !- Heater 2 Capacity
+  0.154465,                           !- Heater 2 Height
+  ELECTRICITY,                        !- Heater Fuel Type
+  0.95,                               !- Heater Thermal Efficiency
+  10,                                 !- Off Cycle Parasitic Fuel Consumption Rate
+  ELECTRICITY,                        !- Off Cycle Parasitic Fuel Type
+  0,                                  !- Off Cycle Parasitic Heat Fraction to Tank
+  0.308929,                           !- Off Cycle Parasitic Height
+  30,                                 !- On Cycle Parasitic Fuel Consumption Rate
+  ELECTRICITY,                        !- On Cycle Parasitic Fuel Type
+  0,                                  !- On Cycle Parasitic Heat Fraction to Tank
+  0.308929,                           !- On Cycle Parasitic Height
+  SCHEDULE,                           !- Ambient Temperature Indicator
+  ScheduledAmbientTemp,               !- Ambient Temperature Schedule Name
+  ,                                   !- Ambient Temperature Zone Name
+  ,                                   !- Ambient Temperature Outdoor Air Node Name
+  0.658944,                           !- Uniform Skin Loss Coefficient per Unit Area to Ambient Temperature
+  1.000000,                           !- Skin Loss Fraction to Zone
+  ,                                   !- Off Cycle Flue Loss Coefficient to Ambient Temperature
+  ,                                   !- Off Cycle Flue Loss Fraction to Zone
+  0.000379,                           !- Peak Use Flow Rate
+  Hot Water Demand Schedule,          !- Use Flow Rate Fraction Schedule Name
+  ,                                   !- Cold Water Supply Temperature Schedule Name
+  ,                                   !- Use Side Inlet Node Name
+  ,                                   !- Use Side Outlet Node Name
+  ,                                   !- Use Side Effectiveness
+  0,                                  !- Use Side Inlet Height
+  autocalculate,                      !- Use Side Outlet Height
+  HPScheduledWaterOutletNode,         !- Source Side Inlet Node Name
+  HPScheduledWaterInletNode,          !- Source Side Outlet Node Name
+  0.95,                               !- Source Side Effectiveness
+  0,                                  !- Source Side Inlet Height
+  0.257441,                           !- Source Side Outlet Height
+  Fixed,                              !- Inlet Mode
+  ,                                   !- Use Side Design Flow Rate
+  ,                                   !- Source Side Design Flow Rate
+  ,                                   !- Indirect Water Heating Recovery Time
+  10,                                 !- Number of Nodes
+  ,                                   !- Additional Destratification Conductivity
+  ,                                   !- Node 1 Additional Loss Coefficient
+  ,                                   !- Node 2 Additional Loss Coefficient
+  ,                                   !- Node 3 Additional Loss Coefficient
+  ,                                   !- Node 4 Additional Loss Coefficient
+  ,                                   !- Node 5 Additional Loss Coefficient
+  ,                                   !- Node 6 Additional Loss Coefficient
+  ,                                   !- Node 7 Additional Loss Coefficient
+  ,                                   !- Node 8 Additional Loss Coefficient
+  ,                                   !- Node 9 Additional Loss Coefficient
+  ,                                   !- Node 10 Additional Loss Coefficient
+  ,                                   !- Source Side Flow Control Mode
+  ;                                   !- Indirect Alternate Setpoint Temperature Schedule Name
   Coil:WaterHeating:AirToWaterHeatPump,
     HPWHScheduledDXCoil,     !- Name
     4000.0,                  !- Rated Heating Capacity {W}
@@ -2839,44 +2996,72 @@
 !*************** End of Scheduled Heat Pump Water Heater Inputs *****************
 !*************** Scheduled non-HP Water Heater (uses electric element for water heating) *********
 
-  WaterHeater:Mixed,
-    ScheduledElectricTank,   !- Name
-    0.3785,                  !- Tank Volume {m3}
-    Hot Water Setpoint Temp Schedule,  !- Setpoint Temperature Schedule Name
-    2.0,                     !- Deadband Temperature Difference {deltaC}
-    82.2222,                 !- Maximum Temperature Limit {C}
-    CYCLE,                   !- Heater Control Type
-    5000,                    !- Heater Maximum Capacity {W}
-    0,                       !- Heater Minimum Capacity {W}
-    ,                        !- Heater Ignition Minimum Flow Rate {m3/s}
-    ,                        !- Heater Ignition Delay {s}
-    ELECTRICITY,             !- Heater Fuel Type
-    0.95,                    !- Heater Thermal Efficiency
-    ,                        !- Part Load Factor Curve Name
-    10,                      !- Off Cycle Parasitic Fuel Consumption Rate {W}
-    ELECTRICITY,             !- Off Cycle Parasitic Fuel Type
-    0,                       !- Off Cycle Parasitic Heat Fraction to Tank
-    30,                      !- On Cycle Parasitic Fuel Consumption Rate {W}
-    ELECTRICITY,             !- On Cycle Parasitic Fuel Type
-    0,                       !- On Cycle Parasitic Heat Fraction to Tank
-    SCHEDULE,                !- Ambient Temperature Indicator
-    ScheduledAmbientTemp,    !- Ambient Temperature Schedule Name
-    ,                        !- Ambient Temperature Zone Name
-    ,                        !- Ambient Temperature Outdoor Air Node Name
-    2.0,                     !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}
-    1.0,                     !- Off Cycle Loss Fraction to Zone
-    2.0,                     !- On Cycle Loss Coefficient to Ambient Temperature {W/K}
-    1.0,                     !- On Cycle Loss Fraction to Zone
-    0.000379,                !- Peak Use Flow Rate {m3/s}
-    Hot Water Demand Schedule,  !- Use Flow Rate Fraction Schedule Name
-    ,                        !- Cold Water Supply Temperature Schedule Name
-    ,                        !- Use Side Inlet Node Name
-    ,                        !- Use Side Outlet Node Name
-    ,                        !- Use Side Effectiveness
-    ,                        !- Source Side Inlet Node Name
-    ,                        !- Source Side Outlet Node Name
-    0.95;                    !- Source Side Effectiveness
-
+  WaterHeater:Stratified,
+  ScheduledElectricTank,              !- Name
+  ,                                   !- End-Use Subcategory
+  0.3785,                             !- Tank Volume
+  0.514882,                           !- Tank Height
+  VerticalCylinder,                   !- Tank Shape
+  ,                                   !- Tank Perimeter
+  82.2222,                            !- Maximum Temperature Limit
+  MasterSlave,                        !- Heater Priority Control
+  Hot Water Setpoint Temp Schedule,   !- Heater 1 Setpoint Temperature Schedule Name
+  2.0,                                !- Heater 1 Deadband Temperature Difference
+  5000,                               !- Heater 1 Capacity
+  0.360417,                           !- Heater 1 Height
+  Hot Water Setpoint Temp Schedule,   !- Heater 2 Setpoint Temperature Schedule Name
+  2.0,                                !- Heater 2 Deadband Temperature Difference
+  0,                                  !- Heater 2 Capacity
+  0.154465,                           !- Heater 2 Height
+  ELECTRICITY,                        !- Heater Fuel Type
+  0.95,                               !- Heater Thermal Efficiency
+  10,                                 !- Off Cycle Parasitic Fuel Consumption Rate
+  ELECTRICITY,                        !- Off Cycle Parasitic Fuel Type
+  0,                                  !- Off Cycle Parasitic Heat Fraction to Tank
+  0.308929,                           !- Off Cycle Parasitic Height
+  30,                                 !- On Cycle Parasitic Fuel Consumption Rate
+  ELECTRICITY,                        !- On Cycle Parasitic Fuel Type
+  0,                                  !- On Cycle Parasitic Heat Fraction to Tank
+  0.308929,                           !- On Cycle Parasitic Height
+  SCHEDULE,                           !- Ambient Temperature Indicator
+  ScheduledAmbientTemp,               !- Ambient Temperature Schedule Name
+  ,                                   !- Ambient Temperature Zone Name
+  ,                                   !- Ambient Temperature Outdoor Air Node Name
+  0.658944,                           !- Uniform Skin Loss Coefficient per Unit Area to Ambient Temperature
+  1.000000,                           !- Skin Loss Fraction to Zone
+  ,                                   !- Off Cycle Flue Loss Coefficient to Ambient Temperature
+  ,                                   !- Off Cycle Flue Loss Fraction to Zone
+  0.000379,                           !- Peak Use Flow Rate
+  Hot Water Demand Schedule,          !- Use Flow Rate Fraction Schedule Name
+  ,                                   !- Cold Water Supply Temperature Schedule Name
+  ,                                   !- Use Side Inlet Node Name
+  ,                                   !- Use Side Outlet Node Name
+  ,                                   !- Use Side Effectiveness
+  0,                                  !- Use Side Inlet Height
+  autocalculate,                      !- Use Side Outlet Height
+  ,                                   !- Source Side Inlet Node Name
+  ,                                   !- Source Side Outlet Node Name
+  0.95,                               !- Source Side Effectiveness
+  0,                                  !- Source Side Inlet Height
+  0.257441,                           !- Source Side Outlet Height
+  Fixed,                              !- Inlet Mode
+  ,                                   !- Use Side Design Flow Rate
+  ,                                   !- Source Side Design Flow Rate
+  ,                                   !- Indirect Water Heating Recovery Time
+  10,                                 !- Number of Nodes
+  ,                                   !- Additional Destratification Conductivity
+  ,                                   !- Node 1 Additional Loss Coefficient
+  ,                                   !- Node 2 Additional Loss Coefficient
+  ,                                   !- Node 3 Additional Loss Coefficient
+  ,                                   !- Node 4 Additional Loss Coefficient
+  ,                                   !- Node 5 Additional Loss Coefficient
+  ,                                   !- Node 6 Additional Loss Coefficient
+  ,                                   !- Node 7 Additional Loss Coefficient
+  ,                                   !- Node 8 Additional Loss Coefficient
+  ,                                   !- Node 9 Additional Loss Coefficient
+  ,                                   !- Node 10 Additional Loss Coefficient
+  ,                                   !- Source Side Flow Control Mode
+  ;                                   !- Indirect Alternate Setpoint Temperature Schedule Name
   Site:WaterMainsTemperature,
     CORRELATION,             !- Calculation Method
     ,                        !- Temperature Schedule Name
@@ -3829,7 +4014,7 @@
     ,                        !- Inlet Air Temperature Schedule Name
     ,                        !- Inlet Air Humidity Schedule Name
     ,                        !- Inlet Air Zone Name
-    WaterHeater:Mixed,       !- Tank Object Type
+    WaterHeater:Stratified,       !- Tank Object Type
     HPWHPlantTank,           !- Tank Name
     HPWH Use Inlet Node,     !- Tank Use Side Inlet Node Name
     HPWH Use Outlet Node,    !- Tank Use Side Outlet Node Name
@@ -3843,47 +4028,78 @@
     BlowThrough,             !- Fan Placement
     ,                        !- On Cycle Parasitic Electric Load {W}
     ,                        !- Off Cycle Parasitic Electric Load {W}
-    ;                        !- Parasitic Heat Rejection Location
+    ,                        !- Parasitic Heat Rejection Location
+    ,                        !- Inlet Air Mixer Node Name
+    ,                        !- Outlet Air Splitter Node Name
+    ,                        !- Inlet Air Mixer Schedule Name
+    Heater2;                 !- Control Sensor Location In Stratified Tank
 
-  WaterHeater:Mixed,
-    HPWHPlantTank,           !- Name
-    0.757,                   !- Tank Volume {m3}
-    Plant Hot Water Setpoint Temp Schedule,  !- Setpoint Temperature Schedule Name
-    2.0,                     !- Deadband Temperature Difference {deltaC}
-    82.2222,                 !- Maximum Temperature Limit {C}
-    CYCLE,                   !- Heater Control Type
-    25000,                   !- Heater Maximum Capacity {W}
-    0,                       !- Heater Minimum Capacity {W}
-    ,                        !- Heater Ignition Minimum Flow Rate {m3/s}
-    ,                        !- Heater Ignition Delay {s}
-    ELECTRICITY,             !- Heater Fuel Type
-    0.98,                    !- Heater Thermal Efficiency
-    ,                        !- Part Load Factor Curve Name
-    10,                      !- Off Cycle Parasitic Fuel Consumption Rate {W}
-    ELECTRICITY,             !- Off Cycle Parasitic Fuel Type
-    0,                       !- Off Cycle Parasitic Heat Fraction to Tank
-    30,                      !- On Cycle Parasitic Fuel Consumption Rate {W}
-    ELECTRICITY,             !- On Cycle Parasitic Fuel Type
-    0,                       !- On Cycle Parasitic Heat Fraction to Tank
-    Outdoors,                !- Ambient Temperature Indicator
-    ,                        !- Ambient Temperature Schedule Name
-    ,                        !- Ambient Temperature Zone Name
-    HPWHPlantTank OA Node,   !- Ambient Temperature Outdoor Air Node Name
-    0.0,                     !- Off Cycle Loss Coefficient to Ambient Temperature {W/K}
-    0.0,                     !- Off Cycle Loss Fraction to Zone
-    0.0,                     !- On Cycle Loss Coefficient to Ambient Temperature {W/K}
-    0.0,                     !- On Cycle Loss Fraction to Zone
-    ,                        !- Peak Use Flow Rate {m3/s}
-    ,                        !- Use Flow Rate Fraction Schedule Name
-    ,                        !- Cold Water Supply Temperature Schedule Name
-    HPWH Use Inlet Node,     !- Use Side Inlet Node Name
-    HPWH Use Outlet Node,    !- Use Side Outlet Node Name
-    0.98,                    !- Use Side Effectiveness
-    HPPlantWaterOutletNode,  !- Source Side Inlet Node Name
-    HPPlantWaterInletNode,   !- Source Side Outlet Node Name
-    0.98,                    !- Source Side Effectiveness
-    autosize;                !- Use Side Design Flow Rate {m3/s}
-
+  WaterHeater:Stratified,
+  HPWHPlantTank,                            !- Name
+  ,                                         !- End-Use Subcategory
+  0.757,                                    !- Tank Volume
+  0.648710,                                 !- Tank Height
+  VerticalCylinder,                         !- Tank Shape
+  ,                                         !- Tank Perimeter
+  82.2222,                                  !- Maximum Temperature Limit
+  MasterSlave,                              !- Heater Priority Control
+  Plant Hot Water Setpoint Temp Schedule,   !- Heater 1 Setpoint Temperature Schedule Name
+  2.0,                                      !- Heater 1 Deadband Temperature Difference
+  25000,                                    !- Heater 1 Capacity
+  0.454097,                                 !- Heater 1 Height
+  Plant Hot Water Setpoint Temp Schedule,   !- Heater 2 Setpoint Temperature Schedule Name
+  2.0,                                      !- Heater 2 Deadband Temperature Difference
+  0,                                        !- Heater 2 Capacity
+  0.194613,                                 !- Heater 2 Height
+  ELECTRICITY,                              !- Heater Fuel Type
+  0.98,                                     !- Heater Thermal Efficiency
+  10,                                       !- Off Cycle Parasitic Fuel Consumption Rate
+  ELECTRICITY,                              !- Off Cycle Parasitic Fuel Type
+  0,                                        !- Off Cycle Parasitic Heat Fraction to Tank
+  0.389226,                                 !- Off Cycle Parasitic Height
+  30,                                       !- On Cycle Parasitic Fuel Consumption Rate
+  ELECTRICITY,                              !- On Cycle Parasitic Fuel Type
+  0,                                        !- On Cycle Parasitic Heat Fraction to Tank
+  0.389226,                                 !- On Cycle Parasitic Height
+  Outdoors,                                 !- Ambient Temperature Indicator
+  ,                                         !- Ambient Temperature Schedule Name
+  ,                                         !- Ambient Temperature Zone Name
+  HPWHPlantTank OA Node,                    !- Ambient Temperature Outdoor Air Node Name
+  0.000000,                                 !- Uniform Skin Loss Coefficient per Unit Area to Ambient Temperature
+  0.000000,                                 !- Skin Loss Fraction to Zone
+  ,                                         !- Off Cycle Flue Loss Coefficient to Ambient Temperature
+  ,                                         !- Off Cycle Flue Loss Fraction to Zone
+  ,                                         !- Peak Use Flow Rate
+  ,                                         !- Use Flow Rate Fraction Schedule Name
+  ,                                         !- Cold Water Supply Temperature Schedule Name
+  HPWH Use Inlet Node,                      !- Use Side Inlet Node Name
+  HPWH Use Outlet Node,                     !- Use Side Outlet Node Name
+  0.98,                                     !- Use Side Effectiveness
+  0,                                        !- Use Side Inlet Height
+  autocalculate,                            !- Use Side Outlet Height
+  HPPlantWaterOutletNode,                   !- Source Side Inlet Node Name
+  HPPlantWaterInletNode,                    !- Source Side Outlet Node Name
+  0.98,                                     !- Source Side Effectiveness
+  0,                                        !- Source Side Inlet Height
+  0.324355,                                 !- Source Side Outlet Height
+  Fixed,                                    !- Inlet Mode
+  autosize,                                 !- Use Side Design Flow Rate
+  ,                                         !- Source Side Design Flow Rate
+  ,                                         !- Indirect Water Heating Recovery Time
+  10,                                       !- Number of Nodes
+  ,                                         !- Additional Destratification Conductivity
+  ,                                         !- Node 1 Additional Loss Coefficient
+  ,                                         !- Node 2 Additional Loss Coefficient
+  ,                                         !- Node 3 Additional Loss Coefficient
+  ,                                         !- Node 4 Additional Loss Coefficient
+  ,                                         !- Node 5 Additional Loss Coefficient
+  ,                                         !- Node 6 Additional Loss Coefficient
+  ,                                         !- Node 7 Additional Loss Coefficient
+  ,                                         !- Node 8 Additional Loss Coefficient
+  ,                                         !- Node 9 Additional Loss Coefficient
+  ,                                         !- Node 10 Additional Loss Coefficient
+  ,                                         !- Source Side Flow Control Mode
+  ;                                         !- Indirect Alternate Setpoint Temperature Schedule Name
   OutdoorAir:Node,
     HPWHPlantTank OA Node;   !- Name
 
