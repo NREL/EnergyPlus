@@ -273,7 +273,7 @@ namespace InputProcessor {
 		NumLines = 0;
 
 		DoingInputProcessing = true;
-		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary (" + inputIddFileName + ") File -- Start";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary -- Start";
 		DisplayString( "Processing Data Dictionary" );
 		ProcessingIDD = true;
 		ProcessDataDicFile( idd_stream, ErrorsInIDD );
@@ -298,7 +298,7 @@ namespace InputProcessor {
 		}
 
 		ProcessingIDD = false;
-		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary (" + inputIddFileName + ") File -- Complete";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary -- Complete";
 
 		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Alpha Args=" << MaxAlphaArgsFound;
 		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Numeric Args=" << MaxNumericArgsFound;
@@ -308,7 +308,7 @@ namespace InputProcessor {
 		gio::write( EchoInputFile, fmtLD ) << " Total Number of Numeric Fields=" << NumNumericArgsFound;
 		gio::write( EchoInputFile, fmtLD ) << " Total Number of Fields=" << NumAlphaArgsFound + NumNumericArgsFound;
 
-		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File (" + inputIdfFileName + ") -- Start";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File -- Start";
 		if ( !DisplayInputInAudit ){
 			gio::write( EchoInputFile, fmtLD ) << " Echo of input lines is off. May be activated by setting the environmental variable DISPLAYINPUTINAUDIT=YES";
 		}
@@ -336,7 +336,7 @@ namespace InputProcessor {
 
 		IDFRecordsGotten.dimension( NumIDFRecords, false );
 
-		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File (" + inputIdfFileName + ") -- Complete";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File -- Complete";
 		//   WRITE(EchoInputFile,*) ' Number of IDF "Lines"=',NumIDFRecords
 		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Alpha IDF Args=" << MaxAlphaIDFArgsFound;
 		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Numeric IDF Args=" << MaxNumericIDFArgsFound;
