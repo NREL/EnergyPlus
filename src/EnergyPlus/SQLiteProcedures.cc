@@ -74,6 +74,7 @@ void CreateSQLiteZoneExtendedOutput() {
 		for( int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
 			sqlite->addZoneData( zoneNum, DataHeatBalance::Zone(zoneNum) );
 		}
+		// This needs to be addressed... it is wrong schema setup
 		// for(auto const & zoneList : zoneLists) {
 		// 	zoneList->insertIntoSQLite( m_zoneListInsertStmt );
 		// }
@@ -797,6 +798,7 @@ void SQLite::initializeMaterialsTable()
 
 void SQLite::initializeZoneListTable()
 {
+	// This needs to be addressed... it is wrong schema setup
 	const std::string zoneListsTableSQL =
 		"CREATE TABLE ZoneLists ( "
 			"ZoneListIndex INTEGER PRIMARY KEY, Name TEXT, ZoneIndex INTEGER, "
@@ -2336,17 +2338,17 @@ void SQLite::createSQLiteMaterialsTable()
 
 void SQLite::createSQLiteZoneListTable()
 {
-	for(int listNum = 1; listNum <= DataHeatBalance::NumOfZoneLists; ++listNum) {
-		auto const & zoneList = DataHeatBalance::ZoneList(listNum);
-		for(int zoneNum = 1; zoneNum <= zoneList.NumOfZones; ++zoneNum) {
-			sqliteBindInteger(m_zoneListInsertStmt, 1, listNum);
-			sqliteBindText(m_zoneListInsertStmt, 2, zoneList.Name);
-			sqliteBindForeignKey(m_zoneListInsertStmt, 3, zoneList.Zone(zoneNum));
+	// for(int listNum = 1; listNum <= DataHeatBalance::NumOfZoneLists; ++listNum) {
+	// 	auto const & zoneList = DataHeatBalance::ZoneList(listNum);
+	// 	for(int zoneNum = 1; zoneNum <= zoneList.NumOfZones; ++zoneNum) {
+	// 		sqliteBindInteger(m_zoneListInsertStmt, 1, listNum);
+	// 		sqliteBindText(m_zoneListInsertStmt, 2, zoneList.Name);
+	// 		sqliteBindForeignKey(m_zoneListInsertStmt, 3, zoneList.Zone(zoneNum));
 
-			sqliteStepCommand(m_zoneListInsertStmt);
-			sqliteResetCommand(m_zoneListInsertStmt);
-		}
-	}
+	// 		sqliteStepCommand(m_zoneListInsertStmt);
+	// 		sqliteResetCommand(m_zoneListInsertStmt);
+	// 	}
+	// }
 }
 
 void SQLite::createSQLiteZoneGroupTable()
@@ -2826,7 +2828,7 @@ bool SQLite::Surface::insertIntoSQLite( sqlite3_stmt * insertStmt ) {
 }
 
 bool SQLite::ZoneList::insertIntoSQLite( sqlite3_stmt * insertStmt ) {
-	// this is bad, table is bad...
+	// This needs to be addressed... it is wrong schema setup
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, name);
 	// sqliteBindForeignKey(insertStmt, 3, zoneList.Zone(zoneNum));
