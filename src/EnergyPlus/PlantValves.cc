@@ -451,7 +451,7 @@ namespace PlantValves {
 					}
 
 					if ( ! SetPointNodeOkay ) {
-						ShowSevereError( "TemperingValve object setpoint node not valid.  " "Check Setpoint manager for Plant Loop Temp Setpoint" );
+						ShowSevereError( "TemperingValve object setpoint node not valid.  Check Setpoint manager for Plant Loop Temp Setpoint" );
 						ErrorsFound = true;
 					}
 

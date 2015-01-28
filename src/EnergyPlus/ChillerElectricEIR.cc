@@ -503,7 +503,7 @@ namespace ChillerElectricEIR {
 			if ( ElectricEIRChiller( EIRChillerNum ).MinPartLoadRat > ElectricEIRChiller( EIRChillerNum ).MaxPartLoadRat ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
 				ShowContinueError( cNumericFieldNames( 7 ) + " [" + RoundSigDigits( rNumericArgs( 7 ), 3 ) + "] > " + cNumericFieldNames( 8 ) + " [" + RoundSigDigits( rNumericArgs( 8 ), 3 ) + ']' );
-				ShowContinueError( "Minimum part load ratio must be less than or equal to the " "maximum part load ratio " );
+				ShowContinueError( "Minimum part load ratio must be less than or equal to the maximum part load ratio " );
 				ErrorsFound = true;
 			}
 
@@ -616,7 +616,7 @@ namespace ChillerElectricEIR {
 				CurveVal = CurveValue( ElectricEIRChiller( EIRChillerNum ).ChillerCapFT, ElectricEIRChiller( EIRChillerNum ).TempRefEvapOut, ElectricEIRChiller( EIRChillerNum ).TempRefCondIn );
 				if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
 					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
-					ShowContinueError( "Capacity ratio as a function of temperature curve output is not equal to 1.0" " (+ or - 10%) at reference conditions." );
+					ShowContinueError( "Capacity ratio as a function of temperature curve output is not equal to 1.0 (+ or - 10%) at reference conditions." );
 					ShowContinueError( "Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
 				}
 			}
@@ -625,7 +625,7 @@ namespace ChillerElectricEIR {
 				CurveVal = CurveValue( ElectricEIRChiller( EIRChillerNum ).ChillerEIRFT, ElectricEIRChiller( EIRChillerNum ).TempRefEvapOut, ElectricEIRChiller( EIRChillerNum ).TempRefCondIn );
 				if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
 					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
-					ShowContinueError( "Energy input ratio as a function of temperature curve output is not equal to 1.0" " (+ or - 10%) at reference conditions." );
+					ShowContinueError( "Energy input ratio as a function of temperature curve output is not equal to 1.0 (+ or - 10%) at reference conditions." );
 					ShowContinueError( "Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
 				}
 			}
@@ -635,7 +635,7 @@ namespace ChillerElectricEIR {
 
 				if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
 					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
-					ShowContinueError( "Energy input ratio as a function of part-load ratio curve output is not equal to 1.0" " (+ or - 10%) at reference conditions." );
+					ShowContinueError( "Energy input ratio as a function of part-load ratio curve output is not equal to 1.0 (+ or - 10%) at reference conditions." );
 					ShowContinueError( "Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
 				}
 			}
@@ -885,7 +885,7 @@ namespace ChillerElectricEIR {
 					if ( ! AnyEnergyManagementSystemInModel ) {
 						if ( ! ElectricEIRChiller( EIRChillNum ).ModulatedFlowErrDone ) {
 							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + ElectricEIRChiller( EIRChillNum ).Name );
-							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller " "in variable flow mode, use a SetpointManager" );
+							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager" );
 							ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
 							ElectricEIRChiller( EIRChillNum ).ModulatedFlowErrDone = true;
 						}
@@ -896,7 +896,7 @@ namespace ChillerElectricEIR {
 						if ( FatalError ) {
 							if ( ! ElectricEIRChiller( EIRChillNum ).ModulatedFlowErrDone ) {
 								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + ElectricEIRChiller( EIRChillNum ).Name );
-								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller evaporator " "in variable flow mode" );
+								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode" );
 								ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node " );
 								ShowContinueError( "  or use an EMS actuator to establish a setpoint at the outlet node " );
 								ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
@@ -966,8 +966,8 @@ namespace ChillerElectricEIR {
 						if ( ! AnyEnergyManagementSystemInModel ) {
 							if ( ! ElectricEIRChiller( EIRChillNum ).HRSPErrDone ) {
 								ShowWarningError( "Missing heat recovery temperature setpoint for chiller named " + ElectricEIRChiller( EIRChillNum ).Name );
-								ShowContinueError( "  A temperature setpoint is needed at the heat recovery leaving temperature " "setpoint node specified, use a SetpointManager" );
-								ShowContinueError( "  The overall loop setpoint will be assumed for heat recovery. " "The simulation continues ..." );
+								ShowContinueError( "  A temperature setpoint is needed at the heat recovery leaving temperature setpoint node specified, use a SetpointManager" );
+								ShowContinueError( "  The overall loop setpoint will be assumed for heat recovery. The simulation continues ..." );
 								ElectricEIRChiller( EIRChillNum ).HeatRecSetPointNodeNum = PlantLoop( ElectricEIRChiller( EIRChillNum ).HRLoopNum ).TempSetPointNodeNum;
 								ElectricEIRChiller( EIRChillNum ).HRSPErrDone = true;
 							}
@@ -978,9 +978,9 @@ namespace ChillerElectricEIR {
 							if ( FatalError ) {
 								if ( ! ElectricEIRChiller( EIRChillNum ).HRSPErrDone ) {
 									ShowWarningError( "Missing heat recovery temperature setpoint for chiller named " + ElectricEIRChiller( EIRChillNum ).Name );
-									ShowContinueError( "  A temperature setpoint is needed at the heat recovery leaving temperature " "setpoint node specified, use a SetpointManager to establish a setpoint" );
+									ShowContinueError( "  A temperature setpoint is needed at the heat recovery leaving temperature setpoint node specified, use a SetpointManager to establish a setpoint" );
 									ShowContinueError( "  or use an EMS actuator to establish a setpoint at this node " );
-									ShowContinueError( "  The overall loop setpoint will be assumed for heat recovery. " "The simulation continues ..." );
+									ShowContinueError( "  The overall loop setpoint will be assumed for heat recovery. The simulation continues ..." );
 									ElectricEIRChiller( EIRChillNum ).HeatRecSetPointNodeNum = PlantLoop( ElectricEIRChiller( EIRChillNum ).HRLoopNum ).TempSetPointNodeNum;
 									ElectricEIRChiller( EIRChillNum ).HRSPErrDone = true;
 								}

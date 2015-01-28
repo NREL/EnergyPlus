@@ -1303,7 +1303,7 @@ namespace ZoneContaminantPredictorCorrector {
 						}
 					}
 				} else {
-					ShowSevereError( "ZoneControl:ContaminantController: a corresponding AirLoopHVAC is not found for the " "controlled zone =" + Zone( ZoneNum ).Name );
+					ShowSevereError( "ZoneControl:ContaminantController: a corresponding AirLoopHVAC is not found for the controlled zone =" + Zone( ZoneNum ).Name );
 					ErrorsFound = true;
 				}
 			}

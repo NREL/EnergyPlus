@@ -9,6 +9,7 @@
 #include <DataHeatBalance.hh>
 #include <DataIPShortCuts.hh>
 #include <DataGlobals.hh>
+#include <DataStringGlobals.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::HeatBalanceManager;

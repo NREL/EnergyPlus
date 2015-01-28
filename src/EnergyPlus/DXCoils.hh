@@ -1098,15 +1098,15 @@ namespace DXCoils {
 		FArray1D< std::string > FieldNames;
 
 		// Default Constructor
-		PerfModeData ():
-			FieldNames( )  
+		PerfModeData () :
+			FieldNames( )
 		{}
 
 		// Member Constructor
 		PerfModeData(
 			FArray1D< std::string > const & FieldNames // Name of the HeatingCoil numeric field descriptions
-	) :
-	    FieldNames( FieldNames )
+		) :
+			FieldNames( FieldNames )
 		{}
 	};
 

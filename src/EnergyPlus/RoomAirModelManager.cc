@@ -554,12 +554,12 @@ namespace RoomAirModelManager {
 		}
 
 		if ( TotalRoomAirPatternTooLow > 0 ) {
-			ShowWarningError( "GetUserDefinedPatternData: RoomAirModelUserTempPattern: " + RoundSigDigits( TotalRoomAirPatternTooLow ) + " problem(s) in non-dimensional height calculations, " "too low surface height(s) in relation to floor height of zone(s)." );
+			ShowWarningError( "GetUserDefinedPatternData: RoomAirModelUserTempPattern: " + RoundSigDigits( TotalRoomAirPatternTooLow ) + " problem(s) in non-dimensional height calculations, too low surface height(s) in relation to floor height of zone(s)." );
 			ShowContinueError( "...Use OutputDiagnostics,DisplayExtraWarnings; to see details." );
 			TotalWarningErrors += TotalRoomAirPatternTooLow;
 		}
 		if ( TotalRoomAirPatternTooHigh > 0 ) {
-			ShowWarningError( "GetUserDefinedPatternData: RoomAirModelUserTempPattern: " + RoundSigDigits( TotalRoomAirPatternTooHigh ) + " problem(s) in non-dimensional height calculations, " "too high surface height(s) in relation to ceiling height of zone(s)." );
+			ShowWarningError( "GetUserDefinedPatternData: RoomAirModelUserTempPattern: " + RoundSigDigits( TotalRoomAirPatternTooHigh ) + " problem(s) in non-dimensional height calculations, too high surface height(s) in relation to ceiling height of zone(s)." );
 			ShowContinueError( "...Use OutputDiagnostics,DisplayExtraWarnings; to see details." );
 			TotalWarningErrors += TotalRoomAirPatternTooHigh;
 		}
@@ -746,7 +746,7 @@ namespace RoomAirModelManager {
 				if ( nodeType == "FLOOR" || nodeType == "CEILING" || nodeType == "MUNDTROOM" || nodeType == "PLUME4" || nodeType == "REESROOM1" || nodeType == "REESROOM2" || nodeType == "REESROOM3" || nodeType == "REESROOM4" ) {
 					// terminate the program due to a severe error in the specified input
 					ShowSevereError( "GetAirNodeData: " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid air node specification." );
-					ShowContinueError( "Mundt Room Air Model: No surface names specified.  " "Air node=\"" + AirNode( AirNodeNum ).Name + " requires name of surfaces associated with it." );
+					ShowContinueError( "Mundt Room Air Model: No surface names specified.  Air node=\"" + AirNode( AirNodeNum ).Name + " requires name of surfaces associated with it." );
 					ErrorsFound = true;
 				} else {
 				}}
@@ -761,7 +761,7 @@ namespace RoomAirModelManager {
 				{ auto const nodeType( cAlphaArgs( 2 ) );
 				if ( nodeType == "INLET" || nodeType == "CONTROL" || nodeType == "RETURN" || nodeType == "PLUME1" || nodeType == "PLUME2" || nodeType == "PLUME3" ) {
 					ShowWarningError( "GetAirNodeData: " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid linkage" );
-					ShowContinueError( "Mundt Room Air Model: No surface names needed.  " "Air node=\"" + AirNode( AirNodeNum ).Name + " does not relate to any surfaces." );
+					ShowContinueError( "Mundt Room Air Model: No surface names needed.  Air node=\"" + AirNode( AirNodeNum ).Name + " does not relate to any surfaces." );
 					SurfNeeded = false;
 				} else {
 				}}
@@ -887,7 +887,7 @@ namespace RoomAirModelManager {
 		}
 
 		if ( NumOfMundtContrl == 0 ) {
-			ShowWarningError( "No " + cCurrentModuleObject + " objects found, program assumes no convection " " or infiltration gains near floors" );
+			ShowWarningError( "No " + cCurrentModuleObject + " objects found, program assumes no convection or infiltration gains near floors" );
 			return;
 		}
 
@@ -1125,13 +1125,13 @@ namespace RoomAirModelManager {
 						if ( lAlphaFieldBlanks( 3 ) ) {
 							ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 							ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
-							ShowContinueError( "Airflow region used for thermal comfort " "evaluation is required for Zone=" + cAlphaArgs( 1 ) );
+							ShowContinueError( "Airflow region used for thermal comfort evaluation is required for Zone=" + cAlphaArgs( 1 ) );
 							ShowContinueError( "Field is blank, please choose Jet or Recirculation." );
 							ErrorsFound = true;
 						} else {
 							ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + " = " + cAlphaArgs( 3 ) );
 							ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
-							ShowContinueError( "Airflow region used for thermal comfort " "evaluation is required for Zone=" + cAlphaArgs( 1 ) );
+							ShowContinueError( "Airflow region used for thermal comfort evaluation is required for Zone=" + cAlphaArgs( 1 ) );
 							ShowContinueError( "Please choose Jet or Recirculation." );
 							ErrorsFound = true;
 						}
@@ -1163,7 +1163,7 @@ namespace RoomAirModelManager {
 							AirModel( ThisZone ).AirModelType = RoomAirModel_Mixing;
 							ShowWarningError( "Problem with " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 							ShowWarningError( "Roomair model will not be applied for Zone=" + cAlphaArgs( 1 ) + '.' );
-							ShowContinueError( "AirflowNetwrok:Multizone:Surface crack object must have an air flow coefficient = 0.5, " "value was=" + RoundSigDigits( MultizoneSurfaceCrackData( TypeNum ).FlowExpo, 2 ) );
+							ShowContinueError( "AirflowNetwrok:Multizone:Surface crack object must have an air flow coefficient = 0.5, value was=" + RoundSigDigits( MultizoneSurfaceCrackData( TypeNum ).FlowExpo, 2 ) );
 						}
 					}
 				}

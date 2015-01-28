@@ -328,7 +328,7 @@ namespace DataZoneEquipment {
 
 		if ( NumOfZoneEquipLists != NumOfControlledZones ) {
 			ShowSevereError( RoutineName + "Number of Zone Equipment lists [" + TrimSigDigits( NumOfZoneEquipLists ) + "] not equal Number of Controlled Zones [" + TrimSigDigits( NumOfControlledZones ) + ']' );
-			ShowContinueError( "..Each Controlled Zone [ZoneHVAC:EquipmentConnections] must have a corresponding" "(unique) ZoneHVAC:EquipmentList" );
+			ShowContinueError( "..Each Controlled Zone [ZoneHVAC:EquipmentConnections] must have a corresponding (unique) ZoneHVAC:EquipmentList" );
 			ShowFatalError( "GetZoneEquipment: Incorrect number of zone equipment lists" );
 		}
 

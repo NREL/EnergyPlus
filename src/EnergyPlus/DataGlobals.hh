@@ -16,6 +16,10 @@ namespace DataGlobals {
 	// -only module should be available to other modules and routines.
 	// Thus, all variables in this module must be PUBLIC.
 
+	extern bool runReadVars;
+	extern bool DDOnlySimulation;
+	extern bool AnnualSimulation;
+
 	// MODULE PARAMETER DEFINITIONS:
 	extern int const BeginDay;
 	extern int const DuringDay;
@@ -136,6 +140,7 @@ namespace DataGlobals {
 	extern bool DisplayUnusedSchedules; // True when selection for  "DisplayUnusedSchedules" is entered
 	extern bool DisplayAdvancedReportVariables; // True when selection for  "DisplayAdvancedReportVariables" is entered
 	extern bool DisplayZoneAirHeatBalanceOffBalance; // True when selection for  "DisplayZoneAirHeatBalanceOffBalance" is entered
+	extern bool DisplayInputInAudit; // True when environmental variable "DisplayInputInAudit" is used
 	extern bool CreateMinimalSurfaceVariables; // True when selection for  "CreateMinimalSurfaceVariables" is entered
 	extern Real64 CurrentTime; // CurrentTime, in fractional hours, from start of day. Uses Loads time step.
 	extern int SimTimeSteps; // Number of (Loads) timesteps since beginning of run period (environment).
@@ -156,9 +161,9 @@ namespace DataGlobals {
 	extern bool AnySlabsInModel; // true if there are any zone-coupled ground domains in the input file
 	extern bool AnyBasementsInModel; // true if there are any basements in the input file
 
-	extern int Progress; 
-	extern void ( *fProgressPtr )( int );
-	extern void ( *fMessagePtr )( std::string );
+	extern int Progress;
+	extern void ( *fProgressPtr )( int const );
+	extern void ( *fMessagePtr )( std::string const & );
 
 } // DataGlobals
 
