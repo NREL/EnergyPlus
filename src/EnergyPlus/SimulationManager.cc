@@ -562,7 +562,8 @@ namespace SimulationManager {
 #endif
 		CloseOutputFiles();
 
-		sqlite->createZoneExtendedOutput();
+		// sqlite->createZoneExtendedOutput();
+		CreateSQLiteZoneExtendedOutput();
 
 		if ( sqlite->writeOutputToSQLite() ) {
 			DisplayString( "Writing final SQL reports" );
