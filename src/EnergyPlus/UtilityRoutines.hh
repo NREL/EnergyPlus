@@ -10,10 +10,7 @@
 namespace EnergyPlus {
 
 void
-AbortEnergyPlus(
-	bool const NoIdf, // Set to true when "noidf" was found
-	bool const NoIDD // Set to true when "noidd" was found
-);
+AbortEnergyPlus();
 
 void
 CloseMiscOpenFiles();

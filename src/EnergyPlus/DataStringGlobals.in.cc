@@ -72,9 +72,64 @@ namespace DataStringGlobals {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	std::string ProgramPath; // Path for Program from Energy+.ini
+	std::string outputAuditFileName("eplusout.audit");
+	std::string outputBndFileName("eplusout.bnd");
+	std::string outputDxfFileName("eplusout.dxf");
+	std::string outputEioFileName("eplusout.eio");
+	std::string outputEndFileName("eplusout.end");
+	std::string outputErrFileName("eplusout.err");
+	std::string outputEsoFileName("eplusout.eso");
+	std::string outputMtdFileName("eplusout.mtd");
+	std::string outputMddFileName("eplusout.mdd");
+	std::string outputMtrFileName("eplusout.mtr");
+	std::string outputRddFileName("eplusout.rdd");
+	std::string outputShdFileName("eplusout.shd");
+	std::string outputTblCsvFileName("eplustbl.csv");
+	std::string outputTblHtmFileName("eplustbl.htm");
+	std::string outputTblTabFileName("eplustbl.tab");
+	std::string outputTblTxtFileName("eplustbl.txt");
+	std::string outputTblXmlFileName("eplustbl.xml");
+	std::string inputIdfFileName;
+	std::string inputIddFileName;
+	std::string inputWeatherFileName;
+	std::string outputAdsFileName("eplusADS.out");
+	std::string outputDfsFileName("eplusout.dfs");
+	std::string outputDelightInFileName("eplusout.delightin");
+	std::string outputDelightOutFileName("eplusout.delightout");
+	std::string outputDelightEldmpFileName("eplusout.delighteldmp");
+	std::string outputDelightDfdmpFileName("eplusout.delightdfdmp");
+	std::string outputMapTabFileName("eplusmap.tab");
+	std::string outputMapCsvFileName("eplusmap.csv");
+	std::string outputMapTxtFileName("eplusmap.txt");
+	std::string outputEddFileName("eplusout.edd");
+	std::string outputIperrFileName("eplusout.iperr");
+	std::string outputDbgFileName("eplusout.dbg");
+	std::string outputSlnFileName("eplusout.sln");
+	std::string outputSciFileName("eplusout.sci");
+	std::string outputWrlFileName("eplusout.wrl");
+	std::string outputZszCsvFileName("epluszsz.csv");
+	std::string outputZszTabFileName("epluszsz.tab");
+	std::string outputZszTxtFileName("epluszsz.txt");
+	std::string outputSszCsvFileName("eplusssz.csv");
+	std::string outputSszTabFileName("eplusssz.tab");
+	std::string outputSszTxtFileName("eplusssz.txt");
+	std::string outputScreenCsvFileName("eplusscreen.csv");
+	std::string outputSqlFileName("eplusout.sql");
+	std::string outputSqliteErrFileName("eplussqlite.err");
+	std::string EnergyPlusIniFileName;
+	std::string inStatFileName;
+	std::string TarcogIterationsFileName("TarcogIterations.dbg");
+	std::string eplusADSFileName;
+	std::string outputCsvFileName("eplusout.csv");
+	std::string outputMtrCsvFileName("eplusmtr.csv");
+	std::string outputRvauditFileName("eplusout.rvaudit");
+	
+	std::string idfFileNameOnly;
+	std::string idfDirPathName;
+	std::string exeDirectory;
+
+	std::string ProgramPath; // Path for Program from INI file
 	std::string CurrentWorkingFolder; // Current working directory for run
-	std::string FullName; // Full name of file to open, including path
 	std::string IDDVerString; // Version information from the IDD (line 1)
 	std::string VerString( "EnergyPlus, Version ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}" ); // String that represents version information
 	std::string MatchVersion( "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}" ); // String to be matched by Version object
