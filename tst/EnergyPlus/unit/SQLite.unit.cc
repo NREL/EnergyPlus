@@ -530,14 +530,31 @@ namespace EnergyPlus {
 
 	}
 
-	// void createSQLiteTabularDataRecords(
-	// 	FArray2D_string const & body, // row,column
-	// 	FArray1D_string const & rowLabels,
-	// 	FArray1D_string const & columnLabels,
-	// 	std::string const & ReportName,
-	// 	std::string const & ReportForString,
-	// 	std::string const & TableName
-	// );
+	TEST_F( SQLiteFixture, createZoneExtendedOutput ) {
+		// void createZoneExtendedOutput();
 
-	// void createZoneExtendedOutput();
+		sqlite_test->sqliteBegin();
+		sqlite_test->createZoneExtendedOutput();
+		auto zones = queryResult("SELECT * FROM Zones;", "Zones");
+		sqlite_test->sqliteCommit();
+
+		ASSERT_EQ(0, zones.size());
+		std::vector<std::string> testResult0 {"1", };
+	}
+
+	TEST_F( SQLiteFixture, createSQLiteTabularDataRecords ) {
+		// void createSQLiteTabularDataRecords(
+		// 	FArray2D_string const & body, // row,column
+		// 	FArray1D_string const & rowLabels,
+		// 	FArray1D_string const & columnLabels,
+		// 	std::string const & ReportName,
+		// 	std::string const & ReportForString,
+		// 	std::string const & TableName
+		// );
+
+		sqlite_test->sqliteBegin();
+		// sqlite_test->createSQLiteTabularDataRecords();
+		// auto result = queryResult("SELECT * FROM TabularData;", "TabularData");
+		sqlite_test->sqliteCommit();
+	}
 }

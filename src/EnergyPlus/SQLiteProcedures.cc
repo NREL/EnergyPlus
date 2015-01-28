@@ -70,7 +70,7 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase() {
 }
 
 void CreateSQLiteZoneExtendedOutput() {
-	if( sqlite ) {
+	if( sqlite && sqlite->writeOutputToSQLite() ) {
 		for( int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
 			sqlite->addZoneData( zoneNum, DataHeatBalance::Zone(zoneNum) );
 		}

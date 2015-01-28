@@ -264,7 +264,7 @@ namespace SimulationManager {
 		//CreateSQLiteDatabase();
 		sqlite = EnergyPlus::CreateSQLiteDatabase();
 
-		if ( sqlite->writeOutputToSQLite() ) {
+		if ( sqlite ) {
 			sqlite->sqliteBegin();
 			sqlite->createSQLiteSimulationsRecord( 1, DataStringGlobals::VerString, DataStringGlobals::CurrentDateTime );
 			sqlite->sqliteCommit();
@@ -384,7 +384,7 @@ namespace SimulationManager {
 			}
 		}
 
-		if ( sqlite->writeOutputToSQLite() ) {
+		if ( sqlite ) {
 			sqlite->sqliteBegin();
 			sqlite->updateSQLiteSimulationRecord( 1, DataGlobals::NumOfTimeStepInHour );
 			sqlite->sqliteCommit();
@@ -409,7 +409,7 @@ namespace SimulationManager {
 
 			++EnvCount;
 
-			if ( sqlite->writeOutputToSQLite() ) {
+			if ( sqlite ) {
 				sqlite->sqliteBegin();
 				sqlite->createSQLiteEnvironmentPeriodRecord( DataEnvironment::CurEnvirNum, DataEnvironment::EnvironmentName, DataGlobals::KindOfSim );
 				sqlite->sqliteCommit();
@@ -431,7 +431,7 @@ namespace SimulationManager {
 
 			while ( ( DayOfSim < NumOfDayInEnvrn ) || ( WarmupFlag ) ) { // Begin day loop ...
 
-				if ( sqlite->writeOutputToSQLite() ) sqlite->sqliteBegin(); // setup for one transaction per day
+				if ( sqlite ) sqlite->sqliteBegin(); // setup for one transaction per day
 
 				++DayOfSim;
 				gio::write( DayOfSimChr, fmtLD ) << DayOfSim;
@@ -512,7 +512,7 @@ namespace SimulationManager {
 
 				} // ... End hour loop.
 
-				if ( sqlite->writeOutputToSQLite() ) sqlite->sqliteCommit(); // one transaction per day
+				if ( sqlite ) sqlite->sqliteCommit(); // one transaction per day
 
 			} // ... End day loop.
 
@@ -534,7 +534,7 @@ namespace SimulationManager {
 			}
 		}
 
-		if ( sqlite->writeOutputToSQLite() ) sqlite->sqliteBegin(); // for final data to write
+		if ( sqlite ) sqlite->sqliteBegin(); // for final data to write
 
 #ifdef EP_Detailed_Timings
 		epStartTime( "Closeout Reporting=" );
@@ -565,7 +565,7 @@ namespace SimulationManager {
 		// sqlite->createZoneExtendedOutput();
 		CreateSQLiteZoneExtendedOutput();
 
-		if ( sqlite->writeOutputToSQLite() ) {
+		if ( sqlite ) {
 			DisplayString( "Writing final SQL reports" );
 			sqlite->sqliteCommit(); // final transactions
 			sqlite->initializeIndexes(); // do not create indexes (SQL) until all is done.
@@ -2462,7 +2462,7 @@ namespace SimulationManager {
 			if ( iostatus != 0 ) break;
 			if ( is_blank( ErrorMessage ) ) continue;
 			ShowErrorMessage( ErrorMessage );
-			if ( sqlite->writeOutputToSQLite() ) {
+			if ( sqlite ) {
 				// Following code relies on specific formatting of Severes, Warnings, and continues
 				// that occur in the IP processing.  Later ones -- i.e. Fatals occur after the
 				// automatic sending of error messages to SQLite are turned on.

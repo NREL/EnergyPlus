@@ -135,7 +135,7 @@ namespace ReportSizingManager {
 		}
 
 		// add to SQL output
-		if ( sqlite->writeOutputToSQLite() ) sqlite->addSQLiteComponentSizingRecord( CompType, CompName, VarDesc, VarValue );
+		if ( sqlite ) sqlite->addSQLiteComponentSizingRecord( CompType, CompName, VarDesc, VarValue );
 
 	}
 
