@@ -73,6 +73,8 @@ link_err ()
 
 chmod o+w "${install_directory}/${package_name}/PreProcess/IDFVersionUpdater/"
 
+mv "${install_directory}/${package_name}/energyplus.1" /usr/local/share/man/man1/
+
 if [ ! "$link_directory" = "n" ]; then
 	uninstall="$install_directory/$package_name/uninstall.sh"
 	echo "#!/usr/bin/env sh" > $uninstall
@@ -123,6 +125,7 @@ if [ ! "$link_directory" = "n" ]; then
       rm -f "${link_directory}/Transition-V8-0-0-to-V8-1-0"
       rm -f "${link_directory}/V8-0-0-Energy+.idd"
       rm -f "${link_directory}/V8-1-0-Energy+.idd"
+      rm -f /usr/local/share/man/man1/energyplus.1
 			echo "Symbolic links to this installation of EnergyPlus have been removed."
 			echo "You may remove the EnergyPlus directory to completely uninstall the software."
 		HERE
