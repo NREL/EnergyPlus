@@ -76,7 +76,7 @@ namespace EnergyPlus {
 			sqlite3_stmt* sqlStmtPtr;
 			std::string sql("pragma index_info(" + indexName + ");");
 			bool success = false;
-			int rc = sqlite3_prepare_v2(sqlite_test->m_db, sql.c_str(), -1, &sqlStmtPtr, nullptr);
+			int rc = sqlite3_prepare_v2(sqlite_test->m_db.get(), sql.c_str(), -1, &sqlStmtPtr, nullptr);
 			if ( SQLITE_OK != rc ) {
 				sqlite3_finalize(sqlStmtPtr);
 				return success;
@@ -91,7 +91,7 @@ namespace EnergyPlus {
 		int columnCount( const std::string& tableName ) {
 			sqlite3_stmt* sqlStmtPtr;
 			std::string sql("pragma table_info(" + tableName + ");");
-			int rc = sqlite3_prepare_v2(sqlite_test->m_db, sql.c_str(), -1, &sqlStmtPtr, nullptr);
+			int rc = sqlite3_prepare_v2(sqlite_test->m_db.get(), sql.c_str(), -1, &sqlStmtPtr, nullptr);
 			if ( SQLITE_OK != rc ) {
 				sqlite3_finalize(sqlStmtPtr);
 				return -1;
@@ -112,7 +112,7 @@ namespace EnergyPlus {
 
 			sqlite3_stmt* sqlStmtPtr;
 
-			int code = sqlite3_prepare_v2(sqlite_test->m_db, statement.c_str(), -1, &sqlStmtPtr, nullptr);
+			int code = sqlite3_prepare_v2(sqlite_test->m_db.get(), statement.c_str(), -1, &sqlStmtPtr, nullptr);
 			while ( SQLITE_ROW == sqlite3_step( sqlStmtPtr ) ) {
 				std::vector < std::string > valueVector;
 				for( int i = 0; i < rowCount; ++i ) {
@@ -129,9 +129,9 @@ namespace EnergyPlus {
 			return queryVector;
 		}
 
-		void createSQLiteZoneTable( std::map<int, DataHeatBalance::ZoneData> const & zones ) {
-			sqlite_test->createSQLiteZoneTable( zones );
-		}
+		// void createSQLiteZoneTable( std::map<int, DataHeatBalance::ZoneData> const & zones ) {
+		// 	sqlite_test->createSQLiteZoneTable( zones );
+		// }
 	};
 
 	TEST_F( SQLiteFixture, sqliteWriteMessage ) {
@@ -518,11 +518,11 @@ namespace EnergyPlus {
 		// zone->ExtNetWallArea = 144.6;
 		// zone->ExtWindowArea = 5.4;
 
-		std::map<int, DataHeatBalance::ZoneData> zones;
-		zones.insert(std::map<int, DataHeatBalance::ZoneData>::value_type(1, *zone));
+		// std::map<int, DataHeatBalance::ZoneData> zones;
+		// zones.insert(std::map<int, DataHeatBalance::ZoneData>::value_type(1, *zone));
 
 		sqlite_test->sqliteBegin();
-		createSQLiteZoneTable( zones );
+		// createSQLiteZoneTable( zones );
 		sqlite_test->createSQLiteDaylightMapTitle( 1, "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", 1, "RefPt1=(2.50:2.00:0.80)", "RefPt2=(2.50:18.00:0.80)", 0.8 );
 		sqlite_test->addSQLiteComponentSizingRecord( "Coil:Heating:Electric", "CORE_BOTTOM VAV BOX REHEAT COIL", "Design Size Nominal Capacity", 38689.18 );
 		auto result = queryResult("SELECT * FROM ComponentSizes;", "ComponentSizes");
