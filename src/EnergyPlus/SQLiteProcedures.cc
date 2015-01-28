@@ -141,12 +141,8 @@ void CreateSQLiteZoneExtendedOutput() {
 SQLite::SQLite( std::ostream & errorStream, bool writeOutputToSQLite, bool writeTabularDataToSQLite, std::string const & dbName )
 	: 
 	SQLiteProcedures(errorStream, writeTabularDataToSQLite, dbName),
-	// m_writeOutputToSQLite(writeOutputToSQLite),
 	m_writeTabularDataToSQLite(writeTabularDataToSQLite),
 	m_sqlDBTimeIndex(0),
-	// m_db(nullptr),
-	// m_dbName(dbName),
-	// m_errorStream(errorStream),
 	m_reportDataInsertStmt(nullptr),
 	m_reportExtendedDataInsertStmt(nullptr),
 	m_reportDictionaryInsertStmt(nullptr),
@@ -189,53 +185,49 @@ SQLite::SQLite( std::ostream & errorStream, bool writeOutputToSQLite, bool write
 	m_simulationDataUpdateStmt(nullptr)
 {
 	if( m_writeOutputToSQLite ) {
-		// if( ok ) {
-			sqliteExecuteCommand("PRAGMA locking_mode = EXCLUSIVE;");
-			sqliteExecuteCommand("PRAGMA journal_mode = OFF;");
-			sqliteExecuteCommand("PRAGMA synchronous = OFF;");
-			// Turn this to ON for Foreign Key constraints.
-			// This must be turned ON for every connection
-			// Currently, inserting into daylighting tables does not work with this ON. The ZoneIndex referenced by DaylightMaps does not exist in
-			// the database at the time data is inserted.
-			sqliteExecuteCommand("PRAGMA foreign_keys = OFF;");
+		sqliteExecuteCommand("PRAGMA locking_mode = EXCLUSIVE;");
+		sqliteExecuteCommand("PRAGMA journal_mode = OFF;");
+		sqliteExecuteCommand("PRAGMA synchronous = OFF;");
+		// Turn this to ON for Foreign Key constraints.
+		// This must be turned ON for every connection
+		// Currently, inserting into daylighting tables does not work with this ON. The ZoneIndex referenced by DaylightMaps does not exist in
+		// the database at the time data is inserted.
+		sqliteExecuteCommand("PRAGMA foreign_keys = OFF;");
 
-			initializeSimulationsTable();
-			initializeEnvironmentPeriodsTable();
-			initializeErrorsTable();
-			initializeTimeIndicesTable();
-			initializeZoneInfoTable();
-			initializeSchedulesTable();
-			initializeZoneListTable();
-			initializeZoneGroupTable();
-			initializeMaterialsTable();
-			initializeConstructionsTables();
-			initializeSurfacesTable();
-			initializeReportDataDictionaryTable();
-			initializeReportDataTables();
-			initializeNominalPeopleTable();
-			initializeNominalLightingTable();
-			initializeNominalElectricEquipmentTable();
-			initializeNominalGasEquipmentTable();
-			initializeNominalSteamEquipmentTable();
-			initializeNominalHotWaterEquipmentTable();
-			initializeNominalOtherEquipmentTable();
-			initializeNominalBaseboardHeatTable();
-			initializeNominalInfiltrationTable();
-			initializeNominalVentilationTable();
-			initializeZoneSizingTable();
-			initializeSystemSizingTable();
-			initializeComponentSizingTable();
-			initializeRoomAirModelTable();
-			initializeDaylightMapTables();
-			initializeViews();
+		initializeSimulationsTable();
+		initializeEnvironmentPeriodsTable();
+		initializeErrorsTable();
+		initializeTimeIndicesTable();
+		initializeZoneInfoTable();
+		initializeSchedulesTable();
+		initializeZoneListTable();
+		initializeZoneGroupTable();
+		initializeMaterialsTable();
+		initializeConstructionsTables();
+		initializeSurfacesTable();
+		initializeReportDataDictionaryTable();
+		initializeReportDataTables();
+		initializeNominalPeopleTable();
+		initializeNominalLightingTable();
+		initializeNominalElectricEquipmentTable();
+		initializeNominalGasEquipmentTable();
+		initializeNominalSteamEquipmentTable();
+		initializeNominalHotWaterEquipmentTable();
+		initializeNominalOtherEquipmentTable();
+		initializeNominalBaseboardHeatTable();
+		initializeNominalInfiltrationTable();
+		initializeNominalVentilationTable();
+		initializeZoneSizingTable();
+		initializeSystemSizingTable();
+		initializeComponentSizingTable();
+		initializeRoomAirModelTable();
+		initializeDaylightMapTables();
+		initializeViews();
 
-			if(m_writeTabularDataToSQLite) {
-				initializeTabularDataTable();
-				initializeTabularDataView();
-			}
-		// } else {
-		// 	throw std::runtime_error("The SQLite database failed to open.");
-		// }
+		if(m_writeTabularDataToSQLite) {
+			initializeTabularDataTable();
+			initializeTabularDataView();
+		}
 	}
 }
 
@@ -281,8 +273,6 @@ SQLite::~SQLite()
 	sqlite3_finalize(m_errorUpdateStmt);
 	sqlite3_finalize(m_simulationUpdateStmt);
 	sqlite3_finalize(m_simulationDataUpdateStmt);
-
-	// sqlite3_close(m_db);
 }
 
 bool SQLite::writeOutputToSQLite() const
@@ -1750,23 +1740,6 @@ void SQLite::addSQLiteComponentSizingRecord(
 	}
 }
 
-void SQLite::createSQLiteRoomAirModelTable()
-{
-	// if( m_writeOutputToSQLite ) {
-	// 	for(int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
-	// 		auto const & zoneAirModel = DataRoomAirModel::AirModel(zoneNum);
-	// 		sqliteBindInteger(m_roomAirModelInsertStmt, 1, zoneNum);
-	// 		sqliteBindText(m_roomAirModelInsertStmt, 2, zoneAirModel.AirModelName);
-	// 		sqliteBindInteger(m_roomAirModelInsertStmt, 3, zoneAirModel.AirModelType);
-	// 		sqliteBindInteger(m_roomAirModelInsertStmt, 4, zoneAirModel.TempCoupleScheme);
-	// 		sqliteBindLogical(m_roomAirModelInsertStmt, 5, zoneAirModel.SimAirModel);
-
-	// 		sqliteStepCommand(m_roomAirModelInsertStmt);
-	// 		sqliteResetCommand(m_roomAirModelInsertStmt);
-	// 	}
-	// }
-}
-
 void SQLite::createSQLiteDaylightMapTitle(
 	int const mapNum,
 	std::string const & mapName,
@@ -2001,343 +1974,8 @@ void SQLite::updateSQLiteSimulationRecord( bool const completed, bool const comp
 	}
 }
 
-void SQLite::createSQLiteZoneTable( std::map<int, DataHeatBalance::ZoneData> const & zones )
-{
-	// for( int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
-	// 	auto const & zoneHB = DataHeatBalance::Zone(zoneNum);
-
-	// 	sqliteBindInteger(m_zoneInfoInsertStmt, 1, zoneNum);
-	// 	sqliteBindText(m_zoneInfoInsertStmt, 2, zoneHB.Name);
-	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 3, zoneHB.RelNorth);
-	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 4, zoneHB.OriginX);
-	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 5, zoneHB.OriginY);
-	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 6, zoneHB.OriginZ);
-	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 7, zoneHB.Centroid.x);
-	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 8, zoneHB.Centroid.y);
-	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 9, zoneHB.Centroid.z);
-	// 	sqliteBindInteger(m_zoneInfoInsertStmt, 10, zoneHB.OfType);
-	// 	sqliteBindInteger(m_zoneInfoInsertStmt, 11, zoneHB.Multiplier);
-	// 	sqliteBindInteger(m_zoneInfoInsertStmt, 12, zoneHB.ListMultiplier);
-	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 13, zoneHB.MinimumX);
-	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 14, zoneHB.MaximumX);
-	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 15, zoneHB.MinimumY);
-	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 16, zoneHB.MaximumY);
-	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 17, zoneHB.MinimumZ);
-	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 18, zoneHB.MaximumZ);
-	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 19, zoneHB.CeilingHeight);
-	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 20, zoneHB.Volume);
-	// 	sqliteBindInteger(m_zoneInfoInsertStmt, 21, zoneHB.InsideConvectionAlgo);
-	// 	sqliteBindInteger(m_zoneInfoInsertStmt, 22, zoneHB.OutsideConvectionAlgo);
-	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 23, zoneHB.FloorArea);
-	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 24, zoneHB.ExtGrossWallArea);
-	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 25, zoneHB.ExtNetWallArea);
-	// 	sqliteBindDouble(m_zoneInfoInsertStmt, 26, zoneHB.ExtWindowArea);
-	// 	sqliteBindLogical(m_zoneInfoInsertStmt, 27, zoneHB.isPartOfTotalArea);
-
-	// 	sqliteStepCommand(m_zoneInfoInsertStmt);
-	// 	sqliteResetCommand(m_zoneInfoInsertStmt);
-	// }
-}
-
-void SQLite::createSQLiteNominalLightingTable()
-{
-	// for(int lightNum = 1; lightNum <= DataHeatBalance::TotLights; ++lightNum) {
-	// 	auto const & lightsHB = DataHeatBalance::Lights(lightNum);
-	// 	sqliteBindInteger(m_nominalLightingInsertStmt, 1, lightNum);
-	// 	sqliteBindText(m_nominalLightingInsertStmt, 2, lightsHB.Name);
-	// 	sqliteBindForeignKey(m_nominalLightingInsertStmt, 3, lightsHB.ZonePtr);
-	// 	sqliteBindForeignKey(m_nominalLightingInsertStmt, 4, lightsHB.SchedPtr);
-	// 	sqliteBindDouble(m_nominalLightingInsertStmt, 5, lightsHB.DesignLevel);
-	// 	sqliteBindDouble(m_nominalLightingInsertStmt, 6, lightsHB.FractionReturnAir);
-	// 	sqliteBindDouble(m_nominalLightingInsertStmt, 7, lightsHB.FractionRadiant);
-	// 	sqliteBindDouble(m_nominalLightingInsertStmt, 8, lightsHB.FractionShortWave);
-	// 	sqliteBindDouble(m_nominalLightingInsertStmt, 9, lightsHB.FractionReplaceable);
-	// 	sqliteBindDouble(m_nominalLightingInsertStmt, 10, lightsHB.FractionConvected);
-	// 	sqliteBindText(m_nominalLightingInsertStmt, 11, lightsHB.EndUseSubcategory);
-
-	// 	sqliteStepCommand(m_nominalLightingInsertStmt);
-	// 	sqliteResetCommand(m_nominalLightingInsertStmt);
-	// }
-}
-
-void SQLite::createSQLiteNominalPeopleTable()
-{
-	// for(int peopleNum = 1; peopleNum <= DataHeatBalance::TotPeople; ++peopleNum) {
-	// 	auto const & peopleHB = DataHeatBalance::People(peopleNum);
-	// 	sqliteBindInteger(m_nominalPeopleInsertStmt, 1, peopleNum);
-	// 	sqliteBindText(m_nominalPeopleInsertStmt, 2, peopleHB.Name);
-	// 	sqliteBindForeignKey(m_nominalPeopleInsertStmt, 3, peopleHB.ZonePtr);
-	// 	sqliteBindDouble(m_nominalPeopleInsertStmt, 4, peopleHB.NumberOfPeople);
-	// 	sqliteBindForeignKey(m_nominalPeopleInsertStmt, 5, peopleHB.NumberOfPeoplePtr);
-	// 	sqliteBindForeignKey(m_nominalPeopleInsertStmt, 6, peopleHB.ActivityLevelPtr);
-	// 	sqliteBindDouble(m_nominalPeopleInsertStmt, 7, peopleHB.FractionRadiant);
-	// 	sqliteBindDouble(m_nominalPeopleInsertStmt, 8, peopleHB.FractionConvected);
-	// 	sqliteBindForeignKey(m_nominalPeopleInsertStmt, 9, peopleHB.WorkEffPtr);
-	// 	sqliteBindForeignKey(m_nominalPeopleInsertStmt, 10, peopleHB.ClothingPtr);
-	// 	sqliteBindForeignKey(m_nominalPeopleInsertStmt, 11, peopleHB.AirVelocityPtr);
-	// 	sqliteBindLogical(m_nominalPeopleInsertStmt, 12, peopleHB.Fanger);
-	// 	sqliteBindLogical(m_nominalPeopleInsertStmt, 13, peopleHB.Pierce);
-	// 	sqliteBindLogical(m_nominalPeopleInsertStmt, 14, peopleHB.KSU);
-	// 	sqliteBindInteger(m_nominalPeopleInsertStmt, 15, peopleHB.MRTCalcType);
-	// 	sqliteBindForeignKey(m_nominalPeopleInsertStmt, 16, peopleHB.SurfacePtr);
-	// 	sqliteBindText(m_nominalPeopleInsertStmt, 17, peopleHB.AngleFactorListName);
-	// 	sqliteBindInteger(m_nominalPeopleInsertStmt, 18, peopleHB.AngleFactorListPtr);
-	// 	sqliteBindDouble(m_nominalPeopleInsertStmt, 19, peopleHB.UserSpecSensFrac);
-	// 	sqliteBindLogical(m_nominalPeopleInsertStmt, 20, peopleHB.Show55Warning);
-
-	// 	sqliteStepCommand(m_nominalPeopleInsertStmt);
-	// 	sqliteResetCommand(m_nominalPeopleInsertStmt);
-	// }
-}
-
-void SQLite::createSQLiteNominalElectricEquipmentTable()
-{
-	// for(int elecEquipNum = 1; elecEquipNum <= DataHeatBalance::TotElecEquip; ++elecEquipNum) {
-	// 	auto const & elecEquipHB = DataHeatBalance::ZoneElectric(elecEquipNum);
-	// 	sqliteBindInteger(m_nominalElectricEquipmentInsertStmt, 1, elecEquipNum);
-	// 	sqliteBindText(m_nominalElectricEquipmentInsertStmt, 2, elecEquipHB.Name);
-	// 	sqliteBindForeignKey(m_nominalElectricEquipmentInsertStmt, 3, elecEquipHB.ZonePtr);
-	// 	sqliteBindForeignKey(m_nominalElectricEquipmentInsertStmt, 4, elecEquipHB.SchedPtr);
-	// 	sqliteBindDouble(m_nominalElectricEquipmentInsertStmt, 5, elecEquipHB.DesignLevel);
-	// 	sqliteBindDouble(m_nominalElectricEquipmentInsertStmt, 6, elecEquipHB.FractionLatent);
-	// 	sqliteBindDouble(m_nominalElectricEquipmentInsertStmt, 7, elecEquipHB.FractionRadiant);
-	// 	sqliteBindDouble(m_nominalElectricEquipmentInsertStmt, 8, elecEquipHB.FractionLost);
-	// 	sqliteBindDouble(m_nominalElectricEquipmentInsertStmt, 9, elecEquipHB.FractionConvected);
-	// 	sqliteBindText(m_nominalElectricEquipmentInsertStmt, 10, elecEquipHB.EndUseSubcategory);
-
-	// 	sqliteStepCommand(m_nominalElectricEquipmentInsertStmt);
-	// 	sqliteResetCommand(m_nominalElectricEquipmentInsertStmt);
-	// }
-}
-
-void SQLite::createSQLiteNominalGasEquipmentTable()
-{
-	// for(int gasEquipNum = 1; gasEquipNum <= DataHeatBalance::TotGasEquip; ++gasEquipNum) {
-	// 	auto const & gasEquipHB = DataHeatBalance::ZoneGas(gasEquipNum);
-	// 	sqliteBindInteger(m_nominalGasEquipmentInsertStmt, 1, gasEquipNum);
-	// 	sqliteBindText(m_nominalGasEquipmentInsertStmt, 2, gasEquipHB.Name);
-	// 	sqliteBindForeignKey(m_nominalGasEquipmentInsertStmt, 3, gasEquipHB.ZonePtr);
-	// 	sqliteBindForeignKey(m_nominalGasEquipmentInsertStmt, 4, gasEquipHB.SchedPtr);
-	// 	sqliteBindDouble(m_nominalGasEquipmentInsertStmt, 5, gasEquipHB.DesignLevel);
-	// 	sqliteBindDouble(m_nominalGasEquipmentInsertStmt, 6, gasEquipHB.FractionLatent);
-	// 	sqliteBindDouble(m_nominalGasEquipmentInsertStmt, 7, gasEquipHB.FractionRadiant);
-	// 	sqliteBindDouble(m_nominalGasEquipmentInsertStmt, 8, gasEquipHB.FractionLost);
-	// 	sqliteBindDouble(m_nominalGasEquipmentInsertStmt, 9, gasEquipHB.FractionConvected);
-	// 	sqliteBindText(m_nominalGasEquipmentInsertStmt, 10, gasEquipHB.EndUseSubcategory);
-
-	// 	sqliteStepCommand(m_nominalGasEquipmentInsertStmt);
-	// 	sqliteResetCommand(m_nominalGasEquipmentInsertStmt);
-	// }
-}
-
-void SQLite::createSQLiteNominalSteamEquipmentTable()
-{
-	// for(int steamEquipNum = 1; steamEquipNum <= DataHeatBalance::TotStmEquip; ++steamEquipNum) {
-	// 	auto const & steamEquipHB = DataHeatBalance::ZoneSteamEq(steamEquipNum);
-	// 	sqliteBindInteger(m_nominalSteamEquipmentInsertStmt, 1, steamEquipNum);
-	// 	sqliteBindText(m_nominalSteamEquipmentInsertStmt, 2, steamEquipHB.Name);
-	// 	sqliteBindForeignKey(m_nominalSteamEquipmentInsertStmt, 3, steamEquipHB.ZonePtr);
-	// 	sqliteBindForeignKey(m_nominalSteamEquipmentInsertStmt, 4, steamEquipHB.SchedPtr);
-	// 	sqliteBindDouble(m_nominalSteamEquipmentInsertStmt, 5, steamEquipHB.DesignLevel);
-	// 	sqliteBindDouble(m_nominalSteamEquipmentInsertStmt, 6, steamEquipHB.FractionLatent);
-	// 	sqliteBindDouble(m_nominalSteamEquipmentInsertStmt, 7, steamEquipHB.FractionRadiant);
-	// 	sqliteBindDouble(m_nominalSteamEquipmentInsertStmt, 8, steamEquipHB.FractionLost);
-	// 	sqliteBindDouble(m_nominalSteamEquipmentInsertStmt, 9, steamEquipHB.FractionConvected);
-	// 	sqliteBindText(m_nominalSteamEquipmentInsertStmt, 10, steamEquipHB.EndUseSubcategory);
-
-	// 	sqliteStepCommand(m_nominalSteamEquipmentInsertStmt);
-	// 	sqliteResetCommand(m_nominalSteamEquipmentInsertStmt);
-	// }
-}
-
-void SQLite::createSQLiteNominalHotWaterEquipmentTable()
-{
-	// for(int hWEquipNum = 1; hWEquipNum <= DataHeatBalance::TotHWEquip; ++hWEquipNum) {
-	// 	auto const & zoneHW = DataHeatBalance::ZoneHWEq(hWEquipNum);
-	// 	sqliteBindInteger(m_nominalHotWaterEquipmentInsertStmt, 1, hWEquipNum);
-	// 	sqliteBindText(m_nominalHotWaterEquipmentInsertStmt, 2, zoneHW.Name);
-	// 	sqliteBindForeignKey(m_nominalHotWaterEquipmentInsertStmt, 3, zoneHW.ZonePtr);
-	// 	sqliteBindForeignKey(m_nominalHotWaterEquipmentInsertStmt, 4, zoneHW.SchedPtr);
-	// 	sqliteBindDouble(m_nominalHotWaterEquipmentInsertStmt, 5, zoneHW.DesignLevel);
-	// 	sqliteBindDouble(m_nominalHotWaterEquipmentInsertStmt, 6, zoneHW.FractionLatent);
-	// 	sqliteBindDouble(m_nominalHotWaterEquipmentInsertStmt, 7, zoneHW.FractionRadiant);
-	// 	sqliteBindDouble(m_nominalHotWaterEquipmentInsertStmt, 8, zoneHW.FractionLost);
-	// 	sqliteBindDouble(m_nominalHotWaterEquipmentInsertStmt, 9, zoneHW.FractionConvected);
-	// 	sqliteBindText(m_nominalHotWaterEquipmentInsertStmt, 10, zoneHW.EndUseSubcategory);
-
-	// 	sqliteStepCommand(m_nominalHotWaterEquipmentInsertStmt);
-	// 	sqliteResetCommand(m_nominalHotWaterEquipmentInsertStmt);
-	// }
-}
-
-void SQLite::createSQLiteNominalOtherEquipmentTable()
-{
-	// for(int otherEquipNum = 1; otherEquipNum <= DataHeatBalance::TotOthEquip; ++otherEquipNum) {
-	// 	auto const & otherEquip = DataHeatBalance::ZoneOtherEq(otherEquipNum);
-	// 	sqliteBindInteger(m_nominalOtherEquipmentInsertStmt, 1, otherEquipNum);
-	// 	sqliteBindText(m_nominalOtherEquipmentInsertStmt, 2, otherEquip.Name);
-	// 	sqliteBindForeignKey(m_nominalOtherEquipmentInsertStmt, 3, otherEquip.ZonePtr);
-	// 	sqliteBindForeignKey(m_nominalOtherEquipmentInsertStmt, 4, otherEquip.SchedPtr);
-	// 	sqliteBindDouble(m_nominalOtherEquipmentInsertStmt, 5, otherEquip.DesignLevel);
-	// 	sqliteBindDouble(m_nominalOtherEquipmentInsertStmt, 6, otherEquip.FractionLatent);
-	// 	sqliteBindDouble(m_nominalOtherEquipmentInsertStmt, 7, otherEquip.FractionRadiant);
-	// 	sqliteBindDouble(m_nominalOtherEquipmentInsertStmt, 8, otherEquip.FractionLost);
-	// 	sqliteBindDouble(m_nominalOtherEquipmentInsertStmt, 9, otherEquip.FractionConvected);
-	// 	sqliteBindText(m_nominalOtherEquipmentInsertStmt, 10, otherEquip.EndUseSubcategory);
-
-	// 	sqliteStepCommand(m_nominalOtherEquipmentInsertStmt);
-	// 	sqliteResetCommand(m_nominalOtherEquipmentInsertStmt);
-	// }
-}
-
-void SQLite::createSQLiteNominalBaseboardHeatTable()
-{
-	// for(int bBHeatNum = 1; bBHeatNum <= DataHeatBalance::TotBBHeat; ++bBHeatNum) {
-	// 	auto const & baseboardHeat = DataHeatBalance::ZoneBBHeat(bBHeatNum);
-	// 	sqliteBindInteger(m_nominalBaseboardHeatInsertStmt, 1, bBHeatNum);
-	// 	sqliteBindText(m_nominalBaseboardHeatInsertStmt, 2, baseboardHeat.Name);
-	// 	sqliteBindForeignKey(m_nominalBaseboardHeatInsertStmt, 3, baseboardHeat.ZonePtr);
-	// 	sqliteBindForeignKey(m_nominalBaseboardHeatInsertStmt, 4, baseboardHeat.SchedPtr);
-	// 	sqliteBindDouble(m_nominalBaseboardHeatInsertStmt, 5, baseboardHeat.CapatLowTemperature);
-	// 	sqliteBindDouble(m_nominalBaseboardHeatInsertStmt, 6, baseboardHeat.LowTemperature);
-	// 	sqliteBindDouble(m_nominalBaseboardHeatInsertStmt, 7, baseboardHeat.CapatHighTemperature);
-	// 	sqliteBindDouble(m_nominalBaseboardHeatInsertStmt, 8, baseboardHeat.HighTemperature);
-	// 	sqliteBindDouble(m_nominalBaseboardHeatInsertStmt, 9, baseboardHeat.FractionRadiant);
-	// 	sqliteBindDouble(m_nominalBaseboardHeatInsertStmt, 10, baseboardHeat.FractionConvected);
-	// 	sqliteBindText(m_nominalBaseboardHeatInsertStmt, 11, baseboardHeat.EndUseSubcategory);
-
-	// 	sqliteStepCommand(m_nominalBaseboardHeatInsertStmt);
-	// 	sqliteResetCommand(m_nominalBaseboardHeatInsertStmt);
-	// }
-}
-
-void SQLite::createSQLiteInfiltrationTable()
-{
-	// for(int stmtNum = 1; stmtNum <= DataHeatBalance::TotInfiltration; ++stmtNum) {
-	// 	auto const & infiltration = DataHeatBalance::Infiltration(stmtNum);
-	// 	sqliteBindInteger(m_infiltrationInsertStmt, 1, stmtNum);
-	// 	sqliteBindText(m_infiltrationInsertStmt, 2, infiltration.Name);
-	// 	sqliteBindForeignKey(m_infiltrationInsertStmt, 3, infiltration.ZonePtr);
-	// 	sqliteBindForeignKey(m_infiltrationInsertStmt, 4, infiltration.SchedPtr);
-	// 	sqliteBindDouble(m_infiltrationInsertStmt, 5, infiltration.DesignLevel);
-
-	// 	sqliteStepCommand(m_infiltrationInsertStmt);
-	// 	sqliteResetCommand(m_infiltrationInsertStmt);
-	// }
-}
-
-void SQLite::createSQLiteVentilationTable()
-{
-	// for(int stmtNum = 1; stmtNum <= DataHeatBalance::TotVentilation; ++stmtNum) {
-	// 	auto const & ventilation = DataHeatBalance::Ventilation(stmtNum);
-	// 	sqliteBindInteger(m_ventilationInsertStmt, 1, stmtNum);
-	// 	sqliteBindText(m_ventilationInsertStmt, 2, ventilation.Name);
-	// 	sqliteBindForeignKey(m_ventilationInsertStmt, 3, ventilation.ZonePtr);
-	// 	sqliteBindForeignKey(m_ventilationInsertStmt, 4, ventilation.SchedPtr);
-	// 	sqliteBindDouble(m_ventilationInsertStmt, 5, ventilation.DesignLevel);
-
-	// 	sqliteStepCommand(m_ventilationInsertStmt);
-	// 	sqliteResetCommand(m_ventilationInsertStmt);
-	// }
-}
-
-void SQLite::createSQLiteSurfacesTable()
-{
-	// for(int surfaceNumber = 1; surfaceNumber <= DataSurfaces::TotSurfaces; ++surfaceNumber) {
-	// 	auto const & surface = DataSurfaces::Surface(surfaceNumber);
-	// 	sqliteBindInteger(m_surfaceInsertStmt, 1, surfaceNumber);
-	// 	sqliteBindText(m_surfaceInsertStmt, 2, surface.Name);
-	// 	sqliteBindForeignKey(m_surfaceInsertStmt, 3, surface.Construction);
-	// 	sqliteBindText(m_surfaceInsertStmt, 4, DataSurfaces::cSurfaceClass(surface.Class));
-	// 	sqliteBindDouble(m_surfaceInsertStmt, 5, surface.Area);
-	// 	sqliteBindDouble(m_surfaceInsertStmt, 6, surface.GrossArea);
-	// 	sqliteBindDouble(m_surfaceInsertStmt, 7, surface.Perimeter);
-	// 	sqliteBindDouble(m_surfaceInsertStmt, 8, surface.Azimuth);
-	// 	sqliteBindDouble(m_surfaceInsertStmt, 9, surface.Height);
-	// 	sqliteBindDouble(m_surfaceInsertStmt, 10, surface.Reveal);
-	// 	sqliteBindInteger(m_surfaceInsertStmt, 11, surface.Shape);
-	// 	sqliteBindInteger(m_surfaceInsertStmt, 12, surface.Sides);
-	// 	sqliteBindDouble(m_surfaceInsertStmt, 13, surface.Tilt);
-	// 	sqliteBindDouble(m_surfaceInsertStmt, 14, surface.Width);
-	// 	sqliteBindLogical(m_surfaceInsertStmt, 15, surface.HeatTransSurf);
-	// 	sqliteBindForeignKey(m_surfaceInsertStmt, 16, surface.BaseSurf);
-	// 	sqliteBindForeignKey(m_surfaceInsertStmt, 17, surface.Zone);
-	// 	sqliteBindInteger(m_surfaceInsertStmt, 18, surface.ExtBoundCond);
-	// 	sqliteBindLogical(m_surfaceInsertStmt, 19, surface.ExtSolar);
-	// 	sqliteBindLogical(m_surfaceInsertStmt, 20, surface.ExtWind);
-
-	// 	sqliteStepCommand(m_surfaceInsertStmt);
-	// 	sqliteResetCommand(m_surfaceInsertStmt);
-	// }
-}
-
-void SQLite::createSQLiteConstructionsTable()
-{
-	// static int constructionLayerIndex = 0;
-	// for(int constructNum = 1; constructNum <= DataHeatBalance::TotConstructs; ++constructNum) {
-	// 	auto const & construction = DataHeatBalance::Construct(constructNum);
-	// 	sqliteBindInteger(m_constructionInsertStmt, 1, constructNum);
-	// 	sqliteBindText(m_constructionInsertStmt, 2, construction.Name);
-	// 	sqliteBindInteger(m_constructionInsertStmt, 3, construction.TotLayers);
-	// 	sqliteBindInteger(m_constructionInsertStmt, 4, construction.TotSolidLayers);
-	// 	sqliteBindInteger(m_constructionInsertStmt, 5, construction.TotGlassLayers);
-	// 	sqliteBindDouble(m_constructionInsertStmt, 6, construction.InsideAbsorpVis);
-	// 	sqliteBindDouble(m_constructionInsertStmt, 7, construction.OutsideAbsorpVis);
-	// 	sqliteBindDouble(m_constructionInsertStmt, 8, construction.InsideAbsorpSolar);
-	// 	sqliteBindDouble(m_constructionInsertStmt, 9, construction.OutsideAbsorpSolar);
-	// 	sqliteBindDouble(m_constructionInsertStmt, 10, construction.InsideAbsorpThermal);
-	// 	sqliteBindDouble(m_constructionInsertStmt, 11, construction.OutsideAbsorpThermal);
-	// 	sqliteBindInteger(m_constructionInsertStmt, 12, construction.OutsideRoughness);
-	// 	sqliteBindLogical(m_constructionInsertStmt, 13, construction.TypeIsWindow);
-
-	// 	if(construction.TotGlassLayers == 0) {
-	// 		sqliteBindDouble(m_constructionInsertStmt, 14, construction.UValue);
-	// 	} else {
-	// 		sqliteBindDouble(m_constructionInsertStmt, 14, DataHeatBalance::NominalU(constructNum));
-	// 	}
-
-	// 	sqliteStepCommand(m_constructionInsertStmt);
-	// 	sqliteResetCommand(m_constructionInsertStmt);
-
-	// 	for(int layerNum = 1; layerNum <= construction.TotLayers; ++layerNum) {
-	// 		++constructionLayerIndex;
-	// 		sqliteBindInteger(m_constructionLayerInsertStmt, 1, constructionLayerIndex);
-	// 		sqliteBindForeignKey(m_constructionLayerInsertStmt, 2, constructNum);
-	// 		sqliteBindInteger(m_constructionLayerInsertStmt, 3, layerNum);
-	// 		sqliteBindForeignKey(m_constructionLayerInsertStmt, 4, construction.LayerPoint(layerNum));
-
-	// 		sqliteStepCommand(m_constructionLayerInsertStmt);
-	// 		sqliteResetCommand(m_constructionLayerInsertStmt);
-	// 	}
-	// }
-}
-
-void SQLite::createSQLiteMaterialsTable()
-{
-	// for(int materialNum = 1; materialNum <= DataHeatBalance::TotMaterials; ++materialNum) {
-	// 	auto const & material = DataHeatBalance::Material(materialNum);
-	// 	sqliteBindInteger(m_materialInsertStmt, 1, materialNum);
-	// 	sqliteBindText(m_materialInsertStmt, 2, material.Name);
-	// 	sqliteBindInteger(m_materialInsertStmt, 3, material.Group);
-	// 	sqliteBindInteger(m_materialInsertStmt, 4, material.Roughness);
-	// 	sqliteBindDouble(m_materialInsertStmt, 5, material.Conductivity);
-	// 	sqliteBindDouble(m_materialInsertStmt, 6, material.Density);
-	// 	sqliteBindDouble(m_materialInsertStmt, 7, material.IsoMoistCap);
-	// 	sqliteBindDouble(m_materialInsertStmt, 8, material.Porosity);
-	// 	sqliteBindDouble(m_materialInsertStmt, 9, material.Resistance);
-	// 	sqliteBindLogical(m_materialInsertStmt, 10, material.ROnly);
-	// 	sqliteBindDouble(m_materialInsertStmt, 11, material.SpecHeat);
-	// 	sqliteBindDouble(m_materialInsertStmt, 12, material.ThermGradCoef);
-	// 	sqliteBindDouble(m_materialInsertStmt, 13, material.Thickness);
-	// 	sqliteBindDouble(m_materialInsertStmt, 14, material.VaporDiffus);
-
-	// 	sqliteStepCommand(m_materialInsertStmt);
-	// 	sqliteResetCommand(m_materialInsertStmt);
-	// }
-}
-
-void SQLite::createSQLiteZoneListTable()
-{
+// void SQLite::createSQLiteZoneListTable()
+// {
 	// for(int listNum = 1; listNum <= DataHeatBalance::NumOfZoneLists; ++listNum) {
 	// 	auto const & zoneList = DataHeatBalance::ZoneList(listNum);
 	// 	for(int zoneNum = 1; zoneNum <= zoneList.NumOfZones; ++zoneNum) {
@@ -2349,35 +1987,7 @@ void SQLite::createSQLiteZoneListTable()
 	// 		sqliteResetCommand(m_zoneListInsertStmt);
 	// 	}
 	// }
-}
-
-void SQLite::createSQLiteZoneGroupTable()
-{
-	// for(int groupNum = 1; groupNum <= DataHeatBalance::NumOfZoneGroups; ++groupNum) {
-	// 	auto const & zoneGroup = DataHeatBalance::ZoneGroup(groupNum);
-	// 	sqliteBindInteger(m_zoneGroupInsertStmt, 1, groupNum);
-	// 	sqliteBindText(m_zoneGroupInsertStmt, 2, zoneGroup.Name);
-	// 	sqliteBindInteger(m_zoneGroupInsertStmt, 3, zoneGroup.ZoneList);
-
-	// 	sqliteStepCommand(m_zoneGroupInsertStmt);
-	// 	sqliteResetCommand(m_zoneGroupInsertStmt);
-	// }
-}
-
-void SQLite::createSQLiteSchedulesTable()
-{
-	// int numberOfSchedules = ScheduleManager::GetNumberOfSchedules();
-	// for(int scheduleNumber = 1; scheduleNumber <= numberOfSchedules; ++scheduleNumber) {
-	// 	sqliteBindInteger(m_scheduleInsertStmt, 1, scheduleNumber);
-	// 	sqliteBindText(m_scheduleInsertStmt, 2, ScheduleManager::GetScheduleName(scheduleNumber));
-	// 	sqliteBindText(m_scheduleInsertStmt, 3, ScheduleManager::GetScheduleType(scheduleNumber));
-	// 	sqliteBindDouble(m_scheduleInsertStmt, 4, ScheduleManager::GetScheduleMinValue(scheduleNumber));
-	// 	sqliteBindDouble(m_scheduleInsertStmt, 5, ScheduleManager::GetScheduleMaxValue(scheduleNumber));
-
-	// 	sqliteStepCommand(m_scheduleInsertStmt);
-	// 	sqliteResetCommand(m_scheduleInsertStmt);
-	// }
-}
+// }
 
 void SQLite::createZoneExtendedOutput()
 {
@@ -2902,12 +2512,7 @@ bool SQLite::Zone::insertIntoSQLite( sqlite3_stmt * insertStmt ) {
 SQLite::SQLiteData::SQLiteData( std::ostream & errorStream, std::shared_ptr<sqlite3> & db )
 	:
 	SQLiteProcedures( errorStream, db )
-	// m_insertStmt(nullptr)
 	{}
-
-// SQLite::SQLiteData::~SQLiteData() {
-// 	sqlite3_finalize(m_insertStmt);
-// }
 
 SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, std::shared_ptr<sqlite3> & db )
 	:
@@ -2985,11 +2590,6 @@ SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, bool writeOutput
 			throw std::runtime_error("The SQLite database failed to open.");
 		}
 	}
-}
-
-SQLiteProcedures::~SQLiteProcedures()
-{
-	// sqlite3_close(m_db);
 }
 
 int SQLiteProcedures::sqliteExecuteCommand(const std::string & commandBuffer)
@@ -3119,13 +2719,5 @@ int SQLiteProcedures::sqliteFinalizeCommand(sqlite3_stmt * stmt)
 {
 	return sqlite3_finalize(stmt);
 }
-
-// namespace SQLiteProcedures {
-
-//// Data
-//bool WriteOutputToSQLite( false );
-//bool WriteTabularDataToSQLite( false );
-
-// } // SQLiteProcedures
 
 } // EnergyPlus
