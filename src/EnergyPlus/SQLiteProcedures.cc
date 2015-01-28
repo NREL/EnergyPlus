@@ -691,8 +691,8 @@ void SQLite::initializeNominalOtherEquipmentTable()
 
 	const std::string nominalOtherEquipmentInsertSQL =
 		"INSERT INTO NominalOtherEquipment VALUES(?,?,?,?,?,?,?,?,?,?);";
-	//TODO fix...
-	sqlitePrepareStatement(m_nominalHotWaterEquipmentInsertStmt,nominalOtherEquipmentInsertSQL);
+
+	sqlitePrepareStatement(m_nominalOtherEquipmentInsertStmt,nominalOtherEquipmentInsertSQL);
 }
 
 void SQLite::initializeNominalBaseboardHeatTable()
