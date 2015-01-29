@@ -1767,8 +1767,8 @@ namespace ReportSizingManager {
 					if ( DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 ) {
 						if (  SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil  ) {
 							ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString, AutosizeUser );
-							SizingResult *= (  1 - DataBypassFrac  ); // now apply bypass fraction for second message and remianing simulation calcs
-							AutosizeUser *= (  1 - DataBypassFrac  ); // now apply bypass fraction for second message and remianing simulation calcs
+							SizingResult *= (  1 - DataBypassFrac  ); // now apply bypass fraction for second message and remaining simulation calcs
+							AutosizeUser *= (  1 - DataBypassFrac  ); // now apply bypass fraction for second message and remaining simulation calcs
 							ReportSizingOutput( CompType, CompName, "Design Size " + SizingString + " ( non-bypassed )", AutosizeDes, "User-Specified " + SizingString + " ( non-bypassed )", AutosizeUser );
 						} else {
 							ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString, AutosizeUser );
@@ -1784,19 +1784,19 @@ namespace ReportSizingManager {
 						}
 					} else if ( ( DataScalableSizingON || DataScalableCapSizingON ) && AutosizeDes > 0.0 ) {
 						if (SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") && SizingType == CoolingAirflowSizing  && DataIsDXCoil) {
-							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
-							SizingResult *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remianing simulation calcs
-							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString + " ( non-bypassed )", SizingResult);
+							if ( DataAutosizable ) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
+							SizingResult *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remaining simulation calcs
+							if ( DataAutosizable ) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString + " ( non-bypassed )", SizingResult);
 						} else {
-							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
+							if ( DataAutosizable ) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
 						}
 					} else {
 						if ( SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil  ) {
-							if (  DataAutosizable  ) ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, SizingResult );
-							SizingResult *= (  1 - DataBypassFrac  ); // now apply bypass fraction for second message and remianing simulation calcs
-							if (  DataAutosizable  ) ReportSizingOutput( CompType, CompName, "Design Size " + SizingString + " ( non-bypassed )", SizingResult );
+							if ( DataAutosizable ) ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, SizingResult );
+							SizingResult *= (  1 - DataBypassFrac  ); // now apply bypass fraction for second message and remaining simulation calcs
+							if ( DataAutosizable ) ReportSizingOutput( CompType, CompName, "Design Size " + SizingString + " ( non-bypassed )", SizingResult );
 						} else {
-							if (  DataAutosizable  ) ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, SizingResult );
+							if ( DataAutosizable ) ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, SizingResult );
 						}
 					}
 				} else {
@@ -1814,7 +1814,7 @@ namespace ReportSizingManager {
 					} else if ( ( DataScalableSizingON || DataScalableCapSizingON ) && AutosizeDes > 0.0 ) {
 						if (SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") && SizingType == CoolingAirflowSizing  && DataIsDXCoil) {
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
-							SizingResult *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remianing simulation calcs
+							SizingResult *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remaining simulation calcs
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString + " ( non-bypassed )", SizingResult);
 						} else {
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
@@ -1822,7 +1822,7 @@ namespace ReportSizingManager {
 					} else if ( ( DataScalableSizingON || DataScalableCapSizingON ) && AutosizeUser > 0.0) {
 						if (SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") && SizingType == CoolingAirflowSizing  && DataIsDXCoil) {
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
-							SizingResult *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remianing simulation calcs
+							SizingResult *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remaining simulation calcs
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString + " ( non-bypassed )", SizingResult);
 						} else {
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
