@@ -23,10 +23,12 @@ namespace EnergyPlus {
 		std::ostringstream ss;
 
 		virtual void SetUp() {
-			ASSERT_NO_THROW(sqlite_test = std::unique_ptr<SQLite>(new SQLite( ss, true, true, ":memory:" )));
+			ASSERT_NO_THROW(sqlite_test = std::unique_ptr<SQLite>(new SQLite( ss, ":memory:", "std::ostringstream", true, true )));
 			ASSERT_TRUE(sqlite_test->writeOutputToSQLite());
 			ASSERT_TRUE(sqlite_test->writeTabularDataToSQLite());
 			sqlite_test->sqliteExecuteCommand("PRAGMA foreign_keys = ON;");
+			EXPECT_EQ("SQLite3 message, std::ostringstream open for processing!\n", ss.str());
+			ss.str(std::string());
 		}
 
 		virtual void TearDown() {
@@ -136,9 +138,11 @@ namespace EnergyPlus {
 
 	TEST_F( SQLiteFixture, sqliteWriteMessage ) {
 		sqlite_test->sqliteWriteMessage("");
-		EXPECT_EQ("SQLite3 message, sqlite.err open for processing!\nSQLite3 message, \n", ss.str());
+		EXPECT_EQ("SQLite3 message, \n", ss.str());
+		ss.str(std::string());
 		sqlite_test->sqliteWriteMessage("test message");
-		EXPECT_EQ("SQLite3 message, sqlite.err open for processing!\nSQLite3 message, \nSQLite3 message, test message\n", ss.str());
+		EXPECT_EQ("SQLite3 message, test message\n", ss.str());
+		ss.str(std::string());
 	}
 
 	TEST_F( SQLiteFixture, initializeIndexes ) {

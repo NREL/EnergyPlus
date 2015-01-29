@@ -62,8 +62,8 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase() {
 			}
 		}
 		std::ofstream errorStream;
-		errorStream.open("sqlite.err", std::ofstream::out | std::ofstream::trunc);
-		return std::unique_ptr<SQLite>(new SQLite( errorStream, writeOutputToSQLite, writeTabularDataToSQLite ));
+		errorStream.open(DataStringGlobals::outputSqliteErrFileName, std::ofstream::out | std::ofstream::trunc);
+		return std::unique_ptr<SQLite>(new SQLite( errorStream, DataStringGlobals::outputSqlFileName, DataStringGlobals::outputSqliteErrFileName, writeOutputToSQLite, writeTabularDataToSQLite ));
 	} catch( const std::runtime_error& error ) {
 		ShowFatalError(error.what());
 		return nullptr;
@@ -139,16 +139,11 @@ void CreateSQLiteZoneExtendedOutput() {
 	}
 }
 
-SQLite::SQLite( std::ostream & errorStream, bool writeOutputToSQLite, bool writeTabularDataToSQLite, std::string const & dbName )
+SQLite::SQLite( std::ostream & errorStream, std::string const & dbName, std::string const & errorFileName, bool writeOutputToSQLite, bool writeTabularDataToSQLite )
 	: 
-	SQLiteProcedures(errorStream, writeTabularDataToSQLite, dbName),
+	SQLiteProcedures(errorStream, writeTabularDataToSQLite, dbName, errorFileName),
 	m_writeTabularDataToSQLite(writeTabularDataToSQLite),
 	m_sqlDBTimeIndex(0),
-<<<<<<< HEAD
-=======
-	m_db(nullptr),
-	m_dbName(DataStringGlobals::outputSqlFileName),
->>>>>>> develop
 	m_reportDataInsertStmt(nullptr),
 	m_reportExtendedDataInsertStmt(nullptr),
 	m_reportDictionaryInsertStmt(nullptr),
@@ -191,7 +186,6 @@ SQLite::SQLite( std::ostream & errorStream, bool writeOutputToSQLite, bool write
 	m_simulationDataUpdateStmt(nullptr)
 {
 	if( m_writeOutputToSQLite ) {
-<<<<<<< HEAD
 		sqliteExecuteCommand("PRAGMA locking_mode = EXCLUSIVE;");
 		sqliteExecuteCommand("PRAGMA journal_mode = OFF;");
 		sqliteExecuteCommand("PRAGMA synchronous = OFF;");
@@ -234,107 +228,6 @@ SQLite::SQLite( std::ostream & errorStream, bool writeOutputToSQLite, bool write
 		if(m_writeTabularDataToSQLite) {
 			initializeTabularDataTable();
 			initializeTabularDataView();
-=======
-		int rc = -1;
-		bool ok = true;
-		m_errorStream.open(DataStringGlobals::outputSqliteErrFileName, std::ofstream::out | std::ofstream::trunc);
-
-		// Test if we can write to the sqlite error file
-		//  Does there need to be a seperate sqlite.err file at all?  Consider using eplusout.err
-		if( m_errorStream.is_open() ) {
-			m_errorStream << "SQLite3 message, " + DataStringGlobals::outputSqliteErrFileName + " open for processing!" << std::endl;
-		} else {
-			ok = false;
-		}
-
-		// Test if we can create a new file named m_dbName
-		if( ok ) {
-			std::ofstream test(m_dbName, std::ofstream::out | std::ofstream::trunc);
-			if( test.is_open() ) {
-				test.close();
-			} else {
-				ok = false;
-			}
-		}
-
-		// Test if we can write to the database
-		// If we can't then there are probably locks on the database
-		if( ok ) {
-			sqlite3_open_v2(m_dbName.c_str(), &m_db, SQLITE_OPEN_READWRITE, nullptr);
-			char * zErrMsg = nullptr;
-			rc = sqlite3_exec(m_db, "CREATE TABLE Test(x INTEGER PRIMARY KEY)", nullptr, 0, &zErrMsg);
-			sqlite3_close(m_db);
-			if( rc ) {
-				m_errorStream << "SQLite3 message, can't get exclusive lock on existing database: " << sqlite3_errmsg(m_db) << std::endl;
-				ok = false;
-			} else {
-				// Remove test db
-				rc = remove( m_dbName.c_str() );
-				if( rc ) {
-					m_errorStream << "SQLite3 message, can't remove old database: " << sqlite3_errmsg(m_db) << std::endl;
-					ok = false;
-				}
-			}
-			sqlite3_free(zErrMsg);
-		}
-
-		if( ok ) {
-			// Now open the output db for the duration of the simulation
-			rc = sqlite3_open_v2(m_dbName.c_str(), &m_db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
-			if( rc ) {
-				m_errorStream << "SQLite3 message, can't open new database: " << sqlite3_errmsg(m_db) << std::endl;
-				sqlite3_close(m_db);
-				ok = false;
-			}
-		}
-
-		if( ok ) {
-			sqliteExecuteCommand("PRAGMA locking_mode = EXCLUSIVE;");
-			sqliteExecuteCommand("PRAGMA journal_mode = OFF;");
-			sqliteExecuteCommand("PRAGMA synchronous = OFF;");
-			// Turn this to ON for Foreign Key constraints.
-			// This must be turned ON for every connection
-			// Currently, inserting into daylighting tables does not work with this ON. The ZoneIndex referenced by DaylightMaps does not exist in
-			// the database at the time data is inserted.
-			sqliteExecuteCommand("PRAGMA foreign_keys = OFF;");
-
-			initializeSimulationsTable();
-			initializeEnvironmentPeriodsTable();
-			initializeErrorsTable();
-			initializeTimeIndicesTable();
-			initializeZoneInfoTable();
-			initializeSchedulesTable();
-			initializeZoneListTable();
-			initializeZoneGroupTable();
-			initializeMaterialsTable();
-			initializeConstructionsTables();
-			initializeSurfacesTable();
-			initializeReportDataDictionaryTable();
-			initializeReportDataTables();
-			initializeNominalPeopleTable();
-			initializeNominalLightingTable();
-			initializeNominalElectricEquipmentTable();
-			initializeNominalGasEquipmentTable();
-			initializeNominalSteamEquipmentTable();
-			initializeNominalHotWaterEquipmentTable();
-			initializeNominalOtherEquipmentTable();
-			initializeNominalBaseboardHeatTable();
-			initializeNominalInfiltrationTable();
-			initializeNominalVentilationTable();
-			initializeZoneSizingTable();
-			initializeSystemSizingTable();
-			initializeComponentSizingTable();
-			initializeRoomAirModelTable();
-			initializeDaylightMapTables();
-			initializeViews();
-
-			if(m_writeTabularDataToSQLite) {
-				initializeTabularDataTable();
-				initializeTabularDataView();
-			}
-		} else {
-			throw std::runtime_error("The SQLite database failed to open.");
->>>>>>> develop
 		}
 	}
 }
@@ -2628,11 +2521,10 @@ SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, std::shared_ptr<
 	m_errorStream(errorStream)
 	{}
 
-SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, bool writeOutputToSQLite, std::string const & dbName )
+SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, bool writeOutputToSQLite, std::string const & dbName, std::string const & errorFileName )
 	:
 	m_writeOutputToSQLite(writeOutputToSQLite),
 	m_connection(nullptr),
-	m_dbName(dbName),
 	m_errorStream(errorStream)
 {
 	if( m_writeOutputToSQLite ) {
@@ -2643,14 +2535,14 @@ SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, bool writeOutput
 		// Test if we can write to the sqlite error file
 		//  Does there need to be a seperate sqlite.err file at all?  Consider using eplusout.err
 		if( m_errorStream ) {
-			m_errorStream << "SQLite3 message, sqlite.err open for processing!" << std::endl;
+			m_errorStream << "SQLite3 message, " << errorFileName << " open for processing!" << std::endl;
 		} else {
 			ok = false;
 		}
 
-		// Test if we can create a new file named m_dbName
-		if( ok && m_dbName != ":memory:" ) {
-			std::ofstream test(m_dbName, std::ofstream::out | std::ofstream::trunc);
+		// Test if we can create a new file named dbName
+		if( ok && dbName != ":memory:" ) {
+			std::ofstream test(dbName, std::ofstream::out | std::ofstream::trunc);
 			if( test.is_open() ) {
 				test.close();
 			} else {
@@ -2661,7 +2553,7 @@ SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, bool writeOutput
 		// Test if we can write to the database
 		// If we can't then there are probably locks on the database
 		if( ok ) {
-			sqlite3_open_v2(m_dbName.c_str(), &m_connection, SQLITE_OPEN_READWRITE, nullptr);
+			sqlite3_open_v2(dbName.c_str(), &m_connection, SQLITE_OPEN_READWRITE, nullptr);
 			char * zErrMsg = nullptr;
 			rc = sqlite3_exec(m_connection, "CREATE TABLE Test(x INTEGER PRIMARY KEY)", nullptr, 0, &zErrMsg);
 			sqlite3_close(m_connection);
@@ -2669,9 +2561,9 @@ SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, bool writeOutput
 				m_errorStream << "SQLite3 message, can't get exclusive lock on existing database: " << sqlite3_errmsg(m_connection) << std::endl;
 				ok = false;
 			} else {
-				if (m_dbName != ":memory:") {
+				if (dbName != ":memory:") {
 					// Remove test db
-					rc = remove( m_dbName.c_str() );
+					rc = remove( dbName.c_str() );
 					if( rc ) {
 						m_errorStream << "SQLite3 message, can't remove old database: " << sqlite3_errmsg(m_connection) << std::endl;
 						ok = false;
@@ -2683,7 +2575,7 @@ SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, bool writeOutput
 
 		if( ok ) {
 			// Now open the output db for the duration of the simulation
-			rc = sqlite3_open_v2(m_dbName.c_str(), &m_connection, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
+			rc = sqlite3_open_v2(dbName.c_str(), &m_connection, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
 			// std::shared_ptr db(m_connection, sqlite3_close);
 			// m_db = db;
 			m_db = std::shared_ptr<sqlite3>(m_connection, sqlite3_close);

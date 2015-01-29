@@ -23,7 +23,7 @@ class SQLiteProcedures
 {
 protected:
 	SQLiteProcedures( std::ostream & errorStream, std::shared_ptr<sqlite3> & db );
-	SQLiteProcedures( std::ostream & errorStream, bool writeOutputToSQLite, std::string const & dbName );
+	SQLiteProcedures( std::ostream & errorStream, bool writeOutputToSQLite, std::string const & dbName, std::string const & errorFileName );
 
 	int sqliteExecuteCommand(const std::string & commandBuffer);
 	int sqlitePrepareStatement(sqlite3_stmt* & stmt, const std::string & stmtBuffer);
@@ -47,7 +47,6 @@ protected:
 	std::ostream & m_errorStream;
 	sqlite3 * m_connection;
 	std::shared_ptr<sqlite3> m_db;
-	std::string m_dbName;
 };
 
 class SQLite : SQLiteProcedures {
@@ -77,7 +76,7 @@ public:
 
 	// Open the DB and prepare for writing data
 	// Create all of the tables on construction
-	SQLite( std::ostream & errorStream, bool writeOutputToSQLite = false, bool writeTabularDataToSQLite = false, std::string const & dbName = "eplusout.sql" );
+	SQLite( std::ostream & errorStream, std::string const & dbName, std::string const & errorFileName, bool writeOutputToSQLite = false, bool writeTabularDataToSQLite = false );
 
 	// Close database and free prepared statements
 	virtual ~SQLite();
