@@ -82,15 +82,19 @@ getAbsolutePath( std::string const& path )
 
 	std::string pathTail;
 	if ( parentPath == "." )
-		pathTail = pathChar + path;
+		pathTail = path;
 	else
-		pathTail = pathChar + path.substr(parentPath.size(), path.size() - parentPath.size());
+		pathTail = path.substr(parentPath.size(), path.size() - parentPath.size());
 
 	char *absolutePathTemp = realpath(parentPath.c_str(), NULL);
 	if (absolutePathTemp != NULL) {
 		std::string absoluteParentPath(absolutePathTemp);
 	    free(absolutePathTemp);
-		return absoluteParentPath + pathTail;
+	    if (pathTail.size() == 0)
+	    	return absoluteParentPath;
+	    else
+	    	return absoluteParentPath + pathChar + pathTail;
+
 	}
 	else {
 		DisplayString("ERROR: Could not resolve path for " + path + ".");
