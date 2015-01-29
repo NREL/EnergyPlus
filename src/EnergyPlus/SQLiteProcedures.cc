@@ -2004,14 +2004,14 @@ void SQLite::createZoneExtendedOutput()
 		for(auto const & schedule : schedules) {
 			schedule->insertIntoSQLite( m_scheduleInsertStmt );
 		}
-		for(auto const & surface : surfaces) {
-			surface->insertIntoSQLite( m_surfaceInsertStmt );
-		}
 		for(auto const & material : materials) {
 			material->insertIntoSQLite( m_materialInsertStmt );
 		}
 		for(auto const & construction : constructions) {
 			construction->insertIntoSQLite( m_constructionInsertStmt, m_constructionLayerInsertStmt );
+		}
+		for(auto const & surface : surfaces) {
+			surface->insertIntoSQLite( m_surfaceInsertStmt );
 		}
 		for(auto const & nominalLighting : nominalLightings) {
 			nominalLighting->insertIntoSQLite( m_nominalLightingInsertStmt );

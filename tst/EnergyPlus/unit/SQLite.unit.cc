@@ -503,43 +503,459 @@ namespace EnergyPlus {
 		// 	Real64 const zCoord
 		// );
 
-		auto zone = std::unique_ptr<DataHeatBalance::ZoneData>(new DataHeatBalance::ZoneData());
+		auto const & zone = std::unique_ptr<DataHeatBalance::ZoneData>(new DataHeatBalance::ZoneData());
 		zone->Name = "DAYLIT ZONE";
-		// zone->Centroid.x = 2.5;
-		// zone->Centroid.y = 9.92;
-		// zone->Centroid.z = 1.50;
-		// zone->MaximumX = 5;
-		// zone->MaximumY = 20;
-		// zone->MaximumZ = 3;
-		// zone->CeilingHeight = 3;
-		// zone->Volume = 302;
-		// zone->FloorArea = 100;
-		// zone->ExtGrossWallArea = 150;
-		// zone->ExtNetWallArea = 144.6;
-		// zone->ExtWindowArea = 5.4;
+		zone->CeilingHeight = 3;
+		zone->Volume = 302;
 
-		// std::map<int, DataHeatBalance::ZoneData> zones;
-		// zones.insert(std::map<int, DataHeatBalance::ZoneData>::value_type(1, *zone));
+		FArray1D< Real64 > XValue( { 50.1, 51.3 } );
+		FArray1D< Real64 > YValue( { 50.1, 52.1 } );
+		FArray2D< Real64 > IllumValue( 2, 2, { 1, 2, 3, 4 } );
 
 		sqlite_test->sqliteBegin();
-		// createSQLiteZoneTable( zones );
+		sqlite_test->addZoneData( 1, *zone );
+		sqlite_test->createZoneExtendedOutput();
 		sqlite_test->createSQLiteDaylightMapTitle( 1, "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", 1, "RefPt1=(2.50:2.00:0.80)", "RefPt2=(2.50:18.00:0.80)", 0.8 );
-		sqlite_test->addSQLiteComponentSizingRecord( "Coil:Heating:Electric", "CORE_BOTTOM VAV BOX REHEAT COIL", "Design Size Nominal Capacity", 38689.18 );
-		auto result = queryResult("SELECT * FROM ComponentSizes;", "ComponentSizes");
+		sqlite_test->createSQLiteDaylightMap( 1, 7 , 21, 5, XValue.size(), XValue, YValue.size(), YValue, IllumValue );
+
+		auto zones = queryResult("SELECT * FROM Zones;", "Zones");
+		auto daylightMaps = queryResult("SELECT * FROM DaylightMaps;", "DaylightMaps");
+		auto daylightMapHourlyData = queryResult("SELECT * FROM DaylightMapHourlyData;", "DaylightMapHourlyData");
+		auto daylightMapHourlyReports = queryResult("SELECT * FROM DaylightMapHourlyReports;", "DaylightMapHourlyReports");
 		sqlite_test->sqliteCommit();
 
+		ASSERT_EQ(1, zones.size());
+		std::vector<std::string> zone0 { "1", "DAYLIT ZONE", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "1", "1.0", "1.0", "0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "3.0", "302.0", "1", "1", "0.0", "0.0", "0.0", "0.0", "1" };
+		EXPECT_EQ(zone0, zones[0]);
+
+		ASSERT_EQ(1, daylightMaps.size());
+		std::vector<std::string> daylightMap0 { "1", "DAYLIT ZONE:CHICAGO", "CHICAGO ANN CLG", "1", "RefPt1=(2.50:2.00:0.80)", "RefPt2=(2.50:18.00:0.80)", "0.8" };
+		EXPECT_EQ(daylightMap0, daylightMaps[0]);
+
+		ASSERT_EQ(1, daylightMapHourlyReports.size());
+		std::vector<std::string> daylightMapHourlyReport0 { "1", "1", "7", "21", "5" };
+		EXPECT_EQ(daylightMapHourlyReport0, daylightMapHourlyReports[0]);
+
+		ASSERT_EQ(4, daylightMapHourlyData.size());
+		std::vector<std::string> daylightMapHourlyData0 { "1", "1", "50.1", "50.1", "1.0" };
+		std::vector<std::string> daylightMapHourlyData1 { "2", "1", "51.3", "50.1", "2.0" };
+		std::vector<std::string> daylightMapHourlyData2 { "3", "1", "50.1", "52.1", "3.0" };
+		std::vector<std::string> daylightMapHourlyData3 { "4", "1", "51.3", "52.1", "4.0" };
+		EXPECT_EQ(daylightMapHourlyData0, daylightMapHourlyData[0]);
+		EXPECT_EQ(daylightMapHourlyData1, daylightMapHourlyData[1]);
+		EXPECT_EQ(daylightMapHourlyData2, daylightMapHourlyData[2]);
+		EXPECT_EQ(daylightMapHourlyData3, daylightMapHourlyData[3]);
+
+		sqlite_test->sqliteBegin();
+		// this should fail due to missing foreign key
+		sqlite_test->createSQLiteDaylightMapTitle( 2, "test", "test", 2, "test", "test", 0.8 );
+		// this should fail due to duplicate primary key
+		sqlite_test->createSQLiteDaylightMapTitle( 1, "test", "test", 1, "test", "test", 0.8 );
+		// this should fail due to missing foreign key
+		sqlite_test->createSQLiteDaylightMap( 2, 7 , 21, 5, XValue.size(), XValue, YValue.size(), YValue, IllumValue );
+		daylightMaps = queryResult("SELECT * FROM DaylightMaps;", "DaylightMaps");
+		daylightMapHourlyData = queryResult("SELECT * FROM DaylightMapHourlyData;", "DaylightMapHourlyData");
+		daylightMapHourlyReports = queryResult("SELECT * FROM DaylightMapHourlyReports;", "DaylightMapHourlyReports");
+		sqlite_test->sqliteCommit();
+
+		ASSERT_EQ(1, daylightMaps.size());
+		ASSERT_EQ(1, daylightMapHourlyReports.size());
+		ASSERT_EQ(4, daylightMapHourlyData.size());
 	}
 
 	TEST_F( SQLiteFixture, createZoneExtendedOutput ) {
 		// void createZoneExtendedOutput();
 
+		auto const & zoneData0 = std::unique_ptr<DataHeatBalance::ZoneData>(new DataHeatBalance::ZoneData());
+		zoneData0->Name = "test zone 1";
+		zoneData0->CeilingHeight = 1;
+		zoneData0->Volume = 1;
+		auto const & zoneData1 = std::unique_ptr<DataHeatBalance::ZoneData>(new DataHeatBalance::ZoneData());
+		zoneData1->Name = "test zone 2";
+		zoneData1->RelNorth = 2;
+		zoneData1->OriginX = 2;
+		zoneData1->OriginY = 2;
+		zoneData1->OriginZ = 2;
+		zoneData1->Centroid.x = 2;
+		zoneData1->Centroid.y = 2;
+		zoneData1->Centroid.z = 2;
+		zoneData1->OfType = 2;
+		zoneData1->Multiplier = 2;
+		zoneData1->ListMultiplier = 2;
+		zoneData1->MinimumX = 2;
+		zoneData1->MaximumX = 2;
+		zoneData1->MinimumY = 2;
+		zoneData1->MaximumY = 2;
+		zoneData1->MinimumZ = 2;
+		zoneData1->MaximumZ = 2;
+		zoneData1->CeilingHeight = 2;
+		zoneData1->Volume = 2;
+		zoneData1->InsideConvectionAlgo = 2;
+		zoneData1->OutsideConvectionAlgo = 2;
+		zoneData1->FloorArea = 2;
+		zoneData1->ExtGrossWallArea = 2;
+		zoneData1->ExtNetWallArea = 2;
+		zoneData1->ExtWindowArea = 2;
+		zoneData1->isPartOfTotalArea = false;
+
+		auto const & materialData0 = std::unique_ptr<DataHeatBalance::MaterialProperties>(new DataHeatBalance::MaterialProperties());
+		materialData0->Name = "test material 1";
+		materialData0->Group = 1;
+		auto const & materialData1 = std::unique_ptr<DataHeatBalance::MaterialProperties>(new DataHeatBalance::MaterialProperties());
+		materialData1->Name = "test material 2";
+		materialData1->Group = 2;
+		materialData1->Roughness = 2;
+		materialData1->Conductivity = 2;
+		materialData1->Density = 2;
+		materialData1->IsoMoistCap = 2;
+		materialData1->Porosity = 2;
+		materialData1->Resistance = 2;
+		materialData1->ROnly = true;
+		materialData1->SpecHeat = 2;
+		materialData1->ThermGradCoef = 2;
+		materialData1->Thickness = 2;
+		materialData1->VaporDiffus  = 2;
+
+		auto const & constructData0 = std::unique_ptr<DataHeatBalance::ConstructionData>(new DataHeatBalance::ConstructionData());
+		constructData0->Name = "test construction 1";
+		auto const & constructData1 = std::unique_ptr<DataHeatBalance::ConstructionData>(new DataHeatBalance::ConstructionData());
+		constructData1->Name = "test construction 2";
+		constructData1->TotLayers = 2;
+		constructData1->TotSolidLayers = 2;
+		constructData1->TotGlassLayers = 2;
+		constructData1->InsideAbsorpVis = 2;
+		constructData1->OutsideAbsorpVis = 2;
+		constructData1->InsideAbsorpSolar = 2;
+		constructData1->OutsideAbsorpSolar = 2;
+		constructData1->InsideAbsorpThermal = 2;
+		constructData1->OutsideAbsorpThermal = 2;
+		constructData1->OutsideRoughness = 2;
+		constructData1->TypeIsWindow = true;
+		constructData1->LayerPoint[ 1 ] = 1;
+		constructData1->LayerPoint[ 2 ] = 2;
+
+		auto const & surfaceData0 = std::unique_ptr<DataSurfaces::SurfaceData>(new DataSurfaces::SurfaceData());
+		surfaceData0->Name = "test surface 1";
+		auto const & surfaceData1 = std::unique_ptr<DataSurfaces::SurfaceData>(new DataSurfaces::SurfaceData());
+		surfaceData1->Name = "test surface 2";
+		surfaceData1->Construction = 2;
+		surfaceData1->Area = 2;
+		surfaceData1->GrossArea = 2;
+		surfaceData1->Perimeter = 2;
+		surfaceData1->Azimuth = 2;
+		surfaceData1->Height = 2;
+		surfaceData1->Reveal = 2;
+		surfaceData1->Shape = 2;
+		surfaceData1->Sides = 2;
+		surfaceData1->Tilt = 2;
+		surfaceData1->Width = 2;
+		surfaceData1->HeatTransSurf = true;
+		surfaceData1->BaseSurf = 1;
+		surfaceData1->Zone = 1;
+		surfaceData1->ExtBoundCond = 2;
+		surfaceData1->ExtSolar = true;
+		surfaceData1->ExtWind = true;
+
+		auto const & lightingData0 = std::unique_ptr<DataHeatBalance::LightsData>(new DataHeatBalance::LightsData());
+		lightingData0->Name = "test lighting 1";
+		auto const & lightingData1 = std::unique_ptr<DataHeatBalance::LightsData>(new DataHeatBalance::LightsData());
+		lightingData1->Name = "test lighting 2";
+		lightingData1->ZonePtr = 1;
+		lightingData1->SchedPtr = 1;
+		lightingData1->DesignLevel = 2;
+		lightingData1->FractionReturnAir = 2;
+		lightingData1->FractionRadiant = 2;
+		lightingData1->FractionShortWave = 2;
+		lightingData1->FractionReplaceable = 2;
+		lightingData1->FractionConvected = 2;
+		lightingData1->EndUseSubcategory = "test";
+
+		auto const & peopleData0 = std::unique_ptr<DataHeatBalance::PeopleData>(new DataHeatBalance::PeopleData());
+		peopleData0->Name = "test people 1";
+		auto const & peopleData1 = std::unique_ptr<DataHeatBalance::PeopleData>(new DataHeatBalance::PeopleData());
+		peopleData1->Name = "test people 2";
+		peopleData1->ZonePtr = 1;
+		peopleData1->NumberOfPeople = 2;
+		peopleData1->NumberOfPeoplePtr = 1;
+		peopleData1->ActivityLevelPtr = 1;
+		peopleData1->FractionRadiant = 2;
+		peopleData1->FractionConvected = 2;
+		peopleData1->WorkEffPtr = 1;
+		peopleData1->ClothingPtr = 1;
+		peopleData1->AirVelocityPtr = 1;
+		peopleData1->Fanger = true;
+		peopleData1->Pierce = true;
+		peopleData1->KSU = true;
+		peopleData1->MRTCalcType = 2;
+		peopleData1->SurfacePtr = 1;
+		peopleData1->AngleFactorListName = "test";
+		peopleData1->AngleFactorListPtr = 1;
+		peopleData1->UserSpecSensFrac = 2;
+		peopleData1->Show55Warning = true;
+
+		auto const & elecEquipData0 = std::unique_ptr<DataHeatBalance::ZoneEquipData>(new DataHeatBalance::ZoneEquipData());
+		elecEquipData0->Name = "test elecEquip 1";
+		auto const & elecEquipData1 = std::unique_ptr<DataHeatBalance::ZoneEquipData>(new DataHeatBalance::ZoneEquipData());
+		elecEquipData1->Name = "test elecEquip 2";
+		elecEquipData1->ZonePtr = 1;
+		elecEquipData1->SchedPtr = 1;
+		elecEquipData1->DesignLevel = 2;
+		elecEquipData1->FractionLatent = 2;
+		elecEquipData1->FractionRadiant = 2;
+		elecEquipData1->FractionLost = 2;
+		elecEquipData1->FractionConvected = 2;
+		elecEquipData1->EndUseSubcategory = "test";
+
+		auto const & gasEquipData0 = std::unique_ptr<DataHeatBalance::ZoneEquipData>(new DataHeatBalance::ZoneEquipData());
+		gasEquipData0->Name = "test gasEquip 1";
+		auto const & gasEquipData1 = std::unique_ptr<DataHeatBalance::ZoneEquipData>(new DataHeatBalance::ZoneEquipData());
+		gasEquipData1->Name = "test gasEquip 2";
+		gasEquipData1->ZonePtr = 1;
+		gasEquipData1->SchedPtr = 1;
+		gasEquipData1->DesignLevel = 2;
+		gasEquipData1->FractionLatent = 2;
+		gasEquipData1->FractionRadiant = 2;
+		gasEquipData1->FractionLost = 2;
+		gasEquipData1->FractionConvected = 2;
+		gasEquipData1->EndUseSubcategory = "test";
+
+		auto const & steamEquipData0 = std::unique_ptr<DataHeatBalance::ZoneEquipData>(new DataHeatBalance::ZoneEquipData());
+		steamEquipData0->Name = "test steamEquip 1";
+		auto const & steamEquipData1 = std::unique_ptr<DataHeatBalance::ZoneEquipData>(new DataHeatBalance::ZoneEquipData());
+		steamEquipData1->Name = "test steamEquip 2";
+		steamEquipData1->ZonePtr = 1;
+		steamEquipData1->SchedPtr = 1;
+		steamEquipData1->DesignLevel = 2;
+		steamEquipData1->FractionLatent = 2;
+		steamEquipData1->FractionRadiant = 2;
+		steamEquipData1->FractionLost = 2;
+		steamEquipData1->FractionConvected = 2;
+		steamEquipData1->EndUseSubcategory = "test";
+
+		auto const & hwEquipData0 = std::unique_ptr<DataHeatBalance::ZoneEquipData>(new DataHeatBalance::ZoneEquipData());
+		hwEquipData0->Name = "test hwEquip 1";
+		auto const & hwEquipData1 = std::unique_ptr<DataHeatBalance::ZoneEquipData>(new DataHeatBalance::ZoneEquipData());
+		hwEquipData1->Name = "test hwEquip 2";
+		hwEquipData1->ZonePtr = 1;
+		hwEquipData1->SchedPtr = 1;
+		hwEquipData1->DesignLevel = 2;
+		hwEquipData1->FractionLatent = 2;
+		hwEquipData1->FractionRadiant = 2;
+		hwEquipData1->FractionLost = 2;
+		hwEquipData1->FractionConvected = 2;
+		hwEquipData1->EndUseSubcategory = "test";
+
+		auto const & otherEquipData0 = std::unique_ptr<DataHeatBalance::ZoneEquipData>(new DataHeatBalance::ZoneEquipData());
+		otherEquipData0->Name = "test otherEquip 1";
+		auto const & otherEquipData1 = std::unique_ptr<DataHeatBalance::ZoneEquipData>(new DataHeatBalance::ZoneEquipData());
+		otherEquipData1->Name = "test otherEquip 2";
+		otherEquipData1->ZonePtr = 1;
+		otherEquipData1->SchedPtr = 1;
+		otherEquipData1->DesignLevel = 2;
+		otherEquipData1->FractionLatent = 2;
+		otherEquipData1->FractionRadiant = 2;
+		otherEquipData1->FractionLost = 2;
+		otherEquipData1->FractionConvected = 2;
+		otherEquipData1->EndUseSubcategory = "test";
+
+		auto const & baseboardData0 = std::unique_ptr<DataHeatBalance::BBHeatData>(new DataHeatBalance::BBHeatData());
+		baseboardData0->Name = "test baseboard 1";
+		auto const & baseboardData1 = std::unique_ptr<DataHeatBalance::BBHeatData>(new DataHeatBalance::BBHeatData());
+		baseboardData1->Name = "test baseboard 2";
+		baseboardData1->ZonePtr = 1;
+		baseboardData1->SchedPtr = 1;
+		baseboardData1->CapatLowTemperature = 2;
+		baseboardData1->LowTemperature = 2;
+		baseboardData1->CapatHighTemperature = 2;
+		baseboardData1->HighTemperature = 2;
+		baseboardData1->FractionRadiant = 2;
+		baseboardData1->FractionConvected = 2;
+		baseboardData1->EndUseSubcategory = "test";
+
+		auto const & infiltrationData0 = std::unique_ptr<DataHeatBalance::InfiltrationData>(new DataHeatBalance::InfiltrationData());
+		infiltrationData0->Name = "test infiltration 1";
+		auto const & infiltrationData1 = std::unique_ptr<DataHeatBalance::InfiltrationData>(new DataHeatBalance::InfiltrationData());
+		infiltrationData1->Name = "test infiltration 2";
+		infiltrationData1->ZonePtr = 1;
+		infiltrationData1->SchedPtr = 1;
+		infiltrationData1->DesignLevel = 2;
+
+		auto const & ventilationData0 = std::unique_ptr<DataHeatBalance::VentilationData>(new DataHeatBalance::VentilationData());
+		ventilationData0->Name = "test ventilation 1";
+		auto const & ventilationData1 = std::unique_ptr<DataHeatBalance::VentilationData>(new DataHeatBalance::VentilationData());
+		ventilationData1->Name = "test ventilation 2";
+		ventilationData1->ZonePtr = 1;
+		ventilationData1->SchedPtr = 1;
+		ventilationData1->DesignLevel = 2;
+
+		auto const & roomAirModelData0 = std::unique_ptr<DataRoomAirModel::AirModelData>(new DataRoomAirModel::AirModelData());
+		roomAirModelData0->AirModelName = "test roomAirModel 1";
+		auto const & roomAirModelData1 = std::unique_ptr<DataRoomAirModel::AirModelData>(new DataRoomAirModel::AirModelData());
+		roomAirModelData1->AirModelName = "test roomAirModel 2";
+		roomAirModelData1->AirModelType = 3;
+		roomAirModelData1->TempCoupleScheme = 3;
+		roomAirModelData1->SimAirModel = true;
+
 		sqlite_test->sqliteBegin();
+		sqlite_test->addScheduleData( 1, "always on", "ON/OFF", 1, 1 );
+		sqlite_test->addScheduleData( 2, "always off", "ON/OFF", 0, 0 );
+		sqlite_test->addZoneData( 1, *zoneData0 );
+		sqlite_test->addZoneData( 2, *zoneData1 );
+		sqlite_test->addMaterialData( 1, *materialData0 );
+		sqlite_test->addMaterialData( 2, *materialData1 );
+		sqlite_test->addConstructionData( 1, *constructData0, 0.0 );
+		sqlite_test->addConstructionData( 2, *constructData1, 2.0 );
+		sqlite_test->addSurfaceData( 1, *surfaceData0, "Window" );
+		sqlite_test->addSurfaceData( 2, *surfaceData1, "Wall" );
+		sqlite_test->addNominalLightingData( 1, *lightingData0 );
+		sqlite_test->addNominalLightingData( 2, *lightingData1 );
+		sqlite_test->addNominalPeopleData( 1, *peopleData0 );
+		sqlite_test->addNominalPeopleData( 2, *peopleData1 );
+		sqlite_test->addNominalElectricEquipmentData( 1, *elecEquipData0 );
+		sqlite_test->addNominalElectricEquipmentData( 2, *elecEquipData1 );
+		sqlite_test->addNominalGasEquipmentData( 1, *gasEquipData0 );
+		sqlite_test->addNominalGasEquipmentData( 2, *gasEquipData1 );
+		sqlite_test->addNominalSteamEquipmentData( 1, *steamEquipData0 );
+		sqlite_test->addNominalSteamEquipmentData( 2, *steamEquipData1 );
+		sqlite_test->addNominalHotWaterEquipmentData( 1, *hwEquipData0 );
+		sqlite_test->addNominalHotWaterEquipmentData( 2, *hwEquipData1 );
+		sqlite_test->addNominalOtherEquipmentData( 1, *otherEquipData0 );
+		sqlite_test->addNominalOtherEquipmentData( 2, *otherEquipData1 );
+		sqlite_test->addNominalBaseboardData( 1, *baseboardData0 );
+		sqlite_test->addNominalBaseboardData( 2, *baseboardData1 );
+		sqlite_test->addInfiltrationData( 1, *infiltrationData0 );
+		sqlite_test->addInfiltrationData( 2, *infiltrationData1 );
+		sqlite_test->addVentilationData( 1, *ventilationData0 );
+		sqlite_test->addVentilationData( 2, *ventilationData1 );
+		sqlite_test->addRoomAirModelData( 1, *roomAirModelData0 );
+		sqlite_test->addRoomAirModelData( 2, *roomAirModelData1 );
+
+		// TODO: finish these last two. ZoneList needs implementation first
+		// sqlite_test->addZoneGroupData( number, DataHeatBalance::ZoneGroupData zoneGroupData );
+		// sqlite_test->addZoneListData( number, DataHeatBalance::ZoneListData zoneListData );
+
 		sqlite_test->createZoneExtendedOutput();
 		auto zones = queryResult("SELECT * FROM Zones;", "Zones");
+		auto schedules = queryResult("SELECT * FROM Schedules;", "Schedules");
+		auto surfaces = queryResult("SELECT * FROM Surfaces;", "Surfaces");
+		auto materials = queryResult("SELECT * FROM Materials;", "Materials");
+		auto constructions = queryResult("SELECT * FROM Constructions;", "Constructions");
+		auto constructionLayers = queryResult("SELECT * FROM ConstructionLayers;", "ConstructionLayers");
+		auto lightings = queryResult("SELECT * FROM NominalLighting;", "NominalLighting");
+		auto peoples = queryResult("SELECT * FROM NominalPeople;", "NominalPeople");
+		auto elecEquips = queryResult("SELECT * FROM NominalElectricEquipment;", "NominalElectricEquipment");
+		auto gasEquips = queryResult("SELECT * FROM NominalGasEquipment;", "NominalGasEquipment");
+		auto steamEquips = queryResult("SELECT * FROM NominalSteamEquipment;", "NominalSteamEquipment");
+		auto hwEquips = queryResult("SELECT * FROM NominalHotWaterEquipment;", "NominalHotWaterEquipment");
+		auto otherEquips = queryResult("SELECT * FROM NominalOtherEquipment;", "NominalOtherEquipment");
+		auto baseboards = queryResult("SELECT * FROM NominalBaseboardHeaters;", "NominalBaseboardHeaters");
+		auto infiltrations = queryResult("SELECT * FROM NominalInfiltration;", "NominalInfiltration");
+		auto ventilations = queryResult("SELECT * FROM NominalVentilation;", "NominalVentilation");
+		auto roomAirModels = queryResult("SELECT * FROM RoomAirModels;", "RoomAirModels");
 		sqlite_test->sqliteCommit();
 
-		ASSERT_EQ(0, zones.size());
-		std::vector<std::string> testResult0 {"1", };
+		ASSERT_EQ(2, zones.size());
+		std::vector<std::string> zone0 { "1","test zone 1","0.0","0.0","0.0","0.0","0.0","0.0","0.0","1","1.0","1.0","0.0","0.0","0.0","0.0","0.0","0.0","1.0","1.0","1","1","0.0","0.0","0.0","0.0","1" };
+		std::vector<std::string> zone1 { "2","test zone 2","2.0","2.0","2.0","2.0","2.0","2.0","2.0","2","2.0","2.0","2.0","2.0","2.0","2.0","2.0","2.0","2.0","2.0","2","2","2.0","2.0","2.0","2.0","0" };
+		EXPECT_EQ(zone0, zones[0]);
+		EXPECT_EQ(zone1, zones[1]);
+
+		ASSERT_EQ(2, schedules.size());
+		std::vector<std::string> schedule0 { "1","always on","ON/OFF","1.0","1.0" };
+		std::vector<std::string> schedule1 { "2","always off","ON/OFF","0.0","0.0" };
+		EXPECT_EQ(schedule0, schedules[0]);
+		EXPECT_EQ(schedule1, schedules[1]);
+
+		ASSERT_EQ(2, materials.size());
+		std::vector<std::string> material0 { "1","test material 1","1","0","0.0","0.0","0.0","0.0","0.0","0","0.0","0.0","0.0","0.0" };
+		std::vector<std::string> material1 { "2","test material 2","2","2","2.0","2.0","2.0","2.0","2.0","1","2.0","2.0","2.0","2.0" };
+		EXPECT_EQ(material0, materials[0]);
+		EXPECT_EQ(material1, materials[1]);
+
+		ASSERT_EQ(2, constructions.size());
+		std::vector<std::string> construction0 { "1","test construction 1","0","0","0","0.0","0.0","0.0","0.0","0.0","0.0","0","0","0.0" };
+		std::vector<std::string> construction1 { "2","test construction 2","2","2","2","2.0","2.0","2.0","2.0","2.0","2.0","2","1","2.0" };
+		EXPECT_EQ(construction0, constructions[0]);
+		EXPECT_EQ(construction1, constructions[1]);
+
+		// TODO: for some reason this assert is failing... might be bad code.
+		// ASSERT_EQ(2, constructionLayers.size());
+		// std::vector<std::string> constructionLayer0 { "1","","","","" };
+		// std::vector<std::string> constructionLayer1 { "2","","","","" };
+		// EXPECT_EQ(constructionLayer0, constructionLayers[0]);
+		// EXPECT_EQ(constructionLayer1, constructionLayers[1]);
+
+		ASSERT_EQ(2, surfaces.size());
+		std::vector<std::string> surface0 { "1","test surface 1","","Window","0.0","0.0","0.0","0.0","0.0","0.0","0","0","0.0","0.0","0","","","0","0","0" };
+		std::vector<std::string> surface1 { "2","test surface 2","2","Wall","2.0","2.0","2.0","2.0","2.0","2.0","2","2","2.0","2.0","1","1","1","2","1","1" };
+		EXPECT_EQ(surface0, surfaces[0]);
+		EXPECT_EQ(surface1, surfaces[1]);
+
+		ASSERT_EQ(2, lightings.size());
+		std::vector<std::string> lighting0 { "1","test lighting 1","","","0.0","0.0","0.0","0.0","0.0","0.0","" };
+		std::vector<std::string> lighting1 { "2","test lighting 2","1","1","2.0","2.0","2.0","2.0","2.0","2.0","test" };
+		EXPECT_EQ(lighting0, lightings[0]);
+		EXPECT_EQ(lighting1, lightings[1]);
+
+		ASSERT_EQ(2, peoples.size());
+		std::vector<std::string> people0 { "1","test people 1","","0","","","0.0","0.0","","","","0","0","0","0","","","-1","0.0","0" };
+		std::vector<std::string> people1 { "2","test people 2","1","2","1","1","2.0","2.0","1","1","1","1","1","1","2","1","test","1","2.0","1" };
+		EXPECT_EQ(people0, peoples[0]);
+		EXPECT_EQ(people1, peoples[1]);
+
+		ASSERT_EQ(2, elecEquips.size());
+		std::vector<std::string> elecEquip0 { "1","test elecEquip 1","","","0.0","0.0","0.0","0.0","0.0","" };
+		std::vector<std::string> elecEquip1 { "2","test elecEquip 2","1","1","2.0","2.0","2.0","2.0","2.0","test" };
+		EXPECT_EQ(elecEquip0, elecEquips[0]);
+		EXPECT_EQ(elecEquip1, elecEquips[1]);
+
+		ASSERT_EQ(2, gasEquips.size());
+		std::vector<std::string> gasEquip0 { "1","test gasEquip 1","","","0.0","0.0","0.0","0.0","0.0","" };
+		std::vector<std::string> gasEquip1 { "2","test gasEquip 2","1","1","2.0","2.0","2.0","2.0","2.0","test" };
+		EXPECT_EQ(gasEquip0, gasEquips[0]);
+		EXPECT_EQ(gasEquip1, gasEquips[1]);
+
+		ASSERT_EQ(2, steamEquips.size());
+		std::vector<std::string> steamEquip0 { "1","test steamEquip 1","","","0.0","0.0","0.0","0.0","0.0","" };
+		std::vector<std::string> steamEquip1 { "2","test steamEquip 2","1","1","2.0","2.0","2.0","2.0","2.0","test" };
+		EXPECT_EQ(steamEquip0, steamEquips[0]);
+		EXPECT_EQ(steamEquip1, steamEquips[1]);
+
+		ASSERT_EQ(2, hwEquips.size());
+		std::vector<std::string> hwEquip0 { "1","test hwEquip 1","","","0.0","0.0","0.0","0.0","0.0","" };
+		std::vector<std::string> hwEquip1 { "2","test hwEquip 2","1","1","2.0","2.0","2.0","2.0","2.0","test" };
+		EXPECT_EQ(hwEquip0, hwEquips[0]);
+		EXPECT_EQ(hwEquip1, hwEquips[1]);
+
+		ASSERT_EQ(2, otherEquips.size());
+		std::vector<std::string> otherEquip0 { "1","test otherEquip 1","","","0.0","0.0","0.0","0.0","0.0","" };
+		std::vector<std::string> otherEquip1 { "2","test otherEquip 2","1","1","2.0","2.0","2.0","2.0","2.0","test" };
+		EXPECT_EQ(otherEquip0, otherEquips[0]);
+		EXPECT_EQ(otherEquip1, otherEquips[1]);
+
+		ASSERT_EQ(2, baseboards.size());
+		std::vector<std::string> baseboard0 { "1","test baseboard 1","","","0.0","0.0","0.0","0.0","0.0","0.0","" };
+		std::vector<std::string> baseboard1 { "2","test baseboard 2","1","1","2.0","2.0","2.0","2.0","2.0","2.0","test" };
+		EXPECT_EQ(baseboard0, baseboards[0]);
+		EXPECT_EQ(baseboard1, baseboards[1]);
+
+		ASSERT_EQ(2, infiltrations.size());
+		std::vector<std::string> infiltration0 { "1","test infiltration 1","","","0.0" };
+		std::vector<std::string> infiltration1 { "2","test infiltration 2","1","1","2.0" };
+		EXPECT_EQ(infiltration0, infiltrations[0]);
+		EXPECT_EQ(infiltration1, infiltrations[1]);
+
+		ASSERT_EQ(2, ventilations.size());
+		std::vector<std::string> ventilation0 { "1","test ventilation 1","","","0.0" };
+		std::vector<std::string> ventilation1 { "2","test ventilation 2","1","1","2.0" };
+		EXPECT_EQ(ventilation0, ventilations[0]);
+		EXPECT_EQ(ventilation1, ventilations[1]);
+
+		ASSERT_EQ(2, roomAirModels.size());
+		std::vector<std::string> roomAirModel0 { "1","test roomAirModel 1","2","1","0" };
+		std::vector<std::string> roomAirModel1 { "2","test roomAirModel 2","3","3","1" };
+		EXPECT_EQ(roomAirModel0, roomAirModels[0]);
+		EXPECT_EQ(roomAirModel1, roomAirModels[1]);
 	}
 
 	TEST_F( SQLiteFixture, createSQLiteTabularDataRecords ) {
@@ -554,7 +970,9 @@ namespace EnergyPlus {
 
 		sqlite_test->sqliteBegin();
 		// sqlite_test->createSQLiteTabularDataRecords();
-		// auto result = queryResult("SELECT * FROM TabularData;", "TabularData");
+		// auto tabularData = queryResult("SELECT * FROM TabularData;", "TabularData");
+		// auto strings = queryResult("SELECT * FROM Strings;", "Strings");
+		// auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
 		sqlite_test->sqliteCommit();
 	}
 }
