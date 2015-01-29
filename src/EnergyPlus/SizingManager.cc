@@ -8,6 +8,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <SizingManager.hh>
 #include <CostEstimateManager.hh>
 #include <DataEnvironment.hh>
@@ -221,19 +222,19 @@ namespace SizingManager {
 			Available = true;
 			OutputFileZoneSizing = GetNewUnitNumber();
 			if ( SizingFileColSep == CharComma ) {
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileZoneSizing, "epluszsz.csv", flags ); write_stat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileZoneSizing, DataStringGlobals::outputZszCsvFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file \"epluszsz.csv\" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+ DataStringGlobals::outputZszCsvFileName +" for output (write)." );
 				}
 			} else if ( SizingFileColSep == CharTab ) {
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileZoneSizing, "epluszsz.tab", flags ); write_stat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileZoneSizing, DataStringGlobals::outputZszTabFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file \"epluszsz.tab\" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+DataStringGlobals::outputZszTabFileName+" for output (write)." );
 				}
 			} else {
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileZoneSizing, "epluszsz.txt", flags ); write_stat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileZoneSizing, DataStringGlobals::outputZszTxtFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file \"epluszsz.txt\" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+ DataStringGlobals::outputZszTxtFileName +" for output (write)." );
 				}
 			}
 
@@ -433,19 +434,19 @@ namespace SizingManager {
 			Available = true;
 			OutputFileSysSizing = GetNewUnitNumber();
 			if ( SizingFileColSep == CharComma ) {
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileSysSizing, "eplusssz.csv", flags ); write_stat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileSysSizing, DataStringGlobals::outputSszCsvFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file \"eplusssz.csv\" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+ DataStringGlobals::outputSszCsvFileName +" for output (write)." );
 				}
 			} else if ( SizingFileColSep == CharTab ) {
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileSysSizing, "eplusssz.tab", flags ); write_stat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileSysSizing, DataStringGlobals::outputSszTabFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file \"eplusssz.tab\" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+ DataStringGlobals::outputSszTabFileName +" for output (write)." );
 				}
 			} else {
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileSysSizing, "eplusssz.txt", flags ); write_stat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileSysSizing, DataStringGlobals::outputSszTxtFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file \"eplusssz.txt\" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+DataStringGlobals::outputSszTxtFileName+ " for output (write)." );
 				}
 			}
 			SimAir = true;

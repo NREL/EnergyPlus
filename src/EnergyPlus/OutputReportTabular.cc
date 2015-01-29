@@ -15,6 +15,7 @@
 #include <ObjexxFCL/Time_Date.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <OutputReportTabular.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataCostEstimate.hh>
@@ -3072,9 +3073,9 @@ namespace OutputReportTabular {
 				curDel = del( iStyle );
 				if ( TableStyle( iStyle ) == tableStyleComma ) {
 					DisplayString( "Writing tabular output file results using comma format." );
-					tbl_stream.open( "eplustbl.csv" );
+					tbl_stream.open( DataStringGlobals::outputTblCsvFileName );
 					if ( ! tbl_stream ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.csv\" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblCsvFileName + "\" for output (write)." );
 					}
 					tbl_stream << "Program Version:" << curDel << VerString << '\n';
 					tbl_stream << "Tabular Output Report in Format: " << curDel << "Comma\n";
@@ -3088,9 +3089,9 @@ namespace OutputReportTabular {
 					tbl_stream << '\n';
 				} else if ( TableStyle( iStyle ) == tableStyleTab ) {
 					DisplayString( "Writing tabular output file results using tab format." );
-					tbl_stream.open( "eplustbl.tab" );
+					tbl_stream.open( DataStringGlobals::outputTblTabFileName );
 					if ( ! tbl_stream ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.tab\" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblTabFileName + "\" for output (write)." );
 					}
 					tbl_stream << "Program Version" << curDel << VerString << '\n';
 					tbl_stream << "Tabular Output Report in Format: " << curDel << "Tab\n";
@@ -3104,9 +3105,9 @@ namespace OutputReportTabular {
 					tbl_stream << '\n';
 				} else if ( TableStyle( iStyle ) == tableStyleHTML ) {
 					DisplayString( "Writing tabular output file results using HTML format." );
-					tbl_stream.open( "eplustbl.htm" );
+					tbl_stream.open( DataStringGlobals::outputTblHtmFileName );
 					if ( ! tbl_stream ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.htm\" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblHtmFileName + "\" for output (write)." );
 					}
 					tbl_stream << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/html4/loose.dtd\">\n";
 					tbl_stream << "<html>\n";
@@ -3135,9 +3136,9 @@ namespace OutputReportTabular {
 					tbl_stream << "  " << std::setw( 2 ) << td( 5 ) << ':' << std::setw( 2 ) << td( 6 ) << ':' << std::setw( 2 ) << td( 7 ) << std::setfill( ' ' ) << "</b></p>\n";
 				} else if ( TableStyle( iStyle ) == tableStyleXML ) {
 					DisplayString( "Writing tabular output file results using XML format." );
-					tbl_stream.open( "eplustbl.xml" );
+					tbl_stream.open( DataStringGlobals::outputTblXmlFileName );
 					if ( ! tbl_stream ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.xml\" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblXmlFileName + "\" for output (write)." );
 					}
 					tbl_stream << "<?xml version=\"1.0\"?>\n";
 					tbl_stream << "<EnergyPlusTabularReports>\n";
@@ -3156,9 +3157,9 @@ namespace OutputReportTabular {
 					tbl_stream << '\n';
 				} else {
 					DisplayString( "Writing tabular output file results using text format." );
-					tbl_stream.open( "eplustbl.txt" );
+					tbl_stream.open( DataStringGlobals::outputTblTxtFileName );
 					if ( ! tbl_stream ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.txt\" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblTxtFileName + "\" for output (write)." );
 					}
 					tbl_stream << "Program Version: " << VerString << '\n';
 					tbl_stream << "Tabular Output Report in Format: " << curDel << "Fixed\n";
@@ -4790,7 +4791,7 @@ namespace OutputReportTabular {
 				WriteTimeBinTables();
 			}
 		}
-		EchoInputFile = FindUnitNumber( "eplusout.audit" );
+		EchoInputFile = FindUnitNumber( DataStringGlobals::outputAuditFileName );
 		gio::write( EchoInputFile, fmtLD ) << "MonthlyInputCount=" << MonthlyInputCount;
 		gio::write( EchoInputFile, fmtLD ) << "sizeMonthlyInput=" << sizeMonthlyInput;
 		gio::write( EchoInputFile, fmtLD ) << "MonthlyFieldSetInputCount=" << MonthlyFieldSetInputCount;
@@ -4906,7 +4907,7 @@ namespace OutputReportTabular {
 		bool coolingDesignlinepassed;
 		bool desConditionlinepassed;
 
-		{ IOFlags flags; gio::inquire( "in.stat", flags ); fileExists = flags.exists(); }
+		{ IOFlags flags; gio::inquire( DataStringGlobals::inStatFileName, flags ); fileExists = flags.exists(); }
 		readStat = 0;
 		isASHRAE = false;
 		iscalc = false;
@@ -4919,9 +4920,9 @@ namespace OutputReportTabular {
 		lineTypeinterim = 0;
 		if ( fileExists ) {
 			statFile = GetNewUnitNumber();
-			{ IOFlags flags; flags.ACTION( "READ" ); gio::open( statFile, "in.stat", flags ); readStat = flags.ios(); }
+			{ IOFlags flags; flags.ACTION( "READ" ); gio::open( statFile, DataStringGlobals::inStatFileName, flags ); readStat = flags.ios(); }
 			if ( readStat != 0 ) {
-				ShowFatalError( "FillWeatherPredefinedEntries: Could not open file \"in.stat\" for input (read)." );
+				ShowFatalError( "FillWeatherPredefinedEntries: Could not open file "+DataStringGlobals::inStatFileName+" for input (read)." );
 			}
 			IOFlags flags;
 			while ( readStat == 0 ) { //end of file, or error

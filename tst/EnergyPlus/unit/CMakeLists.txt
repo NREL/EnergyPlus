@@ -19,7 +19,7 @@ set( test_src
 )
 
 set( test_dependencies
-  EnergyPlusAPI
+  energyplusapi
 #  objexx
 #  sqlite
 #  bcvtb 
@@ -37,4 +37,4 @@ endif()
 # Executable name will be EnergyPlus_tests
 # Execute EnergyPlus_tests --help for options using gtest runner
 # Execute EnergyPlus_tests with no arguments to run all tests
-CREATE_TEST_TARGETS( EnergyPlus "${test_src}" "${test_dependencies}" )
+CREATE_TEST_TARGETS( energyplus "${test_src}" "${test_dependencies}" )
