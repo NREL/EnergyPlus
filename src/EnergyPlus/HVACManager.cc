@@ -61,6 +61,7 @@
 #include <ZoneContaminantPredictorCorrector.hh>
 #include <ZoneEquipmentManager.hh>
 #include <ZoneTempPredictorCorrector.hh>
+#include <HVACSizingSimulationManager.hh>
 
 namespace EnergyPlus {
 
@@ -224,6 +225,10 @@ namespace HVACManager {
 		using ManageElectricPower::ManageElectricLoadCenters;
 		using InternalHeatGains::UpdateInternalGainValues;
 		using ZoneEquipmentManager::CalcAirFlowSimple;
+		using namespace HVACSizingSimulationManagerNamespace;
+		using DataGlobals::KindOfSim;
+		using DataGlobals::ksHVACSizeDesignDay;
+		using DataGlobals::ksHVACSizeRunPeriodDesign;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -448,6 +453,9 @@ namespace HVACManager {
 				if ( DoOutputReporting ) {
 					ReportMaxVentilationLoads();
 					UpdateDataandReport( HVACTSReporting );
+					if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ){
+						UpdateSizingLogsSystemStep();
+					}
 					UpdateTabularReports( HVACTSReporting );
 				}
 				if ( ZoneSizingCalc ) {
@@ -474,6 +482,9 @@ namespace HVACManager {
 				}
 				CalcMoreNodeInfo();
 				UpdateDataandReport( HVACTSReporting );
+				if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ){
+					UpdateSizingLogsSystemStep();
+				}
 			} else if ( UpdateDataDuringWarmupExternalInterface ) { // added for FMI
 				if ( BeginDayFlag && ! PrintEnvrnStampWarmupPrinted ) {
 					PrintEnvrnStampWarmup = true;

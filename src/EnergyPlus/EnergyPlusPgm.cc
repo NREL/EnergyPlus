@@ -236,11 +236,11 @@ EnergyPlusPgm( std::string const & filepath )
 #endif
 #endif
 
-#ifdef _WIN32
-	SetErrorMode(SEM_NOGPFAULTERRORBOX);
-	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
-	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
-#endif
+// _WIN32
+//	SetErrorMode(SEM_NOGPFAULTERRORBOX);
+//	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
+//	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
+//#endif
 
 	// Locals
 	// PROGRAM PARAMETER DEFINITIONS:

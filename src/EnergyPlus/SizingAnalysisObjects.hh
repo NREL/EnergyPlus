@@ -45,7 +45,8 @@ public:
 
 	Real64 LogDataValue		= 0.0;
 	Real64 RunningAvgDataValue = 0.0;
-	int NumSubSteps;
+	bool HasSystemSubSteps	= false;
+	int NumSubSteps = 0;
 	std::vector< systemTimestepObject > subSteps; //nested object array for system timesteps inside here.
 	
 };
@@ -73,7 +74,16 @@ public:
 		zoneTimestepObject tmpztStepStamp
 	);
 
-	void fillSysStep( zoneTimestepObject tmpztStepStamp );
+	int GetSysStepZtStepIndex(
+		zoneTimestepObject tmpztStepStamp 
+	);
+
+	void fillSysStep( 
+		zoneTimestepObject tmpztStepStamp ,
+		systemTimestepObject tmpSysStepStamp
+	 );
+
+	void AverageSysTimeSteps();
 
 	void ProcessRunningAverage( 
 		int const TimeStepsInAverage
@@ -102,7 +112,11 @@ public:
 		int const SupplySideInletNodeNum  //change to pointers for generality later
 	);
 
+	zoneTimestepObject PrepareZoneTimestepStamp ();
+
 	void UpdateSizingLogValuesZoneStep();
+
+	void UpdateSizingLogValuesSystemStep();
 
 	void IncrementSizingPeriodSet(
 		int const HVACSizingIterCount

@@ -7,6 +7,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
+#include <HVACSizingSimulationManager.hh>
 
 namespace EnergyPlus {
 

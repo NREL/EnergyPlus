@@ -98,7 +98,7 @@ namespace EnergyPlus {
 
 	void HVACSizingSimulationManager::setupSizingAnalyses(){
 	
-		for ( auto &P : this -> PlantCoincAnalyObjs ) {
+		for ( auto &P : PlantCoincAnalyObjs ) {
 			//call setup routine for each coincident plant analysis object 
 			P.LogIndex = SizingLogger.SetupVariableSizingLog( P.SupplySideInletNodeNum );
 		}
@@ -115,7 +115,8 @@ namespace EnergyPlus {
 		//first pass through coincident plant objects to check new sizes and see if more iteration needed
 		PlantCoinAnalyRequestsAnotherIteration = false;
 		for ( auto &P : PlantCoincAnalyObjs ) {
-		    SizingLogger.logObjs[ P.LogIndex ].ProcessRunningAverage( P.NumTimeStepsInAvg );
+			SizingLogger.logObjs[ P.LogIndex ].AverageSysTimeSteps();
+			SizingLogger.logObjs[ P.LogIndex ].ProcessRunningAverage( P.NumTimeStepsInAvg );
 			P.newFoundMassFlowRateTimeStamp = SizingLogger.logObjs[ P.LogIndex ].GetLogVariableDataMax( );
 			P.ResolveDesignFlowRate( HVACSizingIterCount );
 			if ( P.AnotherIterationDesired ){
@@ -362,9 +363,11 @@ namespace EnergyPlus {
 		}
 
 		void UpdateSizingLogsZoneStep (){
-		
-		//SizingLogger.
 			SizeSimManagerObj.SizingLogger.UpdateSizingLogValuesZoneStep();
+		}
+
+		void UpdateSizingLogsSystemStep() {
+			SizeSimManagerObj.SizingLogger.UpdateSizingLogValuesSystemStep();
 		}
 	}
 }

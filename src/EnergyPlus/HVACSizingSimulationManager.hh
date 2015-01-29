@@ -73,6 +73,8 @@ namespace EnergyPlus {
 
 		void UpdateSizingLogsZoneStep();
 
+		void UpdateSizingLogsSystemStep();
+
 	}
 
 }
