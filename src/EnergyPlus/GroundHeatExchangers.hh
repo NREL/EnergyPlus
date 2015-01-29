@@ -18,25 +18,24 @@ namespace GroundHeatExchangers {
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE PARAMETER DEFINITIONS
-	extern Real64 const HrsPerDay; // Number of hours in a day
-	extern Real64 const HrsPerMonth; // Number of hours in month
-	extern int const MaxTSinHr; // Max number of time step in a hour
+	extern Real64 const hrsPerDay; // Number of hours in a day
+	extern Real64 const hrsPerMonth; // Number of hours in month
+	extern int const maxTSinHr; // Max number of time step in a hour
 
 	// MODULE VARIABLE DECLARATIONS:
-	//extern int NumVerticalGLHEs;
+	//extern int numVerticalGLHEs;
 	//extern int N; // COUNTER OF TIME STEP
-	//extern Real64 CurrentSimTime; // Current simulation time in hours
-	//extern Real64 GLHEOutletTemp; // Outlet temperature of the fluid  [°C]
-	//extern Real64 GLHEInletTemp; // Inlet temperature of the fluid   [°C]
-	//extern Real64 GLHEMassFlowRate; // Mass flowrate of the fluid       [Kg/s]
+	//extern Real64 currentSimTime; // Current simulation time in hours
+	//extern Real64 outletTemp; // Outlet temperature of the fluid  [°C]
+	//extern Real64 inletTemp; // Inlet temperature of the fluid   [°C]
+	//extern Real64 massFlowRate; // Mass flowrate of the fluid       [Kg/s]
 	//extern Real64 QGLHE; // The normalized heat transfer rate[W/m]
 	////extern Real64 GLHERB; // [K per W/m] Just for Analyis will be removed later
-	//extern Real64 GLHEAveFluidTemp; // The average fluid temperature    [°C]
-	//extern Real64 GLHEBoreholeTemp; // The average borehole tempreature [°C]
+	//extern Real64 aveFluidTemp; // The average fluid temperature    [°C]
+	//extern Real64 boreholeTemp; // The average borehole tempreature [°C]
 	//extern int LocHourOfDay;
 	//extern int LocDayOfSim;
-	//extern FArray1D< Real64 > LastQnSubHr; // Previous time step Qn subhourly value
-	//extern Real64 MDotActual;
+	//extern Real64 mdotActual;
 
 	//extern FArray1D< Real64 > PrevTimeSteps; // This is used to store only the Last Few time step's time
 	// to enable the calculation of the subhouly contribution..
@@ -52,30 +51,30 @@ namespace GroundHeatExchangers {
 	struct GLHEBase
 	{
 		// Members
-		bool Available; // need an array of logicals--load identifiers of available equipment
-		bool ON; // simulate the machine at it's operating part load ratio
+		bool available; // need an array of logicals--load identifiers of available equipment
+		bool on; // simulate the machine at it's operating part load ratio
 		std::string Name; // user identifier
-		int LoopNum;
-		int LoopSideNum;
-		int BranchNum;
-		int CompNum;
-		int GLHEInletNodeNum; // Node number on the inlet side of the plant
-		int GLHEOutletNodeNum; // Node number on the outlet side of the plant
-		Real64 KGround; // Thermal conductivity of the ground		[W/(mK)]
-		Real64 CpRhoGround; // Specific heat capacity of ground		[J/Kg/K]
-		Real64 KPipe; // Thermal Conductivity of the U tube			[W/(mK)]
-		Real64 CpPipe; // Specific heat of the U tube				[J/kg-K]
-		Real64 RhoPipe; // Density of the U tube					[kg/m3]
-		Real64 PipeOutDia; // Outer diameter of the Pipe			[m]
+		int loopNum;
+		int loopSideNum;
+		int branchNum;
+		int compNum;
+		int inletNodeNum; // Node number on the inlet side of the plant
+		int outletNodeNum; // Node number on the outlet side of the plant
+		Real64 kGround; // Thermal conductivity of the ground		[W/(mK)]
+		Real64 cpRhoGround; // Specific heat capacity of ground		[J/Kg/K]
+		Real64 kPipe; // Thermal Conductivity of the U tube			[W/(mK)]
+		Real64 cpPipe; // Specific heat of the U tube				[J/kg-K]
+		Real64 rhoPipe; // Density of the U tube					[kg/m3]
+		Real64 pipeOutDia; // Outer diameter of the Pipe			[m]
 		Real64 PipeThick; // Thickness of the pipe wall				[m]
-		Real64 DesignFlow; // Design volumetric flow rate			[m3/s]
-		Real64 DesignMassFlow; // Design mass flow rate				[kg/s]
-		Real64 TempGround; // The far feild temperature of the ground   [°C]
+		Real64 designFlow; // Design volumetric flow rate			[m3/s]
+		Real64 designMassFlow; // Design mass flow rate				[kg/s]
+		Real64 tempGround; // The far feild temperature of the ground   [°C]
 		FArray1D< Real64 > QnMonthlyAgg; // Monthly aggregated normalized heat extraction/rejection rate [W/m]
 		FArray1D< Real64 > QnHr; // Hourly aggregated normalized heat extraction/rejection rate [W/m]
 		FArray1D< Real64 > QnSubHr; // Contains the subhourly heat extraction/rejection rate normalized
 		// by the total active length of bore holes  [W/m]
-		int PrevHour;
+		int prevHour;
 		Real64 gReferenceRatio; // Reference ratio for developing g-functions [-]
 		int NPairs; // Number of pairs of Lntts and Gfunc
 		FArray1D< Real64 > LNTTS; // natural log of Non Dimensional Time Ln(t/ts)
@@ -85,112 +84,112 @@ namespace GroundHeatExchangers {
 		FArray1D_int LastHourN; // Stores the Previous hour's N for past hours
 		// until the minimum subhourly history
 		//loop topology variables
-		Real64 GLHEBoreholeTemp; // [°C]
-		Real64 GLHEMassFlowRate; // [kg/s]
-		Real64 GLHEOutletTemp; // [°C]
-		Real64 GLHEInletTemp; // [°C]
-		Real64 GLHEAveFluidTemp; // [°C]
+		Real64 boreholeTemp; // [°C]
+		Real64 massFlowRate; // [kg/s]
+		Real64 outletTemp; // [°C]
+		Real64 inletTemp; // [°C]
+		Real64 aveFluidTemp; // [°C]
 		Real64 QGLHE; // [W] heat transfer rate
-		bool MyFlag;
-		bool MyEnvrnFlag;
+		bool myFlag;
+		bool myEnvrnFlag;
 
 		// Default Constructor
 		GLHEBase() :
-			Available( false ),
-			ON( false ),
-			LoopNum( 0 ),
-			LoopSideNum( 0 ),
-			BranchNum( 0 ),
-			CompNum( 0 ),
-			GLHEInletNodeNum( 0 ),
-			GLHEOutletNodeNum( 0 ),
-			KGround( 0.0 ),
-			CpRhoGround( 0.0 ),
-			KPipe( 0.0 ),
-			CpPipe( 0.0 ),
-			RhoPipe( 0.0 ),
-			PipeOutDia( 0.0 ),
+			available( false ),
+			on( false ),
+			loopNum( 0 ),
+			loopSideNum( 0 ),
+			branchNum( 0 ),
+			compNum( 0 ),
+			inletNodeNum( 0 ),
+			outletNodeNum( 0 ),
+			kGround( 0.0 ),
+			cpRhoGround( 0.0 ),
+			kPipe( 0.0 ),
+			cpPipe( 0.0 ),
+			rhoPipe( 0.0 ),
+			pipeOutDia( 0.0 ),
 			PipeThick( 0.0 ),
-			DesignFlow( 0.0 ),
-			DesignMassFlow( 0.0 ),
-			TempGround( 0.0 ),
-			PrevHour( 1 ),
+			designFlow( 0.0 ),
+			designMassFlow( 0.0 ),
+			tempGround( 0.0 ),
+			prevHour( 1 ),
 			gReferenceRatio( 0.0 ),
 			NPairs( 0 ),
 			AGG( 0 ),
 			SubAGG( 0 ),
-			GLHEBoreholeTemp( 0.0 ),
-			GLHEMassFlowRate( 0.0 ),
-			GLHEOutletTemp( 0.0 ),
-			GLHEInletTemp( 0.0 ),
-			GLHEAveFluidTemp( 0.0 ),
+			boreholeTemp( 0.0 ),
+			massFlowRate( 0.0 ),
+			outletTemp( 0.0 ),
+			inletTemp( 0.0 ),
+			aveFluidTemp( 0.0 ),
 			QGLHE( 0.0 ),
-			MyFlag( true ),
-			MyEnvrnFlag( true )
+			myFlag( true ),
+			myEnvrnFlag( true )
 
 		{}
 
 		void
-		CalcAggregateLoad();
+		calcAggregateLoad();
 
 		virtual void
-		CalcGroundHeatExchanger()=0;
+		calcGroundHeatExchanger()=0;
 
 		virtual void
-		UpdateGroundHeatExchanger()=0;
+		updateGroundHeatExchanger()=0;
 
 		virtual void
-		InitGLHESimVars()=0;
+		initGLHESimVars()=0;
 
 		virtual Real64
-		InterpGFunc( Real64 )=0;
+		interpGFunc( Real64 )=0;
 
 	};
 
 	struct GLHEVert:GLHEBase
 	{
 		// Members
-		Real64 MaxGLHEFlowRate; // design nominal capacity of Pump
-		int MaxSimYears; // maximum length of simulation (years)
-		int NumBoreholes;
-		Real64 BoreholeLength;
-		Real64 BoreholeRadius;
+		Real64 maxFlowRate; // design nominal capacity of Pump
+		int maxSimYears; // maximum length of simulation (years)
+		int numBoreholes;
+		Real64 boreholeLength;
+		Real64 boreholeRadius;
 		Real64 KGrout; // Grout thermal conductivity                [W/(mK)]
 		Real64 UtubeDist; // Distance between the legs of the Utube    [m]
-		Real64 ResistanceBhole; // The thermal resistance of the borehole, (K per W/m)
+		Real64 resistanceBhole; // The thermal resistance of the borehole, (K per W/m)
 		bool RunFlag;
 		Real64 LastQnSubHr;
 
 
 		// Default Constructor
 		GLHEVert() :
-			MaxGLHEFlowRate( 0.0 ),
-			MaxSimYears( 0 ),
-			NumBoreholes( 0 ),
-			BoreholeLength( 0.0 ),
-			BoreholeRadius( 0.0 ),
+			maxFlowRate( 0.0 ),
+			maxSimYears( 0 ),
+			numBoreholes( 0 ),
+			boreholeLength( 0.0 ),
+			boreholeRadius( 0.0 ),
 			KGrout( 0.0 ),
 			UtubeDist( 0.0 ),
-			ResistanceBhole( 0.0 ),
+			resistanceBhole( 0.0 ),
 			RunFlag( false ),
 			LastQnSubHr( 0.0 )
 
 		{}
 
 		void
-		UpdateGroundHeatExchanger();
+		updateGroundHeatExchanger();
 
 		void
-		CalcGroundHeatExchanger();
+		calcGroundHeatExchanger();
 
 		void
 		BoreholeResistance();
 
 		void
-		InitGLHESimVars();
+		initGLHESimVars();
 
 		Real64
-		InterpGFunc(
+		interpGFunc(
 		Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
 		);
 
@@ -222,16 +221,16 @@ namespace GroundHeatExchangers {
 		{}
 
 		void
-		CalcGroundHeatExchanger();
+		calcGroundHeatExchanger();
 
 		void
 		CalcGFunctions();
 
 		void
-		InitGLHESimVars();
+		initGLHESimVars();
 
 		Real64
-		InterpGFunc(
+		interpGFunc(
 		Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
 		);
 
@@ -246,7 +245,7 @@ namespace GroundHeatExchangers {
 	void
 	SimGroundHeatExchangers(
 		std::string const & GLHEType,
-		std::string const & GLHEName,
+		std::string const & Name,
 		int & CompIndex,
 		bool const RunFlag,
 		bool const FirstIteration,
