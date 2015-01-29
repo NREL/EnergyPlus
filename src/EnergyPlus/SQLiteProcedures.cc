@@ -2518,6 +2518,8 @@ SQLite::SQLiteData::SQLiteData( std::ostream & errorStream, std::shared_ptr<sqli
 SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, std::shared_ptr<sqlite3> & db )
 	:
 	m_db(db),
+	m_writeOutputToSQLite(true),
+	m_connection(nullptr),
 	m_errorStream(errorStream)
 	{}
 
@@ -2710,14 +2712,14 @@ int SQLiteProcedures::sqliteResetCommand(sqlite3_stmt * stmt)
 	return sqlite3_reset(stmt);
 }
 
-int SQLiteProcedures::sqliteClearBindings(sqlite3_stmt * stmt)
-{
-	return sqlite3_clear_bindings(stmt);
-}
+// int SQLiteProcedures::sqliteClearBindings(sqlite3_stmt * stmt)
+// {
+// 	return sqlite3_clear_bindings(stmt);
+// }
 
-int SQLiteProcedures::sqliteFinalizeCommand(sqlite3_stmt * stmt)
-{
-	return sqlite3_finalize(stmt);
-}
+// int SQLiteProcedures::sqliteFinalizeCommand(sqlite3_stmt * stmt)
+// {
+// 	return sqlite3_finalize(stmt);
+// }
 
 } // EnergyPlus

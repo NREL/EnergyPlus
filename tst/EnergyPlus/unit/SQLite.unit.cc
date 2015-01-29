@@ -50,8 +50,16 @@ namespace EnergyPlus {
 			return sqlite_test->reportingFreqName( reportingFreqIndex );
 		}
 
-		std::string columnText(const unsigned char* column) {
-			return std::string(reinterpret_cast<const char*>(column));
+		std::string columnText( const unsigned char* column ) {
+			return std::string( reinterpret_cast<const char*>( column ) );
+		}
+
+		int logicalToInteger( const bool value ) {
+			return sqlite_test->logicalToInteger(value);
+		}
+
+		void adjustReportingHourAndMinutes( int & hour, int & minutes ) {
+			sqlite_test->adjustReportingHourAndMinutes( hour, minutes );
 		}
 
 		// int executeSQL(const std::string & query) {
@@ -370,6 +378,35 @@ namespace EnergyPlus {
 		EXPECT_EQ(testResult4, result[4]);
 		EXPECT_EQ(testResult5, result[5]);
 		EXPECT_EQ(testResult6, result[6]);
+
+		sqlite_test->sqliteBegin();
+		sqlite_test->createSQLiteTimeIndexRecord( -999, 1, 1, 0 );
+		sqlite_test->sqliteCommit();
+		EXPECT_EQ("SQLite3 message, Illegal reportingInterval passed to CreateSQLiteTimeIndexRecord: -999\n", ss.str());
+		ss.str(std::string());
+
+		EXPECT_EQ(7, result.size());
+
+		sqlite_test->sqliteBegin();
+		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, 3, 3, 60, 0, 0, _, true );
+		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, 3, 3, 60, 0, _, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, 3, 3, 60, _, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, 3, 3, _, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, 3, _, 60, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, 1, _, 3, 60, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 0, 1, 1, 1, _, 3, 3, 60, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 1, 1, 3, 3, 60, 0, 0, _, true );
+		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 1, 1, 3, 3, 60, 0, _, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 1, 1, 3, _, 60, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 1, 1, _, 3, 60, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 1, 1, 1, 1, _, 3, 3, 60, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 1, 1, 3, 3, 60, 0, 0, _, true );
+		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 1, 1, 3, 3, 60, 0, _, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 1, 1, 3, _, 60, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 1, 1, _, 3, 60, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 2, 1, 1, 1, _, 3, 3, 60, 0, 0, "SummerDesignDay", true );
+		sqlite_test->createSQLiteTimeIndexRecord( 3, 1, 1, 1, _, 3, 3, 60, 0, 0, "SummerDesignDay", true );
+		sqlite_test->sqliteCommit();
 	}
 
 	TEST_F( SQLiteFixture, createSQLiteReportDataRecord ) {
@@ -384,14 +421,51 @@ namespace EnergyPlus {
 		// 	Optional_int_const minutesPerTimeStep = _
 		// );
 
+		// ((month*100 + day)*100 + hour)*100 + minute
+		// ((1*100 + 31)*100 + 4) * 100 + 59 = 1310459
+		// ((7*100 + 3)*100 + 15) * 100 + 30 = 7031530
+
 		sqlite_test->sqliteBegin();
 		sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 		sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 		sqlite_test->createSQLiteReportDataRecord( 1, 999.9 );
-		auto result = queryResult("SELECT * FROM ReportData;", "ReportData");
+		sqlite_test->createSQLiteReportDataRecord( 1, 999.9, 2, 0, 1310459, 100, 7031530, 15 );
+		sqlite_test->createSQLiteReportDataRecord( 1, 999.9, 0, 0, 1310459, 100, 7031530, 15 );
+		sqlite_test->createSQLiteReportDataRecord( 1, 999.9, 2, 100, 1310459, 999, 7031530, _ );
+		auto reportData = queryResult("SELECT * FROM ReportData;", "ReportData");
+		auto reportExtendedData = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 		sqlite_test->sqliteCommit();
 
-		ASSERT_EQ(1, result.size());
+		ASSERT_EQ(4, reportData.size());
+		std::vector<std::string> reportData0 {"1", "1", "1", "999.9"};
+		std::vector<std::string> reportData1 {"2", "1", "1", "999.9"};
+		std::vector<std::string> reportData2 {"3", "1", "1", "999.9"};
+		std::vector<std::string> reportData3 {"4", "1", "1", "999.9"};
+		EXPECT_EQ(reportData0, reportData[0]);
+		EXPECT_EQ(reportData1, reportData[1]);
+		EXPECT_EQ(reportData2, reportData[2]);
+		EXPECT_EQ(reportData3, reportData[3]);
+
+		ASSERT_EQ(2, reportExtendedData.size());
+		std::vector<std::string> reportExtendedData0 {"1","2","100.0","7","3","14","16","30","0.0","1","31","3","45","59"};
+		std::vector<std::string> reportExtendedData1 {"2","4","999.0","7","3","14","","30","100.0","1","31","3","","59"};
+		EXPECT_EQ(reportExtendedData0, reportExtendedData[0]);
+		EXPECT_EQ(reportExtendedData1, reportExtendedData[1]);
+
+		sqlite_test->sqliteBegin();
+		sqlite_test->createSQLiteReportDataRecord( 1, 999.9, -999, 0, 1310459, 100, 7031530, 15 );
+		sqlite_test->sqliteCommit();
+		EXPECT_EQ("SQLite3 message, Illegal reportingInterval passed to CreateSQLiteMeterRecord: -999\n", ss.str());
+		ss.str(std::string());
+
+		sqlite_test->sqliteBegin();
+		sqlite_test->createSQLiteReportDataRecord( 1, 999.9, -100, 0, 1310459, 100, 7031530, _ );
+		sqlite_test->sqliteCommit();
+		EXPECT_EQ("SQLite3 message, Illegal reportingInterval passed to CreateSQLiteMeterRecord: -100\n", ss.str());
+		ss.str(std::string());
+
+		EXPECT_EQ(4, reportData.size());
+		EXPECT_EQ(2, reportExtendedData.size());
 	}
 
 	TEST_F( SQLiteFixture, addSQLiteZoneSizingRecord ) {
@@ -482,6 +556,22 @@ namespace EnergyPlus {
 		EXPECT_EQ( "Run Period", reportingFreqName( 4 ) );
 		EXPECT_EQ( "Unknown!!!", reportingFreqName( 5 ) );
 		EXPECT_EQ( "Unknown!!!", reportingFreqName( -2 ) );
+
+		EXPECT_EQ( 1, logicalToInteger( true ) );
+		EXPECT_EQ( 0, logicalToInteger( false ) );
+
+		int hour = 0, minutes = 0;
+		adjustReportingHourAndMinutes( hour, minutes );
+		EXPECT_EQ( -1, hour );
+		EXPECT_EQ( 0, minutes );
+		hour = 1, minutes = 60;
+		adjustReportingHourAndMinutes( hour, minutes );
+		EXPECT_EQ( 1, hour );
+		EXPECT_EQ( 0, minutes );
+		hour = 1, minutes = 65;
+		adjustReportingHourAndMinutes( hour, minutes );
+		EXPECT_EQ( 0, hour );
+		EXPECT_EQ( 65, minutes );
 	}
 
 	TEST_F( SQLiteFixture, DaylightMaping ) {
@@ -972,11 +1062,73 @@ namespace EnergyPlus {
 		// 	std::string const & TableName
 		// );
 
+		FArray1D_string const rowLabels( { "Heating", "Cooling" } );
+		FArray1D_string const columnLabels( { "Electricity [GJ]", "Natural Gas [GJ]" } );
+		FArray2D_string const body( 2, 2, { "216.38", "869.08", "1822.42", "0.00" } );
+		FArray1D_string const rowLabels2( { "Heating [kWh]" } );
+		FArray1D_string const columnLabels2( { "Electricity", "Natural Gas" } );
+		FArray2D_string const body2( 1, 2, { "815.19", "256.72" } );
+
 		sqlite_test->sqliteBegin();
-		// sqlite_test->createSQLiteTabularDataRecords();
-		// auto tabularData = queryResult("SELECT * FROM TabularData;", "TabularData");
-		// auto strings = queryResult("SELECT * FROM Strings;", "Strings");
-		// auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
+		// tabular data references simulation record... always checks for first simulation record only.
+		sqlite_test->createSQLiteSimulationsRecord( 1, "EnergyPlus Version", "Current Time" );
+		sqlite_test->createSQLiteTabularDataRecords(body, rowLabels, columnLabels, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses");
+		sqlite_test->createSQLiteTabularDataRecords(body2, rowLabels2, columnLabels2, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory");
+		auto tabularData = queryResult("SELECT * FROM TabularData;", "TabularData");
+		auto strings = queryResult("SELECT * FROM Strings;", "Strings");
+		auto stringTypes = queryResult("SELECT * FROM StringTypes;", "StringTypes");
 		sqlite_test->sqliteCommit();
+
+		ASSERT_EQ(6, tabularData.size());
+		// tabularDataIndex, reportNameIndex, reportForStringIndex, tableNameIndex, rowLabelIndex, columnLabelIndex, unitsIndex, simulationIndex, rowId, columnId, value
+		std::vector<std::string> tabularData0 { "1","1","2","3","6","4","5","1","0","0","216.38" };
+		std::vector<std::string> tabularData1 { "2","1","2","3","7","4","5","1","1","0","869.08" };
+		std::vector<std::string> tabularData2 { "3","1","2","3","6","8","5","1","0","1","1822.42" };
+		std::vector<std::string> tabularData3 { "4","1","2","3","7","8","5","1","1","1","0.00" };
+		std::vector<std::string> tabularData4 { "5","1","2","9","6","4","10","1","0","0","815.19" };
+		std::vector<std::string> tabularData5 { "6","1","2","9","6","8","10","1","0","1","256.72" };
+		EXPECT_EQ(tabularData0, tabularData[0]);
+		EXPECT_EQ(tabularData1, tabularData[1]);
+		EXPECT_EQ(tabularData2, tabularData[2]);
+		EXPECT_EQ(tabularData3, tabularData[3]);
+		EXPECT_EQ(tabularData4, tabularData[4]);
+		EXPECT_EQ(tabularData5, tabularData[5]);
+
+
+		ASSERT_EQ(10, strings.size());
+		std::vector<std::string> string0 { "1","1","AnnualBuildingUtilityPerformanceSummary" };
+		std::vector<std::string> string1 { "2","2","Entire Facility" };
+		std::vector<std::string> string2 { "3","3","End Uses" };
+		std::vector<std::string> string3 { "4","5","Electricity" };
+		std::vector<std::string> string4 { "5","6","GJ" };
+		std::vector<std::string> string5 { "6","4","Heating" };
+		std::vector<std::string> string6 { "7","4","Cooling" };
+		std::vector<std::string> string7 { "8","5","Natural Gas" };
+		std::vector<std::string> string8 { "9","3","End Uses By Subcategory" };
+		std::vector<std::string> string9 { "10","6","kWh" };
+		EXPECT_EQ(string0, strings[0]);
+		EXPECT_EQ(string1, strings[1]);
+		EXPECT_EQ(string2, strings[2]);
+		EXPECT_EQ(string3, strings[3]);
+		EXPECT_EQ(string4, strings[4]);
+		EXPECT_EQ(string5, strings[5]);
+		EXPECT_EQ(string6, strings[6]);
+		EXPECT_EQ(string7, strings[7]);
+		EXPECT_EQ(string8, strings[8]);
+		EXPECT_EQ(string9, strings[9]);
+
+		ASSERT_EQ(6, stringTypes.size());
+		std::vector<std::string> stringType0 { "1","ReportName" };
+		std::vector<std::string> stringType1 { "2","ReportForString" };
+		std::vector<std::string> stringType2 { "3","TableName" };
+		std::vector<std::string> stringType3 { "4","RowName" };
+		std::vector<std::string> stringType4 { "5","ColumnName" };
+		std::vector<std::string> stringType5 { "6","Units" };
+		EXPECT_EQ(stringType0, stringTypes[0]);
+		EXPECT_EQ(stringType1, stringTypes[1]);
+		EXPECT_EQ(stringType2, stringTypes[2]);
+		EXPECT_EQ(stringType3, stringTypes[3]);
+		EXPECT_EQ(stringType4, stringTypes[4]);
+		EXPECT_EQ(stringType5, stringTypes[5]);
 	}
 }

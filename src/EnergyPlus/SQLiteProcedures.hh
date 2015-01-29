@@ -40,8 +40,8 @@ protected:
 	bool sqliteStepValidity( int const rc );
 	int sqliteStepCommand(sqlite3_stmt * stmt);
 	int sqliteResetCommand(sqlite3_stmt * stmt);
-	int sqliteClearBindings(sqlite3_stmt * stmt);
-	int sqliteFinalizeCommand(sqlite3_stmt * stmt);
+	// int sqliteClearBindings(sqlite3_stmt * stmt);
+	// int sqliteFinalizeCommand(sqlite3_stmt * stmt);
 
 	bool m_writeOutputToSQLite;
 	std::ostream & m_errorStream;
