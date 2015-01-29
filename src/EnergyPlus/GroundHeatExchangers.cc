@@ -726,8 +726,7 @@ namespace GroundHeatExchangers {
 		VerticalGlhe.allocate( NumVerticalGlhes );
 
 		VerticalGlheReport.allocate( NumVerticalGlhes );
-		CheckEquipName.allocate( NumVerticalGlhes );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumVerticalGlhes, true );
 
 		for ( GlheNum = 1; GlheNum <= NumVerticalGlhes; ++GlheNum ) {
 			GetObjectItem( cCurrentModuleObject, GlheNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -763,14 +762,13 @@ namespace GroundHeatExchangers {
 			VerticalGlhe( GlheNum ).KGround = rNumericArgs( 5 );
 			VerticalGlhe( GlheNum ).CpRhoGround = rNumericArgs( 6 );
 			VerticalGlhe( GlheNum ).TempGround = rNumericArgs( 7 );
-			VerticalGlhe( GlheNum ).MaxGlheFlowRate = rNumericArgs( 8 );
-			VerticalGlhe( GlheNum ).KGrout = rNumericArgs( 9 );
-			VerticalGlhe( GlheNum ).KPipe = rNumericArgs( 10 );
-			VerticalGlhe( GlheNum ).PipeOutDia = rNumericArgs( 11 );
-			VerticalGlhe( GlheNum ).UtubeDist = rNumericArgs( 12 );
-			VerticalGlhe( GlheNum ).PipeThick = rNumericArgs( 13 );
-			VerticalGlhe( GlheNum ).MaxSimYears = rNumericArgs( 14 );
-			VerticalGlhe( GlheNum ).gReferenceRatio = rNumericArgs( 15 );
+			VerticalGlhe( GlheNum ).KGrout = rNumericArgs( 8 );
+			VerticalGlhe( GlheNum ).KPipe = rNumericArgs( 9 );
+			VerticalGlhe( GlheNum ).PipeOutDia = rNumericArgs( 10 );
+			VerticalGlhe( GlheNum ).UtubeDist = rNumericArgs( 11 );
+			VerticalGlhe( GlheNum ).PipeThick = rNumericArgs( 12 );
+			VerticalGlhe( GlheNum ).MaxSimYears = rNumericArgs( 13 );
+			VerticalGlhe( GlheNum ).gReferenceRatio = rNumericArgs( 14 );
 
 			//   Not many checks
 			if ( VerticalGlhe( GlheNum ).PipeThick >= VerticalGlhe( GlheNum ).PipeOutDia / 2.0 ) {
@@ -789,7 +787,7 @@ namespace GroundHeatExchangers {
 			}
 
 			// Get Gfunction data
-			VerticalGlhe( GlheNum ).NPairs = rNumericArgs( 16 );
+			VerticalGlhe( GlheNum ).NPairs = rNumericArgs( 15 );
 			VerticalGlhe( GlheNum ).SubAGG = 15;
 			VerticalGlhe( GlheNum ).AGG = 192;
 
@@ -813,7 +811,7 @@ namespace GroundHeatExchangers {
 				Allocated = true;
 			}
 
-			IndexNum = 17;
+			IndexNum = 16;
 			for ( PairNum = 1; PairNum <= VerticalGlhe( GlheNum ).NPairs; ++PairNum ) {
 				VerticalGlhe( GlheNum ).LNTTS( PairNum ) = rNumericArgs( IndexNum );
 				VerticalGlhe( GlheNum ).GFNC( PairNum ) = rNumericArgs( IndexNum + 1 );

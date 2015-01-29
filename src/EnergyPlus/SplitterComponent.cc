@@ -239,25 +239,18 @@ namespace SplitterComponent {
 		NumSplitters = GetNumObjectsFound( CurrentModuleObject );
 
 		if ( NumSplitters > 0 ) SplitterCond.allocate( NumSplitters );
-		CheckEquipName.allocate( NumSplitters );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumSplitters, true );
 
 		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
-		AlphArray = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
+		lAlphaBlanks.dimension( NumAlphas, true );
 		cNumericFields.allocate( NumNums );
-		cNumericFields = "";
-		lNumericBlanks.allocate( NumNums );
-		lNumericBlanks = true;
-		NumArray.allocate( NumNums );
-		NumArray = 0.0;
+		lNumericBlanks.dimension( NumNums, true );
+		NumArray.dimension( NumNums, 0.0 );
 
 		for ( SplitterNum = 1; SplitterNum <= NumSplitters; ++SplitterNum ) {
-			GetObjectItem( CurrentModuleObject, SplitterNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, SplitterNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;

@@ -316,8 +316,7 @@ namespace ChillerGasAbsorption {
 		GasAbsorber.allocate( NumGasAbsorbers );
 
 		GasAbsorberReport.allocate( NumGasAbsorbers );
-		CheckEquipName.allocate( NumGasAbsorbers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumGasAbsorbers, true );
 
 		//LOAD ARRAYS
 
@@ -453,7 +452,7 @@ namespace ChillerGasAbsorption {
 			} else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid value" );
 				ShowContinueError( "Invalid " + cAlphaFieldNames( 18 ) + '=' + cAlphaArgs( 18 ) );
-				ShowContinueError( "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2," "OtherFuel1 or OtherFuel2" );
+				ShowContinueError( "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2,OtherFuel1 or OtherFuel2" );
 				ErrorsFound = true;
 			}}
 
@@ -596,8 +595,7 @@ namespace ChillerGasAbsorption {
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
 			MyPlantScanFlag.allocate( NumGasAbsorbers );
-			MyEnvrnFlag.allocate( NumGasAbsorbers );
-			MyEnvrnFlag = true;
+			MyEnvrnFlag.dimension( NumGasAbsorbers, true );
 			MyOneTimeFlag = false;
 			MyPlantScanFlag = true;
 		}

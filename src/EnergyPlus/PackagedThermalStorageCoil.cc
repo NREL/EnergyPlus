@@ -283,8 +283,7 @@ namespace PackagedThermalStorageCoil {
 		NumTESCoils = GetNumObjectsFound( cCurrentModuleObject );
 
 		TESCoil.allocate( NumTESCoils );
-		CheckEquipName.allocate( NumTESCoils );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumTESCoils, true );
 
 		for ( item = 1; item <= NumTESCoils; ++item ) {
 			GetObjectItem( cCurrentModuleObject, item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -1572,7 +1571,7 @@ namespace PackagedThermalStorageCoil {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + cCurrentModuleObject + " input. " "Preceding condition(s) causes termination." );
+			ShowFatalError( RoutineName + "Errors found in getting " + cCurrentModuleObject + " input. Preceding condition(s) causes termination." );
 		}
 
 		// setup reporting

@@ -173,7 +173,7 @@ namespace WaterManager {
 
 		// Using/Aliasing
 		// na
-		
+
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
 
@@ -188,7 +188,7 @@ namespace WaterManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
-		
+
 		if ( ! ( AnyWaterSystemsInModel ) ) return;
 
 		UpdateWaterManager();
@@ -303,17 +303,11 @@ namespace WaterManager {
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 			cAlphaFieldNames.allocate( MaxNumAlphas );
-			cAlphaFieldNames = "";
 			cAlphaArgs.allocate( MaxNumAlphas );
-			cAlphaArgs = "";
-			lAlphaFieldBlanks.allocate( MaxNumAlphas );
-			lAlphaFieldBlanks = false;
+			lAlphaFieldBlanks.dimension( MaxNumAlphas, false );
 			cNumericFieldNames.allocate( MaxNumNumbers );
-			cNumericFieldNames = "";
-			rNumericArgs.allocate( MaxNumNumbers );
-			rNumericArgs = 0.0;
-			lNumericFieldBlanks.allocate( MaxNumNumbers );
-			lNumericFieldBlanks = false;
+			rNumericArgs.dimension( MaxNumNumbers, 0.0 );
+			lNumericFieldBlanks.dimension( MaxNumNumbers, false );
 
 			MyOneTimeFlag = false;
 			cCurrentModuleObject = "WaterUse:Storage";
@@ -535,7 +529,7 @@ namespace WaterManager {
 						if ( GetScheduleMaxValue( RainCollector( Item ).LossFactorSchedID ) > 1.0 ) {
 							ShowWarningError( "Potentially invalid " + cAlphaFieldNames( 4 ) + '=' + cAlphaArgs( 4 ) );
 							ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
-							ShowContinueError( "found rain water collection loss factor schedule value greater than 1.0, " "simulation continues" );
+							ShowContinueError( "found rain water collection loss factor schedule value greater than 1.0, simulation continues" );
 							// allowing it to continue
 						}
 					}
@@ -720,7 +714,7 @@ namespace WaterManager {
 				} else if ( SameString( cAlphaArgs( 1 ), "SmartSchedule" ) ) {
 					Irrigation.ModeID = IrrSmartSched;
 				} else {
-					ShowSevereError( "Type of " + cCurrentModuleObject + " is incorrect. Options are " "Schedule or SmartSchedule" );
+					ShowSevereError( "Type of " + cCurrentModuleObject + " is incorrect. Options are Schedule or SmartSchedule" );
 					ErrorsFound = true;
 				}
 				Irrigation.IrrSchedID = GetScheduleIndex( cAlphaArgs( 2 ) );

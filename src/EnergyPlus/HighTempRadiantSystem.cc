@@ -538,7 +538,7 @@ namespace HighTempRadiantSystem {
 					ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				} else if ( Surface( HighTempRadSys( Item ).SurfacePtr( SurfNum ) ).Zone != HighTempRadSys( Item ).ZonePtr ) {
-					ShowWarningError( "Surface referenced in ZoneHVAC:HighTemperatureRadiant not in same zone as Radiant System," "surface=" + HighTempRadSys( Item ).SurfaceName( SurfNum ) );
+					ShowWarningError( "Surface referenced in ZoneHVAC:HighTemperatureRadiant not in same zone as Radiant System, surface=" + HighTempRadSys( Item ).SurfaceName( SurfNum ) );
 					ShowContinueError( "Surface is in Zone=" + Zone( Surface( HighTempRadSys( Item ).SurfacePtr( SurfNum ) ).Zone ).Name + " ZoneHVAC:HighTemperatureRadiant in Zone=" + cAlphaArgs( 3 ) );
 					ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				}
@@ -647,20 +647,13 @@ namespace HighTempRadiantSystem {
 
 		// FLOW:
 		if ( firstTime ) {
-			ZeroSourceSumHATsurf.allocate( NumOfZones );
-			ZeroSourceSumHATsurf = 0.0;
-			QHTRadSource.allocate( NumOfHighTempRadSys );
-			QHTRadSource = 0.0;
-			QHTRadSrcAvg.allocate( NumOfHighTempRadSys );
-			QHTRadSrcAvg = 0.0;
-			LastQHTRadSrc.allocate( NumOfHighTempRadSys );
-			LastQHTRadSrc = 0.0;
-			LastSysTimeElapsed.allocate( NumOfHighTempRadSys );
-			LastSysTimeElapsed = 0.0;
-			LastTimeStepSys.allocate( NumOfHighTempRadSys );
-			LastTimeStepSys = 0.0;
-			MySizeFlag.allocate( NumOfHighTempRadSys );
-			MySizeFlag = true;
+			ZeroSourceSumHATsurf.dimension( NumOfZones, 0.0 );
+			QHTRadSource.dimension( NumOfHighTempRadSys, 0.0 );
+			QHTRadSrcAvg.dimension( NumOfHighTempRadSys, 0.0 );
+			LastQHTRadSrc.dimension( NumOfHighTempRadSys, 0.0 );
+			LastSysTimeElapsed.dimension( NumOfHighTempRadSys, 0.0 );
+			LastTimeStepSys.dimension( NumOfHighTempRadSys, 0.0 );
+			MySizeFlag.dimension( NumOfHighTempRadSys, true );
 			firstTime = false;
 		}
 
@@ -779,7 +772,7 @@ namespace HighTempRadiantSystem {
 
 				if ( CapSizingMethod == HeatingDesignCapacity ) {
 					if ( HighTempRadSys( RadSysNum ).ScaledHeatingCapacity == AutoSize ) {
-						CheckZoneSizing( CompType, CompName );						
+						CheckZoneSizing( CompType, CompName );
 						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor / (HighTempRadSys( RadSysNum ).FracRadiant + HighTempRadSys( RadSysNum ).FracConvect );
 					} else {
 						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = HighTempRadSys( RadSysNum ).ScaledHeatingCapacity;
@@ -804,7 +797,7 @@ namespace HighTempRadiantSystem {
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 				HighTempRadSys( RadSysNum ).MaxPowerCapac = TempSize;
 			}
-		
+
 		}
 
 	}

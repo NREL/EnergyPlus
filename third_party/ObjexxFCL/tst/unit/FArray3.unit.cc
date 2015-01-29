@@ -226,7 +226,6 @@ TEST( FArray3Test, PredicateComparisonsValues )
 	EXPECT_TRUE( ge( A2, 31459 ) && ge( 31459, A2 ) );
 	EXPECT_TRUE( ge( A2, 31458 ) && ge( 31460, A2 ) );
 
-	// Elements compared in order
 	FArray3D_int A3( 2, 2, 2, { 111, 211, 121, 221, 112, 212, 122, 222 } );
 	EXPECT_FALSE( eq( A3, 11 ) || eq( 23, A3 ) );
 	EXPECT_TRUE( ne( A3, 11 ) && ne( 23, A3 ) );

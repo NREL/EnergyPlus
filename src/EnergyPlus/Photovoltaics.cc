@@ -345,8 +345,7 @@ namespace Photovoltaics {
 		}
 
 		if ( ! allocated( PVarray ) ) PVarray.allocate( NumPVs );
-		CheckEquipName.allocate( NumPVs );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumPVs, true );
 
 		cCurrentModuleObject = cPVGeneratorObjectName;
 		for ( PVnum = 1; PVnum <= NumPVs; ++PVnum ) {
@@ -464,12 +463,12 @@ namespace Photovoltaics {
 					} else if ( PVarray( dupPtr ).CellIntegrationMode == iTranspiredCollectorCellIntegration ) {
 						ShowSevereError( cCurrentModuleObject + ": problem detected with multiple PV arrays." );
 						ShowContinueError( "When using IntegratedTranspiredCollector heat transfer mode, only one PV array can be coupled" );
-						ShowContinueError( "Both " + PVarray( PVnum ).Name + " and " + PVarray( dupPtr ).Name + " are using UTSC " "surface = " + PVarray( PVnum ).SurfaceName );
+						ShowContinueError( "Both " + PVarray( PVnum ).Name + " and " + PVarray( dupPtr ).Name + " are using UTSC surface = " + PVarray( PVnum ).SurfaceName );
 						ErrorsFound = true;
 					} else if ( PVarray( dupPtr ).CellIntegrationMode == iExteriorVentedCavityCellIntegration ) {
 						ShowSevereError( cCurrentModuleObject + ": problem detected with multiple PV arrays." );
 						ShowContinueError( "When using IntegratedExteriorVentedCavity heat transfer mode, only one PV array can be coupled" );
-						ShowContinueError( "Both " + PVarray( PVnum ).Name + " and " + PVarray( dupPtr ).Name + " are using exterior " "vented surface = " + PVarray( PVnum ).SurfaceName );
+						ShowContinueError( "Both " + PVarray( PVnum ).Name + " and " + PVarray( dupPtr ).Name + " are using exterior vented surface = " + PVarray( PVnum ).SurfaceName );
 						ErrorsFound = true;
 					}
 				}
@@ -1127,8 +1126,7 @@ namespace Photovoltaics {
 		// perform the one time initializations
 		if ( MyOneTimeFlag ) {
 			// initialize the environment and sizing flags
-			MyEnvrnFlag.allocate( NumPVs );
-			MyEnvrnFlag = true;
+			MyEnvrnFlag.dimension( NumPVs, true );
 			MyOneTimeFlag = false;
 		}
 
@@ -2691,7 +2689,7 @@ namespace Photovoltaics {
 		}
 
 		if ( ! Found ) {
-			ShowFatalError( "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, " "Surface name = " + Surface( SurfacePtr ).Name );
+			ShowFatalError( "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, Surface name = " + Surface( SurfacePtr ).Name );
 		} else {
 
 			VentCavIndex = CavNum;

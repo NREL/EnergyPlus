@@ -432,8 +432,8 @@ namespace IceThermalStorage {
 		Real64 const TankChargeToler( 0.999 ); // Above this fraction, we don't have anything left to charge
 		Real64 const TemperatureToler( 0.1 ); // Temperature difference between iterations that indicates convergence [C]
 		Real64 const SIEquiv100GPMinMassFlowRate( 6.31 ); // Used to non-dimensionalize flow rate for use in CubicLinear charging equation
-														  // Flow rate divided by nominal 100GPM used to non-dimensionalize volume flow rate
-														  // Assumes approximate density of 1000 kg/m3 to get an estimate for mass flow rate
+														// Flow rate divided by nominal 100GPM used to non-dimensionalize volume flow rate
+														// Assumes approximate density of 1000 kg/m3 to get an estimate for mass flow rate
 		static std::string const RoutineName( "SimDetailedIceStorage" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -1012,9 +1012,9 @@ namespace IceThermalStorage {
 				ErrorsFound = true;
 			} else {
 				DetIceStor( IceNum ).DischargeCurveType = GetCurveType( DetIceStor( IceNum ).DischargeCurveNum );
-				if ( DetIceStor( IceNum ).DischargeCurveType == "QUADRATICLINEAR") {
+				if ( DetIceStor( IceNum ).DischargeCurveType == "QUADRATICLINEAR" ) {
 					DetIceStor(IceNum).DischargeCurveTypeNum = CurveQuadraticLinear;
-				} else if ( DetIceStor( IceNum ).DischargeCurveType == "CUBICLINEAR") {
+				} else if ( DetIceStor( IceNum ).DischargeCurveType == "CUBICLINEAR" ) {
 					DetIceStor(IceNum).DischargeCurveTypeNum = CurveCubicLinear;
 				}
 			}
@@ -1033,9 +1033,9 @@ namespace IceThermalStorage {
 				ErrorsFound = true;
 			} else {
 				DetIceStor( IceNum ).ChargeCurveType = GetCurveType( DetIceStor( IceNum ).ChargeCurveNum );
-				if ( DetIceStor( IceNum ).ChargeCurveType == "QUADRATICLINEAR") {
+				if ( DetIceStor( IceNum ).ChargeCurveType == "QUADRATICLINEAR" ) {
 					DetIceStor(IceNum).ChargeCurveTypeNum = CurveQuadraticLinear;
-				} else if ( DetIceStor( IceNum ).ChargeCurveType == "CUBICLINEAR") {
+				} else if ( DetIceStor( IceNum ).ChargeCurveType == "CUBICLINEAR" ) {
 					DetIceStor(IceNum).ChargeCurveTypeNum = CurveCubicLinear;
 				}
 			}
@@ -1844,7 +1844,7 @@ namespace IceThermalStorage {
 		using DataPlant::DualSetPointDeadBand;
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::SetComponentFlowRate;
-		
+
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -2525,7 +2525,7 @@ namespace IceThermalStorage {
 
 	//     NOTICE
 
-	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -1122,28 +1122,4 @@ operator /( CArray< T > const & a, T const & t )
 
 } // ObjexxFCL
 
-#ifndef NO_STD_SWAP_OVERLOADS
-
-// std::swap Overloads for Efficiency
-//
-// Technically you cannot add template functions overloads to namespace std
-// but this works with most compilers and makes it much faster if someone uses
-// std::swap instead of swap or ObjexxFCL::swap.  The legal alternative would be
-// to add specializations of swap for each anticipated instantiation.
-
-namespace std {
-
-// std::swap( CArray, CArray )
-template< typename T >
-inline
-void
-swap( ObjexxFCL::CArray< T > & a, ObjexxFCL::CArray< T > & b )
-{
-	a.swap( b );
-}
-
-} // std
-
-#endif // NO_STD_SWAP_OVERLOADS
-
 #endif // ObjexxFCL_CArray_hh_INCLUDED

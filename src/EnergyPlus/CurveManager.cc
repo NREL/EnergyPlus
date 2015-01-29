@@ -119,7 +119,7 @@ namespace CurveManager {
 	int const DESCENDING( 2 );
 
 	// parameters describing curve object/table types
-	int const NumAllCurveTypes( 21 );
+	int const NumAllCurveTypes( 22 );
 
 	// curve object/table types (used for warning messages)
 	int const CurveType_Linear( 1 );
@@ -145,8 +145,7 @@ namespace CurveManager {
 	int const CurveType_QuadLinear( 21 );
 	int const CurveType_CubicLinear( 22 );
 
-	FArray1D_string const cCurveTypes( NumAllCurveTypes, { "Curve:Linear", "Curve:Quadratic", "Curve:Cubic", "Curve:Quartic", "Curve:Exponent", "Curve:BiCubic", "Curve:BiQuadratic", "Curve:QuadraitcLinear", "Curve:TriQuadratic", "Curve:Functional:PressureDrop", "Table:OneIndependentVariable", "Table:TwoIndependentVariables", "Table:MultiVariableLookup", "Curve:FanPressureRise", "Curve:ExponentialSkewNormal", "Curve:Sigmoid", "Curve:RectangularHyperbola1", "Curve:RectangularHyperbola2", "Curve:ExponentialDecay", "Curve:DoubleExponentialDecay", "Curve:QuadLinear",
-		"Curve:CubicLinear" } );
+	FArray1D_string const cCurveTypes( NumAllCurveTypes, { "Curve:Linear", "Curve:Quadratic", "Curve:Cubic", "Curve:Quartic", "Curve:Exponent", "Curve:BiCubic", "Curve:BiQuadratic", "Curve:QuadraitcLinear", "Curve:TriQuadratic", "Curve:Functional:PressureDrop", "Table:OneIndependentVariable", "Table:TwoIndependentVariables", "Table:MultiVariableLookup", "Curve:FanPressureRise", "Curve:ExponentialSkewNormal", "Curve:Sigmoid", "Curve:RectangularHyperbola1", "Curve:RectangularHyperbola2", "Curve:ExponentialDecay", "Curve:DoubleExponentialDecay", "Curve:QuadLinear", "Curve:CubicLinear" } );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -438,7 +437,7 @@ namespace CurveManager {
 
 		NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumCubicLinear + NumLinear + NumBicubic + NumTriQuad + NumExponent + NumQuartic +
 					NumOneVarTab + NumTwoVarTab + NumMultVarLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 +
-					NumExpDecay + NumDoubleExpDecay + NumQLinear; 
+					NumExpDecay + NumDoubleExpDecay + NumQLinear;
 
 		// intermediate count for one and two variable performance tables
 		NumTables = NumOneVarTab + NumTwoVarTab;
@@ -827,7 +826,7 @@ namespace CurveManager {
 				PerfCurve( CurveNum ).CurveMax = Numbers( 12 );
 				PerfCurve( CurveNum ).CurveMaxPresent = true;
 			}
-            
+
 			if ( Numbers( 7 ) > Numbers( 8 ) ) { // error
 				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 				ShowContinueError( cNumericFieldNames( 7 ) + " [" + RoundSigDigits( Numbers( 7 ), 2 ) + "] > " + cNumericFieldNames( 8 ) + " [" + RoundSigDigits( Numbers( 8 ), 2 ) + ']' );
@@ -1811,7 +1810,6 @@ namespace CurveManager {
 			if ( PerfCurve( CurveNum ).InterpolationType == EvaluateCurveToLimits ) {
 				{ auto const SELECT_CASE_var( PerfCurve( CurveNum ).CurveType );
 				if ( ( SELECT_CASE_var == Linear ) || ( SELECT_CASE_var == Quadratic ) || ( SELECT_CASE_var == Cubic ) || ( SELECT_CASE_var == Quartic ) || ( SELECT_CASE_var == Exponent ) ) {
-					TempArray1.allocate( size( PerfCurveTableData( TableNum ).X1 ) );
 					TempArray1 = PerfCurveTableData( TableNum ).X1;
 					TempArray2.allocate( size( PerfCurveTableData( TableNum ).Y ) );
 					for ( VarIndex = 1; VarIndex <= isize( PerfCurveTableData( TableNum ).Y ); ++VarIndex ) {
@@ -2057,9 +2055,7 @@ namespace CurveManager {
 			if ( PerfCurve( CurveNum ).InterpolationType == EvaluateCurveToLimits ) {
 				{ auto const SELECT_CASE_var( PerfCurve( CurveNum ).CurveType );
 				if ( ( SELECT_CASE_var == BiQuadratic ) || ( SELECT_CASE_var == QuadraticLinear ) ) {
-					TempArray1.allocate( size( TableData( TableNum ).X1 ) );
 					TempArray1 = TableData( TableNum ).X1;
-					TempArray3.allocate( size( TableData( TableNum ).X2 ) );
 					TempArray3 = TableData( TableNum ).X2;
 					TempArray2.allocate( size( TableData( TableNum ).Y ) );
 					for ( VarIndex = 1; VarIndex <= isize( TableData( TableNum ).Y ); ++VarIndex ) {
@@ -2534,8 +2530,8 @@ namespace CurveManager {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtA( "(A)" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2571,12 +2567,12 @@ namespace CurveManager {
 		IOFlags non_adv; non_adv.na_on(); // For non-advancing list-directed output
 
 		// Formats
-		static gio::Fmt const Format_140( "('! Reading external file tabular data for ',A,' \"',A,'\"')" );
-		static gio::Fmt const Format_150( "('! Reading tabular data for ',A,' \"',A,'\"')" );
-		static gio::Fmt const Format_110( "('! <READING LOOKUP TABLE DATA>')" );
-		static gio::Fmt const Format_130( "('READING LOOKUP TABLE DATA')" );
-		static gio::Fmt const Format_131( "('END READING LOOKUP TABLE DATA')" );
-		static gio::Fmt const Format_160( "(1X,10(I2,:,2X))" );
+		static gio::Fmt Format_140( "('! Reading external file tabular data for ',A,' \"',A,'\"')" );
+		static gio::Fmt Format_150( "('! Reading tabular data for ',A,' \"',A,'\"')" );
+		static gio::Fmt Format_110( "('! <READING LOOKUP TABLE DATA>')" );
+		static gio::Fmt Format_130( "('READING LOOKUP TABLE DATA')" );
+		static gio::Fmt Format_131( "('END READING LOOKUP TABLE DATA')" );
+		static gio::Fmt Format_160( "(1X,10(I2,:,2X))" );
 
 		//Autodesk:Uninit Initialize variables used uninitialized
 		TotalDataSets = 0; //Autodesk:Uninit Force default initialization
@@ -2607,7 +2603,7 @@ namespace CurveManager {
 			}
 			if ( endcol > 0 ) {
 				if ( int( NextLine[ endcol - 1 ] ) == iUnicode_end ) {
-					ShowSevereError( "ReadTableData: For Table:MultiVariableLookup \"" + PerfCurve( CurveNum ).Name + "\" " " external file, appears to be a Unicode or binary file." );
+					ShowSevereError( "ReadTableData: For Table:MultiVariableLookup \"" + PerfCurve( CurveNum ).Name + "\" external file, appears to be a Unicode or binary file." );
 					ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
 					ShowFatalError( "Program terminates due to previous condition." );
 				}
@@ -3045,7 +3041,7 @@ namespace CurveManager {
 					break;
 				}
 				if ( Var3Index == 0 ) {
-					ShowSevereError( "GetTableDataFile: For Table:MultiVariableLookup \"" + PerfCurve( CurveNum ).Name + "\" " );
+					ShowSevereError( "GetTableDataFile: For Table:MultiVariableLookup \"" + PerfCurve( CurveNum ).Name + "\"" );
 					ShowContinueError( "...The value of the 3rd independent variable (" + RoundSigDigits( Var3, 9 ) + ") does not match the values listed as valid entries for this independent variable." );
 					ShowContinueError( "...Valid entries are: " );
 					if ( TableLookup( TableNum ).NumX3Vars >= 1 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X3Var( 1 ), 9 ) );
@@ -3075,7 +3071,7 @@ namespace CurveManager {
 					break;
 				}
 				if ( Var4Index == 0 ) {
-					ShowSevereError( "GetTableDataFile: For Table:MultiVariableLookup \"" + PerfCurve( CurveNum ).Name + "\" " );
+					ShowSevereError( "GetTableDataFile: For Table:MultiVariableLookup \"" + PerfCurve( CurveNum ).Name + "\"" );
 					ShowContinueError( "...The value of the 4th independent variable (" + RoundSigDigits( Var4, 9 ) + ") does not match the values listed as valid entries for this independent variable." );
 					ShowContinueError( "...Valid entries are: " );
 					if ( TableLookup( TableNum ).NumX4Vars >= 1 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X4Var( 1 ), 9 ) );
@@ -3105,7 +3101,7 @@ namespace CurveManager {
 					break;
 				}
 				if ( Var5Index == 0 && NumIVars > 4 ) {
-					ShowSevereError( "GetTableDataFile: For Table:MultiVariableLookup \"" + PerfCurve( CurveNum ).Name + "\" " );
+					ShowSevereError( "GetTableDataFile: For Table:MultiVariableLookup \"" + PerfCurve( CurveNum ).Name + "\"" );
 					ShowContinueError( "...The value of the 5th independent variable (" + RoundSigDigits( Var5, 9 ) + ") does not match the values listed as valid entries for this independent variable." );
 					ShowContinueError( "...Valid entries are: " );
 					if ( TableLookup( TableNum ).NumX5Vars >= 1 ) ShowContinueError( "..." + RoundSigDigits( TableLookup( TableNum ).X5Var( 1 ), 9 ) );
@@ -3259,14 +3255,14 @@ Label1000: ;
 		if ( ReadFromFile ) gio::close( FileNum );
 
 		if ( TotalDataSets < DataSetCount ) {
-			ShowSevereError( "GetTableDataFile: For Table:MultiVariableLookup \"" + PerfCurve( CurveNum ).Name + "\" " );
+			ShowSevereError( "GetTableDataFile: For Table:MultiVariableLookup \"" + PerfCurve( CurveNum ).Name + "\"" );
 			ShowContinueError( "...The required number of data sets (" + RoundSigDigits( TotalDataSets ) + ") is less than the number determined by the number and count of independent variables (" + RoundSigDigits( DataSetCount ) + ")." );
 		}
 
 		return;
 
 Label999: ;
-		ShowSevereError( "CurveManager: SearchTableDataFile: " "Could not open Table Data File, expecting it as file name = " + FileName );
+		ShowSevereError( "CurveManager: SearchTableDataFile: Could not open Table Data File, expecting it as file name = " + FileName );
 		ShowContinueError( "Certain run environments require a full path to be included with the file name in the input field." );
 		ShowContinueError( "Try again with putting full path and file name in the field." );
 		ShowFatalError( "Program terminates due to these conditions." );
@@ -3752,7 +3748,7 @@ Label999: ;
 		} else {
 			TableValue = 0.0;
 			ShowSevereError( "Errors found in table output calculation for " + PerfCurve( CurveIndex ).Name );
-			ShowContinueError( "...Possible causes are selection of Interpolation Method or Type or Number" " of Independent Variables or Points." );
+			ShowContinueError( "...Possible causes are selection of Interpolation Method or Type or Number of Independent Variables or Points." );
 			ShowFatalError( "PerformanceTableObject: Previous error causes program termination." );
 		}}
 
@@ -3855,16 +3851,16 @@ Label999: ;
 			V2 = max( min( Var2, PerfCurve( CurveIndex ).Var2Max ), PerfCurve( CurveIndex ).Var2Min );
 			if ( TableLookup( TableIndex ).NumIndependentVars < 2 ) {
 				if ( PerfCurve( CurveIndex ).NumIVHighErrorIndex == 0 ) {
-					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
-					ShowContinueError( "...Excess number of independent variables (2) passed to subroutine " "when only 1 is required." );
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
+					ShowContinueError( "...Excess number of independent variables (2) passed to subroutine when only 1 is required." );
 				}
 				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 2.0, 2.0 );
 			}
 		} else {
 			if ( TableLookup( TableIndex ).NumIndependentVars > 1 ) {
 				if ( PerfCurve( CurveIndex ).NumIVLowErrorIndex == 0 ) {
-					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
-					ShowContinueError( "...Insufficient number of independent variables (1) passed to subroutine " "when at least 2 are required." );
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
+					ShowContinueError( "...Insufficient number of independent variables (1) passed to subroutine when at least 2 are required." );
 				}
 				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Insufficient number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVLowErrorIndex, 1.0, 1.0 );
 			}
@@ -3875,16 +3871,16 @@ Label999: ;
 			V3 = max( min( Var3, PerfCurve( CurveIndex ).Var3Max ), PerfCurve( CurveIndex ).Var3Min );
 			if ( TableLookup( TableIndex ).NumIndependentVars < 3 ) {
 				if ( PerfCurve( CurveIndex ).NumIVHighErrorIndex == 0 ) {
-					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
-					ShowContinueError( "...Excess number of independent variables (3) passed to subroutine " "when 2 or less are required." );
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
+					ShowContinueError( "...Excess number of independent variables (3) passed to subroutine when 2 or less are required." );
 				}
 				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 3.0, 3.0 );
 			}
 		} else {
 			if ( TableLookup( TableIndex ).NumIndependentVars > 2 ) {
 				if ( PerfCurve( CurveIndex ).NumIVLowErrorIndex == 0 ) {
-					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
-					ShowContinueError( "...Insufficient number of independent variables (2) passed to subroutine " "when at least 3 are required." );
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
+					ShowContinueError( "...Insufficient number of independent variables (2) passed to subroutine when at least 3 are required." );
 				}
 				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Insufficient number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVLowErrorIndex, 2.0, 2.0 );
 			}
@@ -3895,16 +3891,16 @@ Label999: ;
 			V4 = max( min( Var4, PerfCurve( CurveIndex ).Var4Max ), PerfCurve( CurveIndex ).Var4Min );
 			if ( TableLookup( TableIndex ).NumIndependentVars < 4 ) {
 				if ( PerfCurve( CurveIndex ).NumIVHighErrorIndex == 0 ) {
-					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
-					ShowContinueError( "...Excess number of independent variables (4) passed to subroutine " "when 3 or less are required." );
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
+					ShowContinueError( "...Excess number of independent variables (4) passed to subroutine when 3 or less are required." );
 				}
 				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 4.0, 4.0 );
 			}
 		} else {
 			if ( TableLookup( TableIndex ).NumIndependentVars > 3 ) {
 				if ( PerfCurve( CurveIndex ).NumIVLowErrorIndex == 0 ) {
-					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
-					ShowContinueError( "...Insufficient number of independent variables (3) passed to subroutine " "when at least 4 are required." );
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
+					ShowContinueError( "...Insufficient number of independent variables (3) passed to subroutine when at least 4 are required." );
 				}
 				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Insufficient number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVLowErrorIndex, 3.0, 3.0 );
 			}
@@ -3915,16 +3911,16 @@ Label999: ;
 			V5 = max( min( Var5, PerfCurve( CurveIndex ).Var5Max ), PerfCurve( CurveIndex ).Var5Min );
 			if ( TableLookup( TableIndex ).NumIndependentVars < 5 ) {
 				if ( PerfCurve( CurveIndex ).NumIVHighErrorIndex == 0 ) {
-					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
-					ShowContinueError( "...Excess number of independent variables (5) passed to subroutine " "when 4 or less are required." );
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
+					ShowContinueError( "...Excess number of independent variables (5) passed to subroutine when 4 or less are required." );
 				}
 				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Excess number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVHighErrorIndex, 5.0, 5.0 );
 			}
 		} else {
 			if ( TableLookup( TableIndex ).NumIndependentVars > 4 ) {
 				if ( PerfCurve( CurveIndex ).NumIVLowErrorIndex == 0 ) {
-					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\" " + PerfCurve( CurveIndex ).Name + "\"" );
-					ShowContinueError( "...Insufficient number of independent variables (4) passed to subroutine " "when at least 5 are required." );
+					ShowSevereError( "TableLookupObject: " + cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + "\"" + PerfCurve( CurveIndex ).Name + "\"" );
+					ShowContinueError( "...Insufficient number of independent variables (4) passed to subroutine when at least 5 are required." );
 				}
 				ShowRecurringWarningErrorAtEnd( cCurveTypes( PerfCurve( CurveIndex ).ObjectType ) + " \"" + PerfCurve( CurveIndex ).Name + "\": Insufficient number of independent variables warning continues...", PerfCurve( CurveIndex ).NumIVLowErrorIndex, 4.0, 4.0 );
 			}
@@ -4048,7 +4044,7 @@ Label999: ;
 		} else {
 			TableValue = 0.0;
 			ShowSevereError( "Errors found in table output calculation for " + PerfCurve( CurveIndex ).Name );
-			ShowContinueError( "...Possible causes are selection of Interpolation Method or Type or Number" " of Independent Variables or Points." );
+			ShowContinueError( "...Possible causes are selection of Interpolation Method or Type or Number of Independent Variables or Points." );
 			ShowFatalError( "PerformanceTableObject: Previous error causes program termination." );
 		}}
 
@@ -4185,31 +4181,31 @@ Label999: ;
 		bool EchoTableDataToEio; // logical set equal to global and used to report to eio file
 
 		// Formats
-		static gio::Fmt const Format_110( "('! <CREATING NEW CURVE OBJECT>')" );
-		static gio::Fmt const Format_130( "('CREATING NEW CURVE OBJECT')" );
-		static gio::Fmt const Format_140( "('! Input as ',A,' \"',A,'\"')" );
-		static gio::Fmt const Format_150( "('! RSquared       = ',A)" );
-		static gio::Fmt const Format_160( "('! Standard Error = ',A)" );
-		static gio::Fmt const Format_170( "('! Sample Size    = ',A)" );
-		static gio::Fmt const Format_180( "('Curve:',A,',')" );
-		static gio::Fmt const Format_190( "('FromTable_',A,',  !- Name')" );
-		static gio::Fmt const Format_200( "('  ',A,',  !- Coefficient1 Constant')" );
-		static gio::Fmt const Format_210( "('  ',A,',  !- Coefficient2 x')" );
-		static gio::Fmt const Format_300( "('  ',A,',  !- Minimum Value of x')" );
-		static gio::Fmt const Format_310( "('  ',A,',  !- Maximum Value of x')" );
-		static gio::Fmt const Format_340( "('  ',A,',  !- Minimum Curve Output')" );
-		static gio::Fmt const Format_350( "('  ',A,';  !- Maximum Curve Output')" );
-		static gio::Fmt const Format_360( "('END CREATING NEW CURVE OBJECT')" );
-		static gio::Fmt const Format_220( "('  ',A,',  !- Coefficient3 x**2')" );
-		static gio::Fmt const Format_230( "('  ',A,',  !- !- Coefficient4 x**3')" );
-		static gio::Fmt const Format_240( "('  ',A,',  !- Coefficient4 y')" );
-		static gio::Fmt const Format_250( "('  ',A,',  !- !- Coefficient5 x**4')" );
-		static gio::Fmt const Format_260( "('  ',A,',  !- Coefficient5 y**2')" );
-		static gio::Fmt const Format_270( "('  ',A,',  !- Coefficient5 xy')" );
-		static gio::Fmt const Format_280( "('  ',A,',  !- Coefficient6 x*y')" );
-		static gio::Fmt const Format_290( "('  ',A,',  !- Coefficient6 x**2y')" );
-		static gio::Fmt const Format_320( "('  ',A,',  !- Minimum Value of y')" );
-		static gio::Fmt const Format_330( "('  ',A,',  !- Maximum Value of y')" );
+		static gio::Fmt Format_110( "('! <CREATING NEW CURVE OBJECT>')" );
+		static gio::Fmt Format_130( "('CREATING NEW CURVE OBJECT')" );
+		static gio::Fmt Format_140( "('! Input as ',A,' \"',A,'\"')" );
+		static gio::Fmt Format_150( "('! RSquared       = ',A)" );
+		static gio::Fmt Format_160( "('! Standard Error = ',A)" );
+		static gio::Fmt Format_170( "('! Sample Size    = ',A)" );
+		static gio::Fmt Format_180( "('Curve:',A,',')" );
+		static gio::Fmt Format_190( "('FromTable_',A,',  !- Name')" );
+		static gio::Fmt Format_200( "('  ',A,',  !- Coefficient1 Constant')" );
+		static gio::Fmt Format_210( "('  ',A,',  !- Coefficient2 x')" );
+		static gio::Fmt Format_300( "('  ',A,',  !- Minimum Value of x')" );
+		static gio::Fmt Format_310( "('  ',A,',  !- Maximum Value of x')" );
+		static gio::Fmt Format_340( "('  ',A,',  !- Minimum Curve Output')" );
+		static gio::Fmt Format_350( "('  ',A,';  !- Maximum Curve Output')" );
+		static gio::Fmt Format_360( "('END CREATING NEW CURVE OBJECT')" );
+		static gio::Fmt Format_220( "('  ',A,',  !- Coefficient3 x**2')" );
+		static gio::Fmt Format_230( "('  ',A,',  !- !- Coefficient4 x**3')" );
+		static gio::Fmt Format_240( "('  ',A,',  !- Coefficient4 y')" );
+		static gio::Fmt Format_250( "('  ',A,',  !- !- Coefficient5 x**4')" );
+		static gio::Fmt Format_260( "('  ',A,',  !- Coefficient5 y**2')" );
+		static gio::Fmt Format_270( "('  ',A,',  !- Coefficient5 xy')" );
+		static gio::Fmt Format_280( "('  ',A,',  !- Coefficient6 x*y')" );
+		static gio::Fmt Format_290( "('  ',A,',  !- Coefficient6 x**2y')" );
+		static gio::Fmt Format_320( "('  ',A,',  !- Minimum Value of y')" );
+		static gio::Fmt Format_330( "('  ',A,',  !- Maximum Value of y')" );
 
 		EchoTableDataToEio = DisplayAdvancedReportVariables;
 
@@ -4255,8 +4251,7 @@ Label999: ;
 			return;
 		}
 
-		Results.allocate( MatrixSize );
-		Results = 0.0;
+		Results.dimension( MatrixSize, 0.0 );
 		A.allocate( MatrixSize, MatrixSize );
 		//   ' Sum data
 		N = 0;
@@ -5640,7 +5635,7 @@ Label999: ;
 
 	//     NOTICE
 
-	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

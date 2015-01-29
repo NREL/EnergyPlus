@@ -2093,8 +2093,7 @@ namespace ManageElectricPower {
 
 		// need to do initial setups
 		if ( MyOneTimeSetupFlag ) {
-			MyCoGenSetupFlag.allocate( NumLoadCenters );
-			MyCoGenSetupFlag = true;
+			MyCoGenSetupFlag.dimension( NumLoadCenters, true );
 			ThermalLoad = 0.0;
 			MyOneTimeSetupFlag = false;
 			return;
@@ -2774,12 +2773,9 @@ namespace ManageElectricPower {
 					//        The arrary size needs to be increased when count = MaxRainflowArrayBounds. Please note that (MaxRainflowArrayBounds +1)
 					//        is the index used in the subroutine RainFlow. So we cannot reallocate array size until count = MaxRainflowArrayBounds +1.
 					if ( ElecStorage( ElecStorNum ).count0 == MaxRainflowArrayBounds ) {
-						SaveArrayBounds = MaxRainflowArrayBounds + 1;
-						ReallocateRealArray( ElecStorage( ElecStorNum ).B10, SaveArrayBounds, MaxRainflowArrayInc );
-						SaveArrayBounds = MaxRainflowArrayBounds + 1;
-						ReallocateRealArray( ElecStorage( ElecStorNum ).X0, SaveArrayBounds, MaxRainflowArrayInc );
-						//           Decrement by 1 is needed because the last input parameter of RainFlow is MaxRainflowArrayBounds+1
-						MaxRainflowArrayBounds = SaveArrayBounds - 1;
+						ElecStorage( ElecStorNum ).B10.redimension( MaxRainflowArrayBounds + 1 + MaxRainflowArrayInc, 0.0 );
+						ElecStorage( ElecStorNum ).X0.redimension( MaxRainflowArrayBounds + 1 + MaxRainflowArrayInc, 0.0 );
+						MaxRainflowArrayBounds += MaxRainflowArrayInc;
 					}
 
 					Rainflow( ElecStorage( ElecStorNum ).CycleBinNum, Input0, ElecStorage( ElecStorNum ).B10, ElecStorage( ElecStorNum ).X0, ElecStorage( ElecStorNum ).count0, ElecStorage( ElecStorNum ).Nmb0, ElecStorage( ElecStorNum ).OneNmb0, MaxRainflowArrayBounds + 1 );
@@ -3406,7 +3402,7 @@ namespace ManageElectricPower {
 						ShowSevereError( "Transformer Overloaded" );
 						ShowContinueError( "Entered in ElectricLoadCenter:Transformer =" + Transformer( TransfNum ).Name );
 					}
-					ShowRecurringSevereErrorAtEnd( "Transformer Overloaded: " "Entered in ElectricLoadCenter:Transformer =" + Transformer( TransfNum ).Name, Transformer( TransfNum ).OverloadErrorIndex );
+					ShowRecurringSevereErrorAtEnd( "Transformer Overloaded: Entered in ElectricLoadCenter:Transformer =" + Transformer( TransfNum ).Name, Transformer( TransfNum ).OverloadErrorIndex );
 				}
 
 				TempChange = std::pow( PUL, 1.6 ) * Transformer( TransfNum ).TempRise;

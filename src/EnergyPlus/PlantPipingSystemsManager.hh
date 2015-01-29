@@ -38,7 +38,8 @@ namespace PlantPipingSystemsManager {
 	extern std::string const ObjName_Circuit;
 	extern std::string const ObjName_Segment;
 	extern std::string const ObjName_HorizTrench;
-	extern std::string const ObjName_ZoneCoupled;
+	extern std::string const ObjName_ZoneCoupled_Slab;
+	extern std::string const ObjName_ZoneCoupled_Basement;
 
 	// MODULE INTERFACE DEFINITIONS:
 
@@ -98,16 +99,22 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
-	
+
 	void
 	InitAndSimGroundDomains();
 
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
-	
+
 	void
 	CheckIfAnySlabs();
+
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
+	void
+	CheckIfAnyBasements();
 
 	//*********************************************************************************************!
 
@@ -136,18 +143,27 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
-	
+
 	void
-		ReadZoneCoupledDomainInputs(
+	ReadZoneCoupledDomainInputs(
 		int const StartingDomainNumForZone,
 		int const NumZoneCoupledDomains,
 		bool & ErrorsFound
-		);
+	);
 
 	//*********************************************************************************************!
 
 	//*********************
+	void
+	ReadBasementInputs(
+		int const StartingDomainNumForBasement,
+		int const NumBasements,
+		bool & ErrorsFound
+	);
 
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
 	void
 	ReadPipeCircuitInputs(
 		int const NumPipeCircuits,
@@ -263,11 +279,11 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 
-	FArray1D <ZoneCoupledSurfaceData>
-		GetSurfaceDataForOSCM(
+	FArray1D< ZoneCoupledSurfaceData >
+	GetSurfaceDataForOSCM(
 		int const OSCMIndex,
 		int const SurfCount
-		);
+	);
 
 	//*********************************************************************************************!
 
@@ -286,6 +302,16 @@ namespace PlantPipingSystemsManager {
 
 	bool
 	IsInRange(
+		Real64 const r,
+		Real64 const lower,
+		Real64 const upper
+	);
+
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
+	bool
+	IsInRange_BasementModel(
 		Real64 const r,
 		Real64 const lower,
 		Real64 const upper
@@ -341,7 +367,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	void
-	MeshPartition_SelectionSort( FArray1D< MeshPartition > & X );
+	MeshPartition_SelectionSort( FArray1< MeshPartition > & X );
 
 	//*********************************************************************************************!
 
@@ -642,14 +668,15 @@ namespace PlantPipingSystemsManager {
 		bool const PartitionsExist,
 		Optional_int BasementWallXIndex = _,
 		Optional_int BasementFloorYIndex = _,
-		Optional_int SlabXIndex = _,
+		Optional_int XIndex = _,
+		Optional_int XWallIndex = _,
 		Optional_int InsulationXIndex = _,
-		Optional_int SlabYIndex = _,
+		Optional_int YIndex = _,
+		Optional_int YFloorIndex = _,
 		Optional_int InsulationYIndex = _,
-		Optional_int SlabZIndex = _,
+		Optional_int ZIndex = _,
+		Optional_int ZWallIndex = _,
 		Optional_int InsulationZIndex = _
-		
-		
 	);
 
 	//*********************************************************************************************!
@@ -684,7 +711,7 @@ namespace PlantPipingSystemsManager {
 		int const DomainNum,
 		FArray1D< Real64 > const & XBoundaryPoints,
 		FArray1D< Real64 > const & YBoundaryPoints,
-		FArray1D< Real64 > const & ZBoundaryPoints		
+		FArray1D< Real64 > const & ZBoundaryPoints
 	);
 
 	//*********************************************************************************************!
@@ -730,7 +757,6 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
-	//FUNCTION GetCellWidths(DomainNum, g) RESULT(RetVal)
 
 	void
 	GetCellWidths(
@@ -821,17 +847,17 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	Real64
-		EvaluateZoneInterfaceTemperature(
+	EvaluateZoneInterfaceTemperature(
 		int const DomainNum,
 		CartesianCell const & cell
-		);
+	);
 
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
-	
+
 	Real64
-		GetZoneInterfaceHeatFlux( int const DomainNum );
+	GetZoneInterfaceHeatFlux( int const DomainNum );
 
 	//*********************************************************************************************!
 
@@ -848,6 +874,13 @@ namespace PlantPipingSystemsManager {
 	GetAverageTempByType(
 		int const DomainNum,
 		int const CellType
+	);
+
+	Real64
+	GetAverageInterfaceTemp(
+		int const DomainNum,
+		int const CellType,
+		int const CellType2
 	);
 
 	//*********************************************************************************************!

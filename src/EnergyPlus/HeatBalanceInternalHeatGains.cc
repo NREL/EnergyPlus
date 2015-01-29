@@ -72,7 +72,6 @@ SetupZoneInternalGain(
 	std::string UpperCaseObjectName;
 
 	// Object Data
-	FArray1D< GenericComponentZoneIntGainStruct > TempGenDeviceIntGainsArr;
 
 	FoundIntGainsType = false;
 	FoundDuplicate = false;
@@ -81,7 +80,7 @@ SetupZoneInternalGain(
 
 	// Check if IntGainComp_TypeOfNum and cComponentObject are consistent
 	if ( ! SameString( UpperCaseObjectType, ZoneIntGainDeviceTypes( IntGainComp_TypeOfNum ) ) ) {
-		ShowSevereError( "SetupZoneInternalGain: developer error, trapped inconsistent internal gains object types" " sent to SetupZoneInternalGain" );
+		ShowSevereError( "SetupZoneInternalGain: developer error, trapped inconsistent internal gains object types sent to SetupZoneInternalGain" );
 		ShowContinueError( "Object type character = " + cComponentObject );
 		ShowContinueError( "Type of Num object name = " + ZoneIntGainDeviceTypes( IntGainComp_TypeOfNum ) );
 		return;
@@ -107,20 +106,13 @@ SetupZoneInternalGain(
 
 	if ( ZoneIntGain( ZoneNum ).NumberOfDevices == 0 ) {
 		ZoneIntGain( ZoneNum ).Device.allocate( DeviceAllocInc );
-		ZoneIntGain( ZoneNum ).NumberOfDevices = 1;
 		ZoneIntGain( ZoneNum ).MaxNumberOfDevices = DeviceAllocInc;
 	} else {
 		if ( ZoneIntGain( ZoneNum ).NumberOfDevices + 1 > ZoneIntGain( ZoneNum ).MaxNumberOfDevices ) {
-			TempGenDeviceIntGainsArr.allocate( ZoneIntGain( ZoneNum ).MaxNumberOfDevices + DeviceAllocInc );
-			TempGenDeviceIntGainsArr( {1,ZoneIntGain( ZoneNum ).NumberOfDevices} ) = ZoneIntGain( ZoneNum ).Device( {1,ZoneIntGain( ZoneNum ).NumberOfDevices} );
-			ZoneIntGain( ZoneNum ).Device.deallocate();
-			ZoneIntGain( ZoneNum ).Device.allocate( ZoneIntGain( ZoneNum ).MaxNumberOfDevices + DeviceAllocInc );
-			ZoneIntGain( ZoneNum ).MaxNumberOfDevices += DeviceAllocInc;
-			ZoneIntGain( ZoneNum ).Device( {1,ZoneIntGain( ZoneNum ).NumberOfDevices} ) = TempGenDeviceIntGainsArr( {1,ZoneIntGain( ZoneNum ).NumberOfDevices} );
-			TempGenDeviceIntGainsArr.deallocate();
+			ZoneIntGain( ZoneNum ).Device.redimension( ZoneIntGain( ZoneNum ).MaxNumberOfDevices += DeviceAllocInc );
 		}
-		++ZoneIntGain( ZoneNum ).NumberOfDevices;
 	}
+	++ZoneIntGain( ZoneNum ).NumberOfDevices;
 
 	ZoneIntGain( ZoneNum ).Device( ZoneIntGain( ZoneNum ).NumberOfDevices ).CompObjectType = UpperCaseObjectType;
 	ZoneIntGain( ZoneNum ).Device( ZoneIntGain( ZoneNum ).NumberOfDevices ).CompObjectName = UpperCaseObjectName;

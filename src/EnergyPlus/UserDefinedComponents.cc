@@ -200,7 +200,7 @@ namespace UserDefinedComponents {
 
 			} else {
 				// throw warning
-				ShowFatalError( "SimUserDefinedPlantComponent: did not find where called from" " loop number called from =" + TrimSigDigits( LoopNum ) + " , loop side called from =" + TrimSigDigits( LoopSideNum ) );
+				ShowFatalError( "SimUserDefinedPlantComponent: did not find where called from loop number called from =" + TrimSigDigits( LoopNum ) + " , loop side called from =" + TrimSigDigits( LoopSideNum ) );
 			}
 			return;
 		}
@@ -606,7 +606,7 @@ namespace UserDefinedComponents {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -652,17 +652,11 @@ namespace UserDefinedComponents {
 		MaxNumAlphas = NumAlphas;
 
 		cAlphaFieldNames.allocate( MaxNumAlphas );
-		cAlphaFieldNames = "";
 		cAlphaArgs.allocate( MaxNumAlphas );
-		cAlphaArgs = "";
-		lAlphaFieldBlanks.allocate( MaxNumAlphas );
-		lAlphaFieldBlanks = false;
+		lAlphaFieldBlanks.dimension( MaxNumAlphas, false );
 		cNumericFieldNames.allocate( MaxNumNumbers );
-		cNumericFieldNames = "";
-		rNumericArgs.allocate( MaxNumNumbers );
-		rNumericArgs = 0.0;
-		lNumericFieldBlanks.allocate( MaxNumNumbers );
-		lNumericFieldBlanks = false;
+		rNumericArgs.dimension( MaxNumNumbers, 0.0 );
+		lNumericFieldBlanks.dimension( MaxNumNumbers, false );
 
 		//need to make sure GetEMSInput has run...
 
@@ -670,8 +664,7 @@ namespace UserDefinedComponents {
 		NumUserPlantComps = GetNumObjectsFound( cCurrentModuleObject );
 		if ( NumUserPlantComps > 0 ) {
 			UserPlantComp.allocate( NumUserPlantComps );
-			CheckUserPlantCompName.allocate( NumUserPlantComps );
-			CheckUserPlantCompName = true;
+			CheckUserPlantCompName.dimension( NumUserPlantComps, true );
 			for ( CompLoop = 1; CompLoop <= NumUserPlantComps; ++CompLoop ) {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
@@ -857,8 +850,7 @@ namespace UserDefinedComponents {
 		NumUserCoils = GetNumObjectsFound( cCurrentModuleObject );
 		if ( NumUserCoils > 0 ) {
 			UserCoil.allocate( NumUserCoils );
-			CheckUserCoilName.allocate( NumUserCoils );
-			CheckUserCoilName = true;
+			CheckUserCoilName.dimension( NumUserCoils, true );
 			for ( CompLoop = 1; CompLoop <= NumUserCoils; ++CompLoop ) {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
@@ -1011,8 +1003,7 @@ namespace UserDefinedComponents {
 		NumUserZoneAir = GetNumObjectsFound( cCurrentModuleObject );
 		if ( NumUserZoneAir > 0 ) {
 			UserZoneAirHVAC.allocate( NumUserZoneAir );
-			CheckUserZoneAirName.allocate( NumUserZoneAir );
-			CheckUserZoneAirName = true;
+			CheckUserZoneAirName.dimension( NumUserZoneAir, true );
 			for ( CompLoop = 1; CompLoop <= NumUserZoneAir; ++CompLoop ) {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
@@ -1164,8 +1155,7 @@ namespace UserDefinedComponents {
 		NumUserAirTerminals = GetNumObjectsFound( cCurrentModuleObject );
 		if ( NumUserAirTerminals > 0 ) {
 			UserAirTerminal.allocate( NumUserAirTerminals );
-			CheckUserAirTerminal.allocate( NumUserAirTerminals );
-			CheckUserAirTerminal = true;
+			CheckUserAirTerminal.dimension( NumUserAirTerminals, true );
 			for ( CompLoop = 1; CompLoop <= NumUserAirTerminals; ++CompLoop ) {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
@@ -1479,8 +1469,7 @@ namespace UserDefinedComponents {
 		int Loop;
 
 		if ( MyOneTimeFlag ) {
-			MyFlag.allocate( NumUserCoils );
-			MyFlag = true;
+			MyFlag.dimension( NumUserCoils, true );
 			MyOneTimeFlag = false;
 		}
 
@@ -1570,8 +1559,7 @@ namespace UserDefinedComponents {
 		int Loop;
 
 		if ( MyOneTimeFlag ) {
-			MyFlag.allocate( NumUserZoneAir );
-			MyFlag = true;
+			MyFlag.dimension( NumUserZoneAir, true );
 			MyOneTimeFlag = false;
 		}
 
@@ -1671,8 +1659,7 @@ namespace UserDefinedComponents {
 		int Loop;
 
 		if ( MyOneTimeFlag ) {
-			MyFlag.allocate( NumUserAirTerminals );
-			MyFlag = true;
+			MyFlag.dimension( NumUserAirTerminals, true );
 			MyOneTimeFlag = false;
 		}
 
