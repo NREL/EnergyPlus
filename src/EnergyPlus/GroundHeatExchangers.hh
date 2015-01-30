@@ -23,28 +23,7 @@ namespace GroundHeatExchangers {
 	extern int const maxTSinHr; // Max number of time step in a hour
 
 	// MODULE VARIABLE DECLARATIONS:
-	//extern int numVerticalGLHEs;
-	//extern int N; // COUNTER OF TIME STEP
-	//extern Real64 currentSimTime; // Current simulation time in hours
-	//extern Real64 outletTemp; // Outlet temperature of the fluid  [°C]
-	//extern Real64 inletTemp; // Inlet temperature of the fluid   [°C]
-	//extern Real64 massFlowRate; // Mass flowrate of the fluid       [Kg/s]
-	//extern Real64 QGLHE; // The normalized heat transfer rate[W/m]
-	////extern Real64 GLHERB; // [K per W/m] Just for Analyis will be removed later
-	//extern Real64 aveFluidTemp; // The average fluid temperature    [°C]
-	//extern Real64 boreholeTemp; // The average borehole tempreature [°C]
-	//extern int LocHourOfDay;
-	//extern int LocDayOfSim;
-	//extern Real64 mdotActual;
-
-	//extern FArray1D< Real64 > PrevTimeSteps; // This is used to store only the Last Few time step's time
-	// to enable the calculation of the subhouly contribution..
-	// Recommended size, the product of Minimum subhourly history required and
-	// the maximum no of system time steps in an hour
-
-	//extern FArray1D_bool CheckEquipName;
-
-	// SUBROUTINE SPECIFICATIONS FOR MODULE CondenserTowers
+	//na
 
 	// Types
 
@@ -53,7 +32,7 @@ namespace GroundHeatExchangers {
 		// Members
 		bool available; // need an array of logicals--load identifiers of available equipment
 		bool on; // simulate the machine at it's operating part load ratio
-		std::string Name; // user identifier
+		std::string name; // user identifier
 		int loopNum;
 		int loopSideNum;
 		int branchNum;
@@ -158,7 +137,7 @@ namespace GroundHeatExchangers {
 		Real64 UtubeDist; // Distance between the legs of the Utube    [m]
 		Real64 resistanceBhole; // The thermal resistance of the borehole, (K per W/m)
 		bool runFlag;
-		Real64 LastQnSubHr;
+		Real64 lastQnSubHr;
 
 
 		// Default Constructor
@@ -172,7 +151,7 @@ namespace GroundHeatExchangers {
 			UtubeDist( 0.0 ),
 			resistanceBhole( 0.0 ),
 			runFlag( false ),
-			LastQnSubHr( 0.0 )
+			lastQnSubHr( 0.0 )
 
 		{}
 
@@ -183,7 +162,7 @@ namespace GroundHeatExchangers {
 		calcGroundHeatExchanger();
 
 		void
-		BoreholeResistance();
+		boreholeResistance();
 
 		void
 		initGLHESimVars();
@@ -224,7 +203,7 @@ namespace GroundHeatExchangers {
 		calcGroundHeatExchanger();
 
 		void
-		CalcGFunctions();
+		calcGFunctions();
 
 		void
 		initGLHESimVars();
@@ -238,18 +217,18 @@ namespace GroundHeatExchangers {
 
 
 	// Object Data
-	extern FArray1D< GLHEVert > VerticalGLHE; // dimension to number of machines
+	extern FArray1D< GLHEVert > verticalGLHE; // dimension to number of machines
 
 	// Functions
 
 	void
 	SimGroundHeatExchangers(
 		std::string const & GLHEType,
-		std::string const & Name,
-		int & CompIndex,
+		std::string const & name,
+		int & compIndex,
 		bool const runFlag,
-		bool const FirstIteration,
-		bool const InitLoopEquip
+		bool const firstIteration,
+		bool const initLoopEquip
 	);
 
 	//******************************************************************************
