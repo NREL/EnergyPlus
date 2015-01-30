@@ -104,6 +104,16 @@
     460,                     !- Wind Speed Profile Boundary Layer Thickness {m}
     0.0065;                  !- Air Temperature Gradient Coefficient {K/m}
 
+  SizingPeriod:WeatherFileDays,
+    Weather File Sizing Period,  !- Name
+    7,                       !- Begin Month
+    18,                      !- Begin Day of Month
+    7,                       !- End Month
+    25,                      !- End Day of Month
+    SummerDesignDay,         !- Day of Week for Start Day
+    No,                      !- Use Weather File Daylight Saving Period
+    No;                      !- Use Weather File Rain and Snow Indicators
+
   Timestep,6;
 
   ShadowCalculation,

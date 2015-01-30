@@ -13,6 +13,7 @@
 
 // EnergyPlus Headers
 #include <HeatBalanceSurfaceManager.hh>
+#include <CommandLineInterface.hh>
 #include <ConvectionCoefficients.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataDaylighting.hh>
@@ -20,6 +21,7 @@
 #include <DataDElight.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
+#include <DataStringGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalSurface.hh>
@@ -490,7 +492,7 @@ namespace HeatBalanceSurfaceManager {
 					// Open DElight Electric Lighting Error File for reading
 					iDElightErrorFile = GetNewUnitNumber();
 					// RJH 2008-03-07: open file with READWRITE
-					{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, "eplusout.delighteldmp", flags ); iwriteStatus = flags.ios(); }
+					{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags ); iwriteStatus = flags.ios(); }
 					if ( iwriteStatus == 0 ) {
 						elOpened = true;
 					} else {
@@ -534,7 +536,7 @@ namespace HeatBalanceSurfaceManager {
 					// extract reference point illuminance values from DElight Electric Lighting dump file for reporting
 					// Open DElight Electric Lighting Dump File for reading
 					iDElightErrorFile = GetNewUnitNumber();
-					{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, "eplusout.delighteldmp", flags ); iwriteStatus = flags.ios(); }
+					{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags ); iwriteStatus = flags.ios(); }
 					//            IF (iwriteStatus /= 0) THEN
 					//              CALL ShowFatalError('InitSurfaceHeatBalance: Could not open file "eplusout.delighteldmp" for output (readwrite).')
 					//            ENDIF
