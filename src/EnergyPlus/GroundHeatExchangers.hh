@@ -66,7 +66,7 @@ namespace GroundHeatExchangers {
 		Real64 cpPipe; // Specific heat of the U tube				[J/kg-K]
 		Real64 rhoPipe; // Density of the U tube					[kg/m3]
 		Real64 pipeOutDia; // Outer diameter of the Pipe			[m]
-		Real64 PipeThick; // Thickness of the pipe wall				[m]
+		Real64 pipeThick; // Thickness of the pipe wall				[m]
 		Real64 designFlow; // Design volumetric flow rate			[m3/s]
 		Real64 designMassFlow; // Design mass flow rate				[kg/s]
 		Real64 tempGround; // The far feild temperature of the ground   [°C]
@@ -109,7 +109,7 @@ namespace GroundHeatExchangers {
 			cpPipe( 0.0 ),
 			rhoPipe( 0.0 ),
 			pipeOutDia( 0.0 ),
-			PipeThick( 0.0 ),
+			pipeThick( 0.0 ),
 			designFlow( 0.0 ),
 			designMassFlow( 0.0 ),
 			tempGround( 0.0 ),
@@ -154,10 +154,10 @@ namespace GroundHeatExchangers {
 		int numBoreholes;
 		Real64 boreholeLength;
 		Real64 boreholeRadius;
-		Real64 KGrout; // Grout thermal conductivity                [W/(mK)]
+		Real64 kGrout; // Grout thermal conductivity                [W/(mK)]
 		Real64 UtubeDist; // Distance between the legs of the Utube    [m]
 		Real64 resistanceBhole; // The thermal resistance of the borehole, (K per W/m)
-		bool RunFlag;
+		bool runFlag;
 		Real64 LastQnSubHr;
 
 
@@ -168,10 +168,10 @@ namespace GroundHeatExchangers {
 			numBoreholes( 0 ),
 			boreholeLength( 0.0 ),
 			boreholeRadius( 0.0 ),
-			KGrout( 0.0 ),
+			kGrout( 0.0 ),
 			UtubeDist( 0.0 ),
 			resistanceBhole( 0.0 ),
-			RunFlag( false ),
+			runFlag( false ),
 			LastQnSubHr( 0.0 )
 
 		{}
@@ -247,7 +247,7 @@ namespace GroundHeatExchangers {
 		std::string const & GLHEType,
 		std::string const & Name,
 		int & CompIndex,
-		bool const RunFlag,
+		bool const runFlag,
 		bool const FirstIteration,
 		bool const InitLoopEquip
 	);

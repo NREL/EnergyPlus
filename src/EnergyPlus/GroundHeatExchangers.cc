@@ -118,7 +118,7 @@ namespace GroundHeatExchangers {
 		std::string const & type,
 		std::string const & Name,
 		int & CompIndex,
-		bool const RunFlag,
+		bool const runFlag,
 		bool const FirstIteration,
 		bool const InitLoopEquip
 	)
@@ -754,18 +754,18 @@ namespace GroundHeatExchangers {
 			VerticalGLHE( GLHENum ).kGround = rNumericArgs( 5 );
 			VerticalGLHE( GLHENum ).cpRhoGround = rNumericArgs( 6 );
 			VerticalGLHE( GLHENum ).tempGround = rNumericArgs( 7 );
-			VerticalGLHE( GLHENum ).KGrout = rNumericArgs( 8 );
+			VerticalGLHE( GLHENum ).kGrout = rNumericArgs( 8 );
 			VerticalGLHE( GLHENum ).kPipe = rNumericArgs( 9 );
 			VerticalGLHE( GLHENum ).pipeOutDia = rNumericArgs( 10 );
 			VerticalGLHE( GLHENum ).UtubeDist = rNumericArgs( 11 );
-			VerticalGLHE( GLHENum ).PipeThick = rNumericArgs( 12 );
+			VerticalGLHE( GLHENum ).pipeThick = rNumericArgs( 12 );
 			VerticalGLHE( GLHENum ).maxSimYears = rNumericArgs( 13 );
 			VerticalGLHE( GLHENum ).gReferenceRatio = rNumericArgs( 14 );
 
 			//   Not many checks
-			if ( VerticalGLHE( GLHENum ).PipeThick >= VerticalGLHE( GLHENum ).pipeOutDia / 2.0 ) {
+			if ( VerticalGLHE( GLHENum ).pipeThick >= VerticalGLHE( GLHENum ).pipeOutDia / 2.0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + VerticalGLHE( GLHENum ).Name + "\", invalid value in field." );
-				ShowContinueError( "..." + cNumericFieldNames( 13 ) + "=[" + RoundSigDigits( VerticalGLHE( GLHENum ).PipeThick, 3 ) + "]." );
+				ShowContinueError( "..." + cNumericFieldNames( 13 ) + "=[" + RoundSigDigits( VerticalGLHE( GLHENum ).pipeThick, 3 ) + "]." );
 				ShowContinueError( "..." + cNumericFieldNames( 11 ) + "=[" + RoundSigDigits( VerticalGLHE( GLHENum ).pipeOutDia, 3 ) + "]." );
 				ShowContinueError( "...Radius will be <=0." );
 				ErrorsFound = true;
@@ -869,90 +869,63 @@ namespace GroundHeatExchangers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int NumBholes; // number of boreholes
-		Real64 BholeLength;
-		Real64 BholeRadius;
-		Real64 K_Ground;
-		Real64 Cp_Ground;
-		Real64 Cp_Fluid;
-		Real64 Tground;
-		Real64 K_Grout;
-		Real64 K_Fluid;
-		Real64 K_Pipe;
-		Real64 FluidDensity;
-		Real64 FluidViscosity;
-		Real64 PipeOuterDia;
-		Real64 PipeInnerDia;
-		Real64 DistUtube;
-		Real64 ThickPipe;
+		Real64 cpFluid;
+		Real64 kFluid;
+		Real64 fluidDensity;
+		Real64 fluidViscosity;
+		Real64 pipeInnerDia;
 		Real64 BholeMdot;
-		Real64 PipeOuterRad;
-		Real64 PipeInnerRad;
-		Real64 NusseltNum;
-		Real64 ReynoldsNum;
-		Real64 PrandlNum;
+		Real64 pipeOuterRad;
+		Real64 pipeInnerRad;
+		Real64 nusseltNum;
+		Real64 reynoldsNum;
+		Real64 prandtlNum;
 		Real64 hci;
 		Real64 Rcond;
 		Real64 Rconv;
 		Real64 Rgrout;
 		Real64 B0; // grout resistance curve fit coefficients
 		Real64 B1;
-		Real64 MaxDistance;
-		Real64 DistanceRatio;
+		Real64 maxDistance;
+		Real64 distanceRatio;
 
-		//assign local variables
-		//NumBholes = this->numBoreholes;
-		BholeLength = this->boreholeLength;
-		BholeRadius = this->boreholeRadius;
-		K_Ground = this->kGround;
-		Cp_Ground = this->cpRhoGround;
-
-		Cp_Fluid = GetSpecificHeatGlycol( PlantLoop( this->loopNum ).FluidName, inletTemp, PlantLoop( this->loopNum ).FluidIndex, RoutineName );
-
-		Tground = this->tempGround;
-		K_Grout = this->KGrout;
-		K_Pipe = this->kPipe;
-		K_Fluid = GetConductivityGlycol( PlantLoop( this->loopNum ).FluidName, inletTemp, PlantLoop( this->loopNum ).FluidIndex, RoutineName );
-		FluidDensity = GetDensityGlycol( PlantLoop( this->loopNum ).FluidName, inletTemp, PlantLoop( this->loopNum ).FluidIndex, RoutineName );
-
-		FluidViscosity = GetViscosityGlycol( PlantLoop( this->loopNum ).FluidName, inletTemp, PlantLoop( this->loopNum ).FluidIndex, RoutineName );
-
-		PipeOuterDia = this->pipeOutDia;
-		DistUtube = this->UtubeDist;
-		ThickPipe = this->PipeThick;
+		cpFluid = GetSpecificHeatGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
+		kFluid = GetConductivityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
+		fluidDensity = GetDensityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
+		fluidViscosity = GetViscosityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
 
 		//calculate mass flow rate
-		BholeMdot = massFlowRate / numBoreholes; //VerticalGLHE(GLHENum)%designFlow*FluidDensity /numBoreholes
+		BholeMdot = massFlowRate / numBoreholes; //VerticalGLHE(GLHENum)%designFlow*fluidDensity /numBoreholes
 
-		PipeOuterRad = PipeOuterDia / 2.0;
-		PipeInnerRad = PipeOuterRad - ThickPipe;
-		PipeInnerDia = 2.0 * PipeInnerRad;
+		pipeOuterRad = pipeOutDia / 2.0;
+		pipeInnerRad = pipeOuterRad - pipeThick;
+		pipeInnerDia = 2.0 * pipeInnerRad;
 		//Re=Rho*V*D/Mu
-		ReynoldsNum = FluidDensity * PipeInnerDia * ( BholeMdot / FluidDensity / ( Pi * pow_2( PipeInnerRad ) ) ) / FluidViscosity;
-		PrandlNum = ( Cp_Fluid * FluidViscosity ) / ( K_Fluid );
+		reynoldsNum = fluidDensity * pipeInnerDia * ( BholeMdot / fluidDensity / ( Pi * pow_2( pipeInnerRad ) ) ) / fluidViscosity;
+		prandtlNum = ( cpFluid * fluidViscosity ) / ( kFluid );
 		//   Convection Resistance
-		NusseltNum = 0.023 * std::pow( ReynoldsNum, 0.8 ) * std::pow( PrandlNum, 0.35 );
-		hci = NusseltNum * K_Fluid / PipeInnerDia;
+		nusseltNum = 0.023 * std::pow( reynoldsNum, 0.8 ) * std::pow( prandtlNum, 0.35 );
+		hci = nusseltNum * kFluid / pipeInnerDia;
 		if ( BholeMdot == 0.0 ) {
 			Rconv = 0.0;
 		} else {
-			Rconv = 1.0 / ( 2.0 * Pi * PipeInnerDia * hci );
+			Rconv = 1.0 / ( 2.0 * Pi * pipeInnerDia * hci );
 		}
 
 		//   Conduction Resistance
-		Rcond = std::log( PipeOuterRad / PipeInnerRad ) / ( 2.0 * Pi * K_Pipe ) / 2.0; // pipe in parallel so /2
+		Rcond = std::log( pipeOuterRad / pipeInnerRad ) / ( 2.0 * Pi * kPipe ) / 2.0; // pipe in parallel so /2
 
 		//   Resistance Due to the grout.
-		MaxDistance = 2.0 * BholeRadius - ( 2.0 * PipeOuterDia );
-		DistanceRatio = DistUtube / MaxDistance;
+		maxDistance = 2.0 * boreholeRadius - ( 2.0 * pipeOutDia );
+		distanceRatio = UtubeDist / maxDistance;
 
-		if ( DistanceRatio >= 0.0 && DistanceRatio <= 0.25 ) {
+		if ( distanceRatio >= 0.0 && distanceRatio <= 0.25 ) {
 			B0 = 14.450872;
 			B1 = -0.8176;
-		} else if ( DistanceRatio > 0.25 && DistanceRatio < 0.5 ) {
+		} else if ( distanceRatio > 0.25 && distanceRatio < 0.5 ) {
 			B0 = 20.100377;
 			B1 = -0.94467;
-		} else if ( DistanceRatio >= 0.5 && DistanceRatio <= 0.75 ) {
+		} else if ( distanceRatio >= 0.5 && distanceRatio <= 0.75 ) {
 			B0 = 17.44268;
 			B1 = -0.605154;
 		} else {
@@ -960,8 +933,8 @@ namespace GroundHeatExchangers {
 			B1 = -0.3796;
 		}
 
-		Rgrout = 1.0 / ( K_Grout * ( B0 * std::pow( BholeRadius / PipeOuterRad, B1 ) ) );
-		this->resistanceBhole = Rcond + Rconv + Rgrout;
+		Rgrout = 1.0 / ( kGrout * ( B0 * std::pow( boreholeRadius / pipeOuterRad, B1 ) ) );
+		resistanceBhole = Rcond + Rconv + Rgrout;
 	}
 
 	//******************************************************************************
@@ -1013,9 +986,9 @@ namespace GroundHeatExchangers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int NumPairs;
+		//int NumPairs;
 		Real64 RATIO;
-		Real64 referenceRatio;
+		//Real64 referenceRatio;
 		Real64 GfuncVal;
 
 		//Binary Search Algorithms Variables
@@ -1025,24 +998,24 @@ namespace GroundHeatExchangers {
 		int High;
 		bool Found;
 
-		NumPairs = this->NPairs;
-		RATIO = this->boreholeRadius / this->boreholeLength;
-		referenceRatio = this->gReferenceRatio;
+		//NumPairs = this->NPairs;
+		RATIO = boreholeRadius / boreholeLength;
+		//referenceRatio = this->gReferenceRatio;
 
 		// The following IF loop determines the g-function for the case
 		// when LnTTsVal is less than the first element of the LnTTs array.
 		// In this case, the g-function must be found by extrapolation.
 
-		if ( LnTTsVal <= this->LNTTS( 1 ) ) {
-			GfuncVal = ( ( LnTTsVal - this->LNTTS( 1 ) ) / ( this->LNTTS( 2 ) - this->LNTTS( 1 ) ) ) * ( this->GFNC( 2 ) - this->GFNC( 1 ) ) + this->GFNC( 1 );
+		if ( LnTTsVal <= LNTTS( 1 ) ) {
+			GfuncVal = ( ( LnTTsVal - LNTTS( 1 ) ) / ( LNTTS( 2 ) - LNTTS( 1 ) ) ) * ( GFNC( 2 ) - GFNC( 1 ) ) + GFNC( 1 );
 
 			// The following IF statement determines the condition of the ratio
 			// between the borehole radius and the active borehole length.
 			// If RATIO does not equal 0.0005 then a correction factor for
 			// the g-function must be used.
 
-			if ( RATIO != referenceRatio ) {
-				GfuncVal -= std::log( this->boreholeRadius / ( this->boreholeLength * referenceRatio ) );
+			if ( RATIO != gReferenceRatio ) {
+				GfuncVal -= std::log( boreholeRadius / ( boreholeLength * gReferenceRatio ) );
 			}
 
 			return GfuncVal;
@@ -1052,12 +1025,12 @@ namespace GroundHeatExchangers {
 		// when LnTTsVal is greater than the last element of the LnTTs array.
 		// In this case, the g-function must be found by extrapolation.
 
-		if ( LnTTsVal > this->LNTTS( NumPairs ) ) {
-			GfuncVal = ( ( LnTTsVal - this->LNTTS( NumPairs ) ) / ( this->LNTTS( NumPairs - 1 ) - this->LNTTS( NumPairs ) ) ) * ( this->GFNC( NumPairs - 1 ) - this->GFNC( NumPairs ) ) + this->GFNC( NumPairs );
+		if ( LnTTsVal > LNTTS( NPairs ) ) {
+			GfuncVal = ( ( LnTTsVal - LNTTS( NPairs ) ) / ( LNTTS( NPairs - 1 ) - LNTTS( NPairs ) ) ) * ( GFNC( NPairs - 1 ) - GFNC( NPairs ) ) + GFNC( NPairs );
 
 			// Apply correction factor if necessary
-			if ( RATIO != referenceRatio ) {
-				GfuncVal -= std::log( this->boreholeRadius / ( this->boreholeLength * referenceRatio ) );
+			if ( RATIO != gReferenceRatio ) {
+				GfuncVal -= std::log( boreholeRadius / ( boreholeLength * gReferenceRatio ) );
 			}
 
 			return GfuncVal;
@@ -1070,13 +1043,13 @@ namespace GroundHeatExchangers {
 		// USING BINARY SEARCH TO FIND THE ELEMENET
 		Found = false;
 		Low = 1;
-		High = NumPairs;
+		High = NPairs;
 		LOOP: while ( Low <= High ) {
 			Mid = ( Low + High ) / 2;
-			if ( this->LNTTS( Mid ) < LnTTsVal ) {
+			if ( LNTTS( Mid ) < LnTTsVal ) {
 				Low = Mid + 1;
 			} else {
-				if ( this->LNTTS( Mid ) > LnTTsVal ) {
+				if ( LNTTS( Mid ) > LnTTsVal ) {
 					High = Mid - 1;
 				} else {
 					Found = true;
@@ -1089,10 +1062,10 @@ namespace GroundHeatExchangers {
 		//LnTTsVal is identical to one of the LnTTS array elements return GfuncVal
 		//the GfuncVal after applying the correction
 		if ( Found ) {
-			GfuncVal = this->GFNC( Mid );
+			GfuncVal = GFNC( Mid );
 			// Apply correction factor if necessary
-			if ( RATIO != referenceRatio ) {
-				GfuncVal -= std::log( this->boreholeRadius / ( this->boreholeLength * referenceRatio ) );
+			if ( RATIO != gReferenceRatio ) {
+				GfuncVal -= std::log( boreholeRadius / ( boreholeLength * gReferenceRatio ) );
 			}
 			return GfuncVal;
 		}
@@ -1100,13 +1073,13 @@ namespace GroundHeatExchangers {
 		//LnTTsVal is in between any of the two LnTTS array elements find the
 		// gfunction value by interplation and apply the correction and return GfuncVal
 		else {
-			if ( this->LNTTS( Mid ) < LnTTsVal ) ++Mid;
+			if ( LNTTS( Mid ) < LnTTsVal ) ++Mid;
 
-			GfuncVal = ( ( LnTTsVal - this->LNTTS( Mid ) ) / ( this->LNTTS( Mid - 1 ) - this->LNTTS( Mid ) ) ) * ( this->GFNC( Mid - 1 ) - this->GFNC( Mid ) ) + this->GFNC( Mid );
+			GfuncVal = ( ( LnTTsVal - LNTTS( Mid ) ) / ( LNTTS( Mid - 1 ) - LNTTS( Mid ) ) ) * ( GFNC( Mid - 1 ) - GFNC( Mid ) ) + GFNC( Mid );
 
 			// Apply correction factor if necessary
-			if ( RATIO != referenceRatio ) {
-				GfuncVal -= std::log( this->boreholeRadius / ( this->boreholeLength * referenceRatio ) );
+			if ( RATIO != gReferenceRatio ) {
+				GfuncVal -= std::log( boreholeRadius / ( boreholeLength * gReferenceRatio ) );
 			}
 			return GfuncVal;
 		}
@@ -1159,41 +1132,40 @@ namespace GroundHeatExchangers {
 		bool errFlag;
 
 		// Init more variables
-		if ( this->myFlag ) {
+		if ( myFlag ) {
 			// Locate the hx on the plant loops for later usage
 			errFlag = false;
-			ScanPlantLoopsForObject( this->Name, TypeOf_GrndHtExchgVertical, this->loopNum, this->loopSideNum, this->branchNum, this->compNum, _, _, _, _, _, errFlag );
+			ScanPlantLoopsForObject( Name, TypeOf_GrndHtExchgVertical, loopNum, loopSideNum, branchNum, compNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
 				ShowFatalError( "initGLHESimVars: Program terminated due to previous condition(s)." );
 			}
-			this->myFlag = false;
+			myFlag = false;
 		}
 
-		if ( this->myEnvrnFlag && BeginEnvrnFlag ) {
-			this->myEnvrnFlag = false;
+		if ( myEnvrnFlag && BeginEnvrnFlag ) {
+			myEnvrnFlag = false;
 
-			FluidDensity = GetDensityGlycol( PlantLoop( this->loopNum ).FluidName, 20.0, PlantLoop( this->loopNum ).FluidIndex, RoutineName );
-			this->designMassFlow = this->designFlow * FluidDensity;
-			InitComponentNodes( 0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum );
+			FluidDensity = GetDensityGlycol( PlantLoop( loopNum ).FluidName, 20.0, PlantLoop( loopNum ).FluidIndex, RoutineName );
+			designMassFlow = designFlow * FluidDensity;
+			InitComponentNodes( 0.0, designMassFlow, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum );
 
-			this->LastQnSubHr = 0.0;
-			Node( this->inletNodeNum ).Temp = this->tempGround;
-			Node( this->outletNodeNum ).Temp = this->tempGround;
+			LastQnSubHr = 0.0;
+			Node( inletNodeNum ).Temp = tempGround;
+			Node( outletNodeNum ).Temp = tempGround;
 
 			// zero out all history arrays
 
-			this->QnHr = 0.0;
-			this->QnMonthlyAgg = 0.0;
-			this->QnSubHr = 0.0;
-			this->LastHourN = 0;
-			this->QGLHE = 0.0;
+			QnHr = 0.0;
+			QnMonthlyAgg = 0.0;
+			QnSubHr = 0.0;
+			LastHourN = 0;
 			PrevTimeSteps = 0.0;
 			currentSimTime = 0.0;
 		}
 
-		mdotActual = RegulateCondenserCompFlowReqOp( this->loopNum, this->loopSideNum, this->branchNum, this->compNum, this->designMassFlow );
+		mdotActual = RegulateCondenserCompFlowReqOp( loopNum, loopSideNum, branchNum, compNum, designMassFlow );
 
-		SetComponentFlowRate( mdotActual, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum );
+		SetComponentFlowRate( mdotActual, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum );
 
 		// Resent local environment init flag
 		if ( ! BeginEnvrnFlag ) myEnvrnFlag = true;
@@ -1242,21 +1214,21 @@ namespace GroundHeatExchangers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
-		int inletNode; // Inlet node number of the GLHE
-		int outletNode; // Outlet node number of the GLHE
+		//int inletNode; // Inlet node number of the GLHE
+		//int outletNode; // Outlet node number of the GLHE
 		Real64 GLHEdeltaTemp; // ABS(Outlet temp -inlet temp)
 		static int numErrorCalls( 0 );
 		Real64 designMassFlow;
 		Real64 FluidDensity;
 
 		//set node temperatures
-		inletNode = this->inletNodeNum;
-		outletNode = this->outletNodeNum;
+		//inletNode = this->inletNodeNum;
+		//outletNode = this->outletNodeNum;
 
-		SafeCopyPlantNode( inletNode, outletNode );
+		SafeCopyPlantNode( inletNodeNum, outletNodeNum );
 
-		Node( outletNode ).Temp = outletTemp;
-		Node( outletNode ).Enthalpy = outletTemp * GetSpecificHeatGlycol( PlantLoop( this->loopNum ).FluidName, outletTemp, PlantLoop( this->loopNum ).FluidIndex, RoutineName );
+		Node( outletNodeNum ).Temp = outletTemp;
+		Node( outletNodeNum ).Enthalpy = outletTemp * GetSpecificHeatGlycol( PlantLoop( loopNum ).FluidName, outletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
 		GLHEdeltaTemp = std::abs( outletTemp - inletTemp );
 		this->boreholeTemp = boreholeTemp;
 		this->outletTemp = outletTemp;
@@ -1267,7 +1239,7 @@ namespace GroundHeatExchangers {
 		this->aveFluidTemp = aveFluidTemp;
 
 		if ( GLHEdeltaTemp > DeltaTempLimit && numErrorCalls < numVerticalGLHEs && ! WarmupFlag ) {
-			FluidDensity = GetDensityGlycol( PlantLoop( this->loopNum ).FluidName, inletTemp, PlantLoop( this->loopNum ).FluidIndex, RoutineName );
+			FluidDensity = GetDensityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
 			designMassFlow = this->designFlow * FluidDensity;
 			ShowWarningError( "Check GLHE design inputs & g-functions for consistency" );
 			ShowContinueError( "For GroundHeatExchanger:Vertical " + this->Name + "GLHE delta Temp > 100C." );
