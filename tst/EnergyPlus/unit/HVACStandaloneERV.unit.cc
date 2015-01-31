@@ -10,7 +10,6 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <ObjexxFCL/gio.hh>
-#include <EnergyPlus/SQLiteProcedures.hh>
 
 
 using namespace EnergyPlus;

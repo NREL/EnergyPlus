@@ -75,10 +75,9 @@ void CreateSQLiteZoneExtendedOutput() {
 		for( int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
 			sqlite->addZoneData( zoneNum, DataHeatBalance::Zone(zoneNum) );
 		}
-		// This needs to be addressed... it is wrong schema setup
-		// for(auto const & zoneList : zoneLists) {
-		// 	zoneList->insertIntoSQLite( m_zoneListInsertStmt );
-		// }
+		for(int listNum = 1; listNum <= DataHeatBalance::NumOfZoneLists; ++listNum) {
+			sqlite->addZoneListData(  listNum, DataHeatBalance::ZoneList(listNum) );
+		}
 		for(int groupNum = 1; groupNum <= DataHeatBalance::NumOfZoneGroups; ++groupNum) {
 			sqlite->addZoneGroupData( groupNum, DataHeatBalance::ZoneGroup(groupNum) );
 		}
@@ -141,7 +140,7 @@ void CreateSQLiteZoneExtendedOutput() {
 
 SQLite::SQLite( std::ostream & errorStream, std::string const & dbName, std::string const & errorFileName, bool writeOutputToSQLite, bool writeTabularDataToSQLite )
 	: 
-	SQLiteProcedures(errorStream, writeTabularDataToSQLite, dbName, errorFileName),
+	SQLiteProcedures(errorStream, writeOutputToSQLite, dbName, errorFileName),
 	m_writeTabularDataToSQLite(writeTabularDataToSQLite),
 	m_sqlDBTimeIndex(0),
 	m_reportDataInsertStmt(nullptr),
@@ -149,6 +148,9 @@ SQLite::SQLite( std::ostream & errorStream, std::string const & dbName, std::str
 	m_reportDictionaryInsertStmt(nullptr),
 	m_timeIndexInsertStmt(nullptr),
 	m_zoneInfoInsertStmt(nullptr),
+	m_zoneListInsertStmt(nullptr),
+	m_zoneGroupInsertStmt(nullptr),
+	m_zoneInfoZoneListInsertStmt(nullptr),
 	m_nominalLightingInsertStmt(nullptr),
 	m_nominalElectricEquipmentInsertStmt(nullptr),
 	m_nominalGasEquipmentInsertStmt(nullptr),
@@ -160,8 +162,6 @@ SQLite::SQLite( std::ostream & errorStream, std::string const & dbName, std::str
 	m_constructionInsertStmt(nullptr),
 	m_constructionLayerInsertStmt(nullptr),
 	m_materialInsertStmt(nullptr),
-	m_zoneListInsertStmt(nullptr),
-	m_zoneGroupInsertStmt(nullptr),
 	m_infiltrationInsertStmt(nullptr),
 	m_ventilationInsertStmt(nullptr),
 	m_nominalPeopleInsertStmt(nullptr),
@@ -200,9 +200,10 @@ SQLite::SQLite( std::ostream & errorStream, std::string const & dbName, std::str
 		initializeErrorsTable();
 		initializeTimeIndicesTable();
 		initializeZoneInfoTable();
-		initializeSchedulesTable();
 		initializeZoneListTable();
 		initializeZoneGroupTable();
+		initializeZoneInfoZoneListTable();
+		initializeSchedulesTable();
 		initializeMaterialsTable();
 		initializeConstructionsTables();
 		initializeSurfacesTable();
@@ -239,6 +240,9 @@ SQLite::~SQLite()
 	sqlite3_finalize(m_reportDictionaryInsertStmt);
 	sqlite3_finalize(m_timeIndexInsertStmt);
 	sqlite3_finalize(m_zoneInfoInsertStmt);
+	sqlite3_finalize(m_zoneListInsertStmt);
+	sqlite3_finalize(m_zoneGroupInsertStmt);
+	sqlite3_finalize(m_zoneInfoZoneListInsertStmt);
 	sqlite3_finalize(m_nominalLightingInsertStmt);
 	sqlite3_finalize(m_nominalElectricEquipmentInsertStmt);
 	sqlite3_finalize(m_nominalGasEquipmentInsertStmt);
@@ -250,8 +254,6 @@ SQLite::~SQLite()
 	sqlite3_finalize(m_constructionInsertStmt);
 	sqlite3_finalize(m_constructionLayerInsertStmt);
 	sqlite3_finalize(m_materialInsertStmt);
-	sqlite3_finalize(m_zoneListInsertStmt);
-	sqlite3_finalize(m_zoneGroupInsertStmt);
 	sqlite3_finalize(m_infiltrationInsertStmt);
 	sqlite3_finalize(m_ventilationInsertStmt);
 	sqlite3_finalize(m_nominalPeopleInsertStmt);
@@ -519,6 +521,30 @@ void SQLite::initializeZoneInfoTable()
 		"VALUES (?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?);";
 
 	sqlitePrepareStatement(m_zoneInfoInsertStmt,zoneInfoInsertSQL);
+}
+
+void SQLite::initializeZoneInfoZoneListTable()
+{
+	const std::string zoneInfoZoneListTableSQL =
+		"CREATE TABLE ZoneInfoZoneLists ("
+			"ZoneListIndex INTEGER NOT NULL, "
+			"ZoneIndex INTEGER NOT NULL, "
+			"PRIMARY KEY(ZoneListIndex, ZoneIndex), "
+			"FOREIGN KEY(ZoneListIndex) REFERENCES ZoneLists(ZoneListIndex) "
+				"ON DELETE CASCADE ON UPDATE CASCADE, "
+			"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
+				"ON DELETE CASCADE ON UPDATE CASCADE "
+			");";
+
+	sqliteExecuteCommand(zoneInfoZoneListTableSQL);
+
+	const std::string zoneInfoZoneListInsertSQL =
+		"INSERT INTO ZoneInfoZoneLists ("
+			"ZoneListIndex, "
+			"ZoneIndex) "
+		"VALUES (?,?);";
+
+	sqlitePrepareStatement(m_zoneInfoZoneListInsertStmt,zoneInfoZoneListInsertSQL);
 }
 
 void SQLite::initializeNominalPeopleTable()
@@ -789,18 +815,14 @@ void SQLite::initializeMaterialsTable()
 
 void SQLite::initializeZoneListTable()
 {
-	// This needs to be addressed... it is wrong schema setup
 	const std::string zoneListsTableSQL =
 		"CREATE TABLE ZoneLists ( "
-			"ZoneListIndex INTEGER PRIMARY KEY, Name TEXT, ZoneIndex INTEGER, "
-			"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE "
-		");";
+			"ZoneListIndex INTEGER PRIMARY KEY, Name TEXT);";
 
 	sqliteExecuteCommand(zoneListsTableSQL);
 
 	const std::string zoneListInsertSQL =
-		"INSERT INTO ZoneLists VALUES(?,?,?);";
+		"INSERT INTO ZoneLists VALUES(?,?);";
 
 	sqlitePrepareStatement(m_zoneListInsertStmt,zoneListInsertSQL);
 }
@@ -808,12 +830,19 @@ void SQLite::initializeZoneListTable()
 void SQLite::initializeZoneGroupTable()
 {
 	const std::string zoneGroupsTableSQL =
-		"CREATE TABLE ZoneGroups (ZoneGroupIndex INTEGER PRIMARY KEY, ZoneListName TEXT, ZoneListMultiplier INTEGER);";
+		"CREATE TABLE ZoneGroups ( "
+			"ZoneGroupIndex INTEGER PRIMARY KEY, "
+			"ZoneGroupName TEXT, "
+			"ZoneListIndex INTEGER, "
+			"ZoneListMultiplier INTEGER, "
+			"FOREIGN KEY(ZoneListIndex) REFERENCES ZoneLists(ZoneListIndex) "
+				"ON UPDATE CASCADE "
+			");";
 
 	sqliteExecuteCommand(zoneGroupsTableSQL);
 
 	const std::string zoneGroupInsertSQL =
-		"INSERT INTO ZoneGroups VALUES(?,?,?);";
+		"INSERT INTO ZoneGroups VALUES(?,?,?,?);";
 
 	sqlitePrepareStatement(m_zoneGroupInsertStmt,zoneGroupInsertSQL);
 }
@@ -1997,7 +2026,7 @@ void SQLite::createZoneExtendedOutput()
 			zone->insertIntoSQLite( m_zoneInfoInsertStmt );
 		}
 		for(auto const & zoneList : zoneLists) {
-			zoneList->insertIntoSQLite( m_zoneListInsertStmt );
+			zoneList->insertIntoSQLite( m_zoneListInsertStmt, m_zoneInfoZoneListInsertStmt );
 		}
 		for(auto const & zoneGroup : zoneGroups) {
 			zoneGroup->insertIntoSQLite( m_zoneGroupInsertStmt );
@@ -2162,7 +2191,8 @@ void SQLite::addRoomAirModelData( int const number, DataRoomAirModel::AirModelDa
 bool SQLite::ZoneGroup::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, name);
-	sqliteBindInteger(insertStmt, 3, zoneList);
+	sqliteBindForeignKey(insertStmt, 3, zoneList);
+	sqliteBindInteger(insertStmt, 4, multiplier);
 
 	int rc = sqliteStepCommand(insertStmt);
 	bool validInsert = sqliteStepValidity( rc );
@@ -2190,7 +2220,7 @@ bool SQLite::Material::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
 	sqliteResetCommand(insertStmt);
 	return validInsert;
 }
-bool SQLite::Construction::insertIntoSQLite ( sqlite3_stmt * insertStmt, sqlite3_stmt * subInsertStmt ) {
+bool SQLite::Construction::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, name);
 	sqliteBindInteger(insertStmt, 3, totLayers);
@@ -2206,14 +2236,21 @@ bool SQLite::Construction::insertIntoSQLite ( sqlite3_stmt * insertStmt, sqlite3
 	sqliteBindLogical(insertStmt, 13, typeIsWindow);
 	sqliteBindDouble(insertStmt, 14, uValue);
 
-	for(auto const & constructionLayer : constructionLayers) {
-		constructionLayer->insertIntoSQLite( subInsertStmt );
-	}
-
 	int rc = sqliteStepCommand(insertStmt);
 	bool validInsert = sqliteStepValidity( rc );
 	sqliteResetCommand(insertStmt);
 	return validInsert;
+}
+bool SQLite::Construction::insertIntoSQLite ( sqlite3_stmt * insertStmt, sqlite3_stmt * subInsertStmt ) {
+	bool constructionInsertValid = insertIntoSQLite( insertStmt );
+	if ( !constructionInsertValid ) return false;
+
+	bool valid = true;
+	for(auto const & constructionLayer : constructionLayers) {
+		bool validInsert = constructionLayer->insertIntoSQLite( subInsertStmt );
+		if ( valid && !validInsert ) valid = false;
+	}
+	return valid;
 }
 bool SQLite::Construction::ConstructionLayer::insertIntoSQLite( sqlite3_stmt * insertStmt ) {
 	sqliteBindForeignKey(insertStmt, 1, constructNumber);
@@ -2439,27 +2476,28 @@ bool SQLite::Surface::insertIntoSQLite( sqlite3_stmt * insertStmt ) {
 }
 
 bool SQLite::ZoneList::insertIntoSQLite( sqlite3_stmt * insertStmt ) {
-	// This needs to be addressed... it is wrong schema setup
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, name);
-	// sqliteBindForeignKey(insertStmt, 3, zoneList.Zone(zoneNum));
 
 	int rc = sqliteStepCommand(insertStmt);
 	bool validInsert = sqliteStepValidity( rc );
 	sqliteResetCommand(insertStmt);
-	return validInsert;
+	return validInsert;	
+}
 
-	// for(int listNum = 1; listNum <= DataHeatBalance::NumOfZoneLists; ++listNum) {
-	// 	auto const & zoneList = DataHeatBalance::ZoneList(listNum);
-	// 	for(int zoneNum = 1; zoneNum <= zoneList.NumOfZones; ++zoneNum) {
-	// 		sqliteBindInteger(m_zoneListInsertStmt, 1, listNum);
-	// 		sqliteBindText(m_zoneListInsertStmt, 2, zoneList.Name);
-	// 		sqliteBindForeignKey(m_zoneListInsertStmt, 3, zoneList.Zone(zoneNum));
-
-	// 		sqliteStepCommand(m_zoneListInsertStmt);
-	// 		sqliteResetCommand(m_zoneListInsertStmt);
-	// 	}
-	
+bool SQLite::ZoneList::insertIntoSQLite( sqlite3_stmt * insertStmt, sqlite3_stmt * subInsertStmt ) {
+	bool zoneListInsertValid = insertIntoSQLite( insertStmt );
+	if ( !zoneListInsertValid ) return false;
+	bool valid = true;
+	for ( int i = 1; i <= zones.size(); ++i ) {
+		sqliteBindForeignKey(subInsertStmt, 1, number);
+		sqliteBindForeignKey(subInsertStmt, 2, zones( i ));
+		int rc = sqliteStepCommand(subInsertStmt);
+		bool validInsert = sqliteStepValidity( rc );
+		sqliteResetCommand(subInsertStmt);
+		if ( valid && !validInsert ) valid = false;
+	}
+	return valid;	
 }
 
 bool SQLite::Schedule::insertIntoSQLite( sqlite3_stmt * insertStmt ) {
@@ -2532,7 +2570,6 @@ SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, bool writeOutput
 	if( m_writeOutputToSQLite ) {
 		int rc = -1;
 		bool ok = true;
-		// m_errorStream.open("sqlite.err", std::ofstream::out | std::ofstream::trunc);
 
 		// Test if we can write to the sqlite error file
 		//  Does there need to be a seperate sqlite.err file at all?  Consider using eplusout.err
@@ -2578,12 +2615,9 @@ SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, bool writeOutput
 		if( ok ) {
 			// Now open the output db for the duration of the simulation
 			rc = sqlite3_open_v2(dbName.c_str(), &m_connection, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
-			// std::shared_ptr db(m_connection, sqlite3_close);
-			// m_db = db;
 			m_db = std::shared_ptr<sqlite3>(m_connection, sqlite3_close);
 			if( rc ) {
 				m_errorStream << "SQLite3 message, can't open new database: " << sqlite3_errmsg(m_connection) << std::endl;
-				// sqlite3_close(m_connection);
 				ok = false;
 			}
 		}

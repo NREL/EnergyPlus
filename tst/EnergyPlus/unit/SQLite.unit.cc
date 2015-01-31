@@ -692,6 +692,23 @@ namespace EnergyPlus {
 		zoneData1->ExtWindowArea = 2;
 		zoneData1->isPartOfTotalArea = false;
 
+		auto const & zoneListData0 = std::unique_ptr<DataHeatBalance::ZoneListData>(new DataHeatBalance::ZoneListData());
+		zoneListData0->Name = "test zoneList 1";
+		zoneListData0->Zone.allocate( 1 );
+		zoneListData0->Zone( 1 ) = 1;
+		auto const & zoneListData1 = std::unique_ptr<DataHeatBalance::ZoneListData>(new DataHeatBalance::ZoneListData());
+		zoneListData1->Name = "test zoneList 2";
+		zoneListData1->Zone.allocate( 2 );
+		zoneListData1->Zone( 1 ) = 1;
+		zoneListData1->Zone( 2 ) = 2;
+
+		auto const & zoneGroupData0 = std::unique_ptr<DataHeatBalance::ZoneGroupData>(new DataHeatBalance::ZoneGroupData());
+		zoneGroupData0->Name = "test zoneGroup 1";
+		auto const & zoneGroupData1 = std::unique_ptr<DataHeatBalance::ZoneGroupData>(new DataHeatBalance::ZoneGroupData());
+		zoneGroupData1->Name = "test zoneGroup 2";
+		zoneGroupData1->ZoneList = 2;
+		zoneGroupData1->Multiplier = 99;
+
 		auto const & materialData0 = std::unique_ptr<DataHeatBalance::MaterialProperties>(new DataHeatBalance::MaterialProperties());
 		materialData0->Name = "test material 1";
 		materialData0->Group = 1;
@@ -725,8 +742,9 @@ namespace EnergyPlus {
 		constructData1->OutsideAbsorpThermal = 2;
 		constructData1->OutsideRoughness = 2;
 		constructData1->TypeIsWindow = true;
-		constructData1->LayerPoint[ 1 ] = 1;
-		constructData1->LayerPoint[ 2 ] = 2;
+		constructData1->LayerPoint.allocate( 2 );
+		constructData1->LayerPoint( 1 ) = 1;
+		constructData1->LayerPoint( 2 ) = 2;
 
 		auto const & surfaceData0 = std::unique_ptr<DataSurfaces::SurfaceData>(new DataSurfaces::SurfaceData());
 		surfaceData0->Name = "test surface 1";
@@ -890,11 +908,14 @@ namespace EnergyPlus {
 		roomAirModelData1->TempCoupleScheme = 3;
 		roomAirModelData1->SimAirModel = true;
 
-		sqlite_test->sqliteBegin();
 		sqlite_test->addScheduleData( 1, "always on", "ON/OFF", 1, 1 );
 		sqlite_test->addScheduleData( 2, "always off", "ON/OFF", 0, 0 );
 		sqlite_test->addZoneData( 1, *zoneData0 );
 		sqlite_test->addZoneData( 2, *zoneData1 );
+		sqlite_test->addZoneListData( 1, *zoneListData0 );
+		sqlite_test->addZoneListData( 2, *zoneListData1 );
+		sqlite_test->addZoneGroupData( 1, *zoneGroupData0 );
+		sqlite_test->addZoneGroupData( 2, *zoneGroupData1 );
 		sqlite_test->addMaterialData( 1, *materialData0 );
 		sqlite_test->addMaterialData( 2, *materialData1 );
 		sqlite_test->addConstructionData( 1, *constructData0, 0.0 );
@@ -924,12 +945,12 @@ namespace EnergyPlus {
 		sqlite_test->addRoomAirModelData( 1, *roomAirModelData0 );
 		sqlite_test->addRoomAirModelData( 2, *roomAirModelData1 );
 
-		// TODO: finish these last two. ZoneList needs implementation first
-		// sqlite_test->addZoneGroupData( number, DataHeatBalance::ZoneGroupData zoneGroupData );
-		// sqlite_test->addZoneListData( number, DataHeatBalance::ZoneListData zoneListData );
-
+		sqlite_test->sqliteBegin();
 		sqlite_test->createZoneExtendedOutput();
 		auto zones = queryResult("SELECT * FROM Zones;", "Zones");
+		auto zoneLists = queryResult("SELECT * FROM ZoneLists;", "ZoneLists");
+		auto zoneGroups = queryResult("SELECT * FROM ZoneGroups;", "ZoneGroups");
+		auto zoneInfoZoneLists = queryResult("SELECT * FROM ZoneInfoZoneLists;", "ZoneInfoZoneLists");
 		auto schedules = queryResult("SELECT * FROM Schedules;", "Schedules");
 		auto surfaces = queryResult("SELECT * FROM Surfaces;", "Surfaces");
 		auto materials = queryResult("SELECT * FROM Materials;", "Materials");
@@ -953,6 +974,26 @@ namespace EnergyPlus {
 		std::vector<std::string> zone1 { "2","test zone 2","2.0","2.0","2.0","2.0","2.0","2.0","2.0","2","2.0","2.0","2.0","2.0","2.0","2.0","2.0","2.0","2.0","2.0","2","2","2.0","2.0","2.0","2.0","0" };
 		EXPECT_EQ(zone0, zones[0]);
 		EXPECT_EQ(zone1, zones[1]);
+
+		ASSERT_EQ(2, zoneLists.size());
+		std::vector<std::string> zoneList0 { "1","test zoneList 1" };
+		std::vector<std::string> zoneList1 { "2","test zoneList 2" };
+		EXPECT_EQ(zoneList0, zoneLists[0]);
+		EXPECT_EQ(zoneList1, zoneLists[1]);
+
+		ASSERT_EQ(2, zoneGroups.size());
+		std::vector<std::string> zoneGroup0 { "1","test zoneGroup 1","","1" };
+		std::vector<std::string> zoneGroup1 { "2","test zoneGroup 2","2","99" };
+		EXPECT_EQ(zoneGroup0, zoneGroups[0]);
+		EXPECT_EQ(zoneGroup1, zoneGroups[1]);
+
+		ASSERT_EQ(3, zoneInfoZoneLists.size());
+		std::vector<std::string> zoneInfoZoneList0 { "1","1" };
+		std::vector<std::string> zoneInfoZoneList1 { "2","1" };
+		std::vector<std::string> zoneInfoZoneList2 { "2","2" };
+		EXPECT_EQ(zoneInfoZoneList0, zoneInfoZoneLists[0]);
+		EXPECT_EQ(zoneInfoZoneList1, zoneInfoZoneLists[1]);
+		EXPECT_EQ(zoneInfoZoneList2, zoneInfoZoneLists[2]);
 
 		ASSERT_EQ(2, schedules.size());
 		std::vector<std::string> schedule0 { "1","always on","ON/OFF","1.0","1.0" };

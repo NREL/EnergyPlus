@@ -229,6 +229,7 @@ private:
 	void initializeReportDataTables();
 	void initializeTimeIndicesTable();
 	void initializeZoneInfoTable();
+	void initializeZoneInfoZoneListTable();
 	void initializeNominalPeopleTable();
 	void initializeNominalLightingTable();
 	void initializeNominalElectricEquipmentTable();
@@ -264,6 +265,7 @@ private:
 	sqlite3_stmt * m_reportDictionaryInsertStmt;
 	sqlite3_stmt * m_timeIndexInsertStmt;
 	sqlite3_stmt * m_zoneInfoInsertStmt;
+	sqlite3_stmt * m_zoneInfoZoneListInsertStmt;
 	sqlite3_stmt * m_nominalLightingInsertStmt;
 	sqlite3_stmt * m_nominalElectricEquipmentInsertStmt;
 	sqlite3_stmt * m_nominalGasEquipmentInsertStmt;
@@ -467,14 +469,17 @@ private:
 			ZoneList( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const zoneListNumber, DataHeatBalance::ZoneListData const & zoneListData ) :
 				SQLiteData( errorStream, db ),
 				number( zoneListNumber ),
-				name( zoneListData.Name )
+				name( zoneListData.Name ),
+				zones( zoneListData.Zone )
 			{}
 
 			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt, sqlite3_stmt * subInsertStmt );
 
 		private:
 			int const number;
 			std::string const & name;
+			FArray1D_int const & zones;
 	};
 
 	class ZoneGroup : SQLiteData
@@ -484,7 +489,8 @@ private:
 				SQLiteData( errorStream, db ),
 				number( zoneGroupNumber ),
 				name( zoneGroupData.Name ),
-				zoneList( zoneGroupData.ZoneList )
+				zoneList( zoneGroupData.ZoneList ),
+				multiplier( zoneGroupData.Multiplier )
 			{}
 
 			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
@@ -493,6 +499,7 @@ private:
 			int const number;
 			std::string const & name;
 			int const & zoneList;
+			int const & multiplier;
 	};
 
 	class Material : SQLiteData
@@ -562,9 +569,10 @@ private:
 				}
 			}
 
-			// hacky, but needed since base is pure virtual
-			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt ) { return false; }
-			bool insertIntoSQLite( sqlite3_stmt * insertStmt, sqlite3_stmt * subInsertStmt );
+			// only inserts construction
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt );
+			// inserts construction and construction layers
+			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt, sqlite3_stmt * subInsertStmt );
 
 		private:
 			int const number;
