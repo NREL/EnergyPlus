@@ -29352,7 +29352,6 @@ HVACTemplate:System:DedicatedOutdoorAir,
       \key  FixedSetpoint
       \key  Scheduled
       \key  OutdoorAirTemperatureReset
-      \key  None
       \default FixedSetpoint
   N6, \field Cooling Coil Design Setpoint
       \note  Used for sizing and as constant setpoint if no Cooling Coil Setpoint Schedule Name is specified.
@@ -29413,7 +29412,6 @@ HVACTemplate:System:DedicatedOutdoorAir,
       \key  FixedSetpoint
       \key  Scheduled
       \key  OutdoorAirTemperatureReset
-      \key  None
       \default FixedSetpoint
  N14, \field Heating Coil Design Setpoint
       \note   Used for sizing and as constant setpoint if no Heating Coil Setpoint Schedule Name is specified.
