@@ -31729,7 +31729,7 @@ DO iSys = 1, numCompactDedOutAir
     ELSE
       CALL AddToObjFld('Setpoint Node or NodeList Name', base + doasNameOff,' Cooling Setpoint Nodes',.TRUE.)
     END IF
-    IF (supFanPlacement .EQ. sfpDrawThru) THEN
+    IF ((supFanPlacement .EQ. sfpDrawThru) .AND. (coolCoilKind .NE. ccNone)) THEN
       !***SetpointManager:MixedAir
       CALL CreateNewObj('SetpointManager:MixedAir')
       CALL AddToObjFld('Name', base + doasNameOff,' Cooling Coil Air Temp Manager')
