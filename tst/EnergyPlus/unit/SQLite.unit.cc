@@ -33,7 +33,6 @@ namespace EnergyPlus {
 
 		virtual void TearDown() {
 			// don't know if this is needed...
-			// sqlite3_close(m_db);
 			sqlite_test.reset();
 			sqlite_test = nullptr;
 		}
@@ -61,26 +60,6 @@ namespace EnergyPlus {
 		void adjustReportingHourAndMinutes( int & hour, int & minutes ) {
 			sqlite_test->adjustReportingHourAndMinutes( hour, minutes );
 		}
-
-		// int executeSQL(const std::string & query) {
-		// 	return sqlite3_exec(sqlite->m_db, query.c_str(), NULL, 0, nullptr);
-		// }
-
-		// std::pair<bool, int> executeAndReturnFirstInt( const std::string & statement, const int column ) {
-		// 	bool success = false;
-		// 	int result = 0;
-
-		// 	sqlite3_stmt* sqlStmtPtr;
-		// 	int code = sqlite3_prepare_v2(sqlite->m_db, statement.c_str(), -1, &sqlStmtPtr, nullptr);
-		// 	code = sqlite3_step(sqlStmtPtr);
-		// 	if (code == SQLITE_ROW) {
-		// 		result = sqlite3_column_int(sqlStmtPtr, column);
-		// 		success = true;
-		// 	}
-		// 	sqlite3_finalize(sqlStmtPtr);
-
-		// 	return std::make_pair( success, result );
-		// }
 
 		bool indexExists( const std::string& indexName ) {
 			sqlite3_stmt* sqlStmtPtr;
@@ -114,7 +93,7 @@ namespace EnergyPlus {
 			return rowCount;
 		}
 
-		std::vector<std::vector<std::string>> queryResult( const std::string& statement, const std::string& tableName ) {
+		std::vector < std::vector < std::string > > queryResult( const std::string& statement, const std::string& tableName ) {
 			std::vector < std::vector < std::string > > queryVector;
 
 			int rowCount = columnCount( tableName );
@@ -138,10 +117,6 @@ namespace EnergyPlus {
 			sqlite3_finalize(sqlStmtPtr);
 			return queryVector;
 		}
-
-		// void createSQLiteZoneTable( std::map<int, DataHeatBalance::ZoneData> const & zones ) {
-		// 	sqlite_test->createSQLiteZoneTable( zones );
-		// }
 	};
 
 	TEST_F( SQLiteFixture, sqliteWriteMessage ) {
@@ -275,19 +250,6 @@ namespace EnergyPlus {
 
 	TEST_F( SQLiteFixture, createSQLiteReportDictionaryRecord )
 	{
-		// void createSQLiteReportDictionaryRecord(
-		// 	int const reportVariableReportID,
-		// 	int const storeTypeIndex,
-		// 	std::string const & indexGroup,
-		// 	std::string const & keyedValueString,
-		// 	std::string const & variableName,
-		// 	int const indexType,
-		// 	std::string const & units,
-		// 	int const reportingFreq,
-		// 	bool isMeter,
-		// 	Optional_string_const ScheduleName = _
-		// );
-
 		sqlite_test->sqliteBegin();
 		sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
 		sqlite_test->createSQLiteReportDictionaryRecord( 2, 2, "Facility:Electricity", "", "Facility:Electricity", 1, "J", 1, true, _ );
@@ -336,21 +298,6 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( SQLiteFixture, createSQLiteTimeIndexRecord ) {
-		// void createSQLiteTimeIndexRecord(
-		// 	int const reportingInterval,
-		// 	int const recordIndex,
-		// 	int const CumlativeSimulationDays,
-		//	int const curEnvirNum,
-		// 	Optional_int_const Month = _,
-		// 	Optional_int_const DayOfMonth = _,
-		// 	Optional_int_const Hour = _,
-		// 	Optional< Real64 const > EndMinute = _,
-		// 	Optional< Real64 const > StartMinute = _,
-		// 	Optional_int_const DST = _,
-		// 	Optional_string_const DayType = _,
-		//	bool const warmupFlag = false
-		// );
-
 		sqlite_test->sqliteBegin();
 		sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 		sqlite_test->createSQLiteTimeIndexRecord( 3, 1, 1, 0, 1 );
@@ -410,21 +357,6 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( SQLiteFixture, createSQLiteReportDataRecord ) {
-		// void createSQLiteReportDataRecord(
-		// 	int const recordIndex,
-		// 	Real64 const value,
-		// 	Optional_int_const reportingInterval = _,
-		// 	Optional< Real64 const > minValue = _,
-		// 	Optional_int_const minValueDate = _,
-		// 	Optional< Real64 const > maxValue = _,
-		// 	Optional_int_const maxValueDate = _,
-		// 	Optional_int_const minutesPerTimeStep = _
-		// );
-
-		// ((month*100 + day)*100 + hour)*100 + minute
-		// ((1*100 + 31)*100 + 4) * 100 + 59 = 1310459
-		// ((7*100 + 3)*100 + 15) * 100 + 30 = 7031530
-
 		sqlite_test->sqliteBegin();
 		sqlite_test->createSQLiteTimeIndexRecord( 4, 1, 1, 0 );
 		sqlite_test->createSQLiteReportDictionaryRecord( 1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _ );
@@ -469,20 +401,6 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( SQLiteFixture, addSQLiteZoneSizingRecord ) {
-		// void addSQLiteZoneSizingRecord(
-		// 	std::string const & ZoneName, // the name of the zone
-		// 	std::string const & LoadType, // the description of the input variable
-		// 	Real64 const CalcDesLoad, // the value from the sizing calculation [W]
-		// 	Real64 const UserDesLoad, // the value from the sizing calculation modified by user input [W]
-		// 	Real64 const CalcDesFlow, // calculated design air flow rate [m3/s]
-		// 	Real64 const UserDesFlow, // user input or modified design air flow rate [m3/s]
-		// 	std::string const & DesDayName, // the name of the design day that produced the peak
-		// 	std::string const & PeakHrMin, // time stamp of the peak
-		// 	Real64 const PeakTemp, // temperature at peak [C]
-		// 	Real64 const PeakHumRat, // humidity ratio at peak [kg water/kg dry air]
-		// 	Real64 const MinOAVolFlow // zone design minimum outside air flow rate [m3/s]
-		// );
-
 		sqlite_test->sqliteBegin();
 		sqlite_test->addSQLiteZoneSizingRecord( "FLOOR 1 IT HALL", "Cooling", 175, 262, 0.013, 0.019, "CHICAGO ANN CLG .4% CONDNS WB=>MDB", "7/21 06:00:00", 20.7, 0.0157, 0.0033 );
 		auto result = queryResult("SELECT * FROM ZoneSizes;", "ZoneSizes");
@@ -494,12 +412,6 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( SQLiteFixture, addSQLiteSystemSizingRecord ) {
-		// void addSQLiteSystemSizingRecord(
-		// 	std::string const & SysName, // the name of the system
-		// 	std::string const & VarDesc, // the description of the input variable
-		// 	Real64 const VarValue // the value from the sizing calculation
-		// );
-
 		sqlite_test->sqliteBegin();
 		sqlite_test->addSQLiteSystemSizingRecord( "VAV_1", "Calculated Cooling Design Air Flow Rate [m3/s]", 6.37 );
 		sqlite_test->addSQLiteSystemSizingRecord( "VAV_2", "User Cooling Design Air Flow Rate", 5.1 );
@@ -514,13 +426,6 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( SQLiteFixture, addSQLiteComponentSizingRecord ) {
-		// void addSQLiteComponentSizingRecord(
-		// 	std::string const & CompType, // the type of the component
-		// 	std::string const & CompName, // the name of the component
-		// 	std::string const & VarDesc, // the description of the input variable
-		// 	Real64 const VarValue // the value from the sizing calculation
-		// );
-
 		sqlite_test->sqliteBegin();
 		sqlite_test->addSQLiteComponentSizingRecord( "AirTerminal:SingleDuct:VAV:Reheat", "CORE_BOTTOM VAV BOX COMPONENT", "Design Size Maximum Air Flow Rate [m3/s]", 3.23 );
 		sqlite_test->addSQLiteComponentSizingRecord( "Coil:Heating:Electric", "CORE_BOTTOM VAV BOX REHEAT COIL", "Design Size Nominal Capacity", 38689.18 );
@@ -575,28 +480,6 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( SQLiteFixture, DaylightMaping ) {
-		// void createSQLiteDaylightMap(
-		// 	int const mapNum,
-		// 	int const month,
-		// 	int const dayOfMonth,
-		// 	int const hourOfDay,
-		// 	int const nX,
-		// 	FArray1S< Real64 > const & x,
-		// 	int const nY,
-		// 	FArray1S< Real64 > const & y,
-		// 	FArray2S< Real64 > const & illuminance
-		// );
-
-		// void createSQLiteDaylightMapTitle(
-		// 	int const mapNum,
-		// 	std::string const & mapName,
-		// 	std::string const & environmentName,
-		// 	int const zone,
-		// 	std::string const & refPt1,
-		// 	std::string const & refPt2,
-		// 	Real64 const zCoord
-		// );
-
 		auto const & zone = std::unique_ptr<DataHeatBalance::ZoneData>(new DataHeatBalance::ZoneData());
 		zone->Name = "DAYLIT ZONE";
 		zone->CeilingHeight = 3;
@@ -658,8 +541,6 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( SQLiteFixture, createZoneExtendedOutput ) {
-		// void createZoneExtendedOutput();
-
 		auto const & zoneData0 = std::unique_ptr<DataHeatBalance::ZoneData>(new DataHeatBalance::ZoneData());
 		zoneData0->Name = "test zone 1";
 		zoneData0->CeilingHeight = 1;
@@ -743,8 +624,8 @@ namespace EnergyPlus {
 		constructData1->OutsideRoughness = 2;
 		constructData1->TypeIsWindow = true;
 		constructData1->LayerPoint.allocate( 2 );
-		constructData1->LayerPoint( 1 ) = 1;
-		constructData1->LayerPoint( 2 ) = 2;
+		constructData1->LayerPoint( 1 ) = 2;
+		constructData1->LayerPoint( 2 ) = 1;
 
 		auto const & surfaceData0 = std::unique_ptr<DataSurfaces::SurfaceData>(new DataSurfaces::SurfaceData());
 		surfaceData0->Name = "test surface 1";
@@ -908,8 +789,17 @@ namespace EnergyPlus {
 		roomAirModelData1->TempCoupleScheme = 3;
 		roomAirModelData1->SimAirModel = true;
 
-		sqlite_test->addScheduleData( 1, "always on", "ON/OFF", 1, 1 );
-		sqlite_test->addScheduleData( 2, "always off", "ON/OFF", 0, 0 );
+		std::string const alwaysOn( "always on" );
+		std::string const alwaysOff( "always off" );
+		std::string const onOff( "ON/OFF" );
+		std::string const window( "Window" );
+		std::string const wall( "Wall" );
+		double const one = 1.0;
+		double const zero = 0.0;
+		double const two = 2.0;
+
+		sqlite_test->addScheduleData( 1, alwaysOn, onOff, one, one );
+		sqlite_test->addScheduleData( 2, alwaysOff, onOff, zero, zero );
 		sqlite_test->addZoneData( 1, *zoneData0 );
 		sqlite_test->addZoneData( 2, *zoneData1 );
 		sqlite_test->addZoneListData( 1, *zoneListData0 );
@@ -918,10 +808,10 @@ namespace EnergyPlus {
 		sqlite_test->addZoneGroupData( 2, *zoneGroupData1 );
 		sqlite_test->addMaterialData( 1, *materialData0 );
 		sqlite_test->addMaterialData( 2, *materialData1 );
-		sqlite_test->addConstructionData( 1, *constructData0, 0.0 );
-		sqlite_test->addConstructionData( 2, *constructData1, 2.0 );
-		sqlite_test->addSurfaceData( 1, *surfaceData0, "Window" );
-		sqlite_test->addSurfaceData( 2, *surfaceData1, "Wall" );
+		sqlite_test->addConstructionData( 1, *constructData0, zero );
+		sqlite_test->addConstructionData( 2, *constructData1, two );
+		sqlite_test->addSurfaceData( 1, *surfaceData0, window );
+		sqlite_test->addSurfaceData( 2, *surfaceData1, wall );
 		sqlite_test->addNominalLightingData( 1, *lightingData0 );
 		sqlite_test->addNominalLightingData( 2, *lightingData1 );
 		sqlite_test->addNominalPeopleData( 1, *peopleData0 );
@@ -1013,12 +903,11 @@ namespace EnergyPlus {
 		EXPECT_EQ(construction0, constructions[0]);
 		EXPECT_EQ(construction1, constructions[1]);
 
-		// TODO: for some reason this assert is failing... might be bad code.
-		// ASSERT_EQ(2, constructionLayers.size());
-		// std::vector<std::string> constructionLayer0 { "1","","","","" };
-		// std::vector<std::string> constructionLayer1 { "2","","","","" };
-		// EXPECT_EQ(constructionLayer0, constructionLayers[0]);
-		// EXPECT_EQ(constructionLayer1, constructionLayers[1]);
+		ASSERT_EQ(2, constructionLayers.size());
+		std::vector<std::string> constructionLayer0 { "1","2","1","2" };
+		std::vector<std::string> constructionLayer1 { "2","2","2","1" };
+		EXPECT_EQ(constructionLayer0, constructionLayers[0]);
+		EXPECT_EQ(constructionLayer1, constructionLayers[1]);
 
 		ASSERT_EQ(2, surfaces.size());
 		std::vector<std::string> surface0 { "1","test surface 1","","Window","0.0","0.0","0.0","0.0","0.0","0.0","0","0","0.0","0.0","0","","","0","0","0" };
@@ -1094,15 +983,6 @@ namespace EnergyPlus {
 	}
 
 	TEST_F( SQLiteFixture, createSQLiteTabularDataRecords ) {
-		// void createSQLiteTabularDataRecords(
-		// 	FArray2D_string const & body, // row,column
-		// 	FArray1D_string const & rowLabels,
-		// 	FArray1D_string const & columnLabels,
-		// 	std::string const & ReportName,
-		// 	std::string const & ReportForString,
-		// 	std::string const & TableName
-		// );
-
 		FArray1D_string const rowLabels( { "Heating", "Cooling" } );
 		FArray1D_string const columnLabels( { "Electricity [GJ]", "Natural Gas [GJ]" } );
 		FArray2D_string const body( 2, 2, { "216.38", "869.08", "1822.42", "0.00" } );
