@@ -51,7 +51,7 @@ using namespace DataHVACGlobals;
 using namespace CurveManager;
 using namespace OutputReportPredefined;
 
-TEST ( DXCoilsTest, Test1 )
+TEST( DXCoilsTest, Test1 )
 {
 
 	using CurveManager::Quadratic;
