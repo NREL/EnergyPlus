@@ -172,7 +172,7 @@ TEST ( DXCoilsTest, Test1 )
 
 	SetPredefinedTables();
 	SizeDXCoil( 2 );
-	EXPECT_EQ( 5000.0, DXCoil( 2 ).DefrostCapacity );
+	EXPECT_DOUBLE_EQ( 5000.0, DXCoil( 2 ).DefrostCapacity );
 }
 
 
