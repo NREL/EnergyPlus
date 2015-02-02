@@ -525,7 +525,7 @@ namespace PurchasedAirManager {
 							ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid data" );
 							ShowContinueError( cAlphaFieldNames( 13 ) + '=' + cAlphaArgs( 13 ) + " but CO2 simulation is not active." );
 							ShowContinueError( "Resetting " + cAlphaFieldNames( 13 ) + " to NoDCV" );
-							ShowContinueError( "To activate CO2 simulation, use ZoneAirContaminantBalance object" " and specify \"Carbon Dioxide Concentration\"=\"Yes\"." );
+							ShowContinueError( "To activate CO2 simulation, use ZoneAirContaminantBalance object and specify \"Carbon Dioxide Concentration\"=\"Yes\"." );
 						}
 					} else {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid data" );
@@ -843,7 +843,7 @@ namespace PurchasedAirManager {
 					PurchAir( PurchAirNum ).ZoneRecircAirNodeNum = ZoneEquipConfig( ControlledZoneNum ).ReturnAirNode;
 				} else {
 					ShowFatalError( "InitPurchasedAir: In " + PurchAir( PurchAirNum ).cObjectName + " = " + PurchAir( PurchAirNum ).Name );
-					ShowContinueError( " Invalid recirculation node. No exhaust or return node has been" " specified for this zone in ZoneHVAC:EquipmentConnections." );
+					ShowContinueError( " Invalid recirculation node. No exhaust or return node has been specified for this zone in ZoneHVAC:EquipmentConnections." );
 					ShowFatalError( "Preceding condition causes termination." );
 				}
 			}
@@ -852,7 +852,7 @@ namespace PurchasedAirManager {
 				if ( ( PurchAir( PurchAirNum ).CoolingLimit == NoLimit ) || ( PurchAir( PurchAirNum ).CoolingLimit == LimitCapacity ) ) {
 					ShowSevereError( "InitPurchasedAir: In " + PurchAir( PurchAirNum ).cObjectName + " = " + PurchAir( PurchAirNum ).Name );
 					ShowContinueError( "There is outdoor air with economizer active but there is no limit on cooling air flow rate." );
-					ShowContinueError( "Cooling Limit must be set to LimitFlowRate or LimitFlowRateAndCapacity, and " "Maximum Cooling Air Flow Rate must be set to a value or autosize." );
+					ShowContinueError( "Cooling Limit must be set to LimitFlowRate or LimitFlowRateAndCapacity, and Maximum Cooling Air Flow Rate must be set to a value or autosize." );
 					ShowContinueError( "Simulation will proceed with no limit on outdoor air flow rate." );
 				}
 			}
@@ -907,7 +907,7 @@ namespace PurchasedAirManager {
 					ShowSevereError( "InitPurchasedAir: For " + PurchAir( PurchAirNum ).cObjectName + " = " + PurchAir( PurchAirNum ).Name + " serving Zone " + Zone( ActualZoneNum ).Name );
 					ShowContinueError( "..the minimum supply air temperature for cooling [" + RoundSigDigits( PurchAir( PurchAirNum ).MinCoolSuppAirTemp, 2 ) + "] is greater than the zone cooling mean air temperature (MAT) setpoint [" + RoundSigDigits( ZoneThermostatSetPointHi( ActualZoneNum ), 2 ) + "]." );
 					ShowContinueError( "..For operative and comfort thermostat controls, the MAT setpoint is computed." );
-					ShowContinueError( "..This error may indicate that the mean radiant temperature " "or another comfort factor is too warm." );
+					ShowContinueError( "..This error may indicate that the mean radiant temperature or another comfort factor is too warm." );
 					ShowContinueError( "Unit availability is nominally ON and Cooling availability is nominally ON." );
 					ShowContinueError( "Limit Cooling Capacity Type=" + cLimitType( PurchAir( PurchAirNum ).CoolingLimit ) );
 					// could check for optemp control or comfort control here
@@ -936,7 +936,7 @@ namespace PurchasedAirManager {
 					ShowSevereMessage( "InitPurchasedAir: For " + PurchAir( PurchAirNum ).cObjectName + " = " + PurchAir( PurchAirNum ).Name + " serving Zone " + Zone( ActualZoneNum ).Name );
 					ShowContinueError( "..the maximum supply air temperature for heating [" + RoundSigDigits( PurchAir( PurchAirNum ).MaxHeatSuppAirTemp, 2 ) + "] is less than the zone mean air temperature heating setpoint [" + RoundSigDigits( ZoneThermostatSetPointLo( ActualZoneNum ), 2 ) + "]." );
 					ShowContinueError( "..For operative and comfort thermostat controls, the MAT setpoint is computed." );
-					ShowContinueError( "..This error may indicate that the mean radiant temperature " "or another comfort factor is too cold." );
+					ShowContinueError( "..This error may indicate that the mean radiant temperature or another comfort factor is too cold." );
 					ShowContinueError( "Unit availability is nominally ON and Heating availability is nominally ON." );
 					ShowContinueError( "Limit Heating Capacity Type=" + cLimitType( PurchAir( PurchAirNum ).HeatingLimit ) );
 					// could check for optemp control or comfort control here
@@ -1060,7 +1060,7 @@ namespace PurchasedAirManager {
 					SAFMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingSAFMethod;
 					ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
 					if ( SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedHeatingAirflow ) {
-						if ( SAFMethod == SupplyAirFlowRate ){
+						if ( SAFMethod == SupplyAirFlowRate ) {
 							if ( ( ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow == AutoSize ) && ( ( PurchAir( PurchAirNum ).HeatingLimit == LimitFlowRate ) || ( PurchAir( PurchAirNum ).HeatingLimit == LimitFlowRateAndCapacity ) ) ) {
 								TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 								RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
@@ -1071,14 +1071,14 @@ namespace PurchasedAirManager {
 									HeatingAirVolFlowDes = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 								}
 							}
-						} else if ( SAFMethod == FlowPerFloorArea ){
+						} else if ( SAFMethod == FlowPerFloorArea ) {
 							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow * Zone( DataZoneNumber ).FloorArea;
 							TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 							DataScalableSizingON = true;
 							RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 							HeatingAirVolFlowDes = TempSize;
-						} else if ( SAFMethod == FractionOfAutosizedHeatingAirflow ){
+						} else if ( SAFMethod == FractionOfAutosizedHeatingAirflow ) {
 							DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 							if ( ( ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow == AutoSize ) && ( ( PurchAir( PurchAirNum ).HeatingLimit == LimitFlowRate ) || ( PurchAir( PurchAirNum ).HeatingLimit == LimitFlowRateAndCapacity ) ) ) {
 								TempSize = AutoSize;
@@ -1114,17 +1114,17 @@ namespace PurchasedAirManager {
 					CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod;
 					ZoneEqSizing( CurZoneEqNum ).CapSizingMethod = CapSizingMethod;
 					if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
-						if ( CapSizingMethod == HeatingDesignCapacity ){
+						if ( CapSizingMethod == HeatingDesignCapacity ) {
 							if ( ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity > 0.0 ) {
 								ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 							}
 							TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
-						} else if ( CapSizingMethod == CapacityPerFloorArea ){
+						} else if ( CapSizingMethod == CapacityPerFloorArea ) {
 							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
 							DataScalableSizingON = true;
-						} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
+						} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
 							DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 							TempSize = AutoSize;
 						}
@@ -1145,8 +1145,8 @@ namespace PurchasedAirManager {
 						// If there is OA, check if sizing calcs have OA>0, throw warning if not
 						if ( ( PurchAir( PurchAirNum ).OutdoorAir ) && ( FinalZoneSizing( CurZoneEqNum ).MinOA == 0.0 ) ) {
 							ShowWarningError( "InitPurchasedAir: In " + PurchAir( PurchAirNum ).cObjectName + " = " + PurchAir( PurchAirNum ).Name );
-							ShowContinueError( "There is outdoor air specified in this object, " "but the design outdoor air flow rate for this " );
-							ShowContinueError( "zone is zero. The Maximum Sensible Heating Capacity will be " "autosized for zero outdoor air flow. " );
+							ShowContinueError( "There is outdoor air specified in this object, but the design outdoor air flow rate for this " );
+							ShowContinueError( "zone is zero. The Maximum Sensible Heating Capacity will be autosized for zero outdoor air flow. " );
 							ShowContinueError( "Check the outdoor air specifications in the Sizing:Zone object for zone " + FinalZoneSizing( CurZoneEqNum ).ZoneName + '.' );
 						}
 					} else {
@@ -1175,7 +1175,7 @@ namespace PurchasedAirManager {
 					SAFMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingSAFMethod;
 					ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
 					if ( SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow ) {
-						if ( SAFMethod == SupplyAirFlowRate ){
+						if ( SAFMethod == SupplyAirFlowRate ) {
 							if ( ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow == AutoSize ) && ( ( PurchAir( PurchAirNum ).CoolingLimit == LimitFlowRate ) || ( PurchAir( PurchAirNum ).CoolingLimit == LimitFlowRateAndCapacity ) || ( PurchAir( PurchAirNum ).OutdoorAir && PurchAir( PurchAirNum ).EconomizerType != NoEconomizer ) ) ) {
 								TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 								RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
@@ -1186,14 +1186,14 @@ namespace PurchasedAirManager {
 									CoolingAirVolFlowDes = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 								}
 							}
-						} else if ( SAFMethod == FlowPerFloorArea ){
+						} else if ( SAFMethod == FlowPerFloorArea ) {
 							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow * Zone( DataZoneNumber ).FloorArea;
 							TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 							DataScalableSizingON = true;
 							RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 							CoolingAirVolFlowDes = TempSize;
-						} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ){
+						} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ) {
 							if ( ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow == AutoSize ) && ( ( PurchAir( PurchAirNum ).CoolingLimit == LimitFlowRate ) || ( PurchAir( PurchAirNum ).CoolingLimit == LimitFlowRateAndCapacity ) || ( PurchAir( PurchAirNum ).OutdoorAir && PurchAir( PurchAirNum ).EconomizerType != NoEconomizer ) ) ) {
 								DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 								TempSize = AutoSize;
@@ -1202,7 +1202,7 @@ namespace PurchasedAirManager {
 								CoolingAirVolFlowDes = TempSize;
 							}
 						} else {
-							// Invlid scalable sizing method 
+							// Invalid scalable sizing method
 						}
 					} else if ( SAFMethod == FlowPerCoolingCapacity ) {
 						if ( ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow == AutoSize ) && ( ( PurchAir( PurchAirNum ).CoolingLimit == LimitFlowRate ) || ( PurchAir( PurchAirNum ).CoolingLimit == LimitFlowRateAndCapacity ) || ( PurchAir( PurchAirNum ).OutdoorAir && PurchAir( PurchAirNum ).EconomizerType != NoEconomizer ) ) ) {
@@ -1228,7 +1228,7 @@ namespace PurchasedAirManager {
 					CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingCapMethod;
 					ZoneEqSizing( CurZoneEqNum ).CapSizingMethod = CapSizingMethod;
 					if ( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
-						if ( CapSizingMethod == CoolingDesignCapacity ){
+						if ( CapSizingMethod == CoolingDesignCapacity ) {
 							if ( ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity > 0.0 ) {
 								ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
 								ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
@@ -1236,11 +1236,11 @@ namespace PurchasedAirManager {
 								DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow;
 							}
 							TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
-						} else if ( CapSizingMethod == CapacityPerFloorArea ){
+						} else if ( CapSizingMethod == CapacityPerFloorArea ) {
 							ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
 							ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity * Zone( DataZoneNumber ).FloorArea;
 							DataScalableSizingON = true;
-						} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ){
+						} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
 							DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
 							DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow;
 							TempSize = AutoSize;
@@ -1263,8 +1263,8 @@ namespace PurchasedAirManager {
 						// If there is OA, check if sizing calcs have OA>0, throw warning if not
 						if ( ( PurchAir( PurchAirNum ).OutdoorAir ) && ( FinalZoneSizing( CurZoneEqNum ).MinOA == 0.0 ) ) {
 							ShowWarningError( "SizePurchasedAir: In " + PurchAir( PurchAirNum ).cObjectName + " = " + PurchAir( PurchAirNum ).Name );
-							ShowContinueError( "There is outdoor air specified in this object, " "but the design outdoor air flow rate for this " );
-							ShowContinueError( "zone is zero. The Maximum Total Cooling Capacity will be autosized " "for zero outdoor air flow. " );
+							ShowContinueError( "There is outdoor air specified in this object, but the design outdoor air flow rate for this " );
+							ShowContinueError( "zone is zero. The Maximum Total Cooling Capacity will be autosized for zero outdoor air flow. " );
 							ShowContinueError( "Check the outdoor air specifications in the Sizing:Zone object for zone " + FinalZoneSizing( CurZoneEqNum ).ZoneName + '.' );
 						}
 					} else {
@@ -1337,8 +1337,8 @@ namespace PurchasedAirManager {
 					// If there is OA, check if sizing calcs have OA>0, throw warning if not
 					if ( ( PurchAir( PurchAirNum ).OutdoorAir ) && ( FinalZoneSizing( CurZoneEqNum ).MinOA == 0.0 ) ) {
 						ShowWarningError( "InitPurchasedAir: In " + PurchAir( PurchAirNum ).cObjectName + " = " + PurchAir( PurchAirNum ).Name );
-						ShowContinueError( "There is outdoor air specified in this object, " "but the design outdoor air flow rate for this " );
-						ShowContinueError( "zone is zero. The Maximum Sensible Heating Capacity will be " "autosized for zero outdoor air flow. " );
+						ShowContinueError( "There is outdoor air specified in this object, but the design outdoor air flow rate for this " );
+						ShowContinueError( "zone is zero. The Maximum Sensible Heating Capacity will be autosized for zero outdoor air flow. " );
 						ShowContinueError( "Check the outdoor air specifications in the Sizing:Zone object for zone " + FinalZoneSizing( CurZoneEqNum ).ZoneName + '.' );
 					}
 				} else {
@@ -1406,8 +1406,8 @@ namespace PurchasedAirManager {
 					// If there is OA, check if sizing calcs have OA>0, throw warning if not
 					if ( ( PurchAir( PurchAirNum ).OutdoorAir ) && ( FinalZoneSizing( CurZoneEqNum ).MinOA == 0.0 ) ) {
 						ShowWarningError( "SizePurchasedAir: In " + PurchAir( PurchAirNum ).cObjectName + " = " + PurchAir( PurchAirNum ).Name );
-						ShowContinueError( "There is outdoor air specified in this object, " "but the design outdoor air flow rate for this " );
-						ShowContinueError( "zone is zero. The Maximum Total Cooling Capacity will be autosized " "for zero outdoor air flow. " );
+						ShowContinueError( "There is outdoor air specified in this object, but the design outdoor air flow rate for this " );
+						ShowContinueError( "zone is zero. The Maximum Total Cooling Capacity will be autosized for zero outdoor air flow. " );
 						ShowContinueError( "Check the outdoor air specifications in the Sizing:Zone object for zone " + FinalZoneSizing( CurZoneEqNum ).ZoneName + '.' );
 					}
 				} else {
@@ -1634,11 +1634,11 @@ namespace PurchasedAirManager {
 					OAVolFlowRate = OAMassFlowRate / StdRhoAir;
 					if ( PurchAir( PurchAirNum ).OAFlowMaxCoolOutputError < 1 ) {
 						++PurchAir( PurchAirNum ).OAFlowMaxCoolOutputError;
-						ShowWarningError( PurchAir( PurchAirNum ).cObjectName + " \"" + PurchAir( PurchAirNum ).Name + "\"" " Requested outdoor air flow rate = " + TrimSigDigits( OAVolFlowRate, 5 ) + " [m3/s] exceeds limit." );
+						ShowWarningError( PurchAir( PurchAirNum ).cObjectName + " \"" + PurchAir( PurchAirNum ).Name + "\" Requested outdoor air flow rate = " + TrimSigDigits( OAVolFlowRate, 5 ) + " [m3/s] exceeds limit." );
 						ShowContinueError( " Will be reduced to the Maximum Cooling Air Flow Rate = " + TrimSigDigits( PurchAir( PurchAirNum ).MaxCoolVolFlowRate, 5 ) + " [m3/s]" );
 						ShowContinueErrorTimeStamp( "" );
 					} else {
-						ShowRecurringWarningErrorAtEnd( PurchAir( PurchAirNum ).cObjectName + " \"" + PurchAir( PurchAirNum ).Name + "\"" " Requested outdoor air flow rate [m3/s] reduced to Maximum Cooling Air Flow Rate warning continues...", PurchAir( PurchAirNum ).OAFlowMaxCoolOutputIndex, OAVolFlowRate );
+						ShowRecurringWarningErrorAtEnd( PurchAir( PurchAirNum ).cObjectName + " \"" + PurchAir( PurchAirNum ).Name + "\" Requested outdoor air flow rate [m3/s] reduced to Maximum Cooling Air Flow Rate warning continues...", PurchAir( PurchAirNum ).OAFlowMaxCoolOutputIndex, OAVolFlowRate );
 					}
 					OAMassFlowRate = PurchAir( PurchAirNum ).MaxCoolMassFlowRate;
 
@@ -1891,11 +1891,11 @@ namespace PurchasedAirManager {
 					OAVolFlowRate = OAMassFlowRate / StdRhoAir;
 					if ( PurchAir( PurchAirNum ).OAFlowMaxHeatOutputError < 1 ) {
 						++PurchAir( PurchAirNum ).OAFlowMaxHeatOutputError;
-						ShowWarningError( PurchAir( PurchAirNum ).cObjectName + " \"" + PurchAir( PurchAirNum ).Name + "\"" " Requested outdoor air flow rate = " + TrimSigDigits( OAVolFlowRate, 5 ) + " [m3/s] exceeds limit." );
+						ShowWarningError( PurchAir( PurchAirNum ).cObjectName + " \"" + PurchAir( PurchAirNum ).Name + "\" Requested outdoor air flow rate = " + TrimSigDigits( OAVolFlowRate, 5 ) + " [m3/s] exceeds limit." );
 						ShowContinueError( " Will be reduced to the Maximum Heating Air Flow Rate = " + TrimSigDigits( PurchAir( PurchAirNum ).MaxHeatVolFlowRate, 5 ) + " [m3/s]" );
 						ShowContinueErrorTimeStamp( "" );
 					} else {
-						ShowRecurringWarningErrorAtEnd( PurchAir( PurchAirNum ).cObjectName + " \"" + PurchAir( PurchAirNum ).Name + "\"" " Requested outdoor air flow rate [m3/s] reduced to Maximum Heating Air Flow Rate warning continues...", PurchAir( PurchAirNum ).OAFlowMaxHeatOutputIndex, OAVolFlowRate );
+						ShowRecurringWarningErrorAtEnd( PurchAir( PurchAirNum ).cObjectName + " \"" + PurchAir( PurchAirNum ).Name + "\" Requested outdoor air flow rate [m3/s] reduced to Maximum Heating Air Flow Rate warning continues...", PurchAir( PurchAirNum ).OAFlowMaxHeatOutputIndex, OAVolFlowRate );
 					}
 					OAMassFlowRate = PurchAir( PurchAirNum ).MaxHeatMassFlowRate;
 				}
@@ -2112,11 +2112,11 @@ namespace PurchasedAirManager {
 				if ( DeltaHumRat > SmallDeltaHumRat ) {
 					if ( PurchAir( PurchAirNum ).SaturationOutputError < 1 ) {
 						++PurchAir( PurchAirNum ).SaturationOutputError;
-						ShowWarningError( PurchAir( PurchAirNum ).cObjectName + " \"" + PurchAir( PurchAirNum ).Name + "\"" " Supply humidity ratio = " + TrimSigDigits( SupplyHumRatOrig, 5 ) + " exceeds saturation limit " + TrimSigDigits( SupplyHumRatSat, 5 ) + " [kgWater/kgDryAir]" );
+						ShowWarningError( PurchAir( PurchAirNum ).cObjectName + " \"" + PurchAir( PurchAirNum ).Name + "\" Supply humidity ratio = " + TrimSigDigits( SupplyHumRatOrig, 5 ) + " exceeds saturation limit " + TrimSigDigits( SupplyHumRatSat, 5 ) + " [kgWater/kgDryAir]" );
 						ShowContinueError( " Simulation continuing . . . " );
 						ShowContinueErrorTimeStamp( "" );
 					} else {
-						ShowRecurringWarningErrorAtEnd( PurchAir( PurchAirNum ).cObjectName + " \"" + PurchAir( PurchAirNum ).Name + "\"" " Supply humidity ratio exceeds saturation limit warning continues, delta max/min [kgWater/kgDryAir]...", PurchAir( PurchAirNum ).SaturationOutputIndex, DeltaHumRat, DeltaHumRat );
+						ShowRecurringWarningErrorAtEnd( PurchAir( PurchAirNum ).cObjectName + " \"" + PurchAir( PurchAirNum ).Name + "\" Supply humidity ratio exceeds saturation limit warning continues, delta max/min [kgWater/kgDryAir]...", PurchAir( PurchAirNum ).SaturationOutputIndex, DeltaHumRat, DeltaHumRat );
 					}
 				}
 
@@ -2224,7 +2224,7 @@ namespace PurchasedAirManager {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         M. Witte (GARD)
-		//       DATE WRITTEN   Jun 2011 (taken from HVACSingleDuctSystem.f90 and adapted for Ideal Loads System)
+		//       DATE WRITTEN   Jun 2011 (taken from HVACSingleDuctSystem.cc and adapted for Ideal Loads System)
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
@@ -2853,7 +2853,7 @@ namespace PurchasedAirManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

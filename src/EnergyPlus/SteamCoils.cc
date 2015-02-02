@@ -280,30 +280,23 @@ namespace SteamCoils {
 		NumSteamCoils = NumStmHeat;
 		if ( NumSteamCoils > 0 ) {
 			SteamCoil.allocate( NumSteamCoils );
-			CheckEquipName.allocate( NumSteamCoils );
-			CheckEquipName = true;
+			CheckEquipName.dimension( NumSteamCoils, true );
 		}
 
 		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
-		AlphArray = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNums );
-		cNumericFields = "";
-		NumArray.allocate( NumNums );
-		NumArray = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNums );
-		lNumericBlanks = true;
+		NumArray.dimension( NumNums, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNums, true );
 
 		// Get the data for steam heating coils
 		for ( StmHeatNum = 1; StmHeatNum <= NumStmHeat; ++StmHeatNum ) {
 
 			CoilNum = StmHeatNum;
 
-			GetObjectItem( CurrentModuleObject, StmHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, StmHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( AlphArray( 1 ), SteamCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
@@ -1652,7 +1645,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilIndex == 0 ) {
-			ShowSevereError( "GetCoilAirInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
+			ShowSevereError( "GetCoilAirInletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -1716,7 +1709,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilIndex == 0 ) {
-			ShowSevereError( "GetCoilAirOutletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
+			ShowSevereError( "GetCoilAirOutletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -1849,7 +1842,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilIndex == 0 ) {
-			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
+			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -1920,7 +1913,7 @@ namespace SteamCoils {
 		}
 
 		if ( IndexNum == 0 ) {
-			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
+			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -1984,7 +1977,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilIndex == 0 ) {
-			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
+			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -2055,7 +2048,7 @@ namespace SteamCoils {
 		}
 
 		if ( IndexNum == 0 ) {
-			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
+			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -2194,7 +2187,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilIndex == 0 ) {
-			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
+			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName );
 			ErrorsFound = true;
 			TypeOfCoil = 0;
 		} else {
@@ -2366,7 +2359,7 @@ namespace SteamCoils {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

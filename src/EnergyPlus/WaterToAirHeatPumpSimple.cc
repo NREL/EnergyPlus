@@ -340,8 +340,7 @@ namespace WaterToAirHeatPumpSimple {
 		// Allocate Arrays
 		if ( NumWatertoAirHPs > 0 ) {
 			SimpleWatertoAirHP.allocate( NumWatertoAirHPs );
-			SimpleHPTimeStepFlag.allocate( NumWatertoAirHPs );
-			SimpleHPTimeStepFlag = true;
+			SimpleHPTimeStepFlag.dimension( NumWatertoAirHPs, true );
 		}
 
 		GetObjectDefMaxArgs( "Coil:Cooling:WaterToAirHeatPump:EquationFit", NumParams, NumAlphas, NumNums );
@@ -351,17 +350,11 @@ namespace WaterToAirHeatPumpSimple {
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		AlphArray.allocate( MaxAlphas );
-		AlphArray = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
+		lAlphaBlanks.dimension( MaxAlphas, true );
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
-		NumArray.allocate( MaxNums );
-		NumArray = 0.0;
+		lNumericBlanks.dimension( MaxNums, true );
+		NumArray.dimension( MaxNums, 0.0 );
 
 		// Get the data for cooling coil
 		CurrentModuleObject = "Coil:Cooling:WaterToAirHeatPump:EquationFit";
@@ -370,7 +363,7 @@ namespace WaterToAirHeatPumpSimple {
 
 			++HPNum;
 
-			GetObjectItem( CurrentModuleObject, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -447,7 +440,7 @@ namespace WaterToAirHeatPumpSimple {
 
 			++HPNum;
 
-			GetObjectItem( CurrentModuleObject, WatertoAirHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, WatertoAirHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -1555,7 +1548,7 @@ namespace WaterToAirHeatPumpSimple {
 			} else {
 				ShowSevereError( "Autosizing of water flow requires a loop Sizing:Plant object" );
 				ShowContinueError( "Autosizing also requires physical connection to a plant or condenser loop." );
-				ShowContinueError( "Occurs in " "COIL:" + SimpleWatertoAirHP( HPNum ).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT" " Object=" + SimpleWatertoAirHP( HPNum ).Name );
+				ShowContinueError( "Occurs in COIL:" + SimpleWatertoAirHP( HPNum ).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT Object=" + SimpleWatertoAirHP( HPNum ).Name );
 				ErrorsFound = true;
 			}
 		}

@@ -291,17 +291,11 @@ namespace SolarCollectors {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
-		Numbers.allocate( MaxNumbers );
-		Numbers = 0.0;
+		Numbers.dimension( MaxNumbers, 0.0 );
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNumbers );
-		cNumericFields = "";
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNumbers );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNumbers, true );
 
 		NumOfCollectors = NumFlatPlateUnits + NumOfICSUnits;
 		NumOfParameters = NumOfFlatPlateParam + NumOfICSParam;
@@ -715,8 +709,7 @@ namespace SolarCollectors {
 			if ( ErrorsFound ) ShowFatalError( "Errors in " + CurrentModuleObject + " input." );
 
 			if ( NumOfCollectors > 0 ) {
-				CheckEquipName.allocate( NumOfCollectors );
-				CheckEquipName = true;
+				CheckEquipName.dimension( NumOfCollectors, true );
 			}
 
 		}
@@ -1116,7 +1109,7 @@ namespace SolarCollectors {
 				if ( qEquation < 0.0 ) {
 					if ( Collector( CollectorNum ).ErrIndex == 0 ) {
 						ShowSevereMessage( "CalcSolarCollector: " + ccSimPlantEquipTypes( Collector( CollectorNum ).TypeNum ) + "=\"" + Collector( CollectorNum ).Name + "\", possible bad input coefficients." );
-						ShowContinueError( "...coefficients cause negative quadratic equation part in " "calculating temperature of stagnant fluid." );
+						ShowContinueError( "...coefficients cause negative quadratic equation part in calculating temperature of stagnant fluid." );
 						ShowContinueError( "...examine input coefficients for accuracy. Calculation will be treated as linear." );
 					}
 					ShowRecurringSevereErrorAtEnd( "CalcSolarCollector: " + ccSimPlantEquipTypes( Collector( CollectorNum ).TypeNum ) + "=\"" + Collector( CollectorNum ).Name + "\", coefficient error continues.", Collector( CollectorNum ).ErrIndex, qEquation, qEquation );
@@ -1186,7 +1179,7 @@ namespace SolarCollectors {
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 s; // Intermediate variable
@@ -1473,7 +1466,7 @@ namespace SolarCollectors {
 				TempWater = r1 * ConstantC1 * std::exp( lamda1 * SecInTimeStep ) + r2 * ConstantC2 * std::exp( lamda2 * SecInTimeStep ) + ConstOfTwSln;
 
 			} else { // this should never occur
-				ShowSevereError( "ICSCollectorAnalyticalSoluton: Unanticipated differential equation coefficient - " "report to EnergyPlus Development Team" );
+				ShowSevereError( "ICSCollectorAnalyticalSoluton: Unanticipated differential equation coefficient - report to EnergyPlus Development Team" );
 				ShowFatalError( "Program terminates due to above conditions." );
 			}
 		} else {
@@ -2272,7 +2265,7 @@ namespace SolarCollectors {
 		}
 
 		if ( ! Found ) {
-			ShowFatalError( "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, " "Surface name = " + Surface( SurfacePtr ).Name );
+			ShowFatalError( "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, Surface name = " + Surface( SurfacePtr ).Name );
 		} else {
 
 			VentCavIndex = CavNum;
@@ -2334,7 +2327,7 @@ namespace SolarCollectors {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

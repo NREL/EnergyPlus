@@ -63,7 +63,7 @@ namespace VentilatedSlab {
 
 	// REFERENCES:
 	// ASHRAE Systems and Equipment Handbook (SI), 1996. pp. 31.1-31.3
-	// Fred Buhl's fan coil module (FanCoilUnits.f90)
+	// Fred Buhl's fan coil module (FanCoilUnits.cc)
 
 	// OTHER NOTES: none
 
@@ -272,9 +272,9 @@ namespace VentilatedSlab {
 		// Standard EnergyPlus methodology.
 
 		// REFERENCES:
-		// Fred Buhl's fan coil module (FanCoilUnits.f90)
-		// Kwang Ho Lee's Unit Ventilator Module (UnitVentilator.f90)
-		// Rick Strand's Low temperature Radiant system (RadiantSystemLowTemp.f90)
+		// Fred Buhl's fan coil module (FanCoilUnits.cc)
+		// Kwang Ho Lee's Unit Ventilator Module (UnitVentilator.cc)
+		// Rick Strand's Low temperature Radiant system (RadiantSystemLowTemp.cc)
 
 		// Using/Aliasing
 		using InputProcessor::GetNumObjectsFound;
@@ -357,17 +357,11 @@ namespace VentilatedSlab {
 		SteamMessageNeeded = true;
 		GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
-		cAlphaArgs = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = "";
-		rNumericArgs.allocate( NumNumbers );
-		rNumericArgs = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNumbers );
-		lNumericBlanks = true;
+		rNumericArgs.dimension( NumNumbers, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNumbers, true );
 
 		// make sure data is gotten for surface lists
 		BaseNum = GetNumberOfSurfListVentSlab();
@@ -376,16 +370,14 @@ namespace VentilatedSlab {
 		// Allocate the local derived type and do one-time initializations for all parts of it
 
 		VentSlab.allocate( NumOfVentSlabs );
-		CheckEquipName.allocate( NumOfVentSlabs );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumOfVentSlabs, true );
 		VentSlabNumericFields.allocate( NumOfVentSlabs );
 
 		for ( Item = 1; Item <= NumOfVentSlabs; ++Item ) { // Begin looping over the entire ventilated slab systems found in the input file...
 
 			GetObjectItem( CurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			VentSlabNumericFields( Item ).FieldNames.allocate( NumNumbers) ;
-			VentSlabNumericFields( Item ).FieldNames = "";
+			VentSlabNumericFields( Item ).FieldNames.allocate( NumNumbers );
 			VentSlabNumericFields( Item ).FieldNames = cNumericFields;
 
 			IsNotOK = false;
@@ -492,7 +484,7 @@ namespace VentilatedSlab {
 					//      END IF
 					if ( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Construction == 0 ) continue; // invalid construction, detected earlier
 					if ( ! Construct( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Construction ).SourceSinkPresent ) {
-						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " "surface=\"" + Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Name + "\"." );
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid surface=\"" + Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Name + "\"." );
 						ShowContinueError( "Surface Construction does not have a source/sink, Construction name= \"" + Construct( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Construction ).Name + "\"." );
 						ErrorsFound = true;
 					}
@@ -502,13 +494,13 @@ namespace VentilatedSlab {
 					if ( VentSlab( Item ).SurfacePtr( SurfNum ) == 0 ) continue; // invalid surface -- detected earlier
 					if ( VentSlab( Item ).ZonePtr == 0 ) continue; // invalid zone -- detected earlier
 					if ( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Zone != VentSlab( Item ).ZonePtr ) {
-						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " "surface=\"" + Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Name + "\"." );
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid surface=\"" + Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Name + "\"." );
 						ShowContinueError( "Surface in Zone=" + Zone( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Zone ).Name + ' ' + CurrentModuleObject + " in Zone=" + cAlphaArgs( 3 ) );
 						ErrorsFound = true;
 					}
 					if ( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Construction == 0 ) continue; // invalid construction, detected earlier
 					if ( ! Construct( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Construction ).SourceSinkPresent ) {
-						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " "surface=\"" + Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Name + "\"." );
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid surface=\"" + Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Name + "\"." );
 						ShowContinueError( "Surface Construction does not have a source/sink, Construction name= \"" + Construct( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Construction ).Name + "\"." );
 						ErrorsFound = true;
 					}
@@ -583,21 +575,21 @@ namespace VentilatedSlab {
 
 			if ( SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
 				if ( ! lNumericBlanks( 4 ) ) {
-					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" " " Core Diameter is not needed for the series slabs configuration- ignored." );
+					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  Core Diameter is not needed for the series slabs configuration- ignored." );
 					ShowContinueError( "...It has been asigned on SlabGroup." );
 				}
 			}
 
 			if ( SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
 				if ( ! lNumericBlanks( 5 ) ) {
-					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" " " Core Length is not needed for the series slabs configuration- ignored." );
+					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  Core Length is not needed for the series slabs configuration- ignored." );
 					ShowContinueError( "...It has been asigned on SlabGroup." );
 				}
 			}
 
 			if ( SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
 				if ( ! lNumericBlanks( 6 ) ) {
-					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" " " Core Numbers is not needed for the series slabs configuration- ignored." );
+					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  Core Numbers is not needed for the series slabs configuration- ignored." );
 					ShowContinueError( "...It has been asigned on SlabGroup." );
 				}
 			}
@@ -1156,16 +1148,11 @@ namespace VentilatedSlab {
 			MySizeFlag.allocate( NumOfVentSlabs );
 			MyPlantScanFlag.allocate( NumOfVentSlabs );
 			MyZoneEqFlag.allocate ( NumOfVentSlabs );
-			ZeroSourceSumHATsurf.allocate( NumOfZones );
-			ZeroSourceSumHATsurf = 0.0;
-			QRadSysSrcAvg.allocate( TotSurfaces );
-			QRadSysSrcAvg = 0.0;
-			LastQRadSysSrc.allocate( TotSurfaces );
-			LastQRadSysSrc = 0.0;
-			LastSysTimeElapsed.allocate( TotSurfaces );
-			LastSysTimeElapsed = 0.0;
-			LastTimeStepSys.allocate( TotSurfaces );
-			LastTimeStepSys = 0.0;
+			ZeroSourceSumHATsurf.dimension( NumOfZones, 0.0 );
+			QRadSysSrcAvg.dimension( TotSurfaces, 0.0 );
+			LastQRadSysSrc.dimension( TotSurfaces, 0.0 );
+			LastSysTimeElapsed.dimension( TotSurfaces, 0.0 );
+			LastTimeStepSys.dimension( TotSurfaces, 0.0 );
 
 			// Initialize total areas for all radiant systems
 			for ( RadNum = 1; RadNum <= NumOfVentSlabs; ++RadNum ) {
@@ -1523,18 +1510,18 @@ namespace VentilatedSlab {
 				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingSAFMethod;
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
 				if ( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow ) {
-					if ( SAFMethod == SupplyAirFlowRate ){
+					if ( SAFMethod == SupplyAirFlowRate ) {
 						if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						}
 						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
-					} else if ( SAFMethod == FlowPerFloorArea ){
+					} else if ( SAFMethod == FlowPerFloorArea ) {
 						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow * Zone( DataZoneNumber ).FloorArea;
 						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 						DataScalableSizingON = true;
-					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ){
+					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ) {
 						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 						TempSize = AutoSize;
 						DataScalableSizingON = true;
@@ -1565,18 +1552,18 @@ namespace VentilatedSlab {
 				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingSAFMethod;
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
 				if ( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedHeatingAirflow ) {
-					if ( SAFMethod == SupplyAirFlowRate ){
+					if ( SAFMethod == SupplyAirFlowRate ) {
 						if ( ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow > 0.0 ) {
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						}
 						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
-					} else if ( SAFMethod == FlowPerFloorArea ){
+					} else if ( SAFMethod == FlowPerFloorArea ) {
 						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow * Zone( DataZoneNumber ).FloorArea;
 						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 						DataScalableSizingON = true;
-					} else if ( SAFMethod == FractionOfAutosizedHeatingAirflow ){
+					} else if ( SAFMethod == FractionOfAutosizedHeatingAirflow ) {
 						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 						TempSize = AutoSize;
 						DataScalableSizingON = true;
@@ -1605,7 +1592,7 @@ namespace VentilatedSlab {
 			VentSlab( Item ).MaxAirVolFlow = max( CoolingAirVolFlowScalable, HeatingAirVolFlowScalable );
 		} else {
 			// no scalble sizing method has been specified. Sizing proceeds using the method
-			// specified in the zoneHVAC object 
+			// specified in the zoneHVAC object
 			// N1 , \field Maximum Supply Air Flow Rate
 			SizingMethod = SystemAirflowSizing;
 			FieldNum = 1;
@@ -1637,7 +1624,7 @@ namespace VentilatedSlab {
 						ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes, "User-Specified Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( OutAirVolFlowDes - OutAirVolFlowUser ) / OutAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
+								ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \"" + VentSlab( Item ).Name + "\"." );
 								ShowContinueError( "User-Specified Maximum Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowUser, 5 ) + " [m3/s]" );
 								ShowContinueError( "differs from Design Size Maximum Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowDes, 5 ) + " [m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
@@ -1673,7 +1660,7 @@ namespace VentilatedSlab {
 						ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Minimum Outdoor Air Flow Rate [m3/s]", MinOutAirVolFlowDes, "User-Specified Minimum Outdoor Air Flow Rate [m3/s]", MinOutAirVolFlowUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( MinOutAirVolFlowDes - MinOutAirVolFlowUser ) / MinOutAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
+								ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \"" + VentSlab( Item ).Name + "\"." );
 								ShowContinueError( "User-Specified Minimum Outdoor Air Flow Rate of " + RoundSigDigits( MinOutAirVolFlowUser, 5 ) + " [m3/s]" );
 								ShowContinueError( "differs from Design Size Minimum Outdoor Air Flow Rate of " + RoundSigDigits( MinOutAirVolFlowDes, 5 ) + " [m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
@@ -1712,7 +1699,7 @@ namespace VentilatedSlab {
 									CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod;
 									ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
 									if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
-										if ( CapSizingMethod == HeatingDesignCapacity ){
+										if ( CapSizingMethod == HeatingDesignCapacity ) {
 											if ( ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity > 0.0 ) {
 												ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 												ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
@@ -1720,11 +1707,11 @@ namespace VentilatedSlab {
 												DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
 											}
 											TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
-										} else if ( CapSizingMethod == CapacityPerFloorArea ){
+										} else if ( CapSizingMethod == CapacityPerFloorArea ) {
 											ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 											ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
 											DataScalableCapSizingON = true;
-										} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
+										} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
 											DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 											DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
 											TempSize = AutoSize;
@@ -1764,7 +1751,7 @@ namespace VentilatedSlab {
 							ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxVolHotWaterFlowDes, "User-Specified Maximum Hot Water Flow [m3/s]", MaxVolHotWaterFlowUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser ) / MaxVolHotWaterFlowUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
+									ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \"" + VentSlab( Item ).Name + "\"." );
 									ShowContinueError( "User-Specified Maximum Hot Water Flow of " + RoundSigDigits( MaxVolHotWaterFlowUser, 5 ) + " [m3/s]" );
 									ShowContinueError( "differs from Design Size Maximum Hot Water Flow of " + RoundSigDigits( MaxVolHotWaterFlowDes, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
@@ -1805,7 +1792,7 @@ namespace VentilatedSlab {
 									CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod;
 									ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
 									if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
-										if ( CapSizingMethod == HeatingDesignCapacity ){
+										if ( CapSizingMethod == HeatingDesignCapacity ) {
 											if ( ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity > 0.0 ) {
 												ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 												ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
@@ -1813,11 +1800,11 @@ namespace VentilatedSlab {
 												DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
 											}
 											TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
-										} else if ( CapSizingMethod == CapacityPerFloorArea ){
+										} else if ( CapSizingMethod == CapacityPerFloorArea ) {
 											ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 											ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
 											DataScalableCapSizingON = true;
-										} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
+										} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
 											DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 											DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
 											TempSize = AutoSize;
@@ -1848,7 +1835,7 @@ namespace VentilatedSlab {
 							}
 						} else {
 							ShowSevereError( "Autosizing of Steam flow requires a heating loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in " "ZoneHVAC:VentilatedSlab" " Object=" + VentSlab( Item ).Name );
+							ShowContinueError( "Occurs in ZoneHVAC:VentilatedSlab Object=" + VentSlab( Item ).Name );
 							ErrorsFound = true;
 						}
 					}
@@ -1861,7 +1848,7 @@ namespace VentilatedSlab {
 							ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowDes, "User-Specified Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser ) / MaxVolHotSteamFlowUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
+									ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \"" + VentSlab( Item ).Name + "\"." );
 									ShowContinueError( "User-Specified Maximum Steam Flow of " + RoundSigDigits( MaxVolHotSteamFlowUser, 5 ) + " [m3/s]" );
 									ShowContinueError( "differs from Design Size Maximum Steam Flow of " + RoundSigDigits( MaxVolHotSteamFlowDes, 5 ) + " [m3/s]" );
 									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
@@ -1906,7 +1893,7 @@ namespace VentilatedSlab {
 								CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingCapMethod;
 								ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
 								if ( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
-									if ( CapSizingMethod == CoolingDesignCapacity ){
+									if ( CapSizingMethod == CoolingDesignCapacity ) {
 										if ( ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity > 0.0 ) {
 											ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
 											ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
@@ -1914,11 +1901,11 @@ namespace VentilatedSlab {
 											DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
 										}
 										TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
-									} else if ( CapSizingMethod == CapacityPerFloorArea ){
+									} else if ( CapSizingMethod == CapacityPerFloorArea ) {
 										ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
 										ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity * Zone( DataZoneNumber ).FloorArea;
 										DataScalableCapSizingON = true;
-									} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ){
+									} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
 										DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
 										DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
 										TempSize = AutoSize;
@@ -1958,7 +1945,7 @@ namespace VentilatedSlab {
 						ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxVolColdWaterFlowDes, "User-Specified Maximum Cold Water Flow [m3/s]", MaxVolColdWaterFlowUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( MaxVolColdWaterFlowDes - MaxVolColdWaterFlowUser ) / MaxVolColdWaterFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
+								ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \"" + VentSlab( Item ).Name + "\"." );
 								ShowContinueError( "User-Specified Maximum Cold Water Flow of " + RoundSigDigits( MaxVolColdWaterFlowUser, 5 ) + " [m3/s]" );
 								ShowContinueError( "differs from Design Size Maximum Cold Water Flow of " + RoundSigDigits( MaxVolColdWaterFlowDes, 5 ) + " [m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
@@ -4095,7 +4082,7 @@ namespace VentilatedSlab {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

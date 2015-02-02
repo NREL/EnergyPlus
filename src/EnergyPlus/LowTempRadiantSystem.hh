@@ -139,10 +139,10 @@ namespace LowTempRadiantSystem {
 		Real64 CoolEnergy; // cooling sent to panel in Joules
 		int OutRangeHiErrorCount; // recurring errors for crazy results too high fluid temperature
 		int OutRangeLoErrorCount; // recurring errors for crazy results too low fluid temperature
-		int HeatingCapMethod; // - Method for Low Temp Radiant system heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
-		Real64 ScaledHeatingCapacity; // -  Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
-		int CoolingCapMethod; // - Method for Low Temp Radiant system cooling capacity scaledsizing calculation (CoolingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedCoolingCapacity) 
-		Real64 ScaledCoolingCapacity; // -  Low Temp Radiant system scaled maximum cooling capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
+		int HeatingCapMethod; // - Method for Low Temp Radiant system heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
+		Real64 ScaledHeatingCapacity; // -  Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
+		int CoolingCapMethod; // - Method for Low Temp Radiant system cooling capacity scaledsizing calculation (CoolingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedCoolingCapacity)
+		Real64 ScaledCoolingCapacity; // -  Low Temp Radiant system scaled maximum cooling capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
 
 		// Default Constructor
 		HydronicRadiantSystemData() :
@@ -260,10 +260,10 @@ namespace LowTempRadiantSystem {
 			Real64 const CoolEnergy, // cooling sent to panel in Joules
 			int const OutRangeHiErrorCount, // recurring errors for crazy results too high fluid temperature
 			int const OutRangeLoErrorCount, // recurring errors for crazy results too low fluid temperature
-			int const HeatingCapMethod, // - Method for Low Temp Radiant system heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
-			Real64 const ScaledHeatingCapacity, // -  Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
-			int const CoolingCapMethod, // - Method for Low Temp Radiant system cooling capacity scaledsizing calculation (CoolingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedCoolingCapacity) 
-			Real64 const ScaledCoolingCapacity // -  Low Temp Radiant system scaled maximum cooling capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
+			int const HeatingCapMethod, // - Method for Low Temp Radiant system heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
+			Real64 const ScaledHeatingCapacity, // -  Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
+			int const CoolingCapMethod, // - Method for Low Temp Radiant system cooling capacity scaledsizing calculation (CoolingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedCoolingCapacity)
+			Real64 const ScaledCoolingCapacity // -  Low Temp Radiant system scaled maximum cooling capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
 		) :
 			Name( Name ),
 			SchedName( SchedName ),
@@ -694,8 +694,8 @@ namespace LowTempRadiantSystem {
 		Real64 HeatPower; // heating sent to panel in Watts (same as ElecPower)
 		Real64 HeatEnergy; // heating sent to panel in Joules (same as ElecEnergy)
 		int HeatingCapMethod;    // - Method for Low Temp Radiant system heating capacity scaledsizing calculation
-		//- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
-		Real64 ScaledHeatingCapacity;   // -  Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
+		//- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
+		Real64 ScaledHeatingCapacity;   // -  Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
 
 		// Default Constructor
 		ElectricRadiantSystemData() :
@@ -738,8 +738,8 @@ namespace LowTempRadiantSystem {
 			Real64 const HeatPower, // heating sent to panel in Watts (same as ElecPower)
 			Real64 const HeatEnergy, // heating sent to panel in Joules (same as ElecEnergy)
 			int const HeatingCapMethod,     // - Method for Low Temp Radiant system heating capacity scalable sizing calculation
-			//- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
-			Real64 const ScaledHeatingCapacity   // - Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
+			//- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
+			Real64 const ScaledHeatingCapacity   // - Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
 		) :
 			Name( Name ),
 			SchedName( SchedName ),
@@ -760,7 +760,7 @@ namespace LowTempRadiantSystem {
 			ElecPower( ElecPower ),
 			ElecEnergy( ElecEnergy ),
 			HeatPower( HeatPower ),
-			HeatEnergy( HeatEnergy ), 
+			HeatEnergy( HeatEnergy ),
 			HeatingCapMethod( HeatingCapMethod ),
 			ScaledHeatingCapacity( ScaledHeatingCapacity )
 		{}
@@ -944,7 +944,7 @@ namespace LowTempRadiantSystem {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

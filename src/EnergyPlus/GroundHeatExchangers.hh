@@ -55,7 +55,6 @@ namespace GroundHeatExchangers {
 		std::string Name; // user identifier
 		bool Available; // need an array of logicals--load identifiers of available equipment
 		bool ON; // simulate the machine at it's operating part load ratio
-		Real64 MaxGlheFlowRate; // design nominal capacity of Pump
 		int MaxSimYears; // maximum length of simulation (years)
 		int GlheInletNodeNum; // Node number on the inlet side of the plant
 		int GlheOutletNodeNum; // Node number on the outlet side of the plant
@@ -94,7 +93,6 @@ namespace GroundHeatExchangers {
 		GlheSpecs() :
 			Available( false ),
 			ON( false ),
-			MaxGlheFlowRate( 0.0 ),
 			MaxSimYears( 0 ),
 			GlheInletNodeNum( 0 ),
 			GlheOutletNodeNum( 0 ),
@@ -126,7 +124,6 @@ namespace GroundHeatExchangers {
 			std::string const & Name, // user identifier
 			bool const Available, // need an array of logicals--load identifiers of available equipment
 			bool const ON, // simulate the machine at it's operating part load ratio
-			Real64 const MaxGlheFlowRate, // design nominal capacity of Pump
 			int const MaxSimYears, // maximum length of simulation (years)
 			int const GlheInletNodeNum, // Node number on the inlet side of the plant
 			int const GlheOutletNodeNum, // Node number on the outlet side of the plant
@@ -161,7 +158,6 @@ namespace GroundHeatExchangers {
 			Name( Name ),
 			Available( Available ),
 			ON( ON ),
-			MaxGlheFlowRate( MaxGlheFlowRate ),
 			MaxSimYears( MaxSimYears ),
 			GlheInletNodeNum( GlheInletNodeNum ),
 			GlheOutletNodeNum( GlheOutletNodeNum ),
@@ -308,7 +304,7 @@ namespace GroundHeatExchangers {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

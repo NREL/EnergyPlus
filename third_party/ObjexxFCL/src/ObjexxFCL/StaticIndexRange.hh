@@ -49,13 +49,13 @@ public: // Creation
 	// Copy Constructor
 	inline
 	StaticIndexRange( StaticIndexRange const & I ) :
-		Super( I )
+	 Super( I )
 	{}
 
 	// IndexRange Constructor
 	inline
 	StaticIndexRange( IndexRange const & I ) :
-		Super( I )
+	 Super( I )
 	{
 		assert( I.initialized() );
 	}
@@ -63,7 +63,7 @@ public: // Creation
 	// Upper Index Constructor
 	inline
 	StaticIndexRange( int const u ) :
-		Super( u )
+	 Super( u )
 	{
 		assert( legal_static() );
 	}
@@ -71,13 +71,13 @@ public: // Creation
 	// Star Constructor
 	inline
 	StaticIndexRange( Star const s ) :
-		Super( s )
+	 Super( s )
 	{}
 
 	// Upper Dimension Constructor
 	inline
 	StaticIndexRange( Dimension const & u_dim ) :
-		Super( u_dim.value() )
+	 Super( u_dim.value() )
 	{
 		assert( legal_static() );
 	}
@@ -85,7 +85,7 @@ public: // Creation
 	// Upper Expression Constructor
 	inline
 	StaticIndexRange( Expression const & u_exp ) :
-		Super( u_exp.ivalue() )
+	 Super( u_exp.ivalue() )
 	{
 		assert( legal_static() );
 	}
@@ -93,7 +93,7 @@ public: // Creation
 	// Index Range Constructor
 	inline
 	StaticIndexRange( int const l, int const u ) :
-		Super( l, u )
+	 Super( l, u )
 	{
 		assert( legal_static() );
 	}
@@ -101,7 +101,7 @@ public: // Creation
 	// Lower Index + Star Constructor
 	inline
 	StaticIndexRange( int const l, Star const s ) :
-		Super( l, s )
+	 Super( l, s )
 	{
 		assert( legal_static() );
 	}
@@ -109,16 +109,16 @@ public: // Creation
 	// Star + Upper Index Constructor
 	inline
 	StaticIndexRange( Star const s, int const u ) :
-		Super( s, u )
+	 Super( s, u )
 	{
 		assert( legal_static() );
 	}
 
 	// Initializer List of Integer Constructor
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< int, U >::value >::type >
 	inline
-	StaticIndexRange( std::initializer_list< U > const lu, typename std::enable_if< std::is_constructible< int, U >::value >::type * = 0 ) :
-		Super( lu )
+	StaticIndexRange( std::initializer_list< U > const lu ) :
+	 Super( lu )
 	{
 		assert( legal_static() );
 	}
@@ -126,7 +126,7 @@ public: // Creation
 	// Initializer List of Index Constructor
 	inline
 	StaticIndexRange( std::initializer_list< Index > const lu ) :
-		Super( lu )
+	 Super( lu )
 	{
 		assert( legal_static() );
 	}
@@ -134,7 +134,7 @@ public: // Creation
 	// Omit Constructor
 	inline
 	StaticIndexRange( Omit const o ) :
-		Super( o )
+	 Super( o )
 	{
 		assert( legal_static() );
 	}
@@ -142,7 +142,7 @@ public: // Creation
 	// Lower Index + Omit Constructor
 	inline
 	StaticIndexRange( int const l, Omit const o ) :
-		Super( l, o )
+	 Super( l, o )
 	{
 		assert( legal_static() );
 	}
@@ -150,7 +150,7 @@ public: // Creation
 	// Omit + Upper Index Constructor
 	inline
 	StaticIndexRange( Omit const o, int const u ) :
-		Super( o, u )
+	 Super( o, u )
 	{
 		assert( legal_static() );
 	}
@@ -158,7 +158,7 @@ public: // Creation
 	// Omit + Omit Constructor
 	inline
 	StaticIndexRange( Omit const ol, Omit const ou ) :
-		Super( ol, ou )
+	 Super( ol, ou )
 	{
 		assert( legal_static() );
 	}
@@ -166,7 +166,7 @@ public: // Creation
 	// Dimension Range Constructor
 	inline
 	StaticIndexRange( Dimension const & l_dim, Dimension const & u_dim ) :
-		Super( l_dim.value(), u_dim.value() )
+	 Super( l_dim.value(), u_dim.value() )
 	{
 		assert( legal_static() );
 	}
@@ -174,7 +174,7 @@ public: // Creation
 	// Expression Range Constructor
 	inline
 	StaticIndexRange( Expression const & l_exp, Expression const & u_exp ) :
-		Super( l_exp.ivalue(), u_exp.ivalue() )
+	 Super( l_exp.ivalue(), u_exp.ivalue() )
 	{
 		assert( legal_static() );
 	}
@@ -182,7 +182,7 @@ public: // Creation
 	// Index and Dimension Constructor
 	inline
 	StaticIndexRange( int const l, Dimension const & u_dim ) :
-		Super( l, u_dim.value() )
+	 Super( l, u_dim.value() )
 	{
 		assert( legal_static() );
 	}
@@ -190,7 +190,7 @@ public: // Creation
 	// Dimension and Index Constructor
 	inline
 	StaticIndexRange( Dimension const & l_dim, int const u ) :
-		Super( l_dim.value(), u )
+	 Super( l_dim.value(), u )
 	{
 		assert( legal_static() );
 	}
@@ -198,7 +198,7 @@ public: // Creation
 	// Index and Expression Constructor
 	inline
 	StaticIndexRange( int const l, Expression const & u_exp ) :
-		Super( l, u_exp.ivalue() )
+	 Super( l, u_exp.ivalue() )
 	{
 		assert( legal_static() );
 	}
@@ -206,7 +206,7 @@ public: // Creation
 	// Expression and Index Constructor
 	inline
 	StaticIndexRange( Expression const & l_exp, int const u ) :
-		Super( l_exp.ivalue(), u )
+	 Super( l_exp.ivalue(), u )
 	{
 		assert( legal_static() );
 	}
@@ -214,7 +214,7 @@ public: // Creation
 	// Dimension and Expression Constructor
 	inline
 	StaticIndexRange( Dimension const & l_dim, Expression const & u_exp ) :
-		Super( l_dim.value(), u_exp.ivalue() )
+	 Super( l_dim.value(), u_exp.ivalue() )
 	{
 		assert( legal_static() );
 	}
@@ -222,7 +222,7 @@ public: // Creation
 	// Expression and Dimension Constructor
 	inline
 	StaticIndexRange( Expression const & l_exp, Dimension const & u_dim ) :
-		Super( l_exp.ivalue(), u_dim.value() )
+	 Super( l_exp.ivalue(), u_dim.value() )
 	{
 		assert( legal_static() );
 	}
@@ -230,7 +230,7 @@ public: // Creation
 	// Dimension and Unbounded Upper Index Constructor
 	inline
 	StaticIndexRange( Dimension const & l_dim, Star const s ) :
-		Super( l_dim.value(), s )
+	 Super( l_dim.value(), s )
 	{
 		assert( legal_static() );
 	}
@@ -238,7 +238,7 @@ public: // Creation
 	// Expression and Unbounded Upper Index Constructor
 	inline
 	StaticIndexRange( Expression const & l_exp, Star const s ) :
-		Super( l_exp.ivalue(), s )
+	 Super( l_exp.ivalue(), s )
 	{
 		assert( legal_static() );
 	}
@@ -316,7 +316,7 @@ public: // Assignment
 	}
 
 	// Initializer List of int Assignment
-	template< typename U, class = typename std::enable_if< std::is_constructible< int, U >::value >::type >
+	template< typename U, class = typename std::enable_if< std::is_assignable< int&, U >::value >::type >
 	inline
 	StaticIndexRange &
 	operator =( std::initializer_list< U > const lu )
@@ -680,27 +680,5 @@ swap( StaticIndexRange & a, StaticIndexRange & b )
 }
 
 } // ObjexxFCL
-
-#ifndef NO_STD_SWAP_OVERLOADS
-
-// std::swap Overloads for Efficiency
-//
-// Technically you cannot add functions overloads to namespace std
-// but this works with most compilers and makes it much faster if someone uses
-// std::swap instead of swap or ObjexxFCL::swap.
-
-namespace std {
-
-// std::swap( StaticIndexRange, StaticIndexRange )
-inline
-void
-swap( ObjexxFCL::StaticIndexRange & a, ObjexxFCL::StaticIndexRange & b )
-{
-	a.swap( b );
-}
-
-} // std
-
-#endif // NO_STD_SWAP_OVERLOADS
 
 #endif // ObjexxFCL_StaticIndexRange_hh_INCLUDED

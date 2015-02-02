@@ -313,8 +313,7 @@ namespace HVACHXAssistedCoolingCoil {
 			HXAssistedCoil.allocate( TotalNumHXAssistedCoils );
 			HXAssistedCoilOutletTemp.allocate( TotalNumHXAssistedCoils );
 			HXAssistedCoilOutletHumRat.allocate( TotalNumHXAssistedCoils );
-			CheckEquipName.allocate( TotalNumHXAssistedCoils );
-			CheckEquipName = true;
+			CheckEquipName.dimension( TotalNumHXAssistedCoils, true );
 		}
 
 		GetObjectDefMaxArgs( "CoilSystem:Cooling:DX:HeatExchangerAssisted", TotalArgs, NumAlphas, NumNums );
@@ -325,17 +324,11 @@ namespace HVACHXAssistedCoolingCoil {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		AlphArray.allocate( MaxAlphas );
-		AlphArray = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		NumArray.allocate( MaxNums );
-		NumArray = 0.0;
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		NumArray.dimension( MaxNums, 0.0 );
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNums, true );
 
 		// Get the data for the Coil:DX:CoolingHeatExchangerAssisted objects
 		CurrentModuleObject = "CoilSystem:Cooling:DX:HeatExchangerAssisted";
@@ -1926,7 +1919,7 @@ namespace HVACHXAssistedCoolingCoil {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

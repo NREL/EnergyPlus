@@ -262,6 +262,7 @@ namespace DataPlant {
 	extern int const TypeOf_UnitarySystemRecovery;
 	extern int const TypeOf_PackagedTESCoolingCoil;
 	extern int const TypeOf_CoolingTower_VarSpdMerkel;
+	extern int const TypeOf_SwimmingPool_Indoor;
 
 	// Parameters for General Equipment Types
 	extern int const NumGeneralEquipTypes;
@@ -316,7 +317,7 @@ namespace DataPlant {
 	extern Real64 const square_sum_ConvergenceHistoryARR;
 	extern Real64 const sum_square_ConvergenceHistoryARR;
 
-	// The same as TYPE DefinePriAirSysAvailMgrs in DataAirLoop.f90.  A common definition would be nicer.
+	// The same as TYPE DefinePriAirSysAvailMgrs in DataAirLoop.cc.  A common definition would be nicer.
 
 	// The next three types (all starting with RepReport) are the "shadow"
 	// derived types for the ventilation reports.  It keeps the node and
@@ -363,7 +364,7 @@ namespace DataPlant {
 
 	// these variables are arrays, allocated for the number of those particular loopsides, containing data for the vent reports
 	// they are operated on like normal in almost all cases currently, except in the routine which actually mines data and sets them up
-	// in that routine in SystemReports.f90, a POINTER is used to iterate over the different array variables below
+	// in that routine in SystemReports.cc, a POINTER is used to iterate over the different array variables below
 	// this is why the TARGET attribute is applied to them here
 	// further info can be found in SystemReports
 
@@ -2354,14 +2355,14 @@ namespace DataPlant {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -16,6 +16,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Chunk.hh>
 #include <ObjexxFCL/TypeTraits.hh>
+#include "ObjexxFCL.unit.hh"
 
 // C++ Headers
 #include <iomanip>
@@ -144,9 +145,6 @@ TEST( ChunkTest, Swap )
 	swap( a, b );
 	EXPECT_EQ( B, a );
 	EXPECT_EQ( A, b );
-	std::swap( a, b );
-	EXPECT_EQ( A, a );
-	EXPECT_EQ( B, b );
 }
 
 TEST( ChunkTest, FrontBack )

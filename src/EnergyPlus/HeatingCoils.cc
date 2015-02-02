@@ -359,10 +359,8 @@ namespace HeatingCoils {
 		if ( NumHeatingCoils > 0 ) {
 			HeatingCoil.allocate( NumHeatingCoils );
 			HeatingCoilNumericFields.allocate( NumHeatingCoils );
-			ValidSourceType.allocate( NumHeatingCoils );
-			ValidSourceType = false;
-			CheckEquipName.allocate( NumHeatingCoils );
-			CheckEquipName = true;
+			ValidSourceType.dimension( NumHeatingCoils, false );
+			CheckEquipName.dimension( NumHeatingCoils, true );
 		}
 
 		GetObjectDefMaxArgs( "Coil:Heating:Electric", TotalArgs, NumAlphas, NumNums );
@@ -382,17 +380,11 @@ namespace HeatingCoils {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		Numbers.allocate( MaxNums );
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		Numbers.dimension( MaxNums, 0.0 );
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNums, true );
 
 		// Get the data for electric heating coils
 		for ( ElecCoilNum = 1; ElecCoilNum <= NumElecCoil; ++ElecCoilNum ) {
@@ -756,7 +748,7 @@ namespace HeatingCoils {
 			} else {
 				ShowSevereError( CurrentModuleObject + ", \"" + HeatingCoil( CoilNum ).Name + "\" valid desuperheater heat source object type not found: " + Alphas( 5 ) );
 				ShowContinueError( "Valid desuperheater heat source objects are:" );
-				ShowContinueError( "Refrigeration:CompressorRack, Coil:Cooling:DX:SingleSpeed, " "Refrigeration:Condenser:AirCooled, Refrigeration:Condenser:EvaporativeCooled, " " Refrigeration:Condenser:WaterCooled,Coil:Cooling:DX:TwoSpeed, " "and Coil:Cooling:DX:TwoStageWithHumidityControlMode" );
+				ShowContinueError( "Refrigeration:CompressorRack, Coil:Cooling:DX:SingleSpeed, Refrigeration:Condenser:AirCooled, Refrigeration:Condenser:EvaporativeCooled, Refrigeration:Condenser:WaterCooled,Coil:Cooling:DX:TwoSpeed, and Coil:Cooling:DX:TwoStageWithHumidityControlMode" );
 				ErrorsFound = true;
 			}
 
@@ -971,7 +963,7 @@ namespace HeatingCoils {
 				if ( ControlNode == 0 ) {
 					ShowSevereError( cAllCoilTypes( HeatingCoil( CoilNum ).HCoilType_Num ) + " \"" + HeatingCoil( CoilNum ).Name + "\"" );
 					ShowContinueError( "... Missing control node for heating coil." );
-					ShowContinueError( "... enter a control node name in the coil temperature setpoint node field for this" " heating coil." );
+					ShowContinueError( "... enter a control node name in the coil temperature setpoint node field for this heating coil." );
 					ShowContinueError( "... use a Setpoint Manager to establish a setpoint at the coil temperature setpoint node." );
 					HeatingCoilFatalError = true;
 					//     test 3) here (fatal message)
@@ -1009,8 +1001,8 @@ namespace HeatingCoils {
 				ShowContinueError( " The Temperature Setpoint Node Name input is not required for this heating coil because" );
 				ShowContinueError( " this heating coil is controlled based on the load calculated by the thermostat." );
 				ShowContinueError( "... this heating coil is not controlled by using a temperature setpoint manager." );
-				ShowContinueError( "... if a temperature setpoint is placed at the outlet node of this heating coil, that" " temperature setpoint will not be used." );
-				ShowContinueError( "... leaving the input field \"Temperature Setpoint Node Name\" blank will" " eliminate this warning." );
+				ShowContinueError( "... if a temperature setpoint is placed at the outlet node of this heating coil, that temperature setpoint will not be used." );
+				ShowContinueError( "... leaving the input field \"Temperature Setpoint Node Name\" blank will eliminate this warning." );
 			}
 			MySPTestFlag( CoilNum ) = false;
 		}
@@ -1186,7 +1178,7 @@ namespace HeatingCoils {
 			// Ensure capacity at lower Stage must be lower or equal to the capacity at higher Stage.
 			for ( StageNum = 1; StageNum <= HeatingCoil( CoilNum ).NumOfStages - 1; ++StageNum ) {
 				if ( HeatingCoil( CoilNum ).MSNominalCapacity( StageNum ) > HeatingCoil( CoilNum ).MSNominalCapacity( StageNum + 1 ) ) {
-					ShowSevereError( "SizeHeatingCoil: " + HeatingCoil( CoilNum ).HeatingCoilType + ' ' + HeatingCoil( CoilNum ).Name + ", " "Stage " + TrimSigDigits( StageNum ) + " Nominal Capacity (" + RoundSigDigits( HeatingCoil( CoilNum ).MSNominalCapacity( StageNum ), 2 ) + " W) must be less than or equal to " "Stage " + TrimSigDigits( StageNum + 1 ) + " Nominal Capacity (" + RoundSigDigits( HeatingCoil( CoilNum ).MSNominalCapacity( StageNum + 1 ), 2 ) + " W)." );
+					ShowSevereError( "SizeHeatingCoil: " + HeatingCoil( CoilNum ).HeatingCoilType + ' ' + HeatingCoil( CoilNum ).Name + ", Stage " + TrimSigDigits( StageNum ) + " Nominal Capacity (" + RoundSigDigits( HeatingCoil( CoilNum ).MSNominalCapacity( StageNum ), 2 ) + " W) must be less than or equal to Stage " + TrimSigDigits( StageNum + 1 ) + " Nominal Capacity (" + RoundSigDigits( HeatingCoil( CoilNum ).MSNominalCapacity( StageNum + 1 ), 2 ) + " W)." );
 					ShowFatalError( "Preceding conditions cause termination." );
 				}
 			}
@@ -3261,7 +3253,7 @@ namespace HeatingCoils {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

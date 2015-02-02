@@ -337,7 +337,7 @@ namespace PackagedTerminalHeatPump {
 			CompSpeedRatio( 0.0 ),
 			ErrIndexCyc( 0 ),
 			ErrIndexVar( 0 ),
-			ZonePtr(0), 
+			ZonePtr(0),
 			HVACSizingIndex(0)
 		{}
 
@@ -637,7 +637,7 @@ namespace PackagedTerminalHeatPump {
 
 	// Object Data
 	extern FArray1D< PTUnitData > PTUnit;
-	extern FArray1D< PTUnitNumericFieldData > PTUnitUNumericFields; // holds PT unit numeric input fields character field name 
+	extern FArray1D< PTUnitNumericFieldData > PTUnitUNumericFields; // holds PT unit numeric input fields character field name
 
 	// Functions
 
@@ -874,7 +874,7 @@ namespace PackagedTerminalHeatPump {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

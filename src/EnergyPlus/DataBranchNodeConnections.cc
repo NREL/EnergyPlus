@@ -50,8 +50,6 @@ namespace DataBranchNodeConnections {
 	FArray1D< ComponentListData > CompSets;
 	FArray1D< ParentListData > ParentNodeList;
 	FArray1D< NodeConnectionDef > NodeConnections;
-	FArray1D< NodeConnectionDef > tmpNodeConnections;
-	FArray1D< EqNodeConnectionDef > tmpEqNodeConnections;
 	FArray1D< EqNodeConnectionDef > AirTerminalNodeConnections;
 
 	//     NOTICE
@@ -61,7 +59,7 @@ namespace DataBranchNodeConnections {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

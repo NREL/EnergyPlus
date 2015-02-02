@@ -17,6 +17,7 @@
 #include <ObjexxFCL/ChunkVector.hh>
 #include <ObjexxFCL/ChunkVector.io.hh>
 #include <ObjexxFCL/TypeTraits.hh>
+#include "ObjexxFCL.unit.hh"
 
 // C++ Headers
 #include <limits>
@@ -211,9 +212,6 @@ TEST( ChunkVectorTest, Swap )
 	swap( a, b );
 	EXPECT_EQ( a, B );
 	EXPECT_EQ( b, A );
-	std::swap( a, b );
-	EXPECT_EQ( a, A );
-	EXPECT_EQ( b, B );
 }
 
 TEST( ChunkVectorTest, FrontBack )

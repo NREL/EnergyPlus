@@ -20,6 +20,7 @@ extern "C" {
 #include <UtilityRoutines.hh>
 #include <BranchInputManager.hh>
 #include <BranchNodeConnections.hh>
+#include <CommandLineInterface.hh>
 #include <DataEnvironment.hh>
 #include <DataErrorTracking.hh>
 #include <DataGlobals.hh>
@@ -45,10 +46,7 @@ extern "C" {
 namespace EnergyPlus {
 
 void
-AbortEnergyPlus(
-	bool const NoIdf, // Set to true when "noidf" was found
-	bool const NoIDD // Set to true when "noidd" was found
-)
+AbortEnergyPlus()
 {
 
 	// SUBROUTINE INFORMATION:
@@ -90,9 +88,9 @@ AbortEnergyPlus(
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static gio::Fmt const fmtLD( "*" );
-	static gio::Fmt const OutFmt( "('Press ENTER to continue after reading above message>')" );
-	static gio::Fmt const ETimeFmt( "(I2.2,'hr ',I2.2,'min ',F5.2,'sec')" );
+	static gio::Fmt fmtLD( "*" );
+	static gio::Fmt OutFmt( "('Press ENTER to continue after reading above message>')" );
+	static gio::Fmt ETimeFmt( "(I2.2,'hr ',I2.2,'min ',F5.2,'sec')" );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 
@@ -171,31 +169,6 @@ AbortEnergyPlus(
 	NumSevereDuringSizing = RoundSigDigits( TotalSevereErrorsDuringSizing );
 	strip( NumSevereDuringSizing );
 
-	if ( NoIDD ) {
-		DisplayString( "No EnergyPlus Data Dictionary (Energy+.idd) was found.  It is possible " );
-		DisplayString( "you \"double-clicked\"EnergyPlus.exe rather than using one of the methods" );
-		DisplayString( "to run Energyplus as found in the GettingStarted document in the" );
-		DisplayString( "documentation folder.  Using EP-Launch may be best -- " );
-		DisplayString( "it provides extra help for new users." );
-		ShowMessage( "No EnergyPlus Data Dictionary (Energy+.idd) was found. It is possible you \"double-clicked\" EnergyPlus.exe " );
-		ShowMessage( "rather than using one of the methods to run Energyplus as found in the GettingStarted document" );
-		ShowMessage( "in the documentation folder.  Using EP-Launch may be best -- it provides extra help for new users." );
-		{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutFmt, flags ); }
-		gio::read( "*" );
-	}
-
-	if ( NoIdf ) {
-		DisplayString( "No input file (in.idf) was found.  It is possible you \"double-clicked\"" );
-		DisplayString( "EnergyPlus.exe rather than using one of the methods to run Energyplus" );
-		DisplayString( "as found in the GettingStarted document in the documentation folder." );
-		DisplayString( "Using EP-Launch may be best -- it provides extra help for new users." );
-		ShowMessage( "No input file (in.idf) was found.  It is possible you \"double-clicked\" EnergyPlus.exe rather than" );
-		ShowMessage( "using one of the methods to run Energyplus as found in the GettingStarted document in the documentation" );
-		ShowMessage( "folder.  Using EP-Launch may be best -- it provides extra help for new users." );
-		{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutFmt, flags ); }
-		gio::read( "*" );
-	}
-
 	// catch up with timings if in middle
 	Time_Finish = epElapsedTime();
 	if ( Time_Finish < Time_Start ) Time_Finish += 24.0 * 3600.0;
@@ -217,9 +190,9 @@ AbortEnergyPlus(
 	ShowMessage( "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed );
 	DisplayString( "EnergyPlus Run Time=" + Elapsed );
 	tempfl = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, "eplusout.end", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, DataStringGlobals::outputEndFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		DisplayString( "AbortEnergyPlus: Could not open file \"eplusout.end\" for output (write)." );
+		DisplayString( "AbortEnergyPlus: Could not open file "+ DataStringGlobals::outputEndFileName +" for output (write)." );
 	}
 	gio::write( tempfl, fmtLD ) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 
@@ -387,8 +360,8 @@ EndEnergyPlus()
 	// na
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static gio::Fmt const fmtA( "(A)" );
-	static gio::Fmt const ETimeFmt( "(I2.2,'hr ',I2.2,'min ',F5.2,'sec')" );
+	static gio::Fmt fmtA( "(A)" );
+	static gio::Fmt ETimeFmt( "(I2.2,'hr ',I2.2,'min ',F5.2,'sec')" );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 
@@ -449,9 +422,9 @@ EndEnergyPlus()
 	ShowMessage( "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed );
 	DisplayString( "EnergyPlus Run Time=" + Elapsed );
 	tempfl = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, "eplusout.end", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, DataStringGlobals::outputEndFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		DisplayString( "EndEnergyPlus: Could not open file \"eplusout.end\" for output (write)." );
+		DisplayString( "EndEnergyPlus: Could not open file " + DataStringGlobals::outputEndFileName + " for output (write)." );
 	}
 	gio::write( tempfl, fmtA ) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 	gio::close( tempfl );
@@ -829,20 +802,17 @@ ShowFatalError(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	static bool NoIdf( false );
-	static bool NoIDD( false );
 
 	ShowErrorMessage( " **  Fatal  ** " + ErrorMessage, OutUnit1, OutUnit2 );
 	DisplayString( "**FATAL:" + ErrorMessage );
-	if ( has( ErrorMessage, "in.idf missing" ) ) NoIdf = true;
-	if ( has( ErrorMessage, "Energy+.idd missing" ) ) NoIDD = true;
+
 	ShowErrorMessage( " ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2 );
 	ShowErrorMessage( " ..... Reference severe error count=" + RoundSigDigits( TotalSevereErrors ), OutUnit1, OutUnit2 );
 	ShowErrorMessage( " ..... Last severe error=" + LastSevereError, OutUnit1, OutUnit2 );
 	if ( sqlite && sqlite->writeOutputToSQLite() ) {
 		sqlite->createSQLiteErrorRecord( 1, 2, ErrorMessage, 1 );
 	}
-	AbortEnergyPlus( NoIdf, NoIDD );
+	AbortEnergyPlus();
 
 }
 
@@ -1479,23 +1449,10 @@ StoreRecurringErrorMessage(
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-	// Object Data
-	FArray1D< RecurringErrorData > TempRecurringErrors;
-
 	// If Index is zero, then assign next available index and reallocate array
 	if ( ErrorMsgIndex == 0 ) {
-		++NumRecurringErrors;
+		RecurringErrors.redimension( ++NumRecurringErrors );
 		ErrorMsgIndex = NumRecurringErrors;
-		if ( NumRecurringErrors == 1 ) {
-			RecurringErrors.allocate( NumRecurringErrors );
-		} else if ( NumRecurringErrors > 1 ) {
-			TempRecurringErrors.allocate( NumRecurringErrors );
-			TempRecurringErrors( {1,NumRecurringErrors - 1} ) = RecurringErrors( {1,NumRecurringErrors - 1} );
-			RecurringErrors.deallocate();
-			RecurringErrors.allocate( NumRecurringErrors );
-			RecurringErrors = TempRecurringErrors;
-			TempRecurringErrors.deallocate();
-		}
 		// The message string only needs to be stored once when a new recurring message is created
 		RecurringErrors( ErrorMsgIndex ).Message = ErrorMessage;
 		RecurringErrors( ErrorMsgIndex ).Count = 1;
@@ -1585,8 +1542,8 @@ ShowErrorMessage(
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static gio::Fmt const ErrorFormat( "(2X,A)" );
-	static gio::Fmt const fmtA( "(A)" );
+	static gio::Fmt ErrorFormat( "(2X,A)" );
+	static gio::Fmt fmtA( "(A)" );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -1602,10 +1559,10 @@ ShowErrorMessage(
 
 	if ( TotalErrors == 0 && ! ErrFileOpened ) {
 		StandardErrorOutput = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( StandardErrorOutput, "eplusout.err", flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( StandardErrorOutput, DataStringGlobals::outputErrFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
 			DisplayString( "Trying to display error: \"" + ErrorMessage + "\"" );
-			ShowFatalError( "ShowErrorMessage: Could not open file \"eplusout.err\" for output (write)." );
+			ShowFatalError( "ShowErrorMessage: Could not open file "+DataStringGlobals::outputErrFileName+" for output (write)." );
 		}
 		gio::write( StandardErrorOutput, fmtA ) << "Program Version," + VerString + ',' + IDDVerString;
 		ErrFileOpened = true;
@@ -1714,8 +1671,8 @@ ShowRecurringErrors()
 	// Using/Aliasing
 	using namespace DataErrorTracking;
 	using General::RoundSigDigits;
-    using General::strip_trailing_zeros;
-	
+	using General::strip_trailing_zeros;
+
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 	// na
@@ -1797,7 +1754,7 @@ ShowRecurringErrors()
 //     Portions of the EnergyPlus software package have been developed and copyrighted
 //     by other individuals, companies and institutions.  These portions have been
 //     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in EnergyPlus.f90.
+//     list of contributors, see "Notice" located in main.cc.
 //     NOTICE: The U.S. Government is granted for itself and others acting on its
 //     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 //     reproduce, prepare derivative works, and perform publicly and display publicly.

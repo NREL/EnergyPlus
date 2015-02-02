@@ -15,6 +15,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/fmt.hh>
+#include "ObjexxFCL.unit.hh"
 
 // C++ Headers
 #include <sstream>

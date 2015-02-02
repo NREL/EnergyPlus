@@ -642,8 +642,7 @@ namespace PlantCentralGSHP {
 		// ALLOCATE ARRAYS
 		Wrapper.allocate( NumWrappers );
 		WrapperReport.allocate( NumWrappers );
-		CheckEquipName.allocate( NumWrappers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumWrappers, true );
 		AllocatedFlag = true;
 
 		// Load arrays with electric EIR chiller data
@@ -934,8 +933,8 @@ namespace PlantCentralGSHP {
 		Real64 CurveValTmp; // Used to evaluate PLFFPLR curve objects
 
 		// Formats
-		static gio::Fmt const Format_530( "('Curve Output = ',11(F7.2))" );
-		static gio::Fmt const Format_550( "('Curve Output = ',11(F7.2))" );
+		static gio::Fmt Format_530( "('Curve Output = ',11(F7.2))" );
+		static gio::Fmt Format_550( "('Curve Output = ',11(F7.2))" );
 
 		cCurrentModuleObject = "ChillerHeaterPerformance:Electric:EIR";
 		NumChillerHeaters = GetNumObjectsFound( cCurrentModuleObject );
@@ -1197,8 +1196,7 @@ namespace PlantCentralGSHP {
 					ShowContinueError( "PLR          =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00" );
 					gio::write( StringVar, "'Curve Output = '" );
 					for ( CurveValPtr = 1; CurveValPtr <= 11; ++CurveValPtr ) {
-						gio::write( StringVar, "(F7.2,$)" )
-						    << CurveValArray( CurveValPtr );
+						gio::write( StringVar, "(F7.2,$)" ) << CurveValArray( CurveValPtr );
 					}
 					gio::write( StringVar );
 					ShowContinueError( StringVar );
@@ -3377,7 +3375,7 @@ namespace PlantCentralGSHP {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

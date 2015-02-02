@@ -247,10 +247,8 @@ namespace BoilerSteam {
 
 		// Boiler will have fuel input to it , that is it !
 		Boiler.allocate( NumBoilers );
-		CheckEquipName.allocate( NumBoilers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumBoilers, true );
 		BoilerFuelTypeForOutputVariable.allocate( NumBoilers );
-		BoilerFuelTypeForOutputVariable = "";
 
 		BoilerReport.allocate( NumBoilers );
 
@@ -361,7 +359,7 @@ namespace BoilerSteam {
 				SteamFluidIndex = FindRefrigerant( "Steam" );
 				if ( SteamFluidIndex == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
-					ShowContinueError( "Steam Properties not found; " "Steam Fluid Properties must be included in the input file." );
+					ShowContinueError( "Steam Properties not found; Steam Fluid Properties must be included in the input file." );
 					ErrorsFound = true;
 				}
 			}
@@ -509,7 +507,7 @@ namespace BoilerSteam {
 				if ( ! AnyEnergyManagementSystemInModel ) {
 					if ( ! Boiler( BoilerNum ).MissingSetPointErrDone ) {
 						ShowWarningError( "Missing temperature setpoint for Boiler:Steam = " + Boiler( BoilerNum ).Name );
-						ShowContinueError( " A temperature setpoint is needed at the outlet node of the boiler," " use a SetpointManager" );
+						ShowContinueError( " A temperature setpoint is needed at the outlet node of the boiler, use a SetpointManager" );
 						ShowContinueError( " The overall loop setpoint will be assumed for this boiler. The simulation continues ..." );
 						Boiler( BoilerNum ).MissingSetPointErrDone = true;
 					}
@@ -1048,7 +1046,7 @@ namespace BoilerSteam {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

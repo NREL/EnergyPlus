@@ -12,6 +12,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <DaylightingManager.hh>
 #include <DataBSDFWindow.hh>
 #include <DataDaylighting.hh>
@@ -416,7 +417,6 @@ namespace DaylightingManager {
 		using General::RoundSigDigits;
 		using DaylightingDevices::FindTDDPipe;
 		using DaylightingDevices::TransTDD;
-		using SolarReflectionManager::SolReflRecSurf;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
 
 		// Locals
@@ -424,7 +424,7 @@ namespace DaylightingManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -461,7 +461,7 @@ namespace DaylightingManager {
 		static bool doSkyReporting( true );
 
 		// Formats
-		static gio::Fmt const Format_700( "('! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Daylight Fac: Ref Pt #1, Daylight Fac: Ref Pt #2')" );
+		static gio::Fmt Format_700( "('! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Daylight Fac: Ref Pt #1, Daylight Fac: Ref Pt #2')" );
 
 		// FLOW:
 		if ( firstTime ) {
@@ -684,14 +684,14 @@ namespace DaylightingManager {
 		// open a new file eplusout.dfs for saving the daylight factors
 		if ( CreateDFSReportFile ) {
 			OutputFileDFS = GetNewUnitNumber();
-			{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileDFS, "eplusout.dfs", flags ); write_stat = flags.ios(); }
+			{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileDFS, DataStringGlobals::outputDfsFileName, flags ); write_stat = flags.ios(); }
 			if ( write_stat != 0 ) {
-				ShowFatalError( "CalcDayltgCoefficients: Could not open file \"eplusout.dfs\" for output (write)." );
+				ShowFatalError( "CalcDayltgCoefficients: Could not open file "+DataStringGlobals::outputDfsFileName+" for output (write)." );
 			} else {
 				gio::write( OutputFileDFS, fmtA ) << "This file contains daylight factors for all exterior windows of daylight zones.";
 				gio::write( OutputFileDFS, fmtA ) << "If only one reference point the last 4 columns in the data will be zero.";
 				gio::write( OutputFileDFS, fmtA ) << "MonthAndDay,Zone Name,Window Name,Window State";
-				gio::write( OutputFileDFS, fmtA ) << "Hour,Daylight Factor for Clear Sky at Reference point 1," "Daylight Factor for Clear Turbid Sky at Reference point 1,Daylight Factor for Intermediate Sky at Reference point 1," "Daylight Factor for Overcast Sky at Reference point 1,Daylight Factor for Clear Sky at Reference point 2," "Daylight Factor for Clear Turbid Sky at Reference point 2,Daylight Factor for Intermediate Sky at Reference point 2," "Daylight Factor for Overcast Sky at Reference point 2";
+				gio::write( OutputFileDFS, fmtA ) << "Hour,Daylight Factor for Clear Sky at Reference point 1,Daylight Factor for Clear Turbid Sky at Reference point 1,Daylight Factor for Intermediate Sky at Reference point 1,Daylight Factor for Overcast Sky at Reference point 1,Daylight Factor for Clear Sky at Reference point 2,Daylight Factor for Clear Turbid Sky at Reference point 2,Daylight Factor for Intermediate Sky at Reference point 2,Daylight Factor for Overcast Sky at Reference point 2";
 			}
 			CreateDFSReportFile = false;
 		}
@@ -790,7 +790,6 @@ namespace DaylightingManager {
 		using General::RoundSigDigits;
 		using DaylightingDevices::FindTDDPipe;
 		using DaylightingDevices::TransTDD;
-		using SolarReflectionManager::SolReflRecSurf;
 		using namespace Vectors;
 		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 
@@ -834,7 +833,7 @@ namespace DaylightingManager {
 			}
 
 			if ( ErrorsFound ) {
-				ShowFatalError( "Not all TubularDaylightDome objects have corresponding DaylightingDevice:Tubular objects." " Program terminates." );
+				ShowFatalError( "Not all TubularDaylightDome objects have corresponding DaylightingDevice:Tubular objects. Program terminates." );
 			}
 			VeryFirstTime = false;
 		}
@@ -885,7 +884,6 @@ namespace DaylightingManager {
 		using General::RoundSigDigits;
 		using DaylightingDevices::FindTDDPipe;
 		using DaylightingDevices::TransTDD;
-		using SolarReflectionManager::SolReflRecSurf;
 		using namespace Vectors;
 		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
@@ -1143,7 +1141,6 @@ namespace DaylightingManager {
 		using General::RoundSigDigits;
 		using DaylightingDevices::FindTDDPipe;
 		using DaylightingDevices::TransTDD;
-		using SolarReflectionManager::SolReflRecSurf;
 		using namespace Vectors;
 		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
@@ -4024,7 +4021,7 @@ namespace DaylightingManager {
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// na
@@ -4048,7 +4045,7 @@ namespace DaylightingManager {
 		int TotDaylightingDElight; // Total Daylighting:DElight inputs
 		Real64 dLatitude; // double for argument passing
 		int iErrorFlag; // Error Flag for warning/errors returned from DElight
-		int iDElightErrorFile; // Unit number for reading DElight Error File (eplusout.delightdfdmp)
+		int iDElightErrorFile; // Unit number for reading DElight Error File
 		int iReadStatus; // Error File Read Status
 		std::string cErrorLine; // Each DElight Error line can be up to 210 characters long
 		std::string cErrorMsg; // Each DElight Error Message can be up to 200 characters long
@@ -4190,7 +4187,7 @@ namespace DaylightingManager {
 			if ( iErrorFlag != 0 ) {
 				// Open DElight Daylight Factors Error File for reading
 				iDElightErrorFile = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, "eplusout.delightdfdmp", flags ); }
+				{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags ); }
 
 				// Sequentially read lines in DElight Daylight Factors Error File
 				// and process them using standard EPlus warning/error handling calls
@@ -4231,7 +4228,7 @@ namespace DaylightingManager {
 			} else {
 				// Open, Close, and Delete DElight Daylight Factors Error File for reading
 				iDElightErrorFile = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, "eplusout.delightdfdmp", flags ); }
+				{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, DataStringGlobals::outputDelightDfdmpFileName, flags ); }
 				{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( iDElightErrorFile, flags ); }
 			}
 			SetupDElightOutput4EPlus();
@@ -4299,7 +4296,7 @@ namespace DaylightingManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS: na
 		// DERIVED TYPE DEFINITIONS: na
@@ -4361,8 +4358,7 @@ namespace DaylightingManager {
 
 		IllumMap.allocate( TotIllumMaps );
 		IllumMapCalc.allocate( TotIllumMaps );
-		ZoneMapCount.allocate( NumOfZones );
-		ZoneMapCount = 0;
+		ZoneMapCount.dimension( NumOfZones, 0 );
 
 		if ( TotIllumMaps > 0 ) {
 			for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
@@ -4410,7 +4406,7 @@ namespace DaylightingManager {
 				}
 				if ( IllumMap( MapNum ).Xnum * IllumMap( MapNum ).Ynum > MaxMapRefPoints ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", too many map points specified." );
-					ShowContinueError( "..." + cNumericFieldNames( 4 ) + '[' + RoundSigDigits( IllumMap( MapNum ).Xnum ) + "] * " + cNumericFieldNames( 7 ) + '[' + RoundSigDigits( IllumMap( MapNum ).Ynum ) + "]." "= [" + RoundSigDigits( IllumMap( MapNum ).Xnum * IllumMap( MapNum ).Ynum ) + "] must be <= [" + RoundSigDigits( MaxMapRefPoints ) + "]." );
+					ShowContinueError( "..." + cNumericFieldNames( 4 ) + '[' + RoundSigDigits( IllumMap( MapNum ).Xnum ) + "] * " + cNumericFieldNames( 7 ) + '[' + RoundSigDigits( IllumMap( MapNum ).Ynum ) + "].= [" + RoundSigDigits( IllumMap( MapNum ).Xnum * IllumMap( MapNum ).Ynum ) + "] must be <= [" + RoundSigDigits( MaxMapRefPoints ) + "]." );
 					ErrorsFound = true;
 				}
 			} // MapNum
@@ -4812,8 +4808,7 @@ namespace DaylightingManager {
 
 		}
 
-		ZoneMsgDone.allocate( NumOfZones );
-		ZoneMsgDone = false;
+		ZoneMsgDone.dimension( NumOfZones, false );
 		for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
 			if ( IllumMap( MapNum ).Zone == 0 ) continue;
 			if ( ZoneDaylight( IllumMap( MapNum ).Zone ).DaylightType != DetailedDaylighting && ! ZoneMsgDone( IllumMap( MapNum ).Zone ) ) {
@@ -4824,7 +4819,7 @@ namespace DaylightingManager {
 		ZoneMsgDone.deallocate();
 
 		if ( TotIllumMaps > 0 ) {
-			gio::write( OutputFileInits, fmtA ) << "! <Daylighting:Illuminance Maps:Detail>,Name,Zone,XMin {m},XMax {m},Xinc {m},#X Points," "YMin {m},YMax {m},Yinc {m},#Y Points,Z {m}";
+			gio::write( OutputFileInits, fmtA ) << "! <Daylighting:Illuminance Maps:Detail>,Name,Zone,XMin {m},XMax {m},Xinc {m},#X Points,YMin {m},YMax {m},Yinc {m},#Y Points,Z {m}";
 		}
 		for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
 			gio::write( OutputFileInits, "('Daylighting:Illuminance Maps:Detail',11(',',A))" ) << IllumMap( MapNum ).Name << Zone( IllumMap( MapNum ).Zone ).Name << RoundSigDigits( IllumMap( MapNum ).Xmin, 2 ) << RoundSigDigits( IllumMap( MapNum ).Xmax, 2 ) << RoundSigDigits( IllumMap( MapNum ).Xinc, 2 ) << RoundSigDigits( IllumMap( MapNum ).Xnum ) << RoundSigDigits( IllumMap( MapNum ).Ymin, 2 ) << RoundSigDigits( IllumMap( MapNum ).Ymax, 2 ) << RoundSigDigits( IllumMap( MapNum ).Yinc, 2 ) << RoundSigDigits( IllumMap( MapNum ).Ynum ) << RoundSigDigits( IllumMap( MapNum ).Z, 2 );
@@ -4909,7 +4904,7 @@ namespace DaylightingManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4925,8 +4920,7 @@ namespace DaylightingManager {
 		static bool firstTime( true );
 
 		if ( firstTime ) {
-			CheckTDDZone.allocate( NumOfZones );
-			CheckTDDZone = true;
+			CheckTDDZone.dimension( NumOfZones, true );
 			firstTime = false;
 		}
 
@@ -4937,7 +4931,7 @@ namespace DaylightingManager {
 			if ( SurfNum > 0 ) {
 				if ( ZoneDaylight( Surface( SurfNum ).Zone ).DaylightType == NoDaylighting ) {
 					ShowSevereError( "DaylightingDevice:Tubular = " + TDDPipe( PipeNum ).Name + ":  is not connected to a Zone that has Daylighting.  " );
-					ShowContinueError( "Add Daylighting:Controls (or Daylighting:DELight:Controls) " "to Zone named:  " + Zone( Surface( SurfNum ).Zone ).Name );
+					ShowContinueError( "Add Daylighting:Controls (or Daylighting:DELight:Controls) to Zone named:  " + Zone( Surface( SurfNum ).Zone ).Name );
 					ShowContinueError( "A sufficient control is provided on the .dbg file." );
 					ErrorsFound = true;
 					if ( CheckTDDZone( Surface( SurfNum ).Zone ) ) {
@@ -8137,25 +8131,19 @@ namespace DaylightingManager {
 
 		if ( ! allocated( FLSK ) ) FLSK.allocate( NTrnBasis, 4 );
 		FLSK = 0.0;
-		if ( ! allocated( FLSU ) ) FLSU.allocate( NTrnBasis );
-		FLSU = 0.0;
-		if ( ! allocated( FLSUdisk ) ) FLSUdisk.allocate( NTrnBasis );
-		FLSUdisk = 0.0;
+		if ( ! allocated( FLSU ) ) FLSU.dimension( NTrnBasis, 0.0 );
+		if ( ! allocated( FLSUdisk ) ) FLSUdisk.dimension( NTrnBasis, 0.0 );
 
 		if ( ! allocated( FirstFluxSK ) ) FirstFluxSK.allocate( NTrnBasis, 4 );
 		FirstFluxSK = 0.0;
-		if ( ! allocated( FirstFluxSU ) ) FirstFluxSU.allocate( NTrnBasis );
-		FirstFluxSU = 0.0;
-		if ( ! allocated( FirstFluxSUdisk ) ) FirstFluxSUdisk.allocate( NTrnBasis );
-		FirstFluxSUdisk = 0.0;
+		if ( ! allocated( FirstFluxSU ) ) FirstFluxSU.dimension( NTrnBasis, 0.0 );
+		if ( ! allocated( FirstFluxSUdisk ) ) FirstFluxSUdisk.dimension( NTrnBasis, 0.0 );
 
 		NIncBasis = ComplexWind( IWin ).Geom( CurCplxFenState ).Inc.NBasis;
 		if ( ! allocated( ElementLuminanceSky ) ) ElementLuminanceSky.allocate( NIncBasis, 4 );
 		ElementLuminanceSky = 0.0;
-		if ( ! allocated( ElementLuminanceSun ) ) ElementLuminanceSun.allocate( NIncBasis );
-		ElementLuminanceSun = 0.0;
-		if ( ! allocated( ElementLuminanceSunDisk ) ) ElementLuminanceSunDisk.allocate( NIncBasis );
-		ElementLuminanceSunDisk = 0.0;
+		if ( ! allocated( ElementLuminanceSun ) ) ElementLuminanceSun.dimension( NIncBasis, 0.0 );
+		if ( ! allocated( ElementLuminanceSunDisk ) ) ElementLuminanceSunDisk.dimension( NIncBasis, 0.0 );
 
 		// Integration over sky/ground/sun elements is done over window incoming basis element and flux is calculated for each
 		// outgoing direction. This is used to calculate first reflected flux
@@ -8293,10 +8281,8 @@ namespace DaylightingManager {
 
 		if ( ! allocated( ElementLuminanceSky ) ) ElementLuminanceSky.allocate( NIncBasis, 4 );
 		ElementLuminanceSky = 0.0;
-		if ( ! allocated( ElementLuminanceSun ) ) ElementLuminanceSun.allocate( NIncBasis );
-		ElementLuminanceSun = 0.0;
-		if ( ! allocated( ElementLuminanceSunDisk ) ) ElementLuminanceSunDisk.allocate( NIncBasis );
-		ElementLuminanceSunDisk = 0.0;
+		if ( ! allocated( ElementLuminanceSun ) ) ElementLuminanceSun.dimension( NIncBasis, 0.0 );
+		if ( ! allocated( ElementLuminanceSunDisk ) ) ElementLuminanceSunDisk.dimension( NIncBasis, 0.0 );
 
 		ComplexFenestrationLuminances( IWin, WinEl, NIncBasis, IHR, iRefPoint, ElementLuminanceSky, ElementLuminanceSun, ElementLuminanceSunDisk, CalledFrom, MapNum );
 
@@ -9269,8 +9255,8 @@ namespace DaylightingManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const FmtA( "(A)" );
-		static gio::Fmt const HrFmt( "(I2.2)" );
+		static gio::Fmt FmtA( "(A)" );
+		static gio::Fmt HrFmt( "(I2.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -9310,14 +9296,10 @@ namespace DaylightingManager {
 		// FLOW:
 		if ( firstTime ) {
 			firstTime = false;
-			FirstTimeMaps.allocate( TotIllumMaps );
-			FirstTimeMaps = true;
-			EnvrnPrint.allocate( TotIllumMaps );
-			EnvrnPrint = true;
+			FirstTimeMaps.dimension( TotIllumMaps, true );
+			EnvrnPrint.dimension( TotIllumMaps, true );
 			RefPts.allocate( MaxRefPoints, NumOfZones );
-			RefPts = "";
 			SavedMnDy.allocate( TotIllumMaps );
-			SavedMnDy = "";
 		}
 
 		if ( FirstTimeMaps( MapNum ) ) {
@@ -9326,13 +9308,13 @@ namespace DaylightingManager {
 			IllumMap( MapNum ).UnitNo = GetNewUnitNumber();
 			MapNoString = RoundSigDigits( MapNum );
 			if ( MapColSep == CharTab ) {
-				{ IOFlags flags; flags.ACTION( "readwrite" ); flags.STATUS( "UNKNOWN" ); gio::open( IllumMap( MapNum ).UnitNo, "eplusmap.tab" + MapNoString, flags ); if ( flags.err() ) goto Label901; }
+				{ IOFlags flags; flags.ACTION( "readwrite" ); flags.STATUS( "UNKNOWN" ); gio::open( IllumMap( MapNum ).UnitNo, DataStringGlobals::outputMapTabFileName + MapNoString, flags ); if ( flags.err() ) goto Label901; }
 				CommaDelimited = false;
 			} else if ( MapColSep == CharComma ) {
-				{ IOFlags flags; flags.ACTION( "readwrite" ); flags.STATUS( "UNKNOWN" ); gio::open( IllumMap( MapNum ).UnitNo, "eplusmap.csv" + MapNoString, flags ); if ( flags.err() ) goto Label902; }
+				{ IOFlags flags; flags.ACTION( "readwrite" ); flags.STATUS( "UNKNOWN" ); gio::open( IllumMap( MapNum ).UnitNo, DataStringGlobals::outputMapCsvFileName + MapNoString, flags ); if ( flags.err() ) goto Label902; }
 				CommaDelimited = true;
 			} else {
-				{ IOFlags flags; flags.ACTION( "readwrite" ); flags.STATUS( "UNKNOWN" ); gio::open( IllumMap( MapNum ).UnitNo, "eplusmap.txt" + MapNoString, flags ); if ( flags.err() ) goto Label903; }
+				{ IOFlags flags; flags.ACTION( "readwrite" ); flags.STATUS( "UNKNOWN" ); gio::open( IllumMap( MapNum ).UnitNo, DataStringGlobals::outputMapTxtFileName + MapNoString, flags ); if ( flags.err() ) goto Label903; }
 				CommaDelimited = false;
 			}
 
@@ -9438,15 +9420,15 @@ namespace DaylightingManager {
 		return;
 
 Label901: ;
-		ShowFatalError( "ReportIllumMap: Could not open file \"eplusmap.tab" + MapNoString + "\" for output (write)." );
+		ShowFatalError( "ReportIllumMap: Could not open file "+ DataStringGlobals::outputMapTabFileName + MapNoString + "\" for output (write)." );
 		return;
 
 Label902: ;
-		ShowFatalError( "ReportIllumMap: Could not open file \"eplusmap.csv" + MapNoString + "\" for output (write)." );
+		ShowFatalError( "ReportIllumMap: Could not open file "+ DataStringGlobals::outputMapCsvFileName + MapNoString + "\" for output (write)." );
 		return;
 
 Label903: ;
-		ShowFatalError( "ReportIllumMap: Could not open file \"eplusmap.txt" + MapNoString + "\" for output (write)." );
+		ShowFatalError( "ReportIllumMap: Could not open file "+ DataStringGlobals::outputMapTxtFileName + MapNoString + "\" for output (write)." );
 
 	}
 
@@ -9482,7 +9464,7 @@ Label903: ;
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const FmtA( "(A)" );
+		static gio::Fmt FmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -9502,11 +9484,11 @@ Label903: ;
 
 			// Write map header
 			if ( MapColSep == CharTab ) {
-				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( MapOutputFile, "eplusmap.tab", flags ); if ( flags.err() ) goto Label901; }
+				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( MapOutputFile, DataStringGlobals::outputMapTabFileName, flags ); if ( flags.err() ) goto Label901; }
 			} else if ( MapColSep == CharComma ) {
-				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( MapOutputFile, "eplusmap.csv", flags ); if ( flags.err() ) goto Label902; }
+				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( MapOutputFile, DataStringGlobals::outputMapCsvFileName, flags ); if ( flags.err() ) goto Label902; }
 			} else {
-				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( MapOutputFile, "eplusmap.txt", flags ); if ( flags.err() ) goto Label903; }
+				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( MapOutputFile, DataStringGlobals::outputMapTxtFileName, flags ); if ( flags.err() ) goto Label903; }
 			}
 
 			for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
@@ -9531,8 +9513,8 @@ Label903: ;
 			}
 
 			if ( ! mapResultsReported && ! AbortProcessing ) {
-				ShowSevereError( "CloseReportIllumMaps: Illuminance maps requested but no data ever reported. " "Likely cause is no solar." );
-				gio::write( MapOutputFile, FmtA ) << "CloseReportIllumMaps: Illuminance maps requested but no data ever reported. " "Likely cause is no solar.";
+				ShowSevereError( "CloseReportIllumMaps: Illuminance maps requested but no data ever reported. Likely cause is no solar." );
+				gio::write( MapOutputFile, FmtA ) << "CloseReportIllumMaps: Illuminance maps requested but no data ever reported. Likely cause is no solar.";
 			}
 
 			gio::close( MapOutputFile );
@@ -9542,15 +9524,15 @@ Label903: ;
 		return;
 
 Label901: ;
-		ShowFatalError( "CloseReportIllumMaps: Could not open file \"eplusmap.tab\" for output (write)." );
+		ShowFatalError( "CloseReportIllumMaps: Could not open file "+DataStringGlobals::outputMapTabFileName+" for output (write)." );
 		return;
 
 Label902: ;
-		ShowFatalError( "CloseReportIllumMaps: Could not open file \"eplusmap.csv\" for output (write)." );
+		ShowFatalError( "CloseReportIllumMaps: Could not open file "+DataStringGlobals::outputMapCsvFileName+" for output (write)." );
 		return;
 
 Label903: ;
-		ShowFatalError( "CloseReportIllumMaps: Could not open file \"eplusmap.txt\" for output (write)." );
+		ShowFatalError( "CloseReportIllumMaps: Could not open file "+DataStringGlobals::outputMapTxtFileName+" for output (write)." );
 
 	}
 
@@ -9658,11 +9640,11 @@ Label903: ;
 		int MapNum;
 
 		// Formats
-		static gio::Fmt const Format_700( "('! <Zone/Window Adjacency Daylighting Counts>, Zone Name, ','Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones')" );
-		static gio::Fmt const Format_701( "('Zone/Window Adjacency Daylighting Counts, ',A,',',A,',',A)" );
-		static gio::Fmt const Format_702( "('! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,','Adjacent Zone Names - 1st 100 (max)')" );
-		static gio::Fmt const Format_703( "('Zone/Window Adjacency Daylighting Matrix, ',A,',',A,$)" );
-		static gio::Fmt const fmtCommaA( "(',',A,$)" );
+		static gio::Fmt Format_700( "('! <Zone/Window Adjacency Daylighting Counts>, Zone Name, ','Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones')" );
+		static gio::Fmt Format_701( "('Zone/Window Adjacency Daylighting Counts, ',A,',',A,',',A)" );
+		static gio::Fmt Format_702( "('! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,','Adjacent Zone Names - 1st 100 (max)')" );
+		static gio::Fmt Format_703( "('Zone/Window Adjacency Daylighting Matrix, ',A,',',A,$)" );
+		static gio::Fmt fmtCommaA( "(',',A,$)" );
 
 		// FLOW:
 		// Count number of exterior Windows (use to allocate arrays)
@@ -9801,8 +9783,7 @@ Label903: ;
 
 		}
 
-		ZoneExtWin.allocate( NumOfZones );
-		ZoneExtWin = 0;
+		ZoneExtWin.dimension( NumOfZones, 0 );
 
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints > 0 ) {
@@ -9959,7 +9940,7 @@ Label903: ;
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints == 0 ) continue;
 			gio::write( OutputFileInits, Format_703 ) << Zone( ZoneNum ).Name << RoundSigDigits( ZoneDaylight( ZoneNum ).NumOfIntWinAdjZones );
-			for( int loop = 1, loop_end = min( ZoneDaylight( ZoneNum ).NumOfIntWinAdjZones, 100 ); loop <= loop_end; ++loop ) {
+			for ( int loop = 1, loop_end = min( ZoneDaylight( ZoneNum ).NumOfIntWinAdjZones, 100 ); loop <= loop_end; ++loop ) {
 				gio::write( OutputFileInits, fmtCommaA ) << Zone( ZoneDaylight( ZoneNum ).AdjIntWinZoneNums( loop ) ).Name;
 			} gio::write( OutputFileInits );
 		}
@@ -10277,7 +10258,7 @@ Label903: ;
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const FmtA( "(A)" );
+		static gio::Fmt FmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -10300,14 +10281,14 @@ Label903: ;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -10,6 +10,7 @@
 
 // EnergyPlus Headers
 #include <DElightManagerF.hh>
+#include <CommandLineInterface.hh>
 #include <DataDaylighting.hh>
 #include <DataDElight.hh>
 #include <DataEnvironment.hh>
@@ -95,7 +96,7 @@ namespace DElightManagerF {
 		using General::RoundSigDigits;
 		using InternalHeatGains::GetDesignLightingLevelForZone;
 		using InternalHeatGains::CheckLightsReplaceableMinMaxForZone;
-		
+
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const cModuleObjectDElight( "Daylighting:DELight:Controls" );
 		static std::string const cModuleObjectCFS( "Daylighting:DELight:ComplexFenestration" );
@@ -152,23 +153,23 @@ namespace DElightManagerF {
 		Real64 Ytrans;
 
 		// Formats
-		static gio::Fmt const Format_901( "(\"Version EPlus : DElight input generated from EnergyPlus processed input \",A)" );
-		static gio::Fmt const Format_902( "(,/,\"Building_Name \",A,/,\"Site_Latitude  \",f12.4,/,\"Site_Longitude \",f12.4,/,\"Site_Altitude  \",f12.4,/,\"Bldg_Azimuth   \",f12.4,/,\"Site_Time_Zone \",f12.4,/,\"Atm_Moisture  0.07 0.07 0.07 0.07 0.07 0.07 0.07 0.07 0.07 0.07 0.07 0.07\",/,\"Atm_Turbidity 0.12 0.12 0.12 0.12 0.12 0.12 0.12 0.12 0.12 0.12 0.12 0.12\")" );
-		static gio::Fmt const Format_903( "(,/,\"ZONES\",/,\"N_Zones \",I4)" );
-		static gio::Fmt const Format_904( "(,/,\"ZONE DATA\",/,\"Zone \",A,/,\"BldgSystem_Zone_Origin \",f12.4,f12.4,f12.4,/,\"Zone_Azimuth    \",f12.4,/,\"Zone_Multiplier \",I5,/,\"Zone_Floor_Area \",f12.4,/,\"Zone_Volume     \",f12.4,/,\"Zone_Installed_Lighting \",f12.4,/,\"Min_Input_Power    \",f12.4,/,\"Min_Light_Fraction \",f12.4,/,\"Light_Ctrl_Steps   \",I3,/,\"Light_Ctrl_Prob    \",f12.4,/,\"View_Azimuth  0.0\",/,\"Max_Grid_Node_Area \",f12.4)" );
-		static gio::Fmt const Format_905( "(,/,\"ZONE LIGHTING SCHEDULES\",/,\"N_Lt_Scheds 0\")" );
-		static gio::Fmt const Format_906( "(,/,\"ZONE SURFACES\",/,\"N_Surfaces \",I4)" );
-		static gio::Fmt const Format_907( "(,/,\"ZONE SURFACE DATA\",/,\"Surface \",A,/,\"WCS_Azimuth \",f12.4,/,\"WCS_Tilt    \",f12.4,/,\"Vis_Refl    \",f12.4,/,\"Ext_Refl    \",f12.4,/,\"Gnd_Refl     0.2\",/,\"N_WCS_Vertices \",I6)" );
-		static gio::Fmt const Format_908( "(\"Vertex \",f12.4,f12.4,f12.4)" );
-		static gio::Fmt const Format_909( "(,/,\"SURFACE WINDOWS\",/,\"N_Windows \",I6)" );
-		static gio::Fmt const Format_910( "(,/,\"SURFACE WINDOW DATA\",/,\"Window     \",A,/,\"Glass_Type \",I8,/,\"Shade_Flag   0\",/,\"Overhang_Fin_Depth    0.0 0.0 0.0\",/,\"Overhang_Fin_Distance 0.0 0.0 0.0\",/,\"N_WCS_Vertices \",I4)" );
-		static gio::Fmt const Format_911( "(,/,\"SURFACE CFS\",/,\"N_CFS \",I6)" );
-		static gio::Fmt const Format_915( "(,/,\"COMPLEX FENESTRATION DATA\",/,\"CFS_Name   \",A,/,\"CFS_Type   \",A,/,\"Fenestration_Rotation \",f12.4,/,\"N_WCS_Vertices \",I4)" );
-		static gio::Fmt const Format_912( "(,/,\"ZONE REFERENCE POINTS\",/,\"N_Ref_Pts \",I4)" );
-		static gio::Fmt const Format_913( "(,/,\"ZONE REFERENCE POINT DATA\",/,\"Reference_Point \",A,/,\"RefPt_WCS_Coords \",f12.4,f12.4,f12.4,/,\"Zone_Fraction \",f12.4,/,\"Light_Set_Pt \",f12.4,/,\"Light_Ctrl_Type \",I4)" );
-		static gio::Fmt const Format_914( "(,/,\"BUILDING SHADES\",/,\"N_BShades 0\")" );
-		static gio::Fmt const Format_920( "(,/,\"LIBRARY DATA\",/,\"GLASS TYPES\",/,\"N_Glass_Types \",I4)" );
-		static gio::Fmt const Format_921( "(,/,\"GLASS TYPE DATA\",/,\"Name \",I6,/,\"EPlusDiffuse_Transmittance   \",f12.4,/,\"EPlusDiffuse_Int_Reflectance \",f12.4,/,\"EPlus_Vis_Trans_Coeff_1 \",f17.9,/,\"EPlus_Vis_Trans_Coeff_2 \",f17.9,/,\"EPlus_Vis_Trans_Coeff_3 \",f17.9,/,\"EPlus_Vis_Trans_Coeff_4 \",f17.9,/,\"EPlus_Vis_Trans_Coeff_5 \",f17.9,/,\"EPlus_Vis_Trans_Coeff_6 \",f17.9)" );
+		static gio::Fmt Format_901( "(\"Version EPlus : DElight input generated from EnergyPlus processed input \",A)" );
+		static gio::Fmt Format_902( "(,/,\"Building_Name \",A,/,\"Site_Latitude  \",f12.4,/,\"Site_Longitude \",f12.4,/,\"Site_Altitude  \",f12.4,/,\"Bldg_Azimuth   \",f12.4,/,\"Site_Time_Zone \",f12.4,/,\"Atm_Moisture  0.07 0.07 0.07 0.07 0.07 0.07 0.07 0.07 0.07 0.07 0.07 0.07\",/,\"Atm_Turbidity 0.12 0.12 0.12 0.12 0.12 0.12 0.12 0.12 0.12 0.12 0.12 0.12\")" );
+		static gio::Fmt Format_903( "(,/,\"ZONES\",/,\"N_Zones \",I4)" );
+		static gio::Fmt Format_904( "(,/,\"ZONE DATA\",/,\"Zone \",A,/,\"BldgSystem_Zone_Origin \",f12.4,f12.4,f12.4,/,\"Zone_Azimuth    \",f12.4,/,\"Zone_Multiplier \",I5,/,\"Zone_Floor_Area \",f12.4,/,\"Zone_Volume     \",f12.4,/,\"Zone_Installed_Lighting \",f12.4,/,\"Min_Input_Power    \",f12.4,/,\"Min_Light_Fraction \",f12.4,/,\"Light_Ctrl_Steps   \",I3,/,\"Light_Ctrl_Prob    \",f12.4,/,\"View_Azimuth  0.0\",/,\"Max_Grid_Node_Area \",f12.4)" );
+		static gio::Fmt Format_905( "(,/,\"ZONE LIGHTING SCHEDULES\",/,\"N_Lt_Scheds 0\")" );
+		static gio::Fmt Format_906( "(,/,\"ZONE SURFACES\",/,\"N_Surfaces \",I4)" );
+		static gio::Fmt Format_907( "(,/,\"ZONE SURFACE DATA\",/,\"Surface \",A,/,\"WCS_Azimuth \",f12.4,/,\"WCS_Tilt    \",f12.4,/,\"Vis_Refl    \",f12.4,/,\"Ext_Refl    \",f12.4,/,\"Gnd_Refl     0.2\",/,\"N_WCS_Vertices \",I6)" );
+		static gio::Fmt Format_908( "(\"Vertex \",f12.4,f12.4,f12.4)" );
+		static gio::Fmt Format_909( "(,/,\"SURFACE WINDOWS\",/,\"N_Windows \",I6)" );
+		static gio::Fmt Format_910( "(,/,\"SURFACE WINDOW DATA\",/,\"Window     \",A,/,\"Glass_Type \",I8,/,\"Shade_Flag   0\",/,\"Overhang_Fin_Depth    0.0 0.0 0.0\",/,\"Overhang_Fin_Distance 0.0 0.0 0.0\",/,\"N_WCS_Vertices \",I4)" );
+		static gio::Fmt Format_911( "(,/,\"SURFACE CFS\",/,\"N_CFS \",I6)" );
+		static gio::Fmt Format_915( "(,/,\"COMPLEX FENESTRATION DATA\",/,\"CFS_Name   \",A,/,\"CFS_Type   \",A,/,\"Fenestration_Rotation \",f12.4,/,\"N_WCS_Vertices \",I4)" );
+		static gio::Fmt Format_912( "(,/,\"ZONE REFERENCE POINTS\",/,\"N_Ref_Pts \",I4)" );
+		static gio::Fmt Format_913( "(,/,\"ZONE REFERENCE POINT DATA\",/,\"Reference_Point \",A,/,\"RefPt_WCS_Coords \",f12.4,f12.4,f12.4,/,\"Zone_Fraction \",f12.4,/,\"Light_Set_Pt \",f12.4,/,\"Light_Ctrl_Type \",I4)" );
+		static gio::Fmt Format_914( "(,/,\"BUILDING SHADES\",/,\"N_BShades 0\")" );
+		static gio::Fmt Format_920( "(,/,\"LIBRARY DATA\",/,\"GLASS TYPES\",/,\"N_Glass_Types \",I4)" );
+		static gio::Fmt Format_921( "(,/,\"GLASS TYPE DATA\",/,\"Name \",I6,/,\"EPlusDiffuse_Transmittance   \",f12.4,/,\"EPlusDiffuse_Int_Reflectance \",f12.4,/,\"EPlus_Vis_Trans_Coeff_1 \",f17.9,/,\"EPlus_Vis_Trans_Coeff_2 \",f17.9,/,\"EPlus_Vis_Trans_Coeff_3 \",f17.9,/,\"EPlus_Vis_Trans_Coeff_4 \",f17.9,/,\"EPlus_Vis_Trans_Coeff_5 \",f17.9,/,\"EPlus_Vis_Trans_Coeff_6 \",f17.9)" );
 
 		// Init the ErrorsFound flag
 		ErrorsFound = false;
@@ -185,10 +186,10 @@ namespace DElightManagerF {
 		unit = GetNewUnitNumber();
 
 		// Hardwire file name to eplusout.delightin in the current working directory
-		{ 
-			IOFlags flags; flags.ACTION( "write" ); gio::open( unit, "eplusout.delightin", flags ); 
+		{
+			IOFlags flags; flags.ACTION( "write" ); gio::open( unit, outputDelightInFileName, flags );
 			if ( flags.err() ) {
-				ShowFatalError( "DElightInputGenerator: Could not open file \"eplusout.delightin\" for output (write)." );
+				ShowFatalError( "DElightInputGenerator: Could not open file \""+ outputDelightInFileName + "\" for output (write)." );
 			}
 		}
 
@@ -730,7 +731,7 @@ namespace DElightManagerF {
 		using DataDaylighting::ZoneDaylight;
 		using DataSurfaces::WorldCoordSystem;
 		using DataSurfaces::AspectTransform;
-		
+
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const CurrentModuleObject( "GeometryTransform" );
 
@@ -860,16 +861,16 @@ namespace DElightManagerF {
 		return ResultString;
 	}
 
-	void 
+	void
 	DElightElecLtgCtrl(
 		int iNameLength,
-		std::string cZoneName, 
-		Real64 dBldgLat, 
-		Real64 dHISKF, 
-		Real64 dHISUNF, 
-		Real64 dCloudFraction, 
-		Real64 dSOLCOSX, 
-		Real64 dSOLCOSY, 
+		std::string cZoneName,
+		Real64 dBldgLat,
+		Real64 dHISKF,
+		Real64 dHISUNF,
+		Real64 dCloudFraction,
+		Real64 dSOLCOSX,
+		Real64 dSOLCOSY,
 		Real64 dSOLCOSZ,
 		Real64 & pdPowerReducFac,
 		int piErrorFlag
@@ -878,7 +879,7 @@ namespace DElightManagerF {
 		auto zoneNameArr( getCharArrayFromString( cZoneName ) );
 		delightelecltgctrl( iNameLength, &zoneNameArr[0], dBldgLat, dHISKF, dHISUNF, dCloudFraction, dSOLCOSX, dSOLCOSY, dSOLCOSZ, &pdPowerReducFac, &piErrorFlag );
 	}
-	
+
 	std::vector< char >
 	getCharArrayFromString( std::string const & originalString )
 	{
@@ -886,7 +887,7 @@ namespace DElightManagerF {
 		returnVal.push_back( '\0' ); // get null terminated string of chars
 		return returnVal;
 	}
-	
+
 	std::string
 	getStringFromCharArray( std::vector< char > const & originalCharArray )
 	{
@@ -902,7 +903,7 @@ namespace DElightManagerF {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

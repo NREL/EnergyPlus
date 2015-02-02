@@ -501,14 +501,14 @@ namespace PlantManager {
 			if ( this_loop.CommonPipeType == CommonPipe_TwoWay ) {
 				if ( this_demand_side.InletNodeSetPt && this_supply_side.InletNodeSetPt ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alpha( 1 ) + "\", Invalid condition." );
-					ShowContinueError( "While using a two way common pipe there can be setpoint on only one node other " "than Plant Supply Outlet node." );
+					ShowContinueError( "While using a two way common pipe there can be setpoint on only one node other than Plant Supply Outlet node." );
 					ShowContinueError( "Currently both Plant Demand inlet and plant supply inlet have setpoints." );
 					ShowContinueError( "Select one of the two nodes and rerun the simulation." );
 					ErrorsFound = true;
 				}
 				if ( ! this_demand_side.InletNodeSetPt && ! this_supply_side.InletNodeSetPt ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alpha( 1 ) + "\", Invalid condition." );
-					ShowContinueError( "While using a two way common pipe there must be a setpoint in addition to " "the Plant Supply Outlet node." );
+					ShowContinueError( "While using a two way common pipe there must be a setpoint in addition to the Plant Supply Outlet node." );
 					ShowContinueError( "Currently neither plant demand inlet nor plant supply inlet have setpoints." );
 					ShowContinueError( "Select one of the two nodes and rerun the simulation." );
 					ErrorsFound = true;
@@ -587,7 +587,7 @@ namespace PlantManager {
 				ShowContinueError( "The inlet node of the first branch in the " + cAlphaFieldNames( 12 ) + '=' + Alpha( 12 ) ); //"Plant Demand Side Branch List"
 				ShowContinueError( "is not the same as the " + cAlphaFieldNames( 10 ) + '=' + Alpha( 10 ) ); // "Plant Demand Side Inlet Node Name"
 				ShowContinueError( "Branch List Inlet Node Name=" + GetFirstBranchInletNodeName( this_demand_side.BranchList ) ); // TODO rename point
-				ShowContinueError( "Branches in a BRANCH LIST must be listed in flow order: " "inlet branch, then parallel branches, then outlet branch." ); // TODO rename point
+				ShowContinueError( "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, then outlet branch." ); // TODO rename point
 				ErrorsFound = true;
 			}
 
@@ -599,7 +599,7 @@ namespace PlantManager {
 				ShowContinueError( "is not the same as the " + cAlphaFieldNames( 11 ) + '=' + Alpha( 11 ) );
 				ShowContinueError( "Branch List Outlet Node Name=" + GetLastBranchOutletNodeName( this_demand_side.BranchList ) ); // TODO rename point
 				// TODO rename point
-				ShowContinueError( "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, " "then outlet branch." );
+				ShowContinueError( "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, then outlet branch." );
 				ErrorsFound = true;
 			}
 
@@ -611,7 +611,7 @@ namespace PlantManager {
 				ShowContinueError( "is not the same as the " + cAlphaFieldNames( 6 ) + '=' + Alpha( 6 ) );
 				ShowContinueError( "Branch List Inlet Node Name=" + GetFirstBranchInletNodeName( this_supply_side.BranchList ) ); // TODO rename point
 				// TODO rename point
-				ShowContinueError( "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, " "then outlet branch." );
+				ShowContinueError( "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, then outlet branch." );
 				ErrorsFound = true;
 			}
 
@@ -623,7 +623,7 @@ namespace PlantManager {
 				ShowContinueError( "is not the same as the " + cAlphaFieldNames( 7 ) + '=' + Alpha( 7 ) );
 				ShowContinueError( "Branch List Outlet Node Name=" + GetLastBranchOutletNodeName( this_supply_side.BranchList ) ); // TODO rename point
 				// TODO rename point
-				ShowContinueError( "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, " "then outlet branch." );
+				ShowContinueError( "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, then outlet branch." );
 				ErrorsFound = true;
 			}
 
@@ -791,19 +791,12 @@ namespace PlantManager {
 					TempLoop.Branch( BranchNum ).IsBypass = false;
 
 					CompTypes.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
-					CompTypes = "";
 					CompNames.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
-					CompNames = "";
-					CompCtrls.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
-					CompCtrls = 0;
+					CompCtrls.dimension( TempLoop.Branch( BranchNum ).TotalComponents, 0 );
 					InletNodeNames.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
-					InletNodeNames = "";
-					InletNodeNumbers.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
-					InletNodeNumbers = 0;
+					InletNodeNumbers.dimension( TempLoop.Branch( BranchNum ).TotalComponents, 0 );
 					OutletNodeNames.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
-					OutletNodeNames = "";
-					OutletNodeNumbers.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
-					OutletNodeNumbers = 0;
+					OutletNodeNumbers.dimension( TempLoop.Branch( BranchNum ).TotalComponents, 0 );
 
 					GetBranchData( TempLoop.Name, BranchNames( BranchNum ), TempLoop.Branch( BranchNum ).MaxVolFlowRate, TempLoop.Branch( BranchNum ).PressureCurveType, TempLoop.Branch( BranchNum ).PressureCurveIndex, TempLoop.Branch( BranchNum ).TotalComponents, CompTypes, CompNames, InletNodeNames, InletNodeNumbers, OutletNodeNames, OutletNodeNumbers, ErrorsFound ); // Why is this Vdot and not mdot?
 
@@ -1250,6 +1243,10 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_PackagedTESCoolingCoil;
 							this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "SwimmingPool:Indoor" ) ) {
+							this_comp.TypeOf_Num = TypeOf_SwimmingPool_Indoor;
+							this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
 						} else {
 							//discover unsupported equipment on branches.
 							ShowSevereError( "GetPlantInput: Branch=\"" + BranchNames( BranchNum ) + "\", invalid component on branch." );
@@ -1367,11 +1364,8 @@ namespace PlantManager {
 						}
 
 						TempLoop.Splitter( SplitNum - 1 ).NodeNameOut.allocate( TempLoop.Splitter( SplitNum - 1 ).TotalOutletNodes );
-						TempLoop.Splitter( SplitNum - 1 ).NodeNameOut = "";
-						TempLoop.Splitter( SplitNum - 1 ).NodeNumOut.allocate( TempLoop.Splitter( SplitNum - 1 ).TotalOutletNodes );
-						TempLoop.Splitter( SplitNum - 1 ).NodeNumOut = 0;
-						TempLoop.Splitter( SplitNum - 1 ).BranchNumOut.allocate( TempLoop.Splitter( SplitNum - 1 ).TotalOutletNodes );
-						TempLoop.Splitter( SplitNum - 1 ).BranchNumOut = 0;
+						TempLoop.Splitter( SplitNum - 1 ).NodeNumOut.dimension( TempLoop.Splitter( SplitNum - 1 ).TotalOutletNodes, 0 );
+						TempLoop.Splitter( SplitNum - 1 ).BranchNumOut.dimension( TempLoop.Splitter( SplitNum - 1 ).TotalOutletNodes, 0 );
 
 						SplitOutBranch.allocate( TempLoop.Splitter( SplitNum - 1 ).TotalOutletNodes );
 						SplitOutBranch = false;
@@ -1437,11 +1431,8 @@ namespace PlantManager {
 						}
 
 						TempLoop.Mixer( MixNum - 1 ).NodeNameIn.allocate( TempLoop.Mixer( MixNum - 1 ).TotalInletNodes );
-						TempLoop.Mixer( MixNum - 1 ).NodeNameIn = "";
-						TempLoop.Mixer( MixNum - 1 ).NodeNumIn.allocate( TempLoop.Mixer( MixNum - 1 ).TotalInletNodes );
-						TempLoop.Mixer( MixNum - 1 ).NodeNumIn = 0;
-						TempLoop.Mixer( MixNum - 1 ).BranchNumIn.allocate( TempLoop.Mixer( MixNum - 1 ).TotalInletNodes );
-						TempLoop.Mixer( MixNum - 1 ).BranchNumIn = 0;
+						TempLoop.Mixer( MixNum - 1 ).NodeNumIn.dimension( TempLoop.Mixer( MixNum - 1 ).TotalInletNodes, 0 );
+						TempLoop.Mixer( MixNum - 1 ).BranchNumIn.dimension( TempLoop.Mixer( MixNum - 1 ).TotalInletNodes, 0 );
 
 						MixerInBranch.allocate( TempLoop.Mixer( MixNum - 1 ).TotalInletNodes );
 						MixerInBranch = false;
@@ -1660,12 +1651,12 @@ namespace PlantManager {
 
 		for ( LoopNum = 1; LoopNum <= NumPlantLoops; ++LoopNum ) {
 
-            // set up references for this loop
-            auto & this_plant_loop( PlantLoop( LoopNum ) );
-            auto & this_plant_supply ( this_plant_loop.LoopSide( SupplySide ) );
-            auto & this_vent_plant_supply( VentRepPlantSupplySide( LoopNum ) );
-            auto & this_plant_demand ( this_plant_loop.LoopSide( DemandSide ) );
-            auto & this_vent_plant_demand( VentRepPlantDemandSide( LoopNum ) );
+			// set up references for this loop
+			auto & this_plant_loop( PlantLoop( LoopNum ) );
+			auto & this_plant_supply ( this_plant_loop.LoopSide( SupplySide ) );
+			auto & this_vent_plant_supply( VentRepPlantSupplySide( LoopNum ) );
+			auto & this_plant_demand ( this_plant_loop.LoopSide( DemandSide ) );
+			auto & this_vent_plant_demand( VentRepPlantDemandSide( LoopNum ) );
 
 			this_vent_plant_supply.Name = this_plant_loop.Name;
 			this_vent_plant_supply.NodeNumIn = this_plant_supply.NodeNumIn;
@@ -1678,8 +1669,8 @@ namespace PlantManager {
 
 			for ( BranchNum = 1; BranchNum <= this_vent_plant_supply.TotalBranches; ++BranchNum ) {
 
-                auto & this_plant_supply_branch( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ) );
-                auto & this_vent_plant_supply_branch( VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ) );
+				auto & this_plant_supply_branch( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ) );
+				auto & this_vent_plant_supply_branch( VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ) );
 
 				this_vent_plant_supply_branch.Name = this_plant_supply_branch.Name;
 				this_vent_plant_supply_branch.NodeNumIn = this_plant_supply_branch.NodeNumIn;
@@ -1692,8 +1683,8 @@ namespace PlantManager {
 
 				for ( CompNum = 1; CompNum <= VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
 
-                    auto & this_plant_supply_comp( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ) );
-                    auto & this_vent_plant_supply_comp( VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).Comp( CompNum ) );
+					auto & this_plant_supply_comp( PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).Comp( CompNum ) );
+					auto & this_vent_plant_supply_comp( VentRepPlantSupplySide( LoopNum ).Branch( BranchNum ).Comp( CompNum ) );
 
 					this_vent_plant_supply_comp.Name = this_plant_supply_comp.Name;
 					this_vent_plant_supply_comp.TypeOf = this_plant_supply_comp.TypeOf;
@@ -2686,7 +2677,7 @@ namespace PlantManager {
 								}
 							}
 							if ( ! ( ActiveCntrlfound ) ) {
-								ShowWarningError( "Check control types on branches between splitter and mixer in " "PlantLoop=" + PlantLoop( LoopNum ).Name );
+								ShowWarningError( "Check control types on branches between splitter and mixer in PlantLoop=" + PlantLoop( LoopNum ).Name );
 								ShowContinueError( "Found a BYPASS branch with no ACTIVE branch in parallel with it" );
 								ShowContinueError( "In certain (but not all) situations, this can cause problems; please verify your inputs" );
 								ShowContinueError( "Bypass branch named: " + PlantLoop( LoopNum ).LoopSide( SideNum ).Branch( BranchNum ).Name );
@@ -3419,37 +3410,19 @@ namespace PlantManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PumpsBeforeIncrement;
-		int PumpsAfterIncrement;
 
 		// Object Data
-		FArray1D< LoopSidePumpInformation > TempPumpArray;
 
-		if ( allocated( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps ) ) {
-			PumpsBeforeIncrement = size( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps );
-			TempPumpArray.allocate( PumpsBeforeIncrement + 1 );
-			TempPumpArray( {1,PumpsBeforeIncrement} ) = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps;
-		} else {
-			PumpsBeforeIncrement = 0;
-			TempPumpArray.allocate( 1 );
-		}
-
-		PumpsAfterIncrement = size( TempPumpArray );
-
-		TempPumpArray( PumpsAfterIncrement ).PumpName = PumpName;
-		// TempPumpArray(PumpsAfterIncrement)%PumpTypeOf = FindItemInList(PumpType, SimPlantEquipTypes, SIZE(SimPlantEquipTypes))
-		TempPumpArray( PumpsAfterIncrement ).BranchNum = BranchNum;
-		TempPumpArray( PumpsAfterIncrement ).CompNum = CompNum;
-		TempPumpArray( PumpsAfterIncrement ).PumpOutletNode = PumpOutletNode;
-
-		if ( allocated( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps ) ) PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps.deallocate();
-		PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps.allocate( PumpsAfterIncrement );
-		PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps = TempPumpArray;
-		PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalPumps = PumpsAfterIncrement;
-		PlantLoop( LoopNum ).LoopSide( LoopSideNum ).BranchPumpsExist = HasBranchPumps;
-
-		if ( allocated( TempPumpArray ) ) TempPumpArray.deallocate();
-
+		auto & loop_side( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
+		auto & pumps( loop_side.Pumps );
+		int const nPumpsAfterIncrement = loop_side.TotalPumps = pumps.size() + 1;
+		pumps.redimension( nPumpsAfterIncrement );
+		pumps( nPumpsAfterIncrement ).PumpName = PumpName;
+		// pumps( nPumpsAfterIncrement ).PumpTypeOf = FindItemInList( PumpType, SimPlantEquipTypes, SimPlantEquipTypes.size() );
+		pumps( nPumpsAfterIncrement ).BranchNum = BranchNum;
+		pumps( nPumpsAfterIncrement ).CompNum = CompNum;
+		pumps( nPumpsAfterIncrement ).PumpOutletNode = PumpOutletNode;
+		loop_side.BranchPumpsExist = HasBranchPumps;
 	}
 
 	void
@@ -4057,6 +4030,10 @@ namespace PlantManager {
 							this_component.FlowCtrl = ControlType_Active;
 							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
 							this_component.HowLoadServed = HowMet_NoneDemand;
+						} else if ( SELECT_CASE_var == TypeOf_SwimmingPool_Indoor ) { // 90
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else {
 							ShowSevereError( "SetBranchControlTypes: Caught unexpected equipment type of number" );
 
@@ -4208,7 +4185,7 @@ namespace PlantManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

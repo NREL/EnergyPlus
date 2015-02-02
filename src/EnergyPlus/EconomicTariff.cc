@@ -218,7 +218,6 @@ namespace EconomicTariff {
 
 	// holds the outbound connections for each variable
 	FArray1D_int operand; // sized to sizeOperand
-	FArray1D_int operandCopy;
 	int numOperand( 0 );
 	int sizeOperand( 0 );
 
@@ -249,7 +248,6 @@ namespace EconomicTariff {
 
 	// Object Data
 	FArray1D< EconVarType > econVar;
-	FArray1D< EconVarType > econVarCopy;
 	FArray1D< TariffType > tariff;
 	FArray1D< QualifyType > qualify;
 	FArray1D< ChargeSimpleType > chargeSimple;
@@ -257,7 +255,6 @@ namespace EconomicTariff {
 	FArray1D< RatchetType > ratchet;
 	FArray1D< ComputationType > computation;
 	FArray1D< StackType > stack;
-	FArray1D< StackType > stackCopy;
 
 	//======================================================================================================================
 	//======================================================================================================================
@@ -631,7 +628,7 @@ namespace EconomicTariff {
 					if ( ! ( SameString( tariff( iInObj ).reportMeter, "Electricity:Facility" ) || SameString( tariff( iInObj ).reportMeter, "ElectricityPurchased:Facility" ) ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" atypical meter" );
 						ShowContinueError( "The meter chosen \"" + tariff( iInObj ).reportMeter + " is not typically used with the buyFromUtility option." );
-						ShowContinueError( "Usually the Electricity:Facility meter or the " "ElectricityPurchased:Facility is selected when the buyFromUtility option is used." );
+						ShowContinueError( "Usually the Electricity:Facility meter or the ElectricityPurchased:Facility is selected when the buyFromUtility option is used." );
 					}
 				}
 			}
@@ -817,7 +814,7 @@ namespace EconomicTariff {
 					if ( tariff( chargeSimple( iInObj ).tariffIndx ).seasonSchIndex == 0 ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
 						ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
-						ShowContinueError( " a Season other than Annual is used but no Season Schedule Name is specified" " in the UtilityCost:Tariff." );
+						ShowContinueError( " a Season other than Annual is used but no Season Schedule Name is specified in the UtilityCost:Tariff." );
 					}
 				}
 			}
@@ -903,7 +900,7 @@ namespace EconomicTariff {
 					if ( tariff( chargeBlock( iInObj ).tariffIndx ).seasonSchIndex == 0 ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
 						ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
-						ShowContinueError( " a Season other than Annual is used but no Season Schedule Name is specified" " in the UtilityCost:Tariff." );
+						ShowContinueError( " a Season other than Annual is used but no Season Schedule Name is specified in the UtilityCost:Tariff." );
 					}
 				}
 			}
@@ -2161,16 +2158,9 @@ namespace EconomicTariff {
 			numEconVar = 1;
 		} else {
 			++numEconVar;
-			// if larger then current size then make a temporary array of the same
-			// type and put stuff into it while reallocating the main array
+			// if larger than current size grow the array
 			if ( numEconVar > sizeEconVar ) {
-				econVarCopy.allocate( sizeEconVar );
-				econVarCopy = econVar;
-				econVar.deallocate();
-				econVar.allocate( sizeEconVar + sizeIncrement );
-				econVar( {1,sizeEconVar} ) = econVarCopy;
-				econVarCopy.deallocate();
-				sizeEconVar += sizeIncrement;
+				econVar.redimension( sizeEconVar += sizeIncrement );
 			}
 		}
 		// initialize new record) //Autodesk Most of these match default initialization so not needed
@@ -2232,19 +2222,12 @@ namespace EconomicTariff {
 			numSteps = 1;
 		} else {
 			++numSteps;
-			// if larger then current size then make a temporary array of the same
-			// type and put stuff into it while reallocating the main array
+			// if larger than current size grow the array
 			if ( numSteps > sizeSteps ) {
-				stepsCopy.allocate( sizeSteps );
-				stepsCopy = steps;
-				steps.deallocate();
-				steps.allocate( sizeSteps + sizeIncrement );
-				steps( {1,sizeSteps} ) = stepsCopy;
-				stepsCopy.deallocate();
-				sizeSteps += sizeIncrement;
+				steps.redimension( sizeSteps += sizeIncrement );
 			}
 		}
-		// initialize new record)
+		// initialize new record
 		steps( numSteps ) = 0;
 	}
 
@@ -2841,7 +2824,7 @@ namespace EconomicTariff {
 					}
 				}
 				if ( remainingVarFlag ) {
-					ShowWarningError( "CreateDefaultComputation: In UtilityCost:Computation: " "Circular or invalid dependencies found in tariff: " + tariff( iTariff ).tariffName );
+					ShowWarningError( "CreateDefaultComputation: In UtilityCost:Computation: Circular or invalid dependencies found in tariff: " + tariff( iTariff ).tariffName );
 					ShowContinueError( "  UtilityCost variables that may have invalid dependencies and the variables they are dependant on." );
 					for ( iVar = 1; iVar <= numEconVar; ++iVar ) {
 						if ( econVar( iVar ).tariffIndx == iTariff ) {
@@ -2859,7 +2842,7 @@ namespace EconomicTariff {
 				if ( computation( iTariff ).firstStep >= computation( iTariff ).lastStep ) {
 					computation( iTariff ).firstStep = 0;
 					computation( iTariff ).lastStep = -1;
-					ShowWarningError( "CreateDefaultComputation: In UtilityCost:Computation: " "No lines in the auto generated computation can be interpreted in tariff: " + tariff( iTariff ).tariffName );
+					ShowWarningError( "CreateDefaultComputation: In UtilityCost:Computation: No lines in the auto generated computation can be interpreted in tariff: " + tariff( iTariff ).tariffName );
 				}
 			}
 		}
@@ -2913,16 +2896,9 @@ namespace EconomicTariff {
 				numOperand = 1;
 			} else {
 				++numOperand;
-				// if larger then current size then make a temporary array of the same
-				// type and put stuff into it while reallocating the main array
+				// if larger than current size grow the array
 				if ( numOperand > sizeOperand ) {
-					operandCopy.allocate( sizeOperand );
-					operandCopy = operand;
-					operand.deallocate();
-					operand.allocate( sizeOperand + sizeIncrement );
-					operand( {1,sizeOperand} ) = operandCopy;
-					operandCopy.deallocate();
-					sizeOperand += sizeIncrement;
+					operand.redimension( sizeOperand += sizeIncrement );
 				}
 			}
 			//now add the dependancy relationship
@@ -3665,16 +3641,9 @@ namespace EconomicTariff {
 			topOfStack = 1;
 		} else {
 			++topOfStack;
-			// if larger then current size then make a temporary array of the same
-			// type and put stuff into it while reallocating the main array
+			// if larger than current size grow the array
 			if ( topOfStack > sizeStack ) {
-				stackCopy.allocate( sizeStack );
-				stackCopy = stack;
-				stack.deallocate();
-				stack.allocate( sizeStack + sizeIncrement );
-				stack( {1,sizeStack} ) = stackCopy;
-				stackCopy.deallocate();
-				sizeStack += sizeIncrement;
+				stack.redimension( sizeStack += sizeIncrement );
 			}
 		}
 		//now push the values on to the stack
@@ -5210,12 +5179,12 @@ namespace EconomicTariff {
 				{ auto const SELECT_CASE_var( tariff( iTariff ).buyOrSell );
 				if ( SELECT_CASE_var == buyFromUtility ) {
 					if ( tariff( iTariff ).totalAnnualCost < 0 ) {
-						ShowWarningError( "UtilityCost:Tariff: " "A negative annual total cost when buying electricity from a utility is unusual. " );
+						ShowWarningError( "UtilityCost:Tariff: A negative annual total cost when buying electricity from a utility is unusual. " );
 						ShowContinueError( "  In UtilityCost:Tariff named " + tariff( iTariff ).tariffName );
 					}
 				} else if ( SELECT_CASE_var == sellToUtility ) {
 					if ( tariff( iTariff ).totalAnnualCost > 0 ) {
-						ShowWarningError( "UtilityCost:Tariff: " "A positive annual total cost when selling electricity to a utility is unusual. " );
+						ShowWarningError( "UtilityCost:Tariff: A positive annual total cost when selling electricity to a utility is unusual. " );
 						ShowContinueError( "  In UtilityCost:Tariff named " + tariff( iTariff ).tariffName );
 					}
 				}}
@@ -5516,12 +5485,10 @@ namespace EconomicTariff {
 		int lowestSurplusSoldTariff;
 		int lowestNetMeterTariff;
 
-		groupIndex.allocate( numTariff );
-		groupIndex = 0;
+		groupIndex.dimension( numTariff, 0 );
 		groupCount = 0;
 		numMins = 0;
-		MinTariffIndex.allocate( numTariff );
-		MinTariffIndex = 0;
+		MinTariffIndex.dimension( numTariff, 0 );
 		for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
 			//determine if this is meter related to electricity
 			if ( tariff( iTariff ).reportMeterIndx != 0 ) {
@@ -5760,7 +5727,7 @@ namespace EconomicTariff {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

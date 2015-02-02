@@ -3,8 +3,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/FArray2A.hh>
+#include <ObjexxFCL/FArray2D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -198,6 +197,17 @@ namespace HeatBalFiniteDiffManager {
 			MaxNodeDelTemp( MaxNodeDelTemp )
 		{}
 
+		inline
+		void
+		UpdateMoistureBalance()
+		{
+			// Based on UpdateMoistureBalanceFD by Richard Liesen
+			// Brought into class for performance
+			TOld = T;
+			RhovOld = Rhov;
+			TDOld = TDreport;
+		}
+
 	};
 
 	struct MaterialDataFD
@@ -274,9 +284,6 @@ namespace HeatBalFiniteDiffManager {
 	// *****************************************************************************
 
 	void
-	UpdateMoistureBalanceFD( int const Surf ); // Surface number
-
-	void
 	ReportFiniteDiffInits();
 
 	// Utility Interpolation Function for the Module
@@ -284,8 +291,7 @@ namespace HeatBalFiniteDiffManager {
 
 	Real64
 	terpld(
-		int const N,
-		FArray2A< Real64 > const a,
+		FArray2< Real64 > const & a,
 		Real64 const x1,
 		int const nind,
 		int const ndep
@@ -300,15 +306,15 @@ namespace HeatBalFiniteDiffManager {
 		int const i, // Node Index
 		int const Lay, // Layer Number for Construction
 		int const Surf, // Surface number
-		FArray1S< Real64 > const T, // Old node Temperature in MFD finite difference solution
-		FArray1S< Real64 > TT, // New node Temperature in MFD finite difference solution.
-		FArray1S< Real64 > const Rhov, // MFD Nodal Vapor Density[kg/m3] and is the old or last time step result.
-		FArray1S< Real64 > RhoT, // MFD vapor density for the new time step.
-		FArray1S< Real64 > RH, // Nodal relative humidity
-		FArray1S< Real64 > const TD, // The old dry Temperature at each node for the CondFD algorithm..
-		FArray1S< Real64 > TDT, // The current or new Temperature at each node location for the CondFD solution..
-		FArray1S< Real64 > EnthOld, // Old Nodal enthalpy
-		FArray1S< Real64 > EnthNew, // New Nodal enthalpy
+		FArray1< Real64 > const & T, // Old node Temperature in MFD finite difference solution
+		FArray1< Real64 > & TT, // New node Temperature in MFD finite difference solution.
+		FArray1< Real64 > const & Rhov, // MFD Nodal Vapor Density[kg/m3] and is the old or last time step result.
+		FArray1< Real64 > & RhoT, // MFD vapor density for the new time step.
+		FArray1< Real64 > & RH, // Nodal relative humidity
+		FArray1< Real64 > const & TD, // The old dry Temperature at each node for the CondFD algorithm..
+		FArray1< Real64 > & TDT, // The current or new Temperature at each node location for the CondFD solution..
+		FArray1< Real64 > & EnthOld, // Old Nodal enthalpy
+		FArray1< Real64 > & EnthNew, // New Nodal enthalpy
 		int const TotNodes, // Total nodes in layer
 		Real64 const HMovInsul // Conductance of movable(transparent) insulation.
 	);
@@ -319,15 +325,15 @@ namespace HeatBalFiniteDiffManager {
 		int const i, // Node Index
 		int const Lay, // Layer Number for Construction
 		int const Surf, // Surface number
-		FArray1S< Real64 > const T, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1S< Real64 > TT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1S< Real64 > const Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1S< Real64 > RhoT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1S< Real64 > RH, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1S< Real64 > const TD, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1S< Real64 > TDT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1S< Real64 > EnthOld, // Old Nodal enthalpy
-		FArray1S< Real64 > EnthNew // New Nodal enthalpy
+		FArray1< Real64 > const & T, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		FArray1< Real64 > & TT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		FArray1< Real64 > const & Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		FArray1< Real64 > & RhoT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		FArray1< Real64 > & RH, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		FArray1< Real64 > const & TD, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		FArray1< Real64 > & TDT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		FArray1< Real64 > & EnthOld, // Old Nodal enthalpy
+		FArray1< Real64 > & EnthNew // New Nodal enthalpy
 	);
 
 	void
@@ -336,15 +342,15 @@ namespace HeatBalFiniteDiffManager {
 		int const i, // Node Index
 		int const Lay, // Layer Number for Construction
 		int const Surf, // Surface number
-		FArray1S< Real64 > const T, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1S< Real64 > TT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1S< Real64 > const Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1S< Real64 > RhoT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1S< Real64 > RH, // RELATIVE HUMIDITY.
-		FArray1S< Real64 > const TD, // OLD NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
-		FArray1S< Real64 > TDT, // NEW NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
-		FArray1S< Real64 > const EnthOld, // Old Nodal enthalpy
-		FArray1S< Real64 > EnthNew, // New Nodal enthalpy
+		FArray1< Real64 > const & T, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		FArray1< Real64 > & TT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		FArray1< Real64 > const & Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		FArray1< Real64 > & RhoT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		FArray1< Real64 > & RH, // RELATIVE HUMIDITY.
+		FArray1< Real64 > const & TD, // OLD NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
+		FArray1< Real64 > & TDT, // NEW NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
+		FArray1< Real64 > const & EnthOld, // Old Nodal enthalpy
+		FArray1< Real64 > & EnthNew, // New Nodal enthalpy
 		int const GSiter // Iteration number of Gauss Seidell iteration
 	);
 
@@ -354,16 +360,16 @@ namespace HeatBalFiniteDiffManager {
 		int const i, // Node Index
 		int const Lay, // Layer Number for Construction
 		int const Surf, // Surface number
-		FArray1S< Real64 > const T, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (Old).
-		FArray1S< Real64 > TT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (New).
-		FArray1S< Real64 > const Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1S< Real64 > RhoT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1S< Real64 > RH, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1S< Real64 > const TD, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1S< Real64 > TDT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1S< Real64 > EnthOld, // Old Nodal enthalpy
-		FArray1S< Real64 > EnthNew, // New Nodal enthalpy
-		FArray1S< Real64 > TDreport // Temperature value from previous HeatSurfaceHeatManager titeration's value
+		FArray1< Real64 > const & T, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (Old).
+		FArray1< Real64 > & TT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (New).
+		FArray1< Real64 > const & Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		FArray1< Real64 > & RhoT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		FArray1< Real64 > & RH, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		FArray1< Real64 > const & TD, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		FArray1< Real64 > & TDT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		FArray1< Real64 > & EnthOld, // Old Nodal enthalpy
+		FArray1< Real64 > & EnthNew, // New Nodal enthalpy
+		FArray1< Real64 > & TDreport // Temperature value from previous HeatSurfaceHeatManager titeration's value
 	);
 
 	void
@@ -383,7 +389,7 @@ namespace HeatBalFiniteDiffManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

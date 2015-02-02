@@ -61,7 +61,7 @@ namespace UnitHeater {
 	// REFERENCES:
 	// ASHRAE Systems and Equipment Handbook (SI), 1996. pp. 31.3-31.8
 	// Rick Strand's unit heater module which was based upon Fred Buhl's fan coil
-	// module (FanCoilUnits.f90)
+	// module (FanCoilUnits.cc)
 
 	// OTHER NOTES: none
 
@@ -230,7 +230,7 @@ namespace UnitHeater {
 		// Standard EnergyPlus methodology.
 
 		// REFERENCES:
-		// Fred Buhl's fan coil module (FanCoilUnits.f90)
+		// Fred Buhl's fan coil module (FanCoilUnits.cc)
 
 		// Using/Aliasing
 		using InputProcessor::GetNumObjectsFound;
@@ -307,17 +307,11 @@ namespace UnitHeater {
 		GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
-		Alphas = "";
-		Numbers.allocate( NumNumbers );
-		Numbers = 0.0;
+		Numbers.dimension( NumNumbers, 0.0 );
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = "";
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNumbers );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNumbers, true );
 
 		// Allocate the local derived type and do one-time initializations for all parts of it
 		if ( NumOfUnitHeats > 0 ) {
@@ -394,8 +388,8 @@ namespace UnitHeater {
 
 					if ( FanVolFlow != AutoSize && UnitHeat( UnitHeatNum ).MaxAirVolFlow != AutoSize && FanVolFlow < UnitHeat( UnitHeatNum ).MaxAirVolFlow ) {
 						ShowSevereError( "Specified in " + CurrentModuleObject + " = " + UnitHeat( UnitHeatNum ).Name );
-						ShowContinueError( "...air flow rate (" + TrimSigDigits( FanVolFlow, 7 ) + ") in" " fan object " + UnitHeat( UnitHeatNum ).FanName + " is less than the unit heater maximum supply air" " flow rate (" + TrimSigDigits( UnitHeat( UnitHeatNum ).MaxAirVolFlow, 7 ) + ")." );
-						ShowContinueError( "...the fan flow rate must be greater than or equal to the unit heater maximum" " supply air flow rate." );
+						ShowContinueError( "...air flow rate (" + TrimSigDigits( FanVolFlow, 7 ) + ") in fan object " + UnitHeat( UnitHeatNum ).FanName + " is less than the unit heater maximum supply air flow rate (" + TrimSigDigits( UnitHeat( UnitHeatNum ).MaxAirVolFlow, 7 ) + ")." );
+						ShowContinueError( "...the fan flow rate must be greater than or equal to the unit heater maximum supply air flow rate." );
 						ErrorsFound = true;
 					} else if ( FanVolFlow == AutoSize && UnitHeat( UnitHeatNum ).MaxAirVolFlow != AutoSize ) {
 						ShowWarningError( "Specified in " + CurrentModuleObject + " = " + UnitHeat( UnitHeatNum ).Name );
@@ -527,7 +521,7 @@ namespace UnitHeater {
 				}
 			}
 			if ( ZoneNodeNotFound ) {
-				ShowSevereError( CurrentModuleObject + " = \"" + UnitHeat( UnitHeatNum ).Name + "\"." " Unit heater air inlet node name must be the same as a zone exhaust node name." );
+				ShowSevereError( CurrentModuleObject + " = \"" + UnitHeat( UnitHeatNum ).Name + "\". Unit heater air inlet node name must be the same as a zone exhaust node name." );
 				ShowContinueError( "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
 				ShowContinueError( "..Unit heater air inlet node name = " + NodeID( UnitHeat( UnitHeatNum ).AirInNode ) );
 				ErrorsFound = true;
@@ -545,7 +539,7 @@ namespace UnitHeater {
 				}
 			}
 			if ( ZoneNodeNotFound ) {
-				ShowSevereError( CurrentModuleObject + " = \"" + UnitHeat( UnitHeatNum ).Name + "\"." " Unit heater air outlet node name must be the same as a zone inlet node name." );
+				ShowSevereError( CurrentModuleObject + " = \"" + UnitHeat( UnitHeatNum ).Name + "\". Unit heater air outlet node name must be the same as a zone inlet node name." );
 				ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
 				ShowContinueError( "..Unit heater air outlet node name = " + NodeID( UnitHeat( UnitHeatNum ).AirOutNode ) );
 				ErrorsFound = true;
@@ -921,18 +915,18 @@ namespace UnitHeater {
 				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingSAFMethod;
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
 				if ( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedHeatingAirflow ) {
-					if ( SAFMethod == SupplyAirFlowRate ){
+					if ( SAFMethod == SupplyAirFlowRate ) {
 						if ( ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow > 0.0 ) {
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						}
 						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
-					} else if ( SAFMethod == FlowPerFloorArea ){
+					} else if ( SAFMethod == FlowPerFloorArea ) {
 						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow * Zone( DataZoneNumber ).FloorArea;
 						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 						DataScalableSizingON = true;
-					} else if ( SAFMethod == FractionOfAutosizedHeatingAirflow ){
+					} else if ( SAFMethod == FractionOfAutosizedHeatingAirflow ) {
 						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 						TempSize = AutoSize;
 						DataScalableSizingON = true;
@@ -963,7 +957,7 @@ namespace UnitHeater {
 				DataScalableSizingON = false;
 			} else {
 				// no scalble sizing method has been specified. Sizing proceeds using the method
-				// specified in the zoneHVAC object 
+				// specified in the zoneHVAC object
 				SizingMethod = HeatingAirflowSizing;
 				FieldNum = 1; // N1 , \field Maximum Supply Air Flow Rate
 				PrintFlag = true;
@@ -1000,7 +994,7 @@ namespace UnitHeater {
 								CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod;
 								ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
 								if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
-									if ( CapSizingMethod == HeatingDesignCapacity ){
+									if ( CapSizingMethod == HeatingDesignCapacity ) {
 										if ( ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity == AutoSize ) {
 											ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
 										} else {
@@ -1008,11 +1002,11 @@ namespace UnitHeater {
 										}
 										ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 										TempSize = AutoSize;
-									} else if ( CapSizingMethod == CapacityPerFloorArea ){
+									} else if ( CapSizingMethod == CapacityPerFloorArea ) {
 										ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 										ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
 										DataScalableCapSizingON = true;
-									} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
+									} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
 										DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 										DataScalableCapSizingON = true;
 										TempSize = AutoSize;
@@ -1041,7 +1035,7 @@ namespace UnitHeater {
 
 						} else {
 							ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in " "ZoneHVAC:UnitHeater" " Object=" + UnitHeat( UnitHeatNum ).Name );
+							ShowContinueError( "Occurs in ZoneHVAC:UnitHeater Object=" + UnitHeat( UnitHeatNum ).Name );
 							ErrorsFound = true;
 						}
 					}
@@ -1096,7 +1090,7 @@ namespace UnitHeater {
 								CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod;
 								ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
 								if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
-									if ( CapSizingMethod == HeatingDesignCapacity ){
+									if ( CapSizingMethod == HeatingDesignCapacity ) {
 										if ( ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity == AutoSize ) {
 											ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
 										} else {
@@ -1104,11 +1098,11 @@ namespace UnitHeater {
 										}
 										ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 										TempSize = AutoSize;
-									} else if ( CapSizingMethod == CapacityPerFloorArea ){
+									} else if ( CapSizingMethod == CapacityPerFloorArea ) {
 										ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 										ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
 										DataScalableCapSizingON = true;
-									} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
+									} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
 										DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 										TempSize = AutoSize;
 										DataScalableCapSizingON = true;
@@ -1133,7 +1127,7 @@ namespace UnitHeater {
 							}
 						} else {
 							ShowSevereError( "Autosizing of Steam flow requires a heating loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in " "ZoneHVAC:UnitHeater" " Object=" + UnitHeat( UnitHeatNum ).Name );
+							ShowContinueError( "Occurs in ZoneHVAC:UnitHeater Object=" + UnitHeat( UnitHeatNum ).Name );
 							ErrorsFound = true;
 						}
 					}
@@ -1732,7 +1726,7 @@ namespace UnitHeater {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
