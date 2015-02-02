@@ -62,23 +62,4 @@ TEST( OutputProcessor, TestGetMeteredVariables )
 	GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
 	EXPECT_EQ( 1 , NumFound );
 
-//	SetupOutputVariable( "Electric Equipment Electric Power [W]", ZoneElectricPower, "Zone", "Average", "ZoneName" );
-//	TypeOfComp = "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW";
-//	NameOfComp = "FC-5-1B";
-
-
-
-//	NumExteriorLights = 0;
-//	NumExteriorEqs = 2;
-//	TimeStepZone = 0.25;
-//	ExteriorEquipment.allocate( NumExteriorEqs );
-//	ExteriorEquipment( 1 ).DesignLevel = 1000.0;
-//	ExteriorEquipment( 2 ).DesignLevel = 0.0;
-//	ExteriorEquipment( 1 ).SchedPtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
-//	ExteriorEquipment( 2 ).SchedPtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
-//	ReportExteriorEnergyUse( );
-
-//	EXPECT_EQ( 0.0, ExteriorEquipment( 2 ).Power );
-//	EXPECT_EQ( 900000.0, ExteriorEquipment( 1 ).CurrentUse );
-//	EXPECT_EQ( 0.0, ExteriorEquipment( 2 ).CurrentUse );
 }
