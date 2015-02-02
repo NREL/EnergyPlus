@@ -1,5 +1,8 @@
 ! Plant Components
 
+!  Version,
+!    8.3;                    !- Version Identifier
+
   DistrictCooling,
     Purchased Cooling,       !- Name
     Purchased Cooling Inlet Node,  !- Chilled Water Inlet Node Name
