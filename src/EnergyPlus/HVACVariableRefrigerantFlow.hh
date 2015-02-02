@@ -1282,6 +1282,19 @@ namespace HVACVariableRefrigerantFlow {
 		Optional< Real64 > LatOutputProvided = _ // delivered latent capacity (W)
 	);
 
+	int
+		GetVRFTUOutAirNode( int const VRFTUNum );
+
+	int
+		GetVRFTUZoneInletAirNode( int const VRFTUNum );
+
+	int
+		GetVRFTUMixedAirNode( int const VRFTUNum );
+
+	int
+		GetVRFTUReturnAirNode( int const VRFTUNum );
+
+
 	// End Algorithm Section of the Module
 	// *****************************************************************************
 

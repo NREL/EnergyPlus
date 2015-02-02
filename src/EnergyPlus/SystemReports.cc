@@ -40,6 +40,7 @@
 #include <UnitVentilator.hh>
 #include <UtilityRoutines.hh>
 #include <WindowAC.hh>
+#include <HVACVariableRefrigerantFlow.hh>
 #include <ZonePlenum.hh>
 
 namespace EnergyPlus {
@@ -3868,6 +3869,10 @@ namespace SystemReports {
 		using WindowAC::GetWindowACMixedAirNode;
 		using WindowAC::GetWindowACZoneInletAirNode;
 		using WindowAC::GetWindowACReturnAirNode;
+		using HVACVariableRefrigerantFlow::GetVRFTUOutAirNode;
+		using HVACVariableRefrigerantFlow::GetVRFTUMixedAirNode;
+		using HVACVariableRefrigerantFlow::GetVRFTUZoneInletAirNode;
+		using HVACVariableRefrigerantFlow::GetVRFTUReturnAirNode;
 		using PackagedTerminalHeatPump::GetPTUnitOutAirNode;
 		using PackagedTerminalHeatPump::GetPTUnitMixedAirNode;
 		using PackagedTerminalHeatPump::GetPTUnitZoneInletAirNode;
@@ -3996,6 +4001,7 @@ namespace SystemReports {
 			for ( thisZoneEquipNum = 1; thisZoneEquipNum <= ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).NumOfEquipTypes; ++thisZoneEquipNum ) {
 				{ auto const SELECT_CASE_var( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipType_Num( thisZoneEquipNum ) );
 				// case statement to cover all possible zone forced air units that could have outside air
+				
 				if ( SELECT_CASE_var == WindowAC_Num ) { // Window Air Conditioner
 					OutAirNode = GetWindowACOutAirNode( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ) );
 					if ( OutAirNode > 0 ) ZFAUOutAirFlow += Node( OutAirNode ).MassFlowRate;
@@ -4013,7 +4019,24 @@ namespace SystemReports {
 						ZFAUZoneVentLoad += 0.0;
 					}
 
-				} else if ( ( SELECT_CASE_var == PkgTermHPAirToAir_Num ) || ( SELECT_CASE_var == PkgTermACAirToAir_Num ) || ( SELECT_CASE_var == PkgTermHPWaterToAir_Num ) ) {
+				} else if( SELECT_CASE_var == VRFTerminalUnit_Num ) {
+					OutAirNode = GetVRFTUOutAirNode( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ) );
+					if( OutAirNode > 0 ) ZFAUOutAirFlow += Node( OutAirNode ).MassFlowRate;
+
+					ZoneInletAirNode = GetVRFTUZoneInletAirNode( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ) );
+					if( ZoneInletAirNode > 0 ) ZFAUFlowRate = max( Node( ZoneInletAirNode ).MassFlowRate, 0.0 );
+					MixedAirNode = GetVRFTUMixedAirNode( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ) );
+					ReturnAirNode = GetVRFTUReturnAirNode( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ) );
+					if( ( MixedAirNode > 0 ) && ( ReturnAirNode > 0 ) ) {
+						ZFAUEnthMixedAir = PsyHFnTdbW( Node( MixedAirNode ).Temp, Node( MixedAirNode ).HumRat );
+						ZFAUEnthReturnAir = PsyHFnTdbW( Node( ReturnAirNode ).Temp, Node( ReturnAirNode ).HumRat );
+						//Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
+						ZFAUZoneVentLoad += (ZFAUFlowRate)* ( ZFAUEnthMixedAir - ZFAUEnthReturnAir ) * TimeStepSys * SecInHour; //*KJperJ
+					} else {
+						ZFAUZoneVentLoad += 0.0;
+					}
+
+				} else if( ( SELECT_CASE_var == PkgTermHPAirToAir_Num ) || ( SELECT_CASE_var == PkgTermACAirToAir_Num ) || ( SELECT_CASE_var == PkgTermHPWaterToAir_Num ) ) {
 					OutAirNode = GetPTUnitOutAirNode( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ), ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipType_Num( thisZoneEquipNum ) );
 					if ( OutAirNode > 0 ) ZFAUOutAirFlow += Node( OutAirNode ).MassFlowRate;
 

@@ -5998,6 +5998,211 @@ namespace HVACVariableRefrigerantFlow {
 
 	}
 
+	int
+		GetVRFTUOutAirNode( int const VRFTUNum ) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         R. Raustad (copy of B Griffith routine)
+		//       DATE WRITTEN   Jan  2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// lookup function for OA inlet node
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+		int GetVRFTUOutAirNode;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		// na
+		if( GetVRFInputFlag ) {
+			GetVRFInput();
+			GetVRFInputFlag = false;
+		}
+
+		GetVRFTUOutAirNode = 0;
+		if( VRFTUNum > 0 && VRFTUNum <= NumVRFTU ) {
+			GetVRFTUOutAirNode = VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum;
+		}
+
+		return GetVRFTUOutAirNode;
+
+	}
+
+	int
+		GetVRFTUZoneInletAirNode( int const VRFTUNum ) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         R. Raustad (copy of B Griffith routine)
+		//       DATE WRITTEN   Jan  2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// lookup function for OA inlet node
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+		int GetVRFTUZoneInletAirNode;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		// na
+		if( GetVRFInputFlag ) {
+			GetVRFInput();
+			GetVRFInputFlag = false;
+		}
+		GetVRFTUZoneInletAirNode = 0;
+		if( VRFTUNum > 0 && VRFTUNum <= NumVRFTU ) {
+			GetVRFTUZoneInletAirNode = VRFTU( VRFTUNum ).VRFTUOutletNodeNum;
+		}
+
+		return GetVRFTUZoneInletAirNode;
+
+	}
+
+	int
+		GetVRFTUMixedAirNode( int const VRFTUNum ) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         R. Raustad (copy of B Griffith routine)
+		//       DATE WRITTEN   Jan  2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// lookup function for OA inlet node
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+		int GetVRFTUMixedAirNode;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		// na
+		if( GetVRFInputFlag ) {
+			GetVRFInput();
+			GetVRFInputFlag = false;
+		}
+		GetVRFTUMixedAirNode = 0;
+		if( VRFTUNum > 0 && VRFTUNum <= NumVRFTU ) {
+			GetVRFTUMixedAirNode = VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum;
+		}
+
+		return GetVRFTUMixedAirNode;
+
+	}
+
+	int
+		GetVRFTUReturnAirNode( int const VRFTUNum ) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         R. Raustad (copy of B Griffith routine)
+		//       DATE WRITTEN   Jan  2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// lookup function for OA inlet node
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+		int GetVRFTUReturnAirNode;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		// na
+		if( GetVRFInputFlag ) {
+			GetVRFInput();
+			GetVRFInputFlag = false;
+		}
+		GetVRFTUReturnAirNode = 0;
+		if( VRFTUNum > 0 && VRFTUNum <= NumVRFTU ) {
+			GetVRFTUReturnAirNode = VRFTU( VRFTUNum ).VRFTUOAMixerRetNodeNum;
+		}
+
+		return GetVRFTUReturnAirNode;
+
+	}
+
 	// End of Utility subroutines for the Module
 	// *****************************************************************************
 
