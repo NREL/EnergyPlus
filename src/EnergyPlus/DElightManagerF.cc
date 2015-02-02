@@ -10,6 +10,7 @@
 
 // EnergyPlus Headers
 #include <DElightManagerF.hh>
+#include <CommandLineInterface.hh>
 #include <DataDaylighting.hh>
 #include <DataDElight.hh>
 #include <DataEnvironment.hh>
@@ -186,9 +187,9 @@ namespace DElightManagerF {
 
 		// Hardwire file name to eplusout.delightin in the current working directory
 		{
-			IOFlags flags; flags.ACTION( "write" ); gio::open( unit, "eplusout.delightin", flags );
+			IOFlags flags; flags.ACTION( "write" ); gio::open( unit, outputDelightInFileName, flags );
 			if ( flags.err() ) {
-				ShowFatalError( "DElightInputGenerator: Could not open file \"eplusout.delightin\" for output (write)." );
+				ShowFatalError( "DElightInputGenerator: Could not open file \""+ outputDelightInFileName + "\" for output (write)." );
 			}
 		}
 

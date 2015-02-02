@@ -9150,10 +9150,9 @@ BuildingSurface:Detailed,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
+       \reference RadiantSurfaceNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Surface Type
        \required-field
@@ -10337,10 +10336,9 @@ Wall:Detailed,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
+       \reference RadiantSurfaceNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -10525,10 +10523,9 @@ RoofCeiling:Detailed,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
+       \reference RadiantSurfaceNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -10712,10 +10709,9 @@ Floor:Detailed,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
+       \reference RadiantSurfaceNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -10898,9 +10894,8 @@ Wall:Exterior,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
+       \reference RadiantSurfaceNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -10943,9 +10938,8 @@ Wall:Adiabatic,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
+       \reference RadiantSurfaceNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -10988,9 +10982,8 @@ Wall:Underground,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
+       \reference RadiantSurfaceNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11035,10 +11028,9 @@ Wall:Interzone,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
+       \reference RadiantSurfaceNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11089,9 +11081,8 @@ Roof,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
+       \reference RadiantSurfaceNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11136,9 +11127,8 @@ Ceiling:Adiabatic,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
+       \reference RadiantSurfaceNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11185,9 +11175,8 @@ Ceiling:Interzone,
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
        \reference OutFaceEnvNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
+       \reference RadiantSurfaceNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11240,9 +11229,8 @@ Floor:GroundContact,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
+       \reference RadiantSurfaceNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11290,9 +11278,8 @@ Floor:Adiabatic,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
+       \reference RadiantSurfaceNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11337,10 +11324,9 @@ Floor:Interzone,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
+       \reference RadiantSurfaceNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11396,7 +11382,7 @@ FenestrationSurface:Detailed,
        \reference AllHeatTranSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
+       \reference RadiantSurfaceNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Surface Type
        \required-field
@@ -11415,7 +11401,7 @@ FenestrationSurface:Detailed,
   A4 , \field Building Surface Name
        \required-field
        \type object-list
-       \object-list HeatTranBaseSurfNames
+       \object-list SurfaceNames
   A5,  \field Outside Boundary Condition Object
        \type object-list
        \object-list OutFaceEnvNames
@@ -11521,7 +11507,6 @@ Window,
        \reference AllHeatTranSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11533,7 +11518,7 @@ Window,
        \note Window assumes the azimuth and tilt angles of the surface it is on.
        \required-field
        \type object-list
-       \object-list HeatTranBaseSurfNames
+       \object-list SurfaceNames
   A4, \field Shading Control Name
        \note enter the name of a WindowProperty:ShadingControl object
        \type object-list
@@ -11574,7 +11559,7 @@ Door,
        \reference AllHeatTranSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
+       \reference RadiantSurfaceNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11586,7 +11571,7 @@ Door,
        \note Door assumes the azimuth and tilt angles of the surface it is on.
        \required-field
        \type object-list
-       \object-list HeatTranBaseSurfNames
+       \object-list SurfaceNames
   N1 , \field Multiplier
        \note Used only for Surface Type = WINDOW, GLASSDOOR or DOOR
        \note Non-integer values will be truncated to integer
@@ -11613,7 +11598,6 @@ GlazedDoor,
        \reference AllHeatTranSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11625,7 +11609,7 @@ GlazedDoor,
        \note Door assumes the azimuth and tilt angles of the surface it is on.
        \required-field
        \type object-list
-       \object-list HeatTranBaseSurfNames
+       \object-list SurfaceNames
   A4, \field Shading Control Name
        \note enter the name of a WindowProperty:ShadingControl object
        \type object-list
@@ -11667,7 +11651,6 @@ Window:Interzone,
        \reference AllHeatTranSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11679,7 +11662,7 @@ Window:Interzone,
        \note Window assumes the azimuth and tilt angles of the surface it is on.
        \required-field
        \type object-list
-       \object-list HeatTranBaseSurfNames
+       \object-list SurfaceNames
   A4,  \field Outside Boundary Condition Object
        \type object-list
        \object-list OutFaceEnvNames
@@ -11715,7 +11698,7 @@ Door:Interzone,
        \reference AllHeatTranSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
+       \reference RadiantSurfaceNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11727,7 +11710,7 @@ Door:Interzone,
        \note Door assumes the azimuth and tilt angles of the surface it is on.
        \required-field
        \type object-list
-       \object-list HeatTranBaseSurfNames
+       \object-list SurfaceNames
   A4,  \field Outside Boundary Condition Object
        \type object-list
        \object-list OutFaceEnvNames
@@ -11763,7 +11746,6 @@ GlazedDoor:Interzone,
        \reference AllHeatTranSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
-       \reference RadGroupAndSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11775,7 +11757,7 @@ GlazedDoor:Interzone,
        \note Door assumes the azimuth and tilt angles of the surface it is on.
        \required-field
        \type object-list
-       \object-list HeatTranBaseSurfNames
+       \object-list SurfaceNames
   A4,  \field Outside Boundary Condition Object
        \type object-list
        \object-list OutFaceEnvNames
@@ -12203,6 +12185,7 @@ InternalMass,
        \type alpha
        \reference AllHeatTranSurfNames
        \reference AllHeatTranAngFacNames
+       \reference RadiantSurfaceNames
   A2 , \field Construction Name
        \required-field
        \note To be matched with a construction in this input file
@@ -19931,6 +19914,181 @@ OtherEquipment,
        \maximum 1.0
        \default 0
 
+ElectricEquipment:ITE:AirCooled,
+   \memo This object describes air-cooled electric information technology equipment (ITE) which has 
+   \memo variable power consumption as a function of loading and temperature.
+       \min-fields 27
+  A1 , \field Name
+       \required-field
+       \type alpha
+       \reference ITEEquipmentNames
+  A2 , \field Zone Name
+       \required-field
+       \type object-list
+       \object-list ZoneNames
+  A3 , \field Design Power Input Calculation Method
+       \note The entered calculation method is used to specify the design power input
+       \note Watts/Unit => Watts per Unit -- Design Power = Watts per Unit * Number of Units
+       \note Watts/Area => Watts per Zone Floor Area -- Design Power = Watts per Zone Floor Area * Floor Area
+       \required-field
+       \type choice
+       \key Watts/Unit
+       \key Watts/Area
+       \default Watts/Unit
+  N1 , \field Watts per Unit
+       \units W
+       \type real
+       \minimum 0
+       \ip-units W
+  N2 , \field Number of Units
+       \type real
+       \minimum 0
+       \default 1
+  N3 , \field Watts per Zone Floor Area
+       \type real
+       \minimum 0
+       \units W/m2
+       \ip-units W/ft2
+  A4 , \field Design Power Input Schedule Name
+       \note Operating schedule for this equipment, fraction applied to the design power input,
+       \note generally (0.0 - 1.0)
+       \note If this field is blank, the schedule is assumed to always be 1.0.
+       \type object-list
+       \object-list ScheduleNames
+  A5 , \field CPU Loading  Schedule Name
+       \note CPU loading schedule for this equipment as a fraction from 0.0 (idle) to 1.0 (full load).
+       \note If this field is blank, the schedule is assumed to always be 1.0.
+       \type object-list
+       \object-list ScheduleNames
+  A6 , \field CPU Power Input Function of Loading and Air Temperature Curve Name
+       \required-field
+       \type object-list
+       \object-list BiVariateCurves
+       \note The name of a two-variable curve or table lookup object which modifies the CPU power
+       \note input as a function of CPU loading (x) and air inlet node temperature (y). 
+       \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and 
+       \note Design Entering Air Temperature).
+  N4 , \field Design Fan Power Input Fraction
+       \note The fraction of the total power input at design conditions which is for the cooling fan(s)
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+  N5,  \field Design Fan Air Flow Rate per Power Input
+       \note The cooling fan air flow rate per total electric power input at design conditions
+       \required-field
+       \type real
+       \units m3/s-W
+       \minimum 0.0
+  A7 , \field Air Flow Function of Loading and Air Temperature Curve Name
+       \required-field
+       \type object-list
+       \object-list BiVariateCurves
+       \note The name of a two-variable curve or table lookup object which modifies the cooling
+       \note air flow rate as a function of CPU loading (x) and air inlet node temperature (y). 
+       \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and 
+       \note Design Entering Air Temperature).
+  A8 , \field Fan Power Input Function of Flow Curve Name
+       \required-field
+       \type object-list
+       \object-list UniVariateCurves
+       \note The name of a single-variable curve or table lookup object which modifies the cooling
+       \note fan power as a function of flow fraction (x). 
+       \note This curve (table) should equal 1.0 at a flow fraction of 1.0. 
+  N6,  \field Design Entering Air Temperature
+       \note The entering air temperature at design conditions.
+       \type real
+       \units C
+       \default 15.0
+  A9,  \field Environmental Class
+       \note Specifies the allowable operating conditions for the air inlet conditions.
+       \note Used for reporting time outside allowable conditions.
+       \type choice 
+       \key None
+       \key A1
+       \key A2
+       \key A3
+       \key A4
+       \key B
+       \key C
+       \default None
+  A10, \field Air Inlet Connection Type
+       \note Specifies the type of connection between the zone and the ITE air inlet node.
+       \note AdjustedSupply = ITE inlet temperature will be the current Supply Air Node temperature
+       \note adjusted by the current recirculation fraction. 
+       \note All heat output is added to the zone air heat balance as a convective gain.
+       \note ZoneAirNode = ITE air inlet condition is  the average zone condition. 
+       \note All heat output is added to the zone air heat balance as a convective gain. 
+       \note RoomAirModel = ITE air inlet and outlet are connected to room air model nodes. 
+       \type choice 
+       \key AdjustedSupply
+       \key ZoneAirNode
+       \key RoomAirModel
+       \default AdjustedSupply
+  A11, \field Air Inlet Room Air Model Node Name
+       \note Name of a RoomAir:Node object which is connect to the ITE air inlet.
+       \type object-list
+       \object-list RoomAirNodes
+  A12, \field Air Outlet Room Air Model Node Name
+       \note Name of a RoomAir:Node object which is connect to the ITE air outlet.
+       \type object-list
+       \object-list RoomAirNodes
+  A13, \field Supply Air Node Name
+       \note Name of the supply air inlet node serving this ITE. Required if the 
+       \note Air Node Connection Type = AdjustedSupply. Also required if reporting of 
+       \note Supply Heat Index is desired.
+       \type node
+  N7,  \field Design Recirculation Fraction
+       \note The recirculation fraction for this equipment at design conditions. This field is used only 
+       \note if the Air Node Connection Type = AdjustedSupply. The default is 0.0 (no recirculation).
+       \type real
+       \minimum 0.0
+       \maximum 0.5
+       \default 0.0
+  A14, \field Recirculation Function of Loading and Supply Temperature Curve Name
+       \type object-list
+       \object-list BiVariateCurves
+       \note The name of a two-variable curve or table lookup object which modifies the recirculation
+       \note fractionas a function of CPU loading (x) and supply air node temperature (y). 
+       \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and 
+       \note Design Entering Air Temperature).This field is used only if the 
+       \note Air Node Connection Type = AdjustedSupply. If this curve is left blank, then the curve 
+       \note is assumed to always equal 1.0.
+  N8 , \field Design Electric Power Supply Efficiency
+       \note The efficiency of the power supply system serving this ITE
+       \type real
+       \minimum> 0.0
+       \maximum 1.0
+       \default 1.0
+  A15, \field Electric Power Supply Efficiency Function of Part Load Ratio Curve Name
+       \type object-list
+       \object-list BiVariateCurves
+       \note The name of a two-variable curve or table lookup object which modifies the recirculation
+       \note fractionas a function of CPU loading (x) and supply air node temperature (y). 
+       \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and 
+       \note Design Entering Air Temperature).This field is used only if the 
+       \note Air Node Connection Type = AdjustedSupply. If this curve is left blank, then the curve 
+       \note is assumed to always equal 1.0.
+  N9 , \field Fraction of Electric Power Supply Losses to Zone
+       \note Fraction of the electric power supply losses which are a heat gain to the zone 
+       \note If this field is <1.0, the remainder of the losses are assumed to be lost to the outdoors.
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 1.0
+  A16, \field CPU End-Use Subcategory
+       \type alpha
+       \retaincase
+       \default ITE-CPU
+  A17, \field Fan End-Use Subcategory
+       \type alpha
+       \retaincase
+       \default ITE-Fans
+  A18; \field Electric Power Supply End-Use Subcategory
+       \type alpha
+       \retaincase
+       \default ITE-UPS
+
 ZoneBaseboard:OutdoorTemperatureControlled,
        \memo Specifies outside temperature-controlled electric baseboard heating.
   A1 , \field Name
@@ -24886,7 +25044,7 @@ HVACTemplate:Zone:VRF,
       \note to be equal to the cooling capacity multiplied by this sizing ratio.
       \note This input applies to the terminal unit heating coil and overrides the sizing
       \note ratio entered in the HVACTemplate:System:VRF object.
-  N4, \field Supply Air Flow Rate During Cooling Operation
+  N4, \field Cooling Supply Air Flow Rate
       \note This field may be set to "autosize".  If a value is entered, it will be
       \note multiplied by the Supply Air Sizing Factor and by zone multipliers.
       \type real
@@ -24894,7 +25052,7 @@ HVACTemplate:Zone:VRF,
       \minimum> 0.0
       \autosizable
       \default autosize
-  N5, \field Supply Air Flow Rate When No Cooling is Needed
+  N5, \field No Cooling Supply Air Flow Rate
       \note This flow rate is used when the terminal is not cooling and the previous mode was cooling.
       \note This field may be set to "autosize".  If a value is entered, it will be
       \note multiplied by the Supply Air Sizing Factor and by zone multipliers.
@@ -24903,7 +25061,7 @@ HVACTemplate:Zone:VRF,
       \minimum 0.0
       \autosizable
       \default autosize
-  N6, \field Supply Air Flow Rate During Heating Operation
+  N6, \field Heating Supply Air Flow Rate
       \note This field may be set to "autosize".  If a value is entered, it will be
       \note multiplied by the Supply Air Sizing Factor and by zone multipliers.
       \type real
@@ -24911,7 +25069,7 @@ HVACTemplate:Zone:VRF,
       \minimum> 0.0
       \autosizable
       \default autosize
-  N7, \field Supply Air Flow Rate When No Heating is Needed
+  N7, \field No Heating Supply Air Flow Rate
       \note This flow rate is used when the terminal is not heating and the previous mode was heating.
       \note This field may be set to "autosize".  If a value is entered, it will be
       \note multiplied by the Supply Air Sizing Factor and by zone multipliers.
@@ -24920,7 +25078,7 @@ HVACTemplate:Zone:VRF,
       \minimum 0.0
       \autosizable
       \default autosize
-  N8, \field Outdoor Air Flow Rate During Cooling Operation
+  N8, \field Cooling Outdoor Air Flow Rate
       \note If this field is set to autosize it will be sized based on the outdoor air inputs below,
       \note unless a dedicated outdoor air system is specified for this zone and then it will be
       \note set to zero.
@@ -24929,7 +25087,7 @@ HVACTemplate:Zone:VRF,
       \minimum 0.0
       \autosizable
       \default autosize
-  N9, \field Outdoor Air Flow Rate During Heating Operation
+  N9, \field Heating Outdoor Air Flow Rate
       \note If this field is set to autosize it will be sized based on the outdoor air inputs below,
       \note unless a dedicated outdoor air system is specified for this zone and then it will be
       \note set to zero.
@@ -24938,7 +25096,7 @@ HVACTemplate:Zone:VRF,
       \minimum 0.0
       \autosizable
       \default autosize
- N10, \field Outdoor Air Flow Rate When No Cooling or Heating is Needed
+ N10, \field No Load Outdoor Air Flow Rate
       \note If this field is set to autosize it will be sized based on the outdoor air inputs below,
       \note unless a dedicated outdoor air system is specified for this zone and then it will be
       \note set to zero.
@@ -30396,7 +30554,7 @@ DesignSpecification:ZoneHVAC:Sizing,
       \required-field
       \type alpha
       \reference DesignSpecificationZoneHVACSizingName
-  A2, \field Cooling Design Air Flow Method
+  A2, \field Cooling Supply Air Flow Rate Method
       \type choice
       \key None
       \key SupplyAirFlowRate
@@ -30414,37 +30572,37 @@ DesignSpecification:ZoneHVAC:Sizing,
       \note value determined by the simulation. FlowPerCoolingCapacity => is selected when the supply
       \note air volume is determined from user specified flow per Cooling Capacity and Cooling Capacity
       \note determined by the simulation.
-  N1, \field Cooling Design Supply Air Flow Rate
+  N1, \field Cooling Supply Air Flow Rate
       \type real
       \units m3/s
       \minimum 0.0
       \autosizable
       \note Enter the magnitude of supply air volume flow rate during cooling operation.
-      \note Required field when Supply air Flow Rate Method During Cooling Operation is SupplyAirFlowRate.
+      \note Required field when Cooling Supply Air Flow Rate Method is SupplyAirFlowRate.
       \note This field may be blank if a cooling coil is not included in the Zone HVAC equipment.
-  N2, \field Cooling Design Supply Air Flow Rate Per Floor Area
+  N2, \field Cooling Supply Air Flow Rate Per Floor Area
       \type real
       \units m3/s-m2
       \minimum 0.0
       \note Enter the cooling supply air volume flow rate per total conditioned floor area.
-      \note Required field when Supply air Flow Rate Method During Cooling Operation is FlowPerFloorArea.
+      \note Required field when Cooling Supply Air Flow Rate Method is FlowPerFloorArea.
       \note This field may be blank if a cooling coil is not included in the Zone HVAC equipment.
-  N3, \field Fraction of Autosized Cooling Design Supply Air Flow Rate
+  N3, \field Cooling Fraction of Autosized Cooling Supply Air Flow Rate
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
-      \note Required field when Supply air Flow Rate Method During Cooling Operation is
+      \note Required field when Cooling Supply Air Flow Rate Method is
       \note FractionOfAutosizedCoolingAirflow.
       \note This field may be blank if a cooling coil is not included in the Zone HVAC equipment.
-  N4, \field Cooling Design Supply Air Flow Rate Per Unit Cooling Capacity
+  N4, \field Cooling Supply Air Flow Rate Per Unit Cooling Capacity
       \type real
       \units m3/s-W
       \minimum 0.0
       \note Enter the cooling supply air volume flow rate unit cooling capacity.
-      \note Required field when Supply air Flow Rate Method During Cooling Operation is
+      \note Required field when Cooling Supply Air Flow Rate Method is
       \note FlowPerCoolingCapacity. This field may be blank if a cooling coil is not
       \note included in the Zone HVAC equipment.
-  A3, \field Supply Air Flow Rate Method When No Cooling or Heating is Required
+  A3, \field No Load Supply Air Flow Rate Method
       \type choice
       \key None
       \key SupplyAirFlowRate
@@ -30453,7 +30611,7 @@ DesignSpecification:ZoneHVAC:Sizing,
       \key FractionOfAutosizedHeatingAirflow
       \default SupplyAirFlowRate
       \note Enter the method used to determine the supply air volume flow rate When No Cooling or Heating
-      \note is Required. None is used when a cooling or heating coils is not included in the Zone HVAC
+      \note is Required. None is used when a cooling or heating coil is not included in the Zone HVAC
       \note Equipment or this field may be blank. SupplyAirFlowRate => selected when the magnitude of the
       \note supply air volume flow rate is specified. FlowPerFloorArea => selected when the supply air
       \note volume flow rate is determined from total floor area served by the Zone HVAC unit and Flow Per
@@ -30462,34 +30620,34 @@ DesignSpecification:ZoneHVAC:Sizing,
       \note air flow rate value determined by the simulation. FractionOfAutosizedHeatingAirflow => is
       \note selected when the supply air volume is determined from a user specified fraction and the
       \note Autosized heating supply air flow rate value determined by the simulation.
-  N5, \field Supply Air Flow Rate When No Cooling or Heating is Required
+  N5, \field No Load Supply Air Flow Rate
       \type real
       \units m3/s
       \minimum 0.0
       \autosizable
       \note Enter the magnitude of the supply air volume flow rate during when no cooling or heating
-      \note is required. Required field when Supply air Flow Rate Method When No Cooling or Heating
-      \note is Required is SupplyAirFlowRate.
-  N6, \field Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
+      \note is required. Required field when No Load Supply Air Flow Rate Method
+      \note is SupplyAirFlowRate.
+  N6, \field No Load Supply Air Flow Rate Per Floor Area
       \type real
       \units m3/s-m2
       \minimum 0.0
       \note Enter the supply air volume flow rate per total floor area.
-      \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required
+      \note Required field when No Load Supply Air Flow Rate Method
       \note is FlowPerFloorArea.
-  N7, \field Fraction of Design Cooling Supply Air Flow Rate When No Clg or Htg Required
+  N7, \field No Load Fraction of Cooling Supply Air Flow Rate
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
-      \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required
+      \note Required field when No Load Supply Air Flow Rate Method
       \note is FractionOfAutosizedCoolingAirflow.
-  N8, \field Fraction of Design Heating Supply Air Flow Rate When No Clg or Htg Required
+  N8, \field No Load Fraction of Heating Supply Air Flow Rate
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the heating supply air flow rate.
-      \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required
+      \note Required field when No Load Supply Air Flow Rate Method
       \note is FractionOfAutosizedHeatingAirflow.
-  A4, \field Heating Design Air Flow Method
+  A4, \field Heating Supply Air Flow Rate Method
       \type choice
       \key None
       \key SupplyAirFlowRate
@@ -30507,34 +30665,34 @@ DesignSpecification:ZoneHVAC:Sizing,
       \note value determined by the simulation. FlowPerHeatingCapacity => is selected when the supply
       \note air volume is determined from user specified flow per Heating Capacity and Heating Capacity
       \note determined by the simulation.
-  N9, \field Heating Design Supply Air Flow Rate
+  N9, \field Heating Supply Air Flow Rate
       \type real
       \units m3/s
       \minimum 0.0
       \autosizable
       \note Enter the magnitude of the supply air volume flow rate during heating operation.
-      \note Required field when Supply air Flow Rate Method During Heating Operation is SupplyAirFlowRate.
+      \note Required field when Heating Supply Air Flow Rate Method is SupplyAirFlowRate.
       \note This field may be blank if a heating coil is not included in the Zone HVAC equipment.
- N10, \field Heating Design Supply Air Flow Rate Per Floor Area
+ N10, \field Heating Supply Air Flow Rate Per Floor Area
       \type real
       \units m3/s-m2
       \minimum 0.0
       \note Enter the heating supply air volume flow rate per total conditioned floor area.
-      \note Required field when Supply air Flow Rate Method During Heating Operation is FlowPerFloorArea.
+      \note Required field when Heating Supply Air Flow Rate Method is FlowPerFloorArea.
       \note This field may be blank if a heating coil is not included in the Zone HVAC equipment.
- N11, \field Fraction of Heating Design Supply Air Flow Rate
+ N11, \field Heating Fraction of Heating Supply Air Flow Rate
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the heating supply air flow rate.
-      \note Required field when Supply air Flow Rate Method During Heating Operation is
+      \note Required field when Heating Supply Air Flow Rate Method is
       \note FractionOfAutosizedHeatingAirflow.
       \note This field may be blank if a heating coil is not included in the Zone HVAC equipment.
- N12, \field Heating Design Supply Air Flow Rate Per Unit Heating Capacity
+ N12, \field Heating Supply Air Flow Rate Per Unit Heating Capacity
       \type real
       \units m3/s-W
       \minimum 0.0
       \note Enter the supply air volume flow rate per unit heating capacity.
-      \note Required field when Supply air Flow Rate Method During Heating Operation is
+      \note Required field when Heating Supply Air Flow Rate Method is
       \note FlowPerHeatingCapacity.
       \note This field may be blank if a heating coil is not included in the Zone HVAC equipment.
   A5, \field Cooling Design Capacity Method
@@ -30684,7 +30842,7 @@ Sizing:System,
       \type real
       \default 0.008
       \units kgWater/kgDryAir
-  A6, \field Cooling Design Air Flow Method
+  A6, \field Cooling Supply Air Flow Rate Method
       \type choice
       \key Flow/System
       \key DesignDay
@@ -30692,34 +30850,34 @@ Sizing:System,
       \key FractionOfAutosizedCoolingAirflow
       \key FlowPerCoolingCapacity
       \default DesignDay
- N11, \field Cooling Design Air Flow Rate
-      \note This input is used if Cooling Design Air Flow Method is Flow/System
+ N11, \field Cooling Supply Air Flow Rate
+      \note This input is used if Cooling Supply Air Flow Rate Method is Flow/System
       \note This value will *not* be multiplied by any sizing factor or by zone multipliers.
       \note If using zone multipliers, this value must be large enough to serve the multiplied zones.
       \type real
       \units m3/s
       \minimum 0
       \default 0
- N12, \field Supply Air Flow Rate Per Floor Area During Cooling Operation
+ N12, \field Cooling Supply Air Flow Rate Per Floor Area
       \type real
       \units m3/s-m2
       \minimum 0.0
       \note Enter the cooling supply air volume flow rate per total conditioned floor area.
-      \note Required field when Supply air Flow Rate Method during cooling operation is FlowPerFloorArea.
- N13, \field Fraction of Autosized Design Cooling Supply Air Flow Rate
+      \note Required field when Cooling Supply Air Flow Rate Method is FlowPerFloorArea.
+ N13, \field Cooling Fraction of Autosized Cooling Supply Air Flow Rate
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
-      \note Required field when Supply air Flow Rate Method during cooling operation is
+      \note Required field when Cooling Supply Air Flow Rate Method is
       \note FractionOfAutosizedCoolingAirflow.
- N14, \field Design Supply Air Flow Rate Per Unit Cooling Capacity
+ N14, \field Cooling Supply Air Flow Rate Per Unit Cooling Capacity
       \type real
       \units m3/s-W
       \minimum 0.0
       \note Enter the supply air volume flow rate per unit cooling capacity.
-      \note Required field when Supply air Flow Rate Method During Cooling Operation is
+      \note Required field when Cooling Supply Air Flow Rate Method is
       \note FlowPerCoolingCapacity.
-  A7, \field Heating Design Air Flow Method
+  A7, \field Heating Supply Air Flow Rate Method
       \type choice
       \key Flow/System
       \key DesignDay
@@ -30728,38 +30886,38 @@ Sizing:System,
       \key FractionOfAutosizedCoolingAirflow
       \key FlowPerCoolingCapacity
       \default DesignDay
- N15, \field Heating Design Air Flow Rate
-      \note This input is used if Heating Design Air Flow Method is Flow/System
+ N15, \field Heating Supply Air Flow Rate
+      \note Required field when Heating Supply Air Flow Rate Method is Flow/System
       \note This value will *not* be multiplied by any sizing factor or by zone multipliers.
       \note If using zone multipliers, this value must be large enough to serve the multiplied zones.
       \type real
       \units m3/s
       \minimum 0
       \default 0
- N16, \field Supply Air Flow Rate Per Floor Area During Heating Operation
+ N16, \field Heating Supply Air Flow Rate Per Floor Area
       \type real
       \units m3/s-m2
       \minimum 0.0
       \note Enter the heating supply air volume flow rate per total conditioned floor area.
-      \note Required field when Supply air Flow Rate Method during heating operation is FlowPerFloorArea.
- N17, \field Fraction of Autosized Design Heating Supply Air Flow Rate
+      \note Required field when Heating Supply Air Flow Rate Method is FlowPerFloorArea.
+ N17, \field Heating Fraction of Autosized Heating Supply Air Flow Rate
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the heating supply air flow rate.
-      \note Required field when Supply air Flow Rate Method during heating operation is
+      \note Required field when Heating Supply Air Flow Rate Method is
       \note FractionOfAutosizedHeatingAirflow.
- N18, \field Fraction of Autosized Design Cooling Supply Air Flow Rate
+ N18, \field Heating Fraction of Autosized Cooling Supply Air Flow Rate
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
-      \note Required field when Supply air Flow Rate Method during heating operation is
+      \note Required field when Heating Supply Air Flow Rate Method is
       \note FractionOfAutosizedCoolingAirflow.
- N19, \field Design Supply Air Flow Rate Per Unit Heating Capacity
+ N19, \field Heating Supply Air Flow Rate Per Unit Heating Capacity
       \type real
       \units m3/s-W
       \minimum 0.0
       \note Enter the heating supply air volume flow rate per unit heating capacity.
-      \note Required field when Supply air Flow Rate Method during heating operation is
+      \note Required field when Heating Supply Air Flow Rate Method is
       \note FlowPerHeatingCapacity.
   A8, \field System Outdoor Air Method
       \type choice
@@ -31826,21 +31984,21 @@ ZoneHVAC:PackagedTerminalAirConditioner,
         \type object-list
         \object-list OutdoorAirMixers
         \note Needs to match the name of the PTAC outdoor air mixer object.
-   N1 , \field Supply Air Flow Rate During Cooling Operation
+   N1 , \field Cooling Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to fan size.
-   N2 , \field Supply Air Flow Rate During Heating Operation
+   N2 , \field Heating Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to fan size.
-   N3 , \field Supply Air Flow Rate When No Cooling or Heating is Needed
+   N3 , \field No Load Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum 0
@@ -31851,21 +32009,21 @@ ZoneHVAC:PackagedTerminalAirConditioner,
         \note This air flow rate is used when no heating or cooling is required and the cooling or
         \note heating coil is off. If this field is left blank or zero, the supply air flow rate
         \note from the previous on cycle (either cooling or heating) is used.
-   N4 , \field Outdoor Air Flow Rate During Cooling Operation
+   N4 , \field Cooling Outdoor Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum 0
         \autosizable
         \note Must be less than or equal to supply air flow rate during cooling operation.
-   N5 , \field Outdoor Air Flow Rate During Heating Operation
+   N5 , \field Heating Outdoor Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum 0
         \autosizable
         \note Must be less than or equal to supply air flow rate during heating operation.
-   N6 , \field Outdoor Air Flow Rate When No Cooling or Heating is Needed
+   N6 , \field No Load Outdoor Air Flow Rate
         \type real
         \units m3/s
         \minimum 0
@@ -31972,21 +32130,21 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \type object-list
         \object-list OutdoorAirMixers
         \note Needs to match name of outdoor air mixer object.
-   N1 , \field Supply Air Flow Rate During Cooling Operation
+   N1 , \field Cooling Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to fan size.
-   N2 , \field Supply Air Flow Rate During Heating Operation
+   N2 , \field Heating Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to fan size.
-   N3 , \field Supply Air Flow Rate When No Cooling or Heating is Needed
+   N3 , \field No Load Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum 0
@@ -31996,21 +32154,21 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \note is used when no heating or cooling is required and the DX coil compressor is off.
         \note If this field is left blank or zero, the supply air flow rate from the previous on cycle
         \note (either cooling or heating) is used.
-   N4 , \field Outdoor Air Flow Rate During Cooling Operation
+   N4 , \field Cooling Outdoor Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum 0
         \autosizable
         \note Must be less than or equal to supply air flow rate during cooling operation.
-   N5 , \field Outdoor Air Flow Rate During Heating Operation
+   N5 , \field Heating Outdoor Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum 0
         \autosizable
         \note Must be less than or equal to supply air flow rate during heating operation.
-   N6 , \field Outdoor Air Flow Rate When No Cooling or Heating is Needed
+   N6 , \field No Load Outdoor Air Flow Rate
         \type real
         \units m3/s
         \minimum 0
@@ -32152,21 +32310,21 @@ ZoneHVAC:WaterToAirHeatPump,
         \object-list OutdoorAirMixers
         \note This optional field specifies the name of the outdoor air mixer object.
         \note When used, this name needs to match name of outdoor air mixer object.
-   N1 , \field Supply Air Flow Rate During Cooling Operation
+   N1 , \field Cooling Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to fan size.
-   N2 , \field Supply Air Flow Rate During Heating Operation
+   N2 , \field Heating Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to fan size.
-   N3 , \field Supply Air Flow Rate When No Cooling or Heating is Needed
+   N3 , \field No Load Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum 0
@@ -32176,21 +32334,21 @@ ZoneHVAC:WaterToAirHeatPump,
         \note is used when no heating or cooling is required and the DX coil compressor is off.
         \note If this field is left blank or zero, the supply air flow rate from the previous on cycle
         \note (either cooling or heating) is used.
-   N4 , \field Outdoor Air Flow Rate During Cooling Operation
+   N4 , \field Cooling Outdoor Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum 0
         \autosizable
         \note Must be less than or equal to supply air flow rate during cooling operation.
-   N5 , \field Outdoor Air Flow Rate During Heating Operation
+   N5 , \field Heating Outdoor Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum 0
         \autosizable
         \note Must be less than or equal to supply air flow rate during heating operation.
-   N6 , \field Outdoor Air Flow Rate When No Cooling or Heating is Needed
+   N6 , \field No Load Outdoor Air Flow Rate
         \type real
         \units m3/s
         \minimum 0
@@ -33107,37 +33265,37 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
         \required-field
         \type node
         \note the outlet node of the terminal unit
-  N1 ,  \field Supply Air Flow Rate During Cooling Operation
+  N1 ,  \field Cooling Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
-  N2 ,  \field Supply Air Flow Rate When No Cooling is Needed
+  N2 ,  \field No Cooling Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
         \autosizable
-  N3 ,  \field Supply Air Flow Rate During Heating Operation
+  N3 ,  \field Heating Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
-  N4 ,  \field Supply Air Flow Rate When No Heating is Needed
+  N4 ,  \field No Heating Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
         \autosizable
-  N5 ,  \field Outdoor Air Flow Rate During Cooling Operation
+  N5 ,  \field Cooling Outdoor Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
         \autosizable
-  N6 ,  \field Outdoor Air Flow Rate During Heating Operation
+  N6 ,  \field Heating Outdoor Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
         \autosizable
-  N7 ,  \field Outdoor Air Flow Rate When No Cooling or Heating is Needed
+  N7 ,  \field No Load Outdoor Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
@@ -35688,7 +35846,8 @@ ZoneHVAC:LowTemperatureRadiant:VariableFlow,
         \note For a system with multiple surfaces, enter the name of
         \note a ZoneHVAC:LowTemperatureRadiant:SurfaceGroup object.
         \type object-list
-        \object-list RadGroupAndSurfNames
+        \object-list RadiantSurfaceNames
+        \object-list RadiantGroupNames
    N1 , \field Hydronic Tubing Inside Diameter
         \units m
         \minimum> 0
@@ -35845,7 +36004,8 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
         \note For a system with multiple surfaces, enter the name of
         \note a ZoneHVAC:LowTemperatureRadiant:SurfaceGroup object.
         \type object-list
-        \object-list RadGroupAndSurfNames
+        \object-list RadiantSurfaceNames
+        \object-list RadiantGroupNames
    N1 , \field Hydronic Tubing Inside Diameter
         \units m
         \minimum> 0
@@ -35854,6 +36014,7 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
         \note Total length of pipe embedded in surface
         \units m
         \minimum> 0
+        \autosizable
    A5 , \field Temperature Control Type
         \note Temperature used to control system
         \type choice
@@ -35865,6 +36026,7 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
         \default MeanAirTemperature
    N3 , \field Rated Flow Rate
         \units m3/s
+        \autosizable
    A6 , \field Pump Flow Rate Schedule Name
         \note Modifies the Rated Flow Rate of the pump on a time basis
         \note the default is that the pump is ON and runs according to its other
@@ -35969,7 +36131,8 @@ ZoneHVAC:LowTemperatureRadiant:Electric,
         \note For a system with multiple surfaces, enter the name of
         \note a ZoneHVAC:LowTemperatureRadiant:SurfaceGroup object.
         \type object-list
-        \object-list RadGroupAndSurfNames
+        \object-list RadiantSurfaceNames
+        \object-list RadiantGroupNames
    A5 , \field Heating Design Capacity Method
         \required-field
         \type choice
@@ -36030,508 +36193,508 @@ ZoneHVAC:LowTemperatureRadiant:SurfaceGroup,
    A1 , \field Name
         \required-field
         \type alpha
-        \reference RadGroupAndSurfNames
+        \reference RadiantGroupNames
    A2 , \field Surface 1 Name
         \begin-extensible
         \required-field
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
    N1 , \field Flow Fraction for Surface 1
         \required-field
         \minimum 0.0
    A3 , \field Surface 2 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
    N2 , \field Flow Fraction for Surface 2
         \minimum 0.0
    A4 , \field Surface 3 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
    N3 , \field Flow Fraction for Surface 3
         \minimum 0.0
    A5 , \field Surface 4 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
    N4 , \field Flow Fraction for Surface 4
         \minimum 0.0
    A6 , \field Surface 5 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
    N5 , \field Flow Fraction for Surface 5
         \minimum 0.0
    A7 , \field Surface 6 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
    N6 , \field Flow Fraction for Surface 6
         \minimum 0.0
    A8 , \field Surface 7 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
    N7 , \field Flow Fraction for Surface 7
         \minimum 0.0
    A9 , \field Surface 8 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
    N8 , \field Flow Fraction for Surface 8
         \minimum 0.0
   A10 , \field Surface 9 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
    N9 , \field Flow Fraction for Surface 9
         \minimum 0.0
   A11 , \field Surface 10 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N10 , \field Flow Fraction for Surface 10
         \minimum 0.0
   A12 , \field Surface 11 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N11 , \field Flow Fraction for Surface 11
         \minimum 0.0
   A13 , \field Surface 12 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N12 , \field Flow Fraction for Surface 12
         \minimum 0.0
   A14 , \field Surface 13 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N13 , \field Flow Fraction for Surface 13
         \minimum 0.0
   A15 , \field Surface 14 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N14 , \field Flow Fraction for Surface 14
         \minimum 0.0
   A16 , \field Surface 15 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N15 , \field Flow Fraction for Surface 15
         \minimum 0.0
   A17 , \field Surface 16 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N16 , \field Flow Fraction for Surface 16
         \minimum 0.0
   A18 , \field Surface 17 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N17 , \field Flow Fraction for Surface 17
         \minimum 0.0
   A19 , \field Surface 18 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N18 , \field Flow Fraction for Surface 18
         \minimum 0.0
   A20 , \field Surface 19 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N19 , \field Flow Fraction for Surface 19
         \minimum 0.0
   A21 , \field Surface 20 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N20 , \field Flow Fraction for Surface 20
         \minimum 0.0
   A22 , \field Surface 21 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N21 , \field Flow Fraction for Surface 21
         \minimum 0.0
   A23 , \field Surface 22 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N22 , \field Flow Fraction for Surface 22
         \minimum 0.0
   A24 , \field Surface 23 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N23 , \field Flow Fraction for Surface 23
         \minimum 0.0
   A25 , \field Surface 24 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N24 , \field Flow Fraction for Surface 24
         \minimum 0.0
   A26 , \field Surface 25 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N25 , \field Flow Fraction for Surface 25
         \minimum 0.0
   A27 , \field Surface 26 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N26 , \field Flow Fraction for Surface 26
         \minimum 0.0
   A28 , \field Surface 27 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N27 , \field Flow Fraction for Surface 27
         \minimum 0.0
   A29 , \field Surface 28 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N28 , \field Flow Fraction for Surface 28
         \minimum 0.0
   A30 , \field Surface 29 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N29 , \field Flow Fraction for Surface 29
         \minimum 0.0
   A31 , \field Surface 30 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N30 , \field Flow Fraction for Surface 30
         \minimum 0.0
   A32 , \field Surface 31 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N31 , \field Flow Fraction for Surface 31
         \minimum 0.0
   A33 , \field Surface 32 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N32 , \field Flow Fraction for Surface 32
         \minimum 0.0
   A34 , \field Surface 33 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N33 , \field Flow Fraction for Surface 33
         \minimum 0.0
   A35 , \field Surface 34 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N34 , \field Flow Fraction for Surface 34
         \minimum 0.0
   A36 , \field Surface 35 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N35 , \field Flow Fraction for Surface 35
         \minimum 0.0
   A37 , \field Surface 36 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N36 , \field Flow Fraction for Surface 36
         \minimum 0.0
   A38 , \field Surface 37 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N37 , \field Flow Fraction for Surface 37
         \minimum 0.0
   A39 , \field Surface 38 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N38 , \field Flow Fraction for Surface 38
         \minimum 0.0
   A40 , \field Surface 39 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N39 , \field Flow Fraction for Surface 39
         \minimum 0.0
   A41 , \field Surface 40 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N40 , \field Flow Fraction for Surface 40
         \minimum 0.0
   A42 , \field Surface 41 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N41 , \field Flow Fraction for Surface 41
         \minimum 0.0
   A43 , \field Surface 42 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N42 , \field Flow Fraction for Surface 42
         \minimum 0.0
   A44 , \field Surface 43 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N43 , \field Flow Fraction for Surface 43
         \minimum 0.0
   A45 , \field Surface 44 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N44 , \field Flow Fraction for Surface 44
         \minimum 0.0
   A46 , \field Surface 45 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N45 , \field Flow Fraction for Surface 45
         \minimum 0.0
   A47 , \field Surface 46 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N46 , \field Flow Fraction for Surface 46
         \minimum 0.0
   A48 , \field Surface 47 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N47 , \field Flow Fraction for Surface 47
         \minimum 0.0
   A49 , \field Surface 48 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N48 , \field Flow Fraction for Surface 48
         \minimum 0.0
   A50 , \field Surface 49 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N49 , \field Flow Fraction for Surface 49
         \minimum 0.0
   A51 , \field Surface 50 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N50 , \field Flow Fraction for Surface 50
         \minimum 0.0
   A52 , \field Surface 51 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N51 , \field Flow Fraction for Surface 51
         \minimum 0.0
   A53 , \field Surface 52 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N52 , \field Flow Fraction for Surface 52
         \minimum 0.0
   A54 , \field Surface 53 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N53 , \field Flow Fraction for Surface 53
         \minimum 0.0
   A55 , \field Surface 54 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N54 , \field Flow Fraction for Surface 54
         \minimum 0.0
   A56 , \field Surface 55 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N55 , \field Flow Fraction for Surface 55
         \minimum 0.0
   A57 , \field Surface 56 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N56 , \field Flow Fraction for Surface 56
         \minimum 0.0
   A58 , \field Surface 57 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N57 , \field Flow Fraction for Surface 57
         \minimum 0.0
   A59 , \field Surface 58 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N58 , \field Flow Fraction for Surface 58
         \minimum 0.0
   A60 , \field Surface 59 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N59 , \field Flow Fraction for Surface 59
         \minimum 0.0
   A61 , \field Surface 60 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N60 , \field Flow Fraction for Surface 60
         \minimum 0.0
   A62 , \field Surface 61 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N61 , \field Flow Fraction for Surface 61
         \minimum 0.0
   A63 , \field Surface 62 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N62 , \field Flow Fraction for Surface 62
         \minimum 0.0
   A64 , \field Surface 63 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N63 , \field Flow Fraction for Surface 63
         \minimum 0.0
   A65 , \field Surface 64 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N64 , \field Flow Fraction for Surface 64
         \minimum 0.0
   A66 , \field Surface 65 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N65 , \field Flow Fraction for Surface 65
         \minimum 0.0
   A67 , \field Surface 66 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N66 , \field Flow Fraction for Surface 66
         \minimum 0.0
   A68 , \field Surface 67 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N67 , \field Flow Fraction for Surface 67
         \minimum 0.0
   A69 , \field Surface 68 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N68 , \field Flow Fraction for Surface 68
         \minimum 0.0
   A70 , \field Surface 69 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N69 , \field Flow Fraction for Surface 69
         \minimum 0.0
   A71 , \field Surface 70 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N70 , \field Flow Fraction for Surface 70
         \minimum 0.0
   A72 , \field Surface 71 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N71 , \field Flow Fraction for Surface 71
         \minimum 0.0
   A73 , \field Surface 72 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N72 , \field Flow Fraction for Surface 72
         \minimum 0.0
   A74 , \field Surface 73 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N73 , \field Flow Fraction for Surface 73
         \minimum 0.0
   A75 , \field Surface 74 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N74 , \field Flow Fraction for Surface 74
         \minimum 0.0
   A76 , \field Surface 75 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N75 , \field Flow Fraction for Surface 75
         \minimum 0.0
   A77 , \field Surface 76 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N76 , \field Flow Fraction for Surface 76
         \minimum 0.0
   A78 , \field Surface 77 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N77 , \field Flow Fraction for Surface 77
         \minimum 0.0
   A79 , \field Surface 78 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N78 , \field Flow Fraction for Surface 78
         \minimum 0.0
   A80 , \field Surface 79 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N79 , \field Flow Fraction for Surface 79
         \minimum 0.0
   A81 , \field Surface 80 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N80 , \field Flow Fraction for Surface 80
         \minimum 0.0
   A82 , \field Surface 81 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N81 , \field Flow Fraction for Surface 81
         \minimum 0.0
   A83 , \field Surface 82 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N82 , \field Flow Fraction for Surface 82
         \minimum 0.0
   A84 , \field Surface 83 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N83 , \field Flow Fraction for Surface 83
         \minimum 0.0
   A85 , \field Surface 84 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N84 , \field Flow Fraction for Surface 84
         \minimum 0.0
   A86 , \field Surface 85 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N85 , \field Flow Fraction for Surface 85
         \minimum 0.0
   A87 , \field Surface 86 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N86 , \field Flow Fraction for Surface 86
         \minimum 0.0
   A88 , \field Surface 87 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N87 , \field Flow Fraction for Surface 87
         \minimum 0.0
   A89 , \field Surface 88 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N88 , \field Flow Fraction for Surface 88
         \minimum 0.0
   A90 , \field Surface 89 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N89 , \field Flow Fraction for Surface 89
         \minimum 0.0
   A91 , \field Surface 90 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N90 , \field Flow Fraction for Surface 90
         \minimum 0.0
   A92 , \field Surface 91 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N91 , \field Flow Fraction for Surface 91
         \minimum 0.0
   A93 , \field Surface 92 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N92 , \field Flow Fraction for Surface 92
         \minimum 0.0
   A94 , \field Surface 93 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N93 , \field Flow Fraction for Surface 93
         \minimum 0.0
   A95 , \field Surface 94 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N94 , \field Flow Fraction for Surface 94
         \minimum 0.0
   A96 , \field Surface 95 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N95 , \field Flow Fraction for Surface 95
         \minimum 0.0
   A97 , \field Surface 96 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N96 , \field Flow Fraction for Surface 96
         \minimum 0.0
   A98 , \field Surface 97 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N97 , \field Flow Fraction for Surface 97
         \minimum 0.0
   A99 , \field Surface 98 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N98 , \field Flow Fraction for Surface 98
         \minimum 0.0
  A100 , \field Surface 99 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
   N99 , \field Flow Fraction for Surface 99
         \minimum 0.0
  A101 , \field Surface 100 Name
         \type object-list
-        \object-list SurfaceNames
+        \object-list RadiantSurfaceNames
  N100 ; \field Flow Fraction for Surface 100
         \minimum 0.0
 
@@ -37258,7 +37421,8 @@ ZoneHVAC:VentilatedSlab,
    A4 ,\field Surface Name or Radiant Surface Group Name
        \note (name of surface system is embedded in) or list of surfaces
        \type object-list
-       \object-list RadGroupAndSurfNames
+       \object-list RadiantSurfaceNames
+       \object-list VentSlabGroupNames
    N1, \field Maximum Air Flow Rate
        \required-field
        \units m3/s
@@ -37448,7 +37612,7 @@ ZoneHVAC:VentilatedSlab:SlabGroup,
    A1 , \field Name
          \required-field
          \type alpha
-         \reference RadGroupAndSurfNames
+         \reference VentSlabGroupNames
    A2  , \field Zone 1 Name
          \begin-extensible
          \required-field
@@ -37457,7 +37621,7 @@ ZoneHVAC:VentilatedSlab:SlabGroup,
    A3  , \field Surface 1 Name
          \required-field
          \type object-list
-         \object-list SurfaceNames
+         \object-list RadiantSurfaceNames
    N1  , \field Core Diameter for Surface 1
          \required-field
          \minimum 0.0
@@ -37482,7 +37646,7 @@ ZoneHVAC:VentilatedSlab:SlabGroup,
          \object-list ZoneNames
    A7  , \field Surface 2 Name
          \type object-list
-         \object-list SurfaceNames
+         \object-list RadiantSurfaceNames
    N4  , \field Core Diameter for Surface 2
          \type real
          \units m
@@ -37502,7 +37666,7 @@ ZoneHVAC:VentilatedSlab:SlabGroup,
          \object-list ZoneNames
    A11  , \field Surface 3 Name
          \type object-list
-         \object-list SurfaceNames
+         \object-list RadiantSurfaceNames
    N7  , \field Core Diameter for Surface 3
          \type real
          \units m
@@ -37522,7 +37686,7 @@ ZoneHVAC:VentilatedSlab:SlabGroup,
          \object-list ZoneNames
    A15  , \field Surface 4 Name
          \type object-list
-         \object-list SurfaceNames
+         \object-list RadiantSurfaceNames
    N10  , \field Core Diameter for Surface 4
          \type real
          \units m
@@ -37542,7 +37706,7 @@ ZoneHVAC:VentilatedSlab:SlabGroup,
          \object-list ZoneNames
    A19  , \field Surface 5 Name
          \type object-list
-         \object-list SurfaceNames
+         \object-list RadiantSurfaceNames
    N13  , \field Core Diameter for Surface 5
          \type real
          \units m
@@ -37562,7 +37726,7 @@ ZoneHVAC:VentilatedSlab:SlabGroup,
          \object-list ZoneNames
    A23  , \field Surface 6 Name
          \type object-list
-         \object-list SurfaceNames
+         \object-list RadiantSurfaceNames
    N16  , \field Core Diameter for Surface 6
          \type real
          \units m
@@ -37582,7 +37746,7 @@ ZoneHVAC:VentilatedSlab:SlabGroup,
          \object-list ZoneNames
    A27  , \field Surface 7 Name
          \type object-list
-         \object-list SurfaceNames
+         \object-list RadiantSurfaceNames
    N19  , \field Core Diameter for Surface 7
          \type real
          \units m
@@ -37602,7 +37766,7 @@ ZoneHVAC:VentilatedSlab:SlabGroup,
          \object-list ZoneNames
    A31  , \field Surface 8 Name
          \type object-list
-         \object-list SurfaceNames
+         \object-list RadiantSurfaceNames
    N22  , \field Core Diameter for Surface 8
          \type real
          \units m
@@ -37622,7 +37786,7 @@ ZoneHVAC:VentilatedSlab:SlabGroup,
          \object-list ZoneNames
    A35  , \field Surface 9 Name
          \type object-list
-         \object-list SurfaceNames
+         \object-list RadiantSurfaceNames
    N25  , \field Core Diameter for Surface 9
          \type real
          \units m
@@ -37642,7 +37806,7 @@ ZoneHVAC:VentilatedSlab:SlabGroup,
          \object-list ZoneNames
    A39  , \field Surface 10 Name
          \type object-list
-         \object-list SurfaceNames
+         \object-list RadiantSurfaceNames
    N28  , \field Core Diameter for Surface 10
          \type real
          \units m
@@ -47889,6 +48053,7 @@ Humidifier:Steam:Electric,
       \units m3/s
       \minimum 0.0
       \ip-units gal/min
+      \autosizable
   N2, \field Rated Power
       \type real
       \units W
@@ -48889,7 +49054,7 @@ AirLoopHVAC:UnitarySystem,
        \object-list HeatingCoilsDesuperheater
        \note Enter the name of the supplemental heating coil if included in the unitary system.
        \note Only required if dehumidification control type is "CoolReheat".
-  A20, \field Supply Air Flow Rate Method During Cooling Operation
+  A20, \field Cooling Supply Air Flow Rate Method
        \type choice
        \key None
        \key SupplyAirFlowRate
@@ -48905,35 +49070,35 @@ AirLoopHVAC:UnitarySystem,
        \note value determined by the simulation.
        \note FlowPerCoolingCapacity is selected when the supply air volume is a fraction of the cooling
        \note capacity as determined by the simulation.
-  N3 , \field Supply Air Flow Rate During Cooling Operation
+  N3 , \field Cooling Supply Air Flow Rate
        \type real
        \units m3/s
        \minimum 0.0
        \autosizable
        \note Enter the magnitude of the supply air volume flow rate during cooling operation.
-       \note Required field when Supply air Flow Rate Method During Cooling Operation is SupplyAirFlowRate.
+       \note Required field when Cooling Supply Air Flow Rate Method is SupplyAirFlowRate.
        \note This field may be blank if a cooling coil is not included in the unitary system.
-  N4 , \field Supply Air Flow Rate Per Floor Area During Cooling Operation
+  N4 , \field Cooling Supply Air Flow Rate Per Floor Area
        \type real
        \units m3/s-m2
        \minimum 0.0
        \note Enter the supply air volume flow rate per total floor area fraction.
-       \note Required field when Supply air Flow Rate Method During Cooling Operation is FlowPerFloorArea.
+       \note Required field when Cooling Supply Air Flow Rate Method is FlowPerFloorArea.
        \note This field may be blank if a cooling coil is not included in the unitary system.
-  N5 , \field Fraction of Autosized Design Cooling Supply Air Flow Rate
+  N5 , \field Cooling Fraction of Autosized Cooling Supply Air Flow Rate
        \type real
        \minimum 0.0
        \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
-       \note Required field when Supply air Flow Rate Method During Cooling Operation is FractionOfAutosizedCoolingValue.
+       \note Required field when Cooling Supply Air Flow Rate Method is FractionOfAutosizedCoolingValue.
        \note This field may be blank if a cooling coil is not included in the unitary system.
-  N6 , \field Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation
+  N6 , \field Cooling Supply Air Flow Rate Per Unit of Capacity
        \type real
        \units m3/s-W
        \minimum 0.0
        \note Enter the supply air volume flow rate as a fraction of the cooling capacity.
-       \note Required field when Supply air Flow Rate Method During Cooling Operation is FlowPerCoolingCapacity.
+       \note Required field when Cooling Supply Air Flow Rate Method is FlowPerCoolingCapacity.
        \note This field may be blank if a cooling coil is not included in the unitary system.
-  A21, \field Supply air Flow Rate Method During Heating Operation
+  A21, \field Heating Supply Air Flow Rate Method
        \type choice
        \key None
        \key SupplyAirFlowRate
@@ -48949,35 +49114,35 @@ AirLoopHVAC:UnitarySystem,
        \note value determined by the simulation.
        \note FlowPerHeatingCapacity is selected when the supply air volume is a fraction of the heating
        \note capacity as determined by the simulation.
-  N7 , \field Supply Air Flow Rate During Heating Operation
+  N7 , \field Heating Supply Air Flow Rate
        \type real
        \units m3/s
        \minimum 0.0
        \autosizable
        \note Enter the magnitude of the supply air volume flow rate during heating operation.
-       \note Required field when Supply air Flow Rate Method During Heating Operation is SupplyAirFlowRate.
+       \note Required field when Heating Supply Air Flow Rate Method is SupplyAirFlowRate.
        \note This field may be blank if a heating coil is not included in the unitary system.
-  N8 , \field Supply Air Flow Rate Per Floor Area during Heating Operation
+  N8 , \field Heating Supply Air Flow Rate Per Floor Area
        \type real
        \units m3/s-m2
        \minimum 0.0
        \note Enter the supply air volume flow rate per total floor area fraction.
-       \note Required field when Supply air Flow Rate Method During Heating Operation is FlowPerFloorArea.
+       \note Required field when Heating Supply Air Flow Rate Method is FlowPerFloorArea.
        \note This field may be blank if a heating coil is not included in the unitary system.
-  N9 , \field Fraction of Autosized Design Heating Supply Air Flow Rate
+  N9 , \field Heating Fraction of Autosized Heating Supply Air Flow Rate
        \type real
        \minimum 0.0
        \note Enter the supply air volume flow rate as a fraction of the heating supply air flow rate.
-       \note Required field when Supply air Flow Rate Method During Heating Operation is FractionOfAutosizedHeatingValue.
+       \note Required field when Heating Supply Air Flow Rate Method is FractionOfAutosizedHeatingValue.
        \note This field may be blank if a heating coil is not included in the unitary system.
-  N10, \field Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation
+  N10, \field Heating Supply Air Flow Rate Per Unit of Capacity
        \type real
        \units m3/s-W
        \minimum 0.0
        \note Enter the supply air volume flow rate as a fraction of the heating capacity.
-       \note Required field when Supply air Flow Rate Method During Heating Operation is FlowPerHeatingCapacity.
+       \note Required field when Heating Supply Air Flow Rate Method is FlowPerHeatingCapacity.
        \note This field may be blank if a heating coil is not included in the unitary system.
-  A22, \field Supply Air Flow Rate Method When No Cooling or Heating is Required
+  A22, \field No Load Supply Air Flow Rate Method
        \type choice
        \key None
        \key SupplyAirFlowRate
@@ -48987,7 +49152,7 @@ AirLoopHVAC:UnitarySystem,
        \key FlowPerCoolingCapacity
        \key FlowPerHeatingCapacity
        \note Enter the method used to determine the supply air volume flow rate when no cooling or heating is required.
-       \note None is used when a heating coil is not included in the unitary system or this field may be blank.
+       \note None is used when a cooling and heating coil is not included in the unitary system or this field may be blank.
        \note SupplyAirFlowRate is selected when the magnitude of the supply air volume is used.
        \note FlowPerFloorArea is selected when the supply air volume flow rate is based on total floor area
        \note served by the unitary system.
@@ -48999,41 +49164,41 @@ AirLoopHVAC:UnitarySystem,
        \note capacity as determined by the simulation.
        \note FlowPerHeatingCapacity is selected when the supply air volume is a fraction of the heating
        \note capacity as determined by the simulation.
-  N11, \field Supply Air Flow Rate When No Cooling or Heating is Required
+  N11, \field No Load Supply Air Flow Rate
        \type real
        \units m3/s
        \minimum 0.0
        \autosizable
        \note Enter the magnitude of the supply air volume flow rate during when no cooling or heating is required.
-       \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required is SupplyAirFlowRate.
-  N12, \field Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required
+       \note Required field when No Load Supply Air Flow Rate Method is SupplyAirFlowRate.
+  N12, \field No Load Supply Air Flow Rate Per Floor Area
        \type real
        \units m3/s-m2
        \minimum 0.0
        \note Enter the supply air volume flow rate per total floor area fraction.
-       \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required is FlowPerFloorArea.
-  N13, \field Fraction of Autosized Design Cooling Supply Air Flow Rate
+       \note Required field when No Load Supply Air Flow Rate Method is FlowPerFloorArea.
+  N13, \field No Load Fraction of Autosized Cooling Supply Air Flow Rate
        \type real
        \minimum 0.0
        \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
-       \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required is FractionOfAutosizedCoolingValue.
-  N14, \field Fraction of Autosized Design Heating Supply Air Flow Rate
+       \note Required field when No Load Supply Air Flow Rate Method is FractionOfAutosizedCoolingValue.
+  N14, \field No Load Fraction of Autosized Heating Supply Air Flow Rate
        \type real
        \minimum 0.0
        \note Enter the supply air volume flow rate as a fraction of the heating supply air flow rate.
-       \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required is FractionOfAutosizedHeatingValue.
-  N15, \field Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation
+       \note Required field when No Load Supply Air Flow Rate Method is FractionOfAutosizedHeatingValue.
+  N15, \field No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation
        \type real
        \units m3/s-W
        \minimum 0.0
        \note Enter the supply air volume flow rate as a fraction of the cooling capacity.
-       \note Required field when Supply air Flow Rate Method During Heating Operation is FlowPerCoolingCapacity.
-  N16, \field Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation
+       \note Required field when No Load Supply Air Flow Rate Method is FlowPerCoolingCapacity.
+  N16, \field No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation
        \type real
        \units m3/s-W
        \minimum 0.0
        \note Enter the supply air volume flow rate as a fraction of the heating capacity.
-       \note Required field when Supply air Flow Rate Method During Heating Operation is FlowPerHeatingCapacity.
+       \note Required field when No Load Supply Air Flow Rate Method is FlowPerHeatingCapacity.
   N17, \field Maximum Supply Air Temperature
        \type real
        \units C
@@ -49149,7 +49314,7 @@ UnitarySystemPerformance:HeatPump:Multispeed,
        \maximum 10
        \note Used only for Multi speed coils
        \note Enter the number of the following sets of data for air flow rates.
-  N3 , \field Speed 1 Supply Air Flow Ratio During Heating Operation
+  N3 , \field Heating Speed 1 Supply Air Flow Ratio
        \required-field
        \type real
        \autosizable
@@ -49159,7 +49324,7 @@ UnitarySystemPerformance:HeatPump:Multispeed,
        \note Enter the lowest operating supply air flow ratio during heating
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N4 , \field Speed 1 Supply Air Flow Ratio During Cooling Operation
+  N4 , \field Cooling Speed 1 Supply Air Flow Ratio
        \required-field
        \type real
        \autosizable
@@ -49168,7 +49333,7 @@ UnitarySystemPerformance:HeatPump:Multispeed,
        \note Enter the lowest operating supply air flow ratio during cooling
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N5 , \field Speed 2 Supply Air Flow Ratio During Heating Operation
+  N5 , \field Heating Speed 2 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -49176,7 +49341,7 @@ UnitarySystemPerformance:HeatPump:Multispeed,
        \note Enter the next highest operating supply air flow ratio during heating
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N6 , \field Speed 2 Supply Air Flow Ratio During Cooling Operation
+  N6 , \field Cooling Speed 2 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -49184,7 +49349,7 @@ UnitarySystemPerformance:HeatPump:Multispeed,
        \note Enter the next highest operating supply air flow ratio during cooling
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N7 , \field Speed 3 Supply Air Flow Ratio During Heating Operation
+  N7 , \field Heating Speed 3 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -49192,7 +49357,7 @@ UnitarySystemPerformance:HeatPump:Multispeed,
        \note Enter the next highest operating supply air flow ratio during heating
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N8 , \field Speed 3 Supply Air Flow Ratio During Cooling Operation
+  N8 , \field Cooling Speed 3 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -49200,7 +49365,7 @@ UnitarySystemPerformance:HeatPump:Multispeed,
        \note Enter the next highest operating supply air flow ratio during cooling
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N9 , \field Speed 4 Supply Air Flow Ratio During Heating Operation
+  N9 , \field Heating Speed 4 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -49208,7 +49373,7 @@ UnitarySystemPerformance:HeatPump:Multispeed,
        \note Enter the next highest operating supply air flow ratio during heating
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N10; \field Speed 4 Supply Air Flow Ratio During Cooling Operation
+  N10; \field Cooling Speed 4 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -49250,7 +49415,7 @@ AirLoopHVAC:Unitary:Furnace:HeatOnly,
         \units C
         \autosizable
         \default 80.0
-   N2,  \field Supply Air Flow Rate
+   N2,  \field Heating Supply Air Flow Rate
         \required-field
         \type real
         \note  This value should be > 0 and <= than the fan air flow rate.
@@ -49328,21 +49493,21 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
         \units C
         \autosizable
         \default 80.0
-   N2,  \field Supply Air Flow Rate During Cooling Operation
+   N2,  \field Cooling Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to the fan's maximum flow rate.
-   N3,  \field Supply Air Flow Rate During Heating Operation
+   N3,  \field Heating Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to the fan's maximum flow fate.
-   N4,  \field Supply Air Flow Rate When No Cooling or Heating is Needed
+   N4,  \field No Load Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
@@ -49459,7 +49624,7 @@ AirLoopHVAC:UnitaryHeatOnly,
         \units C
         \autosizable
         \default 80.0
-   N2,  \field Supply Air Flow Rate
+   N2,  \field Heating Supply Air Flow Rate
         \required-field
         \type real
         \note  This value should be > 0 and <= than the fan air flow rate.
@@ -49534,21 +49699,21 @@ AirLoopHVAC:UnitaryHeatCool,
         \units C
         \autosizable
         \default 80.0
-   N2,  \field Supply Air Flow Rate During Cooling Operation
+   N2,  \field Cooling Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to the fan's maximum flow rate.
-   N3,  \field Supply Air Flow Rate During Heating Operation
+   N3,  \field Heating Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to the fan's maximum flow rate.
-   N4,  \field Supply Air Flow Rate When No Cooling or Heating is Needed
+   N4,  \field No Load Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum 0
@@ -49657,21 +49822,21 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
    A4,  \field Air Outlet Node Name
         \required-field
         \type node
-   N1,  \field Supply Air Flow Rate During Cooling Operation
+   N1,  \field Cooling Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to the fan's maximum flow rate.
-   N2,  \field Supply Air Flow Rate During Heating Operation
+   N2,  \field Heating Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to the fan's maximum flow rate.
-   N3,  \field Supply Air Flow Rate When No Cooling or Heating is Needed
+   N3,  \field No Load Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
@@ -49963,7 +50128,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \object-list ScheduleNames
         \note Enter the availability schedule name. Schedule values of zero denote system
         \note is Off. Non-zero schedule values denote system is available to operate.
-   N1 , \field System Air Flow Rate During Cooling Operation
+   N1 , \field Cooling Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
@@ -49971,7 +50136,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \minimum> 0.0
         \note Enter the system air flow rate during cooling
         \note operation or specify autosize.
-   N2 , \field System Air Flow Rate During Heating Operation
+   N2 , \field Heating Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
@@ -49979,7 +50144,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \minimum> 0.0
         \note Enter the system air flow rate during heating
         \note operation or specify autosize.
-   N3 , \field System Air Flow Rate When No Cooling or Heating is Needed
+   N3 , \field No Load Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
@@ -49989,7 +50154,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \note is used when no heating or cooling is required and the coils are off.
         \note If this field is left blank or zero, the system air flow rate from the
         \note previous on cycle (either cooling or heating) is used.
-   N4 , \field Outdoor Air Flow Rate During Cooling Operation
+   N4 , \field Cooling Outdoor Air Flow Rate
         \required-field
         \type real
         \units m3/s
@@ -49997,7 +50162,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \minimum 0.0
         \note Enter the outdoor air flow rate during
         \note cooling operation or specify autosize.
-   N5 , \field Outdoor Air Flow Rate During Heating Operation
+   N5 , \field Heating Outdoor Air Flow Rate
         \required-field
         \type real
         \units m3/s
@@ -50005,7 +50170,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \minimum 0.0
         \note Enter the outdoor air flow rate during
         \note heating operation or specify autosize.
-   N6 , \field Outdoor Air Flow Rate When No Cooling or Heating is Needed
+   N6 , \field No Load Outdoor Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
@@ -50284,7 +50449,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
         \type node
    A17, \field Heat Recovery Water Outlet Node Name
         \type node
-   N8 , \field Supply Air Flow Rate When No Cooling or Heating is Needed
+   N8 , \field No Load Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum 0
@@ -50308,7 +50473,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
         \minimum 2
         \maximum 4
         \note Enter the number of the following sets of data for air flow rates.
-   N11, \field Speed 1 Supply Air Flow Rate During Heating Operation
+   N11, \field Heating Speed 1 Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
@@ -50316,28 +50481,28 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
         \minimum> 0
         \note Enter the operating supply air flow rate during heating
         \note operation or specify autosize.
-   N12, \field Speed 2 Supply Air Flow Rate During Heating Operation
+   N12, \field Heating Speed 2 Supply Air Flow Rate
         \type real
         \units m3/s
         \autosizable
         \minimum> 0
         \note Enter the operating supply air flow rate during heating
         \note operation or specify autosize.
-   N13, \field Speed 3 Supply Air Flow Rate During Heating Operation
+   N13, \field Heating Speed 3 Supply Air Flow Rate
         \type real
         \units m3/s
         \autosizable
         \minimum> 0
         \note Enter the operating supply air flow rate during heating
         \note operation or specify autosize.
-   N14, \field Speed 4 Supply Air Flow Rate During Heating Operation
+   N14, \field Heating Speed 4 Supply Air Flow Rate
         \type real
         \units m3/s
         \autosizable
         \minimum> 0
         \note Enter the operating supply air flow rate during heating
         \note operation or specify autosize.
-   N15, \field Speed 1 Supply Air Flow Rate During Cooling Operation
+   N15, \field Cooling Speed 1 Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
@@ -50345,7 +50510,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
         \minimum> 0
         \note Enter the operating supply air flow rate during cooling
         \note operation or specify autosize.
-   N16, \field Speed 2 Supply Air Flow Rate During Cooling Operation
+   N16, \field Cooling Speed 2 Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
@@ -50353,14 +50518,14 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
         \minimum> 0
         \note Enter the operating supply air flow rate during cooling
         \note operation or specify autosize.
-   N17, \field Speed 3 Supply Air Flow Rate During Cooling Operation
+   N17, \field Cooling Speed 3 Supply Air Flow Rate
         \type real
         \units m3/s
         \autosizable
         \minimum> 0
         \note Enter the operating supply air flow rate during cooling
         \note operation or specify autosize.
-   N18; \field Speed 4 Supply Air Flow Rate During Cooling Operation
+   N18; \field Cooling Speed 4 Supply Air Flow Rate
         \type real
         \units m3/s
         \autosizable
@@ -58779,7 +58944,7 @@ DistrictCooling,
        \required-field
        \type node
   N1 , \field Nominal Capacity
-       \required-field
+       \autosizable
        \units W
        \minimum 0.0
   A4 ; \field Capacity Fraction Schedule Name
@@ -58798,7 +58963,7 @@ DistrictHeating,
        \required-field
        \type node
   N1 , \field Nominal Capacity
-       \required-field
+       \autosizable
        \units W
        \minimum 0.0
   A4 ; \field Capacity Fraction Schedule Name
@@ -61276,13 +61441,13 @@ FluidCooler:TwoSpeed,
        \type node
 
 GroundHeatExchanger:Vertical,
- \min-fields 21
+ \min-fields 20
  \memo Variable short time step vertical ground heat exchanger model based on
  \memo Yavuztruk, C., J.D.Spitler. 1999. A Short Time Step response Factor Model for
  \memo Vertical Ground Loop Heat Exchangers
  \memo The Fluid Type in the associated condenser loop must be same for which the
  \memo g-functions below are calculated.
-  A1,  \field Name
+  A1,   \field Name
         \required-field
   A2,   \field Inlet Node Name
         \required-field
@@ -61290,7 +61455,7 @@ GroundHeatExchanger:Vertical,
   A3,   \field Outlet Node Name
         \required-field
         \type node
-  N1,   \field Maximum Flow Rate
+  N1,   \field Design Flow Rate
         \units m3/s
         \minimum> 0.0
         \ip-units gal/min
@@ -61311,439 +61476,436 @@ GroundHeatExchanger:Vertical,
   N7,   \field Ground Temperature
         \units C
         \minimum> 0.0
-  N8,   \field Design Flow Rate
-        \units m3/s
-        \minimum> 0.0
         \ip-units gal/min
-  N9,   \field Grout Thermal Conductivity
+  N8,   \field Grout Thermal Conductivity
         \units W/m-K
         \minimum> 0.0
-  N10,  \field Pipe Thermal Conductivity
+  N9,   \field Pipe Thermal Conductivity
         \units W/m-K
         \minimum> 0.0
-  N11,  \field Pipe Out Diameter
+  N10,  \field Pipe Out Diameter
         \units m
         \minimum> 0.0
         \ip-units in
-  N12,  \field U-Tube Distance
+  N11,  \field U-Tube Distance
         \units m
         \minimum> 0.0
-  N13,  \field Pipe Thickness
+  N12,  \field Pipe Thickness
         \units m
         \minimum> 0.0
         \ip-units in
-  N14,  \field Maximum Length of Simulation
+  N13,  \field Maximum Length of Simulation
         \minimum> 0.0
-  N15,  \field G-Function Reference Ratio
+  N14,  \field G-Function Reference Ratio
         \type real
         \units dimensionless
         \minimum> 0.0
         \default 0.0005
-  N16,  \field Number of Data Pairs of the G Function
+  N15,  \field Number of Data Pairs of the G Function
         \required-field
         \minimum> 0.0
         \maximum 100
-  N17, \field G-Function Ln(T/Ts) Value 1
-       \required-field
-       \type real
-  N18, \field G-Function G Value 1
-       \required-field
-       \type real
-  N19, \field G-Function Ln(T/Ts) Value 2
-       \type real
-  N20, \field G-Function G Value 2
-       \type real
-  N21, \field G-Function Ln(T/Ts) Value 3
-       \type real
-  N22, \field G-Function G Value 3
-       \type real
-  N23, \field G-Function Ln(T/Ts) Value 4
-       \type real
-  N24, \field G-Function G Value 4
-       \type real
-  N25, \field G-Function Ln(T/Ts) Value 5
-       \type real
-  N26, \field G-Function G Value 5
-       \type real
-  N27, \field G-Function Ln(T/Ts) Value 6
-       \type real
-  N28, \field G-Function G Value 6
-       \type real
-  N29, \field G-Function Ln(T/Ts) Value 7
-       \type real
-  N30, \field G-Function G Value 7
-       \type real
-  N31, \field G-Function Ln(T/Ts) Value 8
-       \type real
-  N32, \field G-Function G Value 8
-       \type real
-  N33, \field G-Function Ln(T/Ts) Value 9
-       \type real
-  N34, \field G-Function G Value 9
-       \type real
-  N35, \field G-Function Ln(T/Ts) Value 10
-       \type real
-  N36, \field G-Function G Value 10
-       \type real
-  N37, \field G-Function Ln(T/Ts) Value 11
-       \type real
-  N38, \field G-Function G Value 11
-       \type real
-  N39, \field G-Function Ln(T/Ts) Value 12
-       \type real
-  N40, \field G-Function G Value 12
-       \type real
-  N41, \field G-Function Ln(T/Ts) Value 13
-       \type real
-  N42, \field G-Function G Value 13
-       \type real
-  N43, \field G-Function Ln(T/Ts) Value 14
-       \type real
-  N44, \field G-Function G Value 14
-       \type real
-  N45, \field G-Function Ln(T/Ts) Value 15
-       \type real
-  N46, \field G-Function G Value 15
-       \type real
-  N47, \field G-Function Ln(T/Ts) Value 16
-       \type real
-  N48, \field G-Function G Value 16
-       \type real
-  N49, \field G-Function Ln(T/Ts) Value 17
-       \type real
-  N50, \field G-Function G Value 17
-       \type real
-  N51, \field G-Function Ln(T/Ts) Value 18
-       \type real
-  N52, \field G-Function G Value 18
-       \type real
-  N53, \field G-Function Ln(T/Ts) Value 19
-       \type real
-  N54, \field G-Function G Value 19
-       \type real
-  N55, \field G-Function Ln(T/Ts) Value 20
-       \type real
-  N56, \field G-Function G Value 20
-       \type real
-  N57, \field G-Function Ln(T/Ts) Value 21
-       \type real
-  N58, \field G-Function G Value 21
-       \type real
-  N59, \field G-Function Ln(T/Ts) Value 22
-       \type real
-  N60, \field G-Function G Value 22
-       \type real
-  N61, \field G-Function Ln(T/Ts) Value 23
-       \type real
-  N62, \field G-Function G Value 23
-       \type real
-  N63, \field G-Function Ln(T/Ts) Value 24
-       \type real
-  N64, \field G-Function G Value 24
-       \type real
-  N65, \field G-Function Ln(T/Ts) Value 25
-       \type real
-  N66, \field G-Function G Value 25
-       \type real
-  N67, \field G-Function Ln(T/Ts) Value 26
-       \type real
-  N68, \field G-Function G Value 26
-       \type real
-  N69, \field G-Function Ln(T/Ts) Value 27
-       \type real
-  N70, \field G-Function G Value 27
-       \type real
-  N71, \field G-Function Ln(T/Ts) Value 28
-       \type real
-  N72, \field G-Function G Value 28
-       \type real
-  N73, \field G-Function Ln(T/Ts) Value 29
-       \type real
-  N74, \field G-Function G Value 29
-       \type real
-  N75, \field G-Function Ln(T/Ts) Value 30
-       \type real
-  N76, \field G-Function G Value 30
-       \type real
-  N77, \field G-Function Ln(T/Ts) Value 31
-       \type real
-  N78, \field G-Function G Value 31
-       \type real
-  N79, \field G-Function Ln(T/Ts) Value 32
-       \type real
-  N80, \field G-Function G Value 32
-       \type real
-  N81, \field G-Function Ln(T/Ts) Value 33
-       \type real
-  N82, \field G-Function G Value 33
-       \type real
-  N83, \field G-Function Ln(T/Ts) Value 34
-       \type real
-  N84, \field G-Function G Value 34
-       \type real
-  N85, \field G-Function Ln(T/Ts) Value 35
-       \type real
-  N86, \field G-Function G Value 35
-       \type real
-  N87, \field G-Function Ln(T/Ts) Value 36
-       \type real
-  N88, \field G-Function G Value 36
-       \type real
-  N89, \field G-Function Ln(T/Ts) Value 37
-       \type real
-  N90, \field G-Function G Value 37
-       \type real
-  N91, \field G-Function Ln(T/Ts) Value 38
-       \type real
-  N92, \field G-Function G Value 38
-       \type real
-  N93, \field G-Function Ln(T/Ts) Value 39
-       \type real
-  N94, \field G-Function G Value 39
-       \type real
-  N95, \field G-Function Ln(T/Ts) Value 40
-       \type real
-  N96, \field G-Function G Value 40
-       \type real
-  N97, \field G-Function Ln(T/Ts) Value 41
+  N16,  \field G-Function Ln(T/Ts) Value 1
+        \required-field
         \type real
-  N98, \field G-Function G Value 41
+  N17,  \field G-Function G Value 1
+        \required-field
         \type real
-  N99, \field G-Function Ln(T/Ts) Value 42
+  N18,  \field G-Function Ln(T/Ts) Value 2
         \type real
-  N100, \field G-Function G Value 42
+  N19,  \field G-Function G Value 2
         \type real
-  N101, \field G-Function Ln(T/Ts) Value 43
+  N20,  \field G-Function Ln(T/Ts) Value 3
         \type real
-  N102, \field G-Function G Value 43
+  N21,  \field G-Function G Value 3
         \type real
-  N103, \field G-Function Ln(T/Ts) Value 44
+  N22,  \field G-Function Ln(T/Ts) Value 4
         \type real
-  N104, \field G-Function G Value 44
+  N23,  \field G-Function G Value 4
         \type real
-  N105, \field G-Function Ln(T/Ts) Value 45
+  N24,  \field G-Function Ln(T/Ts) Value 5
         \type real
-  N106, \field G-Function G Value 45
+  N25,  \field G-Function G Value 5
         \type real
-  N107, \field G-Function Ln(T/Ts) Value 46
+  N26,  \field G-Function Ln(T/Ts) Value 6
         \type real
-  N108, \field G-Function G Value 46
+  N27,  \field G-Function G Value 6
         \type real
-  N109, \field G-Function Ln(T/Ts) Value 47
+  N28,  \field G-Function Ln(T/Ts) Value 7
         \type real
-  N110, \field G-Function G Value 47
+  N29,  \field G-Function G Value 7
         \type real
-  N111, \field G-Function Ln(T/Ts) Value 48
+  N30,  \field G-Function Ln(T/Ts) Value 8
         \type real
-  N112, \field G-Function G Value 48
+  N31,  \field G-Function G Value 8
         \type real
-  N113, \field G-Function Ln(T/Ts) Value 49
+  N32,  \field G-Function Ln(T/Ts) Value 9
         \type real
-  N114, \field G-Function G Value 49
+  N33,  \field G-Function G Value 9
         \type real
-  N115, \field G-Function Ln(T/Ts) Value 50
+  N34,  \field G-Function Ln(T/Ts) Value 10
         \type real
-  N116, \field G-Function G Value 50
+  N35,  \field G-Function G Value 10
         \type real
-  N117, \field G-Function Ln(T/Ts) Value 51
+  N36,  \field G-Function Ln(T/Ts) Value 11
         \type real
-  N118, \field G-Function G Value 51
+  N37,  \field G-Function G Value 11
         \type real
-  N119, \field G-Function Ln(T/Ts) Value 52
+  N38,  \field G-Function Ln(T/Ts) Value 12
         \type real
-  N120, \field G-Function G Value 52
+  N39,  \field G-Function G Value 12
         \type real
-  N121, \field G-Function Ln(T/Ts) Value 53
+  N40,  \field G-Function Ln(T/Ts) Value 13
         \type real
-  N122, \field G-Function G Value 53
+  N41,  \field G-Function G Value 13
         \type real
-  N123, \field G-Function Ln(T/Ts) Value 54
+  N42,  \field G-Function Ln(T/Ts) Value 14
         \type real
-  N124, \field G-Function G Value 54
+  N43,  \field G-Function G Value 14
         \type real
-  N125, \field G-Function Ln(T/Ts) Value 55
+  N44,  \field G-Function Ln(T/Ts) Value 15
         \type real
-  N126, \field G-Function G Value 55
+  N45,  \field G-Function G Value 15
         \type real
-  N127, \field G-Function Ln(T/Ts) Value 56
+  N46,  \field G-Function Ln(T/Ts) Value 16
         \type real
-  N128, \field G-Function G Value 56
+  N47,  \field G-Function G Value 16
         \type real
-  N129, \field G-Function Ln(T/Ts) Value 57
+  N48,  \field G-Function Ln(T/Ts) Value 17
         \type real
-  N130, \field G-Function G Value 57
+  N49,  \field G-Function G Value 17
         \type real
-  N131, \field G-Function Ln(T/Ts) Value 58
+  N50,  \field G-Function Ln(T/Ts) Value 18
         \type real
-  N132, \field G-Function G Value 58
+  N51,  \field G-Function G Value 18
         \type real
-  N133, \field G-Function Ln(T/Ts) Value 59
+  N52,  \field G-Function Ln(T/Ts) Value 19
         \type real
-  N134, \field G-Function G Value 59
+  N53,  \field G-Function G Value 19
         \type real
-  N135, \field G-Function Ln(T/Ts) Value 60
+  N54,  \field G-Function Ln(T/Ts) Value 20
         \type real
-  N136, \field G-Function G Value 60
+  N55,  \field G-Function G Value 20
         \type real
-  N137, \field G-Function Ln(T/Ts) Value 61
+  N56,  \field G-Function Ln(T/Ts) Value 21
         \type real
-  N138, \field G-Function G Value 61
+  N57,  \field G-Function G Value 21
         \type real
-  N139, \field G-Function Ln(T/Ts) Value 62
+  N58,  \field G-Function Ln(T/Ts) Value 22
         \type real
-  N140, \field G-Function G Value 62
+  N59,  \field G-Function G Value 22
         \type real
-  N141, \field G-Function Ln(T/Ts) Value 63
+  N60,  \field G-Function Ln(T/Ts) Value 23
         \type real
-  N142, \field G-Function G Value 63
+  N61,  \field G-Function G Value 23
         \type real
-  N143, \field G-Function Ln(T/Ts) Value 64
+  N62,  \field G-Function Ln(T/Ts) Value 24
         \type real
-  N144, \field G-Function G Value 64
+  N63,  \field G-Function G Value 24
         \type real
-  N145, \field G-Function Ln(T/Ts) Value 65
+  N64,  \field G-Function Ln(T/Ts) Value 25
         \type real
-  N146, \field G-Function G Value 65
+  N65,  \field G-Function G Value 25
         \type real
-  N147, \field G-Function Ln(T/Ts) Value 66
+  N66,  \field G-Function Ln(T/Ts) Value 26
         \type real
-  N148, \field G-Function G Value 66
+  N67,  \field G-Function G Value 26
         \type real
-  N149, \field G-Function Ln(T/Ts) Value 67
+  N68,  \field G-Function Ln(T/Ts) Value 27
         \type real
-  N150, \field G-Function G Value 67
+  N69,  \field G-Function G Value 27
         \type real
-  N151, \field G-Function Ln(T/Ts) Value 68
+  N70,  \field G-Function Ln(T/Ts) Value 28
         \type real
-  N152, \field G-Function G Value 68
+  N71,  \field G-Function G Value 28
         \type real
-  N153, \field G-Function Ln(T/Ts) Value 69
+  N72,  \field G-Function Ln(T/Ts) Value 29
         \type real
-  N154, \field G-Function G Value 69
+  N73,  \field G-Function G Value 29
         \type real
-  N155, \field G-Function Ln(T/Ts) Value 70
+  N74,  \field G-Function Ln(T/Ts) Value 30
         \type real
-  N156, \field G-Function G Value 70
+  N75,  \field G-Function G Value 30
         \type real
-  N157, \field G-Function Ln(T/Ts) Value 71
+  N76,  \field G-Function Ln(T/Ts) Value 31
         \type real
-  N158, \field G-Function G Value 71
+  N77,  \field G-Function G Value 31
         \type real
-  N159, \field G-Function Ln(T/Ts) Value 72
+  N78,  \field G-Function Ln(T/Ts) Value 32
         \type real
-  N160, \field G-Function G Value 72
+  N79,  \field G-Function G Value 32
         \type real
-  N161, \field G-Function Ln(T/Ts) Value 73
+  N80,  \field G-Function Ln(T/Ts) Value 33
         \type real
-  N162, \field G-Function G Value 73
+  N81,  \field G-Function G Value 33
         \type real
-  N163, \field G-Function Ln(T/Ts) Value 74
+  N82,  \field G-Function Ln(T/Ts) Value 34
         \type real
-  N164, \field G-Function G Value 74
+  N83,  \field G-Function G Value 34
         \type real
-  N165, \field G-Function Ln(T/Ts) Value 75
+  N84,  \field G-Function Ln(T/Ts) Value 35
         \type real
-  N166, \field G-Function G Value 75
+  N85,  \field G-Function G Value 35
         \type real
-  N167, \field G-Function Ln(T/Ts) Value 76
+  N86,  \field G-Function Ln(T/Ts) Value 36
         \type real
-  N168, \field G-Function G Value 76
+  N87,  \field G-Function G Value 36
         \type real
-  N169, \field G-Function Ln(T/Ts) Value 77
+  N88,  \field G-Function Ln(T/Ts) Value 37
         \type real
-  N170, \field G-Function G Value 77
+  N89,  \field G-Function G Value 37
         \type real
-  N171, \field G-Function Ln(T/Ts) Value 78
+  N90,  \field G-Function Ln(T/Ts) Value 38
         \type real
-  N172, \field G-Function G Value 78
+  N91,  \field G-Function G Value 38
         \type real
-  N173, \field G-Function Ln(T/Ts) Value 79
+  N92,  \field G-Function Ln(T/Ts) Value 39
         \type real
-  N174, \field G-Function G Value 79
+  N93,  \field G-Function G Value 39
         \type real
-  N175, \field G-Function Ln(T/Ts) Value 80
+  N94,  \field G-Function Ln(T/Ts) Value 40
         \type real
-  N176, \field G-Function G Value 80
+  N95,  \field G-Function G Value 40
         \type real
-  N177, \field G-Function Ln(T/Ts) Value 81
+  N96,  \field G-Function Ln(T/Ts) Value 41
         \type real
-  N178, \field G-Function G Value 81
+  N97,  \field G-Function G Value 41
         \type real
-  N179, \field G-Function Ln(T/Ts) Value 82
+  N98,  \field G-Function Ln(T/Ts) Value 42
         \type real
-  N180, \field G-Function G Value 82
+  N99, \field G-Function G Value 42
         \type real
-  N181, \field G-Function Ln(T/Ts) Value 83
+  N100, \field G-Function Ln(T/Ts) Value 43
         \type real
-  N182, \field G-Function G Value 83
+  N101, \field G-Function G Value 43
         \type real
-  N183, \field G-Function Ln(T/Ts) Value 84
+  N102, \field G-Function Ln(T/Ts) Value 44
         \type real
-  N184, \field G-Function G Value 84
+  N103, \field G-Function G Value 44
         \type real
-  N185, \field G-Function Ln(T/Ts) Value 85
+  N104, \field G-Function Ln(T/Ts) Value 45
         \type real
-  N186, \field G-Function G Value 85
+  N105, \field G-Function G Value 45
         \type real
-  N187, \field G-Function Ln(T/Ts) Value 86
+  N106, \field G-Function Ln(T/Ts) Value 46
         \type real
-  N188, \field G-Function G Value 86
+  N107, \field G-Function G Value 46
         \type real
-  N189, \field G-Function Ln(T/Ts) Value 87
+  N108, \field G-Function Ln(T/Ts) Value 47
         \type real
-  N190, \field G-Function G Value 87
+  N109, \field G-Function G Value 47
         \type real
-  N191, \field G-Function Ln(T/Ts) Value 88
+  N110, \field G-Function Ln(T/Ts) Value 48
         \type real
-  N192, \field G-Function G Value 88
+  N111, \field G-Function G Value 48
         \type real
-  N193, \field G-Function Ln(T/Ts) Value 89
+  N112, \field G-Function Ln(T/Ts) Value 49
         \type real
-  N194, \field G-Function G Value 89
+  N113, \field G-Function G Value 49
         \type real
-  N195, \field G-Function Ln(T/Ts) Value 90
+  N114, \field G-Function Ln(T/Ts) Value 50
         \type real
-  N196, \field G-Function G Value 90
+  N115, \field G-Function G Value 50
         \type real
-  N197, \field G-Function Ln(T/Ts) Value 91
+  N116, \field G-Function Ln(T/Ts) Value 51
         \type real
-  N198, \field G-Function G Value 91
+  N117, \field G-Function G Value 51
         \type real
-  N199, \field G-Function Ln(T/Ts) Value 92
+  N118, \field G-Function Ln(T/Ts) Value 52
         \type real
-  N200, \field G-Function G Value 92
+  N119, \field G-Function G Value 52
         \type real
-  N201, \field G-Function Ln(T/Ts) Value 93
+  N120, \field G-Function Ln(T/Ts) Value 53
         \type real
-  N202, \field G-Function G Value 93
+  N121, \field G-Function G Value 53
         \type real
-  N203, \field G-Function Ln(T/Ts) Value 94
+  N122, \field G-Function Ln(T/Ts) Value 54
         \type real
-  N204, \field G-Function G Value 94
+  N123, \field G-Function G Value 54
         \type real
-  N205, \field G-Function Ln(T/Ts) Value 95
+  N124, \field G-Function Ln(T/Ts) Value 55
         \type real
-  N206, \field G-Function G Value 95
+  N125, \field G-Function G Value 55
         \type real
-  N207, \field G-Function Ln(T/Ts) Value 96
+  N126, \field G-Function Ln(T/Ts) Value 56
         \type real
-  N208, \field G-Function G Value 96
+  N127, \field G-Function G Value 56
         \type real
-  N209, \field G-Function Ln(T/Ts) Value 97
+  N128, \field G-Function Ln(T/Ts) Value 57
         \type real
-  N210, \field G-Function G Value 97
+  N129, \field G-Function G Value 57
         \type real
-  N211, \field G-Function Ln(T/Ts) Value 98
+  N130, \field G-Function Ln(T/Ts) Value 58
         \type real
-  N212, \field G-Function G Value 98
+  N131, \field G-Function G Value 58
         \type real
-  N213, \field G-Function Ln(T/Ts) Value 99
+  N132, \field G-Function Ln(T/Ts) Value 59
         \type real
-  N214, \field G-Function G Value 99
+  N133, \field G-Function G Value 59
         \type real
-  N215, \field G-Function Ln(T/Ts) Value 100
+  N134, \field G-Function Ln(T/Ts) Value 60
         \type real
-  N216; \field G-Function G Value 100
+  N135, \field G-Function G Value 60
+        \type real
+  N136, \field G-Function Ln(T/Ts) Value 61
+        \type real
+  N137, \field G-Function G Value 61
+        \type real
+  N138, \field G-Function Ln(T/Ts) Value 62
+        \type real
+  N139, \field G-Function G Value 62
+        \type real
+  N140, \field G-Function Ln(T/Ts) Value 63
+        \type real
+  N141, \field G-Function G Value 63
+        \type real
+  N142, \field G-Function Ln(T/Ts) Value 64
+        \type real
+  N143, \field G-Function G Value 64
+        \type real
+  N144, \field G-Function Ln(T/Ts) Value 65
+        \type real
+  N145, \field G-Function G Value 65
+        \type real
+  N146, \field G-Function Ln(T/Ts) Value 66
+        \type real
+  N147, \field G-Function G Value 66
+        \type real
+  N148, \field G-Function Ln(T/Ts) Value 67
+        \type real
+  N149, \field G-Function G Value 67
+        \type real
+  N150, \field G-Function Ln(T/Ts) Value 68
+        \type real
+  N151, \field G-Function G Value 68
+        \type real
+  N152, \field G-Function Ln(T/Ts) Value 69
+        \type real
+  N153, \field G-Function G Value 69
+        \type real
+  N154, \field G-Function Ln(T/Ts) Value 70
+        \type real
+  N155, \field G-Function G Value 70
+        \type real
+  N156, \field G-Function Ln(T/Ts) Value 71
+        \type real
+  N157, \field G-Function G Value 71
+        \type real
+  N158, \field G-Function Ln(T/Ts) Value 72
+        \type real
+  N159, \field G-Function G Value 72
+        \type real
+  N160, \field G-Function Ln(T/Ts) Value 73
+        \type real
+  N161, \field G-Function G Value 73
+        \type real
+  N162, \field G-Function Ln(T/Ts) Value 74
+        \type real
+  N163, \field G-Function G Value 74
+        \type real
+  N164, \field G-Function Ln(T/Ts) Value 75
+        \type real
+  N165, \field G-Function G Value 75
+        \type real
+  N166, \field G-Function Ln(T/Ts) Value 76
+        \type real
+  N167, \field G-Function G Value 76
+        \type real
+  N168, \field G-Function Ln(T/Ts) Value 77
+        \type real
+  N169, \field G-Function G Value 77
+        \type real
+  N170, \field G-Function Ln(T/Ts) Value 78
+        \type real
+  N171, \field G-Function G Value 78
+        \type real
+  N172, \field G-Function Ln(T/Ts) Value 79
+        \type real
+  N173, \field G-Function G Value 79
+        \type real
+  N174, \field G-Function Ln(T/Ts) Value 80
+        \type real
+  N175, \field G-Function G Value 80
+        \type real
+  N176, \field G-Function Ln(T/Ts) Value 81
+        \type real
+  N177, \field G-Function G Value 81
+        \type real
+  N178, \field G-Function Ln(T/Ts) Value 82
+        \type real
+  N179, \field G-Function G Value 82
+        \type real
+  N180, \field G-Function Ln(T/Ts) Value 83
+        \type real
+  N181, \field G-Function G Value 83
+        \type real
+  N182, \field G-Function Ln(T/Ts) Value 84
+        \type real
+  N183, \field G-Function G Value 84
+        \type real
+  N184, \field G-Function Ln(T/Ts) Value 85
+        \type real
+  N185, \field G-Function G Value 85
+        \type real
+  N186, \field G-Function Ln(T/Ts) Value 86
+        \type real
+  N187, \field G-Function G Value 86
+        \type real
+  N188, \field G-Function Ln(T/Ts) Value 87
+        \type real
+  N189, \field G-Function G Value 87
+        \type real
+  N190, \field G-Function Ln(T/Ts) Value 88
+        \type real
+  N191, \field G-Function G Value 88
+        \type real
+  N192, \field G-Function Ln(T/Ts) Value 89
+        \type real
+  N193, \field G-Function G Value 89
+        \type real
+  N194, \field G-Function Ln(T/Ts) Value 90
+        \type real
+  N195, \field G-Function G Value 90
+        \type real
+  N196, \field G-Function Ln(T/Ts) Value 91
+        \type real
+  N197, \field G-Function G Value 91
+        \type real
+  N198, \field G-Function Ln(T/Ts) Value 92
+        \type real
+  N199, \field G-Function G Value 92
+        \type real
+  N200, \field G-Function Ln(T/Ts) Value 93
+        \type real
+  N201, \field G-Function G Value 93
+        \type real
+  N202, \field G-Function Ln(T/Ts) Value 94
+        \type real
+  N203, \field G-Function G Value 94
+        \type real
+  N204, \field G-Function Ln(T/Ts) Value 95
+        \type real
+  N205, \field G-Function G Value 95
+        \type real
+  N206, \field G-Function Ln(T/Ts) Value 96
+        \type real
+  N207, \field G-Function G Value 96
+        \type real
+  N208, \field G-Function Ln(T/Ts) Value 97
+        \type real
+  N209, \field G-Function G Value 97
+        \type real
+  N210, \field G-Function Ln(T/Ts) Value 98
+        \type real
+  N211, \field G-Function G Value 98
+        \type real
+  N212, \field G-Function Ln(T/Ts) Value 99
+        \type real
+  N213, \field G-Function G Value 99
+        \type real
+  N214, \field G-Function Ln(T/Ts) Value 100
+        \type real
+  N215; \field G-Function G Value 100
         \type real
 
 GroundHeatExchanger:Pond,
