@@ -114,7 +114,16 @@ getProgramPath()
 	uint32_t pathSize = sizeof(executableRelativePath);
 	_NSGetExecutablePath(executableRelativePath, &pathSize);
 #elif __linux__
-	ssize_t len = readlink("/proc/self/exe", executableRelativePath, sizeof(executableRelativePath)-1);
+  ssize_t len = readlink("/proc/self/exe", executableRelativePath, sizeof(executableRelativePath)-1);
+  if (len == -1)
+  {
+    DisplayString("ERROR: Unable to locate executable.");
+    exit(EXIT_FAILURE);
+  }
+  else
+  {
+    executableRelativePath[len] = '\0';
+  }
 #elif _WIN32
 	GetModuleFileName(NULL, executableRelativePath, sizeof(executableRelativePath));
 #endif
