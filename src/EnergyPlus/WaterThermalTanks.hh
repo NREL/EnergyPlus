@@ -1028,6 +1028,12 @@ namespace WaterThermalTanks {
 
 	};
 
+	enum HeatPumpWaterHeaterCondenserConfiguration {
+		HPWH_CONDENSER_NOT_CONFIGURED,
+		HPWH_CONDENSER_PUMPED,
+		HPWH_CONDENSER_WRAPPED
+	};
+	
 	struct HeatPumpWaterHeaterData
 	{
 		// Members
@@ -1122,6 +1128,10 @@ namespace WaterThermalTanks {
 		Real64 HPWaterHeaterSensibleCapacity; // sensible capacity delivered when HPWH is attached to a zone (W)
 		Real64 HPWaterHeaterLatentCapacity; // latent capacity delivered when HPWH is attached to a zone (kg/s)
 		int ControlSensorLocation; // if using stratified tank, indicates control point
+		HeatPumpWaterHeaterCondenserConfiguration CondenserConfig; // whether this is a pumped or wrapped condenser object
+		Real64 WrappedCondenserBottomLocation; // Location of the bottom of the wrapped condenser.
+		Real64 WrappedCondenserTopLocation; // Location of the top of the wrapped condenser.
+		
 
 		// Default Constructor
 		HeatPumpWaterHeaterData() :
@@ -1207,7 +1217,10 @@ namespace WaterThermalTanks {
 			ShowSetPointWarning( true ),
 			HPWaterHeaterSensibleCapacity( 0.0 ),
 			HPWaterHeaterLatentCapacity( 0.0 ),
-			ControlSensorLocation( HPWHControlNotSet )
+			ControlSensorLocation( HPWHControlNotSet ),
+			CondenserConfig( HPWH_CONDENSER_NOT_CONFIGURED ),
+			WrappedCondenserBottomLocation( 0.0 ),
+			WrappedCondenserTopLocation( 0.0 )
 		{}
 
 		// Member Constructor
@@ -1302,7 +1315,10 @@ namespace WaterThermalTanks {
 			bool const ShowSetPointWarning, // Warn when set point is greater than max tank temp limit
 			Real64 const HPWaterHeaterSensibleCapacity, // sensible capacity delivered when HPWH is attached to a zone (W)
 			Real64 const HPWaterHeaterLatentCapacity, // latent capacity delivered when HPWH is attached to a zone (kg/s)
-			int const ControlSensorLocation // if using stratified tank, indicates control point
+			int const ControlSensorLocation, // if using stratified tank, indicates control point
+			HeatPumpWaterHeaterCondenserConfiguration const CondenserConfig, // whether this is a pumped or wrapped condenser object
+			Real64 WrappedCondenserBottomLocation,
+			Real64 WrappedCondenserTopLocation
 		) :
 			Name( Name ),
 			Type( Type ),
@@ -1394,7 +1410,10 @@ namespace WaterThermalTanks {
 			ShowSetPointWarning( ShowSetPointWarning ),
 			HPWaterHeaterSensibleCapacity( HPWaterHeaterSensibleCapacity ),
 			HPWaterHeaterLatentCapacity( HPWaterHeaterLatentCapacity ),
-			ControlSensorLocation( ControlSensorLocation )
+			ControlSensorLocation( ControlSensorLocation ),
+			CondenserConfig( CondenserConfig ),
+			WrappedCondenserBottomLocation( WrappedCondenserBottomLocation ),
+			WrappedCondenserTopLocation( WrappedCondenserTopLocation )
 		{}
 
 	};

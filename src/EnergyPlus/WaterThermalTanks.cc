@@ -102,6 +102,8 @@ namespace WaterThermalTanks {
 	std::string const cStratifiedWHModuleObj( "WaterHeater:Stratified" );
 	std::string const cMixedCWTankModuleObj( "ThermalStorage:ChilledWater:Mixed" );
 	std::string const cStratifiedCWTankModuleObj( "ThermalStorage:ChilledWater:Stratified" );
+	std::string const cHPWHPumpedCondenser("WaterHeater:HeatPumpPumpedCondenser");
+	std::string const cHPWHWrappedCondenser("WaterHeater:HeatPumpWrappedCondenser");
 	static std::string const BlankString;
 
 	int const HeatMode( 1 ); // heating source is on, source will not turn off until setpoint temp is reached
@@ -935,7 +937,7 @@ namespace WaterThermalTanks {
 			NumChilledWaterMixed = GetNumObjectsFound( cMixedCWTankModuleObj );
 			NumChilledWaterStratified = GetNumObjectsFound( cStratifiedCWTankModuleObj );
 			NumWaterThermalTank = NumWaterHeaterMixed + NumWaterHeaterStratified + NumChilledWaterMixed + NumChilledWaterStratified;
-			NumHeatPumpWaterHeater = GetNumObjectsFound( "WaterHeater:HeatPumpPumpedCondenser" );
+			NumHeatPumpWaterHeater = GetNumObjectsFound( cHPWHPumpedCondenser ) + GetNumObjectsFound( cHPWHWrappedCondenser );
 			NumWaterHeaterDesuperheater = GetNumObjectsFound( "Coil:WaterHeating:Desuperheater" );
 
 			if ( NumWaterThermalTank > 0 ) {
@@ -1228,11 +1230,40 @@ namespace WaterThermalTanks {
 
 			//   get input for heat pump water heater object
 			if ( NumHeatPumpWaterHeater > 0 ) {
-				cCurrentModuleObject = "WaterHeater:HeatPumpPumpedCondenser";
+				int const NumPumpedCondenser = GetNumObjectsFound( cHPWHPumpedCondenser ); // number of WaterHeater:HeatPumpPumpedCondenser objects
+				int nAlphaOffset; // the difference of array location between alpha items between pumped and wrapped condensers
+				int nNumericOffset; // the difference of array location between numeric items between pumped and wrapped condensers
+
 				for ( HPWaterHeaterNum = 1; HPWaterHeaterNum <= NumHeatPumpWaterHeater; ++HPWaterHeaterNum ) {
-
+					
+					// Create reference to current HPWH object in array.
+					HeatPumpWaterHeaterData &HPWH = HPWaterHeater( HPWaterHeaterNum );
+					WaterHeaterSaveNodes &HPWHSaveNode = HPWHSaveNodeNames( HPWaterHeaterNum );
+					
+					// Initialize the offsets to zero
+					nAlphaOffset = 0;
+					nNumericOffset = 0;
+					if ( HPWaterHeaterNum <= NumPumpedCondenser ) {
+						// Pumped Condenser
+						cCurrentModuleObject = cHPWHPumpedCondenser;
+						HPWH.CondenserConfig = HPWH_CONDENSER_PUMPED;
+					} else {
+						// Wrapped Condenser
+						cCurrentModuleObject = cHPWHWrappedCondenser;
+						HPWH.CondenserConfig = HPWH_CONDENSER_WRAPPED;
+					}
+					
+					// Get the lists of IDF arguments
 					GetObjectItem( cCurrentModuleObject, HPWaterHeaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-
+					
+					// Print out IDF arguments (debugging, delete me later)
+					for (int i = 1; i <= NumAlphas; ++i) {
+						std::cout << i << " " << cAlphaFieldNames(i) << " = " << cAlphaArgs(i) << " " << lAlphaFieldBlanks(i) << std::endl;
+					}
+					for (int i = 1; i <= NumNums; ++i) {
+						std::cout << i << " " << cNumericFieldNames(i) << " = " << rNumericArgs(i) << " " << lNumericFieldBlanks(i) << std::endl;
+					}
+					
 					IsNotOK = false;
 					IsBlank = false;
 					VerifyName( cAlphaArgs( 1 ), HPWaterHeater.Name(), HPWaterHeaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
@@ -1240,407 +1271,440 @@ namespace WaterThermalTanks {
 						ErrorsFound = true;
 						if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
 					}
-
-					HPWaterHeater( HPWaterHeaterNum ).Name = cAlphaArgs( 1 );
-					HPWaterHeater( HPWaterHeaterNum ).Type = cCurrentModuleObject;
-					HPWaterHeater( HPWaterHeaterNum ).TypeNum = HeatPumpWaterHeater;
-
-					//       convert schedule name to pointer
+					
+					// Name and type
+					HPWH.Name = cAlphaArgs( 1 );
+					HPWH.Type = cCurrentModuleObject;
+					HPWH.TypeNum = HeatPumpWaterHeater;
+					
+					// Availability Schedule
+					// convert schedule name to pointer
 					if ( ! lAlphaFieldBlanks( 2 ) ) {
-						HPWaterHeater( HPWaterHeaterNum ).AvailSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
-						if ( HPWaterHeater( HPWaterHeaterNum ).AvailSchedPtr == 0 ) {
-							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", not found" );
+						HPWH.AvailSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
+						if ( HPWH.AvailSchedPtr == 0 ) {
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
 							ShowContinueError( cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 							ErrorsFound = true;
 						}
 					} else {
-						HPWaterHeater( HPWaterHeaterNum ).AvailSchedPtr = ScheduleAlwaysOn;
+						HPWH.AvailSchedPtr = ScheduleAlwaysOn;
 					}
-
-					//       convert schedule name to pointer
+					
+					// Compressor Setpoint Temperature Schedule
+					// convert schedule name to pointer
 					if ( ! lAlphaFieldBlanks( 3 ) ) {
-						HPWaterHeater( HPWaterHeaterNum ).SetPointTempSchedule = GetScheduleIndex( cAlphaArgs( 3 ) );
-						if ( HPWaterHeater( HPWaterHeaterNum ).SetPointTempSchedule == 0 ) {
-							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", not found" );
+						HPWH.SetPointTempSchedule = GetScheduleIndex( cAlphaArgs( 3 ) );
+						if ( HPWH.SetPointTempSchedule == 0 ) {
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
 							ShowContinueError( cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 							ErrorsFound = true;
 						}
 					} else {
-						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", " );
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
 						ShowContinueError( "required " + cAlphaFieldNames( 3 ) + " is blank." );
 						ErrorsFound = true;
 					}
 
-					HPWaterHeater( HPWaterHeaterNum ).DeadBandTempDiff = rNumericArgs( 1 );
-					if ( HPWaterHeater( HPWaterHeaterNum ).DeadBandTempDiff <= 0.0 || HPWaterHeater( HPWaterHeaterNum ).DeadBandTempDiff > 20.0 ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", " );
-						ShowContinueError( cNumericFieldNames( 1 ) + " difference must be > 0 and <= 20. Dead band = " + TrimSigDigits( rNumericArgs( 1 ), 1 ) );
+					// Dead Band Temperature Difference
+					HPWH.DeadBandTempDiff = rNumericArgs( 1 + nNumericOffset );
+					if ( HPWH.DeadBandTempDiff <= 0.0 || HPWH.DeadBandTempDiff > 20.0 ) {
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
+						ShowContinueError( cNumericFieldNames( 1 + nNumericOffset ) + " difference must be > 0 and <= 20. Dead band = " + TrimSigDigits( rNumericArgs( 1 + nNumericOffset ), 1 ) );
 						ErrorsFound = true;
 					}
 
-					HPWaterHeater( HPWaterHeaterNum ).CondWaterInletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsParent );
-					HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName1 = cAlphaArgs( 4 );
-					HPWaterHeater( HPWaterHeaterNum ).CondWaterOutletNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsParent );
-					HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName1 = cAlphaArgs( 5 );
-
-					HPWaterHeater( HPWaterHeaterNum ).OperatingWaterFlowRate = rNumericArgs( 2 );
-					if ( HPWaterHeater( HPWaterHeaterNum ).OperatingWaterFlowRate <= 0.0 && rNumericArgs( 2 ) != AutoCalculate ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", " );
-						ShowContinueError( cNumericFieldNames( 2 ) + " must be greater than 0. Condenser water flow rate = " + TrimSigDigits( rNumericArgs( 2 ), 6 ) );
+					if ( HPWH.CondenserConfig == HPWH_CONDENSER_PUMPED ) {
+						
+						// Condenser Inlet/Outlet Nodes
+						HPWH.CondWaterInletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsParent );
+						HPWHSaveNode.InletNodeName1 = cAlphaArgs( 4 );
+						HPWH.CondWaterOutletNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsParent );
+						HPWHSaveNode.OutletNodeName1 = cAlphaArgs( 5 );
+						
+						// Condenser Water Flow Rate
+						HPWH.OperatingWaterFlowRate = rNumericArgs( 2 + nNumericOffset );
+						if ( HPWH.OperatingWaterFlowRate <= 0.0 && rNumericArgs( 2 + nNumericOffset ) != AutoCalculate ) {
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
+							ShowContinueError( cNumericFieldNames( 2 + nNumericOffset ) + " must be greater than 0. Condenser water flow rate = " + TrimSigDigits( rNumericArgs( 2 + nNumericOffset ), 6 ) );
+							ErrorsFound = true;
+						}
+						
+					} else if ( HPWH.CondenserConfig == HPWH_CONDENSER_WRAPPED ) {
+						
+						// Wrapped Condenser Location
+						HPWH.WrappedCondenserBottomLocation = rNumericArgs( 2 + nNumericOffset );
+						HPWH.WrappedCondenserTopLocation = rNumericArgs( 3 + nNumericOffset );
+						// TODO: verify these make sense.
+						
+						// Reset the offset
+						nAlphaOffset = -2;
+						nNumericOffset = 1;
+						
+					} else {
+						assert(0);
+					}
+					
+					// Evaporator Air Flow Rate
+					HPWH.OperatingAirFlowRate = rNumericArgs( 3 + nNumericOffset );
+					if ( HPWH.OperatingAirFlowRate <= 0.0 && rNumericArgs( 3 + nNumericOffset ) != AutoCalculate ) {
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
+						ShowContinueError( cNumericFieldNames( 3 + nNumericOffset ) + " must be greater than 0. Evaporator air flow rate = " + TrimSigDigits( rNumericArgs( 3 + nNumericOffset ), 6 ) );
 						ErrorsFound = true;
 					}
-
-					HPWaterHeater( HPWaterHeaterNum ).OperatingAirFlowRate = rNumericArgs( 3 );
-					if ( HPWaterHeater( HPWaterHeaterNum ).OperatingAirFlowRate <= 0.0 && rNumericArgs( 3 ) != AutoCalculate ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", " );
-						ShowContinueError( cNumericFieldNames( 3 ) + " must be greater than 0. Evaporator air flow rate = " + TrimSigDigits( rNumericArgs( 3 ), 6 ) );
-						ErrorsFound = true;
-					}
-
-					{ auto const SELECT_CASE_var( cAlphaArgs( 6 ) );
+					
+					// Inlet Air Configuration
+					{ auto const SELECT_CASE_var( cAlphaArgs( 6 + nAlphaOffset ) );
 
 					if ( SELECT_CASE_var == "SCHEDULE" ) {
-						HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration = AmbientTempSchedule;
-						if ( ! lAlphaFieldBlanks( 11 ) ) {
-							HPWaterHeater( HPWaterHeaterNum ).AmbientTempSchedule = GetScheduleIndex( cAlphaArgs( 11 ) );
-							if ( HPWaterHeater( HPWaterHeaterNum ).AmbientTempSchedule == 0 ) {
-								ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", not found" );
-								ShowContinueError( cAlphaFieldNames( 11 ) + "=\"" + cAlphaArgs( 11 ) + "\"." );
+						HPWH.InletAirConfiguration = AmbientTempSchedule;
+						
+						// Inlet Air Temperature Schedule
+						if ( ! lAlphaFieldBlanks( 11 + nAlphaOffset ) ) {
+							HPWH.AmbientTempSchedule = GetScheduleIndex( cAlphaArgs( 11 + nAlphaOffset ) );
+							if ( HPWH.AmbientTempSchedule == 0 ) {
+								ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
+								ShowContinueError( cAlphaFieldNames( 11 + nAlphaOffset ) + "=\"" + cAlphaArgs( 11 + nAlphaOffset ) + "\"." );
 								ErrorsFound = true;
 							}
 						} else {
-							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", " );
-							ShowContinueError( "required " + cAlphaFieldNames( 11 ) + " is blank." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
+							ShowContinueError( "required " + cAlphaFieldNames( 11 + nAlphaOffset ) + " is blank." );
 							ErrorsFound = true;
 						}
-						if ( ! lAlphaFieldBlanks( 12 ) ) {
-							HPWaterHeater( HPWaterHeaterNum ).AmbientRHSchedule = GetScheduleIndex( cAlphaArgs( 12 ) );
-							if ( HPWaterHeater( HPWaterHeaterNum ).AmbientRHSchedule == 0 ) {
-								ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", not found" );
-								ShowContinueError( cAlphaFieldNames( 12 ) + "=\"" + cAlphaArgs( 12 ) + "\"." );
+						
+						// Inlet Air Humidity Schedule
+						if ( ! lAlphaFieldBlanks( 12 + nAlphaOffset ) ) {
+							HPWH.AmbientRHSchedule = GetScheduleIndex( cAlphaArgs( 12 + nAlphaOffset ) );
+							if ( HPWH.AmbientRHSchedule == 0 ) {
+								ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
+								ShowContinueError( cAlphaFieldNames( 12 + nAlphaOffset ) + "=\"" + cAlphaArgs( 12 + nAlphaOffset ) + "\"." );
 								ErrorsFound = true;
 							} else {
-								if ( ! CheckScheduleValueMinMax( HPWaterHeater( HPWaterHeaterNum ).AmbientRHSchedule, ">=", 0.0, "<=", 1.0 ) ) {
-									ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", invalid values" );
-									ShowContinueError( cAlphaFieldNames( 12 ) + "=\"" + cAlphaArgs( 12 ) + "\", schedule values must be (>=0., <=1.)" );
+								if ( ! CheckScheduleValueMinMax( HPWH.AmbientRHSchedule, ">=", 0.0, "<=", 1.0 ) ) {
+									ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", invalid values" );
+									ShowContinueError( cAlphaFieldNames( 12 + nAlphaOffset ) + "=\"" + cAlphaArgs( 12 + nAlphaOffset ) + "\", schedule values must be (>=0., <=1.)" );
 									ErrorsFound = true;
 								}
 							}
 						} else {
-							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", " );
-							ShowContinueError( "required " + cAlphaFieldNames( 12 ) + " is blank." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
+							ShowContinueError( "required " + cAlphaFieldNames( 12 + nAlphaOffset ) + " is blank." );
 							ErrorsFound = true;
 						}
 
 					} else if ( SELECT_CASE_var == "ZONEAIRONLY" ) {
-						HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration = AmbientTempZone;
-						if ( ! lAlphaFieldBlanks( 13 ) ) {
-							HPWaterHeater( HPWaterHeaterNum ).AmbientTempZone = FindItemInList( cAlphaArgs( 13 ), Zone.Name(), NumOfZones );
-							if ( HPWaterHeater( HPWaterHeaterNum ).AmbientTempZone == 0 ) {
-								ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", not found" );
-								ShowContinueError( cAlphaFieldNames( 13 ) + "=\"" + cAlphaArgs( 13 ) + "\"." );
+						HPWH.InletAirConfiguration = AmbientTempZone;
+						
+						// Inlet Air Zone
+						if ( ! lAlphaFieldBlanks( 13 + nAlphaOffset ) ) {
+							HPWH.AmbientTempZone = FindItemInList( cAlphaArgs( 13 + nAlphaOffset ), Zone.Name(), NumOfZones );
+							if ( HPWH.AmbientTempZone == 0 ) {
+								ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
+								ShowContinueError( cAlphaFieldNames( 13 + nAlphaOffset ) + "=\"" + cAlphaArgs( 13 + nAlphaOffset ) + "\"." );
 								ErrorsFound = true;
 							}
 						} else {
-							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", " );
-							ShowContinueError( "required " + cAlphaFieldNames( 13 ) + " is blank." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
+							ShowContinueError( "required " + cAlphaFieldNames( 13 + nAlphaOffset ) + " is blank." );
 							ErrorsFound = true;
 						}
 
 					} else if ( SELECT_CASE_var == "OUTDOORAIRONLY" ) {
-						HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration = AmbientTempOutsideAir;
+						HPWH.InletAirConfiguration = AmbientTempOutsideAir;
 
 					} else if ( SELECT_CASE_var == "ZONEANDOUTDOORAIR" ) {
-						HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration = AmbientTempZoneAndOA;
-						if ( ! lAlphaFieldBlanks( 13 ) ) {
-							HPWaterHeater( HPWaterHeaterNum ).AmbientTempZone = FindItemInList( cAlphaArgs( 13 ), Zone.Name(), NumOfZones );
-							if ( HPWaterHeater( HPWaterHeaterNum ).AmbientTempZone == 0 ) {
-								ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", not found" );
-								ShowContinueError( cAlphaFieldNames( 13 ) + "=\"" + cAlphaArgs( 13 ) + "\"." );
+						HPWH.InletAirConfiguration = AmbientTempZoneAndOA;
+						
+						// Inlet Air Zone
+						if ( ! lAlphaFieldBlanks( 13 + nAlphaOffset ) ) {
+							HPWH.AmbientTempZone = FindItemInList( cAlphaArgs( 13 + nAlphaOffset ), Zone.Name(), NumOfZones );
+							if ( HPWH.AmbientTempZone == 0 ) {
+								ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
+								ShowContinueError( cAlphaFieldNames( 13 + nAlphaOffset ) + "=\"" + cAlphaArgs( 13 + nAlphaOffset ) + "\"." );
 								ErrorsFound = true;
 							}
 						} else {
-							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", " );
-							ShowContinueError( "required " + cAlphaFieldNames( 13 ) + " is blank." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
+							ShowContinueError( "required " + cAlphaFieldNames( 13 + nAlphaOffset ) + " is blank." );
 							ErrorsFound = true;
 						}
 
 					}}
 
-					//       Read air inlet nodes after mixer/splitter nodes have been read in (cAlphaArgs 7-10),
-					//       Node_ConnectionType differs for inlet node if mixer/splitter node exists
+					// Read air inlet nodes after mixer/splitter nodes have been read in (cAlphaArgs 7-10),
+					// Node_ConnectionType differs for inlet node if mixer/splitter node exists
 
-					HPWaterHeater( HPWaterHeaterNum ).TankType = cAlphaArgs( 14 );
+					// Tank Name
+					// We will verify this exists and is the right kind of tank later when the tanks are all loaded.
+					HPWH.TankName = cAlphaArgs( 14 + nAlphaOffset );
+					
+					// Use Side Inlet/Outlet
+					// Get the water heater tank use side inlet node names for HPWHs connected to a plant loop
+					// Save the name of the node for use with set up comp sets
+					HPWHSaveNode.InletNodeName2 = cAlphaArgs( 15 + nAlphaOffset );
+					HPWHSaveNode.OutletNodeName2 = cAlphaArgs( 16 + nAlphaOffset );
 
-					if ( ! SameString( HPWaterHeater( HPWaterHeaterNum ).TankType, cMixedWHModuleObj ) && ! SameString( HPWaterHeater( HPWaterHeaterNum ).TankType, cStratifiedWHModuleObj ) ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
-						ShowContinueError( "Heat pump water heater can only be used with " + cMixedWHModuleObj + " or " + cStratifiedWHModuleObj + '.' );
+					if ( ! lAlphaFieldBlanks( 15 + nAlphaOffset ) && ! lAlphaFieldBlanks( 16 + nAlphaOffset ) ) {
+						HPWH.WHUseInletNode = GetOnlySingleNode( HPWHSaveNode.InletNodeName2, ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsParent );
+						HPWH.WHUseOutletNode = GetOnlySingleNode( HPWHSaveNode.OutletNodeName2, ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsParent );
+					}
+
+					// DX Coil
+					// get Coil:DX:HeatPumpWaterHeater object
+					HPWH.DXCoilName = cAlphaArgs( 17 + nAlphaOffset );
+
+					// check that the DX Coil exists
+					DXCoilErrFlag = false;
+					GetDXCoilIndex( HPWH.DXCoilName, HPWH.DXCoilNum, DXCoilErrFlag, cCurrentModuleObject );
+					if ( DXCoilErrFlag ) {
+						ShowContinueError( "...occurs in WaterHeater:HeatPumpPumpedCondenser =" + HPWH.Name );
+						ShowContinueError( "...entered DX CoilType=" + HPWH.DXCoilType );
 						ErrorsFound = true;
 					}
-
-					//       Verify tank name after Water Heater:Mixed objects have been read in
-					HPWaterHeater( HPWaterHeaterNum ).TankName = cAlphaArgs( 15 );
-
-					//       Get the water heater tank use side inlet node names for HPWHs connected to a plant loop
-					//       Save the name of the node for use with set up comp sets
-					HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName2 = cAlphaArgs( 16 );
-					HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName2 = cAlphaArgs( 17 );
-
-					if ( ! lAlphaFieldBlanks( 16 ) && ! lAlphaFieldBlanks( 17 ) ) {
-						HPWaterHeater( HPWaterHeaterNum ).WHUseInletNode = GetOnlySingleNode( cAlphaArgs( 16 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsParent );
-						HPWaterHeater( HPWaterHeaterNum ).WHUseOutletNode = GetOnlySingleNode( cAlphaArgs( 17 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsParent );
-					}
-
-					//       get Coil:DX:HeatPumpWaterHeater object
-					HPWaterHeater( HPWaterHeaterNum ).DXCoilType = cAlphaArgs( 18 );
-					HPWaterHeater( HPWaterHeaterNum ).DXCoilName = cAlphaArgs( 19 );
-
-					//       check that the DX Coil exists
-					if ( ! SameString( HPWaterHeater( HPWaterHeaterNum ).DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump" ) ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
+					HPWH.DXCoilType = DXCoil(HPWH.DXCoilNum).DXCoilType;
+					if ( ! SameString( HPWH.DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump" ) ) {
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
 						ShowContinueError( "Heat pump water heater can only be used with Coil:WaterHeating:AirToWaterHeatPump." );
 						ErrorsFound = true;
 					}
 
-					DXCoilErrFlag = false;
-					GetDXCoilIndex( HPWaterHeater( HPWaterHeaterNum ).DXCoilName, HPWaterHeater( HPWaterHeaterNum ).DXCoilNum, DXCoilErrFlag, cCurrentModuleObject );
-					if ( DXCoilErrFlag ) {
-						ShowContinueError( "...occurs in WaterHeater:HeatPumpPumpedCondenser =" + HPWaterHeater( HPWaterHeaterNum ).Name );
-						ShowContinueError( "...entered DX CoilType=" + HPWaterHeater( HPWaterHeaterNum ).DXCoilType );
-						ErrorsFound = true;
+					// Set up comp set for condenser water side nodes (reverse inlet/outlet for water heater)
+					if (HPWH.CondenserConfig == HPWH_CONDENSER_PUMPED) {
+						SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.DXCoilType, HPWH.DXCoilName, HPWHSaveNode.InletNodeName1, HPWHSaveNode.OutletNodeName1 );
+						SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.TankType, HPWH.TankName, HPWHSaveNode.OutletNodeName1, HPWHSaveNode.InletNodeName1 );
+					} else if (HPWH.CondenserConfig == HPWH_CONDENSER_WRAPPED) {
+						// TODO: figure out how to hook up the condenser
+					} else {
+						assert(0);
+					}
+					
+					// Minimum Inlet Air Temperature for Compressor Operation
+					HPWH.MinAirTempForHPOperation = rNumericArgs( 4 + nNumericOffset );
+					if ( HPWH.MinAirTempForHPOperation < -5 ) {
+						ShowWarningError( cCurrentModuleObject + "=\"" + HPWH.Name + "\": minimum inlet air temperature for heat pump compressor operation must be greater than or equal to -5 C." );
+						ShowContinueError( "...Minimum inlet air temperature = " + TrimSigDigits( rNumericArgs( 4 + nNumericOffset ), 1 ) );
 					}
 
-					//       Set up comp set for condenser water side nodes (reverse inlet/outlet for water heater)
-					SetUpCompSets( HPWaterHeater( HPWaterHeaterNum ).Type, HPWaterHeater( HPWaterHeaterNum ).Name, HPWaterHeater( HPWaterHeaterNum ).DXCoilType, HPWaterHeater( HPWaterHeaterNum ).DXCoilName, cAlphaArgs( 4 ), cAlphaArgs( 5 ) );
-
-					SetUpCompSets( HPWaterHeater( HPWaterHeaterNum ).Type, HPWaterHeater( HPWaterHeaterNum ).Name, HPWaterHeater( HPWaterHeaterNum ).TankType, HPWaterHeater( HPWaterHeaterNum ).TankName, cAlphaArgs( 5 ), cAlphaArgs( 4 ) );
-
-					HPWaterHeater( HPWaterHeaterNum ).MinAirTempForHPOperation = rNumericArgs( 4 );
-					if ( HPWaterHeater( HPWaterHeaterNum ).MinAirTempForHPOperation < 5 ) {
-						ShowWarningError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\": minimum inlet air temperature for heat pump compressor operation must be greater than or equal to 5 C." );
-						ShowContinueError( "...Minimum inlet air temperature = " + TrimSigDigits( rNumericArgs( 4 ), 1 ) );
-					}
-
-					//       Get compressor location
-					{ auto const SELECT_CASE_var( cAlphaArgs( 20 ) );
+					// Compressor Location
+					{ auto const SELECT_CASE_var( cAlphaArgs( 18 + nAlphaOffset ) );
 					if ( SELECT_CASE_var == "SCHEDULE" ) {
-						HPWaterHeater( HPWaterHeaterNum ).CrankcaseTempIndicator = CrankcaseTempSchedule;
-						if ( ! lAlphaFieldBlanks( 21 ) ) {
-							HPWaterHeater( HPWaterHeaterNum ).CrankcaseTempSchedule = GetScheduleIndex( cAlphaArgs( 21 ) );
-							if ( HPWaterHeater( HPWaterHeaterNum ).CrankcaseTempSchedule == 0 ) {
-								ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", not found" );
-								ShowContinueError( cAlphaFieldNames( 21 ) + "=\"" + cAlphaArgs( 21 ) + "\"." );
+						HPWH.CrankcaseTempIndicator = CrankcaseTempSchedule;
+						if ( ! lAlphaFieldBlanks( 19 + nAlphaOffset ) ) {
+							// Compressor Ambient Temperature Schedule
+							HPWH.CrankcaseTempSchedule = GetScheduleIndex( cAlphaArgs( 19 + nAlphaOffset ) );
+							if ( HPWH.CrankcaseTempSchedule == 0 ) {
+								ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
+								ShowContinueError( cAlphaFieldNames( 19 + nAlphaOffset ) + "=\"" + cAlphaArgs( 19 + nAlphaOffset ) + "\"." );
 								ErrorsFound = true;
 							}
 						} else {
-							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", " );
-							ShowContinueError( "required " + cAlphaFieldNames( 21 ) + " is blank." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
+							ShowContinueError( "required " + cAlphaFieldNames( 19 + nAlphaOffset ) + " is blank." );
 							ErrorsFound = true;
 						}
 
 					} else if ( SELECT_CASE_var == "ZONE" ) {
-						HPWaterHeater( HPWaterHeaterNum ).CrankcaseTempIndicator = CrankcaseTempZone;
-						if ( HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempOutsideAir || HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempSchedule ) {
-							ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\":  Inlet Air Configuration must be Zone Air Only or Zone And" );
+						HPWH.CrankcaseTempIndicator = CrankcaseTempZone;
+						if ( HPWH.InletAirConfiguration == AmbientTempOutsideAir || HPWH.InletAirConfiguration == AmbientTempSchedule ) {
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":  Inlet Air Configuration must be Zone Air Only or Zone And" );
 							ShowContinueError( " Outdoor Air when compressor location equals ZONE." );
 							ErrorsFound = true;
 						}
 
-						if ( ! lAlphaFieldBlanks( 21 ) ) {
-							ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  " + cAlphaFieldNames( 21 ) + " was provided but will not be used based on compressor location input=\"" + cAlphaArgs( 20 ) + "\"." );
+						if ( ! lAlphaFieldBlanks( 19 + nAlphaOffset ) ) {
+							ShowWarningError( cCurrentModuleObject + "=\"" + HPWH.Name + "\"  " + cAlphaFieldNames( 19 + nAlphaOffset ) + " was provided but will not be used based on compressor location input=\"" + cAlphaArgs( 18 + nAlphaOffset ) + "\"." );
 						}
 					} else if ( SELECT_CASE_var == "OUTDOORS" ) {
-						HPWaterHeater( HPWaterHeaterNum ).CrankcaseTempIndicator = CrankcaseTempExterior;
-						if ( ! lAlphaFieldBlanks( 21 ) ) {
-							ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"  " + cAlphaFieldNames( 21 ) + " was provided but will not be used based on " + cAlphaFieldNames( 21 ) + "=\"" + cAlphaArgs( 20 ) + "\"." );
+						HPWH.CrankcaseTempIndicator = CrankcaseTempExterior;
+						if ( ! lAlphaFieldBlanks( 19 + nAlphaOffset ) ) {
+							ShowWarningError( cCurrentModuleObject + "=\"" + HPWH.Name + "\"  " + cAlphaFieldNames( 19 + nAlphaOffset ) + " was provided but will not be used based on " + cAlphaFieldNames( 19 + nAlphaOffset ) + "=\"" + cAlphaArgs( 18 + nAlphaOffset ) + "\"." );
 						}
 
 					}}
+					
+					// Fan Name
+					HPWH.FanName = cAlphaArgs( 20 + nAlphaOffset );
 
-					HPWaterHeater( HPWaterHeaterNum ).FanType = cAlphaArgs( 22 );
-					HPWaterHeater( HPWaterHeaterNum ).FanName = cAlphaArgs( 23 );
-
-					//       check that the fan exists
+					// check that the fan exists
 					errFlag = false;
-					GetFanIndex( HPWaterHeater( HPWaterHeaterNum ).FanName, HPWaterHeater( HPWaterHeaterNum ).FanNum, errFlag, cCurrentModuleObject );
+					GetFanIndex( HPWH.FanName, HPWH.FanNum, errFlag, cCurrentModuleObject );
 					if ( errFlag ) {
-						ShowContinueError( "...occurs in unit=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\"." );
+						ShowContinueError( "...occurs in unit=\"" + HPWH.Name + "\"." );
 						ErrorsFound = true;
 					}
 
 					errFlag = false;
-					GetFanType( HPWaterHeater( HPWaterHeaterNum ).FanName, HPWaterHeater( HPWaterHeaterNum ).FanType_Num, errFlag, cCurrentModuleObject, HPWaterHeater( HPWaterHeaterNum ).Name );
+					GetFanType( HPWH.FanName, HPWH.FanType_Num, errFlag, cCurrentModuleObject, HPWH.Name );
 
 					if ( errFlag ) {
+						ErrorsFound = true;
+					} else if ( HPWH.FanType_Num != FanType_SimpleOnOff ) {
+						ShowSevereError( cCurrentModuleObject + " illegal fan type specified." );
+						ShowContinueError( "Occurs in unit=\"" + HPWH.Name + "\"." );
+						ShowContinueError( " The fan object (" + HPWH.FanName + ") type must be Fan:OnOff when used with a heat pump water heater" );
 						ErrorsFound = true;
 					} else {
-						if ( HPWaterHeater( HPWaterHeaterNum ).FanType_Num != FanType_SimpleOnOff ) {
-							ShowSevereError( cCurrentModuleObject + " illegal fan type specified." );
-							ShowContinueError( "Occurs in unit=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\"." );
-							ShowContinueError( " The fan object (" + HPWaterHeater( HPWaterHeaterNum ).FanName + ") type must be Fan:OnOff when used with a heat pump water heater" );
-							ErrorsFound = true;
-						} else {
-							if ( ! SameString( HPWaterHeater( HPWaterHeaterNum ).FanType, "Fan:OnOff" ) ) {
-								ShowWarningError( cCurrentModuleObject + " illegal fan type = " + HPWaterHeater( HPWaterHeaterNum ).FanType );
-								ShowContinueError( "Occurs in unit = " + HPWaterHeater( HPWaterHeaterNum ).Name );
-								ShowContinueError( " The fan object (" + HPWaterHeater( HPWaterHeaterNum ).FanName + ") is actually the correct fan type and the simulation continues." );
-								ShowContinueError( " Node connection errors will result due to the inconsistent fan type." );
-							}
-						}
+						HPWH.FanType = "Fan:OnOff";
 					}
 
-					GetFanVolFlow( HPWaterHeater( HPWaterHeaterNum ).FanNum, FanVolFlow );
+					GetFanVolFlow( HPWH.FanNum, FanVolFlow );
 
 					if ( FanVolFlow != AutoSize && ! errFlag ) {
-						if ( FanVolFlow < HPWaterHeater( HPWaterHeaterNum ).OperatingAirFlowRate ) {
-							ShowSevereError( cCurrentModuleObject + " - air flow rate = " + TrimSigDigits( FanVolFlow, 7 ) + " in fan object " + HPWaterHeater( HPWaterHeaterNum ).FanName + " is less than the  HPWHs evaporator air flow rate." );
+						if ( FanVolFlow < HPWH.OperatingAirFlowRate ) {
+							ShowSevereError( cCurrentModuleObject + " - air flow rate = " + TrimSigDigits( FanVolFlow, 7 ) + " in fan object " + HPWH.FanName + " is less than the  HPWHs evaporator air flow rate." );
 							ShowContinueError( " The fan flow rate must be >= to the HPWHs evaporator volumetric air flow rate." );
-							ShowContinueError( " Occurs in unit = " + HPWaterHeater( HPWaterHeaterNum ).Name );
+							ShowContinueError( " Occurs in unit = " + HPWH.Name );
 							ErrorsFound = true;
 						}
 					}
 
-					if ( SameString( cAlphaArgs( 24 ), "BlowThrough" ) ) {
-						HPWaterHeater( HPWaterHeaterNum ).FanPlacement = BlowThru;
+					// Fan Placement
+					if ( SameString( cAlphaArgs( 21 + nAlphaOffset ), "BlowThrough" ) ) {
+						HPWH.FanPlacement = BlowThru;
 
-					} else if ( SameString( cAlphaArgs( 24 ), "DrawThrough" ) ) {
-						HPWaterHeater( HPWaterHeaterNum ).FanPlacement = DrawThru;
+					} else if ( SameString( cAlphaArgs( 21 + nAlphaOffset ), "DrawThrough" ) ) {
+						HPWH.FanPlacement = DrawThru;
 
 					} else {
-						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", invalid " );
-						ShowContinueError( cAlphaFieldNames( 24 ) + "=\"" + cAlphaArgs( 24 ) + "\"." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", invalid " );
+						ShowContinueError( cAlphaFieldNames( 21 + nAlphaOffset ) + "=\"" + cAlphaArgs( 21 + nAlphaOffset ) + "\"." );
 						ErrorsFound = true;
 					}
 
-					if ( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum > 0 ) {
-						//         get HPWH capacity, air inlet node, and PLF curve info from DX coil object
-						HPWaterHeater( HPWaterHeaterNum ).Capacity = DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).RatedTotCap2;
-						HPWaterHeater( HPWaterHeaterNum ).DXCoilAirInletNode = DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).AirInNode;
-						HPWaterHeater( HPWaterHeaterNum ).DXCoilPLFFPLR = DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).PLFFPLR( 1 );
-						//         check the range of condenser pump power to be <= 5 gpm/ton
-						if ( DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).HPWHCondPumpElecNomPower / DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).RatedTotCap2 > 0.1422 ) {
-							ShowWarningError( DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).DXCoilType + "= " + DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).Name + ": Rated condenser pump power per watt of rated heating capacity has exceeded the recommended maximum of 0.1422 W/W (41.67 watt/MBH). Condenser pump power per watt = " + TrimSigDigits( ( DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).HPWHCondPumpElecNomPower / DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).RatedTotCap2 ), 4 ) );
+					if ( HPWH.DXCoilNum > 0 ) {
+						// get HPWH capacity, air inlet node, and PLF curve info from DX coil object
+						HPWH.Capacity = DXCoil( HPWH.DXCoilNum ).RatedTotCap2;
+						HPWH.DXCoilAirInletNode = DXCoil( HPWH.DXCoilNum ).AirInNode;
+						HPWH.DXCoilPLFFPLR = DXCoil( HPWH.DXCoilNum ).PLFFPLR( 1 );
+						// check the range of condenser pump power to be <= 5 gpm/ton
+						if ( DXCoil( HPWH.DXCoilNum ).HPWHCondPumpElecNomPower / DXCoil( HPWH.DXCoilNum ).RatedTotCap2 > 0.1422 ) {
+							ShowWarningError( DXCoil( HPWH.DXCoilNum ).DXCoilType + "= " + DXCoil( HPWH.DXCoilNum ).Name + ": Rated condenser pump power per watt of rated heating capacity has exceeded the recommended maximum of 0.1422 W/W (41.67 watt/MBH). Condenser pump power per watt = " + TrimSigDigits( ( DXCoil( HPWH.DXCoilNum ).HPWHCondPumpElecNomPower / DXCoil( HPWH.DXCoilNum ).RatedTotCap2 ), 4 ) );
 						}
 					}
 
-					if ( HPWaterHeater( HPWaterHeaterNum ).OperatingWaterFlowRate == AutoCalculate ) {
-						HPWaterHeater( HPWaterHeaterNum ).OperatingWaterFlowRate = 0.00000004487 * HPWaterHeater( HPWaterHeaterNum ).Capacity;
-						HPWaterHeater( HPWaterHeaterNum ).WaterFlowRateAutoSized = true;
+					if ( HPWH.OperatingWaterFlowRate == AutoCalculate ) {
+						HPWH.OperatingWaterFlowRate = 0.00000004487 * HPWH.Capacity;
+						HPWH.WaterFlowRateAutoSized = true;
 					}
 
-					if ( HPWaterHeater( HPWaterHeaterNum ).OperatingAirFlowRate == AutoCalculate ) {
-						HPWaterHeater( HPWaterHeaterNum ).OperatingAirFlowRate = 0.00005035 * HPWaterHeater( HPWaterHeaterNum ).Capacity;
-						HPWaterHeater( HPWaterHeaterNum ).AirFlowRateAutoSized = true;
+					if ( HPWH.OperatingAirFlowRate == AutoCalculate ) {
+						HPWH.OperatingAirFlowRate = 0.00005035 * HPWH.Capacity;
+						HPWH.AirFlowRateAutoSized = true;
 					}
 
-					HPWaterHeater( HPWaterHeaterNum ).OnCycParaLoad = rNumericArgs( 5 );
-					if ( HPWaterHeater( HPWaterHeaterNum ).OnCycParaLoad < 0.0 ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\"," );
-						ShowContinueError( cNumericFieldNames( 5 ) + " must be >= 0. " + cNumericFieldNames( 5 ) + " = " + TrimSigDigits( rNumericArgs( 5 ), 2 ) );
+					// On Cycle Parasitic Electric Load
+					HPWH.OnCycParaLoad = rNumericArgs( 5 + nNumericOffset );
+					if ( HPWH.OnCycParaLoad < 0.0 ) {
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\"," );
+						ShowContinueError( cNumericFieldNames( 5 + nNumericOffset ) + " must be >= 0. " + cNumericFieldNames( 5 + nNumericOffset ) + " = " + TrimSigDigits( rNumericArgs( 5 + nNumericOffset ), 2 ) );
 						ErrorsFound = true;
 					}
 
-					HPWaterHeater( HPWaterHeaterNum ).OffCycParaLoad = rNumericArgs( 6 );
-					if ( HPWaterHeater( HPWaterHeaterNum ).OffCycParaLoad < 0.0 ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\"," );
-						ShowContinueError( cNumericFieldNames( 6 ) + " must be >= 0. " + cNumericFieldNames( 6 ) + " = " + TrimSigDigits( rNumericArgs( 6 ), 2 ) );
+					// Off Cycle Parasitic Electric Load
+					HPWH.OffCycParaLoad = rNumericArgs( 6 + nNumericOffset );
+					if ( HPWH.OffCycParaLoad < 0.0 ) {
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\"," );
+						ShowContinueError( cNumericFieldNames( 6 + nNumericOffset ) + " must be >= 0. " + cNumericFieldNames( 2 + nNumericOffset ) + " = " + TrimSigDigits( rNumericArgs( 6 + nNumericOffset ), 2 ) );
 						ErrorsFound = true;
 					}
 
-					if ( SameString( cAlphaArgs( 25 ), "Zone" ) ) {
-						HPWaterHeater( HPWaterHeaterNum ).ParasiticTempIndicator = AmbientTempZone;
-						if ( HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempOutsideAir || HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempSchedule ) {
-							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\"," );
-							ShowContinueError( cAlphaFieldNames( 25 ) + " must be ZoneAirOnly or ZoneAndOutdoorAir" );
+					// Parasitic Heat Rejection Location
+					if ( SameString( cAlphaArgs( 22 + nAlphaOffset ), "Zone" ) ) {
+						HPWH.ParasiticTempIndicator = AmbientTempZone;
+						if ( HPWH.InletAirConfiguration == AmbientTempOutsideAir || HPWH.InletAirConfiguration == AmbientTempSchedule ) {
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\"," );
+							ShowContinueError( cAlphaFieldNames( 22 + nAlphaOffset ) + " must be ZoneAirOnly or ZoneAndOutdoorAir" );
 							ShowContinueError( " when parasitic heat rejection location equals Zone." );
 							ErrorsFound = true;
 						}
-					} else if ( SameString( cAlphaArgs( 25 ), "Outdoors" ) ) {
-						HPWaterHeater( HPWaterHeaterNum ).ParasiticTempIndicator = AmbientTempOutsideAir;
+					} else if ( SameString( cAlphaArgs( 22 + nAlphaOffset ), "Outdoors" ) ) {
+						HPWH.ParasiticTempIndicator = AmbientTempOutsideAir;
 					} else {
-						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
 						ShowContinueError( " parasitic heat rejection location must be either Zone or Outdoors." );
 						ErrorsFound = true;
 					}
 
-					//       get mixer/splitter nodes only when Inlet Air Configuration is ZoneAndOutdoorAir
-					if ( ! lAlphaFieldBlanks( 26 ) ) {
-						//         For the inlet air mixer node, NodeConnectionType is outlet from the HPWH inlet air node
-						if ( HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempZoneAndOA ) {
-							HPWaterHeater( HPWaterHeaterNum ).InletAirMixerNode = GetOnlySingleNode( cAlphaArgs( 26 ), ErrorsFound, "WaterHeater:HeatPumpPumpedCondenser inlet air mixer", cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+					// Inlet Air Mixer Node
+					// get mixer/splitter nodes only when Inlet Air Configuration is ZoneAndOutdoorAir
+					if ( ! lAlphaFieldBlanks( 23 + nAlphaOffset ) ) {
+						// For the inlet air mixer node, NodeConnectionType is outlet from the HPWH inlet air node
+						if ( HPWH.InletAirConfiguration == AmbientTempZoneAndOA ) {
+							HPWH.InletAirMixerNode = GetOnlySingleNode( cAlphaArgs( 23 + nAlphaOffset ), ErrorsFound, "WaterHeater:HeatPumpPumpedCondenser inlet air mixer", HPWH.Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 						} else {
-							ShowWarningError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
+							ShowWarningError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
 							ShowContinueError( "Inlet air mixer node name specified but only required when Inlet Air Configuration is selected as Zone and OutdoorAir. Node name disregarded and simulation continues." );
 						}
-					} else if ( lAlphaFieldBlanks( 26 ) && HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempZoneAndOA ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
+					} else if ( lAlphaFieldBlanks( 23 + nAlphaOffset ) && HPWH.InletAirConfiguration == AmbientTempZoneAndOA ) {
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
 						ShowContinueError( "Inlet air mixer node name required when Inlet Air Configuration is selected as ZoneAndOutdoorAir." );
 						ErrorsFound = true;
 					}
 
-					if ( ! lAlphaFieldBlanks( 27 ) ) {
-						//         For the outlet air splitter node, NodeConnectionType is inlet to the HPWH outlet air node
-						if ( HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempZoneAndOA ) {
-							HPWaterHeater( HPWaterHeaterNum ).OutletAirSplitterNode = GetOnlySingleNode( cAlphaArgs( 27 ), ErrorsFound, cCurrentModuleObject + "-OUTLET AIR SPLITTER", cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+					// Outlet Air Splitter Node
+					if ( ! lAlphaFieldBlanks( 24 + nAlphaOffset ) ) {
+						//  For the outlet air splitter node, NodeConnectionType is inlet to the HPWH outlet air node
+						if ( HPWH.InletAirConfiguration == AmbientTempZoneAndOA ) {
+							HPWH.OutletAirSplitterNode = GetOnlySingleNode( cAlphaArgs( 24 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject + "-OUTLET AIR SPLITTER", HPWH.Name, NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 						} else {
-							ShowWarningError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
+							ShowWarningError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
 							ShowContinueError( "Outlet air splitter node name specified but only required when Inlet Air Configuration is selected as ZoneAndOutdoorAir. Node name disregarded and simulation continues." );
 						}
-					} else if ( lAlphaFieldBlanks( 27 ) && HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempZoneAndOA ) {
-						ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
+					} else if ( lAlphaFieldBlanks( 24 + nAlphaOffset ) && HPWH.InletAirConfiguration == AmbientTempZoneAndOA ) {
+						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
 						ShowContinueError( "Outlet air splitter node name required when Inlet Air Configuration is selected as ZoneAndOutdoorAir." );
 						ErrorsFound = true;
 					}
 
-					//       get node data for HPWH
-					if ( HPWaterHeater( HPWaterHeaterNum ).InletAirMixerNode != 0 ) {
-						//         when mixer/splitter nodes are used the HPWH's inlet/outlet node are set up as ObjectIsNotParent
+					// get node data for HPWH
+					if ( HPWH.InletAirMixerNode != 0 ) {
+						// when mixer/splitter nodes are used the HPWH's inlet/outlet node are set up as ObjectIsNotParent
 
-						HPWaterHeater( HPWaterHeaterNum ).HeatPumpAirInletNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject + "-INLET AIR MIXER", cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+						HPWH.HeatPumpAirInletNode = GetOnlySingleNode( cAlphaArgs( 7 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject + "-INLET AIR MIXER", HPWH.Name, NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
-						HPWaterHeater( HPWaterHeaterNum ).HeatPumpAirOutletNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, cCurrentModuleObject + "-OUTLET AIR SPLITTER", cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+						HPWH.HeatPumpAirOutletNode = GetOnlySingleNode( cAlphaArgs( 8 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject + "-OUTLET AIR SPLITTER", HPWH.Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-						HPWaterHeater( HPWaterHeaterNum ).OutsideAirNode = GetOnlySingleNode( cAlphaArgs( 9 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsParent );
-						if ( cAlphaArgs( 9 ) != "" ) {
-							CheckAndAddAirNodeNumber( HPWaterHeater( HPWaterHeaterNum ).OutsideAirNode, Okay );
+						HPWH.OutsideAirNode = GetOnlySingleNode( cAlphaArgs( 9 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsParent );
+						if ( cAlphaArgs( 9 + nAlphaOffset ) != "" ) {
+							CheckAndAddAirNodeNumber( HPWH.OutsideAirNode, Okay );
 							if ( ! Okay ) {
-								ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\": Adding outdoor air node=" + cAlphaArgs( 9 ) );
+								ShowWarningError( cCurrentModuleObject + "=\"" + HPWH.Name + "\": Adding outdoor air node=" + cAlphaArgs( 9 + nAlphaOffset ) );
 							}
 						}
 
-						HPWaterHeater( HPWaterHeaterNum ).ExhaustAirNode = GetOnlySingleNode( cAlphaArgs( 10 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsParent );
+						HPWH.ExhaustAirNode = GetOnlySingleNode( cAlphaArgs( 10 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsParent );
 
 					} else {
-						//         when mixer/splitter nodes are NOT used the HPWH's inlet/outlet nodes are set up as ObjectIsParent
-						if ( HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempSchedule ) {
-							//           for scheduled HPWH's the inlet node is not on any branch or parent object, make it an outlet node
-							//           to avoid node connection errors
-							HPWaterHeater( HPWaterHeaterNum ).HeatPumpAirInletNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
+						// when mixer/splitter nodes are NOT used the HPWH's inlet/outlet nodes are set up as ObjectIsParent
+						if ( HPWH.InletAirConfiguration == AmbientTempSchedule ) {
+							// for scheduled HPWH's the inlet node is not on any branch or parent object, make it an outlet node
+							// to avoid node connection errors
+							HPWH.HeatPumpAirInletNode = GetOnlySingleNode( cAlphaArgs( 7 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
-							HPWaterHeater( HPWaterHeaterNum ).HeatPumpAirOutletNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
+							HPWH.HeatPumpAirOutletNode = GetOnlySingleNode( cAlphaArgs( 8 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
 						} else { // HPWH is connected to a zone with no mixer/splitter nodes
-							if ( HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempZone ) {
-								HPWaterHeater( HPWaterHeaterNum ).HeatPumpAirInletNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+							if ( HPWH.InletAirConfiguration == AmbientTempZone ) {
+								HPWH.HeatPumpAirInletNode = GetOnlySingleNode( cAlphaArgs( 7 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
 
-								HPWaterHeater( HPWaterHeaterNum ).HeatPumpAirOutletNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
+								HPWH.HeatPumpAirOutletNode = GetOnlySingleNode( cAlphaArgs( 8 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 							} else { // HPWH is located outdoors
-								HPWaterHeater( HPWaterHeaterNum ).OutsideAirNode = GetOnlySingleNode( cAlphaArgs( 9 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsParent );
-								if ( ! lAlphaFieldBlanks( 9 ) ) {
-									CheckAndAddAirNodeNumber( HPWaterHeater( HPWaterHeaterNum ).OutsideAirNode, Okay );
+								HPWH.OutsideAirNode = GetOnlySingleNode( cAlphaArgs( 9 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_OutsideAirReference, 1, ObjectIsParent );
+								if ( ! lAlphaFieldBlanks( 9 + nAlphaOffset ) ) {
+									CheckAndAddAirNodeNumber( HPWH.OutsideAirNode, Okay );
 									if ( ! Okay ) {
-										ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\": Adding outdoor air node =" + cAlphaArgs( 9 ) );
+										ShowWarningError( cCurrentModuleObject + "=\"" + HPWH.Name + "\": Adding outdoor air node =" + cAlphaArgs( 9 + nAlphaOffset ) );
 									}
 								}
 
-								HPWaterHeater( HPWaterHeaterNum ).ExhaustAirNode = GetOnlySingleNode( cAlphaArgs( 10 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsParent );
+								HPWH.ExhaustAirNode = GetOnlySingleNode( cAlphaArgs( 10 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsParent );
 							}
 						}
 					}
 
-					//       check that the HPWH inlet and outlet nodes are in the same zone (ZoneHVAC:EquipmentConnections) when
-					//       Inlet Air Configuration is Zone Air Only or Zone and Outdoor Air
-					if ( ( HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempZone || HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempZoneAndOA ) && HPWaterHeater( HPWaterHeaterNum ).AmbientTempZone > 0 ) {
+					// check that the HPWH inlet and outlet nodes are in the same zone (ZoneHVAC:EquipmentConnections) when
+					// Inlet Air Configuration is Zone Air Only or Zone and Outdoor Air
+					if ( ( HPWH.InletAirConfiguration == AmbientTempZone || HPWH.InletAirConfiguration == AmbientTempZoneAndOA ) && HPWH.AmbientTempZone > 0 ) {
 						if ( ! ZoneEquipInputsFilled ) {
 							GetZoneEquipmentData();
 							ZoneEquipInputsFilled = true;
@@ -1649,157 +1713,158 @@ namespace WaterThermalTanks {
 							FoundInletNode = false;
 							FoundOutletNode = false;
 							for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-								if ( HPWaterHeater( HPWaterHeaterNum ).AmbientTempZone == ZoneEquipConfig( ZoneNum ).ActualZoneNum ) break;
+								if ( HPWH.AmbientTempZone == ZoneEquipConfig( ZoneNum ).ActualZoneNum ) break;
 							}
 							if ( ZoneNum <= NumOfZones ) {
 								for ( SupAirIn = 1; SupAirIn <= ZoneEquipConfig( ZoneNum ).NumInletNodes; ++SupAirIn ) {
-									if ( HPWaterHeater( HPWaterHeaterNum ).HeatPumpAirOutletNode != ZoneEquipConfig( ZoneNum ).InletNode( SupAirIn ) ) continue;
+									if ( HPWH.HeatPumpAirOutletNode != ZoneEquipConfig( ZoneNum ).InletNode( SupAirIn ) ) continue;
 									FoundOutletNode = true;
 								}
 								for ( ExhAirOut = 1; ExhAirOut <= ZoneEquipConfig( ZoneNum ).NumExhaustNodes; ++ExhAirOut ) {
-									if ( HPWaterHeater( HPWaterHeaterNum ).HeatPumpAirInletNode != ZoneEquipConfig( ZoneNum ).ExhaustNode( ExhAirOut ) ) continue;
+									if ( HPWH.HeatPumpAirInletNode != ZoneEquipConfig( ZoneNum ).ExhaustNode( ExhAirOut ) ) continue;
 									FoundInletNode = true;
 								}
 								if ( ! FoundInletNode ) {
-									ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
-									ShowContinueError( "The HPWH's air inlet node name = " + cAlphaArgs( 7 ) + " was not properly specified " );
-									ShowContinueError( "as an exhaust air node for zone = " + cAlphaArgs( 13 ) + " in a ZoneHVAC:EquipmentConnections object." );
+									ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
+									ShowContinueError( "The HPWH's air inlet node name = " + cAlphaArgs( 7 + nAlphaOffset ) + " was not properly specified " );
+									ShowContinueError( "as an exhaust air node for zone = " + cAlphaArgs( 13 + nAlphaOffset ) + " in a ZoneHVAC:EquipmentConnections object." );
 									ErrorsFound = true;
 								}
 								if ( ! FoundOutletNode ) {
-									ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
-									ShowContinueError( "The HPWH's air outlet node name = " + cAlphaArgs( 8 ) + " was not properly specified " );
-									ShowContinueError( "as an inlet air node for zone = " + cAlphaArgs( 13 ) + " in a ZoneHVAC:EquipmentConnections object." );
+									ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
+									ShowContinueError( "The HPWH's air outlet node name = " + cAlphaArgs( 8 + nAlphaOffset ) + " was not properly specified " );
+									ShowContinueError( "as an inlet air node for zone = " + cAlphaArgs( 13 + nAlphaOffset ) + " in a ZoneHVAC:EquipmentConnections object." );
 									ErrorsFound = true;
 								}
 							}
 						} else {
-							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\":" );
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
 							ShowContinueError( "Heat pump water heater air inlet node name and air outlet node name must be listed in a ZoneHVAC:EquipmentConnections object when Inlet Air Configuration is equal to ZoneAirOnly or ZoneAndOutdoorAir." );
 							ErrorsFound = true;
 						}
 					}
 
-					//       only get the inlet air mixer schedule if the inlet air configuration is zone and outdoor air
-					if ( ! lAlphaFieldBlanks( 28 ) && HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempZoneAndOA ) {
-						HPWaterHeater( HPWaterHeaterNum ).InletAirMixerSchPtr = GetScheduleIndex( cAlphaArgs( 28 ) );
-						if ( HPWaterHeater( HPWaterHeaterNum ).InletAirMixerSchPtr == 0 ) {
-							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", not found" );
-							ShowContinueError( cAlphaFieldNames( 28 ) + "=\"" + cAlphaArgs( 28 ) + "\"," );
+					// only get the inlet air mixer schedule if the inlet air configuration is zone and outdoor air
+					if ( ! lAlphaFieldBlanks( 25 + nAlphaOffset ) && HPWH.InletAirConfiguration == AmbientTempZoneAndOA ) {
+						HPWH.InletAirMixerSchPtr = GetScheduleIndex( cAlphaArgs( 25 + nAlphaOffset ) );
+						if ( HPWH.InletAirMixerSchPtr == 0 ) {
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
+							ShowContinueError( cAlphaFieldNames( 25 + nAlphaOffset ) + "=\"" + cAlphaArgs( 25 + nAlphaOffset ) + "\"," );
 							ErrorsFound = true;
 						} else {
 							//           check schedule values to be between 0 and 1
-							ValidScheduleValue = CheckScheduleValueMinMax( HPWaterHeater( HPWaterHeaterNum ).InletAirMixerSchPtr, ">=", 0.0, "<=", 1.0 );
+							ValidScheduleValue = CheckScheduleValueMinMax( HPWH.InletAirMixerSchPtr, ">=", 0.0, "<=", 1.0 );
 							if ( ! ValidScheduleValue ) {
-								ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", not found" );
-								ShowContinueError( cAlphaFieldNames( 28 ) + " values out of range of 0 to 1, Schedule=\"" + cAlphaArgs( 28 ) + "\"." );
+								ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", not found" );
+								ShowContinueError( cAlphaFieldNames( 25 + nAlphaOffset ) + " values out of range of 0 to 1, Schedule=\"" + cAlphaArgs( 25 + nAlphaOffset ) + "\"." );
 								ErrorsFound = true;
 							}
 							//           set outlet air splitter schedule index equal to inlet air mixer schedule index
 							//           (place holder for when zone pressurization/depressurization is allowed and different schedules can be used)
-							HPWaterHeater( HPWaterHeaterNum ).OutletAirSplitterSchPtr = GetScheduleIndex( cAlphaArgs( 28 ) );
+							HPWH.OutletAirSplitterSchPtr = GetScheduleIndex( cAlphaArgs( 25 + nAlphaOffset ) );
 						}
 					}
 
-					//       set fan outlet node variable for use in setting Node(FanOutletNode)%MassFlowRateMax for fan object
-					if ( HPWaterHeater( HPWaterHeaterNum ).FanPlacement == DrawThru ) {
-						if ( HPWaterHeater( HPWaterHeaterNum ).OutletAirSplitterNode != 0 ) {
-							HPWaterHeater( HPWaterHeaterNum ).FanOutletNode = HPWaterHeater( HPWaterHeaterNum ).OutletAirSplitterNode;
+					// set fan outlet node variable for use in setting Node(FanOutletNode)%MassFlowRateMax for fan object
+					if ( HPWH.FanPlacement == DrawThru ) {
+						if ( HPWH.OutletAirSplitterNode != 0 ) {
+							HPWH.FanOutletNode = HPWH.OutletAirSplitterNode;
 						} else {
-							if ( HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempOutsideAir ) {
-								HPWaterHeater( HPWaterHeaterNum ).FanOutletNode = HPWaterHeater( HPWaterHeaterNum ).ExhaustAirNode;
+							if ( HPWH.InletAirConfiguration == AmbientTempOutsideAir ) {
+								HPWH.FanOutletNode = HPWH.ExhaustAirNode;
 							} else {
-								HPWaterHeater( HPWaterHeaterNum ).FanOutletNode = HPWaterHeater( HPWaterHeaterNum ).HeatPumpAirOutletNode;
+								HPWH.FanOutletNode = HPWH.HeatPumpAirOutletNode;
 							}
 						}
-					} else if ( HPWaterHeater( HPWaterHeaterNum ).FanPlacement == BlowThru ) {
-						//           set fan outlet node variable for use in setting Node(FanOutletNode)%MassFlowRateMax for fan object
-						HPWaterHeater( HPWaterHeaterNum ).FanOutletNode = DXCoil( HPWaterHeater( HPWaterHeaterNum ).DXCoilNum ).AirInNode;
+					} else if ( HPWH.FanPlacement == BlowThru ) {
+						// set fan outlet node variable for use in setting Node(FanOutletNode)%MassFlowRateMax for fan object
+						HPWH.FanOutletNode = DXCoil( HPWH.DXCoilNum ).AirInNode;
 					}
 
-					//       set the max mass flow rate for outdoor fans
-					Node( HPWaterHeater( HPWaterHeaterNum ).FanOutletNode ).MassFlowRateMax = HPWaterHeater( HPWaterHeaterNum ).OperatingAirFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, 20.0, 0.0 );
+					// set the max mass flow rate for outdoor fans
+					Node( HPWH.FanOutletNode ).MassFlowRateMax = HPWH.OperatingAirFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, 20.0, 0.0 );
 
-					if ( HPWaterHeater( HPWaterHeaterNum ).FanPlacement == BlowThru ) {
-						if ( HPWaterHeater( HPWaterHeaterNum ).InletAirMixerNode > 0 ) {
-							//           cAlphaArgs(26) = Inlet Air Mixer Node
-							FanInletNode = cAlphaArgs( 26 );
+					if ( HPWH.FanPlacement == BlowThru ) {
+						if ( HPWH.InletAirMixerNode > 0 ) {
+							//           cAlphaArgs( 23 + nAlphaOffset ) = Inlet Air Mixer Node
+							FanInletNode = cAlphaArgs( 23 + nAlphaOffset );
 							FanOutletNode = "UNDEFINED";
 						} else {
-							if ( HPWaterHeater( HPWaterHeaterNum ).OutsideAirNode == 0 ) {
-								//             cAlphaArgs(7) = Heat Pump Air Inlet Node
-								FanInletNode = cAlphaArgs( 7 );
+							if ( HPWH.OutsideAirNode == 0 ) {
+								//             cAlphaArgs( 7 + nAlphaOffset ) = Heat Pump Air Inlet Node
+								FanInletNode = cAlphaArgs( 7 + nAlphaOffset );
 								FanOutletNode = "UNDEFINED";
 							} else {
-								//             cAlphaArgs(9) = Outside Air Node
-								FanInletNode = cAlphaArgs( 9 );
+								//             cAlphaArgs( 9 + nAlphaOffset ) = Outside Air Node
+								FanInletNode = cAlphaArgs( 9 + nAlphaOffset );
 								FanOutletNode = "UNDEFINED";
 							}
 						}
-						if ( HPWaterHeater( HPWaterHeaterNum ).OutletAirSplitterNode > 0 ) {
-							//           cAlphaArgs(27) = Outlet Air Splitter Node
+						if ( HPWH.OutletAirSplitterNode > 0 ) {
+							//           cAlphaArgs( 27 + nAlphaOffset ) = Outlet Air Splitter Node
 							CoilInletNode = "UNDEFINED";
-							CoilOutletNode = cAlphaArgs( 27 );
+							CoilOutletNode = cAlphaArgs( 24 + nAlphaOffset );
 						} else {
-							if ( HPWaterHeater( HPWaterHeaterNum ).OutsideAirNode == 0 ) {
-								//             cAlphaArgs(8) = Heat Pump Air Outlet Node
+							if ( HPWH.OutsideAirNode == 0 ) {
+								//             cAlphaArgs( 8 + nAlphaOffset ) = Heat Pump Air Outlet Node
 								CoilInletNode = "UNDEFINED";
-								CoilOutletNode = cAlphaArgs( 8 );
+								CoilOutletNode = cAlphaArgs( 8 + nAlphaOffset );
 							} else {
 								CoilInletNode = "UNDEFINED";
-								//             cAlphaArgs(10) = Exhaust Air Node
-								CoilOutletNode = cAlphaArgs( 10 );
+								//             cAlphaArgs( 10 + nAlphaOffset ) = Exhaust Air Node
+								CoilOutletNode = cAlphaArgs( 10 + nAlphaOffset );
 							}
 						}
 					} else {
-						if ( HPWaterHeater( HPWaterHeaterNum ).InletAirMixerNode > 0 ) {
-							CoilInletNode = cAlphaArgs( 26 );
+						if ( HPWH.InletAirMixerNode > 0 ) {
+							CoilInletNode = cAlphaArgs( 23 + nAlphaOffset );
 							CoilOutletNode = "UNDEFINED";
 						} else {
-							if ( HPWaterHeater( HPWaterHeaterNum ).OutsideAirNode == 0 ) {
-								CoilInletNode = cAlphaArgs( 7 );
+							if ( HPWH.OutsideAirNode == 0 ) {
+								CoilInletNode = cAlphaArgs( 7 + nAlphaOffset );
 								CoilOutletNode = "UNDEFINED";
 							} else {
-								CoilInletNode = cAlphaArgs( 9 );
+								CoilInletNode = cAlphaArgs( 9 + nAlphaOffset );
 								CoilOutletNode = "UNDEFINED";
 							}
 						}
-						if ( HPWaterHeater( HPWaterHeaterNum ).OutletAirSplitterNode > 0 ) {
+						if ( HPWH.OutletAirSplitterNode > 0 ) {
 							FanInletNode = "UNDEFINED";
-							FanOutletNode = cAlphaArgs( 27 );
+							FanOutletNode = cAlphaArgs( 24 + nAlphaOffset );
 						} else {
-							if ( HPWaterHeater( HPWaterHeaterNum ).OutsideAirNode == 0 ) {
+							if ( HPWH.OutsideAirNode == 0 ) {
 								FanInletNode = "UNDEFINED";
-								FanOutletNode = cAlphaArgs( 8 );
+								FanOutletNode = cAlphaArgs( 8 + nAlphaOffset );
 							} else {
 								FanInletNode = "UNDEFINED";
-								FanOutletNode = cAlphaArgs( 10 );
+								FanOutletNode = cAlphaArgs( 10 + nAlphaOffset );
 							}
 						}
 					}
 
-					//       set up comp set for air side nodes (can be blow thru or draw thru, may or may not have damper nodes)
-					SetUpCompSets( HPWaterHeater( HPWaterHeaterNum ).Type, HPWaterHeater( HPWaterHeaterNum ).Name, HPWaterHeater( HPWaterHeaterNum ).DXCoilType, HPWaterHeater( HPWaterHeaterNum ).DXCoilName, CoilInletNode, CoilOutletNode );
+					// set up comp set for air side nodes (can be blow thru or draw thru, may or may not have damper nodes)
+					SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.DXCoilType, HPWH.DXCoilName, CoilInletNode, CoilOutletNode );
 
-					SetUpCompSets( HPWaterHeater( HPWaterHeaterNum ).Type, HPWaterHeater( HPWaterHeaterNum ).Name, HPWaterHeater( HPWaterHeaterNum ).FanType, HPWaterHeater( HPWaterHeaterNum ).FanName, FanInletNode, FanOutletNode );
+					SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.FanType, HPWH.FanName, FanInletNode, FanOutletNode );
 
-					if ( ! lAlphaFieldBlanks( 29 ) ) {
-						{ auto const SELECT_CASE_var( cAlphaArgs( 29 ) );
+					// Control Sensor Location In Stratified Tank
+					if ( ! lAlphaFieldBlanks( 26 + nAlphaOffset ) ) {
+						{ auto const SELECT_CASE_var( cAlphaArgs( 26 + nAlphaOffset ) );
 						if ( SELECT_CASE_var == "HEATER1" ) {
-							HPWaterHeater( HPWaterHeaterNum ).ControlSensorLocation = Heater1HPWHControl;
+							HPWH.ControlSensorLocation = Heater1HPWHControl;
 						} else if ( SELECT_CASE_var == "HEATER2" ) {
-							HPWaterHeater( HPWaterHeaterNum ).ControlSensorLocation = Heater2HPWHControl;
+							HPWH.ControlSensorLocation = Heater2HPWHControl;
 						} else if ( SELECT_CASE_var == "SOURCEINLET" ) {
-							HPWaterHeater( HPWaterHeaterNum ).ControlSensorLocation = SourceInletHPWHControl;
+							HPWH.ControlSensorLocation = SourceInletHPWHControl;
 						} else if ( SELECT_CASE_var == "SOURCEOUTLET" ) {
-							HPWaterHeater( HPWaterHeaterNum ).ControlSensorLocation = SourceOutletHPWHControl;
+							HPWH.ControlSensorLocation = SourceOutletHPWHControl;
 						} else if ( SELECT_CASE_var == "USEINLET" ) {
-							HPWaterHeater( HPWaterHeaterNum ).ControlSensorLocation = UseInletHPWHControl;
+							HPWH.ControlSensorLocation = UseInletHPWHControl;
 						} else if ( SELECT_CASE_var == "USEOUTLET" ) {
-							HPWaterHeater( HPWaterHeaterNum ).ControlSensorLocation = UseOutletHPWHControl;
+							HPWH.ControlSensorLocation = UseOutletHPWHControl;
 						} else {
-							ShowSevereError( cCurrentModuleObject + "=\"" + HPWaterHeater( HPWaterHeaterNum ).Name + "\", invalid " );
-							ShowContinueError( cAlphaFieldNames( 29 ) + "=\"" + cAlphaArgs( 29 ) + "\"." );
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", invalid " );
+							ShowContinueError( cAlphaFieldNames( 26 + nAlphaOffset ) + "=\"" + cAlphaArgs( 26 + nAlphaOffset ) + "\"." );
 							ErrorsFound = true;
 						}}
 
@@ -3300,121 +3365,133 @@ namespace WaterThermalTanks {
 				} // DO DesuperheaterNum = 1, NumWaterHeaterDesuperheater
 			}
 
-			//   Loop through HPWH's and then search all water heaters for the tank connected to the HPWH
+			// Loop through HPWH's and then search all water heaters for the tank connected to the HPWH
 			if ( NumHeatPumpWaterHeater > 0 ) {
 
 				cCurrentModuleObject = "WaterHeater:HeatPumpPumpedCondenser";
 
+				int const NumPumpedCondenser = GetNumObjectsFound( cHPWHPumpedCondenser ); // number of WaterHeater:HeatPumpPumpedCondenser objects
 				for ( HPWaterHeaterNum = 1; HPWaterHeaterNum <= NumHeatPumpWaterHeater; ++HPWaterHeaterNum ) {
 
-					//       find the tank associated with the heat pump water heater and change its %TYPE to HEAT PUMP:WATER HEATER
+					// Create reference to current HPWH object in array.
+					HeatPumpWaterHeaterData &HPWH = HPWaterHeater( HPWaterHeaterNum );
+					if ( HPWaterHeaterNum <= NumPumpedCondenser ) {
+						// Pumped Condenser
+						cCurrentModuleObject = cHPWHPumpedCondenser;
+					} else {
+						// Wrapped Condenser
+						cCurrentModuleObject = cHPWHWrappedCondenser;
+					}
+
+					// find the tank associated with the heat pump water heater and change its %TYPE to HEAT PUMP:WATER HEATER
 					for ( CheckWaterHeaterNum = 1; CheckWaterHeaterNum <= NumWaterThermalTank; ++CheckWaterHeaterNum ) {
-						if ( ! SameString( HPWaterHeater( HPWaterHeaterNum ).TankName, WaterThermalTank( CheckWaterHeaterNum ).Name ) || ! SameString( HPWaterHeater( HPWaterHeaterNum ).TankType, WaterThermalTank( CheckWaterHeaterNum ).Type ) ) continue;
+						
+						// Create reference to the tank
+						WaterThermalTankData &Tank = WaterThermalTank( CheckWaterHeaterNum );
+						
+						if ( ! SameString( HPWH.TankName, Tank.Name ) ) continue;
 
-						//         save backup element and on/off-cycle parasitic properties for use during standard rating procedure
-						HPWaterHeater( HPWaterHeaterNum ).BackupElementCapacity = WaterThermalTank( CheckWaterHeaterNum ).MaxCapacity;
-						HPWaterHeater( HPWaterHeaterNum ).BackupElementEfficiency = WaterThermalTank( CheckWaterHeaterNum ).Efficiency;
-						HPWaterHeater( HPWaterHeaterNum ).WHOnCycParaLoad = WaterThermalTank( CheckWaterHeaterNum ).OnCycParaLoad;
-						HPWaterHeater( HPWaterHeaterNum ).WHOffCycParaLoad = WaterThermalTank( CheckWaterHeaterNum ).OffCycParaLoad;
-						HPWaterHeater( HPWaterHeaterNum ).WHOnCycParaFracToTank = WaterThermalTank( CheckWaterHeaterNum ).OnCycParaFracToTank;
-						HPWaterHeater( HPWaterHeaterNum ).WHOffCycParaFracToTank = WaterThermalTank( CheckWaterHeaterNum ).OffCycParaFracToTank;
-						HPWaterHeater( HPWaterHeaterNum ).WHPLFCurve = WaterThermalTank( CheckWaterHeaterNum ).PLFCurve;
+						// save backup element and on/off-cycle parasitic properties for use during standard rating procedure
+						HPWH.BackupElementCapacity = Tank.MaxCapacity;
+						HPWH.BackupElementEfficiency = Tank.Efficiency;
+						HPWH.WHOnCycParaLoad = Tank.OnCycParaLoad;
+						HPWH.WHOffCycParaLoad = Tank.OffCycParaLoad;
+						HPWH.WHOnCycParaFracToTank = Tank.OnCycParaFracToTank;
+						HPWH.WHOffCycParaFracToTank = Tank.OffCycParaFracToTank;
+						HPWH.WHPLFCurve = Tank.PLFCurve;
 
-						if ( WaterThermalTank( CheckWaterHeaterNum ).Type == "WATER HEATER:SIMPLE" ) { // name change issue here.
-							ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
-							ShowContinueError( "WaterHeater:HeatPumpPumpedCondenser cannot be used with WATER HEATER:SIMPLE." );
-							ErrorsFound = true;
-						} else if ( ( WaterThermalTank( CheckWaterHeaterNum ).Type == cMixedWHModuleObj ) || ( WaterThermalTank( CheckWaterHeaterNum ).Type == cStratifiedWHModuleObj ) ) {
-							HPWaterHeater( HPWaterHeaterNum ).TankTypeNum = WaterThermalTank( CheckWaterHeaterNum ).TypeNum;
-							//           use typenum parameter to simulate heatpumpwaterheater in standard ratings procedure
-							//           WaterThermalTank%TypeNum = HeatPumpWaterHeater for a HPWH
-							//            WaterThermalTank(CheckWaterHeaterNum)%TypeNum = HPWaterHeater(HPWaterHeaterNum)%TypeNum
+						if ( ( ( Tank.TypeNum == MixedWaterHeater ) && ( HPWH.CondenserConfig == HPWH_CONDENSER_PUMPED ) ) || ( Tank.TypeNum == StratifiedWaterHeater ) ) {
+							HPWH.TankType = Tank.Type;
+							HPWH.TankTypeNum = Tank.TypeNum;
+							// use typenum parameter to simulate heatpumpwaterheater in standard ratings procedure
+							// WaterThermalTank.TypeNum = HeatPumpWaterHeater for a HPWH
+							// Tank.TypeNum = HPWH.TypeNum
 						} else {
-							ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
-							ShowContinueError( "Invalid water heater tank type =" + WaterThermalTank( CheckWaterHeaterNum ).Type );
+							ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
+							ShowContinueError( "Invalid water heater tank type = " + Tank.Type );
 							ErrorsFound = true;
 						}
 
-						//         do not allow modulating control for HPWH's (i.e. modulating control usually used for tankless WH's)
-						if ( WaterThermalTank( CheckWaterHeaterNum ).ControlType == ControlTypeModulate ) {
-							ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
-							ShowContinueError( "Heater Control Type for " + WaterThermalTank( CheckWaterHeaterNum ).Type + " = " + WaterThermalTank( CheckWaterHeaterNum ).Name + " must be CYCLE." );
+						// do not allow modulating control for HPWH's (i.e. modulating control usually used for tankless WH's)
+						if ( Tank.ControlType == ControlTypeModulate ) {
+							ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
+							ShowContinueError( "Heater Control Type for " + Tank.Type + " = " + Tank.Name + " must be CYCLE." );
 							ErrorsFound = true;
 						}
 
-						WaterThermalTank( CheckWaterHeaterNum ).HeatPumpNum = HPWaterHeaterNum;
-						HPWaterHeater( HPWaterHeaterNum ).WaterHeaterTankNum = CheckWaterHeaterNum;
+						Tank.HeatPumpNum = HPWaterHeaterNum;
+						HPWH.WaterHeaterTankNum = CheckWaterHeaterNum;
 
-						if ( WaterThermalTank( CheckWaterHeaterNum ).DesuperheaterNum > 0 ) {
-							ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + "and Coil:WaterHeating:Desuperheater = " + WaterHeaterDesuperheater( CheckWaterHeaterNum ).Name + ":  cannot be connected to the same water heater tank = " + WaterThermalTank( CheckWaterHeaterNum ).Name );
+						if ( Tank.DesuperheaterNum > 0 ) {
+							ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + "and Coil:WaterHeating:Desuperheater = " + WaterHeaterDesuperheater( CheckWaterHeaterNum ).Name + ":  cannot be connected to the same water heater tank = " + Tank.Name );
 						}
 
-						//         check that water heater source side effectiveness is greater than 0
-						if ( WaterThermalTank( CheckWaterHeaterNum ).SourceEffectiveness <= 0.0 ) {
-							ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ":  Invalid source side effectiveness for heat pump water heater = " + TrimSigDigits( WaterThermalTank( CheckWaterHeaterNum ).SourceEffectiveness, 3 ) );
+						// check that water heater source side effectiveness is greater than 0
+						if ( Tank.SourceEffectiveness <= 0.0 ) {
+							ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ":  Invalid source side effectiveness for heat pump water heater = " + TrimSigDigits( Tank.SourceEffectiveness, 3 ) );
 							ShowContinueError( " water heater source effectiveness will default to 1.0 and simulation continues." );
-							WaterThermalTank( CheckWaterHeaterNum ).SourceEffectiveness = 1.0;
+							Tank.SourceEffectiveness = 1.0;
 						}
 
 						//         Set HPWH structure variable StandAlone to TRUE if use nodes are not connected
-						if ( WaterThermalTank( CheckWaterHeaterNum ).UseInletNode == 0 && WaterThermalTank( CheckWaterHeaterNum ).UseOutletNode == 0 ) HPWaterHeater( HPWaterHeaterNum ).StandAlone = true;
+						if ( Tank.UseInletNode == 0 && Tank.UseOutletNode == 0 ) HPWH.StandAlone = true;
 
-						if ( HPWaterHeater( HPWaterHeaterNum ).WHUseInletNode != WaterThermalTank( CheckWaterHeaterNum ).UseInletNode || HPWaterHeater( HPWaterHeaterNum ).WHUseOutletNode != WaterThermalTank( CheckWaterHeaterNum ).UseOutletNode ) {
-							ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
-							ShowContinueError( "Heat pump water heater tank use side inlet and outlet node names must match the use side inlet and outlet node names for water heater tank = " + HPWaterHeater( HPWaterHeaterNum ).TankType + ": " + HPWaterHeater( HPWaterHeaterNum ).TankName );
+						if ( HPWH.WHUseInletNode != Tank.UseInletNode || HPWH.WHUseOutletNode != Tank.UseOutletNode ) {
+							ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
+							ShowContinueError( "Heat pump water heater tank use side inlet and outlet node names must match the use side inlet and outlet node names for water heater tank = " + HPWH.TankType + ": " + HPWH.TankName );
 							ShowContinueError( "Heat pump water heater use side inlet and outlet node names = " + HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName2 + " and " + HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName2 );
 							ShowContinueError( "Water heater tank use side inlet and outlet node names      = " + WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName1 + " and " + WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName1 );
 							ErrorsFound = true;
 						} else {
-							if ( ! HPWaterHeater( HPWaterHeaterNum ).StandAlone ) {
+							if ( ! HPWH.StandAlone ) {
 								//              removed next to avoid duplicate comp set issue, (should change so that Branch has tank object)
-								//              CALL SetUpCompSets(HPWaterHeater(HPWaterHeaterNum)%Type, HPWaterHeater(HPWaterHeaterNum)%Name, &
-								//                     HPWaterHeater(HPWaterHeaterNum)%TankType, &
-								//                     HPWaterHeater(HPWaterHeaterNum)%TankName, &
+								//              CALL SetUpCompSets(HPWH%Type, HPWH%Name, &
+								//                     HPWH%TankType, &
+								//                     HPWH%TankName, &
 								//                     WHSaveNodeNames(CheckWaterHeaterNum)%InletNodeName1,WHSaveNodeNames(CheckWaterHeaterNum)%OutletNodeName1)
-								TestCompSet( HPWaterHeater( HPWaterHeaterNum ).Type, HPWaterHeater( HPWaterHeaterNum ).Name, WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName1, WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName1, "Water Nodes" );
+								TestCompSet( HPWH.Type, HPWH.Name, WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName1, WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName1, "Water Nodes" );
 							}
 						}
 
 						//         verify HP/tank source node connections
-						if ( HPWaterHeater( HPWaterHeaterNum ).CondWaterInletNode != WaterThermalTank( CheckWaterHeaterNum ).SourceOutletNode ) {
-							ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
+						if ( HPWH.CondWaterInletNode != Tank.SourceOutletNode ) {
+							ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
 							ShowContinueError( "Heat Pump condenser water inlet node name does not match water heater tank source outlet node name." );
 							ShowContinueError( "Heat pump condenser water inlet and outlet node names = " + HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName1 + " and " + HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName1 );
 							ShowContinueError( "Water heater tank source side inlet and outlet node names      = " + WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 + " and " + WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 );
 							ErrorsFound = true;
 						}
 
-						if ( HPWaterHeater( HPWaterHeaterNum ).CondWaterOutletNode != WaterThermalTank( CheckWaterHeaterNum ).SourceInletNode ) {
-							ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
+						if ( HPWH.CondWaterOutletNode != Tank.SourceInletNode ) {
+							ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
 							ShowContinueError( "Heat Pump condenser water outlet node name does not match water heater tank source inlet node name." );
 							ShowContinueError( "Heat pump condenser water inlet and outlet node names = " + HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName1 + " and " + HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName1 );
 							ShowContinueError( "Water heater tank source side inlet and outlet node names      = " + WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 + " and " + WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 );
 							ErrorsFound = true;
 						}
 
-						HPWaterHeater( HPWaterHeaterNum ).FoundTank = true;
+						HPWH.FoundTank = true;
 
-						//         Verify tank name is in a zone equipment list if HPWH Inlet Air Configuration is Zone Air Only or Zone and Outdoor Air
-						if ( HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempZone || HPWaterHeater( HPWaterHeaterNum ).InletAirConfiguration == AmbientTempZoneAndOA ) {
+						// Verify tank name is in a zone equipment list if HPWH Inlet Air Configuration is Zone Air Only or Zone and Outdoor Air
+						if ( HPWH.InletAirConfiguration == AmbientTempZone || HPWH.InletAirConfiguration == AmbientTempZoneAndOA ) {
 							if ( allocated( ZoneEquipConfig ) && allocated( ZoneEquipList ) ) {
 								FoundTankInList = false;
 								TankNotLowestPriority = false;
 								for ( ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum ) {
-									if ( ZoneEquipConfig( ZoneEquipConfigNum ).ActualZoneNum != HPWaterHeater( HPWaterHeaterNum ).AmbientTempZone ) continue;
+									if ( ZoneEquipConfig( ZoneEquipConfigNum ).ActualZoneNum != HPWH.AmbientTempZone ) continue;
 									if ( ZoneEquipConfigNum <= NumOfZones ) {
 										for ( ZoneEquipListNum = 1; ZoneEquipListNum <= NumOfZones; ++ZoneEquipListNum ) {
 											if ( ZoneEquipConfig( ZoneEquipConfigNum ).EquipListName != ZoneEquipList( ZoneEquipListNum ).Name ) continue;
 											if ( ZoneEquipConfigNum <= NumOfZones ) {
 												for ( EquipmentTypeNum = 1; EquipmentTypeNum <= ZoneEquipList( ZoneEquipListNum ).NumOfEquipTypes; ++EquipmentTypeNum ) {
-													if ( ZoneEquipList( ZoneEquipListNum ).EquipName( EquipmentTypeNum ) != HPWaterHeater( HPWaterHeaterNum ).Name ) continue;
+													if ( ZoneEquipList( ZoneEquipListNum ).EquipName( EquipmentTypeNum ) != HPWH.Name ) continue;
 													FoundTankInList = true;
 													TankCoolingPriority = ZoneEquipList( ZoneEquipListNum ).CoolingPriority( EquipmentTypeNum );
 													TankHeatingPriority = ZoneEquipList( ZoneEquipListNum ).HeatingPriority( EquipmentTypeNum );
 													break;
 												} // EquipmentTypeNum
 												if ( ! FoundTankInList ) {
-													ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
+													ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
 													ShowContinueError( "Heat pump water heater type and name must be listed in the correct ZoneHVAC:EquipmentList object when Inlet Air Configuration is equal to ZoneAirOnly or ZoneAndOutdoorAir." );
 													ErrorsFound = true;
 												}
@@ -3426,7 +3503,7 @@ namespace WaterThermalTanks {
 													}
 												} // EquipmentTypeNum
 												if ( TankNotLowestPriority && FoundTankInList ) {
-													ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
+													ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
 													ShowContinueError( "Heat pump water heaters must have lower priorities than all other equipment types in a ZoneHVAC:EquipmentList." );
 													ErrorsFound = true;
 												}
@@ -3437,7 +3514,7 @@ namespace WaterThermalTanks {
 									} // ZoneEquipConfigNum .LE. NumOfZones
 								} // ZoneEquipConfigNum
 							} else {
-								ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
+								ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
 								ShowContinueError( "ZoneHVAC:EquipmentList and ZoneHVAC:EquipmentConnections objects are required when Inlet Air Configuration is either ZoneAirOnly or ZoneAndOutdoorAir." );
 								ErrorsFound = true;
 							} // ALLOCATED
@@ -3445,9 +3522,9 @@ namespace WaterThermalTanks {
 
 					} // DO CheckWaterHeaterNum = 1, NumWaterHeater
 
-					if ( ! HPWaterHeater( HPWaterHeaterNum ).FoundTank ) {
-						ShowSevereError( cCurrentModuleObject + " = " + HPWaterHeater( HPWaterHeaterNum ).Name + ':' );
-						ShowContinueError( "Water heater tank object not found = " + HPWaterHeater( HPWaterHeaterNum ).TankType + ", " + HPWaterHeater( HPWaterHeaterNum ).TankName );
+					if ( ! HPWH.FoundTank ) {
+						ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
+						ShowContinueError( "Water heater tank object not found = " + HPWH.TankType + ", " + HPWH.TankName );
 						ErrorsFound = true;
 					}
 
@@ -3459,7 +3536,7 @@ namespace WaterThermalTanks {
 
 			}
 
-			//Get water heater sizing input.
+			// Get water heater sizing input.
 			cCurrentModuleObject = "WaterHeater:Sizing";
 			NumWaterHeaterSizing = GetNumObjectsFound( cCurrentModuleObject );
 
