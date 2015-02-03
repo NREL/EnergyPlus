@@ -7,6 +7,7 @@ endif()
 
 set( test_src
   DataPlant.unit.cc
+  DXCoils.unit.cc
   ExteriorEnergyUse.unit.cc
   HeatBalanceManager.unit.cc
   HVACStandaloneERV.unit.cc
