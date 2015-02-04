@@ -1286,9 +1286,8 @@ namespace MixedAir {
 				OAController( OutAirNum ).MixNode = GetOnlySingleNode( AlphArray( 4 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 				OAController( OutAirNum ).OANode = GetOnlySingleNode( AlphArray( 5 ), ErrorsFound, CurrentModuleObject, AlphArray( 1 ), NodeType_Air, NodeConnectionType_Actuator, 1, ObjectIsNotParent );
 				if ( ! CheckOutAirNodeNumber( OAController( OutAirNum ).OANode ) ) {
-					ShowSevereError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" invalid field " );
-					ShowContinueError( cAlphaFields( 5 ) + "=\"" + AlphArray( 5 ) + "\", must be an OutdoorAir:Node for outdoor air to be effective." );
-					ErrorsFound = true;
+					ShowWarningError( CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" has a nonstandard input." );
+					ShowContinueError( cAlphaFields( 5 ) + "=\"" + AlphArray( 5 ) + "\", is not an OutdoorAir:Node, confirm intended source for outdoor air stream." );
 				}
 				if ( SameString( AlphArray( 6 ), "NoEconomizer" ) ) {
 					OAController( OutAirNum ).Econo = NoEconomizer;
