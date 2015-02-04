@@ -11,12 +11,14 @@
 #include <ObjexxFCL/Vector3.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <SolarShading.hh>
 #include <DataDaylighting.hh>
 #include <DataDaylightingDevices.hh>
 #include <DataEnvironment.hh>
 #include <DataErrorTracking.hh>
 #include <DataGlobals.hh>
+#include <DataStringGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalSurface.hh>
@@ -253,9 +255,9 @@ namespace SolarShading {
 #endif
 		if ( BeginSimFlag ) {
 
-			shd_stream.open( "eplusout.shd" );
+			shd_stream.open( DataStringGlobals::outputShdFileName );
 			if ( ! shd_stream ) {
-				ShowFatalError( "InitSolarCalculations: Could not open file \"eplusout.shd\" for output (write)." );
+				ShowFatalError( "InitSolarCalculations: Could not open file \"" + DataStringGlobals::outputShdFileName + "\" for output (write)." );
 			}
 
 			if ( GetInputFlag ) {
@@ -3143,7 +3145,6 @@ namespace SolarShading {
 			}
 
 			if ( DisplayExtraWarnings ) {
-				++NumTooManyFigures;
 				TrackTooManyFigures.redimension( ++NumTooManyFigures );
 				TrackTooManyFigures( NumTooManyFigures ).SurfIndex1 = CurrentShadowingSurface;
 				TrackTooManyFigures( NumTooManyFigures ).SurfIndex2 = CurrentSurfaceBeingShadowed;

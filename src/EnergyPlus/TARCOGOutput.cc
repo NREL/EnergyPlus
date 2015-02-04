@@ -8,7 +8,9 @@
 
 // EnergyPlus Headers
 #include <TARCOGOutput.hh>
+#include <CommandLineInterface.hh>
 #include <DataGlobals.hh>
+#include <DataStringGlobals.hh>
 #include <DataPrecisionGlobals.hh>
 #include <TARCOGCommon.hh>
 #include <TARCOGGassesParams.hh>
@@ -1528,11 +1530,11 @@ namespace TARCOGOutput {
 				TarcogIterationsFileNumber = GetNewUnitNumber();
 				//        open(newunit=TarcogIterationsFileNumber,  file=TRIM(DBGD)//'TarcogIterations.dbg',  status='unknown', position='APPEND',  &
 				//              form='formatted', iostat=nperr)
-				{ IOFlags flags; flags.FORM( "formatted" ); flags.STATUS( "unknown" ); flags.POSITION( "APPEND" ); gio::open( TarcogIterationsFileNumber, DBGD + "TarcogIterations.dbg", flags ); nperr = flags.ios(); }
+				{ IOFlags flags; flags.FORM( "formatted" ); flags.STATUS( "unknown" ); flags.POSITION( "APPEND" ); gio::open( TarcogIterationsFileNumber, DBGD + DataStringGlobals::TarcogIterationsFileName, flags ); nperr = flags.ios(); }
 
 				//        if (nperr.ne.0)  open(newunit=TarcogIterationsFileNumber, file='TarcogIterations.dbg',status='unknown', position='APPEND',  &
 				//              &  form='formatted', iostat=nperr)
-				if ( nperr != 0 ) { IOFlags flags; flags.FORM( "formatted" ); flags.STATUS( "unknown" ); flags.POSITION( "APPEND" ); gio::open( TarcogIterationsFileNumber, "TarcogIterations.dbg", flags ); nperr = flags.ios(); }
+				if ( nperr != 0 ) { IOFlags flags; flags.FORM( "formatted" ); flags.STATUS( "unknown" ); flags.POSITION( "APPEND" ); gio::open( TarcogIterationsFileNumber, DataStringGlobals::TarcogIterationsFileName, flags ); nperr = flags.ios(); }
 
 				IterationCSVFileNumber = GetNewUnitNumber();
 				//        open(newunit=IterationCSVFileNumber,  file=TRIM(DBGD)//TRIM(IterationCSVName),  status='unknown', position='APPEND',  &

@@ -748,19 +748,20 @@ namespace GroundHeatExchangers {
 			verticalGLHE( GLHENum ).gReferenceRatio = rNumericArgs( 14 );
 
 			//   Not many checks
-			if ( verticalGLHE( GLHENum ).pipeThick >= verticalGLHE( GLHENum ).pipeOutDia / 2.0 ) {
-				ShowSevereError( cCurrentModuleObject + "=\"" + verticalGLHE( GLHENum ).name + "\", invalid value in field." );
-				ShowContinueError( "..." + cNumericFieldNames( 13 ) + "=[" + RoundSigDigits( verticalGLHE( GLHENum ).pipeThick, 3 ) + "]." );
-				ShowContinueError( "..." + cNumericFieldNames( 11 ) + "=[" + RoundSigDigits( verticalGLHE( GLHENum ).pipeOutDia, 3 ) + "]." );
+
+			if ( VerticalGlhe( GlheNum ).PipeThick >= VerticalGlhe( GlheNum ).PipeOutDia / 2.0 ) {
+				ShowSevereError( cCurrentModuleObject + "=\"" + VerticalGlhe( GlheNum ).Name + "\", invalid value in field." );
+				ShowContinueError( "..." + cNumericFieldNames( 12 ) + "=[" + RoundSigDigits( VerticalGlhe( GlheNum ).PipeThick, 3 ) + "]." );
+				ShowContinueError( "..." + cNumericFieldNames( 10 ) + "=[" + RoundSigDigits( VerticalGlhe( GlheNum ).PipeOutDia, 3 ) + "]." );
 				ShowContinueError( "...Radius will be <=0." );
 				ErrorsFound = true;
 			}
 
-			if ( verticalGLHE( GLHENum ).maxSimYears < MaxNumberSimYears ) {
-				ShowWarningError( cCurrentModuleObject + "=\"" + verticalGLHE( GLHENum ).name + "\", invalid value in field." );
-				ShowContinueError( "..." + cNumericFieldNames( 14 ) + " less than RunPeriod Request" );
-				ShowContinueError( "Requested input=" + TrimSigDigits( verticalGLHE( GLHENum ).maxSimYears ) + " will be set to " + TrimSigDigits( MaxNumberSimYears ) );
-				verticalGLHE( GLHENum ).maxSimYears = MaxNumberSimYears;
+			if ( VerticalGlhe( GlheNum ).MaxSimYears < MaxNumberSimYears ) {
+				ShowWarningError( cCurrentModuleObject + "=\"" + VerticalGlhe( GlheNum ).Name + "\", invalid value in field." );
+				ShowContinueError( "..." + cNumericFieldNames( 13 ) + " less than RunPeriod Request" );
+				ShowContinueError( "Requested input=" + TrimSigDigits( VerticalGlhe( GlheNum ).MaxSimYears ) + " will be set to " + TrimSigDigits( MaxNumberSimYears ) );
+				VerticalGlhe( GlheNum ).MaxSimYears = MaxNumberSimYears;
 			}
 
 			// Get Gfunction data

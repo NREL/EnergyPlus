@@ -16,6 +16,10 @@ namespace DataGlobals {
 	// -only module should be available to other modules and routines.
 	// Thus, all variables in this module must be PUBLIC.
 
+	extern bool runReadVars;
+	extern bool DDOnlySimulation;
+	extern bool AnnualSimulation;
+
 	// MODULE PARAMETER DEFINITIONS:
 	extern int const BeginDay;
 	extern int const DuringDay;

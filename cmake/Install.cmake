@@ -304,6 +304,10 @@ if( APPLE )
   set(CPACK_POSTFLIGHT_SCRIPT "${CMAKE_BINARY_DIR}/darwinpostflight.sh")
 endif()
 
+if( UNIX)
+  install(FILES doc/man/energyplus.1 DESTINATION "./")
+endif()
+
 if( UNIX AND NOT APPLE )
   install_remote(PROGRAMS "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Linux/EP-Compare" "PostProcess/EP-Compare/")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Linux/EP-Compare%20Libs/EHInterfaces5001.so" "PostProcess/EP-Compare/EP-Compare Libs/")
