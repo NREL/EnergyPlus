@@ -773,6 +773,13 @@ namespace PlantLoopEquip {
 					sim_component.CompNum = EquipNum;
 				}
 
+			} else if ( EquipTypeNum == TypeOf_GrndHtExchgSlinky ) { // 'GROUND HEAT EXCHANGER:SLINKY'
+				SimGroundHeatExchangers( sim_component.TypeOf, sim_component.Name, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip );
+
+				if ( InitLoopEquip ) {
+					sim_component.CompNum = EquipNum;
+				}
+
 			}
 			// THERMAL STORAGE
 		} else if ( GeneralEquipType == GenEquipTypes_ThermalStorage ) {
