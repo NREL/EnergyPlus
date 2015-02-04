@@ -114,8 +114,8 @@ namespace GroundHeatExchangers {
 		virtual void
 		calcGroundHeatExchanger()=0;
 
-		virtual void
-		updateGroundHeatExchanger()=0;
+		//virtual void
+		//updateGroundHeatExchanger()=0;
 
 		virtual void
 		initGLHESimVars()=0;
@@ -155,8 +155,8 @@ namespace GroundHeatExchangers {
 
 		{}
 
-		void
-		updateGroundHeatExchanger();
+		//void
+		//updateGroundHeatExchanger();
 
 		void
 		calcGroundHeatExchanger();
@@ -215,7 +215,6 @@ namespace GroundHeatExchangers {
 
 	};
 
-
 	// Object Data
 	extern FArray1D< GLHEVert > verticalGLHE; // dimension to number of machines
 
@@ -230,8 +229,6 @@ namespace GroundHeatExchangers {
 		bool const firstIteration,
 		bool const initLoopEquip
 	);
-
-	//******************************************************************************
 
 	void
 	GetGroundHeatExchangerInput();

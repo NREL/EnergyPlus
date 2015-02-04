@@ -78,6 +78,7 @@ namespace GroundHeatExchangers {
 	// MODULE PARAMETER DEFINITIONS
 	Real64 const hrsPerDay( 24.0 ); // Number of hours in a day
 	Real64 const hrsPerMonth( 730.0 ); // Number of hours in month
+	Real64 const DeltaTempLimit( 100.0 ); // temp limit for warnings
 	int const maxTSinHr( 60 ); // Max number of time step in a hour
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -193,7 +194,7 @@ namespace GroundHeatExchangers {
 
 		//SIMULATE HEAT EXCHANGER
 		thisGLHE.calcGroundHeatExchanger();
-		thisGLHE.updateGroundHeatExchanger();
+		//thisGLHE.updateGroundHeatExchanger();
 
 	}
 
@@ -236,6 +237,8 @@ namespace GroundHeatExchangers {
 		using DataPlant::PlantLoop;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using FluidProperties::GetDensityGlycol;
+		using PlantUtilities::SafeCopyPlantNode;
+		using General::TrimSigDigits;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -275,6 +278,9 @@ namespace GroundHeatExchangers {
 		int IndexN; // Used to index the LastHourN array
 		static bool updateCurSimTime( true ); // Used to reset the CurSimTime to reset after WarmupFlag
 		static bool triggerDesignDayReset( false );
+		Real64 const deltaTempLimit( 100.0 ); // temp limit for warnings
+		Real64 GLHEdeltaTemp; // ABS(Outlet temp -inlet temp)
+		static int numErrorCalls( 0 );
 
 		//Autodesk:Uninit Initialize variables used uninitialized
 		sumTotal = 0.0; //Autodesk:Uninit Force default initialization
@@ -295,12 +301,12 @@ namespace GroundHeatExchangers {
 		if ( DayOfSim == 1 && updateCurSimTime ) {
 			currentSimTime = 0.0;
 			prevTimeSteps = 0.0;
-			for ( I = 1; I <= numVerticalGLHEs; ++I ) {
-				verticalGLHE( I ).QnHr = 0.0;
-				verticalGLHE( I ).QnMonthlyAgg = 0.0;
-				verticalGLHE( I ).QnSubHr = 0.0;
-				verticalGLHE( I ).LastHourN = 1;
-			}
+			//for ( I = 1; I <= numVerticalGLHEs; ++I ) {
+			QnHr = 0.0;
+			QnMonthlyAgg = 0.0;
+			QnSubHr = 0.0;
+			LastHourN = 1;
+			//}
 			N = 1;
 			updateCurSimTime = false;
 			triggerDesignDayReset = false;
@@ -334,9 +340,9 @@ namespace GroundHeatExchangers {
 
 		if ( N != PrevN ) {
 			PrevN = N;
-			for ( I = 1; I <= numVerticalGLHEs; ++I ) {
-				verticalGLHE( I ).QnSubHr = eoshift( verticalGLHE( I ).QnSubHr, -1, lastQnSubHr );
-			}
+			//for ( I = 1; I <= numVerticalGLHEs; ++I ) {
+			QnSubHr = eoshift( QnSubHr, -1, lastQnSubHr );
+			//}
 		}
 
 		calcAggregateLoad();
@@ -531,11 +537,29 @@ namespace GroundHeatExchangers {
 		boreholeTemp = tempGround - sumTotal; //Autodesk:Uninit sumTotal could have been uninitialized here
 		//Load the QnSubHourly Array with a new value at end of every timestep
 
-		//Load the report vars
 		lastQnSubHr = tmpQnSubHourly;
 		outletTemp = ToutNew;
-		QGLHE = tmpQnSubHourly;
+		//QGLHE = tmpQnSubHourly;
+		QGLHE = tmpQnSubHourly * boreholeLength * numBoreholes;
 		aveFluidTemp = fluidAveTemp;
+
+		SafeCopyPlantNode( inletNodeNum, outletNodeNum );
+
+		Node( outletNodeNum ).Temp = outletTemp;
+		Node( outletNodeNum ).Enthalpy = outletTemp * GetSpecificHeatGlycol( PlantLoop( loopNum ).FluidName, outletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
+
+		GLHEdeltaTemp = std::abs( outletTemp - inletTemp );
+		
+		if ( GLHEdeltaTemp > deltaTempLimit && numErrorCalls < numVerticalGLHEs && ! WarmupFlag ) {
+			fluidDensity = GetDensityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
+			designMassFlow = designFlow * fluidDensity;
+			ShowWarningError( "Check GLHE design inputs & g-functions for consistency" );
+			ShowContinueError( "For GroundHeatExchanger:Vertical " + name + "GLHE delta Temp > 100C." );
+			ShowContinueError( "This can be encountered in cases where the GLHE mass flow rate is either significantly" );
+			ShowContinueError( " lower than the design value, or cases where the mass flow rate rapidly changes." );
+			ShowContinueError( "GLHE Current Flow Rate=" + TrimSigDigits( massFlowRate, 3 ) + "; GLHE Design Flow Rate=" + TrimSigDigits( designMassFlow, 3 ) );
+			++numErrorCalls;
+		}
 
 	}
 
@@ -861,15 +885,16 @@ namespace GroundHeatExchangers {
 		pipeOuterRad = pipeOutDia / 2.0;
 		pipeInnerRad = pipeOuterRad - pipeThick;
 		pipeInnerDia = 2.0 * pipeInnerRad;
-		//Re=Rho*V*D/Mu
-		reynoldsNum = fluidDensity * pipeInnerDia * ( BholeMdot / fluidDensity / ( Pi * pow_2( pipeInnerRad ) ) ) / fluidViscosity;
-		prandtlNum = ( cpFluid * fluidViscosity ) / ( kFluid );
-		//   Convection Resistance
-		nusseltNum = 0.023 * std::pow( reynoldsNum, 0.8 ) * std::pow( prandtlNum, 0.35 );
-		hci = nusseltNum * kFluid / pipeInnerDia;
+
 		if ( BholeMdot == 0.0 ) {
 			Rconv = 0.0;
 		} else {
+			//Re=Rho*V*D/Mu
+			reynoldsNum = fluidDensity * pipeInnerDia * ( BholeMdot / fluidDensity / ( Pi * pow_2( pipeInnerRad ) ) ) / fluidViscosity;
+			prandtlNum = ( cpFluid * fluidViscosity ) / ( kFluid );
+			//   Convection Resistance
+			nusseltNum = 0.023 * std::pow( reynoldsNum, 0.8 ) * std::pow( prandtlNum, 0.35 );
+			hci = nusseltNum * kFluid / pipeInnerDia;
 			Rconv = 1.0 / ( 2.0 * Pi * pipeInnerDia * hci );
 		}
 
@@ -1117,7 +1142,7 @@ namespace GroundHeatExchangers {
 			QnHr = 0.0;
 			QnMonthlyAgg = 0.0;
 			QnSubHr = 0.0;
-			QGLHE = 0.0;
+			//QGLHE = 0.0;
 			LastHourN = 0;
 			prevTimeSteps = 0.0;
 			currentSimTime = 0.0;
@@ -1134,9 +1159,9 @@ namespace GroundHeatExchangers {
 
 	//******************************************************************************
 
-	void
-	GLHEVert::updateGroundHeatExchanger()
-	{
+	//void
+	//GLHEVert::updateGroundHeatExchanger()
+	//{
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Dan Fisher
@@ -1153,18 +1178,18 @@ namespace GroundHeatExchangers {
 		// na
 
 		// Using/Aliasing
-		using General::TrimSigDigits;
-		using PlantUtilities::SafeCopyPlantNode;
-		using DataPlant::PlantLoop;
-		using FluidProperties::GetSpecificHeatGlycol;
-		using FluidProperties::GetDensityGlycol;
+		//using General::TrimSigDigits;
+		//using PlantUtilities::SafeCopyPlantNode;
+		//using DataPlant::PlantLoop;
+		//using FluidProperties::GetSpecificHeatGlycol;
+		//using FluidProperties::GetDensityGlycol;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const DeltaTempLimit( 100.0 ); // temp limit for warnings
-		static std::string const RoutineName( "updateVerticalGroundHeatExchanger" );
+		//Real64 const DeltaTempLimit( 100.0 ); // temp limit for warnings
+		//static std::string const RoutineName( "updateVerticalGroundHeatExchanger" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1174,30 +1199,30 @@ namespace GroundHeatExchangers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		static int numErrorCalls( 0 );
-		Real64 GLHEdeltaTemp; // ABS(Outlet temp -inlet temp)
-		Real64 fluidDensity;
+		//static int numErrorCalls( 0 );
+		//Real64 GLHEdeltaTemp; // ABS(Outlet temp -inlet temp)
+		//Real64 fluidDensity;
 
-		SafeCopyPlantNode( inletNodeNum, outletNodeNum );
+		//SafeCopyPlantNode( inletNodeNum, outletNodeNum );
 
-		Node( outletNodeNum ).Temp = outletTemp;
-		Node( outletNodeNum ).Enthalpy = outletTemp * GetSpecificHeatGlycol( PlantLoop( loopNum ).FluidName, outletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
+		//Node( outletNodeNum ).Temp = outletTemp;
+		//Node( outletNodeNum ).Enthalpy = outletTemp * GetSpecificHeatGlycol( PlantLoop( loopNum ).FluidName, outletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
 
-		GLHEdeltaTemp = std::abs( outletTemp - inletTemp );
-		QGLHE = QGLHE * boreholeLength * numBoreholes;
+		//GLHEdeltaTemp = std::abs( outletTemp - inletTemp );
+		//QGLHE = QGLHE * boreholeLength * numBoreholes;
 
-		if ( GLHEdeltaTemp > DeltaTempLimit && numErrorCalls < numVerticalGLHEs && ! WarmupFlag ) {
-			fluidDensity = GetDensityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
-			designMassFlow = designFlow * fluidDensity;
-			ShowWarningError( "Check GLHE design inputs & g-functions for consistency" );
-			ShowContinueError( "For GroundHeatExchanger:Vertical " + name + "GLHE delta Temp > 100C." );
-			ShowContinueError( "This can be encountered in cases where the GLHE mass flow rate is either significantly" );
-			ShowContinueError( " lower than the design value, or cases where the mass flow rate rapidly changes." );
-			ShowContinueError( "GLHE Current Flow Rate=" + TrimSigDigits( massFlowRate, 3 ) + "; GLHE Design Flow Rate=" + TrimSigDigits( designMassFlow, 3 ) );
-			++numErrorCalls;
-		}
+		//if ( GLHEdeltaTemp > DeltaTempLimit && numErrorCalls < numVerticalGLHEs && ! WarmupFlag ) {
+		//	fluidDensity = GetDensityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
+		//	designMassFlow = designFlow * fluidDensity;
+		//	ShowWarningError( "Check GLHE design inputs & g-functions for consistency" );
+		//	ShowContinueError( "For GroundHeatExchanger:Vertical " + name + "GLHE delta Temp > 100C." );
+		//	ShowContinueError( "This can be encountered in cases where the GLHE mass flow rate is either significantly" );
+		//	ShowContinueError( " lower than the design value, or cases where the mass flow rate rapidly changes." );
+		//	ShowContinueError( "GLHE Current Flow Rate=" + TrimSigDigits( massFlowRate, 3 ) + "; GLHE Design Flow Rate=" + TrimSigDigits( designMassFlow, 3 ) );
+		//	++numErrorCalls;
+		//}
 
-	}
+	//}
 
 	//     NOTICE
 
