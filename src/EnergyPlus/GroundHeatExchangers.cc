@@ -83,6 +83,7 @@ namespace GroundHeatExchangers {
 
 	// MODULE VARIABLE DECLARATIONS:
 	int numVerticalGLHEs( 0 );
+	int numSlinkyGLHEs( 0 );
 	int N( 1 ); // COUNTER OF TIME STEP
 	Real64 currentSimTime( 0.0 ); // Current simulation time in hours
 	int locHourOfDay( 0 );
@@ -98,7 +99,8 @@ namespace GroundHeatExchangers {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE CondenserTowers
 
 	// Object Data
-	FArray1D< GLHEVert > verticalGLHE; // dimension to number of machines
+	FArray1D< GLHEVert > verticalGLHE; 
+	//FArray1D< GLHESlinky > slinkyGLHE; 
 
 	// MODULE SUBROUTINES:
 
@@ -162,7 +164,7 @@ namespace GroundHeatExchangers {
 			GetInput = false;
 		}
 
-		// Find the correct Furnace
+		// Find the correct GLHE
 		if ( compIndex == 0 ) {
 			GLHENum = FindItemInList( name, verticalGLHE.name(), numVerticalGLHEs );
 			if ( GLHENum == 0 ) {

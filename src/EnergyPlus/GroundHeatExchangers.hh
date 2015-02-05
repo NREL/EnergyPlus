@@ -216,7 +216,8 @@ namespace GroundHeatExchangers {
 	};
 
 	// Object Data
-	extern FArray1D< GLHEVert > verticalGLHE; // dimension to number of machines
+	extern FArray1D< GLHEVert > verticalGLHE; // Vertical GLHEs
+	//extern FArray1D< GLHESlinky > slinkyGLHE; // Slinky GLHEs
 
 	// Functions
 

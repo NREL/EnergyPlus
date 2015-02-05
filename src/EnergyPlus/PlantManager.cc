@@ -949,6 +949,10 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgPond;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Slinky" ) ) {
+							this_comp.TypeOf_Num = TypeOf_GrndHtExchgSlinky;
+							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
+							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
 						} else if ( SameString( this_comp_type, "Chiller:Electric:EIR" ) ) {
 							this_comp.TypeOf_Num = TypeOf_Chiller_ElectricEIR;
 							this_comp.GeneralEquipType = GenEquipTypes_Chiller;
@@ -1605,6 +1609,8 @@ namespace PlantManager {
 						} else if ( SameString( this_comp.TypeOf, "GroundHeatExchanger:Surface" ) ) {
 							GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 						} else if ( SameString( this_comp.TypeOf, "GroundHeatExchanger:Pond" ) ) {
+							GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
+						} else if ( SameString( this_comp.TypeOf, "GroundHeatExchanger:Slinky" ) ) {
 							GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 						} else if ( SameString( this_comp.TypeOf, "PlantComponent:TemperatureSource" ) ) {
 							GeneralEquipType = GenEquipTypes_HeatExchanger;
