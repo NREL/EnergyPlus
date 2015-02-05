@@ -114,7 +114,7 @@ namespace CondenserLoopTowers {
 		Real64 HighSpeedFanPower; // Fan power at high fan speed [W]
 		bool HighSpeedFanPowerWasAutoSized; //true if fan power was autosize on input
 		Real64 DesignFanPowerPerUnitNomCap; // scalable sizing factor for fan power per capacity [W/W]
-		bool UAvaluesCompleted;
+
 		Real64 HighSpeedTowerUA; // UA of tower at high fan speed [W/C]
 		Real64 HighSpeedTowerUAWasAutoSized; // true if previous was autosize on input
 		Real64 LowSpeedAirFlowRate; // Air flow rate through tower at low speed [m3/s]
@@ -236,7 +236,6 @@ namespace CondenserLoopTowers {
 			HighSpeedFanPower( 0.0 ),
 			HighSpeedFanPowerWasAutoSized( false ),
 			DesignFanPowerPerUnitNomCap( 0.0 ),
-			UAvaluesCompleted( false ),
 			HighSpeedTowerUA( 0.0 ),
 			HighSpeedTowerUAWasAutoSized( false ),
 			LowSpeedAirFlowRate( 0.0 ),
@@ -341,7 +340,6 @@ namespace CondenserLoopTowers {
 			Real64 const HighSpeedFanPower, // Fan power at high fan speed [W]
 			bool const HighSpeedFanPowerWasAutoSized,
 			Real64 const DesignFanPowerPerUnitNomCap, // scalable sizing factor for fan power per capacity [W/W]
-			bool const UAvaluesCompleted,
 			Real64 const HighSpeedTowerUA, // UA of tower at high fan speed [W/C]
 			bool const HighSpeedTowerUAWasAutoSized,
 			Real64 const LowSpeedAirFlowRate, // Air flow rate through tower at low speed [m3/s]
@@ -444,7 +442,6 @@ namespace CondenserLoopTowers {
 			HighSpeedFanPower( HighSpeedFanPower ),
 			HighSpeedFanPowerWasAutoSized( HighSpeedFanPowerWasAutoSized ),
 			DesignFanPowerPerUnitNomCap( DesignFanPowerPerUnitNomCap ),
-			UAvaluesCompleted( UAvaluesCompleted ),
 			HighSpeedTowerUA( HighSpeedTowerUA ),
 			HighSpeedTowerUAWasAutoSized( HighSpeedTowerUAWasAutoSized ),
 			LowSpeedAirFlowRate( LowSpeedAirFlowRate ),

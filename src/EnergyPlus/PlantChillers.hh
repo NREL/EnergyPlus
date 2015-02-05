@@ -136,7 +136,6 @@ namespace PlantChillers {
 		bool CheckEquipName;
 		bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
 		int CondMassFlowIndex;
-		bool IsThisSized; // Ture if sizing is done
 
 		// Default Constructor
 		BaseChillerSpecs() :
@@ -177,8 +176,7 @@ namespace PlantChillers {
 			MsgErrorCount( 0 ),
 			CheckEquipName( true ),
 			PossibleSubcooling( false ),
-			CondMassFlowIndex( 0 ),
-			IsThisSized( false )
+			CondMassFlowIndex( 0 )
 		{}
 
 		// Member Constructor
@@ -223,8 +221,7 @@ namespace PlantChillers {
 			int const MsgErrorCount, // number of occurrences of warning
 			bool const CheckEquipName,
 			bool const PossibleSubcooling, // flag to indicate chiller is doing less cooling that requested
-			int const CondMassFlowIndex,
-			bool const IsThisSized // Ture if sizing is done
+			int const CondMassFlowIndex
 		) :
 			Name( Name ),
 			CondenserType( CondenserType ),
@@ -266,8 +263,7 @@ namespace PlantChillers {
 			MsgErrorCount( MsgErrorCount ),
 			CheckEquipName( CheckEquipName ),
 			PossibleSubcooling( PossibleSubcooling ),
-			CondMassFlowIndex( CondMassFlowIndex ),
-			IsThisSized( IsThisSized )
+			CondMassFlowIndex( CondMassFlowIndex )
 		{}
 
 	};
@@ -302,7 +298,6 @@ namespace PlantChillers {
 		int HRLoopSideNum; // heat recovery water plant loop side index
 		int HRBranchNum; // heat recovery water plant loop branch index
 		int HRCompNum; // heat recovery water plant loop component index
-		bool IsThisSized; // Ture if sizing is done
 
 		// Default Constructor
 		ElectricChillerSpecs() :
@@ -329,8 +324,7 @@ namespace PlantChillers {
 			HRLoopNum( 0 ),
 			HRLoopSideNum( 0 ),
 			HRBranchNum( 0 ),
-			HRCompNum( 0 ),
-			IsThisSized( false )
+			HRCompNum( 0 )
 		{}
 
 		// Member Constructor
@@ -359,8 +353,7 @@ namespace PlantChillers {
 			int const HRLoopNum, // heat recovery water plant loop side index
 			int const HRLoopSideNum, // heat recovery water plant loop side index
 			int const HRBranchNum, // heat recovery water plant loop branch index
-			int const HRCompNum, // heat recovery water plant loop component index
-			bool const IsThisSized // Ture if sizing is done
+			int const HRCompNum // heat recovery water plant loop component index
 		) :
 			Base( Base ),
 			MinPartLoadRat( MinPartLoadRat ),
@@ -386,8 +379,7 @@ namespace PlantChillers {
 			HRLoopNum( HRLoopNum ),
 			HRLoopSideNum( HRLoopSideNum ),
 			HRBranchNum( HRBranchNum ),
-			HRCompNum( HRCompNum ),
-			IsThisSized( IsThisSized )
+			HRCompNum( HRCompNum )
 		{}
 
 	};
@@ -430,7 +422,6 @@ namespace PlantChillers {
 		int HRLoopSideNum; // heat recovery water plant loop side index
 		int HRBranchNum; // heat recovery water plant loop branch index
 		int HRCompNum; // heat recovery water plant loop component index
-		bool IsThisSized; // Ture if sizing is done
 
 		// Default Constructor
 		EngineDrivenChillerSpecs() :
@@ -464,8 +455,7 @@ namespace PlantChillers {
 			HRLoopNum( 0 ),
 			HRLoopSideNum( 0 ),
 			HRBranchNum( 0 ),
-			HRCompNum( 0 ),
-			IsThisSized( false )
+			HRCompNum( 0 )
 		{}
 
 		// Member Constructor
@@ -502,8 +492,7 @@ namespace PlantChillers {
 			int const HRLoopNum, // heat recovery water plant loop side index
 			int const HRLoopSideNum, // heat recovery water plant loop side index
 			int const HRBranchNum, // heat recovery water plant loop branch index
-			int const HRCompNum, // heat recovery water plant loop component index
-			bool const IsThisSized // Ture if sizing is done
+			int const HRCompNum // heat recovery water plant loop component index
 		) :
 			Base( Base ),
 			FuelType( FuelType ),
@@ -537,8 +526,7 @@ namespace PlantChillers {
 			HRLoopNum( HRLoopNum ),
 			HRLoopSideNum( HRLoopSideNum ),
 			HRBranchNum( HRBranchNum ),
-			HRCompNum( HRCompNum ),
-			IsThisSized( IsThisSized )
+			HRCompNum( HRCompNum )
 		{}
 
 	};
@@ -576,6 +564,7 @@ namespace PlantChillers {
 		Real64 UAtoCapRat; // (UACGC) Heat Exchanger UA to Capacity
 		FArray1D< Real64 > UAtoCapCoef; // Heat Exchanger UA to Capacity Coeffs Poly Fit
 		Real64 GTEngineCapacity; // Capacity of GT Unit attached to Chiller
+		bool GTEngineCapacityWasAutoSized; // true if previous field was autosize on inpt
 		Real64 MaxExhaustperGTPower; // Max Exhaust Flow per KW Power Out
 		Real64 DesignSteamSatTemp; // Steam Saturation Temperature
 		Real64 ExhaustStackTemp; // Temperature of Exhaust Gases
@@ -593,7 +582,6 @@ namespace PlantChillers {
 		int HRLoopSideNum; // heat recovery water plant loop side index
 		int HRBranchNum; // heat recovery water plant loop branch index
 		int HRCompNum; // heat recovery water plant loop component index
-		bool IsThisSized; // Ture if sizing is done
 
 		// Default Constructor
 		GTChillerSpecs() :
@@ -621,6 +609,7 @@ namespace PlantChillers {
 			UAtoCapRat( 0.0 ),
 			UAtoCapCoef( 3, 0.0 ),
 			GTEngineCapacity( 0.0 ),
+			GTEngineCapacityWasAutoSized( false ),
 			MaxExhaustperGTPower( 0.0 ),
 			DesignSteamSatTemp( 0.0 ),
 			ExhaustStackTemp( 0.0 ),
@@ -637,8 +626,7 @@ namespace PlantChillers {
 			HRLoopNum( 0 ),
 			HRLoopSideNum( 0 ),
 			HRBranchNum( 0 ),
-			HRCompNum( 0 ),
-			IsThisSized( false )
+			HRCompNum( 0 )
 		{}
 
 		// Member Constructor
@@ -669,6 +657,7 @@ namespace PlantChillers {
 			Real64 const UAtoCapRat, // (UACGC) Heat Exchanger UA to Capacity
 			FArray1< Real64 > const & UAtoCapCoef, // Heat Exchanger UA to Capacity Coeffs Poly Fit
 			Real64 const GTEngineCapacity, // Capacity of GT Unit attached to Chiller
+			bool const GTEngineCapacityWasAutoSized, //true if previous is autosize
 			Real64 const MaxExhaustperGTPower, // Max Exhaust Flow per KW Power Out
 			Real64 const DesignSteamSatTemp, // Steam Saturation Temperature
 			Real64 const ExhaustStackTemp, // Temperature of Exhaust Gases
@@ -685,8 +674,7 @@ namespace PlantChillers {
 			int const HRLoopNum, // heat recovery water plant loop side index
 			int const HRLoopSideNum, // heat recovery water plant loop side index
 			int const HRBranchNum, // heat recovery water plant loop branch index
-			int const HRCompNum, // heat recovery water plant loop component index
-			bool const IsThisSized // Ture if sizing is done
+			int const HRCompNum // heat recovery water plant loop component index
 		) :
 			Base( Base ),
 			FuelType( FuelType ),
@@ -714,6 +702,7 @@ namespace PlantChillers {
 			UAtoCapRat( UAtoCapRat ),
 			UAtoCapCoef( 3, UAtoCapCoef ),
 			GTEngineCapacity( GTEngineCapacity ),
+			GTEngineCapacityWasAutoSized( GTEngineCapacityWasAutoSized ),
 			MaxExhaustperGTPower( MaxExhaustperGTPower ),
 			DesignSteamSatTemp( DesignSteamSatTemp ),
 			ExhaustStackTemp( ExhaustStackTemp ),
@@ -730,8 +719,7 @@ namespace PlantChillers {
 			HRLoopNum( HRLoopNum ),
 			HRLoopSideNum( HRLoopSideNum ),
 			HRBranchNum( HRBranchNum ),
-			HRCompNum( HRCompNum ),
-			IsThisSized( IsThisSized )
+			HRCompNum( HRCompNum )
 		{}
 
 	};

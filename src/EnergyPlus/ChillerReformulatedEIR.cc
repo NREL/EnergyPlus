@@ -213,8 +213,9 @@ namespace ChillerReformulatedEIR {
 			TempEvapOutDesign = ElecReformEIRChiller( EIRChillNum ).TempRefEvapOut;
 			TempCondInDesign = ElecReformEIRChiller( EIRChillNum ).TempRefCondIn;
 			InitElecReformEIRChiller( EIRChillNum, RunFlag, MyLoad );
-			SizeElecReformEIRChiller( EIRChillNum );
+
 			if ( LoopNum == ElecReformEIRChiller( EIRChillNum ).CWLoopNum ) {
+				SizeElecReformEIRChiller( EIRChillNum );
 				MinCap = ElecReformEIRChiller( EIRChillNum ).RefCap * ElecReformEIRChiller( EIRChillNum ).MinPartLoadRat;
 				MaxCap = ElecReformEIRChiller( EIRChillNum ).RefCap * ElecReformEIRChiller( EIRChillNum ).MaxPartLoadRat;
 				OptCap = ElecReformEIRChiller( EIRChillNum ).RefCap * ElecReformEIRChiller( EIRChillNum ).OptPartLoadRat;
@@ -882,7 +883,8 @@ namespace ChillerReformulatedEIR {
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
-		using DataPlant::PlantSizesOkayToReport;
+		using DataPlant::PlantFirstSizesOkayToReport;
+		using DataPlant::PlantFinalSizesOkayToReport;
 		using DataPlant::TypeOf_Chiller_ElectricReformEIR;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
@@ -934,7 +936,6 @@ namespace ChillerReformulatedEIR {
 		Real64 tmpHeatRecVolFlowRate; // local heat recovery design volume flow rate
 		static bool MyOneTimeFlag( true );
 		static FArray1D_bool MyFlag; // TRUE in order to calculate IPLV
-		bool IsAutoSize; // Indicator to autosize for reporting
 		Real64 EvapVolFlowRateUser; // Hardsized evaporator flow for reporting
 		Real64 RefCapUser; // Hardsized reference capacity for reporting
 		Real64 CondVolFlowRateUser; // Hardsized condenser flow for reporting
@@ -952,7 +953,6 @@ namespace ChillerReformulatedEIR {
 		PltSizNum = 0;
 		PltSizCondNum = 0;
 		ErrorsFound = false;
-		IsAutoSize = false;
 		tmpNomCap = ElecReformEIRChiller( EIRChillNum ).RefCap;
 		tmpEvapVolFlowRate = ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRate;
 		tmpCondVolFlowRate = ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate;
@@ -961,9 +961,7 @@ namespace ChillerReformulatedEIR {
 		CondVolFlowRateUser = 0.0;
 		DesignHeatRecVolFlowRateUser = 0.0;
 
-		//IF (ElecReformEIRChiller(EIRChillNum)%CondVolFlowRate == AutoSize) THEN
 		PltSizCondNum = PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).PlantSizNum;
-		//END IF
 
 		// find the appropriate Plant Sizing object
 		PltSizNum = PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).PlantSizNum;
@@ -980,14 +978,21 @@ namespace ChillerReformulatedEIR {
 			if ( PlantFirstSizesOkayToFinalize ) {
 				if ( ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRateWasAutoSized ) {
 					ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRate = tmpEvapVolFlowRate;
-					if ( PlantSizesOkayToReport ) {
-						ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, "Design Size Reference Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate );
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, 
+						"Design Size Reference Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, 
+						"Initial Design Size Reference Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate );
 					}
 				} else { // Hard-size with sizing data
 					if ( ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0 ) {
 						EvapVolFlowRateUser = ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRate;
-						if ( PlantSizesOkayToReport ) {
-							ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, "Design Size Reference Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate, "User-Specified Reference Chilled Water Flow Rate [m3/s]", EvapVolFlowRateUser );
+						if ( PlantFinalSizesOkayToReport ) {
+							ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, 
+								"Design Size Reference Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate, 
+								"User-Specified Reference Chilled Water Flow Rate [m3/s]", EvapVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpEvapVolFlowRate - EvapVolFlowRateUser ) / EvapVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
 									ShowMessage( "SizeChillerElectricReformulatedEIR: Potential issue with equipment sizing for " + ElecReformEIRChiller( EIRChillNum ).Name );
@@ -1003,16 +1008,15 @@ namespace ChillerReformulatedEIR {
 				}
 			}
 		} else {
-			if (  ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRateWasAutoSized ) {
-				if ( PlantSizesOkayToReport ) {
-					ShowSevereError( "Autosizing of Reformulated Electric Chiller evap flow rate requires a loop Sizing:Plant object" );
-					ShowContinueError( "Occurs in Reformulated Electric Chiller object=" + ElecReformEIRChiller( EIRChillNum ).Name );
-					ErrorsFound = true;
-				}
+			if ( ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRateWasAutoSized && PlantFirstSizesOkayToFinalize ) {
+				ShowSevereError( "Autosizing of Reformulated Electric Chiller evap flow rate requires a loop Sizing:Plant object" );
+				ShowContinueError( "Occurs in Reformulated Electric Chiller object=" + ElecReformEIRChiller( EIRChillNum ).Name );
+				ErrorsFound = true;
 			} else { // Hard-size with sizing data
-				if ( PlantSizesOkayToReport ) {
+				if ( PlantFinalSizesOkayToReport ) {
 					if ( ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRate > 0.0 ) {
-						ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, "User-Specified Reference Chilled Water Flow Rate [m3/s]", ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRate );
+						ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, 
+							"User-Specified Reference Chilled Water Flow Rate [m3/s]", ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRate );
 					}
 				}
 			}
@@ -1044,13 +1048,18 @@ namespace ChillerReformulatedEIR {
 			if ( PlantFirstSizesOkayToFinalize ) {
 				if ( ElecReformEIRChiller( EIRChillNum ).RefCapWasAutoSized ) {
 					ElecReformEIRChiller( EIRChillNum ).RefCap = tmpNomCap;
-					if ( PlantSizesOkayToReport ) {
-						ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, "Design Size Reference Capacity [W]", tmpNomCap );
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, 
+						"Design Size Reference Capacity [W]", tmpNomCap );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, 
+						"Initial Design Size Reference Capacity [W]", tmpNomCap );
 					}
 				} else {
 					if ( ElecReformEIRChiller( EIRChillNum ).RefCap > 0.0 && tmpNomCap > 0.0 ) {
 						RefCapUser = ElecReformEIRChiller( EIRChillNum ).RefCap;
-						if ( PlantSizesOkayToReport ) {
+						if ( PlantFinalSizesOkayToReport ) {
 							ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, "Design Size Reference Capacity [W]", tmpNomCap, "User-Specified Reference Capacity [W]", RefCapUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpNomCap - RefCapUser ) / RefCapUser ) > AutoVsHardSizingThreshold ) {
@@ -1067,12 +1076,12 @@ namespace ChillerReformulatedEIR {
 				}
 			}
 		} else {
-			if ( ElecReformEIRChiller( EIRChillNum ).RefCapWasAutoSized && PlantSizesOkayToReport ) {
+			if ( ElecReformEIRChiller( EIRChillNum ).RefCapWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				ShowSevereError( "Autosizing of Reformulated Electric Chiller reference capacity requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Reformulated Electric Chiller object=" + ElecReformEIRChiller( EIRChillNum ).Name );
 				ErrorsFound = true;
 			} else {
-				if ( PlantSizesOkayToReport ) {
+				if ( PlantFinalSizesOkayToReport ) {
 					if ( ElecReformEIRChiller( EIRChillNum ).RefCap > 0.0 ) {
 						ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, "User-Specified Reference Capacity [W]", ElecReformEIRChiller( EIRChillNum ).RefCap );
 					}
@@ -1095,14 +1104,21 @@ namespace ChillerReformulatedEIR {
 			if ( PlantFirstSizesOkayToFinalize ) {
 				if ( ElecReformEIRChiller( EIRChillNum ).CondVolFlowRateWasAutoSized ) {
 					ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate = tmpCondVolFlowRate;
-					if ( PlantSizesOkayToReport ) {
-						ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, "Design Size Reference Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate );
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, 
+							"Design Size Reference Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, 
+							"Initial Design Size Reference Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate );
 					}
 				} else {
 					if ( ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0 ) {
 						CondVolFlowRateUser = ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate;
-						if ( PlantSizesOkayToReport ) {
-							ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, "Design Size Reference Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate, "User-Specified Reference Condenser Water Flow Rate [m3/s]", CondVolFlowRateUser );
+						if ( PlantFinalSizesOkayToReport ) {
+							ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, 
+								"Design Size Reference Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate, 
+								"User-Specified Reference Condenser Water Flow Rate [m3/s]", CondVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpCondVolFlowRate - CondVolFlowRateUser ) / CondVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
 									ShowMessage( "Size:ChillerElectricReformulatedEIR: Potential issue with equipment sizing for " + ElecReformEIRChiller( EIRChillNum ).Name );
@@ -1118,15 +1134,16 @@ namespace ChillerReformulatedEIR {
 				}
 			}
 		} else {
-			if ( ElecReformEIRChiller( EIRChillNum ).CondVolFlowRateWasAutoSized && PlantSizesOkayToReport ) {
+			if ( ElecReformEIRChiller( EIRChillNum ).CondVolFlowRateWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				ShowSevereError( "Autosizing of Reformulated Electric EIR Chiller condenser flow rate requires a condenser" );
 				ShowContinueError( "loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Reformulated Electric EIR Chiller object=" + ElecReformEIRChiller( EIRChillNum ).Name );
 				ErrorsFound = true;
 			} else {
-				if (PlantSizesOkayToReport ) {
+				if (PlantFinalSizesOkayToReport ) {
 					if ( ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate > 0.0 ) {
-						ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, "User-Specified Reference Condenser Water Flow Rate [m3/s]", ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate );
+						ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, 
+							"User-Specified Reference Condenser Water Flow Rate [m3/s]", ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate );
 					}
 				}
 			}
@@ -1143,13 +1160,18 @@ namespace ChillerReformulatedEIR {
 			if ( PlantFirstSizesOkayToFinalize ) {
 				if ( ElecReformEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRateWasAutoSized ) {
 					ElecReformEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRate = tmpHeatRecVolFlowRate;
-					if ( PlantSizesOkayToReport ) {
-						ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate );
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, 
+							"Design Size Design Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, 
+							"Initial Design Size Design Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate );
 					}
 				} else {
 					if ( ElecReformEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRate > 0.0 && tmpHeatRecVolFlowRate > 0.0 ) {
 						DesignHeatRecVolFlowRateUser = ElecReformEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRate;
-						if ( PlantSizesOkayToReport ) {
+						if ( PlantFinalSizesOkayToReport ) {
 							ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate, "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]", DesignHeatRecVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpHeatRecVolFlowRate - DesignHeatRecVolFlowRateUser ) / DesignHeatRecVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
@@ -1169,7 +1191,7 @@ namespace ChillerReformulatedEIR {
 			RegisterPlantCompDesignFlow( ElecReformEIRChiller( EIRChillNum ).HeatRecInletNodeNum, tmpHeatRecVolFlowRate );
 		}
 
-		if ( PlantSizesOkayToReport ) {
+		if ( PlantFinalSizesOkayToReport ) {
 			if ( MyFlag( EIRChillNum ) ) {
 				CalcChillerIPLV( ElecReformEIRChiller( EIRChillNum ).Name, TypeOf_Chiller_ElectricReformEIR, ElecReformEIRChiller( EIRChillNum ).RefCap, ElecReformEIRChiller( EIRChillNum ).RefCOP, ElecReformEIRChiller( EIRChillNum ).CondenserType, ElecReformEIRChiller( EIRChillNum ).ChillerCapFT, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFT, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLR, ElecReformEIRChiller( EIRChillNum ).MinUnloadRat, ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRate, ElecReformEIRChiller( EIRChillNum ).CDLoopNum, ElecReformEIRChiller( EIRChillNum ).CompPowerToCondenserFrac );
 				MyFlag( EIRChillNum ) = false;
@@ -1181,7 +1203,7 @@ namespace ChillerReformulatedEIR {
 			PreDefTableEntry( pdchMechNomCap, equipName, ElecReformEIRChiller( EIRChillNum ).RefCap );
 		}
 
-		if ( PlantSizesOkayToReport ) {
+		if ( PlantFirstSizesOkayToFinalize ) {
 			// Only check performance curves if Capacity and volumetric flow rate are greater than 0
 			if ( ElecReformEIRChiller( EIRChillNum ).RefCap > 0.0 && ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate > 0.0 ) {
 				//   Check the CAP-FT, EIR-FT, and PLR curves at reference conditions and warn user if different from 1.0 by more than +-10%

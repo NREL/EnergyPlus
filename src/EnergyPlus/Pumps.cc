@@ -1564,7 +1564,8 @@ namespace Pumps {
 		using DataSizing::AutoSize;
 		using DataSizing::PlantSizData;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantSizesOkayToReport;
+		using DataPlant::PlantFirstSizesOkayToReport;
+		using DataPlant::PlantFinalSizesOkayToReport;
 		using General::RoundSigDigits;
 		using ReportSizingManager::ReportSizingOutput;
 		using FluidProperties::GetSatDensityRefrig;
@@ -1663,17 +1664,20 @@ namespace Pumps {
 					}
 
 				} else {
-					if (PlantSizesOkayToReport) {
+					if (PlantFinalSizesOkayToReport) {
 						PumpEquip( PumpNum ).NomVolFlowRate = 0.0;
 						ShowWarningError( "SizePump: Calculated Pump Nominal Volume Flow Rate=[" + RoundSigDigits( PlantSizData( PlantSizNum ).DesVolFlowRate, 2 ) + "] is too small. Set to 0.0" );
 						ShowContinueError( "..occurs for Pump=" + PumpEquip( PumpNum ).Name );
 					}
 				}
-				if (PlantSizesOkayToReport) {
+				if (PlantFinalSizesOkayToReport) {
 					ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name, "Rated Flow Rate [m3/s]", PumpEquip( PumpNum ).NomVolFlowRate );
 				}
+				if (PlantFirstSizesOkayToReport) {
+					ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name, "Initial Rated Flow Rate [m3/s]", PumpEquip( PumpNum ).NomVolFlowRate );
+				}
 			} else {
-				if (PlantSizesOkayToReport) {
+				if (PlantFinalSizesOkayToReport) {
 					ShowSevereError( "Autosizing of plant loop pump flow rate requires a loop Sizing:Plant object" );
 					ShowContinueError( "Occurs in plant pump object=" + PumpEquip( PumpNum ).Name );
 					ErrorsFound = true;
@@ -1690,10 +1694,12 @@ namespace Pumps {
 			} else {
 				PumpEquip( PumpNum ).NomPowerUse = 0.0;
 			}
-			if ( PlantSizesOkayToReport ) {
+			if ( PlantFinalSizesOkayToReport ) {
 				ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name, "Rated Power Consumption [W]", PumpEquip( PumpNum ).NomPowerUse );
 			}
-
+			if ( PlantFirstSizesOkayToReport ) {
+				ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name, "Initial Rated Power Consumption [W]", PumpEquip( PumpNum ).NomPowerUse );
+			}
 		}
 
 		if ( ErrorsFound ) {
@@ -1838,7 +1844,7 @@ namespace Pumps {
 			PreDefTableEntry( pdchPumpControl, equipName, "Unknown" );
 		}
 		PreDefTableEntry( pdchPumpHead, equipName, PumpEquip( NumPump ).NomPumpHead );
-		PreDefTableEntry( pdchPumpFlow, equipName, PumpEquip( NumPump ).NomVolFlowRate, 4 );
+		PreDefTableEntry( pdchPumpFlow, equipName, PumpEquip( NumPump ).NomVolFlowRate, 6 );
 		PreDefTableEntry( pdchPumpPower, equipName, PumpEquip( NumPump ).NomPowerUse );
 		if ( PumpEquip( NumPump ).NomVolFlowRate != 0 ) {
 			PreDefTableEntry( pdchPumpPwrPerFlow, equipName, PumpEquip( NumPump ).NomPowerUse / PumpEquip( NumPump ).NomVolFlowRate );

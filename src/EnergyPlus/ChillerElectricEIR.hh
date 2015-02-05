@@ -66,14 +66,17 @@ namespace ChillerElectricEIR {
 		std::string EIRFPLRName; // EIRPLR curve name
 		int CondenserType; // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
 		Real64 RefCap; // Reference capacity of chiller [W]
+		bool RefCapWasAutoSized; //reference capacity was autosized on input
 		Real64 RefCOP; // Reference coefficient of performance [W/W]
 		int FlowMode; // one of 3 modes for componet flow during operation
 		bool ModulatedFlowSetToLoop; // True if the setpoint is missing at the outlet node
 		bool ModulatedFlowErrDone; // true if setpoint warning issued
 		bool HRSPErrDone; // TRUE if set point warning issued for heat recovery loop
 		Real64 EvapVolFlowRate; // Reference water volumetric flow rate through the evaporator [m3/s]
+		bool EvapVolFlowRateWasAutoSized; // true if previous was autosize input
 		Real64 EvapMassFlowRateMax; // Reference water mass flow rate through evaporator [kg/s]
 		Real64 CondVolFlowRate; // Reference water volumetric flow rate through the condenser [m3/s]
+		bool CondVolFlowRateWasAutoSized; // true if previous was set to autosize on input
 		Real64 CondMassFlowRateMax; // Reference water mass flow rate through condenser [kg/s]
 		Real64 CondenserFanPowerRatio; // Reference power of condenser fan to capacity ratio, W/W
 		Real64 CompPowerToCondenserFrac; // Fraction of compressor electric power rejected by condenser [0 to 1]
@@ -91,6 +94,7 @@ namespace ChillerElectricEIR {
 		// at the chiller evaporator side outlet [C]
 		Real64 TempLowLimitEvapOut; // Low temperature shut off [C]
 		Real64 DesignHeatRecVolFlowRate; // Design water volumetric flow rate through heat recovery loop [m3/s]
+		bool DesignHeatRecVolFlowRateWasAutoSized; //true if previous input was autosize
 		Real64 DesignHeatRecMassFlowRate; // Design water mass flow rate through heat recovery loop [kg/s]
 		Real64 SizFac; // sizing factor
 		Real64 BasinHeaterPowerFTempDiff; // Basin heater capacity per degree C below setpoint (W/C)
@@ -141,21 +145,23 @@ namespace ChillerElectricEIR {
 		int MsgErrorCount; // number of occurrences of warning
 		int ErrCount1; // for recurring error messages
 		bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
-		bool IsThisSized; // true if sizing is done
 
 		// Default Constructor
 		ElectricEIRChillerSpecs() :
 			TypeNum( 0 ),
 			CondenserType( 0 ),
 			RefCap( 0.0 ),
+			RefCapWasAutoSized( false ),
 			RefCOP( 0.0 ),
 			FlowMode( FlowModeNotSet ),
 			ModulatedFlowSetToLoop( false ),
 			ModulatedFlowErrDone( false ),
 			HRSPErrDone( false ),
 			EvapVolFlowRate( 0.0 ),
+			EvapVolFlowRateWasAutoSized( false ),
 			EvapMassFlowRateMax( 0.0 ),
 			CondVolFlowRate( 0.0 ),
+			CondVolFlowRateWasAutoSized( false ),
 			CondMassFlowRateMax( 0.0 ),
 			CondenserFanPowerRatio( 0.0 ),
 			CompPowerToCondenserFrac( 0.0 ),
@@ -171,6 +177,7 @@ namespace ChillerElectricEIR {
 			TempRefEvapOut( 0.0 ),
 			TempLowLimitEvapOut( 0.0 ),
 			DesignHeatRecVolFlowRate( 0.0 ),
+			DesignHeatRecVolFlowRateWasAutoSized( false ),
 			DesignHeatRecMassFlowRate( 0.0 ),
 			SizFac( 0.0 ),
 			BasinHeaterPowerFTempDiff( 0.0 ),
@@ -213,8 +220,7 @@ namespace ChillerElectricEIR {
 			PrintMessage( false ),
 			MsgErrorCount( 0 ),
 			ErrCount1( 0 ),
-			PossibleSubcooling( false ),
-			IsThisSized( false )
+			PossibleSubcooling( false )
 		{}
 
 		// Member Constructor
@@ -224,12 +230,14 @@ namespace ChillerElectricEIR {
 			std::string const & EIRFPLRName, // EIRPLR curve name
 			int const CondenserType, // Type of Condenser - Air Cooled, Water Cooled or Evap Cooled
 			Real64 const RefCap, // Reference capacity of chiller [W]
+			bool const RefCapWasAutoSized, //reference capacity was autosized on input
 			Real64 const RefCOP, // Reference coefficient of performance [W/W]
 			int const FlowMode, // one of 3 modes for componet flow during operation
 			bool const ModulatedFlowSetToLoop, // True if the setpoint is missing at the outlet node
 			bool const ModulatedFlowErrDone, // true if setpoint warning issued
 			bool const HRSPErrDone, // TRUE if set point warning issued for heat recovery loop
 			Real64 const EvapVolFlowRate, // Reference water volumetric flow rate through the evaporator [m3/s]
+			bool const EvapVolFlowRateWasAutoSized, // true if previous was autosize input
 			Real64 const EvapMassFlowRateMax, // Reference water mass flow rate through evaporator [kg/s]
 			Real64 const CondVolFlowRate, // Reference water volumetric flow rate through the condenser [m3/s]
 			Real64 const CondMassFlowRateMax, // Reference water mass flow rate through condenser [kg/s]
@@ -247,6 +255,7 @@ namespace ChillerElectricEIR {
 			Real64 const TempRefEvapOut, // The reference primary loop fluid temperature
 			Real64 const TempLowLimitEvapOut, // Low temperature shut off [C]
 			Real64 const DesignHeatRecVolFlowRate, // Design water volumetric flow rate through heat recovery loop [m3/s]
+			bool const DesignHeatRecVolFlowRateWasAutoSized, //true if previous input was autosize
 			Real64 const DesignHeatRecMassFlowRate, // Design water mass flow rate through heat recovery loop [kg/s]
 			Real64 const SizFac, // sizing factor
 			Real64 const BasinHeaterPowerFTempDiff, // Basin heater capacity per degree C below setpoint (W/C)
@@ -291,22 +300,24 @@ namespace ChillerElectricEIR {
 			bool const PrintMessage, // logical to determine if message is valid
 			int const MsgErrorCount, // number of occurrences of warning
 			int const ErrCount1, // for recurring error messages
-			bool const PossibleSubcooling, // flag to indicate chiller is doing less cooling that requested
-			bool const IsThisSized // true if sizing is done
+			bool const PossibleSubcooling // flag to indicate chiller is doing less cooling that requested
 		) :
 			Name( Name ),
 			TypeNum( TypeNum ),
 			EIRFPLRName( EIRFPLRName ),
 			CondenserType( CondenserType ),
 			RefCap( RefCap ),
+			RefCapWasAutoSized( RefCapWasAutoSized ),
 			RefCOP( RefCOP ),
 			FlowMode( FlowMode ),
 			ModulatedFlowSetToLoop( ModulatedFlowSetToLoop ),
 			ModulatedFlowErrDone( ModulatedFlowErrDone ),
 			HRSPErrDone( HRSPErrDone ),
 			EvapVolFlowRate( EvapVolFlowRate ),
+			EvapVolFlowRateWasAutoSized( EvapVolFlowRateWasAutoSized ),
 			EvapMassFlowRateMax( EvapMassFlowRateMax ),
 			CondVolFlowRate( CondVolFlowRate ),
+			CondVolFlowRateWasAutoSized( CondVolFlowRateWasAutoSized ),
 			CondMassFlowRateMax( CondMassFlowRateMax ),
 			CondenserFanPowerRatio( CondenserFanPowerRatio ),
 			CompPowerToCondenserFrac( CompPowerToCondenserFrac ),
@@ -322,6 +333,7 @@ namespace ChillerElectricEIR {
 			TempRefEvapOut( TempRefEvapOut ),
 			TempLowLimitEvapOut( TempLowLimitEvapOut ),
 			DesignHeatRecVolFlowRate( DesignHeatRecVolFlowRate ),
+			DesignHeatRecVolFlowRateWasAutoSized( DesignHeatRecVolFlowRateWasAutoSized ),
 			DesignHeatRecMassFlowRate( DesignHeatRecMassFlowRate ),
 			SizFac( SizFac ),
 			BasinHeaterPowerFTempDiff( BasinHeaterPowerFTempDiff ),
@@ -366,8 +378,7 @@ namespace ChillerElectricEIR {
 			PrintMessage( PrintMessage ),
 			MsgErrorCount( MsgErrorCount ),
 			ErrCount1( ErrCount1 ),
-			PossibleSubcooling( PossibleSubcooling ),
-			IsThisSized( IsThisSized )
+			PossibleSubcooling( PossibleSubcooling )
 		{}
 
 	};

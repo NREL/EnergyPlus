@@ -349,7 +349,8 @@ namespace DataPlant {
 	bool PlantFirstSizeCompleted( false );
 	bool PlantFirstSizesOkayToFinalize( false ); // true if plant sizing is finishing and can save results
 	bool PlantReSizingCompleted( false );
-	bool PlantSizesOkayToReport( false );
+	bool PlantFirstSizesOkayToReport( false );
+	bool PlantFinalSizesOkayToReport( false );
 	bool AnyEMSPlantOpSchemesInModel( false );
 
 	FArray1D_int EconBranchNum; // Branch num on which economizer is placed

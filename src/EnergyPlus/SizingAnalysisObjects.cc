@@ -52,18 +52,18 @@ namespace EnergyPlus {
 		// no we can no longer do this because need to keep system step data already in object
 		//ztStepObj[ index ] = tmpztStepStamp;
 
-		ztStepObj[ index ].KindofSim	= tmpztStepStamp.KindofSim;
-		ztStepObj[ index ].EnvrnNum		= tmpztStepStamp.EnvrnNum;
-		ztStepObj[ index ].DesignDayNum	= tmpztStepStamp.DesignDayNum;
-		ztStepObj[ index ].DayOfSim		= tmpztStepStamp.DayOfSim;
-		ztStepObj[ index ].HourOfDay	= tmpztStepStamp.HourOfDay;
+		ztStepObj[ index ].KindofSim		= tmpztStepStamp.KindofSim;
+		ztStepObj[ index ].EnvrnNum			= tmpztStepStamp.EnvrnNum;
+		ztStepObj[ index ].DesignDayNum		= tmpztStepStamp.DesignDayNum;
+		ztStepObj[ index ].DayOfSim			= tmpztStepStamp.DayOfSim;
+		ztStepObj[ index ].HourOfDay		= tmpztStepStamp.HourOfDay;
 		ztStepObj[ index ].ztStepsIntoPeriod = tmpztStepStamp.ztStepsIntoPeriod;
 		ztStepObj[ index ].stepStartMinute	= tmpztStepStamp.stepStartMinute;
 		ztStepObj[ index ].stepEndMinute	= tmpztStepStamp.stepEndMinute;
 		ztStepObj[ index ].TimeStepDuration	= tmpztStepStamp.TimeStepDuration;
 
 		//hardcode until pointers
-		ztStepObj[ index ].LogDataValue = Node( NodeNum ).MassFlowRate;
+		ztStepObj[ index ].LogDataValue		= Node( NodeNum ).MassFlowRate;
 
 	
 	}
@@ -80,7 +80,7 @@ namespace EnergyPlus {
 		for ( auto & E : EnvrnStartZtStepIndex) {
 			if (E == ZnStepIndex ) { // don't kick over into the next environment
 				ZnStepIndex = LastZnStepIndex;
-			} 	
+			}
 		}
 
 		if ( ZnStepIndex >= NumOfStepsInLogSet ) ZnStepIndex = NumOfStepsInLogSet - 1;

@@ -168,7 +168,6 @@ namespace ChillerReformulatedEIR {
 		//  INTEGER           :: MsgErrorCount = 0   ! number of occurrences of warning
 		//  INTEGER           :: ErrCount1     = 0   ! for recurring error messages
 		bool PossibleSubcooling; // flag to indicate chiller is doing less cooling that requested
-		bool IsThisSized; // true if sizing is done
 
 		// Default Constructor
 		ReformulatedEIRChillerSpecs() :
@@ -262,8 +261,7 @@ namespace ChillerReformulatedEIR {
 			HRBranchNum( 0 ),
 			HRCompNum( 0 ),
 			CondMassFlowIndex( 0 ),
-			PossibleSubcooling( false ),
-			IsThisSized( false )
+			PossibleSubcooling( false )
 		{}
 
 		// Member Constructor
@@ -362,8 +360,7 @@ namespace ChillerReformulatedEIR {
 			int const HRBranchNum, // heat recovery water plant loop branch index
 			int const HRCompNum, // heat recovery water plant loop component index
 			int const CondMassFlowIndex,
-			bool const PossibleSubcooling, // flag to indicate chiller is doing less cooling that requested
-			bool const IsThisSized // true if sizing is done
+			bool const PossibleSubcooling // flag to indicate chiller is doing less cooling that requested
 		) :
 			Name( Name ),
 			TypeNum( TypeNum ),
@@ -459,8 +456,7 @@ namespace ChillerReformulatedEIR {
 			HRBranchNum( HRBranchNum ),
 			HRCompNum( HRCompNum ),
 			CondMassFlowIndex( CondMassFlowIndex ),
-			PossibleSubcooling( PossibleSubcooling ),
-			IsThisSized( IsThisSized )
+			PossibleSubcooling( PossibleSubcooling )
 		{}
 
 	};
