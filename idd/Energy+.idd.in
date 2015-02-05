@@ -25057,7 +25057,7 @@ HVACTemplate:Zone:VRF,
       \note to be equal to the cooling capacity multiplied by this sizing ratio.
       \note This input applies to the terminal unit heating coil and overrides the sizing
       \note ratio entered in the HVACTemplate:System:VRF object.
-  N4, \field Supply Air Flow Rate During Cooling Operation
+  N4, \field Cooling Supply Air Flow Rate
       \note This field may be set to "autosize".  If a value is entered, it will be
       \note multiplied by the Supply Air Sizing Factor and by zone multipliers.
       \type real
@@ -25065,7 +25065,7 @@ HVACTemplate:Zone:VRF,
       \minimum> 0.0
       \autosizable
       \default autosize
-  N5, \field Supply Air Flow Rate When No Cooling is Needed
+  N5, \field No Cooling Supply Air Flow Rate
       \note This flow rate is used when the terminal is not cooling and the previous mode was cooling.
       \note This field may be set to "autosize".  If a value is entered, it will be
       \note multiplied by the Supply Air Sizing Factor and by zone multipliers.
@@ -25074,7 +25074,7 @@ HVACTemplate:Zone:VRF,
       \minimum 0.0
       \autosizable
       \default autosize
-  N6, \field Supply Air Flow Rate During Heating Operation
+  N6, \field Heating Supply Air Flow Rate
       \note This field may be set to "autosize".  If a value is entered, it will be
       \note multiplied by the Supply Air Sizing Factor and by zone multipliers.
       \type real
@@ -25082,7 +25082,7 @@ HVACTemplate:Zone:VRF,
       \minimum> 0.0
       \autosizable
       \default autosize
-  N7, \field Supply Air Flow Rate When No Heating is Needed
+  N7, \field No Heating Supply Air Flow Rate
       \note This flow rate is used when the terminal is not heating and the previous mode was heating.
       \note This field may be set to "autosize".  If a value is entered, it will be
       \note multiplied by the Supply Air Sizing Factor and by zone multipliers.
@@ -25091,7 +25091,7 @@ HVACTemplate:Zone:VRF,
       \minimum 0.0
       \autosizable
       \default autosize
-  N8, \field Outdoor Air Flow Rate During Cooling Operation
+  N8, \field Cooling Outdoor Air Flow Rate
       \note If this field is set to autosize it will be sized based on the outdoor air inputs below,
       \note unless a dedicated outdoor air system is specified for this zone and then it will be
       \note set to zero.
@@ -25100,7 +25100,7 @@ HVACTemplate:Zone:VRF,
       \minimum 0.0
       \autosizable
       \default autosize
-  N9, \field Outdoor Air Flow Rate During Heating Operation
+  N9, \field Heating Outdoor Air Flow Rate
       \note If this field is set to autosize it will be sized based on the outdoor air inputs below,
       \note unless a dedicated outdoor air system is specified for this zone and then it will be
       \note set to zero.
@@ -25109,7 +25109,7 @@ HVACTemplate:Zone:VRF,
       \minimum 0.0
       \autosizable
       \default autosize
- N10, \field Outdoor Air Flow Rate When No Cooling or Heating is Needed
+ N10, \field No Load Outdoor Air Flow Rate
       \note If this field is set to autosize it will be sized based on the outdoor air inputs below,
       \note unless a dedicated outdoor air system is specified for this zone and then it will be
       \note set to zero.
@@ -30567,7 +30567,7 @@ DesignSpecification:ZoneHVAC:Sizing,
       \required-field
       \type alpha
       \reference DesignSpecificationZoneHVACSizingName
-  A2, \field Cooling Design Air Flow Method
+  A2, \field Cooling Supply Air Flow Rate Method
       \type choice
       \key None
       \key SupplyAirFlowRate
@@ -30585,37 +30585,37 @@ DesignSpecification:ZoneHVAC:Sizing,
       \note value determined by the simulation. FlowPerCoolingCapacity => is selected when the supply
       \note air volume is determined from user specified flow per Cooling Capacity and Cooling Capacity
       \note determined by the simulation.
-  N1, \field Cooling Design Supply Air Flow Rate
+  N1, \field Cooling Supply Air Flow Rate
       \type real
       \units m3/s
       \minimum 0.0
       \autosizable
       \note Enter the magnitude of supply air volume flow rate during cooling operation.
-      \note Required field when Supply air Flow Rate Method During Cooling Operation is SupplyAirFlowRate.
+      \note Required field when Cooling Supply Air Flow Rate Method is SupplyAirFlowRate.
       \note This field may be blank if a cooling coil is not included in the Zone HVAC equipment.
-  N2, \field Cooling Design Supply Air Flow Rate Per Floor Area
+  N2, \field Cooling Supply Air Flow Rate Per Floor Area
       \type real
       \units m3/s-m2
       \minimum 0.0
       \note Enter the cooling supply air volume flow rate per total conditioned floor area.
-      \note Required field when Supply air Flow Rate Method During Cooling Operation is FlowPerFloorArea.
+      \note Required field when Cooling Supply Air Flow Rate Method is FlowPerFloorArea.
       \note This field may be blank if a cooling coil is not included in the Zone HVAC equipment.
-  N3, \field Fraction of Autosized Cooling Design Supply Air Flow Rate
+  N3, \field Cooling Fraction of Autosized Cooling Supply Air Flow Rate
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
-      \note Required field when Supply air Flow Rate Method During Cooling Operation is
+      \note Required field when Cooling Supply Air Flow Rate Method is
       \note FractionOfAutosizedCoolingAirflow.
       \note This field may be blank if a cooling coil is not included in the Zone HVAC equipment.
-  N4, \field Cooling Design Supply Air Flow Rate Per Unit Cooling Capacity
+  N4, \field Cooling Supply Air Flow Rate Per Unit Cooling Capacity
       \type real
       \units m3/s-W
       \minimum 0.0
       \note Enter the cooling supply air volume flow rate unit cooling capacity.
-      \note Required field when Supply air Flow Rate Method During Cooling Operation is
+      \note Required field when Cooling Supply Air Flow Rate Method is
       \note FlowPerCoolingCapacity. This field may be blank if a cooling coil is not
       \note included in the Zone HVAC equipment.
-  A3, \field Supply Air Flow Rate Method When No Cooling or Heating is Required
+  A3, \field No Load Supply Air Flow Rate Method
       \type choice
       \key None
       \key SupplyAirFlowRate
@@ -30624,7 +30624,7 @@ DesignSpecification:ZoneHVAC:Sizing,
       \key FractionOfAutosizedHeatingAirflow
       \default SupplyAirFlowRate
       \note Enter the method used to determine the supply air volume flow rate When No Cooling or Heating
-      \note is Required. None is used when a cooling or heating coils is not included in the Zone HVAC
+      \note is Required. None is used when a cooling or heating coil is not included in the Zone HVAC
       \note Equipment or this field may be blank. SupplyAirFlowRate => selected when the magnitude of the
       \note supply air volume flow rate is specified. FlowPerFloorArea => selected when the supply air
       \note volume flow rate is determined from total floor area served by the Zone HVAC unit and Flow Per
@@ -30633,34 +30633,34 @@ DesignSpecification:ZoneHVAC:Sizing,
       \note air flow rate value determined by the simulation. FractionOfAutosizedHeatingAirflow => is
       \note selected when the supply air volume is determined from a user specified fraction and the
       \note Autosized heating supply air flow rate value determined by the simulation.
-  N5, \field Supply Air Flow Rate When No Cooling or Heating is Required
+  N5, \field No Load Supply Air Flow Rate
       \type real
       \units m3/s
       \minimum 0.0
       \autosizable
       \note Enter the magnitude of the supply air volume flow rate during when no cooling or heating
-      \note is required. Required field when Supply air Flow Rate Method When No Cooling or Heating
-      \note is Required is SupplyAirFlowRate.
-  N6, \field Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
+      \note is required. Required field when No Load Supply Air Flow Rate Method
+      \note is SupplyAirFlowRate.
+  N6, \field No Load Supply Air Flow Rate Per Floor Area
       \type real
       \units m3/s-m2
       \minimum 0.0
       \note Enter the supply air volume flow rate per total floor area.
-      \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required
+      \note Required field when No Load Supply Air Flow Rate Method
       \note is FlowPerFloorArea.
-  N7, \field Fraction of Design Cooling Supply Air Flow Rate When No Clg or Htg Required
+  N7, \field No Load Fraction of Cooling Supply Air Flow Rate
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
-      \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required
+      \note Required field when No Load Supply Air Flow Rate Method
       \note is FractionOfAutosizedCoolingAirflow.
-  N8, \field Fraction of Design Heating Supply Air Flow Rate When No Clg or Htg Required
+  N8, \field No Load Fraction of Heating Supply Air Flow Rate
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the heating supply air flow rate.
-      \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required
+      \note Required field when No Load Supply Air Flow Rate Method
       \note is FractionOfAutosizedHeatingAirflow.
-  A4, \field Heating Design Air Flow Method
+  A4, \field Heating Supply Air Flow Rate Method
       \type choice
       \key None
       \key SupplyAirFlowRate
@@ -30678,34 +30678,34 @@ DesignSpecification:ZoneHVAC:Sizing,
       \note value determined by the simulation. FlowPerHeatingCapacity => is selected when the supply
       \note air volume is determined from user specified flow per Heating Capacity and Heating Capacity
       \note determined by the simulation.
-  N9, \field Heating Design Supply Air Flow Rate
+  N9, \field Heating Supply Air Flow Rate
       \type real
       \units m3/s
       \minimum 0.0
       \autosizable
       \note Enter the magnitude of the supply air volume flow rate during heating operation.
-      \note Required field when Supply air Flow Rate Method During Heating Operation is SupplyAirFlowRate.
+      \note Required field when Heating Supply Air Flow Rate Method is SupplyAirFlowRate.
       \note This field may be blank if a heating coil is not included in the Zone HVAC equipment.
- N10, \field Heating Design Supply Air Flow Rate Per Floor Area
+ N10, \field Heating Supply Air Flow Rate Per Floor Area
       \type real
       \units m3/s-m2
       \minimum 0.0
       \note Enter the heating supply air volume flow rate per total conditioned floor area.
-      \note Required field when Supply air Flow Rate Method During Heating Operation is FlowPerFloorArea.
+      \note Required field when Heating Supply Air Flow Rate Method is FlowPerFloorArea.
       \note This field may be blank if a heating coil is not included in the Zone HVAC equipment.
- N11, \field Fraction of Heating Design Supply Air Flow Rate
+ N11, \field Heating Fraction of Heating Supply Air Flow Rate
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the heating supply air flow rate.
-      \note Required field when Supply air Flow Rate Method During Heating Operation is
+      \note Required field when Heating Supply Air Flow Rate Method is
       \note FractionOfAutosizedHeatingAirflow.
       \note This field may be blank if a heating coil is not included in the Zone HVAC equipment.
- N12, \field Heating Design Supply Air Flow Rate Per Unit Heating Capacity
+ N12, \field Heating Supply Air Flow Rate Per Unit Heating Capacity
       \type real
       \units m3/s-W
       \minimum 0.0
       \note Enter the supply air volume flow rate per unit heating capacity.
-      \note Required field when Supply air Flow Rate Method During Heating Operation is
+      \note Required field when Heating Supply Air Flow Rate Method is
       \note FlowPerHeatingCapacity.
       \note This field may be blank if a heating coil is not included in the Zone HVAC equipment.
   A5, \field Cooling Design Capacity Method
@@ -30855,7 +30855,7 @@ Sizing:System,
       \type real
       \default 0.008
       \units kgWater/kgDryAir
-  A6, \field Cooling Design Air Flow Method
+  A6, \field Cooling Supply Air Flow Rate Method
       \type choice
       \key Flow/System
       \key DesignDay
@@ -30863,34 +30863,34 @@ Sizing:System,
       \key FractionOfAutosizedCoolingAirflow
       \key FlowPerCoolingCapacity
       \default DesignDay
- N11, \field Cooling Design Air Flow Rate
-      \note This input is used if Cooling Design Air Flow Method is Flow/System
+ N11, \field Cooling Supply Air Flow Rate
+      \note This input is used if Cooling Supply Air Flow Rate Method is Flow/System
       \note This value will *not* be multiplied by any sizing factor or by zone multipliers.
       \note If using zone multipliers, this value must be large enough to serve the multiplied zones.
       \type real
       \units m3/s
       \minimum 0
       \default 0
- N12, \field Supply Air Flow Rate Per Floor Area During Cooling Operation
+ N12, \field Cooling Supply Air Flow Rate Per Floor Area
       \type real
       \units m3/s-m2
       \minimum 0.0
       \note Enter the cooling supply air volume flow rate per total conditioned floor area.
-      \note Required field when Supply air Flow Rate Method during cooling operation is FlowPerFloorArea.
- N13, \field Fraction of Autosized Design Cooling Supply Air Flow Rate
+      \note Required field when Cooling Supply Air Flow Rate Method is FlowPerFloorArea.
+ N13, \field Cooling Fraction of Autosized Cooling Supply Air Flow Rate
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
-      \note Required field when Supply air Flow Rate Method during cooling operation is
+      \note Required field when Cooling Supply Air Flow Rate Method is
       \note FractionOfAutosizedCoolingAirflow.
- N14, \field Design Supply Air Flow Rate Per Unit Cooling Capacity
+ N14, \field Cooling Supply Air Flow Rate Per Unit Cooling Capacity
       \type real
       \units m3/s-W
       \minimum 0.0
       \note Enter the supply air volume flow rate per unit cooling capacity.
-      \note Required field when Supply air Flow Rate Method During Cooling Operation is
+      \note Required field when Cooling Supply Air Flow Rate Method is
       \note FlowPerCoolingCapacity.
-  A7, \field Heating Design Air Flow Method
+  A7, \field Heating Supply Air Flow Rate Method
       \type choice
       \key Flow/System
       \key DesignDay
@@ -30899,38 +30899,38 @@ Sizing:System,
       \key FractionOfAutosizedCoolingAirflow
       \key FlowPerCoolingCapacity
       \default DesignDay
- N15, \field Heating Design Air Flow Rate
-      \note This input is used if Heating Design Air Flow Method is Flow/System
+ N15, \field Heating Supply Air Flow Rate
+      \note Required field when Heating Supply Air Flow Rate Method is Flow/System
       \note This value will *not* be multiplied by any sizing factor or by zone multipliers.
       \note If using zone multipliers, this value must be large enough to serve the multiplied zones.
       \type real
       \units m3/s
       \minimum 0
       \default 0
- N16, \field Supply Air Flow Rate Per Floor Area During Heating Operation
+ N16, \field Heating Supply Air Flow Rate Per Floor Area
       \type real
       \units m3/s-m2
       \minimum 0.0
       \note Enter the heating supply air volume flow rate per total conditioned floor area.
-      \note Required field when Supply air Flow Rate Method during heating operation is FlowPerFloorArea.
- N17, \field Fraction of Autosized Design Heating Supply Air Flow Rate
+      \note Required field when Heating Supply Air Flow Rate Method is FlowPerFloorArea.
+ N17, \field Heating Fraction of Autosized Heating Supply Air Flow Rate
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the heating supply air flow rate.
-      \note Required field when Supply air Flow Rate Method during heating operation is
+      \note Required field when Heating Supply Air Flow Rate Method is
       \note FractionOfAutosizedHeatingAirflow.
- N18, \field Fraction of Autosized Design Cooling Supply Air Flow Rate
+ N18, \field Heating Fraction of Autosized Cooling Supply Air Flow Rate
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
-      \note Required field when Supply air Flow Rate Method during heating operation is
+      \note Required field when Heating Supply Air Flow Rate Method is
       \note FractionOfAutosizedCoolingAirflow.
- N19, \field Design Supply Air Flow Rate Per Unit Heating Capacity
+ N19, \field Heating Supply Air Flow Rate Per Unit Heating Capacity
       \type real
       \units m3/s-W
       \minimum 0.0
       \note Enter the heating supply air volume flow rate per unit heating capacity.
-      \note Required field when Supply air Flow Rate Method during heating operation is
+      \note Required field when Heating Supply Air Flow Rate Method is
       \note FlowPerHeatingCapacity.
   A8, \field System Outdoor Air Method
       \type choice
@@ -32012,21 +32012,21 @@ ZoneHVAC:PackagedTerminalAirConditioner,
         \type object-list
         \object-list OutdoorAirMixers
         \note Needs to match the name of the PTAC outdoor air mixer object.
-   N1 , \field Supply Air Flow Rate During Cooling Operation
+   N1 , \field Cooling Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to fan size.
-   N2 , \field Supply Air Flow Rate During Heating Operation
+   N2 , \field Heating Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to fan size.
-   N3 , \field Supply Air Flow Rate When No Cooling or Heating is Needed
+   N3 , \field No Load Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum 0
@@ -32037,21 +32037,21 @@ ZoneHVAC:PackagedTerminalAirConditioner,
         \note This air flow rate is used when no heating or cooling is required and the cooling or
         \note heating coil is off. If this field is left blank or zero, the supply air flow rate
         \note from the previous on cycle (either cooling or heating) is used.
-   N4 , \field Outdoor Air Flow Rate During Cooling Operation
+   N4 , \field Cooling Outdoor Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum 0
         \autosizable
         \note Must be less than or equal to supply air flow rate during cooling operation.
-   N5 , \field Outdoor Air Flow Rate During Heating Operation
+   N5 , \field Heating Outdoor Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum 0
         \autosizable
         \note Must be less than or equal to supply air flow rate during heating operation.
-   N6 , \field Outdoor Air Flow Rate When No Cooling or Heating is Needed
+   N6 , \field No Load Outdoor Air Flow Rate
         \type real
         \units m3/s
         \minimum 0
@@ -32158,21 +32158,21 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \type object-list
         \object-list OutdoorAirMixers
         \note Needs to match name of outdoor air mixer object.
-   N1 , \field Supply Air Flow Rate During Cooling Operation
+   N1 , \field Cooling Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to fan size.
-   N2 , \field Supply Air Flow Rate During Heating Operation
+   N2 , \field Heating Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to fan size.
-   N3 , \field Supply Air Flow Rate When No Cooling or Heating is Needed
+   N3 , \field No Load Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum 0
@@ -32182,21 +32182,21 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \note is used when no heating or cooling is required and the DX coil compressor is off.
         \note If this field is left blank or zero, the supply air flow rate from the previous on cycle
         \note (either cooling or heating) is used.
-   N4 , \field Outdoor Air Flow Rate During Cooling Operation
+   N4 , \field Cooling Outdoor Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum 0
         \autosizable
         \note Must be less than or equal to supply air flow rate during cooling operation.
-   N5 , \field Outdoor Air Flow Rate During Heating Operation
+   N5 , \field Heating Outdoor Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum 0
         \autosizable
         \note Must be less than or equal to supply air flow rate during heating operation.
-   N6 , \field Outdoor Air Flow Rate When No Cooling or Heating is Needed
+   N6 , \field No Load Outdoor Air Flow Rate
         \type real
         \units m3/s
         \minimum 0
@@ -32338,21 +32338,21 @@ ZoneHVAC:WaterToAirHeatPump,
         \object-list OutdoorAirMixers
         \note This optional field specifies the name of the outdoor air mixer object.
         \note When used, this name needs to match name of outdoor air mixer object.
-   N1 , \field Supply Air Flow Rate During Cooling Operation
+   N1 , \field Cooling Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to fan size.
-   N2 , \field Supply Air Flow Rate During Heating Operation
+   N2 , \field Heating Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to fan size.
-   N3 , \field Supply Air Flow Rate When No Cooling or Heating is Needed
+   N3 , \field No Load Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum 0
@@ -32362,21 +32362,21 @@ ZoneHVAC:WaterToAirHeatPump,
         \note is used when no heating or cooling is required and the DX coil compressor is off.
         \note If this field is left blank or zero, the supply air flow rate from the previous on cycle
         \note (either cooling or heating) is used.
-   N4 , \field Outdoor Air Flow Rate During Cooling Operation
+   N4 , \field Cooling Outdoor Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum 0
         \autosizable
         \note Must be less than or equal to supply air flow rate during cooling operation.
-   N5 , \field Outdoor Air Flow Rate During Heating Operation
+   N5 , \field Heating Outdoor Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum 0
         \autosizable
         \note Must be less than or equal to supply air flow rate during heating operation.
-   N6 , \field Outdoor Air Flow Rate When No Cooling or Heating is Needed
+   N6 , \field No Load Outdoor Air Flow Rate
         \type real
         \units m3/s
         \minimum 0
@@ -33293,37 +33293,37 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
         \required-field
         \type node
         \note the outlet node of the terminal unit
-  N1 ,  \field Supply Air Flow Rate During Cooling Operation
+  N1 ,  \field Cooling Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
-  N2 ,  \field Supply Air Flow Rate When No Cooling is Needed
+  N2 ,  \field No Cooling Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
         \autosizable
-  N3 ,  \field Supply Air Flow Rate During Heating Operation
+  N3 ,  \field Heating Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
-  N4 ,  \field Supply Air Flow Rate When No Heating is Needed
+  N4 ,  \field No Heating Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
         \autosizable
-  N5 ,  \field Outdoor Air Flow Rate During Cooling Operation
+  N5 ,  \field Cooling Outdoor Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
         \autosizable
-  N6 ,  \field Outdoor Air Flow Rate During Heating Operation
+  N6 ,  \field Heating Outdoor Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
         \autosizable
-  N7 ,  \field Outdoor Air Flow Rate When No Cooling or Heating is Needed
+  N7 ,  \field No Load Outdoor Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
@@ -49082,7 +49082,7 @@ AirLoopHVAC:UnitarySystem,
        \object-list HeatingCoilsDesuperheater
        \note Enter the name of the supplemental heating coil if included in the unitary system.
        \note Only required if dehumidification control type is "CoolReheat".
-  A20, \field Supply Air Flow Rate Method During Cooling Operation
+  A20, \field Cooling Supply Air Flow Rate Method
        \type choice
        \key None
        \key SupplyAirFlowRate
@@ -49098,35 +49098,35 @@ AirLoopHVAC:UnitarySystem,
        \note value determined by the simulation.
        \note FlowPerCoolingCapacity is selected when the supply air volume is a fraction of the cooling
        \note capacity as determined by the simulation.
-  N3 , \field Supply Air Flow Rate During Cooling Operation
+  N3 , \field Cooling Supply Air Flow Rate
        \type real
        \units m3/s
        \minimum 0.0
        \autosizable
        \note Enter the magnitude of the supply air volume flow rate during cooling operation.
-       \note Required field when Supply air Flow Rate Method During Cooling Operation is SupplyAirFlowRate.
+       \note Required field when Cooling Supply Air Flow Rate Method is SupplyAirFlowRate.
        \note This field may be blank if a cooling coil is not included in the unitary system.
-  N4 , \field Supply Air Flow Rate Per Floor Area During Cooling Operation
+  N4 , \field Cooling Supply Air Flow Rate Per Floor Area
        \type real
        \units m3/s-m2
        \minimum 0.0
        \note Enter the supply air volume flow rate per total floor area fraction.
-       \note Required field when Supply air Flow Rate Method During Cooling Operation is FlowPerFloorArea.
+       \note Required field when Cooling Supply Air Flow Rate Method is FlowPerFloorArea.
        \note This field may be blank if a cooling coil is not included in the unitary system.
-  N5 , \field Fraction of Autosized Design Cooling Supply Air Flow Rate
+  N5 , \field Cooling Fraction of Autosized Cooling Supply Air Flow Rate
        \type real
        \minimum 0.0
        \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
-       \note Required field when Supply air Flow Rate Method During Cooling Operation is FractionOfAutosizedCoolingValue.
+       \note Required field when Cooling Supply Air Flow Rate Method is FractionOfAutosizedCoolingValue.
        \note This field may be blank if a cooling coil is not included in the unitary system.
-  N6 , \field Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation
+  N6 , \field Cooling Supply Air Flow Rate Per Unit of Capacity
        \type real
        \units m3/s-W
        \minimum 0.0
        \note Enter the supply air volume flow rate as a fraction of the cooling capacity.
-       \note Required field when Supply air Flow Rate Method During Cooling Operation is FlowPerCoolingCapacity.
+       \note Required field when Cooling Supply Air Flow Rate Method is FlowPerCoolingCapacity.
        \note This field may be blank if a cooling coil is not included in the unitary system.
-  A21, \field Supply air Flow Rate Method During Heating Operation
+  A21, \field Heating Supply Air Flow Rate Method
        \type choice
        \key None
        \key SupplyAirFlowRate
@@ -49142,35 +49142,35 @@ AirLoopHVAC:UnitarySystem,
        \note value determined by the simulation.
        \note FlowPerHeatingCapacity is selected when the supply air volume is a fraction of the heating
        \note capacity as determined by the simulation.
-  N7 , \field Supply Air Flow Rate During Heating Operation
+  N7 , \field Heating Supply Air Flow Rate
        \type real
        \units m3/s
        \minimum 0.0
        \autosizable
        \note Enter the magnitude of the supply air volume flow rate during heating operation.
-       \note Required field when Supply air Flow Rate Method During Heating Operation is SupplyAirFlowRate.
+       \note Required field when Heating Supply Air Flow Rate Method is SupplyAirFlowRate.
        \note This field may be blank if a heating coil is not included in the unitary system.
-  N8 , \field Supply Air Flow Rate Per Floor Area during Heating Operation
+  N8 , \field Heating Supply Air Flow Rate Per Floor Area
        \type real
        \units m3/s-m2
        \minimum 0.0
        \note Enter the supply air volume flow rate per total floor area fraction.
-       \note Required field when Supply air Flow Rate Method During Heating Operation is FlowPerFloorArea.
+       \note Required field when Heating Supply Air Flow Rate Method is FlowPerFloorArea.
        \note This field may be blank if a heating coil is not included in the unitary system.
-  N9 , \field Fraction of Autosized Design Heating Supply Air Flow Rate
+  N9 , \field Heating Fraction of Autosized Heating Supply Air Flow Rate
        \type real
        \minimum 0.0
        \note Enter the supply air volume flow rate as a fraction of the heating supply air flow rate.
-       \note Required field when Supply air Flow Rate Method During Heating Operation is FractionOfAutosizedHeatingValue.
+       \note Required field when Heating Supply Air Flow Rate Method is FractionOfAutosizedHeatingValue.
        \note This field may be blank if a heating coil is not included in the unitary system.
-  N10, \field Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation
+  N10, \field Heating Supply Air Flow Rate Per Unit of Capacity
        \type real
        \units m3/s-W
        \minimum 0.0
        \note Enter the supply air volume flow rate as a fraction of the heating capacity.
-       \note Required field when Supply air Flow Rate Method During Heating Operation is FlowPerHeatingCapacity.
+       \note Required field when Heating Supply Air Flow Rate Method is FlowPerHeatingCapacity.
        \note This field may be blank if a heating coil is not included in the unitary system.
-  A22, \field Supply Air Flow Rate Method When No Cooling or Heating is Required
+  A22, \field No Load Supply Air Flow Rate Method
        \type choice
        \key None
        \key SupplyAirFlowRate
@@ -49180,7 +49180,7 @@ AirLoopHVAC:UnitarySystem,
        \key FlowPerCoolingCapacity
        \key FlowPerHeatingCapacity
        \note Enter the method used to determine the supply air volume flow rate when no cooling or heating is required.
-       \note None is used when a heating coil is not included in the unitary system or this field may be blank.
+       \note None is used when a cooling and heating coil is not included in the unitary system or this field may be blank.
        \note SupplyAirFlowRate is selected when the magnitude of the supply air volume is used.
        \note FlowPerFloorArea is selected when the supply air volume flow rate is based on total floor area
        \note served by the unitary system.
@@ -49192,41 +49192,41 @@ AirLoopHVAC:UnitarySystem,
        \note capacity as determined by the simulation.
        \note FlowPerHeatingCapacity is selected when the supply air volume is a fraction of the heating
        \note capacity as determined by the simulation.
-  N11, \field Supply Air Flow Rate When No Cooling or Heating is Required
+  N11, \field No Load Supply Air Flow Rate
        \type real
        \units m3/s
        \minimum 0.0
        \autosizable
        \note Enter the magnitude of the supply air volume flow rate during when no cooling or heating is required.
-       \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required is SupplyAirFlowRate.
-  N12, \field Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required
+       \note Required field when No Load Supply Air Flow Rate Method is SupplyAirFlowRate.
+  N12, \field No Load Supply Air Flow Rate Per Floor Area
        \type real
        \units m3/s-m2
        \minimum 0.0
        \note Enter the supply air volume flow rate per total floor area fraction.
-       \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required is FlowPerFloorArea.
-  N13, \field Fraction of Autosized Design Cooling Supply Air Flow Rate
+       \note Required field when No Load Supply Air Flow Rate Method is FlowPerFloorArea.
+  N13, \field No Load Fraction of Autosized Cooling Supply Air Flow Rate
        \type real
        \minimum 0.0
        \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
-       \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required is FractionOfAutosizedCoolingValue.
-  N14, \field Fraction of Autosized Design Heating Supply Air Flow Rate
+       \note Required field when No Load Supply Air Flow Rate Method is FractionOfAutosizedCoolingValue.
+  N14, \field No Load Fraction of Autosized Heating Supply Air Flow Rate
        \type real
        \minimum 0.0
        \note Enter the supply air volume flow rate as a fraction of the heating supply air flow rate.
-       \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required is FractionOfAutosizedHeatingValue.
-  N15, \field Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation
+       \note Required field when No Load Supply Air Flow Rate Method is FractionOfAutosizedHeatingValue.
+  N15, \field No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation
        \type real
        \units m3/s-W
        \minimum 0.0
        \note Enter the supply air volume flow rate as a fraction of the cooling capacity.
-       \note Required field when Supply air Flow Rate Method During Heating Operation is FlowPerCoolingCapacity.
-  N16, \field Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation
+       \note Required field when No Load Supply Air Flow Rate Method is FlowPerCoolingCapacity.
+  N16, \field No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation
        \type real
        \units m3/s-W
        \minimum 0.0
        \note Enter the supply air volume flow rate as a fraction of the heating capacity.
-       \note Required field when Supply air Flow Rate Method During Heating Operation is FlowPerHeatingCapacity.
+       \note Required field when No Load Supply Air Flow Rate Method is FlowPerHeatingCapacity.
   N17, \field Maximum Supply Air Temperature
        \type real
        \units C
@@ -49342,7 +49342,7 @@ UnitarySystemPerformance:HeatPump:Multispeed,
        \maximum 10
        \note Used only for Multi speed coils
        \note Enter the number of the following sets of data for air flow rates.
-  N3 , \field Speed 1 Supply Air Flow Ratio During Heating Operation
+  N3 , \field Heating Speed 1 Supply Air Flow Ratio
        \required-field
        \type real
        \autosizable
@@ -49352,7 +49352,7 @@ UnitarySystemPerformance:HeatPump:Multispeed,
        \note Enter the lowest operating supply air flow ratio during heating
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N4 , \field Speed 1 Supply Air Flow Ratio During Cooling Operation
+  N4 , \field Cooling Speed 1 Supply Air Flow Ratio
        \required-field
        \type real
        \autosizable
@@ -49361,7 +49361,7 @@ UnitarySystemPerformance:HeatPump:Multispeed,
        \note Enter the lowest operating supply air flow ratio during cooling
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N5 , \field Speed 2 Supply Air Flow Ratio During Heating Operation
+  N5 , \field Heating Speed 2 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -49369,7 +49369,7 @@ UnitarySystemPerformance:HeatPump:Multispeed,
        \note Enter the next highest operating supply air flow ratio during heating
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N6 , \field Speed 2 Supply Air Flow Ratio During Cooling Operation
+  N6 , \field Cooling Speed 2 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -49377,7 +49377,7 @@ UnitarySystemPerformance:HeatPump:Multispeed,
        \note Enter the next highest operating supply air flow ratio during cooling
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N7 , \field Speed 3 Supply Air Flow Ratio During Heating Operation
+  N7 , \field Heating Speed 3 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -49385,7 +49385,7 @@ UnitarySystemPerformance:HeatPump:Multispeed,
        \note Enter the next highest operating supply air flow ratio during heating
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N8 , \field Speed 3 Supply Air Flow Ratio During Cooling Operation
+  N8 , \field Cooling Speed 3 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -49393,7 +49393,7 @@ UnitarySystemPerformance:HeatPump:Multispeed,
        \note Enter the next highest operating supply air flow ratio during cooling
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N9 , \field Speed 4 Supply Air Flow Ratio During Heating Operation
+  N9 , \field Heating Speed 4 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -49401,7 +49401,7 @@ UnitarySystemPerformance:HeatPump:Multispeed,
        \note Enter the next highest operating supply air flow ratio during heating
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
-  N10; \field Speed 4 Supply Air Flow Ratio During Cooling Operation
+  N10; \field Cooling Speed 4 Supply Air Flow Ratio
        \type real
        \autosizable
        \minimum> 0
@@ -49443,7 +49443,7 @@ AirLoopHVAC:Unitary:Furnace:HeatOnly,
         \units C
         \autosizable
         \default 80.0
-   N2,  \field Supply Air Flow Rate
+   N2,  \field Heating Supply Air Flow Rate
         \required-field
         \type real
         \note  This value should be > 0 and <= than the fan air flow rate.
@@ -49521,21 +49521,21 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
         \units C
         \autosizable
         \default 80.0
-   N2,  \field Supply Air Flow Rate During Cooling Operation
+   N2,  \field Cooling Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to the fan's maximum flow rate.
-   N3,  \field Supply Air Flow Rate During Heating Operation
+   N3,  \field Heating Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to the fan's maximum flow fate.
-   N4,  \field Supply Air Flow Rate When No Cooling or Heating is Needed
+   N4,  \field No Load Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
@@ -49652,7 +49652,7 @@ AirLoopHVAC:UnitaryHeatOnly,
         \units C
         \autosizable
         \default 80.0
-   N2,  \field Supply Air Flow Rate
+   N2,  \field Heating Supply Air Flow Rate
         \required-field
         \type real
         \note  This value should be > 0 and <= than the fan air flow rate.
@@ -49727,21 +49727,21 @@ AirLoopHVAC:UnitaryHeatCool,
         \units C
         \autosizable
         \default 80.0
-   N2,  \field Supply Air Flow Rate During Cooling Operation
+   N2,  \field Cooling Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to the fan's maximum flow rate.
-   N3,  \field Supply Air Flow Rate During Heating Operation
+   N3,  \field Heating Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to the fan's maximum flow rate.
-   N4,  \field Supply Air Flow Rate When No Cooling or Heating is Needed
+   N4,  \field No Load Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum 0
@@ -49850,21 +49850,21 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
    A4,  \field Air Outlet Node Name
         \required-field
         \type node
-   N1,  \field Supply Air Flow Rate During Cooling Operation
+   N1,  \field Cooling Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to the fan's maximum flow rate.
-   N2,  \field Supply Air Flow Rate During Heating Operation
+   N2,  \field Heating Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
         \minimum> 0.0
         \autosizable
         \note Must be less than or equal to the fan's maximum flow rate.
-   N3,  \field Supply Air Flow Rate When No Cooling or Heating is Needed
+   N3,  \field No Load Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
@@ -50156,7 +50156,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \object-list ScheduleNames
         \note Enter the availability schedule name. Schedule values of zero denote system
         \note is Off. Non-zero schedule values denote system is available to operate.
-   N1 , \field System Air Flow Rate During Cooling Operation
+   N1 , \field Cooling Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
@@ -50164,7 +50164,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \minimum> 0.0
         \note Enter the system air flow rate during cooling
         \note operation or specify autosize.
-   N2 , \field System Air Flow Rate During Heating Operation
+   N2 , \field Heating Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
@@ -50172,7 +50172,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \minimum> 0.0
         \note Enter the system air flow rate during heating
         \note operation or specify autosize.
-   N3 , \field System Air Flow Rate When No Cooling or Heating is Needed
+   N3 , \field No Load Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
@@ -50182,7 +50182,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \note is used when no heating or cooling is required and the coils are off.
         \note If this field is left blank or zero, the system air flow rate from the
         \note previous on cycle (either cooling or heating) is used.
-   N4 , \field Outdoor Air Flow Rate During Cooling Operation
+   N4 , \field Cooling Outdoor Air Flow Rate
         \required-field
         \type real
         \units m3/s
@@ -50190,7 +50190,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \minimum 0.0
         \note Enter the outdoor air flow rate during
         \note cooling operation or specify autosize.
-   N5 , \field Outdoor Air Flow Rate During Heating Operation
+   N5 , \field Heating Outdoor Air Flow Rate
         \required-field
         \type real
         \units m3/s
@@ -50198,7 +50198,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \minimum 0.0
         \note Enter the outdoor air flow rate during
         \note heating operation or specify autosize.
-   N6 , \field Outdoor Air Flow Rate When No Cooling or Heating is Needed
+   N6 , \field No Load Outdoor Air Flow Rate
         \type real
         \units m3/s
         \minimum 0.0
@@ -50477,7 +50477,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
         \type node
    A17, \field Heat Recovery Water Outlet Node Name
         \type node
-   N8 , \field Supply Air Flow Rate When No Cooling or Heating is Needed
+   N8 , \field No Load Supply Air Flow Rate
         \type real
         \units m3/s
         \minimum 0
@@ -50501,7 +50501,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
         \minimum 2
         \maximum 4
         \note Enter the number of the following sets of data for air flow rates.
-   N11, \field Speed 1 Supply Air Flow Rate During Heating Operation
+   N11, \field Heating Speed 1 Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
@@ -50509,28 +50509,28 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
         \minimum> 0
         \note Enter the operating supply air flow rate during heating
         \note operation or specify autosize.
-   N12, \field Speed 2 Supply Air Flow Rate During Heating Operation
+   N12, \field Heating Speed 2 Supply Air Flow Rate
         \type real
         \units m3/s
         \autosizable
         \minimum> 0
         \note Enter the operating supply air flow rate during heating
         \note operation or specify autosize.
-   N13, \field Speed 3 Supply Air Flow Rate During Heating Operation
+   N13, \field Heating Speed 3 Supply Air Flow Rate
         \type real
         \units m3/s
         \autosizable
         \minimum> 0
         \note Enter the operating supply air flow rate during heating
         \note operation or specify autosize.
-   N14, \field Speed 4 Supply Air Flow Rate During Heating Operation
+   N14, \field Heating Speed 4 Supply Air Flow Rate
         \type real
         \units m3/s
         \autosizable
         \minimum> 0
         \note Enter the operating supply air flow rate during heating
         \note operation or specify autosize.
-   N15, \field Speed 1 Supply Air Flow Rate During Cooling Operation
+   N15, \field Cooling Speed 1 Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
@@ -50538,7 +50538,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
         \minimum> 0
         \note Enter the operating supply air flow rate during cooling
         \note operation or specify autosize.
-   N16, \field Speed 2 Supply Air Flow Rate During Cooling Operation
+   N16, \field Cooling Speed 2 Supply Air Flow Rate
         \required-field
         \type real
         \units m3/s
@@ -50546,14 +50546,14 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
         \minimum> 0
         \note Enter the operating supply air flow rate during cooling
         \note operation or specify autosize.
-   N17, \field Speed 3 Supply Air Flow Rate During Cooling Operation
+   N17, \field Cooling Speed 3 Supply Air Flow Rate
         \type real
         \units m3/s
         \autosizable
         \minimum> 0
         \note Enter the operating supply air flow rate during cooling
         \note operation or specify autosize.
-   N18; \field Speed 4 Supply Air Flow Rate During Cooling Operation
+   N18; \field Cooling Speed 4 Supply Air Flow Rate
         \type real
         \units m3/s
         \autosizable

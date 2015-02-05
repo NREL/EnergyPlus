@@ -11,9 +11,11 @@
 #include <ObjexxFCL/Time_Date.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <WeatherManager.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
+#include <DataStringGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataReportingFlags.hh>
@@ -4458,7 +4460,7 @@ Label903: ;
 
 		// FLOW:
 
-		{ IOFlags flags; gio::inquire( "in.epw", flags ); WeatherFileExists = flags.exists(); }
+		{ IOFlags flags; gio::inquire( DataStringGlobals::inputWeatherFileName, flags ); WeatherFileExists = flags.exists(); }
 
 		if ( WeatherFileExists ) {
 			OpenEPlusWeatherFile( ErrorsFound, true );
@@ -4511,11 +4513,11 @@ Label903: ;
 		bool EPWOpen;
 		int unitnumber;
 
-		{ IOFlags flags; gio::inquire( "in.epw", flags ); unitnumber = flags.unit(); EPWOpen = flags.open(); }
+		{ IOFlags flags; gio::inquire( DataStringGlobals::inputWeatherFileName, flags ); unitnumber = flags.unit(); EPWOpen = flags.open(); }
 		if ( EPWOpen ) gio::close( unitnumber );
 
 		WeatherFileUnitNumber = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "read" ); gio::open( WeatherFileUnitNumber, "in.epw", flags ); if ( flags.err() ) goto Label9999; }
+		{ IOFlags flags; flags.ACTION( "read" ); gio::open( WeatherFileUnitNumber, DataStringGlobals::inputWeatherFileName, flags ); if ( flags.err() ) goto Label9999; }
 
 		if ( ProcessHeader ) {
 			// Read in Header Information
@@ -4599,7 +4601,7 @@ Label9999: ;
 
 		//  Make sure it's open
 
-		{ IOFlags flags; gio::inquire( "in.epw", flags ); unitnumber = flags.unit(); EPWOpen = flags.open(); }
+		{ IOFlags flags; gio::inquire( DataStringGlobals::inputWeatherFileName, flags ); unitnumber = flags.unit(); EPWOpen = flags.open(); }
 		if ( EPWOpen ) gio::close( unitnumber );
 
 	}
