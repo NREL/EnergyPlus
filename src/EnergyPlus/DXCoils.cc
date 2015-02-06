@@ -6155,26 +6155,23 @@ namespace DXCoils {
 		Real64 PartLoadFraction; // Output of Part Load Fraction as a Function of Part Load Ratio curve
 		Real64 PumpHeatToWater; // Amount of pump heat attributed to heating water
 		Real64 HPRTF; // Heat pump run time fraction
-		int EvapInletNode; // Evaporator air inlet node number
-		int EvapOutletNode; // Evaporator air outlet node number
-		int CondInletNode; // Condenser water inlet node number
-		int CondOutletNode; // Condenser water outlet node number
-
-		CondInletNode = DXCoil( DXCoilNum ).WaterInNode;
-		CondOutletNode = DXCoil( DXCoilNum ).WaterOutNode;
+		
+		// References to Coil and Node struct
+		DXCoilData & Coil = DXCoil( DXCoilNum );
+		NodeData & AirInletNode = Node( Coil.AirInNode );
+		NodeData & WaterInletNode = Node( Coil.WaterInNode );
+		NodeData & WaterOutletNode = Node( Coil.WaterOutNode );
 
 		// If heat pump water heater is OFF, set outlet to inlet and RETURN
 		if ( PartLoadRatio == 0.0 ) {
-			Node( CondOutletNode ) = Node( CondInletNode );
+			WaterOutletNode = WaterInletNode;
 			return;
 		} else {
-			RatedHeatingCapacity = DXCoil( DXCoilNum ).RatedTotCap2;
-			RatedHeatingCOP = DXCoil( DXCoilNum ).RatedCOP( 1 );
-			EvapInletNode = DXCoil( DXCoilNum ).AirInNode;
-			EvapOutletNode = DXCoil( DXCoilNum ).AirOutNode;
-			InletWaterTemp = Node( CondInletNode ).Temp;
-			CondInletMassFlowRate = Node( CondInletNode ).MassFlowRate / PartLoadRatio;
-			EvapInletMassFlowRate = Node( EvapInletNode ).MassFlowRate / PartLoadRatio;
+			RatedHeatingCapacity = Coil.RatedTotCap2;
+			RatedHeatingCOP = Coil.RatedCOP( 1 );
+			InletWaterTemp = WaterInletNode.Temp;
+			CondInletMassFlowRate = WaterInletNode.MassFlowRate / PartLoadRatio;
+			EvapInletMassFlowRate = AirInletNode.MassFlowRate / PartLoadRatio;
 			CpWater = CPHW( InletWaterTemp );
 			CompressorPower = 0.0;
 			OperatingHeatingPower = 0.0;
@@ -6182,129 +6179,129 @@ namespace DXCoils {
 		}
 
 		// determine inlet air temperature type for curve objects
-		if ( DXCoil( DXCoilNum ).InletAirTemperatureType == WetBulbIndicator ) {
+		if ( Coil.InletAirTemperatureType == WetBulbIndicator ) {
 			InletAirTemp = HPWHInletWBTemp;
 		} else {
 			InletAirTemp = HPWHInletDBTemp;
 		}
 
 		// get output of Heating Capacity and Heating COP curves (curves default to 1 if user has not specified curve name)
-		if ( DXCoil( DXCoilNum ).HCapFTemp > 0 ) {
-			if ( DXCoil( DXCoilNum ).HCapFTempCurveType == Cubic ) {
-				HeatCapFTemp = CurveValue( DXCoil( DXCoilNum ).HCapFTemp, InletAirTemp );
+		if ( Coil.HCapFTemp > 0 ) {
+			if ( Coil.HCapFTempCurveType == Cubic ) {
+				HeatCapFTemp = CurveValue( Coil.HCapFTemp, InletAirTemp );
 			} else {
-				HeatCapFTemp = CurveValue( DXCoil( DXCoilNum ).HCapFTemp, InletAirTemp, InletWaterTemp );
+				HeatCapFTemp = CurveValue( Coil.HCapFTemp, InletAirTemp, InletWaterTemp );
 			}
 			//   Warn user if curve output goes negative
 			if ( HeatCapFTemp < 0.0 ) {
-				if ( DXCoil( DXCoilNum ).HCapFTempErrorIndex == 0 ) {
-					ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\":" );
+				if ( Coil.HCapFTempErrorIndex == 0 ) {
+					ShowWarningMessage( Coil.DXCoilType + " \"" + Coil.Name + "\":" );
 					ShowContinueError( " HPWH Heating Capacity Modifier curve (function of temperature) output is negative (" + TrimSigDigits( HeatCapFTemp, 3 ) + ")." );
-					if ( DXCoil( DXCoilNum ).HCapFTempCurveType == BiQuadratic ) {
+					if ( Coil.HCapFTempCurveType == BiQuadratic ) {
 						ShowContinueError( " Negative value occurs using an inlet air temperature of " + TrimSigDigits( InletAirTemp, 1 ) + " and an inlet water temperature of " + TrimSigDigits( InletWaterTemp, 1 ) + '.' );
 					} else {
 						ShowContinueError( " Negative value occurs using an inlet air temperature of " + TrimSigDigits( InletAirTemp, 1 ) + '.' );
 					}
 					ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
 				}
-				ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": HPWH Heating Capacity Modifier curve (function of temperature) output is negative warning continues...", DXCoil( DXCoilNum ).HCapFTempErrorIndex, HeatCapFTemp, HeatCapFTemp, _, "[C]", "[C]" );
+				ShowRecurringWarningErrorAtEnd( Coil.DXCoilType + " \"" + Coil.Name + "\": HPWH Heating Capacity Modifier curve (function of temperature) output is negative warning continues...", Coil.HCapFTempErrorIndex, HeatCapFTemp, HeatCapFTemp, _, "[C]", "[C]" );
 				HeatCapFTemp = 0.0;
 			}
 		} else {
 			HeatCapFTemp = 1.0;
 		}
 
-		if ( DXCoil( DXCoilNum ).HCOPFTemp > 0 ) {
-			if ( DXCoil( DXCoilNum ).HCOPFTempCurveType == Cubic ) {
-				HeatCOPFTemp = CurveValue( DXCoil( DXCoilNum ).HCOPFTemp, InletAirTemp );
+		if ( Coil.HCOPFTemp > 0 ) {
+			if ( Coil.HCOPFTempCurveType == Cubic ) {
+				HeatCOPFTemp = CurveValue( Coil.HCOPFTemp, InletAirTemp );
 			} else {
-				HeatCOPFTemp = CurveValue( DXCoil( DXCoilNum ).HCOPFTemp, InletAirTemp, InletWaterTemp );
+				HeatCOPFTemp = CurveValue( Coil.HCOPFTemp, InletAirTemp, InletWaterTemp );
 			}
 			//   Warn user if curve output goes negative
 			if ( HeatCOPFTemp < 0.0 ) {
-				if ( DXCoil( DXCoilNum ).HCOPFTempErrorIndex == 0 ) {
-					ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\":" );
+				if ( Coil.HCOPFTempErrorIndex == 0 ) {
+					ShowWarningMessage( Coil.DXCoilType + " \"" + Coil.Name + "\":" );
 					ShowContinueError( " HPWH Heating COP Modifier curve (function of temperature) output is negative (" + TrimSigDigits( HeatCOPFTemp, 3 ) + ")." );
-					if ( DXCoil( DXCoilNum ).HCOPFTempCurveType == BiQuadratic ) {
+					if ( Coil.HCOPFTempCurveType == BiQuadratic ) {
 						ShowContinueError( " Negative value occurs using an inlet air temperature of " + TrimSigDigits( InletAirTemp, 1 ) + " and an inlet water temperature of " + TrimSigDigits( InletWaterTemp, 1 ) + '.' );
 					} else {
 						ShowContinueError( " Negative value occurs using an inlet air temperature of " + TrimSigDigits( InletAirTemp, 1 ) + '.' );
 					}
 					ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
 				}
-				ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": HPWH Heating COP Modifier curve (function of temperature) output is negative warning continues...", DXCoil( DXCoilNum ).HCOPFTempErrorIndex, HeatCOPFTemp, HeatCOPFTemp, _, "[C]", "[C]" );
+				ShowRecurringWarningErrorAtEnd( Coil.DXCoilType + " \"" + Coil.Name + "\": HPWH Heating COP Modifier curve (function of temperature) output is negative warning continues...", Coil.HCOPFTempErrorIndex, HeatCOPFTemp, HeatCOPFTemp, _, "[C]", "[C]" );
 				HeatCOPFTemp = 0.0;
 			}
 		} else {
 			HeatCOPFTemp = 1.0;
 		}
 
-		if ( DXCoil( DXCoilNum ).HCapFAirFlow > 0 ) {
-			AirFlowRateRatio = EvapInletMassFlowRate / ( DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 ) );
-			HeatCapFAirFlow = CurveValue( DXCoil( DXCoilNum ).HCapFAirFlow, AirFlowRateRatio );
+		if ( Coil.HCapFAirFlow > 0 ) {
+			AirFlowRateRatio = EvapInletMassFlowRate / ( Coil.RatedAirMassFlowRate( 1 ) );
+			HeatCapFAirFlow = CurveValue( Coil.HCapFAirFlow, AirFlowRateRatio );
 			//   Warn user if curve output goes negative
 			if ( HeatCapFAirFlow < 0.0 ) {
-				if ( DXCoil( DXCoilNum ).HCapFAirFlowErrorIndex == 0 ) {
-					ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\":" );
+				if ( Coil.HCapFAirFlowErrorIndex == 0 ) {
+					ShowWarningMessage( Coil.DXCoilType + " \"" + Coil.Name + "\":" );
 					ShowContinueError( " HPWH Heating Capacity Modifier curve (function of air flow fraction) output is negative (" + TrimSigDigits( HeatCapFAirFlow, 3 ) + ")." );
 					ShowContinueError( " Negative value occurs using an air flow fraction of " + TrimSigDigits( AirFlowRateRatio, 3 ) + '.' );
 					ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
 				}
-				ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": HPWH Heating Capacity Modifier curve (function of air flow fraction) output is negative warning continues...", DXCoil( DXCoilNum ).HCapFAirFlowErrorIndex, HeatCapFAirFlow, HeatCapFAirFlow );
+				ShowRecurringWarningErrorAtEnd( Coil.DXCoilType + " \"" + Coil.Name + "\": HPWH Heating Capacity Modifier curve (function of air flow fraction) output is negative warning continues...", Coil.HCapFAirFlowErrorIndex, HeatCapFAirFlow, HeatCapFAirFlow );
 				HeatCapFAirFlow = 0.0;
 			}
 		} else {
 			HeatCapFAirFlow = 1.0;
 		}
 
-		if ( DXCoil( DXCoilNum ).HCOPFAirFlow > 0 ) {
-			AirFlowRateRatio = EvapInletMassFlowRate / ( DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 ) );
-			HeatCOPFAirFlow = CurveValue( DXCoil( DXCoilNum ).HCOPFAirFlow, AirFlowRateRatio );
+		if ( Coil.HCOPFAirFlow > 0 ) {
+			AirFlowRateRatio = EvapInletMassFlowRate / ( Coil.RatedAirMassFlowRate( 1 ) );
+			HeatCOPFAirFlow = CurveValue( Coil.HCOPFAirFlow, AirFlowRateRatio );
 			//   Warn user if curve output goes negative
 			if ( HeatCOPFAirFlow < 0.0 ) {
-				if ( DXCoil( DXCoilNum ).HCOPFAirFlowErrorIndex == 0 ) {
-					ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\":" );
+				if ( Coil.HCOPFAirFlowErrorIndex == 0 ) {
+					ShowWarningMessage( Coil.DXCoilType + " \"" + Coil.Name + "\":" );
 					ShowContinueError( " HPWH Heating COP Modifier curve (function of air flow fraction) output is negative (" + TrimSigDigits( HeatCOPFAirFlow, 3 ) + ")." );
 					ShowContinueError( " Negative value occurs using an air flow fraction of " + TrimSigDigits( AirFlowRateRatio, 3 ) + '.' );
 					ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
 				}
-				ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": HPWH Heating COP Modifier curve (function of air flow fraction) output is negative warning continues...", DXCoil( DXCoilNum ).HCOPFAirFlowErrorIndex, HeatCOPFAirFlow, HeatCOPFAirFlow );
+				ShowRecurringWarningErrorAtEnd( Coil.DXCoilType + " \"" + Coil.Name + "\": HPWH Heating COP Modifier curve (function of air flow fraction) output is negative warning continues...", Coil.HCOPFAirFlowErrorIndex, HeatCOPFAirFlow, HeatCOPFAirFlow );
 				HeatCOPFAirFlow = 0.0;
 			}
 		} else {
 			HeatCOPFAirFlow = 1.0;
 		}
 
-		if ( DXCoil( DXCoilNum ).HCapFWaterFlow > 0 ) {
-			WaterFlowRateRatio = CondInletMassFlowRate / ( DXCoil( DXCoilNum ).RatedHPWHCondWaterFlow * RhoH2O( InletWaterTemp ) );
-			HeatCapFWaterFlow = CurveValue( DXCoil( DXCoilNum ).HCapFWaterFlow, WaterFlowRateRatio );
+		if ( Coil.HCapFWaterFlow > 0 ) {
+			WaterFlowRateRatio = CondInletMassFlowRate / ( Coil.RatedHPWHCondWaterFlow * RhoH2O( InletWaterTemp ) );
+			HeatCapFWaterFlow = CurveValue( Coil.HCapFWaterFlow, WaterFlowRateRatio );
 			//   Warn user if curve output goes negative
 			if ( HeatCapFWaterFlow < 0.0 ) {
-				if ( DXCoil( DXCoilNum ).HCapFWaterFlowErrorIndex == 0 ) {
-					ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\":" );
+				if ( Coil.HCapFWaterFlowErrorIndex == 0 ) {
+					ShowWarningMessage( Coil.DXCoilType + " \"" + Coil.Name + "\":" );
 					ShowContinueError( " HPWH Heating Capacity Modifier curve (function of water flow fraction) output is negative (" + TrimSigDigits( HeatCapFWaterFlow, 3 ) + ")." );
 					ShowContinueError( " Negative value occurs using a water flow fraction of " + TrimSigDigits( WaterFlowRateRatio, 3 ) + '.' );
 					ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
 				}
-				ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": HPWH Heating Capacity Modifier curve (function of water flow fraction) output is negative warning continues...", DXCoil( DXCoilNum ).HCapFWaterFlowErrorIndex, HeatCapFWaterFlow, HeatCapFWaterFlow );
+				ShowRecurringWarningErrorAtEnd( Coil.DXCoilType + " \"" + Coil.Name + "\": HPWH Heating Capacity Modifier curve (function of water flow fraction) output is negative warning continues...", Coil.HCapFWaterFlowErrorIndex, HeatCapFWaterFlow, HeatCapFWaterFlow );
 				HeatCapFWaterFlow = 0.0;
 			}
 		} else {
 			HeatCapFWaterFlow = 1.0;
 		}
 
-		if ( DXCoil( DXCoilNum ).HCOPFWaterFlow > 0 ) {
-			WaterFlowRateRatio = CondInletMassFlowRate / ( DXCoil( DXCoilNum ).RatedHPWHCondWaterFlow * RhoH2O( InletWaterTemp ) );
-			HeatCOPFWaterFlow = CurveValue( DXCoil( DXCoilNum ).HCOPFWaterFlow, WaterFlowRateRatio );
+		if ( Coil.HCOPFWaterFlow > 0 ) {
+			WaterFlowRateRatio = CondInletMassFlowRate / ( Coil.RatedHPWHCondWaterFlow * RhoH2O( InletWaterTemp ) );
+			HeatCOPFWaterFlow = CurveValue( Coil.HCOPFWaterFlow, WaterFlowRateRatio );
 			//   Warn user if curve output goes negative
 			if ( HeatCOPFWaterFlow < 0.0 ) {
-				if ( DXCoil( DXCoilNum ).HCOPFWaterFlowErrorIndex == 0 ) {
-					ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\":" );
+				if ( Coil.HCOPFWaterFlowErrorIndex == 0 ) {
+					ShowWarningMessage( Coil.DXCoilType + " \"" + Coil.Name + "\":" );
 					ShowContinueError( " HPWH Heating COP Modifier curve (function of water flow fraction) output is negative (" + TrimSigDigits( HeatCOPFWaterFlow, 3 ) + ")." );
 					ShowContinueError( " Negative value occurs using a water flow fraction of " + TrimSigDigits( WaterFlowRateRatio, 3 ) + '.' );
 					ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
 				}
-				ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": HPWH Heating COP Modifier curve (function of water flow fraction) output is negative warning continues...", DXCoil( DXCoilNum ).HCOPFWaterFlowErrorIndex, HeatCOPFWaterFlow, HeatCOPFWaterFlow );
+				ShowRecurringWarningErrorAtEnd( Coil.DXCoilType + " \"" + Coil.Name + "\": HPWH Heating COP Modifier curve (function of water flow fraction) output is negative warning continues...", Coil.HCOPFWaterFlowErrorIndex, HeatCOPFWaterFlow, HeatCOPFWaterFlow );
 				HeatCOPFWaterFlow = 0.0;
 			}
 		} else {
@@ -6317,19 +6314,19 @@ namespace DXCoils {
 
 		if ( OperatingHeatingCOP > 0.0 ) OperatingHeatingPower = OperatingHeatingCapacity / OperatingHeatingCOP;
 
-		PumpHeatToWater = DXCoil( DXCoilNum ).HPWHCondPumpElecNomPower * DXCoil( DXCoilNum ).HPWHCondPumpFracToWater;
+		PumpHeatToWater = Coil.HPWHCondPumpElecNomPower * Coil.HPWHCondPumpFracToWater;
 		TankHeatingCOP = OperatingHeatingCOP;
 
 		// account for pump heat if not included in total water heating capacity
-		if ( DXCoil( DXCoilNum ).CondPumpHeatInCapacity ) {
+		if ( Coil.CondPumpHeatInCapacity ) {
 			TotalTankHeatingCapacity = OperatingHeatingCapacity;
 		} else {
 			TotalTankHeatingCapacity = OperatingHeatingCapacity + PumpHeatToWater;
 		}
 
 		// find part load fraction to calculate RTF
-		if ( DXCoil( DXCoilNum ).PLFFPLR( 1 ) > 0 ) {
-			PartLoadFraction = max( 0.7, CurveValue( DXCoil( DXCoilNum ).PLFFPLR( 1 ), PartLoadRatio ) );
+		if ( Coil.PLFFPLR( 1 ) > 0 ) {
+			PartLoadFraction = max( 0.7, CurveValue( Coil.PLFFPLR( 1 ), PartLoadRatio ) );
 		} else {
 			PartLoadFraction = 1.0;
 		}
@@ -6338,35 +6335,35 @@ namespace DXCoils {
 
 		// calculate evaporator total cooling capacity
 		if ( HPRTF > 0.0 ) {
-			if ( DXCoil( DXCoilNum ).FanPowerIncludedInCOP ) {
-				if ( DXCoil( DXCoilNum ).CondPumpPowerInCOP ) {
+			if ( Coil.FanPowerIncludedInCOP ) {
+				if ( Coil.CondPumpPowerInCOP ) {
 					//       make sure fan power is full load fan power
-					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF - DXCoil( DXCoilNum ).HPWHCondPumpElecNomPower;
+					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF - Coil.HPWHCondPumpElecNomPower;
 					if ( OperatingHeatingPower > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / OperatingHeatingPower;
 				} else {
 					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF;
-					if ( ( OperatingHeatingPower + DXCoil( DXCoilNum ).HPWHCondPumpElecNomPower ) > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / ( OperatingHeatingPower + DXCoil( DXCoilNum ).HPWHCondPumpElecNomPower );
+					if ( ( OperatingHeatingPower + Coil.HPWHCondPumpElecNomPower ) > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / ( OperatingHeatingPower + Coil.HPWHCondPumpElecNomPower );
 				}
 			} else {
-				if ( DXCoil( DXCoilNum ).CondPumpPowerInCOP ) {
+				if ( Coil.CondPumpPowerInCOP ) {
 					//       make sure fan power is full load fan power
-					CompressorPower = OperatingHeatingPower - DXCoil( DXCoilNum ).HPWHCondPumpElecNomPower;
+					CompressorPower = OperatingHeatingPower - Coil.HPWHCondPumpElecNomPower;
 					if ( ( OperatingHeatingPower + FanElecPower / HPRTF ) > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / ( OperatingHeatingPower + FanElecPower / HPRTF );
 				} else {
 					CompressorPower = OperatingHeatingPower;
-					if ( ( OperatingHeatingPower + FanElecPower / HPRTF + DXCoil( DXCoilNum ).HPWHCondPumpElecNomPower ) > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / ( OperatingHeatingPower + FanElecPower / HPRTF + DXCoil( DXCoilNum ).HPWHCondPumpElecNomPower );
+					if ( ( OperatingHeatingPower + FanElecPower / HPRTF + Coil.HPWHCondPumpElecNomPower ) > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / ( OperatingHeatingPower + FanElecPower / HPRTF + Coil.HPWHCondPumpElecNomPower );
 				}
 			}
 		}
 
-		if ( DXCoil( DXCoilNum ).CondPumpHeatInCapacity ) {
+		if ( Coil.CondPumpHeatInCapacity ) {
 			EvapCoolingCapacity = TotalTankHeatingCapacity - PumpHeatToWater - CompressorPower;
 		} else {
 			EvapCoolingCapacity = TotalTankHeatingCapacity - CompressorPower;
 		}
 
 		// set evaporator total cooling capacity prior to CalcDOE2DXCoil subroutine
-		DXCoil( DXCoilNum ).RatedTotCap( 1 ) = EvapCoolingCapacity;
+		Coil.RatedTotCap( 1 ) = EvapCoolingCapacity;
 
 		// determine condenser water inlet/outlet condition at full capacity
 		if ( CondInletMassFlowRate == 0.0 ) {
@@ -6375,9 +6372,9 @@ namespace DXCoils {
 			OutletWaterTemp = InletWaterTemp + TotalTankHeatingCapacity / ( CpWater * CondInletMassFlowRate );
 		}
 
-		Node( CondOutletNode ).Temp = OutletWaterTemp;
+		WaterOutletNode.Temp = OutletWaterTemp;
 
-		Node( CondOutletNode ).MassFlowRate = Node( CondInletNode ).MassFlowRate;
+		WaterOutletNode.MassFlowRate = WaterInletNode.MassFlowRate;
 
 		// send heating capacity and COP to water heater module for standards rating calculation
 		// total heating capacity including condenser pump
@@ -6388,10 +6385,10 @@ namespace DXCoils {
 		// send DX coil total cooling capacity to HPWH for reporting
 		DXCoilTotalCapacity = EvapCoolingCapacity;
 
-		DXCoil( DXCoilNum ).TotalHeatingEnergyRate = TotalTankHeatingCapacity * PartLoadRatio;
+		Coil.TotalHeatingEnergyRate = TotalTankHeatingCapacity * PartLoadRatio;
 
 		// calculate total compressor plus condenser pump power, fan power reported in fan module
-		DXCoil( DXCoilNum ).ElecWaterHeatingPower = ( CompressorPower + DXCoil( DXCoilNum ).HPWHCondPumpElecNomPower ) * HPRTF;
+		Coil.ElecWaterHeatingPower = ( CompressorPower + Coil.HPWHCondPumpElecNomPower ) * HPRTF;
 
 	}
 
@@ -12902,7 +12899,7 @@ Label50: ;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
