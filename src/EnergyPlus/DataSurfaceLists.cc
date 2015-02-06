@@ -148,17 +148,11 @@ namespace DataSurfaceLists {
 
 			GetObjectDefMaxArgs( CurrentModuleObject1, NumArgs, MaxAlphas, MaxNumbers );
 			Alphas.allocate( MaxAlphas );
-			Alphas = "";
-			lAlphaBlanks.allocate( MaxAlphas );
-			lAlphaBlanks = false;
+			lAlphaBlanks.dimension( MaxAlphas, false );
 			cAlphaFields.allocate( MaxAlphas );
-			cAlphaFields = "";
-			Numbers.allocate( MaxNumbers );
-			Numbers = 0.0;
+			Numbers.dimension( MaxNumbers, 0.0 );
 			cNumericFields.allocate( MaxNumbers );
-			cNumericFields = "";
-			lNumericBlanks.allocate( MaxNumbers );
-			lNumericBlanks = false;
+			lNumericBlanks.dimension( MaxNumbers, false );
 
 			for ( Item = 1; Item <= NumOfSurfaceLists; ++Item ) {
 
@@ -213,7 +207,7 @@ namespace DataSurfaceLists {
 					if ( SurfList( Item ).SurfFlowFrac( SurfNum ) < SurfListMinFlowFrac ) {
 						ShowSevereError( "The Flow Fraction for Surface " + SurfList( Item ).SurfName( SurfNum ) + " in Surface Group " + SurfList( Item ).Name + " is too low" );
 						ShowContinueError( "Flow fraction of " + RoundSigDigits( SurfList( Item ).SurfFlowFrac( SurfNum ), 6 ) + " is less than minimum criteria = " + RoundSigDigits( SurfListMinFlowFrac, 6 ) );
-						ShowContinueError( "Zero or extremely low flow fractions are not allowed. " "Remove this surface from the surface group or combine small surfaces together." );
+						ShowContinueError( "Zero or extremely low flow fractions are not allowed. Remove this surface from the surface group or combine small surfaces together." );
 						ErrorsFound = true;
 					}
 					SumOfAllFractions += SurfList( Item ).SurfFlowFrac( SurfNum );
@@ -239,17 +233,11 @@ namespace DataSurfaceLists {
 		if ( NumOfSurfListVentSlab > 0 ) {
 			GetObjectDefMaxArgs( CurrentModuleObject2, NumArgs, MaxAlphas, MaxNumbers );
 			Alphas.allocate( MaxAlphas );
-			Alphas = "";
-			lAlphaBlanks.allocate( MaxAlphas );
-			lAlphaBlanks = false;
+			lAlphaBlanks.dimension( MaxAlphas, false );
 			cAlphaFields.allocate( MaxAlphas );
-			cAlphaFields = "";
-			Numbers.allocate( MaxNumbers );
-			Numbers = 0.0;
+			Numbers.dimension( MaxNumbers, 0.0 );
 			cNumericFields.allocate( MaxNumbers );
-			cNumericFields = "";
-			lNumericBlanks.allocate( MaxNumbers );
-			lNumericBlanks = false;
+			lNumericBlanks.dimension( MaxNumbers, false );
 
 			for ( Item = 1; Item <= NumOfSurfListVentSlab; ++Item ) {
 

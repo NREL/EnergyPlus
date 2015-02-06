@@ -212,8 +212,7 @@ namespace PlantValves {
 		NumTemperingValves = GetNumObjectsFound( CurrentModuleObject );
 
 		TemperValve.allocate( NumTemperingValves );
-		CheckEquipName.allocate( NumTemperingValves );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumTemperingValves, true );
 
 		for ( Item = 1; Item <= NumTemperingValves; ++Item ) {
 
@@ -329,8 +328,7 @@ namespace PlantValves {
 
 			if ( MyOneTimeFlag ) {
 				MyOneTimeFlag = false;
-				MyTwoTimeFlag.allocate( NumTemperingValves );
-				MyTwoTimeFlag = true;
+				MyTwoTimeFlag.dimension( NumTemperingValves, true );
 			} else {
 				// delay checks one pass so more of plant data structure gets filled in
 				if ( MyTwoTimeFlag( CompNum ) ) {
@@ -453,7 +451,7 @@ namespace PlantValves {
 					}
 
 					if ( ! SetPointNodeOkay ) {
-						ShowSevereError( "TemperingValve object setpoint node not valid.  " "Check Setpoint manager for Plant Loop Temp Setpoint" );
+						ShowSevereError( "TemperingValve object setpoint node not valid.  Check Setpoint manager for Plant Loop Temp Setpoint" );
 						ErrorsFound = true;
 					}
 

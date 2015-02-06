@@ -1,4 +1,9 @@
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 // C++ Headers
+#include <iostream>
 #ifndef NDEBUG
 #ifdef __unix__
 #include <cfenv>
@@ -14,6 +19,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlusPgm.hh>
+#include <CommandLineInterface.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataPrecisionGlobals.hh>
@@ -21,6 +27,7 @@
 #include <DataSystemVariables.hh>
 #include <DataTimings.hh>
 #include <DisplayRoutines.hh>
+#include <FileSystem.hh>
 #include <FluidProperties.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
@@ -29,17 +36,15 @@
 #include <SimulationManager.hh>
 #include <UtilityRoutines.hh>
 
-#ifdef __unix__
-#include <unistd.h>
-#endif
-
 #ifdef _WIN32
-#include <stdlib.h>
-#include <direct.h>
+ #include <stdlib.h>
+ #include <direct.h>
+#else //Mac or Linux
+ #include <unistd.h>
 #endif
 
-void 
-EnergyPlusPgm( std::string filepath )
+void
+EnergyPlusPgm( std::string const & filepath )
 {
 	// Using/Aliasing
 	using namespace EnergyPlus;
@@ -215,12 +220,17 @@ EnergyPlusPgm( std::string filepath )
 	using DataEnvironment::IgnoreBeamRadiation;
 	using DataEnvironment::IgnoreDiffuseRadiation;
 	// routine modules
+	using namespace FileSystem;
 	using namespace InputProcessor;
 	using namespace OutputProcessor;
 	using namespace SimulationManager;
 	using ScheduleManager::ReportOrphanSchedules;
 	using FluidProperties::ReportOrphanFluids;
 	using Psychrometrics::ShowPsychrometricSummary;
+
+	// Disable C++ i/o synching with C methods for speed
+	std::ios_base::sync_with_stdio( false );
+	std::cin.tie( 0 ); // Untie cin and cout: Could cause odd behavior for interactive prompts
 
 // Enable floating point exceptions
 #ifndef NDEBUG
@@ -229,12 +239,16 @@ EnergyPlusPgm( std::string filepath )
 #endif
 #endif
 
+#ifdef _WIN32
+	SetErrorMode(SEM_NOGPFAULTERRORBOX);
+	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
+	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
+#endif
+
 	// Locals
 	// PROGRAM PARAMETER DEFINITIONS:
 	// Note: General Parameters for the entire EnergyPlus program are contained
-	// in "DataGlobals.f90"
-	gio::Fmt const EPlusiniFormat( "(/,'[',A,']',/,'dir=',A)" );
-	std::string const BlankString;
+	// in "DataGlobals.cc"
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -243,28 +257,29 @@ EnergyPlusPgm( std::string filepath )
 	// na
 
 	// PROGRAM LOCAL VARIABLE DECLARATIONS:
-	int LFN; // Unit Number for reads
-	bool EPlusINI;
-	std::string::size_type TempIndx;
 	static std::string cEnvValue;
-	int iostatus;
-	bool FileExists;
 
 	//                           INITIALIZE VARIABLES
 	Time_Start = epElapsedTime();
 #ifdef EP_Detailed_Timings
 	epStartTime( "EntireRun=" );
 #endif
+
 	CreateCurrentDateTimeString( CurrentDateTime );
 	VerString += "," + CurrentDateTime;
+
 	get_environment_variable( DDOnlyEnvVar, cEnvValue );
 	DDOnly = env_var_on( cEnvValue ); // Yes or True
+	if(DDOnlySimulation)
+		DDOnly = true;
 
 	get_environment_variable( ReverseDDEnvVar, cEnvValue );
 	ReverseDD = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( FullAnnualSimulation, cEnvValue );
 	FullAnnualRun = env_var_on( cEnvValue ); // Yes or True
+	if(AnnualSimulation)
+		FullAnnualRun = true;
 
 	get_environment_variable( cDisplayAllWarnings, cEnvValue );
 	DisplayAllWarnings = env_var_on( cEnvValue ); // Yes or True
@@ -333,80 +348,32 @@ EnergyPlusPgm( std::string filepath )
 	get_environment_variable( TraceHVACControllerEnvVar, cEnvValue );
 	if ( ! cEnvValue.empty() ) TraceHVACControllerEnvFlag = env_var_on( cEnvValue ); // Yes or True
 
-	{ IOFlags flags; gio::inquire( "eplusout.end", flags ); FileExists = flags.exists(); }
-	if ( FileExists ) {
-		LFN = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "read" ); gio::open( LFN, "eplusout.end", flags ); iostatus = flags.ios(); }
-		if ( iostatus != 0 ) {
-			ShowFatalError( "EnergyPlus: Could not open file \"eplusout.end\" for input (read)." );
-		}
-		{ IOFlags flags; flags.DISPOSE( "delete" ); gio::close( LFN, flags ); }
-	}
-
-	{ IOFlags flags; gio::inquire( "Energy+.ini", flags ); EPlusINI = flags.exists(); }
-	if ( EPlusINI ) {
-		LFN = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "read" ); gio::open( LFN, "Energy+.ini", flags ); iostatus = flags.ios(); }
-		if ( iostatus != 0 ) {
-			ShowFatalError( "EnergyPlus: Could not open file \"Energy+.ini\" for input (read)." );
-		}
-		{ IOFlags flags; gio::inquire( LFN, flags ); CurrentWorkingFolder = flags.name(); }
-		// Relying on compiler to supply full path name here
-		TempIndx = index( CurrentWorkingFolder, pathChar, true );
-		if ( TempIndx == std::string::npos ) {
-			CurrentWorkingFolder = "";
-		} else {
-			CurrentWorkingFolder.erase( TempIndx + 1 );
-		}
-		//       Get directories from ini file
-		ReadINIFile( LFN, "program", "dir", ProgramPath );
-
-		gio::close( LFN );
-	} else {
-		DisplayString( "Missing Energy+.ini" );
-		// TODO This is going to be reset by using filepath later.
-		// Do something that works for executable and library interface.
-		ProgramPath = "";
-		LFN = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( LFN, "Energy+.ini", flags ); iostatus = flags.ios(); }
-		if ( iostatus != 0 ) {
-			ShowFatalError( "EnergyPlus: Could not open file \"Energy+.ini\" for output (write)." );
-		}
-		// Relying on compiler to supply full path name here
-		{ IOFlags flags; gio::inquire( LFN, flags ); CurrentWorkingFolder = flags.name(); }
-		TempIndx = index( CurrentWorkingFolder, pathChar, true );
-		if ( TempIndx == std::string::npos ) {
-			CurrentWorkingFolder = "";
-		} else {
-			CurrentWorkingFolder.erase( TempIndx + 1 );
-		}
-		gio::write( LFN, EPlusiniFormat ) << "program" << ProgramPath;
-		gio::close( LFN );
-	}
-
 	if( ! filepath.empty() ) {
-#ifdef __unix__
-		int status = chdir(filepath.c_str());
-#endif
+		// if filepath is not empty, then we are using E+ as a library API call
+		// change the directory to the specified folder, and pass in dummy args to command line parser
+		// this will initialize the paths throughout E+ to the defaults
+		DisplayString( "EnergyPlus Library: Changing directory to: " + filepath );
 #ifdef _WIN32
-		int status = _chdir(filepath.c_str());
+		int status = _chdir( filepath.c_str() );
+#else
+		int status = chdir( filepath.c_str() );
 #endif
+		if ( status == 0 ) {
+			DisplayString( "Directory change successful." );
+		} else {
+			DisplayString( "Couldn't change directory; aborting EnergyPlus" );
+			exit(EXIT_FAILURE);
+		}
 		ProgramPath = filepath + pathChar;
+		int dummy_argc = 0;
+		const char * dummy_argv[] = { NULL };
+		CommandLineInterface::ProcessArgs( dummy_argc, dummy_argv );
 	}
 
 	TestAllPaths = true;
 
 	DisplayString( "EnergyPlus Starting" );
 	DisplayString( VerString );
-
-	OutputFileDebug = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileDebug, "eplusout.dbg", flags ); iostatus = flags.ios(); }
-	if ( iostatus != 0 ) {
-		ShowFatalError( "EnergyPlus: Could not open file \"eplusout.dbg\" for output (write)." );
-	}
-
-	//Call ProcessInput to produce the IDF file which is read by all of the
-	// Get input routines in the rest of the simulation
 
 	ProcessInput();
 
@@ -422,15 +389,74 @@ EnergyPlusPgm( std::string filepath )
 	ReportOrphanFluids();
 	ReportOrphanSchedules();
 
+    if(runReadVars) {
+		std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;
+		bool FileExists;
+		{ IOFlags flags; gio::inquire( readVarsPath, flags ); FileExists = flags.exists(); }
+		if (!FileExists){
+			DisplayString("ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + "." );
+			exit(EXIT_FAILURE);
+		}
+
+		std::string RVIfile = idfDirPathName + idfFileNameOnly + ".rvi";
+    	std::string MVIfile = idfDirPathName + idfFileNameOnly + ".mvi";
+
+    	int fileUnitNumber;
+    	int iostatus;
+    	bool rviFileExists;
+    	bool mviFileExists;
+
+    	gio::Fmt const readvarsFmt( "(A)" );
+
+    	{ IOFlags flags; gio::inquire( RVIfile, flags ); rviFileExists = flags.exists(); }
+    	if (!rviFileExists) {
+			fileUnitNumber = GetNewUnitNumber();
+			{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, RVIfile, flags ); iostatus = flags.ios(); }
+			if ( iostatus != 0 ) {
+				ShowFatalError( "EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write)." );
+			}
+			gio::write( fileUnitNumber, readvarsFmt ) << outputEsoFileName;
+			gio::write( fileUnitNumber, readvarsFmt ) << outputCsvFileName;
+			gio::close( fileUnitNumber );
+    	}
+
+    	{ IOFlags flags; gio::inquire( MVIfile, flags ); mviFileExists = flags.exists(); }
+    	if (!mviFileExists) {
+			fileUnitNumber = GetNewUnitNumber();
+			{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, MVIfile, flags ); iostatus = flags.ios(); }
+			if ( iostatus != 0 ) {
+				ShowFatalError( "EnergyPlus: Could not open file \"" + MVIfile + "\" for output (write)." );
+			}
+			gio::write( fileUnitNumber, readvarsFmt ) << outputMtrFileName;
+			gio::write( fileUnitNumber, readvarsFmt ) << outputMtrCsvFileName;
+			gio::close( fileUnitNumber );
+    	}
+
+    	std::string readVarsRviCommand = "\"" + readVarsPath + "\"" + " " + RVIfile + " unlimited";
+    	std::string readVarsMviCommand = "\"" + readVarsPath + "\"" + " " + MVIfile + " unlimited";
+
+    	systemCall(readVarsRviCommand);
+    	systemCall(readVarsMviCommand);
+
+	    if (!rviFileExists)
+	    	removeFile(RVIfile.c_str());
+
+	    if (!mviFileExists)
+	    	removeFile(MVIfile.c_str());
+
+	    moveFile("readvars.audit", outputRvauditFileName);
+
+	}
+
 	EndEnergyPlus();
 }
 
-void StoreProgressCallback(void(*f)(int))
+void StoreProgressCallback( void(*f)( int const ) )
 {
 	using namespace EnergyPlus::DataGlobals;
 	fProgressPtr = f;
 }
-void StoreMessageCallback(void(*f)(std::string))
+void StoreMessageCallback( void(*f)( std::string const & ) )
 {
 	using namespace EnergyPlus::DataGlobals;
 	fMessagePtr = f;
@@ -463,7 +489,7 @@ CreateCurrentDateTimeString( std::string & CurrentDateTimeString )
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	gio::Fmt const fmtDate( "(1X,'YMD=',I4,'.',I2.2,'.',I2.2,1X,I2.2,':',I2.2)" );
+	gio::Fmt fmtDate( "(1X,'YMD=',I4,'.',I2.2,'.',I2.2,1X,I2.2,':',I2.2)" );
 
 	// INTERFACE BLOCK SPECIFICATIONS:
 	// na
@@ -492,150 +518,3 @@ CreateCurrentDateTimeString( std::string & CurrentDateTimeString )
 
 }
 
-void
-ReadINIFile(
-	int const UnitNumber, // Unit number of the opened INI file
-	std::string const & Heading, // Heading for the parameters ('[heading]')
-	std::string const & KindofParameter, // Kind of parameter to be found (String)
-	std::string & DataOut // Output from the retrieval
-)
-{
-
-	// SUBROUTINE INFORMATION:
-	//       AUTHOR         Linda K. Lawrie
-	//       DATE WRITTEN   September 1997
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
-
-	// PURPOSE OF THIS SUBROUTINE:
-	// This routine reads the .ini file and retrieves
-	// the path names for the files from it.
-
-	// METHODOLOGY EMPLOYED:
-	// Duplicate the kind of reading the Windows "GetINISetting" would
-	// do.
-
-	// REFERENCES:
-	// na
-
-	// Using/Aliasing
-	using namespace EnergyPlus;
-	using namespace DataStringGlobals;
-	using namespace DataSystemVariables;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
-
-	// DERIVED TYPE DEFINITIONS
-	// na
-
-	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	static std::string LINE;
-	static std::string LINEOut;
-	std::string Param;
-	std::string::size_type ILB;
-	std::string::size_type IRB;
-	std::string::size_type IEQ;
-	std::string::size_type IPAR;
-	std::string::size_type IPOS;
-	std::string::size_type ILEN;
-	int ReadStat;
-	bool EndofFile;
-	bool Found;
-	bool NewHeading;
-
-	// Formats
-	static gio::Fmt const Format_700( "(A)" );
-
-	DataOut = "           ";
-
-	// I tried ADJUSTL(TRIM(KindofParameter)) and got an internal compiler error
-
-	Param = KindofParameter;
-	strip( Param );
-	ILEN = len( Param );
-	gio::rewind( UnitNumber );
-	EndofFile = false;
-	Found = false;
-	NewHeading = false;
-
-	while ( ! EndofFile && ! Found ) {
-		{ IOFlags flags; gio::read( UnitNumber, Format_700, flags ) >> LINE; ReadStat = flags.ios(); }
-		if ( ReadStat < GoodIOStatValue ) {
-			EndofFile = true;
-			break;
-		}
-
-		if ( len( LINE ) == 0 ) continue; // Ignore Blank Lines
-
-		ConvertCaseToLower( LINE, LINEOut ); // Turn line into lower case
-		//        LINE=LINEOut
-
-		if ( ! has( LINEOut, Heading ) ) continue;
-
-		//                                  See if [ and ] are on line
-		ILB = index( LINEOut, '[' );
-		IRB = index( LINEOut, ']' );
-		if ( ILB == std::string::npos && IRB == std::string::npos ) continue;
-		if ( ! has( LINEOut, '[' + Heading + ']' ) ) continue; // Must be really correct heading line
-
-		//                                  Heading line found, now looking for Kind
-		while ( ! EndofFile && ! NewHeading ) {
-			{ IOFlags flags; gio::read( UnitNumber, Format_700, flags ) >> LINE; ReadStat = flags.ios(); }
-			if ( ReadStat < GoodIOStatValue ) {
-				EndofFile = true;
-				break;
-			}
-			strip( LINE );
-
-			if ( len( LINE ) == 0 ) continue; // Ignore Blank Lines
-
-			ConvertCaseToLower( LINE, LINEOut ); // Turn line into lower case
-			//         LINE=LINEOut
-
-			ILB = index( LINEOut, '[' );
-			IRB = index( LINEOut, ']' );
-			NewHeading = ( ILB != std::string::npos && IRB != std::string::npos );
-
-			//                                  Should be a parameter line
-			//                                  KindofParameter = string
-			IEQ = index( LINEOut, '=' );
-			IPAR = index( LINEOut, Param );
-			if ( IEQ == std::string::npos ) continue;
-			if ( IPAR == std::string::npos ) continue;
-			if ( IPAR != 0 ) continue;
-			if ( ! has( LINEOut, Param + '=' ) ) continue; // needs to be param=
-
-			//                                  = found and parameter found.
-			if ( IPAR > IEQ ) continue;
-
-			//                                  parameter = found
-			//                                  Set output string to start with non-blank character
-
-			DataOut = stripped( LINE.substr( IEQ + 1 ) );
-			Found = true;
-			break;
-
-		}
-
-	}
-
-	if ( Param == "dir" ) {
-		IPOS = len( DataOut );
-		if ( IPOS != 0 ) {
-			// Non-blank make sure last position is valid path character
-			//  (Set in DataStringGlobals)
-
-			if ( DataOut[ IPOS - 1 ] != pathChar ) {
-				DataOut += pathChar;
-			}
-
-		}
-	}
-
-}

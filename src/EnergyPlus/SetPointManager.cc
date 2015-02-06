@@ -589,21 +589,14 @@ namespace SetPointManager {
 		NumAllSetPtMgrs = NumSchSetPtMgrs + NumDualSchSetPtMgrs + NumOutAirSetPtMgrs + NumSZRhSetPtMgrs + NumSZHtSetPtMgrs + NumSZClSetPtMgrs + NumSZMinHumSetPtMgrs + NumSZMaxHumSetPtMgrs + NumMixedAirSetPtMgrs + NumOAPretreatSetPtMgrs + NumWarmestSetPtMgrs + NumColdestSetPtMgrs + NumWarmestSetPtMgrsTempFlow + NumRABFlowSetPtMgrs + NumMZClgAverageSetPtMgrs + NumMZHtgAverageSetPtMgrs + NumMZAverageMinHumSetPtMgrs + NumMZAverageMaxHumSetPtMgrs + NumMZMinHumSetPtMgrs + NumMZMaxHumSetPtMgrs + NumFollowOATempSetPtMgrs + NumFollowSysNodeTempSetPtMgrs + NumGroundTempSetPtMgrs + NumCondEntSetPtMgrs + NumIdealCondEntSetPtMgrs + NumSZOneStageCoolingSetPtMgrs + NumSZOneStageHeatingSetPtMgrs;
 
 		cAlphaFieldNames.allocate( MaxNumAlphas );
-		cAlphaFieldNames = "";
 		cAlphaArgs.allocate( MaxNumAlphas );
-		cAlphaArgs = "";
-		lAlphaFieldBlanks.allocate( MaxNumAlphas );
-		lAlphaFieldBlanks = false;
+		lAlphaFieldBlanks.dimension( MaxNumAlphas, false );
 		cNumericFieldNames.allocate( MaxNumNumbers );
-		cNumericFieldNames = "";
-		rNumericArgs.allocate( MaxNumNumbers );
-		rNumericArgs = 0.0;
-		lNumericFieldBlanks.allocate( MaxNumNumbers );
-		lNumericFieldBlanks = false;
+		rNumericArgs.dimension( MaxNumNumbers, 0.0 );
+		lNumericFieldBlanks.dimension( MaxNumNumbers, false );
 
 		GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
-		NodeNums.allocate( NumParams );
-		NodeNums = 0;
+		NodeNums.dimension( NumParams, 0 );
 
 		if ( NumAllSetPtMgrs > 0 ) AllSetPtMgr.allocate( NumAllSetPtMgrs ); // Allocate the entire Setpoint Manager input data array
 
@@ -2325,7 +2318,7 @@ namespace SetPointManager {
 				GroundTempSetPtMgr( SetPtMgrNum ).RefTypeMode = iRefGroundTempObjType_BuildingSurface;
 				if ( NoSurfaceGroundTempObjWarning ) {
 					if ( ! GroundTempObjInput ) {
-						ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" requires " "\"Site:GroundTemperature:BuildingSurface\" in the input." );
+						ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" requires \"Site:GroundTemperature:BuildingSurface\" in the input." );
 						ShowContinueError( "Defaults, constant throughout the year of (" + RoundSigDigits( GroundTemp, 1 ) + ") will be used." );
 					}
 					NoSurfaceGroundTempObjWarning = false;
@@ -2334,7 +2327,7 @@ namespace SetPointManager {
 				GroundTempSetPtMgr( SetPtMgrNum ).RefTypeMode = iRefGroundTempObjType_Shallow;
 				if ( NoShallowGroundTempObjWarning ) {
 					if ( ! GroundTemp_SurfaceObjInput ) {
-						ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" requires " "\"Site:GroundTemperature:Shallow\" in the input." );
+						ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" requires \"Site:GroundTemperature:Shallow\" in the input." );
 						ShowContinueError( "Defaults, constant throughout the year of (" + RoundSigDigits( GroundTemp_Surface, 1 ) + ") will be used." );
 					}
 					NoShallowGroundTempObjWarning = false;
@@ -2343,7 +2336,7 @@ namespace SetPointManager {
 				GroundTempSetPtMgr( SetPtMgrNum ).RefTypeMode = iRefGroundTempObjType_Deep;
 				if ( NoDeepGroundTempObjWarning ) {
 					if ( ! GroundTemp_DeepObjInput ) {
-						ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" requires " "\"Site:GroundTemperature:Deep\" in the input." );
+						ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" requires \"Site:GroundTemperature:Deep\" in the input." );
 						ShowContinueError( "Defaults, constant throughout the year of (" + RoundSigDigits( GroundTemp_Deep, 1 ) + ") will be used." );
 					}
 					NoDeepGroundTempObjWarning = false;
@@ -2352,7 +2345,7 @@ namespace SetPointManager {
 				GroundTempSetPtMgr( SetPtMgrNum ).RefTypeMode = iRefGroundTempObjType_FCfactorMethod;
 				if ( NoFCGroundTempObjWarning ) {
 					if ( ! FCGroundTemps ) {
-						ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" requires " "\"Site:GroundTemperature:FCfactorMethod\" in the input." );
+						ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" requires \"Site:GroundTemperature:FCfactorMethod\" in the input." );
 						ShowContinueError( "Defaults, constant throughout the year of (" + RoundSigDigits( GroundTempFC, 1 ) + ") will be used." );
 					}
 					NoFCGroundTempObjWarning = false;
@@ -2821,7 +2814,7 @@ namespace SetPointManager {
 								ShowContinueError( "...conflicting setpoint manager =" + cValidSPMTypes( AllSetPtMgr( TempSetPtMgrNum ).SPMType ) + ":\"" + AllSetPtMgr( TempSetPtMgrNum ).Name + "\"" );
 								ShowContinueError( "...conflicting node name = " + NodeID( AllSetPtMgr( SetPtMgrNum ).CtrlNodes( CtrldNodeNum ) ) );
 								ShowContinueError( "...control type variable = " + cValidCtrlTypes( AllSetPtMgr( SetPtMgrNum ).CtrlTypeMode ) );
-								ShowContinueError( "...return air bypass flow setpoint manager will have priority setting mass flow rate" " on this node." );
+								ShowContinueError( "...return air bypass flow setpoint manager will have priority setting mass flow rate on this node." );
 							} else { // severe error for other SP manager types
 								ShowWarningError( cValidSPMTypes( AllSetPtMgr( SetPtMgrNum ).SPMType ) + "=\"" + AllSetPtMgr( SetPtMgrNum ).Name + "\"" );
 								ShowContinueError( "...setpoint node conflicts with another setpoint manager." );
@@ -3293,7 +3286,7 @@ namespace SetPointManager {
 							}
 							if ( ! HstatZoneFound ) {
 								ShowSevereError( cSetPointManagerType + "=\"" + MZAverageMinHumSetPtMgr( SetPtMgrNum ).Name + "\", invalid humidistat specification" );
-								ShowContinueError( "could not locate Humidistat in any of the zones" " served by the Air loop=" + PrimaryAirSystem( AirLoopNum ).Name );
+								ShowContinueError( "could not locate Humidistat in any of the zones served by the Air loop=" + PrimaryAirSystem( AirLoopNum ).Name );
 								ErrorsFound = true;
 							}
 						}
@@ -3326,7 +3319,7 @@ namespace SetPointManager {
 							}
 							if ( ! HstatZoneFound ) {
 								ShowSevereError( cSetPointManagerType + "=\"" + MZAverageMaxHumSetPtMgr( SetPtMgrNum ).Name + "\", invalid humidistat specification" );
-								ShowContinueError( "could not locate Humidistat in any of the zones" " served by the Air loop=" + PrimaryAirSystem( AirLoopNum ).Name );
+								ShowContinueError( "could not locate Humidistat in any of the zones served by the Air loop=" + PrimaryAirSystem( AirLoopNum ).Name );
 								ErrorsFound = true;
 							}
 						}
@@ -3359,7 +3352,7 @@ namespace SetPointManager {
 							}
 							if ( ! HstatZoneFound ) {
 								ShowSevereError( cSetPointManagerType + "=\"" + MZMinHumSetPtMgr( SetPtMgrNum ).Name + "\", invalid humidistat specification" );
-								ShowContinueError( "could not locate Humidistat in any of the zones" " served by the Air loop=" + PrimaryAirSystem( AirLoopNum ).Name );
+								ShowContinueError( "could not locate Humidistat in any of the zones served by the Air loop=" + PrimaryAirSystem( AirLoopNum ).Name );
 								ErrorsFound = true;
 							}
 						}
@@ -3392,7 +3385,7 @@ namespace SetPointManager {
 							}
 							if ( ! HstatZoneFound ) {
 								ShowSevereError( cSetPointManagerType + "=\"" + MZMaxHumSetPtMgr( SetPtMgrNum ).Name + "\", invalid humidistat specification" );
-								ShowContinueError( "could not locate Humidistat in any of the zones" " served by the Air loop=" + PrimaryAirSystem( AirLoopNum ).Name );
+								ShowContinueError( "could not locate Humidistat in any of the zones served by the Air loop=" + PrimaryAirSystem( AirLoopNum ).Name );
 								ErrorsFound = true;
 							}
 						}
@@ -4920,7 +4913,7 @@ namespace SetPointManager {
 				if ( ! AnyEnergyManagementSystemInModel ) {
 					ShowSevereError( "CalcMixedAirSetPoint: Missing reference temperature setpoint for Mixed Air Setpoint Manager " + MixedAirSetPtMgr( SetPtMgrNum ).Name );
 					ShowContinueError( "Node Referenced =" + NodeID( RefNode ) );
-					ShowContinueError( "  use an additional Setpoint Manager with Control Variable = \"Temperature\" to establish a " "setpoint at this node." );
+					ShowContinueError( "  use an additional Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at this node." );
 					SetPointErrorFlag = true;
 				} else {
 					// need call to check if this is the target of an EnergyManagementSystem:Actuator object
@@ -4928,7 +4921,7 @@ namespace SetPointManager {
 					if ( SetPointErrorFlag ) {
 						ShowSevereError( "CalcMixedAirSetPoint: Missing reference temperature setpoint for Mixed Air Setpoint Manager " + MixedAirSetPtMgr( SetPtMgrNum ).Name );
 						ShowContinueError( "Node Referenced =" + NodeID( RefNode ) );
-						ShowContinueError( "  use an additional Setpoint Manager with Control Variable = \"Temperature\" to establish a " "setpoint at this node." );
+						ShowContinueError( "  use an additional Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at this node." );
 						ShowContinueError( "Or add EMS Actuator to provide temperature setpoint at this node" );
 					}
 				}
@@ -6444,8 +6437,7 @@ namespace SetPointManager {
 
 		//! Current timestep's condenser water entering setpoint
 		if ( firstTime ) {
-			SetupIdealCondEntSetPtVars.allocate( NumIdealCondEntSetPtMgrs );
-			SetupIdealCondEntSetPtVars = true;
+			SetupIdealCondEntSetPtVars.dimension( NumIdealCondEntSetPtMgrs, true );
 			firstTime = false;
 		}
 

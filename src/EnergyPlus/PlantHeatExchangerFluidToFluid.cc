@@ -290,22 +290,15 @@ namespace PlantHeatExchangerFluidToFluid {
 		MaxNumAlphas = NumAlphas;
 
 		cAlphaFieldNames.allocate( MaxNumAlphas );
-		cAlphaFieldNames = "";
 		cAlphaArgs.allocate( MaxNumAlphas );
-		cAlphaArgs = "";
-		lAlphaFieldBlanks.allocate( MaxNumAlphas );
-		lAlphaFieldBlanks = false;
+		lAlphaFieldBlanks.dimension( MaxNumAlphas, false );
 		cNumericFieldNames.allocate( MaxNumNumbers );
-		cNumericFieldNames = "";
-		rNumericArgs.allocate( MaxNumNumbers );
-		rNumericArgs = 0.0;
-		lNumericFieldBlanks.allocate( MaxNumNumbers );
-		lNumericFieldBlanks = false;
+		rNumericArgs.dimension( MaxNumNumbers, 0.0 );
+		lNumericFieldBlanks.dimension( MaxNumNumbers, false );
 
 		if ( NumberOfPlantFluidHXs > 0 ) {
 			FluidHX.allocate( NumberOfPlantFluidHXs );
-			CheckFluidHXs.allocate( NumberOfPlantFluidHXs );
-			CheckFluidHXs = true;
+			CheckFluidHXs.dimension( NumberOfPlantFluidHXs, true );
 			for ( CompLoop = 1; CompLoop <= NumberOfPlantFluidHXs; ++CompLoop ) {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
@@ -846,7 +839,7 @@ namespace PlantHeatExchangerFluidToFluid {
 					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, "Loop-to-loop Temperature Difference Used to Size Heat Exchanger U-Factor Times Area Value [C]", tmpDeltaTloopToLoop );
 				}
 			} else {
-				ShowSevereError( "SizeFluidHeatExchanger: Autosizing of heat " "Exchanger UA requires a loop Sizing:Plant objects for both loops" );
+				ShowSevereError( "SizeFluidHeatExchanger: Autosizing of heat Exchanger UA requires a loop Sizing:Plant objects for both loops" );
 				ShowContinueError( "Occurs in heat exchanger object=" + FluidHX( CompNum ).Name );
 				ErrorsFound = true;
 			}

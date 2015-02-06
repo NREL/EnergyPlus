@@ -332,17 +332,11 @@ namespace HeatBalanceHAMTManager {
 		ErrorsFound = false;
 
 		AlphaArray.allocate( MaxAlphas );
-		AlphaArray = "";
 		cAlphaFieldNames.allocate( MaxAlphas );
-		cAlphaFieldNames = "";
 		cNumericFieldNames.allocate( MaxNums );
-		cNumericFieldNames = "";
-		NumArray.allocate( MaxNums );
-		NumArray = 0.0;
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = false;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = false;
+		NumArray.dimension( MaxNums, 0.0 );
+		lAlphaBlanks.dimension( MaxAlphas, false );
+		lNumericBlanks.dimension( MaxNums, false );
 
 		HAMTitems = GetNumObjectsFound( cHAMTObject1 ); // MaterialProperty:HeatAndMoistureTransfer:Settings
 		for ( item = 1; item <= HAMTitems; ++item ) {
@@ -352,7 +346,7 @@ namespace HeatBalanceHAMTManager {
 
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject1 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
-				ShowContinueError( "The basic material must be defined in addition to specifying " "HeatAndMoistureTransfer properties." );
+				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
 				ErrorsFound = true;
 				continue;
 			}
@@ -374,7 +368,7 @@ namespace HeatBalanceHAMTManager {
 
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject2 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
-				ShowContinueError( "The basic material must be defined in addition to specifying " "HeatAndMoistureTransfer properties." );
+				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
 				ErrorsFound = true;
 				continue;
 			}
@@ -453,7 +447,7 @@ namespace HeatBalanceHAMTManager {
 
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject3 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
-				ShowContinueError( "The basic material must be defined in addition to specifying " "HeatAndMoistureTransfer properties." );
+				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
 				ErrorsFound = true;
 				continue;
 			}
@@ -485,7 +479,7 @@ namespace HeatBalanceHAMTManager {
 			matid = FindItemInList( AlphaArray( 1 ), Material.Name(), TotMaterials );
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject4 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
-				ShowContinueError( "The basic material must be defined in addition to specifying " "HeatAndMoistureTransfer properties." );
+				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
 				ErrorsFound = true;
 				continue;
 			}
@@ -516,7 +510,7 @@ namespace HeatBalanceHAMTManager {
 			matid = FindItemInList( AlphaArray( 1 ), Material.Name(), TotMaterials );
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject5 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
-				ShowContinueError( "The basic material must be defined in addition to specifying " "HeatAndMoistureTransfer properties." );
+				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
 				ErrorsFound = true;
 				continue;
 			}
@@ -550,7 +544,7 @@ namespace HeatBalanceHAMTManager {
 			matid = FindItemInList( AlphaArray( 1 ), Material.Name(), TotMaterials );
 			if ( matid == 0 ) {
 				ShowSevereError( cHAMTObject6 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
-				ShowContinueError( "The basic material must be defined in addition to specifying " "HeatAndMoistureTransfer properties." );
+				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
 				ErrorsFound = true;
 				continue;
 			}
@@ -584,7 +578,7 @@ namespace HeatBalanceHAMTManager {
 			vtcsid = FindItemInList( AlphaArray( 1 ), Surface.Name(), TotSurfaces );
 			if ( vtcsid == 0 ) {
 				ShowSevereError( cHAMTObject7 + ' ' + cAlphaFieldNames( 1 ) + "=\"" + AlphaArray( 1 ) + "\" is invalid (undefined)." );
-				ShowContinueError( "The basic material must be defined in addition to specifying " "HeatAndMoistureTransfer properties." );
+				ShowContinueError( "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties." );
 				ErrorsFound = true;
 				continue;
 			}
@@ -675,12 +669,12 @@ namespace HeatBalanceHAMTManager {
 		bool DoReport;
 
 		// Formats
-		static gio::Fmt const Format_1966( "('! <HAMT cells>, Surface Name, Construction Name, Cell Numbers')" );
-		static gio::Fmt const Format_1965( "('! <HAMT origins>, Surface Name, Construction Name, Cell origins (m) ')" );
-		static gio::Fmt const Format_1968( "('HAMT cells, ',A,',',A,400(,:,',',i4))" );
-		static gio::Fmt const Format_1967( "('HAMT origins,',A,',',A,400(,:,',',f10.7))" );
-		static gio::Fmt const Format_108( "('! <Material Nominal Resistance>, Material Name,  Nominal R')" );
-		static gio::Fmt const Format_111( "('Material Nominal Resistance's,2(',',A))" );
+		static gio::Fmt Format_1966( "('! <HAMT cells>, Surface Name, Construction Name, Cell Numbers')" );
+		static gio::Fmt Format_1965( "('! <HAMT origins>, Surface Name, Construction Name, Cell origins (m) ')" );
+		static gio::Fmt Format_1968( "('HAMT cells, ',A,',',A,400(,:,',',i4))" );
+		static gio::Fmt Format_1967( "('HAMT origins,',A,',',A,400(,:,',',f10.7))" );
+		static gio::Fmt Format_108( "('! <Material Nominal Resistance>, Material Name,  Nominal R')" );
+		static gio::Fmt Format_111( "('Material Nominal Resistance's,2(',',A))" );
 
 		deltat = TimeStepZone * 3600.0;
 
@@ -703,29 +697,29 @@ namespace HeatBalanceHAMTManager {
 
 				if ( Material( matid ).nmu < 0 ) {
 					ShowSevereError( RoutineName + "Construction=" + Construct( conid ).Name );
-					ShowContinueError( "Reference Material=\"" + Material( matid ).Name + "\"" " does not have required Water Vapor Diffusion Resistance Factor (mu) data." );
+					ShowContinueError( "Reference Material=\"" + Material( matid ).Name + "\" does not have required Water Vapor Diffusion Resistance Factor (mu) data." );
 					++errorCount;
 				}
 
 				if ( Material( matid ).niso < 0 ) {
 					ShowSevereError( RoutineName + "Construction=" + Construct( conid ).Name );
-					ShowContinueError( "Reference Material=\"" + Material( matid ).Name + "\"" " does not have required isotherm data." );
+					ShowContinueError( "Reference Material=\"" + Material( matid ).Name + "\" does not have required isotherm data." );
 					++errorCount;
 				}
 				if ( Material( matid ).nsuc < 0 ) {
 					ShowSevereError( RoutineName + "Construction=" + Construct( conid ).Name );
-					ShowContinueError( "Reference Material=\"" + Material( matid ).Name + "\"" " does not have required liquid transport coefficient (suction) data." );
+					ShowContinueError( "Reference Material=\"" + Material( matid ).Name + "\" does not have required liquid transport coefficient (suction) data." );
 					++errorCount;
 				}
 				if ( Material( matid ).nred < 0 ) {
 					ShowSevereError( RoutineName + "Construction=" + Construct( conid ).Name );
-					ShowContinueError( "Reference Material=\"" + Material( matid ).Name + "\"" " does not have required liquid transport coefficient (redistribution) data." );
+					ShowContinueError( "Reference Material=\"" + Material( matid ).Name + "\" does not have required liquid transport coefficient (redistribution) data." );
 					++errorCount;
 				}
 				if ( Material( matid ).ntc < 0 ) {
 					if ( Material( matid ).Conductivity > 0 ) {
 						ShowWarningError( RoutineName + "Construction=" + Construct( conid ).Name );
-						ShowContinueError( "Reference Material=\"" + Material( matid ).Name + "\"" " does not have thermal conductivity data. Using fixed value." );
+						ShowContinueError( "Reference Material=\"" + Material( matid ).Name + "\" does not have thermal conductivity data. Using fixed value." );
 						Material( matid ).ntc = 2;
 						Material( matid ).tcwater( 1 ) = 0.0;
 						Material( matid ).tcdata( 1 ) = Material( matid ).Conductivity;
@@ -733,7 +727,7 @@ namespace HeatBalanceHAMTManager {
 						Material( matid ).tcdata( 2 ) = Material( matid ).Conductivity;
 					} else {
 						ShowSevereError( RoutineName + "Construction=" + Construct( conid ).Name );
-						ShowContinueError( "Reference Material=\"" + Material( matid ).Name + "\"" " does not have required thermal conductivity data." );
+						ShowContinueError( "Reference Material=\"" + Material( matid ).Name + "\" does not have required thermal conductivity data." );
 						++errorCount;
 					}
 				}
@@ -754,7 +748,7 @@ namespace HeatBalanceHAMTManager {
 					--Material( matid ).divs;
 					if ( Material( matid ).divs < 1 ) {
 						ShowSevereError( RoutineName + "Construction=" + Construct( conid ).Name );
-						ShowContinueError( "Reference Material=\"" + Material( matid ).Name + "\"" " is too thin." );
+						ShowContinueError( "Reference Material=\"" + Material( matid ).Name + "\" is too thin." );
 						++errorCount;
 						break;
 					}

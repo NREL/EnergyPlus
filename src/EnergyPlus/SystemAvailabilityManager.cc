@@ -444,17 +444,11 @@ namespace SystemAvailabilityManager {
 		maxAlphas = max( maxAlphas, NumAlphas );
 
 		cAlphaFieldNames.allocate( maxAlphas );
-		cAlphaFieldNames = "";
 		cAlphaArgs.allocate( maxAlphas );
-		cAlphaArgs = "";
-		lAlphaFieldBlanks.allocate( maxAlphas );
-		lAlphaFieldBlanks = false;
+		lAlphaFieldBlanks.dimension( maxAlphas, false );
 		cNumericFieldNames.allocate( maxNumbers );
-		cNumericFieldNames = "";
-		rNumericArgs.allocate( maxNumbers );
-		rNumericArgs = 0.0;
-		lNumericFieldBlanks.allocate( maxNumbers );
-		lNumericFieldBlanks = false;
+		rNumericArgs.dimension( maxNumbers, 0.0 );
+		lNumericFieldBlanks.dimension( maxNumbers, false );
 
 		if ( ! allocated( ZoneComp ) ) {
 			ZoneComp.allocate( NumValidSysAvailZoneComponents );
@@ -1090,17 +1084,11 @@ namespace SystemAvailabilityManager {
 		cCurrentModuleObject = "AvailabilityManagerAssignmentList";
 		GetObjectDefMaxArgs( cCurrentModuleObject, numArgs, NumAlphas, NumNumbers );
 		cAlphaFieldNames.allocate( NumAlphas );
-		cAlphaFieldNames = "";
 		cAlphaArgs.allocate( NumAlphas );
-		cAlphaArgs = "";
-		lAlphaFieldBlanks.allocate( NumAlphas );
-		lAlphaFieldBlanks = false;
+		lAlphaFieldBlanks.dimension( NumAlphas, false );
 		cNumericFieldNames.allocate( NumNumbers );
-		cNumericFieldNames = "";
-		rNumericArgs.allocate( NumNumbers );
-		rNumericArgs = 0.0;
-		lNumericFieldBlanks.allocate( NumNumbers );
-		lNumericFieldBlanks = false;
+		rNumericArgs.dimension( NumNumbers, 0.0 );
+		lNumericFieldBlanks.dimension( NumNumbers, false );
 
 		cCurrentModuleObject = "AvailabilityManagerAssignmentList";
 		NumAvailManagerLists = GetNumObjectsFound( cCurrentModuleObject );
@@ -1228,17 +1216,17 @@ namespace SystemAvailabilityManager {
 				PlantAvailMgr( Loop ).AvailManagerNum( Num ) = 0;
 				PlantAvailMgr( Loop ).AvailManagerType( Num ) = SysAvailMgrListData( Found ).AvailManagerType( Num );
 				if ( PlantAvailMgr( Loop ).AvailManagerType( Num ) == 0 ) {
-					ShowSevereError( "GetPlantLoopData/GetPlantAvailabilityManager: " "Invalid System Availability Manager Type entered=\"" + SysAvailMgrListData( Found ).cAvailManagerType( Num ) + "\"." );
+					ShowSevereError( "GetPlantLoopData/GetPlantAvailabilityManager: Invalid System Availability Manager Type entered=\"" + SysAvailMgrListData( Found ).cAvailManagerType( Num ) + "\"." );
 					ShowContinueError( "Occurs in AvailabilityManagerAssignmentList=\"" + AvailabilityListName + "\"." );
 					ErrorsFound = true;
 				}
 				if ( SysAvailMgrListData( Found ).AvailManagerType( Num ) == SysAvailMgr_DiffThermo && Num != PlantAvailMgr( Loop ).NumAvailManagers ) {
-					ShowWarningError( "GetPlantLoopData/GetPlantAvailabilityManager: " "AvailabilityManager:DifferentialThermostat=\"" + SysAvailMgrListData( Found ).AvailManagerName( Num ) + "\"." );
-					ShowContinueError( "...is not the last manager on the AvailabilityManagerAssignmentList.  " "Any remaining managers will not be used." );
+					ShowWarningError( "GetPlantLoopData/GetPlantAvailabilityManager: AvailabilityManager:DifferentialThermostat=\"" + SysAvailMgrListData( Found ).AvailManagerName( Num ) + "\"." );
+					ShowContinueError( "...is not the last manager on the AvailabilityManagerAssignmentList.  Any remaining managers will not be used." );
 					ShowContinueError( "Occurs in AvailabilityManagerAssignmentList =\"" + AvailabilityListName + "\"." );
 				}
 				if ( SysAvailMgrListData( Found ).AvailManagerType( Num ) == SysAvailMgr_NightVent || SysAvailMgrListData( Found ).AvailManagerType( Num ) == SysAvailMgr_NightCycle ) {
-					ShowSevereError( "GetPlantLoopData/GetPlantAvailabilityManager: " "Invalid System Availability Manager Type entered=\"" + SysAvailMgrListData( Found ).cAvailManagerType( Num ) + "\"." );
+					ShowSevereError( "GetPlantLoopData/GetPlantAvailabilityManager: Invalid System Availability Manager Type entered=\"" + SysAvailMgrListData( Found ).cAvailManagerType( Num ) + "\"." );
 					ShowContinueError( "...this manager is not used in a Plant Loop." );
 					ShowContinueError( "Occurs in AvailabilityManagerAssignmentList=\"" + AvailabilityListName + "\"." );
 					ErrorsFound = true;
@@ -1332,13 +1320,13 @@ namespace SystemAvailabilityManager {
 				PriAirSysAvailMgr( Loop ).AvailManagerNum( Num ) = 0;
 				PriAirSysAvailMgr( Loop ).AvailManagerType( Num ) = SysAvailMgrListData( Found ).AvailManagerType( Num );
 				if ( PriAirSysAvailMgr( Loop ).AvailManagerType( Num ) == 0 ) {
-					ShowSevereError( "GetAirPathData/GetAirLoopAvailabilityManager: " "Invalid AvailabilityManagerAssignmentList Type entered=\"" + SysAvailMgrListData( Found ).cAvailManagerType( Num ) + "\"." );
+					ShowSevereError( "GetAirPathData/GetAirLoopAvailabilityManager: Invalid AvailabilityManagerAssignmentList Type entered=\"" + SysAvailMgrListData( Found ).cAvailManagerType( Num ) + "\"." );
 					ShowContinueError( "Occurs in AvailabilityManagerAssignmentList=\"" + SysAvailMgrListData( Found ).AvailManagerName( Num ) + "\"." );
 					ErrorsFound = true;
 				}
 				if ( SysAvailMgrListData( Found ).AvailManagerType( Num ) == SysAvailMgr_DiffThermo && Num != PriAirSysAvailMgr( Loop ).NumAvailManagers ) {
-					ShowWarningError( "GetAirPathData/GetAirLoopAvailabilityManager: " "AvailabilityManager:DifferentialThermostat=\"" + SysAvailMgrListData( Found ).AvailManagerName( Num ) + "\"." );
-					ShowContinueError( "...is not the last manager on the AvailabilityManagerAssignmentList.  " "Any remaining managers will not be used." );
+					ShowWarningError( "GetAirPathData/GetAirLoopAvailabilityManager: AvailabilityManager:DifferentialThermostat=\"" + SysAvailMgrListData( Found ).AvailManagerName( Num ) + "\"." );
+					ShowContinueError( "...is not the last manager on the AvailabilityManagerAssignmentList.  Any remaining managers will not be used." );
 					ShowContinueError( "Occurs in AvailabilityManagerAssignmentList=\"" + SysAvailMgrListData( Found ).AvailManagerName( Num ) + "\"." );
 				}
 			} //End of Num Loop
@@ -1428,13 +1416,13 @@ namespace SystemAvailabilityManager {
 					ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).AvailManagerNum( Num ) = 0;
 					ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).AvailManagerType( Num ) = SysAvailMgrListData( Found ).AvailManagerType( Num );
 					if ( ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).AvailManagerType( Num ) == 0 ) {
-						ShowSevereError( "GetZoneEqAvailabilityManager: " "Invalid AvailabilityManagerAssignmentList Type entered=\"" + SysAvailMgrListData( Found ).cAvailManagerType( Num ) + "\"." );
+						ShowSevereError( "GetZoneEqAvailabilityManager: Invalid AvailabilityManagerAssignmentList Type entered=\"" + SysAvailMgrListData( Found ).cAvailManagerType( Num ) + "\"." );
 						ShowContinueError( "Occurs in AvailabilityManagerAssignmentList=\"" + SysAvailMgrListData( Found ).AvailManagerName( Num ) + "\"." );
 						ErrorsFound = true;
 					}
 					if ( SysAvailMgrListData( Found ).AvailManagerType( Num ) == SysAvailMgr_DiffThermo && Num != ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).NumAvailManagers ) {
-						ShowWarningError( "GetZoneEqAvailabilityManager: " "AvailabilityManager:DifferentialThermostat=\"" + SysAvailMgrListData( Found ).AvailManagerName( Num ) + "\"." );
-						ShowContinueError( "...is not the last manager on the AvailabilityManagerAssignmentList.  " "Any remaining managers will not be used." );
+						ShowWarningError( "GetZoneEqAvailabilityManager: AvailabilityManager:DifferentialThermostat=\"" + SysAvailMgrListData( Found ).AvailManagerName( Num ) + "\"." );
+						ShowContinueError( "...is not the last manager on the AvailabilityManagerAssignmentList.  Any remaining managers will not be used." );
 						ShowContinueError( "Occurs in AvailabilityManagerAssignmentList=\"" + SysAvailMgrListData( Found ).AvailManagerName( Num ) + "\"." );
 					}
 				} //End of Num Loop
@@ -1950,8 +1938,7 @@ namespace SystemAvailabilityManager {
 			StartTime = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StartTime;
 			StopTime = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StopTime;
 			if ( OneTimeFlag ) {
-				ZoneCompNCControlType.allocate( NumNCycSysAvailMgrs );
-				ZoneCompNCControlType = true;
+				ZoneCompNCControlType.dimension( NumNCycSysAvailMgrs, true );
 				OneTimeFlag = false;
 			}
 		} else {
@@ -2021,7 +2008,7 @@ namespace SystemAvailabilityManager {
 					if ( ZoneCompNCControlType( SysAvailNum ) ) {
 						ShowWarningError( "AvailabilityManager:NightCycle = " + NCycSysAvailMgrData( SysAvailNum ).Name + ", is specified for a ZoneHVAC component." );
 						ShowContinueError( "The only valid Control Types for ZoneHVAC components are CycleOnControlZone and StayOff." );
-						ShowContinueError( "Night Cycle operation will not be modeled for ZoneHVAC components that reference this " "manager." );
+						ShowContinueError( "Night Cycle operation will not be modeled for ZoneHVAC components that reference this manager." );
 						ZoneCompNCControlType( SysAvailNum ) = false;
 					}
 					AvailStatus = NoAction;
@@ -4069,7 +4056,7 @@ namespace SystemAvailabilityManager {
 					CurveVal = CurveValue( HybridVentSysAvailMgrData( SysAvailNum ).OpeningFactorFWS, CurveMin );
 					if ( CurveVal < 0.0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
-						ShowContinueError( "The minimum value of " + cAlphaFieldNames( 7 ) + " must be greater " "than or equal to 0.0 at the minimum value of wind speed." );
+						ShowContinueError( "The minimum value of " + cAlphaFieldNames( 7 ) + " must be greater than or equal to 0.0 at the minimum value of wind speed." );
 						ShowContinueError( cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\"." );
 						ShowContinueError( "Curve output at the minimum wind speed = " + TrimSigDigits( CurveVal, 3 ) );
 						ErrorsFound = true;
@@ -4077,7 +4064,7 @@ namespace SystemAvailabilityManager {
 					CurveVal = CurveValue( HybridVentSysAvailMgrData( SysAvailNum ).OpeningFactorFWS, CurveMax );
 					if ( CurveVal > 1.0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
-						ShowContinueError( "The maximum value of " + cAlphaFieldNames( 7 ) + " must be less " "than or equal to 1.0 at the maximum value of wind speed." );
+						ShowContinueError( "The maximum value of " + cAlphaFieldNames( 7 ) + " must be less than or equal to 1.0 at the maximum value of wind speed." );
 						ShowContinueError( cAlphaFieldNames( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\"." );
 						ShowContinueError( "Curve output at the maximum wind speed = " + TrimSigDigits( CurveVal, 3 ) );
 						ErrorsFound = true;
@@ -4163,7 +4150,7 @@ namespace SystemAvailabilityManager {
 			if ( HybridVentSysAvailMgrData( SysAvailNum ).SimpleControlTypeSchedPtr > 0 && HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr > 0 ) {
 				if ( HybridVentSysAvailMgrData( SysAvailNum ).ActualZoneNum != Ventilation( HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr ).ZonePtr ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
-					ShowContinueError( "The Zone name specified in the Ventilation " "object " + Zone( Ventilation( HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr ).ZonePtr ).Name );
+					ShowContinueError( "The Zone name specified in the Ventilation object " + Zone( Ventilation( HybridVentSysAvailMgrData( SysAvailNum ).VentilationPtr ).ZonePtr ).Name );
 					ShowContinueError( "is not equal to the " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
 					ErrorsFound = true;
 				}
@@ -4568,7 +4555,7 @@ namespace SystemAvailabilityManager {
 					HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl = HybridVentCtrl_Close;
 					++HybridVentSysAvailMgrData( SysAvailNum ).SingleHCErrCount;
 					if ( HybridVentSysAvailMgrData( SysAvailNum ).SingleHCErrCount < 2 ) {
-						ShowWarningError( "Hybrid ventilation control: " + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName + ": The zone temperature control type is ThermostatSetpoint:SingleHeatingOrCooling." " Natural ventilation is not allowed." );
+						ShowWarningError( "Hybrid ventilation control: " + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName + ": The zone temperature control type is ThermostatSetpoint:SingleHeatingOrCooling. Natural ventilation is not allowed." );
 						ShowContinueErrorTimeStamp( "" );
 					} else {
 						ShowRecurringWarningErrorAtEnd( "Hybrid ventilation control: " + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName + ": No natural ventilation continues with a ThermostatSetpoint:SingleHeatingOrCooling type...", HybridVentSysAvailMgrData( SysAvailNum ).SingleHCErrIndex, double( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode ), double( HybridVentSysAvailMgrData( SysAvailNum ).ControlMode ) );
@@ -4590,7 +4577,7 @@ namespace SystemAvailabilityManager {
 				if ( NumHumidityControlZones == 0 ) {
 					++HybridVentSysAvailMgrData( SysAvailNum ).DewPointNoRHErrCount;
 					if ( HybridVentSysAvailMgrData( SysAvailNum ).DewPointNoRHErrCount < 2 ) {
-						ShowWarningError( "Hybrid ventilation control: Dew point control mode is selected, " "but no ZoneControl:Humidistat object=" + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
+						ShowWarningError( "Hybrid ventilation control: Dew point control mode is selected, but no ZoneControl:Humidistat object=" + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
 						ShowContinueError( "The hybrid ventilation control is triggered by outdoor min and max dewpoint only." );
 						ShowContinueError( "HVAC system may turn off when outdoor dewpoint is between min and max dewpoint." );
 						ShowContinueErrorTimeStamp( "" );
@@ -4618,7 +4605,7 @@ namespace SystemAvailabilityManager {
 				if ( ! found && NumHumidityControlZones > 0 ) {
 					++HybridVentSysAvailMgrData( SysAvailNum ).DewPointErrCount;
 					if ( HybridVentSysAvailMgrData( SysAvailNum ).DewPointErrCount < 2 ) {
-						ShowWarningError( "Hybrid ventilation control: The zone for dew point control mode is different from " "the zone for ZoneControl:Humidistat=" + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
+						ShowWarningError( "Hybrid ventilation control: The zone for dew point control mode is different from the zone for ZoneControl:Humidistat=" + HybridVentSysAvailMgrData( SysAvailNum ).AirLoopName );
 						ShowContinueError( "The Zone name for hybrid control is " + Zone( ZoneNum ).Name + ". Humidistat has no impact" );
 						ShowContinueError( "HVAC system may turn off when outdoor dewpoint is between min and max dewpoint." );
 						ShowContinueErrorTimeStamp( "" );
@@ -4645,7 +4632,7 @@ namespace SystemAvailabilityManager {
 		HybridVentSysAvailVentCtrl( SysAvailNum ) = HybridVentSysAvailMgrData( SysAvailNum ).VentilationCtrl;
 		if ( HybridVentSysAvailVentCtrl( SysAvailNum ) < 0 ) {
 			// Fatal error
-			ShowFatalError( "Hybrid ventilation control: the ventilation control status is beyond the range. " "Please check input of control mode schedule" );
+			ShowFatalError( "Hybrid ventilation control: the ventilation control status is beyond the range. Please check input of control mode schedule" );
 		}
 
 		if ( HybridVentSysAvailMgrData( SysAvailNum ).HybridVentMgrConnectedToAirLoop ) {

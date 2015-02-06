@@ -312,8 +312,7 @@ namespace ChillerIndirectAbsorption {
 
 		IndirectAbsorberReport.allocate( NumIndirectAbsorbers );
 
-		GenInputOutputNodesUsed.allocate( NumIndirectAbsorbers );
-		GenInputOutputNodesUsed = false;
+		GenInputOutputNodesUsed.dimension( NumIndirectAbsorbers, false );
 
 		//LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
 		for ( AbsorberNum = 1; AbsorberNum <= NumIndirectAbsorbers; ++AbsorberNum ) {
@@ -520,7 +519,7 @@ namespace ChillerIndirectAbsorption {
 
 			if ( IndirectAbsorber( AbsorberNum ).GeneratorVolFlowRate == 0.0 && IndirectAbsorber( AbsorberNum ).GenHeatSourceType == NodeType_Water ) {
 				ShowWarningError( cCurrentModuleObject + ", Name=" + cAlphaArgs( 1 ) );
-				ShowContinueError( "...Generator water flow rate must be greater than 0" " when absorber generator fluid type is hot water." );
+				ShowContinueError( "...Generator water flow rate must be greater than 0 when absorber generator fluid type is hot water." );
 				ErrorsFound = true;
 			}
 

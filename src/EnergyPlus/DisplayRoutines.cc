@@ -1,5 +1,6 @@
 // C++ Headers
 #include <iostream>
+#include <sstream>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
@@ -8,7 +9,6 @@
 #include <DisplayRoutines.hh>
 #include <DataGlobals.hh>
 #include <DataSystemVariables.hh>
-#include <sstream>
 
 namespace EnergyPlus {
 
@@ -26,7 +26,47 @@ DisplayString( std::string const & String ) // String to be displayed
 	// This subroutine provides a call to display strings during program execution.
 
 	// METHODOLOGY EMPLOYED:
-	// usage:=  call DisplayString(string)
+
+	// REFERENCES:
+	// na
+
+	// Using/Aliasing
+	using DataGlobals::KickOffSimulation;
+	using DataSystemVariables::DeveloperFlag;
+
+	// Locals
+	// SUBROUTINE ARGUMENT DEFINITIONS:
+
+	// SUBROUTINE PARAMETER DEFINITIONS:
+
+	// INTERFACE BLOCK SPECIFICATIONS
+	// na
+
+	// DERIVED TYPE DEFINITIONS
+	// na
+
+	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+	// na
+
+	if ( KickOffSimulation && ! DeveloperFlag ) return;
+	std::cout << String << '\n';
+
+}
+
+void
+DisplayString( char const * String ) // String to be displayed
+{
+
+	// SUBROUTINE INFORMATION:
+	//       AUTHOR         Linda Lawrie
+	//       DATE WRITTEN   Version 1.0
+	//       MODIFIED       na
+	//       RE-ENGINEERED  Overload to avoid std::string creation overhead
+
+	// PURPOSE OF THIS SUBROUTINE:
+	// This subroutine provides a call to display strings during program execution.
+
+	// METHODOLOGY EMPLOYED:
 
 	// REFERENCES:
 	// na
@@ -50,7 +90,7 @@ DisplayString( std::string const & String ) // String to be displayed
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	// na
 
-	if ( fMessagePtr ) fMessagePtr(String);
+	if ( fMessagePtr ) fMessagePtr( String );
 
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
 	std::cout << String << '\n';
@@ -84,7 +124,7 @@ DisplayNumberAndString(
 	using DataGlobals::KickOffSimulation;
 	using DataSystemVariables::DeveloperFlag;
 	using DataGlobals::fMessagePtr;
-	
+
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -98,9 +138,9 @@ DisplayNumberAndString(
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	std::stringstream sstm;
-	sstm << String << " " << Number;
+	sstm << String << ' ' << Number;
 	if ( fMessagePtr ) fMessagePtr( sstm.str() );
-	
+
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
 	std::cout << String << ' ' << Number << '\n';
 }

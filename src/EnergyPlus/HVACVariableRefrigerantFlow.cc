@@ -189,7 +189,7 @@ namespace HVACVariableRefrigerantFlow {
 	FArray1D< VRFCondenserEquipment > VRF; // AirConditioner:VariableRefrigerantFlow object
 	FArray1D< VRFTerminalUnitEquipment > VRFTU; // ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
 	FArray1D< TerminalUnitListData > TerminalUnitList; // zoneTerminalUnitList object
-	FArray1D< VRFTUNumericFieldData > VRFTUNumericFields; // holds VRF TU numeric input fields character field name 
+	FArray1D< VRFTUNumericFieldData > VRFTUNumericFields; // holds VRF TU numeric input fields character field name
 
 	// Utility routines for module
 	// na
@@ -675,7 +675,7 @@ namespace HVACVariableRefrigerantFlow {
 					if ( VRF( VRFCond ).EIRFTempCoolErrorIndex == 0 ) {
 						ShowSevereMessage( cVRFTypes( VRF_HeatPump ) + " \"" + VRF( VRFCond ).Name + "\":" );
 						ShowContinueError( " Cooling Energy Input Ratio Modifier curve (function of temperature) output is negative (" + TrimSigDigits( TotCoolEIRTempModFac, 3 ) + ")." );
-						ShowContinueError( " Negative value occurs using an outdoor air temperature of " + TrimSigDigits( CondInletTemp, 1 ) + " C" " and an average indoor air wet-bulb temperature of " + TrimSigDigits( InletAirWetBulbC, 1 ) + " C." );
+						ShowContinueError( " Negative value occurs using an outdoor air temperature of " + TrimSigDigits( CondInletTemp, 1 ) + " C and an average indoor air wet-bulb temperature of " + TrimSigDigits( InletAirWetBulbC, 1 ) + " C." );
 						ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
 					}
 					ShowRecurringWarningErrorAtEnd( ccSimPlantEquipTypes( TypeOf_HeatPumpVRF ) + " \"" + VRF( VRFCond ).Name + "\": Cooling Energy Input Ratio Modifier curve (function of temperature) output is negative warning continues...", VRF( VRFCond ).EIRFTempCoolErrorIndex, TotCoolEIRTempModFac, TotCoolEIRTempModFac );
@@ -1277,23 +1277,16 @@ namespace HVACVariableRefrigerantFlow {
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
 		cAlphaArgs.allocate( MaxAlphas );
-		cAlphaArgs = "";
 		cAlphaFieldNames.allocate( MaxAlphas );
-		cAlphaFieldNames = "";
-		lAlphaFieldBlanks.allocate( MaxAlphas );
-		lAlphaFieldBlanks = false;
+		lAlphaFieldBlanks.dimension( MaxAlphas, false );
 		cNumericFieldNames.allocate( MaxNumbers );
-		cNumericFieldNames = "";
-		lNumericFieldBlanks.allocate( MaxNumbers );
-		lNumericFieldBlanks = false;
-		rNumericArgs.allocate( MaxNumbers );
-		rNumericArgs = 0.0;
+		lNumericFieldBlanks.dimension( MaxNumbers, false );
+		rNumericArgs.dimension( MaxNumbers, 0.0 );
 
 		NumVRFTU = NumVRFCTU;
 		if ( NumVRFTU > 0 ) {
 			VRFTU.allocate( NumVRFTU );
-			CheckEquipName.allocate( NumVRFTU );
-			CheckEquipName = true;
+			CheckEquipName.dimension( NumVRFTU, true );
 			VRFTUNumericFields.allocate( NumVRFTU );
 		}
 
@@ -2091,7 +2084,6 @@ namespace HVACVariableRefrigerantFlow {
 			GetObjectItem( cCurrentModuleObject, VRFTUNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			VRFTUNumericFields( VRFTUNum ).FieldNames.allocate(NumNums);
-			VRFTUNumericFields( VRFTUNum ).FieldNames = "";
 			VRFTUNumericFields( VRFTUNum ).FieldNames = cNumericFieldNames;
 
 			IsNotOK = false;
@@ -2426,29 +2418,29 @@ namespace HVACVariableRefrigerantFlow {
 
 					if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).CoolingCapacity <= 0 && VRF( VRFTU( VRFTUNum ).VRFSysNum ).CoolingCapacity != AutoSize ) {
 						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
-						ShowContinueError( "...This terminal unit contains a cooling coil and rated cooling capacity is also " "required in the associated condenser object." );
-						ShowContinueError( "...Rated Cooling Capacity must also be " "specified for condenser = " + cVRFTypes( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFSystemTypeNum ) + " \"" + VRF( VRFTU( VRFTUNum ).VRFSysNum ).Name + "\"." );
+						ShowContinueError( "...This terminal unit contains a cooling coil and rated cooling capacity is also required in the associated condenser object." );
+						ShowContinueError( "...Rated Cooling Capacity must also be specified for condenser = " + cVRFTypes( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFSystemTypeNum ) + " \"" + VRF( VRFTU( VRFTUNum ).VRFSysNum ).Name + "\"." );
 						ErrorsFound = true;
 					}
 
 					if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).CoolCapFT == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
-						ShowContinueError( "...This terminal unit contains a cooling coil and cooling performance curves are also " "required in the associated condenser object." );
-						ShowContinueError( "...Cooling Capacity Ratio Modifier Function of Low Temperature Curve must also be " "specified for condenser = " + cVRFTypes( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFSystemTypeNum ) + " \"" + VRF( VRFTU( VRFTUNum ).VRFSysNum ).Name + "\"." );
+						ShowContinueError( "...This terminal unit contains a cooling coil and cooling performance curves are also required in the associated condenser object." );
+						ShowContinueError( "...Cooling Capacity Ratio Modifier Function of Low Temperature Curve must also be specified for condenser = " + cVRFTypes( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFSystemTypeNum ) + " \"" + VRF( VRFTU( VRFTUNum ).VRFSysNum ).Name + "\"." );
 						ErrorsFound = true;
 					}
 
 					if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).CoolEIRFT == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
-						ShowContinueError( "...This terminal unit contains a cooling coil and cooling performance curves are also " "required in the associated condenser object." );
-						ShowContinueError( "...Cooling Energy Input Ratio Modifier Function of Low Temperature Curve must also be " "specified for condenser = " + cVRFTypes( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFSystemTypeNum ) + " \"" + VRF( VRFTU( VRFTUNum ).VRFSysNum ).Name + "\"." );
+						ShowContinueError( "...This terminal unit contains a cooling coil and cooling performance curves are also required in the associated condenser object." );
+						ShowContinueError( "...Cooling Energy Input Ratio Modifier Function of Low Temperature Curve must also be specified for condenser = " + cVRFTypes( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFSystemTypeNum ) + " \"" + VRF( VRFTU( VRFTUNum ).VRFSysNum ).Name + "\"." );
 						ErrorsFound = true;
 					}
 
 					if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).CoolEIRFPLR1 == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
-						ShowContinueError( "...This terminal unit contains a cooling coil and cooling performance curves are also " "required in the associated condenser object." );
-						ShowContinueError( "...Cooling Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve must also " "be specified for condenser = " + cVRFTypes( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFSystemTypeNum ) + " \"" + VRF( VRFTU( VRFTUNum ).VRFSysNum ).Name + "\"." );
+						ShowContinueError( "...This terminal unit contains a cooling coil and cooling performance curves are also required in the associated condenser object." );
+						ShowContinueError( "...Cooling Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve must also be specified for condenser = " + cVRFTypes( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFSystemTypeNum ) + " \"" + VRF( VRFTU( VRFTUNum ).VRFSysNum ).Name + "\"." );
 						ErrorsFound = true;
 					}
 
@@ -2466,29 +2458,29 @@ namespace HVACVariableRefrigerantFlow {
 
 					if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatingCapacity <= 0 && VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatingCapacity != AutoSize ) {
 						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
-						ShowContinueError( "...This terminal unit contains a heating coil and rated heating capacity is also " "required in the associated condenser object." );
-						ShowContinueError( "...Rated Heating Capacity must also be " "specified for condenser = " + cVRFTypes( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFSystemTypeNum ) + " \"" + VRF( VRFTU( VRFTUNum ).VRFSysNum ).Name + "\"." );
+						ShowContinueError( "...This terminal unit contains a heating coil and rated heating capacity is also required in the associated condenser object." );
+						ShowContinueError( "...Rated Heating Capacity must also be specified for condenser = " + cVRFTypes( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFSystemTypeNum ) + " \"" + VRF( VRFTU( VRFTUNum ).VRFSysNum ).Name + "\"." );
 						ErrorsFound = true;
 					}
 
 					if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatCapFT == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
-						ShowContinueError( "...This terminal unit contains a heating coil and heating performance curves are also " "required in the associated condenser object." );
-						ShowContinueError( "...Heating Capacity Ratio Modifier Function of Low Temperature Curve must also be " "specified for condenser = " + cVRFTypes( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFSystemTypeNum ) + " \"" + VRF( VRFTU( VRFTUNum ).VRFSysNum ).Name + "\"." );
+						ShowContinueError( "...This terminal unit contains a heating coil and heating performance curves are also required in the associated condenser object." );
+						ShowContinueError( "...Heating Capacity Ratio Modifier Function of Low Temperature Curve must also be specified for condenser = " + cVRFTypes( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFSystemTypeNum ) + " \"" + VRF( VRFTU( VRFTUNum ).VRFSysNum ).Name + "\"." );
 						ErrorsFound = true;
 					}
 
 					if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatEIRFT == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
-						ShowContinueError( "...This terminal unit contains a heating coil and heating performance curves are also " "required in the associated condenser object." );
-						ShowContinueError( "...Heating Energy Input Ratio Modifier Function of Low Temperature Curve must also be " "specified for condenser = " + cVRFTypes( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFSystemTypeNum ) + " \"" + VRF( VRFTU( VRFTUNum ).VRFSysNum ).Name + "\"." );
+						ShowContinueError( "...This terminal unit contains a heating coil and heating performance curves are also required in the associated condenser object." );
+						ShowContinueError( "...Heating Energy Input Ratio Modifier Function of Low Temperature Curve must also be specified for condenser = " + cVRFTypes( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFSystemTypeNum ) + " \"" + VRF( VRFTU( VRFTUNum ).VRFSysNum ).Name + "\"." );
 						ErrorsFound = true;
 					}
 
 					if ( VRF( VRFTU( VRFTUNum ).VRFSysNum ).HeatEIRFPLR1 == 0 ) {
 						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
-						ShowContinueError( "...This terminal unit contains a heating coil and heating performance curves are also " "required in the associated condenser object." );
-						ShowContinueError( "...Heating Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve must also " "be specified for condenser = " + cVRFTypes( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFSystemTypeNum ) + " \"" + VRF( VRFTU( VRFTUNum ).VRFSysNum ).Name + "\"." );
+						ShowContinueError( "...This terminal unit contains a heating coil and heating performance curves are also required in the associated condenser object." );
+						ShowContinueError( "...Heating Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve must also be specified for condenser = " + cVRFTypes( VRF( VRFTU( VRFTUNum ).VRFSysNum ).VRFSystemTypeNum ) + " \"" + VRF( VRFTU( VRFTUNum ).VRFSysNum ).Name + "\"." );
 					}
 
 				}
@@ -2548,7 +2540,7 @@ namespace HVACVariableRefrigerantFlow {
 				if ( VRFTU( VRFTUNum ).OAMixerUsed ) {
 					if ( FanInletNodeNum != OANodeNums( 4 ) ) {
 						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\" Fan inlet node name must be the same" );
-						ShowContinueError( "as the outside air mixers mixed air node name when blow through " "fan is specified and an outside air mixer is present." );
+						ShowContinueError( "as the outside air mixers mixed air node name when blow through fan is specified and an outside air mixer is present." );
 						ShowContinueError( "... Fan inlet node = " + NodeID( FanInletNodeNum ) );
 						ShowContinueError( "... OA mixers mixed air node = " + NodeID( OANodeNums( 4 ) ) );
 						ErrorsFound = true;
@@ -2556,7 +2548,7 @@ namespace HVACVariableRefrigerantFlow {
 				} else {
 					if ( FanInletNodeNum != VRFTU( VRFTUNum ).VRFTUInletNodeNum ) {
 						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\" Fan inlet node name must be the same" );
-						ShowContinueError( "as the terminal unit air inlet node name when blow through " "fan is specified and an outside air mixer is not present." );
+						ShowContinueError( "as the terminal unit air inlet node name when blow through fan is specified and an outside air mixer is not present." );
 						ShowContinueError( "... Fan inlet node = " + NodeID( FanInletNodeNum ) );
 						ShowContinueError( "... Terminal unit air inlet node = " + NodeID( VRFTU( VRFTUNum ).VRFTUInletNodeNum ) );
 						ErrorsFound = true;
@@ -2565,7 +2557,7 @@ namespace HVACVariableRefrigerantFlow {
 				if ( VRFTU( VRFTUNum ).CoolingCoilPresent ) {
 					if ( FanOutletNodeNum != CCoilInletNodeNum ) {
 						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\" Fan outlet node name must be the same" );
-						ShowContinueError( "as the DX cooling coil air inlet node name when blow through " "fan is specified." );
+						ShowContinueError( "as the DX cooling coil air inlet node name when blow through fan is specified." );
 						ShowContinueError( "... Fan outlet node = " + NodeID( FanOutletNodeNum ) );
 						ShowContinueError( "... DX cooling coil air inlet node = " + NodeID( CCoilInletNodeNum ) );
 						ErrorsFound = true;
@@ -2573,7 +2565,7 @@ namespace HVACVariableRefrigerantFlow {
 					if ( VRFTU( VRFTUNum ).HeatingCoilPresent ) {
 						if ( HCoilOutletNodeNum != VRFTU( VRFTUNum ).VRFTUOutletNodeNum ) {
 							ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\" Heating coil outlet node name must be the same" );
-							ShowContinueError( "as the terminal unit air outlet node name when blow through " "fan is specified." );
+							ShowContinueError( "as the terminal unit air outlet node name when blow through fan is specified." );
 							ShowContinueError( "... Heating coil outlet node      = " + NodeID( HCoilOutletNodeNum ) );
 							ShowContinueError( "... Terminal Unit air outlet node = " + NodeID( VRFTU( VRFTUNum ).VRFTUOutletNodeNum ) );
 							ErrorsFound = true;
@@ -2581,7 +2573,7 @@ namespace HVACVariableRefrigerantFlow {
 					} else {
 						if ( CCoilOutletNodeNum != VRFTU( VRFTUNum ).VRFTUOutletNodeNum ) {
 							ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\" Cooling coil outlet node name must be the same" );
-							ShowContinueError( "as the terminal unit air outlet node name when blow through " "fan is specified and no DX heating coil is present." );
+							ShowContinueError( "as the terminal unit air outlet node name when blow through fan is specified and no DX heating coil is present." );
 							ShowContinueError( "... Cooling coil outlet node      = " + NodeID( CCoilOutletNodeNum ) );
 							ShowContinueError( "... Terminal Unit air outlet node = " + NodeID( VRFTU( VRFTUNum ).VRFTUOutletNodeNum ) );
 							ErrorsFound = true;
@@ -2590,14 +2582,14 @@ namespace HVACVariableRefrigerantFlow {
 				} else if ( VRFTU( VRFTUNum ).HeatingCoilPresent ) {
 					if ( FanOutletNodeNum != HCoilInletNodeNum ) {
 						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\" Fan outlet node name must be the same" );
-						ShowContinueError( "as the DX heating coil air inlet node name when blow through " "fan is specified and a DX cooling coil is not present." );
+						ShowContinueError( "as the DX heating coil air inlet node name when blow through fan is specified and a DX cooling coil is not present." );
 						ShowContinueError( "... Fan outlet node = " + NodeID( FanOutletNodeNum ) );
 						ShowContinueError( "... DX heating coil air inlet node = " + NodeID( HCoilInletNodeNum ) );
 						ErrorsFound = true;
 					}
 					if ( HCoilOutletNodeNum != VRFTU( VRFTUNum ).VRFTUOutletNodeNum ) {
 						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\" Heating coil outlet node name must be the same" );
-						ShowContinueError( "as the terminal unit air outlet node name when blow through " "fan is specified." );
+						ShowContinueError( "as the terminal unit air outlet node name when blow through fan is specified." );
 						ShowContinueError( "... Heating coil outlet node      = " + NodeID( HCoilOutletNodeNum ) );
 						ShowContinueError( "... Terminal Unit air outlet node = " + NodeID( VRFTU( VRFTUNum ).VRFTUOutletNodeNum ) );
 						ErrorsFound = true;
@@ -2608,7 +2600,7 @@ namespace HVACVariableRefrigerantFlow {
 					if ( ! VRFTU( VRFTUNum ).OAMixerUsed ) {
 						if ( VRFTU( VRFTUNum ).VRFTUInletNodeNum != CCoilInletNodeNum ) {
 							ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\" Cooling coil inlet node name must be the same" );
-							ShowContinueError( "as the terminal unit air inlet node name when draw through " "fan is specified." );
+							ShowContinueError( "as the terminal unit air inlet node name when draw through fan is specified." );
 							ShowContinueError( "... Terminal unit air inlet node = " + NodeID( VRFTU( VRFTUNum ).VRFTUInletNodeNum ) );
 							ShowContinueError( "... DX cooling coil air inlet node = " + NodeID( CCoilInletNodeNum ) );
 							ErrorsFound = true;
@@ -2617,7 +2609,7 @@ namespace HVACVariableRefrigerantFlow {
 					if ( VRFTU( VRFTUNum ).HeatingCoilPresent ) {
 						if ( FanInletNodeNum != HCoilOutletNodeNum ) {
 							ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\" Fan inlet node name must be the same" );
-							ShowContinueError( "as the DX heating coil air outlet node name when draw through " "fan is specifiedt." );
+							ShowContinueError( "as the DX heating coil air outlet node name when draw through fan is specifiedt." );
 							ShowContinueError( "... Fan inlet node = " + NodeID( FanInletNodeNum ) );
 							ShowContinueError( "... DX heating coil air outlet node = " + NodeID( HCoilOutletNodeNum ) );
 							ErrorsFound = true;
@@ -2625,7 +2617,7 @@ namespace HVACVariableRefrigerantFlow {
 					} else {
 						if ( FanInletNodeNum != CCoilOutletNodeNum ) {
 							ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\" Fan inlet node name must be the same" );
-							ShowContinueError( "as the DX cooling coil air outlet node name when draw through " "fan is specified and a DX heating coil is not present." );
+							ShowContinueError( "as the DX cooling coil air outlet node name when draw through fan is specified and a DX heating coil is not present." );
 							ShowContinueError( "... Fan inlet node = " + NodeID( FanInletNodeNum ) );
 							ShowContinueError( "... DX cooling coil air outlet node = " + NodeID( CCoilOutletNodeNum ) );
 							ErrorsFound = true;
@@ -2634,7 +2626,7 @@ namespace HVACVariableRefrigerantFlow {
 				} else if ( VRFTU( VRFTUNum ).HeatingCoilPresent ) {
 					if ( FanInletNodeNum != HCoilOutletNodeNum ) {
 						ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\" Fan inlet node name must be the same" );
-						ShowContinueError( "as the DX heating coil air outlet node name when draw through " "fan is specified." );
+						ShowContinueError( "as the DX heating coil air outlet node name when draw through fan is specified." );
 						ShowContinueError( "... Fan inlet node = " + NodeID( FanInletNodeNum ) );
 						ShowContinueError( "... DX heating coil air outlet node = " + NodeID( HCoilOutletNodeNum ) );
 						ErrorsFound = true;
@@ -2642,7 +2634,7 @@ namespace HVACVariableRefrigerantFlow {
 				}
 				if ( FanOutletNodeNum != VRFTU( VRFTUNum ).VRFTUOutletNodeNum ) {
 					ShowSevereError( cCurrentModuleObject + " \"" + VRFTU( VRFTUNum ).Name + "\" Fan outlet node name must be the same" );
-					ShowContinueError( "as the terminal unit air outlet node name when draw through " "fan is specified." );
+					ShowContinueError( "as the terminal unit air outlet node name when draw through fan is specified." );
 					ShowContinueError( "... Fan outlet node = " + NodeID( FanOutletNodeNum ) );
 					ShowContinueError( "... Terminal unit air outlet node = " + NodeID( VRFTU( VRFTUNum ).VRFTUOutletNodeNum ) );
 					ErrorsFound = true;
@@ -2784,7 +2776,7 @@ namespace HVACVariableRefrigerantFlow {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting AirConditioner:VariableRefrigerantFlow system input. " "Preceding condition(s) causes termination." );
+			ShowFatalError( RoutineName + "Errors found in getting AirConditioner:VariableRefrigerantFlow system input. Preceding condition(s) causes termination." );
 		}
 
 	}
@@ -3782,7 +3774,7 @@ namespace HVACVariableRefrigerantFlow {
 		//       AUTHOR         Richard Raustad, FSEC
 		//       DATE WRITTEN   August 2010
 		//       MODIFIED       August 2013 Daeho Kang, add component sizing table entries
-		//                      B Nigusse, FSEC, added scalable sizing 
+		//                      B Nigusse, FSEC, added scalable sizing
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -3875,8 +3867,8 @@ namespace HVACVariableRefrigerantFlow {
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
 
 		// Formats
-		static gio::Fmt const Format_990( "('! <VRF System Information>, VRF System Type, VRF System Name, ','VRF System Cooling Combination Ratio, VRF System Heating Combination Ratio, ','VRF System Cooling Piping Correction Factor, VRF System Heating Piping Correction Factor')" );
-		static gio::Fmt const Format_991( "(' VRF System Information',6(', ',A))" );
+		static gio::Fmt Format_990( "('! <VRF System Information>, VRF System Type, VRF System Name, ','VRF System Cooling Combination Ratio, VRF System Heating Combination Ratio, ','VRF System Cooling Piping Correction Factor, VRF System Heating Piping Correction Factor')" );
+		static gio::Fmt Format_991( "(' VRF System Information',6(', ',A))" );
 
 		VRFCond = VRFTU( VRFTUNum ).VRFSysNum;
 		IsAutoSize = false;
@@ -3904,7 +3896,7 @@ namespace HVACVariableRefrigerantFlow {
 		EvapCondAirVolFlowRateUser = 0.0;
 		EvapCondPumpPowerDes = 0.0;
 		EvapCondPumpPowerUser = 0.0;
-		
+
 		DataScalableSizingON = false;
 		DataScalableCapSizingON = false;
 		DataFracOfAutosizedCoolingAirflow = 1.0;
@@ -3914,8 +3906,7 @@ namespace HVACVariableRefrigerantFlow {
 
 		if ( MyOneTimeFlag ) {
 			// initialize the environment and sizing flags
-			CheckVRFCombinationRatio.allocate( NumVRFCond );
-			CheckVRFCombinationRatio = true;
+			CheckVRFCombinationRatio.dimension( NumVRFCond, true );
 			MyOneTimeFlag = false;
 		}
 
@@ -3933,18 +3924,18 @@ namespace HVACVariableRefrigerantFlow {
 				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingSAFMethod;
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
 				if ( SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow ) {
-					if ( SAFMethod == SupplyAirFlowRate ){
+					if ( SAFMethod == SupplyAirFlowRate ) {
 						if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						}
 						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
-					} else if ( SAFMethod == FlowPerFloorArea ){
+					} else if ( SAFMethod == FlowPerFloorArea ) {
 						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow * Zone( DataZoneNumber ).FloorArea;
 						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 						DataScalableSizingON = true;
-					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ){
+					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ) {
 						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
 						TempSize = AutoSize;
 						DataScalableSizingON = true;
@@ -3979,18 +3970,18 @@ namespace HVACVariableRefrigerantFlow {
 				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingSAFMethod;
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
 				if ( SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedHeatingAirflow ) {
-					if ( SAFMethod == SupplyAirFlowRate ){
+					if ( SAFMethod == SupplyAirFlowRate ) {
 						if (ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow > 0.0) {
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						}
 						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
-					} else if ( SAFMethod == FlowPerFloorArea ){
+					} else if ( SAFMethod == FlowPerFloorArea ) {
 						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow * Zone( DataZoneNumber ).FloorArea;
 						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 						DataScalableSizingON = true;
-					} else if ( SAFMethod == FractionOfAutosizedHeatingAirflow ){
+					} else if ( SAFMethod == FractionOfAutosizedHeatingAirflow ) {
 						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 						TempSize = AutoSize;
 						DataScalableSizingON = true;
@@ -4025,23 +4016,23 @@ namespace HVACVariableRefrigerantFlow {
 				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).NoCoolHeatSAFMethod;
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
 				if ( ( SAFMethod == SupplyAirFlowRate ) || ( SAFMethod == FlowPerFloorArea ) || ( SAFMethod == FractionOfAutosizedHeatingAirflow ) || ( SAFMethod == FractionOfAutosizedCoolingAirflow ) ) {
-					if ( SAFMethod == SupplyAirFlowRate ){
+					if ( SAFMethod == SupplyAirFlowRate ) {
 						if (ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow > 0.0) {
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
 							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						}
 						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
-					} else if ( SAFMethod == FlowPerFloorArea ){
+					} else if ( SAFMethod == FlowPerFloorArea ) {
 						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow * Zone( DataZoneNumber ).FloorArea;
 						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 						DataScalableSizingON = true;
-					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ){
+					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ) {
 						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
 						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
 						TempSize = AutoSize;
 						DataScalableSizingON = true;
-					} else if ( SAFMethod == FractionOfAutosizedHeatingAirflow ){
+					} else if ( SAFMethod == FractionOfAutosizedHeatingAirflow ) {
 						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
 						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
 						TempSize = AutoSize;
@@ -4060,23 +4051,23 @@ namespace HVACVariableRefrigerantFlow {
 				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).NoCoolHeatSAFMethod;
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod(SizingMethod) = SAFMethod;
 				if ( ( SAFMethod == SupplyAirFlowRate ) || ( SAFMethod == FlowPerFloorArea ) || ( SAFMethod == FractionOfAutosizedHeatingAirflow ) || ( SAFMethod == FractionOfAutosizedCoolingAirflow ) ) {
-					if ( SAFMethod == SupplyAirFlowRate ){
+					if ( SAFMethod == SupplyAirFlowRate ) {
 						if (ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow > 0.0) {
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
 							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						}
 						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
-					} else if ( SAFMethod == FlowPerFloorArea ){
+					} else if ( SAFMethod == FlowPerFloorArea ) {
 						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow * Zone( DataZoneNumber ).FloorArea;
 						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 						DataScalableSizingON = true;
-					} else if  (SAFMethod == FractionOfAutosizedHeatingAirflow ){
+					} else if  (SAFMethod == FractionOfAutosizedHeatingAirflow ) {
 						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
 						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
 						TempSize = AutoSize;
 						DataScalableSizingON = true;
-					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ){
+					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ) {
 						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
 						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
 						TempSize = AutoSize;
@@ -4093,16 +4084,16 @@ namespace HVACVariableRefrigerantFlow {
 				CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingCapMethod;
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
 				if ( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
-					if ( CapSizingMethod == HeatingDesignCapacity ){
+					if ( CapSizingMethod == HeatingDesignCapacity ) {
 						if ( ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity > 0.0 ) {
 							ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
 							ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
 						}
-					} else if (CapSizingMethod == CapacityPerFloorArea){
+					} else if (CapSizingMethod == CapacityPerFloorArea) {
 						ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
 						ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity * Zone( DataZoneNumber ).FloorArea;
 						DataScalableCapSizingON = true;
-					} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ){
+					} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
 						DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
 						DataScalableCapSizingON = true;
 					}
@@ -4113,23 +4104,23 @@ namespace HVACVariableRefrigerantFlow {
 				CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod;
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
 				if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
-					if ( CapSizingMethod == HeatingDesignCapacity ){
+					if ( CapSizingMethod == HeatingDesignCapacity ) {
 						if (ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity > 0.0) {
 							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 						}
-					} else if ( CapSizingMethod == CapacityPerFloorArea ){
+					} else if ( CapSizingMethod == CapacityPerFloorArea ) {
 						ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
 						DataScalableCapSizingON = true;
-					} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
+					} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
 						DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 						DataScalableCapSizingON = true;
 					}
 				}
 			} else {
 				// no scalble sizing method has been specified. Sizing proceeds using the method
-				// specified in the zoneHVAC object 
+				// specified in the zoneHVAC object
 
 				PrintFlag = true;
 
@@ -4696,7 +4687,7 @@ namespace HVACVariableRefrigerantFlow {
 		int const MaxIte( 500 ); // maximum number of iterations
 		Real64 const MinPLF( 0.0 ); // minimum part load factor allowed
 		Real64 const ErrorTol( 0.001 ); // tolerance for RegulaFalsi iterations
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -5974,13 +5965,9 @@ namespace HVACVariableRefrigerantFlow {
 		int MinOutputIndex; // index to TU with lowest load
 		Real64 MinOutput; // used when finding TU "max" capacity limit
 		Real64 RemainingCapacity; // decrement capacity counter to find limiting TU capacity [W]
-		FArray1D< Real64 > Temp; // temporarary array for processing terminal units
-		FArray1D< Real64 > Temp2; // temporarary array for processing terminal units
+		FArray1D< Real64 > Temp( NumTUInList, CapArray ); // temporary array for processing terminal units
+		FArray1D< Real64 > Temp2( NumTUInList, Temp ); // temporary array for processing terminal units
 
-		Temp.allocate( NumTUInList );
-		Temp2.allocate( NumTUInList );
-		Temp = CapArray;
-		Temp2 = Temp;
 		RemainingCapacity = TotalCapacity;
 
 		// sort TU capacity from lowest to highest
@@ -6008,9 +5995,6 @@ namespace HVACVariableRefrigerantFlow {
 				break;
 			}
 		}
-
-		Temp.deallocate();
-		Temp2.deallocate();
 
 	}
 

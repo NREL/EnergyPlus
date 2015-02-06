@@ -230,9 +230,9 @@ namespace HVACManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const EndOfHeaderFormat( "('End of Data Dictionary')" ); // End of data dictionary marker
-		static gio::Fmt const EnvironmentStampFormat( "(a,',',a,3(',',f7.2),',',f7.2)" ); // Format descriptor for environ stamp
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt EndOfHeaderFormat( "('End of Data Dictionary')" ); // End of data dictionary marker
+		static gio::Fmt EnvironmentStampFormat( "(a,',',a,3(',',f7.2),',',f7.2)" ); // Format descriptor for environ stamp
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -260,10 +260,10 @@ namespace HVACManager {
 		bool DummyLogical;
 
 		// Formats
-		static gio::Fmt const Format_10( "('node #   Temp   MassMinAv  MassMaxAv TempSP      MassFlow       MassMin       ','MassMax        MassSP    Press        Enthal     HumRat Fluid Type')" );
-		static gio::Fmt const Format_11( "('node #   Name')" );
-		static gio::Fmt const Format_20( "(1x,I3,1x,F8.2,2(2x,F8.3),2x,F8.2,4(1x,F13.2),2x,F8.0,2x,F11.2,2x,F9.5,2x,A)" );
-		static gio::Fmt const Format_30( "(1x,I3,5x,A)" );
+		static gio::Fmt Format_10( "('node #   Temp   MassMinAv  MassMaxAv TempSP      MassFlow       MassMin       ','MassMax        MassSP    Press        Enthal     HumRat Fluid Type')" );
+		static gio::Fmt Format_11( "('node #   Name')" );
+		static gio::Fmt Format_20( "(1x,I3,1x,F8.2,2(2x,F8.3),2x,F8.2,4(1x,F13.2),2x,F8.0,2x,F11.2,2x,F9.5,2x,A)" );
+		static gio::Fmt Format_30( "(1x,I3,5x,A)" );
 
 		//SYSTEM INITIALIZATION
 		if ( TriggerGetAFN ) {
@@ -836,7 +836,7 @@ namespace HVACManager {
 					ShowContinueError( "The solution for on-site electric generators did not appear to converge" );
 				}
 				if ( ErrCount == 1 && ! DisplayExtraWarnings ) {
-					ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; " "  to show more details on each max iteration exceeded." );
+					ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on each max iteration exceeded." );
 				}
 				if ( DisplayExtraWarnings ) {
 
@@ -2521,13 +2521,13 @@ namespace HVACManager {
 				}
 				if ( ZoneEquipConfig( ControlledZoneNum ).ZonalSystemOnly || CyclingFan ) {
 					if ( Zone( ZoneNum ).RefrigCaseRA ) {
-						ShowWarningError( "For zone=" + Zone( ZoneNum ).Name + " return air cooling by refrigerated cases will be" " applied to the zone air." );
+						ShowWarningError( "For zone=" + Zone( ZoneNum ).Name + " return air cooling by refrigerated cases will be applied to the zone air." );
 						ShowContinueError( "  This zone has no return air or is served by an on/off HVAC system." );
 					}
 					for ( LightNum = 1; LightNum <= TotLights; ++LightNum ) {
 						if ( Lights( LightNum ).ZonePtr != ZoneNum ) continue;
 						if ( Lights( LightNum ).FractionReturnAir > 0.0 ) {
-							ShowWarningError( "For zone=" + Zone( ZoneNum ).Name + " return air heat gain from lights will be" " applied to the zone air." );
+							ShowWarningError( "For zone=" + Zone( ZoneNum ).Name + " return air heat gain from lights will be applied to the zone air." );
 							ShowContinueError( "  This zone has no return air or is served by an on/off HVAC system." );
 							break;
 						}

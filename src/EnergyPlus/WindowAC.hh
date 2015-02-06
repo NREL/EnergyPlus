@@ -138,7 +138,7 @@ namespace WindowAC {
 			FanPartLoadRatio( 0.0 ),
 			CompPartLoadRatio( 0.0 ),
 			AvailStatus( 0 ),
-			ZonePtr( 0 ), 
+			ZonePtr( 0 ),
 			HVACSizingIndex( 0 )
 		{}
 
@@ -267,7 +267,7 @@ namespace WindowAC {
 
 	// Object Data
 	extern FArray1D< WindACData > WindAC;
-	extern FArray1D< WindACNumericFieldData > WindACNumericFields; // holds window AC numeric input fields character field name 
+	extern FArray1D< WindACNumericFieldData > WindACNumericFields; // holds window AC numeric input fields character field name
 
 	// Functions
 

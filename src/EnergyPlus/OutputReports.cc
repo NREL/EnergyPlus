@@ -9,10 +9,12 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <OutputReports.hh>
 #include <DataDaylighting.hh>
 #include <DataErrorTracking.hh>
 #include <DataGlobals.hh>
+#include <DataStringGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataStringGlobals.hh>
@@ -25,7 +27,7 @@
 
 namespace EnergyPlus {
 
-static gio::Fmt const fmtLD( "*" );
+static gio::Fmt fmtLD( "*" );
 
 void
 ReportSurfaces()
@@ -195,9 +197,9 @@ LinesOut( std::string const & option )
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static gio::Fmt const fmt700( "(5(f10.2,','),f10.2)" );
-	static gio::Fmt const fmtA( "(A)" );
-	static gio::Fmt const fmtcoord( "(2X,2(f10.2,','),f10.2,A,A)" );
+	static gio::Fmt fmt700( "(5(f10.2,','),f10.2)" );
+	static gio::Fmt fmtA( "(A)" );
+	static gio::Fmt fmtcoord( "(2X,2(f10.2,','),f10.2,A,A)" );
 	static std::string const vertexstring( "X,Y,Z ==> Vertex" );
 
 	// INTERFACE BLOCK SPECIFICATIONS
@@ -230,9 +232,9 @@ LinesOut( std::string const & option )
 	optiondone = true;
 
 	unit = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, "eplusout.sln", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, DataStringGlobals::outputSlnFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "LinesOut: Could not open file \"eplusout.sln\" for output (write)." );
+		ShowFatalError( "LinesOut: Could not open file "+ DataStringGlobals::outputSlnFileName +" for output (write)." );
 	}
 
 	if ( option != "IDF" ) {
@@ -369,28 +371,28 @@ DXFOut(
 	FArray1D< dTriangle > mytriangles;
 
 	// Formats
-	static gio::Fmt const Format_702( "('  0',/,'SECTION',/,'  2',/,'ENTITIES')" );
-	static gio::Fmt const Format_707( "('999',/,'DXF created from EnergyPlus')" );
-	static gio::Fmt const Format_708( "('999',/,A,A,A)" );
-	static gio::Fmt const Format_800( "('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,' .25',/,'  1',/,'True North',/,' 41',/,' 0.0',/,'  7',/,'MONOTXT',/,'210',/,'0.0',/,'220',/,'0.0',/,'230',/,'1.0')" );
-	static gio::Fmt const Format_801( "('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,' .4',/,'  1',/,A,/,' 41',/,' 0.0',/,'  7',/,'MONOTXT',/,'210',/,'0.0',/,'220',/,'0.0',/,'230',/,'1.0')" );
-	static gio::Fmt const Format_703_0( "('  0',/,'3DFACE',/,'  8',/,'1',/,' 62',/,I3)" );
-	static gio::Fmt const Format_703_1( "(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)" );
-	static gio::Fmt const Format_703_2( "(' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)" );
-	static gio::Fmt const Format_703_3( "(' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)" );
-	static gio::Fmt const Format_703_4( "(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)" );
-	static gio::Fmt const Format_715( "('  0',/,'POLYLINE',/,'  8',/,A,/,' 62',/,I3,/,' 66',/,'  1',/,' 10',/,' 0.0',/,' 20',/,' 0.0',/,' 30',/,f15.5,/,' 70',/,'   9',/,' 40',/,A,/,' 41',/,A)" );
-	static gio::Fmt const Format_716( "('  0',/,'VERTEX',/,'  8',/,A,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)" );
-	static gio::Fmt const Format_717( "('  0',/,'SEQEND',/,'  8',/,A)" );
-	static gio::Fmt const Format_704( "('  0',/,'3DFACE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5,/,' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)" );
-	static gio::Fmt const Format_704_0("('  0',/,'3DFACE',/,'  8',/,A,/,' 62',/,I3)" );
-	static gio::Fmt const Format_704_1("(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)" );
-	static gio::Fmt const Format_704_2("(' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)" );
-	static gio::Fmt const Format_704_3("(' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)" );
-	static gio::Fmt const Format_705( "(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)" );
-	static gio::Fmt const Format_706( "('  0',/,'ENDSEC',/,'  0',/,'EOF')" );
-	static gio::Fmt const Format_709( "('  0',/,'CIRCLE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,f15.5)" );
-	static gio::Fmt const Format_710( "('999',/,A)" );
+	static gio::Fmt Format_702( "('  0',/,'SECTION',/,'  2',/,'ENTITIES')" );
+	static gio::Fmt Format_707( "('999',/,'DXF created from EnergyPlus')" );
+	static gio::Fmt Format_708( "('999',/,A,A,A)" );
+	static gio::Fmt Format_800( "('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,' .25',/,'  1',/,'True North',/,' 41',/,' 0.0',/,'  7',/,'MONOTXT',/,'210',/,'0.0',/,'220',/,'0.0',/,'230',/,'1.0')" );
+	static gio::Fmt Format_801( "('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,' .4',/,'  1',/,A,/,' 41',/,' 0.0',/,'  7',/,'MONOTXT',/,'210',/,'0.0',/,'220',/,'0.0',/,'230',/,'1.0')" );
+	static gio::Fmt Format_703_0( "('  0',/,'3DFACE',/,'  8',/,'1',/,' 62',/,I3)" );
+	static gio::Fmt Format_703_1( "(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)" );
+	static gio::Fmt Format_703_2( "(' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)" );
+	static gio::Fmt Format_703_3( "(' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)" );
+	static gio::Fmt Format_703_4( "(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)" );
+	static gio::Fmt Format_715( "('  0',/,'POLYLINE',/,'  8',/,A,/,' 62',/,I3,/,' 66',/,'  1',/,' 10',/,' 0.0',/,' 20',/,' 0.0',/,' 30',/,f15.5,/,' 70',/,'   9',/,' 40',/,A,/,' 41',/,A)" );
+	static gio::Fmt Format_716( "('  0',/,'VERTEX',/,'  8',/,A,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)" );
+	static gio::Fmt Format_717( "('  0',/,'SEQEND',/,'  8',/,A)" );
+	static gio::Fmt Format_704( "('  0',/,'3DFACE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5,/,' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)" );
+	static gio::Fmt Format_704_0("('  0',/,'3DFACE',/,'  8',/,A,/,' 62',/,I3)" );
+	static gio::Fmt Format_704_1("(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)" );
+	static gio::Fmt Format_704_2("(' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)" );
+	static gio::Fmt Format_704_3("(' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)" );
+	static gio::Fmt Format_705( "(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)" );
+	static gio::Fmt Format_706( "('  0',/,'ENDSEC',/,'  0',/,'EOF')" );
+	static gio::Fmt Format_709( "('  0',/,'CIRCLE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,f15.5)" );
+	static gio::Fmt Format_710( "('999',/,A)" );
 
 	if ( PolygonAction == "TRIANGULATE3DFACE" || PolygonAction == "TRIANGULATE" || PolygonAction == "" ) {
 		TriangulateFace = true;
@@ -420,9 +422,9 @@ DXFOut(
 	}
 
 	unit = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, "eplusout.dxf", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, DataStringGlobals::outputDxfFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "DXFOut: Could not open file \"eplusout.dxf\" for output (write)." );
+		ShowFatalError( "DXFOut: Could not open file "+DataStringGlobals::outputDxfFileName+" for output (write)." );
 	}
 
 	gio::write( unit, Format_702 ); // Start of Entities section
@@ -889,23 +891,23 @@ DXFOutLines( std::string const & ColorScheme )
 	int write_stat;
 
 	// Formats
-	static gio::Fmt const Format_702( "('  0',/,'SECTION',/,'  2',/,'ENTITIES')" );
-	static gio::Fmt const Format_707( "('999',/,'DXF created from EnergyPlus')" );
-	static gio::Fmt const Format_708( "('999',/,A,A,A)" );
-	static gio::Fmt const Format_800( "('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,' .25',/,'  1',/,'True North',/,' 41',/,' 0.0',/,'  7',/,'MONOTXT',/,'210',/,'0.0',/,'220',/,'0.0',/,'230',/,'1.0')" );
-	static gio::Fmt const Format_801( "('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,' .4',/,'  1',/,A,/,' 41',/,' 0.0',/,'  7',/,'MONOTXT',/,'210',/,'0.0',/,'220',/,'0.0',/,'230',/,'1.0')" );
-	static gio::Fmt const Format_703_0( "('  0',/,'3DFACE',/,'  8',/,'1',/,' 62',/,I3)" );
-	static gio::Fmt const Format_703_1( "(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)" );
-	static gio::Fmt const Format_703_2( "(' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)" );
-	static gio::Fmt const Format_703_3( "(' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)" );
-	static gio::Fmt const Format_703_4( "(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)" );
-	static gio::Fmt const Format_704( "('  0',/,'3DFACE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5,/,' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)" );
-	static gio::Fmt const Format_705( "(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)" );
-	static gio::Fmt const Format_711( "('  0',/,'LINE',/,'  8',/,A,/,' 62',/,I3)" );
-	static gio::Fmt const Format_712( "(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)" );
-	static gio::Fmt const Format_706( "('  0',/,'ENDSEC',/,'  0',/,'EOF')" );
-	static gio::Fmt const Format_709( "('  0',/,'CIRCLE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,f15.5)" );
-	static gio::Fmt const Format_710( "('999',/,A)" );
+	static gio::Fmt Format_702( "('  0',/,'SECTION',/,'  2',/,'ENTITIES')" );
+	static gio::Fmt Format_707( "('999',/,'DXF created from EnergyPlus')" );
+	static gio::Fmt Format_708( "('999',/,A,A,A)" );
+	static gio::Fmt Format_800( "('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,' .25',/,'  1',/,'True North',/,' 41',/,' 0.0',/,'  7',/,'MONOTXT',/,'210',/,'0.0',/,'220',/,'0.0',/,'230',/,'1.0')" );
+	static gio::Fmt Format_801( "('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,' .4',/,'  1',/,A,/,' 41',/,' 0.0',/,'  7',/,'MONOTXT',/,'210',/,'0.0',/,'220',/,'0.0',/,'230',/,'1.0')" );
+	static gio::Fmt Format_703_0( "('  0',/,'3DFACE',/,'  8',/,'1',/,' 62',/,I3)" );
+	static gio::Fmt Format_703_1( "(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)" );
+	static gio::Fmt Format_703_2( "(' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)" );
+	static gio::Fmt Format_703_3( "(' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)" );
+	static gio::Fmt Format_703_4( "(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)" );
+	static gio::Fmt Format_704( "('  0',/,'3DFACE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5,/,' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)" );
+	static gio::Fmt Format_705( "(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)" );
+	static gio::Fmt Format_711( "('  0',/,'LINE',/,'  8',/,A,/,' 62',/,I3)" );
+	static gio::Fmt Format_712( "(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)" );
+	static gio::Fmt Format_706( "('  0',/,'ENDSEC',/,'  0',/,'EOF')" );
+	static gio::Fmt Format_709( "('  0',/,'CIRCLE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,f15.5)" );
+	static gio::Fmt Format_710( "('999',/,A)" );
 
 	if ( TotSurfaces > 0 && ! allocated( Surface ) ) {
 		// no error needed, probably in end processing, just return
@@ -913,9 +915,9 @@ DXFOutLines( std::string const & ColorScheme )
 	}
 
 	unit = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, "eplusout.dxf", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, DataStringGlobals::outputDxfFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "DXFOutLines: Could not open file \"eplusout.dxf\" for output (write)." );
+		ShowFatalError( "DXFOutLines: Could not open file "+DataStringGlobals::outputDxfFileName+" for output (write)." );
 	}
 
 	gio::write( unit, Format_702 ); // Start of Entities section
@@ -924,7 +926,7 @@ DXFOutLines( std::string const & ColorScheme )
 
 	gio::write( unit, Format_708 ) << "Program Version" << "," << VerString;
 
-	gio::write( unit, Format_708 ) << "DXF using Lines" << " " << " ";
+	gio::write( unit, Format_708 ) << "DXF using Lines" << ' ' << ' ';
 
 	if ( ColorScheme == "" ) {
 		gio::write( unit, Format_708 ) << "Color Scheme" << "," << "Default";
@@ -1315,24 +1317,24 @@ DXFOutWireFrame( std::string const & ColorScheme )
 	int write_stat;
 
 	// Formats
-	static gio::Fmt const Format_702( "('  0',/,'SECTION',/,'  2',/,'ENTITIES')" );
-	static gio::Fmt const Format_707( "('999',/,'DXF created from EnergyPlus')" );
-	static gio::Fmt const Format_708( "('999',/,A,A,A)" );
-	static gio::Fmt const Format_800( "('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,' .25',/,'  1',/,'True North',/,' 41',/,' 0.0',/,'  7',/,'MONOTXT',/,'210',/,'0.0',/,'220',/,'0.0',/,'230',/,'1.0')" );
-	static gio::Fmt const Format_801( "('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,' .4',/,'  1',/,A,/,' 41',/,' 0.0',/,'  7',/,'MONOTXT',/,'210',/,'0.0',/,'220',/,'0.0',/,'230',/,'1.0')" );
-	static gio::Fmt const Format_703_0( "('  0',/,'3DFACE',/,'  8',/,'1',/,' 62',/,I3)" );
-	static gio::Fmt const Format_703_1( "(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)" );
-	static gio::Fmt const Format_703_2( "(' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)" );
-	static gio::Fmt const Format_703_3( "(' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)" );
-	static gio::Fmt const Format_703_4( "(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)" );
-	static gio::Fmt const Format_715( "('  0',/,'POLYLINE',/,'  8',/,A,/,' 62',/,I3,/,' 66',/,'  1',/,' 10',/,' 0.0',/,' 20',/,' 0.0',/,' 30',/,f15.5,/,' 70',/,'   9',/,' 40',/,A,/,' 41',/,A)" );
-	static gio::Fmt const Format_716( "('  0',/,'VERTEX',/,'  8',/,A,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)" );
-	static gio::Fmt const Format_717( "('  0',/,'SEQEND',/,'  8',/,A)" );
-	static gio::Fmt const Format_704( "('  0',/,'3DFACE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5,/,' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)" );
-	static gio::Fmt const Format_705( "(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)" );
-	static gio::Fmt const Format_706( "('  0',/,'ENDSEC',/,'  0',/,'EOF')" );
-	static gio::Fmt const Format_709( "('  0',/,'CIRCLE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,f15.5)" );
-	static gio::Fmt const Format_710( "('999',/,A)" );
+	static gio::Fmt Format_702( "('  0',/,'SECTION',/,'  2',/,'ENTITIES')" );
+	static gio::Fmt Format_707( "('999',/,'DXF created from EnergyPlus')" );
+	static gio::Fmt Format_708( "('999',/,A,A,A)" );
+	static gio::Fmt Format_800( "('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,' .25',/,'  1',/,'True North',/,' 41',/,' 0.0',/,'  7',/,'MONOTXT',/,'210',/,'0.0',/,'220',/,'0.0',/,'230',/,'1.0')" );
+	static gio::Fmt Format_801( "('  0',/,'TEXT',/,'  8',/,'1',/,'  6',/,'Continuous',/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,' .4',/,'  1',/,A,/,' 41',/,' 0.0',/,'  7',/,'MONOTXT',/,'210',/,'0.0',/,'220',/,'0.0',/,'230',/,'1.0')" );
+	static gio::Fmt Format_703_0( "('  0',/,'3DFACE',/,'  8',/,'1',/,' 62',/,I3)" );
+	static gio::Fmt Format_703_1( "(' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)" );
+	static gio::Fmt Format_703_2( "(' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5)" );
+	static gio::Fmt Format_703_3( "(' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)" );
+	static gio::Fmt Format_703_4( "(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)" );
+	static gio::Fmt Format_715( "('  0',/,'POLYLINE',/,'  8',/,A,/,' 62',/,I3,/,' 66',/,'  1',/,' 10',/,' 0.0',/,' 20',/,' 0.0',/,' 30',/,f15.5,/,' 70',/,'   9',/,' 40',/,A,/,' 41',/,A)" );
+	static gio::Fmt Format_716( "('  0',/,'VERTEX',/,'  8',/,A,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5)" );
+	static gio::Fmt Format_717( "('  0',/,'SEQEND',/,'  8',/,A)" );
+	static gio::Fmt Format_704( "('  0',/,'3DFACE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 11',/,f15.5,/,' 21',/,f15.5,/,' 31',/,f15.5,/,' 12',/,f15.5,/,' 22',/,f15.5,/,' 32',/,f15.5)" );
+	static gio::Fmt Format_705( "(' 13',/,f15.5,/,' 23',/,f15.5,/,' 33',/,f15.5)" );
+	static gio::Fmt Format_706( "('  0',/,'ENDSEC',/,'  0',/,'EOF')" );
+	static gio::Fmt Format_709( "('  0',/,'CIRCLE',/,'  8',/,A,/,' 62',/,I3,/,' 10',/,f15.5,/,' 20',/,f15.5,/,' 30',/,f15.5,/,' 40',/,f15.5)" );
+	static gio::Fmt Format_710( "('999',/,A)" );
 
 	if ( TotSurfaces > 0 && ! allocated( Surface ) ) {
 		// no error needed, probably in end processing, just return
@@ -1340,9 +1342,9 @@ DXFOutWireFrame( std::string const & ColorScheme )
 	}
 
 	unit = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, "eplusout.dxf", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, DataStringGlobals::outputDxfFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "DXFOutWireFrame: Could not open file \"eplusout.dxf\" for output (write)." );
+		ShowFatalError( "DXFOutWireFrame: Could not open file "+DataStringGlobals::outputDxfFileName+" for output (write)." );
 	}
 
 	gio::write( unit, Format_702 ); // Start of Entities section
@@ -1351,7 +1353,7 @@ DXFOutWireFrame( std::string const & ColorScheme )
 
 	gio::write( unit, Format_708 ) << "Program Version" << "," << VerString;
 
-	gio::write( unit, Format_708 ) << "DXF using Wireframe" << " " << " ";
+	gio::write( unit, Format_708 ) << "DXF using Wireframe" << ' ' << ' ';
 
 	if ( ColorScheme == "" ) {
 		gio::write( unit, Format_708 ) << "Color Scheme" << "," << "Default";
@@ -1695,27 +1697,27 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 	bool isWithConvCoefValid;
 
 	// Formats
-	static gio::Fmt const Format_700( "('! <Zone/Shading Surfaces>,<Zone Name>/#Shading Surfaces,# Surfaces')" );
-	static gio::Fmt const Format_701( "('! <HeatTransfer/Shading/Frame/Divider_Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')" );
-	static gio::Fmt const Format_7011( "(',Construction/Transmittance Schedule,Nominal U (w/o film coefs)/Min Schedule Value,','Nominal U (with film coefs)/Max Schedule Value,Solar Diffusing,','Area (Net),Area (Gross),Area (Sunlit Calc),Azimuth,Tilt,~Width,~Height,Reveal,','<ExtBoundCondition>,<ExtConvCoeffCalc>,<IntConvCoeffCalc>,<SunExposure>,<WindExposure>,','ViewFactorToGround,ViewFactorToSky,ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides')" );
-	static gio::Fmt const Format_7012( "(',#Sides')" );
-	static gio::Fmt const Format_702( "('! <Units>,,,,')" );
-	static gio::Fmt const Format_7021( "(',{W/m2-K}/{},{W/m2-K}/{},{},{m2},{m2},{m2},{deg},{deg},{m},{m},{m},,,,,,,,,,')" );
-	static gio::Fmt const Format_7022( "(',')" );
-	static gio::Fmt const Format_703( "(A,',',A,',',I5)" );
-	static gio::Fmt const Format_704( "(A,'_Surface,',A,',',A,',',A,',',A)" );
-	static gio::Fmt const Format_7041( "(',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',2(A,','),A)" );
-	static gio::Fmt const Format_7042( "(',',A)" );
-	static gio::Fmt const Format_7044( "(',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',2(A,','))" );
-	static gio::Fmt const Format_7045( "(',,,,,',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-	static gio::Fmt const Format_705( "(',',A)" );
-	static gio::Fmt const Format_706( "(4(',',A),',',A)" );
-	static gio::Fmt const Format_7061( "(',,,,,,,,,,',A)" );
-	static gio::Fmt const Format_707( "(',{Vertex 1},,,{Vertex 2},,,{Vertex 3},,,{Vertex 4},,,{etc}')" );
-	static gio::Fmt const Format_708( "(4(',X {m},Y {m},Z {m}'))" );
-	static gio::Fmt const Format_709( "(3(',',A))" );
-	static gio::Fmt const Format_710( "(', Vertices are shown starting at Upper-Left-Corner => Counter-Clockwise => World Coordinates')" );
-	static gio::Fmt const Format_711( "(1X)" );
+	static gio::Fmt Format_700( "('! <Zone/Shading Surfaces>,<Zone Name>/#Shading Surfaces,# Surfaces')" );
+	static gio::Fmt Format_701( "('! <HeatTransfer/Shading/Frame/Divider_Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm')" );
+	static gio::Fmt Format_7011( "(',Construction/Transmittance Schedule,Nominal U (w/o film coefs)/Min Schedule Value,','Nominal U (with film coefs)/Max Schedule Value,Solar Diffusing,','Area (Net),Area (Gross),Area (Sunlit Calc),Azimuth,Tilt,~Width,~Height,Reveal,','<ExtBoundCondition>,<ExtConvCoeffCalc>,<IntConvCoeffCalc>,<SunExposure>,<WindExposure>,','ViewFactorToGround,ViewFactorToSky,ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides')" );
+	static gio::Fmt Format_7012( "(',#Sides')" );
+	static gio::Fmt Format_702( "('! <Units>,,,,')" );
+	static gio::Fmt Format_7021( "(',{W/m2-K}/{},{W/m2-K}/{},{},{m2},{m2},{m2},{deg},{deg},{m},{m},{m},,,,,,,,,,')" );
+	static gio::Fmt Format_7022( "(',')" );
+	static gio::Fmt Format_703( "(A,',',A,',',I5)" );
+	static gio::Fmt Format_704( "(A,'_Surface,',A,',',A,',',A,',',A)" );
+	static gio::Fmt Format_7041( "(',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',2(A,','),A)" );
+	static gio::Fmt Format_7042( "(',',A)" );
+	static gio::Fmt Format_7044( "(',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',2(A,','))" );
+	static gio::Fmt Format_7045( "(',,,,,',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+	static gio::Fmt Format_705( "(',',A)" );
+	static gio::Fmt Format_706( "(4(',',A),',',A)" );
+	static gio::Fmt Format_7061( "(',,,,,,,,,,',A)" );
+	static gio::Fmt Format_707( "(',{Vertex 1},,,{Vertex 2},,,{Vertex 3},,,{Vertex 4},,,{etc}')" );
+	static gio::Fmt Format_708( "(4(',X {m},Y {m},Z {m}'))" );
+	static gio::Fmt Format_709( "(3(',',A))" );
+	static gio::Fmt Format_710( "(', Vertices are shown starting at Upper-Left-Corner => Counter-Clockwise => World Coordinates')" );
+	static gio::Fmt Format_711( "(1X)" );
 
 	if ( TotSurfaces > 0 && ! allocated( Surface ) ) {
 		// no error needed, probably in end processing, just return
@@ -1770,7 +1772,7 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 					cSchedMin = "0.0";
 					cSchedMax = "0.0";
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7044, flags ) << ScheduleName << cSchedMin << cSchedMax << " " << RoundSigDigits( Surface( surf ).Area, 2 ) << RoundSigDigits( Surface( surf ).GrossArea, 2 ) << RoundSigDigits( Surface( surf ).NetAreaShadowCalc, 2 ) << RoundSigDigits( Surface( surf ).Azimuth, 2 ) << RoundSigDigits( Surface( surf ).Tilt, 2 ) << RoundSigDigits( Surface( surf ).Width, 2 ) << RoundSigDigits( Surface( surf ).Height, 2 ); }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7044, flags ) << ScheduleName << cSchedMin << cSchedMax << ' ' << RoundSigDigits( Surface( surf ).Area, 2 ) << RoundSigDigits( Surface( surf ).GrossArea, 2 ) << RoundSigDigits( Surface( surf ).NetAreaShadowCalc, 2 ) << RoundSigDigits( Surface( surf ).Azimuth, 2 ) << RoundSigDigits( Surface( surf ).Tilt, 2 ) << RoundSigDigits( Surface( surf ).Width, 2 ) << RoundSigDigits( Surface( surf ).Height, 2 ); }
 				gio::write( unit, Format_7061 ) << TrimSigDigits( Surface( surf ).Sides );
 			} else if ( RptType == 1 ) {
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7042, flags ) << TrimSigDigits( Surface( surf ).Sides ); }
@@ -1784,7 +1786,7 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 					cSchedMin = "0.0";
 					cSchedMax = "0.0";
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7044, flags ) << ScheduleName << cSchedMin << cSchedMax << " " << RoundSigDigits( Surface( surf ).Area, 2 ) << RoundSigDigits( Surface( surf ).GrossArea, 2 ) << RoundSigDigits( Surface( surf ).NetAreaShadowCalc, 2 ) << RoundSigDigits( Surface( surf ).Azimuth, 2 ) << RoundSigDigits( Surface( surf ).Tilt, 2 ) << RoundSigDigits( Surface( surf ).Width, 2 ) << RoundSigDigits( Surface( surf ).Height, 2 ); }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7044, flags ) << ScheduleName << cSchedMin << cSchedMax << ' ' << RoundSigDigits( Surface( surf ).Area, 2 ) << RoundSigDigits( Surface( surf ).GrossArea, 2 ) << RoundSigDigits( Surface( surf ).NetAreaShadowCalc, 2 ) << RoundSigDigits( Surface( surf ).Azimuth, 2 ) << RoundSigDigits( Surface( surf ).Tilt, 2 ) << RoundSigDigits( Surface( surf ).Width, 2 ) << RoundSigDigits( Surface( surf ).Height, 2 ); }
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_7061, flags ) << TrimSigDigits( Surface( surf ).Sides ); }
 			}
 			if ( RptType == 10 ) continue;
@@ -2091,7 +2093,7 @@ CostInfoOut()
 	int write_stat;
 
 	// Formats
-	static gio::Fmt const Format_801( "(I5,',',A,',',A,',',A,',',f14.5,',',f14.5)" );
+	static gio::Fmt Format_801( "(I5,',',A,',',A,',',A,',',f14.5,',',f14.5)" );
 
 	if ( TotSurfaces > 0 && ! allocated( Surface ) ) {
 		// no error needed, probably in end processing, just return
@@ -2099,8 +2101,7 @@ CostInfoOut()
 	}
 
 	// need to determine unique surfacs... some surfaces are shared by zones and hence doubled
-	uniqueSurf.allocate( TotSurfaces );
-	uniqueSurf = true;
+	uniqueSurf.dimension( TotSurfaces, true );
 
 	for ( surf = 1; surf <= TotSurfaces; ++surf ) {
 		if ( Surface( surf ).ExtBoundCond > 0 ) {
@@ -2116,9 +2117,9 @@ CostInfoOut()
 
 	unit = GetNewUnitNumber();
 	// .sci = surface cost info
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, "eplusout.sci", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, DataStringGlobals::outputSciFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "CostInfoOut: Could not open file \"eplusout.sci\" for output (write)." );
+		ShowFatalError( "CostInfoOut: Could not open file "+DataStringGlobals::outputSciFileName+" for output (write)." );
 	}
 	gio::write( unit, fmtLD ) << TotSurfaces << int( count( uniqueSurf ) );
 	gio::write( unit, fmtLD ) << "data for surfaces useful for cost information";
@@ -2216,15 +2217,15 @@ VRMLOut(
 	FArray1D< dTriangle > mytriangles;
 
 	// Formats
-	static gio::Fmt const Format_702( "('#VRML V2.0 utf8')" );
-	static gio::Fmt const Format_707( "('WorldInfo {',/,3X,'title \"Building - ',A,'\"',/,3X,'info [\"EnergyPlus Program Version ',A,'\"]',/,3X,'info [\"Surface Color Scheme ',A,'\"]',/,'}')" );
-	static gio::Fmt const Format_800( "('Shape {',/,'appearance DEF ',A,' Appearance {',/,'material Material { diffuseColor ',A,' }',/,'}',/,'}')" );
-	static gio::Fmt const Format_801( "('Shape {',/,'appearance USE ',A,/,'geometry IndexedFaceSet {',/,'solid TRUE',/,'coord DEF ',A,' Coordinate {',/,'point [')" );
-	static gio::Fmt const Format_802( "(F15.5,1X,F15.5,1X,F15.5,',')" );
-	static gio::Fmt const Format_803( "(']',/,'}',/,'coordIndex [')" );
-	static gio::Fmt const Format_804( "(A)" );
-	static gio::Fmt const Format_805( "(']',/,'ccw TRUE',/,'solid TRUE',/,'}',/,'}')" );
-	static gio::Fmt const Format_710( "(A)" );
+	static gio::Fmt Format_702( "('#VRML V2.0 utf8')" );
+	static gio::Fmt Format_707( "('WorldInfo {',/,3X,'title \"Building - ',A,'\"',/,3X,'info [\"EnergyPlus Program Version ',A,'\"]',/,3X,'info [\"Surface Color Scheme ',A,'\"]',/,'}')" );
+	static gio::Fmt Format_800( "('Shape {',/,'appearance DEF ',A,' Appearance {',/,'material Material { diffuseColor ',A,' }',/,'}',/,'}')" );
+	static gio::Fmt Format_801( "('Shape {',/,'appearance USE ',A,/,'geometry IndexedFaceSet {',/,'solid TRUE',/,'coord DEF ',A,' Coordinate {',/,'point [')" );
+	static gio::Fmt Format_802( "(F15.5,1X,F15.5,1X,F15.5,',')" );
+	static gio::Fmt Format_803( "(']',/,'}',/,'coordIndex [')" );
+	static gio::Fmt Format_804( "(A)" );
+	static gio::Fmt Format_805( "(']',/,'ccw TRUE',/,'solid TRUE',/,'}',/,'}')" );
+	static gio::Fmt Format_710( "(A)" );
 
 	if ( PolygonAction == "TRIANGULATE3DFACE" || PolygonAction == "TRIANGULATE" ) {
 		TriangulateFace = true;
@@ -2245,9 +2246,9 @@ VRMLOut(
 	}
 
 	unit = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, "eplusout.wrl", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, DataStringGlobals::outputWrlFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "VRMLOut: Could not open file \"eplusout.wrl\" for output (write)." );
+		ShowFatalError( "VRMLOut: Could not open file "+ DataStringGlobals::outputWrlFileName +" for output (write)." );
 	}
 
 	gio::write( unit, Format_702 ); // Beginning
@@ -2314,7 +2315,7 @@ VRMLOut(
 			for ( vert = 1; vert <= Surface( surf ).Sides; ++vert ) {
 				gio::write( csidenumber, fmtLD ) << vert - 1;
 				strip( csidenumber );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 				if ( vert == Surface( surf ).Sides ) gio::write( unit, Format_804 ) << " -1";
 			}
 			gio::write( unit, Format_805 );
@@ -2324,15 +2325,15 @@ VRMLOut(
 				vv0 = mytriangles( svert ).vv0;
 				gio::write( csidenumber, fmtLD ) << vv0 - 1;
 				strip( csidenumber );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 				vv1 = mytriangles( svert ).vv1;
 				gio::write( csidenumber, fmtLD ) << vv1 - 1;
 				strip( csidenumber );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 				vv2 = mytriangles( svert ).vv2;
 				gio::write( csidenumber, fmtLD ) << vv2 - 1;
 				strip( csidenumber );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 				gio::write( unit, Format_804 ) << " -1";
 			}
 			gio::write( unit, Format_805 );
@@ -2373,7 +2374,7 @@ VRMLOut(
 				for ( vert = 1; vert <= Surface( surf ).Sides; ++vert ) {
 					gio::write( csidenumber, fmtLD ) << vert - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					if ( vert == Surface( surf ).Sides ) gio::write( unit, Format_804 ) << " -1";
 				}
 				gio::write( unit, Format_805 );
@@ -2383,15 +2384,15 @@ VRMLOut(
 					vv0 = mytriangles( svert ).vv0;
 					gio::write( csidenumber, fmtLD ) << vv0 - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					vv1 = mytriangles( svert ).vv1;
 					gio::write( csidenumber, fmtLD ) << vv1 - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					vv2 = mytriangles( svert ).vv2;
 					gio::write( csidenumber, fmtLD ) << vv2 - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					gio::write( unit, Format_804 ) << " -1";
 				}
 				gio::write( unit, Format_805 );
@@ -2415,7 +2416,7 @@ VRMLOut(
 				for ( vert = 1; vert <= Surface( surf ).Sides; ++vert ) {
 					gio::write( csidenumber, fmtLD ) << vert - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					if ( vert == Surface( surf ).Sides ) gio::write( unit, Format_804 ) << " -1";
 				}
 				gio::write( unit, Format_805 );
@@ -2425,15 +2426,15 @@ VRMLOut(
 					vv0 = mytriangles( svert ).vv0;
 					gio::write( csidenumber, fmtLD ) << vv0 - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					vv1 = mytriangles( svert ).vv1;
 					gio::write( csidenumber, fmtLD ) << vv1 - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					vv2 = mytriangles( svert ).vv2;
 					gio::write( csidenumber, fmtLD ) << vv2 - 1;
 					strip( csidenumber );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << " " + csidenumber; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_804, flags ) << ' ' + csidenumber; }
 					gio::write( unit, Format_804 ) << " -1";
 				}
 				gio::write( unit, Format_805 );

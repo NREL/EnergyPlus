@@ -27,6 +27,10 @@ is_fstream( std::ostream const & stream );
 std::istream &
 cross_platform_get_line( std::istream & stream, std::string & line );
 
+// Read a Line from a Text Input Stream with an Extra Delimiter: Cross-Platform: Linux (\n) or Windows (\r\n)
+std::istream &
+cross_platform_get_line( std::istream & stream, std::string & line, char const delim );
+
 // Auto-Detected Line Terminator from a Text Input Stream: Cross-Platform: Linux (\n) or Windows (\r\n)
 std::string
 line_terminator( std::istream & stream );

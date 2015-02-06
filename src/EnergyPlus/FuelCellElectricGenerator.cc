@@ -275,8 +275,7 @@ namespace FuelCellElectricGenerator {
 
 			//ALLOCATE ARRAYS
 			FuelCell.allocate( NumFuelCellGenerators ); // inits handeled in derived type definitions
-			CheckEquipName.allocate( NumFuelCellGenerators );
-			CheckEquipName = true;
+			CheckEquipName.dimension( NumFuelCellGenerators, true );
 
 			// first load in FuelCell names
 			for ( GeneratorNum = 1; GeneratorNum <= NumFuelCellGenerators; ++GeneratorNum ) {
@@ -1624,7 +1623,7 @@ namespace FuelCellElectricGenerator {
 
 			}
 			if ( SolverFlag == -1 ) {
-				ShowWarningError( "CalcFuelCellGeneratorModel: " "Regula falsi problem, flag = -1, check accuracy and iterations, did not converge" );
+				ShowWarningError( "CalcFuelCellGeneratorModel: Regula falsi problem, flag = -1, check accuracy and iterations, did not converge" );
 
 			}
 			if ( SolverFlag > 0 ) {
