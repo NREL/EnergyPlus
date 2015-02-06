@@ -5449,7 +5449,7 @@ namespace DXCoils {
 				}
 
 //				// Sizing resistive defrost heater capacity
-				if ( DXCoil( DXCoilNum ).DXCoilType_Num != CoilVRF_Heating ) {
+				if ( DXCoil( DXCoilNum ).DXCoilType_Num != CoilVRF_Heating && DXCoil( DXCoilNum ).DXCoilType_Num != CoilDX_MultiSpeedHeating) {
 					//IF (DXCoil(DXCoilNum)%DXCoilType_Num == CoilDX_MultiSpeedHeating .OR. &
 					//    DXCoil(DXCoilNum)%DXCoilType_Num == Coil_HeatingAirToAirVariableSpeed) THEN
 					if ( DXCoil( DXCoilNum ).DefrostStrategy == Resistive ) {
