@@ -62197,13 +62197,13 @@ GroundHeatExchanger:Slinky,
         \units m
         \minimum> 0
         \ip-units in
-        \default 0.03340        
-   N9 , \field Pipe Inner Diameter
+        \default 0.02667        
+   N9 , \field Pipe Thickness
         \type real
         \units m
         \minimum> 0
         \ip-units in
-        \default 0.02697
+        \default 0.002413
    A4 , \field Heat Exchanger Configuration
         \note This is the orientation of the heat exchanger
         \type choice

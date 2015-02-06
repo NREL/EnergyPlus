@@ -177,25 +177,37 @@ namespace GroundHeatExchangers {
 	struct GLHESlinky:GLHEBase
 	{
 		// Members
-		bool VerticalHX;		// Vertical HX Configuration Flag
-		bool HorizontalHX;		// Horizontal HX Configuration Flag
-		Real64 CoilDiameter;	// Diameter of the slinky coils [m]
-		Real64 CoilPitch;		// Center-to-center slinky coil spacing [m]
-		Real64 TrenchDepth;		// Trench depth from ground surface to trench bottom [m]
-		Real64 TrenchLength;	// Length of single trench [m]
-		int NumTrenches;		// Number of parallel trenches [m]
-		Real64 TrenchSpacing;	// Spacing between parallel trenches [m]
+		bool verticalConfig;	// HX Configuration Flag
+		Real64 coilDiameter;	// Diameter of the slinky coils [m]
+		Real64 coilPitch;		// Center-to-center slinky coil spacing [m]
+		Real64 trenchDepth;		// Trench depth from ground surface to trench bottom [m]
+		Real64 trenchLength;	// Length of single trench [m]
+		int numTrenches;		// Number of parallel trenches [m]
+		Real64 trenchSpacing;	// Spacing between parallel trenches [m]
+		int numCoils;			// Number of coils
+		bool useGroundTempDataForKusuda; // Use Ground Temp Data Flag
+		Real64 averageGroundTemp;
+		Real64 averageGroundTempAmplitude;
+		Real64 phaseShiftOfMinGroundTempDays;
+		int monthOfMinSurfTemp;
+		Real64 minSurfTemp;
 
 		// Default Constructor
 		GLHESlinky() :
-			VerticalHX( false ),
-			HorizontalHX( false ),
-			CoilDiameter( 0.0 ),
-			CoilPitch( 0.0 ),
-			TrenchDepth( 0.0 ),
-			TrenchLength( 0.0 ),
-			NumTrenches( 0 ),
-			TrenchSpacing( 0.0 )
+			verticalConfig( false ),
+			coilDiameter( 0.0 ),
+			coilPitch( 0.0 ),
+			trenchDepth( 0.0 ),
+			trenchLength( 0.0 ),
+			numTrenches( 0 ),
+			trenchSpacing( 0.0 ),
+			numCoils( 0 ),
+			useGroundTempDataForKusuda( false ),
+			averageGroundTemp( 0.0 ),
+			averageGroundTempAmplitude( 0.0 ),
+			phaseShiftOfMinGroundTempDays( 0.0 ),
+			monthOfMinSurfTemp( 0 ),
+			minSurfTemp( 0.0 )
 
 		{}
 
@@ -217,7 +229,7 @@ namespace GroundHeatExchangers {
 
 	// Object Data
 	extern FArray1D< GLHEVert > verticalGLHE; // Vertical GLHEs
-	//extern FArray1D< GLHESlinky > slinkyGLHE; // Slinky GLHEs
+	extern FArray1D< GLHESlinky > slinkyGLHE; // Slinky GLHEs
 
 	// Functions
 
