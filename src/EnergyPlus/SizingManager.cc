@@ -781,17 +781,17 @@ namespace SizingManager {
 
 	void
 	ProcessInputOARequirements(
-	std::string const & CurrentModuleObject,
-	int const OAIndex,
-	FArray1_string const & Alphas,
-	int & NumAlphas,
-	FArray1< Real64 > const & Numbers,
-	int & NumNumbers,
-	FArray1_bool const & lNumericBlanks, //Unused
-	FArray1_bool const & lAlphaBlanks,
-	FArray1_string const & cAlphaFields,
-	FArray1_string const & cNumericFields, //Unused
-	bool & ErrorsFound // If errors found in input
+		std::string const & CurrentModuleObject,
+		int const OAIndex,
+		FArray1_string const & Alphas,
+		int & NumAlphas,
+		FArray1< Real64 > const & Numbers,
+		int & NumNumbers,
+		FArray1_bool const & lNumericBlanks, //Unused
+		FArray1_bool const & lAlphaBlanks,
+		FArray1_string const & cAlphaFields,
+		FArray1_string const & cNumericFields, //Unused
+		bool & ErrorsFound // If errors found in input
 	)
 	{
 
