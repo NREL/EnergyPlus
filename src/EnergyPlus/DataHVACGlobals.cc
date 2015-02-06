@@ -39,6 +39,9 @@ namespace DataHVACGlobals {
 	Real64 const RetTempMax( 60.0 ); // maximum return air temperature [deg C]
 	Real64 const RetTempMin( -30.0 ); // minimum return air temperature [deg C]
 
+	// Number of Sizing types from list below
+	int const NumOfSizingTypes( 24 ); // number of sizing types
+
 	// Sizing types
 	int const CoolingAirflowSizing( 1 ); // request sizing for cooling air flow rate
 	int const CoolingWaterflowSizing( 2 ); // request sizing for cooling water flow rate

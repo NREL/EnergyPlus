@@ -31,6 +31,8 @@ namespace DataHVACGlobals {
 	extern Real64 const RetTempMax; // maximum return air temperature [deg C]
 	extern Real64 const RetTempMin; // minimum return air temperature [deg C]
 
+	extern int const NumOfSizingTypes; // request sizing for cooling air flow rate
+
 	extern int const CoolingAirflowSizing; // request sizing for cooling air flow rate
 	extern int const CoolingWaterflowSizing; // request sizing for cooling coil water flow rate
 	extern int const HeatingWaterflowSizing; // request sizing for heating coil water flow rate

@@ -287,6 +287,7 @@ namespace ZoneEquipmentManager {
 		// Using/Aliasing
 		using DataHVACGlobals::NoAction;
 		using DataHVACGlobals::ZoneComp;
+		using DataHVACGlobals::NumOfSizingTypes;
 		using DataEnvironment::OutBaroPress;
 		using DataEnvironment::OutHumRat;
 		using DataLoopNode::Node;
@@ -301,7 +302,7 @@ namespace ZoneEquipmentManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int NumOfSizingTypes = 24; // number of sizing types
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

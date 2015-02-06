@@ -1131,29 +1131,48 @@ namespace ReportSizingManager {
 						if ( OASysEqSizing( CurOASysNum ).CoolingAirFlow ) {
 							// Parent object sets flow rate
 							AutosizeDes = OASysEqSizing ( CurOASysNum ).CoolingAirVolFlow;
+						} else if ( OASysEqSizing( CurOASysNum ).AirFlow ) {
+							// Parent object sets flow rate
+							AutosizeDes = OASysEqSizing ( CurOASysNum ).AirVolFlow;
 						} else {
 							AutosizeDes = FinalSysSizing ( CurSysNum ).DesOutAirVolFlow;
 						}
 					} else {
-						if ( CurDuctType == Main ) {
-							AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-						} else if ( CurDuctType == Cooling ) {
-							AutosizeDes = FinalSysSizing( CurSysNum ).DesCoolVolFlow;
-						} else if ( CurDuctType == Heating ) {
-							AutosizeDes = FinalSysSizing( CurSysNum ).DesHeatVolFlow;
-						} else if ( CurDuctType == Other ) {
-							AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+						if ( UnitarySysEqSizing(CurSysNum).CoolingAirFlow ) {
+							AutosizeDes = UnitarySysEqSizing(CurSysNum).CoolingAirVolFlow;
+						} else if ( UnitarySysEqSizing(CurSysNum).AirFlow ) {
+							AutosizeDes = UnitarySysEqSizing(CurSysNum).AirVolFlow;
 						} else {
-							AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+							if ( CurDuctType == Main ) {
+								AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+							} else if ( CurDuctType == Cooling ) {
+								AutosizeDes = FinalSysSizing( CurSysNum ).DesCoolVolFlow;
+							} else if ( CurDuctType == Heating ) {
+								AutosizeDes = FinalSysSizing( CurSysNum ).DesHeatVolFlow;
+							} else if ( CurDuctType == Other ) {
+								AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+							} else {
+								AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+							}
 						}
 					}
 
 				} else if ( SizingType == HeatingAirflowSizing ) {
-					if ( UnitarySysEqSizing(CurSysNum).HeatingAirFlow ) {
-						AutosizeDes = UnitarySysEqSizing(CurSysNum).AirVolFlow;
-					} else {
-						if ( CurOASysNum > 0 ) {
+					if ( CurOASysNum > 0 ) {
+						if ( OASysEqSizing( CurOASysNum ).HeatingAirFlow ) {
+							// Parent object sets heating flow rate
+							AutosizeDes = OASysEqSizing ( CurOASysNum ).HeatingAirVolFlow;
+						} else if ( OASysEqSizing( CurOASysNum ).AirFlow ) {
+							// Parent object sets system flow rate
+							AutosizeDes = OASysEqSizing ( CurOASysNum ).AirVolFlow;
+						} else {
 							AutosizeDes = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+						}
+					} else {
+						if ( UnitarySysEqSizing(CurSysNum).HeatingAirFlow ) {
+							AutosizeDes = UnitarySysEqSizing(CurSysNum).HeatingAirVolFlow;
+						} else if ( UnitarySysEqSizing(CurSysNum).AirFlow ) {
+							AutosizeDes = UnitarySysEqSizing(CurSysNum).AirVolFlow;
 						} else {
 							if ( CurDuctType == Main ) {
 								if ( SameString ( CompType, "COIL:HEATING:WATER" ) ) {
@@ -1387,8 +1406,10 @@ namespace ReportSizingManager {
 					DataFracOfAutosizedCoolingCapacity = 1.0;
 					if ( OASysFlag ) {
 						AutosizeDes = OASysEqSizing ( CurOASysNum ).DesCoolingLoad;
+						DesVolFlow = DataFlowUsedForSizing;
 					} else if ( AirLoopSysFlag ) {
 						AutosizeDes = UnitarySysEqSizing ( CurSysNum ).DesCoolingLoad;
+						DesVolFlow = DataFlowUsedForSizing;
 					} else {
 						CheckSysSizing ( CompType, CompName );
 						DesVolFlow = DataFlowUsedForSizing;
