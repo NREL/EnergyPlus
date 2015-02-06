@@ -1039,7 +1039,7 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_Generator_FCExhaust;
 							this_comp.GeneralEquipType = GenEquipTypes_Generator;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( this_comp_type, "WaterHeater:HeatPumpPumpedCondenser" ) ) {
+						} else if ( SameString( this_comp_type, "WaterHeater:HeatPumpPumpedCondenser" ) || SameString( this_comp_type, "WaterHeater:HeatPumpWrappedCondenser") ) {
 							this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeater;
 							this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
@@ -1582,7 +1582,7 @@ namespace PlantManager {
 					if ( GeneralEquipType == 0 ) {
 						if ( has_prefixi( this_comp.TypeOf, "HeaderedPumps" ) ) {
 							GeneralEquipType = GenEquipTypes_Pump;
-						} else if ( SameString( this_comp.TypeOf, "WaterHeater:HeatPumpPumpedCondenser" ) ) {
+						} else if ( has_prefixi( this_comp.TypeOf, "WaterHeater:HeatPump" ) ) {
 							GeneralEquipType = GenEquipTypes_WaterThermalTank;
 						} else if ( SameString( this_comp.TypeOf, "TemperingValve" ) ) {
 							GeneralEquipType = GenEquipTypes_Valve;
@@ -1624,7 +1624,9 @@ namespace PlantManager {
 					// Set up "TypeOf" Num
 					TypeOfNum = FindItemInList( this_comp.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes );
 					if ( TypeOfNum == 0 ) {
-						if ( ! has_prefixi( this_comp.TypeOf, "Pump" ) && ! has_prefixi( this_comp.TypeOf, "HeaderedPump" ) ) {
+						if ( has_prefixi(this_comp.TypeOf, "WaterHeater:HeatPump") ) {
+							this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeater;
+						} else if ( ! has_prefixi( this_comp.TypeOf, "Pump" ) && ! has_prefixi( this_comp.TypeOf, "HeaderedPump" ) ) {
 							// Error.  May have already been flagged under General
 							if ( GeneralEquipType != 0 ) { // if GeneralEquipmentType == 0, then already flagged
 								ShowSevereError( "GetPlantInput: PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\" invalid equipment type." );

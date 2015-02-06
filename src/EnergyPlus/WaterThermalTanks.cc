@@ -1322,10 +1322,10 @@ namespace WaterThermalTanks {
 						HPWHSaveNode.OutletNodeName1 = cAlphaArgs( 5 );
 						
 						// Condenser Water Flow Rate
-						HPWH.OperatingWaterFlowRate = rNumericArgs( 2 + nNumericOffset );
-						if ( HPWH.OperatingWaterFlowRate <= 0.0 && rNumericArgs( 2 + nNumericOffset ) != AutoCalculate ) {
+						HPWH.OperatingWaterFlowRate = rNumericArgs( 2 );
+						if ( HPWH.OperatingWaterFlowRate <= 0.0 && rNumericArgs( 2 ) != AutoCalculate ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
-							ShowContinueError( cNumericFieldNames( 2 + nNumericOffset ) + " must be greater than 0. Condenser water flow rate = " + TrimSigDigits( rNumericArgs( 2 + nNumericOffset ), 6 ) );
+							ShowContinueError( cNumericFieldNames( 2 ) + " must be greater than 0. Condenser water flow rate = " + TrimSigDigits( rNumericArgs( 2 ), 6 ) );
 							ErrorsFound = true;
 						}
 						
@@ -1334,8 +1334,19 @@ namespace WaterThermalTanks {
 						// Wrapped Condenser Location
 						HPWH.WrappedCondenserBottomLocation = rNumericArgs( 2 + nNumericOffset );
 						HPWH.WrappedCondenserTopLocation = rNumericArgs( 3 + nNumericOffset );
-						// TODO: verify these make sense.
 						
+						if ( HPWH.WrappedCondenserBottomLocation < 0.0 ) {
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", ");
+							ShowContinueError( cNumericFieldNames( 2 ) + " must be greater than 0. Condenser bottom location = " + TrimSigDigits( HPWH.WrappedCondenserBottomLocation, 6 ));
+							ErrorsFound = true;
+						}
+
+						if ( HPWH.WrappedCondenserBottomLocation >= HPWH.WrappedCondenserTopLocation ) {
+							ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\", " );
+							ShowContinueError( cNumericFieldNames( 3 ) + " (" + TrimSigDigits( HPWH.WrappedCondenserTopLocation, 6 ) + ") must be greater than " + cNumericFieldNames( 2 ) + " (" + TrimSigDigits( HPWH.WrappedCondenserBottomLocation, 6 ) + ")." );
+							ErrorsFound = true;
+						}
+
 						// Reset the offset
 						nAlphaOffset = -2;
 						nNumericOffset = 1;
@@ -3433,7 +3444,7 @@ namespace WaterThermalTanks {
 							Tank.SourceEffectiveness = 1.0;
 						}
 
-						//         Set HPWH structure variable StandAlone to TRUE if use nodes are not connected
+						// Set HPWH structure variable StandAlone to TRUE if use nodes are not connected
 						if ( Tank.UseInletNode == 0 && Tank.UseOutletNode == 0 ) HPWH.StandAlone = true;
 
 						if ( HPWH.WHUseInletNode != Tank.UseInletNode || HPWH.WHUseOutletNode != Tank.UseOutletNode ) {
@@ -3452,22 +3463,32 @@ namespace WaterThermalTanks {
 								TestCompSet( HPWH.Type, HPWH.Name, WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName1, WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName1, "Water Nodes" );
 							}
 						}
+						if ( HPWH.CondenserConfig == HPWH_CONDENSER_PUMPED ) {
+							// verify HP/tank source node connections
+							if ( HPWH.CondWaterInletNode != Tank.SourceOutletNode ) {
+								ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
+								ShowContinueError( "Heat Pump condenser water inlet node name does not match water heater tank source outlet node name." );
+								ShowContinueError( "Heat pump condenser water inlet and outlet node names = " + HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName1 + " and " + HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName1 );
+								ShowContinueError( "Water heater tank source side inlet and outlet node names      = " + WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 + " and " + WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 );
+								ErrorsFound = true;
+							}
 
-						//         verify HP/tank source node connections
-						if ( HPWH.CondWaterInletNode != Tank.SourceOutletNode ) {
-							ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
-							ShowContinueError( "Heat Pump condenser water inlet node name does not match water heater tank source outlet node name." );
-							ShowContinueError( "Heat pump condenser water inlet and outlet node names = " + HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName1 + " and " + HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName1 );
-							ShowContinueError( "Water heater tank source side inlet and outlet node names      = " + WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 + " and " + WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 );
-							ErrorsFound = true;
-						}
-
-						if ( HPWH.CondWaterOutletNode != Tank.SourceInletNode ) {
-							ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
-							ShowContinueError( "Heat Pump condenser water outlet node name does not match water heater tank source inlet node name." );
-							ShowContinueError( "Heat pump condenser water inlet and outlet node names = " + HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName1 + " and " + HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName1 );
-							ShowContinueError( "Water heater tank source side inlet and outlet node names      = " + WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 + " and " + WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 );
-							ErrorsFound = true;
+							if ( HPWH.CondWaterOutletNode != Tank.SourceInletNode ) {
+								ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
+								ShowContinueError( "Heat Pump condenser water outlet node name does not match water heater tank source inlet node name." );
+								ShowContinueError( "Heat pump condenser water inlet and outlet node names = " + HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName1 + " and " + HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName1 );
+								ShowContinueError( "Water heater tank source side inlet and outlet node names      = " + WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 + " and " + WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 );
+								ErrorsFound = true;
+							}
+						} else if ( HPWH.CondenserConfig == HPWH_CONDENSER_WRAPPED ) {
+							// make sure the top of the condenser is not above the tank height.
+							if ( HPWH.WrappedCondenserTopLocation > Tank.Height ) {
+								ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
+								ShowContinueError( "The height of the top of the wrapped condenser is greater than the height of the tank." );
+								ErrorsFound = true;
+							}
+						} else {
+							assert(0);
 						}
 
 						HPWH.FoundTank = true;
