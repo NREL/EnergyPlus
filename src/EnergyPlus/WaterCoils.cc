@@ -1656,7 +1656,7 @@ namespace WaterCoils {
 		LoopErrorsFound = false;
 		CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
 
-				// cooling coils
+		// cooling coils
 		if ( WaterCoil( CoilNum ).WaterCoilType == CoilType_Cooling && WaterCoil( CoilNum ).RequestingAutoSize ) {
 			// find the appropriate Plant Sizing object
 			PltSizCoolNum = MyPlantSizingIndex( "chilled water coil", WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).WaterInletNodeNum, WaterCoil( CoilNum ).WaterOutletNodeNum, LoopErrorsFound );
