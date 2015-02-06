@@ -1354,7 +1354,7 @@ namespace OutputReportTabular {
 	}
 
 	bool
-	warningAboutKeyNotFound( int foundIndex, int inObjIndex, std::string moduleName )
+	warningAboutKeyNotFound( int foundIndex, int inObjIndex, const std::string & moduleName )
 	{
 		if ( foundIndex == 0 ) {
 			ShowWarningError( moduleName + ": Specified key not found: " + OutputTableBinned( inObjIndex ).keyValue + " for variable: " + OutputTableBinned( inObjIndex ).varOrMeter );
