@@ -73,15 +73,22 @@ namespace FluidCoolers {
 		bool Available; // need an array of logicals--load identifiers of available equipment
 		bool ON; // Simulate the machine at it's operating part load ratio
 		Real64 DesignWaterFlowRate; // Design water flow rate through the fluid cooler [m3/s]
+		bool DesignWaterFlowRateWasAutoSized; // true if previous was autosize on input
 		Real64 DesWaterMassFlowRate; // Design water flow rate through the fluid cooler [kg/s]
 		Real64 HighSpeedAirFlowRate; // Air flow rate through the fluid cooler at high speed [m3/s]
+		bool HighSpeedAirFlowRateWasAutoSized; //true if previous was autosized
 		Real64 HighSpeedFanPower; // Fan power at high fan speed [W]
+		bool HighSpeedFanPowerWasAutoSized; // true if previous was autosize on input
 		Real64 HighSpeedFluidCoolerUA; // UA of fluid cooler at high fan speed [W/C]
+		bool HighSpeedFluidCoolerUAWasAutoSized; // true if prevous was autosized on input
 		Real64 LowSpeedAirFlowRate; // Air flow rate through fluid cooler at low speed [m3/s]
+		bool LowSpeedAirFlowRateWasAutoSized; // true if previous was autosize on input
 		Real64 LowSpeedAirFlowRateSizingFactor; // sizing factor for low speed air flow rate []
 		Real64 LowSpeedFanPower; // Fan power at low fan speed [W]
+		bool LowSpeedFanPowerWasAutoSized; // true if previous set to autosize on input
 		Real64 LowSpeedFanPowerSizingFactor; // sizing factor for low speed fan power []
 		Real64 LowSpeedFluidCoolerUA; // UA of fluid cooler at low fan speed [W/C]
+		bool LowSpeedFluidCoolerUAWasAutoSized; //true if previous set to autosize on input
 		Real64 LowSpeedFluidCoolerUASizingFactor; // sizing factor for low speed UA []
 		Real64 DesignEnteringWaterTemp; // Entering water temperature at design conditions
 		Real64 DesignLeavingWaterTemp; // Entering water temperature at design conditions
@@ -90,6 +97,7 @@ namespace FluidCoolers {
 		Real64 FluidCoolerMassFlowRateMultiplier; // Maximum fluid cooler flow rate is this multiplier * design flow rate
 		Real64 FluidCoolerNominalCapacity; // Nominal capacity of the fluid cooler [W] at high speed
 		Real64 FluidCoolerLowSpeedNomCap; // Nominal capacity of the fluid cooler [W] at low speed
+		bool FluidCoolerLowSpeedNomCapWasAutoSized; // true if previous was set to autosize on input
 		Real64 FluidCoolerLowSpeedNomCapSizingFactor; // sizing factor for low speed capacity []
 		int WaterInletNodeNum; // Node number on the water inlet side of the fluid cooler
 		int WaterOutletNodeNum; // Node number on the water outlet side of the fluid cooler
@@ -117,15 +125,22 @@ namespace FluidCoolers {
 			Available( true ),
 			ON( true ),
 			DesignWaterFlowRate( 0.0 ),
+			DesignWaterFlowRateWasAutoSized( false ),
 			DesWaterMassFlowRate( 0.0 ),
 			HighSpeedAirFlowRate( 0.0 ),
+			HighSpeedAirFlowRateWasAutoSized( false ),
 			HighSpeedFanPower( 0.0 ),
+			HighSpeedFanPowerWasAutoSized( false ),
 			HighSpeedFluidCoolerUA( 0.0 ),
+			HighSpeedFluidCoolerUAWasAutoSized( false ),
 			LowSpeedAirFlowRate( 0.0 ),
+			LowSpeedAirFlowRateWasAutoSized( false ),
 			LowSpeedAirFlowRateSizingFactor( 0.0 ),
 			LowSpeedFanPower( 0.0 ),
+			LowSpeedFanPowerWasAutoSized( false ),
 			LowSpeedFanPowerSizingFactor( 0.0 ),
 			LowSpeedFluidCoolerUA( 0.0 ),
+			LowSpeedFluidCoolerUAWasAutoSized( false ),
 			LowSpeedFluidCoolerUASizingFactor( 0.0 ),
 			DesignEnteringWaterTemp( 0.0 ),
 			DesignLeavingWaterTemp( 0.0 ),
@@ -134,6 +149,7 @@ namespace FluidCoolers {
 			FluidCoolerMassFlowRateMultiplier( 0.0 ),
 			FluidCoolerNominalCapacity( 0.0 ),
 			FluidCoolerLowSpeedNomCap( 0.0 ),
+			FluidCoolerLowSpeedNomCapWasAutoSized( false ),
 			FluidCoolerLowSpeedNomCapSizingFactor( 0.0 ),
 			WaterInletNodeNum( 0 ),
 			WaterOutletNodeNum( 0 ),
@@ -163,15 +179,22 @@ namespace FluidCoolers {
 			bool const Available, // need an array of logicals--load identifiers of available equipment
 			bool const ON, // Simulate the machine at it's operating part load ratio
 			Real64 const DesignWaterFlowRate, // Design water flow rate through the fluid cooler [m3/s]
+			bool const DesignWaterFlowRateWasAutoSized, // true if previous was autosized on input
 			Real64 const DesWaterMassFlowRate, // Design water flow rate through the fluid cooler [kg/s]
 			Real64 const HighSpeedAirFlowRate, // Air flow rate through the fluid cooler at high speed [m3/s]
+			bool const HighSpeedAirFlowRateWasAutoSized, //true if previous was autosize on input
 			Real64 const HighSpeedFanPower, // Fan power at high fan speed [W]
+			bool const HighSpeedFanPowerWasAutoSized, //true if previous is autosize on input
 			Real64 const HighSpeedFluidCoolerUA, // UA of fluid cooler at high fan speed [W/C]
+			bool const HighSpeedFluidCoolerUAWasAutoSized, //true if previous was set to autosize on input
 			Real64 const LowSpeedAirFlowRate, // Air flow rate through fluid cooler at low speed [m3/s]
+			bool const LowSpeedAirFlowRateWasAutoSized, // true if previous set to autosize on input
 			Real64 const LowSpeedAirFlowRateSizingFactor, // sizing factor for low speed air flow rate []
 			Real64 const LowSpeedFanPower, // Fan power at low fan speed [W]
+			bool const LowSpeedFanPowerWasAutoSized, 
 			Real64 const LowSpeedFanPowerSizingFactor, // sizing factor for low speed fan power []
 			Real64 const LowSpeedFluidCoolerUA, // UA of fluid cooler at low fan speed [W/C]
+			bool const LowSpeedFluidCoolerUAWasAutoSized,
 			Real64 const LowSpeedFluidCoolerUASizingFactor, // sizing factor for low speed UA []
 			Real64 const DesignEnteringWaterTemp, // Entering water temperature at design conditions
 			Real64 const DesignLeavingWaterTemp, // Entering water temperature at design conditions
@@ -180,6 +203,7 @@ namespace FluidCoolers {
 			Real64 const FluidCoolerMassFlowRateMultiplier, // Maximum fluid cooler flow rate is this multiplier * design flow rate
 			Real64 const FluidCoolerNominalCapacity, // Nominal capacity of the fluid cooler [W] at high speed
 			Real64 const FluidCoolerLowSpeedNomCap, // Nominal capacity of the fluid cooler [W] at low speed
+			bool const FluidCoolerLowSpeedNomCapWasAutoSized,
 			Real64 const FluidCoolerLowSpeedNomCapSizingFactor, // sizing factor for low speed capacity []
 			int const WaterInletNodeNum, // Node number on the water inlet side of the fluid cooler
 			int const WaterOutletNodeNum, // Node number on the water outlet side of the fluid cooler
@@ -206,15 +230,21 @@ namespace FluidCoolers {
 			Available( Available ),
 			ON( ON ),
 			DesignWaterFlowRate( DesignWaterFlowRate ),
+			DesignWaterFlowRateWasAutoSized( DesignWaterFlowRateWasAutoSized ),
 			DesWaterMassFlowRate( DesWaterMassFlowRate ),
 			HighSpeedAirFlowRate( HighSpeedAirFlowRate ),
+			HighSpeedAirFlowRateWasAutoSized( HighSpeedAirFlowRateWasAutoSized ),
 			HighSpeedFanPower( HighSpeedFanPower ),
 			HighSpeedFluidCoolerUA( HighSpeedFluidCoolerUA ),
+			HighSpeedFluidCoolerUAWasAutoSized( HighSpeedFluidCoolerUAWasAutoSized ),
 			LowSpeedAirFlowRate( LowSpeedAirFlowRate ),
+			LowSpeedAirFlowRateWasAutoSized( LowSpeedAirFlowRateWasAutoSized ),
 			LowSpeedAirFlowRateSizingFactor( LowSpeedAirFlowRateSizingFactor ),
 			LowSpeedFanPower( LowSpeedFanPower ),
+			LowSpeedFanPowerWasAutoSized( LowSpeedFanPowerWasAutoSized ),
 			LowSpeedFanPowerSizingFactor( LowSpeedFanPowerSizingFactor ),
 			LowSpeedFluidCoolerUA( LowSpeedFluidCoolerUA ),
+			LowSpeedFluidCoolerUAWasAutoSized( LowSpeedFluidCoolerUAWasAutoSized ),
 			LowSpeedFluidCoolerUASizingFactor( LowSpeedFluidCoolerUASizingFactor ),
 			DesignEnteringWaterTemp( DesignEnteringWaterTemp ),
 			DesignLeavingWaterTemp( DesignLeavingWaterTemp ),
@@ -223,6 +253,7 @@ namespace FluidCoolers {
 			FluidCoolerMassFlowRateMultiplier( FluidCoolerMassFlowRateMultiplier ),
 			FluidCoolerNominalCapacity( FluidCoolerNominalCapacity ),
 			FluidCoolerLowSpeedNomCap( FluidCoolerLowSpeedNomCap ),
+			FluidCoolerLowSpeedNomCapWasAutoSized( FluidCoolerLowSpeedNomCapWasAutoSized ),
 			FluidCoolerLowSpeedNomCapSizingFactor( FluidCoolerLowSpeedNomCapSizingFactor ),
 			WaterInletNodeNum( WaterInletNodeNum ),
 			WaterOutletNodeNum( WaterOutletNodeNum ),
