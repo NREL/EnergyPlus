@@ -92,6 +92,7 @@ TEST( ReportSizingManager, GetCoilDesFlowT )
 	
 	// Oh and the sensible cases
 	DataSizing::SysSizInput(1).CoolingPeakLoadType = DataSizing::SensibleCoolingLoad;
+	DataSizing::FinalSysSizing(1).CoolingPeakLoadType = DataSizing::SensibleCoolingLoad;
 	// Repeat a VT case
 	DataSizing::SysSizInput(1).CoolCapControl = DataSizing::VT;
 	DataSizing::CalcSysSizing(1).CoolZoneAvgTempSeq(1) = 10;
