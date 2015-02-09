@@ -6070,7 +6070,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   Sizing:System,
     VAV_2,                   !- AirLoop Name
@@ -6109,7 +6109,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   Sizing:System,
     VAV_3,                   !- AirLoop Name
@@ -6148,7 +6148,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   Sizing:System,
     VAV_5,                   !- AirLoop Name
@@ -6187,7 +6187,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   Controller:OutdoorAir,
     VAV_1_OA_Controller,     !- Name

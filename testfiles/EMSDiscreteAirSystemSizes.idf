@@ -5481,7 +5481,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     PSZ-AC_1:1 Availability Manager List,  !- Name
@@ -5767,7 +5767,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     PSZ-AC_2:2 Availability Manager List,  !- Name
@@ -6053,7 +6053,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     PSZ-AC_3:3 Availability Manager List,  !- Name
@@ -6339,7 +6339,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     PSZ-AC_4:4 Availability Manager List,  !- Name
@@ -6625,7 +6625,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     PSZ-AC_5:5 Availability Manager List,  !- Name
@@ -6911,7 +6911,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     PSZ-AC_6:6 Availability Manager List,  !- Name
@@ -7197,7 +7197,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     PSZ-AC_7:7 Availability Manager List,  !- Name
@@ -7483,7 +7483,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     PSZ-AC_8:8 Availability Manager List,  !- Name
@@ -7769,7 +7769,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     PSZ-AC_9:9 Availability Manager List,  !- Name
@@ -8055,7 +8055,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     PSZ-AC_10:10 Availability Manager List,  !- Name

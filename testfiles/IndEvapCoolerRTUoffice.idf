@@ -3813,7 +3813,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN1 Inlets,         !- Name
@@ -4137,7 +4137,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN3 Inlets,         !- Name
@@ -4461,7 +4461,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN5 Inlets,         !- Name
@@ -4785,7 +4785,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN7 Inlets,         !- Name
@@ -5109,7 +5109,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN9 Inlets,         !- Name
@@ -5433,7 +5433,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN11 Inlets,        !- Name
@@ -5757,7 +5757,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN13 Inlets,        !- Name
@@ -6081,7 +6081,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN15 Inlets,        !- Name
@@ -6405,7 +6405,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN17 Inlets,        !- Name
@@ -6729,7 +6729,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN19 Inlets,        !- Name

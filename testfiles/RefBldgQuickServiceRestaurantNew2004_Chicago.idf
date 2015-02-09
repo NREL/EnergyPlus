@@ -1612,7 +1612,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   Sizing:System,
     PSZ-AC_2:2,              !- AirLoop Name
@@ -1651,7 +1651,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   Controller:OutdoorAir,
     PSZ-AC_1:1_OA_Controller,!- Name

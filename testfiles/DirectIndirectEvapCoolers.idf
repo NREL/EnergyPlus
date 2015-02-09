@@ -3936,7 +3936,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     FURNACE_PACU_CAV:1 Availability Manager List,  !- Name
@@ -4259,7 +4259,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     FURNACE_PACU_CAV:2 Availability Manager List,  !- Name
@@ -4560,7 +4560,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     FURNACE_PACU_CAV:3 Availability Manager List,  !- Name
@@ -4879,7 +4879,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     FURNACE_PACU_CAV:4 Availability Manager List,  !- Name

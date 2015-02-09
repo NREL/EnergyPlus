@@ -1062,7 +1062,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
 !-   ===========  ALL OBJECTS IN CLASS: CURVE:BIQUADRATIC ===========
 ! DOE-2.1E, COOL-CAP-FT for PTAC w/ SI temps

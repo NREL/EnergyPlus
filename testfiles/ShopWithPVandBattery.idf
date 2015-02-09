@@ -3031,7 +3031,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     ZN_1_FLR_1_SEC_1:Sys Availability Manager List,  !- Name
@@ -3313,7 +3313,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     ZN_1_FLR_1_SEC_2:Sys Availability Manager List,  !- Name
@@ -3595,7 +3595,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     ZN_1_FLR_1_SEC_3:Sys Availability Manager List,  !- Name
@@ -3877,7 +3877,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     ZN_1_FLR_1_SEC_4:Sys Availability Manager List,  !- Name
@@ -4159,7 +4159,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- <none>
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     ZN_1_FLR_1_SEC_5:Sys Availability Manager List,  !- Name
