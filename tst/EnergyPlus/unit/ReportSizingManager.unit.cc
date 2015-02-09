@@ -90,6 +90,22 @@ TEST( ReportSizingManager, GetCoilDesFlowT )
 	EXPECT_DOUBLE_EQ(10, designExitTemp);
 	EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).DesCoolVolFlow, designFlowValue);
 	
+	// Oh and the sensible cases
+	DataSizing::SysSizInput(1).CoolingPeakLoadType = DataSizing::SensibleCoolingLoad;
+	// Repeat a VT case
+	DataSizing::SysSizInput(1).CoolCapControl = DataSizing::VT;
+	DataSizing::CalcSysSizing(1).CoolZoneAvgTempSeq(1) = 10;
+	ReportSizingManager::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp);
+	EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).CoolSupTemp, designExitTemp);
+	EXPECT_DOUBLE_EQ(DataSizing::FinalSysSizing(1).DesCoolVolFlow, designFlowValue);
+	// And a bypass case
+	DataSizing::SysSizInput(1).CoolCapControl = DataSizing::Bypass;
+	DataSizing::CalcSysSizing(1).CoolZoneAvgTempSeq(1) = 13;
+	DataSizing::CalcSysSizing(1).MixTempAtCoolPeak = 15;
+	ReportSizingManager::GetCoilDesFlowT(sysNum, CpAir, designFlowValue, designExitTemp);
+	EXPECT_DOUBLE_EQ(10, designExitTemp);
+	EXPECT_NEAR(0.119823, designFlowValue, 0.0001);
+	
 	
 	// tear down
 	DataSizing::CalcSysSizing(1).SumZoneCoolLoadSeq.deallocate();
