@@ -30997,7 +30997,7 @@ Sizing:System,
       \minimum 0.0
       \note Enter the fraction of auto-sized heating design capacity. Required field when capacity the
       \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
- A11; \Central Cooling Capacity Control Method
+ A11; \field Central Cooling Capacity Control Method
       \note Method used to control the coil's output
       \type choice
       \key VAV
