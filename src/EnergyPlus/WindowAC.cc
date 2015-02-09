@@ -423,7 +423,7 @@ namespace WindowAC {
 						GetFanVolFlow( WindAC( WindACNum ).FanIndex, FanVolFlow );
 						if ( FanVolFlow != AutoSize ) {
 							if ( FanVolFlow < WindAC( WindACNum ).MaxAirVolFlow ) {
-								ShowWarningError( "Air flow rate = " + TrimSigDigits( FanVolFlow, 7 ) + " in fan object " + WindAC( WindACNum ).FanName + " is less than the maximum supply air flow" " rate (" + TrimSigDigits( WindAC( WindACNum ).MaxAirVolFlow, 7 ) + ") in the " + CurrentModuleObject + " object." );
+								ShowWarningError( "Air flow rate = " + TrimSigDigits( FanVolFlow, 7 ) + " in fan object " + WindAC( WindACNum ).FanName + " is less than the maximum supply air flow rate (" + TrimSigDigits( WindAC( WindACNum ).MaxAirVolFlow, 7 ) + ") in the " + CurrentModuleObject + " object." );
 								ShowContinueError( " The fan flow rate must be >= to the " + cNumericFields( 1 ) + " in the " + CurrentModuleObject + " object." );
 								ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + WindAC( WindACNum ).Name );
 								ErrorsFound = true;
@@ -515,7 +515,7 @@ namespace WindowAC {
 					}
 				}
 				if ( ZoneNodeNotFound ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + WindAC( WindACNum ).Name + "\"." " Window AC air inlet node name must be the same as a zone exhaust node name." );
+					ShowSevereError( CurrentModuleObject + " = \"" + WindAC( WindACNum ).Name + "\". Window AC air inlet node name must be the same as a zone exhaust node name." );
 					ShowContinueError( "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
 					ShowContinueError( "..Window AC air inlet node name = " + NodeID( WindAC( WindACNum ).AirInNode ) );
 					ErrorsFound = true;
@@ -533,7 +533,7 @@ namespace WindowAC {
 					}
 				}
 				if ( ZoneNodeNotFound ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + WindAC( WindACNum ).Name + "\"." " Window AC air outlet node name must be the same as a zone inlet node name." );
+					ShowSevereError( CurrentModuleObject + " = \"" + WindAC( WindACNum ).Name + "\". Window AC air outlet node name must be the same as a zone inlet node name." );
 					ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
 					ShowContinueError( "..Window AC air outlet node name = " + NodeID( WindAC( WindACNum ).AirOutNode ) );
 					ErrorsFound = true;
@@ -573,7 +573,7 @@ namespace WindowAC {
 					}
 				}
 				if ( ZoneNodeNotFound ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + WindAC( WindACNum ).Name + "\"." " Window AC air outlet node name must be the same as a zone inlet node name." );
+					ShowSevereError( CurrentModuleObject + " = \"" + WindAC( WindACNum ).Name + "\". Window AC air outlet node name must be the same as a zone inlet node name." );
 					ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
 					ShowContinueError( "..Window AC outlet node name = " + NodeID( WindAC( WindACNum ).AirOutNode ) );
 					ErrorsFound = true;
@@ -898,18 +898,18 @@ namespace WindowAC {
 				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingSAFMethod;
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
 				if ( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow ) {
-					if ( SAFMethod == SupplyAirFlowRate ){
+					if ( SAFMethod == SupplyAirFlowRate ) {
 						if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						}
 						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
-					} else if ( SAFMethod == FlowPerFloorArea ){
+					} else if ( SAFMethod == FlowPerFloorArea ) {
 						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow * Zone( DataZoneNumber ).FloorArea;
 						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 						DataScalableSizingON = true;
-					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ){
+					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ) {
 						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 						TempSize = AutoSize;
 						DataScalableSizingON = true;
@@ -943,16 +943,16 @@ namespace WindowAC {
 				CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingCapMethod;
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
 				if ( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
-					if ( CapSizingMethod == HeatingDesignCapacity ){
+					if ( CapSizingMethod == HeatingDesignCapacity ) {
 						if ( ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity > 0.0 ) {
 							ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
 							ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
 						}
-					} else if ( CapSizingMethod == CapacityPerFloorArea ){
+					} else if ( CapSizingMethod == CapacityPerFloorArea ) {
 						ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
 						ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity * Zone( DataZoneNumber ).FloorArea;
 						DataScalableCapSizingON = true;
-					} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ){
+					} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
 						DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
 						DataScalableCapSizingON = true;
 					}
@@ -1404,7 +1404,7 @@ namespace WindowAC {
 		}
 		if ( Iter > MaxIter ) {
 			if ( WindAC( WindACNum ).MaxIterIndex1 == 0 ) {
-				ShowWarningMessage( "ZoneHVAC:WindowAirConditioner=\"" + WindAC( WindACNum ).Name + "\" -- Exceeded max iterations while adjusting compressor" " sensible runtime to meet the zone load within the cooling convergence tolerance." );
+				ShowWarningMessage( "ZoneHVAC:WindowAirConditioner=\"" + WindAC( WindACNum ).Name + "\" -- Exceeded max iterations while adjusting compressor sensible runtime to meet the zone load within the cooling convergence tolerance." );
 				ShowContinueErrorTimeStamp( "Iterations=" + TrimSigDigits( MaxIter ) );
 			}
 			ShowRecurringWarningErrorAtEnd( "ZoneHVAC:WindowAirConditioner=\"" + WindAC( WindACNum ).Name + "\"  -- Exceeded max iterations error (sensible runtime) continues...", WindAC( WindACNum ).MaxIterIndex1 );
@@ -1441,7 +1441,7 @@ namespace WindowAC {
 			}
 			if ( Iter > MaxIter ) {
 				if ( WindAC( WindACNum ).MaxIterIndex2 == 0 ) {
-					ShowWarningMessage( "ZoneHVAC:WindowAirConditioner=\"" + WindAC( WindACNum ).Name + "\" -- Exceeded max iterations while adjusting compressor" " latent runtime to meet the zone load within the cooling convergence tolerance." );
+					ShowWarningMessage( "ZoneHVAC:WindowAirConditioner=\"" + WindAC( WindACNum ).Name + "\" -- Exceeded max iterations while adjusting compressor latent runtime to meet the zone load within the cooling convergence tolerance." );
 					ShowContinueErrorTimeStamp( "Iterations=" + TrimSigDigits( MaxIter ) );
 				}
 				ShowRecurringWarningErrorAtEnd( "ZoneHVAC:WindowAirConditioner=\"" + WindAC( WindACNum ).Name + "\"  -- Exceeded max iterations error (latent runtime) continues...", WindAC( WindACNum ).MaxIterIndex2 );

@@ -9,11 +9,13 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <WindowManager.hh>
 #include <ConvectionCoefficients.hh>
 #include <DataBSDFWindow.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
+#include <DataStringGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalSurface.hh>
@@ -2925,7 +2927,7 @@ namespace WindowManager {
 				hr( i ) = emis( i ) * sigma * pow_3( thetas( i ) );
 				// Following line is redundant since thetas is being relaxed;
 				// removed by FCW, 3/4/03
-				//!fw if(iter >= 1) hr(i) = 0.5*(hrprev(i)+hr(i))
+				//!fw if ( iter >= 1 ) hr(i) = 0.5*(hrprev(i)+hr(i))
 				hrprev( i ) = hr( i );
 			}
 
@@ -6791,7 +6793,7 @@ namespace WindowManager {
 		while ( iter < MaxIterations && errtemp > errtemptol ) {
 			for ( i = 1; i <= nglface; ++i ) {
 				hr( i ) = emis( i ) * sigma * pow_3( thetas( i ) );
-				//!fw 3/4/03 if(iter >= 1) hr(i) = 0.5*(hrprev(i)+hr(i))
+				//!fw 3/4/03 if ( iter >= 1 ) hr(i) = 0.5*(hrprev(i)+hr(i))
 				hrprev( i ) = hr( i );
 			}
 
@@ -7702,7 +7704,7 @@ namespace WindowManager {
 
 		if ( PrintTransMap ) {
 			ScreenTransUnitNo = GetNewUnitNumber();
-			{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "unknown" ); gio::open( ScreenTransUnitNo, "eplusscreen.csv", flags ); if ( flags.err() ) goto Label99999; }
+			{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "unknown" ); gio::open( ScreenTransUnitNo, DataStringGlobals::outputScreenCsvFileName, flags ); if ( flags.err() ) goto Label99999; }
 			//  WRITE(ScreenTransUnitNo,*)' '
 			for ( ScreenNum = 1; ScreenNum <= NumSurfaceScreens; ++ScreenNum ) {
 				MatNum = SurfaceScreens( ScreenNum ).MaterialNumber;

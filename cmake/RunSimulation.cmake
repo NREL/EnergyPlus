@@ -5,159 +5,145 @@
 # ENERGYPLUS_EXE
 # IDF_FILE
 # EPW_FILE
-# ANNUAL_SIMULATION
 # BUILD_FORTRAN
-
-if(ANNUAL_SIMULATION)
- set( ENV{FULLANNUALRUN} y )
-else()
- set( ENV{DDONLY} y)
-endif()
+# ENERGYPLUS_FLAGS
 
 get_filename_component(IDF_NAME "${IDF_FILE}" NAME_WE)
 get_filename_component(IDF_EXT "${IDF_FILE}" EXT)
+get_filename_component(EXE_PATH "${ENERGYPLUS_EXE}" PATH)
 
-execute_process(COMMAND "${CMAKE_COMMAND}" -E remove_directory "${BINARY_DIR}/testfiles/${IDF_NAME}" )
+# Create path variables
+set (OUTPUT_DIR_PATH "${BINARY_DIR}/testfiles/${IDF_NAME}/")
+set (IDF_PATH "${SOURCE_DIR}/testfiles/${IDF_FILE}")
+set (PRODUCT_PATH "${BINARY_DIR}/Products/")
+set (EXE_PATH "${EXE_PATH}/")
+set (EPW_PATH "${SOURCE_DIR}/weather/${EPW_FILE}")
 
-execute_process(COMMAND "${CMAKE_COMMAND}" -E copy 
-                "${SOURCE_DIR}/testfiles/${IDF_FILE}" 
-                "${BINARY_DIR}/testfiles/${IDF_NAME}/in${IDF_EXT}" )
+# Copy IDD to Executable directory if it is not already there
+execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PRODUCT_PATH}/Energy+.idd" "${EXE_PATH}")
 
-execute_process(COMMAND "${CMAKE_COMMAND}" -E copy 
-                "${SOURCE_DIR}/weather/${EPW_FILE}" 
-                "${BINARY_DIR}/testfiles/${IDF_NAME}/in.epw" )
-
-execute_process(COMMAND "${CMAKE_COMMAND}" -E copy 
-                "${BINARY_DIR}/Energy+.idd" 
-                "${BINARY_DIR}/testfiles/${IDF_NAME}/Energy+.idd" )
+# Clean up old test directory
+execute_process(COMMAND "${CMAKE_COMMAND}" -E remove_directory "${OUTPUT_DIR_PATH}" )
+execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${OUTPUT_DIR_PATH}" )
 
 # Read the file contents to check for special cases
-file(READ "${BINARY_DIR}/testfiles/${IDF_NAME}/in${IDF_EXT}" IDF_CONTENT)
+file(READ "${IDF_PATH}" IDF_CONTENT)
 
-# Handle setting up datasets files first
-string( FIND "${IDF_CONTENT}" "Window5DataFile.dat" WINDOW_RESULT )
-if ( "${WINDOW_RESULT}" GREATER -1 )
-  file( MAKE_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}/DataSets" )
-  file( COPY "${SOURCE_DIR}/datasets/Window5DataFile.dat" DESTINATION "${BINARY_DIR}/testfiles/${IDF_NAME}/DataSets" )
-endif ()
+# Convert flags back to CMake list
+string(STRIP ${ENERGYPLUS_FLAGS} ENERGYPLUS_FLAGS)
+string(REPLACE " " ";" ENERGYPLUS_FLAGS_LIST ${ENERGYPLUS_FLAGS})
 
-# Handle setting up TDV dataset files next
-string(FIND "${IDF_CONTENT}" "TDV" TDV_RESULT)
-if ( "${TDV_RESULT}" GREATER -1 )
-  file( MAKE_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}/DataSets" )
-  file( MAKE_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}/DataSets/TDV" )
-  file( COPY "${SOURCE_DIR}/datasets/TDV/" DESTINATION "${BINARY_DIR}/testfiles/${IDF_NAME}/DataSets/TDV/" )
-endif ()
+# Use EPMacro if necessary
+list(FIND ENERGYPLUS_FLAGS_LIST -m EPMACRO_RESULT)
 
-# Handle setting up External Interface FMU-import files next
-# Note we only have FMUs for Win32 in the repo, this should be improved
-string(FIND "${IDF_CONTENT}" "ExternalInterface:" EXTINT_RESULT)
-if ( "${EXTINT_RESULT}" GREATER -1 )
-  file( MAKE_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}/DataSets" )
-  file( MAKE_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}/DataSets/FMUs" )
-  file( COPY "${SOURCE_DIR}/datasets/FMUs/" DESTINATION "${BINARY_DIR}/testfiles/${IDF_NAME}/DataSets/FMUs/" )
-endif ()
-
-# EPMacro should run here first
-if( "${IDF_EXT}" STREQUAL ".imf" )
+if("${EPMACRO_RESULT}" GREATER -1)
   # first bring in all imf files into the run folder
   file( GLOB SRC_IMF_FILES "${SOURCE_DIR}/testfiles/*.imf" )
   foreach( IMF_FILE ${SRC_IMF_FILES} )
-    file( COPY "${IMF_FILE}" DESTINATION "${BINARY_DIR}/testfiles/${IDF_NAME}/" )
+    file( COPY "${IMF_FILE}" DESTINATION "${OUTPUT_DIR_PATH}" )
   endforeach()
-  # find the appropriate macro file
+  # find the appropriate executable file
   if( UNIX AND NOT APPLE )
-    find_program(EPMACRO_EXE EPMacro PATHS "${SOURCE_DIR}/bin/EPMacro/Linux" 
+    find_program(EPMACRO_EXE EPMacro PATHS "${SOURCE_DIR}/bin/EPMacro/Linux"
       NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
   elseif( APPLE )
-    find_program(EPMACRO_EXE EPMacro PATHS "${SOURCE_DIR}/bin/EPMacro/Mac" 
+    find_program(EPMACRO_EXE EPMacro PATHS "${SOURCE_DIR}/bin/EPMacro/Mac"
       NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
   else() # windows
-    find_program(EPMACRO_EXE EPMacro PATHS "${SOURCE_DIR}/bin/EPMacro/Windows" 
+    find_program(EPMACRO_EXE EPMacro PATHS "${SOURCE_DIR}/bin/EPMacro/Windows"
       NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
   endif()
-  # execute EPMacro and rename the idf file
-  message("Executing EPMacro from ${EPMACRO_EXE}")
-  execute_process(COMMAND "${EPMACRO_EXE}" WORKING_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}")
-  file(RENAME "${BINARY_DIR}/testfiles/${IDF_NAME}/out.idf" "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf")
+  # Move EPMacro to executable directory
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EPMACRO_EXE}" "${EXE_PATH}")
 endif()
-    
 
 if(BUILD_FORTRAN)
 
   # Parametric preprocessor next
   string(FIND "${IDF_CONTENT}" "Parametric:" PAR_RESULT)
   if ( "${PAR_RESULT}" GREATER -1 )
-    find_program(PARAMETRIC_EXE parametricpreprocessor PATHS "${BINARY_DIR}/Products/" 
+    find_program(PARAMETRIC_EXE parametricpreprocessor PATHS "${PRODUCT_PATH}"
       NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
-    message("Executing ParametricPreprocessor from ${PARAMETRIC_EXE}")
-    execute_process(COMMAND "${PARAMETRIC_EXE}" "in.idf" WORKING_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}")
-    
+    execute_process(COMMAND ${CMAKE_COMMAND} -E copy "${IDF_PATH}" "${OUTPUT_DIR_PATH}")
+    execute_process(COMMAND "${PARAMETRIC_EXE}" "${IDF_FILE}" WORKING_DIRECTORY "${OUTPUT_DIR_PATH}")
+
     # this handles the LBuildingAppGRotPar parametric file
-    if (EXISTS "${BINARY_DIR}/testfiles/${IDF_NAME}/in-G000.idf")
-      message("Parametric: Trying to run: in-G000.idf")
-      FILE( RENAME "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf" "${BINARY_DIR}/testfiles/${IDF_NAME}/in-original.idf" )
-      FILE( RENAME "${BINARY_DIR}/testfiles/${IDF_NAME}/in-G000.idf" "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf" )
-    
+    if (EXISTS "${OUTPUT_DIR_PATH}/${IDF_NAME}-G000.idf")
+      set (IDF_PATH "${OUTPUT_DIR_PATH}/${IDF_NAME}-G000.idf")
+
     # this handles the LBuildingAppGRotPar and ParametricInsulation-5ZoneAirCooled parametric files
-    elseif (EXISTS "${BINARY_DIR}/testfiles/${IDF_NAME}/in-000001.idf")
-      message("Parametric: Trying to run: in-000001.idf")
-      FILE( RENAME "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf" "${BINARY_DIR}/testfiles/${IDF_NAME}/in-original.idf" )
-      FILE( RENAME "${BINARY_DIR}/testfiles/${IDF_NAME}/in-000001.idf" "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf" )
-    
+    elseif (EXISTS "${OUTPUT_DIR_PATH}/${IDF_NAME}-000001.idf")
+      set (IDF_PATH "${OUTPUT_DIR_PATH}/${IDF_NAME}-000001.idf")
+
     # this shouldn't happen unless a new parametric file is added with a different processed filename
     else ()
-      message("Couldn't find parametric preprocessor output file, attempting to continue with original in.idf")
-    
+      message("Couldn't find parametric preprocessor output file for ${IDF_NAME}, attempting to continue with original input file.")
+
     endif ()
 
   endif () # parametric preprocessor definitions detected
-        
-  # ExpandObjects (and other preprocessors) as necessary
-  find_program(EXPANDOBJECTS_EXE ExpandObjects PATHS "${BINARY_DIR}/Products/" 
-    NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
-  message("Executing ExpandObjects from ${EXPANDOBJECTS_EXE}")
-  execute_process(COMMAND "${EXPANDOBJECTS_EXE}" WORKING_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}")
-  
-  if (EXISTS "${BINARY_DIR}/testfiles/${IDF_NAME}/expanded.idf")
-  
-    # Copy the expanded idf into in.idf, which could be updated with ground stuff as well
-    if (EXISTS "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf")
-        file(REMOVE "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf")
-    endif()
-    file(RENAME "${BINARY_DIR}/testfiles/${IDF_NAME}/expanded.idf" "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf")
 
-    # i f we have an expanded.idf, then ExpandObjects must have found something
-    # it is possible this includes ground heat transfer objects, so run them here if needed
-    # Need to copy in Slab/Basement IDDs before ExpandObjects if relevant for this file
-    string(FIND "${IDF_CONTENT}" "GroundHeatTransfer:Slab" SLAB_RESULT)
-    if ( "${SLAB_RESULT}" GREATER -1 )
-      file ( COPY "${SOURCE_DIR}/idd/SlabGHT.idd" DESTINATION "${BINARY_DIR}/testfiles/${IDF_NAME}/" )
+  # Run ExpandObjects independently if there are ground heat transfer objects
+  string(FIND "${IDF_CONTENT}" "GroundHeatTransfer:Slab" SLAB_RESULT)
+  string(FIND "${IDF_CONTENT}" "GroundHeatTransfer:Basement" BASEMENT_RESULT)
+
+  if ( "${SLAB_RESULT}" GREATER -1 OR "${BASEMENT_RESULT}" GREATER -1)
+    find_program(EXPANDOBJECTS_EXE ExpandObjects PATHS "${BINARY_DIR}/Products/"
+      NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+    message("Executing ExpandObjects from ${EXPANDOBJECTS_EXE}")
+    execute_process(COMMAND ${CMAKE_COMMAND} -E copy "${IDF_PATH}" "${OUTPUT_DIR_PATH}/in.idf")
+    execute_process(COMMAND ${CMAKE_COMMAND} -E copy "${EPW_PATH}" "${OUTPUT_DIR_PATH}/in.epw")
+    execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PRODUCT_PATH}/Energy+.idd" "${OUTPUT_DIR_PATH}")
+    execute_process(COMMAND "${EXPANDOBJECTS_EXE}" WORKING_DIRECTORY "${OUTPUT_DIR_PATH}")
+
+    if ( "${SLAB_RESULT}" GREATER -1)
+      # Copy files needed for Slab
+      file ( COPY "${SOURCE_DIR}/idd/SlabGHT.idd" DESTINATION "${OUTPUT_DIR_PATH}" )
       # Find and run slab
-      find_program(SLAB_EXE Slab PATHS "${BINARY_DIR}/Products/" 
+      find_program(SLAB_EXE Slab PATHS "${PRODUCT_PATH}"
         NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
       message("Executing Slab from ${SLAB_EXE}")
-      execute_process(COMMAND "${SLAB_EXE}" WORKING_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}")
+      execute_process(COMMAND "${SLAB_EXE}" WORKING_DIRECTORY "${OUTPUT_DIR_PATH}")
       # Then copy slab results into the expanded file
-      file(READ "${BINARY_DIR}/testfiles/${IDF_NAME}/SLABSurfaceTemps.TXT" SLAB_CONTENTS)
-      file(APPEND "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf" "${SLAB_CONTENTS}")
-    endif ()
-    
-    string(FIND "${IDF_CONTENT}" "GroundHeatTransfer:Basement" BASEMENT_RESULT)
-    if ( "${BASEMENT_RESULT}" GREATER -1 )
-      file ( COPY "${SOURCE_DIR}/idd/BasementGHT.idd" DESTINATION "${BINARY_DIR}/testfiles/${IDF_NAME}/" )
+      file(READ "${OUTPUT_DIR_PATH}/SLABSurfaceTemps.TXT" SLAB_CONTENTS)
+      file(APPEND "${OUTPUT_DIR_PATH}/expanded.idf" "${SLAB_CONTENTS}")
+    endif()
+
+    if ( "${BASEMENT_RESULT}" GREATER -1)
+      # Copy files needed for Basement
+      file ( COPY "${SOURCE_DIR}/idd/BasementGHT.idd" DESTINATION "${OUTPUT_DIR_PATH}" )
       # Find and run basement
-      find_program(BASEMENT_EXE Basement PATHS "${BINARY_DIR}/Products/" 
+      find_program(BASEMENT_EXE Basement PATHS "${PRODUCT_PATH}"
         NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
       message("Executing Basement from ${BASEMENT_EXE}")
-      execute_process(COMMAND "${BASEMENT_EXE}" WORKING_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}")
+      execute_process(COMMAND "${BASEMENT_EXE}" WORKING_DIRECTORY "${OUTPUT_DIR_PATH}")
       # Then copy basement results into the expanded file
-      file(READ "${BINARY_DIR}/testfiles/${IDF_NAME}/EPObjects.TXT" BASEMENT_CONTENTS)
-      file(APPEND "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf" "${BASEMENT_CONTENTS}")
-    endif ()
+      file(READ "${OUTPUT_DIR_PATH}/EPObjects.TXT" BASEMENT_CONTENTS)
+      file(APPEND "${OUTPUT_DIR_PATH}/expanded.idf" "${BASEMENT_CONTENTS}")
+    endif()
+
+    set (IDF_PATH "${OUTPUT_DIR_PATH}/expanded.idf")
 
   endif() # expand objects found something and created expanded.idf
-  
+
+  list(FIND ENERGYPLUS_FLAGS_LIST -x EXPAND_RESULT)
+
+  if("${EXPAND_RESULT}" GREATER -1)
+    find_program(EXPANDOBJECTS_EXE ExpandObjects PATHS "${PRODUCT_PATH}"
+      NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+    # Move to executable directory
+    execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EXPANDOBJECTS_EXE}" "${EXE_PATH}")
+  endif()
+
+  list(FIND ENERGYPLUS_FLAGS_LIST -r READVARS_RESULT)
+
+  if("${READVARS_RESULT}" GREATER -1)
+    find_program(READVARS_EXE ReadVarsESO PATHS "${PRODUCT_PATH}"
+      NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+    # Move to executable directory
+    execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different "${READVARS_EXE}" "${EXE_PATH}")
+  endif()
+
 endif() # build fortran
 
 
@@ -167,18 +153,10 @@ else()
   set(ECHO_CMD "echo")
 endif()
 
-
 execute_process(COMMAND ${ECHO_CMD}
-                COMMAND "${ENERGYPLUS_EXE}" WORKING_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}")
-
-
-execute_process(COMMAND "${CMAKE_COMMAND}" -E remove 
-                "${BINARY_DIR}/testfiles/${IDF_NAME}/Energy+.idd"
-                "${BINARY_DIR}/testfiles/${IDF_NAME}/in.epw" )
-
-file(READ "${BINARY_DIR}/testfiles/${IDF_NAME}/eplusout.end" FILE_CONTENT)
-
-string(FIND "${FILE_CONTENT}" "EnergyPlus Completed Successfully" RESULT)
+                COMMAND "${ENERGYPLUS_EXE}" -w "${EPW_PATH}" -d "${OUTPUT_DIR_PATH}" ${ENERGYPLUS_FLAGS_LIST} "${IDF_PATH}"
+                WORKING_DIRECTORY "${OUTPUT_DIR_PATH}"
+                RESULT_VARIABLE RESULT)
 
 if( RESULT EQUAL 0 )
   message("Test Passed")

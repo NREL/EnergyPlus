@@ -11,6 +11,8 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
+#include <CommandLineInterface.hh>
 #include <InputProcessor.hh>
 #include <DataIPShortCuts.hh>
 #include <DataOutputs.hh>
@@ -52,6 +54,7 @@ namespace InputProcessor {
 	// USE STATEMENTS:
 	// Use statements for data only modules
 	// Using/Aliasing
+    
 	using namespace DataPrecisionGlobals;
 	using namespace DataStringGlobals;
 	using DataGlobals::MaxNameLength;
@@ -66,6 +69,7 @@ namespace InputProcessor {
 	using DataSystemVariables::SortedIDD;
 	using DataSystemVariables::iASCII_CR;
 	using DataSystemVariables::iUnicode_end;
+	using DataGlobals::DisplayInputInAudit;
 
 	// Use statements for access to subroutines in other modules
 
@@ -234,50 +238,42 @@ namespace InputProcessor {
 		InitSecretObjects();
 
 		EchoInputFile = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( EchoInputFile, "eplusout.audit", flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( EchoInputFile, outputAuditFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			DisplayString( "Could not open (write) eplusout.audit." );
-			ShowFatalError( "ProcessInput: Could not open file \"eplusout.audit\" for output (write)." );
+			DisplayString( "Could not open (write) "+ outputAuditFileName + " ." );
+			ShowFatalError( "ProcessInput: Could not open file " + outputAuditFileName + " for output (write)." );
 		}
 		echo_stream = gio::out_stream( EchoInputFile );
 
-		{ IOFlags flags; gio::inquire( "eplusout.iperr", flags ); FileExists = flags.exists(); }
+		{ IOFlags flags; gio::inquire( outputIperrFileName, flags ); FileExists = flags.exists(); }
 		if ( FileExists ) {
 			CacheIPErrorFile = GetNewUnitNumber();
-			{ IOFlags flags; flags.ACTION( "read" ); gio::open( CacheIPErrorFile, "eplusout.iperr", flags ); read_stat = flags.ios(); }
+			{ IOFlags flags; flags.ACTION( "read" ); gio::open( CacheIPErrorFile, outputIperrFileName, flags ); read_stat = flags.ios(); }
 			if ( read_stat != 0 ) {
-				ShowFatalError( "EnergyPlus: Could not open file \"eplusout.iperr\" for input (read)." );
+				ShowFatalError( "EnergyPlus: Could not open file "+outputIperrFileName+" for input (read)." );
 			}
 			{ IOFlags flags; flags.DISPOSE( "delete" ); gio::close( CacheIPErrorFile, flags ); }
 		}
 		CacheIPErrorFile = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( CacheIPErrorFile, "eplusout.iperr", flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( CacheIPErrorFile, outputIperrFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			DisplayString( "Could not open (write) eplusout.iperr." );
-			ShowFatalError( "ProcessInput: Could not open file \"eplusout.audit\" for output (write)." );
+			DisplayString( "Could not open (write) "+outputIperrFileName );
+			ShowFatalError( "ProcessInput: Could not open file " + outputIperrFileName + " for output (write)." );
 		}
 
-		// FullName from StringGlobals is used to build file name with Path
-		if ( len( ProgramPath ) == 0 ) {
-			FullName = "Energy+.idd";
-		} else {
-			FullName = ProgramPath + "Energy+.idd";
-		}
-		std::ifstream idd_stream( FullName, std::ios_base::in | std::ios_base::binary );
+		std::ifstream idd_stream( inputIddFileName, std::ios_base::in | std::ios_base::binary );
 		if ( ! idd_stream ) {
 			if ( idd_stream.is_open() ) idd_stream.close();
-			if ( ! gio::file_exists( FullName ) ) { // No such file
-				DisplayString( "Missing " + FullName );
-				ShowFatalError( "ProcessInput: Energy+.idd missing. Program terminates. Fullname=" + FullName );
+			if ( ! gio::file_exists( inputIddFileName ) ) { // No such file
+				ShowFatalError( "ProcessInput: Energy+.idd missing. Program terminates. Fullname=" + inputIddFileName );
 			} else {
-				DisplayString( "Could not open (read) Energy+.idd." );
-				ShowFatalError( "ProcessInput: Could not open file \"Energy+.idd\" for input (read)." );
+				ShowFatalError( "ProcessInput: Could not open file \"" + inputIddFileName + "\" for input (read)." );
 			}
 		}
 		NumLines = 0;
 
 		DoingInputProcessing = true;
-		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary (Energy+.idd) File -- Start";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary -- Start";
 		DisplayString( "Processing Data Dictionary" );
 		ProcessingIDD = true;
 		ProcessDataDicFile( idd_stream, ErrorsInIDD );
@@ -302,7 +298,7 @@ namespace InputProcessor {
 		}
 
 		ProcessingIDD = false;
-		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary (Energy+.idd) File -- Complete";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary -- Complete";
 
 		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Alpha Args=" << MaxAlphaArgsFound;
 		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Numeric Args=" << MaxNumericArgsFound;
@@ -312,19 +308,15 @@ namespace InputProcessor {
 		gio::write( EchoInputFile, fmtLD ) << " Total Number of Numeric Fields=" << NumNumericArgsFound;
 		gio::write( EchoInputFile, fmtLD ) << " Total Number of Fields=" << NumAlphaArgsFound + NumNumericArgsFound;
 
-		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File (in.idf) -- Start";
-
-		{ IOFlags flags; gio::inquire( "in.idf", flags ); FileExists = flags.exists(); }
-		if ( ! FileExists ) {
-			DisplayString( "Missing " + CurrentWorkingFolder + "in.idf" );
-			ShowFatalError( "ProcessInput: in.idf missing. Program terminates." );
+		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File -- Start";
+		if ( !DisplayInputInAudit ){
+			gio::write( EchoInputFile, fmtLD ) << " Echo of input lines is off. May be activated by setting the environmental variable DISPLAYINPUTINAUDIT=YES";
 		}
 
-		std::ifstream idf_stream( "in.idf", std::ios_base::in | std::ios_base::binary );
+		std::ifstream idf_stream( inputIdfFileName, std::ios_base::in | std::ios_base::binary );
 		if ( ! idf_stream ) {
 			if ( idf_stream.is_open() ) idf_stream.close();
-			DisplayString( "Could not open (read) in.idf." );
-			ShowFatalError( "ProcessInput: Could not open file \"in.idf\" for input (read)." );
+			ShowFatalError( "ProcessInput: Could not open file \"" + inputIdfFileName + "\" for input (read)." );
 		}
 		NumLines = 0;
 		EchoInputLine = true;
@@ -344,7 +336,7 @@ namespace InputProcessor {
 
 		IDFRecordsGotten.dimension( NumIDFRecords, false );
 
-		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File (in.idf) -- Complete";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File -- Complete";
 		//   WRITE(EchoInputFile,*) ' Number of IDF "Lines"=',NumIDFRecords
 		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Alpha IDF Args=" << MaxAlphaIDFArgsFound;
 		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Numeric IDF Args=" << MaxNumericIDFArgsFound;
@@ -398,7 +390,7 @@ namespace InputProcessor {
 		}
 
 		if ( TotalAuditErrors > 0 ) {
-			ShowWarningError( "IP: Note -- Some missing fields have been filled with defaults." " See the audit output file for details." );
+			ShowWarningError( "IP: Note -- Some missing fields have been filled with defaults. See the audit output file for details." );
 		}
 
 		if ( NumOutOfRangeErrorsFound > 0 ) {
@@ -583,7 +575,7 @@ namespace InputProcessor {
 				ErrorsFound = true;
 			}
 		} else {
-			ShowSevereError( "IP: Blank Sections not allowed.  Review eplusout.audit file.", EchoInputFile );
+			ShowSevereError( "IP: Blank Sections not allowed.  Review " + outputAuditFileName + " file.", EchoInputFile );
 			errFlag = true;
 			ErrorsFound = true;
 		}
@@ -872,7 +864,7 @@ namespace InputProcessor {
 						Pos = std::string::npos;
 					}
 					if ( Pos == std::string::npos ) {
-						ShowSevereError( "IP: IDD line~" + IPTrimSigDigits( NumLines ) + " , or ; expected on this line" ",position=\"" + InputLine.substr( CurPos ) + "\"", EchoInputFile );
+						ShowSevereError( "IP: IDD line~" + IPTrimSigDigits( NumLines ) + " , or ; expected on this line,position=\"" + InputLine.substr( CurPos ) + "\"", EchoInputFile );
 						errFlag = true;
 						ErrorsFound = true;
 					}
@@ -1852,7 +1844,7 @@ namespace InputProcessor {
 
 		for ( int Count = 1; Count <= NumIDFSections; ++Count ) {
 			if ( SectionsOnFile( Count ).FirstRecord > SectionsOnFile( Count ).LastRecord ) {
-				gio::write( EchoInputFile, fmtLD ) << " Section " << Count << " " << SectionsOnFile( Count ).Name << " had no object records";
+				gio::write( EchoInputFile, fmtLD ) << " Section " << Count << ' ' << SectionsOnFile( Count ).Name << " had no object records";
 				SectionsOnFile( Count ).FirstRecord = -1;
 				SectionsOnFile( Count ).LastRecord = -1;
 			}
@@ -2639,7 +2631,9 @@ namespace InputProcessor {
 		} else {
 			if ( EchoInputLine ) {
 				++NumLines;
-				if ( echo_stream ) *echo_stream << std::setw( 7 ) << NumLines << ' ' << InputLine << NL;
+				if ( DisplayInputInAudit ) {
+					if ( echo_stream ) *echo_stream << std::setw(7) << NumLines << ' ' << InputLine << NL;
+				}
 			}
 			EchoInputLine = true;
 			InputLineLength = static_cast< int >( len_trim( InputLine ) );
@@ -2818,7 +2812,9 @@ namespace InputProcessor {
 		} else {
 			if ( EchoInputLine ) {
 				++NumLines;
-				if ( echo_stream ) *echo_stream << std::setw( 7 ) << NumLines << ' ' << InputLine << NL;
+				if ( DisplayInputInAudit ) {
+					if ( echo_stream ) *echo_stream << std::setw( 7 ) << NumLines << ' ' << InputLine << NL;
+				}
 			}
 			EchoInputLine = true;
 			InputLineLength = static_cast< int >( len_trim( InputLine ) );
@@ -4374,7 +4370,7 @@ namespace InputProcessor {
 			gio::write( EchoInputFile, fmtLD ) << "Unused Objects -- Objects in IDF that were never \"gotten\"";
 			for ( Count = 1; Count <= NumOrphObjNames; ++Count ) {
 				if ( ! OrphanNames( Count ).empty() ) {
-					gio::write( EchoInputFile, fmtA ) << " " + OrphanObjectNames( Count ) + '=' + OrphanNames( Count );
+					gio::write( EchoInputFile, fmtA ) << ' ' + OrphanObjectNames( Count ) + '=' + OrphanNames( Count );
 				} else {
 					gio::write( EchoInputFile, fmtLD ) << OrphanObjectNames( Count );
 				}
@@ -4382,7 +4378,7 @@ namespace InputProcessor {
 			ShowWarningError( "The following lines are \"Unused Objects\".  These objects are in the idf" );
 			ShowContinueError( " file but are never obtained by the simulation and therefore are NOT used." );
 			if ( ! DisplayAllWarnings ) {
-				ShowContinueError( " Only the first unused named object of an object class is shown.  " "Use Output:Diagnostics,DisplayAllWarnings to see all." );
+				ShowContinueError( " Only the first unused named object of an object class is shown.  Use Output:Diagnostics,DisplayAllWarnings to see all." );
 			} else {
 				ShowContinueError( " Each unused object is shown." );
 			}
@@ -5946,7 +5942,7 @@ namespace InputProcessor {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
@@ -5970,3 +5966,4 @@ namespace InputProcessor {
 } // InputProcessor
 
 } // EnergyPlus
+

@@ -418,7 +418,7 @@ namespace FanCoilUnits {
 				ShowContinueError( "... " + cNumericFields( 2 ) + " is greater than the medium speed supply air flow ratio." );
 				ShowContinueError( "... Fan Coil Unit low speed supply air flow ratio = " + TrimSigDigits( FanCoil( FanCoilNum ).LowSpeedRatio, 5 ) + ' ' );
 				ShowContinueError( "... Fan Coit Unit medium speed supply air flow ratio = " + TrimSigDigits( FanCoil( FanCoilNum ).MedSpeedRatio, 5 ) + ' ' );
-				ShowContinueError( "... Fan Coil Unit low speed supply air flow ratio and medium speed " "supply air flow ratio set to default values" );
+				ShowContinueError( "... Fan Coil Unit low speed supply air flow ratio and medium speed supply air flow ratio set to default values" );
 				FanCoil( FanCoilNum ).LowSpeedRatio = 1.0 / 3.0;
 				FanCoil( FanCoilNum ).MedSpeedRatio = 2.0 / 3.0;
 			}
@@ -612,11 +612,11 @@ namespace FanCoilUnits {
 				FanCoil( FanCoilNum ).ATMixerOutNode = ATMixerOutNode;
 				// check that fan coil doesn' have local outside air
 				if ( ! lAlphaBlanks( 8 ) ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\"." " Fan coil unit has local as well as central outdoor air specified" );
+					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\". Fan coil unit has local as well as central outdoor air specified" );
 				}
 				// check that the air teminal mixer out node is the fan coil inlet node
 				if ( FanCoil( FanCoilNum ).AirInNode != ATMixerOutNode ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\"." " Fan coil unit air inlet node name must be the same as an air terminal mixer outlet node name." );
+					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\". Fan coil unit air inlet node name must be the same as an air terminal mixer outlet node name." );
 					ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object." );
 					ShowContinueError( "..Fan coil unit air inlet node name = " + NodeID( FanCoil( FanCoilNum ).AirInNode ) );
 					ErrorsFound = true;
@@ -633,12 +633,12 @@ namespace FanCoilUnits {
 				FanCoil( FanCoilNum ).ATMixerOutNode = ATMixerOutNode;
 				// check that fan coil doesn' have local outside air
 				if ( ! lAlphaBlanks( 8 ) ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\"." " Fan coil unit has local as well as central outdoor air specified" );
+					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\". Fan coil unit has local as well as central outdoor air specified" );
 				}
 				// check that the air teminal mixer secondary air inlet node is the fan coil outlet node
 				if ( FanCoil( FanCoilNum ).AirOutNode != ATMixerSecNode ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\"." " Fan coil unit air outlet node name must be the same as the air terminal mixer secondary air inlet node name." );
-					ShowContinueError( "..Air terminal mixer secondary inlet node name is specified in " "AirTerminal:SingleDuct:SupplySideMixer object." );
+					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\". Fan coil unit air outlet node name must be the same as the air terminal mixer secondary air inlet node name." );
+					ShowContinueError( "..Air terminal mixer secondary inlet node name is specified in AirTerminal:SingleDuct:SupplySideMixer object." );
 					ShowContinueError( "..Fan coil unit air outlet node name = " + NodeID( FanCoil( FanCoilNum ).AirOutNode ) );
 					ErrorsFound = true;
 				}
@@ -655,7 +655,7 @@ namespace FanCoilUnits {
 					}
 				}
 				if ( ZoneExNodeNotFound ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\"." " Fan coil unit air inlet node name must be the same as a zone exhaust node name." );
+					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\". Fan coil unit air inlet node name must be the same as a zone exhaust node name." );
 					ShowContinueError( "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object." );
 					ShowContinueError( "..Fan coil unit air inlet node name = " + NodeID( FanCoil( FanCoilNum ).AirInNode ) );
 					ErrorsFound = true;
@@ -666,13 +666,13 @@ namespace FanCoilUnits {
 					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
 					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
 						if ( FanCoil( FanCoilNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
-							 FanCoil( FanCoilNum ).ZonePtr = CtrlZone;
+							FanCoil( FanCoilNum ).ZonePtr = CtrlZone;
 							ZoneInNodeNotFound = false;
 						}
 					}
 				}
 				if ( ZoneInNodeNotFound ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\"." " Fan coil unit air outlet node name must be the same as a zone inlet node name." );
+					ShowSevereError( CurrentModuleObject + " = \"" + FanCoil( FanCoilNum ).Name + "\". Fan coil unit air outlet node name must be the same as a zone inlet node name." );
 					ShowContinueError( "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object." );
 					ShowContinueError( "..Fan coil unit air outlet node name = " + NodeID( FanCoil( FanCoilNum ).AirOutNode ) );
 
@@ -1082,18 +1082,18 @@ namespace FanCoilUnits {
 					SAFMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingSAFMethod;
 					ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
 					if ( SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow ) {
-						if ( SAFMethod == SupplyAirFlowRate ){
+						if ( SAFMethod == SupplyAirFlowRate ) {
 							if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
 								ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 								ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 							}
 							TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
-						} else if ( SAFMethod == FlowPerFloorArea ){
+						} else if ( SAFMethod == FlowPerFloorArea ) {
 							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow * Zone( DataZoneNumber ).FloorArea;
 							TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 							DataScalableSizingON = true;
-						} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ){
+						} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ) {
 							DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 							TempSize = AutoSize;
 							DataScalableSizingON = true;
@@ -1126,18 +1126,18 @@ namespace FanCoilUnits {
 					SAFMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingSAFMethod;
 					ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
 					if ( SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedHeatingAirflow ) {
-						if ( SAFMethod == SupplyAirFlowRate ){
+						if ( SAFMethod == SupplyAirFlowRate ) {
 							if ( ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow > 0.0 ) {
 								ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 								ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 							}
 							TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
-						} else if ( SAFMethod == FlowPerFloorArea ){
+						} else if ( SAFMethod == FlowPerFloorArea ) {
 							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow * Zone( DataZoneNumber ).FloorArea;
 							TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 							DataScalableSizingON = true;
-						} else if ( SAFMethod == FractionOfAutosizedHeatingAirflow ){
+						} else if ( SAFMethod == FractionOfAutosizedHeatingAirflow ) {
 							DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 							TempSize = AutoSize;
 							DataScalableSizingON = true;
@@ -1313,17 +1313,17 @@ namespace FanCoilUnits {
 							CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod;
 							ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
 							if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
-								if ( CapSizingMethod == HeatingDesignCapacity ){
+								if ( CapSizingMethod == HeatingDesignCapacity ) {
 									if ( ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity > 0.0 ) {
 										ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 										ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 									}
 									TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
-								} else if ( CapSizingMethod == CapacityPerFloorArea ){
+								} else if ( CapSizingMethod == CapacityPerFloorArea ) {
 									ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 									ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
 									DataScalableCapSizingON = true;
-								} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
+								} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
 									DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 									TempSize = AutoSize;
 									DataScalableCapSizingON = true;
@@ -1361,8 +1361,7 @@ namespace FanCoilUnits {
 			if ( IsAutoSize ) {
 				FanCoil( FanCoilNum ).MaxHotWaterVolFlow = MaxHotWaterVolFlowDes;
 				ReportSizingOutput( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxHotWaterVolFlowDes );
-			}
-			else { // Hard size with sizing data
+			} else { // Hard size with sizing data
 				if ( FanCoil( FanCoilNum ).MaxHotWaterVolFlow > 0.0 && MaxHotWaterVolFlowDes > 0.0 ) {
 					MaxHotWaterVolFlowDes = FanCoil( FanCoilNum ).MaxHotWaterVolFlow;
 					ReportSizingOutput( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxHotWaterVolFlowDes, "User-Specified Maximum Hot Water Flow [m3/s]", MaxHotWaterVolFlowUser );
@@ -1412,7 +1411,7 @@ namespace FanCoilUnits {
 							CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingCapMethod;
 							ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
 							if ( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
-								if ( CapSizingMethod == CoolingDesignCapacity ){
+								if ( CapSizingMethod == CoolingDesignCapacity ) {
 									if ( ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity > 0.0 ) {
 										ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
 										ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
@@ -1420,11 +1419,11 @@ namespace FanCoilUnits {
 										DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
 									}
 									TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
-								} else if ( CapSizingMethod == CapacityPerFloorArea ){
+								} else if ( CapSizingMethod == CapacityPerFloorArea ) {
 									ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
 									ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity * Zone( DataZoneNumber ).FloorArea;
 									DataScalableCapSizingON = true;
-								} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ){
+								} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
 									DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
 									DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
 									TempSize = AutoSize;
@@ -1763,7 +1762,7 @@ namespace FanCoilUnits {
 					// warning if not converged
 					if ( Iter > ( MaxIterCycl - 1 ) ) {
 						if ( FanCoil( FanCoilNum ).MaxIterIndexC == 0 ) {
-							ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\" -- Exceeded max iterations while adjusting cycling fan" " sensible runtime to meet the zone load within the cooling convergence tolerance." );
+							ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\" -- Exceeded max iterations while adjusting cycling fan sensible runtime to meet the zone load within the cooling convergence tolerance." );
 							ShowContinueErrorTimeStamp( "Iterations=" + TrimSigDigits( MaxIterCycl ) );
 						}
 						ShowRecurringWarningErrorAtEnd( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\"  -- Exceeded max iterations error (sensible runtime) continues...", FanCoil( FanCoilNum ).MaxIterIndexC );
@@ -1817,7 +1816,7 @@ namespace FanCoilUnits {
 					// warning if not converged
 					if ( Iter > ( MaxIterCycl - 1 ) ) {
 						if ( FanCoil( FanCoilNum ).MaxIterIndexH == 0 ) {
-							ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\" -- Exceeded max iterations while adjusting cycling fan" " sensible runtime to meet the zone load within the heating convergence tolerance." );
+							ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\" -- Exceeded max iterations while adjusting cycling fan sensible runtime to meet the zone load within the heating convergence tolerance." );
 							ShowContinueErrorTimeStamp( "Iterations=" + TrimSigDigits( MaxIterCycl ) );
 						}
 						ShowRecurringWarningErrorAtEnd( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\"  -- Exceeded max iterations error (sensible runtime) continues...", FanCoil( FanCoilNum ).MaxIterIndexH );
@@ -1905,7 +1904,7 @@ namespace FanCoilUnits {
 				// warning if not converged
 				if ( Iter > ( MaxIterCycl - 1 ) ) {
 					if ( FanCoil( FanCoilNum ).MaxIterIndexC == 0 ) {
-						ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\" -- Exceeded max iterations while adjusting cycling fan" " sensible runtime to meet the zone load within the cooling convergence tolerance." );
+						ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\" -- Exceeded max iterations while adjusting cycling fan sensible runtime to meet the zone load within the cooling convergence tolerance." );
 						ShowContinueErrorTimeStamp( "Iterations=" + TrimSigDigits( MaxIterCycl ) );
 					}
 					ShowRecurringWarningErrorAtEnd( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\"  -- Exceeded max iterations error (sensible runtime) continues...", FanCoil( FanCoilNum ).MaxIterIndexC );
@@ -1943,7 +1942,7 @@ namespace FanCoilUnits {
 				// warning if not converged
 				if ( Iter > ( MaxIterCycl - 1 ) ) {
 					if ( FanCoil( FanCoilNum ).MaxIterIndexH == 0 ) {
-						ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\" -- Exceeded max iterations while adjusting cycling fan" " sensible runtime to meet the zone load within the heating convergence tolerance." );
+						ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\" -- Exceeded max iterations while adjusting cycling fan sensible runtime to meet the zone load within the heating convergence tolerance." );
 						ShowContinueErrorTimeStamp( "Iterations=" + TrimSigDigits( MaxIterCycl ) );
 					}
 					ShowRecurringWarningErrorAtEnd( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\"  -- Exceeded max iterations error (sensible runtime) continues...", FanCoil( FanCoilNum ).MaxIterIndexH );
