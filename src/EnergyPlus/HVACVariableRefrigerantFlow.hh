@@ -1283,69 +1283,16 @@ namespace HVACVariableRefrigerantFlow {
 	);
 
 	int
-		GetVRFTUOutAirNode( int const VRFTUNum );
+	GetVRFTUOutAirNode( int const VRFTUNum );
 
 	int
-		GetVRFTUZoneInletAirNode( int const VRFTUNum );
+	GetVRFTUZoneInletAirNode( int const VRFTUNum );
 
 	int
-		GetVRFTUMixedAirNode( int const VRFTUNum );
+	GetVRFTUMixedAirNode( int const VRFTUNum );
 
 	int
-		GetVRFTUReturnAirNode( int const VRFTUNum );
-
-
-	// End Algorithm Section of the Module
-	// *****************************************************************************
-
-	// Beginning of Update subroutines
-	// *****************************************************************************
-
-	//SUBROUTINE UpdateVRF()
-
-	//          ! SUBROUTINE INFORMATION:
-	//          !       AUTHOR         Richard Raustad, FSEC
-	//          !       DATE WRITTEN   August 2010
-	//          !       MODIFIED       na
-	//          !       RE-ENGINEERED  na
-
-	//          ! PURPOSE OF THIS SUBROUTINE:
-	//          ! This subroutine updates the fan outlet nodes.
-
-	//          ! METHODOLOGY EMPLOYED:
-	//          ! Data is moved from the fan data structure to the fan outlet nodes.
-
-	//          ! REFERENCES:
-	//          ! na
-
-	//          ! USE STATEMENTS:
-	//          ! na
-
-	//  IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
-
-	//          ! SUBROUTINE ARGUMENT DEFINITIONS:
-	//          ! na
-
-	//          ! SUBROUTINE PARAMETER DEFINITIONS:
-	//          ! na
-
-	//          ! INTERFACE BLOCK SPECIFICATIONS
-	//          ! na
-
-	//          ! DERIVED TYPE DEFINITIONS
-	//          ! na
-
-	//          ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	//          ! na
-
-	//  RETURN
-	//END Subroutine UpdateVRF
-
-	//        End of Update subroutines for the Fan Module
-	// *****************************************************************************
-
-	// Beginning of Reporting subroutines
-	// *****************************************************************************
+	GetVRFTUReturnAirNode( int const VRFTUNum );
 
 	void
 	ReportVRFTerminalUnit( int const VRFTUNum ); // index to VRF terminal unit
@@ -1355,11 +1302,6 @@ namespace HVACVariableRefrigerantFlow {
 
 	void
 	UpdateVRFCondenser( int const VRFCond ); // index to VRF condensing unit
-
-	//        End of Reporting subroutines for the Module
-	// *****************************************************************************
-
-	// Utility subroutines for the Module
 
 	Real64
 	PLRResidual(
