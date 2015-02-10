@@ -4292,7 +4292,9 @@ namespace SimAirServingZones {
 						VozClgSum += VbzByZone( CtrlZoneNum ) / FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling;
 					}
 					// accumulate values for system ventilation parameters report
-					RpPzSum += FinalZoneSizing( CtrlZoneNum ).DesOAFlowPPer * FinalZoneSizing( CtrlZoneNum ).TotPeopleInZone;
+					if ( FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowPPer || FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowSum || FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowMax ){
+						RpPzSum += FinalZoneSizing( CtrlZoneNum ).DesOAFlowPPer * FinalZoneSizing( CtrlZoneNum ).TotPeopleInZone;
+					} 
 					RaAzSum += FinalZoneSizing( CtrlZoneNum ).DesOAFlowPerArea * FinalZoneSizing( CtrlZoneNum ).TotalZoneFloorArea;
 					AzSum += FinalZoneSizing( CtrlZoneNum ).TotalZoneFloorArea;
 					VbzSum += VbzByZone( CtrlZoneNum );

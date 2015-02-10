@@ -12,6 +12,7 @@ set( test_src
   HeatBalanceManager.unit.cc
   HVACStandaloneERV.unit.cc
   OutputReportTabular.unit.cc
+  SizingManager.unit.cc
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
   Vectors.unit.cc
