@@ -7,10 +7,12 @@ endif()
 
 set( test_src
   DataPlant.unit.cc
+  DXCoils.unit.cc
   ExteriorEnergyUse.unit.cc
   HeatBalanceManager.unit.cc
   HVACStandaloneERV.unit.cc
   OutputProcessor.unit.cc
+  OutputReportTabular.unit.cc
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
   Vectors.unit.cc
