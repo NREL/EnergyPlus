@@ -65,4 +65,6 @@ TEST( OutputProcessor, TestGetMeteredVariables )
 
 	// Clean up
 	RVariableTypes.deallocate();
+	VarMeterArrays.deallocate();
+	EnergyMeters.deallocate();
 }
