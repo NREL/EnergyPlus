@@ -63,4 +63,6 @@ TEST( OutputProcessor, TestGetMeteredVariables )
 	GetMeteredVariables( TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, Names, NumFound );
 	EXPECT_EQ( 1 , NumFound );
 
+	// Clean up
+	RVariableTypes.deallocate();
 }
