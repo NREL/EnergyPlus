@@ -45,12 +45,13 @@ TEST( OutputProcessor, TestGetMeteredVariables )
 	EXPECT_EQ( 0, NumFound );
 
 	NumOfRVariable = 2;
+	RVariableTypes.allocate( NumOfRVariable );
 	NameOfComp = "OUTSIDELIGHTS";
 	RVar.allocate();
 
 	RVar().MeterArrayPtr = 1;
 	RVariableTypes( 1 ).KeyNameOnlyUC = NameOfComp;
-	RVariableTypes(1).VarPtr = RVar; 
+	RVariableTypes( 1 ).VarPtr = RVar; 
 	VarMeterArrays.allocate( 1 );
 
 	VarMeterArrays( 1 ).NumOnMeters = 1;
