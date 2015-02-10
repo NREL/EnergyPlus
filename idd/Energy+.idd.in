@@ -65576,8 +65576,7 @@ EnergyManagementSystem:Sensor,
   A3 ; \field Output:Variable or Output:Meter Name
        \required-field
        \type external-list
-       \external-list autoRDDvariable
-       \external-list autoRDDmeter
+       \external-list autoRDDvariableMeter
 
 EnergyManagementSystem:Actuator,
        \memo Hardware portion of EMS used to set up actuators in the model
