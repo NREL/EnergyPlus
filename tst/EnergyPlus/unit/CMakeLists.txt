@@ -11,6 +11,9 @@ set( test_src
   ExteriorEnergyUse.unit.cc
   HeatBalanceManager.unit.cc
   HVACStandaloneERV.unit.cc
+  OutputProcessor.unit.cc
+  OutputReportTabular.unit.cc
+  SizingManager.unit.cc
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
   Vectors.unit.cc
