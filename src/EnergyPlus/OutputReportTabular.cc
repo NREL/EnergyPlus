@@ -1323,16 +1323,9 @@ namespace OutputReportTabular {
 					}
 				}
 				// the first and only report is assigned to the found object name
-				if ( found != 0 ) {
+				if ( !warningAboutKeyNotFound( found, iInObj, CurrentModuleObject ) ) {
 					BinObjVarID( firstReport ).namesOfObj = objNames( found );
 					BinObjVarID( firstReport ).varMeterNum = objVarIDs( found );
-				} else {
-					ShowWarningError( CurrentModuleObject + ": Specified key not found, the first key will be used: " + OutputTableBinned( iInObj ).keyValue );
-					BinObjVarID( firstReport ).namesOfObj = objNames( 1 );
-					BinObjVarID( firstReport ).varMeterNum = objVarIDs( 1 );
-					if ( objVarIDs( 1 ) == 0 ) {
-						ShowWarningError( CurrentModuleObject + ": Specified meter or variable not found: " + objNames( 1 ) );
-					}
 				}
 				// reset the number of tables to one
 				OutputTableBinned( iInObj ).numTables = 1;
@@ -1359,6 +1352,19 @@ namespace OutputReportTabular {
 		AlphArray.deallocate();
 		NumArray.deallocate();
 
+	}
+
+	bool
+	warningAboutKeyNotFound( int foundIndex, int inObjIndex, const std::string & moduleName )
+	{
+		if ( foundIndex == 0 ) {
+			ShowWarningError( moduleName + ": Specified key not found: " + OutputTableBinned( inObjIndex ).keyValue + " for variable: " + OutputTableBinned( inObjIndex ).varOrMeter );
+			return true;
+		}
+		else {
+			return false;
+		}
+	
 	}
 
 	void

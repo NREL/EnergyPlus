@@ -763,6 +763,9 @@ namespace OutputReportTabular {
 	void
 	GetInputTabularTimeBins();
 
+	bool
+	warningAboutKeyNotFound( int foundIndex, int inObjIndex, const std::string & moduleName );
+
 	void
 	GetInputTabularStyle();
 

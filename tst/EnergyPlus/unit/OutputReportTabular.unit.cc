@@ -1,8 +1,9 @@
-// EnergyPlus::OutpurReportTabular Unit Tests
+// EnergyPlus::OutputReportTabular Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
-
+// ObjexxFCL Headers
+#include <ObjexxFCL/FArray1D.hh>
 // EnergyPlus Headers
 #include <EnergyPlus/OutputReportTabular.hh>
 
@@ -18,4 +19,11 @@ TEST( OutputReportTabularTest, ConfirmSetUnitsStyleFromString )
 	EXPECT_EQ( unitsStyleJtoGJ, SetUnitsStyleFromString( "JTOGJ" ) );
 	EXPECT_EQ( unitsStyleInchPound, SetUnitsStyleFromString( "INCHPOUND" ) );
 	EXPECT_EQ( unitsStyleNotFound, SetUnitsStyleFromString( "qqq" ) );
+}
+
+TEST( OutputReportTabularTest, Basic )
+{
+	OutputTableBinned.allocate( 10 );
+	EXPECT_TRUE( warningAboutKeyNotFound( 0, 1, "moduleName" ) );
+	EXPECT_FALSE( warningAboutKeyNotFound( 100, 1, "moduleName") );
 }

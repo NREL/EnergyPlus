@@ -7160,36 +7160,40 @@ GetMeteredVariables(
 		if ( RVar().MeterArrayPtr == 0 ) continue;
 		NumOnMeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).NumOnMeters;
 		MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( 1 );
-		++NumVariables;
-		VarIndexes( NumVariables ) = Loop;
-		VarTypes( NumVariables ) = 2;
-		IndexTypes( NumVariables ) = RVariableTypes( Loop ).IndexType;
-		UnitsStrings( NumVariables ) = RVariableTypes( Loop ).UnitsString;
+		if ( MeterPtr ) {
+			++NumVariables;
+			VarIndexes( NumVariables ) = Loop;
+			VarTypes( NumVariables ) = 2;
+			IndexTypes( NumVariables ) = RVariableTypes( Loop ).IndexType;
+			UnitsStrings( NumVariables ) = RVariableTypes( Loop ).UnitsString;
 
-		ResourceTypes( NumVariables ) = AssignResourceTypeNum( MakeUPPERCase( EnergyMeters( MeterPtr ).ResourceType ) );
-		if ( present( Names ) ) {
-			Names()( NumVariables ) = RVariableTypes( Loop ).VarNameUC;
-		}
-		if ( present( EndUses ) ) {
-			for ( MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum ) {
-				MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( MeterNum );
-				if ( EnergyMeters( MeterPtr ).EndUse != "" ) {
-					EndUses()( NumVariables ) = MakeUPPERCase( EnergyMeters( MeterPtr ).EndUse );
-					break;
+			ResourceTypes( NumVariables ) = AssignResourceTypeNum( MakeUPPERCase( EnergyMeters( MeterPtr ).ResourceType ) );
+			if ( present( Names ) ) {
+				Names()( NumVariables ) = RVariableTypes( Loop ).VarNameUC;
+			}
+			if ( present( EndUses ) ) {
+				for ( MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum ) {
+					MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( MeterNum );
+					if ( EnergyMeters( MeterPtr ).EndUse != "" ) {
+						EndUses()( NumVariables ) = MakeUPPERCase( EnergyMeters( MeterPtr ).EndUse );
+						break;
+					}
 				}
 			}
-		}
-		if ( present( Groups ) ) {
-			for ( MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum ) {
-				MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( MeterNum );
-				if ( EnergyMeters( MeterPtr ).Group != "" ) {
-					Groups()( NumVariables ) = MakeUPPERCase( EnergyMeters( MeterPtr ).Group );
-					break;
+			if ( present( Groups ) ) {
+				for ( MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum ) {
+					MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( MeterNum );
+					if ( EnergyMeters( MeterPtr ).Group != "" ) {
+						Groups()( NumVariables ) = MakeUPPERCase( EnergyMeters( MeterPtr ).Group );
+						break;
+					}
 				}
 			}
-		}
-		if ( present( VarIDs ) ) {
-			VarIDs()( NumVariables ) = RVar().ReportID;
+			if ( present( VarIDs ) ) {
+				VarIDs()( NumVariables ) = RVar().ReportID;
+			}
+		} else {
+			ShowWarningError( "Referenced variable or meter used in the wrong context \"" + ComponentName + "\" of type \"" + ComponentType + "\"" );
 		}
 	}
 
