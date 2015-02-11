@@ -35,8 +35,8 @@ TEST( ProcessOAControllerTest, Test1 )
 	//    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
 	//    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
 
-	static bool ErrorsFound( false ); // If errors detected in input
-	static int ControllerNum( 0 ); // Controller number
+	bool ErrorsFound( false ); // If errors detected in input
+	int ControllerNum( 0 ); // Controller number
 	int NumAlphas ( 17 );
 	int NumNumbers ( 7 );
 	int NumOfOAControllers( 2 );
