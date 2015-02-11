@@ -164,39 +164,78 @@ namespace GroundHeatExchangers {
 			GetInput = false;
 		}
 
-		// Find the correct GLHE
-		if ( compIndex == 0 ) {
-			GLHENum = FindItemInList( name, verticalGLHE.name(), numVerticalGLHEs );
-			if ( GLHENum == 0 ) {
-				ShowFatalError( "SimGroundHeatExchangers: Unit not found=" + name );
-			}
-			compIndex = GLHENum;
-		} else {
-			GLHENum = compIndex;
-			if ( GLHENum > numVerticalGLHEs || GLHENum < 1 ) {
-				ShowFatalError( "SimGroundHeatExchangers:  Invalid compIndex passed=" + TrimSigDigits( GLHENum ) + ", Number of Units=" + TrimSigDigits( numVerticalGLHEs ) + ", Entered Unit name=" + name );
-			}
-			if ( checkEquipName( GLHENum ) ) {
-				if ( name != verticalGLHE( GLHENum ).name ) {
-					ShowFatalError( "SimGroundHeatExchangers: Invalid compIndex passed=" + TrimSigDigits( numVerticalGLHEs ) + ", Unit name=" + name + ", stored Unit name for that index=" + verticalGLHE( GLHENum ).name );
+		if ( type == "GROUNDHEATEXCHANGER:VERTICAL") {
+
+			// Find the correct GLHE
+			if ( compIndex == 0 ) {
+				GLHENum = FindItemInList( name, verticalGLHE.name(), numVerticalGLHEs );
+				if ( GLHENum == 0 ) {
+					ShowFatalError( "SimGroundHeatExchangers: Unit not found=" + name );
 				}
-				checkEquipName( GLHENum ) = false;
+				compIndex = GLHENum;
+			} else {
+				GLHENum = compIndex;
+				if ( GLHENum > numVerticalGLHEs || GLHENum < 1 ) {
+					ShowFatalError( "SimGroundHeatExchangers:  Invalid compIndex passed=" + TrimSigDigits( GLHENum ) + ", Number of Units=" + TrimSigDigits( numVerticalGLHEs ) + ", Entered Unit name=" + name );
+				}
+				if ( checkEquipName( GLHENum ) ) {
+					if ( name != verticalGLHE( GLHENum ).name ) {
+						ShowFatalError( "SimGroundHeatExchangers: Invalid compIndex passed=" + TrimSigDigits( numVerticalGLHEs ) + ", Unit name=" + name + ", stored Unit name for that index=" + verticalGLHE( GLHENum ).name );
+					}
+					checkEquipName( GLHENum ) = false;
+				}
 			}
-		}
 
-		auto & thisGLHE( verticalGLHE( GLHENum ) );
+			auto & thisGLHE( verticalGLHE( GLHENum ) );
 
-		if ( initLoopEquip ) {
+			if ( initLoopEquip ) {
+				thisGLHE.initGLHESimVars();
+				return;
+			}
+
+			//INITIALIZE
 			thisGLHE.initGLHESimVars();
-			return;
+
+			//SIMULATE HEAT EXCHANGER
+			thisGLHE.calcGroundHeatExchanger();
+			//thisGLHE.updateGroundHeatExchanger();
+
+		} else if ( type == "GROUNDHEATEXCHANGER:SLINKY") {
+		
+			// Find the correct GLHE
+			if ( compIndex == 0 ) {
+				GLHENum = FindItemInList( name, slinkyGLHE.name(), numSlinkyGLHEs );
+				if ( GLHENum == 0 ) {
+					ShowFatalError( "SimGroundHeatExchangers: Unit not found=" + name );
+				}
+				compIndex = GLHENum;
+			} else {
+				GLHENum = compIndex;
+				if ( GLHENum > numSlinkyGLHEs || GLHENum < 1 ) {
+					ShowFatalError( "SimGroundHeatExchangers:  Invalid compIndex passed=" + TrimSigDigits( GLHENum ) + ", Number of Units=" + TrimSigDigits( numSlinkyGLHEs ) + ", Entered Unit name=" + name );
+				}
+				if ( checkEquipName( GLHENum ) ) {
+					if ( name != slinkyGLHE( GLHENum ).name ) {
+						ShowFatalError( "SimGroundHeatExchangers: Invalid compIndex passed=" + TrimSigDigits( numSlinkyGLHEs ) + ", Unit name=" + name + ", stored Unit name for that index=" + slinkyGLHE( GLHENum ).name );
+					}
+					checkEquipName( GLHENum ) = false;
+				}
+			}
+
+			auto & thisGLHE( slinkyGLHE( GLHENum ) );
+
+			if ( initLoopEquip ) {
+				thisGLHE.initGLHESimVars();
+				return;
+			}
+
+			//INITIALIZE
+			thisGLHE.initGLHESimVars();
+
+			//SIMULATE HEAT EXCHANGER
+			thisGLHE.calcGroundHeatExchanger();
+			//thisGLHE.updateGroundHeatExchanger();
 		}
-
-		//INITIALIZE
-		thisGLHE.initGLHESimVars();
-
-		//SIMULATE HEAT EXCHANGER
-		thisGLHE.calcGroundHeatExchanger();
-		//thisGLHE.updateGroundHeatExchanger();
 
 	}
 
@@ -234,22 +273,31 @@ namespace GroundHeatExchangers {
 		Real64 tLg_grid( 0.25 );
 		Real64 tLg;
 		Real64 t; 
-		Real64 numGFunctions;
+		int numGFunctions;
 		int NT;
 		int numLC;
 		int numRC;
-		FArray1D< Real64 > X0;
-		FArray1D< Real64 > Y0;
 		int coil;
 		int trench;
 		Real64 fraction;
-		FArray2D< Real64 > valStored;
+		FArray2D< Real64 > valStored( {0, numTrenches}, {0, numCoils}, -1.0 );
 		Real64 gFunc;
+		Real64 gFuncin;
 		int m1;
 		int n1;
 		int m;
 		int n;
+		int mm1;
+		int nn1;
+		int i;
+		int j;
 		Real64 disRing;
+		int I0;
+		int J0;
+		Real64 doubleIntegralVal;
+		Real64 midFieldVal;
+
+		//ShowString( "Calculating G-Functions" );
 
 		X0.allocate( numCoils );
 		Y0.allocate( numTrenches );
@@ -257,64 +305,336 @@ namespace GroundHeatExchangers {
 		// Calculate the number of g-functions required
 		numGFunctions = ( tLg_max - tLg_min ) / ( tLg_grid ) + 1;
 
+		// Allocate and setup g-function arrays
+		GFNC.allocate( numGFunctions );
+		LNTTS.allocate( numGFunctions );
+		for ( i = 1; i <= numGFunctions; i++ ) {
+			GFNC( i ) = 0.0;
+			LNTTS( i ) = 0.0;
+		}
+
 		// Calculate the number of loops (per trench) and number of trenchs to be involved
 			// Due to the symmetry of a slinky GHX field, we need only calculate about 
 			// on quarter of the rings' tube wall temperature perturbation to get the 
 			// mean wall temperature perturbation of the entire slinky GHX field.
-		numLC = ceil( numCoils / 2);
-		numRC = ceil( numTrenches / 2 );
+		numLC = std::ceil( numCoils / 2.0 );
+		numRC = std::ceil( numTrenches / 2.0 );
 
 		// Calculate coordinates (X0, Y0) of a ring's center
-		for ( coil = 1; coil == numCoils; coil++) {
-			X0( coil ) = coilDiameter + coilPitch * ( coil - 1 );		
+		for ( coil = 1; coil <= numCoils; coil++ ) {
+			X0( coil ) = ( coilDiameter / 2.0 ) + coilPitch * ( coil - 1 );		
 		}
-		for ( trench = 1; trench == numTrenches; trench++ ){
+		for ( trench = 1; trench <= numTrenches; trench++ ) {
 			Y0( trench ) = ( trench - 1 ) * trenchSpacing;
 		}
 
 		// If number of trenches is greater than 1, one quarter of the rings are involved.
 		// If number of trenches is 1, one half of the rings are involved.
-		if ( numTrenches > 1 ){
+		if ( numTrenches > 1 ) {
 			fraction = 0.25;
 		} else {
 			fraction = 0.5;
 		}
 		
 		// Calculate the corresponding time of each temperature response factor
-		for ( NT = 1; NT == numGFunctions; NT++ ){
-			tLg = tLg_min + tLg_grid * ( NT -1 );
+		for ( NT = 1; NT <= numGFunctions; NT++ ) {
+			tLg = tLg_min + tLg_grid * ( NT - 1 );
 			t = pow( 10, tLg ) * 3600;
-
-			// Initialize each iteration
-			for ( trench = 1; trench == numTrenches; trench++ ){
-				for ( coil = 1; coil == numCoils; coil++ ){
-					valStored( trench, coil ) = 0.0;
-				} // coils
-			} // trenchs
 
 			// Set the average temperature resonse of the whole field to zero
 			gFunc = 0;
 
-			for ( m1 = 1; m1 == numRC; m1++ ){
-				for ( n1 = 1; n1 == numLC; n1++ ){
-					for ( m = 1; m == numTrenches; m++ ){
-						for ( n = 1; n == numCoils; n++ ){
+			for ( i = 0; i <= numTrenches; i++ ) {
+				for ( j = 0; j <= numCoils; j++ ) {
+					valStored( i, j ) = -1.0;
+				}
+			}
+
+			for ( m1 = 1; m1 <= numRC; m1++ ) {
+				for ( n1 = 1; n1 <= numLC; n1++ ) {
+					for ( m = 1; m <= numTrenches; m++ ) {
+						for ( n = 1; n <= numCoils; n++ ) {
 
 							// Calculate the distance between ring centers
-							//disRing = disCenter( m, n, m1, n1 )
+							disRing = disCenter( m, n, m1, n1 );
+
+							// Save mm1 and nn1
+							mm1 = std::abs( m - m1 );
+							nn1 = std::abs( n - n1 );
+
+							// If we're calculating a ring's temperature response to itself as a ring source,
+							// then we nee some extra effort in calculating the double integral
+							if ( m1 == m && n1 == n) {
+							
+								I0 = 33;
+								J0 = 1089;
+							
+							} else {
+							
+								I0 = 33;
+								J0 = 561;
+							}
+
+							// if the ring(n1, m1) is the near-field ring of the ring(n,m)
+							if ( disRing <= (2.5 + coilDiameter) ) {
+								// if no calculated value has been stored
+								if ( valStored( mm1, nn1 ) < 0 ) {
+									doubleIntegralVal = doubleIntegral( m, n, m1, n1, t, I0, J0 );
+									valStored( mm1, nn1 ) = doubleIntegralVal;
+								// else: if a stored value is found for the combination of (m, n, m1, n1)
+								} else {
+									doubleIntegralVal = valStored( mm1, nn1 );
+								}
+							
+								// due to symmetry, the temperature response of ring(n1, m1) should be 0.25, 0.5, or 1 times its calculated value
+								if ( ! isEven( numTrenches ) && ! isEven( numCoils ) && m1 == numRC && n1 == numLC && numTrenches > 1.5 ) {
+									gFuncin = 0.25 * doubleIntegralVal;
+								} else if ( ! isEven( numTrenches ) && m1 == numRC && numTrenches > 1.5 ) {
+									gFuncin = 0.5 * doubleIntegralVal;
+								} else if ( ! isEven( numCoils ) && n1 == numLC ) {
+									gFuncin = 0.5  * doubleIntegralVal;
+								} else {
+									gFuncin = doubleIntegralVal;
+								}
+
+							// if the ring(n1, m1) is in the far-field or the ring(n,m)
+							} else if ( disRing > (10 + coilDiameter ) ) {
+								gFuncin = 0;
+
+							// else the ring(n1, m1) is in the middle-field of the ring(n,m)
+							} else {
+								// if no calculated value have been stored
+								if ( valStored( mm1, nn1 ) < 0.0 ) {
+									midFieldVal = middleField( m, n, m1, n1, t );
+									valStored( mm1, nn1 ) = midFieldVal;
+								//if a stored value is found for the comination of (m, n, m1, n1), then
+								} else {
+									midFieldVal = valStored( mm1, nn1 );
+								}
+
+								// due to symmetry, the temperature response of ring(n1, m1) should be 0.25, 0.5, or 1 times its calculated value
+								if ( ! isEven( numTrenches ) && ! isEven( numCoils ) && m1 == numRC && n1 == numLC && numTrenches > 1.5 ) {
+									gFuncin = 0.25 * midFieldVal;
+								} else if ( ! isEven( numTrenches ) && m1 == numRC && numTrenches > 1.5 ) {
+									gFuncin = 0.5 * midFieldVal;
+								} else if ( ! isEven( numCoils ) && n1 == numLC ) {
+									gFuncin = 0.5  * midFieldVal;
+								} else {
+									gFuncin = midFieldVal;
+								}
+
+							}
+
+							gFunc += gFuncin;
 
 						} // n
 					} // m
 				} // n1			
 			} // m1
 
+			GFNC( NT ) = ( gFunc * ( coilDiameter / 2.0 ) ) / ( 4 * Pi	* fraction * numTrenches * numCoils );
+			LNTTS( NT ) = tLg;
+
 		} // NT time
 	
 	};
+	//******************************************************************************
 
-	//GLHESlinky::disCenter(){
+	Real64
+	GLHESlinky::responseFunction(
+	Real64 distance,
+	Real64 const t
+	)
+	{
+		Real64 errFunc1;
+		Real64 errFunc2;
+		Real64 sqrtAlphaT;
+		Real64 sqrtDistDepth;
+
+		sqrtAlphaT = std::sqrt( diffusivityGround * t );
+
+		sqrtDistDepth = std::sqrt( std::pow( distance, 2.0 ) + 4 * std::pow( coilDepth, 2.0 ) );
+		
+		errFunc1 = std::erfc( 0.5 * distance / sqrtAlphaT );
+
+		errFunc2 = std::erfc( 0.5 * sqrtDistDepth / sqrtAlphaT );
+		
+		return errFunc1 / distance - errFunc2 / sqrtDistDepth;
+
+	};
+	//******************************************************************************
+
+	Real64
+	GLHESlinky::middleField(
+	int const m,
+	int const n,
+	int const m1,
+	int const n1,
+	Real64 const t
+	)
+	{
+		return 4 * std::pow( Pi, 2.0 ) * responseFunction( disCenter( m, n, m1, n1 ), t );
+	};
+
+	//******************************************************************************
+
+	Real64
+	GLHESlinky::disCenter(
+		int const m, 
+		int const n,
+		int const m1,
+		int const n1
+	)
+	{
+		return std::sqrt( std::pow( X0( n ) - X0( n1 ), 2 ) + std::pow( Y0( m ) - Y0( m1 ), 2 ) );
+	};
+
+	//******************************************************************************
+
+	Real64
+	GLHESlinky::distance(
+	int const m,
+	int const n,
+	int const m1,
+	int const n1,
+	Real64 const eta,
+	Real64 const theta	
+	)
+	{
+		// Function to calculate distance between any two point on any two loops
+
+		Real64 x;
+		Real64 y;
+		Real64 xIn;
+		Real64 yIn;
+		Real64 xOut;
+		Real64 yOut;
+		Real64 pipeOuterRadius;
+
+		pipeOuterRadius = pipeOutDia / 2.0;
+
+		if ( ! verticalConfig ) {
+
+			x = X0( n ) + std::cos( theta ) * ( coilDiameter / 2.0 );
+			y = Y0( m ) + std::sin( theta ) * ( coilDiameter / 2.0 );
+
+			xIn = X0( n1 ) + std::cos( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
+			yIn = Y0( m1 ) + std::sin( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
+
+			xOut = X0( n1 ) + std::cos( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
+			yOut = Y0( m1 ) + std::sin( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
 	
-	//};
+			return 0.5 * std::sqrt( std::pow( x - xIn, 2.0 ) + std::pow( y - yIn, 2.0 ) ) 
+				+ 0.5 * std::sqrt( std::pow( x - xOut, 2.0 ) + std::pow( y - yOut, 2.0 ) );
+
+		} else {
+		
+			
+		}
+	};
+
+
+	//******************************************************************************
+
+	bool
+	GLHESlinky::isEven(
+		int const val
+	)
+	{
+		if ( val % 2 == 0 ) {
+			return true;
+		} else {
+			return false;
+		}
+	};
+
+	//******************************************************************************
+
+	Real64
+	GLHESlinky::integral(
+		int const m,
+		int const n,
+		int const m1,
+		int const n1,
+		Real64 const t,
+		Real64 const eta,
+		Real64 const J0
+	)
+	{
+		Real64 sumIntF( 0.0 );
+		Real64 theta( 0.0 );
+		Real64 theta1( 0.0 );
+		Real64 theta2( 2 * Pi );
+		Real64 h;
+		int j;
+		FArray1D< Real64 > f( J0, 0.0 );
+
+		h = ( theta2 - theta1 ) / ( J0 - 1 );
+
+		// Calculate the function at various equally spaced x values
+		for ( j = 1; j <= J0; j++ ) {
+		
+			theta = theta1 + ( j - 1 ) * h;
+
+			f( j ) =  responseFunction( distance( m, n, m1, n1, eta, theta ), t );
+
+			if ( j == 1 || j == J0) {
+				f( j ) = f( j );
+			} else if ( isEven( j ) ) {
+				f( j ) = 4 * f( j );
+			} else {
+				f( j ) = 2 * f( j );
+			}
+
+			sumIntF += f( j );
+		}
+		
+		return ( h / 3 ) * sumIntF;
+	};
+	//******************************************************************************
+
+	Real64
+	GLHESlinky::doubleIntegral(
+		int const m,
+		int const n,
+		int const m1,
+		int const n1,
+		Real64 const t,
+		int const I0,
+		int const J0
+	)
+	{
+	
+		Real64 sumIntF( 0.0 );
+		Real64 eta( 0.0 );
+		Real64 eta1( 0.0 );
+		Real64 eta2( 2 * Pi );
+		Real64 h;
+		int i;
+		FArray1D< Real64 > g( I0, 0.0 );
+
+		h = ( eta2 - eta1 ) / ( I0 - 1 );
+
+		// Calculates the value of the function at various equally spaced values
+		for ( i = 1; i <= I0; i++ ) {
+		
+			eta = eta1 + ( i - 1 ) * h;
+			g( i ) = integral( m, n, m1, n1, t, eta, J0 );
+
+			if ( i == 1 || i == I0 ) {
+				g( i ) = g( i );
+			} else if ( isEven( i ) == true ) {
+				g( i ) = 4 * g( i );
+			} else {
+				g( i ) = 2 * g( i );
+			}
+			
+			sumIntF += g( i );
+		}
+
+		return ( h / 3 ) * sumIntF;
+
+	};
 
 	//******************************************************************************
 
@@ -348,7 +668,7 @@ namespace GroundHeatExchangers {
 		static bool firstTime( true );
 
 		// Calculate g-functions
-		if ( firstTime ){
+		if ( firstTime ) {
 			calcGFunctions();
 			firstTime = false;
 		}
@@ -1045,8 +1365,35 @@ namespace GroundHeatExchangers {
 				slinkyGLHE( GLHENum ).numTrenches = rNumericArgs( 14 );
 				slinkyGLHE( GLHENum ).trenchSpacing = rNumericArgs( 15 );
 
+				// Number of coils
+				slinkyGLHE( GLHENum ).numCoils = slinkyGLHE( GLHENum ).trenchLength / slinkyGLHE( GLHENum ).coilPitch;
+
 				// Farfield model parameters, validated min/max by IP
 				slinkyGLHE( GLHENum ).useGroundTempDataForKusuda = lNumericFieldBlanks( 16 ) || lNumericFieldBlanks( 17 ) || lNumericFieldBlanks( 18 );
+
+				// Average coil depth
+				if ( slinkyGLHE( GLHENum ).verticalConfig == true ) {
+					// Vertical configuration
+					if ( slinkyGLHE( GLHENum ).trenchDepth - slinkyGLHE(GLHENum).coilDiameter < 0.0 ) {
+						// Error: part of the coil is above ground
+						ShowSevereError( cCurrentModuleObject + "=\"" + slinkyGLHE( GLHENum ).name + "\", invalid value in field." );
+						ShowContinueError( "..." + cNumericFieldNames( 13 ) + "=[" + RoundSigDigits( slinkyGLHE( GLHENum ).trenchDepth, 3 ) + "]." );
+						ShowContinueError( "..." + cNumericFieldNames( 10 ) + "=[" + RoundSigDigits( slinkyGLHE( GLHENum ).coilDepth, 3 ) + "]." );
+						ShowContinueError( "...Average coil depth will be <=0." );
+						errorsFound = true;
+
+					} else {
+						// Entire coil is below ground
+						slinkyGLHE( GLHENum ).coilDepth = slinkyGLHE( GLHENum ).trenchDepth - ( slinkyGLHE( GLHENum ).coilDiameter / 2.0 );
+					}
+
+				} else {
+					// Horizontal configuration
+					slinkyGLHE( GLHENum ). coilDepth = slinkyGLHE( GLHENum ).trenchDepth;
+				}
+
+				// Thermal diffusivity of the ground
+				slinkyGLHE( GLHENum ).diffusivityGround = slinkyGLHE( GLHENum ).kGround / slinkyGLHE( GLHENum ).cpRhoGround;
 
 				if ( !slinkyGLHE( GLHENum ).useGroundTempDataForKusuda ) {
 					slinkyGLHE( GLHENum ).averageGroundTemp = rNumericArgs( 16 );
@@ -1089,8 +1436,9 @@ namespace GroundHeatExchangers {
 							slinkyGLHE( GLHENum ).minSurfTemp = PubGroundTempSurface( monthIndex );
 						}
 					}
-
+				
 				slinkyGLHE( GLHENum ).phaseShiftOfMinGroundTempDays = slinkyGLHE( GLHENum ).monthOfMinSurfTemp * AvgDaysInMonth;
+
 			}
 				//   Not many checks
 
@@ -1101,45 +1449,6 @@ namespace GroundHeatExchangers {
 					ShowContinueError( "...Radius will be <=0." );
 					errorsFound = true;
 				}
-
-				//if ( slinkyGLHE( GLHENum ).maxSimYears < MaxNumberSimYears ) {
-				//	ShowWarningError( cCurrentModuleObject + "=\"" + slinkyGLHE( GLHENum ).name + "\", invalid value in field." );
-				//	ShowContinueError( "..." + cNumericFieldNames( 13 ) + " less than RunPeriod Request" );
-				//	ShowContinueError( "Requested input=" + TrimSigDigits( slinkyGLHE( GLHENum ).maxSimYears ) + " will be set to " + TrimSigDigits( MaxNumberSimYears ) );
-				//	slinkyGLHE( GLHENum ).maxSimYears = MaxNumberSimYears;
-				//}
-
-				//// Get Gfunction data
-				//slinkyGLHE( GLHENum ).NPairs = rNumericArgs( 15 );
-				//slinkyGLHE( GLHENum ).SubAGG = 15;
-				//slinkyGLHE( GLHENum ).AGG = 192;
-
-				//// Allocation of all the dynamic arrays
-				//slinkyGLHE( GLHENum ).LNTTS.allocate( slinkyGLHE( GLHENum ).NPairs );
-				//slinkyGLHE( GLHENum ).LNTTS = 0.0;
-				//slinkyGLHE( GLHENum ).GFNC.allocate( slinkyGLHE( GLHENum ).NPairs );
-				//slinkyGLHE( GLHENum ).GFNC = 0.0;
-				//slinkyGLHE( GLHENum ).QnMonthlyAgg.allocate( slinkyGLHE( GLHENum ).maxSimYears * 12 );
-				//slinkyGLHE( GLHENum ).QnMonthlyAgg = 0.0;
-				//slinkyGLHE( GLHENum ).QnHr.allocate( 730 + slinkyGLHE( GLHENum ).AGG + slinkyGLHE( GLHENum ).SubAGG );
-				//slinkyGLHE( GLHENum ).QnHr = 0.0;
-				//slinkyGLHE( GLHENum ).QnSubHr.allocate( ( slinkyGLHE( GLHENum ).SubAGG + 1 ) * maxTSinHr + 1 );
-				//slinkyGLHE( GLHENum ).QnSubHr = 0.0;
-				//slinkyGLHE( GLHENum ).LastHourN.allocate( slinkyGLHE( GLHENum ).SubAGG + 1 );
-				//slinkyGLHE( GLHENum ).LastHourN = 0;
-
-				//if ( ! allocated ) {
-				//	prevTimeSteps.allocate( ( slinkyGLHE( GLHENum ).SubAGG + 1 ) * maxTSinHr + 1 );
-				//	prevTimeSteps = 0.0;
-				//	allocated = true;
-				//}
-
-				//indexNum = 16;
-				//for ( pairNum = 1; pairNum <= slinkyGLHE( GLHENum ).NPairs; ++pairNum ) {
-				//	slinkyGLHE( GLHENum ).LNTTS( pairNum ) = rNumericArgs( indexNum );
-				//	slinkyGLHE( GLHENum ).GFNC( pairNum ) = rNumericArgs( indexNum + 1 );
-				//	indexNum += 2;
-				//}
 
 				//Check for Errors
 				if ( errorsFound ) {
@@ -1474,7 +1783,7 @@ namespace GroundHeatExchangers {
 		}
 
 		if ( myEnvrnFlag && BeginEnvrnFlag ) {
-			std::cout << "BegEnvrnFlag = true\n" ;
+			
 			myEnvrnFlag = false;
 
 			fluidDensity = GetDensityGlycol( PlantLoop( loopNum ).FluidName, 20.0, PlantLoop( loopNum ).FluidIndex, RoutineName );
@@ -1506,7 +1815,90 @@ namespace GroundHeatExchangers {
 	}
 
 	void
-	GLHESlinky::initGLHESimVars(){}
+	GLHESlinky::initGLHESimVars(){
+	
+			// SUBROUTINE INFORMATION:
+		//       AUTHOR:          Dan Fisher
+		//       DATE WRITTEN:    August, 2000
+		//       MODIFIED         Arun Murugappan
+		//       RE-ENGINEERED    na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine needs a description.
+
+		// METHODOLOGY EMPLOYED:
+		// Needs description, as appropriate.
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using PlantUtilities::InitComponentNodes;
+		using PlantUtilities::SetComponentFlowRate;
+		using PlantUtilities::RegulateCondenserCompFlowReqOp;
+		using DataPlant::PlantLoop;
+		using DataPlant::TypeOf_GrndHtExchgSlinky;
+		using DataPlant::ScanPlantLoopsForObject;
+		using FluidProperties::GetDensityGlycol;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "initGLHESimVars" );
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 fluidDensity;
+		bool errFlag;
+
+		// Init more variables
+		if ( myFlag ) {
+			// Locate the hx on the plant loops for later usage
+			errFlag = false;
+			ScanPlantLoopsForObject( name, TypeOf_GrndHtExchgSlinky, loopNum, loopSideNum, branchNum, compNum, _, _, _, _, _, errFlag );
+			if ( errFlag ) {
+				ShowFatalError( "initGLHESimVars: Program terminated due to previous condition(s)." );
+			}
+			myFlag = false;
+		}
+
+		if ( myEnvrnFlag && BeginEnvrnFlag ) {
+
+			myEnvrnFlag = false;
+
+			fluidDensity = GetDensityGlycol( PlantLoop( loopNum ).FluidName, 20.0, PlantLoop( loopNum ).FluidIndex, RoutineName );
+			designMassFlow = designFlow * fluidDensity;
+			InitComponentNodes( 0.0, designMassFlow, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum );
+
+			lastQnSubHr = 0.0;
+			Node( inletNodeNum ).Temp = tempGround;
+			Node( outletNodeNum ).Temp = tempGround;
+
+			// zero out all history arrays
+
+			QnHr = 0.0;
+			QnMonthlyAgg = 0.0;
+			QnSubHr = 0.0;
+			//QGLHE = 0.0;
+			LastHourN = 0;
+			prevTimeSteps = 0.0;
+			currentSimTime = 0.0;
+		}
+
+		massFlowRate = RegulateCondenserCompFlowReqOp( loopNum, loopSideNum, branchNum, compNum, designMassFlow );
+
+		SetComponentFlowRate( massFlowRate, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum );
+
+		// Reset local environment init flag
+		if ( ! BeginEnvrnFlag ) myEnvrnFlag = true;
+	
+	}
 
 	//******************************************************************************
 

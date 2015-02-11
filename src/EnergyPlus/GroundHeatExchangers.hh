@@ -41,6 +41,7 @@ namespace GroundHeatExchangers {
 		int outletNodeNum; // Node number on the outlet side of the plant
 		Real64 kGround; // Thermal conductivity of the ground		[W/(mK)]
 		Real64 cpRhoGround; // Specific heat capacity of ground		[J/Kg/K]
+		Real64 diffusivityGround; // Thermal diffisivity of the ground [m2/s]
 		Real64 kPipe; // Thermal Conductivity of the U tube			[W/(mK)]
 		Real64 cpPipe; // Specific heat of the U tube				[J/kg-K]
 		Real64 rhoPipe; // Density of the U tube					[kg/m3]
@@ -71,6 +72,7 @@ namespace GroundHeatExchangers {
 		Real64 QGLHE; // [W] heat transfer rate
 		bool myFlag;
 		bool myEnvrnFlag;
+		Real64 lastQnSubHr;
 
 		// Default Constructor
 		GLHEBase() :
@@ -104,7 +106,8 @@ namespace GroundHeatExchangers {
 			aveFluidTemp( 0.0 ),
 			QGLHE( 0.0 ),
 			myFlag( true ),
-			myEnvrnFlag( true )
+			myEnvrnFlag( true ),
+			lastQnSubHr( 0.0 )
 
 		{}
 
@@ -137,8 +140,6 @@ namespace GroundHeatExchangers {
 		Real64 UtubeDist; // Distance between the legs of the Utube    [m]
 		Real64 resistanceBhole; // The thermal resistance of the borehole, (K per W/m)
 		bool runFlag;
-		Real64 lastQnSubHr;
-
 
 		// Default Constructor
 		GLHEVert() :
@@ -150,8 +151,7 @@ namespace GroundHeatExchangers {
 			kGrout( 0.0 ),
 			UtubeDist( 0.0 ),
 			resistanceBhole( 0.0 ),
-			runFlag( false ),
-			lastQnSubHr( 0.0 )
+			runFlag( false )
 
 		{}
 
@@ -180,6 +180,7 @@ namespace GroundHeatExchangers {
 		bool verticalConfig;	// HX Configuration Flag
 		Real64 coilDiameter;	// Diameter of the slinky coils [m]
 		Real64 coilPitch;		// Center-to-center slinky coil spacing [m]
+		Real64 coilDepth;		// Average depth of the coil [m]
 		Real64 trenchDepth;		// Trench depth from ground surface to trench bottom [m]
 		Real64 trenchLength;	// Length of single trench [m]
 		int numTrenches;		// Number of parallel trenches [m]
@@ -191,12 +192,15 @@ namespace GroundHeatExchangers {
 		Real64 phaseShiftOfMinGroundTempDays;
 		int monthOfMinSurfTemp;
 		Real64 minSurfTemp;
+		FArray1D< Real64 > X0;
+		FArray1D< Real64 > Y0;
 
 		// Default Constructor
 		GLHESlinky() :
 			verticalConfig( false ),
 			coilDiameter( 0.0 ),
 			coilPitch( 0.0 ),
+			coilDepth( 0.0 ),
 			trenchDepth( 0.0 ),
 			trenchLength( 0.0 ),
 			numTrenches( 0 ),
@@ -223,6 +227,66 @@ namespace GroundHeatExchangers {
 		Real64
 		interpGFunc(
 		Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
+		);
+
+		Real64
+		disCenter(
+		int const m,
+		int const n,
+		int const m1,
+		int const n1
+		);
+
+		Real64
+		doubleIntegral(
+		int const m,
+		int const n,
+		int const m1,
+		int const n1,
+		Real64 const t,
+		int const I0,
+		int const J0
+		);
+
+		Real64
+		integral(
+		int const m,
+		int const n,
+		int const m1,
+		int const n1,
+		Real64 const t,
+		Real64 const eta,
+		Real64 const J0
+		);
+
+		bool
+		isEven(
+		int const val
+		);
+
+		Real64
+		distance(
+		int const m,
+		int const n,
+		int const m1,
+		int const n1,
+		Real64 const eta,
+		Real64 const theta
+		);
+
+		Real64
+		middleField(
+		int const m,
+		int const n,
+		int const m1,
+		int const n1,
+		Real64 const t
+		);
+
+		Real64
+		responseFunction(
+		Real64 const distance,
+		Real64 const t
 		);
 
 	};
