@@ -80,7 +80,7 @@ namespace DataSurfaces {
 	// SHADING (includes OVERHANG, WING), DETACHED, INTMASS),
 	// TDD:DOME, TDD:DIFFUSER (for tubular daylighting device)
 	// (Note: GLASSDOOR and TDD:DIFFUSER get overwritten as WINDOW
-	// in SurfaceGeometry.f90, SurfaceWindow%OriginalClass holds the true value)
+	// in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
 	// why aren't these sequential (LKL - 13 Aug 2007)
 	extern int const SurfaceClass_Wall;
 	extern int const SurfaceClass_Floor;
@@ -549,6 +549,7 @@ namespace DataSurfaces {
 		int ExtCavNum; // index for this surface in ExtVentedCavity structure (if any)
 		bool IsPV; // true if this is a photovoltaic surface (dxf output)
 		bool IsICS; // true if this is an ICS collector
+		bool IsPool; // true if this is a pool
 		int ICSPtr; // Index to ICS collector
 		// TH added 3/26/2010
 		bool MirroredSurf; // Ture if it is a mirrored surface
@@ -669,6 +670,7 @@ namespace DataSurfaces {
 			ExtCavNum( 0 ),
 			IsPV( false ),
 			IsICS( false ),
+			IsPool( false ),
 			ICSPtr( 0 ),
 			MirroredSurf( false ),
 			IntConvClassification( 0 ),
@@ -791,6 +793,7 @@ namespace DataSurfaces {
 			int const ExtCavNum, // index for this surface in ExtVentedCavity structure (if any)
 			bool const IsPV, // true if this is a photovoltaic surface (dxf output)
 			bool const IsICS, // true if this is an ICS collector
+			bool const IsPool, // true if this is a pool
 			int const ICSPtr, // Index to ICS collector
 			bool const MirroredSurf, // Ture if it is a mirrored surface
 			int const IntConvClassification, // current classification for inside face air flow regime and surface orientation
@@ -910,6 +913,7 @@ namespace DataSurfaces {
 			ExtCavNum( ExtCavNum ),
 			IsPV( IsPV ),
 			IsICS( IsICS ),
+			IsPool( IsPool ),
 			ICSPtr( ICSPtr ),
 			MirroredSurf( MirroredSurf ),
 			IntConvClassification( IntConvClassification ),
@@ -1188,7 +1192,7 @@ namespace DataSurfaces {
 		Real64 SpecTemp; // The specification temperature of the TC layer glass
 		// Added for W6 integration June 2010
 		int WindowModelType; // if set to WindowBSDFModel, then uses BSDF methods
-		BSDFWindowDescript ComplexFen; // Data for complex fenestration, see DataBSDFWindow.f90 for declaration
+		BSDFWindowDescript ComplexFen; // Data for complex fenestration, see DataBSDFWindow.cc for declaration
 
 		// Default Constructor
 		SurfaceWindowCalc() :
@@ -1533,7 +1537,7 @@ namespace DataSurfaces {
 			Real64 const TCLayerTemp, // The temperature of the thermochromic layer of the window
 			Real64 const SpecTemp, // The specification temperature of the TC layer glass
 			int const WindowModelType, // if set to WindowBSDFModel, then uses BSDF methods
-			BSDFWindowDescript const & ComplexFen // Data for complex fenestration, see DataBSDFWindow.f90 for declaration
+			BSDFWindowDescript const & ComplexFen // Data for complex fenestration, see DataBSDFWindow.cc for declaration
 		) :
 			ShadingFlag( ShadingFlag ),
 			ShadingFlagEMSOn( ShadingFlagEMSOn ),
@@ -2480,14 +2484,14 @@ namespace DataSurfaces {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

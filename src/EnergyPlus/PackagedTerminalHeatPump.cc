@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -149,7 +150,7 @@ namespace PackagedTerminalHeatPump {
 
 	// Object Data
 	FArray1D< PTUnitData > PTUnit;
-	FArray1D< PTUnitNumericFieldData > PTUnitUNumericFields; // holds VRF TU numeric input fields character field name 
+	FArray1D< PTUnitNumericFieldData > PTUnitUNumericFields; // holds VRF TU numeric input fields character field name
 
 	// Functions
 
@@ -202,7 +203,7 @@ namespace PackagedTerminalHeatPump {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PTUnitNum; // index of packaged terminal heat pump being simulated
+		int PTUnitNum( 0 ); // index of packaged terminal heat pump being simulated
 
 		Real64 OnOffAirFlowRatio; // ratio of compressor ON airflow to average airflow over timestep
 		Real64 QZnReq; // load to be met by zone equipment
@@ -233,6 +234,7 @@ namespace PackagedTerminalHeatPump {
 			} else if ( SELECT_CASE_var == PkgTermHPWaterToAir_Num ) {
 				PTUnitNum = CompIndex + NumPTHP + NumPTAC;
 			} else {
+				assert( false );
 			}}
 			if ( PTUnitNum > NumPTUs || PTUnitNum < 1 ) {
 				ShowFatalError( "SimPackagedTerminalUnit:  Invalid CompIndex passed=" + TrimSigDigits( PTUnitNum ) + ", Number of Units=" + TrimSigDigits( NumPTUs ) + ", Entered Unit name=" + CompName );
@@ -622,23 +624,17 @@ namespace PackagedTerminalHeatPump {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
-		Numbers.allocate( MaxNumbers );
-		Numbers = 0.0;
+		Numbers.dimension( MaxNumbers, 0.0 );
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNumbers );
-		cNumericFields = "";
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNumbers );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNumbers, true );
 		NumPTUs = NumPTHP + NumPTAC + NumPTWSHP;
 
 		// allocate the data structures
 		if ( NumPTUs > 0 ) {
 			PTUnit.allocate( NumPTUs );
-			CheckEquipName.allocate( NumPTUs );		
+			CheckEquipName.allocate( NumPTUs );
 			PTUnitUNumericFields.allocate( NumPTUs );
 		}
 		CheckEquipName = true;
@@ -1194,13 +1190,13 @@ namespace PackagedTerminalHeatPump {
 				if ( PTUnit( PTUnitNum ).FanSchedPtr > 0 && SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) ) {
 					if ( ! CheckScheduleValueMinMax( PTUnit( PTUnitNum ).FanSchedPtr, ">", 0.0, "<=", 1.0 ) ) {
 						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
-						ShowContinueError( "Fan operating mode must be continuous (fan operating mode schedule values > 0)" " for supply fan type Fan:ConstantVolume." );
+						ShowContinueError( "Fan operating mode must be continuous (fan operating mode schedule values > 0) for supply fan type Fan:ConstantVolume." );
 						ShowContinueError( "Error found in " + cAlphaFields( 16 ) + " = " + Alphas( 16 ) );
 						ShowContinueError( "schedule values must be (>0., <=1.)" );
 						ErrorsFound = true;
 					} else if ( PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow > PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow && PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow != AutoSize && PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow != AutoSize && PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow != 0.0 ) {
 						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
-						ShowContinueError( "Outdoor air flow rate when compressor is off cannot be greater than " "supply air flow rate when compressor is off" );
+						ShowContinueError( "Outdoor air flow rate when compressor is off cannot be greater than supply air flow rate when compressor is off" );
 						ErrorsFound = true;
 					}
 				}
@@ -1721,7 +1717,7 @@ namespace PackagedTerminalHeatPump {
 			if ( ! lAlphaBlanks( 15 ) ) {
 				PTUnit( PTUnitNum ).AvailManagerListName = Alphas( 15 );
 			}
-			
+
 			PTUnit( PTUnitNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 16 ) ) {
 				PTUnit( PTUnitNum ).HVACSizingIndex = FindItemInList( Alphas( 16 ), ZoneHVACSizing.Name(), NumZoneHVACSizing );
@@ -1748,13 +1744,13 @@ namespace PackagedTerminalHeatPump {
 				if ( PTUnit( PTUnitNum ).FanSchedPtr > 0 && SameString( PTUnit( PTUnitNum ).FanType, "Fan:ConstantVolume" ) ) {
 					if ( ! CheckScheduleValueMinMax( PTUnit( PTUnitNum ).FanSchedPtr, ">", 0.0, "<=", 1.0 ) ) {
 						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
-						ShowContinueError( "Fan operating mode must be continuous (fan operating mode schedule values > 0)" " for supply fan type Fan:ConstantVolume." );
+						ShowContinueError( "Fan operating mode must be continuous (fan operating mode schedule values > 0) for supply fan type Fan:ConstantVolume." );
 						ShowContinueError( "Error found in " + cAlphaFields( 14 ) + " = " + Alphas( 14 ) );
 						ShowContinueError( "schedule values must be (>0., <=1.)" );
 						ErrorsFound = true;
 					} else if ( PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow > PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow && PTUnit( PTUnitNum ).NoCoolHeatOutAirVolFlow != AutoSize && PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow != AutoSize && PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow != 0.0 ) {
 						ShowSevereError( CurrentModuleObject + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
-						ShowContinueError( "Outdoor air flow rate when compressor is off cannot be greater than " "supply air flow rate when compressor is off" );
+						ShowContinueError( "Outdoor air flow rate when compressor is off cannot be greater than supply air flow rate when compressor is off" );
 						ErrorsFound = true;
 					}
 				}
@@ -2190,7 +2186,7 @@ namespace PackagedTerminalHeatPump {
 
 			// check that heat pump doesn' have local outside air and DOA
 			if ( PTUnit( PTUnitNum ).ATMixerExists && OANodeNums( 4 ) > 0 ) {
-				ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\"." " heat pump unit has local as well as central outdoor air specified" );
+				ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". heat pump unit has local as well as central outdoor air specified" );
 				ErrorsFound = true;
 			}
 
@@ -2254,7 +2250,7 @@ namespace PackagedTerminalHeatPump {
 			if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide ) {
 				// check that the air teminal mixer out node is the heat pump inlet node
 				if ( PTUnit( PTUnitNum ).AirInNode != PTUnit( PTUnitNum ).ATMixerOutNode ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\"." " heat pump unit air inlet node name must be the same as the air terminal mixer outlet node name." );
+					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". heat pump unit air inlet node name must be the same as the air terminal mixer outlet node name." );
 					ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object." );
 					ShowContinueError( "..heat pump unit air inlet node name = " + NodeID( PTUnit( PTUnitNum ).AirInNode ) );
 					ErrorsFound = true;
@@ -2263,14 +2259,14 @@ namespace PackagedTerminalHeatPump {
 			if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_SupplySide ) {
 				// check that the air teminal mixer secondary air node is the heat pump outlet node
 				if ( PTUnit( PTUnitNum ).AirOutNode != PTUnit( PTUnitNum ).ATMixerSecNode ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\"." " heat pump unit air outlet node name must be the same as the air terminal mixer secondary node name." );
+					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". heat pump unit air outlet node name must be the same as the air terminal mixer secondary node name." );
 					ShowContinueError( "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:SupplySideMixer object." );
 					ShowContinueError( "..heat pump unit air outlet node name = " + NodeID( PTUnit( PTUnitNum ).AirOutNode ) );
 					ErrorsFound = true;
 				}
 				// check that the air teminal mixer secondary node is the supplemental heat coil air outlet node
 				if ( PTUnit( PTUnitNum ).AirOutNode != SuppHeatOutletNodeNum ) {
-					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\"." " supplemental heating coil air outlet node name must be the same as an air terminal mixer secondary air node name." );
+					ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". supplemental heating coil air outlet node name must be the same as an air terminal mixer secondary air node name." );
 					ShowContinueError( "..Air terminal mixer secondary node name is specified in AirTerminal:SingleDuct:SupplySideMixer object." );
 					ShowContinueError( "..heat pump unit supp heater outlet node name = " + NodeID( SuppHeatOutletNodeNum ) );
 					ErrorsFound = true;
@@ -2328,7 +2324,7 @@ namespace PackagedTerminalHeatPump {
 				if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide ) {
 					// check that the air teminal mixer out node is the fan inlet node
 					if ( PTUnit( PTUnitNum ).AirInNode != FanInletNodeNum ) {
-						ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\"." " fan inlet node name must be the same as an air terminal mixer outlet node name." );
+						ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". fan inlet node name must be the same as an air terminal mixer outlet node name." );
 						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object." );
 						ShowContinueError( "..fan inlet node name = " + NodeID( FanInletNodeNum ) );
 						ErrorsFound = true;
@@ -2386,7 +2382,7 @@ namespace PackagedTerminalHeatPump {
 				if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide ) {
 					// check that the air teminal mixer out node is the cooling coil inlet node
 					if ( PTUnit( PTUnitNum ).AirInNode != CoolCoilInletNodeNum ) {
-						ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\"." " cooling coil inlet node name must be the same as an air terminal mixer outlet node name." );
+						ShowSevereError( CurrentModuleObject + " = \"" + PTUnit( PTUnitNum ).Name + "\". cooling coil inlet node name must be the same as an air terminal mixer outlet node name." );
 						ShowContinueError( "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object." );
 						ShowContinueError( "..cooling coil inlet node name = " + NodeID( CoolCoilInletNodeNum ) );
 						ErrorsFound = true;
@@ -3034,14 +3030,14 @@ namespace PackagedTerminalHeatPump {
 				if ( PTUnit( PTUnitNum ).FanVolFlow != AutoSize ) {
 					//     Check fan versus system supply air flow rates
 					if ( PTUnit( PTUnitNum ).FanVolFlow + 1e-10 < PTUnit( PTUnitNum ).CoolVolumeFlowRate( NumOfSpeedCooling ) ) {
-						ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( PTUnit( PTUnitNum ).FanVolFlow, 7 ) + " in fan object " " is less than the MSHP system air flow rate" " when cooling is required (" + TrimSigDigits( PTUnit( PTUnitNum ).CoolVolumeFlowRate( NumOfSpeedCooling ), 7 ) + ")." );
-						ShowContinueError( " The MSHP system flow rate when cooling is required is reset to the" " fan flow rate and the simulation continues." );
+						ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( PTUnit( PTUnitNum ).FanVolFlow, 7 ) + " in fan object is less than the MSHP system air flow rate when cooling is required (" + TrimSigDigits( PTUnit( PTUnitNum ).CoolVolumeFlowRate( NumOfSpeedCooling ), 7 ) + ")." );
+						ShowContinueError( " The MSHP system flow rate when cooling is required is reset to the fan flow rate and the simulation continues." );
 						ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
 						PTUnit( PTUnitNum ).CoolVolumeFlowRate( NumOfSpeedCooling ) = PTUnit( PTUnitNum ).FanVolFlow;
 						// Check flow rates in other speeds and ensure flow rates are not above the max flow rate
 						for ( i = NumOfSpeedCooling - 1; i >= 1; --i ) {
 							if ( PTUnit( PTUnitNum ).CoolVolumeFlowRate( i ) > PTUnit( PTUnitNum ).CoolVolumeFlowRate( i + 1 ) ) {
-								ShowContinueError( " The MSHP system flow rate when cooling is required is reset to the" " flow rate at higher speed and the simulation continues at Speed" + TrimSigDigits( i ) + '.' );
+								ShowContinueError( " The MSHP system flow rate when cooling is required is reset to the flow rate at higher speed and the simulation continues at Speed" + TrimSigDigits( i ) + '.' );
 								ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
 								PTUnit( PTUnitNum ).CoolVolumeFlowRate( i ) = PTUnit( PTUnitNum ).CoolVolumeFlowRate( i + 1 );
 							}
@@ -3050,13 +3046,13 @@ namespace PackagedTerminalHeatPump {
 
 					if ( PTUnit( PTUnitNum ).NumOfSpeedHeating > 0 ) {
 						if ( PTUnit( PTUnitNum ).FanVolFlow + 1e-10 < PTUnit( PTUnitNum ).HeatVolumeFlowRate( NumOfSpeedHeating ) ) {
-							ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( PTUnit( PTUnitNum ).FanVolFlow, 7 ) + " in fan object " " is less than the MSHP system air flow rate" " when heating is required (" + TrimSigDigits( PTUnit( PTUnitNum ).HeatVolumeFlowRate( NumOfSpeedHeating ), 7 ) + ")." );
-							ShowContinueError( " The MSHP system flow rate when heating is required is reset to the" " fan flow rate and the simulation continues." );
+							ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( PTUnit( PTUnitNum ).FanVolFlow, 7 ) + " in fan object is less than the MSHP system air flow rate when heating is required (" + TrimSigDigits( PTUnit( PTUnitNum ).HeatVolumeFlowRate( NumOfSpeedHeating ), 7 ) + ")." );
+							ShowContinueError( " The MSHP system flow rate when heating is required is reset to the fan flow rate and the simulation continues." );
 							ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
 							PTUnit( PTUnitNum ).HeatVolumeFlowRate( NumOfSpeedHeating ) = PTUnit( PTUnitNum ).FanVolFlow;
 							for ( i = NumOfSpeedHeating - 1; i >= 1; --i ) {
 								if ( PTUnit( PTUnitNum ).HeatVolumeFlowRate( i ) > PTUnit( PTUnitNum ).HeatVolumeFlowRate( i + 1 ) ) {
-									ShowContinueError( " The MSHP system flow rate when heating is required is reset to the" " flow rate at higher speed and the simulation continues at Speed" + TrimSigDigits( i ) + '.' );
+									ShowContinueError( " The MSHP system flow rate when heating is required is reset to the flow rate at higher speed and the simulation continues at Speed" + TrimSigDigits( i ) + '.' );
 									ShowContinueError( " Occurs in " + CurrentModuleObject + " system = " + PTUnit( PTUnitNum ).Name );
 									PTUnit( PTUnitNum ).HeatVolumeFlowRate( i ) = PTUnit( PTUnitNum ).HeatVolumeFlowRate( i + 1 );
 								}
@@ -3065,8 +3061,8 @@ namespace PackagedTerminalHeatPump {
 					}
 
 					if ( PTUnit( PTUnitNum ).FanVolFlow < PTUnit( PTUnitNum ).IdleVolumeAirRate && PTUnit( PTUnitNum ).IdleVolumeAirRate != 0.0 ) {
-						ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( PTUnit( PTUnitNum ).FanVolFlow, 7 ) + " in fan object " " is less than the MSHP system air flow rate when no " "heating or cooling is needed (" + TrimSigDigits( PTUnit( PTUnitNum ).IdleVolumeAirRate, 7 ) + ")." );
-						ShowContinueError( " The MSHP system flow rate when no heating or cooling is needed is reset to the" " fan flow rate and the simulation continues." );
+						ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( PTUnit( PTUnitNum ).FanVolFlow, 7 ) + " in fan object is less than the MSHP system air flow rate when no heating or cooling is needed (" + TrimSigDigits( PTUnit( PTUnitNum ).IdleVolumeAirRate, 7 ) + ")." );
+						ShowContinueError( " The MSHP system flow rate when no heating or cooling is needed is reset to the fan flow rate and the simulation continues." );
 						ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
 						PTUnit( PTUnitNum ).IdleVolumeAirRate = PTUnit( PTUnitNum ).FanVolFlow;
 					}
@@ -3545,7 +3541,7 @@ namespace PackagedTerminalHeatPump {
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
-		
+
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName("SizePTUnit: "); // include trailing blank space
 
@@ -3613,7 +3609,7 @@ namespace PackagedTerminalHeatPump {
 						if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
-						} 
+						}
 						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 					} else if ( SAFMethod == FlowPerFloorArea ) {
 						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
@@ -3693,14 +3689,14 @@ namespace PackagedTerminalHeatPump {
 					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 					PTUnit( PTUnitNum ).MaxHeatAirVolFlow = TempSize;
 				}
-				
+
 				SizingMethod = SystemAirflowSizing;
 				FieldNum = 3; //N3, \field Supply Air Flow Rate When No Cooling or Heating is Needed
 				PrintFlag = true;
 				SizingString = PTUnitUNumericFields( PTUnitNum ).FieldNames( FieldNum ) + " [m3/s]";
 				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).NoCoolHeatSAFMethod;
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
-				if ( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow || SAFMethod == FractionOfAutosizedHeatingAirflow ) {					
+				if ( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow || SAFMethod == FractionOfAutosizedHeatingAirflow ) {
 					if ( SAFMethod == SupplyAirFlowRate ) {
 						if ( ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow > 0.0 ) {
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
@@ -3766,7 +3762,7 @@ namespace PackagedTerminalHeatPump {
 				}
 			} else {
 				// no scalble sizing method has been specified. Sizing proceeds using the method
-				// specified in the zoneHVAC object 
+				// specified in the zoneHVAC object
 
 				PrintFlag = true;
 				SizingMethod = CoolingAirflowSizing;
@@ -3998,7 +3994,7 @@ namespace PackagedTerminalHeatPump {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // maximum number of iterations
 		Real64 const MinPLF( 0.0 ); // minimum part load factor allowed
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4125,7 +4121,7 @@ namespace PackagedTerminalHeatPump {
 							gio::write( IterNum, fmtLD ) << MaxIte;
 							strip( IterNum );
 							ShowWarningError( PTUnit( PTUnitNum ).UnitType + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
-							ShowContinueError( " Iteration limit exceeded calculating packaged terminal unit part-load ratio, " "maximum iterations = " + IterNum );
+							ShowContinueError( " Iteration limit exceeded calculating packaged terminal unit part-load ratio, maximum iterations = " + IterNum );
 							ShowContinueErrorTimeStamp( " Part-load ratio returned = " + RoundSigDigits( PartLoadFrac, 3 ) );
 							ShowContinueError( " Load requested = " + TrimSigDigits( QZnReq, 5 ) + ", Load delivered = " + TrimSigDigits( TempOutput, 5 ) );
 						}
@@ -4135,7 +4131,7 @@ namespace PackagedTerminalHeatPump {
 				} else if ( SolFla == -2 ) {
 					if ( ! FirstHVACIteration ) {
 						ShowWarningError( PTUnit( PTUnitNum ).UnitType + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
-						ShowContinueError( "Packaged terminal unit part-load ratio calculation failed: " "PLR limits of 0 to 1 exceeded" );
+						ShowContinueError( "Packaged terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded" );
 						ShowContinueError( "Please fill out a bug report and forward to the EnergyPlus support group." );
 						ShowContinueErrorTimeStamp( "" );
 						if ( WarmupFlag ) ShowContinueError( "Error occurred during warmup days." );
@@ -4145,7 +4141,7 @@ namespace PackagedTerminalHeatPump {
 			} else if ( SolFla == -2 ) {
 				if ( ! FirstHVACIteration ) {
 					ShowWarningError( PTUnit( PTUnitNum ).UnitType + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
-					ShowContinueError( "Packaged terminal unit part-load ratio calculation failed: " "PLR limits of 0 to 1 exceeded" );
+					ShowContinueError( "Packaged terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded" );
 					ShowContinueError( "Please fill out a bug report and forward to the EnergyPlus support group." );
 					ShowContinueErrorTimeStamp( "" );
 					if ( WarmupFlag ) ShowContinueError( "Error occurred during warmup days." );
@@ -5055,7 +5051,7 @@ namespace PackagedTerminalHeatPump {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int PTUnitNum;
+		int PTUnitNum( 0 );
 
 		if ( GetPTUnitInputFlag ) {
 			GetPTUnit();
@@ -5079,6 +5075,7 @@ namespace PackagedTerminalHeatPump {
 		} else if ( SELECT_CASE_var == PkgTermHPWaterToAir_Num ) {
 			PTUnitNum = PTUnitCompIndex + NumPTHP + NumPTAC;
 		} else {
+			assert( false );
 		}}
 
 		if ( PTUnitNum > 0 && PTUnitNum <= NumPTUs ) {
@@ -5132,7 +5129,7 @@ namespace PackagedTerminalHeatPump {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int PTUnitNum;
+		int PTUnitNum( 0 );
 
 		if ( GetPTUnitInputFlag ) {
 			GetPTUnit();
@@ -5156,6 +5153,7 @@ namespace PackagedTerminalHeatPump {
 		} else if ( SELECT_CASE_var == PkgTermHPWaterToAir_Num ) {
 			PTUnitNum = PTUnitCompIndex + NumPTHP + NumPTAC;
 		} else {
+			assert( false );
 		}}
 
 		if ( PTUnitNum > 0 && PTUnitNum <= NumPTUs ) {
@@ -5211,7 +5209,7 @@ namespace PackagedTerminalHeatPump {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int PTUnitNum;
+		int PTUnitNum( 0 );
 
 		if ( GetPTUnitInputFlag ) {
 			GetPTUnit();
@@ -5233,6 +5231,7 @@ namespace PackagedTerminalHeatPump {
 		} else if ( SELECT_CASE_var == PkgTermHPWaterToAir_Num ) {
 			PTUnitNum = PTUnitCompIndex + NumPTHP + NumPTAC;
 		} else {
+			assert( false );
 		}}
 
 		if ( PTUnitNum > 0 && PTUnitNum <= NumPTUs ) {
@@ -5293,7 +5292,7 @@ namespace PackagedTerminalHeatPump {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int PTUnitNum;
+		int PTUnitNum( 0 );
 
 		if ( GetPTUnitInputFlag ) {
 			GetPTUnit();
@@ -5315,6 +5314,7 @@ namespace PackagedTerminalHeatPump {
 		} else if ( SELECT_CASE_var == PkgTermHPWaterToAir_Num ) {
 			PTUnitNum = PTUnitCompIndex + NumPTHP + NumPTAC;
 		} else {
+			assert( false );
 		}}
 
 		if ( PTUnitNum > 0 && PTUnitNum <= NumPTUs ) {
@@ -6697,7 +6697,7 @@ namespace PackagedTerminalHeatPump {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

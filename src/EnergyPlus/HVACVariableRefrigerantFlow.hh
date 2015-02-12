@@ -998,7 +998,7 @@ namespace HVACVariableRefrigerantFlow {
 			EMSValueForPartLoadFrac( 0.0 ),
 			IterLimitExceeded( 0 ),
 			FirstIterfailed( 0 ),
-			ZonePtr( 0 ), 
+			ZonePtr( 0 ),
 			HVACSizingIndex( 0 )
 		{}
 
@@ -1149,7 +1149,7 @@ namespace HVACVariableRefrigerantFlow {
 			EMSValueForPartLoadFrac( EMSValueForPartLoadFrac ),
 			IterLimitExceeded( IterLimitExceeded ),
 			FirstIterfailed( FirstIterfailed ),
-			ZonePtr( ZonePtr ), 
+			ZonePtr( ZonePtr ),
 			HVACSizingIndex( HVACSizingIndex )
 		{}
 
@@ -1178,7 +1178,7 @@ namespace HVACVariableRefrigerantFlow {
 	extern FArray1D< VRFCondenserEquipment > VRF; // AirConditioner:VariableRefrigerantFlow object
 	extern FArray1D< VRFTerminalUnitEquipment > VRFTU; // ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
 	extern FArray1D< TerminalUnitListData > TerminalUnitList; // zoneTerminalUnitList object
-	extern FArray1D< VRFTUNumericFieldData > VRFTUNumericFields; // holds VRF TU numeric input fields character field name 
+	extern FArray1D< VRFTUNumericFieldData > VRFTUNumericFields; // holds VRF TU numeric input fields character field name
 
 	// Functions
 
@@ -1401,7 +1401,7 @@ namespace HVACVariableRefrigerantFlow {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

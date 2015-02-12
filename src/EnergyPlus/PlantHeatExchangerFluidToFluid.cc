@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -289,22 +290,15 @@ namespace PlantHeatExchangerFluidToFluid {
 		MaxNumAlphas = NumAlphas;
 
 		cAlphaFieldNames.allocate( MaxNumAlphas );
-		cAlphaFieldNames = "";
 		cAlphaArgs.allocate( MaxNumAlphas );
-		cAlphaArgs = "";
-		lAlphaFieldBlanks.allocate( MaxNumAlphas );
-		lAlphaFieldBlanks = false;
+		lAlphaFieldBlanks.dimension( MaxNumAlphas, false );
 		cNumericFieldNames.allocate( MaxNumNumbers );
-		cNumericFieldNames = "";
-		rNumericArgs.allocate( MaxNumNumbers );
-		rNumericArgs = 0.0;
-		lNumericFieldBlanks.allocate( MaxNumNumbers );
-		lNumericFieldBlanks = false;
+		rNumericArgs.dimension( MaxNumNumbers, 0.0 );
+		lNumericFieldBlanks.dimension( MaxNumNumbers, false );
 
 		if ( NumberOfPlantFluidHXs > 0 ) {
 			FluidHX.allocate( NumberOfPlantFluidHXs );
-			CheckFluidHXs.allocate( NumberOfPlantFluidHXs );
-			CheckFluidHXs = true;
+			CheckFluidHXs.dimension( NumberOfPlantFluidHXs, true );
 			for ( CompLoop = 1; CompLoop <= NumberOfPlantFluidHXs; ++CompLoop ) {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
@@ -760,7 +754,7 @@ namespace PlantHeatExchangerFluidToFluid {
 		Real64 tmpDmdSideDesignVolFlowRate;
 		Real64 tmpUA;
 		Real64 tmpDeltaTSupLoop;
-		Real64 tmpDeltaTloopToLoop;
+		Real64 tmpDeltaTloopToLoop( 0.0 );
 		bool ErrorsFound;
 		Real64 Cp;
 		Real64 rho;
@@ -821,6 +815,8 @@ namespace PlantHeatExchangerFluidToFluid {
 					tmpDeltaTloopToLoop = std::abs( ( PlantSizData( PltSizNumSupSide ).ExitTemp + PlantSizData( PltSizNumSupSide ).DeltaT ) - PlantSizData( PltSizNumDmdSide ).ExitTemp );
 				} else if ( SELECT_CASE_var == SteamLoop ) {
 					tmpDeltaTloopToLoop = std::abs( ( PlantSizData( PltSizNumSupSide ).ExitTemp - PlantSizData( PltSizNumSupSide ).DeltaT ) - PlantSizData( PltSizNumDmdSide ).ExitTemp );
+				} else {
+					assert( false );
 				}}
 
 				tmpDeltaTloopToLoop = max( 2.0, tmpDeltaTloopToLoop );
@@ -843,7 +839,7 @@ namespace PlantHeatExchangerFluidToFluid {
 					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, "Loop-to-loop Temperature Difference Used to Size Heat Exchanger U-Factor Times Area Value [C]", tmpDeltaTloopToLoop );
 				}
 			} else {
-				ShowSevereError( "SizeFluidHeatExchanger: Autosizing of heat " "Exchanger UA requires a loop Sizing:Plant objects for both loops" );
+				ShowSevereError( "SizeFluidHeatExchanger: Autosizing of heat Exchanger UA requires a loop Sizing:Plant objects for both loops" );
 				ShowContinueError( "Occurs in heat exchanger object=" + FluidHX( CompNum ).Name );
 				ErrorsFound = true;
 			}
@@ -964,7 +960,7 @@ namespace PlantHeatExchangerFluidToFluid {
 		Real64 SetPointTemp; // temperature setpoint for single setpoint
 		Real64 SetPointTempLo; // low setpoint for dual deadband temperature setpoints
 		Real64 SetPointTempHi; // High setpoint for dual deadband temperature setpoints
-		Real64 ControlSignalValue;
+		Real64 ControlSignalValue( 0.0 );
 		bool ChillerShutDown;
 
 		// check if available by schedule
@@ -1291,6 +1287,8 @@ namespace PlantHeatExchangerFluidToFluid {
 				} else if ( SELECT_CASE_var1 == LoopTemperature ) {
 					// ControlSignalValue = FluidHX(CompNum)%DemandSideLoop%InletTemp
 					ControlSignalValue = Node( FluidHX( CompNum ).OtherCompDemandSideLoop.InletNodeNum ).TempLastTimestep;
+				} else {
+					assert( false );
 				}}
 
 				SetPointTemp = Node( FluidHX( CompNum ).SetPointNodeNum ).TempSetPoint;
@@ -1379,7 +1377,7 @@ namespace PlantHeatExchangerFluidToFluid {
 		Real64 CapRatio;
 		Real64 ExpCheckValue1;
 		Real64 ExpCheckValue2;
-		Real64 Effectiveness;
+		Real64 Effectiveness( 0.0 );
 		Real64 HeatTransferRate;
 		Real64 MdotDmdSide;
 		Real64 LeavingTempMinFlow;
@@ -1489,6 +1487,8 @@ namespace PlantHeatExchangerFluidToFluid {
 							Effectiveness = min( 1.0, Effectiveness );
 						}
 					}
+				} else {
+					assert( false );
 				}
 
 			} else if ( SELECT_CASE_var == CounterFlow ) {
@@ -1532,6 +1532,8 @@ namespace PlantHeatExchangerFluidToFluid {
 
 			} else if ( SELECT_CASE_var == Ideal ) {
 				Effectiveness = 1.0;
+			} else {
+				assert( false );
 			}}
 
 		} else { // no capacity
@@ -1874,7 +1876,7 @@ namespace PlantHeatExchangerFluidToFluid {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

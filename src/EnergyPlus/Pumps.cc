@@ -367,7 +367,7 @@ namespace Pumps {
 			PumpEquip( PumpNum ).PumpScheduleIndex = GetScheduleIndex( cAlphaArgs( 5 ) );
 			if ( ! lAlphaFieldBlanks( 5 ) && ! ( PumpEquip( PumpNum ).PumpScheduleIndex > 0 ) ) {
 				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", Invalid " + cAlphaFieldNames( 5 ) );
-				ShowContinueError( "Schedule named =[" + cAlphaArgs( 5 ) + "]. " " was not found and will not be used." );
+				ShowContinueError( "Schedule named =[" + cAlphaArgs( 5 ) + "]. was not found and will not be used." );
 			}
 
 			PumpEquip( PumpNum ).NomVolFlowRate = rNumericArgs( 1 );
@@ -418,11 +418,11 @@ namespace Pumps {
 					PumpEquip( PumpNum ).VFD.ManualRPMSchedName = cAlphaArgs( 8 );
 					PumpEquip( PumpNum ).VFD.ManualRPMSchedIndex = GetScheduleIndex( cAlphaArgs( 8 ) );
 					if ( PumpEquip( PumpNum ).VFD.ManualRPMSchedIndex <= 0 ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", " "At least one scheduled VFD schedule input was invalid." );
-						ShowContinueError( "Verify that all of the pressure and rpm schedules referenced " "in the input fields actually exist." );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", At least one scheduled VFD schedule input was invalid." );
+						ShowContinueError( "Verify that all of the pressure and rpm schedules referenced in the input fields actually exist." );
 						ErrorsFound = true;
 					} else if ( ! CheckScheduleValueMinMax( PumpEquip( PumpNum ).VFD.ManualRPMSchedIndex, ">", 0.0 ) || ! CheckScheduleValueMinMax( PumpEquip( PumpNum ).VFD.ManualRPMSchedIndex, ">", 0.0 ) ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", " "A pump rpm schedule had zero value.  Ensure all entries in the schedule are greater than zero." );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", A pump rpm schedule had zero value.  Ensure all entries in the schedule are greater than zero." );
 						ErrorsFound = true;
 					}
 				} else if ( cAlphaArgs( 7 ) == "PRESSURESETPOINTCONTROL" ) {
@@ -436,15 +436,15 @@ namespace Pumps {
 					PumpEquip( PumpNum ).VFD.MaxRPMSchedName = cAlphaArgs( 12 );
 					PumpEquip( PumpNum ).VFD.MaxRPMSchedIndex = GetScheduleIndex( cAlphaArgs( 12 ) );
 					if ( min( PumpEquip( PumpNum ).VFD.LowerPsetSchedIndex, PumpEquip( PumpNum ).VFD.UpperPsetSchedIndex, PumpEquip( PumpNum ).VFD.MinRPMSchedIndex, PumpEquip( PumpNum ).VFD.MaxRPMSchedIndex ) <= 0 ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", " "At least one scheduled VFD schedule input was invalid." );
-						ShowContinueError( "Verify that all of the pressure and rpm schedules referenced " "in the input fields actually exist." );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", At least one scheduled VFD schedule input was invalid." );
+						ShowContinueError( "Verify that all of the pressure and rpm schedules referenced in the input fields actually exist." );
 						ErrorsFound = true;
 					} else if ( ! CheckScheduleValueMinMax( PumpEquip( PumpNum ).VFD.MinRPMSchedIndex, ">", 0.0 ) || ! CheckScheduleValueMinMax( PumpEquip( PumpNum ).VFD.MaxRPMSchedIndex, ">", 0.0 ) ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", " "A pump rpm schedule had zero value.  Ensure all entries in the schedule are greater than zero." );
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", A pump rpm schedule had zero value.  Ensure all entries in the schedule are greater than zero." );
 						ErrorsFound = true;
 					}
 				} else {
-					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", " "VFD Control type entered is invalid.  Use one of the key choice entries." );
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", VFD Control type entered is invalid.  Use one of the key choice entries." );
 					ErrorsFound = true;
 				}
 			}
@@ -521,7 +521,7 @@ namespace Pumps {
 			PumpEquip( PumpNum ).PumpScheduleIndex = GetScheduleIndex( cAlphaArgs( 5 ) );
 			if ( ! lAlphaFieldBlanks( 5 ) && ! ( PumpEquip( PumpNum ).PumpScheduleIndex > 0 ) ) {
 				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", Invalid " + cAlphaFieldNames( 5 ) );
-				ShowContinueError( "Schedule named =[" + cAlphaArgs( 5 ) + "]. " " was not found and will not be used." );
+				ShowContinueError( "Schedule named =[" + cAlphaArgs( 5 ) + "]. was not found and will not be used." );
 			}
 
 			// Input pressure related data such as pressure curve and impeller size/rotational speed
@@ -594,7 +594,7 @@ namespace Pumps {
 			PumpEquip( PumpNum ).PumpScheduleIndex = GetScheduleIndex( cAlphaArgs( 4 ) );
 			if ( ! lAlphaFieldBlanks( 4 ) && ! ( PumpEquip( PumpNum ).PumpScheduleIndex > 0 ) ) {
 				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", Invalid " + cAlphaFieldNames( 4 ) );
-				ShowContinueError( "Schedule named =[" + cAlphaArgs( 4 ) + "]. " " was not found and will not be used." );
+				ShowContinueError( "Schedule named =[" + cAlphaArgs( 4 ) + "]. was not found and will not be used." );
 			}
 
 			PumpEquip( PumpNum ).NomSteamVolFlowRate = rNumericArgs( 1 );
@@ -685,7 +685,7 @@ namespace Pumps {
 			PumpEquip( PumpNum ).PumpScheduleIndex = GetScheduleIndex( cAlphaArgs( 6 ) );
 			if ( ! lAlphaFieldBlanks( 6 ) && ! ( PumpEquip( PumpNum ).PumpScheduleIndex > 0 ) ) {
 				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", Invalid " + cAlphaFieldNames( 6 ) );
-				ShowContinueError( "Schedule named =[" + cAlphaArgs( 6 ) + "]. " " was not found and will not be used." );
+				ShowContinueError( "Schedule named =[" + cAlphaArgs( 6 ) + "]. was not found and will not be used." );
 			}
 
 			PumpEquip( PumpNum ).NomVolFlowRate = rNumericArgs( 1 );
@@ -767,7 +767,7 @@ namespace Pumps {
 			PumpEquip( PumpNum ).PumpScheduleIndex = GetScheduleIndex( cAlphaArgs( 6 ) );
 			if ( ! lAlphaFieldBlanks( 6 ) && ! ( PumpEquip( PumpNum ).PumpScheduleIndex > 0 ) ) {
 				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + PumpEquip( PumpNum ).Name + "\", Invalid " + cAlphaFieldNames( 6 ) );
-				ShowContinueError( "Schedule named =[" + cAlphaArgs( 6 ) + "]. " " was not found and will not be used." );
+				ShowContinueError( "Schedule named =[" + cAlphaArgs( 6 ) + "]. was not found and will not be used." );
 			}
 
 			PumpEquip( PumpNum ).NomVolFlowRate = rNumericArgs( 1 );
@@ -1137,15 +1137,14 @@ namespace Pumps {
 
 		//User specified min/max mass flow rates for pump
 		PumpOverridableMaxLimit = PumpEquip( PumpNum ).MassFlowRateMax;
-		
+
 		// override the user specified min to allow pump to turn off when no flow is required.
 		if ( PumpEquip( PumpNum ).LoopSolverOverwriteFlag == true ) {
 			PumpMassFlowRateMinLimit = 0.0;
-		}
-		else {
+		} else {
 			PumpMassFlowRateMinLimit = PumpEquip( PumpNum ).MassFlowRateMin;
 		}
-		
+
 
 		//The pump outlet node Min/MaxAvail
 		PumpMassFlowRateMin = max( InletNodeMin, PumpMassFlowRateMinLimit );
@@ -1441,7 +1440,7 @@ namespace Pumps {
 			if ( PumpEquip( PumpNum ).PowerErrIndex1 == 0 ) {
 				ShowWarningMessage( RoutineName + " Calculated Pump Power < 0, Type=" + cPumpTypes( PumpType ) + ", Name=\"" + PumpEquip( PumpNum ).Name + "\"." );
 				ShowContinueErrorTimeStamp( "" );
-				ShowContinueError( "...PartLoadRatio=[" + RoundSigDigits( PartLoadRatio, 4 ) + "], " "Fraction Full Load Power=" + RoundSigDigits( FracFullLoadPower, 4 ) + ']' );
+				ShowContinueError( "...PartLoadRatio=[" + RoundSigDigits( PartLoadRatio, 4 ) + "], Fraction Full Load Power=" + RoundSigDigits( FracFullLoadPower, 4 ) + ']' );
 				ShowContinueError( "...Power is set to 0 for continuing the simulation." );
 				ShowContinueError( "...Pump coefficients should be checked for producing this negative value." );
 			}
@@ -1930,7 +1929,7 @@ namespace Pumps {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

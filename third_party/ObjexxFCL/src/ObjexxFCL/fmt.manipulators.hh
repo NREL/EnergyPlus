@@ -189,10 +189,10 @@ struct Exponent_num_put : std::num_put< char >
 	inline
 	explicit
 	Exponent_num_put( Size const d = 0ul, Size const e = 2ul, int const k = 0, char const E = 'E' ) :
-		d_( d ),
-		e_( e ),
-		k_( k ),
-		E_( E )
+	 d_( d ),
+	 e_( e ),
+	 k_( k ),
+	 E_( E )
 	{}
 
 	inline
@@ -375,8 +375,8 @@ struct Engineering_num_put : std::num_put< char >
 	inline
 	explicit
 	Engineering_num_put( Size const d = 0ul, Size const e = 2ul ) :
-		d_( d ),
-		e_( e )
+	 d_( d ),
+	 e_( e )
 	{}
 
 	inline
@@ -529,8 +529,8 @@ struct Scientific_num_put : std::num_put< char >
 	inline
 	explicit
 	Scientific_num_put( Size const d = 0ul, Size const e = 2ul ) :
-		d_( d ),
-		e_( e )
+	 d_( d ),
+	 e_( e )
 	{}
 
 	inline

@@ -301,20 +301,13 @@ namespace ZonePlenum {
 		MaxNums = max( NumNums, MaxNums );
 		MaxAlphas = max( NumAlphas, MaxAlphas );
 		AlphArray.allocate( MaxAlphas );
-		AlphArray = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		NumArray.allocate( MaxNums );
-		NumArray = 0.0;
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		NumArray.dimension( MaxNums, 0.0 );
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNums, true );
 		GetObjectDefMaxArgs( "NodeList", NumArgs, NumAlphas, NumNums );
-		NodeNums.allocate( NumArgs );
-		NodeNums = 0;
+		NodeNums.dimension( NumArgs, 0 );
 
 		InducedNodeListName = "";
 
@@ -324,10 +317,8 @@ namespace ZonePlenum {
 
 		if ( NumZoneReturnPlenums > 0 ) ZoneRetPlenCond.allocate( NumZoneReturnPlenums );
 		if ( NumZoneSupplyPlenums > 0 ) ZoneSupPlenCond.allocate( NumZoneSupplyPlenums );
-		CheckRetEquipName.allocate( NumZoneReturnPlenums );
-		CheckRetEquipName = true;
-		CheckSupEquipName.allocate( NumZoneSupplyPlenums );
-		CheckSupEquipName = true;
+		CheckRetEquipName.dimension( NumZoneReturnPlenums, true );
+		CheckSupEquipName.dimension( NumZoneSupplyPlenums, true );
 
 		ZonePlenumNum = 0;
 
@@ -337,7 +328,7 @@ namespace ZonePlenum {
 
 			CurrentModuleObject = "AirLoopHVAC:ReturnPlenum";
 
-			GetObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( AlphArray( 1 ), ZoneRetPlenCond.ZonePlenumName(), ZonePlenumNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
@@ -366,7 +357,7 @@ namespace ZonePlenum {
 			//  Check if this zone is used as a controlled zone
 			ZoneEquipConfigLoop = FindItemInList( AlphArray( 2 ), ZoneEquipConfig.ZoneName(), NumOfZones );
 			if ( ZoneEquipConfigLoop != 0 ) {
-				ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is a controlled zone." " It cannot be used as a " + CurrentModuleObject );
+				ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is a controlled zone. It cannot be used as a " + CurrentModuleObject );
 				ShowContinueError( "..occurs in " + CurrentModuleObject + " = " + AlphArray( 1 ) );
 				ErrorsFound = true;
 			}
@@ -463,7 +454,7 @@ namespace ZonePlenum {
 
 			CurrentModuleObject = "AirLoopHVAC:SupplyPlenum";
 
-			GetObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, ZonePlenumNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -486,7 +477,7 @@ namespace ZonePlenum {
 				IOStat = FindItemInList( AlphArray( 2 ), ZoneRetPlenCond.ZoneName(), NumZoneReturnPlenums );
 				if ( IOStat != 0 ) {
 					ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is used more than once as a " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum." );
-					ShowContinueError( "..Only one " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum object" " may be connected to a given zone." );
+					ShowContinueError( "..Only one " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum object may be connected to a given zone." );
 					ShowContinueError( "..occurs in " + CurrentModuleObject + " = " + AlphArray( 1 ) );
 					ErrorsFound = true;
 				}
@@ -503,7 +494,7 @@ namespace ZonePlenum {
 			if ( any( ZoneEquipConfig.IsControlled() ) ) {
 				ZoneEquipConfigLoop = FindItemInList( AlphArray( 2 ), ZoneEquipConfig.ZoneName(), NumOfZones );
 				if ( ZoneEquipConfigLoop != 0 ) {
-					ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is a controlled zone." " It cannot be used as a " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum." );
+					ShowSevereError( RoutineName + cAlphaFields( 2 ) + " \"" + AlphArray( 2 ) + "\" is a controlled zone. It cannot be used as a " + CurrentModuleObject + " or AirLoopHVAC:ReturnPlenum." );
 					ShowContinueError( "..occurs in " + CurrentModuleObject + " = " + AlphArray( 1 ) );
 					ErrorsFound = true;
 				}
@@ -1365,7 +1356,7 @@ namespace ZonePlenum {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

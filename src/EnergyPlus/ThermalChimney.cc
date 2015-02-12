@@ -317,7 +317,7 @@ namespace ThermalChimney {
 
 			// Error trap if the sum of fractions is not equal to 1.0
 			if ( std::abs( AllRatiosSummed - 1.0 ) > FlowFractionTolerance ) {
-				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " "sum of fractions, must be =1.0, entered value (summed from entries)=[" + RoundSigDigits( AllRatiosSummed, 4 ) + "]." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid sum of fractions, must be =1.0, entered value (summed from entries)=[" + RoundSigDigits( AllRatiosSummed, 4 ) + "]." );
 				ErrorsFound = true;
 			}
 
@@ -881,7 +881,7 @@ namespace ThermalChimney {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

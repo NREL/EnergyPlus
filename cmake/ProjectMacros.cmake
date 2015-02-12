@@ -64,7 +64,8 @@ macro(ADD_GOOGLE_TESTS executable)
       string(REGEX MATCHALL "TEST_?F?\\(([A-Za-z_0-9 ,]+)\\)" found_tests ${contents})
       foreach(hit ${found_tests})
         string(REGEX REPLACE ".*\\(( )*([A-Za-z_0-9]+)( )*,( )*([A-Za-z_0-9]+)( )*\\).*" "\\2.\\5" test_name ${hit})
-        add_test(${test_name} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${executable}" --gtest_filter=${test_name})
+        add_test(NAME ${test_name} 
+                 COMMAND "${executable}" "--gtest_filter=${test_name}")
       endforeach(hit)
     endif()
   endforeach()
@@ -109,10 +110,21 @@ macro( CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES )
   endif()
 endmacro()
 
+# Named arguments 
+# IDF_FILE <filename> IDF input file
+# EPW_FILE <filename> EPW weather file
+# 
+# Optional Arguments
+# DESIGN_DAY_ONLY force design day simulation
+# ANNUAL_SIMULATION force annual simulation
+# EXPECT_FATAL Expect simulation to fail
+# COST <integer> Cost of this simulation relative to other simulations.
+#                Higher cost simulations run earlier in an attempt to enhance
+#                test parallelization and reduce overall test run time.
 function( ADD_SIMULATION_TEST )
-  set(options ANNUAL_SIMULATION DESIGN_DAY_ONLY)
-  set(oneValueArgs IDF_FILE EPW_FILE)
-  set(multiValueArgs "")
+  set(options ANNUAL_SIMULATION DESIGN_DAY_ONLY EXPECT_FATAL)
+  set(oneValueArgs IDF_FILE EPW_FILE COST)
+  set(multiValueArgs ENERGYPLUS_FLAGS)
   cmake_parse_arguments(ADD_SIM_TEST "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
   if( DESIGN_DAY_ONLY )
@@ -123,36 +135,54 @@ function( ADD_SIMULATION_TEST )
     set(ANNUAL_SIMULATION false)
   endif()
 
-  get_filename_component(IDF_NAME "${ADD_SIM_TEST_IDF_FILE}" NAME_WE)
-  if(BUILD_FORTRAN) #only do ExpandObjects in Fortran/Full builds
-    add_test(NAME "integration.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}
-      -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
-      -DBINARY_DIR=${CMAKE_BINARY_DIR}
-      -DENERGYPLUS_EXE=$<TARGET_FILE:EnergyPlus>
-      #-DEXPANDOBJECTS_EXE=$<TARGET_FILE:ExpandObjects>
-      -DIDF_FILE=${ADD_SIM_TEST_IDF_FILE}
-      -DEPW_FILE=${ADD_SIM_TEST_EPW_FILE}
-      -DANNUAL_SIMULATION=${ANNUAL_SIMULATION}
-      -DBUILD_FORTRAN=${BUILD_FORTRAN}
-      -P ${CMAKE_SOURCE_DIR}/cmake/RunSimulation.cmake
-    )
+  if(ANNUAL_SIMULATION)
+   set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -a" )
   else()
-    add_test(NAME "integration.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}
-      -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
-      -DBINARY_DIR=${CMAKE_BINARY_DIR}
-      -DENERGYPLUS_EXE=$<TARGET_FILE:EnergyPlus>
-      -DIDF_FILE=${ADD_SIM_TEST_IDF_FILE}
-      -DEPW_FILE=${ADD_SIM_TEST_EPW_FILE}
-      -DANNUAL_SIMULATION=${ANNUAL_SIMULATION}
-      -DBUILD_FORTRAN=${BUILD_FORTRAN}
-      -P ${CMAKE_SOURCE_DIR}/cmake/RunSimulation.cmake
-    )  
+   set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -D" )
+  endif()
+  
+  get_filename_component(IDF_NAME "${ADD_SIM_TEST_IDF_FILE}" NAME_WE)
+
+  if ( PROFILE_GENERATE AND IDF_NAME MATCHES "^(ChilledWaterStorage-Mixed|AirflowNetwork3zVent|AirflowNetwork3zVentAutoWPC|DElightCFSWindow|PipeHeatTransfer_Outair|RadHiTempElecTermReheat|RadLoTempCFloTermReheat|RadLoTempHydrMulti10|RefBldgSmallOfficeNew2004_Chicago|WindowTestsSimple|.*CentralChillerHeaterSystem.*|EMSCustomOutputVariable|EMSTestMathAndKill)$")
+    message("Setting ANNUAL_SIMULATION to true for ${IDF_NAME} for the purpose of PGO training")
+    set(ANNUAL_SIMULATION true)
   endif()
 
-  SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
-  SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
+  add_test(NAME "integration.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}
+    -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
+    -DBINARY_DIR=${CMAKE_BINARY_DIR}
+    -DENERGYPLUS_EXE=$<TARGET_FILE:energyplus>
+    -DIDF_FILE=${ADD_SIM_TEST_IDF_FILE}
+    -DEPW_FILE=${ADD_SIM_TEST_EPW_FILE}
+    -DENERGYPLUS_FLAGS=${ENERGYPLUS_FLAGS}
+    -DBUILD_FORTRAN=${BUILD_FORTRAN}
+    -P ${CMAKE_SOURCE_DIR}/cmake/RunSimulation.cmake
+  )  
 
-  if( DO_REGRESSION_TESTING )
+  # MSVC's profile generator does not work with parallel runs
+  #if( MSVC AND PROFILE_GENERATE )
+    #set_tests_properties("integration.${IDF_NAME}" PROPERTIES RUN_SERIAL true)
+  #endif()
+
+  if (ADD_SIM_TEST_COST AND NOT ADD_SIM_TEST_COST STREQUAL "" )
+    set_tests_properties("integration.${IDF_NAME}" PROPERTIES COST ${ADD_SIM_TEST_COST})
+  endif()
+
+  # Added the expect_fatal here to detect files that are expected to fatal error properly
+  if( ADD_SIM_TEST_EXPECT_FATAL )
+    set_tests_properties("integration.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Failed")
+    set_tests_properties("integration.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Passed")
+  else()
+    set_tests_properties("integration.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
+    set_tests_properties("integration.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
+  endif()
+
+  if ( PROFILE_GENERATE AND ANNUAL_SIMULATION )
+    set_tests_properties("integration.${IDF_NAME}" PROPERTIES TIMEOUT 4500)
+  endif()
+
+
+  if( DO_REGRESSION_TESTING AND (NOT ADD_SIM_TEST_EXPECT_FATAL) )
     add_test(NAME "regression.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}
       -DBINARY_DIR=${CMAKE_BINARY_DIR}
       -DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}
@@ -170,7 +200,6 @@ function( ADD_SIMULATION_TEST )
     set_tests_properties("regression.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Success")
     set_tests_properties("regression.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
   endif()
-
 
 endfunction()
 

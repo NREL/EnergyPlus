@@ -52,7 +52,7 @@ public: // Creation
 	// Default Constructor
 	inline
 	Cstring() :
-		str_( new char[ 1 ] )
+	 str_( new char[ 1 ] )
 	{
 		str_[ 0 ] = '\0';
 	}
@@ -60,7 +60,7 @@ public: // Creation
 	// Copy Constructor
 	inline
 	Cstring( Cstring const & s ) :
-		str_( new char[ std::strlen( s.str_ ) + 1 ] )
+	 str_( new char[ std::strlen( s.str_ ) + 1 ] )
 	{
 		std::memcpy( str_, s.str_, std::strlen( s.str_ ) + 1 );
 	}
@@ -68,7 +68,7 @@ public: // Creation
 	// C string Constructor: Implicit Conversion
 	inline
 	Cstring( c_cstring const s ) :
-		str_( new char[ std::strlen( s ) + 1 ] )
+	 str_( new char[ std::strlen( s ) + 1 ] )
 	{
 		std::memcpy( str_, s, std::strlen( s ) + 1 );
 	}
@@ -77,7 +77,7 @@ public: // Creation
 	inline
 	explicit
 	Cstring( std::string const & s ) :
-		str_( new char[ s.length() + 1 ] )
+	 str_( new char[ s.length() + 1 ] )
 	{
 		size_type const len( s.length() );
 		s.copy( str_, len );
@@ -87,10 +87,10 @@ public: // Creation
 	// Cstring + Length Constructor
 	inline
 	Cstring(
-		Cstring const & s,
-		size_type const len
+	 Cstring const & s,
+	 size_type const len
 	) :
-		str_( new char[ len + 1 ] )
+	 str_( new char[ len + 1 ] )
 	{
 		assert( len <= s.length() );
 		std::memcpy( str_, s.str_, len );
@@ -100,10 +100,10 @@ public: // Creation
 	// C string + Length Constructor
 	inline
 	Cstring(
-		c_cstring const s,
-		size_type const len
+	 c_cstring const s,
+	 size_type const len
 	) :
-		str_( new char[ len + 1 ] )
+	 str_( new char[ len + 1 ] )
 	{
 		assert( len <= std::strlen( s ) );
 		std::memcpy( str_, s, len );
@@ -113,10 +113,10 @@ public: // Creation
 	// std::string + Length Constructor
 	inline
 	Cstring(
-		std::string const & s,
-		size_type const len
+	 std::string const & s,
+	 size_type const len
 	) :
-		str_( new char[ len + 1 ] )
+	 str_( new char[ len + 1 ] )
 	{
 		assert( len <= s.length() );
 		s.copy( str_, len );
@@ -127,7 +127,7 @@ public: // Creation
 	inline
 	explicit
 	Cstring( char const c ) :
-		str_( new char[ 2 ] )
+	 str_( new char[ 2 ] )
 	{
 		str_[ 0 ] = c;
 		str_[ 1 ] = '\0';
@@ -137,7 +137,7 @@ public: // Creation
 	inline
 	explicit
 	Cstring( size_type const len ) :
-		str_( new char[ len + 1 ] )
+	 str_( new char[ len + 1 ] )
 	{
 		std::memset( str_, ' ', len );
 		str_[ len ] = '\0';
@@ -147,7 +147,7 @@ public: // Creation
 	inline
 	explicit
 	Cstring( int const len ) :
-		str_( new char[ len + 1 ] )
+	 str_( new char[ len + 1 ] )
 	{
 		std::memset( str_, ' ', len );
 		str_[ len ] = '\0';
@@ -163,16 +163,16 @@ public: // Creation
 
 public: // Conversion
 
-	// C string Conversion: Invalid after str_ is reallocated
+	// C string Conversion
 	inline
 	operator c_cstring() const
 	{
 		return str_;
 	}
 
-	// C string Conversion: Invalid after str_ is reallocated
+	// C string Conversion
 	inline
-	operator cstring()
+	operator cstring &()
 	{
 		return str_;
 	}

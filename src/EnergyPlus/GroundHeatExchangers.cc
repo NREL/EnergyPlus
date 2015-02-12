@@ -726,8 +726,7 @@ namespace GroundHeatExchangers {
 		VerticalGlhe.allocate( NumVerticalGlhes );
 
 		VerticalGlheReport.allocate( NumVerticalGlhes );
-		CheckEquipName.allocate( NumVerticalGlhes );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumVerticalGlhes, true );
 
 		for ( GlheNum = 1; GlheNum <= NumVerticalGlhes; ++GlheNum ) {
 			GetObjectItem( cCurrentModuleObject, GlheNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -763,33 +762,32 @@ namespace GroundHeatExchangers {
 			VerticalGlhe( GlheNum ).KGround = rNumericArgs( 5 );
 			VerticalGlhe( GlheNum ).CpRhoGround = rNumericArgs( 6 );
 			VerticalGlhe( GlheNum ).TempGround = rNumericArgs( 7 );
-			VerticalGlhe( GlheNum ).MaxGlheFlowRate = rNumericArgs( 8 );
-			VerticalGlhe( GlheNum ).KGrout = rNumericArgs( 9 );
-			VerticalGlhe( GlheNum ).KPipe = rNumericArgs( 10 );
-			VerticalGlhe( GlheNum ).PipeOutDia = rNumericArgs( 11 );
-			VerticalGlhe( GlheNum ).UtubeDist = rNumericArgs( 12 );
-			VerticalGlhe( GlheNum ).PipeThick = rNumericArgs( 13 );
-			VerticalGlhe( GlheNum ).MaxSimYears = rNumericArgs( 14 );
-			VerticalGlhe( GlheNum ).gReferenceRatio = rNumericArgs( 15 );
+			VerticalGlhe( GlheNum ).KGrout = rNumericArgs( 8 );
+			VerticalGlhe( GlheNum ).KPipe = rNumericArgs( 9 );
+			VerticalGlhe( GlheNum ).PipeOutDia = rNumericArgs( 10 );
+			VerticalGlhe( GlheNum ).UtubeDist = rNumericArgs( 11 );
+			VerticalGlhe( GlheNum ).PipeThick = rNumericArgs( 12 );
+			VerticalGlhe( GlheNum ).MaxSimYears = rNumericArgs( 13 );
+			VerticalGlhe( GlheNum ).gReferenceRatio = rNumericArgs( 14 );
 
 			//   Not many checks
 			if ( VerticalGlhe( GlheNum ).PipeThick >= VerticalGlhe( GlheNum ).PipeOutDia / 2.0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + VerticalGlhe( GlheNum ).Name + "\", invalid value in field." );
-				ShowContinueError( "..." + cNumericFieldNames( 13 ) + "=[" + RoundSigDigits( VerticalGlhe( GlheNum ).PipeThick, 3 ) + "]." );
-				ShowContinueError( "..." + cNumericFieldNames( 11 ) + "=[" + RoundSigDigits( VerticalGlhe( GlheNum ).PipeOutDia, 3 ) + "]." );
+				ShowContinueError( "..." + cNumericFieldNames( 12 ) + "=[" + RoundSigDigits( VerticalGlhe( GlheNum ).PipeThick, 3 ) + "]." );
+				ShowContinueError( "..." + cNumericFieldNames( 10 ) + "=[" + RoundSigDigits( VerticalGlhe( GlheNum ).PipeOutDia, 3 ) + "]." );
 				ShowContinueError( "...Radius will be <=0." );
 				ErrorsFound = true;
 			}
 
 			if ( VerticalGlhe( GlheNum ).MaxSimYears < MaxNumberSimYears ) {
 				ShowWarningError( cCurrentModuleObject + "=\"" + VerticalGlhe( GlheNum ).Name + "\", invalid value in field." );
-				ShowContinueError( "..." + cNumericFieldNames( 14 ) + " less than RunPeriod Request" );
+				ShowContinueError( "..." + cNumericFieldNames( 13 ) + " less than RunPeriod Request" );
 				ShowContinueError( "Requested input=" + TrimSigDigits( VerticalGlhe( GlheNum ).MaxSimYears ) + " will be set to " + TrimSigDigits( MaxNumberSimYears ) );
 				VerticalGlhe( GlheNum ).MaxSimYears = MaxNumberSimYears;
 			}
 
 			// Get Gfunction data
-			VerticalGlhe( GlheNum ).NPairs = rNumericArgs( 16 );
+			VerticalGlhe( GlheNum ).NPairs = rNumericArgs( 15 );
 			VerticalGlhe( GlheNum ).SubAGG = 15;
 			VerticalGlhe( GlheNum ).AGG = 192;
 
@@ -813,7 +811,7 @@ namespace GroundHeatExchangers {
 				Allocated = true;
 			}
 
-			IndexNum = 17;
+			IndexNum = 16;
 			for ( PairNum = 1; PairNum <= VerticalGlhe( GlheNum ).NPairs; ++PairNum ) {
 				VerticalGlhe( GlheNum ).LNTTS( PairNum ) = rNumericArgs( IndexNum );
 				VerticalGlhe( GlheNum ).GFNC( PairNum ) = rNumericArgs( IndexNum + 1 );
@@ -1312,7 +1310,7 @@ namespace GroundHeatExchangers {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

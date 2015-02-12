@@ -293,8 +293,7 @@ namespace WaterToAirHeatPump {
 		// Allocate Arrays
 		if ( NumWatertoAirHPs > 0 ) {
 			WatertoAirHP.allocate( NumWatertoAirHPs );
-			CheckEquipName.allocate( NumWatertoAirHPs );
-			CheckEquipName = true;
+			CheckEquipName.dimension( NumWatertoAirHPs, true );
 		}
 
 		GetObjectDefMaxArgs( "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", NumParams, NumAlphas, NumNums );
@@ -304,17 +303,11 @@ namespace WaterToAirHeatPump {
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		AlphArray.allocate( MaxAlphas );
-		AlphArray = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
+		lAlphaBlanks.dimension( MaxAlphas, true );
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
-		NumArray.allocate( MaxNums );
-		NumArray = 0.0;
+		lNumericBlanks.dimension( MaxNums, true );
+		NumArray.dimension( MaxNums, 0.0 );
 
 		// Get the data for detailed cooling Heat Pump
 		CurrentModuleObject = "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation";
@@ -323,7 +316,7 @@ namespace WaterToAirHeatPump {
 
 			++HPNum;
 
-			GetObjectItem( CurrentModuleObject, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -432,7 +425,7 @@ namespace WaterToAirHeatPump {
 
 			++HPNum;
 
-			GetObjectItem( CurrentModuleObject, WatertoAirHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, WatertoAirHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;

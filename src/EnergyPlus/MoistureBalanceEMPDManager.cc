@@ -194,8 +194,7 @@ namespace MoistureBalanceEMPDManager {
 		}
 
 		// Ensure at least one interior EMPD surface for each zone
-		EMPDzone.allocate( NumOfZones );
-		EMPDzone = false;
+		EMPDzone.dimension( NumOfZones, false );
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			if ( ! Surface( SurfNum ).HeatTransSurf || Surface( SurfNum ).Class == SurfaceClass_Window ) continue; // Heat transfer surface only and not a window
 			if ( Surface( SurfNum ).HeatTransferAlgorithm != HeatTransferModel_EMPD ) continue;
@@ -210,7 +209,7 @@ namespace MoistureBalanceEMPDManager {
 					ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces." );
 				}
 				if ( DisplayExtraWarnings ) {
-					ShowMessage( "GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the " "inside layer in Surface=" + Surface( SurfNum ).Name );
+					ShowMessage( "GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the inside layer in Surface=" + Surface( SurfNum ).Name );
 					ShowContinueError( "with Construction=" + Construct( ConstrNum ).Name );
 				}
 			}
@@ -218,14 +217,14 @@ namespace MoistureBalanceEMPDManager {
 				continue;
 			} else { // Multiple layer construction
 				if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).EMPDMaterialProps && Surface( SurfNum ).ExtBoundCond <= 0 ) { // The external layer is not exposed to zone
-					ShowSevereError( "GetMoistureBalanceEMPDInput: EMPD properties are assigned to the " "outside layer in Construction=" + Construct( ConstrNum ).Name );
+					ShowSevereError( "GetMoistureBalanceEMPDInput: EMPD properties are assigned to the outside layer in Construction=" + Construct( ConstrNum ).Name );
 					ShowContinueError( "..Outside layer material with EMPD properties = " + Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Name );
 					ShowContinueError( "..A material with EMPD properties must be assigned to the inside layer of a construction." );
 					ErrorsFound = true;
 				}
 				for ( Layer = 2; Layer <= Construct( ConstrNum ).TotLayers - 1; ++Layer ) {
 					if ( Material( Construct( ConstrNum ).LayerPoint( Layer ) ).EMPDMaterialProps ) {
-						ShowSevereError( "GetMoistureBalanceEMPDInput: EMPD properties are assigned to a " "middle layer in Construction=" + Construct( ConstrNum ).Name );
+						ShowSevereError( "GetMoistureBalanceEMPDInput: EMPD properties are assigned to a middle layer in Construction=" + Construct( ConstrNum ).Name );
 						ShowContinueError( "..Middle layer material with EMPD properties = " + Material( Construct( ConstrNum ).LayerPoint( Layer ) ).Name );
 						ShowContinueError( "..A material with EMPD properties must be assigned to the inside layer of a construction." );
 						ErrorsFound = true;
@@ -613,7 +612,7 @@ namespace MoistureBalanceEMPDManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -628,13 +627,13 @@ namespace MoistureBalanceEMPDManager {
 		int MatNum;
 
 		// Formats
-		static gio::Fmt const Format_700( "(' Construction EMPD, ',A,', ',A,', ',4(F8.4,', '),F8.4)" );
+		static gio::Fmt Format_700( "(' Construction EMPD, ',A,', ',A,', ',4(F8.4,', '),F8.4)" );
 
 		ScanForReports( "Constructions", DoReport, "Constructions" );
 
 		if ( ! DoReport ) return;
 		//   Write Descriptions
-		gio::write( OutputFileInits, fmtA ) << "! <Construction EMPD>, Construction Name, Inside Layer Material Name, " "Penetration Depth {m}, a, b, c, d";
+		gio::write( OutputFileInits, fmtA ) << "! <Construction EMPD>, Construction Name, Inside Layer Material Name, Penetration Depth {m}, a, b, c, d";
 
 		for ( ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum ) {
 			if ( Construct( ConstrNum ).TypeIsWindow ) continue;
@@ -655,7 +654,7 @@ namespace MoistureBalanceEMPDManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

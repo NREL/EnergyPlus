@@ -7,19 +7,29 @@ endif()
 
 set( test_src
   DataPlant.unit.cc
+  DXCoils.unit.cc
+  ExteriorEnergyUse.unit.cc
+  HeatBalanceManager.unit.cc
+  HVACStandaloneERV.unit.cc
+  OutputProcessor.unit.cc
+  OutputReportTabular.unit.cc
+  SizingManager.unit.cc
+  SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
+  WaterThermalTanks.unit.cc
 )
 
 set( test_dependencies
-  EnergyPlusLib
-  objexx
-  sqlite
-  bcvtb 
-  epexpat 
-  epfmiimport 
-)
+  energyplusapi
+#  objexx
+#  sqlite
+#  bcvtb 
+#  epexpat 
+#  epfmiimport 
+#  DElight
+ )
 
 if(CMAKE_HOST_UNIX)
   if(NOT APPLE)
@@ -30,4 +40,4 @@ endif()
 # Executable name will be EnergyPlus_tests
 # Execute EnergyPlus_tests --help for options using gtest runner
 # Execute EnergyPlus_tests with no arguments to run all tests
-CREATE_TEST_TARGETS( EnergyPlus "${test_src}" "${test_dependencies}" )
+CREATE_TEST_TARGETS( energyplus "${test_src}" "${test_dependencies}" )

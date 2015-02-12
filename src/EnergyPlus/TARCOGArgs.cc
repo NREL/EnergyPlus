@@ -47,7 +47,7 @@ namespace TARCOGArgs {
 	using namespace TARCOGOutput;
 	using namespace TARCOGParams;
 
-	static gio::Fmt const fmtI3( "(I3)" );
+	static gio::Fmt fmtI3( "(I3)" );
 
 	// Functions
 
@@ -321,7 +321,7 @@ namespace TARCOGArgs {
 			if ( ( LayerType( i ) < MinLayType ) || ( LayerType( i ) > MaxLayType ) ) {
 				ArgCheck = 22;
 				gio::write( a, fmtI3 ) << i;
-				ErrorMessage = "Incorrect layer type for layer #" + a + ".  Layer type can either be 0 (glazing layer)," "1 (Venetian blind), 2 (woven shade), 3 (perforated), 4 (diffuse shade) or 5 (bsdf).";
+				ErrorMessage = "Incorrect layer type for layer #" + a + ".  Layer type can either be 0 (glazing layer), 1 (Venetian blind), 2 (woven shade), 3 (perforated), 4 (diffuse shade) or 5 (bsdf).";
 				return ArgCheck;
 			}
 
@@ -650,7 +650,7 @@ namespace TARCOGArgs {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

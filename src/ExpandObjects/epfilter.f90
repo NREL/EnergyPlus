@@ -18654,6 +18654,8 @@ CHARACTER(len=MaxAlphaLength) :: airloopOutlet=''
 CHARACTER(len=MaxAlphaLength) :: dxCoilObjectType='None'
 CHARACTER(len=MaxAlphaLength) :: scheduleName=''
 CHARACTER(len=MaxAlphaLength) :: returnInletToOAMIxer=''
+CHARACTER(len=MaxAlphaLength) :: dehumscheduleName=''
+CHARACTER(len=MaxAlphaLength) :: humscheduleName=''
 
 !create some common schedules
 IF (numCompactZoneConstVol /= 0) THEN
@@ -19159,10 +19161,8 @@ DO iSys = 1, numCompactSysConstVol
   isDehumidifyNone = SameString(FldVal(base + cvsDehumCtrlTypeOff),'None')
   IF (SameString(FldVal(base +  cvsDehumCtrlTypeOff),'None')) THEN
     dehumidCtrlKind = dehumidNone
-    isDehumidifyNone = .TRUE.
   ELSEIF (SameString(FldVal(base +  cvsDehumCtrlTypeOff),'CoolReheat')) THEN
     dehumidCtrlKind = dehumidCoolRht
-    isDehumidifyNone = .TRUE.
   ELSE
     CALL WriteError('Invalid choice in HVACTemplate:System:ConstantVolume "'//TRIM(FldVal(base + cvsAirHandlerNameOff))//'"'// &
                     ' in the Dehumidification Control Type field: '//TRIM(FldVal(base + cvsDehumCtrlTypeOff)))
@@ -20038,35 +20038,76 @@ DO iSys = 1, numCompactSysConstVol
   CALL AddToObjFld('Motor in Airstream Fraction', base + cvsSupplyFanFractionOff,' ')
   CALL AddToObjStr('Air Inlet Node Name', TRIM(fanInlet))
   CALL AddToObjStr('Air Outlet Node Name', TRIM(fanOutlet),.TRUE.)
-  ! Dehumidification set point manager
+
+  ! Humdistat(s) if needed
+  ! first check if the schedule names are used or if values should be used.
   IF (.NOT. isDehumidifyNone) THEN
-    ! first check if the schedule name is used or if value should be used.
     IF (FldVal(base + cvsDehumSetPtSchedNameOff) .EQ. '') THEN
-      scheduleName = 'HVACTemplate-Always ' // TRIM(FldVal(base + cvsDehumSetPtOff))
+      dehumscheduleName = 'HVACTemplate-Always ' // TRIM(FldVal(base + cvsDehumSetPtOff))
       CALL AddAlwaysSchedule(FldVal(base + cvsDehumSetPtOff))
     ELSE
-      scheduleName = TRIM(FldVal(base + cvsDehumSetPtSchedNameOff))
+      dehumscheduleName = TRIM(FldVal(base + cvsDehumSetPtSchedNameOff))
     ENDIF
-    CALL CreateNewObj('SetpointManager:Scheduled')
-    CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Dehumidification Setpoint Manager')
-    CALL AddToObjStr('Control Variable','MaximumHumidityRatio')
-    CALL AddToObjStr('Schedule Name', TRIM(scheduleName))
-    CALL AddToObjStr('Setpoint Node or NodeList Name', TRIM(coolCoilUnitOutlet),.TRUE.)
   END IF
-  ! Humidifier set point manager and humidifier
   IF (.NOT. isHumidifierNone) THEN
     ! first check if the schedule name is used or if value should be used.
     IF (FldVal(base + cvsHumidSetPtSchedNameOff) .EQ. '') THEN
-      scheduleName = 'HVACTemplate-Always ' // TRIM(FldVal(base + cvsHumidSetPtOff))
+      humscheduleName = 'HVACTemplate-Always ' // TRIM(FldVal(base + cvsHumidSetPtOff))
       CALL AddAlwaysSchedule(FldVal(base + cvsHumidSetPtOff))
     ELSE
-      scheduleName = TRIM(FldVal(base + cvsHumidSetPtSchedNameOff))
+      humscheduleName = TRIM(FldVal(base + cvsHumidSetPtSchedNameOff))
     ENDIF
-    CALL CreateNewObj('SetpointManager:Scheduled')
+  END IF
+
+  !    Single humidistat if humidification and dehumidification are both active and control zones are the same
+  IF ((.NOT. isHumidifierNone) .AND. (.NOT. isDehumidifyNone) &
+       .AND. SameString(FldVal(base +  cvsDehumCtrlZoneOff),FldVal(base +  cvsHumidCtrlZoneOff))) THEN
+    CALL CreateNewObj('ZoneControl:Humidistat')
+    CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Humidistat')
+    CALL AddToObjFld('Zone Name', base + cvsDehumCtrlZoneOff,'')
+    CALL AddToObjStr('Humidifying Relative Humidity Setpoint Schedule Name', TRIM(humscheduleName))
+    CALL AddToObjStr('Dehumidifying Relative Humidity Setpoint Schedule Name', TRIM(dehumscheduleName),.TRUE.)
+  ELSE
+    IF (.NOT. isDehumidifyNone) THEN
+  !   Dehumidification humidistat
+      CALL CreateNewObj('ZoneControl:Humidistat')
+      CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Dehumidification Humidistat')
+      CALL AddToObjFld('Zone Name', base + cvsDehumCtrlZoneOff,'')
+      CALL AddToObjStr('Humidifying Relative Humidity Setpoint Schedule Name','HVACTemplate-Always 1')
+      CALL AddToObjStr('Dehumidifying Relative Humidity Setpoint Schedule Name', TRIM(dehumscheduleName),.TRUE.)
+
+      CALL AddAlwaysSchedule('1')
+    ENDIF
+    IF (.NOT. isHumidifierNone) THEN
+  !    Humidification humidistat
+      CALL CreateNewObj('ZoneControl:Humidistat')
+      CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Humidification Humidistat')
+      CALL AddToObjFld('Zone Name', base + cvsHumidCtrlZoneOff,'')
+      CALL AddToObjStr('Humidifying Relative Humidity Setpoint Schedule Name', TRIM(humscheduleName))
+      CALL AddToObjStr('Dehumidifying Relative Humidity Setpoint Schedule Name','HVACTemplate-Always 100',.TRUE.)
+
+      CALL AddAlwaysSchedule('100')
+    ENDIF
+  ENDIF
+
+  !Set point manager for dehumidification
+  IF (.NOT. isDehumidifyNone) THEN
+    CALL CreateNewObj('SetpointManager:SingleZone:Humidity:Maximum')
+    CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Dehumidification Setpoint Manager')
+    CALL AddToObjStr('Control Variable','')
+    CALL AddToObjStr('Schedule Name','')
+    CALL AddToObjStr('Setpoint Node or NodeList Name', TRIM(coolCoilUnitOutlet))
+    CALL AddToObjFld('Control Zone Air Node Name', base + cvsDehumCtrlZoneOff,' Zone Air Node',.TRUE.)
+  END IF
+
+  ! Humidifier set point manager and humidifier
+  IF (.NOT. isHumidifierNone) THEN
+    CALL CreateNewObj('SetpointManager:SingleZone:Humidity:Minimum')
     CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Humidification Setpoint Manager')
-    CALL AddToObjStr('Control Variable','MinimumHumidityRatio')
-    CALL AddToObjStr('Schedule Name', TRIM(scheduleName))
-    CALL AddToObjStr('Setpoint Node or NodeList Name', TRIM(humidifierOutlet),.TRUE.)
+    CALL AddToObjStr('Control Variable','')
+    CALL AddToObjStr('Schedule Name','')
+    CALL AddToObjStr('Setpoint Node or NodeList Name', TRIM(humidifierOutlet))
+    CALL AddToObjFld('Control Zone Air Node Name', base + cvsHumidCtrlZoneOff,' Zone Air Node',.TRUE.)
     IF (humidifierKind .EQ. humidifyElecSteam) THEN
       !***Humidifier:Steam:Electric
       CALL CreateNewObj('Humidifier:Steam:Electric')
@@ -31400,6 +31441,8 @@ DO iSys = 1, numCompactDedOutAir
       coolCoilUnitOutlet = TRIM(FldVal(base + doasNameOff))//' Cooling Coil Outlet'
     END IF
     lastOutlet       = TRIM(coolCoilUnitOutlet)
+  ELSE ! If there is no cooling coil, set to fan outlet in case the cooling setpoint is needed for heat recovery controls
+      coolCoilUnitOutlet = TRIM(FldVal(base + doasNameOff))//' Supply Fan Outlet'
   END IF
 
   ! desuperheater reheat coil
@@ -31650,8 +31693,8 @@ DO iSys = 1, numCompactDedOutAir
     CALL AddToObjFld('Schedule Name', base + doasSysAvailSchedNameOff,'',.TRUE.)
   END IF
 
-  ! Cooling coil setpoint manager
-  IF (coolCoilKind .NE. ccNone) THEN
+  ! Cooling coil setpoint manager (If there is no cooling coil and no heating coil but there is heat recovery, then need this)
+  IF ((coolCoilKind .NE. ccNone) .OR. ((heatRecovery .NE. htrecNone) .AND. heatCoilType .EQ. ctNone)) THEN
     CALL CreateNewObj('NodeList')
     CALL AddToObjFld('Name', base + doasNameOff,' Cooling Setpoint Nodes')
     IF (dehumidCtrlKind .EQ. dehumidCoolRhtDesuper) THEN
@@ -31686,7 +31729,7 @@ DO iSys = 1, numCompactDedOutAir
     ELSE
       CALL AddToObjFld('Setpoint Node or NodeList Name', base + doasNameOff,' Cooling Setpoint Nodes',.TRUE.)
     END IF
-    IF (supFanPlacement .EQ. sfpDrawThru) THEN
+    IF ((supFanPlacement .EQ. sfpDrawThru) .AND. (coolCoilKind .NE. ccNone)) THEN
       !***SetpointManager:MixedAir
       CALL CreateNewObj('SetpointManager:MixedAir')
       CALL AddToObjFld('Name', base + doasNameOff,' Cooling Coil Air Temp Manager')

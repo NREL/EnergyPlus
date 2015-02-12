@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -290,8 +291,7 @@ namespace EvaporativeCoolers {
 		NumEvapCool = NumDirectEvapCool + NumDryInDirectEvapCool + NumWetInDirectEvapCool + NumRDDEvapCool + NumDirectResearchSpecialEvapCool;
 
 		if ( NumEvapCool > 0 ) EvapCond.allocate( NumEvapCool );
-		CheckEquipName.allocate( NumEvapCool );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumEvapCool, true );
 
 		cCurrentModuleObject = "EvaporativeCooler:Direct:CelDekPad";
 
@@ -501,7 +501,7 @@ namespace EvaporativeCoolers {
 		cCurrentModuleObject = "EvaporativeCooler:Indirect:ResearchSpecial";
 		for ( IndEvapCoolNum = 1; IndEvapCoolNum <= NumRDDEvapCool; ++IndEvapCoolNum ) {
 			EvapCoolNum = NumDirectEvapCool + NumDryInDirectEvapCool + NumWetInDirectEvapCool + IndEvapCoolNum;
-			GetObjectItem( cCurrentModuleObject, IndEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GetObjectItem( cCurrentModuleObject, IndEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( cAlphaArgs( 1 ), EvapCond.EvapCoolerName(), EvapCoolNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
@@ -721,8 +721,7 @@ namespace EvaporativeCoolers {
 		static bool localSetPointCheck( false );
 
 		if ( MyOneTimeFlag ) {
-			MySizeFlag.allocate( NumEvapCool );
-			MySizeFlag = true;
+			MySizeFlag.dimension( NumEvapCool, true );
 			MyOneTimeFlag = false;
 		}
 
@@ -907,7 +906,7 @@ namespace EvaporativeCoolers {
 				}
 
 				// would like search for this componenent in some OutsideAirSys structure
-				// but thats not so easy becuase of circular USE with MixedAir.f90
+				// but thats not so easy becuase of circular USE with MixedAir.cc
 				//  So assume if its not on main air path, its on OA path (for now)
 				if ( ! CoolerOnMainAirLoop ) CoolerOnOApath = true;
 
@@ -1385,8 +1384,8 @@ namespace EvaporativeCoolers {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		std::string CompName;
-		Real64 FullOutput;
-		Real64 ReqOutput;
+		Real64 FullOutput( 0.0 );
+		Real64 ReqOutput( 0.0 );
 		int InletNode;
 		int OutletNode;
 		int ControlNode;
@@ -1427,6 +1426,8 @@ namespace EvaporativeCoolers {
 				// now reinit after test call
 				InitEvapCooler( EvapCoolNum );
 
+			} else {
+				assert( false );
 			}}
 
 			// Since we are cooling, we expect FullOutput to be < 0 and FullOutput < NoCoolOutput
@@ -2134,27 +2135,20 @@ namespace EvaporativeCoolers {
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
-		Numbers.allocate( MaxNumbers );
-		Numbers = 0.0;
+		Numbers.dimension( MaxNumbers, 0.0 );
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNumbers );
-		cNumericFields = "";
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNumbers );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNumbers, true );
 
 		if ( NumZoneEvapUnits > 0 ) {
-			CheckZoneEvapUnitName.allocate( NumZoneEvapUnits );
-			CheckZoneEvapUnitName = true;
+			CheckZoneEvapUnitName.dimension( NumZoneEvapUnits, true );
 			ZoneEvapUnit.allocate( NumZoneEvapUnits );
 			ZoneEvapCoolerUnitFields.allocate( NumZoneEvapUnits );
 
 			for ( UnitLoop = 1; UnitLoop <= NumZoneEvapUnits; ++UnitLoop ) {
 				GetObjectItem( CurrentModuleObject, UnitLoop, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-				
+
 				ZoneEvapCoolerUnitFields( UnitLoop ).FieldNames.allocate( NumNumbers );
 				ZoneEvapCoolerUnitFields( UnitLoop ).FieldNames = "";
 				ZoneEvapCoolerUnitFields( UnitLoop ).FieldNames = cNumericFields;
@@ -2456,12 +2450,9 @@ namespace EvaporativeCoolers {
 		Real64 TimeElapsed;
 
 		if ( MyOneTimeFlag ) {
-			MySizeFlag.allocate( NumZoneEvapUnits );
-			MySizeFlag = true;
-			MyEnvrnFlag.allocate( NumZoneEvapUnits );
-			MyEnvrnFlag = true;
-			MyFanFlag.allocate( NumZoneEvapUnits );
-			MyFanFlag = true;
+			MySizeFlag.dimension( NumZoneEvapUnits, true );
+			MyEnvrnFlag.dimension( NumZoneEvapUnits, true );
+			MyFanFlag.dimension( NumZoneEvapUnits, true );
 			MyZoneEqFlag.allocate ( NumZoneEvapUnits );
 			MyZoneEqFlag = true;
 			MyOneTimeFlag = false;
@@ -2662,7 +2653,7 @@ namespace EvaporativeCoolers {
 				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingSAFMethod;
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
 				if ( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow ) {
-					if ( SAFMethod == SupplyAirFlowRate ){
+					if ( SAFMethod == SupplyAirFlowRate ) {
 						if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
@@ -2671,17 +2662,16 @@ namespace EvaporativeCoolers {
 						if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
 							PrintFlag = false;
 						}
-					} else if ( SAFMethod == FlowPerFloorArea ){
+					} else if ( SAFMethod == FlowPerFloorArea ) {
 						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow * Zone( DataZoneNumber ).FloorArea;
 						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 						DataScalableSizingON = true;
-					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ){
+					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ) {
 						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 						TempSize = AutoSize;
 						DataScalableSizingON = true;
-					}
-					else {
+					} else {
 						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 					}
 					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
@@ -2708,11 +2698,11 @@ namespace EvaporativeCoolers {
 				ZoneCoolingOnlyFan = false;
 			} else {
 				// no scalble sizing method has been specified. Sizing proceeds using the method
-				// specified in the zoneHVAC object 
+				// specified in the zoneHVAC object
 				// N1 , \field Maximum Supply Air Flow Rate
-				ZoneCoolingOnlyFan = true;				
+				ZoneCoolingOnlyFan = true;
 				if ( ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate > 0.0) {
-					 PrintFlag = false;
+					PrintFlag = false;
 				}
 				TempSize = ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate;
 				RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
@@ -3124,12 +3114,12 @@ namespace EvaporativeCoolers {
 
 			} else if ( SolFla == -2 ) {
 				if ( ZoneEvapUnit( UnitNum ).UnitVSControlLimitsErrorIndex == 0 ) {
-					ShowWarningError( "Variable speed evaporative cooler unit calculation failed: fan speed ratio limits exceeded," " for unit = " + ZoneEvapUnit( UnitNum ).Name );
+					ShowWarningError( "Variable speed evaporative cooler unit calculation failed: fan speed ratio limits exceeded, for unit = " + ZoneEvapUnit( UnitNum ).Name );
 					ShowContinueError( "Check input for Fan Placement." );
 					ShowContinueErrorTimeStamp( "" );
 					if ( WarmupFlag ) ShowContinueError( "Error occurred during warmup days." );
 				}
-				ShowRecurringWarningErrorAtEnd( "Zone Evaporative Cooler unit control failed (limits exceeded) " "for ZoneHVAC:EvaporativeCoolerUnit =\"" + ZoneEvapUnit( UnitNum ).Name, ZoneEvapUnit( UnitNum ).UnitVSControlLimitsErrorIndex );
+				ShowRecurringWarningErrorAtEnd( "Zone Evaporative Cooler unit control failed (limits exceeded) for ZoneHVAC:EvaporativeCoolerUnit =\"" + ZoneEvapUnit( UnitNum ).Name, ZoneEvapUnit( UnitNum ).UnitVSControlLimitsErrorIndex );
 			}
 			ZoneEvapUnit( UnitNum ).FanSpeedRatio = FanSpeedRatio;
 		}
@@ -3300,7 +3290,7 @@ namespace EvaporativeCoolers {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

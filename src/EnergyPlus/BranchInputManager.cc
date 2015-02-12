@@ -476,7 +476,7 @@ namespace BranchInputManager {
 		// USE STATEMENTS:
 
 		// Return value
-		int GetAirBranchIndex;
+		int GetAirBranchIndex( 0 );
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -504,7 +504,6 @@ namespace BranchInputManager {
 
 		if ( NumBranches == 0 ) {
 			ShowSevereError( "GetAirBranchIndex:  Branch not found with component = " + CompType + " \"" + CompName + "\"" );
-			GetAirBranchIndex = 0;
 		} else {
 			BranchLoop: for ( BranchNum = 1; BranchNum <= NumBranches; ++BranchNum ) {
 				for ( CompNum = 1; CompNum <= Branch( BranchNum ).NumOfComponents; ++CompNum ) {
@@ -545,7 +544,7 @@ namespace BranchInputManager {
 		using General::TrimSigDigits;
 
 		// Return value
-		Real64 GetBranchFlow;
+		Real64 GetBranchFlow( 0.0 );
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -571,7 +570,6 @@ namespace BranchInputManager {
 
 		if ( NumBranches == 0 ) {
 			ShowSevereError( "GetBranchFlow:  Branch index not found = " + TrimSigDigits( BranchNum ) );
-			GetBranchFlow = 0.0;
 		} else {
 			if ( BranchNum > 0 && BranchNum <= NumBranches ) {
 				GetBranchFlow = Branch( BranchNum ).MaxFlowRate;
@@ -702,7 +700,7 @@ namespace BranchInputManager {
 		int CompNum; // loop counter
 		int NumBranches; // number of branches
 		int BranchNum; // loop index
-		int AirBranchIndex; // index to branch containing CompType, CompName
+		int AirBranchIndex( 0 ); // index to branch containing CompType, CompName
 
 		if ( GetBranchInputFlag ) {
 			GetBranchInputFlag = false;
@@ -1107,7 +1105,7 @@ namespace BranchInputManager {
 				RegisterNodeConnection( OutletNodeNum, NodeID( OutletNodeNum ), "Connector:Mixer", MixerName, ValidConnectionTypes( NodeConnectionType_Outlet ), 1, ObjectIsNotParent, errFlag );
 
 				if ( NumInletNodes > isize( InletNodeNames ) || NumInletNodes > isize( InletNodeNums ) ) {
-					ShowSevereError( "GetLoopMixer: Connector:Mixer=" + MixerName + " contains too many inlets for size of " "Inlet Array." );
+					ShowSevereError( "GetLoopMixer: Connector:Mixer=" + MixerName + " contains too many inlets for size of Inlet Array." );
 					ShowContinueError( "Max array size=" + TrimSigDigits( size( InletNodeNames ) ) + ", Mixer statement inlets=" + TrimSigDigits( NumInletNodes ) );
 					ShowFatalError( "Program terminates due to preceding condition." );
 				}
@@ -1260,7 +1258,7 @@ namespace BranchInputManager {
 				RegisterNodeConnection( InletNodeNum, NodeID( InletNodeNum ), "Connector:Splitter", SplitterName, ValidConnectionTypes( NodeConnectionType_Inlet ), 1, ObjectIsNotParent, errFlag );
 
 				if ( NumOutletNodes > isize( OutletNodeNames ) || NumOutletNodes > isize( OutletNodeNums ) ) {
-					ShowSevereError( "GetLoopSplitter: Connector:Splitter=" + SplitterName + " contains too many outlets for size of " "Outlet Array." );
+					ShowSevereError( "GetLoopSplitter: Connector:Splitter=" + SplitterName + " contains too many outlets for size of Outlet Array." );
 					ShowContinueError( "Max array size=" + TrimSigDigits( size( OutletNodeNames ) ) + ", Splitter statement outlets=" + TrimSigDigits( NumOutletNodes ) );
 					ShowFatalError( "Program terminates due to preceding condition." );
 				}
@@ -1491,7 +1489,7 @@ namespace BranchInputManager {
 					ShowWarningError( "Branch maximum flow rate differs from system flow rate." );
 					ShowContinueError( "Branch = " + BranchName + " has volume flow rate = " + TrimSigDigits( BranchFlow, 6 ) + " m3/s." );
 					ShowContinueError( "System = " + SystemType + " \"" + SystemName + "\" has volume flow rate = " + TrimSigDigits( BranchFanFlow, 6 ) + " m3/s." );
-					ShowContinueError( "A branch flow rate that is different from the system flow rate can cause" " discrepancies with outdoor air control." );
+					ShowContinueError( "A branch flow rate that is different from the system flow rate can cause discrepancies with outdoor air control." );
 				}
 			}
 		}
@@ -1608,21 +1606,14 @@ namespace BranchInputManager {
 				Branch.AssignedLoopName() = "";
 				ErrFound = false;
 				GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNumbers );
-				NodeNums.allocate( NumParams );
-				NodeNums = 0;
+				NodeNums.dimension( NumParams, 0 );
 				GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
 				Alphas.allocate( NumAlphas );
-				Alphas = "";
-				Numbers.allocate( NumNumbers );
-				Numbers = 0.0;
+				Numbers.dimension( NumNumbers, 0.0 );
 				cAlphaFields.allocate( NumAlphas );
-				cAlphaFields = "";
 				cNumericFields.allocate( NumNumbers );
-				cNumericFields = "";
-				lAlphaBlanks.allocate( NumAlphas );
-				lAlphaBlanks = true;
-				lNumericBlanks.allocate( NumNumbers );
-				lNumericBlanks = true;
+				lAlphaBlanks.dimension( NumAlphas, true );
+				lNumericBlanks.dimension( NumNumbers, true );
 				BCount = 0;
 				for ( Count = 1; Count <= NumOfBranches; ++Count ) {
 					GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
@@ -1832,17 +1823,11 @@ namespace BranchInputManager {
 		BranchList.LoopType_s() = ""; //Autodesk LoopType is the name of both int and string member arrays so we use the _s to disambiguate
 		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
 		Alphas.allocate( NumAlphas );
-		Alphas = "";
-		Numbers.allocate( NumNumbers );
-		Numbers = 0.0;
+		Numbers.dimension( NumNumbers, 0.0 );
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = "";
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNumbers );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNumbers, true );
 
 		if ( NumNumbers > 0 ) {
 			ShowSevereError( RoutineName + CurrentModuleObject + " Object definition contains numbers, cannot be decoded by GetBranchListInput routine." );
@@ -1999,20 +1984,14 @@ namespace BranchInputManager {
 		ConnectorLists.allocate( NumOfConnectorLists );
 		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
 		if ( NumAlphas != 5 || NumNumbers != 0 ) {
-			ShowWarningError( "GetConnectorList: Illegal \"extension\" to " + CurrentModuleObject + " object. " "Internal code does not support > 2 connectors (Connector:Splitter and Connector:Mixer)" );
+			ShowWarningError( "GetConnectorList: Illegal \"extension\" to " + CurrentModuleObject + " object. Internal code does not support > 2 connectors (Connector:Splitter and Connector:Mixer)" );
 		}
 		Alphas.allocate( NumAlphas );
-		Alphas = "";
-		Numbers.allocate( NumNumbers );
-		Numbers = 0.0;
+		Numbers.dimension( NumNumbers, 0.0 );
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = "";
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNumbers );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNumbers, true );
 		for ( Count = 1; Count <= NumOfConnectorLists; ++Count ) {
 			GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			ConnectorLists( Count ).Name = Alphas( 1 );
@@ -2079,7 +2058,6 @@ namespace BranchInputManager {
 						continue;
 					}
 					NumBranchNames = Splitters( SplitNum ).NumOutletBranches;
-					BranchNames.allocate( NumBranchNames );
 					BranchNames = Splitters( SplitNum ).OutletBranchNames;
 				} else if ( SameString( ConnectorLists( Count ).ConnectorType( Loop ), cMIXER ) ) {
 					CurSplitter = true;
@@ -2091,7 +2069,6 @@ namespace BranchInputManager {
 						continue;
 					}
 					NumBranchNames = Mixers( MixerNum ).NumInletBranches;
-					BranchNames.allocate( NumBranchNames );
 					BranchNames = Mixers( MixerNum ).InletBranchNames;
 				} else {
 					continue;
@@ -2151,9 +2128,9 @@ namespace BranchInputManager {
 				ShowSevereError( "For " + CurrentModuleObject + '=' + ConnectorLists( Count ).Name );
 				ShowContinueError( "...Item=" + ConnectorLists( Count ).ConnectorName( Loop ) + ", Type=" + ConnectorLists( Count ).ConnectorType( Loop ) + " was not matched." );
 				if ( SameString( ConnectorLists( Count ).ConnectorType( Loop ), "Connector:Splitter" ) ) {
-					ShowContinueError( "The BranchList for this Connector:Splitter does not match the BranchList" " for its corresponding Connector:Mixer." );
+					ShowContinueError( "The BranchList for this Connector:Splitter does not match the BranchList for its corresponding Connector:Mixer." );
 				} else {
-					ShowContinueError( "The BranchList for this Connector:Mixer does not match the BranchList" " for its corresponding Connector:Splitter." );
+					ShowContinueError( "The BranchList for this Connector:Mixer does not match the BranchList for its corresponding Connector:Splitter." );
 				}
 				ErrorsFound = true;
 			}
@@ -2249,17 +2226,11 @@ namespace BranchInputManager {
 		Splitters.allocate( NumSplitters );
 		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
 		Alphas.allocate( NumAlphas );
-		Alphas = "";
-		Numbers.allocate( NumNumbers );
-		Numbers = 0.0;
+		Numbers.dimension( NumNumbers, 0.0 );
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = "";
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNumbers );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNumbers, true );
 		for ( Count = 1; Count <= NumSplitters; ++Count ) {
 			GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			Splitters( Count ).Name = Alphas( 1 );
@@ -2490,17 +2461,11 @@ namespace BranchInputManager {
 		Mixers.allocate( NumMixers );
 		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
 		Alphas.allocate( NumAlphas );
-		Alphas = "";
-		Numbers.allocate( NumNumbers );
-		Numbers = 0.0;
+		Numbers.dimension( NumNumbers, 0.0 );
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = "";
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNumbers );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNumbers, true );
 		for ( Count = 1; Count <= NumMixers; ++Count ) {
 			GetObjectItem( CurrentModuleObject, Count, Alphas, NumAlphas, Numbers, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			Mixers( Count ).Name = Alphas( 1 );
@@ -3092,7 +3057,7 @@ namespace BranchInputManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3157,14 +3122,13 @@ namespace BranchInputManager {
 		FArray1D< BranchUniqueNodes > BranchNodes;
 
 		// Formats
-		gio::Fmt const Format_700( "('! <#Branch Lists>,<Number of Branch Lists>')" );
-		gio::Fmt const Format_701( "(A)" );
-		gio::Fmt const Format_702( "('! <Branch List>,<Branch List Count>,<Branch List Name>,<Loop Name>,<Loop Type>,<Number of Branches>')" );
-		gio::Fmt const Format_704( "('! <Branch>,<Branch Count>,<Branch Name>,<Loop Name>,<Loop Type>,<Branch Inlet Node Name>,<Branch Outlet Node Name>')" );
-		gio::Fmt const Format_706( "('! <# Orphaned Branches>,<Number of Branches not on Branch Lists>')" );
+		static gio::Fmt Format_700( "('! <#Branch Lists>,<Number of Branch Lists>')" );
+		static gio::Fmt Format_701( "(A)" );
+		static gio::Fmt Format_702( "('! <Branch List>,<Branch List Count>,<Branch List Name>,<Loop Name>,<Loop Type>,<Number of Branches>')" );
+		static gio::Fmt Format_704( "('! <Branch>,<Branch Count>,<Branch Name>,<Loop Name>,<Loop Type>,<Branch Inlet Node Name>,<Branch Outlet Node Name>')" );
+		static gio::Fmt Format_706( "('! <# Orphaned Branches>,<Number of Branches not on Branch Lists>')" );
 
-		BranchReported.allocate( NumOfBranches );
-		BranchReported = false;
+		BranchReported.dimension( NumOfBranches, false );
 
 		// Do by Branch Lists
 		ShowMessage( "Testing Individual Branch Integrity" );
@@ -3205,8 +3169,7 @@ namespace BranchInputManager {
 				}
 			}
 			BranchPtrs( BranchList( BCount ).NumOfBranchNames + 1 ) = BranchPtrs( BranchList( BCount ).NumOfBranchNames ) + 1;
-			BranchFluidNodes.allocate( NumNodesOnBranchList );
-			BranchFluidNodes = 0;
+			BranchFluidNodes.dimension( NumNodesOnBranchList, 0 );
 			OriginalBranchFluidType = BlankString;
 			NumFluidNodes = 0;
 			for ( Count = 1; Count <= BranchList( BCount ).NumOfBranchNames; ++Count ) {
@@ -3217,7 +3180,7 @@ namespace BranchInputManager {
 
 				Found = FoundBranches( Count );
 				if ( Found == 0 ) {
-					gio::write( OutputFileBNDetails, Format_701 ) << "   Branch," + ChrOut + ',' + BranchList( BCount ).BranchNames( Count ) + "(not found)," "**Unknown**,**Unknown**,**Unknown**,**Unknown**";
+					gio::write( OutputFileBNDetails, Format_701 ) << "   Branch," + ChrOut + ',' + BranchList( BCount ).BranchNames( Count ) + "(not found),**Unknown**,**Unknown**,**Unknown**,**Unknown**";
 					continue;
 				}
 				BranchReported( Found ) = true;
@@ -3432,7 +3395,7 @@ namespace BranchInputManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

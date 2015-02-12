@@ -52,6 +52,7 @@ namespace OutsideEnergySources {
 		bool OneTimeInitFlag;
 		bool BeginEnvrnInitFlag;
 		bool CheckEquipName;
+		bool isThisSized;
 
 		// Default Constructor
 		OutsideEnergySourceSpecs() :
@@ -69,50 +70,8 @@ namespace OutsideEnergySources {
 			CompNum( 0 ),
 			OneTimeInitFlag( true ),
 			BeginEnvrnInitFlag( true ),
-			CheckEquipName( true )
-		{}
-
-		// Member Constructor
-		OutsideEnergySourceSpecs(
-			std::string const & PlantLoopID, // main plant loop ID
-			std::string const & SecndryLoopID, // secondary chiller loop (cond loop) ID
-			std::string const & ScheduleID, // equipment availability schedule
-			std::string const & Name, // user identifier
-			Real64 const NomCap, // design nominal capacity of district service
-			int const CapFractionSchedNum, // capacity modifier schedule number
-			int const InletNodeNum, // Node number on the inlet side of the plant
-			int const OutletNodeNum, // Node number on the inlet side of the plant
-			Real64 const EnergyTransfer, // cooling energy provided in time step
-			Real64 const EnergyRate, // cooling power
-			int const EnergyType, // flag for district heating OR cooling
-			int const MassFlowReSimIndex,
-			int const LoopNum,
-			int const LoopSideNum,
-			int const BranchNum,
-			int const CompNum,
-			bool const OneTimeInitFlag,
-			bool const BeginEnvrnInitFlag,
-			bool const CheckEquipName
-		) :
-			PlantLoopID( PlantLoopID ),
-			SecndryLoopID( SecndryLoopID ),
-			ScheduleID( ScheduleID ),
-			Name( Name ),
-			NomCap( NomCap ),
-			CapFractionSchedNum( CapFractionSchedNum ),
-			InletNodeNum( InletNodeNum ),
-			OutletNodeNum( OutletNodeNum ),
-			EnergyTransfer( EnergyTransfer ),
-			EnergyRate( EnergyRate ),
-			EnergyType( EnergyType ),
-			MassFlowReSimIndex( MassFlowReSimIndex ),
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			OneTimeInitFlag( OneTimeInitFlag ),
-			BeginEnvrnInitFlag( BeginEnvrnInitFlag ),
-			CheckEquipName( CheckEquipName )
+			CheckEquipName( true ),
+			isThisSized( false )
 		{}
 
 	};
@@ -200,6 +159,11 @@ namespace OutsideEnergySources {
 	// *****************************************************************************
 
 	void
+	SizeDistrictEnergy( 
+		int const EnergySourceNum 
+	);
+
+	void
 	SimDistrictEnergy(
 		bool const RunFlag,
 		int const DistrictEqNum,
@@ -235,7 +199,7 @@ namespace OutsideEnergySources {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -9,9 +10,11 @@
 
 // EnergyPlus Headers
 #include <WindTurbine.hh>
+#include <CommandLineInterface.hh>
 #include <DataEnvironment.hh>
 #include <DataGenerators.hh>
 #include <DataGlobalConstants.hh>
+#include <DataStringGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
@@ -276,17 +279,11 @@ namespace WindTurbine {
 		// Initializations and allocations
 		GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
-		cAlphaArgs = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = "";
-		rNumericArgs.allocate( NumNumbers );
-		rNumericArgs = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNumbers );
-		lNumericBlanks = true;
+		rNumericArgs.dimension( NumNumbers, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNumbers, true );
 
 		NumWindTurbines = GetNumObjectsFound( CurrentModuleObject );
 
@@ -295,7 +292,7 @@ namespace WindTurbine {
 		// Flow
 		for ( WindTurbineNum = 1; WindTurbineNum <= NumWindTurbines; ++WindTurbineNum ) {
 
-			GetObjectItem( CurrentModuleObject, WindTurbineNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, WindTurbineNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( cAlphaArgs( 1 ), WindTurbineSys.Name(), WindTurbineNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
@@ -601,7 +598,7 @@ namespace WindTurbine {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static char const TabChr( '\t' ); // Tab character
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -617,7 +614,7 @@ namespace WindTurbine {
 		std::string::size_type lnPtr; // scan pointer for Line input
 		int mon; // loop counter
 		bool wsStatFound; // logical noting that wind stats were found
-		bool fileExists; // true if in.stat file exists
+		bool fileExists; // true if Stat file exists
 		bool warningShown; // true if the <365 warning has already been shown
 		std::string lineIn;
 		FArray1D< Real64 > MonthWS( 12 );
@@ -627,13 +624,13 @@ namespace WindTurbine {
 		// Estimate average annual wind speed once
 		if ( MyOneTimeFlag ) {
 			wsStatFound = false;
-			{ IOFlags flags; gio::inquire( "in.stat", flags ); fileExists = flags.exists(); }
+			{ IOFlags flags; gio::inquire( DataStringGlobals::inStatFileName, flags ); fileExists = flags.exists(); }
 			if ( fileExists ) {
 				statFile = GetNewUnitNumber();
 				ReadStatus = 0;
-				{ IOFlags flags; flags.ACTION( "READ" ); gio::open( statFile, "in.stat", flags ); ReadStatus = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "READ" ); gio::open( statFile, DataStringGlobals::inStatFileName, flags ); ReadStatus = flags.ios(); }
 				if ( ReadStatus != 0 ) {
-					ShowFatalError( "InitWindTurbine: Could not open file \"in.stat\" for input (read)." );
+					ShowFatalError( "InitWindTurbine: Could not open file "+DataStringGlobals::inStatFileName+" for input (read)." );
 				}
 				while ( ReadStatus == 0 ) { //end of file
 					{ IOFlags flags; gio::read( statFile, fmtA, flags ) >> lineIn; ReadStatus = flags.ios(); }
@@ -660,14 +657,14 @@ namespace WindTurbine {
 									}
 								} else { // blank field
 									if ( ! warningShown ) {
-										ShowWarningError( "InitWindTurbine: read from in.stat file shows <365 days in weather file. " "Annual average wind speed used will be inaccurate." );
+										ShowWarningError( "InitWindTurbine: read from " + DataStringGlobals::inStatFileName + " file shows <365 days in weather file. Annual average wind speed used will be inaccurate." );
 										lineIn.erase( 0, lnPtr + 1 );
 										warningShown = true;
 									}
 								}
 							} else { // two tabs in succession
 								if ( ! warningShown ) {
-									ShowWarningError( "InitWindTurbine: read from in.stat file shows <365 days in weather file. " "Annual average wind speed used will be inaccurate." );
+									ShowWarningError( "InitWindTurbine: read from " + DataStringGlobals::inStatFileName + " file shows <365 days in weather file. Annual average wind speed used will be inaccurate." );
 									lineIn.erase( 0, lnPtr + 1 );
 									warningShown = true;
 								}
@@ -681,10 +678,10 @@ namespace WindTurbine {
 				if ( wsStatFound ) {
 					AnnualTMYWS = sum( MonthWS ) / 12.0;
 				} else {
-					ShowWarningError( "InitWindTurbine: stat file did not include Wind Speed statistics. " "TMY Wind Speed adjusted at the height is used." );
+					ShowWarningError( "InitWindTurbine: stat file did not include Wind Speed statistics. TMY Wind Speed adjusted at the height is used." );
 				}
 			} else { // No stat file
-				ShowWarningError( "InitWindTurbine: stat file missing. " "TMY Wind Speed adjusted at the height is used." );
+				ShowWarningError( "InitWindTurbine: stat file missing. TMY Wind Speed adjusted at the height is used." );
 			}
 
 			MyOneTimeFlag = false;
@@ -776,7 +773,7 @@ namespace WindTurbine {
 		Real64 LocalAirDensity; // Local density at the specific height in m
 		Real64 PowerCoeff; // Power coefficient
 		Real64 SweptArea; // Swept area of the rotor in m2
-		Real64 WTPower; // Total Power generated by the turbine in the quasi-steady state in Watts
+		Real64 WTPower( 0.0 ); // Total Power generated by the turbine in the quasi-steady state in Watts
 		Real64 Power; // Actual power of the turbine in Watts
 		Real64 TipSpeedRatio; // Tip speed ratio (TSR)
 		Real64 TipSpeedRatioAtI; // Tip speed ratio at the ith time step
@@ -937,6 +934,8 @@ namespace WindTurbine {
 				WindTurbineSys( WindTurbineNum ).NorForce = NorForce;
 				WindTurbineSys( WindTurbineNum ).TotTorque = TotTorque;
 
+			} else {
+				assert( false );
 			}}
 
 			if ( WTPower > WindTurbineSys( WindTurbineNum ).RatedPower ) {
@@ -1018,7 +1017,7 @@ namespace WindTurbine {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

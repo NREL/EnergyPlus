@@ -19,6 +19,7 @@
 #include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/DimensionExpressions.hh>
 #include <ObjexxFCL/FArray.functions.hh>
+#include "ObjexxFCL.unit.hh"
 
 // C++ Headers
 #include <array>
@@ -217,26 +218,6 @@ TEST( FArrayTest, Redimension2D )
 			}
 		}
 	}
-}
-
-TEST( FArrayTest, Transpose )
-{
-	FArray2D_int A( 2, 3 );
-	A( 1, 1 ) = 4;
-	A( 1, 2 ) = 3;
-	A( 1, 3 ) = 5;
-	A( 2, 1 ) = 9;
-	A( 2, 2 ) = 2;
-	A( 2, 3 ) = 8;
-	FArray2D_int B( transpose( A ) );
-	EXPECT_EQ( 3u, B.size1() );
-	EXPECT_EQ( 2u, B.size2() );
-	EXPECT_EQ( A( 1, 1 ), B( 1, 1 ) );
-	EXPECT_EQ( A( 1, 2 ), B( 2, 1 ) );
-	EXPECT_EQ( A( 1, 3 ), B( 3, 1 ) );
-	EXPECT_EQ( A( 2, 1 ), B( 1, 2 ) );
-	EXPECT_EQ( A( 2, 2 ), B( 2, 2 ) );
-	EXPECT_EQ( A( 2, 3 ), B( 3, 2 ) );
 }
 
 TEST( FArrayTest, Redimension2DDimension )

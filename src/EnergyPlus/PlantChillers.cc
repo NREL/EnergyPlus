@@ -1104,7 +1104,7 @@ namespace PlantChillers {
 			} else {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 12 ) + '=' + cAlphaArgs( 12 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
-				ShowContinueError( "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2," "OtherFuel1 or OtherFuel2" );
+				ShowContinueError( "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2,OtherFuel1 or OtherFuel2" );
 				ErrorsFound = true;
 			}}
 
@@ -1568,7 +1568,7 @@ namespace PlantChillers {
 			} else {
 				ShowSevereError( "Invalid " + cAlphaFieldNames( 10 ) + '=' + cAlphaArgs( 10 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
-				ShowContinueError( "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2," "OtherFuel1 or OtherFuel2" );
+				ShowContinueError( "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2,OtherFuel1 or OtherFuel2" );
 				ErrorsFound = true;
 			}}
 
@@ -2063,7 +2063,7 @@ namespace PlantChillers {
 					if ( ! AnyEnergyManagementSystemInModel ) {
 						if ( ! ElectricChiller( ChillNum ).Base.ModulatedFlowErrDone ) {
 							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + ElectricChiller( ChillNum ).Base.Name );
-							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller " "in variable flow mode, use a SetpointManager" );
+							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager" );
 							ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
 							ElectricChiller( ChillNum ).Base.ModulatedFlowErrDone = true;
 						}
@@ -2074,7 +2074,7 @@ namespace PlantChillers {
 						if ( FatalError ) {
 							if ( ! ElectricChiller( ChillNum ).Base.ModulatedFlowErrDone ) {
 								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + ElectricChiller( ChillNum ).Base.Name );
-								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller evaporator " "in variable flow mode" );
+								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode" );
 								ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node " );
 								ShowContinueError( "  or use an EMS actuator to establish a setpoint at the outlet node " );
 								ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
@@ -2146,7 +2146,7 @@ namespace PlantChillers {
 						if ( ! AnyEnergyManagementSystemInModel ) {
 							if ( ! ElectricChiller( ChillNum ).Base.HRSPErrDone ) {
 								ShowWarningError( "Missing heat recovery temperature setpoint for chiller named " + ElectricChiller( ChillNum ).Base.Name );
-								ShowContinueError( "  A temperature setpoint is needed at the heat recovery leaving temperature " "setpoint node specified, use a SetpointManager" );
+								ShowContinueError( "  A temperature setpoint is needed at the heat recovery leaving temperature setpoint node specified, use a SetpointManager" );
 								ShowContinueError( "  The overall loop setpoint will be assumed for heat recovery. The simulation continues ..." );
 								ElectricChiller( ChillNum ).HeatRecSetPointNodeNum = PlantLoop( ElectricChiller( ChillNum ).HRLoopNum ).TempSetPointNodeNum;
 								ElectricChiller( ChillNum ).Base.HRSPErrDone = true;
@@ -2158,9 +2158,9 @@ namespace PlantChillers {
 							if ( FatalError ) {
 								if ( ! ElectricChiller( ChillNum ).Base.HRSPErrDone ) {
 									ShowWarningError( "Missing heat recovery temperature setpoint for chiller named " + ElectricChiller( ChillNum ).Base.Name );
-									ShowContinueError( "  A temperature setpoint is needed at the heat recovery leaving temperature " "setpoint node specified, use a SetpointManager to establish a setpoint" );
+									ShowContinueError( "  A temperature setpoint is needed at the heat recovery leaving temperature setpoint node specified, use a SetpointManager to establish a setpoint" );
 									ShowContinueError( "  or use an EMS actuator to establish a setpoint at this node " );
-									ShowContinueError( "  The overall loop setpoint will be assumed " "for heat recovery. The simulation continues ..." );
+									ShowContinueError( "  The overall loop setpoint will be assumed for heat recovery. The simulation continues ..." );
 									ElectricChiller( ChillNum ).HeatRecSetPointNodeNum = PlantLoop( ElectricChiller( ChillNum ).HRLoopNum ).TempSetPointNodeNum;
 									ElectricChiller( ChillNum ).Base.HRSPErrDone = true;
 								}
@@ -2359,7 +2359,7 @@ namespace PlantChillers {
 					if ( ! AnyEnergyManagementSystemInModel ) {
 						if ( ! EngineDrivenChiller( ChillNum ).Base.ModulatedFlowErrDone ) {
 							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + EngineDrivenChiller( ChillNum ).Base.Name );
-							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller " "in variable flow mode, use a SetpointManager" );
+							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager" );
 							ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
 							EngineDrivenChiller( ChillNum ).Base.ModulatedFlowErrDone = true;
 						}
@@ -2370,7 +2370,7 @@ namespace PlantChillers {
 						if ( FatalError ) {
 							if ( ! EngineDrivenChiller( ChillNum ).Base.ModulatedFlowErrDone ) {
 								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + EngineDrivenChiller( ChillNum ).Base.Name );
-								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller evaporator " "in variable flow mode" );
+								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode" );
 								ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node " );
 								ShowContinueError( "  or use an EMS actuator to establish a setpoint at the outlet node " );
 								ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
@@ -2610,7 +2610,7 @@ namespace PlantChillers {
 					if ( ! AnyEnergyManagementSystemInModel ) {
 						if ( ! GTChiller( ChillNum ).Base.ModulatedFlowErrDone ) {
 							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + GTChiller( ChillNum ).Base.Name );
-							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller " "in variable flow mode, use a SetpointManager" );
+							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager" );
 							ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
 							GTChiller( ChillNum ).Base.ModulatedFlowErrDone = true;
 						}
@@ -2621,7 +2621,7 @@ namespace PlantChillers {
 						if ( FatalError ) {
 							if ( ! GTChiller( ChillNum ).Base.ModulatedFlowErrDone ) {
 								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + GTChiller( ChillNum ).Base.Name );
-								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller evaporator " "in variable flow mode" );
+								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode" );
 								ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node " );
 								ShowContinueError( "  or use an EMS actuator to establish a setpoint at the outlet node " );
 								ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
@@ -2838,7 +2838,7 @@ namespace PlantChillers {
 					if ( ! AnyEnergyManagementSystemInModel ) {
 						if ( ! ConstCOPChiller( ChillNum ).Base.ModulatedFlowErrDone ) {
 							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + ConstCOPChiller( ChillNum ).Base.Name );
-							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller " "in variable flow mode, use a SetpointManager" );
+							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager" );
 							ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
 							ConstCOPChiller( ChillNum ).Base.ModulatedFlowErrDone = true;
 						}
@@ -2849,7 +2849,7 @@ namespace PlantChillers {
 						if ( FatalError ) {
 							if ( ! ConstCOPChiller( ChillNum ).Base.ModulatedFlowErrDone ) {
 								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + ConstCOPChiller( ChillNum ).Base.Name );
-								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller evaporator " "in variable flow mode" );
+								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode" );
 								ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node " );
 								ShowContinueError( "  or use an EMS actuator to establish a setpoint at the outlet node " );
 								ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
@@ -3005,9 +3005,7 @@ namespace PlantChillers {
 		DesignHeatRecVolFlowRateUser = 0.0;
 
 		if ( ElectricChiller( ChillNum ).Base.CondenserType == WaterCooled ) {
-			//IF (ElectricChiller(ChillNum)%Base%CondVolFlowRate == AutoSize) THEN
 			PltSizCondNum = PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).PlantSizNum;
-			//END IF
 		}
 
 		PltSizNum = PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).PlantSizNum;
@@ -3021,10 +3019,8 @@ namespace PlantChillers {
 				Cp = GetSpecificHeatGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ElectricChiller( ChillNum ).Base.CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate * ElectricChiller( ChillNum ).Base.SizFac;
 				if ( ! IsAutoSize ) tmpNomCap = ElectricChiller( ChillNum ).Base.NomCap;
-				//IF (PlantSizesOkayToFinalize) ElectricChiller(ChillNum)%Base%NomCap = tmpNomCap
 			} else {
 				if ( IsAutoSize ) tmpNomCap = 0.0;
-				//IF (PlantSizesOkayToFinalize) ElectricChiller(ChillNum)%Base%NomCap = tmpNomCap
 			}
 			if ( PlantSizesOkayToFinalize ) {
 				if ( IsAutoSize ) {
@@ -3073,10 +3069,8 @@ namespace PlantChillers {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				tmpEvapVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate * ElectricChiller( ChillNum ).Base.SizFac;
 				if ( ! IsAutoSize ) tmpEvapVolFlowRate = ElectricChiller( ChillNum ).Base.EvapVolFlowRate;
-				//IF (PlantSizesOkayToFinalize) ElectricChiller(ChillNum)%Base%EvapVolFlowRate = tmpEvapVolFlowRate
 			} else {
 				if ( IsAutoSize ) tmpEvapVolFlowRate = 0.0;
-				//IF (PlantSizesOkayToFinalize)  ElectricChiller(ChillNum)%Base%EvapVolFlowRate = tmpEvapVolFlowRate
 			}
 			if ( PlantSizesOkayToFinalize ) {
 				if ( IsAutoSize ) {
@@ -3130,10 +3124,8 @@ namespace PlantChillers {
 				Cp = GetSpecificHeatGlycol( PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).FluidName, ElectricChiller( ChillNum ).TempDesCondIn, PlantLoop( ElectricChiller( ChillNum ).Base.CDLoopNum ).FluidIndex, RoutineName );
 				tmpCondVolFlowRate = tmpNomCap * ( 1.0 + 1.0 / ElectricChiller( ChillNum ).Base.COP ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
 				if ( ! IsAutoSize ) tmpCondVolFlowRate = ElectricChiller( ChillNum ).Base.CondVolFlowRate;
-				//IF (PlantSizesOkayToFinalize) ElectricChiller(ChillNum)%Base%CondVolFlowRate = tmpCondVolFlowRate
 			} else {
 				if ( IsAutoSize ) tmpCondVolFlowRate = 0.0;
-				//IF (PlantSizesOkayToFinalize)  ElectricChiller(ChillNum)%Base%CondVolFlowRate = 0.0d0
 			}
 			if ( PlantSizesOkayToFinalize ) {
 				if ( IsAutoSize ) {
@@ -4110,7 +4102,7 @@ namespace PlantChillers {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
-		static gio::Fmt const OutputFormat( "(F6.2)" );
+		static gio::Fmt OutputFormat( "(F6.2)" );
 		static std::string const RoutineName( "CalcElectricChillerModel" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -4120,9 +4112,6 @@ namespace PlantChillers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > CapacityRat( 3 ); // intermediate result:  capacity ratio
-		FArray1D< Real64 > PowerRat( 3 ); // intermediate result:  power ratio
-		FArray1D< Real64 > FullLoadFactor( 3 ); // intermediate result:  full load factor
 		Real64 MinPartLoadRat; // min allowed operating frac full load
 		Real64 MaxPartLoadRat; // max allowed operating frac full load
 		Real64 TempCondInDesign; // C - (Electric ADJTC(1)The design secondary loop fluid
@@ -4243,9 +4232,9 @@ namespace PlantChillers {
 		}
 
 		//  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
-		CapacityRat = ElectricChiller( ChillNum ).CapRatCoef;
-		PowerRat = ElectricChiller( ChillNum ).PowerRatCoef;
-		FullLoadFactor = ElectricChiller( ChillNum ).FullLoadCoef;
+		auto const & CapacityRat( ElectricChiller( ChillNum ).CapRatCoef );
+		auto const & PowerRat( ElectricChiller( ChillNum ).PowerRatCoef );
+		auto const & FullLoadFactor( ElectricChiller( ChillNum ).FullLoadCoef );
 		MinPartLoadRat = ElectricChiller( ChillNum ).MinPartLoadRat;
 		PartLoadRat = MinPartLoadRat;
 		MaxPartLoadRat = ElectricChiller( ChillNum ).MaxPartLoadRat;
@@ -4663,7 +4652,7 @@ namespace PlantChillers {
 		Real64 const ReferenceTemp( 25.0 ); // Reference temperature by which lower heating
 		// value is reported.  This should be subtracted
 		// off of when calculated exhaust energies.
-		static gio::Fmt const OutputFormat( "(F6.2)" );
+		static gio::Fmt OutputFormat( "(F6.2)" );
 		static std::string const RoutineName( "CalcEngineDrivenChillerModel" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -4673,9 +4662,6 @@ namespace PlantChillers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > CapacityRat( 3 ); // intermediate result:  capacity ratio
-		FArray1D< Real64 > PowerRat( 3 ); // intermediate result:  power ratio
-		FArray1D< Real64 > FullLoadFactor( 3 ); // intermediate result:  full load factor
 		Real64 MinPartLoadRat; // min allowed operating frac full load
 		Real64 MaxPartLoadRat; // max allowed operating frac full load
 		Real64 TempCondIn; // C - (EngineDriven ADJTC(1)The design secondary loop fluid
@@ -4855,9 +4841,9 @@ namespace PlantChillers {
 		}
 
 		//  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
-		CapacityRat = EngineDrivenChiller( ChillerNum ).CapRatCoef;
-		PowerRat = EngineDrivenChiller( ChillerNum ).PowerRatCoef;
-		FullLoadFactor = EngineDrivenChiller( ChillerNum ).FullLoadCoef;
+		auto const & CapacityRat( EngineDrivenChiller( ChillerNum ).CapRatCoef );
+		auto const & PowerRat( EngineDrivenChiller( ChillerNum ).PowerRatCoef );
+		auto const & FullLoadFactor( EngineDrivenChiller( ChillerNum ).FullLoadCoef );
 		MinPartLoadRat = EngineDrivenChiller( ChillerNum ).MinPartLoadRat;
 		MaxPartLoadRat = EngineDrivenChiller( ChillerNum ).MaxPartLoadRat;
 		TempCondInDesign = EngineDrivenChiller( ChillerNum ).TempDesCondIn;
@@ -5181,7 +5167,7 @@ namespace PlantChillers {
 			if ( EngineDrivenChiller( ChillerNum ).Base.CondenserType == WaterCooled ) {
 				// first check for run away condenser loop temps (only reason yet to be observed for this?)
 				if ( CondInletTemp > 70.0 ) {
-					ShowSevereError( "CalcEngineDrivenChillerModel: Condenser loop inlet temperatures " "> 70.0 C for EngineDrivenChiller=" + EngineDrivenChiller( ChillerNum ).Base.Name );
+					ShowSevereError( "CalcEngineDrivenChillerModel: Condenser loop inlet temperatures > 70.0 C for EngineDrivenChiller=" + EngineDrivenChiller( ChillerNum ).Base.Name );
 					ShowContinueErrorTimeStamp( "" );
 					ShowContinueError( "Condenser loop water temperatures are too high at" + RoundSigDigits( CondInletTemp, 2 ) );
 					ShowContinueError( "Check input for condenser plant loop, especially cooling tower" );
@@ -5266,7 +5252,7 @@ namespace PlantChillers {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
 		Real64 const ExhaustCP( 1.047 ); // Exhaust Gas Specific Heat
-		static gio::Fmt const OutputFormat( "(F6.2)" );
+		static gio::Fmt OutputFormat( "(F6.2)" );
 		static std::string const RoutineName( "CalcGTChillerModel" );
 		static std::string const RoutineNameHeatRecovery( "ChillerHeatRecovery" );
 
@@ -5277,9 +5263,6 @@ namespace PlantChillers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > CapacityRat( 3 ); // intermediate result:  capacity ratio
-		FArray1D< Real64 > PowerRat( 3 ); // intermediate result:  power ratio
-		FArray1D< Real64 > FullLoadFactor( 3 ); // intermediate result:  full load factor
 		Real64 MinPartLoadRat; // min allowed operating frac full load
 		Real64 MaxPartLoadRat; // max allowed operating frac full load
 		Real64 TempCondIn; // C - (GT ADJTC(1)The design secondary loop fluid
@@ -5312,7 +5295,7 @@ namespace PlantChillers {
 		Real64 RL;
 		Real64 RL2;
 
-		Real64 FuelEnergyIn; // (EFUEL) Amount of Fuel Energy Required to run gas turbine
+		Real64 FuelEnergyIn( 0.0 ); // (EFUEL) Amount of Fuel Energy Required to run gas turbine
 		Real64 ExhaustFlow( 0.0 ); // (FEX) Exhaust Gas Flow Rate cubic meters per second
 		Real64 ExhaustTemp( 0.0 ); // (TEX) Exhaust Gas Temperature in C
 		Real64 QHeatRecLube; // (ELUBE) Recoverable Lube Oil Energy (W)
@@ -5453,9 +5436,9 @@ namespace PlantChillers {
 		}
 
 		//  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
-		CapacityRat = GTChiller( ChillerNum ).CapRatCoef;
-		PowerRat = GTChiller( ChillerNum ).PowerRatCoef;
-		FullLoadFactor = GTChiller( ChillerNum ).FullLoadCoef;
+		auto const & CapacityRat( GTChiller( ChillerNum ).CapRatCoef );
+		auto const & PowerRat( GTChiller( ChillerNum ).PowerRatCoef );
+		auto const & FullLoadFactor( GTChiller( ChillerNum ).FullLoadCoef );
 		MinPartLoadRat = GTChiller( ChillerNum ).MinPartLoadRat;
 		MaxPartLoadRat = GTChiller( ChillerNum ).MaxPartLoadRat;
 		TempCondInDesign = GTChiller( ChillerNum ).TempDesCondIn;
@@ -5937,7 +5920,7 @@ namespace PlantChillers {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
 		Real64 const DeltaTempTol( 0.0001 ); // C - minimum significant mass flow rate
-		static gio::Fmt const OutputFormat( "(F6.2)" );
+		static gio::Fmt OutputFormat( "(F6.2)" );
 		static std::string const RoutineName( "CalcConstCOPChillerModel" );
 
 		// DERIVED TYPE DEFINITIONS
@@ -7009,7 +6992,7 @@ namespace PlantChillers {
 //     Portions of the EnergyPlus software package have been developed and copyrighted
 //     by other individuals, companies and institutions.  These portions have been
 //     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in EnergyPlus.f90.
+//     list of contributors, see "Notice" located in main.cc.
 //     NOTICE: The U.S. Government is granted for itself and others acting on its
 //     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 //     reproduce, prepare derivative works, and perform publicly and display publicly.
