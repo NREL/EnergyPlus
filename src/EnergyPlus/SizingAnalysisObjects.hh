@@ -33,22 +33,34 @@ public:
 class ZoneTimestepObject {
 public:
 
-	int KindofSim			= 0;
-	int EnvrnNum			= 0;
-	int DesignDayNum		= 0;
-	int DayOfSim			= 0;    // since start of simulation
-	int HourOfDay			= 0; 
+	int kindofSim			= 0;
+	int envrnNum			= 0;
+	int designDayNum		= 0;
+	int dayOfSim			= 0;    // since start of simulation
+	int hourOfDay			= 0; 
 	int ztStepsIntoPeriod	= 0;    //count of zone timesteps into period
 	Real64 stepStartMinute	= 0.0;  //minutes at beginning of zone timestep
 	Real64 stepEndMinute	= 0.0;  //minutes at end of zone timestep
-	Real64 TimeStepDuration = 0.0;  //in fractional hours, length of timestep
+	Real64 timeStepDuration = 0.0;  //in fractional hours, length of timestep
 
-	Real64 LogDataValue		= 0.0;
-	Real64 RunningAvgDataValue = 0.0;
-	bool HasSystemSubSteps	= false;
-	int NumSubSteps = 0;
+	Real64 logDataValue		= 0.0;
+	Real64 runningAvgDataValue = 0.0;
+	bool hasSystemSubSteps	= false;
+	int numSubSteps = 0;
 	std::vector< SystemTimestepObject > subSteps; //nested object array for system timesteps inside here.
 	
+	ZoneTimestepObject (
+		int kindOfSim,
+		int environmentNum,
+		int designDayNum,
+		int dayOfSim,
+		int hourOfDay,
+		int stepEndMinute,
+		Real64 timeStepDuration,
+		int numOfTimeStepsPerHour
+	);
+
+	ZoneTimestepObject();
 };
 
 class SizingLog {
@@ -61,21 +73,15 @@ public:
 	std::vector <int> EnvrnStartZtStepIndex ; //sized to number of environments in sizing set
 
 	int NumOfStepsInLogSet; // sum of all zone timestep steps in log
+	int timeStepsInAverage;
+	Real64 *p_rVariable;
+
 	std::vector< ZoneTimestepObject > ztStepObj; //will be sized to the sum of all steps, eg. timesteps in hour * 24 hours * 2 design days.  
 
 
-	int NodeNum; //temporary until pointers...
-
-	int GetZtStepIndex(
-		const ZoneTimestepObject tmpztStepStamp
-	);
 
 	void FillZoneStep(
 		ZoneTimestepObject tmpztStepStamp
-	);
-
-	int GetSysStepZtStepIndex(
-		ZoneTimestepObject tmpztStepStamp 
 	);
 
 	void FillSysStep( 
@@ -85,11 +91,13 @@ public:
 
 	void AverageSysTimeSteps();
 
-	void ProcessRunningAverage( 
-		int const TimeStepsInAverage
-	);
+	void ProcessRunningAverage();
 
 	ZoneTimestepObject GetLogVariableDataMax( );
+
+	Real64 GetLogVariableDataAtTimestamp( 
+		ZoneTimestepObject tmpztStepStamp
+		);
 
 	void AdjustEnvrnIndexMapForIteration(
 		int const HVACSizingIterCount
@@ -97,19 +105,23 @@ public:
 
 	void ReInitLogForIteration();
 
+private:
+
+	int GetSysStepZtStepIndex(
+		const ZoneTimestepObject tmpztStepStamp 
+	);
+	int GetZtStepIndex(
+		const ZoneTimestepObject tmpztStepStamp
+	);
 
 };
 
-
 class SizingLoggerFramework {
 public:
-
-	int NumOfLogs;
 	std::vector <SizingLog> logObjs;
-
-
 	int const SetupVariableSizingLog(
-		int const SupplySideInletNodeNum  //change to pointers for generality later
+		Real64 & rVariable,
+		int stepsInAverage
 	);
 
 	ZoneTimestepObject PrepareZoneTimestepStamp ();
@@ -121,38 +133,66 @@ public:
 	void IncrementSizingPeriodSet(
 		int const HVACSizingIterCount
 	);
+private:
+	int NumOfLogs;
+
 
 };
 
 
-class  PlantCoinicidentAnalyis {
+class  PlantCoinicidentAnalysis {
 public:
 
 	//this object collects data and methods for analyzing coincident sizing for a single plant loop
-
-	// name of analysis object
-	std::string name = "";
 	int PlantLoopIndex = 0; // index in plant loop data structure.
+	int SupplySideInletNodeNum = 0; // node index for supply side inlet node
 	int PlantSizingIndex = 0;
-	int SupplySideInletNodeNum = 0;
 	int NumTimeStepsInAvg = 0;
-	Real64 DensityForSizing = 0.0;
-	Real64 PlantSizingFraction = 0.0;
-	Real64 previousVolDesignFlowRate = 0.0;
-	Real64 newVolDesignFlowRate = 0.0;
-	Real64 newAdjustedMassFlowRate = 0.0; // with sizing factor included...
-	Real64 newFoundMassFlowRate = 0.0;
 	ZoneTimestepObject newFoundMassFlowRateTimeStamp;
-	const Real64 SignificantNormalizedChange = 0.01 ;
+	Real64 PeakMdotCoincidentReturnTemp;
+	Real64 PeakMdotCoincidentDemand;
+
 	bool AnotherIterationDesired = false ;
 
-	int LogIndex; //the index in the vector of log objects in the logger framework.
+	int supplyInletNodeFlow_LogIndex; // loop flow rate index for vector of log objects in the logger framework
+	int supplyInletNodeTemp_LogIndex; // loop return temperature index for vector of log objects in the logger framework
 
-	void Initialize();
+	// variables related to loop demand
+	int loopDemand_LogIndex; // Loop demand load index for vector of log objects in the logger framework
+	bool PeakDemandAndFlowMismatch;
+	ZoneTimestepObject newFoundMaxDemandTimeStamp;
+
+	Real64 PeakDemandReturnTemp;
+	Real64 PeakDemandMassFlow;
+
+
+	PlantCoinicidentAnalysis (
+		std::string plantLoopName,
+		int loopIndex,
+		int NodeNum,
+		Real64 density,
+			Real64 cp,
+		int numTimeStepsInAvg,
+		int sizingIndex
+	);
 
 	void ResolveDesignFlowRate(
 		int const HVACSizingIterCount
 	);
+
+private:
+	std::string name = ""; // name of analysis object
+
+
+	Real64 newAdjustedMassFlowRate = 0.0; // with sizing factor included...
+	Real64 newFoundMassFlowRate = 0.0;
+
+	const Real64 SignificantNormalizedChange = 0.005 ;
+	Real64 DensityForSizing = 0.0;
+	Real64 SpecificHeatForSizing = 0.0;
+	Real64 PlantSizingFraction = 0.0;
+	Real64 previousVolDesignFlowRate = 0.0;
+	Real64 newVolDesignFlowRate = 0.0;
 	
 };
 

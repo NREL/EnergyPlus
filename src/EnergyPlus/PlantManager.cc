@@ -3322,7 +3322,7 @@ namespace PlantManager {
 				break;
 			}
 		}
-		if ((PlantSizData( PlantSizNum ).ConcurrenceOption  == NonCoincident))  {
+		if (PlantSizData( PlantSizNum ).ConcurrenceOption  == NonCoincident)  {
 		// we can have plant loops that are non-coincident along with some that are coincident
 		// so refresh sum of registered flows (they may have changed)
 		

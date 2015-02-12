@@ -1478,18 +1478,27 @@ namespace CondenserLoopTowers {
 			}
 
 			SimpleTower( TowerNum ).DesignWaterFlowRate = NumArray( 4 );
+			if ( SimpleTower( TowerNum ).DesignWaterFlowRate == AutoSize ) {
+				SimpleTower( TowerNum ).DesignWaterFlowRateWasAutoSized = true;
+			}
 			if ( NumArray( 4 ) <= 0.0 && NumArray( 4 ) != AutoSize ) {
 				ShowSevereError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" design water flow rate must be > 0" );
 				ErrorsFound = true;
 			}
 
 			SimpleTower( TowerNum ).HighSpeedAirFlowRate = NumArray( 5 );
+			if ( SimpleTower( TowerNum ).HighSpeedAirFlowRate == AutoSize ) {
+				SimpleTower( TowerNum ).HighSpeedAirFlowRateWasAutoSized = true;
+			}
 			if ( NumArray( 5 ) <= 0.0 && NumArray( 5 ) != AutoSize ) {
 				ShowSevereError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" design air flow rate must be > 0" );
 				ErrorsFound = true;
 			}
 
 			SimpleTower( TowerNum ).HighSpeedFanPower = NumArray( 6 );
+			if ( SimpleTower( TowerNum ).HighSpeedFanPower == AutoSize ) {
+				SimpleTower( TowerNum ).HighSpeedFanPowerWasAutoSized = true;
+			}
 			if ( NumArray( 6 ) <= 0.0 && NumArray( 6 ) != AutoSize ) {
 				ShowSevereError( cCurrentModuleObject + ", \"" + SimpleTower( TowerNum ).Name + "\" design fan power must be > 0" );
 				ErrorsFound = true;
