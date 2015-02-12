@@ -44,6 +44,14 @@ option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
 
+# we don't need all devs to have Python installed.  There are 2 cases where we do want it
+# 1. Doing regression testing; which would be: BUILD_TESTING AND ENABLE_REGRESSION_TESTING
+# 2. Doing package building, since Python is going to be our tool for some things; thus: BUILD_PACKAGE
+
+if( ( BUILD_TESTING AND ENABLE_REGRESSION_TESTING ) OR ( BUILD_PACKAGE ) )
+  find_package(PythonInterp REQUIRED)
+endif()
+
 if( BUILD_TESTING )
   option( ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF )
   if( ENABLE_REGRESSION_TESTING )
@@ -53,7 +61,6 @@ if( BUILD_TESTING )
       set( ARCH_FLAG "" )
     endif()
 
-    find_package(PythonInterp REQUIRED)
     set( REGRESSION_BASELINE_SHA "" CACHE STRING "SHA of baseline comparison" )
     set( COMMIT_SHA "" CACHE STRING "Commit sha of this build" )
     set( REGRESSION_SCRIPT_PATH "" CACHE PATH "Path to regression scripts" )
@@ -108,7 +115,7 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/zlib )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/gtest/include/ SYSTEM )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
-INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/third_party/Expat" "${CMAKE_SOURCE_DIR}/third_party/Expat/lib" SYSTEM)
+INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/Expat" "${CMAKE_SOURCE_DIR}/third_party/Expat/lib" SYSTEM)
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/CLI/ )
 
 if( BUILD_TESTING )
@@ -156,10 +163,6 @@ configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.id
 if( BUILD_PACKAGE )
   set(CPACK_INSTALL_CMAKE_PROJECTS
     "${CMAKE_BINARY_DIR};EnergyPlus;ALL;/"
-  )
-
-  set(EPLUS_BUILDSUPPORT_REPO 
-    "RootOfEnergyPlusBuildSupportRepo" CACHE PATH "Enter the root of the EnergyPlusBuildSupport repo"
   )
   
   if( BUILD_FORTRAN )

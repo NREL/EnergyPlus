@@ -1,29 +1,29 @@
-#!/usr/bin/python
 
 # generates a csv summary of the output variables in E+
-# main assumption: function calls are single line -- **NOT** wrapped
-# can call 1 of 2 ways:
-#  Method 1: NO ARGUMENTS, in this case, the defaults below are used
-#  Method 2: 2 ARGUMENTS, the first is the source dir to find *.cc files, and the second is the csv output file name
+# assumption: function calls are single line -- **NOT** wrapped
+# assumption: no /* */ style commenting
+#  To Call: 3 ARGUMENTS:
+  #the first is the source dir to find *.cc files
+  #the second is the csv output file name
+  #the third is the md output file name
 
 import sys
 import os
 import glob
 import csv
 
-# defaults here
-source_dir = "C:\ResearchProjects\EnergyPlus\GitHub\EnergyPlusTeamBranch\src\EnergyPlus" #"/home/elee/EnergyPlus/GitHub/EnergyPlusTeam/src/EnergyPlus"
-output_file = "SetupOutputVariableCalls.csv"
+# example arguments here
+#source_dir = "<repo_source_dir>\src\EnergyPlus" 
+#csv_file = "<repo_build_dir>\auto_docs\SetupOutputVariableCalls.csv"
+#md_file = "<repo_build_dir>\auto_docs\SetupOutputVariableCalls.csv"
 
-if len(sys.argv) == 1:
-	pass
-elif len(sys.argv) == 3:
+if len(sys.argv) == 4:
 	source_dir = sys.argv[1]
 	output_file = sys.argv[2]
+	md_output_file = sys.argv[3]
 else:
-	print("Bad usage, either zero or two command line arguments are required")
-	print("If using zero arguments, the defaults hardwired in the script are used")
-	print("If using two arguments, the first is the source dir to find .cc files, and the second is the output csv file")
+	print("Bad usage, three command line arguments are required")
+	print("  The first is the source dir to find .cc files, and the second is the output csv file, and the third is the output md file")
 	sys.exit(1)
 	
 def do_initial_line_trimming(working_line):
@@ -49,6 +49,7 @@ def get_level_zero_comma_locations(line):
 		elif char == ')':
 			current_parentheses_level -= 1
 #		print "Character: " + char + "; paren_level: " + str(current_parentheses_level)
+		#print (char + " : " + str(level_zero_comma_locations) )
 	return level_zero_comma_locations
 
 def get_arguments_based_on_comma_locations(line, comma_locations):
@@ -75,7 +76,7 @@ def process_variable_name_and_units(argument):
 	return variable_name, variable_units
 
 class OutputVariableCall:
-	
+	# constructor
 	def __init__(self, file_name, line_number, variable_name, units, variable_itself, index_type_key, variable_type_key, keyed_value):
 		self.file_name = file_name
 		self.line_number = line_number
@@ -85,17 +86,30 @@ class OutputVariableCall:
 		self.index_type_key = index_type_key
 		self.variable_type_key = variable_type_key
 		self.keyed_value = keyed_value
-	
+
+	# csv methods
 	@staticmethod
 	def spew_header_to_csv(csv_file_object):
 		csv_file_object.writerow(["Filename","Line number","Variable name","Units","Variable reference","Index type key","Variable type key","Keyed value"])
-	
 	def spew_to_csv(self, csv_file_object):
 		csv_file_object.writerow([self.file_name, self.line_number, self.variable_name, self.units, self.variable, self.index_type_key, self.variable_type_key, self.keyed_value])
+
+	# markdown methods
+	def spew_to_md(self, md_file_object):
+		md_file_object.write("|")
+		md_file_object.write("|".join( [str(x) for x in [self.line_number, self.variable_name, self.units, self.variable, self.index_type_key, self.variable_type_key, self.keyed_value] ]))
+		md_file_object.write("|")
+		md_file_object.write("\n")
+	def write_file_header(self, md_file_object):
+		md_file_object.write("\n")
+		md_file_object.write("## %s\n" % self.file_name)
+		md_file_object.write("|Line #|Variable name|Units|Variable reference|Index type key|Variable type key|Keyed value|\n")
+		md_file_object.write("|------|-------------|-----|------------------|--------------|-----------------|-----------|\n")
 
 # this is the master list of calls
 output_variables = []
 
+# find all the source files
 files = sorted(glob.glob(os.path.join(source_dir,"*.cc")))
 
 for this_file in files:
@@ -105,51 +119,52 @@ for this_file in files:
 		continue
 
 	with open(this_file,'r') as f:
-		
+
+		# initialize
 		line_number = 0
-		
+
 		for line in f.readlines():
-		
+
 			line_number += 1
-			
+
 			# create a copy of line to work on
 			working_line = line
-			#print working_line
-			
+
 			# trim off comments first
 			if "//" in working_line:
 				working_line = working_line[0:working_line.index("//")]
-			
+
 			if 'SetupOutputVariable' in working_line:
-				
+
 				# trim off the leading/trailing stuff to just get args
 				working_line = do_initial_line_trimming(working_line)
-				
+
 				# get all the zero parentheses level comma locations to parse actual arguments, even if the arguments have embedded commas
 				comma_locations = get_level_zero_comma_locations(working_line)
-				
+
 				# get a list of the actual arguments
 				arguments = get_arguments_based_on_comma_locations(working_line, comma_locations)
-				
+
 				# parse out data from the variable name first
 				variable_name, variable_units = process_variable_name_and_units(arguments[0])
-				
+
 				# the second can be taken as-is
 				actual_variable = arguments[1]
-				
+
 				# the third should be processed for quotes
 				index_type_key = arguments[2]
-				
+
 				# same for the fourth
 				variable_type_key = arguments[3]
-				
+
 				# same for the fifth I guess
 				keyed_value = arguments[4]
 
 				# add to the array
-				output_variables.append(OutputVariableCall(file_name, line_number, variable_name, variable_units, actual_variable, index_type_key, variable_type_key, keyed_value))
-	
-	print "Finished with file %s; %i calls processed so far" % (file_name, len(output_variables))
+				thisOV = OutputVariableCall(file_name, line_number, variable_name, variable_units, actual_variable, index_type_key, variable_type_key, keyed_value)
+				output_variables.append(thisOV)
+
+	#print "Finished with file %s; %i calls processed so far" % (file_name, len(output_variables))
 
 # output the data to csv
 with open(output_file,"w") as csvfile:
@@ -158,4 +173,13 @@ with open(output_file,"w") as csvfile:
 	for call in output_variables:
 		call.spew_to_csv(csv_writer)
 
-print "DONE"
+with open(md_output_file,"w") as mdfile:
+	mdfile.write("# Internal EnergyPlus Output Variable Definitions\n")
+	headers_written = []
+	for call in output_variables:
+		if not call.file_name in headers_written:
+			call.write_file_header(mdfile)
+			headers_written.append(call.file_name)
+		call.spew_to_md(mdfile)
+
+print(" +++ AutoDocs: Completed processing output variable audit: processed %i calls" % len(output_variables))
