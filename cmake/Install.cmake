@@ -34,12 +34,6 @@ set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/license.txt")
 
 install( FILES "${CMAKE_BINARY_DIR}/Energy+.idd" DESTINATION ./ )
 
-# Some docs are generated on the fly here
-file( MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/autodocs" )
-execute_process( COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/doc/tools/parse_output_variables.py" "${CMAKE_SOURCE_DIR}/src/EnergyPlus" "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.csv" "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.md" )
-install(FILES "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.csv" DESTINATION "./")
-install(FILES "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.md" DESTINATION "./")
-
 # Install files that are in the current repo
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/datasets/AirCooledChiller.idf" DESTINATION "./DataSets")
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/datasets/ASHRAE_2005_HOF_Materials.idf" DESTINATION "./DataSets")

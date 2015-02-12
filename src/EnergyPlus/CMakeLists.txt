@@ -603,3 +603,16 @@ if(UNIX AND NOT APPLE)
   COMMAND ${CMAKE_COMMAND} -E create_symlink energyplus EnergyPlus
   COMMAND ${CMAKE_COMMAND} -E rename EnergyPlus "${CMAKE_BINARY_DIR}/Products/EnergyPlus") 
 endif()
+
+# if we are building a package, we can do additional operations, such as run doc scripts
+if(BUILD_PACKAGE)
+  # Some docs are generated on the fly here
+  file( MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/autodocs" )
+  add_custom_command( 
+    TARGET energyplus
+    PRE_BUILD
+    COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/doc/tools/parse_output_variables.py" "${CMAKE_SOURCE_DIR}/src/EnergyPlus" "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.csv" "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.md" 
+  )
+  install(FILES "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.csv" DESTINATION "./")
+  install(FILES "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.md" DESTINATION "./")
+endif()
