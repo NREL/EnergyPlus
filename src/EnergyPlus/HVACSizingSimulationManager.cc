@@ -31,15 +31,7 @@
 namespace EnergyPlus { 
 
 
-	void HVACSizingSimulationManager::initialize() {
-
-		if (this->oneTimeInit ) {
-
-			this->oneTimeInit = false;
-		}
-	}
-
-	void HVACSizingSimulationManager::determineSizingAnalysesNeeded(){
+	void HVACSizingSimulationManager::DetermineSizingAnalysesNeeded(){
 	
 		int NumPlantLoopsWithCoincidentSizing;
 		bool anyAdvancedSizingNeeded = false;
@@ -58,14 +50,14 @@ namespace EnergyPlus {
 			if (PlantSizData(i).ConcurrenceOption == Coincident ){
 
 				//create an instance of analysis object for each loop
-				createNewCoincidentPlantAnalysisObject ( PlantSizData(i).PlantLoopName, i );
+				CreateNewCoincidentPlantAnalysisObject ( PlantSizData(i).PlantLoopName, i );
 				anyAdvancedSizingNeeded = true;
 			}
 		}
 		
 	}
 
-	void HVACSizingSimulationManager::createNewCoincidentPlantAnalysisObject(
+	void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(
 			std::string const & PlantLoopName,
 			int const PlantSizingIndex
 		) {
@@ -93,18 +85,18 @@ namespace EnergyPlus {
 				}
 			}
 
-		 PlantCoincAnalyObjs.push_back( tmpAnalysisObj );
+		 plantCoincAnalyObjs.push_back( tmpAnalysisObj );
 	}
 
-	void HVACSizingSimulationManager::setupSizingAnalyses(){
+	void HVACSizingSimulationManager::SetupSizingAnalyses(){
 	
-		for ( auto &P : PlantCoincAnalyObjs ) {
+		for ( auto &P : plantCoincAnalyObjs ) {
 			//call setup routine for each coincident plant analysis object 
-			P.LogIndex = SizingLogger.SetupVariableSizingLog( P.SupplySideInletNodeNum );
+			P.LogIndex = sizingLogger.SetupVariableSizingLog( P.SupplySideInletNodeNum );
 		}
 	}
 
-	void HVACSizingSimulationManager::processCoincidentPlantSizeAdjustments(
+	void HVACSizingSimulationManager::ProcessCoincidentPlantSizeAdjustments(
 		int const HVACSizingIterCount
 	){
 
@@ -113,19 +105,19 @@ namespace EnergyPlus {
 		using DataGlobals::FinalSizingHVACSizingSimIteration;
 
 		//first pass through coincident plant objects to check new sizes and see if more iteration needed
-		PlantCoinAnalyRequestsAnotherIteration = false;
-		for ( auto &P : PlantCoincAnalyObjs ) {
-			SizingLogger.logObjs[ P.LogIndex ].AverageSysTimeSteps();
-			SizingLogger.logObjs[ P.LogIndex ].ProcessRunningAverage( P.NumTimeStepsInAvg );
-			P.newFoundMassFlowRateTimeStamp = SizingLogger.logObjs[ P.LogIndex ].GetLogVariableDataMax( );
+		plantCoinAnalyRequestsAnotherIteration = false;
+		for ( auto &P : plantCoincAnalyObjs ) {
+			sizingLogger.logObjs[ P.LogIndex ].AverageSysTimeSteps();
+			sizingLogger.logObjs[ P.LogIndex ].ProcessRunningAverage( P.NumTimeStepsInAvg );
+			P.newFoundMassFlowRateTimeStamp = sizingLogger.logObjs[ P.LogIndex ].GetLogVariableDataMax( );
 			P.ResolveDesignFlowRate( HVACSizingIterCount );
 			if ( P.AnotherIterationDesired ){
-				PlantCoinAnalyRequestsAnotherIteration = true;
+				plantCoinAnalyRequestsAnotherIteration = true;
 			}
 		}
 
 		// as more sizing adjustments are added this will need to change to consider all not just plant coincident
-		FinalSizingHVACSizingSimIteration = PlantCoinAnalyRequestsAnotherIteration;
+		FinalSizingHVACSizingSimIteration = plantCoinAnalyRequestsAnotherIteration;
 
 	}
 	void HVACSizingSimulationManager::RedoKickOffAndResize(){
@@ -198,9 +190,9 @@ namespace EnergyPlus {
 			static gio::Fmt Format_700("('Environment:WarmupDays,',I3)");
 			static gio::Fmt fmtLD( "*" );
 
-			SizeSimManagerObj.determineSizingAnalysesNeeded();
+			SizeSimManagerObj.DetermineSizingAnalysesNeeded();
 
-			SizeSimManagerObj.setupSizingAnalyses();
+			SizeSimManagerObj.SetupSizingAnalyses();
 
 
 
@@ -341,16 +333,16 @@ namespace EnergyPlus {
 
 
 			} // ... End environment loop.
-			SizeSimManagerObj.processCoincidentPlantSizeAdjustments( HVACSizingIterCount );
+			SizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments( HVACSizingIterCount );
 
 			SizeSimManagerObj.RedoKickOffAndResize();
 
-			if ( ! SizeSimManagerObj.PlantCoinAnalyRequestsAnotherIteration ) {
+			if ( ! SizeSimManagerObj.plantCoinAnalyRequestsAnotherIteration ) {
 				// jump out of for loop, or change for to a while
 				break;
 			}
 
-			SizeSimManagerObj.SizingLogger.IncrementSizingPeriodSet ( HVACSizingIterCount );
+			SizeSimManagerObj.sizingLogger.IncrementSizingPeriodSet ( HVACSizingIterCount );
 
 		} // End HVAC Sizing Iteration loop
 
@@ -363,11 +355,11 @@ namespace EnergyPlus {
 		}
 
 		void UpdateSizingLogsZoneStep (){
-			SizeSimManagerObj.SizingLogger.UpdateSizingLogValuesZoneStep();
+			SizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep();
 		}
 
 		void UpdateSizingLogsSystemStep() {
-			SizeSimManagerObj.SizingLogger.UpdateSizingLogValuesSystemStep();
+			SizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep();
 		}
 	}
 }

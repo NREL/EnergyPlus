@@ -36,24 +36,22 @@ namespace EnergyPlus {
 		static std::string objectName() { return "Advanced Sizing Manager for HVAC Sizing Simulations"; }
 		bool oneTimeInit = true;
 
-		int NumCoincidentPlantLoops;
-		std::vector< PlantCoinicidentAnalyis > PlantCoincAnalyObjs ;
-		bool PlantCoinAnalyRequestsAnotherIteration;
+		int numCoincidentPlantLoops;
+		std::vector< PlantCoinicidentAnalyis > plantCoincAnalyObjs ;
+		bool plantCoinAnalyRequestsAnotherIteration;
 
-		SizingLoggerFramework SizingLogger;
+		SizingLoggerFramework sizingLogger;
 
-		void initialize();
+		void DetermineSizingAnalysesNeeded();
 
-		void determineSizingAnalysesNeeded();
-
-		void createNewCoincidentPlantAnalysisObject(
-			std::string const & PlantLoopName,
-			int const PlantSizingIndex
+		void CreateNewCoincidentPlantAnalysisObject(
+			std::string const & plantLoopName,
+			int const plantSizingIndex
 		);
 
-		void setupSizingAnalyses();
+		void SetupSizingAnalyses();
 
-		void processCoincidentPlantSizeAdjustments(
+		void ProcessCoincidentPlantSizeAdjustments(
 			int const HVACSizingIterCount
 		);
 

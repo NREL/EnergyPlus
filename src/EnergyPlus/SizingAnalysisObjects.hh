@@ -19,7 +19,7 @@
 namespace EnergyPlus {
 
 
-class systemTimestepObject {
+class SystemTimestepObject {
 public: 
 
 	Real64 CurMinuteStart		= 0.0; //minutes at beginning of system timestep
@@ -30,7 +30,7 @@ public:
 };
 
 
-class zoneTimestepObject {
+class ZoneTimestepObject {
 public:
 
 	int KindofSim			= 0;
@@ -47,7 +47,7 @@ public:
 	Real64 RunningAvgDataValue = 0.0;
 	bool HasSystemSubSteps	= false;
 	int NumSubSteps = 0;
-	std::vector< systemTimestepObject > subSteps; //nested object array for system timesteps inside here.
+	std::vector< SystemTimestepObject > subSteps; //nested object array for system timesteps inside here.
 	
 };
 
@@ -61,26 +61,26 @@ public:
 	std::vector <int> EnvrnStartZtStepIndex ; //sized to number of environments in sizing set
 
 	int NumOfStepsInLogSet; // sum of all zone timestep steps in log
-	std::vector< zoneTimestepObject > ztStepObj; //will be sized to the sum of all steps, eg. timesteps in hour * 24 hours * 2 design days.  
+	std::vector< ZoneTimestepObject > ztStepObj; //will be sized to the sum of all steps, eg. timesteps in hour * 24 hours * 2 design days.  
 
 
 	int NodeNum; //temporary until pointers...
 
-	int getZtStepIndex(
-		const zoneTimestepObject tmpztStepStamp
+	int GetZtStepIndex(
+		const ZoneTimestepObject tmpztStepStamp
 	);
 
-	void fillZoneStep(
-		zoneTimestepObject tmpztStepStamp
+	void FillZoneStep(
+		ZoneTimestepObject tmpztStepStamp
 	);
 
 	int GetSysStepZtStepIndex(
-		zoneTimestepObject tmpztStepStamp 
+		ZoneTimestepObject tmpztStepStamp 
 	);
 
-	void fillSysStep( 
-		zoneTimestepObject tmpztStepStamp ,
-		systemTimestepObject tmpSysStepStamp
+	void FillSysStep( 
+		ZoneTimestepObject tmpztStepStamp ,
+		SystemTimestepObject tmpSysStepStamp
 	 );
 
 	void AverageSysTimeSteps();
@@ -89,7 +89,7 @@ public:
 		int const TimeStepsInAverage
 	);
 
-	zoneTimestepObject GetLogVariableDataMax( );
+	ZoneTimestepObject GetLogVariableDataMax( );
 
 	void AdjustEnvrnIndexMapForIteration(
 		int const HVACSizingIterCount
@@ -112,7 +112,7 @@ public:
 		int const SupplySideInletNodeNum  //change to pointers for generality later
 	);
 
-	zoneTimestepObject PrepareZoneTimestepStamp ();
+	ZoneTimestepObject PrepareZoneTimestepStamp ();
 
 	void UpdateSizingLogValuesZoneStep();
 
@@ -142,13 +142,13 @@ public:
 	Real64 newVolDesignFlowRate = 0.0;
 	Real64 newAdjustedMassFlowRate = 0.0; // with sizing factor included...
 	Real64 newFoundMassFlowRate = 0.0;
-	zoneTimestepObject newFoundMassFlowRateTimeStamp;
+	ZoneTimestepObject newFoundMassFlowRateTimeStamp;
 	const Real64 SignificantNormalizedChange = 0.01 ;
 	bool AnotherIterationDesired = false ;
 
 	int LogIndex; //the index in the vector of log objects in the logger framework.
 
-	void initialize();
+	void Initialize();
 
 	void ResolveDesignFlowRate(
 		int const HVACSizingIterCount
