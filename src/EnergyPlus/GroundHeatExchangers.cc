@@ -234,7 +234,7 @@ namespace GroundHeatExchangers {
 
 			//SIMULATE HEAT EXCHANGER
 			thisGLHE.calcGroundHeatExchanger();
-			//thisGLHE.updateGroundHeatExchanger();
+
 		}
 
 	}
@@ -268,11 +268,13 @@ namespace GroundHeatExchangers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	
-		Real64 tLg_max( 5 ); // ~11.4 years
+		Real64 tLg_max( 0.0 ); 
 		Real64 tLg_min( -2 );
 		Real64 tLg_grid( 0.25 );
+		Real64 ts( 3600 );
 		Real64 tLg;
-		Real64 t; 
+		Real64 t;
+		Real64 convertYearsToSeconds( 356 * 24 * 60 * 60 );
 		int numGFunctions;
 		int NT;
 		int numLC;
@@ -303,6 +305,7 @@ namespace GroundHeatExchangers {
 		Y0.allocate( numTrenches );
 
 		// Calculate the number of g-functions required
+		tLg_max = std::log10( maxLengthOfSimulationInYears * convertYearsToSeconds / ts );
 		numGFunctions = ( tLg_max - tLg_min ) / ( tLg_grid ) + 1;
 
 		// Allocate and setup g-function arrays
@@ -320,13 +323,14 @@ namespace GroundHeatExchangers {
 		numLC = std::ceil( numCoils / 2.0 );
 		numRC = std::ceil( numTrenches / 2.0 );
 
-		// Calculate coordinates (X0, Y0) of a ring's center
+		// Calculate coordinates (X0, Y0, Z0) of a ring's center
 		for ( coil = 1; coil <= numCoils; coil++ ) {
-			X0( coil ) = ( coilDiameter / 2.0 ) + coilPitch * ( coil - 1 );		
+			X0( coil ) = coilPitch * ( coil - 1 );
 		}
 		for ( trench = 1; trench <= numTrenches; trench++ ) {
 			Y0( trench ) = ( trench - 1 ) * trenchSpacing;
 		}
+		Z0 = coilDepth;
 
 		// If number of trenches is greater than 1, one quarter of the rings are involved.
 		// If number of trenches is 1, one half of the rings are involved.
@@ -339,7 +343,7 @@ namespace GroundHeatExchangers {
 		// Calculate the corresponding time of each temperature response factor
 		for ( NT = 1; NT <= numGFunctions; NT++ ) {
 			tLg = tLg_min + tLg_grid * ( NT - 1 );
-			t = pow( 10, tLg ) * 3600;
+			t = std::pow( 10, tLg ) * ts;
 
 			// Set the average temperature resonse of the whole field to zero
 			gFunc = 0;
@@ -356,7 +360,7 @@ namespace GroundHeatExchangers {
 						for ( n = 1; n <= numCoils; n++ ) {
 
 							// Calculate the distance between ring centers
-							disRing = disCenter( m, n, m1, n1 );
+							disRing = distToCenter( m, n, m1, n1 );
 
 							// Save mm1 and nn1
 							mm1 = std::abs( m - m1 );
@@ -405,7 +409,7 @@ namespace GroundHeatExchangers {
 							} else {
 								// if no calculated value have been stored
 								if ( valStored( mm1, nn1 ) < 0.0 ) {
-									midFieldVal = middleField( m, n, m1, n1, t );
+									midFieldVal = midFieldResponseFunction( m, n, m1, n1, t );
 									valStored( mm1, nn1 ) = midFieldVal;
 								//if a stored value is found for the comination of (m, n, m1, n1), then
 								} else {
@@ -441,31 +445,76 @@ namespace GroundHeatExchangers {
 	//******************************************************************************
 
 	Real64
-	GLHESlinky::responseFunction(
-	Real64 distance,
-	Real64 const t
+	GLHESlinky::nearFieldResponseFunction(
+		int const m,
+		int const n,
+		int const m1,
+		int const n1,
+		Real64 const eta,
+		Real64 const theta,
+		Real64 const t
 	)
 	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR:          Matt Mitchell
+		//       DATE WRITTEN:    February, 2015
+		//       MODIFIED         na
+		//       RE-ENGINEERED    na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Calculates the temperature response of from one near-field point to another
+
+		// METHODOLOGY EMPLOYED:
+
+		// REFERENCES:
+
+		// USE STATEMENTS:
+
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+
+		// DERIVED TYPE DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 distance1;
+		Real64 distance2;
 		Real64 errFunc1;
 		Real64 errFunc2;
 		Real64 sqrtAlphaT;
 		Real64 sqrtDistDepth;
 
+		distance1 = distance( m, n, m1, n1, eta, theta);
+
 		sqrtAlphaT = std::sqrt( diffusivityGround * t );
 
-		sqrtDistDepth = std::sqrt( std::pow( distance, 2.0 ) + 4 * std::pow( coilDepth, 2.0 ) );
+		if ( ! verticalConfig ) {
+			
+			sqrtDistDepth = std::sqrt( std::pow( distance1, 2.0 ) + 4 * std::pow( coilDepth, 2.0 ) );
+			errFunc1 = std::erfc( 0.5 * distance1 / sqrtAlphaT );
+			errFunc2 = std::erfc( 0.5 * sqrtDistDepth / sqrtAlphaT );
 		
-		errFunc1 = std::erfc( 0.5 * distance / sqrtAlphaT );
+			return errFunc1 / distance1 - errFunc2 / sqrtDistDepth;
 
-		errFunc2 = std::erfc( 0.5 * sqrtDistDepth / sqrtAlphaT );
+		} else {
+
+			distance2 = distanceToFictRing( m, n, m1, n1, eta, theta );
 		
-		return errFunc1 / distance - errFunc2 / sqrtDistDepth;
+			errFunc1 = std::erfc( 0.5 * distance1 / sqrtAlphaT );
+			errFunc2 = std::erfc( 0.5 * distance2 / sqrtAlphaT );
+
+			return errFunc1 / distance1 - errFunc2 / distance2;
+
+		}
 
 	};
 	//******************************************************************************
 
 	Real64
-	GLHESlinky::middleField(
+	GLHESlinky::midFieldResponseFunction(
 	int const m,
 	int const n,
 	int const m1,
@@ -473,20 +522,46 @@ namespace GroundHeatExchangers {
 	Real64 const t
 	)
 	{
-		return 4 * std::pow( Pi, 2.0 ) * responseFunction( disCenter( m, n, m1, n1 ), t );
-	};
 
-	//******************************************************************************
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR:          Matt Mitchell
+		//       DATE WRITTEN:    February, 2015
+		//       MODIFIED         na
+		//       RE-ENGINEERED    na
 
-	Real64
-	GLHESlinky::disCenter(
-		int const m, 
-		int const n,
-		int const m1,
-		int const n1
-	)
-	{
-		return std::sqrt( std::pow( X0( n ) - X0( n1 ), 2 ) + std::pow( Y0( m ) - Y0( m1 ), 2 ) );
+		// PURPOSE OF THIS SUBROUTINE:
+		// Calculates the temperature response of from one mid-field point to another
+
+		// METHODOLOGY EMPLOYED:
+
+		// REFERENCES:
+
+		// USE STATEMENTS:
+
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+
+		// DERIVED TYPE DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 errFunc1;
+		Real64 errFunc2;
+		Real64 sqrtAlphaT;
+		Real64 sqrtDistDepth;
+		Real64 distance;
+
+		sqrtAlphaT = std::sqrt( diffusivityGround * t );
+		
+		distance = distToCenter( m, n, m1, n1 );
+		sqrtDistDepth = std::sqrt( std::pow( distance, 2.0 ) + 4 * std::pow( coilDepth, 2.0 ) );
+		
+		errFunc1 = std::erfc( 0.5 * distance / sqrtAlphaT );
+		errFunc2 = std::erfc( 0.5 * sqrtDistDepth / sqrtAlphaT );
+	
+		return 4 * std::pow( Pi, 2.0 ) * errFunc1 / distance - errFunc2 / sqrtDistDepth;
 	};
 
 	//******************************************************************************
@@ -501,38 +576,182 @@ namespace GroundHeatExchangers {
 	Real64 const theta	
 	)
 	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR:          Matt Mitchell
+		//       DATE WRITTEN:    February, 2015
+		//       MODIFIED         na
+		//       RE-ENGINEERED    na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Calculates the distance between any two points
+
+		// METHODOLOGY EMPLOYED:
+
+		// REFERENCES:
+
+		// USE STATEMENTS:
+
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+
+		// DERIVED TYPE DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
 		// Function to calculate distance between any two point on any two loops
 
 		Real64 x;
 		Real64 y;
+		Real64 z;
 		Real64 xIn;
 		Real64 yIn;
+		Real64 zIn;
 		Real64 xOut;
 		Real64 yOut;
+		Real64 zOut;
 		Real64 pipeOuterRadius;
 
 		pipeOuterRadius = pipeOutDia / 2.0;
 
+		x = X0( n ) + std::cos( theta ) * ( coilDiameter / 2.0 );
+		y = Y0( m ) + std::sin( theta ) * ( coilDiameter / 2.0 );
+
+		xIn = X0( n1 ) + std::cos( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
+		yIn = Y0( m1 ) + std::sin( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
+
+		xOut = X0( n1 ) + std::cos( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
+		yOut = Y0( m1 ) + std::sin( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
+
 		if ( ! verticalConfig ) {
-
-			x = X0( n ) + std::cos( theta ) * ( coilDiameter / 2.0 );
-			y = Y0( m ) + std::sin( theta ) * ( coilDiameter / 2.0 );
-
-			xIn = X0( n1 ) + std::cos( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
-			yIn = Y0( m1 ) + std::sin( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
-
-			xOut = X0( n1 ) + std::cos( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
-			yOut = Y0( m1 ) + std::sin( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
 	
 			return 0.5 * std::sqrt( std::pow( x - xIn, 2.0 ) + std::pow( y - yIn, 2.0 ) ) 
 				+ 0.5 * std::sqrt( std::pow( x - xOut, 2.0 ) + std::pow( y - yOut, 2.0 ) );
 
 		} else {
-		
 			
+			z = Z0 + std::sin( theta ) * ( coilDiameter / 2.0 );
+
+			zIn = Z0 + std::sin( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
+			zOut = Z0 + std::sin( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
+
+			return 0.5 * std::sqrt( std::pow( x - xIn, 2.0 ) + std::pow( Y0( m1 ) - Y0( m ), 2.0 ) + std::pow( z - zIn, 2.0 ) ) 
+				+ 0.5 * std::sqrt( std::pow( x - xOut, 2.0 ) + std::pow( Y0( m1 ) - Y0( m ), 2.0 ) + std::pow( z - zOut, 2.0 ) );			
 		}
 	};
 
+	//******************************************************************************
+
+	Real64
+	GLHESlinky::distanceToFictRing(
+		int const m,
+		int const n,
+		int const m1,
+		int const n1,
+		Real64 const eta,
+		Real64 const theta	
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR:          Matt Mitchell
+		//       DATE WRITTEN:    February, 2015
+		//       MODIFIED         na
+		//       RE-ENGINEERED    na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Calculates the distance between any two points
+
+		// METHODOLOGY EMPLOYED:
+
+		// REFERENCES:
+
+		// USE STATEMENTS:
+
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+
+		// DERIVED TYPE DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+		// Function to calculate distance between any two point on any two loops
+
+		Real64 x;
+		Real64 y;
+		Real64 z;
+		Real64 xIn;
+		Real64 yIn;
+		Real64 zIn;
+		Real64 xOut;
+		Real64 yOut;
+		Real64 zOut;
+		Real64 pipeOuterRadius;
+
+		pipeOuterRadius = pipeOutDia / 2.0;
+
+		x = X0( n ) + std::cos( theta ) * ( coilDiameter / 2.0 );
+		y = Y0( m ) + std::sin( theta ) * ( coilDiameter / 2.0 );
+		z = Z0 + std::sin( theta ) * ( coilDiameter / 2.0 ) + 2 * coilDepth;
+
+		xIn = X0( n1 ) + std::cos( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
+		yIn = Y0( m1 ) + std::sin( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
+		zIn = Z0 + std::sin( eta ) * ( coilDiameter / 2.0 - pipeOuterRadius );
+
+		xOut = X0( n1 ) + std::cos( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
+		yOut = Y0( m1 ) + std::sin( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
+		zOut = Z0 + std::sin( eta ) * ( coilDiameter / 2.0 + pipeOuterRadius );
+
+		return 0.5 * std::sqrt( std::pow( x - xIn, 2.0 ) + std::pow( Y0( m1 ) - Y0( m ), 2.0 ) + std::pow( z - zIn, 2.0 ) ) 
+				+ 0.5 * std::sqrt( std::pow( x - xOut, 2.0 ) + std::pow( Y0( m1 ) - Y0( m ), 2.0 ) + std::pow( z - zOut, 2.0 ) );			
+
+	};
+	
+	//******************************************************************************
+
+	Real64
+	GLHESlinky::distToCenter(
+		int const m, 
+		int const n,
+		int const m1,
+		int const n1
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR:          Matt Mitchell
+		//       DATE WRITTEN:    February, 2015
+		//       MODIFIED         na
+		//       RE-ENGINEERED    na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Calculates the center-to-center distance between rings
+
+		// METHODOLOGY EMPLOYED:
+
+		// REFERENCES:
+
+		// USE STATEMENTS:
+
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+
+		// DERIVED TYPE DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+
+		return std::sqrt( std::pow( X0( n ) - X0( n1 ), 2 ) + std::pow( Y0( m ) - Y0( m1 ), 2 ) );
+	};
 
 	//******************************************************************************
 
@@ -541,6 +760,32 @@ namespace GroundHeatExchangers {
 		int const val
 	)
 	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR:          Matt Mitchell
+		//       DATE WRITTEN:    February, 2015
+		//       MODIFIED         na
+		//       RE-ENGINEERED    na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Determines if an integer is even
+
+		// METHODOLOGY EMPLOYED:
+
+		// REFERENCES:
+
+		// USE STATEMENTS:
+
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+
+		// DERIVED TYPE DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
 		if ( val % 2 == 0 ) {
 			return true;
 		} else {
@@ -561,6 +806,34 @@ namespace GroundHeatExchangers {
 		Real64 const J0
 	)
 	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR:          Matt Mitchell
+		//       DATE WRITTEN:    February, 2015
+		//       MODIFIED         na
+		//       RE-ENGINEERED    na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Integrates the temperature response at one point based on 
+		// input from other points
+
+		// METHODOLOGY EMPLOYED:
+		// Simpson's 1/3 rule of integration
+
+		// REFERENCES:
+
+		// USE STATEMENTS:
+
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+
+		// DERIVED TYPE DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
 		Real64 sumIntF( 0.0 );
 		Real64 theta( 0.0 );
 		Real64 theta1( 0.0 );
@@ -576,7 +849,7 @@ namespace GroundHeatExchangers {
 		
 			theta = theta1 + ( j - 1 ) * h;
 
-			f( j ) =  responseFunction( distance( m, n, m1, n1, eta, theta ), t );
+			f( j ) = nearFieldResponseFunction( m, n, m1, n1, eta, theta, t );
 
 			if ( j == 1 || j == J0) {
 				f( j ) = f( j );
@@ -604,6 +877,33 @@ namespace GroundHeatExchangers {
 		int const J0
 	)
 	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR:          Matt Mitchell
+		//       DATE WRITTEN:    February, 2015
+		//       MODIFIED         na
+		//       RE-ENGINEERED    na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Integrates the temperature response at one point based on 
+		// input from other points
+
+		// METHODOLOGY EMPLOYED:
+		// Simpson's 1/3 rule of integration
+
+		// REFERENCES:
+
+		// USE STATEMENTS:
+
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+
+		// DERIVED TYPE DEFINITIONS:
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	
 		Real64 sumIntF( 0.0 );
 		Real64 eta( 0.0 );
@@ -648,7 +948,7 @@ namespace GroundHeatExchangers {
 		//       RE-ENGINEERED    na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// calculates g-functions for the slinky ground heat exchanger model
+		// Calculates g-functions for the slinky ground heat exchanger model
 
 		// METHODOLOGY EMPLOYED:
 
@@ -1364,6 +1664,7 @@ namespace GroundHeatExchangers {
 				slinkyGLHE( GLHENum ).trenchLength = rNumericArgs( 13 );
 				slinkyGLHE( GLHENum ).numTrenches = rNumericArgs( 14 );
 				slinkyGLHE( GLHENum ).trenchSpacing = rNumericArgs( 15 );
+				slinkyGLHE( GLHENum ).maxLengthOfSimulationInYears = rNumericArgs( 19 );
 
 				// Number of coils
 				slinkyGLHE( GLHENum ).numCoils = slinkyGLHE( GLHENum ).trenchLength / slinkyGLHE( GLHENum ).coilPitch;
@@ -1439,7 +1740,7 @@ namespace GroundHeatExchangers {
 				
 				slinkyGLHE( GLHENum ).phaseShiftOfMinGroundTempDays = slinkyGLHE( GLHENum ).monthOfMinSurfTemp * AvgDaysInMonth;
 
-			}
+				}
 				//   Not many checks
 
 				if ( slinkyGLHE( GLHENum ).pipeThick >= slinkyGLHE( GLHENum ).pipeOutDia / 2.0 ) {

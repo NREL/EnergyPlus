@@ -191,9 +191,11 @@ namespace GroundHeatExchangers {
 		Real64 averageGroundTempAmplitude;
 		Real64 phaseShiftOfMinGroundTempDays;
 		int monthOfMinSurfTemp;
+		Real64 maxLengthOfSimulationInYears;
 		Real64 minSurfTemp;
 		FArray1D< Real64 > X0;
 		FArray1D< Real64 > Y0;
+		Real64 Z0;
 
 		// Default Constructor
 		GLHESlinky() :
@@ -211,6 +213,7 @@ namespace GroundHeatExchangers {
 			averageGroundTempAmplitude( 0.0 ),
 			phaseShiftOfMinGroundTempDays( 0.0 ),
 			monthOfMinSurfTemp( 0 ),
+			maxLengthOfSimulationInYears( 0.0 ),
 			minSurfTemp( 0.0 )
 
 		{}
@@ -227,14 +230,6 @@ namespace GroundHeatExchangers {
 		Real64
 		interpGFunc(
 		Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
-		);
-
-		Real64
-		disCenter(
-		int const m,
-		int const n,
-		int const m1,
-		int const n1
 		);
 
 		Real64
@@ -275,17 +270,40 @@ namespace GroundHeatExchangers {
 		);
 
 		Real64
-		middleField(
+		distanceToFictRing(
 		int const m,
 		int const n,
 		int const m1,
 		int const n1,
+		Real64 const eta,
+		Real64 const theta
+		);
+
+		Real64
+		distToCenter(
+		int const m,
+		int const n,
+		int const m1,
+		int const n1
+		);
+
+		Real64
+		nearFieldResponseFunction(
+		int const m, 
+		int const n,
+		int const m1,
+		int const n1,
+		Real64 const eta,
+		Real64 const theta,
 		Real64 const t
 		);
 
 		Real64
-		responseFunction(
-		Real64 const distance,
+		midFieldResponseFunction(
+		int const m,
+		int const n,
+		int const m1,
+		int const n1,
 		Real64 const t
 		);
 
