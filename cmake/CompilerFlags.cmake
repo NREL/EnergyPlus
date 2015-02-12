@@ -1,39 +1,44 @@
 
 # Compiler-agnostic compiler flags first
-ADD_CXX_DEBUG_DEFINITIONS("-DOBJEXXFCL_FARRAY_INIT_DEBUG") # Objexx DEFinition
+ADD_CXX_DEFINITIONS("-DOBJEXXFCL_ARRAY_NOALIGN") # Disable experimental ObjexxFCL array alignment
+ADD_CXX_DEBUG_DEFINITIONS("-DOBJEXXFCL_FARRAY_INIT_DEBUG") # Initialize ObjexxFCL arrays to aid debugging
 
 # Make sure expat is compiled as a static library
 ADD_DEFINITIONS("-DXML_STATIC")
 
-IF ( MSVC ) # visual c++ (VS 2013)
+IF ( MSVC ) # Visual C++ (VS 2013)
 
-    # Disabled Warnings:
-    #  4244  Narrowing conversions
-    #  4258  Definition from the loop is ignored
-    #  4355  Passing this pointer in class initializer (object is incomplete so bases/members can only use this in limited ways)
-    #  4996  Deprecated" STL functions (that MS has safer, non-std alternatives for)
+    # Disabled Warnings: Enable some of these as more serious warnings are addressed
+    #  4101 Unreferenced local variable
+    #  4102 Unreferenced label
+    #  4244 Narrowing conversions
+    #  4258 Definition from the loop is ignored
+    #  4355 Passing this pointer in class initializer (object is incomplete so bases/members can only use this in limited ways)
+    #  4996 Deprecated functions (/D_SCL_SECURE_NO_WARNINGS /D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_WARNINGS)
 
     # need to figure out how to set this to avoid the major slow-down in debugging:
     # Configuration Properties ->Debugging -> Environment, use drop-down list to choose <Edit> and type _NO_DEBUG_HEAP=1 then click OK
 
     # COMPILER FLAGS
-    ADD_CXX_DEFINITIONS("-MP") # Enables multi-processor compilation of source within a single project
+    ADD_CXX_DEFINITIONS("/nologo")
+    ADD_CXX_DEFINITIONS("/EHsc")
+    ADD_CXX_DEFINITIONS("/MP") # Enables multi-processor compilation of source within a single project
+    ADD_CXX_DEFINITIONS("/W1") # Increase to /W2 then /W3 as more serious warnings are addressed
 
-    # Za must be set in the individual projects because gtest uses win.h and cannot compile with it
-    #ADD_DEFINITIONS("-Za") # Disables MS language extensions
+    # Some third party components use windows.h so MS extensions must be allowed
+    #ADD_DEFINITIONS("/Za") # Disables MS language extensions
 
-    ADD_CXX_DEFINITIONS("-wd4244 -wd4258 -wd4355 -wd4996") # Disables warning messages listed above
-    ADD_CXX_DEFINITIONS("-DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
-    ADD_CXX_DEFINITIONS("-W1")
-
-    # -D_CRT_SECURE_NO_DEPRECATE hides function calls which make the library thread-unsafe
-    # -D_SCL_SECURE_NO_DEPRECATE is itself deprecated and replaced by _SCL_SECURE_NO_WARNING which is made irrelevant by -wd4996 above
-    # Todo remove this line entirely
-    #ADD_DEFINITIONS("-D_CRT_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_DEPRECATE -D_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES") # ???
+    ADD_CXX_DEFINITIONS("/wd4101 /wd4102 /wd4244 /wd4258 /wd4355 /wd4996") # Disables warning messages listed above
+    ADD_CXX_DEFINITIONS("/DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
+    ADD_CXX_DEFINITIONS("/DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
+    ADD_CXX_DEFINITIONS("/DMSC_EXTENSIONS") # ObjexxFCL needs this when not using /Za
 
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
-    ADD_CXX_RELEASE_DEFINITIONS("-GS-") # Disable buffer overrun checks for performance in release mode
-	
+    ADD_CXX_RELEASE_DEFINITIONS("/GS-") # Disable buffer overrun checks for performance in release mode
+
+    # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
+    ADD_CXX_DEBUG_DEFINITIONS("/Ob0") # Disable inlining
+    ADD_CXX_DEBUG_DEFINITIONS("/RTCsu") # Runtime checks
 
 ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # g++/Clang
     option(ENABLE_THREAD_SANITIZER "Enable thread sanitizer testing in gcc/clang" FALSE)
@@ -79,38 +84,105 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
 
 
     # COMPILER FLAGS
+    ADD_CXX_DEFINITIONS("-pipe") # Faster compiler processing
     ADD_CXX_DEFINITIONS("-std=c++11") # Enable C++11 features in g++
     ADD_CXX_DEFINITIONS("-pedantic") # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
-    # ADD_CXX_DEFINITIONS("-Wall -Wextra -Wno-unused-parameter") # Turn on warnings (all, extra, "???don't warn about unused parameters???")
+    ADD_CXX_DEFINITIONS("-Wall -Wextra") # Turn on warnings
+    ADD_CXX_DEFINITIONS("-Wno-unused-parameter -Wno-unused-variable -Wno-unused-label") # Suppress unused item warnings until more serious ones are addressed
+  IF ( CMAKE_COMPILER_IS_GNUCXX ) # g++
+    ADD_CXX_DEFINITIONS("-Wno-unused-but-set-parameter -Wno-unused-but-set-variable") # Suppress unused-but-set warnings until more serious ones are addressed
+  ENDIF ()
     ADD_CXX_DEFINITIONS("-Wno-invalid-source-encoding")
-    
+    ADD_CXX_DEFINITIONS("-ffor-scope")
+
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
+  IF ( CMAKE_COMPILER_IS_GNUCXX ) # g++
+    ADD_CXX_DEBUG_DEFINITIONS("-ffloat-store") # Improve debug run solution stability
     ADD_CXX_DEBUG_DEFINITIONS("-fsignaling-nans") # Disable optimizations that may have concealed NaN behavior
+  ENDIF ()
     ADD_CXX_DEBUG_DEFINITIONS("-ggdb") # Produces debugging information specifically for gdb
 
-ELSEIF ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
+ELSEIF ( WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
 
-    # Warnings ignored:
-    #  1786: Use of deprecated items
-    #  2259: Non-pointer conversion from "type" to "type" may lose significant bits
-    
+    # Disabled Warnings: Enable some of these as more serious warnings are addressed
+    #   177 Variable declared but never referenced
+    #   869 Parameter never referenced
+    #  1786 Use of deprecated items
+    #  2259 Non-pointer conversions may lose significant bits
+    #  3280 Declaration hides variable
+    # 11074 Inlining inhibited
+    # 11075 Inlining inhibited
+
     # COMPILER FLAGS
-    #ADD_CXX_DEFINITIONS("/Wall") # Enable "all" warnings
-    ADD_CXX_DEFINITIONS("/Qdiag-disable:1786,2259") # Disable warnings listed above
-    ADD_CXX_DEFINITIONS("/DVC_EXTRALEAN /DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
+    ADD_CXX_DEFINITIONS("/Qstd=c++11") # Specify C++11 language
+    ADD_CXX_DEFINITIONS("/Qcxx-features") # Enables standard C++ features without disabling Microsoft extensions
+    ADD_CXX_DEFINITIONS("/Wall") # Enable "all" warnings
+    ADD_CXX_DEFINITIONS("/Wp64") # 64-bit warnings
+    ADD_CXX_DEFINITIONS("/Qdiag-disable:177,869,1786,2259,3280,11074,11075") # Disable warnings listed above
     ADD_CXX_DEFINITIONS("/DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
-    
+    ADD_CXX_DEFINITIONS("/DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
+
+    # Optimization options that had no significant benefit for EnergyPlus
+    #  /Qinline-factor:200
+    #  /Qipo instead of /Qip
+    #  /Qopt-prefetch
+    #  /Qparallel
+    #  /Qunroll-aggressive
+    #  /xHost
+
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
+    ADD_CXX_RELEASE_DEFINITIONS("/Qansi-alias") # Enables more aggressive optimizations on floating-point data
     ADD_CXX_RELEASE_DEFINITIONS("/fp:fast") # Enables more aggressive optimizations on floating-point data
     ADD_CXX_RELEASE_DEFINITIONS("/Qprec-div-") # ???If this is equivalent to /Qno-prec-div, it disables the improved division accuracy in favor of speed
     ADD_CXX_RELEASE_DEFINITIONS("/Qip") # Enables inter-procedural optimnization within a single file
-    ADD_CXX_RELEASE_DEFINITIONS("/Qoption,c,-ip_ninl_max_stats=500") # Sets the max increase in the # of intermediate language statements to 500 for each function
-    ADD_CXX_RELEASE_DEFINITIONS("/Qoption,c,-ip_ninl_max_total_stats=5000") # Sets the total max increase in the # of intermediate language statements to 5000
-        
+
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
+    ADD_CXX_DEBUG_DEFINITIONS("/fp:source") # Use source-specified floating point precision
+    ADD_CXX_DEBUG_DEFINITIONS("/Qtrapuv") # Initialize local variables to unusual values to help detect use uninitialized
     ADD_CXX_DEBUG_DEFINITIONS("/check:stack,uninit") # Enables runtime checking of the stack (buffer over and underruns; pointer verification) and uninitialized variables
-    ADD_CXX_DEBUG_DEFINITIONS("/Gs0") # ??? Disable/Enable stack checking
+    ADD_CXX_DEBUG_DEFINITIONS("/Gs0") # Enable stack checking for all functions
+    ADD_CXX_DEBUG_DEFINITIONS("/GS") # Buffer overrun detection
     ADD_CXX_DEBUG_DEFINITIONS("/Qfp-stack-check") # Tells the compiler to generate extra code after every function call to ensure fp stack is as expected
-    ADD_CXX_DEBUG_DEFINITIONS("/Qtrapuv") # ??? Initializes variables with NaN
-    
+    ADD_CXX_DEBUG_DEFINITIONS("/traceback") # Enables traceback on error
+
+ELSEIF ( UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
+
+    # Disabled Warnings: Enable some of these as more serious warnings are addressed
+    #   177 Variable declared but never referenced
+    #   869 Parameter never referenced
+    #  1786 Use of deprecated items
+    #  2259 Non-pointer conversions may lose significant bits
+    #  3280 Declaration hides variable
+    # 11074 Inlining inhibited
+    # 11075 Inlining inhibited
+
+    # COMPILER FLAGS
+    ADD_CXX_DEFINITIONS("-std=c++11") # Specify C++11 language
+    ADD_CXX_DEFINITIONS("-Wall") # Enable "all" warnings
+    ADD_CXX_DEFINITIONS("-Wp64") # 64-bit warnings
+    ADD_CXX_DEFINITIONS("-diag-disable:177,869,1786,2259,3280,11074,11075") # Disable warnings listed above
+
+    # Optimization options that had no significant benefit for EnergyPlus
+    #  -inline-factor=200
+    #  -ipo instead of -ip
+    #  -opt-prefetch
+    #  -parallel
+    #  -unroll-aggressive
+    #  -xHost
+
+    # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
+    ADD_CXX_RELEASE_DEFINITIONS("-ansi-alias") # Enables more aggressive optimizations on floating-point data
+    ADD_CXX_RELEASE_DEFINITIONS("-fp:fast") # Enables more aggressive optimizations on floating-point data
+    ADD_CXX_RELEASE_DEFINITIONS("-prec-div-") # ???If this is equivalent to /Qno-prec-div, it disables the improved division accuracy in favor of speed
+    ADD_CXX_RELEASE_DEFINITIONS("-ip") # Enables inter-procedural optimnization within a single file
+
+    # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
+    ADD_CXX_DEBUG_DEFINITIONS("-strict-ansi") # Strict language conformance: Performance impact so limit to debug build
+    ADD_CXX_DEBUG_DEFINITIONS("-fp-model source") # Use source-specified floating point precision
+    ADD_CXX_DEBUG_DEFINITIONS("-ftrapuv") # Initialize local variables to unusual values to help detect use uninitialized
+    ADD_CXX_DEBUG_DEFINITIONS("-check=stack,uninit") # Enables runtime checking of the stack (buffer over and underruns; pointer verification) and uninitialized variables
+    ADD_CXX_DEBUG_DEFINITIONS("-fstack-security-check") # Buffer overrun detection
+    ADD_CXX_DEBUG_DEFINITIONS("-fp-stack-check") # Check the floating point stack after every function call
+    ADD_CXX_DEBUG_DEFINITIONS("-traceback") # Enables traceback on error
+
 ENDIF () # COMPILER TYPE

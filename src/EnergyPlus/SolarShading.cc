@@ -3172,7 +3172,6 @@ namespace SolarShading {
 			}
 
 			if ( DisplayExtraWarnings ) {
-				++NumTooManyFigures;
 				TrackTooManyFigures.redimension( ++NumTooManyFigures );
 				TrackTooManyFigures( NumTooManyFigures ).SurfIndex1 = CurrentShadowingSurface;
 				TrackTooManyFigures( NumTooManyFigures ).SurfIndex2 = CurrentSurfaceBeingShadowed;
