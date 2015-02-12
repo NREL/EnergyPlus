@@ -1268,7 +1268,11 @@ namespace ZoneEquipmentManager {
 				}
 			}
 			FinalZoneSizing( CtrlZoneNum ).TotalZoneFloorArea = ( Zone( ZoneIndex ).FloorArea * Zone( FinalZoneSizing( CtrlZoneNum ).ActualZoneNum ).Multiplier * Zone( FinalZoneSizing( CtrlZoneNum ).ActualZoneNum ).ListMultiplier );
-			OAFromPeople = FinalZoneSizing( CtrlZoneNum ).DesOAFlowPPer * TotPeopleInZone;
+			if ( FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowPPer || FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowSum || FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowMax ){
+				OAFromPeople = FinalZoneSizing( CtrlZoneNum ).DesOAFlowPPer * TotPeopleInZone;
+			} else { 
+				OAFromPeople = 0.0;
+			}
 			OAFromArea = FinalZoneSizing( CtrlZoneNum ).DesOAFlowPerArea * FinalZoneSizing( CtrlZoneNum ).TotalZoneFloorArea;
 			FinalZoneSizing( CtrlZoneNum ).TotPeopleInZone = TotPeopleInZone;
 			FinalZoneSizing( CtrlZoneNum ).TotalOAFromPeople = OAFromPeople;
@@ -2629,6 +2633,7 @@ namespace ZoneEquipmentManager {
 
 		static bool SupPathInletChanged( false );
 		static bool FirstCall; // indicates first call to supply air path components
+		static bool FirstPassZoneEquip ( true ); // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
 		static bool MyOneTimeFlag( true );
 		bool ErrorFlag;
 		static bool ValidSAMComp( false );
@@ -2721,6 +2726,28 @@ namespace ZoneEquipmentManager {
 				SysOutputProvided = 0.0;
 				LatOutputProvided = 0.0;
 				DataCoolCoilCap = 0.0; // reset global variable used only for heat pumps (i.e., DX cooling and heating coils)
+
+				// Reset ZoneEqSizing data (because these may change from one equipment type to the next)
+				if ( FirstPassZoneEquip ) {
+					ZoneEqSizing( ControlledZoneNum ).AirVolFlow = 0.0;
+					ZoneEqSizing( ControlledZoneNum ).MaxHWVolFlow = 0.0;
+					ZoneEqSizing( ControlledZoneNum ).MaxCWVolFlow = 0.0;
+					ZoneEqSizing( ControlledZoneNum ).OAVolFlow = 0.0;
+					ZoneEqSizing( ControlledZoneNum ).DesCoolingLoad = 0.0;
+					ZoneEqSizing( ControlledZoneNum ).DesHeatingLoad = 0.0;
+					ZoneEqSizing( ControlledZoneNum ).CoolingAirVolFlow = 0.0;
+					ZoneEqSizing( ControlledZoneNum ).HeatingAirVolFlow = 0.0;
+					ZoneEqSizing( ControlledZoneNum ).SystemAirVolFlow = 0.0;
+					ZoneEqSizing( ControlledZoneNum ).AirFlow = false;
+					ZoneEqSizing( ControlledZoneNum ).CoolingAirFlow = false;
+					ZoneEqSizing( ControlledZoneNum ).HeatingAirFlow = false;
+					ZoneEqSizing( ControlledZoneNum ).SystemAirFlow = false;
+					ZoneEqSizing( ControlledZoneNum ).Capacity = false;
+					ZoneEqSizing( ControlledZoneNum ).CoolingCapacity = false;
+					ZoneEqSizing( ControlledZoneNum ).HeatingCapacity = false;
+					ZoneEqSizing( ControlledZoneNum ).SystemCapacity = false;
+					ZoneEqSizing( ControlledZoneNum ).DesignSizeFromParent = false;
+				}
 
 				ZoneEquipTypeNum = PrioritySimOrder( EquipTypeNum ).EquipType_Num;
 
@@ -2944,6 +2971,7 @@ namespace ZoneEquipmentManager {
 			}
 		} // End of controlled zone loop
 		CurZoneEqNum = 0;
+		FirstPassZoneEquip = false;
 
 		//This is the call to the Supply Air Path after the components are simulated to update
 		//  the path inlets

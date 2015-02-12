@@ -2010,7 +2010,8 @@ namespace MixedAir {
 											VentilationMechanical( VentMechNum ).ZoneOAACH = OARequirements( ObjIndex ).OAFlowACH;
 										} else { // use defaults
 											VentilationMechanical( VentMechNum ).ZoneOAAreaRate( MechVentZoneCount ) = 0.0;
-											VentilationMechanical( VentMechNum ).ZoneOAPeopleRate( MechVentZoneCount ) = 0.00944;
+											// since this is case with no DesSpcOA object, cannot determine the method and default would be Flow/Person which should default to this flow rate
+											VentilationMechanical( VentMechNum ).ZoneOAPeopleRate( MechVentZoneCount ) = 0.00944; 
 											VentilationMechanical( VentMechNum ).ZoneOAFlow( MechVentZoneCount ) = 0.0;
 											VentilationMechanical( VentMechNum ).ZoneOAACH = 0.0;
 										}
@@ -3022,7 +3023,10 @@ namespace MixedAir {
 						ZoneNum = vent_mech.Zone( ZoneIndex );
 
 						// ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
-						TotalPeopleOAFlow += ZoneIntGain( ZoneNum ).NOFOCC * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * vent_mech.ZoneOAPeopleRate( ZoneIndex );
+						int OAFlowMethod = OARequirements( vent_mech.ZoneDesignSpecOAObjIndex( ZoneIndex ) ).OAFlowMethod;
+						if ( OAFlowMethod == OAFlowPPer || OAFlowMethod == OAFlowSum || OAFlowMethod == OAFlowMax ){
+							TotalPeopleOAFlow += ZoneIntGain( ZoneNum ).NOFOCC * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * vent_mech.ZoneOAPeopleRate( ZoneIndex );
+						}
 					}
 					vent_mech.TotPeopleOAFlow = TotalPeopleOAFlow;
 				}

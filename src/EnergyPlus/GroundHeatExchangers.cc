@@ -773,15 +773,15 @@ namespace GroundHeatExchangers {
 			//   Not many checks
 			if ( VerticalGlhe( GlheNum ).PipeThick >= VerticalGlhe( GlheNum ).PipeOutDia / 2.0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + VerticalGlhe( GlheNum ).Name + "\", invalid value in field." );
-				ShowContinueError( "..." + cNumericFieldNames( 13 ) + "=[" + RoundSigDigits( VerticalGlhe( GlheNum ).PipeThick, 3 ) + "]." );
-				ShowContinueError( "..." + cNumericFieldNames( 11 ) + "=[" + RoundSigDigits( VerticalGlhe( GlheNum ).PipeOutDia, 3 ) + "]." );
+				ShowContinueError( "..." + cNumericFieldNames( 12 ) + "=[" + RoundSigDigits( VerticalGlhe( GlheNum ).PipeThick, 3 ) + "]." );
+				ShowContinueError( "..." + cNumericFieldNames( 10 ) + "=[" + RoundSigDigits( VerticalGlhe( GlheNum ).PipeOutDia, 3 ) + "]." );
 				ShowContinueError( "...Radius will be <=0." );
 				ErrorsFound = true;
 			}
 
 			if ( VerticalGlhe( GlheNum ).MaxSimYears < MaxNumberSimYears ) {
 				ShowWarningError( cCurrentModuleObject + "=\"" + VerticalGlhe( GlheNum ).Name + "\", invalid value in field." );
-				ShowContinueError( "..." + cNumericFieldNames( 14 ) + " less than RunPeriod Request" );
+				ShowContinueError( "..." + cNumericFieldNames( 13 ) + " less than RunPeriod Request" );
 				ShowContinueError( "Requested input=" + TrimSigDigits( VerticalGlhe( GlheNum ).MaxSimYears ) + " will be set to " + TrimSigDigits( MaxNumberSimYears ) );
 				VerticalGlhe( GlheNum ).MaxSimYears = MaxNumberSimYears;
 			}

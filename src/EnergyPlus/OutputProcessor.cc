@@ -15,6 +15,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <OutputProcessor.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobalConstants.hh>
@@ -1379,9 +1380,9 @@ namespace OutputProcessor {
 		int write_stat;
 
 		OutputFileMeterDetails = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileMeterDetails, "eplusout.mtd", flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileMeterDetails, DataStringGlobals::outputMtdFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "InitializeMeters: Could not open file \"eplusout.mtd\" for output (write)." );
+			ShowFatalError( "InitializeMeters: Could not open file "+DataStringGlobals::outputMtdFileName+" for output (write)." );
 		}
 
 	}
@@ -6349,7 +6350,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptTS ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (TimeStep), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (TimeStep), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName + " and " + DataStringGlobals::outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptTS ) {
@@ -6362,7 +6363,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccTS ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (TimeStep), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (TimeStep), already on \"Output:Meter\". Will report to both "+ DataStringGlobals::outputEsoFileName+ " and " + DataStringGlobals::outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccTS ) {
@@ -6377,7 +6378,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptHR ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Hourly), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Hourly), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName + " and " + DataStringGlobals::outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptHR ) {
@@ -6391,7 +6392,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccHR ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Hourly), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Hourly), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName + " and " + DataStringGlobals::outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccHR ) {
@@ -6407,7 +6408,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptDY ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Daily), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Daily), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName+ " and " + DataStringGlobals::outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptDY ) {
@@ -6421,7 +6422,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccDY ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Hourly), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Hourly), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName+ " and " + DataStringGlobals::outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccDY ) {
@@ -6437,7 +6438,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptMN ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Monthly), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Monthly), already on \"Output:Meter\". Will report to both "+ DataStringGlobals::outputEsoFileName + " and " + DataStringGlobals::outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptMN ) {
@@ -6451,7 +6452,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccMN ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Monthly), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Monthly), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName + " and " + DataStringGlobals::outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccMN ) {
@@ -6467,7 +6468,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptSM ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (RunPeriod), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (RunPeriod), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName + " and " + DataStringGlobals::outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptSM ) {
@@ -6481,7 +6482,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccSM ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (RunPeriod), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (RunPeriod), already on \"Output:Meter\". Will report to both " + DataStringGlobals::outputEsoFileName+" and " + DataStringGlobals::outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccSM ) {
@@ -7159,36 +7160,40 @@ GetMeteredVariables(
 		if ( RVar().MeterArrayPtr == 0 ) continue;
 		NumOnMeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).NumOnMeters;
 		MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( 1 );
-		++NumVariables;
-		VarIndexes( NumVariables ) = Loop;
-		VarTypes( NumVariables ) = 2;
-		IndexTypes( NumVariables ) = RVariableTypes( Loop ).IndexType;
-		UnitsStrings( NumVariables ) = RVariableTypes( Loop ).UnitsString;
+		if ( MeterPtr ) {
+			++NumVariables;
+			VarIndexes( NumVariables ) = Loop;
+			VarTypes( NumVariables ) = 2;
+			IndexTypes( NumVariables ) = RVariableTypes( Loop ).IndexType;
+			UnitsStrings( NumVariables ) = RVariableTypes( Loop ).UnitsString;
 
-		ResourceTypes( NumVariables ) = AssignResourceTypeNum( MakeUPPERCase( EnergyMeters( MeterPtr ).ResourceType ) );
-		if ( present( Names ) ) {
-			Names()( NumVariables ) = RVariableTypes( Loop ).VarNameUC;
-		}
-		if ( present( EndUses ) ) {
-			for ( MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum ) {
-				MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( MeterNum );
-				if ( EnergyMeters( MeterPtr ).EndUse != "" ) {
-					EndUses()( NumVariables ) = MakeUPPERCase( EnergyMeters( MeterPtr ).EndUse );
-					break;
+			ResourceTypes( NumVariables ) = AssignResourceTypeNum( MakeUPPERCase( EnergyMeters( MeterPtr ).ResourceType ) );
+			if ( present( Names ) ) {
+				Names()( NumVariables ) = RVariableTypes( Loop ).VarNameUC;
+			}
+			if ( present( EndUses ) ) {
+				for ( MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum ) {
+					MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( MeterNum );
+					if ( EnergyMeters( MeterPtr ).EndUse != "" ) {
+						EndUses()( NumVariables ) = MakeUPPERCase( EnergyMeters( MeterPtr ).EndUse );
+						break;
+					}
 				}
 			}
-		}
-		if ( present( Groups ) ) {
-			for ( MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum ) {
-				MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( MeterNum );
-				if ( EnergyMeters( MeterPtr ).Group != "" ) {
-					Groups()( NumVariables ) = MakeUPPERCase( EnergyMeters( MeterPtr ).Group );
-					break;
+			if ( present( Groups ) ) {
+				for ( MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum ) {
+					MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( MeterNum );
+					if ( EnergyMeters( MeterPtr ).Group != "" ) {
+						Groups()( NumVariables ) = MakeUPPERCase( EnergyMeters( MeterPtr ).Group );
+						break;
+					}
 				}
 			}
-		}
-		if ( present( VarIDs ) ) {
-			VarIDs()( NumVariables ) = RVar().ReportID;
+			if ( present( VarIDs ) ) {
+				VarIDs()( NumVariables ) = RVar().ReportID;
+			}
+		} else {
+			ShowWarningError( "Referenced variable or meter used in the wrong context \"" + ComponentName + "\" of type \"" + ComponentType + "\"" );
 		}
 	}
 
@@ -7861,28 +7866,28 @@ ProduceRDDMDD()
 	std::ofstream rdd_stream;
 	std::ofstream mdd_stream;
 	if ( ProduceReportVDD == ReportVDD_Yes ) {
-		rdd_stream.open( "eplusout.rdd" ); // Text mode so we use \n as terminator
+		rdd_stream.open( DataStringGlobals::outputRddFileName ); // Text mode so we use \n as terminator
 		if ( ! rdd_stream ) {
-			ShowFatalError( "ProduceRDDMDD: Could not open file \"eplusout.rdd\" for output (write)." );
+			ShowFatalError( "ProduceRDDMDD: Could not open file \"" + DataStringGlobals::outputRddFileName + "\" for output (write)." );
 		}
 		rdd_stream << "Program Version," << VerString << ',' << IDDVerString << '\n';
 		rdd_stream << "Var Type (reported time step),Var Report Type,Variable Name [Units]" << '\n';
-		mdd_stream.open( "eplusout.mdd" );
+		mdd_stream.open( DataStringGlobals::outputMddFileName );
 		if ( ! mdd_stream ) {
-			ShowFatalError( "ProduceRDDMDD: Could not open file \"eplusout.mdd\" for output (write)." );
+			ShowFatalError( "ProduceRDDMDD: Could not open file \"" + DataStringGlobals::outputMddFileName + "\" for output (write)." );
 		}
 		mdd_stream << "Program Version," << VerString << ',' << IDDVerString << '\n';
 		mdd_stream << "Var Type (reported time step),Var Report Type,Variable Name [Units]" << '\n';
 	} else if ( ProduceReportVDD == ReportVDD_IDF ) {
-		rdd_stream.open( "eplusout.rdd" ); // Text mode so we use \n as terminator
+		rdd_stream.open( DataStringGlobals::outputRddFileName ); // Text mode so we use \n as terminator
 		if ( ! rdd_stream ) {
-			ShowFatalError( "ProduceRDDMDD: Could not open file \"eplusout.rdd\" for output (write)." );
+			ShowFatalError( "ProduceRDDMDD: Could not open file \"" + DataStringGlobals::outputRddFileName + "\" for output (write)." );
 		}
 		rdd_stream << "! Program Version," << VerString << ',' << IDDVerString << '\n';
 		rdd_stream << "! Output:Variable Objects (applicable to this run)" << '\n';
-		mdd_stream.open( "eplusout.mdd" );
+		mdd_stream.open( DataStringGlobals::outputMddFileName );
 		if ( ! mdd_stream ) {
-			ShowFatalError( "ProduceRDDMDD: Could not open file \"eplusout.mdd\" for output (write)." );
+			ShowFatalError( "ProduceRDDMDD: Could not open file \"" + DataStringGlobals::outputMddFileName + "\" for output (write)." );
 		}
 		mdd_stream << "! Program Version," << VerString << ',' << IDDVerString << '\n';
 		mdd_stream << "! Output:Meter Objects (applicable to this run)" << '\n';

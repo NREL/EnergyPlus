@@ -62,6 +62,21 @@ namespace SizingManager {
 	GetOARequirements();
 
 	void
+	ProcessInputOARequirements(
+		std::string const & cCurrentModuleObject,
+		int const OAIndex,
+		FArray1_string const & cAlphaArgs,
+		int & NumAlphas,
+		FArray1< Real64 > const & rNumericArgs,
+		int & NumNumbers,
+		FArray1_bool const & lNumericFieldBlanks, //Unused
+		FArray1_bool const & lAlphaFieldBlanks,
+		FArray1_string const & cAlphaFieldNames,
+		FArray1_string const & cNumericFieldNames, //Unused
+		bool & ErrorsFound // If errors found in input
+		);
+
+	void
 	GetZoneAirDistribution();
 
 	void

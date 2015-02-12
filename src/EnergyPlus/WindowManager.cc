@@ -9,11 +9,13 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <WindowManager.hh>
 #include <ConvectionCoefficients.hh>
 #include <DataBSDFWindow.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
+#include <DataStringGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalSurface.hh>
@@ -7702,7 +7704,7 @@ namespace WindowManager {
 
 		if ( PrintTransMap ) {
 			ScreenTransUnitNo = GetNewUnitNumber();
-			{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "unknown" ); gio::open( ScreenTransUnitNo, "eplusscreen.csv", flags ); if ( flags.err() ) goto Label99999; }
+			{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "unknown" ); gio::open( ScreenTransUnitNo, DataStringGlobals::outputScreenCsvFileName, flags ); if ( flags.err() ) goto Label99999; }
 			//  WRITE(ScreenTransUnitNo,*)' '
 			for ( ScreenNum = 1; ScreenNum <= NumSurfaceScreens; ++ScreenNum ) {
 				MatNum = SurfaceScreens( ScreenNum ).MaterialNumber;

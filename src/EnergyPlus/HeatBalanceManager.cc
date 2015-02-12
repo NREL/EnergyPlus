@@ -3855,20 +3855,21 @@ namespace HeatBalanceManager {
 			// A FrameAndDivider object will also be created if window on data file has a
 			// frame or divider.)
 
+			std::string window5DataFileName;
 			if ( ConstructAlphas( 1 ) == "" ) {
-				FullName = CurrentWorkingFolder + "Window5DataFile.dat";
+				window5DataFileName = CurrentWorkingFolder + "Window5DataFile.dat";
 			} else {
-				FullName = ConstructAlphas( 1 );
+				window5DataFileName = ConstructAlphas( 1 );
 			}
 			DisplayString( "Searching Window5 data file for Construction=" + ConstructAlphas( 0 ) );
 
-			SearchWindow5DataFile( FullName, ConstructAlphas( 0 ), ConstructionFound, EOFonW5File, ErrorsFound );
+			SearchWindow5DataFile( window5DataFileName, ConstructAlphas( 0 ), ConstructionFound, EOFonW5File, ErrorsFound );
 
 			if ( EOFonW5File || ! ConstructionFound ) {
 				DisplayString( "--Construction not found" );
 				ErrorsFound = true;
 				ShowSevereError( "No match on WINDOW5 data file for Construction=" + ConstructAlphas( 0 ) + ", or error in data file." );
-				ShowContinueError( "...Looking on file=" + FullName );
+				ShowContinueError( "...Looking on file=" + window5DataFileName );
 				continue;
 			}
 

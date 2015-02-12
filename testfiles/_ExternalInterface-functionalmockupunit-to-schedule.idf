@@ -1196,42 +1196,42 @@
     FunctionalMockupUnitImport;  !- Name of External Interface
 
   ExternalInterface:FunctionalMockupUnitImport,
-    DataSets\FMUs\MoistAir.fmu,  !- FMU File Name
+    ..\datasets\FMUs\MoistAir.fmu,  !- FMU File Name
     15,                      !- FMU Timeout {ms}
     0;                       !- FMU LoggingOn
 
   ExternalInterface:FunctionalMockupUnitImport:From:Variable,
     Environment,             !- Output:Variable Index Key Name
     Site Outdoor Air Drybulb Temperature,  !- Output:Variable Name
-    DataSets\FMUs\MoistAir.fmu,  !- FMU File Name
+    ..\datasets\FMUs\MoistAir.fmu,  !- FMU File Name
     Model1,                  !- FMU Instance Name
     TDryBul;                 !- FMU Variable Name
 
   ExternalInterface:FunctionalMockupUnitImport:From:Variable,
     ZONE ONE,                !- Output:Variable Index Key Name
     Zone Mean Air Temperature,  !- Output:Variable Name
-    DataSets\FMUs\MoistAir.fmu,  !- FMU File Name
+    ..\datasets\FMUs\MoistAir.fmu,  !- FMU File Name
     Model1,                  !- FMU Instance Name
     TRooMea;                 !- FMU Variable Name
 
   ExternalInterface:FunctionalMockupUnitImport:From:Variable,
     Environment,             !- Output:Variable Index Key Name
     Site Outdoor Air Relative Humidity,  !- Output:Variable Name
-    DataSets\FMUs\MoistAir.fmu,  !- FMU File Name
+    ..\datasets\FMUs\MoistAir.fmu,  !- FMU File Name
     Model1,                  !- FMU Instance Name
     outRelHum;               !- FMU Variable Name
 
   ExternalInterface:FunctionalMockupUnitImport:From:Variable,
     ZONE ONE,                !- Output:Variable Index Key Name
     Zone Air Relative Humidity,  !- Output:Variable Name
-    DataSets\FMUs\MoistAir.fmu,  !- FMU File Name
+    ..\datasets\FMUs\MoistAir.fmu,  !- FMU File Name
     Model1,                  !- FMU Instance Name
     rooRelHum;               !- FMU Variable Name
 
   ExternalInterface:FunctionalMockupUnitImport:To:Schedule,
     FMU_OthEquSen_ZoneOne,   !- Name
     Any Number,              !- Schedule Type Limits Names
-    DataSets\FMUs\MoistAir.fmu,  !- FMU File Name
+    ..\datasets\FMUs\MoistAir.fmu,  !- FMU File Name
     Model1,                  !- FMU Instance Name
     QSensible,               !- FMU Variable Name
     0;                       !- Initial Value
@@ -1239,7 +1239,7 @@
   ExternalInterface:FunctionalMockupUnitImport:To:Schedule,
     FMU_OthEquLat_ZoneOne,   !- Name
     Any Number,              !- Schedule Type Limits Names
-    DataSets\FMUs\MoistAir.fmu,  !- FMU File Name
+    ..\datasets\FMUs\MoistAir.fmu,  !- FMU File Name
     Model1,                  !- FMU Instance Name
     QLatent,                 !- FMU Variable Name
     0;                       !- Initial Value

@@ -9,9 +9,11 @@
 
 // EnergyPlus Headers
 #include <EMSManager.hh>
+#include <CommandLineInterface.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
 #include <DataGlobals.hh>
+#include <DataStringGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataLoopNode.hh>
 #include <DataPrecisionGlobals.hh>
@@ -189,9 +191,9 @@ namespace EMSManager {
 			if ( OutputEDDFile ) {
 				// open up output file for EMS EDD file  EMS Data and Debug
 				OutputEMSFileUnitNum = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputEMSFileUnitNum, "eplusout.edd", flags ); write_stat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputEMSFileUnitNum, DataStringGlobals::outputEddFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( "CheckIFAnyEMS: Could not open file \"eplusout.edd\" for output (write)." );
+					ShowFatalError( "CheckIFAnyEMS: Could not open file "+ DataStringGlobals::outputEddFileName +" for output (write)." );
 				}
 			}
 		} else {
