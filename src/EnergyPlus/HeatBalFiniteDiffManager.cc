@@ -104,6 +104,7 @@ namespace HeatBalFiniteDiffManager {
 	using DataHeatBalFanSys::QHWBaseboardSurf;
 	using DataHeatBalFanSys::QSteamBaseboardSurf;
 	using DataHeatBalFanSys::QElecBaseboardSurf;
+	using DataHeatBalFanSys::QCoolingPanelSurf;
 	using DataEnvironment::SkyTemp;
 	using DataEnvironment::IsRain;
 	using Psychrometrics::PsyRhFnTdbRhovLBnd0C;
@@ -2119,6 +2120,7 @@ namespace HeatBalFiniteDiffManager {
 		using DataHeatBalFanSys::QHWBaseboardSurf;
 		using DataHeatBalFanSys::QSteamBaseboardSurf;
 		using DataHeatBalFanSys::QElecBaseboardSurf;
+		using DataHeatBalFanSys::QCoolingPanelSurf;
 		using DataSurfaces::HeatTransferModel_CondFD;
 
 		// Locals
@@ -2134,12 +2136,9 @@ namespace HeatBalFiniteDiffManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 		auto const & surface( Surface( Surf ) );
 
 		int const ConstrNum( surface.Construction );
-//		Real64 const SigmaRLoc( SigmaR( ConstrNum ) ); //Unused
-//		Real64 const SigmaCLoc( SigmaC( ConstrNum ) ); //Unused
 
 		// Set the internal conditions to local variables
 		Real64 const NetLWRadToSurfFD( NetLWRadToSurf( Surf ) ); // Net interior long wavelength radiation to surface from other surfaces
@@ -2149,18 +2148,16 @@ namespace HeatBalFiniteDiffManager {
 		Real64 const QSteamBaseboardSurfFD( QSteamBaseboardSurf( Surf ) ); // Current radiant heat flux at a surface due to the presence of steam baseboard heaters
 		Real64 const QElecBaseboardSurfFD( QElecBaseboardSurf( Surf ) ); // Current radiant heat flux at a surface due to the presence of electric baseboard heaters
 		Real64 const QRadThermInFD( QRadThermInAbs( Surf ) ); // Thermal radiation absorbed on inside surfaces
+		Real64 const QCoolingPanelSurfFD( QCoolingPanelSurf( Surf ) ); // Current radiant heat flux at a surface due to the presence of simple cooling panels
 
 		// Boundary Conditions from Simulation for Interior
 		Real64 hconvi( HConvInFD( Surf ) );
-//		Real64 hmassi( HMassConvInFD( Surf ) ); //Unused
-
 		Real64 const Tia( MAT( surface.Zone ) );
-//		Real64 const Rhovi( RhoVaporAirIn( Surf ) ); //Unused
 
 		//++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		//    Do all the nodes in the surface   Else will switch to SigmaR,SigmaC
 		auto TDT_i( TDT( i ) );
-		Real64 const QFac( NetLWRadToSurfFD + QHtRadSysSurfFD + QHWBaseboardSurfFD + QSteamBaseboardSurfFD + QElecBaseboardSurfFD + QRadSWInFD + QRadThermInFD );
+		Real64 const QFac( NetLWRadToSurfFD + QHtRadSysSurfFD + QCoolingPanelSurfFD + QHWBaseboardSurfFD + QSteamBaseboardSurfFD + QElecBaseboardSurfFD + QRadSWInFD + QRadThermInFD );
 		if ( surface.HeatTransferAlgorithm == HeatTransferModel_CondFD ) {
 			int const MatLay( Construct( ConstrNum ).LayerPoint( Lay ) );
 			auto const & mat( Material( MatLay ) );
@@ -2372,7 +2369,7 @@ namespace HeatBalFiniteDiffManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

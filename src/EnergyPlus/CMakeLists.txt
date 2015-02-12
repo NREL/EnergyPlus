@@ -32,6 +32,8 @@ SET( SRC
   BranchNodeConnections.hh
   CTElectricGenerator.cc
   CTElectricGenerator.hh
+  ChilledCeilingPanelSimple.cc
+  ChilledCeilingPanelSimple.hh
   ChillerAbsorption.cc
   ChillerAbsorption.hh
   ChillerElectricEIR.cc
