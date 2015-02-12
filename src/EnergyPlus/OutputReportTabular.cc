@@ -142,6 +142,7 @@ namespace OutputReportTabular {
 	int const unitsStyleJtoMJ( 2 );
 	int const unitsStyleJtoGJ( 3 );
 	int const unitsStyleInchPound( 4 );
+	int const unitsStyleNotFound( 5 );
 
 	int const isAverage( 1 );
 	int const isSum( 2 );
@@ -1322,16 +1323,9 @@ namespace OutputReportTabular {
 					}
 				}
 				// the first and only report is assigned to the found object name
-				if ( found != 0 ) {
+				if ( !warningAboutKeyNotFound( found, iInObj, CurrentModuleObject ) ) {
 					BinObjVarID( firstReport ).namesOfObj = objNames( found );
 					BinObjVarID( firstReport ).varMeterNum = objVarIDs( found );
-				} else {
-					ShowWarningError( CurrentModuleObject + ": Specified key not found, the first key will be used: " + OutputTableBinned( iInObj ).keyValue );
-					BinObjVarID( firstReport ).namesOfObj = objNames( 1 );
-					BinObjVarID( firstReport ).varMeterNum = objVarIDs( 1 );
-					if ( objVarIDs( 1 ) == 0 ) {
-						ShowWarningError( CurrentModuleObject + ": Specified meter or variable not found: " + objNames( 1 ) );
-					}
 				}
 				// reset the number of tables to one
 				OutputTableBinned( iInObj ).numTables = 1;
@@ -1358,6 +1352,19 @@ namespace OutputReportTabular {
 		AlphArray.deallocate();
 		NumArray.deallocate();
 
+	}
+
+	bool
+	warningAboutKeyNotFound( int foundIndex, int inObjIndex, const std::string & moduleName )
+	{
+		if ( foundIndex == 0 ) {
+			ShowWarningError( moduleName + ": Specified key not found: " + OutputTableBinned( inObjIndex ).keyValue + " for variable: " + OutputTableBinned( inObjIndex ).varOrMeter );
+			return true;
+		}
+		else {
+			return false;
+		}
+	
 	}
 
 	void
@@ -1487,18 +1494,8 @@ namespace OutputReportTabular {
 			}
 			//MonthlyUnitConversion
 			if ( NumAlphas >= 2 ) {
-				if ( SameString( AlphArray( 2 ), "None" ) ) {
-					unitsStyle = unitsStyleNone;
-				} else if ( SameString( AlphArray( 2 ), "JTOKWH" ) ) {
-					unitsStyle = unitsStyleJtoKWH;
-				} else if ( SameString( AlphArray( 2 ), "JTOMJ" ) ) {
-					unitsStyle = unitsStyleJtoMJ;
-				} else if ( SameString( AlphArray( 2 ), "JTOGJ" ) ) {
-					unitsStyle = unitsStyleJtoGJ;
-				} else if ( SameString( AlphArray( 2 ), "INCHPOUND" ) ) {
-					unitsStyle = unitsStyleInchPound;
-				} else {
-					unitsStyle = unitsStyleNone;
+				unitsStyle = SetUnitsStyleFromString( AlphArray( 2 ) );
+				if (unitsStyle == unitsStyleNotFound) {
 					ShowWarningError( CurrentModuleObject + ": Invalid " + cAlphaFieldNames( 2 ) + "=\"" + AlphArray( 2 ) + "\". No unit conversion will be performed. Normal SI units will be shown." );
 				}
 			} else {
@@ -1527,6 +1524,33 @@ namespace OutputReportTabular {
 		AlphArray.deallocate();
 		NumArray.deallocate();
 
+	}
+
+	int
+	SetUnitsStyleFromString(
+	std::string unitStringIn
+	)
+	{
+		int unitsStyleReturn;
+		if ( SameString( unitStringIn, "None" ) ) {
+			unitsStyleReturn = unitsStyleNone;
+		}
+		else if ( SameString( unitStringIn, "JTOKWH" ) ) {
+			unitsStyleReturn = unitsStyleJtoKWH;
+		}
+		else if ( SameString( unitStringIn, "JTOMJ" ) ) {
+			unitsStyleReturn = unitsStyleJtoMJ;
+		}
+		else if ( SameString( unitStringIn, "JTOGJ" ) ) {
+			unitsStyleReturn = unitsStyleJtoGJ;
+		}
+		else if ( SameString( unitStringIn, "INCHPOUND" ) ) {
+			unitsStyleReturn = unitsStyleInchPound;
+		}
+		else {
+			unitsStyleReturn = unitsStyleNotFound;
+		}
+		return unitsStyleReturn;
 	}
 
 	void
@@ -5826,8 +5850,11 @@ namespace OutputReportTabular {
 		//CALL PreDefTableEntry(pdchLeedGenData,'Heating Degree Days','-')
 		//CALL PreDefTableEntry(pdchLeedGenData,'Cooling Degree Days','-')
 		PreDefTableEntry( pdchLeedGenData, "HDD and CDD data source", "Weather File Stat" );
-		PreDefTableEntry( pdchLeedGenData, "Total gross floor area [m2]", "-" );
-
+		if ( unitsStyle == unitsStyleInchPound ) {
+			PreDefTableEntry( pdchLeedGenData, "Total gross floor area [ft2]", "-" );
+		} else {
+			PreDefTableEntry( pdchLeedGenData, "Total gross floor area [m2]", "-" );
+		}
 	}
 
 	void
@@ -7072,7 +7099,11 @@ namespace OutputReportTabular {
 
 			tableBody = "";
 			tableBody( 1, 1 ) = RealToStr( convBldgGrossFloorArea, 2 );
-			PreDefTableEntry( pdchLeedGenData, "Total gross floor area [m2]", RealToStr( convBldgGrossFloorArea, 2 ) );
+			if ( unitsStyle == unitsStyleInchPound ) {
+				PreDefTableEntry( pdchLeedGenData, "Total gross floor area [ft2]", RealToStr( convBldgGrossFloorArea, 2 ) );
+			} else {
+				PreDefTableEntry( pdchLeedGenData, "Total gross floor area [m2]", RealToStr( convBldgGrossFloorArea, 2 ) );
+			}
 			tableBody( 2, 1 ) = RealToStr( convBldgCondFloorArea, 2 );
 			tableBody( 3, 1 ) = RealToStr( convBldgGrossFloorArea - convBldgCondFloorArea, 2 );
 

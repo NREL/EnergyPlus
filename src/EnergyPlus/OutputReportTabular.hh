@@ -54,6 +54,7 @@ namespace OutputReportTabular {
 	extern int const unitsStyleJtoMJ;
 	extern int const unitsStyleJtoGJ;
 	extern int const unitsStyleInchPound;
+	extern int const unitsStyleNotFound;
 
 	extern int const isAverage;
 	extern int const isSum;
@@ -762,8 +763,18 @@ namespace OutputReportTabular {
 	void
 	GetInputTabularTimeBins();
 
+	bool
+	warningAboutKeyNotFound( int foundIndex, int inObjIndex, const std::string & moduleName );
+
 	void
 	GetInputTabularStyle();
+
+
+	int
+	SetUnitsStyleFromString(
+		std::string unitStringIn
+		);
+
 
 	void
 	GetInputTabularPredefined();
