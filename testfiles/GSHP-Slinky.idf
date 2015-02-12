@@ -3555,7 +3555,8 @@
     2,                !- Trench Spacing [m]
     15.5,             !- Kusuda-Achenbach Average Surface Temp [C]
     3.2,              !- Kusuda-Achenbach Average Surface Temp Amplitude [C]
-    8;                !- Kusuda-Achenbach Phase Shift [C]
+    8,                !- Kusuda-Achenbach Phase Shift [C]
+    10;               !- Maximum length of simulation [years] 
   
   Pump:ConstantSpeed,
     Cond Circ Pump,          !- Name

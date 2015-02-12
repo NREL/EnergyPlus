@@ -62276,7 +62276,7 @@ GroundHeatExchanger:Slinky,
         \note from this object
         \type real
         \units deltaC
-   N18; \field Kusuda-Achenbach Phase Shift of Minimum Surface 
+   N18, \field Kusuda-Achenbach Phase Shift of Minimum Surface 
         \note Temperature
         \note This is the parameter for phase shift from minimum
         \note surface temperature
@@ -62287,6 +62287,9 @@ GroundHeatExchanger:Slinky,
         \note from this object
         \type real
         \units days
+   N19; \field Maximum Length of Simulation
+        \type real
+        \units years
 
 HeatExchanger:FluidToFluid,
         \memo A fluid/fluid heat exchanger designed to couple the supply side of one loop to the demand side of another loop
