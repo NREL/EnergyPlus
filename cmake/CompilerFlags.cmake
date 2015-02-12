@@ -25,9 +25,6 @@ IF ( MSVC ) # Visual C++ (VS 2013)
     ADD_CXX_DEFINITIONS("/MP") # Enables multi-processor compilation of source within a single project
     ADD_CXX_DEFINITIONS("/W1") # Increase to /W2 then /W3 as more serious warnings are addressed
 
-    # Some third party components use windows.h so MS extensions must be allowed
-    #ADD_DEFINITIONS("/Za") # Disables MS language extensions
-
     ADD_CXX_DEFINITIONS("/wd4101 /wd4102 /wd4244 /wd4258 /wd4355 /wd4996") # Disables warning messages listed above
     ADD_CXX_DEFINITIONS("/DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
     ADD_CXX_DEFINITIONS("/DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
@@ -41,6 +38,7 @@ IF ( MSVC ) # Visual C++ (VS 2013)
     ADD_CXX_DEBUG_DEFINITIONS("/RTCsu") # Runtime checks
 
 ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # g++/Clang
+
     option(ENABLE_THREAD_SANITIZER "Enable thread sanitizer testing in gcc/clang" FALSE)
     set(LINKER_FLAGS "")
     if(ENABLE_THREAD_SANITIZER)
@@ -82,16 +80,15 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LINKER_FLAGS}")
     set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${LINKER_FLAGS}")
 
-
     # COMPILER FLAGS
     ADD_CXX_DEFINITIONS("-pipe") # Faster compiler processing
     ADD_CXX_DEFINITIONS("-std=c++11") # Enable C++11 features in g++
     ADD_CXX_DEFINITIONS("-pedantic") # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
-    ADD_CXX_DEFINITIONS("-Wall -Wextra") # Turn on warnings
+    #ADD_CXX_DEFINITIONS("-Wall -Wextra") # Turn on warnings
     ADD_CXX_DEFINITIONS("-Wno-unused-parameter -Wno-unused-variable -Wno-unused-label") # Suppress unused item warnings until more serious ones are addressed
-  IF ( CMAKE_COMPILER_IS_GNUCXX ) # g++
-    ADD_CXX_DEFINITIONS("-Wno-unused-but-set-parameter -Wno-unused-but-set-variable") # Suppress unused-but-set warnings until more serious ones are addressed
-  ENDIF ()
+    if( CMAKE_COMPILER_IS_GNUCXX ) # g++
+      ADD_CXX_DEFINITIONS("-Wno-unused-but-set-parameter -Wno-unused-but-set-variable") # Suppress unused-but-set warnings until more serious ones are addressed
+    endif()
     ADD_CXX_DEFINITIONS("-Wno-invalid-source-encoding")
     ADD_CXX_DEFINITIONS("-ffor-scope")
 
