@@ -41,12 +41,12 @@ TEST( ProcessOAControllerTest, Test1 )
 	int NumNumbers ( 7 );
 	int NumOfOAControllers( 2 );
 
-	static int StandardErrorOutput;
-	int write_stat;
-
 	// Open the Error Output File (lifted from UtilityRoutines.cc)
-	StandardErrorOutput = GetNewUnitNumber( );
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( StandardErrorOutput, DataStringGlobals::outputErrFileName, flags ); write_stat = flags.ios( ); }
+	int StandardErrorOutput = GetNewUnitNumber( );
+	IOFlags flags;
+	flags.ACTION( "write" );
+	gio::open( StandardErrorOutput, DataStringGlobals::outputErrFileName, flags );
+	int write_stat = flags.ios( );
 
 	cCurrentModuleObject = "Controller:OutdoorAir";
 	OAController.allocate( NumOfOAControllers );
@@ -147,4 +147,14 @@ TEST( ProcessOAControllerTest, Test1 )
 	EXPECT_FALSE( ErrorsFound );
 	EXPECT_EQ( 4, OAController( 2 ).OANode );
 	EXPECT_FALSE( CheckOutAirNodeNumber( OAController( 2 ).OANode ) );
+
+	OAController.deallocate();
+	OutsideAirNodeList.deallocate();
+
+	lNumericFieldBlanks.deallocate();
+	lAlphaFieldBlanks.deallocate();
+	cAlphaFieldNames.deallocate();
+	cNumericFieldNames.deallocate();
+	cAlphaArgs.deallocate();
+	rNumericArgs.deallocate();
 }
