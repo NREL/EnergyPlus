@@ -193,7 +193,8 @@ namespace ReportSizingManager {
 		// SystemCapacitySizing( 21 ); // request sizing for system capacity
 		// CoolingSHRSizing( 22 ); // request sizing for cooling SHR (DataFlowUsedForSizing, DataCapacityUsedForSizing)
 		// HeatingDefrostSizing( 23 ); // request sizing for heating defrost capacity
-		// AutoCalculateSizing ( 24 ); // identifies an autocalulate input
+		// MaxHeaterOutletTempSizing( 24 ); // request sizing for heating coil maximum outlet temperature
+		// AutoCalculateSizing ( 25 ); // identifies an autocalulate input
 		//
 		// GLOBAL VARIABLES (previously used as optional arguments):
 		// (other global variables may be added as needed)
@@ -418,7 +419,7 @@ namespace ReportSizingManager {
 		}
 
 		if ( SizingType == AutoCalculateSizing ) {
-			if ( DataConstantUsedForSizing > 0.0 && DataFractionUsedForSizing > 0.0 ) {
+			if ( DataFractionUsedForSizing > 0.0 ) {
 				AutosizeDes = DataConstantUsedForSizing * DataFractionUsedForSizing;
 				HardSizeNoDesRun = false;
 			} else {
@@ -1106,6 +1107,8 @@ namespace ReportSizingManager {
 							ShowContinueError( "  the zone heating design supply air temperature" );
 						}
 					}
+				} else if (SizingType == MaxHeaterOutletTempSizing) {
+					AutosizeDes = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
 				} else {
 					// should never happen
 				}
@@ -1686,6 +1689,8 @@ namespace ReportSizingManager {
 							ShowContinueError( "  the system heating design supply air temperature" );
 						}
 					}
+				} else if (SizingType == MaxHeaterOutletTempSizing) {
+					AutosizeDes = FinalSysSizing( CurSysNum ).HeatSupTemp;
 				}
 			}
 		} else {
@@ -1750,14 +1755,14 @@ namespace ReportSizingManager {
 			}
 			}
 		}
-		if ( PrintWarningFlag ) {
+//		if ( PrintWarningFlag ) { // these special if tests inside here are only executed when PrintWarningFlag is true, but we might want to get the size without printing
 			if ( !HardSizeNoDesRun || DataScalableSizingON || DataScalableCapSizingON ) {
 				if ( IsAutoSize ) { // Design Size values are available for both autosized and hard - sized
 					// check capacity to make sure design volume flow per total capacity is within range
 					if ( DataIsDXCoil && ( SizingType == CoolingCapacitySizing || SizingType == HeatingCapacitySizing ) ) {
 						RatedVolFlowPerRatedTotCap = DesVolFlow / SizingResult;
 						if ( RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap( DXCT ) ) {
-							if ( !DataEMSOverride && DisplayExtraWarnings ) {
+							if ( !DataEMSOverride && DisplayExtraWarnings && PrintWarningFlag ) {
 								ShowWarningError( CallingRoutine + ' ' + CompType + ' ' + CompName );
 								ShowContinueError( "..." + SizingString + " will be limited by the minimum rated volume flow per rated total capacity ratio." );
 								ShowContinueError( "...DX coil volume flow rate (m3/s ) = " + TrimSigDigits( DesVolFlow, 6 ) );
@@ -1766,11 +1771,11 @@ namespace ReportSizingManager {
 								ShowContinueError( "...Minimum flow/capacity ratio (m3/s/W ) = " + TrimSigDigits( MinRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
 							}
 							SizingResult = DesVolFlow / MinRatedVolFlowPerRatedTotCap( DXCT );
-							if ( !DataEMSOverride && DisplayExtraWarnings ) {
+							if ( !DataEMSOverride && DisplayExtraWarnings && PrintWarningFlag ) {
 								ShowContinueError( "...Adjusted capacity ( W ) = " + TrimSigDigits( SizingResult, 3 ) );
 							}
 						} else if ( RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap( DXCT ) ) {
-							if ( !DataEMSOverride && DisplayExtraWarnings ) {
+							if ( !DataEMSOverride && DisplayExtraWarnings && PrintWarningFlag ) {
 								ShowWarningError( CallingRoutine + ' ' + CompType + ' ' + CompName );
 								ShowContinueError( "..." + SizingString + " will be limited by the maximum rated volume flow per rated total capacity ratio." );
 								ShowContinueError( "...DX coil volume flow rate ( m3/s ) = " + TrimSigDigits( DesVolFlow, 6 ) );
@@ -1779,13 +1784,13 @@ namespace ReportSizingManager {
 								ShowContinueError( "...Maximum flow/capacity ratio ( m3/s/W ) = " + TrimSigDigits( MaxRatedVolFlowPerRatedTotCap( DXCT ), 3 ) );
 							}
 							SizingResult = DesVolFlow / MaxRatedVolFlowPerRatedTotCap( DXCT );
-							if ( !DataEMSOverride && DisplayExtraWarnings ) {
+							if ( !DataEMSOverride && DisplayExtraWarnings && PrintWarningFlag ) {
 								ShowContinueError( "...Adjusted capacity ( W ) = " + TrimSigDigits( SizingResult, 3 ) );
 							}
 							AutosizeDes = SizingResult;
 						}
 					}
-					if ( DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 ) {
+					if ( DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 && PrintWarningFlag ) {
 						if (  SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil  ) {
 							ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString, AutosizeUser );
 							SizingResult *= (  1 - DataBypassFrac  ); // now apply bypass fraction for second message and remaining simulation calcs
@@ -1794,7 +1799,7 @@ namespace ReportSizingManager {
 						} else {
 							ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString, AutosizeUser );
 						}
-						if ( DisplayExtraWarnings ) {
+						if ( DisplayExtraWarnings && PrintWarningFlag ) {
 							if ( ( std::abs( AutosizeDes - AutosizeUser ) / AutosizeUser ) > AutoVsHardSizingThreshold ) {
 								ShowMessage( CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName );
 								ShowContinueError( "User-Specified " + SizingString + " = " + RoundSigDigits( AutosizeUser, 5 ) );
@@ -1803,7 +1808,7 @@ namespace ReportSizingManager {
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
 						}
-					} else if ( ( DataScalableSizingON || DataScalableCapSizingON ) && AutosizeDes > 0.0 ) {
+					} else if ( ( DataScalableSizingON || DataScalableCapSizingON ) && AutosizeDes > 0.0 && PrintWarningFlag ) {
 						if (SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") && SizingType == CoolingAirflowSizing  && DataIsDXCoil) {
 							if ( DataAutosizable ) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
 							SizingResult *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remaining simulation calcs
@@ -1812,16 +1817,16 @@ namespace ReportSizingManager {
 							if ( DataAutosizable ) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
 						}
 					} else {
-						if ( SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil  ) {
+						if ( SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil && PrintWarningFlag ) {
 							if ( DataAutosizable ) ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, SizingResult );
 							SizingResult *= (  1 - DataBypassFrac  ); // now apply bypass fraction for second message and remaining simulation calcs
 							if ( DataAutosizable ) ReportSizingOutput( CompType, CompName, "Design Size " + SizingString + " ( non-bypassed )", SizingResult );
 						} else {
-							if ( DataAutosizable ) ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, SizingResult );
+							if ( DataAutosizable && PrintWarningFlag ) ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, SizingResult );
 						}
 					}
 				} else {
-					if ( DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 ) {
+					if ( DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 && PrintWarningFlag ) {
 						ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString, AutosizeUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( AutosizeDes - AutosizeUser ) / AutosizeUser ) > AutoVsHardSizingThreshold ) {
@@ -1832,7 +1837,7 @@ namespace ReportSizingManager {
 								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
 						}
-					} else if ( ( DataScalableSizingON || DataScalableCapSizingON ) && AutosizeDes > 0.0 ) {
+					} else if ( ( DataScalableSizingON || DataScalableCapSizingON ) && AutosizeDes > 0.0 && PrintWarningFlag ) {
 						if (SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") && SizingType == CoolingAirflowSizing  && DataIsDXCoil) {
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
 							SizingResult *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remaining simulation calcs
@@ -1840,7 +1845,7 @@ namespace ReportSizingManager {
 						} else {
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
 						}
-					} else if ( ( DataScalableSizingON || DataScalableCapSizingON ) && AutosizeUser > 0.0) {
+					} else if ( ( DataScalableSizingON || DataScalableCapSizingON ) && AutosizeUser > 0.0 && PrintWarningFlag ) {
 						if (SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") && SizingType == CoolingAirflowSizing  && DataIsDXCoil) {
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
 							SizingResult *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remaining simulation calcs
@@ -1849,19 +1854,19 @@ namespace ReportSizingManager {
 							if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
 						}
 					} else {
-						if ( SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil ) {
+						if ( SameString( CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) && SizingType == CoolingAirflowSizing  && DataIsDXCoil && PrintWarningFlag ) {
 							if ( DataAutosizable ) ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString, SizingResult );
 							SizingResult *= ( 1 - DataBypassFrac ); // now apply bypass fraction for second message and remaining simulation calcs
 							if ( DataAutosizable ) ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString + " (non-bypassed)", SizingResult );
 						} else {
-							if ( DataAutosizable ) ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString, SizingResult );
+							if ( DataAutosizable && PrintWarningFlag ) ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString, SizingResult );
 						}
 					}
 				}
 //			} else {
 //				eventually move hardsize reporting here? [up in calcs, 3 places at e.g., if ( !IsAutoSize && !SizingDesRunThisAirSys )]
 			}
-		}
+//		}
 	}
 
 	//     NOTICE

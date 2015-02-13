@@ -40,7 +40,7 @@ namespace DataHVACGlobals {
 	Real64 const RetTempMin( -30.0 ); // minimum return air temperature [deg C]
 
 	// Number of Sizing types from list below
-	int const NumOfSizingTypes( 24 ); // number of sizing types
+	int const NumOfSizingTypes( 25 ); // number of sizing types
 
 	// Sizing types
 	int const CoolingAirflowSizing( 1 ); // request sizing for cooling air flow rate
@@ -66,7 +66,8 @@ namespace DataHVACGlobals {
 	int const SystemCapacitySizing( 21 ); // request sizing for system capacity
 	int const CoolingSHRSizing( 22 ); // request sizing for cooling SHR
 	int const HeatingDefrostSizing( 23 ); // request sizing for heating defrost capacity
-	int const AutoCalculateSizing ( 24 ); // identifies an autocalulate input
+	int const MaxHeaterOutletTempSizing( 24 ); // request sizing for heating coil maximum outlet temperature
+	int const AutoCalculateSizing ( 25 ); // identifies an autocalulate input
 
 	// Condenser Type (using same numbering scheme as for chillers)
 	int const AirCooled( 1 ); // Air-cooled condenser

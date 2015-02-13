@@ -1813,6 +1813,36 @@ namespace HVACUnitarySystem {
 		int HeatingSAFlowMethod; // Sizing type for UnitarySystem Heating coil
 //		int SAFMethod( 0 ); // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
 
+		// References
+		ZoneEqSizingData * select_EqSizing( nullptr );
+
+		//sweep specific data into one pointer to avoid if statements throughout this subroutine
+		if( CurOASysNum > 0 ) {
+			select_EqSizing = &OASysEqSizing( CurOASysNum );
+		} else if( CurSysNum > 0 ) {
+			select_EqSizing = &UnitarySysEqSizing( CurSysNum );
+		} else if( CurZoneEqNum > 0 ) {
+			select_EqSizing = &ZoneEqSizing( CurZoneEqNum );
+		} else {
+			assert( false );
+		}
+		// Object Data, points to specific array
+		ZoneEqSizingData & EqSizing( *select_EqSizing );
+
+		// can't hurt to initialize these going in, problably redundant
+		EqSizing.AirFlow = false;
+		EqSizing.CoolingAirFlow = false;
+		EqSizing.HeatingAirFlow = false;
+		EqSizing.AirVolFlow = 0.0;
+		EqSizing.CoolingAirVolFlow = 0.0;
+		EqSizing.HeatingAirVolFlow = 0.0;
+		EqSizing.Capacity = false;
+		EqSizing.CoolingCapacity = false;
+		EqSizing.HeatingCapacity = false;
+		EqSizing.DesCoolingLoad = 0.0;
+		EqSizing.DesHeatingLoad = 0.0;
+
+
 		ManageEMS( emsCallFromUnitarySystemSizing ); // calling point
 
 		CompName = UnitarySystem( UnitarySysNum ).Name;
@@ -1835,26 +1865,11 @@ namespace HVACUnitarySystem {
 		HeatCapAtPeak = 0.0;
 		SupFanNum = 0;
 
-		//  IF(UnitarySystem(UnitarySysNum)%CoolCoilExists)THEN
-		//    IF(
-		//    UnitarySystem(UnitarySysNum)%DesignCoolingCapacity =    &
-		//     GetWaterHXAssistedCoilCapacity(CoolingCoilType,CoolingCoilName,ErrFlag)
-		//    IF(UnitarySystem(UnitarySysNum)%DesignCoolingCapacity == AutoSize) &
-		//        UnitarySystem(UnitarySysNum)%RequestAutosize = .TRUE.
-		//    IF (ErrFlag) THEN
-		//      CALL ShowContinueError('Occurs in '//TRIM(CurrentModuleObject)//' = '//TRIM(UnitarySystem(UnitarySysNum)%Name))
-		//      ErrorsFound=.TRUE.
-		//    END IF
-		//  END IF
-
 		if ( ( CurOASysNum > 0 || CurSysNum > 0 ) && UnitarySystem( UnitarySysNum ).RequestAutoSize ) {
 			CheckSysSizing( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name );
 		} else if ( CurZoneEqNum > 0 ) {
 			CheckZoneSizing( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name );
 		}
-
-		if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-		if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
 
 		if ( CurSysNum > 0 && CurOASysNum == 0 && UnitarySystem( UnitarySysNum ).FanExists ) {
 			PrimaryAirSystem( CurSysNum ).SupFanNum = UnitarySystem( UnitarySysNum ).FanIndex;
@@ -1874,23 +1889,12 @@ namespace HVACUnitarySystem {
 			} else if ( CoolingSAFlowMethod == FlowPerFloorArea ) {
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 				SysCoolingFlow = TempSize;
-				//				UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
-				if ( CurOASysNum > 0 ) {
-					OASysEqSizing( CurOASysNum ).AirFlow = true;
-					OASysEqSizing( CurOASysNum ).AirVolFlow = SysCoolingFlow;
-				} else if ( CurSysNum > 0 ) {
-					UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-					UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysCoolingFlow;
-				} else {
-					ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-					ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysCoolingFlow;
-				}
+				UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
 			} else if ( CoolingSAFlowMethod == FractionOfAutoSizedCoolingValue ) {
 				TempSize = AutoSize;
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 				SysCoolingFlow = TempSize * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-//				UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
-//				UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+				UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
 			} else if ( CoolingSAFlowMethod == FlowPerCoolingCapacity ) {
 				if ( UnitarySystem( UnitarySysNum ).DesignCoolingCapacity == AutoSize ) {
 					TempSize = AutoSize;
@@ -1898,37 +1902,46 @@ namespace HVACUnitarySystem {
 					SizingMethod = CoolingCapacitySizing;
 					DataFlowUsedForSizing = TempSize;
 					TempSize = AutoSize;
-//					DataFracOfAutosizedCoolingCapacity = 1.0; This is set to 1 in ReportSizingManger, why?
 					if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
 						DataTotCapCurveIndex = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
+						DataIsDXCoil = true;
 					}
 					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 					CoolCapAtPeak = TempSize;
 					SysCoolingFlow = TempSize * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
 					DataTotCapCurveIndex = 0;
-					if ( CurOASysNum > 0 ) {
-						OASysEqSizing( CurOASysNum ).Capacity = true;
-						OASysEqSizing( CurOASysNum ).CoolingCapacity = true;
-						OASysEqSizing( CurOASysNum ).DesCoolingLoad = CoolCapAtPeak;
-					} else if ( CurSysNum > 0 ) {
-						UnitarySysEqSizing( CurSysNum ).Capacity = true;
-						UnitarySysEqSizing( CurSysNum ).CoolingCapacity = true;
-						UnitarySysEqSizing( CurSysNum ).DesCoolingLoad = CoolCapAtPeak;
-					} else {
-						ZoneEqSizing( CurZoneEqNum ).Capacity = true;
-						ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
-						ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = CoolCapAtPeak;
-					}
+					EqSizing.CoolingCapacity = true;
+					EqSizing.DesCoolingLoad = CoolCapAtPeak;
 				} else {
 					SysCoolingFlow = UnitarySystem( UnitarySysNum ).DesignCoolingCapacity * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
 					CoolCapAtPeak = UnitarySystem( UnitarySysNum ).DesignCoolingCapacity;
 				}
+				UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
 			} else {
 				// should never happen
 				ShowSevereError( RoutineName + ": " + CompType + " = " + CompName );
 				ShowContinueError( "Illegal entry for Cooling Supply Air Flow Rate Method." );
 			}
+
+			EqSizing.CoolingAirFlow = true;
+			EqSizing.CoolingAirVolFlow = SysCoolingFlow;
+
+// Cooling airflow should be known at this point. Now find autosized design cooling capacity.
+			if ( CoolingSAFlowMethod != FlowPerCoolingCapacity ) {
+				SizingMethod = CoolingCapacitySizing;
+				DataFlowUsedForSizing = SysCoolingFlow;
+				TempSize = AutoSize;
+				if( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+					DataTotCapCurveIndex = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
+					DataIsDXCoil = true;
+				}
+				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+				CoolCapAtPeak = TempSize;
+				EqSizing.CoolingCapacity = true;
+				EqSizing.DesCoolingLoad = CoolCapAtPeak;
+			}
 		}
+
 		if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
 			// **************
 			FieldNum = 7;	// N7 , \field Heating Supply Air Flow Rate
@@ -1942,13 +1955,12 @@ namespace HVACUnitarySystem {
 			} else if ( HeatingSAFlowMethod == FlowPerFloorArea ) {
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 				SysHeatingFlow = TempSize;
-				//				UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+				UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
 			} else if ( HeatingSAFlowMethod == FractionOfAutoSizedHeatingValue ) {
 				TempSize = AutoSize;
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 				SysHeatingFlow = TempSize * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-//				UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
-//				UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+				UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
 			} else if ( HeatingSAFlowMethod == FlowPerHeatingCapacity ) {
 				TempSize = AutoSize;
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
@@ -1964,932 +1976,876 @@ namespace HVACUnitarySystem {
 				AirLoopControlInfo( AirLoopNum ).UnitarySysSimulating = true;
 				HeatCapAtPeak = TempSize;
 				SysHeatingFlow = TempSize * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+				UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
 				DataTotCapCurveIndex = 0;
-				if ( CurOASysNum > 0 ) {
-					OASysEqSizing( CurOASysNum ).Capacity = true;
-					OASysEqSizing( CurOASysNum ).HeatingCapacity = true;
-					OASysEqSizing( CurOASysNum ).DesHeatingLoad = HeatCapAtPeak;
-				} else if ( CurSysNum > 0 ) {
-					UnitarySysEqSizing( CurSysNum ).Capacity = true;
-					UnitarySysEqSizing( CurSysNum ).HeatingCapacity = true;
-					UnitarySysEqSizing( CurSysNum ).DesHeatingLoad = HeatCapAtPeak;
-				} else {
-					ZoneEqSizing( CurZoneEqNum ).Capacity = true;
-					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = HeatCapAtPeak;
-				}
+				EqSizing.HeatingCapacity = true;
+				EqSizing.DesHeatingLoad = HeatCapAtPeak;
 			} else {
 				// should never happen
 				ShowSevereError( RoutineName + ": " + CompType + " = " + CompName );
 				ShowContinueError( "Illegal entry for Heating Supply Air Flow Rate Method." );
 			}
+
+			EqSizing.HeatingAirFlow = true;
+			EqSizing.HeatingAirVolFlow = SysHeatingFlow;
+
+// Cooling airflow should be known at this point. Now find autosized design cooling capacity.
+			if ( HeatingSAFlowMethod != FlowPerHeatingCapacity ) {
+				SizingMethod = HeatingCapacitySizing;
+				DataFlowUsedForSizing = SysHeatingFlow;
+				TempSize = AutoSize;
+				if( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating ) {
+					DataTotCapCurveIndex = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
+					DataIsDXCoil = true;
+				}
+				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+				HeatCapAtPeak = TempSize;
+				EqSizing.HeatingCapacity = true;
+				EqSizing.DesHeatingLoad = HeatCapAtPeak;
+			}
 		}
 
-		if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && ! UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-			if ( CurOASysNum > 0 ) {
-				OASysEqSizing( CurOASysNum ).AirFlow = true;
-				OASysEqSizing( CurOASysNum ).AirVolFlow = SysCoolingFlow;
-				OASysEqSizing( CurOASysNum ).CoolingAirFlow = true;
-				OASysEqSizing( CurOASysNum ).CoolingAirVolFlow = SysCoolingFlow;
-			} else if ( CurSysNum > 0 ) {
-				UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-				UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysCoolingFlow;
-				UnitarySysEqSizing( CurSysNum ).CoolingAirFlow = true;
-				UnitarySysEqSizing( CurSysNum ).CoolingAirVolFlow = SysCoolingFlow;
-			} else {
-				ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-				ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysCoolingFlow;
-				ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = true;
-				ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = SysCoolingFlow;
-			}
-		} else if ( UnitarySystem( UnitarySysNum ).HeatCoilExists && ! UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
-			if ( CurOASysNum > 0 ) {
-				OASysEqSizing( CurOASysNum ).AirFlow = true;
-				OASysEqSizing( CurOASysNum ).AirVolFlow = SysHeatingFlow;
-				OASysEqSizing( CurOASysNum ).HeatingAirFlow = true;
-				OASysEqSizing( CurOASysNum ).HeatingAirVolFlow = SysHeatingFlow;
-			} else if ( CurSysNum > 0 ) {
-				UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-				UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysHeatingFlow;
-				UnitarySysEqSizing( CurSysNum ).HeatingAirFlow = true;
-				UnitarySysEqSizing( CurSysNum ).HeatingAirVolFlow = SysHeatingFlow;
-			} else {
-				ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-				ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysHeatingFlow;
-				ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow = true;
-				ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow = SysHeatingFlow;
-			}
-		} else if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-			if ( CurOASysNum > 0 ) {
-				OASysEqSizing( CurOASysNum ).AirFlow = true;
-				OASysEqSizing( CurOASysNum ).AirVolFlow = max ( SysCoolingFlow, SysHeatingFlow );
-				if ( UnitarySystem( UnitarySysNum ).HeatPump && CoolingSAFlowMethod == FlowPerCoolingCapacity) {
-					OASysEqSizing( CurOASysNum ).Capacity = true;
-					OASysEqSizing( CurOASysNum ).CoolingCapacity = true;
-					OASysEqSizing( CurOASysNum ).DesCoolingLoad = max( CoolCapAtPeak, HeatCapAtPeak );
-				}
-				if ( UnitarySystem( UnitarySysNum ).HeatPump && HeatingSAFlowMethod == FlowPerHeatingCapacity) {
-					OASysEqSizing( CurOASysNum ).Capacity = true;
-					OASysEqSizing( CurOASysNum ).HeatingCapacity = true;
-					OASysEqSizing( CurOASysNum ).DesHeatingLoad = max( CoolCapAtPeak, HeatCapAtPeak );
-				}
-			} else if ( CurSysNum > 0 ) {
-				UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-				UnitarySysEqSizing( CurSysNum ).AirVolFlow = max ( SysCoolingFlow, SysHeatingFlow );
-				if ( UnitarySystem( UnitarySysNum ).HeatPump && CoolingSAFlowMethod == FlowPerCoolingCapacity) {
-					UnitarySysEqSizing( CurSysNum ).Capacity = true;
-					UnitarySysEqSizing( CurSysNum ).CoolingCapacity = true;
-					UnitarySysEqSizing( CurSysNum ).DesCoolingLoad = max( CoolCapAtPeak, HeatCapAtPeak );
-				}
-				if ( UnitarySystem( UnitarySysNum ).HeatPump && HeatingSAFlowMethod == FlowPerHeatingCapacity) {
-					UnitarySysEqSizing( CurSysNum ).Capacity = true;
-					UnitarySysEqSizing( CurSysNum ).HeatingCapacity = true;
-					UnitarySysEqSizing( CurSysNum ).DesHeatingLoad = max( CoolCapAtPeak, HeatCapAtPeak );
-				}
-			} else {
-				ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-				ZoneEqSizing( CurZoneEqNum ).AirVolFlow = max ( SysCoolingFlow, SysHeatingFlow );
-				if ( UnitarySystem( UnitarySysNum ).HeatPump && CoolingSAFlowMethod == FlowPerCoolingCapacity) {
-					ZoneEqSizing( CurZoneEqNum ).Capacity = true;
-					ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
-					ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = max( CoolCapAtPeak, HeatCapAtPeak );
-				}
-				if ( UnitarySystem( UnitarySysNum ).HeatPump && HeatingSAFlowMethod == FlowPerHeatingCapacity) {
-					ZoneEqSizing( CurZoneEqNum ).Capacity = true;
-					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = max( CoolCapAtPeak, HeatCapAtPeak );
-				}
-			}
-			ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Cooling Supply Air Flow Rate [m3/s]", SysCoolingFlow );
-			ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Heating Supply Air Flow Rate [m3/s]", SysHeatingFlow );
-			ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Cooling Capacity [W]", CoolCapAtPeak );
-			ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Heating Capacity [W]", HeatCapAtPeak );
+		if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
+			EqSizing.AirFlow = true;
+			EqSizing.AirVolFlow = max( SysCoolingFlow, SysHeatingFlow );
+			EqSizing.Capacity = true;
+			EqSizing.DesCoolingLoad = max( CoolCapAtPeak, HeatCapAtPeak );
+			EqSizing.DesHeatingLoad = max( CoolCapAtPeak, HeatCapAtPeak );
 		}
-		// **************
+		ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Cooling Supply Air Flow Rate [m3/s]", SysCoolingFlow );
+		ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Heating Supply Air Flow Rate [m3/s]", SysHeatingFlow );
+		ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Cooling Capacity [W]", CoolCapAtPeak );
+		ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Heating Capacity [W]", HeatCapAtPeak );
+
+		if ( UnitarySystem( UnitarySysNum ).HeatPump ) {
+			SysCoolingFlow = max( SysCoolingFlow, SysHeatingFlow );
+			SysHeatingFlow = SysCoolingFlow;
+			DXCoolCap = EqSizing.DesCoolingLoad;
+		}
 
 
-		if( UnitarySystem( UnitarySysNum ).RequestAutoSize ) {
-
-			if ( CurOASysNum > 0 ) {
-				//    CALL CheckSysSizing(UnitarySystem(UnitarySysNum)%UnitarySystemType, UnitarySystem(UnitarySysNum)%Name)
-				if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && ! UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-					{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).CoolingSAFMethod );
-					if ( ( SELECT_CASE_var == SupplyAirFlowRate ) || ( SELECT_CASE_var == None ) ) {
-						if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
-							SysCoolingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-						} else {
-							SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-						}
-						OASysEqSizing( CurOASysNum ).AirFlow = true;
-						OASysEqSizing( CurOASysNum ).AirVolFlow = SysCoolingFlow;
-					} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
-						SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
-						OASysEqSizing( CurOASysNum ).AirFlow = true;
-						OASysEqSizing( CurOASysNum ).AirVolFlow = SysCoolingFlow;
-					} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
-						SysCoolingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
-						OASysEqSizing( CurOASysNum ).AirFlow = true;
-						OASysEqSizing( CurOASysNum ).AirVolFlow = SysCoolingFlow;
-					} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) {
-						VolFlowRate = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-						MixTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
-						MixHumRat = FinalSysSizing( CurSysNum ).CoolOutHumRat;
-						SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
-						SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
-						OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
-						rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
-						MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
-						if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-							CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
-							TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
-						} else {
-							TotCapTempModFac = 1.0;
-						}
-						CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
-						if ( TotCapTempModFac > 0.0 ) {
-							CoolCapAtPeak /= TotCapTempModFac;
-						}
-						SysCoolingFlow = CoolCapAtPeak * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
-						OASysEqSizing( CurOASysNum ).AirFlow = true;
-						OASysEqSizing( CurOASysNum ).AirVolFlow = SysCoolingFlow;
-						OASysEqSizing( CurOASysNum ).Capacity = true;
-						OASysEqSizing( CurOASysNum ).DesCoolingLoad = CoolCapAtPeak;
-					} else {
-						if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
-							SysCoolingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-						} else {
-							SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-						}
-					}}
-				} else if ( UnitarySystem( UnitarySysNum ).HeatCoilExists && ! UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
-					{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).HeatingSAFMethod );
-					if ( ( SELECT_CASE_var == SupplyAirFlowRate ) || ( SELECT_CASE_var == None ) ) {
-						if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
-							SysHeatingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-						} else {
-							SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-						}
-						OASysEqSizing( CurOASysNum ).AirFlow = true;
-						OASysEqSizing( CurOASysNum ).AirVolFlow = SysHeatingFlow;
-					} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
-						SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
-						OASysEqSizing( CurOASysNum ).AirFlow = true;
-						OASysEqSizing( CurOASysNum ).AirVolFlow = SysHeatingFlow;
-					} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
-						SysHeatingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
-						OASysEqSizing( CurOASysNum ).AirFlow = true;
-						OASysEqSizing( CurOASysNum ).AirVolFlow = SysHeatingFlow;
-					} else if ( SELECT_CASE_var == FlowPerHeatingCapacity ) {
-						VolFlowRate = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-						MixTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
-						MixHumRat = FinalSysSizing( CurSysNum ).HeatOutHumRat;
-						SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
-						SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
-						OutTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
-						rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
-						MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
-						if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
-							CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
-							TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
-						} else {
-							TotCapTempModFac = 1.0;
-						}
-						HeatCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( SupEnth - MixEnth ) ) );
-						if ( TotCapTempModFac > 0.0 ) {
-							HeatCapAtPeak /= TotCapTempModFac;
-						}
-						SysHeatingFlow = HeatCapAtPeak * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
-						OASysEqSizing( CurOASysNum ).AirFlow = true;
-						OASysEqSizing( CurOASysNum ).AirVolFlow = SysCoolingFlow;
-						OASysEqSizing( CurOASysNum ).Capacity = true;
-						OASysEqSizing( CurOASysNum ).DesCoolingLoad = HeatCapAtPeak;
-					} else {
-						if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
-							SysHeatingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-						} else {
-							SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-						}
-						OASysEqSizing( CurOASysNum ).AirFlow = true;
-						OASysEqSizing( CurOASysNum ).AirVolFlow = SysCoolingFlow;
-					}}
-				} else { // Cooling and Heating coil are present
-					{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).CoolingSAFMethod );
-					if ( ( SELECT_CASE_var == SupplyAirFlowRate ) || ( SELECT_CASE_var == None ) ) {
-						if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
-							SysCoolingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-						} else {
-							SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-						}
-						OASysEqSizing( CurOASysNum ).AirFlow = true;
-					} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
-						SysCoolingFlow = max( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow, UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow );
-						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
-						OASysEqSizing( CurOASysNum ).AirFlow = true;
-					} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
-						SysCoolingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow * max( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow, UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow );
-						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = SysCoolingFlow;
-						OASysEqSizing( CurOASysNum ).AirFlow = true;
-					} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) {
-						VolFlowRate = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-						MixTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
-						MixHumRat = FinalSysSizing( CurSysNum ).CoolOutHumRat;
-						SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
-						SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
-						OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
-						rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
-						MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
-						if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-							CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
-							TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
-						} else {
-							TotCapTempModFac = 1.0;
-						}
-						CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
-						if ( TotCapTempModFac > 0.0 ) {
-							CoolCapAtPeak /= TotCapTempModFac;
-						}
-						SysCoolingFlow = CoolCapAtPeak * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
-						OASysEqSizing( CurOASysNum ).AirFlow = true;
-						OASysEqSizing( CurOASysNum ).Capacity = true;
-					} else {
-						if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
-							SysCoolingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-						} else {
-							SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-						}
-						OASysEqSizing( CurOASysNum ).AirFlow = true;
-					}}
-					{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).HeatingSAFMethod );
-					if ( ( SELECT_CASE_var == SupplyAirFlowRate ) || ( SELECT_CASE_var == None ) ) {
-						if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
-							SysHeatingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-						} else {
-							SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-						}
-						OASysEqSizing( CurOASysNum ).AirFlow = true;
-					} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
-						SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
-						OASysEqSizing( CurOASysNum ).AirFlow = true;
-					} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
-						SysHeatingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = SysHeatingFlow;
-						OASysEqSizing( CurOASysNum ).AirFlow = true;
-					} else if ( SELECT_CASE_var == FlowPerHeatingCapacity ) {
-						VolFlowRate = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-						MixTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
-						MixHumRat = FinalSysSizing( CurSysNum ).HeatOutHumRat;
-						SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
-						SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
-						OutTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
-						rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
-						MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
-						if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
-							CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
-							TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
-						} else {
-							TotCapTempModFac = 1.0;
-						}
-						HeatCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( SupEnth - MixEnth ) ) );
-						if ( TotCapTempModFac > 0.0 ) {
-							HeatCapAtPeak /= TotCapTempModFac;
-						}
-						SysHeatingFlow = HeatCapAtPeak * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
-						OASysEqSizing( CurOASysNum ).AirFlow = true;
-						OASysEqSizing( CurOASysNum ).Capacity = true;
-					} else {
-						if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
-							SysHeatingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-						} else {
-							SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-						}
-						OASysEqSizing( CurOASysNum ).AirFlow = true;
-					}}
-					OASysEqSizing( CurOASysNum ).AirVolFlow = max( SysCoolingFlow, SysHeatingFlow );
-					OASysEqSizing( CurOASysNum ).DesHeatingLoad = max( CoolCapAtPeak, HeatCapAtPeak );
-				}
-			} else {
-
-				if ( CurSysNum > 0 ) {
-
-					//      CALL CheckSysSizing(UnitarySystem(UnitarySysNum)%UnitarySystemType, UnitarySystem(UnitarySysNum)%Name)
-
-					if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && ! UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-						{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).CoolingSAFMethod );
-						if ( ( SELECT_CASE_var == SupplyAirFlowRate ) || ( SELECT_CASE_var == None ) ) {
-							// **************
-							SizingMethod = CoolingAirflowSizing;
-							CompName = UnitarySystem( UnitarySysNum ).Name;
-							FieldNum = 3;
-							PrintFlag = false;
-							TempSize = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-							SizingString = UnitarySystemNumericFields( UnitarySysNum ).FieldNames( FieldNum ) + " [m3/s]";
-							CompType = UnitarySystem( UnitarySysNum ).UnitarySystemType;
-							RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-							SysCoolingFlow = TempSize;
-							// **************
-//							if( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
+//		if( UnitarySystem( UnitarySysNum ).RequestAutoSize ) {
+//
+//			if ( CurOASysNum > 0 ) {
+//				//    CALL CheckSysSizing(UnitarySystem(UnitarySysNum)%UnitarySystemType, UnitarySystem(UnitarySysNum)%Name)
+//				if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && ! UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
+//					{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).CoolingSAFMethod );
+//					if ( ( SELECT_CASE_var == SupplyAirFlowRate ) || ( SELECT_CASE_var == None ) ) {
+//						if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
+//							SysCoolingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+//						} else {
+//							SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//						}
+//						OASysEqSizing( CurOASysNum ).AirFlow = true;
+//						OASysEqSizing( CurOASysNum ).AirVolFlow = SysCoolingFlow;
+//					} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
+//						SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
+//						OASysEqSizing( CurOASysNum ).AirFlow = true;
+//						OASysEqSizing( CurOASysNum ).AirVolFlow = SysCoolingFlow;
+//					} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
+//						SysCoolingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
+//						OASysEqSizing( CurOASysNum ).AirFlow = true;
+//						OASysEqSizing( CurOASysNum ).AirVolFlow = SysCoolingFlow;
+//					} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) {
+//						VolFlowRate = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+//						MixTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
+//						MixHumRat = FinalSysSizing( CurSysNum ).CoolOutHumRat;
+//						SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
+//						SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
+//						OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
+//						rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
+//						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+//						MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
+//						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+//						if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+//							CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
+//							TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
+//						} else {
+//							TotCapTempModFac = 1.0;
+//						}
+//						CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
+//						if ( TotCapTempModFac > 0.0 ) {
+//							CoolCapAtPeak /= TotCapTempModFac;
+//						}
+//						SysCoolingFlow = CoolCapAtPeak * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
+//						OASysEqSizing( CurOASysNum ).AirFlow = true;
+//						OASysEqSizing( CurOASysNum ).AirVolFlow = SysCoolingFlow;
+//						OASysEqSizing( CurOASysNum ).Capacity = true;
+//						OASysEqSizing( CurOASysNum ).DesCoolingLoad = CoolCapAtPeak;
+//					} else {
+//						if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
+//							SysCoolingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+//						} else {
+//							SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//						}
+//					}}
+//				} else if ( UnitarySystem( UnitarySysNum ).HeatCoilExists && ! UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
+//					{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).HeatingSAFMethod );
+//					if ( ( SELECT_CASE_var == SupplyAirFlowRate ) || ( SELECT_CASE_var == None ) ) {
+//						if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
+//							SysHeatingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+//						} else {
+//							SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//						}
+//						OASysEqSizing( CurOASysNum ).AirFlow = true;
+//						OASysEqSizing( CurOASysNum ).AirVolFlow = SysHeatingFlow;
+//					} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
+//						SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+//						OASysEqSizing( CurOASysNum ).AirFlow = true;
+//						OASysEqSizing( CurOASysNum ).AirVolFlow = SysHeatingFlow;
+//					} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
+//						SysHeatingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+//						OASysEqSizing( CurOASysNum ).AirFlow = true;
+//						OASysEqSizing( CurOASysNum ).AirVolFlow = SysHeatingFlow;
+//					} else if ( SELECT_CASE_var == FlowPerHeatingCapacity ) {
+//						VolFlowRate = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+//						MixTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
+//						MixHumRat = FinalSysSizing( CurSysNum ).HeatOutHumRat;
+//						SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
+//						SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
+//						OutTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
+//						rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
+//						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+//						MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
+//						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+//						if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
+//							CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
+//							TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
+//						} else {
+//							TotCapTempModFac = 1.0;
+//						}
+//						HeatCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( SupEnth - MixEnth ) ) );
+//						if ( TotCapTempModFac > 0.0 ) {
+//							HeatCapAtPeak /= TotCapTempModFac;
+//						}
+//						SysHeatingFlow = HeatCapAtPeak * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+//						OASysEqSizing( CurOASysNum ).AirFlow = true;
+//						OASysEqSizing( CurOASysNum ).AirVolFlow = SysCoolingFlow;
+//						OASysEqSizing( CurOASysNum ).Capacity = true;
+//						OASysEqSizing( CurOASysNum ).DesCoolingLoad = HeatCapAtPeak;
+//					} else {
+//						if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
+//							SysHeatingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+//						} else {
+//							SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//						}
+//						OASysEqSizing( CurOASysNum ).AirFlow = true;
+//						OASysEqSizing( CurOASysNum ).AirVolFlow = SysCoolingFlow;
+//					}}
+//				} else { // Cooling and Heating coil are present
+//					{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).CoolingSAFMethod );
+//					if ( ( SELECT_CASE_var == SupplyAirFlowRate ) || ( SELECT_CASE_var == None ) ) {
+//						if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
+//							SysCoolingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+//						} else {
+//							SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//						}
+//						OASysEqSizing( CurOASysNum ).AirFlow = true;
+//					} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
+//						SysCoolingFlow = max( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow, UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow );
+//						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
+//						OASysEqSizing( CurOASysNum ).AirFlow = true;
+//					} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
+//						SysCoolingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow * max( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow, UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow );
+//						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = SysCoolingFlow;
+//						OASysEqSizing( CurOASysNum ).AirFlow = true;
+//					} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) {
+//						VolFlowRate = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+//						MixTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
+//						MixHumRat = FinalSysSizing( CurSysNum ).CoolOutHumRat;
+//						SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
+//						SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
+//						OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
+//						rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
+//						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+//						MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
+//						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+//						if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+//							CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
+//							TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
+//						} else {
+//							TotCapTempModFac = 1.0;
+//						}
+//						CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
+//						if ( TotCapTempModFac > 0.0 ) {
+//							CoolCapAtPeak /= TotCapTempModFac;
+//						}
+//						SysCoolingFlow = CoolCapAtPeak * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
+//						OASysEqSizing( CurOASysNum ).AirFlow = true;
+//						OASysEqSizing( CurOASysNum ).Capacity = true;
+//					} else {
+//						if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
+//							SysCoolingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+//						} else {
+//							SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//						}
+//						OASysEqSizing( CurOASysNum ).AirFlow = true;
+//					}}
+//					{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).HeatingSAFMethod );
+//					if ( ( SELECT_CASE_var == SupplyAirFlowRate ) || ( SELECT_CASE_var == None ) ) {
+//						if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
+//							SysHeatingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+//						} else {
+//							SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//						}
+//						OASysEqSizing( CurOASysNum ).AirFlow = true;
+//					} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
+//						SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+//						OASysEqSizing( CurOASysNum ).AirFlow = true;
+//					} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
+//						SysHeatingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = SysHeatingFlow;
+//						OASysEqSizing( CurOASysNum ).AirFlow = true;
+//					} else if ( SELECT_CASE_var == FlowPerHeatingCapacity ) {
+//						VolFlowRate = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+//						MixTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
+//						MixHumRat = FinalSysSizing( CurSysNum ).HeatOutHumRat;
+//						SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
+//						SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
+//						OutTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
+//						rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
+//						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+//						MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
+//						SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+//						if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
+//							CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
+//							TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
+//						} else {
+//							TotCapTempModFac = 1.0;
+//						}
+//						HeatCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( SupEnth - MixEnth ) ) );
+//						if ( TotCapTempModFac > 0.0 ) {
+//							HeatCapAtPeak /= TotCapTempModFac;
+//						}
+//						SysHeatingFlow = HeatCapAtPeak * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+//						OASysEqSizing( CurOASysNum ).AirFlow = true;
+//						OASysEqSizing( CurOASysNum ).Capacity = true;
+//					} else {
+//						if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
+//							SysHeatingFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+//						} else {
+//							SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//						}
+//						OASysEqSizing( CurOASysNum ).AirFlow = true;
+//					}}
+//					OASysEqSizing( CurOASysNum ).AirVolFlow = max( SysCoolingFlow, SysHeatingFlow );
+//					OASysEqSizing( CurOASysNum ).DesHeatingLoad = max( CoolCapAtPeak, HeatCapAtPeak );
+//				}
+//			} else {
+//
+//				if ( CurSysNum > 0 ) {
+//
+//					//      CALL CheckSysSizing(UnitarySystem(UnitarySysNum)%UnitarySystemType, UnitarySystem(UnitarySysNum)%Name)
+//
+//					if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && ! UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
+//						{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).CoolingSAFMethod );
+//						if ( ( SELECT_CASE_var == SupplyAirFlowRate ) || ( SELECT_CASE_var == None ) ) {
+//							// **************
+//							SizingMethod = CoolingAirflowSizing;
+//							CompName = UnitarySystem( UnitarySysNum ).Name;
+//							FieldNum = 3;
+//							PrintFlag = false;
+//							TempSize = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//							SizingString = UnitarySystemNumericFields( UnitarySysNum ).FieldNames( FieldNum ) + " [m3/s]";
+//							CompType = UnitarySystem( UnitarySysNum ).UnitarySystemType;
+//							RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+//							SysCoolingFlow = TempSize;
+//							// **************
+////							if( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
+////								SysCoolingFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+////							} else {
+////								SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+////							}
+//							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+//							UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysCoolingFlow;
+//						} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
+//							SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
+//							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+//							UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysCoolingFlow;
+//						} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
+//							SysCoolingFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
+//							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+//							UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysCoolingFlow;
+//						} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) {
+//							VolFlowRate = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+//							SupTemp = FinalSysSizing( CurSysNum ).CoolSupTemp;
+//							SupHumRat = FinalSysSizing( CurSysNum ).CoolSupHumRat;
+//							if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
+//								MixTemp = FinalSysSizing( CurSysNum ).CoolMixTemp;
+//								MixHumRat = FinalSysSizing( CurSysNum ).CoolMixHumRat;
+//							} else { // there is precooling of OA stream
+//								if ( VolFlowRate > 0.0 ) {
+//									OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / VolFlowRate;
+//								} else {
+//									OutAirFrac = 1.0;
+//								}
+//								OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
+//								MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetTemp;
+//								MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetHumRat;
+//							}
+//							OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
+//							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
+//							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+//							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
+//							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+//							if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+//								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
+//								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
+//							} else {
+//								TotCapTempModFac = 1.0;
+//							}
+//							CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
+//							SupFanNum = PrimaryAirSystem( CurSysNum ).SupFanNum;
+//							CoolCapAtPeak = CoolCapAtPeak + FanDesHeatGain( SupFanNum, VolFlowRate );
+//							if ( TotCapTempModFac > 0.0 ) {
+//								CoolCapAtPeak /= TotCapTempModFac;
+//							}
+//							SysCoolingFlow = CoolCapAtPeak * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
+//							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+//							UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysCoolingFlow;
+//							UnitarySysEqSizing( CurSysNum ).Capacity = true;
+//							UnitarySysEqSizing( CurSysNum ).DesCoolingLoad = CoolCapAtPeak;
+//						} else {
+//							if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
 //								SysCoolingFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 //							} else {
 //								SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
 //							}
-							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-							UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysCoolingFlow;
-						} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
-							SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
-							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-							UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysCoolingFlow;
-						} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
-							SysCoolingFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
-							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-							UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysCoolingFlow;
-						} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) {
-							VolFlowRate = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-							SupTemp = FinalSysSizing( CurSysNum ).CoolSupTemp;
-							SupHumRat = FinalSysSizing( CurSysNum ).CoolSupHumRat;
-							if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
-								MixTemp = FinalSysSizing( CurSysNum ).CoolMixTemp;
-								MixHumRat = FinalSysSizing( CurSysNum ).CoolMixHumRat;
-							} else { // there is precooling of OA stream
-								if ( VolFlowRate > 0.0 ) {
-									OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / VolFlowRate;
-								} else {
-									OutAirFrac = 1.0;
-								}
-								OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
-								MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetTemp;
-								MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetHumRat;
-							}
-							OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
-							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
-							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
-							if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
-								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
-							} else {
-								TotCapTempModFac = 1.0;
-							}
-							CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
-							SupFanNum = PrimaryAirSystem( CurSysNum ).SupFanNum;
-							CoolCapAtPeak = CoolCapAtPeak + FanDesHeatGain( SupFanNum, VolFlowRate );
-							if ( TotCapTempModFac > 0.0 ) {
-								CoolCapAtPeak /= TotCapTempModFac;
-							}
-							SysCoolingFlow = CoolCapAtPeak * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
-							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-							UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysCoolingFlow;
-							UnitarySysEqSizing( CurSysNum ).Capacity = true;
-							UnitarySysEqSizing( CurSysNum ).DesCoolingLoad = CoolCapAtPeak;
-						} else {
-							if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
-								SysCoolingFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-							} else {
-								SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-							}
-							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-							UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysCoolingFlow;
-						}}
-					} else if ( UnitarySystem( UnitarySysNum ).HeatCoilExists && ! UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
-						{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).HeatingSAFMethod );
-						if ( SELECT_CASE_var == SupplyAirFlowRate ) {
-							// **************
-							SizingMethod = HeatingAirflowSizing;
-							CompName = UnitarySystem( UnitarySysNum ).Name;
-							FieldNum = 7;
-							PrintFlag = false;
-							TempSize = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-							SizingString = UnitarySystemNumericFields( UnitarySysNum ).FieldNames( FieldNum ) + " [m3/s]";
-							CompType = UnitarySystem( UnitarySysNum ).UnitarySystemType;
-							RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-							SysHeatingFlow = TempSize;
-							// **************
-//							if( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
+//							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+//							UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysCoolingFlow;
+//						}}
+//					} else if ( UnitarySystem( UnitarySysNum ).HeatCoilExists && ! UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
+//						{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).HeatingSAFMethod );
+//						if ( SELECT_CASE_var == SupplyAirFlowRate ) {
+//							// **************
+//							SizingMethod = HeatingAirflowSizing;
+//							CompName = UnitarySystem( UnitarySysNum ).Name;
+//							FieldNum = 7;
+//							PrintFlag = false;
+//							TempSize = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//							SizingString = UnitarySystemNumericFields( UnitarySysNum ).FieldNames( FieldNum ) + " [m3/s]";
+//							CompType = UnitarySystem( UnitarySysNum ).UnitarySystemType;
+//							RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+//							SysHeatingFlow = TempSize;
+//							// **************
+////							if( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
+////								SysHeatingFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+////							} else {
+////								SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+////							}
+//							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+//							UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysHeatingFlow;
+//						} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
+//							SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+//							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+//							UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysHeatingFlow;
+//						} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
+//							SysHeatingFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+//							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+//							UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysHeatingFlow;
+//						} else if ( SELECT_CASE_var == FlowPerHeatingCapacity ) {
+//							VolFlowRate = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+//							SupTemp = FinalSysSizing( CurSysNum ).HeatSupTemp;
+//							SupHumRat = FinalSysSizing( CurSysNum ).HeatSupHumRat;
+//							if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
+//								MixTemp = FinalSysSizing( CurSysNum ).HeatMixTemp;
+//								MixHumRat = FinalSysSizing( CurSysNum ).HeatMixHumRat;
+//							} else { // there is precooling of OA stream
+//								if ( VolFlowRate > 0.0 ) {
+//									OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / VolFlowRate;
+//								} else {
+//									OutAirFrac = 1.0;
+//								}
+//								OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
+//								MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetTemp;
+//								MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetHumRat;
+//							}
+//							OutTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
+//							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
+//							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+//							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
+//							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+//							if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
+//								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
+//								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
+//							} else {
+//								TotCapTempModFac = 1.0;
+//							}
+//							HeatCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( SupEnth - MixEnth ) ) );
+//							if ( TotCapTempModFac > 0.0 ) {
+//								HeatCapAtPeak /= TotCapTempModFac;
+//							}
+//							SysHeatingFlow = HeatCapAtPeak * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
+//							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+//							UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysHeatingFlow;
+//							UnitarySysEqSizing( CurSysNum ).Capacity = true;
+//							UnitarySysEqSizing( CurSysNum ).DesHeatingLoad = HeatCapAtPeak;
+//						} else {
+//							if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
 //								SysHeatingFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 //							} else {
 //								SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
 //							}
-							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-							UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysHeatingFlow;
-						} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
-							SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
-							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-							UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysHeatingFlow;
-						} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
-							SysHeatingFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
-							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-							UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysHeatingFlow;
-						} else if ( SELECT_CASE_var == FlowPerHeatingCapacity ) {
-							VolFlowRate = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-							SupTemp = FinalSysSizing( CurSysNum ).HeatSupTemp;
-							SupHumRat = FinalSysSizing( CurSysNum ).HeatSupHumRat;
-							if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
-								MixTemp = FinalSysSizing( CurSysNum ).HeatMixTemp;
-								MixHumRat = FinalSysSizing( CurSysNum ).HeatMixHumRat;
-							} else { // there is precooling of OA stream
-								if ( VolFlowRate > 0.0 ) {
-									OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / VolFlowRate;
-								} else {
-									OutAirFrac = 1.0;
-								}
-								OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
-								MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetTemp;
-								MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetHumRat;
-							}
-							OutTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
-							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
-							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
-							if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
-								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
-								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
-							} else {
-								TotCapTempModFac = 1.0;
-							}
-							HeatCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( SupEnth - MixEnth ) ) );
-							if ( TotCapTempModFac > 0.0 ) {
-								HeatCapAtPeak /= TotCapTempModFac;
-							}
-							SysHeatingFlow = HeatCapAtPeak * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
-							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-							UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysHeatingFlow;
-							UnitarySysEqSizing( CurSysNum ).Capacity = true;
-							UnitarySysEqSizing( CurSysNum ).DesHeatingLoad = HeatCapAtPeak;
-						} else {
-							if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
-								SysHeatingFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-							} else {
-								SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-							}
-							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-							UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysHeatingFlow;
-						}}
-					} else { // Cooling and Heating coil are present
-						{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).CoolingSAFMethod );
-						if ( ( SELECT_CASE_var == SupplyAirFlowRate ) || ( SELECT_CASE_var == None ) ) {
-							// **************
-							SizingMethod = CoolingAirflowSizing;
-							CompName = UnitarySystem( UnitarySysNum ).Name;
-							FieldNum = 3;
-							PrintFlag = false;
-							TempSize = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-							SizingString = UnitarySystemNumericFields( UnitarySysNum ).FieldNames( FieldNum ) + " [m3/s]";
-							CompType = UnitarySystem( UnitarySysNum ).UnitarySystemType;
-							RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-							SysCoolingFlow = TempSize;
-							// **************
-
-//							if( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
+//							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+//							UnitarySysEqSizing( CurSysNum ).AirVolFlow = SysHeatingFlow;
+//						}}
+//					} else { // Cooling and Heating coil are present
+//						{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).CoolingSAFMethod );
+//						if ( ( SELECT_CASE_var == SupplyAirFlowRate ) || ( SELECT_CASE_var == None ) ) {
+//							// **************
+//							SizingMethod = CoolingAirflowSizing;
+//							CompName = UnitarySystem( UnitarySysNum ).Name;
+//							FieldNum = 3;
+//							PrintFlag = false;
+//							TempSize = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//							SizingString = UnitarySystemNumericFields( UnitarySysNum ).FieldNames( FieldNum ) + " [m3/s]";
+//							CompType = UnitarySystem( UnitarySysNum ).UnitarySystemType;
+//							RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+//							SysCoolingFlow = TempSize;
+//							// **************
+//
+////							if( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
+////								SysCoolingFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+////							} else {
+////								SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+////							}
+//							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+//						} else if( SELECT_CASE_var == FlowPerFloorArea ) {
+//							SysCoolingFlow = max( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow, UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow );
+//							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
+//							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+//							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+//						} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
+//							SysCoolingFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow * max( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow, UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow );
+//							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
+//							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+//							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+//						} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) {
+//							VolFlowRate = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+//							SupTemp = FinalSysSizing( CurSysNum ).CoolSupTemp;
+//							SupHumRat = FinalSysSizing( CurSysNum ).CoolSupHumRat;
+//							if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
+//								MixTemp = FinalSysSizing( CurSysNum ).CoolMixTemp;
+//								MixHumRat = FinalSysSizing( CurSysNum ).CoolMixHumRat;
+//							} else { // there is precooling of OA stream
+//								if ( VolFlowRate > 0.0 ) {
+//									OutAirFrac = FinalSysSizing( CurSysNum ).DesMainVolFlow / VolFlowRate;
+//								} else {
+//									OutAirFrac = 1.0;
+//								}
+//								OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
+//								MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetTemp;
+//								MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetHumRat;
+//							}
+//							OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
+//							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
+//							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+//							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
+//							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+//							if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+//								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
+//								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
+//							} else {
+//								TotCapTempModFac = 1.0;
+//							}
+//							CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
+//							SupFanNum = PrimaryAirSystem( CurSysNum ).SupFanNum;
+//							CoolCapAtPeak = CoolCapAtPeak + FanDesHeatGain( SupFanNum, VolFlowRate );
+//							if ( TotCapTempModFac > 0.0 ) {
+//								CoolCapAtPeak /= TotCapTempModFac;
+//							}
+//							SysCoolingFlow = CoolCapAtPeak * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
+//							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+//							UnitarySysEqSizing( CurSysNum ).Capacity = true;
+//						} else {
+//							if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
 //								SysCoolingFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 //							} else {
 //								SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
 //							}
-							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-						} else if( SELECT_CASE_var == FlowPerFloorArea ) {
-							SysCoolingFlow = max( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow, UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow );
-							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
-							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
-							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-						} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
-							SysCoolingFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow * max( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow, UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow );
-							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
-							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
-							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-						} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) {
-							VolFlowRate = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-							SupTemp = FinalSysSizing( CurSysNum ).CoolSupTemp;
-							SupHumRat = FinalSysSizing( CurSysNum ).CoolSupHumRat;
-							if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
-								MixTemp = FinalSysSizing( CurSysNum ).CoolMixTemp;
-								MixHumRat = FinalSysSizing( CurSysNum ).CoolMixHumRat;
-							} else { // there is precooling of OA stream
-								if ( VolFlowRate > 0.0 ) {
-									OutAirFrac = FinalSysSizing( CurSysNum ).DesMainVolFlow / VolFlowRate;
-								} else {
-									OutAirFrac = 1.0;
-								}
-								OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
-								MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetTemp;
-								MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetHumRat;
-							}
-							OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
-							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
-							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
-							if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
-								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
-							} else {
-								TotCapTempModFac = 1.0;
-							}
-							CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
-							SupFanNum = PrimaryAirSystem( CurSysNum ).SupFanNum;
-							CoolCapAtPeak = CoolCapAtPeak + FanDesHeatGain( SupFanNum, VolFlowRate );
-							if ( TotCapTempModFac > 0.0 ) {
-								CoolCapAtPeak /= TotCapTempModFac;
-							}
-							SysCoolingFlow = CoolCapAtPeak * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
-							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-							UnitarySysEqSizing( CurSysNum ).Capacity = true;
-						} else {
-							if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
-								SysCoolingFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-							} else {
-								SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-							}
-							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-						}}
-						{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).HeatingSAFMethod );
-						if ( SELECT_CASE_var == SupplyAirFlowRate ) {
-							// **************
-							SizingMethod = HeatingAirflowSizing;
-							CompName = UnitarySystem( UnitarySysNum ).Name;
-							FieldNum = 7;
-							PrintFlag = false;
-							TempSize = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-							SizingString = UnitarySystemNumericFields( UnitarySysNum ).FieldNames( FieldNum ) + " [m3/s]";
-							CompType = UnitarySystem( UnitarySysNum ).UnitarySystemType;
-							RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-							SysHeatingFlow = TempSize;
-							// **************
-//							if( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
+//							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+//						}}
+//						{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).HeatingSAFMethod );
+//						if ( SELECT_CASE_var == SupplyAirFlowRate ) {
+//							// **************
+//							SizingMethod = HeatingAirflowSizing;
+//							CompName = UnitarySystem( UnitarySysNum ).Name;
+//							FieldNum = 7;
+//							PrintFlag = false;
+//							TempSize = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//							SizingString = UnitarySystemNumericFields( UnitarySysNum ).FieldNames( FieldNum ) + " [m3/s]";
+//							CompType = UnitarySystem( UnitarySysNum ).UnitarySystemType;
+//							RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+//							SysHeatingFlow = TempSize;
+//							// **************
+////							if( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
+////								SysHeatingFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+////							} else {
+////								SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+////							}
+//							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+//						} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
+//							SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+//							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+//						} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
+//							SysHeatingFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+//							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+//						} else if ( SELECT_CASE_var == FlowPerHeatingCapacity ) {
+//							VolFlowRate = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+//							SupTemp = FinalSysSizing( CurSysNum ).HeatSupTemp;
+//							SupHumRat = FinalSysSizing( CurSysNum ).HeatSupHumRat;
+//							if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
+//								MixTemp = FinalSysSizing( CurSysNum ).HeatMixTemp;
+//								MixHumRat = FinalSysSizing( CurSysNum ).HeatMixHumRat;
+//							} else { // there is precooling of OA stream
+//								if ( VolFlowRate > 0.0 ) {
+//									OutAirFrac = FinalSysSizing( CurSysNum ).DesMainVolFlow / VolFlowRate;
+//								} else {
+//									OutAirFrac = 1.0;
+//								}
+//								OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
+//								MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetTemp;
+//								MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetHumRat;
+//							}
+//							OutTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
+//							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
+//							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+//							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
+//							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+//							if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
+//								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
+//								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
+//							} else {
+//								TotCapTempModFac = 1.0;
+//							}
+//							HeatCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( SupEnth - MixEnth ) ) ); // oops! should not use MdotDeltaH for heating coils
+//							CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
+//							HeatCapAtPeak = max( 0.0, (CpAirStd *  rhoair * VolFlowRate * ( SupTemp - MixTemp ) ) );
+//							HeatCapAtPeak = max( 0.0, (CpAirStd *  StdRhoAir * VolFlowRate * ( SupTemp - MixTemp ) ) );
+//							if ( TotCapTempModFac > 0.0 ) {
+//								HeatCapAtPeak /= TotCapTempModFac;
+//							}
+//							SysHeatingFlow = HeatCapAtPeak * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+//							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+//							UnitarySysEqSizing( CurSysNum ).Capacity = true;
+//						} else {
+//							if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
 //								SysHeatingFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 //							} else {
 //								SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
 //							}
-							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-						} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
-							SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
-							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-						} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
-							SysHeatingFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
-							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-						} else if ( SELECT_CASE_var == FlowPerHeatingCapacity ) {
-							VolFlowRate = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-							SupTemp = FinalSysSizing( CurSysNum ).HeatSupTemp;
-							SupHumRat = FinalSysSizing( CurSysNum ).HeatSupHumRat;
-							if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
-								MixTemp = FinalSysSizing( CurSysNum ).HeatMixTemp;
-								MixHumRat = FinalSysSizing( CurSysNum ).HeatMixHumRat;
-							} else { // there is precooling of OA stream
-								if ( VolFlowRate > 0.0 ) {
-									OutAirFrac = FinalSysSizing( CurSysNum ).DesMainVolFlow / VolFlowRate;
-								} else {
-									OutAirFrac = 1.0;
-								}
-								OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
-								MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetTemp;
-								MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetHumRat;
-							}
-							OutTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
-							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
-							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
-							if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
-								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
-								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
-							} else {
-								TotCapTempModFac = 1.0;
-							}
-							HeatCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( SupEnth - MixEnth ) ) ); // oops! should not use MdotDeltaH for heating coils
-							CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
-							HeatCapAtPeak = max( 0.0, (CpAirStd *  rhoair * VolFlowRate * ( SupTemp - MixTemp ) ) );
-							HeatCapAtPeak = max( 0.0, (CpAirStd *  StdRhoAir * VolFlowRate * ( SupTemp - MixTemp ) ) );
-							if ( TotCapTempModFac > 0.0 ) {
-								HeatCapAtPeak /= TotCapTempModFac;
-							}
-							SysHeatingFlow = HeatCapAtPeak * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
-							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-							UnitarySysEqSizing( CurSysNum ).Capacity = true;
-						} else {
-							if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
-								SysHeatingFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-							} else {
-								SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-							}
-							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
-						}}
-						UnitarySysEqSizing( CurSysNum ).AirVolFlow = max( SysCoolingFlow, SysHeatingFlow );
-						UnitarySysEqSizing( CurSysNum ).DesCoolingLoad = max( CoolCapAtPeak, HeatCapAtPeak );
-					}
-				} else if ( CurZoneEqNum > 0 ) {
-					// if we keep this (zone equipment) then we should probably check to see IF a cooling/heating coil is present
-					// and use just cooling if only a cooling coil, or just heating if only a heating coil
-					//      CALL CheckZoneSizing(UnitarySystem(UnitarySysNum)%UnitarySystemType, UnitarySystem(UnitarySysNum)%Name)
-
-					if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && ! UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-						ZoneCoolingOnlyFan = true;
-						{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).CoolingSAFMethod );
-						if ( SELECT_CASE_var == SupplyAirFlowRate ) {
-							if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
-								SysCoolingFlow = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-							} else {
-								SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-							}
-							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysCoolingFlow;
-						} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
-							SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
-							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysCoolingFlow;
-						} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
-							SysCoolingFlow = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
-							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysCoolingFlow;
-						} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) {
-							VolFlowRate = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-							if ( ZoneEqDXCoil ) {
-								if ( ZoneEqSizing( CurZoneEqNum ).OAVolFlow > 0.0 ) {
-									MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
-									MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
-								} else {
-									MixTemp = FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtCoolPeak;
-									MixHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak;
-								}
-							} else {
-								MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
-								MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
-							}
-							SupTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
-							SupHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
-							TimeStepNumAtMax = FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtCoolMax;
-							DDNum = FinalZoneSizing( CurZoneEqNum ).CoolDDNum;
-							if ( DDNum > 0 && TimeStepNumAtMax > 0 ) {
-								OutTemp = DesDayWeath( DDNum ).Temp( TimeStepNumAtMax );
-							} else {
-								OutTemp = 0.0;
-							}
-							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
-							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
-							if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
-								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
-							} else {
-								TotCapTempModFac = 1.0;
-							}
-							CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
-							if ( TotCapTempModFac > 0.0 ) {
-								CoolCapAtPeak /= TotCapTempModFac;
-							}
-							SysCoolingFlow = CoolCapAtPeak * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
-							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysCoolingFlow;
-							ZoneEqSizing( CurZoneEqNum ).Capacity = true;
-							ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = CoolCapAtPeak;
-						} else {
-							if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
-								SysCoolingFlow = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-							} else {
-								SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-							}
-							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysCoolingFlow;
-						}}
-					} else if ( UnitarySystem( UnitarySysNum ).HeatCoilExists && ! UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
-						ZoneHeatingOnlyFan = true;
-						{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).HeatingSAFMethod );
-						if ( SELECT_CASE_var == SupplyAirFlowRate ) {
-							if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
-								SysHeatingFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
-							} else {
-								SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-							}
-							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysHeatingFlow;
-						} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
-							SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
-							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysHeatingFlow;
-						} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
-							SysHeatingFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
-							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysHeatingFlow;
-						} else if ( SELECT_CASE_var == FlowPerHeatingCapacity ) {
-							VolFlowRate = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
-							if ( ZoneEqDXCoil ) {
-								if ( ZoneEqSizing( CurZoneEqNum ).OAVolFlow > 0.0 ) {
-									MixTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
-									MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRat;
-								} else {
-									MixTemp = FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtHeatPeak;
-									MixHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak;
-								}
-							} else {
-								MixTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
-								MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRat;
-							}
-							SupTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
-							SupHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
-							TimeStepNumAtMax = FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtHeatMax;
-							DDNum = FinalZoneSizing( CurZoneEqNum ).HeatDDNum;
-							if ( DDNum > 0 && TimeStepNumAtMax > 0 ) {
-								OutTemp = DesDayWeath( DDNum ).Temp( TimeStepNumAtMax );
-							} else {
-								OutTemp = 0.0;
-							}
-							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
-							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
-							if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
-								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
-								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
-							} else {
-								TotCapTempModFac = 1.0;
-							}
-							HeatCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( SupEnth - MixEnth ) ) );
-							if ( TotCapTempModFac > 0.0 ) {
-								HeatCapAtPeak /= TotCapTempModFac;
-							}
-							SysHeatingFlow = HeatCapAtPeak * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
-							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysHeatingFlow;
-							ZoneEqSizing( CurZoneEqNum ).Capacity = true;
-							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = HeatCapAtPeak;
-						} else {
-							if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
-								SysHeatingFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
-							} else {
-								SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-							}
-							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysHeatingFlow;
-						}}
-					} else {
-						{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).CoolingSAFMethod );
-						if ( ( SELECT_CASE_var == SupplyAirFlowRate ) || ( SELECT_CASE_var == None ) ) {
-							if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
-								SysCoolingFlow = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-							} else {
-								SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-							}
-							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-						} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
-							SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize; // allow reporting for sizing
-							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-						} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
-							SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow * FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
-							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-						} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) {
-							VolFlowRate = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-							if ( ZoneEqDXCoil ) {
-								if ( ZoneEqSizing( CurZoneEqNum ).OAVolFlow > 0.0 ) {
-									MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
-									MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
-								} else {
-									MixTemp = FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtCoolPeak;
-									MixHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak;
-								}
-							} else {
-								MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
-								MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
-							}
-							SupTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
-							SupHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
-							TimeStepNumAtMax = FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtCoolMax;
-							DDNum = FinalZoneSizing( CurZoneEqNum ).CoolDDNum;
-							if ( DDNum > 0 && TimeStepNumAtMax > 0 ) {
-								OutTemp = DesDayWeath( DDNum ).Temp( TimeStepNumAtMax );
-							} else {
-								OutTemp = 0.0;
-							}
-							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
-							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
-							if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
-								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
-								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
-							} else {
-								TotCapTempModFac = 1.0;
-							}
-							CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
-							if ( TotCapTempModFac > 0.0 ) {
-								CoolCapAtPeak /= TotCapTempModFac;
-							}
-							SysCoolingFlow = CoolCapAtPeak * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
-							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-							ZoneEqSizing( CurZoneEqNum ).Capacity = true;
-						} else {
-							if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
-								SysCoolingFlow = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-							} else {
-								SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
-							}
-							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-						}}
-						{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).HeatingSAFMethod );
-						if ( SELECT_CASE_var == SupplyAirFlowRate ) {
-							if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
-								SysHeatingFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
-							} else {
-								SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-							}
-							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-						} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
-							SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
-							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-						} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
-							SysHeatingFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
-							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-						} else if ( SELECT_CASE_var == FlowPerHeatingCapacity ) {
-							VolFlowRate = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
-							if ( ZoneEqDXCoil ) {
-								if ( ZoneEqSizing( CurZoneEqNum ).OAVolFlow > 0.0 ) {
-									MixTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
-									MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRat;
-								} else {
-									MixTemp = FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtHeatPeak;
-									MixHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak;
-								}
-							} else {
-								MixTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
-								MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRat;
-							}
-							SupTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
-							SupHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
-							TimeStepNumAtMax = FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtHeatMax;
-							DDNum = FinalZoneSizing( CurZoneEqNum ).HeatDDNum;
-							if ( DDNum > 0 && TimeStepNumAtMax > 0 ) {
-								OutTemp = DesDayWeath( DDNum ).Temp( TimeStepNumAtMax );
-							} else {
-								OutTemp = 0.0;
-							}
-							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
-							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
-							if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
-								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
-								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
-							} else {
-								TotCapTempModFac = 1.0;
-							}
-							HeatCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( SupEnth - MixEnth ) ) );
-							if ( TotCapTempModFac > 0.0 ) {
-								HeatCapAtPeak /= TotCapTempModFac;
-							}
-							SysHeatingFlow = HeatCapAtPeak * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
-							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-							ZoneEqSizing( CurZoneEqNum ).Capacity = true;
-						} else {
-							if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
-								SysHeatingFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
-							} else {
-								SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-							}
-							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
-						}}
-						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = max( SysCoolingFlow, SysHeatingFlow );
-						ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = max( CoolCapAtPeak, HeatCapAtPeak );
-					}
-				}
-			}
-		} // IF(UnitarySystem(UnitarySysNum)%RequestAutosize)THEN
+//							UnitarySysEqSizing( CurSysNum ).AirFlow = true;
+//						}}
+//						UnitarySysEqSizing( CurSysNum ).AirVolFlow = max( SysCoolingFlow, SysHeatingFlow );
+//						UnitarySysEqSizing( CurSysNum ).DesCoolingLoad = max( CoolCapAtPeak, HeatCapAtPeak );
+//					}
+//				} else if ( CurZoneEqNum > 0 ) {
+//					// if we keep this (zone equipment) then we should probably check to see IF a cooling/heating coil is present
+//					// and use just cooling if only a cooling coil, or just heating if only a heating coil
+//					//      CALL CheckZoneSizing(UnitarySystem(UnitarySysNum)%UnitarySystemType, UnitarySystem(UnitarySysNum)%Name)
+//
+//					if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && ! UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
+//						ZoneCoolingOnlyFan = true;
+//						{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).CoolingSAFMethod );
+//						if ( SELECT_CASE_var == SupplyAirFlowRate ) {
+//							if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
+//								SysCoolingFlow = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+//							} else {
+//								SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//							}
+//							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
+//							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysCoolingFlow;
+//						} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
+//							SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
+//							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
+//							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysCoolingFlow;
+//						} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
+//							SysCoolingFlow = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
+//							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
+//							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysCoolingFlow;
+//						} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) {
+//							VolFlowRate = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+//							if ( ZoneEqDXCoil ) {
+//								if ( ZoneEqSizing( CurZoneEqNum ).OAVolFlow > 0.0 ) {
+//									MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
+//									MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
+//								} else {
+//									MixTemp = FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtCoolPeak;
+//									MixHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak;
+//								}
+//							} else {
+//								MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
+//								MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
+//							}
+//							SupTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
+//							SupHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
+//							TimeStepNumAtMax = FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtCoolMax;
+//							DDNum = FinalZoneSizing( CurZoneEqNum ).CoolDDNum;
+//							if ( DDNum > 0 && TimeStepNumAtMax > 0 ) {
+//								OutTemp = DesDayWeath( DDNum ).Temp( TimeStepNumAtMax );
+//							} else {
+//								OutTemp = 0.0;
+//							}
+//							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
+//							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+//							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
+//							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+//							if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+//								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
+//								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
+//							} else {
+//								TotCapTempModFac = 1.0;
+//							}
+//							CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
+//							if ( TotCapTempModFac > 0.0 ) {
+//								CoolCapAtPeak /= TotCapTempModFac;
+//							}
+//							SysCoolingFlow = CoolCapAtPeak * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
+//							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
+//							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysCoolingFlow;
+//							ZoneEqSizing( CurZoneEqNum ).Capacity = true;
+//							ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = CoolCapAtPeak;
+//						} else {
+//							if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
+//								SysCoolingFlow = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+//							} else {
+//								SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//							}
+//							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
+//							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysCoolingFlow;
+//						}}
+//					} else if ( UnitarySystem( UnitarySysNum ).HeatCoilExists && ! UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
+//						ZoneHeatingOnlyFan = true;
+//						{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).HeatingSAFMethod );
+//						if ( SELECT_CASE_var == SupplyAirFlowRate ) {
+//							if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
+//								SysHeatingFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+//							} else {
+//								SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//							}
+//							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
+//							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysHeatingFlow;
+//						} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
+//							SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+//							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
+//							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysHeatingFlow;
+//						} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
+//							SysHeatingFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+//							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
+//							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysHeatingFlow;
+//						} else if ( SELECT_CASE_var == FlowPerHeatingCapacity ) {
+//							VolFlowRate = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+//							if ( ZoneEqDXCoil ) {
+//								if ( ZoneEqSizing( CurZoneEqNum ).OAVolFlow > 0.0 ) {
+//									MixTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
+//									MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRat;
+//								} else {
+//									MixTemp = FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtHeatPeak;
+//									MixHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak;
+//								}
+//							} else {
+//								MixTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
+//								MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRat;
+//							}
+//							SupTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
+//							SupHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
+//							TimeStepNumAtMax = FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtHeatMax;
+//							DDNum = FinalZoneSizing( CurZoneEqNum ).HeatDDNum;
+//							if ( DDNum > 0 && TimeStepNumAtMax > 0 ) {
+//								OutTemp = DesDayWeath( DDNum ).Temp( TimeStepNumAtMax );
+//							} else {
+//								OutTemp = 0.0;
+//							}
+//							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
+//							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+//							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
+//							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+//							if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
+//								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
+//								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
+//							} else {
+//								TotCapTempModFac = 1.0;
+//							}
+//							HeatCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( SupEnth - MixEnth ) ) );
+//							if ( TotCapTempModFac > 0.0 ) {
+//								HeatCapAtPeak /= TotCapTempModFac;
+//							}
+//							SysHeatingFlow = HeatCapAtPeak * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+//							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
+//							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysHeatingFlow;
+//							ZoneEqSizing( CurZoneEqNum ).Capacity = true;
+//							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = HeatCapAtPeak;
+//						} else {
+//							if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
+//								SysHeatingFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+//							} else {
+//								SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//							}
+//							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
+//							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = SysHeatingFlow;
+//						}}
+//					} else {
+//						{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).CoolingSAFMethod );
+//						if ( ( SELECT_CASE_var == SupplyAirFlowRate ) || ( SELECT_CASE_var == None ) ) {
+//							if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
+//								SysCoolingFlow = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+//							} else {
+//								SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//							}
+//							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
+//						} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
+//							SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize; // allow reporting for sizing
+//							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
+//						} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
+//							SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow * FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
+//							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
+//						} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) {
+//							VolFlowRate = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+//							if ( ZoneEqDXCoil ) {
+//								if ( ZoneEqSizing( CurZoneEqNum ).OAVolFlow > 0.0 ) {
+//									MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
+//									MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
+//								} else {
+//									MixTemp = FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtCoolPeak;
+//									MixHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak;
+//								}
+//							} else {
+//								MixTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
+//								MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
+//							}
+//							SupTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
+//							SupHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
+//							TimeStepNumAtMax = FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtCoolMax;
+//							DDNum = FinalZoneSizing( CurZoneEqNum ).CoolDDNum;
+//							if ( DDNum > 0 && TimeStepNumAtMax > 0 ) {
+//								OutTemp = DesDayWeath( DDNum ).Temp( TimeStepNumAtMax );
+//							} else {
+//								OutTemp = 0.0;
+//							}
+//							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
+//							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+//							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
+//							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+//							if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
+//								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrFound );
+//								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
+//							} else {
+//								TotCapTempModFac = 1.0;
+//							}
+//							CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
+//							if ( TotCapTempModFac > 0.0 ) {
+//								CoolCapAtPeak /= TotCapTempModFac;
+//							}
+//							SysCoolingFlow = CoolCapAtPeak * UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
+//							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
+//							ZoneEqSizing( CurZoneEqNum ).Capacity = true;
+//						} else {
+//							if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
+//								SysCoolingFlow = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+//							} else {
+//								SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
+//							}
+//							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
+//						}}
+//						{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).HeatingSAFMethod );
+//						if ( SELECT_CASE_var == SupplyAirFlowRate ) {
+//							if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
+//								SysHeatingFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+//							} else {
+//								SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//							}
+//							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
+//						} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
+//							SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+//							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
+//						} else if ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) {
+//							SysHeatingFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+//							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
+//						} else if ( SELECT_CASE_var == FlowPerHeatingCapacity ) {
+//							VolFlowRate = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+//							if ( ZoneEqDXCoil ) {
+//								if ( ZoneEqSizing( CurZoneEqNum ).OAVolFlow > 0.0 ) {
+//									MixTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
+//									MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRat;
+//								} else {
+//									MixTemp = FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtHeatPeak;
+//									MixHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak;
+//								}
+//							} else {
+//								MixTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
+//								MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRat;
+//							}
+//							SupTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
+//							SupHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
+//							TimeStepNumAtMax = FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtHeatMax;
+//							DDNum = FinalZoneSizing( CurZoneEqNum ).HeatDDNum;
+//							if ( DDNum > 0 && TimeStepNumAtMax > 0 ) {
+//								OutTemp = DesDayWeath( DDNum ).Temp( TimeStepNumAtMax );
+//							} else {
+//								OutTemp = 0.0;
+//							}
+//							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
+//							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+//							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
+//							SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+//							if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
+//								CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
+//								TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
+//							} else {
+//								TotCapTempModFac = 1.0;
+//							}
+//							HeatCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( SupEnth - MixEnth ) ) );
+//							if ( TotCapTempModFac > 0.0 ) {
+//								HeatCapAtPeak /= TotCapTempModFac;
+//							}
+//							SysHeatingFlow = HeatCapAtPeak * UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//							UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
+//							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
+//							ZoneEqSizing( CurZoneEqNum ).Capacity = true;
+//						} else {
+//							if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
+//								SysHeatingFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+//							} else {
+//								SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//							}
+//							ZoneEqSizing( CurZoneEqNum ).AirFlow = true;
+//						}}
+//						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = max( SysCoolingFlow, SysHeatingFlow );
+//						ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = max( CoolCapAtPeak, HeatCapAtPeak );
+//					}
+//				}
+//			}
+//		} // IF(UnitarySystem(UnitarySysNum)%RequestAutosize)THEN
 
 		// Not sure yet how to enforce heat pump cooling/heating air flow and capacity limits.
 		// Other checks are in place (e.g., DXCoolCap) to already account for heat pump DX coils but apply to all coil types.
@@ -2943,21 +2899,21 @@ namespace HVACUnitarySystem {
 		//    END IF
 		//  END IF
 
-		if ( UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate == AutoSize && UnitarySystem( UnitarySysNum ).FanExists ) {
-
+//		if ( UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate == AutoSize && UnitarySystem( UnitarySysNum ).FanExists ) {
+//
 //			UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = max( SysCoolingFlow, SysHeatingFlow );
-
+//
 //			if ( UnitarySystem( UnitarySysNum ).DesignFanVolFlowRateEMSOverrideOn ) {
 //				UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = UnitarySystem( UnitarySysNum ).DesignFanVolFlowRateEMSOverrideValue;
 //			}
-
+//
 //			if ( UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate < SmallAirVolFlow ) {
 //				UnitarySystem( UnitarySysNum ).DesignFanVolFlowRate = 0.0;
 //			}
-
-			ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Supply Air Flow Rate [m3/s]", max( SysCoolingFlow, SysHeatingFlow ) );
-
-		}
+//
+//			ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Supply Air Flow Rate [m3/s]", max( SysCoolingFlow, SysHeatingFlow ) );
+//
+//		}
 
 		if( UnitarySystem( UnitarySysNum ).FanExists ) {
 
@@ -2987,8 +2943,9 @@ namespace HVACUnitarySystem {
 		}
 
 		if( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
+
 			SizingMethod = HeatingAirflowSizing;
-			if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize ) {
+			if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize && max( SysCoolingFlow, SysHeatingFlow ) > 0.0 ) {
 				DataConstantUsedForSizing = max( SysCoolingFlow, SysHeatingFlow );
 				DataFractionUsedForSizing = 1.0;
 				SizingMethod = AutoCalculateSizing;
@@ -3003,64 +2960,63 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = TempSize;
 			DataEMSOverrideON = false;
 			DataConstantUsedForSizing = 0.0;
-			// delete this line after development
-			if ( SizingMethod == AutoCalculateSizing ) UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = AutoSize;
-		}
-
-		if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize && UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-
-			if ( CurOASysNum > 0 ) {
-				if ( OASysEqSizing( CurOASysNum ).AirFlow ) {
-					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = OASysEqSizing( CurOASysNum ).AirVolFlow;
-				} else {
-					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-				}
-				if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow < SmallAirVolFlow ) {
-					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 0.0;
-				}
-			} else {
-				if ( CurSysNum > 0 ) {
-
-					if ( UnitarySysEqSizing( CurSysNum ).AirFlow ) {
-						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = UnitarySysEqSizing( CurSysNum ).AirVolFlow;
-					} else {
-						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-					}
-					if ( FinalSysSizing( CurSysNum ).DesMainVolFlow < SmallAirVolFlow ) {
-						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 0.0;
-					}
-
-					if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlowEMSOverrideOn ) {
-						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlowEMSOverrideValue;
-					}
-
-				} else if ( CurZoneEqNum > 0 ) {
-					// if we keep this (zone equipment) then we should probably check to see if a cooling/heating coil is present
-					// and use just cooling if only a cooling coil, or just heating if only a heating coil
-					if ( ZoneEqSizing( CurZoneEqNum ).AirFlow ) {
-						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
-					} else {
-						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
-					}
-					if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow < SmallAirVolFlow ) {
-						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 0.0;
-					}
-
-					if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlowEMSOverrideOn ) {
-						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlowEMSOverrideValue;
-					}
-
-				}
-			}
-
-			ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Supply Air Flow Rate During Heating Operation [m3/s]", UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow );
 
 		}
+
+//		if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow == AutoSize && UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
+//
+//			if ( CurOASysNum > 0 ) {
+//				if ( OASysEqSizing( CurOASysNum ).AirFlow ) {
+//					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = OASysEqSizing( CurOASysNum ).AirVolFlow;
+//				} else {
+//					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+//				}
+//				if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow < SmallAirVolFlow ) {
+//					UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 0.0;
+//				}
+//			} else {
+//				if ( CurSysNum > 0 ) {
+//
+//					if ( UnitarySysEqSizing( CurSysNum ).AirFlow ) {
+//						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = UnitarySysEqSizing( CurSysNum ).AirVolFlow;
+//					} else {
+//						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+//					}
+//					if ( FinalSysSizing( CurSysNum ).DesMainVolFlow < SmallAirVolFlow ) {
+//						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 0.0;
+//					}
+//
+//					if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlowEMSOverrideOn ) {
+//						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlowEMSOverrideValue;
+//					}
+//
+//				} else if ( CurZoneEqNum > 0 ) {
+//					// if we keep this (zone equipment) then we should probably check to see if a cooling/heating coil is present
+//					// and use just cooling if only a cooling coil, or just heating if only a heating coil
+//					if ( ZoneEqSizing( CurZoneEqNum ).AirFlow ) {
+//						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
+//					} else {
+//						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+//					}
+//					if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow < SmallAirVolFlow ) {
+//						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = 0.0;
+//					}
+//
+//					if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlowEMSOverrideOn ) {
+//						UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlowEMSOverrideValue;
+//					}
+//
+//				}
+//			}
+//
+//			ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Supply Air Flow Rate During Heating Operation [m3/s]", UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow );
+//
+//		}
 
 		if( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
 
 			SizingMethod = CoolingAirflowSizing;
-			if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize ) {
+			if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize && max( SysCoolingFlow, SysHeatingFlow ) > 0.0 ) {
 				DataConstantUsedForSizing = max( SysCoolingFlow, SysHeatingFlow );
 				DataFractionUsedForSizing = 1.0;
 				SizingMethod = AutoCalculateSizing;
@@ -3075,66 +3031,73 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = TempSize;
 			DataEMSOverrideON = false;
 			DataConstantUsedForSizing = 0.0;
-			// delete this line after development
-			if ( SizingMethod == AutoCalculateSizing ) UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = AutoSize;
 
 		}
 
-		if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize && UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
-
-			if ( CurOASysNum > 0 ) {
-				if ( OASysEqSizing( CurOASysNum ).AirFlow ) {
-					UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = OASysEqSizing( CurOASysNum ).AirVolFlow;
-				} else {
-					UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-				}
-			} else {
-				if ( CurSysNum > 0 ) {
-
-					if ( UnitarySysEqSizing( CurSysNum ).AirFlow ) {
-						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = UnitarySysEqSizing( CurSysNum ).AirVolFlow;
-					} else {
-						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-					}
-					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow < SmallAirVolFlow ) {
-						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 0.0;
-					}
-
-					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlowEMSOverrideOn ) {
-						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlowEMSOverrideValue;
-					}
-
-				} else if ( CurZoneEqNum > 0 ) {
-					// if we keep this (zone equipment) then we should probably check to see if a cooling/heating coil is present
-					// and use just cooling if only a cooling coil, or just heating if only a heating coil
-					if ( ZoneEqSizing( CurZoneEqNum ).AirFlow ) {
-						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
-					} else {
-						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
-					}
-					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow < SmallAirVolFlow ) {
-						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 0.0;
-					}
-
-					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlowEMSOverrideOn ) {
-						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlowEMSOverrideValue;
-					}
-
-				}
-			}
-
-			ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Supply Air Flow Rate During Cooling Operation [m3/s]", UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow );
-
-		}
+//		if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow == AutoSize && UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
+//
+//			if ( CurOASysNum > 0 ) {
+//				if ( OASysEqSizing( CurOASysNum ).AirFlow ) {
+//					UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = OASysEqSizing( CurOASysNum ).AirVolFlow;
+//				} else {
+//					UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+//				}
+//			} else {
+//				if ( CurSysNum > 0 ) {
+//
+//					if ( UnitarySysEqSizing( CurSysNum ).AirFlow ) {
+//						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = UnitarySysEqSizing( CurSysNum ).AirVolFlow;
+//					} else {
+//						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+//					}
+//					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow < SmallAirVolFlow ) {
+//						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 0.0;
+//					}
+//
+//					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlowEMSOverrideOn ) {
+//						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlowEMSOverrideValue;
+//					}
+//
+//				} else if ( CurZoneEqNum > 0 ) {
+//					// if we keep this (zone equipment) then we should probably check to see if a cooling/heating coil is present
+//					// and use just cooling if only a cooling coil, or just heating if only a heating coil
+//					if ( ZoneEqSizing( CurZoneEqNum ).AirFlow ) {
+//						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
+//					} else {
+//						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+//					}
+//					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow < SmallAirVolFlow ) {
+//						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = 0.0;
+//					}
+//
+//					if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlowEMSOverrideOn ) {
+//						UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlowEMSOverrideValue;
+//					}
+//
+//				}
+//			}
+//
+//			ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Supply Air Flow Rate During Cooling Operation [m3/s]", UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow );
+//
+//		}
 
 		if ( UnitarySystem( UnitarySysNum ).CoolCoilExists || UnitarySystem( UnitarySysNum ).HeatCoilExists || UnitarySystem( UnitarySysNum ).SuppCoilExists ) {
 
 			SizingMethod = SystemAirflowSizing;
 
-			if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow == AutoSize ) {
-				DataConstantUsedForSizing = max( SysCoolingFlow, SysHeatingFlow );
-				DataFractionUsedForSizing = 1.0;
-				SizingMethod = AutoCalculateSizing;
+			if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow == AutoSize && max( SysCoolingFlow, SysHeatingFlow ) > 0.0 ) {
+				if ( UnitarySystem( UnitarySysNum ).NoCoolHeatSAFMethod == FractionOfAutoSizedCoolingValue ) {
+					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow *= SysCoolingFlow;
+				} else if ( UnitarySystem( UnitarySysNum ).NoCoolHeatSAFMethod == FractionOfAutoSizedHeatingValue ) {
+					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow *= SysHeatingFlow;
+				} else if ( UnitarySystem( UnitarySysNum ).NoCoolHeatSAFMethod == FlowPerCoolingCapacity ) {
+					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow *= EqSizing.DesCoolingLoad;
+				} else if ( UnitarySystem( UnitarySysNum ).NoCoolHeatSAFMethod == FlowPerHeatingCapacity ) {
+					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow *= EqSizing.DesHeatingLoad;
+				}
+			DataConstantUsedForSizing = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow;
+			DataFractionUsedForSizing = 1.0;
+			SizingMethod = AutoCalculateSizing;
 			}
 
 			FieldNum = 11;
@@ -3147,118 +3110,117 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = TempSize;
 			DataEMSOverrideON = false;
 			DataConstantUsedForSizing = 0.0;
-			// delete this line after development
-			if ( SizingMethod == AutoCalculateSizing ) UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = AutoSize;
+			DataFractionUsedForSizing = 0.0;
 
 		}
 
-		if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow == AutoSize && ( UnitarySystem( UnitarySysNum ).CoolCoilExists || ( UnitarySystem( UnitarySysNum ).HeatCoilExists || UnitarySystem( UnitarySysNum ).SuppCoilExists ) ) ) {
-
-			if ( CurOASysNum > 0 ) {
-				if ( OASysEqSizing( CurOASysNum ).AirFlow ) {
-					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = OASysEqSizing( CurOASysNum ).AirVolFlow;
-				} else {
-					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-				}
-			} else {
-				if ( CurSysNum > 0 ) {
-
-					if ( UnitarySysEqSizing( CurSysNum ).AirFlow ) {
-						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = UnitarySysEqSizing( CurSysNum ).AirVolFlow;
-					} else {
-						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-					}
-					if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow < SmallAirVolFlow ) {
-						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = 0.0;
-					}
-
-					if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlowEMSOverrideOn ) {
-						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlowEMSOverrideValue;
-					}
-
-					ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Supply Air Flow Rate When No Cooling or Heating is Needed [m3/s]", UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow );
-
-				} else if ( CurZoneEqNum > 0 ) {
-					// if we keep this (zone equipment) then we should probably check to see if a cooling/heating coil is present
-					// and use just cooling if only a cooling coil, or just heating if only a heating coil
-					//        CALL CheckZoneSizing(UnitarySystem(UnitarySysNum)%UnitarySystemType, UnitarySystem(UnitarySysNum)%Name)
-					//  would use this to size cooling or heating only systems except for the case where dual UnitarySystems are on the branch
-					//  and each has only 1 cooling or heating coil ??? How to handle?
-					//  Use same logic for other flow rates in this sizing module.
-					if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
-					} else if ( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
-						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-					} else if ( UnitarySystem( UnitarySysNum ).HeatCoilExists || UnitarySystem( UnitarySysNum ).SuppCoilExists ) {
-						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
-					} else {
-						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = 0.0; // ?
-					}
-
-					if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow < SmallAirVolFlow ) {
-						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = 0.0;
-					}
-
-					if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlowEMSOverrideOn ) {
-						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlowEMSOverrideValue;
-					}
-
-					ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Supply Air Flow Rate When No Cooling or Heating is Needed [m3/s]", UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow );
-
-				}
-			}
-		} else if ( UnitarySystem( UnitarySysNum ).CoolCoilExists || UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-			{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).NoCoolHeatSAFMethod );
-			if ( SELECT_CASE_var == SupplyAirFlowRate ) {
-				if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow == AutoSize ) {
-					if ( CurOASysNum > 0 ) {
-						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-					} else if ( CurSysNum > 0 ) {
-						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-					} else if ( CurZoneEqNum > 0 ) {
-						if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-							UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
-						} else if ( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
-							UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-						} else if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-							UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
-						} else {
-							// just guessing here what this should be
-							UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = 0.0;
-						}
-					}
-				}
-			} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
-				// already calculated in GetInput
-			} else if ( ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) || ( SELECT_CASE_var == FractionOfAutoSizedHeatingValue ) ) {
-				if ( CurOASysNum > 0 ) {
-					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow *= FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-				} else if ( CurSysNum > 0 ) {
-					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow *= FinalSysSizing( CurSysNum ).DesMainVolFlow;
-				} else if ( CurZoneEqNum > 0 ) {
-					if ( UnitarySystem( UnitarySysNum ).NoCoolHeatSAFMethod == FractionOfAutoSizedCoolingValue ) {
-						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow *= FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-					} else {
-						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow *= FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
-					}
-				}
-			} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) { // these aren't going to work if the user doesn't choose the same method for all cases
-				if ( DXCoolCap == 0.0 ) {
-					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow *= ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad;
-				} else {
-					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow *= DXCoolCap;
-				}
-			} else if ( SELECT_CASE_var == FlowPerHeatingCapacity ) {
-				UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow *= ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
-			} else if ( SELECT_CASE_var == None ) {
-				// what does this mean?
-			} else {
-				// wait for CR's
-			}}
-
-		} else {
-			UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = 0.0;
-		}
+//		if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow == AutoSize && ( UnitarySystem( UnitarySysNum ).CoolCoilExists || ( UnitarySystem( UnitarySysNum ).HeatCoilExists || UnitarySystem( UnitarySysNum ).SuppCoilExists ) ) ) {
+//
+//			if ( CurOASysNum > 0 ) {
+//				if ( OASysEqSizing( CurOASysNum ).AirFlow ) {
+//					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = OASysEqSizing( CurOASysNum ).AirVolFlow;
+//				} else {
+//					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+//				}
+//			} else {
+//				if ( CurSysNum > 0 ) {
+//
+//					if ( UnitarySysEqSizing( CurSysNum ).AirFlow ) {
+//						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = UnitarySysEqSizing( CurSysNum ).AirVolFlow;
+//					} else {
+//						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+//					}
+//					if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow < SmallAirVolFlow ) {
+//						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = 0.0;
+//					}
+//
+//					if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlowEMSOverrideOn ) {
+//						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlowEMSOverrideValue;
+//					}
+//
+//					ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Supply Air Flow Rate When No Cooling or Heating is Needed [m3/s]", UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow );
+//
+//				} else if ( CurZoneEqNum > 0 ) {
+//					// if we keep this (zone equipment) then we should probably check to see if a cooling/heating coil is present
+//					// and use just cooling if only a cooling coil, or just heating if only a heating coil
+//					//        CALL CheckZoneSizing(UnitarySystem(UnitarySysNum)%UnitarySystemType, UnitarySystem(UnitarySysNum)%Name)
+//					//  would use this to size cooling or heating only systems except for the case where dual UnitarySystems are on the branch
+//					//  and each has only 1 cooling or heating coil ??? How to handle?
+//					//  Use same logic for other flow rates in this sizing module.
+//					if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
+//						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+//					} else if ( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
+//						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+//					} else if ( UnitarySystem( UnitarySysNum ).HeatCoilExists || UnitarySystem( UnitarySysNum ).SuppCoilExists ) {
+//						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+//					} else {
+//						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = 0.0; // ?
+//					}
+//
+//					if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow < SmallAirVolFlow ) {
+//						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = 0.0;
+//					}
+//
+//					if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlowEMSOverrideOn ) {
+//						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlowEMSOverrideValue;
+//					}
+//
+//					ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Supply Air Flow Rate When No Cooling or Heating is Needed [m3/s]", UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow );
+//
+//				}
+//			}
+//		} else if ( UnitarySystem( UnitarySysNum ).CoolCoilExists || UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
+//			{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).NoCoolHeatSAFMethod );
+//			if ( SELECT_CASE_var == SupplyAirFlowRate ) {
+//				if ( UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow == AutoSize ) {
+//					if ( CurOASysNum > 0 ) {
+//						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+//					} else if ( CurSysNum > 0 ) {
+//						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+//					} else if ( CurZoneEqNum > 0 ) {
+//						if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
+//							UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+//						} else if ( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
+//							UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+//						} else if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
+//							UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+//						} else {
+//							// just guessing here what this should be
+//							UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = 0.0;
+//						}
+//					}
+//				}
+//			} else if ( SELECT_CASE_var == FlowPerFloorArea ) {
+//				// already calculated in GetInput
+//			} else if ( ( SELECT_CASE_var == FractionOfAutoSizedCoolingValue ) || ( SELECT_CASE_var == FractionOfAutoSizedHeatingValue ) ) {
+//				if ( CurOASysNum > 0 ) {
+//					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow *= FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+//				} else if ( CurSysNum > 0 ) {
+//					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow *= FinalSysSizing( CurSysNum ).DesMainVolFlow;
+//				} else if ( CurZoneEqNum > 0 ) {
+//					if ( UnitarySystem( UnitarySysNum ).NoCoolHeatSAFMethod == FractionOfAutoSizedCoolingValue ) {
+//						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow *= FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+//					} else {
+//						UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow *= FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+//					}
+//				}
+//			} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) { // these aren't going to work if the user doesn't choose the same method for all cases
+//				if ( DXCoolCap == 0.0 ) {
+//					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow *= ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad;
+//				} else {
+//					UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow *= DXCoolCap;
+//				}
+//			} else if ( SELECT_CASE_var == FlowPerHeatingCapacity ) {
+//				UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow *= ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
+//			} else if ( SELECT_CASE_var == None ) {
+//				// what does this mean?
+//			} else {
+//				// wait for CR's
+//			}}
+//
+//		} else {
+//			UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow = 0.0;
+//		}
 
 		{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num );
 		if ( SELECT_CASE_var == CoilDX_CoolingSingleSpeed ) {
@@ -3444,434 +3406,510 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).LatLoadLoss = 0.0;
 		}
 
-		if ( UnitarySystem( UnitarySysNum ).HeatCoilExists && UnitarySystem( UnitarySysNum ).DesignHeatingCapacity == AutoSize ) {
+		if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
 
-			if ( CurOASysNum > 0 ) {
-				if ( OASysEqSizing( CurOASysNum ).Capacity ) {
-					if ( OASysEqSizing( CurOASysNum ).DesHeatingLoad > 0.0 ) {
-						UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = OASysEqSizing( CurOASysNum ).DesHeatingLoad;
-					} else {
-						UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = OASysEqSizing( CurOASysNum ).DesCoolingLoad * UnitarySystem( UnitarySysNum ).HeatingSizingRatio;
-					}
-				} else {
-					if ( DXCoolCap >= SmallLoad ) {
-						UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = DXCoolCap * UnitarySystem( UnitarySysNum ).HeatingSizingRatio;
-					} else {
-						UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = 0.0;
-					}
-				}
-			} else if ( CurZoneEqNum > 0 ) {
-				if ( ZoneEqSizing( CurZoneEqNum ).Capacity ) {
-					if ( ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad > 0.0 ) {
-						UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
-					} else {
-						UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad * UnitarySystem( UnitarySysNum ).HeatingSizingRatio;
-					}
-				} else {
-					if ( DXCoolCap >= SmallLoad ) {
-						UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = DXCoolCap * UnitarySystem( UnitarySysNum ).HeatingSizingRatio;
-					} else {
-						UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = 0.0;
-					}
-				}
-			} else if ( DXCoolCap > 0 && UnitarySystem( UnitarySysNum ).HeatPump ) {
-				if ( DXCoolCap >= SmallLoad ) {
-					UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = DXCoolCap * UnitarySystem( UnitarySysNum ).HeatingSizingRatio;
-				} else {
-					UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = 0.0;
-				}
-			} else if ( CurSysNum > 0 ) {
+			SizingMethod = HeatingCapacitySizing;
 
-				if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHPSimple || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHP || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHPVSEquationFit || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
-					// for now, find the associated DX cooling coil to identically size heating coil
-					DXHeatCoilBranch = 0;
-					DXHeatCoilCompNum = 0;
-					if ( UnitarySystem( UnitarySysNum ).DXHeatingCoil && ! UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
-						BRANCHLoop: for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNum ).NumBranches; ++BranchNum ) {
-							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-								if ( ! SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, UnitarySystem( UnitarySysNum ).UnitarySystemType ) ) continue;
-								if ( ! SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name, UnitarySystem( UnitarySysNum ).Name ) ) continue;
-								DXHeatCoilBranch = BranchNum;
-								DXHeatCoilCompNum = CompNum;
-								goto BRANCHLoop_exit;
-							}
-							BRANCHLoop_loop: ;
-						}
-						BRANCHLoop_exit: ;
-					}
-					if ( DXHeatCoilCompNum > 0 ) {
-						for ( CompNum = PrimaryAirSystem( AirLoopNum ).Branch( DXHeatCoilBranch ).TotalComponents; CompNum >= 1; --CompNum ) {
-							if ( SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, UnitarySystem( UnitarySysNum ).UnitarySystemType ) ) {
-								if ( SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name, UnitarySystem( UnitarySysNum ).Name ) ) continue;
-								CoolCoilIndex = GetUnitarySystemDXCoolingCoilIndex( PrimaryAirSystem( AirLoopNum ).Branch( DXHeatCoilBranch ).Comp( CompNum ).Name );
-								if ( CoolCoilIndex > 0 ) {
-									CoolUnitarySystemNum = FindItemInList( PrimaryAirSystem( AirLoopNum ).Branch( DXHeatCoilBranch ).Comp( CompNum ).Name, UnitarySystem.Name(), NumUnitarySystem );
-									CoolCoilType = UnitarySystem( CoolUnitarySystemNum ).CoolingCoilType_Num;
-									CoolCoilName = UnitarySystem ( CoolUnitarySystemNum ).CoolingCoilName;
-									if ( ( CoolCoilType == CoilDX_CoolingSingleSpeed ) || ( CoolCoilType == CoilDX_CoolingTwoSpeed ) || ( CoolCoilType == CoilDX_CoolingTwoStageWHumControl ) ) {
-										DXCoolCap = GetCoilCapacityByIndexType( CoolCoilIndex, CoolCoilType, ErrFound );
-									} else if ( CoolCoilType == CoilDX_CoolingHXAssisted ) {
-										DXCoolCap = GetCoilCapacity( cAllCoilTypes( CoolCoilType ), CoolCoilName, ErrFound );
-									} else if ( CoolCoilType == Coil_CoolingAirToAirVariableSpeed ) {
-										DXCoolCap = GetCoilCapacityByIndexType( CoolCoilIndex, CoolCoilType, ErrFound );
-									} else if ( CoolCoilType == Coil_CoolingWaterToAirHPSimple ) {
-										DXCoolCap = GetSimpleCoilCapacity( cAllCoilTypes( CoolCoilType ), CoolCoilName, ErrFound );
-									} else if ( CoolCoilType == Coil_CoolingWaterToAirHP ) {
-										DXCoolCap = GetWAHPCoilCapacity( cAllCoilTypes( CoolCoilType ), CoolCoilName, ErrFound );
-									} else if ( CoolCoilType == Coil_CoolingWaterToAirHPVSEquationFit ) {
-										DXCoolCap = GetCoilCapacityVariableSpeed( cAllCoilTypes( CoolCoilType ), CoolCoilName, ErrFound );
-									} else if ( CoolCoilType == CoilDX_MultiSpeedCooling ) {
-										DXCoolCap = GetCoilCapacityByIndexType( CoolCoilIndex, CoolCoilType, ErrFound );
-									} else {
-										// nothing to do, no cooling coil exists? what if it's a water coil?
-									}
-									if ( DXCoolCap > 0.0 ) { // coil must have been sized or is not autosized for this to work.
-										UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = DXCoolCap * UnitarySystem( UnitarySysNum ).HeatingSizingRatio;
-									}
-									break;
-								}
-							} else if ( SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "CoilSystem:Cooling:DX" ) ) {
-								CoolCoilType = 0;
-								CoolCoilIndex = 0;
-								CoolCoilName = "";
-								GetCoolingCoilTypeNameAndIndex( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name, CoolCoilType, CoolCoilIndex, CoolCoilName, ErrFound );
-								if ( CoolCoilIndex > 0 ) {
-									if ( ( CoolCoilType == CoilDX_CoolingSingleSpeed ) || ( CoolCoilType == CoilDX_CoolingTwoSpeed ) || ( CoolCoilType == CoilDX_CoolingTwoStageWHumControl ) ) {
-										DXCoolCap = GetCoilCapacityByIndexType( CoolCoilIndex, CoolCoilType, ErrFound );
-									} else if ( CoolCoilType == CoilDX_CoolingHXAssisted ) {
-										DXCoolCap = GetCoilCapacity( cAllCoilTypes( CoolCoilType ), CoolCoilName, ErrFound );
-									} else if ( CoolCoilType == Coil_CoolingAirToAirVariableSpeed ) {
-										DXCoolCap = GetCoilCapacityByIndexType( CoolCoilIndex, CoolCoilType, ErrFound );
-										// the following CASE's are not allowed in CoilSystem:Cooling:DX
-									} else if ( CoolCoilType == Coil_CoolingWaterToAirHPSimple ) {
-										DXCoolCap = GetSimpleCoilCapacity( cAllCoilTypes( CoolCoilType ), CoolCoilName, ErrFound );
-									} else if ( CoolCoilType == Coil_CoolingWaterToAirHP ) {
-										DXCoolCap = GetWAHPCoilCapacity( cAllCoilTypes( CoolCoilType ), CoolCoilName, ErrFound );
-									} else if ( CoolCoilType == Coil_CoolingWaterToAirHPVSEquationFit ) {
-										DXCoolCap = GetCoilCapacityVariableSpeed( cAllCoilTypes( CoolCoilType ), CoolCoilName, ErrFound );
-									} else if ( CoolCoilType == CoilDX_MultiSpeedCooling ) {
-										DXCoolCap = GetCoilCapacityByIndexType( CoolCoilIndex, CoolCoilType, ErrFound );
-									} else {
-										// nothing to do, no cooling coil exists? what if it's a water coil?
-									}
-								}
-								UnitarySystem( UnitarySysNum ).CoolingCoilIndex = CoolCoilIndex; // why retain the coil index to a coil in a differnt object?
-								if ( UnitarySystem( UnitarySysNum ).CoolingCoilIndex > 0 ) {
-									if ( DXCoolCap > 0.0 ) UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = DXCoolCap * UnitarySystem( UnitarySysNum ).HeatingSizingRatio;
-									//                EXIT - don't exit, see if there is a UnitarySystem on the branch more upstream of the CoilSystem
-								}
-							}
-						}
-						if ( DXCoolCap <= 0.0 ) {
-							if ( UnitarySystem( UnitarySysNum ).DesignHeatingCapacity == AutoSize ) {
-								VolFlowRate = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-								if ( VolFlowRate >= SmallAirVolFlow ) {
-									if ( CurOASysNum > 0 ) { // coil is in the OA stream
-										MixTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
-										MixHumRat = FinalSysSizing( CurSysNum ).HeatOutHumRat;
-										SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
-										SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
-										OutTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
-									} else if ( CurSysNum > 0 ) { // coil is on the main air loop
-										SupTemp = FinalSysSizing( CurSysNum ).HeatSupTemp;
-										SupHumRat = FinalSysSizing( CurSysNum ).HeatSupHumRat;
-										MixTemp = FinalSysSizing( CurSysNum ).HeatMixTemp;
-										MixHumRat = FinalSysSizing( CurSysNum ).HeatMixHumRat;
-										OutTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
-									} else { // coil is zone equipment
-										if ( ZoneEqSizing( CurZoneEqNum ).OAVolFlow > 0.0 ) {
-											MixTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
-											MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRat;
-										} else {
-											MixTemp = FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtCoolPeak;
-											MixHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak;
-										}
-										SupTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
-										SupHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
-										TimeStepNumAtMax = FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtCoolMax;
-										DDNum = FinalZoneSizing( CurZoneEqNum ).CoolDDNum;
-										if ( DDNum > 0 && TimeStepNumAtMax > 0 ) {
-											OutTemp = DesDayWeath( DDNum ).Temp( TimeStepNumAtMax );
-										} else {
-											OutTemp = 0.0;
-										}
-									}
-									rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-									MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
-									MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-									SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
-									if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
-										CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
-										TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
-									} else {
-										TotCapTempModFac = 1.0;
-									}
-									HeatCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( SupEnth - MixEnth ) ) );
-									if ( TotCapTempModFac > 0.0 ) {
-										DXCoolCap = HeatCapAtPeak / TotCapTempModFac;
-									} else {
-										DXCoolCap = HeatCapAtPeak;
-									}
-									UnitarySystem ( UnitarySysNum ).DesignHeatingCapacity = DXCoolCap;
-									if ( UnitarySystem( UnitarySysNum ).DesignHeatingCapacity > 0.0 ) {
-										RatedVolFlowPerRatedTotCap = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow / UnitarySystem( UnitarySysNum ).DesignHeatingCapacity;
-									} else {
-										RatedVolFlowPerRatedTotCap = 0.0;
-									}
-									// check capacity to make sure design volume flow per total capacity is within range
-									if ( RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap1 ) {
-										HeatCapAtPeak = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow / MinRatedVolFlowPerRatedTotCap1;
-										UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = HeatCapAtPeak;
-										DXCoolCap = HeatCapAtPeak;
-									} else if ( RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap1 ) {
-										HeatCapAtPeak = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow / MaxRatedVolFlowPerRatedTotCap1;
-										UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = HeatCapAtPeak;
-										DXCoolCap = HeatCapAtPeak;
-									}
-								} // IF (VolFlowRate >= SmallAirVolFlow) THEN
-							} // IF(UnitarySystem(UnitarySysNum)%DesignHeatingCapacity == AutoSize)THEN
-						} // IF(DXCoolCap == 0.0d0)THEN
-					} else {
-						if ( UnitarySystem( UnitarySysNum ).DesignHeatingCapacity == AutoSize ) {
-							VolFlowRate = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
-							if ( VolFlowRate >= SmallAirVolFlow ) {
-								if ( CurOASysNum > 0 ) { // coil is in the OA stream
-									MixTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
-									MixHumRat = FinalSysSizing( CurSysNum ).HeatOutHumRat;
-									SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
-									SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
-									OutTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
-								} else if ( CurSysNum > 0 ) { // coil is on the main air loop
-									SupTemp = FinalSysSizing( CurSysNum ).HeatSupTemp;
-									SupHumRat = FinalSysSizing( CurSysNum ).HeatSupHumRat;
-									MixTemp = FinalSysSizing( CurSysNum ).HeatMixTemp;
-									MixHumRat = FinalSysSizing( CurSysNum ).HeatMixHumRat;
-									OutTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
-								} else { // coil is zone equipment
-									if ( ZoneEqSizing( CurZoneEqNum ).OAVolFlow > 0.0 ) {
-										MixTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
-										MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRat;
-									} else {
-										MixTemp = FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtCoolPeak;
-										MixHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak;
-									}
-									SupTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
-									SupHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
-									TimeStepNumAtMax = FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtHeatMax;
-									DDNum = FinalZoneSizing( CurZoneEqNum ).HeatDDNum;
-									if ( DDNum > 0 && TimeStepNumAtMax > 0 ) {
-										OutTemp = DesDayWeath( DDNum ).Temp( TimeStepNumAtMax );
-									} else {
-										OutTemp = 0.0;
-									}
-								}
-								rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
-								MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
-								MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
-								SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
-								if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
-									CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
-									TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
-								} else {
-									TotCapTempModFac = 1.0;
-								}
-								HeatCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( SupEnth - MixEnth ) ) );
-								if ( TotCapTempModFac > 0.0 ) {
-									UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = HeatCapAtPeak / TotCapTempModFac;
-								} else {
-									UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = HeatCapAtPeak;
-								}
-								DXCoolCap = UnitarySystem( UnitarySysNum ).DesignHeatingCapacity;
-								if ( UnitarySystem( UnitarySysNum ).DesignHeatingCapacity > 0.0 ) {
-									RatedVolFlowPerRatedTotCap = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow / UnitarySystem( UnitarySysNum ).DesignHeatingCapacity;
-								} else {
-									RatedVolFlowPerRatedTotCap = 0.0;
-								}
-								// check capacity to make sure design volume flow per total capacity is within range
-								if ( RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap1 ) {
-									HeatCapAtPeak = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow / MinRatedVolFlowPerRatedTotCap1;
-									UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = HeatCapAtPeak;
-									DXCoolCap = HeatCapAtPeak;
-								} else if ( RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap1 ) {
-									HeatCapAtPeak = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow / MaxRatedVolFlowPerRatedTotCap1;
-									UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = HeatCapAtPeak;
-									DXCoolCap = HeatCapAtPeak;
-								}
-							} // IF (VolFlowRate >= SmallAirVolFlow) THEN
-						} // IF(UnitarySystem(UnitarySysNum)%DesignHeatingCapacity == AutoSize)THEN
-					} // IF(DXHeatCoilCompNum .GT. 0)THEN
-
-				} else { // else not a HP heating coil
-					if ( CurOASysNum > 0 ) {
-						if ( OASysEqSizing( CurOASysNum ).Capacity ) UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = OASysEqSizing( CurOASysNum ).DesHeatingLoad;
-					} else if ( CurSysNum > 0 ) {
-						if ( UnitarySysEqSizing( CurSysNum ).Capacity ) UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = UnitarySysEqSizing( CurSysNum ).DesHeatingLoad;
-					} else if ( CurZoneEqNum > 0 ) {
-						if ( ZoneEqSizing( CurZoneEqNum ).Capacity ) UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
-					}
-					if ( UnitarySystem( UnitarySysNum ).DesignHeatingCapacity == AutoSize ) {
-						if ( CurOASysNum > 0 ) {
-							if ( OASysEqSizing( CurOASysNum ).AirFlow ) {
-								VolFlowRate = OASysEqSizing( CurOASysNum ).AirVolFlow;
-							} else {
-								VolFlowRate = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-							}
-						} else {
-							if ( CurZoneEqNum > 0 ) {
-								if ( ZoneEqSizing( CurZoneEqNum ).AirFlow ) {
-									VolFlowRate = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
-								} else {
-									VolFlowRate = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
-								}
-							} else {
-								if ( UnitarySysEqSizing( CurSysNum ).AirFlow ) {
-									VolFlowRate = UnitarySysEqSizing( CurSysNum ).AirVolFlow;
-								} else {
-									{ auto const SELECT_CASE_var( CurDuctType );
-									if ( SELECT_CASE_var == Main ) {
-										VolFlowRate = FinalSysSizing( CurSysNum ).SysAirMinFlowRat * FinalSysSizing( CurSysNum ).DesMainVolFlow;
-									} else if ( SELECT_CASE_var == Cooling ) {
-										VolFlowRate = FinalSysSizing( CurSysNum ).SysAirMinFlowRat * FinalSysSizing( CurSysNum ).DesCoolVolFlow;
-									} else if ( SELECT_CASE_var == Heating ) {
-										VolFlowRate = FinalSysSizing( CurSysNum ).DesHeatVolFlow;
-									} else if ( SELECT_CASE_var == Other ) {
-										VolFlowRate = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-									} else {
-										VolFlowRate = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-									}}
-								}
-							}
-						}
-						// get the outside air fraction
-						if ( CurOASysNum > 0 ) {
-							OutAirFrac = 1.0;
-						} else if ( CurSysNum > 0 ) {
-							if ( FinalSysSizing( CurSysNum ).HeatOAOption == MinOA ) {
-								if ( VolFlowRate > 0.0 ) {
-									OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / VolFlowRate;
-								} else {
-									OutAirFrac = 1.0;
-								}
-							} else {
-								OutAirFrac = 1.0;
-							}
-							OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
-						} else {
-							OutAirFrac = 1.0;
-						}
-						// coil inlet temperature
-						if ( CurZoneEqNum > 0 ) {
-							MixTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
-							CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
-							HeatCapAtPeak = CpAirStd * StdRhoAir * VolFlowRate * ( FinalZoneSizing( CurZoneEqNum ).HeatDesTemp - MixTemp );
-							ZoneEqSizing( CurZoneEqNum ).Capacity = true;
-							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = HeatCapAtPeak;
-						} else {
-							if ( CurOASysNum == 0 && PrimaryAirSystem( CurSysNum ).NumOAHeatCoils > 0 ) {
-								MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PreheatTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetTemp;
-							} else {
-								MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).HeatOutTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetTemp;
-							}
-							// coil load
-							if ( CurOASysNum > 0 ) {
-								if ( OASysEqSizing( CurOASysNum ).Capacity ) {
-									HeatCapAtPeak = OASysEqSizing( CurOASysNum ).DesHeatingLoad;
-								} else {
-									CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
-									HeatCapAtPeak = CpAirStd * StdRhoAir * VolFlowRate * ( FinalSysSizing( CurSysNum ).PreheatTemp - MixTemp );
-								}
-							} else {
-								if ( UnitarySysEqSizing( CurSysNum ).Capacity ) {
-									HeatCapAtPeak = UnitarySysEqSizing( CurSysNum ).DesHeatingLoad;
-								} else {
-									CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
-									HeatCapAtPeak = CpAirStd * StdRhoAir * VolFlowRate * ( FinalSysSizing( CurSysNum ).HeatSupTemp - MixTemp );
-								}
-							}
-							UnitaryHeatCap = HeatCapAtPeak;
-						}
-						UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = HeatCapAtPeak;
-					}
-				}
-
-				if ( UnitarySystem( UnitarySysNum ).DesignHeatingCapacity < SmallLoad ) {
-					UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = 0.0;
-				}
-
+			if( UnitarySystem( UnitarySysNum ).DesignHeatingCapacity == AutoSize && EqSizing.DesHeatingLoad > 0.0 ) {
+				DataConstantUsedForSizing = EqSizing.DesHeatingLoad;
+				DataFractionUsedForSizing = 1.0;
+				SizingMethod = AutoCalculateSizing;
 			}
 
-			ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Nominal Heating Capacity [W]", UnitarySystem( UnitarySysNum ).DesignHeatingCapacity );
+			PrintFlag = true;
+			TempSize = UnitarySystem( UnitarySysNum ).DesignHeatingCapacity;
+			SizingString = "Nominal Heating Capacity [W]";
+			RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+			UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = TempSize;
 
 		}
+
+//		if( UnitarySystem( UnitarySysNum ).HeatCoilExists && UnitarySystem( UnitarySysNum ).DesignHeatingCapacity == AutoSize ) {
+//
+//			if ( CurOASysNum > 0 ) {
+//				if ( OASysEqSizing( CurOASysNum ).Capacity ) {
+//					if ( OASysEqSizing( CurOASysNum ).DesHeatingLoad > 0.0 ) {
+//						UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = OASysEqSizing( CurOASysNum ).DesHeatingLoad;
+//					} else {
+//						UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = OASysEqSizing( CurOASysNum ).DesCoolingLoad * UnitarySystem( UnitarySysNum ).HeatingSizingRatio;
+//					}
+//				} else {
+//					if ( DXCoolCap >= SmallLoad ) {
+//						UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = DXCoolCap * UnitarySystem( UnitarySysNum ).HeatingSizingRatio;
+//					} else {
+//						UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = 0.0;
+//					}
+//				}
+//			} else if ( CurZoneEqNum > 0 ) {
+//				if ( ZoneEqSizing( CurZoneEqNum ).Capacity ) {
+//					if ( ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad > 0.0 ) {
+//						UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
+//					} else {
+//						UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad * UnitarySystem( UnitarySysNum ).HeatingSizingRatio;
+//					}
+//				} else {
+//					if ( DXCoolCap >= SmallLoad ) {
+//						UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = DXCoolCap * UnitarySystem( UnitarySysNum ).HeatingSizingRatio;
+//					} else {
+//						UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = 0.0;
+//					}
+//				}
+//			} else if ( DXCoolCap > 0 && UnitarySystem( UnitarySysNum ).HeatPump ) {
+//				if ( DXCoolCap >= SmallLoad ) {
+//					UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = DXCoolCap * UnitarySystem( UnitarySysNum ).HeatingSizingRatio;
+//				} else {
+//					UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = 0.0;
+//				}
+//			} else if ( CurSysNum > 0 ) {
+//
+//				if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHPSimple || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHP || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHPVSEquationFit || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
+//					// for now, find the associated DX cooling coil to identically size heating coil
+//					DXHeatCoilBranch = 0;
+//					DXHeatCoilCompNum = 0;
+//					if ( UnitarySystem( UnitarySysNum ).DXHeatingCoil && ! UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
+//						BRANCHLoop: for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirLoopNum ).NumBranches; ++BranchNum ) {
+//							for ( CompNum = 1; CompNum <= PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
+//								if ( ! SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, UnitarySystem( UnitarySysNum ).UnitarySystemType ) ) continue;
+//								if ( ! SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name, UnitarySystem( UnitarySysNum ).Name ) ) continue;
+//								DXHeatCoilBranch = BranchNum;
+//								DXHeatCoilCompNum = CompNum;
+//								goto BRANCHLoop_exit;
+//							}
+//							BRANCHLoop_loop: ;
+//						}
+//						BRANCHLoop_exit: ;
+//					}
+//					if ( DXHeatCoilCompNum > 0 ) {
+//						for ( CompNum = PrimaryAirSystem( AirLoopNum ).Branch( DXHeatCoilBranch ).TotalComponents; CompNum >= 1; --CompNum ) {
+//							if ( SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, UnitarySystem( UnitarySysNum ).UnitarySystemType ) ) {
+//								if ( SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name, UnitarySystem( UnitarySysNum ).Name ) ) continue;
+//								CoolCoilIndex = GetUnitarySystemDXCoolingCoilIndex( PrimaryAirSystem( AirLoopNum ).Branch( DXHeatCoilBranch ).Comp( CompNum ).Name );
+//								if ( CoolCoilIndex > 0 ) {
+//									CoolUnitarySystemNum = FindItemInList( PrimaryAirSystem( AirLoopNum ).Branch( DXHeatCoilBranch ).Comp( CompNum ).Name, UnitarySystem.Name(), NumUnitarySystem );
+//									CoolCoilType = UnitarySystem( CoolUnitarySystemNum ).CoolingCoilType_Num;
+//									CoolCoilName = UnitarySystem ( CoolUnitarySystemNum ).CoolingCoilName;
+//									if ( ( CoolCoilType == CoilDX_CoolingSingleSpeed ) || ( CoolCoilType == CoilDX_CoolingTwoSpeed ) || ( CoolCoilType == CoilDX_CoolingTwoStageWHumControl ) ) {
+//										DXCoolCap = GetCoilCapacityByIndexType( CoolCoilIndex, CoolCoilType, ErrFound );
+//									} else if ( CoolCoilType == CoilDX_CoolingHXAssisted ) {
+//										DXCoolCap = GetCoilCapacity( cAllCoilTypes( CoolCoilType ), CoolCoilName, ErrFound );
+//									} else if ( CoolCoilType == Coil_CoolingAirToAirVariableSpeed ) {
+//										DXCoolCap = GetCoilCapacityByIndexType( CoolCoilIndex, CoolCoilType, ErrFound );
+//									} else if ( CoolCoilType == Coil_CoolingWaterToAirHPSimple ) {
+//										DXCoolCap = GetSimpleCoilCapacity( cAllCoilTypes( CoolCoilType ), CoolCoilName, ErrFound );
+//									} else if ( CoolCoilType == Coil_CoolingWaterToAirHP ) {
+//										DXCoolCap = GetWAHPCoilCapacity( cAllCoilTypes( CoolCoilType ), CoolCoilName, ErrFound );
+//									} else if ( CoolCoilType == Coil_CoolingWaterToAirHPVSEquationFit ) {
+//										DXCoolCap = GetCoilCapacityVariableSpeed( cAllCoilTypes( CoolCoilType ), CoolCoilName, ErrFound );
+//									} else if ( CoolCoilType == CoilDX_MultiSpeedCooling ) {
+//										DXCoolCap = GetCoilCapacityByIndexType( CoolCoilIndex, CoolCoilType, ErrFound );
+//									} else {
+//										// nothing to do, no cooling coil exists? what if it's a water coil?
+//									}
+//									if ( DXCoolCap > 0.0 ) { // coil must have been sized or is not autosized for this to work.
+//										UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = DXCoolCap * UnitarySystem( UnitarySysNum ).HeatingSizingRatio;
+//									}
+//									break;
+//								}
+//							} else if ( SameString( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf, "CoilSystem:Cooling:DX" ) ) {
+//								CoolCoilType = 0;
+//								CoolCoilIndex = 0;
+//								CoolCoilName = "";
+//								GetCoolingCoilTypeNameAndIndex( PrimaryAirSystem( AirLoopNum ).Branch( BranchNum ).Comp( CompNum ).Name, CoolCoilType, CoolCoilIndex, CoolCoilName, ErrFound );
+//								if ( CoolCoilIndex > 0 ) {
+//									if ( ( CoolCoilType == CoilDX_CoolingSingleSpeed ) || ( CoolCoilType == CoilDX_CoolingTwoSpeed ) || ( CoolCoilType == CoilDX_CoolingTwoStageWHumControl ) ) {
+//										DXCoolCap = GetCoilCapacityByIndexType( CoolCoilIndex, CoolCoilType, ErrFound );
+//									} else if ( CoolCoilType == CoilDX_CoolingHXAssisted ) {
+//										DXCoolCap = GetCoilCapacity( cAllCoilTypes( CoolCoilType ), CoolCoilName, ErrFound );
+//									} else if ( CoolCoilType == Coil_CoolingAirToAirVariableSpeed ) {
+//										DXCoolCap = GetCoilCapacityByIndexType( CoolCoilIndex, CoolCoilType, ErrFound );
+//										// the following CASE's are not allowed in CoilSystem:Cooling:DX
+//									} else if ( CoolCoilType == Coil_CoolingWaterToAirHPSimple ) {
+//										DXCoolCap = GetSimpleCoilCapacity( cAllCoilTypes( CoolCoilType ), CoolCoilName, ErrFound );
+//									} else if ( CoolCoilType == Coil_CoolingWaterToAirHP ) {
+//										DXCoolCap = GetWAHPCoilCapacity( cAllCoilTypes( CoolCoilType ), CoolCoilName, ErrFound );
+//									} else if ( CoolCoilType == Coil_CoolingWaterToAirHPVSEquationFit ) {
+//										DXCoolCap = GetCoilCapacityVariableSpeed( cAllCoilTypes( CoolCoilType ), CoolCoilName, ErrFound );
+//									} else if ( CoolCoilType == CoilDX_MultiSpeedCooling ) {
+//										DXCoolCap = GetCoilCapacityByIndexType( CoolCoilIndex, CoolCoilType, ErrFound );
+//									} else {
+//										// nothing to do, no cooling coil exists? what if it's a water coil?
+//									}
+//								}
+//								UnitarySystem( UnitarySysNum ).CoolingCoilIndex = CoolCoilIndex; // why retain the coil index to a coil in a differnt object?
+//								if ( UnitarySystem( UnitarySysNum ).CoolingCoilIndex > 0 ) {
+//									if ( DXCoolCap > 0.0 ) UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = DXCoolCap * UnitarySystem( UnitarySysNum ).HeatingSizingRatio;
+//									//                EXIT - don't exit, see if there is a UnitarySystem on the branch more upstream of the CoilSystem
+//								}
+//							}
+//						}
+//						if ( DXCoolCap <= 0.0 ) {
+//							if ( UnitarySystem( UnitarySysNum ).DesignHeatingCapacity == AutoSize ) {
+//								VolFlowRate = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//								if ( VolFlowRate >= SmallAirVolFlow ) {
+//									if ( CurOASysNum > 0 ) { // coil is in the OA stream
+//										MixTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
+//										MixHumRat = FinalSysSizing( CurSysNum ).HeatOutHumRat;
+//										SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
+//										SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
+//										OutTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
+//									} else if ( CurSysNum > 0 ) { // coil is on the main air loop
+//										SupTemp = FinalSysSizing( CurSysNum ).HeatSupTemp;
+//										SupHumRat = FinalSysSizing( CurSysNum ).HeatSupHumRat;
+//										MixTemp = FinalSysSizing( CurSysNum ).HeatMixTemp;
+//										MixHumRat = FinalSysSizing( CurSysNum ).HeatMixHumRat;
+//										OutTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
+//									} else { // coil is zone equipment
+//										if ( ZoneEqSizing( CurZoneEqNum ).OAVolFlow > 0.0 ) {
+//											MixTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
+//											MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRat;
+//										} else {
+//											MixTemp = FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtCoolPeak;
+//											MixHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak;
+//										}
+//										SupTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
+//										SupHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
+//										TimeStepNumAtMax = FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtCoolMax;
+//										DDNum = FinalZoneSizing( CurZoneEqNum ).CoolDDNum;
+//										if ( DDNum > 0 && TimeStepNumAtMax > 0 ) {
+//											OutTemp = DesDayWeath( DDNum ).Temp( TimeStepNumAtMax );
+//										} else {
+//											OutTemp = 0.0;
+//										}
+//									}
+//									rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
+//									MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+//									MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
+//									SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+//									if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
+//										CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
+//										TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
+//									} else {
+//										TotCapTempModFac = 1.0;
+//									}
+//									HeatCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( SupEnth - MixEnth ) ) );
+//									if ( TotCapTempModFac > 0.0 ) {
+//										DXCoolCap = HeatCapAtPeak / TotCapTempModFac;
+//									} else {
+//										DXCoolCap = HeatCapAtPeak;
+//									}
+//									UnitarySystem ( UnitarySysNum ).DesignHeatingCapacity = DXCoolCap;
+//									if ( UnitarySystem( UnitarySysNum ).DesignHeatingCapacity > 0.0 ) {
+//										RatedVolFlowPerRatedTotCap = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow / UnitarySystem( UnitarySysNum ).DesignHeatingCapacity;
+//									} else {
+//										RatedVolFlowPerRatedTotCap = 0.0;
+//									}
+//									// check capacity to make sure design volume flow per total capacity is within range
+//									if ( RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap1 ) {
+//										HeatCapAtPeak = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow / MinRatedVolFlowPerRatedTotCap1;
+//										UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = HeatCapAtPeak;
+//										DXCoolCap = HeatCapAtPeak;
+//									} else if ( RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap1 ) {
+//										HeatCapAtPeak = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow / MaxRatedVolFlowPerRatedTotCap1;
+//										UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = HeatCapAtPeak;
+//										DXCoolCap = HeatCapAtPeak;
+//									}
+//								} // IF (VolFlowRate >= SmallAirVolFlow) THEN
+//							} // IF(UnitarySystem(UnitarySysNum)%DesignHeatingCapacity == AutoSize)THEN
+//						} // IF(DXCoolCap == 0.0d0)THEN
+//					} else {
+//						if ( UnitarySystem( UnitarySysNum ).DesignHeatingCapacity == AutoSize ) {
+//							VolFlowRate = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+//							if ( VolFlowRate >= SmallAirVolFlow ) {
+//								if ( CurOASysNum > 0 ) { // coil is in the OA stream
+//									MixTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
+//									MixHumRat = FinalSysSizing( CurSysNum ).HeatOutHumRat;
+//									SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
+//									SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
+//									OutTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
+//								} else if ( CurSysNum > 0 ) { // coil is on the main air loop
+//									SupTemp = FinalSysSizing( CurSysNum ).HeatSupTemp;
+//									SupHumRat = FinalSysSizing( CurSysNum ).HeatSupHumRat;
+//									MixTemp = FinalSysSizing( CurSysNum ).HeatMixTemp;
+//									MixHumRat = FinalSysSizing( CurSysNum ).HeatMixHumRat;
+//									OutTemp = FinalSysSizing( CurSysNum ).HeatOutTemp;
+//								} else { // coil is zone equipment
+//									if ( ZoneEqSizing( CurZoneEqNum ).OAVolFlow > 0.0 ) {
+//										MixTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
+//										MixHumRat = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInHumRat;
+//									} else {
+//										MixTemp = FinalZoneSizing( CurZoneEqNum ).ZoneRetTempAtCoolPeak;
+//										MixHumRat = FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak;
+//									}
+//									SupTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
+//									SupHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
+//									TimeStepNumAtMax = FinalZoneSizing( CurZoneEqNum ).TimeStepNumAtHeatMax;
+//									DDNum = FinalZoneSizing( CurZoneEqNum ).HeatDDNum;
+//									if ( DDNum > 0 && TimeStepNumAtMax > 0 ) {
+//										OutTemp = DesDayWeath( DDNum ).Temp( TimeStepNumAtMax );
+//									} else {
+//										OutTemp = 0.0;
+//									}
+//								}
+//								rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
+//								MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
+//								MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
+//								SupEnth = PsyHFnTdbW( SupTemp, SupHumRat );
+//								if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
+//									CapFTCurve = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
+//									TotCapTempModFac = CurveValue( CapFTCurve, MixWetBulb, OutTemp );
+//								} else {
+//									TotCapTempModFac = 1.0;
+//								}
+//								HeatCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( SupEnth - MixEnth ) ) );
+//								if ( TotCapTempModFac > 0.0 ) {
+//									UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = HeatCapAtPeak / TotCapTempModFac;
+//								} else {
+//									UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = HeatCapAtPeak;
+//								}
+//								DXCoolCap = UnitarySystem( UnitarySysNum ).DesignHeatingCapacity;
+//								if ( UnitarySystem( UnitarySysNum ).DesignHeatingCapacity > 0.0 ) {
+//									RatedVolFlowPerRatedTotCap = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow / UnitarySystem( UnitarySysNum ).DesignHeatingCapacity;
+//								} else {
+//									RatedVolFlowPerRatedTotCap = 0.0;
+//								}
+//								// check capacity to make sure design volume flow per total capacity is within range
+//								if ( RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap1 ) {
+//									HeatCapAtPeak = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow / MinRatedVolFlowPerRatedTotCap1;
+//									UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = HeatCapAtPeak;
+//									DXCoolCap = HeatCapAtPeak;
+//								} else if ( RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap1 ) {
+//									HeatCapAtPeak = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow / MaxRatedVolFlowPerRatedTotCap1;
+//									UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = HeatCapAtPeak;
+//									DXCoolCap = HeatCapAtPeak;
+//								}
+//							} // IF (VolFlowRate >= SmallAirVolFlow) THEN
+//						} // IF(UnitarySystem(UnitarySysNum)%DesignHeatingCapacity == AutoSize)THEN
+//					} // IF(DXHeatCoilCompNum .GT. 0)THEN
+//
+//				} else { // else not a HP heating coil
+//					if ( CurOASysNum > 0 ) {
+//						if ( OASysEqSizing( CurOASysNum ).Capacity ) UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = OASysEqSizing( CurOASysNum ).DesHeatingLoad;
+//					} else if ( CurSysNum > 0 ) {
+//						if ( UnitarySysEqSizing( CurSysNum ).Capacity ) UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = UnitarySysEqSizing( CurSysNum ).DesHeatingLoad;
+//					} else if ( CurZoneEqNum > 0 ) {
+//						if ( ZoneEqSizing( CurZoneEqNum ).Capacity ) UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
+//					}
+//					if ( UnitarySystem( UnitarySysNum ).DesignHeatingCapacity == AutoSize ) {
+//						if ( CurOASysNum > 0 ) {
+//							if ( OASysEqSizing( CurOASysNum ).AirFlow ) {
+//								VolFlowRate = OASysEqSizing( CurOASysNum ).AirVolFlow;
+//							} else {
+//								VolFlowRate = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+//							}
+//						} else {
+//							if ( CurZoneEqNum > 0 ) {
+//								if ( ZoneEqSizing( CurZoneEqNum ).AirFlow ) {
+//									VolFlowRate = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
+//								} else {
+//									VolFlowRate = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+//								}
+//							} else {
+//								if ( UnitarySysEqSizing( CurSysNum ).AirFlow ) {
+//									VolFlowRate = UnitarySysEqSizing( CurSysNum ).AirVolFlow;
+//								} else {
+//									{ auto const SELECT_CASE_var( CurDuctType );
+//									if ( SELECT_CASE_var == Main ) {
+//										VolFlowRate = FinalSysSizing( CurSysNum ).SysAirMinFlowRat * FinalSysSizing( CurSysNum ).DesMainVolFlow;
+//									} else if ( SELECT_CASE_var == Cooling ) {
+//										VolFlowRate = FinalSysSizing( CurSysNum ).SysAirMinFlowRat * FinalSysSizing( CurSysNum ).DesCoolVolFlow;
+//									} else if ( SELECT_CASE_var == Heating ) {
+//										VolFlowRate = FinalSysSizing( CurSysNum ).DesHeatVolFlow;
+//									} else if ( SELECT_CASE_var == Other ) {
+//										VolFlowRate = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+//									} else {
+//										VolFlowRate = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+//									}}
+//								}
+//							}
+//						}
+//						// get the outside air fraction
+//						if ( CurOASysNum > 0 ) {
+//							OutAirFrac = 1.0;
+//						} else if ( CurSysNum > 0 ) {
+//							if ( FinalSysSizing( CurSysNum ).HeatOAOption == MinOA ) {
+//								if ( VolFlowRate > 0.0 ) {
+//									OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / VolFlowRate;
+//								} else {
+//									OutAirFrac = 1.0;
+//								}
+//							} else {
+//								OutAirFrac = 1.0;
+//							}
+//							OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
+//						} else {
+//							OutAirFrac = 1.0;
+//						}
+//						// coil inlet temperature
+//						if ( CurZoneEqNum > 0 ) {
+//							MixTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
+//							CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
+//							HeatCapAtPeak = CpAirStd * StdRhoAir * VolFlowRate * ( FinalZoneSizing( CurZoneEqNum ).HeatDesTemp - MixTemp );
+//							ZoneEqSizing( CurZoneEqNum ).Capacity = true;
+//							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = HeatCapAtPeak;
+//						} else {
+//							if ( CurOASysNum == 0 && PrimaryAirSystem( CurSysNum ).NumOAHeatCoils > 0 ) {
+//								MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PreheatTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetTemp;
+//							} else {
+//								MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).HeatOutTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetTemp;
+//							}
+//							// coil load
+//							if ( CurOASysNum > 0 ) {
+//								if ( OASysEqSizing( CurOASysNum ).Capacity ) {
+//									HeatCapAtPeak = OASysEqSizing( CurOASysNum ).DesHeatingLoad;
+//								} else {
+//									CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
+//									HeatCapAtPeak = CpAirStd * StdRhoAir * VolFlowRate * ( FinalSysSizing( CurSysNum ).PreheatTemp - MixTemp );
+//								}
+//							} else {
+//								if ( UnitarySysEqSizing( CurSysNum ).Capacity ) {
+//									HeatCapAtPeak = UnitarySysEqSizing( CurSysNum ).DesHeatingLoad;
+//								} else {
+//									CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
+//									HeatCapAtPeak = CpAirStd * StdRhoAir * VolFlowRate * ( FinalSysSizing( CurSysNum ).HeatSupTemp - MixTemp );
+//								}
+//							}
+//							UnitaryHeatCap = HeatCapAtPeak;
+//						}
+//						UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = HeatCapAtPeak;
+//					}
+//				}
+//
+//				if ( UnitarySystem( UnitarySysNum ).DesignHeatingCapacity < SmallLoad ) {
+//					UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = 0.0;
+//				}
+//
+//			}
+//
+//			ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Nominal Heating Capacity [W]", UnitarySystem( UnitarySysNum ).DesignHeatingCapacity );
+//
+//		}
 
 		UnitaryHeatCap = UnitarySystem( UnitarySysNum ).DesignHeatingCapacity;
 
-		if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && UnitarySystem( UnitarySysNum ).DesignCoolingCapacity == AutoSize ) {
+		if ( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
 
-			if ( CurOASysNum > 0 ) {
-				if ( DXCoolCap >= SmallLoad ) {
-					UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = DXCoolCap;
-				} else {
-					UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = 0.0;
-				}
-			} else if ( CurZoneEqNum > 0 ) {
+			SizingMethod = CoolingCapacitySizing;
 
-				if ( DXCoolCap >= SmallLoad ) {
-					UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = DXCoolCap;
-				} else {
-					UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = 0.0;
-				}
-			} else if ( CurSysNum > 0 ) {
-
-				if ( DXCoolCap >= SmallLoad ) {
-					UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = DXCoolCap;
-				} else {
-					UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = 0.0;
-				}
+			if( UnitarySystem( UnitarySysNum ).DesignCoolingCapacity == AutoSize && EqSizing.DesCoolingLoad > 0.0 ) {
+				DataConstantUsedForSizing = EqSizing.DesCoolingLoad;
+				DataFractionUsedForSizing = 1.0;
+				SizingMethod = AutoCalculateSizing;
 			}
 
-			ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Nominal Cooling Capacity [W]", UnitarySystem( UnitarySysNum ).DesignCoolingCapacity );
+			PrintFlag = true;
+			TempSize = UnitarySystem( UnitarySysNum ).DesignCoolingCapacity;
+			SizingString = "Nominal Cooling Capacity [W]";
+			RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+			UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = TempSize;
 
 		}
 
-		if ( UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp == AutoSize && ( UnitarySystem( UnitarySysNum ).HeatCoilExists || UnitarySystem( UnitarySysNum ).SuppCoilExists ) ) {
+//		if ( UnitarySystem( UnitarySysNum ).CoolCoilExists && UnitarySystem( UnitarySysNum ).DesignCoolingCapacity == AutoSize ) {
+//
+//			if ( CurOASysNum > 0 ) {
+//				if ( DXCoolCap >= SmallLoad ) {
+//					UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = DXCoolCap;
+//				} else {
+//					UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = 0.0;
+//				}
+//			} else if ( CurZoneEqNum > 0 ) {
+//
+//				if ( DXCoolCap >= SmallLoad ) {
+//					UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = DXCoolCap;
+//				} else {
+//					UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = 0.0;
+//				}
+//			} else if ( CurSysNum > 0 ) {
+//
+//				if ( DXCoolCap >= SmallLoad ) {
+//					UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = DXCoolCap;
+//				} else {
+//					UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = 0.0;
+//				}
+//			}
+//
+//			ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Nominal Cooling Capacity [W]", UnitarySystem( UnitarySysNum ).DesignCoolingCapacity );
+//
+//		}
 
-			if ( CurOASysNum > 0 ) {
-				UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp = FinalSysSizing( CurSysNum ).HeatSupTemp;
-			} else if ( CurZoneEqNum > 0 ) {
-				UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
-			} else if ( CurSysNum > 0 ) {
-				UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp = FinalSysSizing( CurSysNum ).HeatSupTemp;
-			}
+		if ( UnitarySystem( UnitarySysNum ).HeatCoilExists || UnitarySystem( UnitarySysNum ).SuppCoilExists ) {
 
-			ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Maximum Supply Air Temperature from Unitary Heater [C]", UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp );
+			SizingMethod = MaxHeaterOutletTempSizing;
+			PrintFlag = true;
+			TempSize = UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp;
+			FieldNum = 18;
+			SizingString = UnitarySystemNumericFields( UnitarySysNum ).FieldNames( FieldNum ) + " [m3/s]";
+			RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+			UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp = TempSize;
 
 		}
 
-		if ( UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity == AutoSize ) {
+//		if ( UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp == AutoSize && ( UnitarySystem( UnitarySysNum ).HeatCoilExists || UnitarySystem( UnitarySysNum ).SuppCoilExists ) ) {
+//
+//			if ( CurOASysNum > 0 ) {
+//				UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp = FinalSysSizing( CurSysNum ).HeatSupTemp;
+//			} else if ( CurZoneEqNum > 0 ) {
+//				UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
+//			} else if ( CurSysNum > 0 ) {
+//				UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp = FinalSysSizing( CurSysNum ).HeatSupTemp;
+//			}
+//
+//			ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Maximum Supply Air Temperature from Unitary Heater [C]", UnitarySystem( UnitarySysNum ).DesignMaxOutletTemp );
+//
+//		}
 
-			if ( CurOASysNum > 0 ) {
-				UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity = FinalSysSizing( CurSysNum ).HeatCap;
-			} else if ( CurZoneEqNum > 0 ) {
-				UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
-			} else if ( CurSysNum > 0 ) {
+		if ( UnitarySystem( UnitarySysNum ).SuppCoilExists ) {
 
-				// set the supplemental heating capacity to the actual heating load
-				UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity = FinalSysSizing( CurSysNum ).HeatCap;
-				// If reheat needed for humidity control, make sure supplemental heating is at least as big
-				// as the cooling capacity
-				if ( UnitarySystem( UnitarySysNum ).Humidistat && UnitarySystem( UnitarySysNum ).DehumidControlType_Num == DehumidControl_CoolReheat ) {
-					UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity = max( UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity, UnitarySystem( UnitarySysNum ).DesignCoolingCapacity );
-					if ( UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity < SmallLoad ) {
-						UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity = 0.0;
-					}
-				}
+			SizingMethod = HeatingCapacitySizing;
 
+			if( UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity == AutoSize && EqSizing.DesHeatingLoad > 0.0 ) {
+				DataConstantUsedForSizing = EqSizing.DesHeatingLoad;
+				DataFractionUsedForSizing = 1.0;
+				SizingMethod = AutoCalculateSizing;
 			}
 
-			ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Supplemental Heating Coil Nominal Capacity [W]", UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity );
+			PrintFlag = false;
+			TempSize = UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity;
+			SizingString = "Supplemental Heating Coil Nominal Capacity [W]";
+			RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+
+			if ( UnitarySystem( UnitarySysNum ).Humidistat && UnitarySystem( UnitarySysNum ).DehumidControlType_Num == DehumidControl_CoolReheat ) {
+				TempSize = max( TempSize, UnitarySystem( UnitarySysNum ).DesignCoolingCapacity );
+				DataConstantUsedForSizing = TempSize;
+				DataFractionUsedForSizing = 1.0;
+				SizingMethod = AutoCalculateSizing;
+			}
+
+			PrintFlag = true;
+			RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+			UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity = TempSize;
 
 		}
+
+//		if ( UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity == AutoSize ) {
+//
+//			if ( CurOASysNum > 0 ) {
+//				UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity = FinalSysSizing( CurSysNum ).HeatCap;
+//			} else if ( CurZoneEqNum > 0 ) {
+//				UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
+//			} else if ( CurSysNum > 0 ) {
+//
+//				// set the supplemental heating capacity to the actual heating load
+//				UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity = FinalSysSizing( CurSysNum ).HeatCap;
+//				// If reheat needed for humidity control, make sure supplemental heating is at least as big
+//				// as the cooling capacity
+//				if ( UnitarySystem( UnitarySysNum ).Humidistat && UnitarySystem( UnitarySysNum ).DehumidControlType_Num == DehumidControl_CoolReheat ) {
+//					UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity = max( UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity, UnitarySystem( UnitarySysNum ).DesignCoolingCapacity );
+//					if ( UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity < SmallLoad ) {
+//						UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity = 0.0;
+//					}
+//				}
+//
+//			}
+//
+//			ReportSizingOutput( UnitarySystem( UnitarySysNum ).UnitarySystemType, UnitarySystem( UnitarySysNum ).Name, "Supplemental Heating Coil Nominal Capacity [W]", UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity );
+//
+//		}
 
 		SuppHeatCap = UnitarySystem( UnitarySysNum ).DesignSuppHeatingCapacity;
 
