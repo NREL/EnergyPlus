@@ -222,7 +222,6 @@ namespace BoilerSteam {
 
 	void
 	SimSteamBoiler(
-		std::string const & BoilerType, // boiler type (used in CASE statement)
 		std::string const & BoilerName, // boiler identifier
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // boiler counter/identifier
@@ -260,8 +259,7 @@ namespace BoilerSteam {
 	UpdateBoilerRecords(
 		Real64 const MyLoad, // boiler operating load
 		bool const RunFlag, // boiler on when TRUE
-		int const Num, // boiler number
-		bool const FirstHVACIteration // TRUE if First iteration of simulation
+		int const Num // boiler number
 	);
 
 	// End of Record Keeping subroutines for the BOILER:STEAM Module

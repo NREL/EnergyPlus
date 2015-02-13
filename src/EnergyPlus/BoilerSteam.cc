@@ -93,7 +93,6 @@ namespace BoilerSteam {
 
 	void
 	SimSteamBoiler(
-		std::string const & BoilerType, // boiler type (used in CASE statement)
 		std::string const & BoilerName, // boiler identifier
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // boiler counter/identifier
@@ -183,7 +182,7 @@ namespace BoilerSteam {
 		//Select boiler type and call boiler model
 		InitBoiler( BoilerNum );
 		CalcBoilerModel( BoilerNum, MyLoad, RunFlag, EquipFlowCtrl );
-		UpdateBoilerRecords( MyLoad, RunFlag, BoilerNum, FirstHVACIteration );
+		UpdateBoilerRecords( MyLoad, RunFlag, BoilerNum );
 
 	}
 
@@ -747,11 +746,9 @@ namespace BoilerSteam {
 		Real64 OperPLR; // operating part load ratio
 		Real64 BoilerDeltaTemp( 0.0 ); // C - boiler inlet to outlet temperature difference
 		Real64 TempUpLimitBout; // C - boiler high temperature limit
-		Real64 BoilerMassFlowRateMax; // Max Design Boiler Mass Flow Rate converted from Volume Flow Rate
 		Real64 EnthSteamOutDry;
 		Real64 EnthSteamOutWet;
 		Real64 LatentEnthSteam;
-		Real64 QualitySteam;
 		FArray1D< Real64 > LoadCoef( 3 ); // coefficients of the fuel use/part load curve
 		Real64 CpWater; // Heat capacity of condensed steam
 		int BoilerInletNode; // Boiler inlet node number
@@ -771,11 +768,9 @@ namespace BoilerSteam {
 		BoilerMinPLR = Boiler( BoilerNum ).MinPartLoadRat;
 		LoadCoef = Boiler( BoilerNum ).FullLoadCoef;
 		TempUpLimitBout = Boiler( BoilerNum ).TempUpLimitBoilerOut;
-		BoilerMassFlowRateMax = Boiler( BoilerNum ).DesMassFlowRate;
 		BoilerMaxPress = Boiler( BoilerNum ).BoilerMaxOperPress;
 		BoilerEff = Boiler( BoilerNum ).Effic;
 
-		QualitySteam = Node( BoilerInletNode ).Quality;
 		LoopNum = Boiler( BoilerNum ).LoopNum;
 		LoopSideNum = Boiler( BoilerNum ).LoopSideNum;
 		{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
@@ -952,8 +947,7 @@ namespace BoilerSteam {
 	UpdateBoilerRecords(
 		Real64 const MyLoad, // boiler operating load
 		bool const RunFlag, // boiler on when TRUE
-		int const Num, // boiler number
-		bool const FirstHVACIteration // TRUE if First iteration of simulation
+		int const Num // boiler number
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -992,8 +986,6 @@ namespace BoilerSteam {
 		int BoilerInletNode; // Boiler inlet node number
 		int BoilerOutletNode; // Boiler outlet node number
 		Real64 ReportingConstant;
-		int LoopNum;
-		int LoopSideNum;
 
 		ReportingConstant = TimeStepSys * SecInHour;
 
@@ -1027,8 +1019,6 @@ namespace BoilerSteam {
 
 		BoilerReport( Num ).BoilerInletTemp = Node( BoilerInletNode ).Temp;
 		BoilerReport( Num ).Mdot = Node( BoilerOutletNode ).MassFlowRate;
-		LoopNum = Boiler( Num ).LoopNum;
-		LoopSideNum = Boiler( Num ).LoopSideNum;
 
 		BoilerReport( Num ).BoilerEnergy = BoilerReport( Num ).BoilerLoad * ReportingConstant;
 		BoilerReport( Num ).FuelConsumed = BoilerReport( Num ).FuelUsed * ReportingConstant;
