@@ -90,7 +90,6 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     #if( CMAKE_COMPILER_IS_GNUCXX ) # g++
     #  ADD_CXX_DEFINITIONS("-Wno-unused-but-set-parameter -Wno-unused-but-set-variable") # Suppress unused-but-set warnings until more serious ones are addressed
     #endif()
-    ADD_CXX_DEFINITIONS("-Wno-invalid-source-encoding")
     ADD_CXX_DEFINITIONS("-ffor-scope")
 
     # ADDITIONAL DEBUG-MODE-SPECIFIC FLAGS
