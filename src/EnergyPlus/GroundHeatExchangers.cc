@@ -1556,28 +1556,22 @@ namespace GroundHeatExchangers {
 				}
 
 				// Get Gfunction data
-				verticalGLHE( GLHENum ).NPairs = rNumericArgs( 15 );
-				verticalGLHE( GLHENum ).SubAGG = 15;
-				verticalGLHE( GLHENum ).AGG = 192;
+				VerticalGlhe( GlheNum ).NPairs = rNumericArgs( 15 );
+				VerticalGlhe( GlheNum ).SubAGG = 15;
+				VerticalGlhe( GlheNum ).AGG = 192;
 
 				// Allocation of all the dynamic arrays
-				verticalGLHE( GLHENum ).LNTTS.allocate( verticalGLHE( GLHENum ).NPairs );
-				verticalGLHE( GLHENum ).LNTTS = 0.0;
-				verticalGLHE( GLHENum ).GFNC.allocate( verticalGLHE( GLHENum ).NPairs );
-				verticalGLHE( GLHENum ).GFNC = 0.0;
-				verticalGLHE( GLHENum ).QnMonthlyAgg.allocate( verticalGLHE( GLHENum ).maxSimYears * 12 );
-				verticalGLHE( GLHENum ).QnMonthlyAgg = 0.0;
-				verticalGLHE( GLHENum ).QnHr.allocate( 730 + verticalGLHE( GLHENum ).AGG + verticalGLHE( GLHENum ).SubAGG );
-				verticalGLHE( GLHENum ).QnHr = 0.0;
-				verticalGLHE( GLHENum ).QnSubHr.allocate( ( verticalGLHE( GLHENum ).SubAGG + 1 ) * maxTSinHr + 1 );
-				verticalGLHE( GLHENum ).QnSubHr = 0.0;
-				verticalGLHE( GLHENum ).LastHourN.allocate( verticalGLHE( GLHENum ).SubAGG + 1 );
-				verticalGLHE( GLHENum ).LastHourN = 0;
+				VerticalGlhe( GlheNum ).LNTTS.dimension( VerticalGlhe( GlheNum ).NPairs, 0.0 );
+				VerticalGlhe( GlheNum ).GFNC.dimension( VerticalGlhe( GlheNum ).NPairs, 0.0 );
+				VerticalGlhe( GlheNum ).QnMonthlyAgg.dimension( VerticalGlhe( GlheNum ).MaxSimYears * 12, 0.0 );
+				VerticalGlhe( GlheNum ).QnHr.dimension( 730 + VerticalGlhe( GlheNum ).AGG + VerticalGlhe( GlheNum ).SubAGG, 0.0 );
+				VerticalGlhe( GlheNum ).QnSubHr.dimension( ( VerticalGlhe( GlheNum ).SubAGG + 1 ) * MaxTSinHr + 1, 0.0 );
+				VerticalGlhe( GlheNum ).LastHourN.dimension( VerticalGlhe( GlheNum ).SubAGG + 1, 0 );
 
-				if ( ! allocated ) {
-					prevTimeSteps.allocate( ( verticalGLHE( GLHENum ).SubAGG + 1 ) * maxTSinHr + 1 );
-					prevTimeSteps = 0.0;
-					allocated = true;
+				if ( ! Allocated ) {
+					PrevTimeSteps.allocate( ( VerticalGlhe( GlheNum ).SubAGG + 1 ) * MaxTSinHr + 1 );
+					PrevTimeSteps = 0.0;
+					Allocated = true;
 				}
 
 				indexNum = 16;

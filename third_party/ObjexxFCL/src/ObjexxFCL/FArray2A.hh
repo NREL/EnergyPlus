@@ -27,9 +27,6 @@ class FArray2A : public FArray2< T >
 private: // Types
 
 	typedef  FArray2< T >  Super;
-	typedef  typename Super::real_FArray  real_FArray;
-	typedef  typename Super::proxy_FArray  proxy_FArray;
-	typedef  typename Super::arg_FArray  arg_FArray;
 	typedef  internal::ProxySentinel  ProxySentinel;
 
 public: // Types
@@ -93,7 +90,7 @@ public: // Creation
 
 	// Real Constructor
 	inline
-	FArray2A( real_FArray const & a ) :
+	FArray2A( FArray2D< T > const & a ) :
 	 Super( a, ProxySentinel() ),
 	 I1_( a.I1_ ),
 	 I2_( a.I2_ )
@@ -104,7 +101,7 @@ public: // Creation
 
 	// Proxy Constructor
 	inline
-	FArray2A( proxy_FArray const & a ) :
+	FArray2A( FArray2P< T > const & a ) :
 	 Super( a, ProxySentinel() ),
 	 I1_( a.I1_ ),
 	 I2_( a.I2_ )
@@ -169,7 +166,7 @@ public: // Creation
 
 	// Real + IndexRange Constructor
 	inline
-	FArray2A( real_FArray const & a, IR const & I1, IR const & I2 ) :
+	FArray2A( FArray2D< T > const & a, IR const & I1, IR const & I2 ) :
 	 Super( a, ProxySentinel() ),
 	 I1_( I1 ),
 	 I2_( I2 )
@@ -179,7 +176,7 @@ public: // Creation
 
 	// Proxy + IndexRange Constructor
 	inline
-	FArray2A( proxy_FArray const & a, IR const & I1, IR const & I2 ) :
+	FArray2A( FArray2P< T > const & a, IR const & I1, IR const & I2 ) :
 	 Super( a, ProxySentinel() ),
 	 I1_( I1 ),
 	 I2_( I2 )
@@ -242,7 +239,7 @@ public: // Creation
 
 	// Non-Const Real Constructor
 	inline
-	FArray2A( real_FArray & a ) :
+	FArray2A( FArray2D< T > & a ) :
 	 Super( a, ProxySentinel() ),
 	 I1_( a.I1_ ),
 	 I2_( a.I2_ )
@@ -253,7 +250,7 @@ public: // Creation
 
 	// Non-Const Proxy Constructor
 	inline
-	FArray2A( proxy_FArray & a ) :
+	FArray2A( FArray2P< T > & a ) :
 	 Super( a, ProxySentinel() ),
 	 I1_( a.I1_ ),
 	 I2_( a.I2_ )
@@ -318,7 +315,7 @@ public: // Creation
 
 	// Non-Const Real + IndexRange Constructor
 	inline
-	FArray2A( real_FArray & a, IR const & I1, IR const & I2 ) :
+	FArray2A( FArray2D< T > & a, IR const & I1, IR const & I2 ) :
 	 Super( a, ProxySentinel() ),
 	 I1_( I1 ),
 	 I2_( I2 )
@@ -328,7 +325,7 @@ public: // Creation
 
 	// Non-Const Proxy + IndexRange Constructor
 	inline
-	FArray2A( proxy_FArray & a, IR const & I1, IR const & I2 ) :
+	FArray2A( FArray2P< T > & a, IR const & I1, IR const & I2 ) :
 	 Super( a, ProxySentinel() ),
 	 I1_( I1 ),
 	 I2_( I2 )
@@ -682,6 +679,14 @@ public: // Assignment: Value
 
 public: // Subscript
 
+	// Linear Index
+	inline
+	size_type
+	index( int const i1, int const i2 ) const
+	{
+		return ( ( ( i2 * z1_ ) + i1 ) - shift_ );
+	}
+
 	// Const Tail Starting at array( i1, i2 )
 	inline
 	Tail const
@@ -701,14 +706,6 @@ public: // Subscript
 		assert( ( I1_.contains( i1 ) ) && ( I2_.contains( i2 ) ) );
 		size_type const offset( ( ( i2 * z1_ ) + i1 ) - shift_ );
 		return Tail( data_ + offset, ( data_size_ != npos ? data_size_ - offset : npos ) );
-	}
-
-	// Linear Index
-	inline
-	size_type
-	index( int const i1, int const i2 ) const
-	{
-		return ( ( ( i2 * z1_ ) + i1 ) - shift_ );
 	}
 
 public: // Predicate
@@ -885,7 +882,7 @@ public: // Modifier
 	// Attach to Real Array
 	inline
 	FArray2A &
-	attach( real_FArray const & a )
+	attach( FArray2D< T > const & a )
 	{
 		Base::attach( a );
 		z1_ = a.z1_;
@@ -897,7 +894,7 @@ public: // Modifier
 	// Attach to Non-Const Real Array
 	inline
 	FArray2A &
-	attach( real_FArray & a )
+	attach( FArray2D< T > & a )
 	{
 		Base::attach( a );
 		z1_ = a.z1_;
@@ -909,7 +906,7 @@ public: // Modifier
 	// Attach to Proxy Array
 	inline
 	FArray2A &
-	attach( proxy_FArray const & a )
+	attach( FArray2P< T > const & a )
 	{
 		Base::attach( a );
 		z1_ = a.z1_;
@@ -921,7 +918,7 @@ public: // Modifier
 	// Attach to Non-Const Proxy Array
 	inline
 	FArray2A &
-	attach( proxy_FArray & a )
+	attach( FArray2P< T > & a )
 	{
 		Base::attach( a );
 		z1_ = a.z1_;
@@ -959,7 +956,7 @@ public: // Modifier
 	FArray2A &
 	attach( Base const & a )
 	{
-		Base::attach( a, 2 );
+		Base::attach< 2 >( a );
 		z1_ = 1;
 		I1_ = 1;
 		I2_ = a.isize();
@@ -971,7 +968,7 @@ public: // Modifier
 	FArray2A &
 	attach( Base & a )
 	{
-		Base::attach( a, 2 );
+		Base::attach< 2 >( a );
 		z1_ = 1;
 		I1_ = 1;
 		I2_ = a.isize();
@@ -983,7 +980,7 @@ public: // Modifier
 	FArray2A &
 	attach( Tail const & s )
 	{
-		Base::attach( s, 2 );
+		Base::attach< 2 >( s );
 		z1_ = 1;
 		I1_ = 1;
 		I2_ = s.isize();
@@ -995,7 +992,7 @@ public: // Modifier
 	FArray2A &
 	attach( Tail & s )
 	{
-		Base::attach( s, 2 );
+		Base::attach< 2 >( s );
 		z1_ = 1;
 		I1_ = 1;
 		I2_ = s.isize();
@@ -1007,7 +1004,7 @@ public: // Modifier
 	FArray2A &
 	attach( T const & t )
 	{
-		Base::attach( t, 2 );
+		Base::attach< 2 >( t );
 		z1_ = 1;
 		I1_ = 1;
 		I2_ = star; // Unbounded
@@ -1019,7 +1016,7 @@ public: // Modifier
 	FArray2A &
 	attach( T & t )
 	{
-		Base::attach( t, 2 );
+		Base::attach< 2 >( t );
 		z1_ = 1;
 		I1_ = 1;
 		I2_ = star; // Unbounded

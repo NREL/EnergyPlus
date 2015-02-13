@@ -46,29 +46,6 @@ namespace DataPlant {
 
 
 	// Parameters for scheme types
-	// Used in TYPE(OperationData)%OpSchemeType
-	// As in PlantLoop(:)%OpScheme(:)%OpSchemeType
-	// Also in PlantLoop()LoopSide()Branch()Comp()%CurOpSchemeType
-	int const UnknownStatusOpSchemeType( -2 );
-	int const NoControlOpSchemeType( -1 ); // Scheme Type placeholder for items such as pipes
-	int const LoadRBOpSchemeType( 0 ); // Scheme Type for Load Range Based Operation (Deprecated)
-	int const HeatingRBOpSchemeType( 1 ); // Scheme Type for Heating Load Range Based Operation
-	int const CoolingRBOpSchemeType( 2 ); // Scheme Type for Cooling  Load Range Based Operation
-	int const WetBulbRBOpSchemeType( 3 ); // Scheme Type for Wet bulb range based Operation
-	int const DryBulbRBOpSchemeType( 4 ); // Scheme Type for Dry bulb range based Operation
-	int const DewPointRBOpSchemeType( 5 ); // Scheme Type for Dewpoint range based Operation
-	int const RelHumRBOpSchemeType( 6 ); // Scheme Type for relative humidity range based Operation
-	int const DryBulbTDBOpSchemeType( 7 ); // Scheme Type for relative humidity range based Operation
-	int const WetBulbTDBOpSchemeType( 8 ); // Scheme Type for Wet bulb range based Operation
-	int const DewPointTDBOpSchemeType( 9 ); // Scheme Type for Wet bulb range based Operation
-	int const CompSetPtBasedSchemeType( 10 ); // *Sankar Temp Based Control
-	int const UncontrolledOpSchemeType( 11 ); // Scheme Type for Uncontrolled Operation
-	int const EMSOpSchemeType( 12 ); // Scheme Type for EMS based operation user Define scheme
-	int const PumpOpSchemeType( 13 ); // Not really an OpScheme, just a placeholder
-	int const DemandOpSchemeType( 14 ); // Plcaeholder for demand side equipment such as coils
-	int const FreeRejectionOpSchemeType( 15 ); // Scheme Type for waterside economizers and the like
-	int const WSEconOpSchemeType( 16 ); // Scheme Type for waterside economizers and the like
-	// this may be changed later...
 
 	// These are useful for SELECT CASE statements rather than listing all of the individual types listed above
 	int const LoadRangeBasedMin( 0 );
@@ -964,7 +941,7 @@ namespace DataPlant {
 
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

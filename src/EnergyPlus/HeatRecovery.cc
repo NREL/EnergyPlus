@@ -3112,7 +3112,7 @@ namespace HeatRecovery {
 	Real64
 	GetResidCrossFlowBothUnmixed(
 		Real64 const NTU, // number of transfer units
-		Optional< FArray1S< Real64 > const > Par // par(1) = Eps, par(2) = Z
+		FArray1< Real64 > const & Par // par(1) = Eps, par(2) = Z
 	)
 	{
 
@@ -3159,7 +3159,7 @@ namespace HeatRecovery {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		Residuum = 1.0 - std::exp( ( std::exp( -std::pow( NTU, 0.78 ) * Par()( 2 ) ) - 1.0 ) / Par()( 2 ) * std::pow( NTU, 0.22 ) ) - Par()( 1 );
+		Residuum = 1.0 - std::exp( ( std::exp( -std::pow( NTU, 0.78 ) * Par( 2 ) ) - 1.0 ) / Par( 2 ) * std::pow( NTU, 0.22 ) ) - Par( 1 );
 
 		return Residuum;
 
