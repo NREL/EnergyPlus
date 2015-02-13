@@ -494,10 +494,6 @@ namespace BaseboardElectric {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		bool IsAutoSize; // Indicator to autosizing nominal capacity
-		Real64 NominalCapacityDes; // Design nominal capacity for reporting
-		Real64 NominalCapacityUser; // User hard-sized nominal capacity for reporting
-
 		std::string CompName; // component name
 		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
@@ -507,9 +503,6 @@ namespace BaseboardElectric {
 		bool PrintFlag; // TRUE when sizing information is reported in the eio file
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
 
-		IsAutoSize = false;
-		NominalCapacityDes = 0.0;
-		NominalCapacityUser = 0.0;
 		DataScalableCapSizingON = false;
 
 		if ( CurZoneEqNum > 0 ) {
