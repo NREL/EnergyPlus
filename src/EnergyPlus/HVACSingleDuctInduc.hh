@@ -3,8 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -291,13 +289,13 @@ namespace HVACSingleDuctInduc {
 	Real64
 	FourPipeIUHeatingResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		Optional< FArray1S< Real64 > const > Par = _ // Par(5) is the requested zone load
+		FArray1< Real64 > const & Par // Par(5) is the requested zone load
 	);
 
 	Real64
 	FourPipeIUCoolingResidual(
 		Real64 const CWFlow, // cold water flow rate in kg/s
-		Optional< FArray1S< Real64 > const > Par = _ // Par(5) is the requested zone load
+		FArray1< Real64 > const & Par // Par(5) is the requested zone load
 	);
 
 	// ========================= Utilities =======================

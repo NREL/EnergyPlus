@@ -171,10 +171,10 @@ namespace DataHeatBalSurface {
 	//the next user requested time step)
 	extern FArray3D< Real64 > THM; // Master Temperature History (on the time step for the construct)
 	extern FArray3D< Real64 > QHM; // Master Flux History (on the time step for the construct)
-	extern FArray2D< Real64 > TsrcHist; // Temperature history at the source location (SurfNum,Term)
-	extern FArray2D< Real64 > QsrcHist; // Heat source/sink history for the surface (SurfNum,Term)
-	extern FArray2D< Real64 > TsrcHistM; // Master temperature history at the source location (SurfNum,Term)
-	extern FArray2D< Real64 > QsrcHistM; // Master heat source/sink history for the surface (SurfNum,Term)
+	extern FArray2D< Real64 > TsrcHist; // Temperature history at the source location (Term,SurfNum)
+	extern FArray2D< Real64 > QsrcHist; // Heat source/sink history for the surface (Term,SurfNum)
+	extern FArray2D< Real64 > TsrcHistM; // Master temperature history at the source location (Term,SurfNum)
+	extern FArray2D< Real64 > QsrcHistM; // Master heat source/sink history for the surface (Term,SurfNum)
 
 	extern FArray2D< Real64 > FractDifShortZtoZ; // Fraction of diffuse short radiation in Zone 2 transmitted to Zone 1
 	extern FArray1D_bool RecDifShortFromZ; // True if Zone gets short radiation from another

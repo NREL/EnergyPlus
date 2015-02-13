@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -105,7 +104,7 @@ namespace StandardRatings {
 	Real64
 	ReformEIRChillerCondInletTempResidual(
 		Real64 const CondenserOutletTemp, // Condenser outlet temperature (boundary condition or guess value) [C]
-		Optional< FArray1S< Real64 > const > Par = _ // par(1)  = Condenser inlet temperature at AHRI Standard
+		FArray1< Real64 > const & Par // par(1)  = Condenser inlet temperature at AHRI Standard
 	);
 
 	void

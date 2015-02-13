@@ -147,7 +147,7 @@ TEST( FArray3Test, Predicates )
 	FArray3D_int A1;
 	EXPECT_FALSE( A1.active() );
 	EXPECT_FALSE( A1.allocated() );
-	EXPECT_TRUE( A1.is_contiguous() );
+	EXPECT_TRUE( A1.contiguous() );
 	EXPECT_TRUE( A1.data_size_bounded() );
 	EXPECT_FALSE( A1.data_size_unbounded() );
 	EXPECT_TRUE( A1.empty() );
@@ -163,7 +163,7 @@ TEST( FArray3Test, Predicates )
 	FArray3D_int A2( 2, 3, 2 ); // Uninitialized
 	EXPECT_TRUE( A2.active() );
 	EXPECT_TRUE( A2.allocated() );
-	EXPECT_TRUE( A2.is_contiguous() );
+	EXPECT_TRUE( A2.contiguous() );
 	EXPECT_TRUE( A2.data_size_bounded() );
 	EXPECT_FALSE( A2.data_size_unbounded() );
 	EXPECT_FALSE( A2.empty() );
@@ -175,7 +175,7 @@ TEST( FArray3Test, Predicates )
 	FArray3D_int A3( 2, 3, 2, 31459 );
 	EXPECT_TRUE( A3.active() );
 	EXPECT_TRUE( A3.allocated() );
-	EXPECT_TRUE( A3.is_contiguous() );
+	EXPECT_TRUE( A3.contiguous() );
 	EXPECT_TRUE( A3.data_size_bounded() );
 	EXPECT_FALSE( A3.data_size_unbounded() );
 	EXPECT_FALSE( A3.empty() );
@@ -191,7 +191,7 @@ TEST( FArray3Test, Predicates )
 	FArray3D_int A4( 2, 2, 2, { 111, 211, 121, 221, 112, 212, 122, 222 } );
 	EXPECT_TRUE( A4.active() );
 	EXPECT_TRUE( A4.allocated() );
-	EXPECT_TRUE( A4.is_contiguous() );
+	EXPECT_TRUE( A4.contiguous() );
 	EXPECT_TRUE( A4.data_size_bounded() );
 	EXPECT_FALSE( A4.data_size_unbounded() );
 	EXPECT_FALSE( A4.empty() );
