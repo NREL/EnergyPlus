@@ -6175,7 +6175,7 @@ namespace DXCoils {
 			InletWaterTemp = Node( CondInletNode ).Temp;
 			CondInletMassFlowRate = Node( CondInletNode ).MassFlowRate / PartLoadRatio;
 			EvapInletMassFlowRate = Node( EvapInletNode ).MassFlowRate / PartLoadRatio;
-			CpWater = CPHW( InletWaterTemp );
+			CpWater = CPHW();
 			CompressorPower = 0.0;
 			OperatingHeatingPower = 0.0;
 			TankHeatingCOP = 0.0;

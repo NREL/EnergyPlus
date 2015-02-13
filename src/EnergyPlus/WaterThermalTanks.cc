@@ -6550,7 +6550,7 @@ namespace WaterThermalTanks {
 		}
 
 		// set the water-side mass flow rate
-		CpWater = CPHW( Node( WaterInletNode ).Temp );
+		CpWater = CPHW();
 		MdotWater = WaterHeaterDesuperheater( DesuperheaterNum ).OperatingWaterFlowRate * RhoH2O( Node( WaterInletNode ).Temp );
 		if ( Node( WaterInletNode ).Temp <= WaterHeaterDesuperheater( DesuperheaterNum ).MaxInletWaterTemp + Acc ) {
 			QHeatRate = ( ( AverageWasteHeat * Effic * HEffFTemp ) / WaterHeaterDesuperheater( DesuperheaterNum ).DXSysPLR ) + ( WaterHeaterDesuperheater( DesuperheaterNum ).PumpElecPower * WaterHeaterDesuperheater( DesuperheaterNum ).PumpFracToWater );
@@ -9239,10 +9239,10 @@ namespace WaterThermalTanks {
 			if ( WaterThermalTank( WaterThermalTankNum ).FirstRecoveryDone && WaterThermalTank( WaterThermalTankNum ).FirstRecoveryFuel > 0.0 ) {
 				// Calculate Recovery Efficiency based on energy used to recover from the first draw
 				// FirstRecoveryFuel is recorded inside the CalcWaterThermalTank subroutine
-				RecoveryEfficiency = DrawMass * CPHW( 57.2222 ) * ( 57.2222 - 14.4444 ) / WaterThermalTank( WaterThermalTankNum ).FirstRecoveryFuel;
+				RecoveryEfficiency = DrawMass * CPHW() * ( 57.2222 - 14.4444 ) / WaterThermalTank( WaterThermalTankNum ).FirstRecoveryFuel;
 
 				// Calculate Energy Factor based on total energy (including parasitics) used over entire test
-				EnergyFactor = TotalDrawMass * CPHW( 57.2222 ) * ( 57.2222 - 14.4444 ) / FuelEnergy;
+				EnergyFactor = TotalDrawMass * CPHW() * ( 57.2222 - 14.4444 ) / FuelEnergy;
 
 			} else {
 				RecoveryEfficiency = 0.0;

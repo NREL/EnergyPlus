@@ -2240,9 +2240,9 @@ namespace RuntimeLanguageProcessor {
 				//                        PsyTsatFnPb(Operand(1)%Number, & ! pressure (Pa)
 				//                                    'EMS Built-In Function') )
 			} else if ( SELECT_CASE_var == FuncCpCW ) {
-				ReturnValue = SetErlValueNumber( CPCW( Operand( 1 ).Number ) ); // result => specific heat of water (J/kg-K) = 4180.d0 | temperature (C) unused
+				ReturnValue = SetErlValueNumber( CPCW() ); // result => specific heat of water (J/kg-K) = 4180.d0 | temperature (C) unused
 			} else if ( SELECT_CASE_var == FuncCpHW ) {
-				ReturnValue = SetErlValueNumber( CPHW( Operand( 1 ).Number ) ); // result => specific heat of water (J/kg-K) = 4180.d0 | temperature (C) unused
+				ReturnValue = SetErlValueNumber( CPHW() ); // result => specific heat of water (J/kg-K) = 4180.d0 | temperature (C) unused
 			} else if ( SELECT_CASE_var == FuncRhoH2O ) {
 				ReturnValue = SetErlValueNumber( RhoH2O( Operand( 1 ).Number ) ); // result => density of water (kg/m3) | temperature (C)
 			} else if ( SELECT_CASE_var == FuncFatalHaltEp ) {

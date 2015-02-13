@@ -1681,14 +1681,14 @@ namespace IceThermalStorage {
 				Qice = 0.0;
 				Uact = 0.0;
 			} else {
-				DeltaTemp = Qice / CPCW( ITSInletTemp ) / ITSMassFlowRate;
+				DeltaTemp = Qice / CPCW() / ITSMassFlowRate;
 				ITSOutletTemp = ITSInletTemp + DeltaTemp;
 				// Limit leaving temp to be no greater than setpoint or freezing temp minus 1C
 				ITSOutletTemp = min( ITSOutletTemp, ITSOutletSetPointTemp, ( FreezTemp - 1 ) );
 				// Limit leaving temp to be no less than inlet temp
 				ITSOutletTemp = max( ITSOutletTemp, ITSInletTemp );
 				DeltaTemp = ITSOutletTemp - ITSInletTemp;
-				Qice = DeltaTemp * CPCW( ITSInletTemp ) * ITSMassFlowRate;
+				Qice = DeltaTemp * CPCW() * ITSMassFlowRate;
 				Uact = Qice / ( ITSNomCap / TimeInterval );
 			} // End of leaving temp checks
 

@@ -1231,9 +1231,7 @@ namespace Psychrometrics {
 
 	inline
 	Real64
-	CPCW(
-		Real64 const Temperature // unused1208
-	)
+	CPCW()
 	{
 		// FUNCTION INFORMATION:
 		//       AUTHOR         RUSSELL D. TAYLOR
@@ -1247,9 +1245,7 @@ namespace Psychrometrics {
 
 	inline
 	Real64
-	CPHW(
-		Real64 const Temperature // unused1208
-	)
+	CPHW()
 	{
 		// FUNCTION INFORMATION:
 		//       AUTHOR         RUSSELL D. TAYLOR
