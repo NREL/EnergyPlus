@@ -57,7 +57,7 @@ namespace OutsideEnergySources {
 	using DataPlant::TypeOf_PurchHotWater;
 	using DataPlant::TypeOf_PurchChilledWater;
 	using DataPlant::ScanPlantLoopsForObject;
-	using DataPlant::PlantFirstSizesOkayToFinalize;
+
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
@@ -513,6 +513,7 @@ namespace OutsideEnergySources {
 		using ReportSizingManager::ReportSizingOutput;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::PlantFirstSizesOkayToReport;
 		using DataPlant::PlantFinalSizesOkayToReport;
 

@@ -755,12 +755,11 @@ namespace Boilers {
 				ShowSevereError( "Autosizing of Boiler nominal capacity requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Boiler object=" + Boiler( BoilerNum ).Name );
 				ErrorsFound = true;
-			} else { // Hard-sized with no sizing data
-				if ( PlantFinalSizesOkayToReport ) {
-					if ( Boiler( BoilerNum ).NomCap > 0.0 ) {
-						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name, "User-Specified Nominal Capacity [W]", Boiler( BoilerNum ).NomCap );
-					}
-				}
+			} 
+			if ( ! Boiler( BoilerNum ).NomCapWasAutoSized && PlantFinalSizesOkayToReport 
+					&& ( Boiler( BoilerNum ).NomCap > 0.0 ) ) { // Hard-sized with no sizing data
+					ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name, 
+						"User-Specified Nominal Capacity [W]", Boiler( BoilerNum ).NomCap );
 			}
 		}
 
@@ -807,12 +806,11 @@ namespace Boilers {
 				ShowSevereError( "Autosizing of Boiler design flow rate requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Boiler object=" + Boiler( BoilerNum ).Name );
 				ErrorsFound = true;
-			} else { // Hard-sized with no sizing data
-				if ( PlantFinalSizesOkayToReport ) {
-					if ( Boiler( BoilerNum ).VolFlowRate > 0.0 ) {
-						ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name, "User-Specified Design Water Flow Rate [m3/s]", Boiler( BoilerNum ).VolFlowRate );
-					}
-				}
+			} 
+			if ( ! Boiler( BoilerNum ).VolFlowRateWasAutoSized && PlantFinalSizesOkayToReport 
+					&& ( Boiler( BoilerNum ).VolFlowRate > 0.0 ) ) { // Hard-sized with no sizing data
+					ReportSizingOutput( "Boiler:HotWater", Boiler( BoilerNum ).Name, 
+						"User-Specified Design Water Flow Rate [m3/s]", Boiler( BoilerNum ).VolFlowRate );
 			}
 		}
 

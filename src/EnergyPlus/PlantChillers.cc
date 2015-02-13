@@ -3069,12 +3069,11 @@ namespace PlantChillers {
 				ShowSevereError( "Autosizing of Electric Chiller nominal capacity requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Electric Chiller object=" + ElectricChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
-			} else {
-				if ( PlantFinalSizesOkayToReport ) {
-					if ( ElectricChiller( ChillNum ).Base.NomCap > 0.0 ) {
-						ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "User-Specified Nominal Capacity [W]", ElectricChiller( ChillNum ).Base.NomCap );
-					}
-				}
+			} 
+			if ( ! ElectricChiller( ChillNum ).Base.NomCapWasAutoSized && PlantFinalSizesOkayToReport 
+					&& ( ElectricChiller( ChillNum ).Base.NomCap > 0.0 ) ) {
+					ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, 
+						"User-Specified Nominal Capacity [W]", ElectricChiller( ChillNum ).Base.NomCap );
 			}
 		}
 
@@ -3118,17 +3117,15 @@ namespace PlantChillers {
 				}
 			}
 		} else {
-			if (  ElectricChiller( ChillNum ).Base.EvapVolFlowRateWasAutoSized && PlantFirstSizesOkayToFinalize) {
+			if ( ElectricChiller( ChillNum ).Base.EvapVolFlowRateWasAutoSized && PlantFirstSizesOkayToFinalize) {
 				ShowSevereError( "Autosizing of Electric Chiller evap flow rate requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Electric Chiller object=" + ElectricChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
-			} else {
-				if ( PlantFinalSizesOkayToReport ) {
-					if ( ElectricChiller( ChillNum ).Base.EvapVolFlowRate > 0.0 ) {
-						ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, 
-							"User-Specified Design Chilled Water Flow Rate [m3/s]", ElectricChiller( ChillNum ).Base.EvapVolFlowRate );
-					}
-				}
+			} 
+			if ( ! ElectricChiller( ChillNum ).Base.EvapVolFlowRateWasAutoSized && PlantFinalSizesOkayToReport 
+					&& ( ElectricChiller( ChillNum ).Base.EvapVolFlowRate > 0.0 ) ) {
+					ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, 
+						"User-Specified Design Chilled Water Flow Rate [m3/s]", ElectricChiller( ChillNum ).Base.EvapVolFlowRate );
 			}
 		}
 
@@ -3180,12 +3177,11 @@ namespace PlantChillers {
 				ShowContinueError( "loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Electric Chiller object=" + ElectricChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
-			} else {
-				if ( PlantFinalSizesOkayToReport ) {
-					if ( ElectricChiller( ChillNum ).Base.CondVolFlowRate > 0.0 ) {
-						ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "User-Specified Design Condenser Water Flow Rate [m3/s]", ElectricChiller( ChillNum ).Base.CondVolFlowRate );
-					}
-				}
+			} 
+			if ( ! ElectricChiller( ChillNum ).Base.CondVolFlowRateWasAutoSized && PlantFinalSizesOkayToReport 
+					&& ( ElectricChiller( ChillNum ).Base.CondVolFlowRate > 0.0 ) ) {
+					ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, 
+						"User-Specified Design Condenser Water Flow Rate [m3/s]", ElectricChiller( ChillNum ).Base.CondVolFlowRate );
 			}
 		}
 
@@ -3217,7 +3213,9 @@ namespace PlantChillers {
 					if ( ElectricChiller( ChillNum ).DesignHeatRecVolFlowRate > 0.0 && tmpHeatRecVolFlowRate > 0.0 ) {
 						DesignHeatRecVolFlowRateUser = ElectricChiller( ChillNum ).DesignHeatRecVolFlowRate;
 						if ( PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "Design Size Design Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate, "User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]", DesignHeatRecVolFlowRateUser );
+							ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, 
+								"Design Size Design Heat Recovery Fluid Flow Rate [m3/s]", tmpHeatRecVolFlowRate, 
+								"User-Specified Design Heat Recovery Fluid Flow Rate [m3/s]", DesignHeatRecVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpHeatRecVolFlowRate - DesignHeatRecVolFlowRateUser ) / DesignHeatRecVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
 									ShowMessage( "SizeChillerElectric: Potential issue with equipment sizing for " + ElectricChiller( ChillNum ).Base.Name );
@@ -3370,12 +3368,11 @@ namespace PlantChillers {
 				ShowSevereError( "Autosizing of Engine Driven Chiller nominal capacity requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Engine Driven Chiller object=" + EngineDrivenChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
-			} else {
-				if ( PlantFinalSizesOkayToReport ) {
-					if ( EngineDrivenChiller( ChillNum ).Base.NomCap > 0.0 ) {
-						ReportSizingOutput( "Chiller:EngineDriven", EngineDrivenChiller( ChillNum ).Base.Name, "User-Specified Nominal Capacity [W]", EngineDrivenChiller( ChillNum ).Base.NomCap );
-					}
-				}
+			}
+			if ( ! EngineDrivenChiller( ChillNum ).Base.NomCapWasAutoSized && PlantFinalSizesOkayToReport 
+					&& ( EngineDrivenChiller( ChillNum ).Base.NomCap > 0.0 ) ) {
+					ReportSizingOutput( "Chiller:EngineDriven", EngineDrivenChiller( ChillNum ).Base.Name, 
+						"User-Specified Nominal Capacity [W]", EngineDrivenChiller( ChillNum ).Base.NomCap );
 			}
 		}
 
@@ -3425,13 +3422,12 @@ namespace PlantChillers {
 				ShowSevereError( "Autosizing of Engine Driven Chiller evap flow rate requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Engine Driven Chiller object=" + EngineDrivenChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
-			} else {
-				if ( PlantFinalSizesOkayToReport) {
-					if ( EngineDrivenChiller( ChillNum ).Base.EvapVolFlowRate > 0.0 ) {
+			}
+			if ( ! EngineDrivenChiller( ChillNum ).Base.EvapVolFlowRateWasAutoSized && PlantFinalSizesOkayToReport 
+					&& ( EngineDrivenChiller( ChillNum ).Base.EvapVolFlowRate > 0.0 ) ) {
 						ReportSizingOutput( "Chiller:EngineDriven", EngineDrivenChiller( ChillNum ).Base.Name, 
-							"Design Chilled Water Flow Rate [m3/s]", EngineDrivenChiller( ChillNum ).Base.EvapVolFlowRate );
-					}
-				}
+							"User-Specified Design Chilled Water Flow Rate [m3/s]", EngineDrivenChiller( ChillNum ).Base.EvapVolFlowRate );
+
 			}
 		}
 
@@ -3487,13 +3483,11 @@ namespace PlantChillers {
 				ShowContinueError( "Occurs in EngineDriven Chiller object=" + EngineDrivenChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
 
-			} else {
-				if ( PlantFinalSizesOkayToReport ) {
-					if ( EngineDrivenChiller( ChillNum ).Base.CondVolFlowRate > 0.0 ) {
-						ReportSizingOutput( "Chiller:EngineDriven", EngineDrivenChiller( ChillNum ).Base.Name, 
-							"User-Specified Design Condenser Water Flow Rate [m3/s]", EngineDrivenChiller( ChillNum ).Base.CondVolFlowRate );
-					}
-				}
+			} 
+			if ( ! EngineDrivenChiller( ChillNum ).Base.CondVolFlowRateWasAutoSized && PlantFinalSizesOkayToReport 
+					&& ( EngineDrivenChiller( ChillNum ).Base.CondVolFlowRate > 0.0 ) ) {
+					ReportSizingOutput( "Chiller:EngineDriven", EngineDrivenChiller( ChillNum ).Base.Name, 
+						"User-Specified Design Condenser Water Flow Rate [m3/s]", EngineDrivenChiller( ChillNum ).Base.CondVolFlowRate );
 			}
 		}
 
@@ -3648,19 +3642,11 @@ namespace PlantChillers {
 				ShowSevereError( "Autosizing of Gas Turbine Chiller nominal capacity requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Gas Turbine Chiller object=" + GTChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
-			} else {
-				if ( PlantFinalSizesOkayToReport ) {
-					if ( GTChiller( ChillNum ).Base.NomCap > 0.0 ) {
-						ReportSizingOutput( "Chiller:CombustionTurbine", GTChiller( ChillNum ).Base.Name, 
-							"Design Size Nominal Capacity [W]", GTChiller( ChillNum ).Base.NomCap );
-					}
-				}
-				if ( PlantFirstSizesOkayToReport ) {
-					if ( GTChiller( ChillNum ).Base.NomCap > 0.0 ) {
-						ReportSizingOutput( "Chiller:CombustionTurbine", GTChiller( ChillNum ).Base.Name, 
-							"Initial Design Size Nominal Capacity [W]", GTChiller( ChillNum ).Base.NomCap );
-					}
-				}
+			}
+			if ( ! GTChiller( ChillNum ).Base.NomCapWasAutoSized && PlantFinalSizesOkayToReport 
+					&& ( GTChiller( ChillNum ).Base.NomCap > 0.0 ) ) {
+					ReportSizingOutput( "Chiller:CombustionTurbine", GTChiller( ChillNum ).Base.Name, 
+						"User-Specified Design Size Nominal Capacity [W]", GTChiller( ChillNum ).Base.NomCap );
 			}
 		}
 
@@ -3708,12 +3694,11 @@ namespace PlantChillers {
 				ShowSevereError( "Autosizing of Gas Turbine Chiller evap flow rate requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Gas Turbine Chiller object=" + GTChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
-			} else {
-				if ( PlantFinalSizesOkayToReport ) {
-					if ( GTChiller( ChillNum ).Base.EvapVolFlowRate > 0.0 ) {
-						ReportSizingOutput( "Chiller:CombustionTurbine", GTChiller( ChillNum ).Base.Name, "User-Specified Design Chilled Water Flow Rate [m3/s]", GTChiller( ChillNum ).Base.EvapVolFlowRate );
-					}
-				}
+			}
+			if ( ! GTChiller( ChillNum ).Base.EvapVolFlowRateWasAutoSized && PlantFinalSizesOkayToReport 
+					&& ( GTChiller( ChillNum ).Base.EvapVolFlowRate > 0.0 ) ) {
+					ReportSizingOutput( "Chiller:CombustionTurbine", GTChiller( ChillNum ).Base.Name, 
+						"User-Specified Design Chilled Water Flow Rate [m3/s]", GTChiller( ChillNum ).Base.EvapVolFlowRate );
 			}
 		}
 
@@ -3765,12 +3750,12 @@ namespace PlantChillers {
 				ShowContinueError( "loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Gas Turbine Chiller object=" + GTChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
-			} else {
-				if ( PlantFinalSizesOkayToReport ) {
-					if ( GTChiller( ChillNum ).Base.CondVolFlowRate > 0.0 ) {
-						ReportSizingOutput( "Chiller:Electric", GTChiller( ChillNum ).Base.Name, "User-Specified Design Condenser Water Flow Rate [m3/s]", GTChiller( ChillNum ).Base.CondVolFlowRate );
-					}
-				}
+			} 
+			if ( ! GTChiller( ChillNum ).Base.CondVolFlowRateWasAutoSized  && PlantFinalSizesOkayToReport 
+					&& ( GTChiller( ChillNum ).Base.CondVolFlowRate > 0.0 ) ) {
+					ReportSizingOutput( "Chiller:Electric", GTChiller( ChillNum ).Base.Name, 
+						"User-Specified Design Condenser Water Flow Rate [m3/s]", GTChiller( ChillNum ).Base.CondVolFlowRate );
+
 			}
 		}
 		// save the design condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
@@ -3947,12 +3932,11 @@ namespace PlantChillers {
 				ShowSevereError( "Autosizing of Constant COP Chiller nominal capacity requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Chiller:ConstantCOP object=" + ConstCOPChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
-			} else {
-				if ( PlantFinalSizesOkayToReport ) {
-					if ( ConstCOPChiller( ChillNum ).Base.NomCap > 0.0 ) {
-						ReportSizingOutput( "Chiller:ConstantCOP", ConstCOPChiller( ChillNum ).Base.Name, "User-Specified Nominal Capacity [W]", ConstCOPChiller( ChillNum ).Base.NomCap );
-					}
-				}
+			}
+			if ( ! ConstCOPChiller( ChillNum ).Base.NomCapWasAutoSized && PlantFinalSizesOkayToReport 
+					&& ( ConstCOPChiller( ChillNum ).Base.NomCap > 0.0 ) ) {
+					ReportSizingOutput( "Chiller:ConstantCOP", ConstCOPChiller( ChillNum ).Base.Name, 
+						"User-Specified Nominal Capacity [W]", ConstCOPChiller( ChillNum ).Base.NomCap );
 			}
 		}
 
@@ -3998,12 +3982,11 @@ namespace PlantChillers {
 				ShowSevereError( "Autosizing of Constant COP Chiller evap flow rate requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Chiller:ConstantCOP object=" + ConstCOPChiller( ChillNum ).Base.Name );
 				ErrorsFound = true;
-			} else {
-				if ( PlantFinalSizesOkayToReport ) {
-					if ( ConstCOPChiller( ChillNum ).Base.EvapVolFlowRate > 0.0 ) {
-						ReportSizingOutput( "Chiller:ConstantCOP", ConstCOPChiller( ChillNum ).Base.Name, "User-Specified Design Chilled Water Flow Rate [m3/s]", ConstCOPChiller( ChillNum ).Base.EvapVolFlowRate );
-					}
-				}
+			}
+			if ( ! ConstCOPChiller( ChillNum ).Base.EvapVolFlowRateWasAutoSized && PlantFinalSizesOkayToReport 
+					&& ( ConstCOPChiller( ChillNum ).Base.EvapVolFlowRate > 0.0 ) ) {
+					ReportSizingOutput( "Chiller:ConstantCOP", ConstCOPChiller( ChillNum ).Base.Name, 
+						"User-Specified Design Chilled Water Flow Rate [m3/s]", ConstCOPChiller( ChillNum ).Base.EvapVolFlowRate );
 			}
 		}
 
@@ -4056,12 +4039,11 @@ namespace PlantChillers {
 					ShowContinueError( "loop Sizing:Plant object" );
 					ShowContinueError( "Occurs in Chiller:ConstantCOP object=" + ConstCOPChiller( ChillNum ).Base.Name );
 					ErrorsFound = true;
-				} else {
-					if ( PlantFinalSizesOkayToReport ) {
-						if ( ConstCOPChiller( ChillNum ).Base.CondVolFlowRate > 0.0 ) {
-							ReportSizingOutput( "Chiller:ConstantCOP", ConstCOPChiller( ChillNum ).Base.Name, "User-Specified Design Condenser Water Flow Rate [m3/s]", ConstCOPChiller( ChillNum ).Base.CondVolFlowRate );
-						}
-					}
+				}
+				if ( ! ConstCOPChiller( ChillNum ).Base.CondVolFlowRateWasAutoSized && PlantFinalSizesOkayToReport 
+						&& ( ConstCOPChiller( ChillNum ).Base.CondVolFlowRate > 0.0 ) ) {
+						ReportSizingOutput( "Chiller:ConstantCOP", ConstCOPChiller( ChillNum ).Base.Name, 
+							"User-Specified Design Condenser Water Flow Rate [m3/s]", ConstCOPChiller( ChillNum ).Base.CondVolFlowRate );
 				}
 			}
 		}

@@ -670,7 +670,8 @@ namespace BoilerSteam {
 				ShowContinueError( "Occurs in Boiler:Steam object=" + Boiler( BoilerNum ).Name );
 				ErrorsFound = true;
 			} 
-			if ( ! Boiler( BoilerNum ).NomCapWasAutoSized && Boiler( BoilerNum ).NomCap > 0.0 && PlantFinalSizesOkayToReport ) {
+			if ( ! Boiler( BoilerNum ).NomCapWasAutoSized && Boiler( BoilerNum ).NomCap > 0.0 
+					&& PlantFinalSizesOkayToReport ) {
 						ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name, 
 						"User-Specified Nominal Capacity [W]", Boiler( BoilerNum ).NomCap );
 			}

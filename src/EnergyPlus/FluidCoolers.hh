@@ -73,22 +73,22 @@ namespace FluidCoolers {
 		bool Available; // need an array of logicals--load identifiers of available equipment
 		bool ON; // Simulate the machine at it's operating part load ratio
 		Real64 DesignWaterFlowRate; // Design water flow rate through the fluid cooler [m3/s]
-		bool DesignWaterFlowRateWasAutoSized; // true if previous was autosize on input
+		bool DesignWaterFlowRateWasAutoSized; // true if design water rate was autosize on input
 		Real64 DesWaterMassFlowRate; // Design water flow rate through the fluid cooler [kg/s]
 		Real64 HighSpeedAirFlowRate; // Air flow rate through the fluid cooler at high speed [m3/s]
-		bool HighSpeedAirFlowRateWasAutoSized; //true if previous was autosized
+		bool HighSpeedAirFlowRateWasAutoSized; //true if high speed air rate was autosize on input
 		Real64 HighSpeedFanPower; // Fan power at high fan speed [W]
-		bool HighSpeedFanPowerWasAutoSized; // true if previous was autosize on input
+		bool HighSpeedFanPowerWasAutoSized; // true if high fan power was autosize on input
 		Real64 HighSpeedFluidCoolerUA; // UA of fluid cooler at high fan speed [W/C]
-		bool HighSpeedFluidCoolerUAWasAutoSized; // true if prevous was autosized on input
+		bool HighSpeedFluidCoolerUAWasAutoSized; // true if high speed UA was autosized on input
 		Real64 LowSpeedAirFlowRate; // Air flow rate through fluid cooler at low speed [m3/s]
-		bool LowSpeedAirFlowRateWasAutoSized; // true if previous was autosize on input
+		bool LowSpeedAirFlowRateWasAutoSized; // true if low speed air rate was autosize on input
 		Real64 LowSpeedAirFlowRateSizingFactor; // sizing factor for low speed air flow rate []
 		Real64 LowSpeedFanPower; // Fan power at low fan speed [W]
-		bool LowSpeedFanPowerWasAutoSized; // true if previous set to autosize on input
+		bool LowSpeedFanPowerWasAutoSized; // true if low speed fan power set to autosize on input
 		Real64 LowSpeedFanPowerSizingFactor; // sizing factor for low speed fan power []
 		Real64 LowSpeedFluidCoolerUA; // UA of fluid cooler at low fan speed [W/C]
-		bool LowSpeedFluidCoolerUAWasAutoSized; //true if previous set to autosize on input
+		bool LowSpeedFluidCoolerUAWasAutoSized; //true if low speed UA set to autosize on input
 		Real64 LowSpeedFluidCoolerUASizingFactor; // sizing factor for low speed UA []
 		Real64 DesignEnteringWaterTemp; // Entering water temperature at design conditions
 		Real64 DesignLeavingWaterTemp; // Entering water temperature at design conditions
@@ -189,22 +189,6 @@ namespace FluidCoolers {
 			AirPress( 0.0 ),
 			AirHumRat( 0.0 )
 		{}
-
-		// Member Constructor
-		FluidCoolerInletConds(
-			Real64 const WaterTemp, // Fluid cooler water inlet temperature (C)
-			Real64 const AirTemp, // Fluid cooler air inlet dry-bulb temperature (C)
-			Real64 const AirWetBulb, // Fluid cooler air inlet wet-bulb temperature (C)
-			Real64 const AirPress, // Fluid cooler air barometric pressure
-			Real64 const AirHumRat // Fluid cooler air inlet humidity ratio (kg/kg)
-		) :
-			WaterTemp( WaterTemp ),
-			AirTemp( AirTemp ),
-			AirWetBulb( AirWetBulb ),
-			AirPress( AirPress ),
-			AirHumRat( AirHumRat )
-		{}
-
 	};
 
 	struct ReportVars
@@ -226,24 +210,6 @@ namespace FluidCoolers {
 			FanPower( 0.0 ),
 			FanEnergy( 0.0 )
 		{}
-
-		// Member Constructor
-		ReportVars(
-			Real64 const InletWaterTemp, // Fluid cooler inlet water temperature (C)
-			Real64 const OutletWaterTemp, // Fluid cooler outlet water temperature (C)
-			Real64 const WaterMassFlowRate, // Fluid cooler water mass flow rate (m3/s)
-			Real64 const Qactual, // Fluid cooler heat rejection rate (W)
-			Real64 const FanPower, // Fluid cooler fan power (W)
-			Real64 const FanEnergy // Fluid cooler fan energy consumption (J)
-		) :
-			InletWaterTemp( InletWaterTemp ),
-			OutletWaterTemp( OutletWaterTemp ),
-			WaterMassFlowRate( WaterMassFlowRate ),
-			Qactual( Qactual ),
-			FanPower( FanPower ),
-			FanEnergy( FanEnergy )
-		{}
-
 	};
 
 	// Object Data

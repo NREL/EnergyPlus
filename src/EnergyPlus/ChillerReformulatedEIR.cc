@@ -1012,13 +1012,11 @@ namespace ChillerReformulatedEIR {
 				ShowSevereError( "Autosizing of Reformulated Electric Chiller evap flow rate requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Reformulated Electric Chiller object=" + ElecReformEIRChiller( EIRChillNum ).Name );
 				ErrorsFound = true;
-			} else { // Hard-size with sizing data
-				if ( PlantFinalSizesOkayToReport ) {
-					if ( ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRate > 0.0 ) {
-						ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, 
-							"User-Specified Reference Chilled Water Flow Rate [m3/s]", ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRate );
-					}
-				}
+			} 
+			if ( ! ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRateWasAutoSized && PlantFinalSizesOkayToReport 
+					&&  ( ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRate > 0.0 ) ) { // Hard-size with sizing data
+				ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, 
+					"User-Specified Reference Chilled Water Flow Rate [m3/s]", ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRate );
 			}
 		}
 
@@ -1080,12 +1078,11 @@ namespace ChillerReformulatedEIR {
 				ShowSevereError( "Autosizing of Reformulated Electric Chiller reference capacity requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Reformulated Electric Chiller object=" + ElecReformEIRChiller( EIRChillNum ).Name );
 				ErrorsFound = true;
-			} else {
-				if ( PlantFinalSizesOkayToReport ) {
-					if ( ElecReformEIRChiller( EIRChillNum ).RefCap > 0.0 ) {
-						ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, "User-Specified Reference Capacity [W]", ElecReformEIRChiller( EIRChillNum ).RefCap );
-					}
-				}
+			} 
+			if ( ! ElecReformEIRChiller( EIRChillNum ).RefCapWasAutoSized && PlantFinalSizesOkayToReport 
+					&& ( ElecReformEIRChiller( EIRChillNum ).RefCap > 0.0 ) ) {
+						ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, 
+							"User-Specified Reference Capacity [W]", ElecReformEIRChiller( EIRChillNum ).RefCap );
 			}
 		}
 
@@ -1139,13 +1136,11 @@ namespace ChillerReformulatedEIR {
 				ShowContinueError( "loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Reformulated Electric EIR Chiller object=" + ElecReformEIRChiller( EIRChillNum ).Name );
 				ErrorsFound = true;
-			} else {
-				if (PlantFinalSizesOkayToReport ) {
-					if ( ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate > 0.0 ) {
+			} 
+			if ( ! ElecReformEIRChiller( EIRChillNum ).CondVolFlowRateWasAutoSized && PlantFinalSizesOkayToReport 
+					&&  ( ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate > 0.0 ) ) {
 						ReportSizingOutput( "Chiller:Electric:ReformulatedEIR", ElecReformEIRChiller( EIRChillNum ).Name, 
 							"User-Specified Reference Condenser Water Flow Rate [m3/s]", ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate );
-					}
-				}
 			}
 		}
 

@@ -91,20 +91,6 @@ namespace OutsideEnergySources {
 			OutletTemp( 0.0 ),
 			EnergyTransfer( 0.0 )
 		{}
-
-		// Member Constructor
-		ReportVars(
-			Real64 const MassFlowRate,
-			Real64 const InletTemp,
-			Real64 const OutletTemp,
-			Real64 const EnergyTransfer
-		) :
-			MassFlowRate( MassFlowRate ),
-			InletTemp( InletTemp ),
-			OutletTemp( OutletTemp ),
-			EnergyTransfer( EnergyTransfer )
-		{}
-
 	};
 
 	// Object Data
