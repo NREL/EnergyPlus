@@ -382,7 +382,7 @@ namespace PlantLoopEquip {
 				// Chiller-Heater needs to know whether it is being called for heating or cooling
 				// Since loops are generic, pass the branch inlet nodenum
 			} else if ( EquipTypeNum == TypeOf_Chiller_DFAbsorption ) {
-				SimGasAbsorber( sim_component.TypeOf, sim_component.Name, EquipFlowCtrl, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).NodeNumIn, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign, TempEvapOutDesign ); //DSU
+				SimGasAbsorber( sim_component.Name, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).NodeNumIn, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign, TempEvapOutDesign ); //DSU
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
 					sim_component.MinLoad = MinLoad;

@@ -101,9 +101,7 @@ namespace ChillerGasAbsorption {
 
 	void
 	SimGasAbsorber(
-		std::string const & AbsorberType, // type of Absorber
 		std::string const & AbsorberName, // user specified name of Absorber
-		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // Absorber number counter
 		bool const RunFlag, // simulate Absorber when TRUE
 		bool const FirstIteration, // initialize variables when TRUE
@@ -189,7 +187,7 @@ namespace ChillerGasAbsorption {
 			TempEvapOutDesign = GasAbsorber( ChillNum ).TempDesCHWSupply;
 			TempCondInDesign = GasAbsorber( ChillNum ).TempDesCondReturn;
 			GasAbsorber( ChillNum ).IsThisSized = false;
-			InitGasAbsorber( ChillNum, RunFlag );
+			InitGasAbsorber( ChillNum );
 			GasAbsorber( ChillNum ).IsThisSized = true;
 			SizeGasAbsorber( ChillNum );
 			// Match inlet node name of calling branch to determine if this call is for heating or cooling
@@ -227,8 +225,8 @@ namespace ChillerGasAbsorption {
 			} else {
 				GasAbsorber( ChillNum ).InCoolingMode = false;
 			}
-			InitGasAbsorber( ChillNum, RunFlag );
-			CalcGasAbsorberChillerModel( ChillNum, MyLoad, RunFlag );
+			InitGasAbsorber( ChillNum );
+			CalcGasAbsorberChillerModel( ChillNum, MyLoad );
 			UpdateGasAbsorberCoolRecords( MyLoad, RunFlag, ChillNum );
 		} else if ( BranchInletNodeNum == GasAbsorber( ChillNum ).HeatReturnNodeNum ) { // Operate as heater
 			// Calculate Node Values
@@ -238,7 +236,7 @@ namespace ChillerGasAbsorption {
 			} else {
 				GasAbsorber( ChillNum ).InHeatingMode = false;
 			}
-			InitGasAbsorber( ChillNum, RunFlag );
+			InitGasAbsorber( ChillNum );
 			CalcGasAbsorberHeaterModel( ChillNum, MyLoad, RunFlag );
 			UpdateGasAbsorberHeatRecords( MyLoad, RunFlag, ChillNum );
 		} else if ( BranchInletNodeNum == GasAbsorber( ChillNum ).CondReturnNodeNum ) { // called from condenser loop
@@ -527,8 +525,7 @@ namespace ChillerGasAbsorption {
 
 	void
 	InitGasAbsorber(
-		int const ChillNum, // number of the current engine driven chiller being simulated
-		bool const RunFlag // TRUE when chiller operating
+		int const ChillNum // number of the current engine driven chiller being simulated
 	)
 	{
 
@@ -1091,8 +1088,7 @@ namespace ChillerGasAbsorption {
 	void
 	CalcGasAbsorberChillerModel(
 		int & ChillNum, // Absorber number
-		Real64 & MyLoad, // operating load
-		bool const RunFlag // TRUE when Absorber operating
+		Real64 & MyLoad // operating load
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -1152,13 +1148,8 @@ namespace ChillerGasAbsorption {
 		int lChillReturnNodeNum; // Node number on the inlet side of the plant
 		int lChillSupplyNodeNum; // Node number on the outlet side of the plant
 		int lCondReturnNodeNum; // Node number on the inlet side of the condenser
-		int lCondSupplyNodeNum; // Node number on the outlet side of the condenser
 		Real64 lMinPartLoadRat; // min allowed operating frac full load
 		Real64 lMaxPartLoadRat; // max allowed operating frac full load
-		Real64 lOptPartLoadRat; // optimal operating frac full load
-		Real64 lTempDesCondReturn; // design secondary loop fluid temperature at the Absorber condenser side inlet
-		Real64 lTempDesCHWSupply; // design chilled water supply temperature
-		Real64 lCondVolFlowRate; // m**3/s - design nominal water volumetric flow rate through the condenser
 		int lCoolCapFTCurve; // cooling capacity as a function of temperature curve
 		int lFuelCoolFTCurve; // Fuel-Input-to cooling output Ratio Function of Temperature Curve
 		int lFuelCoolFPLRCurve; // Fuel-Input-to cooling output Ratio Function of Part Load Ratio Curve
@@ -1167,21 +1158,12 @@ namespace ChillerGasAbsorption {
 		bool lIsEnterCondensTemp; // if using entering conderser water temperature is TRUE, exiting is FALSE
 		bool lIsWaterCooled; // if water cooled it is TRUE
 		Real64 lCHWLowLimitTemp; // Chilled Water Lower Limit Temperature
-		Real64 lFuelHeatingValue;
 		// Local copies of GasAbsorberReportVars Type
 		Real64 lCoolingLoad; // cooling load on the chiller (previously called QEvap)
-		Real64 lCoolingEnergy; // variable to track total cooling load for period (was EvapEnergy)
 		Real64 lTowerLoad; // load on the cooling tower/condenser (previously called QCond)
-		Real64 lTowerEnergy; // variable to track total tower load for a period (was CondEnergy)
-		Real64 lFuelUseRate; // instantaneous use of gas for period
-		Real64 lFuelEnergy; // variable to track total fuel used for a period
 		Real64 lCoolFuelUseRate; // instantaneous use of gas for period for cooling
-		Real64 lCoolFuelEnergy; // variable to track total fuel used for a period for cooling
 		Real64 lHeatFuelUseRate; // instantaneous use of gas for period for heating
-		Real64 lElectricPower; // parasitic electric power used (was PumpingPower)
-		Real64 lElectricEnergy; // track the total electricity used for a period (was PumpingEnergy)
 		Real64 lCoolElectricPower; // parasitic electric power used  for cooling
-		Real64 lCoolElectricEnergy; // track the total electricity used for a period for cooling
 		Real64 lHeatElectricPower; // parasitic electric power used  for heating
 		Real64 lChillReturnTemp; // reporting: evaporator inlet temperature (was EvapInletTemp)
 		Real64 lChillSupplyTemp; // reporting: evaporator outlet temperature (was EvapOutletTemp)
@@ -1208,26 +1190,16 @@ namespace ChillerGasAbsorption {
 		Real64 errorAvailCap; // error fraction on final estimate of AvailableCoolingCapacity
 		int LoopNum;
 		int LoopSideNum;
-		Real64 rhoCW; // local fluid density for chilled water
 		Real64 Cp_CW; // local fluid specific heat for chilled water
-		Real64 rhoCD; // local fluid density for condenser water
 		Real64 Cp_CD; // local fluid specific heat for condenser water
 
 		//initialize all output variables to zero
 
 		lCoolingLoad = 0.0;
-		lCoolingEnergy = 0.0;
 		lTowerLoad = 0.0;
-		lTowerEnergy = 0.0;
-		lFuelUseRate = 0.0;
-		lFuelEnergy = 0.0;
 		lCoolFuelUseRate = 0.0;
-		lCoolFuelEnergy = 0.0;
 		lHeatFuelUseRate = 0.0;
-		lElectricPower = 0.0;
-		lElectricEnergy = 0.0;
 		lCoolElectricPower = 0.0;
-		lCoolElectricEnergy = 0.0;
 		lHeatElectricPower = 0.0;
 		lChillReturnTemp = 0.0;
 		lChillSupplyTemp = 0.0;
@@ -1246,7 +1218,6 @@ namespace ChillerGasAbsorption {
 		lChillReturnNodeNum = GasAbsorber( ChillNum ).ChillReturnNodeNum;
 		lChillSupplyNodeNum = GasAbsorber( ChillNum ).ChillSupplyNodeNum;
 		lCondReturnNodeNum = GasAbsorber( ChillNum ).CondReturnNodeNum;
-		lCondSupplyNodeNum = GasAbsorber( ChillNum ).CondSupplyNodeNum;
 
 		// set local copies of data from rest of input structure
 
@@ -1256,10 +1227,6 @@ namespace ChillerGasAbsorption {
 		lElecCoolRatio = GasAbsorber( ChillNum ).ElecCoolRatio;
 		lMinPartLoadRat = GasAbsorber( ChillNum ).MinPartLoadRat;
 		lMaxPartLoadRat = GasAbsorber( ChillNum ).MaxPartLoadRat;
-		lOptPartLoadRat = GasAbsorber( ChillNum ).OptPartLoadRat;
-		lTempDesCondReturn = GasAbsorber( ChillNum ).TempDesCondReturn;
-		lTempDesCHWSupply = GasAbsorber( ChillNum ).TempDesCHWSupply;
-		lCondVolFlowRate = GasAbsorber( ChillNum ).CondVolFlowRate;
 		lCoolCapFTCurve = GasAbsorber( ChillNum ).CoolCapFTCurve;
 		lFuelCoolFTCurve = GasAbsorber( ChillNum ).FuelCoolFTCurve;
 		lFuelCoolFPLRCurve = GasAbsorber( ChillNum ).FuelCoolFPLRCurve;
@@ -1268,8 +1235,7 @@ namespace ChillerGasAbsorption {
 		lIsEnterCondensTemp = GasAbsorber( ChillNum ).isEnterCondensTemp;
 		lIsWaterCooled = GasAbsorber( ChillNum ).isWaterCooled;
 		lCHWLowLimitTemp = GasAbsorber( ChillNum ).CHWLowLimitTemp;
-		lFuelHeatingValue = GasAbsorber( ChillNum ).FuelHeatingValue;
-
+		
 		lHeatElectricPower = GasAbsorberReport( ChillNum ).HeatElectricPower;
 		lHeatFuelUseRate = GasAbsorberReport( ChillNum ).HeatFuelUseRate;
 		lHeatPartLoadRatio = GasAbsorberReport( ChillNum ).HeatPartLoadRatio;
@@ -1289,9 +1255,7 @@ namespace ChillerGasAbsorption {
 		}}
 		ChillDeltaTemp = std::abs( lChillReturnTemp - ChillSupplySetPointTemp );
 
-		rhoCW = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 		Cp_CW = GetSpecificHeatGlycol( PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
-		rhoCD = GetDensityGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 		Cp_CD = GetSpecificHeatGlycol( PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidName, lChillReturnTemp, PlantLoop( GasAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 
 		//If no loop demand or Absorber OFF, return
@@ -1569,23 +1533,14 @@ namespace ChillerGasAbsorption {
 		int lHeatSupplyNodeNum; // absorber steam outlet node number, water side
 		Real64 lMinPartLoadRat; // min allowed operating frac full load
 		Real64 lMaxPartLoadRat; // max allowed operating frac full load
-		Real64 lOptPartLoadRat; // optimal operating frac full load
 		int lHeatCapFCoolCurve; // Heating Capacity Function of Cooling Capacity Curve
 		int lFuelHeatFHPLRCurve; // Fuel Input to heat output ratio during heating only function
-		Real64 lFuelHeatingValue;
 		// Local copies of GasAbsorberReportVars Type
 		Real64 lHeatingLoad; // heating load on the chiller
-		Real64 lHeatingEnergy; // heating energy
-		Real64 lFuelUseRate; // instantaneous use of gas for period
-		Real64 lFuelEnergy; // variable to track total fuel used for a period
 		Real64 lCoolFuelUseRate; // instantaneous use of gas for period for cooling
 		Real64 lHeatFuelUseRate; // instantaneous use of gas for period for heating
-		Real64 lHeatFuelEnergy; // variable to track total fuel used for a period for heating
-		Real64 lElectricPower; // parasitic electric power used (was PumpingPower)
-		Real64 lElectricEnergy; // track the total electricity used for a period (was PumpingEnergy)
 		Real64 lCoolElectricPower; // parasitic electric power used  for cooling
 		Real64 lHeatElectricPower; // parasitic electric power used  for heating
-		Real64 lHeatElectricEnergy; // track the total electricity used for a period for heating
 		Real64 lHotWaterReturnTemp; // reporting: hot water return (inlet) temperature
 		Real64 lHotWaterSupplyTemp; // reporting: hot water supply (outlet) temperature
 		Real64 lHotWaterMassFlowRate; // reporting: hot water mass flow rate
@@ -1593,31 +1548,22 @@ namespace ChillerGasAbsorption {
 		Real64 lHeatPartLoadRatio; // operating part load ratio (load/capacity for heating)
 		Real64 lAvailableHeatingCapacity; // current heating capacity
 		Real64 lFractionOfPeriodRunning;
-		Real64 lHotWaterMassFlowRateMax; // Maximum flow rate through the evaporator
 		// other local variables
 		Real64 HeatDeltaTemp; // hot water temperature difference
 		Real64 HeatSupplySetPointTemp( 0.0 );
 		int LoopNum;
 		int LoopSideNum;
 		Real64 Cp_HW; // local fluid specific heat for hot water
-		Real64 rhoHW; // local fluid density for hot water
 
 		//  INTEGER, SAVE          :: ErrCount            ! error counter
 
 		//initialize all output variables to zero
 
 		lHeatingLoad = 0.0;
-		lHeatingEnergy = 0.0;
-		lFuelUseRate = 0.0;
-		lFuelEnergy = 0.0;
 		lCoolFuelUseRate = 0.0;
 		lHeatFuelUseRate = 0.0;
-		lHeatFuelEnergy = 0.0;
-		lElectricPower = 0.0;
-		lElectricEnergy = 0.0;
 		lCoolElectricPower = 0.0;
 		lHeatElectricPower = 0.0;
-		lHeatElectricEnergy = 0.0;
 		lHotWaterReturnTemp = 0.0;
 		lHotWaterSupplyTemp = 0.0;
 		lHotWaterMassFlowRate = 0.0;
@@ -1639,16 +1585,12 @@ namespace ChillerGasAbsorption {
 		lElecHeatRatio = GasAbsorber( ChillNum ).ElecHeatRatio;
 		lMinPartLoadRat = GasAbsorber( ChillNum ).MinPartLoadRat;
 		lMaxPartLoadRat = GasAbsorber( ChillNum ).MaxPartLoadRat;
-		lOptPartLoadRat = GasAbsorber( ChillNum ).OptPartLoadRat;
 		lHeatCapFCoolCurve = GasAbsorber( ChillNum ).HeatCapFCoolCurve;
 		lFuelHeatFHPLRCurve = GasAbsorber( ChillNum ).FuelHeatFHPLRCurve;
-		lFuelHeatingValue = GasAbsorber( ChillNum ).FuelHeatingValue;
-		lHotWaterMassFlowRateMax = GasAbsorber( ChillNum ).DesHeatMassFlowRate;
 		LoopNum = GasAbsorber( ChillNum ).HWLoopNum;
 		LoopSideNum = GasAbsorber( ChillNum ).HWLoopSideNum;
 
 		Cp_HW = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, lHotWaterReturnTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
-		rhoHW = GetDensityGlycol( PlantLoop( LoopNum ).FluidName, lHotWaterReturnTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 
 		lCoolElectricPower = GasAbsorberReport( ChillNum ).CoolElectricPower;
 		lCoolFuelUseRate = GasAbsorberReport( ChillNum ).CoolFuelUseRate;
