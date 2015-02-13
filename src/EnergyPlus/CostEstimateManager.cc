@@ -327,10 +327,8 @@ namespace CostEstimateManager {
 		//  REAL(r64), ALLOCATABLE, DIMENSION(:)   :: SurfMultipleARR
 		//  INTEGER             :: surf ! do-loop counter for checking for surfaces for uniqueness
 		int thisCoil; // index of named coil in its derived type
-		bool WildcardObjNames;
 		int thisChil;
 		int thisPV;
-		Real64 Multipliers;
 
 		//Setup working data structure for line items
 		for ( Item = 1; Item <= NumLineItems; ++Item ) { //Loop thru cost line items
@@ -361,7 +359,6 @@ namespace CostEstimateManager {
 				}
 
 			} else if ( ( SELECT_CASE_var == "COIL:DX" ) || ( SELECT_CASE_var == "COIL:COOLING:DX:SINGLESPEED" ) ) {
-				WildcardObjNames = false;
 				thisCoil = 0;
 				// test if too many pricing methods are set in user input
 				if ( ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) && ( CostLineItem( Item ).PerEach > 0.0 ) ) {
@@ -378,7 +375,6 @@ namespace CostEstimateManager {
 				}
 				//  check for wildcard * in object name..
 				if ( CostLineItem( Item ).ParentObjName == "*" ) { // wildcard, apply to all such components
-					WildcardObjNames = true;
 
 				} else if ( CostLineItem( Item ).ParentObjName == "" ) {
 					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:DX: need to specify a Reference Object Name " );
@@ -394,7 +390,6 @@ namespace CostEstimateManager {
 
 			} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
 
-				WildcardObjNames = false;
 				thisCoil = 0;
 				// test if too many pricing methods are set in user input
 				if ( ( CostLineItem( Item ).PerKiloWattCap > 0.0 ) && ( CostLineItem( Item ).PerEach > 0.0 ) ) {
@@ -411,7 +406,6 @@ namespace CostEstimateManager {
 				}
 				//  check for wildcard * in object name..
 				if ( CostLineItem( Item ).ParentObjName == "*" ) { // wildcard, apply to all such components
-					WildcardObjNames = true;
 
 				} else if ( CostLineItem( Item ).ParentObjName == "" ) {
 					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Coil:Heating:Gas, need to specify a Reference Object Name" );
@@ -438,10 +432,9 @@ namespace CostEstimateManager {
 				}
 
 			} else if ( SELECT_CASE_var == "DAYLIGHTING:CONTROLS" ) {
-				WildcardObjNames = false;
 
 				if ( CostLineItem( Item ).ParentObjName == "*" ) { // wildcard, apply to all such components
-					WildcardObjNames = true;
+
 				} else if ( CostLineItem( Item ).ParentObjName == "" ) {
 					ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Daylighting:Controls, need to specify a Reference Object Name" );
 					ErrorsFound = true;
@@ -504,11 +497,6 @@ namespace CostEstimateManager {
 						thisPV = FindItem( CostLineItem( Item ).ParentObjName, PVarray.Name(), NumPVs );
 						if ( thisPV > 0 ) {
 							ThisZoneID = FindItem( Surface( PVarray( thisPV ).SurfacePtr ).ZoneName, Zone.Name(), NumOfZones );
-							if ( ThisZoneID == 0 ) {
-								Multipliers = 1.0;
-							} else {
-								Multipliers = Zone( ThisZoneID ).Multiplier * Zone( ThisZoneID ).ListMultiplier;
-							}
 							if ( PVarray( thisPV ).PVModelType != iSimplePVModel ) {
 								ShowSevereError( "ComponentCost:LineItem: \"" + CostLineItem( Item ).LineName + "\", Generator:Photovoltaic, only available for model type PhotovoltaicPerformance:Simple" );
 								ErrorsFound = true;
