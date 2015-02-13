@@ -505,14 +505,13 @@ namespace BranchInputManager {
 		if ( NumBranches == 0 ) {
 			ShowSevereError( "GetAirBranchIndex:  Branch not found with component = " + CompType + " \"" + CompName + "\"" );
 		} else {
-			BranchLoop: for ( BranchNum = 1; BranchNum <= NumBranches; ++BranchNum ) {
+			for ( BranchNum = 1; BranchNum <= NumBranches; ++BranchNum ) {
 				for ( CompNum = 1; CompNum <= Branch( BranchNum ).NumOfComponents; ++CompNum ) {
 					if ( SameString( CompType, Branch( BranchNum ).Component( CompNum ).CType ) && SameString( CompName, Branch( BranchNum ).Component( CompNum ).Name ) ) {
 						GetAirBranchIndex = BranchNum;
 						goto BranchLoop_exit;
 					}
 				}
-				BranchLoop_loop: ;
 			}
 			BranchLoop_exit: ;
 		}
@@ -711,13 +710,12 @@ namespace BranchInputManager {
 		OASysFlag = false;
 		NumBranches = size( Branch );
 
-		BranchLoop: for ( BranchNum = 1; BranchNum <= NumBranches; ++BranchNum ) {
+		for ( BranchNum = 1; BranchNum <= NumBranches; ++BranchNum ) {
 			for ( CompNum = 1; CompNum <= Branch( BranchNum ).NumOfComponents; ++CompNum ) {
 				if ( ! SameString( CompType, Branch( BranchNum ).Component( CompNum ).CType ) && ! SameString( CompName, Branch( BranchNum ).Component( CompNum ).Name ) ) continue;
 				AirBranchIndex = BranchNum;
 				goto BranchLoop_exit;
 			}
-			BranchLoop_loop: ;
 		}
 		BranchLoop_exit: ;
 
@@ -1735,7 +1733,7 @@ namespace BranchInputManager {
 					ShowSevereError( RoutineName + " Invalid " + CurrentModuleObject + " Input, preceding condition(s) will likely cause termination." );
 					InvalidBranchDefinitions = true;
 				}
-				TestInletOutletNodes( ErrFound );
+				TestInletOutletNodes();
 				GetInputFlag = false;
 			}
 		}

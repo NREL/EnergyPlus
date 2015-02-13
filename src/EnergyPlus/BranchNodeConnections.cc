@@ -1563,7 +1563,7 @@ namespace BranchNodeConnections {
 	}
 
 	void
-	TestInletOutletNodes( bool & ErrorsFound )
+	TestInletOutletNodes()
 	{
 
 		// SUBROUTINE INFORMATION:
