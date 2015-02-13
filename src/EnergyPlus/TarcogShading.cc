@@ -126,14 +126,14 @@ namespace TarcogShading {
 		hgas.dim( maxlay1 );
 		hcgas.dim( maxlay1 );
 		hrgas.dim( maxlay1 );
-		frct.dim( maxlay1, maxgas );
-		iprop.dim( maxlay1, maxgas );
+		frct.dim( maxgas, maxlay1 );
+		iprop.dim( maxgas, maxlay1 );
 		pressure.dim( maxlay1 );
 		nmix.dim( maxlay1 );
 		xwght.dim( maxgas );
-		xgcon.dim( maxgas, 3 );
-		xgvis.dim( maxgas, 3 );
-		xgcp.dim( maxgas, 3 );
+		xgcon.dim( 3, maxgas );
+		xgvis.dim( 3, maxgas );
+		xgcp.dim( 3, maxgas );
 		Atop.dim( maxlay );
 		Abot.dim( maxlay );
 		Al.dim( maxlay );
@@ -213,10 +213,10 @@ namespace TarcogShading {
 				press1 = pressure( i );
 				press2 = pressure( i + 1 );
 				for ( j = 1; j <= maxgas; ++j ) {
-					iprop1( j ) = iprop( i, j );
-					iprop2( j ) = iprop( i + 1, j );
-					frct1( j ) = frct( i, j );
-					frct2( j ) = frct( i + 1, j );
+					iprop1( j ) = iprop( j, i );
+					iprop2( j ) = iprop( j, i + 1 );
+					frct1( j ) = frct( j, i );
+					frct2( j ) = frct( j, i + 1 );
 				} // j
 
 				//dr.......shading on outdoor side
@@ -368,9 +368,9 @@ namespace TarcogShading {
 		iprop.dim( maxgas );
 		frct.dim( maxgas );
 		xwght.dim( maxgas );
-		xgcon.dim( maxgas, 3 );
-		xgvis.dim( maxgas, 3 );
-		xgcp.dim( maxgas, 3 );
+		xgcon.dim( 3, maxgas );
+		xgvis.dim( 3, maxgas );
+		xgcp.dim( 3, maxgas );
 
 		// Locals
 		Real64 H0;
@@ -474,9 +474,9 @@ namespace TarcogShading {
 		iprop2.dim( maxgas );
 		frct2.dim( maxgas );
 		xwght.dim( maxgas );
-		xgcon.dim( maxgas, 3 );
-		xgvis.dim( maxgas, 3 );
-		xgcp.dim( maxgas, 3 );
+		xgcon.dim( 3, maxgas );
+		xgvis.dim( 3, maxgas );
+		xgcp.dim( 3, maxgas );
 
 		// Locals
 		Real64 A;
@@ -775,9 +775,9 @@ namespace TarcogShading {
 		iprop2.dim( maxgas );
 		frct2.dim( maxgas );
 		xwght.dim( maxgas );
-		xgcon.dim( maxgas, 3 );
-		xgvis.dim( maxgas, 3 );
-		xgcp.dim( maxgas, 3 );
+		xgcon.dim( 3, maxgas );
+		xgvis.dim( 3, maxgas );
+		xgcp.dim( 3, maxgas );
 
 		// Locals
 		Real64 A;

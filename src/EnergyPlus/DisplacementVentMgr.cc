@@ -725,36 +725,36 @@ namespace DisplacementVentMgr {
 		// have to be located above 1.8m.
 
 		if ( NumOfLinksMultiZone > 0 ) {
-			for ( Loop = 1; Loop <= AirflowNetworkSurfaceUCSDCV( ZoneNum, 0 ); ++Loop ) {
+			for ( Loop = 1; Loop <= AirflowNetworkSurfaceUCSDCV( 0, ZoneNum ); ++Loop ) {
 				// direct AirflowNetwork surface
 
-				if ( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).SurfNum ).Zone == ZoneNum ) {
+				if ( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).SurfNum ).Zone == ZoneNum ) {
 
-					if ( ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmax < 0.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).VolFLOW > 0 ) ) {
+					if ( ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmax < 0.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).VolFLOW > 0 ) ) {
 						FlagApertures = 0;
 						break;
 					}
-					if ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmin > 1.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).VolFLOW2 > 0 ) {
+					if ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmin > 1.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).VolFLOW2 > 0 ) {
 						FlagApertures = 0;
 						break;
 					}
 
-					if ( ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmin > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmin < 1.8 ) || ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmax > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmax < 1.8 ) ) {
+					if ( ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmin > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmin < 1.8 ) || ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmax > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmax < 1.8 ) ) {
 						FlagApertures = 0;
 						break;
 					}
 					// indirect AirflowNetwork surface; this is an interzone surface
 				} else {
 
-					if ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmax + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ < 0.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).VolFLOW2 > 0 ) {
+					if ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmax + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ < 0.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).VolFLOW2 > 0 ) {
 						FlagApertures = 0;
 						break;
 					}
-					if ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmin + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ > 1.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).VolFLOW > 0 ) {
+					if ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmin + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ > 1.8 && AirflowNetworkLinkSimu( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).VolFLOW > 0 ) {
 						FlagApertures = 0;
 						break;
 					}
-					if ( ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmin + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmin + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ < 1.8 ) || ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmax + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).Zmax + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( ZoneNum, Loop ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ < 1.8 ) ) {
+					if ( ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmin + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmin + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ < 1.8 ) || ( SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmax + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ > 0.8 && SurfParametersCVDV( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).Zmax + Zone( Surface( MultizoneSurfaceData( AirflowNetworkSurfaceUCSDCV( Loop, ZoneNum ) ).SurfNum ).Zone ).OriginZ - Zone( ZoneNum ).OriginZ < 1.8 ) ) {
 						FlagApertures = 0;
 						break;
 					}

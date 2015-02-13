@@ -212,7 +212,7 @@ namespace AirflowNetworkSolver {
 		DpProf.allocate( n * ( NrInt + 2 ) );
 		RhoProfF.allocate( n * ( NrInt + 2 ) );
 		RhoProfT.allocate( n * ( NrInt + 2 ) );
-		DpL.allocate( 2, AirflowNetworkNumOfLinks );
+		DpL.allocate( AirflowNetworkNumOfLinks, 2 );
 
 		PB = 101325.0;
 		//   LIST = 5
@@ -871,7 +871,7 @@ namespace AirflowNetworkSolver {
 			if ( i > NumOfLinksMultiZone ) {
 				DP = PZ( n ) - PZ( M ) + PS( i ) + PW( i );
 			} else {
-				DP = PZ( n ) - PZ( M ) + DpL( 1, i ) + PW( i );
+				DP = PZ( n ) - PZ( M ) + DpL( i, 1 ) + PW( i );
 			}
 			if ( LIST >= 4 ) gio::write( Unit21, Format_901 ) << "PS:" << i << n << M << PS( i ) << PW( i ) << AirflowNetworkLinkSimu( i ).DP;
 			j = AirflowNetworkLinkageData( i ).CompNum;
@@ -3984,7 +3984,7 @@ Label90: ;
 
 		// calculate DpProfNew
 		for ( i = 1; i <= NrInt + 2; ++i ) {
-			DpProfNew( i ) = PDROP + DpProf( Loc + i ) - DpL( 1, IL );
+			DpProfNew( i ) = PDROP + DpProf( Loc + i ) - DpL( IL, 1 );
 		}
 
 		// Get opening data based on the opening factor
@@ -4517,7 +4517,7 @@ Label90: ;
 		Real64 RhoL1; // Air density [kg/m3]
 		Real64 RhoL2;
 		Real64 Pbz; // Pbarom at entrance level [Pa]
-		Array2D< Real64 > RhoDrL( 2, NumOfLinksMultiZone ); // dry air density on both sides of the link [kg/m3]
+		Array2D< Real64 > RhoDrL( NumOfLinksMultiZone, 2 ); // dry air density on both sides of the link [kg/m3]
 		Real64 TempL1; // Temp in From and To zone at link level [C]
 		Real64 TempL2;
 		//      REAL(r64) Tout ! outside temperature [C]
@@ -4646,8 +4646,8 @@ Label90: ;
 			}
 
 			// RhoDrL is Rho at link level without pollutant but with humidity
-			RhoDrL( 1, i ) = PsyRhoAirFnPbTdbW( OutBaroPress + PzFrom, TempL1, Xhl1 );
-			RhoDrL( 2, i ) = PsyRhoAirFnPbTdbW( OutBaroPress + PzTo, TempL2, Xhl2 );
+			RhoDrL( i, 1 ) = PsyRhoAirFnPbTdbW( OutBaroPress + PzFrom, TempL1, Xhl1 );
+			RhoDrL( i, 2 ) = PsyRhoAirFnPbTdbW( OutBaroPress + PzTo, TempL2, Xhl2 );
 
 			// End initialisation
 
@@ -4656,7 +4656,7 @@ Label90: ;
 			if ( Fromz == 0 ) ilayptr = 1;
 			j = ilayptr;
 			k = 1;
-			LClimb( G, RhoLd( 1 ), AirflowNetworkLinkageData( i ).NodeHeights( 1 ), TempL1, Xhl1, DpF( k ), Toz, PzTo, Pbz, RhoDrL( 1, i ) );
+			LClimb( G, RhoLd( 1 ), AirflowNetworkLinkageData( i ).NodeHeights( 1 ), TempL1, Xhl1, DpF( k ), Toz, PzTo, Pbz, RhoDrL( i, 1 ) );
 			RhoL1 = RhoLd( 1 );
 			// For large openings calculate the stack pressure difference profile and the
 			// density profile within the the top- and the bottom- height of the large opening
@@ -4711,7 +4711,7 @@ Label90: ;
 			j = ilayptr;
 			// Calculate Rho at link height only if we have large openings or layered zones.
 			k = 1;
-			LClimb( G, RhoLd( 2 ), AirflowNetworkLinkageData( i ).NodeHeights( 2 ), TempL2, Xhl2, DpT( k ), Toz, PzTo, Pbz, RhoDrL( 2, i ) );
+			LClimb( G, RhoLd( 2 ), AirflowNetworkLinkageData( i ).NodeHeights( 2 ), TempL2, Xhl2, DpT( k ), Toz, PzTo, Pbz, RhoDrL( i, 2 ) );
 			RhoL2 = RhoLd( 2 );
 
 			// For large openings calculate the stack pressure difference profile and the
@@ -4769,12 +4769,12 @@ Label90: ;
 			// IF AIR FLOWS from "From" to "To"
 			Pref = Pbz + PzFrom + DpF( 1 );
 			DpP = psz( Pref, RhoLd( 1 ), 0.0, 0.0, H, G );
-			DpL( 1, i ) = ( DpF( 1 ) - DpT( 1 ) + DpP );
+			DpL( i, 1 ) = ( DpF( 1 ) - DpT( 1 ) + DpP );
 
 			// IF AIR FLOWS from "To" to "From"
 			Pref = Pbz + PzTo + DpT( 1 );
 			DpP = -psz( Pref, RhoLd( 2 ), 0.0, 0.0, -H, G );
-			DpL( 2, i ) = ( DpF( 1 ) - DpT( 1 ) + DpP );
+			DpL( i, 2 ) = ( DpF( 1 ) - DpT( 1 ) + DpP );
 
 			if ( Ltyp == CompTypeNum_DOP ) {
 				Pprof = OpenNum * ( NrInt + 2 );

@@ -927,7 +927,7 @@ namespace TranspiredCollector {
 			InitExteriorConvectionCoeff( SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR( ThisSurf ), HGroundARR( ThisSurf ), HAirARR( ThisSurf ) );
 			ConstrNum = Surface( SurfPtr ).Construction;
 			AbsThermSurf = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermal;
-			TsoK = TH( SurfPtr, 1, 1 ) + KelvinConv;
+			TsoK = TH( 1, 1, SurfPtr ) + KelvinConv;
 			TscollK = UTSC( UTSCNum ).TcollLast + KelvinConv;
 			HPlenARR( ThisSurf ) = Sigma * AbsExt * AbsThermSurf * ( pow_4( TscollK ) - pow_4( TsoK ) ) / ( TscollK - TsoK );
 		}
@@ -954,7 +954,7 @@ namespace TranspiredCollector {
 //		Isc = sum( QRadSWOutIncident( UTSC( UTSCNum ).SurfPtrs ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage: Replaced by below
 		Isc = sum_product_sub( QRadSWOutIncident, Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / AreaSum; //Autodesk:F2C++ Functions handle array subscript usage
 //		Tso = sum( TH( UTSC( UTSCNum ).SurfPtrs, 1, 1 ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage: Replaced by below
-		Tso = sum_product_sub( TH( _, 1, 1 ), Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / AreaSum; //Autodesk:F2C++ Functions handle array subscript usage
+		Tso = sum_product_sub( TH( 1, 1, _ ), Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / AreaSum; //Autodesk:F2C++ Functions handle array subscript usage
 
 		if ( Vwind > 5.0 ) {
 			HcWind = 5.62 + 3.9 * ( Vwind - 5.0 ); //McAdams forced convection correlation

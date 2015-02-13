@@ -395,7 +395,7 @@ namespace DataSurfaces {
 	// if present
 	Array1D< Real64 > WinSysSolAbsorptance; // Effective solar absorptance of window + shading device,
 	// if present
-	Array2D< Real64 > SUNCOSHR( 3, 24, 0.0 ); // Hourly values of SUNCOS (solar direction cosines) //Autodesk:Init Zero-initialization added to avoid use uninitialized
+	Array2D< Real64 > SUNCOSHR( 24, 3, 0.0 ); // Hourly values of SUNCOS (solar direction cosines) //Autodesk:Init Zero-initialization added to avoid use uninitialized
 	Array2D< Real64 > ReflFacBmToDiffSolObs;
 	Array2D< Real64 > ReflFacBmToDiffSolGnd;
 	Array2D< Real64 > ReflFacBmToBmSolObs;

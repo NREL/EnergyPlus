@@ -278,8 +278,8 @@ namespace MundtSimMgr {
 		// allocate and initialize surface and air-node data
 		ID1dSurf.allocate( MaxNumOfSurfs );
 		TheseSurfIDs.allocate( MaxNumOfSurfs );
-		MundtAirSurf.allocate( NumOfMundtZones, MaxNumOfSurfs );
-		LineNode.allocate( NumOfMundtZones, MaxNumOfAirNodes );
+		MundtAirSurf.allocate( MaxNumOfSurfs, NumOfMundtZones );
+		LineNode.allocate( MaxNumOfAirNodes, NumOfMundtZones );
 		for ( SurfNum = 1; SurfNum <= MaxNumOfSurfs; ++SurfNum ) ID1dSurf( SurfNum ) = SurfNum;
 		MundtAirSurf.Area() = 0.0;
 		MundtAirSurf.Temp() = 25.0;
@@ -298,7 +298,7 @@ namespace MundtSimMgr {
 				if ( ZoneData( ZoneIndex ).MundtZoneIndex == MundtZoneIndex ) {
 					// get surface data
 					for ( SurfNum = 1; SurfNum <= ZoneData( ZoneIndex ).NumOfSurfs; ++SurfNum ) {
-						MundtAirSurf( MundtZoneIndex, SurfNum ).Area = Surface( ZoneData( ZoneIndex ).SurfFirst + SurfNum - 1 ).Area;
+						MundtAirSurf( SurfNum, MundtZoneIndex ).Area = Surface( ZoneData( ZoneIndex ).SurfFirst + SurfNum - 1 ).Area;
 					}
 
 					// get air node data
@@ -306,7 +306,7 @@ namespace MundtSimMgr {
 					FloorSurfCount = 0;
 					for ( NodeNum = 1; NodeNum <= TotNumOfZoneAirNodes( ZoneIndex ); ++NodeNum ) {
 
-						LineNode( MundtZoneIndex, NodeNum ).SurfMask.allocate( ZoneData( ZoneIndex ).NumOfSurfs );
+						LineNode( NodeNum, MundtZoneIndex ).SurfMask.allocate( ZoneData( ZoneIndex ).NumOfSurfs );
 
 						if ( NodeNum == 1 ) {
 							AirNodeBeginNum = NodeNum;
@@ -320,11 +320,11 @@ namespace MundtSimMgr {
 						AirNodeFoundFlag = false;
 						for ( AirNodeNum = AirNodeBeginNum; AirNodeNum <= TotNumOfAirNodes; ++AirNodeNum ) {
 							if ( SameString( AirNode( AirNodeNum ).ZoneName, Zone( ZoneIndex ).Name ) ) {
-								LineNode( MundtZoneIndex, NodeNum ).ClassType = AirNode( AirNodeNum ).ClassType;
-								LineNode( MundtZoneIndex, NodeNum ).AirNodeName = AirNode( AirNodeNum ).Name;
-								LineNode( MundtZoneIndex, NodeNum ).Height = AirNode( AirNodeNum ).Height;
-								LineNode( MundtZoneIndex, NodeNum ).SurfMask = AirNode( AirNodeNum ).SurfMask;
-								SetupOutputVariable( "Room Air Node Air Temperature [C]", LineNode( MundtZoneIndex, NodeNum ).Temp, "HVAC", "Average", LineNode( MundtZoneIndex, NodeNum ).AirNodeName );
+								LineNode( NodeNum, MundtZoneIndex ).ClassType = AirNode( AirNodeNum ).ClassType;
+								LineNode( NodeNum, MundtZoneIndex ).AirNodeName = AirNode( AirNodeNum ).Name;
+								LineNode( NodeNum, MundtZoneIndex ).Height = AirNode( AirNodeNum ).Height;
+								LineNode( NodeNum, MundtZoneIndex ).SurfMask = AirNode( AirNodeNum ).SurfMask;
+								SetupOutputVariable( "Room Air Node Air Temperature [C]", LineNode( NodeNum, MundtZoneIndex ).Temp, "HVAC", "Average", LineNode( NodeNum, MundtZoneIndex ).AirNodeName );
 
 								AirNodeBeginNum = AirNodeNum + 1;
 								AirNodeFoundFlag = true;
@@ -341,13 +341,13 @@ namespace MundtSimMgr {
 						}
 
 						// count air nodes connected to walls in each zone
-						if ( LineNode( MundtZoneIndex, NodeNum ).ClassType == MundtRoomAirNode ) {
+						if ( LineNode( NodeNum, MundtZoneIndex ).ClassType == MundtRoomAirNode ) {
 							++RoomNodesCount;
 						}
 
 						// count floors in each zone
-						if ( LineNode( MundtZoneIndex, NodeNum ).ClassType == FloorAirNode ) {
-							FloorSurfCount += count( LineNode( MundtZoneIndex, NodeNum ).SurfMask );
+						if ( LineNode( NodeNum, MundtZoneIndex ).ClassType == FloorAirNode ) {
+							FloorSurfCount += count( LineNode( NodeNum, MundtZoneIndex ).SurfMask );
 						}
 
 					}
@@ -505,8 +505,8 @@ namespace MundtSimMgr {
 
 		// get surface data
 		for ( SurfNum = 1; SurfNum <= ZoneData( ZoneNum ).NumOfSurfs; ++SurfNum ) {
-			MundtAirSurf( MundtZoneNum, SurfNum ).Temp = TempSurfIn( ZoneData( ZoneNum ).SurfFirst + SurfNum - 1 );
-			MundtAirSurf( MundtZoneNum, SurfNum ).Hc = HConvIn( ZoneData( ZoneNum ).SurfFirst + SurfNum - 1 );
+			MundtAirSurf( SurfNum, MundtZoneNum ).Temp = TempSurfIn( ZoneData( ZoneNum ).SurfFirst + SurfNum - 1 );
+			MundtAirSurf( SurfNum, MundtZoneNum ).Hc = HConvIn( ZoneData( ZoneNum ).SurfFirst + SurfNum - 1 );
 		}
 
 	}
@@ -562,7 +562,7 @@ namespace MundtSimMgr {
 		// set up air node ID
 		NumRoomNodes = 0;
 		for ( NodeNum = 1; NodeNum <= TotNumOfZoneAirNodes( ZoneNum ); ++NodeNum ) {
-			{ auto const SELECT_CASE_var( LineNode( MundtZoneNum, NodeNum ).ClassType );
+			{ auto const SELECT_CASE_var( LineNode( NodeNum, MundtZoneNum ).ClassType );
 			if ( SELECT_CASE_var == InletAirNode ) { //inlet
 				SupplyNodeID = NodeNum;
 			} else if ( SELECT_CASE_var == FloorAirNode ) { // floor
@@ -584,17 +584,17 @@ namespace MundtSimMgr {
 
 		//  get number of floors in the zone and setup FloorSurfSetIDs
 		if ( MundtFootAirID > 0 ) {
-			NumFloorSurfs = count( LineNode( MundtZoneNum, MundtFootAirID ).SurfMask );
-			FloorSurfSetIDs = pack( ID1dSurf, LineNode( MundtZoneNum, MundtFootAirID ).SurfMask );
+			NumFloorSurfs = count( LineNode( MundtFootAirID, MundtZoneNum ).SurfMask );
+			FloorSurfSetIDs = pack( ID1dSurf, LineNode( MundtFootAirID, MundtZoneNum ).SurfMask );
 			// initialize floor surface data (a must since NumFloorSurfs is varied among zones)
 			FloorSurf.Temp() = 25.0;
 			FloorSurf.Hc() = 0.0;
 			FloorSurf.Area() = 0.0;
 			// get floor surface data
 			for ( SurfNum = 1; SurfNum <= NumFloorSurfs; ++SurfNum ) {
-				FloorSurf( SurfNum ).Temp = MundtAirSurf( MundtZoneNum, FloorSurfSetIDs( SurfNum ) ).Temp;
-				FloorSurf( SurfNum ).Hc = MundtAirSurf( MundtZoneNum, FloorSurfSetIDs( SurfNum ) ).Hc;
-				FloorSurf( SurfNum ).Area = MundtAirSurf( MundtZoneNum, FloorSurfSetIDs( SurfNum ) ).Area;
+				FloorSurf( SurfNum ).Temp = MundtAirSurf( FloorSurfSetIDs( SurfNum ), MundtZoneNum ).Temp;
+				FloorSurf( SurfNum ).Hc = MundtAirSurf( FloorSurfSetIDs( SurfNum ), MundtZoneNum ).Hc;
+				FloorSurf( SurfNum ).Area = MundtAirSurf( FloorSurfSetIDs( SurfNum ), MundtZoneNum ).Area;
 			}
 		} else {
 			ShowSevereError( "SetupMundtModel: Mundt model has no FloorAirNode, Zone=" + Zone( ZoneNum ).Name );
@@ -682,11 +682,11 @@ namespace MundtSimMgr {
 		}
 
 		// Eq 2.4 in ASHRAE RP 1222 Final report
-		Slope = ( TLeaving - TAirFoot ) / ( LineNode( MundtZoneNum, ReturnNodeID ).Height - LineNode( MundtZoneNum, MundtFootAirID ).Height );
+		Slope = ( TLeaving - TAirFoot ) / ( LineNode( ReturnNodeID, MundtZoneNum ).Height - LineNode( MundtFootAirID, MundtZoneNum ).Height );
 		// check slope
 		if ( Slope > MaxSlope ) {
 			Slope = MaxSlope;
-			TAirFoot = TLeaving - ( Slope * ( LineNode( MundtZoneNum, ReturnNodeID ).Height - LineNode( MundtZoneNum, MundtFootAirID ).Height ) );
+			TAirFoot = TLeaving - ( Slope * ( LineNode( ReturnNodeID, MundtZoneNum ).Height - LineNode( MundtFootAirID, MundtZoneNum ).Height ) );
 		}
 		if ( Slope < MinSlope ) { // pretty much vertical
 			Slope = MinSlope;
@@ -694,9 +694,9 @@ namespace MundtSimMgr {
 		}
 
 		// Eq 2.4 in ASHRAE RP 1222 Final report
-		TAirCeil = TLeaving - ( Slope * ( LineNode( MundtZoneNum, ReturnNodeID ).Height - LineNode( MundtZoneNum, MundtCeilAirID ).Height ) );
+		TAirCeil = TLeaving - ( Slope * ( LineNode( ReturnNodeID, MundtZoneNum ).Height - LineNode( MundtCeilAirID, MundtZoneNum ).Height ) );
 
-		TControlPoint = TLeaving - ( Slope * ( LineNode( MundtZoneNum, ReturnNodeID ).Height - LineNode( MundtZoneNum, TstatNodeID ).Height ) );
+		TControlPoint = TLeaving - ( Slope * ( LineNode( ReturnNodeID, MundtZoneNum ).Height - LineNode( TstatNodeID, MundtZoneNum ).Height ) );
 
 		// determine air node temperatures in this zone
 		SetNodeResult( SupplyNodeID, SupplyAirTemp );
@@ -709,17 +709,17 @@ namespace MundtSimMgr {
 			SetSurfTmeanAir( FloorSurfSetIDs( SurfNum ), TAirFoot );
 		}
 
-		SurfCounted = count( LineNode( MundtZoneNum, MundtCeilAirID ).SurfMask );
-		TheseSurfIDs = pack( ID1dSurf, LineNode( MundtZoneNum, MundtCeilAirID ).SurfMask );
+		SurfCounted = count( LineNode( MundtCeilAirID, MundtZoneNum ).SurfMask );
+		TheseSurfIDs = pack( ID1dSurf, LineNode( MundtCeilAirID, MundtZoneNum ).SurfMask );
 		for ( SurfNum = 1; SurfNum <= SurfCounted; ++SurfNum ) {
 			SetSurfTmeanAir( TheseSurfIDs( SurfNum ), TAirCeil );
 		}
 
 		for ( NodeNum = 1; NodeNum <= NumRoomNodes; ++NodeNum ) {
-			TThisNode = TLeaving - ( Slope * ( LineNode( MundtZoneNum, ReturnNodeID ).Height - LineNode( MundtZoneNum, RoomNodeIDs( NodeNum ) ).Height ) );
+			TThisNode = TLeaving - ( Slope * ( LineNode( ReturnNodeID, MundtZoneNum ).Height - LineNode( RoomNodeIDs( NodeNum ), MundtZoneNum ).Height ) );
 			SetNodeResult( RoomNodeIDs( NodeNum ), TThisNode );
-			SurfCounted = count( LineNode( MundtZoneNum, RoomNodeIDs( NodeNum ) ).SurfMask );
-			TheseSurfIDs = pack( ID1dSurf, LineNode( MundtZoneNum, RoomNodeIDs( NodeNum ) ).SurfMask );
+			SurfCounted = count( LineNode( RoomNodeIDs( NodeNum ), MundtZoneNum ).SurfMask );
+			TheseSurfIDs = pack( ID1dSurf, LineNode( RoomNodeIDs( NodeNum ), MundtZoneNum ).SurfMask );
 			for ( SurfNum = 1; SurfNum <= SurfCounted; ++SurfNum ) {
 				SetSurfTmeanAir( TheseSurfIDs( SurfNum ), TThisNode );
 			}
@@ -772,7 +772,7 @@ namespace MundtSimMgr {
 
 		// FLOW:
 
-		LineNode( MundtZoneNum, NodeID ).Temp = TempResult;
+		LineNode( NodeID, MundtZoneNum ).Temp = TempResult;
 
 	}
 
@@ -821,7 +821,7 @@ namespace MundtSimMgr {
 
 		// FLOW:
 
-		MundtAirSurf( MundtZoneNum, SurfID ).TMeanAir = TeffAir;
+		MundtAirSurf( SurfID, MundtZoneNum ).TMeanAir = TeffAir;
 
 	}
 
@@ -894,36 +894,36 @@ namespace MundtSimMgr {
 				// Use direct coupling scheme to report air temperatures back to surface/system domains
 				// a) Bulk air temperatures -> TempEffBulkAir(SurfNum)
 				for ( SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum ) {
-					TempEffBulkAir( SurfFirst + SurfNum - 1 ) = MundtAirSurf( MundtZoneNum, SurfNum ).TMeanAir;
+					TempEffBulkAir( SurfFirst + SurfNum - 1 ) = MundtAirSurf( SurfNum, MundtZoneNum ).TMeanAir;
 					// set flag for reference air temperature
 					Surface( SurfFirst + SurfNum - 1 ).TAirRef = AdjacentAirTemp;
 				}
 				// b) Average zone air temperature -> ZT(ZoneNum)
 				// For Mundt model, average room air is the weighted value of floor and ceiling air temps
-				TRoomAverage = ( LineNode( MundtZoneNum, MundtCeilAirID ).Temp + LineNode( MundtZoneNum, MundtFootAirID ).Temp ) / 2;
+				TRoomAverage = ( LineNode( MundtCeilAirID, MundtZoneNum ).Temp + LineNode( MundtFootAirID, MundtZoneNum ).Temp ) / 2;
 				//ZT(ZoneNum) = TRoomAverage
 				// c) Leaving-zone air temperature -> Node(ZoneNode)%Temp
 				ZoneNodeNum = Zone( ZoneNum ).SystemZoneNodeNumber;
-				Node( ZoneNodeNum ).Temp = LineNode( MundtZoneNum, ReturnNodeID ).Temp;
+				Node( ZoneNodeNum ).Temp = LineNode( ReturnNodeID, MundtZoneNum ).Temp;
 				// d) Thermostat air temperature -> TempTstatAir(ZoneNum)
-				TempTstatAir( ZoneNum ) = LineNode( MundtZoneNum, TstatNodeID ).Temp;
+				TempTstatAir( ZoneNum ) = LineNode( TstatNodeID, MundtZoneNum ).Temp;
 			} else {
 				// Use indirect coupling scheme to report air temperatures back to surface/system domains
 				// a) Bulk air temperatures -> TempEffBulkAir(SurfNum)
 				for ( SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum ) {
-					DeltaTemp = MundtAirSurf( MundtZoneNum, SurfNum ).TMeanAir - LineNode( MundtZoneNum, TstatNodeID ).Temp;
+					DeltaTemp = MundtAirSurf( SurfNum, MundtZoneNum ).TMeanAir - LineNode( TstatNodeID, MundtZoneNum ).Temp;
 					TempEffBulkAir( SurfFirst + SurfNum - 1 ) = TempZoneThermostatSetPoint( ZoneNum ) + DeltaTemp;
 					// set flag for reference air temperature
 					Surface( SurfFirst + SurfNum - 1 ).TAirRef = AdjacentAirTemp;
 				}
 				// b) Average zone air temperature -> ZT(ZoneNum)
 				// For Mundt model, average room air is the weighted value of floor and ceiling air temps
-				TRoomAverage = ( LineNode( MundtZoneNum, MundtCeilAirID ).Temp + LineNode( MundtZoneNum, MundtFootAirID ).Temp ) / 2;
-				DeltaTemp = TRoomAverage - LineNode( MundtZoneNum, TstatNodeID ).Temp;
+				TRoomAverage = ( LineNode( MundtCeilAirID, MundtZoneNum ).Temp + LineNode( MundtFootAirID, MundtZoneNum ).Temp ) / 2;
+				DeltaTemp = TRoomAverage - LineNode( TstatNodeID, MundtZoneNum ).Temp;
 				// ZT(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum) + DeltaTemp
 				// c) Leaving-zone air temperature -> Node(ZoneNode)%Temp
 				ZoneNodeNum = Zone( ZoneNum ).SystemZoneNodeNumber;
-				DeltaTemp = LineNode( MundtZoneNum, ReturnNodeID ).Temp - LineNode( MundtZoneNum, TstatNodeID ).Temp;
+				DeltaTemp = LineNode( ReturnNodeID, MundtZoneNum ).Temp - LineNode( TstatNodeID, MundtZoneNum ).Temp;
 				Node( ZoneNodeNum ).Temp = TempZoneThermostatSetPoint( ZoneNum ) + DeltaTemp;
 				// d) Thermostat air temperature -> TempTstatAir(ZoneNum)
 				TempTstatAir( ZoneNum ) = ZT( ZoneNum ); // for indirect coupling, control air temp is equal to mean air temp?

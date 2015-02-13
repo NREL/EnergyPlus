@@ -751,7 +751,7 @@ DXFOut(
 		}
 		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDaylRefPoints; ++refpt ) {
 			gio::write( unit, Format_710 ) << Zone( zones ).Name + ":DayRefPt:" + TrimSigDigits( refpt );
-			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 1 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 2 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 3 ) << 0.2;
+			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 1, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 2, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 3, refpt ) << 0.2;
 			curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
 		}
 	}
@@ -773,7 +773,7 @@ DXFOut(
 			if ( IllumMapCalc( mapnum ).Zone != zones ) continue;
 			for ( refpt = 1; refpt <= IllumMapCalc( mapnum ).TotalMapRefPoints; ++refpt ) {
 				gio::write( unit, Format_710 ) << Zone( zones ).Name + ":MapRefPt:" + TrimSigDigits( refpt );
-				gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << IllumMapCalc( mapnum ).MapRefPtAbsCoord( refpt, 1 ) << IllumMapCalc( mapnum ).MapRefPtAbsCoord( refpt, 2 ) << IllumMapCalc( mapnum ).MapRefPtAbsCoord( refpt, 3 ) << 0.05;
+				gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << IllumMapCalc( mapnum ).MapRefPtAbsCoord( 1, refpt ) << IllumMapCalc( mapnum ).MapRefPtAbsCoord( 2, refpt ) << IllumMapCalc( mapnum ).MapRefPtAbsCoord( 3, refpt ) << 0.05;
 			}
 		}
 	}
@@ -794,7 +794,7 @@ DXFOut(
 		}
 		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDElightRefPts; ++refpt ) {
 			gio::write( unit, Format_710 ) << Zone( zones ).Name + ":DEDayRefPt:" + TrimSigDigits( refpt );
-			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 1 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 2 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 3 ) << 0.2;
+			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 1, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 2, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 3, refpt ) << 0.2;
 			curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
 		}
 	}
@@ -1199,7 +1199,7 @@ DXFOutLines( std::string const & ColorScheme )
 		}
 		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDaylRefPoints; ++refpt ) {
 			gio::write( unit, Format_710 ) << Zone( zones ).Name + ":DayRefPt:" + TrimSigDigits( refpt );
-			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 1 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 2 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 3 ) << 0.2;
+			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 1, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 2, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 3, refpt ) << 0.2;
 			curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
 		}
 	}
@@ -1220,7 +1220,7 @@ DXFOutLines( std::string const & ColorScheme )
 		}
 		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDElightRefPts; ++refpt ) {
 			gio::write( unit, Format_710 ) << Zone( zones ).Name + ":DEDayRefPt:" + TrimSigDigits( refpt );
-			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 1 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 2 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 3 ) << 0.2;
+			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 1, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 2, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 3, refpt ) << 0.2;
 			curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
 		}
 	}
@@ -1599,7 +1599,7 @@ DXFOutWireFrame( std::string const & ColorScheme )
 		}
 		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDaylRefPoints; ++refpt ) {
 			gio::write( unit, Format_710 ) << Zone( zones ).Name + ":DayRefPt:" + TrimSigDigits( refpt );
-			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 1 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 2 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 3 ) << 0.2;
+			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 1, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 2, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 3, refpt ) << 0.2;
 			curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
 		}
 	}
@@ -1620,7 +1620,7 @@ DXFOutWireFrame( std::string const & ColorScheme )
 		}
 		for ( refpt = 1; refpt <= ZoneDaylight( zones ).TotalDElightRefPts; ++refpt ) {
 			gio::write( unit, Format_710 ) << Zone( zones ).Name + ":DEDayRefPt:" + TrimSigDigits( refpt );
-			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 1 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 2 ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( refpt, 3 ) << 0.2;
+			gio::write( unit, Format_709 ) << TempZoneName << DXFcolorno( curcolorno ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 1, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 2, refpt ) << ZoneDaylight( zones ).DaylRefPtAbsCoord( 3, refpt ) << 0.2;
 			curcolorno = ColorNo_DaylSensor2; // ref pts 2 and later are this color
 		}
 	}

@@ -409,7 +409,7 @@ EnergyPlusPgm( std::string const & filepath )
     	bool rviFileExists;
     	bool mviFileExists;
 
-    	gio::Fmt const readvarsFmt( "(A)" );
+    	gio::Fmt readvarsFmt( "(A)" );
 
     	{ IOFlags flags; gio::inquire( RVIfile, flags ); rviFileExists = flags.exists(); }
     	if (!rviFileExists) {

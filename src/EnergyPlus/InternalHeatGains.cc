@@ -3610,9 +3610,9 @@ namespace InternalHeatGains {
 				// QRadThermInAbs is the thermal radiation absorbed on inside surfaces
 				QRadThermInAbs( SurfNum ) = adjQL * TMULT( NZ ) * ITABSF( SurfNum );
 				// store the magnitude and time of the pulse
-				radiantPulseUsed( NZ, CurOverallSimDay ) = adjQL - curQL;
-				radiantPulseTimestep( NZ, CurOverallSimDay ) = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
-				radiantPulseReceived( SurfNum, CurOverallSimDay ) = ( adjQL - curQL ) * TMULT( NZ ) * ITABSF( SurfNum ) * Surface( SurfNum ).Area;
+				radiantPulseUsed( CurOverallSimDay, NZ ) = adjQL - curQL;
+				radiantPulseTimestep( CurOverallSimDay, NZ ) = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
+				radiantPulseReceived( CurOverallSimDay, SurfNum ) = ( adjQL - curQL ) * TMULT( NZ ) * ITABSF( SurfNum ) * Surface( SurfNum ).Area;
 			}
 		}
 
@@ -5260,30 +5260,30 @@ namespace InternalHeatGains {
 		if ( CompLoadReportIsReq && ! isPulseZoneSizing ) {
 			TimeStepInDay = ( HourOfDay - 1 ) * NumOfTimeStepInHour + TimeStep;
 			for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
-				SumInternalConvectionGainsByTypes( iZone, IntGainTypesPeople, peopleInstantSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalLatentGainsByTypes( iZone, IntGainTypesPeople, peopleLatentSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalRadiationGainsByTypes( iZone, IntGainTypesPeople, peopleRadSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
+				SumInternalConvectionGainsByTypes( iZone, IntGainTypesPeople, peopleInstantSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalLatentGainsByTypes( iZone, IntGainTypesPeople, peopleLatentSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalRadiationGainsByTypes( iZone, IntGainTypesPeople, peopleRadSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
 
-				SumInternalConvectionGainsByTypes( iZone, IntGainTypesLight, lightInstantSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumReturnAirConvectionGainsByTypes( iZone, IntGainTypesLight, lightRetAirSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalRadiationGainsByTypes( iZone, IntGainTypesLight, lightLWRadSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
+				SumInternalConvectionGainsByTypes( iZone, IntGainTypesLight, lightInstantSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumReturnAirConvectionGainsByTypes( iZone, IntGainTypesLight, lightRetAirSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalRadiationGainsByTypes( iZone, IntGainTypesLight, lightLWRadSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
 
-				SumInternalConvectionGainsByTypes( iZone, IntGainTypesEquip, equipInstantSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalLatentGainsByTypes( iZone, IntGainTypesEquip, equipLatentSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalRadiationGainsByTypes( iZone, IntGainTypesEquip, equipRadSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
+				SumInternalConvectionGainsByTypes( iZone, IntGainTypesEquip, equipInstantSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalLatentGainsByTypes( iZone, IntGainTypesEquip, equipLatentSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalRadiationGainsByTypes( iZone, IntGainTypesEquip, equipRadSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
 
-				SumInternalConvectionGainsByTypes( iZone, IntGainTypesRefrig, refrigInstantSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumReturnAirConvectionGainsByTypes( iZone, IntGainTypesRefrig, refrigRetAirSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalLatentGainsByTypes( iZone, IntGainTypesRefrig, refrigLatentSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
+				SumInternalConvectionGainsByTypes( iZone, IntGainTypesRefrig, refrigInstantSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumReturnAirConvectionGainsByTypes( iZone, IntGainTypesRefrig, refrigRetAirSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalLatentGainsByTypes( iZone, IntGainTypesRefrig, refrigLatentSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
 
-				SumInternalConvectionGainsByTypes( iZone, IntGainTypesWaterUse, waterUseInstantSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalLatentGainsByTypes( iZone, IntGainTypesWaterUse, waterUseLatentSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
+				SumInternalConvectionGainsByTypes( iZone, IntGainTypesWaterUse, waterUseInstantSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalLatentGainsByTypes( iZone, IntGainTypesWaterUse, waterUseLatentSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
 
-				SumInternalConvectionGainsByTypes( iZone, IntGainTypesHvacLoss, hvacLossInstantSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalRadiationGainsByTypes( iZone, IntGainTypesHvacLoss, hvacLossRadSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
+				SumInternalConvectionGainsByTypes( iZone, IntGainTypesHvacLoss, hvacLossInstantSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalRadiationGainsByTypes( iZone, IntGainTypesHvacLoss, hvacLossRadSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
 
-				SumInternalConvectionGainsByTypes( iZone, IntGainTypesPowerGen, powerGenInstantSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
-				SumInternalRadiationGainsByTypes( iZone, IntGainTypesPowerGen, powerGenRadSeq( iZone, TimeStepInDay, CurOverallSimDay ) );
+				SumInternalConvectionGainsByTypes( iZone, IntGainTypesPowerGen, powerGenInstantSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
+				SumInternalRadiationGainsByTypes( iZone, IntGainTypesPowerGen, powerGenRadSeq( CurOverallSimDay, TimeStepInDay, iZone ) );
 			}
 		}
 	}

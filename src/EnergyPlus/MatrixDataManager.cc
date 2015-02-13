@@ -159,14 +159,14 @@ namespace MatrixDataManager {
 				ShowContinueError( "Check input, total number of elements does not agree with " + cNumericFieldNames( 1 ) + " and " + cNumericFieldNames( 2 ) );
 				ErrorsFound = true;
 			}
-			MatData( MatNum ).Mat2D.allocate( NumRows, NumCols ); // This is standard order for a NumRows X NumCols matrix
+			MatData( MatNum ).Mat2D.allocate( NumCols, NumRows ); // This is standard order for a NumRows X NumCols matrix
 			MatData( MatNum ).MatrixType = TwoDimensional;
 			RowIndex = 1;
 			ColIndex = 1;
 			for ( ElementNum = 1; ElementNum <= NumElements; ++ElementNum ) {
 				RowIndex = ( ElementNum - 1 ) / NumCols + 1;
 				ColIndex = mod( ( ElementNum - 1 ), NumCols ) + 1;
-				MatData( MatNum ).Mat2D( RowIndex, ColIndex ) = rNumericArgs( ElementNum + 2 ); // Matrix is read in row-by-row
+				MatData( MatNum ).Mat2D( ColIndex, RowIndex ) = rNumericArgs( ElementNum + 2 ); // Matrix is read in row-by-row
 				//Note: this is opposite to usual FORTRAN array storage
 			}
 
@@ -322,8 +322,8 @@ namespace MatrixDataManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		if ( Idx > 0 ) {
-			NumRows = MatData( Idx ).Mat2D.isize( 1 );
-			NumCols = MatData( Idx ).Mat2D.isize( 2 );
+			NumRows = MatData( Idx ).Mat2D.isize( 2 );
+			NumCols = MatData( Idx ).Mat2D.isize( 1 );
 		} else {
 			// do nothing (?) throw dev error?
 		}

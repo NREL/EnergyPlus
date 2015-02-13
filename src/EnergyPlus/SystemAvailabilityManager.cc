@@ -2246,8 +2246,8 @@ namespace SystemAvailabilityManager {
 			TmrJDay = JDay + 1;
 			TmrDayOfWeek = DayOfWeekTomorrow;
 
-			DayValues.allocate( 24, NumOfTimeStepInHour );
-			DayValuesTmr.allocate( 24, NumOfTimeStepInHour );
+			DayValues.allocate( NumOfTimeStepInHour, 24 );
+			DayValuesTmr.allocate( NumOfTimeStepInHour, 24 );
 			if ( ! allocated( OptStartData.OptStartFlag ) ) {
 				OptStartData.OptStartFlag.allocate( NumOfZones );
 				OptStartData.OccStartTime.allocate( NumOfZones );
@@ -2262,7 +2262,7 @@ namespace SystemAvailabilityManager {
 			FanStartTimeTmr = 0.0;
 			for ( I = 1; I <= 24; ++I ) {
 				for ( J = 1; J <= NumOfTimeStepInHour; ++J ) {
-					if ( DayValues( I, J ) > 0.0 ) {
+					if ( DayValues( J, I ) > 0.0 ) {
 						FanStartTime = I - 1 + 1 / NumOfTimeStepInHour * J;
 						goto Loop1_exit;
 					}
@@ -2272,7 +2272,7 @@ namespace SystemAvailabilityManager {
 
 			for ( I = 1; I <= 24; ++I ) {
 				for ( J = 1; J <= NumOfTimeStepInHour; ++J ) {
-					if ( DayValuesTmr( I, J ) > 0.0 ) {
+					if ( DayValuesTmr( J, I ) > 0.0 ) {
 						FanStartTimeTmr = I - 1 + 1 / NumOfTimeStepInHour * J;
 						goto Loop3_exit;
 					}

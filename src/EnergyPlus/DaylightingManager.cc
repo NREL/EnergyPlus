@@ -126,24 +126,24 @@ namespace DaylightingManager {
 	// I = 1 for clear sky, 2 for clear turbid, 3 for intermediate, 4 for overcast;
 	// J = 1 for bare window, 2 - 12 for shaded;
 	// K = sun position index.
-	Array3D< Real64 > EINTSK( 4, MaxSlatAngs+1, 24, 0.0 ); // Sky-related portion of internally reflected illuminance
-	Array2D< Real64 > EINTSU( MaxSlatAngs+1, 24, 0.0 ); // Sun-related portion of internally reflected illuminance,
+	Array3D< Real64 > EINTSK( 24, MaxSlatAngs+1, 4, 0.0 ); // Sky-related portion of internally reflected illuminance
+	Array2D< Real64 > EINTSU( 24, MaxSlatAngs+1, 0.0 ); // Sun-related portion of internally reflected illuminance,
 	// excluding entering beam
-	Array2D< Real64 > EINTSUdisk( MaxSlatAngs+1, 24, 0.0 ); // Sun-related portion of internally reflected illuminance
+	Array2D< Real64 > EINTSUdisk( 24, MaxSlatAngs+1, 0.0 ); // Sun-related portion of internally reflected illuminance
 	// due to entering beam
-	Array3D< Real64 > WLUMSK( 4, MaxSlatAngs+1, 24, 0.0 ); // Sky-related window luminance
-	Array2D< Real64 > WLUMSU( MaxSlatAngs+1, 24, 0.0 ); // Sun-related window luminance, excluding view of solar disk
-	Array2D< Real64 > WLUMSUdisk( MaxSlatAngs+1, 24, 0.0 ); // Sun-related window luminance, due to view of solar disk
+	Array3D< Real64 > WLUMSK( 24, MaxSlatAngs+1, 4, 0.0 ); // Sky-related window luminance
+	Array2D< Real64 > WLUMSU( 24, MaxSlatAngs+1, 0.0 ); // Sun-related window luminance, excluding view of solar disk
+	Array2D< Real64 > WLUMSUdisk( 24, MaxSlatAngs+1, 0.0 ); // Sun-related window luminance, due to view of solar disk
 
-	Array2D< Real64 > GILSK( 4, 24, 0.0 ); // Horizontal illuminance from sky, by sky type, for each hour of the day
+	Array2D< Real64 > GILSK( 24, 4, 0.0 ); // Horizontal illuminance from sky, by sky type, for each hour of the day
 	Array1D< Real64 > GILSU( 24, 0.0 ); // Horizontal illuminance from sun for each hour of the day
 
-	Array3D< Real64 > EDIRSK( 4, MaxSlatAngs+1, 24 ); // Sky-related component of direct illuminance
-	Array2D< Real64 > EDIRSU( MaxSlatAngs+1, 24 ); // Sun-related component of direct illuminance (excluding beam solar at ref pt)
-	Array2D< Real64 > EDIRSUdisk( MaxSlatAngs+1, 24 ); // Sun-related component of direct illuminance due to beam solar at ref pt
-	Array3D< Real64 > AVWLSK( 4, MaxSlatAngs+1, 24 ); // Sky-related average window luminance
-	Array2D< Real64 > AVWLSU( MaxSlatAngs+1, 24 ); // Sun-related average window luminance, excluding view of solar disk
-	Array2D< Real64 > AVWLSUdisk( MaxSlatAngs+1, 24 ); // Sun-related average window luminance due to view of solar disk
+	Array3D< Real64 > EDIRSK( 24, MaxSlatAngs+1, 4 ); // Sky-related component of direct illuminance
+	Array2D< Real64 > EDIRSU( 24, MaxSlatAngs+1 ); // Sun-related component of direct illuminance (excluding beam solar at ref pt)
+	Array2D< Real64 > EDIRSUdisk( 24, MaxSlatAngs+1 ); // Sun-related component of direct illuminance due to beam solar at ref pt
+	Array3D< Real64 > AVWLSK( 24, MaxSlatAngs+1, 4 ); // Sky-related average window luminance
+	Array2D< Real64 > AVWLSU( 24, MaxSlatAngs+1 ); // Sun-related average window luminance, excluding view of solar disk
+	Array2D< Real64 > AVWLSUdisk( 24, MaxSlatAngs+1 ); // Sun-related average window luminance due to view of solar disk
 
 	// Allocatable daylight factor arrays  -- are in the ZoneDaylight Structure
 
@@ -506,9 +506,9 @@ namespace DaylightingManager {
 			// Used in calculating daylighting through interior windows.
 			CalcMinIntWinSolidAngs();
 
-			TDDTransVisBeam.allocate( NumOfTDDPipes, 24 );
-			TDDFluxInc.allocate( NumOfTDDPipes, 4, 24 );
-			TDDFluxTrans.allocate( NumOfTDDPipes, 4, 24 );
+			TDDTransVisBeam.allocate( 24, NumOfTDDPipes );
+			TDDFluxInc.allocate( 24, 4, NumOfTDDPipes );
+			TDDFluxTrans.allocate( 24, 4, NumOfTDDPipes );
 
 			// Warning if detailed daylighting has been requested for a zone with no associated exterior windows.
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
@@ -535,9 +535,9 @@ namespace DaylightingManager {
 			TDDFluxInc = 0.0;
 			TDDFluxTrans = 0.0;
 		} else {
-			TDDTransVisBeam( {1,NumOfTDDPipes}, HourOfDay ) = 0.0;
-			TDDFluxInc( {1,NumOfTDDPipes}, {1,4}, HourOfDay ) = 0.0;
-			TDDFluxTrans( {1,NumOfTDDPipes}, {1,4}, HourOfDay ) = 0.0;
+			TDDTransVisBeam( HourOfDay, {1,NumOfTDDPipes} ) = 0.0;
+			TDDFluxInc( HourOfDay, {1,4}, {1,NumOfTDDPipes} ) = 0.0;
+			TDDFluxTrans( HourOfDay, {1,4}, {1,NumOfTDDPipes} ) = 0.0;
 		}
 
 		if ( ! DetailedSolarTimestepIntegration ) {
@@ -555,17 +555,17 @@ namespace DaylightingManager {
 				GILSK = 0.0;
 				GILSU = 0.0;
 				for ( IHR = 1; IHR <= 24; ++IHR ) {
-					if ( SUNCOSHR( 3, IHR ) < SunIsUpValue ) continue; // Skip if sun is below horizon //Autodesk SUNCOSHR was uninitialized here
-					PHSUN = PiOvr2 - std::acos( SUNCOSHR( 3, IHR ) );
+					if ( SUNCOSHR( IHR, 3 ) < SunIsUpValue ) continue; // Skip if sun is below horizon //Autodesk SUNCOSHR was uninitialized here
+					PHSUN = PiOvr2 - std::acos( SUNCOSHR( IHR, 3 ) );
 					PHSUNHR( IHR ) = PHSUN;
 					SPHSUNHR( IHR ) = std::sin( PHSUN );
 					CPHSUNHR( IHR ) = std::cos( PHSUN );
-					THSUNHR( IHR ) = std::atan2( SUNCOSHR( 2, IHR ), SUNCOSHR( 1, IHR ) );
+					THSUNHR( IHR ) = std::atan2( SUNCOSHR( IHR, 2 ), SUNCOSHR( IHR, 1 ) );
 					// Get exterior horizontal illuminance from sky and sun
 					THSUN = THSUNHR( IHR );
 					SPHSUN = SPHSUNHR( IHR );
 					CPHSUN = CPHSUNHR( IHR );
-					DayltgExtHorizIllum( GILSK( 1, IHR ), GILSU( IHR ) );
+					DayltgExtHorizIllum( GILSK( IHR, 1 ), GILSU( IHR ) );
 				}
 			}
 		} else { //timestep integrated calculations
@@ -578,19 +578,19 @@ namespace DaylightingManager {
 			SPHSUNHR( HourOfDay ) = 0.0;
 			CPHSUNHR( HourOfDay ) = 0.0;
 			THSUNHR( HourOfDay ) = 0.0;
-			GILSK( {1,4}, HourOfDay ) = 0.0;
+			GILSK( HourOfDay, {1,4} ) = 0.0;
 			GILSU( HourOfDay ) = 0.0;
-			if ( ! ( SUNCOSHR( 3, HourOfDay ) < SunIsUpValue ) ) { // Skip if sun is below horizon
-				PHSUN = PiOvr2 - std::acos( SUNCOSHR( 3, HourOfDay ) );
+			if ( ! ( SUNCOSHR( HourOfDay, 3 ) < SunIsUpValue ) ) { // Skip if sun is below horizon
+				PHSUN = PiOvr2 - std::acos( SUNCOSHR( HourOfDay, 3 ) );
 				PHSUNHR( HourOfDay ) = PHSUN;
 				SPHSUNHR( HourOfDay ) = std::sin( PHSUN );
 				CPHSUNHR( HourOfDay ) = std::cos( PHSUN );
-				THSUNHR( HourOfDay ) = std::atan2( SUNCOSHR( 2, HourOfDay ), SUNCOSHR( 1, HourOfDay ) );
+				THSUNHR( HourOfDay ) = std::atan2( SUNCOSHR( HourOfDay, 2 ), SUNCOSHR( HourOfDay, 1 ) );
 				// Get exterior horizontal illuminance from sky and sun
 				THSUN = THSUNHR( HourOfDay );
 				SPHSUN = SPHSUNHR( HourOfDay );
 				CPHSUN = CPHSUNHR( HourOfDay );
-				DayltgExtHorizIllum( GILSK( 1, HourOfDay ), GILSU( HourOfDay ) );
+				DayltgExtHorizIllum( GILSK( HourOfDay, 1 ), GILSU( HourOfDay ) );
 			}
 
 		}
@@ -627,27 +627,27 @@ namespace DaylightingManager {
 							// component will not be calculated for these windows until the time-step loop.
 							if ( Surface( IWin ).Zone == ZoneNum ) {
 								// clear sky
-								DaylFac1 = ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, 1, 1, 1, 12 );
+								DaylFac1 = ZoneDaylight( ZoneNum ).DaylIllFacSky( 12, 1, 1, 1, loop );
 								DaylFac2 = 0.0;
-								if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints > 1 ) DaylFac2 = ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, 2, 1, 1, 12 );
+								if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints > 1 ) DaylFac2 = ZoneDaylight( ZoneNum ).DaylIllFacSky( 12, 1, 1, 2, loop );
 								gio::write( OutputFileInits, fmtA ) << " Clear Sky Daylight Factors," + CurMnDy + ',' + Zone( ZoneNum ).Name + ',' + Surface( IWin ).Name + ',' + RoundSigDigits( DaylFac1, 4 ) + ',' + RoundSigDigits( DaylFac2, 4 );
 
 								// clear Turbid sky
-								DaylFac1 = ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, 1, 2, 1, 12 );
+								DaylFac1 = ZoneDaylight( ZoneNum ).DaylIllFacSky( 12, 1, 2, 1, loop );
 								DaylFac2 = 0.0;
-								if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints > 1 ) DaylFac2 = ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, 2, 2, 1, 12 );
+								if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints > 1 ) DaylFac2 = ZoneDaylight( ZoneNum ).DaylIllFacSky( 12, 1, 2, 2, loop );
 								gio::write( OutputFileInits, fmtA ) << " Clear Turbid Sky Daylight Factors," + CurMnDy + ',' + Zone( ZoneNum ).Name + ',' + Surface( IWin ).Name + ',' + RoundSigDigits( DaylFac1, 4 ) + ',' + RoundSigDigits( DaylFac2, 4 );
 
 								// Intermediate sky
-								DaylFac1 = ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, 1, 3, 1, 12 );
+								DaylFac1 = ZoneDaylight( ZoneNum ).DaylIllFacSky( 12, 1, 3, 1, loop );
 								DaylFac2 = 0.0;
-								if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints > 1 ) DaylFac2 = ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, 2, 3, 1, 12 );
+								if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints > 1 ) DaylFac2 = ZoneDaylight( ZoneNum ).DaylIllFacSky( 12, 1, 3, 2, loop );
 								gio::write( OutputFileInits, fmtA ) << " Intermediate Sky Daylight Factors," + CurMnDy + ',' + Zone( ZoneNum ).Name + ',' + Surface( IWin ).Name + ',' + RoundSigDigits( DaylFac1, 4 ) + ',' + RoundSigDigits( DaylFac2, 4 );
 
 								// Overcast sky
-								DaylFac1 = ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, 1, 4, 1, 12 );
+								DaylFac1 = ZoneDaylight( ZoneNum ).DaylIllFacSky( 12, 1, 4, 1, loop );
 								DaylFac2 = 0.0;
-								if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints > 1 ) DaylFac2 = ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, 2, 4, 1, 12 );
+								if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints > 1 ) DaylFac2 = ZoneDaylight( ZoneNum ).DaylIllFacSky( 12, 1, 4, 2, loop );
 								gio::write( OutputFileInits, fmtA ) << " Overcast Sky Daylight Factors," + CurMnDy + ',' + Zone( ZoneNum ).Name + ',' + Surface( IWin ).Name + ',' + RoundSigDigits( DaylFac1, 4 ) + ',' + RoundSigDigits( DaylFac2, 4 );
 							}
 						}
@@ -734,17 +734,17 @@ namespace DaylightingManager {
 
 						for ( IHR = 1; IHR <= 24; ++IHR ) {
 							// daylight reference point 1
-							DFClrSky1 = ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, 1, 1, ISlatAngle, IHR ); // clear sky
-							DFClrTbSky1 = ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, 1, 2, ISlatAngle, IHR ); // clear Turbid sky
-							DFIntSky1 = ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, 1, 3, ISlatAngle, IHR ); // Intermediate sky
-							DFOcSky1 = ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, 1, 4, ISlatAngle, IHR ); // Overcast sky
+							DFClrSky1 = ZoneDaylight( ZoneNum ).DaylIllFacSky( IHR, ISlatAngle, 1, 1, loop ); // clear sky
+							DFClrTbSky1 = ZoneDaylight( ZoneNum ).DaylIllFacSky( IHR, ISlatAngle, 2, 1, loop ); // clear Turbid sky
+							DFIntSky1 = ZoneDaylight( ZoneNum ).DaylIllFacSky( IHR, ISlatAngle, 3, 1, loop ); // Intermediate sky
+							DFOcSky1 = ZoneDaylight( ZoneNum ).DaylIllFacSky( IHR, ISlatAngle, 4, 1, loop ); // Overcast sky
 
 							// daylight reference point 2
 							if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints > 1 ) {
-								DFClrSky2 = ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, 2, 1, ISlatAngle, IHR );
-								DFClrTbSky2 = ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, 2, 2, ISlatAngle, IHR );
-								DFIntSky2 = ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, 2, 3, ISlatAngle, IHR );
-								DFOcSky2 = ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, 2, 4, ISlatAngle, IHR );
+								DFClrSky2 = ZoneDaylight( ZoneNum ).DaylIllFacSky( IHR, ISlatAngle, 1, 2, loop );
+								DFClrTbSky2 = ZoneDaylight( ZoneNum ).DaylIllFacSky( IHR, ISlatAngle, 2, 2, loop );
+								DFIntSky2 = ZoneDaylight( ZoneNum ).DaylIllFacSky( IHR, ISlatAngle, 3, 2, loop );
+								DFOcSky2 = ZoneDaylight( ZoneNum ).DaylIllFacSky( IHR, ISlatAngle, 4, 2, loop );
 							} else {
 								DFClrSky2 = 0.0;
 								DFClrTbSky2 = 0.0;
@@ -971,7 +971,7 @@ namespace DaylightingManager {
 		int WinEl; // Current window element
 
 		if ( refFirstTime && any_gt( ZoneDaylight.TotalDaylRefPoints(), 0 ) ) {
-			RefErrIndex.allocate( TotSurfaces, maxval( ZoneDaylight.TotalDaylRefPoints() ) );
+			RefErrIndex.allocate( maxval( ZoneDaylight.TotalDaylRefPoints() ), TotSurfaces );
 			RefErrIndex = 0;
 			refFirstTime = false;
 		}
@@ -1004,15 +1004,15 @@ namespace DaylightingManager {
 			ZoneDaylight( ZoneNum ).DaylBackFacSunDisk = 0.0;
 		} else {
 
-			ZoneDaylight( ZoneNum ).DaylIllFacSky( {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins}, {1,MaxRefPoints}, {1,4}, {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
-			ZoneDaylight( ZoneNum ).DaylSourceFacSky( {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins}, {1,MaxRefPoints}, {1,4}, {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
-			ZoneDaylight( ZoneNum ).DaylBackFacSky( {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins}, {1,MaxRefPoints}, {1,4}, {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
-			ZoneDaylight( ZoneNum ).DaylIllFacSun( {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins}, {1,MaxRefPoints}, {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
-			ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins}, {1,MaxRefPoints}, {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
-			ZoneDaylight( ZoneNum ).DaylSourceFacSun( {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins}, {1,MaxRefPoints}, {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
-			ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins}, {1,MaxRefPoints}, {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
-			ZoneDaylight( ZoneNum ).DaylBackFacSun( {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins}, {1,MaxRefPoints}, {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
-			ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins}, {1,MaxRefPoints}, {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
+			ZoneDaylight( ZoneNum ).DaylIllFacSky( HourOfDay, {1,MaxSlatAngs + 1}, {1,4}, {1,MaxRefPoints}, {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins} ) = 0.0;
+			ZoneDaylight( ZoneNum ).DaylSourceFacSky( HourOfDay, {1,MaxSlatAngs + 1}, {1,4}, {1,MaxRefPoints}, {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins} ) = 0.0;
+			ZoneDaylight( ZoneNum ).DaylBackFacSky( HourOfDay, {1,MaxSlatAngs + 1}, {1,4}, {1,MaxRefPoints}, {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins} ) = 0.0;
+			ZoneDaylight( ZoneNum ).DaylIllFacSun( HourOfDay, {1,MaxSlatAngs + 1}, {1,MaxRefPoints}, {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins} ) = 0.0;
+			ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( HourOfDay, {1,MaxSlatAngs + 1}, {1,MaxRefPoints}, {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins} ) = 0.0;
+			ZoneDaylight( ZoneNum ).DaylSourceFacSun( HourOfDay, {1,MaxSlatAngs + 1}, {1,MaxRefPoints}, {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins} ) = 0.0;
+			ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( HourOfDay, {1,MaxSlatAngs + 1}, {1,MaxRefPoints}, {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins} ) = 0.0;
+			ZoneDaylight( ZoneNum ).DaylBackFacSun( HourOfDay, {1,MaxSlatAngs + 1}, {1,MaxRefPoints}, {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins} ) = 0.0;
+			ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( HourOfDay, {1,MaxSlatAngs + 1}, {1,MaxRefPoints}, {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins} ) = 0.0;
 		}
 
 		NRF = ZoneDaylight( ZoneNum ).TotalDaylRefPoints;
@@ -1022,7 +1022,7 @@ namespace DaylightingManager {
 
 		for ( IL = 1; IL <= NRF; ++IL ) {
 			// Reference point in absolute coordinate system
-			RREF( {1,3} ) = ZoneDaylight( ZoneNum ).DaylRefPtAbsCoord( IL, {1,3} ); // (x, y, z)
+			RREF( {1,3} ) = ZoneDaylight( ZoneNum ).DaylRefPtAbsCoord( {1,3}, IL ); // (x, y, z)
 
 			//           -------------
 			// ---------- WINDOW LOOP ----------
@@ -1233,7 +1233,7 @@ namespace DaylightingManager {
 			for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
 				IL = max( IL, IllumMapCalc( MapNum ).TotalMapRefPoints );
 			}
-			MapErrIndex.allocate( TotSurfaces, IL );
+			MapErrIndex.allocate( IL, TotSurfaces );
 			MapErrIndex = 0;
 			mapFirstTime = false;
 		}
@@ -1267,25 +1267,25 @@ namespace DaylightingManager {
 				IllumMapCalc( MapNum ).DaylBackFacSun = 0.0;
 				IllumMapCalc( MapNum ).DaylBackFacSunDisk = 0.0;
 			} else {
-				IllumMapCalc( MapNum ).DaylIllFacSky( {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins}, {1,MaxRefPoints}, {1,4}, {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
-				IllumMapCalc( MapNum ).DaylSourceFacSky( {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins}, {1,MaxRefPoints}, {1,4}, {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
-				IllumMapCalc( MapNum ).DaylBackFacSky( {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins}, {1,MaxRefPoints}, {1,4}, {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
-				IllumMapCalc( MapNum ).DaylIllFacSun( {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins}, {1,MaxRefPoints}, {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
-				IllumMapCalc( MapNum ).DaylIllFacSunDisk( {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins}, {1,MaxRefPoints}, {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
-				IllumMapCalc( MapNum ).DaylSourceFacSun( {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins}, {1,MaxRefPoints}, {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
-				IllumMapCalc( MapNum ).DaylSourceFacSunDisk( {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins}, {1,MaxRefPoints}, {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
-				IllumMapCalc( MapNum ).DaylBackFacSun( {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins}, {1,MaxRefPoints}, {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
-				IllumMapCalc( MapNum ).DaylBackFacSunDisk( {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins}, {1,MaxRefPoints}, {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
+				IllumMapCalc( MapNum ).DaylIllFacSky( HourOfDay, {1,MaxSlatAngs + 1}, {1,4}, {1,MaxRefPoints}, {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins} ) = 0.0;
+				IllumMapCalc( MapNum ).DaylSourceFacSky( HourOfDay, {1,MaxSlatAngs + 1}, {1,4}, {1,MaxRefPoints}, {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins} ) = 0.0;
+				IllumMapCalc( MapNum ).DaylBackFacSky( HourOfDay, {1,MaxSlatAngs + 1}, {1,4}, {1,MaxRefPoints}, {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins} ) = 0.0;
+				IllumMapCalc( MapNum ).DaylIllFacSun( HourOfDay, {1,MaxSlatAngs + 1}, {1,MaxRefPoints}, {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins} ) = 0.0;
+				IllumMapCalc( MapNum ).DaylIllFacSunDisk( HourOfDay, {1,MaxSlatAngs + 1}, {1,MaxRefPoints}, {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins} ) = 0.0;
+				IllumMapCalc( MapNum ).DaylSourceFacSun( HourOfDay, {1,MaxSlatAngs + 1}, {1,MaxRefPoints}, {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins} ) = 0.0;
+				IllumMapCalc( MapNum ).DaylSourceFacSunDisk( HourOfDay, {1,MaxSlatAngs + 1}, {1,MaxRefPoints}, {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins} ) = 0.0;
+				IllumMapCalc( MapNum ).DaylBackFacSun( HourOfDay, {1,MaxSlatAngs + 1}, {1,MaxRefPoints}, {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins} ) = 0.0;
+				IllumMapCalc( MapNum ).DaylBackFacSunDisk( HourOfDay, {1,MaxSlatAngs + 1}, {1,MaxRefPoints}, {1,ZoneDaylight( ZoneNum ).NumOfDayltgExtWins} ) = 0.0;
 			}
 			NRF = IllumMapCalc( MapNum ).TotalMapRefPoints;
 			ZF = 0.0;
 
-			MapWindowSolidAngAtRefPt.allocate( ZoneDaylight( ZoneNum ).NumOfDayltgExtWins, NRF );
-			MapWindowSolidAngAtRefPtWtd.allocate( ZoneDaylight( ZoneNum ).NumOfDayltgExtWins, NRF );
+			MapWindowSolidAngAtRefPt.allocate( NRF, ZoneDaylight( ZoneNum ).NumOfDayltgExtWins );
+			MapWindowSolidAngAtRefPtWtd.allocate( NRF, ZoneDaylight( ZoneNum ).NumOfDayltgExtWins );
 
 			for ( IL = 1; IL <= NRF; ++IL ) {
 
-				RREF = IllumMapCalc( MapNum ).MapRefPtAbsCoord( IL, {1,3} ); // (x, y, z)
+				RREF = IllumMapCalc( MapNum ).MapRefPtAbsCoord( {1,3}, IL ); // (x, y, z)
 
 				//           -------------
 				// ---------- WINDOW LOOP ----------
@@ -1507,11 +1507,11 @@ namespace DaylightingManager {
 		IWin = ZoneDaylight( ZoneNum ).DayltgExtWinSurfNums( loopwin );
 
 		if ( CalledFrom == CalledForRefPoint ) {
-			ZoneDaylight( ZoneNum ).SolidAngAtRefPt( iRefPoint, loopwin ) = 0.0;
-			ZoneDaylight( ZoneNum ).SolidAngAtRefPtWtd( iRefPoint, loopwin ) = 0.0;
+			ZoneDaylight( ZoneNum ).SolidAngAtRefPt( loopwin, iRefPoint ) = 0.0;
+			ZoneDaylight( ZoneNum ).SolidAngAtRefPtWtd( loopwin, iRefPoint ) = 0.0;
 		} else if ( CalledFrom == CalledForMapPoint ) {
-			IllumMapCalc( MapNum ).SolidAngAtMapPt( iRefPoint, loopwin ) = 0.0;
-			IllumMapCalc( MapNum ).SolidAngAtMapPtWtd( iRefPoint, loopwin ) = 0.0;
+			IllumMapCalc( MapNum ).SolidAngAtMapPt( loopwin, iRefPoint ) = 0.0;
+			IllumMapCalc( MapNum ).SolidAngAtMapPtWtd( loopwin, iRefPoint ) = 0.0;
 		}
 		ZoneNumThisWin = Surface( Surface( IWin ).BaseSurf ).Zone;
 		if ( ZoneNumThisWin == ZoneNum ) {
@@ -1624,18 +1624,18 @@ namespace DaylightingManager {
 					ShowFatalError( "Program terminates due to preceding condition." );
 				}
 			} else if ( ALF < 0.1524 && ExtWinType == AdjZoneExtWin ) {
-				if ( RefErrIndex( IWin, iRefPoint ) == 0 ) { // only show error message once
+				if ( RefErrIndex( iRefPoint, IWin ) == 0 ) { // only show error message once
 					ShowWarningError( "CalcDaylightCoeffRefPoints: For Zone=\"" + Zone( ZoneNum ).Name + "\" External Window=\"" + Surface( IWin ).Name + "\"in Zone=\"" + Zone( Surface( IWin ).Zone ).Name + "\" reference point is less than 0.15m (6\") from window plane " );
 					ShowContinueError( "Distance=[" + RoundSigDigits( ALF, 1 ) + " m] to ref point=[" + RoundSigDigits( RREF( 1 ), 1 ) + ',' + RoundSigDigits( RREF( 2 ), 1 ) + ',' + RoundSigDigits( RREF( 3 ), 1 ) + "], Inaccuracy in Daylighting Calcs may result." );
-					RefErrIndex( IWin, iRefPoint ) = 1;
+					RefErrIndex( iRefPoint, IWin ) = 1;
 				}
 			}
 		} else if ( CalledFrom == CalledForMapPoint ) {
 			if ( ALF < 0.1524 && ExtWinType == AdjZoneExtWin ) {
-				if ( MapErrIndex( IWin, iRefPoint ) == 0 ) { // only show error message once
+				if ( MapErrIndex( iRefPoint, IWin ) == 0 ) { // only show error message once
 					ShowWarningError( "CalcDaylightCoeffMapPoints: For Zone=\"" + Zone( ZoneNum ).Name + "\" External Window=\"" + Surface( IWin ).Name + "\"in Zone=\"" + Zone( Surface( IWin ).Zone ).Name + "\" map point is less than 0.15m (6\") from window plane " );
 					ShowContinueError( "Distance=[" + RoundSigDigits( ALF, 1 ) + " m] map point=[" + RoundSigDigits( RREF( 1 ), 1 ) + ',' + RoundSigDigits( RREF( 2 ), 1 ) + ',' + RoundSigDigits( RREF( 3 ), 1 ) + "], Inaccuracy in Map Calcs may result." );
-					MapErrIndex( IWin, iRefPoint ) = 1;
+					MapErrIndex( iRefPoint, IWin ) = 1;
 				}
 			}
 		}
@@ -1795,12 +1795,12 @@ namespace DaylightingManager {
 			AVWLSU = 0.0;
 			AVWLSUdisk = 0.0;
 		} else {
-			EDIRSK( {1,4}, {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
-			EDIRSU( {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
-			EDIRSUdisk( {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
-			AVWLSK( {1,4}, {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
-			AVWLSU( {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
-			AVWLSUdisk( {1,MaxSlatAngs + 1}, HourOfDay ) = 0.0;
+			EDIRSK( HourOfDay, {1,MaxSlatAngs + 1}, {1,4} ) = 0.0;
+			EDIRSU( HourOfDay, {1,MaxSlatAngs + 1} ) = 0.0;
+			EDIRSUdisk( HourOfDay, {1,MaxSlatAngs + 1} ) = 0.0;
+			AVWLSK( HourOfDay, {1,MaxSlatAngs + 1}, {1,4} ) = 0.0;
+			AVWLSU( HourOfDay, {1,MaxSlatAngs + 1} ) = 0.0;
+			AVWLSUdisk( HourOfDay, {1,MaxSlatAngs + 1} ) = 0.0;
 		}
 		if ( CalledFrom == CalledForRefPoint ) {
 			// Initialize solid angle subtended by window wrt ref pt
@@ -1810,8 +1810,8 @@ namespace DaylightingManager {
 		} else if ( CalledFrom == CalledForMapPoint ) {
 			// Initialize solid angle subtended by window wrt ref pt
 			// and solid angle weighted by glare position factor
-			MapWindowSolidAngAtRefPt()( loopwin, iRefPoint ) = 0.0;
-			MapWindowSolidAngAtRefPtWtd()( loopwin, iRefPoint ) = 0.0;
+			MapWindowSolidAngAtRefPt()( iRefPoint, loopwin ) = 0.0;
+			MapWindowSolidAngAtRefPtWtd()( iRefPoint, loopwin ) = 0.0;
 		}
 		// Area of window element
 		if ( Rectangle ) {
@@ -2087,19 +2087,19 @@ namespace DaylightingManager {
 					if ( ExtWinType == InZoneExtWin || ( ExtWinType == AdjZoneExtWin && IHitIntWin > 0 ) ) {
 						// Increment solid angle subtended by portion of window above ref pt
 						SurfaceWindow( IWin ).SolidAngAtRefPt( iRefPoint ) += DOMEGA;
-						ZoneDaylight( ZoneNum ).SolidAngAtRefPt( iRefPoint, loopwin ) += DOMEGA;
+						ZoneDaylight( ZoneNum ).SolidAngAtRefPt( loopwin, iRefPoint ) += DOMEGA;
 						// Increment position-factor-modified solid angle
 						SurfaceWindow( IWin ).SolidAngAtRefPtWtd( iRefPoint ) += DOMEGA * POSFAC;
-						ZoneDaylight( ZoneNum ).SolidAngAtRefPtWtd( iRefPoint, loopwin ) += DOMEGA * POSFAC;
+						ZoneDaylight( ZoneNum ).SolidAngAtRefPtWtd( loopwin, iRefPoint ) += DOMEGA * POSFAC;
 					}
 				}
 			} else if ( CalledFrom == CalledForMapPoint ) {
 				if ( IHitIntObs == 0 ) {
 					if ( ExtWinType == InZoneExtWin || ( ExtWinType == AdjZoneExtWin && IHitIntWin > 0 ) ) {
-						MapWindowSolidAngAtRefPt()( loopwin, iRefPoint ) += DOMEGA;
-						IllumMapCalc( MapNum ).SolidAngAtMapPt( iRefPoint, loopwin ) += DOMEGA;
-						MapWindowSolidAngAtRefPtWtd()( loopwin, iRefPoint ) += DOMEGA * POSFAC;
-						IllumMapCalc( MapNum ).SolidAngAtMapPtWtd( iRefPoint, loopwin ) += DOMEGA * POSFAC;
+						MapWindowSolidAngAtRefPt()( iRefPoint, loopwin ) += DOMEGA;
+						IllumMapCalc( MapNum ).SolidAngAtMapPt( loopwin, iRefPoint ) += DOMEGA;
+						MapWindowSolidAngAtRefPtWtd()( iRefPoint, loopwin ) += DOMEGA * POSFAC;
+						IllumMapCalc( MapNum ).SolidAngAtMapPtWtd( loopwin, iRefPoint ) += DOMEGA * POSFAC;
 					}
 				}
 			}
@@ -2125,22 +2125,22 @@ namespace DaylightingManager {
 					if ( CalledFrom == CalledForRefPoint ) {
 						NReflSurf = ComplexWind( IWin ).DaylghtGeom( CplxFenState ).RefPoint( iRefPoint ).NReflSurf( WinEl );
 					} else {
-						NReflSurf = ComplexWind( IWin ).DaylghtGeom( CplxFenState ).IlluminanceMap( MapNum, iRefPoint ).NReflSurf( WinEl );
+						NReflSurf = ComplexWind( IWin ).DaylghtGeom( CplxFenState ).IlluminanceMap( iRefPoint, MapNum ).NReflSurf( WinEl );
 					}
 					for ( ICplxFen = 1; ICplxFen <= NReflSurf; ++ICplxFen ) {
 						if ( CalledFrom == CalledForRefPoint ) {
-							RayIndex = ComplexWind( IWin ).DaylghtGeom( CplxFenState ).RefPoint( iRefPoint ).RefSurfIndex( WinEl, ICplxFen );
+							RayIndex = ComplexWind( IWin ).DaylghtGeom( CplxFenState ).RefPoint( iRefPoint ).RefSurfIndex( ICplxFen, WinEl );
 						} else {
-							RayIndex = ComplexWind( IWin ).DaylghtGeom( CplxFenState ).IlluminanceMap( MapNum, iRefPoint ).RefSurfIndex( WinEl, ICplxFen );
+							RayIndex = ComplexWind( IWin ).DaylghtGeom( CplxFenState ).IlluminanceMap( iRefPoint, MapNum ).RefSurfIndex( ICplxFen, WinEl );
 						}
 						RayVector = ComplexWind( IWin ).Geom( CplxFenState ).sInc( RayIndex );
 						// It will get product of all transmittances
 						DayltgHitObstruction( HourOfDay, IWin, RWIN, RayVector, TransBeam );
 						// IF (TransBeam > 0.0d0) ObTrans = TransBeam
 						if ( CalledFrom == CalledForRefPoint ) {
-							ComplexWind( IWin ).DaylghtGeom( CplxFenState ).RefPoint( iRefPoint ).TransOutSurf( WinEl, ICplxFen ) = TransBeam;
+							ComplexWind( IWin ).DaylghtGeom( CplxFenState ).RefPoint( iRefPoint ).TransOutSurf( ICplxFen, WinEl ) = TransBeam;
 						} else {
-							ComplexWind( IWin ).DaylghtGeom( CplxFenState ).IlluminanceMap( MapNum, iRefPoint ).TransOutSurf( WinEl, ICplxFen ) = TransBeam;
+							ComplexWind( IWin ).DaylghtGeom( CplxFenState ).IlluminanceMap( iRefPoint, MapNum ).TransOutSurf( ICplxFen, WinEl ) = TransBeam;
 						}
 					}
 					// This will avoid obstruction multiplier calculations for non-CFS window
@@ -2292,10 +2292,10 @@ namespace DaylightingManager {
 		if ( CalledFrom == CalledForMapPoint ) {
 
 			if ( ! allocated( ComplexWind( IWin ).IlluminanceMap ) ) {
-				ComplexWind( IWin ).IlluminanceMap.allocate( TotIllumMaps, NRefPts );
+				ComplexWind( IWin ).IlluminanceMap.allocate( NRefPts, TotIllumMaps );
 			}
 
-			AllocateForCFSRefPointsGeometry( ComplexWind( IWin ).IlluminanceMap( MapNum, iRefPoint ), NumOfWinEl );
+			AllocateForCFSRefPointsGeometry( ComplexWind( IWin ).IlluminanceMap( iRefPoint, MapNum ), NumOfWinEl );
 
 		} else if ( CalledFrom == CalledForRefPoint ) {
 			if ( ! allocated( ComplexWind( IWin ).RefPoint ) ) {
@@ -2321,12 +2321,12 @@ namespace DaylightingManager {
 				if ( TotIllumMaps > 0 ) {
 					// illuminance map for each state
 					if ( ! allocated( ComplexWind( IWin ).DaylghtGeom( CurFenState ).IlluminanceMap ) ) {
-						ComplexWind( IWin ).DaylghtGeom( CurFenState ).IlluminanceMap.allocate( TotIllumMaps, NRefPts );
+						ComplexWind( IWin ).DaylghtGeom( CurFenState ).IlluminanceMap.allocate( NRefPts, TotIllumMaps );
 					}
 
-					AllocateForCFSRefPointsState( ComplexWind( IWin ).DaylghtGeom( CurFenState ).IlluminanceMap( MapNum, iRefPoint ), NumOfWinEl, NBasis, NTrnBasis );
+					AllocateForCFSRefPointsState( ComplexWind( IWin ).DaylghtGeom( CurFenState ).IlluminanceMap( iRefPoint, MapNum ), NumOfWinEl, NBasis, NTrnBasis );
 
-					InitializeCFSStateData( ComplexWind( IWin ).DaylghtGeom( CurFenState ).IlluminanceMap( MapNum, iRefPoint ), ComplexWind( IWin ).IlluminanceMap( MapNum, iRefPoint ), ZoneNum, IWin, RefPoint, CurFenState, NBasis, NTrnBasis, AZVIEW, NWX, NWY, W2, W21, W23, DWX, DWY, WNorm, WinElArea, CalledFrom, MapNum );
+					InitializeCFSStateData( ComplexWind( IWin ).DaylghtGeom( CurFenState ).IlluminanceMap( iRefPoint, MapNum ), ComplexWind( IWin ).IlluminanceMap( iRefPoint, MapNum ), ZoneNum, IWin, RefPoint, CurFenState, NBasis, NTrnBasis, AZVIEW, NWX, NWY, W2, W21, W23, DWX, DWY, WNorm, WinElArea, CalledFrom, MapNum );
 				}
 
 			} else if ( CalledFrom == CalledForRefPoint ) {
@@ -2430,14 +2430,14 @@ namespace DaylightingManager {
 		Array1D< Real64 > TmpGndMultiplier( NBasis, 0.0 ); // Temporary ground obstruction multiplier
 		Array1D_int TmpRfSfInd( NBasis, 0 ); // Temporary RefSurfIndex
 		Array1D_int TmpRfRyNH( NBasis, 0 ); // Temporary RefRayNHits
-		Array2D_int TmpHSurfNo( NBasis, TotSurfaces, 0 ); // Temporary HitSurfNo
-		Array2D< Real64 > TmpHSurfDSq( NBasis, TotSurfaces, 0.0 ); // Temporary HitSurfDSq
+		Array2D_int TmpHSurfNo( TotSurfaces, NBasis, 0 ); // Temporary HitSurfNo
+		Array2D< Real64 > TmpHSurfDSq( TotSurfaces, NBasis, 0.0 ); // Temporary HitSurfDSq
 
 		// Object Data
 		Vector Centroid; // current window element centroid
 		Vector HitPt; // surface hit point
 		Array1D< Vector > TmpGndPt( NBasis, Vector( 0.0, 0.0, 0.0 ) ); // Temporary ground intersection list
-		Array2D< Vector > TmpHitPt( NBasis, TotSurfaces, Vector( 0.0, 0.0, 0.0 ) ); // Temporary HitPt
+		Array2D< Vector > TmpHitPt( TotSurfaces, NBasis, Vector( 0.0, 0.0, 0.0 ) ); // Temporary HitPt
 
 		// find if reference point belongs to light tube of outgoing bsdf direction.  This works for entire window and not window
 		// elements.
@@ -2499,11 +2499,11 @@ namespace DaylightingManager {
 							++NReflSurf;
 							TmpRfSfInd( NReflSurf ) = IRay;
 							TmpRfRyNH( NReflSurf ) = 1;
-							TmpHSurfNo( NReflSurf, 1 ) = JSurf;
-							TmpHitPt( NReflSurf, 1 ) = HitPt;
+							TmpHSurfNo( 1, NReflSurf ) = JSurf;
+							TmpHitPt( 1, NReflSurf ) = HitPt;
 							V = HitPt - Centroid; //vector array from window ctr to hit pt
 							LeastHitDsq = magnitude_squared( V ); //dist^2 window ctr to hit pt
-							TmpHSurfDSq( NReflSurf, 1 ) = LeastHitDsq;
+							TmpHSurfDSq( 1, NReflSurf ) = LeastHitDsq;
 							if ( ! Surface( JSurf ).HeatTransSurf && Surface( JSurf ).SchedShadowSurfIndex != 0 ) {
 								TransRSurf = 1.0; //If a shadowing surface may have a scheduled transmittance,
 								//   treat it here as completely transparent
@@ -2518,16 +2518,16 @@ namespace DaylightingManager {
 									J = TotHits + 1;
 									if ( TotHits > 1 ) {
 										for ( I = 2; I <= TotHits; ++I ) {
-											if ( HitDsq < TmpHSurfDSq( NReflSurf, I ) ) {
+											if ( HitDsq < TmpHSurfDSq( I, NReflSurf ) ) {
 												J = I;
 												break;
 											}
 										}
 										if ( ! Surface( JSurf ).HeatTransSurf && Surface( JSurf ).SchedShadowSurfIndex == 0 ) {
 											//  The new hit is opaque, so we can drop all the hits further away
-											TmpHSurfNo( NReflSurf, J ) = JSurf;
-											TmpHitPt( NReflSurf, J ) = HitPt;
-											TmpHSurfDSq( NReflSurf, J ) = HitDsq;
+											TmpHSurfNo( J, NReflSurf ) = JSurf;
+											TmpHitPt( J, NReflSurf ) = HitPt;
+											TmpHSurfDSq( J, NReflSurf ) = HitDsq;
 											TotHits = J;
 										} else {
 											//  The new hit is scheduled (presumed transparent), so keep the more distant hits
@@ -2535,13 +2535,13 @@ namespace DaylightingManager {
 											//       which may be either transparent or opaque
 											if ( TotHits >= J ) {
 												for ( I = TotHits; I >= J; --I ) {
-													TmpHSurfNo( NReflSurf, I + 1 ) = TmpHSurfNo( NReflSurf, I );
-													TmpHitPt( NReflSurf, I + 1 ) = TmpHitPt( NReflSurf, I );
-													TmpHSurfDSq( NReflSurf, I + 1 ) = TmpHSurfDSq( NReflSurf, I );
+													TmpHSurfNo( I + 1, NReflSurf ) = TmpHSurfNo( I, NReflSurf );
+													TmpHitPt( I + 1, NReflSurf ) = TmpHitPt( I, NReflSurf );
+													TmpHSurfDSq( I + 1, NReflSurf ) = TmpHSurfDSq( I, NReflSurf );
 												}
-												TmpHSurfNo( NReflSurf, J ) = JSurf;
-												TmpHitPt( NReflSurf, J ) = HitPt;
-												TmpHSurfDSq( NReflSurf, J ) = HitDsq;
+												TmpHSurfNo( J, NReflSurf ) = JSurf;
+												TmpHitPt( J, NReflSurf ) = HitPt;
+												TmpHSurfDSq( J, NReflSurf ) = HitDsq;
 												++TotHits;
 											}
 										} // if (.NOT.Surface(JSurf)%HeatTransSurf .AND. Surface(JSurf)%SchedShadowSurfIndex == 0)  then
@@ -2554,18 +2554,18 @@ namespace DaylightingManager {
 								if ( ! Surface( JSurf ).HeatTransSurf && Surface( JSurf ).SchedShadowSurfIndex != 0 ) {
 									TransRSurf = 1.0; // New closest hit is transparent, keep the existing hit list
 									for ( I = TotHits; I >= 1; --I ) {
-										TmpHSurfNo( NReflSurf, I + 1 ) = TmpHSurfNo( NReflSurf, I );
-										TmpHitPt( NReflSurf, I + 1 ) = TmpHitPt( NReflSurf, I );
-										TmpHSurfDSq( NReflSurf, I + 1 ) = TmpHSurfDSq( NReflSurf, I );
+										TmpHSurfNo( I + 1, NReflSurf ) = TmpHSurfNo( I, NReflSurf );
+										TmpHitPt( I + 1, NReflSurf ) = TmpHitPt( I, NReflSurf );
+										TmpHSurfDSq( I + 1, NReflSurf ) = TmpHSurfDSq( I, NReflSurf );
 										++TotHits;
 									}
 								} else {
 									TransRSurf = 0.0; // New closest hit is opaque, drop the existing hit list
 									TotHits = 1;
 								}
-								TmpHSurfNo( NReflSurf, 1 ) = JSurf; // In either case the new hit is put in position 1
-								TmpHitPt( NReflSurf, 1 ) = HitPt;
-								TmpHSurfDSq( NReflSurf, 1 ) = LeastHitDsq;
+								TmpHSurfNo( 1, NReflSurf ) = JSurf; // In either case the new hit is put in position 1
+								TmpHitPt( 1, NReflSurf ) = HitPt;
+								TmpHSurfDSq( 1, NReflSurf ) = LeastHitDsq;
 							}
 						}
 					} // do JSurf = 1, TotSurfaces
@@ -2598,19 +2598,19 @@ namespace DaylightingManager {
 
 				// Fill up state data for current window element data
 				StateRefPoint.NSky( curWinEl ) = NSky;
-				StateRefPoint.SkyIndex( curWinEl, {1,NSky} ) = TmpSkyInd( {1,NSky} );
+				StateRefPoint.SkyIndex( {1,NSky}, curWinEl ) = TmpSkyInd( {1,NSky} );
 
 				StateRefPoint.NGnd( curWinEl ) = NGnd;
-				StateRefPoint.GndIndex( curWinEl, {1,NGnd} ) = TmpGndInd( {1,NGnd} );
-				StateRefPoint.GndPt( curWinEl, {1,NGnd} ) = TmpGndPt( {1,NGnd} );
-				StateRefPoint.GndObstrMultiplier( curWinEl, {1,NGnd} ) = TmpGndMultiplier( {1,NGnd} );
+				StateRefPoint.GndIndex( {1,NGnd}, curWinEl ) = TmpGndInd( {1,NGnd} );
+				StateRefPoint.GndPt( {1,NGnd}, curWinEl ) = TmpGndPt( {1,NGnd} );
+				StateRefPoint.GndObstrMultiplier( {1,NGnd}, curWinEl ) = TmpGndMultiplier( {1,NGnd} );
 
 				StateRefPoint.NReflSurf( curWinEl ) = NReflSurf;
-				StateRefPoint.RefSurfIndex( curWinEl, {1,NReflSurf} ) = TmpRfSfInd( {1,NReflSurf} );
-				StateRefPoint.RefRayNHits( curWinEl, {1,NReflSurf} ) = TmpRfRyNH( {1,NReflSurf} );
-				StateRefPoint.HitSurfNo( curWinEl, {1,NReflSurf}, {1,MaxTotHits} ) = TmpHSurfNo( {1,NReflSurf}, {1,MaxTotHits} );
-				StateRefPoint.HitSurfDSq( curWinEl, {1,NReflSurf}, {1,MaxTotHits} ) = TmpHSurfDSq( {1,NReflSurf}, {1,MaxTotHits} );
-				StateRefPoint.HitPt( curWinEl, {1,NReflSurf}, {1,MaxTotHits} ) = TmpHitPt( {1,NReflSurf}, {1,MaxTotHits} );
+				StateRefPoint.RefSurfIndex( {1,NReflSurf}, curWinEl ) = TmpRfSfInd( {1,NReflSurf} );
+				StateRefPoint.RefRayNHits( {1,NReflSurf}, curWinEl ) = TmpRfRyNH( {1,NReflSurf} );
+				StateRefPoint.HitSurfNo( {1,MaxTotHits}, {1,NReflSurf}, curWinEl ) = TmpHSurfNo( {1,MaxTotHits}, {1,NReflSurf} );
+				StateRefPoint.HitSurfDSq( {1,MaxTotHits}, {1,NReflSurf}, curWinEl ) = TmpHSurfDSq( {1,MaxTotHits}, {1,NReflSurf} );
+				StateRefPoint.HitPt( {1,MaxTotHits}, {1,NReflSurf}, curWinEl ) = TmpHitPt( {1,MaxTotHits}, {1,NReflSurf} );
 			} // do IY = 1, NWY
 		} // do IX = 1, NWX
 
@@ -2653,7 +2653,7 @@ namespace DaylightingManager {
 		}
 
 		if ( ! allocated( StateRefPoint.SkyIndex ) ) {
-			StateRefPoint.SkyIndex.allocate( NumOfWinEl, NBasis );
+			StateRefPoint.SkyIndex.allocate( NBasis, NumOfWinEl );
 			StateRefPoint.SkyIndex = 0;
 		}
 
@@ -2663,17 +2663,17 @@ namespace DaylightingManager {
 		}
 
 		if ( ! allocated( StateRefPoint.GndIndex ) ) {
-			StateRefPoint.GndIndex.allocate( NumOfWinEl, NBasis );
+			StateRefPoint.GndIndex.allocate( NBasis, NumOfWinEl );
 			StateRefPoint.GndIndex = 0;
 		}
 
 		if ( ! allocated( StateRefPoint.GndPt ) ) {
-			StateRefPoint.GndPt.allocate( NumOfWinEl, NBasis );
+			StateRefPoint.GndPt.allocate( NBasis, NumOfWinEl );
 			StateRefPoint.GndPt = Vector( 0.0, 0.0, 0.0 );
 		}
 
 		if ( ! allocated( StateRefPoint.GndObstrMultiplier ) ) {
-			StateRefPoint.GndObstrMultiplier.allocate( NumOfWinEl, NBasis );
+			StateRefPoint.GndObstrMultiplier.allocate( NBasis, NumOfWinEl );
 			StateRefPoint.GndObstrMultiplier = 0.0;
 		}
 
@@ -2683,32 +2683,32 @@ namespace DaylightingManager {
 		}
 
 		if ( ! allocated( StateRefPoint.RefSurfIndex ) ) {
-			StateRefPoint.RefSurfIndex.allocate( NumOfWinEl, NBasis );
+			StateRefPoint.RefSurfIndex.allocate( NBasis, NumOfWinEl );
 			StateRefPoint.RefSurfIndex = 0;
 		}
 
 		if ( ! allocated( StateRefPoint.TransOutSurf ) ) {
-			StateRefPoint.TransOutSurf.allocate( NumOfWinEl, NBasis );
+			StateRefPoint.TransOutSurf.allocate( NBasis, NumOfWinEl );
 			StateRefPoint.TransOutSurf = 1.0;
 		}
 
 		if ( ! allocated( StateRefPoint.RefRayNHits ) ) {
-			StateRefPoint.RefRayNHits.allocate( NumOfWinEl, NBasis );
+			StateRefPoint.RefRayNHits.allocate( NBasis, NumOfWinEl );
 			StateRefPoint.RefRayNHits = 0;
 		}
 
 		if ( ! allocated( StateRefPoint.HitSurfNo ) ) {
-			StateRefPoint.HitSurfNo.allocate( NumOfWinEl, NBasis, TotSurfaces );
+			StateRefPoint.HitSurfNo.allocate( TotSurfaces, NBasis, NumOfWinEl );
 			StateRefPoint.HitSurfNo = 0;
 		}
 
 		if ( ! allocated( StateRefPoint.HitSurfDSq ) ) {
-			StateRefPoint.HitSurfDSq.allocate( NumOfWinEl, NBasis, TotSurfaces );
+			StateRefPoint.HitSurfDSq.allocate( TotSurfaces, NBasis, NumOfWinEl );
 			StateRefPoint.HitSurfDSq = 0.0;
 		}
 
 		if ( ! allocated( StateRefPoint.HitPt ) ) {
-			StateRefPoint.HitPt.allocate( NumOfWinEl, NBasis, TotSurfaces );
+			StateRefPoint.HitPt.allocate( TotSurfaces, NBasis, NumOfWinEl );
 			StateRefPoint.HitPt = Vector( 0.0, 0.0, 0.0 );
 		}
 
@@ -3185,7 +3185,7 @@ namespace DaylightingManager {
 		Real64 TVisIntWinDiskMult; // Interior window vis trans solar disk multiplier for ext win in adj zone
 		Real64 WindowSolidAngleDaylightPoint;
 
-		if ( SUNCOSHR( 3, iHour ) < SunIsUpValue ) return;
+		if ( SUNCOSHR( iHour, 3 ) < SunIsUpValue ) return;
 
 		++ISunPos;
 
@@ -3254,8 +3254,8 @@ namespace DaylightingManager {
 				// Beam solar reflected from nearest obstruction
 
 				DayltgSurfaceLumFromSun( iHour, Ray, NearestHitSurfNum, NearestHitPt, LumAtHitPtFrSun );
-				AVWLSU( 1, iHour ) += LumAtHitPtFrSun * TVISB;
-				if ( PHRAY >= 0.0 ) EDIRSU( 1, iHour ) += LumAtHitPtFrSun * DOMEGA_Ray_3 * TVISB;
+				AVWLSU( iHour, 1 ) += LumAtHitPtFrSun * TVISB;
+				if ( PHRAY >= 0.0 ) EDIRSU( iHour, 1 ) += LumAtHitPtFrSun * DOMEGA_Ray_3 * TVISB;
 
 				// Sky solar reflected from nearest obstruction
 
@@ -3289,11 +3289,11 @@ namespace DaylightingManager {
 				if ( ! DetailedSkyDiffuseAlgorithm || ! ShadingTransmittanceVaries || SolarDistribution == MinimalShadowing ) {
 					SkyReflVisLum = ObsVisRefl * Surface( NearestHitSurfNumX ).ViewFactorSky * DifShdgRatioIsoSky( NearestHitSurfNumX ) / Pi;
 				} else {
-					SkyReflVisLum = ObsVisRefl * Surface( NearestHitSurfNumX ).ViewFactorSky * DifShdgRatioIsoSkyHRTS( NearestHitSurfNumX, iHour, 1 ) / Pi;
+					SkyReflVisLum = ObsVisRefl * Surface( NearestHitSurfNumX ).ViewFactorSky * DifShdgRatioIsoSkyHRTS( 1, iHour, NearestHitSurfNumX ) / Pi;
 				}
 				assert( equal_dimensions( AVWLSK, EDIRSK ) );
-				auto l2( GILSK.index( 1, iHour ) );
-				auto l3( AVWLSK.index( 1, 1, iHour ) );
+				auto l2( GILSK.index( iHour, 1 ) );
+				auto l3( AVWLSK.index( iHour, 1, 1 ) );
 				for ( ISky = 1; ISky <= 4; ++ISky, ++l2, ++l3 ) { // [ l2 ] == ( ISky, iHour ) // [ l3 ] == ( ISky, 1, iHour )
 					XAVWLSK( ISky ) = GILSK[ l2 ] * SkyReflVisLum;
 					AVWLSK[ l3 ] += XAVWLSK( ISky ) * TVISB;
@@ -3312,16 +3312,16 @@ namespace DaylightingManager {
 				// Make all transmitted light diffuse for a TDD with a bare diffuser
 				assert( equal_dimensions( AVWLSK, WLUMSK ) );
 				assert( equal_dimensions( AVWLSK, EDIRSK ) );
-				auto l3( AVWLSK.index( 1, 1, iHour ) );
+				auto l3( AVWLSK.index( iHour, 1, 1 ) );
 				for ( ISky = 1; ISky <= 4; ++ISky, ++l3 ) { // [ l3 ] == ( ISky, 1, iHour )
 					AVWLSK[ l3 ] += WLUMSK[ l3 ];
 					if ( ISky == 1 ) {
-						AVWLSU( 1, iHour ) += WLUMSU( 1, iHour );
-						AVWLSUdisk( 1, iHour ) += WLUMSUdisk( 1, iHour );
+						AVWLSU( iHour, 1 ) += WLUMSU( iHour, 1 );
+						AVWLSUdisk( iHour, 1 ) += WLUMSUdisk( iHour, 1 );
 					}
 					if ( PHRAY > 0.0 ) {
 						EDIRSK[ l3 ] += WLUMSK[ l3 ] * DOMEGA_Ray_3;
-						if ( ISky == 1 ) EDIRSU( 1, iHour ) += WLUMSU( 1, iHour ) * DOMEGA_Ray_3;
+						if ( ISky == 1 ) EDIRSU( iHour, 1 ) += WLUMSU( iHour, 1 ) * DOMEGA_Ray_3;
 					}
 				}
 
@@ -3338,9 +3338,9 @@ namespace DaylightingManager {
 				Real64 const GILSK_mult( ( GndReflectanceForDayltg / Pi ) * ObTrans * SkyObstructionMult );
 				Real64 const TVISB_ObTrans( TVISB * ObTrans );
 				Real64 const AVWLSU_add( TVISB_ObTrans * GILSU( iHour ) * ( GndReflectanceForDayltg / Pi ) );
-				Array1D< Real64 > const SUNCOS_iHour( SUNCOSHR( {1,3}, iHour ) );
+				Array1D< Real64 > const SUNCOS_iHour( SUNCOSHR( iHour, {1,3} ) );
 				assert( equal_dimensions( EDIRSK, AVWLSK ) );
-				auto l( EDIRSK.index( 1, 1, iHour ) );
+				auto l( EDIRSK.index( iHour, 1, 1 ) );
 				for ( ISky = 1; ISky <= 4; ++ISky, ++l ) { // [ l ] == ( ISky, 1, iHour )
 					if ( PHRAY > 0.0 ) { // Ray heads upward to sky
 						ELUM = DayltgSkyLuminance( ISky, THRAY, PHRAY );
@@ -3352,7 +3352,7 @@ namespace DaylightingManager {
 					} else { // PHRAY <= 0.
 						// Ray heads downward to ground.
 						// Contribution from sky diffuse reflected from ground
-						XAVWLSK( ISky ) = GILSK( ISky, iHour ) * GILSK_mult;
+						XAVWLSK( ISky ) = GILSK( iHour, ISky ) * GILSK_mult;
 						AVWLSK[ l ] += TVISB * XAVWLSK( ISky );
 						// Contribution from beam solar reflected from ground (beam reaching ground point
 						// can be obstructed [SunObstructionMult < 1.0] if CalcSolRefl = .TRUE.)
@@ -3367,9 +3367,9 @@ namespace DaylightingManager {
 									if ( IHitObs > 0 ) break;
 								}
 								//if ( IHitObs > 0 ) SunObstructionMult = 0.0;
-								if ( IHitObs == 0 ) AVWLSU( 1, iHour ) += AVWLSU_add;
+								if ( IHitObs == 0 ) AVWLSU( iHour, 1 ) += AVWLSU_add;
 							} else {
-								AVWLSU( 1, iHour ) += AVWLSU_add;
+								AVWLSU( iHour, 1 ) += AVWLSU_add;
 							}
 						} // End of check if ISky = 1
 					} // End of check if ray is going up or down
@@ -3480,7 +3480,7 @@ namespace DaylightingManager {
 							if ( ExtWinType == AdjZoneExtWin && IHitIntWinDisk == 1 ) TVISS *= TVISIntWinDisk;
 						}
 
-						EDIRSUdisk( 1, iHour ) = RAYCOS( 3 ) * TVISS * ObTransDisk; // Bare window
+						EDIRSUdisk( iHour, 1 ) = RAYCOS( 3 ) * TVISS * ObTransDisk; // Bare window
 
 						TransBmBmMult = 0.0;
 						if ( ShType == WSC_ST_ExteriorBlind || ShType == WSC_ST_InteriorBlind || ShType == WSC_ST_BetweenGlassBlind ) {
@@ -3494,7 +3494,7 @@ namespace DaylightingManager {
 									SlatAng = Blind( BlNum ).SlatAngle * DegToRadians;
 								}
 								TransBmBmMult( JB ) = BlindBeamBeamTrans( ProfAng, SlatAng, Blind( BlNum ).SlatWidth, Blind( BlNum ).SlatSeparation, Blind( BlNum ).SlatThickness );
-								EDIRSUdisk( JB + 1, iHour ) = RAYCOS( 3 ) * TVISS * TransBmBmMult( JB ) * ObTransDisk;
+								EDIRSUdisk( iHour, JB + 1 ) = RAYCOS( 3 ) * TVISS * TransBmBmMult( JB ) * ObTransDisk;
 
 								// do this only once for fixed slat blinds
 								if ( ! SurfaceWindow( IWin ).MovableSlats ) break;
@@ -3505,7 +3505,7 @@ namespace DaylightingManager {
 							//                          SunAzimuthToWindowNormalAngle = THSUN - SurfaceWindow(IWin)%Theta
 							CalcScreenTransmittance( IWin, ( PHSUN - SurfaceWindow( IWin ).Phi ), ( THSUN - SurfaceWindow( IWin ).Theta ) );
 							TransBmBmMult( 1 ) = SurfaceScreens( SurfaceWindow( IWin ).ScreenNumber ).BmBmTrans;
-							EDIRSUdisk( 2, iHour ) = RAYCOS( 3 ) * TVISS * TransBmBmMult( 1 ) * ObTransDisk;
+							EDIRSUdisk( iHour, 2 ) = RAYCOS( 3 ) * TVISS * TransBmBmMult( 1 ) * ObTransDisk;
 						}
 
 						// Glare from solar disk
@@ -3521,7 +3521,7 @@ namespace DaylightingManager {
 						if ( SELECT_CASE_var == CalledForRefPoint ) {
 							WindowSolidAngleDaylightPoint = SurfaceWindow( IWin ).SolidAngAtRefPtWtd( iRefPoint );
 						} else if ( SELECT_CASE_var == CalledForMapPoint ) {
-							WindowSolidAngleDaylightPoint = MapWindowSolidAngAtRefPtWtd()( loopwin, iRefPoint );
+							WindowSolidAngleDaylightPoint = MapWindowSolidAngAtRefPtWtd()( iRefPoint, loopwin );
 						}}
 
 						if ( POSFAC != 0.0 && WindowSolidAngleDaylightPoint > 0.000001 ) {
@@ -3532,16 +3532,16 @@ namespace DaylightingManager {
 							// Solid angle subtended by sun is 0.000068 steradians
 
 							XAVWL = 14700.0 * std::sqrt( 0.000068 * POSFAC ) * double( NWX * NWY ) / std::pow( WindowSolidAngleDaylightPoint, 0.8 );
-							AVWLSUdisk( 1, iHour ) = XAVWL * TVISS * ObTransDisk; // Bare window
+							AVWLSUdisk( iHour, 1 ) = XAVWL * TVISS * ObTransDisk; // Bare window
 
 							if ( ShType == WSC_ST_ExteriorBlind || ShType == WSC_ST_InteriorBlind || ShType == WSC_ST_BetweenGlassBlind ) {
 								for ( JB = 1; JB <= MaxSlatAngs; ++JB ) {
 									//IF (.NOT. SurfaceWindow(IWin)%MovableSlats .AND. JB > 1) EXIT
-									AVWLSUdisk( JB + 1, iHour ) = XAVWL * TVISS * TransBmBmMult( JB ) * ObTransDisk;
+									AVWLSUdisk( iHour, JB + 1 ) = XAVWL * TVISS * TransBmBmMult( JB ) * ObTransDisk;
 									if ( ! SurfaceWindow( IWin ).MovableSlats ) break;
 								}
 							} else if ( ShType == WSC_ST_ExteriorScreen ) {
-								AVWLSUdisk( 2, iHour ) = XAVWL * TVISS * TransBmBmMult( 1 ) * ObTransDisk;
+								AVWLSUdisk( iHour, 2 ) = XAVWL * TVISS * TransBmBmMult( 1 ) * ObTransDisk;
 							}
 						} // Position Factor
 					} // Beam avoids all obstructions
@@ -3571,7 +3571,7 @@ namespace DaylightingManager {
 								// Vector to sun that is mirrored in obstruction
 								SunVecMir = RAYCOS - 2.0 * dot( RAYCOS, ReflNorm ) * ReflNorm;
 								// Skip if reflecting surface is not sunlit
-								if ( SunlitFrac( ReflSurfNumX, iHour, 1 ) < 0.01 ) continue;
+								if ( SunlitFrac( 1, iHour, ReflSurfNumX ) < 0.01 ) continue;
 								// Skip if altitude angle of mirrored sun is negative since reflected sun cannot
 								// reach reference point in this case
 								if ( SunVecMir( 3 ) <= 0.0 ) continue;
@@ -3640,7 +3640,7 @@ namespace DaylightingManager {
 								}
 								if ( Surface( ReflSurfNum ).ShadowingSurf && Surface( ReflSurfNum ).ShadowSurfGlazingConstruct > 0 ) SpecReflectance = Surface( ReflSurfNum ).ShadowSurfGlazingFrac * POLYF( std::abs( CosIncAngRefl ), Construct( Surface( ReflSurfNum ).ShadowSurfGlazingConstruct ).ReflSolBeamFrontCoef( {1,6} ) );
 								TVisRefl = POLYF( CosIncAngRec, Construct( IConst ).TransVisBeamCoef( 1 ) ) * SurfaceWindow( IWin ).GlazedFrac * SurfaceWindow( IWin ).LightWellEff;
-								EDIRSUdisk( 1, iHour ) += SunVecMir( 3 ) * SpecReflectance * TVisRefl; // Bare window
+								EDIRSUdisk( iHour, 1 ) += SunVecMir( 3 ) * SpecReflectance * TVisRefl; // Bare window
 
 								TransBmBmMultRefl = 0.0;
 								if ( ShType == WSC_ST_ExteriorBlind || ShType == WSC_ST_InteriorBlind || ShType == WSC_ST_BetweenGlassBlind ) {
@@ -3655,7 +3655,7 @@ namespace DaylightingManager {
 											SlatAng = Blind( BlNum ).SlatAngle * DegToRadians;
 										}
 										TransBmBmMultRefl( JB ) = BlindBeamBeamTrans( ProfAng, SlatAng, Blind( BlNum ).SlatWidth, Blind( BlNum ).SlatSeparation, Blind( BlNum ).SlatThickness );
-										EDIRSUdisk( JB + 1, iHour ) += SunVecMir( 3 ) * SpecReflectance * TVisRefl * TransBmBmMultRefl( JB );
+										EDIRSUdisk( iHour, JB + 1 ) += SunVecMir( 3 ) * SpecReflectance * TVisRefl * TransBmBmMultRefl( JB );
 
 										if ( ! SurfaceWindow( IWin ).MovableSlats ) break;
 									}
@@ -3665,7 +3665,7 @@ namespace DaylightingManager {
 									//                             SunAzimuthToWindowNormalAngle = THSUN - SurfaceWindow(IWin)%Theta
 									CalcScreenTransmittance( IWin, ( PHSUN - SurfaceWindow( IWin ).Phi ), ( THSUN - SurfaceWindow( IWin ).Theta ) );
 									TransBmBmMultRefl( 1 ) = SurfaceScreens( SurfaceWindow( IWin ).ScreenNumber ).BmBmTrans;
-									EDIRSUdisk( 2, iHour ) += SunVecMir( 3 ) * SpecReflectance * TVisRefl * TransBmBmMultRefl( 1 );
+									EDIRSUdisk( iHour, 2 ) += SunVecMir( 3 ) * SpecReflectance * TVisRefl * TransBmBmMultRefl( 1 );
 								} // End of check if window has a blind or screen
 
 								// Glare from reflected solar disk
@@ -3677,15 +3677,15 @@ namespace DaylightingManager {
 								POSFAC = DayltgGlarePositionFactor( XR, YR );
 								if ( POSFAC != 0.0 && SurfaceWindow( IWin ).SolidAngAtRefPtWtd( iRefPoint ) > 0.000001 ) {
 									XAVWL = 14700.0 * std::sqrt( 0.000068 * POSFAC ) * double( NWX * NWY ) / std::pow( SurfaceWindow( IWin ).SolidAngAtRefPtWtd( iRefPoint ), 0.8 );
-									AVWLSUdisk( 1, iHour ) += XAVWL * TVisRefl * SpecReflectance; // Bare window
+									AVWLSUdisk( iHour, 1 ) += XAVWL * TVisRefl * SpecReflectance; // Bare window
 									if ( ShType == WSC_ST_ExteriorBlind || ShType == WSC_ST_InteriorBlind || ShType == WSC_ST_BetweenGlassBlind ) {
 										for ( JB = 1; JB <= MaxSlatAngs; ++JB ) {
 											//IF(.NOT. SurfaceWindow(IWin)%MovableSlats .AND. JB > 1) EXIT
-											AVWLSUdisk( JB + 1, iHour ) += XAVWL * TVisRefl * SpecReflectance * TransBmBmMultRefl( JB );
+											AVWLSUdisk( iHour, JB + 1 ) += XAVWL * TVisRefl * SpecReflectance * TransBmBmMultRefl( JB );
 											if ( ! SurfaceWindow( IWin ).MovableSlats ) break;
 										}
 									} else if ( ShType == WSC_ST_ExteriorScreen ) {
-										AVWLSUdisk( 2, iHour ) += XAVWL * TVisRefl * SpecReflectance * TransBmBmMultRefl( 1 );
+										AVWLSUdisk( iHour, 2 ) += XAVWL * TVisRefl * SpecReflectance * TransBmBmMultRefl( 1 );
 									}
 								}
 							} // End of check that obstruction can specularly reflect
@@ -3713,14 +3713,14 @@ namespace DaylightingManager {
 			for ( ISky = 1; ISky <= 4; ++ISky ) {
 				for ( JB = 1; JB <= MaxSlatAngs; ++JB ) {
 					//IF (.NOT.SurfaceWindow(IWin)%MovableSlats .AND. JB > 1) EXIT
-					AVWLSK( ISky, JB + 1, iHour ) += WLUMSK( ISky, JB + 1, iHour ) * TVisIntWinMult;
+					AVWLSK( iHour, JB + 1, ISky ) += WLUMSK( iHour, JB + 1, ISky ) * TVisIntWinMult;
 					if ( ISky == 1 ) {
-						AVWLSU( JB + 1, iHour ) += WLUMSU( JB + 1, iHour ) * TVisIntWinMult;
-						AVWLSUdisk( JB + 1, iHour ) += WLUMSUdisk( JB + 1, iHour ) * TVisIntWinDiskMult;
+						AVWLSU( iHour, JB + 1 ) += WLUMSU( iHour, JB + 1 ) * TVisIntWinMult;
+						AVWLSUdisk( iHour, JB + 1 ) += WLUMSUdisk( iHour, JB + 1 ) * TVisIntWinDiskMult;
 					}
 					if ( PHRAY > 0.0 ) {
-						EDIRSK( ISky, JB + 1, iHour ) += WLUMSK( ISky, JB + 1, iHour ) * DOMEGA_Ray_3_TVisIntWinMult;
-						if ( ISky == 1 ) EDIRSU( JB + 1, iHour ) += WLUMSU( JB + 1, iHour ) * DOMEGA_Ray_3_TVisIntWinMult;
+						EDIRSK( iHour, JB + 1, ISky ) += WLUMSK( iHour, JB + 1, ISky ) * DOMEGA_Ray_3_TVisIntWinMult;
+						if ( ISky == 1 ) EDIRSU( iHour, JB + 1 ) += WLUMSU( iHour, JB + 1 ) * DOMEGA_Ray_3_TVisIntWinMult;
 					}
 					if ( ! SurfaceWindow( IWin ).MovableSlats ) break;
 				}
@@ -3779,7 +3779,7 @@ namespace DaylightingManager {
 		Real64 VTR; // For switchable glazing, ratio of visible transmittance of
 		//  fully-switched state to that of the unswitched state
 
-		if ( SUNCOSHR( 3, iHour ) < SunIsUpValue ) return;
+		if ( SUNCOSHR( iHour, 3 ) < SunIsUpValue ) return;
 
 		++ISunPos;
 
@@ -3805,35 +3805,35 @@ namespace DaylightingManager {
 			for ( JSH = 1; JSH <= MaxSlatAngs + 1; ++JSH ) {
 				if ( ! SurfaceWindow( IWin ).MovableSlats && JSH > 2 ) break;
 
-				if ( GILSK( ISky, iHour ) > tmpDFCalc ) {
-					ZoneDaylight( ZoneNum ).DaylIllFacSky( loopwin, iRefPoint, ISky, JSH, iHour ) = ( EDIRSK( ISky, JSH, iHour ) + EINTSK( ISky, JSH, iHour ) ) / GILSK( ISky, iHour );
-					ZoneDaylight( ZoneNum ).DaylSourceFacSky( loopwin, iRefPoint, ISky, JSH, iHour ) = AVWLSK( ISky, JSH, iHour ) / ( NWX * NWY * GILSK( ISky, iHour ) );
-					ZoneDaylight( ZoneNum ).DaylBackFacSky( loopwin, iRefPoint, ISky, JSH, iHour ) = EINTSK( ISky, JSH, iHour ) * ZoneDaylight( ZoneNum ).AveVisDiffReflect / ( Pi * GILSK( ISky, iHour ) );
+				if ( GILSK( iHour, ISky ) > tmpDFCalc ) {
+					ZoneDaylight( ZoneNum ).DaylIllFacSky( iHour, JSH, ISky, iRefPoint, loopwin ) = ( EDIRSK( iHour, JSH, ISky ) + EINTSK( iHour, JSH, ISky ) ) / GILSK( iHour, ISky );
+					ZoneDaylight( ZoneNum ).DaylSourceFacSky( iHour, JSH, ISky, iRefPoint, loopwin ) = AVWLSK( iHour, JSH, ISky ) / ( NWX * NWY * GILSK( iHour, ISky ) );
+					ZoneDaylight( ZoneNum ).DaylBackFacSky( iHour, JSH, ISky, iRefPoint, loopwin ) = EINTSK( iHour, JSH, ISky ) * ZoneDaylight( ZoneNum ).AveVisDiffReflect / ( Pi * GILSK( iHour, ISky ) );
 				} else {
-					ZoneDaylight( ZoneNum ).DaylIllFacSky( loopwin, iRefPoint, ISky, JSH, iHour ) = 0.0;
-					ZoneDaylight( ZoneNum ).DaylSourceFacSky( loopwin, iRefPoint, ISky, JSH, iHour ) = 0.0;
-					ZoneDaylight( ZoneNum ).DaylBackFacSky( loopwin, iRefPoint, ISky, JSH, iHour ) = 0.0;
+					ZoneDaylight( ZoneNum ).DaylIllFacSky( iHour, JSH, ISky, iRefPoint, loopwin ) = 0.0;
+					ZoneDaylight( ZoneNum ).DaylSourceFacSky( iHour, JSH, ISky, iRefPoint, loopwin ) = 0.0;
+					ZoneDaylight( ZoneNum ).DaylBackFacSky( iHour, JSH, ISky, iRefPoint, loopwin ) = 0.0;
 				}
 
 				if ( ISky == 1 ) {
 					if ( GILSU( iHour ) > tmpDFCalc ) {
-						ZoneDaylight( ZoneNum ).DaylIllFacSun( loopwin, iRefPoint, JSH, iHour ) = ( EDIRSU( JSH, iHour ) + EINTSU( JSH, iHour ) ) / ( GILSU( iHour ) + 0.0001 );
-						ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( loopwin, iRefPoint, JSH, iHour ) = ( EDIRSUdisk( JSH, iHour ) + EINTSUdisk( JSH, iHour ) ) / ( GILSU( iHour ) + 0.0001 );
+						ZoneDaylight( ZoneNum ).DaylIllFacSun( iHour, JSH, iRefPoint, loopwin ) = ( EDIRSU( iHour, JSH ) + EINTSU( iHour, JSH ) ) / ( GILSU( iHour ) + 0.0001 );
+						ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( iHour, JSH, iRefPoint, loopwin ) = ( EDIRSUdisk( iHour, JSH ) + EINTSUdisk( iHour, JSH ) ) / ( GILSU( iHour ) + 0.0001 );
 
-						ZoneDaylight( ZoneNum ).DaylSourceFacSun( loopwin, iRefPoint, JSH, iHour ) = AVWLSU( JSH, iHour ) / ( NWX * NWY * ( GILSU( iHour ) + 0.0001 ) );
-						ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( loopwin, iRefPoint, JSH, iHour ) = AVWLSUdisk( JSH, iHour ) / ( NWX * NWY * ( GILSU( iHour ) + 0.0001 ) );
+						ZoneDaylight( ZoneNum ).DaylSourceFacSun( iHour, JSH, iRefPoint, loopwin ) = AVWLSU( iHour, JSH ) / ( NWX * NWY * ( GILSU( iHour ) + 0.0001 ) );
+						ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( iHour, JSH, iRefPoint, loopwin ) = AVWLSUdisk( iHour, JSH ) / ( NWX * NWY * ( GILSU( iHour ) + 0.0001 ) );
 
-						ZoneDaylight( ZoneNum ).DaylBackFacSun( loopwin, iRefPoint, JSH, iHour ) = EINTSU( JSH, iHour ) * ZoneDaylight( ZoneNum ).AveVisDiffReflect / ( Pi * ( GILSU( iHour ) + 0.0001 ) );
-						ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( loopwin, iRefPoint, JSH, iHour ) = EINTSUdisk( JSH, iHour ) * ZoneDaylight( ZoneNum ).AveVisDiffReflect / ( Pi * ( GILSU( iHour ) + 0.0001 ) );
+						ZoneDaylight( ZoneNum ).DaylBackFacSun( iHour, JSH, iRefPoint, loopwin ) = EINTSU( iHour, JSH ) * ZoneDaylight( ZoneNum ).AveVisDiffReflect / ( Pi * ( GILSU( iHour ) + 0.0001 ) );
+						ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( iHour, JSH, iRefPoint, loopwin ) = EINTSUdisk( iHour, JSH ) * ZoneDaylight( ZoneNum ).AveVisDiffReflect / ( Pi * ( GILSU( iHour ) + 0.0001 ) );
 					} else {
-						ZoneDaylight( ZoneNum ).DaylIllFacSun( loopwin, iRefPoint, JSH, iHour ) = 0.0;
-						ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( loopwin, iRefPoint, JSH, iHour ) = 0.0;
+						ZoneDaylight( ZoneNum ).DaylIllFacSun( iHour, JSH, iRefPoint, loopwin ) = 0.0;
+						ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( iHour, JSH, iRefPoint, loopwin ) = 0.0;
 
-						ZoneDaylight( ZoneNum ).DaylSourceFacSun( loopwin, iRefPoint, JSH, iHour ) = 0.0;
-						ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( loopwin, iRefPoint, JSH, iHour ) = 0.0;
+						ZoneDaylight( ZoneNum ).DaylSourceFacSun( iHour, JSH, iRefPoint, loopwin ) = 0.0;
+						ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( iHour, JSH, iRefPoint, loopwin ) = 0.0;
 
-						ZoneDaylight( ZoneNum ).DaylBackFacSun( loopwin, iRefPoint, JSH, iHour ) = 0.0;
-						ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( loopwin, iRefPoint, JSH, iHour ) = 0.0;
+						ZoneDaylight( ZoneNum ).DaylBackFacSun( iHour, JSH, iRefPoint, loopwin ) = 0.0;
+						ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( iHour, JSH, iRefPoint, loopwin ) = 0.0;
 					}
 				}
 			} // End of shading index loop, JSH
@@ -3842,16 +3842,16 @@ namespace DaylightingManager {
 			if ( ICtrl > 0 ) {
 				if ( WindowShadingControl( ICtrl ).ShadingType == WSC_ST_SwitchableGlazing ) {
 					VTR = SurfaceWindow( IWin ).VisTransRatio;
-					ZoneDaylight( ZoneNum ).DaylIllFacSky( loopwin, iRefPoint, ISky, 2, iHour ) = ZoneDaylight( ZoneNum ).DaylIllFacSky( loopwin, iRefPoint, ISky, 1, iHour ) * VTR;
-					ZoneDaylight( ZoneNum ).DaylSourceFacSky( loopwin, iRefPoint, ISky, 2, iHour ) = ZoneDaylight( ZoneNum ).DaylSourceFacSky( loopwin, iRefPoint, ISky, 1, iHour ) * VTR;
-					ZoneDaylight( ZoneNum ).DaylBackFacSky( loopwin, iRefPoint, ISky, 2, iHour ) = ZoneDaylight( ZoneNum ).DaylBackFacSky( loopwin, iRefPoint, ISky, 1, iHour ) * VTR;
+					ZoneDaylight( ZoneNum ).DaylIllFacSky( iHour, 2, ISky, iRefPoint, loopwin ) = ZoneDaylight( ZoneNum ).DaylIllFacSky( iHour, 1, ISky, iRefPoint, loopwin ) * VTR;
+					ZoneDaylight( ZoneNum ).DaylSourceFacSky( iHour, 2, ISky, iRefPoint, loopwin ) = ZoneDaylight( ZoneNum ).DaylSourceFacSky( iHour, 1, ISky, iRefPoint, loopwin ) * VTR;
+					ZoneDaylight( ZoneNum ).DaylBackFacSky( iHour, 2, ISky, iRefPoint, loopwin ) = ZoneDaylight( ZoneNum ).DaylBackFacSky( iHour, 1, ISky, iRefPoint, loopwin ) * VTR;
 					if ( ISky == 1 ) {
-						ZoneDaylight( ZoneNum ).DaylIllFacSun( loopwin, iRefPoint, 2, iHour ) = ZoneDaylight( ZoneNum ).DaylIllFacSun( loopwin, iRefPoint, 1, iHour ) * VTR;
-						ZoneDaylight( ZoneNum ).DaylSourceFacSun( loopwin, iRefPoint, 2, iHour ) = ZoneDaylight( ZoneNum ).DaylSourceFacSun( loopwin, iRefPoint, 1, iHour ) * VTR;
-						ZoneDaylight( ZoneNum ).DaylBackFacSun( loopwin, iRefPoint, 2, iHour ) = ZoneDaylight( ZoneNum ).DaylBackFacSun( loopwin, iRefPoint, 1, iHour ) * VTR;
-						ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( loopwin, iRefPoint, 2, iHour ) = ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( loopwin, iRefPoint, 1, iHour ) * VTR;
-						ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( loopwin, iRefPoint, 2, iHour ) = ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( loopwin, iRefPoint, 1, iHour ) * VTR;
-						ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( loopwin, iRefPoint, 2, iHour ) = ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( loopwin, iRefPoint, 1, iHour ) * VTR;
+						ZoneDaylight( ZoneNum ).DaylIllFacSun( iHour, 2, iRefPoint, loopwin ) = ZoneDaylight( ZoneNum ).DaylIllFacSun( iHour, 1, iRefPoint, loopwin ) * VTR;
+						ZoneDaylight( ZoneNum ).DaylSourceFacSun( iHour, 2, iRefPoint, loopwin ) = ZoneDaylight( ZoneNum ).DaylSourceFacSun( iHour, 1, iRefPoint, loopwin ) * VTR;
+						ZoneDaylight( ZoneNum ).DaylBackFacSun( iHour, 2, iRefPoint, loopwin ) = ZoneDaylight( ZoneNum ).DaylBackFacSun( iHour, 1, iRefPoint, loopwin ) * VTR;
+						ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( iHour, 2, iRefPoint, loopwin ) = ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( iHour, 1, iRefPoint, loopwin ) * VTR;
+						ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( iHour, 2, iRefPoint, loopwin ) = ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( iHour, 1, iRefPoint, loopwin ) * VTR;
+						ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( iHour, 2, iRefPoint, loopwin ) = ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( iHour, 1, iRefPoint, loopwin ) * VTR;
 					}
 				}
 			} // ICtrl > 0
@@ -3911,7 +3911,7 @@ namespace DaylightingManager {
 		Real64 VTR; // For switchable glazing, ratio of visible transmittance of
 		//  fully-switched state to that of the unswitched state
 
-		if ( SUNCOSHR( 3, iHour ) < SunIsUpValue ) return;
+		if ( SUNCOSHR( iHour, 3 ) < SunIsUpValue ) return;
 
 		// Altitude of sun (degrees)
 		PHSUN = PHSUNHR( iHour );
@@ -3935,35 +3935,35 @@ namespace DaylightingManager {
 			for ( JSH = 1; JSH <= MaxSlatAngs + 1; ++JSH ) {
 				if ( ! SurfaceWindow( IWin ).MovableSlats && JSH > 2 ) break;
 
-				if ( GILSK( ISky, iHour ) > tmpDFCalc ) {
-					IllumMapCalc( MapNum ).DaylIllFacSky( loopwin, iMapPoint, ISky, JSH, iHour ) = ( EDIRSK( ISky, JSH, iHour ) + EINTSK( ISky, JSH, iHour ) ) / GILSK( ISky, iHour );
-					IllumMapCalc( MapNum ).DaylSourceFacSky( loopwin, iMapPoint, ISky, JSH, iHour ) = AVWLSK( ISky, JSH, iHour ) / ( NWX * NWY * GILSK( ISky, iHour ) );
-					IllumMapCalc( MapNum ).DaylBackFacSky( loopwin, iMapPoint, ISky, JSH, iHour ) = EINTSK( ISky, JSH, iHour ) * ZoneDaylight( ZoneNum ).AveVisDiffReflect / ( Pi * GILSK( ISky, iHour ) );
+				if ( GILSK( iHour, ISky ) > tmpDFCalc ) {
+					IllumMapCalc( MapNum ).DaylIllFacSky( iHour, JSH, ISky, iMapPoint, loopwin ) = ( EDIRSK( iHour, JSH, ISky ) + EINTSK( iHour, JSH, ISky ) ) / GILSK( iHour, ISky );
+					IllumMapCalc( MapNum ).DaylSourceFacSky( iHour, JSH, ISky, iMapPoint, loopwin ) = AVWLSK( iHour, JSH, ISky ) / ( NWX * NWY * GILSK( iHour, ISky ) );
+					IllumMapCalc( MapNum ).DaylBackFacSky( iHour, JSH, ISky, iMapPoint, loopwin ) = EINTSK( iHour, JSH, ISky ) * ZoneDaylight( ZoneNum ).AveVisDiffReflect / ( Pi * GILSK( iHour, ISky ) );
 				} else {
-					IllumMapCalc( MapNum ).DaylIllFacSky( loopwin, iMapPoint, ISky, JSH, iHour ) = 0.0;
-					IllumMapCalc( MapNum ).DaylSourceFacSky( loopwin, iMapPoint, ISky, JSH, iHour ) = 0.0;
-					IllumMapCalc( MapNum ).DaylBackFacSky( loopwin, iMapPoint, ISky, JSH, iHour ) = 0.0;
+					IllumMapCalc( MapNum ).DaylIllFacSky( iHour, JSH, ISky, iMapPoint, loopwin ) = 0.0;
+					IllumMapCalc( MapNum ).DaylSourceFacSky( iHour, JSH, ISky, iMapPoint, loopwin ) = 0.0;
+					IllumMapCalc( MapNum ).DaylBackFacSky( iHour, JSH, ISky, iMapPoint, loopwin ) = 0.0;
 				}
 
 				if ( ISky == 1 ) {
 					if ( GILSU( iHour ) > tmpDFCalc ) {
-						IllumMapCalc( MapNum ).DaylIllFacSun( loopwin, iMapPoint, JSH, iHour ) = ( EDIRSU( JSH, iHour ) + EINTSU( JSH, iHour ) ) / ( GILSU( iHour ) + 0.0001 );
-						IllumMapCalc( MapNum ).DaylIllFacSunDisk( loopwin, iMapPoint, JSH, iHour ) = ( EDIRSUdisk( JSH, iHour ) + EINTSUdisk( JSH, iHour ) ) / ( GILSU( iHour ) + 0.0001 );
+						IllumMapCalc( MapNum ).DaylIllFacSun( iHour, JSH, iMapPoint, loopwin ) = ( EDIRSU( iHour, JSH ) + EINTSU( iHour, JSH ) ) / ( GILSU( iHour ) + 0.0001 );
+						IllumMapCalc( MapNum ).DaylIllFacSunDisk( iHour, JSH, iMapPoint, loopwin ) = ( EDIRSUdisk( iHour, JSH ) + EINTSUdisk( iHour, JSH ) ) / ( GILSU( iHour ) + 0.0001 );
 
-						IllumMapCalc( MapNum ).DaylSourceFacSun( loopwin, iMapPoint, JSH, iHour ) = AVWLSU( JSH, iHour ) / ( NWX * NWY * ( GILSU( iHour ) + 0.0001 ) );
-						IllumMapCalc( MapNum ).DaylSourceFacSunDisk( loopwin, iMapPoint, JSH, iHour ) = AVWLSUdisk( JSH, iHour ) / ( NWX * NWY * ( GILSU( iHour ) + 0.0001 ) );
+						IllumMapCalc( MapNum ).DaylSourceFacSun( iHour, JSH, iMapPoint, loopwin ) = AVWLSU( iHour, JSH ) / ( NWX * NWY * ( GILSU( iHour ) + 0.0001 ) );
+						IllumMapCalc( MapNum ).DaylSourceFacSunDisk( iHour, JSH, iMapPoint, loopwin ) = AVWLSUdisk( iHour, JSH ) / ( NWX * NWY * ( GILSU( iHour ) + 0.0001 ) );
 
-						IllumMapCalc( MapNum ).DaylBackFacSun( loopwin, iMapPoint, JSH, iHour ) = EINTSU( JSH, iHour ) * ZoneDaylight( ZoneNum ).AveVisDiffReflect / ( Pi * ( GILSU( iHour ) + 0.0001 ) );
-						IllumMapCalc( MapNum ).DaylBackFacSunDisk( loopwin, iMapPoint, JSH, iHour ) = EINTSUdisk( JSH, iHour ) * ZoneDaylight( ZoneNum ).AveVisDiffReflect / ( Pi * ( GILSU( iHour ) + 0.0001 ) );
+						IllumMapCalc( MapNum ).DaylBackFacSun( iHour, JSH, iMapPoint, loopwin ) = EINTSU( iHour, JSH ) * ZoneDaylight( ZoneNum ).AveVisDiffReflect / ( Pi * ( GILSU( iHour ) + 0.0001 ) );
+						IllumMapCalc( MapNum ).DaylBackFacSunDisk( iHour, JSH, iMapPoint, loopwin ) = EINTSUdisk( iHour, JSH ) * ZoneDaylight( ZoneNum ).AveVisDiffReflect / ( Pi * ( GILSU( iHour ) + 0.0001 ) );
 					} else {
-						IllumMapCalc( MapNum ).DaylIllFacSun( loopwin, iMapPoint, JSH, iHour ) = 0.0;
-						IllumMapCalc( MapNum ).DaylIllFacSunDisk( loopwin, iMapPoint, JSH, iHour ) = 0.0;
+						IllumMapCalc( MapNum ).DaylIllFacSun( iHour, JSH, iMapPoint, loopwin ) = 0.0;
+						IllumMapCalc( MapNum ).DaylIllFacSunDisk( iHour, JSH, iMapPoint, loopwin ) = 0.0;
 
-						IllumMapCalc( MapNum ).DaylSourceFacSun( loopwin, iMapPoint, JSH, iHour ) = 0.0;
-						IllumMapCalc( MapNum ).DaylSourceFacSunDisk( loopwin, iMapPoint, JSH, iHour ) = 0.0;
+						IllumMapCalc( MapNum ).DaylSourceFacSun( iHour, JSH, iMapPoint, loopwin ) = 0.0;
+						IllumMapCalc( MapNum ).DaylSourceFacSunDisk( iHour, JSH, iMapPoint, loopwin ) = 0.0;
 
-						IllumMapCalc( MapNum ).DaylBackFacSun( loopwin, iMapPoint, JSH, iHour ) = 0.0;
-						IllumMapCalc( MapNum ).DaylBackFacSunDisk( loopwin, iMapPoint, JSH, iHour ) = 0.0;
+						IllumMapCalc( MapNum ).DaylBackFacSun( iHour, JSH, iMapPoint, loopwin ) = 0.0;
+						IllumMapCalc( MapNum ).DaylBackFacSunDisk( iHour, JSH, iMapPoint, loopwin ) = 0.0;
 					}
 				}
 			} // End of shading index loop, JSH
@@ -3972,16 +3972,16 @@ namespace DaylightingManager {
 			if ( ICtrl > 0 ) {
 				if ( WindowShadingControl( ICtrl ).ShadingType == WSC_ST_SwitchableGlazing ) {
 					VTR = SurfaceWindow( IWin ).VisTransRatio;
-					IllumMapCalc( MapNum ).DaylIllFacSky( loopwin, iMapPoint, ISky, 2, iHour ) = IllumMapCalc( MapNum ).DaylIllFacSky( loopwin, iMapPoint, ISky, 1, iHour ) * VTR;
-					IllumMapCalc( MapNum ).DaylSourceFacSky( loopwin, iMapPoint, ISky, 2, iHour ) = IllumMapCalc( MapNum ).DaylSourceFacSky( loopwin, iMapPoint, ISky, 1, iHour ) * VTR;
-					IllumMapCalc( MapNum ).DaylBackFacSky( loopwin, iMapPoint, ISky, 2, iHour ) = IllumMapCalc( MapNum ).DaylBackFacSky( loopwin, iMapPoint, ISky, 1, iHour ) * VTR;
+					IllumMapCalc( MapNum ).DaylIllFacSky( iHour, 2, ISky, iMapPoint, loopwin ) = IllumMapCalc( MapNum ).DaylIllFacSky( iHour, 1, ISky, iMapPoint, loopwin ) * VTR;
+					IllumMapCalc( MapNum ).DaylSourceFacSky( iHour, 2, ISky, iMapPoint, loopwin ) = IllumMapCalc( MapNum ).DaylSourceFacSky( iHour, 1, ISky, iMapPoint, loopwin ) * VTR;
+					IllumMapCalc( MapNum ).DaylBackFacSky( iHour, 2, ISky, iMapPoint, loopwin ) = IllumMapCalc( MapNum ).DaylBackFacSky( iHour, 1, ISky, iMapPoint, loopwin ) * VTR;
 					if ( ISky == 1 ) {
-						IllumMapCalc( MapNum ).DaylIllFacSun( loopwin, iMapPoint, 2, iHour ) = IllumMapCalc( MapNum ).DaylIllFacSun( loopwin, iMapPoint, 1, iHour ) * VTR;
-						IllumMapCalc( MapNum ).DaylSourceFacSun( loopwin, iMapPoint, 2, iHour ) = IllumMapCalc( MapNum ).DaylSourceFacSun( loopwin, iMapPoint, 1, iHour ) * VTR;
-						IllumMapCalc( MapNum ).DaylBackFacSun( loopwin, iMapPoint, 2, iHour ) = IllumMapCalc( MapNum ).DaylBackFacSun( loopwin, iMapPoint, 1, iHour ) * VTR;
-						IllumMapCalc( MapNum ).DaylIllFacSunDisk( loopwin, iMapPoint, 2, iHour ) = IllumMapCalc( MapNum ).DaylIllFacSunDisk( loopwin, iMapPoint, 1, iHour ) * VTR;
-						IllumMapCalc( MapNum ).DaylSourceFacSunDisk( loopwin, iMapPoint, 2, iHour ) = IllumMapCalc( MapNum ).DaylSourceFacSunDisk( loopwin, iMapPoint, 1, iHour ) * VTR;
-						IllumMapCalc( MapNum ).DaylBackFacSunDisk( loopwin, iMapPoint, 2, iHour ) = IllumMapCalc( MapNum ).DaylBackFacSunDisk( loopwin, iMapPoint, 1, iHour ) * VTR;
+						IllumMapCalc( MapNum ).DaylIllFacSun( iHour, 2, iMapPoint, loopwin ) = IllumMapCalc( MapNum ).DaylIllFacSun( iHour, 1, iMapPoint, loopwin ) * VTR;
+						IllumMapCalc( MapNum ).DaylSourceFacSun( iHour, 2, iMapPoint, loopwin ) = IllumMapCalc( MapNum ).DaylSourceFacSun( iHour, 1, iMapPoint, loopwin ) * VTR;
+						IllumMapCalc( MapNum ).DaylBackFacSun( iHour, 2, iMapPoint, loopwin ) = IllumMapCalc( MapNum ).DaylBackFacSun( iHour, 1, iMapPoint, loopwin ) * VTR;
+						IllumMapCalc( MapNum ).DaylIllFacSunDisk( iHour, 2, iMapPoint, loopwin ) = IllumMapCalc( MapNum ).DaylIllFacSunDisk( iHour, 1, iMapPoint, loopwin ) * VTR;
+						IllumMapCalc( MapNum ).DaylSourceFacSunDisk( iHour, 2, iMapPoint, loopwin ) = IllumMapCalc( MapNum ).DaylSourceFacSunDisk( iHour, 1, iMapPoint, loopwin ) * VTR;
+						IllumMapCalc( MapNum ).DaylBackFacSunDisk( iHour, 2, iMapPoint, loopwin ) = IllumMapCalc( MapNum ).DaylBackFacSunDisk( iHour, 1, iMapPoint, loopwin ) * VTR;
 					}
 				}
 			} // ICtrl > 0
@@ -4077,11 +4077,11 @@ namespace DaylightingManager {
 					SurfaceWindow( SurfNum ).SolidAngAtRefPt = 0.0;
 					SurfaceWindow( SurfNum ).SolidAngAtRefPtWtd.allocate( MaxRefPoints );
 					SurfaceWindow( SurfNum ).SolidAngAtRefPtWtd = 0.0;
-					SurfaceWindow( SurfNum ).IllumFromWinAtRefPt.allocate( MaxRefPoints, 2 );
+					SurfaceWindow( SurfNum ).IllumFromWinAtRefPt.allocate( 2, MaxRefPoints );
 					SurfaceWindow( SurfNum ).IllumFromWinAtRefPt = 0.0;
-					SurfaceWindow( SurfNum ).BackLumFromWinAtRefPt.allocate( MaxRefPoints, 2 );
+					SurfaceWindow( SurfNum ).BackLumFromWinAtRefPt.allocate( 2, MaxRefPoints );
 					SurfaceWindow( SurfNum ).BackLumFromWinAtRefPt = 0.0;
-					SurfaceWindow( SurfNum ).SourceLumFromWinAtRefPt.allocate( MaxRefPoints, 2 );
+					SurfaceWindow( SurfNum ).SourceLumFromWinAtRefPt.allocate( 2, MaxRefPoints );
 					SurfaceWindow( SurfNum ).SourceLumFromWinAtRefPt = 0.0;
 					SurfaceWindow( SurfNum ).SurfDayLightInit = true;
 				}
@@ -4095,11 +4095,11 @@ namespace DaylightingManager {
 							SurfaceWindow( SurfNum ).SolidAngAtRefPt = 0.0;
 							SurfaceWindow( SurfNum ).SolidAngAtRefPtWtd.allocate( MaxRefPoints );
 							SurfaceWindow( SurfNum ).SolidAngAtRefPtWtd = 0.0;
-							SurfaceWindow( SurfNum ).IllumFromWinAtRefPt.allocate( MaxRefPoints, 2 );
+							SurfaceWindow( SurfNum ).IllumFromWinAtRefPt.allocate( 2, MaxRefPoints );
 							SurfaceWindow( SurfNum ).IllumFromWinAtRefPt = 0.0;
-							SurfaceWindow( SurfNum ).BackLumFromWinAtRefPt.allocate( MaxRefPoints, 2 );
+							SurfaceWindow( SurfNum ).BackLumFromWinAtRefPt.allocate( 2, MaxRefPoints );
 							SurfaceWindow( SurfNum ).BackLumFromWinAtRefPt = 0.0;
-							SurfaceWindow( SurfNum ).SourceLumFromWinAtRefPt.allocate( MaxRefPoints, 2 );
+							SurfaceWindow( SurfNum ).SourceLumFromWinAtRefPt.allocate( 2, MaxRefPoints );
 							SurfaceWindow( SurfNum ).SourceLumFromWinAtRefPt = 0.0;
 							SurfaceWindow( SurfNum ).SurfDayLightInit = true;
 						}
@@ -4485,7 +4485,7 @@ namespace DaylightingManager {
 			rLightLevel = GetDesignLightingLevelForZone( ZoneFound );
 			CheckLightsReplaceableMinMaxForZone( ZoneFound );
 
-			zone_daylight.DaylRefPtAbsCoord.allocate( MaxRefPoints, 3 );
+			zone_daylight.DaylRefPtAbsCoord.allocate( 3, MaxRefPoints );
 			zone_daylight.DaylRefPtAbsCoord = 0.0;
 			zone_daylight.DaylRefPtInBounds.allocate( MaxRefPoints );
 			zone_daylight.DaylRefPtInBounds = true;
@@ -4514,19 +4514,19 @@ namespace DaylightingManager {
 				if ( DaylRefWorldCoordSystem ) {
 					//transform only by appendix G rotation
 					zone_daylight.DaylRefPtAbsCoord( 1, 1 ) = rNumericArgs( 2 ) * CosBldgRotAppGonly - rNumericArgs( 3 ) * SinBldgRotAppGonly;
-					zone_daylight.DaylRefPtAbsCoord( 1, 2 ) = rNumericArgs( 2 ) * SinBldgRotAppGonly + rNumericArgs( 3 ) * CosBldgRotAppGonly;
-					zone_daylight.DaylRefPtAbsCoord( 1, 3 ) = rNumericArgs( 4 );
+					zone_daylight.DaylRefPtAbsCoord( 2, 1 ) = rNumericArgs( 2 ) * SinBldgRotAppGonly + rNumericArgs( 3 ) * CosBldgRotAppGonly;
+					zone_daylight.DaylRefPtAbsCoord( 3, 1 ) = rNumericArgs( 4 );
 				} else {
 					//Transform reference point coordinates into building coordinate system
 					Xb = rNumericArgs( 2 ) * CosZoneRelNorth - rNumericArgs( 3 ) * SinZoneRelNorth + zone.OriginX;
 					Yb = rNumericArgs( 2 ) * SinZoneRelNorth + rNumericArgs( 3 ) * CosZoneRelNorth + zone.OriginY;
 					//Transform into World Coordinate System
 					zone_daylight.DaylRefPtAbsCoord( 1, 1 ) = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
-					zone_daylight.DaylRefPtAbsCoord( 1, 2 ) = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
-					zone_daylight.DaylRefPtAbsCoord( 1, 3 ) = rNumericArgs( 4 ) + zone.OriginZ;
+					zone_daylight.DaylRefPtAbsCoord( 2, 1 ) = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
+					zone_daylight.DaylRefPtAbsCoord( 3, 1 ) = rNumericArgs( 4 ) + zone.OriginZ;
 					if ( doTransform ) {
 						Xo = zone_daylight.DaylRefPtAbsCoord( 1, 1 ); // world coordinates.... shifted by relative north angle...
-						Yo = zone_daylight.DaylRefPtAbsCoord( 1, 2 );
+						Yo = zone_daylight.DaylRefPtAbsCoord( 2, 1 );
 						// next derotate the building
 						XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
 						YnoRot = Yo * CosBldgRelNorth - Xo * SinBldgRelNorth;
@@ -4536,7 +4536,7 @@ namespace DaylightingManager {
 						// rerotate
 						zone_daylight.DaylRefPtAbsCoord( 1, 1 ) = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
 
-						zone_daylight.DaylRefPtAbsCoord( 1, 2 ) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
+						zone_daylight.DaylRefPtAbsCoord( 2, 1 ) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
 					}
 				}
 				zone_daylight.FracZoneDaylit( 1 ) = rNumericArgs( 8 );
@@ -4545,19 +4545,19 @@ namespace DaylightingManager {
 			if ( zone_daylight.TotalDaylRefPoints >= 2 ) {
 				if ( DaylRefWorldCoordSystem ) {
 					//transform only by appendix G rotation
-					zone_daylight.DaylRefPtAbsCoord( 2, 1 ) = rNumericArgs( 5 ) * CosBldgRotAppGonly - rNumericArgs( 6 ) * SinBldgRotAppGonly;
+					zone_daylight.DaylRefPtAbsCoord( 1, 2 ) = rNumericArgs( 5 ) * CosBldgRotAppGonly - rNumericArgs( 6 ) * SinBldgRotAppGonly;
 					zone_daylight.DaylRefPtAbsCoord( 2, 2 ) = rNumericArgs( 5 ) * SinBldgRotAppGonly + rNumericArgs( 6 ) * CosBldgRotAppGonly;
-					zone_daylight.DaylRefPtAbsCoord( 2, 3 ) = rNumericArgs( 7 );
+					zone_daylight.DaylRefPtAbsCoord( 3, 2 ) = rNumericArgs( 7 );
 				} else {
 					//Transform reference point coordinates into building coordinate system
 					Xb = rNumericArgs( 5 ) * CosZoneRelNorth - rNumericArgs( 6 ) * SinZoneRelNorth + zone.OriginX;
 					Yb = rNumericArgs( 5 ) * SinZoneRelNorth + rNumericArgs( 6 ) * CosZoneRelNorth + zone.OriginY;
 					//Transform into World Coordinate System
-					zone_daylight.DaylRefPtAbsCoord( 2, 1 ) = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
+					zone_daylight.DaylRefPtAbsCoord( 1, 2 ) = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
 					zone_daylight.DaylRefPtAbsCoord( 2, 2 ) = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
-					zone_daylight.DaylRefPtAbsCoord( 2, 3 ) = rNumericArgs( 7 ) + zone.OriginZ;
+					zone_daylight.DaylRefPtAbsCoord( 3, 2 ) = rNumericArgs( 7 ) + zone.OriginZ;
 					if ( doTransform ) {
-						Xo = zone_daylight.DaylRefPtAbsCoord( 2, 1 ); // world coordinates.... shifted by relative north angle...
+						Xo = zone_daylight.DaylRefPtAbsCoord( 1, 2 ); // world coordinates.... shifted by relative north angle...
 						Yo = zone_daylight.DaylRefPtAbsCoord( 2, 2 );
 						// next derotate the building
 						XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
@@ -4566,7 +4566,7 @@ namespace DaylightingManager {
 						Xtrans = XnoRot * std::sqrt( NewAspectRatio / OldAspectRatio );
 						Ytrans = YnoRot * std::sqrt( OldAspectRatio / NewAspectRatio );
 						// rerotate
-						zone_daylight.DaylRefPtAbsCoord( 2, 1 ) = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
+						zone_daylight.DaylRefPtAbsCoord( 1, 2 ) = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
 
 						zone_daylight.DaylRefPtAbsCoord( 2, 2 ) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
 					}
@@ -4575,34 +4575,34 @@ namespace DaylightingManager {
 				zone_daylight.IllumSetPoint( 2 ) = rNumericArgs( 11 );
 			}
 			for ( RefPt = 1; RefPt <= zone_daylight.TotalDaylRefPoints; ++RefPt ) {
-				if ( zone_daylight.DaylRefPtAbsCoord( RefPt, 1 ) < zone.MinimumX || zone_daylight.DaylRefPtAbsCoord( RefPt, 1 ) > zone.MaximumX ) {
+				if ( zone_daylight.DaylRefPtAbsCoord( 1, RefPt ) < zone.MinimumX || zone_daylight.DaylRefPtAbsCoord( 1, RefPt ) > zone.MaximumX ) {
 					zone_daylight.DaylRefPtInBounds( RefPt ) = false;
 					ShowWarningError( "GetDetailedDaylighting: Reference point X Value outside Zone Min/Max X, Zone=" + zone.Name );
-					ShowContinueError( "...X Reference Point= " + RoundSigDigits( zone_daylight.DaylRefPtAbsCoord( RefPt, 1 ), 2 ) + ", Zone Minimum X= " + RoundSigDigits( zone.MinimumX, 2 ) + ", Zone Maximum X= " + RoundSigDigits( zone.MaximumX, 2 ) );
-					if ( zone_daylight.DaylRefPtAbsCoord( RefPt, 1 ) < zone.MinimumX ) {
-						ShowContinueError( "...X Reference Distance Outside MinimumX= " + RoundSigDigits( zone.MinimumX - zone_daylight.DaylRefPtAbsCoord( RefPt, 1 ), 4 ) + " m." );
+					ShowContinueError( "...X Reference Point= " + RoundSigDigits( zone_daylight.DaylRefPtAbsCoord( 1, RefPt ), 2 ) + ", Zone Minimum X= " + RoundSigDigits( zone.MinimumX, 2 ) + ", Zone Maximum X= " + RoundSigDigits( zone.MaximumX, 2 ) );
+					if ( zone_daylight.DaylRefPtAbsCoord( 1, RefPt ) < zone.MinimumX ) {
+						ShowContinueError( "...X Reference Distance Outside MinimumX= " + RoundSigDigits( zone.MinimumX - zone_daylight.DaylRefPtAbsCoord( 1, RefPt ), 4 ) + " m." );
 					} else {
-						ShowContinueError( "...X Reference Distance Outside MaximumX= " + RoundSigDigits( zone_daylight.DaylRefPtAbsCoord( RefPt, 1 ) - zone.MaximumX, 4 ) + " m." );
+						ShowContinueError( "...X Reference Distance Outside MaximumX= " + RoundSigDigits( zone_daylight.DaylRefPtAbsCoord( 1, RefPt ) - zone.MaximumX, 4 ) + " m." );
 					}
 				}
-				if ( zone_daylight.DaylRefPtAbsCoord( RefPt, 2 ) < zone.MinimumY || zone_daylight.DaylRefPtAbsCoord( RefPt, 2 ) > zone.MaximumY ) {
+				if ( zone_daylight.DaylRefPtAbsCoord( 2, RefPt ) < zone.MinimumY || zone_daylight.DaylRefPtAbsCoord( 2, RefPt ) > zone.MaximumY ) {
 					zone_daylight.DaylRefPtInBounds( RefPt ) = false;
 					ShowWarningError( "GetDetailedDaylighting: Reference point Y Value outside Zone Min/Max Y, Zone=" + zone.Name );
-					ShowContinueError( "...Y Reference Point= " + RoundSigDigits( zone_daylight.DaylRefPtAbsCoord( RefPt, 2 ), 2 ) + ", Zone Minimum Y= " + RoundSigDigits( zone.MinimumY, 2 ) + ", Zone Maximum Y= " + RoundSigDigits( zone.MaximumY, 2 ) );
-					if ( zone_daylight.DaylRefPtAbsCoord( RefPt, 2 ) < zone.MinimumY ) {
-						ShowContinueError( "...Y Reference Distance Outside MinimumY= " + RoundSigDigits( zone.MinimumY - zone_daylight.DaylRefPtAbsCoord( RefPt, 2 ), 4 ) + " m." );
+					ShowContinueError( "...Y Reference Point= " + RoundSigDigits( zone_daylight.DaylRefPtAbsCoord( 2, RefPt ), 2 ) + ", Zone Minimum Y= " + RoundSigDigits( zone.MinimumY, 2 ) + ", Zone Maximum Y= " + RoundSigDigits( zone.MaximumY, 2 ) );
+					if ( zone_daylight.DaylRefPtAbsCoord( 2, RefPt ) < zone.MinimumY ) {
+						ShowContinueError( "...Y Reference Distance Outside MinimumY= " + RoundSigDigits( zone.MinimumY - zone_daylight.DaylRefPtAbsCoord( 2, RefPt ), 4 ) + " m." );
 					} else {
-						ShowContinueError( "...Y Reference Distance Outside MaximumY= " + RoundSigDigits( zone_daylight.DaylRefPtAbsCoord( RefPt, 2 ) - zone.MaximumY, 4 ) + " m." );
+						ShowContinueError( "...Y Reference Distance Outside MaximumY= " + RoundSigDigits( zone_daylight.DaylRefPtAbsCoord( 2, RefPt ) - zone.MaximumY, 4 ) + " m." );
 					}
 				}
-				if ( zone_daylight.DaylRefPtAbsCoord( RefPt, 3 ) < zone.MinimumZ || zone_daylight.DaylRefPtAbsCoord( RefPt, 3 ) > zone.MaximumZ ) {
+				if ( zone_daylight.DaylRefPtAbsCoord( 3, RefPt ) < zone.MinimumZ || zone_daylight.DaylRefPtAbsCoord( 3, RefPt ) > zone.MaximumZ ) {
 					zone_daylight.DaylRefPtInBounds( RefPt ) = false;
 					ShowWarningError( "GetDetailedDaylighting: Reference point Z Value outside Zone Min/Max Z, Zone=" + zone.Name );
-					ShowContinueError( "...Z Reference Point= " + RoundSigDigits( zone_daylight.DaylRefPtAbsCoord( RefPt, 3 ), 2 ) + ", Zone Minimum Z= " + RoundSigDigits( zone.MinimumZ, 2 ) + ", Zone Maximum Z= " + RoundSigDigits( zone.MaximumZ, 2 ) );
-					if ( zone_daylight.DaylRefPtAbsCoord( RefPt, 3 ) < zone.MinimumZ ) {
-						ShowContinueError( "...Z Reference Distance Outside MinimumZ= " + RoundSigDigits( zone.MinimumZ - zone_daylight.DaylRefPtAbsCoord( RefPt, 3 ), 4 ) + " m." );
+					ShowContinueError( "...Z Reference Point= " + RoundSigDigits( zone_daylight.DaylRefPtAbsCoord( 3, RefPt ), 2 ) + ", Zone Minimum Z= " + RoundSigDigits( zone.MinimumZ, 2 ) + ", Zone Maximum Z= " + RoundSigDigits( zone.MaximumZ, 2 ) );
+					if ( zone_daylight.DaylRefPtAbsCoord( 3, RefPt ) < zone.MinimumZ ) {
+						ShowContinueError( "...Z Reference Distance Outside MinimumZ= " + RoundSigDigits( zone.MinimumZ - zone_daylight.DaylRefPtAbsCoord( 3, RefPt ), 4 ) + " m." );
 					} else {
-						ShowContinueError( "...Z Reference Distance Outside MaximumZ= " + RoundSigDigits( zone_daylight.DaylRefPtAbsCoord( RefPt, 3 ) - zone.MaximumZ, 4 ) + " m." );
+						ShowContinueError( "...Z Reference Distance Outside MaximumZ= " + RoundSigDigits( zone_daylight.DaylRefPtAbsCoord( 3, RefPt ) - zone.MaximumZ, 4 ) + " m." );
 					}
 				}
 			} // RefPt
@@ -4681,7 +4681,7 @@ namespace DaylightingManager {
 						// Add additional daylighting reference points for map
 						AddMapPoints = IllumMap( MapNum ).Xnum * IllumMap( MapNum ).Ynum;
 						IllumMapCalc( MapNum ).TotalMapRefPoints = AddMapPoints;
-						IllumMapCalc( MapNum ).MapRefPtAbsCoord.allocate( AddMapPoints, 3 );
+						IllumMapCalc( MapNum ).MapRefPtAbsCoord.allocate( 3, AddMapPoints );
 						IllumMapCalc( MapNum ).MapRefPtAbsCoord = 0.0;
 						IllumMapCalc( MapNum ).MapRefPtInBounds.allocate( AddMapPoints );
 						IllumMapCalc( MapNum ).MapRefPtInBounds = true;
@@ -4719,9 +4719,9 @@ namespace DaylightingManager {
 						// Map points and increments are stored in AbsCoord and then that is operated on if relative coords entered.
 						for ( Y = 1; Y <= IllumMap( MapNum ).Ynum; ++Y ) {
 							for ( X = 1; X <= IllumMap( MapNum ).Xnum; ++X ) {
-								IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) = IllumMap( MapNum ).Xmin + ( X - 1 ) * IllumMap( MapNum ).Xinc;
-								IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) = IllumMap( MapNum ).Ymin + ( Y - 1 ) * IllumMap( MapNum ).Yinc;
-								IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 3 ) = IllumMap( MapNum ).Z;
+								IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) = IllumMap( MapNum ).Xmin + ( X - 1 ) * IllumMap( MapNum ).Xinc;
+								IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) = IllumMap( MapNum ).Ymin + ( Y - 1 ) * IllumMap( MapNum ).Yinc;
+								IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ) = IllumMap( MapNum ).Z;
 								++RefPt;
 							}
 						}
@@ -4729,14 +4729,14 @@ namespace DaylightingManager {
 						for ( Y = 1; Y <= IllumMap( MapNum ).Ynum; ++Y ) {
 							for ( X = 1; X <= IllumMap( MapNum ).Xnum; ++X ) {
 								if ( ! DaylRefWorldCoordSystem ) {
-									Xb = IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) * CosZoneRelNorth - IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) * SinZoneRelNorth + zone.OriginX;
-									Yb = IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) * SinZoneRelNorth + IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) * CosZoneRelNorth + zone.OriginY;
-									IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
-									IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
-									IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 3 ) += zone.OriginZ;
+									Xb = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) * CosZoneRelNorth - IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) * SinZoneRelNorth + zone.OriginX;
+									Yb = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) * SinZoneRelNorth + IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) * CosZoneRelNorth + zone.OriginY;
+									IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) = Xb * CosBldgRelNorth - Yb * SinBldgRelNorth;
+									IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) = Xb * SinBldgRelNorth + Yb * CosBldgRelNorth;
+									IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ) += zone.OriginZ;
 									if ( doTransform ) {
-										Xo = IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ); // world coordinates.... shifted by relative north angle...
-										Yo = IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 );
+										Xo = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ); // world coordinates.... shifted by relative north angle...
+										Yo = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt );
 										// next derotate the building
 										XnoRot = Xo * CosBldgRelNorth + Yo * SinBldgRelNorth;
 										YnoRot = Yo * CosBldgRelNorth - Xo * SinBldgRelNorth;
@@ -4744,57 +4744,57 @@ namespace DaylightingManager {
 										Xtrans = XnoRot * std::sqrt( NewAspectRatio / OldAspectRatio );
 										Ytrans = YnoRot * std::sqrt( OldAspectRatio / NewAspectRatio );
 										// rerotate
-										IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
+										IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) = Xtrans * CosBldgRelNorth - Ytrans * SinBldgRelNorth;
 
-										IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
+										IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
 									}
 								} else {
-									Xb = IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 );
-									Yb = IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 );
-									IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) = Xb * CosBldgRotAppGonly - Yb * SinBldgRotAppGonly;
-									IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) = Xb * SinBldgRotAppGonly + Yb * CosBldgRotAppGonly;
+									Xb = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt );
+									Yb = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt );
+									IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) = Xb * CosBldgRotAppGonly - Yb * SinBldgRotAppGonly;
+									IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) = Xb * SinBldgRotAppGonly + Yb * CosBldgRotAppGonly;
 								}
 								if ( RefPt == 1 ) {
-									IllumMap( MapNum ).Xmin = IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 );
-									IllumMap( MapNum ).Ymin = IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 );
-									IllumMap( MapNum ).Xmax = IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 );
-									IllumMap( MapNum ).Ymax = IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 );
-									IllumMap( MapNum ).Z = IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 3 );
+									IllumMap( MapNum ).Xmin = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt );
+									IllumMap( MapNum ).Ymin = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt );
+									IllumMap( MapNum ).Xmax = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt );
+									IllumMap( MapNum ).Ymax = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt );
+									IllumMap( MapNum ).Z = IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt );
 								}
-								IllumMap( MapNum ).Xmin = min( IllumMap( MapNum ).Xmin, IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) );
-								IllumMap( MapNum ).Ymin = min( IllumMap( MapNum ).Ymin, IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) );
-								IllumMap( MapNum ).Xmax = max( IllumMap( MapNum ).Xmax, IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) );
-								IllumMap( MapNum ).Ymax = max( IllumMap( MapNum ).Ymax, IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) );
-								if ( ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) < zone.MinimumX && ( zone.MinimumX - IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) ) > 0.001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) > zone.MaximumX && ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) - zone.MaximumX ) > 0.001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) < zone.MinimumY && ( zone.MinimumY - IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) ) > 0.001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) > zone.MaximumY && ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) - zone.MaximumY ) > 0.001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 3 ) < zone.MinimumZ && ( zone.MinimumZ - IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 3 ) ) > 0.001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 3 ) > zone.MaximumZ && ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 3 ) - zone.MaximumZ ) > 0.001 ) ) {
+								IllumMap( MapNum ).Xmin = min( IllumMap( MapNum ).Xmin, IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) );
+								IllumMap( MapNum ).Ymin = min( IllumMap( MapNum ).Ymin, IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) );
+								IllumMap( MapNum ).Xmax = max( IllumMap( MapNum ).Xmax, IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) );
+								IllumMap( MapNum ).Ymax = max( IllumMap( MapNum ).Ymax, IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) );
+								if ( ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) < zone.MinimumX && ( zone.MinimumX - IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) ) > 0.001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) > zone.MaximumX && ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) - zone.MaximumX ) > 0.001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) < zone.MinimumY && ( zone.MinimumY - IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) ) > 0.001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) > zone.MaximumY && ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) - zone.MaximumY ) > 0.001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ) < zone.MinimumZ && ( zone.MinimumZ - IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ) ) > 0.001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ) > zone.MaximumZ && ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ) - zone.MaximumZ ) > 0.001 ) ) {
 									IllumMapCalc( MapNum ).MapRefPtInBounds( RefPt ) = false;
 								}
 								// Test extremes of Map Points against Zone Min/Max
 								if ( RefPt == 1 || RefPt == IllumMapCalc( MapNum ).TotalMapRefPoints ) {
-									if ( ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) < zone.MinimumX || IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) > zone.MaximumX ) && ! IllumMapCalc( MapNum ).MapRefPtInBounds( RefPt ) ) {
+									if ( ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) < zone.MinimumX || IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) > zone.MaximumX ) && ! IllumMapCalc( MapNum ).MapRefPtInBounds( RefPt ) ) {
 										ShowWarningError( "GetDetailedDaylighting: Reference Map point #[" + RoundSigDigits( RefPt ) + "], X Value outside Zone Min/Max X, Zone=" + zone.Name );
-										ShowContinueError( "...X Reference Point= " + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ), 2 ) + ", Zone Minimum X= " + RoundSigDigits( zone.MinimumX, 2 ) + ", Zone Maximum X= " + RoundSigDigits( zone.MaximumX, 2 ) );
-										if ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) < zone.MinimumX ) {
-											ShowContinueError( "...X Reference Distance Outside MinimumX= " + RoundSigDigits( zone.MinimumX - IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ), 4 ) + " m." );
+										ShowContinueError( "...X Reference Point= " + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ), 2 ) + ", Zone Minimum X= " + RoundSigDigits( zone.MinimumX, 2 ) + ", Zone Maximum X= " + RoundSigDigits( zone.MaximumX, 2 ) );
+										if ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) < zone.MinimumX ) {
+											ShowContinueError( "...X Reference Distance Outside MinimumX= " + RoundSigDigits( zone.MinimumX - IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ), 4 ) + " m." );
 										} else {
-											ShowContinueError( "...X Reference Distance Outside MaximumX= " + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) - zone.MaximumX, 4 ) + " m." );
+											ShowContinueError( "...X Reference Distance Outside MaximumX= " + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ) - zone.MaximumX, 4 ) + " m." );
 										}
 									}
-									if ( ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) < zone.MinimumY || IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) > zone.MaximumY ) && ! IllumMapCalc( MapNum ).MapRefPtInBounds( RefPt ) ) {
+									if ( ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) < zone.MinimumY || IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) > zone.MaximumY ) && ! IllumMapCalc( MapNum ).MapRefPtInBounds( RefPt ) ) {
 										ShowWarningError( "GetDetailedDaylighting: Reference Map point #[" + RoundSigDigits( RefPt ) + "], Y Value outside Zone Min/Max Y, Zone=" + zone.Name );
-										ShowContinueError( "...Y Reference Point= " + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ), 2 ) + ", Zone Minimum Y= " + RoundSigDigits( zone.MinimumY, 2 ) + ", Zone Maximum Y= " + RoundSigDigits( zone.MaximumY, 2 ) );
-										if ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) < zone.MinimumY ) {
-											ShowContinueError( "...Y Reference Distance Outside MinimumY= " + RoundSigDigits( zone.MinimumY - IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ), 4 ) + " m." );
+										ShowContinueError( "...Y Reference Point= " + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ), 2 ) + ", Zone Minimum Y= " + RoundSigDigits( zone.MinimumY, 2 ) + ", Zone Maximum Y= " + RoundSigDigits( zone.MaximumY, 2 ) );
+										if ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) < zone.MinimumY ) {
+											ShowContinueError( "...Y Reference Distance Outside MinimumY= " + RoundSigDigits( zone.MinimumY - IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ), 4 ) + " m." );
 										} else {
-											ShowContinueError( "...Y Reference Distance Outside MaximumY= " + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) - zone.MaximumY, 4 ) + " m." );
+											ShowContinueError( "...Y Reference Distance Outside MaximumY= " + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ) - zone.MaximumY, 4 ) + " m." );
 										}
 									}
-									if ( ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 3 ) < zone.MinimumZ || IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 3 ) > zone.MaximumZ ) && ! IllumMapCalc( MapNum ).MapRefPtInBounds( RefPt ) ) {
+									if ( ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ) < zone.MinimumZ || IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ) > zone.MaximumZ ) && ! IllumMapCalc( MapNum ).MapRefPtInBounds( RefPt ) ) {
 										ShowWarningError( "GetDetailedDaylighting: Reference Map point #[" + RoundSigDigits( RefPt ) + "], Z Value outside Zone Min/Max Z, Zone=" + zone.Name );
-										ShowContinueError( "...Z Reference Point= " + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 3 ), 2 ) + ", Zone Minimum Z= " + RoundSigDigits( zone.MinimumZ, 2 ) + ", Zone Maximum Z= " + RoundSigDigits( zone.MaximumZ, 2 ) );
-										if ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 3 ) < zone.MinimumZ ) {
-											ShowContinueError( "...Z Reference Distance Outside MinimumZ= " + RoundSigDigits( zone.MinimumZ - IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 3 ), 4 ) + " m." );
+										ShowContinueError( "...Z Reference Point= " + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ), 2 ) + ", Zone Minimum Z= " + RoundSigDigits( zone.MinimumZ, 2 ) + ", Zone Maximum Z= " + RoundSigDigits( zone.MaximumZ, 2 ) );
+										if ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ) < zone.MinimumZ ) {
+											ShowContinueError( "...Z Reference Distance Outside MinimumZ= " + RoundSigDigits( zone.MinimumZ - IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ), 4 ) + " m." );
 										} else {
-											ShowContinueError( "...Z Reference Distance Outside MaximumZ= " + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 3 ) - zone.MaximumZ, 4 ) + " m." );
+											ShowContinueError( "...Z Reference Distance Outside MaximumZ= " + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 3, RefPt ) - zone.MaximumZ, 4 ) + " m." );
 										}
 									}
 								}
@@ -5164,8 +5164,8 @@ namespace DaylightingManager {
 			if ( ( SurfaceWindow( IWin ).ShadingFlag >= 1 && SurfaceWindow( IWin ).ShadingFlag <= 9 ) || SurfaceWindow( IWin ).SolarDiffusing ) IS = 2;
 			// Conversion from ft-L to cd/m2, with cd/m2 = 0.2936 ft-L, gives the 0.4794 factor
 			// below, which is (0.2936)**0.6
-			GTOT1 = 0.4794 * ( std::pow( ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop ), 1.6 ) ) * std::pow( ZoneDaylight( ZoneNum ).SolidAngAtRefPtWtd( IL, loop ), 0.8 );
-			GTOT2 = BLUM + 0.07 * ( std::sqrt( ZoneDaylight( ZoneNum ).SolidAngAtRefPt( IL, loop ) ) ) * ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop );
+			GTOT1 = 0.4794 * ( std::pow( ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( loop, IS, IL ), 1.6 ) ) * std::pow( ZoneDaylight( ZoneNum ).SolidAngAtRefPtWtd( loop, IL ), 0.8 );
+			GTOT2 = BLUM + 0.07 * ( std::sqrt( ZoneDaylight( ZoneNum ).SolidAngAtRefPt( loop, IL ) ) ) * ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( loop, IS, IL );
 			GTOT += GTOT1 / ( GTOT2 + 0.000001 );
 		}
 
@@ -5243,8 +5243,8 @@ namespace DaylightingManager {
 				if ( ( SurfaceWindow( IWin ).ShadingFlag >= 1 && SurfaceWindow( IWin ).ShadingFlag <= 9 ) || SurfaceWindow( IWin ).SolarDiffusing ) IS = 2;
 				// Conversion from ft-L to cd/m2, with cd/m2 = 0.2936 ft-L, gives the 0.4794 factor
 				// below, which is (0.2936)**0.6
-				GTOT1 = 0.4794 * ( std::pow( ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop ), 1.6 ) ) * std::pow( ZoneDaylight( ZoneNum ).SolidAngAtRefPtWtd( IL, loop ), 0.8 );
-				GTOT2 = BacLum + 0.07 * ( std::sqrt( ZoneDaylight( ZoneNum ).SolidAngAtRefPt( IL, loop ) ) ) * ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop );
+				GTOT1 = 0.4794 * ( std::pow( ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( loop, IS, IL ), 1.6 ) ) * std::pow( ZoneDaylight( ZoneNum ).SolidAngAtRefPtWtd( loop, IL ), 0.8 );
+				GTOT2 = BacLum + 0.07 * ( std::sqrt( ZoneDaylight( ZoneNum ).SolidAngAtRefPt( loop, IL ) ) ) * ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( loop, IS, IL );
 				GTOT += GTOT1 / ( GTOT2 + 0.000001 );
 			}
 
@@ -5481,9 +5481,9 @@ namespace DaylightingManager {
 
 		// FLOW:
 		if ( FirstTimeFlag ) {
-			A.allocate( MaxVerticesPerSurface, 3 );
-			C.allocate( MaxVerticesPerSurface, 3 );
-			V.allocate( MaxVerticesPerSurface, 3 );
+			A.allocate( 3, MaxVerticesPerSurface );
+			C.allocate( 3, MaxVerticesPerSurface );
+			V.allocate( 3, MaxVerticesPerSurface );
 			FirstTimeFlag = false;
 		}
 		IPIERC = 0;
@@ -5501,12 +5501,12 @@ namespace DaylightingManager {
 
 		// Vertex-to-vertex vectors. A(1,2) is from vertex 1 to 2, etc.
 		for ( I = 1; I <= 3; ++I ) {
-			auto l( A.index( 1, I ) );
+			auto l( A.index( I, 1 ) );
 			for ( N = 1; N <= NV - 1; ++N, ++l ) {
 				A[ l ] = V[ l + 1 ] - V[ l ]; // [ l ] == ( N, I )
 			}
-			A( NV, I ) = V( 1, I ) - V( NV, I );
-			l = A.index( 1, I );
+			A( I, NV ) = V( I, 1 ) - V( I, NV );
+			l = A.index( I, 1 );
 			A1( I ) = A[ l ]; // [ l ] == ( 1, I )
 			V1( I ) = V[ l ]; // [ l ] == ( 1, I )
 			A2( I ) = A[ ++l ]; // [ l ] == ( 2, I )
@@ -5565,7 +5565,7 @@ namespace DaylightingManager {
 		} else { // Surface is not rectangular
 			// Vectors from surface vertices to CP
 			for ( I = 1; I <= 3; ++I ) {
-				auto l( C.index( 1, I ) );
+				auto l( C.index( I, 1 ) );
 				Real64 const CP_I( CP( I ) );
 				for ( N = 1; N <= NV; ++N, ++l ) {
 					C[ l ] = CP_I - V[ l ]; // [ l ] == ( N, I )
@@ -5933,13 +5933,13 @@ namespace DaylightingManager {
 		int ISky1; // Sky type index values for averaging two sky types
 		int ISky2;
 		static Array1D< Real64 > SetPnt( 2 ); // Illuminance setpoint at reference points (lux)
-		static Array2D< Real64 > DFSKHR( 4, 2 ); // Sky daylight factor for sky type (first index),
+		static Array2D< Real64 > DFSKHR( 2, 4 ); // Sky daylight factor for sky type (first index),
 		//   bare/shaded window (second index)
 		static Array1D< Real64 > DFSUHR( 2 ); // Sun daylight factor for bare/shaded window
-		static Array2D< Real64 > BFSKHR( 4, 2 ); // Sky background luminance factor for sky type (first index),
+		static Array2D< Real64 > BFSKHR( 2, 4 ); // Sky background luminance factor for sky type (first index),
 		//   bare/shaded window (second index)
 		static Array1D< Real64 > BFSUHR( 2 ); // Sun background luminance factor for bare/shaded window
-		static Array2D< Real64 > SFSKHR( 4, 2 ); // Sky source luminance factor for sky type (first index),
+		static Array2D< Real64 > SFSKHR( 2, 4 ); // Sky source luminance factor for sky type (first index),
 		//   bare/shaded window (second index)
 		static Array1D< Real64 > SFSUHR( 2 ); // Sun source luminance factor for bare/shaded window
 		static Array2D< Real64 > WDAYIL( 2, 2 ); // Illuminance from window at reference point (first index)
@@ -5997,9 +5997,9 @@ namespace DaylightingManager {
 		// Three arrays to save original clear and dark (fully switched) states'
 		//  zone/window daylighting properties.
 		if ( firstTime ) {
-			tmpIllumFromWinAtRefPt.allocate( 2, 2, max( maxval( Zone.NumSubSurfaces() ), maxval( ZoneDaylight.NumOfDayltgExtWins() ) ) );
-			tmpBackLumFromWinAtRefPt.allocate( 2, 2, max( maxval( Zone.NumSubSurfaces() ), maxval( ZoneDaylight.NumOfDayltgExtWins() ) ) );
-			tmpSourceLumFromWinAtRefPt.allocate( 2, 2, max( maxval( Zone.NumSubSurfaces() ), maxval( ZoneDaylight.NumOfDayltgExtWins() ) ) );
+			tmpIllumFromWinAtRefPt.allocate( max( maxval( Zone.NumSubSurfaces() ), maxval( ZoneDaylight.NumOfDayltgExtWins() ) ), 2, 2 );
+			tmpBackLumFromWinAtRefPt.allocate( max( maxval( Zone.NumSubSurfaces() ), maxval( ZoneDaylight.NumOfDayltgExtWins() ) ), 2, 2 );
+			tmpSourceLumFromWinAtRefPt.allocate( max( maxval( Zone.NumSubSurfaces() ), maxval( ZoneDaylight.NumOfDayltgExtWins() ) ), 2, 2 );
 			firstTime = false;
 		}
 		tmpIllumFromWinAtRefPt = 0.0;
@@ -6061,66 +6061,66 @@ namespace DaylightingManager {
 				for ( ISky = 1; ISky <= 4; ++ISky ) {
 
 					// ===Bare window===
-					DFSKHR( ISky, 1 ) = VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, IL, ISky, 1, HourOfDay ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, IL, ISky, 1, PreviousHour ) );
+					DFSKHR( 1, ISky ) = VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylIllFacSky( HourOfDay, 1, ISky, IL, loop ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylIllFacSky( PreviousHour, 1, ISky, IL, loop ) );
 
-					if ( ISky == 1 ) DFSUHR( 1 ) = VTRatio * ( WeightNow * ( ZoneDaylight( ZoneNum ).DaylIllFacSun( loop, IL, 1, HourOfDay ) + ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( loop, IL, 1, HourOfDay ) ) + WeightPreviousHour * ( ZoneDaylight( ZoneNum ).DaylIllFacSun( loop, IL, 1, PreviousHour ) + ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( loop, IL, 1, PreviousHour ) ) );
+					if ( ISky == 1 ) DFSUHR( 1 ) = VTRatio * ( WeightNow * ( ZoneDaylight( ZoneNum ).DaylIllFacSun( HourOfDay, 1, IL, loop ) + ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( HourOfDay, 1, IL, loop ) ) + WeightPreviousHour * ( ZoneDaylight( ZoneNum ).DaylIllFacSun( PreviousHour, 1, IL, loop ) + ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( PreviousHour, 1, IL, loop ) ) );
 
-					BFSKHR( ISky, 1 ) = VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylBackFacSky( loop, IL, ISky, 1, HourOfDay ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylBackFacSky( loop, IL, ISky, 1, PreviousHour ) );
+					BFSKHR( 1, ISky ) = VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylBackFacSky( HourOfDay, 1, ISky, IL, loop ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylBackFacSky( PreviousHour, 1, ISky, IL, loop ) );
 
-					if ( ISky == 1 ) BFSUHR( 1 ) = VTRatio * ( WeightNow * ( ZoneDaylight( ZoneNum ).DaylBackFacSun( loop, IL, 1, HourOfDay ) + ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( loop, IL, 1, HourOfDay ) ) + WeightPreviousHour * ( ZoneDaylight( ZoneNum ).DaylBackFacSun( loop, IL, 1, PreviousHour ) + ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( loop, IL, 1, PreviousHour ) ) );
+					if ( ISky == 1 ) BFSUHR( 1 ) = VTRatio * ( WeightNow * ( ZoneDaylight( ZoneNum ).DaylBackFacSun( HourOfDay, 1, IL, loop ) + ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( HourOfDay, 1, IL, loop ) ) + WeightPreviousHour * ( ZoneDaylight( ZoneNum ).DaylBackFacSun( PreviousHour, 1, IL, loop ) + ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( PreviousHour, 1, IL, loop ) ) );
 
-					SFSKHR( ISky, 1 ) = VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylSourceFacSky( loop, IL, ISky, 1, HourOfDay ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylSourceFacSky( loop, IL, ISky, 1, PreviousHour ) );
+					SFSKHR( 1, ISky ) = VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylSourceFacSky( HourOfDay, 1, ISky, IL, loop ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylSourceFacSky( PreviousHour, 1, ISky, IL, loop ) );
 
-					if ( ISky == 1 ) SFSUHR( 1 ) = VTRatio * ( WeightNow * ( ZoneDaylight( ZoneNum ).DaylSourceFacSun( loop, IL, 1, HourOfDay ) + ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( loop, IL, 1, HourOfDay ) ) + WeightPreviousHour * ( ZoneDaylight( ZoneNum ).DaylSourceFacSun( loop, IL, 1, PreviousHour ) + ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( loop, IL, 1, PreviousHour ) ) );
+					if ( ISky == 1 ) SFSUHR( 1 ) = VTRatio * ( WeightNow * ( ZoneDaylight( ZoneNum ).DaylSourceFacSun( HourOfDay, 1, IL, loop ) + ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( HourOfDay, 1, IL, loop ) ) + WeightPreviousHour * ( ZoneDaylight( ZoneNum ).DaylSourceFacSun( PreviousHour, 1, IL, loop ) + ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( PreviousHour, 1, IL, loop ) ) );
 
 					if ( SurfaceWindow( IWin ).ShadingFlag >= 1 || SurfaceWindow( IWin ).SolarDiffusing ) {
 
 						// ===Shaded window or window with diffusing glass===
 						if ( ! SurfaceWindow( IWin ).MovableSlats ) {
 							// Shade, screen, blind with fixed slats, or diffusing glass
-							DFSKHR( ISky, 2 ) = VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, IL, ISky, 2, HourOfDay ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, IL, ISky, 2, PreviousHour ) );
+							DFSKHR( 2, ISky ) = VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylIllFacSky( HourOfDay, 2, ISky, IL, loop ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylIllFacSky( PreviousHour, 2, ISky, IL, loop ) );
 
 							if ( ISky == 1 ) {
-								DFSUHR( 2 ) = VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylIllFacSun( loop, IL, 2, HourOfDay ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylIllFacSun( loop, IL, 2, PreviousHour ) );
+								DFSUHR( 2 ) = VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylIllFacSun( HourOfDay, 2, IL, loop ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylIllFacSun( PreviousHour, 2, IL, loop ) );
 
-								if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) DFSUHR( 2 ) += VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( loop, IL, 2, HourOfDay ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( loop, IL, 2, PreviousHour ) );
+								if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) DFSUHR( 2 ) += VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( HourOfDay, 2, IL, loop ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( PreviousHour, 2, IL, loop ) );
 							}
 
-							BFSKHR( ISky, 2 ) = VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylBackFacSky( loop, IL, ISky, 2, HourOfDay ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylBackFacSky( loop, IL, ISky, 2, PreviousHour ) );
+							BFSKHR( 2, ISky ) = VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylBackFacSky( HourOfDay, 2, ISky, IL, loop ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylBackFacSky( PreviousHour, 2, ISky, IL, loop ) );
 
 							if ( ISky == 1 ) {
-								BFSUHR( 2 ) = VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylBackFacSun( loop, IL, 2, HourOfDay ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylBackFacSun( loop, IL, 2, PreviousHour ) );
-								if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) BFSUHR( 2 ) += VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( loop, IL, 2, HourOfDay ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( loop, IL, 2, PreviousHour ) );
+								BFSUHR( 2 ) = VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylBackFacSun( HourOfDay, 2, IL, loop ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylBackFacSun( PreviousHour, 2, IL, loop ) );
+								if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) BFSUHR( 2 ) += VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( HourOfDay, 2, IL, loop ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( PreviousHour, 2, IL, loop ) );
 							}
 
-							SFSKHR( ISky, 2 ) = VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylSourceFacSky( loop, IL, ISky, 2, HourOfDay ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylSourceFacSky( loop, IL, ISky, 2, PreviousHour ) );
+							SFSKHR( 2, ISky ) = VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylSourceFacSky( HourOfDay, 2, ISky, IL, loop ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylSourceFacSky( PreviousHour, 2, ISky, IL, loop ) );
 
 							if ( ISky == 1 ) {
-								SFSUHR( 2 ) = VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylSourceFacSun( loop, IL, 2, HourOfDay ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylSourceFacSun( loop, IL, 2, PreviousHour ) );
-								if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) SFSUHR( 2 ) += VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( loop, IL, 2, HourOfDay ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( loop, IL, 2, PreviousHour ) );
+								SFSUHR( 2 ) = VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylSourceFacSun( HourOfDay, 2, IL, loop ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylSourceFacSun( PreviousHour, 2, IL, loop ) );
+								if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) SFSUHR( 2 ) += VTRatio * ( WeightNow * ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( HourOfDay, 2, IL, loop ) + WeightPreviousHour * ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( PreviousHour, 2, IL, loop ) );
 							}
 
 						} else { // Blind with movable slats
 							VarSlats = SurfaceWindow( IWin ).MovableSlats;
 							SlatAng = SurfaceWindow( IWin ).SlatAngThisTS;
 
-							DFSKHR( ISky, 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, IL, ISky, {2,MaxSlatAngs + 1}, HourOfDay ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylIllFacSky( loop, IL, ISky, {2,MaxSlatAngs + 1}, PreviousHour ) ) );
+							DFSKHR( 2, ISky ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylIllFacSky( HourOfDay, {2,MaxSlatAngs + 1}, ISky, IL, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylIllFacSky( PreviousHour, {2,MaxSlatAngs + 1}, ISky, IL, loop ) ) );
 
 							if ( ISky == 1 ) {
-								DFSUHR( 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylIllFacSun( loop, IL, {2,MaxSlatAngs + 1}, HourOfDay ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylIllFacSun( loop, IL, {2,MaxSlatAngs + 1}, PreviousHour ) ) );
+								DFSUHR( 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylIllFacSun( HourOfDay, {2,MaxSlatAngs + 1}, IL, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylIllFacSun( PreviousHour, {2,MaxSlatAngs + 1}, IL, loop ) ) );
 
 								// We add the contribution from the solar disk if slats do not block beam solar
 								// TH CR 8010. DaylIllFacSunDisk needs to be interpolated!
 								//IF (.NOT.SurfaceWindow(IWin)%SlatsBlockBeam) DFSUHR(2) = DFSUHR(2) + &
 								//            VTRatio * (WeightNow * ZoneDaylight(ZoneNum)%DaylIllFacSunDisk(loop,IL,2,HourOfDay) + &
 								//            WeightPreviousHour * ZoneDaylight(ZoneNum)%DaylIllFacSunDisk(loop,IL,2,PreviousHour))
-								if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) DFSUHR( 2 ) += VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( loop, IL, {2,MaxSlatAngs + 1}, HourOfDay ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( loop, IL, {2,MaxSlatAngs + 1}, PreviousHour ) ) );
+								if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) DFSUHR( 2 ) += VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( HourOfDay, {2,MaxSlatAngs + 1}, IL, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylIllFacSunDisk( PreviousHour, {2,MaxSlatAngs + 1}, IL, loop ) ) );
 							}
 
-							BFSKHR( ISky, 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylBackFacSky( loop, IL, ISky, {2,MaxSlatAngs + 1}, HourOfDay ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylBackFacSky( loop, IL, ISky, {2,MaxSlatAngs + 1}, PreviousHour ) ) );
+							BFSKHR( 2, ISky ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylBackFacSky( HourOfDay, {2,MaxSlatAngs + 1}, ISky, IL, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylBackFacSky( PreviousHour, {2,MaxSlatAngs + 1}, ISky, IL, loop ) ) );
 
 							if ( ISky == 1 ) {
-								BFSUHR( 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylBackFacSun( loop, IL, {2,MaxSlatAngs + 1}, HourOfDay ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylBackFacSun( loop, IL, {2,MaxSlatAngs + 1}, PreviousHour ) ) );
+								BFSUHR( 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylBackFacSun( HourOfDay, {2,MaxSlatAngs + 1}, IL, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylBackFacSun( PreviousHour, {2,MaxSlatAngs + 1}, IL, loop ) ) );
 
 								// TH CR 8010. DaylBackFacSunDisk needs to be interpolated!
 								//IF (.NOT.SurfaceWindow(IWin)%SlatsBlockBeam) THEN
@@ -6128,14 +6128,14 @@ namespace DaylightingManager {
 								//            VTRatio * (WeightNow * ZoneDaylight(ZoneNum)%DaylBackFacSunDisk(loop,IL,2,HourOfDay) + &
 								//            WeightPreviousHour * ZoneDaylight(ZoneNum)%DaylBackFacSunDisk(loop,IL,2,PreviousHour))
 								if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) {
-									BFSUHR( 2 ) += VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( loop, IL, {2,MaxSlatAngs + 1}, HourOfDay ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( loop, IL, {2,MaxSlatAngs + 1}, PreviousHour ) ) );
+									BFSUHR( 2 ) += VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( HourOfDay, {2,MaxSlatAngs + 1}, IL, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylBackFacSunDisk( PreviousHour, {2,MaxSlatAngs + 1}, IL, loop ) ) );
 								}
 							}
 
-							SFSKHR( ISky, 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylSourceFacSky( loop, IL, ISky, {2,MaxSlatAngs + 1}, HourOfDay ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylSourceFacSky( loop, IL, ISky, {2,MaxSlatAngs + 1}, PreviousHour ) ) );
+							SFSKHR( 2, ISky ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylSourceFacSky( HourOfDay, {2,MaxSlatAngs + 1}, ISky, IL, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylSourceFacSky( PreviousHour, {2,MaxSlatAngs + 1}, ISky, IL, loop ) ) );
 
 							if ( ISky == 1 ) {
-								SFSUHR( 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylSourceFacSun( loop, IL, {2,MaxSlatAngs + 1}, HourOfDay ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylSourceFacSun( loop, IL, {2,MaxSlatAngs + 1}, PreviousHour ) ) );
+								SFSUHR( 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylSourceFacSun( HourOfDay, {2,MaxSlatAngs + 1}, IL, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylSourceFacSun( PreviousHour, {2,MaxSlatAngs + 1}, IL, loop ) ) );
 
 								// TH CR 8010. DaylSourceFacSunDisk needs to be interpolated!
 								//IF (.NOT.SurfaceWindow(IWin)%SlatsBlockBeam) THEN
@@ -6143,7 +6143,7 @@ namespace DaylightingManager {
 								//           VTRatio * (WeightNow * ZoneDaylight(ZoneNum)%DaylSourceFacSunDisk(loop,IL,2,HourOfDay) + &
 								//           WeightPreviousHour * ZoneDaylight(ZoneNum)%DaylSourceFacSunDisk(loop,IL,2,PreviousHour))
 								if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) {
-									SFSUHR( 2 ) += VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( loop, IL, {2,MaxSlatAngs + 1}, HourOfDay ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( loop, IL, {2,MaxSlatAngs + 1}, PreviousHour ) ) );
+									SFSUHR( 2 ) += VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( HourOfDay, {2,MaxSlatAngs + 1}, IL, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk( PreviousHour, {2,MaxSlatAngs + 1}, IL, loop ) ) );
 								}
 							}
 
@@ -6158,7 +6158,7 @@ namespace DaylightingManager {
 				// is up in the present time step but GILSK(ISky,HourOfDay) and GILSK(ISky,NextHour) are both zero.
 				for ( ISky = 1; ISky <= 4; ++ISky ) {
 					// HorIllSky(ISky) = WeightNow * GILSK(ISky,HourOfDay) + WeightNextHour * GILSK(ISky,NextHour) + 0.001
-					HorIllSky( ISky ) = WeightNow * GILSK( ISky, HourOfDay ) + WeightPreviousHour * GILSK( ISky, PreviousHour ) + 0.001;
+					HorIllSky( ISky ) = WeightNow * GILSK( HourOfDay, ISky ) + WeightPreviousHour * GILSK( PreviousHour, ISky ) + 0.001;
 				}
 
 				// HISKF is current time step horizontal illuminance from sky, calculated in DayltgLuminousEfficacy,
@@ -6170,18 +6170,18 @@ namespace DaylightingManager {
 				for ( IS = 1; IS <= 2; ++IS ) {
 					if ( IS == 2 && SurfaceWindow( IWin ).ShadingFlag <= 0 && ! SurfaceWindow( IWin ).SolarDiffusing ) break;
 
-					ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( IL, IS, loop ) = DFSUHR( IS ) * HISUNF + HorIllSkyFac * ( DFSKHR( ISky1, IS ) * SkyWeight * HorIllSky( ISky1 ) + DFSKHR( ISky2, IS ) * ( 1.0 - SkyWeight ) * HorIllSky( ISky2 ) );
-					ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt( IL, IS, loop ) = BFSUHR( IS ) * HISUNF + HorIllSkyFac * ( BFSKHR( ISky1, IS ) * SkyWeight * HorIllSky( ISky1 ) + BFSKHR( ISky2, IS ) * ( 1.0 - SkyWeight ) * HorIllSky( ISky2 ) );
+					ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( loop, IS, IL ) = DFSUHR( IS ) * HISUNF + HorIllSkyFac * ( DFSKHR( IS, ISky1 ) * SkyWeight * HorIllSky( ISky1 ) + DFSKHR( IS, ISky2 ) * ( 1.0 - SkyWeight ) * HorIllSky( ISky2 ) );
+					ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt( loop, IS, IL ) = BFSUHR( IS ) * HISUNF + HorIllSkyFac * ( BFSKHR( IS, ISky1 ) * SkyWeight * HorIllSky( ISky1 ) + BFSKHR( IS, ISky2 ) * ( 1.0 - SkyWeight ) * HorIllSky( ISky2 ) );
 
-					ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop ) = SFSUHR( IS ) * HISUNF + HorIllSkyFac * ( SFSKHR( ISky1, IS ) * SkyWeight * HorIllSky( ISky1 ) + SFSKHR( ISky2, IS ) * ( 1.0 - SkyWeight ) * HorIllSky( ISky2 ) );
+					ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( loop, IS, IL ) = SFSUHR( IS ) * HISUNF + HorIllSkyFac * ( SFSKHR( IS, ISky1 ) * SkyWeight * HorIllSky( ISky1 ) + SFSKHR( IS, ISky2 ) * ( 1.0 - SkyWeight ) * HorIllSky( ISky2 ) );
 
-					ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop ) = max( ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop ), 0.0 );
+					ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( loop, IS, IL ) = max( ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( loop, IS, IL ), 0.0 );
 
 					// Added TH 1/21/2010 - save the original clear and dark (fully switched) states'
 					//  zone daylighting values, needed for switachable glazings
-					tmpIllumFromWinAtRefPt( IL, IS, loop ) = ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( IL, IS, loop );
-					tmpBackLumFromWinAtRefPt( IL, IS, loop ) = ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt( IL, IS, loop );
-					tmpSourceLumFromWinAtRefPt( IL, IS, loop ) = ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop );
+					tmpIllumFromWinAtRefPt( loop, IS, IL ) = ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( loop, IS, IL );
+					tmpBackLumFromWinAtRefPt( loop, IS, IL ) = ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt( loop, IS, IL );
+					tmpSourceLumFromWinAtRefPt( loop, IS, IL ) = ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( loop, IS, IL );
 				} // IS
 
 			} // End of reference point loop, IL
@@ -6213,8 +6213,8 @@ namespace DaylightingManager {
 			if ( ( SurfaceWindow( IWin ).ShadingFlag >= 1 && SurfaceWindow( IWin ).ShadingFlag <= 9 ) || SurfaceWindow( IWin ).SolarDiffusing ) IS = 2;
 
 			for ( IL = 1; IL <= NREFPT; ++IL ) {
-				DaylIllum( IL ) += ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( IL, IS, loop );
-				ZoneDaylight( ZoneNum ).BacLum( IL ) += ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt( IL, IS, loop );
+				DaylIllum( IL ) += ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( loop, IS, IL );
+				ZoneDaylight( ZoneNum ).BacLum( IL ) += ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt( loop, IS, IL );
 			}
 		} // End of second window loop over exterior windows associated with this zone
 
@@ -6240,9 +6240,9 @@ namespace DaylightingManager {
 				if ( ( SurfaceWindow( IWin ).ShadingFlag >= 1 && SurfaceWindow( IWin ).ShadingFlag <= 9 ) || SurfaceWindow( IWin ).SolarDiffusing ) IS = 2;
 				if ( ICtrl > 0 ) {
 					if ( SurfaceWindow( IWin ).ShadingFlag == GlassConditionallyLightened && WindowShadingControl( ICtrl ).ShadingControlType == WSCT_MeetDaylIlumSetp ) {
-						DILLSW += ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( 1, IS, loop );
+						DILLSW += ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( loop, IS, 1 );
 					} else {
-						DILLUN += ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( 1, IS, loop );
+						DILLUN += ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( loop, IS, 1 );
 					}
 				}
 			} // End of third window loop, IWin
@@ -6296,16 +6296,16 @@ namespace DaylightingManager {
 						//  and need to adjusted for intermediate switched state at VisTransSelected: IS = 2
 						IS = 1;
 						VTRAT = SurfaceWindow( IWin ).VisTransSelected / ( TVIS1 + 0.000001 );
-						DaylIllum( IL ) += ( VTRAT - 1.0 ) * ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( IL, IS, loop );
-						ZoneDaylight( ZoneNum ).BacLum( IL ) += ( VTRAT - 1.0 ) * ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt( IL, IS, loop );
+						DaylIllum( IL ) += ( VTRAT - 1.0 ) * ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( loop, IS, IL );
+						ZoneDaylight( ZoneNum ).BacLum( IL ) += ( VTRAT - 1.0 ) * ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt( loop, IS, IL );
 
 						// Adjust illum, background illum and source luminance for this window in intermediate switched state
 						//  for later use in the DayltgGlare calc because SurfaceWindow(IWin)%ShadingFlag = SwitchableGlazing = 2
 						IS = 2;
 						VTRAT = SurfaceWindow( IWin ).VisTransSelected / ( TVIS2 + 0.000001 );
-						ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( IL, IS, loop ) = VTRAT * tmpIllumFromWinAtRefPt( IL, IS, loop );
-						ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt( IL, IS, loop ) = VTRAT * tmpBackLumFromWinAtRefPt( IL, IS, loop );
-						ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop ) = VTRAT * tmpSourceLumFromWinAtRefPt( IL, IS, loop );
+						ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( loop, IS, IL ) = VTRAT * tmpIllumFromWinAtRefPt( loop, IS, IL );
+						ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt( loop, IS, IL ) = VTRAT * tmpBackLumFromWinAtRefPt( loop, IS, IL );
+						ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( loop, IS, IL ) = VTRAT * tmpSourceLumFromWinAtRefPt( loop, IS, IL );
 					} // IL
 
 					// If new daylight does not exceed the illuminance setpoint, done, no more checking other switchable glazings
@@ -6359,8 +6359,8 @@ namespace DaylightingManager {
 					//  For switchable windows, this may be partially switched rather than fully dark
 					for ( IL = 1; IL <= NREFPT; ++IL ) {
 						for ( IS = 1; IS <= 2; ++IS ) {
-							WDAYIL( IL, IS ) = ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( IL, IS, loop );
-							WBACLU( IL, IS ) = ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt( IL, IS, loop );
+							WDAYIL( IS, IL ) = ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( loop, IS, IL );
+							WBACLU( IS, IL ) = ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt( loop, IS, IL );
 						}
 					}
 
@@ -6370,12 +6370,12 @@ namespace DaylightingManager {
 						if ( SurfaceWindow( IWin ).ShadingFlag != SwitchableGlazing ) {
 							// for non switchable glazings or switchable glazings not switched yet (still in clear state)
 							//  SurfaceWindow(IWin)%ShadingFlag = GlassConditionallyLightened
-							RDAYIL( IL ) = DaylIllum( IL ) - WDAYIL( IL, 1 ) + WDAYIL( IL, 2 );
-							RBACLU( IL ) = ZoneDaylight( ZoneNum ).BacLum( IL ) - WBACLU( IL, 1 ) + WBACLU( IL, 2 );
+							RDAYIL( IL ) = DaylIllum( IL ) - WDAYIL( 1, IL ) + WDAYIL( 2, IL );
+							RBACLU( IL ) = ZoneDaylight( ZoneNum ).BacLum( IL ) - WBACLU( 1, IL ) + WBACLU( 2, IL );
 						} else {
 							// switchable glazings already in partially switched state when calc the RDAYIL(IL) & RBACLU(IL)
-							RDAYIL( IL ) = DaylIllum( IL ) - WDAYIL( IL, 2 ) + tmpIllumFromWinAtRefPt( IL, 2, loop );
-							RBACLU( IL ) = ZoneDaylight( ZoneNum ).BacLum( IL ) - WBACLU( IL, 2 ) + tmpBackLumFromWinAtRefPt( IL, 2, loop );
+							RDAYIL( IL ) = DaylIllum( IL ) - WDAYIL( 2, IL ) + tmpIllumFromWinAtRefPt( loop, 2, IL );
+							RBACLU( IL ) = ZoneDaylight( ZoneNum ).BacLum( IL ) - WBACLU( 2, IL ) + tmpBackLumFromWinAtRefPt( loop, 2, IL );
 						}
 					}
 
@@ -6385,9 +6385,9 @@ namespace DaylightingManager {
 					// update ZoneDaylight(ZoneNum)%SourceLumFromWinAtRefPt(IL,2,loop) for use in DayltgGlare
 					if ( SurfaceWindow( IWin ).ShadingFlag == SwitchableGlazing ) {
 						for ( IL = 1; IL <= NREFPT; ++IL ) {
-							ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, 2, loop ) = tmpSourceLumFromWinAtRefPt( IL, 2, loop );
-							ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( IL, 2, loop ) = tmpIllumFromWinAtRefPt( IL, 2, loop );
-							ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt( IL, 2, loop ) = tmpBackLumFromWinAtRefPt( IL, 2, loop );
+							ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( loop, 2, IL ) = tmpSourceLumFromWinAtRefPt( loop, 2, IL );
+							ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( loop, 2, IL ) = tmpIllumFromWinAtRefPt( loop, 2, IL );
+							ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt( loop, 2, IL ) = tmpBackLumFromWinAtRefPt( loop, 2, IL );
 						}
 
 						IConst = Surface( IWin ).Construction;
@@ -6438,9 +6438,9 @@ namespace DaylightingManager {
 
 							// RESET properties for fully dark state
 							for ( IL = 1; IL <= NREFPT; ++IL ) {
-								ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( IL, 2, loop ) = tmpIllumFromWinAtRefPt( IL, 2, loop );
-								ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt( IL, 2, loop ) = tmpBackLumFromWinAtRefPt( IL, 2, loop );
-								ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, 2, loop ) = tmpSourceLumFromWinAtRefPt( IL, 2, loop );
+								ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( loop, 2, IL ) = tmpIllumFromWinAtRefPt( loop, 2, IL );
+								ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt( loop, 2, IL ) = tmpBackLumFromWinAtRefPt( loop, 2, IL );
+								ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( loop, 2, IL ) = tmpSourceLumFromWinAtRefPt( loop, 2, IL );
 							}
 						}
 
@@ -6472,11 +6472,11 @@ namespace DaylightingManager {
 
 						// restore fully dark values
 						for ( IL = 1; IL <= NREFPT; ++IL ) {
-							WDAYIL( IL, 2 ) = tmpIllumFromWinAtRefPt( IL, 2, loop );
-							WBACLU( IL, 2 ) = tmpBackLumFromWinAtRefPt( IL, 2, loop );
-							ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( IL, 2, loop ) = tmpIllumFromWinAtRefPt( IL, 2, loop );
-							ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt( IL, 2, loop ) = tmpBackLumFromWinAtRefPt( IL, 2, loop );
-							ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, 2, loop ) = tmpSourceLumFromWinAtRefPt( IL, 2, loop );
+							WDAYIL( 2, IL ) = tmpIllumFromWinAtRefPt( loop, 2, IL );
+							WBACLU( 2, IL ) = tmpBackLumFromWinAtRefPt( loop, 2, IL );
+							ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( loop, 2, IL ) = tmpIllumFromWinAtRefPt( loop, 2, IL );
+							ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt( loop, 2, IL ) = tmpBackLumFromWinAtRefPt( loop, 2, IL );
+							ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( loop, 2, IL ) = tmpSourceLumFromWinAtRefPt( loop, 2, IL );
 						}
 					}
 
@@ -6497,23 +6497,23 @@ namespace DaylightingManager {
 							// Iteration to find the right switching factor meeting the glare index
 
 							// get fully dark state values
-							tmpSWSL1 = tmpSourceLumFromWinAtRefPt( 1, 2, loop );
-							if ( NREFPT > 1 ) tmpSWSL2 = tmpSourceLumFromWinAtRefPt( 2, 2, loop );
+							tmpSWSL1 = tmpSourceLumFromWinAtRefPt( loop, 2, 1 );
+							if ( NREFPT > 1 ) tmpSWSL2 = tmpSourceLumFromWinAtRefPt( loop, 2, 2 );
 
 							// use simple fixed step search in iteraction, can be improved in future
 							tmpSWFactor = 1.0 - tmpSWIterStep;
 							while ( tmpSWFactor > 0 ) {
 								// calc new glare at new switching state
 								for ( IL = 1; IL <= NREFPT; ++IL ) {
-									RDAYIL( IL ) = DaylIllum( IL ) + ( WDAYIL( IL, 1 ) - WDAYIL( IL, 2 ) ) * ( 1.0 - tmpSWFactor );
-									RBACLU( IL ) = ZoneDaylight( ZoneNum ).BacLum( IL ) + ( WBACLU( IL, 1 ) - WBACLU( IL, 2 ) ) * ( 1.0 - tmpSWFactor );
+									RDAYIL( IL ) = DaylIllum( IL ) + ( WDAYIL( 1, IL ) - WDAYIL( 2, IL ) ) * ( 1.0 - tmpSWFactor );
+									RBACLU( IL ) = ZoneDaylight( ZoneNum ).BacLum( IL ) + ( WBACLU( 1, IL ) - WBACLU( 2, IL ) ) * ( 1.0 - tmpSWFactor );
 									BACL = max( SetPnt( IL ) * ZoneDaylight( ZoneNum ).AveVisDiffReflect / Pi, RBACLU( IL ) );
 									// needs to update SourceLumFromWinAtRefPt(IL,2,loop) before re-calc DayltgGlare
 									tmpMult = ( TVIS1 - ( TVIS1 - TVIS2 ) * tmpSWFactor ) / TVIS2;
 									if ( IL == 1 ) {
-										ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, 2, loop ) = tmpSWSL1 * tmpMult;
+										ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( loop, 2, IL ) = tmpSWSL1 * tmpMult;
 									} else {
-										ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, 2, loop ) = tmpSWSL2 * tmpMult;
+										ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( loop, 2, IL ) = tmpSWSL2 * tmpMult;
 									}
 									// Calc new glare
 									DayltgGlare( IL, BACL, GLRNEW( IL ), ZoneNum );
@@ -6547,16 +6547,16 @@ namespace DaylightingManager {
 							if ( ! GlareOK ) {
 								// Glare too high, use previous state and re-calc
 								for ( IL = 1; IL <= NREFPT; ++IL ) {
-									RDAYIL( IL ) = DaylIllum( IL ) + ( WDAYIL( IL, 1 ) - WDAYIL( IL, 2 ) ) * ( 1.0 - tmpSWFactor );
-									RBACLU( IL ) = ZoneDaylight( ZoneNum ).BacLum( IL ) + ( WBACLU( IL, 1 ) - WBACLU( IL, 2 ) ) * ( 1.0 - tmpSWFactor );
+									RDAYIL( IL ) = DaylIllum( IL ) + ( WDAYIL( 1, IL ) - WDAYIL( 2, IL ) ) * ( 1.0 - tmpSWFactor );
+									RBACLU( IL ) = ZoneDaylight( ZoneNum ).BacLum( IL ) + ( WBACLU( 1, IL ) - WBACLU( 2, IL ) ) * ( 1.0 - tmpSWFactor );
 									BACL = max( SetPnt( IL ) * ZoneDaylight( ZoneNum ).AveVisDiffReflect / Pi, RBACLU( IL ) );
 
 									// needs to update SourceLumFromWinAtRefPt(IL,2,IWin) before re-calc DayltgGlare
 									tmpMult = ( TVIS1 - ( TVIS1 - TVIS2 ) * tmpSWFactor ) / TVIS2;
 									if ( IL == 1 ) {
-										ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( 1, 2, loop ) = tmpSWSL1 * tmpMult;
+										ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( loop, 2, 1 ) = tmpSWSL1 * tmpMult;
 									} else {
-										ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( 2, 2, loop ) = tmpSWSL2 * tmpMult;
+										ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( loop, 2, 2 ) = tmpSWSL2 * tmpMult;
 									}
 									DayltgGlare( IL, BACL, GLRNEW( IL ), ZoneNum );
 								}
@@ -6570,8 +6570,8 @@ namespace DaylightingManager {
 
 								tmpMult = ( TVIS1 - ( TVIS1 - TVIS2 ) * tmpSWFactor ) / TVIS2;
 								//update report variables
-								ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( IL, 2, loop ) = tmpIllumFromWinAtRefPt( IL, 2, loop ) * tmpMult;
-								ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt( IL, 2, loop ) = tmpBackLumFromWinAtRefPt( IL, 2, loop ) * tmpMult;
+								ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( loop, 2, IL ) = tmpIllumFromWinAtRefPt( loop, 2, IL ) * tmpMult;
+								ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt( loop, 2, IL ) = tmpBackLumFromWinAtRefPt( loop, 2, IL ) * tmpMult;
 							}
 							SurfaceWindow( IWin ).SwitchingFactor = tmpSWFactor;
 							SurfaceWindow( IWin ).VisTransSelected = TVIS1 - ( TVIS1 - TVIS2 ) * tmpSWFactor;
@@ -6632,11 +6632,11 @@ namespace DaylightingManager {
 				IWin = ZoneDaylight( ZoneNum ).DayltgExtWinSurfNums( loop );
 				IS = 1;
 				if ( SurfaceWindow( IWin ).ShadingFlag > 0 || SurfaceWindow( IWin ).SolarDiffusing ) IS = 2;
-				SurfaceWindow( IWin ).IllumFromWinAtRefPt1Rep = ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( 1, IS, loop );
-				SurfaceWindow( IWin ).LumWinFromRefPt1Rep = ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( 1, IS, loop );
+				SurfaceWindow( IWin ).IllumFromWinAtRefPt1Rep = ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( loop, IS, 1 );
+				SurfaceWindow( IWin ).LumWinFromRefPt1Rep = ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( loop, IS, 1 );
 				if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints > 1 ) {
-					SurfaceWindow( IWin ).IllumFromWinAtRefPt2Rep = ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( 2, IS, loop );
-					SurfaceWindow( IWin ).LumWinFromRefPt2Rep = ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( 2, IS, loop );
+					SurfaceWindow( IWin ).IllumFromWinAtRefPt2Rep = ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt( loop, IS, 2 );
+					SurfaceWindow( IWin ).LumWinFromRefPt2Rep = ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( loop, IS, 2 );
 				}
 			}
 		}
@@ -6705,17 +6705,17 @@ namespace DaylightingManager {
 		// Calculate and report TDD visible transmittances
 		for ( PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum ) {
 
-			TDDPipe( PipeNum ).TransVisBeam = WeightNow * TDDTransVisBeam( PipeNum, HourOfDay ) + WeightPreviousHour * TDDTransVisBeam( PipeNum, PreviousHour );
+			TDDPipe( PipeNum ).TransVisBeam = WeightNow * TDDTransVisBeam( HourOfDay, PipeNum ) + WeightPreviousHour * TDDTransVisBeam( PreviousHour, PipeNum );
 
 			for ( ISky = 1; ISky <= 4; ++ISky ) {
-				if ( TDDFluxInc( PipeNum, ISky, HourOfDay ) > 0.0 ) {
-					TDDTransVisDiffNow = TDDFluxTrans( PipeNum, ISky, HourOfDay ) / TDDFluxInc( PipeNum, ISky, HourOfDay );
+				if ( TDDFluxInc( HourOfDay, ISky, PipeNum ) > 0.0 ) {
+					TDDTransVisDiffNow = TDDFluxTrans( HourOfDay, ISky, PipeNum ) / TDDFluxInc( HourOfDay, ISky, PipeNum );
 				} else {
 					TDDTransVisDiffNow = 0.0;
 				}
 
-				if ( TDDFluxInc( PipeNum, ISky, PreviousHour ) > 0.0 ) {
-					TDDTransVisDiffPrev = TDDFluxTrans( PipeNum, ISky, PreviousHour ) / TDDFluxInc( PipeNum, ISky, PreviousHour );
+				if ( TDDFluxInc( PreviousHour, ISky, PipeNum ) > 0.0 ) {
+					TDDTransVisDiffPrev = TDDFluxTrans( PreviousHour, ISky, PipeNum ) / TDDFluxInc( PreviousHour, ISky, PipeNum );
 				} else {
 					TDDTransVisDiffPrev = 0.0;
 				}
@@ -6944,7 +6944,7 @@ namespace DaylightingManager {
 		Real64 FA; // Intermediate variables
 		Real64 FB;
 
-		static Array2D< Real64 > const PF( 7, 5, reshape2< Real64, int >( { 1.00, 0.492, 0.226, 0.128, 0.081, 0.061, 0.057, 0.123, 0.119, 0.065, 0.043, 0.029, 0.026, 0.023, 0.019, 0.026, 0.019, 0.016, 0.014, 0.011, 0.011, 0.008, 0.008, 0.008, 0.008, 0.008, 0.006, 0.006, 0.0, 0.0, 0.003, 0.003, 0.003, 0.003, 0.003 }, { 7, 5 } ) ); // Position factor array // Explicit reshape2 template args are work-around for VC++2013 bug
+		static Array2D< Real64 > const PF( 5, 7, reshape2< Real64, int >( { 1.00, 0.492, 0.226, 0.128, 0.081, 0.061, 0.057, 0.123, 0.119, 0.065, 0.043, 0.029, 0.026, 0.023, 0.019, 0.026, 0.019, 0.016, 0.014, 0.011, 0.011, 0.008, 0.008, 0.008, 0.008, 0.008, 0.006, 0.006, 0.0, 0.0, 0.003, 0.003, 0.003, 0.003, 0.003 }, { 5, 7 } ) ); // Position factor array // Explicit reshape2 template args are work-around for VC++2013 bug
 
 		// FLOW:
 		DayltgGlarePositionFactor = 0.0;
@@ -6955,8 +6955,8 @@ namespace DaylightingManager {
 		IY = 1 + int( 2.0 * Y );
 		X1 = 0.5 * double( IX - 1 );
 		Y1 = 0.5 * double( IY - 1 );
-		FA = PF( IX, IY ) + 2.0 * ( X - X1 ) * ( PF( IX + 1, IY ) - PF( IX, IY ) );
-		FB = PF( IX, IY + 1 ) + 2.0 * ( X - X1 ) * ( PF( IX + 1, IY + 1 ) - PF( IX, IY + 1 ) );
+		FA = PF( IY, IX ) + 2.0 * ( X - X1 ) * ( PF( IY, IX + 1 ) - PF( IY, IX ) );
+		FB = PF( IY + 1, IX ) + 2.0 * ( X - X1 ) * ( PF( IY + 1, IX + 1 ) - PF( IY + 1, IX ) );
 		DayltgGlarePositionFactor = FA + 2.0 * ( Y - Y1 ) * ( FB - FA );
 
 		return DayltgGlarePositionFactor;
@@ -7049,10 +7049,10 @@ namespace DaylightingManager {
 		// In the following I,J arrays:
 		// I = sky type;
 		// J = 1 for bare window, 2 and above for window with shade or blind.
-		static Array2D< Real64 > FLFWSK( 4, MaxSlatAngs+1 ); // Sky-related downgoing luminous flux
+		static Array2D< Real64 > FLFWSK( MaxSlatAngs+1, 4 ); // Sky-related downgoing luminous flux
 		static Array1D< Real64 > FLFWSU( MaxSlatAngs+1 ); // Sun-related downgoing luminous flux, excluding entering beam
 		static Array1D< Real64 > FLFWSUdisk( MaxSlatAngs+1 ); // Sun-related downgoing luminous flux, due to entering beam
-		static Array2D< Real64 > FLCWSK( 4, MaxSlatAngs+1 ); // Sky-related upgoing luminous flux
+		static Array2D< Real64 > FLCWSK( MaxSlatAngs+1, 4 ); // Sky-related upgoing luminous flux
 		static Array1D< Real64 > FLCWSU( MaxSlatAngs+1 ); // Sun-related upgoing luminous flux
 
 		int ISky; // Sky type index: 1=clear, 2=clear turbid,
@@ -7084,7 +7084,7 @@ namespace DaylightingManager {
 		//  element for clear and overcast sky
 		static Array1D< Real64 > U( 3 ); // Unit vector in (PH,TH) direction
 		Real64 ObTrans; // Product of solar transmittances of obstructions seen by a light ray
-		static Array2D< Real64 > ObTransM( NTHMAX, NPHMAX ); // ObTrans value for each (TH,PH) direction
+		static Array2D< Real64 > ObTransM( NPHMAX, NTHMAX ); // ObTrans value for each (TH,PH) direction
 		//unused  REAL(r64)         :: HitPointLumFrClearSky     ! Luminance of obstruction from clear sky (cd/m2)
 		//unused  REAL(r64)         :: HitPointLumFrOvercSky     ! Luminance of obstruction from overcast sky (cd/m2)
 		//unused  REAL(r64)         :: HitPointLumFrSun          ! Luminance of obstruction from sun (cd/m2)
@@ -7140,7 +7140,7 @@ namespace DaylightingManager {
 		Real64 LumAtHitPtFrSun; // Luminance at hit point on obstruction from solar reflection
 		//  for unit beam normal illuminance (cd/m2)
 		Real64 SunObstructionMult; // = 1 if sun hits a ground point; otherwise = 0
-		static Array2D< Real64 > SkyObstructionMult( NTHMAX, NPHMAX ); // Ratio of obstructed to unobstructed sky diffuse at
+		static Array2D< Real64 > SkyObstructionMult( NPHMAX, NTHMAX ); // Ratio of obstructed to unobstructed sky diffuse at
 		// a ground point for each (TH,PH) direction
 		Real64 Alfa; // Direction angles for ray heading towards the ground (radians)
 		Real64 Beta;
@@ -7192,9 +7192,9 @@ namespace DaylightingManager {
 
 		// FLOW:
 		// Initialize window luminance and fluxes for split-flux calculation
-		WLUMSK( _, _, IHR ) = 0.0;
-		WLUMSU( _, IHR ) = 0.0;
-		WLUMSUdisk( _, IHR ) = 0.0;
+		WLUMSK( IHR, _, _ ) = 0.0;
+		WLUMSU( IHR, _ ) = 0.0;
+		WLUMSUdisk( IHR, _ ) = 0.0;
 		FLFWSK = 0.0;
 		FLFWSU = 0.0;
 		FLFWSUdisk = 0.0;
@@ -7231,7 +7231,7 @@ namespace DaylightingManager {
 		DPH = ( PHMAX - PHMIN ) / double( NPHMAX );
 
 		// Sky/ground element altitude integration
-		Array1D< Real64 > const SUNCOS_IHR( SUNCOSHR( {1,3}, IHR ) );
+		Array1D< Real64 > const SUNCOS_IHR( SUNCOSHR( IHR, {1,3} ) );
 		for ( IPH = 1; IPH <= NPHMAX; ++IPH ) {
 			PH = PHMIN + ( double( IPH ) - 0.5 ) * DPH;
 
@@ -7288,7 +7288,7 @@ namespace DaylightingManager {
 					// Determine net transmittance of obstructions that the ray hits. ObTrans will be 1.0
 					// if no obstructions are hit.
 					DayltgHitObstruction( IHR, IWin, SurfaceWindow( IWin ).WinCenter, U, ObTrans );
-					ObTransM( ITH, IPH ) = ObTrans;
+					ObTransM( IPH, ITH ) = ObTrans;
 				}
 
 				// SKY AND GROUND RADIATION ON WINDOW
@@ -7297,13 +7297,13 @@ namespace DaylightingManager {
 				// (There may also be contributions from reflection from obstructions; see 'BEAM SOLAR AND SKY SOLAR
 				// REFLECTED FROM NEAREST OBSTRUCTION,' below.)
 
-				if ( ISunPos == 1 ) SkyObstructionMult( ITH, IPH ) = 1.0;
+				if ( ISunPos == 1 ) SkyObstructionMult( IPH, ITH ) = 1.0;
 				if ( PH > 0.0 ) { // Contribution is from sky
 					for ( ISky = 1; ISky <= 4; ++ISky ) {
-						ZSK( ISky ) = DayltgSkyLuminance( ISky, TH, PH ) * COSB * DA * ObTransM( ITH, IPH );
+						ZSK( ISky ) = DayltgSkyLuminance( ISky, TH, PH ) * COSB * DA * ObTransM( IPH, ITH );
 					}
 				} else { // PH <= 0.0; contribution is from ground
-					if ( CalcSolRefl && ObTransM( ITH, IPH ) > 1.e-6 && ISunPos == 1 ) {
+					if ( CalcSolRefl && ObTransM( IPH, ITH ) > 1.e-6 && ISunPos == 1 ) {
 						// Calculate effect of obstructions on shading of sky diffuse reaching the ground point hit
 						// by the ray. This effect is given by the ratio SkyObstructionMult =
 						// (obstructed sky diffuse at ground point)/(unobstructed sky diffuse at ground point).
@@ -7316,19 +7316,19 @@ namespace DaylightingManager {
 						GroundHitPt( 1 ) = SurfaceWindow( IWin ).WinCenter( 1 ) + HorDis * std::cos( Beta );
 						GroundHitPt( 2 ) = SurfaceWindow( IWin ).WinCenter( 2 ) + HorDis * std::sin( Beta );
 
-						SkyObstructionMult( ITH, IPH ) = CalcObstrMultiplier( GroundHitPt, AltAngStepsForSolReflCalc, AzimAngStepsForSolReflCalc );
+						SkyObstructionMult( IPH, ITH ) = CalcObstrMultiplier( GroundHitPt, AltAngStepsForSolReflCalc, AzimAngStepsForSolReflCalc );
 					} // End of check if solar reflection calc is in effect
 					for ( ISky = 1; ISky <= 4; ++ISky ) {
 						// Below, luminance of ground in cd/m2 is illuminance on ground in lumens/m2
 						// times ground reflectance, divided by pi, times obstruction multiplier.
-						ZSK( ISky ) = ( GILSK( ISky, IHR ) * GndReflectanceForDayltg / Pi ) * COSB * DA * ObTransM( ITH, IPH ) * SkyObstructionMult( ITH, IPH );
+						ZSK( ISky ) = ( GILSK( IHR, ISky ) * GndReflectanceForDayltg / Pi ) * COSB * DA * ObTransM( IPH, ITH ) * SkyObstructionMult( IPH, ITH );
 					}
 					// Determine if sun illuminates the point that ray hits the ground. If the solar reflection
 					// calculation has been requested (CalcSolRefl = .TRUE.) shading by obstructions, including
 					// the building itself, is considered in determining whether sun hits the ground point.
 					// Otherwise this shading is ignored and the sun always hits the ground point.
 					SunObstructionMult = 1.0;
-					if ( CalcSolRefl && ObTransM( ITH, IPH ) > 1.e-6 ) {
+					if ( CalcSolRefl && ObTransM( IPH, ITH ) > 1.e-6 ) {
 						// Sun reaches ground point if vector from this point to the sun is unobstructed
 						IHitObs = 0;
 						for ( ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum ) {
@@ -7338,12 +7338,12 @@ namespace DaylightingManager {
 						}
 						if ( IHitObs > 0 ) SunObstructionMult = 0.0;
 					}
-					ZSU = ( GILSU( IHR ) * GndReflectanceForDayltg / Pi ) * COSB * DA * ObTransM( ITH, IPH ) * SunObstructionMult;
+					ZSU = ( GILSU( IHR ) * GndReflectanceForDayltg / Pi ) * COSB * DA * ObTransM( IPH, ITH ) * SunObstructionMult;
 				}
 
 				// BEAM SOLAR AND SKY SOLAR REFLECTED FROM NEAREST OBSTRUCTION
 
-				if ( CalcSolRefl && ObTransM( ITH, IPH ) < 1.0 ) {
+				if ( CalcSolRefl && ObTransM( IPH, ITH ) < 1.0 ) {
 					// Find obstruction whose hit point is closest to the center of the window
 					DayltgClosestObstruction( SurfaceWindow( IWin ).WinCenter, U, NearestHitSurfNum, NearestHitPt );
 					if ( NearestHitSurfNum > 0 ) {
@@ -7386,11 +7386,11 @@ namespace DaylightingManager {
 						if ( ! DetailedSkyDiffuseAlgorithm || ! ShadingTransmittanceVaries || SolarDistribution == MinimalShadowing ) {
 							SkyReflVisLum = ObsVisRefl * Surface( NearestHitSurfNumX ).ViewFactorSky * DifShdgRatioIsoSky( NearestHitSurfNumX ) / Pi;
 						} else {
-							SkyReflVisLum = ObsVisRefl * Surface( NearestHitSurfNumX ).ViewFactorSky * DifShdgRatioIsoSkyHRTS( NearestHitSurfNumX, IHR, 1 ) / Pi;
+							SkyReflVisLum = ObsVisRefl * Surface( NearestHitSurfNumX ).ViewFactorSky * DifShdgRatioIsoSkyHRTS( 1, IHR, NearestHitSurfNumX ) / Pi;
 						}
 						dReflObsSky = SkyReflVisLum * COSB * DA;
 						for ( ISky = 1; ISky <= 4; ++ISky ) {
-							ZSK( ISky ) += GILSK( ISky, IHR ) * dReflObsSky;
+							ZSK( ISky ) += GILSK( IHR, ISky ) * dReflObsSky;
 						}
 					}
 				} // End of check if exterior solar reflection calculation is active
@@ -7407,22 +7407,22 @@ namespace DaylightingManager {
 
 					// Make all transmitted light diffuse for a TDD with a bare diffuser
 					for ( ISky = 1; ISky <= 4; ++ISky ) {
-						WLUMSK( ISky, 1, IHR ) += ZSK( ISky ) * TVISBR / Pi;
-						FLFWSK( ISky, 1 ) += ZSK( ISky ) * TVISBR * ( 1.0 - SurfaceWindow( IWin ).FractionUpgoing );
-						FLCWSK( ISky, 1 ) += ZSK( ISky ) * TVISBR * SurfaceWindow( IWin ).FractionUpgoing;
+						WLUMSK( IHR, 1, ISky ) += ZSK( ISky ) * TVISBR / Pi;
+						FLFWSK( 1, ISky ) += ZSK( ISky ) * TVISBR * ( 1.0 - SurfaceWindow( IWin ).FractionUpgoing );
+						FLCWSK( 1, ISky ) += ZSK( ISky ) * TVISBR * SurfaceWindow( IWin ).FractionUpgoing;
 
 						// For later calculation of diffuse visible transmittance
-						TDDFluxInc( PipeNum, ISky, IHR ) += ZSK( ISky );
-						TDDFluxTrans( PipeNum, ISky, IHR ) += ZSK( ISky ) * TVISBR;
+						TDDFluxInc( IHR, ISky, PipeNum ) += ZSK( ISky );
+						TDDFluxTrans( IHR, ISky, PipeNum ) += ZSK( ISky ) * TVISBR;
 
 						if ( ISky == 1 ) {
-							WLUMSU( 1, IHR ) += ZSU * TVISBR / Pi;
+							WLUMSU( IHR, 1 ) += ZSU * TVISBR / Pi;
 							FLFWSU( 1 ) += ZSU * TVISBR * ( 1.0 - SurfaceWindow( IWin ).FractionUpgoing );
 							FLCWSU( 1 ) += ZSU * TVISBR * SurfaceWindow( IWin ).FractionUpgoing;
 
 							// For later calculation of diffuse visible transmittance
-							TDDFluxInc( PipeNum, ISky, IHR ) += ZSU;
-							TDDFluxTrans( PipeNum, ISky, IHR ) += ZSU * TVISBR;
+							TDDFluxInc( IHR, ISky, PipeNum ) += ZSU;
+							TDDFluxTrans( IHR, ISky, PipeNum ) += ZSU * TVISBR;
 						}
 					}
 
@@ -7435,7 +7435,7 @@ namespace DaylightingManager {
 						// Daylighting shelf simplification:  All light is diffuse
 						// SurfaceWindow(IWin)%FractionUpgoing is already set to 1.0 earlier
 						for ( ISky = 1; ISky <= 4; ++ISky ) {
-							FLCWSK( ISky, 1 ) += ZSK( ISky ) * TVISBR * SurfaceWindow( IWin ).FractionUpgoing;
+							FLCWSK( 1, ISky ) += ZSK( ISky ) * TVISBR * SurfaceWindow( IWin ).FractionUpgoing;
 
 							if ( ISky == 1 ) {
 								FLCWSU( 1 ) += ZSU * TVISBR * SurfaceWindow( IWin ).FractionUpgoing;
@@ -7468,10 +7468,10 @@ namespace DaylightingManager {
 							//IF (PH < 0.0d0) THEN
 							//Fixed by FCW, Nov. 2003:
 							if ( PH > 0.0 ) {
-								FLFWSK( ISky, 1 ) += ZSK( ISky ) * TVISBR;
+								FLFWSK( 1, ISky ) += ZSK( ISky ) * TVISBR;
 								if ( ISky == 1 ) FLFWSU( 1 ) += ZSU * TVISBR;
 							} else {
-								FLCWSK( ISky, 1 ) += ZSK( ISky ) * TVISBR;
+								FLCWSK( 1, ISky ) += ZSK( ISky ) * TVISBR;
 								if ( ISky == 1 ) FLCWSU( 1 ) += ZSU * TVISBR;
 							}
 
@@ -7546,11 +7546,11 @@ namespace DaylightingManager {
 						for ( JB = 1; JB <= MaxSlatAngs; ++JB ) {
 							if ( ! SurfaceWindow( IWin ).MovableSlats && JB > 1 ) break;
 
-							TransBlBmDiffFront = InterpProfAng( ProfAng, Blind( BlNum ).VisFrontBeamDiffTrans( {1,37}, JB ) );
+							TransBlBmDiffFront = InterpProfAng( ProfAng, Blind( BlNum ).VisFrontBeamDiffTrans( JB, {1,37} ) );
 
 							if ( ShType == WSC_ST_InteriorBlind ) { // Interior blind
 								ReflGlDiffDiffBack = Construct( IConst ).ReflectVisDiffBack;
-								ReflBlBmDiffFront = InterpProfAng( ProfAng, Blind( BlNum ).VisFrontBeamDiffRefl( {1,37}, JB ) );
+								ReflBlBmDiffFront = InterpProfAng( ProfAng, Blind( BlNum ).VisFrontBeamDiffRefl( JB, {1,37} ) );
 								ReflBlDiffDiffFront = Blind( BlNum ).VisFrontDiffDiffRefl( JB );
 								TransBlDiffDiffFront = Blind( BlNum ).VisFrontDiffDiffTrans( JB );
 								TransMult( JB ) = TVISBR * ( TransBlBmDiffFront + ReflBlBmDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront / ( 1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack ) );
@@ -7561,18 +7561,18 @@ namespace DaylightingManager {
 								TransMult( JB ) = TransBlBmDiffFront * SurfaceWindow( IWin ).GlazedFrac * Construct( IConst ).TransDiffVis / ( 1.0 - ReflGlDiffDiffFront * ReflBlDiffDiffBack ) * SurfaceWindow( IWin ).LightWellEff;
 
 							} else { // Between-glass blind
-								t1 = POLYF( COSB, Construct( IConst ).tBareVisCoef( 1, {1,6} ) );
+								t1 = POLYF( COSB, Construct( IConst ).tBareVisCoef( {1,6}, 1 ) );
 								td2 = Construct( IConst ).tBareVisDiff( 2 );
 								rbd1 = Construct( IConst ).rbBareVisDiff( 1 );
 								rfd2 = Construct( IConst ).rfBareVisDiff( 2 );
-								tfshBd = InterpProfAng( ProfAng, Blind( BlNum ).VisFrontBeamDiffTrans( {1,37}, JB ) );
+								tfshBd = InterpProfAng( ProfAng, Blind( BlNum ).VisFrontBeamDiffTrans( JB, {1,37} ) );
 								tfshd = Blind( BlNum ).VisFrontDiffDiffTrans( JB );
-								rfshB = InterpProfAng( ProfAng, Blind( BlNum ).VisFrontBeamDiffRefl( {1,37}, JB ) );
+								rfshB = InterpProfAng( ProfAng, Blind( BlNum ).VisFrontBeamDiffRefl( JB, {1,37} ) );
 								rbshd = Blind( BlNum ).VisFrontDiffDiffRefl( JB );
 								if ( Construct( IConst ).TotGlassLayers == 2 ) { // 2 glass layers
 									TransMult( JB ) = t1 * ( tfshBd * ( 1.0 + rfd2 * rbshd ) + rfshB * rbd1 * tfshd ) * td2 * SurfaceWindow( IWin ).LightWellEff;
 								} else { // 3 glass layers; blind between layers 2 and 3
-									t2 = POLYF( COSB, Construct( IConst ).tBareVisCoef( 2, {1,6} ) );
+									t2 = POLYF( COSB, Construct( IConst ).tBareVisCoef( {1,6}, 2 ) );
 									td3 = Construct( IConst ).tBareVisDiff( 3 );
 									rfd3 = Construct( IConst ).rfBareVisDiff( 3 );
 									rbd2 = Construct( IConst ).rbBareVisDiff( 2 );
@@ -7610,13 +7610,13 @@ namespace DaylightingManager {
 							// EXIT after first pass if not movable slats or exterior window screen
 							if ( ! SurfaceWindow( IWin ).MovableSlats && JB > 1 ) break;
 
-							WLUMSK( ISky, JB + 1, IHR ) += ZSK( ISky ) * TransMult( JB ) / Pi;
-							FLFWSK( ISky, JB + 1 ) += ZSK( ISky ) * TransMult( JB ) * ( 1.0 - SurfaceWindow( IWin ).FractionUpgoing );
-							if ( PH > 0.0 && ( BlindOn || ScreenOn ) ) FLFWSK( ISky, JB + 1 ) += ZSK( ISky ) * TransBmBmMult( JB );
-							FLCWSK( ISky, JB + 1 ) += ZSK( ISky ) * TransMult( JB ) * SurfaceWindow( IWin ).FractionUpgoing;
-							if ( PH <= 0.0 && ( BlindOn || ScreenOn ) ) FLCWSK( ISky, JB + 1 ) += ZSK( ISky ) * TransBmBmMult( JB );
+							WLUMSK( IHR, JB + 1, ISky ) += ZSK( ISky ) * TransMult( JB ) / Pi;
+							FLFWSK( JB + 1, ISky ) += ZSK( ISky ) * TransMult( JB ) * ( 1.0 - SurfaceWindow( IWin ).FractionUpgoing );
+							if ( PH > 0.0 && ( BlindOn || ScreenOn ) ) FLFWSK( JB + 1, ISky ) += ZSK( ISky ) * TransBmBmMult( JB );
+							FLCWSK( JB + 1, ISky ) += ZSK( ISky ) * TransMult( JB ) * SurfaceWindow( IWin ).FractionUpgoing;
+							if ( PH <= 0.0 && ( BlindOn || ScreenOn ) ) FLCWSK( JB + 1, ISky ) += ZSK( ISky ) * TransBmBmMult( JB );
 							if ( ISky == 1 ) {
-								WLUMSU( JB + 1, IHR ) += ZSU * TransMult( JB ) / Pi;
+								WLUMSU( IHR, JB + 1 ) += ZSU * TransMult( JB ) / Pi;
 								FLFWSU( JB + 1 ) += ZSU * TransMult( JB ) * ( 1.0 - SurfaceWindow( IWin ).FractionUpgoing );
 								if ( PH > 0.0 && ( BlindOn || ScreenOn ) ) FLFWSU( JB + 1 ) += ZSU * TransBmBmMult( JB );
 								FLCWSU( JB + 1 ) += ZSU * TransMult( JB ) * SurfaceWindow( IWin ).FractionUpgoing;
@@ -7638,13 +7638,13 @@ namespace DaylightingManager {
 			for ( ISky = 1; ISky <= 4; ++ISky ) {
 				// This is only an estimate because the anisotropic sky view of the shelf is not yet taken into account.
 				// AnisoSkyMult would be great to use but it is not available until the heat balance starts up.
-				ZSK( ISky ) = GILSK( ISky, IHR ) * 1.0 * Shelf( ShelfNum ).OutReflectVis * Shelf( ShelfNum ).ViewFactor;
+				ZSK( ISky ) = GILSK( IHR, ISky ) * 1.0 * Shelf( ShelfNum ).OutReflectVis * Shelf( ShelfNum ).ViewFactor;
 
 				// SurfaceWindow(IWin)%FractionUpgoing is already set to 1.0 earlier
-				FLCWSK( ISky, 1 ) += ZSK( ISky ) * TVISBR * SurfaceWindow( IWin ).FractionUpgoing;
+				FLCWSK( 1, ISky ) += ZSK( ISky ) * TVISBR * SurfaceWindow( IWin ).FractionUpgoing;
 
 				if ( ISky == 1 ) {
-					ZSU = GILSU( IHR ) * SunlitFracHR( OutShelfSurf, IHR ) * Shelf( ShelfNum ).OutReflectVis * Shelf( ShelfNum ).ViewFactor;
+					ZSU = GILSU( IHR ) * SunlitFracHR( IHR, OutShelfSurf ) * Shelf( ShelfNum ).OutReflectVis * Shelf( ShelfNum ).ViewFactor;
 					FLCWSU( 1 ) += ZSU * TVISBR * SurfaceWindow( IWin ).FractionUpgoing;
 				}
 			} // ISKY
@@ -7659,7 +7659,7 @@ namespace DaylightingManager {
 				if ( ! SurfaceWindow( IWin ).MovableSlats && JSH > 2 ) break;
 				// Full area of window is used in following since effect of dividers on reducing
 				// effective window transmittance has already been accounted for in calc of FLFWSK and FLCWSK.
-				EINTSK( ISky, JSH, IHR ) = ( FLFWSK( ISky, JSH ) * SurfaceWindow( IWin ).RhoFloorWall + FLCWSK( ISky, JSH ) * SurfaceWindow( IWin ).RhoCeilingWall ) * ( Surface( IWin ).Area / SurfaceWindow( IWin ).GlazedFrac ) / ( ZoneInsideSurfArea * ( 1.0 - ZoneDaylight( ZoneNum ).AveVisDiffReflect ) );
+				EINTSK( IHR, JSH, ISky ) = ( FLFWSK( JSH, ISky ) * SurfaceWindow( IWin ).RhoFloorWall + FLCWSK( JSH, ISky ) * SurfaceWindow( IWin ).RhoCeilingWall ) * ( Surface( IWin ).Area / SurfaceWindow( IWin ).GlazedFrac ) / ( ZoneInsideSurfArea * ( 1.0 - ZoneDaylight( ZoneNum ).AveVisDiffReflect ) );
 			} // JSH
 		} // ISKY
 
@@ -7667,7 +7667,7 @@ namespace DaylightingManager {
 
 		// Beam reaching window directly (without specular reflection from exterior obstructions)
 
-		if ( SunlitFracHR( IWin, IHR ) > 0.0 ) {
+		if ( SunlitFracHR( IHR, IWin ) > 0.0 ) {
 			// Cos of angle of incidence
 			COSBSun = SPHSUN * std::sin( SurfaceWindow( IWin ).Phi ) + CPHSUN * std::cos( SurfaceWindow( IWin ).Phi ) * std::cos( THSUN - SurfaceWindow( IWin ).Theta );
 
@@ -7677,7 +7677,7 @@ namespace DaylightingManager {
 				// Note that in the following SunlitFracHR accounts for possibly non-zero transmittance of
 				// shading surfaces.
 
-				ZSU1 = COSBSun * SunlitFracHR( IWin, IHR );
+				ZSU1 = COSBSun * SunlitFracHR( IHR, IWin );
 
 				// Contribution to window luminance and downgoing flux
 
@@ -7686,11 +7686,11 @@ namespace DaylightingManager {
 				if ( SurfaceWindow( IWin ).OriginalClass == SurfaceClass_TDD_Dome ) {
 					// Unshaded visible transmittance of TDD for collimated beam from the sun
 					TVISBSun = TransTDD( PipeNum, COSBSun, VisibleBeam ) * SurfaceWindow( IWin ).GlazedFrac;
-					TDDTransVisBeam( PipeNum, IHR ) = TVISBSun;
+					TDDTransVisBeam( IHR, PipeNum ) = TVISBSun;
 
 					FLFWSUdisk( 1 ) = 0.0; // Diffuse light only
 
-					WLUMSU( 1, IHR ) += ZSU1 * TVISBSun / Pi;
+					WLUMSU( IHR, 1 ) += ZSU1 * TVISBSun / Pi;
 					FLFWSU( 1 ) += ZSU1 * TVISBSun * ( 1.0 - SurfaceWindow( IWin ).FractionUpgoing );
 					FLCWSU( 1 ) += ZSU1 * TVISBSun * SurfaceWindow( IWin ).FractionUpgoing;
 
@@ -7716,7 +7716,7 @@ namespace DaylightingManager {
 					TransMult = 0.0;
 
 					// TH 7/7/2010 moved from inside the loop: DO JB = 1,MaxSlatAngs
-					if ( BlindOn ) ProfileAngle( IWin, SUNCOSHR( {1,3}, IHR ), Blind( BlNum ).SlatOrientation, ProfAng );
+					if ( BlindOn ) ProfileAngle( IWin, SUNCOSHR( IHR, {1,3} ), Blind( BlNum ).SlatOrientation, ProfAng );
 
 					for ( JB = 1; JB <= MaxSlatAngs; ++JB ) {
 						if ( ! SurfaceWindow( IWin ).MovableSlats && JB > 1 ) break;
@@ -7741,12 +7741,12 @@ namespace DaylightingManager {
 							// TH 7/7/2010: This call is moved outside the loop - DO JB = 1,MaxSlatAngs
 							//CALL ProfileAngle(IWin,SUNCOSHR(1:3,IHR),Blind(BlNum)%SlatOrientation,ProfAng)
 
-							TransBlBmDiffFront = InterpProfAng( ProfAng, Blind( BlNum ).VisFrontBeamDiffTrans( {1,37}, JB ) );
+							TransBlBmDiffFront = InterpProfAng( ProfAng, Blind( BlNum ).VisFrontBeamDiffTrans( JB, {1,37} ) );
 
 							if ( ShType == WSC_ST_InteriorBlind ) { // Interior blind
 								// TH CR 8121, 7/7/2010
 								//ReflBlBmDiffFront = InterpProfAng(ProfAng,Blind(BlNum)%VisFrontBeamDiffRefl)
-								ReflBlBmDiffFront = InterpProfAng( ProfAng, Blind( BlNum ).VisFrontBeamDiffRefl( {1,37}, JB ) );
+								ReflBlBmDiffFront = InterpProfAng( ProfAng, Blind( BlNum ).VisFrontBeamDiffRefl( JB, {1,37} ) );
 
 								// TH added 7/12/2010 for CR 8121
 								ReflBlDiffDiffFront = Blind( BlNum ).VisFrontDiffDiffRefl( JB );
@@ -7758,13 +7758,13 @@ namespace DaylightingManager {
 								TransMult( JB ) = TransBlBmDiffFront * ( Construct( IConst ).TransDiffVis / ( 1.0 - ReflGlDiffDiffFront * Blind( BlNum ).VisBackDiffDiffRefl( JB ) ) ) * SurfaceWindow( IWin ).GlazedFrac * SurfaceWindow( IWin ).LightWellEff;
 
 							} else { // Between-glass blind
-								t1 = POLYF( COSBSun, Construct( IConst ).tBareVisCoef( 1, {1,6} ) );
-								tfshBd = InterpProfAng( ProfAng, Blind( BlNum ).VisFrontBeamDiffTrans( {1,37}, JB ) );
-								rfshB = InterpProfAng( ProfAng, Blind( BlNum ).VisFrontBeamDiffRefl( {1,37}, JB ) );
+								t1 = POLYF( COSBSun, Construct( IConst ).tBareVisCoef( {1,6}, 1 ) );
+								tfshBd = InterpProfAng( ProfAng, Blind( BlNum ).VisFrontBeamDiffTrans( JB, {1,37} ) );
+								rfshB = InterpProfAng( ProfAng, Blind( BlNum ).VisFrontBeamDiffRefl( JB, {1,37} ) );
 								if ( Construct( IConst ).TotGlassLayers == 2 ) { // 2 glass layers
 									TransMult( JB ) = t1 * ( tfshBd * ( 1.0 + rfd2 * rbshd ) + rfshB * rbd1 * tfshd ) * td2 * SurfaceWindow( IWin ).LightWellEff;
 								} else { // 3 glass layers; blind between layers 2 and 3
-									t2 = POLYF( COSBSun, Construct( IConst ).tBareVisCoef( 2, {1,6} ) );
+									t2 = POLYF( COSBSun, Construct( IConst ).tBareVisCoef( {1,6}, 2 ) );
 									TransMult( JB ) = t1 * t2 * ( tfshBd * ( 1.0 + rfd3 * rbshd ) + rfshB * ( rbd2 * tfshd + td2 * rbd1 * td2 * tfshd ) ) * td3 * SurfaceWindow( IWin ).LightWellEff;
 								}
 							}
@@ -7786,8 +7786,8 @@ namespace DaylightingManager {
 							// SurfaceWindow(IWin)%FractionUpgoing is already set to 1.0 earlier
 						}
 
-						WLUMSU( JB + 1, IHR ) += ZSU1 * TransMult( JB ) / Pi;
-						WLUMSUdisk( JB + 1, IHR ) = ZSU1 * TransBmBmMult( JB ) / Pi;
+						WLUMSU( IHR, JB + 1 ) += ZSU1 * TransMult( JB ) / Pi;
+						WLUMSUdisk( IHR, JB + 1 ) = ZSU1 * TransBmBmMult( JB ) / Pi;
 						FLFWSU( JB + 1 ) += ZSU1 * TransMult( JB ) * ( 1.0 - SurfaceWindow( IWin ).FractionUpgoing );
 						FLFWSUdisk( JB + 1 ) = ZSU1 * TransBmBmMult( JB );
 						FLCWSU( JB + 1 ) += ZSU1 * TransMult( JB ) * SurfaceWindow( IWin ).FractionUpgoing;
@@ -7802,7 +7802,7 @@ namespace DaylightingManager {
 		// specular reflection from exterior surfaces
 
 		if ( CalcSolRefl && SurfaceWindow( IWin ).OriginalClass != SurfaceClass_TDD_Dome ) {
-			ZSU1refl = ReflFacBmToBmSolObs( IWin, IHR );
+			ZSU1refl = ReflFacBmToBmSolObs( IHR, IWin );
 
 			if ( ZSU1refl > 0.0 ) {
 				// Contribution to window luminance and downgoing flux
@@ -7855,7 +7855,7 @@ namespace DaylightingManager {
 							} // End of check of interior/exterior/between-glass blind
 						} // ShadeOn/BlindOn
 
-						WLUMSU( JB + 1, IHR ) += ZSU1refl * TransMult( JB ) / Pi;
+						WLUMSU( IHR, JB + 1 ) += ZSU1refl * TransMult( JB ) / Pi;
 						FLFWSU( JB + 1 ) += ZSU1refl * TransMult( JB ) * ( 1.0 - SurfaceWindow( IWin ).FractionUpgoing );
 						FLCWSU( JB + 1 ) += ZSU1refl * TransMult( JB ) * SurfaceWindow( IWin ).FractionUpgoing;
 					} // End of loop over slat angles
@@ -7872,9 +7872,9 @@ namespace DaylightingManager {
 			// effective window transmittance already accounted for in calc of FLFWSU and FLCWSU
 			// CR 7869 added effect of intervening interior windows on transmittance and
 			// added inside surface area of adjacent zone
-			EINTSU( JSH, IHR ) = ( FLFWSU( JSH ) * SurfaceWindow( IWin ).RhoFloorWall + FLCWSU( JSH ) * SurfaceWindow( IWin ).RhoCeilingWall ) * ( Surface( IWin ).Area / SurfaceWindow( IWin ).GlazedFrac ) / ( ZoneInsideSurfArea * ( 1.0 - ZoneDaylight( ZoneNum ).AveVisDiffReflect ) );
+			EINTSU( IHR, JSH ) = ( FLFWSU( JSH ) * SurfaceWindow( IWin ).RhoFloorWall + FLCWSU( JSH ) * SurfaceWindow( IWin ).RhoCeilingWall ) * ( Surface( IWin ).Area / SurfaceWindow( IWin ).GlazedFrac ) / ( ZoneInsideSurfArea * ( 1.0 - ZoneDaylight( ZoneNum ).AveVisDiffReflect ) );
 
-			EINTSUdisk( JSH, IHR ) = FLFWSUdisk( JSH ) * SurfaceWindow( IWin ).RhoFloorWall * ( Surface( IWin ).Area / SurfaceWindow( IWin ).GlazedFrac ) / ( ZoneInsideSurfArea * ( 1.0 - ZoneDaylight( ZoneNum ).AveVisDiffReflect ) );
+			EINTSUdisk( IHR, JSH ) = FLFWSUdisk( JSH ) * SurfaceWindow( IWin ).RhoFloorWall * ( Surface( IWin ).Area / SurfaceWindow( IWin ).GlazedFrac ) / ( ZoneInsideSurfArea * ( 1.0 - ZoneDaylight( ZoneNum ).AveVisDiffReflect ) );
 		}
 
 	}
@@ -7909,7 +7909,7 @@ namespace DaylightingManager {
 		// USE STATEMENTS:
 
 		// Argument array dimensioning
-		ElementLuminanceSky.dim( NBasis, 4 );
+		ElementLuminanceSky.dim( 4, NBasis );
 		ElementLuminanceSun.dim( NBasis );
 		ElementLuminanceSunDisk.dim( NBasis );
 
@@ -7946,7 +7946,7 @@ namespace DaylightingManager {
 		CurCplxFenState = SurfaceWindow( IWin ).ComplexFen.CurrentState;
 
 		// Calculate luminance from sky and sun excluding exterior obstruction transmittances and obstruction multipliers
-		SolBmIndex = ComplexWind( IWin ).Geom( CurCplxFenState ).SolBmIndex( IHR, TimeStep );
+		SolBmIndex = ComplexWind( IWin ).Geom( CurCplxFenState ).SolBmIndex( TimeStep, IHR );
 		for ( iIncElem = 1; iIncElem <= NBasis; ++iIncElem ) {
 			LambdaInc = ComplexWind( IWin ).Geom( CurCplxFenState ).Inc.Lamda( iIncElem );
 			//COSB = ComplexWind(IWin)%Geom(CurCplxFenState)%CosInc(iIncElem)
@@ -7956,26 +7956,26 @@ namespace DaylightingManager {
 			if ( Altitude > 0.0 ) {
 				// Ray from sky element
 				for ( iSky = 1; iSky <= 4; ++iSky ) {
-					ElementLuminanceSky( iIncElem, iSky ) = DayltgSkyLuminance( iSky, Azimuth, Altitude ) * LambdaInc;
+					ElementLuminanceSky( iSky, iIncElem ) = DayltgSkyLuminance( iSky, Azimuth, Altitude ) * LambdaInc;
 				}
 			} else if ( Altitude < 0.0 ) {
 				// Ray from ground element
 				// BeamObstrMultiplier = ComplexWind(IWin)%DaylghtGeom(CurCplxFenState)%GndObstrMultiplier(WinEl, iIncElem)
 				for ( iSky = 1; iSky <= 4; ++iSky ) {
-					ElementLuminanceSky( iIncElem, iSky ) = GILSK( iSky, IHR ) * GndReflectanceForDayltg / Pi * LambdaInc;
+					ElementLuminanceSky( iSky, iIncElem ) = GILSK( IHR, iSky ) * GndReflectanceForDayltg / Pi * LambdaInc;
 				}
 				ElementLuminanceSun( iIncElem ) = GILSU( IHR ) * GndReflectanceForDayltg / Pi * LambdaInc;
 			} else {
 				// Ray from the element which is half sky and half ground
 				for ( iSky = 1; iSky <= 4; ++iSky ) {
 					// in this case half of the pach is coming from the sky and half from the ground
-					ElementLuminanceSky( iIncElem, iSky ) = 0.5 * DayltgSkyLuminance( iSky, Azimuth, Altitude ) * LambdaInc;
-					ElementLuminanceSky( iIncElem, iSky ) += 0.5 * GILSK( iSky, IHR ) * GndReflectanceForDayltg / Pi * LambdaInc;
+					ElementLuminanceSky( iSky, iIncElem ) = 0.5 * DayltgSkyLuminance( iSky, Azimuth, Altitude ) * LambdaInc;
+					ElementLuminanceSky( iSky, iIncElem ) += 0.5 * GILSK( IHR, iSky ) * GndReflectanceForDayltg / Pi * LambdaInc;
 				}
 				ElementLuminanceSun( iIncElem ) = 0.5 * GILSU( IHR ) * GndReflectanceForDayltg / Pi * LambdaInc;
 			}
 			// Sun beam calculations
-			if ( ( SolBmIndex == iIncElem ) && ( SunlitFracHR( IWin, IHR ) > 0.0 ) ) {
+			if ( ( SolBmIndex == iIncElem ) && ( SunlitFracHR( IHR, IWin ) > 0.0 ) ) {
 				ElementLuminanceSunDisk( iIncElem ) = 1.0;
 			}
 		}
@@ -7984,19 +7984,19 @@ namespace DaylightingManager {
 		if ( CalledFrom == CalledForRefPoint ) {
 			NRefl = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).RefPoint( iRefPoint ).NReflSurf( WinEl );
 		} else {
-			NRefl = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( MapNum, iRefPoint ).NReflSurf( WinEl );
+			NRefl = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( iRefPoint, MapNum ).NReflSurf( WinEl );
 		}
 		for ( iReflElem = 1; iReflElem <= NRefl; ++iReflElem ) {
 			if ( CalledFrom == CalledForRefPoint ) {
-				ObstrTrans = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).RefPoint( iRefPoint ).TransOutSurf( WinEl, iReflElem );
-				iReflElemIndex = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).RefPoint( iRefPoint ).RefSurfIndex( WinEl, iReflElem );
+				ObstrTrans = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).RefPoint( iRefPoint ).TransOutSurf( iReflElem, WinEl );
+				iReflElemIndex = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).RefPoint( iRefPoint ).RefSurfIndex( iReflElem, WinEl );
 			} else {
-				ObstrTrans = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( MapNum, iRefPoint ).TransOutSurf( WinEl, iReflElem );
-				iReflElemIndex = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( MapNum, iRefPoint ).RefSurfIndex( WinEl, iReflElem );
+				ObstrTrans = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( iRefPoint, MapNum ).TransOutSurf( iReflElem, WinEl );
+				iReflElemIndex = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( iRefPoint, MapNum ).RefSurfIndex( iReflElem, WinEl );
 			}
 
 			for ( iSky = 1; iSky <= 4; ++iSky ) {
-				ElementLuminanceSky( iReflElemIndex, iSky ) *= ObstrTrans;
+				ElementLuminanceSky( iSky, iReflElemIndex ) *= ObstrTrans;
 			}
 			ElementLuminanceSun( iReflElemIndex ) *= ObstrTrans;
 			ElementLuminanceSunDisk( iReflElemIndex ) *= ObstrTrans;
@@ -8007,21 +8007,21 @@ namespace DaylightingManager {
 		if ( CalledFrom == CalledForRefPoint ) {
 			NGnd = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).RefPoint( iRefPoint ).NGnd( WinEl );
 		} else {
-			NGnd = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( MapNum, iRefPoint ).NGnd( WinEl );
+			NGnd = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( iRefPoint, MapNum ).NGnd( WinEl );
 		}
-		Array1D< Real64 > const SUNCOS_IHR( SUNCOSHR( {1,3}, IHR ) );
+		Array1D< Real64 > const SUNCOS_IHR( SUNCOSHR( IHR, {1,3} ) );
 		for ( iGndElem = 1; iGndElem <= NGnd; ++iGndElem ) {
 			// case for sky elements. Integration is done over upper ground hemisphere to determine how many obstructions
 			// were hit in the process
 			if ( CalledFrom == CalledForRefPoint ) {
-				BeamObstrMultiplier = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).RefPoint( iRefPoint ).GndObstrMultiplier( WinEl, iGndElem );
-				iGndElemIndex = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).RefPoint( iRefPoint ).GndIndex( WinEl, iGndElem );
+				BeamObstrMultiplier = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).RefPoint( iRefPoint ).GndObstrMultiplier( iGndElem, WinEl );
+				iGndElemIndex = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).RefPoint( iRefPoint ).GndIndex( iGndElem, WinEl );
 			} else {
-				BeamObstrMultiplier = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( MapNum, iRefPoint ).GndObstrMultiplier( WinEl, iGndElem );
-				iGndElemIndex = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( MapNum, iRefPoint ).GndIndex( WinEl, iGndElem );
+				BeamObstrMultiplier = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( iRefPoint, MapNum ).GndObstrMultiplier( iGndElem, WinEl );
+				iGndElemIndex = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( iRefPoint, MapNum ).GndIndex( iGndElem, WinEl );
 			}
 			for ( iSky = 1; iSky <= 4; ++iSky ) {
-				ElementLuminanceSky( iGndElemIndex, iSky ) *= BeamObstrMultiplier;
+				ElementLuminanceSky( iSky, iGndElemIndex ) *= BeamObstrMultiplier;
 			}
 
 			// direct sun disk reflect off the ground
@@ -8032,13 +8032,13 @@ namespace DaylightingManager {
 				for ( ObsSurfNum = 1; ObsSurfNum <= TotSurfaces; ++ObsSurfNum ) {
 					if ( ! Surface( ObsSurfNum ).ShadowSurfPossibleObstruction ) continue;
 					if ( CalledFrom == CalledForRefPoint ) {
-						GroundHitPt( 1 ) = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).RefPoint( iRefPoint ).GndPt( WinEl, iGndElem ).x;
-						GroundHitPt( 2 ) = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).RefPoint( iRefPoint ).GndPt( WinEl, iGndElem ).y;
-						GroundHitPt( 3 ) = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).RefPoint( iRefPoint ).GndPt( WinEl, iGndElem ).z;
+						GroundHitPt( 1 ) = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).RefPoint( iRefPoint ).GndPt( iGndElem, WinEl ).x;
+						GroundHitPt( 2 ) = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).RefPoint( iRefPoint ).GndPt( iGndElem, WinEl ).y;
+						GroundHitPt( 3 ) = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).RefPoint( iRefPoint ).GndPt( iGndElem, WinEl ).z;
 					} else {
-						GroundHitPt( 1 ) = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( MapNum, iRefPoint ).GndPt( WinEl, iGndElem ).x;
-						GroundHitPt( 2 ) = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( MapNum, iRefPoint ).GndPt( WinEl, iGndElem ).y;
-						GroundHitPt( 3 ) = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( MapNum, iRefPoint ).GndPt( WinEl, iGndElem ).z;
+						GroundHitPt( 1 ) = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( iRefPoint, MapNum ).GndPt( iGndElem, WinEl ).x;
+						GroundHitPt( 2 ) = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( iRefPoint, MapNum ).GndPt( iGndElem, WinEl ).y;
+						GroundHitPt( 3 ) = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( iRefPoint, MapNum ).GndPt( iGndElem, WinEl ).z;
 					}
 
 					DayltgPierceSurface( ObsSurfNum, GroundHitPt, SUNCOS_IHR, iHitObs, ObsHitPt );
@@ -8129,18 +8129,18 @@ namespace DaylightingManager {
 		iConst = SurfaceWindow( IWin ).ComplexFen.State( CurCplxFenState ).Konst;
 		NTrnBasis = ComplexWind( IWin ).Geom( CurCplxFenState ).Trn.NBasis;
 
-		if ( ! allocated( FLSK ) ) FLSK.allocate( NTrnBasis, 4 );
+		if ( ! allocated( FLSK ) ) FLSK.allocate( 4, NTrnBasis );
 		FLSK = 0.0;
 		if ( ! allocated( FLSU ) ) FLSU.dimension( NTrnBasis, 0.0 );
 		if ( ! allocated( FLSUdisk ) ) FLSUdisk.dimension( NTrnBasis, 0.0 );
 
-		if ( ! allocated( FirstFluxSK ) ) FirstFluxSK.allocate( NTrnBasis, 4 );
+		if ( ! allocated( FirstFluxSK ) ) FirstFluxSK.allocate( 4, NTrnBasis );
 		FirstFluxSK = 0.0;
 		if ( ! allocated( FirstFluxSU ) ) FirstFluxSU.dimension( NTrnBasis, 0.0 );
 		if ( ! allocated( FirstFluxSUdisk ) ) FirstFluxSUdisk.dimension( NTrnBasis, 0.0 );
 
 		NIncBasis = ComplexWind( IWin ).Geom( CurCplxFenState ).Inc.NBasis;
-		if ( ! allocated( ElementLuminanceSky ) ) ElementLuminanceSky.allocate( NIncBasis, 4 );
+		if ( ! allocated( ElementLuminanceSky ) ) ElementLuminanceSky.allocate( 4, NIncBasis );
 		ElementLuminanceSky = 0.0;
 		if ( ! allocated( ElementLuminanceSun ) ) ElementLuminanceSun.dimension( NIncBasis, 0.0 );
 		if ( ! allocated( ElementLuminanceSunDisk ) ) ElementLuminanceSunDisk.dimension( NIncBasis, 0.0 );
@@ -8151,13 +8151,13 @@ namespace DaylightingManager {
 		ComplexFenestrationLuminances( IWin, WinEl, NIncBasis, IHR, iRefPoint, ElementLuminanceSky, ElementLuminanceSun, ElementLuminanceSunDisk, CalledFrom, MapNum );
 
 		// luminance from sun disk needs to include fraction of sunlit area
-		SolBmIndex = ComplexWind( IWin ).Geom( CurCplxFenState ).SolBmIndex( IHR, TimeStep );
+		SolBmIndex = ComplexWind( IWin ).Geom( CurCplxFenState ).SolBmIndex( TimeStep, IHR );
 		if ( SolBmIndex > 0 ) {
 			COSIncSun = ComplexWind( IWin ).Geom( CurCplxFenState ).CosInc( SolBmIndex );
 		} else {
 			COSIncSun = 0.0;
 		}
-		ElementLuminanceSunDisk *= SunlitFracHR( IWin, IHR ) * COSIncSun;
+		ElementLuminanceSunDisk *= SunlitFracHR( IHR, IWin ) * COSIncSun;
 
 		FLSKTot = 0.0;
 		FLSUTot = 0.0;
@@ -8169,10 +8169,10 @@ namespace DaylightingManager {
 		for ( iBackElem = 1; iBackElem <= NTrnBasis; ++iBackElem ) {
 			for ( iIncElem = 1; iIncElem <= NIncBasis; ++iIncElem ) {
 				LambdaInc = ComplexWind( IWin ).Geom( CurCplxFenState ).Inc.Lamda( iIncElem );
-				dirTrans = Construct( iConst ).BSDFInput.VisFrtTrans( iIncElem, iBackElem );
+				dirTrans = Construct( iConst ).BSDFInput.VisFrtTrans( iBackElem, iIncElem );
 
 				for ( iSky = 1; iSky <= 4; ++iSky ) {
-					FLSK( iBackElem, iSky ) += dirTrans * LambdaInc * ElementLuminanceSky( iIncElem, iSky );
+					FLSK( iSky, iBackElem ) += dirTrans * LambdaInc * ElementLuminanceSky( iSky, iIncElem );
 				}
 
 				FLSU( iBackElem ) += dirTrans * LambdaInc * ElementLuminanceSun( iIncElem );
@@ -8180,9 +8180,9 @@ namespace DaylightingManager {
 			}
 
 			for ( iSky = 1; iSky <= 4; ++iSky ) {
-				FirstFluxSK( iBackElem, iSky ) = FLSK( iBackElem, iSky ) * ComplexWind( IWin ).Geom( CurCplxFenState ).AveRhoVisOverlap( iBackElem );
-				FFSKTot( iSky ) += FirstFluxSK( iBackElem, iSky );
-				FLSKTot( iSky ) += FLSK( iBackElem, iSky );
+				FirstFluxSK( iSky, iBackElem ) = FLSK( iSky, iBackElem ) * ComplexWind( IWin ).Geom( CurCplxFenState ).AveRhoVisOverlap( iBackElem );
+				FFSKTot( iSky ) += FirstFluxSK( iSky, iBackElem );
+				FLSKTot( iSky ) += FLSK( iSky, iBackElem );
 			}
 			FirstFluxSU( iBackElem ) = FLSU( iBackElem ) * ComplexWind( IWin ).Geom( CurCplxFenState ).AveRhoVisOverlap( iBackElem );
 			FFSUTot += FirstFluxSU( iBackElem );
@@ -8195,10 +8195,10 @@ namespace DaylightingManager {
 
 		ZoneInsideSurfArea = ZoneDaylight( ZoneNum ).TotInsSurfArea;
 		for ( iSky = 1; iSky <= 4; ++iSky ) {
-			EINTSK( iSky, 1, IHR ) = FFSKTot( iSky ) * ( Surface( IWin ).Area / SurfaceWindow( IWin ).GlazedFrac ) / ( ZoneInsideSurfArea * ( 1.0 - ZoneDaylight( ZoneNum ).AveVisDiffReflect ) );
+			EINTSK( IHR, 1, iSky ) = FFSKTot( iSky ) * ( Surface( IWin ).Area / SurfaceWindow( IWin ).GlazedFrac ) / ( ZoneInsideSurfArea * ( 1.0 - ZoneDaylight( ZoneNum ).AveVisDiffReflect ) );
 		}
-		EINTSU( 1, IHR ) = FFSUTot * ( Surface( IWin ).Area / SurfaceWindow( IWin ).GlazedFrac ) / ( ZoneInsideSurfArea * ( 1.0 - ZoneDaylight( ZoneNum ).AveVisDiffReflect ) );
-		EINTSUdisk( 1, IHR ) = FFSUdiskTot * ( Surface( IWin ).Area / SurfaceWindow( IWin ).GlazedFrac ) / ( ZoneInsideSurfArea * ( 1.0 - ZoneDaylight( ZoneNum ).AveVisDiffReflect ) );
+		EINTSU( IHR, 1 ) = FFSUTot * ( Surface( IWin ).Area / SurfaceWindow( IWin ).GlazedFrac ) / ( ZoneInsideSurfArea * ( 1.0 - ZoneDaylight( ZoneNum ).AveVisDiffReflect ) );
+		EINTSUdisk( IHR, 1 ) = FFSUdiskTot * ( Surface( IWin ).Area / SurfaceWindow( IWin ).GlazedFrac ) / ( ZoneInsideSurfArea * ( 1.0 - ZoneDaylight( ZoneNum ).AveVisDiffReflect ) );
 
 		if ( allocated( FLSK ) ) FLSK.deallocate();
 		if ( allocated( FLSU ) ) FLSU.deallocate();
@@ -8279,7 +8279,7 @@ namespace DaylightingManager {
 		iConst = SurfaceWindow( IWin ).ComplexFen.State( CurCplxFenState ).Konst;
 		NIncBasis = ComplexWind( IWin ).Geom( CurCplxFenState ).Inc.NBasis;
 
-		if ( ! allocated( ElementLuminanceSky ) ) ElementLuminanceSky.allocate( NIncBasis, 4 );
+		if ( ! allocated( ElementLuminanceSky ) ) ElementLuminanceSky.allocate( 4, NIncBasis );
 		ElementLuminanceSky = 0.0;
 		if ( ! allocated( ElementLuminanceSun ) ) ElementLuminanceSun.dimension( NIncBasis, 0.0 );
 		if ( ! allocated( ElementLuminanceSunDisk ) ) ElementLuminanceSunDisk.dimension( NIncBasis, 0.0 );
@@ -8292,9 +8292,9 @@ namespace DaylightingManager {
 			dOmega = ComplexWind( IWin ).RefPoint( iRefPoint ).SolidAngle( WinEl );
 			zProjection = ComplexWind( IWin ).RefPoint( iRefPoint ).SolidAngleVec( WinEl ).z;
 		} else {
-			RefPointIndex = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( MapNum, iRefPoint ).RefPointIndex( WinEl );
-			dOmega = ComplexWind( IWin ).IlluminanceMap( MapNum, iRefPoint ).SolidAngle( WinEl );
-			zProjection = ComplexWind( IWin ).IlluminanceMap( MapNum, iRefPoint ).SolidAngleVec( WinEl ).z;
+			RefPointIndex = ComplexWind( IWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( iRefPoint, MapNum ).RefPointIndex( WinEl );
+			dOmega = ComplexWind( IWin ).IlluminanceMap( iRefPoint, MapNum ).SolidAngle( WinEl );
+			zProjection = ComplexWind( IWin ).IlluminanceMap( iRefPoint, MapNum ).SolidAngleVec( WinEl ).z;
 		}
 
 		WinLumSK = 0.0;
@@ -8306,10 +8306,10 @@ namespace DaylightingManager {
 
 		for ( iIncElem = 1; iIncElem <= NIncBasis; ++iIncElem ) {
 			// LambdaInc = ComplexWind(IWin)%Geom(CurCplxFenState)%Inc%Lamda(iIncElem)
-			dirTrans = Construct( iConst ).BSDFInput.VisFrtTrans( iIncElem, RefPointIndex );
+			dirTrans = Construct( iConst ).BSDFInput.VisFrtTrans( RefPointIndex, iIncElem );
 
 			for ( iSky = 1; iSky <= 4; ++iSky ) {
-				WinLumSK( iSky ) += dirTrans * ElementLuminanceSky( iIncElem, iSky );
+				WinLumSK( iSky ) += dirTrans * ElementLuminanceSky( iSky, iIncElem );
 			}
 
 			WinLumSU += dirTrans * ElementLuminanceSun( iIncElem );
@@ -8330,12 +8330,12 @@ namespace DaylightingManager {
 
 		// Store solution in global variables
 		for ( iSky = 1; iSky <= 4; ++iSky ) {
-			AVWLSK( iSky, 1, IHR ) += WinLumSK( iSky );
-			EDIRSK( iSky, 1, IHR ) += EDirSky( iSky );
+			AVWLSK( IHR, 1, iSky ) += WinLumSK( iSky );
+			EDIRSK( IHR, 1, iSky ) += EDirSky( iSky );
 		}
 
-		AVWLSU( 1, IHR ) += WinLumSU;
-		EDIRSU( 1, IHR ) += EDirSun;
+		AVWLSU( IHR, 1 ) += WinLumSU;
+		EDIRSU( IHR, 1 ) += EDirSun;
 		//AVWLSUdisk(1,IHR) = AVWLSUdisk(1,IHR) + WinLumSUdisk
 
 		if ( allocated( ElementLuminanceSky ) ) ElementLuminanceSky.deallocate();
@@ -8402,13 +8402,13 @@ namespace DaylightingManager {
 
 		CurCplxFenState = SurfaceWindow( iWin ).ComplexFen.CurrentState;
 		iConst = SurfaceWindow( iWin ).ComplexFen.State( CurCplxFenState ).Konst;
-		SolBmIndex = ComplexWind( iWin ).Geom( CurCplxFenState ).SolBmIndex( iHour, TimeStep );
+		SolBmIndex = ComplexWind( iWin ).Geom( CurCplxFenState ).SolBmIndex( TimeStep, iHour );
 
 		{ auto const SELECT_CASE_var( CalledFrom );
 		if ( SELECT_CASE_var == CalledForRefPoint ) {
 			WindowSolidAngleDaylightPoint = SurfaceWindow( iWin ).SolidAngAtRefPtWtd( iRefPoint );
 		} else if ( SELECT_CASE_var == CalledForMapPoint ) {
-			WindowSolidAngleDaylightPoint = MapWindowSolidAngAtRefPtWtd()( LoopWin, iRefPoint );
+			WindowSolidAngleDaylightPoint = MapWindowSolidAngAtRefPtWtd()( iRefPoint, LoopWin );
 		} else {
 			assert( false ); // Bad CalledFrom argument
 		}}
@@ -8423,13 +8423,13 @@ namespace DaylightingManager {
 			if ( CalledFrom == CalledForRefPoint ) {
 				refPointIntersect = ComplexWind( iWin ).DaylghtGeom( CurCplxFenState ).RefPoint( iRefPoint ).RefPointIntersection( iTrnElem );
 			} else {
-				refPointIntersect = ComplexWind( iWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( MapNum, iRefPoint ).RefPointIntersection( iTrnElem );
+				refPointIntersect = ComplexWind( iWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( iRefPoint, MapNum ).RefPointIntersection( iTrnElem );
 			}
 			if ( refPointIntersect ) {
 				if ( CalledFrom == CalledForRefPoint ) {
 					PosFac = ComplexWind( iWin ).DaylghtGeom( CurCplxFenState ).RefPoint( iRefPoint ).RefPtIntPosFac( iTrnElem );
 				} else {
-					PosFac = ComplexWind( iWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( MapNum, iRefPoint ).RefPtIntPosFac( iTrnElem );
+					PosFac = ComplexWind( iWin ).DaylghtGeom( CurCplxFenState ).IlluminanceMap( iRefPoint, MapNum ).RefPtIntPosFac( iTrnElem );
 				}
 				RayZ = - ComplexWind( iWin ).Geom( CurCplxFenState ).sTrn( iTrnElem ).z;
 
@@ -8444,7 +8444,7 @@ namespace DaylightingManager {
 
 				if ( PosFac != 0.0 ) {
 					if ( SolBmIndex > 0 ) {
-						dirTrans = Construct( iConst ).BSDFInput.VisFrtTrans( SolBmIndex, iTrnElem );
+						dirTrans = Construct( iConst ).BSDFInput.VisFrtTrans( iTrnElem, SolBmIndex );
 					} else {
 						dirTrans = 0.0;
 					}
@@ -8468,8 +8468,8 @@ namespace DaylightingManager {
 			}
 		}
 
-		AVWLSUdisk( 1, iHour ) = WinLumSunDisk;
-		EDIRSUdisk( 1, iHour ) = ELumSunDisk;
+		AVWLSUdisk( iHour, 1 ) = WinLumSunDisk;
+		EDIRSUdisk( iHour, 1 ) = ELumSunDisk;
 
 	}
 
@@ -8820,7 +8820,7 @@ namespace DaylightingManager {
 			}
 		}
 		// Cosine of angle of incidence of sun at HitPt if sun were to reach HitPt
-		Array1D< Real64 > const SUNCOS_IHR( SUNCOSHR( {1,3}, IHR ) );
+		Array1D< Real64 > const SUNCOS_IHR( SUNCOSHR( IHR, {1,3} ) );
 		CosIncAngAtHitPt = dot( ReflNorm, SUNCOS_IHR );
 		// Require that the sun be in front of this surface relative to window element
 		if ( CosIncAngAtHitPt <= 0.0 ) return; // Sun is in back of reflecting surface
@@ -8911,13 +8911,13 @@ namespace DaylightingManager {
 		int ISky; // Sky type index
 		int ISky1; // Sky type index values for averaging two sky types
 		int ISky2;
-		static Array2D< Real64 > DFSKHR( 4, 2 ); // Sky daylight factor for sky type (first index),
+		static Array2D< Real64 > DFSKHR( 2, 4 ); // Sky daylight factor for sky type (first index),
 		//   bare/shaded window (second index)
 		static Array1D< Real64 > DFSUHR( 2 ); // Sun daylight factor for bare/shaded window
-		static Array2D< Real64 > BFSKHR( 4, 2 ); // Sky background luminance factor for sky type (first index),
+		static Array2D< Real64 > BFSKHR( 2, 4 ); // Sky background luminance factor for sky type (first index),
 		//   bare/shaded window (second index)
 		static Array1D< Real64 > BFSUHR( 2 ); // Sun background luminance factor for bare/shaded window
-		static Array2D< Real64 > SFSKHR( 4, 2 ); // Sky source luminance factor for sky type (first index),
+		static Array2D< Real64 > SFSKHR( 2, 4 ); // Sky source luminance factor for sky type (first index),
 		//   bare/shaded window (second index)
 		static Array1D< Real64 > SFSUHR( 2 ); // Sun source luminance factor for bare/shaded window
 		int IL; // Reference point index
@@ -9017,22 +9017,22 @@ namespace DaylightingManager {
 					//          Daylight factors for current sun position
 					for ( ISky = 1; ISky <= 4; ++ISky ) {
 						//                                ===Bare window===
-						DFSKHR( ISky, 1 ) = VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylIllFacSky( loop, ILB, ISky, 1, HourOfDay ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylIllFacSky( loop, ILB, ISky, 1, PreviousHour ) );
+						DFSKHR( 1, ISky ) = VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylIllFacSky( HourOfDay, 1, ISky, ILB, loop ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylIllFacSky( PreviousHour, 1, ISky, ILB, loop ) );
 
 						if ( ISky == 1 ) {
-							DFSUHR( 1 ) = VTRatio * ( WeightNow * ( IllumMapCalc( MapNum ).DaylIllFacSun( loop, ILB, 1, HourOfDay ) + IllumMapCalc( MapNum ).DaylIllFacSunDisk( loop, ILB, 1, HourOfDay ) ) + WeightPreviousHour * ( IllumMapCalc( MapNum ).DaylIllFacSun( loop, ILB, 1, PreviousHour ) + IllumMapCalc( MapNum ).DaylIllFacSunDisk( loop, ILB, 1, PreviousHour ) ) );
+							DFSUHR( 1 ) = VTRatio * ( WeightNow * ( IllumMapCalc( MapNum ).DaylIllFacSun( HourOfDay, 1, ILB, loop ) + IllumMapCalc( MapNum ).DaylIllFacSunDisk( HourOfDay, 1, ILB, loop ) ) + WeightPreviousHour * ( IllumMapCalc( MapNum ).DaylIllFacSun( PreviousHour, 1, ILB, loop ) + IllumMapCalc( MapNum ).DaylIllFacSunDisk( PreviousHour, 1, ILB, loop ) ) );
 						}
 
-						BFSKHR( ISky, 1 ) = VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylBackFacSky( loop, ILB, ISky, 1, HourOfDay ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylBackFacSky( loop, ILB, ISky, 1, PreviousHour ) );
+						BFSKHR( 1, ISky ) = VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylBackFacSky( HourOfDay, 1, ISky, ILB, loop ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylBackFacSky( PreviousHour, 1, ISky, ILB, loop ) );
 
 						if ( ISky == 1 ) {
-							BFSUHR( 1 ) = VTRatio * ( WeightNow * ( IllumMapCalc( MapNum ).DaylBackFacSun( loop, ILB, 1, HourOfDay ) + IllumMapCalc( MapNum ).DaylBackFacSunDisk( loop, ILB, 1, HourOfDay ) ) + WeightPreviousHour * ( IllumMapCalc( MapNum ).DaylBackFacSun( loop, ILB, 1, PreviousHour ) + IllumMapCalc( MapNum ).DaylBackFacSunDisk( loop, ILB, 1, PreviousHour ) ) );
+							BFSUHR( 1 ) = VTRatio * ( WeightNow * ( IllumMapCalc( MapNum ).DaylBackFacSun( HourOfDay, 1, ILB, loop ) + IllumMapCalc( MapNum ).DaylBackFacSunDisk( HourOfDay, 1, ILB, loop ) ) + WeightPreviousHour * ( IllumMapCalc( MapNum ).DaylBackFacSun( PreviousHour, 1, ILB, loop ) + IllumMapCalc( MapNum ).DaylBackFacSunDisk( PreviousHour, 1, ILB, loop ) ) );
 						}
 
-						SFSKHR( ISky, 1 ) = VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylSourceFacSky( loop, ILB, ISky, 1, HourOfDay ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylSourceFacSky( loop, ILB, ISky, 1, PreviousHour ) );
+						SFSKHR( 1, ISky ) = VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylSourceFacSky( HourOfDay, 1, ISky, ILB, loop ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylSourceFacSky( PreviousHour, 1, ISky, ILB, loop ) );
 
 						if ( ISky == 1 ) {
-							SFSUHR( 1 ) = VTRatio * ( WeightNow * ( IllumMapCalc( MapNum ).DaylSourceFacSun( loop, ILB, 1, HourOfDay ) + IllumMapCalc( MapNum ).DaylSourceFacSunDisk( loop, ILB, 1, HourOfDay ) ) + WeightPreviousHour * ( IllumMapCalc( MapNum ).DaylSourceFacSun( loop, ILB, 1, PreviousHour ) + IllumMapCalc( MapNum ).DaylSourceFacSunDisk( loop, ILB, 1, PreviousHour ) ) );
+							SFSUHR( 1 ) = VTRatio * ( WeightNow * ( IllumMapCalc( MapNum ).DaylSourceFacSun( HourOfDay, 1, ILB, loop ) + IllumMapCalc( MapNum ).DaylSourceFacSunDisk( HourOfDay, 1, ILB, loop ) ) + WeightPreviousHour * ( IllumMapCalc( MapNum ).DaylSourceFacSun( PreviousHour, 1, ILB, loop ) + IllumMapCalc( MapNum ).DaylSourceFacSunDisk( PreviousHour, 1, ILB, loop ) ) );
 						}
 
 						if ( SurfaceWindow( IWin ).ShadingFlag >= 1 || SurfaceWindow( IWin ).SolarDiffusing ) {
@@ -9040,31 +9040,31 @@ namespace DaylightingManager {
 							//                                 ===Shaded window===
 							if ( ! SurfaceWindow( IWin ).MovableSlats ) {
 								// Shade, screen, blind with fixed slats, or diffusing glass
-								DFSKHR( ISky, 2 ) = VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylIllFacSky( loop, ILB, ISky, 2, HourOfDay ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylIllFacSky( loop, ILB, ISky, 2, PreviousHour ) );
+								DFSKHR( 2, ISky ) = VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylIllFacSky( HourOfDay, 2, ISky, ILB, loop ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylIllFacSky( PreviousHour, 2, ISky, ILB, loop ) );
 
 								if ( ISky == 1 ) {
-									DFSUHR( 2 ) = VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylIllFacSun( loop, ILB, 2, HourOfDay ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylIllFacSun( loop, ILB, 2, PreviousHour ) );
+									DFSUHR( 2 ) = VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylIllFacSun( HourOfDay, 2, ILB, loop ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylIllFacSun( PreviousHour, 2, ILB, loop ) );
 
 									if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) {
-										DFSUHR( 2 ) += VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylIllFacSunDisk( loop, ILB, 2, HourOfDay ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylIllFacSunDisk( loop, ILB, 2, PreviousHour ) );
+										DFSUHR( 2 ) += VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylIllFacSunDisk( HourOfDay, 2, ILB, loop ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylIllFacSunDisk( PreviousHour, 2, ILB, loop ) );
 									}
 								}
 
-								BFSKHR( ISky, 2 ) = VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylBackFacSky( loop, ILB, ISky, 2, HourOfDay ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylBackFacSky( loop, ILB, ISky, 2, PreviousHour ) );
+								BFSKHR( 2, ISky ) = VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylBackFacSky( HourOfDay, 2, ISky, ILB, loop ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylBackFacSky( PreviousHour, 2, ISky, ILB, loop ) );
 
 								if ( ISky == 1 ) {
-									BFSUHR( 2 ) = VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylBackFacSun( loop, ILB, 2, HourOfDay ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylBackFacSun( loop, ILB, 2, PreviousHour ) );
+									BFSUHR( 2 ) = VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylBackFacSun( HourOfDay, 2, ILB, loop ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylBackFacSun( PreviousHour, 2, ILB, loop ) );
 									if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) {
-										BFSUHR( 2 ) += VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylBackFacSunDisk( loop, ILB, 2, HourOfDay ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylBackFacSunDisk( loop, ILB, 2, PreviousHour ) );
+										BFSUHR( 2 ) += VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylBackFacSunDisk( HourOfDay, 2, ILB, loop ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylBackFacSunDisk( PreviousHour, 2, ILB, loop ) );
 									}
 								}
 
-								SFSKHR( ISky, 2 ) = VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylSourceFacSky( loop, ILB, ISky, 2, HourOfDay ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylSourceFacSky( loop, ILB, ISky, 2, PreviousHour ) );
+								SFSKHR( 2, ISky ) = VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylSourceFacSky( HourOfDay, 2, ISky, ILB, loop ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylSourceFacSky( PreviousHour, 2, ISky, ILB, loop ) );
 
 								if ( ISky == 1 ) {
-									SFSUHR( 2 ) = VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylSourceFacSun( loop, ILB, 2, HourOfDay ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylSourceFacSun( loop, ILB, 2, PreviousHour ) );
+									SFSUHR( 2 ) = VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylSourceFacSun( HourOfDay, 2, ILB, loop ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylSourceFacSun( PreviousHour, 2, ILB, loop ) );
 									if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) {
-										SFSUHR( 2 ) += VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylSourceFacSunDisk( loop, ILB, 2, HourOfDay ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylSourceFacSunDisk( loop, ILB, 2, PreviousHour ) );
+										SFSUHR( 2 ) += VTRatio * ( WeightNow * IllumMapCalc( MapNum ).DaylSourceFacSunDisk( HourOfDay, 2, ILB, loop ) + WeightPreviousHour * IllumMapCalc( MapNum ).DaylSourceFacSunDisk( PreviousHour, 2, ILB, loop ) );
 									}
 								}
 
@@ -9072,10 +9072,10 @@ namespace DaylightingManager {
 								VarSlats = SurfaceWindow( IWin ).MovableSlats;
 								SlatAng = SurfaceWindow( IWin ).SlatAngThisTS;
 
-								DFSKHR( ISky, 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylIllFacSky( loop, ILB, ISky, {2,MaxSlatAngs + 1}, HourOfDay ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylIllFacSky( loop, ILB, ISky, {2,MaxSlatAngs + 1}, PreviousHour ) ) );
+								DFSKHR( 2, ISky ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylIllFacSky( HourOfDay, {2,MaxSlatAngs + 1}, ISky, ILB, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylIllFacSky( PreviousHour, {2,MaxSlatAngs + 1}, ISky, ILB, loop ) ) );
 
 								if ( ISky == 1 ) {
-									DFSUHR( 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylIllFacSun( loop, ILB, {2,MaxSlatAngs + 1}, HourOfDay ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylIllFacSun( loop, ILB, {2,MaxSlatAngs + 1}, PreviousHour ) ) );
+									DFSUHR( 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylIllFacSun( HourOfDay, {2,MaxSlatAngs + 1}, ILB, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylIllFacSun( PreviousHour, {2,MaxSlatAngs + 1}, ILB, loop ) ) );
 
 									// We add the contribution from the solar disk if slats do not block beam solar
 									// TH CR 8010, DaylIllFacSunDisk needs to be interpolated
@@ -9083,29 +9083,29 @@ namespace DaylightingManager {
 									//  VTRatio * (WeightNow * ZoneDaylight(ZoneNum)%DaylIllFacSunDisk(loop,ILB,2,HourOfDay) + &
 									//            WeightPreviousHour * ZoneDaylight(ZoneNum)%DaylIllFacSunDisk(loop,ILB,2,PreviousHour))
 									if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) {
-										DFSUHR( 2 ) += VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylIllFacSunDisk( loop, ILB, {2,MaxSlatAngs + 1}, HourOfDay ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylIllFacSunDisk( loop, ILB, {2,MaxSlatAngs + 1}, PreviousHour ) ) );
+										DFSUHR( 2 ) += VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylIllFacSunDisk( HourOfDay, {2,MaxSlatAngs + 1}, ILB, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylIllFacSunDisk( PreviousHour, {2,MaxSlatAngs + 1}, ILB, loop ) ) );
 									}
 								}
 
-								BFSKHR( ISky, 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylBackFacSky( loop, ILB, ISky, {2,MaxSlatAngs + 1}, HourOfDay ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylBackFacSky( loop, ILB, ISky, {2,MaxSlatAngs + 1}, PreviousHour ) ) );
+								BFSKHR( 2, ISky ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylBackFacSky( HourOfDay, {2,MaxSlatAngs + 1}, ISky, ILB, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylBackFacSky( PreviousHour, {2,MaxSlatAngs + 1}, ISky, ILB, loop ) ) );
 
 								if ( ISky == 1 ) {
-									BFSUHR( 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylBackFacSun( loop, ILB, {2,MaxSlatAngs + 1}, HourOfDay ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylBackFacSun( loop, ILB, {2,MaxSlatAngs + 1}, PreviousHour ) ) );
+									BFSUHR( 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylBackFacSun( HourOfDay, {2,MaxSlatAngs + 1}, ILB, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylBackFacSun( PreviousHour, {2,MaxSlatAngs + 1}, ILB, loop ) ) );
 
 									// TH CR 8010, DaylBackFacSunDisk needs to be interpolated
 									if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) {
-										BFSUHR( 2 ) += VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylBackFacSunDisk( loop, ILB, {2,MaxSlatAngs + 1}, HourOfDay ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylBackFacSunDisk( loop, ILB, {2,MaxSlatAngs + 1}, PreviousHour ) ) );
+										BFSUHR( 2 ) += VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylBackFacSunDisk( HourOfDay, {2,MaxSlatAngs + 1}, ILB, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylBackFacSunDisk( PreviousHour, {2,MaxSlatAngs + 1}, ILB, loop ) ) );
 									}
 								}
 
-								SFSKHR( ISky, 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylSourceFacSky( loop, ILB, ISky, {2,MaxSlatAngs + 1}, HourOfDay ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylSourceFacSky( loop, ILB, ISky, {2,MaxSlatAngs + 1}, PreviousHour ) ) );
+								SFSKHR( 2, ISky ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylSourceFacSky( HourOfDay, {2,MaxSlatAngs + 1}, ISky, ILB, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylSourceFacSky( PreviousHour, {2,MaxSlatAngs + 1}, ISky, ILB, loop ) ) );
 
 								if ( ISky == 1 ) {
-									SFSUHR( 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylSourceFacSun( loop, ILB, {2,MaxSlatAngs + 1}, HourOfDay ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylSourceFacSun( loop, ILB, {2,MaxSlatAngs + 1}, PreviousHour ) ) );
+									SFSUHR( 2 ) = VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylSourceFacSun( HourOfDay, {2,MaxSlatAngs + 1}, ILB, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylSourceFacSun( PreviousHour, {2,MaxSlatAngs + 1}, ILB, loop ) ) );
 
 									// TH CR 8010, DaylSourceFacSunDisk needs to be interpolated
 									if ( ! SurfaceWindow( IWin ).SlatsBlockBeam ) {
-										SFSUHR( 2 ) += VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylSourceFacSunDisk( loop, ILB, {2,MaxSlatAngs + 1}, HourOfDay ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylSourceFacSunDisk( loop, ILB, {2,MaxSlatAngs + 1}, PreviousHour ) ) );
+										SFSUHR( 2 ) += VTRatio * ( WeightNow * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylSourceFacSunDisk( HourOfDay, {2,MaxSlatAngs + 1}, ILB, loop ) ) + WeightPreviousHour * InterpSlatAng( SlatAng, VarSlats, IllumMapCalc( MapNum ).DaylSourceFacSunDisk( PreviousHour, {2,MaxSlatAngs + 1}, ILB, loop ) ) );
 									}
 								}
 
@@ -9121,7 +9121,7 @@ namespace DaylightingManager {
 					// Adding 0.001 in the following prevents zero HorIllSky in early morning or late evening when sun
 					// is up in the present time step but GILSK(ISky,HourOfDay) and GILSK(ISky,NextHour) are both zero.
 					for ( ISky = 1; ISky <= 4; ++ISky ) {
-						HorIllSky( ISky ) = WeightNow * GILSK( ISky, HourOfDay ) + WeightPreviousHour * GILSK( ISky, PreviousHour ) + 0.001;
+						HorIllSky( ISky ) = WeightNow * GILSK( HourOfDay, ISky ) + WeightPreviousHour * GILSK( PreviousHour, ISky ) + 0.001;
 					}
 
 					// HISKF is current time step horizontal illuminance from sky, calculated in DayltgLuminousEfficacy,
@@ -9132,12 +9132,12 @@ namespace DaylightingManager {
 					for ( IS = 1; IS <= 2; ++IS ) {
 						if ( IS == 2 && SurfaceWindow( IWin ).ShadingFlag <= 0 && ! SurfaceWindow( IWin ).SolarDiffusing ) break;
 
-						IllumMapCalc( MapNum ).IllumFromWinAtMapPt( ILB, IS, loop ) = DFSUHR( IS ) * HISUNF + HorIllSkyFac * ( DFSKHR( ISky1, IS ) * SkyWeight * HorIllSky( ISky1 ) + DFSKHR( ISky2, IS ) * ( 1.0 - SkyWeight ) * HorIllSky( ISky2 ) );
+						IllumMapCalc( MapNum ).IllumFromWinAtMapPt( loop, IS, ILB ) = DFSUHR( IS ) * HISUNF + HorIllSkyFac * ( DFSKHR( IS, ISky1 ) * SkyWeight * HorIllSky( ISky1 ) + DFSKHR( IS, ISky2 ) * ( 1.0 - SkyWeight ) * HorIllSky( ISky2 ) );
 
-						IllumMapCalc( MapNum ).BackLumFromWinAtMapPt( ILB, IS, loop ) = BFSUHR( IS ) * HISUNF + HorIllSkyFac * ( BFSKHR( ISky1, IS ) * SkyWeight * HorIllSky( ISky1 ) + BFSKHR( ISky2, IS ) * ( 1.0 - SkyWeight ) * HorIllSky( ISky2 ) );
+						IllumMapCalc( MapNum ).BackLumFromWinAtMapPt( loop, IS, ILB ) = BFSUHR( IS ) * HISUNF + HorIllSkyFac * ( BFSKHR( IS, ISky1 ) * SkyWeight * HorIllSky( ISky1 ) + BFSKHR( IS, ISky2 ) * ( 1.0 - SkyWeight ) * HorIllSky( ISky2 ) );
 
-						IllumMapCalc( MapNum ).SourceLumFromWinAtMapPt( ILB, IS, loop ) = SFSUHR( IS ) * HISUNF + HorIllSkyFac * ( SFSKHR( ISky1, IS ) * SkyWeight * HorIllSky( ISky1 ) + SFSKHR( ISky2, IS ) * ( 1.0 - SkyWeight ) * HorIllSky( ISky2 ) );
-						IllumMapCalc( MapNum ).SourceLumFromWinAtMapPt( ILB, IS, loop ) = max( IllumMapCalc( MapNum ).SourceLumFromWinAtMapPt( ILB, IS, loop ), 0.0 );
+						IllumMapCalc( MapNum ).SourceLumFromWinAtMapPt( loop, IS, ILB ) = SFSUHR( IS ) * HISUNF + HorIllSkyFac * ( SFSKHR( IS, ISky1 ) * SkyWeight * HorIllSky( ISky1 ) + SFSKHR( IS, ISky2 ) * ( 1.0 - SkyWeight ) * HorIllSky( ISky2 ) );
+						IllumMapCalc( MapNum ).SourceLumFromWinAtMapPt( loop, IS, ILB ) = max( IllumMapCalc( MapNum ).SourceLumFromWinAtMapPt( loop, IS, ILB ), 0.0 );
 					}
 
 				} // End of reference point loop
@@ -9170,8 +9170,8 @@ namespace DaylightingManager {
 
 				for ( IL = 1; IL <= NREFPT; ++IL ) {
 					//              Determine if illuminance contribution is from bare or shaded window
-					DaylIllum( IL ) += VTMULT * IllumMapCalc( MapNum ).IllumFromWinAtMapPt( IL, IS, loop );
-					BACLUM( IL ) += VTMULT * IllumMapCalc( MapNum ).BackLumFromWinAtMapPt( IL, IS, loop );
+					DaylIllum( IL ) += VTMULT * IllumMapCalc( MapNum ).IllumFromWinAtMapPt( loop, IS, IL );
+					BACLUM( IL ) += VTMULT * IllumMapCalc( MapNum ).BackLumFromWinAtMapPt( loop, IS, IL );
 				}
 
 			} // End of second window loop
@@ -9204,8 +9204,8 @@ namespace DaylightingManager {
 
 					// Conversion from ft-L to cd/m2, with cd/m2 = 0.2936 ft-L, gives the 0.4794 factor
 					// below, which is (0.2936)**0.6
-					GTOT1 = 0.4794 * ( std::pow( VTMULT * IllumMapCalc( MapNum ).SourceLumFromWinAtMapPt( IL, IS, loop ), 1.6 ) ) * std::pow( IllumMapCalc( MapNum ).SolidAngAtMapPtWtd( IL, loop ), 0.8 );
-					GTOT2 = BACLUM( IL ) + 0.07 * ( std::sqrt( IllumMapCalc( MapNum ).SolidAngAtMapPt( IL, loop ) ) ) * VTMULT * IllumMapCalc( MapNum ).SourceLumFromWinAtMapPt( IL, IS, loop );
+					GTOT1 = 0.4794 * ( std::pow( VTMULT * IllumMapCalc( MapNum ).SourceLumFromWinAtMapPt( loop, IS, IL ), 1.6 ) ) * std::pow( IllumMapCalc( MapNum ).SolidAngAtMapPtWtd( loop, IL ), 0.8 );
+					GTOT2 = BACLUM( IL ) + 0.07 * ( std::sqrt( IllumMapCalc( MapNum ).SolidAngAtMapPt( loop, IL ) ) ) * VTMULT * IllumMapCalc( MapNum ).SourceLumFromWinAtMapPt( loop, IS, IL );
 					GTOT += GTOT1 / ( GTOT2 + 0.000001 );
 				}
 
@@ -9298,7 +9298,7 @@ namespace DaylightingManager {
 			firstTime = false;
 			FirstTimeMaps.dimension( TotIllumMaps, true );
 			EnvrnPrint.dimension( TotIllumMaps, true );
-			RefPts.allocate( MaxRefPoints, NumOfZones );
+			RefPts.allocate( NumOfZones, MaxRefPoints );
 			SavedMnDy.allocate( TotIllumMaps );
 		}
 
@@ -9324,13 +9324,13 @@ namespace DaylightingManager {
 
 			for ( R = 1; R <= ZoneDaylight( IllumMap( MapNum ).Zone ).TotalDaylRefPoints; ++R ) {
 				String = RoundSigDigits( R );
-				RefPts( R, IllumMap( MapNum ).Zone ) = "RefPt" + String + "=(";
-				String = RoundSigDigits( ZoneDaylight( IllumMap( MapNum ).Zone ).DaylRefPtAbsCoord( R, 1 ), 2 );
-				RefPts( R, IllumMap( MapNum ).Zone ) = RefPts( R, IllumMap( MapNum ).Zone ) + String + ':';
-				String = RoundSigDigits( ZoneDaylight( IllumMap( MapNum ).Zone ).DaylRefPtAbsCoord( R, 2 ), 2 );
-				RefPts( R, IllumMap( MapNum ).Zone ) = RefPts( R, IllumMap( MapNum ).Zone ) + String + ':';
-				String = RoundSigDigits( ZoneDaylight( IllumMap( MapNum ).Zone ).DaylRefPtAbsCoord( R, 3 ), 2 );
-				RefPts( R, IllumMap( MapNum ).Zone ) = RefPts( R, IllumMap( MapNum ).Zone ) + String + ')';
+				RefPts( IllumMap( MapNum ).Zone, R ) = "RefPt" + String + "=(";
+				String = RoundSigDigits( ZoneDaylight( IllumMap( MapNum ).Zone ).DaylRefPtAbsCoord( 1, R ), 2 );
+				RefPts( IllumMap( MapNum ).Zone, R ) = RefPts( IllumMap( MapNum ).Zone, R ) + String + ':';
+				String = RoundSigDigits( ZoneDaylight( IllumMap( MapNum ).Zone ).DaylRefPtAbsCoord( 2, R ), 2 );
+				RefPts( IllumMap( MapNum ).Zone, R ) = RefPts( IllumMap( MapNum ).Zone, R ) + String + ':';
+				String = RoundSigDigits( ZoneDaylight( IllumMap( MapNum ).Zone ).DaylRefPtAbsCoord( 3, R ), 2 );
+				RefPts( IllumMap( MapNum ).Zone, R ) = RefPts( IllumMap( MapNum ).Zone, R ) + String + ')';
 			}
 		}
 		if ( SavedMnDy( MapNum ) != CurMnDyHr.substr( 0, 5 ) ) {
@@ -9338,7 +9338,7 @@ namespace DaylightingManager {
 			SavedMnDy( MapNum ) = CurMnDyHr.substr( 0, 5 );
 		}
 		if ( EnvrnPrint( MapNum ) ) {
-			WriteDaylightMapTitle( MapNum, IllumMap( MapNum ).UnitNo, IllumMap( MapNum ).Name, EnvironmentName, IllumMap( MapNum ).Zone, RefPts( 1, IllumMap( MapNum ).Zone ), RefPts( 2, IllumMap( MapNum ).Zone ), IllumMap( MapNum ).Z );
+			WriteDaylightMapTitle( MapNum, IllumMap( MapNum ).UnitNo, IllumMap( MapNum ).Name, EnvironmentName, IllumMap( MapNum ).Zone, RefPts( IllumMap( MapNum ).Zone, 1 ), RefPts( IllumMap( MapNum ).Zone, 2 ), IllumMap( MapNum ).Z );
 			EnvrnPrint( MapNum ) = false;
 		}
 
@@ -9351,7 +9351,7 @@ namespace DaylightingManager {
 				if ( IllumMap( MapNum ).HeaderXLineLengthNeeded ) linelen = len( mapLine );
 				RefPt = 1;
 				for ( X = 1; X <= IllumMap( MapNum ).Xnum; ++X ) {
-					AddXorYString = std::string( 1, MapColSep ) + '(' + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ), 2 ) + ';' + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ), 2 ) + ")=";
+					AddXorYString = std::string( 1, MapColSep ) + '(' + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ), 2 ) + ';' + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ), 2 ) + ")=";
 					if ( IllumMap( MapNum ).HeaderXLineLengthNeeded ) linelen += len( AddXorYString );
 					mapLine += AddXorYString;
 					++RefPt;
@@ -9371,7 +9371,7 @@ namespace DaylightingManager {
 				// Write Y scale prefix and illuminance values
 				RefPt = 1;
 				for ( Y = 1; Y <= IllumMap( MapNum ).Ynum; ++Y ) {
-					mapLine = "(" + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ), 2 ) + ';' + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ), 2 ) + ")=";
+					mapLine = "(" + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 1, RefPt ), 2 ) + ';' + RoundSigDigits( IllumMapCalc( MapNum ).MapRefPtAbsCoord( 2, RefPt ), 2 ) + ")=";
 					for ( R = RefPt; R <= RefPt + IllumMap( MapNum ).Xnum - 1; ++R ) {
 						IllumOut = nint( IllumMapCalc( MapNum ).DaylIllumAtMapPtHr( R ) );
 						if ( IllumMapCalc( MapNum ).MapRefPtInBounds( R ) ) {
@@ -9392,7 +9392,7 @@ namespace DaylightingManager {
 					if ( SQFirstTime ) {
 						XValue.allocate( maxval( IllumMap( {1,TotIllumMaps} ).Xnum() ) );
 						YValue.allocate( maxval( IllumMap( {1,TotIllumMaps} ).Ynum() ) );
-						IllumValue.allocate( maxval( IllumMap( {1,TotIllumMaps} ).Xnum() ), maxval( IllumMap( {1,TotIllumMaps} ).Ynum() ) );
+						IllumValue.allocate( maxval( IllumMap( {1,TotIllumMaps} ).Ynum() ), maxval( IllumMap( {1,TotIllumMaps} ).Xnum() ) );
 						SQFirstTime = false;
 					}
 
@@ -9404,9 +9404,9 @@ namespace DaylightingManager {
 						for ( X = 1; X <= IllumMap( MapNum ).Xnum; ++X ) {
 							XValue( X ) = IllumMap( MapNum ).Xmin + ( X - 1 ) * IllumMap( MapNum ).Xinc;
 							IllumIndex = X + ( Y - 1 ) * IllumMap( MapNum ).Xnum;
-							IllumValue( X, Y ) = nint( IllumMapCalc( MapNum ).DaylIllumAtMapPtHr( IllumIndex ) );
+							IllumValue( Y, X ) = nint( IllumMapCalc( MapNum ).DaylIllumAtMapPtHr( IllumIndex ) );
 							if ( ! IllumMapCalc( MapNum ).MapRefPtInBounds( IllumIndex ) ) {
-								IllumValue( X, Y ) = -IllumValue( X, Y );
+								IllumValue( Y, X ) = -IllumValue( Y, X );
 							}
 						} // X Loop
 					} // Y Loop
@@ -9826,15 +9826,15 @@ Label903: ;
 				ZoneDaylight( ZoneNum ).DayltgFacPtrsForExtWins.allocate( ZoneExtWin( ZoneNum ) );
 				ZoneDaylight( ZoneNum ).DayltgFacPtrsForExtWins = 0;
 
-				ZoneDaylight( ZoneNum ).SolidAngAtRefPt.allocate( ZoneDaylight( ZoneNum ).TotalDaylRefPoints, ZoneExtWin( ZoneNum ) );
+				ZoneDaylight( ZoneNum ).SolidAngAtRefPt.allocate( ZoneExtWin( ZoneNum ), ZoneDaylight( ZoneNum ).TotalDaylRefPoints );
 				ZoneDaylight( ZoneNum ).SolidAngAtRefPt = 0.0;
-				ZoneDaylight( ZoneNum ).SolidAngAtRefPtWtd.allocate( ZoneDaylight( ZoneNum ).TotalDaylRefPoints, ZoneExtWin( ZoneNum ) );
+				ZoneDaylight( ZoneNum ).SolidAngAtRefPtWtd.allocate( ZoneExtWin( ZoneNum ), ZoneDaylight( ZoneNum ).TotalDaylRefPoints );
 				ZoneDaylight( ZoneNum ).SolidAngAtRefPtWtd = 0.0;
-				ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt.allocate( ZoneDaylight( ZoneNum ).TotalDaylRefPoints, 2, ZoneExtWin( ZoneNum ) );
+				ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt.allocate( ZoneExtWin( ZoneNum ), 2, ZoneDaylight( ZoneNum ).TotalDaylRefPoints );
 				ZoneDaylight( ZoneNum ).IllumFromWinAtRefPt = 0.0;
-				ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt.allocate( ZoneDaylight( ZoneNum ).TotalDaylRefPoints, 2, ZoneExtWin( ZoneNum ) );
+				ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt.allocate( ZoneExtWin( ZoneNum ), 2, ZoneDaylight( ZoneNum ).TotalDaylRefPoints );
 				ZoneDaylight( ZoneNum ).BackLumFromWinAtRefPt = 0.0;
-				ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt.allocate( ZoneDaylight( ZoneNum ).TotalDaylRefPoints, 2, ZoneExtWin( ZoneNum ) );
+				ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt.allocate( ZoneExtWin( ZoneNum ), 2, ZoneDaylight( ZoneNum ).TotalDaylRefPoints );
 				ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt = 0.0;
 
 				for ( loop = 1; loop <= ZoneDaylight( ZoneNum ).MapCount; ++loop ) {
@@ -9842,15 +9842,15 @@ Label903: ;
 
 					if ( IllumMapCalc( MapNum ).TotalMapRefPoints > 0 ) {
 						// might be able to use TotalMapRefPoints for zone in below.
-						IllumMapCalc( MapNum ).SolidAngAtMapPt.allocate( IllumMapCalc( MapNum ).TotalMapRefPoints, ZoneExtWin( ZoneNum ) );
+						IllumMapCalc( MapNum ).SolidAngAtMapPt.allocate( ZoneExtWin( ZoneNum ), IllumMapCalc( MapNum ).TotalMapRefPoints );
 						IllumMapCalc( MapNum ).SolidAngAtMapPt = 0.0;
-						IllumMapCalc( MapNum ).SolidAngAtMapPtWtd.allocate( IllumMapCalc( MapNum ).TotalMapRefPoints, ZoneExtWin( ZoneNum ) );
+						IllumMapCalc( MapNum ).SolidAngAtMapPtWtd.allocate( ZoneExtWin( ZoneNum ), IllumMapCalc( MapNum ).TotalMapRefPoints );
 						IllumMapCalc( MapNum ).SolidAngAtMapPtWtd = 0.0;
-						IllumMapCalc( MapNum ).IllumFromWinAtMapPt.allocate( IllumMapCalc( MapNum ).TotalMapRefPoints, 2, ZoneExtWin( ZoneNum ) );
+						IllumMapCalc( MapNum ).IllumFromWinAtMapPt.allocate( ZoneExtWin( ZoneNum ), 2, IllumMapCalc( MapNum ).TotalMapRefPoints );
 						IllumMapCalc( MapNum ).IllumFromWinAtMapPt = 0.0;
-						IllumMapCalc( MapNum ).BackLumFromWinAtMapPt.allocate( IllumMapCalc( MapNum ).TotalMapRefPoints, 2, ZoneExtWin( ZoneNum ) );
+						IllumMapCalc( MapNum ).BackLumFromWinAtMapPt.allocate( ZoneExtWin( ZoneNum ), 2, IllumMapCalc( MapNum ).TotalMapRefPoints );
 						IllumMapCalc( MapNum ).BackLumFromWinAtMapPt = 0.0;
-						IllumMapCalc( MapNum ).SourceLumFromWinAtMapPt.allocate( IllumMapCalc( MapNum ).TotalMapRefPoints, 2, ZoneExtWin( ZoneNum ) );
+						IllumMapCalc( MapNum ).SourceLumFromWinAtMapPt.allocate( ZoneExtWin( ZoneNum ), 2, IllumMapCalc( MapNum ).TotalMapRefPoints );
 						IllumMapCalc( MapNum ).SourceLumFromWinAtMapPt = 0.0;
 					}
 				}
@@ -9886,11 +9886,11 @@ Label903: ;
 										SurfaceWindow( SurfNumAdj ).SolidAngAtRefPt = 0.0;
 										SurfaceWindow( SurfNumAdj ).SolidAngAtRefPtWtd.allocate( ZoneDaylight( ZoneNum ).TotalDaylRefPoints );
 										SurfaceWindow( SurfNumAdj ).SolidAngAtRefPtWtd = 0.0;
-										SurfaceWindow( SurfNumAdj ).IllumFromWinAtRefPt.allocate( ZoneDaylight( ZoneNum ).TotalDaylRefPoints, 2 );
+										SurfaceWindow( SurfNumAdj ).IllumFromWinAtRefPt.allocate( 2, ZoneDaylight( ZoneNum ).TotalDaylRefPoints );
 										SurfaceWindow( SurfNumAdj ).IllumFromWinAtRefPt = 0.0;
-										SurfaceWindow( SurfNumAdj ).BackLumFromWinAtRefPt.allocate( ZoneDaylight( ZoneNum ).TotalDaylRefPoints, 2 );
+										SurfaceWindow( SurfNumAdj ).BackLumFromWinAtRefPt.allocate( 2, ZoneDaylight( ZoneNum ).TotalDaylRefPoints );
 										SurfaceWindow( SurfNumAdj ).BackLumFromWinAtRefPt = 0.0;
-										SurfaceWindow( SurfNumAdj ).SourceLumFromWinAtRefPt.allocate( ZoneDaylight( ZoneNum ).TotalDaylRefPoints, 2 );
+										SurfaceWindow( SurfNumAdj ).SourceLumFromWinAtRefPt.allocate( 2, ZoneDaylight( ZoneNum ).TotalDaylRefPoints );
 										SurfaceWindow( SurfNumAdj ).SourceLumFromWinAtRefPt = 0.0;
 										SurfaceWindow( SurfNumAdj ).SurfDayLightInit = true;
 									}
@@ -9903,28 +9903,28 @@ Label903: ;
 				ZoneDaylight( ZoneNum ).NumOfDayltgExtWins = ZoneExtWin( ZoneNum );
 				WinSize = ZoneExtWin( ZoneNum );
 				RefSize = 2;
-				ZoneDaylight( ZoneNum ).DaylIllFacSky.allocate( WinSize, RefSize, 4, MaxSlatAngs + 1, 24 );
-				ZoneDaylight( ZoneNum ).DaylSourceFacSky.allocate( WinSize, RefSize, 4, MaxSlatAngs + 1, 24 );
-				ZoneDaylight( ZoneNum ).DaylBackFacSky.allocate( WinSize, RefSize, 4, MaxSlatAngs + 1, 24 );
-				ZoneDaylight( ZoneNum ).DaylIllFacSun.allocate( WinSize, RefSize, MaxSlatAngs + 1, 24 );
-				ZoneDaylight( ZoneNum ).DaylIllFacSunDisk.allocate( WinSize, RefSize, MaxSlatAngs + 1, 24 );
-				ZoneDaylight( ZoneNum ).DaylSourceFacSun.allocate( WinSize, RefSize, MaxSlatAngs + 1, 24 );
-				ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk.allocate( WinSize, RefSize, MaxSlatAngs + 1, 24 );
-				ZoneDaylight( ZoneNum ).DaylBackFacSun.allocate( WinSize, RefSize, MaxSlatAngs + 1, 24 );
-				ZoneDaylight( ZoneNum ).DaylBackFacSunDisk.allocate( WinSize, RefSize, MaxSlatAngs + 1, 24 );
+				ZoneDaylight( ZoneNum ).DaylIllFacSky.allocate( 24, MaxSlatAngs + 1, 4, RefSize, WinSize );
+				ZoneDaylight( ZoneNum ).DaylSourceFacSky.allocate( 24, MaxSlatAngs + 1, 4, RefSize, WinSize );
+				ZoneDaylight( ZoneNum ).DaylBackFacSky.allocate( 24, MaxSlatAngs + 1, 4, RefSize, WinSize );
+				ZoneDaylight( ZoneNum ).DaylIllFacSun.allocate( 24, MaxSlatAngs + 1, RefSize, WinSize );
+				ZoneDaylight( ZoneNum ).DaylIllFacSunDisk.allocate( 24, MaxSlatAngs + 1, RefSize, WinSize );
+				ZoneDaylight( ZoneNum ).DaylSourceFacSun.allocate( 24, MaxSlatAngs + 1, RefSize, WinSize );
+				ZoneDaylight( ZoneNum ).DaylSourceFacSunDisk.allocate( 24, MaxSlatAngs + 1, RefSize, WinSize );
+				ZoneDaylight( ZoneNum ).DaylBackFacSun.allocate( 24, MaxSlatAngs + 1, RefSize, WinSize );
+				ZoneDaylight( ZoneNum ).DaylBackFacSunDisk.allocate( 24, MaxSlatAngs + 1, RefSize, WinSize );
 
 				for ( loop = 1; loop <= ZoneDaylight( ZoneNum ).MapCount; ++loop ) {
 					MapNum = ZoneDaylight( ZoneNum ).ZoneToMap( loop );
 					RefSize = IllumMapCalc( MapNum ).TotalMapRefPoints;
-					IllumMapCalc( MapNum ).DaylIllFacSky.allocate( WinSize, RefSize, 4, MaxSlatAngs + 1, 24 );
-					IllumMapCalc( MapNum ).DaylSourceFacSky.allocate( WinSize, RefSize, 4, MaxSlatAngs + 1, 24 );
-					IllumMapCalc( MapNum ).DaylBackFacSky.allocate( WinSize, RefSize, 4, MaxSlatAngs + 1, 24 );
-					IllumMapCalc( MapNum ).DaylIllFacSun.allocate( WinSize, RefSize, MaxSlatAngs + 1, 24 );
-					IllumMapCalc( MapNum ).DaylIllFacSunDisk.allocate( WinSize, RefSize, MaxSlatAngs + 1, 24 );
-					IllumMapCalc( MapNum ).DaylSourceFacSun.allocate( WinSize, RefSize, MaxSlatAngs + 1, 24 );
-					IllumMapCalc( MapNum ).DaylSourceFacSunDisk.allocate( WinSize, RefSize, MaxSlatAngs + 1, 24 );
-					IllumMapCalc( MapNum ).DaylBackFacSun.allocate( WinSize, RefSize, MaxSlatAngs + 1, 24 );
-					IllumMapCalc( MapNum ).DaylBackFacSunDisk.allocate( WinSize, RefSize, MaxSlatAngs + 1, 24 );
+					IllumMapCalc( MapNum ).DaylIllFacSky.allocate( 24, MaxSlatAngs + 1, 4, RefSize, WinSize );
+					IllumMapCalc( MapNum ).DaylSourceFacSky.allocate( 24, MaxSlatAngs + 1, 4, RefSize, WinSize );
+					IllumMapCalc( MapNum ).DaylBackFacSky.allocate( 24, MaxSlatAngs + 1, 4, RefSize, WinSize );
+					IllumMapCalc( MapNum ).DaylIllFacSun.allocate( 24, MaxSlatAngs + 1, RefSize, WinSize );
+					IllumMapCalc( MapNum ).DaylIllFacSunDisk.allocate( 24, MaxSlatAngs + 1, RefSize, WinSize );
+					IllumMapCalc( MapNum ).DaylSourceFacSun.allocate( 24, MaxSlatAngs + 1, RefSize, WinSize );
+					IllumMapCalc( MapNum ).DaylSourceFacSunDisk.allocate( 24, MaxSlatAngs + 1, RefSize, WinSize );
+					IllumMapCalc( MapNum ).DaylBackFacSun.allocate( 24, MaxSlatAngs + 1, RefSize, WinSize );
+					IllumMapCalc( MapNum ).DaylBackFacSunDisk.allocate( 24, MaxSlatAngs + 1, RefSize, WinSize );
 				}
 
 			} // End of check if a Daylighting:Detailed zone
@@ -10097,7 +10097,7 @@ Label903: ;
 					if ( IntWinNextToIntWinAdjZone ) {
 						for ( IL = 1; IL <= ZoneDaylight( ZoneNum ).TotalDaylRefPoints; ++IL ) {
 							// Reference point in absolute coordinate system
-							RREF( {1,3} ) = ZoneDaylight( ZoneNum ).DaylRefPtAbsCoord( IL, {1,3} );
+							RREF( {1,3} ) = ZoneDaylight( ZoneNum ).DaylRefPtAbsCoord( {1,3}, IL );
 							Rectangle = false;
 							Triangle = false;
 							if ( Surface( IWin ).Sides == 3 ) Triangle = true;

@@ -103,12 +103,12 @@ namespace ThermalEN673Calc {
 		emis.dim( maxlay2 );
 		asol.dim( maxlay );
 		presure.dim( maxlay1 );
-		iprop.dim( maxlay1, maxgas );
-		frct.dim( maxlay1, maxgas );
+		iprop.dim( maxgas, maxlay1 );
+		frct.dim( maxgas, maxlay1 );
 		nmix.dim( maxlay1 );
-		xgcon.dim( maxgas, 3 );
-		xgvis.dim( maxgas, 3 );
-		xgcp.dim( maxgas, 3 );
+		xgcon.dim( 3, maxgas );
+		xgvis.dim( 3, maxgas );
+		xgcp.dim( 3, maxgas );
 		xwght.dim( maxgas );
 		theta.dim( maxlay2 );
 		ibc.dim( 2 );
@@ -200,11 +200,11 @@ namespace ThermalEN673Calc {
 		gap.dim( MaxGap );
 		thick.dim( maxlay );
 		scon.dim( maxlay );
-		iprop.dim( maxlay1, maxgas );
-		frct.dim( maxlay1, maxgas );
-		xgcon.dim( maxgas, 3 );
-		xgvis.dim( maxgas, 3 );
-		xgcp.dim( maxgas, 3 );
+		iprop.dim( maxgas, maxlay1 );
+		frct.dim( maxgas, maxlay1 );
+		xgcon.dim( 3, maxgas );
+		xgvis.dim( 3, maxgas );
+		xgcp.dim( 3, maxgas );
 		xwght.dim( maxgas );
 		presure.dim( maxlay1 );
 		nmix.dim( maxlay1 );
@@ -321,8 +321,8 @@ namespace ThermalEN673Calc {
 					//   write(18, 22222) iprop(i+1, j), tempDens, gvis(iprop(i+1,j), 1), gcon(iprop(i+1,j), 1), gcp(iprop(i+1,j), 1)
 					dT( i ) = 15.0 / ( nlayer - 1 ); // set initial temperature distribution
 					for ( j = 1; j <= nmix( i + 1 ); ++j ) {
-						ipropg( j ) = iprop( i + 1, j );
-						frctg( j ) = frct( i + 1, j );
+						ipropg( j ) = iprop( j, i + 1 );
+						frctg( j ) = frct( j, i + 1 );
 					}
 					GASSES90( Tm, ipropg, frctg, presure( i + 1 ), nmix( i + 1 ), xwght, xgcon, xgvis, xgcp, con, visc, dens, cp, pr, standard, nperr, ErrorMessage );
 					Gr( i ) = ( GravityConstant * pow_3( gap( i ) ) * dT( i ) * pow_2( dens ) ) / ( Tm * pow_2( visc ) );
@@ -373,8 +373,8 @@ namespace ThermalEN673Calc {
 								Tm = ( theta( 2 * i ) + theta( 2 * i + 1 ) ) / 2.0;
 							}
 							for ( j = 1; j <= nmix( i + 1 ); ++j ) {
-								ipropg( j ) = iprop( i + 1, j );
-								frctg( j ) = frct( i + 1, j );
+								ipropg( j ) = iprop( j, i + 1 );
+								frctg( j ) = frct( j, i + 1 );
 							} // j, gas mix
 							GASSES90( Tm, ipropg, frctg, presure( i + 1 ), nmix( i + 1 ), xwght, xgcon, xgvis, xgcp, con, visc, dens, cp, pr, standard, nperr, ErrorMessage );
 							Gr( i ) = ( GravityConstant * pow_3( gap( i ) ) * dT( i ) * pow_2( dens ) ) / ( Tm * pow_2( visc ) );

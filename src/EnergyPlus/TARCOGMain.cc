@@ -439,11 +439,11 @@ namespace TARCOGMain {
 		emis.dim( maxlay2 );
 		asol.dim( maxlay );
 		presure.dim( maxlay1 );
-		iprop.dim( maxlay1, maxgas );
-		frct.dim( maxlay1, maxgas );
-		xgcon.dim( maxgas, 3 );
-		xgvis.dim( maxgas, 3 );
-		xgcp.dim( maxgas, 3 );
+		iprop.dim( maxgas, maxlay1 );
+		frct.dim( maxgas, maxlay1 );
+		xgcon.dim( 3, maxgas );
+		xgvis.dim( 3, maxgas );
+		xgcp.dim( 3, maxgas );
 		xwght.dim( maxgas );
 		gama.dim( maxgas );
 		nmix.dim( maxlay1 );

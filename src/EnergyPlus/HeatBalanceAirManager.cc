@@ -2249,9 +2249,9 @@ namespace HeatBalanceAirManager {
 
 		// Detect invalid Crossmixings
 		if ( TotCrossMixing > 1 && ! ErrorsFound ) {
-			SVals1.allocate( 24, NumOfTimeStepInHour );
+			SVals1.allocate( NumOfTimeStepInHour, 24 );
 			SVals1 = 0.0;
-			SVals2.allocate( 24, NumOfTimeStepInHour );
+			SVals2.allocate( NumOfTimeStepInHour, 24 );
 			SVals2 = 0.0;
 			OverLap.dimension( TotCrossMixing, false );
 			for ( Loop = 1; Loop <= TotCrossMixing; ++Loop ) {
@@ -2271,7 +2271,7 @@ namespace HeatBalanceAirManager {
 						if ( OverLap( Loop ) && OverLap( Loop1 ) ) continue; // Already problem for these Cross Mixings
 						for ( Hr = 1; Hr <= 24; ++Hr ) {
 							for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
-								if ( SVals1( Hr, TS ) == 0.0 || SVals2( Hr, TS ) == 0.0 ) continue;
+								if ( SVals1( TS, Hr ) == 0.0 || SVals2( TS, Hr ) == 0.0 ) continue;
 								ShowSevereError( RoutineName + "Overlapping Cross Mixings found" );
 								ShowContinueError( "Cross Mixing with receiving zone " + Zone( CrossMixing( Loop ).ZonePtr ).Name + ", source zone " + Zone( CrossMixing( Loop ).FromZone ).Name );
 								ShowContinueError( "overlaps with Cross Mixing with receiving zone " + Zone( CrossMixing( Loop1 ).ZonePtr ).Name + ", source zone " + Zone( CrossMixing( Loop1 ).FromZone ).Name );

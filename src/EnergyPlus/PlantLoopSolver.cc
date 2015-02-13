@@ -616,8 +616,8 @@ namespace PlantLoopSolver {
 					MaxParallelBranchCount = max( MaxParallelBranchCount, PlantLoop( LoopCounter ).LoopSide( LoopSideCounter ).TotalBranches - 2 );
 				}
 			}
-//			LoadedConstantSpeedBranchFlowRateSteps.allocate( 2, MaxParallelBranchCount );
-			NoLoadConstantSpeedBranchFlowRateSteps.allocate( 2, MaxParallelBranchCount );
+//			LoadedConstantSpeedBranchFlowRateSteps.allocate( MaxParallelBranchCount, 2 );
+			NoLoadConstantSpeedBranchFlowRateSteps.allocate( MaxParallelBranchCount, 2 );
 			AllocatedParallelArray = true;
 		}
 
@@ -841,7 +841,7 @@ namespace PlantLoopSolver {
 //								LoadedConstantSpeedBranchFlowRateSteps( LoopSideCounter, ParallelBranchIndex ) = branch_mass_flow;
 								LoadedConstantSpeedBranchFlowRateSteps_sum += branch_mass_flow;
 							} else {
-								NoLoadConstantSpeedBranchFlowRateSteps( LoopSideCounter, ParallelBranchIndex ) = branch_mass_flow;
+								NoLoadConstantSpeedBranchFlowRateSteps( ParallelBranchIndex, LoopSideCounter ) = branch_mass_flow;
 								NoLoadConstantSpeedBranchFlowRateSteps_sum += branch_mass_flow;
 							}
 						}
@@ -864,7 +864,7 @@ namespace PlantLoopSolver {
 							} else {
 								continue;
 							}
-							auto const steps( NoLoadConstantSpeedBranchFlowRateSteps( LoopSideCounter, ParallelBranchIndex ) );
+							auto const steps( NoLoadConstantSpeedBranchFlowRateSteps( ParallelBranchIndex, LoopSideCounter ) );
 							if ( steps > 0.0 ) { // add in branches with zero MyLoad  in branch input order until satisfied
 								if ( tmpLoopFlow > AccumFlowSteps ) {
 									if ( tmpLoopFlow <= AccumFlowSteps + steps ) { // found it set requests and exit

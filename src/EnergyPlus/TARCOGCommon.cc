@@ -181,7 +181,7 @@ namespace TARCOGCommon {
 		for ( i = 1; i <= 4 * nlayer; ++i ) {
 			b( i ) = 0.0;
 			for ( j = 1; j <= 4 * nlayer; ++j ) {
-				a( i, j ) = 0.0;
+				a( j, i ) = 0.0;
 			}
 		}
 
@@ -199,30 +199,30 @@ namespace TARCOGCommon {
 			back = 2 * i;
 			if ( nlayer != 1 ) {
 				if ( i != 1 ) {
-					a( k, k - 3 ) = -hcgas( i );
-					a( k, k - 1 ) = -1.0;
-					a( k + 1, k - 3 ) = -hcgas( i );
-					a( k + 1, k - 1 ) = -1.0;
-					a( k + 2, k - 1 ) = rir( front );
-					a( k + 3, k - 1 ) = tir( front );
+					a( k - 3, k ) = -hcgas( i );
+					a( k - 1, k ) = -1.0;
+					a( k - 3, k + 1 ) = -hcgas( i );
+					a( k - 1, k + 1 ) = -1.0;
+					a( k - 1, k + 2 ) = rir( front );
+					a( k - 1, k + 3 ) = tir( front );
 				}
 				if ( i != nlayer ) {
-					a( k, k + 4 ) = -hcgas( i + 1 );
-					a( k, k + 6 ) = -1.0;
-					a( k + 2, k + 6 ) = tir( back );
-					a( k + 3, k + 6 ) = rir( back );
+					a( k + 4, k ) = -hcgas( i + 1 );
+					a( k + 6, k ) = -1.0;
+					a( k + 6, k + 2 ) = tir( back );
+					a( k + 6, k + 3 ) = rir( back );
 				}
 			}
 			a( k, k ) = hcgas( i );
-			a( k, k + 1 ) = hcgas( i + 1 );
-			a( k, k + 2 ) = 1.0;
-			a( k, k + 3 ) = 1.0;
-			a( k + 1, k ) = scon( i ) / thick( i ) + hcgas( i );
+			a( k + 1, k ) = hcgas( i + 1 );
+			a( k + 2, k ) = 1.0;
+			a( k + 3, k ) = 1.0;
+			a( k, k + 1 ) = scon( i ) / thick( i ) + hcgas( i );
 			a( k + 1, k + 1 ) = -scon( i ) / thick( i );
-			a( k + 1, k + 2 ) = 1.0;
-			a( k + 2, k ) = emis( front ) * StefanBoltzmann * pow_3( theta( front ) );
+			a( k + 2, k + 1 ) = 1.0;
+			a( k, k + 2 ) = emis( front ) * StefanBoltzmann * pow_3( theta( front ) );
 			a( k + 2, k + 2 ) = -1.0;
-			a( k + 3, k + 1 ) = emis( back ) * StefanBoltzmann * pow_3( theta( back ) );
+			a( k + 1, k + 3 ) = emis( back ) * StefanBoltzmann * pow_3( theta( back ) );
 			a( k + 3, k + 3 ) = -1.0;
 		}
 
@@ -320,7 +320,7 @@ namespace TARCOGCommon {
 		for ( i = 1; i <= n; ++i ) {
 			aamax = 0.0;
 			for ( j = 1; j <= n; ++j ) {
-				if ( std::abs( a( i, j ) ) > aamax ) aamax = std::abs( a( i, j ) );
+				if ( std::abs( a( j, i ) ) > aamax ) aamax = std::abs( a( j, i ) );
 			} // j
 			if ( aamax == 0.0 ) {
 				nperr = 13;
@@ -332,19 +332,19 @@ namespace TARCOGCommon {
 
 		for ( j = 1; j <= n; ++j ) {
 			for ( i = 1; i <= j - 1; ++i ) {
-				sum = a( i, j );
+				sum = a( j, i );
 				for ( k = 1; k <= i - 1; ++k ) {
-					sum -= a( i, k ) * a( k, j );
+					sum -= a( k, i ) * a( j, k );
 				} // k
-				a( i, j ) = sum;
+				a( j, i ) = sum;
 			} // i
 			aamax = 0.0;
 			for ( i = j; i <= n; ++i ) {
-				sum = a( i, j );
+				sum = a( j, i );
 				for ( k = 1; k <= j - 1; ++k ) {
-					sum -= a( i, k ) * a( k, j );
+					sum -= a( k, i ) * a( j, k );
 				} // k
-				a( i, j ) = sum;
+				a( j, i ) = sum;
 				dum = vv( i ) * std::abs( sum );
 				if ( dum >= aamax ) {
 					imax = i;
@@ -353,9 +353,9 @@ namespace TARCOGCommon {
 			} // i
 			if ( j != imax ) {
 				for ( k = 1; k <= n; ++k ) {
-					dum = a( imax, k );
-					a( imax, k ) = a( j, k );
-					a( j, k ) = dum;
+					dum = a( k, imax );
+					a( k, imax ) = a( k, j );
+					a( k, j ) = dum;
 				} // k
 				d = -d;
 				vv( imax ) = vv( j );
@@ -365,7 +365,7 @@ namespace TARCOGCommon {
 			if ( j != n ) {
 				dum = 1.0 / a( j, j );
 				for ( i = j + 1; i <= n; ++i ) {
-					a( i, j ) *= dum;
+					a( j, i ) *= dum;
 				} // i
 			}
 		} // j
@@ -402,7 +402,7 @@ namespace TARCOGCommon {
 			b( ll ) = b( i );
 			if ( ii != 0 ) {
 				for ( j = ii; j <= i - 1; ++j ) {
-					sum -= a( i, j ) * b( j );
+					sum -= a( j, i ) * b( j );
 				} // j
 			} else if ( sum != 0.0 ) {
 				ii = i;
@@ -413,7 +413,7 @@ namespace TARCOGCommon {
 		for ( i = n; i >= 1; --i ) {
 			sum = b( i );
 			for ( j = i + 1; j <= n; ++j ) {
-				sum -= a( i, j ) * b( j );
+				sum -= a( j, i ) * b( j );
 			} // j
 			b( i ) = sum / a( i, i );
 		} // i

@@ -180,11 +180,11 @@ namespace TARCOGOutput {
 		tvent.dim( maxlay1 );
 		presure.dim( maxlay1 );
 		nmix.dim( maxlay1 );
-		iprop.dim( maxlay1, maxgas );
-		frct.dim( maxlay1, maxgas );
-		xgcon.dim( maxgas, 3 );
-		xgvis.dim( maxgas, 3 );
-		xgcp.dim( maxgas, 3 );
+		iprop.dim( maxgas, maxlay1 );
+		frct.dim( maxgas, maxlay1 );
+		xgcon.dim( 3, maxgas );
+		xgvis.dim( 3, maxgas );
+		xgcp.dim( 3, maxgas );
 		xwght.dim( maxgas );
 
 		// Locals
@@ -470,15 +470,15 @@ namespace TARCOGOutput {
 			//if (mgas.eq.0) then ! show received gass properties:
 			for ( j = 1; j <= nmix( i ); ++j ) {
 				//if (iprop(i, j).eq.1) write(InArgumentsFile, 1115) iprop(i, j), ' ' 100*frct(i, j) ! Air
-				gio::write( InArgumentsFile, Format_1115 ) << iprop( i, j ) << ' ' << 100 * frct( i, j ); // gas
+				gio::write( InArgumentsFile, Format_1115 ) << iprop( j, i ) << ' ' << 100 * frct( j, i ); // gas
 				//if (iprop(i, j).eq.2) write(InArgumentsFile, 1116) iprop(i, j), 100*frct(i, j) ! Argon
 				//if (iprop(i, j).eq.3) write(InArgumentsFile, 1117) iprop(i, j), 100*frct(i, j) ! Krypton
 				//if (iprop(i, j).eq.4) write(InArgumentsFile, 1118) iprop(i, j), 100*frct(i, j) ! Xenon
-				gio::write( InArgumentsFile, Format_1130 ) << iprop( i, j ) << 100 * frct( i, j );
-				gio::write( InArgumentsFile, Format_1131 ) << xgcon( iprop( i, j ), 1 ) << xgcon( iprop( i, j ), 2 ) << xgcon( iprop( i, j ), 3 );
-				gio::write( InArgumentsFile, Format_1132 ) << xgvis( iprop( i, j ), 1 ) << xgvis( iprop( i, j ), 2 ) << xgvis( iprop( i, j ), 3 );
-				gio::write( InArgumentsFile, Format_1133 ) << xgcp( iprop( i, j ), 1 ) << xgcp( iprop( i, j ), 2 ) << xgcp( iprop( i, j ), 3 );
-				gio::write( InArgumentsFile, Format_1134 ) << xwght( iprop( i, j ) );
+				gio::write( InArgumentsFile, Format_1130 ) << iprop( j, i ) << 100 * frct( j, i );
+				gio::write( InArgumentsFile, Format_1131 ) << xgcon( 1, iprop( j, i ) ) << xgcon( 2, iprop( j, i ) ) << xgcon( 3, iprop( j, i ) );
+				gio::write( InArgumentsFile, Format_1132 ) << xgvis( 1, iprop( j, i ) ) << xgvis( 2, iprop( j, i ) ) << xgvis( 3, iprop( j, i ) );
+				gio::write( InArgumentsFile, Format_1133 ) << xgcp( 1, iprop( j, i ) ) << xgcp( 2, iprop( j, i ) ) << xgcp( 3, iprop( j, i ) );
+				gio::write( InArgumentsFile, Format_1134 ) << xwght( iprop( j, i ) );
 			} // - j - one mix
 			//end if  ! MGAS = 1 - "table" gasses
 		} // i - gas loop
@@ -544,13 +544,13 @@ namespace TARCOGOutput {
 		// Argument array dimensioning
 		LayerType.dim( maxlay );
 		nmix.dim( maxlay1 );
-		frct.dim( maxlay1, maxgas );
+		frct.dim( maxgas, maxlay1 );
 		thick.dim( maxlay );
 		scon.dim( maxlay );
 		gap.dim( MaxGap );
-		xgcon.dim( maxgas, 3 );
-		xgvis.dim( maxgas, 3 );
-		xgcp.dim( maxgas, 3 );
+		xgcon.dim( 3, maxgas );
+		xgvis.dim( 3, maxgas );
+		xgcp.dim( 3, maxgas );
 		xwght.dim( maxgas );
 
 		// Locals
@@ -616,10 +616,10 @@ namespace TARCOGOutput {
 			if ( i == nlayer + 1 ) gio::write( InArgumentsFile, Format_11111 );
 			//    write(InArgumentsFile, 1111) i-1
 			for ( j = 1; j <= nmix( i ); ++j ) {
-				gio::write( InArgumentsFile, Format_1130 ) << j << 100 * frct( i, j );
-				gio::write( InArgumentsFile, Format_1131 ) << xgcon( j, 1 ) << xgcon( j, 2 ) << xgcon( j, 3 );
-				gio::write( InArgumentsFile, Format_1132 ) << xgvis( j, 1 ) << xgvis( j, 2 ) << xgvis( j, 3 );
-				gio::write( InArgumentsFile, Format_1133 ) << xgcp( j, 1 ) << xgcp( j, 2 ) << xgcp( j, 3 );
+				gio::write( InArgumentsFile, Format_1130 ) << j << 100 * frct( j, i );
+				gio::write( InArgumentsFile, Format_1131 ) << xgcon( 1, j ) << xgcon( 2, j ) << xgcon( 3, j );
+				gio::write( InArgumentsFile, Format_1132 ) << xgvis( 1, j ) << xgvis( 2, j ) << xgvis( 3, j );
+				gio::write( InArgumentsFile, Format_1133 ) << xgcp( 1, j ) << xgcp( 2, j ) << xgcp( 3, j );
 				gio::write( InArgumentsFile, Format_1134 ) << xwght( j );
 			} // j - gas mix
 		} // i - gaps
@@ -1121,11 +1121,11 @@ namespace TARCOGOutput {
 		tvent.dim( maxlay1 );
 		presure.dim( maxlay1 );
 		nmix.dim( maxlay1 );
-		iprop.dim( maxlay1, maxgas );
-		frct.dim( maxlay1, maxgas );
-		xgcon.dim( maxgas, 3 );
-		xgvis.dim( maxgas, 3 );
-		xgcp.dim( maxgas, 3 );
+		iprop.dim( maxgas, maxlay1 );
+		frct.dim( maxgas, maxlay1 );
+		xgcon.dim( 3, maxgas );
+		xgvis.dim( 3, maxgas );
+		xgcp.dim( 3, maxgas );
 		xwght.dim( maxgas );
 		gama.dim( maxgas );
 
@@ -1271,19 +1271,19 @@ namespace TARCOGOutput {
 			gio::write( WINCogFile, Format_2031 );
 			gio::write( Format_2020 ) << xgcon( 1, 1 );
 			for ( j = 2; i <= 3; ++j ) {
-				gio::write( WINCogFile, Format_2030 ) << xgcon( i, j );
+				gio::write( WINCogFile, Format_2030 ) << xgcon( j, i );
 			}
 			gio::write( WINCogFile );
 			gio::write( WINCogFile, Format_2032 );
 			gio::write( Format_2020 ) << xgvis( 1, 1 );
 			for ( j = 2; i <= 3; ++j ) {
-				gio::write( WINCogFile, Format_2030 ) << xgvis( i, j );
+				gio::write( WINCogFile, Format_2030 ) << xgvis( j, i );
 			}
 			gio::write( WINCogFile );
 			gio::write( WINCogFile, Format_2033 );
 			gio::write( Format_2020 ) << xgcp( 1, 1 );
 			for ( j = 2; i <= 3; ++j ) {
-				gio::write( WINCogFile, Format_2030 ) << xgcp( i, j );
+				gio::write( WINCogFile, Format_2030 ) << xgcp( j, i );
 			}
 			gio::write( WINCogFile );
 			gio::write( WINCogFile, Format_2034 );
@@ -1353,10 +1353,10 @@ namespace TARCOGOutput {
 				gio::write( WINCogFile, Format_1048 );
 				gio::write( WINCogFile, "('    ',F24.12, ', ', F24.12,', ',F24.12,', ',I1,', ',$)" ) << gap( i ) << GapDef( i ) << presure( i + 1 ) << nmix( i + 1 );
 				for ( j = 1; j <= nmix( i + 1 ); ++ j ) {
-					gio::write( WINCogFile, "(I1,', ',$)" ) << iprop( i + 1, j );
+					gio::write( WINCogFile, "(I1,', ',$)" ) << iprop( j, i + 1 );
 				}
 				for ( j = 1; j <= nmix( i + 1 ); ++ j ) {
-					gio::write( WINCogFile, "(F24.12,', ',$)" ) << frct( i + 1, j );
+					gio::write( WINCogFile, "(F24.12,', ',$)" ) << frct( j, i + 1 );
 				}
 				gio::write( WINCogFile, "('    ',F24.12,', ', F24.12,', ',F24.12,', ',I1)" ) << vvent( i + 1 ) << tvent( i + 1 ) << SupportPillar( i );
 				if ( SupportPillar( i ) == YES_SupportPillar ) {

@@ -2818,12 +2818,12 @@ namespace ZoneTempPredictorCorrector {
 
 				if ( allocated( OptStartData.OptStartFlag ) ) {
 					if ( ! allocated( DaySPValues ) ) {
-						DaySPValues.allocate( 24, NumOfTimeStepInHour );
+						DaySPValues.allocate( NumOfTimeStepInHour, 24 );
 					}
 					if ( OptStartData.ActualZoneNum( ActualZoneNum ) == ActualZoneNum ) {
 						GetScheduleValuesForDay( SetPointTempSchedIndexCold, DaySPValues );
 						OccStartTime = CEILING( OptStartData.OccStartTime( ActualZoneNum ) ) + 1;
-						TempZoneThermostatSetPoint( ActualZoneNum ) = DaySPValues( OccStartTime, 1 );
+						TempZoneThermostatSetPoint( ActualZoneNum ) = DaySPValues( 1, OccStartTime );
 					}
 
 					if ( OptStartData.OptStartFlag( ActualZoneNum ) ) {
@@ -2851,14 +2851,14 @@ namespace ZoneTempPredictorCorrector {
 
 				if ( allocated( OptStartData.OptStartFlag ) ) {
 					if ( ! allocated( DaySPValues ) ) {
-						DaySPValues.allocate( 24, NumOfTimeStepInHour );
+						DaySPValues.allocate( NumOfTimeStepInHour, 24 );
 					}
 					if ( OptStartData.ActualZoneNum( ActualZoneNum ) == ActualZoneNum ) {
 						GetScheduleValuesForDay( SetPointTempSchedIndexCold, DaySPValues );
 						OccStartTime = CEILING( OptStartData.OccStartTime( ActualZoneNum ) ) + 1;
-						OccRoomTSetPointCool( ActualZoneNum ) = DaySPValues( OccStartTime, 1 );
+						OccRoomTSetPointCool( ActualZoneNum ) = DaySPValues( 1, OccStartTime );
 						GetScheduleValuesForDay( SetPointTempSchedIndexHot, DaySPValues );
-						OccRoomTSetPointHeat( ActualZoneNum ) = DaySPValues( OccStartTime, 1 );
+						OccRoomTSetPointHeat( ActualZoneNum ) = DaySPValues( 1, OccStartTime );
 					}
 
 					if ( OptStartData.OptStartFlag( ActualZoneNum ) ) {
@@ -5136,7 +5136,7 @@ namespace ZoneTempPredictorCorrector {
 
 		//first time run allocate arrays and setup output variable
 		if ( SetupOscillationOutputFlag ) {
-			ZoneTempHist.allocate( NumOfZones, 4 );
+			ZoneTempHist.allocate( 4, NumOfZones );
 			ZoneTempHist = 0.0;
 			ZoneTempOscillate.dimension( NumOfZones, 0.0 );
 			//set up zone by zone variables
@@ -5154,13 +5154,13 @@ namespace ZoneTempPredictorCorrector {
 		isAnyZoneOscillating = false;
 		for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
 			isOscillate = false;
-			ZoneTempHist( iZone, 4 ) = ZoneTempHist( iZone, 3 );
-			ZoneTempHist( iZone, 3 ) = ZoneTempHist( iZone, 2 );
-			ZoneTempHist( iZone, 2 ) = ZoneTempHist( iZone, 1 );
-			ZoneTempHist( iZone, 1 ) = ZT( iZone );
-			Diff34 = ZoneTempHist( iZone, 3 ) - ZoneTempHist( iZone, 4 );
-			Diff23 = ZoneTempHist( iZone, 2 ) - ZoneTempHist( iZone, 3 );
-			Diff12 = ZoneTempHist( iZone, 1 ) - ZoneTempHist( iZone, 2 );
+			ZoneTempHist( 4, iZone ) = ZoneTempHist( 3, iZone );
+			ZoneTempHist( 3, iZone ) = ZoneTempHist( 2, iZone );
+			ZoneTempHist( 2, iZone ) = ZoneTempHist( 1, iZone );
+			ZoneTempHist( 1, iZone ) = ZT( iZone );
+			Diff34 = ZoneTempHist( 3, iZone ) - ZoneTempHist( 4, iZone );
+			Diff23 = ZoneTempHist( 2, iZone ) - ZoneTempHist( 3, iZone );
+			Diff12 = ZoneTempHist( 1, iZone ) - ZoneTempHist( 2, iZone );
 			// roll out the conditionals for increased performance
 			if ( Diff12 > OscillateMagnitude ) {
 				if ( Diff23 < NegOscillateMagnitude ) {

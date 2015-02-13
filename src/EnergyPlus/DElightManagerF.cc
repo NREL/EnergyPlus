@@ -274,7 +274,7 @@ namespace DElightManagerF {
 					ShowWarningError( "Maximum of 100 Reference Points exceeded for DElight Zone =" + AlphaArrayDElight( 1 ) );
 					ShowWarningError( "  Only first 100 Reference Points included in DElight analysis" );
 				}
-				ZoneDaylight( izone ).DaylRefPtAbsCoord.allocate( ZoneDaylight( izone ).TotalDElightRefPts, 3 );
+				ZoneDaylight( izone ).DaylRefPtAbsCoord.allocate( 3, ZoneDaylight( izone ).TotalDElightRefPts );
 				ZoneDaylight( izone ).DaylRefPtAbsCoord = 0.0;
 
 				// RJH 2008-03-07: Allocate and Init DaylIllumAtRefPt array for this DElight zone
@@ -602,7 +602,7 @@ namespace DElightManagerF {
 									RefPt_WCS_Coord( 2 ) = Xtrans * SinBldgRelNorth + Ytrans * CosBldgRelNorth;
 								}
 							}
-							ZoneDaylight( izone ).DaylRefPtAbsCoord( iNumRefPts, {1,3} ) = RefPt_WCS_Coord( {1,3} );
+							ZoneDaylight( izone ).DaylRefPtAbsCoord( {1,3}, iNumRefPts ) = RefPt_WCS_Coord( {1,3} );
 
 							// Validate that Reference Point coordinates are within the host Zone
 							if ( RefPt_WCS_Coord( 1 ) < Zone( izone ).MinimumX || RefPt_WCS_Coord( 1 ) > Zone( izone ).MaximumX ) {

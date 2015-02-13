@@ -413,8 +413,8 @@ namespace ReportSizingManager {
 		if ( SizingResult == AutoSize ) {
 			IsAutoSize = true;
 			HardSizeNoDesRun = false;
-			if ( !SizingDesRunThisAirSys && CurSysNum > 0 )CheckSysSizing( CompType, CompName );
-			if ( !SizingDesRunThisZone && CurZoneEqNum > 0 && !SizingDesValueFromParent )CheckZoneSizing( CompType, CompName );
+			if ( !SizingDesRunThisAirSys && CurSysNum > 0 ) CheckSysSizing( CompType, CompName );
+			if ( !SizingDesRunThisZone && CurZoneEqNum > 0 && !SizingDesValueFromParent ) CheckZoneSizing( CompType, CompName );
 		}
 
 		if ( SizingType == AutoCalculateSizing ) {

@@ -651,7 +651,7 @@ namespace General {
 		Real64 InterpProfSlatAng;
 
 		// Argument array dimensioning
-		PropArray.dim( 37, MaxSlatAngs );
+		PropArray.dim( MaxSlatAngs, 37 );
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -693,16 +693,16 @@ namespace General {
 		if ( VarSlats ) { // Variable-angle slats: interpolate in profile angle and slat angle
 			IBeta = int( SlatAng1 / DeltaSlatAng ) + 1;
 			SlatAngRatio = ( SlatAng1 - ( IBeta - 1 ) * DeltaSlatAng ) / DeltaSlatAng;
-			Val1 = PropArray( IAlpha, IBeta );
-			Val2 = PropArray( IAlpha, min( MaxSlatAngs, IBeta + 1 ) );
-			Val3 = PropArray( min( 37, IAlpha + 1 ), IBeta );
-			Val4 = PropArray( min( 37, IAlpha + 1 ), min( MaxSlatAngs, IBeta + 1 ) );
+			Val1 = PropArray( IBeta, IAlpha );
+			Val2 = PropArray( min( MaxSlatAngs, IBeta + 1 ), IAlpha );
+			Val3 = PropArray( IBeta, min( 37, IAlpha + 1 ) );
+			Val4 = PropArray( min( MaxSlatAngs, IBeta + 1 ), min( 37, IAlpha + 1 ) );
 			ValA = Val1 + SlatAngRatio * ( Val2 - Val1 );
 			ValB = Val3 + SlatAngRatio * ( Val4 - Val3 );
 			InterpProfSlatAng = ValA + ProfAngRatio * ( ValB - ValA );
 		} else { // Fixed-angle slats: interpolate only in profile angle
-			Val1 = PropArray( IAlpha, 1 );
-			Val2 = PropArray( min( 37, IAlpha + 1 ), 1 );
+			Val1 = PropArray( 1, IAlpha );
+			Val2 = PropArray( 1, min( 37, IAlpha + 1 ) );
 			InterpProfSlatAng = Val1 + ProfAngRatio * ( Val2 - Val1 );
 		}
 
@@ -2243,7 +2243,7 @@ namespace General {
 
 		// Compute Determinant
 
-		Determinant = A( 1, 1 ) * A( 2, 2 ) * A( 3, 3 ) + A( 1, 2 ) * A( 2, 3 ) * A( 3, 1 ) + A( 1, 3 ) * A( 2, 1 ) * A( 3, 2 ) - A( 1, 1 ) * A( 3, 2 ) * A( 2, 3 ) - A( 2, 1 ) * A( 1, 2 ) * A( 3, 3 ) - A( 3, 1 ) * A( 2, 2 ) * A( 1, 3 );
+		Determinant = A( 1, 1 ) * A( 2, 2 ) * A( 3, 3 ) + A( 2, 1 ) * A( 3, 2 ) * A( 1, 3 ) + A( 3, 1 ) * A( 1, 2 ) * A( 2, 3 ) - A( 1, 1 ) * A( 2, 3 ) * A( 3, 2 ) - A( 1, 2 ) * A( 2, 1 ) * A( 3, 3 ) - A( 1, 3 ) * A( 2, 2 ) * A( 3, 1 );
 
 		if ( std::abs( Determinant ) < .1E-12 ) {
 			ShowFatalError( "Determinant = [Zero] in Invert3By3Matrix", OutputFileStandard );
@@ -2251,15 +2251,15 @@ namespace General {
 
 		// Compute Inverse
 
-		InverseA( 1, 1 ) = ( A( 2, 2 ) * A( 3, 3 ) - A( 3, 2 ) * A( 2, 3 ) ) / Determinant;
-		InverseA( 2, 1 ) = ( A( 3, 1 ) * A( 2, 3 ) - A( 2, 1 ) * A( 3, 3 ) ) / Determinant;
-		InverseA( 3, 1 ) = ( A( 2, 1 ) * A( 3, 2 ) - A( 3, 1 ) * A( 2, 2 ) ) / Determinant;
-		InverseA( 1, 2 ) = ( A( 3, 2 ) * A( 1, 3 ) - A( 1, 2 ) * A( 3, 3 ) ) / Determinant;
-		InverseA( 2, 2 ) = ( A( 1, 1 ) * A( 3, 3 ) - A( 3, 1 ) * A( 1, 3 ) ) / Determinant;
-		InverseA( 3, 2 ) = ( A( 3, 1 ) * A( 1, 2 ) - A( 1, 1 ) * A( 3, 2 ) ) / Determinant;
-		InverseA( 1, 3 ) = ( A( 1, 2 ) * A( 2, 3 ) - A( 2, 2 ) * A( 1, 3 ) ) / Determinant;
-		InverseA( 2, 3 ) = ( A( 2, 1 ) * A( 1, 3 ) - A( 1, 1 ) * A( 2, 3 ) ) / Determinant;
-		InverseA( 3, 3 ) = ( A( 1, 1 ) * A( 2, 2 ) - A( 2, 1 ) * A( 1, 2 ) ) / Determinant;
+		InverseA( 1, 1 ) = ( A( 2, 2 ) * A( 3, 3 ) - A( 2, 3 ) * A( 3, 2 ) ) / Determinant;
+		InverseA( 1, 2 ) = ( A( 1, 3 ) * A( 3, 2 ) - A( 1, 2 ) * A( 3, 3 ) ) / Determinant;
+		InverseA( 1, 3 ) = ( A( 1, 2 ) * A( 2, 3 ) - A( 1, 3 ) * A( 2, 2 ) ) / Determinant;
+		InverseA( 2, 1 ) = ( A( 2, 3 ) * A( 3, 1 ) - A( 2, 1 ) * A( 3, 3 ) ) / Determinant;
+		InverseA( 2, 2 ) = ( A( 1, 1 ) * A( 3, 3 ) - A( 1, 3 ) * A( 3, 1 ) ) / Determinant;
+		InverseA( 2, 3 ) = ( A( 1, 3 ) * A( 2, 1 ) - A( 1, 1 ) * A( 2, 3 ) ) / Determinant;
+		InverseA( 3, 1 ) = ( A( 2, 1 ) * A( 3, 2 ) - A( 2, 2 ) * A( 3, 1 ) ) / Determinant;
+		InverseA( 3, 2 ) = ( A( 1, 2 ) * A( 3, 1 ) - A( 1, 1 ) * A( 3, 2 ) ) / Determinant;
+		InverseA( 3, 3 ) = ( A( 1, 1 ) * A( 2, 2 ) - A( 1, 2 ) * A( 2, 1 ) ) / Determinant;
 
 	}
 

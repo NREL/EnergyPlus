@@ -628,10 +628,8 @@ namespace SurfaceGeometry {
 		BmToBmReflFacObs.dimension( TotSurfaces, 0.0 );
 		BmToDiffReflFacObs.dimension( TotSurfaces, 0.0 );
 		BmToDiffReflFacGnd.dimension( TotSurfaces, 0.0 );
-		AWinSurf.allocate( TotSurfaces, CFSMAXNL + 1 );
-		AWinSurf = 0.0;
-		AWinCFOverlap.allocate( TotSurfaces, MaxSolidWinLayers );
-		AWinCFOverlap = 0.0;
+		AWinSurf.dimension( CFSMAXNL + 1, TotSurfaces, 0.0 );
+		AWinCFOverlap.dimension( MaxSolidWinLayers, TotSurfaces, 0.0 );
 
 	}
 
@@ -9180,11 +9178,11 @@ namespace SurfaceGeometry {
 						Material( TotMaterials ).GlassSpectralDataPtr = 0;
 						Material( TotMaterials ).NumberOfGasesInMixture = 1;
 						Material( TotMaterials ).GasCon( 1, 1 ) = 2.873e-3;
-						Material( TotMaterials ).GasCon( 1, 2 ) = 7.760e-5;
+						Material( TotMaterials ).GasCon( 2, 1 ) = 7.760e-5;
 						Material( TotMaterials ).GasVis( 1, 1 ) = 3.723e-6;
-						Material( TotMaterials ).GasVis( 1, 2 ) = 4.940e-8;
+						Material( TotMaterials ).GasVis( 2, 1 ) = 4.940e-8;
 						Material( TotMaterials ).GasCp( 1, 1 ) = 1002.737;
-						Material( TotMaterials ).GasCp( 1, 2 ) = 1.2324e-2;
+						Material( TotMaterials ).GasCp( 2, 1 ) = 1.2324e-2;
 						Material( TotMaterials ).GasWght( 1 ) = 28.97;
 						Material( TotMaterials ).GasFract( 1 ) = 1.0;
 						Material( TotMaterials ).AbsorpSolar = 0.0;

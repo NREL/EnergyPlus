@@ -885,8 +885,8 @@ namespace SwimmingPool {
 		// Get an estimate of the pool water specific heat
 		Cp = GetSpecificHeatGlycol( "WATER", Pool( PoolNum ).PoolWaterTemp, Pool( PoolNum ).GlycolIndex, RoutineName );
 
-		TH22 = TH( SurfNum, 2, 2 ); // inside surface temperature at the previous time step equals the old pool water temperature
-		TH11 = TH( SurfNum, 1, 1 ); // outside surface temperature at the current time step
+		TH22 = TH( 2, 2, SurfNum ); // inside surface temperature at the previous time step equals the old pool water temperature
+		TH11 = TH( 1, 1, SurfNum ); // outside surface temperature at the current time step
 		ConstrNum = Surface( SurfNum ).Construction;
 		TInSurf = Pool( PoolNum ).CurSetPtTemp;
 		Tmuw = Pool( PoolNum ).CurMakeupWaterTemp;
@@ -1217,7 +1217,7 @@ namespace SwimmingPool {
 			SurfNum = Pool( PoolNum ).SurfacePtr;
 
 			// First transfer the surface inside temperature data to the current pool water temperature
-			Pool( PoolNum ).PoolWaterTemp = TH( SurfNum, 1, 2 );
+			Pool( PoolNum ).PoolWaterTemp = TH( 2, 1, SurfNum );
 
 			// Next calculate the amount of heating done by the plant loop
 			Cp = GetSpecificHeatGlycol( "WATER", Pool( PoolNum ).PoolWaterTemp, Pool( PoolNum ).GlycolIndex, RoutineName );

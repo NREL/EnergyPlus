@@ -166,7 +166,7 @@ namespace WindowEquivalentLayer {
 		if ( TotWinEquivLayerConstructs < 1 ) return;
 		if ( ! allocated( CFS ) ) CFS.allocate( TotWinEquivLayerConstructs );
 		if ( ! allocated( EQLDiffPropFlag ) ) EQLDiffPropFlag.allocate( TotWinEquivLayerConstructs );
-		if ( ! allocated( CFSDiffAbsTrans ) ) CFSDiffAbsTrans.allocate( TotWinEquivLayerConstructs, CFSMAXNL + 1, 2 );
+		if ( ! allocated( CFSDiffAbsTrans ) ) CFSDiffAbsTrans.allocate( 2, CFSMAXNL + 1, TotWinEquivLayerConstructs );
 
 		EQLDiffPropFlag = true;
 		CFSDiffAbsTrans = 0.0;
@@ -232,7 +232,7 @@ namespace WindowEquivalentLayer {
 		int NumGLayers; // number of gap layers
 		int NumSLayers; // number of glazing and shade layers (non-gas layers)
 		int DoWhat; // DoWhat =1, index for diffuse, and =2 index for beam
-		Array2D< Real64 > SysAbs1( CFSMAXNL+1, 2 ); // layers absorptance and system transmittance
+		Array2D< Real64 > SysAbs1( 2, CFSMAXNL+1 ); // layers absorptance and system transmittance
 		// Flow
 
 		if ( ! allocated( CFSLayers ) ) CFSLayers.allocate( Construct( ConstrNum ).TotLayers );
@@ -341,14 +341,14 @@ namespace WindowEquivalentLayer {
 				CFS( EQLNum ).G( gLayer ).TAS = Material( MaterNum ).Thickness;
 				CFS( EQLNum ).G( gLayer ).FG.Name = Material( MaterNum ).GasName;
 				CFS( EQLNum ).G( gLayer ).FG.AK = Material( MaterNum ).GasCon( 1, 1 );
-				CFS( EQLNum ).G( gLayer ).FG.BK = Material( MaterNum ).GasCon( 1, 2 );
-				CFS( EQLNum ).G( gLayer ).FG.CK = Material( MaterNum ).GasCon( 1, 3 );
+				CFS( EQLNum ).G( gLayer ).FG.BK = Material( MaterNum ).GasCon( 2, 1 );
+				CFS( EQLNum ).G( gLayer ).FG.CK = Material( MaterNum ).GasCon( 3, 1 );
 				CFS( EQLNum ).G( gLayer ).FG.ACP = Material( MaterNum ).GasCp( 1, 1 );
-				CFS( EQLNum ).G( gLayer ).FG.BCP = Material( MaterNum ).GasCp( 1, 2 );
-				CFS( EQLNum ).G( gLayer ).FG.CCP = Material( MaterNum ).GasCp( 1, 3 );
+				CFS( EQLNum ).G( gLayer ).FG.BCP = Material( MaterNum ).GasCp( 2, 1 );
+				CFS( EQLNum ).G( gLayer ).FG.CCP = Material( MaterNum ).GasCp( 3, 1 );
 				CFS( EQLNum ).G( gLayer ).FG.AVISC = Material( MaterNum ).GasVis( 1, 1 );
-				CFS( EQLNum ).G( gLayer ).FG.BVISC = Material( MaterNum ).GasVis( 1, 2 );
-				CFS( EQLNum ).G( gLayer ).FG.CVISC = Material( MaterNum ).GasVis( 1, 3 );
+				CFS( EQLNum ).G( gLayer ).FG.BVISC = Material( MaterNum ).GasVis( 2, 1 );
+				CFS( EQLNum ).G( gLayer ).FG.CVISC = Material( MaterNum ).GasVis( 3, 1 );
 				CFS( EQLNum ).G( gLayer ).FG.MHAT = Material( MaterNum ).GasWght( 1 );
 				// fills gas density and effective gap thickness
 				BuildGap( CFS( EQLNum ).G( gLayer ), CFS( EQLNum ).G( gLayer ).GTYPE, CFS( EQLNum ).G( gLayer ).TAS );
@@ -375,10 +375,10 @@ namespace WindowEquivalentLayer {
 
 		// Calculate layers diffuse absorptance and system diffuse transmittance
 		CalcEQLWindowOpticalProperty( CFS( EQLNum ), isDIFF, SysAbs1, 0.0, 0.0, 0.0 );
-		Construct( ConstrNum ).TransDiffFrontEQL = SysAbs1( CFS( EQLNum ).NL + 1, 1 );
-		CFSDiffAbsTrans( EQLNum, _, _ ) = SysAbs1;
-		Construct( ConstrNum ).AbsDiffFrontEQL( {1,CFSMAXNL} ) = SysAbs1( {1,CFSMAXNL}, 1 );
-		Construct( ConstrNum ).AbsDiffBackEQL( {1,CFSMAXNL} ) = SysAbs1( {1,CFSMAXNL}, 2 );
+		Construct( ConstrNum ).TransDiffFrontEQL = SysAbs1( 1, CFS( EQLNum ).NL + 1 );
+		CFSDiffAbsTrans( _, _, EQLNum ) = SysAbs1;
+		Construct( ConstrNum ).AbsDiffFrontEQL( {1,CFSMAXNL} ) = SysAbs1( 1, {1,CFSMAXNL} );
+		Construct( ConstrNum ).AbsDiffBackEQL( {1,CFSMAXNL} ) = SysAbs1( 2, {1,CFSMAXNL} );
 		// get construction front and back diffuse effective reflectance
 		Construct( ConstrNum ).ReflectSolDiffFront = CFS( EQLNum ).L( 1 ).SWP_EL.RHOSFDD;
 		Construct( ConstrNum ).ReflectSolDiffBack = CFS( EQLNum ).L( CFS( EQLNum ).NL ).SWP_EL.RHOSBDD;
@@ -552,7 +552,7 @@ namespace WindowEquivalentLayer {
 		Array1D< Real64 > T( CFSMAXNL );
 		Array1D< Real64 > Q( {0,CFSMAXNL} );
 		Array1D< Real64 > H( {0,CFSMAXNL+1} );
-		Array2D< Real64 > Abs1( CFSMAXNL+1, 2 );
+		Array2D< Real64 > Abs1( 2, CFSMAXNL+1 );
 		Real64 QRSW;
 		Real64 QRLW;
 		Real64 QCONV;
@@ -596,11 +596,11 @@ namespace WindowEquivalentLayer {
 		for ( I = 1; I <= NL; ++I ) {
 			ASHWAT_OffNormalProperties( FS.L( I ), IncA, VProfA, HProfA, SWP_ON( I ) );
 		}
-		ASHWAT_Solar( FS.NL, SWP_ON, SWP_ROOMBLK, 1.0, 0.0, 0.0, Abs1( {1,FS.NL+1}, 1 ), Abs1( {1,FS.NL+1}, 2 ) );
-		TransNormal = Abs1( NL + 1, 1 );
+		ASHWAT_Solar( FS.NL, SWP_ON, SWP_ROOMBLK, 1.0, 0.0, 0.0, Abs1( 1, {1,FS.NL+1} ), Abs1( 2, {1,FS.NL+1} ) );
+		TransNormal = Abs1( 1, NL + 1 );
 
 		// Calculate SHGC using net radiation method (ASHWAT Model)
-		CFSSHGC = ASHWAT_Thermal( FS, TIN, TOUT, HCIN, HCOUT, TRMOUT, TRMIN, BeamSolarInc, BeamSolarInc * Abs1( {1,NL+1}, 1 ), TOL, QOCF, QOCFRoom, T, Q, JF, JB, H, UCG, SHGC, true );
+		CFSSHGC = ASHWAT_Thermal( FS, TIN, TOUT, HCIN, HCOUT, TRMOUT, TRMIN, BeamSolarInc, BeamSolarInc * Abs1( 1, {1,NL+1} ), TOL, QOCF, QOCFRoom, T, Q, JF, JB, H, UCG, SHGC, true );
 
 		if ( ! CFSSHGC ) {
 			ShowWarningMessage( RoutineName + "Solar heat gain coefficient calculation failed for " + FS.Name );
@@ -642,7 +642,7 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Argument array dimensioning
-		Abs1.dim( CFSMAXNL+1, 2 );
+		Abs1.dim( 2, CFSMAXNL+1 );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -692,12 +692,12 @@ namespace WindowEquivalentLayer {
 			for ( I = 1; I <= NL; ++I ) {
 				ASHWAT_OffNormalProperties( FS.L( I ), IncA, VProfA, HProfA, SWP_ON( I ) );
 			}
-			ASHWAT_Solar( FS.NL, SWP_ON, SWP_ROOMBLK, 1.0, 0.0, 0.0, Abs1( {1,FS.NL+1}, 1 ), Abs1( {1,FS.NL+1}, 2 ) );
+			ASHWAT_Solar( FS.NL, SWP_ON, SWP_ROOMBLK, 1.0, 0.0, 0.0, Abs1( 1, {1,FS.NL+1} ), Abs1( 2, {1,FS.NL+1} ) );
 		} else {
 			// diffuse
 			Array1D< CFSSWP > const SWP_EL( FS.L.ma( &CFSLAYER::SWP_EL ) ); //Autodesk:F2C++ Can't slice a member array so we create a temporary: Inefficient
-			ASHWAT_Solar( FS.NL, SWP_EL, SWP_ROOMBLK, 0.0, 1.0, 0.0, Abs1( {1,FS.NL+1}, 1 ) );
-			ASHWAT_Solar( FS.NL, SWP_EL, SWP_ROOMBLK, 0.0, 0.0, 1.0, Abs1( {1,FS.NL+1}, 2 ) );
+			ASHWAT_Solar( FS.NL, SWP_EL, SWP_ROOMBLK, 0.0, 1.0, 0.0, Abs1( 1, {1,FS.NL+1} ) );
+			ASHWAT_Solar( FS.NL, SWP_EL, SWP_ROOMBLK, 0.0, 0.0, 1.0, Abs1( 2, {1,FS.NL+1} ) );
 			//CFSFenProp = LOK1 .AND. LOK2
 		}
 	}
@@ -927,7 +927,7 @@ namespace WindowEquivalentLayer {
 		TRMIN = root_4( rmir / StefanBoltzmann ); // TODO check model equation.
 
 		NL = CFS( EQLNum ).NL;
-		QAllSWwinAbs( {1,NL + 1} ) = QRadSWwinAbs( SurfNum, {1,NL + 1} );
+		QAllSWwinAbs( {1,NL + 1} ) = QRadSWwinAbs( {1,NL + 1}, SurfNum );
 		//  Solve energy balance(s) for temperature at each node/layer and
 		//  heat flux, including components, between each pair of nodes/layers
 		ASHWAT_ThermalR = ASHWAT_Thermal( CFS( EQLNum ), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, 0.0, QAllSWwinAbs( {1,NL+1} ), TOL, QOCF, QOCFRoom, T, Q, JF, JB, H, UCG, SHGC );
@@ -1156,13 +1156,13 @@ namespace WindowEquivalentLayer {
 				}
 			}
 
-			T( 1, K ) = DX * SUM;
+			T( K, 1 ) = DX * SUM;
 			// trapezoid result - i.e., first column Romberg entry
 			// Now complete the row
 			if ( K > 1 ) {
 				for ( L = 2; L <= K; ++L ) {
 					Real64 const pow_4_L_1( std::pow( 4.0, L - 1 ) );
-					T( L, K ) = ( pow_4_L_1 * T( L - 1, K ) - T( L - 1, K - 1 ) ) / ( pow_4_L_1 - 1.0 );
+					T( K, L ) = ( pow_4_L_1 * T( K, L - 1 ) - T( K - 1, L - 1 ) ) / ( pow_4_L_1 - 1.0 );
 				}
 				//    check for convergence
 				//    do 8 panels minimum, else can miss F() features
@@ -2001,7 +2001,7 @@ namespace WindowEquivalentLayer {
 		Real64 G3;
 		Real64 G5;
 		Real64 G7;
-		Array2D< Real64 > A( N, N+2 );
+		Array2D< Real64 > A( N+2, N );
 		Array1D< Real64 > XSOL( N );
 		// Flow
 
@@ -2044,47 +2044,47 @@ namespace WindowEquivalentLayer {
 		// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = -RHOBF_DD * F12;
-		A( 1, 3 ) = -RHOBF_DD * F14;
-		A( 1, 4 ) = 0.0;
-		A( 1, 5 ) = 0.0;
-		A( 1, 6 ) = 0.0;
-		A( 1, 7 ) = TAUF_DD;
-		A( 2, 1 ) = -RHOBF_DD * F21;
-		A( 2, 2 ) = 1.0;
-		A( 2, 3 ) = -RHOBF_DD * F24;
-		A( 2, 4 ) = -TAUF_DD * F87;
-		A( 2, 5 ) = -TAUF_DD * F86;
-		A( 2, 6 ) = 0.0;
-		A( 2, 7 ) = TAUF_DD * F85;
-		A( 3, 1 ) = -RHOBF_DD * F41;
-		A( 3, 2 ) = -RHOBF_DD * F42;
-		A( 3, 3 ) = 1.0;
-		A( 3, 4 ) = -TAUF_DD * F67;
-		A( 3, 5 ) = 0.0;
-		A( 3, 6 ) = -TAUF_DD * F68;
-		A( 3, 7 ) = TAUF_DD * F65;
+		A( 2, 1 ) = -RHOBF_DD * F12;
+		A( 3, 1 ) = -RHOBF_DD * F14;
 		A( 4, 1 ) = 0.0;
-		A( 4, 2 ) = 0.0;
-		A( 4, 3 ) = 0.0;
-		A( 4, 4 ) = 1.0;
-		A( 4, 5 ) = -RHOFF_DD * F76;
-		A( 4, 6 ) = -RHOFF_DD * F78;
-		A( 4, 7 ) = RHOFF_DD * F75;
-		A( 5, 1 ) = -TAUF_DD * F41;
-		A( 5, 2 ) = -TAUF_DD * F42;
-		A( 5, 3 ) = 0.0;
-		A( 5, 4 ) = -RHOFF_DD * F67;
-		A( 5, 5 ) = 1.0;
-		A( 5, 6 ) = -RHOFF_DD * F68;
-		A( 5, 7 ) = RHOFF_DD * F65;
-		A( 6, 1 ) = -TAUF_DD * F21;
+		A( 5, 1 ) = 0.0;
+		A( 6, 1 ) = 0.0;
+		A( 7, 1 ) = TAUF_DD;
+		A( 1, 2 ) = -RHOBF_DD * F21;
+		A( 2, 2 ) = 1.0;
+		A( 3, 2 ) = -RHOBF_DD * F24;
+		A( 4, 2 ) = -TAUF_DD * F87;
+		A( 5, 2 ) = -TAUF_DD * F86;
 		A( 6, 2 ) = 0.0;
-		A( 6, 3 ) = -TAUF_DD * F24;
-		A( 6, 4 ) = -RHOFF_DD * F87;
-		A( 6, 5 ) = -RHOFF_DD * F86;
+		A( 7, 2 ) = TAUF_DD * F85;
+		A( 1, 3 ) = -RHOBF_DD * F41;
+		A( 2, 3 ) = -RHOBF_DD * F42;
+		A( 3, 3 ) = 1.0;
+		A( 4, 3 ) = -TAUF_DD * F67;
+		A( 5, 3 ) = 0.0;
+		A( 6, 3 ) = -TAUF_DD * F68;
+		A( 7, 3 ) = TAUF_DD * F65;
+		A( 1, 4 ) = 0.0;
+		A( 2, 4 ) = 0.0;
+		A( 3, 4 ) = 0.0;
+		A( 4, 4 ) = 1.0;
+		A( 5, 4 ) = -RHOFF_DD * F76;
+		A( 6, 4 ) = -RHOFF_DD * F78;
+		A( 7, 4 ) = RHOFF_DD * F75;
+		A( 1, 5 ) = -TAUF_DD * F41;
+		A( 2, 5 ) = -TAUF_DD * F42;
+		A( 3, 5 ) = 0.0;
+		A( 4, 5 ) = -RHOFF_DD * F67;
+		A( 5, 5 ) = 1.0;
+		A( 6, 5 ) = -RHOFF_DD * F68;
+		A( 7, 5 ) = RHOFF_DD * F65;
+		A( 1, 6 ) = -TAUF_DD * F21;
+		A( 2, 6 ) = 0.0;
+		A( 3, 6 ) = -TAUF_DD * F24;
+		A( 4, 6 ) = -RHOFF_DD * F87;
+		A( 5, 6 ) = -RHOFF_DD * F86;
 		A( 6, 6 ) = 1.0;
-		A( 6, 7 ) = RHOFF_DD * F85;
+		A( 7, 6 ) = RHOFF_DD * F85;
 
 		SOLMATS( N, A, XSOL );
 
@@ -2399,7 +2399,7 @@ namespace WindowEquivalentLayer {
 		Real64 G5;
 		Real64 G8;
 		Real64 G11;
-		Array2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
+		Array2D< Real64 > A( N+2, N ); // coefficients of the radiosity equations matrix
 		Array1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
 		// Flow
 
@@ -2498,161 +2498,161 @@ namespace WindowEquivalentLayer {
 		// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = -RHOBF_DD * F12;
-		A( 1, 3 ) = -RHOBF_DD * F13;
-		A( 1, 4 ) = -RHOBF_DD * F14;
-		A( 1, 5 ) = -RHOBF_DD * F16;
-		A( 1, 6 ) = -RHOBF_DD * F17;
-		A( 1, 7 ) = 0.0;
-		A( 1, 8 ) = 0.0;
-		A( 1, 9 ) = 0.0;
-		A( 1, 10 ) = 0.0;
-		A( 1, 11 ) = 0.0;
-		A( 1, 12 ) = 0.0;
-		A( 1, 13 ) = Z1_BD;
-		A( 2, 1 ) = -RHOBF_DD * F21;
-		A( 2, 2 ) = 1.0;
-		A( 2, 3 ) = 0.0;
-		A( 2, 4 ) = 0.0;
-		A( 2, 5 ) = -RHOBF_DD * F26;
-		A( 2, 6 ) = -RHOBF_DD * F27;
-		A( 2, 7 ) = -TAUFF_DD * F149;
-		A( 2, 8 ) = -TAUFF_DD * F1410;
-		A( 2, 9 ) = -TAUFF_DD * F1411;
-		A( 2, 10 ) = 0.0;
-		A( 2, 11 ) = 0.0;
-		A( 2, 12 ) = 0.0;
-		A( 2, 13 ) = Z2_BD;
-		A( 3, 1 ) = -RHOBF_DD * F31;
-		A( 3, 2 ) = 0.0;
-		A( 3, 3 ) = 1.0;
-		A( 3, 4 ) = 0.0;
-		A( 3, 5 ) = -RHOBF_DD * F36;
-		A( 3, 6 ) = -RHOBF_DD * F37;
-		A( 3, 7 ) = -TAUFF_DD * F139;
-		A( 3, 8 ) = -TAUFF_DD * F1310;
-		A( 3, 9 ) = -TAUFF_DD * F1311;
-		A( 3, 10 ) = 0.0;
-		A( 3, 11 ) = 0.0;
-		A( 3, 12 ) = 0.0;
-		A( 3, 13 ) = Z3_BD;
-		A( 4, 1 ) = -RHOBF_DD * F41;
-		A( 4, 2 ) = 0.0;
-		A( 4, 3 ) = 0.0;
-		A( 4, 4 ) = 1.0;
-		A( 4, 5 ) = -RHOBF_DD * F46;
-		A( 4, 6 ) = -RHOBF_DD * F47;
-		A( 4, 7 ) = -TAUFF_DD * F129;
-		A( 4, 8 ) = -TAUFF_DD * F1210;
-		A( 4, 9 ) = -TAUFF_DD * F1211;
-		A( 4, 10 ) = 0.0;
-		A( 4, 11 ) = 0.0;
-		A( 4, 12 ) = 0.0;
-		A( 4, 13 ) = 0.0;
-		A( 5, 1 ) = -RHOBF_DD * F61;
-		A( 5, 2 ) = -RHOBF_DD * F62;
-		A( 5, 3 ) = -RHOBF_DD * F63;
-		A( 5, 4 ) = -RHOBF_DD * F64;
-		A( 5, 5 ) = 1.0;
-		A( 5, 6 ) = 0.0;
-		A( 5, 7 ) = 0.0;
-		A( 5, 8 ) = 0.0;
-		A( 5, 9 ) = -TAUFF_DD * F1011;
-		A( 5, 10 ) = -TAUFF_DD * F1012;
-		A( 5, 11 ) = -TAUFF_DD * F1013;
-		A( 5, 12 ) = -TAUFF_DD * F1014;
-		A( 5, 13 ) = 0.0;
-		A( 6, 1 ) = -RHOBF_DD * F71;
-		A( 6, 2 ) = -RHOBF_DD * F72;
-		A( 6, 3 ) = -RHOBF_DD * F73;
-		A( 6, 4 ) = -RHOBF_DD * F74;
-		A( 6, 5 ) = 0.0;
-		A( 6, 6 ) = 1.0;
-		A( 6, 7 ) = 0.0;
-		A( 6, 8 ) = 0.0;
-		A( 6, 9 ) = -TAUFF_DD * F911;
-		A( 6, 10 ) = -TAUFF_DD * F912;
-		A( 6, 11 ) = -TAUFF_DD * F913;
-		A( 6, 12 ) = -TAUFF_DD * F914;
-		A( 6, 13 ) = Z7_BD;
-		A( 7, 1 ) = -TAUBF_DD * F71;
-		A( 7, 2 ) = -TAUBF_DD * F72;
-		A( 7, 3 ) = -TAUBF_DD * F73;
-		A( 7, 4 ) = -TAUBF_DD * F74;
-		A( 7, 5 ) = 0.0;
-		A( 7, 6 ) = 0.0;
-		A( 7, 7 ) = 1.0;
-		A( 7, 8 ) = 0.0;
-		A( 7, 9 ) = -RHOFF_DD * F911;
-		A( 7, 10 ) = -RHOFF_DD * F912;
-		A( 7, 11 ) = -RHOFF_DD * F913;
-		A( 7, 12 ) = -RHOFF_DD * F914;
-		A( 7, 13 ) = Z9_BD;
-		A( 8, 1 ) = -TAUBF_DD * F61;
-		A( 8, 2 ) = -TAUBF_DD * F62;
-		A( 8, 3 ) = -TAUBF_DD * F63;
-		A( 8, 4 ) = -TAUBF_DD * F64;
-		A( 8, 5 ) = 0.0;
-		A( 8, 6 ) = 0.0;
-		A( 8, 7 ) = 0.0;
-		A( 8, 8 ) = 1.0;
-		A( 8, 9 ) = -RHOFF_DD * F1011;
-		A( 8, 10 ) = -RHOFF_DD * F1012;
-		A( 8, 11 ) = -RHOFF_DD * F1013;
-		A( 8, 12 ) = -RHOFF_DD * F1014;
-		A( 8, 13 ) = 0.0;
+		A( 2, 1 ) = -RHOBF_DD * F12;
+		A( 3, 1 ) = -RHOBF_DD * F13;
+		A( 4, 1 ) = -RHOBF_DD * F14;
+		A( 5, 1 ) = -RHOBF_DD * F16;
+		A( 6, 1 ) = -RHOBF_DD * F17;
+		A( 7, 1 ) = 0.0;
+		A( 8, 1 ) = 0.0;
 		A( 9, 1 ) = 0.0;
-		A( 9, 2 ) = 0.0;
-		A( 9, 3 ) = 0.0;
-		A( 9, 4 ) = 0.0;
-		A( 9, 5 ) = 0.0;
-		A( 9, 6 ) = 0.0;
-		A( 9, 7 ) = -RHOFF_DD * F119;
-		A( 9, 8 ) = -RHOFF_DD * F1110;
-		A( 9, 9 ) = 1.0;
-		A( 9, 10 ) = -RHOFF_DD * F1112;
-		A( 9, 11 ) = -RHOFF_DD * F1113;
-		A( 9, 12 ) = -RHOFF_DD * F1114;
-		A( 9, 13 ) = 0.0;
-		A( 10, 1 ) = -TAUBF_DD * F41;
+		A( 10, 1 ) = 0.0;
+		A( 11, 1 ) = 0.0;
+		A( 12, 1 ) = 0.0;
+		A( 13, 1 ) = Z1_BD;
+		A( 1, 2 ) = -RHOBF_DD * F21;
+		A( 2, 2 ) = 1.0;
+		A( 3, 2 ) = 0.0;
+		A( 4, 2 ) = 0.0;
+		A( 5, 2 ) = -RHOBF_DD * F26;
+		A( 6, 2 ) = -RHOBF_DD * F27;
+		A( 7, 2 ) = -TAUFF_DD * F149;
+		A( 8, 2 ) = -TAUFF_DD * F1410;
+		A( 9, 2 ) = -TAUFF_DD * F1411;
 		A( 10, 2 ) = 0.0;
-		A( 10, 3 ) = 0.0;
-		A( 10, 4 ) = 0.0;
-		A( 10, 5 ) = -TAUBF_DD * F46;
-		A( 10, 6 ) = -TAUBF_DD * F47;
-		A( 10, 7 ) = -RHOFF_DD * F129;
-		A( 10, 8 ) = -RHOFF_DD * F1210;
-		A( 10, 9 ) = -RHOFF_DD * F1211;
-		A( 10, 10 ) = 1.0;
-		A( 10, 11 ) = 0.0;
-		A( 10, 12 ) = 0.0;
-		A( 10, 13 ) = 0.0;
-		A( 11, 1 ) = -TAUBF_DD * F31;
 		A( 11, 2 ) = 0.0;
-		A( 11, 3 ) = 0.0;
-		A( 11, 4 ) = 0.0;
-		A( 11, 5 ) = -TAUBF_DD * F36;
-		A( 11, 6 ) = -TAUBF_DD * F37;
-		A( 11, 7 ) = -RHOFF_DD * F139;
-		A( 11, 8 ) = -RHOFF_DD * F1310;
-		A( 11, 9 ) = -RHOFF_DD * F1311;
-		A( 11, 10 ) = 0.0;
-		A( 11, 11 ) = 1.0;
-		A( 11, 12 ) = 0.0;
-		A( 11, 13 ) = Z13_BD;
-		A( 12, 1 ) = -TAUBF_DD * F21;
 		A( 12, 2 ) = 0.0;
+		A( 13, 2 ) = Z2_BD;
+		A( 1, 3 ) = -RHOBF_DD * F31;
+		A( 2, 3 ) = 0.0;
+		A( 3, 3 ) = 1.0;
+		A( 4, 3 ) = 0.0;
+		A( 5, 3 ) = -RHOBF_DD * F36;
+		A( 6, 3 ) = -RHOBF_DD * F37;
+		A( 7, 3 ) = -TAUFF_DD * F139;
+		A( 8, 3 ) = -TAUFF_DD * F1310;
+		A( 9, 3 ) = -TAUFF_DD * F1311;
+		A( 10, 3 ) = 0.0;
+		A( 11, 3 ) = 0.0;
 		A( 12, 3 ) = 0.0;
+		A( 13, 3 ) = Z3_BD;
+		A( 1, 4 ) = -RHOBF_DD * F41;
+		A( 2, 4 ) = 0.0;
+		A( 3, 4 ) = 0.0;
+		A( 4, 4 ) = 1.0;
+		A( 5, 4 ) = -RHOBF_DD * F46;
+		A( 6, 4 ) = -RHOBF_DD * F47;
+		A( 7, 4 ) = -TAUFF_DD * F129;
+		A( 8, 4 ) = -TAUFF_DD * F1210;
+		A( 9, 4 ) = -TAUFF_DD * F1211;
+		A( 10, 4 ) = 0.0;
+		A( 11, 4 ) = 0.0;
 		A( 12, 4 ) = 0.0;
-		A( 12, 5 ) = -TAUBF_DD * F26;
-		A( 12, 6 ) = -TAUBF_DD * F27;
-		A( 12, 7 ) = -RHOFF_DD * F149;
-		A( 12, 8 ) = -RHOFF_DD * F1410;
-		A( 12, 9 ) = -RHOFF_DD * F1411;
+		A( 13, 4 ) = 0.0;
+		A( 1, 5 ) = -RHOBF_DD * F61;
+		A( 2, 5 ) = -RHOBF_DD * F62;
+		A( 3, 5 ) = -RHOBF_DD * F63;
+		A( 4, 5 ) = -RHOBF_DD * F64;
+		A( 5, 5 ) = 1.0;
+		A( 6, 5 ) = 0.0;
+		A( 7, 5 ) = 0.0;
+		A( 8, 5 ) = 0.0;
+		A( 9, 5 ) = -TAUFF_DD * F1011;
+		A( 10, 5 ) = -TAUFF_DD * F1012;
+		A( 11, 5 ) = -TAUFF_DD * F1013;
+		A( 12, 5 ) = -TAUFF_DD * F1014;
+		A( 13, 5 ) = 0.0;
+		A( 1, 6 ) = -RHOBF_DD * F71;
+		A( 2, 6 ) = -RHOBF_DD * F72;
+		A( 3, 6 ) = -RHOBF_DD * F73;
+		A( 4, 6 ) = -RHOBF_DD * F74;
+		A( 5, 6 ) = 0.0;
+		A( 6, 6 ) = 1.0;
+		A( 7, 6 ) = 0.0;
+		A( 8, 6 ) = 0.0;
+		A( 9, 6 ) = -TAUFF_DD * F911;
+		A( 10, 6 ) = -TAUFF_DD * F912;
+		A( 11, 6 ) = -TAUFF_DD * F913;
+		A( 12, 6 ) = -TAUFF_DD * F914;
+		A( 13, 6 ) = Z7_BD;
+		A( 1, 7 ) = -TAUBF_DD * F71;
+		A( 2, 7 ) = -TAUBF_DD * F72;
+		A( 3, 7 ) = -TAUBF_DD * F73;
+		A( 4, 7 ) = -TAUBF_DD * F74;
+		A( 5, 7 ) = 0.0;
+		A( 6, 7 ) = 0.0;
+		A( 7, 7 ) = 1.0;
+		A( 8, 7 ) = 0.0;
+		A( 9, 7 ) = -RHOFF_DD * F911;
+		A( 10, 7 ) = -RHOFF_DD * F912;
+		A( 11, 7 ) = -RHOFF_DD * F913;
+		A( 12, 7 ) = -RHOFF_DD * F914;
+		A( 13, 7 ) = Z9_BD;
+		A( 1, 8 ) = -TAUBF_DD * F61;
+		A( 2, 8 ) = -TAUBF_DD * F62;
+		A( 3, 8 ) = -TAUBF_DD * F63;
+		A( 4, 8 ) = -TAUBF_DD * F64;
+		A( 5, 8 ) = 0.0;
+		A( 6, 8 ) = 0.0;
+		A( 7, 8 ) = 0.0;
+		A( 8, 8 ) = 1.0;
+		A( 9, 8 ) = -RHOFF_DD * F1011;
+		A( 10, 8 ) = -RHOFF_DD * F1012;
+		A( 11, 8 ) = -RHOFF_DD * F1013;
+		A( 12, 8 ) = -RHOFF_DD * F1014;
+		A( 13, 8 ) = 0.0;
+		A( 1, 9 ) = 0.0;
+		A( 2, 9 ) = 0.0;
+		A( 3, 9 ) = 0.0;
+		A( 4, 9 ) = 0.0;
+		A( 5, 9 ) = 0.0;
+		A( 6, 9 ) = 0.0;
+		A( 7, 9 ) = -RHOFF_DD * F119;
+		A( 8, 9 ) = -RHOFF_DD * F1110;
+		A( 9, 9 ) = 1.0;
+		A( 10, 9 ) = -RHOFF_DD * F1112;
+		A( 11, 9 ) = -RHOFF_DD * F1113;
+		A( 12, 9 ) = -RHOFF_DD * F1114;
+		A( 13, 9 ) = 0.0;
+		A( 1, 10 ) = -TAUBF_DD * F41;
+		A( 2, 10 ) = 0.0;
+		A( 3, 10 ) = 0.0;
+		A( 4, 10 ) = 0.0;
+		A( 5, 10 ) = -TAUBF_DD * F46;
+		A( 6, 10 ) = -TAUBF_DD * F47;
+		A( 7, 10 ) = -RHOFF_DD * F129;
+		A( 8, 10 ) = -RHOFF_DD * F1210;
+		A( 9, 10 ) = -RHOFF_DD * F1211;
+		A( 10, 10 ) = 1.0;
+		A( 11, 10 ) = 0.0;
 		A( 12, 10 ) = 0.0;
+		A( 13, 10 ) = 0.0;
+		A( 1, 11 ) = -TAUBF_DD * F31;
+		A( 2, 11 ) = 0.0;
+		A( 3, 11 ) = 0.0;
+		A( 4, 11 ) = 0.0;
+		A( 5, 11 ) = -TAUBF_DD * F36;
+		A( 6, 11 ) = -TAUBF_DD * F37;
+		A( 7, 11 ) = -RHOFF_DD * F139;
+		A( 8, 11 ) = -RHOFF_DD * F1310;
+		A( 9, 11 ) = -RHOFF_DD * F1311;
+		A( 10, 11 ) = 0.0;
+		A( 11, 11 ) = 1.0;
 		A( 12, 11 ) = 0.0;
+		A( 13, 11 ) = Z13_BD;
+		A( 1, 12 ) = -TAUBF_DD * F21;
+		A( 2, 12 ) = 0.0;
+		A( 3, 12 ) = 0.0;
+		A( 4, 12 ) = 0.0;
+		A( 5, 12 ) = -TAUBF_DD * F26;
+		A( 6, 12 ) = -TAUBF_DD * F27;
+		A( 7, 12 ) = -RHOFF_DD * F149;
+		A( 8, 12 ) = -RHOFF_DD * F1410;
+		A( 9, 12 ) = -RHOFF_DD * F1411;
+		A( 10, 12 ) = 0.0;
+		A( 11, 12 ) = 0.0;
 		A( 12, 12 ) = 1.0;
-		A( 12, 13 ) = Z14_BD;
+		A( 13, 12 ) = Z14_BD;
 
 		SOLMATS( N, A, XSOL );
 
@@ -2820,7 +2820,7 @@ namespace WindowEquivalentLayer {
 		Real64 G4;
 		Real64 G7;
 		Real64 G10;
-		Array2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
+		Array2D< Real64 > A( N+2, N ); // coefficients of the radiosity equations matrix
 		Array1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
 		// Flow
 
@@ -2897,115 +2897,115 @@ namespace WindowEquivalentLayer {
 		// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = -RHOBF_DD * F12;
-		A( 1, 3 ) = -RHOBF_DD * F13;
-		A( 1, 4 ) = -RHOBF_DD * F15;
-		A( 1, 5 ) = -RHOBF_DD * F16;
-		A( 1, 6 ) = 0.0;
-		A( 1, 7 ) = 0.0;
-		A( 1, 8 ) = 0.0;
-		A( 1, 9 ) = 0.0;
-		A( 1, 10 ) = 0.0;
-		A( 1, 11 ) = Z1_BD;
-		A( 2, 1 ) = -RHOBF_DD * F21;
-		A( 2, 2 ) = 1.0;
-		A( 2, 3 ) = 0.0;
-		A( 2, 4 ) = -RHOBF_DD * F25;
-		A( 2, 5 ) = -RHOBF_DD * F26;
-		A( 2, 6 ) = -TAUFF_DD * F128;
-		A( 2, 7 ) = -TAUFF_DD * F129;
-		A( 2, 8 ) = -TAUFF_DD * F1210;
-		A( 2, 9 ) = 0.0;
-		A( 2, 10 ) = 0.0;
-		A( 2, 11 ) = Z2_BD;
-		A( 3, 1 ) = -RHOBF_DD * F31;
-		A( 3, 2 ) = 0.0;
-		A( 3, 3 ) = 1.0;
-		A( 3, 4 ) = -RHOBF_DD * F35;
-		A( 3, 5 ) = -RHOBF_DD * F36;
-		A( 3, 6 ) = -TAUFF_DD * F118;
-		A( 3, 7 ) = -TAUFF_DD * F119;
-		A( 3, 8 ) = -TAUFF_DD * F1110;
-		A( 3, 9 ) = 0.0;
-		A( 3, 10 ) = 0.0;
-		A( 3, 11 ) = Z3_BD;
-		A( 4, 1 ) = -RHOBF_DD * F51;
-		A( 4, 2 ) = -RHOBF_DD * F52;
-		A( 4, 3 ) = -RHOBF_DD * F53;
-		A( 4, 4 ) = 1.0;
-		A( 4, 5 ) = 0.0;
-		A( 4, 6 ) = 0.0;
-		A( 4, 7 ) = 0.0;
-		A( 4, 8 ) = -TAUFF_DD * F910;
-		A( 4, 9 ) = -TAUFF_DD * F911;
-		A( 4, 10 ) = -TAUFF_DD * F912;
-		A( 4, 11 ) = 0.0;
-		A( 5, 1 ) = -RHOBF_DD * F61;
-		A( 5, 2 ) = -RHOBF_DD * F62;
-		A( 5, 3 ) = -RHOBF_DD * F63;
-		A( 5, 4 ) = 0.0;
-		A( 5, 5 ) = 1.0;
-		A( 5, 6 ) = 0.0;
-		A( 5, 7 ) = 0.0;
-		A( 5, 8 ) = -TAUFF_DD * F810;
-		A( 5, 9 ) = -TAUFF_DD * F811;
-		A( 5, 10 ) = -TAUFF_DD * F812;
-		A( 5, 11 ) = Z6_BD;
-		A( 6, 1 ) = -TAUBF_DD * F61;
-		A( 6, 2 ) = -TAUBF_DD * F62;
-		A( 6, 3 ) = -TAUBF_DD * F63;
-		A( 6, 4 ) = 0.0;
-		A( 6, 5 ) = 0.0;
-		A( 6, 6 ) = 1.0;
-		A( 6, 7 ) = 0.0;
-		A( 6, 8 ) = -RHOFF_DD * F810;
-		A( 6, 9 ) = -RHOFF_DD * F811;
-		A( 6, 10 ) = -RHOFF_DD * F812;
-		A( 6, 11 ) = Z8_BD;
-		A( 7, 1 ) = -TAUBF_DD * F51;
-		A( 7, 2 ) = -TAUBF_DD * F52;
-		A( 7, 3 ) = -TAUBF_DD * F53;
-		A( 7, 4 ) = 0.0;
-		A( 7, 5 ) = 0.0;
-		A( 7, 6 ) = 0.0;
-		A( 7, 7 ) = 1.0;
-		A( 7, 8 ) = -RHOFF_DD * F910;
-		A( 7, 9 ) = -RHOFF_DD * F911;
-		A( 7, 10 ) = -RHOFF_DD * F912;
-		A( 7, 11 ) = 0.0;
+		A( 2, 1 ) = -RHOBF_DD * F12;
+		A( 3, 1 ) = -RHOBF_DD * F13;
+		A( 4, 1 ) = -RHOBF_DD * F15;
+		A( 5, 1 ) = -RHOBF_DD * F16;
+		A( 6, 1 ) = 0.0;
+		A( 7, 1 ) = 0.0;
 		A( 8, 1 ) = 0.0;
-		A( 8, 2 ) = 0.0;
-		A( 8, 3 ) = 0.0;
-		A( 8, 4 ) = 0.0;
-		A( 8, 5 ) = 0.0;
-		A( 8, 6 ) = -RHOFF_DD * F108;
-		A( 8, 7 ) = -RHOFF_DD * F109;
-		A( 8, 8 ) = 1.0;
-		A( 8, 9 ) = -RHOFF_DD * F1011;
-		A( 8, 10 ) = -RHOFF_DD * F1012;
-		A( 8, 11 ) = 0.0;
-		A( 9, 1 ) = -TAUBF_DD * F31;
+		A( 9, 1 ) = 0.0;
+		A( 10, 1 ) = 0.0;
+		A( 11, 1 ) = Z1_BD;
+		A( 1, 2 ) = -RHOBF_DD * F21;
+		A( 2, 2 ) = 1.0;
+		A( 3, 2 ) = 0.0;
+		A( 4, 2 ) = -RHOBF_DD * F25;
+		A( 5, 2 ) = -RHOBF_DD * F26;
+		A( 6, 2 ) = -TAUFF_DD * F128;
+		A( 7, 2 ) = -TAUFF_DD * F129;
+		A( 8, 2 ) = -TAUFF_DD * F1210;
 		A( 9, 2 ) = 0.0;
-		A( 9, 3 ) = 0.0;
-		A( 9, 4 ) = -TAUBF_DD * F35;
-		A( 9, 5 ) = -TAUBF_DD * F36;
-		A( 9, 6 ) = -RHOFF_DD * F118;
-		A( 9, 7 ) = -RHOFF_DD * F119;
-		A( 9, 8 ) = -RHOFF_DD * F1110;
-		A( 9, 9 ) = 1.0;
-		A( 9, 10 ) = 0.0;
-		A( 9, 11 ) = Z11_BD;
-		A( 10, 1 ) = -TAUBF_DD * F21;
 		A( 10, 2 ) = 0.0;
+		A( 11, 2 ) = Z2_BD;
+		A( 1, 3 ) = -RHOBF_DD * F31;
+		A( 2, 3 ) = 0.0;
+		A( 3, 3 ) = 1.0;
+		A( 4, 3 ) = -RHOBF_DD * F35;
+		A( 5, 3 ) = -RHOBF_DD * F36;
+		A( 6, 3 ) = -TAUFF_DD * F118;
+		A( 7, 3 ) = -TAUFF_DD * F119;
+		A( 8, 3 ) = -TAUFF_DD * F1110;
+		A( 9, 3 ) = 0.0;
 		A( 10, 3 ) = 0.0;
-		A( 10, 4 ) = -TAUBF_DD * F25;
-		A( 10, 5 ) = -TAUBF_DD * F26;
-		A( 10, 6 ) = -RHOFF_DD * F128;
-		A( 10, 7 ) = -RHOFF_DD * F129;
-		A( 10, 8 ) = -RHOFF_DD * F1210;
+		A( 11, 3 ) = Z3_BD;
+		A( 1, 4 ) = -RHOBF_DD * F51;
+		A( 2, 4 ) = -RHOBF_DD * F52;
+		A( 3, 4 ) = -RHOBF_DD * F53;
+		A( 4, 4 ) = 1.0;
+		A( 5, 4 ) = 0.0;
+		A( 6, 4 ) = 0.0;
+		A( 7, 4 ) = 0.0;
+		A( 8, 4 ) = -TAUFF_DD * F910;
+		A( 9, 4 ) = -TAUFF_DD * F911;
+		A( 10, 4 ) = -TAUFF_DD * F912;
+		A( 11, 4 ) = 0.0;
+		A( 1, 5 ) = -RHOBF_DD * F61;
+		A( 2, 5 ) = -RHOBF_DD * F62;
+		A( 3, 5 ) = -RHOBF_DD * F63;
+		A( 4, 5 ) = 0.0;
+		A( 5, 5 ) = 1.0;
+		A( 6, 5 ) = 0.0;
+		A( 7, 5 ) = 0.0;
+		A( 8, 5 ) = -TAUFF_DD * F810;
+		A( 9, 5 ) = -TAUFF_DD * F811;
+		A( 10, 5 ) = -TAUFF_DD * F812;
+		A( 11, 5 ) = Z6_BD;
+		A( 1, 6 ) = -TAUBF_DD * F61;
+		A( 2, 6 ) = -TAUBF_DD * F62;
+		A( 3, 6 ) = -TAUBF_DD * F63;
+		A( 4, 6 ) = 0.0;
+		A( 5, 6 ) = 0.0;
+		A( 6, 6 ) = 1.0;
+		A( 7, 6 ) = 0.0;
+		A( 8, 6 ) = -RHOFF_DD * F810;
+		A( 9, 6 ) = -RHOFF_DD * F811;
+		A( 10, 6 ) = -RHOFF_DD * F812;
+		A( 11, 6 ) = Z8_BD;
+		A( 1, 7 ) = -TAUBF_DD * F51;
+		A( 2, 7 ) = -TAUBF_DD * F52;
+		A( 3, 7 ) = -TAUBF_DD * F53;
+		A( 4, 7 ) = 0.0;
+		A( 5, 7 ) = 0.0;
+		A( 6, 7 ) = 0.0;
+		A( 7, 7 ) = 1.0;
+		A( 8, 7 ) = -RHOFF_DD * F910;
+		A( 9, 7 ) = -RHOFF_DD * F911;
+		A( 10, 7 ) = -RHOFF_DD * F912;
+		A( 11, 7 ) = 0.0;
+		A( 1, 8 ) = 0.0;
+		A( 2, 8 ) = 0.0;
+		A( 3, 8 ) = 0.0;
+		A( 4, 8 ) = 0.0;
+		A( 5, 8 ) = 0.0;
+		A( 6, 8 ) = -RHOFF_DD * F108;
+		A( 7, 8 ) = -RHOFF_DD * F109;
+		A( 8, 8 ) = 1.0;
+		A( 9, 8 ) = -RHOFF_DD * F1011;
+		A( 10, 8 ) = -RHOFF_DD * F1012;
+		A( 11, 8 ) = 0.0;
+		A( 1, 9 ) = -TAUBF_DD * F31;
+		A( 2, 9 ) = 0.0;
+		A( 3, 9 ) = 0.0;
+		A( 4, 9 ) = -TAUBF_DD * F35;
+		A( 5, 9 ) = -TAUBF_DD * F36;
+		A( 6, 9 ) = -RHOFF_DD * F118;
+		A( 7, 9 ) = -RHOFF_DD * F119;
+		A( 8, 9 ) = -RHOFF_DD * F1110;
+		A( 9, 9 ) = 1.0;
 		A( 10, 9 ) = 0.0;
+		A( 11, 9 ) = Z11_BD;
+		A( 1, 10 ) = -TAUBF_DD * F21;
+		A( 2, 10 ) = 0.0;
+		A( 3, 10 ) = 0.0;
+		A( 4, 10 ) = -TAUBF_DD * F25;
+		A( 5, 10 ) = -TAUBF_DD * F26;
+		A( 6, 10 ) = -RHOFF_DD * F128;
+		A( 7, 10 ) = -RHOFF_DD * F129;
+		A( 8, 10 ) = -RHOFF_DD * F1210;
+		A( 9, 10 ) = 0.0;
 		A( 10, 10 ) = 1.0;
-		A( 10, 11 ) = Z12_BD;
+		A( 11, 10 ) = Z12_BD;
 
 		SOLMATS( N, A, XSOL );
 
@@ -3171,7 +3171,7 @@ namespace WindowEquivalentLayer {
 		Real64 G7;
 		Real64 G10;
 
-		Array2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
+		Array2D< Real64 > A( N+2, N ); // coefficients of the radiosity equations matrix
 		Array1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
 		// Flow
 
@@ -3248,115 +3248,115 @@ namespace WindowEquivalentLayer {
 		// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = -RHOBF_DD * F12;
-		A( 1, 3 ) = -RHOBF_DD * F13;
-		A( 1, 4 ) = -RHOBF_DD * F15;
-		A( 1, 5 ) = -RHOBF_DD * F16;
-		A( 1, 6 ) = 0.0;
-		A( 1, 7 ) = 0.0;
-		A( 1, 8 ) = 0.0;
-		A( 1, 9 ) = 0.0;
-		A( 1, 10 ) = 0.0;
-		A( 1, 11 ) = Z1_BD;
-		A( 2, 1 ) = -RHOBF_DD * F21;
-		A( 2, 2 ) = 1.0;
-		A( 2, 3 ) = 0.0;
-		A( 2, 4 ) = -RHOBF_DD * F25;
-		A( 2, 5 ) = -RHOBF_DD * F26;
-		A( 2, 6 ) = -TAUFF_DD * F128;
-		A( 2, 7 ) = -TAUFF_DD * F129;
-		A( 2, 8 ) = -TAUFF_DD * F1210;
-		A( 2, 9 ) = 0.0;
-		A( 2, 10 ) = 0.0;
-		A( 2, 11 ) = Z2_BD;
-		A( 3, 1 ) = -RHOBF_DD * F31;
-		A( 3, 2 ) = 0.0;
-		A( 3, 3 ) = 1.0;
-		A( 3, 4 ) = -RHOBF_DD * F35;
-		A( 3, 5 ) = -RHOBF_DD * F36;
-		A( 3, 6 ) = -TAUFF_DD * F118;
-		A( 3, 7 ) = -TAUFF_DD * F119;
-		A( 3, 8 ) = -TAUFF_DD * F1110;
-		A( 3, 9 ) = 0.0;
-		A( 3, 10 ) = 0.0;
-		A( 3, 11 ) = Z3_BD;
-		A( 4, 1 ) = -RHOBF_DD * F51;
-		A( 4, 2 ) = -RHOBF_DD * F52;
-		A( 4, 3 ) = -RHOBF_DD * F53;
-		A( 4, 4 ) = 1.0;
-		A( 4, 5 ) = 0.0;
-		A( 4, 6 ) = 0.0;
-		A( 4, 7 ) = 0.0;
-		A( 4, 8 ) = -TAUFF_DD * F910;
-		A( 4, 9 ) = -TAUFF_DD * F911;
-		A( 4, 10 ) = -TAUFF_DD * F912;
-		A( 4, 11 ) = 0.0;
-		A( 5, 1 ) = -RHOBF_DD * F61;
-		A( 5, 2 ) = -RHOBF_DD * F62;
-		A( 5, 3 ) = -RHOBF_DD * F63;
-		A( 5, 4 ) = 0.0;
-		A( 5, 5 ) = 1.0;
-		A( 5, 6 ) = 0.0;
-		A( 5, 7 ) = 0.0;
-		A( 5, 8 ) = -TAUFF_DD * F810;
-		A( 5, 9 ) = -TAUFF_DD * F811;
-		A( 5, 10 ) = -TAUFF_DD * F812;
-		A( 5, 11 ) = Z6_BD;
-		A( 6, 1 ) = -TAUBF_DD * F61;
-		A( 6, 2 ) = -TAUBF_DD * F62;
-		A( 6, 3 ) = -TAUBF_DD * F63;
-		A( 6, 4 ) = 0.0;
-		A( 6, 5 ) = 0.0;
-		A( 6, 6 ) = 1.0;
-		A( 6, 7 ) = 0.0;
-		A( 6, 8 ) = -RHOFF_DD * F810;
-		A( 6, 9 ) = -RHOFF_DD * F811;
-		A( 6, 10 ) = -RHOFF_DD * F812;
-		A( 6, 11 ) = Z8_BD;
-		A( 7, 1 ) = -TAUBF_DD * F51;
-		A( 7, 2 ) = -TAUBF_DD * F52;
-		A( 7, 3 ) = -TAUBF_DD * F53;
-		A( 7, 4 ) = 0.0;
-		A( 7, 5 ) = 0.0;
-		A( 7, 6 ) = 0.0;
-		A( 7, 7 ) = 1.0;
-		A( 7, 8 ) = -RHOFF_DD * F910;
-		A( 7, 9 ) = -RHOFF_DD * F911;
-		A( 7, 10 ) = -RHOFF_DD * F912;
-		A( 7, 11 ) = 0.0;
+		A( 2, 1 ) = -RHOBF_DD * F12;
+		A( 3, 1 ) = -RHOBF_DD * F13;
+		A( 4, 1 ) = -RHOBF_DD * F15;
+		A( 5, 1 ) = -RHOBF_DD * F16;
+		A( 6, 1 ) = 0.0;
+		A( 7, 1 ) = 0.0;
 		A( 8, 1 ) = 0.0;
-		A( 8, 2 ) = 0.0;
-		A( 8, 3 ) = 0.0;
-		A( 8, 4 ) = 0.0;
-		A( 8, 5 ) = 0.0;
-		A( 8, 6 ) = -RHOFF_DD * F108;
-		A( 8, 7 ) = -RHOFF_DD * F109;
-		A( 8, 8 ) = 1.0;
-		A( 8, 9 ) = -RHOFF_DD * F1011;
-		A( 8, 10 ) = -RHOFF_DD * F1012;
-		A( 8, 11 ) = 0.0;
-		A( 9, 1 ) = -TAUBF_DD * F31;
+		A( 9, 1 ) = 0.0;
+		A( 10, 1 ) = 0.0;
+		A( 11, 1 ) = Z1_BD;
+		A( 1, 2 ) = -RHOBF_DD * F21;
+		A( 2, 2 ) = 1.0;
+		A( 3, 2 ) = 0.0;
+		A( 4, 2 ) = -RHOBF_DD * F25;
+		A( 5, 2 ) = -RHOBF_DD * F26;
+		A( 6, 2 ) = -TAUFF_DD * F128;
+		A( 7, 2 ) = -TAUFF_DD * F129;
+		A( 8, 2 ) = -TAUFF_DD * F1210;
 		A( 9, 2 ) = 0.0;
-		A( 9, 3 ) = 0.0;
-		A( 9, 4 ) = -TAUBF_DD * F35;
-		A( 9, 5 ) = -TAUBF_DD * F36;
-		A( 9, 6 ) = -RHOFF_DD * F118;
-		A( 9, 7 ) = -RHOFF_DD * F119;
-		A( 9, 8 ) = -RHOFF_DD * F1110;
-		A( 9, 9 ) = 1.0;
-		A( 9, 10 ) = 0.0;
-		A( 9, 11 ) = Z11_BD;
-		A( 10, 1 ) = -TAUBF_DD * F21;
 		A( 10, 2 ) = 0.0;
+		A( 11, 2 ) = Z2_BD;
+		A( 1, 3 ) = -RHOBF_DD * F31;
+		A( 2, 3 ) = 0.0;
+		A( 3, 3 ) = 1.0;
+		A( 4, 3 ) = -RHOBF_DD * F35;
+		A( 5, 3 ) = -RHOBF_DD * F36;
+		A( 6, 3 ) = -TAUFF_DD * F118;
+		A( 7, 3 ) = -TAUFF_DD * F119;
+		A( 8, 3 ) = -TAUFF_DD * F1110;
+		A( 9, 3 ) = 0.0;
 		A( 10, 3 ) = 0.0;
-		A( 10, 4 ) = -TAUBF_DD * F25;
-		A( 10, 5 ) = -TAUBF_DD * F26;
-		A( 10, 6 ) = -RHOFF_DD * F128;
-		A( 10, 7 ) = -RHOFF_DD * F129;
-		A( 10, 8 ) = -RHOFF_DD * F1210;
+		A( 11, 3 ) = Z3_BD;
+		A( 1, 4 ) = -RHOBF_DD * F51;
+		A( 2, 4 ) = -RHOBF_DD * F52;
+		A( 3, 4 ) = -RHOBF_DD * F53;
+		A( 4, 4 ) = 1.0;
+		A( 5, 4 ) = 0.0;
+		A( 6, 4 ) = 0.0;
+		A( 7, 4 ) = 0.0;
+		A( 8, 4 ) = -TAUFF_DD * F910;
+		A( 9, 4 ) = -TAUFF_DD * F911;
+		A( 10, 4 ) = -TAUFF_DD * F912;
+		A( 11, 4 ) = 0.0;
+		A( 1, 5 ) = -RHOBF_DD * F61;
+		A( 2, 5 ) = -RHOBF_DD * F62;
+		A( 3, 5 ) = -RHOBF_DD * F63;
+		A( 4, 5 ) = 0.0;
+		A( 5, 5 ) = 1.0;
+		A( 6, 5 ) = 0.0;
+		A( 7, 5 ) = 0.0;
+		A( 8, 5 ) = -TAUFF_DD * F810;
+		A( 9, 5 ) = -TAUFF_DD * F811;
+		A( 10, 5 ) = -TAUFF_DD * F812;
+		A( 11, 5 ) = Z6_BD;
+		A( 1, 6 ) = -TAUBF_DD * F61;
+		A( 2, 6 ) = -TAUBF_DD * F62;
+		A( 3, 6 ) = -TAUBF_DD * F63;
+		A( 4, 6 ) = 0.0;
+		A( 5, 6 ) = 0.0;
+		A( 6, 6 ) = 1.0;
+		A( 7, 6 ) = 0.0;
+		A( 8, 6 ) = -RHOFF_DD * F810;
+		A( 9, 6 ) = -RHOFF_DD * F811;
+		A( 10, 6 ) = -RHOFF_DD * F812;
+		A( 11, 6 ) = Z8_BD;
+		A( 1, 7 ) = -TAUBF_DD * F51;
+		A( 2, 7 ) = -TAUBF_DD * F52;
+		A( 3, 7 ) = -TAUBF_DD * F53;
+		A( 4, 7 ) = 0.0;
+		A( 5, 7 ) = 0.0;
+		A( 6, 7 ) = 0.0;
+		A( 7, 7 ) = 1.0;
+		A( 8, 7 ) = -RHOFF_DD * F910;
+		A( 9, 7 ) = -RHOFF_DD * F911;
+		A( 10, 7 ) = -RHOFF_DD * F912;
+		A( 11, 7 ) = 0.0;
+		A( 1, 8 ) = 0.0;
+		A( 2, 8 ) = 0.0;
+		A( 3, 8 ) = 0.0;
+		A( 4, 8 ) = 0.0;
+		A( 5, 8 ) = 0.0;
+		A( 6, 8 ) = -RHOFF_DD * F108;
+		A( 7, 8 ) = -RHOFF_DD * F109;
+		A( 8, 8 ) = 1.0;
+		A( 9, 8 ) = -RHOFF_DD * F1011;
+		A( 10, 8 ) = -RHOFF_DD * F1012;
+		A( 11, 8 ) = 0.0;
+		A( 1, 9 ) = -TAUBF_DD * F31;
+		A( 2, 9 ) = 0.0;
+		A( 3, 9 ) = 0.0;
+		A( 4, 9 ) = -TAUBF_DD * F35;
+		A( 5, 9 ) = -TAUBF_DD * F36;
+		A( 6, 9 ) = -RHOFF_DD * F118;
+		A( 7, 9 ) = -RHOFF_DD * F119;
+		A( 8, 9 ) = -RHOFF_DD * F1110;
+		A( 9, 9 ) = 1.0;
 		A( 10, 9 ) = 0.0;
+		A( 11, 9 ) = Z11_BD;
+		A( 1, 10 ) = -TAUBF_DD * F21;
+		A( 2, 10 ) = 0.0;
+		A( 3, 10 ) = 0.0;
+		A( 4, 10 ) = -TAUBF_DD * F25;
+		A( 5, 10 ) = -TAUBF_DD * F26;
+		A( 6, 10 ) = -RHOFF_DD * F128;
+		A( 7, 10 ) = -RHOFF_DD * F129;
+		A( 8, 10 ) = -RHOFF_DD * F1210;
+		A( 9, 10 ) = 0.0;
 		A( 10, 10 ) = 1.0;
-		A( 10, 11 ) = Z12_BD;
+		A( 11, 10 ) = Z12_BD;
 
 		SOLMATS( N, A, XSOL );
 
@@ -3479,7 +3479,7 @@ namespace WindowEquivalentLayer {
 		Real64 G3;
 		Real64 G5;
 		Real64 G7;
-		Array2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
+		Array2D< Real64 > A( N+2, N ); // coefficients of the radiosity equations matrix
 		Array1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
 		// Flow
 
@@ -3520,47 +3520,47 @@ namespace WindowEquivalentLayer {
 		// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = -RHOBF_DD * F12;
-		A( 1, 3 ) = -RHOBF_DD * F14;
-		A( 1, 4 ) = 0.0;
-		A( 1, 5 ) = 0.0;
-		A( 1, 6 ) = 0.0;
-		A( 1, 7 ) = Z1_BD;
-		A( 2, 1 ) = -RHOBF_DD * F21;
-		A( 2, 2 ) = 1.0;
-		A( 2, 3 ) = -RHOBF_DD * F24;
-		A( 2, 4 ) = -TAUFF_DD * F86;
-		A( 2, 5 ) = -TAUFF_DD * F87;
-		A( 2, 6 ) = 0.0;
-		A( 2, 7 ) = Z2_BD;
-		A( 3, 1 ) = -RHOBF_DD * F41;
-		A( 3, 2 ) = -RHOBF_DD * F42;
-		A( 3, 3 ) = 1.0;
-		A( 3, 4 ) = 0.0;
-		A( 3, 5 ) = -TAUFF_DD * F67;
-		A( 3, 6 ) = -TAUFF_DD * F68;
-		A( 3, 7 ) = Z4_BD;
-		A( 4, 1 ) = -TAUBF_DD * F41;
-		A( 4, 2 ) = -TAUBF_DD * F42;
-		A( 4, 3 ) = 0.0;
-		A( 4, 4 ) = 1.0;
-		A( 4, 5 ) = -RHOFF_DD * F67;
-		A( 4, 6 ) = -RHOFF_DD * F68;
-		A( 4, 7 ) = Z6_BD;
+		A( 2, 1 ) = -RHOBF_DD * F12;
+		A( 3, 1 ) = -RHOBF_DD * F14;
+		A( 4, 1 ) = 0.0;
 		A( 5, 1 ) = 0.0;
-		A( 5, 2 ) = 0.0;
-		A( 5, 3 ) = 0.0;
-		A( 5, 4 ) = -RHOFF_DD * F76;
-		A( 5, 5 ) = 1.0;
-		A( 5, 6 ) = -RHOFF_DD * F78;
-		A( 5, 7 ) = 0.0;
-		A( 6, 1 ) = -TAUBF_DD * F21;
+		A( 6, 1 ) = 0.0;
+		A( 7, 1 ) = Z1_BD;
+		A( 1, 2 ) = -RHOBF_DD * F21;
+		A( 2, 2 ) = 1.0;
+		A( 3, 2 ) = -RHOBF_DD * F24;
+		A( 4, 2 ) = -TAUFF_DD * F86;
+		A( 5, 2 ) = -TAUFF_DD * F87;
 		A( 6, 2 ) = 0.0;
-		A( 6, 3 ) = -TAUBF_DD * F24;
-		A( 6, 4 ) = -RHOFF_DD * F86;
-		A( 6, 5 ) = -RHOFF_DD * F87;
+		A( 7, 2 ) = Z2_BD;
+		A( 1, 3 ) = -RHOBF_DD * F41;
+		A( 2, 3 ) = -RHOBF_DD * F42;
+		A( 3, 3 ) = 1.0;
+		A( 4, 3 ) = 0.0;
+		A( 5, 3 ) = -TAUFF_DD * F67;
+		A( 6, 3 ) = -TAUFF_DD * F68;
+		A( 7, 3 ) = Z4_BD;
+		A( 1, 4 ) = -TAUBF_DD * F41;
+		A( 2, 4 ) = -TAUBF_DD * F42;
+		A( 3, 4 ) = 0.0;
+		A( 4, 4 ) = 1.0;
+		A( 5, 4 ) = -RHOFF_DD * F67;
+		A( 6, 4 ) = -RHOFF_DD * F68;
+		A( 7, 4 ) = Z6_BD;
+		A( 1, 5 ) = 0.0;
+		A( 2, 5 ) = 0.0;
+		A( 3, 5 ) = 0.0;
+		A( 4, 5 ) = -RHOFF_DD * F76;
+		A( 5, 5 ) = 1.0;
+		A( 6, 5 ) = -RHOFF_DD * F78;
+		A( 7, 5 ) = 0.0;
+		A( 1, 6 ) = -TAUBF_DD * F21;
+		A( 2, 6 ) = 0.0;
+		A( 3, 6 ) = -TAUBF_DD * F24;
+		A( 4, 6 ) = -RHOFF_DD * F86;
+		A( 5, 6 ) = -RHOFF_DD * F87;
 		A( 6, 6 ) = 1.0;
-		A( 6, 7 ) = Z8_BD;
+		A( 7, 6 ) = Z8_BD;
 
 		SOLMATS( N, A, XSOL );
 
@@ -3695,7 +3695,7 @@ namespace WindowEquivalentLayer {
 		Real64 G7;
 		Real64 G8;
 
-		Array2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
+		Array2D< Real64 > A( N+2, N ); // coefficients of the radiosity equations matrix
 		Array1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
 		// Flow
 
@@ -3750,61 +3750,61 @@ namespace WindowEquivalentLayer {
 		// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = -RHOBF_DD * F12;
-		A( 1, 3 ) = -RHOBF_DD * F14;
-		A( 1, 4 ) = 0.0;
-		A( 1, 5 ) = 0.0;
-		A( 1, 6 ) = 0.0;
-		A( 1, 7 ) = 0.0;
-		A( 1, 8 ) = Z1_BD;
-		A( 2, 1 ) = -RHOBF_DD * F21;
-		A( 2, 2 ) = 1.0;
-		A( 2, 3 ) = -RHOBF_DD * F24;
-		A( 2, 4 ) = -TAUFF_DD * F96;
-		A( 2, 5 ) = -TAUFF_DD * F97;
-		A( 2, 6 ) = -TAUFF_DD * F98;
-		A( 2, 7 ) = 0.0;
-		A( 2, 8 ) = Z2_BD;
-		A( 3, 1 ) = -RHOBF_DD * F41;
-		A( 3, 2 ) = -RHOBF_DD * F42;
-		A( 3, 3 ) = 1.0;
-		A( 3, 4 ) = 0.0;
-		A( 3, 5 ) = -TAUFF_DD * F67;
-		A( 3, 6 ) = -TAUFF_DD * F68;
-		A( 3, 7 ) = -TAUFF_DD * F69;
-		A( 3, 8 ) = Z4_BD;
-		A( 4, 1 ) = -TAUBF_DD * F41;
-		A( 4, 2 ) = -TAUBF_DD * F42;
-		A( 4, 3 ) = 0.0;
-		A( 4, 4 ) = 1.0;
-		A( 4, 5 ) = -RHOFF_DD * F67;
-		A( 4, 6 ) = -RHOFF_DD * F68;
-		A( 4, 7 ) = -RHOFF_DD * F69;
-		A( 4, 8 ) = Z6_BD;
+		A( 2, 1 ) = -RHOBF_DD * F12;
+		A( 3, 1 ) = -RHOBF_DD * F14;
+		A( 4, 1 ) = 0.0;
 		A( 5, 1 ) = 0.0;
-		A( 5, 2 ) = 0.0;
-		A( 5, 3 ) = 0.0;
-		A( 5, 4 ) = -RHOFF_DD * F76;
-		A( 5, 5 ) = 1.0;
-		A( 5, 6 ) = 0.0;
-		A( 5, 7 ) = -RHOFF_DD * F79;
-		A( 5, 8 ) = Z7_BD;
 		A( 6, 1 ) = 0.0;
-		A( 6, 2 ) = 0.0;
-		A( 6, 3 ) = 0.0;
-		A( 6, 4 ) = -RHOFF_DD * F86;
-		A( 6, 5 ) = 0.0;
-		A( 6, 6 ) = 1.0;
-		A( 6, 7 ) = -RHOFF_DD * F89;
-		A( 6, 8 ) = 0.0;
-		A( 7, 1 ) = -TAUBF_DD * F21;
+		A( 7, 1 ) = 0.0;
+		A( 8, 1 ) = Z1_BD;
+		A( 1, 2 ) = -RHOBF_DD * F21;
+		A( 2, 2 ) = 1.0;
+		A( 3, 2 ) = -RHOBF_DD * F24;
+		A( 4, 2 ) = -TAUFF_DD * F96;
+		A( 5, 2 ) = -TAUFF_DD * F97;
+		A( 6, 2 ) = -TAUFF_DD * F98;
 		A( 7, 2 ) = 0.0;
-		A( 7, 3 ) = -TAUBF_DD * F24;
-		A( 7, 4 ) = -RHOFF_DD * F96;
-		A( 7, 5 ) = -RHOFF_DD * F97;
-		A( 7, 6 ) = -RHOFF_DD * F98;
+		A( 8, 2 ) = Z2_BD;
+		A( 1, 3 ) = -RHOBF_DD * F41;
+		A( 2, 3 ) = -RHOBF_DD * F42;
+		A( 3, 3 ) = 1.0;
+		A( 4, 3 ) = 0.0;
+		A( 5, 3 ) = -TAUFF_DD * F67;
+		A( 6, 3 ) = -TAUFF_DD * F68;
+		A( 7, 3 ) = -TAUFF_DD * F69;
+		A( 8, 3 ) = Z4_BD;
+		A( 1, 4 ) = -TAUBF_DD * F41;
+		A( 2, 4 ) = -TAUBF_DD * F42;
+		A( 3, 4 ) = 0.0;
+		A( 4, 4 ) = 1.0;
+		A( 5, 4 ) = -RHOFF_DD * F67;
+		A( 6, 4 ) = -RHOFF_DD * F68;
+		A( 7, 4 ) = -RHOFF_DD * F69;
+		A( 8, 4 ) = Z6_BD;
+		A( 1, 5 ) = 0.0;
+		A( 2, 5 ) = 0.0;
+		A( 3, 5 ) = 0.0;
+		A( 4, 5 ) = -RHOFF_DD * F76;
+		A( 5, 5 ) = 1.0;
+		A( 6, 5 ) = 0.0;
+		A( 7, 5 ) = -RHOFF_DD * F79;
+		A( 8, 5 ) = Z7_BD;
+		A( 1, 6 ) = 0.0;
+		A( 2, 6 ) = 0.0;
+		A( 3, 6 ) = 0.0;
+		A( 4, 6 ) = -RHOFF_DD * F86;
+		A( 5, 6 ) = 0.0;
+		A( 6, 6 ) = 1.0;
+		A( 7, 6 ) = -RHOFF_DD * F89;
+		A( 8, 6 ) = 0.0;
+		A( 1, 7 ) = -TAUBF_DD * F21;
+		A( 2, 7 ) = 0.0;
+		A( 3, 7 ) = -TAUBF_DD * F24;
+		A( 4, 7 ) = -RHOFF_DD * F96;
+		A( 5, 7 ) = -RHOFF_DD * F97;
+		A( 6, 7 ) = -RHOFF_DD * F98;
 		A( 7, 7 ) = 1.0;
-		A( 7, 8 ) = Z9_BD;
+		A( 8, 7 ) = Z9_BD;
 
 		SOLMATS( N, A, XSOL );
 
@@ -3921,7 +3921,7 @@ namespace WindowEquivalentLayer {
 		Real64 G3;
 		Real64 G5;
 		Real64 G7;
-		Array2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
+		Array2D< Real64 > A( N+2, N ); // coefficients of the radiosity equations matrix
 		Array1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
 		// Flow
 
@@ -3956,47 +3956,47 @@ namespace WindowEquivalentLayer {
 		// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = -RHOBF_DD * F12;
-		A( 1, 3 ) = -RHOBF_DD * F14;
-		A( 1, 4 ) = 0.0;
-		A( 1, 5 ) = 0.0;
-		A( 1, 6 ) = 0.0;
-		A( 1, 7 ) = Z1_BD;
-		A( 2, 1 ) = -RHOBF_DD * F21;
-		A( 2, 2 ) = 1.0;
-		A( 2, 3 ) = -RHOBF_DD * F24;
-		A( 2, 4 ) = -TAUFF_DD * F86;
-		A( 2, 5 ) = -TAUFF_DD * F87;
-		A( 2, 6 ) = 0.0;
-		A( 2, 7 ) = 0.0;
-		A( 3, 1 ) = -RHOBF_DD * F41;
-		A( 3, 2 ) = -RHOBF_DD * F42;
-		A( 3, 3 ) = 1.0;
-		A( 3, 4 ) = 0.0;
-		A( 3, 5 ) = -TAUFF_DD * F67;
-		A( 3, 6 ) = -TAUFF_DD * F68;
-		A( 3, 7 ) = 0.0;
-		A( 4, 1 ) = -TAUBF_DD * F41;
-		A( 4, 2 ) = -TAUBF_DD * F42;
-		A( 4, 3 ) = 0.0;
-		A( 4, 4 ) = 1.0;
-		A( 4, 5 ) = -RHOFF_DD * F67;
-		A( 4, 6 ) = -RHOFF_DD * F68;
-		A( 4, 7 ) = 0.0;
+		A( 2, 1 ) = -RHOBF_DD * F12;
+		A( 3, 1 ) = -RHOBF_DD * F14;
+		A( 4, 1 ) = 0.0;
 		A( 5, 1 ) = 0.0;
-		A( 5, 2 ) = 0.0;
-		A( 5, 3 ) = 0.0;
-		A( 5, 4 ) = -RHOFF_DD * F76;
-		A( 5, 5 ) = 1.0;
-		A( 5, 6 ) = -RHOFF_DD * F78;
-		A( 5, 7 ) = Z7_BD;
-		A( 6, 1 ) = -TAUBF_DD * F21;
+		A( 6, 1 ) = 0.0;
+		A( 7, 1 ) = Z1_BD;
+		A( 1, 2 ) = -RHOBF_DD * F21;
+		A( 2, 2 ) = 1.0;
+		A( 3, 2 ) = -RHOBF_DD * F24;
+		A( 4, 2 ) = -TAUFF_DD * F86;
+		A( 5, 2 ) = -TAUFF_DD * F87;
 		A( 6, 2 ) = 0.0;
-		A( 6, 3 ) = -TAUBF_DD * F24;
-		A( 6, 4 ) = -RHOFF_DD * F86;
-		A( 6, 5 ) = -RHOFF_DD * F87;
+		A( 7, 2 ) = 0.0;
+		A( 1, 3 ) = -RHOBF_DD * F41;
+		A( 2, 3 ) = -RHOBF_DD * F42;
+		A( 3, 3 ) = 1.0;
+		A( 4, 3 ) = 0.0;
+		A( 5, 3 ) = -TAUFF_DD * F67;
+		A( 6, 3 ) = -TAUFF_DD * F68;
+		A( 7, 3 ) = 0.0;
+		A( 1, 4 ) = -TAUBF_DD * F41;
+		A( 2, 4 ) = -TAUBF_DD * F42;
+		A( 3, 4 ) = 0.0;
+		A( 4, 4 ) = 1.0;
+		A( 5, 4 ) = -RHOFF_DD * F67;
+		A( 6, 4 ) = -RHOFF_DD * F68;
+		A( 7, 4 ) = 0.0;
+		A( 1, 5 ) = 0.0;
+		A( 2, 5 ) = 0.0;
+		A( 3, 5 ) = 0.0;
+		A( 4, 5 ) = -RHOFF_DD * F76;
+		A( 5, 5 ) = 1.0;
+		A( 6, 5 ) = -RHOFF_DD * F78;
+		A( 7, 5 ) = Z7_BD;
+		A( 1, 6 ) = -TAUBF_DD * F21;
+		A( 2, 6 ) = 0.0;
+		A( 3, 6 ) = -TAUBF_DD * F24;
+		A( 4, 6 ) = -RHOFF_DD * F86;
+		A( 5, 6 ) = -RHOFF_DD * F87;
 		A( 6, 6 ) = 1.0;
-		A( 6, 7 ) = 0.0;
+		A( 7, 6 ) = 0.0;
 
 		SOLMATS( N, A, XSOL );
 
@@ -4626,7 +4626,7 @@ namespace WindowEquivalentLayer {
 		Real64 J4;
 		Real64 J5;
 		Real64 J6;
-		Array2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
+		Array2D< Real64 > A( N+2, N ); // coefficients of the radiosity equations matrix
 		Array1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
 		// flow
 
@@ -4690,25 +4690,25 @@ namespace WindowEquivalentLayer {
 			// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 			A( 1, 1 ) = 1.0 - TAU_SLAT * F43;
-			A( 1, 2 ) = -RHODFS_SLAT * F34;
-			A( 1, 3 ) = -TAU_SLAT * F45;
-			A( 1, 4 ) = -RHODFS_SLAT * F36;
-			A( 1, 5 ) = Z3;
-			A( 2, 1 ) = -RHOUFS_SLAT * F43;
+			A( 2, 1 ) = -RHODFS_SLAT * F34;
+			A( 3, 1 ) = -TAU_SLAT * F45;
+			A( 4, 1 ) = -RHODFS_SLAT * F36;
+			A( 5, 1 ) = Z3;
+			A( 1, 2 ) = -RHOUFS_SLAT * F43;
 			A( 2, 2 ) = 1.0 - TAU_SLAT * F34;
-			A( 2, 3 ) = -RHOUFS_SLAT * F45;
-			A( 2, 4 ) = -TAU_SLAT * F36;
-			A( 2, 5 ) = Z4;
-			A( 3, 1 ) = -TAU_SLAT * F63;
-			A( 3, 2 ) = -RHODFS_SLAT * F54;
+			A( 3, 2 ) = -RHOUFS_SLAT * F45;
+			A( 4, 2 ) = -TAU_SLAT * F36;
+			A( 5, 2 ) = Z4;
+			A( 1, 3 ) = -TAU_SLAT * F63;
+			A( 2, 3 ) = -RHODFS_SLAT * F54;
 			A( 3, 3 ) = 1.0 - TAU_SLAT * F65;
-			A( 3, 4 ) = -RHODFS_SLAT * F56;
-			A( 3, 5 ) = 0.0;
-			A( 4, 1 ) = -RHOUFS_SLAT * F63;
-			A( 4, 2 ) = -TAU_SLAT * F54;
-			A( 4, 3 ) = -RHOUFS_SLAT * F65;
+			A( 4, 3 ) = -RHODFS_SLAT * F56;
+			A( 5, 3 ) = 0.0;
+			A( 1, 4 ) = -RHOUFS_SLAT * F63;
+			A( 2, 4 ) = -TAU_SLAT * F54;
+			A( 3, 4 ) = -RHOUFS_SLAT * F65;
 			A( 4, 4 ) = 1.0 - TAU_SLAT * F56;
-			A( 4, 5 ) = 0.0;
+			A( 5, 4 ) = 0.0;
 
 			SOLMATS( N, A, XSOL );
 
@@ -4783,13 +4783,13 @@ namespace WindowEquivalentLayer {
 		NP2 = N + 2;
 
 		for ( I = 1; I <= N; ++I ) {
-			A( I, NP2 ) = 0.0;
+			A( NP2, I ) = 0.0;
 			// DO 1 J=1,NP1    ! TODO ?
 		}
 
 		for ( I = 1; I <= N; ++I ) {
 			for ( J = 1; J <= NP1; ++J ) {
-				A( I, NP2 ) += A( I, J );
+				A( NP2, I ) += A( J, I );
 			}
 		}
 
@@ -4799,8 +4799,8 @@ namespace WindowEquivalentLayer {
 			NOS = L;
 
 			for ( I = LP; I <= N; ++I ) {
-				if ( std::abs( CMAX ) < std::abs( A( I, L ) ) ) {
-					CMAX = A( I, L );
+				if ( std::abs( CMAX ) < std::abs( A( L, I ) ) ) {
+					CMAX = A( L, I );
 					NOS = I;
 				}
 			}
@@ -4808,34 +4808,34 @@ namespace WindowEquivalentLayer {
 			// Swap rows
 			if ( NOS != L ) {
 				for ( J = 1; J <= NP2; ++J ) {
-					TEMP = A( L, J );
-					A( L, J ) = A( NOS, J );
-					A( NOS, J ) = TEMP;
+					TEMP = A( J, L );
+					A( J, L ) = A( J, NOS );
+					A( J, NOS ) = TEMP;
 				}
 			}
 
 			for ( I = LP; I <= N; ++I ) {
 				C = 0.0;
-				Y = -A( I, L ) / A( L, L );
+				Y = -A( L, I ) / A( L, L );
 				for ( J = L; J <= NP2; ++J ) {
-					A( I, J ) += Y * A( L, J );
+					A( J, I ) += Y * A( J, L );
 				}
 				for ( J = L; J <= NP1; ++J ) {
-					C += A( I, J );
+					C += A( J, I );
 				}
 			}
 		}
 
 		// back-substitute
-		XSOL( N ) = A( N, NP1 ) / A( N, N );
+		XSOL( N ) = A( NP1, N ) / A( N, N );
 		for ( I = 1; I <= NM1; ++I ) {
 			NI = N - I;
 			D = 0.0;
 			for ( J = 1; J <= I; ++J ) {
 				NJ = N + 1 - J;
-				D += A( NI, NJ ) * XSOL( NJ );
+				D += A( NJ, NI ) * XSOL( NJ );
 			}
-			XSOL( NI ) = ( A( NI, NP1 ) - D ) / A( NI, NI );
+			XSOL( NI ) = ( A( NP1, NI ) - D ) / A( NI, NI );
 		}
 	}
 
@@ -4928,7 +4928,7 @@ namespace WindowEquivalentLayer {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 ALPHA;
 		Real64 HCOCFout;
-		Array2D< Real64 > A( 3*FS.NL+2, 3*FS.NL+4 );
+		Array2D< Real64 > A( 3*FS.NL+4, 3*FS.NL+2 );
 		Array1D< Real64 > XSOL( 3*FS.NL+2 );
 		Real64 MAXERR;
 		Array1D< Real64 > TNEW( FS.NL ); // latest estimate of layer temperatures, K
@@ -5200,64 +5200,64 @@ namespace WindowEquivalentLayer {
 			A = 0.0;
 
 			L = 1;
-			A( L, 1 ) = 1.0;
-			A( L, 2 ) = -1.0 * RHOB( 0 ); //  -1.0 * RHOB_OUT
-			A( L, ADIM + 1 ) = EPSB_OUT * StefanBoltzmann * TRMOUT_4;
+			A( 1, L ) = 1.0;
+			A( 2, L ) = -1.0 * RHOB( 0 ); //  -1.0 * RHOB_OUT
+			A( ADIM + 1, L ) = EPSB_OUT * StefanBoltzmann * TRMOUT_4;
 
 			for ( I = 1; I <= NL; ++I ) {
 				L = 3 * I - 1;
-				A( L, 3 * I - 2 ) = RHOF( I );
-				A( L, 3 * I - 1 ) = -1.0;
-				A( L, 3 * I ) = EPSF( I ); //  LWP( I)%EPSLF
-				A( L, 3 * I + 2 ) = TAU( I ); //  LWP( I)%TAUL
-				A( L, ADIM + 1 ) = 0.0;
+				A( 3 * I - 2, L ) = RHOF( I );
+				A( 3 * I - 1, L ) = -1.0;
+				A( 3 * I, L ) = EPSF( I ); //  LWP( I)%EPSLF
+				A( 3 * I + 2, L ) = TAU( I ); //  LWP( I)%TAUL
+				A( ADIM + 1, L ) = 0.0;
 
 				L = 3 * I;
 				if ( NL == 1 ) {
-					A( L, 1 ) = 1.0; // Single layer
-					A( L, 2 ) = -1.0;
-					A( L, 3 ) = -1.0 * ( HHAT( 0 ) + HHAT( 1 ) );
-					A( L, 4 ) = -1.0;
-					A( L, 5 ) = 1.0;
-					A( L, ADIM + 1 ) = -1.0 * ( HHAT( 0 ) * EB( 0 ) + HHAT( 1 ) * EB( 2 ) + SOURCE( 1 ) + QOCF( 1 ) );
+					A( 1, L ) = 1.0; // Single layer
+					A( 2, L ) = -1.0;
+					A( 3, L ) = -1.0 * ( HHAT( 0 ) + HHAT( 1 ) );
+					A( 4, L ) = -1.0;
+					A( 5, L ) = 1.0;
+					A( ADIM + 1, L ) = -1.0 * ( HHAT( 0 ) * EB( 0 ) + HHAT( 1 ) * EB( 2 ) + SOURCE( 1 ) + QOCF( 1 ) );
 				} else if ( I == 1 ) {
-					A( L, 1 ) = 1.0; //  Outdoor layer
-					A( L, 2 ) = -1.0;
-					A( L, 3 ) = -1.0 * ( HHAT( 0 ) + HHAT( 1 ) );
-					A( L, 4 ) = -1.0;
-					A( L, 5 ) = 1.0;
-					A( L, 6 ) = HHAT( 1 );
-					A( L, ADIM + 1 ) = -1.0 * ( HHAT( 0 ) * EB( 0 ) + SOURCE( 1 ) + QOCF( 1 ) );
+					A( 1, L ) = 1.0; //  Outdoor layer
+					A( 2, L ) = -1.0;
+					A( 3, L ) = -1.0 * ( HHAT( 0 ) + HHAT( 1 ) );
+					A( 4, L ) = -1.0;
+					A( 5, L ) = 1.0;
+					A( 6, L ) = HHAT( 1 );
+					A( ADIM + 1, L ) = -1.0 * ( HHAT( 0 ) * EB( 0 ) + SOURCE( 1 ) + QOCF( 1 ) );
 				} else if ( I == NL ) {
-					A( L, 3 * NL - 3 ) = HHAT( NL - 1 ); // Indoor layer
-					A( L, 3 * NL - 2 ) = 1.0;
-					A( L, 3 * NL - 1 ) = -1.0;
-					A( L, 3 * NL ) = -1.0 * ( HHAT( NL ) + HHAT( NL - 1 ) );
-					A( L, 3 * NL + 1 ) = -1.0;
-					A( L, 3 * NL + 2 ) = 1.0;
-					A( L, ADIM + 1 ) = -1.0 * ( HHAT( NL ) * EB( NL + 1 ) + SOURCE( NL ) + QOCF( NL ) );
+					A( 3 * NL - 3, L ) = HHAT( NL - 1 ); // Indoor layer
+					A( 3 * NL - 2, L ) = 1.0;
+					A( 3 * NL - 1, L ) = -1.0;
+					A( 3 * NL, L ) = -1.0 * ( HHAT( NL ) + HHAT( NL - 1 ) );
+					A( 3 * NL + 1, L ) = -1.0;
+					A( 3 * NL + 2, L ) = 1.0;
+					A( ADIM + 1, L ) = -1.0 * ( HHAT( NL ) * EB( NL + 1 ) + SOURCE( NL ) + QOCF( NL ) );
 				} else {
-					A( L, 3 * I - 3 ) = HHAT( I - 1 );
-					A( L, 3 * I - 2 ) = 1.0;
-					A( L, 3 * I - 1 ) = -1.0;
-					A( L, 3 * I ) = -1.0 * ( HHAT( I ) + HHAT( I - 1 ) );
-					A( L, 3 * I + 1 ) = -1.0;
-					A( L, 3 * I + 2 ) = 1.0;
-					A( L, 3 * I + 3 ) = HHAT( I );
-					A( L, ADIM + 1 ) = -1.0 * ( SOURCE( I ) + QOCF( I ) );
+					A( 3 * I - 3, L ) = HHAT( I - 1 );
+					A( 3 * I - 2, L ) = 1.0;
+					A( 3 * I - 1, L ) = -1.0;
+					A( 3 * I, L ) = -1.0 * ( HHAT( I ) + HHAT( I - 1 ) );
+					A( 3 * I + 1, L ) = -1.0;
+					A( 3 * I + 2, L ) = 1.0;
+					A( 3 * I + 3, L ) = HHAT( I );
+					A( ADIM + 1, L ) = -1.0 * ( SOURCE( I ) + QOCF( I ) );
 				}
 				L = 3 * I + 1;
-				A( L, 3 * I - 2 ) = TAU( I ); //   LWP( I)%TAUL
-				A( L, 3 * I ) = EPSB( I ); //   LWP( I)%EPSLB
-				A( L, 3 * I + 1 ) = -1.0;
-				A( L, 3 * I + 2 ) = RHOB( I );
-				A( L, ADIM + 1 ) = 0.0;
+				A( 3 * I - 2, L ) = TAU( I ); //   LWP( I)%TAUL
+				A( 3 * I, L ) = EPSB( I ); //   LWP( I)%EPSLB
+				A( 3 * I + 1, L ) = -1.0;
+				A( 3 * I + 2, L ) = RHOB( I );
+				A( ADIM + 1, L ) = 0.0;
 			}
 
 			L = 3 * NL + 2;
-			A( L, 3 * NL + 1 ) = -1.0 * RHOF( NL + 1 ); //   - 1.0 * RHOF_ROOM
-			A( L, 3 * NL + 2 ) = 1.0;
-			A( L, ADIM + 1 ) = EPSF_ROOM * StefanBoltzmann * TRMIN_4;
+			A( 3 * NL + 1, L ) = -1.0 * RHOF( NL + 1 ); //   - 1.0 * RHOF_ROOM
+			A( 3 * NL + 2, L ) = 1.0;
+			A( ADIM + 1, L ) = EPSF_ROOM * StefanBoltzmann * TRMIN_4;
 
 			//  SOLVE MATRIX
 
@@ -5471,8 +5471,8 @@ namespace WindowEquivalentLayer {
 		IE = NL - 1;
 		if ( IB <= IE ) {
 			for ( I = IB; I <= IE; ++I ) {
-				HC2D( I, I + 1 ) = HC( I );
-				HC2D( I + 1, I ) = HC2D( I, I + 1 );
+				HC2D( I + 1, I ) = HC( I );
+				HC2D( I, I + 1 ) = HC2D( I + 1, I );
 			}
 		}
 
@@ -5481,8 +5481,8 @@ namespace WindowEquivalentLayer {
 		IE = NL - 1;
 		if ( IB <= IE ) {
 			for ( I = IB; I <= IE; ++I ) {
-				HC2D( I - 1, I + 1 ) = HJC( I );
-				HC2D( I + 1, I - 1 ) = HC2D( I - 1, I + 1 );
+				HC2D( I + 1, I - 1 ) = HJC( I );
+				HC2D( I - 1, I + 1 ) = HC2D( I + 1, I - 1 );
 			}
 		}
 
@@ -5513,8 +5513,8 @@ namespace WindowEquivalentLayer {
 		IE = NL - 1;
 		if ( IB <= IE ) {
 			for ( I = IB; I <= IE; ++I ) {
-				HR2D( I, I + 1 ) = HR( I );
-				HR2D( I + 1, I ) = HR2D( I, I + 1 );
+				HR2D( I + 1, I ) = HR( I );
+				HR2D( I, I + 1 ) = HR2D( I + 1, I );
 			}
 		}
 
@@ -5523,8 +5523,8 @@ namespace WindowEquivalentLayer {
 		IE = NL - 1;
 		if ( IB <= IE ) {
 			for ( I = IB; I <= IE; ++I ) {
-				HR2D( I - 1, I + 1 ) = HJR( I );
-				HR2D( I + 1, I - 1 ) = HR2D( I - 1, I + 1 );
+				HR2D( I + 1, I - 1 ) = HJR( I );
+				HR2D( I - 1, I + 1 ) = HR2D( I + 1, I - 1 );
 			}
 		}
 
@@ -5569,12 +5569,12 @@ namespace WindowEquivalentLayer {
 			SOURCEdv = SOURCE;
 
 			for ( I = 1; I <= NL; ++I ) {
-				A( I, ADIM + 1 ) = HCIout( I ) * TOUTdv + HRIout( I ) * TRMOUTdv + HCIin( I ) * TINdv + HRIin( I ) * TRMINdv + SOURCEdv( I );
+				A( ADIM + 1, I ) = HCIout( I ) * TOUTdv + HRIout( I ) * TRMOUTdv + HCIin( I ) * TINdv + HRIin( I ) * TRMINdv + SOURCEdv( I );
 				A( I, I ) = HCIout( I ) + HRIout( I ) + HCIin( I ) + HRIin( I );
 				for ( J = 1; J <= NL; ++J ) {
 					if ( J != I ) {
-						A( I, I ) += HC2D( I, J ) + HR2D( I, J );
-						A( I, J ) = -1.0 * ( HC2D( I, J ) + HR2D( I, J ) );
+						A( I, I ) += HC2D( J, I ) + HR2D( J, I );
+						A( J, I ) = -1.0 * ( HC2D( J, I ) + HR2D( J, I ) );
 					}
 				}
 			}
@@ -5606,12 +5606,12 @@ namespace WindowEquivalentLayer {
 		SOURCEdv = 0.0;
 
 		for ( I = 1; I <= NL; ++I ) {
-			A( I, ADIM + 1 ) = HCIout( I ) * TOUTdv + HRIout( I ) * TRMOUTdv + HCIin( I ) * TINdv + HRIin( I ) * TRMINdv + SOURCEdv( I );
+			A( ADIM + 1, I ) = HCIout( I ) * TOUTdv + HRIout( I ) * TRMOUTdv + HCIin( I ) * TINdv + HRIin( I ) * TRMINdv + SOURCEdv( I );
 			A( I, I ) = HCIout( I ) + HRIout( I ) + HCIin( I ) + HRIin( I );
 			for ( J = 1; J <= NL; ++J ) {
 				if ( J != I ) {
-					A( I, I ) += HC2D( I, J ) + HR2D( I, J );
-					A( I, J ) = -1.0 * ( HC2D( I, J ) + HR2D( I, J ) );
+					A( I, I ) += HC2D( J, I ) + HR2D( J, I );
+					A( J, I ) = -1.0 * ( HC2D( J, I ) + HR2D( J, I ) );
 				}
 			}
 
@@ -5652,12 +5652,12 @@ namespace WindowEquivalentLayer {
 			}
 
 			for ( I = 1; I <= NL; ++I ) {
-				A( I, ADIM + 1 ) = HCIout( I ) * TOUTdv + HRIout( I ) * TRMOUTdv + HCIin( I ) * TINdv + HRIin( I ) * TRMINdv + SOURCEdv( I );
+				A( ADIM + 1, I ) = HCIout( I ) * TOUTdv + HRIout( I ) * TRMOUTdv + HCIin( I ) * TINdv + HRIin( I ) * TRMINdv + SOURCEdv( I );
 				A( I, I ) = HCIout( I ) + HRIout( I ) + HCIin( I ) + HRIin( I );
 				for ( J = 1; J <= NL; ++J ) {
 					if ( J != I ) {
-						A( I, I ) += HC2D( I, J ) + HR2D( I, J );
-						A( I, J ) = -1.0 * ( HC2D( I, J ) + HR2D( I, J ) );
+						A( I, I ) += HC2D( J, I ) + HR2D( J, I );
+						A( J, I ) = -1.0 * ( HC2D( J, I ) + HR2D( J, I ) );
 					}
 				}
 			}
@@ -5694,12 +5694,12 @@ namespace WindowEquivalentLayer {
 		SOURCEdv = 0.0;
 
 		for ( I = 1; I <= NL; ++I ) {
-			A( I, ADIM + 1 ) = HCIout( I ) * TOUTdv + HRIout( I ) * TRMOUTdv + HCIin( I ) * TINdv + HRIin( I ) * TRMINdv + SOURCEdv( I );
+			A( ADIM + 1, I ) = HCIout( I ) * TOUTdv + HRIout( I ) * TRMOUTdv + HCIin( I ) * TINdv + HRIin( I ) * TRMINdv + SOURCEdv( I );
 			A( I, I ) = HCIout( I ) + HRIout( I ) + HCIin( I ) + HRIin( I );
 			for ( J = 1; J <= NL; ++J ) {
 				if ( J != I ) {
-					A( I, I ) += HC2D( I, J ) + HR2D( I, J );
-					A( I, J ) = -1.0 * ( HC2D( I, J ) + HR2D( I, J ) );
+					A( I, I ) += HC2D( J, I ) + HR2D( J, I );
+					A( J, I ) = -1.0 * ( HC2D( J, I ) + HR2D( J, I ) );
 				}
 			}
 		}
@@ -5736,12 +5736,12 @@ namespace WindowEquivalentLayer {
 		SOURCEdv = 0.0;
 
 		for ( I = 1; I <= NL; ++I ) {
-			A( I, ADIM + 1 ) = HCIout( I ) * TOUTdv + HRIout( I ) * TRMOUTdv + HCIin( I ) * TINdv + HRIin( I ) * TRMINdv + SOURCEdv( I );
+			A( ADIM + 1, I ) = HCIout( I ) * TOUTdv + HRIout( I ) * TRMOUTdv + HCIin( I ) * TINdv + HRIin( I ) * TRMINdv + SOURCEdv( I );
 			A( I, I ) = HCIout( I ) + HRIout( I ) + HCIin( I ) + HRIin( I );
 			for ( J = 1; J <= NL; ++J ) {
 				if ( J != I ) {
-					A( I, I ) += HC2D( I, J ) + HR2D( I, J );
-					A( I, J ) = -1.0 * ( HC2D( I, J ) + HR2D( I, J ) );
+					A( I, I ) += HC2D( J, I ) + HR2D( J, I );
+					A( J, I ) = -1.0 * ( HC2D( J, I ) + HR2D( J, I ) );
 				}
 			}
 		}
@@ -5846,7 +5846,7 @@ namespace WindowEquivalentLayer {
 		Real64 Epsdf;
 		Real64 Epsdb;
 		Real64 Epsm;
-		Array2D< Real64 > A( 20, 22 );
+		Array2D< Real64 > A( 22, 20 );
 		Array1D< Real64 > X( 20 );
 		// real FSg_g, FSdf_g, FSdb_g, FSm_g
 		Real64 FSg_df;
@@ -5878,7 +5878,7 @@ namespace WindowEquivalentLayer {
 		// step 1:  unit emission from (g) only
 
 		SETUP4x4_A( rhog, rhodf, rhodb, taud, rhom, A );
-		A( 1, 5 ) = 1.0; // unit source of radiation
+		A( 5, 1 ) = 1.0; // unit source of radiation
 		SOLMATS( 4, A, X );
 		FSg_df = X( 1 );
 		//  FSg_g   = X(2)
@@ -5908,7 +5908,7 @@ namespace WindowEquivalentLayer {
 		// step 4:  unit emission from (m) only
 
 		SETUP4x4_A( rhog, rhodf, rhodb, taud, rhom, A );
-		A( 4, 5 ) = 1.0; // unit source of radiation
+		A( 5, 4 ) = 1.0; // unit source of radiation
 		SOLMATS( 4, A, X );
 		FSm_df = X( 1 );
 		//  FSm_g   = X(2)
@@ -5957,7 +5957,7 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Argument array dimensioning
-		A.dim( 20, 22 );
+		A.dim( 22, 20 );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5978,14 +5978,14 @@ namespace WindowEquivalentLayer {
 
 		A = 0.0;
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = -1.0 * rhog;
-		A( 2, 1 ) = -1.0 * rhodf;
+		A( 2, 1 ) = -1.0 * rhog;
+		A( 1, 2 ) = -1.0 * rhodf;
 		A( 2, 2 ) = 1.0;
-		A( 2, 4 ) = -1.0 * taud;
-		A( 3, 1 ) = -1.0 * taud;
+		A( 4, 2 ) = -1.0 * taud;
+		A( 1, 3 ) = -1.0 * taud;
 		A( 3, 3 ) = 1.0;
-		A( 3, 4 ) = -1.0 * rhodb;
-		A( 4, 3 ) = -1.0 * rhom;
+		A( 4, 3 ) = -1.0 * rhodb;
+		A( 3, 4 ) = -1.0 * rhom;
 		A( 4, 4 ) = 1.0;
 
 	}
@@ -9207,7 +9207,7 @@ namespace WindowEquivalentLayer {
 		using DaylightingManager::ProfileAngle;
 
 		// Argument array dimensioning
-		CFSAbs.dim( CFSMAXNL+1, 2 );
+		CFSAbs.dim( 2, CFSMAXNL+1 );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9226,7 +9226,7 @@ namespace WindowEquivalentLayer {
 		Real64 ProfAngVer; // Solar profile angle (radians) for vertical blind
 		Real64 IncAng; // incident angle degree
 		Real64 IncidAngle; // = ACOS(SOLCOS(3))
-		static Array2D< Real64 > Abs1( CFSMAXNL+1, 2 );
+		static Array2D< Real64 > Abs1( 2, CFSMAXNL+1 );
 		int Lay; // window layer index
 		int EQLNum; // equivalent layer window construction index
 		int ConstrNum; // construction index
@@ -9242,7 +9242,7 @@ namespace WindowEquivalentLayer {
 		EQLNum = Construct( Surface( SurfNum ).Construction ).EQLConsPtr;
 
 		if ( BeamDIffFlag != isDIFF ) {
-			if ( CosIncAng( SurfNum, HourOfDay, TimeStep ) <= 0.0 ) return;
+			if ( CosIncAng( TimeStep, HourOfDay, SurfNum ) <= 0.0 ) return;
 
 			for ( Lay = 1; Lay <= CFS( EQLNum ).NL; ++Lay ) {
 				if ( IsVBLayer( CFS( EQLNum ).L( Lay ) ) ) {
@@ -9254,10 +9254,10 @@ namespace WindowEquivalentLayer {
 				}
 			}
 			// Incident angle
-			IncAng = std::acos( CosIncAng( SurfNum, HourOfDay, TimeStep ) );
+			IncAng = std::acos( CosIncAng( TimeStep, HourOfDay, SurfNum ) );
 			CalcEQLWindowOpticalProperty( CFS( EQLNum ), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor );
-			CFSAbs( {1,CFSMAXNL + 1}, 1 ) = Abs1( {1,CFSMAXNL + 1}, 1 );
-			CFSAbs( {1,CFSMAXNL + 1}, 2 ) = Abs1( {1,CFSMAXNL + 1}, 2 );
+			CFSAbs( 1, {1,CFSMAXNL + 1} ) = Abs1( 1, {1,CFSMAXNL + 1} );
+			CFSAbs( 2, {1,CFSMAXNL + 1} ) = Abs1( 2, {1,CFSMAXNL + 1} );
 		} else {
 			if ( EQLDiffPropFlag( EQLNum ) ) {
 				for ( Lay = 1; Lay <= CFS( EQLNum ).NL; ++Lay ) {
@@ -9270,19 +9270,19 @@ namespace WindowEquivalentLayer {
 					}
 				}
 				CalcEQLWindowOpticalProperty( CFS( EQLNum ), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor );
-				CFSAbs( {1,CFSMAXNL + 1}, _ ) = Abs1( {1,CFSMAXNL + 1}, _ );
-				CFSDiffAbsTrans( EQLNum, {1,CFSMAXNL + 1}, _ ) = Abs1( {1,CFSMAXNL + 1}, _ );
-				Construct( ConstrNum ).TransDiff = Abs1( CFS( EQLNum ).NL + 1, 1 );
-				Construct( ConstrNum ).AbsDiffFrontEQL( {1,CFSMAXNL} ) = Abs1( {1,CFSMAXNL}, 1 );
-				Construct( ConstrNum ).AbsDiffBackEQL( {1,CFSMAXNL} ) = Abs1( {1,CFSMAXNL}, 2 );
+				CFSAbs( _, {1,CFSMAXNL + 1} ) = Abs1( _, {1,CFSMAXNL + 1} );
+				CFSDiffAbsTrans( _, {1,CFSMAXNL + 1}, EQLNum ) = Abs1( _, {1,CFSMAXNL + 1} );
+				Construct( ConstrNum ).TransDiff = Abs1( 1, CFS( EQLNum ).NL + 1 );
+				Construct( ConstrNum ).AbsDiffFrontEQL( {1,CFSMAXNL} ) = Abs1( 1, {1,CFSMAXNL} );
+				Construct( ConstrNum ).AbsDiffBackEQL( {1,CFSMAXNL} ) = Abs1( 2, {1,CFSMAXNL} );
 				Construct( ConstrNum ).ReflectSolDiffFront = CFS( EQLNum ).L( 1 ).SWP_EL.RHOSFDD;
 				Construct( ConstrNum ).ReflectSolDiffBack = CFS( EQLNum ).L( CFS( EQLNum ).NL ).SWP_EL.RHOSBDD;
 				if ( ! CFS( EQLNum ).ISControlled ) EQLDiffPropFlag( EQLNum ) = false;
 			} else {
-				CFSAbs( {1,CFSMAXNL + 1}, _ ) = CFSDiffAbsTrans( EQLNum, {1,CFSMAXNL + 1}, _ );
-				Construct( ConstrNum ).TransDiff = CFSDiffAbsTrans( EQLNum, CFS( EQLNum ).NL + 1, 1 );
-				Construct( ConstrNum ).AbsDiffFrontEQL( {1,CFSMAXNL} ) = CFSAbs( {1,CFSMAXNL}, 1 );
-				Construct( ConstrNum ).AbsDiffBackEQL( {1,CFSMAXNL} ) = CFSAbs( {1,CFSMAXNL}, 2 );
+				CFSAbs( _, {1,CFSMAXNL + 1} ) = CFSDiffAbsTrans( _, {1,CFSMAXNL + 1}, EQLNum );
+				Construct( ConstrNum ).TransDiff = CFSDiffAbsTrans( 1, CFS( EQLNum ).NL + 1, EQLNum );
+				Construct( ConstrNum ).AbsDiffFrontEQL( {1,CFSMAXNL} ) = CFSAbs( 1, {1,CFSMAXNL} );
+				Construct( ConstrNum ).AbsDiffBackEQL( {1,CFSMAXNL} ) = CFSAbs( 2, {1,CFSMAXNL} );
 			}
 		}
 

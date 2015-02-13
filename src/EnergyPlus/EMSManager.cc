@@ -1887,10 +1887,10 @@ namespace EMSManager {
 
 		//Setup error checking storage
 
-		if ( ! allocated( EMSConstructActuatorChecked ) ) EMSConstructActuatorChecked.allocate( TotSurfaces, TotConstructs );
+		if ( ! allocated( EMSConstructActuatorChecked ) ) EMSConstructActuatorChecked.allocate( TotConstructs, TotSurfaces );
 		EMSConstructActuatorChecked = false;
 
-		if ( ! allocated( EMSConstructActuatorIsOkay ) ) EMSConstructActuatorIsOkay.allocate( TotSurfaces, TotConstructs );
+		if ( ! allocated( EMSConstructActuatorIsOkay ) ) EMSConstructActuatorIsOkay.allocate( TotConstructs, TotSurfaces );
 		EMSConstructActuatorIsOkay = false;
 
 	}

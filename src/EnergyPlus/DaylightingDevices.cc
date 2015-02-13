@@ -1148,9 +1148,9 @@ namespace DaylightingDevices {
 			HorizonRad = MultHorizonZenith( DomeSurf ) * DifShdgRatioHoriz( DomeSurf );
 		} else {
 			IsoSkyRad = MultIsoSky( DomeSurf ) * curDifShdgRatioIsoSky( DomeSurf );
-			HorizonRad = MultHorizonZenith( DomeSurf ) * DifShdgRatioHorizHRTS( DomeSurf, HourOfDay, TimeStep );
+			HorizonRad = MultHorizonZenith( DomeSurf ) * DifShdgRatioHorizHRTS( TimeStep, HourOfDay, DomeSurf );
 		}
-		CircumSolarRad = MultCircumSolar( DomeSurf ) * SunlitFrac( DomeSurf, HourOfDay, TimeStep );
+		CircumSolarRad = MultCircumSolar( DomeSurf ) * SunlitFrac( TimeStep, HourOfDay, DomeSurf );
 
 		AnisoSkyTDDMult = TDDPipe( PipeNum ).TransSolIso * IsoSkyRad + TransTDD( PipeNum, COSI, SolarBeam ) * CircumSolarRad + TDDPipe( PipeNum ).TransSolHorizon * HorizonRad;
 
@@ -1409,7 +1409,7 @@ namespace DaylightingDevices {
 			// Add diffuse interior shortwave reflected from zone surfaces and from zone sources, lights, etc.
 			QRefl += QS( Surface( DiffSurf ).Zone ) * Surface( DiffSurf ).Area * transDiff;
 
-			TotTDDPipeGain = WinTransSolar( TDDPipe( PipeNum ).Dome ) - QRadSWOutIncident( DiffSurf ) * Surface( DiffSurf ).Area + QRefl * ( 1.0 - TDDPipe( PipeNum ).TransSolIso / transDiff ) + QRadSWwinAbs( TDDPipe( PipeNum ).Dome, 1 ) * Surface( DiffSurf ).Area / 2.0 + QRadSWwinAbs( DiffSurf, 1 ) * Surface( DiffSurf ).Area / 2.0; // Solar entering pipe | Solar exiting pipe | Absorbed due to reflections on the way out | Inward absorbed solar from dome glass | Inward absorbed solar from diffuser glass
+			TotTDDPipeGain = WinTransSolar( TDDPipe( PipeNum ).Dome ) - QRadSWOutIncident( DiffSurf ) * Surface( DiffSurf ).Area + QRefl * ( 1.0 - TDDPipe( PipeNum ).TransSolIso / transDiff ) + QRadSWwinAbs( 1, TDDPipe( PipeNum ).Dome ) * Surface( DiffSurf ).Area / 2.0 + QRadSWwinAbs( 1, DiffSurf ) * Surface( DiffSurf ).Area / 2.0; // Solar entering pipe | Solar exiting pipe | Absorbed due to reflections on the way out | Inward absorbed solar from dome glass | Inward absorbed solar from diffuser glass
 
 			TDDPipe( PipeNum ).PipeAbsorbedSolar = max( 0.0, TotTDDPipeGain ); // Report variable [W]
 

@@ -70,7 +70,7 @@ namespace DataBSDFWindow {
 	int MaxBkSurf( 20 ); // was 20    Maximum number of back surfaces in solar overlap & interior solar distribution
 	int TotThermalModels( 0 ); // Number of thermal models
 	//calculation
-	Array3D< Real64 > SUNCOSTS( 3, 24, 60 ); // Timestep values of solar direction cosines
+	Array3D< Real64 > SUNCOSTS( 60, 24, 3 ); // Timestep values of solar direction cosines
 	Array2D< Real64 > BSDFTempMtrx; // Temporary matrix for holding axisymmetric input
 
 	// Object Data

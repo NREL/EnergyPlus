@@ -378,43 +378,43 @@ namespace HeatBalFiniteDiffManager {
 					ShowContinueError( "...expected " + RoundSigDigits( MaterialFD( MaterNum ).numTempEnth ) + " pairs, but only entered " + RoundSigDigits( MaterialNumProp - 1 ) + " numbers." );
 					ErrorsFound = true;
 				}
-				MaterialFD( MaterNum ).TempEnth.dimension( MaterialFD( MaterNum ).numTempEnth, 2, 0.0 );
+				MaterialFD( MaterNum ).TempEnth.dimension( 2, MaterialFD( MaterNum ).numTempEnth, 0.0 );
 				propNum = 2;
 				// Temperature first
 				for ( int pcount = 1, pcount_end = MaterialFD( MaterNum ).numTempEnth; pcount <= pcount_end; ++pcount ) {
-					MaterialFD( MaterNum ).TempEnth( pcount, 1 ) = MaterialProps( propNum );
+					MaterialFD( MaterNum ).TempEnth( 1, pcount ) = MaterialProps( propNum );
 					propNum += 2;
 				}
 				propNum = 3;
 				// Then Enthalpy
 				for ( int pcount = 1, pcount_end = MaterialFD( MaterNum ).numTempEnth; pcount <= pcount_end; ++pcount ) {
-					MaterialFD( MaterNum ).TempEnth( pcount, 2 ) = MaterialProps( propNum );
+					MaterialFD( MaterNum ).TempEnth( 2, pcount ) = MaterialProps( propNum );
 					propNum += 2;
 				}
 				nonInc = false;
 				inegptr = 0;
 				for ( int pcount = 1, pcount_end = MaterialFD( MaterNum ).numTempEnth - 1; pcount <= pcount_end; ++pcount ) {
-					if ( MaterialFD( MaterNum ).TempEnth( pcount, 1 ) < MaterialFD( MaterNum ).TempEnth( pcount + 1, 1 ) ) continue;
+					if ( MaterialFD( MaterNum ).TempEnth( 1, pcount ) < MaterialFD( MaterNum ).TempEnth( 1, pcount + 1 ) ) continue;
 					nonInc = true;
 					inegptr = pcount + 1;
 					break;
 				}
 				if ( nonInc ) {
 					ShowSevereError( "GetCondFDInput: " + cCurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", non increasing Temperatures. Temperatures must be strictly increasing." );
-					ShowContinueError( "...occurs first at item=[" + RoundSigDigits( inegptr ) + "], value=[" + RoundSigDigits( MaterialFD( MaterNum ).TempEnth( inegptr, 1 ), 2 ) + "]." );
+					ShowContinueError( "...occurs first at item=[" + RoundSigDigits( inegptr ) + "], value=[" + RoundSigDigits( MaterialFD( MaterNum ).TempEnth( 1, inegptr ), 2 ) + "]." );
 					ErrorsFound = true;
 				}
 				nonInc = false;
 				inegptr = 0;
 				for ( int pcount = 1, pcount_end = MaterialFD( MaterNum ).numTempEnth - 1; pcount <= pcount_end; ++pcount ) {
-					if ( MaterialFD( MaterNum ).TempEnth( pcount, 2 ) <= MaterialFD( MaterNum ).TempEnth( pcount + 1, 2 ) ) continue;
+					if ( MaterialFD( MaterNum ).TempEnth( 2, pcount ) <= MaterialFD( MaterNum ).TempEnth( 2, pcount + 1 ) ) continue;
 					nonInc = true;
 					inegptr = pcount + 1;
 					break;
 				}
 				if ( nonInc ) {
 					ShowSevereError( "GetCondFDInput: " + cCurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", non increasing Enthalpy." );
-					ShowContinueError( "...occurs first at item=[" + RoundSigDigits( inegptr ) + "], value=[" + RoundSigDigits( MaterialFD( MaterNum ).TempEnth( inegptr, 2 ), 2 ) + "]." );
+					ShowContinueError( "...occurs first at item=[" + RoundSigDigits( inegptr ) + "], value=[" + RoundSigDigits( MaterialFD( MaterNum ).TempEnth( 2, inegptr ), 2 ) + "]." );
 					ShowContinueError( "...These values may be Cp (Specific Heat) rather than Enthalpy.  Please correct." );
 					ErrorsFound = true;
 				}
@@ -451,30 +451,30 @@ namespace HeatBalFiniteDiffManager {
 					ShowContinueError( "...expected " + RoundSigDigits( MaterialFD( MaterNum ).numTempCond ) + " pairs, but only entered " + RoundSigDigits( MaterialNumProp ) + " numbers." );
 					ErrorsFound = true;
 				}
-				MaterialFD( MaterNum ).TempCond.dimension( MaterialFD( MaterNum ).numTempCond, 2, 0.0 );
+				MaterialFD( MaterNum ).TempCond.dimension( 2, MaterialFD( MaterNum ).numTempCond, 0.0 );
 				propNum = 1;
 				// Temperature first
 				for ( int pcount = 1, pcount_end = MaterialFD( MaterNum ).numTempCond; pcount <= pcount_end; ++pcount ) {
-					MaterialFD( MaterNum ).TempCond( pcount, 1 ) = MaterialProps( propNum );
+					MaterialFD( MaterNum ).TempCond( 1, pcount ) = MaterialProps( propNum );
 					propNum += 2;
 				}
 				propNum = 2;
 				// Then Conductivity
 				for ( int pcount = 1, pcount_end = MaterialFD( MaterNum ).numTempCond; pcount <= pcount_end; ++pcount ) {
-					MaterialFD( MaterNum ).TempCond( pcount, 2 ) = MaterialProps( propNum );
+					MaterialFD( MaterNum ).TempCond( 2, pcount ) = MaterialProps( propNum );
 					propNum += 2;
 				}
 				nonInc = false;
 				inegptr = 0;
 				for ( int pcount = 1, pcount_end = MaterialFD( MaterNum ).numTempCond - 1; pcount <= pcount_end; ++pcount ) {
-					if ( MaterialFD( MaterNum ).TempCond( pcount, 1 ) < MaterialFD( MaterNum ).TempCond( pcount + 1, 1 ) ) continue;
+					if ( MaterialFD( MaterNum ).TempCond( 1, pcount ) < MaterialFD( MaterNum ).TempCond( 1, pcount + 1 ) ) continue;
 					nonInc = true;
 					inegptr = pcount + 1;
 					break;
 				}
 				if ( nonInc ) {
 					ShowSevereError( "GetCondFDInput: " + cCurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", non increasing Temperatures. Temperatures must be strictly increasing." );
-					ShowContinueError( "...occurs first at item=[" + RoundSigDigits( inegptr ) + "], value=[" + RoundSigDigits( MaterialFD( MaterNum ).TempCond( inegptr, 1 ), 2 ) + "]." );
+					ShowContinueError( "...occurs first at item=[" + RoundSigDigits( inegptr ) + "], value=[" + RoundSigDigits( MaterialFD( MaterNum ).TempCond( 1, inegptr ), 2 ) + "]." );
 					ErrorsFound = true;
 				}
 			}
@@ -483,11 +483,11 @@ namespace HeatBalFiniteDiffManager {
 		for ( MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum ) {
 			if ( MaterialFD( MaterNum ).numTempEnth == 0 ) {
 				MaterialFD( MaterNum ).numTempEnth = 3;
-				MaterialFD( MaterNum ).TempEnth.dimension( 3, 2, -100.0 );
+				MaterialFD( MaterNum ).TempEnth.dimension( 2, 3, -100.0 );
 			}
 			if ( MaterialFD( MaterNum ).numTempCond == 0 ) {
 				MaterialFD( MaterNum ).numTempCond = 3;
-				MaterialFD( MaterNum ).TempCond.dimension( 3, 2, -100.0 );
+				MaterialFD( MaterNum ).TempCond.dimension( 2, 3, -100.0 );
 			}
 		}
 
@@ -1343,8 +1343,8 @@ namespace HeatBalFiniteDiffManager {
 
 		//inputs:
 		//  a = two dimensional array
-		//  nind=column containing independent variable
-		//  ndep=column containing the dependent variable
+		//  nind=row containing independent variable
+		//  ndep=row containing the dependent variable
 		//   x1 = specific independent variable value for which
 		//      interpolated output is wanted
 		//outputs:
@@ -1353,32 +1353,32 @@ namespace HeatBalFiniteDiffManager {
 		//    routine returns first or last dependent variable
 		//      for out of range x1.
 
-		int const first( a.l1() );
+		int const first( a.l2() );
 
 		assert( a.size() > 0u );
 		Array2< Real64 >::size_type l( 1 );
 		Real64 r( a[ 0 ] );
 		int last( first );
-		for ( int i1 = first + 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
+		for ( int i1 = first + 1, e1 = a.u2(); i1 <= e1; ++i1, ++l ) {
 			if ( a[ l ] > r ) {
 				r = a[ l ];
 				last = i1;
 			}
 		}
 
-		Array2< Real64 >::size_type lind( a.index( 0, nind ) );
-		Array2< Real64 >::size_type ldep( a.index( 0, ndep ) );
-		if ( ( a.size1() == 1u ) || ( x1 <= a[ lind + first ] ) ) { // [ lind + first ] == ( first, nind )
-			return a[ ldep + first ]; // [ ldep + first ] == ( first, ndep )
-		} else if ( x1 >= a[ lind + last ] ) { // [ lind + last ] == ( last, nind )
-			return a[ ldep + last ]; // [ ldep + last ] == ( last, ndep )
+		Array2< Real64 >::size_type lind( a.index( nind, 0 ) );
+		Array2< Real64 >::size_type ldep( a.index( ndep, 0 ) );
+		if ( ( a.size2() == 1u ) || ( x1 <= a[ lind + first ] ) ) { // [ lind + first ] == ( nind, first )
+			return a[ ldep + first ]; // [ ldep + first ] == ( ndep, first )
+		} else if ( x1 >= a[ lind + last ] ) { // [ lind + last ] == ( nind, last )
+			return a[ ldep + last ]; // [ ldep + last ] == ( ndep, last )
 		} else {
 			int i;
 			int i1( first );
 			int i2( last );
 			while ( ( i2 - i1 ) > 1 ) {
 				i = i1 + ( ( i2 - i1 ) >> 1 ); //Tuned bit shift replaces / 2
-				if ( x1 < a[ lind + i ] ) { // [ lind + i ] == ( i, nind )
+				if ( x1 < a[ lind + i ] ) { // [ lind + i ] == ( nind, i )
 					i2 = i;
 				} else {
 					i1 = i;
@@ -1387,8 +1387,8 @@ namespace HeatBalFiniteDiffManager {
 			i = i2;
 			lind += i;
 			ldep += i;
-			Real64 const fract( ( x1 - a[ lind - 1 ] ) / ( a[ lind ] - a[ lind - 1 ] ) ); // [ lind ] == ( i, nind ), [ lind - 1 ] == ( i - 1, nind )
-			return a[ ldep - 1 ] + fract * ( a[ ldep ] - a[ ldep - 1 ] ); // [ ldep ] == ( i, ndep ), [ ldep - 1 ] == ( i - 1, ndep )
+			Real64 const fract( ( x1 - a[ lind - 1 ] ) / ( a[ lind ] - a[ lind - 1 ] ) ); // [ lind ] == ( nind, i ), [ lind - 1 ] == ( nind, i - 1 )
+			return a[ ldep - 1 ] + fract * ( a[ ldep ] - a[ ldep - 1 ] ); // [ ldep ] == ( ndep, i ), [ ldep - 1 ] == ( ndep, i - 1 )
 		}
 	}
 
@@ -1563,8 +1563,8 @@ namespace HeatBalFiniteDiffManager {
 
 					// Set Thermal Conductivity. Can be constant, simple linear temp dep or multiple linear segment temp function dep.
 					auto const & matFD_TempCond( matFD.TempCond );
-					assert( matFD_TempCond.u1() >= 3 );
-					auto const lTC( matFD_TempCond.index( 1, 2 ) );
+					assert( matFD_TempCond.u2() >= 3 );
+					auto const lTC( matFD_TempCond.index( 2, 1 ) );
 					Real64 kt;
 					if ( matFD_TempCond[ lTC ] + matFD_TempCond[ lTC+1 ] + matFD_TempCond[ lTC+2 ] >= 0.0 ) { // Multiple Linear Segment Function
 						// Use average temp of surface and first node for k
@@ -1580,8 +1580,8 @@ namespace HeatBalFiniteDiffManager {
 					Real64 const Cpo( mat.SpecHeat ); // Specific heat from idf
 					Real64 Cp( Cpo ); // Specific heat modified if PCM, otherwise equal to Cpo // Will be changed if PCM
 					auto const & matFD_TempEnth( matFD.TempEnth );
-					assert( matFD_TempEnth.u1() >= 3 );
-					auto const lTE( matFD_TempEnth.index( 1, 2 ) );
+					assert( matFD_TempEnth.u2() >= 3 );
+					auto const lTE( matFD_TempEnth.index( 2, 1 ) );
 					if ( matFD_TempEnth[ lTE ] + matFD_TempEnth[ lTE+1 ] + matFD_TempEnth[ lTE+2 ] >= 0.0 ) { // Phase change material: Use TempEnth data to generate Cp
 						//               CheckhT = Material(MatLay)%TempEnth       ! debug
 						// Enthalpy function used to get average specific heat. Updated by GS so enthalpy function is followed.
@@ -1742,8 +1742,8 @@ namespace HeatBalFiniteDiffManager {
 
 		//  Set Thermal Conductivity.  Can be constant, simple linear temp dep or multiple linear segment temp function dep.
 		auto const & matFD_TempCond( matFD.TempCond );
-		assert( matFD_TempCond.u1() >= 3 );
-		auto const lTC( matFD_TempCond.index( 1, 2 ) );
+		assert( matFD_TempCond.u2() >= 3 );
+		auto const lTC( matFD_TempCond.index( 2, 1 ) );
 		Real64 ktA1; // Variable Outer Thermal conductivity in temperature equation
 		Real64 ktA2; // Thermal Inner conductivity in temperature equation
 		if ( matFD_TempCond[ lTC ] + matFD_TempCond[ lTC+1 ] + matFD_TempCond[ lTC+2 ] >= 0.0 ) { // Multiple Linear Segment Function
@@ -1761,8 +1761,8 @@ namespace HeatBalFiniteDiffManager {
 		Real64 const Cpo( mat.SpecHeat ); // Const Cp from input
 		Real64 Cp( Cpo ); // Cp used // Will be changed if PCM
 		auto const & matFD_TempEnth( matFD.TempEnth );
-		assert( matFD_TempEnth.u1() >= 3 );
-		auto const lTE( matFD_TempEnth.index( 1, 2 ) );
+		assert( matFD_TempEnth.u2() >= 3 );
+		auto const lTE( matFD_TempEnth.index( 2, 1 ) );
 		if ( matFD_TempEnth[ lTE ] + matFD_TempEnth[ lTE+1 ] + matFD_TempEnth[ lTE+2 ] >= 0.0 ) { // Phase change material: Use TempEnth data
 			EnthOld( i ) = terpld( matFD_TempEnth, TD_i, 1, 2 ); // 1: Temperature, 2: Enthalpy
 			EnthNew( i ) = terpld( matFD_TempEnth, TDT_i, 1, 2 ); // 1: Temperature, 2: Enthalpy
@@ -1882,8 +1882,8 @@ namespace HeatBalFiniteDiffManager {
 				Real64 kt1( 0.0 );
 				if ( ! RLayerPresent ) {
 					auto const & matFD_TempCond( matFD.TempCond );
-					assert( matFD_TempCond.u1() >= 3 );
-					auto const lTC( matFD_TempCond.index( 1, 2 ) );
+					assert( matFD_TempCond.u2() >= 3 );
+					auto const lTC( matFD_TempCond.index( 2, 1 ) );
 					if ( matFD_TempCond[ lTC ] + matFD_TempCond[ lTC+1 ] + matFD_TempCond[ lTC+2 ] >= 0.0 ) { // Multiple Linear Segment Function
 						kt1 = terpld( matFD.TempCond, ( TDT_i + TDT_m ) / 2.0, 1, 2 ); // 1: Temperature, 2: Thermal conductivity
 					} else {
@@ -1896,8 +1896,8 @@ namespace HeatBalFiniteDiffManager {
 				Real64 kt2( 0.0 );
 				if ( ! RLayer2Present ) {
 					auto const & matFD2_TempCond( matFD2.TempCond );
-					assert( matFD2_TempCond.u1() >= 3 );
-					auto const lTC2( matFD2_TempCond.index( 1, 2 ) );
+					assert( matFD2_TempCond.u2() >= 3 );
+					auto const lTC2( matFD2_TempCond.index( 2, 1 ) );
 					if ( matFD2_TempCond[ lTC2 ] + matFD2_TempCond[ lTC2+1 ] + matFD2_TempCond[ lTC2+2 ] >= 0.0 ) { // Multiple Linear Segment Function
 						kt2 = terpld( matFD2_TempCond, ( TDT_i + TDT_p ) / 2.0, 1, 2 ); // 1: Temperature, 2: Thermal conductivity
 					} else {
@@ -1928,13 +1928,13 @@ namespace HeatBalFiniteDiffManager {
 				auto const TD_i( TD( i ) );
 
 				auto const & matFD_TempEnth( matFD.TempEnth );
-				assert( matFD_TempEnth.u1() >= 3 );
-				auto const lTE( matFD_TempEnth.index( 1, 2 ) );
+				assert( matFD_TempEnth.u2() >= 3 );
+				auto const lTE( matFD_TempEnth.index( 2, 1 ) );
 				Real64 const matFD_sum( matFD_TempEnth[ lTE ] + matFD_TempEnth[ lTE+1 ] + matFD_TempEnth[ lTE+2 ] );
 
 				auto const & matFD2_TempEnth( matFD2.TempEnth );
-				assert( matFD2_TempEnth.u1() >= 3 );
-				auto const lTE2( matFD2_TempEnth.index( 1, 2 ) );
+				assert( matFD2_TempEnth.u2() >= 3 );
+				auto const lTE2( matFD2_TempEnth.index( 2, 1 ) );
 				Real64 const matFD2_sum( matFD2_TempEnth[ lTE2 ] + matFD2_TempEnth[ lTE2+1 ] + matFD2_TempEnth[ lTE2+2 ] );
 
 				if ( RLayerPresent && ! RLayer2Present ) { // R-layer first
@@ -2182,8 +2182,8 @@ namespace HeatBalFiniteDiffManager {
 
 				// Set Thermal Conductivity. Can be constant, simple linear temp dep or multiple linear segment temp function dep.
 				auto const & matFD_TempCond( matFD.TempCond );
-				assert( matFD_TempCond.u1() >= 3 );
-				auto const lTC( matFD_TempCond.index( 1, 2 ) );
+				assert( matFD_TempCond.u2() >= 3 );
+				auto const lTC( matFD_TempCond.index( 2, 1 ) );
 				Real64 kt;
 				if ( matFD_TempCond[ lTC ] + matFD_TempCond[ lTC+1 ] + matFD_TempCond[ lTC+2 ] >= 0.0 ) { // Multiple Linear Segment Function
 					// Use average of surface and first node temp for determining k
@@ -2198,8 +2198,8 @@ namespace HeatBalFiniteDiffManager {
 				Real64 const Cpo( mat.SpecHeat );
 				Real64 Cp( Cpo ); // Will be changed if PCM
 				auto const & matFD_TempEnth( matFD.TempEnth );
-				assert( matFD_TempEnth.u1() >= 3 );
-				auto const lTE( matFD_TempEnth.index( 1, 2 ) );
+				assert( matFD_TempEnth.u2() >= 3 );
+				auto const lTE( matFD_TempEnth.index( 2, 1 ) );
 				if ( matFD_TempEnth[ lTE ] + matFD_TempEnth[ lTE+1 ] + matFD_TempEnth[ lTE+2 ] >= 0.0 ) { // Phase change material: Use TempEnth data
 					EnthOld( i ) = terpld( matFD_TempEnth, TD_i, 1, 2 ); // 1: Temperature, 2: Enthalpy
 					EnthNew( i ) = terpld( matFD_TempEnth, TDT_i, 1, 2 ); // 1: Temperature, 2: Enthalpy

@@ -583,7 +583,7 @@ namespace HeatBalanceIntRadExchange {
 				} gio::write( OutputFileInits );
 
 				for ( Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex ) {
-					RowSum = sum( SaveApproximateViewFactors( Findex, _ ) );
+					RowSum = sum( SaveApproximateViewFactors( _, Findex ) );
 					gio::write( OutputFileInits, "(A,3(',',A),$)" )
 						<< "View Factor"
 						<< Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name
@@ -591,7 +591,7 @@ namespace HeatBalanceIntRadExchange {
 						<< RoundSigDigits( RowSum, 4 );
 					for ( int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum ) {
 						gio::write( OutputFileInits, "(',',A,$)" )
-							<< RoundSigDigits( SaveApproximateViewFactors( Findex, SurfNum ), 4 );
+							<< RoundSigDigits( SaveApproximateViewFactors( SurfNum, Findex ), 4 );
 					} gio::write( OutputFileInits );
 				}
 			}
@@ -603,14 +603,14 @@ namespace HeatBalanceIntRadExchange {
 				} gio::write( OutputFileInits );
 
 				for ( Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex ) {
-					RowSum = sum( ZoneInfo( ZoneNum ).F( Findex, _ ) );
+					RowSum = sum( ZoneInfo( ZoneNum ).F( _, Findex ) );
 					gio::write( OutputFileInits, "(A,3(',',A),$)" )
 						<< "View Factor"
 						<< Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name
 						<< cSurfaceClass( Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Class )
 						<< RoundSigDigits( RowSum, 4 );
 					for ( int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum ) {
-						gio::write( OutputFileInits, "(',',A,$)" ) << RoundSigDigits( ZoneInfo( ZoneNum ).F( Findex, SurfNum ), 4 );
+						gio::write( OutputFileInits, "(',',A,$)" ) << RoundSigDigits( ZoneInfo( ZoneNum ).F( SurfNum, Findex ), 4 );
 					} gio::write( OutputFileInits );
 				}
 
@@ -620,9 +620,9 @@ namespace HeatBalanceIntRadExchange {
 					for ( int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum ) {
 						for ( Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex ) {
 							if ( ! ( SurfNum == NumOfZoneSurfaces && Findex == NumOfZoneSurfaces ) ) {
-								gio::write( OutputFileDebug, fmtA ) << "  " + Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name + ',' + Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name + ',' + RoundSigDigits( ZoneInfo( ZoneNum ).F( SurfNum, Findex ), 6 ) + ',';
+								gio::write( OutputFileDebug, fmtA ) << "  " + Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name + ',' + Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name + ',' + RoundSigDigits( ZoneInfo( ZoneNum ).F( Findex, SurfNum ), 6 ) + ',';
 							} else {
-								gio::write( OutputFileDebug, fmtA ) << "  " + Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name + ',' + Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name + ',' + RoundSigDigits( ZoneInfo( ZoneNum ).F( SurfNum, Findex ), 6 ) + ';';
+								gio::write( OutputFileDebug, fmtA ) << "  " + Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name + ',' + Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name + ',' + RoundSigDigits( ZoneInfo( ZoneNum ).F( Findex, SurfNum ), 6 ) + ';';
 							}
 						}
 					}
@@ -633,9 +633,9 @@ namespace HeatBalanceIntRadExchange {
 					for ( int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum ) {
 						for ( Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex ) {
 							if ( ! ( SurfNum == NumOfZoneSurfaces && Findex == NumOfZoneSurfaces ) ) {
-								gio::write( OutputFileDebug, fmtA ) << "  " + Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name + ',' + Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name + ',' + RoundSigDigits( ZoneInfo( ZoneNum ).F( SurfNum, Findex ), 6 ) + ',';
+								gio::write( OutputFileDebug, fmtA ) << "  " + Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name + ',' + Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name + ',' + RoundSigDigits( ZoneInfo( ZoneNum ).F( Findex, SurfNum ), 6 ) + ',';
 							} else {
-								gio::write( OutputFileDebug, fmtA ) << "  " + Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name + ',' + Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name + ',' + RoundSigDigits( ZoneInfo( ZoneNum ).F( SurfNum, Findex ), 6 ) + ';';
+								gio::write( OutputFileDebug, fmtA ) << "  " + Surface( ZoneInfo( ZoneNum ).SurfacePtr( SurfNum ) ).Name + ',' + Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name + ',' + RoundSigDigits( ZoneInfo( ZoneNum ).F( Findex, SurfNum ), 6 ) + ';';
 							}
 						}
 					}
@@ -658,7 +658,7 @@ namespace HeatBalanceIntRadExchange {
 						<< Surface( ZoneInfo( ZoneNum ).SurfacePtr( Findex ) ).Name;
 					for ( int SurfNum = 1; SurfNum <= NumOfZoneSurfaces; ++SurfNum ) {
 						gio::write( OutputFileInits, "(',',A,$)" )
-							<< RoundSigDigits( ZoneInfo( ZoneNum ).ScriptF( SurfNum, Findex ), 4 );
+							<< RoundSigDigits( ZoneInfo( ZoneNum ).ScriptF( Findex, SurfNum ), 4 );
 					} gio::write( OutputFileInits );
 				}
 			}
@@ -669,7 +669,7 @@ namespace HeatBalanceIntRadExchange {
 
 			RowSum = 0.0;
 			for ( Findex = 1; Findex <= NumOfZoneSurfaces; ++Findex ) {
-				RowSum += sum( ZoneInfo( ZoneNum ).F( Findex, _ ) );
+				RowSum += sum( ZoneInfo( ZoneNum ).F( _, Findex ) );
 			}
 			RowSum = std::abs( RowSum - NumOfZoneSurfaces );
 			FixedRowSum = std::abs( FixedRowSum - NumOfZoneSurfaces );
@@ -770,7 +770,7 @@ namespace HeatBalanceIntRadExchange {
 			for ( index = 1; index <= NumNums; index += 3 ) {
 				inx1 = rNumericArgs( index );
 				inx2 = rNumericArgs( index + 1 );
-				F( inx1, inx2 ) = rNumericArgs( index + 2 );
+				F( inx2, inx1 ) = rNumericArgs( index + 2 );
 			}
 		}
 
@@ -871,7 +871,7 @@ namespace HeatBalanceIntRadExchange {
 					ErrorsFound = true;
 				}
 				++numinx1;
-				if ( inx1 > 0 && inx2 > 0 ) F( inx1, inx2 ) = rNumericArgs( numinx1 );
+				if ( inx1 > 0 && inx2 > 0 ) F( inx2, inx1 ) = rNumericArgs( numinx1 );
 			}
 			ZoneSurfaceNames.deallocate();
 		}
@@ -988,7 +988,7 @@ namespace HeatBalanceIntRadExchange {
 				if ( i == j ) continue;
 				//  Include INTMASS, FLOOR(for others), CEILING/ROOF  and different facing surfaces.
 				if ( ( Surface( SPtr( j ) ).Class == SurfaceClass_IntMass ) || ( Surface( SPtr( j ) ).Class == SurfaceClass_Floor ) || ( Surface( SPtr( j ) ).Class == SurfaceClass_Roof ) || ( ( std::abs( Azimuth( i ) - Azimuth( j ) ) > SameAngleLimit ) || ( std::abs( Tilt( i ) - Tilt( j ) ) > SameAngleLimit ) ) ) {
-					if ( ZoneArea( i ) > 0.0 ) F( i, j ) = A( j ) / ( ZoneArea( i ) );
+					if ( ZoneArea( i ) > 0.0 ) F( j, i ) = A( j ) / ( ZoneArea( i ) );
 				}
 
 			}
@@ -1095,7 +1095,7 @@ namespace HeatBalanceIntRadExchange {
 		Array2D< Real64 > AF( N, N ); // = (AREA * DIRECT VIEW FACTOR) MATRIX
 		for ( i = 1; i <= N; ++i ) {
 			for ( j = 1; j <= N; ++j ) {
-				AF( i, j ) = FixedAF( i, j ) * A( i );
+				AF( j, i ) = FixedAF( j, i ) * A( i );
 			}
 		}
 
@@ -1113,7 +1113,7 @@ namespace HeatBalanceIntRadExchange {
 		if ( N <= 3 ) {
 			for ( i = 1; i <= N; ++i ) {
 				for ( j = 1; j <= N; ++j ) {
-					FixedF( i, j ) = FixedAF( i, j ) / A( i );
+					FixedF( j, i ) = FixedAF( j, i ) / A( i );
 				}
 			}
 
@@ -1135,13 +1135,13 @@ namespace HeatBalanceIntRadExchange {
 			++NumIterations;
 			for ( i = 1; i <= N; ++i ) {
 				// Determine row coefficients which will enforce closure.
-				Real64 const sum_FixedAF_i( sum( FixedAF( i, _ ) ) );
+				Real64 const sum_FixedAF_i( sum( FixedAF( _, i ) ) );
 				if ( std::abs( sum_FixedAF_i ) > 1.0e-10 ) {
 					RowCoefficient( i ) = A( i ) / sum_FixedAF_i;
 				} else {
 					RowCoefficient( i ) = 1.0;
 				}
-				FixedAF( i, _ ) *= RowCoefficient( i );
+				FixedAF( _, i ) *= RowCoefficient( i );
 			}
 
 			//  Enforce reciprocity by averaging AiFij and AjFji
@@ -1150,10 +1150,10 @@ namespace HeatBalanceIntRadExchange {
 			//  Form FixedF matrix
 			for ( i = 1; i <= N; ++i ) {
 				for ( j = 1; j <= N; ++j ) {
-					FixedF( i, j ) = FixedAF( i, j ) / A( i );
-					if ( std::abs( FixedF( i, j ) ) < 1.e-10 ) {
-						FixedF( i, j ) = 0.0;
-						FixedAF( i, j ) = 0.0;
+					FixedF( j, i ) = FixedAF( j, i ) / A( i );
+					if ( std::abs( FixedF( j, i ) ) < 1.e-10 ) {
+						FixedF( j, i ) = 0.0;
+						FixedAF( j, i ) = 0.0;
 					}
 				}
 			}
@@ -1170,7 +1170,7 @@ namespace HeatBalanceIntRadExchange {
 				//  Form FixedF matrix
 				for ( i = 1; i <= N; ++i ) {
 					for ( j = 1; j <= N; ++j ) {
-						FixedF( i, j ) = FixedAF( i, j ) / A( i );
+						FixedF( j, i ) = FixedAF( j, i ) / A( i );
 					}
 				}
 				Real64 const sum_FixedF( sum( FixedF ) );
@@ -1363,7 +1363,7 @@ namespace HeatBalanceIntRadExchange {
 			// Find pivot row in column i below diagonal
 			int iPiv = i;
 			Real64 aPiv( std::abs( A( i, i ) ) );
-			auto ki( A.index( i + 1, i ) );
+			auto ki( A.index( i, i + 1 ) );
 			for ( int k = i + 1; k <= u; ++k, ++ki ) {
 				Real64 const aAki( std::abs( A[ ki ] ) ); // [ ki ] == ( k, i )
 				if ( aAki > aPiv ) {
@@ -1375,8 +1375,8 @@ namespace HeatBalanceIntRadExchange {
 
 			// Swap row i with pivot row
 			if ( iPiv != i ) {
-				auto ij( A.index( i, l ) ); // [ ij ] == ( i, j )
-				auto pj( A.index( iPiv, l ) ); // [ pj ] == ( iPiv, j )
+				auto ij( A.index( l, i ) ); // [ ij ] == ( i, j )
+				auto pj( A.index( l, iPiv ) ); // [ pj ] == ( iPiv, j )
 				for ( int j = l; j <= u; ++j, ij += n, pj += n ) {
 					Real64 const Aij( A[ ij ] );
 					A[ ij ] = A[ pj ];
@@ -1390,16 +1390,16 @@ namespace HeatBalanceIntRadExchange {
 			// Put multipliers in column i and reduce block below A(i,i)
 			Real64 const Aii_inv( 1.0 / A( i, i ) );
 			for ( int k = i + 1; k <= u; ++k ) {
-				Real64 const multiplier( A( k, i ) * Aii_inv );
-				A( k, i ) = multiplier;
+				Real64 const multiplier( A( i, k ) * Aii_inv );
+				A( i, k ) = multiplier;
 				if ( multiplier != 0.0 ) {
-					auto ij( A.index( i, i + 1 ) ); // [ ij ] == ( i, j )
-					auto kj( A.index( k, i + 1 ) ); // [ kj ] == ( k, j )
+					auto ij( A.index( i + 1, i ) ); // [ ij ] == ( i, j )
+					auto kj( A.index( i + 1, k ) ); // [ kj ] == ( k, j )
 					for ( int j = i + 1; j <= u; ++j, ij += n, kj += n ) {
 						A[ kj ] -= multiplier * A[ ij ];
 					}
-					ij = A.index( i, l );
-					kj = A.index( k, l );
+					ij = A.index( l, i );
+					kj = A.index( l, k );
 					for ( int j = l; j <= u; ++j, ij += n, kj += n ) {
 						Real64 const Iij( I[ ij ] );
 						if ( Iij != 0.0 ) {
@@ -1414,15 +1414,15 @@ namespace HeatBalanceIntRadExchange {
 		// Perform back-substitution on [U|I] to put inverse in I
 		for ( int k = u; k >= l; --k ) {
 			Real64 const Akk_inv( 1.0 / A( k, k ) );
-			auto kj( A.index( k, l ) ); // [ kj ] == ( k, j )
+			auto kj( A.index( l, k ) ); // [ kj ] == ( k, j )
 			for ( int j = l; j <= u; ++j, kj += n ) {
 				I[ kj ] *= Akk_inv;
 			}
-			auto ik( A.index( l, k ) ); // [ ik ] == ( i, k )
+			auto ik( A.index( k, l ) ); // [ ik ] == ( i, k )
 			for ( int i = l; i < k; ++i, ++ik ) { // Eliminate kth column entries from I in rows above k
 				Real64 const Aik( A[ ik ] );
-				auto ij( A.index( i, l ) ); // [ ij ] == ( i, j )
-				auto kj( A.index( k, l ) ); // [ kj ] == ( k, j )
+				auto ij( A.index( l, i ) ); // [ ij ] == ( i, j )
+				auto kj( A.index( l, k ) ); // [ kj ] == ( k, j )
 				for ( int j = l; j <= u; ++j, ij += n, kj += n ) {
 					I[ ij ] -= Aik * I[ kj ];
 				}

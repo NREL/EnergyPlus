@@ -207,7 +207,7 @@ namespace DXFEarClipping {
 		Array1D_int r_angles( nsides );
 		Array1D< Real64 > rangles( nsides );
 		Array1D_int c_vertices( nsides );
-		Array2D_int earvert( 3, nsides );
+		Array2D_int earvert( nsides, 3 );
 		Array1D_bool removed( nsides );
 		//unused  type(Vector_2d), dimension(3) :: testtri
 		//unused  type(Vector_2d) :: point
@@ -314,9 +314,9 @@ namespace DXFEarClipping {
 				// remove ear
 				++ncount;
 				removed( mvert ) = true;
-				earvert( 1, ncount ) = svert;
-				earvert( 2, ncount ) = mvert;
-				earvert( 3, ncount ) = evert;
+				earvert( ncount, 1 ) = svert;
+				earvert( ncount, 2 ) = mvert;
+				earvert( ncount, 3 ) = evert;
 				--nvertcur;
 			}
 			if ( nvertcur == 3 ) {
@@ -324,7 +324,7 @@ namespace DXFEarClipping {
 				++ncount;
 				for ( i = 1; i <= nsides; ++i ) {
 					if ( removed( i ) ) continue;
-					earvert( j, ncount ) = i;
+					earvert( ncount, j ) = i;
 					++j;
 				}
 			}
@@ -333,9 +333,9 @@ namespace DXFEarClipping {
 		ntri = ncount;
 
 		for ( i = 1; i <= ntri; ++i ) {
-			Triangle( i ).vv0 = earvert( 1, i );
-			Triangle( i ).vv1 = earvert( 2, i );
-			Triangle( i ).vv2 = earvert( 3, i );
+			Triangle( i ).vv0 = earvert( i, 1 );
+			Triangle( i ).vv1 = earvert( i, 2 );
+			Triangle( i ).vv2 = earvert( i, 3 );
 		}
 
 		outtriangles.allocate( ntri );

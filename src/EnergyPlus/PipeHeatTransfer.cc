@@ -223,7 +223,7 @@ namespace PipeHeatTransfer {
 					for ( WidthIndex = 2; WidthIndex <= PipeHT( PipeHTNum ).PipeNodeWidth; ++WidthIndex ) {
 						//This will store the old 'current' values as the new 'previous values'  This allows
 						// us to use the previous time array as history terms in the equations
-						PipeHT( PipeHTNum ).T( PreviousTimeIndex, LengthIndex, DepthIndex, WidthIndex ) = PipeHT( PipeHTNum ).T( CurrentTimeIndex, LengthIndex, DepthIndex, WidthIndex );
+						PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, PreviousTimeIndex ) = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex );
 					}
 				}
 			}
@@ -697,7 +697,7 @@ namespace PipeHeatTransfer {
 			PipeHT( Item ).NumSections = NumPipeSections;
 
 			// For buried pipes, we need to allocate the cartesian finite difference array
-			PipeHT( Item ).T.allocate( TentativeTimeIndex, PipeHT( Item ).NumSections, PipeHT( Item ).NumDepthNodes, PipeHT( Item ).PipeNodeWidth );
+			PipeHT( Item ).T.allocate( PipeHT( Item ).PipeNodeWidth, PipeHT( Item ).NumDepthNodes, PipeHT( Item ).NumSections, TentativeTimeIndex );
 			PipeHT( Item ).T = 0.0;
 
 		} // PipeUG input loop
@@ -1050,7 +1050,7 @@ namespace PipeHeatTransfer {
 							for ( DepthIndex = 1; DepthIndex <= PipeHT( PipeNum ).NumDepthNodes; ++DepthIndex ) {
 								for ( WidthIndex = 1; WidthIndex <= PipeHT( PipeNum ).PipeNodeWidth; ++WidthIndex ) {
 									CurrentDepth = ( DepthIndex - 1 ) * PipeHT( PipeNum ).dSregular;
-									PipeHT( PipeNum ).T( TimeIndex, LengthIndex, DepthIndex, WidthIndex ) = TBND( CurrentDepth, CurSimDay, PipeNum );
+									PipeHT( PipeNum ).T( WidthIndex, DepthIndex, LengthIndex, TimeIndex ) = TBND( CurrentDepth, CurSimDay, PipeNum );
 								}
 							}
 						}
@@ -1098,13 +1098,13 @@ namespace PipeHeatTransfer {
 							//Farfield boundary
 							CurrentDepth = ( DepthIndex - 1 ) * PipeHT( PipeHTNum ).dSregular;
 							CurTemp = TBND( CurrentDepth, CurSimDay, PipeHTNum );
-							PipeHT( PipeHTNum ).T( TimeIndex, LengthIndex, DepthIndex, 1 ) = CurTemp;
+							PipeHT( PipeHTNum ).T( 1, DepthIndex, LengthIndex, TimeIndex ) = CurTemp;
 						}
 						for ( WidthIndex = 1; WidthIndex <= PipeHT( PipeHTNum ).PipeNodeWidth; ++WidthIndex ) {
 							//Bottom side of boundary
 							CurrentDepth = PipeHT( PipeHTNum ).DomainDepth;
 							CurTemp = TBND( CurrentDepth, CurSimDay, PipeHTNum );
-							PipeHT( PipeHTNum ).T( TimeIndex, LengthIndex, PipeHT( PipeHTNum ).NumDepthNodes, WidthIndex ) = CurTemp;
+							PipeHT( PipeHTNum ).T( WidthIndex, PipeHT( PipeHTNum ).NumDepthNodes, LengthIndex, TimeIndex ) = CurTemp;
 						}
 					}
 				}
@@ -1152,7 +1152,7 @@ namespace PipeHeatTransfer {
 						for ( WidthIndex = 2; WidthIndex <= PipeHT( PipeHTNum ).PipeNodeWidth; ++WidthIndex ) {
 							//This will essentially 'accept' the tentative values that were calculated last iteration
 							// as the new officially 'current' values
-							PipeHT( PipeHTNum ).T( CurrentTimeIndex, LengthIndex, DepthIndex, WidthIndex ) = PipeHT( PipeHTNum ).T( TentativeTimeIndex, LengthIndex, DepthIndex, WidthIndex );
+							PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex ) = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex );
 						}
 					}
 				}
@@ -1171,7 +1171,7 @@ namespace PipeHeatTransfer {
 				for ( DepthIndex = 1; DepthIndex <= PipeHT( PipeHTNum ).NumDepthNodes; ++DepthIndex ) {
 					for ( WidthIndex = 2; WidthIndex <= PipeHT( PipeHTNum ).PipeNodeWidth; ++WidthIndex ) {
 						//This will essentially erase the past iterations and revert back to the correct values
-						PipeHT( PipeHTNum ).T( TentativeTimeIndex, LengthIndex, DepthIndex, WidthIndex ) = PipeHT( PipeHTNum ).T( CurrentTimeIndex, LengthIndex, DepthIndex, WidthIndex );
+						PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex );
 					}
 				}
 			}
@@ -1406,9 +1406,9 @@ namespace PipeHeatTransfer {
 
 			PipeDepth = PipeHT( PipeHTNum ).PipeNodeDepth;
 			PipeWidth = PipeHT( PipeHTNum ).PipeNodeWidth;
-			TempBelow = PipeHT( PipeHTNum ).T( CurrentTimeIndex, LengthIndex, PipeDepth + 1, PipeWidth );
-			TempBeside = PipeHT( PipeHTNum ).T( CurrentTimeIndex, LengthIndex, PipeDepth, PipeWidth - 1 );
-			TempAbove = PipeHT( PipeHTNum ).T( CurrentTimeIndex, LengthIndex, PipeDepth - 1, PipeWidth );
+			TempBelow = PipeHT( PipeHTNum ).T( PipeWidth, PipeDepth + 1, LengthIndex, CurrentTimeIndex );
+			TempBeside = PipeHT( PipeHTNum ).T( PipeWidth - 1, PipeDepth, LengthIndex, CurrentTimeIndex );
+			TempAbove = PipeHT( PipeHTNum ).T( PipeWidth, PipeDepth - 1, LengthIndex, CurrentTimeIndex );
 			EnvironmentTemp = ( TempBelow + TempBeside + TempAbove ) / 3.0;
 
 			PipeHT( PipeHTNum ).TentativeFluidTemp( LengthIndex ) = ( A2 * PipeHT( PipeHTNum ).TentativeFluidTemp( LengthIndex - 1 ) + A3 / B1 * ( B3 * EnvironmentTemp + B4 * PipeHT( PipeHTNum ).PreviousPipeTemp( LengthIndex ) ) + A4 * PipeHT( PipeHTNum ).PreviousFluidTemp( LengthIndex ) ) / ( A1 - A3 * B2 / B1 );
@@ -1505,7 +1505,7 @@ namespace PipeHeatTransfer {
 		static Real64 ConvCoef( 0.0 ); // Current convection coefficient = f(Wind Speed,Roughness)
 		static Real64 RadCoef( 0.0 ); // Current radiation coefficient
 		static Real64 QSolAbsorbed( 0.0 ); // Current total solar energy absorbed
-		Array3D< Real64 > T_O( NumSections, PipeHT( PipeHTNum ).NumDepthNodes, PipeHT( PipeHTNum ).PipeNodeWidth );
+		Array3D< Real64 > T_O( PipeHT( PipeHTNum ).PipeNodeWidth, PipeHT( PipeHTNum ).NumDepthNodes, NumSections );
 
 		//Local variable placeholders for code readability
 		static Real64 A1( 0.0 ); // Placeholder for CoefA1
@@ -1540,7 +1540,7 @@ namespace PipeHeatTransfer {
 			for ( LengthIndex = 2; LengthIndex <= PipeHT( PipeHTNum ).NumSections; ++LengthIndex ) {
 				for ( DepthIndex = 1; DepthIndex <= PipeHT( PipeHTNum ).NumDepthNodes - 1; ++DepthIndex ) {
 					for ( WidthIndex = 2; WidthIndex <= PipeHT( PipeHTNum ).PipeNodeWidth; ++WidthIndex ) {
-						T_O( LengthIndex, DepthIndex, WidthIndex ) = PipeHT( PipeHTNum ).T( TentativeTimeIndex, LengthIndex, DepthIndex, WidthIndex );
+						T_O( WidthIndex, DepthIndex, LengthIndex ) = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex );
 					}
 				}
 			}
@@ -1553,7 +1553,7 @@ namespace PipeHeatTransfer {
 						if ( DepthIndex == 1 ) { //Soil Surface Boundary
 
 							//If on soil boundary, load up local variables and perform calculations
-							NodePast = PipeHT( PipeHTNum ).T( PreviousTimeIndex, LengthIndex, DepthIndex, WidthIndex );
+							NodePast = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, PreviousTimeIndex );
 							PastNodeTempAbs = NodePast + KelvinConv;
 							SkyTempAbs = SkyTemp + KelvinConv;
 							TopRoughness = PipeHT( PipeHTNum ).SoilRoughness;
@@ -1587,21 +1587,21 @@ namespace PipeHeatTransfer {
 							if ( WidthIndex == PipeHT( PipeHTNum ).PipeNodeWidth ) { //Symmetric centerline boundary
 
 								//-Coefficients and Temperatures
-								NodeBelow = PipeHT( PipeHTNum ).T( CurrentTimeIndex, LengthIndex, DepthIndex + 1, WidthIndex );
-								NodeLeft = PipeHT( PipeHTNum ).T( CurrentTimeIndex, LengthIndex, DepthIndex, WidthIndex - 1 );
+								NodeBelow = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex + 1, LengthIndex, CurrentTimeIndex );
+								NodeLeft = PipeHT( PipeHTNum ).T( WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex );
 
 								//-Update Equation, basically a detailed energy balance at the surface
-								PipeHT( PipeHTNum ).T( TentativeTimeIndex, LengthIndex, DepthIndex, WidthIndex ) = ( QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp + ( kSoil / dS ) * ( NodeBelow + 2 * NodeLeft ) + ( rho * Cp / DeltaTime ) * NodePast ) / ( RadCoef + ConvCoef + 3 * ( kSoil / dS ) + ( rho * Cp / DeltaTime ) );
+								PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = ( QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp + ( kSoil / dS ) * ( NodeBelow + 2 * NodeLeft ) + ( rho * Cp / DeltaTime ) * NodePast ) / ( RadCoef + ConvCoef + 3 * ( kSoil / dS ) + ( rho * Cp / DeltaTime ) );
 
 							} else { //Soil surface, but not on centerline
 
 								//-Coefficients and Temperatures
-								NodeBelow = PipeHT( PipeHTNum ).T( CurrentTimeIndex, LengthIndex, DepthIndex + 1, WidthIndex );
-								NodeLeft = PipeHT( PipeHTNum ).T( CurrentTimeIndex, LengthIndex, DepthIndex, WidthIndex - 1 );
-								NodeRight = PipeHT( PipeHTNum ).T( CurrentTimeIndex, LengthIndex, DepthIndex, WidthIndex + 1 );
+								NodeBelow = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex + 1, LengthIndex, CurrentTimeIndex );
+								NodeLeft = PipeHT( PipeHTNum ).T( WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex );
+								NodeRight = PipeHT( PipeHTNum ).T( WidthIndex + 1, DepthIndex, LengthIndex, CurrentTimeIndex );
 
 								//-Update Equation
-								PipeHT( PipeHTNum ).T( TentativeTimeIndex, LengthIndex, DepthIndex, WidthIndex ) = ( QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp + ( kSoil / dS ) * ( NodeBelow + NodeLeft + NodeRight ) + ( rho * Cp / DeltaTime ) * NodePast ) / ( RadCoef + ConvCoef + 3 * ( kSoil / dS ) + ( rho * Cp / DeltaTime ) );
+								PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = ( QSolAbsorbed + RadCoef * SkyTemp + ConvCoef * OutDryBulbTemp + ( kSoil / dS ) * ( NodeBelow + NodeLeft + NodeRight ) + ( rho * Cp / DeltaTime ) * NodePast ) / ( RadCoef + ConvCoef + 3 * ( kSoil / dS ) + ( rho * Cp / DeltaTime ) );
 
 							} //Soil-to-air surface node structure
 
@@ -1613,20 +1613,20 @@ namespace PipeHeatTransfer {
 								CalcPipesHeatTransfer( PipeHTNum, LengthIndex );
 
 								//-Update node for cartesian system
-								PipeHT( PipeHTNum ).T( TentativeTimeIndex, LengthIndex, DepthIndex, WidthIndex ) = PipeHT( PipeHTNum ).PipeTemp( LengthIndex );
+								PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = PipeHT( PipeHTNum ).PipeTemp( LengthIndex );
 
 							} else if ( DepthIndex != 1 ) { //Not surface node
 
 								//-Coefficients and Temperatures
-								NodeLeft = PipeHT( PipeHTNum ).T( CurrentTimeIndex, LengthIndex, DepthIndex, WidthIndex - 1 );
-								NodeAbove = PipeHT( PipeHTNum ).T( CurrentTimeIndex, LengthIndex, DepthIndex - 1, WidthIndex );
-								NodeBelow = PipeHT( PipeHTNum ).T( CurrentTimeIndex, LengthIndex, DepthIndex + 1, WidthIndex );
-								NodePast = PipeHT( PipeHTNum ).T( CurrentTimeIndex - 1, LengthIndex, DepthIndex, WidthIndex );
+								NodeLeft = PipeHT( PipeHTNum ).T( WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex );
+								NodeAbove = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex - 1, LengthIndex, CurrentTimeIndex );
+								NodeBelow = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex + 1, LengthIndex, CurrentTimeIndex );
+								NodePast = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex - 1 );
 								A1 = PipeHT( PipeHTNum ).CoefA1;
 								A2 = PipeHT( PipeHTNum ).CoefA2;
 
 								//-Update Equation
-								PipeHT( PipeHTNum ).T( TentativeTimeIndex, LengthIndex, DepthIndex, WidthIndex ) = A1 * ( NodeBelow + NodeAbove + 2 * NodeLeft ) + A2 * NodePast;
+								PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = A1 * ( NodeBelow + NodeAbove + 2 * NodeLeft ) + A2 * NodePast;
 
 							} //Symmetric centerline node structure
 
@@ -1635,14 +1635,14 @@ namespace PipeHeatTransfer {
 							//-Coefficients and Temperatures
 							A1 = PipeHT( PipeHTNum ).CoefA1;
 							A2 = PipeHT( PipeHTNum ).CoefA2;
-							NodeBelow = PipeHT( PipeHTNum ).T( CurrentTimeIndex, LengthIndex, DepthIndex + 1, WidthIndex );
-							NodeAbove = PipeHT( PipeHTNum ).T( CurrentTimeIndex, LengthIndex, DepthIndex - 1, WidthIndex );
-							NodeRight = PipeHT( PipeHTNum ).T( CurrentTimeIndex, LengthIndex, DepthIndex, WidthIndex + 1 );
-							NodeLeft = PipeHT( PipeHTNum ).T( CurrentTimeIndex, LengthIndex, DepthIndex, WidthIndex - 1 );
-							NodePast = PipeHT( PipeHTNum ).T( CurrentTimeIndex - 1, LengthIndex, DepthIndex, WidthIndex );
+							NodeBelow = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex + 1, LengthIndex, CurrentTimeIndex );
+							NodeAbove = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex - 1, LengthIndex, CurrentTimeIndex );
+							NodeRight = PipeHT( PipeHTNum ).T( WidthIndex + 1, DepthIndex, LengthIndex, CurrentTimeIndex );
+							NodeLeft = PipeHT( PipeHTNum ).T( WidthIndex - 1, DepthIndex, LengthIndex, CurrentTimeIndex );
+							NodePast = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, CurrentTimeIndex - 1 );
 
 							//-Update Equation
-							PipeHT( PipeHTNum ).T( TentativeTimeIndex, LengthIndex, DepthIndex, WidthIndex ) = A1 * ( NodeBelow + NodeAbove + NodeRight + NodeLeft ) + A2 * NodePast; //Eq. D1
+							PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex ) = A1 * ( NodeBelow + NodeAbove + NodeRight + NodeLeft ) + A2 * NodePast; //Eq. D1
 
 						}
 					}
@@ -1653,8 +1653,8 @@ namespace PipeHeatTransfer {
 			for ( LengthIndex = 2; LengthIndex <= PipeHT( PipeHTNum ).NumSections; ++LengthIndex ) {
 				for ( DepthIndex = 1; DepthIndex <= PipeHT( PipeHTNum ).NumDepthNodes - 1; ++DepthIndex ) {
 					for ( WidthIndex = 2; WidthIndex <= PipeHT( PipeHTNum ).PipeNodeWidth; ++WidthIndex ) {
-						Ttemp = PipeHT( PipeHTNum ).T( TentativeTimeIndex, LengthIndex, DepthIndex, WidthIndex );
-						if ( std::abs( T_O( LengthIndex, DepthIndex, WidthIndex ) - Ttemp ) > ConvCrit ) goto IterationLoop_loop;
+						Ttemp = PipeHT( PipeHTNum ).T( WidthIndex, DepthIndex, LengthIndex, TentativeTimeIndex );
+						if ( std::abs( T_O( WidthIndex, DepthIndex, LengthIndex ) - Ttemp ) > ConvCrit ) goto IterationLoop_loop;
 					}
 				}
 			}

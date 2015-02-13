@@ -2025,12 +2025,12 @@ namespace WeatherManager {
 			ShowFatalError( "SetCurrentWeather: At " + CurMnDyHr + " Sun is Up but Solar Altitude Angle is < 0.0" );
 		}
 
-		OutDryBulbTemp = TodayOutDryBulbTemp( HourOfDay, TimeStep );
+		OutDryBulbTemp = TodayOutDryBulbTemp( TimeStep, HourOfDay );
 		if ( EMSOutDryBulbOverrideOn ) OutDryBulbTemp = EMSOutDryBulbOverrideValue;
-		OutBaroPress = TodayOutBaroPress( HourOfDay, TimeStep );
-		OutDewPointTemp = TodayOutDewPointTemp( HourOfDay, TimeStep );
+		OutBaroPress = TodayOutBaroPress( TimeStep, HourOfDay );
+		OutDewPointTemp = TodayOutDewPointTemp( TimeStep, HourOfDay );
 		if ( EMSOutDewPointTempOverrideOn ) OutDewPointTemp = EMSOutDewPointTempOverrideValue;
-		OutRelHum = TodayOutRelHum( HourOfDay, TimeStep );
+		OutRelHum = TodayOutRelHum( TimeStep, HourOfDay );
 		OutRelHumValue = OutRelHum / 100.0;
 		if ( EMSOutRelHumOverrideOn ) {
 			OutRelHumValue = EMSOutRelHumOverrideValue / 100.0;
@@ -2059,19 +2059,19 @@ namespace WeatherManager {
 			SPSiteSkyTemperatureScheduleValue = -999.0; // N/A SkyTemperature Modifier Schedule Value
 
 			if ( DesDayInput( Envrn ).DBTempRangeType != DDDBRangeType_Default ) {
-				SPSiteDryBulbRangeModScheduleValue( Envrn ) = DDDBRngModifier( Envrn, HourOfDay, TimeStep );
+				SPSiteDryBulbRangeModScheduleValue( Envrn ) = DDDBRngModifier( TimeStep, HourOfDay, Envrn );
 			}
 			if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_WBProfDef || DesDayInput( Envrn ).HumIndType == DDHumIndType_WBProfDif || DesDayInput( Envrn ).HumIndType == DDHumIndType_WBProfMul ) {
-				SPSiteHumidityConditionScheduleValue( Envrn ) = DDHumIndModifier( Envrn, HourOfDay, TimeStep );
+				SPSiteHumidityConditionScheduleValue( Envrn ) = DDHumIndModifier( TimeStep, HourOfDay, Envrn );
 			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_RelHumSch ) {
-				SPSiteHumidityConditionScheduleValue( Envrn ) = DDHumIndModifier( Envrn, HourOfDay, TimeStep );
+				SPSiteHumidityConditionScheduleValue( Envrn ) = DDHumIndModifier( TimeStep, HourOfDay, Envrn );
 			}
 			if ( DesDayInput( Envrn ).SolarModel == SolarModel_Schedule ) {
-				SPSiteBeamSolarScheduleValue( Envrn ) = DDBeamSolarValues( Envrn, HourOfDay, TimeStep );
-				SPSiteDiffuseSolarScheduleValue( Envrn ) = DDDiffuseSolarValues( Envrn, HourOfDay, TimeStep );
+				SPSiteBeamSolarScheduleValue( Envrn ) = DDBeamSolarValues( TimeStep, HourOfDay, Envrn );
+				SPSiteDiffuseSolarScheduleValue( Envrn ) = DDDiffuseSolarValues( TimeStep, HourOfDay, Envrn );
 			}
 			if ( Environment( Envrn ).WP_Type1 != 0 ) {
-				SPSiteSkyTemperatureScheduleValue( Envrn ) = DDSkyTempScheduleValues( Envrn, HourOfDay, TimeStep );
+				SPSiteSkyTemperatureScheduleValue( Envrn ) = DDSkyTempScheduleValues( TimeStep, HourOfDay, Envrn );
 			}
 		} else if ( TotDesDays > 0 ) {
 			SPSiteDryBulbRangeModScheduleValue = -999.0; // N/A Drybulb Temperature Range Modifier Schedule Value
@@ -2081,26 +2081,26 @@ namespace WeatherManager {
 			SPSiteSkyTemperatureScheduleValue = -999.0; // N/A SkyTemperature Modifier Schedule Value
 		}
 
-		WindSpeed = TodayWindSpeed( HourOfDay, TimeStep );
+		WindSpeed = TodayWindSpeed( TimeStep, HourOfDay );
 		if ( EMSWindSpeedOverrideOn ) WindSpeed = EMSWindSpeedOverrideValue;
-		WindDir = TodayWindDir( HourOfDay, TimeStep );
+		WindDir = TodayWindDir( TimeStep, HourOfDay );
 		if ( EMSWindDirOverrideOn ) WindDir = EMSWindDirOverrideValue;
-		HorizIRSky = TodayHorizIRSky( HourOfDay, TimeStep );
-		SkyTemp = TodaySkyTemp( HourOfDay, TimeStep );
+		HorizIRSky = TodayHorizIRSky( TimeStep, HourOfDay );
+		SkyTemp = TodaySkyTemp( TimeStep, HourOfDay );
 		SkyTempKelvin = SkyTemp + KelvinConv;
-		DifSolarRad = TodayDifSolarRad( HourOfDay, TimeStep );
+		DifSolarRad = TodayDifSolarRad( TimeStep, HourOfDay );
 		if ( EMSDifSolarRadOverrideOn ) DifSolarRad = EMSDifSolarRadOverrideValue;
-		BeamSolarRad = TodayBeamSolarRad( HourOfDay, TimeStep );
+		BeamSolarRad = TodayBeamSolarRad( TimeStep, HourOfDay );
 		if ( EMSBeamSolarRadOverrideOn ) BeamSolarRad = EMSBeamSolarRadOverrideValue;
-		LiquidPrecipitation = TodayLiquidPrecip( HourOfDay, TimeStep ) / 1000.0; // convert from mm to m
+		LiquidPrecipitation = TodayLiquidPrecip( TimeStep, HourOfDay ) / 1000.0; // convert from mm to m
 
 		if ( UseRainValues ) {
-			IsRain = TodayIsRain( HourOfDay, TimeStep ); //.or. LiquidPrecipitation >= .8d0)  ! > .8 mm
+			IsRain = TodayIsRain( TimeStep, HourOfDay ); //.or. LiquidPrecipitation >= .8d0)  ! > .8 mm
 		} else {
 			IsRain = false;
 		}
 		if ( UseSnowValues ) {
-			IsSnow = TodayIsSnow( HourOfDay, TimeStep );
+			IsSnow = TodayIsSnow( TimeStep, HourOfDay );
 		} else {
 			IsSnow = false;
 		}
@@ -2750,15 +2750,15 @@ namespace WeatherManager {
 					//          Missed%DaysLastSnow=Missed%DaysLastSnow+1
 					//        ENDIF
 
-					TomorrowOutDryBulbTemp( Hour, CurTimeStep ) = DryBulb;
-					TomorrowOutDewPointTemp( Hour, CurTimeStep ) = DewPoint;
-					TomorrowOutBaroPress( Hour, CurTimeStep ) = AtmPress;
-					TomorrowOutRelHum( Hour, CurTimeStep ) = RelHum;
+					TomorrowOutDryBulbTemp( CurTimeStep, Hour ) = DryBulb;
+					TomorrowOutDewPointTemp( CurTimeStep, Hour ) = DewPoint;
+					TomorrowOutBaroPress( CurTimeStep, Hour ) = AtmPress;
+					TomorrowOutRelHum( CurTimeStep, Hour ) = RelHum;
 					RelHum *= 0.01;
-					TomorrowWindSpeed( Hour, CurTimeStep ) = WindSpeed;
-					TomorrowWindDir( Hour, CurTimeStep ) = WindDir;
-					TomorrowLiquidPrecip( Hour, CurTimeStep ) = LiquidPrecip;
-					TomorrowHorizIRSky( Hour, CurTimeStep ) = IRHoriz;
+					TomorrowWindSpeed( CurTimeStep, Hour ) = WindSpeed;
+					TomorrowWindDir( CurTimeStep, Hour ) = WindDir;
+					TomorrowLiquidPrecip( CurTimeStep, Hour ) = LiquidPrecip;
+					TomorrowHorizIRSky( CurTimeStep, Hour ) = IRHoriz;
 
 					if ( Environment( Envrn ).WP_Type1 == 0 ) {
 						// Calculate sky temperature, use IRHoriz if not missing
@@ -2775,7 +2775,7 @@ namespace WeatherManager {
 						SkyTemp = 0.0; // dealt with later
 					}
 
-					TomorrowSkyTemp( Hour, CurTimeStep ) = SkyTemp;
+					TomorrowSkyTemp( CurTimeStep, Hour ) = SkyTemp;
 
 					if ( ETHoriz >= 9999.0 ) ETHoriz = 0.0;
 					if ( ETDirect >= 9999.0 ) ETDirect = 0.0;
@@ -2798,19 +2798,19 @@ namespace WeatherManager {
 						DiffuseRad = 0.0;
 					}
 
-					TomorrowBeamSolarRad( Hour, CurTimeStep ) = DirectRad;
-					TomorrowDifSolarRad( Hour, CurTimeStep ) = DiffuseRad;
+					TomorrowBeamSolarRad( CurTimeStep, Hour ) = DirectRad;
+					TomorrowDifSolarRad( CurTimeStep, Hour ) = DiffuseRad;
 
-					TomorrowIsRain( Hour, CurTimeStep ) = false;
+					TomorrowIsRain( CurTimeStep, Hour ) = false;
 					if ( PresWeathObs == 0 ) {
-						if ( PresWeathConds( 1 ) < 9 || PresWeathConds( 2 ) < 9 || PresWeathConds( 3 ) < 9 ) TomorrowIsRain( Hour, CurTimeStep ) = true;
+						if ( PresWeathConds( 1 ) < 9 || PresWeathConds( 2 ) < 9 || PresWeathConds( 3 ) < 9 ) TomorrowIsRain( CurTimeStep, Hour ) = true;
 					} else {
-						TomorrowIsRain( Hour, CurTimeStep ) = false;
+						TomorrowIsRain( CurTimeStep, Hour ) = false;
 					}
-					TomorrowIsSnow( Hour, CurTimeStep ) = ( SnowDepth > 0.0 );
+					TomorrowIsSnow( CurTimeStep, Hour ) = ( SnowDepth > 0.0 );
 
 					// default if rain but none on weather file
-					if ( TomorrowIsRain( Hour, CurTimeStep ) && TomorrowLiquidPrecip( Hour, CurTimeStep ) == 0.0 ) TomorrowLiquidPrecip( Hour, CurTimeStep ) = 2.0; // 2mm in an hour ~ .08 inch
+					if ( TomorrowIsRain( CurTimeStep, Hour ) && TomorrowLiquidPrecip( CurTimeStep, Hour ) == 0.0 ) TomorrowLiquidPrecip( CurTimeStep, Hour ) = 2.0; // 2mm in an hour ~ .08 inch
 
 					Missing.DryBulb = DryBulb;
 					Missing.DewPoint = DewPoint;
@@ -2843,20 +2843,20 @@ namespace WeatherManager {
 			// Create interpolated weather for timestep orientation
 			// First copy ts=1 (hourly) from data arrays to Wthr structure
 			for ( Hour = 1; Hour <= 24; ++Hour ) {
-				Wthr.OutDryBulbTemp( Hour ) = TomorrowOutDryBulbTemp( Hour, 1 );
-				Wthr.OutDewPointTemp( Hour ) = TomorrowOutDewPointTemp( Hour, 1 );
-				Wthr.OutBaroPress( Hour ) = TomorrowOutBaroPress( Hour, 1 );
-				Wthr.OutRelHum( Hour ) = TomorrowOutRelHum( Hour, 1 );
-				Wthr.WindSpeed( Hour ) = TomorrowWindSpeed( Hour, 1 );
-				Wthr.WindDir( Hour ) = TomorrowWindDir( Hour, 1 );
-				Wthr.SkyTemp( Hour ) = TomorrowSkyTemp( Hour, 1 );
-				Wthr.HorizIRSky( Hour ) = TomorrowHorizIRSky( Hour, 1 );
-				Wthr.BeamSolarRad( Hour ) = TomorrowBeamSolarRad( Hour, 1 );
-				Wthr.DifSolarRad( Hour ) = TomorrowDifSolarRad( Hour, 1 );
-				Wthr.IsRain( Hour ) = TomorrowIsRain( Hour, 1 );
-				Wthr.IsSnow( Hour ) = TomorrowIsSnow( Hour, 1 );
-				Wthr.Albedo( Hour ) = TomorrowAlbedo( Hour, 1 );
-				Wthr.LiquidPrecip( Hour ) = TomorrowLiquidPrecip( Hour, 1 );
+				Wthr.OutDryBulbTemp( Hour ) = TomorrowOutDryBulbTemp( 1, Hour );
+				Wthr.OutDewPointTemp( Hour ) = TomorrowOutDewPointTemp( 1, Hour );
+				Wthr.OutBaroPress( Hour ) = TomorrowOutBaroPress( 1, Hour );
+				Wthr.OutRelHum( Hour ) = TomorrowOutRelHum( 1, Hour );
+				Wthr.WindSpeed( Hour ) = TomorrowWindSpeed( 1, Hour );
+				Wthr.WindDir( Hour ) = TomorrowWindDir( 1, Hour );
+				Wthr.SkyTemp( Hour ) = TomorrowSkyTemp( 1, Hour );
+				Wthr.HorizIRSky( Hour ) = TomorrowHorizIRSky( 1, Hour );
+				Wthr.BeamSolarRad( Hour ) = TomorrowBeamSolarRad( 1, Hour );
+				Wthr.DifSolarRad( Hour ) = TomorrowDifSolarRad( 1, Hour );
+				Wthr.IsRain( Hour ) = TomorrowIsRain( 1, Hour );
+				Wthr.IsSnow( Hour ) = TomorrowIsSnow( 1, Hour );
+				Wthr.Albedo( Hour ) = TomorrowAlbedo( 1, Hour );
+				Wthr.LiquidPrecip( Hour ) = TomorrowLiquidPrecip( 1, Hour );
 			}
 
 			if ( ! LastHourSet ) {
@@ -2913,24 +2913,24 @@ namespace WeatherManager {
 						}
 					}
 
-					TomorrowOutDryBulbTemp( Hour, TS ) = LastHrOutDryBulbTemp * WtPrevHour + Wthr.OutDryBulbTemp( Hour ) * WtNow;
-					TomorrowOutBaroPress( Hour, TS ) = LastHrOutBaroPress * WtPrevHour + Wthr.OutBaroPress( Hour ) * WtNow;
-					TomorrowOutDewPointTemp( Hour, TS ) = LastHrOutDewPointTemp * WtPrevHour + Wthr.OutDewPointTemp( Hour ) * WtNow;
-					TomorrowOutRelHum( Hour, TS ) = LastHrOutRelHum * WtPrevHour + Wthr.OutRelHum( Hour ) * WtNow;
-					TomorrowWindSpeed( Hour, TS ) = LastHrWindSpeed * WtPrevHour + Wthr.WindSpeed( Hour ) * WtNow;
-					TomorrowWindDir( Hour, TS ) = LastHrWindDir * WtPrevHour + Wthr.WindDir( Hour ) * WtNow;
-					TomorrowHorizIRSky( Hour, TS ) = LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky( Hour ) * WtNow;
+					TomorrowOutDryBulbTemp( TS, Hour ) = LastHrOutDryBulbTemp * WtPrevHour + Wthr.OutDryBulbTemp( Hour ) * WtNow;
+					TomorrowOutBaroPress( TS, Hour ) = LastHrOutBaroPress * WtPrevHour + Wthr.OutBaroPress( Hour ) * WtNow;
+					TomorrowOutDewPointTemp( TS, Hour ) = LastHrOutDewPointTemp * WtPrevHour + Wthr.OutDewPointTemp( Hour ) * WtNow;
+					TomorrowOutRelHum( TS, Hour ) = LastHrOutRelHum * WtPrevHour + Wthr.OutRelHum( Hour ) * WtNow;
+					TomorrowWindSpeed( TS, Hour ) = LastHrWindSpeed * WtPrevHour + Wthr.WindSpeed( Hour ) * WtNow;
+					TomorrowWindDir( TS, Hour ) = LastHrWindDir * WtPrevHour + Wthr.WindDir( Hour ) * WtNow;
+					TomorrowHorizIRSky( TS, Hour ) = LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky( Hour ) * WtNow;
 					if ( Environment( Environ ).WP_Type1 == 0 ) {
-						TomorrowSkyTemp( Hour, TS ) = LastHrSkyTemp * WtPrevHour + Wthr.SkyTemp( Hour ) * WtNow;
+						TomorrowSkyTemp( TS, Hour ) = LastHrSkyTemp * WtPrevHour + Wthr.SkyTemp( Hour ) * WtNow;
 					}
-					TomorrowDifSolarRad( Hour, TS ) = LastHrDifSolarRad * WgtPrevHour + Wthr.DifSolarRad( Hour ) * WgtHourNow + NextHrDifSolarRad * WgtNextHour;
-					TomorrowBeamSolarRad( Hour, TS ) = LastHrBeamSolarRad * WgtPrevHour + Wthr.BeamSolarRad( Hour ) * WgtHourNow + NextHrBeamSolarRad * WgtNextHour;
+					TomorrowDifSolarRad( TS, Hour ) = LastHrDifSolarRad * WgtPrevHour + Wthr.DifSolarRad( Hour ) * WgtHourNow + NextHrDifSolarRad * WgtNextHour;
+					TomorrowBeamSolarRad( TS, Hour ) = LastHrBeamSolarRad * WgtPrevHour + Wthr.BeamSolarRad( Hour ) * WgtHourNow + NextHrBeamSolarRad * WgtNextHour;
 
-					TomorrowLiquidPrecip( Hour, TS ) = LastHrLiquidPrecip * WtPrevHour + Wthr.LiquidPrecip( Hour ) * WtNow;
-					TomorrowLiquidPrecip( Hour, TS ) /= double( NumOfTimeStepInHour );
+					TomorrowLiquidPrecip( TS, Hour ) = LastHrLiquidPrecip * WtPrevHour + Wthr.LiquidPrecip( Hour ) * WtNow;
+					TomorrowLiquidPrecip( TS, Hour ) /= double( NumOfTimeStepInHour );
 
-					TomorrowIsRain( Hour, TS ) = TomorrowLiquidPrecip( Hour, TS ) >= ( 0.8 / double( NumOfTimeStepInHour ) ); //Wthr%IsRain(Hour)
-					TomorrowIsSnow( Hour, TS ) = Wthr.IsSnow( Hour );
+					TomorrowIsRain( TS, Hour ) = TomorrowLiquidPrecip( TS, Hour ) >= ( 0.8 / double( NumOfTimeStepInHour ) ); //Wthr%IsRain(Hour)
+					TomorrowIsSnow( TS, Hour ) = Wthr.IsSnow( Hour );
 				} // End of TS Loop
 
 				LastHrOutDryBulbTemp = Wthr.OutDryBulbTemp( Hour );
@@ -2957,7 +2957,7 @@ namespace WeatherManager {
 					GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear, CurDayOfWeek );
 					for ( Hour = 1; Hour <= 24; ++Hour ) {
 						for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
-							TomorrowSkyTemp( Hour, TS ) = TomorrowOutDryBulbTemp( Hour, TS ) - TomorrowSkyTemp( Hour, TS );
+							TomorrowSkyTemp( TS, Hour ) = TomorrowOutDryBulbTemp( TS, Hour ) - TomorrowSkyTemp( TS, Hour );
 						}
 					}
 
@@ -2965,7 +2965,7 @@ namespace WeatherManager {
 					GetScheduleValuesForDay( WPSkyTemperature( Environment( Environ ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp, TomorrowVariables.DayOfYear, CurDayOfWeek );
 					for ( Hour = 1; Hour <= 24; ++Hour ) {
 						for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
-							TomorrowSkyTemp( Hour, TS ) = TomorrowOutDewPointTemp( Hour, TS ) - TomorrowSkyTemp( Hour, TS );
+							TomorrowSkyTemp( TS, Hour ) = TomorrowOutDewPointTemp( TS, Hour ) - TomorrowSkyTemp( TS, Hour );
 						}
 					}
 
@@ -3635,7 +3635,7 @@ Label902: ;
 		} else if ( SELECT_CASE_var == DDHumIndType_RelHumSch ) {
 			// nothing to do -- DDHumIndModifier already contains the scheduled Relative Humidity
 			ConstantHumidityRatio = false;
-			TomorrowOutRelHum = DDHumIndModifier( EnvrnNum, _, _ );
+			TomorrowOutRelHum = DDHumIndModifier( _, _, EnvrnNum );
 
 		} else if ( ( SELECT_CASE_var == DDHumIndType_WBProfDef ) || ( SELECT_CASE_var == DDHumIndType_WBProfDif ) || ( SELECT_CASE_var == DDHumIndType_WBProfMul ) ) {
 			ConstantHumidityRatio = false;
@@ -3690,35 +3690,35 @@ Label902: ;
 
 				if ( DesDayInput( EnvrnNum ).DBTempRangeType != DDDBRangeType_Profile ) {
 					// dry-bulb profile
-					TomorrowOutDryBulbTemp( Hour, TS ) = DesDayInput( EnvrnNum ).MaxDryBulb - DDDBRngModifier( EnvrnNum, Hour, TS ) * DBRange;
+					TomorrowOutDryBulbTemp( TS, Hour ) = DesDayInput( EnvrnNum ).MaxDryBulb - DDDBRngModifier( TS, Hour, EnvrnNum ) * DBRange;
 				} else { // DesDayInput(EnvrnNum)%DBTempRangeType == DDDBRangeType_Profile
-					TomorrowOutDryBulbTemp( Hour, TS ) = DDDBRngModifier( EnvrnNum, Hour, TS );
+					TomorrowOutDryBulbTemp( TS, Hour ) = DDDBRngModifier( TS, Hour, EnvrnNum );
 				}
 
 				// wet-bulb - generate from profile, humidity ratio, or dew point
 				if ( DesDayInput( EnvrnNum ).HumIndType == DDHumIndType_WBProfDef || DesDayInput( EnvrnNum ).HumIndType == DDHumIndType_WBProfDif || DesDayInput( EnvrnNum ).HumIndType == DDHumIndType_WBProfMul ) {
-					WetBulb = DesDayInput( EnvrnNum ).HumIndValue - DDHumIndModifier( EnvrnNum, Hour, TS ) * WBRange;
-					WetBulb = min( WetBulb, TomorrowOutDryBulbTemp( Hour, TS ) ); // WB must be <= DB
-					OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( Hour, TS ), WetBulb, DesDayInput( EnvrnNum ).PressBarom );
-					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom );
-					TomorrowOutRelHum( Hour, TS ) = PsyRhFnTdbWPb( TomorrowOutDryBulbTemp( Hour, TS ), OutHumRat, DesDayInput( EnvrnNum ).PressBarom, WeatherManager ) * 100.0;
+					WetBulb = DesDayInput( EnvrnNum ).HumIndValue - DDHumIndModifier( TS, Hour, EnvrnNum ) * WBRange;
+					WetBulb = min( WetBulb, TomorrowOutDryBulbTemp( TS, Hour ) ); // WB must be <= DB
+					OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( TS, Hour ), WetBulb, DesDayInput( EnvrnNum ).PressBarom );
+					TomorrowOutDewPointTemp( TS, Hour ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom );
+					TomorrowOutRelHum( TS, Hour ) = PsyRhFnTdbWPb( TomorrowOutDryBulbTemp( TS, Hour ), OutHumRat, DesDayInput( EnvrnNum ).PressBarom, WeatherManager ) * 100.0;
 				} else if ( ConstantHumidityRatio ) {
 					//  Need Dew Point Temperature.  Use Relative Humidity to get Humidity Ratio, unless Humidity Ratio is constant
 					//BG 9-26-07  moved following inside this IF statment; when HumIndType is 'Schedule' HumidityRatio wasn't being initialized
-					WetBulb = PsyTwbFnTdbWPb( TomorrowOutDryBulbTemp( Hour, TS ), HumidityRatio, DesDayInput( EnvrnNum ).PressBarom, RoutineNameLong );
+					WetBulb = PsyTwbFnTdbWPb( TomorrowOutDryBulbTemp( TS, Hour ), HumidityRatio, DesDayInput( EnvrnNum ).PressBarom, RoutineNameLong );
 
-					OutHumRat = PsyWFnTdpPb( TomorrowOutDryBulbTemp( Hour, TS ), DesDayInput( EnvrnNum ).PressBarom );
+					OutHumRat = PsyWFnTdpPb( TomorrowOutDryBulbTemp( TS, Hour ), DesDayInput( EnvrnNum ).PressBarom );
 					if ( HumidityRatio > OutHumRat ) {
-						WetBulb = TomorrowOutDryBulbTemp( Hour, TS );
+						WetBulb = TomorrowOutDryBulbTemp( TS, Hour );
 					} else {
-						OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( Hour, TS ), WetBulb, DesDayInput( EnvrnNum ).PressBarom );
+						OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( TS, Hour ), WetBulb, DesDayInput( EnvrnNum ).PressBarom );
 					}
-					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom );
-					TomorrowOutRelHum( Hour, TS ) = PsyRhFnTdbWPb( TomorrowOutDryBulbTemp( Hour, TS ), OutHumRat, DesDayInput( EnvrnNum ).PressBarom, WeatherManager ) * 100.0;
+					TomorrowOutDewPointTemp( TS, Hour ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom );
+					TomorrowOutRelHum( TS, Hour ) = PsyRhFnTdbWPb( TomorrowOutDryBulbTemp( TS, Hour ), OutHumRat, DesDayInput( EnvrnNum ).PressBarom, WeatherManager ) * 100.0;
 				} else {
-					HumidityRatio = PsyWFnTdbRhPb( TomorrowOutDryBulbTemp( Hour, TS ), DDHumIndModifier( EnvrnNum, Hour, TS ) / 100.0, DesDayInput( EnvrnNum ).PressBarom );
+					HumidityRatio = PsyWFnTdbRhPb( TomorrowOutDryBulbTemp( TS, Hour ), DDHumIndModifier( TS, Hour, EnvrnNum ) / 100.0, DesDayInput( EnvrnNum ).PressBarom );
 					// TomorrowOutRelHum values set earlier
-					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( HumidityRatio, DesDayInput( EnvrnNum ).PressBarom );
+					TomorrowOutDewPointTemp( TS, Hour ) = PsyTdpFnWPb( HumidityRatio, DesDayInput( EnvrnNum ).PressBarom );
 				}
 
 				// Determine Sky Temp ==>
@@ -3746,14 +3746,14 @@ Label902: ;
 				//Cloudy Skies," Proc. 2nd National Passive Solar Conference (AS/ISES), 1978, pp. 675-678.
 
 				if ( Environment( EnvrnNum ).WP_Type1 == 0 ) {
-					TDewK = min( TomorrowOutDryBulbTemp( Hour, TS ), TomorrowOutDewPointTemp( Hour, TS ) ) + TKelvin;
+					TDewK = min( TomorrowOutDryBulbTemp( TS, Hour ), TomorrowOutDewPointTemp( TS, Hour ) ) + TKelvin;
 					ESky = ( 0.787 + 0.764 * std::log( ( TDewK ) / TKelvin ) ) * ( 1.0 + 0.0224 * OSky - 0.0035 * pow_2( OSky ) + 0.00028 * pow_3( OSky ) );
-					TomorrowHorizIRSky( Hour, TS ) = ESky * Sigma * pow_4( TomorrowOutDryBulbTemp( Hour, TS ) + TKelvin );
-					TomorrowSkyTemp( Hour, TS ) = ( TomorrowOutDryBulbTemp( Hour, TS ) + TKelvin ) * root_4( ESky ) - TKelvin;
+					TomorrowHorizIRSky( TS, Hour ) = ESky * Sigma * pow_4( TomorrowOutDryBulbTemp( TS, Hour ) + TKelvin );
+					TomorrowSkyTemp( TS, Hour ) = ( TomorrowOutDryBulbTemp( TS, Hour ) + TKelvin ) * root_4( ESky ) - TKelvin;
 				} else {
-					TDewK = min( TomorrowOutDryBulbTemp( Hour, TS ), TomorrowOutDewPointTemp( Hour, TS ) ) + TKelvin;
+					TDewK = min( TomorrowOutDryBulbTemp( TS, Hour ), TomorrowOutDewPointTemp( TS, Hour ) ) + TKelvin;
 					ESky = ( 0.787 + 0.764 * std::log( ( TDewK ) / TKelvin ) ) * ( 1.0 + 0.0224 * OSky - 0.0035 * pow_2( OSky ) + 0.00028 * pow_3( OSky ) );
-					TomorrowHorizIRSky( Hour, TS ) = ESky * Sigma * pow_4( TomorrowOutDryBulbTemp( Hour, TS ) + TKelvin );
+					TomorrowHorizIRSky( TS, Hour ) = ESky * Sigma * pow_4( TomorrowOutDryBulbTemp( TS, Hour ) + TKelvin );
 				}
 
 				// Generate solar values for timestep
@@ -3761,8 +3761,8 @@ Label902: ;
 				//    stored to program globals at end of loop
 				if ( DesDayInput( EnvrnNum ).SolarModel == SolarModel_Schedule ) {
 					// scheduled: set value unconditionally (whether sun up or not)
-					BeamRad = DDBeamSolarValues( EnvrnNum, Hour, TS );
-					DiffRad = DDDiffuseSolarValues( EnvrnNum, Hour, TS );
+					BeamRad = DDBeamSolarValues( TS, Hour, EnvrnNum );
+					DiffRad = DDDiffuseSolarValues( TS, Hour, EnvrnNum );
 				} else {
 
 					// calc time = fractional hour of day
@@ -3800,7 +3800,7 @@ Label902: ;
 						} else if ( SELECT_CASE_var == Zhang_Huang ) {
 							Hour3Ago = mod( Hour + 20, 24 ) + 1; // hour 3 hours before
 							TotSkyCover = max( 1.0 - DesDayInput( EnvrnNum ).SkyClear, 0.0 );
-							GloHorzRad = ( ZHGlobalSolarConstant * SinSolarAltitude * ( ZhangHuangModCoeff_C0 + ZhangHuangModCoeff_C1 * TotSkyCover + ZhangHuangModCoeff_C2 * pow_2( TotSkyCover ) + ZhangHuangModCoeff_C3 * ( TomorrowOutDryBulbTemp( Hour, TS ) - TomorrowOutDryBulbTemp( Hour3Ago, TS ) ) + ZhangHuangModCoeff_C4 * TomorrowOutRelHum( Hour, TS ) + ZhangHuangModCoeff_C5 * TomorrowWindSpeed( Hour, TS ) ) + ZhangHuangModCoeff_D ) / ZhangHuangModCoeff_K;
+							GloHorzRad = ( ZHGlobalSolarConstant * SinSolarAltitude * ( ZhangHuangModCoeff_C0 + ZhangHuangModCoeff_C1 * TotSkyCover + ZhangHuangModCoeff_C2 * pow_2( TotSkyCover ) + ZhangHuangModCoeff_C3 * ( TomorrowOutDryBulbTemp( TS, Hour ) - TomorrowOutDryBulbTemp( TS, Hour3Ago ) ) + ZhangHuangModCoeff_C4 * TomorrowOutRelHum( TS, Hour ) + ZhangHuangModCoeff_C5 * TomorrowWindSpeed( TS, Hour ) ) + ZhangHuangModCoeff_D ) / ZhangHuangModCoeff_K;
 							GloHorzRad = max( GloHorzRad, 0.0 );
 							ClearnessIndex_kt = GloHorzRad / ( GlobalSolarConstant * SinSolarAltitude );
 							//          ClearnessIndex_kt=DesDayInput(EnvrnNum)%SkyClear
@@ -3824,8 +3824,8 @@ Label902: ;
 				if ( IgnoreSolarRadiation || IgnoreBeamRadiation ) BeamRad = 0.0;
 				if ( IgnoreSolarRadiation || IgnoreDiffuseRadiation ) DiffRad = 0.0;
 
-				TomorrowBeamSolarRad( Hour, TS ) = BeamRad;
-				TomorrowDifSolarRad( Hour, TS ) = DiffRad;
+				TomorrowBeamSolarRad( TS, Hour ) = BeamRad;
+				TomorrowDifSolarRad( TS, Hour ) = DiffRad;
 
 			} // Timestep (TS) Loop
 		} // Hour Loop
@@ -3835,11 +3835,11 @@ Label902: ;
 		// insurance: hourly values not known to be needed
 		for ( Hour = 1; Hour <= 24; ++Hour ) {
 			Hour1Ago = mod( Hour + 22, 24 ) + 1;
-			BeamRad = ( TomorrowBeamSolarRad( Hour1Ago, NumOfTimeStepInHour ) + TomorrowBeamSolarRad( Hour, NumOfTimeStepInHour ) ) / 2.0;
-			DiffRad = ( TomorrowDifSolarRad( Hour1Ago, NumOfTimeStepInHour ) + TomorrowDifSolarRad( Hour, NumOfTimeStepInHour ) ) / 2.0;
+			BeamRad = ( TomorrowBeamSolarRad( NumOfTimeStepInHour, Hour1Ago ) + TomorrowBeamSolarRad( NumOfTimeStepInHour, Hour ) ) / 2.0;
+			DiffRad = ( TomorrowDifSolarRad( NumOfTimeStepInHour, Hour1Ago ) + TomorrowDifSolarRad( NumOfTimeStepInHour, Hour ) ) / 2.0;
 			if ( NumOfTimeStepInHour > 1 ) {
-				BeamRad += sum( TomorrowBeamSolarRad( Hour, {1,NumOfTimeStepInHour - 1} ) );
-				DiffRad += sum( TomorrowDifSolarRad( Hour, {1,NumOfTimeStepInHour - 1} ) );
+				BeamRad += sum( TomorrowBeamSolarRad( {1,NumOfTimeStepInHour - 1}, Hour ) );
+				DiffRad += sum( TomorrowDifSolarRad( {1,NumOfTimeStepInHour - 1}, Hour ) );
 			}
 			Wthr.BeamSolarRad( Hour ) = BeamRad / NumOfTimeStepInHour;
 			Wthr.DifSolarRad( Hour ) = DiffRad / NumOfTimeStepInHour;
@@ -3851,22 +3851,22 @@ Label902: ;
 
 			if ( SELECT_CASE_var == WP_ScheduleValue ) {
 				GetSingleDayScheduleValues( WPSkyTemperature( Environment( EnvrnNum ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp );
-				DDSkyTempScheduleValues( EnvrnNum, _, _ ) = TomorrowSkyTemp;
+				DDSkyTempScheduleValues( _, _, EnvrnNum ) = TomorrowSkyTemp;
 			} else if ( SELECT_CASE_var == WP_DryBulbDelta ) {
 				GetSingleDayScheduleValues( WPSkyTemperature( Environment( EnvrnNum ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp );
-				DDSkyTempScheduleValues( EnvrnNum, _, _ ) = TomorrowSkyTemp;
+				DDSkyTempScheduleValues( _, _, EnvrnNum ) = TomorrowSkyTemp;
 				for ( Hour = 1; Hour <= 24; ++Hour ) {
 					for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
-						TomorrowSkyTemp( Hour, TS ) = TomorrowOutDryBulbTemp( Hour, TS ) - TomorrowSkyTemp( Hour, TS );
+						TomorrowSkyTemp( TS, Hour ) = TomorrowOutDryBulbTemp( TS, Hour ) - TomorrowSkyTemp( TS, Hour );
 					}
 				}
 
 			} else if ( SELECT_CASE_var == WP_DewPointDelta ) {
 				GetSingleDayScheduleValues( WPSkyTemperature( Environment( EnvrnNum ).WP_Type1 ).SchedulePtr, TomorrowSkyTemp );
-				DDSkyTempScheduleValues( EnvrnNum, _, _ ) = TomorrowSkyTemp;
+				DDSkyTempScheduleValues( _, _, EnvrnNum ) = TomorrowSkyTemp;
 				for ( Hour = 1; Hour <= 24; ++Hour ) {
 					for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
-						TomorrowSkyTemp( Hour, TS ) = TomorrowOutDewPointTemp( Hour, TS ) - TomorrowSkyTemp( Hour, TS );
+						TomorrowSkyTemp( TS, Hour ) = TomorrowOutDewPointTemp( TS, Hour ) - TomorrowSkyTemp( TS, Hour );
 					}
 				}
 
@@ -4042,62 +4042,62 @@ Label902: ;
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		TodayIsRain.allocate( 24, NumOfTimeStepInHour );
+		TodayIsRain.allocate( NumOfTimeStepInHour, 24 );
 		TodayIsRain = false;
-		TodayIsSnow.allocate( 24, NumOfTimeStepInHour );
+		TodayIsSnow.allocate( NumOfTimeStepInHour, 24 );
 		TodayIsSnow = false;
-		TodayOutDryBulbTemp.allocate( 24, NumOfTimeStepInHour );
+		TodayOutDryBulbTemp.allocate( NumOfTimeStepInHour, 24 );
 		TodayOutDryBulbTemp = 0.0;
-		TodayOutDewPointTemp.allocate( 24, NumOfTimeStepInHour );
+		TodayOutDewPointTemp.allocate( NumOfTimeStepInHour, 24 );
 		TodayOutDewPointTemp = 0.0;
-		TodayOutBaroPress.allocate( 24, NumOfTimeStepInHour );
+		TodayOutBaroPress.allocate( NumOfTimeStepInHour, 24 );
 		TodayOutBaroPress = 0.0;
-		TodayOutRelHum.allocate( 24, NumOfTimeStepInHour );
+		TodayOutRelHum.allocate( NumOfTimeStepInHour, 24 );
 		TodayOutRelHum = 0.0;
-		TodayWindSpeed.allocate( 24, NumOfTimeStepInHour );
+		TodayWindSpeed.allocate( NumOfTimeStepInHour, 24 );
 		TodayWindSpeed = 0.0;
-		TodayWindDir.allocate( 24, NumOfTimeStepInHour );
+		TodayWindDir.allocate( NumOfTimeStepInHour, 24 );
 		TodayWindDir = 0.0;
-		TodaySkyTemp.allocate( 24, NumOfTimeStepInHour );
+		TodaySkyTemp.allocate( NumOfTimeStepInHour, 24 );
 		TodaySkyTemp = 0.0;
-		TodayHorizIRSky.allocate( 24, NumOfTimeStepInHour );
+		TodayHorizIRSky.allocate( NumOfTimeStepInHour, 24 );
 		TodayHorizIRSky = 0.0;
-		TodayBeamSolarRad.allocate( 24, NumOfTimeStepInHour );
+		TodayBeamSolarRad.allocate( NumOfTimeStepInHour, 24 );
 		TodayBeamSolarRad = 0.0;
-		TodayDifSolarRad.allocate( 24, NumOfTimeStepInHour );
+		TodayDifSolarRad.allocate( NumOfTimeStepInHour, 24 );
 		TodayDifSolarRad = 0.0;
-		TodayAlbedo.allocate( 24, NumOfTimeStepInHour );
+		TodayAlbedo.allocate( NumOfTimeStepInHour, 24 );
 		TodayAlbedo = 0.0;
-		TodayLiquidPrecip.allocate( 24, NumOfTimeStepInHour );
+		TodayLiquidPrecip.allocate( NumOfTimeStepInHour, 24 );
 		TodayLiquidPrecip = 0.0;
 
-		TomorrowIsRain.allocate( 24, NumOfTimeStepInHour );
+		TomorrowIsRain.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowIsRain = false;
-		TomorrowIsSnow.allocate( 24, NumOfTimeStepInHour );
+		TomorrowIsSnow.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowIsSnow = false;
-		TomorrowOutDryBulbTemp.allocate( 24, NumOfTimeStepInHour );
+		TomorrowOutDryBulbTemp.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowOutDryBulbTemp = 0.0;
-		TomorrowOutDewPointTemp.allocate( 24, NumOfTimeStepInHour );
+		TomorrowOutDewPointTemp.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowOutDewPointTemp = 0.0;
-		TomorrowOutBaroPress.allocate( 24, NumOfTimeStepInHour );
+		TomorrowOutBaroPress.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowOutBaroPress = 0.0;
-		TomorrowOutRelHum.allocate( 24, NumOfTimeStepInHour );
+		TomorrowOutRelHum.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowOutRelHum = 0.0;
-		TomorrowWindSpeed.allocate( 24, NumOfTimeStepInHour );
+		TomorrowWindSpeed.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowWindSpeed = 0.0;
-		TomorrowWindDir.allocate( 24, NumOfTimeStepInHour );
+		TomorrowWindDir.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowWindDir = 0.0;
-		TomorrowSkyTemp.allocate( 24, NumOfTimeStepInHour );
+		TomorrowSkyTemp.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowSkyTemp = 0.0;
-		TomorrowHorizIRSky.allocate( 24, NumOfTimeStepInHour );
+		TomorrowHorizIRSky.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowHorizIRSky = 0.0;
-		TomorrowBeamSolarRad.allocate( 24, NumOfTimeStepInHour );
+		TomorrowBeamSolarRad.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowBeamSolarRad = 0.0;
-		TomorrowDifSolarRad.allocate( 24, NumOfTimeStepInHour );
+		TomorrowDifSolarRad.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowDifSolarRad = 0.0;
-		TomorrowAlbedo.allocate( 24, NumOfTimeStepInHour );
+		TomorrowAlbedo.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowAlbedo = 0.0;
-		TomorrowLiquidPrecip.allocate( 24, NumOfTimeStepInHour );
+		TomorrowLiquidPrecip.allocate( NumOfTimeStepInHour, 24 );
 		TomorrowLiquidPrecip = 0.0;
 
 	}
@@ -6196,15 +6196,15 @@ Label9999: ;
 		// FLOW:
 
 		DesDayInput.allocate( TotDesDays ); // Allocate the array to the # of DD's
-		DDDBRngModifier.allocate( TotDesDays, 24, NumOfTimeStepInHour );
+		DDDBRngModifier.allocate( NumOfTimeStepInHour, 24, TotDesDays );
 		DDDBRngModifier = 0.0;
-		DDHumIndModifier.allocate( TotDesDays, 24, NumOfTimeStepInHour );
+		DDHumIndModifier.allocate( NumOfTimeStepInHour, 24, TotDesDays );
 		DDHumIndModifier = 0.0;
-		DDBeamSolarValues.allocate( TotDesDays, 24, NumOfTimeStepInHour );
+		DDBeamSolarValues.allocate( NumOfTimeStepInHour, 24, TotDesDays );
 		DDBeamSolarValues = 0.0;
-		DDDiffuseSolarValues.allocate( TotDesDays, 24, NumOfTimeStepInHour );
+		DDDiffuseSolarValues.allocate( NumOfTimeStepInHour, 24, TotDesDays );
 		DDDiffuseSolarValues = 0.0;
-		DDSkyTempScheduleValues.allocate( TotDesDays, 24, NumOfTimeStepInHour );
+		DDSkyTempScheduleValues.allocate( NumOfTimeStepInHour, 24, TotDesDays );
 		DDSkyTempScheduleValues = 0.0;
 
 		SPSiteDryBulbRangeModScheduleValue.dimension( TotDesDays, 0.0 );
@@ -6353,7 +6353,7 @@ Label9999: ;
 						ShowContinueError( "..invalid field: " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
 						ErrorsFound = true;
 					} else {
-						GetSingleDayScheduleValues( DesDayInput( EnvrnNum ).TempRangeSchPtr, DDDBRngModifier( EnvrnNum, _, _ ) );
+						GetSingleDayScheduleValues( DesDayInput( EnvrnNum ).TempRangeSchPtr, DDDBRngModifier( _, _, EnvrnNum ) );
 						schPtr = FindNumberInList( DesDayInput( EnvrnNum ).TempRangeSchPtr, SPSiteScheduleNamePtr, NumSPSiteScheduleNamePtrs );
 						if ( schPtr == 0 ) {
 							++NumSPSiteScheduleNamePtrs;
@@ -6382,7 +6382,7 @@ Label9999: ;
 							}
 						}
 						if ( cAlphaArgs( 3 ) == "TemperatureProfileSchedule" ) {
-							testval = maxval( DDDBRngModifier( EnvrnNum, _, _ ) );
+							testval = maxval( DDDBRngModifier( _, _, EnvrnNum ) );
 							if ( MaxDryBulbEntered ) {
 								ShowWarningError( cCurrentModuleObject + "=\"" + DesDayInput( EnvrnNum ).Title + "\", data override." );
 								ShowContinueError( ".." + cNumericFieldNames( 3 ) + "=[" + RoundSigDigits( DesDayInput( EnvrnNum ).MaxDryBulb, 2 ) + "] will be overwritten." );
@@ -6391,7 +6391,7 @@ Label9999: ;
 							}
 							DesDayInput( EnvrnNum ).MaxDryBulb = testval;
 						}
-						testval = maxval( DDDBRngModifier( EnvrnNum, _, _ ) );
+						testval = maxval( DDDBRngModifier( _, _, EnvrnNum ) );
 						testval = DesDayInput( EnvrnNum ).MaxDryBulb - testval;
 						errFlag = false;
 						RangeCheck( errFlag, cAlphaFieldNames( 4 ), cCurrentModuleObject, "Severe", ">= -90", ( testval >= -90.0 ), "<= 70", ( testval <= 70.0 ), _, DesDayInput( EnvrnNum ).Title );
@@ -6412,7 +6412,7 @@ Label9999: ;
 					for ( TSLoop = 1; TSLoop <= NumOfTimeStepInHour; ++TSLoop ) {
 						WNow = Interpolation( TSLoop );
 						WPrev = 1.0 - WNow;
-						DDDBRngModifier( EnvrnNum, HrLoop, TSLoop ) = LastHrValue * WPrev + DefaultTempRangeMult( HrLoop ) * WNow;
+						DDDBRngModifier( TSLoop, HrLoop, EnvrnNum ) = LastHrValue * WPrev + DefaultTempRangeMult( HrLoop ) * WNow;
 					}
 					LastHrValue = DefaultTempRangeMult( HrLoop );
 				}
@@ -6552,7 +6552,7 @@ Label9999: ;
 						// reset HumIndType ?
 					} else {
 
-						GetSingleDayScheduleValues( DesDayInput( EnvrnNum ).HumIndSchPtr, DDHumIndModifier( EnvrnNum, _, _ ) );
+						GetSingleDayScheduleValues( DesDayInput( EnvrnNum ).HumIndSchPtr, DDHumIndModifier( _, _, EnvrnNum ) );
 
 						schPtr = FindNumberInList( DesDayInput( EnvrnNum ).HumIndSchPtr, SPSiteScheduleNamePtr, NumSPSiteScheduleNamePtrs );
 						if ( schPtr == 0 ) {
@@ -6604,7 +6604,7 @@ Label9999: ;
 					for ( TSLoop = 1; TSLoop <= NumOfTimeStepInHour; ++TSLoop ) {
 						WNow = Interpolation( TSLoop );
 						WPrev = 1.0 - WNow;
-						DDHumIndModifier( EnvrnNum, HrLoop, TSLoop ) = LastHrValue * WPrev + DefaultTempRangeMult( HrLoop ) * WNow;
+						DDHumIndModifier( TSLoop, HrLoop, EnvrnNum ) = LastHrValue * WPrev + DefaultTempRangeMult( HrLoop ) * WNow;
 					}
 					LastHrValue = DefaultTempRangeMult( HrLoop );
 				}
@@ -6655,7 +6655,7 @@ Label9999: ;
 						ShowContinueError( "..Required when " + cAlphaFieldNames( 10 ) + " indicates \"Schedule\"." );
 						ErrorsFound = true;
 					} else {
-						GetSingleDayScheduleValues( DesDayInput( EnvrnNum ).BeamSolarSchPtr, DDBeamSolarValues( EnvrnNum, _, _ ) );
+						GetSingleDayScheduleValues( DesDayInput( EnvrnNum ).BeamSolarSchPtr, DDBeamSolarValues( _, _, EnvrnNum ) );
 						schPtr = FindNumberInList( DesDayInput( EnvrnNum ).BeamSolarSchPtr, SPSiteScheduleNamePtr, NumSPSiteScheduleNamePtrs );
 						units = "[W/m2]";
 						if ( schPtr == 0 ) {
@@ -6690,7 +6690,7 @@ Label9999: ;
 						ShowContinueError( "..Required when " + cAlphaFieldNames( 10 ) + " indicates \"Schedule\"." );
 						ErrorsFound = true;
 					} else {
-						GetSingleDayScheduleValues( DesDayInput( EnvrnNum ).DiffuseSolarSchPtr, DDDiffuseSolarValues( EnvrnNum, _, _ ) );
+						GetSingleDayScheduleValues( DesDayInput( EnvrnNum ).DiffuseSolarSchPtr, DDDiffuseSolarValues( _, _, EnvrnNum ) );
 						schPtr = FindNumberInList( DesDayInput( EnvrnNum ).DiffuseSolarSchPtr, SPSiteScheduleNamePtr, NumSPSiteScheduleNamePtrs );
 						units = "[W/m2]";
 						if ( schPtr == 0 ) {

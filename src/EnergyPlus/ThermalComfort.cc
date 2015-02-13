@@ -1849,7 +1849,7 @@ namespace ThermalComfort {
 
 		for ( SurfNum = 1; SurfNum <= AngleFactorList( AngleFacNum ).TotAngleFacSurfaces; ++SurfNum ) {
 
-			SurfaceTemp = TH( AngleFactorList( AngleFacNum ).SurfacePtr( SurfNum ), 1, 2 );
+			SurfaceTemp = TH( 2, 1, AngleFactorList( AngleFacNum ).SurfacePtr( SurfNum ) );
 			SurfTempAngleFacSummed += SurfaceTemp * AngleFactorList( AngleFacNum ).AngleFactor( SurfNum );
 
 		}
@@ -1981,7 +1981,7 @@ namespace ThermalComfort {
 			RadTemp = MRT( ZoneNum );
 		} else if ( SELECT_CASE_var == SurfaceWeighted ) {
 			ZoneRadTemp = MRT( ZoneNum );
-			SurfaceTemp = TH( People( PeopleListNum ).SurfacePtr, 1, 2 );
+			SurfaceTemp = TH( 2, 1, People( PeopleListNum ).SurfacePtr );
 			RadTemp = ( ZoneRadTemp + SurfaceTemp ) / 2.0;
 		} else if ( SELECT_CASE_var == AngleFactor ) {
 			RadTemp = CalcAngleFactorMRT( People( PeopleListNum ).AngleFactorListPtr );

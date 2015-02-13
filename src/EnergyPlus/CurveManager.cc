@@ -1800,10 +1800,10 @@ namespace CurveManager {
 
 			// move table data to performance curve table data structure
 			PerfCurveTableData( TableNum ).X1.allocate( NumXVar - 1 );
-			PerfCurveTableData( TableNum ).Y.allocate( NumXVar - 1, 1 );
+			PerfCurveTableData( TableNum ).Y.allocate( 1, NumXVar - 1 );
 			PerfCurveTableData( TableNum ).X1 = TableData( TableNum ).X1;
 			for ( VarIndex = 1; VarIndex <= NumXVar - 1; ++VarIndex ) {
-				PerfCurveTableData( TableNum ).Y( VarIndex, 1 ) = TableData( TableNum ).Y( VarIndex );
+				PerfCurveTableData( TableNum ).Y( 1, VarIndex ) = TableData( TableNum ).Y( VarIndex );
 			}
 
 			// create curve objects when regression analysis is required
@@ -1813,7 +1813,7 @@ namespace CurveManager {
 					TempArray1 = PerfCurveTableData( TableNum ).X1;
 					TempArray2.allocate( size( PerfCurveTableData( TableNum ).Y ) );
 					for ( VarIndex = 1; VarIndex <= isize( PerfCurveTableData( TableNum ).Y ); ++VarIndex ) {
-						TempArray2( VarIndex ) = PerfCurveTableData( TableNum ).Y( VarIndex, 1 );
+						TempArray2( VarIndex ) = PerfCurveTableData( TableNum ).Y( 1, VarIndex );
 					}
 					SolveRegression( CurveNum, CurrentModuleObject, PerfCurve( CurveNum ).Name, TempArray1, TempArray2 );
 					TempArray1.deallocate();
@@ -1828,9 +1828,9 @@ namespace CurveManager {
 			TableLookup( TableNum ).NumIndependentVars = 1;
 			TableLookup( TableNum ).NumX1Vars = size( PerfCurveTableData( TableNum ).X1 );
 			TableLookup( TableNum ).X1Var.allocate( TableLookup( TableNum ).NumX1Vars );
-			TableLookup( TableNum ).TableLookupZData.allocate( size( PerfCurveTableData( TableNum ).Y ), 1, 1, 1, 1 );
+			TableLookup( TableNum ).TableLookupZData.allocate( 1, 1, 1, 1, size( PerfCurveTableData( TableNum ).Y ) );
 			TableLookup( TableNum ).X1Var = PerfCurveTableData( TableNum ).X1;
-			TableLookup( TableNum ).TableLookupZData( _, 1, 1, 1, 1 ) = PerfCurveTableData( TableNum ).Y( _, 1 );
+			TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, _ ) = PerfCurveTableData( TableNum ).Y( 1, _ );
 		}
 
 		// Loop over two variable tables and load data
@@ -2033,7 +2033,7 @@ namespace CurveManager {
 			// move table data to performance curve table data structure
 			PerfCurveTableData( TableNum ).X1.allocate( NumXVar );
 			PerfCurveTableData( TableNum ).X2.allocate( NumX2Var );
-			PerfCurveTableData( TableNum ).Y.allocate( NumXVar, NumX2Var );
+			PerfCurveTableData( TableNum ).Y.allocate( NumX2Var, NumXVar );
 			PerfCurveTableData( TableNum ).X1 = -9999999.0;
 			PerfCurveTableData( TableNum ).X2 = -9999999.0;
 			PerfCurveTableData( TableNum ).Y = -9999999.0;
@@ -2043,7 +2043,7 @@ namespace CurveManager {
 					PerfCurveTableData( TableNum ).X2( TempVarIndex ) = X2Var( TempVarIndex );
 					for ( TempVarIndex1 = 1; TempVarIndex1 <= MaxTableNums; ++TempVarIndex1 ) {
 						if ( ( TableData( TableNum ).X1( TempVarIndex1 ) == PerfCurveTableData( TableNum ).X1( VarIndex ) ) && ( TableData( TableNum ).X2( TempVarIndex1 ) == PerfCurveTableData( TableNum ).X2( TempVarIndex ) ) ) {
-							PerfCurveTableData( TableNum ).Y( VarIndex, TempVarIndex ) = TableData( TableNum ).Y( TempVarIndex1 );
+							PerfCurveTableData( TableNum ).Y( TempVarIndex, VarIndex ) = TableData( TableNum ).Y( TempVarIndex1 );
 						}
 					}
 				}
@@ -2078,10 +2078,10 @@ namespace CurveManager {
 			TableLookup( TableNum ).NumX2Vars = size( PerfCurveTableData( TableNum ).X2 );
 			TableLookup( TableNum ).X1Var.allocate( TableLookup( TableNum ).NumX1Vars );
 			TableLookup( TableNum ).X2Var.allocate( TableLookup( TableNum ).NumX2Vars );
-			TableLookup( TableNum ).TableLookupZData.allocate( size( PerfCurveTableData( TableNum ).Y( _, 1 ) ), size( PerfCurveTableData( TableNum ).Y( 1, _ ) ), 1, 1, 1 );
+			TableLookup( TableNum ).TableLookupZData.allocate( 1, 1, 1, size( PerfCurveTableData( TableNum ).Y( _, 1 ) ), size( PerfCurveTableData( TableNum ).Y( 1, _ ) ) );
 			TableLookup( TableNum ).X1Var = PerfCurveTableData( TableNum ).X1;
 			TableLookup( TableNum ).X2Var = PerfCurveTableData( TableNum ).X2;
-			TableLookup( TableNum ).TableLookupZData( _, _, 1, 1, 1 ) = PerfCurveTableData( TableNum ).Y( _, _ );
+			TableLookup( TableNum ).TableLookupZData( 1, 1, 1, _, _ ) = PerfCurveTableData( TableNum ).Y( _, _ );
 
 		}
 
@@ -2285,22 +2285,22 @@ namespace CurveManager {
 			if ( PerfCurve( CurveNum ).InterpolationType == EvaluateCurveToLimits ) {
 				{ auto const SELECT_CASE_var( TableLookup( TableNum ).NumIndependentVars );
 				if ( SELECT_CASE_var == 1 ) {
-					TempArray1.allocate( size( TableLookup( TableNum ).TableLookupZData( _, 1, 1, 1, 1 ) ) );
+					TempArray1.allocate( size( TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, _ ) ) );
 					TempArray2.allocate( size( TempArray1 ) );
 					TempArray1 = TableLookup( TableNum ).X1Var;
-					TempArray2 = TableLookup( TableNum ).TableLookupZData( _, 1, 1, 1, 1 );
+					TempArray2 = TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, _ );
 					SolveRegression( CurveNum, CurrentModuleObject, PerfCurve( CurveNum ).Name, TempArray1, TempArray2 );
 					TempArray1.deallocate();
 					TempArray2.deallocate();
 
 					// Save array info in performance table arrays in case the performance table routine is selected in regression routine
 					PerfCurveTableData( TableNum ).X1.allocate( size( TableLookup( TableNum ).X1Var ) );
-					PerfCurveTableData( TableNum ).Y.allocate( size( TableLookup( TableNum ).X1Var ), 1 );
+					PerfCurveTableData( TableNum ).Y.allocate( 1, size( TableLookup( TableNum ).X1Var ) );
 					PerfCurveTableData( TableNum ).X1 = TableLookup( TableNum ).X1Var;
-					PerfCurveTableData( TableNum ).Y( _, 1 ) = TableLookup( TableNum ).TableLookupZData( _, 1, 1, 1, 1 );
+					PerfCurveTableData( TableNum ).Y( 1, _ ) = TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, _ );
 
 				} else if ( SELECT_CASE_var == 2 ) {
-					TempArray1.allocate( size( TableLookup( TableNum ).TableLookupZData( _, _, 1, 1, 1 ) ) );
+					TempArray1.allocate( size( TableLookup( TableNum ).TableLookupZData( 1, 1, 1, _, _ ) ) );
 					TempArray2.allocate( size( TempArray1 ) );
 					TempArray3.allocate( size( TempArray1 ) );
 					TableDataIndex = 0;
@@ -2309,7 +2309,7 @@ namespace CurveManager {
 							++TableDataIndex;
 							TempArray1( TableDataIndex ) = TableLookup( TableNum ).X1Var( VarIndex );
 							TempArray2( TableDataIndex ) = TableLookup( TableNum ).X2Var( TempVarIndex );
-							TempArray3( TableDataIndex ) = TableLookup( TableNum ).TableLookupZData( VarIndex, TempVarIndex, 1, 1, 1 );
+							TempArray3( TableDataIndex ) = TableLookup( TableNum ).TableLookupZData( 1, 1, 1, TempVarIndex, VarIndex );
 						}
 					}
 					SolveRegression( CurveNum, CurrentModuleObject, PerfCurve( CurveNum ).Name, TempArray1, TempArray3, TempArray2 );
@@ -2319,10 +2319,10 @@ namespace CurveManager {
 					// Save array info in performance table arrays in case the performance table routine is selected in regression routine
 					PerfCurveTableData( TableNum ).X1.allocate( size( TableLookup( TableNum ).X1Var ) );
 					PerfCurveTableData( TableNum ).X2.allocate( size( TableLookup( TableNum ).X2Var ) );
-					PerfCurveTableData( TableNum ).Y.allocate( size( TableLookup( TableNum ).X1Var ), size( TableLookup( TableNum ).X2Var ) );
+					PerfCurveTableData( TableNum ).Y.allocate( size( TableLookup( TableNum ).X2Var ), size( TableLookup( TableNum ).X1Var ) );
 					PerfCurveTableData( TableNum ).X1 = TableLookup( TableNum ).X1Var;
 					PerfCurveTableData( TableNum ).X2 = TableLookup( TableNum ).X2Var;
-					PerfCurveTableData( TableNum ).Y( _, _ ) = TableLookup( TableNum ).TableLookupZData( _, _, 1, 1, 1 );
+					PerfCurveTableData( TableNum ).Y( _, _ ) = TableLookup( TableNum ).TableLookupZData( 1, 1, 1, _, _ );
 				} else {
 					ShowSevereError( "GetTableInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 					ShowContinueError( "...Invalid " + cAlphaFieldNames( 2 ) + " = " + Alphas( 2 ) );
@@ -2334,18 +2334,18 @@ namespace CurveManager {
 				if ( SELECT_CASE_var == 1 ) {
 					// Save array info in performance table arrays in case the performance table routine is selected in regression routine
 					PerfCurveTableData( TableNum ).X1.allocate( size( TableLookup( TableNum ).X1Var ) );
-					PerfCurveTableData( TableNum ).Y.allocate( size( TableLookup( TableNum ).X1Var ), 1 );
+					PerfCurveTableData( TableNum ).Y.allocate( 1, size( TableLookup( TableNum ).X1Var ) );
 					PerfCurveTableData( TableNum ).X1 = TableLookup( TableNum ).X1Var;
-					PerfCurveTableData( TableNum ).Y( _, 1 ) = TableLookup( TableNum ).TableLookupZData( _, 1, 1, 1, 1 );
+					PerfCurveTableData( TableNum ).Y( 1, _ ) = TableLookup( TableNum ).TableLookupZData( 1, 1, 1, 1, _ );
 					// if linear interpolation of table is selected, switch interpolation type
 				} else if ( SELECT_CASE_var == 2 ) {
 					// Save array info in performance table arrays in case the performance table routine is selected in regression routine
 					PerfCurveTableData( TableNum ).X1.allocate( size( TableLookup( TableNum ).X1Var ) );
 					PerfCurveTableData( TableNum ).X2.allocate( size( TableLookup( TableNum ).X2Var ) );
-					PerfCurveTableData( TableNum ).Y.allocate( size( TableLookup( TableNum ).X1Var ), size( TableLookup( TableNum ).X2Var ) );
+					PerfCurveTableData( TableNum ).Y.allocate( size( TableLookup( TableNum ).X2Var ), size( TableLookup( TableNum ).X1Var ) );
 					PerfCurveTableData( TableNum ).X1 = TableLookup( TableNum ).X1Var;
 					PerfCurveTableData( TableNum ).X2 = TableLookup( TableNum ).X2Var;
-					PerfCurveTableData( TableNum ).Y( _, _ ) = TableLookup( TableNum ).TableLookupZData( _, _, 1, 1, 1 );
+					PerfCurveTableData( TableNum ).Y( _, _ ) = TableLookup( TableNum ).TableLookupZData( 1, 1, 1, _, _ );
 					// if linear interpolation of table is selected, switch interpolation type
 				} else {
 					// if linear interpolation of table is selected, fatal if more than 2 independent variables
@@ -2933,18 +2933,18 @@ namespace CurveManager {
 								}
 							}
 
-							TableLookup( TableNum ).TableLookupZData.allocate( TableLookup( TableNum ).NumX1Vars, TableLookup( TableNum ).NumX2Vars, TableLookup( TableNum ).NumX3Vars, TableLookup( TableNum ).NumX4Vars, TableLookup( TableNum ).NumX5Vars );
+							TableLookup( TableNum ).TableLookupZData.allocate( TableLookup( TableNum ).NumX5Vars, TableLookup( TableNum ).NumX4Vars, TableLookup( TableNum ).NumX3Vars, TableLookup( TableNum ).NumX2Vars, TableLookup( TableNum ).NumX1Vars );
 						} else {
-							TableLookup( TableNum ).TableLookupZData.allocate( TableLookup( TableNum ).NumX1Vars, TableLookup( TableNum ).NumX2Vars, TableLookup( TableNum ).NumX3Vars, TableLookup( TableNum ).NumX4Vars, 1 );
+							TableLookup( TableNum ).TableLookupZData.allocate( 1, TableLookup( TableNum ).NumX4Vars, TableLookup( TableNum ).NumX3Vars, TableLookup( TableNum ).NumX2Vars, TableLookup( TableNum ).NumX1Vars );
 						}
 					} else {
-						TableLookup( TableNum ).TableLookupZData.allocate( TableLookup( TableNum ).NumX1Vars, TableLookup( TableNum ).NumX2Vars, TableLookup( TableNum ).NumX3Vars, 1, 1 );
+						TableLookup( TableNum ).TableLookupZData.allocate( 1, 1, TableLookup( TableNum ).NumX3Vars, TableLookup( TableNum ).NumX2Vars, TableLookup( TableNum ).NumX1Vars );
 					}
 				} else {
-					TableLookup( TableNum ).TableLookupZData.allocate( TableLookup( TableNum ).NumX1Vars, TableLookup( TableNum ).NumX2Vars, 1, 1, 1 );
+					TableLookup( TableNum ).TableLookupZData.allocate( 1, 1, 1, TableLookup( TableNum ).NumX2Vars, TableLookup( TableNum ).NumX1Vars );
 				}
 			} else {
-				TableLookup( TableNum ).TableLookupZData.allocate( TableLookup( TableNum ).NumX1Vars, 1, 1, 1, 1 );
+				TableLookup( TableNum ).TableLookupZData.allocate( 1, 1, 1, 1, TableLookup( TableNum ).NumX1Vars );
 			}
 		}
 
@@ -3131,7 +3131,7 @@ namespace CurveManager {
 							{
 								IOFlags flags;
 								for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
+									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( Var5Index, Var4Index, Var3Index, J, I );
 								}
 								ReadStat = flags.ios();
 							}
@@ -3141,7 +3141,7 @@ namespace CurveManager {
 						} else {
 
 							for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-								TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index ) = Numbers( NumbersOffset );
+								TableLookup( TableNum ).TableLookupZData( Var5Index, Var4Index, Var3Index, J, I ) = Numbers( NumbersOffset );
 								++NumbersOffset;
 							}
 
@@ -3156,7 +3156,7 @@ namespace CurveManager {
 							{
 								IOFlags flags;
 								for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
+									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( Var5Index, Var4Index, Var3Index, J, I );
 								}
 								ReadStat = flags.ios();
 							}
@@ -3166,7 +3166,7 @@ namespace CurveManager {
 						} else {
 
 							for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-								TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index ) = Numbers( NumbersOffset ) / TableData( TableNum ).NormalPoint;
+								TableLookup( TableNum ).TableLookupZData( Var5Index, Var4Index, Var3Index, J, I ) = Numbers( NumbersOffset ) / TableData( TableNum ).NormalPoint;
 								++NumbersOffset;
 							}
 
@@ -3183,7 +3183,7 @@ namespace CurveManager {
 							{
 								IOFlags flags;
 								for ( I = TableLookup( TableNum ).NumX1Vars; I >= 1; --I ) {
-									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
+									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( Var5Index, Var4Index, Var3Index, J, I );
 								}
 								ReadStat = flags.ios();
 							}
@@ -3193,7 +3193,7 @@ namespace CurveManager {
 						} else {
 
 							for ( I = TableLookup( TableNum ).NumX1Vars; I >= 1; --I ) {
-								TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index ) = Numbers( NumbersOffset );
+								TableLookup( TableNum ).TableLookupZData( Var5Index, Var4Index, Var3Index, J, I ) = Numbers( NumbersOffset );
 								++NumbersOffset;
 							}
 
@@ -3207,7 +3207,7 @@ namespace CurveManager {
 							{
 								IOFlags flags;
 								for ( I = TableLookup( TableNum ).NumX1Vars; I >= 1; --I ) {
-									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
+									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( Var5Index, Var4Index, Var3Index, J, I );
 								}
 								ReadStat = flags.ios();
 							}
@@ -3217,7 +3217,7 @@ namespace CurveManager {
 						} else {
 
 							for ( I = TableLookup( TableNum ).NumX1Vars; I >= 1; --I ) {
-								TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index ) = Numbers( NumbersOffset );
+								TableLookup( TableNum ).TableLookupZData( Var5Index, Var4Index, Var3Index, J, I ) = Numbers( NumbersOffset );
 								++NumbersOffset;
 							}
 
@@ -3231,13 +3231,13 @@ namespace CurveManager {
 				// write data to eio file in ascending order
 				if ( EchoTableDataToEio ) {
 					for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-						gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
+						gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).TableLookupZData( Var5Index, Var4Index, Var3Index, J, I );
 					} gio::write( OutputFileInits );
 				}
 
 				// normalize the data according to the user entered normal point
 				for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-					TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index ) /= TableData( TableNum ).NormalPoint;
+					TableLookup( TableNum ).TableLookupZData( Var5Index, Var4Index, Var3Index, J, I ) /= TableData( TableNum ).NormalPoint;
 				}
 
 			}
@@ -3426,19 +3426,19 @@ Label999: ;
 		}
 
 		if ( QUITX && QUITY ) {
-			DLAG = Z( I, J ); // found exact X and Y point in Z array
+			DLAG = Z( J, I ); // found exact X and Y point in Z array
 		} else if ( QUITX && ! QUITY ) { // only interpolate in Y direction
 			Array1D< Real64 > XLAG( IEYPT );
 			for ( int l = ISYPT; l <= IEYPT; ++l ) {
-				XLAG( l ) = Z( I, l ); // store X's at each Y (I = midpoint of array from above)
+				XLAG( l ) = Z( l, I ); // store X's at each Y (I = midpoint of array from above)
 			}
 			Interpolate_Lagrange( YY, XLAG, Y, ISYPT, IEYPT, DLAG ); // now interpolate these X's
 		} else if ( ! QUITX && QUITY ) { // only interpolate in X direction
-			Interpolate_Lagrange( XX, Z( _, J ), X, ISXPT, IEXPT, DLAG ); // (:,J) interpolate X array at fixed Y (J here)
+			Interpolate_Lagrange( XX, Z( J, _ ), X, ISXPT, IEXPT, DLAG ); // (:,J) interpolate X array at fixed Y (J here)
 		} else { // else interpolate in X and Y directions
 			Array1D< Real64 > XLAG( IEYPT );
 			for ( K = ISYPT; K <= IEYPT; ++K ) {
-				Interpolate_Lagrange( XX, Z( _, K ), X, ISXPT, IEXPT, XLAG( K ) ); // (:,K) interpolate X array at all Y's (K here)
+				Interpolate_Lagrange( XX, Z( K, _ ), X, ISXPT, IEXPT, XLAG( K ) ); // (:,K) interpolate X array at all Y's (K here)
 			}
 			Interpolate_Lagrange( YY, XLAG, Y, ISYPT, IEYPT, DLAG ); // final interpolation of X array
 		}
@@ -3680,10 +3680,10 @@ Label999: ;
 				}
 			}
 			if ( TempX1LowPtr == TempX1HighPtr ) {
-				TableValue = PerfCurveTableData( TableIndex ).Y( TempX1LowPtr, 1 );
+				TableValue = PerfCurveTableData( TableIndex ).Y( 1, TempX1LowPtr );
 			} else {
 				X1Frac = ( V1 - PerfCurveTableData( TableIndex ).X1( TempX1LowPtr ) ) / ( PerfCurveTableData( TableIndex ).X1( TempX1HighPtr ) - PerfCurveTableData( TableIndex ).X1( TempX1LowPtr ) );
-				TableValue = X1Frac * PerfCurveTableData( TableIndex ).Y( TempX1HighPtr, 1 ) + ( 1 - X1Frac ) * PerfCurveTableData( TableIndex ).Y( TempX1LowPtr, 1 );
+				TableValue = X1Frac * PerfCurveTableData( TableIndex ).Y( 1, TempX1HighPtr ) + ( 1 - X1Frac ) * PerfCurveTableData( TableIndex ).Y( 1, TempX1LowPtr );
 			}
 
 		} else if ( SELECT_CASE_var == 2 ) {
@@ -3728,18 +3728,18 @@ Label999: ;
 
 			if ( TempX1LowPtr == TempX1HighPtr ) {
 				if ( TempX2LowPtr == TempX2HighPtr ) {
-					TableValue = PerfCurveTableData( TableIndex ).Y( TempX1LowPtr, TempX2LowPtr );
+					TableValue = PerfCurveTableData( TableIndex ).Y( TempX2LowPtr, TempX1LowPtr );
 				} else {
 					X2Frac = ( V2 - PerfCurveTableData( TableIndex ).X2( TempX2LowPtr ) ) / ( PerfCurveTableData( TableIndex ).X2( TempX2HighPtr ) - PerfCurveTableData( TableIndex ).X2( TempX2LowPtr ) );
-					TableValue = X2Frac * PerfCurveTableData( TableIndex ).Y( TempX1LowPtr, TempX2HighPtr ) + ( 1 - X2Frac ) * PerfCurveTableData( TableIndex ).Y( TempX1LowPtr, TempX2LowPtr );
+					TableValue = X2Frac * PerfCurveTableData( TableIndex ).Y( TempX2HighPtr, TempX1LowPtr ) + ( 1 - X2Frac ) * PerfCurveTableData( TableIndex ).Y( TempX2LowPtr, TempX1LowPtr );
 				}
 			} else {
 				X1Frac = ( V1 - PerfCurveTableData( TableIndex ).X1( TempX1LowPtr ) ) / ( PerfCurveTableData( TableIndex ).X1( TempX1HighPtr ) - PerfCurveTableData( TableIndex ).X1( TempX1LowPtr ) );
 				if ( TempX2LowPtr == TempX2HighPtr ) {
-					TableValue = X1Frac * PerfCurveTableData( TableIndex ).Y( TempX1HighPtr, TempX2LowPtr ) + ( 1 - X1Frac ) * PerfCurveTableData( TableIndex ).Y( TempX1LowPtr, TempX2LowPtr );
+					TableValue = X1Frac * PerfCurveTableData( TableIndex ).Y( TempX2LowPtr, TempX1HighPtr ) + ( 1 - X1Frac ) * PerfCurveTableData( TableIndex ).Y( TempX2LowPtr, TempX1LowPtr );
 				} else {
-					X1ValLow = X1Frac * PerfCurveTableData( TableIndex ).Y( TempX1HighPtr, TempX2LowPtr ) + ( 1 - X1Frac ) * PerfCurveTableData( TableIndex ).Y( TempX1LowPtr, TempX2LowPtr );
-					X1ValHigh = X1Frac * PerfCurveTableData( TableIndex ).Y( TempX1HighPtr, TempX2HighPtr ) + ( 1 - X1Frac ) * PerfCurveTableData( TableIndex ).Y( TempX1LowPtr, TempX2HighPtr );
+					X1ValLow = X1Frac * PerfCurveTableData( TableIndex ).Y( TempX2LowPtr, TempX1HighPtr ) + ( 1 - X1Frac ) * PerfCurveTableData( TableIndex ).Y( TempX2LowPtr, TempX1LowPtr );
+					X1ValHigh = X1Frac * PerfCurveTableData( TableIndex ).Y( TempX2HighPtr, TempX1HighPtr ) + ( 1 - X1Frac ) * PerfCurveTableData( TableIndex ).Y( TempX2HighPtr, TempX1LowPtr );
 					X2Frac = ( V2 - PerfCurveTableData( TableIndex ).X2( TempX2LowPtr ) ) / ( PerfCurveTableData( TableIndex ).X2( TempX2HighPtr ) - PerfCurveTableData( TableIndex ).X2( TempX2LowPtr ) );
 					TableValue = X2Frac * X1ValHigh + ( 1 - X2Frac ) * X1ValLow;
 				}
@@ -3934,7 +3934,7 @@ Label999: ;
 			NUMPT = TableLookup( TableIndex ).InterpolationOrder;
 			VALSX.allocate( NX );
 			VALSX = TableLookup( TableIndex ).X1Var;
-			TableValue = DLAG( V1, VALSX( 1 ), VALSX, VALSX, TableLookup( TableIndex ).TableLookupZData( _, _, 1, 1, 1 ), NX, NY, NUMPT, IEXTX, IEXTY );
+			TableValue = DLAG( V1, VALSX( 1 ), VALSX, VALSX, TableLookup( TableIndex ).TableLookupZData( 1, 1, 1, _, _ ), NX, NY, NUMPT, IEXTX, IEXTY );
 			VALSX.deallocate();
 		} else if ( SELECT_CASE_var == 2 ) {
 			NX = TableLookup( TableIndex ).NumX1Vars;
@@ -3944,7 +3944,7 @@ Label999: ;
 			VALSX = TableLookup( TableIndex ).X1Var;
 			VALSY.allocate( NY );
 			VALSY = TableLookup( TableIndex ).X2Var;
-			TableValue = DLAG( V1, V2, VALSX, VALSY, TableLookup( TableIndex ).TableLookupZData( _, _, 1, 1, 1 ), NX, NY, NUMPT, IEXTX, IEXTY );
+			TableValue = DLAG( V1, V2, VALSX, VALSY, TableLookup( TableIndex ).TableLookupZData( 1, 1, 1, _, _ ), NX, NY, NUMPT, IEXTX, IEXTY );
 			VALSX.deallocate();
 			VALSY.deallocate();
 		} else if ( SELECT_CASE_var == 3 ) {
@@ -3958,10 +3958,10 @@ Label999: ;
 			VALSY = TableLookup( TableIndex ).X2Var;
 			VALSV3.allocate( NV3 );
 			VALSV3 = TableLookup( TableIndex ).X3Var;
-			TWODVALS.allocate( NV3, 1 );
+			TWODVALS.allocate( 1, NV3 );
 			// perform 2-D interpolation of X (V1) and Y (V2) and save in 2-D array
 			for ( IV3 = 1; IV3 <= NV3; ++IV3 ) {
-				TWODVALS( IV3, 1 ) = DLAG( V1, V2, VALSX, VALSY, TableLookup( TableIndex ).TableLookupZData( _, _, IV3, 1, 1 ), NX, NY, NUMPT, IEXTX, IEXTY );
+				TWODVALS( 1, IV3 ) = DLAG( V1, V2, VALSX, VALSY, TableLookup( TableIndex ).TableLookupZData( 1, 1, IV3, _, _ ), NX, NY, NUMPT, IEXTX, IEXTY );
 			}
 			if ( NV3 == 1 ) {
 				TableValue = TWODVALS( 1, 1 );
@@ -3986,11 +3986,11 @@ Label999: ;
 			VALSV3 = TableLookup( TableIndex ).X3Var;
 			VALSV4.allocate( NV4 );
 			VALSV4 = TableLookup( TableIndex ).X4Var;
-			TWODVALS.allocate( NV3, NV4 );
+			TWODVALS.allocate( NV4, NV3 );
 			// perform 2-D interpolation of X (V1) and Y (V2) and save in 2-D array
 			for ( IV4 = 1; IV4 <= NV4; ++IV4 ) {
 				for ( IV3 = 1; IV3 <= NV3; ++IV3 ) {
-					TWODVALS( IV3, IV4 ) = DLAG( V1, V2, VALSX, VALSY, TableLookup( TableIndex ).TableLookupZData( _, _, IV3, IV4, 1 ), NX, NY, NUMPT, IEXTX, IEXTY );
+					TWODVALS( IV4, IV3 ) = DLAG( V1, V2, VALSX, VALSY, TableLookup( TableIndex ).TableLookupZData( 1, IV4, IV3, _, _ ), NX, NY, NUMPT, IEXTX, IEXTY );
 				}
 			}
 			// final interpolation of 2-D array in V3 and V4
@@ -4017,17 +4017,17 @@ Label999: ;
 			VALSV4 = TableLookup( TableIndex ).X4Var;
 			VALSV5.allocate( NV5 );
 			VALSV5 = TableLookup( TableIndex ).X5Var;
-			THREEDVALS.allocate( NV3, NV4, NV5 );
+			THREEDVALS.allocate( NV5, NV4, NV3 );
 			for ( IV5 = 1; IV5 <= NV5; ++IV5 ) {
 				for ( IV4 = 1; IV4 <= NV4; ++IV4 ) {
 					for ( IV3 = 1; IV3 <= NV3; ++IV3 ) {
-						THREEDVALS( IV3, IV4, IV5 ) = DLAG( V1, V2, VALSX, VALSY, TableLookup( TableIndex ).TableLookupZData( _, _, IV3, IV4, IV5 ), NX, NY, NUMPT, IEXTX, IEXTY );
+						THREEDVALS( IV5, IV4, IV3 ) = DLAG( V1, V2, VALSX, VALSY, TableLookup( TableIndex ).TableLookupZData( IV5, IV4, IV3, _, _ ), NX, NY, NUMPT, IEXTX, IEXTY );
 					}
 				}
 			}
-			TWODVALS.allocate( NV5, 1 );
+			TWODVALS.allocate( 1, NV5 );
 			for ( IV5 = 1; IV5 <= NV5; ++IV5 ) {
-				TWODVALS( IV5, 1 ) = DLAG( V3, V4, VALSV3, VALSV4, THREEDVALS( _, _, IV5 ), NV3, NV4, NUMPT, IEXTX, IEXTY );
+				TWODVALS( 1, IV5 ) = DLAG( V3, V4, VALSV3, VALSV4, THREEDVALS( IV5, _, _ ), NV3, NV4, NUMPT, IEXTX, IEXTY );
 			}
 			if ( NV5 == 1 ) {
 				TableValue = TWODVALS( 1, 1 );
@@ -4361,53 +4361,53 @@ Label999: ;
 
 		//    ' Form "A" Matrix
 		A( 1, 1 ) = double( N );
-		A( 1, 2 ) = sX;
+		A( 2, 1 ) = sX;
 		A( 2, 2 ) = sX2;
 		{ auto const SELECT_CASE_var( PerfCurve( CurveNum ).CurveType );
 		if ( SELECT_CASE_var == Linear ) {
 		} else if ( SELECT_CASE_var == Quadratic ) {
-			A( 1, 3 ) = sY;
-			A( 2, 3 ) = sXY;
+			A( 3, 1 ) = sY;
+			A( 3, 2 ) = sXY;
 			A( 3, 3 ) = sY2;
 		} else if ( SELECT_CASE_var == Cubic ) {
-			A( 1, 3 ) = sY;
-			A( 1, 4 ) = sV;
-			A( 2, 3 ) = sXY;
-			A( 2, 4 ) = sXV;
+			A( 3, 1 ) = sY;
+			A( 4, 1 ) = sV;
+			A( 3, 2 ) = sXY;
+			A( 4, 2 ) = sXV;
 			A( 3, 3 ) = sY2;
-			A( 3, 4 ) = sYV;
+			A( 4, 3 ) = sYV;
 			A( 4, 4 ) = sV2;
 		} else if ( SELECT_CASE_var == Quartic ) {
-			A( 1, 3 ) = sY;
-			A( 1, 4 ) = sV;
-			A( 1, 5 ) = sU;
-			A( 2, 3 ) = sXY;
-			A( 2, 4 ) = sXV;
-			A( 2, 5 ) = sXU;
+			A( 3, 1 ) = sY;
+			A( 4, 1 ) = sV;
+			A( 5, 1 ) = sU;
+			A( 3, 2 ) = sXY;
+			A( 4, 2 ) = sXV;
+			A( 5, 2 ) = sXU;
 			A( 3, 3 ) = sY2;
-			A( 3, 4 ) = sYV;
-			A( 3, 5 ) = sYU;
+			A( 4, 3 ) = sYV;
+			A( 5, 3 ) = sYU;
 			A( 4, 4 ) = sV2;
-			A( 4, 5 ) = sVU;
+			A( 5, 4 ) = sVU;
 			A( 5, 5 ) = sU2;
 		} else if ( ( SELECT_CASE_var == BiQuadratic ) || ( SELECT_CASE_var == QuadraticLinear ) ) {
-			A( 1, 3 ) = sY;
-			A( 1, 4 ) = sV;
-			A( 1, 5 ) = sU;
-			A( 1, 6 ) = sT;
-			A( 2, 3 ) = sXY;
-			A( 2, 4 ) = sXV;
-			A( 2, 5 ) = sXU;
-			A( 2, 6 ) = sXT;
+			A( 3, 1 ) = sY;
+			A( 4, 1 ) = sV;
+			A( 5, 1 ) = sU;
+			A( 6, 1 ) = sT;
+			A( 3, 2 ) = sXY;
+			A( 4, 2 ) = sXV;
+			A( 5, 2 ) = sXU;
+			A( 6, 2 ) = sXT;
 			A( 3, 3 ) = sY2;
-			A( 3, 4 ) = sYV;
-			A( 3, 5 ) = sYU;
-			A( 3, 6 ) = sYT;
+			A( 4, 3 ) = sYV;
+			A( 5, 3 ) = sYU;
+			A( 6, 3 ) = sYT;
 			A( 4, 4 ) = sV2;
-			A( 4, 5 ) = sVU;
-			A( 4, 6 ) = sVT;
+			A( 5, 4 ) = sVU;
+			A( 6, 4 ) = sVT;
 			A( 5, 5 ) = sU2;
-			A( 5, 6 ) = sUT;
+			A( 6, 5 ) = sUT;
 			A( 6, 6 ) = sT2;
 		} else {
 		}}
@@ -4415,7 +4415,7 @@ Label999: ;
 		//  copy elements to bottom half of symmetrical square matrix
 		for ( i = 1; i <= MatrixSize - 1; ++i ) {
 			for ( j = i + 1; j <= MatrixSize; ++j ) {
-				A( j, i ) = A( i, j );
+				A( i, j ) = A( j, i );
 			}
 		}
 
@@ -4429,11 +4429,11 @@ Label999: ;
 			}
 			for ( j = i + 1; j <= MatrixSize; ++j ) {
 				//      find the ratio of the element to the one above it
-				C = A( j, i ) / A( i, i );
+				C = A( i, j ) / A( i, i );
 				//      replace the element by reducing it by the ratio multiplied by the element above it
 				//      this makes the bottom half of symmetrical square matix 0's
 				for ( k = i; k <= MatrixSize; ++k ) {
-					A( j, k ) -= C * A( i, k );
+					A( k, j ) -= C * A( k, i );
 				}
 				Results( j ) -= C * Results( i );
 			}
@@ -4453,7 +4453,7 @@ Label999: ;
 		for ( i = MatrixSize - 1; i >= 1; --i ) {
 			C = Results( i );
 			for ( j = 1; j <= MatrixSize - i; ++j ) {
-				C -= A( i, i + j ) * Results( i + j );
+				C -= A( i + j, i ) * Results( i + j );
 			}
 			Results( i ) = C / A( i, i );
 		}

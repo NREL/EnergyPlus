@@ -1944,9 +1944,9 @@ namespace HeatBalanceManager {
 				Material( MaterNum ).GasWght( 1 ) = GasWght( GasType );
 				Material( MaterNum ).GasSpecHeatRatio( 1 ) = GasSpecificHeatRatio( GasType );
 				for ( ICoeff = 1; ICoeff <= 3; ++ICoeff ) {
-					Material( MaterNum ).GasCon( 1, ICoeff ) = GasCoeffsCon( GasType, ICoeff );
-					Material( MaterNum ).GasVis( 1, ICoeff ) = GasCoeffsVis( GasType, ICoeff );
-					Material( MaterNum ).GasCp( 1, ICoeff ) = GasCoeffsCp( GasType, ICoeff );
+					Material( MaterNum ).GasCon( ICoeff, 1 ) = GasCoeffsCon( ICoeff, GasType );
+					Material( MaterNum ).GasVis( ICoeff, 1 ) = GasCoeffsVis( ICoeff, GasType );
+					Material( MaterNum ).GasCp( ICoeff, 1 ) = GasCoeffsCp( ICoeff, GasType );
 				}
 			}
 
@@ -1954,9 +1954,9 @@ namespace HeatBalanceManager {
 
 			if ( GasType == 0 ) {
 				for ( ICoeff = 1; ICoeff <= 3; ++ICoeff ) {
-					Material( MaterNum ).GasCon( 1, ICoeff ) = MaterialProps( 1 + ICoeff );
-					Material( MaterNum ).GasVis( 1, ICoeff ) = MaterialProps( 4 + ICoeff );
-					Material( MaterNum ).GasCp( 1, ICoeff ) = MaterialProps( 7 + ICoeff );
+					Material( MaterNum ).GasCon( ICoeff, 1 ) = MaterialProps( 1 + ICoeff );
+					Material( MaterNum ).GasVis( ICoeff, 1 ) = MaterialProps( 4 + ICoeff );
+					Material( MaterNum ).GasCp( ICoeff, 1 ) = MaterialProps( 7 + ICoeff );
 				}
 				Material( MaterNum ).GasWght( 1 ) = MaterialProps( 11 );
 				Material( MaterNum ).GasSpecHeatRatio( 1 ) = MaterialProps( 12 );
@@ -1987,7 +1987,7 @@ namespace HeatBalanceManager {
 
 			// Nominal resistance of gap at room temperature
 			if ( ! ErrorsFound ) {
-				DenomRGas = ( Material( MaterNum ).GasCon( 1, 1 ) + Material( MaterNum ).GasCon( 1, 2 ) * 300.0 + Material( MaterNum ).GasCon( 1, 3 ) * 90000.0 );
+				DenomRGas = ( Material( MaterNum ).GasCon( 1, 1 ) + Material( MaterNum ).GasCon( 2, 1 ) * 300.0 + Material( MaterNum ).GasCon( 3, 1 ) * 90000.0 );
 				if ( DenomRGas > 0.0 ) {
 					NominalR( MaterNum ) = Material( MaterNum ).Thickness / DenomRGas;
 				} else {
@@ -2050,9 +2050,9 @@ namespace HeatBalanceManager {
 				Material( MaterNum ).GasWght( 1 ) = GasWght( GasType );
 				Material( MaterNum ).GasSpecHeatRatio( 1 ) = GasSpecificHeatRatio( GasType );
 				for ( ICoeff = 1; ICoeff <= 3; ++ICoeff ) {
-					Material( MaterNum ).GasCon( 1, ICoeff ) = GasCoeffsCon( GasType, ICoeff );
-					Material( MaterNum ).GasVis( 1, ICoeff ) = GasCoeffsVis( GasType, ICoeff );
-					Material( MaterNum ).GasCp( 1, ICoeff ) = GasCoeffsCp( GasType, ICoeff );
+					Material( MaterNum ).GasCon( ICoeff, 1 ) = GasCoeffsCon( ICoeff, GasType );
+					Material( MaterNum ).GasVis( ICoeff, 1 ) = GasCoeffsVis( ICoeff, GasType );
+					Material( MaterNum ).GasCp( ICoeff, 1 ) = GasCoeffsCp( ICoeff, GasType );
 				}
 			}
 
@@ -2074,9 +2074,9 @@ namespace HeatBalanceManager {
 
 			if ( GasType == 0 ) {
 				for ( ICoeff = 1; ICoeff <= 3; ++ICoeff ) {
-					Material( MaterNum ).GasCon( 1, ICoeff ) = MaterialProps( 1 + ICoeff );
-					Material( MaterNum ).GasVis( 1, ICoeff ) = MaterialProps( 4 + ICoeff );
-					Material( MaterNum ).GasCp( 1, ICoeff ) = MaterialProps( 7 + ICoeff );
+					Material( MaterNum ).GasCon( ICoeff, 1 ) = MaterialProps( 1 + ICoeff );
+					Material( MaterNum ).GasVis( ICoeff, 1 ) = MaterialProps( 4 + ICoeff );
+					Material( MaterNum ).GasCp( ICoeff, 1 ) = MaterialProps( 7 + ICoeff );
 				}
 				Material( MaterNum ).GasWght( 1 ) = MaterialProps( 11 );
 				Material( MaterNum ).GasSpecHeatRatio( 1 ) = MaterialProps( 12 );
@@ -2101,7 +2101,7 @@ namespace HeatBalanceManager {
 
 			// Nominal resistance of gap at room temperature
 			if ( ! ErrorsFound ) {
-				DenomRGas = ( Material( MaterNum ).GasCon( 1, 1 ) + Material( MaterNum ).GasCon( 1, 2 ) * 300.0 + Material( MaterNum ).GasCon( 1, 3 ) * 90000.0 );
+				DenomRGas = ( Material( MaterNum ).GasCon( 1, 1 ) + Material( MaterNum ).GasCon( 2, 1 ) * 300.0 + Material( MaterNum ).GasCon( 3, 1 ) * 90000.0 );
 				if ( DenomRGas > 0.0 ) {
 					NominalR( MaterNum ) = Material( MaterNum ).Thickness / DenomRGas;
 				} else {
@@ -2168,15 +2168,15 @@ namespace HeatBalanceManager {
 					Material( MaterNum ).GasSpecHeatRatio( NumGas ) = GasSpecificHeatRatio( GasType );
 					Material( MaterNum ).GasFract( NumGas ) = MaterialProps( 2 + NumGas );
 					for ( ICoeff = 1; ICoeff <= 3; ++ICoeff ) {
-						Material( MaterNum ).GasCon( NumGas, ICoeff ) = GasCoeffsCon( GasType, ICoeff );
-						Material( MaterNum ).GasVis( NumGas, ICoeff ) = GasCoeffsVis( GasType, ICoeff );
-						Material( MaterNum ).GasCp( NumGas, ICoeff ) = GasCoeffsCp( GasType, ICoeff );
+						Material( MaterNum ).GasCon( ICoeff, NumGas ) = GasCoeffsCon( ICoeff, GasType );
+						Material( MaterNum ).GasVis( ICoeff, NumGas ) = GasCoeffsVis( ICoeff, GasType );
+						Material( MaterNum ).GasCp( ICoeff, NumGas ) = GasCoeffsCp( ICoeff, GasType );
 					}
 				}
 			}
 
 			// Nominal resistance of gap at room temperature (based on first gas in mixture)
-			NominalR( MaterNum ) = Material( MaterNum ).Thickness / ( Material( MaterNum ).GasCon( 1, 1 ) + Material( MaterNum ).GasCon( 1, 2 ) * 300.0 + Material( MaterNum ).GasCon( 1, 3 ) * 90000.0 );
+			NominalR( MaterNum ) = Material( MaterNum ).Thickness / ( Material( MaterNum ).GasCon( 1, 1 ) + Material( MaterNum ).GasCon( 2, 1 ) * 300.0 + Material( MaterNum ).GasCon( 3, 1 ) * 90000.0 );
 
 		}
 
@@ -4587,9 +4587,9 @@ namespace HeatBalanceManager {
 		WarmupLoadDiff.dimension( NumOfZones, 0.0 );
 		TempZone.dimension( NumOfZones, 0.0 );
 		LoadZone.dimension( NumOfZones, 0.0 );
-		TempZoneRpt.dimension( NumOfTimeStepInHour * 24, NumOfZones, 0.0 );
-		LoadZoneRpt.dimension( NumOfTimeStepInHour * 24, NumOfZones, 0.0 );
-		MaxLoadZoneRpt.dimension( NumOfTimeStepInHour * 24, NumOfZones, 0.0 );
+		TempZoneRpt.dimension( NumOfZones, NumOfTimeStepInHour * 24, 0.0 );
+		LoadZoneRpt.dimension( NumOfZones, NumOfTimeStepInHour * 24, 0.0 );
+		MaxLoadZoneRpt.dimension( NumOfZones, NumOfTimeStepInHour * 24, 0.0 );
 		WarmupConvergenceValues.allocate( NumOfZones );
 		TempZoneRptStdDev.allocate( NumOfTimeStepInHour * 24 );
 		LoadZoneRptStdDev.allocate( NumOfTimeStepInHour * 24 );
@@ -4682,9 +4682,9 @@ namespace HeatBalanceManager {
 				WarmupTempDiff( ZoneNum ) = std::abs( TempZoneSecPrevDay( ZoneNum ) - TempZonePrevDay( ZoneNum ) );
 				WarmupLoadDiff( ZoneNum ) = std::abs( LoadZoneSecPrevDay( ZoneNum ) - LoadZonePrevDay( ZoneNum ) );
 				if ( ZoneNum == 1 ) ++CountWarmupDayPoints;
-				TempZoneRpt( CountWarmupDayPoints, ZoneNum ) = WarmupTempDiff( ZoneNum );
-				LoadZoneRpt( CountWarmupDayPoints, ZoneNum ) = WarmupLoadDiff( ZoneNum );
-				MaxLoadZoneRpt( CountWarmupDayPoints, ZoneNum ) = LoadZone( ZoneNum );
+				TempZoneRpt( ZoneNum, CountWarmupDayPoints ) = WarmupTempDiff( ZoneNum );
+				LoadZoneRpt( ZoneNum, CountWarmupDayPoints ) = WarmupLoadDiff( ZoneNum );
+				MaxLoadZoneRpt( ZoneNum, CountWarmupDayPoints ) = LoadZone( ZoneNum );
 
 				if ( ReportDetailedWarmupConvergence ) { // only do this detailed thing when requested by user is on
 					// Write Warmup Convergence Information to the initialization output file
@@ -4940,20 +4940,20 @@ namespace HeatBalanceManager {
 			}
 
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-				AverageZoneTemp = sum( TempZoneRpt( {1,CountWarmupDayPoints}, ZoneNum ) ) / double( CountWarmupDayPoints );
+				AverageZoneTemp = sum( TempZoneRpt( ZoneNum, {1,CountWarmupDayPoints} ) ) / double( CountWarmupDayPoints );
 				for ( Num = 1; Num <= CountWarmupDayPoints; ++Num ) {
-					if ( MaxLoadZoneRpt( Num, ZoneNum ) > 1.e-4 ) {
-						LoadZoneRpt( Num, ZoneNum ) /= MaxLoadZoneRpt( Num, ZoneNum );
+					if ( MaxLoadZoneRpt( ZoneNum, Num ) > 1.e-4 ) {
+						LoadZoneRpt( ZoneNum, Num ) /= MaxLoadZoneRpt( ZoneNum, Num );
 					} else {
-						LoadZoneRpt( Num, ZoneNum ) = 0.0;
+						LoadZoneRpt( ZoneNum, Num ) = 0.0;
 					}
 				}
-				AverageZoneLoad = sum( LoadZoneRpt( {1,CountWarmupDayPoints}, ZoneNum ) ) / double( CountWarmupDayPoints );
+				AverageZoneLoad = sum( LoadZoneRpt( ZoneNum, {1,CountWarmupDayPoints} ) ) / double( CountWarmupDayPoints );
 				StdDevZoneTemp = 0.0;
 				StdDevZoneLoad = 0.0;
 				for ( Num = 1; Num <= CountWarmupDayPoints; ++Num ) {
-					TempZoneRptStdDev( Num ) = pow_2( TempZoneRpt( Num, ZoneNum ) - AverageZoneTemp );
-					LoadZoneRptStdDev( Num ) = pow_2( LoadZoneRpt( Num, ZoneNum ) - AverageZoneLoad );
+					TempZoneRptStdDev( Num ) = pow_2( TempZoneRpt( ZoneNum, Num ) - AverageZoneTemp );
+					LoadZoneRptStdDev( Num ) = pow_2( LoadZoneRpt( ZoneNum, Num ) - AverageZoneLoad );
 				}
 				StdDevZoneTemp = std::sqrt( sum( TempZoneRptStdDev( {1,CountWarmupDayPoints} ) ) / double( CountWarmupDayPoints ) );
 				StdDevZoneLoad = std::sqrt( sum( LoadZoneRptStdDev( {1,CountWarmupDayPoints} ) ) / double( CountWarmupDayPoints ) );
@@ -5283,9 +5283,9 @@ namespace HeatBalanceManager {
 		int LineNum;
 		int ReadStat; // File read status
 		Array1D_int NGlass( 2 ); // Number of glass layers in glazing system
-		Array2D_int NumGases( 2, 4 ); // Number of gases in each gap of a glazing system
-		Array2D_int MaterNumSysGlass( 2, 5 ); // Material numbers for glazing system / glass combinations
-		Array2D_int MaterNumSysGap( 2, 4 ); // Material numbers for glazing system / gap combinations
+		Array2D_int NumGases( 4, 2 ); // Number of gases in each gap of a glazing system
+		Array2D_int MaterNumSysGlass( 5, 2 ); // Material numbers for glazing system / glass combinations
+		Array2D_int MaterNumSysGap( 4, 2 ); // Material numbers for glazing system / gap combinations
 		int TotMaterialsPrev; // Number of materials before adding ones from W5DataFile
 		int TotFrameDividerPrev; // Number of FrameAndDivider objects before adding ones from W5DataFile
 		Array1D_int NGaps( 2 ); // Number of gaps in window construction
@@ -5310,7 +5310,7 @@ namespace HeatBalanceManager {
 		Array1D< Real64 > SHGCCenter( 2 ); // Center of glass solar heat gain coefficient for glazing system
 		Array1D< Real64 > TVisCenter( 2 ); // Center of glass visible transmittance for glazing system
 		Array1D< Real64 > Tsol( 11 ); // Solar transmittance vs incidence angle; diffuse trans.
-		Array2D< Real64 > AbsSol( 5, 11 ); // Solar absorptance vs inc. angle in each glass layer
+		Array2D< Real64 > AbsSol( 11, 5 ); // Solar absorptance vs inc. angle in each glass layer
 		Array1D< Real64 > Rfsol( 11 ); // Front solar reflectance vs inc. angle
 		Array1D< Real64 > Rbsol( 11 ); // Back solar reflectance vs inc. angle
 		Array1D< Real64 > Tvis( 11 ); // Visible transmittance vs inc. angle
@@ -5323,7 +5323,7 @@ namespace HeatBalanceManager {
 		Array1D< Real64 > tsolFit( 10 ); // Fitted solar transmittance vs incidence angle
 		Array1D< Real64 > tvisFit( 10 ); // Fitted visible transmittance vs incidence angle
 		Array1D< Real64 > rfsolFit( 10 ); // Fitted solar front reflectance vs incidence angle
-		Array2D< Real64 > solabsFit( 10, 5 ); // Fitted solar absorptance vs incidence angle for each glass layer
+		Array2D< Real64 > solabsFit( 5, 10 ); // Fitted solar absorptance vs incidence angle for each glass layer
 		Array1D_string DividerType( 2 ); // Divider type: DividedLite or Suspended
 		Real64 FrameWidth;
 		Real64 MullionWidth;
@@ -5664,7 +5664,7 @@ Label20: ;
 			for ( IGlSys = 1; IGlSys <= NGlSys; ++IGlSys ) {
 				for ( IGlass = 1; IGlass <= NGlass( IGlSys ); ++IGlass ) {
 					++MaterNum;
-					MaterNumSysGlass( IGlSys, IGlass ) = MaterNum;
+					MaterNumSysGlass( IGlass, IGlSys ) = MaterNum;
 					Material( MaterNum ).Group = WindowGlass;
 					{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 					++FileLineCount;
@@ -5695,10 +5695,10 @@ Label20: ;
 			for ( IGlSys = 1; IGlSys <= NGlSys; ++IGlSys ) {
 				for ( IGap = 1; IGap <= NGaps( IGlSys ); ++IGap ) {
 					++MaterNum;
-					MaterNumSysGap( IGlSys, IGap ) = MaterNum;
+					MaterNumSysGap( IGap, IGlSys ) = MaterNum;
 					{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 					++FileLineCount;
-					gio::read( NextLine.substr( 23 ), "*" ) >> Material( MaterNum ).Thickness >> NumGases( IGlSys, IGap );
+					gio::read( NextLine.substr( 23 ), "*" ) >> Material( MaterNum ).Thickness >> NumGases( IGap, IGlSys );
 					if ( NGlSys == 1 ) {
 						Material( MaterNum ).Name = "W5:" + DesiredConstructionName + ":GAP" + NumName( IGap );
 					} else {
@@ -5714,16 +5714,16 @@ Label20: ;
 			++FileLineCount;
 			for ( IGlSys = 1; IGlSys <= NGlSys; ++IGlSys ) {
 				for ( IGap = 1; IGap <= NGaps( IGlSys ); ++IGap ) {
-					MaterNum = MaterNumSysGap( IGlSys, IGap );
-					Material( MaterNum ).NumberOfGasesInMixture = NumGases( IGlSys, IGap );
+					MaterNum = MaterNumSysGap( IGap, IGlSys );
+					Material( MaterNum ).NumberOfGasesInMixture = NumGases( IGap, IGlSys );
 					Material( MaterNum ).Group = WindowGas;
-					if ( NumGases( IGlSys, IGap ) > 1 ) Material( MaterNum ).Group = WindowGasMixture;
-					for ( IGas = 1; IGas <= NumGases( IGlSys, IGap ); ++IGas ) {
+					if ( NumGases( IGap, IGlSys ) > 1 ) Material( MaterNum ).Group = WindowGasMixture;
+					for ( IGas = 1; IGas <= NumGases( IGap, IGlSys ); ++IGas ) {
 						{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 						++FileLineCount;
-						gio::read( NextLine.substr( 19 ), "*" ) >> GasName( IGas ) >> Material( MaterNum ).GasFract( IGas ) >> Material( MaterNum ).GasWght( IGas ) >> Material( MaterNum ).GasCon( IGas, _ ) >> Material( MaterNum ).GasVis( IGas, _ ) >> Material( MaterNum ).GasCp( IGas, _ );
+						gio::read( NextLine.substr( 19 ), "*" ) >> GasName( IGas ) >> Material( MaterNum ).GasFract( IGas ) >> Material( MaterNum ).GasWght( IGas ) >> Material( MaterNum ).GasCon( _, IGas ) >> Material( MaterNum ).GasVis( _, IGas ) >> Material( MaterNum ).GasCp( _, IGas );
 						// Nominal resistance of gap at room temperature (based on first gas in mixture)
-						NominalR( MaterNum ) = Material( MaterNum ).Thickness / ( Material( MaterNum ).GasCon( 1, 1 ) + Material( MaterNum ).GasCon( 1, 2 ) * 300.0 + Material( MaterNum ).GasCon( 1, 3 ) * 90000.0 );
+						NominalR( MaterNum ) = Material( MaterNum ).Thickness / ( Material( MaterNum ).GasCon( 1, 1 ) + Material( MaterNum ).GasCon( 2, 1 ) * 300.0 + Material( MaterNum ).GasCon( 3, 1 ) * 90000.0 );
 					}
 				}
 			}
@@ -5800,8 +5800,8 @@ Label20: ;
 				Construct( ConstrNum ).TotSolidLayers = NGlass( IGlSys );
 
 				for ( IGlass = 1; IGlass <= NGlass( IGlSys ); ++IGlass ) {
-					Construct( ConstrNum ).LayerPoint( 2 * IGlass - 1 ) = MaterNumSysGlass( IGlSys, IGlass );
-					if ( IGlass < NGlass( IGlSys ) ) Construct( ConstrNum ).LayerPoint( 2 * IGlass ) = MaterNumSysGap( IGlSys, IGlass );
+					Construct( ConstrNum ).LayerPoint( 2 * IGlass - 1 ) = MaterNumSysGlass( IGlass, IGlSys );
+					if ( IGlass < NGlass( IGlSys ) ) Construct( ConstrNum ).LayerPoint( 2 * IGlass ) = MaterNumSysGap( IGlass, IGlSys );
 				}
 
 				Construct( ConstrNum ).OutsideRoughness = VerySmooth;
@@ -5849,12 +5849,12 @@ Label20: ;
 				for ( IGlass = 1; IGlass <= NGlass( IGlSys ); ++IGlass ) {
 					{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 					++FileLineCount;
-					{ IOFlags flags; gio::read( NextLine.substr( 5 ), "*", flags ) >> AbsSol( IGlass, _ ); ReadStat = flags.ios(); }
+					{ IOFlags flags; gio::read( NextLine.substr( 5 ), "*", flags ) >> AbsSol( _, IGlass ); ReadStat = flags.ios(); }
 					if ( ReadStat != 0 ) {
 						ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Error in Read of AbsSol values. For Glass=" + TrimSigDigits( IGlass ) );
 						ShowContinueError( "Line (~" + TrimSigDigits( FileLineCount ) + ") in error (first 100 characters)=" + NextLine.substr( 0, 100 ) );
 						ErrorsFound = true;
-					} else if ( any_lt( AbsSol( IGlass, _ ), 0.0 ) || any_gt( AbsSol( IGlass, _ ), 1.0 ) ) {
+					} else if ( any_lt( AbsSol( _, IGlass ), 0.0 ) || any_gt( AbsSol( _, IGlass ), 1.0 ) ) {
 						ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Error in Read of AbsSol values. (out of range [0,1]) For Glass=" + TrimSigDigits( IGlass ) );
 						ShowContinueError( "Line (~" + TrimSigDigits( FileLineCount ) + ") in error (first 100 characters)=" + NextLine.substr( 0, 100 ) );
 						ErrorsFound = true;
@@ -5929,7 +5929,7 @@ Label20: ;
 				W5LsqFit( CosPhiIndepVar, Tvis, 6, 1, 10, Construct( ConstrNum ).TransVisBeamCoef );
 				W5LsqFit( CosPhiIndepVar, Rfsol, 6, 1, 10, Construct( ConstrNum ).ReflSolBeamFrontCoef );
 				for ( IGlass = 1; IGlass <= NGlass( IGlSys ); ++IGlass ) {
-					W5LsqFit( CosPhiIndepVar, AbsSol( IGlass, _ ), 6, 1, 10, Construct( ConstrNum ).AbsBeamCoef( IGlass, _ ) );
+					W5LsqFit( CosPhiIndepVar, AbsSol( _, IGlass ), 6, 1, 10, Construct( ConstrNum ).AbsBeamCoef( _, IGlass ) );
 				}
 
 				// For comparing fitted vs. input distribution in incidence angle
@@ -5941,7 +5941,7 @@ Label20: ;
 					tvisFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransVisBeamCoef( {1,6} ) );
 					rfsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).ReflSolBeamFrontCoef( {1,6} ) );
 					for ( IGlass = 1; IGlass <= NGlass( IGlSys ); ++IGlass ) {
-						solabsFit( IPhi, IGlass ) = POLYF( CosPhi, Construct( ConstrNum ).AbsBeamCoef( IGlass, {1,6} ) );
+						solabsFit( IGlass, IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).AbsBeamCoef( {1,6}, IGlass ) );
 					}
 				}
 				// end
@@ -5955,7 +5955,7 @@ Label20: ;
 						NominalRforNominalUCalculation( ConstrNum ) += Material( MatNum ).Thickness / Material( MatNum ).Conductivity;
 					} else if ( Material( MatNum ).Group == WindowGas || Material( MatNum ).Group == WindowGasMixture ) {
 						// If mixture, use conductivity of first gas in mixture
-						NominalRforNominalUCalculation( ConstrNum ) += Material( MatNum ).Thickness / ( Material( MatNum ).GasCon( 1, 1 ) + Material( MatNum ).GasCon( 1, 2 ) * 300.0 + Material( MatNum ).GasCon( 1, 3 ) * 90000.0 );
+						NominalRforNominalUCalculation( ConstrNum ) += Material( MatNum ).Thickness / ( Material( MatNum ).GasCon( 1, 1 ) + Material( MatNum ).GasCon( 2, 1 ) * 300.0 + Material( MatNum ).GasCon( 3, 1 ) * 90000.0 );
 					}
 				}
 
@@ -7541,7 +7541,7 @@ Label1000: ;
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Illegal value for " + locAlphaFieldNames( 5 ) + " has been found." );
 				ShowContinueError( locAlphaFieldNames( 5 ) + " entered value=\"" + locAlphaArgs( 5 ) + "\" invalid matrix dimensions.  Basis matrix dimension can only be 2 x 1." );
 			}
-			Construct( ConstrNum ).BSDFInput.BasisMat.allocate( NumRows, NumCols );
+			Construct( ConstrNum ).BSDFInput.BasisMat.allocate( NumCols, NumRows );
 			Get2DMatrix( Construct( ConstrNum ).BSDFInput.BasisMatIndex, Construct( ConstrNum ).BSDFInput.BasisMat );
 			if ( Construct( ConstrNum ).BSDFInput.BasisType == BasisType_WINDOW ) CalculateBasisLength( Construct( ConstrNum ).BSDFInput, ConstrNum, Construct( ConstrNum ).BSDFInput.NBasis );
 
@@ -7592,7 +7592,7 @@ Label1000: ;
 					// matrix defines the basis length
 				}
 
-				Construct( ConstrNum ).BSDFInput.SolFrtTrans.allocate( NumRows, NumCols );
+				Construct( ConstrNum ).BSDFInput.SolFrtTrans.allocate( NumCols, NumRows );
 				if ( Construct( ConstrNum ).BSDFInput.SolFrtTransIndex == 0 ) {
 					ErrorsFound = true;
 					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Referenced Matrix:TwoDimension is missing from the input file." );
@@ -7621,7 +7621,7 @@ Label1000: ;
 					ShowContinueError( "Solar bakc reflectance matrix \"" + locAlphaArgs( 7 ) + "\" must have the same number of rows and columns." );
 				}
 
-				Construct( ConstrNum ).BSDFInput.SolBkRefl.allocate( NumRows, NumCols );
+				Construct( ConstrNum ).BSDFInput.SolBkRefl.allocate( NumCols, NumRows );
 				if ( Construct( ConstrNum ).BSDFInput.SolBkReflIndex == 0 ) {
 					ErrorsFound = true;
 					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Referenced Matrix:TwoDimension is missing from the input file." );
@@ -7650,7 +7650,7 @@ Label1000: ;
 					ShowContinueError( "Visible front transmittance matrix \"" + locAlphaArgs( 8 ) + "\" must have the same number of rows and columns." );
 				}
 
-				Construct( ConstrNum ).BSDFInput.VisFrtTrans.allocate( NumRows, NumCols );
+				Construct( ConstrNum ).BSDFInput.VisFrtTrans.allocate( NumCols, NumRows );
 				if ( Construct( ConstrNum ).BSDFInput.VisFrtTransIndex == 0 ) {
 					ErrorsFound = true;
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Referenced Matrix:TwoDimension is missing from the input file." );
@@ -7679,7 +7679,7 @@ Label1000: ;
 					ShowContinueError( "Visible back reflectance \"" + locAlphaArgs( 9 ) + "\" must have the same number of rows and columns." );
 				}
 
-				Construct( ConstrNum ).BSDFInput.VisBkRefl.allocate( NumRows, NumCols );
+				Construct( ConstrNum ).BSDFInput.VisBkRefl.allocate( NumCols, NumRows );
 				if ( Construct( ConstrNum ).BSDFInput.VisBkReflIndex == 0 ) {
 					ErrorsFound = true;
 					ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Referenced Matrix:TwoDimension is missing from the input file." );
@@ -7720,7 +7720,7 @@ Label1000: ;
 						}
 
 						Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).AbsNcols = NumCols;
-						Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).FrtAbs.allocate( NumRows, NumCols );
+						Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).FrtAbs.allocate( NumCols, NumRows );
 						if ( Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).FrtAbsIndex == 0 ) {
 							ErrorsFound = true;
 							ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Referenced Matrix:TwoDimension is missing from the input file." );
@@ -7749,7 +7749,7 @@ Label1000: ;
 							ShowContinueError( "Matrix has " + RoundSigDigits( NumCols ) + " number of columns, while basis definition specifies " + RoundSigDigits( NBasis ) + " number of columns." );
 						}
 
-						Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).BkAbs.allocate( NumRows, NumCols );
+						Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).BkAbs.allocate( NumCols, NumRows );
 						if ( Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).BkAbsIndex == 0 ) {
 							ErrorsFound = true;
 							ShowSevereError( RoutineName + locCurrentModuleObject + "=\"" + locAlphaArgs( 1 ) + ", object. Referenced Matrix:TwoDimension is missing from the input file." );
@@ -7763,7 +7763,7 @@ Label1000: ;
 			} else {
 				//Axisymmetric basis
 				NBasis = Construct( ConstrNum ).BSDFInput.NBasis; //Basis length has already been calculated
-				BSDFTempMtrx.allocate( 1, NBasis );
+				BSDFTempMtrx.allocate( NBasis, 1 );
 
 				// *******************************************************************************
 				// Solar front transmittance
@@ -7795,7 +7795,7 @@ Label1000: ;
 
 					Construct( ConstrNum ).BSDFInput.SolFrtTrans = 0.0;
 					for ( I = 1; I <= NBasis; ++I ) {
-						Construct( ConstrNum ).BSDFInput.SolFrtTrans( I, I ) = BSDFTempMtrx( 1, I );
+						Construct( ConstrNum ).BSDFInput.SolFrtTrans( I, I ) = BSDFTempMtrx( I, 1 );
 					}
 				}
 
@@ -7828,7 +7828,7 @@ Label1000: ;
 					Get2DMatrix( Construct( ConstrNum ).BSDFInput.SolBkReflIndex, BSDFTempMtrx );
 					Construct( ConstrNum ).BSDFInput.SolBkRefl = 0.0;
 					for ( I = 1; I <= NBasis; ++I ) {
-						Construct( ConstrNum ).BSDFInput.SolBkRefl( I, I ) = BSDFTempMtrx( 1, I );
+						Construct( ConstrNum ).BSDFInput.SolBkRefl( I, I ) = BSDFTempMtrx( I, 1 );
 					}
 				}
 
@@ -7861,7 +7861,7 @@ Label1000: ;
 					Get2DMatrix( Construct( ConstrNum ).BSDFInput.VisFrtTransIndex, BSDFTempMtrx );
 					Construct( ConstrNum ).BSDFInput.VisFrtTrans = 0.0;
 					for ( I = 1; I <= NBasis; ++I ) {
-						Construct( ConstrNum ).BSDFInput.VisFrtTrans( I, I ) = BSDFTempMtrx( 1, I );
+						Construct( ConstrNum ).BSDFInput.VisFrtTrans( I, I ) = BSDFTempMtrx( I, 1 );
 					}
 				}
 
@@ -7894,7 +7894,7 @@ Label1000: ;
 					Get2DMatrix( Construct( ConstrNum ).BSDFInput.VisBkReflIndex, BSDFTempMtrx );
 					Construct( ConstrNum ).BSDFInput.VisBkRefl = 0.0;
 					for ( I = 1; I <= NBasis; ++I ) {
-						Construct( ConstrNum ).BSDFInput.VisBkRefl( I, I ) = BSDFTempMtrx( 1, I );
+						Construct( ConstrNum ).BSDFInput.VisBkRefl( I, I ) = BSDFTempMtrx( I, 1 );
 					}
 				}
 
@@ -7939,7 +7939,7 @@ Label1000: ;
 						}
 
 						Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).AbsNcols = NumCols;
-						Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).FrtAbs.allocate( NumRows, NumCols );
+						Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).FrtAbs.allocate( NumCols, NumRows );
 
 						if ( Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).FrtAbsIndex == 0 ) {
 							ErrorsFound = true;
@@ -7969,7 +7969,7 @@ Label1000: ;
 							ShowContinueError( "Matrix has " + RoundSigDigits( NumCols ) + " number of columns, while basis definition specifies " + RoundSigDigits( NBasis ) + " number of columns." );
 						}
 
-						Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).BkAbs.allocate( NumRows, NumCols );
+						Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).BkAbs.allocate( NumCols, NumRows );
 
 						if ( Construct( ConstrNum ).BSDFInput.Layer( currentOpticalLayer ).BkAbsIndex == 0 ) {
 							ErrorsFound = true;

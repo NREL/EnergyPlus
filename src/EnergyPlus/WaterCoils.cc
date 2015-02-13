@@ -3982,7 +3982,7 @@ namespace WaterCoils {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static Array2D< Real64 > OrderedPair( 2, MaxOrderedPairs ); //Tuned Changed to static: Set before use
+		static Array2D< Real64 > OrderedPair( MaxOrderedPairs, 2 ); //Tuned Changed to static: Set before use
 		Real64 FAI;
 		Real64 FED;
 		Real64 FEDnumerator;
@@ -4022,8 +4022,8 @@ namespace WaterCoils {
 				FED = 0.0;
 			}
 			//      FED = RO * (R1I1 * R2K1 - R2I1 * R1K1) / (R2I0 * R1K1 + R1I1 * R2K0)
-			OrderedPair( 1, I ) = FAI;
-			OrderedPair( 2, I ) = FED;
+			OrderedPair( I, 1 ) = FAI;
+			OrderedPair( I, 2 ) = FED;
 		}
 		CalcPolynomCoef( OrderedPair, PolynomCoef );
 	}
@@ -4336,7 +4336,7 @@ namespace WaterCoils {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool Converged;
-		static Array2D< Real64 > OrdPairSum( 2, 10 ); //Tuned Changed to static and whole array zero-initialized
+		static Array2D< Real64 > OrdPairSum( 10, 2 ); //Tuned Changed to static and whole array zero-initialized
 		static Array2D< Real64 > OrdPairSumMatrix( 10, 10 ); //Tuned Changed to static
 		Real64 B;
 		int I;
@@ -4352,70 +4352,70 @@ namespace WaterCoils {
 		OrdPairSum( 1, 1 ) = MaxOrderedPairs;
 		PolynomCoef = 0.0;
 		for ( CurrentOrdPair = 1; CurrentOrdPair <= MaxOrderedPairs; ++CurrentOrdPair ) {
-			OrdPairSum( 1, 2 ) += OrderedPair( 1, CurrentOrdPair );
-			OrdPairSum( 1, 3 ) += OrderedPair( 1, CurrentOrdPair ) * OrderedPair( 1, CurrentOrdPair );
-			OrdPairSum( 2, 1 ) += OrderedPair( 2, CurrentOrdPair );
-			OrdPairSum( 2, 2 ) += OrderedPair( 1, CurrentOrdPair ) * OrderedPair( 2, CurrentOrdPair );
+			OrdPairSum( 2, 1 ) += OrderedPair( CurrentOrdPair, 1 );
+			OrdPairSum( 3, 1 ) += OrderedPair( CurrentOrdPair, 1 ) * OrderedPair( CurrentOrdPair, 1 );
+			OrdPairSum( 1, 2 ) += OrderedPair( CurrentOrdPair, 2 );
+			OrdPairSum( 2, 2 ) += OrderedPair( CurrentOrdPair, 1 ) * OrderedPair( CurrentOrdPair, 2 );
 		}
 		PolynomOrder = 1;
 		Converged = false;
 		while ( ! Converged ) {
 			for ( CurrentOrder = 1; CurrentOrder <= PolynomOrder + 1; ++CurrentOrder ) {
 				for ( J = 1; J <= PolynomOrder + 1; ++J ) {
-					OrdPairSumMatrix( CurrentOrder, J ) = OrdPairSum( 1, J - 1 + CurrentOrder );
+					OrdPairSumMatrix( J, CurrentOrder ) = OrdPairSum( J - 1 + CurrentOrder, 1 );
 				} //End of J loop
-				OrdPairSumMatrix( CurrentOrder, PolynomOrder + 2 ) = OrdPairSum( 2, CurrentOrder );
+				OrdPairSumMatrix( PolynomOrder + 2, CurrentOrder ) = OrdPairSum( CurrentOrder, 2 );
 			} //End of CurrentOrder loop
 
 			for ( CurrentOrder = 1; CurrentOrder <= PolynomOrder + 1; ++CurrentOrder ) {
-				OrdPairSumMatrix( PolynomOrder + 2, CurrentOrder ) = -1.0;
+				OrdPairSumMatrix( CurrentOrder, PolynomOrder + 2 ) = -1.0;
 				for ( J = CurrentOrder + 1; J <= PolynomOrder + 2; ++J ) {
-					OrdPairSumMatrix( PolynomOrder + 2, J ) = 0.0;
+					OrdPairSumMatrix( J, PolynomOrder + 2 ) = 0.0;
 				} //End of J loop
 
 				for ( II = 2; II <= PolynomOrder + 2; ++II ) {
 					for ( J = CurrentOrder + 1; J <= PolynomOrder + 2; ++J ) {
-						OrdPairSumMatrix( II, J ) -= OrdPairSumMatrix( 1, J ) * OrdPairSumMatrix( II, CurrentOrder ) / OrdPairSumMatrix( 1, CurrentOrder );
+						OrdPairSumMatrix( J, II ) -= OrdPairSumMatrix( J, 1 ) * OrdPairSumMatrix( CurrentOrder, II ) / OrdPairSumMatrix( CurrentOrder, 1 );
 					} //End of J loop
 				} //End of II loop
 				for ( II = 1; II <= PolynomOrder + 1; ++II ) {
 					for ( J = CurrentOrder + 1; J <= PolynomOrder + 2; ++J ) {
-						OrdPairSumMatrix( II, J ) = OrdPairSumMatrix( II + 1, J );
+						OrdPairSumMatrix( J, II ) = OrdPairSumMatrix( J, II + 1 );
 					} //End of J loop
 				} //End of II loop
 			} //End of CurrentOrder loop
 
 			S2 = 0.0;
 			for ( CurrentOrdPair = 1; CurrentOrdPair <= MaxOrderedPairs; ++CurrentOrdPair ) {
-				S1 = OrdPairSumMatrix( 1, PolynomOrder + 2 );
-				auto const OrderedPair1C( OrderedPair( 1, CurrentOrdPair ) );
+				S1 = OrdPairSumMatrix( PolynomOrder + 2, 1 );
+				auto const OrderedPair1C( OrderedPair( CurrentOrdPair, 1 ) );
 				auto OrderedPair1C_pow( 1.0 );
 				for ( CurrentOrder = 1; CurrentOrder <= PolynomOrder; ++CurrentOrder ) {
 					OrderedPair1C_pow *= OrderedPair1C;
-					S1 += OrdPairSumMatrix( CurrentOrder + 1, PolynomOrder + 2 ) * OrderedPair1C_pow;
+					S1 += OrdPairSumMatrix( PolynomOrder + 2, CurrentOrder + 1 ) * OrderedPair1C_pow;
 				} //End of CurrentOrder loop
-				S2 += ( S1 - OrderedPair( 2, CurrentOrdPair ) ) * ( S1 - OrderedPair( 2, CurrentOrdPair ) );
+				S2 += ( S1 - OrderedPair( CurrentOrdPair, 2 ) ) * ( S1 - OrderedPair( CurrentOrdPair, 2 ) );
 			} //End of CurrentOrdPair loop
 			B = MaxOrderedPairs - ( PolynomOrder + 1 );
 			if ( S2 > 0.0001 ) S2 = std::sqrt( S2 / B );
 			for ( CurrentOrder = 1; CurrentOrder <= PolynomOrder + 1; ++CurrentOrder ) {
-				PolynomCoef( CurrentOrder ) = OrdPairSumMatrix( CurrentOrder, PolynomOrder + 2 );
+				PolynomCoef( CurrentOrder ) = OrdPairSumMatrix( PolynomOrder + 2, CurrentOrder );
 			} //End of CurrentOrder loop
 
 			if ( ( PolynomOrder - MaxPolynomOrder < 0 ) && ( S2 - PolyConvgTol > 0.0 ) ) {
 				++PolynomOrder;
 				J = 2 * PolynomOrder;
-				OrdPairSum( 1, J ) = OrdPairSum( 1, J + 1 ) = 0.0;
-				auto OrdPairSum2P = OrdPairSum( 2, PolynomOrder + 1 ) = 0.0;
+				OrdPairSum( J, 1 ) = OrdPairSum( J + 1, 1 ) = 0.0;
+				auto OrdPairSum2P = OrdPairSum( PolynomOrder + 1, 2 ) = 0.0;
 				for ( I = 1; I <= MaxOrderedPairs; ++I ) {
-					auto const OrderedPair1I( OrderedPair( 1, I ) );
+					auto const OrderedPair1I( OrderedPair( I, 1 ) );
 					auto OrderedPair_pow( std::pow( OrderedPair1I, J - 1 ) );
-					OrdPairSum( 1, J ) += OrderedPair_pow;
+					OrdPairSum( J, 1 ) += OrderedPair_pow;
 					OrderedPair_pow *= OrderedPair1I;
-					OrdPairSum( 1, J + 1 ) += OrderedPair_pow;
-					OrdPairSum2P += OrderedPair( 2, I ) * std::pow( OrderedPair1I, PolynomOrder );
+					OrdPairSum( J + 1, 1 ) += OrderedPair_pow;
+					OrdPairSum2P += OrderedPair( I, 2 ) * std::pow( OrderedPair1I, PolynomOrder );
 				}
-				OrdPairSum( 2, PolynomOrder + 1 ) = OrdPairSum2P;
+				OrdPairSum( PolynomOrder + 1, 2 ) = OrdPairSum2P;
 			} else {
 				Converged = true;
 			}

@@ -2880,7 +2880,7 @@ namespace LowTempRadiantSystem {
 			if ( ( OperatingMode == CoolingMode ) && ( HydrRadSys( RadSysNum ).CondCtrlType == CondCtrlSimpleOff ) ) {
 
 				for ( RadSurfNum2 = 1; RadSurfNum2 <= HydrRadSys( RadSysNum ).NumOfSurfaces; ++RadSurfNum2 ) {
-					if ( TH( HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ), 1, 2 ) < ( DewPointTemp + HydrRadSys( RadSysNum ).CondDewPtDeltaT ) ) {
+					if ( TH( 2, 1, HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ) < ( DewPointTemp + HydrRadSys( RadSysNum ).CondDewPtDeltaT ) ) {
 						// Condensation warning--must shut off radiant system
 						HydrRadSys( RadSysNum ).CondCausedShutDown = true;
 						WaterMassFlow = 0.0;
@@ -2897,7 +2897,7 @@ namespace LowTempRadiantSystem {
 								ShowWarningMessage( cHydronicSystem + " [" + HydrRadSys( RadSysNum ).Name + ']' );
 								ShowContinueError( "Surface [" + Surface( HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ).Name + "] temperature below dew-point temperature--potential for condensation exists" );
 								ShowContinueError( "Flow to the radiant system will be shut-off to avoid condensation" );
-								ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ), 1, 2 ), 2 ) );
+								ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( 2, 1, HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ), 2 ) );
 								ShowContinueError( "Zone dew-point temperature + safety delta T= " + RoundSigDigits( DewPointTemp + HydrRadSys( RadSysNum ).CondDewPtDeltaT, 2 ) );
 								ShowContinueErrorTimeStamp( "" );
 								ShowContinueError( "Note that a " + RoundSigDigits( HydrRadSys( RadSysNum ).CondDewPtDeltaT, 4 ) + " C safety was chosen in the input for the shut-off criteria" );
@@ -2912,7 +2912,7 @@ namespace LowTempRadiantSystem {
 			} else if ( ( OperatingMode == CoolingMode ) && ( HydrRadSys( RadSysNum ).CondCtrlType == CondCtrlNone ) ) {
 
 				for ( RadSurfNum2 = 1; RadSurfNum2 <= HydrRadSys( RadSysNum ).NumOfSurfaces; ++RadSurfNum2 ) {
-					if ( TH( HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ), 1, 2 ) < DewPointTemp ) {
+					if ( TH( 2, 1, HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ) < DewPointTemp ) {
 						// Condensation occurring but user does not want to shut radiant system off ever
 						HydrRadSys( RadSysNum ).CondCausedShutDown = true;
 					}
@@ -2923,9 +2923,9 @@ namespace LowTempRadiantSystem {
 				LowestRadSurfTemp = 999.9;
 				CondSurfNum = 0;
 				for ( RadSurfNum2 = 1; RadSurfNum2 <= HydrRadSys( RadSysNum ).NumOfSurfaces; ++RadSurfNum2 ) {
-					if ( TH( HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ), 1, 2 ) < ( DewPointTemp + HydrRadSys( RadSysNum ).CondDewPtDeltaT ) ) {
-						if ( TH( HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ), 1, 2 ) < LowestRadSurfTemp ) {
-							LowestRadSurfTemp = TH( HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ), 1, 2 );
+					if ( TH( 2, 1, HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ) < ( DewPointTemp + HydrRadSys( RadSysNum ).CondDewPtDeltaT ) ) {
+						if ( TH( 2, 1, HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ) < LowestRadSurfTemp ) {
+							LowestRadSurfTemp = TH( 2, 1, HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) );
 							CondSurfNum = RadSurfNum2;
 						}
 					}
@@ -2952,7 +2952,7 @@ namespace LowTempRadiantSystem {
 					CalcHeatBalanceInsideSurf( ZoneNum );
 					// Now check all of the surface temperatures.  If any potentially have condensation, leave the system off.
 					for ( RadSurfNum2 = 1; RadSurfNum2 <= HydrRadSys( RadSysNum ).NumOfSurfaces; ++RadSurfNum2 ) {
-						if ( TH( HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ), 1, 2 ) < ( DewPointTemp + HydrRadSys( RadSysNum ).CondDewPtDeltaT ) ) {
+						if ( TH( 2, 1, HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ) < ( DewPointTemp + HydrRadSys( RadSysNum ).CondDewPtDeltaT ) ) {
 							HydrRadSys( RadSysNum ).CondCausedShutDown = true;
 						}
 					}
@@ -2961,7 +2961,7 @@ namespace LowTempRadiantSystem {
 					// flow rate.
 					if ( ! HydrRadSys( RadSysNum ).CondCausedShutDown ) {
 						PredictedCondTemp = DewPointTemp + HydrRadSys( RadSysNum ).CondDewPtDeltaT;
-						ZeroFlowSurfTemp = TH( HydrRadSys( RadSysNum ).SurfacePtr( CondSurfNum ), 1, 2 );
+						ZeroFlowSurfTemp = TH( 2, 1, HydrRadSys( RadSysNum ).SurfacePtr( CondSurfNum ) );
 						ReductionFrac = ( ZeroFlowSurfTemp - PredictedCondTemp ) / std::abs( ZeroFlowSurfTemp - LowestRadSurfTemp );
 						if ( ReductionFrac < 0.0 ) ReductionFrac = 0.0; // Shouldn't happen as the above check should have screened this out
 						if ( ReductionFrac > 1.0 ) ReductionFrac = 1.0; // Shouldn't happen either because condensation doesn't exist then
@@ -3005,7 +3005,7 @@ namespace LowTempRadiantSystem {
 						// condensation, shut things down and be done.
 						for ( RadSurfNum2 = 1; RadSurfNum2 <= HydrRadSys( RadSysNum ).NumOfSurfaces; ++RadSurfNum2 ) {
 							if ( HydrRadSys( RadSysNum ).CondCausedShutDown ) break;
-							if ( TH( HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ), 1, 2 ) < ( PredictedCondTemp ) ) {
+							if ( TH( 2, 1, HydrRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ) < ( PredictedCondTemp ) ) {
 								// Condensation still present--must shut off radiant system
 								HydrRadSys( RadSysNum ).CondCausedShutDown = true;
 								WaterMassFlow = 0.0;
@@ -3029,7 +3029,7 @@ namespace LowTempRadiantSystem {
 								ShowWarningMessage( cHydronicSystem + " [" + HydrRadSys( RadSysNum ).Name + ']' );
 								ShowContinueError( "Surface [" + Surface( HydrRadSys( RadSysNum ).SurfacePtr( CondSurfNum ) ).Name + "] temperature below dew-point temperature--potential for condensation exists" );
 								ShowContinueError( "Flow to the radiant system will be shut-off to avoid condensation" );
-								ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( HydrRadSys( RadSysNum ).SurfacePtr( CondSurfNum ), 1, 2 ), 2 ) );
+								ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( 2, 1, HydrRadSys( RadSysNum ).SurfacePtr( CondSurfNum ) ), 2 ) );
 								ShowContinueError( "Zone dew-point temperature + safety delta T= " + RoundSigDigits( DewPointTemp + HydrRadSys( RadSysNum ).CondDewPtDeltaT, 2 ) );
 								ShowContinueErrorTimeStamp( "" );
 								ShowContinueError( "Note that a " + RoundSigDigits( HydrRadSys( RadSysNum ).CondDewPtDeltaT, 4 ) + " C safety was chosen in the input for the shut-off criteria" );
@@ -3927,7 +3927,7 @@ namespace LowTempRadiantSystem {
 			if ( ( OperatingMode == CoolingMode ) && ( CFloRadSys( RadSysNum ).CondCtrlType == CondCtrlSimpleOff ) ) {
 
 				for ( RadSurfNum2 = 1; RadSurfNum2 <= CFloRadSys( RadSysNum ).NumOfSurfaces; ++RadSurfNum2 ) {
-					if ( TH( CFloRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ), 1, 2 ) < ( DewPointTemp + CFloRadSys( RadSysNum ).CondDewPtDeltaT ) ) {
+					if ( TH( 2, 1, CFloRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ) < ( DewPointTemp + CFloRadSys( RadSysNum ).CondDewPtDeltaT ) ) {
 						// Condensation warning--must shut off radiant system
 						CFloRadSys( RadSysNum ).CondCausedShutDown = true;
 						WaterMassFlow = 0.0;
@@ -3944,7 +3944,7 @@ namespace LowTempRadiantSystem {
 								ShowWarningMessage( cConstantFlowSystem + " [" + CFloRadSys( RadSysNum ).Name + ']' );
 								ShowContinueError( "Surface [" + Surface( CFloRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ).Name + "] temperature below dew-point temperature--potential for condensation exists" );
 								ShowContinueError( "Flow to the radiant system will be shut-off to avoid condensation" );
-								ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( CFloRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ), 1, 2 ), 2 ) );
+								ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( 2, 1, CFloRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ), 2 ) );
 								ShowContinueError( "Zone dew-point temperature + safety delta T= " + RoundSigDigits( DewPointTemp + CFloRadSys( RadSysNum ).CondDewPtDeltaT, 2 ) );
 								ShowContinueErrorTimeStamp( "" );
 								ShowContinueError( "Note that a " + RoundSigDigits( CFloRadSys( RadSysNum ).CondDewPtDeltaT, 4 ) + " C safety was chosen in the input for the shut-off criteria" );
@@ -3959,7 +3959,7 @@ namespace LowTempRadiantSystem {
 			} else if ( ( OperatingMode == CoolingMode ) && ( CFloRadSys( RadSysNum ).CondCtrlType == CondCtrlNone ) ) {
 
 				for ( RadSurfNum2 = 1; RadSurfNum2 <= CFloRadSys( RadSysNum ).NumOfSurfaces; ++RadSurfNum2 ) {
-					if ( TH( CFloRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ), 1, 2 ) < DewPointTemp ) {
+					if ( TH( 2, 1, CFloRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ) < DewPointTemp ) {
 						// Condensation occurring but user does not want to shut radiant system off ever
 						CFloRadSys( RadSysNum ).CondCausedShutDown = true;
 					}
@@ -3968,7 +3968,7 @@ namespace LowTempRadiantSystem {
 			} else if ( ( OperatingMode == CoolingMode ) && ( CFloRadSys( RadSysNum ).CondCtrlType == CondCtrlVariedOff ) ) {
 
 				for ( RadSurfNum2 = 1; RadSurfNum2 <= CFloRadSys( RadSysNum ).NumOfSurfaces; ++RadSurfNum2 ) {
-					if ( TH( CFloRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ), 1, 2 ) < ( DewPointTemp + CFloRadSys( RadSysNum ).CondDewPtDeltaT ) ) {
+					if ( TH( 2, 1, CFloRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ) < ( DewPointTemp + CFloRadSys( RadSysNum ).CondDewPtDeltaT ) ) {
 						VarOffCond = true;
 						if ( CFloCondIterNum >= 2 ) {
 							// We have already iterated once so now we must shut off radiant system
@@ -3987,7 +3987,7 @@ namespace LowTempRadiantSystem {
 									ShowWarningMessage( cConstantFlowSystem + " [" + CFloRadSys( RadSysNum ).Name + ']' );
 									ShowContinueError( "Surface [" + Surface( CFloRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ).Name + "] temperature below dew-point temperature--potential for condensation exists" );
 									ShowContinueError( "Flow to the radiant system will be shut-off to avoid condensation" );
-									ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( CFloRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ), 1, 2 ), 2 ) );
+									ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( 2, 1, CFloRadSys( RadSysNum ).SurfacePtr( RadSurfNum2 ) ), 2 ) );
 									ShowContinueError( "Zone dew-point temperature + safety delta T= " + RoundSigDigits( DewPointTemp + CFloRadSys( RadSysNum ).CondDewPtDeltaT, 2 ) );
 									ShowContinueErrorTimeStamp( "" );
 									ShowContinueError( "Note that a " + RoundSigDigits( CFloRadSys( RadSysNum ).CondDewPtDeltaT, 4 ) + " C safety was chosen in the input for the shut-off criteria" );

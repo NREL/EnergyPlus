@@ -175,7 +175,7 @@ namespace OutputProcessor {
 	Array1D_int ReportList;
 	int NumReportList( 0 );
 	int NumExtraVars( 0 );
-	Array2D_string FreqNotice( {-1,4}, {1,2} ); // =(/'! Each Call','! TimeStep',' !Hourly',',Daily',',Monthly',',Environment'/)
+	Array2D_string FreqNotice( {1,2}, {-1,4} ); // =(/'! Each Call','! TimeStep',' !Hourly',',Daily',',Monthly',',Environment'/)
 
 	int NumOfReqVariables( 0 ); // Current number of Requested Report Variables
 
@@ -291,18 +291,18 @@ namespace OutputProcessor {
 		// First index is the frequency designation (-1 = each call, etc)
 		// Second index is the variable type (1=Average, 2=Sum)
 		// Note, Meters always report like Average (with min/max, etc) for hourly and above
-		FreqNotice( -1, 1 ) = " !Each Call";
-		FreqNotice( 0, 1 ) = " !TimeStep";
+		FreqNotice( 1, -1 ) = " !Each Call";
+		FreqNotice( 1, 0 ) = " !TimeStep";
 		FreqNotice( 1, 1 ) = " !Hourly";
-		FreqNotice( 2, 1 ) = " !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]";
-		FreqNotice( 3, 1 ) = " !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]";
-		FreqNotice( 4, 1 ) = " !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]";
-		FreqNotice( -1, 2 ) = " !Each Call";
-		FreqNotice( 0, 2 ) = " !TimeStep";
-		FreqNotice( 1, 2 ) = " !Hourly";
+		FreqNotice( 1, 2 ) = " !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]";
+		FreqNotice( 1, 3 ) = " !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]";
+		FreqNotice( 1, 4 ) = " !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]";
+		FreqNotice( 2, -1 ) = " !Each Call";
+		FreqNotice( 2, 0 ) = " !TimeStep";
+		FreqNotice( 2, 1 ) = " !Hourly";
 		FreqNotice( 2, 2 ) = " !Daily  [Value,Min,Hour,Minute,Max,Hour,Minute]";
-		FreqNotice( 3, 2 ) = " !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]";
-		FreqNotice( 4, 2 ) = " !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]";
+		FreqNotice( 2, 3 ) = " !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]";
+		FreqNotice( 2, 4 ) = " !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]";
 
 		ReportList.allocate( 500 );
 		NumReportList = 500;
@@ -747,7 +747,7 @@ namespace OutputProcessor {
 			DetermineFrequency( cMinReportFrequency, Item ); // Use local variable Item so as not to possibly confuse things
 			MinReportFrequency = max( MinReportFrequency, Item );
 			gio::write( OutputFileInits, Format_800 );
-			gio::write( OutputFileInits, Format_801 ) << FreqNotice( MinReportFrequency, 1 ) << cMinReportFrequency;
+			gio::write( OutputFileInits, Format_801 ) << FreqNotice( 1, MinReportFrequency ) << cMinReportFrequency;
 		}
 
 		cCurrentModuleObject = "Output:Variable";
@@ -3849,7 +3849,7 @@ namespace OutputProcessor {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string FreqString;
 
-		FreqString = FreqNotice( reportingInterval, storeType );
+		FreqString = FreqNotice( storeType, reportingInterval );
 
 		if ( present( ScheduleName ) ) {
 			FreqString += "," + ScheduleName;
@@ -3928,7 +3928,7 @@ namespace OutputProcessor {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string::size_type lenString;
 
-		std::string const FreqString( FreqNotice( reportingInterval, storeType ) );
+		std::string const FreqString( FreqNotice( storeType, reportingInterval ) );
 
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) || ( reportingInterval == ReportHourly ) ) { // -1, 0, 1
 			if ( ! cumulativeMeterFlag ) {

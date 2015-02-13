@@ -902,7 +902,7 @@ namespace RefrigeratedCase {
 		if ( NumCompressorLists > 0 ) CompressorLists.allocate( NumCompressorLists );
 		if ( NumSimulationTransferLoadLists > 0 ) TransferLoadList.allocate( NumSimulationTransferLoadLists );
 
-		DayValues.allocate( 24, NumOfTimeStepInHour );
+		DayValues.allocate( NumOfTimeStepInHour, 24 );
 		RefrigPresentInZone.dimension( NumOfZones, false );
 
 		GetObjectDefMaxArgs( "Refrigeration:Case", MaxNumArgs, MaxNumAlphasCase, MaxNumNumbersCase );
@@ -1284,7 +1284,7 @@ namespace RefrigeratedCase {
 				GetScheduleValuesForDay( RefrigCase( CaseNum ).DefrostSchedPtr, DayValues, 1 );
 				for ( HRNum = 1; HRNum <= 24; ++HRNum ) {
 					for ( TSNum = 1; TSNum <= NumOfTimeStepInHour; ++TSNum ) {
-						if ( DayValues( HRNum, TSNum ) > 0.0 ) {
+						if ( DayValues( TSNum, HRNum ) > 0.0 ) {
 							if ( ! StartCycle ) {
 								++NumDefCycles;
 								StartCycle = true;

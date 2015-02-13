@@ -1895,7 +1895,7 @@ void SQLite::createSQLiteDaylightMap(
 				sqliteBindForeignKey(m_daylightMapHourlyDataInsertStmt, 2, hourlyReportIndex);
 				sqliteBindDouble(m_daylightMapHourlyDataInsertStmt, 3, x(xIndex));
 				sqliteBindDouble(m_daylightMapHourlyDataInsertStmt, 4, y(yIndex));
-				sqliteBindDouble(m_daylightMapHourlyDataInsertStmt, 5, illuminance(xIndex, yIndex));
+				sqliteBindDouble(m_daylightMapHourlyDataInsertStmt, 5, illuminance(yIndex, xIndex));
 
 				sqliteStepCommand(m_daylightMapHourlyDataInsertStmt);
 				sqliteResetCommand(m_daylightMapHourlyDataInsertStmt);

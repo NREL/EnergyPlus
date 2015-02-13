@@ -769,7 +769,6 @@ namespace OutputReportTabular {
 	void
 	GetInputTabularStyle();
 
-
 	int
 	SetUnitsStyleFromString( std::string const & unitStringIn );
 

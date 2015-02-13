@@ -120,9 +120,9 @@ namespace WindowManager {
 	Real64 Outir; // IR radiance of window's exterior surround (W/m2)
 	Real64 Rmir; // IR radiance of window's interior surround (W/m2)
 	Real64 Rtot; // Total thermal resistance of window (m2-K/W)
-	Array3D< Real64 > gcon( 5, 5, 3, 0.0 ); // Gas thermal conductivity coefficients for each gap
-	Array3D< Real64 > gvis( 5, 5, 3, 0.0 ); // Gas viscosity coefficients for each gap
-	Array3D< Real64 > gcp( 5, 5, 3, 0.0 ); // Gas specific-heat coefficients for each gap
+	Array3D< Real64 > gcon( 3, 5, 5, 0.0 ); // Gas thermal conductivity coefficients for each gap
+	Array3D< Real64 > gvis( 3, 5, 5, 0.0 ); // Gas viscosity coefficients for each gap
+	Array3D< Real64 > gcp( 3, 5, 5, 0.0 ); // Gas specific-heat coefficients for each gap
 	Array2D< Real64 > gwght( 5, 5, 0.0 ); // Gas molecular weights for each gap
 	Array2D< Real64 > gfract( 5, 5, 0.0 ); // Gas fractions for each gap
 	Array1D_int gnmix( 5, 0 ); // Number of gases in gap
@@ -147,8 +147,8 @@ namespace WindowManager {
 	//   residuals wrt temperature
 	Array1D< Real64 > qf( 10, 0.0 ); // IR heat flux at each face [W/m2]
 	Array1D< Real64 > hf( 10, 0.0 ); // Component of convective flux at each face
-	Array2D< Real64 > der( 10, 5, 0.0 ); // Derivative of IR sources wrt surface temperature
-	Array2D< Real64 > dhf( 10, 5, 0.0 ); // Derivative of heat flux wrt surface temperature
+	Array2D< Real64 > der( 5, 10, 0.0 ); // Derivative of IR sources wrt surface temperature
+	Array2D< Real64 > dhf( 5, 10, 0.0 ); // Derivative of heat flux wrt surface temperature
 	Array1D< Real64 > sour( 10, 0.0 ); // IR source term at each face [W/m2]
 	Array1D< Real64 > delta( 5, 0.0 ); // Residual at each glass layer [W/m2]
 	Array1D< Real64 > hcgap( 5, 0.0 ); // Convective gap conductance
@@ -168,23 +168,23 @@ namespace WindowManager {
 	Real64 A45;
 	Real64 A67;
 
-	Array2D< Real64 > wlt( MaxSpectralDataElements, 5, 0.0 ); // Spectral data wavelengths for each glass layer in a glazing system
+	Array2D< Real64 > wlt( 5, MaxSpectralDataElements, 0.0 ); // Spectral data wavelengths for each glass layer in a glazing system
 	// Following data, Spectral data for each layer for each wavelength in wlt
-	Array2D< Real64 > t( MaxSpectralDataElements, 5, 0.0 ); // normal transmittance
-	Array2D< Real64 > rff( MaxSpectralDataElements, 5, 0.0 ); // normal front reflectance
-	Array2D< Real64 > rbb( MaxSpectralDataElements, 5, 0.0 ); // normal back reflectance
-	Array2D< Real64 > tPhi( MaxSpectralDataElements, 5, 0.0 ); // transmittance at angle of incidence
-	Array2D< Real64 > rfPhi( MaxSpectralDataElements, 5, 0.0 ); // front reflectance at angle of incidence
-	Array2D< Real64 > rbPhi( MaxSpectralDataElements, 5, 0.0 ); // back reflectance at angle of incidence
-	Array2D< Real64 > tadjPhi( MaxSpectralDataElements, 5, 0.0 ); // transmittance at angle of incidence
-	Array2D< Real64 > rfadjPhi( MaxSpectralDataElements, 5, 0.0 ); // front reflectance at angle of incidence
-	Array2D< Real64 > rbadjPhi( MaxSpectralDataElements, 5, 0.0 ); // back reflectance at angle of incidence
+	Array2D< Real64 > t( 5, MaxSpectralDataElements, 0.0 ); // normal transmittance
+	Array2D< Real64 > rff( 5, MaxSpectralDataElements, 0.0 ); // normal front reflectance
+	Array2D< Real64 > rbb( 5, MaxSpectralDataElements, 0.0 ); // normal back reflectance
+	Array2D< Real64 > tPhi( 5, MaxSpectralDataElements, 0.0 ); // transmittance at angle of incidence
+	Array2D< Real64 > rfPhi( 5, MaxSpectralDataElements, 0.0 ); // front reflectance at angle of incidence
+	Array2D< Real64 > rbPhi( 5, MaxSpectralDataElements, 0.0 ); // back reflectance at angle of incidence
+	Array2D< Real64 > tadjPhi( 5, MaxSpectralDataElements, 0.0 ); // transmittance at angle of incidence
+	Array2D< Real64 > rfadjPhi( 5, MaxSpectralDataElements, 0.0 ); // front reflectance at angle of incidence
+	Array2D< Real64 > rbadjPhi( 5, MaxSpectralDataElements, 0.0 ); // back reflectance at angle of incidence
 
 	Array1D_int numpt( 5, 0 ); // Number of spectral data wavelengths for each layer; =2 if no spectra data for a layer
 	Array1D< Real64 > stPhi( nume, 0.0 ); // Glazing system transmittance at angle of incidence for each wavelength in wle
 	Array1D< Real64 > srfPhi( nume, 0.0 ); // Glazing system front reflectance at angle of incidence for each wavelength in wle
 	Array1D< Real64 > srbPhi( nume, 0.0 ); // Glazing system back reflectance at angle of incidence for each wavelenth in wle
-	Array2D< Real64 > saPhi( nume, 5, 0.0 ); // For each layer, glazing system absorptance at angle of incidence
+	Array2D< Real64 > saPhi( 5, nume, 0.0 ); // For each layer, glazing system absorptance at angle of incidence
 	// for each wavelenth in wle
 	Array2D< Real64 > top( 5, 5, 0.0 ); // Transmittance matrix for subr. op
 	Array2D< Real64 > rfop( 5, 5, 0.0 ); // Front reflectance matrix for subr. op
@@ -195,8 +195,8 @@ namespace WindowManager {
 	Array1D< Real64 > tsolPhi( 10, 0.0 ); // Glazing system solar transmittance for each angle of incidence
 	Array1D< Real64 > rfsolPhi( 10, 0.0 ); // Glazing system solar front reflectance for each angle of incidence
 	Array1D< Real64 > rbsolPhi( 10, 0.0 ); // Glazing system solar back reflectance for each angle of incidence
-	Array2D< Real64 > solabsPhi( 10, 5, 0.0 ); // Glazing system solar absorptance for each angle of incidence
-	Array2D< Real64 > solabsBackPhi( 10, 5, 0.0 ); // Glazing system back solar absorptance for each angle of incidence
+	Array2D< Real64 > solabsPhi( 5, 10, 0.0 ); // Glazing system solar absorptance for each angle of incidence
+	Array2D< Real64 > solabsBackPhi( 5, 10, 0.0 ); // Glazing system back solar absorptance for each angle of incidence
 	Array1D< Real64 > solabsShadePhi( 10, 0.0 ); // Glazing system interior shade solar absorptance for each angle of incidence
 	Array1D< Real64 > tvisPhi( 10, 0.0 ); // Glazing system visible transmittance for each angle of incidence
 	Array1D< Real64 > rfvisPhi( 10, 0.0 ); // Glazing system visible front reflectance for each angle of incidence
@@ -284,21 +284,21 @@ namespace WindowManager {
 		Array1D< Real64 > solabsPhiLay( 10 ); // Glazing system solar absorptance for a layer at each incidence angle
 		Array1D< Real64 > tsolPhiFit( 10 ); // Glazing system solar transmittance from fit at each incidence angle
 		Array1D< Real64 > tvisPhiFit( 10 ); // Glazing system visible transmittance from fit at each incidence angle
-		Array2D< Real64 > tBareSolPhi( 10, 5 ); // Isolated glass solar transmittance for each incidence angle
+		Array2D< Real64 > tBareSolPhi( 5, 10 ); // Isolated glass solar transmittance for each incidence angle
 		Real64 t1; // = tBareSolPhi(,1)(,2)
 		Real64 t2;
-		Array2D< Real64 > tBareVisPhi( 10, 5 ); // Isolated glass visible transmittance for each incidence angle
+		Array2D< Real64 > tBareVisPhi( 5, 10 ); // Isolated glass visible transmittance for each incidence angle
 		Real64 t1v; // = tBareVisPhi(,1)(,2)
 		Real64 t2v;
-		Array2D< Real64 > rfBareSolPhi( 10, 5 ); // Isolated glass front solar reflectance for each incidence angle
-		Array2D< Real64 > rfBareVisPhi( 10, 5 ); // Isolated glass front visible reflectance for each incidence angle
-		Array2D< Real64 > rbBareSolPhi( 10, 5 ); // Isolated glass back solar reflectance for each incidence angle
-		Array2D< Real64 > rbBareVisPhi( 10, 5 ); // Isolated glass back visible reflectance for each incidence angle
-		Array2D< Real64 > afBareSolPhi( 10, 5 ); // Isolated glass front solar absorptance for each incidence angle
+		Array2D< Real64 > rfBareSolPhi( 5, 10 ); // Isolated glass front solar reflectance for each incidence angle
+		Array2D< Real64 > rfBareVisPhi( 5, 10 ); // Isolated glass front visible reflectance for each incidence angle
+		Array2D< Real64 > rbBareSolPhi( 5, 10 ); // Isolated glass back solar reflectance for each incidence angle
+		Array2D< Real64 > rbBareVisPhi( 5, 10 ); // Isolated glass back visible reflectance for each incidence angle
+		Array2D< Real64 > afBareSolPhi( 5, 10 ); // Isolated glass front solar absorptance for each incidence angle
 		Real64 af1; // = afBareSolPhi(,1)(,2)
 		Real64 af2;
 		Real64 rbmf2; // Isolated glass #2 front beam reflectance
-		Array2D< Real64 > abBareSolPhi( 10, 5 ); // Isolated glass back solar absorptance for each incidence angle
+		Array2D< Real64 > abBareSolPhi( 5, 10 ); // Isolated glass back solar absorptance for each incidence angle
 		Real64 ab1; // = abBareSolPhi(,1)(,2)
 		Real64 ab2;
 		Real64 td1; // Isolated glass diffuse solar transmittance
@@ -401,8 +401,8 @@ namespace WindowManager {
 		static Array1D< Real64 > DbgTSol( 11, 0.0 );
 		static Array1D< Real64 > DbgRbSol( 11, 0.0 );
 		static Array1D< Real64 > DbgTVis( 11, 0.0 );
-		static Array2D< Real64 > DbgFtAbs( 11, 5, 0.0 );
-		static Array2D< Real64 > DbgBkAbs( 11, 5, 0.0 );
+		static Array2D< Real64 > DbgFtAbs( 5, 11, 0.0 );
+		static Array2D< Real64 > DbgBkAbs( 5, 11, 0.0 );
 		static Real64 DbgTSolDiff( 0.0 );
 		static Real64 DbgRBSolDiff( 0.0 );
 		static Array1D< Real64 > DbgFTAbsDiff( 5, 0.0 );
@@ -578,11 +578,11 @@ namespace WindowManager {
 					numpt( IGlass ) = numptDAT;
 
 					for ( ILam = 1; ILam <= numptDAT; ++ILam ) {
-						wlt( ILam, IGlass ) = SpectralData( SpecDataNum ).WaveLength( ILam );
-						t( ILam, IGlass ) = SpectralData( SpecDataNum ).Trans( ILam );
-						if ( ( IGlass == 1 || ( IGlass == 2 && StormWinConst ) ) && ( ! BGFlag ) ) t( ILam, IGlass ) *= Material( LayPtr ).GlassTransDirtFactor;
-						rff( ILam, IGlass ) = SpectralData( SpecDataNum ).ReflFront( ILam );
-						rbb( ILam, IGlass ) = SpectralData( SpecDataNum ).ReflBack( ILam );
+						wlt( IGlass, ILam ) = SpectralData( SpecDataNum ).WaveLength( ILam );
+						t( IGlass, ILam ) = SpectralData( SpecDataNum ).Trans( ILam );
+						if ( ( IGlass == 1 || ( IGlass == 2 && StormWinConst ) ) && ( ! BGFlag ) ) t( IGlass, ILam ) *= Material( LayPtr ).GlassTransDirtFactor;
+						rff( IGlass, ILam ) = SpectralData( SpecDataNum ).ReflFront( ILam );
+						rbb( IGlass, ILam ) = SpectralData( SpecDataNum ).ReflBack( ILam );
 					}
 
 					// TH 8/26/2010, CR 8206
@@ -620,14 +620,14 @@ namespace WindowManager {
 				if ( SpecDataNum == 0 ) { // No spectral data for this layer; use spectral average values
 					lquasi = true;
 					numpt( IGlass ) = 2;
-					t( 1, IGlass ) = Material( LayPtr ).Trans;
-					if ( IGlass == 1 || ( IGlass == 2 && StormWinConst ) ) t( 1, IGlass ) *= Material( LayPtr ).GlassTransDirtFactor;
-					t( 2, IGlass ) = Material( LayPtr ).TransVis;
-					if ( IGlass == 1 || ( IGlass == 2 && StormWinConst ) ) t( 2, IGlass ) *= Material( LayPtr ).GlassTransDirtFactor;
-					rff( 1, IGlass ) = Material( LayPtr ).ReflectSolBeamFront;
-					rbb( 1, IGlass ) = Material( LayPtr ).ReflectSolBeamBack;
-					rff( 2, IGlass ) = Material( LayPtr ).ReflectVisBeamFront;
-					rbb( 2, IGlass ) = Material( LayPtr ).ReflectVisBeamBack;
+					t( IGlass, 1 ) = Material( LayPtr ).Trans;
+					if ( IGlass == 1 || ( IGlass == 2 && StormWinConst ) ) t( IGlass, 1 ) *= Material( LayPtr ).GlassTransDirtFactor;
+					t( IGlass, 2 ) = Material( LayPtr ).TransVis;
+					if ( IGlass == 1 || ( IGlass == 2 && StormWinConst ) ) t( IGlass, 2 ) *= Material( LayPtr ).GlassTransDirtFactor;
+					rff( IGlass, 1 ) = Material( LayPtr ).ReflectSolBeamFront;
+					rbb( IGlass, 1 ) = Material( LayPtr ).ReflectSolBeamBack;
+					rff( IGlass, 2 ) = Material( LayPtr ).ReflectVisBeamFront;
+					rbb( IGlass, 2 ) = Material( LayPtr ).ReflectVisBeamBack;
 				}
 			} // End of loop over glass layers in the construction for front calculation
 
@@ -645,21 +645,21 @@ namespace WindowManager {
 				for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
 					for ( ILam = 1; ILam <= numpt( IGlass ); ++ILam ) {
 
-						TransAndReflAtPhi( CosPhi, t( ILam, IGlass ), rff( ILam, IGlass ), rbb( ILam, IGlass ), tPhi( ILam, IGlass ), rfPhi( ILam, IGlass ), rbPhi( ILam, IGlass ), lSimpleGlazingSystem, SimpleGlazingSHGC, SimpleGlazingU );
+						TransAndReflAtPhi( CosPhi, t( IGlass, ILam ), rff( IGlass, ILam ), rbb( IGlass, ILam ), tPhi( IGlass, ILam ), rfPhi( IGlass, ILam ), rbPhi( IGlass, ILam ), lSimpleGlazingSystem, SimpleGlazingSHGC, SimpleGlazingU );
 					}
 
 					// For use with between-glass shade/blind, save angular properties of isolated glass
 					// for case that all glass layers were input with spectral-average properties
 					//  only used by between-glass shades or blinds
 					if ( AllGlassIsSpectralAverage ) {
-						tBareSolPhi( IPhi, IGlass ) = tPhi( 1, IGlass );
-						tBareVisPhi( IPhi, IGlass ) = tPhi( 2, IGlass );
-						rfBareSolPhi( IPhi, IGlass ) = rfPhi( 1, IGlass );
-						rfBareVisPhi( IPhi, IGlass ) = rfPhi( 2, IGlass );
-						rbBareSolPhi( IPhi, IGlass ) = rbPhi( 1, IGlass );
-						rbBareVisPhi( IPhi, IGlass ) = rbPhi( 2, IGlass );
-						afBareSolPhi( IPhi, IGlass ) = max( 0.0, 1.0 - ( tBareSolPhi( IPhi, IGlass ) + rfBareSolPhi( IPhi, IGlass ) ) );
-						abBareSolPhi( IPhi, IGlass ) = max( 0.0, 1.0 - ( tBareSolPhi( IPhi, IGlass ) + rbBareSolPhi( IPhi, IGlass ) ) );
+						tBareSolPhi( IGlass, IPhi ) = tPhi( IGlass, 1 );
+						tBareVisPhi( IGlass, IPhi ) = tPhi( IGlass, 2 );
+						rfBareSolPhi( IGlass, IPhi ) = rfPhi( IGlass, 1 );
+						rfBareVisPhi( IGlass, IPhi ) = rfPhi( IGlass, 2 );
+						rbBareSolPhi( IGlass, IPhi ) = rbPhi( IGlass, 1 );
+						rbBareVisPhi( IGlass, IPhi ) = rbPhi( IGlass, 2 );
+						afBareSolPhi( IGlass, IPhi ) = max( 0.0, 1.0 - ( tBareSolPhi( IGlass, IPhi ) + rfBareSolPhi( IGlass, IPhi ) ) );
+						abBareSolPhi( IGlass, IPhi ) = max( 0.0, 1.0 - ( tBareSolPhi( IGlass, IPhi ) + rbBareSolPhi( IGlass, IPhi ) ) );
 					}
 				}
 
@@ -677,9 +677,9 @@ namespace WindowManager {
 
 				for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
 					for ( ILam = 1; ILam <= nume; ++ILam ) {
-						sabsPhi( ILam ) = saPhi( ILam, IGlass );
+						sabsPhi( ILam ) = saPhi( IGlass, ILam );
 					}
-					SolarSprectrumAverage( sabsPhi, solabsPhi( IPhi, IGlass ) );
+					SolarSprectrumAverage( sabsPhi, solabsPhi( IGlass, IPhi ) );
 				}
 
 				// Get visible properties of system by integrating over solar irradiance
@@ -699,14 +699,14 @@ namespace WindowManager {
 			//  only used by between-glass shades or blinds
 			if ( AllGlassIsSpectralAverage ) {
 				for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
-					W5LsqFit( CosPhiIndepVar, tBareSolPhi( _, IGlass ), 6, 1, 10, Construct( ConstrNum ).tBareSolCoef( IGlass, _ ) );
-					W5LsqFit( CosPhiIndepVar, tBareVisPhi( _, IGlass ), 6, 1, 10, Construct( ConstrNum ).tBareVisCoef( IGlass, _ ) );
-					W5LsqFit( CosPhiIndepVar, rfBareSolPhi( _, IGlass ), 6, 1, 10, Construct( ConstrNum ).rfBareSolCoef( IGlass, _ ) );
-					W5LsqFit( CosPhiIndepVar, rfBareVisPhi( _, IGlass ), 6, 1, 10, Construct( ConstrNum ).rfBareVisCoef( IGlass, _ ) );
-					W5LsqFit( CosPhiIndepVar, rbBareSolPhi( _, IGlass ), 6, 1, 10, Construct( ConstrNum ).rbBareSolCoef( IGlass, _ ) );
-					W5LsqFit( CosPhiIndepVar, rbBareVisPhi( _, IGlass ), 6, 1, 10, Construct( ConstrNum ).rbBareVisCoef( IGlass, _ ) );
-					W5LsqFit( CosPhiIndepVar, afBareSolPhi( _, IGlass ), 6, 1, 10, Construct( ConstrNum ).afBareSolCoef( IGlass, _ ) );
-					W5LsqFit( CosPhiIndepVar, abBareSolPhi( _, IGlass ), 6, 1, 10, Construct( ConstrNum ).abBareSolCoef( IGlass, _ ) );
+					W5LsqFit( CosPhiIndepVar, tBareSolPhi( IGlass, _ ), 6, 1, 10, Construct( ConstrNum ).tBareSolCoef( _, IGlass ) );
+					W5LsqFit( CosPhiIndepVar, tBareVisPhi( IGlass, _ ), 6, 1, 10, Construct( ConstrNum ).tBareVisCoef( _, IGlass ) );
+					W5LsqFit( CosPhiIndepVar, rfBareSolPhi( IGlass, _ ), 6, 1, 10, Construct( ConstrNum ).rfBareSolCoef( _, IGlass ) );
+					W5LsqFit( CosPhiIndepVar, rfBareVisPhi( IGlass, _ ), 6, 1, 10, Construct( ConstrNum ).rfBareVisCoef( _, IGlass ) );
+					W5LsqFit( CosPhiIndepVar, rbBareSolPhi( IGlass, _ ), 6, 1, 10, Construct( ConstrNum ).rbBareSolCoef( _, IGlass ) );
+					W5LsqFit( CosPhiIndepVar, rbBareVisPhi( IGlass, _ ), 6, 1, 10, Construct( ConstrNum ).rbBareVisCoef( _, IGlass ) );
+					W5LsqFit( CosPhiIndepVar, afBareSolPhi( IGlass, _ ), 6, 1, 10, Construct( ConstrNum ).afBareSolCoef( _, IGlass ) );
+					W5LsqFit( CosPhiIndepVar, abBareSolPhi( IGlass, _ ), 6, 1, 10, Construct( ConstrNum ).abBareSolCoef( _, IGlass ) );
 				}
 			}
 
@@ -720,7 +720,7 @@ namespace WindowManager {
 			Construct( ConstrNum ).TransDiff = tsolDiff;
 			Construct( ConstrNum ).TransDiffVis = tvisDiff;
 			for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
-				solabsPhiLay( {1,10} ) = solabsPhi( {1,10}, IGlass );
+				solabsPhiLay( {1,10} ) = solabsPhi( IGlass, {1,10} );
 				solabsDiff( IGlass ) = DiffuseAverage( solabsPhiLay );
 				Construct( ConstrNum ).AbsDiff( IGlass ) = solabsDiff( IGlass );
 
@@ -728,12 +728,12 @@ namespace WindowManager {
 				// all glass layers were input with spectral-average properties
 				//  only used by between-glass shades or blinds
 				if ( AllGlassIsSpectralAverage ) {
-					Construct( ConstrNum ).tBareSolDiff( IGlass ) = DiffuseAverage( tBareSolPhi( {1,10}, IGlass ) );
-					Construct( ConstrNum ).tBareVisDiff( IGlass ) = DiffuseAverage( tBareVisPhi( {1,10}, IGlass ) );
-					Construct( ConstrNum ).rfBareSolDiff( IGlass ) = DiffuseAverage( rfBareSolPhi( {1,10}, IGlass ) );
-					Construct( ConstrNum ).rfBareVisDiff( IGlass ) = DiffuseAverage( rfBareVisPhi( {1,10}, IGlass ) );
-					Construct( ConstrNum ).rbBareSolDiff( IGlass ) = DiffuseAverage( rbBareSolPhi( {1,10}, IGlass ) );
-					Construct( ConstrNum ).rbBareVisDiff( IGlass ) = DiffuseAverage( rbBareVisPhi( {1,10}, IGlass ) );
+					Construct( ConstrNum ).tBareSolDiff( IGlass ) = DiffuseAverage( tBareSolPhi( IGlass, {1,10} ) );
+					Construct( ConstrNum ).tBareVisDiff( IGlass ) = DiffuseAverage( tBareVisPhi( IGlass, {1,10} ) );
+					Construct( ConstrNum ).rfBareSolDiff( IGlass ) = DiffuseAverage( rfBareSolPhi( IGlass, {1,10} ) );
+					Construct( ConstrNum ).rfBareVisDiff( IGlass ) = DiffuseAverage( rfBareVisPhi( IGlass, {1,10} ) );
+					Construct( ConstrNum ).rbBareSolDiff( IGlass ) = DiffuseAverage( rbBareSolPhi( IGlass, {1,10} ) );
+					Construct( ConstrNum ).rbBareVisDiff( IGlass ) = DiffuseAverage( rbBareVisPhi( IGlass, {1,10} ) );
 					Construct( ConstrNum ).afBareSolDiff( IGlass ) = max( 0.0, 1.0 - ( Construct( ConstrNum ).tBareSolDiff( IGlass ) + Construct( ConstrNum ).rfBareSolDiff( IGlass ) ) );
 					Construct( ConstrNum ).abBareSolDiff( IGlass ) = max( 0.0, 1.0 - ( Construct( ConstrNum ).tBareSolDiff( IGlass ) + Construct( ConstrNum ).rbBareSolDiff( IGlass ) ) );
 				}
@@ -773,24 +773,24 @@ namespace WindowManager {
 					numpt( IGlass ) = numptDAT;
 
 					for ( ILam = 1; ILam <= numptDAT; ++ILam ) {
-						wlt( ILam, IGlass ) = SpectralData( SpecDataNum ).WaveLength( ILam );
-						t( ILam, IGlass ) = SpectralData( SpecDataNum ).Trans( ILam );
-						if ( IGlass == NGlass || ( IGlass == ( NGlass - 1 ) && StormWinConst ) ) t( ILam, IGlass ) *= Material( LayPtr ).GlassTransDirtFactor;
-						rff( ILam, IGlass ) = SpectralData( SpecDataNum ).ReflBack( ILam );
-						rbb( ILam, IGlass ) = SpectralData( SpecDataNum ).ReflFront( ILam );
+						wlt( IGlass, ILam ) = SpectralData( SpecDataNum ).WaveLength( ILam );
+						t( IGlass, ILam ) = SpectralData( SpecDataNum ).Trans( ILam );
+						if ( IGlass == NGlass || ( IGlass == ( NGlass - 1 ) && StormWinConst ) ) t( IGlass, ILam ) *= Material( LayPtr ).GlassTransDirtFactor;
+						rff( IGlass, ILam ) = SpectralData( SpecDataNum ).ReflBack( ILam );
+						rbb( IGlass, ILam ) = SpectralData( SpecDataNum ).ReflFront( ILam );
 					}
 
 				} else { // No spectral data for this layer; use spectral average values
 					lquasi = true;
 					numpt( IGlass ) = 2;
-					t( 1, IGlass ) = Material( LayPtr ).Trans;
-					if ( IGlass == NGlass || ( IGlass == ( NGlass - 1 ) && StormWinConst ) ) t( 1, IGlass ) *= Material( LayPtr ).GlassTransDirtFactor;
-					t( 2, IGlass ) = Material( LayPtr ).TransVis;
-					if ( IGlass == NGlass || ( IGlass == ( NGlass - 1 ) && StormWinConst ) ) t( 2, IGlass ) *= Material( LayPtr ).GlassTransDirtFactor;
-					rff( 1, IGlass ) = Material( LayPtr ).ReflectSolBeamBack;
-					rbb( 1, IGlass ) = Material( LayPtr ).ReflectSolBeamFront;
-					rff( 2, IGlass ) = Material( LayPtr ).ReflectVisBeamBack;
-					rbb( 2, IGlass ) = Material( LayPtr ).ReflectVisBeamFront;
+					t( IGlass, 1 ) = Material( LayPtr ).Trans;
+					if ( IGlass == NGlass || ( IGlass == ( NGlass - 1 ) && StormWinConst ) ) t( IGlass, 1 ) *= Material( LayPtr ).GlassTransDirtFactor;
+					t( IGlass, 2 ) = Material( LayPtr ).TransVis;
+					if ( IGlass == NGlass || ( IGlass == ( NGlass - 1 ) && StormWinConst ) ) t( IGlass, 2 ) *= Material( LayPtr ).GlassTransDirtFactor;
+					rff( IGlass, 1 ) = Material( LayPtr ).ReflectSolBeamBack;
+					rbb( IGlass, 1 ) = Material( LayPtr ).ReflectSolBeamFront;
+					rff( IGlass, 2 ) = Material( LayPtr ).ReflectVisBeamBack;
+					rbb( IGlass, 2 ) = Material( LayPtr ).ReflectVisBeamFront;
 				}
 			} // End of loop over glass layers in the construction for back calculation
 
@@ -808,7 +808,7 @@ namespace WindowManager {
 				for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
 					for ( ILam = 1; ILam <= numpt( IGlass ); ++ILam ) {
 
-						TransAndReflAtPhi( CosPhi, t( ILam, IGlass ), rff( ILam, IGlass ), rbb( ILam, IGlass ), tPhi( ILam, IGlass ), rfPhi( ILam, IGlass ), rbPhi( ILam, IGlass ), lSimpleGlazingSystem, SimpleGlazingSHGC, SimpleGlazingU );
+						TransAndReflAtPhi( CosPhi, t( IGlass, ILam ), rff( IGlass, ILam ), rbb( IGlass, ILam ), tPhi( IGlass, ILam ), rfPhi( IGlass, ILam ), rbPhi( IGlass, ILam ), lSimpleGlazingSystem, SimpleGlazingSHGC, SimpleGlazingU );
 					}
 				}
 
@@ -821,16 +821,16 @@ namespace WindowManager {
 
 				for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
 					for ( j = 1; j <= nume; ++j ) {
-						sabsPhi( j ) = saPhi( j, IGlass );
+						sabsPhi( j ) = saPhi( IGlass, j );
 					}
-					SolarSprectrumAverage( sabsPhi, solabsBackPhi( IPhi, IGlass ) );
+					SolarSprectrumAverage( sabsPhi, solabsBackPhi( IGlass, IPhi ) );
 				}
 
 			} // End of loop over incidence angles for back calculation
 
 			for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
 				IGlassBack = NGlass - IGlass + 1;
-				Construct( ConstrNum ).AbsDiffBack( IGlass ) = DiffuseAverage( solabsBackPhi( {1,10}, IGlassBack ) );
+				Construct( ConstrNum ).AbsDiffBack( IGlass ) = DiffuseAverage( solabsBackPhi( IGlassBack, {1,10} ) );
 			}
 
 			//-----------------------------------------------------------------------
@@ -924,7 +924,7 @@ namespace WindowManager {
 						if ( ExtShade ) {
 							for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
 								for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
-									solabsPhi( IPhi, IGlass ) = ShadeTrans * solabsDiff( IGlass ) * ShadeReflFac;
+									solabsPhi( IGlass, IPhi ) = ShadeTrans * solabsDiff( IGlass ) * ShadeReflFac;
 								}
 								tsolPhi( IPhi ) = ShadeTrans * ShadeReflFac * tsolDiff;
 								tvisPhi( IPhi ) = ShadeTransVis * ShadeReflFacVis * tvisDiff;
@@ -936,9 +936,9 @@ namespace WindowManager {
 
 						for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
 							if ( ExtBlind ) {
-								Construct( ConstrNum ).BlAbsDiff( IGlass, ISlatAng ) = ShadeTrans * ShadeReflFac * solabsDiff( IGlass );
-								Construct( ConstrNum ).BlAbsDiffGnd( IGlass, ISlatAng ) = ShadeTransGnd * ShadeReflFac * solabsDiff( IGlass );
-								Construct( ConstrNum ).BlAbsDiffSky( IGlass, ISlatAng ) = ShadeTransSky * ShadeReflFac * solabsDiff( IGlass );
+								Construct( ConstrNum ).BlAbsDiff( ISlatAng, IGlass ) = ShadeTrans * ShadeReflFac * solabsDiff( IGlass );
+								Construct( ConstrNum ).BlAbsDiffGnd( ISlatAng, IGlass ) = ShadeTransGnd * ShadeReflFac * solabsDiff( IGlass );
+								Construct( ConstrNum ).BlAbsDiffSky( ISlatAng, IGlass ) = ShadeTransSky * ShadeReflFac * solabsDiff( IGlass );
 							}
 							if ( ExtShade || ExtScreen ) Construct( ConstrNum ).AbsDiff( IGlass ) = ShadeTrans * ShadeReflFac * solabsDiff( IGlass );
 						}
@@ -965,7 +965,7 @@ namespace WindowManager {
 
 						if ( ExtBlind ) {
 							for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
-								Construct( ConstrNum ).BlAbsDiffBack( IGlass, ISlatAng ) = Construct( ConstrNum ).AbsDiffBack( IGlass ) + tsolDiff * ShadeRefl * ShadeReflFac * solabsDiff( IGlass );
+								Construct( ConstrNum ).BlAbsDiffBack( ISlatAng, IGlass ) = Construct( ConstrNum ).AbsDiffBack( IGlass ) + tsolDiff * ShadeRefl * ShadeReflFac * solabsDiff( IGlass );
 							}
 							Construct( ConstrNum ).AbsDiffBackBlind( ISlatAng ) = tsolDiff * ShadeReflFac * ShadeAbs;
 							Construct( ConstrNum ).BlReflectSolDiffBack( ISlatAng ) = Construct( ConstrNum ).ReflectSolDiffBack + tsolDiff_2 * ShadeRefl * ShadeReflFac;
@@ -989,7 +989,7 @@ namespace WindowManager {
 						if ( IntShade ) {
 							for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
 								for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
-									solabsPhi( IPhi, IGlass ) += tsolPhi( IPhi ) * ShadeRefl * ShadeReflFac * Construct( ConstrNum ).AbsDiffBack( IGlass );
+									solabsPhi( IGlass, IPhi ) += tsolPhi( IPhi ) * ShadeRefl * ShadeReflFac * Construct( ConstrNum ).AbsDiffBack( IGlass );
 								}
 								solabsShadePhi( IPhi ) = tsolPhi( IPhi ) * ShadeReflFac * ShadeAbs;
 								tsolPhi( IPhi ) *= ShadeReflFac * ShadeTrans;
@@ -1001,9 +1001,9 @@ namespace WindowManager {
 
 						if ( IntBlind ) {
 							for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
-								Construct( ConstrNum ).BlAbsDiff( IGlass, ISlatAng ) = Construct( ConstrNum ).AbsDiff( IGlass ) + tsolDiff * ShadeRefl * ShadeReflFac * Construct( ConstrNum ).AbsDiffBack( IGlass );
-								Construct( ConstrNum ).BlAbsDiffGnd( IGlass, ISlatAng ) = Construct( ConstrNum ).AbsDiff( IGlass ) + tsolDiff * ShadeReflGnd * ShadeReflFac * Construct( ConstrNum ).AbsDiffBack( IGlass );
-								Construct( ConstrNum ).BlAbsDiffSky( IGlass, ISlatAng ) = Construct( ConstrNum ).AbsDiff( IGlass ) + tsolDiff * ShadeReflSky * ShadeReflFac * Construct( ConstrNum ).AbsDiffBack( IGlass );
+								Construct( ConstrNum ).BlAbsDiff( ISlatAng, IGlass ) = Construct( ConstrNum ).AbsDiff( IGlass ) + tsolDiff * ShadeRefl * ShadeReflFac * Construct( ConstrNum ).AbsDiffBack( IGlass );
+								Construct( ConstrNum ).BlAbsDiffGnd( ISlatAng, IGlass ) = Construct( ConstrNum ).AbsDiff( IGlass ) + tsolDiff * ShadeReflGnd * ShadeReflFac * Construct( ConstrNum ).AbsDiffBack( IGlass );
+								Construct( ConstrNum ).BlAbsDiffSky( ISlatAng, IGlass ) = Construct( ConstrNum ).AbsDiff( IGlass ) + tsolDiff * ShadeReflSky * ShadeReflFac * Construct( ConstrNum ).AbsDiffBack( IGlass );
 							}
 
 							Construct( ConstrNum ).AbsDiffBlind( ISlatAng ) = tsolDiff * ShadeReflFac * ShadeAbs;
@@ -1019,7 +1019,7 @@ namespace WindowManager {
 							// Back incident solar, diffuse, interior blind
 
 							for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
-								Construct( ConstrNum ).BlAbsDiffBack( IGlass, ISlatAng ) = Construct( ConstrNum ).AbsDiffBack( IGlass ) * ShadeTrans * ShadeReflFac;
+								Construct( ConstrNum ).BlAbsDiffBack( ISlatAng, IGlass ) = Construct( ConstrNum ).AbsDiffBack( IGlass ) * ShadeTrans * ShadeReflFac;
 							}
 
 							Construct( ConstrNum ).AbsDiffBackBlind( ISlatAng ) = Blind( BlNum ).SolBackDiffAbs( ISlatAng ) + ShadeTrans * ShadeReflFac * Construct( ConstrNum ).ReflectSolDiffBack * ShadeAbs;
@@ -1080,15 +1080,15 @@ namespace WindowManager {
 								// Front incident solar, beam, between-glass shade, NGlass = 2
 
 								for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
-									t1 = tBareSolPhi( IPhi, 1 );
-									t1v = tBareVisPhi( IPhi, 1 );
-									af1 = afBareSolPhi( IPhi, 1 );
-									ab1 = abBareSolPhi( IPhi, 1 );
+									t1 = tBareSolPhi( 1, IPhi );
+									t1v = tBareVisPhi( 1, IPhi );
+									af1 = afBareSolPhi( 1, IPhi );
+									ab1 = abBareSolPhi( 1, IPhi );
 									tsolPhi( IPhi ) = t1 * ( tsh + rsh * rb1 * tsh + tsh * rf2 * rsh ) * td2;
 									tvisPhi( IPhi ) = t1v * ( tshv + rshv * rb1v * tshv + tshv * rf2v * rshv ) * td2v;
 									solabsShadePhi( IPhi ) = t1 * ( ash + rsh * rb1 + tsh * rf2 ) * ash;
-									solabsPhi( IPhi, 1 ) = af1 + t1 * ( rsh + rsh * rb1 * rsh + tsh * rf2 * tsh ) * abd1;
-									solabsPhi( IPhi, 2 ) = t1 * ( tsh + rsh * rb1 * tsh + tsh * rf2 * rsh ) * afd2;
+									solabsPhi( 1, IPhi ) = af1 + t1 * ( rsh + rsh * rb1 * rsh + tsh * rf2 * tsh ) * abd1;
+									solabsPhi( 2, IPhi ) = t1 * ( tsh + rsh * rb1 * tsh + tsh * rf2 * rsh ) * afd2;
 								} // End of loop over incidence angles
 
 								// Front incident solar, diffuse, between-glass shade, NGlass = 2
@@ -1125,22 +1125,22 @@ namespace WindowManager {
 								// Front incident solar, beam, between-glass shade, NGlass = 3
 
 								for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
-									t1 = tBareSolPhi( IPhi, 1 );
-									t1v = tBareVisPhi( IPhi, 1 );
-									t2 = tBareSolPhi( IPhi, 2 );
-									t2v = tBareVisPhi( IPhi, 2 );
-									af1 = afBareSolPhi( IPhi, 1 );
-									af2 = afBareSolPhi( IPhi, 2 );
-									ab1 = abBareSolPhi( IPhi, 1 );
-									ab2 = abBareSolPhi( IPhi, 2 );
+									t1 = tBareSolPhi( 1, IPhi );
+									t1v = tBareVisPhi( 1, IPhi );
+									t2 = tBareSolPhi( 2, IPhi );
+									t2v = tBareVisPhi( 2, IPhi );
+									af1 = afBareSolPhi( 1, IPhi );
+									af2 = afBareSolPhi( 2, IPhi );
+									ab1 = abBareSolPhi( 1, IPhi );
+									ab2 = abBareSolPhi( 2, IPhi );
 									rbmf2 = max( 0.0, 1.0 - ( t2 + af2 ) );
 
 									tsolPhi( IPhi ) = t1 * t2 * ( tsh + tsh * rf3 * rsh + rsh * td2 * rb1 * td2 * tsh + rsh * rb2 * tsh ) * td3;
 									tvisPhi( IPhi ) = t1v * t2v * ( tshv + tshv * rf3v * rshv + rshv * td2v * rb1v * td2v * tshv + rshv * rb2v * tshv ) * td3v;
 									solabsShadePhi( IPhi ) = t1 * t2 * ( 1 + rsh * td2 * rb1 * td2 + rsh * rb2 ) * ash;
-									solabsPhi( IPhi, 1 ) = af1 + rbmf2 * ab1 + t1 * t2 * rsh * ( 1 + rf3 * tsh + rb2 * rsh + td2 * rb1 * td2 * rsh ) * td2 * abd1;
-									solabsPhi( IPhi, 2 ) = t1 * af2 + t1 * t2 * ( ( rsh + tsh * rf3 * tsh + rsh * rb2 * rsh ) * abd2 + rsh * td2 * rb1 * afd2 );
-									solabsPhi( IPhi, 3 ) = t1 * t2 * ( tsh + rsh * ( rb2 * tsh + td2 * rb2 * td2 * tsh + rf3 * rsh ) ) * afd3;
+									solabsPhi( 1, IPhi ) = af1 + rbmf2 * ab1 + t1 * t2 * rsh * ( 1 + rf3 * tsh + rb2 * rsh + td2 * rb1 * td2 * rsh ) * td2 * abd1;
+									solabsPhi( 2, IPhi ) = t1 * af2 + t1 * t2 * ( ( rsh + tsh * rf3 * tsh + rsh * rb2 * rsh ) * abd2 + rsh * td2 * rb1 * afd2 );
+									solabsPhi( 3, IPhi ) = t1 * t2 * ( tsh + rsh * ( rb2 * tsh + td2 * rb2 * td2 * tsh + rf3 * rsh ) ) * afd3;
 								} // End of loop over incidence angle
 
 								// Front incident solar, diffuse, between-glass shade, NGlass = 3
@@ -1173,12 +1173,12 @@ namespace WindowManager {
 
 								// Front incident solar, diffuse, between-glass blind, NGlass = 2
 
-								Construct( ConstrNum ).BlAbsDiff( 1, ISlatAng ) = afd1 + td1 * ( rfsh + rfsh * rb1 * rfsh + tsh * rb2 * tsh ) * abd1;
-								Construct( ConstrNum ).BlAbsDiffGnd( 1, ISlatAng ) = afd1 + td1 * ( rfshGnd + rfshGnd * rb1 * rfshGnd + tshGnd * rb2 * tsh ) * abd1;
-								Construct( ConstrNum ).BlAbsDiffSky( 1, ISlatAng ) = afd1 + td1 * ( rfshSky + rfshSky * rb1 * rfshSky + tshSky * rb2 * tsh ) * abd1;
-								Construct( ConstrNum ).BlAbsDiff( 2, ISlatAng ) = td1 * ( tsh + rfsh * rb1 * tsh + tsh * rf2 * rbsh ) * afd2;
-								Construct( ConstrNum ).BlAbsDiffGnd( 2, ISlatAng ) = td1 * ( tshGnd + rfshGnd * rb1 * tsh + tshGnd * rf2 * rbsh ) * afd2;
-								Construct( ConstrNum ).BlAbsDiffSky( 2, ISlatAng ) = td1 * ( tshSky + rfshSky * rb1 * tsh + tshSky * rf2 * rbsh ) * afd2;
+								Construct( ConstrNum ).BlAbsDiff( ISlatAng, 1 ) = afd1 + td1 * ( rfsh + rfsh * rb1 * rfsh + tsh * rb2 * tsh ) * abd1;
+								Construct( ConstrNum ).BlAbsDiffGnd( ISlatAng, 1 ) = afd1 + td1 * ( rfshGnd + rfshGnd * rb1 * rfshGnd + tshGnd * rb2 * tsh ) * abd1;
+								Construct( ConstrNum ).BlAbsDiffSky( ISlatAng, 1 ) = afd1 + td1 * ( rfshSky + rfshSky * rb1 * rfshSky + tshSky * rb2 * tsh ) * abd1;
+								Construct( ConstrNum ).BlAbsDiff( ISlatAng, 2 ) = td1 * ( tsh + rfsh * rb1 * tsh + tsh * rf2 * rbsh ) * afd2;
+								Construct( ConstrNum ).BlAbsDiffGnd( ISlatAng, 2 ) = td1 * ( tshGnd + rfshGnd * rb1 * tsh + tshGnd * rf2 * rbsh ) * afd2;
+								Construct( ConstrNum ).BlAbsDiffSky( ISlatAng, 2 ) = td1 * ( tshSky + rfshSky * rb1 * tsh + tshSky * rf2 * rbsh ) * afd2;
 								Construct( ConstrNum ).AbsDiffBlind( ISlatAng ) = td1 * ( afsh + rfsh * rb1 * afsh + tsh * rf2 * absh );
 								Construct( ConstrNum ).AbsDiffBlindGnd( ISlatAng ) = td1 * ( afshGnd + rfsh * rb1 * afsh + tshGnd * rf2 * absh );
 								Construct( ConstrNum ).AbsDiffBlindSky( ISlatAng ) = td1 * ( afshSky + rfsh * rb1 * afsh + tshSky * rf2 * absh );
@@ -1191,8 +1191,8 @@ namespace WindowManager {
 
 								// Back incident solar, diffuse, between-glass blind, NGlass = 2
 
-								Construct( ConstrNum ).BlAbsDiffBack( 1, ISlatAng ) = td2 * ( tsh + rbsh * rf2 * tsh + tsh * rb1 * rfsh ) * abd1;
-								Construct( ConstrNum ).BlAbsDiffBack( 2, ISlatAng ) = abd2 + td2 * ( rbsh + rbsh * rf2 * rbsh + tsh * rb1 * tsh ) * afd2;
+								Construct( ConstrNum ).BlAbsDiffBack( ISlatAng, 1 ) = td2 * ( tsh + rbsh * rf2 * tsh + tsh * rb1 * rfsh ) * abd1;
+								Construct( ConstrNum ).BlAbsDiffBack( ISlatAng, 2 ) = abd2 + td2 * ( rbsh + rbsh * rf2 * rbsh + tsh * rb1 * tsh ) * afd2;
 								Construct( ConstrNum ).AbsDiffBackBlind( ISlatAng ) = td2 * ( absh + rbsh * rf2 * absh + tsh * rb1 * afsh );
 								Construct( ConstrNum ).BlReflectSolDiffBack( ISlatAng ) = rb2 + td2 * ( rbsh + rbsh * rf2 * rbsh + tsh * rb1 * tsh ) * td2;
 								Construct( ConstrNum ).BlReflectVisDiffBack( ISlatAng ) = rb2v + td2v * ( rbshv + rbshv * rf2v * rbshv + tshv * rb1v * tshv ) * td2v;
@@ -1212,15 +1212,15 @@ namespace WindowManager {
 
 								// Front incident solar, diffuse, between-glass blind, NGlass = 3
 
-								Construct( ConstrNum ).BlAbsDiff( 1, ISlatAng ) = afd1 + td1 * ( rf2 + td2 * ( rfsh + rfsh * rb2 * rfsh + tsh * rf3 * tsh + rfsh * td2 * rb1 * td2 * rfsh ) * td2 ) * abd1;
-								Construct( ConstrNum ).BlAbsDiffGnd( 1, ISlatAng ) = afd1 + td1 * ( rf2 + td2 * ( rfshGnd + rfshGnd * rb2 * rfsh + tshGnd * rf3 * tsh + rfshGnd * td2 * rb1 * td2 * rfsh ) * td2 ) * abd1;
-								Construct( ConstrNum ).BlAbsDiffSky( 1, ISlatAng ) = afd1 + td1 * ( rf2 + td2 * ( rfshSky + rfshSky * rb2 * rfsh + tshSky * rf3 * tsh + rfshSky * td2 * rb1 * td2 * rfsh ) * td2 ) * abd1;
-								Construct( ConstrNum ).BlAbsDiff( 2, ISlatAng ) = td1 * ( afd2 + td2 * ( rfsh + rfsh * rb2 * rfsh + tsh * rf3 * tsh ) * abd2 );
-								Construct( ConstrNum ).BlAbsDiffGnd( 2, ISlatAng ) = td1 * ( afd2 + td2 * ( rfshGnd + rfshGnd * rb2 * rfsh + tshGnd * rf3 * tsh ) * abd2 );
-								Construct( ConstrNum ).BlAbsDiffSky( 2, ISlatAng ) = td1 * ( afd2 + td2 * ( rfshSky + rfshSky * rb2 * rfsh + tshSky * rf3 * tsh ) * abd2 );
-								Construct( ConstrNum ).BlAbsDiff( 3, ISlatAng ) = td1 * td2 * ( tsh + rfsh * rb2 * tsh + rfsh * td2 * rb1 * td2 * tsh + tsh * rf3 * rbsh ) * afd3;
-								Construct( ConstrNum ).BlAbsDiffGnd( 3, ISlatAng ) = td1 * td2 * ( tshGnd + rfshGnd * rb2 * tsh + rfshGnd * td2 * rb1 * td2 * tsh + tshGnd * rf3 * rbsh ) * afd3;
-								Construct( ConstrNum ).BlAbsDiffSky( 3, ISlatAng ) = td1 * td2 * ( tshSky + rfshSky * rb2 * tsh + rfshSky * td2 * rb1 * td2 * tsh + tshSky * rf3 * rbsh ) * afd3;
+								Construct( ConstrNum ).BlAbsDiff( ISlatAng, 1 ) = afd1 + td1 * ( rf2 + td2 * ( rfsh + rfsh * rb2 * rfsh + tsh * rf3 * tsh + rfsh * td2 * rb1 * td2 * rfsh ) * td2 ) * abd1;
+								Construct( ConstrNum ).BlAbsDiffGnd( ISlatAng, 1 ) = afd1 + td1 * ( rf2 + td2 * ( rfshGnd + rfshGnd * rb2 * rfsh + tshGnd * rf3 * tsh + rfshGnd * td2 * rb1 * td2 * rfsh ) * td2 ) * abd1;
+								Construct( ConstrNum ).BlAbsDiffSky( ISlatAng, 1 ) = afd1 + td1 * ( rf2 + td2 * ( rfshSky + rfshSky * rb2 * rfsh + tshSky * rf3 * tsh + rfshSky * td2 * rb1 * td2 * rfsh ) * td2 ) * abd1;
+								Construct( ConstrNum ).BlAbsDiff( ISlatAng, 2 ) = td1 * ( afd2 + td2 * ( rfsh + rfsh * rb2 * rfsh + tsh * rf3 * tsh ) * abd2 );
+								Construct( ConstrNum ).BlAbsDiffGnd( ISlatAng, 2 ) = td1 * ( afd2 + td2 * ( rfshGnd + rfshGnd * rb2 * rfsh + tshGnd * rf3 * tsh ) * abd2 );
+								Construct( ConstrNum ).BlAbsDiffSky( ISlatAng, 2 ) = td1 * ( afd2 + td2 * ( rfshSky + rfshSky * rb2 * rfsh + tshSky * rf3 * tsh ) * abd2 );
+								Construct( ConstrNum ).BlAbsDiff( ISlatAng, 3 ) = td1 * td2 * ( tsh + rfsh * rb2 * tsh + rfsh * td2 * rb1 * td2 * tsh + tsh * rf3 * rbsh ) * afd3;
+								Construct( ConstrNum ).BlAbsDiffGnd( ISlatAng, 3 ) = td1 * td2 * ( tshGnd + rfshGnd * rb2 * tsh + rfshGnd * td2 * rb1 * td2 * tsh + tshGnd * rf3 * rbsh ) * afd3;
+								Construct( ConstrNum ).BlAbsDiffSky( ISlatAng, 3 ) = td1 * td2 * ( tshSky + rfshSky * rb2 * tsh + rfshSky * td2 * rb1 * td2 * tsh + tshSky * rf3 * rbsh ) * afd3;
 								Construct( ConstrNum ).AbsDiffBlind( ISlatAng ) = td1 * td2 * ( afsh * ( 1 + rfsh * td2 * rb1 * td2 ) + rfsh * rb2 * afsh + tsh * rf3 * absh );
 								Construct( ConstrNum ).AbsDiffBlindGnd( ISlatAng ) = td1 * td2 * ( afshGnd + afsh * rfsh * ( td2 * rb1 * td2 + rb2 ) + tshGnd * rf3 * absh );
 								Construct( ConstrNum ).AbsDiffBlindSky( ISlatAng ) = td1 * td2 * ( afshSky + afsh * rfsh * ( td2 * rb1 * td2 + rb2 ) + tshSky * rf3 * absh );
@@ -1233,9 +1233,9 @@ namespace WindowManager {
 
 								// Back incident solar, diffuse, between-glass blind, NGlass = 3
 
-								Construct( ConstrNum ).BlAbsDiffBack( 1, ISlatAng ) = td3 * ( tsh + rbsh * rf3 * tsh + tsh * rb2 * rfsh + tsh * td2 * rb1 * td2 * rfsh ) * td2 * abd1;
-								Construct( ConstrNum ).BlAbsDiffBack( 2, ISlatAng ) = td3 * ( ( tsh + rbsh * rf3 * tsh ) * abd2 + ( tsh * td2 * rb1 * td2 + tsh * rb2 ) * afd2 );
-								Construct( ConstrNum ).BlAbsDiffBack( 3, ISlatAng ) = abd3 + td3 * ( rbsh + tsh * rb2 * tsh + tsh * td2 * rb1 * td2 * tsh ) * afd3;
+								Construct( ConstrNum ).BlAbsDiffBack( ISlatAng, 1 ) = td3 * ( tsh + rbsh * rf3 * tsh + tsh * rb2 * rfsh + tsh * td2 * rb1 * td2 * rfsh ) * td2 * abd1;
+								Construct( ConstrNum ).BlAbsDiffBack( ISlatAng, 2 ) = td3 * ( ( tsh + rbsh * rf3 * tsh ) * abd2 + ( tsh * td2 * rb1 * td2 + tsh * rb2 ) * afd2 );
+								Construct( ConstrNum ).BlAbsDiffBack( ISlatAng, 3 ) = abd3 + td3 * ( rbsh + tsh * rb2 * tsh + tsh * td2 * rb1 * td2 * tsh ) * afd3;
 								Construct( ConstrNum ).AbsDiffBackBlind( ISlatAng ) = td3 * ( ( 1 + rbsh * rf3 ) * absh + ( tsh * td2 * rb1 * td2 + tsh * rb2 ) * afsh );
 								Construct( ConstrNum ).BlReflectSolDiffBack( ISlatAng ) = rb3 + td3 * ( rbsh + rbsh * rf3 * rbsh + tsh * rb2 * tsh + tsh * td2 * rb1 * td2 * tsh ) * td3;
 								Construct( ConstrNum ).BlReflectVisDiffBack( ISlatAng ) = rb3v + td3v * ( rbshv + rbshv * rf3v * rbshv + tshv * rb2v * tshv + tshv * td2v * rb1v * td2v * tshv ) * td3v;
@@ -1264,14 +1264,14 @@ namespace WindowManager {
 				W5LsqFit( CosPhiIndepVar, tvisPhi, 6, 1, 10, Construct( ConstrNum ).TransVisBeamCoef );
 				for ( IGlass = 1; IGlass <= NGlass; ++IGlass ) {
 					// Front absorptance coefficients for glass layers
-					DepVarCurveFit( {1,10} ) = solabsPhi( {1,10}, IGlass );
+					DepVarCurveFit( {1,10} ) = solabsPhi( IGlass, {1,10} );
 					W5LsqFit( CosPhiIndepVar, DepVarCurveFit, 6, 1, 10, CoeffsCurveFit );
-					Construct( ConstrNum ).AbsBeamCoef( IGlass, {1,6} ) = CoeffsCurveFit;
+					Construct( ConstrNum ).AbsBeamCoef( {1,6}, IGlass ) = CoeffsCurveFit;
 					// Back absorptance coefficients for glass layers
 					IGlassBack = NGlass - IGlass + 1;
-					DepVarCurveFit( {1,10} ) = solabsBackPhi( {1,10}, IGlassBack );
+					DepVarCurveFit( {1,10} ) = solabsBackPhi( IGlassBack, {1,10} );
 					W5LsqFit( CosPhiIndepVar, DepVarCurveFit, 6, 1, 10, CoeffsCurveFit );
-					Construct( ConstrNum ).AbsBeamBackCoef( IGlass, {1,6} ) = CoeffsCurveFit;
+					Construct( ConstrNum ).AbsBeamBackCoef( {1,6}, IGlass ) = CoeffsCurveFit;
 				}
 
 				// To check goodness of fit //Tuned
@@ -1643,14 +1643,14 @@ namespace WindowManager {
 				// In the following numpt is the number of spectral data points for each layer;
 				// numpt = 2 if there is no spectral data for a layer.
 				if ( numpt( in ) <= 2 ) {
-					tadjPhi( iwl, in ) = tPhi( iquasi, in );
-					rfadjPhi( iwl, in ) = rfPhi( iquasi, in );
-					rbadjPhi( iwl, in ) = rbPhi( iquasi, in );
+					tadjPhi( in, iwl ) = tPhi( in, iquasi );
+					rfadjPhi( in, iwl ) = rfPhi( in, iquasi );
+					rbadjPhi( in, iwl ) = rbPhi( in, iquasi );
 				} else {
 					// Interpolate to get properties at the solar spectrum wavelengths
-					Interpolate( wlt( 1, in ), tPhi( 1, in ), numpt( in ), wl, tadjPhi( iwl, in ) );
-					Interpolate( wlt( 1, in ), rfPhi( 1, in ), numpt( in ), wl, rfadjPhi( iwl, in ) );
-					Interpolate( wlt( 1, in ), rbPhi( 1, in ), numpt( in ), wl, rbadjPhi( iwl, in ) );
+					Interpolate( wlt( in, 1 ), tPhi( in, 1 ), numpt( in ), wl, tadjPhi( in, iwl ) );
+					Interpolate( wlt( in, 1 ), rfPhi( in, 1 ), numpt( in ), wl, rfadjPhi( in, iwl ) );
+					Interpolate( wlt( in, 1 ), rbPhi( in, 1 ), numpt( in ), wl, rbadjPhi( in, iwl ) );
 				}
 			}
 		}
@@ -1662,9 +1662,9 @@ namespace WindowManager {
 
 			// Set diagonal of matrix for subroutine SystemPropertiesAtLambdaAndPhi
 			for ( i = 1; i <= ngllayer; ++i ) {
-				top( i, i ) = tadjPhi( j, i );
-				rfop( i, i ) = rfadjPhi( j, i );
-				rbop( i, i ) = rbadjPhi( j, i );
+				top( i, i ) = tadjPhi( i, j );
+				rfop( i, i ) = rfadjPhi( i, j );
+				rbop( i, i ) = rbadjPhi( i, j );
 			}
 
 			// Calculate glazing system properties
@@ -1679,7 +1679,7 @@ namespace WindowManager {
 			}
 
 			for ( i = 1; i <= ngllayer; ++i ) {
-				saPhi( j, i ) = sabsPhi( i );
+				saPhi( i, j ) = sabsPhi( i );
 			}
 
 		} // End of wavelength loop
@@ -1738,22 +1738,22 @@ namespace WindowManager {
 		// Calculate perimeter elements of rt matrix
 		for ( i = 1; i <= n - 1; ++i ) {
 			for ( j = i + 1; j <= n; ++j ) {
-				denom = 1.0 - rfop( j, j ) * rbop( j - 1, i );
+				denom = 1.0 - rfop( j, j ) * rbop( i, j - 1 );
 				if ( denom == 0.0 ) {
-					top( i, j ) = 0.0;
-					rfop( i, j ) = 1.0;
-					rbop( j, i ) = 1.0;
+					top( j, i ) = 0.0;
+					rfop( j, i ) = 1.0;
+					rbop( i, j ) = 1.0;
 				} else {
-					top( i, j ) = top( i, j - 1 ) * top( j, j ) / denom;
-					rfop( i, j ) = rfop( i, j - 1 ) + pow_2( top( i, j - 1 ) ) * rfop( j, j ) / denom;
-					rbop( j, i ) = rbop( j, j ) + pow_2( top( j, j ) ) * rbop( j - 1, i ) / denom;
+					top( j, i ) = top( j - 1, i ) * top( j, j ) / denom;
+					rfop( j, i ) = rfop( j - 1, i ) + pow_2( top( j - 1, i ) ) * rfop( j, j ) / denom;
+					rbop( i, j ) = rbop( j, j ) + pow_2( top( j, j ) ) * rbop( i, j - 1 ) / denom;
 				}
 			}
 		}
 		// System properties: transmittance, front and back reflectance
-		tt = top( 1, n );
-		rft = rfop( 1, n );
-		rbt = rbop( n, 1 );
+		tt = top( n, 1 );
+		rft = rfop( n, 1 );
+		rbt = rbop( 1, n );
 
 		// Absorptance in each layer
 		for ( j = 1; j <= n; ++j ) {
@@ -1761,25 +1761,25 @@ namespace WindowManager {
 				t0 = 1.0;
 				rb0 = 0.0;
 			} else {
-				t0 = top( 1, j - 1 );
-				rb0 = rbop( j - 1, 1 );
+				t0 = top( j - 1, 1 );
+				rb0 = rbop( 1, j - 1 );
 			}
 
 			if ( j == n ) {
 				rf0 = 0.0;
 			} else {
-				rf0 = rfop( j + 1, n );
+				rf0 = rfop( n, j + 1 );
 			}
 
 			af = 1.0 - top( j, j ) - rfop( j, j );
 			ab = 1.0 - top( j, j ) - rbop( j, j );
-			denom1 = 1.0 - rfop( j, n ) * rb0;
-			denom2 = 1.0 - rbop( j, 1 ) * rf0;
+			denom1 = 1.0 - rfop( n, j ) * rb0;
+			denom2 = 1.0 - rbop( 1, j ) * rf0;
 
 			if ( denom1 == 0.0 || denom2 == 0.0 ) {
 				aft( j ) = 0.0;
 			} else {
-				aft( j ) = ( t0 * af ) / denom1 + ( top( 1, j ) * rf0 * ab ) / denom2;
+				aft( j ) = ( t0 * af ) / denom1 + ( top( j, 1 ) * rf0 * ab ) / denom2;
 			}
 		}
 	}
@@ -2261,8 +2261,8 @@ namespace WindowManager {
 			// absorbed at each face. Assumes equal split between faces of short-wave absorbed in glass layer.
 
 			for ( IGlass = 1; IGlass <= TotGlassLay; ++IGlass ) {
-				AbsRadGlassFace( 2 * IGlass - 1 ) = QRadSWwinAbs( SurfNum, IGlass ) / 2.0;
-				AbsRadGlassFace( 2 * IGlass ) = QRadSWwinAbs( SurfNum, IGlass ) / 2.0;
+				AbsRadGlassFace( 2 * IGlass - 1 ) = QRadSWwinAbs( IGlass, SurfNum ) / 2.0;
+				AbsRadGlassFace( 2 * IGlass ) = QRadSWwinAbs( IGlass, SurfNum ) / 2.0;
 			}
 
 			// IR from zone internal gains (lights, equipment and people) absorbed on zone-side face
@@ -2376,12 +2376,12 @@ namespace WindowManager {
 					gap( IGap ) = Material( LayPtr ).Thickness;
 					gnmix( IGap ) = Material( LayPtr ).NumberOfGasesInMixture;
 					for ( IMix = 1; IMix <= gnmix( IGap ); ++IMix ) {
-						gwght( IGap, IMix ) = Material( LayPtr ).GasWght( IMix );
-						gfract( IGap, IMix ) = Material( LayPtr ).GasFract( IMix );
+						gwght( IMix, IGap ) = Material( LayPtr ).GasWght( IMix );
+						gfract( IMix, IGap ) = Material( LayPtr ).GasFract( IMix );
 						for ( ICoeff = 1; ICoeff <= 3; ++ICoeff ) {
-							gcon( IGap, IMix, ICoeff ) = Material( LayPtr ).GasCon( IMix, ICoeff );
-							gvis( IGap, IMix, ICoeff ) = Material( LayPtr ).GasVis( IMix, ICoeff );
-							gcp( IGap, IMix, ICoeff ) = Material( LayPtr ).GasCp( IMix, ICoeff );
+							gcon( ICoeff, IMix, IGap ) = Material( LayPtr ).GasCon( ICoeff, IMix );
+							gvis( ICoeff, IMix, IGap ) = Material( LayPtr ).GasVis( ICoeff, IMix );
+							gcp( ICoeff, IMix, IGap ) = Material( LayPtr ).GasCp( ICoeff, IMix );
 						}
 					}
 				}
@@ -2398,11 +2398,11 @@ namespace WindowManager {
 					gap( IGap ) = Blind( window.BlindNumber ).BlindToGlassDist;
 				}
 				gnmix( IGap ) = 1;
-				gwght( IGap, 1 ) = GasWght( 1 );
+				gwght( 1, IGap ) = GasWght( 1 );
 				for ( ICoeff = 1; ICoeff <= 3; ++ICoeff ) {
-					gcon( IGap, 1, ICoeff ) = GasCoeffsCon( 1, ICoeff );
-					gvis( IGap, 1, ICoeff ) = GasCoeffsVis( 1, ICoeff );
-					gcp( IGap, 1, ICoeff ) = GasCoeffsCp( 1, ICoeff );
+					gcon( ICoeff, 1, IGap ) = GasCoeffsCon( ICoeff, 1 );
+					gvis( ICoeff, 1, IGap ) = GasCoeffsVis( ICoeff, 1 );
+					gcp( ICoeff, 1, IGap ) = GasCoeffsCp( ICoeff, 1 );
 				}
 			}
 
@@ -2995,8 +2995,8 @@ namespace WindowManager {
 				Bface( 2 ) = Rmir * emis( 2 ) + hcin * tin + AbsRadGlassFace( 2 );
 
 				Aface( 1, 1 ) = hr( 1 ) + scon( 1 ) + hcout;
-				Aface( 1, 2 ) = -scon( 1 );
 				Aface( 2, 1 ) = -scon( 1 );
+				Aface( 1, 2 ) = -scon( 1 );
 				Aface( 2, 2 ) = hr( 2 ) + scon( 1 ) + hcin;
 
 				if ( ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn ) {
@@ -3005,11 +3005,11 @@ namespace WindowManager {
 					Bface( 4 ) = Rmir * EpsShIR2 + hcin * tin + AbsRadShadeFace( 2 );
 
 					Aface( 2, 2 ) = hr( 2 ) * ( 1 - RhoShIR1 ) / ShGlReflFacIR + scon( 1 ) + hcv;
-					Aface( 2, 3 ) = -emis( 2 ) * hr( 3 ) / ShGlReflFacIR;
-					Aface( 3, 2 ) = -hr( 2 ) * EpsShIR1 / ShGlReflFacIR;
+					Aface( 3, 2 ) = -emis( 2 ) * hr( 3 ) / ShGlReflFacIR;
+					Aface( 2, 3 ) = -hr( 2 ) * EpsShIR1 / ShGlReflFacIR;
 					Aface( 3, 3 ) = hr( 3 ) * ( 1 - RhoGlIR2 * ( EpsShIR1 + RhoShIR1 ) ) / ShGlReflFacIR + sconsh + hcv;
-					Aface( 3, 4 ) = -sconsh;
 					Aface( 4, 3 ) = -sconsh;
+					Aface( 3, 4 ) = -sconsh;
 					Aface( 4, 4 ) = hr( 4 ) + sconsh + hcin;
 				}
 
@@ -3019,11 +3019,11 @@ namespace WindowManager {
 					Bface( 4 ) = Outir * TauShIR * RhoGlIR1 * EpsShIR2 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace( 2 );
 
 					Aface( 1, 1 ) = hr( 1 ) * ( 1 - RhoShIR2 ) / ShGlReflFacIR + scon( 1 ) + hcv;
-					Aface( 1, 4 ) = -emis( 1 ) * hr( 4 ) / ShGlReflFacIR;
+					Aface( 4, 1 ) = -emis( 1 ) * hr( 4 ) / ShGlReflFacIR;
 					Aface( 3, 3 ) = hr( 3 ) + sconsh + hcout;
-					Aface( 3, 4 ) = -sconsh;
-					Aface( 4, 1 ) = -hr( 1 ) * EpsShIR2 / ShGlReflFacIR;
 					Aface( 4, 3 ) = -sconsh;
+					Aface( 1, 4 ) = -hr( 1 ) * EpsShIR2 / ShGlReflFacIR;
+					Aface( 3, 4 ) = -sconsh;
 					Aface( 4, 4 ) = hr( 4 ) * ( 1 - RhoGlIR1 * ( EpsShIR2 + RhoShIR2 ) ) / ShGlReflFacIR + sconsh + hcv;
 				}
 
@@ -3042,25 +3042,25 @@ namespace WindowManager {
 				Bface( 4 ) = Rmir * emis( 4 ) + hcin * tin + AbsRadGlassFace( 4 );
 
 				Aface( 1, 1 ) = hr( 1 ) + scon( 1 ) + hcout;
-				Aface( 1, 2 ) = -scon( 1 );
-
 				Aface( 2, 1 ) = -scon( 1 );
+
+				Aface( 1, 2 ) = -scon( 1 );
 				Aface( 2, 2 ) = scon( 1 ) + hgap( 1 ) - A23P * hr( 2 );
-				Aface( 2, 3 ) = -hgap( 1 ) - A32P * hr( 3 );
+				Aface( 3, 2 ) = -hgap( 1 ) - A32P * hr( 3 );
 
-				Aface( 3, 2 ) = -hgap( 1 ) + A23P * hr( 2 );
+				Aface( 2, 3 ) = -hgap( 1 ) + A23P * hr( 2 );
 				Aface( 3, 3 ) = hgap( 1 ) + scon( 2 ) + A32P * hr( 3 );
-				Aface( 3, 4 ) = -scon( 2 );
-
 				Aface( 4, 3 ) = -scon( 2 );
+
+				Aface( 3, 4 ) = -scon( 2 );
 				Aface( 4, 4 ) = hr( 4 ) + scon( 2 ) + hcin;
 
 				if ( ShadeFlag != BGShadeOn && ShadeFlag != BGBlindOn && SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 ) {
 					Bface( 2 ) = AbsRadGlassFace( 2 ) + hcvAirflowGap * TAirflowGapNew;
 					Bface( 3 ) = AbsRadGlassFace( 3 ) + hcvAirflowGap * TAirflowGapNew;
 					Aface( 2, 2 ) = scon( 1 ) + hcvAirflowGap - A23P * hr( 2 );
-					Aface( 2, 3 ) = -A32P * hr( 3 );
-					Aface( 3, 2 ) = A23P * hr( 2 );
+					Aface( 3, 2 ) = -A32P * hr( 3 );
+					Aface( 2, 3 ) = A23P * hr( 2 );
 					Aface( 3, 3 ) = hcvAirflowGap + scon( 2 ) + A32P * hr( 3 );
 				}
 
@@ -3070,11 +3070,11 @@ namespace WindowManager {
 					Bface( 6 ) = Rmir * EpsShIR2 + hcin * tin + AbsRadShadeFace( 2 );
 
 					Aface( 4, 4 ) = hr( 4 ) * ( 1 - RhoShIR1 ) / ShGlReflFacIR + scon( 2 ) + hcv;
-					Aface( 4, 5 ) = -emis( 4 ) * hr( 5 ) / ShGlReflFacIR;
-					Aface( 5, 4 ) = -hr( 4 ) * EpsShIR1 / ShGlReflFacIR;
+					Aface( 5, 4 ) = -emis( 4 ) * hr( 5 ) / ShGlReflFacIR;
+					Aface( 4, 5 ) = -hr( 4 ) * EpsShIR1 / ShGlReflFacIR;
 					Aface( 5, 5 ) = hr( 5 ) * ( 1 - RhoGlIR2 * ( EpsShIR1 + RhoShIR1 ) ) / ShGlReflFacIR + sconsh + hcv;
-					Aface( 5, 6 ) = -sconsh;
 					Aface( 6, 5 ) = -sconsh;
+					Aface( 5, 6 ) = -sconsh;
 					Aface( 6, 6 ) = hr( 6 ) + sconsh + hcin;
 				}
 
@@ -3084,11 +3084,11 @@ namespace WindowManager {
 					Bface( 6 ) = Outir * TauShIR * RhoGlIR1 * EpsShIR2 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace( 2 );
 
 					Aface( 1, 1 ) = hr( 1 ) * ( 1 - RhoShIR2 ) / ShGlReflFacIR + scon( 1 ) + hcv;
-					Aface( 1, 6 ) = -emis( 1 ) * hr( 6 ) / ShGlReflFacIR;
+					Aface( 6, 1 ) = -emis( 1 ) * hr( 6 ) / ShGlReflFacIR;
 					Aface( 5, 5 ) = hr( 5 ) + sconsh + hcout;
-					Aface( 5, 6 ) = -sconsh;
-					Aface( 6, 1 ) = -hr( 1 ) * EpsShIR2 / ShGlReflFacIR;
 					Aface( 6, 5 ) = -sconsh;
+					Aface( 1, 6 ) = -hr( 1 ) * EpsShIR2 / ShGlReflFacIR;
+					Aface( 5, 6 ) = -sconsh;
 					Aface( 6, 6 ) = hr( 6 ) * ( 1 - RhoGlIR1 * ( EpsShIR2 + RhoShIR2 ) ) / ShGlReflFacIR + sconsh + hcv;
 				}
 
@@ -3106,23 +3106,23 @@ namespace WindowManager {
 					FacRhoIR2fpRhoIR63 = FacRhoIR2fp * FacRhoIR63;
 					FacRhoIR3bpRhoIR25 = FacRhoIR3bp * FacRhoIR25;
 					Aface( 2, 2 ) = scon( 1 ) + hcvBG( 1 ) + hr( 2 ) * ( 1 - RhoIRfp * ( emis( 2 ) + RhoIR( 2 ) ) ) / FacRhoIR2fp;
-					Aface( 2, 3 ) = -emis( 2 ) * hr( 3 ) * tir( 5 ) / FacRhoIR2fpRhoIR63;
-					Aface( 2, 5 ) = -emis( 2 ) * hr( 5 ) / FacRhoIR2fp;
-					Aface( 2, 6 ) = -emis( 2 ) * hr( 6 ) * RhoIR( 3 ) * tir( 5 ) / FacRhoIR2fpRhoIR63;
+					Aface( 3, 2 ) = -emis( 2 ) * hr( 3 ) * tir( 5 ) / FacRhoIR2fpRhoIR63;
+					Aface( 5, 2 ) = -emis( 2 ) * hr( 5 ) / FacRhoIR2fp;
+					Aface( 6, 2 ) = -emis( 2 ) * hr( 6 ) * RhoIR( 3 ) * tir( 5 ) / FacRhoIR2fpRhoIR63;
 					Bface( 2 ) = hcvBG( 1 ) * TGapNewBG( 1 ) + AbsRadGlassFace( 2 );
-					Aface( 3, 2 ) = -emis( 3 ) * hr( 2 ) * tir( 5 ) / FacRhoIR3bpRhoIR25;
+					Aface( 2, 3 ) = -emis( 3 ) * hr( 2 ) * tir( 5 ) / FacRhoIR3bpRhoIR25;
 					Aface( 3, 3 ) = scon( 2 ) + hcvBG( 2 ) + hr( 3 ) * ( 1 - RhoIRbp * ( emis( 3 ) + RhoIR( 3 ) ) ) / FacRhoIR3bp;
-					Aface( 3, 5 ) = -emis( 3 ) * hr( 5 ) * RhoIR( 2 ) * tir( 5 ) / FacRhoIR3bpRhoIR25;
-					Aface( 3, 6 ) = -emis( 3 ) * hr( 6 ) / FacRhoIR3bp;
+					Aface( 5, 3 ) = -emis( 3 ) * hr( 5 ) * RhoIR( 2 ) * tir( 5 ) / FacRhoIR3bpRhoIR25;
+					Aface( 6, 3 ) = -emis( 3 ) * hr( 6 ) / FacRhoIR3bp;
 					Bface( 3 ) = hcvBG( 2 ) * TGapNewBG( 2 ) + AbsRadGlassFace( 3 );
-					Aface( 5, 2 ) = -emis( 5 ) * hr( 2 ) / FacRhoIR2fp;
-					Aface( 5, 3 ) = -hr( 3 ) * tir( 5 ) * RhoIR( 2 ) * emis( 5 ) / FacRhoIR2fpRhoIR63;
+					Aface( 2, 5 ) = -emis( 5 ) * hr( 2 ) / FacRhoIR2fp;
+					Aface( 3, 5 ) = -hr( 3 ) * tir( 5 ) * RhoIR( 2 ) * emis( 5 ) / FacRhoIR2fpRhoIR63;
 					Aface( 5, 5 ) = sconsh + hcvBG( 1 ) + hr( 5 ) * ( 1 - RhoIR( 2 ) * emis( 5 ) / FacRhoIR2fp );
-					Aface( 5, 6 ) = -sconsh - hr( 6 ) * RhoIR( 2 ) * tir( 5 ) * RhoIR( 3 ) * emis( 5 ) / FacRhoIR2fpRhoIR63;
+					Aface( 6, 5 ) = -sconsh - hr( 6 ) * RhoIR( 2 ) * tir( 5 ) * RhoIR( 3 ) * emis( 5 ) / FacRhoIR2fpRhoIR63;
 					Bface( 5 ) = hcvBG( 1 ) * TGapNewBG( 1 ) + AbsRadShadeFace( 1 );
-					Aface( 6, 2 ) = -hr( 2 ) * tir( 5 ) * RhoIR( 3 ) * emis( 6 ) / FacRhoIR3bpRhoIR25;
-					Aface( 6, 3 ) = -emis( 6 ) * hr( 3 ) / FacRhoIR3bp;
-					Aface( 6, 5 ) = -sconsh - hr( 5 ) * RhoIR( 3 ) * tir( 5 ) * RhoIR( 2 ) * emis( 6 ) / FacRhoIR3bpRhoIR25;
+					Aface( 2, 6 ) = -hr( 2 ) * tir( 5 ) * RhoIR( 3 ) * emis( 6 ) / FacRhoIR3bpRhoIR25;
+					Aface( 3, 6 ) = -emis( 6 ) * hr( 3 ) / FacRhoIR3bp;
+					Aface( 5, 6 ) = -sconsh - hr( 5 ) * RhoIR( 3 ) * tir( 5 ) * RhoIR( 2 ) * emis( 6 ) / FacRhoIR3bpRhoIR25;
 					Aface( 6, 6 ) = sconsh + hcvBG( 2 ) + hr( 6 ) * ( 1 - RhoIR( 3 ) * emis( 6 ) / FacRhoIR3bp );
 					Bface( 6 ) = hcvBG( 2 ) * TGapNewBG( 2 ) + AbsRadShadeFace( 2 );
 				}
@@ -3152,33 +3152,33 @@ namespace WindowManager {
 				Bface( 6 ) = Rmir * emis( 6 ) + hcin * tin + AbsRadGlassFace( 6 );
 
 				Aface( 1, 1 ) = hr( 1 ) + scon( 1 ) + hcout;
-				Aface( 1, 2 ) = -scon( 1 );
-
 				Aface( 2, 1 ) = -scon( 1 );
+
+				Aface( 1, 2 ) = -scon( 1 );
 				Aface( 2, 2 ) = scon( 1 ) + hgap( 1 ) - A23P * hr( 2 );
-				Aface( 2, 3 ) = -hgap( 1 ) - A32P * hr( 3 );
+				Aface( 3, 2 ) = -hgap( 1 ) - A32P * hr( 3 );
 
-				Aface( 3, 2 ) = -hgap( 1 ) + A23P * hr( 2 );
+				Aface( 2, 3 ) = -hgap( 1 ) + A23P * hr( 2 );
 				Aface( 3, 3 ) = hgap( 1 ) + scon( 2 ) + A32P * hr( 3 );
-				Aface( 3, 4 ) = -scon( 2 );
-
 				Aface( 4, 3 ) = -scon( 2 );
+
+				Aface( 3, 4 ) = -scon( 2 );
 				Aface( 4, 4 ) = scon( 2 ) + hgap( 2 ) - A45P * hr( 4 );
-				Aface( 4, 5 ) = -hgap( 2 ) - A54P * hr( 5 );
+				Aface( 5, 4 ) = -hgap( 2 ) - A54P * hr( 5 );
 
-				Aface( 5, 4 ) = -hgap( 2 ) + A45P * hr( 4 );
+				Aface( 4, 5 ) = -hgap( 2 ) + A45P * hr( 4 );
 				Aface( 5, 5 ) = hgap( 2 ) + scon( 3 ) + A54P * hr( 5 );
-				Aface( 5, 6 ) = -scon( 3 );
-
 				Aface( 6, 5 ) = -scon( 3 );
+
+				Aface( 5, 6 ) = -scon( 3 );
 				Aface( 6, 6 ) = hr( 6 ) + scon( 3 ) + hcin;
 
 				if ( ShadeFlag != BGShadeOn && ShadeFlag != BGBlindOn && SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 ) {
 					Bface( 4 ) = AbsRadGlassFace( 4 ) + hcvAirflowGap * TAirflowGapNew;
 					Bface( 5 ) = AbsRadGlassFace( 5 ) + hcvAirflowGap * TAirflowGapNew;
 					Aface( 4, 4 ) = scon( 2 ) + hcvAirflowGap - A45P * hr( 4 );
-					Aface( 4, 5 ) = -A54P * hr( 5 );
-					Aface( 5, 4 ) = A45P * hr( 4 );
+					Aface( 5, 4 ) = -A54P * hr( 5 );
+					Aface( 4, 5 ) = A45P * hr( 4 );
 					Aface( 5, 5 ) = hcvAirflowGap + scon( 3 ) + A54P * hr( 5 );
 				}
 
@@ -3188,11 +3188,11 @@ namespace WindowManager {
 					Bface( 8 ) = Rmir * EpsShIR2 + hcin * tin + AbsRadShadeFace( 2 );
 
 					Aface( 6, 6 ) = hr( 6 ) * ( 1 - RhoShIR1 ) / ShGlReflFacIR + scon( 3 ) + hcv;
-					Aface( 6, 7 ) = -emis( 6 ) * hr( 7 ) / ShGlReflFacIR;
-					Aface( 7, 6 ) = -hr( 6 ) * EpsShIR1 / ShGlReflFacIR;
+					Aface( 7, 6 ) = -emis( 6 ) * hr( 7 ) / ShGlReflFacIR;
+					Aface( 6, 7 ) = -hr( 6 ) * EpsShIR1 / ShGlReflFacIR;
 					Aface( 7, 7 ) = hr( 7 ) * ( 1 - RhoGlIR2 * ( EpsShIR1 + RhoShIR1 ) ) / ShGlReflFacIR + sconsh + hcv;
-					Aface( 7, 8 ) = -sconsh;
 					Aface( 8, 7 ) = -sconsh;
+					Aface( 7, 8 ) = -sconsh;
 					Aface( 8, 8 ) = hr( 8 ) + sconsh + hcin;
 				}
 
@@ -3202,11 +3202,11 @@ namespace WindowManager {
 					Bface( 8 ) = Outir * TauShIR * RhoGlIR1 * EpsShIR2 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace( 2 );
 
 					Aface( 1, 1 ) = hr( 1 ) * ( 1 - RhoShIR2 ) / ShGlReflFacIR + scon( 1 ) + hcv;
-					Aface( 1, 8 ) = -emis( 1 ) * hr( 8 ) / ShGlReflFacIR;
+					Aface( 8, 1 ) = -emis( 1 ) * hr( 8 ) / ShGlReflFacIR;
 					Aface( 7, 7 ) = hr( 7 ) + sconsh + hcout;
-					Aface( 7, 8 ) = -sconsh;
-					Aface( 8, 1 ) = -hr( 1 ) * EpsShIR2 / ShGlReflFacIR;
 					Aface( 8, 7 ) = -sconsh;
+					Aface( 1, 8 ) = -hr( 1 ) * EpsShIR2 / ShGlReflFacIR;
+					Aface( 7, 8 ) = -sconsh;
 					Aface( 8, 8 ) = hr( 8 ) * ( 1 - RhoGlIR1 * ( EpsShIR2 + RhoShIR2 ) ) / ShGlReflFacIR + sconsh + hcv;
 				}
 
@@ -3224,23 +3224,23 @@ namespace WindowManager {
 					FacRhoIR4fpRhoIR85 = FacRhoIR4fp * FacRhoIR85;
 					FacRhoIR5bpRhoIR47 = FacRhoIR5bp * FacRhoIR47;
 					Aface( 4, 4 ) = scon( 2 ) + hcvBG( 1 ) + hr( 4 ) * ( 1 - RhoIRfp * ( emis( 4 ) + RhoIR( 4 ) ) ) / FacRhoIR4fp;
-					Aface( 4, 5 ) = -emis( 4 ) * hr( 5 ) * tir( 7 ) / FacRhoIR4fpRhoIR85;
-					Aface( 4, 7 ) = -emis( 4 ) * hr( 7 ) / FacRhoIR4fp;
-					Aface( 4, 8 ) = -emis( 4 ) * hr( 8 ) * RhoIR( 5 ) * tir( 7 ) / FacRhoIR4fpRhoIR85;
+					Aface( 5, 4 ) = -emis( 4 ) * hr( 5 ) * tir( 7 ) / FacRhoIR4fpRhoIR85;
+					Aface( 7, 4 ) = -emis( 4 ) * hr( 7 ) / FacRhoIR4fp;
+					Aface( 8, 4 ) = -emis( 4 ) * hr( 8 ) * RhoIR( 5 ) * tir( 7 ) / FacRhoIR4fpRhoIR85;
 					Bface( 4 ) = hcvBG( 1 ) * TGapNewBG( 1 ) + AbsRadGlassFace( 4 );
-					Aface( 5, 4 ) = -emis( 5 ) * hr( 4 ) * tir( 7 ) / FacRhoIR5bpRhoIR47;
+					Aface( 4, 5 ) = -emis( 5 ) * hr( 4 ) * tir( 7 ) / FacRhoIR5bpRhoIR47;
 					Aface( 5, 5 ) = scon( 3 ) + hcvBG( 2 ) + hr( 5 ) * ( 1 - RhoIRbp * ( emis( 5 ) + RhoIR( 5 ) ) ) / FacRhoIR5bp;
-					Aface( 5, 7 ) = -emis( 5 ) * hr( 7 ) * RhoIR( 4 ) * tir( 7 ) / FacRhoIR5bpRhoIR47;
-					Aface( 5, 8 ) = -emis( 5 ) * hr( 8 ) / FacRhoIR5bp;
+					Aface( 7, 5 ) = -emis( 5 ) * hr( 7 ) * RhoIR( 4 ) * tir( 7 ) / FacRhoIR5bpRhoIR47;
+					Aface( 8, 5 ) = -emis( 5 ) * hr( 8 ) / FacRhoIR5bp;
 					Bface( 5 ) = hcvBG( 2 ) * TGapNewBG( 2 ) + AbsRadGlassFace( 5 );
-					Aface( 7, 4 ) = -emis( 7 ) * hr( 4 ) / FacRhoIR4fp;
-					Aface( 7, 5 ) = -hr( 5 ) * tir( 7 ) * RhoIR( 4 ) * emis( 7 ) / FacRhoIR4fpRhoIR85;
+					Aface( 4, 7 ) = -emis( 7 ) * hr( 4 ) / FacRhoIR4fp;
+					Aface( 5, 7 ) = -hr( 5 ) * tir( 7 ) * RhoIR( 4 ) * emis( 7 ) / FacRhoIR4fpRhoIR85;
 					Aface( 7, 7 ) = sconsh + hcvBG( 1 ) + hr( 7 ) * ( 1 - RhoIR( 4 ) * emis( 7 ) / FacRhoIR4fp );
-					Aface( 7, 8 ) = -sconsh - hr( 8 ) * RhoIR( 4 ) * tir( 7 ) * RhoIR( 5 ) * emis( 7 ) / FacRhoIR4fpRhoIR85;
+					Aface( 8, 7 ) = -sconsh - hr( 8 ) * RhoIR( 4 ) * tir( 7 ) * RhoIR( 5 ) * emis( 7 ) / FacRhoIR4fpRhoIR85;
 					Bface( 7 ) = hcvBG( 1 ) * TGapNewBG( 1 ) + AbsRadShadeFace( 1 );
-					Aface( 8, 4 ) = -hr( 4 ) * tir( 7 ) * RhoIR( 5 ) * emis( 8 ) / FacRhoIR5bpRhoIR47;
-					Aface( 8, 5 ) = -emis( 8 ) * hr( 5 ) / FacRhoIR5bp;
-					Aface( 8, 7 ) = -sconsh - hr( 7 ) * RhoIR( 5 ) * tir( 7 ) * RhoIR( 4 ) * emis( 8 ) / FacRhoIR5bpRhoIR47;
+					Aface( 4, 8 ) = -hr( 4 ) * tir( 7 ) * RhoIR( 5 ) * emis( 8 ) / FacRhoIR5bpRhoIR47;
+					Aface( 5, 8 ) = -emis( 8 ) * hr( 5 ) / FacRhoIR5bp;
+					Aface( 7, 8 ) = -sconsh - hr( 7 ) * RhoIR( 5 ) * tir( 7 ) * RhoIR( 4 ) * emis( 8 ) / FacRhoIR5bpRhoIR47;
 					Aface( 8, 8 ) = sconsh + hcvBG( 2 ) + hr( 8 ) * ( 1 - RhoIR( 5 ) * emis( 8 ) / FacRhoIR5bp );
 					Bface( 8 ) = hcvBG( 2 ) * TGapNewBG( 2 ) + AbsRadShadeFace( 2 );
 				}
@@ -3279,33 +3279,33 @@ namespace WindowManager {
 				Bface( 8 ) = Rmir * emis( 8 ) + hcin * tin + AbsRadGlassFace( 8 );
 
 				Aface( 1, 1 ) = hr( 1 ) + scon( 1 ) + hcout;
-				Aface( 1, 2 ) = -scon( 1 );
-
 				Aface( 2, 1 ) = -scon( 1 );
+
+				Aface( 1, 2 ) = -scon( 1 );
 				Aface( 2, 2 ) = scon( 1 ) + hgap( 1 ) - A23P * hr( 2 );
-				Aface( 2, 3 ) = -hgap( 1 ) - A32P * hr( 3 );
+				Aface( 3, 2 ) = -hgap( 1 ) - A32P * hr( 3 );
 
-				Aface( 3, 2 ) = -hgap( 1 ) + A23P * hr( 2 );
+				Aface( 2, 3 ) = -hgap( 1 ) + A23P * hr( 2 );
 				Aface( 3, 3 ) = hgap( 1 ) + scon( 2 ) + A32P * hr( 3 );
-				Aface( 3, 4 ) = -scon( 2 );
-
 				Aface( 4, 3 ) = -scon( 2 );
+
+				Aface( 3, 4 ) = -scon( 2 );
 				Aface( 4, 4 ) = scon( 2 ) + hgap( 2 ) - A45P * hr( 4 );
-				Aface( 4, 5 ) = -hgap( 2 ) - A54P * hr( 5 );
+				Aface( 5, 4 ) = -hgap( 2 ) - A54P * hr( 5 );
 
-				Aface( 5, 4 ) = -hgap( 2 ) + A45P * hr( 4 );
+				Aface( 4, 5 ) = -hgap( 2 ) + A45P * hr( 4 );
 				Aface( 5, 5 ) = hgap( 2 ) + scon( 3 ) + A54P * hr( 5 );
-				Aface( 5, 6 ) = -scon( 3 );
-
 				Aface( 6, 5 ) = -scon( 3 );
+
+				Aface( 5, 6 ) = -scon( 3 );
 				Aface( 6, 6 ) = scon( 3 ) + hgap( 3 ) - A67P * hr( 6 );
-				Aface( 6, 7 ) = -hgap( 3 ) - A76P * hr( 7 );
+				Aface( 7, 6 ) = -hgap( 3 ) - A76P * hr( 7 );
 
-				Aface( 7, 6 ) = -hgap( 3 ) + A67P * hr( 6 );
+				Aface( 6, 7 ) = -hgap( 3 ) + A67P * hr( 6 );
 				Aface( 7, 7 ) = hgap( 3 ) + scon( 4 ) + A76P * hr( 7 );
-				Aface( 7, 8 ) = -scon( 4 );
-
 				Aface( 8, 7 ) = -scon( 4 );
+
+				Aface( 7, 8 ) = -scon( 4 );
 				Aface( 8, 8 ) = hr( 8 ) + scon( 4 ) + hcin;
 
 				if ( ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn ) {
@@ -3314,11 +3314,11 @@ namespace WindowManager {
 					Bface( 10 ) = Rmir * EpsShIR2 + hcin * tin + AbsRadShadeFace( 2 );
 
 					Aface( 8, 8 ) = hr( 8 ) * ( 1 - RhoShIR1 ) / ShGlReflFacIR + scon( 4 ) + hcv;
-					Aface( 8, 9 ) = -emis( 8 ) * hr( 9 ) / ShGlReflFacIR;
-					Aface( 9, 8 ) = -hr( 8 ) * EpsShIR1 / ShGlReflFacIR;
+					Aface( 9, 8 ) = -emis( 8 ) * hr( 9 ) / ShGlReflFacIR;
+					Aface( 8, 9 ) = -hr( 8 ) * EpsShIR1 / ShGlReflFacIR;
 					Aface( 9, 9 ) = hr( 9 ) * ( 1 - RhoGlIR2 * ( EpsShIR1 + RhoShIR1 ) ) / ShGlReflFacIR + sconsh + hcv;
-					Aface( 9, 10 ) = -sconsh;
 					Aface( 10, 9 ) = -sconsh;
+					Aface( 9, 10 ) = -sconsh;
 					Aface( 10, 10 ) = hr( 10 ) + sconsh + hcin;
 				}
 
@@ -3328,11 +3328,11 @@ namespace WindowManager {
 					Bface( 10 ) = Outir * TauShIR * RhoGlIR1 * EpsShIR2 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace( 2 );
 
 					Aface( 1, 1 ) = hr( 1 ) * ( 1 - RhoShIR2 ) / ShGlReflFacIR + scon( 1 ) + hcv;
-					Aface( 1, 10 ) = -emis( 1 ) * hr( 10 ) / ShGlReflFacIR;
+					Aface( 10, 1 ) = -emis( 1 ) * hr( 10 ) / ShGlReflFacIR;
 					Aface( 9, 9 ) = hr( 9 ) + sconsh + hcout;
-					Aface( 9, 10 ) = -sconsh;
-					Aface( 10, 1 ) = -hr( 1 ) * EpsShIR2 / ShGlReflFacIR;
 					Aface( 10, 9 ) = -sconsh;
+					Aface( 1, 10 ) = -hr( 1 ) * EpsShIR2 / ShGlReflFacIR;
+					Aface( 9, 10 ) = -sconsh;
 					Aface( 10, 10 ) = hr( 10 ) * ( 1 - RhoGlIR1 * ( EpsShIR2 + RhoShIR2 ) ) / ShGlReflFacIR + sconsh + hcv;
 				}
 
@@ -4260,26 +4260,26 @@ namespace WindowManager {
 		for ( i = 1; i <= n; ++i ) {
 			aamax = 0.0;
 			for ( j = 1; j <= n; ++j ) {
-				if ( std::abs( ajac( i, j ) ) > aamax ) aamax = std::abs( ajac( i, j ) );
+				if ( std::abs( ajac( j, i ) ) > aamax ) aamax = std::abs( ajac( j, i ) );
 			}
 			if ( aamax == 0.0 ) ShowFatalError( "Singular matrix in LUdecomposition, window calculations" );
 			vv( i ) = 1.0 / aamax;
 		}
 		for ( j = 1; j <= n; ++j ) {
 			for ( i = 1; i <= j - 1; ++i ) {
-				sum = ajac( i, j );
+				sum = ajac( j, i );
 				for ( k = 1; k <= i - 1; ++k ) {
-					sum -= ajac( i, k ) * ajac( k, j );
+					sum -= ajac( k, i ) * ajac( j, k );
 				}
-				ajac( i, j ) = sum;
+				ajac( j, i ) = sum;
 			}
 			aamax = 0.0;
 			for ( i = j; i <= n; ++i ) {
-				sum = ajac( i, j );
+				sum = ajac( j, i );
 				for ( k = 1; k <= j - 1; ++k ) {
-					sum -= ajac( i, k ) * ajac( k, j );
+					sum -= ajac( k, i ) * ajac( j, k );
 				}
-				ajac( i, j ) = sum;
+				ajac( j, i ) = sum;
 				dum = vv( i ) * std::abs( sum );
 				if ( dum >= aamax ) {
 					imax = i;
@@ -4288,9 +4288,9 @@ namespace WindowManager {
 			}
 			if ( j != imax ) {
 				for ( k = 1; k <= n; ++k ) {
-					dum = ajac( imax, k );
-					ajac( imax, k ) = ajac( j, k );
-					ajac( j, k ) = dum;
+					dum = ajac( k, imax );
+					ajac( k, imax ) = ajac( k, j );
+					ajac( k, j ) = dum;
 				}
 				d = -d;
 				vv( imax ) = vv( j );
@@ -4300,7 +4300,7 @@ namespace WindowManager {
 			if ( j != n ) {
 				dum = 1.0 / ajac( j, j );
 				for ( i = j + 1; i <= n; ++i ) {
-					ajac( i, j ) *= dum;
+					ajac( j, i ) *= dum;
 				}
 			}
 		}
@@ -4362,7 +4362,7 @@ namespace WindowManager {
 			b( ll ) = b( i );
 			if ( ii != 0 ) {
 				for ( j = ii; j <= i - 1; ++j ) {
-					sum -= a( i, j ) * b( j );
+					sum -= a( j, i ) * b( j );
 				}
 			} else if ( sum != 0.0 ) {
 				ii = i;
@@ -4372,7 +4372,7 @@ namespace WindowManager {
 		for ( i = n; i >= 1; --i ) {
 			sum = b( i );
 			for ( j = i + 1; j <= n; ++j ) {
-				sum -= a( i, j ) * b( j );
+				sum -= a( j, i ) * b( j );
 			}
 			b( i ) = sum / a( i, i );
 		}
@@ -4462,16 +4462,16 @@ namespace WindowManager {
 		NMix = gnmix( IGap ); //Autodesk:Logic Either assert NMix>0 or handle NMix<=0 in logic so that con and locals guar. initialized before use
 
 		for ( IMix = 1; IMix <= NMix; ++IMix ) {
-			frct( IMix ) = gfract( IGap, IMix );
+			frct( IMix ) = gfract( IMix, IGap );
 		}
 
 		Real64 const tmean( 0.5 * ( tleft + tright ) ); // Average gap gas temperature (K)
 		Real64 const tmean_2( pow_2( tmean ) );
 
-		fcon( 1 ) = gcon( IGap, 1, 1 ) + gcon( IGap, 1, 2 ) * tmean + gcon( IGap, 1, 3 ) * tmean_2;
-		fvis( 1 ) = gvis( IGap, 1, 1 ) + gvis( IGap, 1, 2 ) * tmean + gvis( IGap, 1, 3 ) * tmean_2;
-		fcp( 1 ) = gcp( IGap, 1, 1 ) + gcp( IGap, 1, 2 ) * tmean + gcp( IGap, 1, 3 ) * tmean_2;
-		fdens( 1 ) = pres * gwght( IGap, 1 ) / ( gaslaw * tmean ); // Density using ideal gas law:
+		fcon( 1 ) = gcon( 1, 1, IGap ) + gcon( 2, 1, IGap ) * tmean + gcon( 3, 1, IGap ) * tmean_2;
+		fvis( 1 ) = gvis( 1, 1, IGap ) + gvis( 2, 1, IGap ) * tmean + gvis( 3, 1, IGap ) * tmean_2;
+		fcp( 1 ) = gcp( 1, 1, IGap ) + gcp( 2, 1, IGap ) * tmean + gcp( 3, 1, IGap ) * tmean_2;
+		fdens( 1 ) = pres * gwght( 1, IGap ) / ( gaslaw * tmean ); // Density using ideal gas law:
 		//  rho=(presure*molecweight)/(gasconst*tmean)
 
 		if ( NMix == 1 ) { // Single gas
@@ -4480,9 +4480,9 @@ namespace WindowManager {
 			cp = fcp( 1 );
 			dens = fdens( 1 );
 		} else if ( NMix > 1 ) { // Multiple gases; calculate mixture properties
-			molmix = frct( 1 ) * gwght( IGap, 1 ); // initialize eq. 56
+			molmix = frct( 1 ) * gwght( 1, IGap ); // initialize eq. 56
 			cpmixm = molmix * fcp( 1 ); // initialize eq. 58
-			kprime( 1 ) = 3.75 * ( gaslaw / gwght( IGap, 1 ) ) * fvis( 1 ); // eq. 67
+			kprime( 1 ) = 3.75 * ( gaslaw / gwght( 1, IGap ) ) * fvis( 1 ); // eq. 67
 			kdblprm( 1 ) = fcon( 1 ) - kprime( 1 ); // eq. 67
 
 			// Initialize summations for eqns 60-66
@@ -4495,13 +4495,13 @@ namespace WindowManager {
 
 			// Calculate properties of mixture constituents
 			for ( i = 2; i <= NMix; ++i ) {
-				fcon( i ) = gcon( IGap, i, 1 ) + gcon( IGap, i, 2 ) * tmean + gcon( IGap, i, 3 ) * tmean_2;
-				fvis( i ) = gvis( IGap, i, 1 ) + gvis( IGap, i, 2 ) * tmean + gvis( IGap, i, 3 ) * tmean_2;
-				fcp( i ) = gcp( IGap, i, 1 ) + gcp( IGap, i, 2 ) * tmean + gcp( IGap, i, 3 ) * tmean_2;
-				fdens( i ) = pres * gwght( IGap, i ) / ( gaslaw * tmean );
-				molmix += frct( i ) * gwght( IGap, i ); // eq. 56
-				cpmixm += frct( i ) * fcp( i ) * gwght( IGap, i ); // eq. 58-59
-				kprime( i ) = 3.75 * gaslaw / gwght( IGap, i ) * fvis( i ); // eq. 67
+				fcon( i ) = gcon( 1, i, IGap ) + gcon( 2, i, IGap ) * tmean + gcon( 3, i, IGap ) * tmean_2;
+				fvis( i ) = gvis( 1, i, IGap ) + gvis( 2, i, IGap ) * tmean + gvis( 3, i, IGap ) * tmean_2;
+				fcp( i ) = gcp( 1, i, IGap ) + gcp( 2, i, IGap ) * tmean + gcp( 3, i, IGap ) * tmean_2;
+				fdens( i ) = pres * gwght( i, IGap ) / ( gaslaw * tmean );
+				molmix += frct( i ) * gwght( i, IGap ); // eq. 56
+				cpmixm += frct( i ) * fcp( i ) * gwght( i, IGap ); // eq. 58-59
+				kprime( i ) = 3.75 * gaslaw / gwght( i, IGap ) * fvis( i ); // eq. 67
 				kdblprm( i ) = fcon( i ) - kprime( i ); // eq. 68
 				mukpdwn( i ) = 1.0; // initialize denomonator of eq. 60
 				kpdown( i ) = 1.0; // initialize denomonator of eq. 63
@@ -4511,18 +4511,18 @@ namespace WindowManager {
 			for ( i = 1; i <= NMix; ++i ) {
 				for ( j = 1; j <= NMix; ++j ) {
 					// numerator of equation 61
-					phimup = pow_2( 1.0 + std::sqrt( fvis( i ) / fvis( j ) ) * root_4( gwght( IGap, j ) / gwght( IGap, i ) ) );
+					phimup = pow_2( 1.0 + std::sqrt( fvis( i ) / fvis( j ) ) * root_4( gwght( j, IGap ) / gwght( i, IGap ) ) );
 					// denomonator of eq. 61, 64 and 66
-					downer = two_sqrt_2 * std::sqrt( 1 + ( gwght( IGap, i ) / gwght( IGap, j ) ) );
+					downer = two_sqrt_2 * std::sqrt( 1 + ( gwght( i, IGap ) / gwght( j, IGap ) ) );
 					// calculate the denominator of eq. 60
 					if ( i != j ) mukpdwn( i ) += phimup / downer * frct( j ) / frct( i );
 					// numerator of eq. 64; psiterm is the multiplied term in backets
-					psiup = pow_2( 1.0 + std::sqrt( kprime( i ) / kprime( j ) ) * root_4( gwght( IGap, i ) / gwght( IGap, j ) ) );
-					psiterm = 1.0 + 2.41 * ( gwght( IGap, i ) - gwght( IGap, j ) ) * ( gwght( IGap, i ) - 0.142 * gwght( IGap, j ) ) / pow_2( gwght( IGap, i ) + gwght( IGap, j ) );
+					psiup = pow_2( 1.0 + std::sqrt( kprime( i ) / kprime( j ) ) * root_4( gwght( i, IGap ) / gwght( j, IGap ) ) );
+					psiterm = 1.0 + 2.41 * ( gwght( i, IGap ) - gwght( j, IGap ) ) * ( gwght( i, IGap ) - 0.142 * gwght( j, IGap ) ) / pow_2( gwght( i, IGap ) + gwght( j, IGap ) );
 					// using the common denominator, downer, calculate the denominator for eq. 63
 					if ( i != j ) kpdown( i ) += psiup * ( psiterm / downer ) * ( frct( j ) / frct( i ) );
 					// calculate the numerator of eq. 66
-					phikup = pow_2( 1.0 + std::sqrt( kprime( i ) / kprime( j ) ) * root_4( gwght( IGap, i ) / gwght( IGap, j ) ) );
+					phikup = pow_2( 1.0 + std::sqrt( kprime( i ) / kprime( j ) ) * root_4( gwght( i, IGap ) / gwght( j, IGap ) ) );
 					// using the common denominator, downer, calculate the denomonator for eq. 65
 					if ( i != j ) kdpdown( i ) += ( phikup / downer ) * ( frct( j ) / frct( i ) );
 				}
@@ -4613,18 +4613,18 @@ namespace WindowManager {
 		NMix = gnmix( IGap );
 
 		for ( IMix = 1; IMix <= NMix; ++IMix ) {
-			frct( IMix ) = gfract( IGap, IMix );
+			frct( IMix ) = gfract( IMix, IGap );
 		}
 
 		Real64 const tmean_2( pow_2( tmean ) );
-		fvis( 1 ) = gvis( IGap, 1, 1 ) + gvis( IGap, 1, 2 ) * tmean + gvis( IGap, 1, 3 ) * tmean_2;
-		fdens( 1 ) = pres * gwght( IGap, 1 ) / ( gaslaw * tmean ); // Density using ideal gas law:
+		fvis( 1 ) = gvis( 1, 1, IGap ) + gvis( 2, 1, IGap ) * tmean + gvis( 3, 1, IGap ) * tmean_2;
+		fdens( 1 ) = pres * gwght( 1, IGap ) / ( gaslaw * tmean ); // Density using ideal gas law:
 		//  rho=(presure*molecweight)/(gasconst*tmean)
 		if ( NMix == 1 ) { // Single gas
 			visc = fvis( 1 );
 			dens = fdens( 1 );
 		} else { // Multiple gases; calculate mixture properties
-			molmix = frct( 1 ) * gwght( IGap, 1 ); // initialize eq. 56
+			molmix = frct( 1 ) * gwght( 1, IGap ); // initialize eq. 56
 
 			// Initialize summations for eqns 60-66
 			mumix = 0.0;
@@ -4632,18 +4632,18 @@ namespace WindowManager {
 
 			// Calculate properties of mixture constituents
 			for ( i = 2; i <= NMix; ++i ) {
-				fvis( i ) = gvis( IGap, i, 1 ) + gvis( IGap, i, 2 ) * tmean + gvis( IGap, i, 3 ) * tmean_2;
-				fdens( i ) = pres * gwght( IGap, i ) / ( gaslaw * tmean );
-				molmix += frct( i ) * gwght( IGap, i ); // eq. 56
+				fvis( i ) = gvis( 1, i, IGap ) + gvis( 2, i, IGap ) * tmean + gvis( 3, i, IGap ) * tmean_2;
+				fdens( i ) = pres * gwght( i, IGap ) / ( gaslaw * tmean );
+				molmix += frct( i ) * gwght( i, IGap ); // eq. 56
 				mukpdwn( i ) = 1.0; // initialize denomonator of eq. 60
 			}
 
 			for ( i = 1; i <= NMix; ++i ) {
 				for ( j = 1; j <= NMix; ++j ) {
 					// numerator of equation 61
-					phimup = pow_2( 1.0 + std::sqrt( fvis( i ) / fvis( j ) ) * root_4( gwght( IGap, j ) / gwght( IGap, i ) ) );
+					phimup = pow_2( 1.0 + std::sqrt( fvis( i ) / fvis( j ) ) * root_4( gwght( j, IGap ) / gwght( i, IGap ) ) );
 					// denomonator of eq. 61, 64 and 66
-					downer = two_sqrt_2 * std::sqrt( 1 + ( gwght( IGap, i ) / gwght( IGap, j ) ) );
+					downer = two_sqrt_2 * std::sqrt( 1 + ( gwght( i, IGap ) / gwght( j, IGap ) ) );
 					// calculate the denominator of eq. 60
 					if ( i != j ) mukpdwn( i ) += phimup / downer * frct( j ) / frct( i );
 				}
@@ -5592,7 +5592,7 @@ namespace WindowManager {
 
 		Array2D< Real64 > A( 6, 6 ); // Least squares derivative matrix
 		Array1D< Real64 > B( 6 ); // Least squares derivative vector
-		Array2D< Real64 > D( 16, 6 ); // Powers of independent variable
+		Array2D< Real64 > D( 6, 16 ); // Powers of independent variable
 		Real64 ACON; // Intermediate variables
 		Real64 SUM;
 		int i; // Loop parameters
@@ -5608,28 +5608,28 @@ namespace WindowManager {
 
 		// Set up least squares matrix
 		for ( M = N1; M <= N2; ++M ) {
-			D( M, 1 ) = IndepVar( M );
+			D( 1, M ) = IndepVar( M );
 		}
 
 		for ( i = 2; i <= N; ++i ) {
 			for ( M = N1; M <= N2; ++M ) {
-				D( M, i ) = D( M, i - 1 ) * IndepVar( M );
+				D( i, M ) = D( i - 1, M ) * IndepVar( M );
 			}
 		}
 
 		for ( i = 1; i <= N; ++i ) {
 			SUM = 0.0;
 			for ( M = N1; M <= N2; ++M ) {
-				SUM += DepVar( M ) * D( M, i );
+				SUM += DepVar( M ) * D( i, M );
 			}
 			B( i ) = SUM;
 			for ( j = 1; j <= N; ++j ) {
 				SUM = 0.0;
 				for ( M = N1; M <= N2; ++M ) {
-					SUM += D( M, i ) * D( M, j );
+					SUM += D( i, M ) * D( j, M );
 				}
-				A( i, j ) = SUM;
 				A( j, i ) = SUM;
+				A( i, j ) = SUM;
 			}
 		}
 
@@ -5638,10 +5638,10 @@ namespace WindowManager {
 		for ( K = 1; K <= NM1; ++K ) {
 			KP1 = K + 1;
 			for ( i = KP1; i <= N; ++i ) {
-				ACON = A( i, K ) / A( K, K );
+				ACON = A( K, i ) / A( K, K );
 				B( i ) -= B( K ) * ACON;
 				for ( j = K; j <= N; ++j ) {
-					A( i, j ) -= A( K, j ) * ACON;
+					A( j, i ) -= A( j, K ) * ACON;
 				}
 			}
 		}
@@ -5654,7 +5654,7 @@ namespace WindowManager {
 		while ( L > 0 ) {
 			SUM = 0.0;
 			for ( j = LP1; j <= N; ++j ) {
-				SUM += A( L, j ) * CoeffsCurve( j );
+				SUM += A( j, L ) * CoeffsCurve( j );
 			}
 			CoeffsCurve( L ) = ( B( L ) - SUM ) / A( L, L );
 			LP1 = L;
@@ -5716,7 +5716,7 @@ namespace WindowManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Array2D< Real64 > A( 6, 6 ); // Least squares derivative matrix
 		Array1D< Real64 > B( 6 ); // Least squares derivative vector
-		Array2D< Real64 > D( 16, 6 ); // Powers of independent variable
+		Array2D< Real64 > D( 6, 16 ); // Powers of independent variable
 		Real64 ACON; // Intermediate variables
 		Real64 SUM;
 		int i; // Loop parameters
@@ -5730,28 +5730,28 @@ namespace WindowManager {
 
 		// Set up least squares matrix
 		for ( M = N1; M <= N2; ++M ) {
-			D( M, 1 ) = IndepVar( M );
+			D( 1, M ) = IndepVar( M );
 		}
 
 		for ( i = 2; i <= N; ++i ) {
 			for ( M = N1; M <= N2; ++M ) {
-				D( M, i ) = D( M, i - 1 ) * IndepVar( M );
+				D( i, M ) = D( i - 1, M ) * IndepVar( M );
 			}
 		}
 
 		for ( i = 1; i <= N; ++i ) {
 			SUM = 0.0;
 			for ( M = N1; M <= N2; ++M ) {
-				SUM += DepVar( M ) * D( M, i );
+				SUM += DepVar( M ) * D( i, M );
 			}
 			B( i ) = SUM;
 			for ( j = 1; j <= N; ++j ) {
 				SUM = 0.0;
 				for ( M = N1; M <= N2; ++M ) {
-					SUM += D( M, i ) * D( M, j );
+					SUM += D( i, M ) * D( j, M );
 				}
-				A( i, j ) = SUM;
 				A( j, i ) = SUM;
+				A( i, j ) = SUM;
 			}
 		}
 
@@ -5760,10 +5760,10 @@ namespace WindowManager {
 		for ( K = 1; K <= NM1; ++K ) {
 			KP1 = K + 1;
 			for ( i = KP1; i <= N; ++i ) {
-				ACON = A( i, K ) / A( K, K );
+				ACON = A( K, i ) / A( K, K );
 				B( i ) -= B( K ) * ACON;
 				for ( j = K; j <= N; ++j ) {
-					A( i, j ) -= A( K, j ) * ACON;
+					A( j, i ) -= A( j, K ) * ACON;
 				}
 			}
 		}
@@ -5776,7 +5776,7 @@ namespace WindowManager {
 		while ( L > 0 ) {
 			SUM = 0.0;
 			for ( j = LP1; j <= N; ++j ) {
-				SUM += A( L, j ) * CoeffsCurve( j );
+				SUM += A( j, L ) * CoeffsCurve( j );
 			}
 			CoeffsCurve( L ) = ( B( L ) - SUM ) / A( L, L );
 			LP1 = L;
@@ -6571,16 +6571,16 @@ namespace WindowManager {
 				emis( 2 * IGlass ) = Material( LayPtr ).AbsorpThermalBack;
 				tir( 2 * IGlass - 1 ) = Material( LayPtr ).TransThermal;
 				tir( 2 * IGlass ) = Material( LayPtr ).TransThermal;
-				AbsBeamNorm( IGlass ) = POLYF( 1.0, Construct( ConstrNum ).AbsBeamCoef( IGlass, {1,6} ) );
+				AbsBeamNorm( IGlass ) = POLYF( 1.0, Construct( ConstrNum ).AbsBeamCoef( {1,6}, IGlass ) );
 				if ( ShadeFlag == IntBlindOn ) { // Interior blind on
-					AbsBeamNorm( IGlass ) = POLYF( 1.0, Construct( ConstrNumBare ).AbsBeamCoef( IGlass, {1,6} ) );
+					AbsBeamNorm( IGlass ) = POLYF( 1.0, Construct( ConstrNumBare ).AbsBeamCoef( {1,6}, IGlass ) );
 					AGlDiffBack = Construct( ConstrNumBare ).AbsDiffBack( IGlass );
 					AbsBeamNorm( IGlass ) += TBmBm * AGlDiffBack * RhoBlFront / ( 1.0 - RhoBlFront * RGlDiffBack );
 				} else if ( ShadeFlag == ExtBlindOn ) { // Exterior blind on
-					AbsBeamNorm( IGlass ) = POLYF( 1.0, Construct( ConstrNumBare ).AbsBeamCoef( IGlass, {1,6} ) );
+					AbsBeamNorm( IGlass ) = POLYF( 1.0, Construct( ConstrNumBare ).AbsBeamCoef( {1,6}, IGlass ) );
 					AbsBeamNorm( IGlass ) = TBlBmBm * AbsBeamNorm( IGlass ) + ( TBlBmBm * RGlFront * RhoBlBack + TBlBmDif ) * Construct( ConstrNumBare ).AbsDiff( IGlass ) / ( 1.0 - RGlDiffFront * RhoBlDiffBack );
 				} else if ( ShadeFlag == ExtScreenOn ) { // Exterior screen on
-					AbsBeamNorm( IGlass ) = POLYF( 1.0, Construct( ConstrNumBare ).AbsBeamCoef( IGlass, {1,6} ) );
+					AbsBeamNorm( IGlass ) = POLYF( 1.0, Construct( ConstrNumBare ).AbsBeamCoef( {1,6}, IGlass ) );
 					AbsBeamNorm( IGlass ) = TScBmBm * AbsBeamNorm( IGlass ) + ( TScBmBm * RGlFront * RScBack + TScBmDif ) * Construct( ConstrNumBare ).AbsDiff( IGlass ) / ( 1.0 - RGlDiffFront * RScDifBack );
 				}
 				AbsRadGlassFace( 2 * IGlass - 1 ) = 0.5 * BeamSolarInc * AbsBeamNorm( IGlass );
@@ -6595,12 +6595,12 @@ namespace WindowManager {
 				gap( IGap ) = Material( LayPtr ).Thickness;
 				gnmix( IGap ) = Material( LayPtr ).NumberOfGasesInMixture;
 				for ( IMix = 1; IMix <= gnmix( IGap ); ++IMix ) {
-					gwght( IGap, IMix ) = Material( LayPtr ).GasWght( IMix );
-					gfract( IGap, IMix ) = Material( LayPtr ).GasFract( IMix );
+					gwght( IMix, IGap ) = Material( LayPtr ).GasWght( IMix );
+					gfract( IMix, IGap ) = Material( LayPtr ).GasFract( IMix );
 					for ( ICoeff = 1; ICoeff <= 3; ++ICoeff ) {
-						gcon( IGap, IMix, ICoeff ) = Material( LayPtr ).GasCon( IMix, ICoeff );
-						gvis( IGap, IMix, ICoeff ) = Material( LayPtr ).GasVis( IMix, ICoeff );
-						gcp( IGap, IMix, ICoeff ) = Material( LayPtr ).GasCp( IMix, ICoeff );
+						gcon( ICoeff, IMix, IGap ) = Material( LayPtr ).GasCon( ICoeff, IMix );
+						gvis( ICoeff, IMix, IGap ) = Material( LayPtr ).GasVis( ICoeff, IMix );
+						gcp( ICoeff, IMix, IGap ) = Material( LayPtr ).GasCp( ICoeff, IMix );
 					}
 				}
 			}
@@ -6838,8 +6838,8 @@ namespace WindowManager {
 				Bface( 2 ) = Rmir * emis( 2 ) + hcin * tin + AbsRadGlassFace( 2 );
 
 				Aface( 1, 1 ) = hr( 1 ) + scon( 1 ) + hcout;
-				Aface( 1, 2 ) = -scon( 1 );
 				Aface( 2, 1 ) = -scon( 1 );
+				Aface( 1, 2 ) = -scon( 1 );
 				Aface( 2, 2 ) = hr( 2 ) + scon( 1 ) + hcin;
 
 			} else if ( SELECT_CASE_var == 2 ) {
@@ -6853,17 +6853,17 @@ namespace WindowManager {
 				Bface( 4 ) = Rmir * emis( 4 ) + hcin * tin + AbsRadGlassFace( 4 );
 
 				Aface( 1, 1 ) = hr( 1 ) + scon( 1 ) + hcout;
-				Aface( 1, 2 ) = -scon( 1 );
-
 				Aface( 2, 1 ) = -scon( 1 );
+
+				Aface( 1, 2 ) = -scon( 1 );
 				Aface( 2, 2 ) = scon( 1 ) + hgap( 1 ) - A23P * hr( 2 );
-				Aface( 2, 3 ) = -hgap( 1 ) - A32P * hr( 3 );
+				Aface( 3, 2 ) = -hgap( 1 ) - A32P * hr( 3 );
 
-				Aface( 3, 2 ) = -hgap( 1 ) + A23P * hr( 2 );
+				Aface( 2, 3 ) = -hgap( 1 ) + A23P * hr( 2 );
 				Aface( 3, 3 ) = hgap( 1 ) + scon( 2 ) + A32P * hr( 3 );
-				Aface( 3, 4 ) = -scon( 2 );
-
 				Aface( 4, 3 ) = -scon( 2 );
+
+				Aface( 3, 4 ) = -scon( 2 );
 				Aface( 4, 4 ) = hr( 4 ) + scon( 2 ) + hcin;
 
 			} else if ( SELECT_CASE_var == 3 ) {
@@ -6883,25 +6883,25 @@ namespace WindowManager {
 				Bface( 6 ) = Rmir * emis( 6 ) + hcin * tin + AbsRadGlassFace( 6 );
 
 				Aface( 1, 1 ) = hr( 1 ) + scon( 1 ) + hcout;
-				Aface( 1, 2 ) = -scon( 1 );
-
 				Aface( 2, 1 ) = -scon( 1 );
+
+				Aface( 1, 2 ) = -scon( 1 );
 				Aface( 2, 2 ) = scon( 1 ) + hgap( 1 ) - A23P * hr( 2 );
-				Aface( 2, 3 ) = -hgap( 1 ) - A32P * hr( 3 );
+				Aface( 3, 2 ) = -hgap( 1 ) - A32P * hr( 3 );
 
-				Aface( 3, 2 ) = -hgap( 1 ) + A23P * hr( 2 );
+				Aface( 2, 3 ) = -hgap( 1 ) + A23P * hr( 2 );
 				Aface( 3, 3 ) = hgap( 1 ) + scon( 2 ) + A32P * hr( 3 );
-				Aface( 3, 4 ) = -scon( 2 );
-
 				Aface( 4, 3 ) = -scon( 2 );
+
+				Aface( 3, 4 ) = -scon( 2 );
 				Aface( 4, 4 ) = scon( 2 ) + hgap( 2 ) - A45P * hr( 4 );
-				Aface( 4, 5 ) = -hgap( 2 ) - A54P * hr( 5 );
+				Aface( 5, 4 ) = -hgap( 2 ) - A54P * hr( 5 );
 
-				Aface( 5, 4 ) = -hgap( 2 ) + A45P * hr( 4 );
+				Aface( 4, 5 ) = -hgap( 2 ) + A45P * hr( 4 );
 				Aface( 5, 5 ) = hgap( 2 ) + scon( 3 ) + A54P * hr( 5 );
-				Aface( 5, 6 ) = -scon( 3 );
-
 				Aface( 6, 5 ) = -scon( 3 );
+
+				Aface( 5, 6 ) = -scon( 3 );
 				Aface( 6, 6 ) = hr( 6 ) + scon( 3 ) + hcin;
 
 			} else if ( SELECT_CASE_var == 4 ) {
@@ -6927,33 +6927,33 @@ namespace WindowManager {
 				Bface( 8 ) = Rmir * emis( 8 ) + hcin * tin + AbsRadGlassFace( 8 );
 
 				Aface( 1, 1 ) = hr( 1 ) + scon( 1 ) + hcout;
-				Aface( 1, 2 ) = -scon( 1 );
-
 				Aface( 2, 1 ) = -scon( 1 );
+
+				Aface( 1, 2 ) = -scon( 1 );
 				Aface( 2, 2 ) = scon( 1 ) + hgap( 1 ) - A23P * hr( 2 );
-				Aface( 2, 3 ) = -hgap( 1 ) - A32P * hr( 3 );
+				Aface( 3, 2 ) = -hgap( 1 ) - A32P * hr( 3 );
 
-				Aface( 3, 2 ) = -hgap( 1 ) + A23P * hr( 2 );
+				Aface( 2, 3 ) = -hgap( 1 ) + A23P * hr( 2 );
 				Aface( 3, 3 ) = hgap( 1 ) + scon( 2 ) + A32P * hr( 3 );
-				Aface( 3, 4 ) = -scon( 2 );
-
 				Aface( 4, 3 ) = -scon( 2 );
+
+				Aface( 3, 4 ) = -scon( 2 );
 				Aface( 4, 4 ) = scon( 2 ) + hgap( 2 ) - A45P * hr( 4 );
-				Aface( 4, 5 ) = -hgap( 2 ) - A54P * hr( 5 );
+				Aface( 5, 4 ) = -hgap( 2 ) - A54P * hr( 5 );
 
-				Aface( 5, 4 ) = -hgap( 2 ) + A45P * hr( 4 );
+				Aface( 4, 5 ) = -hgap( 2 ) + A45P * hr( 4 );
 				Aface( 5, 5 ) = hgap( 2 ) + scon( 3 ) + A54P * hr( 5 );
-				Aface( 5, 6 ) = -scon( 3 );
-
 				Aface( 6, 5 ) = -scon( 3 );
+
+				Aface( 5, 6 ) = -scon( 3 );
 				Aface( 6, 6 ) = scon( 3 ) + hgap( 3 ) - A67P * hr( 6 );
-				Aface( 6, 7 ) = -hgap( 3 ) - A76P * hr( 7 );
+				Aface( 7, 6 ) = -hgap( 3 ) - A76P * hr( 7 );
 
-				Aface( 7, 6 ) = -hgap( 3 ) + A67P * hr( 6 );
+				Aface( 6, 7 ) = -hgap( 3 ) + A67P * hr( 6 );
 				Aface( 7, 7 ) = hgap( 3 ) + scon( 4 ) + A76P * hr( 7 );
-				Aface( 7, 8 ) = -scon( 4 );
-
 				Aface( 8, 7 ) = -scon( 4 );
+
+				Aface( 7, 8 ) = -scon( 4 );
 				Aface( 8, 8 ) = hr( 8 ) + scon( 4 ) + hcin;
 
 			}}
@@ -7509,26 +7509,26 @@ namespace WindowManager {
 						BlindOpticsBeam( BlindNum, bld_pr, bld_el, sun_el, st_lay );
 
 						if ( ISolVis == 1 ) { // Fill blind beam solar properties
-							Blind( BlindNum ).SolFrontBeamBeamTrans( IProfAng, ISlatAng ) = st_lay( 1 );
-							Blind( BlindNum ).SolFrontBeamBeamRefl( IProfAng, ISlatAng ) = st_lay( 2 );
-							Blind( BlindNum ).SolBackBeamBeamTrans( IProfAng, ISlatAng ) = st_lay( 3 );
-							Blind( BlindNum ).SolBackBeamBeamRefl( IProfAng, ISlatAng ) = st_lay( 4 );
-							Blind( BlindNum ).SolFrontBeamDiffTrans( IProfAng, ISlatAng ) = st_lay( 5 );
-							Blind( BlindNum ).SolFrontBeamDiffRefl( IProfAng, ISlatAng ) = st_lay( 6 );
-							Blind( BlindNum ).SolBackBeamDiffTrans( IProfAng, ISlatAng ) = st_lay( 7 );
-							Blind( BlindNum ).SolBackBeamDiffRefl( IProfAng, ISlatAng ) = st_lay( 8 );
-							Blind( BlindNum ).SolFrontBeamAbs( IProfAng, ISlatAng ) = max( 0.0, 1.0 - st_lay( 6 ) - st_lay( 1 ) - st_lay( 5 ) );
-							Blind( BlindNum ).SolBackBeamAbs( IProfAng, ISlatAng ) = max( 0.0, 1.0 - st_lay( 7 ) - st_lay( 3 ) - st_lay( 8 ) );
+							Blind( BlindNum ).SolFrontBeamBeamTrans( ISlatAng, IProfAng ) = st_lay( 1 );
+							Blind( BlindNum ).SolFrontBeamBeamRefl( ISlatAng, IProfAng ) = st_lay( 2 );
+							Blind( BlindNum ).SolBackBeamBeamTrans( ISlatAng, IProfAng ) = st_lay( 3 );
+							Blind( BlindNum ).SolBackBeamBeamRefl( ISlatAng, IProfAng ) = st_lay( 4 );
+							Blind( BlindNum ).SolFrontBeamDiffTrans( ISlatAng, IProfAng ) = st_lay( 5 );
+							Blind( BlindNum ).SolFrontBeamDiffRefl( ISlatAng, IProfAng ) = st_lay( 6 );
+							Blind( BlindNum ).SolBackBeamDiffTrans( ISlatAng, IProfAng ) = st_lay( 7 );
+							Blind( BlindNum ).SolBackBeamDiffRefl( ISlatAng, IProfAng ) = st_lay( 8 );
+							Blind( BlindNum ).SolFrontBeamAbs( ISlatAng, IProfAng ) = max( 0.0, 1.0 - st_lay( 6 ) - st_lay( 1 ) - st_lay( 5 ) );
+							Blind( BlindNum ).SolBackBeamAbs( ISlatAng, IProfAng ) = max( 0.0, 1.0 - st_lay( 7 ) - st_lay( 3 ) - st_lay( 8 ) );
 
 						} else { // Fill blind beam visible properties
-							Blind( BlindNum ).VisFrontBeamBeamTrans( IProfAng, ISlatAng ) = st_lay( 1 );
-							Blind( BlindNum ).VisFrontBeamBeamRefl( IProfAng, ISlatAng ) = st_lay( 2 );
-							Blind( BlindNum ).VisBackBeamBeamTrans( IProfAng, ISlatAng ) = st_lay( 3 );
-							Blind( BlindNum ).VisBackBeamBeamRefl( IProfAng, ISlatAng ) = st_lay( 4 );
-							Blind( BlindNum ).VisFrontBeamDiffTrans( IProfAng, ISlatAng ) = st_lay( 5 );
-							Blind( BlindNum ).VisFrontBeamDiffRefl( IProfAng, ISlatAng ) = st_lay( 6 );
-							Blind( BlindNum ).VisBackBeamDiffTrans( IProfAng, ISlatAng ) = st_lay( 7 );
-							Blind( BlindNum ).VisBackBeamDiffRefl( IProfAng, ISlatAng ) = st_lay( 8 );
+							Blind( BlindNum ).VisFrontBeamBeamTrans( ISlatAng, IProfAng ) = st_lay( 1 );
+							Blind( BlindNum ).VisFrontBeamBeamRefl( ISlatAng, IProfAng ) = st_lay( 2 );
+							Blind( BlindNum ).VisBackBeamBeamTrans( ISlatAng, IProfAng ) = st_lay( 3 );
+							Blind( BlindNum ).VisBackBeamBeamRefl( ISlatAng, IProfAng ) = st_lay( 4 );
+							Blind( BlindNum ).VisFrontBeamDiffTrans( ISlatAng, IProfAng ) = st_lay( 5 );
+							Blind( BlindNum ).VisFrontBeamDiffRefl( ISlatAng, IProfAng ) = st_lay( 6 );
+							Blind( BlindNum ).VisBackBeamDiffTrans( ISlatAng, IProfAng ) = st_lay( 7 );
+							Blind( BlindNum ).VisBackBeamDiffRefl( ISlatAng, IProfAng ) = st_lay( 8 );
 						}
 
 						if ( Blind( BlindNum ).SlatAngleType == FixedSlats ) break;
@@ -7537,12 +7537,12 @@ namespace WindowManager {
 
 				if ( ISolVis == 1 ) {
 					for ( ISlatAng = 1; ISlatAng <= MaxSlatAngs; ++ISlatAng ) {
-						Blind( BlindNum ).SolFrontDiffDiffTransGnd( ISlatAng ) = DiffuseAverageProfAngGnd( Blind( BlindNum ).SolFrontBeamBeamTrans( {1,37}, ISlatAng ) ) + DiffuseAverageProfAngGnd( Blind( BlindNum ).SolFrontBeamDiffTrans( {1,37}, ISlatAng ) );
-						Blind( BlindNum ).SolFrontDiffDiffTransSky( ISlatAng ) = DiffuseAverageProfAngSky( Blind( BlindNum ).SolFrontBeamBeamTrans( {1,37}, ISlatAng ) ) + DiffuseAverageProfAngSky( Blind( BlindNum ).SolFrontBeamDiffTrans( {1,37}, ISlatAng ) );
-						Blind( BlindNum ).SolFrontDiffAbsGnd( ISlatAng ) = DiffuseAverageProfAngGnd( Blind( BlindNum ).SolFrontBeamAbs( {1,37}, ISlatAng ) );
-						Blind( BlindNum ).SolFrontDiffAbsSky( ISlatAng ) = DiffuseAverageProfAngSky( Blind( BlindNum ).SolFrontBeamAbs( {1,37}, ISlatAng ) );
-						Blind( BlindNum ).SolFrontDiffDiffReflGnd( ISlatAng ) = DiffuseAverageProfAngGnd( Blind( BlindNum ).SolFrontBeamDiffRefl( {1,37}, ISlatAng ) );
-						Blind( BlindNum ).SolFrontDiffDiffReflSky( ISlatAng ) = DiffuseAverageProfAngSky( Blind( BlindNum ).SolFrontBeamDiffRefl( {1,37}, ISlatAng ) );
+						Blind( BlindNum ).SolFrontDiffDiffTransGnd( ISlatAng ) = DiffuseAverageProfAngGnd( Blind( BlindNum ).SolFrontBeamBeamTrans( ISlatAng, {1,37} ) ) + DiffuseAverageProfAngGnd( Blind( BlindNum ).SolFrontBeamDiffTrans( ISlatAng, {1,37} ) );
+						Blind( BlindNum ).SolFrontDiffDiffTransSky( ISlatAng ) = DiffuseAverageProfAngSky( Blind( BlindNum ).SolFrontBeamBeamTrans( ISlatAng, {1,37} ) ) + DiffuseAverageProfAngSky( Blind( BlindNum ).SolFrontBeamDiffTrans( ISlatAng, {1,37} ) );
+						Blind( BlindNum ).SolFrontDiffAbsGnd( ISlatAng ) = DiffuseAverageProfAngGnd( Blind( BlindNum ).SolFrontBeamAbs( ISlatAng, {1,37} ) );
+						Blind( BlindNum ).SolFrontDiffAbsSky( ISlatAng ) = DiffuseAverageProfAngSky( Blind( BlindNum ).SolFrontBeamAbs( ISlatAng, {1,37} ) );
+						Blind( BlindNum ).SolFrontDiffDiffReflGnd( ISlatAng ) = DiffuseAverageProfAngGnd( Blind( BlindNum ).SolFrontBeamDiffRefl( ISlatAng, {1,37} ) );
+						Blind( BlindNum ).SolFrontDiffDiffReflSky( ISlatAng ) = DiffuseAverageProfAngSky( Blind( BlindNum ).SolFrontBeamDiffRefl( ISlatAng, {1,37} ) );
 
 						// TH 2/17/2010. Added. Loop only for movable slat blinds
 						if ( Blind( BlindNum ).SlatAngleType == FixedSlats ) break;
@@ -7727,8 +7727,8 @@ namespace WindowManager {
 							SunAzimuth = Material( MatNum ).ScreenMapResolution * ( j - 1 ) * ( Pi / 180.0 );
 							SunAltitude = Material( MatNum ).ScreenMapResolution * ( i - 1 ) * ( Pi / 180.0 );
 							CalcScreenTransmittance( 0, SunAltitude, SunAzimuth, ScreenNum );
-							ScreenTrans( ScreenNum ).Trans( j, i ) = SurfaceScreens( ScreenNum ).BmBmTrans;
-							ScreenTrans( ScreenNum ).Scatt( j, i ) = SurfaceScreens( ScreenNum ).BmDifTrans;
+							ScreenTrans( ScreenNum ).Trans( i, j ) = SurfaceScreens( ScreenNum ).BmBmTrans;
+							ScreenTrans( ScreenNum ).Scatt( i, j ) = SurfaceScreens( ScreenNum ).BmDifTrans;
 						}
 					}
 
@@ -7743,9 +7743,9 @@ namespace WindowManager {
 					for ( j = 1; j <= 90 / Material( MatNum ).ScreenMapResolution + 1; ++j ) {
 						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( ScreenTransUnitNo, fmtA, flags ) << RoundSigDigits( ( ( j - 1 ) * Material( MatNum ).ScreenMapResolution ) ); }
 						for ( i = 90 / Material( MatNum ).ScreenMapResolution + 1; i >= 2; --i ) {
-							{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( ScreenTransUnitNo, fmtA, flags ) << "," + RoundSigDigits( ScreenTrans( ScreenNum ).Trans( j, i ), 6 ); }
+							{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( ScreenTransUnitNo, fmtA, flags ) << "," + RoundSigDigits( ScreenTrans( ScreenNum ).Trans( i, j ), 6 ); }
 						}
-						gio::write( ScreenTransUnitNo, fmtA ) << "," + RoundSigDigits( ScreenTrans( ScreenNum ).Trans( j, i ), 6 );
+						gio::write( ScreenTransUnitNo, fmtA ) << "," + RoundSigDigits( ScreenTrans( ScreenNum ).Trans( i, j ), 6 );
 					}
 					gio::write( ScreenTransUnitNo );
 					gio::write( ScreenTransUnitNo );
@@ -7760,9 +7760,9 @@ namespace WindowManager {
 					for ( j = 1; j <= 90 / Material( MatNum ).ScreenMapResolution + 1; ++j ) {
 						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( ScreenTransUnitNo, fmtA, flags ) << RoundSigDigits( ( ( j - 1 ) * Material( MatNum ).ScreenMapResolution ) ); }
 						for ( i = 1; i <= 90 / Material( MatNum ).ScreenMapResolution; ++i ) {
-							{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( ScreenTransUnitNo, fmtA, flags ) << "," + RoundSigDigits( ScreenTrans( ScreenNum ).Scatt( j, i ), 6 ); }
+							{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( ScreenTransUnitNo, fmtA, flags ) << "," + RoundSigDigits( ScreenTrans( ScreenNum ).Scatt( i, j ), 6 ); }
 						}
-						gio::write( ScreenTransUnitNo, fmtA ) << "," + RoundSigDigits( ScreenTrans( ScreenNum ).Scatt( j, 90 / Material( MatNum ).ScreenMapResolution + 1 ), 6 );
+						gio::write( ScreenTransUnitNo, fmtA ) << "," + RoundSigDigits( ScreenTrans( ScreenNum ).Scatt( 90 / Material( MatNum ).ScreenMapResolution + 1, j ), 6 );
 					}
 					gio::write( ScreenTransUnitNo );
 					gio::write( ScreenTransUnitNo );
@@ -7895,8 +7895,8 @@ Label99999: ;
 
 		for ( k = 3; k <= 5; k += 2 ) {
 			for ( m = 3; m <= 6; ++m ) {
-				X( k - 2, m - 2 ) = -c( 12 ) * F( m, k ) - c( 10 ) * F( m, k + 1 );
-				X( k - 1, m - 2 ) = -c( 10 ) * F( m, k ) - c( 11 ) * F( m, k + 1 );
+				X( m - 2, k - 2 ) = -c( 12 ) * F( k, m ) - c( 10 ) * F( k + 1, m );
+				X( m - 2, k - 1 ) = -c( 10 ) * F( k, m ) - c( 11 ) * F( k + 1, m );
 			}
 		}
 
@@ -7911,10 +7911,10 @@ Label99999: ;
 
 		//     Sources
 
-		Q( 3 ) = c( 12 ) * F( 1, 3 ) + c( 10 ) * F( 1, 4 );
-		Q( 4 ) = c( 10 ) * F( 1, 3 ) + c( 11 ) * F( 1, 4 );
-		Q( 5 ) = c( 12 ) * F( 1, 5 ) + c( 10 ) * F( 1, 6 );
-		Q( 6 ) = c( 10 ) * F( 1, 5 ) + c( 11 ) * F( 1, 6 );
+		Q( 3 ) = c( 12 ) * F( 3, 1 ) + c( 10 ) * F( 4, 1 );
+		Q( 4 ) = c( 10 ) * F( 3, 1 ) + c( 11 ) * F( 4, 1 );
+		Q( 5 ) = c( 12 ) * F( 5, 1 ) + c( 10 ) * F( 6, 1 );
+		Q( 6 ) = c( 10 ) * F( 5, 1 ) + c( 11 ) * F( 6, 1 );
 
 		//     Radiosities
 
@@ -7923,7 +7923,7 @@ Label99999: ;
 		for ( k = 3; k <= 6; ++k ) {
 			j( k ) = 0.0;
 			for ( m = 3; m <= 6; ++m ) {
-				j( k ) += Xinv( k - 2, m - 2 ) * Q( m );
+				j( k ) += Xinv( m - 2, k - 2 ) * Q( m );
 			}
 		}
 
@@ -7933,7 +7933,7 @@ Label99999: ;
 			G( k ) = 0.0;
 			for ( m = 1; m <= 6; ++m ) {
 				//G(k)=G(k)+F(k,m)*J(m)
-				G( k ) += j( m ) * F( m, k );
+				G( k ) += j( m ) * F( k, m );
 			}
 		}
 
@@ -7967,10 +7967,10 @@ Label99999: ;
 
 		//     Sources
 
-		Q( 3 ) = c( 12 ) * F( 2, 3 ) + c( 10 ) * F( 2, 4 );
-		Q( 4 ) = c( 10 ) * F( 2, 3 ) + c( 11 ) * F( 2, 4 );
-		Q( 5 ) = c( 12 ) * F( 2, 5 ) + c( 10 ) * F( 2, 6 );
-		Q( 6 ) = c( 10 ) * F( 2, 5 ) + c( 11 ) * F( 2, 6 );
+		Q( 3 ) = c( 12 ) * F( 3, 2 ) + c( 10 ) * F( 4, 2 );
+		Q( 4 ) = c( 10 ) * F( 3, 2 ) + c( 11 ) * F( 4, 2 );
+		Q( 5 ) = c( 12 ) * F( 5, 2 ) + c( 10 ) * F( 6, 2 );
+		Q( 6 ) = c( 10 ) * F( 5, 2 ) + c( 11 ) * F( 6, 2 );
 
 		//     Radiosities
 
@@ -7979,7 +7979,7 @@ Label99999: ;
 		for ( k = 3; k <= 6; ++k ) {
 			j( k ) = 0.0;
 			for ( m = 3; m <= 6; ++m ) {
-				j( k ) += Xinv( k - 2, m - 2 ) * Q( m );
+				j( k ) += Xinv( m - 2, k - 2 ) * Q( m );
 			}
 		}
 
@@ -7989,7 +7989,7 @@ Label99999: ;
 			G( k ) = 0.0;
 			for ( m = 1; m <= 6; ++m ) {
 				//G(k)=G(k)+F(k,m)*J(m)
-				G( k ) += j( m ) * F( m, k );
+				G( k ) += j( m ) * F( k, m );
 			}
 		}
 
@@ -8012,8 +8012,8 @@ Label99999: ;
 
 			for ( k = 3; k <= 5; k += 2 ) {
 				for ( m = 3; m <= 6; ++m ) {
-					X( k - 2, m - 2 ) = -rib * F( m, k ) - c( 13 ) * F( m, k + 1 );
-					X( k - 1, m - 2 ) = -c( 13 ) * F( m, k ) - ri * F( m, k + 1 );
+					X( m - 2, k - 2 ) = -rib * F( k, m ) - c( 13 ) * F( k + 1, m );
+					X( m - 2, k - 1 ) = -c( 13 ) * F( k, m ) - ri * F( k + 1, m );
 				}
 			}
 
@@ -8028,10 +8028,10 @@ Label99999: ;
 
 			//     Sources
 
-			Q( 3 ) = rib * F( 1, 3 ) + c( 13 ) * F( 1, 4 );
-			Q( 4 ) = c( 13 ) * F( 1, 3 ) + ri * F( 1, 4 );
-			Q( 5 ) = rib * F( 1, 5 ) + c( 13 ) * F( 1, 6 );
-			Q( 6 ) = c( 13 ) * F( 1, 5 ) + ri * F( 1, 6 );
+			Q( 3 ) = rib * F( 3, 1 ) + c( 13 ) * F( 4, 1 );
+			Q( 4 ) = c( 13 ) * F( 3, 1 ) + ri * F( 4, 1 );
+			Q( 5 ) = rib * F( 5, 1 ) + c( 13 ) * F( 6, 1 );
+			Q( 6 ) = c( 13 ) * F( 5, 1 ) + ri * F( 6, 1 );
 
 			//     Radiosities
 
@@ -8040,7 +8040,7 @@ Label99999: ;
 			for ( k = 3; k <= 6; ++k ) {
 				j( k ) = 0.0;
 				for ( m = 3; m <= 6; ++m ) {
-					j( k ) += Xinv( k - 2, m - 2 ) * Q( m );
+					j( k ) += Xinv( m - 2, k - 2 ) * Q( m );
 				}
 			}
 
@@ -8049,7 +8049,7 @@ Label99999: ;
 				G( k ) = 0.0;
 				for ( m = 1; m <= 6; ++m ) {
 					//G(k)=G(k)+F(k,m)*J(m)
-					G( k ) += j( m ) * F( m, k );
+					G( k ) += j( m ) * F( k, m );
 				}
 			}
 
@@ -8067,10 +8067,10 @@ Label99999: ;
 
 			//     Sources
 
-			Q( 3 ) = rib * F( 2, 3 ) + c( 13 ) * F( 2, 4 );
-			Q( 4 ) = c( 13 ) * F( 2, 3 ) + ri * F( 2, 4 );
-			Q( 5 ) = rib * F( 2, 5 ) + c( 13 ) * F( 2, 6 );
-			Q( 6 ) = c( 13 ) * F( 2, 5 ) + ri * F( 2, 6 );
+			Q( 3 ) = rib * F( 3, 2 ) + c( 13 ) * F( 4, 2 );
+			Q( 4 ) = c( 13 ) * F( 3, 2 ) + ri * F( 4, 2 );
+			Q( 5 ) = rib * F( 5, 2 ) + c( 13 ) * F( 6, 2 );
+			Q( 6 ) = c( 13 ) * F( 5, 2 ) + ri * F( 6, 2 );
 
 			//     Radiosities
 
@@ -8079,7 +8079,7 @@ Label99999: ;
 			for ( k = 3; k <= 6; ++k ) {
 				j( k ) = 0.0;
 				for ( m = 3; m <= 6; ++m ) {
-					j( k ) += Xinv( k - 2, m - 2 ) * Q( m );
+					j( k ) += Xinv( m - 2, k - 2 ) * Q( m );
 				}
 			}
 
@@ -8089,7 +8089,7 @@ Label99999: ;
 				G( k ) = 0.0;
 				for ( m = 1; m <= 6; ++m ) {
 					//G(k)=G(k)+F(k,m)*J(m)
-					G( k ) += j( m ) * F( m, k );
+					G( k ) += j( m ) * F( k, m );
 				}
 			}
 
@@ -8261,8 +8261,8 @@ Label99999: ;
 
 			for ( k = 3; k <= 5; k += 2 ) {
 				for ( m = 3; m <= 6; ++m ) {
-					X( k - 2, m - 2 ) = -c( 12 ) * F( m, k ) - c( 10 ) * F( m, k + 1 );
-					X( k - 1, m - 2 ) = -c( 10 ) * F( m, k ) - c( 11 ) * F( m, k + 1 );
+					X( m - 2, k - 2 ) = -c( 12 ) * F( k, m ) - c( 10 ) * F( k + 1, m );
+					X( m - 2, k - 1 ) = -c( 10 ) * F( k, m ) - c( 11 ) * F( k + 1, m );
 				}
 			}
 
@@ -8294,7 +8294,7 @@ Label99999: ;
 			for ( k = 3; k <= 6; ++k ) {
 				j( k ) = 0.0;
 				for ( m = 3; m <= 4; ++m ) {
-					j( k ) += Xinv( k - 2, m - 2 ) * Q( m );
+					j( k ) += Xinv( m - 2, k - 2 ) * Q( m );
 				}
 			}
 
@@ -8302,7 +8302,7 @@ Label99999: ;
 			for ( k = 1; k <= 6; ++k ) {
 				G( k ) = 0.0;
 				for ( m = 3; m <= 6; ++m ) {
-					G( k ) += j( m ) * F( m, k );
+					G( k ) += j( m ) * F( k, m );
 				}
 			}
 
@@ -8400,22 +8400,22 @@ Label99999: ;
 			F( i, i ) = 0.0;
 		}
 		F( 1, 1 ) = 0.0;
-		F( 1, 2 ) = ( d1 + d2 - 2.0 * s ) / ht;
-		F( 1, 3 ) = ( h + L3 - d3 ) / ht;
-		F( 1, 4 ) = ( h + L3 - d4 ) / ht;
-		F( 1, 5 ) = ( L5 + d3 - d1 ) / ht;
-		F( 1, 6 ) = ( L5 + d4 - d2 ) / ht;
-		F( 2, 3 ) = ( L3 + d5 - d2 ) / ht;
-		F( 2, 4 ) = ( L3 + d6 - d1 ) / ht;
-		F( 2, 5 ) = ( h + L5 - d5 ) / ht;
-		F( 2, 6 ) = ( h + L5 - d6 ) / ht;
-		F( 3, 4 ) = ( d3 + d4 - ht ) / ( 2.0 * L3 );
-		F( 3, 5 ) = 0.0;
-		F( 3, 6 ) = ( d2 + h - d4 - d5 ) / ( 2.0 * L3 );
-		F( 4, 5 ) = ( d1 + h - d3 - d6 ) / ( 2.0 * L3 );
-		F( 4, 6 ) = 0.0;
-		F( 5, 6 ) = 0.0;
-		if ( L5 > 0.0 ) F( 5, 6 ) = ( d5 + d6 - ht ) / ( 2.0 * L5 );
+		F( 2, 1 ) = ( d1 + d2 - 2.0 * s ) / ht;
+		F( 3, 1 ) = ( h + L3 - d3 ) / ht;
+		F( 4, 1 ) = ( h + L3 - d4 ) / ht;
+		F( 5, 1 ) = ( L5 + d3 - d1 ) / ht;
+		F( 6, 1 ) = ( L5 + d4 - d2 ) / ht;
+		F( 3, 2 ) = ( L3 + d5 - d2 ) / ht;
+		F( 4, 2 ) = ( L3 + d6 - d1 ) / ht;
+		F( 5, 2 ) = ( h + L5 - d5 ) / ht;
+		F( 6, 2 ) = ( h + L5 - d6 ) / ht;
+		F( 4, 3 ) = ( d3 + d4 - ht ) / ( 2.0 * L3 );
+		F( 5, 3 ) = 0.0;
+		F( 6, 3 ) = ( d2 + h - d4 - d5 ) / ( 2.0 * L3 );
+		F( 5, 4 ) = ( d1 + h - d3 - d6 ) / ( 2.0 * L3 );
+		F( 6, 4 ) = 0.0;
+		F( 6, 5 ) = 0.0;
+		if ( L5 > 0.0 ) F( 6, 5 ) = ( d5 + d6 - ht ) / ( 2.0 * L5 );
 		L( 1 ) = h;
 		L( 2 ) = h;
 		L( 3 ) = L3;
@@ -8424,8 +8424,8 @@ Label99999: ;
 		L( 6 ) = L5;
 		for ( i = 2; i <= 6; ++i ) {
 			for ( j = 1; j <= i - 1; ++j ) {
-				F( i, j ) = 0.0;
-				if ( L( i ) > 0.0 ) F( i, j ) = F( j, i ) * L( j ) / L( i );
+				F( j, i ) = 0.0;
+				if ( L( i ) > 0.0 ) F( j, i ) = F( i, j ) * L( j ) / L( i );
 			}
 		}
 	}
@@ -8480,7 +8480,7 @@ Label99999: ;
 		LUDCMP( a, n, np, indx, d );
 
 		for ( j = 1; j <= n; ++j ) {
-			LUBKSB( a, n, np, indx, y( 1, j ) );
+			LUBKSB( a, n, np, indx, y( j, 1 ) );
 		}
 
 	}
@@ -8545,7 +8545,7 @@ Label99999: ;
 		for ( i = 1; i <= N; ++i ) {
 			aamax = 0.0;
 			for ( j = 1; j <= N; ++j ) {
-				if ( std::abs( A( i, j ) ) > aamax ) aamax = std::abs( A( i, j ) );
+				if ( std::abs( A( j, i ) ) > aamax ) aamax = std::abs( A( j, i ) );
 			}
 
 			if ( aamax == 0.0 ) {
@@ -8559,24 +8559,24 @@ Label99999: ;
 		for ( j = 1; j <= N; ++j ) {
 			if ( j > 1 ) {
 				for ( i = 1; i <= j - 1; ++i ) {
-					sum = A( i, j );
+					sum = A( j, i );
 					if ( i > 1 ) {
 						for ( K = 1; K <= i - 1; ++K ) {
-							sum -= A( i, K ) * A( K, j );
+							sum -= A( K, i ) * A( j, K );
 						}
 
-						A( i, j ) = sum;
+						A( j, i ) = sum;
 					}
 				}
 			}
 			aamax = 0.0;
 			for ( i = j; i <= N; ++i ) {
-				sum = A( i, j );
+				sum = A( j, i );
 				if ( j > 1 ) {
 					for ( K = 1; K <= j - 1; ++K ) {
-						sum -= A( i, K ) * A( K, j );
+						sum -= A( K, i ) * A( j, K );
 					}
-					A( i, j ) = sum;
+					A( j, i ) = sum;
 				}
 
 				dum = VV( i ) * std::abs( sum );
@@ -8588,9 +8588,9 @@ Label99999: ;
 
 			if ( j != imax ) {
 				for ( K = 1; K <= N; ++K ) {
-					dum = A( imax, K );
-					A( imax, K ) = A( j, K );
-					A( j, K ) = dum;
+					dum = A( K, imax );
+					A( K, imax ) = A( K, j );
+					A( K, j ) = dum;
 				}
 
 				D = -D;
@@ -8603,7 +8603,7 @@ Label99999: ;
 
 				dum = 1.0 / A( j, j );
 				for ( i = j + 1; i <= N; ++i ) {
-					A( i, j ) *= dum;
+					A( j, i ) *= dum;
 				}
 
 			}
@@ -8677,7 +8677,7 @@ Label99999: ;
 			B( LL ) = B( i );
 			if ( ii != 0 ) {
 				for ( j = ii; j <= i - 1; ++j ) {
-					sum -= A( i, j ) * B( j );
+					sum -= A( j, i ) * B( j );
 				}
 			} else if ( sum != 0.0 ) {
 				ii = i;
@@ -8690,7 +8690,7 @@ Label99999: ;
 			sum = B( i );
 			if ( i < N ) {
 				for ( j = i + 1; j <= N; ++j ) {
-					sum -= A( i, j ) * B( j );
+					sum -= A( j, i ) * B( j );
 				}
 			}
 

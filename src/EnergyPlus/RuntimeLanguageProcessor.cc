@@ -422,7 +422,7 @@ namespace RuntimeLanguageProcessor {
 		int InstructionNum2;
 		int GotoNum;
 		Array1D_int SavedIfInstructionNum( IfDepthAllowed ); // index is depth of If statements
-		Array2D_int SavedGotoInstructionNum( IfDepthAllowed, ELSEIFLengthAllowed );
+		Array2D_int SavedGotoInstructionNum( ELSEIFLengthAllowed, IfDepthAllowed );
 		Array1D_int NumGotos( IfDepthAllowed ); // index is depth of If statements,
 		int SavedWhileInstructionNum;
 		int SavedWhileExpressionNum;
@@ -552,7 +552,7 @@ namespace RuntimeLanguageProcessor {
 					AddError( StackNum, LineNum, "Detected ELSEIF series that is longer than allowed; terminate earlier IF instruction." );
 					break;
 				} else {
-					SavedGotoInstructionNum( NestedIfDepth, NumGotos( NestedIfDepth ) ) = InstructionNum;
+					SavedGotoInstructionNum( NumGotos( NestedIfDepth ), NestedIfDepth ) = InstructionNum;
 				}
 
 				if ( Remainder.empty() ) {
@@ -586,7 +586,7 @@ namespace RuntimeLanguageProcessor {
 					AddError( StackNum, LineNum, "Detected ELSEIF-ELSE series that is longer than allowed." );
 					break;
 				} else {
-					SavedGotoInstructionNum( NestedIfDepth, NumGotos( NestedIfDepth ) ) = InstructionNum;
+					SavedGotoInstructionNum( NumGotos( NestedIfDepth ), NestedIfDepth ) = InstructionNum;
 				}
 
 				if ( ! Remainder.empty() ) {
@@ -620,9 +620,9 @@ namespace RuntimeLanguageProcessor {
 
 				// Go back and complete all of the GOTOs that terminate each IF and ELSEIF block
 				for ( GotoNum = 1; GotoNum <= NumGotos( NestedIfDepth ); ++GotoNum ) {
-					InstructionNum2 = SavedGotoInstructionNum( NestedIfDepth, GotoNum );
+					InstructionNum2 = SavedGotoInstructionNum( GotoNum, NestedIfDepth );
 					ErlStack( StackNum ).Instruction( InstructionNum2 ).Argument1 = InstructionNum;
-					SavedGotoInstructionNum( NestedIfDepth, GotoNum ) = 0;
+					SavedGotoInstructionNum( GotoNum, NestedIfDepth ) = 0;
 				}
 
 				NumGotos( NestedIfDepth ) = 0;

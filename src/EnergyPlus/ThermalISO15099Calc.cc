@@ -251,11 +251,11 @@ namespace ThermalISO15099Calc {
 		emis.dim( maxlay2 );
 		asol.dim( maxlay );
 		presure.dim( maxlay1 );
-		iprop.dim( maxlay1, maxgas );
-		frct.dim( maxlay1, maxgas );
-		xgcon.dim( maxgas, 3 );
-		xgvis.dim( maxgas, 3 );
-		xgcp.dim( maxgas, 3 );
+		iprop.dim( maxgas, maxlay1 );
+		frct.dim( maxgas, maxlay1 );
+		xgcon.dim( 3, maxgas );
+		xgvis.dim( 3, maxgas );
+		xgcp.dim( 3, maxgas );
 		xwght.dim( maxgas );
 		gama.dim( maxgas );
 		nmix.dim( maxlay1 );
@@ -403,8 +403,8 @@ namespace ThermalISO15099Calc {
 		Array1D< Real64 > rir_NOSD( maxlay2 );
 		Array1D< Real64 > tir_NOSD( maxlay2 );
 		Array1D< Real64 > theta_NOSD( maxlay2 );
-		Array2D< Real64 > frct_NOSD( maxlay1, maxgas );
-		Array2D_int iprop_NOSD( maxlay1, maxgas );
+		Array2D< Real64 > frct_NOSD( maxgas, maxlay1 );
+		Array2D_int iprop_NOSD( maxgas, maxlay1 );
 		Array1D_int nmix_NOSD( maxlay1 );
 		Array1D< Real64 > presure_NOSD( maxlay1 );
 		Array1D< Real64 > hcgas_NOSD( maxlay1 );
@@ -610,12 +610,12 @@ namespace ThermalISO15099Calc {
 				nmix_NOSD( nlayer_NOSD + 1 ) = nmix( nlayer + 1 );
 				presure_NOSD( nlayer_NOSD + 1 ) = presure( nlayer + 1 );
 				for ( j = 1; j <= nmix( 1 ); ++j ) {
-					iprop_NOSD( 1, j ) = iprop( 1, j );
-					frct_NOSD( 1, j ) = frct( 1, j );
+					iprop_NOSD( j, 1 ) = iprop( j, 1 );
+					frct_NOSD( j, 1 ) = frct( j, 1 );
 				}
 				for ( j = 1; j <= nmix( nlayer_NOSD + 1 ); ++j ) {
-					iprop_NOSD( nlayer_NOSD + 1, j ) = iprop( nlayer + 1, j );
-					frct_NOSD( nlayer_NOSD + 1, j ) = frct( nlayer + 1, j );
+					iprop_NOSD( j, nlayer_NOSD + 1 ) = iprop( j, nlayer + 1 );
+					frct_NOSD( j, nlayer_NOSD + 1 ) = frct( j, nlayer + 1 );
 				}
 				for ( i = 1; i <= nlayer_NOSD; ++i ) {
 					OriginalIndex = FirstSpecularLayer + i - 1;
@@ -652,8 +652,8 @@ namespace ThermalISO15099Calc {
 						nmix_NOSD( i + 1 ) = nmix( OriginalIndex + 1 );
 						presure_NOSD( i + 1 ) = presure( OriginalIndex + 1 );
 						for ( j = 1; j <= nmix_NOSD( i + 1 ); ++j ) {
-							iprop_NOSD( i + 1, j ) = iprop( OriginalIndex + 1, j );
-							frct_NOSD( i + 1, j ) = frct( OriginalIndex + 1, j );
+							iprop_NOSD( j, i + 1 ) = iprop( j, OriginalIndex + 1 );
+							frct_NOSD( j, i + 1 ) = frct( j, OriginalIndex + 1 );
 						}
 					}
 
@@ -942,14 +942,14 @@ namespace ThermalISO15099Calc {
 		thick.dim( maxlay );
 		scon.dim( maxlay );
 		asol.dim( maxlay );
-		iprop.dim( maxlay1, maxgas );
-		frct.dim( maxlay1, maxgas );
+		iprop.dim( maxgas, maxlay1 );
+		frct.dim( maxgas, maxlay1 );
 		presure.dim( maxlay1 );
 		nmix.dim( maxlay1 );
 		wght.dim( maxgas );
-		gcon.dim( maxgas, 3 );
-		gvis.dim( maxgas, 3 );
-		gcp.dim( maxgas, 3 );
+		gcon.dim( 3, maxgas );
+		gvis.dim( 3, maxgas );
+		gcp.dim( 3, maxgas );
 		gama.dim( maxgas );
 		SupportPillar.dim( maxlay );
 		PillarSpacing.dim( maxlay );
@@ -1867,14 +1867,14 @@ namespace ThermalISO15099Calc {
 		theta.dim( maxlay2 );
 		Tgap.dim( maxlay1 );
 		Radiation.dim( 2*nlayer ); //Autodesk Bug: Was ( maxlay2 ) but therm1d passes ( 2*nlayer ) array
-		iprop.dim( maxlay1, maxgas );
-		frct.dim( maxlay1, maxgas );
+		iprop.dim( maxgas, maxlay1 );
+		frct.dim( maxgas, maxlay1 );
 		presure.dim( maxlay1 );
 		nmix.dim( maxlay1 );
 		wght.dim( maxgas );
-		gcon.dim( maxgas, 3 );
-		gvis.dim( maxgas, 3 );
-		gcp.dim( maxgas, 3 );
+		gcon.dim( 3, maxgas );
+		gvis.dim( 3, maxgas );
+		gcp.dim( 3, maxgas );
 		gama.dim( maxgas );
 		SupportPillar.dim( maxlay );
 		PillarSpacing.dim( maxlay );
@@ -2053,14 +2053,14 @@ namespace ThermalISO15099Calc {
 		using DataGlobals::Pi;
 
 		// Argument array dimensioning
-		iprop.dim( maxlay1, maxgas );
-		frct.dim( maxlay1, maxgas );
+		iprop.dim( maxgas, maxlay1 );
+		frct.dim( maxgas, maxlay1 );
 		presure.dim( maxlay1 );
 		nmix.dim( maxlay1 );
 		wght.dim( maxgas );
-		gcon.dim( maxgas, 3 );
-		gvis.dim( maxgas, 3 );
-		gcp.dim( maxgas, 3 );
+		gcon.dim( 3, maxgas );
+		gvis.dim( 3, maxgas );
+		gcp.dim( 3, maxgas );
 
 		// Locals
 		Array1D< Real64 > frcti( maxgas );
@@ -2093,8 +2093,8 @@ namespace ThermalISO15099Calc {
 			delt = std::abs( tair - t );
 
 			for ( j = 1; j <= nmix( nlayer + 1 ); ++j ) {
-				ipropi( j ) = iprop( nlayer + 1, j );
-				frcti( j ) = frct( nlayer + 1, j );
+				ipropi( j ) = iprop( j, nlayer + 1 );
+				frcti( j ) = frct( j, nlayer + 1 );
 			}
 
 			GASSES90( tmean, ipropi, frcti, presure( nlayer + 1 ), nmix( nlayer + 1 ), wght, gcon, gvis, gcp, con, visc, dens, cp, pr, ISO15099, nperr, ErrorMessage );
@@ -2194,14 +2194,14 @@ namespace ThermalISO15099Calc {
 		theta.dim( maxlay2 );
 		Tgap.dim( maxlay1 );
 		gap.dim( MaxGap );
-		iprop.dim( maxlay1, maxgas );
-		frct.dim( maxlay1, maxgas );
+		iprop.dim( maxgas, maxlay1 );
+		frct.dim( maxgas, maxlay1 );
 		presure.dim( maxlay1 );
 		nmix.dim( maxlay1 );
 		wght.dim( maxgas );
-		gcon.dim( maxgas, 3 );
-		gvis.dim( maxgas, 3 );
-		gcp.dim( maxgas, 3 );
+		gcon.dim( 3, maxgas );
+		gvis.dim( 3, maxgas );
+		gcp.dim( 3, maxgas );
 		gama.dim( maxgas );
 		hcgas.dim( maxlay1 );
 		Rayleigh.dim( maxlay );
@@ -2237,8 +2237,8 @@ namespace ThermalISO15099Calc {
 			// Temperatures should not be equal. This can happen in initial temperature guess before iterations started
 			if ( delt == 0.0 ) delt = 1.0e-6;
 			for ( l = 1; l <= nmix( i + 1 ); ++l ) {
-				ipropg( l ) = iprop( i + 1, l );
-				frctg( l ) = frct( i + 1, l );
+				ipropg( l ) = iprop( l, i + 1 );
+				frctg( l ) = frct( l, i + 1 );
 			}
 
 			if ( presure( i + 1 ) > VacuumPressure ) {
@@ -2264,7 +2264,7 @@ namespace ThermalISO15099Calc {
 				// write(*,*)'Nusselt,Rayleigh,Prandtl,hgas(k),k'
 				// write(*,*) gnu,gr*pr,pr,hgas(k),k
 			} else { //low pressure calculations
-				GassesLow( tmean, wght( iprop( i + 1, 1 ) ), presure( i + 1 ), gama( iprop( i + 1, 1 ) ), con, nperr, ErrorMessage );
+				GassesLow( tmean, wght( iprop( 1, i + 1 ) ), presure( i + 1 ), gama( iprop( 1, i + 1 ) ), con, nperr, ErrorMessage );
 				hcgas( i + 1 ) = con;
 			} //if (pressure(i+1).gt.VacuumPressure) then
 		}
@@ -2547,14 +2547,14 @@ namespace ThermalISO15099Calc {
 		theta.dim( maxlay2 );
 		thick.dim( maxlay );
 		gap.dim( MaxGap );
-		iprop.dim( maxlay1, maxgas );
-		frct.dim( maxlay1, maxgas );
+		iprop.dim( maxgas, maxlay1 );
+		frct.dim( maxgas, maxlay1 );
 		presure.dim( maxlay1 );
 		nmix.dim( maxlay1 );
 		wght.dim( maxgas );
-		gcon.dim( maxgas, 3 );
-		gvis.dim( maxgas, 3 );
-		gcp.dim( maxgas, 3 );
+		gcon.dim( 3, maxgas );
+		gvis.dim( 3, maxgas );
+		gcp.dim( 3, maxgas );
 		Ebf.dim( maxlay );
 		Ebb.dim( maxlay );
 		hgas.dim( maxlay );
@@ -2650,8 +2650,8 @@ namespace ThermalISO15099Calc {
 			delt = std::abs( theta( j ) - theta( k ) );
 			i = SDLayerIndex;
 			for ( l = 1; l <= nmix( i + 1 ); ++l ) {
-				ipropg( l ) = iprop( i + 1, l );
-				frctg( l ) = frct( i + 1, l );
+				ipropg( l ) = iprop( l, i + 1 );
+				frctg( l ) = frct( l, i + 1 );
 			}
 			GASSES90( tmean, ipropg, frctg, presure( i + 1 ), nmix( i + 1 ), wght, gcon, gvis, gcp, con, visc, dens, cp, pr, ISO15099, nperr, ErrorMessage );
 			gap_NOSD = gap( SDLayerIndex - 1 ) + gap( SDLayerIndex ) + thick( SDLayerIndex );
@@ -2902,7 +2902,7 @@ namespace ThermalISO15099Calc {
 		for ( i = 1; i <= 4 * nlayer; ++i ) {
 			FRes( i ) = -b( i );
 			for ( j = 1; j <= 4 * nlayer; ++j ) {
-				FRes( i ) += a( i, j ) * x( j );
+				FRes( i ) += a( j, i ) * x( j );
 			}
 		} //do i=1, 4*nlayer
 

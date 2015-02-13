@@ -3360,7 +3360,7 @@ Label100: ;
 				}
 
 				if ( WaterCoilContrlCount > 1 ) {
-					ContrlSensedNodeNums.allocate( WaterCoilContrlCount, 3 );
+					ContrlSensedNodeNums.allocate( 3, WaterCoilContrlCount );
 					ContrlSensedNodeNums = 0;
 					SensedNodeIndex = 0;
 					for ( ContrlNum = 1; ContrlNum <= PrimaryAirSystem( AirSysNum ).NumControllers; ++ContrlNum ) {
@@ -3368,7 +3368,7 @@ Label100: ;
 							++SensedNodeIndex;
 							foundControl = FindItemInList( PrimaryAirSystem( AirSysNum ).ControllerName( ContrlNum ), ControllerProps.ControllerName(), NumControllers );
 							if ( foundControl > 0 ) {
-								ContrlSensedNodeNums( SensedNodeIndex, 1 ) = ControllerProps( foundControl ).SensedNode;
+								ContrlSensedNodeNums( 1, SensedNodeIndex ) = ControllerProps( foundControl ).SensedNode;
 							}
 						}
 					}
@@ -3379,9 +3379,9 @@ Label100: ;
 					for ( BranchNum = 1; BranchNum <= PrimaryAirSystem( AirSysNum ).NumBranches; ++BranchNum ) {
 						for ( SensedNodeIndex = 1; SensedNodeIndex <= WaterCoilContrlCount; ++SensedNodeIndex ) {
 							for ( BranchNodeIndex = 1; BranchNodeIndex <= PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).TotalNodes; ++BranchNodeIndex ) {
-								if ( ContrlSensedNodeNums( SensedNodeIndex, 1 ) == PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).NodeNum( BranchNodeIndex ) ) {
-									ContrlSensedNodeNums( SensedNodeIndex, 2 ) = BranchNodeIndex;
-									ContrlSensedNodeNums( SensedNodeIndex, 3 ) = BranchNum;
+								if ( ContrlSensedNodeNums( 1, SensedNodeIndex ) == PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).NodeNum( BranchNodeIndex ) ) {
+									ContrlSensedNodeNums( 2, SensedNodeIndex ) = BranchNodeIndex;
+									ContrlSensedNodeNums( 3, SensedNodeIndex ) = BranchNum;
 								}
 							}
 						}
@@ -3391,9 +3391,9 @@ Label100: ;
 				if ( allocated( ContrlSensedNodeNums ) ) {
 					for ( SensedNodeIndex = 1; SensedNodeIndex <= WaterCoilContrlCount; ++SensedNodeIndex ) {
 						if ( SensedNodeIndex == 1 ) continue;
-						if ( ContrlSensedNodeNums( SensedNodeIndex, 2 ) < ContrlSensedNodeNums( SensedNodeIndex - 1, 2 ) ) {
+						if ( ContrlSensedNodeNums( 2, SensedNodeIndex ) < ContrlSensedNodeNums( 2, SensedNodeIndex - 1 ) ) {
 							//now see if on the same branch
-							if ( ContrlSensedNodeNums( SensedNodeIndex, 3 ) == ContrlSensedNodeNums( SensedNodeIndex - 1, 3 ) ) {
+							if ( ContrlSensedNodeNums( 3, SensedNodeIndex ) == ContrlSensedNodeNums( 3, SensedNodeIndex - 1 ) ) {
 								// we have a flow order problem with water coil controllers
 								ShowSevereError( "CheckControllerListOrder: A water coil controller list has the wrong order" );
 								ShowContinueError( "Check the AirLoopHVAC:ControllerList for the air loop called \"" + PrimaryAirSystem( AirSysNum ).Name + "\"" );

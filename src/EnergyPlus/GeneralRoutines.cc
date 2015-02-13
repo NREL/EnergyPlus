@@ -1024,7 +1024,7 @@ CalcPassiveExteriorBaffleGap(
 		InitExteriorConvectionCoeff( SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR( ThisSurf ), HSkyARR( ThisSurf ), HGroundARR( ThisSurf ), HAirARR( ThisSurf ) );
 		ConstrNum = Surface( SurfPtr ).Construction;
 		AbsThermSurf = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermal;
-		TsoK = TH( SurfPtr, 1, 1 ) + KelvinConv;
+		TsoK = TH( 1, 1, SurfPtr ) + KelvinConv;
 		TsBaffK = TmpTsBaf + KelvinConv;
 		if ( TsBaffK == TsoK ) { // avoid divide by zero
 			HPlenARR( ThisSurf ) = 0.0; // no net heat transfer if same temperature
@@ -1077,8 +1077,8 @@ CalcPassiveExteriorBaffleGap(
 
 	if ( IsRain ) HExt = 1000.0;
 
-//	Tso = sum( TH( SurfPtrARR, 1, 1 ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-	Tso = sum_product_sub( TH( _, 1, 1 ), Surface.Area(), SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
+//	Tso = sum( TH( 1, 1, SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
+	Tso = sum_product_sub( TH( 1, 1, _ ), Surface.Area(), SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
 //	Isc = sum( QRadSWOutIncident( SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
 	Isc = sum_product_sub( QRadSWOutIncident, Surface.Area(), SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
 
@@ -1349,10 +1349,10 @@ TestAirPathIntegrity( bool & ErrFound )
 	Array2D_int ValSupAPaths;
 	Array2D_int NumSAPNodes;
 
-	NumSAPNodes.allocate( NumPrimaryAirSys, NumOfNodes );
-	NumRAPNodes.allocate( NumPrimaryAirSys, NumOfNodes );
-	ValRetAPaths.allocate( NumPrimaryAirSys, NumOfNodes );
-	ValSupAPaths.allocate( NumPrimaryAirSys, NumOfNodes );
+	NumSAPNodes.allocate( NumOfNodes, NumPrimaryAirSys );
+	NumRAPNodes.allocate( NumOfNodes, NumPrimaryAirSys );
+	ValRetAPaths.allocate( NumOfNodes, NumPrimaryAirSys );
+	ValSupAPaths.allocate( NumOfNodes, NumPrimaryAirSys );
 	NumSAPNodes = 0;
 	NumRAPNodes = 0;
 	ValRetAPaths = 0;
@@ -1365,20 +1365,20 @@ TestAirPathIntegrity( bool & ErrFound )
 
 	// Final tests, look for duplicate nodes
 	for ( Loop = 1; Loop <= NumPrimaryAirSys; ++Loop ) {
-		if ( ValRetAPaths( Loop, 1 ) != 0 ) continue;
+		if ( ValRetAPaths( 1, Loop ) != 0 ) continue;
 		if ( AirToZoneNodeInfo( Loop ).NumReturnNodes <= 0 ) continue;
-		ValRetAPaths( Loop, 1 ) = AirToZoneNodeInfo( Loop ).ZoneEquipReturnNodeNum( 1 );
+		ValRetAPaths( 1, Loop ) = AirToZoneNodeInfo( Loop ).ZoneEquipReturnNodeNum( 1 );
 	}
 
 	for ( Loop = 1; Loop <= NumPrimaryAirSys; ++Loop ) {
 		for ( Loop1 = 1; Loop1 <= NumOfNodes; ++Loop1 ) {
-			TestNode = ValRetAPaths( Loop, Loop1 );
+			TestNode = ValRetAPaths( Loop1, Loop );
 			Count = 0;
 			for ( Loop2 = 1; Loop2 <= NumPrimaryAirSys; ++Loop2 ) {
 				for ( Loop3 = 1; Loop3 <= NumOfNodes; ++Loop3 ) {
 					if ( Loop2 == Loop && Loop1 == Loop3 ) continue; // Don't count test node
-					if ( ValRetAPaths( Loop2, Loop3 ) == 0 ) break;
-					if ( ValRetAPaths( Loop2, Loop3 ) == TestNode ) ++Count;
+					if ( ValRetAPaths( Loop3, Loop2 ) == 0 ) break;
+					if ( ValRetAPaths( Loop3, Loop2 ) == TestNode ) ++Count;
 				}
 			}
 			if ( Count > 0 ) {
@@ -1947,8 +1947,8 @@ TestReturnAirPathIntegrity(
 			if ( AirToZoneNodeInfo( Count2 ).NumReturnNodes > 0 ) {
 				if ( AllNodes( 1 ) == AirToZoneNodeInfo( Count2 ).ZoneEquipReturnNodeNum( 1 ) ) {
 					WAirLoop = Count2;
-					ValRetAPaths( WAirLoop, _ ) = 0;
-					ValRetAPaths( WAirLoop, {1,CountNodes} ) = AllNodes( {1,CountNodes} );
+					ValRetAPaths( _, WAirLoop ) = 0;
+					ValRetAPaths( {1,CountNodes}, WAirLoop ) = AllNodes( {1,CountNodes} );
 					break;
 				}
 			} else {

@@ -610,14 +610,14 @@ namespace ThermalChimney {
 
 				for ( ThermChimLoop1 = 1; ThermChimLoop1 <= NTC; ++ThermChimLoop1 ) {
 					for ( ThermChimLoop2 = 1; ThermChimLoop2 <= NTC; ++ThermChimLoop2 ) {
-						EquaCoef( ThermChimLoop1, ThermChimLoop2 ) = 0.0;
+						EquaCoef( ThermChimLoop2, ThermChimLoop1 ) = 0.0;
 					}
 				}
 
 				EquaCoef( 1, 1 ) = Process2;
 				EquaConst( 1 ) = Process3 - Process1 * RoomAirTemp;
 				for ( ThermChimLoop1 = 2; ThermChimLoop1 <= NTC; ++ThermChimLoop1 ) {
-					EquaCoef( ThermChimLoop1, ( ThermChimLoop1 - 1 ) ) = Process1;
+					EquaCoef( ( ThermChimLoop1 - 1 ), ThermChimLoop1 ) = Process1;
 					EquaCoef( ThermChimLoop1, ThermChimLoop1 ) = Process2;
 					EquaConst( ThermChimLoop1 ) = Process3;
 				}
@@ -640,14 +640,14 @@ namespace ThermalChimney {
 
 			for ( ThermChimLoop1 = 1; ThermChimLoop1 <= NTC; ++ThermChimLoop1 ) {
 				for ( ThermChimLoop2 = 1; ThermChimLoop2 <= NTC; ++ThermChimLoop2 ) {
-					EquaCoef( ThermChimLoop1, ThermChimLoop2 ) = 0.0;
+					EquaCoef( ThermChimLoop2, ThermChimLoop1 ) = 0.0;
 				}
 			}
 
 			EquaCoef( 1, 1 ) = Process2;
 			EquaConst( 1 ) = Process3 - Process1 * RoomAirTemp;
 			for ( ThermChimLoop1 = 2; ThermChimLoop1 <= NTC; ++ThermChimLoop1 ) {
-				EquaCoef( ThermChimLoop1, ( ThermChimLoop1 - 1 ) ) = Process1;
+				EquaCoef( ( ThermChimLoop1 - 1 ), ThermChimLoop1 ) = Process1;
 				EquaCoef( ThermChimLoop1, ThermChimLoop1 ) = Process2;
 				EquaConst( ThermChimLoop1 ) = Process3;
 			}
@@ -835,24 +835,24 @@ namespace ThermalChimney {
 			TCvalue = std::abs( EquaCoef( ThermChimLoop1, ThermChimLoop1 ) );
 			pivot = ThermChimLoop1;
 			for ( ThermChimLoop2 = ThermChimLoop1 + 1; ThermChimLoop2 <= NTC; ++ThermChimLoop2 ) {
-				if ( std::abs( EquaCoef( ThermChimLoop2, ThermChimLoop1 ) ) > TCvalue ) {
-					TCvalue = std::abs( EquaCoef( ThermChimLoop2, ThermChimLoop1 ) );
+				if ( std::abs( EquaCoef( ThermChimLoop1, ThermChimLoop2 ) ) > TCvalue ) {
+					TCvalue = std::abs( EquaCoef( ThermChimLoop1, ThermChimLoop2 ) );
 					pivot = ThermChimLoop2;
 				}
 			}
 
 			if ( pivot != ThermChimLoop1 ) {
-				tempor( {ThermChimLoop1,NTC} ) = EquaCoef( ThermChimLoop1, {ThermChimLoop1,NTC} );
+				tempor( {ThermChimLoop1,NTC} ) = EquaCoef( {ThermChimLoop1,NTC}, ThermChimLoop1 );
 				tempb = EquaConst( ThermChimLoop1 );
-				EquaCoef( ThermChimLoop1, {ThermChimLoop1,NTC} ) = EquaCoef( pivot, {ThermChimLoop1,NTC} );
+				EquaCoef( {ThermChimLoop1,NTC}, ThermChimLoop1 ) = EquaCoef( {ThermChimLoop1,NTC}, pivot );
 				EquaConst( ThermChimLoop1 ) = EquaConst( pivot );
-				EquaCoef( pivot, {ThermChimLoop1,NTC} ) = tempor( {ThermChimLoop1,NTC} );
+				EquaCoef( {ThermChimLoop1,NTC}, pivot ) = tempor( {ThermChimLoop1,NTC} );
 				EquaConst( pivot ) = tempb;
 			}
 
 			for ( ThermChimLoop2 = ThermChimLoop1 + 1; ThermChimLoop2 <= NTC; ++ThermChimLoop2 ) {
-				TCcoefficient = -EquaCoef( ThermChimLoop2, ThermChimLoop1 ) / EquaCoef( ThermChimLoop1, ThermChimLoop1 );
-				EquaCoef( ThermChimLoop2, {ThermChimLoop1,NTC} ) += TCcoefficient * EquaCoef( ThermChimLoop1, {ThermChimLoop1,NTC} );
+				TCcoefficient = -EquaCoef( ThermChimLoop1, ThermChimLoop2 ) / EquaCoef( ThermChimLoop1, ThermChimLoop1 );
+				EquaCoef( {ThermChimLoop1,NTC}, ThermChimLoop2 ) += TCcoefficient * EquaCoef( {ThermChimLoop1,NTC}, ThermChimLoop1 );
 				EquaConst( ThermChimLoop2 ) += TCcoefficient * EquaConst( ThermChimLoop1 );
 			}
 
@@ -862,7 +862,7 @@ namespace ThermalChimney {
 		for ( ThermChimLoop2 = NTC - 1; ThermChimLoop2 >= 1; --ThermChimLoop2 ) {
 			ThermalChimSum = 0.0;
 			for ( ThermChimLoop3 = ThermChimLoop2 + 1; ThermChimLoop3 <= NTC; ++ThermChimLoop3 ) {
-				ThermalChimSum += EquaCoef( ThermChimLoop2, ThermChimLoop3 ) * ThermChimSubTemp( ThermChimLoop3 );
+				ThermalChimSum += EquaCoef( ThermChimLoop3, ThermChimLoop2 ) * ThermChimSubTemp( ThermChimLoop3 );
 			}
 			ThermChimSubTemp( ThermChimLoop2 ) = ( EquaConst( ThermChimLoop2 ) - ThermalChimSum ) / EquaCoef( ThermChimLoop2, ThermChimLoop2 );
 		}

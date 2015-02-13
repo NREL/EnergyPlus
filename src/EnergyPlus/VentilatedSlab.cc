@@ -2210,7 +2210,7 @@ namespace VentilatedSlab {
 		} else if ( SELECT_CASE_var == OWBControl ) {
 			SetPointTemp = OutWetBulbTemp;
 		} else if ( SELECT_CASE_var == SURControl ) {
-			SetPointTemp = TH( VentSlab( Item ).SurfacePtr( RadSurfNum ), 1, 2 );
+			SetPointTemp = TH( 2, 1, VentSlab( Item ).SurfacePtr( RadSurfNum ) );
 		} else if ( SELECT_CASE_var == DPTZControl ) {
 			SetPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZonePtr ), OutBaroPress );
 		} else { // Should never get here
@@ -2244,7 +2244,7 @@ namespace VentilatedSlab {
 			HCoilOn = false;
 
 			// Node condition
-			Node( InletNode ).Temp = TH( VentSlab( Item ).SurfacePtr( 1 ), 1, 2 );
+			Node( InletNode ).Temp = TH( 2, 1, VentSlab( Item ).SurfacePtr( 1 ) );
 			Node( FanOutletNode ).Temp = Node( InletNode ).Temp;
 			Node( OutletNode ).Temp = Node( FanOutletNode ).Temp;
 
@@ -3145,7 +3145,7 @@ namespace VentilatedSlab {
 
 							if ( VentSlab( Item ).SysConfg == SlabOnly ) {
 								//            Node(Returnairnode)%Temp = MAT(Zonenum)
-								Node( ReturnAirNode ).Temp = TH( VentSlab( Item ).SurfacePtr( RadSurfNum ), 1, 2 );
+								Node( ReturnAirNode ).Temp = TH( 2, 1, VentSlab( Item ).SurfacePtr( RadSurfNum ) );
 								Node( FanOutletNode ).Temp = Node( ReturnAirNode ).Temp;
 								Node( SlabInNode ).Temp = Node( FanOutletNode ).Temp;
 							} else if ( VentSlab( Item ).SysConfg == SlabAndZone ) {
@@ -3168,7 +3168,7 @@ namespace VentilatedSlab {
 					if ( OperatingMode == CoolingMode ) {
 						DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZonePtr ), OutBaroPress );
 						for ( RadSurfNum2 = 1; RadSurfNum2 <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum2 ) {
-							if ( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ) < ( DewPointTemp + CondDeltaTemp ) ) {
+							if ( TH( 2, 1, VentSlab( Item ).SurfacePtr( RadSurfNum2 ) ) < ( DewPointTemp + CondDeltaTemp ) ) {
 								// Condensation warning--must shut off radiant system
 								Node( SlabInNode ).MassFlowRate = 0.0;
 								Node( FanOutletNode ).MassFlowRate = 0.0;
@@ -3190,7 +3190,7 @@ namespace VentilatedSlab {
 										ShowWarningMessage( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + ']' );
 										ShowContinueError( "Surface [" + Surface( VentSlab( Item ).SurfacePtr( RadSurfNum2 ) ).Name + "] temperature below dew-point temperature--potential for condensation exists" );
 										ShowContinueError( "Flow to the ventilated slab system will be shut-off to avoid condensation" );
-										ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ), 2 ) );
+										ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( 2, 1, VentSlab( Item ).SurfacePtr( RadSurfNum2 ) ), 2 ) );
 										ShowContinueError( "Zone dew-point temperature + safety factor delta= " + RoundSigDigits( DewPointTemp + CondDeltaTemp, 2 ) );
 										ShowContinueErrorTimeStamp( "" );
 									}
@@ -3375,7 +3375,7 @@ namespace VentilatedSlab {
 								QRadSysSource( SurfNum2 ) = 0.0;
 								if ( Surface( SurfNum2 ).ExtBoundCond > 0 && Surface( SurfNum2 ).ExtBoundCond != SurfNum2 ) QRadSysSource( Surface( SurfNum2 ).ExtBoundCond ) = 0.0; // Also zero the other side of an interzone
 							}
-							Node( ReturnAirNode ).Temp = TH( VentSlab( Item ).SurfacePtr( 1 ), 1, 2 );
+							Node( ReturnAirNode ).Temp = TH( 2, 1, VentSlab( Item ).SurfacePtr( 1 ) );
 							Node( FanOutletNode ).Temp = Node( ReturnAirNode ).Temp;
 							Node( SlabInNode ).Temp = Node( FanOutletNode ).Temp;
 							// Each Internal node is reseted at the surface temperature
@@ -3392,7 +3392,7 @@ namespace VentilatedSlab {
 					if ( OperatingMode == CoolingMode ) {
 						DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZPtr( RadSurfNum ) ), OutBaroPress );
 						for ( RadSurfNum2 = 1; RadSurfNum2 <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum2 ) {
-							if ( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ) < ( DewPointTemp + CondDeltaTemp ) ) {
+							if ( TH( 2, 1, VentSlab( Item ).SurfacePtr( RadSurfNum2 ) ) < ( DewPointTemp + CondDeltaTemp ) ) {
 								// Condensation warning--must shut off radiant system
 								Node( SlabInNode ).MassFlowRate = 0.0;
 								Node( FanOutletNode ).MassFlowRate = 0.0;
@@ -3413,7 +3413,7 @@ namespace VentilatedSlab {
 										ShowWarningMessage( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + ']' );
 										ShowContinueError( "Surface [" + Surface( VentSlab( Item ).SurfacePtr( RadSurfNum2 ) ).Name + "] temperature below dew-point temperature--potential for condensation exists" );
 										ShowContinueError( "Flow to the ventilated slab system will be shut-off to avoid condensation" );
-										ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ), 2 ) );
+										ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( 2, 1, VentSlab( Item ).SurfacePtr( RadSurfNum2 ) ), 2 ) );
 										ShowContinueError( "Zone dew-point temperature + safety factor delta= " + RoundSigDigits( DewPointTemp + CondDeltaTemp, 2 ) );
 										ShowContinueErrorTimeStamp( "" );
 									}
