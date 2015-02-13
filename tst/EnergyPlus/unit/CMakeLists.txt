@@ -6,6 +6,7 @@ if(MSVC)
 endif()
 
 set( test_src
+  AdvancedAFN.unit.cc
   DataPlant.unit.cc
   ExteriorEnergyUse.unit.cc
   HeatBalanceManager.unit.cc

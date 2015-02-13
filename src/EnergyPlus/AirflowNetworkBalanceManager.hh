@@ -75,6 +75,7 @@ namespace AirflowNetworkBalanceManager {
 	extern int SupplyFanOutletNode; // Supply air fan outlet node number
 	extern int SupplyFanType; // Supply air fan type
 	extern Real64 OnOffFanRunTimeFraction; // Run time fraction for an On/Off fan flow rate
+	extern int AirflowNetworkNumOfOccuVentCtrls;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE AirflowNetworkBalanceManager:
 	// Name Public routines, optionally name Private routines within this module
@@ -231,6 +232,66 @@ namespace AirflowNetworkBalanceManager {
 
 	Real64
 	GetZoneInfilAirChangeRate( int const ZoneNum ); // hybrid ventilation system controlled zone number
+
+	// derived class or struct
+	class OccupantVentilationControlProp {
+	
+	private:
+
+	public:
+		std::string Name; // Provide a unique object name
+		Real64 MinOpeningTime; // Minimum Opening Time
+		Real64 MinClosingTime; // Minimum Closing Time
+		std::string ComfortLowTempCurveName; // Thermal Comfort Low Temperature Curve Name
+		std::string ComfortHighTempCurveName; // Thermal Comfort High Temperature Curve Name
+		int ComfortLowTempCurveNum; // Thermal Comfort Low Temperature Curve number
+		int ComfortHighTempCurveNum; // Thermal Comfort high Temperature Curve number
+		int OpeningProbSchNum; // Opening probability schedule pointer
+		int ClosingProbSchNum; // Closing probability schedule pointer
+		Real64 ComfortBouPoint; // Thermal Comfort Temperature Boundary Point
+		bool OccupancyCheck; // Occupancy check 
+		std::string OpeningProbSchName; // Opening probability schedule name
+		std::string ClosingProbSchName; // Closing probability schedule name
+		Real64 MaxPPD; // Maximum PPD used to calculate comfort band (%)
+		bool MinTimeControlOnly; // Chach minimum opening and closing time only
+
+		// Default Constructor
+		OccupantVentilationControlProp():
+			Name( "" ),
+			MinOpeningTime( 0.0 ),
+			MinClosingTime( 0.0 ),
+			ComfortLowTempCurveNum( 0 ),
+			ComfortHighTempCurveNum( 0 ),
+			OpeningProbSchNum( 0 ),
+			ClosingProbSchNum( 0 ),
+			ComfortBouPoint( 10.0 ),
+			MaxPPD( 10.0 ),
+			OccupancyCheck( false ),
+			MinTimeControlOnly( false )
+		{}
+
+		void calc(
+			int const ZoneNum,
+			int const SurfNum,
+			int const PrevOpeningstatus,
+			Real64 const TimeOpenDuration,
+			Real64 const TimeCloseDuration,
+			int & OpeningStatus,
+			int & OpeningProbStatus,
+			int & ClosingProbStatus
+		); // function to perform calculations
+
+		bool openingProbability(
+			int const ZoneNum,
+			Real64 const TimeCloseDuration
+			); // function to perform calculations of opening probability
+
+		bool closingProbability( 
+			Real64 const TimeCloseDuration
+			); // function to perform calculations of closing probability
+	};
+
+	extern FArray1D< OccupantVentilationControlProp > OccupantVentilationControl;
 
 	//     NOTICE
 
