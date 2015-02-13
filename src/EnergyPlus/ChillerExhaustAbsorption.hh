@@ -483,9 +483,7 @@ namespace ChillerExhaustAbsorption {
 
 	void
 	SimExhaustAbsorber(
-		std::string const & AbsorberType, // type of Absorber
 		std::string const & AbsorberName, // user specified name of Absorber
-		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // Absorber number counter
 		bool const RunFlag, // simulate Absorber when TRUE
 		bool const FirstIteration, // initialize variables when TRUE
@@ -513,8 +511,7 @@ namespace ChillerExhaustAbsorption {
 
 	void
 	InitExhaustAbsorber(
-		int const ChillNum, // number of the current engine driven chiller being simulated
-		bool const RunFlag // TRUE when chiller operating
+		int const ChillNum // number of the current engine driven chiller being simulated
 	);
 
 	void
@@ -526,8 +523,7 @@ namespace ChillerExhaustAbsorption {
 	void
 	CalcExhaustAbsorberChillerModel(
 		int & ChillNum, // Absorber number
-		Real64 & MyLoad, // operating load
-		bool const RunFlag // TRUE when Absorber operating
+		Real64 & MyLoad // operating load
 	);
 
 	void
