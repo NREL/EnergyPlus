@@ -48081,6 +48081,79 @@ Humidifier:Steam:Electric,
       \type object-list
       \object-list WaterStorageTankNames
 
+Humidifier:Steam:Gas,
+      \memo Natural gas fired steam humidifier with fan.
+  A1, \field Name
+      \required-field
+  A2, \field Availability Schedule Name
+      \note Availability schedule name for this system. Schedule value > 0 means the system is available.
+      \note If this field is blank, the system is always available.
+      \type object-list
+      \object-list ScheduleNames
+  N1, \field Rated Capacity
+      \note Capacity is m3/s of water at 5.05 C
+      \type real
+      \units m3/s
+      \minimum 0.0
+      \ip-units gal/min
+      \autosizable
+      \note The nominal full capacity water addition rate in m3/s of water at 5.05 C
+  N2, \field Thermal Efficiency
+      \type real
+      \units dimensionless
+      \minimum> 0.0
+      \maximum 1.0
+      \default 0.80  
+      \note Based on the higher heating value of fuel.
+      \note The rated or nominal gas use rate is autosized internally using the rated capacity, 
+      \note enthalpy rise of water from 20.0C to 100.0C steam and user input thermal efficiency
+      \note value specified in the next input field. 
+  A3, \field Thermal Efficiency Modifier Curve Name
+      \type object-list
+      \object-list UniVariateCurves
+      \note Linear, Quadratic and Cubic efficiency curves are solely a function of PLR.
+      \note Linear = C1 + C2*PLR
+      \note Quadratic = C1 + C2*PLR + C3*PLR^2
+      \note Cubic = C1 + C2*PLR + C3*PLR^2 + C4*PLR^3
+      \note This is thermal efficiency modifier curve name of gas fired steam humidifier.
+      \note This curve is normalized, i.e., curve output value at rated condition is 1.0. 
+  N3, \field Rated Fan Power
+      \type real
+      \units W
+      \minimum 0.0
+      \ip-units W
+      \note The nominal full capacity electric power input to the blower fan in Watts. If no 
+      \note blower fan is required to inject the dry steam to the supply air stream, then 
+      \note this input field is set to zero.
+  N4, \field Auxiliary Electric Power
+      \type real
+      \units W
+      \minimum 0.0
+      \ip-units W
+      \default 0.0   
+      \note The auxiliary electric power input in watts. This amount of power will be consumed
+      \note whenever the unit is available (as defined by the availability schedule). This 
+      \note electric power is used for control purpose only.
+  A4, \field Air Inlet Node Name
+       \type node
+  A5, \field Air Outlet Node Name
+       \type node
+  A6, \field Water Storage Tank Name
+      \type object-list
+      \object-list WaterStorageTankNames  
+  A7; \field Inlet Water Temperature Option
+      \note The inlet water temperature can be fixed at 20C as it is done for electric steam 
+      \note humidifier or it can be allowed to vary with temperature of the water source.  
+      \note Currently allowed water sources are main water or water storage tank in water use objects.  
+      \note if FixedInletWaterTemperature is specified, then a fixed 20C water temperature will be 
+      \note used, or else if VariableInletWaterTemperature is specified, then inlet water will vary
+      \note depending the source water temperature. If this input field is left blank, then fixed 
+      \note inlet water temperature of 20C will be assumed.  
+      \type choice
+      \key FixedInletWaterTemperature
+      \key VariableInletWaterTemperature
+      \default FixedInletWaterTemperature
+  
 Dehumidifier:Desiccant:NoFans,
        \memo This object models a solid desiccant dehumidifier. The process
        \memo air stream is the air which is dehumidified. The regeneration air
