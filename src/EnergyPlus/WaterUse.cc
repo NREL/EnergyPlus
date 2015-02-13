@@ -916,7 +916,7 @@ namespace WaterUse {
 				WaterEquipment( WaterEquipNum ).MoistureMass = GetCurrentScheduleValue( WaterEquipment( WaterEquipNum ).LatentFracSchedule ) * MoistureMassMax;
 				WaterEquipment( WaterEquipNum ).MoistureRate = WaterEquipment( WaterEquipNum ).MoistureMass / ( TimeStepSys * SecInHour );
 
-				WaterEquipment( WaterEquipNum ).LatentRate = WaterEquipment( WaterEquipNum ).MoistureRate * PsyHfgAirFnWTdb( ZoneHumRat, ZoneMAT );
+				WaterEquipment( WaterEquipNum ).LatentRate = WaterEquipment( WaterEquipNum ).MoistureRate * PsyHfgAirFnWTdb( ZoneMAT );
 				WaterEquipment( WaterEquipNum ).LatentEnergy = WaterEquipment( WaterEquipNum ).LatentRate * TimeStepSys * SecInHour;
 			}
 

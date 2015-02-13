@@ -2193,7 +2193,7 @@ namespace RuntimeLanguageProcessor {
 				ReturnValue = SetErlValueNumber( PsyCpAirFnWTdb( Operand( 1 ).Number, Operand( 2 ).Number ) ); // result =>   heat capacity of air {J/kg-C} | Humidity ratio (kg water vapor/kg dry air) | drybulb (C)
 			} else if ( SELECT_CASE_var == FuncHfgAirFnWTdb ) {
 				//BG comment these two psych funct seems confusing (?) is this the enthalpy of water in the air?
-				ReturnValue = SetErlValueNumber( PsyHfgAirFnWTdb( Operand( 1 ).Number, Operand( 2 ).Number ) ); // result =>   heat of vaporization for moist air {J/kg} | Humidity ratio (kg water vapor/kg dry air) | drybulb (C)
+				ReturnValue = SetErlValueNumber( PsyHfgAirFnWTdb( Operand( 1 ).Number ) ); // result =>   heat of vaporization for moist air {J/kg} | drybulb (C)
 			} else if ( SELECT_CASE_var == FuncHgAirFnWTdb ) {
 				// confusing ?  seems like this is really classical Hfg, heat of vaporization
 				ReturnValue = SetErlValueNumber( PsyHgAirFnWTdb( Operand( 1 ).Number ) ); // result =>   enthalpy of the gas {units?} | drybulb (C)
