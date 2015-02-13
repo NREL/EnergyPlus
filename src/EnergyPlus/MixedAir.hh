@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -805,7 +804,7 @@ namespace MixedAir {
 	Real64
 	MixedAirControlTempResidual(
 		Real64 const OASignal, // Relative outside air flow rate (0 to 1)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = mixed node number
+		FArray1< Real64 > const & Par // par(1) = mixed node number
 	);
 
 	FArray1D_int

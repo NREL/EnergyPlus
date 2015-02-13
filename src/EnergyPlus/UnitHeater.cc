@@ -1647,7 +1647,7 @@ namespace UnitHeater {
 	Real64
 	CalcUnitHeaterResidual(
 		Real64 const PartLoadRatio, // heating coil part load ratio
-		Optional< FArray1S< Real64 > const > Par // Function parameters
+		FArray1< Real64 > const & Par // Function parameters
 	)
 	{
 
@@ -1698,13 +1698,9 @@ namespace UnitHeater {
 		Real64 QUnitOut; // heating provided by unit heater [watts]
 
 		// Convert parameters to usable variables
-		UnitHeaterNum = int( Par()( 1 ) ); //Autodesk:OPTIONAL Par used without PRESENT check
-		if ( Par()( 2 ) == 1.0 ) {
-			FirstHVACIteration = true;
-		} else {
-			FirstHVACIteration = false;
-		}
-		OpMode = int( Par()( 3 ) );
+		UnitHeaterNum = int( Par( 1 ) ); //Autodesk:OPTIONAL Par used without PRESENT check
+		FirstHVACIteration = ( Par( 2 ) == 1.0 );
+		OpMode = int( Par( 3 ) );
 
 		CalcUnitHeaterComponents( UnitHeaterNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadRatio );
 

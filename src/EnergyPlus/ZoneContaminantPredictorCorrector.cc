@@ -1375,7 +1375,7 @@ namespace ZoneContaminantPredictorCorrector {
 				if ( Sch == 0.0 || BeginEnvrnFlag || WarmupFlag ) {
 					ZoneContamGenericDecay( Loop ).GCTime = 0.0;
 				} else {
-					ZoneContamGenericDecay( Loop ).GCTime += TimeStepZone * SecInHour;
+					ZoneContamGenericDecay( Loop ).GCTime += TimeStepZoneSec;
 				}
 				GCGain = ZoneContamGenericDecay( Loop ).GCInitEmiRate * Sch * std::exp( -ZoneContamGenericDecay( Loop ).GCTime / ZoneContamGenericDecay( Loop ).GCDelayTime );
 				ZoneContamGenericDecay( Loop ).GCGenRate = GCGain;

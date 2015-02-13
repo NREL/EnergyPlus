@@ -1219,7 +1219,7 @@ namespace HVACSingleDuctInduc {
 	Real64
 	FourPipeIUHeatingResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		Optional< FArray1S< Real64 > const > Par // Par(5) is the requested zone load
+		FArray1< Real64 > const & Par // Par(5) is the requested zone load
 	)
 	{
 
@@ -1266,16 +1266,12 @@ namespace HVACSingleDuctInduc {
 		Real64 MinCWFlow;
 		Real64 UnitOutput;
 
-		IUIndex = int( Par()( 1 ) );
-		if ( Par()( 2 ) > 0.0 ) {
-			FirstHVACSoln = true;
-		} else {
-			FirstHVACSoln = false;
-		}
-		ZoneNodeIndex = int( Par()( 3 ) );
-		MinCWFlow = Par()( 4 );
+		IUIndex = int( Par( 1 ) );
+		FirstHVACSoln = ( Par( 2 ) > 0.0 );
+		ZoneNodeIndex = int( Par( 3 ) );
+		MinCWFlow = Par( 4 );
 		CalcFourPipeIndUnit( IUIndex, FirstHVACSoln, ZoneNodeIndex, HWFlow, MinCWFlow, UnitOutput );
-		Residuum = ( Par()( 5 ) - UnitOutput ) / ( Par()( 7 ) - Par()( 6 ) );
+		Residuum = ( Par( 5 ) - UnitOutput ) / ( Par( 7 ) - Par( 6 ) );
 
 		return Residuum;
 	}
@@ -1283,7 +1279,7 @@ namespace HVACSingleDuctInduc {
 	Real64
 	FourPipeIUCoolingResidual(
 		Real64 const CWFlow, // cold water flow rate in kg/s
-		Optional< FArray1S< Real64 > const > Par // Par()(5) is the requested zone load
+		FArray1< Real64 > const & Par // Par(5) is the requested zone load
 	)
 	{
 
@@ -1330,16 +1326,12 @@ namespace HVACSingleDuctInduc {
 		Real64 MinHWFlow;
 		Real64 UnitOutput;
 
-		IUIndex = int( Par()( 1 ) );
-		if ( Par()( 2 ) > 0.0 ) {
-			FirstHVACSoln = true;
-		} else {
-			FirstHVACSoln = false;
-		}
-		ZoneNodeIndex = int( Par()( 3 ) );
-		MinHWFlow = Par()( 4 );
+		IUIndex = int( Par( 1 ) );
+		FirstHVACSoln = ( Par( 2 ) > 0.0 );
+		ZoneNodeIndex = int( Par( 3 ) );
+		MinHWFlow = Par( 4 );
 		CalcFourPipeIndUnit( IUIndex, FirstHVACSoln, ZoneNodeIndex, MinHWFlow, CWFlow, UnitOutput );
-		Residuum = ( Par()( 5 ) - UnitOutput ) / ( Par()( 7 ) - Par()( 6 ) );
+		Residuum = ( Par( 5 ) - UnitOutput ) / ( Par( 7 ) - Par( 6 ) );
 
 		return Residuum;
 	}

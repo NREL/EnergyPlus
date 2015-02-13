@@ -2013,18 +2013,18 @@ public: // Comparison: Count
 template< class A, typename T >
 inline
 MArray6< A, T >
-make_MArray6( A & array, T A::value_type::* pmem )
+make_MArray6( A & a, T A::value_type::* pmem )
 {
-	return MArray6< A, T >( array, pmem );
+	return MArray6< A, T >( a, pmem );
 }
 
 // Make a MArray6
 template< class A, typename T >
 inline
 MArray6< A, T >
-MA6( A & array, T A::value_type::* pmem )
+MA6( A & a, T A::value_type::* pmem )
 {
-	return MArray6< A, T >( array, pmem );
+	return MArray6< A, T >( a, pmem );
 }
 
 // Conformable?

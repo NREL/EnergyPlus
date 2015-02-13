@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -550,7 +549,7 @@ namespace DesiccantDehumidifiers {
 	Real64
 	HotWaterCoilResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		Optional< FArray1S< Real64 > const > Par = _ // Par(5) is the requested coil load
+		FArray1< Real64 > const & Par // Par(5) is the requested coil load
 	);
 
 	//        End of Reporting subroutines for the SimAir Module

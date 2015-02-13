@@ -3100,7 +3100,7 @@ private: // Methods
 	void
 	read_val_reinterpret( std::istream & stream, T & t ) const
 	{
-		Size const w( TraitsA< T >::w() );
+		Size const w( TraitsA< T >::w );
 		std::string s( read( stream, wid( w ) ) );
 		std::string::size_type const ls( s.length() );
 		if ( ( w > 0ul ) && ( ls < w ) ) s += std::string( w - ls, ' ' ); // Right-pad to width needed by T
@@ -3119,7 +3119,7 @@ private: // Methods
 	void
 	write_val_reinterpret( std::ostream & stream, T const & t, std::string const & ter )
 	{
-		Size const w( TraitsA< T >::w() );
+		Size const w( TraitsA< T >::w );
 		Size const ww( wid( w ) );
 		Size const wt( std::min( w, ww ) );
 		std::string s( ww, ' ' );
@@ -3133,7 +3133,7 @@ private: // Methods
 	void
 	write_val_reinterpret( std::ostream & stream, bool const b, std::string const & ter )
 	{
-		Size const w( TraitsA< bool >::w() );
+		Size const w( TraitsA< bool >::w );
 		Size const ww( wid( w ) );
 		Size const wt( std::min( w, ww ) );
 		std::string s( ww, ' ' );
@@ -3335,7 +3335,7 @@ public: // Properties
 		return w_;
 	}
 
-	// Min Width
+	// Minimum Width
 	inline
 	Size
 	m() const
@@ -3467,7 +3467,7 @@ protected: // Methods
 	void
 	read_int( std::istream & stream, T & t ) const
 	{
-		std::string const s( blank_process( read( stream, wid( TraitsI< T >::w() ) ) ) );
+		std::string const s( blank_process( read( stream, wid( TraitsI< T >::w ) ) ) );
 		t = static_cast< T >( read_int_base( stream, s ) );
 	}
 
@@ -3477,7 +3477,7 @@ protected: // Methods
 	void
 	read_int_reinterpret( std::istream & stream, T & t ) const
 	{
-		std::string const s( blank_process( read( stream, wid( TraitsI< T >::w() ) ) ) );
+		std::string const s( blank_process( read( stream, wid( TraitsI< T >::w ) ) ) );
 		read_int_reinterpret( stream, s, t );
 	}
 
@@ -3854,7 +3854,7 @@ protected: // Methods
 	void
 	read_binary( std::istream & stream, T & t ) const
 	{
-		std::string const s( blank_process( read( stream, wid( TraitsB< T >::w() ) ) ) );
+		std::string const s( blank_process( read( stream, wid( TraitsB< T >::w ) ) ) );
 		t = static_cast< T >( read_int_base( stream, s ) );
 	}
 
@@ -3864,7 +3864,7 @@ protected: // Methods
 	void
 	read_binary_reinterpret( std::istream & stream, T & t ) const
 	{
-		std::string const s( blank_process( read( stream, wid( TraitsB< T >::w() ) ) ) );
+		std::string const s( blank_process( read( stream, wid( TraitsB< T >::w ) ) ) );
 		read_int_reinterpret( stream, s, t );
 	}
 
@@ -4272,7 +4272,7 @@ public: // Input Methods
 	void
 	in( std::istream & stream, bool & b )
 	{
-		std::string const s( blank_process( read_float( stream, wid( TraitsF< bool >::w() ) ) ) );
+		std::string const s( blank_process( read_float( stream, wid( TraitsF< bool >::w ) ) ) );
 		if ( s.length() > 0 ) {
 			bool ok( is_type< float >( s ) );
 			float const v( val_of< float >( s ) );
@@ -4365,7 +4365,7 @@ protected: // Methods
 	void
 	read_val( std::istream & stream, T & t ) const
 	{
-		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w() ) ) ) );
+		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w ) ) ) );
 		if ( is_type< T >( s ) ) {
 			t = type_of< T >( s );
 			if ( ( d_ > 0ul ) && ( t != T( 0 ) ) && ( ! has( s, '.' ) ) ) t /= static_cast< T >( std::pow( T( 10 ), d_ ) ); // Apply implied decimal point
@@ -4382,7 +4382,7 @@ protected: // Methods
 	void
 	read_val_reinterpret( std::istream & stream, T & t ) const
 	{
-		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w() ) ) ) );
+		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w ) ) ) );
 		if ( s.length() > 0 ) {
 			bool ok( true );
 			if ( sizeof( T ) < sizeof( float ) ) {
@@ -4767,7 +4767,7 @@ protected: // Methods
 	void
 	read_int( std::istream & stream, T & t ) const
 	{
-		std::string const s( blank_process( read( stream, wid( TraitsG< T >::w() ) ) ) );
+		std::string const s( blank_process( read( stream, wid( TraitsG< T >::w ) ) ) );
 		if ( is_type< T >( s ) ) {
 			t = type_of< T >( s );
 		} else { // Bad input

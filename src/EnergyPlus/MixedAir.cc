@@ -4655,7 +4655,7 @@ namespace MixedAir {
 	Real64
 	MixedAirControlTempResidual(
 		Real64 const OASignal, // Relative outside air flow rate (0 to 1)
-		Optional< FArray1S< Real64 > const > Par // par(1) = mixed node number
+		FArray1< Real64 > const & Par // par(1) = mixed node number
 	)
 	{
 
@@ -4711,10 +4711,10 @@ namespace MixedAir {
 		Real64 MixHumRat; // mixed air humidity ratio [kg water/kg dry air]
 		Real64 MixTemp; // mixed air temperature [C]
 
-		MixNode = int( Par()( 1 ) );
-		RetNode = int( Par()( 2 ) );
-		OANode = int( Par()( 3 ) );
-		MixMassFlowRate = Par()( 4 );
+		MixNode = int( Par( 1 ) );
+		RetNode = int( Par( 2 ) );
+		OANode = int( Par( 3 ) );
+		MixMassFlowRate = Par( 4 );
 		OAMassFlowRate = OASignal * MixMassFlowRate;
 		RecircMassFlowRate = max( MixMassFlowRate - OAMassFlowRate, 0.0 );
 		RecircEnth = Node( RetNode ).Enthalpy;
