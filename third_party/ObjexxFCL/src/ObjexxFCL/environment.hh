@@ -9,30 +9,17 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // C++ Headers
 #include <string>
 
 namespace ObjexxFCL {
-
-// Get Environment Variable
-void
-get_environment_variable( Fstring const & name, Optional< Fstring > value = _, Optional< int > length = _, Optional< int > status = _, Optional< bool const > trim_name = _ );
-
-// Get Environment Variable Value
-int
-getenvqq( Fstring const & name, Fstring & value );
-
-// Set Environment Variable Value
-bool
-setenvqq( Fstring const & name_eq_value );
 
 // Get Environment Variable
 void

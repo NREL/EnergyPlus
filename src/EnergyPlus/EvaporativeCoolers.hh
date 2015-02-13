@@ -2,7 +2,7 @@
 #define EvaporativeCoolers_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -32,11 +32,11 @@ namespace EvaporativeCoolers {
 	// MODULE VARIABLE DECLARATIONS:
 	extern bool GetInputEvapComponentsFlag; // Flag set to make sure you get input once
 	extern int NumEvapCool; // The Number of Evap Coolers found in the Input
-	extern FArray1D_bool MySizeFlag;
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool MySizeFlag;
+	extern Array1D_bool CheckEquipName;
 
 	extern int NumZoneEvapUnits;
-	extern FArray1D_bool CheckZoneEvapUnitName;
+	extern Array1D_bool CheckZoneEvapUnitName;
 	extern bool GetInputZoneEvapUnit;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE EvapCoolers
@@ -585,7 +585,7 @@ namespace EvaporativeCoolers {
 	struct ZoneEvapCoolerUnitFieldData
 	{
 		// Members
-		FArray1D_string FieldNames;
+		Array1D_string FieldNames;
 
 		// Default Constructor
 		ZoneEvapCoolerUnitFieldData()
@@ -593,16 +593,16 @@ namespace EvaporativeCoolers {
 
 		// Member Constructor
 		ZoneEvapCoolerUnitFieldData(
-			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
 			) :
 			FieldNames(FieldNames)
 		{}
 	};
 
 	// Object Data
-	extern FArray1D< EvapConditions > EvapCond;
-	extern FArray1D< ZoneEvapCoolerUnitStruct > ZoneEvapUnit;
-	extern FArray1D< ZoneEvapCoolerUnitFieldData > ZoneEvapCoolerUnitFields;
+	extern Array1D< EvapConditions > EvapCond;
+	extern Array1D< ZoneEvapCoolerUnitStruct > ZoneEvapUnit;
+	extern Array1D< ZoneEvapCoolerUnitFieldData > ZoneEvapCoolerUnitFields;
 
 
 	// Functions
@@ -717,7 +717,7 @@ namespace EvaporativeCoolers {
 	Real64
 	VSEvapUnitLoadResidual(
 		Real64 const FanSpeedRatio,
-		FArray1< Real64 > const & Par // parameters
+		Array1< Real64 > const & Par // parameters
 	);
 
 	void

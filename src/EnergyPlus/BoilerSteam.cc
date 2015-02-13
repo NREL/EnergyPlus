@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -77,13 +77,13 @@ namespace BoilerSteam {
 	Real64 BoilerMassFlowMinAvail( 0.0 ); // kg/s - Boiler mass flow rate
 	static std::string const FluidNameSteam( "STEAM" );
 
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Boilers
 
 	// Object Data
-	FArray1D< BoilerSpecs > Boiler; // dimension to number of machines
-	FArray1D< ReportVars > BoilerReport;
+	Array1D< BoilerSpecs > Boiler; // dimension to number of machines
+	Array1D< ReportVars > BoilerReport;
 
 	// MODULE SUBROUTINES:
 
@@ -231,7 +231,7 @@ namespace BoilerSteam {
 		int SteamFluidIndex; // Fluid Index for Steam
 		static bool ErrorsFound( false );
 		bool errFlag;
-		FArray1D_string BoilerFuelTypeForOutputVariable; // used to set up report variables
+		Array1D_string BoilerFuelTypeForOutputVariable; // used to set up report variables
 
 		SteamFluidIndex = 0;
 		cCurrentModuleObject = "Boiler:Steam";
@@ -441,8 +441,8 @@ namespace BoilerSteam {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyFlag;
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyFlag;
+		static Array1D_bool MyEnvrnFlag;
 		bool FatalError;
 		Real64 TempUpLimitBoilerOut; // C - Boiler outlet maximum temperature limit
 		Real64 EnthSteamOutWet;
@@ -752,7 +752,7 @@ namespace BoilerSteam {
 		Real64 EnthSteamOutWet;
 		Real64 LatentEnthSteam;
 		Real64 QualitySteam;
-		FArray1D< Real64 > LoadCoef( 3 ); // coefficients of the fuel use/part load curve
+		Array1D< Real64 > LoadCoef( 3 ); // coefficients of the fuel use/part load curve
 		Real64 CpWater; // Heat capacity of condensed steam
 		int BoilerInletNode; // Boiler inlet node number
 		int BoilerOutletNode; // Boiler outlet node number

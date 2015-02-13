@@ -370,7 +370,7 @@ namespace ReportSizingManager {
 		Real64 SupFanDT;
 		Real64 RetFanDT;
 		Real64 FanCoolLoad;
-		FArray1D< Real64 > Par( 4 ); // array passed to RegulaFalsi
+		Array1D< Real64 > Par( 4 ); // array passed to RegulaFalsi
 		Real64 DesOAFlowFrac;   // design outdoor air flow volume fraction
 		std::string ScalableSM; // scalable sizing methods label for reporting
 

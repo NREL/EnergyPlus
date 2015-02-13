@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -100,13 +100,13 @@ namespace ChillerAbsorption {
 	static std::string const moduleObjectType( "Chiller:Absorption" );
 	static std::string const calcChillerAbsorption( "CALC Chiller:Absorption " );
 
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
 
 	// Object Data
-	FArray1D< BLASTAbsorberSpecs > BLASTAbsorber; // dimension to number of machines
-	FArray1D< ReportVars > BLASTAbsorberReport;
+	Array1D< BLASTAbsorberSpecs > BLASTAbsorber; // dimension to number of machines
+	Array1D< ReportVars > BLASTAbsorberReport;
 
 	// MODULE SUBROUTINES:
 
@@ -290,7 +290,7 @@ namespace ChillerAbsorption {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_bool GenInputOutputNodesUsed; // Used for SetupOutputVariable
+		Array1D_bool GenInputOutputNodesUsed; // Used for SetupOutputVariable
 		static bool ErrorsFound( false );
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -553,8 +553,8 @@ namespace ChillerAbsorption {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyFlag;
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyFlag;
+		static Array1D_bool MyEnvrnFlag;
 		int CondInletNode; // node number of water inlet node to the condenser
 		int CondOutletNode; // node number of water outlet node from the condenser
 		int LoopCtr; // Plant loop counter
@@ -1263,8 +1263,8 @@ namespace ChillerAbsorption {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > SteamLoadFactor( 3 ); // coefficients to poly curve fit
-		FArray1D< Real64 > ElectricLoadFactor( 3 ); // coefficients to poly curve fit
+		Array1D< Real64 > SteamLoadFactor( 3 ); // coefficients to poly curve fit
+		Array1D< Real64 > ElectricLoadFactor( 3 ); // coefficients to poly curve fit
 		Real64 MinPartLoadRat; // min allowed operating frac full load
 		Real64 MaxPartLoadRat; // max allowed operating frac full load
 		Real64 TempCondIn; // C - (BLAST ADJTC(1)The design secondary loop fluid
@@ -1290,8 +1290,8 @@ namespace ChillerAbsorption {
 		Real64 EnthSteamOutDry; // enthalpy of dry steam at generator inlet
 		Real64 EnthSteamOutWet; // enthalpy of wet steam at generator inlet
 		Real64 HfgSteam; // heat of vaporization of steam
-		static FArray1D_bool MyEnvironFlag;
-		static FArray1D_bool MyEnvironSteamFlag;
+		static Array1D_bool MyEnvironFlag;
+		static Array1D_bool MyEnvironSteamFlag;
 		static bool OneTimeFlag( true );
 		Real64 FRAC;
 		//  LOGICAL,SAVE           :: PossibleSubcooling

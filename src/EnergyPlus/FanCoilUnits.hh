@@ -2,7 +2,7 @@
 #define FanCoilUnits_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -45,8 +45,8 @@ namespace FanCoilUnits {
 
 	extern int NumFanCoils;
 	extern int Num4PipeFanCoils;
-	extern FArray1D_bool MySizeFlag;
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool MySizeFlag;
+	extern Array1D_bool CheckEquipName;
 	extern bool GetFanCoilInputFlag; // First time, input is "gotten"
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
@@ -427,7 +427,7 @@ namespace FanCoilUnits {
 	struct FanCoilNumericFieldData
 	{
 		// Members
-		FArray1D_string FieldNames;
+		Array1D_string FieldNames;
 
 		// Default Constructor
 		FanCoilNumericFieldData()
@@ -435,15 +435,15 @@ namespace FanCoilUnits {
 
 		// Member Constructor
 		FanCoilNumericFieldData(
-			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			Array1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
 			) :
 			FieldNames(FieldNames)
 		{}
 	};
 
 	// Object Data
-	extern FArray1D< FanCoilData > FanCoil;
-	extern FArray1D< FanCoilNumericFieldData > FanCoilNumericFields;
+	extern Array1D< FanCoilData > FanCoil;
+	extern Array1D< FanCoilNumericFieldData > FanCoilNumericFields;
 
 	// Functions
 

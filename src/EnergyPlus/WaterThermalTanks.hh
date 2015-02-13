@@ -2,7 +2,7 @@
 #define WaterThermalTanks_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -91,10 +91,10 @@ namespace WaterThermalTanks {
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE TYPE DECLARATIONS:
-	extern FArray1D_bool ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
-	extern FArray1D_bool MyHPSizeFlag; // Used to report autosize info in Init
-	extern FArray1D_bool CheckWTTEquipName;
-	extern FArray1D_bool CheckHPWHEquipName;
+	extern Array1D_bool ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
+	extern Array1D_bool MyHPSizeFlag; // Used to report autosize info in Init
+	extern Array1D_bool CheckWTTEquipName;
+	extern Array1D_bool CheckHPWHEquipName;
 
 	// MODULE VARIABLE DECLARATIONS:
 	extern int NumChilledWaterMixed; // number of mixed chilled water tanks
@@ -111,7 +111,7 @@ namespace WaterThermalTanks {
 	extern Real64 MixerInletAirSchedule; // output of inlet air mixer node schedule
 	extern Real64 MdotAir; // mass flow rate of evaporator air, kg/s
 	extern int NumWaterHeaterSizing; // Number of sizing/design objects for water heaters.
-	extern FArray1D_bool AlreadyRated; // control so we don't repeat again
+	extern Array1D_bool AlreadyRated; // control so we don't repeat again
 
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -443,9 +443,9 @@ namespace WaterThermalTanks {
 		int SourceOutletStratNode; // Source-side outlet node number
 		int InletMode; // Inlet position mode:  1 = FIXED; 2 = SEEKING
 		Real64 InversionMixingRate;
-		FArray1D< Real64 > AdditionalLossCoeff; // Loss coefficient added to the skin loss coefficient (W/m2-K)
+		Array1D< Real64 > AdditionalLossCoeff; // Loss coefficient added to the skin loss coefficient (W/m2-K)
 		int Nodes; // Number of nodes
-		FArray1D< StratifiedNodeData > Node; // Array of node data
+		Array1D< StratifiedNodeData > Node; // Array of node data
 		// Report variables
 		Real64 VolFlowRate; // Scheduled DHW demand (m3/s)
 		Real64 VolumeConsumed; // Volume of DHW consumed (m3)
@@ -792,9 +792,9 @@ namespace WaterThermalTanks {
 			int const SourceOutletStratNode, // Source-side outlet node number
 			int const InletMode, // Inlet position mode:  1 = FIXED; 2 = SEEKING
 			Real64 const InversionMixingRate,
-			FArray1< Real64 > const & AdditionalLossCoeff, // Loss coefficient added to the skin loss coefficient (W/m2-K)
+			Array1< Real64 > const & AdditionalLossCoeff, // Loss coefficient added to the skin loss coefficient (W/m2-K)
 			int const Nodes, // Number of nodes
-			FArray1< StratifiedNodeData > const & Node, // Array of node data
+			Array1< StratifiedNodeData > const & Node, // Array of node data
 			Real64 const VolFlowRate, // Scheduled DHW demand (m3/s)
 			Real64 const VolumeConsumed, // Volume of DHW consumed (m3)
 			Real64 const UnmetRate, // Energy demand to heat tank water to setpoint (W)
@@ -1629,9 +1629,9 @@ namespace WaterThermalTanks {
 	};
 
 	// Object Data
-	extern FArray1D< WaterThermalTankData > WaterThermalTank;
-	extern FArray1D< HeatPumpWaterHeaterData > HPWaterHeater;
-	extern FArray1D< WaterHeaterDesuperheaterData > WaterHeaterDesuperheater;
+	extern Array1D< WaterThermalTankData > WaterThermalTank;
+	extern Array1D< HeatPumpWaterHeaterData > HPWaterHeater;
+	extern Array1D< WaterHeaterDesuperheaterData > WaterHeaterDesuperheater;
 
 	// Functions
 
@@ -1690,10 +1690,8 @@ namespace WaterThermalTanks {
 	);
 
 	void
-	CalcWaterThermalTankMixed(
-        int const WaterThermalTankNum // Water Heater being simulated
-    );
-	
+	CalcWaterThermalTankMixed( int const WaterThermalTankNum ); // Water Heater being simulated
+
 	void CalcMixedTankSourceSideHeatTransferRate(
 		Real64 HPWHCondenserDeltaT, // input, The temperature difference (C) across the heat pump, zero if there is no heat pump or if the heat pump is off
 		Real64 SourceInletTemp, // input, Source inlet temperature (C)
@@ -1767,7 +1765,7 @@ namespace WaterThermalTanks {
 		Real64 SourceMassFlowRate, // source mass flow rate (kg/s)
 		Real64 NodeTemp // temperature of the source inlet node (C)
 	);
-	
+
 	void
 	CalcNodeMassFlows(
 		int const WaterThermalTankNum, // Water Heater being simulated
@@ -1789,13 +1787,13 @@ namespace WaterThermalTanks {
 	Real64
 	PLRResidualMixedTank(
 		Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = HP set point temperature [C]
+		Array1< Real64 > const & Par // par(1) = HP set point temperature [C]
 	);
 
 	Real64
 	PLRResidualStratifiedTank(
 		Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = HP set point temperature [C]
+		Array1< Real64 > const & Par // par(1) = HP set point temperature [C]
 	);
 
 	Real64
@@ -1854,7 +1852,7 @@ namespace WaterThermalTanks {
 
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

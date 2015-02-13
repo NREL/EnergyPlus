@@ -3,7 +3,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -90,17 +90,17 @@ namespace PlantCentralGSHP {
 
 	// Type defining the component specifications
 
-	FArray1D_bool CheckEquipName;
-	FArray1D_bool CHCheckEquipName;
-	FArray1D_bool HPCheckEquipName;
+	Array1D_bool CheckEquipName;
+	Array1D_bool CHCheckEquipName;
+	Array1D_bool HPCheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ChillerElectricEIR
 
 	// Object Data
-	FArray1D< WrapperSpecs > Wrapper;
-	FArray1D< ChillerHeaterSpecs > ChillerHeater;
-	FArray1D< CHReportVars > ChillerHeaterReport;
-	FArray1D< WrapperReportVars > WrapperReport;
+	Array1D< WrapperSpecs > Wrapper;
+	Array1D< ChillerHeaterSpecs > ChillerHeater;
+	Array1D< CHReportVars > ChillerHeaterReport;
+	Array1D< WrapperReportVars > WrapperReport;
 
 	// MODULE SUBROUTINES:
 
@@ -929,7 +929,7 @@ namespace PlantCentralGSHP {
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
 		Real64 CurveVal; // Used to verify EIR-FT and CAP-FT curves
-		FArray1D< Real64 > CurveValArray( 11 ); // Used to evaluate PLFFPLR curve objects
+		Array1D< Real64 > CurveValArray( 11 ); // Used to evaluate PLFFPLR curve objects
 		Real64 CurveValTmp; // Used to evaluate PLFFPLR curve objects
 
 		// Formats
@@ -1278,8 +1278,8 @@ namespace PlantCentralGSHP {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyWrapperOneTimeFlag( true ); // Flag used to execute code only once
-		static FArray1D_bool MyWrapperFlag; // TRUE in order to set component location
-		static FArray1D_bool MyWrapperEnvrnFlag; // TRUE when new environment is started
+		static Array1D_bool MyWrapperFlag; // TRUE in order to set component location
+		static Array1D_bool MyWrapperEnvrnFlag; // TRUE when new environment is started
 		int WrapperCondInletNode; // Node number for condenser water inlet node
 		int WrapperCondOutletNode; // Node number for condenser water outlet node
 		int HeatRecInNode; // Node number for heat recovery water inlet node

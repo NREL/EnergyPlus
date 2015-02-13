@@ -9,11 +9,12 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
+#include <ObjexxFCL/noexcept.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/TraitsA.hh>
 #include <ObjexxFCL/TraitsB.hh>
@@ -27,8 +28,9 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdlib>
-#include <iostream>
+#include <istream>
 #include <limits>
+#include <ostream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -38,7 +40,6 @@ namespace ObjexxFCL {
 // Forward
 class byte;
 class ubyte;
-class Fstring;
 
 // List-Directed Input Entry
 struct EntryFormatLD
@@ -143,7 +144,7 @@ protected: // Creation
 
 	// Move Constructor
 	inline
-	Format( Format && f ) :
+	Format( Format && f ) NOEXCEPT :
 	 p_( f.p_ ),
 	 r_( f.r_ ),
 	 u_( f.u_ ),
@@ -720,11 +721,6 @@ public: // Input Methods
 		io_err( stream );
 	}
 
-	// Input
-	virtual
-	void
-	in( std::istream & stream, Fstring & s );
-
 public: // Output Methods
 
 	// Output without Argument
@@ -923,15 +919,6 @@ public: // Output Methods
 		io_err( stream );
 	}
 
-	// Output
-	inline
-	virtual
-	void
-	out( std::ostream & stream, Fstring const &, std::string const & )
-	{ // Default implementation
-		io_err( stream );
-	}
-
 public: // Static Methods
 
 	// Skip Rest of Line and Line Terminator (Manipulator)
@@ -1097,7 +1084,7 @@ private: // Data
 
 protected: // Static Data
 
-	static Size const NOSIZE = static_cast< Size >( -1 );
+	static Size const NOSIZE;
 	static std::string const LF;
 
 }; // Format
@@ -1129,7 +1116,7 @@ protected: // Creation
 
 	// Move Constructor
 	inline
-	FormatCombo( FormatCombo && f ) :
+	FormatCombo( FormatCombo && f ) NOEXCEPT :
 	 Format( std::move( f ) )
 	{}
 
@@ -1179,10 +1166,12 @@ public: // Creation
 
 	// Move Constructor
 	inline
-	FormatList( FormatList && f ) :
+	FormatList( FormatList && f ) NOEXCEPT :
 	 FormatCombo( std::move( f ) ),
 	 formats_( std::move( f.formats_ ) )
-	{}
+	{
+		f.formats_.clear();
+	}
 
 	// Clone
 	inline
@@ -1324,7 +1313,7 @@ protected: // Creation
 
 	// Move Constructor
 	inline
-	FormatGroup( FormatGroup && f ) :
+	FormatGroup( FormatGroup && f ) NOEXCEPT :
 	 FormatCombo( std::move( f ) ),
 	 format_( f.format_ )
 	{
@@ -1500,7 +1489,7 @@ public: // Creation
 
 	// Move Constructor
 	inline
-	FormatGroupTop( FormatGroupTop && f ) :
+	FormatGroupTop( FormatGroupTop && f ) NOEXCEPT :
 	 FormatGroup( std::move( f ) ),
 	 P_( 0 ),
 	 blank_zero_( false ),
@@ -1804,7 +1793,7 @@ protected: // Creation
 
 	// Move Constructor
 	inline
-	FormatLeaf( FormatLeaf && f ) :
+	FormatLeaf( FormatLeaf && f ) NOEXCEPT :
 	 Format( std::move( f ) )
 	{}
 
@@ -2966,10 +2955,6 @@ public: // Input Methods
 		s = read( stream, w_ ); // Reads the whole record if w_ unspecified since std::string is variable length
 	}
 
-	// Input
-	void
-	in( std::istream & stream, Fstring & s );
-
 public: // Output Methods
 
 	// Output
@@ -3087,10 +3072,6 @@ public: // Output Methods
 		std::string::size_type const l( s.length() );
 		stream << spc( ter ) << std::string( ( has_w() && ( w_ > l ) ? w_ - l : 0ul ), ' ' ) << s;
 	}
-
-	// Output
-	void
-	out( std::ostream & stream, Fstring const &, std::string const & ter );
 
 private: // Methods
 
@@ -3281,7 +3262,7 @@ protected: // Creation
 
 	// Move Constructor
 	inline
-	FormatInteger( FormatInteger && f ) :
+	FormatInteger( FormatInteger && f ) NOEXCEPT :
 	 FormatLeaf( std::move( f ) ),
 	 w_( f.w_ ),
 	 m_( f.m_ )
@@ -4203,7 +4184,7 @@ protected: // Creation
 
 	// Move Constructor
 	inline
-	FormatFloat( FormatFloat && f ) :
+	FormatFloat( FormatFloat && f ) NOEXCEPT :
 	 FormatLeaf( std::move( f ) ),
 	 w_( f.w_ ),
 	 d_( f.d_ )
@@ -4522,7 +4503,7 @@ protected: // Creation
 
 	// Move Constructor
 	inline
-	FormatGED( FormatGED && f ) :
+	FormatGED( FormatGED && f ) NOEXCEPT :
 	 FormatFloat( std::move( f ) ),
 	 e_( f.e_ )
 	{}
@@ -4700,10 +4681,6 @@ public: // Input Methods
 	{
 		s = read( stream, w() ); // Reads the whole record if w() unspecified since std::string is variable length
 	}
-
-	// Input
-	void
-	in( std::istream & stream, Fstring & s );
 
 public: // Output Methods
 
@@ -5236,10 +5213,6 @@ public: // Input Methods
 		read_string( stream, s );
 	}
 
-	// Input
-	void
-	in( std::istream & stream, Fstring & s );
-
 public: // Output Methods
 
 	// Output
@@ -5305,10 +5278,6 @@ public: // Output Methods
 	// Output
 	void
 	out( std::ostream & stream, std::string const & s, std::string const & ter );
-
-	// Output
-	void
-	out( std::ostream & stream, Fstring const & s, std::string const & ter );
 
 protected: // Methods
 

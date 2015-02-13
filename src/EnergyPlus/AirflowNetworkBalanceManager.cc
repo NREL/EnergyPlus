@@ -3,8 +3,8 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -161,12 +161,12 @@ namespace AirflowNetworkBalanceManager {
 
 	// MODULE VARIABLE DECLARATIONS:
 	// Report variables
-	FArray1D< Real64 > PZ;
+	Array1D< Real64 > PZ;
 	// Inverse matrix
-	FArray1D< Real64 > MA;
-	FArray1D< Real64 > MV;
-	FArray1D_int IVEC;
-	FArray1D_int SplitterNodeNumbers;
+	Array1D< Real64 > MA;
+	Array1D< Real64 > MV;
+	Array1D_int IVEC;
+	Array1D_int SplitterNodeNumbers;
 
 	bool AirflowNetworkGetInputFlag( true );
 	int VentilationCtrl( 0 ); // Hybrid ventilation control type
@@ -199,7 +199,7 @@ namespace AirflowNetworkBalanceManager {
 	int NumOfExtNodes( 0 );
 	int AirflowNetworkNumOfExtSurfaces( 0 );
 	Real64 IncAng( 0.0 ); // Wind incidence angle relative to facade normal (deg)
-	FArray1D< Real64 > FacadeAng( 5 ); // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
+	Array1D< Real64 > FacadeAng( 5 ); // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
 	int WindDirNum; // Wind direction number
 	Real64 WindAng; // Wind direction angle (degrees clockwise from North)
 	int SupplyFanInletNode( 0 ); // Supply air fan inlet node number
@@ -211,7 +211,7 @@ namespace AirflowNetworkBalanceManager {
 	// Name Public routines, optionally name Private routines within this module
 
 	// Object Data
-	FArray1D< AirflowNetworkReportVars > AirflowNetworkZnRpt;
+	Array1D< AirflowNetworkReportVars > AirflowNetworkZnRpt;
 
 	// Functions
 
@@ -410,7 +410,7 @@ namespace AirflowNetworkBalanceManager {
 		int NumAPL;
 		bool IsNotOK;
 		bool IsBlank;
-		FArray1D_string CompName( 2 );
+		Array1D_string CompName( 2 );
 		std::string SimAirNetworkKey;
 		bool SimObjectError;
 		std::string StringOut;
@@ -420,20 +420,20 @@ namespace AirflowNetworkBalanceManager {
 
 		// Declare variables used in this subroutine for debug purpose
 		bool AirflowNetworkInitFlag;
-		FArray1D_int ZoneCheck;
-		FArray1D_int ZoneBCCheck;
+		Array1D_int ZoneCheck;
+		Array1D_int ZoneBCCheck;
 		bool SurfaceFound;
 
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
 		std::string CurrentModuleObject;
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int MaxNums( 0 ); // Maximum number of numeric input fields
 		static int MaxAlphas( 0 ); // Maximum number of alpha input fields
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
@@ -3537,10 +3537,10 @@ namespace AirflowNetworkBalanceManager {
 		// SUBROUTINE PARAMETER DEFINITIONS
 		//  index 1 is wind incidence angle (0,30,60,...,300,330 deg)
 		//  index 2 is side ratio (0.25,1.0,4.0),
-		static FArray2D< Real64 > const CPHighRiseWall( 12, 3, reshape2< Real64, int >( { 0.60, 0.54, 0.23, -0.25, -0.61, -0.55, -0.51, -0.55, -0.61, -0.25, 0.23, 0.54, 0.60, 0.48, 0.04, -0.56, -0.56, -0.42, -0.37, -0.42, -0.56, -0.56, 0.04, 0.48, 0.60, 0.44, -0.26, -0.70, -0.53, -0.32, -0.22, -0.32, -0.53, -0.70, -0.26, 0.44 }, { 12, 3 } ) ); // Surface-averaged wind-pressure coefficient array for walls // Explicit reshape2 template args are work-around for VC++2013 bug
+		static Array2D< Real64 > const CPHighRiseWall( 12, 3, reshape2< Real64, int >( { 0.60, 0.54, 0.23, -0.25, -0.61, -0.55, -0.51, -0.55, -0.61, -0.25, 0.23, 0.54, 0.60, 0.48, 0.04, -0.56, -0.56, -0.42, -0.37, -0.42, -0.56, -0.56, 0.04, 0.48, 0.60, 0.44, -0.26, -0.70, -0.53, -0.32, -0.22, -0.32, -0.53, -0.70, -0.26, 0.44 }, { 12, 3 } ) ); // Surface-averaged wind-pressure coefficient array for walls // Explicit reshape2 template args are work-around for VC++2013 bug
 		//  index 1 is wind incidence angle (0,30,60,...,300,330 deg)
 		//  index 2 is side ratio (0.25,0.5,1.0),
-		static FArray2D< Real64 > const CPHighRiseRoof( 12, 3, reshape2< Real64, int >( { -0.28, -0.69, -0.72, -0.76, -0.72, -0.69, -0.28, -0.69, -0.72, -0.76, -0.72, -0.69, -0.47, -0.52, -0.70, -0.76, -0.70, -0.52, -0.47, -0.52, -0.70, -0.76, -0.70, -0.52, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55 }, { 12, 3 } ) ); // Surface-averaged wind-pressure coefficient array for roof // Explicit reshape2 template args are work-around for VC++2013 bug
+		static Array2D< Real64 > const CPHighRiseRoof( 12, 3, reshape2< Real64, int >( { -0.28, -0.69, -0.72, -0.76, -0.72, -0.69, -0.28, -0.69, -0.72, -0.76, -0.72, -0.69, -0.47, -0.52, -0.70, -0.76, -0.70, -0.52, -0.47, -0.52, -0.70, -0.76, -0.70, -0.52, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55, -0.70, -0.55, -0.55 }, { 12, 3 } ) ); // Surface-averaged wind-pressure coefficient array for roof // Explicit reshape2 template args are work-around for VC++2013 bug
 
 		// INTERFACE BLOCK SPECIFICATIONS:na
 		// DERIVED TYPE DEFINITIONS:na
@@ -4864,18 +4864,15 @@ namespace AirflowNetworkBalanceManager {
 				for ( K = 1; K <= NORDER; ++K ) {
 					MA( ( j - 1 ) * NORDER + K ) -= R1 * MA( ( i - 1 ) * NORDER + K );
 				}
-Label60: ;
 			}
 		}
 		for ( i = 1; i <= NORDER; ++i ) {
 			if ( IVEC( i + 20 ) == i ) continue;
 			M = i;
 			while ( NORDER > M ) {
-Label70: ;
 				++M;
 				if ( IVEC( M + 20 ) == i ) break;
 			}
-Label80: ;
 			IVEC( M + 20 ) = IVEC( i + 20 );
 			for ( j = 1; j <= NORDER; ++j ) {
 				R1 = MA( ( i - 1 ) * NORDER + j );
@@ -4883,7 +4880,6 @@ Label80: ;
 				MA( ( M - 1 ) * NORDER + j ) = R1;
 			}
 			IVEC( i + 20 ) = i;
-Label90: ;
 		}
 		return;
 		//   ########################################################### END
@@ -6077,11 +6073,11 @@ Label90: ;
 		static bool OneTimeFlag( true );
 		static bool ErrorsFound( false );
 		bool LocalError;
-		FArray1D_bool NodeFound;
+		Array1D_bool NodeFound;
 		Real64 FanFlow;
 		static bool IsNotOK( false );
 		static bool errFlag( false );
-		FArray1D_int NodeConnectionType; // Specifies the type of node connection
+		Array1D_int NodeConnectionType; // Specifies the type of node connection
 		std::string CurrentModuleObject;
 
 		// Validate supply and return connections
@@ -6826,16 +6822,16 @@ Label90: ;
 		Real64 ZoneAngDiff;
 		Real64 SSZoneNum;
 		Real64 SmallArea;
-		FArray1D< Real64 > ZoneAng; // Azimuth angle of the exterior wall of the zone
-		FArray1D< Real64 > PiFormula; // Formula for the mean pressure difference
-		FArray1D< Real64 > SigmaFormula; // Formula for the flucuating pressure difference
-		FArray1D< Real64 > Sprime; // The dimensionless ratio of the window separation to the building width
-		FArray1D< Real64 > CPV1; // Wind pressure coefficient for the first opening in the zone
-		FArray1D< Real64 > CPV2; // Wind pressure coefficient for the second opening in the zone
+		Array1D< Real64 > ZoneAng; // Azimuth angle of the exterior wall of the zone
+		Array1D< Real64 > PiFormula; // Formula for the mean pressure difference
+		Array1D< Real64 > SigmaFormula; // Formula for the flucuating pressure difference
+		Array1D< Real64 > Sprime; // The dimensionless ratio of the window separation to the building width
+		Array1D< Real64 > CPV1; // Wind pressure coefficient for the first opening in the zone
+		Array1D< Real64 > CPV2; // Wind pressure coefficient for the second opening in the zone
 		static int AFNNumOfExtOpenings( 0 ); // Total number of external openings in the model
 		static int OpenNuminZone( 0 ); // Counts which opening this is in the zone, 1 or 2
 		std::string Name; // External node name
-		FArray1D_int NumofExtSurfInZone; // List of the number of exterior openings in each zone
+		Array1D_int NumofExtSurfInZone; // List of the number of exterior openings in each zone
 
 		struct AFNExtSurfacesProp // External opening information
 		{
@@ -6907,7 +6903,7 @@ Label90: ;
 		};
 
 		// Object Data
-		FArray1D< AFNExtSurfacesProp > AFNExtSurfaces; // Surface numbers of all exterior openings
+		Array1D< AFNExtSurfacesProp > AFNExtSurfaces; // Surface numbers of all exterior openings
 
 		//count the total number of exterior simple and detailed openings and the number in each zone
 		//verify that each zone with "ADVANCED" single sided wind pressure coefficients has exactly two openings.

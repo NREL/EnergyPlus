@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -132,7 +132,7 @@ namespace EvaporativeFluidCoolers {
 	// to design air flow rate
 	Real64 WaterUsage( 0.0 ); // Evaporative fluid cooler water usage (m3/s)
 
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE EvaporativeFluidCoolers
 
@@ -146,9 +146,9 @@ namespace EvaporativeFluidCoolers {
 	// Update routines to check convergence and update nodes
 
 	// Object Data
-	FArray1D< EvapFluidCoolerspecs > SimpleEvapFluidCooler; // dimension to number of machines
-	FArray1D< EvapFluidCoolerInletConds > SimpleEvapFluidCoolerInlet; // inlet conditions
-	FArray1D< ReportVars > SimpleEvapFluidCoolerReport; // report variables
+	Array1D< EvapFluidCoolerspecs > SimpleEvapFluidCooler; // dimension to number of machines
+	Array1D< EvapFluidCoolerInletConds > SimpleEvapFluidCoolerInlet; // inlet conditions
+	Array1D< ReportVars > SimpleEvapFluidCoolerReport; // report variables
 
 	// MODULE SUBROUTINES:
 
@@ -236,11 +236,11 @@ namespace EvaporativeFluidCoolers {
 			}
 		}
 
-		//INITIALIZE
+		// INITIALIZE
 		InitSimVars();
 
-		//CALCULATE
-		TypeOfEquip: { auto const SELECT_CASE_var( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num );
+		// CALCULATE
+		{ auto const SELECT_CASE_var( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num );
 
 		if ( SELECT_CASE_var == EvapFluidCooler_SingleSpeed ) {
 
@@ -364,8 +364,8 @@ namespace EvaporativeFluidCoolers {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false ); // Logical flag set .TRUE. if errors found while getting input data
-		FArray1D< Real64 > NumArray( 25 ); // Numeric input data array
-		FArray1D_string AlphArray( 13 ); // Character string input data array
+		Array1D< Real64 > NumArray( 25 ); // Numeric input data array
+		Array1D_string AlphArray( 13 ); // Character string input data array
 		std::string FluidName;
 
 		// Get number of all evaporative fluid coolers specified in the input data file (idf)
@@ -1020,8 +1020,8 @@ namespace EvaporativeFluidCoolers {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Flag if input data errors are found
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool OneTimeFlagForEachEvapFluidCooler;
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool OneTimeFlagForEachEvapFluidCooler;
 		int TypeOf_Num( 0 );
 		int LoopNum;
 		int LoopSideNum;
@@ -1179,7 +1179,7 @@ namespace EvaporativeFluidCoolers {
 		// temperature specified in the plant:sizing object
 		// is higher than the design entering air wet-bulb temp
 		// when autosize feature is used
-		FArray1D< Real64 > Par( 6 ); // Parameter array need for RegulaFalsi routine
+		Array1D< Real64 > Par( 6 ); // Parameter array need for RegulaFalsi routine
 		std::string equipName;
 		Real64 Cp; // local specific heat for fluid
 		Real64 rho; // local density for fluid
@@ -2110,7 +2110,7 @@ namespace EvaporativeFluidCoolers {
 	Real64
 	SimpleEvapFluidCoolerUAResidual(
 		Real64 const UA, // UA of evaporative fluid cooler
-		FArray1< Real64 > const & Par // par(1) = design evaporative fluid cooler load [W]
+		Array1< Real64 > const & Par // par(1) = design evaporative fluid cooler load [W]
 	)
 	{
 

@@ -3,7 +3,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -72,8 +72,8 @@ namespace OutsideEnergySources {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE OutsideEnergySources
 
 	// Object Data
-	FArray1D< OutsideEnergySourceSpecs > EnergySource;
-	FArray1D< ReportVars > EnergySourceReport;
+	Array1D< OutsideEnergySourceSpecs > EnergySource;
+	Array1D< ReportVars > EnergySourceReport;
 
 	// Functions
 
@@ -489,18 +489,18 @@ namespace OutsideEnergySources {
 	// *****************************************************************************
 
 	void
-	SizeDistrictEnergy( 
-		int const EnergySourceNum 
+	SizeDistrictEnergy(
+		int const EnergySourceNum
 	)
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Daeho Kang
 		//       DATE WRITTEN   April 2014
-		//       MODIFIED       
+		//       MODIFIED
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		//  This subroutine is for sizing capacities of district cooling and heating objects. 
+		//  This subroutine is for sizing capacities of district cooling and heating objects.
 
 		// USE STATEMENTS:
 		using DataSizing::AutoSize;
@@ -563,7 +563,7 @@ namespace OutsideEnergySources {
 				ErrorsFound = true;
 			} else {
 				if ( EnergySource( EnergySourceNum ).NomCap > 0.0 ) {
-					ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name, 
+					ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name,
 						"User-Specified Nominal Capacity [W]", EnergySource( EnergySourceNum ).NomCap );
 				}
 			}

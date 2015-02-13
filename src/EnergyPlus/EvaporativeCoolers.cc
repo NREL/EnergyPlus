@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -98,11 +98,11 @@ namespace EvaporativeCoolers {
 	// MODULE VARIABLE DECLARATIONS:
 	bool GetInputEvapComponentsFlag( true ); // Flag set to make sure you get input once
 	int NumEvapCool( 0 ); // The Number of Evap Coolers found in the Input
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool CheckEquipName;
+	Array1D_bool MySizeFlag;
+	Array1D_bool CheckEquipName;
 
 	int NumZoneEvapUnits( 0 );
-	FArray1D_bool CheckZoneEvapUnitName;
+	Array1D_bool CheckZoneEvapUnitName;
 	bool GetInputZoneEvapUnit( true );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE EvapCoolers
@@ -112,9 +112,9 @@ namespace EvaporativeCoolers {
 	// zone unit routines
 
 	// Object Data
-	FArray1D< EvapConditions > EvapCond;
-	FArray1D< ZoneEvapCoolerUnitStruct > ZoneEvapUnit;
-	FArray1D< ZoneEvapCoolerUnitFieldData > ZoneEvapCoolerUnitFields;
+	Array1D< EvapConditions > EvapCond;
+	Array1D< ZoneEvapCoolerUnitStruct > ZoneEvapUnit;
+	Array1D< ZoneEvapCoolerUnitFieldData > ZoneEvapCoolerUnitFields;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -2100,12 +2100,12 @@ namespace EvaporativeCoolers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CurrentModuleObject; // Object type for getting and error messages
-		FArray1D_string Alphas; // Alpha items for object
-		FArray1D< Real64 > Numbers; // Numeric items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha items for object
+		Array1D< Real64 > Numbers; // Numeric items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int MaxAlphas; // Maximum number of alpha fields in all objects
@@ -2426,7 +2426,7 @@ namespace EvaporativeCoolers {
 		using Fans::GetFanVolFlow;
 
 		// Locals
-		static FArray1D_bool MySizeFlag;
+		static Array1D_bool MySizeFlag;
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -2441,9 +2441,9 @@ namespace EvaporativeCoolers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true ); // one time flag
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MyFanFlag;
-		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MyFanFlag;
+		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		bool errFlag;
 		int Loop;
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
@@ -3055,7 +3055,7 @@ namespace EvaporativeCoolers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 MinHumRat;
-		FArray1D< Real64 > Par( 5 ); // Parameters passed to RegulaFalsi
+		Array1D< Real64 > Par( 5 ); // Parameters passed to RegulaFalsi
 		Real64 FanSpeedRatio;
 		static Real64 ErrorToler( 0.001 ); // error tolerance
 		int SolFla; // Flag of RegulaFalsi solver
@@ -3129,7 +3129,7 @@ namespace EvaporativeCoolers {
 	Real64
 	VSEvapUnitLoadResidual(
 		Real64 const FanSpeedRatio,
-		FArray1< Real64 > const & Par // parameters
+		Array1< Real64 > const & Par // parameters
 	)
 	{
 

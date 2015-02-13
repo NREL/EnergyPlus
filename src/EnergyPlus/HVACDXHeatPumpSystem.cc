@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <HVACDXHeatPumpSystem.hh>
@@ -75,7 +75,7 @@ namespace HVACDXHeatPumpSystem {
 	bool EconomizerFlag( false ); // holds air loop economizer status
 
 	// Make this type allocatable
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -85,7 +85,7 @@ namespace HVACDXHeatPumpSystem {
 	// Update routine to check convergence and update nodes
 
 	// Object Data
-	FArray1D< DXHeatPumpSystemStruct > DXHeatPumpSystem;
+	Array1D< DXHeatPumpSystemStruct > DXHeatPumpSystem;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -295,12 +295,12 @@ namespace HVACDXHeatPumpSystem {
 		bool FanErrorsFound; // flag returned on fan operating mode check
 		bool DXErrorsFound; // flag returned on DX coil name check
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 		//  certain object in the input file
 
@@ -594,7 +594,7 @@ namespace HVACDXHeatPumpSystem {
 		Real64 OutletTempDXCoil; // Actual outlet temperature of the DX cooling coil
 
 		int SolFla; // Flag of solver
-		FArray1D< Real64 > Par( 5 ); // Parameter array passed to solver
+		Array1D< Real64 > Par( 5 ); // Parameter array passed to solver
 		bool SensibleLoad; // True if there is a sensible cooling load on this system
 		bool LatentLoad; // True if there is a latent   cooling load on this system
 		int FanOpMode; // Supply air fan operating mode
@@ -887,7 +887,7 @@ namespace HVACDXHeatPumpSystem {
 	Real64
 	DXHeatingCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // Par(1) = DX coil number
+		Array1< Real64 > const & Par // Par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -949,7 +949,7 @@ namespace HVACDXHeatPumpSystem {
 	Real64
 	VSCoilCyclingResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // Par(1) = DX coil number
+		Array1< Real64 > const & Par // Par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -1019,7 +1019,7 @@ namespace HVACDXHeatPumpSystem {
 	Real64
 	VSCoilSpeedResidual(
 		Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // Par(1) = DX coil number
+		Array1< Real64 > const & Par // Par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:

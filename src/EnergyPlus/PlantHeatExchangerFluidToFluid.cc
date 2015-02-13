@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -93,12 +93,12 @@ namespace PlantHeatExchangerFluidToFluid {
 	std::string ComponentClassName( "HeatExchanger:FluidToFluid" );
 	int NumberOfPlantFluidHXs( 0 );
 	bool GetInput( true );
-	FArray1D_bool CheckFluidHXs;
+	Array1D_bool CheckFluidHXs;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Object Data
-	FArray1D< HeatExchangerStruct > FluidHX;
+	Array1D< HeatExchangerStruct > FluidHX;
 
 	// Functions
 
@@ -270,12 +270,12 @@ namespace PlantHeatExchangerFluidToFluid {
 		static int MaxNumAlphas( 0 ); // argument for call to GetObjectDefMaxArgs
 		static int MaxNumNumbers( 0 ); // argument for call to GetObjectDefMaxArgs
 		static int TotalArgs( 0 ); // argument for call to GetObjectDefMaxArgs
-		FArray1D_string cAlphaFieldNames;
-		FArray1D_string cNumericFieldNames;
-		FArray1D_bool lNumericFieldBlanks;
-		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_string cAlphaArgs;
-		FArray1D< Real64 > rNumericArgs;
+		Array1D_string cAlphaFieldNames;
+		Array1D_string cNumericFieldNames;
+		Array1D_bool lNumericFieldBlanks;
+		Array1D_bool lAlphaFieldBlanks;
+		Array1D_string cAlphaArgs;
+		Array1D< Real64 > rNumericArgs;
 		std::string cCurrentModuleObject;
 		int CompLoop;
 		bool NodeEMSSetPointMissing;
@@ -577,8 +577,8 @@ namespace PlantHeatExchangerFluidToFluid {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true ); // one time flag
-		static FArray1D_bool MyEnvrnFlag; // environment flag
-		static FArray1D_bool MyFlag;
+		static Array1D_bool MyEnvrnFlag; // environment flag
+		static Array1D_bool MyFlag;
 		bool errFlag;
 		static std::string const RoutineName( "InitFluidHeatExchanger: " );
 		Real64 rho;
@@ -1607,7 +1607,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SolFla; // Flag of solver
-		FArray1D< Real64 > Par( 2 ); // Parameter array passed to solver
+		Array1D< Real64 > Par( 2 ); // Parameter array passed to solver
 
 		Real64 LeavingTempMinFlow;
 		Real64 LeavingTempFullFlow;
@@ -1716,7 +1716,7 @@ namespace PlantHeatExchangerFluidToFluid {
 	Real64
 	HXDemandSideLoopFlowResidual(
 		Real64 const DmdSideMassFlowRate,
-		FArray1< Real64 > const & Par // Par(1) = HX index number
+		Array1< Real64 > const & Par // Par(1) = HX index number
 	)
 	{
 

@@ -3,9 +3,9 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/MArray.functions.hh>
@@ -774,8 +774,8 @@ namespace HeatBalanceSurfaceManager {
 		Real64 frameArea;
 		Real64 dividerArea;
 		//counts for object count report
-		FArray1D_int numSurfaces( 20 );
-		FArray1D_int numExtSurfaces( 20 );
+		Array1D_int numSurfaces( 20 );
+		Array1D_int numExtSurfaces( 20 );
 		int frameDivNum;
 		bool isExterior;
 
@@ -1681,9 +1681,9 @@ namespace HeatBalanceSurfaceManager {
 		int TotGlassLay; // Number of glass layers
 		int TotSolidLay; // Number of solid layers in fenestration system (glass + shading)
 		int CurrentState; // Current state for Complex Fenestration
-		static FArray1D< Real64 > AbsDiffWin( CFSMAXNL ); // Diffuse solar absorptance of glass layers //Tuned Made static
-		static FArray1D< Real64 > AbsDiffWinGnd( CFSMAXNL ); // Ground diffuse solar absorptance of glass layers //Tuned Made static
-		static FArray1D< Real64 > AbsDiffWinSky( CFSMAXNL ); // Sky diffuse solar absorptance of glass layers //Tuned Made static
+		static Array1D< Real64 > AbsDiffWin( CFSMAXNL ); // Diffuse solar absorptance of glass layers //Tuned Made static
+		static Array1D< Real64 > AbsDiffWinGnd( CFSMAXNL ); // Ground diffuse solar absorptance of glass layers //Tuned Made static
+		static Array1D< Real64 > AbsDiffWinSky( CFSMAXNL ); // Sky diffuse solar absorptance of glass layers //Tuned Made static
 		int Lay; // Layer number
 		Real64 DividerAbs; // Window divider solar absorptance
 		Real64 DividerRefl; // Window divider solar reflectance
@@ -1894,8 +1894,8 @@ namespace HeatBalanceSurfaceManager {
 
 			assert( equal_dimensions( ReflFacBmToBmSolObs, ReflFacBmToDiffSolObs ) ); // For linear indexing
 			assert( equal_dimensions( ReflFacBmToBmSolObs, ReflFacBmToDiffSolGnd ) ); // For linear indexing
-			FArray2D< Real64 >::size_type lSH( CalcSolRefl ? ReflFacBmToBmSolObs.index( 1, HourOfDay ) : 0u );
-			FArray2D< Real64 >::size_type lSP( CalcSolRefl ? ReflFacBmToBmSolObs.index( 1, PreviousHour ) : 0u );
+			Array2D< Real64 >::size_type lSH( CalcSolRefl ? ReflFacBmToBmSolObs.index( 1, HourOfDay ) : 0u );
+			Array2D< Real64 >::size_type lSP( CalcSolRefl ? ReflFacBmToBmSolObs.index( 1, PreviousHour ) : 0u );
 			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 				SurfaceWindow( SurfNum ).SkySolarInc = DifSolarRad * AnisoSkyMult( SurfNum );
 				SurfaceWindow( SurfNum ).GndSolarInc = GndSolarRad * Surface( SurfNum ).ViewFactorGround;
@@ -3101,7 +3101,7 @@ namespace HeatBalanceSurfaceManager {
 		Real64 DividerRefl; // Window divider short-wave reflectance
 
 		static bool firstTime( true ); // First time through routine
-		static FArray1D_bool FirstCalcZone; // for error message
+		static Array1D_bool FirstCalcZone; // for error message
 
 		// FLOW:
 
@@ -3277,7 +3277,7 @@ namespace HeatBalanceSurfaceManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray2D< Real64 > D;
+		static Array2D< Real64 > D;
 		int SurfNum;
 		int IZ;
 		int JZ;
@@ -3314,7 +3314,7 @@ namespace HeatBalanceSurfaceManager {
 		}
 		//          Compute fractions for multiple passes.
 
-		FArray2D< Real64 >::size_type l( 0u ), m( 0u ), d( 0u );
+		Array2D< Real64 >::size_type l( 0u ), m( 0u ), d( 0u );
 		for ( NZ = 1; NZ <= NumberOfZones; ++NZ, d += NumberOfZones + 1 ) {
 			m = NZ - 1;
 			Real64 D_d( 0.0 ); // Local accumulator
@@ -3757,13 +3757,13 @@ namespace HeatBalanceSurfaceManager {
 		int SurfNum; // Surface number DO loop counter
 		int ZoneNum; // Zone number DO loop counter
 
-		static FArray1D< Real64 > QExt1; // Heat flux at the exterior surface during first time step/series
-		static FArray1D< Real64 > QInt1; // Heat flux at the interior surface during first time step/series
-		static FArray1D< Real64 > TempInt1; // Temperature of interior surface during first time step/series
-		static FArray1D< Real64 > TempExt1; // Temperature of exterior surface during first time step/series
-		static FArray1D< Real64 > Qsrc1; // Heat source/sink (during first time step/series)
-		static FArray1D< Real64 > Tsrc1; // Temperature at source/sink (during first time step/series)
-		static FArray1D< Real64 > SumTime; // Amount of time that has elapsed from start of master history to
+		static Array1D< Real64 > QExt1; // Heat flux at the exterior surface during first time step/series
+		static Array1D< Real64 > QInt1; // Heat flux at the interior surface during first time step/series
+		static Array1D< Real64 > TempInt1; // Temperature of interior surface during first time step/series
+		static Array1D< Real64 > TempExt1; // Temperature of exterior surface during first time step/series
+		static Array1D< Real64 > Qsrc1; // Heat source/sink (during first time step/series)
+		static Array1D< Real64 > Tsrc1; // Temperature at source/sink (during first time step/series)
+		static Array1D< Real64 > SumTime; // Amount of time that has elapsed from start of master history to
 		// the current time step
 
 		static bool FirstTimeFlag( true );
@@ -4037,9 +4037,9 @@ namespace HeatBalanceSurfaceManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool firstTime( true ); // Flag for first time calculations
 		Real64 SumAET; // Intermediate calculational variable (area*emissivity*T) sum
-		static FArray1D< Real64 > SurfaceAE; // Product of area and emissivity for each surface
+		static Array1D< Real64 > SurfaceAE; // Product of area and emissivity for each surface
 		int SurfNum; // Surface number
-		static FArray1D< Real64 > ZoneAESum; // Sum of area times emissivity for all zone surfaces
+		static Array1D< Real64 > ZoneAESum; // Sum of area times emissivity for all zone surfaces
 		int ZoneNum; // Zone number
 
 		// FLOW:
@@ -4884,7 +4884,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	int RoughSurf; // Outside surface roughness
 	Real64 EmisOut; // Glass outside surface emissivity
 
-	static FArray1D< Real64 > TempInsOld; // Holds previous iteration's value for convergence check
+	static Array1D< Real64 > TempInsOld; // Holds previous iteration's value for convergence check
 	Real64 RhoVaporSat; // Local temporary saturated vapor density for checking
 	Real64 TempSurfOutTmp; // Local Temporary Surface temperature for the outside surface face
 	Real64 TempSurfInSat; // Local temperary surface dew point temperature
@@ -4906,7 +4906,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	Real64 MassFlowRate;
 	Real64 NodeTemp;
 	Real64 CpAir;
-	static FArray1D< Real64 > RefAirTemp; // reference air temperatures
+	static Array1D< Real64 > RefAirTemp; // reference air temperatures
 	static bool MyEnvrnFlag( true );
 	//  LOGICAL, SAVE     :: DoThisLoop
 	static int InsideSurfErrCount( 0 );
@@ -5044,7 +5044,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	}
 
 	//Tuned Precompute whether CTF temperature limits will be needed //? Can we do this just once in the FirstTime block to save a little more time (with static array)
-	FArray1D_bool any_surface_ConFD_or_HAMT( NumOfZones, false );
+	Array1D_bool any_surface_ConFD_or_HAMT( NumOfZones, false );
 	for ( int iZone = 1; iZone <= NumOfZones; ++iZone ) {
 		auto const & zone( Zone( iZone ) );
 		for ( int iSurf = zone.SurfaceFirst, eSurf = zone.SurfaceLast; iSurf <= eSurf; ++iSurf ) { //Tuned Replaced any_eq and array slicing and member array usage

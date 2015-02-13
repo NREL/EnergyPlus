@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -76,13 +76,13 @@ namespace MicroturbineElectricGenerator {
 	int NumMTGenerators( 0 ); // number of MT Generators specified in input
 	bool GetMTInput( true ); // then TRUE, calls subroutine to read input file.
 
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE MicroturbineElectricGenerator
 
 	// Object Data
-	FArray1D< MTGeneratorSpecs > MTGenerator; // dimension to number of generators
-	FArray1D< ReportVars > MTGeneratorReport;
+	Array1D< MTGeneratorSpecs > MTGenerator; // dimension to number of generators
+	Array1D< ReportVars > MTGeneratorReport;
 
 	// MODULE SUBROUTINES:
 	// Beginning of MT Generator Module Driver Subroutine
@@ -308,9 +308,9 @@ namespace MicroturbineElectricGenerator {
 		static Real64 Var1Min( 0.0 ); // Minimum value for variable 1, value obtained from a curve object
 		static Real64 Var1Max( 0.0 ); // Maximum value for variable 1, value obtained from a curve object
 
-		FArray1D< Real64 > NumArray( 19 ); // Numeric data array
+		Array1D< Real64 > NumArray( 19 ); // Numeric data array
 
-		FArray1D_string AlphArray( 20 ); // Character string data array
+		Array1D_string AlphArray( 20 ); // Character string data array
 		std::string FuelType; // Type of fuel used for generator
 
 		// FLOW:
@@ -1126,9 +1126,9 @@ namespace MicroturbineElectricGenerator {
 		int HeatRecInletNode; // Inlet node number in heat recovery loop
 		int HeatRecOutletNode; // Outlet node number in heat recovery loop
 		static bool InitGeneratorOnce( true ); // Flag for 1 time initialization
-		static FArray1D_bool MyEnvrnFlag; // Flag for init once at start of environment
-		static FArray1D_bool MyPlantScanFlag;
-		static FArray1D_bool MySizeAndNodeInitFlag;
+		static Array1D_bool MyEnvrnFlag; // Flag for init once at start of environment
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MySizeAndNodeInitFlag;
 		static bool MyOneTimeFlag( true ); // Initialization flag
 		Real64 rho; // local temporary fluid density
 		Real64 DesiredMassFlowRate;

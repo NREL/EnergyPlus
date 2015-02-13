@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -162,27 +162,27 @@ namespace LowTempRadiantSystem {
 	int MaxCloNumOfSurfaces( 0 ); // Used to set allocate size in CalcClo routine
 	bool VarOffCond( false ); // Set to true when in cooling for constant flow system + variable off condensation predicted
 	Real64 LoopReqTemp( 0.0 ); // Temperature required at the inlet of the pump (from the loop) to meet control logic
-	FArray1D< Real64 > QRadSysSrcAvg; // Average source over the time step for a particular radiant surface
-	FArray1D< Real64 > ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+	Array1D< Real64 > QRadSysSrcAvg; // Average source over the time step for a particular radiant surface
+	Array1D< Real64 > ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
 	// Record keeping variables used to calculate QRadSysSrcAvg locally
-	FArray1D< Real64 > LastQRadSysSrc; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastQRadSysSrc; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
 	// Autosizing variables
-	FArray1D_bool MySizeFlagHydr;
-	FArray1D_bool MySizeFlagCFlo;
-	FArray1D_bool MySizeFlagElec;
-	FArray1D_bool CheckEquipName;
+	Array1D_bool MySizeFlagHydr;
+	Array1D_bool MySizeFlagCFlo;
+	Array1D_bool MySizeFlagElec;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE LowTempRadiantSystem
 
 	// Object Data
-	FArray1D< HydronicRadiantSystemData > HydrRadSys;
-	FArray1D< ConstantFlowRadiantSystemData > CFloRadSys;
-	FArray1D< ElectricRadiantSystemData > ElecRadSys;
-	FArray1D< RadSysTypeData > RadSysTypes;
-	FArray1D< ElecRadSysNumericFieldData > ElecRadSysNumericFields;
-	FArray1D< HydronicRadiantSysNumericFieldData > HydronicRadiantSysNumericFields;
+	Array1D< HydronicRadiantSystemData > HydrRadSys;
+	Array1D< ConstantFlowRadiantSystemData > CFloRadSys;
+	Array1D< ElectricRadiantSystemData > ElecRadSys;
+	Array1D< RadSysTypeData > RadSysTypes;
+	Array1D< ElecRadSysNumericFieldData > ElecRadSysNumericFields;
+	Array1D< HydronicRadiantSysNumericFieldData > HydronicRadiantSysNumericFields;
 
 	// Functions
 
@@ -383,10 +383,10 @@ namespace LowTempRadiantSystem {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string Alphas; // Alpha items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D_bool AssignedAsRadiantSurface; // Set to true when a surface is part of a radiant system
+		Array1D_string Alphas; // Alpha items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D_bool AssignedAsRadiantSurface; // Set to true when a surface is part of a radiant system
 		int CheckSurfNum; // Surface number to check to see if it has already been used by a radiant system
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int GlycolIndex; // Index of 'Water' in glycol data structure
@@ -395,7 +395,7 @@ namespace LowTempRadiantSystem {
 		int MaxAlphas; // Maximum number of alphas for these input keywords
 		int MaxNumbers; // Maximum number of numbers for these input keywords
 		//unused1208  INTEGER    :: NameConflict ! Used to see if a surface name matches the name of a surface list (not allowed)
-		FArray1D< Real64 > Numbers; // Numeric items for object
+		Array1D< Real64 > Numbers; // Numeric items for object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumArgs; // Unused variable that is part of a subroutine call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
@@ -406,8 +406,8 @@ namespace LowTempRadiantSystem {
 		int BaseNum; // Temporary number for creating RadiantSystemTypes structure
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		// FLOW:
 		// Initializations and allocations
@@ -1469,15 +1469,15 @@ namespace LowTempRadiantSystem {
 		Real64 TotalEffic; // Intermediate calculation variable for total pump efficiency
 		int WaterNodeIn; // Node number for water inlet node
 		int ZoneNum; // Intermediate variable for keeping track of the zone number
-		static FArray1D_bool MyEnvrnFlagHydr;
-		static FArray1D_bool MyEnvrnFlagCFlo;
-		static FArray1D_bool MyEnvrnFlagElec;
+		static Array1D_bool MyEnvrnFlagHydr;
+		static Array1D_bool MyEnvrnFlagCFlo;
+		static Array1D_bool MyEnvrnFlagElec;
 		static bool MyEnvrnFlagGeneral( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop;
 		static bool MyOneTimeFlag( true ); // Initialization flag
-		static FArray1D_bool MyPlantScanFlagHydr;
-		static FArray1D_bool MyPlantScanFlagCFlo;
+		static Array1D_bool MyPlantScanFlagHydr;
+		static Array1D_bool MyPlantScanFlagCFlo;
 		Real64 mdot; // local fluid mass flow rate
 		Real64 rho; // local fluid density
 		bool errFlag;
@@ -2275,13 +2275,13 @@ namespace LowTempRadiantSystem {
 			if ( CurZoneEqNum > 0 ) {
 				if ( !IsAutoSize && !ZoneSizingRunDone ) { // simulation continue
 					if ( CFloRadSys( RadSysNum ).WaterVolFlowMax > 0.0 ) {
-						ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name, 
+						ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name,
 							"User-Specified Maximum Water Flow [m3/s]", CFloRadSys( RadSysNum ).WaterVolFlowMax );
 					}
 				} else { // Autosize or hard-size with sizing run
 					CheckZoneSizing( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name );
 					// Estimate hot water and chilled water flows
-					// Index only if it provides heating to avoid severe error 
+					// Index only if it provides heating to avoid severe error
 					if ( OpMode == ClgHtg || OpMode == HtgOnly ) {
 						PltSizHeatNum = MyPlantSizingIndex( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name,
 											CFloRadSys( RadSysNum ).HotWaterInNode, CFloRadSys( RadSysNum ).HotWaterOutNode, ErrorsFound );
@@ -2290,9 +2290,9 @@ namespace LowTempRadiantSystem {
 						if ( ( CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor ) >= SmallLoad ) {
 							rho = GetDensityGlycol( PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidName,
 								60.0, PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidIndex, "SizeLowTempRadiantSystem" );
-							Cp = GetSpecificHeatGlycol( PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidName, 
+							Cp = GetSpecificHeatGlycol( PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidName,
 								60.0, PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidIndex, "SizeLowTempRadiantSystem" );
-							WaterVolFlowMaxHeatDes = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatAirDesMethod  / 
+							WaterVolFlowMaxHeatDes = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatAirDesMethod  /
                                                         ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 						} else {
 							WaterVolFlowMaxHeatDes = 0.0;
@@ -2305,18 +2305,18 @@ namespace LowTempRadiantSystem {
 						}
 					}
 
-					// Index only if it provides cooling system to avoid severe error 
+					// Index only if it provides cooling system to avoid severe error
 					if ( OpMode == ClgHtg || OpMode == ClgOnly ) {
 						PltSizCoolNum = MyPlantSizingIndex( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name,
 							CFloRadSys( RadSysNum ).ColdWaterInNode, CFloRadSys( RadSysNum ).ColdWaterOutNode, ErrorsFound );
 					}
 					if ( PltSizCoolNum > 0 ) {
 						if ( ( CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor ) >= SmallLoad ) {
-							rho = GetDensityGlycol( PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidName, 5.0, 
+							rho = GetDensityGlycol( PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidName, 5.0,
                              PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidIndex, "SizeLowTempRadiantSystem" );
-							Cp  = GetSpecificHeatGlycol( PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidName, 5.0, 
+							Cp  = GetSpecificHeatGlycol( PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidName, 5.0,
 								PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidIndex, "SizeLowTempRadiantSystem" );
-							WaterVolFlowMaxCoolDes = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor / 
+							WaterVolFlowMaxCoolDes = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor /
 								( PlantSizData(PltSizCoolNum).DeltaT * Cp * rho );
 						} else {
 							WaterVolFlowMaxCoolDes = 0.0;
@@ -2328,7 +2328,7 @@ namespace LowTempRadiantSystem {
 							ErrorsFound = true;
 						}
 					}
-					
+
 					// Determine maximum water flow rate depending upon system type
 					if ( OpMode == ClgHtg ) {
 						WaterVolFlowMaxDes = std::max( WaterVolFlowMaxHeatDes, WaterVolFlowMaxCoolDes );
@@ -2351,7 +2351,7 @@ namespace LowTempRadiantSystem {
 								"Design Size Maximum Water Flow [m3/s]", WaterVolFlowMaxDes, "User-Specified Maximum Water Flow [m3/s]", WaterVolFlowMaxUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( WaterVolFlowMaxDes - WaterVolFlowMaxUser ) / WaterVolFlowMaxUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for \nZoneHVAC:LowTemperatureRadiant:Constant = \" " + 
+									ShowMessage( "SizeLowTempRadiantSystem: Potential issue with equipment sizing for \nZoneHVAC:LowTemperatureRadiant:Constant = \" " +
 										CFloRadSys( RadSysNum ).Name + "\"." );
 									ShowContinueError( "User-Specified Maximum Water Flow of " + RoundSigDigits( WaterVolFlowMaxUser, 5 ) + " [m3/s]" );
 									ShowContinueError( "differs from Design Size Maximum Water Flow of " + RoundSigDigits(WaterVolFlowMaxDes, 5 ) + " [m3/s]" );
@@ -2387,7 +2387,7 @@ namespace LowTempRadiantSystem {
 						if ( CFloRadSys( RadSysNum ).TubeLength > 0.0 && TubeLengthDes > 0.0 ) {
 							TubeLengthUser = CFloRadSys( RadSysNum ).TubeLength;
 							ReportSizingOutput( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", CFloRadSys( RadSysNum ).Name,
-								"Design Size Hydronic Tubing Length [m]", TubeLengthDes, 
+								"Design Size Hydronic Tubing Length [m]", TubeLengthDes,
 								"User-Specified Hydronic Tubing Length [m]", TubeLengthUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( TubeLengthDes - TubeLengthUser ) / TubeLengthUser ) > AutoVsHardSizingThreshold ) {
@@ -2402,7 +2402,7 @@ namespace LowTempRadiantSystem {
 					}
 				}
 			}
- 
+
 			for ( SurfNum = 1; SurfNum <= CFloRadSys( RadSysNum ).NumOfSurfaces; ++SurfNum ) {
 				if ( CFloRadSys( RadSysNum ).NumCircCalcMethod == CalculateFromLength ) {
 					CFloRadSys( RadSysNum ).NumCircuits( SurfNum ) = ( CFloRadSys( RadSysNum ).SurfaceFlowFrac( SurfNum ) * CFloRadSys( RadSysNum ).TubeLength ) / CFloRadSys( RadSysNum ).CircLength;
@@ -3671,9 +3671,9 @@ namespace LowTempRadiantSystem {
 		Real64 Cl;
 		// For more info on Ca through Cl, see comments below
 
-		static FArray1D< Real64 > Ckj; // Coefficients for individual surfaces within a radiant system
-		static FArray1D< Real64 > Cmj;
-		static FArray1D< Real64 > WaterTempOut; // Array of outlet water temperatures for
+		static Array1D< Real64 > Ckj; // Coefficients for individual surfaces within a radiant system
+		static Array1D< Real64 > Cmj;
+		static Array1D< Real64 > WaterTempOut; // Array of outlet water temperatures for
 		// each surface in the radiant system
 
 		static bool FirstTimeFlag( true ); // for setting size of Ckj, Cmj, WaterTempOut arrays
@@ -4597,10 +4597,10 @@ namespace LowTempRadiantSystem {
 		Real64 const MaxLaminarRe( 2300.0 ); // Maximum Reynolds number for laminar flow
 		int const NumOfPropDivisions( 13 );
 		Real64 const MaxExpPower( 50.0 ); // Maximum power after which EXP argument would be zero for DP variables
-		static FArray1D< Real64 > const Temps( NumOfPropDivisions, { 1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85 } ); // Temperature, in C
-		static FArray1D< Real64 > const Mu( NumOfPropDivisions, { 0.001652, 0.001422, 0.001225, 0.00108, 0.000959, 0.000855, 0.000769, 0.000695, 0.000631, 0.000577, 0.000528, 0.000489, 0.000453 } ); // Viscosity, in Ns/m2
-		static FArray1D< Real64 > const Conductivity( NumOfPropDivisions, { 0.574, 0.582, 0.590, 0.598, 0.606, 0.613, 0.620, 0.628, 0.634, 0.640, 0.645, 0.650, 0.656 } ); // Conductivity, in W/mK
-		static FArray1D< Real64 > const Pr( NumOfPropDivisions, { 12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88 } ); // Prandtl number (dimensionless)
+		static Array1D< Real64 > const Temps( NumOfPropDivisions, { 1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85 } ); // Temperature, in C
+		static Array1D< Real64 > const Mu( NumOfPropDivisions, { 0.001652, 0.001422, 0.001225, 0.00108, 0.000959, 0.000855, 0.000769, 0.000695, 0.000631, 0.000577, 0.000528, 0.000489, 0.000453 } ); // Viscosity, in Ns/m2
+		static Array1D< Real64 > const Conductivity( NumOfPropDivisions, { 0.574, 0.582, 0.590, 0.598, 0.606, 0.613, 0.620, 0.628, 0.634, 0.640, 0.645, 0.650, 0.656 } ); // Conductivity, in W/mK
+		static Array1D< Real64 > const Pr( NumOfPropDivisions, { 12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88 } ); // Prandtl number (dimensionless)
 		static std::string const RoutineName( "CalcRadSysHXEffectTerm" );
 
 		// INTERFACE BLOCK SPECIFICATIONS

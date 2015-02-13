@@ -3,8 +3,8 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray3D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -145,7 +145,7 @@ namespace CurveManager {
 	int const CurveType_QuadLinear( 21 );
 	int const CurveType_CubicLinear( 22 );
 
-	FArray1D_string const cCurveTypes( NumAllCurveTypes, { "Curve:Linear", "Curve:Quadratic", "Curve:Cubic", "Curve:Quartic", "Curve:Exponent", "Curve:BiCubic", "Curve:BiQuadratic", "Curve:QuadraitcLinear", "Curve:TriQuadratic", "Curve:Functional:PressureDrop", "Table:OneIndependentVariable", "Table:TwoIndependentVariables", "Table:MultiVariableLookup", "Curve:FanPressureRise", "Curve:ExponentialSkewNormal", "Curve:Sigmoid", "Curve:RectangularHyperbola1", "Curve:RectangularHyperbola2", "Curve:ExponentialDecay", "Curve:DoubleExponentialDecay", "Curve:QuadLinear", "Curve:CubicLinear" } );
+	Array1D_string const cCurveTypes( NumAllCurveTypes, { "Curve:Linear", "Curve:Quadratic", "Curve:Cubic", "Curve:Quartic", "Curve:Exponent", "Curve:BiCubic", "Curve:BiQuadratic", "Curve:QuadraitcLinear", "Curve:TriQuadratic", "Curve:Functional:PressureDrop", "Table:OneIndependentVariable", "Table:TwoIndependentVariables", "Table:MultiVariableLookup", "Curve:FanPressureRise", "Curve:ExponentialSkewNormal", "Curve:Sigmoid", "Curve:RectangularHyperbola1", "Curve:RectangularHyperbola2", "Curve:ExponentialDecay", "Curve:DoubleExponentialDecay", "Curve:QuadLinear", "Curve:CubicLinear" } );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -157,12 +157,12 @@ namespace CurveManager {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Object Data
-	FArray1D< PerfomanceCurveData > PerfCurve;
-	FArray1D< PerfCurveTableDataStruct > PerfCurveTableData;
-	FArray1D< TableDataStruct > TableData;
-	FArray1D< TableDataStruct > TempTableData;
-	FArray1D< TableDataStruct > Temp2TableData;
-	FArray1D< TableLookupData > TableLookup;
+	Array1D< PerfomanceCurveData > PerfCurve;
+	Array1D< PerfCurveTableDataStruct > PerfCurveTableData;
+	Array1D< TableDataStruct > TableData;
+	Array1D< TableDataStruct > TempTableData;
+	Array1D< TableDataStruct > Temp2TableData;
+	Array1D< TableLookupData > TableLookup;
 
 	// Functions
 
@@ -376,8 +376,8 @@ namespace CurveManager {
 		int NumTables; // Total tables in the input file
 		int CurveIndex; // do loop index
 		int CurveNum; // current curve number
-		FArray1D_string Alphas( 13 ); // Alpha items for object
-		FArray1D< Real64 > Numbers( 10000 ); // Numeric items for object
+		Array1D_string Alphas( 13 ); // Alpha items for object
+		Array1D< Real64 > Numbers( 10000 ); // Numeric items for object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem
@@ -394,8 +394,8 @@ namespace CurveManager {
 		static int NumTableEntries( 0 ); // Number of data pairs in table data
 		int NumXVar;
 		int NumX2Var;
-		FArray1D< Real64 > XVar;
-		FArray1D< Real64 > X2Var;
+		Array1D< Real64 > XVar;
+		Array1D< Real64 > X2Var;
 		int VarIndex;
 		int TempVarIndex;
 		int TempVarIndex1;
@@ -403,9 +403,9 @@ namespace CurveManager {
 		Real64 MaxTableDataValue;
 		int NextXVar;
 		bool FoundNewData;
-		FArray1D< Real64 > TempArray1;
-		FArray1D< Real64 > TempArray2;
-		FArray1D< Real64 > TempArray3;
+		Array1D< Real64 > TempArray1;
+		Array1D< Real64 > TempArray2;
+		Array1D< Real64 > TempArray3;
 
 		std::string FileName; // name of external table data file
 		bool ReadFromFile; // True if external data file exists
@@ -2490,8 +2490,8 @@ namespace CurveManager {
 		std::string & CurrentModuleObject,
 		bool const ReadFromFile,
 		std::string & FileName,
-		FArray1S_string Alphas,
-		FArray1S< Real64 > Numbers,
+		Array1S_string Alphas,
+		Array1S< Real64 > Numbers,
 		int const NumNumbers,
 		bool & ErrorsFound
 	)
@@ -3273,9 +3273,9 @@ Label999: ;
 	DLAG(
 		Real64 const XX,
 		Real64 const YY,
-		FArray1S< Real64 > X,
-		FArray1S< Real64 > Y,
-		FArray2S< Real64 > Z,
+		Array1S< Real64 > X,
+		Array1S< Real64 > Y,
+		Array2S< Real64 > Z,
 		int const NX,
 		int const NY,
 		int const M,
@@ -3428,7 +3428,7 @@ Label999: ;
 		if ( QUITX && QUITY ) {
 			DLAG = Z( I, J ); // found exact X and Y point in Z array
 		} else if ( QUITX && ! QUITY ) { // only interpolate in Y direction
-			FArray1D< Real64 > XLAG( IEYPT );
+			Array1D< Real64 > XLAG( IEYPT );
 			for ( int l = ISYPT; l <= IEYPT; ++l ) {
 				XLAG( l ) = Z( I, l ); // store X's at each Y (I = midpoint of array from above)
 			}
@@ -3436,7 +3436,7 @@ Label999: ;
 		} else if ( ! QUITX && QUITY ) { // only interpolate in X direction
 			Interpolate_Lagrange( XX, Z( _, J ), X, ISXPT, IEXPT, DLAG ); // (:,J) interpolate X array at fixed Y (J here)
 		} else { // else interpolate in X and Y directions
-			FArray1D< Real64 > XLAG( IEYPT );
+			Array1D< Real64 > XLAG( IEYPT );
 			for ( K = ISYPT; K <= IEYPT; ++K ) {
 				Interpolate_Lagrange( XX, Z( _, K ), X, ISXPT, IEXPT, XLAG( K ) ); // (:,K) interpolate X array at all Y's (K here)
 			}
@@ -3818,13 +3818,13 @@ Label999: ;
 		int NV5;
 		int TableIndex;
 		//REAL(r64), ALLOCATABLE, DIMENSION(:)     :: ONEDVALS
-		FArray2D< Real64 > TWODVALS;
-		FArray3D< Real64 > THREEDVALS;
-		FArray1D< Real64 > VALSX;
-		FArray1D< Real64 > VALSY;
-		FArray1D< Real64 > VALSV3;
-		FArray1D< Real64 > VALSV4;
-		FArray1D< Real64 > VALSV5;
+		Array2D< Real64 > TWODVALS;
+		Array3D< Real64 > THREEDVALS;
+		Array1D< Real64 > VALSX;
+		Array1D< Real64 > VALSY;
+		Array1D< Real64 > VALSV3;
+		Array1D< Real64 > VALSV4;
+		Array1D< Real64 > VALSV5;
 		//REAL(r64), ALLOCATABLE, DIMENSION(:,:,:) :: HPVAL
 		//REAL(r64), ALLOCATABLE, DIMENSION(:,:,:,:) :: HPVALS
 		//REAL(r64), ALLOCATABLE, DIMENSION(:,:,:,:,:) :: DVLTRN
@@ -4060,9 +4060,9 @@ Label999: ;
 		int & CurveNum, // index to performance curve
 		std::string & TableType, // tabular data object type
 		std::string & CurveName, // performance curve name
-		FArray1S< Real64 > RawDataX, // table data X values (1st independent variable)
-		FArray1S< Real64 > RawDataY, // table data Y values (dependent variables)
-		Optional< FArray1S< Real64 > > RawDataX2 // table data X2 values (2nd independent variable)
+		Array1S< Real64 > RawDataX, // table data X values (1st independent variable)
+		Array1S< Real64 > RawDataY, // table data Y values (dependent variables)
+		Optional< Array1S< Real64 > > RawDataX2 // table data X2 values (2nd independent variable)
 	)
 	{
 
@@ -4174,8 +4174,8 @@ Label999: ;
 		Real64 RSquared;
 		Real64 StandardError;
 		Real64 Est( 0.0 );
-		FArray1D< Real64 > Results; // performance curve coefficients
-		FArray2D< Real64 > A; // linear algebra matrix
+		Array1D< Real64 > Results; // performance curve coefficients
+		Array2D< Real64 > A; // linear algebra matrix
 		std::string StrCurve; // string representation of curve type
 		static bool WriteHeaderOnce( true );
 		bool EchoTableDataToEio; // logical set equal to global and used to report to eio file
@@ -4645,8 +4645,8 @@ Label999: ;
 	void
 	Interpolate_Lagrange(
 		Real64 const DataPoint, // point used for interpolating output (x)
-		FArray1S< Real64 > FunctionArray, // array of output data (Y's)
-		FArray1S< Real64 > Ordinate, // array of input data (X's)
+		Array1S< Real64 > FunctionArray, // array of output data (Y's)
+		Array1S< Real64 > Ordinate, // array of input data (X's)
 		int const ISPT, // the starting point in the interpolated array
 		int const IEPT, // the ending point in the interpolated array
 		Real64 & ALAG // the interpolated output (y or F(x) in equation above)
@@ -5230,8 +5230,8 @@ Label999: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumPressure;
-		FArray1D_string Alphas( 1 ); // Alpha items for object
-		FArray1D< Real64 > Numbers( 5 ); // Numeric items for object
+		Array1D_string Alphas( 1 ); // Alpha items for object
+		Array1D< Real64 > Numbers( 5 ); // Numeric items for object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; // Used in GetObjectItem

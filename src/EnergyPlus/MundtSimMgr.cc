@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -64,8 +64,8 @@ namespace MundtSimMgr {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	FArray1D_int FloorSurfSetIDs; // fixed variable for floors
-	FArray1D_int TheseSurfIDs; // temporary working variable
+	Array1D_int FloorSurfSetIDs; // fixed variable for floors
+	Array1D_int TheseSurfIDs; // temporary working variable
 	int MundtCeilAirID( 0 ); // air node index in AirDataManager
 	int MundtFootAirID( 0 ); // air node index in AirDataManager
 	int SupplyNodeID( 0 ); // air node index in AirDataManager
@@ -73,8 +73,8 @@ namespace MundtSimMgr {
 	int ReturnNodeID( 0 ); // air node index in AirDataManager
 	int NumRoomNodes( 0 ); // number of nodes connected to walls
 	int NumFloorSurfs( 0 ); // total number of surfaces for floor
-	FArray1D_int RoomNodeIDs; // ids of the first NumRoomNode Air Nodes
-	FArray1D_int ID1dSurf; // numbers used to identify surfaces
+	Array1D_int RoomNodeIDs; // ids of the first NumRoomNode Air Nodes
+	Array1D_int ID1dSurf; // numbers used to identify surfaces
 	int MundtZoneNum( 0 ); // index of zones using Mundt model
 	Real64 ZoneHeight( 0.0 ); // zone height
 	Real64 ZoneFloorArea( 0.0 ); // zone floor area
@@ -94,10 +94,10 @@ namespace MundtSimMgr {
 	// Routines for actual calculations in Mundt model
 
 	// Object Data
-	FArray1D< DefineZoneData > ZoneData; // zone data
-	FArray2D< DefineLinearModelNode > LineNode; // air nodes
-	FArray2D< DefineSurfaceSettings > MundtAirSurf; // surfaces
-	FArray1D< DefineSurfaceSettings > FloorSurf; // floor
+	Array1D< DefineZoneData > ZoneData; // zone data
+	Array2D< DefineLinearModelNode > LineNode; // air nodes
+	Array2D< DefineSurfaceSettings > MundtAirSurf; // surfaces
+	Array1D< DefineSurfaceSettings > FloorSurf; // floor
 
 	// MODULE SUBROUTINES:
 
@@ -293,7 +293,7 @@ namespace MundtSimMgr {
 		// get constant data (unchanged over time) for surfaces and air nodes
 		for ( MundtZoneIndex = 1; MundtZoneIndex <= NumOfMundtZones; ++MundtZoneIndex ) {
 
-			Zone_Loop: for ( ZoneIndex = 1; ZoneIndex <= NumOfZones; ++ZoneIndex ) {
+			for ( ZoneIndex = 1; ZoneIndex <= NumOfZones; ++ZoneIndex ) {
 
 				if ( ZoneData( ZoneIndex ).MundtZoneIndex == MundtZoneIndex ) {
 					// get surface data
@@ -352,15 +352,11 @@ namespace MundtSimMgr {
 
 					}
 					// got data for this zone so exit the zone loop
-					if ( AirNodeFoundFlag ) {
-						goto Zone_Loop_exit;
-					}
+					if ( AirNodeFoundFlag ) break;
 
 				}
 
-				Zone_Loop_loop: ;
 			}
-			Zone_Loop_exit: ;
 
 			MaxNumOfRoomNodes = max( MaxNumOfRoomNodes, RoomNodesCount );
 			MaxNumOfFloorSurfs = max( MaxNumOfFloorSurfs, FloorSurfCount );
@@ -951,7 +947,7 @@ namespace MundtSimMgr {
 
 	//     NOTICE
 
-	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

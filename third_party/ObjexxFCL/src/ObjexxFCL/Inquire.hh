@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -24,7 +24,6 @@
 namespace ObjexxFCL {
 
 // Forward
-class Fstring;
 class IOFlags;
 class Stream;
 class IStream;
@@ -42,10 +41,6 @@ typedef  char const *  c_cstring;
 // Inquire by Name
 void
 Inquire( std::string const & name, IOFlags & flags );
-
-// Inquire by Name
-void
-Inquire( Fstring const & name, IOFlags & flags );
 
 // Inquire by Name
 void

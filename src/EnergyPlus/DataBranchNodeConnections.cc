@@ -47,10 +47,10 @@ namespace DataBranchNodeConnections {
 	int EqNodeConnectionAlloc( 100 );
 
 	// Object Data
-	FArray1D< ComponentListData > CompSets;
-	FArray1D< ParentListData > ParentNodeList;
-	FArray1D< NodeConnectionDef > NodeConnections;
-	FArray1D< EqNodeConnectionDef > AirTerminalNodeConnections;
+	Array1D< ComponentListData > CompSets;
+	Array1D< ParentListData > ParentNodeList;
+	Array1D< NodeConnectionDef > NodeConnections;
+	Array1D< EqNodeConnectionDef > AirTerminalNodeConnections;
 
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

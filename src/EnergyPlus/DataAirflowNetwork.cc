@@ -96,7 +96,7 @@ namespace DataAirflowNetwork {
 	int const AirflowNetworkControlMultiADS( 5 ); // Perform distribution system durin system on time
 	// and multizone calculations during off time
 
-	FArray1D_bool AirflowNetworkZoneFlag;
+	Array1D_bool AirflowNetworkZoneFlag;
 
 	int NumOfNodesMultiZone( 0 ); // Number of nodes for multizone calculation
 	int NumOfNodesDistribution( 0 ); // Number of nodes for distribution system calculation
@@ -113,12 +113,12 @@ namespace DataAirflowNetwork {
 	int AirflowNetworkNumOfZones( 0 ); // The number of zones for multizone calculation
 
 	bool RollBackFlag( false ); // Roll back flag when system time steo down shifting
-	FArray1D< Real64 > ANZT; // Local zone air temperature for roll back use
-	FArray1D< Real64 > ANZW; // Local zone air humidity ratio for roll back use
-	FArray1D< Real64 > ANCO; // Local zone air CO2 for roll back use
-	FArray1D< Real64 > ANGC; // Local zone air generic contaminant for roll back use
+	Array1D< Real64 > ANZT; // Local zone air temperature for roll back use
+	Array1D< Real64 > ANZW; // Local zone air humidity ratio for roll back use
+	Array1D< Real64 > ANCO; // Local zone air CO2 for roll back use
+	Array1D< Real64 > ANGC; // Local zone air generic contaminant for roll back use
 	int AirflowNetworkNumOfExhFan( 0 ); // Number of zone exhaust fans
-	FArray1D_bool AirflowNetworkZoneExhaustFan; // Logical to use zone exhaust fans
+	Array1D_bool AirflowNetworkZoneExhaustFan; // Logical to use zone exhaust fans
 	bool AirflowNetworkFanActivated( false ); // Supply fan activation flag
 	bool AirflowNetworkUnitarySystem( false ); // set to TRUE for unitary systems (to make answers equal, will remove eventually)
 	// Multispeed HP only
@@ -147,46 +147,46 @@ namespace DataAirflowNetwork {
 	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
 	// Object Data
-	FArray1D< AirflowNetworkNodeSimuData > AirflowNetworkNodeSimu;
-	FArray1D< AirflowNetworkLinkSimuData > AirflowNetworkLinkSimu;
-	FArray1D< AirflowNetworkExchangeProp > AirflowNetworkExchangeData;
-	FArray1D< AirflowNetworkExchangeProp > AirflowNetworkMultiExchangeData;
-	FArray1D< AirflowNetworkLinkReportData > AirflowNetworkLinkReport;
-	FArray1D< AirflowNetworkNodeReportData > AirflowNetworkNodeReport;
-	FArray1D< AirflowNetworkLinkReportData > AirflowNetworkLinkReport1;
+	Array1D< AirflowNetworkNodeSimuData > AirflowNetworkNodeSimu;
+	Array1D< AirflowNetworkLinkSimuData > AirflowNetworkLinkSimu;
+	Array1D< AirflowNetworkExchangeProp > AirflowNetworkExchangeData;
+	Array1D< AirflowNetworkExchangeProp > AirflowNetworkMultiExchangeData;
+	Array1D< AirflowNetworkLinkReportData > AirflowNetworkLinkReport;
+	Array1D< AirflowNetworkNodeReportData > AirflowNetworkNodeReport;
+	Array1D< AirflowNetworkLinkReportData > AirflowNetworkLinkReport1;
 	AirflowNetworkSimuProp AirflowNetworkSimu( "", "NoMultizoneOrDistribution", "Input", 0, "", "", "", 500, 0, 1.0e-5, 1.0e-5, -0.5, 500.0, 0.0, 1.0, 0, 1.0e-4, 0, 0, 0, 0, "ZeroNodePressures", false ); // unique object name | AirflowNetwork control | Wind pressure coefficient input control | Integer equivalent for WPCCntr field | CP Array name at WPCCntr = "INPUT" | Building type | Height Selection | Maximum number of iteration | Initialization flag | Relative airflow convergence | Absolute airflow convergence | Convergence acceleration limit | Maximum pressure change in an element [Pa] | Azimuth Angle of Long Axis of Building | Ratio of Building Width Along Short Axis to Width Along Long Axis | Number of wind directions | Minimum pressure difference | Exterior large opening error count during HVAC system operation | Exterior large opening error index during HVAC system operation | Large opening error count at Open factor > 1.0 | Large opening error error index at Open factor > 1.0 | Initialization flag type
-	FArray1D< AirflowNetworkNodeProp > AirflowNetworkNodeData;
-	FArray1D< AirflowNetworkCompProp > AirflowNetworkCompData;
-	FArray1D< AirflowNetworkLinkageProp > AirflowNetworkLinkageData;
-	FArray1D< MultizoneZoneProp > MultizoneZoneData;
-	FArray1D< MultizoneSurfaceProp > MultizoneSurfaceData;
-	FArray1D< MultizoneCompDetOpeningProp > MultizoneCompDetOpeningData;
-	FArray1D< MultizoneCompSimpleOpeningProp > MultizoneCompSimpleOpeningData;
-	FArray1D< MultizoneCompHorOpeningProp > MultizoneCompHorOpeningData;
-	FArray1D< MultizoneSurfaceCrackStdCndns > MultizoneSurfaceStdConditionsCrackData;
-	FArray1D< MultizoneSurfaceCrackProp > MultizoneSurfaceCrackData;
-	FArray1D< MultizoneSurfaceELAProp > MultizoneSurfaceELAData;
-	FArray1D< MultizoneExternalNodeProp > MultizoneExternalNodeData;
-	FArray1D< MultizoneCPArrayProp > MultizoneCPArrayData;
-	FArray1D< MultizoneCPArrayProp > MultizoneCPArrayDataSingleSided;
-	FArray1D< MultizoneCPValueProp > MultizoneCPValueData;
-	FArray1D< MultizoneCPValueProp > MultizoneCPValueDataTemp; // temporary CP values
-	FArray1D< MultizoneCPValueProp > MultizoneCPValueDataTempUnMod; // temporary CPValues, without modifcation factor
-	FArray1D< DeltaCpProp > DeltaCp;
-	FArray1D< DeltaCpProp > EPDeltaCP;
-	FArray1D< MultizoneCompExhaustFanProp > MultizoneCompExhaustFanData;
-	FArray1D< DisSysNodeProp > DisSysNodeData;
-	FArray1D< DisSysCompLeakProp > DisSysCompLeakData;
-	FArray1D< DisSysCompELRProp > DisSysCompELRData;
-	FArray1D< DisSysCompDuctProp > DisSysCompDuctData;
-	FArray1D< DisSysCompDamperProp > DisSysCompDamperData;
-	FArray1D< DisSysCompCVFProp > DisSysCompCVFData;
-	FArray1D< DisSysCompDetFanProp > DisSysCompDetFanData;
-	FArray1D< DisSysCompCoilProp > DisSysCompCoilData;
-	FArray1D< DisSysCompHXProp > DisSysCompHXData;
-	FArray1D< DisSysCompTermUnitProp > DisSysCompTermUnitData;
-	FArray1D< DisSysCompCPDProp > DisSysCompCPDData;
-	FArray1D< AiflowNetworkReportProp > AirflowNetworkReportData;
+	Array1D< AirflowNetworkNodeProp > AirflowNetworkNodeData;
+	Array1D< AirflowNetworkCompProp > AirflowNetworkCompData;
+	Array1D< AirflowNetworkLinkageProp > AirflowNetworkLinkageData;
+	Array1D< MultizoneZoneProp > MultizoneZoneData;
+	Array1D< MultizoneSurfaceProp > MultizoneSurfaceData;
+	Array1D< MultizoneCompDetOpeningProp > MultizoneCompDetOpeningData;
+	Array1D< MultizoneCompSimpleOpeningProp > MultizoneCompSimpleOpeningData;
+	Array1D< MultizoneCompHorOpeningProp > MultizoneCompHorOpeningData;
+	Array1D< MultizoneSurfaceCrackStdCndns > MultizoneSurfaceStdConditionsCrackData;
+	Array1D< MultizoneSurfaceCrackProp > MultizoneSurfaceCrackData;
+	Array1D< MultizoneSurfaceELAProp > MultizoneSurfaceELAData;
+	Array1D< MultizoneExternalNodeProp > MultizoneExternalNodeData;
+	Array1D< MultizoneCPArrayProp > MultizoneCPArrayData;
+	Array1D< MultizoneCPArrayProp > MultizoneCPArrayDataSingleSided;
+	Array1D< MultizoneCPValueProp > MultizoneCPValueData;
+	Array1D< MultizoneCPValueProp > MultizoneCPValueDataTemp; // temporary CP values
+	Array1D< MultizoneCPValueProp > MultizoneCPValueDataTempUnMod; // temporary CPValues, without modifcation factor
+	Array1D< DeltaCpProp > DeltaCp;
+	Array1D< DeltaCpProp > EPDeltaCP;
+	Array1D< MultizoneCompExhaustFanProp > MultizoneCompExhaustFanData;
+	Array1D< DisSysNodeProp > DisSysNodeData;
+	Array1D< DisSysCompLeakProp > DisSysCompLeakData;
+	Array1D< DisSysCompELRProp > DisSysCompELRData;
+	Array1D< DisSysCompDuctProp > DisSysCompDuctData;
+	Array1D< DisSysCompDamperProp > DisSysCompDamperData;
+	Array1D< DisSysCompCVFProp > DisSysCompCVFData;
+	Array1D< DisSysCompDetFanProp > DisSysCompDetFanData;
+	Array1D< DisSysCompCoilProp > DisSysCompCoilData;
+	Array1D< DisSysCompHXProp > DisSysCompHXData;
+	Array1D< DisSysCompTermUnitProp > DisSysCompTermUnitData;
+	Array1D< DisSysCompCPDProp > DisSysCompCPDData;
+	Array1D< AiflowNetworkReportProp > AirflowNetworkReportData;
 
 } // DataAirflowNetwork
 

@@ -9,13 +9,12 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/Fstring.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // C++ Headers
@@ -25,11 +24,11 @@
 namespace ObjexxFCL {
 
 // Forward
-template< typename > class FArray1;
+template< typename > class Array1;
 
 // Current Time: HH, MM, SS
 void
-itime( FArray1< std::int32_t > & timearray );
+itime( Array1< std::int32_t > & timearray );
 
 // Current Time: HH, MM, SS, CC
 void
@@ -41,14 +40,14 @@ gettim( std::int32_t & h, int & m, std::int32_t & s, std::int32_t & c );
 
 // Current Time: HH:MM:SS
 void
-TIME( Fstring & time );
+TIME( std::string & time );
 
 // Time in Seconds Since Epoch
 std::int64_t
 TIME();
 
 // Clock
-Fstring
+std::string
 CLOCK();
 
 // System Clock
@@ -61,7 +60,7 @@ SYSTEM_CLOCK32( Optional< std::int32_t > count = _, Optional< std::int32_t > cou
 
 // Current Date: DD, MM, YYYY
 void
-idate( FArray1< std::int32_t > & datearray );
+idate( Array1< std::int32_t > & datearray );
 
 // Current Date: MM, DD, YY (Not Y2K Compliant)
 void
@@ -73,7 +72,7 @@ idate( std::int32_t & month, std::int32_t & day, std::int32_t & year );
 
 // Current Date: DD, MM, YYYY (Year < 2000 is offset from 1900)
 void
-idate4( FArray1< std::int32_t > & datearray );
+idate4( Array1< std::int32_t > & datearray );
 
 // Current Date: MM, DD, YYYY (Year is offset from 1900)
 void
@@ -89,23 +88,15 @@ getdat( std::int32_t & year, std::int32_t & month, std::int32_t & day );
 
 // Current Date String: DD-MMM-YY (Not Y2K Compliant)
 void
-date( Fstring & day );
-
-// Current Date String: DD-MMM-YY (Not Y2K Compliant)
-void
 date( std::string & day );
 
 // Current Date String: YYDDD (Not Y2K Compliant)
-Fstring
+std::string
 jdate();
 
 // Current Date and Time
 void
-date_and_time( Optional< Fstring > date = _, Optional< Fstring > time = _, Optional< Fstring > zone = _, Optional< FArray1D< int > > values = _ );
-
-// Current Date and Time
-void
-date_and_time_string( Optional< std::string > date = _, Optional< std::string > time = _, Optional< std::string > zone = _, Optional< FArray1D< int > > values = _ );
+date_and_time( Optional< std::string > date = _, Optional< std::string > time = _, Optional< std::string > zone = _, Optional< Array1D< int > > values = _ );
 
 } // ObjexxFCL
 

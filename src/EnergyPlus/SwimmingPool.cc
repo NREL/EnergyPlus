@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -85,21 +85,21 @@ namespace SwimmingPool {
 	// MODULE VARIABLE DECLARATIONS:
 	// Standard, run-of-the-mill variables...
 	int NumSwimmingPools( 0 ); // Number of swimming pools
-	FArray1D_bool CheckEquipName;
-	FArray1D_int SurfaceToPoolIndex;
-	FArray1D< Real64 > QPoolSrcAvg; // Average source over the time step for a particular radiant surface
-	FArray1D< Real64 > HeatTransCoefsAvg; // Average denominator term over the time step for a particular pool
-	FArray1D< Real64 > ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+	Array1D_bool CheckEquipName;
+	Array1D_int SurfaceToPoolIndex;
+	Array1D< Real64 > QPoolSrcAvg; // Average source over the time step for a particular radiant surface
+	Array1D< Real64 > HeatTransCoefsAvg; // Average denominator term over the time step for a particular pool
+	Array1D< Real64 > ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
 	// Record keeping variables used to calculate QRadSysSrcAvg locally
-	FArray1D< Real64 > LastQPoolSrc; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastQPoolSrc; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE LowTempRadiantSystem
 
 	// Object Data
-	FArray1D< SwimmingPoolData > Pool;
+	Array1D< SwimmingPoolData > Pool;
 
 	// Functions
 
@@ -235,21 +235,21 @@ namespace SwimmingPool {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if something goes wrong
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string Alphas; // Alpha items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
+		Array1D_string Alphas; // Alpha items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
 		int IOStatus; // Used in GetObjectItem
 		int Item; // Item to be "gotten"
 		int MaxAlphas; // Maximum number of alphas for these input keywords
 		int MaxNumbers; // Maximum number of numbers for these input keywords
-		FArray1D< Real64 > Numbers; // Numeric items for object
+		Array1D< Real64 > Numbers; // Numeric items for object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumArgs; // Unused variable that is part of a subroutine call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		int SurfNum; // Surface number
 
 		// FLOW:
@@ -561,7 +561,7 @@ namespace SwimmingPool {
 		static bool MyOneTimeFlag( true ); // Flag for one-time initializations
 		static bool MyEnvrnFlagGeneral( true );
 		std::string Errout; // Message for errors
-		static FArray1D_bool MyPlantScanFlagPool;
+		static Array1D_bool MyPlantScanFlagPool;
 		bool errFlag;
 		Real64 mdot;
 		Real64 HeatGainPerPerson;

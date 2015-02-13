@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -96,7 +96,7 @@ namespace PhotovoltaicThermalCollectors {
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 	int NumPVT( 0 ); // count of all types of PVT in input file
 	int NumSimplePVTPerform( 0 ); // count of simple PVT performance objects in input file
 
@@ -109,7 +109,7 @@ namespace PhotovoltaicThermalCollectors {
 	//PUBLIC  GetPVTCellTemp
 
 	// Object Data
-	FArray1D< PVTCollectorStruct > PVT;
+	Array1D< PVTCollectorStruct > PVT;
 
 	// Functions
 
@@ -269,7 +269,7 @@ namespace PhotovoltaicThermalCollectors {
 		bool IsBlank; // Flag for blank name
 
 		// Object Data
-		FArray1D< SimplePVTModelStruct > tmpSimplePVTperf;
+		Array1D< SimplePVTModelStruct > tmpSimplePVTperf;
 
 		// first load the performance object info into temporary structure
 		cCurrentModuleObject = "SolarCollectorPerformance:PhotovoltaicThermal:Simple";
@@ -539,7 +539,7 @@ namespace PhotovoltaicThermalCollectors {
 		static bool ErrorsFound( false );
 		static bool MySetPointCheckFlag( true );
 		static bool MyOneTimeFlag( true ); // one time flag
-		static FArray1D_bool SetLoopIndexFlag; // get loop number flag
+		static Array1D_bool SetLoopIndexFlag; // get loop number flag
 		bool errFlag;
 		Real64 rho; // local fluid density kg/s
 		// FLOW:

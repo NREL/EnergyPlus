@@ -4,7 +4,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -82,7 +82,7 @@ namespace ConvectionCoefficients {
 	Real64 const FourFifths( 4.0 / 5.0 ); // 4/5 in highest precision
 
 	// Coefficients that modify the convection coeff based on surface roughness
-	FArray1D< Real64 > const RoughnessMultiplier( 6, { 2.17, 1.67, 1.52, 1.13, 1.11, 1.0 } );
+	Array1D< Real64 > const RoughnessMultiplier( 6, { 2.17, 1.67, 1.52, 1.13, 1.11, 1.0 } );
 
 	// parameters for identifying more specific hc model equations, inside face
 	int const HcInt_UserValue( 200 );
@@ -190,15 +190,15 @@ namespace ConvectionCoefficients {
 	// Object Data
 	InsideFaceAdaptiveConvAlgoStruct InsideFaceAdaptiveConvectionAlgo; // stores rules for Hc model equations
 	OutsideFaceAdpativeConvAlgoStruct OutsideFaceAdaptiveConvectionAlgo;
-	FArray1D< HcInsideFaceUserCurveStruct > HcInsideUserCurve;
-	FArray1D< HcOutsideFaceUserCurveStruct > HcOutsideUserCurve;
+	Array1D< HcInsideFaceUserCurveStruct > HcInsideUserCurve;
+	Array1D< HcOutsideFaceUserCurveStruct > HcOutsideUserCurve;
 	RoofGeoCharactisticsStruct RoofGeo;
 
 	// Functions
 
 	void
 	InitInteriorConvectionCoeffs(
-		FArray1S< Real64 > const SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
+		Array1S< Real64 > const SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
 		Optional_int_const ZoneToResimulate // if passed in, then only calculate surfaces that have this zone
 	)
 	{
@@ -325,7 +325,7 @@ namespace ConvectionCoefficients {
 			MyEnvirnFlag = false;
 		}
 		if ( ! BeginEnvrnFlag ) MyEnvirnFlag = true;
-		ZoneLoop1: for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
 			{ auto const SELECT_CASE_var( Zone( ZoneNum ).InsideConvectionAlgo );
 			// Ceiling Diffuser and Trombe Wall only make sense at Zone Level
@@ -340,12 +340,10 @@ namespace ConvectionCoefficients {
 
 			}}
 
-			ZoneLoop1_loop: ;
 		}
-		ZoneLoop1_exit: ;
-		ZoneLoop2: for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
-			SurfLoop: for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+			for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
 
 				if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 
@@ -422,14 +420,8 @@ namespace ConvectionCoefficients {
 				}}
 
 				if ( Surface( SurfNum ).EMSOverrideIntConvCoef ) HConvIn( SurfNum ) = Surface( SurfNum ).EMSValueForIntConvCoef;
-
-				SurfLoop_loop: ;
 			}
-			SurfLoop_exit: ;
-
-			ZoneLoop2_loop: ;
 		}
-		ZoneLoop2_exit: ;
 
 	}
 
@@ -1091,25 +1083,25 @@ namespace ConvectionCoefficients {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetUserConvectionCoefficients" );
 		int const NumValidSurfaceTypes( 11 );
-		static FArray1D_string const ValidSurfaceTypes( 11, { "ALLEXTERIORSURFACES", "ALLEXTERIORWINDOWS", "ALLEXTERIORWALLS", "ALLEXTERIORROOFS", "ALLEXTERIORFLOORS", "ALLINTERIORSURFACES", "ALLINTERIORWINDOWS", "ALLINTERIORWALLS", "ALLINTERIORROOFS", "ALLINTERIORCEILINGS", "ALLINTERIORFLOORS" } );
+		static Array1D_string const ValidSurfaceTypes( 11, { "ALLEXTERIORSURFACES", "ALLEXTERIORWINDOWS", "ALLEXTERIORWALLS", "ALLEXTERIORROOFS", "ALLEXTERIORFLOORS", "ALLINTERIORSURFACES", "ALLINTERIORWINDOWS", "ALLINTERIORWALLS", "ALLINTERIORROOFS", "ALLINTERIORCEILINGS", "ALLINTERIORFLOORS" } );
 
 		int const NumValidExtConvectionValueTypes( 22 );
-		static FArray1D_string const ValidExtConvectionValueTypes( 22, { "VALUE", "SCHEDULE", "SIMPLECOMBINED", "TARP", "MOWITT", "DOE-2", "ADAPTIVECONVECTIONALGORITHM", "USERCURVE", "ASHRAEVERTICALWALL", "WALTONUNSTABLEHORIZONTALORTILT", "WALTONSTABLEHORIZONTALORTILT", "NUSSELTJURGES", "MCADAMS", "MITCHELL", "CLEARROOF", "EMMELVERTICAL", "EMMELROOF", "ALAMDARIHAMMONDVERTICALWALL", "FOHANNOPOLIDORIVERTICALWALL", "ISO15099WINDOWS", "ALAMDARIHAMMONDSTABLEHORIZONTAL", "ALAMDARIHAMMONDUNSTABLEHORIZONTAL" } );
+		static Array1D_string const ValidExtConvectionValueTypes( 22, { "VALUE", "SCHEDULE", "SIMPLECOMBINED", "TARP", "MOWITT", "DOE-2", "ADAPTIVECONVECTIONALGORITHM", "USERCURVE", "ASHRAEVERTICALWALL", "WALTONUNSTABLEHORIZONTALORTILT", "WALTONSTABLEHORIZONTALORTILT", "NUSSELTJURGES", "MCADAMS", "MITCHELL", "CLEARROOF", "EMMELVERTICAL", "EMMELROOF", "ALAMDARIHAMMONDVERTICALWALL", "FOHANNOPOLIDORIVERTICALWALL", "ISO15099WINDOWS", "ALAMDARIHAMMONDSTABLEHORIZONTAL", "ALAMDARIHAMMONDUNSTABLEHORIZONTAL" } );
 
-		static FArray1D_int const ExtConvectionValue( 22, { -999, -999, ASHRAESimple, TarpHcOutside, MoWiTTHcOutside, DOE2HcOutside, AdaptiveConvectionAlgorithm, HcExt_UserCurve, HcExt_NaturalASHRAEVerticalWall, HcExt_NaturalWaltonUnstableHorizontalOrTilt, HcExt_NaturalWaltonStableHorizontalOrTilt, HcExt_NusseltJurges, HcExt_McAdams, HcExt_Mitchell, HcExt_ClearRoof, HcExt_EmmelVertical, HcExt_EmmelRoof, HcExt_AlamdariHammondVerticalWall, HcExt_FohannoPolidoriVerticalWall, HcExt_ISO15099Windows, HcExt_AlamdariHammondStableHorizontal, HcExt_AlamdariHammondUnstableHorizontal } );
+		static Array1D_int const ExtConvectionValue( 22, { -999, -999, ASHRAESimple, TarpHcOutside, MoWiTTHcOutside, DOE2HcOutside, AdaptiveConvectionAlgorithm, HcExt_UserCurve, HcExt_NaturalASHRAEVerticalWall, HcExt_NaturalWaltonUnstableHorizontalOrTilt, HcExt_NaturalWaltonStableHorizontalOrTilt, HcExt_NusseltJurges, HcExt_McAdams, HcExt_Mitchell, HcExt_ClearRoof, HcExt_EmmelVertical, HcExt_EmmelRoof, HcExt_AlamdariHammondVerticalWall, HcExt_FohannoPolidoriVerticalWall, HcExt_ISO15099Windows, HcExt_AlamdariHammondStableHorizontal, HcExt_AlamdariHammondUnstableHorizontal } );
 
 		int const NumValidSpecificExtWindConvValueTypes( 15 );
-		static FArray1D_string const ValidSpecificExtWindConvValueTypes( 15, { "SIMPLECOMBINED", "TARPWINDWARD", "TARPLEEWARD", "MOWITTWINDWARD", "MOWITTLEEWARD", "DOE2WINDWARD", "DOE2LEEWARD", "NUSSELTJURGES", "MCADAMS", "MITCHELL", "EMMELVERTICAL", "EMMELROOF", "BLOCKENWINDWARD", "CLEARROOF", "USERCURVE" } );
-		static FArray1D_int const MoreSpecificExtWindConvectionValue( 15, { HcExt_ASHRAESimpleCombined, HcExt_SparrowWindward, HcExt_SparrowLeeward, HcExt_MoWiTTWindward, HcExt_DOE2Windward, HcExt_MoWiTTLeeward, HcExt_DOE2Leeward, HcExt_NusseltJurges, HcExt_McAdams, HcExt_Mitchell, HcExt_EmmelVertical, HcExt_EmmelRoof, HcExt_BlockenWindward, HcExt_ClearRoof, HcExt_UserCurve } );
+		static Array1D_string const ValidSpecificExtWindConvValueTypes( 15, { "SIMPLECOMBINED", "TARPWINDWARD", "TARPLEEWARD", "MOWITTWINDWARD", "MOWITTLEEWARD", "DOE2WINDWARD", "DOE2LEEWARD", "NUSSELTJURGES", "MCADAMS", "MITCHELL", "EMMELVERTICAL", "EMMELROOF", "BLOCKENWINDWARD", "CLEARROOF", "USERCURVE" } );
+		static Array1D_int const MoreSpecificExtWindConvectionValue( 15, { HcExt_ASHRAESimpleCombined, HcExt_SparrowWindward, HcExt_SparrowLeeward, HcExt_MoWiTTWindward, HcExt_DOE2Windward, HcExt_MoWiTTLeeward, HcExt_DOE2Leeward, HcExt_NusseltJurges, HcExt_McAdams, HcExt_Mitchell, HcExt_EmmelVertical, HcExt_EmmelRoof, HcExt_BlockenWindward, HcExt_ClearRoof, HcExt_UserCurve } );
 
 		int const NumValidSpecificExtNatConvectValueTypes( 10 );
-		static FArray1D_string const ValidSpecificExtNatConvectValueTypes( 10, { "ASHRAEVERTICALWALL", "ALAMDARIHAMMONDVERTICALWALL", "FOHANNOPOLIDORIVERTICALWALL", "WALTONUNSTABLEHORIZONTALORTILT", "WALTONSTABLEHORIZONTALORTILT", "ALAMDARIHAMMONDSTABLEHORIZONTAL", "ALAMDARIHAMMONDUNSTABLEHORIZONTAL", "ISO15099WINDOWS", "USERCURVE", "NONE" } );
-		static FArray1D_int const SpecificExtNatConvectionValue( 10, { HcExt_NaturalASHRAEVerticalWall, HcExt_AlamdariHammondVerticalWall, HcExt_FohannoPolidoriVerticalWall, HcExt_NaturalWaltonUnstableHorizontalOrTilt, HcExt_NaturalWaltonStableHorizontalOrTilt, HcExt_AlamdariHammondStableHorizontal, HcExt_AlamdariHammondUnstableHorizontal, HcExt_ISO15099Windows, HcExt_UserCurve, HcExt_None } );
+		static Array1D_string const ValidSpecificExtNatConvectValueTypes( 10, { "ASHRAEVERTICALWALL", "ALAMDARIHAMMONDVERTICALWALL", "FOHANNOPOLIDORIVERTICALWALL", "WALTONUNSTABLEHORIZONTALORTILT", "WALTONSTABLEHORIZONTALORTILT", "ALAMDARIHAMMONDSTABLEHORIZONTAL", "ALAMDARIHAMMONDUNSTABLEHORIZONTAL", "ISO15099WINDOWS", "USERCURVE", "NONE" } );
+		static Array1D_int const SpecificExtNatConvectionValue( 10, { HcExt_NaturalASHRAEVerticalWall, HcExt_AlamdariHammondVerticalWall, HcExt_FohannoPolidoriVerticalWall, HcExt_NaturalWaltonUnstableHorizontalOrTilt, HcExt_NaturalWaltonStableHorizontalOrTilt, HcExt_AlamdariHammondStableHorizontal, HcExt_AlamdariHammondUnstableHorizontal, HcExt_ISO15099Windows, HcExt_UserCurve, HcExt_None } );
 
 		// CeilingDiffuser and TrombeWall Interior types are only Zone Level settings.
 		int const NumValidIntConvectionValueTypes( 34 );
-		static FArray1D_string const ValidIntConvectionValueTypes( 34, { "VALUE", "SCHEDULE", "SIMPLE", "TARP", "ADAPTIVECONVECTIONALGORITHM", "USERCURVE", "ASHRAEVERTICALWALL", "WALTONUNSTABLEHORIZONTALORTILT", "WALTONSTABLEHORIZONTALORTILT", "FISHERPEDERSENCEILINGDIFFUSERWALLS", "FISHERPEDERSENCEILINGDIFFUSERCEILING", "FISHERPEDERSENCEILINGDIFFUSERFLOOR", "ALAMDARIHAMMONDSTABLEHORIZONTAL", "ALAMDARIHAMMONDUNSTABLEHORIZONTAL", "ALAMDARIHAMMONDVERTICALWALL", "KHALIFAEQ3WALLAWAYFROMHEAT", "KHALIFAEQ4CEILINGAWAYFROMHEAT", "KHALIFAEQ5WALLNEARHEAT", "KHALIFAEQ6NONHEATEDWALLS", "KHALIFAEQ7CEILING", "AWBIHATTONHEATEDFLOOR", "AWBIHATTONHEATEDWALL", "BEAUSOLEILMORRISONMIXEDASSISTEDWALL", "BEAUSOLEILMORRISONMIXEDOPPOSINGWALL", "BEAUSOLEILMORRISONMIXEDSTABLEFLOOR", "BEAUSOLEILMORRISONMIXEDUNSTABLEFLOOR", "BEAUSOLEILMORRISONMIXEDSTABLECEILING", "BEAUSOLEILMORRISONMIXEDUNSTABLECEILING", "FOHANNOPOLIDORIVERTICALWALL", "KARADAGCHILLEDCEILING", "ISO15099WINDOWS", "GOLDSTEINNOVOSELACCEILINGDIFFUSERWINDOW", "GOLDSTEINNOVOSELACCEILINGDIFFUSERWALLS", "GOLDSTEINNOVOSELACCEILINGDIFFUSERFLOOR" } );
-		static FArray1D_int const IntConvectionValue( 34, { -999, -999, ASHRAESimple, ASHRAETARP, AdaptiveConvectionAlgorithm, HcInt_UserCurve, HcInt_ASHRAEVerticalWall, HcInt_WaltonUnstableHorizontalOrTilt, HcInt_WaltonStableHorizontalOrTilt, HcInt_FisherPedersenCeilDiffuserWalls, HcInt_FisherPedersenCeilDiffuserCeiling, HcInt_FisherPedersenCeilDiffuserFloor, HcInt_AlamdariHammondStableHorizontal, HcInt_AlamdariHammondUnstableHorizontal, HcInt_AlamdariHammondVerticalWall, HcInt_KhalifaEq3WallAwayFromHeat, HcInt_KhalifaEq4CeilingAwayFromHeat, HcInt_KhalifaEq5WallNearHeat, HcInt_KhalifaEq6NonHeatedWalls, HcInt_KhalifaEq7Ceiling, HcInt_AwbiHattonHeatedFloor, HcInt_AwbiHattonHeatedWall, HcInt_BeausoleilMorrisonMixedAssistingWall, HcInt_BeausoleilMorrisonMixedOppossingWall, HcInt_BeausoleilMorrisonMixedStableFloor, HcInt_BeausoleilMorrisonMixedUnstableFloor, HcInt_BeausoleilMorrisonMixedStableCeiling, HcInt_BeausoleilMorrisonMixedUnstableCeiling, HcInt_FohannoPolidoriVerticalWall, HcInt_KaradagChilledCeiling, HcInt_ISO15099Windows, HcInt_GoldsteinNovoselacCeilingDiffuserWindow, HcInt_GoldsteinNovoselacCeilingDiffuserWalls, HcInt_GoldsteinNovoselacCeilingDiffuserFloor } );
+		static Array1D_string const ValidIntConvectionValueTypes( 34, { "VALUE", "SCHEDULE", "SIMPLE", "TARP", "ADAPTIVECONVECTIONALGORITHM", "USERCURVE", "ASHRAEVERTICALWALL", "WALTONUNSTABLEHORIZONTALORTILT", "WALTONSTABLEHORIZONTALORTILT", "FISHERPEDERSENCEILINGDIFFUSERWALLS", "FISHERPEDERSENCEILINGDIFFUSERCEILING", "FISHERPEDERSENCEILINGDIFFUSERFLOOR", "ALAMDARIHAMMONDSTABLEHORIZONTAL", "ALAMDARIHAMMONDUNSTABLEHORIZONTAL", "ALAMDARIHAMMONDVERTICALWALL", "KHALIFAEQ3WALLAWAYFROMHEAT", "KHALIFAEQ4CEILINGAWAYFROMHEAT", "KHALIFAEQ5WALLNEARHEAT", "KHALIFAEQ6NONHEATEDWALLS", "KHALIFAEQ7CEILING", "AWBIHATTONHEATEDFLOOR", "AWBIHATTONHEATEDWALL", "BEAUSOLEILMORRISONMIXEDASSISTEDWALL", "BEAUSOLEILMORRISONMIXEDOPPOSINGWALL", "BEAUSOLEILMORRISONMIXEDSTABLEFLOOR", "BEAUSOLEILMORRISONMIXEDUNSTABLEFLOOR", "BEAUSOLEILMORRISONMIXEDSTABLECEILING", "BEAUSOLEILMORRISONMIXEDUNSTABLECEILING", "FOHANNOPOLIDORIVERTICALWALL", "KARADAGCHILLEDCEILING", "ISO15099WINDOWS", "GOLDSTEINNOVOSELACCEILINGDIFFUSERWINDOW", "GOLDSTEINNOVOSELACCEILINGDIFFUSERWALLS", "GOLDSTEINNOVOSELACCEILINGDIFFUSERFLOOR" } );
+		static Array1D_int const IntConvectionValue( 34, { -999, -999, ASHRAESimple, ASHRAETARP, AdaptiveConvectionAlgorithm, HcInt_UserCurve, HcInt_ASHRAEVerticalWall, HcInt_WaltonUnstableHorizontalOrTilt, HcInt_WaltonStableHorizontalOrTilt, HcInt_FisherPedersenCeilDiffuserWalls, HcInt_FisherPedersenCeilDiffuserCeiling, HcInt_FisherPedersenCeilDiffuserFloor, HcInt_AlamdariHammondStableHorizontal, HcInt_AlamdariHammondUnstableHorizontal, HcInt_AlamdariHammondVerticalWall, HcInt_KhalifaEq3WallAwayFromHeat, HcInt_KhalifaEq4CeilingAwayFromHeat, HcInt_KhalifaEq5WallNearHeat, HcInt_KhalifaEq6NonHeatedWalls, HcInt_KhalifaEq7Ceiling, HcInt_AwbiHattonHeatedFloor, HcInt_AwbiHattonHeatedWall, HcInt_BeausoleilMorrisonMixedAssistingWall, HcInt_BeausoleilMorrisonMixedOppossingWall, HcInt_BeausoleilMorrisonMixedStableFloor, HcInt_BeausoleilMorrisonMixedUnstableFloor, HcInt_BeausoleilMorrisonMixedStableCeiling, HcInt_BeausoleilMorrisonMixedUnstableCeiling, HcInt_FohannoPolidoriVerticalWall, HcInt_KaradagChilledCeiling, HcInt_ISO15099Windows, HcInt_GoldsteinNovoselacCeilingDiffuserWindow, HcInt_GoldsteinNovoselacCeilingDiffuserWalls, HcInt_GoldsteinNovoselacCeilingDiffuserFloor } );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1118,8 +1110,8 @@ namespace ConvectionCoefficients {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string Alphas( 9 );
-		FArray1D< Real64 > Numbers( 2 );
+		Array1D_string Alphas( 9 );
+		Array1D< Real64 > Numbers( 2 );
 		int NumAlphas;
 		int NumNumbers;
 		int Loop;
@@ -3568,9 +3560,9 @@ namespace ConvectionCoefficients {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static FArray1D< Real64 > const D( 6, { 11.58, 12.49, 10.79, 8.23, 10.22, 8.23 } );
-		static FArray1D< Real64 > const E( 6, { 5.894, 4.065, 4.192, 4.00, 3.100, 3.33 } );
-		static FArray1D< Real64 > const F( 6, { 0.0, 0.028, 0.0, -0.057, 0.0, -0.036 } );
+		static Array1D< Real64 > const D( 6, { 11.58, 12.49, 10.79, 8.23, 10.22, 8.23 } );
+		static Array1D< Real64 > const E( 6, { 5.894, 4.065, 4.192, 4.00, 3.100, 3.33 } );
+		static Array1D< Real64 > const F( 6, { 0.0, 0.028, 0.0, -0.057, 0.0, -0.036 } );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3761,9 +3753,9 @@ namespace ConvectionCoefficients {
 	void
 	CalcDetailedHcInForDVModel(
 		int const SurfNum, // surface number for which coefficients are being calculated
-		FArray1S< Real64 > const SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
-		FArray1S< Real64 > HcIn, // Interior Convection Coeff Array
-		Optional< FArray1S< Real64 > const > Vhc // Velocity array for forced convection coeff calculation
+		Array1S< Real64 > const SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
+		Array1S< Real64 > HcIn, // Interior Convection Coeff Array
+		Optional< Array1S< Real64 > const > Vhc // Velocity array for forced convection coeff calculation
 	)
 	{
 
@@ -3980,7 +3972,7 @@ namespace ConvectionCoefficients {
 	void
 	CalcCeilingDiffuserInletCorr(
 		int const ZoneNum, // Zone number
-		FArray1S< Real64 > const SurfaceTemperatures // For CalcASHRAEDetailed, if called
+		Array1S< Real64 > const SurfaceTemperatures // For CalcASHRAEDetailed, if called
 	)
 	{
 
@@ -4082,7 +4074,7 @@ namespace ConvectionCoefficients {
 	void
 	CalcTrombeWallIntConvCoeff(
 		int const ZoneNum, // Zone number for which coefficients are being calculated
-		FArray1S< Real64 > const SurfaceTemperatures // Temperature of surfaces for evaluation of HcIn
+		Array1S< Real64 > const SurfaceTemperatures // Temperature of surfaces for evaluation of HcIn
 	)
 	{
 
@@ -4697,8 +4689,8 @@ namespace ConvectionCoefficients {
 		Real64 thisAzimuth;
 		Real64 thisArea;
 		int thisZone;
-		FArray1D< Real64 > RoofBoundZvals( 8 );
-		FArray1D< Real64 > TestDist( 4 );
+		Array1D< Real64 > RoofBoundZvals( 8 );
+		Array1D< Real64 > TestDist( 4 );
 		//  TYPE(Vector), DIMENSION(4) :: BoundSurf
 		Real64 surfacearea;
 		Real64 BoundTilt;
@@ -6271,9 +6263,9 @@ namespace ConvectionCoefficients {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static int ZoneNum( 0 );
 		static int PriorityEquipOn( 0 );
-		static FArray1D_int HeatingPriorityStack( {0,10}, 0 );
-		static FArray1D_int CoolingPriorityStack( {0,10}, 0 );
-		static FArray1D_int FlowRegimeStack( {0,10}, 0 );
+		static Array1D_int HeatingPriorityStack( {0,10}, 0 );
+		static Array1D_int CoolingPriorityStack( {0,10}, 0 );
+		static Array1D_int FlowRegimeStack( {0,10}, 0 );
 		static int EquipNum( 0 );
 		static int ZoneNode( 0 );
 		static int EquipOnCount( 0 );
@@ -9870,7 +9862,7 @@ namespace ConvectionCoefficients {
 		Real64 Rex; // Reynolds number
 		Real64 x; // distance to roof edge toward wind direction
 		Real64 eta;
-		FArray1D< Real64 > RfARR( 6 );
+		Array1D< Real64 > RfARR( 6 );
 		Real64 Rf;
 		Real64 BetaFilm;
 		static int ErrorIndex( 0 );

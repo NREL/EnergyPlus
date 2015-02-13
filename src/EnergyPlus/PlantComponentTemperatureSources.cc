@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -71,7 +71,7 @@ namespace PlantComponentTemperatureSources {
 	//MODULE ROUTINES
 
 	// Object Data
-	FArray1D< WaterSourceSpecs > WaterSource; // dimension to number of machines
+	Array1D< WaterSourceSpecs > WaterSource; // dimension to number of machines
 
 	// Functions
 

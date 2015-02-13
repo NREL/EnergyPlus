@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -108,8 +108,8 @@ namespace WindowEquivalentLayer {
 	int const hipTAU_BB0( 3 );
 	int const hipDIM( 3 ); // dimension of parameter array
 
-	FArray3D< Real64 > CFSDiffAbsTrans;
-	FArray1D_bool EQLDiffPropFlag;
+	Array3D< Real64 > CFSDiffAbsTrans;
+	Array1D_bool EQLDiffPropFlag;
 
 	// MODULE SUBROUTINES:
 	// Initialization routines for module
@@ -232,7 +232,7 @@ namespace WindowEquivalentLayer {
 		int NumGLayers; // number of gap layers
 		int NumSLayers; // number of glazing and shade layers (non-gas layers)
 		int DoWhat; // DoWhat =1, index for diffuse, and =2 index for beam
-		FArray2D< Real64 > SysAbs1( CFSMAXNL+1, 2 ); // layers absorptance and system transmittance
+		Array2D< Real64 > SysAbs1( CFSMAXNL+1, 2 ); // layers absorptance and system transmittance
 		// Flow
 
 		if ( ! allocated( CFSLayers ) ) CFSLayers.allocate( Construct( ConstrNum ).TotLayers );
@@ -546,13 +546,13 @@ namespace WindowEquivalentLayer {
 		Real64 TRMOUT;
 		Real64 TRMIN;
 		Real64 HCIN;
-		FArray1D< Real64 > QOCF( CFSMAXNL );
-		FArray1D< Real64 > JB( {0,CFSMAXNL} );
-		FArray1D< Real64 > JF( {1,CFSMAXNL+1} );
-		FArray1D< Real64 > T( CFSMAXNL );
-		FArray1D< Real64 > Q( {0,CFSMAXNL} );
-		FArray1D< Real64 > H( {0,CFSMAXNL+1} );
-		FArray2D< Real64 > Abs1( CFSMAXNL+1, 2 );
+		Array1D< Real64 > QOCF( CFSMAXNL );
+		Array1D< Real64 > JB( {0,CFSMAXNL} );
+		Array1D< Real64 > JF( {1,CFSMAXNL+1} );
+		Array1D< Real64 > T( CFSMAXNL );
+		Array1D< Real64 > Q( {0,CFSMAXNL} );
+		Array1D< Real64 > H( {0,CFSMAXNL+1} );
+		Array2D< Real64 > Abs1( CFSMAXNL+1, 2 );
 		Real64 QRSW;
 		Real64 QRLW;
 		Real64 QCONV;
@@ -573,7 +573,7 @@ namespace WindowEquivalentLayer {
 		// Flow
 
 		// Object Data
-		FArray1D< CFSSWP > SWP_ON( CFSMAXNL );
+		Array1D< CFSSWP > SWP_ON( CFSMAXNL );
 
 		CFSSHGC = true;
 		NL = FS.NL;
@@ -617,7 +617,7 @@ namespace WindowEquivalentLayer {
 	CalcEQLWindowOpticalProperty(
 		CFSTY & FS, // fenestration system
 		int const DiffBeamFlag, // isDIFF: calc diffuse properties
-		FArray2A< Real64 > Abs1,
+		Array2A< Real64 > Abs1,
 		Real64 const IncA, // angle of incidence, radians
 		Real64 const VProfA, // inc solar vertical profile angle, radians
 		Real64 const HProfA // inc solar horizontal profile angle, radians
@@ -673,7 +673,7 @@ namespace WindowEquivalentLayer {
 		// Flow
 
 		// Object Data
-		FArray1D< CFSSWP > SWP_ON( CFSMAXNL );
+		Array1D< CFSSWP > SWP_ON( CFSMAXNL );
 
 		NL = FS.NL;
 		Abs1 = 0.0;
@@ -695,7 +695,7 @@ namespace WindowEquivalentLayer {
 			ASHWAT_Solar( FS.NL, SWP_ON, SWP_ROOMBLK, 1.0, 0.0, 0.0, Abs1( {1,FS.NL+1}, 1 ), Abs1( {1,FS.NL+1}, 2 ) );
 		} else {
 			// diffuse
-			FArray1D< CFSSWP > const SWP_EL( FS.L.ma( &CFSLAYER::SWP_EL ) ); //Autodesk:F2C++ Can't slice a member array so we create a temporary: Inefficient
+			Array1D< CFSSWP > const SWP_EL( FS.L.ma( &CFSLAYER::SWP_EL ) ); //Autodesk:F2C++ Can't slice a member array so we create a temporary: Inefficient
 			ASHWAT_Solar( FS.NL, SWP_EL, SWP_ROOMBLK, 0.0, 1.0, 0.0, Abs1( {1,FS.NL+1}, 1 ) );
 			ASHWAT_Solar( FS.NL, SWP_EL, SWP_ROOMBLK, 0.0, 0.0, 1.0, Abs1( {1,FS.NL+1}, 2 ) );
 			//CFSFenProp = LOK1 .AND. LOK2
@@ -769,14 +769,14 @@ namespace WindowEquivalentLayer {
 		Real64 QRLWX;
 		Real64 QCONV;
 		Real64 TSX;
-		FArray1D< Real64 > QOCF( CFSMAXNL );
+		Array1D< Real64 > QOCF( CFSMAXNL );
 		Real64 QOCFRoom;
-		FArray1D< Real64 > JB( {0,CFSMAXNL} );
-		FArray1D< Real64 > JF( {1,CFSMAXNL+1} );
-		FArray1D< Real64 > T( CFSMAXNL );
-		FArray1D< Real64 > Q( {0,CFSMAXNL} );
-		FArray1D< Real64 > H( {0,CFSMAXNL+1} );
-		FArray1D< Real64 > QAllSWwinAbs( {1,CFSMAXNL+1} );
+		Array1D< Real64 > JB( {0,CFSMAXNL} );
+		Array1D< Real64 > JF( {1,CFSMAXNL+1} );
+		Array1D< Real64 > T( CFSMAXNL );
+		Array1D< Real64 > Q( {0,CFSMAXNL} );
+		Array1D< Real64 > H( {0,CFSMAXNL+1} );
+		Array1D< Real64 > QAllSWwinAbs( {1,CFSMAXNL+1} );
 
 		bool ASHWAT_ThermalR; // net long wave radiation flux on the inside face of window
 		int EQLNum; // equivalent layer window index
@@ -1083,9 +1083,9 @@ namespace WindowEquivalentLayer {
 
 	Real64
 	HEMINT(
-		std::function< Real64( Real64 const THETA, int const OPT, FArray1A< Real64 > const ) > F, // property integrand function
+		std::function< Real64( Real64 const THETA, int const OPT, Array1A< Real64 > const ) > F, // property integrand function
 		int const F_Opt, // options passed to F() (hipRHO, hipTAU)
-		FArray1A< Real64 > const F_P // parameters passed to F()
+		Array1A< Real64 > const F_P // parameters passed to F()
 	)
 	{
 		//       AUTHOR         ASHRAE 1311-RP
@@ -1123,7 +1123,7 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		FArray2D< Real64 > T( KMAX, KMAX );
+		Array2D< Real64 > T( KMAX, KMAX );
 		Real64 FX;
 		Real64 X1;
 		Real64 X2;
@@ -1219,7 +1219,7 @@ namespace WindowEquivalentLayer {
 		// DERIVED TYPE DEFINITIONS
 		// na
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > P( hipDIM );
+		Array1D< Real64 > P( hipDIM );
 		Real64 SumRefAndTran; // sum of the reflectance and transmittance
 		// Flow
 
@@ -1245,7 +1245,7 @@ namespace WindowEquivalentLayer {
 	RB_F(
 		Real64 const THETA, // incidence angle, radians
 		int const OPT, // options (unused)
-		FArray1A< Real64 > const P // parameters
+		Array1A< Real64 > const P // parameters
 	)
 	{
 		//       AUTHOR         ASHRAE 1311-RP
@@ -1401,7 +1401,7 @@ namespace WindowEquivalentLayer {
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		//   TAU_BT0 = TAU_BB0 + TAU_BD0
-		FArray1D< Real64 > P( hipDIM );
+		Array1D< Real64 > P( hipDIM );
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "IS_DIFF: " );
 
@@ -1437,7 +1437,7 @@ namespace WindowEquivalentLayer {
 	IS_F(
 		Real64 const THETA, // incidence angle, radians
 		int const OPT, // options (1=reflectance, 2=transmittance)
-		FArray1A< Real64 > const P // parameters
+		Array1A< Real64 > const P // parameters
 	)
 	{
 		//       AUTHOR         ASHRAE 1311-RP
@@ -1699,7 +1699,7 @@ namespace WindowEquivalentLayer {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 TAU_BD0;
-		FArray1D< Real64 > P( hipDIM );
+		Array1D< Real64 > P( hipDIM );
 		Real64 SumRefAndTran;
 		// flow
 
@@ -1727,7 +1727,7 @@ namespace WindowEquivalentLayer {
 	FM_F(
 		Real64 const THETA, // incidence angle, radians
 		int const Opt, // options (hipRHO, hipTAU)
-		FArray1A< Real64 > const P // parameters
+		Array1A< Real64 > const P // parameters
 	)
 	{
 		//       AUTHOR         ASHRAE 1311-RP
@@ -2001,8 +2001,8 @@ namespace WindowEquivalentLayer {
 		Real64 G3;
 		Real64 G5;
 		Real64 G7;
-		FArray2D< Real64 > A( N, N+2 );
-		FArray1D< Real64 > XSOL( N );
+		Array2D< Real64 > A( N, N+2 );
+		Array1D< Real64 > XSOL( N );
 		// Flow
 
 		if ( W / S < SMALL_ERROR ) {
@@ -2399,8 +2399,8 @@ namespace WindowEquivalentLayer {
 		Real64 G5;
 		Real64 G8;
 		Real64 G11;
-		FArray2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
-		FArray1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
+		Array2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
+		Array1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
 		// Flow
 
 		TAUBF_BT_PERP = TAUBF_BD_PERP + TAUBF_BB_PERP;
@@ -2820,8 +2820,8 @@ namespace WindowEquivalentLayer {
 		Real64 G4;
 		Real64 G7;
 		Real64 G10;
-		FArray2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
-		FArray1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
+		Array2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
+		Array1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
 		// Flow
 
 		TAUBF_BT_PERP = TAUBF_BD_PERP + TAUBF_BB_PERP;
@@ -3171,8 +3171,8 @@ namespace WindowEquivalentLayer {
 		Real64 G7;
 		Real64 G10;
 
-		FArray2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
-		FArray1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
+		Array2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
+		Array1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
 		// Flow
 
 		TAUBF_BT_PERP = TAUBF_BD_PERP + TAUBF_BB_PERP;
@@ -3479,8 +3479,8 @@ namespace WindowEquivalentLayer {
 		Real64 G3;
 		Real64 G5;
 		Real64 G7;
-		FArray2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
-		FArray1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
+		Array2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
+		Array1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
 		// Flow
 
 		TAUBF_BT_PERP = TAUBF_BD_PERP + TAUBF_BB_PERP;
@@ -3695,8 +3695,8 @@ namespace WindowEquivalentLayer {
 		Real64 G7;
 		Real64 G8;
 
-		FArray2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
-		FArray1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
+		Array2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
+		Array1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
 		// Flow
 
 		TAUBF_BT_PERP = TAUBF_BD_PERP + TAUBF_BB_PERP;
@@ -3921,8 +3921,8 @@ namespace WindowEquivalentLayer {
 		Real64 G3;
 		Real64 G5;
 		Real64 G7;
-		FArray2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
-		FArray1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
+		Array2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
+		Array1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
 		// Flow
 
 		AK = std::sqrt( W * W + S * S );
@@ -4626,8 +4626,8 @@ namespace WindowEquivalentLayer {
 		Real64 J4;
 		Real64 J5;
 		Real64 J6;
-		FArray2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
-		FArray1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
+		Array2D< Real64 > A( N, N+2 ); // coefficients of the radiosity equations matrix
+		Array1D< Real64 > XSOL( N ); // solution vector (obtained after solving the radiosity equations matrix)
 		// flow
 
 		//  CHECK TO SEE WHICH SIDE OF SLAT IS SUNLIT
@@ -4725,8 +4725,8 @@ namespace WindowEquivalentLayer {
 	void
 	SOLMATS(
 		int const N, // # of active rows in A
-		FArray2S< Real64 > A, // matrix, minimum required dimensions: A( N, N+2)
-		FArray1S< Real64 > XSOL // returned: solution vector, min req dimension: XSOL( N)
+		Array2S< Real64 > A, // matrix, minimum required dimensions: A( N, N+2)
+		Array1S< Real64 > XSOL // returned: solution vector, min req dimension: XSOL( N)
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -4849,15 +4849,15 @@ namespace WindowEquivalentLayer {
 		Real64 const TRMOUT,
 		Real64 const TRMIN, // indoor / outdoor mean radiant temp, K
 		Real64 const ISOL, // total incident solar, W/m2 (values used for SOURCE derivation)
-		FArray1S< Real64 > const SOURCE, // absorbed solar by layer, W/m2
+		Array1S< Real64 > const SOURCE, // absorbed solar by layer, W/m2
 		Real64 const TOL, // convergence tolerance, usually
-		FArray1A< Real64 > QOCF, // returned: heat flux to layer i from gaps i-1 and i
+		Array1A< Real64 > QOCF, // returned: heat flux to layer i from gaps i-1 and i
 		Real64 & QOCFRoom, // returned: open channel heat gain to room, W/m2
-		FArray1A< Real64 > T, // returned: layer temperatures, 1=outside-most layer, K
-		FArray1< Real64 > & Q, // returned: heat flux at ith gap (betw layers i and i+1), W/m2
-		FArray1A< Real64 > JF, // returned: front (outside facing) radiosity of surfaces, W/m2
-		FArray1A< Real64 > JB, // returned: back (inside facing) radiosity, W/m2
-		FArray1A< Real64 > HC, // returned: gap convective heat transfer coefficient, W/m2K
+		Array1A< Real64 > T, // returned: layer temperatures, 1=outside-most layer, K
+		Array1< Real64 > & Q, // returned: heat flux at ith gap (betw layers i and i+1), W/m2
+		Array1A< Real64 > JF, // returned: front (outside facing) radiosity of surfaces, W/m2
+		Array1A< Real64 > JB, // returned: back (inside facing) radiosity, W/m2
+		Array1A< Real64 > HC, // returned: gap convective heat transfer coefficient, W/m2K
 		Real64 & UCG, // returned: center-glass U-factor, W/m2-K
 		Real64 & SHGC, // returned: center-glass SHGC (Solar Heat Gain Coefficient)
 		Optional_bool_const HCInFlag // If true uses ISO Std 150099 routine for HCIn calc
@@ -4928,13 +4928,13 @@ namespace WindowEquivalentLayer {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 ALPHA;
 		Real64 HCOCFout;
-		FArray2D< Real64 > A( 3*FS.NL+2, 3*FS.NL+4 );
-		FArray1D< Real64 > XSOL( 3*FS.NL+2 );
+		Array2D< Real64 > A( 3*FS.NL+2, 3*FS.NL+4 );
+		Array1D< Real64 > XSOL( 3*FS.NL+2 );
 		Real64 MAXERR;
-		FArray1D< Real64 > TNEW( FS.NL ); // latest estimate of layer temperatures, K
-		FArray1D< Real64 > EB( {0,FS.NL+1} ); // black emissive power by layer, W/m2
+		Array1D< Real64 > TNEW( FS.NL ); // latest estimate of layer temperatures, K
+		Array1D< Real64 > EB( {0,FS.NL+1} ); // black emissive power by layer, W/m2
 		//   EB( 0) = outdoor environment, EB( NL+1) = indoor environment
-		FArray1D< Real64 > HHAT( {0,FS.NL} ); // convective heat transfer coefficient (W/m2.K4)
+		Array1D< Real64 > HHAT( {0,FS.NL} ); // convective heat transfer coefficient (W/m2.K4)
 		//   based on EB, NOT temperature difference
 		Real64 RHOF_ROOM; // effective longwave room-side properties
 		Real64 TAU_ROOM;
@@ -4942,7 +4942,7 @@ namespace WindowEquivalentLayer {
 		Real64 RHOB_OUT; // effective longwave outdoor environment properties
 		Real64 TAU_OUT;
 		Real64 EPSB_OUT;
-		FArray1D< Real64 > QNET( FS.NL ); // checksum - net heat flux to a layer - should be zero - not needed
+		Array1D< Real64 > QNET( FS.NL ); // checksum - net heat flux to a layer - should be zero - not needed
 		int ADIM; // dimension of the A matrix
 		int CONVRG;
 		int NL;
@@ -4951,38 +4951,38 @@ namespace WindowEquivalentLayer {
 		int L;
 		int ITRY;
 		int hin_scheme; // flags different schemes for indoor convection coefficients
-		FArray1D_int ISDL( {0,FS.NL+1} ); // Flag to mark diathermanous layers, 0=opaque
+		Array1D_int ISDL( {0,FS.NL+1} ); // Flag to mark diathermanous layers, 0=opaque
 		int NDLIAR; // Number of Diathermanous Layers In A Row (i.e., consecutive)
 		int IB; // Counter begin and end limits
 		int IE;
 		int IDV; // Integer dummy variable, general utility
 		int IM_ON; // Turns on calculation of Indices of Merit if IM_ON=1
-		FArray1D< Real64 > QOCF_F( FS.NL ); // heat flux to outdoor-facing surface of layer i, from gap i-1,
+		Array1D< Real64 > QOCF_F( FS.NL ); // heat flux to outdoor-facing surface of layer i, from gap i-1,
 		//   due to open channel flow, W/m2
-		FArray1D< Real64 > QOCF_B( FS.NL ); // heat flux to indoor-facing surface of layer i, from gap i,
+		Array1D< Real64 > QOCF_B( FS.NL ); // heat flux to indoor-facing surface of layer i, from gap i,
 		//   due to open channel flow, W/m2
 		Real64 Rvalue; // R-value in IP units [hr.ft2.F/BTU]
 		Real64 TAE_IN; // Indoor and outdoor effective ambient temperatures [K]
 		Real64 TAE_OUT;
-		FArray1D< Real64 > HR( {0,FS.NL} ); // Radiant heat transfer coefficient [W/m2K]
-		FArray1D< Real64 > HJR( FS.NL ); // radiative and convective jump heat transfer coefficients
-		FArray1D< Real64 > HJC( FS.NL );
+		Array1D< Real64 > HR( {0,FS.NL} ); // Radiant heat transfer coefficient [W/m2K]
+		Array1D< Real64 > HJR( FS.NL ); // radiative and convective jump heat transfer coefficients
+		Array1D< Real64 > HJC( FS.NL );
 		Real64 FHR_OUT; // hre/(hre+hce) fraction radiant h, outdoor or indoor, used for TAE
 		Real64 FHR_IN;
 		Real64 Q_IN; // net gain to the room [W/m2], including transmitted solar
-		FArray1D< Real64 > RHOF( {0,FS.NL+1} ); // longwave reflectance, front    !  these variables help simplify
-		FArray1D< Real64 > RHOB( {0,FS.NL+1} ); // longwave reflectance, back     !  the code because it is useful to
-		FArray1D< Real64 > EPSF( {0,FS.NL+1} ); // longwave emisivity,   front    !  increase the scope of the arrays
-		FArray1D< Real64 > EPSB( {0,FS.NL+1} ); // longwave emisivity,   back     !  to include indoor and outdoor
-		FArray1D< Real64 > TAU( {0,FS.NL+1} ); // longwave transmittance         !  nodes - more general
+		Array1D< Real64 > RHOF( {0,FS.NL+1} ); // longwave reflectance, front    !  these variables help simplify
+		Array1D< Real64 > RHOB( {0,FS.NL+1} ); // longwave reflectance, back     !  the code because it is useful to
+		Array1D< Real64 > EPSF( {0,FS.NL+1} ); // longwave emisivity,   front    !  increase the scope of the arrays
+		Array1D< Real64 > EPSB( {0,FS.NL+1} ); // longwave emisivity,   back     !  to include indoor and outdoor
+		Array1D< Real64 > TAU( {0,FS.NL+1} ); // longwave transmittance         !  nodes - more general
 		Real64 RTOT; // total resistance from TAE_OUT to TAE_IN [m2K/W]
-		FArray2D< Real64 > HC2D( 6, 6 ); // convective heat transfer coefficients between layers i and j
-		FArray2D< Real64 > HR2D( 6, 6 ); // radiant heat transfer coefficients between layers i and j
-		FArray1D< Real64 > HCIout( 6 ); // convective and radiant heat transfer coefficients between
-		FArray1D< Real64 > HRIout( 6 );
+		Array2D< Real64 > HC2D( 6, 6 ); // convective heat transfer coefficients between layers i and j
+		Array2D< Real64 > HR2D( 6, 6 ); // radiant heat transfer coefficients between layers i and j
+		Array1D< Real64 > HCIout( 6 ); // convective and radiant heat transfer coefficients between
+		Array1D< Real64 > HRIout( 6 );
 		// layer i and outdoor air or mean radiant temperature, resp.
-		FArray1D< Real64 > HCIin( 6 ); // convective and radiant heat transfer coefficients between
-		FArray1D< Real64 > HRIin( 6 );
+		Array1D< Real64 > HCIin( 6 ); // convective and radiant heat transfer coefficients between
+		Array1D< Real64 > HRIin( 6 );
 		// layer i and indoor air or mean radiant temperature, resp.
 		Real64 HCinout; // convective and radiant heat transfer coefficients between
 		Real64 HRinout;
@@ -5000,7 +5000,7 @@ namespace WindowEquivalentLayer {
 		Real64 TOUTdv;
 		Real64 TRMINdv; // for boundary conditions in calculating
 		Real64 TRMOUTdv;
-		FArray1D< Real64 > SOURCEdv( FS.NL+1 ); // indices of merit
+		Array1D< Real64 > SOURCEdv( FS.NL+1 ); // indices of merit
 		Real64 SUMERR; // error summation used to check validity of code/model
 		Real64 QGAIN; // total gain to conditioned space [[W/m2]
 		Real64 SaveHCNLm; // place to save HC(NL-1) - two resistance networks differ
@@ -5846,8 +5846,8 @@ namespace WindowEquivalentLayer {
 		Real64 Epsdf;
 		Real64 Epsdb;
 		Real64 Epsm;
-		FArray2D< Real64 > A( 20, 22 );
-		FArray1D< Real64 > X( 20 );
+		Array2D< Real64 > A( 20, 22 );
+		Array1D< Real64 > X( 20 );
 		// real FSg_g, FSdf_g, FSdb_g, FSm_g
 		Real64 FSg_df;
 		Real64 FSdf_df;
@@ -5936,7 +5936,7 @@ namespace WindowEquivalentLayer {
 		Real64 const rhodb,
 		Real64 const taud,
 		Real64 const rhom,
-		FArray2A< Real64 > A
+		Array2A< Real64 > A
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -6689,14 +6689,14 @@ namespace WindowEquivalentLayer {
 		Real64 TRMOUT;
 		Real64 TIABS;
 		Real64 TRMIN;
-		FArray1D< Real64 > QOCF( FS.NL );
+		Array1D< Real64 > QOCF( FS.NL );
 		Real64 QOCFRoom;
-		FArray1D< Real64 > JB( {0,FS.NL} );
-		FArray1D< Real64 > JF( {1,FS.NL+1} );
-		FArray1D< Real64 > T( FS.NL );
-		FArray1D< Real64 > Q( {0,FS.NL} );
-		FArray1D< Real64 > H( {0,FS.NL+1} );
-		FArray1D< Real64 > SOURCE( FS.NL+1 );
+		Array1D< Real64 > JB( {0,FS.NL} );
+		Array1D< Real64 > JF( {1,FS.NL+1} );
+		Array1D< Real64 > T( FS.NL );
+		Array1D< Real64 > Q( {0,FS.NL} );
+		Array1D< Real64 > H( {0,FS.NL+1} );
+		Array1D< Real64 > SOURCE( FS.NL+1 );
 		Real64 ISOL;
 		Real64 UX;
 		Real64 SHGC;
@@ -6729,13 +6729,13 @@ namespace WindowEquivalentLayer {
 	void
 	ASHWAT_Solar(
 		int const NL, // # of layers
-		FArray1S< CFSSWP > const LSWP_ON, // layer SW (solar) properties (off-normal adjusted)
+		Array1S< CFSSWP > const LSWP_ON, // layer SW (solar) properties (off-normal adjusted)
 		CFSSWP const & SWP_ROOM, // effective SW (solar) properties of room
 		Real64 const IBEAM, // incident beam insolation (W/m2 aperture)
 		Real64 const IDIFF, // incident diffuse insolation (W/m2 aperture)
 		Real64 const ILIGHTS, // incident diffuse insolation (W/m2 aperture)
-		FArray1S< Real64 > SOURCE, // returned: layer-by-layer flux of absorbed
-		Optional< FArray1S< Real64 > > SourceBD // returned: layer-by-layer flux of absorbed
+		Array1S< Real64 > SOURCE, // returned: layer-by-layer flux of absorbed
+		Optional< Array1S< Real64 > > SourceBD // returned: layer-by-layer flux of absorbed
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -6780,23 +6780,23 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS
-		FArray1D< Real64 > BPLUS( {0,NL} ); // beam solar fluxes flowing in outward and inward directions
-		FArray1D< Real64 > BMINUS( {0,NL} );
+		Array1D< Real64 > BPLUS( {0,NL} ); // beam solar fluxes flowing in outward and inward directions
+		Array1D< Real64 > BMINUS( {0,NL} );
 		//   correspond to Edwards QPLUS and QMINUS (except note
 		//   reverse layer numbering)
-		FArray1D< Real64 > CPLUS( {0,NL} ); // diffuse solar fluxes caused by BPLUS and BMINUS;
-		FArray1D< Real64 > CMINUS( {0,NL} );
+		Array1D< Real64 > CPLUS( {0,NL} ); // diffuse solar fluxes caused by BPLUS and BMINUS;
+		Array1D< Real64 > CMINUS( {0,NL} );
 		//   appear as sources in diffuse calculation
-		FArray1D< Real64 > DPLUS( {0,NL} ); // diffuse solar fluxes flowing in outward and inward
-		FArray1D< Real64 > DMINUS( {0,NL} );
+		Array1D< Real64 > DPLUS( {0,NL} ); // diffuse solar fluxes flowing in outward and inward
+		Array1D< Real64 > DMINUS( {0,NL} );
 		//   directions (W/m2)
-		FArray1D< Real64 > AP( 2*NL );
-		FArray1D< Real64 > AE( 2*NL );
-		FArray1D< Real64 > AW( 2*NL );
-		FArray1D< Real64 > BP( 2*NL );
-		FArray1D< Real64 > X( 2*NL );
+		Array1D< Real64 > AP( 2*NL );
+		Array1D< Real64 > AE( 2*NL );
+		Array1D< Real64 > AW( 2*NL );
+		Array1D< Real64 > BP( 2*NL );
+		Array1D< Real64 > X( 2*NL );
 		Real64 CHKSUM;
-		FArray1D< Real64 > BeamDiffuseAbs( NL+1 ); // beam-diffuse absorbed fraction of beam radiation (W/m2)
+		Array1D< Real64 > BeamDiffuseAbs( NL+1 ); // beam-diffuse absorbed fraction of beam radiation (W/m2)
 		int N_TDMA;
 		int I;
 		int LINE;
@@ -6901,11 +6901,11 @@ namespace WindowEquivalentLayer {
 	void
 	NETRAD(
 		int const NL, // # of layers, 1=outside .. NL=inside
-		FArray1S< CFSSWP > const LSWP_ON, // layer SW (solar) properties (off-normal adjusted)
+		Array1S< CFSSWP > const LSWP_ON, // layer SW (solar) properties (off-normal adjusted)
 		Real64 const RHO_room, // effective solar reflectance of room (at inside)
 		Real64 const ISOL, // incident flux (W/m2)
-		FArray1< Real64 > & QPLUS, // returned: see Edwards paper
-		FArray1< Real64 > & QMINUS // returned: see Edwards paper
+		Array1< Real64 > & QPLUS, // returned: see Edwards paper
+		Array1< Real64 > & QMINUS // returned: see Edwards paper
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -6943,8 +6943,8 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > TED( NL+1 );
-		FArray1D< Real64 > RED( NL+1 );
+		Array1D< Real64 > TED( NL+1 );
+		Array1D< Real64 > RED( NL+1 );
 
 		//   Reflectance and Transmittance
 
@@ -6967,11 +6967,11 @@ namespace WindowEquivalentLayer {
 
 	void
 	TDMA_R(
-		FArray1S< Real64 > X,
-		FArray1S< Real64 > const AP,
-		FArray1S< Real64 > const AE,
-		FArray1S< Real64 > const AW,
-		FArray1S< Real64 > const BP,
+		Array1S< Real64 > X,
+		Array1S< Real64 > const AP,
+		Array1S< Real64 > const AE,
+		Array1S< Real64 > const AW,
+		Array1S< Real64 > const BP,
 		int const N
 	)
 	{
@@ -7005,8 +7005,8 @@ namespace WindowEquivalentLayer {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int J;
-		FArray1D< Real64 > ALPHA( N );
-		FArray1D< Real64 > BETA( N );
+		Array1D< Real64 > ALPHA( N );
+		Array1D< Real64 > BETA( N );
 		// Flow
 
 		ALPHA( N ) = AW( N ) / AP( N );
@@ -7025,11 +7025,11 @@ namespace WindowEquivalentLayer {
 
 	void
 	TDMA(
-		FArray1S< Real64 > X,
-		FArray1S< Real64 > const AP,
-		FArray1S< Real64 > const AE,
-		FArray1S< Real64 > const AW,
-		FArray1S< Real64 > const BP,
+		Array1S< Real64 > X,
+		Array1S< Real64 > const AP,
+		Array1S< Real64 > const AE,
+		Array1S< Real64 > const AW,
+		Array1S< Real64 > const BP,
 		int const N
 	)
 	{
@@ -7063,8 +7063,8 @@ namespace WindowEquivalentLayer {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int J;
-		FArray1D< Real64 > ALPHA( N );
-		FArray1D< Real64 > BETA( N );
+		Array1D< Real64 > ALPHA( N );
+		Array1D< Real64 > BETA( N );
 		Real64 D;
 		// Flow
 
@@ -7090,11 +7090,11 @@ namespace WindowEquivalentLayer {
 
 	void
 	AUTOTDMA(
-		FArray1S< Real64 > X,
-		FArray1S< Real64 > AP,
-		FArray1S< Real64 > const AE,
-		FArray1S< Real64 > const AW,
-		FArray1S< Real64 > const BP,
+		Array1S< Real64 > X,
+		Array1S< Real64 > AP,
+		Array1S< Real64 > const AE,
+		Array1S< Real64 > const AW,
+		Array1S< Real64 > const BP,
 		int & N
 	)
 	{
@@ -7442,7 +7442,7 @@ namespace WindowEquivalentLayer {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Real64 X1MRDiff( -1.0 );
 		static Real64 XTAUDiff( -1.0 );
-		FArray1D< Real64 > P( hipDIM );
+		Array1D< Real64 > P( hipDIM );
 		// Flow
 
 		if ( XTAUDiff < 0.0 ) {
@@ -7458,7 +7458,7 @@ namespace WindowEquivalentLayer {
 	Specular_F(
 		Real64 const THETA, // incidence angle, radians
 		int const OPT, // options (unused)
-		FArray1A< Real64 > const P // parameters (none defined)
+		Array1A< Real64 > const P // parameters (none defined)
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -9180,7 +9180,7 @@ namespace WindowEquivalentLayer {
 	CalcEQLOpticalProperty(
 		int const SurfNum,
 		int const BeamDIffFlag, // identifier index of diffuse and beam SW radiation
-		FArray2A< Real64 > CFSAbs // absorbed beam solar radiation by layers fraction
+		Array2A< Real64 > CFSAbs // absorbed beam solar radiation by layers fraction
 	)
 	{
 
@@ -9226,7 +9226,7 @@ namespace WindowEquivalentLayer {
 		Real64 ProfAngVer; // Solar profile angle (radians) for vertical blind
 		Real64 IncAng; // incident angle degree
 		Real64 IncidAngle; // = ACOS(SOLCOS(3))
-		static FArray2D< Real64 > Abs1( CFSMAXNL+1, 2 );
+		static Array2D< Real64 > Abs1( CFSMAXNL+1, 2 );
 		int Lay; // window layer index
 		int EQLNum; // equivalent layer window construction index
 		int ConstrNum; // construction index

@@ -2,7 +2,7 @@
 #define ZonePlenum_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -21,8 +21,8 @@ namespace ZonePlenum {
 	extern int NumZonePlenums; // The Number of ZonePlenums found in the Input
 	extern int NumZoneReturnPlenums; // The Number of ZoneReturnPlenums found in the Input
 	extern int NumZoneSupplyPlenums; // The Number of ZoneSupplyPlenums found in the Input
-	extern FArray1D_bool CheckRetEquipName;
-	extern FArray1D_bool CheckSupEquipName;
+	extern Array1D_bool CheckRetEquipName;
+	extern Array1D_bool CheckSupEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ZONEPLENUM
 
@@ -48,27 +48,27 @@ namespace ZonePlenum {
 		Real64 OutletMassFlowRateMaxAvail; // [kg/Sec]
 		Real64 OutletMassFlowRateMinAvail; // [kg/Sec]
 		int NumInducedNodes;
-		FArray1D_int InducedNode;
-		FArray1D< Real64 > InducedMassFlowRate;
-		FArray1D< Real64 > InducedMassFlowRateMaxAvail;
-		FArray1D< Real64 > InducedMassFlowRateMinAvail;
-		FArray1D< Real64 > InducedTemp;
-		FArray1D< Real64 > InducedHumRat;
-		FArray1D< Real64 > InducedEnthalpy;
-		FArray1D< Real64 > InducedPressure;
+		Array1D_int InducedNode;
+		Array1D< Real64 > InducedMassFlowRate;
+		Array1D< Real64 > InducedMassFlowRateMaxAvail;
+		Array1D< Real64 > InducedMassFlowRateMinAvail;
+		Array1D< Real64 > InducedTemp;
+		Array1D< Real64 > InducedHumRat;
+		Array1D< Real64 > InducedEnthalpy;
+		Array1D< Real64 > InducedPressure;
 		bool InitFlag;
 		int NumInletNodes;
-		FArray1D_int InletNode;
-		FArray1D< Real64 > InletMassFlowRate;
-		FArray1D< Real64 > InletMassFlowRateMaxAvail;
-		FArray1D< Real64 > InletMassFlowRateMinAvail;
-		FArray1D< Real64 > InletTemp;
-		FArray1D< Real64 > InletHumRat;
-		FArray1D< Real64 > InletEnthalpy;
-		FArray1D< Real64 > InletPressure;
-		FArray1D_int ADUIndex; // index to AirDistUnit leaking to this plenum
+		Array1D_int InletNode;
+		Array1D< Real64 > InletMassFlowRate;
+		Array1D< Real64 > InletMassFlowRateMaxAvail;
+		Array1D< Real64 > InletMassFlowRateMinAvail;
+		Array1D< Real64 > InletTemp;
+		Array1D< Real64 > InletHumRat;
+		Array1D< Real64 > InletEnthalpy;
+		Array1D< Real64 > InletPressure;
+		Array1D_int ADUIndex; // index to AirDistUnit leaking to this plenum
 		int NumADUs; // number of ADU's that can leak to this plenum
-		FArray1D_int ZoneEqNum; // list of zone equip config indices for this plenum
+		Array1D_int ZoneEqNum; // list of zone equip config indices for this plenum
 
 		// Default Constructor
 		ZoneReturnPlenumConditions() :
@@ -109,27 +109,27 @@ namespace ZonePlenum {
 			Real64 const OutletMassFlowRateMaxAvail, // [kg/Sec]
 			Real64 const OutletMassFlowRateMinAvail, // [kg/Sec]
 			int const NumInducedNodes,
-			FArray1_int const & InducedNode,
-			FArray1< Real64 > const & InducedMassFlowRate,
-			FArray1< Real64 > const & InducedMassFlowRateMaxAvail,
-			FArray1< Real64 > const & InducedMassFlowRateMinAvail,
-			FArray1< Real64 > const & InducedTemp,
-			FArray1< Real64 > const & InducedHumRat,
-			FArray1< Real64 > const & InducedEnthalpy,
-			FArray1< Real64 > const & InducedPressure,
+			Array1_int const & InducedNode,
+			Array1< Real64 > const & InducedMassFlowRate,
+			Array1< Real64 > const & InducedMassFlowRateMaxAvail,
+			Array1< Real64 > const & InducedMassFlowRateMinAvail,
+			Array1< Real64 > const & InducedTemp,
+			Array1< Real64 > const & InducedHumRat,
+			Array1< Real64 > const & InducedEnthalpy,
+			Array1< Real64 > const & InducedPressure,
 			bool const InitFlag,
 			int const NumInletNodes,
-			FArray1_int const & InletNode,
-			FArray1< Real64 > const & InletMassFlowRate,
-			FArray1< Real64 > const & InletMassFlowRateMaxAvail,
-			FArray1< Real64 > const & InletMassFlowRateMinAvail,
-			FArray1< Real64 > const & InletTemp,
-			FArray1< Real64 > const & InletHumRat,
-			FArray1< Real64 > const & InletEnthalpy,
-			FArray1< Real64 > const & InletPressure,
-			FArray1_int const & ADUIndex, // index to AirDistUnit leaking to this plenum
+			Array1_int const & InletNode,
+			Array1< Real64 > const & InletMassFlowRate,
+			Array1< Real64 > const & InletMassFlowRateMaxAvail,
+			Array1< Real64 > const & InletMassFlowRateMinAvail,
+			Array1< Real64 > const & InletTemp,
+			Array1< Real64 > const & InletHumRat,
+			Array1< Real64 > const & InletEnthalpy,
+			Array1< Real64 > const & InletPressure,
+			Array1_int const & ADUIndex, // index to AirDistUnit leaking to this plenum
 			int const NumADUs, // number of ADU's that can leak to this plenum
-			FArray1_int const & ZoneEqNum // list of zone equip config indices for this plenum
+			Array1_int const & ZoneEqNum // list of zone equip config indices for this plenum
 		) :
 			ZonePlenumName( ZonePlenumName ),
 			ZoneName( ZoneName ),
@@ -194,14 +194,14 @@ namespace ZonePlenum {
 		Real64 InletMassFlowRateMinAvail; // [kg/Sec]
 		bool InitFlag;
 		int NumOutletNodes;
-		FArray1D_int OutletNode;
-		FArray1D< Real64 > OutletMassFlowRate;
-		FArray1D< Real64 > OutletMassFlowRateMaxAvail;
-		FArray1D< Real64 > OutletMassFlowRateMinAvail;
-		FArray1D< Real64 > OutletTemp;
-		FArray1D< Real64 > OutletHumRat;
-		FArray1D< Real64 > OutletEnthalpy;
-		FArray1D< Real64 > OutletPressure;
+		Array1D_int OutletNode;
+		Array1D< Real64 > OutletMassFlowRate;
+		Array1D< Real64 > OutletMassFlowRateMaxAvail;
+		Array1D< Real64 > OutletMassFlowRateMinAvail;
+		Array1D< Real64 > OutletTemp;
+		Array1D< Real64 > OutletHumRat;
+		Array1D< Real64 > OutletEnthalpy;
+		Array1D< Real64 > OutletPressure;
 
 		// Default Constructor
 		ZoneSupplyPlenumConditions() :
@@ -242,14 +242,14 @@ namespace ZonePlenum {
 			Real64 const InletMassFlowRateMinAvail, // [kg/Sec]
 			bool const InitFlag,
 			int const NumOutletNodes,
-			FArray1_int const & OutletNode,
-			FArray1< Real64 > const & OutletMassFlowRate,
-			FArray1< Real64 > const & OutletMassFlowRateMaxAvail,
-			FArray1< Real64 > const & OutletMassFlowRateMinAvail,
-			FArray1< Real64 > const & OutletTemp,
-			FArray1< Real64 > const & OutletHumRat,
-			FArray1< Real64 > const & OutletEnthalpy,
-			FArray1< Real64 > const & OutletPressure
+			Array1_int const & OutletNode,
+			Array1< Real64 > const & OutletMassFlowRate,
+			Array1< Real64 > const & OutletMassFlowRateMaxAvail,
+			Array1< Real64 > const & OutletMassFlowRateMinAvail,
+			Array1< Real64 > const & OutletTemp,
+			Array1< Real64 > const & OutletHumRat,
+			Array1< Real64 > const & OutletEnthalpy,
+			Array1< Real64 > const & OutletPressure
 		) :
 			ZonePlenumName( ZonePlenumName ),
 			ZoneName( ZoneName ),
@@ -282,8 +282,8 @@ namespace ZonePlenum {
 	};
 
 	// Object Data
-	extern FArray1D< ZoneReturnPlenumConditions > ZoneRetPlenCond;
-	extern FArray1D< ZoneSupplyPlenumConditions > ZoneSupPlenCond;
+	extern Array1D< ZoneReturnPlenumConditions > ZoneRetPlenCond;
+	extern Array1D< ZoneSupplyPlenumConditions > ZoneSupPlenCond;
 
 	// Functions
 

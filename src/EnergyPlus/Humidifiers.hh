@@ -2,7 +2,7 @@
 #define Humidifiers_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -18,14 +18,14 @@ namespace Humidifiers {
 	// MODULE PARAMETER DEFINITIONS
 	extern int const Humidifier_Steam_Electric;
 
-	extern FArray1D_string const HumidifierType;
+	extern Array1D_string const HumidifierType;
 
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
 	extern int NumHumidifiers; // number of humidifiers of all types
 	extern int NumElecSteamHums; // number of electric steam humidifiers
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -178,7 +178,7 @@ namespace Humidifiers {
 	};
 
 	// Object Data
-	extern FArray1D< HumidifierData > Humidifier;
+	extern Array1D< HumidifierData > Humidifier;
 
 	// Functions
 

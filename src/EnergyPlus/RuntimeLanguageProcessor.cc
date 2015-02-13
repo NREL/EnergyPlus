@@ -4,9 +4,9 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/char.functions.hh>
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArrayS.functions.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/ArrayS.functions.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/random.hh>
@@ -95,8 +95,8 @@ namespace RuntimeLanguageProcessor {
 	int OffVariableNum( 0 );
 	int OnVariableNum( 0 );
 	int PiVariableNum( 0 );
-	FArray1D_int CurveIndexVariableNums;
-	FArray1D_int ConstructionIndexVariableNums;
+	Array1D_int CurveIndexVariableNums;
+	Array1D_int ConstructionIndexVariableNums;
 	int YearVariableNum( 0 );
 	int MonthVariableNum( 0 );
 	int DayOfMonthVariableNum( 0 );
@@ -121,7 +121,7 @@ namespace RuntimeLanguageProcessor {
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
-	FArray1D< RuntimeReportVarType > RuntimeReportVar;
+	Array1D< RuntimeReportVarType > RuntimeReportVar;
 
 	// MODULE SUBROUTINES:
 
@@ -168,7 +168,7 @@ namespace RuntimeLanguageProcessor {
 		static Real64 tmpMinutes( 0.0 );
 		static Real64 tmpHours( 0.0 );
 		static Real64 tmpCurEnvirNum( 0.0 );
-		FArray1D_int datevalues( 8 );
+		Array1D_int datevalues( 8 );
 		//value(1)   Current year
 		//value(2)   Current month
 		//value(3)   Current day
@@ -217,7 +217,7 @@ namespace RuntimeLanguageProcessor {
 
 			GetRuntimeLanguageUserInput(); // Load and parse all runtime language objects
 
-			date_and_time_string( datestring, _, _, datevalues );
+			date_and_time( datestring, _, _, datevalues );
 			if ( datestring != "" ) {
 				ErlVariable( ActualDateAndTimeNum ).Value = SetErlValueNumber( double( sum( datevalues ) ) );
 				//datevalues(1)+datevalues(2)+datevalues(3)+  &
@@ -421,14 +421,14 @@ namespace RuntimeLanguageProcessor {
 		int InstructionNum;
 		int InstructionNum2;
 		int GotoNum;
-		FArray1D_int SavedIfInstructionNum( IfDepthAllowed ); // index is depth of If statements
-		FArray2D_int SavedGotoInstructionNum( IfDepthAllowed, ELSEIFLengthAllowed );
-		FArray1D_int NumGotos( IfDepthAllowed ); // index is depth of If statements,
+		Array1D_int SavedIfInstructionNum( IfDepthAllowed ); // index is depth of If statements
+		Array2D_int SavedGotoInstructionNum( IfDepthAllowed, ELSEIFLengthAllowed );
+		Array1D_int NumGotos( IfDepthAllowed ); // index is depth of If statements,
 		int SavedWhileInstructionNum;
 		int SavedWhileExpressionNum;
 		int NumWhileGotos;
-		FArray1D_bool ReadyForElse( IfDepthAllowed );
-		FArray1D_bool ReadyForEndif( IfDepthAllowed );
+		Array1D_bool ReadyForElse( IfDepthAllowed );
+		Array1D_bool ReadyForEndif( IfDepthAllowed );
 
 		//  CHARACTER(len=2*MaxNameLength), DIMENSION(:), ALLOCATABLE :: DummyError
 
@@ -1080,7 +1080,7 @@ namespace RuntimeLanguageProcessor {
 		bool LastED; // last character in a numeric was an E or D
 
 		// Object Data
-		static FArray1D< TokenType > Token;
+		static Array1D< TokenType > Token;
 
 		// FLOW:
 		CountDoLooping = 0;
@@ -1618,7 +1618,7 @@ namespace RuntimeLanguageProcessor {
 
 	int
 	ProcessTokens(
-		FArray1S< TokenType > const TokenIN,
+		Array1S< TokenType > const TokenIN,
 		int const NumTokensIN,
 		int const StackNum,
 		std::string const & ParsingString
@@ -1666,8 +1666,8 @@ namespace RuntimeLanguageProcessor {
 		int i;
 
 		// Object Data
-		FArray1D< TokenType > Token( TokenIN );
-		FArray1D< TokenType > SubTokenList;
+		Array1D< TokenType > Token( TokenIN );
+		Array1D< TokenType > SubTokenList;
 
 		// FLOW:
 		ExpressionNum = 0;
@@ -1968,7 +1968,7 @@ namespace RuntimeLanguageProcessor {
 		int OperandNum;
 		int SeedElementInt;
 		int SeedN; // number of digits in the number used to seed the generator
-		FArray1D_int SeedIntARR; // local temporary for random seed
+		Array1D_int SeedIntARR; // local temporary for random seed
 		int Pos; // local temporary for string position.
 		Real64 tmpRANDU1; // local temporary for uniform random number
 		Real64 tmpRANDU2; // local temporary for uniform random number
@@ -1977,7 +1977,7 @@ namespace RuntimeLanguageProcessor {
 		Real64 TestValue; // local temporary
 
 		// Object Data
-		FArray1D< ErlValueType > Operand;
+		Array1D< ErlValueType > Operand;
 
 		static std::string const EMSBuiltInFunction( "EMS Built-In Function" );
 
@@ -2498,12 +2498,12 @@ namespace RuntimeLanguageProcessor {
 		static int MaxNumAlphas( 0 ); // argument for call to GetObjectDefMaxArgs
 		static int MaxNumNumbers( 0 ); // argument for call to GetObjectDefMaxArgs
 		static int TotalArgs( 0 ); // argument for call to GetObjectDefMaxArgs
-		FArray1D_string cAlphaFieldNames;
-		FArray1D_string cNumericFieldNames;
-		FArray1D_bool lNumericFieldBlanks;
-		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_string cAlphaArgs;
-		FArray1D< Real64 > rNumericArgs;
+		Array1D_string cAlphaFieldNames;
+		Array1D_string cNumericFieldNames;
+		Array1D_bool lNumericFieldBlanks;
+		Array1D_bool lAlphaFieldBlanks;
+		Array1D_string cAlphaArgs;
+		Array1D< Real64 > rNumericArgs;
 		std::string cCurrentModuleObject;
 		int ConstructNum;
 		bool errFlag;

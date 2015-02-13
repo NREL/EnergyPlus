@@ -2,7 +2,7 @@
 #define FaultsManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -52,7 +52,7 @@ namespace FaultsManager {
 	//  10. Meter: air flow, water flow
 	//  11. CO2 sensor
 	//  12. more
-	extern FArray1D_string const cFaults;
+	extern Array1D_string const cFaults;
 	//      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
 	//      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
 	//      'FaultModel:TemperatureSensorOffset:ZoneAir   ', &
@@ -64,7 +64,7 @@ namespace FaultsManager {
 	//      'FaultModel:DamperLeakage:ReturnAir           ', &
 	//      'FaultModel:DamperLeakage:OutdoorAir          ' /)
 
-	extern FArray1D_int const iFaultTypeEnums;
+	extern Array1D_int const iFaultTypeEnums;
 
 	extern bool AnyFaultsInModel; // True if there are operationla faults in the model
 	extern int NumFaults; // Number of faults (include multiple faults of same type) in the model
@@ -167,8 +167,8 @@ namespace FaultsManager {
 	};
 
 	// Object Data
-	extern FArray1D< FaultProperties > Faults;
-	extern FArray1D< FaultProperties > FouledCoils;
+	extern Array1D< FaultProperties > Faults;
+	extern Array1D< FaultProperties > FouledCoils;
 
 	// Functions
 

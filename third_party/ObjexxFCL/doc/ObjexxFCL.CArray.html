@@ -5,7 +5,7 @@
 	<title>ObjexxFCL Users Guide: CArray</title>
 	<meta name="description" content="Objexx Fortran Compatibility Library">
 	<meta name="keywords" content="ObjexxFCL, Fortran-to-C++, F2C++, F2Cpp, F2Cxx, F2C, Fortran, C++, array library">
-	<meta name="copyright" content="Copyright 2000-2014 Objexx Engineering, Inc. All rights reserved.">
+	<meta name="copyright" content="Copyright 2000-2015 Objexx Engineering, Inc. All rights reserved.">
 	<link rel="icon" href="favicon.ico" type="image/x-icon">
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 	<link rel="stylesheet" href="styles/Objexx.css" type="text/css">
@@ -53,12 +53,12 @@
 				<li>Index and iterator based element access are supported.</li>
 				<li>0-based subscripting is provided by the [] operator, as in v[ i ].</li>
 				<li>1-based subscripting is provided by the () operator, as in v( i ).</li>
-				<li>Subscripting does bounds checking in debug builds. </li>
+				<li>Subscripting does bounds checking in debug builds.</li>
 				<li>Array size and indexing types are std::size_t so very large arrays are supported on 64-bit platforms where std::size_t is a 64-bit unsigned integer.</li>
 			</ul>
-			<p> Shorthand (typedef) names are provided for the common value header so, for example, we use <span class="source">CArray_int</span> instead of <span class="source">CArray&lt; int &gt;</span> on this page.</p>
+			<p class="body">Shorthand (typedef) names are provided for the common value header so, for example, we use <span class="source">CArray_int</span> instead of <span class="source">CArray&lt; int &gt;</span> on this page.</p>
 			<h2 class="h3">Construction</h2>
-			<p class="body">CArrays are created in a straightforward fashion: </p>
+			<p class="body">CArrays are created in a straightforward fashion:</p>
 			<table border="1" cellspacing="0" cellpadding="12">
 				<tr>
 					<td bgcolor="#F7F4F7"><pre>
@@ -67,8 +67,8 @@ CArray_int v( n ); // Elements are uninitialized
 CArray_int w( n, 0 ); // Initialize elements to 0</pre></td>
 				</tr>
 			</table>
-			<p class="body">The first constructor shown does not initialize the elements of built-in types such as int and float, for efficiency when constructing very large arrays that will be initialized after construction. </p>
-			<p class="body">CArrays can be constructed from C arrays and a length: </p>
+			<p class="body">The first constructor shown does not initialize the elements of built-in types such as int and float, for efficiency when constructing very large arrays that will be initialized after construction.</p>
+			<p class="body">CArrays can be constructed from C arrays and a length:</p>
 			<table border="1" cellspacing="0" cellpadding="12">
 				<tr>
 					<td bgcolor="#F7F4F7"><pre>int * s = new int[ n ];
@@ -111,7 +111,7 @@ int j = v( 1 ); // First element</pre></td>
 				</tr>
 			</table>
 			<p class="body">Subscripting accesses to a CArray's elements are bounds-checked via assertions in a debug build.</p>
-			<p class="h3">Front and Back Elements </p>
+			<p class="h3">Front and Back Elements</p>
 			<p class="body">The first and last elements of a CArray elements can be read or write accessed with the STL-compatible <span class="source">front</span> and <span class="source">back</span> functions:</p>
 			<table border="1" cellspacing="0" cellpadding="12">
 				<tr>
@@ -147,7 +147,7 @@ v += 4.2; // Now all elements are 127</pre></td>
 					<td bgcolor="#F7F4F7"><pre>v.assign( s.begin(), s.end() );</pre></td>
 				</tr>
 			</table>
-			<p>or assigning a specified number of uniform-value elements: </p>
+			<p>or assigning a specified number of uniform-value elements:</p>
 			<table border="1" cellspacing="0" cellpadding="12">
 				<tr>
 					<td bgcolor="#F7F4F7"><pre>v.assign( 1000, 123 ); // 1000 elements with value 123</pre></td>
@@ -156,13 +156,13 @@ v += 4.2; // Now all elements are 127</pre></td>
 			<h2 class="h3">Comparison</h2>
 			<p class="body">CArrays can be compared with CArrays and uniform values using the operators { ==,  !=, &lt;, &lt;=, &gt;=, &gt; }.</p>
 			<h2 class="h3">Resizing</h2>
-			<p class="body">CArrays can be resized with the <span class="source">size</span> and <span class="source">resize </span>functions. The <span class="source">resize</span> function preserves the values of the array that fit within the new size range and sets any new values to a specified fill value that defaults to the default-constructed value of the value type. If the values do not need to be preserved the <span class="source">size</span> function is more efficient. </p>
+			<p class="body">CArrays can be resized with the <span class="source">size</span> and <span class="source">resize</span> functions. The <span class="source">resize</span> function preserves the values of the array that fit within the new size range and sets any new values to a specified fill value that defaults to the default-constructed value of the value type. If the values do not need to be preserved the <span class="source">size</span> function is more efficient.</p>
 			<h2 class="h3">Special Functions</h2>
-			<p class="body">CArrays can be reset to a default-constructed state with the <span class="source">clear</span> member function. Two CArrays can efficiently swap their contents with the <span class="source">swap</span> member and free functions. CArrays have <span class="source">length</span> and <span class="source">length_squared</span> member functions to compute their L<sub>2</sub> length and squared length and the <span class="source">normalize</span> function to normalize the array to unit length. The <span class="source">dot_product</span> function computes the dot (inner) product of two CArrays. The <span class="source">distance</span> and <span class="source">distance_squared</span> functions compute the L<sub>2 </sub>distance and squared distance between two CArrays.</p>
+			<p class="body">CArrays can be reset to a default-constructed state with the <span class="source">clear</span> member function. Two CArrays can efficiently swap their contents with the <span class="source">swap</span> member and free functions. CArrays have <span class="source">length</span> and <span class="source">length_squared</span> member functions to compute their L<sub>2</sub> length and squared length and the <span class="source">normalize</span> function to normalize the array to unit length. The <span class="source">dot_product</span> function computes the dot (inner) product of two CArrays. The <span class="source">distance</span> and <span class="source">distance_squared</span> functions compute the L<sub>2</sub> distance and squared distance between two CArrays.</p>
 			<h2 class="h3">Debugging</h2>
 			<p class="body">For  performance, CArray doesn't check for bounds errors in release builds (when NDEBUG is defined). It is therefore important to test assertion-enabled debug builds of code using CArrays.</p>
 			<h2 class="h3">Output</h2>
-			<p class="body">A stream output operator is provided in CArray.io.hh.</p>
+			<p class="body">A stream input and output operators are provided.</p>
 		</td>
 		<td></td>
 		<td width="100%" valign="top">
@@ -188,7 +188,7 @@ v += 4.2; // Now all elements are 127</pre></td>
 		<td height="21"></td>
 		<td></td>
 		<td></td>
-		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2014 Objexx Engineering, Inc. All Rights Reserved.</td>
+		<td colspan="3" valign="bottom" class="footer_text">Copyright &copy; 2000-2015 Objexx Engineering, Inc. All Rights Reserved.</td>
 		<td></td>
 	</tr>
 	<tr>

@@ -2,8 +2,8 @@
 #define SQLiteProcedures_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -117,16 +117,16 @@ public:
 		int const dayOfMonth,
 		int const hourOfDay,
 		int const nX,
-		FArray1< Real64 > const & x,
+		Array1< Real64 > const & x,
 		int const nY,
-		FArray1< Real64 > const & y,
-		FArray2< Real64 > const & illuminance
+		Array1< Real64 > const & y,
+		Array2< Real64 > const & illuminance
 	);
 
 	void createSQLiteTabularDataRecords(
-		FArray2D_string const & body, // row,column
-		FArray1D_string const & rowLabels,
-		FArray1D_string const & columnLabels,
+		Array2D_string const & body, // row,column
+		Array1D_string const & rowLabels,
+		Array1D_string const & columnLabels,
 		std::string const & ReportName,
 		std::string const & ReportForString,
 		std::string const & TableName

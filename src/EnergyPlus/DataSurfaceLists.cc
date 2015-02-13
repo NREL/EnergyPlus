@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <DataSurfaceLists.hh>
@@ -57,8 +57,8 @@ namespace DataSurfaceLists {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaceLists
 
 	// Object Data
-	FArray1D< SurfaceListData > SurfList;
-	FArray1D< SlabListData > SlabList;
+	Array1D< SurfaceListData > SurfList;
+	Array1D< SlabListData > SlabList;
 
 	// Functions
 
@@ -110,21 +110,21 @@ namespace DataSurfaceLists {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string Alphas; // Alpha items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
+		Array1D_string Alphas; // Alpha items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
 		int MaxAlphas; // Maximum number of alphas for these input keywords
 		int MaxNumbers; // Maximum number of numbers for these input keywords
 		int NameConflict; // Used to see if a surface name matches the name of a surface list (not allowed)
-		FArray1D< Real64 > Numbers; // Numeric items for object
+		Array1D< Real64 > Numbers; // Numeric items for object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumArgs; // Unused variable that is part of a subroutine call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		Real64 SumOfAllFractions; // Summation of all of the fractions for splitting flow (must sum to 1)
 		int SurfNum; // DO loop counter for surfaces
 		int ZoneForSurface; // Zone number that a particular surface is attached to
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		int Item;
 		bool ErrorsFound;
 		int IOStatus;

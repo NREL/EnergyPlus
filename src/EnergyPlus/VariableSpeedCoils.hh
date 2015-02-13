@@ -2,7 +2,7 @@
 #define VariableSpeedCoils_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -183,42 +183,42 @@ namespace VariableSpeedCoils {
 		int CompanionHeatingCoilNum; // Cooling coil companion heating coil index
 		Real64 FanDelayTime; // Fan delay time, time delay for the HP's fan to
 		// beginning for multispeed coil type
-		FArray1D_int MSErrIndex; // index flag for num speeds/recurring messages
-		FArray1D< Real64 > MSRatedPercentTotCap; // Percentage to the total cooling capacity for MS heat pump at the highest speed [dimensionless]
-		FArray1D< Real64 > MSRatedTotCap; // Rated cooling capacity for MS heat pump [W]
-		FArray1D< Real64 > MSRatedSHR; // Rated SHR for MS heat pump [dimensionless]
-		FArray1D< Real64 > MSRatedCOP; // Rated COP for MS heat pump [dimensionless]
-		FArray1D< Real64 > MSRatedAirVolFlowPerRatedTotCap;
+		Array1D_int MSErrIndex; // index flag for num speeds/recurring messages
+		Array1D< Real64 > MSRatedPercentTotCap; // Percentage to the total cooling capacity for MS heat pump at the highest speed [dimensionless]
+		Array1D< Real64 > MSRatedTotCap; // Rated cooling capacity for MS heat pump [W]
+		Array1D< Real64 > MSRatedSHR; // Rated SHR for MS heat pump [dimensionless]
+		Array1D< Real64 > MSRatedCOP; // Rated COP for MS heat pump [dimensionless]
+		Array1D< Real64 > MSRatedAirVolFlowPerRatedTotCap;
 		// Rated Air volume flow rate per total capacity through unit at rated conditions [m^3/w]
-		FArray1D< Real64 > MSRatedAirVolFlowRate;
+		Array1D< Real64 > MSRatedAirVolFlowRate;
 		// Air volume flow rate through unit at rated conditions [m3/s]
-		FArray1D< Real64 > MSRatedAirMassFlowRate;
+		Array1D< Real64 > MSRatedAirMassFlowRate;
 		// Air mass flow rate through unit at rated conditions [kg/s]
-		FArray1D< Real64 > MSRatedWaterVolFlowPerRatedTotCap;
+		Array1D< Real64 > MSRatedWaterVolFlowPerRatedTotCap;
 		// Rated water volume flow rate per total  capacity through unit at rated conditions [m^3/w]
-		FArray1D< Real64 > MSRatedWaterVolFlowRate;
+		Array1D< Real64 > MSRatedWaterVolFlowRate;
 		// Water volume flow rate through unit at rated conditions [m3/s]
-		FArray1D< Real64 > MSRatedWaterMassFlowRate;
+		Array1D< Real64 > MSRatedWaterMassFlowRate;
 		// Water mass flow rate through unit at rated conditions [kg/s]
-		FArray1D< Real64 > MSRatedCBF;
+		Array1D< Real64 > MSRatedCBF;
 		// rated coil bypass factor
-		FArray1D< Real64 > MSEffectiveAo;
+		Array1D< Real64 > MSEffectiveAo;
 		// effective heat transfer surface at each speed
-		FArray1D_int MSCCapFTemp;
+		Array1D_int MSCCapFTemp;
 		// index of total capacity modifier curve
-		FArray1D_int MSCCapAirFFlow;
+		Array1D_int MSCCapAirFFlow;
 		// index of total capacity modifier curve as a function of air flow
-		FArray1D_int MSCCapWaterFFlow;
+		Array1D_int MSCCapWaterFFlow;
 		// index of total capacity modifier curve as a function of water flow
-		FArray1D_int MSEIRFTemp;
+		Array1D_int MSEIRFTemp;
 		// index of energy input ratio modifier curve as a function of temperature
-		FArray1D_int MSEIRAirFFlow;
+		Array1D_int MSEIRAirFFlow;
 		// index of energy input ratio modifier curve as a function of air flow fraction
-		FArray1D_int MSEIRWaterFFlow;
+		Array1D_int MSEIRWaterFFlow;
 		// index of energy input ratio modifier curve as a function of water flow fraction
-		FArray1D_int MSWasteHeat;
+		Array1D_int MSWasteHeat;
 		// index of waste heat as a function of temperature
-		FArray1D< Real64 > MSWasteHeatFrac;
+		Array1D< Real64 > MSWasteHeatFrac;
 		// Waste heat fraction
 		Real64 SpeedNumReport;
 		//speed number for output
@@ -265,11 +265,11 @@ namespace VariableSpeedCoils {
 		Real64 BasinHeaterSetPointTemp; // setpoint temperature for basin heater operation (C)
 		Real64 BasinHeaterPower; // Basin heater power (W)
 		int BasinHeaterSchedulePtr; // Pointer to basin heater schedule
-		FArray1D< Real64 > EvapCondAirFlow; // Air flow rate through the evap condenser at high speed, volumetric flow rate
+		Array1D< Real64 > EvapCondAirFlow; // Air flow rate through the evap condenser at high speed, volumetric flow rate
 		// for water use calcs [m3/s]
-		FArray1D< Real64 > EvapCondEffect; // effectiveness of the evaporatively cooled condenser
+		Array1D< Real64 > EvapCondEffect; // effectiveness of the evaporatively cooled condenser
 		// [high speed for multi-speed unit] (-)
-		FArray1D< Real64 > MSRatedEvapCondVolFlowPerRatedTotCap; // evap condenser air flow ratio to capacity
+		Array1D< Real64 > MSRatedEvapCondVolFlowPerRatedTotCap; // evap condenser air flow ratio to capacity
 		//begin variables for Water System interactions
 		int EvapWaterSupplyMode; // where does water come from
 		std::string EvapWaterSupplyName; // name of water source e.g. water storage tank
@@ -496,27 +496,27 @@ namespace VariableSpeedCoils {
 			int const CompanionCoolingCoilNum, // Heating coil companion cooling coil index
 			int const CompanionHeatingCoilNum, // Cooling coil companion heating coil index
 			Real64 const FanDelayTime, // Fan delay time, time delay for the HP's fan to
-			FArray1_int const & MSErrIndex, // index flag for num speeds/recurring messages
-			FArray1< Real64 > const & MSRatedPercentTotCap, // Percentage to the total cooling capacity for MS heat pump at the highest speed [dimensionless]
-			FArray1< Real64 > const & MSRatedTotCap, // Rated cooling capacity for MS heat pump [W]
-			FArray1< Real64 > const & MSRatedSHR, // Rated SHR for MS heat pump [dimensionless]
-			FArray1< Real64 > const & MSRatedCOP, // Rated COP for MS heat pump [dimensionless]
-			FArray1< Real64 > const & MSRatedAirVolFlowPerRatedTotCap,
-			FArray1< Real64 > const & MSRatedAirVolFlowRate,
-			FArray1< Real64 > const & MSRatedAirMassFlowRate,
-			FArray1< Real64 > const & MSRatedWaterVolFlowPerRatedTotCap,
-			FArray1< Real64 > const & MSRatedWaterVolFlowRate,
-			FArray1< Real64 > const & MSRatedWaterMassFlowRate,
-			FArray1< Real64 > const & MSRatedCBF,
-			FArray1< Real64 > const & MSEffectiveAo,
-			FArray1_int const & MSCCapFTemp,
-			FArray1_int const & MSCCapAirFFlow,
-			FArray1_int const & MSCCapWaterFFlow,
-			FArray1_int const & MSEIRFTemp,
-			FArray1_int const & MSEIRAirFFlow,
-			FArray1_int const & MSEIRWaterFFlow,
-			FArray1_int const & MSWasteHeat,
-			FArray1< Real64 > const & MSWasteHeatFrac,
+			Array1_int const & MSErrIndex, // index flag for num speeds/recurring messages
+			Array1< Real64 > const & MSRatedPercentTotCap, // Percentage to the total cooling capacity for MS heat pump at the highest speed [dimensionless]
+			Array1< Real64 > const & MSRatedTotCap, // Rated cooling capacity for MS heat pump [W]
+			Array1< Real64 > const & MSRatedSHR, // Rated SHR for MS heat pump [dimensionless]
+			Array1< Real64 > const & MSRatedCOP, // Rated COP for MS heat pump [dimensionless]
+			Array1< Real64 > const & MSRatedAirVolFlowPerRatedTotCap,
+			Array1< Real64 > const & MSRatedAirVolFlowRate,
+			Array1< Real64 > const & MSRatedAirMassFlowRate,
+			Array1< Real64 > const & MSRatedWaterVolFlowPerRatedTotCap,
+			Array1< Real64 > const & MSRatedWaterVolFlowRate,
+			Array1< Real64 > const & MSRatedWaterMassFlowRate,
+			Array1< Real64 > const & MSRatedCBF,
+			Array1< Real64 > const & MSEffectiveAo,
+			Array1_int const & MSCCapFTemp,
+			Array1_int const & MSCCapAirFFlow,
+			Array1_int const & MSCCapWaterFFlow,
+			Array1_int const & MSEIRFTemp,
+			Array1_int const & MSEIRAirFFlow,
+			Array1_int const & MSEIRWaterFFlow,
+			Array1_int const & MSWasteHeat,
+			Array1< Real64 > const & MSWasteHeatFrac,
 			Real64 const SpeedNumReport,
 			Real64 const SpeedRatioReport,
 			int const DefrostStrategy, // defrost strategy; 1=reverse-cycle, 2=resistive
@@ -551,9 +551,9 @@ namespace VariableSpeedCoils {
 			Real64 const BasinHeaterSetPointTemp, // setpoint temperature for basin heater operation (C)
 			Real64 const BasinHeaterPower, // Basin heater power (W)
 			int const BasinHeaterSchedulePtr, // Pointer to basin heater schedule
-			FArray1< Real64 > const & EvapCondAirFlow, // Air flow rate through the evap condenser at high speed, volumetric flow rate
-			FArray1< Real64 > const & EvapCondEffect, // effectiveness of the evaporatively cooled condenser
-			FArray1< Real64 > const & MSRatedEvapCondVolFlowPerRatedTotCap, // evap condenser air flow ratio to capacity
+			Array1< Real64 > const & EvapCondAirFlow, // Air flow rate through the evap condenser at high speed, volumetric flow rate
+			Array1< Real64 > const & EvapCondEffect, // effectiveness of the evaporatively cooled condenser
+			Array1< Real64 > const & MSRatedEvapCondVolFlowPerRatedTotCap, // evap condenser air flow ratio to capacity
 			int const EvapWaterSupplyMode, // where does water come from
 			std::string const & EvapWaterSupplyName, // name of water source e.g. water storage tank
 			int const EvapWaterSupTankID,
@@ -714,7 +714,7 @@ namespace VariableSpeedCoils {
 	};
 
 	// Object Data
-	extern FArray1D< VariableSpeedCoilData > VarSpeedCoil;
+	extern Array1D< VariableSpeedCoilData > VarSpeedCoil;
 
 	// Functions
 

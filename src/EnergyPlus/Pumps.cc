@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -95,7 +95,7 @@ namespace Pumps {
 	int const PumpBank_VarSpeed( 104 );
 	std::string const cPumpBank_ConSpeed( "HeaderedPumps:ConstantSpeed" );
 	int const PumpBank_ConSpeed( 105 );
-	FArray1D_string const cPumpTypes( {101,105}, { cPump_VarSpeed, cPump_ConSpeed, cPump_Cond, cPumpBank_VarSpeed, cPumpBank_ConSpeed } );
+	Array1D_string const cPumpTypes( {101,105}, { cPump_VarSpeed, cPump_ConSpeed, cPump_Cond, cPumpBank_VarSpeed, cPumpBank_ConSpeed } );
 
 	static std::string const fluidNameSteam( "STEAM" );
 	static std::string const fluidNameWater( "WATER" );
@@ -120,8 +120,8 @@ namespace Pumps {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 
 	// Object Data
-	FArray1D< PumpSpecs > PumpEquip;
-	FArray1D< ReportVars > PumpEquipReport;
+	Array1D< PumpSpecs > PumpEquip;
+	Array1D< ReportVars > PumpEquipReport;
 
 	//*************************************************************************!
 
@@ -1581,7 +1581,7 @@ namespace Pumps {
 		}
 		// look for pump sizing factor on branch
 		if ( PumpEquip( PumpNum ).LoopNum > 0 ) {
-			SideLoop: for ( Side = 1; Side <= 2; ++Side ) {
+			for ( Side = 1; Side <= 2; ++Side ) {
 				for ( BranchNum = 1; BranchNum <= PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).TotalBranches; ++BranchNum ) {
 					for ( CompNum = 1; CompNum <= PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
 						if ( PumpEquip( PumpNum ).InletNodeNum == PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn && PumpEquip( PumpNum ).OutletNodeNum == PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).Branch( BranchNum ).Comp( CompNum ).NodeNumOut ) {
@@ -1594,7 +1594,6 @@ namespace Pumps {
 						}
 					}
 				}
-				SideLoop_loop: ;
 			}
 			SideLoop_exit: ;
 		}

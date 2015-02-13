@@ -4,7 +4,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -121,7 +121,7 @@ namespace HeatBalFiniteDiffManager {
 
 	int const CrankNicholsonSecondOrder( 1 ); // original CondFD scheme.  semi implicit, second order in time
 	int const FullyImplicitFirstOrder( 2 ); // fully implicit scheme, first order in time.
-	FArray1D_string const cCondFDSchemeType( 2, { "CrankNicholsonSecondOrder", "FullyImplicitFirstOrder" } );
+	Array1D_string const cCondFDSchemeType( 2, { "CrankNicholsonSecondOrder", "FullyImplicitFirstOrder" } );
 
 	Real64 const TempInitValue( 23.0 ); // Initialization value for Temperature
 	Real64 const RhovInitValue( 0.0115 ); // Initialization value for Rhov
@@ -139,14 +139,14 @@ namespace HeatBalFiniteDiffManager {
 	//REAL(r64) :: Tdryin   =0.0d0
 	//REAL(r64) :: RHOut    =0.0d0
 	//REAL(r64) :: RHIn     =0.0d0
-	FArray1D< Real64 > SigmaR; // Total Resistance of construction layers
-	FArray1D< Real64 > SigmaC; // Total Capacitance of construction layers
+	Array1D< Real64 > SigmaR; // Total Resistance of construction layers
+	Array1D< Real64 > SigmaC; // Total Capacitance of construction layers
 
 	//REAL(r64), ALLOCATABLE, DIMENSION(:)   :: WSurfIn         !Humidity Ratio of the inside surface for reporting
 	//REAL(r64), ALLOCATABLE, DIMENSION(:)   :: QMassInFlux     !MassFlux on Surface for reporting
 	//REAL(r64), ALLOCATABLE, DIMENSION(:)   :: QMassOutFlux    !MassFlux on Surface for reporting
-	FArray1D< Real64 > QHeatInFlux; // HeatFlux on Surface for reporting
-	FArray1D< Real64 > QHeatOutFlux; // HeatFlux on Surface for reporting
+	Array1D< Real64 > QHeatInFlux; // HeatFlux on Surface for reporting
+	Array1D< Real64 > QHeatOutFlux; // HeatFlux on Surface for reporting
 	//REAL(r64), ALLOCATABLE, DIMENSION(:)   :: QFluxZoneToInSurf !sum of Heat flows at the surface to air interface,
 	//                                 ! zone-side boundary conditions W/m2 before CR 8280 was not reported, but was calculated.
 	//REAL(r64), ALLOCATABLE, DIMENSION(:)   :: QFluxOutsideToOutSurf !sum of Heat flows at the surface to air interface, Out-side boundary conditions W/m2
@@ -177,9 +177,9 @@ namespace HeatBalFiniteDiffManager {
 	// Update Data Routine
 
 	// Object Data
-	FArray1D< ConstructionDataFD > ConstructFD;
-	FArray1D< SurfaceDataFD > SurfaceFD;
-	FArray1D< MaterialDataFD > MaterialFD;
+	Array1D< ConstructionDataFD > ConstructFD;
+	Array1D< SurfaceDataFD > SurfaceFD;
+	Array1D< MaterialDataFD > MaterialFD;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -287,12 +287,12 @@ namespace HeatBalFiniteDiffManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string MaterialNames( 3 ); // Number of Material Alpha names defined
-		FArray1D_string ConstructionName( 3 ); // Name of Construction with CondFDsimplified
+		Array1D_string MaterialNames( 3 ); // Number of Material Alpha names defined
+		Array1D_string ConstructionName( 3 ); // Name of Construction with CondFDsimplified
 		int MaterNum; // Counter to keep track of the material number
 		int MaterialNumAlpha; // Number of material alpha names being passed
 		int MaterialNumProp; // Number of material properties being passed
-		FArray1D< Real64 > MaterialProps( 40 ); // Temporary array to transfer material properties
+		Array1D< Real64 > MaterialProps( 40 ); // Temporary array to transfer material properties
 		static bool ErrorsFound( false ); // If errors detected in input
 		//  INTEGER :: CondFDMat                ! Number of variable property CondFD materials in input
 		int ConstructNumber; // Cconstruction with CondHBsimple to be overridden with CondHBdetailed
@@ -992,8 +992,8 @@ namespace HeatBalFiniteDiffManager {
 
 	void
 	relax_array(
-		FArray1< Real64 > & a, // Array to relax
-		FArray1< Real64 > const & b, // Array to relax towards
+		Array1< Real64 > & a, // Array to relax
+		Array1< Real64 > const & b, // Array to relax towards
 		Real64 const r // Relaxation factor [0-1]
 	)
 	{
@@ -1007,8 +1007,8 @@ namespace HeatBalFiniteDiffManager {
 
 	Real64
 	sum_array_diff(
-		FArray1< Real64 > const & a,
-		FArray1< Real64 > const & b
+		Array1< Real64 > const & a,
+		Array1< Real64 > const & b
 	)
 	{
 		assert( equal_dimensions( a, b ) );
@@ -1329,7 +1329,7 @@ namespace HeatBalFiniteDiffManager {
 
 	Real64
 	terpld(
-		FArray2< Real64 > const & a,
+		Array2< Real64 > const & a,
 		Real64 const x1,
 		int const nind,
 		int const ndep
@@ -1356,7 +1356,7 @@ namespace HeatBalFiniteDiffManager {
 		int const first( a.l1() );
 
 		assert( a.size() > 0u );
-		FArray2< Real64 >::size_type l( 1 );
+		Array2< Real64 >::size_type l( 1 );
 		Real64 r( a[ 0 ] );
 		int last( first );
 		for ( int i1 = first + 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
@@ -1366,8 +1366,8 @@ namespace HeatBalFiniteDiffManager {
 			}
 		}
 
-		FArray2< Real64 >::size_type lind( a.index( 0, nind ) );
-		FArray2< Real64 >::size_type ldep( a.index( 0, ndep ) );
+		Array2< Real64 >::size_type lind( a.index( 0, nind ) );
+		Array2< Real64 >::size_type ldep( a.index( 0, ndep ) );
 		if ( ( a.size1() == 1u ) || ( x1 <= a[ lind + first ] ) ) { // [ lind + first ] == ( first, nind )
 			return a[ ldep + first ]; // [ ldep + first ] == ( first, ndep )
 		} else if ( x1 >= a[ lind + last ] ) { // [ lind + last ] == ( last, nind )
@@ -1401,15 +1401,15 @@ namespace HeatBalFiniteDiffManager {
 		int const i, // Node Index
 		int const Lay, // Layer Number for Construction
 		int const Surf, // Surface number
-		FArray1< Real64 > const & T, // Old node Temperature in MFD finite difference solution
-		FArray1< Real64 > & TT, // New node Temperature in MFD finite difference solution.
-		FArray1< Real64 > const & Rhov, // MFD Nodal Vapor Density[kg/m3] and is the old or last time step result.
-		FArray1< Real64 > & RhoT, // MFD vapor density for the new time step.
-		FArray1< Real64 > & RH, // Nodal relative humidity
-		FArray1< Real64 > const & TD, // The old dry Temperature at each node for the CondFD algorithm..
-		FArray1< Real64 > & TDT, // The current or new Temperature at each node location for the CondFD solution..
-		FArray1< Real64 > & EnthOld, // Old Nodal enthalpy
-		FArray1< Real64 > & EnthNew, // New Nodal enthalpy
+		Array1< Real64 > const & T, // Old node Temperature in MFD finite difference solution
+		Array1< Real64 > & TT, // New node Temperature in MFD finite difference solution.
+		Array1< Real64 > const & Rhov, // MFD Nodal Vapor Density[kg/m3] and is the old or last time step result.
+		Array1< Real64 > & RhoT, // MFD vapor density for the new time step.
+		Array1< Real64 > & RH, // Nodal relative humidity
+		Array1< Real64 > const & TD, // The old dry Temperature at each node for the CondFD algorithm..
+		Array1< Real64 > & TDT, // The current or new Temperature at each node location for the CondFD solution..
+		Array1< Real64 > & EnthOld, // Old Nodal enthalpy
+		Array1< Real64 > & EnthNew, // New Nodal enthalpy
 		int const TotNodes, // Total nodes in layer
 		Real64 const HMovInsul // Conductance of movable(transparent) insulation.
 	)
@@ -1681,15 +1681,15 @@ namespace HeatBalFiniteDiffManager {
 		int const i, // Node Index
 		int const Lay, // Layer Number for Construction
 		int const Surf, // Surface number
-		FArray1< Real64 > const & T, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & TT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > const & Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & RhoT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & RH, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > const & TD, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & TDT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & EnthOld, // Old Nodal enthalpy
-		FArray1< Real64 > & EnthNew // New Nodal enthalpy
+		Array1< Real64 > const & T, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & TT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > const & Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & RhoT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & RH, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > const & TD, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & TDT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & EnthOld, // Old Nodal enthalpy
+		Array1< Real64 > & EnthNew // New Nodal enthalpy
 	)
 	{
 
@@ -1800,15 +1800,15 @@ namespace HeatBalFiniteDiffManager {
 		int const i, // Node Index
 		int const Lay, // Layer Number for Construction
 		int const Surf, // Surface number
-		FArray1< Real64 > const & T, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & TT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > const & Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & RhoT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & RH, // RELATIVE HUMIDITY.
-		FArray1< Real64 > const & TD, // OLD NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
-		FArray1< Real64 > & TDT, // NEW NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
-		FArray1< Real64 > const & EnthOld, // Old Nodal enthalpy
-		FArray1< Real64 > & EnthNew, // New Nodal enthalpy
+		Array1< Real64 > const & T, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & TT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > const & Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & RhoT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & RH, // RELATIVE HUMIDITY.
+		Array1< Real64 > const & TD, // OLD NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
+		Array1< Real64 > & TDT, // NEW NODE TEMPERATURES OF EACH HEAT TRANSFER SURF IN CONDFD.
+		Array1< Real64 > const & EnthOld, // Old Nodal enthalpy
+		Array1< Real64 > & EnthNew, // New Nodal enthalpy
 		int const GSiter // Iteration number of Gauss Seidell iteration
 	)
 	{
@@ -2082,16 +2082,16 @@ namespace HeatBalFiniteDiffManager {
 		int const i, // Node Index
 		int const Lay, // Layer Number for Construction
 		int const Surf, // Surface number
-		FArray1< Real64 > const & T, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (Old).
-		FArray1< Real64 > & TT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (New).
-		FArray1< Real64 > const & Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & RhoT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & RH, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > const & TD, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & TDT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
-		FArray1< Real64 > & EnthOld, // Old Nodal enthalpy
-		FArray1< Real64 > & EnthNew, // New Nodal enthalpy
-		FArray1< Real64 > & TDreport // Temperature value from previous HeatSurfaceHeatManager titeration's value
+		Array1< Real64 > const & T, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (Old).
+		Array1< Real64 > & TT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF (New).
+		Array1< Real64 > const & Rhov, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & RhoT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & RH, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > const & TD, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & TDT, // INSIDE SURFACE TEMPERATURE OF EACH HEAT TRANSFER SURF.
+		Array1< Real64 > & EnthOld, // Old Nodal enthalpy
+		Array1< Real64 > & EnthNew, // New Nodal enthalpy
+		Array1< Real64 > & TDreport // Temperature value from previous HeatSurfaceHeatManager titeration's value
 	)
 	{
 		// SUBROUTINE INFORMATION:

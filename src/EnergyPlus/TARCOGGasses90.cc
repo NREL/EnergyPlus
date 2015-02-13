@@ -3,6 +3,8 @@
 #include <cmath>
 
 // ObjexxFCL Headers
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -53,14 +55,14 @@ namespace TARCOGGasses90 {
 	void
 	GASSES90(
 		Real64 const tmean,
-		FArray1A_int const iprop,
-		FArray1A< Real64 > const frct,
+		Array1A_int const iprop,
+		Array1A< Real64 > const frct,
 		Real64 const pres,
 		int const nmix,
-		FArray1A< Real64 > const xwght,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
+		Array1A< Real64 > const xwght,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
 		Real64 & con,
 		Real64 & visc,
 		Real64 & dens,
@@ -89,15 +91,15 @@ namespace TARCOGGasses90 {
 		int i;
 		int j;
 
-		FArray1D< Real64 > fvis( maxgas );
-		FArray1D< Real64 > fcon( maxgas );
-		FArray1D< Real64 > fdens( maxgas );
-		FArray1D< Real64 > fcp( maxgas );
-		FArray1D< Real64 > kprime( maxgas );
-		FArray1D< Real64 > kdblprm( maxgas );
-		FArray1D< Real64 > mukpdwn( maxgas );
-		FArray1D< Real64 > kpdown( maxgas );
-		FArray1D< Real64 > kdpdown( maxgas );
+		Array1D< Real64 > fvis( maxgas );
+		Array1D< Real64 > fcon( maxgas );
+		Array1D< Real64 > fdens( maxgas );
+		Array1D< Real64 > fcp( maxgas );
+		Array1D< Real64 > kprime( maxgas );
+		Array1D< Real64 > kdblprm( maxgas );
+		Array1D< Real64 > mukpdwn( maxgas );
+		Array1D< Real64 > kpdown( maxgas );
+		Array1D< Real64 > kdpdown( maxgas );
 		Real64 molmix;
 		Real64 cpmixm;
 		Real64 kpmix;
@@ -113,7 +115,7 @@ namespace TARCOGGasses90 {
 
 		//Simon: TODO: this is used for EN673 calculations and it is not assigned properly. Check this
 		//REAL(r64), dimension(maxgas, 3) :: xgrho //Autodesk:Unused
-		FArray2D< Real64 > grho( maxgas, 3 );
+		Array2D< Real64 > grho( maxgas, 3 );
 
 		//REAL(r64) gaslaw
 		//DATA gaslaw /8314.51d0/   ! Molar gas constant in Joules/(kmol*K)

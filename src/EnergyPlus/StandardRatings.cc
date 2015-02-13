@@ -83,8 +83,8 @@ namespace StandardRatings {
 	// when the standard tests are conducted on units that do not have an
 	// indoor air circulting fan. Used if user doesn't enter a specific value.
 	Real64 const PLRforSEER( 0.5 ); // Part-load ratio for SEER calculation (single speed DX cooling coils)
-	FArray1D< Real64 > const ReducedPLR( 4, { 1.0, 0.75, 0.50, 0.25 } ); // Reduced Capacity part-load conditions
-	FArray1D< Real64 > const IEERWeightingFactor( 4, { 0.020, 0.617, 0.238, 0.125 } ); // EER Weighting factors (IEER)
+	Array1D< Real64 > const ReducedPLR( 4, { 1.0, 0.75, 0.50, 0.25 } ); // Reduced Capacity part-load conditions
+	Array1D< Real64 > const IEERWeightingFactor( 4, { 0.020, 0.617, 0.238, 0.125 } ); // EER Weighting factors (IEER)
 	Real64 const OADBTempLowReducedCapacityTest( 18.3 ); // Outdoor air dry-bulb temp in degrees C (65F)
 	// Std. AHRI AHRI 340/360 Dry-bulb Temp at reduced capacity, <= 0.444
 
@@ -92,34 +92,34 @@ namespace StandardRatings {
 	int const Timed( 1 ); // defrost cycle is timed
 	int const OnDemand( 2 ); // defrost cycle occurs only when required
 	int const TotalNumOfStandardDHRs( 16 ); // Total number of standard design heating requirements
-	FArray1D_int const TotalNumOfTemperatureBins( 6, { 9, 10, 13, 15, 18, 9 } ); // Total number of temperature
+	Array1D_int const TotalNumOfTemperatureBins( 6, { 9, 10, 13, 15, 18, 9 } ); // Total number of temperature
 	// bins for a region
-	FArray1D< Real64 > const StandardDesignHeatingRequirement( 16, { 1465.36, 2930.71, 4396.07, 5861.42, 7326.78, 8792.14, 10257.49, 11722.85, 14653.56, 17584.27, 20514.98, 23445.70, 26376.41, 29307.12, 32237.83, 38099.26 } );
+	Array1D< Real64 > const StandardDesignHeatingRequirement( 16, { 1465.36, 2930.71, 4396.07, 5861.42, 7326.78, 8792.14, 10257.49, 11722.85, 14653.56, 17584.27, 20514.98, 23445.70, 26376.41, 29307.12, 32237.83, 38099.26 } );
 	// Standardized DHRs from ANSI/AHRI 210/240
 	Real64 const CorrectionFactor( 0.77 ); // A correction factor which tends to improve the agreement
 	// between calculated and measured building loads, dimensionless.
 	Real64 const CyclicDegradationCoeff( 0.25 );
-	FArray1D< Real64 > const OutdoorDesignTemperature( 6, { 2.78, -2.78, -8.33, -15.0, -23.33, -1.11 } );
+	Array1D< Real64 > const OutdoorDesignTemperature( 6, { 2.78, -2.78, -8.33, -15.0, -23.33, -1.11 } );
 	// Outdoor design temperature for a region from ANSI/AHRI 210/240
-	FArray1D< Real64 > const OutdoorBinTemperature( 18, { 16.67, 13.89, 11.11, 8.33, 5.56, 2.78, 0.00, -2.78, -5.56, -8.33, -11.11, -13.89, -16.67, -19.44, -22.22, -25.00, -27.78, -30.56 } );
+	Array1D< Real64 > const OutdoorBinTemperature( 18, { 16.67, 13.89, 11.11, 8.33, 5.56, 2.78, 0.00, -2.78, -5.56, -8.33, -11.11, -13.89, -16.67, -19.44, -22.22, -25.00, -27.78, -30.56 } );
 	// Fractional bin hours for different bin temperatures for region one, from ANSI/AHRI 210/240
-	FArray1D< Real64 > const RegionOneFracBinHoursAtOutdoorBinTemp( 18, { 0.291, 0.239, 0.194, 0.129, 0.081, 0.041, 0.019, 0.005, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 } );
+	Array1D< Real64 > const RegionOneFracBinHoursAtOutdoorBinTemp( 18, { 0.291, 0.239, 0.194, 0.129, 0.081, 0.041, 0.019, 0.005, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 } );
 	// Fractional bin hours for different bin temperatures for region two, from ANSI/AHRI 210/240
-	FArray1D< Real64 > const RegionTwoFracBinHoursAtOutdoorBinTemp( 18, { 0.215, 0.189, 0.163, 0.143, 0.112, 0.088, 0.056, 0.024, 0.008, 0.002, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 } );
+	Array1D< Real64 > const RegionTwoFracBinHoursAtOutdoorBinTemp( 18, { 0.215, 0.189, 0.163, 0.143, 0.112, 0.088, 0.056, 0.024, 0.008, 0.002, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 } );
 	// Fractional bin hours for different bin temperatures for region three, from ANSI/AHRI 210/240
-	FArray1D< Real64 > const RegionThreeFracBinHoursAtOutdoorBinTemp( 18, { 0.153, 0.142, 0.138, 0.137, 0.135, 0.118, 0.092, 0.047, 0.021, 0.009, 0.005, 0.002, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0 } );
+	Array1D< Real64 > const RegionThreeFracBinHoursAtOutdoorBinTemp( 18, { 0.153, 0.142, 0.138, 0.137, 0.135, 0.118, 0.092, 0.047, 0.021, 0.009, 0.005, 0.002, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0 } );
 	// Fractional bin hours for different bin temperatures for region four, from ANSI/AHRI 210/240
-	FArray1D< Real64 > const RegionFourFracBinHoursAtOutdoorBinTemp( 18, { 0.132, 0.111, 0.103, 0.093, 0.1, 0.109, 0.126, 0.087, 0.055, 0.036, 0.026, 0.013, 0.006, 0.002, 0.001, 0.0, 0.0, 0.0 } );
+	Array1D< Real64 > const RegionFourFracBinHoursAtOutdoorBinTemp( 18, { 0.132, 0.111, 0.103, 0.093, 0.1, 0.109, 0.126, 0.087, 0.055, 0.036, 0.026, 0.013, 0.006, 0.002, 0.001, 0.0, 0.0, 0.0 } );
 	// Fractional bin hours for different bin temperatures for region five, from ANSI/AHRI 210/240
-	FArray1D< Real64 > const RegionFiveFracBinHoursAtOutdoorBinTemp( 18, { 0.106, 0.092, 0.086, 0.076, 0.078, 0.087, 0.102, 0.094, 0.074, 0.055, 0.047, 0.038, 0.029, 0.018, 0.01, 0.005, 0.002, 0.001 } );
+	Array1D< Real64 > const RegionFiveFracBinHoursAtOutdoorBinTemp( 18, { 0.106, 0.092, 0.086, 0.076, 0.078, 0.087, 0.102, 0.094, 0.074, 0.055, 0.047, 0.038, 0.029, 0.018, 0.01, 0.005, 0.002, 0.001 } );
 	// Fractional bin hours for different bin temperatures for region six, from ANSI/AHRI 210/240
-	FArray1D< Real64 > const RegionSixFracBinHoursAtOutdoorBinTemp( 18, { 0.113, 0.206, 0.215, 0.204, 0.141, 0.076, 0.034, 0.008, 0.003, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 } );
+	Array1D< Real64 > const RegionSixFracBinHoursAtOutdoorBinTemp( 18, { 0.113, 0.206, 0.215, 0.204, 0.141, 0.076, 0.034, 0.008, 0.003, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 } );
 
 	// Representative cooling season Outdoor air temperature bin from ANSI/AHRI 210/240-2008
 	int const NumOfOATempBins( 8 ); // number of outdoor temperature bins for cooling season
-	FArray1D< Real64 > const OutdoorBinTemperatureSEER( NumOfOATempBins, { 19.44, 22.22, 25.00, 27.78, 30.56, 33.33, 36.11, 38.89 } );
+	Array1D< Real64 > const OutdoorBinTemperatureSEER( NumOfOATempBins, { 19.44, 22.22, 25.00, 27.78, 30.56, 33.33, 36.11, 38.89 } );
 	// Fractional bin hours for different bin temperatures for cooling, from ANSI/AHRI 210/240 - 2008
-	FArray1D< Real64 > const CoolFracBinHoursAtOutdoorBinTemp( NumOfOATempBins, { 0.214, 0.231, 0.216, 0.161, 0.104, 0.052, 0.018, 0.004 } );
+	Array1D< Real64 > const CoolFracBinHoursAtOutdoorBinTemp( NumOfOATempBins, { 0.214, 0.231, 0.216, 0.161, 0.104, 0.052, 0.018, 0.004 } );
 
 	Real64 const HeatingIndoorCoilInletAirDBTempRated( 21.11 ); // Heating coil entering air dry-bulb temperature in
 	// degrees C (70F) Test H1, H2 and H3
@@ -190,7 +190,7 @@ namespace StandardRatings {
 
 		// Locals
 		Real64 const ConvFromSIToIP( 3.412141633 ); // Conversion from SI to IP [3.412 Btu/hr-W]
-		static FArray1D< Real64 > const ReducedPLR( 4, { 1.0, 0.75, 0.50, 0.25 } ); // Reduced Capacity part-load conditions
+		static Array1D< Real64 > const ReducedPLR( 4, { 1.0, 0.75, 0.50, 0.25 } ); // Reduced Capacity part-load conditions
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// (function of leaving chilled water temperature and
@@ -207,7 +207,7 @@ namespace StandardRatings {
 		Real64 const Acc( 0.0001 ); // Accuracy of result
 		int const NumOfReducedCap( 4 ); // Number of reduced capacity test conditions (100%,75%,50%,and 25%)
 		int const IterMax( 500 ); // Maximum number of iterations
-		static FArray1D< Real64 > const IPLVWeightingFactor( 4, { 0.010, 0.42, 0.45, 0.12 } ); // EER Weighting factors (IPLV)
+		static Array1D< Real64 > const IPLVWeightingFactor( 4, { 0.010, 0.42, 0.45, 0.12 } ); // EER Weighting factors (IPLV)
 		static std::string const RoutineName( "CalcChillerIPLV" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -243,7 +243,7 @@ namespace StandardRatings {
 		static Real64 PartLoadRatio( 0.0 ); // Part load ratio (PLR) at which chiller is operatign at reduced capacity
 		int RedCapNum; // Integer counter for reduced capacity
 		int SolFla; // Flag of solver
-		FArray1D< Real64 > Par( 11 ); // Parameter array need for RegulaFalsi routine
+		Array1D< Real64 > Par( 11 ); // Parameter array need for RegulaFalsi routine
 
 		// Initialize local variables
 		AvailChillerCap = 0.0;
@@ -400,7 +400,7 @@ namespace StandardRatings {
 	Real64
 	ReformEIRChillerCondInletTempResidual(
 		Real64 const CondenserOutletTemp, // Condenser outlet temperature (boundary condition or guess value) [C]
-		FArray1< Real64 > const & Par // par(1)  = Condenser inlet temperature at AHRI Standard
+		Array1< Real64 > const & Par // par(1)  = Condenser inlet temperature at AHRI Standard
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -702,15 +702,15 @@ namespace StandardRatings {
 		std::string const & DXCoilType, // Type of DX coil for which HSPF is calculated
 		int const DXCoilType_Num, // Integer Type of DX coil - heating or cooling
 		int const ns, // Number of compressor speeds
-		FArray1A< Real64 > const RatedTotalCapacity, // Reference capacity of DX coil [W]
-		FArray1A< Real64 > const RatedCOP, // Reference coefficient of performance [W/W]
-		FArray1A_int const CapFFlowCurveIndex, // Index for the capacity as a function of flow fraction modifier curve
-		FArray1A_int const CapFTempCurveIndex, // Index for the capacity as a function of temperature modifier curve
-		FArray1A_int const EIRFFlowCurveIndex, // Index for the EIR as a function of flow fraction modifier curve
-		FArray1A_int const EIRFTempCurveIndex, // Index for the EIR as a function of temperature modifier curve
-		FArray1A_int const PLFFPLRCurveIndex, // Index for the PLF vs part-load ratio curve
-		FArray1A< Real64 > const RatedAirVolFlowRate, // Reference air flow rate of DX coil [m3/s]
-		FArray1A< Real64 > const FanPowerPerEvapAirFlowRateFromInput, // Reference fan power per evap air flow rate [W/(m3/s)]
+		Array1A< Real64 > const RatedTotalCapacity, // Reference capacity of DX coil [W]
+		Array1A< Real64 > const RatedCOP, // Reference coefficient of performance [W/W]
+		Array1A_int const CapFFlowCurveIndex, // Index for the capacity as a function of flow fraction modifier curve
+		Array1A_int const CapFTempCurveIndex, // Index for the capacity as a function of temperature modifier curve
+		Array1A_int const EIRFFlowCurveIndex, // Index for the EIR as a function of flow fraction modifier curve
+		Array1A_int const EIRFTempCurveIndex, // Index for the EIR as a function of temperature modifier curve
+		Array1A_int const PLFFPLRCurveIndex, // Index for the PLF vs part-load ratio curve
+		Array1A< Real64 > const RatedAirVolFlowRate, // Reference air flow rate of DX coil [m3/s]
+		Array1A< Real64 > const FanPowerPerEvapAirFlowRateFromInput, // Reference fan power per evap air flow rate [W/(m3/s)]
 		Optional_int_const RegionNum, // Region number for calculating HSPF of single speed DX heating coil //Autodesk:OPTIONAL Used without PRESENT check
 		Optional< Real64 const > MinOATCompressor, // Minimum OAT for heat pump compressor operation [C] //Autodesk:OPTIONAL Used without PRESENT check
 		Optional< Real64 const > OATempCompressorOn, // The outdoor temperature when the compressor is automatically turned //Autodesk:OPTIONAL Used without PRESENT check
@@ -858,7 +858,7 @@ namespace StandardRatings {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > FanPowerPerEvapAirFlowRate( ns ); // Fan power per air volume flow rate through the evaporator coil [W/(m3/s)]
+		Array1D< Real64 > FanPowerPerEvapAirFlowRate( ns ); // Fan power per air volume flow rate through the evaporator coil [W/(m3/s)]
 
 		// Intermediate values calculated from the inputs in the idf file
 		static Real64 TotCapTempModFacH0( 0.0 ); // Tot capacity modifier (function of entering wetbulb, outside drybulb) at H0 Test [-]
@@ -890,7 +890,7 @@ namespace StandardRatings {
 		static Real64 HSPF( 0.0 ); // Heating Seasonal Performance Factor in SI [W/W]
 		static Real64 NetHeatingCapRatedHighTemp( 0.0 ); // Net Rated heating capacity at high temp [W]
 		static Real64 NetHeatingCapRatedLowTemp( 0.0 ); // Net Rated heating capacity at low temp [W]
-		FArray1D< Real64 > NetCoolingCapRated( ns ); // Net Cooling Coil capacity at Rated conditions, accounting for supply fan heat [W]
+		Array1D< Real64 > NetCoolingCapRated( ns ); // Net Cooling Coil capacity at Rated conditions, accounting for supply fan heat [W]
 
 		NetCoolingCapRated = 0.0;
 
@@ -1392,15 +1392,15 @@ namespace StandardRatings {
 	MultiSpeedDXCoolingCoilStandardRatings(
 		std::string const & DXCoilName, // Name of DX coil for which HSPF is calculated
 		std::string const & DXCoilType, // Type of DX coil for which HSPF is calculated
-		FArray1A_int const CapFTempCurveIndex, // Index for the capacity as a function of temperature modifier curve
-		FArray1A_int const CapFFlowCurveIndex, // Index for the capacity as a function of flow fraction modifier curve
-		FArray1A_int const EIRFTempCurveIndex, // Index for the EIR as a function of temperature modifier curve
-		FArray1A_int const EIRFFlowCurveIndex, // Index for the EIR as a function of flow fraction modifier curve
-		FArray1A_int const PLFFPLRCurveIndex, // Index for the PLF vs part-load ratio curve
-		FArray1A< Real64 > const RatedTotalCapacity, // Reference capacity of DX coil [W]
-		FArray1A< Real64 > const RatedCOP, // Reference coefficient of performance [W/W]
-		FArray1A< Real64 > const RatedAirVolFlowRate, // Reference air flow rate of DX coil [m3/s]
-		FArray1A< Real64 > const FanPowerPerEvapAirFlowRateFromInput, // rated fan power per evap air flow rate [W/(m3/s)]
+		Array1A_int const CapFTempCurveIndex, // Index for the capacity as a function of temperature modifier curve
+		Array1A_int const CapFFlowCurveIndex, // Index for the capacity as a function of flow fraction modifier curve
+		Array1A_int const EIRFTempCurveIndex, // Index for the EIR as a function of temperature modifier curve
+		Array1A_int const EIRFFlowCurveIndex, // Index for the EIR as a function of flow fraction modifier curve
+		Array1A_int const PLFFPLRCurveIndex, // Index for the PLF vs part-load ratio curve
+		Array1A< Real64 > const RatedTotalCapacity, // Reference capacity of DX coil [W]
+		Array1A< Real64 > const RatedCOP, // Reference coefficient of performance [W/W]
+		Array1A< Real64 > const RatedAirVolFlowRate, // Reference air flow rate of DX coil [m3/s]
+		Array1A< Real64 > const FanPowerPerEvapAirFlowRateFromInput, // rated fan power per evap air flow rate [W/(m3/s)]
 		int const nsp, // Number of compressor speeds
 		Real64 & NetCoolingCapRatedMaxSpeed, // net cooling capacity at maximum speed
 		Real64 & SEER // seasonale energy efficiency ratio of multi speed DX cooling coil
@@ -1452,18 +1452,18 @@ namespace StandardRatings {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// Intermediate values calculated from the inputs in the idf file
-		FArray1D< Real64 > FanPowerPerEvapAirFlowRate( nsp ); // Fan power per air volume flow rate through the evaporator coil [W/(m3/s)]
-		FArray1D< Real64 > TotCoolCapTestA2( nsp ); // Total cooling capacity at A2 test condition (High speed)
-		FArray1D< Real64 > TotCoolCapTestB2( nsp ); // Total cooling capacity at B2 test condition (High speed)
-		FArray1D< Real64 > TotCoolCapTestB1( nsp ); // Total cooling capacity at B1 test condition (Low speed)
-		FArray1D< Real64 > TotCoolCapTestF1( nsp ); // Total cooling capacity at F1 test condition (Low speed)
-		FArray1D< Real64 > OutdoorUnitPowerTestA2( nsp ); // Outdoor Unit electric power at A2 test condition (High speed)
-		FArray1D< Real64 > OutdoorUnitPowerTestB2( nsp ); // Outdoor Unit electric power at B2 test condition (High speed)
-		FArray1D< Real64 > OutdoorUnitPowerTestB1( nsp ); // Outdoor Unit electric power at B1 test condition (Low speed)
-		FArray1D< Real64 > OutdoorUnitPowerTestF1( nsp ); // Outdoor Unit electric power at F1 test condition (Low speed)
-		FArray1D< Real64 > NetCoolingCapRated( nsp ); // net cooling capacity at each speed
-		FArray1D< Real64 > TotCapFlowModFac( nsp ); // Total capacity modifier f(actual flow vs rated flow) for each speed [-]
-		FArray1D< Real64 > EIRFlowModFac( nsp ); // EIR modifier f(actual supply air flow vs rated flow) for each speed [-]
+		Array1D< Real64 > FanPowerPerEvapAirFlowRate( nsp ); // Fan power per air volume flow rate through the evaporator coil [W/(m3/s)]
+		Array1D< Real64 > TotCoolCapTestA2( nsp ); // Total cooling capacity at A2 test condition (High speed)
+		Array1D< Real64 > TotCoolCapTestB2( nsp ); // Total cooling capacity at B2 test condition (High speed)
+		Array1D< Real64 > TotCoolCapTestB1( nsp ); // Total cooling capacity at B1 test condition (Low speed)
+		Array1D< Real64 > TotCoolCapTestF1( nsp ); // Total cooling capacity at F1 test condition (Low speed)
+		Array1D< Real64 > OutdoorUnitPowerTestA2( nsp ); // Outdoor Unit electric power at A2 test condition (High speed)
+		Array1D< Real64 > OutdoorUnitPowerTestB2( nsp ); // Outdoor Unit electric power at B2 test condition (High speed)
+		Array1D< Real64 > OutdoorUnitPowerTestB1( nsp ); // Outdoor Unit electric power at B1 test condition (Low speed)
+		Array1D< Real64 > OutdoorUnitPowerTestF1( nsp ); // Outdoor Unit electric power at F1 test condition (Low speed)
+		Array1D< Real64 > NetCoolingCapRated( nsp ); // net cooling capacity at each speed
+		Array1D< Real64 > TotCapFlowModFac( nsp ); // Total capacity modifier f(actual flow vs rated flow) for each speed [-]
+		Array1D< Real64 > EIRFlowModFac( nsp ); // EIR modifier f(actual supply air flow vs rated flow) for each speed [-]
 		static Real64 CoolingCapacityLS( 0.0 ); // cooling capacity of Mult-speed DX coil at lower speed, [W]
 		static Real64 CoolingCapacityHS( 0.0 ); // cooling capacity of Mult-speed DX coil at higher speed, [W]
 		static Real64 CoolingElecPowerLS( 0.0 ); // outdoor unit electric power input at low speed, [W]
@@ -1521,7 +1521,7 @@ namespace StandardRatings {
 			CoolingCapacityMax = TotCoolCapTestB2( nsp ) + ( ( TotCoolCapTestA2( nsp ) - TotCoolCapTestB2( nsp ) ) / ( OutdoorCoilInletAirDryBulbTempTestA2 - OutdoorCoilInletAirDryBulbTempTestB2 ) ) * ( OutdoorBinTemperatureSEER( BinNum ) - OutdoorCoilInletAirDryBulbTempTestB2 );
 			CoolingElecPowerMax = OutdoorUnitPowerTestB2( nsp ) + ( ( OutdoorUnitPowerTestA2( nsp ) - OutdoorUnitPowerTestB2( nsp ) ) / ( OutdoorCoilInletAirDryBulbTempTestA2 - OutdoorCoilInletAirDryBulbTempTestB2 ) ) * ( OutdoorBinTemperatureSEER( BinNum ) - OutdoorCoilInletAirDryBulbTempTestB2 );
 
-			SpeedLoop: for ( spnum = 1; spnum <= nsp - 1; ++spnum ) {
+			for ( spnum = 1; spnum <= nsp - 1; ++spnum ) {
 				CoolingCapacityLS = TotCoolCapTestF1( spnum ) + ( ( TotCoolCapTestB1( spnum ) - TotCoolCapTestF1( spnum ) ) / ( OutdoorCoilInletAirDryBulbTempTestB1 - OutdoorCoilInletAirDryBulbTempTestF1 ) ) * ( OutdoorBinTemperatureSEER( BinNum ) - OutdoorCoilInletAirDryBulbTempTestF1 );
 				CoolingElecPowerLS = OutdoorUnitPowerTestF1( spnum ) + ( ( OutdoorUnitPowerTestB1( spnum ) - OutdoorUnitPowerTestF1( spnum ) ) / ( OutdoorCoilInletAirDryBulbTempTestB1 - OutdoorCoilInletAirDryBulbTempTestF1 ) ) * ( OutdoorBinTemperatureSEER( BinNum ) - OutdoorCoilInletAirDryBulbTempTestF1 );
 				CoolingCapacityHS = TotCoolCapTestB2( spnum + 1 ) + ( ( TotCoolCapTestA2( spnum + 1 ) - TotCoolCapTestB2( spnum + 1 ) ) / ( OutdoorCoilInletAirDryBulbTempTestA2 - OutdoorCoilInletAirDryBulbTempTestB2 ) ) * ( OutdoorBinTemperatureSEER( BinNum ) - OutdoorCoilInletAirDryBulbTempTestB2 );
@@ -1545,7 +1545,6 @@ namespace StandardRatings {
 					TotCoolElecPowerBinned = CoolingElecPowerMax;
 					goto SpeedLoop_exit;
 				}
-				SpeedLoop_loop: ;
 			}
 			SpeedLoop_exit: ;
 
@@ -1564,15 +1563,15 @@ namespace StandardRatings {
 	MultiSpeedDXHeatingCoilStandardRatings(
 		std::string const & DXCoilName, // Name of DX coil for which HSPF is calculated
 		std::string const & DXCoilType, // Type of DX coil for which HSPF is calculated
-		FArray1A_int const CapFTempCurveIndex, // Index for the capacity as a function of temperature modifier curve
-		FArray1A_int const CapFFlowCurveIndex, // Index for the capacity as a function of flow fraction modifier curve
-		FArray1A_int const EIRFTempCurveIndex, // Index for the EIR as a function of temperature modifier curve
-		FArray1A_int const EIRFFlowCurveIndex, // Index for the EIR as a function of flow fraction modifier curve
-		FArray1A_int const PLFFPLRCurveIndex, // Index for the PLF vs part-load ratio curve
-		FArray1A< Real64 > const RatedTotalCapacity, // Reference capacity of DX coil [W]
-		FArray1A< Real64 > const RatedCOP, // Reference coefficient of performance [W/W]
-		FArray1A< Real64 > const RatedAirVolFlowRate, // Reference air flow rate of DX coil [m3/s]
-		FArray1A< Real64 > const FanPowerPerEvapAirFlowRateFromInput, // rated fan power per evap air flow rate [W/(m3/s)]
+		Array1A_int const CapFTempCurveIndex, // Index for the capacity as a function of temperature modifier curve
+		Array1A_int const CapFFlowCurveIndex, // Index for the capacity as a function of flow fraction modifier curve
+		Array1A_int const EIRFTempCurveIndex, // Index for the EIR as a function of temperature modifier curve
+		Array1A_int const EIRFFlowCurveIndex, // Index for the EIR as a function of flow fraction modifier curve
+		Array1A_int const PLFFPLRCurveIndex, // Index for the PLF vs part-load ratio curve
+		Array1A< Real64 > const RatedTotalCapacity, // Reference capacity of DX coil [W]
+		Array1A< Real64 > const RatedCOP, // Reference coefficient of performance [W/W]
+		Array1A< Real64 > const RatedAirVolFlowRate, // Reference air flow rate of DX coil [m3/s]
+		Array1A< Real64 > const FanPowerPerEvapAirFlowRateFromInput, // rated fan power per evap air flow rate [W/(m3/s)]
 		int const nsp, // Number of compressor speeds
 		Real64 & NetHeatingCapRatedHighTemp, // net heating capacity at maximum speed and High Temp
 		Real64 & NetHeatingCapRatedLowTemp, // net heating capacity at maximum speed and low Temp
@@ -1634,26 +1633,26 @@ namespace StandardRatings {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// Intermediate values calculated from the inputs in the idf file
-		FArray1D< Real64 > FanPowerPerEvapAirFlowRate( nsp ); // Fan power per air volume flow rate through the evaporator coil [W/(m3/s)]
-		FArray1D< Real64 > TotHeatCapTestH0( nsp ); // Total cooling capacity at A2 test condition (High speed)
-		FArray1D< Real64 > TotHeatCapTestH1( nsp ); // Total cooling capacity at B2 test condition (High speed)
-		FArray1D< Real64 > TotHeatCapTestH2( nsp ); // Total cooling capacity at B1 test condition (Low speed)
-		FArray1D< Real64 > TotHeatCapTestH3( nsp ); // Total cooling capacity at F1 test condition (Low speed)
-		FArray1D< Real64 > OutdoorUnitPowerTestH0( nsp ); // Outdoor Unit electric power at A2 test condition (High speed)
-		FArray1D< Real64 > OutdoorUnitPowerTestH1( nsp ); // Outdoor Unit electric power at B2 test condition (High speed)
-		FArray1D< Real64 > OutdoorUnitPowerTestH2( nsp ); // Outdoor Unit electric power at B1 test condition (Low speed)
-		FArray1D< Real64 > OutdoorUnitPowerTestH3( nsp ); // Outdoor Unit electric power at F1 test condition (Low speed)
+		Array1D< Real64 > FanPowerPerEvapAirFlowRate( nsp ); // Fan power per air volume flow rate through the evaporator coil [W/(m3/s)]
+		Array1D< Real64 > TotHeatCapTestH0( nsp ); // Total cooling capacity at A2 test condition (High speed)
+		Array1D< Real64 > TotHeatCapTestH1( nsp ); // Total cooling capacity at B2 test condition (High speed)
+		Array1D< Real64 > TotHeatCapTestH2( nsp ); // Total cooling capacity at B1 test condition (Low speed)
+		Array1D< Real64 > TotHeatCapTestH3( nsp ); // Total cooling capacity at F1 test condition (Low speed)
+		Array1D< Real64 > OutdoorUnitPowerTestH0( nsp ); // Outdoor Unit electric power at A2 test condition (High speed)
+		Array1D< Real64 > OutdoorUnitPowerTestH1( nsp ); // Outdoor Unit electric power at B2 test condition (High speed)
+		Array1D< Real64 > OutdoorUnitPowerTestH2( nsp ); // Outdoor Unit electric power at B1 test condition (Low speed)
+		Array1D< Real64 > OutdoorUnitPowerTestH3( nsp ); // Outdoor Unit electric power at F1 test condition (Low speed)
 		Real64 HeatingCapacityLS; // cooling capacity of Mult-speed DX coil at lower speed, [W]
 		Real64 HeatingCapacityHS; // cooling capacity of Mult-speed DX coil at higher speed, [W]
 		Real64 HeatingElecPowerLS; // outdoor unit electric power input at low speed, [W]
 		Real64 HeatingElecPowerHS; // outdoor unit electric power input at high speed, [W]
 		Real64 HeatingCapacityMax; // cooling capacity of Mult-speed DX coil at max speed, [W]
 		Real64 HeatingElecPowerMax; // outdoor unit electric power input at Max speed, [W]
-		FArray1D< Real64 > TotHeatCapTestH1High( nsp ); // net heating capacity high speed at H1 test conditon, [W]
+		Array1D< Real64 > TotHeatCapTestH1High( nsp ); // net heating capacity high speed at H1 test conditon, [W]
 
 		// Intermediate values calculated from the inputs in the idf file
-		FArray1D< Real64 > TotCapFlowModFac( nsp ); // Total capacity modifier f(actual flow vs rated flow) for each speed [-]
-		FArray1D< Real64 > EIRFlowModFac( nsp ); // EIR modifier f(actual supply air flow vs rated flow) for each speed [-]
+		Array1D< Real64 > TotCapFlowModFac( nsp ); // Total capacity modifier f(actual flow vs rated flow) for each speed [-]
+		Array1D< Real64 > EIRFlowModFac( nsp ); // EIR modifier f(actual supply air flow vs rated flow) for each speed [-]
 		static Real64 TotCapTempModFac( 0.0 ); // Total capacity modifier (function of entering wetbulb, outside drybulb) [-]
 		static Real64 EIRTempModFac( 0.0 ); // EIR modifier (function of entering wetbulb, outside drybulb) [-]
 
@@ -1829,7 +1828,7 @@ namespace StandardRatings {
 			}
 
 			// determine the speed number
-			HeatSpeedLoop: for ( spnum = 1; spnum <= nsp - 1; ++spnum ) {
+			for ( spnum = 1; spnum <= nsp - 1; ++spnum ) {
 				// Low Speed
 				if ( OutdoorBinTemperature( BinNum ) < -8.33 ) {
 					HeatingCapacityLS = TotHeatCapTestH3( spnum ) + ( ( TotHeatCapTestH1( spnum ) - TotHeatCapTestH3( spnum ) ) * ( OutdoorBinTemperature( BinNum ) - HeatingOutdoorCoilInletAirDBTempH3Test ) / ( HeatingOutdoorCoilInletAirDBTempRated - HeatingOutdoorCoilInletAirDBTempH3Test ) );
@@ -1903,7 +1902,6 @@ namespace StandardRatings {
 
 					goto HeatSpeedLoop_exit;
 				}
-				HeatSpeedLoop_loop: ;
 			}
 			HeatSpeedLoop_exit: ;
 

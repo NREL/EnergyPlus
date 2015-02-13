@@ -2,7 +2,7 @@
 #define HeatBalanceHAMTManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
+#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -27,28 +27,28 @@ namespace HeatBalanceHAMTManager {
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern FArray1D_int firstcell;
-	extern FArray1D_int lastcell;
-	extern FArray1D_int Extcell;
-	extern FArray1D_int ExtRadcell;
-	extern FArray1D_int ExtConcell;
-	extern FArray1D_int ExtSkycell;
-	extern FArray1D_int ExtGrncell;
-	extern FArray1D_int Intcell;
-	extern FArray1D_int IntConcell;
+	extern Array1D_int firstcell;
+	extern Array1D_int lastcell;
+	extern Array1D_int Extcell;
+	extern Array1D_int ExtRadcell;
+	extern Array1D_int ExtConcell;
+	extern Array1D_int ExtSkycell;
+	extern Array1D_int ExtGrncell;
+	extern Array1D_int Intcell;
+	extern Array1D_int IntConcell;
 
-	extern FArray1D< Real64 > watertot;
-	extern FArray1D< Real64 > surfrh;
-	extern FArray1D< Real64 > surfextrh;
-	extern FArray1D< Real64 > surftemp;
-	extern FArray1D< Real64 > surfexttemp;
-	extern FArray1D< Real64 > surfvp;
+	extern Array1D< Real64 > watertot;
+	extern Array1D< Real64 > surfrh;
+	extern Array1D< Real64 > surfextrh;
+	extern Array1D< Real64 > surftemp;
+	extern Array1D< Real64 > surfexttemp;
+	extern Array1D< Real64 > surfvp;
 
-	extern FArray1D< Real64 > extvtc; // External Surface vapor transfer coefficient
-	extern FArray1D< Real64 > intvtc; // Internal Surface Vapor Transfer Coefficient
-	extern FArray1D_bool extvtcflag; // External Surface vapor transfer coefficient flag
-	extern FArray1D_bool intvtcflag; // Internal Surface Vapor Transfer Coefficient flag
-	extern FArray1D_bool MyEnvrnFlag; // Flag to reset surface properties.
+	extern Array1D< Real64 > extvtc; // External Surface vapor transfer coefficient
+	extern Array1D< Real64 > intvtc; // Internal Surface Vapor Transfer Coefficient
+	extern Array1D_bool extvtcflag; // External Surface vapor transfer coefficient flag
+	extern Array1D_bool intvtcflag; // Internal Surface Vapor Transfer Coefficient flag
+	extern Array1D_bool MyEnvrnFlag; // Flag to reset surface properties.
 
 	extern Real64 deltat; // time step in seconds
 
@@ -88,12 +88,12 @@ namespace HeatBalanceHAMTManager {
 		Real64 rhp; // cell relative humidity (percent - reporting)
 		Real64 dwdphi; // Moisture storage capacity
 		Real64 dw; // Liquid transport Coefficient
-		FArray1D< Real64 > origin; // Cell origin. The geometric centre of the cell.
-		FArray1D< Real64 > length; // Cell lengths
-		FArray1D< Real64 > overlap; // Area of overlap
-		FArray1D< Real64 > dist; // distance between cell origins
-		FArray1D_int adjs;
-		FArray1D_int adjsl;
+		Array1D< Real64 > origin; // Cell origin. The geometric centre of the cell.
+		Array1D< Real64 > length; // Cell lengths
+		Array1D< Real64 > overlap; // Area of overlap
+		Array1D< Real64 > dist; // distance between cell origins
+		Array1D_int adjs;
+		Array1D_int adjsl;
 
 		// Default Constructor
 		subcell() :
@@ -155,12 +155,12 @@ namespace HeatBalanceHAMTManager {
 			Real64 const rhp, // cell relative humidity (percent - reporting)
 			Real64 const dwdphi, // Moisture storage capacity
 			Real64 const dw, // Liquid transport Coefficient
-			FArray1< Real64 > const & origin, // Cell origin. The geometric centre of the cell.
-			FArray1< Real64 > const & length, // Cell lengths
-			FArray1< Real64 > const & overlap, // Area of overlap
-			FArray1< Real64 > const & dist, // distance between cell origins
-			FArray1_int const & adjs,
-			FArray1_int const & adjsl
+			Array1< Real64 > const & origin, // Cell origin. The geometric centre of the cell.
+			Array1< Real64 > const & length, // Cell lengths
+			Array1< Real64 > const & overlap, // Area of overlap
+			Array1< Real64 > const & dist, // distance between cell origins
+			Array1_int const & adjs,
+			Array1_int const & adjsl
 		) :
 			matid( matid ),
 			sid( sid ),
@@ -197,7 +197,7 @@ namespace HeatBalanceHAMTManager {
 	};
 
 	// Object Data
-	extern FArray1D< subcell > cells;
+	extern Array1D< subcell > cells;
 
 	// Functions
 
@@ -227,8 +227,8 @@ namespace HeatBalanceHAMTManager {
 	void
 	interp(
 		int const ndata,
-		FArray1A< Real64 > const xx,
-		FArray1A< Real64 > const yy,
+		Array1A< Real64 > const xx,
+		Array1A< Real64 > const yy,
 		Real64 const invalue,
 		Real64 & outvalue,
 		Optional< Real64 > outgrad = _

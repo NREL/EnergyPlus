@@ -2,7 +2,7 @@
 #define WaterUse_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -34,8 +34,8 @@ namespace WaterUse {
 	//INTEGER :: MaxIterationsErrorCount =0
 	extern bool GetWaterUseInputFlag;
 
-	extern FArray1D_bool CheckEquipName;
-	extern FArray1D_bool CheckPlantLoop;
+	extern Array1D_bool CheckEquipName;
+	extern Array1D_bool CheckPlantLoop;
 
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -267,7 +267,7 @@ namespace WaterUse {
 		Real64 Energy; // Heating energy required to raise temperature from cold to hot (J)
 		int NumWaterEquipment;
 		int MaxIterationsErrorIndex; // recurring error index
-		FArray1D_int WaterEquipment;
+		Array1D_int WaterEquipment;
 		int PlantLoopNum;
 		int PlantLoopSide;
 		int PlantLoopBranchNum;
@@ -388,7 +388,7 @@ namespace WaterUse {
 			Real64 const Energy, // Heating energy required to raise temperature from cold to hot (J)
 			int const NumWaterEquipment,
 			int const MaxIterationsErrorIndex, // recurring error index
-			FArray1_int const & WaterEquipment,
+			Array1_int const & WaterEquipment,
 			int const PlantLoopNum,
 			int const PlantLoopSide,
 			int const PlantLoopBranchNum,
@@ -457,8 +457,8 @@ namespace WaterUse {
 	};
 
 	// Object Data
-	extern FArray1D< WaterEquipmentType > WaterEquipment;
-	extern FArray1D< WaterConnectionsType > WaterConnections;
+	extern Array1D< WaterEquipmentType > WaterEquipment;
+	extern Array1D< WaterConnectionsType > WaterConnections;
 
 	// Functions
 

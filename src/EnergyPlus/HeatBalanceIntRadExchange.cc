@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -88,9 +88,9 @@ namespace HeatBalanceIntRadExchange {
 
 	void
 	CalcInteriorRadExchange(
-		FArray1S< Real64 > const SurfaceTemp, // Current surface temperatures
+		Array1S< Real64 > const SurfaceTemp, // Current surface temperatures
 		int const SurfIterations, // Number of iterations in calling subroutine
-		FArray1< Real64 > & NetLWRadToSurf, // Net long wavelength radiant exchange from other surfaces
+		Array1< Real64 > & NetLWRadToSurf, // Net long wavelength radiant exchange from other surfaces
 		Optional_int_const ZoneToResimulate, // if passed in, then only calculate for this zone
 		std::string const & CalledFrom
 	)
@@ -116,7 +116,7 @@ namespace HeatBalanceIntRadExchange {
 		// Hottel, H. C. and A. F. Sarofim, Radiative Transfer, Ch 3, McGraw Hill, 1967.
 
 		// Types
-		typedef  FArray1< Real64 >::size_type  size_type;
+		typedef  Array1< Real64 >::size_type  size_type;
 
 		// Using/Aliasing
 		using General::InterpSlatAng; // Function for slat angle interpolation
@@ -159,7 +159,7 @@ namespace HeatBalanceIntRadExchange {
 		//variables added as part of strategy to reduce calculation time - Glazer 2011-04-22
 //		Real64 SendSurfTempInKTo4th; // Sending surface temperature in K to 4th power
 		Real64 RecSurfTempInKTo4th; // Receiving surface temperature in K to 4th power
-		static FArray1D< Real64 > SendSurfaceTempInKto4thPrecalc;
+		static Array1D< Real64 > SendSurfaceTempInKto4thPrecalc;
 
 		// FLOW:
 
@@ -444,7 +444,7 @@ namespace HeatBalanceIntRadExchange {
 		Real64 CheckValue1;
 		Real64 CheckValue2;
 		Real64 FinalCheckValue;
-		FArray2D< Real64 > SaveApproximateViewFactors; // Save for View Factor reporting
+		Array2D< Real64 > SaveApproximateViewFactors; // Save for View Factor reporting
 		Real64 RowSum;
 		Real64 FixedRowSum;
 		int NumIterations;
@@ -697,8 +697,8 @@ namespace HeatBalanceIntRadExchange {
 	GetInputViewFactors(
 		std::string const & ZoneName, // Needed to check for user input view factors.
 		int const N, // NUMBER OF SURFACES
-		FArray2A< Real64 > F, // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
-		FArray1A_int const SPtr, // pointer to actual surface number
+		Array2A< Real64 > F, // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
+		Array1A_int const SPtr, // pointer to actual surface number
 		bool & NoUserInputF, // Flag signifying no input F's for this
 		bool & ErrorsFound // True when errors are found in number of fields vs max args
 	)
@@ -780,8 +780,8 @@ namespace HeatBalanceIntRadExchange {
 	GetInputViewFactorsbyName(
 		std::string const & ZoneName, // Needed to check for user input view factors.
 		int const N, // NUMBER OF SURFACES
-		FArray2A< Real64 > F, // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
-		FArray1A_int const SPtr, // pointer to actual surface number
+		Array2A< Real64 > F, // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
+		Array1A_int const SPtr, // pointer to actual surface number
 		bool & NoUserInputF, // Flag signifying no input F's for this
 		bool & ErrorsFound // True when errors are found in number of fields vs max args
 	)
@@ -834,7 +834,7 @@ namespace HeatBalanceIntRadExchange {
 		int numinx1;
 		int inx1;
 		int inx2;
-		FArray1D_string ZoneSurfaceNames;
+		Array1D_string ZoneSurfaceNames;
 
 		NoUserInputF = true;
 		UserFZoneIndex = GetObjectItemNum( "ZoneProperty:UserViewFactors:bySurfaceName", ZoneName );
@@ -881,11 +881,11 @@ namespace HeatBalanceIntRadExchange {
 	void
 	CalcApproximateViewFactors(
 		int const N, // NUMBER OF SURFACES
-		FArray1A< Real64 > const A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-		FArray1A< Real64 > const Azimuth, // Facing angle of the surface (in degrees)
-		FArray1A< Real64 > const Tilt, // Tilt angle of the surface (in degrees)
-		FArray2A< Real64 > F, // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
-		FArray1A_int const SPtr // pointer to REAL(r64) surface number (for error message)
+		Array1A< Real64 > const A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+		Array1A< Real64 > const Azimuth, // Facing angle of the surface (in degrees)
+		Array1A< Real64 > const Tilt, // Tilt angle of the surface (in degrees)
+		Array2A< Real64 > F, // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
+		Array1A_int const SPtr // pointer to REAL(r64) surface number (for error message)
 	)
 	{
 
@@ -940,7 +940,7 @@ namespace HeatBalanceIntRadExchange {
 
 		int i; // DO loop counters for surfaces in the zone
 		int j;
-		FArray1D< Real64 > ZoneArea; // Sum of the area of all zone surfaces seen
+		Array1D< Real64 > ZoneArea; // Sum of the area of all zone surfaces seen
 
 		// FLOW:
 		// Calculate the sum of the areas seen by all zone surfaces
@@ -1001,8 +1001,8 @@ namespace HeatBalanceIntRadExchange {
 	void
 	FixViewFactors(
 		int const N, // NUMBER OF SURFACES
-		FArray1A< Real64 > const A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-		FArray2A< Real64 > F, // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
+		Array1A< Real64 > const A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+		Array2A< Real64 > F, // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
 		int const ZoneNum, // Zone number being fixe
 		Real64 & OriginalCheckValue, // check of SUM(F) - N
 		Real64 & FixedCheckValue, // check after fixed of SUM(F) - N
@@ -1075,7 +1075,7 @@ namespace HeatBalanceIntRadExchange {
 		OriginalCheckValue = std::abs( sum( F ) - N );
 
 		//  Allocate and zero arrays
-		FArray2D< Real64 > FixedAF( F ); // store for largest area check
+		Array2D< Real64 > FixedAF( F ); // store for largest area check
 
 		Accelerator = 1.0;
 		ConvrgOld = 10.0;
@@ -1092,7 +1092,7 @@ namespace HeatBalanceIntRadExchange {
 		}
 
 		//  Set up AF matrix.
-		FArray2D< Real64 > AF( N, N ); // = (AREA * DIRECT VIEW FACTOR) MATRIX
+		Array2D< Real64 > AF( N, N ); // = (AREA * DIRECT VIEW FACTOR) MATRIX
 		for ( i = 1; i <= N; ++i ) {
 			for ( j = 1; j <= N; ++j ) {
 				AF( i, j ) = FixedAF( i, j ) * A( i );
@@ -1104,7 +1104,7 @@ namespace HeatBalanceIntRadExchange {
 
 		AF.deallocate();
 
-		FArray2D< Real64 > FixedF( N, N ); // CORRECTED MATRIX OF VIEW FACTORS (N X N)
+		Array2D< Real64 > FixedF( N, N ); // CORRECTED MATRIX OF VIEW FACTORS (N X N)
 
 		NumIterations = 0;
 		RowSum = 0.0;
@@ -1129,7 +1129,7 @@ namespace HeatBalanceIntRadExchange {
 		} //  N <= 3 Case
 
 		//  Regular fix cases
-		FArray1D< Real64 > RowCoefficient( N );
+		Array1D< Real64 > RowCoefficient( N );
 		Converged = false;
 		while ( ! Converged ) {
 			++NumIterations;
@@ -1208,10 +1208,10 @@ namespace HeatBalanceIntRadExchange {
 	void
 	CalcScriptF(
 		int const N, // Number of surfaces
-		FArray1< Real64 > const & A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-		FArray2< Real64 > const & F, // DIRECT VIEW FACTOR MATRIX (N X N)
-		FArray1< Real64 > & EMISS, // VECTOR OF SURFACE EMISSIVITIES
-		FArray2< Real64 > & ScriptF // MATRIX OF SCRIPT F FACTORS (N X N) //Tuned Transposed
+		Array1< Real64 > const & A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+		Array2< Real64 > const & F, // DIRECT VIEW FACTOR MATRIX (N X N)
+		Array1< Real64 > & EMISS, // VECTOR OF SURFACE EMISSIVITIES
+		Array2< Real64 > & ScriptF // MATRIX OF SCRIPT F FACTORS (N X N) //Tuned Transposed
 	)
 	{
 
@@ -1266,9 +1266,9 @@ namespace HeatBalanceIntRadExchange {
 #endif
 
 		// Load Cmatrix with AF (AREA * DIRECT VIEW FACTOR) matrix
-		FArray2D< Real64 > Cmatrix( N, N ); // = (AF - EMISS/REFLECTANCE) matrix (but plays other roles)
+		Array2D< Real64 > Cmatrix( N, N ); // = (AF - EMISS/REFLECTANCE) matrix (but plays other roles)
 		assert( equal_dimensions( Cmatrix, F ) ); // For linear indexing
-		FArray2D< Real64 >::size_type l( 0u );
+		Array2D< Real64 >::size_type l( 0u );
 		for ( int j = 1; j <= N; ++j ) {
 			for ( int i = 1; i <= N; ++i, ++l ) {
 				Cmatrix[ l ] = A( i ) * F[ l ]; // [ l ] == ( i, j )
@@ -1276,7 +1276,7 @@ namespace HeatBalanceIntRadExchange {
 		}
 
 		// Load Cmatrix with (AF - EMISS/REFLECTANCE) matrix
-		FArray1D< Real64 > Excite( N ); // Excitation vector = A*EMISS/REFLECTANCE
+		Array1D< Real64 > Excite( N ); // Excitation vector = A*EMISS/REFLECTANCE
 		l = 0u;
 		for ( int i = 1; i <= N; ++i, l += N + 1 ) {
 			Real64 EMISS_i( EMISS( i ) );
@@ -1289,7 +1289,7 @@ namespace HeatBalanceIntRadExchange {
 			Cmatrix[ l ] -= EMISS_i_fac; // Coefficient matrix for partial radiosity calculation // [ l ] == ( i, i )
 		}
 
-		FArray2D< Real64 > Cinverse( N, N ); // Inverse of Cmatrix
+		Array2D< Real64 > Cinverse( N, N ); // Inverse of Cmatrix
 		CalcMatrixInverse( Cmatrix, Cinverse ); // SOLVE THE LINEAR SYSTEM
 		Cmatrix.clear(); // Release memory ASAP
 
@@ -1305,11 +1305,11 @@ namespace HeatBalanceIntRadExchange {
 
 		// Form Script F matrix transposed
 		assert( equal_dimensions( Cinverse, ScriptF ) ); // For linear indexing
-		FArray2D< Real64 >::size_type m( 0u );
+		Array2D< Real64 >::size_type m( 0u );
 		for ( int i = 1; i <= N; ++i ) { // Inefficient order for cache but can reuse multiplier so faster choice depends on N
 			Real64 const EMISS_i( EMISS( i ) );
 			Real64 const EMISS_fac( EMISS_i / ( 1.0 - EMISS_i ) );
-			l = static_cast< FArray2D< Real64 >::size_type >( i - 1 );
+			l = static_cast< Array2D< Real64 >::size_type >( i - 1 );
 			for ( int j = 1; j <= N; ++j, l += N, ++m ) {
 				if ( i == j ) {
 					//        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=1
@@ -1325,8 +1325,8 @@ namespace HeatBalanceIntRadExchange {
 
 	void
 	CalcMatrixInverse(
-		FArray2< Real64 > & A, // Matrix: Gets reduced to L\U form
-		FArray2< Real64 > & I // Returned as inverse matrix
+		Array2< Real64 > & A, // Matrix: Gets reduced to L\U form
+		Array2< Real64 > & I // Returned as inverse matrix
 	)
 	{
 		// SUBROUTINE INFORMATION:

@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/numeric.hh>
@@ -150,7 +150,7 @@ namespace DaylightingDevices {
 	// MODULE VARIABLE TYPE DECLARATIONS: na
 
 	// MODULE VARIABLE DECLARATIONS:
-	FArray1D< Real64 > COSAngle( NumOfAngles ); // List of cosines of incident angle
+	Array1D< Real64 > COSAngle( NumOfAngles ); // List of cosines of incident angle
 
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -211,7 +211,7 @@ namespace DaylightingDevices {
 			// Members
 			Real64 AspectRatio; // Aspect ratio, length / diameter
 			Real64 Reflectance; // Reflectance of surface
-			FArray1D< Real64 > TransBeam; // Table of beam transmittance vs. cosine angle
+			Array1D< Real64 > TransBeam; // Table of beam transmittance vs. cosine angle
 
 			// Default Constructor
 			TDDPipeStoredData() :
@@ -224,7 +224,7 @@ namespace DaylightingDevices {
 			TDDPipeStoredData(
 				Real64 const AspectRatio, // Aspect ratio, length / diameter
 				Real64 const Reflectance, // Reflectance of surface
-				FArray1< Real64 > const & TransBeam // Table of beam transmittance vs. cosine angle
+				Array1< Real64 > const & TransBeam // Table of beam transmittance vs. cosine angle
 			) :
 				AspectRatio( AspectRatio ),
 				Reflectance( Reflectance ),
@@ -234,7 +234,7 @@ namespace DaylightingDevices {
 		};
 
 		// Object Data
-		FArray1D< TDDPipeStoredData > TDDPipeStored;
+		Array1D< TDDPipeStoredData > TDDPipeStored;
 
 		// FLOW:
 		// Initialize tubular daylighting devices (TDDs)
@@ -1252,7 +1252,7 @@ namespace DaylightingDevices {
 	Real64
 	InterpolatePipeTransBeam(
 		Real64 const COSI, // Cosine of the incident angle
-		FArray1A< Real64 > const transBeam // Table of beam transmittance vs. cosine angle
+		Array1A< Real64 > const transBeam // Table of beam transmittance vs. cosine angle
 	)
 	{
 

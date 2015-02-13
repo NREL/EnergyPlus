@@ -4,8 +4,8 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -310,10 +310,10 @@ namespace RefrigeratedCase {
 	Real64 const FanHalfSpeedRatio( 0.1768 ); // = 1/(2**2.5) for power step for two speed fan
 	Real64 const CapFac60Percent( 0.60 ); // = 60%, load served by half power 2-speed fan
 
-	FArray1D< Real64 > const EuropeanWetCoilFactor( 5, { 1.35, 1.15, 1.05, 1.01, 1.0 } );
-	FArray1D< Real64 > const EuropeanAirInletTemp( 5, { 10.0, 0.0, -18.0, -25.0, -34.0 } );
-	FArray1D< Real64 > const EuropeanEvapTemp( 5, { 0.0, -8.0, -25.0, -31.0, -40.0 } );
-	FArray1D< Real64 > const EuropeanDT1( 5, { 10.0, 8.0, 7.0, 7.0, 6.0 } );
+	Array1D< Real64 > const EuropeanWetCoilFactor( 5, { 1.35, 1.15, 1.05, 1.01, 1.0 } );
+	Array1D< Real64 > const EuropeanAirInletTemp( 5, { 10.0, 0.0, -18.0, -25.0, -34.0 } );
+	Array1D< Real64 > const EuropeanEvapTemp( 5, { 0.0, -8.0, -25.0, -31.0, -40.0 } );
+	Array1D< Real64 > const EuropeanDT1( 5, { 10.0, 8.0, 7.0, 7.0, 6.0 } );
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -347,15 +347,15 @@ namespace RefrigeratedCase {
 
 	// Refrigerated case variables
 	Real64 CaseRAFactor( 0.0 ); // Factor determining case credit allocation (e.g. % to zone or HVAC)
-	FArray1D_bool ShowStockingWarning; // Used for one-time warning message for possible case
+	Array1D_bool ShowStockingWarning; // Used for one-time warning message for possible case
 	// input error regarding stocking
-	FArray1D_bool ShowFrostWarning; // Used for one-time warning message for possible case
+	Array1D_bool ShowFrostWarning; // Used for one-time warning message for possible case
 	// input error regarding frost
-	FArray1D_bool ShowStoreEnergyWarning; // Used for one-time warning message for possible case
+	Array1D_bool ShowStoreEnergyWarning; // Used for one-time warning message for possible case
 	// input error regarding defrost or stocking
 	//  Walk In variables
-	FArray1D_bool ShowUnmetWIEnergyWarning; // Used for one-time warning message
-	FArray1D_bool ShowWIFrostWarning; // Used for one-time warning message
+	Array1D_bool ShowUnmetWIEnergyWarning; // Used for one-time warning message
+	Array1D_bool ShowWIFrostWarning; // Used for one-time warning message
 
 	// Refrigeration compressor rack variables
 	Real64 TotalRackDeliveredCapacity( 0.0 ); // Total capacity of all refrigerated cases attached to rack (W)
@@ -365,7 +365,7 @@ namespace RefrigeratedCase {
 	Real64 RackSenCreditToHVAC( 0.0 ); // Amount of condenser heat applied to HVAC RA duct (W)
 	int InletNode( 0 ); // Water-cooled condenser inlet node number
 	int OutletNode( 0 ); // Water-cooled condenser outlet node number
-	FArray1D_bool ShowCOPWarning; // Used for one-time warning message for possible rack
+	Array1D_bool ShowCOPWarning; // Used for one-time warning message for possible rack
 	// input error regarding COP
 	// Refrigeration condenser variables (used for both racks and detailed systems)
 	Real64 TotalCondenserFanPower( 0.0 ); // Total condenser fan electric power (W)
@@ -375,32 +375,32 @@ namespace RefrigeratedCase {
 	Real64 TotalEvapWaterUseRate( 0.0 ); // Total condenser water use rate (m3/s)
 
 	// Refrigeration system variables
-	FArray1D_bool ShowUnmetEnergyWarning; // Used for one-time warning message for possible
+	Array1D_bool ShowUnmetEnergyWarning; // Used for one-time warning message for possible
 	//compressor input error regarding total system compressor capacity
-	FArray1D_bool ShowHiStageUnmetEnergyWarning; // Used for one-time warning message for possible
+	Array1D_bool ShowHiStageUnmetEnergyWarning; // Used for one-time warning message for possible
 	//high-stage compressor input error regarding high-stage compressor capacity
 
 	// Transcritical refrigeration system variables
 	bool TransCritSysFlag( false ); // Used to indicate whether or not a transcritical refrigeration system has been defined.
-	FArray1D_bool ShowUnmetEnergyWarningTrans; // Used for one-time warning message for possible
+	Array1D_bool ShowUnmetEnergyWarningTrans; // Used for one-time warning message for possible
 	//compressor input error regarding total system compressor capacity
 
 	// Refrigeration Secondary Loop variables
-	FArray1D_bool ShowUnmetSecondEnergyWarning; // Used for one-time warning message for possible
+	Array1D_bool ShowUnmetSecondEnergyWarning; // Used for one-time warning message for possible
 	//compressor input error regarding secondary loop heat exchanger capacity
 	//Refrigerated warehouse coil variables
-	FArray1D_bool CheckChillerName; // used when simrefrigcoil called for a zone
+	Array1D_bool CheckChillerName; // used when simrefrigcoil called for a zone
 	//LOGICAL, ALLOCATABLE,DIMENSION(:) :: CheckZoneNum  !used when simrefrigcoil called for a zone
-	FArray1D_bool ShowCoilFrostWarning; // Used for one-time warning message if defrost cycles insufficient to melt ice
+	Array1D_bool ShowCoilFrostWarning; // Used for one-time warning message if defrost cycles insufficient to melt ice
 
 	// Refrigeration Plant connections checks
-	FArray1D_bool CheckEquipNameRackWaterCondenser;
-	FArray1D_bool CheckEquipNameWaterCondenser;
+	Array1D_bool CheckEquipNameRackWaterCondenser;
+	Array1D_bool CheckEquipNameWaterCondenser;
 
 	//Control variables
-	FArray1D_bool RefrigPresentInZone; // Used when translating rate to energy for reporting
+	Array1D_bool RefrigPresentInZone; // Used when translating rate to energy for reporting
 	//  total refrigeration impact on a zone
-	FArray1D_bool CheckChillerSetName; // used when sim chiller set called form zone equip manager
+	Array1D_bool CheckChillerSetName; // used when sim chiller set called form zone equip manager
 
 	bool GetRefrigerationInputFlag( true ); // Flag to show case input should be read
 	bool HaveRefrigRacks( true ); // Is initialized as TRUE and remains true when
@@ -420,24 +420,24 @@ namespace RefrigeratedCase {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE RefrigeratedCase:
 
 	// Object Data
-	FArray1D< RefrigCaseData > RefrigCase;
-	FArray1D< RefrigRackData > RefrigRack;
-	FArray1D< CaseRAFractionData > CaseRAFraction;
-	FArray1D< RefrigSystemData > System;
-	FArray1D< TransRefrigSystemData > TransSystem;
-	FArray1D< RefrigCondenserData > Condenser;
-	FArray1D< RefrigCompressorData > Compressor;
-	FArray1D< RefrigGasCoolerData > GasCooler;
-	FArray1D< SubcoolerData > Subcooler;
-	FArray1D< CaseAndWalkInListDef > CaseAndWalkInList;
-	FArray1D< CompressorListDef > CompressorLists;
-	FArray1D< SecondaryLoopData > Secondary;
-	FArray1D< TransferLoadListDef > TransferLoadList;
-	FArray1D< WalkInData > WalkIn;
-	FArray1D< WarehouseCoilData > WarehouseCoil;
-	FArray1D< AirChillerSetData > AirChillerSet;
-	FArray1D< CoilCreditData > CoilSysCredit;
-	FArray1D< CaseWIZoneReportData > CaseWIZoneReport;
+	Array1D< RefrigCaseData > RefrigCase;
+	Array1D< RefrigRackData > RefrigRack;
+	Array1D< CaseRAFractionData > CaseRAFraction;
+	Array1D< RefrigSystemData > System;
+	Array1D< TransRefrigSystemData > TransSystem;
+	Array1D< RefrigCondenserData > Condenser;
+	Array1D< RefrigCompressorData > Compressor;
+	Array1D< RefrigGasCoolerData > GasCooler;
+	Array1D< SubcoolerData > Subcooler;
+	Array1D< CaseAndWalkInListDef > CaseAndWalkInList;
+	Array1D< CompressorListDef > CompressorLists;
+	Array1D< SecondaryLoopData > Secondary;
+	Array1D< TransferLoadListDef > TransferLoadList;
+	Array1D< WalkInData > WalkIn;
+	Array1D< WarehouseCoilData > WarehouseCoil;
+	Array1D< AirChillerSetData > AirChillerSet;
+	Array1D< CoilCreditData > CoilSysCredit;
+	Array1D< CaseWIZoneReportData > CaseWIZoneReport;
 
 	// Functions
 
@@ -631,13 +631,13 @@ namespace RefrigeratedCase {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string Alphas; // Alpha items for object
-		FArray1D_string cAlphaFieldNames; // Alpha field names (from input processor)
-		FArray1D_string cNumericFieldNames; // Numeric field names (from input processor)
+		Array1D_string Alphas; // Alpha items for object
+		Array1D_string cAlphaFieldNames; // Alpha field names (from input processor)
+		Array1D_string cNumericFieldNames; // Numeric field names (from input processor)
 		static std::string CurrentModuleObject; // Object type for getting and error messages
 
-		FArray1D_bool lAlphaBlanks; // Logic array, alpha input blank = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logic array, numeric input blank = .TRUE.
+		Array1D_bool lAlphaBlanks; // Logic array, alpha input blank = .TRUE.
+		Array1D_bool lNumericBlanks; // Logic array, numeric input blank = .TRUE.
 		static bool CaseLoads( false ); // Flag to help verify load type with loads served by systems cooled by cascade condensers
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		static bool IsNotOK( false ); // Flag to verify name
@@ -814,8 +814,8 @@ namespace RefrigeratedCase {
 		static Real64 TBrineAverage( 0.0 ); // Rated average of inlet and outlet temps, used for property look up, C
 		static Real64 TempRAFraction( 0.0 ); // Temporary sum of Return Air fraction per zone for reporting
 		static Real64 TestDelta( 0.0 ); // Used to compare secondary loop rated capacity to calculated capacity, fraction
-		FArray1D< Real64 > Numbers; // Numeric items for object
-		FArray2D< Real64 > DayValues; // Array of schedule values
+		Array1D< Real64 > Numbers; // Numeric items for object
+		Array2D< Real64 > DayValues; // Array of schedule values
 
 		NumSimulationCascadeCondensers = GetNumObjectsFound( "Refrigeration:Condenser:Cascade" );
 		NumSimulationCases = GetNumObjectsFound( "Refrigeration:Case" );

@@ -4,7 +4,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -119,8 +119,8 @@ namespace ChillerReformulatedEIR {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ChillerReformulatedEIR
 
 	// Object Data
-	FArray1D< ReformulatedEIRChillerSpecs > ElecReformEIRChiller; // dimension to number of machines
-	FArray1D< ReportVars > ElecReformEIRChillerReport;
+	Array1D< ReformulatedEIRChillerSpecs > ElecReformEIRChiller; // dimension to number of machines
+	Array1D< ReportVars > ElecReformEIRChillerReport;
 
 	// MODULE SUBROUTINES:
 
@@ -643,8 +643,8 @@ namespace ChillerReformulatedEIR {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "InitElecReformEIRChiller" );
 		static bool MyOneTimeFlag( true ); // One time logic flag for allocating MyEnvrnFlag array
-		static FArray1D_bool MyFlag;
-		static FArray1D_bool MyEnvrnFlag; // Logical array to initialize when appropriate
+		static Array1D_bool MyFlag;
+		static Array1D_bool MyEnvrnFlag; // Logical array to initialize when appropriate
 		int EvapInletNode; // Node number for evaporator water inlet node
 		int EvapOutletNode; // Node number for evaporator water outlet node
 		int CondInletNode; // Node number for condenser water inlet node
@@ -905,8 +905,8 @@ namespace ChillerReformulatedEIR {
 		Real64 CondTemp; // Used to verify EIRFPLR curve is > than 0 at reference conditions
 		static bool FoundNegValue( false ); // Used to evaluate EIRFPLR curve objects
 		static int CurveCheck( 0 ); // Used to evaluate EIRFPLR curve objects
-		FArray1D< Real64 > CurveValArray( 11 ); // Used to evaluate EIRFPLR curve objects
-		FArray1D< Real64 > CondTempArray( 11 ); // Used to evaluate EIRFPLR curve objects
+		Array1D< Real64 > CurveValArray( 11 ); // Used to evaluate EIRFPLR curve objects
+		Array1D< Real64 > CondTempArray( 11 ); // Used to evaluate EIRFPLR curve objects
 		Real64 CurveValTmp; // Used to evaluate EIRFPLR curve objects
 		Real64 Density; // Density of condenser water used in warning messages
 		Real64 SpecificHeat; // Specific heat of condenser water used in warning messages
@@ -922,7 +922,7 @@ namespace ChillerReformulatedEIR {
 		Real64 tmpCondVolFlowRate; // local condenser design volume flow rate
 		Real64 tmpHeatRecVolFlowRate; // local heat recovery design volume flow rate
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyFlag; // TRUE in order to calculate IPLV
+		static Array1D_bool MyFlag; // TRUE in order to calculate IPLV
 		bool IsAutoSize; // Indicator to autosize for reporting
 		Real64 EvapVolFlowRateUser; // Hardsized evaporator flow for reporting
 		Real64 RefCapUser; // Hardsized reference capacity for reporting
@@ -1351,7 +1351,7 @@ namespace ChillerReformulatedEIR {
 		Real64 EIRFPLRTmax; // Maximum condenser leaving temperature allowed by EIRFPLR curve [C]
 		Real64 Tmin; // Minimum condenser leaving temperature allowed by curve objects [C]
 		Real64 Tmax; // Maximum condenser leaving temperature allowed by curve objects [C]
-		FArray1D< Real64 > Par( 6 ); // Pass parameters for RegulaFalsi solver
+		Array1D< Real64 > Par( 6 ); // Pass parameters for RegulaFalsi solver
 		Real64 FalsiCondOutTemp; // RegulaFalsi condenser outlet temperature result [C]
 		int SolFla; // Feedback flag from SolveRegulaFalsi
 		Real64 CondTempMin; // Condenser outlet temperature when using Tmin as input to CalcReformEIRChillerModel [C]
@@ -1688,7 +1688,7 @@ namespace ChillerReformulatedEIR {
 	Real64
 	CondOutTempResidual(
 		Real64 const FalsiCondOutTemp, // RegulaFalsi condenser outlet temperature result [C]
-		FArray1< Real64 > const & Par // Parameter array used to interface with RegulaFalsi solver
+		Array1< Real64 > const & Par // Parameter array used to interface with RegulaFalsi solver
 	)
 	{
 

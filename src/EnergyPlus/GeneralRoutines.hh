@@ -2,8 +2,8 @@
 #define GeneralRoutines_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/FArray2S.hh>
+#include <ObjexxFCL/Array1S.hh>
+#include <ObjexxFCL/Array2S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -69,7 +69,7 @@ ValidateComponent(
 
 void
 CalcPassiveExteriorBaffleGap(
-	FArray1S_int const SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
+	Array1S_int const SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
 	Real64 const VentArea, // Area available for venting the gap [m2]
 	Real64 const Cv, // Oriface coefficient for volume-based discharge, wind-driven [--]
 	Real64 const Cd, // oriface coefficient for discharge,  bouyancy-driven [--]
@@ -120,7 +120,7 @@ TestSupplyAirPathIntegrity( bool & ErrFound );
 void
 TestReturnAirPathIntegrity(
 	bool & ErrFound,
-	FArray2S_int ValRetAPaths
+	Array2S_int ValRetAPaths
 );
 
 //     NOTICE

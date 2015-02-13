@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -156,26 +156,26 @@ namespace EconomicLifeCycleCost {
 	int numResourcesUsed;
 
 	//present value factors
-	FArray1D< Real64 > SPV;
-	FArray2D< Real64 > energySPV; // yearly equivalent to FEMP UPV* values
+	Array1D< Real64 > SPV;
+	Array2D< Real64 > energySPV; // yearly equivalent to FEMP UPV* values
 
 	//arrays related to computing after tax cashflow and present value
-	FArray1D< Real64 > DepreciatedCapital;
-	FArray1D< Real64 > TaxableIncome;
-	FArray1D< Real64 > Taxes;
-	FArray1D< Real64 > AfterTaxCashFlow;
-	FArray1D< Real64 > AfterTaxPresentValue;
+	Array1D< Real64 > DepreciatedCapital;
+	Array1D< Real64 > TaxableIncome;
+	Array1D< Real64 > Taxes;
+	Array1D< Real64 > AfterTaxCashFlow;
+	Array1D< Real64 > AfterTaxPresentValue;
 
-	FArray1D_string const MonthNames( 12, { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" } );
+	Array1D_string const MonthNames( 12, { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" } );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
 	// Object Data
-	FArray1D< RecurringCostsType > RecurringCosts;
-	FArray1D< NonrecurringCostType > NonrecurringCost;
-	FArray1D< UsePriceEscalationType > UsePriceEscalation;
-	FArray1D< UseAdjustmentType > UseAdjustment;
-	FArray1D< CashFlowType > CashFlow;
+	Array1D< RecurringCostsType > RecurringCosts;
+	Array1D< NonrecurringCostType > NonrecurringCost;
+	Array1D< UsePriceEscalationType > UsePriceEscalation;
+	Array1D< UseAdjustmentType > UseAdjustment;
+	Array1D< CashFlowType > CashFlow;
 
 	// Functions
 
@@ -317,8 +317,8 @@ namespace EconomicLifeCycleCost {
 		int jFld;
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
-		FArray1D_string AlphaArray( 100 ); // character string data
-		FArray1D< Real64 > NumArray( 100 ); // numeric data
+		Array1D_string AlphaArray( 100 ); // character string data
+		Array1D< Real64 > NumArray( 100 ); // numeric data
 		int IOStat; // IO Status when calling get input subroutine
 		std::string CurrentModuleObject; // for ease in renaming.
 		int NumObj; // count of objects
@@ -563,8 +563,8 @@ namespace EconomicLifeCycleCost {
 		int jFld;
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
-		FArray1D_string AlphaArray( 100 ); // character string data
-		FArray1D< Real64 > NumArray( 100 ); // numeric data
+		Array1D_string AlphaArray( 100 ); // character string data
+		Array1D< Real64 > NumArray( 100 ); // numeric data
 		int IOStat; // IO Status when calling get input subroutine
 		std::string CurrentModuleObject; // for ease in renaming.
 
@@ -730,8 +730,8 @@ namespace EconomicLifeCycleCost {
 		int jFld;
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
-		FArray1D_string AlphaArray( 100 ); // character string data
-		FArray1D< Real64 > NumArray( 100 ); // numeric data
+		Array1D_string AlphaArray( 100 ); // character string data
+		Array1D< Real64 > NumArray( 100 ); // numeric data
 		int IOStat; // IO Status when calling get input subroutine
 		std::string CurrentModuleObject; // for ease in renaming.
 		int numComponentCostLineItems; // number of ComponentCost:LineItem objects
@@ -857,8 +857,8 @@ namespace EconomicLifeCycleCost {
 		int jFld;
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
-		FArray1D_string AlphaArray( 100 ); // character string data
-		FArray1D< Real64 > NumArray( 100 ); // numeric data
+		Array1D_string AlphaArray( 100 ); // character string data
+		Array1D< Real64 > NumArray( 100 ); // numeric data
 		int IOStat; // IO Status when calling get input subroutine
 		std::string CurrentModuleObject; // for ease in renaming.
 		static int escStartYear( 0 );
@@ -1005,8 +1005,8 @@ namespace EconomicLifeCycleCost {
 		int jYear;
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
-		FArray1D_string AlphaArray( 100 ); // character string data
-		FArray1D< Real64 > NumArray( 100 ); // numeric data
+		Array1D_string AlphaArray( 100 ); // character string data
+		Array1D< Real64 > NumArray( 100 ); // numeric data
 		int IOStat; // IO Status when calling get input subroutine
 		std::string CurrentModuleObject; // for ease in renaming.
 		int numFldsToUse;
@@ -1196,15 +1196,15 @@ namespace EconomicLifeCycleCost {
 		static int baseMonths1900( 0 ); // number of months since 1900 for base period
 		static int serviceMonths1900( 0 ); // number of months since 1900 for service period
 		int monthsBaseToService;
-		FArray2D< Real64 > resourceCosts;
-		FArray1D< Real64 > curResourceCosts( 12 );
-		FArray1D_bool resourceCostNotZero;
-		FArray1D< Real64 > resourceCostAnnual;
+		Array2D< Real64 > resourceCosts;
+		Array1D< Real64 > curResourceCosts( 12 );
+		Array1D_bool resourceCostNotZero;
+		Array1D< Real64 > resourceCostAnnual;
 		Real64 annualCost;
 		int cashFlowCounter;
 		int found;
 		int curCategory;
-		FArray1D< Real64 > monthlyInflationFactor;
+		Array1D< Real64 > monthlyInflationFactor;
 		Real64 inflationPerMonth;
 		int iLoop;
 
@@ -1599,7 +1599,7 @@ namespace EconomicLifeCycleCost {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > DepreciationPercent( SizeDepr ); // values expressed as percent 5% is 5.0 (based on tables)
+		Array1D< Real64 > DepreciationPercent( SizeDepr ); // values expressed as percent 5% is 5.0 (based on tables)
 		Real64 curCapital;
 		int curDepYear;
 		int iYear;
@@ -1914,10 +1914,10 @@ namespace EconomicLifeCycleCost {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// all arrays are in the format: (row, column)
-		FArray1D_string columnHead;
-		FArray1D_int columnWidth;
-		FArray1D_string rowHead;
-		FArray2D_string tableBody;
+		Array1D_string columnHead;
+		Array1D_int columnWidth;
+		Array1D_string rowHead;
+		Array2D_string tableBody;
 
 		int month;
 		int numColumns;

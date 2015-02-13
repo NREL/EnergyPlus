@@ -87,9 +87,9 @@ SQLite::SQLite()
 	int numberOfSQLiteObjects = InputProcessor::GetNumObjectsFound("Output:SQLite");
 
 	if ( ( numberOfSQLiteObjects == 1 ) && ( ! DataSystemVariables::DDOnly ) ) {
-		FArray1D_string alphas(5);
+		Array1D_string alphas(5);
 		int numAlphas;
-		FArray1D< Real64 > numbers(2);
+		Array1D< Real64 > numbers(2);
 		int numNumbers;
 		int status;
 
@@ -1868,10 +1868,10 @@ void SQLite::createSQLiteDaylightMap(
 	int const dayOfMonth,
 	int const hourOfDay,
 	int const nX,
-	FArray1< Real64 > const & x,
+	Array1< Real64 > const & x,
 	int const nY,
-	FArray1< Real64 > const & y,
-	FArray2< Real64 > const & illuminance
+	Array1< Real64 > const & y,
+	Array2< Real64 > const & illuminance
 )
 {
 	static int hourlyReportIndex = 0;
@@ -1905,9 +1905,9 @@ void SQLite::createSQLiteDaylightMap(
 }
 
 void SQLite::createSQLiteTabularDataRecords(
-	FArray2D_string const & body, // html table row, html table column
-	FArray1D_string const & rowLabels,
-	FArray1D_string const & columnLabels,
+	Array2D_string const & body, // html table row, html table column
+	Array1D_string const & rowLabels,
+	Array1D_string const & columnLabels,
 	std::string const & reportName,
 	std::string const & reportForString,
 	std::string const & tableName

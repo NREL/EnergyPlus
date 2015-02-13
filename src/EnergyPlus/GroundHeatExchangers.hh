@@ -2,7 +2,7 @@
 #define GroundHeatExchangers_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -35,15 +35,15 @@ namespace GroundHeatExchangers {
 	extern Real64 GlheBoreholeTemp; // The average borehole tempreature [°C]
 	extern int LocHourOfDay;
 	extern int LocDayOfSim;
-	extern FArray1D< Real64 > LastQnSubHr; // Previous time step Qn subhourly value
+	extern Array1D< Real64 > LastQnSubHr; // Previous time step Qn subhourly value
 	extern Real64 MDotActual;
 
-	extern FArray1D< Real64 > PrevTimeSteps; // This is used to store only the Last Few time step's time
+	extern Array1D< Real64 > PrevTimeSteps; // This is used to store only the Last Few time step's time
 	// to enable the calculation of the subhouly contribution..
 	// Recommended size, the product of Minimum subhourly history required and
 	// the maximum no of system time steps in an hour
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE CondenserTowers
 
@@ -73,15 +73,15 @@ namespace GroundHeatExchangers {
 		Real64 PipeThick; // Thickness of the pipe wall
 		Real64 gReferenceRatio; // Reference ratio for developing g-functions [-]
 		int NPairs; // Number of pairs of Lntts and Gfunc
-		FArray1D< Real64 > QnMonthlyAgg; // Monthly aggregated normalised heat extraction/rejection rate [W/m]
-		FArray1D< Real64 > QnHr; // Hourly aggregated normalised heat extraction/rejection rate [W/m]
-		FArray1D< Real64 > QnSubHr; // Contains the subhourly heat extraction/rejection rate normalised
+		Array1D< Real64 > QnMonthlyAgg; // Monthly aggregated normalised heat extraction/rejection rate [W/m]
+		Array1D< Real64 > QnHr; // Hourly aggregated normalised heat extraction/rejection rate [W/m]
+		Array1D< Real64 > QnSubHr; // Contains the subhourly heat extraction/rejection rate normalised
 		// by the total active length of bore holes  [W/m]
-		FArray1D< Real64 > LNTTS; // natural log of Non Dimensional Time Ln(t/ts)
-		FArray1D< Real64 > GFNC; // G-function ( Non Dimensional temperature response factors)
+		Array1D< Real64 > LNTTS; // natural log of Non Dimensional Time Ln(t/ts)
+		Array1D< Real64 > GFNC; // G-function ( Non Dimensional temperature response factors)
 		int AGG; // Minimum Hourly Histroy required
 		int SubAGG; // Minimum subhourly History
-		FArray1D_int LastHourN; // Stores the Previous hour's N for past hours
+		Array1D_int LastHourN; // Stores the Previous hour's N for past hours
 		// until the minimum subhourly history
 		//loop topology variables
 		int LoopNum;
@@ -142,14 +142,14 @@ namespace GroundHeatExchangers {
 			Real64 const PipeThick, // Thickness of the pipe wall
 			Real64 const gReferenceRatio, // Reference ratio for developing g-functions [-]
 			int const NPairs, // Number of pairs of Lntts and Gfunc
-			FArray1< Real64 > const & QnMonthlyAgg, // Monthly aggregated normalised heat extraction/rejection rate [W/m]
-			FArray1< Real64 > const & QnHr, // Hourly aggregated normalised heat extraction/rejection rate [W/m]
-			FArray1< Real64 > const & QnSubHr, // Contains the subhourly heat extraction/rejection rate normalised
-			FArray1< Real64 > const & LNTTS, // natural log of Non Dimensional Time Ln(t/ts)
-			FArray1< Real64 > const & GFNC, // G-function ( Non Dimensional temperature response factors)
+			Array1< Real64 > const & QnMonthlyAgg, // Monthly aggregated normalised heat extraction/rejection rate [W/m]
+			Array1< Real64 > const & QnHr, // Hourly aggregated normalised heat extraction/rejection rate [W/m]
+			Array1< Real64 > const & QnSubHr, // Contains the subhourly heat extraction/rejection rate normalised
+			Array1< Real64 > const & LNTTS, // natural log of Non Dimensional Time Ln(t/ts)
+			Array1< Real64 > const & GFNC, // G-function ( Non Dimensional temperature response factors)
 			int const AGG, // Minimum Hourly Histroy required
 			int const SubAGG, // Minimum subhourly History
-			FArray1_int const & LastHourN, // Stores the Previous hour's N for past hours
+			Array1_int const & LastHourN, // Stores the Previous hour's N for past hours
 			int const LoopNum,
 			int const LoopSideNum,
 			int const BranchNum,
@@ -232,8 +232,8 @@ namespace GroundHeatExchangers {
 	};
 
 	// Object Data
-	extern FArray1D< GlheSpecs > VerticalGlhe; // dimension to number of machines
-	extern FArray1D< ReportVars > VerticalGlheReport;
+	extern Array1D< GlheSpecs > VerticalGlhe; // dimension to number of machines
+	extern Array1D< ReportVars > VerticalGlheReport;
 
 	// Functions
 

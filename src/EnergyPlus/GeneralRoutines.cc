@@ -3,9 +3,9 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -126,7 +126,7 @@ ControlCompOutput(
 	// Note - order in routine must match order below
 	//  Plus -- order in ListOfComponents array must be in sorted order.
 	int const NumComponents( 11 );
-	static FArray1D_string const ListOfComponents( NumComponents, { "AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT", "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT", "COIL:HEATING:WATER", "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER", "ZONEHVAC:FOURPIPEFANCOIL", "ZONEHVAC:OUTDOORAIRUNIT", "ZONEHVAC:UNITHEATER", "ZONEHVAC:UNITVENTILATOR", "ZONEHVAC:VENTILATEDSLAB" } );
+	static Array1D_string const ListOfComponents( NumComponents, { "AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT", "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT", "COIL:HEATING:WATER", "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER", "ZONEHVAC:FOURPIPEFANCOIL", "ZONEHVAC:OUTDOORAIRUNIT", "ZONEHVAC:UNITHEATER", "ZONEHVAC:UNITVENTILATOR", "ZONEHVAC:VENTILATEDSLAB" } );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -860,7 +860,7 @@ ValidateComponent(
 
 void
 CalcPassiveExteriorBaffleGap(
-	FArray1S_int const SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
+	Array1S_int const SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
 	Real64 const VentArea, // Area available for venting the gap [m2]
 	Real64 const Cv, // Oriface coefficient for volume-based discharge, wind-driven [--]
 	Real64 const Cd, // oriface coefficient for discharge,  bouyancy-driven [--]
@@ -942,12 +942,12 @@ CalcPassiveExteriorBaffleGap(
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 	// following arrays are used to temporarily hold results from multiple underlying surfaces
-	FArray1D< Real64 > HSkyARR;
-	FArray1D< Real64 > HGroundARR;
-	FArray1D< Real64 > HAirARR;
-	FArray1D< Real64 > HPlenARR;
-	FArray1D< Real64 > HExtARR;
-	FArray1D< Real64 > LocalWindArr;
+	Array1D< Real64 > HSkyARR;
+	Array1D< Real64 > HGroundARR;
+	Array1D< Real64 > HAirARR;
+	Array1D< Real64 > HPlenARR;
+	Array1D< Real64 > HExtARR;
+	Array1D< Real64 > LocalWindArr;
 
 	// local working variables
 	Real64 RhoAir; // density of air
@@ -1344,10 +1344,10 @@ TestAirPathIntegrity( bool & ErrFound )
 	int Count;
 	int TestNode;
 	bool errFlag;
-	FArray2D_int ValRetAPaths;
-	FArray2D_int NumRAPNodes;
-	FArray2D_int ValSupAPaths;
-	FArray2D_int NumSAPNodes;
+	Array2D_int ValRetAPaths;
+	Array2D_int NumRAPNodes;
+	Array2D_int ValSupAPaths;
+	Array2D_int NumSAPNodes;
 
 	NumSAPNodes.allocate( NumPrimaryAirSys, NumOfNodes );
 	NumRAPNodes.allocate( NumPrimaryAirSys, NumOfNodes );
@@ -1448,9 +1448,9 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	int Count;
 	std::string AirPathNodeName; // Air Path Inlet Node Name
 	std::string PrimaryAirLoopName; // Air Loop to which this supply air path is connected
-	FArray1D_bool FoundSupplyPlenum;
-	FArray1D_bool FoundZoneSplitter;
-	FArray1D_string FoundNames;
+	Array1D_bool FoundSupplyPlenum;
+	Array1D_bool FoundZoneSplitter;
+	Array1D_string FoundNames;
 	int NumErr( 0 ); // Error Counter //Autodesk:Init Initialization added
 	int BCount;
 	int Found;
@@ -1663,7 +1663,7 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 void
 TestReturnAirPathIntegrity(
 	bool & ErrFound,
-	FArray2S_int ValRetAPaths
+	Array2S_int ValRetAPaths
 )
 {
 
@@ -1739,9 +1739,9 @@ TestReturnAirPathIntegrity(
 	int Count;
 	std::string AirPathNodeName; // Air Path Inlet Node Name
 	std::string PrimaryAirLoopName; // Air Loop to which this return air path is connected
-	FArray1D_bool FoundReturnPlenum;
-	FArray1D_bool FoundZoneMixer;
-	FArray1D_string FoundNames;
+	Array1D_bool FoundReturnPlenum;
+	Array1D_bool FoundZoneMixer;
+	Array1D_string FoundNames;
 	int NumErr; // Error Counter
 	int BCount;
 	int Found;
@@ -1750,7 +1750,7 @@ TestReturnAirPathIntegrity(
 	int Count2;
 	bool HasMixer;
 	int MixerComp;
-	FArray1D_int AllNodes;
+	Array1D_int AllNodes;
 	int MixerCount;
 	int Count3;
 	int NumComp;

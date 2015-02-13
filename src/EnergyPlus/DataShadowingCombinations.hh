@@ -2,7 +2,7 @@
 #define DataShadowingCombinations_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -26,11 +26,11 @@ namespace DataShadowingCombinations {
 		// Members
 		bool UseThisSurf; // True when this surface should be used in calculations
 		int NumGenSurf; // Number of General surfaces for this surf
-		FArray1D_int GenSurf; // Array of General Surface Numbers
+		Array1D_int GenSurf; // Array of General Surface Numbers
 		int NumBackSurf; // Number of Back (Interior) surfaces for this surf
-		FArray1D_int BackSurf; // Array of Back (Interior) surface numbers
+		Array1D_int BackSurf; // Array of Back (Interior) surface numbers
 		int NumSubSurf; // Number of SubSurfaces for this surf
-		FArray1D_int SubSurf; // Array of SubSurface surface Numbers
+		Array1D_int SubSurf; // Array of SubSurface surface Numbers
 
 		// Default Constructor
 		ShadowingCombinations() :
@@ -44,11 +44,11 @@ namespace DataShadowingCombinations {
 		ShadowingCombinations(
 			bool const UseThisSurf, // True when this surface should be used in calculations
 			int const NumGenSurf, // Number of General surfaces for this surf
-			FArray1_int const & GenSurf, // Array of General Surface Numbers
+			Array1_int const & GenSurf, // Array of General Surface Numbers
 			int const NumBackSurf, // Number of Back (Interior) surfaces for this surf
-			FArray1_int const & BackSurf, // Array of Back (Interior) surface numbers
+			Array1_int const & BackSurf, // Array of Back (Interior) surface numbers
 			int const NumSubSurf, // Number of SubSurfaces for this surf
-			FArray1_int const & SubSurf // Array of SubSurface surface Numbers
+			Array1_int const & SubSurf // Array of SubSurface surface Numbers
 		) :
 			UseThisSurf( UseThisSurf ),
 			NumGenSurf( NumGenSurf ),
@@ -62,7 +62,7 @@ namespace DataShadowingCombinations {
 	};
 
 	// Object Data
-	extern FArray1D< ShadowingCombinations > ShadowComb;
+	extern Array1D< ShadowingCombinations > ShadowComb;
 
 } // DataShadowingCombinations
 

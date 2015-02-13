@@ -2,8 +2,8 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -218,12 +218,12 @@ namespace PlantPressureSystem {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//Initialization Variables
 		static bool OneTimeInit( true );
-		static FArray1D_bool LoopInit;
+		static Array1D_bool LoopInit;
 
 		//Simulation Variables
 		int NumBranches;
 		int BranchPressureTally;
-		static FArray1D_bool FullParallelBranchSetFound( 2 );
+		static Array1D_bool FullParallelBranchSetFound( 2 );
 		static bool CommonPipeErrorEncountered( false );
 
 		if ( OneTimeInit ) {
@@ -728,8 +728,8 @@ namespace PlantPressureSystem {
 		Real64 BranchPressureDrop;
 		Real64 LoopSidePressureDrop;
 		Real64 LoopPressureDrop;
-		FArray1D< Real64 > ParallelBranchPressureDrops;
-		FArray1D< Real64 > ParallelBranchInletPressures;
+		Array1D< Real64 > ParallelBranchPressureDrops;
+		Array1D< Real64 > ParallelBranchInletPressures;
 		int ParallelBranchCounter;
 		Real64 SplitterInletPressure;
 		Real64 MixerPressure;
@@ -1338,7 +1338,7 @@ namespace PlantPressureSystem {
 		bool Converged;
 		static int ZeroKWarningCounter( 0 );
 		static int MaxIterWarningCounter( 0 );
-		FArray1D< Real64 > MassFlowIterativeHistory( 3 );
+		Array1D< Real64 > MassFlowIterativeHistory( 3 );
 		Real64 MdotDeltaLatest;
 		Real64 MdotDeltaPrevious;
 		Real64 DampingFactor;

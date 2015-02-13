@@ -2,10 +2,10 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArrayS.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/ArrayS.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/MArray.functions.hh>
 
 // EnergyPlus Headers
@@ -893,7 +893,7 @@ namespace RoomAirModelManager {
 
 		// this zone uses Mundt model so get Mundt Model Control
 		// loop through all 'RoomAirSettings:OneNodeDisplacementVentilation' objects
-		Mundt_Control_Loop: for ( ControlNum = 1; ControlNum <= NumOfMundtContrl; ++ControlNum ) {
+		for ( ControlNum = 1; ControlNum <= NumOfMundtContrl; ++ControlNum ) {
 			GetObjectItem( cCurrentModuleObject, ControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
 			ZoneNum = FindItemInList( cAlphaArgs( 1 ), Zone.Name(), NumOfZones );
 			if ( ZoneNum == 0 ) {
@@ -911,9 +911,7 @@ namespace RoomAirModelManager {
 			}
 			ConvectiveFloorSplit( ZoneNum ) = rNumericArgs( 1 );
 			InfiltratFloorSplit( ZoneNum ) = rNumericArgs( 2 );
-			Mundt_Control_Loop_loop: ;
 		}
-		Mundt_Control_Loop_exit: ;
 
 	}
 
@@ -1428,9 +1426,9 @@ namespace RoomAirModelManager {
 		static Real64 Z2Zone( 0.0 ); // Auxiliary variables
 		static Real64 CeilingHeightDiffMax( 0.1 ); // Maximum difference between wall height and ceiling height
 		bool SetZoneAux;
-		FArray1D_int AuxSurf;
+		Array1D_int AuxSurf;
 		int MaxSurf;
-		FArray2D_int AuxAirflowNetworkSurf;
+		Array2D_int AuxAirflowNetworkSurf;
 		Real64 WidthFactMax;
 		Real64 HeightFactMax;
 		Real64 WidthFact;
@@ -1441,7 +1439,7 @@ namespace RoomAirModelManager {
 		int AirflowNetworkSurfPtr;
 		int NSides;
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 
 		static int CompNum( 0 ); // AirflowNetwork Component number
 		static int TypeNum( 0 ); // Airflownetwork Type Number within a component

@@ -3,7 +3,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -727,12 +727,12 @@ namespace SizingManager {
 		//  REAL(r64) :: CalcAmt
 
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		CurrentModuleObject = "DesignSpecification:OutdoorAir";
 		NumOARequirements = GetNumObjectsFound( CurrentModuleObject );
@@ -783,14 +783,14 @@ namespace SizingManager {
 	ProcessInputOARequirements(
 		std::string const & CurrentModuleObject,
 		int const OAIndex,
-		FArray1_string const & Alphas,
+		Array1_string const & Alphas,
 		int & NumAlphas,
-		FArray1< Real64 > const & Numbers,
+		Array1< Real64 > const & Numbers,
 		int & NumNumbers,
-		FArray1_bool const & lNumericBlanks, //Unused
-		FArray1_bool const & lAlphaBlanks,
-		FArray1_string const & cAlphaFields,
-		FArray1_string const & cNumericFields, //Unused
+		Array1_bool const & lNumericBlanks, //Unused
+		Array1_bool const & lAlphaBlanks,
+		Array1_string const & cAlphaFields,
+		Array1_string const & cNumericFields, //Unused
 		bool & ErrorsFound // If errors found in input
 	)
 	{
@@ -870,10 +870,10 @@ namespace SizingManager {
 			OARequirements( OAIndex ).OAFlowPerPerson = Numbers( 1 );
 		}
 		else {
-			// default value for Outdoor Air Flow per Person when per person flow is counted 
+			// default value for Outdoor Air Flow per Person when per person flow is counted
 			OARequirements( OAIndex ).OAFlowPerPerson = 0.00944;
 		}
-		// if one of the methods that should not use the flow per person field is chosen then zero out the flow per person to avoid it 
+		// if one of the methods that should not use the flow per person field is chosen then zero out the flow per person to avoid it
 		// being counted later #4378
 		if ( OARequirements( OAIndex ).OAFlowMethod != OAFlowPPer && OARequirements( OAIndex ).OAFlowMethod != OAFlowSum && OARequirements( OAIndex ).OAFlowMethod != OAFlowMax ){
 			OARequirements( OAIndex ).OAFlowPerPerson = 0.0;
@@ -984,12 +984,12 @@ namespace SizingManager {
 		bool IsBlank; // Flag for blank name
 
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		CurrentModuleObject = "DesignSpecification:ZoneAirDistribution";
 		NumZoneAirDistribution = GetNumObjectsFound( CurrentModuleObject );
@@ -1240,7 +1240,7 @@ namespace SizingManager {
 		int Item1;
 		int ZLItem;
 		bool errFlag;
-		FArray1D_string ZoneNames;
+		Array1D_string ZoneNames;
 		int NumZones;
 		int NumZoneLists;
 		int OAIndex; // Index of design specification object
@@ -1281,8 +1281,8 @@ namespace SizingManager {
 		};
 
 		// Object Data
-		FArray1D< ZoneListData > ZoneListNames;
-		FArray1D< GlobalMiscObject > SizingZoneObjects;
+		Array1D< ZoneListData > ZoneListNames;
+		Array1D< GlobalMiscObject > SizingZoneObjects;
 
 		cCurrentModuleObject = "Sizing:Zone";
 		NumSizingZoneStatements = GetNumObjectsFound( cCurrentModuleObject );
@@ -1756,9 +1756,9 @@ namespace SizingManager {
 	GetZoneAndZoneListNames(
 		bool & ErrorsFound,
 		int & NumZones,
-		FArray1D_string & ZoneNames,
+		Array1D_string & ZoneNames,
 		int & NumZoneLists,
-		FArray1D< ZoneListData > & ZoneListNames
+		Array1D< ZoneListData > & ZoneListNames
 	)
 	{
 
@@ -2786,12 +2786,12 @@ namespace SizingManager {
 			//  REAL(r64) :: CalcAmt
 
 			std::string CurrentModuleObject; // for ease in getting objects
-			FArray1D_string Alphas; // Alpha input items for object
-			FArray1D_string cAlphaFields; // Alpha field names
-			FArray1D_string cNumericFields; // Numeric field names
-			FArray1D< Real64 > Numbers; // Numeric input items for object
-			FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-			FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+			Array1D_string Alphas; // Alpha input items for object
+			Array1D_string cAlphaFields; // Alpha field names
+			Array1D_string cNumericFields; // Numeric field names
+			Array1D< Real64 > Numbers; // Numeric input items for object
+			Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+			Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 			CurrentModuleObject = "DesignSpecification:ZoneHVAC:Sizing";
 			NumZoneHVACSizing = GetNumObjectsFound( CurrentModuleObject );

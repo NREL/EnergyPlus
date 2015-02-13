@@ -4,7 +4,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -79,26 +79,26 @@ namespace ConductionTransferFunctionCalc {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	FArray2D< Real64 > AExp; // Exponential of AMat
-	FArray2D< Real64 > AInv; // Inverse of AMat
-	FArray2D< Real64 > AMat; // "A" matrix from Seem's dissertation
+	Array2D< Real64 > AExp; // Exponential of AMat
+	Array2D< Real64 > AInv; // Inverse of AMat
+	Array2D< Real64 > AMat; // "A" matrix from Seem's dissertation
 	// (constant coefficients of linear system)
-	FArray1D< Real64 > BMat( 3 ); // "B" matrix of state space method (non-zero elements)
-	FArray1D< Real64 > CMat( 2 ); // "C" matrix of state space method (non-zero elements)
-	FArray1D< Real64 > DMat( 2 ); // "D" matrix of state space method (non-zero elements)
-	FArray1D< Real64 > e; // Coefficients for the surface flux history term
-	FArray2D< Real64 > Gamma1; // Intermediate calculation array corresponding to a term
+	Array1D< Real64 > BMat( 3 ); // "B" matrix of state space method (non-zero elements)
+	Array1D< Real64 > CMat( 2 ); // "C" matrix of state space method (non-zero elements)
+	Array1D< Real64 > DMat( 2 ); // "D" matrix of state space method (non-zero elements)
+	Array1D< Real64 > e; // Coefficients for the surface flux history term
+	Array2D< Real64 > Gamma1; // Intermediate calculation array corresponding to a term
 	// in Seem's dissertation
-	FArray2D< Real64 > Gamma2; // Intermediate calculation array corresponding to a term
+	Array2D< Real64 > Gamma2; // Intermediate calculation array corresponding to a term
 	// in Seem's dissertation
 	int NodeSource; // Node at which a source or sink is present
 	int NodeUserTemp; // Node where user wishes to calculate a temperature
 	// (for constructions with sources/sinks only)
 	int rcmax; // Total number of nodes in the construct (<= MaxTotNodes)
-	FArray3D< Real64 > s; // Coefficients for the surface temperature history terms
-	FArray2D< Real64 > s0( 4, 3 ); // Coefficients for the current surface temperature terms
+	Array3D< Real64 > s; // Coefficients for the surface temperature history terms
+	Array2D< Real64 > s0( 4, 3 ); // Coefficients for the current surface temperature terms
 	Real64 TinyLimit;
-	FArray2D< Real64 > IdenMatrix; // Identity Matrix
+	Array2D< Real64 > IdenMatrix; // Identity Matrix
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ConductionTransferFunctionCalc
 
@@ -209,7 +209,7 @@ namespace ConductionTransferFunctionCalc {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_int AdjacentResLayerNum( MaxLayersInConstruct ); // Layers that are adjacent to each other which are resistive
+		Array1D_int AdjacentResLayerNum( MaxLayersInConstruct ); // Layers that are adjacent to each other which are resistive
 		// only can and should be combined
 		int AdjLayer; // Loop counter for adjacent resistance-only layers
 		Real64 amatx; // Intermediate calculation variable
@@ -221,13 +221,13 @@ namespace ConductionTransferFunctionCalc {
 		Real64 cnd; // Total thermal conductance (1/Rtot) of the bldg element
 		int Constr; // Loop counter
 		int ConstrNum; // Loop counter (construct number)
-		FArray1D< Real64 > cp( MaxLayersInConstruct ); // Specific heat of a material layer
+		Array1D< Real64 > cp( MaxLayersInConstruct ); // Specific heat of a material layer
 		bool CTFConvrg; // Set after CTFs are calculated, based on whether there are too
 		// many CTF terms
 		int CurrentLayer; // Pointer to material number in Material derived type (current layer)
-		FArray1D< Real64 > dl( MaxLayersInConstruct ); // Thickness of a material layer
+		Array1D< Real64 > dl( MaxLayersInConstruct ); // Thickness of a material layer
 		Real64 dtn; // Intermediate calculation of the time step
-		FArray1D< Real64 > dx( MaxLayersInConstruct ); // Distance between nodes in a particular material layer
+		Array1D< Real64 > dx( MaxLayersInConstruct ); // Distance between nodes in a particular material layer
 		Real64 dxn; // Intermediate calculation of nodal spacing
 		Real64 dxtmp; // Intermediate calculation variable ( = 1/dx/cap)
 		Real64 dyn; // Nodal spacing in the direction perpendicular to the main direction
@@ -240,21 +240,21 @@ namespace ConductionTransferFunctionCalc {
 		int Layer1; // Loop counter
 		int LayersInConstruct; // Array containing the number of layers for each construct
 		// Different from TotLayers because shades are not include in local var
-		FArray1D< Real64 > lr( MaxLayersInConstruct ); // R value of a material layer
+		Array1D< Real64 > lr( MaxLayersInConstruct ); // R value of a material layer
 		int Node; // Loop counter
 		int Node2; // Node number (modification of Node and NodeInRow)
 		int NodeInLayer; // Loop counter
 		int NodeInRow; // Loop counter
-		FArray1D_int Nodes( MaxLayersInConstruct ); // Array containing the number of nodes per layer
+		Array1D_int Nodes( MaxLayersInConstruct ); // Array containing the number of nodes per layer
 		int NumResLayers; // Number of resistive layers in the construction
 		// property allowable, traditional value from BLAST
 		int NumAdjResLayers; // Number of resistive layers that are adjacent
 		int OppositeLayer; // Used for comparing constructions (to see if one is the reverse of another)
-		FArray1D_bool ResLayer( MaxLayersInConstruct ); // Set true if the layer must be handled as a resistive
+		Array1D_bool ResLayer( MaxLayersInConstruct ); // Set true if the layer must be handled as a resistive
 		bool RevConst; // Set true if one construct is the reverse of another (CTFs already
 		// available)
-		FArray1D< Real64 > rho( MaxLayersInConstruct ); // Density of a material layer
-		FArray1D< Real64 > rk( MaxLayersInConstruct ); // Thermal conductivity of a material layer
+		Array1D< Real64 > rho( MaxLayersInConstruct ); // Density of a material layer
+		Array1D< Real64 > rk( MaxLayersInConstruct ); // Thermal conductivity of a material layer
 		Real64 rs; // Total thermal resistance of the building element
 		Real64 SumXi; // Summation of all of the Xi terms (inside CTFs) for a construction
 		Real64 SumYi; // Summation of all of the Xi terms (cross CTFs) for a construction
@@ -1251,9 +1251,9 @@ namespace ConductionTransferFunctionCalc {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 AMatRowNorm; // Row norm for AMat
 		Real64 AMatRowNormMax; // Largest row norm for AMat
-		FArray2D< Real64 > AMat1; // AMat factored by (delt/2^k)
-		FArray2D< Real64 > AMato; // AMat raised to the previous power (power of AMat1-1)
-		FArray2D< Real64 > AMatN; // Current value of AMat raised to power n (n = 1,2...)
+		Array2D< Real64 > AMat1; // AMat factored by (delt/2^k)
+		Array2D< Real64 > AMato; // AMat raised to the previous power (power of AMat1-1)
+		Array2D< Real64 > AMatN; // Current value of AMat raised to power n (n = 1,2...)
 		bool Backup; // Used when numerics get to small in Exponentiation
 		Real64 CheckVal; // Used to avoid possible overflow from Double->REAL(r64)->Integer
 		Real64 fact; // Intermediate calculation variable (delt/2^k)
@@ -1492,7 +1492,7 @@ namespace ConductionTransferFunctionCalc {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray2D< Real64 > AMat1; // Intermediate calculation matrix equivalent at first to AMat
+		Array2D< Real64 > AMat1; // Intermediate calculation matrix equivalent at first to AMat
 		int ic; // Loop counter
 		int ir; // Loop counter
 		int irr; // Loop counter
@@ -1640,7 +1640,7 @@ namespace ConductionTransferFunctionCalc {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray2D< Real64 > ATemp; // Intermediate variable equal to AExp - I
+		Array2D< Real64 > ATemp; // Intermediate variable equal to AExp - I
 		int i; // Loop counter
 		int is1; // Loop counter
 		int j; // Loop counter
@@ -1785,12 +1785,12 @@ namespace ConductionTransferFunctionCalc {
 		int is; // Loop counter
 		int is2; // Loop counter
 		int j; // Loop counter
-		FArray2D< Real64 > PhiR0; // Product of Phi( = AExp) and R0 matrices from the state
+		Array2D< Real64 > PhiR0; // Product of Phi( = AExp) and R0 matrices from the state
 		// space method
 		Real64 rat; // Intermediate calculation variable (ratio of flux history
 		// terms)
-		FArray2D< Real64 > Rnew; // Current R matrix
-		FArray2D< Real64 > Rold; // R matrix from the last iteration
+		Array2D< Real64 > Rnew; // Current R matrix
+		Array2D< Real64 > Rold; // R matrix from the last iteration
 		int SurfNode; // Loop counter (for nodes at a surface)
 		Real64 SurfNodeFac; // Multiplying factor applied to various surface nodes
 		Real64 trace; // Trace of the product of Phi( = AExp) and R0

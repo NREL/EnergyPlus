@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -124,16 +124,16 @@ namespace UnitVentilator {
 	int NumOfUnitVents( 0 ); // Number of unit ventilators in the input file
 	Real64 OAMassFlowRate( 0.0 ); // Outside air mass flow rate for the unit ventilator
 	Real64 QZnReq( 0.0 ); // heating or cooling needed by zone [watts]
-	FArray1D_bool MySizeFlag;
+	Array1D_bool MySizeFlag;
 	bool GetUnitVentilatorInputFlag( true ); // First time, input is "gotten"
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE UnitVentilator
 	//PRIVATE UpdateUnitVentilator
 
 	// Object Data
-	FArray1D< UnitVentilatorData > UnitVent;
-	FArray1D< UnitVentNumericFieldData > UnitVentNumericFields;
+	Array1D< UnitVentilatorData > UnitVent;
+	Array1D< UnitVentNumericFieldData > UnitVentNumericFields;
 
 	// Functions
 
@@ -314,12 +314,12 @@ namespace UnitVentilator {
 		int FanIndex; // index to fan used for flow checks
 		Real64 FanVolFlow; // volumetric flow rate of fan
 		std::string CurrentModuleObject;
-		FArray1D_string Alphas; // Alpha items for object
-		FArray1D< Real64 > Numbers; // Numeric items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha items for object
+		Array1D< Real64 > Numbers; // Numeric items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		int CtrlZone; // index to loop counter
 		int NodeNum; // index to loop counter
 		bool ZoneNodeNotFound; // used in error checking
@@ -933,9 +933,9 @@ namespace UnitVentilator {
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop;
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MyPlantScanFlag;
-		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		int HotConNode; // hot water control node number in unit ventilator loop
 		int InNode; // inlet node number in unit ventilator loop
 		int OutNode; // outlet node number in unit ventilator loop
@@ -2030,7 +2030,7 @@ namespace UnitVentilator {
 		Real64 SpecHumOut; // Specific humidity ratio of outlet air (kg moisture / kg moist air)
 		Real64 SpecHumIn; // Specific humidity ratio of inlet air (kg moisture / kg moist air)
 		Real64 mdot;
-		FArray1D< Real64 > Par( 3 ); // parameters passed to RegulaFalsi function
+		Array1D< Real64 > Par( 3 ); // parameters passed to RegulaFalsi function
 		int OpMode; // operatin gmode of the fan
 		Real64 PartLoadFrac; // part load ratio of the unit ventilator
 		Real64 NoOutput; // no load output of the unit ventilator
@@ -3192,7 +3192,7 @@ namespace UnitVentilator {
 	Real64
 	CalcUnitVentilatorResidual(
 		Real64 const PartLoadRatio, // Coil Part Load Ratio
-		FArray1< Real64 > const & Par // Function parameters
+		Array1< Real64 > const & Par // Function parameters
 	)
 	{
 		// FUNCTION INFORMATION:

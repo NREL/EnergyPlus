@@ -4,7 +4,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/MArray.functions.hh>
@@ -69,11 +69,11 @@ namespace SurfaceGeometry {
 	// Data
 	//MODULE PARAMETER DEFINITIONS
 	static std::string const BlankString;
-	FArray1D_string const BaseSurfCls( 3, { "WALL", "FLOOR", "ROOF" } );
-	FArray1D_string const SubSurfCls( 6, { "WINDOW", "DOOR", "GLASSDOOR", "SHADING", "TUBULARDAYLIGHTDOME", "TUBULARDAYLIGHTDIFFUSER" } );
-	FArray1D_int const BaseSurfIDs( 3, { SurfaceClass_Wall, SurfaceClass_Floor, SurfaceClass_Roof } );
+	Array1D_string const BaseSurfCls( 3, { "WALL", "FLOOR", "ROOF" } );
+	Array1D_string const SubSurfCls( 6, { "WINDOW", "DOOR", "GLASSDOOR", "SHADING", "TUBULARDAYLIGHTDOME", "TUBULARDAYLIGHTDIFFUSER" } );
+	Array1D_int const BaseSurfIDs( 3, { SurfaceClass_Wall, SurfaceClass_Floor, SurfaceClass_Roof } );
 
-	FArray1D_int const SubSurfIDs( 6, { SurfaceClass_Window, SurfaceClass_Door, SurfaceClass_GlassDoor, SurfaceClass_Shading, SurfaceClass_TDD_Dome, SurfaceClass_TDD_Diffuser } );
+	Array1D_int const SubSurfIDs( 6, { SurfaceClass_Window, SurfaceClass_Door, SurfaceClass_GlassDoor, SurfaceClass_Shading, SurfaceClass_TDD_Dome, SurfaceClass_TDD_Diffuser } );
 
 	int const UnenteredAdjacentZoneSurface( -998 ); // allows users to enter one zone surface ("Zone")
 	// referencing another in adjacent zone
@@ -92,8 +92,8 @@ namespace SurfaceGeometry {
 	Real64 SinBldgRelNorth( 0.0 ); // Sine of the building rotation (relative north)   (includes appendix G rotation)
 	Real64 CosBldgRotAppGonly( 0.0 ); // Cosine of the building rotation for appendix G only(relative north)
 	Real64 SinBldgRotAppGonly( 0.0 ); // Sine of the building rotation for appendix G only (relative north)
-	FArray1D< Real64 > CosZoneRelNorth; // Cosine of the zone rotation (relative north)
-	FArray1D< Real64 > SinZoneRelNorth; // Sine of the zone rotation (relative north)
+	Array1D< Real64 > CosZoneRelNorth; // Cosine of the zone rotation (relative north)
+	Array1D< Real64 > SinZoneRelNorth; // Sine of the zone rotation (relative north)
 
 	bool NoGroundTempObjWarning( true ); // This will cause a warning to be issued if surfaces with "Ground"
 	// outside environment are used but no ground temperature object was input.
@@ -107,7 +107,7 @@ namespace SurfaceGeometry {
 	//SUBROUTINE SPECIFICATIONS FOR MODULE SurfaceGeometry
 
 	// Object Data
-	FArray1D< SurfaceData > SurfaceTmp; // Allocated/Deallocated during input processing
+	Array1D< SurfaceData > SurfaceTmp; // Allocated/Deallocated during input processing
 
 	// Functions
 
@@ -172,8 +172,8 @@ namespace SurfaceGeometry {
 		std::string String2;
 		std::string String3;
 		int Count; // To count wall surfaces for ceiling height calculation
-		FArray1D_bool ZoneCeilingHeightEntered;
-		FArray1D< Real64 > ZoneCeilingArea;
+		Array1D_bool ZoneCeilingHeightEntered;
+		Array1D< Real64 > ZoneCeilingArea;
 		static int ErrCount( 0 );
 		Real64 NominalUwithConvCoeffs;
 		std::string cNominalU;
@@ -2072,8 +2072,8 @@ namespace SurfaceGeometry {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_string const AbCorners( 4, { "ULC", "LLC", "LRC", "URC" } );
-		static FArray1D_string const FlCorners( 4, { "UpperLeftCorner", "LowerLeftCorner", "LowerRightCorner", "UpperRightCorner" } );
+		static Array1D_string const AbCorners( 4, { "ULC", "LLC", "LRC", "URC" } );
+		static Array1D_string const FlCorners( 4, { "UpperLeftCorner", "LowerLeftCorner", "LowerRightCorner", "UpperRightCorner" } );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2083,9 +2083,9 @@ namespace SurfaceGeometry {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumStmt;
-		FArray1D_string GAlphas( 5 );
+		Array1D_string GAlphas( 5 );
 		int NAlphas;
-		FArray1D< Real64 > GNum( 1 );
+		Array1D< Real64 > GNum( 1 );
 		int NNum;
 		int IOStat;
 		bool OK;
@@ -2318,7 +2318,7 @@ namespace SurfaceGeometry {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_string const cModuleObjects( 2, { "Shading:Site:Detailed", "Shading:Building:Detailed" } );
+		static Array1D_string const cModuleObjects( 2, { "Shading:Site:Detailed", "Shading:Building:Detailed" } );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2484,7 +2484,7 @@ namespace SurfaceGeometry {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_string const cModuleObjects( 2, { "Shading:Site", "Shading:Building" } );
+		static Array1D_string const cModuleObjects( 2, { "Shading:Site", "Shading:Building" } );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2580,8 +2580,8 @@ namespace SurfaceGeometry {
 		int const TotDetailedWalls, // Number of Wall:Detailed items to obtain
 		int const TotDetailedRoofs, // Number of RoofCeiling:Detailed items to obtain
 		int const TotDetailedFloors, // Number of Floor:Detailed items to obtain
-		FArray1S_string const BaseSurfCls, // Valid Classes for Base Surfaces
-		FArray1S_int const BaseSurfIDs,
+		Array1S_string const BaseSurfCls, // Valid Classes for Base Surfaces
+		Array1S_int const BaseSurfIDs,
 		int & NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
 	)
 	{
@@ -2715,7 +2715,7 @@ namespace SurfaceGeometry {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_string const cModuleObjects( 4, { "BuildingSurface:Detailed", "Wall:Detailed", "Floor:Detailed", "RoofCeiling:Detailed" } );
+		static Array1D_string const cModuleObjects( 4, { "BuildingSurface:Detailed", "Wall:Detailed", "Floor:Detailed", "RoofCeiling:Detailed" } );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3052,7 +3052,7 @@ namespace SurfaceGeometry {
 		int const TotRectGCFloors, // Number of Floors with Ground Contact to obtain
 		int const TotRectIntFloors, // Number of Adiabatic Walls to obtain
 		int const TotRectIZFloors, // Number of Interzone Floors to obtain
-		FArray1S_int const BaseSurfIDs, // ID Assignments for valid surface classes
+		Array1S_int const BaseSurfIDs, // ID Assignments for valid surface classes
 		int & NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
 	)
 	{
@@ -3088,7 +3088,7 @@ namespace SurfaceGeometry {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_string const cModuleObjects( 10, { "Wall:Exterior", "Wall:Adiabatic", "Wall:Interzone", "Wall:Underground", "Roof", "Ceiling:Adiabatic", "Ceiling:Interzone", "Floor:GroundContact", "Floor:Adiabatic", "Floor:Interzone" } );
+		static Array1D_string const cModuleObjects( 10, { "Wall:Exterior", "Wall:Adiabatic", "Wall:Interzone", "Wall:Underground", "Roof", "Ceiling:Adiabatic", "Ceiling:Interzone", "Floor:GroundContact", "Floor:Adiabatic", "Floor:Interzone" } );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3393,8 +3393,8 @@ namespace SurfaceGeometry {
 		Real64 SinSurfAzimuth;
 		Real64 CosSurfTilt;
 		Real64 SinSurfTilt;
-		FArray1D< Real64 > XX( 4 );
-		FArray1D< Real64 > YY( 4 );
+		Array1D< Real64 > XX( 4 );
+		Array1D< Real64 > YY( 4 );
 		Real64 Xb;
 		Real64 Yb;
 		Real64 Perimeter;
@@ -3523,8 +3523,8 @@ namespace SurfaceGeometry {
 		bool & ErrorsFound, // Error flag indicator (true if errors found)
 		int & SurfNum, // Count of Current SurfaceNumber
 		int const TotHTSubs, // Number of Heat Transfer SubSurfaces to obtain
-		FArray1S_string const SubSurfCls, // Valid Classes for Sub Surfaces
-		FArray1S_int const SubSurfIDs, // ID Assignments for valid sub surface classes
+		Array1S_string const SubSurfCls, // Valid Classes for Sub Surfaces
+		Array1S_int const SubSurfIDs, // ID Assignments for valid sub surface classes
 		int & AddedSubSurfaces, // Subsurfaces added when windows reference Window5
 		int & NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
 	)
@@ -3912,7 +3912,7 @@ namespace SurfaceGeometry {
 		int const TotIZWindows, // Number of Interzone Window SubSurfaces to obtain
 		int const TotIZDoors, // Number of Interzone Door SubSurfaces to obtain
 		int const TotIZGlazedDoors, // Number of Interzone Glass Door SubSurfaces to obtain
-		FArray1S_int const SubSurfIDs, // ID Assignments for valid sub surface classes
+		Array1S_int const SubSurfIDs, // ID Assignments for valid sub surface classes
 		int & AddedSubSurfaces, // Subsurfaces added when windows reference Window5
 		int & NeedToAddSubSurfaces // Number of surfaces to add, based on unentered IZ surfaces
 	)
@@ -3950,7 +3950,7 @@ namespace SurfaceGeometry {
 		//  data file entry with two glazing systems
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_string const cModuleObjects( 6, { "Window", "Door", "GlazedDoor", "Window:Interzone", "Door:Interzone", "GlazedDoor:Interzone" } );
+		static Array1D_string const cModuleObjects( 6, { "Window", "Door", "GlazedDoor", "Window:Interzone", "Door:Interzone", "GlazedDoor:Interzone" } );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -4672,8 +4672,8 @@ namespace SurfaceGeometry {
 		Real64 BaseSinSurfAzimuth;
 		Real64 BaseCosSurfTilt;
 		Real64 BaseSinSurfTilt;
-		FArray1D< Real64 > XX( 4 );
-		FArray1D< Real64 > YY( 4 );
+		Array1D< Real64 > XX( 4 );
+		Array1D< Real64 > YY( 4 );
 		Real64 Perimeter;
 		int n;
 		int Vrt;
@@ -5029,7 +5029,7 @@ namespace SurfaceGeometry {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_string const cModuleObjects( 4, { "Shading:Overhang", "Shading:Overhang:Projection", "Shading:Fin", "Shading:Fin:Projection" } );
+		static Array1D_string const cModuleObjects( 4, { "Shading:Overhang", "Shading:Overhang:Projection", "Shading:Fin", "Shading:Fin:Projection" } );
 		static gio::Fmt dfmt( "(A,3(2x,f6.2))" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -6294,7 +6294,7 @@ namespace SurfaceGeometry {
 	GetVertices(
 		int const SurfNum, // Current surface number
 		int const NSides, // Number of sides to figure
-		FArray1S< Real64 > const Vertices // Vertices, in specified order
+		Array1S< Real64 > const Vertices // Vertices, in specified order
 	)
 	{
 
@@ -6651,7 +6651,7 @@ namespace SurfaceGeometry {
 		std::string TiltString;
 
 		// Object Data
-		FArray1D< Vector > Vertices( NSides ); // Vertices, in specified order
+		Array1D< Vector > Vertices( NSides ); // Vertices, in specified order
 
 		for ( n = 1; n <= NSides; ++n ) {
 			Vertices( n ) = SurfaceTmp( SurfNum ).Vertex( n );
@@ -6851,13 +6851,13 @@ namespace SurfaceGeometry {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const NumValidShadingTypes( 8 );
-		static FArray1D_string const cValidShadingTypes( NumValidShadingTypes, { "INTERIORSHADE", "EXTERIORSHADE", "EXTERIORSCREEN", "INTERIORBLIND", "EXTERIORBLIND", "BETWEENGLASSSHADE", "BETWEENGLASSBLIND", "SWITCHABLEGLAZING" } );
-		static FArray1D_int const ValidShadingTypes( NumValidShadingTypes, { WSC_ST_InteriorShade, WSC_ST_ExteriorShade, WSC_ST_ExteriorScreen, WSC_ST_InteriorBlind, WSC_ST_ExteriorBlind, WSC_ST_BetweenGlassShade, WSC_ST_BetweenGlassBlind, WSC_ST_SwitchableGlazing } );
+		static Array1D_string const cValidShadingTypes( NumValidShadingTypes, { "INTERIORSHADE", "EXTERIORSHADE", "EXTERIORSCREEN", "INTERIORBLIND", "EXTERIORBLIND", "BETWEENGLASSSHADE", "BETWEENGLASSBLIND", "SWITCHABLEGLAZING" } );
+		static Array1D_int const ValidShadingTypes( NumValidShadingTypes, { WSC_ST_InteriorShade, WSC_ST_ExteriorShade, WSC_ST_ExteriorScreen, WSC_ST_InteriorBlind, WSC_ST_ExteriorBlind, WSC_ST_BetweenGlassShade, WSC_ST_BetweenGlassBlind, WSC_ST_SwitchableGlazing } );
 
 		int const NumValidWindowShadingControlTypes( 21 );
-		static FArray1D_string const cValidWindowShadingControlTypes( NumValidWindowShadingControlTypes, { "ALWAYSON", "ALWAYSOFF", "ONIFSCHEDULEALLOWS", "ONIFHIGHSOLARONWINDOW", "ONIFHIGHHORIZONTALSOLAR", "ONIFHIGHOUTDOORAIRTEMPERATURE", "ONIFHIGHZONEAIRTEMPERATURE", "ONIFHIGHZONECOOLING", "ONIFHIGHGLARE", "MEETDAYLIGHTILLUMINANCESETPOINT", "ONNIGHTIFLOWOUTDOORTEMPANDOFFDAY", "ONNIGHTIFLOWINSIDETEMPANDOFFDAY", "ONNIGHTIFHEATINGANDOFFDAY", "ONNIGHTIFLOWOUTDOORTEMPANDONDAYIFCOOLING", "ONNIGHTIFHEATINGANDONDAYIFCOOLING", "OFFNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW", "ONNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW", "ONIFHIGHOUTDOORAIRTEMPANDHIGHSOLARONWINDOW", "ONIFHIGHOUTDOORAIRTEMPANDHIGHHORIZONTALSOLAR", "ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW", "ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR" } );
+		static Array1D_string const cValidWindowShadingControlTypes( NumValidWindowShadingControlTypes, { "ALWAYSON", "ALWAYSOFF", "ONIFSCHEDULEALLOWS", "ONIFHIGHSOLARONWINDOW", "ONIFHIGHHORIZONTALSOLAR", "ONIFHIGHOUTDOORAIRTEMPERATURE", "ONIFHIGHZONEAIRTEMPERATURE", "ONIFHIGHZONECOOLING", "ONIFHIGHGLARE", "MEETDAYLIGHTILLUMINANCESETPOINT", "ONNIGHTIFLOWOUTDOORTEMPANDOFFDAY", "ONNIGHTIFLOWINSIDETEMPANDOFFDAY", "ONNIGHTIFHEATINGANDOFFDAY", "ONNIGHTIFLOWOUTDOORTEMPANDONDAYIFCOOLING", "ONNIGHTIFHEATINGANDONDAYIFCOOLING", "OFFNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW", "ONNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW", "ONIFHIGHOUTDOORAIRTEMPANDHIGHSOLARONWINDOW", "ONIFHIGHOUTDOORAIRTEMPANDHIGHHORIZONTALSOLAR", "ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW", "ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR" } );
 
-		static FArray1D_int const ValidWindowShadingControlTypes( NumValidWindowShadingControlTypes, { WSCT_AlwaysOn, WSCT_AlwaysOff, WSCT_OnIfScheduled, WSCT_HiSolar, WSCT_HiHorzSolar, WSCT_HiOutAirTemp, WSCT_HiZoneAirTemp, WSCT_HiZoneCooling, WSCT_HiGlare, WSCT_MeetDaylIlumSetp, WSCT_OnNightLoOutTemp_OffDay, WSCT_OnNightLoInTemp_OffDay, WSCT_OnNightIfHeating_OffDay, WSCT_OnNightLoOutTemp_OnDayCooling, WSCT_OnNightIfHeating_OnDayCooling, WSCT_OffNight_OnDay_HiSolarWindow, WSCT_OnNight_OnDay_HiSolarWindow, WSCT_OnHiOutTemp_HiSolarWindow, WSCT_OnHiOutTemp_HiHorzSolar, WSCT_OnHiZoneTemp_HiSolarWindow, WSCT_OnHiZoneTemp_HiHorzSolar } ); // 'ALWAYSON                                    ', & | 'ALWAYSOFF                                   ', & | 'ONIFSCHEDULEALLOWS                          ', & | 'ONIFHIGHSOLARONWINDOW                       ', & | 'ONIFHIGHHORIZONTALSOLAR                     ', & | 'ONIFHIGHOUTDOORAIRTEMPERATURE                      ', & | 'ONIFHIGHZONEAIRTEMPERATURE                         ', & | 'ONIFHIGHZONECOOLING                         ', & | 'ONIFHIGHGLARE                               ', & | 'MEETDAYLIGHTILLUMINANCESETPOINT             ', & | 'ONNIGHTIFLOWOUTDOORTEMPANDOFFDAY              ', & | 'ONNIGHTIFLOWINSIDETEMPANDOFFDAY               ', & | 'ONNIGHTIFHEATINGANDOFFDAY                     ', & | 'ONNIGHTIFLOWOUTDOORTEMPANDONDAYIFCOOLING      ', & | 'ONNIGHTIFHEATINGANDONDAYIFCOOLING             ', & | 'OFFNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW ', & | 'ONNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW  ', & | 'ONIFHIGHOUTDOORAIRTEMPANDHIGHSOLARONWINDOW  ', & | 'ONIFHIGHOUTDOORAIRTEMPANDHIGHHORIZONTALSOLAR', & | 'ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW     ', & | 'ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR   '/)
+		static Array1D_int const ValidWindowShadingControlTypes( NumValidWindowShadingControlTypes, { WSCT_AlwaysOn, WSCT_AlwaysOff, WSCT_OnIfScheduled, WSCT_HiSolar, WSCT_HiHorzSolar, WSCT_HiOutAirTemp, WSCT_HiZoneAirTemp, WSCT_HiZoneCooling, WSCT_HiGlare, WSCT_MeetDaylIlumSetp, WSCT_OnNightLoOutTemp_OffDay, WSCT_OnNightLoInTemp_OffDay, WSCT_OnNightIfHeating_OffDay, WSCT_OnNightLoOutTemp_OnDayCooling, WSCT_OnNightIfHeating_OnDayCooling, WSCT_OffNight_OnDay_HiSolarWindow, WSCT_OnNight_OnDay_HiSolarWindow, WSCT_OnHiOutTemp_HiSolarWindow, WSCT_OnHiOutTemp_HiHorzSolar, WSCT_OnHiZoneTemp_HiSolarWindow, WSCT_OnHiZoneTemp_HiHorzSolar } ); // 'ALWAYSON                                    ', & | 'ALWAYSOFF                                   ', & | 'ONIFSCHEDULEALLOWS                          ', & | 'ONIFHIGHSOLARONWINDOW                       ', & | 'ONIFHIGHHORIZONTALSOLAR                     ', & | 'ONIFHIGHOUTDOORAIRTEMPERATURE                      ', & | 'ONIFHIGHZONEAIRTEMPERATURE                         ', & | 'ONIFHIGHZONECOOLING                         ', & | 'ONIFHIGHGLARE                               ', & | 'MEETDAYLIGHTILLUMINANCESETPOINT             ', & | 'ONNIGHTIFLOWOUTDOORTEMPANDOFFDAY              ', & | 'ONNIGHTIFLOWINSIDETEMPANDOFFDAY               ', & | 'ONNIGHTIFHEATINGANDOFFDAY                     ', & | 'ONNIGHTIFLOWOUTDOORTEMPANDONDAYIFCOOLING      ', & | 'ONNIGHTIFHEATINGANDONDAYIFCOOLING             ', & | 'OFFNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW ', & | 'ONNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW  ', & | 'ONIFHIGHOUTDOORAIRTEMPANDHIGHSOLARONWINDOW  ', & | 'ONIFHIGHOUTDOORAIRTEMPANDHIGHHORIZONTALSOLAR', & | 'ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW     ', & | 'ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR   '/)
 
 		// INTERFACE BLOCK SPECIFICATIONS:na
 		// DERIVED TYPE DEFINITIONS:na
@@ -8054,7 +8054,7 @@ namespace SurfaceGeometry {
 	void
 	CalculateZoneVolume(
 		bool & ErrorsFound, // If errors found in input
-		FArray1S_bool const CeilingHeightEntered
+		Array1S_bool const CeilingHeightEntered
 	)
 	{
 
@@ -8104,7 +8104,7 @@ namespace SurfaceGeometry {
 		int ZoneNum; // Loop counter for Zones
 		bool ErrorFlag;
 		Real64 TempVolume; // Temporary for calculating volume
-		FArray1D_int surfacenotused;
+		Array1D_int surfacenotused;
 		int notused;
 		int NFaces;
 		int NActFaces;
@@ -8332,9 +8332,9 @@ namespace SurfaceGeometry {
 		Real64 XLLC; // X-coordinate of lower left corner
 		Real64 YLLC; // Y-coordinate of lower left corner
 		Real64 ZLLC; // Z-coordinate of lower left corner
-		static FArray1D< Real64 > X;
-		static FArray1D< Real64 > Y;
-		static FArray1D< Real64 > Z;
+		static Array1D< Real64 > X;
+		static Array1D< Real64 > Y;
+		static Array1D< Real64 > Z;
 		static bool OneTimeFlag( true );
 		//  INTEGER :: I  ! Loop Control
 		//  INTEGER :: J  ! Loop Control
@@ -9383,7 +9383,7 @@ namespace SurfaceGeometry {
 		struct rectangularwindow
 		{
 			// Members
-			FArray1D< Vector > Vertex;
+			Array1D< Vector > Vertex;
 
 			// Default Constructor
 			rectangularwindow() :
@@ -9392,7 +9392,7 @@ namespace SurfaceGeometry {
 
 			// Member Constructor
 			explicit
-			rectangularwindow( FArray1< Vector > const & Vertex ) :
+			rectangularwindow( Array1< Vector > const & Vertex ) :
 				Vertex( 4, Vertex )
 			{}
 
@@ -9566,7 +9566,7 @@ namespace SurfaceGeometry {
 		struct rectangularwindow
 		{
 			// Members
-			FArray1D< Vector > Vertex;
+			Array1D< Vector > Vertex;
 
 			// Default Constructor
 			rectangularwindow() :
@@ -9575,7 +9575,7 @@ namespace SurfaceGeometry {
 
 			// Member Constructor
 			explicit
-			rectangularwindow( FArray1< Vector > const & Vertex ) :
+			rectangularwindow( Array1< Vector > const & Vertex ) :
 				Vertex( 4, Vertex )
 			{}
 
@@ -9988,8 +9988,8 @@ namespace SurfaceGeometry {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string cAlphas( 1 );
-		FArray1D< Real64 > rNumerics( 2 );
+		Array1D_string cAlphas( 1 );
+		Array1D< Real64 > rNumerics( 2 );
 		int NAlphas;
 		int NNum;
 		int IOStat;
@@ -10120,8 +10120,8 @@ namespace SurfaceGeometry {
 		int negZcount; // for warning error in surface centroids
 
 		// Object Data
-		FArray1D< Vector > Triangle1( 3 ); // working struct for a 3-sided surface
-		FArray1D< Vector > Triangle2( 3 ); // working struct for a 3-sided surface
+		Array1D< Vector > Triangle1( 3 ); // working struct for a 3-sided surface
+		Array1D< Vector > Triangle2( 3 ); // working struct for a 3-sided surface
 		Vector VecAvg; // Average (calc for multisided polygons (>4 sides))
 
 		negZcount = 0;
@@ -10163,7 +10163,7 @@ namespace SurfaceGeometry {
 				Tri2Area = 0.0;
 
 				// split into 2 3-sided polygons (Triangle 1 and Triangle 2)
-				FArray1D< Vector > const & Vertex( Surface( ThisSurf ).Vertex );
+				Array1D< Vector > const & Vertex( Surface( ThisSurf ).Vertex );
 				Triangle1( 1 ) = Vertex( 1 );
 				Triangle1( 2 ) = Vertex( 2 );
 				Triangle1( 3 ) = Vertex( 3 );
@@ -10301,9 +10301,9 @@ namespace SurfaceGeometry {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string TmpCandidateSurfaceNames;
-		FArray1D_string TmpCandidateICSSurfaceNames;
-		FArray1D_string TmpCandidateICSBCTypeNames;
+		Array1D_string TmpCandidateSurfaceNames;
+		Array1D_string TmpCandidateICSSurfaceNames;
+		Array1D_string TmpCandidateICSBCTypeNames;
 		int NumCandidateNames;
 		int NumOfCollectors;
 		int NumOfICSUnits;
@@ -10464,12 +10464,12 @@ namespace SurfaceGeometry {
 		Real64 V2len; // Edge vector length
 		bool SignFlag; // Direction of edge turn : true is right, false is left
 		bool PrevSignFlag( false ); // Container for the sign of the previous iteration's edge turn
-		static FArray1D< Real64 > X; // containers for x,y,z vertices of the surface
-		static FArray1D< Real64 > Y;
-		static FArray1D< Real64 > Z;
-		static FArray1D< Real64 > A; // containers for convexity test
-		static FArray1D< Real64 > B;
-		static FArray1D_int SurfCollinearVerts; // Array containing indices of collinear vertices
+		static Array1D< Real64 > X; // containers for x,y,z vertices of the surface
+		static Array1D< Real64 > Y;
+		static Array1D< Real64 > Z;
+		static Array1D< Real64 > A; // containers for convexity test
+		static Array1D< Real64 > B;
+		static Array1D_int SurfCollinearVerts; // Array containing indices of collinear vertices
 		static int VertSize; // size of X,Y,Z,A,B arrays
 		Real64 cosarg;
 		int M; // Array index for SurfCollinearVerts container

@@ -2,8 +2,8 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -14,7 +14,6 @@
 #include <DataDaylighting.hh>
 #include <DataErrorTracking.hh>
 #include <DataGlobals.hh>
-#include <DataStringGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataStringGlobals.hh>
@@ -322,24 +321,24 @@ DXFOut(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	static FArray1D< Real64 > StemX( 4, -10.0 );
-	static FArray1D< Real64 > StemY( 4, { 3.0, 3.0, 0.0, 0.0 } );
-	static FArray1D< Real64 > StemZ( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > Head1X( 4, { -10.0, -10.0, -10.5, -10.5 } );
-	static FArray1D< Real64 > Head1Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
-	static FArray1D< Real64 > Head1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > Head2X( 4, { -10.0, -10.0, -9.5, -9.5 } );
-	static FArray1D< Real64 > Head2Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
-	static FArray1D< Real64 > Head2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > NSide1X( 4, -10.5 );
-	static FArray1D< Real64 > NSide1Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
-	static FArray1D< Real64 > NSide1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > NSide2X( 4, { -10.5, -10.5, -9.5, -9.5 } );
-	static FArray1D< Real64 > NSide2Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
-	static FArray1D< Real64 > NSide2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > NSide3X( 4, -9.5 );
-	static FArray1D< Real64 > NSide3Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
-	static FArray1D< Real64 > NSide3Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > StemX( 4, -10.0 );
+	static Array1D< Real64 > StemY( 4, { 3.0, 3.0, 0.0, 0.0 } );
+	static Array1D< Real64 > StemZ( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > Head1X( 4, { -10.0, -10.0, -10.5, -10.5 } );
+	static Array1D< Real64 > Head1Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
+	static Array1D< Real64 > Head1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > Head2X( 4, { -10.0, -10.0, -9.5, -9.5 } );
+	static Array1D< Real64 > Head2Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
+	static Array1D< Real64 > Head2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > NSide1X( 4, -10.5 );
+	static Array1D< Real64 > NSide1Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
+	static Array1D< Real64 > NSide1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > NSide2X( 4, { -10.5, -10.5, -9.5, -9.5 } );
+	static Array1D< Real64 > NSide2Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
+	static Array1D< Real64 > NSide2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > NSide3X( 4, -9.5 );
+	static Array1D< Real64 > NSide3Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
+	static Array1D< Real64 > NSide3Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
 	//  integer, dimension(7) :: colorno=(/3,4,5,6,2,8,9/)
 	int unit; // Unit number on which to write file
 	int surf; // Loop variable for surfaces
@@ -368,7 +367,7 @@ DXFOut(
 	int mapnum;
 
 	// Object Data
-	FArray1D< dTriangle > mytriangles;
+	Array1D< dTriangle > mytriangles;
 
 	// Formats
 	static gio::Fmt Format_702( "('  0',/,'SECTION',/,'  2',/,'ENTITIES')" );
@@ -851,24 +850,24 @@ DXFOutLines( std::string const & ColorScheme )
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	static FArray1D< Real64 > StemX( 4, -10.0 );
-	static FArray1D< Real64 > StemY( 4, { 3.0, 3.0, 0.0, 0.0 } );
-	static FArray1D< Real64 > StemZ( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > Head1X( 4, { -10.0, -10.0, -10.5, -10.5 } );
-	static FArray1D< Real64 > Head1Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
-	static FArray1D< Real64 > Head1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > Head2X( 4, { -10.0, -10.0, -9.5, -9.5 } );
-	static FArray1D< Real64 > Head2Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
-	static FArray1D< Real64 > Head2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > NSide1X( 4, -10.5 );
-	static FArray1D< Real64 > NSide1Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
-	static FArray1D< Real64 > NSide1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > NSide2X( 4, { -10.5, -10.5, -9.5, -9.5 } );
-	static FArray1D< Real64 > NSide2Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
-	static FArray1D< Real64 > NSide2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > NSide3X( 4, -9.5 );
-	static FArray1D< Real64 > NSide3Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
-	static FArray1D< Real64 > NSide3Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > StemX( 4, -10.0 );
+	static Array1D< Real64 > StemY( 4, { 3.0, 3.0, 0.0, 0.0 } );
+	static Array1D< Real64 > StemZ( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > Head1X( 4, { -10.0, -10.0, -10.5, -10.5 } );
+	static Array1D< Real64 > Head1Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
+	static Array1D< Real64 > Head1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > Head2X( 4, { -10.0, -10.0, -9.5, -9.5 } );
+	static Array1D< Real64 > Head2Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
+	static Array1D< Real64 > Head2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > NSide1X( 4, -10.5 );
+	static Array1D< Real64 > NSide1Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
+	static Array1D< Real64 > NSide1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > NSide2X( 4, { -10.5, -10.5, -9.5, -9.5 } );
+	static Array1D< Real64 > NSide2Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
+	static Array1D< Real64 > NSide2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > NSide3X( 4, -9.5 );
+	static Array1D< Real64 > NSide3Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
+	static Array1D< Real64 > NSide3Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
 	//  integer, dimension(7) :: colorno=(/3,4,5,6,2,8,9/)
 	int unit; // Unit number on which to write file
 	int surf; // Loop variable for surfaces
@@ -1277,24 +1276,24 @@ DXFOutWireFrame( std::string const & ColorScheme )
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	static FArray1D< Real64 > StemX( 4, -10.0 );
-	static FArray1D< Real64 > StemY( 4, { 3.0, 3.0, 0.0, 0.0 } );
-	static FArray1D< Real64 > StemZ( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > Head1X( 4, { -10.0, -10.0, -10.5, -10.5 } );
-	static FArray1D< Real64 > Head1Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
-	static FArray1D< Real64 > Head1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > Head2X( 4, { -10.0, -10.0, -9.5, -9.5 } );
-	static FArray1D< Real64 > Head2Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
-	static FArray1D< Real64 > Head2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > NSide1X( 4, -10.5 );
-	static FArray1D< Real64 > NSide1Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
-	static FArray1D< Real64 > NSide1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > NSide2X( 4, { -10.5, -10.5, -9.5, -9.5 } );
-	static FArray1D< Real64 > NSide2Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
-	static FArray1D< Real64 > NSide2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
-	static FArray1D< Real64 > NSide3X( 4, -9.5 );
-	static FArray1D< Real64 > NSide3Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
-	static FArray1D< Real64 > NSide3Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > StemX( 4, -10.0 );
+	static Array1D< Real64 > StemY( 4, { 3.0, 3.0, 0.0, 0.0 } );
+	static Array1D< Real64 > StemZ( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > Head1X( 4, { -10.0, -10.0, -10.5, -10.5 } );
+	static Array1D< Real64 > Head1Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
+	static Array1D< Real64 > Head1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > Head2X( 4, { -10.0, -10.0, -9.5, -9.5 } );
+	static Array1D< Real64 > Head2Y( 4, { 3.0, 3.0, 2.133975, 2.133975 } );
+	static Array1D< Real64 > Head2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > NSide1X( 4, -10.5 );
+	static Array1D< Real64 > NSide1Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
+	static Array1D< Real64 > NSide1Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > NSide2X( 4, { -10.5, -10.5, -9.5, -9.5 } );
+	static Array1D< Real64 > NSide2Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
+	static Array1D< Real64 > NSide2Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
+	static Array1D< Real64 > NSide3X( 4, -9.5 );
+	static Array1D< Real64 > NSide3Y( 4, { 4.5, 4.5, 3.5, 3.5 } );
+	static Array1D< Real64 > NSide3Z( 4, { 0.1, 0.0, 0.0, 0.1 } );
 	//  integer, dimension(7) :: colorno=(/3,4,5,6,2,8,9/)
 	int unit; // Unit number on which to write file
 	int surf; // Loop variable for surfaces
@@ -1668,7 +1667,7 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static FArray1D_string const ConvCoeffCalcs( {1,9}, { "ASHRAESimple", "ASHRAETARP", "CeilingDiffuser", "TrombeWall", "TARP", "MoWitt", "DOE-2", "BLAST", "AdaptiveConvectionAlgorithm" } );
+	static Array1D_string const ConvCoeffCalcs( {1,9}, { "ASHRAESimple", "ASHRAETARP", "CeilingDiffuser", "TrombeWall", "TARP", "MoWitt", "DOE-2", "BLAST", "AdaptiveConvectionAlgorithm" } );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -2089,7 +2088,7 @@ CostInfoOut()
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	int unit; // Unit number on which to write file
 	int surf; // Loop variable for surfaces
-	FArray1D_bool uniqueSurf;
+	Array1D_bool uniqueSurf;
 	int write_stat;
 
 	// Formats
@@ -2179,7 +2178,7 @@ VRMLOut(
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static FArray1D_string const colorstring( 7, { "WALL", "WINDOW", "FIXEDSHADE", "SUBSHADE", "ROOF", "FLOOR", "BLDGSHADE" } );
+	static Array1D_string const colorstring( 7, { "WALL", "WINDOW", "FIXEDSHADE", "SUBSHADE", "ROOF", "FLOOR", "BLDGSHADE" } );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -2214,7 +2213,7 @@ VRMLOut(
 	int write_stat;
 
 	// Object Data
-	FArray1D< dTriangle > mytriangles;
+	Array1D< dTriangle > mytriangles;
 
 	// Formats
 	static gio::Fmt Format_702( "('#VRML V2.0 utf8')" );

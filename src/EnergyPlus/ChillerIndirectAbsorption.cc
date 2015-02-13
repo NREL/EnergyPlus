@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -103,8 +103,8 @@ namespace ChillerIndirectAbsorption {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
 
 	// Object Data
-	FArray1D< IndirectAbsorberSpecs > IndirectAbsorber; // dimension to number of machines
-	FArray1D< ReportVars > IndirectAbsorberReport;
+	Array1D< IndirectAbsorberSpecs > IndirectAbsorber; // dimension to number of machines
+	Array1D< ReportVars > IndirectAbsorberReport;
 
 	// MODULE SUBROUTINES:
 
@@ -294,7 +294,7 @@ namespace ChillerIndirectAbsorption {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		bool errFlag; // GetInput error flag
-		FArray1D_bool GenInputOutputNodesUsed; // Used for SetupOutputVariable
+		Array1D_bool GenInputOutputNodesUsed; // Used for SetupOutputVariable
 
 		//FLOW
 		cCurrentModuleObject = "Chiller:Absorption:Indirect";
@@ -654,8 +654,8 @@ namespace ChillerIndirectAbsorption {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyFlag;
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyFlag;
+		static Array1D_bool MyEnvrnFlag;
 		int CondInletNode; // node number of water inlet node to the condenser
 		int CondOutletNode; // node number of water outlet node from the condenser
 		int LoopCtr; // Plant loop counter
@@ -1387,8 +1387,8 @@ namespace ChillerIndirectAbsorption {
 		Real64 EnthSteamOutDry; // enthalpy of dry steam at generator inlet
 		Real64 EnthSteamOutWet; // enthalpy of wet steam at generator inlet
 		Real64 HfgSteam; // heat of vaporization of steam
-		static FArray1D_bool MyEnvironFlag;
-		static FArray1D_bool MyEnvironSteamFlag;
+		static Array1D_bool MyEnvironFlag;
+		static Array1D_bool MyEnvironSteamFlag;
 		static bool OneTimeFlag( true );
 		Real64 FRAC; // fraction of time step chiller cycles
 		static bool PossibleSubcooling; // flag to determine if supply water temperature is below setpoint

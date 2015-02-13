@@ -2,8 +2,8 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -225,8 +225,8 @@ namespace ZoneContaminantPredictorCorrector {
 		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string AlphaName;
-		FArray1D< Real64 > IHGNumbers;
+		Array1D_string AlphaName;
+		Array1D< Real64 > IHGNumbers;
 		Real64 SchMin;
 		Real64 SchMax;
 		int NumAlpha;
@@ -240,7 +240,7 @@ namespace ZoneContaminantPredictorCorrector {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		//  LOGICAL :: ValidScheduleType
-		FArray1D_bool RepVarSet;
+		Array1D_bool RepVarSet;
 		std::string CurrentModuleObject;
 
 		// FLOW:
@@ -894,8 +894,8 @@ namespace ZoneContaminantPredictorCorrector {
 		struct NeededControlTypes
 		{
 			// Members
-			FArray1D_bool MustHave; // 4= the four control types
-			FArray1D_bool DidHave;
+			Array1D_bool MustHave; // 4= the four control types
+			Array1D_bool DidHave;
 
 			// Default Constructor
 			NeededControlTypes() :
@@ -905,8 +905,8 @@ namespace ZoneContaminantPredictorCorrector {
 
 			// Member Constructor
 			NeededControlTypes(
-				FArray1_bool const & MustHave, // 4= the four control types
-				FArray1_bool const & DidHave
+				Array1_bool const & MustHave, // 4= the four control types
+				Array1_bool const & DidHave
 			) :
 				MustHave( 4, MustHave ),
 				DidHave( 4, DidHave )
@@ -917,8 +917,8 @@ namespace ZoneContaminantPredictorCorrector {
 		struct NeededComfortControlTypes
 		{
 			// Members
-			FArray1D_bool MustHave; // 4= the four control types
-			FArray1D_bool DidHave;
+			Array1D_bool MustHave; // 4= the four control types
+			Array1D_bool DidHave;
 
 			// Default Constructor
 			NeededComfortControlTypes() :
@@ -928,8 +928,8 @@ namespace ZoneContaminantPredictorCorrector {
 
 			// Member Constructor
 			NeededComfortControlTypes(
-				FArray1_bool const & MustHave, // 4= the four control types
-				FArray1_bool const & DidHave
+				Array1_bool const & MustHave, // 4= the four control types
+				Array1_bool const & DidHave
 			) :
 				MustHave( 12, MustHave ),
 				DidHave( 12, DidHave )
@@ -1328,7 +1328,7 @@ namespace ZoneContaminantPredictorCorrector {
 		if ( Contaminant.CO2Simulation ) {
 			for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 				SumAllInternalCO2Gains( Loop, ZoneCO2Gain( Loop ) );
-				SumInternalCO2GainsByTypes( Loop, FArray1D_int( 1, IntGainTypeOf_People ), ZoneCO2GainFromPeople( Loop ) );
+				SumInternalCO2GainsByTypes( Loop, Array1D_int( 1, IntGainTypeOf_People ), ZoneCO2GainFromPeople( Loop ) );
 			}
 		}
 

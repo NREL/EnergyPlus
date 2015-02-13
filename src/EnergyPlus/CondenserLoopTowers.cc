@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -150,7 +150,7 @@ namespace CondenserLoopTowers {
 	Real64 WaterUsage( 0.0 ); // Tower water usage (m3/s)
 	Real64 FanCyclingRatio( 0.0 ); // cycling ratio of tower fan when min fan speed provide to much capacity
 
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE CondenserLoopTowers
 
@@ -163,10 +163,10 @@ namespace CondenserLoopTowers {
 	// Update routines to check convergence and update nodes
 
 	// Object Data
-	FArray1D< Towerspecs > SimpleTower; // dimension to number of machines
-	FArray1D< TowerInletConds > SimpleTowerInlet; // inlet conditions
-	FArray1D< ReportVars > SimpleTowerReport; // report variables
-	FArray1D< VSTowerData > VSTower; // model coefficients and specific variables for VS tower
+	Array1D< Towerspecs > SimpleTower; // dimension to number of machines
+	Array1D< TowerInletConds > SimpleTowerInlet; // inlet conditions
+	Array1D< ReportVars > SimpleTowerReport; // report variables
+	Array1D< VSTowerData > VSTower; // model coefficients and specific variables for VS tower
 
 	// MODULE SUBROUTINES:
 
@@ -260,7 +260,7 @@ namespace CondenserLoopTowers {
 		InitSimVars();
 
 		//CALCULATE
-		TypeOfEquip: { auto const SELECT_CASE_var( SimpleTower( TowerNum ).TowerType_Num );
+		{ auto const SELECT_CASE_var( SimpleTower( TowerNum ).TowerType_Num );
 
 		if ( SELECT_CASE_var == CoolingTower_SingleSpeed ) {
 
@@ -428,10 +428,10 @@ namespace CondenserLoopTowers {
 		std::string OutputChar; // report variable for warning messages
 		std::string OutputCharLo; // report variable for warning messages
 		std::string OutputCharHi; // report variable for warning messages
-		FArray1D< Real64 > NumArray( 29 ); // Numeric input data array
-		FArray1D< Real64 > NumArray2( 43 ); // Numeric input data array for VS tower coefficients
-		FArray1D_string AlphArray( 15 ); // Character string input data array
-		FArray1D_string AlphArray2( 1 ); // Character string input data array for VS tower coefficients
+		Array1D< Real64 > NumArray( 29 ); // Numeric input data array
+		Array1D< Real64 > NumArray2( 43 ); // Numeric input data array for VS tower coefficients
+		Array1D_string AlphArray( 15 ); // Character string input data array
+		Array1D_string AlphArray2( 1 ); // Character string input data array for VS tower coefficients
 
 		// Get number of all cooling towers specified in the input data file (idf)
 		NumSingleSpeedTowers = GetNumObjectsFound( cCoolingTower_SingleSpeed );
@@ -2036,8 +2036,8 @@ namespace CondenserLoopTowers {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Flag if input data errors are found
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool OneTimeFlagForEachTower;
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool OneTimeFlagForEachTower;
 		//  LOGICAL                                 :: FatalError
 		int TypeOf_Num( 0 );
 		int LoopNum;
@@ -2209,7 +2209,7 @@ namespace CondenserLoopTowers {
 		Real64 Tapproach; // temporary tower approach temp variable [C]
 		Real64 ModelWaterFlowRatioMax; // maximum water flow rate ratio used for model calibration
 		Real64 FlowRateRatioStep; // flow rate ratio to determine maximum water flow rate ratio during calibration
-		FArray1D< Real64 > Par( 6 ); // Parameter array need for RegulaFalsi routine
+		Array1D< Real64 > Par( 6 ); // Parameter array need for RegulaFalsi routine
 		bool ModelCalibrated; // TRUE if water flow rate ratio is with the specified range
 		std::string OutputChar; // report variable for warning messages
 		std::string OutputChar2; // report variable for warning messages
@@ -2725,7 +2725,7 @@ namespace CondenserLoopTowers {
 		Real64 tmpHighSpeedFanPower;
 		Real64 tmpFreeConvAirFlowRate;
 
-		FArray1D< Real64 > Par( 6 ); // Parameter array need for RegulaFalsi routine
+		Array1D< Real64 > Par( 6 ); // Parameter array need for RegulaFalsi routine
 		Real64 UA0; // Lower bound for UA [W/C]
 		Real64 UA1; // Upper bound for UA [W/C]
 		Real64 DesTowerLoad; // Design tower load [W]
@@ -3716,7 +3716,7 @@ namespace CondenserLoopTowers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > Par( 8 ); // Parameter array passed to solver
+		Array1D< Real64 > Par( 8 ); // Parameter array passed to solver
 		int SolFla; // Flag of solver
 		Real64 CpWater;
 		int LoopNum;
@@ -3931,7 +3931,7 @@ namespace CondenserLoopTowers {
 	Real64
 	VSMerkelResidual(
 		Real64 const AirFlowRateRatio, // fan speed ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = Tower number
+		Array1< Real64 > const & Par // par(1) = Tower number
 	)
 	{
 
@@ -4100,7 +4100,7 @@ namespace CondenserLoopTowers {
 		Real64 AirMassFlowRate; // Mass flow rate of air [kg/s]
 		Real64 InletAirEnthalpy; // Enthalpy of entering moist air [J/kg]
 		int SolFla; // Flag of solver
-		FArray1D< Real64 > Par( 6 ); // Parameter array for regula falsi solver
+		Array1D< Real64 > Par( 6 ); // Parameter array for regula falsi solver
 		Real64 Twb; // inlet air wet-bulb temperature
 		Real64 TwbCapped; // inlet air wet-bulb temp passed to VS tower model
 		Real64 Tr; // range temperature
@@ -4569,7 +4569,7 @@ namespace CondenserLoopTowers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int SolFla; // Flag of solver
-		FArray1D< Real64 > Par( 4 ); // Parameter array for regula falsi solver
+		Array1D< Real64 > Par( 4 ); // Parameter array for regula falsi solver
 		Real64 Tr; // range temperature which results in an energy balance
 		Real64 TempSetPoint( 0.0 ); // local temporary for loop setpoint
 
@@ -4921,7 +4921,7 @@ namespace CondenserLoopTowers {
 	Real64
 	SimpleTowerUAResidual(
 		Real64 const UA, // UA of cooling tower
-		FArray1< Real64 > const & Par // par(1) = design tower load [W]
+		Array1< Real64 > const & Par // par(1) = design tower load [W]
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -4979,7 +4979,7 @@ namespace CondenserLoopTowers {
 	Real64
 	SimpleTowerTrResidual(
 		Real64 const Trange, // cooling tower range temperature [C]
-		FArray1< Real64 > const & Par // par(1) = tower number
+		Array1< Real64 > const & Par // par(1) = tower number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -5046,7 +5046,7 @@ namespace CondenserLoopTowers {
 	Real64
 	SimpleTowerApproachResidual(
 		Real64 const FlowRatio, // water or air flow ratio of cooling tower
-		FArray1< Real64 > const & Par // par(1) = tower number
+		Array1< Real64 > const & Par // par(1) = tower number
 	)
 	{
 		// FUNCTION INFORMATION:

@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -93,21 +93,21 @@ namespace GroundHeatExchangers {
 	Real64 GlheBoreholeTemp( 0.0 ); // The average borehole tempreature [°C]
 	int LocHourOfDay( 0 );
 	int LocDayOfSim( 0 );
-	FArray1D< Real64 > LastQnSubHr; // Previous time step Qn subhourly value
+	Array1D< Real64 > LastQnSubHr; // Previous time step Qn subhourly value
 	Real64 MDotActual;
 
-	FArray1D< Real64 > PrevTimeSteps; // This is used to store only the Last Few time step's time
+	Array1D< Real64 > PrevTimeSteps; // This is used to store only the Last Few time step's time
 	// to enable the calculation of the subhouly contribution..
 	// Recommended size, the product of Minimum subhourly history required and
 	// the maximum no of system time steps in an hour
 
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE CondenserTowers
 
 	// Object Data
-	FArray1D< GlheSpecs > VerticalGlhe; // dimension to number of machines
-	FArray1D< ReportVars > VerticalGlheReport;
+	Array1D< GlheSpecs > VerticalGlhe; // dimension to number of machines
+	Array1D< ReportVars > VerticalGlheReport;
 
 	// MODULE SUBROUTINES:
 
@@ -402,7 +402,7 @@ namespace GroundHeatExchangers {
 				}
 				SubHourlyLimit = N - VerticalGlhe( GlheNum ).LastHourN( IndexN ); //Check this when running simulation
 
-				SUBHRLY_LOOP: for ( I = 1; I <= SubHourlyLimit; ++I ) {
+				for ( I = 1; I <= SubHourlyLimit; ++I ) {
 					if ( I == SubHourlyLimit ) {
 						if ( int( CurrentSimTime ) >= SubAGG ) {
 							XI = std::log( ( CurrentSimTime - PrevTimeSteps( I + 1 ) ) / ( TimeSS_Factor ) );
@@ -422,7 +422,6 @@ namespace GroundHeatExchangers {
 					INTERP( GlheNum, XI, GfuncVal );
 					RQSubHr = GfuncVal / ( K_Ground_Factor );
 					SumQnSubHourly += ( VerticalGlhe( GlheNum ).QnSubHr( I ) - VerticalGlhe( GlheNum ).QnSubHr( I + 1 ) ) * RQSubHr;
-					SUBHRLY_LOOP_loop: ;
 				}
 				SUBHRLY_LOOP_exit: ;
 
@@ -430,7 +429,7 @@ namespace GroundHeatExchangers {
 
 				HourlyLimit = int( CurrentSimTime );
 				SumQnHourly = 0.0;
-				HOURLY_LOOP: for ( I = SubAGG + 1; I <= HourlyLimit; ++I ) {
+				for ( I = SubAGG + 1; I <= HourlyLimit; ++I ) {
 					if ( I == HourlyLimit ) {
 						XI = std::log( CurrentSimTime / ( TimeSS_Factor ) );
 						INTERP( GlheNum, XI, GfuncVal );
@@ -442,7 +441,6 @@ namespace GroundHeatExchangers {
 					INTERP( GlheNum, XI, GfuncVal );
 					RQHour = GfuncVal / ( K_Ground_Factor );
 					SumQnHourly += ( VerticalGlhe( GlheNum ).QnHr( I ) - VerticalGlhe( GlheNum ).QnHr( I + 1 ) ) * RQHour;
-					HOURLY_LOOP_loop: ;
 				}
 				HOURLY_LOOP_exit: ;
 
@@ -481,7 +479,7 @@ namespace GroundHeatExchangers {
 
 				//monthly superposition
 				SumQnMonthly = 0.0;
-				SUMMONTHLY: for ( I = 1; I <= CurrentMonth; ++I ) {
+				for ( I = 1; I <= CurrentMonth; ++I ) {
 					if ( I == 1 ) {
 						XI = std::log( CurrentSimTime / ( TimeSS_Factor ) );
 						INTERP( GlheNum, XI, GfuncVal );
@@ -495,12 +493,11 @@ namespace GroundHeatExchangers {
 					SumQnMonthly += ( VerticalGlhe( GlheNum ).QnMonthlyAgg( I ) - VerticalGlhe( GlheNum ).QnMonthlyAgg( I - 1 ) ) * RQMonth;
 					SUMMONTHLY_loop: ;
 				}
-				SUMMONTHLY_exit: ;
 
 				// Hourly Supr position
 				HourlyLimit = int( CurrentSimTime - CurrentMonth * HrsPerMonth );
 				SumQnHourly = 0.0;
-				HOURLYLOOP: for ( I = 1 + SubAGG; I <= HourlyLimit; ++I ) {
+				for ( I = 1 + SubAGG; I <= HourlyLimit; ++I ) {
 					if ( I == HourlyLimit ) {
 						XI = std::log( ( CurrentSimTime - int( CurrentSimTime ) + I ) / ( TimeSS_Factor ) );
 						INTERP( GlheNum, XI, GfuncVal );
@@ -512,14 +509,13 @@ namespace GroundHeatExchangers {
 					INTERP( GlheNum, XI, GfuncVal );
 					RQHour = GfuncVal / ( K_Ground_Factor );
 					SumQnHourly += ( VerticalGlhe( GlheNum ).QnHr( I ) - VerticalGlhe( GlheNum ).QnHr( I + 1 ) ) * RQHour;
-					HOURLYLOOP_loop: ;
 				}
 				HOURLYLOOP_exit: ;
 
 				// Subhourly Superposition
 				SubHourlyLimit = N - VerticalGlhe( GlheNum ).LastHourN( SubAGG + 1 );
 				SumQnSubHourly = 0.0;
-				SUBHRLOOP: for ( I = 1; I <= SubHourlyLimit; ++I ) {
+				for ( I = 1; I <= SubHourlyLimit; ++I ) {
 					if ( I == SubHourlyLimit ) {
 						XI = std::log( ( CurrentSimTime - PrevTimeSteps( I + 1 ) ) / ( TimeSS_Factor ) );
 						INTERP( GlheNum, XI, GfuncVal );
@@ -531,7 +527,6 @@ namespace GroundHeatExchangers {
 					INTERP( GlheNum, XI, GfuncVal );
 					RQSubHr = GfuncVal / ( K_Ground_Factor );
 					SumQnSubHourly += ( VerticalGlhe( GlheNum ).QnSubHr( I ) - VerticalGlhe( GlheNum ).QnSubHr( I + 1 ) ) * RQSubHr;
-					SUBHRLOOP_loop: ;
 				}
 				SUBHRLOOP_exit: ;
 
@@ -608,7 +603,7 @@ namespace GroundHeatExchangers {
 		Real64 SumQnHr;
 		int MonthNum;
 		int J; // Loop counter
-		static FArray1D_int PrevHour; // Saved Var to store the previous hour
+		static Array1D_int PrevHour; // Saved Var to store the previous hour
 		//    LOGICAL,SAVE :: Allocated = .FALSE.
 		static bool MyEnvrnFlag( true );
 
@@ -1069,7 +1064,7 @@ namespace GroundHeatExchangers {
 		Found = false;
 		Low = 1;
 		High = NumPairs;
-		LOOP: while ( Low <= High ) {
+		while ( Low <= High ) {
 			Mid = ( Low + High ) / 2;
 			if ( VerticalGlhe( GlheNum ).LNTTS( Mid ) < LnTTsVal ) {
 				Low = Mid + 1;
@@ -1078,12 +1073,10 @@ namespace GroundHeatExchangers {
 					High = Mid - 1;
 				} else {
 					Found = true;
-					goto LOOP_exit;
+					break;
 				}
 			}
-			LOOP_loop: ;
 		}
-		LOOP_exit: ;
 		//LnTTsVal is identical to one of the LnTTS array elements return
 		//the GfuncVal after applying the correction
 		if ( Found ) {
@@ -1158,9 +1151,9 @@ namespace GroundHeatExchangers {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyEnvironFlag( true );
 		Real64 FluidDensity;
-		static FArray1D_bool MyFlag;
+		static Array1D_bool MyFlag;
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		bool errFlag;
 
 		if ( MyOneTimeFlag ) {

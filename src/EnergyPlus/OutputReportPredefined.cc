@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
@@ -630,12 +630,12 @@ namespace OutputReportPredefined {
 	Real64 TotalTimeNotSimpleASH55EitherForABUPS( 0.0 );
 
 	// Object Data
-	FArray1D< reportNameType > reportName;
-	FArray1D< SubTableType > subTable;
-	FArray1D< ColumnTagType > columnTag;
-	FArray1D< TableEntryType > tableEntry;
-	FArray1D< CompSizeTableEntryType > CompSizeTableEntry;
-	FArray1D< ShadowRelateType > ShadowRelate;
+	Array1D< reportNameType > reportName;
+	Array1D< SubTableType > subTable;
+	Array1D< ColumnTagType > columnTag;
+	Array1D< TableEntryType > tableEntry;
+	Array1D< CompSizeTableEntryType > CompSizeTableEntry;
+	Array1D< ShadowRelateType > ShadowRelate;
 
 	// Functions
 

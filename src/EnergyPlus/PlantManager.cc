@@ -2,7 +2,7 @@
 #include <cassert>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -92,16 +92,16 @@ namespace PlantManager {
 	int PlantSupplyLoopCase( 0 );
 	int PlantDemandLoopCase( 0 );
 
-	FArray1D_int SupplySideInletNode; // Node number for the supply side inlet
-	FArray1D_int SupplySideOutletNode; // Node number for the supply side outlet
-	FArray1D_int DemandSideInletNode; // Inlet node on the demand side
+	Array1D_int SupplySideInletNode; // Node number for the supply side inlet
+	Array1D_int SupplySideOutletNode; // Node number for the supply side outlet
+	Array1D_int DemandSideInletNode; // Inlet node on the demand side
 
 	// SUBROUTINE SPECIFICATIONS:
 	//The following public routines are called from HVAC Manager
 	//PUBLIC  CheckPlantLoopData      !called from SimHVAC
 
 	// Object Data
-	FArray1D< LoopPipeData > LoopPipe;
+	Array1D< LoopPipeData > LoopPipe;
 	TempLoopData TempLoop; // =(' ',' ',' ',0, , , ,.FALSE.,.FALSE.,.FALSE.,.FALSE.,.FALSE.)
 
 	// MODULE SUBROUTINES
@@ -211,16 +211,13 @@ namespace PlantManager {
 
 			// decide new status for SimPlantLoops flag
 			SimPlantLoops = false;
-			LoopLevel: for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
-				LoopSideLevel: for ( LoopSideNum = 1; LoopSideNum <= 2; ++LoopSideNum ) {
+			for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
+				for ( LoopSideNum = 1; LoopSideNum <= 2; ++LoopSideNum ) {
 					if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).SimLoopSideNeeded ) {
 						SimPlantLoops = true;
 						goto LoopLevel_exit;
 					}
-					LoopSideLevel_loop: ;
 				}
-				LoopSideLevel_exit: ;
-				LoopLevel_loop: ;
 			}
 			LoopLevel_exit: ;
 
@@ -308,8 +305,8 @@ namespace PlantManager {
 		int NumFluids; // number of fluids in sim
 		int PlantLoopNum;
 		int CondLoopNum;
-		FArray1D_string Alpha( 18 ); // dimension to num of alpha fields in input
-		FArray1D< Real64 > Num( 30 ); // dimension to num of numeric data fields in input
+		Array1D_string Alpha( 18 ); // dimension to num of alpha fields in input
+		Array1D< Real64 > Num( 30 ); // dimension to num of numeric data fields in input
 		static bool ErrorsFound( false );
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
@@ -718,16 +715,16 @@ namespace PlantManager {
 
 		std::string LoopIdentifier;
 
-		static FArray1D_string BranchNames; // Branch names from GetBranchList call
-		static FArray1D_string CompTypes; // Branch names from GetBranchList call
-		static FArray1D_string CompNames; // Branch names from GetBranchList call
-		static FArray1D_int CompCtrls; // Branch names from GetBranchList call
-		static FArray1D_string InletNodeNames; // Node names from GetBranchData call
-		static FArray1D_string OutletNodeNames; // Node names from GetBranchData call
-		static FArray1D_int InletNodeNumbers; // Node numbers from GetBranchData call
-		static FArray1D_int OutletNodeNumbers; // Node numbers from GetBranchData call
-		static FArray1D_bool SplitOutBranch;
-		static FArray1D_bool MixerInBranch;
+		static Array1D_string BranchNames; // Branch names from GetBranchList call
+		static Array1D_string CompTypes; // Branch names from GetBranchList call
+		static Array1D_string CompNames; // Branch names from GetBranchList call
+		static Array1D_int CompCtrls; // Branch names from GetBranchList call
+		static Array1D_string InletNodeNames; // Node names from GetBranchData call
+		static Array1D_string OutletNodeNames; // Node names from GetBranchData call
+		static Array1D_int InletNodeNumbers; // Node numbers from GetBranchData call
+		static Array1D_int OutletNodeNumbers; // Node numbers from GetBranchData call
+		static Array1D_bool SplitOutBranch;
+		static Array1D_bool MixerInBranch;
 		bool errFlag;
 		int GeneralEquipType;
 		int TypeOfNum;
@@ -2035,7 +2032,7 @@ namespace PlantManager {
 		//  LOGICAL,SAVE  :: MySizeFlag = .TRUE.
 		static bool MySetPointCheckFlag( true );
 
-		static FArray1D_bool PlantLoopSetPointInitFlag;
+		static Array1D_bool PlantLoopSetPointInitFlag;
 
 		int HalfLoopNum;
 		int passNum;
@@ -4178,7 +4175,7 @@ namespace PlantManager {
 
 	//     NOTICE
 
-	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

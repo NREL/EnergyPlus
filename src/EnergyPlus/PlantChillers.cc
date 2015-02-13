@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -154,14 +154,14 @@ namespace PlantChillers {
 	// Const COP
 
 	// Object Data
-	FArray1D< ElectricChillerSpecs > ElectricChiller; // dimension to number of machines
-	FArray1D< ElectricReportVars > ElectricChillerReport;
-	FArray1D< EngineDrivenChillerSpecs > EngineDrivenChiller; // dimension to number of machines
-	FArray1D< EngineDrivenReportVars > EngineDrivenChillerReport;
-	FArray1D< GTChillerSpecs > GTChiller; // dimension to number of machines
-	FArray1D< GasTurbineReportVars > GTChillerReport;
-	FArray1D< ConstCOPChillerSpecs > ConstCOPChiller; // dimension to number of machines
-	FArray1D< ConstCOPReportVars > ConstCOPChillerReport;
+	Array1D< ElectricChillerSpecs > ElectricChiller; // dimension to number of machines
+	Array1D< ElectricReportVars > ElectricChillerReport;
+	Array1D< EngineDrivenChillerSpecs > EngineDrivenChiller; // dimension to number of machines
+	Array1D< EngineDrivenReportVars > EngineDrivenChillerReport;
+	Array1D< GTChillerSpecs > GTChiller; // dimension to number of machines
+	Array1D< GasTurbineReportVars > GTChillerReport;
+	Array1D< ConstCOPChillerSpecs > ConstCOPChiller; // dimension to number of machines
+	Array1D< ConstCOPReportVars > ConstCOPChillerReport;
 
 	// MODULE SUBROUTINES:
 
@@ -1985,8 +1985,8 @@ namespace PlantChillers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyFlag;
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyFlag;
+		static Array1D_bool MyEnvrnFlag;
 		int CondInletNode; // node number of water inlet node to the condenser
 		int CondOutletNode; // node number of water outlet node from the condenser
 		int EvapInletNode;
@@ -2283,8 +2283,8 @@ namespace PlantChillers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MyFlag;
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MyFlag;
 		int CondInletNode; // node number of water inlet node to the condenser
 		int CondOutletNode;
 		int EvapInletNode;
@@ -2535,8 +2535,8 @@ namespace PlantChillers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MyFlag;
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MyFlag;
 		int CondInletNode; // node number of water inlet node to the condenser
 		int CondOutletNode; // node number of water outlet node from the condenser
 		int EvapInletNode;
@@ -2784,8 +2784,8 @@ namespace PlantChillers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool OneTimeFlag( true );
-		static FArray1D_bool MyFlag;
-		static FArray1D_bool MyEnvironFlag;
+		static Array1D_bool MyFlag;
+		static Array1D_bool MyEnvironFlag;
 		int CondInletNode; // node number of water inlet node to the condenser
 		int CondOutletNode; // node number of water outlet node from the condenser
 		int EvapInletNode;

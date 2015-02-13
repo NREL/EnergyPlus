@@ -3,7 +3,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -143,9 +143,9 @@ namespace HVACManager {
 	int HVACManageIteration( 0 ); // counts iterations to enforce maximum iteration limit
 	int RepIterAir( 0 );
 
-	//FArray1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
-	//FArray1D_bool MixingReportFlag; // TRUE when Mixing is active based on controls
-	//FArray1D< Real64 > VentMCP; // product of mass rate and Cp for each Venitlation object
+	//Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
+	//Array1D_bool MixingReportFlag; // TRUE when Mixing is active based on controls
+	//Array1D< Real64 > VentMCP; // product of mass rate and Cp for each Venitlation object
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 	// and zone equipment simulations
@@ -2097,8 +2097,8 @@ namespace HVACManager {
 		Real64 H2OHtOfVap; // Heat of vaporization of air
 		Real64 TotalLoad; // Total loss or gain
 		int MixNum; // Counter for MIXING and Cross Mixing statements
-		static FArray1D< Real64 > MixSenLoad; // Mixing sensible loss or gain
-		static FArray1D< Real64 > MixLatLoad; // Mixing latent loss or gain
+		static Array1D< Real64 > MixSenLoad; // Mixing sensible loss or gain
+		static Array1D< Real64 > MixLatLoad; // Mixing latent loss or gain
 		int j; // Index in a do-loop
 		int VentZoneNum; // Number of ventilation object per zone
 		Real64 VentZoneMassflow; // Total mass flow rate per zone
@@ -2616,7 +2616,7 @@ namespace HVACManager {
 		int ZoneIndex;
 		int NodeIndex;
 		int NodeNum;
-		FArray1D< Real64 > tmpRealARR( ConvergLogStackDepth );
+		Array1D< Real64 > tmpRealARR( ConvergLogStackDepth );
 
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 

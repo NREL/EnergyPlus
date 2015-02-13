@@ -2,7 +2,7 @@
 #define ChillerExhaustAbsorption_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -23,7 +23,7 @@ namespace ChillerExhaustAbsorption {
 
 	// This type holds the output from the algorithm i.e., the Report Variables
 
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 
@@ -476,8 +476,8 @@ namespace ChillerExhaustAbsorption {
 	};
 
 	// Object Data
-	extern FArray1D< ExhaustAbsorberSpecs > ExhaustAbsorber; // dimension to number of machines
-	extern FArray1D< ReportVars > ExhaustAbsorberReport;
+	extern Array1D< ExhaustAbsorberSpecs > ExhaustAbsorber; // dimension to number of machines
+	extern Array1D< ReportVars > ExhaustAbsorberReport;
 
 	// Functions
 

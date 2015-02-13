@@ -2,8 +2,8 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/MArray.functions.hh>
 
@@ -100,7 +100,7 @@ namespace SystemAvailabilityManager {
 	int const HybridVentCtrl_Close( 2 ); // Close windows or doors
 
 	int const NumValidSysAvailManagerTypes( 12 );
-	FArray1D_string const cValidSysAvailManagerTypes( NumValidSysAvailManagerTypes, { "AvailabilityManager:Scheduled", "AvailabilityManager:ScheduledOn", "AvailabilityManager:ScheduledOff", "AvailabilityManager:NightCycle", "AvailabilityManager:DifferentialThermostat", "AvailabilityManager:HighTemperatureTurnOff", "AvailabilityManager:HighTemperatureTurnOn", "AvailabilityManager:LowTemperatureTurnOff", "AvailabilityManager:LowTemperatureTurnOn", "AvailabilityManager:NightVentilation", "AvailabilityManager:HybridVentilation", "AvailabilityManager:OptimumStart" } );
+	Array1D_string const cValidSysAvailManagerTypes( NumValidSysAvailManagerTypes, { "AvailabilityManager:Scheduled", "AvailabilityManager:ScheduledOn", "AvailabilityManager:ScheduledOff", "AvailabilityManager:NightCycle", "AvailabilityManager:DifferentialThermostat", "AvailabilityManager:HighTemperatureTurnOff", "AvailabilityManager:HighTemperatureTurnOn", "AvailabilityManager:LowTemperatureTurnOff", "AvailabilityManager:LowTemperatureTurnOn", "AvailabilityManager:NightVentilation", "AvailabilityManager:HybridVentilation", "AvailabilityManager:OptimumStart" } );
 	int const SysAvailMgr_Scheduled( 1 );
 	int const SysAvailMgr_ScheduledOn( 2 );
 	int const SysAvailMgr_ScheduledOff( 3 );
@@ -114,7 +114,7 @@ namespace SystemAvailabilityManager {
 	int const SysAvailMgr_HybridVent( 11 );
 
 	int const SysAvailMgr_OptimumStart( 12 );
-	FArray1D_int const ValidSysAvailManagerTypes( NumValidSysAvailManagerTypes, { SysAvailMgr_Scheduled, SysAvailMgr_ScheduledOn, SysAvailMgr_ScheduledOff, SysAvailMgr_NightCycle, SysAvailMgr_DiffThermo, SysAvailMgr_HiTempTOff, SysAvailMgr_HiTempTOn, SysAvailMgr_LoTempTOff, SysAvailMgr_LoTempTOn, SysAvailMgr_NightVent, SysAvailMgr_HybridVent, SysAvailMgr_OptimumStart } );
+	Array1D_int const ValidSysAvailManagerTypes( NumValidSysAvailManagerTypes, { SysAvailMgr_Scheduled, SysAvailMgr_ScheduledOn, SysAvailMgr_ScheduledOff, SysAvailMgr_NightCycle, SysAvailMgr_DiffThermo, SysAvailMgr_HiTempTOff, SysAvailMgr_HiTempTOn, SysAvailMgr_LoTempTOff, SysAvailMgr_LoTempTOn, SysAvailMgr_NightVent, SysAvailMgr_HybridVent, SysAvailMgr_OptimumStart } );
 	// DERIVED TYPE DEFINITIONS
 
 	//Not used yet
@@ -140,21 +140,21 @@ namespace SystemAvailabilityManager {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Object Data
-	FArray1D< DefineSchedSysAvailManager > SchedSysAvailMgrData;
-	FArray1D< DefineSchedOnSysAvailManager > SchedOnSysAvailMgrData;
-	FArray1D< DefineSchedOffSysAvailManager > SchedOffSysAvailMgrData;
-	FArray1D< DefineNightCycSysAvailManager > NCycSysAvailMgrData;
-	FArray1D< DefineDiffTSysAvailManager > DiffTSysAvailMgrData;
-	FArray1D< DefineHiLoSysAvailManager > HiTurnOffSysAvailMgrData;
-	FArray1D< DefineHiLoSysAvailManager > HiTurnOnSysAvailMgrData;
-	FArray1D< DefineHiLoSysAvailManager > LoTurnOffSysAvailMgrData;
-	FArray1D< DefineHiLoSysAvailManager > LoTurnOnSysAvailMgrData;
-	FArray1D< DefineNightVentSysAvailManager > NVentSysAvailMgrData;
-	FArray1D< DefineHybridVentSysAvailManager > HybridVentSysAvailMgrData;
-	FArray1D< SysAvailManagerList > SysAvailMgrListData;
-	FArray1D< DefineOptStartSysAvailManager > OptStartSysAvailMgrData;
-	FArray1D< DefineASHRAEAdaptiveOptimumStartCoeffs > ASHRAEOptSCoeffCooling;
-	FArray1D< DefineASHRAEAdaptiveOptimumStartCoeffs > ASHRAEOptSCoeffHeating;
+	Array1D< DefineSchedSysAvailManager > SchedSysAvailMgrData;
+	Array1D< DefineSchedOnSysAvailManager > SchedOnSysAvailMgrData;
+	Array1D< DefineSchedOffSysAvailManager > SchedOffSysAvailMgrData;
+	Array1D< DefineNightCycSysAvailManager > NCycSysAvailMgrData;
+	Array1D< DefineDiffTSysAvailManager > DiffTSysAvailMgrData;
+	Array1D< DefineHiLoSysAvailManager > HiTurnOffSysAvailMgrData;
+	Array1D< DefineHiLoSysAvailManager > HiTurnOnSysAvailMgrData;
+	Array1D< DefineHiLoSysAvailManager > LoTurnOffSysAvailMgrData;
+	Array1D< DefineHiLoSysAvailManager > LoTurnOnSysAvailMgrData;
+	Array1D< DefineNightVentSysAvailManager > NVentSysAvailMgrData;
+	Array1D< DefineHybridVentSysAvailManager > HybridVentSysAvailMgrData;
+	Array1D< SysAvailManagerList > SysAvailMgrListData;
+	Array1D< DefineOptStartSysAvailManager > OptStartSysAvailMgrData;
+	Array1D< DefineASHRAEAdaptiveOptimumStartCoeffs > ASHRAEOptSCoeffCooling;
+	Array1D< DefineASHRAEAdaptiveOptimumStartCoeffs > ASHRAEOptSCoeffHeating;
 
 	// Functions
 
@@ -374,12 +374,12 @@ namespace SystemAvailabilityManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string cAlphaFieldNames;
-		FArray1D_string cNumericFieldNames;
-		FArray1D_bool lNumericFieldBlanks;
-		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_string cAlphaArgs;
-		FArray1D< Real64 > rNumericArgs;
+		Array1D_string cAlphaFieldNames;
+		Array1D_string cNumericFieldNames;
+		Array1D_bool lNumericFieldBlanks;
+		Array1D_bool lAlphaFieldBlanks;
+		Array1D_string cAlphaArgs;
+		Array1D< Real64 > rNumericArgs;
 		std::string cCurrentModuleObject;
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
@@ -1056,12 +1056,12 @@ namespace SystemAvailabilityManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string cAlphaFieldNames;
-		FArray1D_string cNumericFieldNames;
-		FArray1D_bool lNumericFieldBlanks;
-		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_string cAlphaArgs;
-		FArray1D< Real64 > rNumericArgs;
+		Array1D_string cAlphaFieldNames;
+		Array1D_string cNumericFieldNames;
+		Array1D_bool lNumericFieldBlanks;
+		Array1D_bool lAlphaFieldBlanks;
+		Array1D_string cAlphaArgs;
+		Array1D< Real64 > rNumericArgs;
 		std::string cCurrentModuleObject;
 		int NumAlphas;
 		int NumNumbers;
@@ -1930,7 +1930,7 @@ namespace SystemAvailabilityManager {
 		int CtrldZoneNum;
 		int ZoneNum;
 		Real64 TempTol;
-		static FArray1D_bool ZoneCompNCControlType;
+		static Array1D_bool ZoneCompNCControlType;
 		static bool OneTimeFlag( true );
 
 		TempTol = 0.5 * NCycSysAvailMgrData( SysAvailNum ).TempTolRange;
@@ -2198,8 +2198,8 @@ namespace SystemAvailabilityManager {
 
 		int ScheduleIndex;
 		int DayScheduleIndex;
-		FArray2D< Real64 > DayValues;
-		FArray2D< Real64 > DayValuesTmr;
+		Array2D< Real64 > DayValues;
+		Array2D< Real64 > DayValuesTmr;
 		int JDay;
 		int TmrJDay;
 		int CurDayofWeek;
@@ -2222,8 +2222,8 @@ namespace SystemAvailabilityManager {
 		static bool OSReportVarFlag( true );
 		int NumPreDays;
 		int NumOfZonesInList;
-		static FArray1D< Real64 > AdaTempGradTrdHeat; // Heating temp gradient for previous days
-		static FArray1D< Real64 > AdaTempGradTrdCool; // Cooling temp gradient for previous days
+		static Array1D< Real64 > AdaTempGradTrdHeat; // Heating temp gradient for previous days
+		static Array1D< Real64 > AdaTempGradTrdCool; // Cooling temp gradient for previous days
 		static Real64 AdaTempGradHeat;
 		static Real64 AdaTempGradCool;
 		static Real64 ATGUpdateTime1( 0.0 );
@@ -2260,29 +2260,23 @@ namespace SystemAvailabilityManager {
 
 			FanStartTime = 0.0;
 			FanStartTimeTmr = 0.0;
-			Loop1: for ( I = 1; I <= 24; ++I ) {
-				Loop2: for ( J = 1; J <= NumOfTimeStepInHour; ++J ) {
+			for ( I = 1; I <= 24; ++I ) {
+				for ( J = 1; J <= NumOfTimeStepInHour; ++J ) {
 					if ( DayValues( I, J ) > 0.0 ) {
 						FanStartTime = I - 1 + 1 / NumOfTimeStepInHour * J;
 						goto Loop1_exit;
 					}
-					Loop2_loop: ;
 				}
-				Loop2_exit: ;
-				Loop1_loop: ;
 			}
 			Loop1_exit: ;
 
-			Loop3: for ( I = 1; I <= 24; ++I ) {
-				Loop4: for ( J = 1; J <= NumOfTimeStepInHour; ++J ) {
+			for ( I = 1; I <= 24; ++I ) {
+				for ( J = 1; J <= NumOfTimeStepInHour; ++J ) {
 					if ( DayValuesTmr( I, J ) > 0.0 ) {
 						FanStartTimeTmr = I - 1 + 1 / NumOfTimeStepInHour * J;
 						goto Loop3_exit;
 					}
-					Loop4_loop: ;
 				}
-				Loop4_exit: ;
-				Loop3_loop: ;
 			}
 			Loop3_exit: ;
 

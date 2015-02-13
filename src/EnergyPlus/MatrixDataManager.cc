@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -66,7 +66,7 @@ namespace MatrixDataManager {
 	//PUBLIC GetMatrixName
 
 	// Object Data
-	FArray1D< MatrixDataStruct > MatData;
+	Array1D< MatrixDataStruct > MatData;
 
 	// Functions
 
@@ -160,16 +160,13 @@ namespace MatrixDataManager {
 				ErrorsFound = true;
 			}
 			MatData( MatNum ).Mat2D.allocate( NumRows, NumCols ); // This is standard order for a NumRows X NumCols matrix
-			MatData( MatNum ).Dim.allocate( 2 );
 			MatData( MatNum ).MatrixType = TwoDimensional;
-			MatData( MatNum ).Dim( 1 ) = NumRows;
-			MatData( MatNum ).Dim( 2 ) = NumCols;
 			RowIndex = 1;
 			ColIndex = 1;
 			for ( ElementNum = 1; ElementNum <= NumElements; ++ElementNum ) {
 				RowIndex = ( ElementNum - 1 ) / NumCols + 1;
 				ColIndex = mod( ( ElementNum - 1 ), NumCols ) + 1;
-				MatData( MatNum ).Mat2D( RowIndex, ColIndex ) = rNumericArgs( ElementNum + 2 ); //Matrix is read in row-by-row
+				MatData( MatNum ).Mat2D( RowIndex, ColIndex ) = rNumericArgs( ElementNum + 2 ); // Matrix is read in row-by-row
 				//Note: this is opposite to usual FORTRAN array storage
 			}
 
@@ -239,7 +236,7 @@ namespace MatrixDataManager {
 	void
 	Get2DMatrix(
 		int const Idx, // pointer index to location in MatData
-		FArray2S< Real64 > Mat2D
+		Array2S< Real64 > Mat2D
 	)
 	{
 
@@ -325,11 +322,10 @@ namespace MatrixDataManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		if ( Idx > 0 ) {
-			NumRows = MatData( Idx ).Dim( 1 );
-			NumCols = MatData( Idx ).Dim( 2 );
+			NumRows = MatData( Idx ).Mat2D.isize( 1 );
+			NumCols = MatData( Idx ).Mat2D.isize( 2 );
 		} else {
 			// do nothing (?) throw dev error?
-
 		}
 
 	}

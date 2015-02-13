@@ -5,7 +5,7 @@
 #include <limits>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -99,8 +99,8 @@ namespace FluidProperties {
 	bool DebugReportRefrigerants( false );
 	int GlycolErrorLimitTest( 1 ); // how many times error is printed with details before recurring called
 	int RefrigerantErrorLimitTest( 1 ); // how many times error is printed with details before recurring called
-	FArray1D_bool RefrigUsed;
-	FArray1D_bool GlycolUsed;
+	Array1D_bool RefrigUsed;
+	Array1D_bool GlycolUsed;
 	int FluidIndex_Water( 0 );
 	int FluidIndex_EthyleneGlycol( 0 );
 	int FluidIndex_PropoleneGlycol( 0 );
@@ -108,68 +108,68 @@ namespace FluidProperties {
 	// ACCESSIBLE SPECIFICATIONS OF MODULE SUBROUTINES OR FUNCTONS:
 
 	// Object Data
-	FArray1D< FluidPropsRefrigerantData > RefrigData;
-	FArray1D< FluidPropsRefrigErrors > RefrigErrorTracking;
-	FArray1D< FluidPropsGlycolRawData > GlyRawData;
-	FArray1D< FluidPropsGlycolData > GlycolData;
-	FArray1D< FluidPropsGlycolErrors > GlycolErrorTracking;
+	Array1D< FluidPropsRefrigerantData > RefrigData;
+	Array1D< FluidPropsRefrigErrors > RefrigErrorTracking;
+	Array1D< FluidPropsGlycolRawData > GlyRawData;
+	Array1D< FluidPropsGlycolData > GlycolData;
+	Array1D< FluidPropsGlycolErrors > GlycolErrorTracking;
 
 	// Data Initializer Forward Declarations
 	// See GetFluidPropertiesData "SUBROUTINE LOCAL DATA" for actual data.
 
 	void
 	DefaultEthGlyCpData_initializer(
-		FArray2D< Real64 > &,
-		FArray1D< Real64 > const &
+		Array2D< Real64 > &,
+		Array1D< Real64 > const &
 	);
 
 	void
 	DefaultEthGlyViscData_initializer(
-		FArray2D< Real64 > &,
-		FArray1D< Real64 > const &
+		Array2D< Real64 > &,
+		Array1D< Real64 > const &
 	);
 
 	void
 	DefaultEthGlyRhoData_initializer(
-		FArray2D< Real64 > &,
-		FArray1D< Real64 > const &
+		Array2D< Real64 > &,
+		Array1D< Real64 > const &
 	);
 
 	void
 	DefaultEthGlyCondData_initializer(
-		FArray2D< Real64 > &,
-		FArray1D< Real64 > const &
+		Array2D< Real64 > &,
+		Array1D< Real64 > const &
 	);
 
 	void
 	DefaultPropGlyCpData_initializer(
-		FArray2D< Real64 > &,
-		FArray1D< Real64 > const &
+		Array2D< Real64 > &,
+		Array1D< Real64 > const &
 	);
 
 	void
 	DefaultPropGlyViscData_initializer(
-		FArray2D< Real64 > &,
-		FArray1D< Real64 > const &
+		Array2D< Real64 > &,
+		Array1D< Real64 > const &
 	);
 
 	void
 	DefaultPropGlyRhoData_initializer(
-		FArray2D< Real64 > &,
-		FArray1D< Real64 > const &
+		Array2D< Real64 > &,
+		Array1D< Real64 > const &
 	);
 
 	void
 	DefaultPropGlyCondData_initializer(
-		FArray2D< Real64 > &,
-		FArray1D< Real64 > const &
+		Array2D< Real64 > &,
+		Array1D< Real64 > const &
 	);
 
 	void
-	DefaultSteamSuperheatedEnthalpyData_initializer( FArray2D< Real64 > & );
+	DefaultSteamSuperheatedEnthalpyData_initializer( Array2D< Real64 > & );
 
 	void
-	DefaultSteamSuperheatedDensityData_initializer( FArray2D< Real64 > & );
+	DefaultSteamSuperheatedDensityData_initializer( Array2D< Real64 > & );
 
 	// MODULE SUBROUTINES:
 
@@ -200,7 +200,7 @@ namespace FluidProperties {
 		// na
 
 		// Using/Aliasing
-		using namespace std::placeholders; // For use with 'std::bind' in FArray initializers
+		using namespace std::placeholders; // For use with 'std::bind' in Array initializers
 		using namespace InputProcessor;
 
 		// Locals
@@ -223,14 +223,14 @@ namespace FluidProperties {
 		// DERIVED TYPE DEFINITIONS
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string Alphas; // Reads string value from input file
-		FArray1D_string cAlphaFieldNames; // field names for alpha fields
-		FArray1D_string cNumericFieldNames; // field names for numeric fields
+		Array1D_string Alphas; // Reads string value from input file
+		Array1D_string cAlphaFieldNames; // field names for alpha fields
+		Array1D_string cNumericFieldNames; // field names for numeric fields
 		int Loop; // DO loop counter (various uses)
 		int NumAlphas; // States which alpha value to read from a "Number" line
-		FArray1D< Real64 > Numbers; // brings in data from IP
-		FArray1D_bool lAlphaFieldBlanks; // logical for blank alpha fields
-		FArray1D_bool lNumericFieldBlanks; // logical for blank numeric fields
+		Array1D< Real64 > Numbers; // brings in data from IP
+		Array1D_bool lAlphaFieldBlanks; // logical for blank alpha fields
+		Array1D_bool lNumericFieldBlanks; // logical for blank numeric fields
 		int NumNumbers; // States which number value to read from a "Numbers" line
 		int MaxAlphas; // maximum number of alphas
 		int MaxNumbers; // maximum number of numbers
@@ -261,83 +261,83 @@ namespace FluidProperties {
 
 		// SUBROUTINE LOCAL DATA:
 
-		// Note two methods of FArray initialization in use:
+		// Note two methods of Array initialization in use:
 		// - Fixed list of values.  The second parameter is an initializer list (brace
 		//   delimited list of numbers).
 		// - Initializer function.  The second parameter is the function name.
 		//   In several cases we need to pass water data to the initializer, but an
-		//   FArray initializer only takes one argument.  std::bind is used to convert the
+		//   Array initializer only takes one argument.  std::bind is used to convert the
 		//   actual initializer into a function of one argument.
 
 		// For default "glycol" fluids of Water, Ethylene Glycol, and Propylene Glycol
 
-		static FArray1D< Real64 > const DefaultGlycolTemps( DefaultNumGlyTemps, { -35.0, -30.0, -25.0, -20.0, -15.0, -10.0, -5.0, 0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0, 95.0, 100.0, 105.0, 110.0, 115.0, 120.0, 125.0 } ); // 33 total temperature points
+		static Array1D< Real64 > const DefaultGlycolTemps( DefaultNumGlyTemps, { -35.0, -30.0, -25.0, -20.0, -15.0, -10.0, -5.0, 0.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 75.0, 80.0, 85.0, 90.0, 95.0, 100.0, 105.0, 110.0, 115.0, 120.0, 125.0 } ); // 33 total temperature points
 
-		static FArray1D< Real64 > const DefaultGlycolConcs( DefaultNumGlyConcs, { 0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9 } ); // 10 total concentration points
+		static Array1D< Real64 > const DefaultGlycolConcs( DefaultNumGlyConcs, { 0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9 } ); // 10 total concentration points
 
-		static FArray1D< Real64 > const DefaultWaterCpData( DefaultNumGlyTemps, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4217.0, 4198.0, 4191.0, 4185.0, 4181.0, 4179.0, 4180.0, 4180.0, 4180.0, 4180.0, 4181.0, 4183.0, 4185.0, 4188.0, 4192.0, 4196.0, 4200.0, 4203.0, 4208.0, 4213.0, 4218.0, 4223.0, 4228.0, 4233.0, 4238.0, 4243.0 } ); // in J/kg-K
+		static Array1D< Real64 > const DefaultWaterCpData( DefaultNumGlyTemps, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4217.0, 4198.0, 4191.0, 4185.0, 4181.0, 4179.0, 4180.0, 4180.0, 4180.0, 4180.0, 4181.0, 4183.0, 4185.0, 4188.0, 4192.0, 4196.0, 4200.0, 4203.0, 4208.0, 4213.0, 4218.0, 4223.0, 4228.0, 4233.0, 4238.0, 4243.0 } ); // in J/kg-K
 
-		static FArray1D< Real64 > const DefaultWaterViscData( DefaultNumGlyTemps, { 0.0e-3, 0.0e-3, 0.0e-3, 0.0e-3, 0.0e-3, 0.0e-3, 0.0e-3, 1.7912e-3, 1.5183e-3, 1.306e-3, 1.1376e-3, 1.0016e-3, 0.8901e-3, 0.7974e-3, 0.7193e-3, 0.653e-3, 0.5961e-3, 0.5468e-3, 0.504e-3, 0.4664e-3, 0.4332e-3, 0.4039e-3, 0.3777e-3, 0.3543e-3, 0.3333e-3, 0.3144e-3, 0.2973e-3, 0.2817e-3, 0.0e-3, 0.0e-3, 0.0e-3, 0.0e-3, 0.0e-3 } ); // in Pa-s
+		static Array1D< Real64 > const DefaultWaterViscData( DefaultNumGlyTemps, { 0.0e-3, 0.0e-3, 0.0e-3, 0.0e-3, 0.0e-3, 0.0e-3, 0.0e-3, 1.7912e-3, 1.5183e-3, 1.306e-3, 1.1376e-3, 1.0016e-3, 0.8901e-3, 0.7974e-3, 0.7193e-3, 0.653e-3, 0.5961e-3, 0.5468e-3, 0.504e-3, 0.4664e-3, 0.4332e-3, 0.4039e-3, 0.3777e-3, 0.3543e-3, 0.3333e-3, 0.3144e-3, 0.2973e-3, 0.2817e-3, 0.0e-3, 0.0e-3, 0.0e-3, 0.0e-3, 0.0e-3 } ); // in Pa-s
 
-		static FArray1D< Real64 > const DefaultWaterRhoData( DefaultNumGlyTemps, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 999.8, 999.9, 999.7, 999.1, 998.2, 997.0, 995.6, 994.0, 992.2, 990.2, 988.0, 985.7, 983.2, 980.5, 977.7, 974.8, 971.8, 968.6, 965.3, 961.9, 958.3, 0.0, 0.0, 0.0, 0.0, 0.0 } ); // in kg/m3
+		static Array1D< Real64 > const DefaultWaterRhoData( DefaultNumGlyTemps, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 999.8, 999.9, 999.7, 999.1, 998.2, 997.0, 995.6, 994.0, 992.2, 990.2, 988.0, 985.7, 983.2, 980.5, 977.7, 974.8, 971.8, 968.6, 965.3, 961.9, 958.3, 0.0, 0.0, 0.0, 0.0, 0.0 } ); // in kg/m3
 
-		static FArray1D< Real64 > const DefaultWaterCondData( DefaultNumGlyTemps, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.561, 0.5705, 0.58, 0.5893, 0.5984, 0.6072, 0.6155, 0.6233, 0.6306, 0.6373, 0.6436, 0.6492, 0.6543, 0.659, 0.6631, 0.6668, 0.67, 0.6728, 0.6753, 0.6773, 0.6791, 0.0, 0.0, 0.0, 0.0, 0.0 } ); // in W/mK
+		static Array1D< Real64 > const DefaultWaterCondData( DefaultNumGlyTemps, { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.561, 0.5705, 0.58, 0.5893, 0.5984, 0.6072, 0.6155, 0.6233, 0.6306, 0.6373, 0.6436, 0.6492, 0.6543, 0.659, 0.6631, 0.6668, 0.67, 0.6728, 0.6753, 0.6773, 0.6791, 0.0, 0.0, 0.0, 0.0, 0.0 } ); // in W/mK
 
 		// Ethylene Glycol Data: Specific Heat in J/(kg-k)
-		static FArray2D< Real64 > const DefaultEthGlyCpData( DefaultNumGlyConcs, DefaultNumGlyTemps, std::bind( DefaultEthGlyCpData_initializer, _1, DefaultWaterCpData ) );
+		static Array2D< Real64 > const DefaultEthGlyCpData( DefaultNumGlyConcs, DefaultNumGlyTemps, std::bind( DefaultEthGlyCpData_initializer, _1, DefaultWaterCpData ) );
 
 		// Ethylene Glycol Data: Viscosity in mPa-s
-		static FArray2D< Real64 > const DefaultEthGlyViscData( DefaultNumGlyConcs, DefaultNumGlyTemps, std::bind( DefaultEthGlyViscData_initializer, _1, DefaultWaterViscData ) );
+		static Array2D< Real64 > const DefaultEthGlyViscData( DefaultNumGlyConcs, DefaultNumGlyTemps, std::bind( DefaultEthGlyViscData_initializer, _1, DefaultWaterViscData ) );
 
 		// Ethylene Glycol Data: Density in kg/m3
-		static FArray2D< Real64 > const DefaultEthGlyRhoData( DefaultNumGlyConcs, DefaultNumGlyTemps, std::bind( DefaultEthGlyRhoData_initializer, _1, DefaultWaterRhoData ) );
+		static Array2D< Real64 > const DefaultEthGlyRhoData( DefaultNumGlyConcs, DefaultNumGlyTemps, std::bind( DefaultEthGlyRhoData_initializer, _1, DefaultWaterRhoData ) );
 
 		// Ethylene Glycol Data: Conductivity in W/(m-K)
-		static FArray2D< Real64 > const DefaultEthGlyCondData( DefaultNumGlyConcs, DefaultNumGlyTemps, std::bind( DefaultEthGlyCondData_initializer, _1, DefaultWaterCondData ) );
+		static Array2D< Real64 > const DefaultEthGlyCondData( DefaultNumGlyConcs, DefaultNumGlyTemps, std::bind( DefaultEthGlyCondData_initializer, _1, DefaultWaterCondData ) );
 
 		// Propylene Glycol Data: Specific Heat in J/(kg-k)
-		static FArray2D< Real64 > const DefaultPropGlyCpData( DefaultNumGlyConcs, DefaultNumGlyTemps, std::bind( DefaultPropGlyCpData_initializer, _1, DefaultWaterCpData ) );
+		static Array2D< Real64 > const DefaultPropGlyCpData( DefaultNumGlyConcs, DefaultNumGlyTemps, std::bind( DefaultPropGlyCpData_initializer, _1, DefaultWaterCpData ) );
 
 		// Propylene Glycol Data: Viscosity in mPa-s
-		static FArray2D< Real64 > const DefaultPropGlyViscData( DefaultNumGlyConcs, DefaultNumGlyTemps, std::bind( DefaultPropGlyViscData_initializer, _1, DefaultWaterViscData ) );
+		static Array2D< Real64 > const DefaultPropGlyViscData( DefaultNumGlyConcs, DefaultNumGlyTemps, std::bind( DefaultPropGlyViscData_initializer, _1, DefaultWaterViscData ) );
 
 		// Propylene Glycol Data: Density in kg/m3
-		static FArray2D< Real64 > const DefaultPropGlyRhoData( DefaultNumGlyConcs, DefaultNumGlyTemps, std::bind( DefaultPropGlyRhoData_initializer, _1, DefaultWaterRhoData ) );
+		static Array2D< Real64 > const DefaultPropGlyRhoData( DefaultNumGlyConcs, DefaultNumGlyTemps, std::bind( DefaultPropGlyRhoData_initializer, _1, DefaultWaterRhoData ) );
 
 		// Propylene Glycol Data: Conductivity in W/(m-K)
-		static FArray2D< Real64 > const DefaultPropGlyCondData( DefaultNumGlyConcs, DefaultNumGlyTemps, std::bind( DefaultPropGlyCondData_initializer, _1, DefaultWaterCondData ) );
+		static Array2D< Real64 > const DefaultPropGlyCondData( DefaultNumGlyConcs, DefaultNumGlyTemps, std::bind( DefaultPropGlyCondData_initializer, _1, DefaultWaterCondData ) );
 
 		// Steam Refrigerant Data
-		static FArray1D< Real64 > const DefaultSteamTemps( DefaultNumSteamTemps, { 1.00e-002, 1.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 72.0, 74.0, 76.0, 78.0, 80.0, 82.0, 84.0, 86.0, 88.0, 90.0, 92.0, 94.0, 96.0, 98.0, 99.0, 100.0, 101.0, 102.0, 103.0, 104.0, 105.0, 106.0, 107.0, 108.0, 109.0, 110.0, 111.0, 112.0, 113.0, 114.0, 115.0, 116.0, 117.0, 118.0, 119.0, 120.0, 121.0, 122.0, 123.0, 124.0, 125.0, 126.0, 127.0, 128.0, 129.0, 130.0, 132.0, 134.0, 136.0, 138.0, 140.0, 142.0, 144.0, 146.0, 148.0, 150.0, 152.0, 154.0, 156.0, 158.0, 160.0, 162.0, 164.0, 166.0, 168.0, 170.0, 172.0, 174.0, 176.0, 178.0, 180.0, 185.0, 190.0, 195.0, 200.0, 205.0, 210.0, 215.0, 220.0, 225.0, 230.0, 240.0, 250.0, 260.0, 270.0, 280.0, 290.0, 300.0, 310.0, 320.0, 330.0, 340.0, 350.0, 360.0, 370.0 } );
+		static Array1D< Real64 > const DefaultSteamTemps( DefaultNumSteamTemps, { 1.00e-002, 1.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 72.0, 74.0, 76.0, 78.0, 80.0, 82.0, 84.0, 86.0, 88.0, 90.0, 92.0, 94.0, 96.0, 98.0, 99.0, 100.0, 101.0, 102.0, 103.0, 104.0, 105.0, 106.0, 107.0, 108.0, 109.0, 110.0, 111.0, 112.0, 113.0, 114.0, 115.0, 116.0, 117.0, 118.0, 119.0, 120.0, 121.0, 122.0, 123.0, 124.0, 125.0, 126.0, 127.0, 128.0, 129.0, 130.0, 132.0, 134.0, 136.0, 138.0, 140.0, 142.0, 144.0, 146.0, 148.0, 150.0, 152.0, 154.0, 156.0, 158.0, 160.0, 162.0, 164.0, 166.0, 168.0, 170.0, 172.0, 174.0, 176.0, 178.0, 180.0, 185.0, 190.0, 195.0, 200.0, 205.0, 210.0, 215.0, 220.0, 225.0, 230.0, 240.0, 250.0, 260.0, 270.0, 280.0, 290.0, 300.0, 310.0, 320.0, 330.0, 340.0, 350.0, 360.0, 370.0 } );
 
-		static FArray1D< Real64 > const DefaultSteamPressData( DefaultNumSteamTemps, { 611.7, 657.1, 872.6, 1228.0, 1706.0, 2339.0, 3170.0, 4247.0, 5629.0, 7385.0, 9595.0, 12350.0, 15760.0, 19950.0, 25040.0, 31200.0, 34000.0, 37010.0, 40240.0, 43700.0, 47410.0, 51390.0, 55640.0, 60170.0, 65020.0, 70180.0, 75680.0, 81540.0, 87770.0, 94390.0, 97850.0, 101400.0, 105100.0, 108900.0, 112800.0, 116800.0, 120900.0, 125100.0, 129500.0, 134000.0, 138600.0, 143400.0, 148300.0, 153300.0, 158400.0, 163700.0, 169200.0, 174800.0, 180500.0, 186400.0, 192500.0, 198700.0, 205000.0, 211600.0, 218300.0, 225200.0, 232200.0, 239500.0, 246900.0, 254500.0, 262300.0, 270300.0, 286800.0, 304200.0, 322400.0, 341500.0, 361500.0, 382500.0, 404400.0, 427300.0, 451200.0, 476200.0, 502200.0, 529500.0, 557800.0, 587400.0, 618200.0, 650300.0, 683700.0, 718500.0, 754600.0, 792200.0, 831200.0, 871800.0, 913800.0, 957500.0, 1003000.0, 1123000.0, 1255000.0, 1399000.0, 1555000.0, 1724000.0, 1908000.0, 2106000.0, 2320000.0, 2550000.0, 2797000.0, 3347000.0, 3976000.0, 4692000.0, 5503000.0, 6417000.0, 7442000.0, 8588000.0, 9865000.0, 11280000.0, 12860000.0, 14600000.0, 16530000.0, 18670000.0, 21040000.0 } );
+		static Array1D< Real64 > const DefaultSteamPressData( DefaultNumSteamTemps, { 611.7, 657.1, 872.6, 1228.0, 1706.0, 2339.0, 3170.0, 4247.0, 5629.0, 7385.0, 9595.0, 12350.0, 15760.0, 19950.0, 25040.0, 31200.0, 34000.0, 37010.0, 40240.0, 43700.0, 47410.0, 51390.0, 55640.0, 60170.0, 65020.0, 70180.0, 75680.0, 81540.0, 87770.0, 94390.0, 97850.0, 101400.0, 105100.0, 108900.0, 112800.0, 116800.0, 120900.0, 125100.0, 129500.0, 134000.0, 138600.0, 143400.0, 148300.0, 153300.0, 158400.0, 163700.0, 169200.0, 174800.0, 180500.0, 186400.0, 192500.0, 198700.0, 205000.0, 211600.0, 218300.0, 225200.0, 232200.0, 239500.0, 246900.0, 254500.0, 262300.0, 270300.0, 286800.0, 304200.0, 322400.0, 341500.0, 361500.0, 382500.0, 404400.0, 427300.0, 451200.0, 476200.0, 502200.0, 529500.0, 557800.0, 587400.0, 618200.0, 650300.0, 683700.0, 718500.0, 754600.0, 792200.0, 831200.0, 871800.0, 913800.0, 957500.0, 1003000.0, 1123000.0, 1255000.0, 1399000.0, 1555000.0, 1724000.0, 1908000.0, 2106000.0, 2320000.0, 2550000.0, 2797000.0, 3347000.0, 3976000.0, 4692000.0, 5503000.0, 6417000.0, 7442000.0, 8588000.0, 9865000.0, 11280000.0, 12860000.0, 14600000.0, 16530000.0, 18670000.0, 21040000.0 } );
 
-		static FArray1D< Real64 > const DefaultSteamEnthalpyFluidData( DefaultNumSteamTemps, { 0.59, 4177.0, 21020.0, 42020.0, 62980.0, 83910.0, 104800.0, 125700.0, 146600.0, 167500.0, 188400.0, 209300.0, 230300.0, 251200.0, 272100.0, 293100.0, 301400.0, 309800.0, 318200.0, 326600.0, 335000.0, 343400.0, 351800.0, 360200.0, 368600.0, 377000.0, 385500.0, 393900.0, 402300.0, 410700.0, 414900.0, 419200.0, 423400.0, 427600.0, 431800.0, 436000.0, 440300.0, 444500.0, 448700.0, 453000.0, 457200.0, 461400.0, 465600.0, 469900.0, 474100.0, 478400.0, 482600.0, 486800.0, 491100.0, 495300.0, 499600.0, 503800.0, 508100.0, 512300.0, 516600.0, 520800.0, 525100.0, 529300.0, 533600.0, 537900.0, 542100.0, 546400.0, 554900.0, 563500.0, 572000.0, 580600.0, 589200.0, 597700.0, 606300.0, 614900.0, 623600.0, 632200.0, 640800.0, 649500.0, 658100.0, 666800.0, 675500.0, 684200.0, 692900.0, 701600.0, 710300.0, 719100.0, 727800.0, 736600.0, 745400.0, 754200.0, 763100.0, 785200.0, 807400.0, 829800.0, 852300.0, 874900.0, 897600.0, 920500.0, 943600.0, 966800.0, 990200.0, 1038000.0, 1086000.0, 1135000.0, 1185000.0, 1237000.0, 1290000.0, 1345000.0, 1402000.0, 1462000.0, 1526000.0, 1595000.0, 1671000.0, 1762000.0, 1891000.0 } );
+		static Array1D< Real64 > const DefaultSteamEnthalpyFluidData( DefaultNumSteamTemps, { 0.59, 4177.0, 21020.0, 42020.0, 62980.0, 83910.0, 104800.0, 125700.0, 146600.0, 167500.0, 188400.0, 209300.0, 230300.0, 251200.0, 272100.0, 293100.0, 301400.0, 309800.0, 318200.0, 326600.0, 335000.0, 343400.0, 351800.0, 360200.0, 368600.0, 377000.0, 385500.0, 393900.0, 402300.0, 410700.0, 414900.0, 419200.0, 423400.0, 427600.0, 431800.0, 436000.0, 440300.0, 444500.0, 448700.0, 453000.0, 457200.0, 461400.0, 465600.0, 469900.0, 474100.0, 478400.0, 482600.0, 486800.0, 491100.0, 495300.0, 499600.0, 503800.0, 508100.0, 512300.0, 516600.0, 520800.0, 525100.0, 529300.0, 533600.0, 537900.0, 542100.0, 546400.0, 554900.0, 563500.0, 572000.0, 580600.0, 589200.0, 597700.0, 606300.0, 614900.0, 623600.0, 632200.0, 640800.0, 649500.0, 658100.0, 666800.0, 675500.0, 684200.0, 692900.0, 701600.0, 710300.0, 719100.0, 727800.0, 736600.0, 745400.0, 754200.0, 763100.0, 785200.0, 807400.0, 829800.0, 852300.0, 874900.0, 897600.0, 920500.0, 943600.0, 966800.0, 990200.0, 1038000.0, 1086000.0, 1135000.0, 1185000.0, 1237000.0, 1290000.0, 1345000.0, 1402000.0, 1462000.0, 1526000.0, 1595000.0, 1671000.0, 1762000.0, 1891000.0 } );
 
-		static FArray1D< Real64 > const DefaultSteamEnthalpyGasFluidData( DefaultNumSteamTemps, { 2501000.0, 2503000.0, 2510000.0, 2519000.0, 2528000.0, 2537000.0, 2547000.0, 2556000.0, 2565000.0, 2574000.0, 2582000.0, 2591000.0, 2600000.0, 2609000.0, 2618000.0, 2626000.0, 2630000.0, 2633000.0, 2636000.0, 2640000.0, 2643000.0, 2646000.0, 2650000.0, 2653000.0, 2656000.0, 2660000.0, 2663000.0, 2666000.0, 2669000.0, 2672000.0, 2674000.0, 2676000.0, 2677000.0, 2679000.0, 2680000.0, 2682000.0, 2683000.0, 2685000.0, 2686000.0, 2688000.0, 2690000.0, 2691000.0, 2693000.0, 2694000.0, 2696000.0, 2697000.0, 2699000.0, 2700000.0, 2702000.0, 2703000.0, 2704000.0, 2706000.0, 2707000.0, 2709000.0, 2710000.0, 2712000.0, 2713000.0, 2715000.0, 2716000.0, 2717000.0, 2719000.0, 2720000.0, 2723000.0, 2726000.0, 2728000.0, 2731000.0, 2733000.0, 2736000.0, 2739000.0, 2741000.0, 2744000.0, 2746000.0, 2748000.0, 2751000.0, 2753000.0, 2755000.0, 2757000.0, 2760000.0, 2762000.0, 2764000.0, 2766000.0, 2768000.0, 2770000.0, 2772000.0, 2774000.0, 2775000.0, 2777000.0, 2781000.0, 2785000.0, 2789000.0, 2792000.0, 2795000.0, 2797000.0, 2799000.0, 2801000.0, 2802000.0, 2803000.0, 2803000.0, 2801000.0, 2797000.0, 2790000.0, 2780000.0, 2767000.0, 2750000.0, 2728000.0, 2701000.0, 2666000.0, 2622000.0, 2564000.0, 2481000.0, 2335000.0 } );
+		static Array1D< Real64 > const DefaultSteamEnthalpyGasFluidData( DefaultNumSteamTemps, { 2501000.0, 2503000.0, 2510000.0, 2519000.0, 2528000.0, 2537000.0, 2547000.0, 2556000.0, 2565000.0, 2574000.0, 2582000.0, 2591000.0, 2600000.0, 2609000.0, 2618000.0, 2626000.0, 2630000.0, 2633000.0, 2636000.0, 2640000.0, 2643000.0, 2646000.0, 2650000.0, 2653000.0, 2656000.0, 2660000.0, 2663000.0, 2666000.0, 2669000.0, 2672000.0, 2674000.0, 2676000.0, 2677000.0, 2679000.0, 2680000.0, 2682000.0, 2683000.0, 2685000.0, 2686000.0, 2688000.0, 2690000.0, 2691000.0, 2693000.0, 2694000.0, 2696000.0, 2697000.0, 2699000.0, 2700000.0, 2702000.0, 2703000.0, 2704000.0, 2706000.0, 2707000.0, 2709000.0, 2710000.0, 2712000.0, 2713000.0, 2715000.0, 2716000.0, 2717000.0, 2719000.0, 2720000.0, 2723000.0, 2726000.0, 2728000.0, 2731000.0, 2733000.0, 2736000.0, 2739000.0, 2741000.0, 2744000.0, 2746000.0, 2748000.0, 2751000.0, 2753000.0, 2755000.0, 2757000.0, 2760000.0, 2762000.0, 2764000.0, 2766000.0, 2768000.0, 2770000.0, 2772000.0, 2774000.0, 2775000.0, 2777000.0, 2781000.0, 2785000.0, 2789000.0, 2792000.0, 2795000.0, 2797000.0, 2799000.0, 2801000.0, 2802000.0, 2803000.0, 2803000.0, 2801000.0, 2797000.0, 2790000.0, 2780000.0, 2767000.0, 2750000.0, 2728000.0, 2701000.0, 2666000.0, 2622000.0, 2564000.0, 2481000.0, 2335000.0 } );
 
-		static FArray1D< Real64 > const DefaultSteamCpFluidData( DefaultNumSteamTemps, { 4220.0, 4217.0, 4205.0, 4196.0, 4189.0, 4184.0, 4182.0, 4180.0, 4180.0, 4180.0, 4180.0, 4182.0, 4183.0, 4185.0, 4187.0, 4190.0, 4191.0, 4193.0, 4194.0, 4195.0, 4197.0, 4198.0, 4200.0, 4202.0, 4203.0, 4205.0, 4207.0, 4209.0, 4211.0, 4213.0, 4215.0, 4216.0, 4217.0, 4218.0, 4219.0, 4220.0, 4222.0, 4223.0, 4224.0, 4226.0, 4227.0, 4228.0, 4230.0, 4231.0, 4233.0, 4234.0, 4236.0, 4237.0, 4239.0, 4240.0, 4242.0, 4244.0, 4245.0, 4247.0, 4249.0, 4250.0, 4252.0, 4254.0, 4256.0, 4258.0, 4260.0, 4261.0, 4265.0, 4270.0, 4274.0, 4278.0, 4283.0, 4287.0, 4292.0, 4297.0, 4302.0, 4307.0, 4312.0, 4318.0, 4324.0, 4329.0, 4335.0, 4341.0, 4348.0, 4354.0, 4361.0, 4368.0, 4375.0, 4382.0, 4390.0, 4397.0, 4405.0, 4425.0, 4447.0, 4471.0, 4496.0, 4523.0, 4551.0, 4582.0, 4615.0, 4650.0, 4688.0, 4772.0, 4870.0, 4986.0, 5123.0, 5289.0, 5493.0, 5750.0, 6085.0, 6537.0, 7186.0, 8208.0, 10120.0, 15000.0, 45160.0 } );
+		static Array1D< Real64 > const DefaultSteamCpFluidData( DefaultNumSteamTemps, { 4220.0, 4217.0, 4205.0, 4196.0, 4189.0, 4184.0, 4182.0, 4180.0, 4180.0, 4180.0, 4180.0, 4182.0, 4183.0, 4185.0, 4187.0, 4190.0, 4191.0, 4193.0, 4194.0, 4195.0, 4197.0, 4198.0, 4200.0, 4202.0, 4203.0, 4205.0, 4207.0, 4209.0, 4211.0, 4213.0, 4215.0, 4216.0, 4217.0, 4218.0, 4219.0, 4220.0, 4222.0, 4223.0, 4224.0, 4226.0, 4227.0, 4228.0, 4230.0, 4231.0, 4233.0, 4234.0, 4236.0, 4237.0, 4239.0, 4240.0, 4242.0, 4244.0, 4245.0, 4247.0, 4249.0, 4250.0, 4252.0, 4254.0, 4256.0, 4258.0, 4260.0, 4261.0, 4265.0, 4270.0, 4274.0, 4278.0, 4283.0, 4287.0, 4292.0, 4297.0, 4302.0, 4307.0, 4312.0, 4318.0, 4324.0, 4329.0, 4335.0, 4341.0, 4348.0, 4354.0, 4361.0, 4368.0, 4375.0, 4382.0, 4390.0, 4397.0, 4405.0, 4425.0, 4447.0, 4471.0, 4496.0, 4523.0, 4551.0, 4582.0, 4615.0, 4650.0, 4688.0, 4772.0, 4870.0, 4986.0, 5123.0, 5289.0, 5493.0, 5750.0, 6085.0, 6537.0, 7186.0, 8208.0, 10120.0, 15000.0, 45160.0 } );
 
-		static FArray1D< Real64 > const DefaultSteamCpGasFluidData( DefaultNumSteamTemps, { 1884.0, 1885.0, 1889.0, 1895.0, 1900.0, 1906.0, 1912.0, 1918.0, 1925.0, 1931.0, 1939.0, 1947.0, 1955.0, 1965.0, 1975.0, 1986.0, 1991.0, 1996.0, 2001.0, 2006.0, 2012.0, 2018.0, 2024.0, 2030.0, 2036.0, 2043.0, 2050.0, 2057.0, 2064.0, 2072.0, 2076.0, 2080.0, 2084.0, 2088.0, 2093.0, 2097.0, 2101.0, 2106.0, 2110.0, 2115.0, 2120.0, 2124.0, 2129.0, 2134.0, 2139.0, 2144.0, 2150.0, 2155.0, 2160.0, 2166.0, 2171.0, 2177.0, 2183.0, 2189.0, 2195.0, 2201.0, 2207.0, 2213.0, 2219.0, 2226.0, 2232.0, 2239.0, 2252.0, 2266.0, 2281.0, 2296.0, 2311.0, 2327.0, 2343.0, 2359.0, 2376.0, 2394.0, 2412.0, 2430.0, 2449.0, 2468.0, 2488.0, 2509.0, 2529.0, 2551.0, 2572.0, 2594.0, 2617.0, 2640.0, 2664.0, 2688.0, 2713.0, 2777.0, 2844.0, 2915.0, 2990.0, 3068.0, 3150.0, 3237.0, 3329.0, 3426.0, 3528.0, 3754.0, 4011.0, 4308.0, 4656.0, 5073.0, 5582.0, 6220.0, 7045.0, 8159.0, 9753.0, 12240.0, 16690.0, 27360.0, 96600.0 } );
+		static Array1D< Real64 > const DefaultSteamCpGasFluidData( DefaultNumSteamTemps, { 1884.0, 1885.0, 1889.0, 1895.0, 1900.0, 1906.0, 1912.0, 1918.0, 1925.0, 1931.0, 1939.0, 1947.0, 1955.0, 1965.0, 1975.0, 1986.0, 1991.0, 1996.0, 2001.0, 2006.0, 2012.0, 2018.0, 2024.0, 2030.0, 2036.0, 2043.0, 2050.0, 2057.0, 2064.0, 2072.0, 2076.0, 2080.0, 2084.0, 2088.0, 2093.0, 2097.0, 2101.0, 2106.0, 2110.0, 2115.0, 2120.0, 2124.0, 2129.0, 2134.0, 2139.0, 2144.0, 2150.0, 2155.0, 2160.0, 2166.0, 2171.0, 2177.0, 2183.0, 2189.0, 2195.0, 2201.0, 2207.0, 2213.0, 2219.0, 2226.0, 2232.0, 2239.0, 2252.0, 2266.0, 2281.0, 2296.0, 2311.0, 2327.0, 2343.0, 2359.0, 2376.0, 2394.0, 2412.0, 2430.0, 2449.0, 2468.0, 2488.0, 2509.0, 2529.0, 2551.0, 2572.0, 2594.0, 2617.0, 2640.0, 2664.0, 2688.0, 2713.0, 2777.0, 2844.0, 2915.0, 2990.0, 3068.0, 3150.0, 3237.0, 3329.0, 3426.0, 3528.0, 3754.0, 4011.0, 4308.0, 4656.0, 5073.0, 5582.0, 6220.0, 7045.0, 8159.0, 9753.0, 12240.0, 16690.0, 27360.0, 96600.0 } );
 
-		static FArray1D< Real64 > const DefaultSteamDensityFluidData( DefaultNumSteamTemps, { 999.8, 999.9, 999.9, 999.7, 999.1, 998.2, 997.0, 995.6, 994.0, 992.2, 990.2, 988.0, 985.7, 983.2, 980.5, 977.7, 976.6, 975.4, 974.2, 973.0, 971.8, 970.5, 969.2, 967.9, 966.6, 965.3, 963.9, 962.6, 961.2, 959.8, 959.1, 958.3, 957.6, 956.9, 956.2, 955.4, 954.7, 954.0, 953.2, 952.5, 951.7, 950.9, 950.2, 949.4, 948.6, 947.9, 947.1, 946.3, 945.5, 944.7, 943.9, 943.1, 942.3, 941.5, 940.7, 939.8, 939.0, 938.2, 937.4, 936.5, 935.7, 934.8, 933.1, 931.4, 929.7, 927.9, 926.1, 924.3, 922.5, 920.7, 918.9, 917.0, 915.1, 913.2, 911.3, 909.4, 907.4, 905.5, 903.5, 901.5, 899.5, 897.5, 895.4, 893.3, 891.2, 889.1, 887.0, 881.6, 876.1, 870.4, 864.7, 858.8, 852.7, 846.5, 840.2, 833.7, 827.1, 813.4, 798.9, 783.6, 767.5, 750.3, 731.9, 712.1, 690.7, 667.1, 640.8, 610.7, 574.7, 527.6, 451.4 } );
+		static Array1D< Real64 > const DefaultSteamDensityFluidData( DefaultNumSteamTemps, { 999.8, 999.9, 999.9, 999.7, 999.1, 998.2, 997.0, 995.6, 994.0, 992.2, 990.2, 988.0, 985.7, 983.2, 980.5, 977.7, 976.6, 975.4, 974.2, 973.0, 971.8, 970.5, 969.2, 967.9, 966.6, 965.3, 963.9, 962.6, 961.2, 959.8, 959.1, 958.3, 957.6, 956.9, 956.2, 955.4, 954.7, 954.0, 953.2, 952.5, 951.7, 950.9, 950.2, 949.4, 948.6, 947.9, 947.1, 946.3, 945.5, 944.7, 943.9, 943.1, 942.3, 941.5, 940.7, 939.8, 939.0, 938.2, 937.4, 936.5, 935.7, 934.8, 933.1, 931.4, 929.7, 927.9, 926.1, 924.3, 922.5, 920.7, 918.9, 917.0, 915.1, 913.2, 911.3, 909.4, 907.4, 905.5, 903.5, 901.5, 899.5, 897.5, 895.4, 893.3, 891.2, 889.1, 887.0, 881.6, 876.1, 870.4, 864.7, 858.8, 852.7, 846.5, 840.2, 833.7, 827.1, 813.4, 798.9, 783.6, 767.5, 750.3, 731.9, 712.1, 690.7, 667.1, 640.8, 610.7, 574.7, 527.6, 451.4 } );
 
-		static FArray1D< Real64 > const DefaultSteamDensityGasFluidData( DefaultNumSteamTemps, { 4.86e-003, 5.20e-003, 6.80e-003, 9.41e-003, 1.28e-002, 1.73e-002, 2.31e-002, 3.04e-002, 3.97e-002, 5.12e-002, 6.56e-002, 8.32e-002, 0.10, 0.13, 0.16, 0.20, 0.22, 0.23, 0.25, 0.27, 0.29, 0.32, 0.34, 0.37, 0.39, 0.42, 0.45, 0.49, 0.52, 0.56, 0.58, 0.60, 0.62, 0.64, 0.66, 0.68, 0.71, 0.73, 0.75, 0.78, 0.80, 0.83, 0.85, 0.88, 0.91, 0.94, 0.97, 1.00, 1.03, 1.06, 1.09, 1.12, 1.16, 1.19, 1.23, 1.26, 1.30, 1.34, 1.38, 1.42, 1.46, 1.50, 1.58, 1.67, 1.77, 1.86, 1.97, 2.07, 2.19, 2.30, 2.42, 2.55, 2.68, 2.82, 2.96, 3.11, 3.26, 3.42, 3.59, 3.76, 3.94, 4.12, 4.32, 4.52, 4.72, 4.94, 5.16, 5.75, 6.40, 7.10, 7.86, 8.69, 9.59, 10.56, 11.62, 12.75, 13.99, 16.75, 19.97, 23.71, 28.07, 33.16, 39.13, 46.17, 54.54, 64.64, 77.05, 92.76, 113.60, 143.90, 201.80 } );
+		static Array1D< Real64 > const DefaultSteamDensityGasFluidData( DefaultNumSteamTemps, { 4.86e-003, 5.20e-003, 6.80e-003, 9.41e-003, 1.28e-002, 1.73e-002, 2.31e-002, 3.04e-002, 3.97e-002, 5.12e-002, 6.56e-002, 8.32e-002, 0.10, 0.13, 0.16, 0.20, 0.22, 0.23, 0.25, 0.27, 0.29, 0.32, 0.34, 0.37, 0.39, 0.42, 0.45, 0.49, 0.52, 0.56, 0.58, 0.60, 0.62, 0.64, 0.66, 0.68, 0.71, 0.73, 0.75, 0.78, 0.80, 0.83, 0.85, 0.88, 0.91, 0.94, 0.97, 1.00, 1.03, 1.06, 1.09, 1.12, 1.16, 1.19, 1.23, 1.26, 1.30, 1.34, 1.38, 1.42, 1.46, 1.50, 1.58, 1.67, 1.77, 1.86, 1.97, 2.07, 2.19, 2.30, 2.42, 2.55, 2.68, 2.82, 2.96, 3.11, 3.26, 3.42, 3.59, 3.76, 3.94, 4.12, 4.32, 4.52, 4.72, 4.94, 5.16, 5.75, 6.40, 7.10, 7.86, 8.69, 9.59, 10.56, 11.62, 12.75, 13.99, 16.75, 19.97, 23.71, 28.07, 33.16, 39.13, 46.17, 54.54, 64.64, 77.05, 92.76, 113.60, 143.90, 201.80 } );
 
-		static FArray1D< Real64 > const DefaultSteamSuperheatedTemps( DefaultNumSteamSuperheatedTemps, { 1.00e-002, 1.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 72.0, 74.0, 76.0, 78.0, 80.0, 82.0, 84.0, 86.0, 88.0, 90.0, 92.0, 94.0, 96.0, 98.0, 99.0, 100.0, 101.0, 102.0, 103.0, 104.0, 105.0, 106.0, 107.0, 108.0, 109.0, 110.0, 111.0, 112.0, 113.0, 114.0, 115.0, 116.0, 117.0, 118.0, 119.0, 120.0, 121.0, 122.0, 123.0, 124.0, 125.0, 126.0, 127.0, 128.0, 129.0, 130.0, 132.0, 134.0, 136.0, 138.0, 140.0, 142.0, 144.0, 146.0, 148.0, 150.0, 152.0, 154.0, 156.0, 158.0, 160.0, 162.0, 164.0, 166.0, 168.0, 170.0, 172.0, 174.0, 176.0, 178.0, 180.0, 185.0, 190.0, 195.0, 200.0, 205.0, 210.0, 215.0, 220.0, 225.0, 230.0, 240.0, 250.0, 260.0, 270.0, 280.0, 290.0, 300.0, 310.0, 320.0, 330.0, 340.0, 350.0, 360.0, 370.0, 400.0, 450.0, 500.0 } );
+		static Array1D< Real64 > const DefaultSteamSuperheatedTemps( DefaultNumSteamSuperheatedTemps, { 1.00e-002, 1.0, 5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 65.0, 70.0, 72.0, 74.0, 76.0, 78.0, 80.0, 82.0, 84.0, 86.0, 88.0, 90.0, 92.0, 94.0, 96.0, 98.0, 99.0, 100.0, 101.0, 102.0, 103.0, 104.0, 105.0, 106.0, 107.0, 108.0, 109.0, 110.0, 111.0, 112.0, 113.0, 114.0, 115.0, 116.0, 117.0, 118.0, 119.0, 120.0, 121.0, 122.0, 123.0, 124.0, 125.0, 126.0, 127.0, 128.0, 129.0, 130.0, 132.0, 134.0, 136.0, 138.0, 140.0, 142.0, 144.0, 146.0, 148.0, 150.0, 152.0, 154.0, 156.0, 158.0, 160.0, 162.0, 164.0, 166.0, 168.0, 170.0, 172.0, 174.0, 176.0, 178.0, 180.0, 185.0, 190.0, 195.0, 200.0, 205.0, 210.0, 215.0, 220.0, 225.0, 230.0, 240.0, 250.0, 260.0, 270.0, 280.0, 290.0, 300.0, 310.0, 320.0, 330.0, 340.0, 350.0, 360.0, 370.0, 400.0, 450.0, 500.0 } );
 
-		static FArray1D< Real64 > const DefaultSteamSuperheatedPressData( DefaultNumSteamSuperheatedTemps, { 611.70, 657.10, 872.60, 1228.0, 1706.0, 2339.0, 3170.0, 4247.0, 5629.0, 7385.0, 9595.0, 12350.0, 15760.0, 19950.0, 25040.0, 31200.0, 34000.0, 37010.0, 40240.0, 43700.0, 47410.0, 51390.0, 55640.0, 60170.0, 65020.0, 70180.0, 75680.0, 81540.0, 87770.0, 94390.0, 97850.0, 101400.0, 105100.0, 108900.0, 112800.0, 116800.0, 120900.0, 125100.0, 129500.0, 134000.0, 138600.0, 143400.0, 148300.0, 153300.0, 158400.0, 163700.0, 169200.0, 174800.0, 180500.0, 186400.0, 192500.0, 198700.0, 205000.0, 211600.0, 218300.0, 225200.0, 232200.0, 239500.0, 246900.0, 254500.0, 262300.0, 270300.0, 286800.0, 304200.0, 322400.0, 341500.0, 361500.0, 382500.0, 404400.0, 427300.0, 451200.0, 476200.0, 502200.0, 529500.0, 557800.0, 587400.0, 618200.0, 650300.0, 683700.0, 718500.0, 754600.0, 792200.0, 831200.0, 871800.0, 913800.0, 957500.0, 1003000.0, 1123000.0, 1255000.0, 1399000.0, 1555000.0, 1724000.0, 1908000.0, 2106000.0, 2320000.0, 2550000.0, 2797000.0, 3347000.0, 3976000.0, 4692000.0, 5503000.0, 6417000.0, 7442000.0, 8588000.0, 9865000.0, 11280000.0, 12860000.0, 14600000.0, 16530000.0, 18670000.0, 21040000.0, 30000000.0, 35000000.0, 40000000.0 } );
+		static Array1D< Real64 > const DefaultSteamSuperheatedPressData( DefaultNumSteamSuperheatedTemps, { 611.70, 657.10, 872.60, 1228.0, 1706.0, 2339.0, 3170.0, 4247.0, 5629.0, 7385.0, 9595.0, 12350.0, 15760.0, 19950.0, 25040.0, 31200.0, 34000.0, 37010.0, 40240.0, 43700.0, 47410.0, 51390.0, 55640.0, 60170.0, 65020.0, 70180.0, 75680.0, 81540.0, 87770.0, 94390.0, 97850.0, 101400.0, 105100.0, 108900.0, 112800.0, 116800.0, 120900.0, 125100.0, 129500.0, 134000.0, 138600.0, 143400.0, 148300.0, 153300.0, 158400.0, 163700.0, 169200.0, 174800.0, 180500.0, 186400.0, 192500.0, 198700.0, 205000.0, 211600.0, 218300.0, 225200.0, 232200.0, 239500.0, 246900.0, 254500.0, 262300.0, 270300.0, 286800.0, 304200.0, 322400.0, 341500.0, 361500.0, 382500.0, 404400.0, 427300.0, 451200.0, 476200.0, 502200.0, 529500.0, 557800.0, 587400.0, 618200.0, 650300.0, 683700.0, 718500.0, 754600.0, 792200.0, 831200.0, 871800.0, 913800.0, 957500.0, 1003000.0, 1123000.0, 1255000.0, 1399000.0, 1555000.0, 1724000.0, 1908000.0, 2106000.0, 2320000.0, 2550000.0, 2797000.0, 3347000.0, 3976000.0, 4692000.0, 5503000.0, 6417000.0, 7442000.0, 8588000.0, 9865000.0, 11280000.0, 12860000.0, 14600000.0, 16530000.0, 18670000.0, 21040000.0, 30000000.0, 35000000.0, 40000000.0 } );
 
-		FArray2D< Real64 > DefaultSteamSuperheatedEnthalpyData( DefaultNumSteamSuperheatedTemps, DefaultNumSteamSuperheatedPressure );
+		Array2D< Real64 > DefaultSteamSuperheatedEnthalpyData( DefaultNumSteamSuperheatedTemps, DefaultNumSteamSuperheatedPressure );
 
-		FArray2D< Real64 > DefaultSteamSuperheatedDensityData( DefaultNumSteamSuperheatedTemps, DefaultNumSteamSuperheatedPressure );
+		Array2D< Real64 > DefaultSteamSuperheatedDensityData( DefaultNumSteamSuperheatedTemps, DefaultNumSteamSuperheatedPressure );
 
 		struct FluidTempData
 		{
 			// Members
 			std::string Name; // Name of the temperature list
 			int NumOfTemps; // Number of temperatures in a particular arry
-			FArray1D< Real64 > Temps; // Temperature values (degrees C)
+			Array1D< Real64 > Temps; // Temperature values (degrees C)
 
 			// Default Constructor
 			FluidTempData() :
@@ -348,7 +348,7 @@ namespace FluidProperties {
 			FluidTempData(
 				std::string const & Name, // Name of the temperature list
 				int const NumOfTemps, // Number of temperatures in a particular arry
-				FArray1< Real64 > const & Temps // Temperature values (degrees C)
+				Array1< Real64 > const & Temps // Temperature values (degrees C)
 			) :
 				Name( Name ),
 				NumOfTemps( NumOfTemps ),
@@ -403,9 +403,9 @@ namespace FluidProperties {
 		};
 
 		// Object Data
-		FArray1D< FluidTempData > FluidTemps;
-		FArray1D< PressureSequence > PressurePtr;
-		FArray1D< FluidData > FluidNames;
+		Array1D< FluidTempData > FluidTemps;
+		Array1D< PressureSequence > PressurePtr;
+		Array1D< FluidData > FluidNames;
 
 		// FLOW:
 		MaxAlphas = 0;
@@ -1900,15 +1900,15 @@ namespace FluidProperties {
 
 	}
 
-	// Use FArray initializers to mimic the complex initialization of the original
+	// Use Array initializers to mimic the complex initialization of the original
 	// DATA blocks as closely as possible.  In several cases using initializer lists
 	// would be shorter and more obvious, but would lose the flow of the original code.
 	// Each function initializes the array of the same name in `GetFluidPropertiesData`.
 
 	void
 	DefaultEthGlyCpData_initializer(
-		FArray2D< Real64 > & DefaultEthGlyCpData,
-		FArray1D< Real64 > const & DefaultWaterCpData
+		Array2D< Real64 > & DefaultEthGlyCpData,
+		Array1D< Real64 > const & DefaultWaterCpData
 	)
 	{
 		DefaultEthGlyCpData( 2, _ ) = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3937.0, 3946.0, 3954.0, 3963.0, 3972.0, 3981.0, 3989.0, 3998.0, 4007.0, 4015.0, 4024.0, 4033.0, 4042.0, 4050.0, 4059.0, 4068.0, 4077.0, 4085.0, 4094.0, 4103.0, 4112.0, 4120.0, 4129.0, 4138.0, 4147.0, 4155.0 }; // Conc=0.
@@ -1927,8 +1927,8 @@ namespace FluidProperties {
 
 	void
 	DefaultEthGlyViscData_initializer(
-		FArray2D< Real64 > & DefaultEthGlyViscData,
-		FArray1D< Real64 > const & DefaultWaterViscData
+		Array2D< Real64 > & DefaultEthGlyViscData,
+		Array1D< Real64 > const & DefaultWaterViscData
 	)
 	{
 		DefaultEthGlyViscData( 2, _ ) = { 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 2.08, 1.79, 1.56, 1.37, 1.21, 1.08, 0.97, 0.88, 0.80, 0.73, 0.67, 0.62, 0.57, 0.53, 0.50, 0.47, 0.44, 0.41, 0.39, 0.37, 0.35, 0.33, 0.32, 0.30, 0.29, 0.28 }; // Conc=0.1
@@ -1952,8 +1952,8 @@ namespace FluidProperties {
 
 	void
 	DefaultEthGlyRhoData_initializer(
-		FArray2D< Real64 > & DefaultEthGlyRhoData,
-		FArray1D< Real64 > const & DefaultWaterRhoData
+		Array2D< Real64 > & DefaultEthGlyRhoData,
+		Array1D< Real64 > const & DefaultWaterRhoData
 	)
 	{
 		DefaultEthGlyRhoData( 2, _ ) = { 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1018.73, 1017.57, 1016.28, 1014.87, 1013.34, 1011.69, 1009.92, 1008.02, 1006.01, 1003.87, 1001.61, 999.23, 996.72, 994.10, 991.35, 988.49, 985.50, 982.39, 979.15, 975.80, 972.32, 968.73, 965.01, 961.17, 957.21, 953.12 }; // Conc=0.1
@@ -1972,8 +1972,8 @@ namespace FluidProperties {
 
 	void
 	DefaultEthGlyCondData_initializer(
-		FArray2D< Real64 > & DefaultEthGlyCondData,
-		FArray1D< Real64 > const & DefaultWaterCondData
+		Array2D< Real64 > & DefaultEthGlyCondData,
+		Array1D< Real64 > const & DefaultWaterCondData
 	)
 	{
 		DefaultEthGlyCondData( 2, _ ) = { 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.511, 0.520, 0.528, 0.537, 0.545, 0.552, 0.559, 0.566, 0.572, 0.577, 0.583, 0.588, 0.592, 0.596, 0.600, 0.603, 0.606, 0.608, 0.610, 0.612, 0.613, 0.614, 0.614, 0.614, 0.613, 0.612 }; // Conc=0.1
@@ -1992,8 +1992,8 @@ namespace FluidProperties {
 
 	void
 	DefaultPropGlyCpData_initializer(
-		FArray2D< Real64 > & DefaultPropGlyCpData,
-		FArray1D< Real64 > const & DefaultWaterCpData
+		Array2D< Real64 > & DefaultPropGlyCpData,
+		Array1D< Real64 > const & DefaultWaterCpData
 	)
 	{
 		DefaultPropGlyCpData( 2, _ ) = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4042.0, 4050.0, 4058.0, 4067.0, 4075.0, 4083.0, 4091.0, 4099.0, 4107.0, 4115.0, 4123.0, 4131.0, 4139.0, 4147.0, 4155.0, 4163.0, 4171.0, 4179.0, 4187.0, 4195.0, 4203.0, 4211.0, 4219.0, 4227.0, 4235.0, 4243.0 }; // Conc=0.1
@@ -2012,8 +2012,8 @@ namespace FluidProperties {
 
 	void
 	DefaultPropGlyViscData_initializer(
-		FArray2D< Real64 > & DefaultPropGlyViscData,
-		FArray1D< Real64 > const & DefaultWaterViscData
+		Array2D< Real64 > & DefaultPropGlyViscData,
+		Array1D< Real64 > const & DefaultWaterViscData
 	)
 	{
 		DefaultPropGlyViscData( 2, _ ) = { 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 2.68, 2.23, 1.89, 1.63, 1.42, 1.25, 1.11, 0.99, 0.89, 0.81, 0.73, 0.67, 0.62, 0.57, 0.53, 0.49, 0.46, 0.43, 0.40, 0.38, 0.35, 0.33, 0.32, 0.30, 0.28, 0.27 }; // Conc=0.1
@@ -2037,8 +2037,8 @@ namespace FluidProperties {
 
 	void
 	DefaultPropGlyRhoData_initializer(
-		FArray2D< Real64 > & DefaultPropGlyRhoData,
-		FArray1D< Real64 > const & DefaultWaterRhoData
+		Array2D< Real64 > & DefaultPropGlyRhoData,
+		Array1D< Real64 > const & DefaultWaterRhoData
 	)
 	{
 		DefaultPropGlyRhoData( 2, _ ) = { 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 1013.85, 1012.61, 1011.24, 1009.75, 1008.13, 1006.40, 1004.54, 1002.56, 1000.46, 998.23, 995.88, 993.41, 990.82, 988.11, 985.27, 982.31, 979.23, 976.03, 972.70, 969.25, 965.68, 961.99, 958.17, 954.24, 950.18, 945.99 }; // Conc=0.1
@@ -2057,8 +2057,8 @@ namespace FluidProperties {
 
 	void
 	DefaultPropGlyCondData_initializer(
-		FArray2D< Real64 > & DefaultPropGlyCondData,
-		FArray1D< Real64 > const & DefaultWaterCondData
+		Array2D< Real64 > & DefaultPropGlyCondData,
+		Array1D< Real64 > const & DefaultWaterCondData
 	)
 	{
 		DefaultPropGlyCondData( 2, _ ) = { 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.510, 0.518, 0.527, 0.535, 0.543, 0.550, 0.557, 0.563, 0.569, 0.575, 0.580, 0.585, 0.589, 0.593, 0.596, 0.599, 0.602, 0.604, 0.606, 0.607, 0.608, 0.609, 0.609, 0.608, 0.608, 0.606 }; // Conc=0.1
@@ -2076,7 +2076,7 @@ namespace FluidProperties {
 	}
 
 	void
-	DefaultSteamSuperheatedEnthalpyData_initializer( FArray2D< Real64 > & DefaultSteamSuperheatedEnthalpyData )
+	DefaultSteamSuperheatedEnthalpyData_initializer( Array2D< Real64 > & DefaultSteamSuperheatedEnthalpyData )
 	{
 		DefaultSteamSuperheatedEnthalpyData( _, 1 ) = { 2501000.0, 2503000.0, 2510000.0, 2520000.0, 2529000.0, 2538000.0, 2548000.0, 2557000.0, 2566000.0, 2576000.0, 2585000.0, 2595000.0, 2604000.0, 2613000.0, 2623000.0, 2632000.0, 2636000.0, 2640000.0, 2643000.0, 2647000.0, 2651000.0, 2655000.0, 2658000.0, 2662000.0, 2666000.0, 2670000.0, 2673000.0, 2677000.0, 2681000.0, 2685000.0, 2687000.0, 2689000.0, 2690000.0, 2692000.0, 2694000.0, 2696000.0, 2698000.0, 2700000.0, 2702000.0, 2704000.0, 2706000.0, 2708000.0, 2709000.0, 2711000.0, 2713000.0, 2715000.0, 2717000.0, 2719000.0, 2721000.0, 2723000.0, 2725000.0, 2727000.0, 2728000.0, 2730000.0, 2732000.0, 2734000.0, 2736000.0, 2738000.0, 2740000.0, 2742000.0, 2744000.0, 2746000.0, 2749000.0, 2753000.0, 2757000.0, 2761000.0, 2765000.0, 2768000.0, 2772000.0, 2776000.0, 2780000.0, 2784000.0, 2788000.0, 2791000.0, 2795000.0, 2799000.0, 2803000.0, 2807000.0, 2811000.0, 2814000.0, 2818000.0, 2822000.0, 2826000.0, 2830000.0, 2834000.0, 2837000.0, 2841000.0, 2851000.0, 2861000.0, 2870000.0, 2880000.0, 2890000.0, 2899000.0, 2909000.0, 2919000.0, 2929000.0, 2938000.0, 2958000.0, 2978000.0, 2997000.0, 3017000.0, 3037000.0, 3057000.0, 3077000.0, 3097000.0, 3117000.0, 3137000.0, 3157000.0, 3178000.0, 3198000.0, 3218000.0, 3280000.0, 3384000.0, 3490000.0 };
 		DefaultSteamSuperheatedEnthalpyData( _, 2 ) = { 0.0, 2503000.0, 2510000.0, 2520000.0, 2529000.0, 2538000.0, 2548000.0, 2557000.0, 2566000.0, 2576000.0, 2585000.0, 2595000.0, 2604000.0, 2613000.0, 2623000.0, 2632000.0, 2636000.0, 2640000.0, 2643000.0, 2647000.0, 2651000.0, 2655000.0, 2658000.0, 2662000.0, 2666000.0, 2670000.0, 2673000.0, 2677000.0, 2681000.0, 2685000.0, 2687000.0, 2689000.0, 2690000.0, 2692000.0, 2694000.0, 2696000.0, 2698000.0, 2700000.0, 2702000.0, 2704000.0, 2706000.0, 2708000.0, 2709000.0, 2711000.0, 2713000.0, 2715000.0, 2717000.0, 2719000.0, 2721000.0, 2723000.0, 2725000.0, 2727000.0, 2728000.0, 2730000.0, 2732000.0, 2734000.0, 2736000.0, 2738000.0, 2740000.0, 2742000.0, 2744000.0, 2746000.0, 2749000.0, 2753000.0, 2757000.0, 2761000.0, 2765000.0, 2768000.0, 2772000.0, 2776000.0, 2780000.0, 2784000.0, 2788000.0, 2791000.0, 2795000.0, 2799000.0, 2803000.0, 2807000.0, 2811000.0, 2814000.0, 2818000.0, 2822000.0, 2826000.0, 2830000.0, 2834000.0, 2837000.0, 2841000.0, 2851000.0, 2861000.0, 2870000.0, 2880000.0, 2890000.0, 2899000.0, 2909000.0, 2919000.0, 2929000.0, 2938000.0, 2958000.0, 2978000.0, 2997000.0, 3017000.0, 3037000.0, 3057000.0, 3077000.0, 3097000.0, 3117000.0, 3137000.0, 3157000.0, 3178000.0, 3198000.0, 3218000.0, 3280000.0, 3384000.0, 3490000.0 };
@@ -2195,7 +2195,7 @@ namespace FluidProperties {
 	}
 
 	void
-	DefaultSteamSuperheatedDensityData_initializer( FArray2D< Real64 > & DefaultSteamSuperheatedDensityData )
+	DefaultSteamSuperheatedDensityData_initializer( Array2D< Real64 > & DefaultSteamSuperheatedDensityData )
 	{
 		DefaultSteamSuperheatedDensityData( _, 1 ) = { 4.855e-03, 4.837e-03, 4.767e-03, 4.683e-03, 4.601e-03, 4.522e-03, 4.446e-03, 4.373e-03, 4.302e-03, 4.233e-03, 4.167e-03, 4.102e-03, 4.039e-03, 3.979e-03, 3.920e-03, 3.863e-03, 3.840e-03, 3.818e-03, 3.796e-03, 3.775e-03, 3.753e-03, 3.732e-03, 3.711e-03, 3.691e-03, 3.670e-03, 3.650e-03, 3.630e-03, 3.610e-03, 3.591e-03, 3.571e-03, 3.562e-03, 3.552e-03, 3.543e-03, 3.533e-03, 3.524e-03, 3.514e-03, 3.505e-03, 3.496e-03, 3.487e-03, 3.477e-03, 3.468e-03, 3.459e-03, 3.450e-03, 3.441e-03, 3.432e-03, 3.424e-03, 3.415e-03, 3.406e-03, 3.397e-03, 3.388e-03, 3.380e-03, 3.371e-03, 3.363e-03, 3.354e-03, 3.346e-03, 3.337e-03, 3.329e-03, 3.321e-03, 3.312e-03, 3.304e-03, 3.296e-03, 3.288e-03, 3.271e-03, 3.255e-03, 3.239e-03, 3.224e-03, 3.208e-03, 3.193e-03, 3.177e-03, 3.162e-03, 3.147e-03, 3.132e-03, 3.117e-03, 3.103e-03, 3.088e-03, 3.074e-03, 3.060e-03, 3.046e-03, 3.032e-03, 3.018e-03, 3.004e-03, 2.991e-03, 2.977e-03, 2.964e-03, 2.951e-03, 2.938e-03, 2.925e-03, 2.893e-03, 2.862e-03, 2.831e-03, 2.801e-03, 2.772e-03, 2.743e-03, 2.715e-03, 2.688e-03, 2.661e-03, 2.634e-03, 2.583e-03, 2.533e-03, 2.486e-03, 2.440e-03, 2.396e-03, 2.353e-03, 2.312e-03, 2.273e-03, 2.234e-03, 2.197e-03, 2.162e-03, 2.127e-03, 2.093e-03, 2.061e-03, 3.542e-05, 1.833e-03, 1.714e-03 };
 		DefaultSteamSuperheatedDensityData( _, 2 ) = { 0.0, 5.196e-03, 5.121e-03, 5.031e-03, 4.943e-03, 4.859e-03, 4.777e-03, 4.698e-03, 4.622e-03, 4.548e-03, 4.476e-03, 4.407e-03, 4.340e-03, 4.274e-03, 4.211e-03, 4.150e-03, 4.126e-03, 4.102e-03, 4.078e-03, 4.055e-03, 4.032e-03, 4.009e-03, 3.987e-03, 3.965e-03, 3.943e-03, 3.921e-03, 3.899e-03, 3.878e-03, 3.857e-03, 3.836e-03, 3.826e-03, 3.816e-03, 3.806e-03, 3.795e-03, 3.785e-03, 3.775e-03, 3.765e-03, 3.755e-03, 3.746e-03, 3.736e-03, 3.726e-03, 3.716e-03, 3.707e-03, 3.697e-03, 3.687e-03, 3.678e-03, 3.668e-03, 3.659e-03, 3.650e-03, 3.640e-03, 3.631e-03, 3.622e-03, 3.612e-03, 3.603e-03, 3.594e-03, 3.585e-03, 3.576e-03, 3.567e-03, 3.558e-03, 3.549e-03, 3.541e-03, 3.532e-03, 3.514e-03, 3.497e-03, 3.480e-03, 3.463e-03, 3.446e-03, 3.430e-03, 3.413e-03, 3.397e-03, 3.381e-03, 3.365e-03, 3.349e-03, 3.333e-03, 3.318e-03, 3.302e-03, 3.287e-03, 3.272e-03, 3.257e-03, 3.242e-03, 3.228e-03, 3.213e-03, 3.198e-03, 3.184e-03, 3.170e-03, 3.156e-03, 3.142e-03, 3.108e-03, 3.074e-03, 3.041e-03, 3.009e-03, 2.978e-03, 2.947e-03, 2.917e-03, 2.887e-03, 2.858e-03, 2.830e-03, 2.775e-03, 2.722e-03, 2.671e-03, 2.621e-03, 2.574e-03, 2.528e-03, 2.484e-03, 2.442e-03, 2.400e-03, 2.361e-03, 2.322e-03, 2.285e-03, 2.249e-03, 2.214e-03, 3.542e-05, 1.969e-03, 1.841e-03 };
@@ -2319,10 +2319,10 @@ namespace FluidProperties {
 	InterpDefValuesForGlycolConc(
 		int const NumOfConcs, // number of concentrations (dimension of raw data)
 		int const NumOfTemps, // number of temperatures (dimension of raw data)
-		FArray1S< Real64 > const RawConcData, // concentrations for raw data
-		FArray2S< Real64 > const RawPropData, // raw property data (concentration, temperature)
+		Array1S< Real64 > const RawConcData, // concentrations for raw data
+		Array2S< Real64 > const RawPropData, // raw property data (concentration, temperature)
 		Real64 const Concentration, // concentration of actual fluid mix
-		FArray1S< Real64 > InterpData // interpolated output data at proper concentration
+		Array1S< Real64 > InterpData // interpolated output data at proper concentration
 	)
 	{
 
@@ -2419,10 +2419,10 @@ namespace FluidProperties {
 	InterpValuesForGlycolConc(
 		int const NumOfConcs, // number of concentrations (dimension of raw data)
 		int const NumOfTemps, // number of temperatures (dimension of raw data)
-		FArray1S< Real64 > const RawConcData, // concentrations for raw data
-		FArray2S< Real64 > const RawPropData, // raw property data (temperature,concentration)
+		Array1S< Real64 > const RawConcData, // concentrations for raw data
+		Array2S< Real64 > const RawPropData, // raw property data (temperature,concentration)
 		Real64 const Concentration, // concentration of actual fluid mix
-		FArray1S< Real64 > InterpData // interpolated output data at proper concentration
+		Array1S< Real64 > InterpData // interpolated output data at proper concentration
 	)
 	{
 
@@ -4562,13 +4562,13 @@ namespace FluidProperties {
 			}
 			RefrigIndex = RefrigNum;
 		}
-		auto const & Refrig( RefrigData( RefrigNum ) ); // Shorthand name
+		auto const & refrig( RefrigData( RefrigNum ) );
 
 		// check temperature data range and attempt to cap if necessary
-		TempIndex = FindArrayIndex( Temperature, Refrig.SHTemps, 1, Refrig.NumSuperTempPts );
-		if ( ( TempIndex > 0 ) && ( TempIndex < Refrig.NumSuperTempPts ) ) { // in range
+		TempIndex = FindArrayIndex( Temperature, refrig.SHTemps, 1, refrig.NumSuperTempPts );
+		if ( ( TempIndex > 0 ) && ( TempIndex < refrig.NumSuperTempPts ) ) { // in range
 			HiTempIndex = TempIndex + 1;
-			TempInterpRatio = ( Temperature - Refrig.SHTemps( TempIndex ) ) / ( Refrig.SHTemps( HiTempIndex ) - Refrig.SHTemps( TempIndex ) );
+			TempInterpRatio = ( Temperature - refrig.SHTemps( TempIndex ) ) / ( refrig.SHTemps( HiTempIndex ) - refrig.SHTemps( TempIndex ) );
 		} else if ( TempIndex < 1 ) {
 			++CurTempRangeErrCount;
 			++ErrCount;
@@ -4585,11 +4585,11 @@ namespace FluidProperties {
 		}
 
 		// check pressure data range and attempt to cap if necessary
-		LoPressIndex = FindArrayIndex( Pressure, Refrig.SHPress, 1, Refrig.NumSuperPressPts );
-		if ( ( LoPressIndex > 0 ) && ( LoPressIndex < Refrig.NumSuperPressPts ) ) { // in range
+		LoPressIndex = FindArrayIndex( Pressure, refrig.SHPress, 1, refrig.NumSuperPressPts );
+		if ( ( LoPressIndex > 0 ) && ( LoPressIndex < refrig.NumSuperPressPts ) ) { // in range
 			HiPressIndex = LoPressIndex + 1;
-			Real64 const SHPress_Lo( Refrig.SHPress( LoPressIndex ) );
-			PressInterpRatio = ( Pressure - SHPress_Lo ) / ( Refrig.SHPress( HiPressIndex ) - SHPress_Lo );
+			Real64 const SHPress_Lo( refrig.SHPress( LoPressIndex ) );
+			PressInterpRatio = ( Pressure - SHPress_Lo ) / ( refrig.SHPress( HiPressIndex ) - SHPress_Lo );
 		} else if ( LoPressIndex < 1 ) {
 			++CurPresRangeErrCount;
 			++ErrCount;
@@ -4605,7 +4605,7 @@ namespace FluidProperties {
 		}
 
 		// get interpolation point values
-		auto const & Rhosh( Refrig.RhoshValues );
+		auto const & Rhosh( refrig.RhoshValues );
 		LoTempLoDensity = Rhosh( TempIndex, LoPressIndex );
 		LoTempHiDensity = Rhosh( TempIndex, HiPressIndex );
 		HiTempLoDensity = Rhosh( HiTempIndex, LoPressIndex );
@@ -5575,7 +5575,7 @@ namespace FluidProperties {
 	int
 	FindArrayIndex(
 		Real64 const Value, // Value to be placed/found within the array of values
-		FArray1D< Real64 > const & Array, // Array of values in ascending order
+		Array1D< Real64 > const & Array, // Array of values in ascending order
 		int const LowBound, // Valid values lower bound (set by calling program)
 		int const UpperBound // Valid values upper bound (set by calling program)
 	)
@@ -5603,7 +5603,7 @@ namespace FluidProperties {
 		// Bit shifting is substantially faster than /2 at least on GCC even with high optimization
 		// Linear indexing used to assure we are bit shifting positive values where behavior is assured
 		// std::lower_bound was 4x slower for the small (~100) array sizes seen in EnergyPlus use
-		typedef  FArray1< Real64 >::size_type  size_type;
+		typedef  Array1< Real64 >::size_type  size_type;
 		int const l( Array.l() );
 		assert( LowBound >= l );
 		assert( LowBound <= UpperBound );
@@ -5631,7 +5631,7 @@ namespace FluidProperties {
 	int
 	FindArrayIndex(
 		Real64 const Value, // Value to be placed/found within the array of values
-		FArray1D< Real64 > const & Array // Array of values in ascending order
+		Array1D< Real64 > const & Array // Array of values in ascending order
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -5657,7 +5657,7 @@ namespace FluidProperties {
 		// Bit shifting is substantially faster than /2 at least on GCC even with high optimization
 		// Linear indexing used to assure we are bit shifting positive values where behavior is assured
 		// std::lower_bound was 4x slower for the small (~100) array sizes seen in EnergyPlus use
-		typedef  FArray1< Real64 >::size_type  size_type;
+		typedef  Array1< Real64 >::size_type  size_type;
 		assert( Array.size() > 0u ); // Empty arrays are not currently supported
 		assert( Array.l() > 0 ); // Returning 0 for Value smaller than lowest doesn't make sense if l() <= 0
 		if ( Value < Array[ 0 ] ) {
@@ -5682,9 +5682,9 @@ namespace FluidProperties {
 	Real64
 	GetInterpolatedSatProp(
 		Real64 const Temperature, // Saturation Temp.
-		FArray1D< Real64 > const & PropTemps, // Array of temperature at which props are available
-		FArray1D< Real64 > const & LiqProp, // Array of saturated liquid properties
-		FArray1D< Real64 > const & VapProp, // Array of saturatedvapour properties
+		Array1D< Real64 > const & PropTemps, // Array of temperature at which props are available
+		Array1D< Real64 > const & LiqProp, // Array of saturated liquid properties
+		Array1D< Real64 > const & VapProp, // Array of saturatedvapour properties
 		Real64 const Quality, // Quality
 		std::string const & CalledFrom, // routine this function was called from (error messages)
 		int const LowBound, // Valid values lower bound (set by calling program)

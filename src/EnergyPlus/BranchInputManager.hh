@@ -2,8 +2,8 @@
 #define BranchInputManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -56,9 +56,9 @@ namespace BranchInputManager {
 		int NumOfConnectors; // Number of Connectors in this group
 		int NumOfSplitters; // Number of Splitters in this connector group
 		int NumOfMixers; // Number of Mixers in this connector group
-		FArray1D_string ConnectorType; // Connector:Splitter or Connector:Mixer
-		FArray1D_string ConnectorName; // Name for that Connector:Splitter or Connector:Mixer
-		FArray1D_int ConnectorMatchNo; // Pointer to index where this Splitter or Mixer matches
+		Array1D_string ConnectorType; // Connector:Splitter or Connector:Mixer
+		Array1D_string ConnectorName; // Name for that Connector:Splitter or Connector:Mixer
+		Array1D_int ConnectorMatchNo; // Pointer to index where this Splitter or Mixer matches
 		// Splitter => Mixer or Mixer => Splitter.  0 indicates no match
 
 		// Default Constructor
@@ -74,9 +74,9 @@ namespace BranchInputManager {
 			int const NumOfConnectors, // Number of Connectors in this group
 			int const NumOfSplitters, // Number of Splitters in this connector group
 			int const NumOfMixers, // Number of Mixers in this connector group
-			FArray1_string const & ConnectorType, // Connector:Splitter or Connector:Mixer
-			FArray1_string const & ConnectorName, // Name for that Connector:Splitter or Connector:Mixer
-			FArray1_int const & ConnectorMatchNo // Pointer to index where this Splitter or Mixer matches
+			Array1_string const & ConnectorType, // Connector:Splitter or Connector:Mixer
+			Array1_string const & ConnectorName, // Name for that Connector:Splitter or Connector:Mixer
+			Array1_int const & ConnectorMatchNo // Pointer to index where this Splitter or Mixer matches
 		) :
 			Name( Name ),
 			NumOfConnectors( NumOfConnectors ),
@@ -94,7 +94,7 @@ namespace BranchInputManager {
 		// Members
 		std::string Name; // Name of this Branch List
 		int NumOfBranchNames; // Number of Branches on the Branch List
-		FArray1D_string BranchNames; // Names of the branches on this branch list
+		Array1D_string BranchNames; // Names of the branches on this branch list
 		std::string LoopName; // Name of Loop this Branch list belongs to
 		std::string LoopType; // Loop type this branch is on
 
@@ -107,7 +107,7 @@ namespace BranchInputManager {
 		BranchListData(
 			std::string const & Name, // Name of this Branch List
 			int const NumOfBranchNames, // Number of Branches on the Branch List
-			FArray1_string const & BranchNames, // Names of the branches on this branch list
+			Array1_string const & BranchNames, // Names of the branches on this branch list
 			std::string const & LoopName, // Name of Loop this Branch list belongs to
 			std::string const & LoopType // Loop type this branch is on
 		) :
@@ -169,7 +169,7 @@ namespace BranchInputManager {
 		int PressureCurveIndex; // Integer index of pressure curve
 		int FluidType; // Fluid type (see DataLoopNode)
 		int NumOfComponents; // Number of Components on this Branch
-		FArray1D< ComponentData > Component; // Component definitions for each component
+		Array1D< ComponentData > Component; // Component definitions for each component
 
 		// Default Constructor
 		BranchData() :
@@ -189,7 +189,7 @@ namespace BranchInputManager {
 			int const PressureCurveIndex, // Integer index of pressure curve
 			int const FluidType, // Fluid type (see DataLoopNode)
 			int const NumOfComponents, // Number of Components on this Branch
-			FArray1< ComponentData > const & Component // Component definitions for each component
+			Array1< ComponentData > const & Component // Component definitions for each component
 		) :
 			Name( Name ),
 			AssignedLoopName( AssignedLoopName ),
@@ -209,7 +209,7 @@ namespace BranchInputManager {
 		std::string Name; // Splitter Name
 		std::string InletBranchName; // Splitter Inlet Branch Name
 		int NumOutletBranches; // Number of outlets on this Splitter
-		FArray1D_string OutletBranchNames; // Names of the Outlet Branches
+		Array1D_string OutletBranchNames; // Names of the Outlet Branches
 
 		// Default Constructor
 		SplitterData() :
@@ -221,7 +221,7 @@ namespace BranchInputManager {
 			std::string const & Name, // Splitter Name
 			std::string const & InletBranchName, // Splitter Inlet Branch Name
 			int const NumOutletBranches, // Number of outlets on this Splitter
-			FArray1_string const & OutletBranchNames // Names of the Outlet Branches
+			Array1_string const & OutletBranchNames // Names of the Outlet Branches
 		) :
 			Name( Name ),
 			InletBranchName( InletBranchName ),
@@ -237,7 +237,7 @@ namespace BranchInputManager {
 		std::string Name; // Mixer Name
 		std::string OutletBranchName; // Mixer Outlet Branch Name
 		int NumInletBranches; // Number of inlets for this Mixer
-		FArray1D_string InletBranchNames; // Names of Inlet Branches
+		Array1D_string InletBranchNames; // Names of Inlet Branches
 
 		// Default Constructor
 		MixerData() :
@@ -249,7 +249,7 @@ namespace BranchInputManager {
 			std::string const & Name, // Mixer Name
 			std::string const & OutletBranchName, // Mixer Outlet Branch Name
 			int const NumInletBranches, // Number of inlets for this Mixer
-			FArray1_string const & InletBranchNames // Names of Inlet Branches
+			Array1_string const & InletBranchNames // Names of Inlet Branches
 		) :
 			Name( Name ),
 			OutletBranchName( OutletBranchName ),
@@ -260,11 +260,11 @@ namespace BranchInputManager {
 	};
 
 	// Object Data
-	extern FArray1D< BranchListData > BranchList; // Branch List data for each Branch List
-	extern FArray1D< BranchData > Branch; // Branch Data for each Branch
-	extern FArray1D< ConnectorData > ConnectorLists; // Connector List data for each Connector List
-	extern FArray1D< SplitterData > Splitters; // Splitter Data for each Splitter
-	extern FArray1D< MixerData > Mixers; // Mixer Data for each Mixer
+	extern Array1D< BranchListData > BranchList; // Branch List data for each Branch List
+	extern Array1D< BranchData > Branch; // Branch Data for each Branch
+	extern Array1D< ConnectorData > ConnectorLists; // Connector List data for each Connector List
+	extern Array1D< SplitterData > Splitters; // Splitter Data for each Splitter
+	extern Array1D< MixerData > Mixers; // Mixer Data for each Mixer
 
 	// Functions
 
@@ -280,7 +280,7 @@ namespace BranchInputManager {
 		std::string const & LoopName, // Name of Loop Branch List is on
 		std::string const & BranchListName, // Branch List Name from Input
 		int & NumBranchNames, // Number of Branches for this Branch List
-		FArray1S_string BranchNames, // Names of Branches on this Branch List
+		Array1S_string BranchNames, // Names of Branches on this Branch List
 		std::string const & LoopType // Type of Loop Branch list is on
 	);
 
@@ -295,12 +295,12 @@ namespace BranchInputManager {
 		int & PressCurveType, // Index of a pressure curve object
 		int & PressCurveIndex, // Index of a pressure curve object
 		int & NumComps, // Number of Components on Branch
-		FArray1S_string CompType, // Component Type for each item on Branch
-		FArray1S_string CompName, // Component Name for each item on Branch
-		FArray1S_string CompInletNodeNames, // Component Inlet Node IDs for each item on Branch
-		FArray1S_int CompInletNodeNums, // Component Inlet Node Numbers for each item on Branch
-		FArray1S_string CompOutletNodeNames, // Component Outlet Node IDs for each item on Branch
-		FArray1S_int CompOutletNodeNums, // Component Outlet Node Numbers for each item on Branch
+		Array1S_string CompType, // Component Type for each item on Branch
+		Array1S_string CompName, // Component Name for each item on Branch
+		Array1S_string CompInletNodeNames, // Component Inlet Node IDs for each item on Branch
+		Array1S_int CompInletNodeNums, // Component Inlet Node Numbers for each item on Branch
+		Array1S_string CompOutletNodeNames, // Component Outlet Node IDs for each item on Branch
+		Array1S_int CompOutletNodeNums, // Component Outlet Node Numbers for each item on Branch
 		bool & ErrorsFound
 	);
 
@@ -340,7 +340,7 @@ namespace BranchInputManager {
 		int & PressCurveType, // Index of pressure curve object
 		int & PressCurveIndex, // Index of pressure curve object
 		int & NumComps, // Number of Components on Branch
-		FArray1S< ComponentData > BComponents, // Component data returned
+		Array1S< ComponentData > BComponents, // Component data returned
 		bool & ErrorsFound // True when Loop Name is already assigned and this not same loop
 	);
 
@@ -369,8 +369,8 @@ namespace BranchInputManager {
 		std::string & OutletNodeName, // Outlet Node ID
 		int & OutletNodeNum, // Outlet Node Number
 		int & NumInletNodes, // Number of Inlet Nodes
-		FArray1S_string InletNodeNames, // Inlet Node IDs
-		FArray1S_int InletNodeNums, // Inlet Node Numbers
+		Array1S_string InletNodeNames, // Inlet Node IDs
+		Array1S_int InletNodeNums, // Inlet Node Numbers
 		bool & ErrorsFound,
 		Optional_int_const ConnectorNumber = _, // number of the current item in connector list
 		Optional_int MixerNumber = _ // Mixer number for this specific splitter
@@ -385,8 +385,8 @@ namespace BranchInputManager {
 		std::string & InletNodeName, // Inlet Node ID
 		int & InletNodeNum, // Inlet Node Number
 		int & NumOutletNodes, // Number of Outlet Nodes
-		FArray1S_string OutletNodeNames, // Outlet Node IDs
-		FArray1S_int OutletNodeNums, // Outlet Node Numbers
+		Array1S_string OutletNodeNames, // Outlet Node IDs
+		Array1S_int OutletNodeNums, // Outlet Node Numbers
 		bool & ErrorsFound,
 		Optional_int_const ConnectorNumber = _, // number of the current item in connector list
 		Optional_int SplitterNumber = _ // splitter number for this specific splitter

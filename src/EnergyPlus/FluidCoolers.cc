@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -120,7 +120,7 @@ namespace FluidCoolers {
 	Real64 Qactual( 0.0 ); // Fluid cooler heat transfer
 	Real64 FanPower( 0.0 ); // Fluid cooler fan power used
 
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE CondenserLoopFluidCoolers
 
@@ -134,9 +134,9 @@ namespace FluidCoolers {
 	// Update routines to check convergence and update nodes
 
 	// Object Data
-	FArray1D< FluidCoolerspecs > SimpleFluidCooler; // dimension to number of machines
-	FArray1D< FluidCoolerInletConds > SimpleFluidCoolerInlet; // inlet conditions
-	FArray1D< ReportVars > SimpleFluidCoolerReport; // report variables
+	Array1D< FluidCoolerspecs > SimpleFluidCooler; // dimension to number of machines
+	Array1D< FluidCoolerInletConds > SimpleFluidCoolerInlet; // inlet conditions
+	Array1D< ReportVars > SimpleFluidCoolerReport; // report variables
 
 	// MODULE SUBROUTINES:
 
@@ -192,16 +192,16 @@ namespace FluidCoolers {
 		// DERIVED TYPE DEFINITIONS
 		// na
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		// LOCAL VARIABLE DECLARATIONS:
 		static bool GetInput( true );
 		int FluidCoolerNum;
 
-		//GET INPUT
+		// GET INPUT
 		if ( GetInput ) {
 			GetFluidCoolerInput();
 			GetInput = false;
 		}
-		//INITIALIZE
+		// INITIALIZE
 		// Find the correct Equipment
 		if ( CompIndex == 0 ) {
 			FluidCoolerNum = FindItemInList( FluidCoolerName, SimpleFluidCooler.Name(), NumSimpleFluidCoolers );
@@ -224,8 +224,8 @@ namespace FluidCoolers {
 
 		InitSimVars();
 
-		//CALCULATE
-		TypeOfEquip: { auto const SELECT_CASE_var( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType_Num );
+		// CALCULATE
+		{ auto const SELECT_CASE_var( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType_Num );
 
 		if ( SELECT_CASE_var == FluidCooler_SingleSpeed ) {
 			if ( InitLoopEquip ) {
@@ -328,8 +328,8 @@ namespace FluidCoolers {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false ); // Logical flag set .TRUE. if errors found while getting input data
-		FArray1D< Real64 > NumArray( 16 ); // Numeric input data array
-		FArray1D_string AlphArray( 5 ); // Character string input data array
+		Array1D< Real64 > NumArray( 16 ); // Numeric input data array
+		Array1D_string AlphArray( 5 ); // Character string input data array
 
 		//! LKL - still more renaming stuff to go.
 
@@ -746,8 +746,8 @@ namespace FluidCoolers {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Flag if input data errors are found
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool OneTimeFlagForEachFluidCooler;
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool OneTimeFlagForEachFluidCooler;
 		bool FatalError;
 		int TypeOf_Num( 0 );
 		int LoopNum;
@@ -885,7 +885,7 @@ namespace FluidCoolers {
 		Real64 UA; // Calculated UA value
 		Real64 OutWaterTempAtUA0; // Water outlet temperature at UA0
 		Real64 OutWaterTempAtUA1; // Water outlet temperature at UA1
-		FArray1D< Real64 > Par( 5 ); // Parameter array need for RegulaFalsi routine
+		Array1D< Real64 > Par( 5 ); // Parameter array need for RegulaFalsi routine
 		std::string equipName;
 		Real64 Cp; // local specific heat for fluid
 		Real64 rho; // local density for fluid
@@ -1660,7 +1660,7 @@ namespace FluidCoolers {
 	Real64
 	SimpleFluidCoolerUAResidual(
 		Real64 const UA, // UA of fluid cooler
-		FArray1< Real64 > const & Par // par(1) = design fluid cooler load [W]
+		Array1< Real64 > const & Par // par(1) = design fluid cooler load [W]
 	)
 	{
 

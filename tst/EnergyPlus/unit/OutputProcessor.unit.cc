@@ -13,14 +13,14 @@ using namespace DataGlobals;
 
 TEST( OutputProcessor, TestGetMeteredVariables )
 {
-	FArray1D_int VarIndexes; // Variable Numbers
-	FArray1D_int VarTypes; // Variable Types (1=integer, 2=real, 3=meter)
-	FArray1D_int IndexTypes; // Variable Index Types (1=Zone,2=HVAC)
-	FArray1D_string UnitsStrings; // UnitsStrings for each variable
-	FArray1D_int ResourceTypes; // ResourceTypes for each variable
-	FArray1D_string EndUses; // EndUses for each variable
-	FArray1D_string Groups; // Groups for each variable
-	FArray1D_string Names; // Variable Names for each variable
+	Array1D_int VarIndexes; // Variable Numbers
+	Array1D_int VarTypes; // Variable Types (1=integer, 2=real, 3=meter)
+	Array1D_int IndexTypes; // Variable Index Types (1=Zone,2=HVAC)
+	Array1D_string UnitsStrings; // UnitsStrings for each variable
+	Array1D_int ResourceTypes; // ResourceTypes for each variable
+	Array1D_string EndUses; // EndUses for each variable
+	Array1D_string Groups; // Groups for each variable
+	Array1D_string Names; // Variable Names for each variable
 	int NumVariables = 2;
 	Real64 ZoneElectricPower = 0.2;
 	Reference< RealVariables > RVar;
@@ -51,7 +51,7 @@ TEST( OutputProcessor, TestGetMeteredVariables )
 
 	RVar().MeterArrayPtr = 1;
 	RVariableTypes( 1 ).KeyNameOnlyUC = NameOfComp;
-	RVariableTypes( 1 ).VarPtr = RVar; 
+	RVariableTypes( 1 ).VarPtr = RVar;
 	VarMeterArrays.allocate( 1 );
 
 	VarMeterArrays( 1 ).NumOnMeters = 1;

@@ -3,7 +3,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -127,15 +127,15 @@ namespace ZoneEquipmentManager {
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
-	FArray1D< Real64 > AvgData; // scratch array for storing averaged data
-	FArray1D_int DefaultSimOrder;
+	Array1D< Real64 > AvgData; // scratch array for storing averaged data
+	Array1D_int DefaultSimOrder;
 	int NumOfTimeStepInDay; // number of zone time steps in a day
 	bool GetZoneEquipmentInputFlag( true );
 
 	//SUBROUTINE SPECIFICATIONS FOR MODULE ZoneEquipmentManager
 
 	// Object Data
-	FArray1D< SimulationOrder > PrioritySimOrder;
+	Array1D< SimulationOrder > PrioritySimOrder;
 
 	// Functions
 
@@ -1268,9 +1268,9 @@ namespace ZoneEquipmentManager {
 				}
 			}
 			FinalZoneSizing( CtrlZoneNum ).TotalZoneFloorArea = ( Zone( ZoneIndex ).FloorArea * Zone( FinalZoneSizing( CtrlZoneNum ).ActualZoneNum ).Multiplier * Zone( FinalZoneSizing( CtrlZoneNum ).ActualZoneNum ).ListMultiplier );
-			if ( FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowPPer || FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowSum || FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowMax ){
+			if ( FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowPPer || FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowSum || FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowMax ) {
 				OAFromPeople = FinalZoneSizing( CtrlZoneNum ).DesOAFlowPPer * TotPeopleInZone;
-			} else { 
+			} else {
 				OAFromPeople = 0.0;
 			}
 			OAFromArea = FinalZoneSizing( CtrlZoneNum ).DesOAFlowPerArea * FinalZoneSizing( CtrlZoneNum ).TotalZoneFloorArea;
@@ -2633,7 +2633,7 @@ namespace ZoneEquipmentManager {
 
 		static bool SupPathInletChanged( false );
 		static bool FirstCall; // indicates first call to supply air path components
-		static bool FirstPassZoneEquip ( true ); // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
+		static bool FirstPassZoneEquip( true ); // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
 		static bool MyOneTimeFlag( true );
 		bool ErrorFlag;
 		static bool ValidSAMComp( false );
@@ -2644,7 +2644,7 @@ namespace ZoneEquipmentManager {
 		Real64 NonAirSysOutput;
 		static bool ZoneHasAirLoopHVACTerminal( false ); // true if zone has an air loop terminal
 		static bool ZoneHasAirLoopHVACDirectAir( false ); // true if zone has an uncontrolled air loop terminal
-		static FArray1D_bool DirectAirAndAirTerminalWarningIssued; // only warn once for each zone with problems
+		static Array1D_bool DirectAirAndAirTerminalWarningIssued; // only warn once for each zone with problems
 
 		// Determine flow rate and temperature of supply air based on type of damper
 
@@ -2682,7 +2682,7 @@ namespace ZoneEquipmentManager {
 		}
 
 		FirstCall = false;
-		
+
 		// Simulate all of the pools. These have a potential impact on surface heat balances, zone air heat balances, and moisture balances.
 		// These should be simulated first so that any systems or zone equipment devices deal with the effects of the pool properly.
 		SimSwimmingPool( FirstHVACIteration );
@@ -4022,8 +4022,8 @@ namespace ZoneEquipmentManager {
 		Real64 VVF; // DESIGN VENTILATION FLOW RATE (M**3/SEC)
 		Real64 MCpI_temp;
 		Real64 VAMFL_temp;
-		static FArray1D< Real64 > ZMAT; // Zone air temperature
-		static FArray1D< Real64 > ZHumRat; // Zone air humidity ratio
+		static Array1D< Real64 > ZMAT; // Zone air temperature
+		static Array1D< Real64 > ZHumRat; // Zone air humidity ratio
 		Real64 Cw; // Opening effectivenss
 		Real64 Cd; // Discharge coefficent
 		Real64 angle; // Angle between wind direction and effective angle

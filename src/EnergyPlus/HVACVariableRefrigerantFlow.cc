@@ -4,7 +4,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -117,10 +117,10 @@ namespace HVACVariableRefrigerantFlow {
 	// VRF System Types (strings used in integer conversions)
 	int const NumVRFSystemTypes( 1 );
 	int const VRF_HeatPump( 1 );
-	FArray1D_string const cVRFTypes( NumVRFSystemTypes, std::string( "AirConditioner:VariableRefrigerantFlow" ) );
+	Array1D_string const cVRFTypes( NumVRFSystemTypes, std::string( "AirConditioner:VariableRefrigerantFlow" ) );
 
 	int const NumValidFuelTypes( 9 );
-	FArray1D_string const cValidFuelTypes( NumValidFuelTypes, { "Electric", "NaturalGas", "PropaneGas", "Diesel", "Gasoline", "FuelOil#1", "FuelOil#2", "OtherFuel1", "OtherFuel2" } );
+	Array1D_string const cValidFuelTypes( NumValidFuelTypes, { "Electric", "NaturalGas", "PropaneGas", "Diesel", "Gasoline", "FuelOil#1", "FuelOil#2", "OtherFuel1", "OtherFuel2" } );
 
 	// Fuel Types
 	int const FuelTypeElectric( 1 ); // Fuel type for electricity
@@ -142,7 +142,7 @@ namespace HVACVariableRefrigerantFlow {
 
 	//MODULE VARIABLE DECLARATIONS:
 	bool GetVRFInputFlag( true ); // Flag set to make sure you get input once
-	FArray1D_bool CheckEquipName; // Flag set to check equipment connections once
+	Array1D_bool CheckEquipName; // Flag set to check equipment connections once
 	int NumVRFCond( 0 ); // total number of VRF condensers
 	int NumVRFTU( 0 ); // total number of VRF terminal units
 	int NumVRFTULists( 0 ); // The number of VRF TU lists
@@ -153,23 +153,23 @@ namespace HVACVariableRefrigerantFlow {
 	Real64 CompOnFlowRatio( 0.0 ); // fan flow ratio when coil on
 	Real64 CompOffFlowRatio( 0.0 ); // fan flow ratio when coil off
 	Real64 FanSpeedRatio( 0.0 ); // ratio of air flow ratio passed to fan object
-	FArray1D_bool HeatingLoad; // defines a heating load on VRFTerminalUnits
-	FArray1D_bool CoolingLoad; // defines a cooling load on VRFTerminalUnits
-	FArray1D_bool LastModeHeating; // defines last mode was heating mode
-	FArray1D_bool LastModeCooling; // defines last mode was cooling mode
-	FArray1D< Real64 > MaxCoolingCapacity; // maximum capacity of any terminal unit
-	FArray1D< Real64 > MaxHeatingCapacity; // maximum capacity of any terminal unit
-	FArray1D< Real64 > CoolCombinationRatio; // ratio of terminal unit capacity to VRF condenser capacity
-	FArray1D< Real64 > HeatCombinationRatio; // ratio of terminal unit capacity to VRF condenser capacity
+	Array1D_bool HeatingLoad; // defines a heating load on VRFTerminalUnits
+	Array1D_bool CoolingLoad; // defines a cooling load on VRFTerminalUnits
+	Array1D_bool LastModeHeating; // defines last mode was heating mode
+	Array1D_bool LastModeCooling; // defines last mode was cooling mode
+	Array1D< Real64 > MaxCoolingCapacity; // maximum capacity of any terminal unit
+	Array1D< Real64 > MaxHeatingCapacity; // maximum capacity of any terminal unit
+	Array1D< Real64 > CoolCombinationRatio; // ratio of terminal unit capacity to VRF condenser capacity
+	Array1D< Real64 > HeatCombinationRatio; // ratio of terminal unit capacity to VRF condenser capacity
 	Real64 LoopDXCoolCoilRTF( 0.0 ); // holds value of DX cooling coil RTF
 	Real64 LoopDXHeatCoilRTF( 0.0 ); // holds value of DX heating coil RTF
 	Real64 CondenserWaterMassFlowRate; // VRF water-cooled condenser mass flow rate (kg/s)
-	FArray1D_int NumCoolingLoads; // number of TU's requesting cooling
-	FArray1D_int NumHeatingLoads; // number of TU's requesting heating
-	FArray1D< Real64 > MaxDeltaT; // maximum zone temperature difference from setpoint
-	FArray1D< Real64 > MinDeltaT; // minimum zone temperature difference from setpoint
-	FArray1D< Real64 > SumCoolingLoads; // sum of cooling loads
-	FArray1D< Real64 > SumHeatingLoads; // sum of heating loads
+	Array1D_int NumCoolingLoads; // number of TU's requesting cooling
+	Array1D_int NumHeatingLoads; // number of TU's requesting heating
+	Array1D< Real64 > MaxDeltaT; // maximum zone temperature difference from setpoint
+	Array1D< Real64 > MinDeltaT; // minimum zone temperature difference from setpoint
+	Array1D< Real64 > SumCoolingLoads; // sum of cooling loads
+	Array1D< Real64 > SumHeatingLoads; // sum of heating loads
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -186,10 +186,10 @@ namespace HVACVariableRefrigerantFlow {
 	// Reporting routines for module
 
 	// Object Data
-	FArray1D< VRFCondenserEquipment > VRF; // AirConditioner:VariableRefrigerantFlow object
-	FArray1D< VRFTerminalUnitEquipment > VRFTU; // ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
-	FArray1D< TerminalUnitListData > TerminalUnitList; // zoneTerminalUnitList object
-	FArray1D< VRFTUNumericFieldData > VRFTUNumericFields; // holds VRF TU numeric input fields character field name
+	Array1D< VRFCondenserEquipment > VRF; // AirConditioner:VariableRefrigerantFlow object
+	Array1D< VRFTerminalUnitEquipment > VRFTU; // ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
+	Array1D< TerminalUnitListData > TerminalUnitList; // zoneTerminalUnitList object
+	Array1D< VRFTUNumericFieldData > VRFTUNumericFields; // holds VRF TU numeric input fields character field name
 
 	// Utility routines for module
 	// na
@@ -405,7 +405,7 @@ namespace HVACVariableRefrigerantFlow {
 		}
 
 		// Calculate Demand on heat pump
-		TypeOfEquip: { auto const SELECT_CASE_var( VRFTypeNum );
+		{ auto const SELECT_CASE_var( VRFTypeNum );
 		if ( SELECT_CASE_var == TypeOf_HeatPumpVRF ) {
 			if ( VRFNum != 0 ) {
 				if ( LoopNum == VRF( VRFNum ).SourceLoopNum ) { // condenser loop
@@ -417,10 +417,9 @@ namespace HVACVariableRefrigerantFlow {
 			} else {
 				ShowFatalError( "SimVRFCondenserPlant:: Invalid " + cVRFTypes( VRF_HeatPump ) + ", Requested Unit=" + VRFName );
 			}
-
 		} else {
 			ShowFatalError( "SimVRFCondenserPlant: Module called with incorrect VRFType=" + VRFType );
-		}} // TypeOfEquip
+		}}
 
 	}
 
@@ -1224,12 +1223,12 @@ namespace HVACVariableRefrigerantFlow {
 		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		FArray1D_string cAlphaFieldNames;
-		FArray1D_string cNumericFieldNames;
-		FArray1D_bool lNumericFieldBlanks;
-		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_string cAlphaArgs;
-		FArray1D< Real64 > rNumericArgs;
+		Array1D_string cAlphaFieldNames;
+		Array1D_string cNumericFieldNames;
+		Array1D_bool lNumericFieldBlanks;
+		Array1D_bool lAlphaFieldBlanks;
+		Array1D_string cAlphaArgs;
+		Array1D< Real64 > rNumericArgs;
 		std::string cCurrentModuleObject;
 		int NumParams;
 		int MaxAlphas;
@@ -1243,7 +1242,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 FanVolFlowRate; // Fan Max Flow Rate from Fan object (for comparisons to validity)
 		int FanInletNodeNum; // Used in TU configuration setup
 		int FanOutletNodeNum; // Used in TU configuration setup
-		FArray1D_int OANodeNums( 4 ); // Node numbers of OA mixer (OA, EA, RA, MA)
+		Array1D_int OANodeNums( 4 ); // Node numbers of OA mixer (OA, EA, RA, MA)
 		int CCoilInletNodeNum; // Used in TU configuration setup
 		int CCoilOutletNodeNum; // Used in TU configuration setup
 		int HCoilInletNodeNum; // Used in TU configuration setup
@@ -2854,12 +2853,12 @@ namespace HVACVariableRefrigerantFlow {
 		int OutsideAirNode; // TU mixer outside air inlet node
 		static bool MyOneTimeFlag( true ); // False after allocating and initializing subroutine variables
 		static bool ZoneEquipmentListNotChecked( true ); // False after the Zone Equipment List has been checked for items
-		static FArray1D_bool MyEnvrnFlag; // Flag for initializing at beginning of each new environment
-		static FArray1D_bool MySizeFlag; // False after TU has been sized
-		static FArray1D_bool MyBeginTimeStepFlag; // Flag to sense beginning of time step
-		static FArray1D_bool MyVRFFlag; // used for sizing VRF inputs one time
-		static FArray1D_bool MyVRFCondFlag; // used to reset timer counter
-		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+		static Array1D_bool MyEnvrnFlag; // Flag for initializing at beginning of each new environment
+		static Array1D_bool MySizeFlag; // False after TU has been sized
+		static Array1D_bool MyBeginTimeStepFlag; // Flag to sense beginning of time step
+		static Array1D_bool MyVRFFlag; // used for sizing VRF inputs one time
+		static Array1D_bool MyVRFCondFlag; // used to reset timer counter
+		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		int NumTULoop; // loop counter, number of TU's in list
 		int ELLoop; // loop counter, number of zone equipment lists
 		int ListLoop; // loop counter, number of equipment is each list
@@ -2973,7 +2972,7 @@ namespace HVACVariableRefrigerantFlow {
 				for ( TUListNum = 1; TUListNum <= NumVRFTULists; ++TUListNum ) {
 					for ( NumTULoop = 1; NumTULoop <= TerminalUnitList( TUListNum ).NumTUInList; ++NumTULoop ) {
 						TUIndex = TerminalUnitList( TUListNum ).ZoneTUPtr( NumTULoop );
-						EquipList: for ( ELLoop = 1; ELLoop <= NumOfZones; ++ELLoop ) { // NumOfZoneEquipLists
+						for ( ELLoop = 1; ELLoop <= NumOfZones; ++ELLoop ) { // NumOfZoneEquipLists
 							if ( ZoneEquipList( ELLoop ).Name == "" ) continue; // dimensioned by NumOfZones.  Only valid ones have names.
 							for ( ListLoop = 1; ListLoop <= ZoneEquipList( ELLoop ).NumOfEquipTypes; ++ListLoop ) {
 								if ( ! SameString( ZoneEquipList( ELLoop ).EquipType( ListLoop ), cVRFTUTypes( VRFTU( TUIndex ).VRFTUType_Num ) ) ) continue;
@@ -2984,7 +2983,6 @@ namespace HVACVariableRefrigerantFlow {
 								}
 								goto EquipList_exit;
 							}
-							EquipList_loop: ;
 						}
 						EquipList_exit: ;
 					}
@@ -3816,7 +3814,7 @@ namespace HVACVariableRefrigerantFlow {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_bool CheckVRFCombinationRatio;
+		static Array1D_bool CheckVRFCombinationRatio;
 		static bool MyOneTimeFlag( true ); // One time flag used to allocate MyEnvrnFlag and MySizeFlag
 		bool FoundAll; // temporary variable used to check all terminal units
 		bool errFlag; // temporary variable used for error checking
@@ -4700,7 +4698,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 TempOutput; // unit output when iteration limit exceeded [W]
 		Real64 NoCompOutput; // output when no active compressor [W]
 		int SolFla; // Flag of RegulaFalsi solver
-		FArray1D< Real64 > Par( 6 ); // Parameters passed to RegulaFalsi
+		Array1D< Real64 > Par( 6 ); // Parameters passed to RegulaFalsi
 		std::string IterNum; // Max number of iterations for warning message
 		Real64 TempMinPLR; // min PLR used in Regula Falsi call
 		Real64 TempMaxPLR; // max PLR used in Regula Falsi call
@@ -5326,7 +5324,7 @@ namespace HVACVariableRefrigerantFlow {
 	Real64
 	PLRResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = VRFTUNum
+		Array1< Real64 > const & Par // par(1) = VRFTUNum
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -5823,10 +5821,10 @@ namespace HVACVariableRefrigerantFlow {
 		int const VRFCond, // Condenser Unit index
 		int const NumTUInList, // Number of terminal units in list
 		Real64 const StartingCapacity, // temporary variable holding condenser capacity [W]
-		FArray1S< Real64 > const CapArray, // Array of coil capacities in either cooling or heating mode [W]
+		Array1S< Real64 > const CapArray, // Array of coil capacities in either cooling or heating mode [W]
 		Real64 & MaxLimit, // Maximum terminal unit capacity for coils in same operating mode [W]
 		Real64 const AltCapacity, // temporary variable holding heat recovery capacity [W]
-		FArray1S< Real64 > const AltArray, // Array of coil capacities of heat recovery [W]
+		Array1S< Real64 > const AltArray, // Array of coil capacities of heat recovery [W]
 		Real64 & AltLimit // Maximum terminal unit capacity of heat recovery coils [W]
 	)
 	{
@@ -5906,7 +5904,7 @@ namespace HVACVariableRefrigerantFlow {
 	LimitCoilCapacity(
 		int const NumTUInList, // Number of terminal units in list
 		Real64 const TotalCapacity, // temporary variable holding condenser capacity [W]
-		FArray1S< Real64 > const CapArray, // Array of coil capacities in either cooling or heating mode [W]
+		Array1S< Real64 > const CapArray, // Array of coil capacities in either cooling or heating mode [W]
 		Real64 & MaxLimit // Maximum terminal unit capacity for coils in same operating mode [W]
 	)
 	{
@@ -5961,8 +5959,8 @@ namespace HVACVariableRefrigerantFlow {
 		int MinOutputIndex; // index to TU with lowest load
 		Real64 MinOutput; // used when finding TU "max" capacity limit
 		Real64 RemainingCapacity; // decrement capacity counter to find limiting TU capacity [W]
-		FArray1D< Real64 > Temp( NumTUInList, CapArray ); // temporary array for processing terminal units
-		FArray1D< Real64 > Temp2( NumTUInList, Temp ); // temporary array for processing terminal units
+		Array1D< Real64 > Temp( NumTUInList, CapArray ); // temporary array for processing terminal units
+		Array1D< Real64 > Temp2( NumTUInList, Temp ); // temporary array for processing terminal units
 
 		RemainingCapacity = TotalCapacity;
 

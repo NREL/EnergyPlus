@@ -2,7 +2,7 @@
 #define Pumps_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -36,7 +36,7 @@ namespace Pumps {
 	extern int const PumpBank_VarSpeed;
 	extern std::string const cPumpBank_ConSpeed;
 	extern int const PumpBank_ConSpeed;
-	extern FArray1D_string const cPumpTypes;
+	extern Array1D_string const cPumpTypes;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -167,7 +167,7 @@ namespace Pumps {
 		Real64 FracMotorLossToFluid; // ?????
 		Real64 Energy; // Energy consumed
 		Real64 Power; // Power used
-		FArray1D< Real64 > PartLoadCoef; // Pump Curve Coefficients
+		Array1D< Real64 > PartLoadCoef; // Pump Curve Coefficients
 		int PressureCurve_Index; // Pointer to a pump coefficient curve
 		Real64 PumpMassFlowRateMaxRPM; // Mass flow rate calculated from maximum rpm
 		Real64 PumpMassFlowRateMinRPM; // Mass flow rate calculated from minimum rpm
@@ -278,7 +278,7 @@ namespace Pumps {
 			Real64 const FracMotorLossToFluid, // ?????
 			Real64 const Energy, // Energy consumed
 			Real64 const Power, // Power used
-			FArray1< Real64 > const & PartLoadCoef, // Pump Curve Coefficients
+			Array1< Real64 > const & PartLoadCoef, // Pump Curve Coefficients
 			int const PressureCurve_Index, // Pointer to a pump coefficient curve
 			Real64 const PumpMassFlowRateMaxRPM, // Mass flow rate calculated from maximum rpm
 			Real64 const PumpMassFlowRateMinRPM, // Mass flow rate calculated from minimum rpm
@@ -412,8 +412,8 @@ namespace Pumps {
 	};
 
 	// Object Data
-	extern FArray1D< PumpSpecs > PumpEquip;
-	extern FArray1D< ReportVars > PumpEquipReport;
+	extern Array1D< PumpSpecs > PumpEquip;
+	extern Array1D< ReportVars > PumpEquipReport;
 
 	// Functions
 

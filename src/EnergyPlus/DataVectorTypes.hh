@@ -6,7 +6,8 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Vector3.hh>
 
 // EnergyPlus Headers
@@ -67,7 +68,7 @@ namespace DataVectorTypes {
 		// Array Assignment
 		inline
 		Vector &
-		operator =( FArray1D< Real64 > const a )
+		operator =( Array1D< Real64 > const a )
 		{
 			assert( ( a.l() == 1 ) && ( a.u() == 3 ) );
 			x = a( 1 );
@@ -79,7 +80,7 @@ namespace DataVectorTypes {
 		// Array Assignment
 		inline
 		Vector &
-		operator =( FArray1A< Real64 > const a )
+		operator =( Array1A< Real64 > const a )
 		{
 			a.dim( 3 );
 			x = a( 1 );
@@ -91,7 +92,7 @@ namespace DataVectorTypes {
 		// Array Assignment
 		inline
 		Vector &
-		operator =( FArray1S< Real64 > const & a )
+		operator =( Array1S< Real64 > const & a )
 		{
 			assert( ( a.l() == 1 ) && ( a.u() == 3 ) );
 			x = a( 1 );
@@ -191,9 +192,9 @@ namespace DataVectorTypes {
 
 		// Array Conversion
 		inline
-		operator FArray1D< Real64 >() const
+		operator Array1D< Real64 >() const
 		{
-			return FArray1D< Real64 >( 3, { x, y, z } );
+			return Array1D< Real64 >( 3, { x, y, z } );
 		}
 
 		// Length
@@ -444,18 +445,18 @@ namespace DataVectorTypes {
 
 		// Array Generator
 		inline
-		FArray1D< Real64 >
-		FArray() const
+		Array1D< Real64 >
+		Array() const
 		{
-			return FArray1D< Real64 >( 3, { x, y, z } );
+			return Array1D< Real64 >( 3, { x, y, z } );
 		}
 
 		// Array Generator
 		inline
-		FArray1D< Real64 >
-		as_FArray() const
+		Array1D< Real64 >
+		as_Array() const
 		{
-			return FArray1D< Real64 >( 3, { x, y, z } );
+			return Array1D< Real64 >( 3, { x, y, z } );
 		}
 
 		// Vector3 Generator
@@ -466,10 +467,10 @@ namespace DataVectorTypes {
 			return Vector3< Real64 >( x, y, z );
 		}
 
-		// Assign to an FArray
+		// Assign to an Array
 		inline
 		void
-		assign_to( FArray1D< Real64 > & a ) const
+		assign_to( Array1D< Real64 > & a ) const
 		{
 			a.dimension( 3 );
 			a( 1 ) = x;
@@ -532,7 +533,7 @@ namespace DataVectorTypes {
 		// Members
 		int NSides; // Number of Sides for this Face
 		int SurfNum; // ALLOCATABLE to actual surface number
-		FArray1D< Vector > FacePoints;
+		Array1D< Vector > FacePoints;
 		Vector NewellAreaVector;
 
 		// Default Constructor
@@ -544,7 +545,7 @@ namespace DataVectorTypes {
 		Face(
 			int const NSides, // Number of Sides for this Face
 			int const SurfNum, // ALLOCATABLE to actual surface number
-			FArray1< Vector > const & FacePoints,
+			Array1< Vector > const & FacePoints,
 			Vector const & NewellAreaVector
 		) :
 			NSides( NSides ),
@@ -559,7 +560,7 @@ namespace DataVectorTypes {
 	{
 		// Members
 		int NumSurfaceFaces;
-		FArray1D< Face > SurfaceFace;
+		Array1D< Face > SurfaceFace;
 
 		// Default Constructor
 		Polyhedron() :
@@ -569,7 +570,7 @@ namespace DataVectorTypes {
 		// Member Constructor
 		Polyhedron(
 			int const NumSurfaceFaces,
-			FArray1< Face > const & SurfaceFace
+			Array1< Face > const & SurfaceFace
 		) :
 			NumSurfaceFaces( NumSurfaceFaces ),
 			SurfaceFace( SurfaceFace )

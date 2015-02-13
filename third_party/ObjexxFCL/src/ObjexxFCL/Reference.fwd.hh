@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -24,7 +24,6 @@ namespace ObjexxFCL {
 template< typename > class Reference;
 class byte;
 class ubyte;
-class Fstring;
 
 // Types
 typedef  byte  sbyte;
@@ -54,7 +53,6 @@ typedef  Reference< char >                Reference_char;
 typedef  Reference< unsigned char >       Reference_uchar;
 typedef  Reference< signed char >         Reference_schar;
 typedef  Reference< std::string >         Reference_string;
-typedef  Reference< Fstring >             Reference_Fstring;
 
 // Const Types
 typedef  Reference< bool const >                Reference_bool_const;
@@ -83,7 +81,6 @@ typedef  Reference< char const >                Reference_char_const;
 typedef  Reference< unsigned char const >       Reference_uchar_const;
 typedef  Reference< signed char const >         Reference_schar_const;
 typedef  Reference< std::string const >         Reference_string_const;
-typedef  Reference< Fstring const >             Reference_Fstring_const;
 
 } // ObjexxFCL
 

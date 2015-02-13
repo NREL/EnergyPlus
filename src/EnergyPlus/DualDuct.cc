@@ -3,7 +3,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -97,7 +97,7 @@ namespace DualDuct {
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	int NumDampers( 0 ); // The Number of Dampers found in the Input //Autodesk Poss used uninitialized in ReportDualDuctConnections
 	int NumDualDuctConstVolDampers;
@@ -120,13 +120,13 @@ namespace DualDuct {
 	// Reporting routines for module
 
 	// Object Data
-	FArray1D< DamperDesignParams > Damper;
-	FArray1D< DamperFlowConditions > DamperInlet;
-	FArray1D< DamperFlowConditions > DamperHotAirInlet;
-	FArray1D< DamperFlowConditions > DamperColdAirInlet;
-	FArray1D< DamperFlowConditions > DamperOutlet;
-	FArray1D< DamperFlowConditions > DamperOAInlet; // VAV:OutdoorAir Outdoor Air Inlet
-	FArray1D< DamperFlowConditions > DamperRecircAirInlet; // VAV:OutdoorAir Recirculated Air Inlet
+	Array1D< DamperDesignParams > Damper;
+	Array1D< DamperFlowConditions > DamperInlet;
+	Array1D< DamperFlowConditions > DamperHotAirInlet;
+	Array1D< DamperFlowConditions > DamperColdAirInlet;
+	Array1D< DamperFlowConditions > DamperOutlet;
+	Array1D< DamperFlowConditions > DamperOAInlet; // VAV:OutdoorAir Outdoor Air Inlet
+	Array1D< DamperFlowConditions > DamperRecircAirInlet; // VAV:OutdoorAir Recirculated Air Inlet
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -298,12 +298,12 @@ namespace DualDuct {
 		int NumNums;
 		int IOStat;
 		int ZoneNum; // Index to actual zone number
-		static FArray1D< Real64 > NumArray( 2, 0.0 );
-		static FArray1D_string AlphArray( 7 );
-		static FArray1D_string cAlphaFields( 7 ); // Alpha field names
-		static FArray1D_string cNumericFields( 2 ); // Numeric field names
-		static FArray1D_bool lAlphaBlanks( 7, true ); // Logical array, alpha field input BLANK = .TRUE.
-		static FArray1D_bool lNumericBlanks( 2, true ); // Logical array, numeric field input BLANK = .TRUE.
+		static Array1D< Real64 > NumArray( 2, 0.0 );
+		static Array1D_string AlphArray( 7 );
+		static Array1D_string cAlphaFields( 7 ); // Alpha field names
+		static Array1D_string cNumericFields( 2 ); // Numeric field names
+		static Array1D_bool lAlphaBlanks( 7, true ); // Logical array, alpha field input BLANK = .TRUE.
+		static Array1D_bool lNumericBlanks( 2, true ); // Logical array, numeric field input BLANK = .TRUE.
 		std::string CurrentModuleObject; // for ease in getting objects
 		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
@@ -687,9 +687,9 @@ namespace DualDuct {
 		int RAInNode; // Reciruclated Air Inlet Node for VAV:OutdoorAir units
 		int OutNode;
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MySizeFlag;
-		static FArray1D_bool MyAirLoopFlag;
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MySizeFlag;
+		static Array1D_bool MyAirLoopFlag;
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop; // Loop checking control variable
 		Real64 PeopleFlow; // local sum variable, m3/s
@@ -2139,16 +2139,16 @@ namespace DualDuct {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  INTEGER :: DamperNum
 		static bool FirstTimeOnly( true );
-		static FArray1D_bool RecircIsUsedARR;
-		static FArray1D_string DamperNamesARR;
+		static Array1D_bool RecircIsUsedARR;
+		static Array1D_string DamperNamesARR;
 		int DamperIndex; // Loop index to Damper that you are currently loading input into
 		std::string CurrentModuleObject; // for ease in getting objects
-		static FArray1D< Real64 > NumArray( 2, 0.0 );
-		static FArray1D_string AlphArray( 7 );
-		static FArray1D_string cAlphaFields( 7 ); // Alpha field names
-		static FArray1D_string cNumericFields( 2 ); // Numeric field names
-		static FArray1D_bool lAlphaBlanks( 7, true ); // Logical array, alpha field input BLANK = .TRUE.
-		static FArray1D_bool lNumericBlanks( 2, true ); // Logical array, numeric field input BLANK = .TRUE.
+		static Array1D< Real64 > NumArray( 2, 0.0 );
+		static Array1D_string AlphArray( 7 );
+		static Array1D_string cAlphaFields( 7 ); // Alpha field names
+		static Array1D_string cNumericFields( 2 ); // Numeric field names
+		static Array1D_bool lAlphaBlanks( 7, true ); // Logical array, alpha field input BLANK = .TRUE.
+		static Array1D_bool lNumericBlanks( 2, true ); // Logical array, numeric field input BLANK = .TRUE.
 		int NumAlphas;
 		int NumNums;
 		int IOStat;

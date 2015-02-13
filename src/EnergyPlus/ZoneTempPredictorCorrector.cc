@@ -3,7 +3,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -97,11 +97,11 @@ namespace ZoneTempPredictorCorrector {
 	//INTEGER, PUBLIC, PARAMETER :: iPushZoneTimestepHistories    = 5
 	//INTEGER, PUBLIC, PARAMETER :: iPushSystemTimestepHistories  = 6
 
-	FArray1D_string const ValidControlTypes( 4, { "ThermostatSetpoint:SingleHeating", "ThermostatSetpoint:SingleCooling", "ThermostatSetpoint:SingleHeatingOrCooling", "ThermostatSetpoint:DualSetpoint" } );
+	Array1D_string const ValidControlTypes( 4, { "ThermostatSetpoint:SingleHeating", "ThermostatSetpoint:SingleCooling", "ThermostatSetpoint:SingleHeatingOrCooling", "ThermostatSetpoint:DualSetpoint" } );
 
-	FArray1D_string const ValidComfortControlTypes( 12, { "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating", "ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling", "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling", "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint", "ThermostatSetpoint:ThermalComfort:Pierce:SingleHeating", "ThermostatSetpoint:ThermalComfort:Pierce:SingleCooling", "ThermostatSetpoint:ThermalComfort:Pierce:SingleHeatingOrCooling", "ThermostatSetpoint:ThermalComfort:Pierce:DualSetpoint", "ThermostatSetpoint:ThermalComfort:KSU:SingleHeating", "ThermostatSetpoint:ThermalComfort:KSU:SingleCooling", "ThermostatSetpoint:ThermalComfort:KSU:SingleHeatingOrCooling", "ThermostatSetpoint:ThermalComfort:KSU:DualSetpoint" } );
+	Array1D_string const ValidComfortControlTypes( 12, { "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating", "ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling", "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling", "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint", "ThermostatSetpoint:ThermalComfort:Pierce:SingleHeating", "ThermostatSetpoint:ThermalComfort:Pierce:SingleCooling", "ThermostatSetpoint:ThermalComfort:Pierce:SingleHeatingOrCooling", "ThermostatSetpoint:ThermalComfort:Pierce:DualSetpoint", "ThermostatSetpoint:ThermalComfort:KSU:SingleHeating", "ThermostatSetpoint:ThermalComfort:KSU:SingleCooling", "ThermostatSetpoint:ThermalComfort:KSU:SingleHeatingOrCooling", "ThermostatSetpoint:ThermalComfort:KSU:DualSetpoint" } );
 
-	FArray1D_string const cZControlTypes( 6, { "ZoneControl:Thermostat", "ZoneControl:Thermostat:ThermalComfort", "ZoneControl:Thermostat:OperativeTemperature", "ZoneControl:Humidistat", "ZoneControl:Thermostat:TemperatureAndHumidity", "ZoneControl:Thermostat:StagedDualSetpoint" } );
+	Array1D_string const cZControlTypes( 6, { "ZoneControl:Thermostat", "ZoneControl:Thermostat:ThermalComfort", "ZoneControl:Thermostat:OperativeTemperature", "ZoneControl:Humidistat", "ZoneControl:Thermostat:TemperatureAndHumidity", "ZoneControl:Thermostat:StagedDualSetpoint" } );
 
 	int const iZC_TStat( 1 );
 	int const iZC_TCTStat( 2 );
@@ -109,7 +109,7 @@ namespace ZoneTempPredictorCorrector {
 	int const iZC_HStat( 4 );
 	int const iZC_TandHStat( 5 );
 	int const iZC_StagedDual( 6 );
-	FArray1D_int const iZControlTypes( 6, { iZC_TStat, iZC_TCTStat, iZC_OTTStat, iZC_HStat, iZC_TandHStat, iZC_StagedDual } );
+	Array1D_int const iZControlTypes( 6, { iZC_TStat, iZC_TCTStat, iZC_OTTStat, iZC_HStat, iZC_TandHStat, iZC_StagedDual } );
 
 	int const SglHeatSetPoint( 1 );
 	int const SglCoolSetPoint( 2 );
@@ -157,27 +157,27 @@ namespace ZoneTempPredictorCorrector {
 	// Number of zone with staged controlled objects
 	int NumStageCtrZone( 0 );
 
-	FArray1D< Real64 > ZoneSetPointLast;
-	FArray1D< Real64 > TempIndZnLd;
-	FArray1D< Real64 > TempDepZnLd;
-	FArray1D< Real64 > ZoneAirRelHum; // Zone relative humidity in percent
+	Array1D< Real64 > ZoneSetPointLast;
+	Array1D< Real64 > TempIndZnLd;
+	Array1D< Real64 > TempDepZnLd;
+	Array1D< Real64 > ZoneAirRelHum; // Zone relative humidity in percent
 
 	// Zone temperature history - used only for oscillation test
-	FArray2D< Real64 > ZoneTempHist;
-	FArray1D< Real64 > ZoneTempOscillate;
+	Array2D< Real64 > ZoneTempHist;
+	Array1D< Real64 > ZoneTempOscillate;
 	Real64 AnyZoneTempOscillate;
 
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
-	FArray1D< ZoneTempControlType > SetPointSingleHeating;
-	FArray1D< ZoneTempControlType > SetPointSingleCooling;
-	FArray1D< ZoneTempControlType > SetPointSingleHeatCool;
-	FArray1D< ZoneTempControlType > SetPointDualHeatCool;
-	FArray1D< ZoneComfortFangerControlType > SetPointSingleHeatingFanger;
-	FArray1D< ZoneComfortFangerControlType > SetPointSingleCoolingFanger;
-	FArray1D< ZoneComfortFangerControlType > SetPointSingleHeatCoolFanger;
-	FArray1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
+	Array1D< ZoneTempControlType > SetPointSingleHeating;
+	Array1D< ZoneTempControlType > SetPointSingleCooling;
+	Array1D< ZoneTempControlType > SetPointSingleHeatCool;
+	Array1D< ZoneTempControlType > SetPointDualHeatCool;
+	Array1D< ZoneComfortFangerControlType > SetPointSingleHeatingFanger;
+	Array1D< ZoneComfortFangerControlType > SetPointSingleCoolingFanger;
+	Array1D< ZoneComfortFangerControlType > SetPointSingleHeatCoolFanger;
+	Array1D< ZoneComfortFangerControlType > SetPointDualHeatCoolFanger;
 
 	// Functions
 
@@ -347,8 +347,8 @@ namespace ZoneTempPredictorCorrector {
 		int NumStageControlledZones; // Number of staged controlled objects
 		int StageControlledZoneNum; // Index for staged controlled zones
 
-		FArray1D_int CTSchedMapToControlledZone;
-		FArray1D_int CCmSchedMapToControlledZone;
+		Array1D_int CTSchedMapToControlledZone;
+		Array1D_int CCmSchedMapToControlledZone;
 		int Item;
 		int Item1;
 		int ZLItem;
@@ -356,8 +356,8 @@ namespace ZoneTempPredictorCorrector {
 		struct NeededControlTypes
 		{
 			// Members
-			FArray1D_bool MustHave; // 4= the four control types
-			FArray1D_bool DidHave;
+			Array1D_bool MustHave; // 4= the four control types
+			Array1D_bool DidHave;
 
 			// Default Constructor
 			NeededControlTypes() :
@@ -367,8 +367,8 @@ namespace ZoneTempPredictorCorrector {
 
 			// Member Constructor
 			NeededControlTypes(
-				FArray1_bool const & MustHave, // 4= the four control types
-				FArray1_bool const & DidHave
+				Array1_bool const & MustHave, // 4= the four control types
+				Array1_bool const & DidHave
 			) :
 				MustHave( 4, MustHave ),
 				DidHave( 4, DidHave )
@@ -379,8 +379,8 @@ namespace ZoneTempPredictorCorrector {
 		struct NeededComfortControlTypes
 		{
 			// Members
-			FArray1D_bool MustHave; // 4= the four control types
-			FArray1D_bool DidHave;
+			Array1D_bool MustHave; // 4= the four control types
+			Array1D_bool DidHave;
 
 			// Default Constructor
 			NeededComfortControlTypes() :
@@ -390,8 +390,8 @@ namespace ZoneTempPredictorCorrector {
 
 			// Member Constructor
 			NeededComfortControlTypes(
-				FArray1_bool const & MustHave, // 4= the four control types
-				FArray1_bool const & DidHave
+				Array1_bool const & MustHave, // 4= the four control types
+				Array1_bool const & DidHave
 			) :
 				MustHave( 12, MustHave ),
 				DidHave( 12, DidHave )
@@ -400,8 +400,8 @@ namespace ZoneTempPredictorCorrector {
 		};
 
 		// Object Data
-		FArray1D< NeededControlTypes > TStatControlTypes;
-		FArray1D< NeededComfortControlTypes > TComfortControlTypes;
+		Array1D< NeededControlTypes > TStatControlTypes;
+		Array1D< NeededComfortControlTypes > TComfortControlTypes;
 
 		// Formats
 		static gio::Fmt Format_700( "('! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, ','Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier')" );
@@ -2744,7 +2744,7 @@ namespace ZoneTempPredictorCorrector {
 		int SetPointTempSchedIndexCold;
 		int SchedNameIndex;
 		int SchedTypeIndex;
-		FArray2D< Real64 > DaySPValues; // Day room temp setpoint values - for optimum start
+		Array2D< Real64 > DaySPValues; // Day room temp setpoint values - for optimum start
 		Real64 OccRoomSP; // Occupied room temp set point - for optimum start
 		int OccStartTime; // Occupancy start time - for optimum start
 
@@ -5620,7 +5620,7 @@ namespace ZoneTempPredictorCorrector {
 		Real64 PMVResult; // Calculated PMV value
 		Real64 PMVMin; // Minimum allowed PMV value
 		Real64 PMVMax; // Calculated PMV value
-		FArray1D< Real64 > Par( 2 ); // Passed parameter for RegularFalsi function
+		Array1D< Real64 > Par( 2 ); // Passed parameter for RegularFalsi function
 		int SolFla; // feed back flag from SolveRegulaFalsi
 		static int IterLimitExceededNum1( 0 );
 		static int IterLimitErrIndex1( 0 );
@@ -5668,7 +5668,7 @@ namespace ZoneTempPredictorCorrector {
 	Real64
 	PMVResidual(
 		Real64 const Tset,
-		FArray1< Real64 > const & Par // par(1) = PMV set point
+		Array1< Real64 > const & Par // par(1) = PMV set point
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -5788,7 +5788,7 @@ namespace ZoneTempPredictorCorrector {
 
 	//     NOTICE
 
-	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

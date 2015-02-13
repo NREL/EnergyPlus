@@ -3,8 +3,8 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
@@ -121,21 +121,21 @@ namespace DElightManagerF {
 		Real64 Xb; // temp var for transformation calc
 		Real64 Yb; // temp var for transformation calc
 		Real64 rTotalZoneFraction; // Zone Fraction sum for all RefPts in each Zone
-		FArray1D< Real64 > RefPt_WCS_Coord( 3 );
-		FArray1D_string AlphaArrayDElight( 2 );
-		FArray1D< Real64 > RealNumArrayDElight( 6 );
+		Array1D< Real64 > RefPt_WCS_Coord( 3 );
+		Array1D_string AlphaArrayDElight( 2 );
+		Array1D< Real64 > RealNumArrayDElight( 6 );
 		int IOSTAT;
 		int NumAlphasDElight;
 		int NumNumsDElight;
-		FArray1D_string AlphaArrayCFS( 4 );
-		FArray1D< Real64 > RealNumArrayCFS( 1 );
+		Array1D_string AlphaArrayCFS( 4 );
+		Array1D< Real64 > RealNumArrayCFS( 1 );
 		int NumAlphasCFS;
 		int NumNumsCFS;
-		FArray1D_string AlphaArrayRefPt( 2 );
-		FArray1D< Real64 > RealNumArrayRefPt( 5 );
+		Array1D_string AlphaArrayRefPt( 2 );
+		Array1D< Real64 > RealNumArrayRefPt( 5 );
 		int NumAlphasRefPt;
 		int NumNumsRefPt;
-		FArray1D_int iWndoConstIndexes( 100 );
+		Array1D_int iWndoConstIndexes( 100 );
 		bool lWndoConstFound; // Flag for non-unique window const index
 		std::string cNameWOBlanks; // Name without blanks
 		bool ErrorsFound;
@@ -736,8 +736,8 @@ namespace DElightManagerF {
 		static std::string const CurrentModuleObject( "GeometryTransform" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string cAlphas( 1 );
-		FArray1D< Real64 > rNumerics( 2 );
+		Array1D_string cAlphas( 1 );
+		Array1D< Real64 > rNumerics( 2 );
 		int NAlphas;
 		int NNum;
 		int IOStat;

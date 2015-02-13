@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -146,7 +146,7 @@ namespace VariableSpeedCoils {
 	//SHR, bypass factor routines
 
 	// Object Data
-	FArray1D< VariableSpeedCoilData > VarSpeedCoil;
+	Array1D< VariableSpeedCoilData > VarSpeedCoil;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -337,12 +337,12 @@ namespace VariableSpeedCoils {
 		bool errFlag;
 		Real64 CurveVal; // Used to verify modifier curves equal 1 at rated conditions
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string AlphArray; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > NumArray; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string AlphArray; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > NumArray; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		NumCool = GetNumObjectsFound( "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" );
 		NumHeat = GetNumObjectsFound( "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" );
@@ -1989,9 +1989,9 @@ namespace VariableSpeedCoils {
 		int AirInletNode; // Node Number of the air inlet
 		int WaterInletNode; // Node Number of the Water inlet
 		static bool MyOneTimeFlag( true ); // one time allocation flag
-		static FArray1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
-		static FArray1D_bool MySizeFlag; // used for sizing PTHP inputs one time
-		static FArray1D_bool MyPlantScanFlag;
+		static Array1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
+		static Array1D_bool MySizeFlag; // used for sizing PTHP inputs one time
+		static Array1D_bool MyPlantScanFlag;
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
 		int SpeedCal; // calculated speed level
@@ -3403,7 +3403,7 @@ namespace VariableSpeedCoils {
 			RuntimeFrac = VarSpeedCoil( DXCoilNum ).RunFrac;
 		}
 
-		LOOP: while ( true ) {
+		while ( true ) {
 			++NumIteration;
 			if ( NumIteration == 1 ) {
 				//Set indoor air conditions to the rated conditions
@@ -3554,7 +3554,6 @@ namespace VariableSpeedCoils {
 				SHReff = QSensible / QLoadTotal;
 				goto LOOP_exit;
 			}
-			LOOP_loop: ;
 		}
 		LOOP_exit: ;
 

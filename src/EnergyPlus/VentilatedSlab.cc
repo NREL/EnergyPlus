@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -143,27 +143,27 @@ namespace VentilatedSlab {
 	bool HCoilOn( false ); // TRUE if the heating coil (gas or electric especially) should be running
 	int NumOfVentSlabs( 0 ); // Number of ventilated slab in the input file
 	Real64 OAMassFlowRate( 0.0 ); // Outside air mass flow rate for the ventilated slab
-	FArray1D_double QRadSysSrcAvg; // Average source over the time step for a particular radiant surfaceD
-	FArray1D< Real64 > ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+	Array1D_double QRadSysSrcAvg; // Average source over the time step for a particular radiant surfaceD
+	Array1D< Real64 > ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
 	int MaxCloNumOfSurfaces( 0 ); // Used to set allocate size in CalcClo routine
 	Real64 QZnReq( 0.0 ); // heating or cooling needed by system [watts]
 
 	// Record keeping variables used to calculate QRadSysSrcAvg locally
 
-	FArray1D_double LastQRadSysSrc; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
-	FArray1D_bool CheckEquipName;
+	Array1D_double LastQRadSysSrc; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+	Array1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
+	Array1D_bool CheckEquipName;
 
 	// Autosizing variables
-	FArray1D_bool MySizeFlag;
+	Array1D_bool MySizeFlag;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE VentilatedSlab
 	// PRIVATE UpdateVentilatedSlabValAvg
 
 	// Object Data
-	FArray1D< VentilatedSlabData > VentSlab;
-	FArray1D< VentSlabNumericFieldData > VentSlabNumericFields;
+	Array1D< VentilatedSlabData > VentSlab;
+	Array1D< VentSlabNumericFieldData > VentSlabNumericFields;
 
 	// Functions
 
@@ -343,12 +343,12 @@ namespace VentilatedSlab {
 		//unused0309  INTEGER                         :: NumOfSurfListVB  ! Number of surface lists in the user input file
 		int SurfNum; // DO loop counter for surfaces
 		bool IsValid; // Set for outside air node check
-		FArray1D_string cAlphaArgs; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > rNumericArgs; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string cAlphaArgs; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > rNumericArgs; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		bool SteamMessageNeeded;
 
 		// FLOW:
@@ -1125,9 +1125,9 @@ namespace VentilatedSlab {
 		int ColdConNode; // cold water control node number in Ventilated Slab loop
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
-		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MyPlantScanFlag;
-		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+		static Array1D_bool MyEnvrnFlag;
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		int HotConNode; // hot water control node number in Ventilated Slab loop
 		int InNode; // inlet node number in Ventilated Slab loop
 		int OutNode; // outlet node number in Ventilated Slab loop
@@ -2967,7 +2967,7 @@ namespace VentilatedSlab {
 		//unused0309  REAL(r64):: CoreNumber
 		static Real64 Ckj; // Coefficients for individual surfaces within a radiant system
 		static Real64 Cmj;
-		static FArray1D< Real64 > AirTempOut; // Array of outlet air temperatures for each surface in the radiant system
+		static Array1D< Real64 > AirTempOut; // Array of outlet air temperatures for each surface in the radiant system
 		int FanOutletNode; // unit air outlet node
 		int OAInletNode; // unit air outlet node
 		int MixoutNode; // unit air outlet node
@@ -3828,10 +3828,10 @@ namespace VentilatedSlab {
 		Real64 const MaxLaminarRe( 2300.0 ); // Maximum Reynolds number for laminar flow
 		int const NumOfPropDivisions( 13 );
 		Real64 const MaxExpPower( 50.0 ); // Maximum power after which EXP argument would be zero for DP variables
-		static FArray1D< Real64 > const Temps( NumOfPropDivisions, { 1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85 } ); // Temperature, in C
-		static FArray1D< Real64 > const Mu( NumOfPropDivisions, { 0.0000088, 0.0000176, 0.00001781, 0.00001802, 0.000018225, 0.00001843, 0.00001865, 0.00001887, 0.00001908, 0.00001929, 0.0000195, 0.00001971, 0.00001992 } ); // Viscosity, in Ns/m2
-		static FArray1D< Real64 > const Conductivity( NumOfPropDivisions, { 0.01275, 0.0255, 0.0258, 0.0261, 0.0264, 0.0267, 0.02705, 0.0274, 0.02775, 0.0281, 0.0284, 0.0287, 0.01435 } ); // Conductivity, in W/mK
-		static FArray1D< Real64 > const Pr( NumOfPropDivisions, 0.69 ); // Prandtl number (dimensionless)
+		static Array1D< Real64 > const Temps( NumOfPropDivisions, { 1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85 } ); // Temperature, in C
+		static Array1D< Real64 > const Mu( NumOfPropDivisions, { 0.0000088, 0.0000176, 0.00001781, 0.00001802, 0.000018225, 0.00001843, 0.00001865, 0.00001887, 0.00001908, 0.00001929, 0.0000195, 0.00001971, 0.00001992 } ); // Viscosity, in Ns/m2
+		static Array1D< Real64 > const Conductivity( NumOfPropDivisions, { 0.01275, 0.0255, 0.0258, 0.0261, 0.0264, 0.0267, 0.02705, 0.0274, 0.02775, 0.0281, 0.0284, 0.0287, 0.01435 } ); // Conductivity, in W/mK
+		static Array1D< Real64 > const Pr( NumOfPropDivisions, 0.69 ); // Prandtl number (dimensionless)
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

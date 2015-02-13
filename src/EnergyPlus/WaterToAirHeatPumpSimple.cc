@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -92,8 +92,8 @@ namespace WaterToAirHeatPumpSimple {
 	//INTEGER        :: WaterIndex = 0                   ! Water index
 	//INTEGER        :: Count = 0
 	bool GetCoilsInputFlag( true ); // Flag set to make sure you get input once
-	FArray1D_bool MySizeFlag;
-	FArray1D_bool SimpleHPTimeStepFlag; // determines whether the previous operating mode for the coil and it's partner has been initialized
+	Array1D_bool MySizeFlag;
+	Array1D_bool SimpleHPTimeStepFlag; // determines whether the previous operating mode for the coil and it's partner has been initialized
 
 	Real64 SourceSideMassFlowRate( 0.0 ); // Source Side Mass flow rate [Kg/s]
 	Real64 SourceSideInletTemp( 0.0 ); // Source Side Inlet Temperature [C]
@@ -128,7 +128,7 @@ namespace WaterToAirHeatPumpSimple {
 	// Utility routines
 
 	// Object Data
-	FArray1D< SimpleWatertoAirHPConditions > SimpleWatertoAirHP;
+	Array1D< SimpleWatertoAirHPConditions > SimpleWatertoAirHP;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -320,12 +320,12 @@ namespace WaterToAirHeatPumpSimple {
 		bool IsBlank; // Flag for blank name
 		bool errFlag;
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string AlphArray; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > NumArray; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string AlphArray; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > NumArray; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		NumCool = GetNumObjectsFound( "Coil:Cooling:WaterToAirHeatPump:EquationFit" );
 		NumHeat = GetNumObjectsFound( "Coil:Heating:WaterToAirHeatPump:EquationFit" );
@@ -594,7 +594,7 @@ namespace WaterToAirHeatPumpSimple {
 		using PlantUtilities::SetComponentFlowRate;
 
 		// Locals
-		static FArray1D_bool MySizeFlag; // used for sizing PTHP inputs one time
+		static Array1D_bool MySizeFlag; // used for sizing PTHP inputs one time
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -613,8 +613,8 @@ namespace WaterToAirHeatPumpSimple {
 		int AirInletNode; // Node Number of the air inlet
 		int WaterInletNode; // Node Number of the Water inlet
 		static bool MyOneTimeFlag( true ); // one time allocation flag
-		static FArray1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
-		static FArray1D_bool MyPlantScanFlag;
+		static Array1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
+		static Array1D_bool MyPlantScanFlag;
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
 		bool errFlag;
@@ -1782,7 +1782,7 @@ namespace WaterToAirHeatPumpSimple {
 		LoadSideInletEnth_Unit = SimpleWatertoAirHP( HPNum ).InletAirEnthalpy;
 		CpAir_Unit = PsyCpAirFnWTdb( LoadSideInletHumRat_Unit, LoadSideInletDBTemp_Unit );
 
-		LOOP: while ( true ) {
+		while ( true ) {
 			++NumIteration;
 			if ( NumIteration == 1 ) {
 				//Set indoor air conditions to the rated conditions
@@ -1831,16 +1831,14 @@ namespace WaterToAirHeatPumpSimple {
 					SHReff = CalcEffectiveSHR( HPNum, SHRss, CyclingScheme, RuntimeFrac, QLatRated, QLatActual, LoadSideInletDBTemp, LoadSideInletWBTemp );
 					//       Update sensible capacity based on effective SHR
 					QSensible = QLoadTotal * SHReff;
-					goto LOOP_exit;
+					break;
 				}
 			} else {
 				//Assume SHReff=SHRss
 				SHReff = QSensible / QLoadTotal;
-				goto LOOP_exit;
+				break;
 			}
-			LOOP_loop: ;
 		}
-		LOOP_exit: ;
 
 		//calculate coil outlet state variables
 		LoadSideOutletEnth = LoadSideInletEnth - QLoadTotal / LoadSideMassFlowRate;

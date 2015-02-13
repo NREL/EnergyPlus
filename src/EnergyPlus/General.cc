@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -74,10 +74,10 @@ namespace General {
 		int const MaxIte, // maximum number of allowed iterations
 		int & Flag, // integer storing exit status
 		Real64 & XRes, // value of x that solves f(x,Par) = 0
-		std::function< Real64( Real64 const, FArray1< Real64 > const & ) > f,
+		std::function< Real64( Real64 const, Array1< Real64 > const & ) > f,
 		Real64 const X_0, // 1st bound of interval that contains the solution
 		Real64 const X_1, // 2nd bound of interval that contains the solution
-		FArray1< Real64 > const & Par // array with additional parameters used for function evaluation
+		Array1< Real64 > const & Par // array with additional parameters used for function evaluation
 	)
 	{
 
@@ -386,7 +386,7 @@ namespace General {
 	Real64
 	InterpBlind(
 		Real64 const ProfAng, // Profile angle (rad)
-		FArray1A< Real64 > const PropArray // Array of blind properties
+		Array1A< Real64 > const PropArray // Array of blind properties
 	)
 	{
 
@@ -444,7 +444,7 @@ namespace General {
 	Real64
 	InterpProfAng(
 		Real64 const ProfAng, // Profile angle (rad)
-		FArray1S< Real64 > const PropArray // Array of blind properties
+		Array1S< Real64 > const PropArray // Array of blind properties
 	)
 	{
 
@@ -494,7 +494,7 @@ namespace General {
 //	InterpSlatAng(
 //		Real64 const SlatAng, // Slat angle (rad)
 //		bool const VarSlats, // True if slat angle is variable
-//		FArray1A< Real64 > const PropArray // Array of blind properties as function of slat angle
+//		Array1A< Real64 > const PropArray // Array of blind properties as function of slat angle
 //	)
 //	{
 //
@@ -560,7 +560,7 @@ namespace General {
 	InterpSlatAng(
 		Real64 const SlatAng, // Slat angle (rad)
 		bool const VarSlats, // True if slat angle is variable
-		FArray1S< Real64 > const PropArray // Array of blind properties as function of slat angle
+		Array1S< Real64 > const PropArray // Array of blind properties as function of slat angle
 	)
 	{
 
@@ -623,7 +623,7 @@ namespace General {
 		Real64 const ProfAng, // Profile angle (rad)
 		Real64 const SlatAng, // Slat angle (rad)
 		bool const VarSlats, // True if variable-angle slats
-		FArray2A< Real64 > const PropArray // Array of blind properties
+		Array2A< Real64 > const PropArray // Array of blind properties
 	)
 	{
 
@@ -781,7 +781,7 @@ namespace General {
 	Real64
 	POLYF(
 		Real64 const X, // Cosine of angle of incidence
-		FArray1A< Real64 > const A // Polynomial coefficients
+		Array1A< Real64 > const A // Polynomial coefficients
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -836,7 +836,7 @@ namespace General {
 	Real64
 	POLYF(
 		Real64 const X, // Cosine of angle of incidence
-		FArray1< Real64 > const & A // Polynomial coefficients
+		Array1< Real64 > const & A // Polynomial coefficients
 	)
 	{
 		// Return value
@@ -853,7 +853,7 @@ namespace General {
 	Real64
 	POLYF(
 		Real64 const X, // Cosine of angle of incidence
-		FArray1S< Real64 > const & A // Polynomial coefficients
+		Array1S< Real64 > const & A // Polynomial coefficients
 	)
 	{
 		// Return value
@@ -870,7 +870,7 @@ namespace General {
 	Real64
 	POLY1F(
 		Real64 & X, // independent variable
-		FArray1A< Real64 > A, // array of polynomial coefficients
+		Array1A< Real64 > A, // array of polynomial coefficients
 		int & N // number of terms in polynomial
 	)
 	{
@@ -930,7 +930,7 @@ namespace General {
 	Real64
 	POLY2F(
 		Real64 & X, // independent variable
-		FArray1A< Real64 > A, // array of polynomial coefficients
+		Array1A< Real64 > A, // array of polynomial coefficients
 		int & N // number of terms in polynomial
 	)
 	{
@@ -1408,10 +1408,10 @@ namespace General {
 
 	void
 	MovingAvg(
-		FArray1A< Real64 > const DataIn, // input data that needs smoothing
+		Array1A< Real64 > const DataIn, // input data that needs smoothing
 		int const NumDataItems, // number of values in DataIn
 		int const NumItemsInAvg, // number of items in the averaging window
-		FArray1A< Real64 > SmoothedData // output data after smoothing
+		Array1A< Real64 > SmoothedData // output data after smoothing
 	)
 	{
 
@@ -1449,7 +1449,7 @@ namespace General {
 		// DERIVED TYPE DEFINITIONS
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > TempData( 3 * NumDataItems ); // a scratch array
+		Array1D< Real64 > TempData( 3 * NumDataItems ); // a scratch array
 
 		for ( int i = 1; i <= NumDataItems; ++i ) {
 			TempData( i ) = TempData( NumDataItems + i ) = TempData( 2 * NumDataItems + i ) = DataIn( i );
@@ -1592,11 +1592,11 @@ namespace General {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static int const NumSingleChars( 3 );
-		static FArray1D_string const SingleChars( NumSingleChars, { "/", ":", "-" } );
+		static Array1D_string const SingleChars( NumSingleChars, { "/", ":", "-" } );
 		static int const NumDoubleChars( 6 );
-		static FArray1D_string const DoubleChars( NumDoubleChars, { "ST ", "ND ", "RD ", "TH ", "OF ", "IN " } ); // Need trailing spaces: Want thse only at end of words
-		static FArray1D_string const Months( 12, { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" } );
-		static FArray1D_string const Weekdays( 7, { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" } );
+		static Array1D_string const DoubleChars( NumDoubleChars, { "ST ", "ND ", "RD ", "TH ", "OF ", "IN " } ); // Need trailing spaces: Want thse only at end of words
+		static Array1D_string const Months( 12, { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" } );
+		static Array1D_string const Weekdays( 7, { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" } );
 		static std::string const Numbers( "0123456789" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -1609,7 +1609,7 @@ namespace General {
 		std::string CurrentString;
 		std::string::size_type Pos;
 		int Loop;
-		FArray1D_string Fields( 3 );
+		Array1D_string Fields( 3 );
 		int NumField1;
 		int NumField2;
 		int NumField3;
@@ -1807,7 +1807,7 @@ namespace General {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_int const EndMonthDay( 12, { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 } );
+		static Array1D_int const EndMonthDay( 12, { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 } );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1876,7 +1876,7 @@ namespace General {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_int EndDayofMonth( 12, { 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 } );
+		static Array1D_int EndDayofMonth( 12, { 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 } );
 		// End day numbers of each month (without Leap Year)
 
 		if ( Month == 1 ) {
@@ -1933,7 +1933,7 @@ namespace General {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_int const EndOfMonth( {0,12}, { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 } );
+		static Array1D_int const EndOfMonth( {0,12}, { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 } );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2198,8 +2198,8 @@ namespace General {
 
 	void
 	Invert3By3Matrix(
-		FArray2A< Real64 > const A, // Input 3X3 Matrix
-		FArray2A< Real64 > InverseA // Output 3X3 Matrix - Inverse Of A
+		Array2A< Real64 > const A, // Input 3X3 Matrix
+		Array2A< Real64 > InverseA // Output 3X3 Matrix - Inverse Of A
 	)
 	{
 
@@ -2357,7 +2357,7 @@ namespace General {
 	int
 	FindNumberInList(
 		int const WhichNumber,
-		FArray1A_int const ListOfItems,
+		Array1A_int const ListOfItems,
 		int const NumItems
 	)
 	{
@@ -2386,7 +2386,7 @@ namespace General {
 		int FindNumberInList;
 
 		// Argument array dimensioning
-		ListOfItems.dim( star );
+		ListOfItems.dim( _ );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3359,7 +3359,7 @@ namespace General {
 		std::string const & ZoneName, // Zone Name associated
 		std::string::size_type const MaxZoneNameLength, // maximum length of zonelist zone names
 		std::string const & ItemName, // Item name (People, Lights, etc object)
-		FArray1S_string const ItemNames, // Item Names to check for duplication
+		Array1S_string const ItemNames, // Item Names to check for duplication
 		int const NumItems, // Number of items in ItemNames array
 		std::string & ResultName, // Resultant name
 		bool & errFlag // Error flag set to true if error found here.

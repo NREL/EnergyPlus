@@ -4,7 +4,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/floops.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
@@ -175,10 +175,10 @@ namespace WaterThermalTanks {
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE TYPE DECLARATIONS:
-	FArray1D_bool ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
-	FArray1D_bool MyHPSizeFlag; // Used to report autosize info in Init
-	FArray1D_bool CheckWTTEquipName;
-	FArray1D_bool CheckHPWHEquipName;
+	Array1D_bool ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
+	Array1D_bool MyHPSizeFlag; // Used to report autosize info in Init
+	Array1D_bool CheckWTTEquipName;
+	Array1D_bool CheckHPWHEquipName;
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumChilledWaterMixed( 0 ); // number of mixed chilled water tanks
@@ -195,14 +195,14 @@ namespace WaterThermalTanks {
 	Real64 MixerInletAirSchedule( 0.0 ); // output of inlet air mixer node schedule
 	Real64 MdotAir( 0.0 ); // mass flow rate of evaporator air, kg/s
 	int NumWaterHeaterSizing( 0 ); // Number of sizing/design objects for water heaters.
-	FArray1D_bool AlreadyRated; // control so we don't repeat again
+	Array1D_bool AlreadyRated; // control so we don't repeat again
 
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
-	FArray1D< WaterThermalTankData > WaterThermalTank;
-	FArray1D< HeatPumpWaterHeaterData > HPWaterHeater;
-	FArray1D< WaterHeaterDesuperheaterData > WaterHeaterDesuperheater;
+	Array1D< WaterThermalTankData > WaterThermalTank;
+	Array1D< HeatPumpWaterHeaterData > HPWaterHeater;
+	Array1D< WaterHeaterDesuperheaterData > WaterHeaterDesuperheater;
 
 	static gio::Fmt fmtLD( "*" );
 
@@ -254,10 +254,10 @@ namespace WaterThermalTanks {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool OneTimeSetupFlag( true );
-		static FArray1D_bool MyOneTimeFlagWH; // first pass log
-		static FArray1D_bool MyTwoTimeFlagWH; // second pass do input check
-		static FArray1D_bool MyOneTimeFlagHP; // first pass log
-		static FArray1D_bool MyTwoTimeFlagHP; // second pass do input check
+		static Array1D_bool MyOneTimeFlagWH; // first pass log
+		static Array1D_bool MyTwoTimeFlagWH; // second pass do input check
+		static Array1D_bool MyOneTimeFlagHP; // first pass log
+		static Array1D_bool MyTwoTimeFlagHP; // second pass do input check
 		int tmpLoopNum;
 		int tmpLoopSideNum;
 		int CompNum;
@@ -911,9 +911,9 @@ namespace WaterThermalTanks {
 		};
 
 		// Object Data
-		FArray1D< WaterHeaterSaveNodes > HPWHSaveNodeNames; // temporary for HPWH node names used in later checks
-		FArray1D< WaterHeaterSaveNodes > WHSaveNodeNames; // temporary for WH node names used in later checks
-		FArray1D< WaterHeaterSaveNodes > CoilSaveNodeNames; // temporary for coil node names used in later checks
+		Array1D< WaterHeaterSaveNodes > HPWHSaveNodeNames; // temporary for HPWH node names used in later checks
+		Array1D< WaterHeaterSaveNodes > WHSaveNodeNames; // temporary for WH node names used in later checks
+		Array1D< WaterHeaterSaveNodes > CoilSaveNodeNames; // temporary for coil node names used in later checks
 
 		// Formats
 		static gio::Fmt Format_720( "('! <Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},Standard Rated Recovery Efficiency, ','Standard Rated Energy Factor')" );
@@ -4242,10 +4242,10 @@ namespace WaterThermalTanks {
 		//  LOGICAL,SAVE        :: ZoneEquipmentListChecked = .FALSE.  ! True after the Zone Equipment List has been checked for items
 		//  Integer             :: Loop
 		static bool InitWaterThermalTanksOnce( true ); // flag for 1 time initialization
-		static FArray1D_bool MyEnvrnFlag; // flag for init once at start of environment
-		static FArray1D_bool MyWarmupFlag; // flag for init after warmup complete
-		static FArray1D_bool SetLoopIndexFlag; // get loop number flag
-		static FArray1D_bool MySizingDoneFlag; // true if sizing is finished
+		static Array1D_bool MyEnvrnFlag; // flag for init once at start of environment
+		static Array1D_bool MyWarmupFlag; // flag for init after warmup complete
+		static Array1D_bool SetLoopIndexFlag; // get loop number flag
+		static Array1D_bool MySizingDoneFlag; // true if sizing is finished
 
 		static std::string const RoutineName( "InitWaterThermalTank" );
 		static std::string const GetWaterThermalTankInput( "GetWaterThermalTankInput" );
@@ -4963,8 +4963,8 @@ namespace WaterThermalTanks {
 		static int DummyWaterIndex( 1 );
 
 		// Reference to objects
-		WaterThermalTankData &Tank = WaterThermalTank( WaterThermalTankNum ); // Reference to the tank object to save typing
-		
+		WaterThermalTankData & Tank = WaterThermalTank( WaterThermalTankNum ); // Reference to the tank object to save typing
+
 		// FLOW:
 		TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
 
@@ -5049,21 +5049,21 @@ namespace WaterThermalTanks {
 
 		// Calculate the heating rate from the heat pump.
 		if ( Tank.HeatPumpNum > 0 ) {
-			HeatPumpWaterHeaterData const &HeatPump = HPWaterHeater(Tank.HeatPumpNum);
-			DataLoopNode::NodeData const &HPWHCondWaterInletNode = DataLoopNode::Node(HeatPump.CondWaterInletNode);
-			DataLoopNode::NodeData const &HPWHCondWaterOutletNode = DataLoopNode::Node(HeatPump.CondWaterOutletNode);
+			HeatPumpWaterHeaterData const & HeatPump = HPWaterHeater(Tank.HeatPumpNum);
+			DataLoopNode::NodeData const & HPWHCondWaterInletNode = DataLoopNode::Node(HeatPump.CondWaterInletNode);
+			DataLoopNode::NodeData const & HPWHCondWaterOutletNode = DataLoopNode::Node(HeatPump.CondWaterOutletNode);
 			HPWHCondenserDeltaT = HPWHCondWaterOutletNode.Temp - HPWHCondWaterInletNode.Temp;
 		} else {
 			HPWHCondenserDeltaT = 0.0;
 		}
 		assert( HPWHCondenserDeltaT >= 0 );
-		
+
 		CalcMixedTankSourceSideHeatTransferRate(HPWHCondenserDeltaT, SourceInletTemp, Cp, SetPointTemp,
 												SourceMassFlowRate, Qheatpump, Qsource);
-		
+
 		// Calculate steady-state use heat rate.
 		Quse = UseMassFlowRate * Cp * ( UseInletTemp - SetPointTemp );
-		
+
 		while ( TimeRemaining > 0.0 ) {
 
 			TimeNeeded = 0.0;
@@ -5315,7 +5315,7 @@ namespace WaterThermalTanks {
 
 			} else {
 				// No default
-				assert(0);
+				assert( false );
 			}}
 
 			deltaTsum = CalcTempIntegral( TankTemp, NewTankTemp, AmbientTemp, UseInletTemp, SourceInletTemp, TankMass, Cp, UseMassFlowRate, SourceMassFlowRate, LossCoeff, Qheat, TimeNeeded );
@@ -5427,13 +5427,13 @@ namespace WaterThermalTanks {
 		//		Date Written: January 2015
 		//		Modified: na
 		//		Re-engineered: na
-		
+
 		// Purpose of this function:
 		// Determines if the source side heat transfer is coming from a heat pump.
 		// If so it treats the source side heat transfer as a constant heat source
 		// If it is not coming from a heat pump it treats the source side heat transfer
 		// as a constant temperature.
-		
+
 		// Determine if the source side heating is coming from a heat pump.
 		Qheatpump = SourceMassFlowRate * Cp * HPWHCondenserDeltaT;
 		if ( Qheatpump > 0.0 ) {
@@ -5442,9 +5442,9 @@ namespace WaterThermalTanks {
 		} else {
 			Qsource = SourceMassFlowRate * Cp * ( SourceInletTemp - SetPointTemp );
 		}
-		
+
 	}
-	
+
 	Real64
 	CalcTimeNeeded(
 		Real64 const Ti, // Initial tank temperature (C)
@@ -5826,7 +5826,7 @@ namespace WaterThermalTanks {
 		Real64 HPWHCondenserDeltaT; // Temperature difference across the condenser for a heat pump water heater
 
 		// References
-		WaterThermalTankData &Tank = WaterThermalTank( WaterThermalTankNum ); // Tank object
+		WaterThermalTankData & Tank = WaterThermalTank( WaterThermalTankNum ); // Tank object
 
 		// FLOW:
 		TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
@@ -5858,9 +5858,9 @@ namespace WaterThermalTanks {
 
 		// Calculate the heating rate from the heat pump.
 		if ( Tank.HeatPumpNum > 0 ) {
-			HeatPumpWaterHeaterData const &HeatPump = HPWaterHeater(Tank.HeatPumpNum);
-			DataLoopNode::NodeData const &HPWHCondWaterInletNode = DataLoopNode::Node(HeatPump.CondWaterInletNode);
-			DataLoopNode::NodeData const &HPWHCondWaterOutletNode = DataLoopNode::Node(HeatPump.CondWaterOutletNode);
+			HeatPumpWaterHeaterData const & HeatPump = HPWaterHeater(Tank.HeatPumpNum);
+			DataLoopNode::NodeData const & HPWHCondWaterInletNode = DataLoopNode::Node(HeatPump.CondWaterInletNode);
+			DataLoopNode::NodeData const & HPWHCondWaterOutletNode = DataLoopNode::Node(HeatPump.CondWaterOutletNode);
 			HPWHCondenserDeltaT = HPWHCondWaterOutletNode.Temp - HPWHCondWaterInletNode.Temp;
 		} else {
 			HPWHCondenserDeltaT = 0.0;
@@ -5992,7 +5992,7 @@ namespace WaterThermalTanks {
 				// Heat transfer due to fluid flow entering an inlet node
 				Quse = UseMassFlowRate * Cp * ( UseInletTemp - NodeTemp );
 				Qsource = CalcStratifiedTankSourceSideHeatTransferRate(HPWHCondenserDeltaT, SourceInletTemp, Cp, SourceMassFlowRate, NodeTemp);
-				
+
 				InvMixUp = 0.0;
 				if ( NodeNum > 1 ) {
 					TempUp = Tank.Node( NodeNum - 1 ).Temp;
@@ -6153,7 +6153,7 @@ namespace WaterThermalTanks {
 		if ( Tank.AmbientTempZone > 0 ) WaterThermalTank( WaterThermalTankNum ).AmbientZoneGain = -Qlosszone - Qvent;
 
 	}
-	
+
 	Real64
 	CalcStratifiedTankSourceSideHeatTransferRate(
 		Real64 HPWHCondenserDeltaT, // input, The temperature difference (C) across the heat pump, zero if there is no heat pump or if the heat pump is off
@@ -6169,7 +6169,7 @@ namespace WaterThermalTanks {
 
 		// Purpose of this function:
 		// Calculates the source side heat transfer rate of a stratified tank.
-		
+
 		// Methodology:
 		// If the source side heat transfer is coming from a heat pump, then
 		Real64 Qsource;
@@ -6224,7 +6224,7 @@ namespace WaterThermalTanks {
 		Real64 MinDeltaTemp; // Smallest temperature difference found so far (delta C)
 
 		// References to objects
-		WaterThermalTankData &Tank = WaterThermalTank( WaterThermalTankNum );
+		WaterThermalTankData & Tank = WaterThermalTank( WaterThermalTankNum );
 
 		// FLOW:
 		NumNodes = Tank.Nodes;
@@ -6412,7 +6412,7 @@ namespace WaterThermalTanks {
 		int DesuperheaterNum; // Index to desuperheater
 		int SolFla; // Flag of RegulaFalsi solver
 		int SourceID; // Waste Heat Source ID number
-		FArray1D< Real64 > Par( 5 ); // Parameters passed to RegulaFalsi
+		Array1D< Real64 > Par( 5 ); // Parameters passed to RegulaFalsi
 		static Real64 MinTemp( 0.0 ); // used for error messages, C
 		std::string IterNum; // Max number of iterations for warning message
 
@@ -6830,7 +6830,7 @@ namespace WaterThermalTanks {
 		int OutletAirSplitterNode; // HP outlet air splitter node number
 		int DXCoilAirInletNode; // Inlet air node number of DX coil
 		int SolFla( 0 ); // Flag of RegulaFalsi solver
-		FArray1D< Real64 > Par( 5 ); // Parameters passed to RegulaFalsi
+		Array1D< Real64 > Par( 5 ); // Parameters passed to RegulaFalsi
 		Real64 HPMinTemp; // used for error messages, C
 		std::string HPMinTempChar; // used for error messages
 		std::string IterNum; // Max number of iterations for warning message
@@ -6839,10 +6839,10 @@ namespace WaterThermalTanks {
 		Real64 HPWHCondInletNodeLast; // Water temp sent from WH on last iteration
 		Real64 HPWaterInletNodeTempSaved; // Water temp saved from previous timestep
 		int loopIter; // iteration loop counter
-		
+
 		// References to objects used in this function
-		WaterThermalTankData &Tank = WaterThermalTank( WaterThermalTankNum );
-		HeatPumpWaterHeaterData &HeatPump = HPWaterHeater( Tank.HeatPumpNum );
+		WaterThermalTankData & Tank = WaterThermalTank( WaterThermalTankNum );
+		HeatPumpWaterHeaterData & HeatPump = HPWaterHeater( Tank.HeatPumpNum );
 
 		// FLOW:
 		// initialize local variables
@@ -6952,12 +6952,12 @@ namespace WaterThermalTanks {
 		{ auto const SELECT_CASE_var( HeatPump.Mode );
 		if ( SELECT_CASE_var == HeatMode ) {
 			// HPWH was heating last iteration and will continue to heat until the set point is reached
-			
+
 			HPPartLoadRatio = 1.0;
-			
+
 		} else if ( SELECT_CASE_var == FloatMode ) {
 			// HPWH was floating last iteration and will continue to float until the cut-in temperature is reached
-			
+
 			// set the condenser inlet node temperature and full mass flow rate prior to calling the HPWH DX coil
 			{ auto const SELECT_CASE_var1( HeatPump.TankTypeNum );
 			if ( SELECT_CASE_var1 == MixedWaterHeater ) {
@@ -7002,7 +7002,7 @@ namespace WaterThermalTanks {
 
 				// HPWH is now in heating mode
 				HeatPump.Mode = HeatMode;
-				
+
 				// Reset the water heater's mode (call above may have changed modes)
 				Tank.Mode = HeatPump.SaveWHMode;
 
@@ -7017,20 +7017,20 @@ namespace WaterThermalTanks {
 
 		} else {
 			// Never gets here, only allowed modes for HPWH are float and heat
-			assert(0);
+			assert( false );
 		}}
-		
+
 		// If the HPWH was in heating mode during the last timestep or if it was determined that
 		// heating would be needed during this timestep to maintain setpoint, do the heating calculation.
 		if ( HeatPump.Mode == HeatMode ) {
-			
+
 			// set up air flow on DX coil inlet node
 			Node( DXCoilAirInletNode ).MassFlowRate = MdotAir * HPPartLoadRatio;
 
 			// set the condenser inlet node mass flow rate prior to calling the CalcHPWHDXCoil
 			Node( HPWaterInletNode ).MassFlowRate = MdotWater * HPPartLoadRatio;
 			Tank.SourceMassFlowRate = MdotWater * HPPartLoadRatio;
-			
+
 			HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
 			HPWaterInletNodeTempSaved = Node( HPWaterInletNode ).Temp;
 			// This for loop is intended to iterate and converge on a condenser operating temperature so that the evaporator model correctly calculates performance.
@@ -7042,7 +7042,7 @@ namespace WaterThermalTanks {
 				// (possibly with an iteration loop to converge on a solution)
 				CondenserDeltaT = Node( HPWaterOutletNode ).Temp - Node( HPWaterInletNode ).Temp;
 				Tank.SourceInletTemp = HPWaterInletNodeTempSaved + CondenserDeltaT;
-				
+
 				// this CALL does not update node temps, must use WaterThermalTank variables
 				// select tank type
 				{ auto const SELECT_CASE_var1( HeatPump.TankTypeNum );
@@ -7057,7 +7057,7 @@ namespace WaterThermalTanks {
 				if ( std::abs( Node( HPWaterInletNode ).Temp - HPWHCondInletNodeLast ) < SmallTempDiff ) break;
 				HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
 			}
-			
+
 			// if tank temperature is greater than set point, calculate a PLR needed to exactly reach the set point
 			if ( NewTankTemp > SetPointTemp ) {
 				HeatPump.Mode = FloatMode;
@@ -7103,17 +7103,17 @@ namespace WaterThermalTanks {
 						}
 					}
 				}
-				
+
 				// Re-calculate the HPWH Coil to get the correct heat transfer rate.
 				Node( HPWaterInletNode ).Temp = Tank.SourceOutletTemp;
 				CalcHPWHDXCoil( HeatPump.DXCoilNum, HPPartLoadRatio );
-				
+
 			} else {
 				// Set the PLR to 1 if we're not going to reach setpoint during this timestep.
 				HPPartLoadRatio = 1.0;
 			}
 		}
-		
+
 		// set air-side mass flow rate for final calculation
 		if ( InletAirMixerNode > 0 ) {
 			Node( InletAirMixerNode ).MassFlowRate = MdotAir * HPPartLoadRatio;
@@ -7198,7 +7198,7 @@ namespace WaterThermalTanks {
 	Real64
 	PLRResidualMixedTank(
 		Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = HP set point temperature [C]
+		Array1< Real64 > const & Par // par(1) = HP set point temperature [C]
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -7262,7 +7262,7 @@ namespace WaterThermalTanks {
 	Real64
 	PLRResidualStratifiedTank(
 		Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = HP set point temperature [C]
+		Array1< Real64 > const & Par // par(1) = HP set point temperature [C]
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -9338,7 +9338,7 @@ namespace WaterThermalTanks {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeSetupFlag( true ); // one time setup flag
-		static FArray1D_bool AlreadyReported; // control so we don't repeat again
+		static Array1D_bool AlreadyReported; // control so we don't repeat again
 
 		// Formats
 		static gio::Fmt Format_728( "('Chilled Water Tank Information',5(',',A))" );
@@ -9425,7 +9425,7 @@ namespace WaterThermalTanks {
 
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

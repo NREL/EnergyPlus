@@ -4,7 +4,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -118,7 +118,7 @@ namespace ChillerElectricEIR {
 	Real64 ChillerFalseLoadRate( 0.0 ); // Chiller false load over and above the water-side load [W]
 	Real64 AvgCondSinkTemp( 0.0 ); // condenser temperature value for use in curves [C]
 
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	bool GetInputEIR( true ); // When TRUE, calls subroutine to read input file.
 
@@ -126,8 +126,8 @@ namespace ChillerElectricEIR {
 	//PUBLIC     SimEIRChillerHeatRecovery
 
 	// Object Data
-	FArray1D< ElectricEIRChillerSpecs > ElectricEIRChiller; // Dimension to number of machines
-	FArray1D< ReportEIRVars > ElectricEIRChillerReport;
+	Array1D< ElectricEIRChillerSpecs > ElectricEIRChiller; // Dimension to number of machines
+	Array1D< ReportEIRVars > ElectricEIRChillerReport;
 
 	// MODULE SUBROUTINES:
 
@@ -309,7 +309,7 @@ namespace ChillerElectricEIR {
 		Real64 CurveVal; // Used to verify EIR-FT and CAP-FT curves equal 1 at reference conditions
 		static bool FoundNegValue( false ); // Used to evaluate PLFFPLR curve objects
 		static int CurveCheck( 0 ); // Used to evaluate PLFFPLR curve objects
-		FArray1D< Real64 > CurveValArray( 11 ); // Used to evaluate PLFFPLR curve objects
+		Array1D< Real64 > CurveValArray( 11 ); // Used to evaluate PLFFPLR curve objects
 		Real64 CurveValTmp; // Used to evaluate PLFFPLR curve objects
 		bool errFlag; // Used to tell if a unique chiller name has been specified
 		std::string StringVar; // Used for EIRFPLR warning messages
@@ -811,8 +811,8 @@ namespace ChillerElectricEIR {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static std::string const RoutineName( "InitElectricEIRChiller" );
 		static bool MyOneTimeFlag( true ); // Flag used to execute code only once
-		static FArray1D_bool MyFlag; // TRUE in order to set component location
-		static FArray1D_bool MyEnvrnFlag; // TRUE when new environment is started
+		static Array1D_bool MyFlag; // TRUE in order to set component location
+		static Array1D_bool MyEnvrnFlag; // TRUE when new environment is started
 		int EvapInletNode; // Node number for evaporator water inlet node
 		int EvapOutletNode; // Node number for evaporator water outlet node
 		int CondInletNode; // Node number for condenser water inlet node
@@ -1095,7 +1095,7 @@ namespace ChillerElectricEIR {
 		Real64 tmpEvapVolFlowRate; // local evaporator design volume flow rate
 		Real64 tmpCondVolFlowRate; // local condenser design volume flow rate
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyFlag; // TRUE in order to calculate IPLV
+		static Array1D_bool MyFlag; // TRUE in order to calculate IPLV
 		bool IsAutoSize; // Indicator to autosize for reporting
 		Real64 EvapVolFlowRateUser; // Hardsized evaporator flow for reporting
 		Real64 RefCapUser; // Hardsized reference capacity for reporting

@@ -5,7 +5,7 @@
 #include <utility>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/floops.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
@@ -80,8 +80,8 @@ namespace PlantPipingSystemsManager {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	FArray1D_int NeighborFieldCells;
-	FArray1D_int NeighborBoundaryCells;
+	Array1D_int NeighborFieldCells;
+	Array1D_int NeighborBoundaryCells;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
 	// ************************************* !
@@ -1105,7 +1105,7 @@ namespace PlantPipingSystemsManager {
 			};
 
 			// Object Data
-			FArray1D< GroundDomainData > Domain( NumZoneCoupledDomains );
+			Array1D< GroundDomainData > Domain( NumZoneCoupledDomains );
 
 			// initialize these counters properly so they can be incremented within the DO loop
 			DomainCtr = StartingDomainNumForZone - 1;
@@ -1520,7 +1520,7 @@ namespace PlantPipingSystemsManager {
 		};
 
 		// Object Data
-		FArray1D< GroundDomainData > Domain( NumBasements );
+		Array1D< GroundDomainData > Domain( NumBasements );
 
 		// initialize these counters properly so they can be incremented within the DO loop
 		DomainNum = StartingDomainNumForBasement - 1;
@@ -2212,7 +2212,7 @@ namespace PlantPipingSystemsManager {
 		};
 
 		// Object Data
-		FArray1D< HorizontalTrenchData > HGHX( NumHorizontalTrenchesInInput );
+		Array1D< HorizontalTrenchData > HGHX( NumHorizontalTrenchesInInput );
 
 		// initialize these counters properly so they can be incremented within the DO loop
 		DomainCtr = StartingDomainNumForHorizontal - 1;
@@ -2899,7 +2899,7 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 
-	FArray1D_int
+	Array1D_int
 	GetSurfaceIndecesForOSCM(
 		int const OSCMIndex,
 		int const SurfCount
@@ -2925,7 +2925,7 @@ namespace PlantPipingSystemsManager {
 		using DataSurfaces::Surface;
 
 		// Return value
-		FArray1D_int RetVal( {1,SurfCount} );
+		Array1D_int RetVal( {1,SurfCount} );
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -2950,7 +2950,7 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 
-	FArray1D <ZoneCoupledSurfaceData>
+	Array1D <ZoneCoupledSurfaceData>
 		GetSurfaceDataForOSCM(
 		int const OSCMIndex,
 		int const SurfCount
@@ -2976,7 +2976,7 @@ namespace PlantPipingSystemsManager {
 			using DataSurfaces::Surface;
 
 			// Return value
-			FArray1D <ZoneCoupledSurfaceData> RetVal( { 1, SurfCount } );
+			Array1D <ZoneCoupledSurfaceData> RetVal( { 1, SurfCount } );
 
 			// Locals
 			// FUNCTION ARGUMENT DEFINITIONS:
@@ -3159,7 +3159,7 @@ namespace PlantPipingSystemsManager {
 
 	bool
 	MeshPartitionArray_Contains(
-		FArray1D< MeshPartition > const & meshes,
+		Array1D< MeshPartition > const & meshes,
 		Real64 const value
 	)
 	{
@@ -3259,7 +3259,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	void
-	MeshPartition_SelectionSort( FArray1< MeshPartition > & X )
+	MeshPartition_SelectionSort( Array1< MeshPartition > & X )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3278,7 +3278,7 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static FArray1D_int ISWAP( 1 );
+		static Array1D_int ISWAP( 1 );
 		int ISWAP1;
 
 		using std::swap;
@@ -4131,7 +4131,7 @@ namespace PlantPipingSystemsManager {
 
 	NeighborInformation
 	NeighborInformationArray_Value(
-		FArray1D< DirectionNeighbor_Dictionary > const & dict,
+		Array1D< DirectionNeighbor_Dictionary > const & dict,
 		int const Direction // From Enum: Direction
 	)
 	{
@@ -4370,9 +4370,9 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > XBoundaryPoints;
-		FArray1D< Real64 > YBoundaryPoints;
-		FArray1D< Real64 > ZBoundaryPoints;
+		Array1D< Real64 > XBoundaryPoints;
+		Array1D< Real64 > YBoundaryPoints;
+		Array1D< Real64 > ZBoundaryPoints;
 		int RegionListCount;
 		int BoundaryListCount;
 		bool XPartitionsExist;
@@ -4386,12 +4386,12 @@ namespace PlantPipingSystemsManager {
 		int MaxZIndex( 0 );
 
 		// Object Data
-		FArray1D< GridRegion > XPartitionRegions;
-		FArray1D< GridRegion > YPartitionRegions;
-		FArray1D< GridRegion > ZPartitionRegions;
-		FArray1D< GridRegion > XRegions;
-		FArray1D< GridRegion > YRegions;
-		FArray1D< GridRegion > ZRegions;
+		Array1D< GridRegion > XPartitionRegions;
+		Array1D< GridRegion > YPartitionRegions;
+		Array1D< GridRegion > ZPartitionRegions;
+		Array1D< GridRegion > XRegions;
+		Array1D< GridRegion > YRegions;
+		Array1D< GridRegion > ZRegions;
 
 		//'****** LAYOUT PARTITIONS ******'
 		CreatePartitionCenterList( DomainNum );
@@ -4560,7 +4560,7 @@ namespace PlantPipingSystemsManager {
 		Real64 InterfaceCellWidth( 0.008 );
 
 		// Object Data
-		FArray1D< MeshPartition > PreviousEntries;
+		Array1D< MeshPartition > PreviousEntries;
 		PipeSegmentInfo ThisSegment;
 
 		//'NOTE: pipe location y values have already been corrected to be measured from the bottom surface
@@ -5031,10 +5031,10 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 
-	FArray1D< GridRegion >
+	Array1D< GridRegion >
 	CreatePartitionRegionList(
 		int const DomainNum,
-		FArray1D< MeshPartition > const & ThesePartitionCenters,
+		Array1D< MeshPartition > const & ThesePartitionCenters,
 		bool const PartitionsExist,
 		Real64 const DirExtentMax,
 		int const PartitionsUBound
@@ -5060,7 +5060,7 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// Return value
-		FArray1D< GridRegion > ThesePartitionRegions( {0,PartitionsUBound} );
+		Array1D< GridRegion > ThesePartitionRegions( {0,PartitionsUBound} );
 
 		// Argument array dimensioning
 
@@ -5176,7 +5176,7 @@ namespace PlantPipingSystemsManager {
 
 	int
 	CreateRegionListCount(
-		FArray1D< GridRegion > const & ThesePartitionRegions,
+		Array1D< GridRegion > const & ThesePartitionRegions,
 		Real64 const DirExtentMax,
 		bool const PartitionsExist
 	)
@@ -5241,10 +5241,10 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 
-	FArray1D< GridRegion >
+	Array1D< GridRegion >
 	CreateRegionList(
 		int const DomainNum,
-		FArray1D< GridRegion > const & ThesePartitionRegions,
+		Array1D< GridRegion > const & ThesePartitionRegions,
 		Real64 const DirExtentMax,
 		int const DirDirection,
 		int const RetValUBound,
@@ -5282,7 +5282,7 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// Return value
-		FArray1D< GridRegion > RetVal( {0,RetValUBound} );
+		Array1D< GridRegion > RetVal( {0,RetValUBound} );
 
 		// Argument array dimensioning
 
@@ -5299,7 +5299,7 @@ namespace PlantPipingSystemsManager {
 		int NumCellWidths;
 
 		// Object Data
-		FArray1D< TempGridRegionData > TempRegions( {0,RetValUBound} );
+		Array1D< TempGridRegionData > TempRegions( {0,RetValUBound} );
 		GridRegion ThisRegion;
 		TempGridRegionData PreviousRegion;
 
@@ -5408,7 +5408,7 @@ namespace PlantPipingSystemsManager {
 
 	int
 	CreateBoundaryListCount(
-		FArray1D< GridRegion > const & RegionList,
+		Array1D< GridRegion > const & RegionList,
 		int const DirDirection
 	)
 	{
@@ -5476,9 +5476,9 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 
-	FArray1D< Real64 >
+	Array1D< Real64 >
 	CreateBoundaryList(
-		FArray1D< GridRegion > const & RegionList,
+		Array1D< GridRegion > const & RegionList,
 		Real64 const DirExtentMax,
 		int const DirDirection,
 		int const RetValLbound,
@@ -5505,7 +5505,7 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// Return value
-		FArray1D< Real64 > RetVal( {RetValLbound,RetValUBound} );
+		Array1D< Real64 > RetVal( {RetValLbound,RetValUBound} );
 
 		// Argument array dimensioning
 
@@ -5550,9 +5550,9 @@ namespace PlantPipingSystemsManager {
 	void
 	CreateCellArray(
 		int const DomainNum,
-		FArray1D< Real64 > const & XBoundaryPoints,
-		FArray1D< Real64 > const & YBoundaryPoints,
-		FArray1D< Real64 > const & ZBoundaryPoints
+		Array1D< Real64 > const & XBoundaryPoints,
+		Array1D< Real64 > const & YBoundaryPoints,
+		Array1D< Real64 > const & ZBoundaryPoints
 	)
 	{
 
@@ -5925,10 +5925,10 @@ namespace PlantPipingSystemsManager {
 					}
 
 					//'check to see if this is a pipe node...
-					CircuitLoop: for ( CircuitCtr = lbound( PipingSystemDomains( DomainNum ).CircuitIndeces, 1 ); CircuitCtr <= ubound( PipingSystemDomains( DomainNum ).CircuitIndeces, 1 ); ++CircuitCtr ) {
+					for ( CircuitCtr = lbound( PipingSystemDomains( DomainNum ).CircuitIndeces, 1 ); CircuitCtr <= ubound( PipingSystemDomains( DomainNum ).CircuitIndeces, 1 ); ++CircuitCtr ) {
 
 						FoundOnCircuitIndex = PipingSystemDomains( DomainNum ).CircuitIndeces( CircuitCtr );
-						SegmentLoop: for ( PipeCounter = lbound( PipingSystemCircuits( FoundOnCircuitIndex ).PipeSegmentIndeces, 1 ); PipeCounter <= ubound( PipingSystemCircuits( FoundOnCircuitIndex ).PipeSegmentIndeces, 1 ); ++PipeCounter ) {
+						for ( PipeCounter = lbound( PipingSystemCircuits( FoundOnCircuitIndex ).PipeSegmentIndeces, 1 ); PipeCounter <= ubound( PipingSystemCircuits( FoundOnCircuitIndex ).PipeSegmentIndeces, 1 ); ++PipeCounter ) {
 
 							ThisSegment = PipingSystemSegments( PipingSystemCircuits( FoundOnCircuitIndex ).PipeSegmentIndeces( PipeCounter ) );
 							if ( RectangleF_Contains( XYRectangle, ThisSegment.PipeLocation ) ) {
@@ -5946,11 +5946,7 @@ namespace PlantPipingSystemsManager {
 								goto CircuitLoop_exit;
 							}
 
-							SegmentLoop_loop: ;
 						}
-						SegmentLoop_exit: ;
-
-						CircuitLoop_loop: ;
 					}
 					CircuitLoop_exit: ;
 
@@ -6167,7 +6163,7 @@ namespace PlantPipingSystemsManager {
 		int PrevUBound;
 
 		// Object Data
-		FArray1D< DirectionNeighbor_Dictionary > PrevValues;
+		Array1D< DirectionNeighbor_Dictionary > PrevValues;
 
 		if ( ! allocated( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).NeighborInformation ) ) {
 			PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).NeighborInformation.allocate( {0,0} );
@@ -6384,7 +6380,7 @@ namespace PlantPipingSystemsManager {
 		int I;
 		Real64 CellWidth;
 		int SubIndex;
-		FArray1D< Real64 > RetVal;
+		Array1D< Real64 > RetVal;
 		int RetMaxIndex;
 
 		// Object Data
@@ -8211,7 +8207,7 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_int const Directions( 4, { Direction_NegativeX, Direction_NegativeY, Direction_PositiveX, Direction_PositiveY } );
+		static Array1D_int const Directions( 4, { Direction_NegativeX, Direction_NegativeY, Direction_PositiveX, Direction_PositiveY } );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 Numerator;
@@ -9700,7 +9696,7 @@ namespace PlantPipingSystemsManager {
 
 	//     NOTICE
 
-	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

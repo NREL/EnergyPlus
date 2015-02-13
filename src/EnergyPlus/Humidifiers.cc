@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -76,7 +76,7 @@ namespace Humidifiers {
 	// MODULE PARAMETER DEFINITIONS
 	int const Humidifier_Steam_Electric( 1 );
 
-	FArray1D_string const HumidifierType( 1, std::string( "Humidifier:Steam:Electric" ) );
+	Array1D_string const HumidifierType( 1, std::string( "Humidifier:Steam:Electric" ) );
 
 	static std::string const fluidNameSteam( "STEAM" );
 	static std::string const fluidNameWater( "WATER" );
@@ -86,12 +86,12 @@ namespace Humidifiers {
 	// MODULE VARIABLE DECLARATIONS:
 	int NumHumidifiers( 0 ); // number of humidifiers of all types
 	int NumElecSteamHums( 0 ); // number of electric steam humidifiers
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Object Data
-	FArray1D< HumidifierData > Humidifier;
+	Array1D< HumidifierData > Humidifier;
 
 	// Functions
 
@@ -245,12 +245,12 @@ namespace Humidifiers {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string Alphas; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > Numbers; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string Alphas; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > Numbers; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 		//  certain object in the input file
 
@@ -402,9 +402,9 @@ namespace Humidifiers {
 		Real64 WaterSatEnthalpy; // enthalpy of saturated water at 100C, J/kg
 
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		static bool MySetPointCheckFlag( true );
-		static FArray1D_bool MySizeFlag;
+		static Array1D_bool MySizeFlag;
 
 		// do one time initializations
 		if ( MyOneTimeFlag ) {
@@ -541,16 +541,16 @@ namespace Humidifiers {
 		Real64 WaterSatEnthalpy; // enthalpy of saturated water at 100C, J/kg
 		bool IsAutoSize;			// Indicator to autosize
 		bool HardSizeNoDesRun;		// Indicator to a hard-sized field with no design sizing data
-		Real64 NomPowerDes;			// Autosized nominal power for reporting 
-		Real64 NomPowerUser;		// Hardsized nominal power for reporting  
-		Real64 MassFlowDes;			// Design air mass flow rate   
-		Real64 InletHumRatDes;		// Design inlet humidity ratio 
+		Real64 NomPowerDes;			// Autosized nominal power for reporting
+		Real64 NomPowerUser;		// Hardsized nominal power for reporting
+		Real64 MassFlowDes;			// Design air mass flow rate
+		Real64 InletHumRatDes;		// Design inlet humidity ratio
 		Real64 OutletHumRatDes;		// Design outlet humidity ratio
 		Real64 NomCapVolDes;		// Autosized Nominal capacity volume for reporting
 		Real64 NomCapVolUser;		// HardSized nominal capacity volume for reporting
 		Real64 AirVolFlow;			// Design air volume flow rate
-		Real64 AirDensity;			// Density of air 
-  
+		Real64 AirDensity;			// Density of air
+
 
 		if ( Humidifier( HumNum ).HumType_Code == Humidifier_Steam_Electric ) {
 			IsAutoSize = false;
@@ -567,7 +567,7 @@ namespace Humidifiers {
 					if ( Humidifier( HumNum ).NomCapVol > 0.0 ) {
 						ReportSizingOutput( "Humidifier:SizeHumidifier", Humidifier( HumNum ).Name, "User-Specified Nominal Capacity Volume [m3/s]", Humidifier( HumNum ).NomCapVol );
 					}
-				} else {	// Sizing run done  
+				} else {	// Sizing run done
 					CheckZoneSizing( "Humidifier:SizeHumidifier", Humidifier( HumNum ).Name );
 					AirDensity = FinalZoneSizing( CurZoneEqNum ).DesCoolDens;
 					MassFlowDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow ) * AirDensity;
@@ -620,7 +620,7 @@ namespace Humidifiers {
 						} else {
 							AirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 						}
-						AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, FinalSysSizing( CurSysNum ).CoolMixTemp, FinalSysSizing( CurSysNum ).CoolMixHumRat, CalledFrom );    
+						AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, FinalSysSizing( CurSysNum ).CoolMixTemp, FinalSysSizing( CurSysNum ).CoolMixHumRat, CalledFrom );
 						MassFlowDes = AirVolFlow * AirDensity;
 						InletHumRatDes = std::min( FinalSysSizing( CurSysNum ).CoolMixHumRat, FinalSysSizing( CurSysNum ).HeatMixHumRat );
 						OutletHumRatDes = std::max( FinalSysSizing( CurSysNum ).CoolSupHumRat, FinalSysSizing( CurSysNum ).HeatSupHumRat);
@@ -651,7 +651,7 @@ namespace Humidifiers {
 					}
 				}
 			}
-			
+
 			Humidifier( HumNum ).NomCap = RhoH2O( InitConvTemp ) * Humidifier( HumNum ).NomCapVol;
 			RefrigerantIndex = FindRefrigerant( fluidNameSteam );
 			WaterIndex = FindGlycol( fluidNameWater );
@@ -664,7 +664,7 @@ namespace Humidifiers {
 			if ( Humidifier( HumNum ).NomPower == AutoSize ) {
 				IsAutoSize = true;
 			}
-			
+
 			NomPowerDes = NominalPower;
 			if ( IsAutoSize ) {
 				Humidifier( HumNum ).NomPower = NomPowerDes;
@@ -1052,7 +1052,7 @@ namespace Humidifiers {
 
 	//     NOTICE
 
-	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -102,7 +102,7 @@ namespace TARCOGOutput {
 		Real64 const fclr,
 		Real64 const VacuumPressure,
 		Real64 const VacuumMaxGapThickness,
-		FArray1A_int const ibc,
+		Array1A_int const ibc,
 		Real64 const hout,
 		Real64 const hin,
 		int const standard,
@@ -114,38 +114,38 @@ namespace TARCOGOutput {
 		Real64 const tilt,
 		Real64 const totsol,
 		int const nlayer,
-		FArray1A_int const LayerType,
-		FArray1A< Real64 > const thick,
-		FArray1A< Real64 > const scon,
-		FArray1A< Real64 > const asol,
-		FArray1A< Real64 > const tir,
-		FArray1A< Real64 > const emis,
-		FArray1A< Real64 > const Atop,
-		FArray1A< Real64 > const Abot,
-		FArray1A< Real64 > const Al,
-		FArray1A< Real64 > const Ar,
-		FArray1A< Real64 > const Ah,
-		FArray1A< Real64 > const SlatThick,
-		FArray1A< Real64 > const SlatWidth,
-		FArray1A< Real64 > const SlatAngle,
-		FArray1A< Real64 > const SlatCond,
-		FArray1A< Real64 > const SlatSpacing,
-		FArray1A< Real64 > const SlatCurve,
-		FArray1A_int const nslice,
-		FArray1A< Real64 > const LaminateA,
-		FArray1A< Real64 > const LaminateB,
-		FArray1A< Real64 > const sumsol,
-		FArray1A< Real64 > const gap,
-		FArray1A< Real64 > const vvent,
-		FArray1A< Real64 > const tvent,
-		FArray1A< Real64 > const presure,
-		FArray1A_int const nmix,
-		FArray2A_int const iprop,
-		FArray2A< Real64 > const frct,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
-		FArray1A< Real64 > const xwght
+		Array1A_int const LayerType,
+		Array1A< Real64 > const thick,
+		Array1A< Real64 > const scon,
+		Array1A< Real64 > const asol,
+		Array1A< Real64 > const tir,
+		Array1A< Real64 > const emis,
+		Array1A< Real64 > const Atop,
+		Array1A< Real64 > const Abot,
+		Array1A< Real64 > const Al,
+		Array1A< Real64 > const Ar,
+		Array1A< Real64 > const Ah,
+		Array1A< Real64 > const SlatThick,
+		Array1A< Real64 > const SlatWidth,
+		Array1A< Real64 > const SlatAngle,
+		Array1A< Real64 > const SlatCond,
+		Array1A< Real64 > const SlatSpacing,
+		Array1A< Real64 > const SlatCurve,
+		Array1A_int const nslice,
+		Array1A< Real64 > const LaminateA,
+		Array1A< Real64 > const LaminateB,
+		Array1A< Real64 > const sumsol,
+		Array1A< Real64 > const gap,
+		Array1A< Real64 > const vvent,
+		Array1A< Real64 > const tvent,
+		Array1A< Real64 > const presure,
+		Array1A_int const nmix,
+		Array2A_int const iprop,
+		Array2A< Real64 > const frct,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
+		Array1A< Real64 > const xwght
 	)
 	{
 
@@ -188,8 +188,8 @@ namespace TARCOGOutput {
 		xwght.dim( maxgas );
 
 		// Locals
-		FArray1D_int DATE_TIME( 8 );
-		FArray1D_string real_CLOCK( 3 );
+		Array1D_int DATE_TIME( 8 );
+		Array1D_string real_CLOCK( 3 );
 
 		int i;
 		int j;
@@ -294,7 +294,7 @@ namespace TARCOGOutput {
 		// File is not open and nothing cannot be written
 		if ( InArgumentsFile == statusClosed ) return;
 
-		date_and_time_string( real_CLOCK( 1 ), real_CLOCK( 2 ), real_CLOCK( 3 ), DATE_TIME );
+		date_and_time( real_CLOCK( 1 ), real_CLOCK( 2 ), real_CLOCK( 3 ), DATE_TIME );
 
 		gio::write( InArgumentsFile, fmtLD );
 		//  write(InArgumentsFile, 10001) VersionNumber, VersionCompileDateCC
@@ -525,16 +525,16 @@ namespace TARCOGOutput {
 		Real64 const Gout,
 		Real64 const Gin,
 		int const nlayer,
-		FArray1A_int const LayerType,
-		FArray1A_int const nmix,
-		FArray2A< Real64 > const frct,
-		FArray1A< Real64 > const thick,
-		FArray1A< Real64 > const scon,
-		FArray1A< Real64 > const gap,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
-		FArray1A< Real64 > const xwght
+		Array1A_int const LayerType,
+		Array1A_int const nmix,
+		Array2A< Real64 > const frct,
+		Array1A< Real64 > const thick,
+		Array1A< Real64 > const scon,
+		Array1A< Real64 > const gap,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
+		Array1A< Real64 > const xwght
 	)
 	{
 
@@ -641,15 +641,15 @@ namespace TARCOGOutput {
 		std::string const & DBGD,
 		int const nlayer,
 		Real64 const tamb,
-		FArray1A< Real64 > const q,
-		FArray1A< Real64 > const qv,
-		FArray1A< Real64 > const qcgas,
-		FArray1A< Real64 > const qrgas,
-		FArray1A< Real64 > const theta,
-		FArray1A< Real64 > const vfreevent,
-		FArray1A< Real64 > const vvent,
-		FArray1A< Real64 > const Keff,
-		FArray1A< Real64 > const ShadeGapKeffConv,
+		Array1A< Real64 > const q,
+		Array1A< Real64 > const qv,
+		Array1A< Real64 > const qcgas,
+		Array1A< Real64 > const qrgas,
+		Array1A< Real64 > const theta,
+		Array1A< Real64 > const vfreevent,
+		Array1A< Real64 > const vvent,
+		Array1A< Real64 > const Keff,
+		Array1A< Real64 > const ShadeGapKeffConv,
 		Real64 const troom,
 		Real64 const ufactor,
 		Real64 const shgc,
@@ -660,13 +660,13 @@ namespace TARCOGOutput {
 		Real64 const hrin,
 		Real64 const hcout,
 		Real64 const hrout,
-		FArray1A< Real64 > const Ra,
-		FArray1A< Real64 > const Nu,
-		FArray1A_int const LayerType,
-		FArray1A< Real64 > const Ebf,
-		FArray1A< Real64 > const Ebb,
-		FArray1A< Real64 > const Rf,
-		FArray1A< Real64 > const Rb,
+		Array1A< Real64 > const Ra,
+		Array1A< Real64 > const Nu,
+		Array1A_int const LayerType,
+		Array1A< Real64 > const Ebf,
+		Array1A< Real64 > const Ebb,
+		Array1A< Real64 > const Rf,
+		Array1A< Real64 > const Rb,
 		Real64 const ebsky,
 		Real64 const Gout,
 		Real64 const ebroom,
@@ -677,8 +677,8 @@ namespace TARCOGOutput {
 		Real64 const ShadeHcRatioOut,
 		Real64 const HcUnshadedIn,
 		Real64 const HcUnshadedOut,
-		FArray1A< Real64 > const hcgas,
-		FArray1A< Real64 > const hrgas,
+		Array1A< Real64 > const hcgas,
+		Array1A< Real64 > const hrgas,
 		Real64 const AchievedErrorTolerance,
 		int const NumOfIter
 	)
@@ -708,8 +708,8 @@ namespace TARCOGOutput {
 		hrgas.dim( maxlay );
 
 		// Locals
-		FArray1D_int DATE_TIME( 8 );
-		FArray1D_string real_CLOCK( 3 );
+		Array1D_int DATE_TIME( 8 );
+		Array1D_string real_CLOCK( 3 );
 
 		int i;
 		int nperr;
@@ -776,7 +776,7 @@ namespace TARCOGOutput {
 		//      position=FilePosition, form='formatted', iostat=nperr)
 		//if (nperr.ne.0)  open(unit=OutArgumentsFile,  file=DebugOutputFileName,  status='unknown', access=FileMode, &
 		//      position=FilePosition, form='formatted', iostat=nperr)
-		date_and_time_string( real_CLOCK( 1 ), real_CLOCK( 2 ), real_CLOCK( 3 ), DATE_TIME );
+		date_and_time( real_CLOCK( 1 ), real_CLOCK( 2 ), real_CLOCK( 3 ), DATE_TIME );
 		gio::write( OutArgumentsFile, fmtLD );
 		gio::write( OutArgumentsFile, Format_2000 ) << DATE_TIME( 1 ) << DATE_TIME( 2 ) << DATE_TIME( 3 ) << DATE_TIME( 5 ) << DATE_TIME( 6 ) << DATE_TIME( 7 );
 		gio::write( OutArgumentsFile, fmtLD );
@@ -950,11 +950,11 @@ namespace TARCOGOutput {
 		Real64 const ufactor,
 		Real64 const hout,
 		Real64 const hin,
-		FArray1A< Real64 > const Ra,
-		FArray1A< Real64 > const Nu,
-		FArray1A< Real64 > const hg,
-		FArray1A< Real64 > const hr,
-		FArray1A< Real64 > const hs,
+		Array1A< Real64 > const Ra,
+		Array1A< Real64 > const Nu,
+		Array1A< Real64 > const hg,
+		Array1A< Real64 > const hr,
+		Array1A< Real64 > const hs,
 		int & nperr
 	)
 	{
@@ -969,8 +969,8 @@ namespace TARCOGOutput {
 		// Locals
 		//character(len=*), intent (inout) :: ErrorMessage
 
-		FArray1D_int DATE_TIME( 8 );
-		FArray1D_string real_CLOCK( 3 );
+		Array1D_int DATE_TIME( 8 );
+		Array1D_string real_CLOCK( 3 );
 
 		int i;
 
@@ -986,7 +986,7 @@ namespace TARCOGOutput {
 		//      position=FilePosition, form='formatted', iostat=nperr)
 		//if (nperr.ne.0)  open(unit=OutArgumentsFile,  file=DebugOutputFileName,  status='unknown', access=FileMode,  &
 		//      position=FilePosition, form='formatted', iostat=nperr)
-		date_and_time_string( real_CLOCK( 1 ), real_CLOCK( 2 ), real_CLOCK( 3 ), DATE_TIME );
+		date_and_time( real_CLOCK( 1 ), real_CLOCK( 2 ), real_CLOCK( 3 ), DATE_TIME );
 		gio::write( OutArgumentsFile, fmtLD );
 		gio::write( OutArgumentsFile, Format_2000 ) << DATE_TIME( 1 ) << DATE_TIME( 2 ) << DATE_TIME( 3 ) << DATE_TIME( 5 ) << DATE_TIME( 6 ) << DATE_TIME( 7 );
 		gio::write( OutArgumentsFile, fmtLD );
@@ -1036,7 +1036,7 @@ namespace TARCOGOutput {
 		Real64 const Pa,
 		Real64 const Pini,
 		Real64 const Tini,
-		FArray1A_int const ibc,
+		Array1A_int const ibc,
 		Real64 const hout,
 		Real64 const hin,
 		int const standard,
@@ -1048,42 +1048,42 @@ namespace TARCOGOutput {
 		Real64 const tilt,
 		Real64 const totsol,
 		int const nlayer,
-		FArray1A_int const LayerType,
-		FArray1A< Real64 > const thick,
-		FArray1A< Real64 > const scon,
-		FArray1A< Real64 > const YoungsMod,
-		FArray1A< Real64 > const PoissonsRat,
-		FArray1A< Real64 > const asol,
-		FArray1A< Real64 > const tir,
-		FArray1A< Real64 > const emis,
-		FArray1A< Real64 > const Atop,
-		FArray1A< Real64 > const Abot,
-		FArray1A< Real64 > const Al,
-		FArray1A< Real64 > const Ar,
-		FArray1A< Real64 > const Ah,
-		FArray1A_int const SupportPillar, // Shows whether or not gap have support pillar
-		FArray1A< Real64 > const PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
-		FArray1A< Real64 > const PillarRadius, // Pillar radius for each gap (used in case there is support pillar)
-		FArray1A< Real64 > const SlatThick,
-		FArray1A< Real64 > const SlatWidth,
-		FArray1A< Real64 > const SlatAngle,
-		FArray1A< Real64 > const SlatCond,
-		FArray1A< Real64 > const SlatSpacing,
-		FArray1A< Real64 > const SlatCurve,
-		FArray1A_int const nslice,
-		FArray1A< Real64 > const gap,
-		FArray1A< Real64 > const GapDef,
-		FArray1A< Real64 > const vvent,
-		FArray1A< Real64 > const tvent,
-		FArray1A< Real64 > const presure,
-		FArray1A_int const nmix,
-		FArray2A_int const iprop,
-		FArray2A< Real64 > const frct,
-		FArray2A< Real64 > const xgcon,
-		FArray2A< Real64 > const xgvis,
-		FArray2A< Real64 > const xgcp,
-		FArray1A< Real64 > const xwght,
-		FArray1A< Real64 > const gama
+		Array1A_int const LayerType,
+		Array1A< Real64 > const thick,
+		Array1A< Real64 > const scon,
+		Array1A< Real64 > const YoungsMod,
+		Array1A< Real64 > const PoissonsRat,
+		Array1A< Real64 > const asol,
+		Array1A< Real64 > const tir,
+		Array1A< Real64 > const emis,
+		Array1A< Real64 > const Atop,
+		Array1A< Real64 > const Abot,
+		Array1A< Real64 > const Al,
+		Array1A< Real64 > const Ar,
+		Array1A< Real64 > const Ah,
+		Array1A_int const SupportPillar, // Shows whether or not gap have support pillar
+		Array1A< Real64 > const PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
+		Array1A< Real64 > const PillarRadius, // Pillar radius for each gap (used in case there is support pillar)
+		Array1A< Real64 > const SlatThick,
+		Array1A< Real64 > const SlatWidth,
+		Array1A< Real64 > const SlatAngle,
+		Array1A< Real64 > const SlatCond,
+		Array1A< Real64 > const SlatSpacing,
+		Array1A< Real64 > const SlatCurve,
+		Array1A_int const nslice,
+		Array1A< Real64 > const gap,
+		Array1A< Real64 > const GapDef,
+		Array1A< Real64 > const vvent,
+		Array1A< Real64 > const tvent,
+		Array1A< Real64 > const presure,
+		Array1A_int const nmix,
+		Array2A_int const iprop,
+		Array2A< Real64 > const frct,
+		Array2A< Real64 > const xgcon,
+		Array2A< Real64 > const xgvis,
+		Array2A< Real64 > const xgcp,
+		Array1A< Real64 > const xwght,
+		Array1A< Real64 > const gama
 	)
 	{
 
@@ -1138,8 +1138,8 @@ namespace TARCOGOutput {
 		int j;
 		int NumOfProvGasses;
 
-		FArray1D_int DATE_TIME( 8 );
-		FArray1D_string real_CLOCK( 3 );
+		Array1D_int DATE_TIME( 8 );
+		Array1D_string real_CLOCK( 3 );
 
 		int nperr;
 
@@ -1218,7 +1218,7 @@ namespace TARCOGOutput {
 
 		//bi...Write the header:
 
-		date_and_time_string( real_CLOCK( 1 ), real_CLOCK( 2 ), real_CLOCK( 3 ), DATE_TIME );
+		date_and_time( real_CLOCK( 1 ), real_CLOCK( 2 ), real_CLOCK( 3 ), DATE_TIME );
 
 		gio::write( WINCogFile, Format_112 );
 		gio::write( WINCogFile, Format_111 );

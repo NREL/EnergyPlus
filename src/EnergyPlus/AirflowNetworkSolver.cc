@@ -3,7 +3,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -14,7 +14,6 @@
 #include <DataAirLoop.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
-#include <DataStringGlobals.hh>
 #include <DataStringGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <DataLoopNode.hh>
@@ -82,46 +81,46 @@ namespace AirflowNetworkSolver {
 	static std::string const BlankString;
 
 	// Common block AFEDAT
-	FArray1D< Real64 > AFECTL;
-	FArray1D< Real64 > AFLOW2;
-	FArray1D< Real64 > AFLOW;
-	FArray1D< Real64 > PS;
-	FArray1D< Real64 > PW;
+	Array1D< Real64 > AFECTL;
+	Array1D< Real64 > AFLOW2;
+	Array1D< Real64 > AFLOW;
+	Array1D< Real64 > PS;
+	Array1D< Real64 > PW;
 
 	// Common block CONTRL
 	Real64 PB( 0.0 );
 	int LIST( 0 );
 
 	// Common block ZONL
-	FArray1D< Real64 > RHOZ;
-	FArray1D< Real64 > SQRTDZ;
-	FArray1D< Real64 > VISCZ;
-	FArray1D< Real64 > SUMAF;
-	FArray1D< Real64 > TZ; // Temperature [C]
-	FArray1D< Real64 > WZ; // Humidity ratio [kg/kg]
-	FArray1D< Real64 > PZ; // Pressure [Pa]
+	Array1D< Real64 > RHOZ;
+	Array1D< Real64 > SQRTDZ;
+	Array1D< Real64 > VISCZ;
+	Array1D< Real64 > SUMAF;
+	Array1D< Real64 > TZ; // Temperature [C]
+	Array1D< Real64 > WZ; // Humidity ratio [kg/kg]
+	Array1D< Real64 > PZ; // Pressure [Pa]
 
 	// Other array variables
-	FArray1D_int ID;
-	FArray1D_int IK;
-	FArray1D< Real64 > AD;
-	FArray1D< Real64 > AU;
+	Array1D_int ID;
+	Array1D_int IK;
+	Array1D< Real64 > AD;
+	Array1D< Real64 > AU;
 
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
-	FArray1D_int newIK; // noel
-	FArray1D< Real64 > newAU; // noel
+	Array1D_int newIK; // noel
+	Array1D< Real64 > newAU; // noel
 #endif
 
 	//REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
-	FArray1D< Real64 > SUMF;
+	Array1D< Real64 > SUMF;
 	int Unit11( 0 );
 	int Unit21( 0 );
 
 	// Large opening variables
-	FArray1D< Real64 > DpProf; // Differential pressure profile for Large Openings [Pa]
-	FArray1D< Real64 > RhoProfF; // Density profile in FROM zone [kg/m3]
-	FArray1D< Real64 > RhoProfT; // Density profile in TO zone [kg/m3]
-	FArray2D< Real64 > DpL; // Array of stack pressures in link
+	Array1D< Real64 > DpProf; // Differential pressure profile for Large Openings [Pa]
+	Array1D< Real64 > RhoProfF; // Density profile in FROM zone [kg/m3]
+	Array1D< Real64 > RhoProfT; // Density profile in TO zone [kg/m3]
+	Array2D< Real64 > DpL; // Array of stack pressures in link
 
 	// Functions
 
@@ -569,9 +568,9 @@ namespace AirflowNetworkSolver {
 
 	void
 	SOLVZP(
-		FArray1A_int IK, // pointer to the top of column/row "K"
-		FArray1A< Real64 > AD, // the main diagonal of [A] before and after factoring
-		FArray1A< Real64 > AU, // the upper triangle of [A] before and after factoring
+		Array1A_int IK, // pointer to the top of column/row "K"
+		Array1A< Real64 > AD, // the main diagonal of [A] before and after factoring
+		Array1A< Real64 > AU, // the upper triangle of [A] before and after factoring
 		int & ITER // number of iterations
 	)
 	{
@@ -635,14 +634,14 @@ namespace AirflowNetworkSolver {
 		int LFLAG;
 		int CONVG;
 		int ACCEL;
-		FArray1D< Real64 > PCF( NetworkNumOfNodes );
-		FArray1D< Real64 > CEF( NetworkNumOfNodes );
+		Array1D< Real64 > PCF( NetworkNumOfNodes );
+		Array1D< Real64 > CEF( NetworkNumOfNodes );
 		Real64 C;
 		Real64 SSUMF;
 		Real64 SSUMAF;
 		Real64 ACC0;
 		Real64 ACC1;
-		FArray1D< Real64 > CCF( NetworkNumOfNodes );
+		Array1D< Real64 > CCF( NetworkNumOfNodes );
 
 		// Formats
 		static gio::Fmt Format_901( "(A5,I3,2E14.6,0P,F8.4,F24.14)" );
@@ -842,10 +841,10 @@ namespace AirflowNetworkSolver {
 		bool allZero; // noel
 		static bool firstTime( true ); // noel
 #endif
-		FArray1D< Real64 > X( 4 );
+		Array1D< Real64 > X( 4 );
 		Real64 DP;
-		FArray1D< Real64 > F( 2 );
-		FArray1D< Real64 > DF( 2 );
+		Array1D< Real64 > F( 2 );
+		Array1D< Real64 > DF( 2 );
 
 		// Formats
 		static gio::Fmt Format_901( "(A5,3I3,4E16.7)" );
@@ -1041,8 +1040,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -1165,8 +1164,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -1302,8 +1301,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -1479,8 +1478,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -1656,8 +1655,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -1775,8 +1774,8 @@ namespace AirflowNetworkSolver {
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -1894,7 +1893,6 @@ Label40: ;
 			CY = DisSysCompDetFanData( CompNum ).Coeff( k + 1 ) + CX * ( DisSysCompDetFanData( CompNum ).Coeff( k + 2 ) + CX * ( DisSysCompDetFanData( CompNum ).Coeff( k + 3 ) + CX * DisSysCompDetFanData( CompNum ).Coeff( k + 4 ) ) ) - PRISE;
 			if ( BY * CY == 0.0 ) goto Label90;
 			if ( BY * CY > 0.0 ) goto Label60;
-Label50: ;
 			DX = CX;
 			DY = CY;
 			if ( CY * CCY > 0.0 ) BY *= 0.5;
@@ -1922,9 +1920,6 @@ Label90: ;
 		} else {
 			DF( 1 ) = -1.0 / DPDF;
 		}
-
-Label999: ;
-		return;
 	}
 
 	// The above subroutine is not used. Leave it for the time being and revise later.
@@ -1937,8 +1932,8 @@ Label999: ;
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -2004,8 +1999,8 @@ Label999: ;
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -2091,8 +2086,8 @@ Label999: ;
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -2205,8 +2200,8 @@ Label999: ;
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -2317,8 +2312,8 @@ Label999: ;
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -2397,8 +2392,8 @@ Label999: ;
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -2577,8 +2572,8 @@ Label999: ;
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -2765,8 +2760,8 @@ Label999: ;
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -2913,8 +2908,8 @@ Label999: ;
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -3083,8 +3078,8 @@ Label999: ;
 		int const i, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -3236,8 +3231,8 @@ Label999: ;
 		Real64 const PDROP, // Total pressure drop across a component (P1 - P2) [Pa]
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -3360,10 +3355,10 @@ Label999: ;
 
 	void
 	FACSKY(
-		FArray1A< Real64 > AU, // the upper triangle of [A] before and after factoring
-		FArray1A< Real64 > AD, // the main diagonal of [A] before and after factoring
-		FArray1A< Real64 > AL, // the lower triangle of [A] before and after factoring
-		FArray1A_int const IK, // pointer to the top of column/row "K"
+		Array1A< Real64 > AU, // the upper triangle of [A] before and after factoring
+		Array1A< Real64 > AD, // the main diagonal of [A] before and after factoring
+		Array1A< Real64 > AL, // the lower triangle of [A] before and after factoring
+		Array1A_int const IK, // pointer to the top of column/row "K"
 		int const NEQ, // number of equations
 		int const NSYM // symmetry:  0 = symmetric matrix, 1 = non-symmetric
 	)
@@ -3509,11 +3504,11 @@ Label999: ;
 
 	void
 	SLVSKY(
-		FArray1A< Real64 > const AU, // the upper triangle of [A] before and after factoring
-		FArray1A< Real64 > const AD, // the main diagonal of [A] before and after factoring
-		FArray1A< Real64 > const AL, // the lower triangle of [A] before and after factoring
-		FArray1A< Real64 > B, // "B" vector (input); "X" vector (output).
-		FArray1A_int const IK, // pointer to the top of column/row "K"
+		Array1A< Real64 > const AU, // the upper triangle of [A] before and after factoring
+		Array1A< Real64 > const AD, // the main diagonal of [A] before and after factoring
+		Array1A< Real64 > const AL, // the lower triangle of [A] before and after factoring
+		Array1A< Real64 > B, // "B" vector (input); "X" vector (output).
+		Array1A_int const IK, // pointer to the top of column/row "K"
 		int const NEQ, // number of equations
 		int const NSYM // symmetry:  0 = symmetric matrix, 1 = non-symmetric
 	)
@@ -3614,11 +3609,11 @@ Label999: ;
 
 	void
 	FILSKY(
-		FArray1A< Real64 > const X, // element array (row-wise sequence)
-		FArray1A_int const LM, // location matrix
-		FArray1A_int const IK, // pointer to the top of column/row "K"
-		FArray1A< Real64 > AU, // the upper triangle of [A] before and after factoring
-		FArray1A< Real64 > AD, // the main diagonal of [A] before and after factoring
+		Array1A< Real64 > const X, // element array (row-wise sequence)
+		Array1A_int const LM, // location matrix
+		Array1A_int const IK, // pointer to the top of column/row "K"
+		Array1A< Real64 > AU, // the upper triangle of [A] before and after factoring
+		Array1A< Real64 > AD, // the main diagonal of [A] before and after factoring
 		int const FLAG // mode of operation
 	)
 	{
@@ -3695,7 +3690,7 @@ Label999: ;
 	void
 	DUMPVD(
 		std::string const & S, // Description
-		FArray1A< Real64 > const V, // Output values
+		Array1A< Real64 > const V, // Output values
 		int const n, // Array size
 		int const UOUT // Output file unit
 	)
@@ -3722,7 +3717,7 @@ Label999: ;
 		// na
 
 		// Argument array dimensioning
-		V.dim( star );
+		V.dim( _ );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3755,7 +3750,7 @@ Label999: ;
 	void
 	DUMPVR(
 		std::string const & S, // Description
-		FArray1A< Real64 > const V, // Output values
+		Array1A< Real64 > const V, // Output values
 		int const n, // Array size
 		int const UOUT // Output file unit
 	)
@@ -3782,7 +3777,7 @@ Label999: ;
 		// na
 
 		// Argument array dimensioning
-		V.dim( star );
+		V.dim( _ );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3819,8 +3814,8 @@ Label999: ;
 		int const IL, // Linkage number
 		int const n, // Node 1 number
 		int const M, // Node 2 number
-		FArray1A< Real64 > F, // Airflow through the component [kg/s]
-		FArray1A< Real64 > DF, // Partial derivative:  DF/DP
+		Array1A< Real64 > F, // Airflow through the component [kg/s]
+		Array1A< Real64 > DF, // Partial derivative:  DF/DP
 		int & NF // Number of flows, either 1 or 2
 	)
 	{
@@ -3900,7 +3895,7 @@ Label999: ;
 		Real64 fma21; // massflow in direction "to-from" [kg/s]
 		Real64 dp1fma12; // derivative d fma12 / d Dp [kg/s/Pa]
 		Real64 dp1fma21; // derivative d fma21 / d Dp [kg/s/Pa]
-		FArray1D< Real64 > DpProfNew( NrInt+2 ); // Differential pressure profile for Large Openings, taking into account fixed
+		Array1D< Real64 > DpProfNew( NrInt+2 ); // Differential pressure profile for Large Openings, taking into account fixed
 		// pressures and actual zone pressures at reference height
 		Real64 Fact; // Actual opening factor
 		Real64 DifLim; // Limit for the pressure difference where laminarization takes place [Pa]
@@ -3919,7 +3914,7 @@ Label999: ;
 		Real64 fmasum;
 		Real64 dfmasum;
 		Real64 Prefact;
-		FArray1D< Real64 > EvalHghts( NrInt+2 );
+		Array1D< Real64 > EvalHghts( NrInt+2 );
 		Real64 h2;
 		Real64 h4;
 		Real64 alpha;
@@ -4278,12 +4273,12 @@ Label999: ;
 		int const il, // Linkage number
 		int const Pprof, // Opening number
 		Real64 const G, // gravitation field strength [N/kg]
-		FArray1A< Real64 > const DpF, // Stack pressures at start heights of Layers
-		FArray1A< Real64 > const DpT, // Stack pressures at start heights of Layers
-		FArray1A< Real64 > const BetaF, // Density gradients in the FROM zone (starting at linkheight) [Kg/m3/m]
-		FArray1A< Real64 > const BetaT, // Density gradients in the TO zone (starting at linkheight) [Kg/m3/m]
-		FArray1A< Real64 > const RhoStF, // Density at the start heights of Layers in the FROM zone
-		FArray1A< Real64 > const RhoStT, // Density at the start heights of Layers in the TO zone
+		Array1A< Real64 > const DpF, // Stack pressures at start heights of Layers
+		Array1A< Real64 > const DpT, // Stack pressures at start heights of Layers
+		Array1A< Real64 > const BetaF, // Density gradients in the FROM zone (starting at linkheight) [Kg/m3/m]
+		Array1A< Real64 > const BetaT, // Density gradients in the TO zone (starting at linkheight) [Kg/m3/m]
+		Array1A< Real64 > const RhoStF, // Density at the start heights of Layers in the FROM zone
+		Array1A< Real64 > const RhoStT, // Density at the start heights of Layers in the TO zone
 		int const From, // Number of FROM zone
 		int const To, // Number of To zone
 		Real64 const ActLh, // Actual height of opening [m]
@@ -4352,15 +4347,15 @@ Label999: ;
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > zF( 2 ); // Startheights of layers in FROM-, TO-zone
-		FArray1D< Real64 > zT( 2 );
-		FArray1D< Real64 > zStF( 2 ); // Startheights of layers within the LO, starting with the actual startheight of the LO.
-		FArray1D< Real64 > zStT( 2 );
+		Array1D< Real64 > zF( 2 ); // Startheights of layers in FROM-, TO-zone
+		Array1D< Real64 > zT( 2 );
+		Array1D< Real64 > zStF( 2 ); // Startheights of layers within the LO, starting with the actual startheight of the LO.
+		Array1D< Real64 > zStT( 2 );
 		// The values in the arrays DpF, DpT, BetaF, BetaT, RhoStF, RhoStT are calculated at these heights.
 		Real64 hghtsFR;
 		Real64 hghtsTR;
-		FArray1D< Real64 > hghtsF( NrInt+2 ); // Heights of evaluation points for pressure and density profiles
-		FArray1D< Real64 > hghtsT( NrInt+2 );
+		Array1D< Real64 > hghtsF( NrInt+2 ); // Heights of evaluation points for pressure and density profiles
+		Array1D< Real64 > hghtsT( NrInt+2 );
 		Real64 Interval; // Distance between two evaluation points
 		Real64 delzF; // Interval between actual evaluation point and startheight of actual layer in FROM-, TO-zone
 		Real64 delzT;
@@ -4522,28 +4517,28 @@ Label999: ;
 		Real64 RhoL1; // Air density [kg/m3]
 		Real64 RhoL2;
 		Real64 Pbz; // Pbarom at entrance level [Pa]
-		FArray2D< Real64 > RhoDrL( 2, NumOfLinksMultiZone ); // dry air density on both sides of the link [kg/m3]
+		Array2D< Real64 > RhoDrL( 2, NumOfLinksMultiZone ); // dry air density on both sides of the link [kg/m3]
 		Real64 TempL1; // Temp in From and To zone at link level [C]
 		Real64 TempL2;
 		//      REAL(r64) Tout ! outside temperature [C]
 		Real64 Xhl1; // Humidity in From and To zone at link level [kg/kg]
 		Real64 Xhl2;
 		//      REAL(r64) Xhout ! outside humidity [kg/kg]
-		FArray1D< Real64 > Hfl( NumOfLinksMultiZone ); // Own height factor for large (slanted) openings
+		Array1D< Real64 > Hfl( NumOfLinksMultiZone ); // Own height factor for large (slanted) openings
 		int Nl; // number of links
 
-		FArray1D< Real64 > DpF( 2 );
+		Array1D< Real64 > DpF( 2 );
 		Real64 DpP;
-		FArray1D< Real64 > DpT( 2 );
+		Array1D< Real64 > DpT( 2 );
 		Real64 H;
-		FArray1D< Real64 > RhoStF( 2 );
-		FArray1D< Real64 > RhoStT( 2 );
+		Array1D< Real64 > RhoStF( 2 );
+		Array1D< Real64 > RhoStT( 2 );
 		Real64 RhoDrDummi;
-		FArray1D< Real64 > BetaStF( 2 );
-		FArray1D< Real64 > BetaStT( 2 );
+		Array1D< Real64 > BetaStF( 2 );
+		Array1D< Real64 > BetaStT( 2 );
 		Real64 T;
 		Real64 X;
-		FArray1D< Real64 > HSt( 2 );
+		Array1D< Real64 > HSt( 2 );
 		Real64 TzFrom;
 		Real64 XhzFrom;
 		Real64 TzTo;
@@ -4553,7 +4548,7 @@ Label999: ;
 		Real64 Pref;
 		Real64 PzFrom;
 		Real64 PzTo;
-		FArray1D< Real64 > RhoLd( 2 );
+		Array1D< Real64 > RhoLd( 2 );
 		Real64 RhoStd;
 		int From;
 		int To;

@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <FaultsManager.hh>
@@ -69,7 +69,7 @@ namespace FaultsManager {
 	//  10. Meter: air flow, water flow
 	//  11. CO2 sensor
 	//  12. more
-	FArray1D_string const cFaults( NumFaultTypes, { "FaultModel:TemperatureSensorOffset:OutdoorAir", "FaultModel:HumiditySensorOffset:OutdoorAir", "FaultModel:EnthalpySensorOffset:OutdoorAir", "FaultModel:TemperatureSensorOffset:ReturnAir", "FaultModel:EnthalpySensorOffset:ReturnAir", "FaultModel:Fouling:Coil" } );
+	Array1D_string const cFaults( NumFaultTypes, { "FaultModel:TemperatureSensorOffset:OutdoorAir", "FaultModel:HumiditySensorOffset:OutdoorAir", "FaultModel:EnthalpySensorOffset:OutdoorAir", "FaultModel:TemperatureSensorOffset:ReturnAir", "FaultModel:EnthalpySensorOffset:ReturnAir", "FaultModel:Fouling:Coil" } );
 	//      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
 	//      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
 	//      'FaultModel:TemperatureSensorOffset:ZoneAir   ', &
@@ -81,7 +81,7 @@ namespace FaultsManager {
 	//      'FaultModel:DamperLeakage:ReturnAir           ', &
 	//      'FaultModel:DamperLeakage:OutdoorAir          ' /)
 
-	FArray1D_int const iFaultTypeEnums( NumFaultTypes, { iFault_TemperatureSensorOffset_OutdoorAir, iFault_HumiditySensorOffset_OutdoorAir, iFault_EnthalpySensorOffset_OutdoorAir, iFault_TemperatureSensorOffset_ReturnAir, iFault_EnthalpySensorOffset_ReturnAir, iFault_Fouling_Coil } );
+	Array1D_int const iFaultTypeEnums( NumFaultTypes, { iFault_TemperatureSensorOffset_OutdoorAir, iFault_HumiditySensorOffset_OutdoorAir, iFault_EnthalpySensorOffset_OutdoorAir, iFault_TemperatureSensorOffset_ReturnAir, iFault_EnthalpySensorOffset_ReturnAir, iFault_Fouling_Coil } );
 
 	bool AnyFaultsInModel( false ); // True if there are operationla faults in the model
 	int NumFaults( 0 ); // Number of faults (include multiple faults of same type) in the model
@@ -90,8 +90,8 @@ namespace FaultsManager {
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
-	FArray1D< FaultProperties > Faults;
-	FArray1D< FaultProperties > FouledCoils;
+	Array1D< FaultProperties > Faults;
+	Array1D< FaultProperties > FouledCoils;
 
 	// Functions
 
@@ -140,12 +140,12 @@ namespace FaultsManager {
 		int NumAlphas; // Number of Alphas for each GetobjectItem call
 		int NumNumbers; // Number of Numbers for each GetobjectItem call
 		int IOStatus;
-		FArray1D_string cAlphaArgs( 5 ); // Alpha input items for object
-		static FArray1D_bool lAlphaFieldBlanks( 5, false );
-		static FArray1D_bool lNumericFieldBlanks( 5, false );
-		FArray1D_string cAlphaFieldNames( 5 );
-		FArray1D_string cNumericFieldNames( 5 );
-		FArray1D< Real64 > rNumericArgs( 5 ); // Numeric input items for object
+		Array1D_string cAlphaArgs( 5 ); // Alpha input items for object
+		static Array1D_bool lAlphaFieldBlanks( 5, false );
+		static Array1D_bool lNumericFieldBlanks( 5, false );
+		Array1D_string cAlphaFieldNames( 5 );
+		Array1D_string cNumericFieldNames( 5 );
+		Array1D< Real64 > rNumericArgs( 5 ); // Numeric input items for object
 
 		int i;
 		int j;

@@ -2,6 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -132,23 +133,23 @@ namespace TARCOGCommon {
 	void
 	matrixQBalance(
 		int const nlayer,
-		FArray2A< Real64 > a,
-		FArray1A< Real64 > b,
-		FArray1A< Real64 > const scon,
-		FArray1A< Real64 > const thick,
-		FArray1A< Real64 > const hcgas,
+		Array2A< Real64 > a,
+		Array1A< Real64 > b,
+		Array1A< Real64 > const scon,
+		Array1A< Real64 > const thick,
+		Array1A< Real64 > const hcgas,
 		Real64 const hcout,
 		Real64 const hcin,
-		FArray1A< Real64 > const asol,
-		FArray1A< Real64 > const qv,
+		Array1A< Real64 > const asol,
+		Array1A< Real64 > const qv,
 		Real64 const Tin,
 		Real64 const Tout,
 		Real64 const Gin,
 		Real64 const Gout,
-		FArray1A< Real64 > const theta,
-		FArray1A< Real64 > const tir,
-		FArray1A< Real64 > const rir,
-		FArray1A< Real64 > const emis
+		Array1A< Real64 > const theta,
+		Array1A< Real64 > const tir,
+		Array1A< Real64 > const rir,
+		Array1A< Real64 > const emis
 	)
 	{
 
@@ -249,8 +250,8 @@ namespace TARCOGCommon {
 
 	void
 	EquationsSolver(
-		FArray2A< Real64 > a,
-		FArray1A< Real64 > b,
+		Array2A< Real64 > a,
+		Array1A< Real64 > b,
 		int const n,
 		int & nperr,
 		std::string & ErrorMessage
@@ -275,7 +276,7 @@ namespace TARCOGCommon {
 		b.dim( n );
 
 		// Locals
-		FArray1D_int indx( n );
+		Array1D_int indx( n );
 		Real64 d;
 
 		ludcmp( a, n, indx, d, nperr, ErrorMessage );
@@ -289,9 +290,9 @@ namespace TARCOGCommon {
 
 	void
 	ludcmp(
-		FArray2A< Real64 > a,
+		Array2A< Real64 > a,
 		int const n,
-		FArray1A_int indx,
+		Array1A_int indx,
 		Real64 & d,
 		int & nperr,
 		std::string & ErrorMessage
@@ -313,7 +314,7 @@ namespace TARCOGCommon {
 		Real64 aamax;
 		Real64 dum;
 		Real64 sum;
-		FArray1D< Real64 > vv( NMAX );
+		Array1D< Real64 > vv( NMAX );
 
 		d = 1.0;
 		for ( i = 1; i <= n; ++i ) {
@@ -373,10 +374,10 @@ namespace TARCOGCommon {
 
 	void
 	lubksb(
-		FArray2A< Real64 > const a,
+		Array2A< Real64 > const a,
 		int const n,
-		FArray1A_int const indx,
-		FArray1A< Real64 > b
+		Array1A_int const indx,
+		Array1A< Real64 > b
 	)
 	{
 		//***********************************************************************

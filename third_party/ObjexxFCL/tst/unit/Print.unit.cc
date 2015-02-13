@@ -6,7 +6,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -219,18 +219,18 @@ TEST_F( PrintTest, Fmt )
 	EXPECT_EQ( "  1125.", buf.str() );
 }
 
-TEST_F( PrintTest, FArray1DOut )
+TEST_F( PrintTest, Array1DOut )
 {
-	FArray1D_int const A( 3, { 1, 2, 3 } );
+	Array1D_int const A( 3, { 1, 2, 3 } );
 	gio::Fmt const fmt( "(3I3)" );
 	Print( fmt ) << A;
 	EXPECT_EQ( "  1  2  3\n", buf.str() );
 }
 
-TEST_F( PrintTest, FArray1SOut )
+TEST_F( PrintTest, Array1SOut )
 {
-	FArray1D_int const A( 3, { 1, 2, 3 } );
-	FArray1S_int S( A );
+	Array1D_int const A( 3, { 1, 2, 3 } );
+	Array1S_int S( A );
 	gio::Fmt const fmt( "(3I3)" );
 	Print( fmt ) << S;
 	EXPECT_EQ( "  1  2  3\n", buf.str() );

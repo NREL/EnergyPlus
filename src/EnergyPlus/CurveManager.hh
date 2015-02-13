@@ -2,11 +2,11 @@
 #define CurveManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/FArray2S.hh>
-#include <ObjexxFCL/FArray5D.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array1S.hh>
+#include <ObjexxFCL/Array2D.hh>
+#include <ObjexxFCL/Array2S.hh>
+#include <ObjexxFCL/Array5D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -85,7 +85,7 @@ namespace CurveManager {
 	extern int const CurveType_QuadLinear;
 	extern int const CurveType_CubicLinear;
 
-	extern FArray1D_string const cCurveTypes;
+	extern Array1D_string const cCurveTypes;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -226,9 +226,9 @@ namespace CurveManager {
 	{
 		// Members
 		Real64 NormalPoint;
-		FArray1D< Real64 > X1;
-		FArray1D< Real64 > X2;
-		FArray1D< Real64 > Y;
+		Array1D< Real64 > X1;
+		Array1D< Real64 > X2;
+		Array1D< Real64 > Y;
 
 		// Default Constructor
 		TableDataStruct() :
@@ -238,9 +238,9 @@ namespace CurveManager {
 		// Member Constructor
 		TableDataStruct(
 			Real64 const NormalPoint,
-			FArray1< Real64 > const & X1,
-			FArray1< Real64 > const & X2,
-			FArray1< Real64 > const & Y
+			Array1< Real64 > const & X1,
+			Array1< Real64 > const & X2,
+			Array1< Real64 > const & Y
 		) :
 			NormalPoint( NormalPoint ),
 			X1( X1 ),
@@ -253,9 +253,9 @@ namespace CurveManager {
 	struct PerfCurveTableDataStruct
 	{
 		// Members
-		FArray1D< Real64 > X1;
-		FArray1D< Real64 > X2;
-		FArray2D< Real64 > Y;
+		Array1D< Real64 > X1;
+		Array1D< Real64 > X2;
+		Array2D< Real64 > Y;
 
 		// Default Constructor
 		PerfCurveTableDataStruct()
@@ -263,9 +263,9 @@ namespace CurveManager {
 
 		// Member Constructor
 		PerfCurveTableDataStruct(
-			FArray1< Real64 > const & X1,
-			FArray1< Real64 > const & X2,
-			FArray2< Real64 > const & Y
+			Array1< Real64 > const & X1,
+			Array1< Real64 > const & X2,
+			Array2< Real64 > const & Y
 		) :
 			X1( X1 ),
 			X2( X2 ),
@@ -312,7 +312,7 @@ namespace CurveManager {
 		Real64 CurveMax; // maximum value of curve output
 		bool CurveMinPresent; // If TRUE, then cap minimum curve output
 		bool CurveMaxPresent; // if TRUE, then cap maximum curve output
-		FArray1D< TriQuadraticCurveDataStruct > Tri2ndOrder; // structure for triquadratic curve data
+		Array1D< TriQuadraticCurveDataStruct > Tri2ndOrder; // structure for triquadratic curve data
 		bool EMSOverrideOn; // if TRUE, then EMS is calling to override curve value
 		Real64 EMSOverrideCurveValue; // Value of curve result EMS is directing to use
 		// report variables
@@ -406,7 +406,7 @@ namespace CurveManager {
 			Real64 const CurveMax, // maximum value of curve output
 			bool const CurveMinPresent, // If TRUE, then cap minimum curve output
 			bool const CurveMaxPresent, // if TRUE, then cap maximum curve output
-			FArray1< TriQuadraticCurveDataStruct > const & Tri2ndOrder, // structure for triquadratic curve data
+			Array1< TriQuadraticCurveDataStruct > const & Tri2ndOrder, // structure for triquadratic curve data
 			bool const EMSOverrideOn, // if TRUE, then EMS is calling to override curve value
 			Real64 const EMSOverrideCurveValue, // Value of curve result EMS is directing to use
 			Real64 const CurveOutput, // curve output or result
@@ -470,16 +470,16 @@ namespace CurveManager {
 		int NumIndependentVars; // Curve type (see parameter definitions above)
 		int InterpolationOrder; // number of points to interpolate (table data only)
 		int NumX1Vars; // Number of variables for independent variable #1
-		FArray1D< Real64 > X1Var;
+		Array1D< Real64 > X1Var;
 		int NumX2Vars; // Number of variables for independent variable #2
-		FArray1D< Real64 > X2Var;
+		Array1D< Real64 > X2Var;
 		int NumX3Vars; // Number of variables for independent variable #3
-		FArray1D< Real64 > X3Var;
+		Array1D< Real64 > X3Var;
 		int NumX4Vars; // Number of variables for independent variable #4
-		FArray1D< Real64 > X4Var;
+		Array1D< Real64 > X4Var;
 		int NumX5Vars; // Number of variables for independent variable #5
-		FArray1D< Real64 > X5Var;
-		FArray5D< Real64 > TableLookupZData;
+		Array1D< Real64 > X5Var;
+		Array5D< Real64 > TableLookupZData;
 
 		// Default Constructor
 		TableLookupData() :
@@ -497,16 +497,16 @@ namespace CurveManager {
 			int const NumIndependentVars, // Curve type (see parameter definitions above)
 			int const InterpolationOrder, // number of points to interpolate (table data only)
 			int const NumX1Vars, // Number of variables for independent variable #1
-			FArray1< Real64 > const & X1Var,
+			Array1< Real64 > const & X1Var,
 			int const NumX2Vars, // Number of variables for independent variable #2
-			FArray1< Real64 > const & X2Var,
+			Array1< Real64 > const & X2Var,
 			int const NumX3Vars, // Number of variables for independent variable #3
-			FArray1< Real64 > const & X3Var,
+			Array1< Real64 > const & X3Var,
 			int const NumX4Vars, // Number of variables for independent variable #4
-			FArray1< Real64 > const & X4Var,
+			Array1< Real64 > const & X4Var,
 			int const NumX5Vars, // Number of variables for independent variable #5
-			FArray1< Real64 > const & X5Var,
-			FArray5< Real64 > const & TableLookupZData
+			Array1< Real64 > const & X5Var,
+			Array5< Real64 > const & TableLookupZData
 		) :
 			NumIndependentVars( NumIndependentVars ),
 			InterpolationOrder( InterpolationOrder ),
@@ -526,12 +526,12 @@ namespace CurveManager {
 	};
 
 	// Object Data
-	extern FArray1D< PerfomanceCurveData > PerfCurve;
-	extern FArray1D< PerfCurveTableDataStruct > PerfCurveTableData;
-	extern FArray1D< TableDataStruct > TableData;
-	extern FArray1D< TableDataStruct > TempTableData;
-	extern FArray1D< TableDataStruct > Temp2TableData;
-	extern FArray1D< TableLookupData > TableLookup;
+	extern Array1D< PerfomanceCurveData > PerfCurve;
+	extern Array1D< PerfCurveTableDataStruct > PerfCurveTableData;
+	extern Array1D< TableDataStruct > TableData;
+	extern Array1D< TableDataStruct > TempTableData;
+	extern Array1D< TableDataStruct > Temp2TableData;
+	extern Array1D< TableLookupData > TableLookup;
 
 	// Functions
 
@@ -560,8 +560,8 @@ namespace CurveManager {
 		std::string & CurrentModuleObject,
 		bool const ReadFromFile,
 		std::string & FileName,
-		FArray1S_string Alphas,
-		FArray1S< Real64 > Numbers,
+		Array1S_string Alphas,
+		Array1S< Real64 > Numbers,
 		int const NumNumbers,
 		bool & ErrorsFound
 	);
@@ -570,9 +570,9 @@ namespace CurveManager {
 	DLAG(
 		Real64 const XX,
 		Real64 const YY,
-		FArray1S< Real64 > X,
-		FArray1S< Real64 > Y,
-		FArray2S< Real64 > Z,
+		Array1S< Real64 > X,
+		Array1S< Real64 > Y,
+		Array2S< Real64 > Z,
 		int const NX,
 		int const NY,
 		int const M,
@@ -612,16 +612,16 @@ namespace CurveManager {
 		int & CurveNum, // index to performance curve
 		std::string & TableType, // tabular data object type
 		std::string & CurveName, // performance curve name
-		FArray1S< Real64 > RawDataX, // table data X values (1st independent variable)
-		FArray1S< Real64 > RawDataY, // table data Y values (dependent variables)
-		Optional< FArray1S< Real64 > > RawDataX2 = _ // table data X2 values (2nd independent variable)
+		Array1S< Real64 > RawDataX, // table data X values (1st independent variable)
+		Array1S< Real64 > RawDataY, // table data Y values (dependent variables)
+		Optional< Array1S< Real64 > > RawDataX2 = _ // table data X2 values (2nd independent variable)
 	);
 
 	void
 	Interpolate_Lagrange(
 		Real64 const DataPoint, // point used for interpolating output (x)
-		FArray1S< Real64 > FunctionArray, // array of output data (Y's)
-		FArray1S< Real64 > Ordinate, // array of input data (X's)
+		Array1S< Real64 > FunctionArray, // array of output data (Y's)
+		Array1S< Real64 > Ordinate, // array of input data (X's)
 		int const ISPT, // the starting point in the interpolated array
 		int const IEPT, // the ending point in the interpolated array
 		Real64 & ALAG // the interpolated output (y or F(x) in equation above)

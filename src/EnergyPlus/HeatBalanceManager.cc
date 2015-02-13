@@ -3,9 +3,8 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArrayS.functions.hh>
-#include <ObjexxFCL/FArray1S.io.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/MArray.functions.hh>
@@ -130,7 +129,7 @@ namespace HeatBalanceManager {
 	static std::string const BlankString;
 	static gio::Fmt fmtA( "(A)" );
 
-	FArray1D_string const PassFail( 2, { "Fail", "Pass" } );
+	Array1D_string const PassFail( 2, { "Fail", "Pass" } );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -138,30 +137,30 @@ namespace HeatBalanceManager {
 
 	//Real Variables for the Heat Balance Simulation
 	//Variables used to determine warmup convergence
-	FArray1D< Real64 > MaxCoolLoadPrevDay; // Max cooling load from the previous day
-	FArray1D< Real64 > MaxCoolLoadZone; // Maximum zone cooling load from the current day
-	FArray1D< Real64 > MaxHeatLoadPrevDay; // Max heating load from the previous day
-	FArray1D< Real64 > MaxHeatLoadZone; // Maximum zone heating load from the current day
-	FArray1D< Real64 > MaxTempPrevDay; // Max temperature from the previous day
-	FArray1D< Real64 > MaxTempZone; // Maximum zone temperature from the current day
-	FArray1D< Real64 > MinTempPrevDay; // Min temperature from the previous day
-	FArray1D< Real64 > MinTempZone; // Minimum zone temperature from the current day
+	Array1D< Real64 > MaxCoolLoadPrevDay; // Max cooling load from the previous day
+	Array1D< Real64 > MaxCoolLoadZone; // Maximum zone cooling load from the current day
+	Array1D< Real64 > MaxHeatLoadPrevDay; // Max heating load from the previous day
+	Array1D< Real64 > MaxHeatLoadZone; // Maximum zone heating load from the current day
+	Array1D< Real64 > MaxTempPrevDay; // Max temperature from the previous day
+	Array1D< Real64 > MaxTempZone; // Maximum zone temperature from the current day
+	Array1D< Real64 > MinTempPrevDay; // Min temperature from the previous day
+	Array1D< Real64 > MinTempZone; // Minimum zone temperature from the current day
 
 	//Variables used to report difference in temperature and load from the last two warmup days
-	FArray1D< Real64 > WarmupTempDiff; // Temperature difference between the last two warmup days
-	FArray1D< Real64 > WarmupLoadDiff; // Zone load differences between the last two warmup days
-	FArray1D< Real64 > TempZoneSecPrevDay; // Zone air temperature from the second last warmup day
-	FArray1D< Real64 > LoadZoneSecPrevDay; // Zone load from the second last warmup day
-	FArray1D< Real64 > TempZonePrevDay; // Zone air temperature from the previous day
-	FArray1D< Real64 > LoadZonePrevDay; // Zone load from the previuos day
-	FArray1D< Real64 > TempZone; // Zone air temperature from the current warmup day
-	FArray1D< Real64 > LoadZone; // Zone load from the current warmup day
+	Array1D< Real64 > WarmupTempDiff; // Temperature difference between the last two warmup days
+	Array1D< Real64 > WarmupLoadDiff; // Zone load differences between the last two warmup days
+	Array1D< Real64 > TempZoneSecPrevDay; // Zone air temperature from the second last warmup day
+	Array1D< Real64 > LoadZoneSecPrevDay; // Zone load from the second last warmup day
+	Array1D< Real64 > TempZonePrevDay; // Zone air temperature from the previous day
+	Array1D< Real64 > LoadZonePrevDay; // Zone load from the previuos day
+	Array1D< Real64 > TempZone; // Zone air temperature from the current warmup day
+	Array1D< Real64 > LoadZone; // Zone load from the current warmup day
 
-	FArray2D< Real64 > TempZoneRpt; // Zone air temperature to report (average over all warmup days)
-	FArray1D< Real64 > TempZoneRptStdDev; // Zone air temperature to report (std dev over all warmup days)
-	FArray2D< Real64 > LoadZoneRpt; // Zone load to report (average over all warmup days)
-	FArray1D< Real64 > LoadZoneRptStdDev; // Zone load to report (std dev over all warmup days)
-	FArray2D< Real64 > MaxLoadZoneRpt; // Maximum zone load for reporting calcs
+	Array2D< Real64 > TempZoneRpt; // Zone air temperature to report (average over all warmup days)
+	Array1D< Real64 > TempZoneRptStdDev; // Zone air temperature to report (std dev over all warmup days)
+	Array2D< Real64 > LoadZoneRpt; // Zone load to report (average over all warmup days)
+	Array1D< Real64 > LoadZoneRptStdDev; // Zone load to report (std dev over all warmup days)
+	Array2D< Real64 > MaxLoadZoneRpt; // Maximum zone load for reporting calcs
 	int CountWarmupDayPoints; // Count of warmup timesteps (to achieve warmup)
 
 	std::string CurrentModuleObject; // to assist in getting input
@@ -178,7 +177,7 @@ namespace HeatBalanceManager {
 	// Reporting routines for module
 
 	// Object Data
-	FArray1D< WarmupConvergence > WarmupConvergenceValues;
+	Array1D< WarmupConvergence > WarmupConvergenceValues;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -399,7 +398,7 @@ namespace HeatBalanceManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const NumConstrObjects( 5 );
-		static FArray1D_string const ConstrObjects( NumConstrObjects, { "Pipe:Indoor", "Pipe:Outdoor", "Pipe:Underground", "GroundHeatExchanger:Surface", "DaylightingDevice:Tubular" } );
+		static Array1D_string const ConstrObjects( NumConstrObjects, { "Pipe:Indoor", "Pipe:Outdoor", "Pipe:Underground", "GroundHeatExchanger:Surface", "DaylightingDevice:Tubular" } );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -602,8 +601,8 @@ namespace HeatBalanceManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string AlphaName( 4 );
-		FArray1D< Real64 > BuildingNumbers( 5 );
+		Array1D_string AlphaName( 4 );
+		Array1D< Real64 > BuildingNumbers( 5 );
 		int NumAlpha;
 		int NumNumber;
 		int IOStat;
@@ -634,20 +633,20 @@ namespace HeatBalanceManager {
 			GetObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// Building Name (remove certain characters)
 			BuildingName = AlphaName( 1 );
-			TMP = index( BuildingName, CHAR( 1 ) );
+			TMP = index( BuildingName, char( 1 ) );
 			while ( TMP != std::string::npos ) {
 				BuildingName[ TMP ] = ',';
-				TMP = index( BuildingName, CHAR( 1 ) );
+				TMP = index( BuildingName, char( 1 ) );
 			}
-			TMP = index( BuildingName, CHAR( 2 ) );
+			TMP = index( BuildingName, char( 2 ) );
 			while ( TMP != std::string::npos ) {
 				BuildingName[ TMP ] = '!';
-				TMP = index( BuildingName, CHAR( 2 ) );
+				TMP = index( BuildingName, char( 2 ) );
 			}
-			TMP = index( BuildingName, CHAR( 3 ) );
+			TMP = index( BuildingName, char( 3 ) );
 			while ( TMP != std::string::npos ) {
 				BuildingName[ TMP ] = '\\';
-				TMP = index( BuildingName, CHAR( 3 ) );
+				TMP = index( BuildingName, char( 3 ) );
 			}
 			// Building Azimuth (no validation)
 			BuildingAzimuth = mod( BuildingNumbers( 1 ), 360.0 );
@@ -1129,8 +1128,8 @@ namespace HeatBalanceManager {
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string AlphArray( 1 ); // Character string data
-		FArray1D< Real64 > NumArray( 3 ); // Numeric data
+		Array1D_string AlphArray( 1 ); // Character string data
+		Array1D< Real64 > NumArray( 3 ); // Numeric data
 
 		// Formats
 		static gio::Fmt Format_720( "('Environment:Site Atmospheric Variation',3(',',A))" );
@@ -1219,11 +1218,11 @@ namespace HeatBalanceManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string MaterialNames( 5 ); // Number of Material Alpha names defined
+		Array1D_string MaterialNames( 5 ); // Number of Material Alpha names defined
 		int MaterNum; // Counter to keep track of the material number
 		int MaterialNumAlpha; // Number of material alpha names being passed
 		int MaterialNumProp; // Number of material properties being passed
-		FArray1D< Real64 > MaterialProps( 27 ); // Temporary array to transfer material properties
+		Array1D< Real64 > MaterialProps( 27 ); // Temporary array to transfer material properties
 		int RegMat; // Regular Materials -- full property definition
 		int RegRMat; // Regular Materials -- R only property definition
 		int AirMat; // Air space materias in opaque constructions
@@ -3309,10 +3308,10 @@ namespace HeatBalanceManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string SpecDataNames( 1 ); // Spectral data alpha names
+		Array1D_string SpecDataNames( 1 ); // Spectral data alpha names
 		int SpecDataNumAlpha; // Number of spectral data alpha names being passed
 		int SpecDataNumProp; // Number of spectral data properties being passed
-		FArray1D< Real64 > SpecDataProps; // Temporary array to transfer spectal data properties
+		Array1D< Real64 > SpecDataProps; // Temporary array to transfer spectal data properties
 		int Loop;
 		bool ErrorInName;
 		bool IsBlank;
@@ -3531,8 +3530,8 @@ namespace HeatBalanceManager {
 		int ConstructNumAlpha; // Number of construction alpha names being passed
 		int DummyNumProp; // dummy variable for properties being passed
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string ConstructAlphas( {0,MaxLayersInConstruct} ); // Construction Alpha names defined
-		FArray1D< Real64 > DummyProps( 4 ); // Temporary array to transfer construction properties
+		Array1D_string ConstructAlphas( {0,MaxLayersInConstruct} ); // Construction Alpha names defined
+		Array1D< Real64 > DummyProps( 4 ); // Temporary array to transfer construction properties
 		bool ErrorInName;
 		bool IsBlank;
 		int Loop;
@@ -3549,7 +3548,7 @@ namespace HeatBalanceManager {
 		static bool NoRegularMaterialsUsed( true );
 
 		int iMatGlass; // number of glass layers
-		FArray1D_string WConstructNames;
+		Array1D_string WConstructNames;
 
 		// FLOW:
 
@@ -4004,15 +4003,15 @@ namespace HeatBalanceManager {
 
 			rNumericArgs = 0.0; // Zero out just in case
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			TMP = index( cAlphaArgs( 1 ), CHAR( 1 ) );
+			TMP = index( cAlphaArgs( 1 ), char( 1 ) );
 			while ( TMP != std::string::npos ) {
 				cAlphaArgs( 1 )[ TMP ] = ',';
-				TMP = index( cAlphaArgs( 1 ), CHAR( 1 ) );
+				TMP = index( cAlphaArgs( 1 ), char( 1 ) );
 			}
-			TMP = index( cAlphaArgs( 1 ), CHAR( 2 ) );
+			TMP = index( cAlphaArgs( 1 ), char( 2 ) );
 			while ( TMP != std::string::npos ) {
 				cAlphaArgs( 1 )[ TMP ] = '!';
-				TMP = index( cAlphaArgs( 1 ), CHAR( 2 ) );
+				TMP = index( cAlphaArgs( 1 ), char( 2 ) );
 			}
 
 			//    Make sure Zone Name is unique
@@ -4167,14 +4166,14 @@ namespace HeatBalanceManager {
 	ProcessZoneData(
 		std::string const & cCurrentModuleObject,
 		int const ZoneLoop,
-		FArray1_string const & cAlphaArgs,
+		Array1_string const & cAlphaArgs,
 		int & NumAlphas,
-		FArray1< Real64 > const & rNumericArgs,
+		Array1< Real64 > const & rNumericArgs,
 		int & NumNumbers,
-		FArray1_bool const & lNumericFieldBlanks, //Unused
-		FArray1_bool const & lAlphaFieldBlanks,
-		FArray1_string const & cAlphaFieldNames,
-		FArray1_string const & cNumericFieldNames, //Unused
+		Array1_bool const & lNumericFieldBlanks, //Unused
+		Array1_bool const & lAlphaFieldBlanks,
+		Array1_string const & cAlphaFieldNames,
+		Array1_string const & cNumericFieldNames, //Unused
 		bool & ErrorsFound // If errors found in input
 	)
 	{
@@ -5102,11 +5101,11 @@ namespace HeatBalanceManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string FrameDividerNames( 2 ); // Frame/Divider Alpha names
+		Array1D_string FrameDividerNames( 2 ); // Frame/Divider Alpha names
 		int FrameDividerNum; // Counter to keep track of the frame/divider number
 		int FrameDividerNumAlpha; // Number of frame/divider alpha names being passed
 		int FrameDividerNumProp; // Number of frame/divider properties being passed
-		FArray1D< Real64 > FrameDividerProps( 23 ); // Temporary array to transfer frame/divider properties
+		Array1D< Real64 > FrameDividerProps( 23 ); // Temporary array to transfer frame/divider properties
 		int Loop;
 		bool ErrorInName;
 		bool IsBlank;
@@ -5263,7 +5262,7 @@ namespace HeatBalanceManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_string const NumName( 5, { "1", "2", "3", "4", "5" } );
+		static Array1D_string const NumName( 5, { "1", "2", "3", "4", "5" } );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -5274,22 +5273,22 @@ namespace HeatBalanceManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static int W5DataFileNum;
 		int FileLineCount; // counter for number of lines read (used in some error messages)
-		FArray1D_string DataLine( 100 ); // Array of data lines
+		Array1D_string DataLine( 100 ); // Array of data lines
 		std::string NextLine; // Line of data
 		std::string WindowNameInW5DataFile;
 		std::string W5Name;
-		FArray1D_string GasName( 3 ); // Gas name from data file
+		Array1D_string GasName( 3 ); // Gas name from data file
 		std::string LayerName; // Layer name from data file
 		std::string MullionOrientation; // Horizontal, vertical or none
 		int LineNum;
 		int ReadStat; // File read status
-		FArray1D_int NGlass( 2 ); // Number of glass layers in glazing system
-		FArray2D_int NumGases( 2, 4 ); // Number of gases in each gap of a glazing system
-		FArray2D_int MaterNumSysGlass( 2, 5 ); // Material numbers for glazing system / glass combinations
-		FArray2D_int MaterNumSysGap( 2, 4 ); // Material numbers for glazing system / gap combinations
+		Array1D_int NGlass( 2 ); // Number of glass layers in glazing system
+		Array2D_int NumGases( 2, 4 ); // Number of gases in each gap of a glazing system
+		Array2D_int MaterNumSysGlass( 2, 5 ); // Material numbers for glazing system / glass combinations
+		Array2D_int MaterNumSysGap( 2, 4 ); // Material numbers for glazing system / gap combinations
 		int TotMaterialsPrev; // Number of materials before adding ones from W5DataFile
 		int TotFrameDividerPrev; // Number of FrameAndDivider objects before adding ones from W5DataFile
-		FArray1D_int NGaps( 2 ); // Number of gaps in window construction
+		Array1D_int NGaps( 2 ); // Number of gaps in window construction
 		int NGlSys; // Number of glazing systems (normally 1, but 2 for mullioned window
 		//  with two different glazing systems
 		int loop; // DO loop counter
@@ -5304,28 +5303,28 @@ namespace HeatBalanceManager {
 		int MatNum;
 		int FrDivNum; // FrameDivider number
 		bool exists; // True if Window5 data file exists
-		FArray1D< Real64 > WinHeight( 2 ); // Height, width for glazing system (m)
-		FArray1D< Real64 > WinWidth( 2 );
-		FArray1D< Real64 > UValCenter( 2 ); // Center of glass U-value (W/m2-K) for glazing system
-		FArray1D< Real64 > SCCenter( 2 ); // Center of glass shading coefficient for glazing system
-		FArray1D< Real64 > SHGCCenter( 2 ); // Center of glass solar heat gain coefficient for glazing system
-		FArray1D< Real64 > TVisCenter( 2 ); // Center of glass visible transmittance for glazing system
-		FArray1D< Real64 > Tsol( 11 ); // Solar transmittance vs incidence angle; diffuse trans.
-		FArray2D< Real64 > AbsSol( 5, 11 ); // Solar absorptance vs inc. angle in each glass layer
-		FArray1D< Real64 > Rfsol( 11 ); // Front solar reflectance vs inc. angle
-		FArray1D< Real64 > Rbsol( 11 ); // Back solar reflectance vs inc. angle
-		FArray1D< Real64 > Tvis( 11 ); // Visible transmittance vs inc. angle
-		FArray1D< Real64 > Rfvis( 11 ); // Front visible reflectance vs inc. angle
-		FArray1D< Real64 > Rbvis( 11 ); // Back visible reflectance vs inc. angle
-		FArray1D< Real64 > CosPhiIndepVar( 10 ); // Cosine of incidence angle from 0 to 90 deg in 10 deg increments
+		Array1D< Real64 > WinHeight( 2 ); // Height, width for glazing system (m)
+		Array1D< Real64 > WinWidth( 2 );
+		Array1D< Real64 > UValCenter( 2 ); // Center of glass U-value (W/m2-K) for glazing system
+		Array1D< Real64 > SCCenter( 2 ); // Center of glass shading coefficient for glazing system
+		Array1D< Real64 > SHGCCenter( 2 ); // Center of glass solar heat gain coefficient for glazing system
+		Array1D< Real64 > TVisCenter( 2 ); // Center of glass visible transmittance for glazing system
+		Array1D< Real64 > Tsol( 11 ); // Solar transmittance vs incidence angle; diffuse trans.
+		Array2D< Real64 > AbsSol( 5, 11 ); // Solar absorptance vs inc. angle in each glass layer
+		Array1D< Real64 > Rfsol( 11 ); // Front solar reflectance vs inc. angle
+		Array1D< Real64 > Rbsol( 11 ); // Back solar reflectance vs inc. angle
+		Array1D< Real64 > Tvis( 11 ); // Visible transmittance vs inc. angle
+		Array1D< Real64 > Rfvis( 11 ); // Front visible reflectance vs inc. angle
+		Array1D< Real64 > Rbvis( 11 ); // Back visible reflectance vs inc. angle
+		Array1D< Real64 > CosPhiIndepVar( 10 ); // Cosine of incidence angle from 0 to 90 deg in 10 deg increments
 		int IPhi; // Incidence angle counter
 		Real64 Phi; // Incidence angle (deg)
 		Real64 CosPhi; // Cosine of incidence angle
-		FArray1D< Real64 > tsolFit( 10 ); // Fitted solar transmittance vs incidence angle
-		FArray1D< Real64 > tvisFit( 10 ); // Fitted visible transmittance vs incidence angle
-		FArray1D< Real64 > rfsolFit( 10 ); // Fitted solar front reflectance vs incidence angle
-		FArray2D< Real64 > solabsFit( 10, 5 ); // Fitted solar absorptance vs incidence angle for each glass layer
-		FArray1D_string DividerType( 2 ); // Divider type: DividedLite or Suspended
+		Array1D< Real64 > tsolFit( 10 ); // Fitted solar transmittance vs incidence angle
+		Array1D< Real64 > tvisFit( 10 ); // Fitted visible transmittance vs incidence angle
+		Array1D< Real64 > rfsolFit( 10 ); // Fitted solar front reflectance vs incidence angle
+		Array2D< Real64 > solabsFit( 10, 5 ); // Fitted solar absorptance vs incidence angle for each glass layer
+		Array1D_string DividerType( 2 ); // Divider type: DividedLite or Suspended
 		Real64 FrameWidth;
 		Real64 MullionWidth;
 		Real64 FrameProjectionOut;
@@ -5335,16 +5334,16 @@ namespace HeatBalanceManager {
 		Real64 FrameSolAbsorp;
 		Real64 FrameVisAbsorp;
 		Real64 FrameEmis;
-		FArray1D_int HorDividers( 2 ); // For divider: number horizontal for each glazing system
-		FArray1D_int VertDividers( 2 ); // For divider: number vertical for each glazing system
-		FArray1D< Real64 > DividerWidth( 2 );
-		FArray1D< Real64 > DividerProjectionOut( 2 );
-		FArray1D< Real64 > DividerProjectionIn( 2 );
-		FArray1D< Real64 > DividerConductance( 2 );
-		FArray1D< Real64 > DivEdgeToCenterGlCondRatio( 2 );
-		FArray1D< Real64 > DividerSolAbsorp( 2 );
-		FArray1D< Real64 > DividerVisAbsorp( 2 );
-		FArray1D< Real64 > DividerEmis( 2 );
+		Array1D_int HorDividers( 2 ); // For divider: number horizontal for each glazing system
+		Array1D_int VertDividers( 2 ); // For divider: number vertical for each glazing system
+		Array1D< Real64 > DividerWidth( 2 );
+		Array1D< Real64 > DividerProjectionOut( 2 );
+		Array1D< Real64 > DividerProjectionIn( 2 );
+		Array1D< Real64 > DividerConductance( 2 );
+		Array1D< Real64 > DivEdgeToCenterGlCondRatio( 2 );
+		Array1D< Real64 > DividerSolAbsorp( 2 );
+		Array1D< Real64 > DividerVisAbsorp( 2 );
+		Array1D< Real64 > DividerEmis( 2 );
 		std::string::size_type endcol;
 
 		// Object Data
@@ -6156,8 +6155,8 @@ Label1000: ;
 		int ConstructNumAlpha; // Number of construction alpha names being passed
 		int DummyNumProp; // dummy variable for properties being passed
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string ConstructAlphas( 1 ); // Construction Alpha names defined
-		FArray1D< Real64 > DummyProps( 4 ); // Temporary array to transfer construction properties
+		Array1D_string ConstructAlphas( 1 ); // Construction Alpha names defined
+		Array1D< Real64 > DummyProps( 4 ); // Temporary array to transfer construction properties
 		bool ErrorInName;
 		bool IsBlank;
 		int Loop;
@@ -6970,10 +6969,10 @@ Label1000: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int IOStat; // IO Status when calling get input subroutine
-		FArray1D_string MaterialNames( 5 ); // Number of Material Alpha names defined
+		Array1D_string MaterialNames( 5 ); // Number of Material Alpha names defined
 		int MaterialNumAlpha; // Number of material alpha names being passed
 		int MaterialNumProp; // Number of material properties being passed
-		FArray1D< Real64 > MaterialProps( 27 ); // Temporary array to transfer material properties
+		Array1D< Real64 > MaterialProps( 27 ); // Temporary array to transfer material properties
 		int Loop;
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
@@ -7359,12 +7358,12 @@ Label1000: ;
 		// When reading Construction:ComplexFenestrationState, there is a call of GetMatrix2D which also uses same
 		// variables from DataIPShortCuts.  Since this can cause some errors in reading, it is important
 		// to declare local variables for reading Construction:ComplexFenestrationState object(s)
-		FArray1D_string locAlphaFieldNames;
-		FArray1D_string locNumericFieldNames;
-		FArray1D_bool locNumericFieldBlanks;
-		FArray1D_bool locAlphaFieldBlanks;
-		FArray1D_string locAlphaArgs;
-		FArray1D< Real64 > locNumericArgs;
+		Array1D_string locAlphaFieldNames;
+		Array1D_string locNumericFieldNames;
+		Array1D_bool locNumericFieldBlanks;
+		Array1D_bool locAlphaFieldBlanks;
+		Array1D_string locAlphaArgs;
+		Array1D< Real64 > locNumericArgs;
 		std::string locCurrentModuleObject;
 
 		//Reading WindowThermalModel:Params

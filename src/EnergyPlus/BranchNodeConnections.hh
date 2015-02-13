@@ -2,8 +2,8 @@
 #define BranchNodeConnections_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray1S.hh>
+#include <ObjexxFCL/Array1A.hh>
+#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -99,13 +99,13 @@ namespace BranchNodeConnections {
 		std::string const & ComponentName,
 		bool & IsParent,
 		int & NumInlets,
-		FArray1D_string & InletNodeNames,
-		FArray1D_int & InletNodeNums,
-		FArray1D_int & InletFluidStreams,
+		Array1D_string & InletNodeNames,
+		Array1D_int & InletNodeNums,
+		Array1D_int & InletFluidStreams,
 		int & NumOutlets,
-		FArray1D_string & OutletNodeNames,
-		FArray1D_int & OutletNodeNums,
-		FArray1D_int & OutletFluidStreams,
+		Array1D_string & OutletNodeNames,
+		Array1D_int & OutletNodeNums,
+		Array1D_int & OutletFluidStreams,
 		bool & ErrorsFound
 	);
 
@@ -114,12 +114,12 @@ namespace BranchNodeConnections {
 		std::string const & ComponentType,
 		std::string const & ComponentName,
 		int & NumChildren,
-		FArray1S_string ChildrenCType,
-		FArray1S_string ChildrenCName,
-		FArray1S_string InletNodeName,
-		FArray1S_int InletNodeNum,
-		FArray1S_string OutletNodeName,
-		FArray1S_int OutletNodeNum,
+		Array1S_string ChildrenCType,
+		Array1S_string ChildrenCName,
+		Array1S_string InletNodeName,
+		Array1S_int InletNodeNum,
+		Array1S_string OutletNodeName,
+		Array1S_int OutletNodeNum,
 		bool & ErrorsFound
 	);
 
@@ -152,17 +152,17 @@ namespace BranchNodeConnections {
 	void
 	GetNodeConnectionType(
 		int const NodeNumber,
-		FArray1D_int & NodeConnectType,
+		Array1D_int & NodeConnectType,
 		bool & errFlag
 	);
 
 	void
 	FindAllNumbersInList(
 		int const WhichNumber,
-		FArray1A_int const ListOfItems,
+		Array1A_int const ListOfItems,
 		int const NumItems,
 		int & CountOfItems, // Number of items found
-		FArray1D_int & AllNumbersInList // Index array to all numbers found
+		Array1D_int & AllNumbersInList // Index array to all numbers found
 	);
 
 	template< typename A >
@@ -173,10 +173,10 @@ namespace BranchNodeConnections {
 		MArray1< A, int > const & ListOfItems,
 		int const NumItems,
 		int & CountOfItems, // Number of items found
-		FArray1D_int & AllNumbersInList // Index array to all numbers found
+		Array1D_int & AllNumbersInList // Index array to all numbers found
 	)
 	{
-		FindAllNumbersInList( WhichNumber, FArray1D_int( ListOfItems ), NumItems, CountOfItems, AllNumbersInList );
+		FindAllNumbersInList( WhichNumber, Array1D_int( ListOfItems ), NumItems, CountOfItems, AllNumbersInList );
 	}
 
 	//     NOTICE

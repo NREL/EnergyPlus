@@ -7,7 +7,7 @@
 #include <vector>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/numeric.hh>
@@ -179,7 +179,7 @@ namespace OutputReportTabular {
 	int sizeMonthlyFieldSetInput( 0 );
 	int MonthlyTablesCount( 0 );
 	int MonthlyColumnsCount( 0 );
-	FArray1D_bool IsMonthGathered( 12, false ); // shown as true for any month used
+	Array1D_bool IsMonthGathered( 12, false ); // shown as true for any month used
 
 	int TOCEntriesCount( 0 );
 	int TOCEntriesSize( 0 );
@@ -199,9 +199,9 @@ namespace OutputReportTabular {
 	std::ofstream fix_stream; // Fixed table stream
 	std::ofstream htm_stream; // HTML table stream
 	std::ofstream xml_stream; // XML table stream
-	FArray1D< std::ofstream * > TabularOutputFile( maxNumStyles, { &csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream } ); // Table stream array
-	FArray1D_string del( maxNumStyles ); // the delimiter to use
-	FArray1D_int TableStyle( maxNumStyles, 0 ); // see list of parameters
+	Array1D< std::ofstream * > TabularOutputFile( maxNumStyles, { &csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream } ); // Table stream array
+	Array1D_string del( maxNumStyles ); // the delimiter to use
+	Array1D_int TableStyle( maxNumStyles, 0 ); // see list of parameters
 
 	Real64 timeInYear( 0.0 );
 
@@ -220,32 +220,32 @@ namespace OutputReportTabular {
 	// BEPS Report Related Variables
 	// From Report:Table:Predefined - BEPS
 	// arrays that hold the meter numbers that are initialized at get input
-	FArray1D_int meterNumTotalsBEPS( numResourceTypes, 0 );
-	FArray1D_int meterNumTotalsSource( numSourceTypes, 0 );
-	FArray1D_bool fuelfactorsused( numSourceTypes, false );
-	FArray1D_bool ffUsed( numResourceTypes, false );
-	FArray1D< Real64 > SourceFactors( numResourceTypes, 0.0 );
-	FArray1D_bool ffSchedUsed( numResourceTypes, false );
-	FArray1D_int ffSchedIndex( numResourceTypes, 0 );
-	FArray2D_int meterNumEndUseBEPS( NumEndUses, numResourceTypes, 0 );
-	FArray3D_int meterNumEndUseSubBEPS;
+	Array1D_int meterNumTotalsBEPS( numResourceTypes, 0 );
+	Array1D_int meterNumTotalsSource( numSourceTypes, 0 );
+	Array1D_bool fuelfactorsused( numSourceTypes, false );
+	Array1D_bool ffUsed( numResourceTypes, false );
+	Array1D< Real64 > SourceFactors( numResourceTypes, 0.0 );
+	Array1D_bool ffSchedUsed( numResourceTypes, false );
+	Array1D_int ffSchedIndex( numResourceTypes, 0 );
+	Array2D_int meterNumEndUseBEPS( NumEndUses, numResourceTypes, 0 );
+	Array3D_int meterNumEndUseSubBEPS;
 	// arrays that hold the names of the resource and end uses
-	FArray1D_string resourceTypeNames( numResourceTypes );
-	FArray1D_string sourceTypeNames( numSourceTypes );
-	FArray1D_string endUseNames( NumEndUses );
+	Array1D_string resourceTypeNames( numResourceTypes );
+	Array1D_string sourceTypeNames( numSourceTypes );
+	Array1D_string endUseNames( NumEndUses );
 	// arrays that hold the actual values for the year
-	FArray1D< Real64 > gatherTotalsBEPS( numResourceTypes, 0.0 );
-	FArray1D< Real64 > gatherTotalsBySourceBEPS( numResourceTypes, 0.0 );
-	FArray1D< Real64 > gatherTotalsSource( numSourceTypes, 0.0 );
-	FArray1D< Real64 > gatherTotalsBySource( numSourceTypes, 0.0 );
-	FArray2D< Real64 > gatherEndUseBEPS( NumEndUses, numResourceTypes, 0.0 );
-	FArray2D< Real64 > gatherEndUseBySourceBEPS( NumEndUses, numResourceTypes, 0.0 );
-	FArray3D< Real64 > gatherEndUseSubBEPS;
+	Array1D< Real64 > gatherTotalsBEPS( numResourceTypes, 0.0 );
+	Array1D< Real64 > gatherTotalsBySourceBEPS( numResourceTypes, 0.0 );
+	Array1D< Real64 > gatherTotalsSource( numSourceTypes, 0.0 );
+	Array1D< Real64 > gatherTotalsBySource( numSourceTypes, 0.0 );
+	Array2D< Real64 > gatherEndUseBEPS( NumEndUses, numResourceTypes, 0.0 );
+	Array2D< Real64 > gatherEndUseBySourceBEPS( NumEndUses, numResourceTypes, 0.0 );
+	Array3D< Real64 > gatherEndUseSubBEPS;
 	// arrays the hold the demand values
-	FArray1D< Real64 > gatherDemandTotal( numResourceTypes, 0.0 );
-	FArray2D< Real64 > gatherDemandEndUse( NumEndUses, numResourceTypes, 0.0 );
-	FArray3D< Real64 > gatherDemandEndUseSub;
-	FArray1D_int gatherDemandTimeStamp( numResourceTypes, 0 );
+	Array1D< Real64 > gatherDemandTotal( numResourceTypes, 0.0 );
+	Array2D< Real64 > gatherDemandEndUse( NumEndUses, numResourceTypes, 0.0 );
+	Array3D< Real64 > gatherDemandEndUseSub;
+	Array1D_int gatherDemandTimeStamp( numResourceTypes, 0 );
 	// to keep track of hours for the BEPS report gathering
 	Real64 gatherElapsedTimeBEPS( 0.0 );
 	// for normalization of results
@@ -308,7 +308,7 @@ namespace OutputReportTabular {
 	Real64 sourceFactorOtherFuel1( 0.0 );
 	Real64 sourceFactorOtherFuel2( 0.0 );
 
-	FArray1D_int td( 8 );
+	Array1D_int td( 8 );
 	//(1)   Current year
 	//(2)   Current month
 	//(3)   Current day
@@ -319,67 +319,67 @@ namespace OutputReportTabular {
 	//(8)   Milliseconds (0-999)
 
 	// Design day name storage
-	FArray1D_string DesignDayName;
+	Array1D_string DesignDayName;
 	int DesignDayCount( 0 );
 
 	//arrays related to pulse and load component reporting
-	FArray2D< Real64 > radiantPulseUsed;
-	FArray2D_int radiantPulseTimestep;
-	FArray2D< Real64 > radiantPulseReceived;
-	FArray3D< Real64 > loadConvectedNormal;
-	FArray3D< Real64 > loadConvectedWithPulse;
-	FArray3D< Real64 > netSurfRadSeq;
-	FArray2D< Real64 > decayCurveCool;
-	FArray2D< Real64 > decayCurveHeat;
-	FArray3D< Real64 > ITABSFseq; // used for determining the radiant fraction on each surface
-	FArray3D< Real64 > TMULTseq; // used for determining the radiant fraction on each surface
+	Array2D< Real64 > radiantPulseUsed;
+	Array2D_int radiantPulseTimestep;
+	Array2D< Real64 > radiantPulseReceived;
+	Array3D< Real64 > loadConvectedNormal;
+	Array3D< Real64 > loadConvectedWithPulse;
+	Array3D< Real64 > netSurfRadSeq;
+	Array2D< Real64 > decayCurveCool;
+	Array2D< Real64 > decayCurveHeat;
+	Array3D< Real64 > ITABSFseq; // used for determining the radiant fraction on each surface
+	Array3D< Real64 > TMULTseq; // used for determining the radiant fraction on each surface
 
-	FArray3D< Real64 > peopleInstantSeq;
-	FArray3D< Real64 > peopleLatentSeq;
-	FArray3D< Real64 > peopleRadSeq;
-	FArray3D< Real64 > peopleDelaySeq;
+	Array3D< Real64 > peopleInstantSeq;
+	Array3D< Real64 > peopleLatentSeq;
+	Array3D< Real64 > peopleRadSeq;
+	Array3D< Real64 > peopleDelaySeq;
 
-	FArray3D< Real64 > lightInstantSeq;
-	FArray3D< Real64 > lightRetAirSeq;
-	FArray3D< Real64 > lightLWRadSeq; // long wave thermal radiation
-	FArray3D< Real64 > lightSWRadSeq; // short wave visible radiation
-	FArray3D< Real64 > lightDelaySeq;
+	Array3D< Real64 > lightInstantSeq;
+	Array3D< Real64 > lightRetAirSeq;
+	Array3D< Real64 > lightLWRadSeq; // long wave thermal radiation
+	Array3D< Real64 > lightSWRadSeq; // short wave visible radiation
+	Array3D< Real64 > lightDelaySeq;
 
-	FArray3D< Real64 > equipInstantSeq;
-	FArray3D< Real64 > equipLatentSeq;
-	FArray3D< Real64 > equipRadSeq;
-	FArray3D< Real64 > equipDelaySeq;
+	Array3D< Real64 > equipInstantSeq;
+	Array3D< Real64 > equipLatentSeq;
+	Array3D< Real64 > equipRadSeq;
+	Array3D< Real64 > equipDelaySeq;
 
-	FArray3D< Real64 > refrigInstantSeq;
-	FArray3D< Real64 > refrigRetAirSeq;
-	FArray3D< Real64 > refrigLatentSeq;
+	Array3D< Real64 > refrigInstantSeq;
+	Array3D< Real64 > refrigRetAirSeq;
+	Array3D< Real64 > refrigLatentSeq;
 
-	FArray3D< Real64 > waterUseInstantSeq;
-	FArray3D< Real64 > waterUseLatentSeq;
+	Array3D< Real64 > waterUseInstantSeq;
+	Array3D< Real64 > waterUseLatentSeq;
 
-	FArray3D< Real64 > hvacLossInstantSeq;
-	FArray3D< Real64 > hvacLossRadSeq;
-	FArray3D< Real64 > hvacLossDelaySeq;
+	Array3D< Real64 > hvacLossInstantSeq;
+	Array3D< Real64 > hvacLossRadSeq;
+	Array3D< Real64 > hvacLossDelaySeq;
 
-	FArray3D< Real64 > powerGenInstantSeq;
-	FArray3D< Real64 > powerGenRadSeq;
-	FArray3D< Real64 > powerGenDelaySeq;
+	Array3D< Real64 > powerGenInstantSeq;
+	Array3D< Real64 > powerGenRadSeq;
+	Array3D< Real64 > powerGenDelaySeq;
 
-	FArray3D< Real64 > infilInstantSeq;
-	FArray3D< Real64 > infilLatentSeq;
+	Array3D< Real64 > infilInstantSeq;
+	Array3D< Real64 > infilLatentSeq;
 
-	FArray3D< Real64 > zoneVentInstantSeq;
-	FArray3D< Real64 > zoneVentLatentSeq;
+	Array3D< Real64 > zoneVentInstantSeq;
+	Array3D< Real64 > zoneVentLatentSeq;
 
-	FArray3D< Real64 > interZoneMixInstantSeq;
-	FArray3D< Real64 > interZoneMixLatentSeq;
+	Array3D< Real64 > interZoneMixInstantSeq;
+	Array3D< Real64 > interZoneMixLatentSeq;
 
-	FArray3D< Real64 > feneCondInstantSeq;
+	Array3D< Real64 > feneCondInstantSeq;
 	//REAL(r64), DIMENSION(:,:,:),ALLOCATABLE,PUBLIC  :: feneSolarInstantSeq
-	FArray3D< Real64 > feneSolarRadSeq;
-	FArray3D< Real64 > feneSolarDelaySeq;
+	Array3D< Real64 > feneSolarRadSeq;
+	Array3D< Real64 > feneSolarDelaySeq;
 
-	FArray3D< Real64 > surfDelaySeq;
+	Array3D< Real64 > surfDelaySeq;
 
 	int maxUniqueKeyCount( 0 );
 
@@ -394,19 +394,19 @@ namespace OutputReportTabular {
 	//PRIVATE      DateToStr
 
 	// Object Data
-	FArray1D< OutputTableBinnedType > OutputTableBinned;
-	FArray2D< BinResultsType > BinResults; // table number, number of intervals
-	FArray1D< BinResultsType > BinResultsBelow; // time below the lowest defined bin
-	FArray1D< BinResultsType > BinResultsAbove; // time above the highest defined bin
-	FArray1D< BinObjVarIDType > BinObjVarID;
-	FArray1D< BinStatisticsType > BinStatistics;
-	FArray1D< NamedMonthlyType > namedMonthly; // for predefined monthly report titles
-	FArray1D< MonthlyFieldSetInputType > MonthlyFieldSetInput;
-	FArray1D< MonthlyInputType > MonthlyInput;
-	FArray1D< MonthlyTablesType > MonthlyTables;
-	FArray1D< MonthlyColumnsType > MonthlyColumns;
-	FArray1D< TOCEntriesType > TOCEntries;
-	FArray1D< UnitConvType > UnitConv;
+	Array1D< OutputTableBinnedType > OutputTableBinned;
+	Array2D< BinResultsType > BinResults; // table number, number of intervals
+	Array1D< BinResultsType > BinResultsBelow; // time below the lowest defined bin
+	Array1D< BinResultsType > BinResultsAbove; // time above the highest defined bin
+	Array1D< BinObjVarIDType > BinObjVarID;
+	Array1D< BinStatisticsType > BinStatistics;
+	Array1D< NamedMonthlyType > namedMonthly; // for predefined monthly report titles
+	Array1D< MonthlyFieldSetInputType > MonthlyFieldSetInput;
+	Array1D< MonthlyInputType > MonthlyInput;
+	Array1D< MonthlyTablesType > MonthlyTables;
+	Array1D< MonthlyColumnsType > MonthlyColumns;
+	Array1D< TOCEntriesType > TOCEntries;
+	Array1D< UnitConvType > UnitConv;
 
 	static gio::Fmt fmtLD( "*" );
 	static gio::Fmt fmtA( "(A)" );
@@ -465,7 +465,7 @@ namespace OutputReportTabular {
 			SetupUnitConversions();
 			AddTOCZoneLoadComponentTable();
 			GetInput = false;
-			date_and_time_string( _, _, _, td );
+			date_and_time( _, _, _, td );
 		}
 		if ( DoOutputReporting && WriteTabularFiles && ( KindOfSim == ksRunPeriodWeather ) ) {
 			if ( IndexTypeKey == stepTypeZone ) {
@@ -536,8 +536,8 @@ namespace OutputReportTabular {
 		int NumParams; // Number of elements combined
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
-		FArray1D_string AlphArray; // character string data
-		FArray1D< Real64 > NumArray; // numeric data
+		Array1D_string AlphArray; // character string data
+		Array1D< Real64 > NumArray; // numeric data
 		int IOStat; // IO Status when calling get input subroutine
 		static bool ErrorsFound( false );
 		bool IsNotOK; // Flag to verify name
@@ -608,8 +608,6 @@ namespace OutputReportTabular {
 				AddMonthlyFieldSetInput( curTable, AlphArray( jField ), "", curAggType );
 			}
 		}
-		AlphArray.deallocate();
-		NumArray.deallocate();
 
 	}
 
@@ -795,7 +793,7 @@ namespace OutputReportTabular {
 		std::string UnitsVar; // Units sting, may be blank
 		//CHARACTER(len=MaxNameLength), DIMENSION(:), ALLOCATABLE :: NamesOfKeys      ! Specific key name
 		//INTEGER, DIMENSION(:) , ALLOCATABLE                     :: IndexesForKeyVar ! Array index
-		FArray1D_string UniqueKeyNames;
+		Array1D_string UniqueKeyNames;
 		int UniqueKeyCount;
 		int iKey;
 		int jUnique;
@@ -1161,8 +1159,6 @@ namespace OutputReportTabular {
 		//DEALLOCATE(NamesOfKeys)
 		//DEALLOCATE(IndexesForKeyVar)
 		//#endif
-
-		if ( allocated( UniqueKeyNames ) ) UniqueKeyNames.deallocate();
 	}
 
 	void
@@ -1207,8 +1203,8 @@ namespace OutputReportTabular {
 		int NumParams; // Number of elements combined
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
-		FArray1D_string AlphArray; // character string data
-		FArray1D< Real64 > NumArray; // numeric data
+		Array1D_string AlphArray; // character string data
+		Array1D< Real64 > NumArray; // numeric data
 		int IOStat; // IO Status when calling get input subroutine
 		int iTable;
 		int firstReport;
@@ -1217,8 +1213,8 @@ namespace OutputReportTabular {
 		int found;
 		Real64 const bigVal( 0.0 ); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
 
-		FArray1D_string objNames;
-		FArray1D_int objVarIDs;
+		Array1D_string objNames;
+		Array1D_int objVarIDs;
 
 		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
@@ -1331,9 +1327,6 @@ namespace OutputReportTabular {
 				// reset the number of tables to one
 				OutputTableBinned( iInObj ).numTables = 1;
 			}
-			// release the arrays if they are already allocated
-			objNames.deallocate();
-			objVarIDs.deallocate();
 		}
 		// clear the binning arrays to zeros
 		BinResults.mnth() = 0.0;
@@ -1350,13 +1343,10 @@ namespace OutputReportTabular {
 		BinStatistics.sum() = 0.0;
 		BinStatistics.sum2() = 0.0;
 
-		AlphArray.deallocate();
-		NumArray.deallocate();
-
 	}
 
 	bool
-	warningAboutKeyNotFound( int foundIndex, int inObjIndex, const std::string & moduleName )
+	warningAboutKeyNotFound( int foundIndex, int inObjIndex, std::string const & moduleName )
 	{
 		if ( foundIndex == 0 ) {
 			ShowWarningError( moduleName + ": Specified key not found: " + OutputTableBinned( inObjIndex ).keyValue + " for variable: " + OutputTableBinned( inObjIndex ).varOrMeter );
@@ -1365,7 +1355,7 @@ namespace OutputReportTabular {
 		else {
 			return false;
 		}
-	
+
 	}
 
 	void
@@ -1411,8 +1401,8 @@ namespace OutputReportTabular {
 		int NumParams; // Number of elements combined
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
-		FArray1D_string AlphArray; // character string data
-		FArray1D< Real64 > NumArray; // numeric data
+		Array1D_string AlphArray; // character string data
+		Array1D< Real64 > NumArray; // numeric data
 		int IOStat; // IO Status when calling get input subroutine
 
 		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
@@ -1522,15 +1512,10 @@ namespace OutputReportTabular {
 			gio::write( OutputFileInits, "('Tabular Report,',A,',',A)" ) << AlphArray( 1 ) << AlphArray( 2 );
 		}
 
-		AlphArray.deallocate();
-		NumArray.deallocate();
-
 	}
 
 	int
-	SetUnitsStyleFromString(
-	std::string unitStringIn
-	)
+	SetUnitsStyleFromString( std::string const & unitStringIn )
 	{
 		int unitsStyleReturn;
 		if ( SameString( unitStringIn, "None" ) ) {
@@ -1602,8 +1587,8 @@ namespace OutputReportTabular {
 		int NumParams;
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
-		FArray1D_string AlphArray;
-		FArray1D< Real64 > NumArray;
+		Array1D_string AlphArray;
+		Array1D< Real64 > NumArray;
 		int IOStat; // IO Status when calling get input subroutine
 		int iReport;
 		std::string meterName;
@@ -1796,8 +1781,6 @@ namespace OutputReportTabular {
 				}
 			}
 			CreatePredefinedMonthlyReports();
-			AlphArray.deallocate();
-			NumArray.deallocate();
 		} else if ( NumTabularPredefined > 1 ) {
 			ShowSevereError( CurrentModuleObject + ": Only one instance of this object is allowed." );
 			ErrorsFound = true;
@@ -1991,8 +1974,8 @@ namespace OutputReportTabular {
 		int NumParams;
 		int NumAlphas; // Number of elements in the alpha array
 		int NumNums; // Number of elements in the numeric array
-		FArray1D_string AlphArray;
-		FArray1D< Real64 > NumArray;
+		Array1D_string AlphArray;
+		Array1D< Real64 > NumArray;
 		int IOStat; // IO Status when calling get input subroutine
 		int iReport;
 		bool isFound;
@@ -2020,8 +2003,6 @@ namespace OutputReportTabular {
 					isFound = true;
 				}
 			}
-			AlphArray.deallocate();
-			NumArray.deallocate();
 		}
 		isCompLoadRepReq = isFound; //return true if either report was found
 		return isCompLoadRepReq;
@@ -3590,11 +3571,11 @@ namespace OutputReportTabular {
 		// local copies of some of the MonthlyColumns array references since
 		// profiling showed that they were slow.
 		static bool RunOnce( true );
-		static FArray1D_int MonthlyColumnsTypeOfVar;
-		static FArray1D_int MonthlyColumnsStepType;
-		static FArray1D_int MonthlyColumnsAggType;
-		static FArray1D_int MonthlyColumnsVarNum;
-		static FArray1D_int MonthlyTablesNumColumns;
+		static Array1D_int MonthlyColumnsTypeOfVar;
+		static Array1D_int MonthlyColumnsStepType;
+		static Array1D_int MonthlyColumnsAggType;
+		static Array1D_int MonthlyColumnsVarNum;
+		static Array1D_int MonthlyTablesNumColumns;
 		static int curFirstColumn( 0 );
 
 		if ( ! DoWeathSim ) return;
@@ -4358,8 +4339,8 @@ namespace OutputReportTabular {
 		static Real64 eqpSens( 0.0 );
 		static Real64 total( 0.0 );
 		// the following arrays store the radiant total for each timestep
-		static FArray1D< Real64 > radiantHeat;
-		static FArray1D< Real64 > radiantCool;
+		static Array1D< Real64 > radiantHeat;
+		static Array1D< Real64 > radiantCool;
 		static int timestepTimeStamp( 0 );
 		static Real64 bldgHtPk( 0.0 );
 		static Real64 bldgClPk( 0.0 );
@@ -5892,11 +5873,11 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string columnHead;
-		FArray1D_int columnWidth;
-		FArray1D_string rowHead( 16 );
-		FArray2D_string tableBody;
-		FArray1D_string aggString( 13 );
+		Array1D_string columnHead;
+		Array1D_int columnWidth;
+		Array1D_string rowHead( 16 );
+		Array2D_string tableBody;
+		Array1D_string aggString( 13 );
 		std::string curAggString;
 		int iInput;
 		int jTable;
@@ -6231,9 +6212,6 @@ namespace OutputReportTabular {
 				WriteSubtitle( "Custom Monthly Report" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth, true ); //transpose monthly XML tables.
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, MonthlyInput( iInput ).name, MonthlyTables( curTable ).keyValue, "Custom Monthly Report" );
-				columnHead.deallocate();
-				columnWidth.deallocate();
-				tableBody.deallocate();
 			} //jTables
 		} // iInput
 	}
@@ -6276,15 +6254,15 @@ namespace OutputReportTabular {
 		int kMonth;
 		int nCol;
 		//main table
-		FArray1D_string columnHead;
-		FArray1D_int columnWidth;
-		FArray1D_string rowHead( 39 );
-		FArray2D_string tableBody;
+		Array1D_string columnHead;
+		Array1D_int columnWidth;
+		Array1D_string rowHead( 39 );
+		Array2D_string tableBody;
 		//stat table
-		FArray1D_string columnHeadStat( 1 );
-		FArray1D_int columnWidthStat( 1 );
-		FArray1D_string rowHeadStat( 6 );
-		FArray2D_string tableBodyStat( 6, 1 );
+		Array1D_string columnHeadStat( 1 );
+		Array1D_int columnWidthStat( 1 );
+		Array1D_string rowHeadStat( 6 );
+		Array2D_string tableBodyStat( 6, 1 );
 
 		Real64 curIntervalStart;
 		Real64 curIntervalSize;
@@ -6485,9 +6463,6 @@ namespace OutputReportTabular {
 				WriteTable( tableBodyStat, rowHeadStat, columnHeadStat, columnWidthStat, true ); //transpose XML table
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID( repIndex ).namesOfObj, "Statistics" );
 			}
-			columnHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
 		}
 	}
 
@@ -6560,19 +6535,19 @@ namespace OutputReportTabular {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// all arrays are in the format: (row, column)
-		FArray1D_string columnHead;
-		FArray1D_int columnWidth;
-		FArray1D_string rowHead;
-		FArray2D_string tableBody;
+		Array1D_string columnHead;
+		Array1D_int columnWidth;
+		Array1D_string rowHead;
+		Array2D_string tableBody;
 
 		// all arrays are in the format: (row, columnm)
-		FArray2D< Real64 > useVal( 15, 6 );
-		FArray2D< Real64 > normalVal( 4, 6 );
-		FArray1D< Real64 > collapsedTotal( 6 );
-		FArray2D< Real64 > collapsedEndUse( NumEndUses, 6 );
-		FArray3D< Real64 > collapsedEndUseSub( 6, NumEndUses, MaxNumSubcategories );
-		FArray2D< Real64 > endUseSubOther( NumEndUses, 6 );
-		FArray1D_bool needOtherRow( NumEndUses );
+		Array2D< Real64 > useVal( 15, 6 );
+		Array2D< Real64 > normalVal( 4, 6 );
+		Array1D< Real64 > collapsedTotal( 6 );
+		Array2D< Real64 > collapsedEndUse( NumEndUses, 6 );
+		Array3D< Real64 > collapsedEndUseSub( 6, NumEndUses, MaxNumSubcategories );
+		Array2D< Real64 > endUseSubOther( NumEndUses, 6 );
+		Array1D_bool needOtherRow( NumEndUses );
 		Real64 totalOnsiteHeat;
 		Real64 totalOnsiteWater;
 		Real64 totalWater;
@@ -6608,12 +6583,12 @@ namespace OutputReportTabular {
 		Real64 processGasCost;
 		Real64 processOthrCost;
 
-		FArray1D< Real64 > leedFansParkFromFan( 6 );
-		FArray1D< Real64 > leedFansParkFromExtFuelEquip( 6 );
-		FArray1D< Real64 > leedIntLightProc( 6 );
-		FArray1D< Real64 > leedCook( 6 );
-		FArray1D< Real64 > leedIndProc( 6 );
-		FArray1D< Real64 > leedElevEsc( 6 );
+		Array1D< Real64 > leedFansParkFromFan( 6 );
+		Array1D< Real64 > leedFansParkFromExtFuelEquip( 6 );
+		Array1D< Real64 > leedIntLightProc( 6 );
+		Array1D< Real64 > leedCook( 6 );
+		Array1D< Real64 > leedIndProc( 6 );
+		Array1D< Real64 > leedElevEsc( 6 );
 		std::string subCatName;
 		Real64 nonMisc;
 		static Real64 leedSiteIntLite( 0.0 );
@@ -6936,11 +6911,6 @@ namespace OutputReportTabular {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site and Source Energy" );
 			}
 
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
-
 			//---- Source and Site Energy Sub-Table
 			rowHead.allocate( 13 );
 			columnHead.allocate( 1 );
@@ -7073,11 +7043,6 @@ namespace OutputReportTabular {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site to Source Energy Conversion Factors" );
 			}
 
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
-
 			//---- Building Area Sub-Table
 			rowHead.allocate( 3 );
 			columnHead.allocate( 1 );
@@ -7114,11 +7079,6 @@ namespace OutputReportTabular {
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Building Area" );
 			}
-
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
 
 			//---- End Use Sub-Table
 			rowHead.allocate( 16 );
@@ -7384,10 +7344,6 @@ namespace OutputReportTabular {
 				WriteTable( tableBody, rowHead, columnHead, columnWidth, false, footnote );
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses" );
 			}
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
 
 			//---- End Uses By Subcategory Sub-Table
 
@@ -7512,10 +7468,6 @@ namespace OutputReportTabular {
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory" );
 			}
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
 			//---- Normalized by Conditioned Area Sub-Table
 			// Calculations for both normalized tables are first
 			rowHead.allocate( 4 );
@@ -7601,10 +7553,6 @@ namespace OutputReportTabular {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Utility Use Per Total Floor Area" );
 			}
 
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
 			//---- Electric Loads Satisfied Sub-Table
 			rowHead.allocate( 13 );
 			columnHead.allocate( 2 );
@@ -7677,11 +7625,6 @@ namespace OutputReportTabular {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Electric Loads Satisfied" );
 			}
 
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
-
 			//---- On-Site Thermal Sources Sub-Table
 			rowHead.allocate( 7 );
 			columnHead.allocate( 2 );
@@ -7747,11 +7690,6 @@ namespace OutputReportTabular {
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "On-Site Thermal Sources" );
 			}
-
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
 
 			//---- Water Loads Sub-Table
 			// As of 12/8/2003 decided to not include this sub-table to wait
@@ -7839,11 +7777,6 @@ namespace OutputReportTabular {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Water Source Summary" );
 			}
 
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
-
 			//---- Comfort and Setpoint Not Met Sub-Table
 			if ( displayTabularBEPS ) {
 				rowHead.allocate( 2 );
@@ -7874,11 +7807,6 @@ namespace OutputReportTabular {
 
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Setpoint Not Met Criteria" );
-
-				columnHead.deallocate();
-				rowHead.deallocate();
-				columnWidth.deallocate();
-				tableBody.deallocate();
 			}
 
 			rowHead.allocate( 3 );
@@ -7908,11 +7836,6 @@ namespace OutputReportTabular {
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Comfort and Setpoint Not Met Summary" );
 			}
-
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
 
 			//---- Control Summary Sub-Table
 
@@ -7964,16 +7887,16 @@ namespace OutputReportTabular {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// all arrays are in the format: (row, column)
-		FArray1D_string columnHead;
-		FArray1D_int columnWidth;
-		FArray1D_string rowHead;
-		FArray2D_string tableBody;
+		Array1D_string columnHead;
+		Array1D_int columnWidth;
+		Array1D_string rowHead;
+		Array2D_string tableBody;
 
 		// all arrays are in the format: (row, columnm)
-		FArray2D< Real64 > useVal( 15, 6 );
-		FArray1D< Real64 > collapsedTotal( 6 );
-		FArray2D< Real64 > collapsedEndUse( NumEndUses, 6 );
-		FArray3D< Real64 > collapsedEndUseSub( 6, NumEndUses, MaxNumSubcategories );
+		Array2D< Real64 > useVal( 15, 6 );
+		Array1D< Real64 > collapsedTotal( 6 );
+		Array2D< Real64 > collapsedEndUse( NumEndUses, 6 );
+		Array3D< Real64 > collapsedEndUseSub( 6, NumEndUses, MaxNumSubcategories );
 		Real64 totalSourceEnergyUse;
 		int iResource;
 		int jEndUse;
@@ -8176,10 +8099,6 @@ namespace OutputReportTabular {
 			WriteSubtitle( "Source Energy End Use Components Per Total Floor Area" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Components Per Total Floor Area" );
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
 
 		}
 	}
@@ -8234,17 +8153,17 @@ namespace OutputReportTabular {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// all arrays are in the format: (row, column)
-		FArray1D_string columnHead;
-		FArray1D_int columnWidth;
-		FArray1D_string rowHead;
-		FArray2D_string tableBody;
+		Array1D_string columnHead;
+		Array1D_int columnWidth;
+		Array1D_string rowHead;
+		Array2D_string tableBody;
 
 		// all arrays are in the format: (row, columnm)
-		FArray2D< Real64 > useVal( 15, 6 );
-		FArray1D< Real64 > collapsedTotal( 6 );
-		FArray2D< Real64 > collapsedEndUse( NumEndUses, 6 );
-		FArray1D_int collapsedTimeStep( 6 );
-		FArray3D< Real64 > collapsedEndUseSub( 6, NumEndUses, MaxNumSubcategories );
+		Array2D< Real64 > useVal( 15, 6 );
+		Array1D< Real64 > collapsedTotal( 6 );
+		Array2D< Real64 > collapsedEndUse( NumEndUses, 6 );
+		Array1D_int collapsedTimeStep( 6 );
+		Array3D< Real64 > collapsedEndUseSub( 6, NumEndUses, MaxNumSubcategories );
 		int iResource;
 		int jEndUse;
 		int kEndUseSub;
@@ -8259,12 +8178,12 @@ namespace OutputReportTabular {
 		Real64 powerConversion;
 		Real64 flowConversion;
 
-		FArray1D< Real64 > leedFansParkFromFan( 6 );
-		FArray1D< Real64 > leedFansParkFromExtFuelEquip( 6 );
-		FArray1D< Real64 > leedIntLightProc( 6 );
-		FArray1D< Real64 > leedCook( 6 );
-		FArray1D< Real64 > leedIndProc( 6 );
-		FArray1D< Real64 > leedElevEsc( 6 );
+		Array1D< Real64 > leedFansParkFromFan( 6 );
+		Array1D< Real64 > leedFansParkFromExtFuelEquip( 6 );
+		Array1D< Real64 > leedIntLightProc( 6 );
+		Array1D< Real64 > leedCook( 6 );
+		Array1D< Real64 > leedIndProc( 6 );
+		Array1D< Real64 > leedElevEsc( 6 );
 		Real64 unconvert;
 		std::string subCatName;
 
@@ -8591,10 +8510,6 @@ namespace OutputReportTabular {
 			WriteSubtitle( "End Uses" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth, false, footnote );
 			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses" );
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
 
 			//---- End Uses By Subcategory Sub-Table
 			numRows = 0;
@@ -8713,10 +8628,6 @@ namespace OutputReportTabular {
 			WriteSubtitle( "End Uses By Subcategory" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth, false, footnote );
 			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory" );
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
 		}
 	}
 
@@ -8757,13 +8668,13 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray2D< Real64 > TableBodyData( 10, 3 );
+		Array2D< Real64 > TableBodyData( 10, 3 );
 		Real64 RefBldgConstCost; // holds interim value for construction component costs: reference bldg.
 		Real64 CurntBldgConstCost; // holds interim value for construction component costs: current bldg.
-		FArray1D_string columnHead;
-		FArray1D_int columnWidth;
-		FArray1D_string rowHead;
-		FArray2D_string tableBody;
+		Array1D_string columnHead;
+		Array1D_int columnWidth;
+		Array1D_string rowHead;
+		Array2D_string tableBody;
 		int item; // do-loop counter for line items
 		int NumRows; // number of rows in report table excluding table header
 		int NumCols; // number of columns in report table
@@ -8898,11 +8809,6 @@ namespace OutputReportTabular {
 		WriteTable( tableBody, rowHead, columnHead, columnWidth );
 		sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary" );
 
-		columnHead.deallocate();
-		rowHead.deallocate();
-		columnWidth.deallocate();
-		tableBody.deallocate();
-
 		NumRows = NumLineItems + 1; //body will have the total and line items
 		NumCols = 6; // Line no., Line name, Qty, Units, ValperQty, Subtotal
 		rowHead.allocate( NumRows );
@@ -8952,10 +8858,6 @@ namespace OutputReportTabular {
 		WriteSubtitle( "Cost Line Item Details" ); //: '//TRIM(RealToStr(CostEstimateTotal, 2)))
 		WriteTable( tableBody, rowHead, columnHead, columnWidth );
 		sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details" );
-		columnHead.deallocate();
-		rowHead.deallocate();
-		columnWidth.deallocate();
-		tableBody.deallocate();
 
 	}
 
@@ -9053,10 +8955,10 @@ namespace OutputReportTabular {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// all arrays are in the format: (row, column)
-		FArray1D_string columnHead;
-		FArray1D_int columnWidth;
-		FArray1D_string rowHead;
-		FArray2D_string tableBody;
+		Array1D_string columnHead;
+		Array1D_int columnWidth;
+		Array1D_string rowHead;
+		Array2D_string tableBody;
 
 		int iSurf;
 		int kOpaque;
@@ -9124,13 +9026,13 @@ namespace OutputReportTabular {
 		static std::string Wm2_unitName;
 
 		//zone summary total
-		static FArray1D< Real64 > zstArea( 4, 0.0 );
-		static FArray1D< Real64 > zstVolume( 4, 0.0 );
-		static FArray1D< Real64 > zstWallArea( 4, 0.0 );
-		static FArray1D< Real64 > zstWindowArea( 4, 0.0 );
-		static FArray1D< Real64 > zstLight( 4, 0.0 );
-		static FArray1D< Real64 > zstPeople( 4, 0.0 );
-		static FArray1D< Real64 > zstPlug( 4, 0.0 );
+		static Array1D< Real64 > zstArea( 4, 0.0 );
+		static Array1D< Real64 > zstVolume( 4, 0.0 );
+		static Array1D< Real64 > zstWallArea( 4, 0.0 );
+		static Array1D< Real64 > zstWindowArea( 4, 0.0 );
+		static Array1D< Real64 > zstLight( 4, 0.0 );
+		static Array1D< Real64 > zstPeople( 4, 0.0 );
+		static Array1D< Real64 > zstPlug( 4, 0.0 );
 
 		// misc
 		Real64 pdiff;
@@ -9209,10 +9111,6 @@ namespace OutputReportTabular {
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General" );
 
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
 			//---- Window Wall Ratio Sub-Table
 			WriteTextLine( "ENVELOPE", true );
 
@@ -9415,11 +9313,6 @@ namespace OutputReportTabular {
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio" );
 
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
-
 			//---- Conditioned Window Wall Ratio Sub-Table
 			rowHead.allocate( 5 );
 			columnHead.allocate( 5 );
@@ -9481,11 +9374,6 @@ namespace OutputReportTabular {
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio" );
 
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
-
 			//---- Skylight Roof Ratio Sub-Table
 			rowHead.allocate( 3 );
 			columnHead.allocate( 1 );
@@ -9512,11 +9400,6 @@ namespace OutputReportTabular {
 			WriteSubtitle( "Skylight-Roof Ratio" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio" );
-
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
 
 			if ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) > 0.0 || sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) > 0.0 ) {
 				pdiff = std::abs( ( wallAreaN + wallAreaS + wallAreaE + wallAreaW ) - ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) + sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) ) ) / ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) + sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) );
@@ -9702,11 +9585,6 @@ namespace OutputReportTabular {
 			WriteSubtitle( "Zone Summary" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary" );
-
-			columnHead.deallocate();
-			rowHead.deallocate();
-			columnWidth.deallocate();
-			tableBody.deallocate();
 		}
 	}
 
@@ -9748,13 +9626,13 @@ namespace OutputReportTabular {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		FArray1D_string columnHead( 5 );
-		FArray1D_int columnWidth;
-		FArray1D_string rowHead;
-		FArray2D_string tableBody;
+		Array1D_string columnHead( 5 );
+		Array1D_int columnWidth;
+		Array1D_string rowHead;
+		Array2D_string tableBody;
 		static int numPeopleAdaptive( 0 );
 		int i;
-		FArray1D_int peopleInd; // Index the relevant people
+		Array1D_int peopleInd; // Index the relevant people
 
 		// Should deallocate after writing table. - LKL
 
@@ -9845,17 +9723,17 @@ namespace OutputReportTabular {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// all arrays are in the format: (row, column)
-		FArray1D_string columnHead;
-		FArray1D_int columnWidth;
-		FArray1D_string rowHead;
-		FArray2D_string tableBody;
-		FArray1D_int rowToUnqObjName;
-		FArray1D_int colHeadToColTag;
+		Array1D_string columnHead;
+		Array1D_int columnWidth;
+		Array1D_string rowHead;
+		Array2D_string tableBody;
+		Array1D_int rowToUnqObjName;
+		Array1D_int colHeadToColTag;
 		int curNumColumns;
 		int curNumRows;
 		int curColumn;
-		FArray1D_string uniqueObjectName;
-		FArray1D_bool useUniqueObjectName;
+		Array1D_string uniqueObjectName;
+		Array1D_bool useUniqueObjectName;
 		int numUnqObjName;
 		std::string curObjectName;
 		int countRow;
@@ -9873,7 +9751,7 @@ namespace OutputReportTabular {
 		int oRowHead;
 		std::string colTagWithSI;
 		std::string curColTag;
-		FArray1D_int colUnitConv;
+		Array1D_int colUnitConv;
 		int indexUnitConv;
 		int columnUnitConv;
 		std::string repTableTag;
@@ -10024,20 +9902,10 @@ namespace OutputReportTabular {
 						WriteSubtitle( subTable( jSubTable ).name );
 						WriteTable( tableBody, rowHead, columnHead, columnWidth, false, subTable( jSubTable ).footnote );
 						sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, reportName( iReportName ).name, "Entire Facility", subTable( jSubTable ).name );
-						//clean up the temporary arrays used
-						columnHead.deallocate();
-						rowHead.deallocate();
-						columnWidth.deallocate();
-						tableBody.deallocate();
-						//clean up the pointer arrays
-						rowToUnqObjName.deallocate();
-						colHeadToColTag.deallocate();
-						colUnitConv.deallocate();
 					}
 				}
 			}
 		}
-		uniqueObjectName.deallocate();
 	}
 
 	void
@@ -10083,14 +9951,14 @@ namespace OutputReportTabular {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// all arrays are in the format: (row, column)
-		FArray1D_string columnHead;
-		FArray1D_int columnWidth;
-		FArray1D_int colUnitConv;
-		FArray1D_string rowHead;
-		FArray2D_string tableBody;
-		FArray1D_string uniqueDesc;
+		Array1D_string columnHead;
+		Array1D_int columnWidth;
+		Array1D_int colUnitConv;
+		Array1D_string rowHead;
+		Array2D_string tableBody;
+		Array1D_string uniqueDesc;
 		int numUniqueDesc;
-		FArray1D_string uniqueObj;
+		Array1D_string uniqueObj;
 		int numUniqueObj;
 		std::string curDesc;
 		std::string curObj;
@@ -10252,17 +10120,7 @@ namespace OutputReportTabular {
 				WriteSubtitle( CompSizeTableEntry( foundEntry ).typeField );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth, false, "User-Specified values were used. Design Size values were used if no User-Specified values were provided." );
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ComponentSizingSummary", "Entire Facility", CompSizeTableEntry( foundEntry ).typeField );
-				//deallocate these arrays since they are used to create the next
-				//table
-				rowHead.deallocate();
-				columnHead.deallocate();
-				columnWidth.deallocate();
-				colUnitConv.deallocate();
-				tableBody.deallocate();
 			}
-			//free the memory of these arrays that are only needed in this routine
-			uniqueDesc.deallocate();
-			uniqueObj.deallocate();
 		}
 	}
 
@@ -10306,12 +10164,12 @@ namespace OutputReportTabular {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// all arrays are in the format: (row, column)
-		FArray1D_string columnHead( 1 );
-		FArray1D_int columnWidth( 1 );
-		FArray1D_string rowHead;
-		FArray2D_string tableBody;
+		Array1D_string columnHead( 1 );
+		Array1D_int columnWidth( 1 );
+		Array1D_string rowHead;
+		Array2D_string tableBody;
 		//CHARACTER(len=MaxNameLength),ALLOCATABLE, DIMENSION(:)     :: unique
-		FArray1D_int unique;
+		Array1D_int unique;
 		int numUnique;
 		//CHARACTER(len=MaxNameLength)                               :: curRecSurf
 		int curRecSurf;
@@ -10950,19 +10808,19 @@ namespace OutputReportTabular {
 		Real64 QRadThermInAbsMult;
 		Real64 peopleConvFromSurf;
 		Real64 peopleConvIntoZone;
-		FArray1D< Real64 > peopleRadIntoSurf;
+		Array1D< Real64 > peopleRadIntoSurf;
 		Real64 equipConvFromSurf;
 		Real64 equipConvIntoZone;
-		FArray1D< Real64 > equipRadIntoSurf;
+		Array1D< Real64 > equipRadIntoSurf;
 		Real64 hvacLossConvFromSurf;
 		Real64 hvacLossConvIntoZone;
-		FArray1D< Real64 > hvacLossRadIntoSurf;
+		Array1D< Real64 > hvacLossRadIntoSurf;
 		Real64 powerGenConvFromSurf;
 		Real64 powerGenConvIntoZone;
-		FArray1D< Real64 > powerGenRadIntoSurf;
+		Array1D< Real64 > powerGenRadIntoSurf;
 		Real64 lightLWConvFromSurf;
 		Real64 lightLWConvIntoZone;
-		FArray1D< Real64 > lightLWRadIntoSurf;
+		Array1D< Real64 > lightLWRadIntoSurf;
 		Real64 lightSWConvFromSurf;
 		Real64 lightSWConvIntoZone;
 		Real64 feneSolarConvFromSurf;
@@ -11203,14 +11061,14 @@ namespace OutputReportTabular {
 		static int objCount( 0 );
 		static int ZoneNum( 0 );
 		static int tempUnitConvIndex( 0 );
-		FArray1D< Real64 > seqData; // raw data sequence that has not been averaged yet
-		FArray1D< Real64 > AvgData; // sequence data after averaging
+		Array1D< Real64 > seqData; // raw data sequence that has not been averaged yet
+		Array1D< Real64 > AvgData; // sequence data after averaging
 		int NumOfTimeStepInDay;
-		FArray1D< Real64 > delayOpaque; // hold values for report for delayed opaque
+		Array1D< Real64 > delayOpaque; // hold values for report for delayed opaque
 		Real64 singleSurfDelay;
-		FArray1D< Real64 > totalColumn;
-		FArray1D< Real64 > percentColumn;
-		FArray1D< Real64 > grandTotalRow;
+		Array1D< Real64 > totalColumn;
+		Array1D< Real64 > percentColumn;
+		Array1D< Real64 > grandTotalRow;
 		Real64 totalGrandTotal;
 		Real64 powerConversion;
 		int tempConvIndx; // temperature conversion index
@@ -11219,10 +11077,10 @@ namespace OutputReportTabular {
 		Real64 mult; // zone multiplier
 
 		// all arrays are in the format: (row, column)
-		FArray1D_string columnHead;
-		FArray1D_int columnWidth;
-		FArray1D_string rowHead;
-		FArray2D_string tableBody;
+		Array1D_string columnHead;
+		Array1D_int columnWidth;
+		Array1D_string rowHead;
+		Array2D_string tableBody;
 
 		if ( displayZoneComponentLoadSummary && CompLoadReportIsReq ) {
 			ComputeDelayedComponents();
@@ -11575,11 +11433,6 @@ namespace OutputReportTabular {
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Cooling Peak Load Components" );
 
-				columnHead.deallocate();
-				rowHead.deallocate();
-				columnWidth.deallocate();
-				tableBody.deallocate();
-
 				//---- Cooling Peak Conditions
 
 				rowHead.allocate( 10 );
@@ -11656,11 +11509,6 @@ namespace OutputReportTabular {
 				WriteSubtitle( "Cooling Peak Conditions" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Cooling Peak Conditions" );
-
-				columnHead.deallocate();
-				rowHead.deallocate();
-				columnWidth.deallocate();
-				tableBody.deallocate();
 
 				//    !
 				//    !---- Radiant to Convective Decay Curves for Cooling
@@ -12053,11 +11901,6 @@ namespace OutputReportTabular {
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Heating Peak Load Components" );
 
-				columnHead.deallocate();
-				rowHead.deallocate();
-				columnWidth.deallocate();
-				tableBody.deallocate();
-
 				//---- Heating Peak Conditions Sub-Table
 
 				rowHead.allocate( 10 );
@@ -12133,11 +11976,6 @@ namespace OutputReportTabular {
 				WriteSubtitle( "Heating Peak Conditions" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Heating Peak Conditions" );
-
-				columnHead.deallocate();
-				rowHead.deallocate();
-				columnWidth.deallocate();
-				tableBody.deallocate();
 
 				//    !
 				//    !---- Radiant to Convective Decay Curves for Heating
@@ -12390,10 +12228,10 @@ namespace OutputReportTabular {
 
 	void
 	WriteTable(
-		FArray2S_string const body, // row,column
-		FArray1S_string const rowLabels,
-		FArray1S_string const columnLabels,
-		FArray1S_int widthColumn,
+		Array2S_string const body, // row,column
+		Array1S_string const rowLabels,
+		Array1S_string const columnLabels,
+		Array1S_int widthColumn,
 		Optional_bool_const transposeXML,
 		Optional_string_const footnoteText
 	)
@@ -12432,13 +12270,13 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray2D_string colLabelMulti;
+		Array2D_string colLabelMulti;
 		std::string workColumn;
-		FArray1D_string rowLabelTags;
-		FArray1D_string columnLabelTags;
-		FArray1D_string rowUnitStrings;
-		FArray1D_string columnUnitStrings;
-		FArray2D_string bodyEsc;
+		Array1D_string rowLabelTags;
+		Array1D_string columnLabelTags;
+		Array1D_string rowUnitStrings;
+		Array1D_string columnUnitStrings;
+		Array2D_string bodyEsc;
 
 		int numColLabelRows;
 		int maxNumColLabelRows;
@@ -12719,10 +12557,10 @@ namespace OutputReportTabular {
 									tbl_stream << "    <name>" << rowLabelTags( jRow ) << "</name>\n";
 								}
 								for ( iCol = 1; iCol <= colsBody; ++iCol ) {
-									if ( len( stripped( bodyEsc( jRow, iCol ) ) ) > 0 ) { //skip blank cells
+									if ( len( stripped( bodyEsc( jRow, iCol ) ) ) > 0 ) { // skip blank cells
 										tagWithAttrib = "<" + columnLabelTags( iCol );
 										if ( len( columnUnitStrings( iCol ) ) > 0 ) {
-											tagWithAttrib += " units=" + CHAR( 34 ) + columnUnitStrings( iCol ) + CHAR( 34 ) + '>'; //if units are present add them as an attribute
+											tagWithAttrib += std::string( " units=" ) + char( 34 ) + columnUnitStrings( iCol ) + char( 34 ) + '>'; // if units are present add them as an attribute
 										} else {
 											tagWithAttrib += ">";
 										}
@@ -12748,16 +12586,16 @@ namespace OutputReportTabular {
 								// if the column has units put them into the name tag
 								if ( len( columnLabelTags( iCol ) ) > 0 ) {
 									if ( len( columnUnitStrings( iCol ) ) > 0 ) {
-										tbl_stream << "    <name units=" << CHAR( 34 ) << columnUnitStrings( iCol ) << CHAR( 34 ) << '>' << columnLabelTags( iCol ) << "</name>\n";
+										tbl_stream << "    <name units=" << char( 34 ) << columnUnitStrings( iCol ) << char( 34 ) << '>' << columnLabelTags( iCol ) << "</name>\n";
 									} else {
 										tbl_stream << "    <name>" << columnLabelTags( iCol ) << "</name>\n";
 									}
 								}
 								for ( jRow = 1; jRow <= rowsBody; ++jRow ) {
-									if ( len( bodyEsc( jRow, iCol ) ) > 0 ) { //skip blank cells
+									if ( len( bodyEsc( jRow, iCol ) ) > 0 ) { // skip blank cells
 										tagWithAttrib = "<" + rowLabelTags( jRow );
 										if ( len( rowUnitStrings( jRow ) ) > 0 ) {
-											tagWithAttrib += " units=" + CHAR( 34 ) + rowUnitStrings( jRow ) + CHAR( 34 ) + ">\n"; //if units are present add them as an attribute
+											tagWithAttrib += std::string( " units=" ) + char( 34 ) + rowUnitStrings( jRow ) + char( 34 ) + ">\n"; // if units are present add them as an attribute
 										} else {
 											tagWithAttrib += ">";
 										}
@@ -12998,7 +12836,7 @@ namespace OutputReportTabular {
 				outString += "&gt;";
 			} else if ( curCharVal == 176 ) { //   degree
 				outString += '*'; // replace degree symbol with asterisk to avoid errors from various XML editors
-			} else { //most characters are fine
+			} else { // most characters are fine
 				outString += c;
 			}
 		}
@@ -13253,8 +13091,8 @@ namespace OutputReportTabular {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static FArray1D< gio::Fmt > formDigits( {0,9}, { "(F12.0)", "(F12.1)", "(F12.2)", "(F12.3)", "(F12.4)", "(F12.5)", "(F12.6)", "(F12.7)", "(F12.8)", "(F12.9)" } ); // formDigits(0) | formDigits(1) | formDigits(2) | formDigits(3) | formDigits(4) | formDigits(5) | formDigits(6) | formDigits(7) | formDigits(8) | formDigits(9)
-		static FArray1D< Real64 > const maxvalDigits( {0,9}, { 9999999999.0, 999999999.0, 99999999.0, 9999999.0, 999999.0, 99999.0, 9999.0, 999.0, 99.0, 9.0 } ); // maxvalDigits(0) | maxvalDigits(1) | maxvalDigits(2) | maxvalDigits(3) | maxvalDigits(4) | maxvalDigits(5) | maxvalDigits(6) | maxvalDigits(7) | maxvalDigits(8) | maxvalDigits(9)
+		static Array1D< gio::Fmt > formDigits( {0,9}, { "(F12.0)", "(F12.1)", "(F12.2)", "(F12.3)", "(F12.4)", "(F12.5)", "(F12.6)", "(F12.7)", "(F12.8)", "(F12.9)" } ); // formDigits(0) | formDigits(1) | formDigits(2) | formDigits(3) | formDigits(4) | formDigits(5) | formDigits(6) | formDigits(7) | formDigits(8) | formDigits(9)
+		static Array1D< Real64 > const maxvalDigits( {0,9}, { 9999999999.0, 999999999.0, 99999999.0, 9999999.0, 999999.0, 99999.0, 9999.0, 999.0, 99.0, 9.0 } ); // maxvalDigits(0) | maxvalDigits(1) | maxvalDigits(2) | maxvalDigits(3) | maxvalDigits(4) | maxvalDigits(5) | maxvalDigits(6) | maxvalDigits(7) | maxvalDigits(8) | maxvalDigits(9)
 		static gio::Fmt fmtd( "(E12.6)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:

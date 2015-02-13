@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -104,11 +104,11 @@ namespace Fans {
 	int NumFans( 0 ); // The Number of Fans found in the Input
 	int NumNightVentPerf( 0 ); // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
 	bool GetFanInputFlag( true ); // Flag set to make sure you get input once
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 	bool LocalTurnFansOn( false ); // If True, overrides fan schedule and cycles ZoneHVAC component fans on
 	bool LocalTurnFansOff( false ); // If True, overrides fan schedule and LocalTurnFansOn and
 	// forces ZoneHVAC comp fans off
-	static FArray1D_bool MySizeFlag;
+	static Array1D_bool MySizeFlag;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -126,9 +126,9 @@ namespace Fans {
 	// Utility routines for module
 
 	// Object Data
-	FArray1D< FanEquipConditions > Fan;
-	FArray1D< NightVentPerfData > NightVentPerf;
-	FArray1D< FanNumericFieldData > FanNumericFields;
+	Array1D< FanEquipConditions > Fan;
+	Array1D< NightVentPerfData > NightVentPerf;
+	Array1D< FanNumericFieldData > FanNumericFields;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -317,12 +317,12 @@ namespace Fans {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		static std::string const RoutineName( "GetFanInput: " ); // include trailing blank space
-		FArray1D_string cAlphaFieldNames;
-		FArray1D_string cNumericFieldNames;
-		FArray1D_bool lNumericFieldBlanks;
-		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_string cAlphaArgs;
-		FArray1D< Real64 > rNumericArgs;
+		Array1D_string cAlphaFieldNames;
+		Array1D_string cNumericFieldNames;
+		Array1D_bool lNumericFieldBlanks;
+		Array1D_bool lAlphaFieldBlanks;
+		Array1D_string cAlphaArgs;
+		Array1D< Real64 > rNumericArgs;
 		std::string cCurrentModuleObject;
 		int NumParams;
 		int MaxAlphas;
@@ -945,7 +945,7 @@ namespace Fans {
 		int OutNode;
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 		int Loop;
 
 		// FLOW:

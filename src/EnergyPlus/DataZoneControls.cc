@@ -48,19 +48,19 @@ namespace DataZoneControls {
 	int NumTempAndHumidityControlledZones( 0 ); // number of zones with over cool control
 	bool AnyOpTempControl( false ); // flag set true if any zones have op temp control
 	bool AnyZoneTempAndHumidityControl( false ); // flag set true if any zones have over cool control
-	FArray1D_bool StageZoneLogic; // Logical array, A zone with staged thermostat = .TRUE.
-	FArray1D< Real64 > OccRoomTSetPointHeat; // occupied heating set point for optimum start period
-	FArray1D< Real64 > OccRoomTSetPointCool; // occupied cooling set point for optimum start period
+	Array1D_bool StageZoneLogic; // Logical array, A zone with staged thermostat = .TRUE.
+	Array1D< Real64 > OccRoomTSetPointHeat; // occupied heating set point for optimum start period
+	Array1D< Real64 > OccRoomTSetPointCool; // occupied cooling set point for optimum start period
 	bool GetZoneAirStatsInputFlag( true ); // True when need to get input
 
 	// Object Data
-	FArray1D< ZoneHumidityControls > HumidityControlZone;
-	FArray1D< ZoneTempControls > TempControlledZone;
-	FArray1D< ZoneComfortControls > ComfortControlledZone;
-	FArray1D< TStatObject > TStatObjects;
-	FArray1D< TStatObject > ComfortTStatObjects;
-	FArray1D< TStatObject > StagedTStatObjects;
-	FArray1D< ZoneStagedControls > StageControlledZone;
+	Array1D< ZoneHumidityControls > HumidityControlZone;
+	Array1D< ZoneTempControls > TempControlledZone;
+	Array1D< ZoneComfortControls > ComfortControlledZone;
+	Array1D< TStatObject > TStatObjects;
+	Array1D< TStatObject > ComfortTStatObjects;
+	Array1D< TStatObject > StagedTStatObjects;
+	Array1D< ZoneStagedControls > StageControlledZone;
 
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

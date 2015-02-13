@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -68,10 +68,10 @@ namespace ScheduleManager {
 	//MODULE PARAMETER DEFINITIONS
 	int const MaxDayTypes( 12 );
 	static std::string const BlankString;
-	FArray1D_string const ValidDayTypes( MaxDayTypes, { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
+	Array1D_string const ValidDayTypes( MaxDayTypes, { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
 
 	int const NumScheduleTypeLimitUnitTypes( 14 );
-	FArray1D_string const ScheduleTypeLimitUnitTypes( NumScheduleTypeLimitUnitTypes, { "Dimensionless", "Temperature", "DeltaTemperature", "PrecipitationRate", "Angle", "ConvectionCoefficient", "ActivityLevel", "Velocity", "Capacity", "Power", "Availability", "Percent", "Control", "Mode" } );
+	Array1D_string const ScheduleTypeLimitUnitTypes( NumScheduleTypeLimitUnitTypes, { "Dimensionless", "Temperature", "DeltaTemperature", "PrecipitationRate", "Angle", "ConvectionCoefficient", "ActivityLevel", "Velocity", "Capacity", "Power", "Availability", "Percent", "Control", "Mode" } );
 
 	int const ScheduleInput_year( 1 );
 	int const ScheduleInput_compact( 2 );
@@ -98,10 +98,10 @@ namespace ScheduleManager {
 	//Derived Types Variables
 
 	// Object Data
-	FArray1D< ScheduleTypeData > ScheduleType; // Allowed Schedule Types
-	FArray1D< DayScheduleData > DaySchedule; // Day Schedule Storage
-	FArray1D< WeekScheduleData > WeekSchedule; // Week Schedule Storage
-	FArray1D< ScheduleData > Schedule; // Schedule Storage
+	Array1D< ScheduleTypeData > ScheduleType; // Allowed Schedule Types
+	Array1D< DayScheduleData > DaySchedule; // Day Schedule Storage
+	Array1D< WeekScheduleData > WeekSchedule; // Week Schedule Storage
+	Array1D< ScheduleData > Schedule; // Schedule Storage
 
 	static gio::Fmt fmtLD( "*" );
 	static gio::Fmt fmtA( "(A)" );
@@ -166,18 +166,18 @@ namespace ScheduleManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		FArray1D_int DaysInYear( 366 );
+		Array1D_int DaysInYear( 366 );
 		int UnitNumber;
 		int LoopIndex;
 		int InLoopIndex;
 		int DayIndex;
 		int WeekIndex;
-		FArray1D_string Alphas;
-		FArray1D_string cAlphaFields;
-		FArray1D_string cNumericFields;
-		FArray1D< Real64 > Numbers;
-		FArray1D_bool lAlphaBlanks;
-		FArray1D_bool lNumericBlanks;
+		Array1D_string Alphas;
+		Array1D_string cAlphaFields;
+		Array1D_string cNumericFields;
+		Array1D< Real64 > Numbers;
+		Array1D_bool lAlphaBlanks;
+		Array1D_bool lNumericBlanks;
 		int NumAlphas;
 		int NumNumbers;
 		int Status;
@@ -214,8 +214,8 @@ namespace ScheduleManager {
 		int NumConstantSchedules; // Number of "constant" schedules
 		int TS; // Counter for Num Of Time Steps in Hour
 		int Hr; // Hour Counter
-		FArray2D< Real64 > MinuteValue; // Temporary for processing interval schedules
-		FArray2D_bool SetMinuteValue; // Temporary for processing interval schedules
+		Array2D< Real64 > MinuteValue; // Temporary for processing interval schedules
+		Array2D_bool SetMinuteValue; // Temporary for processing interval schedules
 		int NumFields;
 		int SCount;
 		//  LOGICAL RptSchedule
@@ -227,8 +227,8 @@ namespace ScheduleManager {
 		int MaxAlps;
 		int AddWeekSch;
 		int AddDaySch;
-		FArray1D_bool AllDays( MaxDayTypes );
-		FArray1D_bool TheseDays( MaxDayTypes );
+		Array1D_bool AllDays( MaxDayTypes );
+		Array1D_bool TheseDays( MaxDayTypes );
 		bool ErrorHere;
 		int SchNum;
 		int WkCount;
@@ -248,7 +248,7 @@ namespace ScheduleManager {
 		int kdy;
 		bool FileExists;
 		// for SCHEDULE:FILE
-		FArray1D< Real64 > hourlyFileValues;
+		Array1D< Real64 > hourlyFileValues;
 		int SchdFile;
 		int colCnt;
 		int rowCnt;
@@ -1005,7 +1005,7 @@ namespace ScheduleManager {
 			WkCount = 0;
 			DyCount = 0;
 			FullYearSet = false;
-			Through: while ( NumField < NumAlphas ) {
+			while ( NumField < NumAlphas ) {
 				//   Process "Through"
 				if ( ! has_prefix( Alphas( NumField ), "THROUGH:" ) && ! has_prefix( Alphas( NumField ), "THROUGH" ) ) {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Schedule( SchNum ).Name + "\", Expecting \"Through:\" date" );
@@ -1059,7 +1059,7 @@ namespace ScheduleManager {
 				ThruField = NumField;
 				AllDays = false;
 				++NumField;
-				For: while ( NumField < NumAlphas ) { // Continues until next "Through"
+				while ( NumField < NumAlphas ) { // Continues until next "Through"
 					if ( has_prefix( Alphas( NumField ), "THROUGH" ) ) goto For_exit;
 					//   "For" must be next, adds to "# Day Schedules"
 					if ( has_prefix( Alphas( NumField ), "FOR" ) ) {
@@ -1118,9 +1118,9 @@ namespace ScheduleManager {
 					NumNumbers = 0;
 					xxcount = 0;
 					UntilFld = NumField;
-					Until: while ( true ) {
-						if ( has_prefix( Alphas( NumField ), "FOR" ) ) goto Until_exit;
-						if ( has_prefix( Alphas( NumField ), "THROUGH" ) ) goto Until_exit;
+					while ( true ) {
+						if ( has_prefix( Alphas( NumField ), "FOR" ) ) break;
+						if ( has_prefix( Alphas( NumField ), "THROUGH" ) ) break;
 						if ( has_prefix( Alphas( NumField ), "UNTIL" ) ) {
 							// Process Until/Value pairs for later processing by other routine.
 							++NumField;
@@ -1139,10 +1139,8 @@ namespace ScheduleManager {
 							ErrorsFound = true;
 							goto Through_exit;
 						}
-						if ( Alphas( NumField ).empty() ) goto Until_exit;
-						Until_loop: ;
+						if ( Alphas( NumField ).empty() ) break;
 					}
-					Until_exit: ;
 					// Process Untils, Numbers
 					if ( NumNumbers > 0 ) {
 						NumFields = NumNumbers;
@@ -1174,7 +1172,6 @@ namespace ScheduleManager {
 							}
 						}
 					}
-					For_loop: ;
 				}
 				For_exit: ;
 				if ( ! all( AllDays ) ) {
@@ -1190,7 +1187,6 @@ namespace ScheduleManager {
 					ShowContinueError( errmsg );
 					ShowContinueError( "Missing day types will have 0.0 as Schedule Values" );
 				}
-				Through_loop: ;
 			}
 			Through_exit: ;
 			if ( DaysInYear( 60 ) == 0 ) {
@@ -1877,8 +1873,8 @@ namespace ScheduleManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D_string const Months( 12, { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" } );
-		static FArray1D_string const HrField( {0,24}, { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24" } );
+		static Array1D_string const Months( 12, { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" } );
+		static Array1D_string const HrField( {0,24}, { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24" } );
 		static gio::Fmt SchTFmt0( "('! Schedule Details Report=',A,' =====================')" );
 		static gio::Fmt SchTFmt( "('! <ScheduleType>,Name,Limited? {Yes/No},Minimum,Maximum,',   'Continuous? {Yes/No - Discrete}')" );
 		static gio::Fmt SchSFmt( "('! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31')" );
@@ -1906,9 +1902,9 @@ namespace ScheduleManager {
 		int iDay;
 		int DT;
 		int iDayP;
-		FArray1D_string ShowMinute;
+		Array1D_string ShowMinute;
 		int CurMinute;
-		FArray1D_string TimeHHMM;
+		Array1D_string TimeHHMM;
 		std::string SchWFmt( "('! <WeekSchedule>,Name" );
 		std::string SchDFmt;
 		std::string SchDFmtdata;
@@ -1916,7 +1912,7 @@ namespace ScheduleManager {
 		std::string YesNo2;
 		std::string Num1;
 		std::string Num2;
-		FArray2D_string RoundTSValue;
+		Array2D_string RoundTSValue;
 
 		ShowMinute.allocate( NumOfTimeStepInHour );
 		TimeHHMM.allocate( NumOfTimeStepInHour * 24 );
@@ -2658,7 +2654,7 @@ namespace ScheduleManager {
 	void
 	GetScheduleValuesForDay(
 		int const ScheduleIndex,
-		FArray2S< Real64 > DayValues,
+		Array2S< Real64 > DayValues,
 		Optional_int_const JDay,
 		Optional_int_const CurDayofWeek
 	)
@@ -2741,7 +2737,7 @@ namespace ScheduleManager {
 	void
 	GetSingleDayScheduleValues(
 		int const DayScheduleIndex, // Index of the DaySchedule for values
-		FArray2S< Real64 > DayValues // Returned set of values
+		Array2S< Real64 > DayValues // Returned set of values
 	)
 	{
 
@@ -2845,12 +2841,12 @@ namespace ScheduleManager {
 
 	void
 	ProcessIntervalFields(
-		FArray1S_string const Untils,
-		FArray1S< Real64 > const Numbers,
+		Array1S_string const Untils,
+		Array1S< Real64 > const Numbers,
 		int const NumUntils,
 		int const NumNumbers,
-		FArray2A< Real64 > MinuteValue,
-		FArray2A_bool SetMinuteValue,
+		Array2A< Real64 > MinuteValue,
+		Array2A_bool SetMinuteValue,
 		bool & ErrorsFound,
 		std::string const & DayScheduleName, // Name (used for errors)
 		std::string const & ErrContext // Context (used for errors)
@@ -2919,7 +2915,7 @@ namespace ScheduleManager {
 			return;
 		}
 
-		UntilLoop: for ( Count = 1; Count <= NumUntils; ++Count ) {
+		for ( Count = 1; Count <= NumUntils; ++Count ) {
 			Pos = index( Untils( Count ), "UNTIL" );
 			if ( Pos == 0 ) {
 				if ( Untils( Count )[ 5 ] == ':' ) {
@@ -2999,7 +2995,6 @@ namespace ScheduleManager {
 				}
 			}
 
-			UntilLoop_loop: ;
 		}
 		UntilLoop_exit: ;
 
@@ -3114,8 +3109,8 @@ namespace ScheduleManager {
 	void
 	ProcessForDayTypes(
 		std::string const & ForDayField, // Field containing the "FOR:..."
-		FArray1A_bool TheseDays, // Array to contain returned "true" days
-		FArray1A_bool AlReady, // Array of days already done
+		Array1A_bool TheseDays, // Array to contain returned "true" days
+		Array1A_bool AlReady, // Array of days already done
 		bool & ErrorsFound // Will be true if error found.
 	)
 	{
@@ -3813,7 +3808,7 @@ namespace ScheduleManager {
 
 		if ( ScheduleIndex > 0 ) {
 			CheckScheduleValue = false;
-			DayLoop: for ( Loop = 1; Loop <= 366; ++Loop ) {
+			for ( Loop = 1; Loop <= 366; ++Loop ) {
 				WkSch = Schedule( ScheduleIndex ).WeekSchedulePointer( Loop );
 				for ( DayT = 1; DayT <= MaxDayTypes; ++DayT ) {
 					if ( any_eq( DaySchedule( WeekSchedule( WkSch ).DaySchedulePointer( DayT ) ).TSValue, Value ) ) {
@@ -3821,7 +3816,6 @@ namespace ScheduleManager {
 						goto DayLoop_exit;
 					}
 				}
-				DayLoop_loop: ;
 			}
 			DayLoop_exit: ;
 		}
@@ -3887,8 +3881,7 @@ namespace ScheduleManager {
 		}
 
 		if ( ScheduleIndex > 0 ) {
-
-			DayLoop: for ( Loop = 1; Loop <= 366; ++Loop ) {
+			for ( Loop = 1; Loop <= 366; ++Loop ) {
 				WkSch = Schedule( ScheduleIndex ).WeekSchedulePointer( Loop );
 				for ( DayT = 1; DayT <= MaxDayTypes; ++DayT ) {
 					if ( any_eq( DaySchedule( WeekSchedule( WkSch ).DaySchedulePointer( DayT ) ).TSValue, double( Value ) ) ) {
@@ -3896,7 +3889,6 @@ namespace ScheduleManager {
 						goto DayLoop_exit;
 					}
 				}
-				DayLoop_loop: ;
 			}
 			DayLoop_exit: ;
 		}
@@ -4149,7 +4141,7 @@ namespace ScheduleManager {
 
 		if ( ScheduleIndex > 0 ) {
 			WkSch = Schedule( ScheduleIndex ).WeekSchedulePointer( 1 );
-			DayTLoop: for ( DayT = 1; DayT <= MaxDayTypes; ++DayT ) {
+			for ( DayT = 1; DayT <= MaxDayTypes; ++DayT ) {
 				for ( Hour = 1; Hour <= 24; ++Hour ) {
 					for ( TStep = 1; TStep <= NumOfTimeStepInHour; ++TStep ) {
 						if ( DaySchedule( WeekSchedule( WkSch ).DaySchedulePointer( DayT ) ).TSValue( Hour, TStep ) > 0.0 && DaySchedule( WeekSchedule( WkSch ).DaySchedulePointer( DayT ) ).TSValue( Hour, TStep ) < 1.0 ) {
@@ -4158,13 +4150,12 @@ namespace ScheduleManager {
 						}
 					}
 				}
-				DayTLoop_loop: ;
 			}
 			DayTLoop_exit: ;
 			if ( ! HasFractions ) {
 				for ( Loop = 2; Loop <= 366; ++Loop ) {
 					WkSch = Schedule( ScheduleIndex ).WeekSchedulePointer( Loop );
-					DayTLoop2: for ( DayT = 1; DayT <= MaxDayTypes; ++DayT ) {
+					for ( DayT = 1; DayT <= MaxDayTypes; ++DayT ) {
 						for ( Hour = 1; Hour <= 24; ++Hour ) {
 							for ( TStep = 1; TStep <= NumOfTimeStepInHour; ++TStep ) {
 								if ( DaySchedule( WeekSchedule( WkSch ).DaySchedulePointer( DayT ) ).TSValue( Hour, TStep ) > 0.0 && DaySchedule( WeekSchedule( WkSch ).DaySchedulePointer( DayT ) ).TSValue( Hour, TStep ) < 1.0 ) {
@@ -4173,7 +4164,6 @@ namespace ScheduleManager {
 								}
 							}
 						}
-						DayTLoop2_loop: ;
 					}
 					DayTLoop2_exit: ;
 				}

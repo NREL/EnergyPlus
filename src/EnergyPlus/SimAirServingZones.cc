@@ -2,8 +2,8 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -340,19 +340,19 @@ namespace SimAirServingZones {
 
 		// SUBROUTINE LOCAL VARIABLE DEFINITIONS
 		int NumNumbers; // number of numbers returned by GetObjectItem
-		FArray1D< Real64 > Numbers; // numbers (REAL(r64)s) returned by GetObjectItem
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D< Real64 > Numbers; // numbers (REAL(r64)s) returned by GetObjectItem
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 		int NumAlphas; // number of strings returned by GetObjectItem
 		int NumParams;
 		int MaxNumbers;
 		int MaxAlphas;
-		FArray1D_string Alphas; // alpha strings returned by GetObjectItem
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_string Alphas; // alpha strings returned by GetObjectItem
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		std::string CurrentModuleObject; // Object type for getting and error messages
 		int NumNodes; // number of nodes returned by GetNodeNums
-		FArray1D_int NodeNums; // node numbers returned by GetNodeNums
+		Array1D_int NodeNums; // node numbers returned by GetNodeNums
 		int NodeNum; // a node number
 		int AirSysNum; // an air system (air loop) number
 		int OANum; // outside aur system index
@@ -376,20 +376,20 @@ namespace SimAirServingZones {
 		std::string ControllerListName; // Name of a controller list object
 		std::string AvailManagerListName; // Name of an availability manager list object
 		std::string ConnectorListName; // Name of a connector list object
-		static FArray1D_string BranchNames; // Branch names from GetBranchList call
-		static FArray1D_string CompTypes; // Component types from GetBranchList call
-		static FArray1D_string CompNames; // Component names from GetBranchList call
-		static FArray1D_string InletNodeNames; // Component inlet node names from GetBranchData call
-		static FArray1D_string OutletNodeNames; // Component outlet node names from GetBranchData call
-		static FArray1D_string NodeNames; // Outlet node names from GetLoopSplitter call
-		static FArray1D_int NodeNumbers; // Outlet node numbers from GetLoopSplitter call
-		static FArray1D_int InletNodeNumbers; // Component inlet node numbers from GetBranchData call
-		static FArray1D_int OutletNodeNumbers; // Component outlet node numbers from GetBranchData call
-		FArray1D_int DummyInteger( 2 ); // Placeholder for corresponding plant loop branch pressure drop info
+		static Array1D_string BranchNames; // Branch names from GetBranchList call
+		static Array1D_string CompTypes; // Component types from GetBranchList call
+		static Array1D_string CompNames; // Component names from GetBranchList call
+		static Array1D_string InletNodeNames; // Component inlet node names from GetBranchData call
+		static Array1D_string OutletNodeNames; // Component outlet node names from GetBranchData call
+		static Array1D_string NodeNames; // Outlet node names from GetLoopSplitter call
+		static Array1D_int NodeNumbers; // Outlet node numbers from GetLoopSplitter call
+		static Array1D_int InletNodeNumbers; // Component inlet node numbers from GetBranchData call
+		static Array1D_int OutletNodeNumbers; // Component outlet node numbers from GetBranchData call
+		Array1D_int DummyInteger( 2 ); // Placeholder for corresponding plant loop branch pressure drop info
 		static bool ErrorsFound( false ); // TRUE if errors detected in input
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		static FArray1D_bool PackagedUnit;
+		static Array1D_bool PackagedUnit;
 		int test;
 		int count;
 		bool ErrInList;
@@ -407,7 +407,7 @@ namespace SimAirServingZones {
 		std::string CompType; // component type
 		int WaterCoilNodeNum; // numeric equivalent for water coil node number
 		int ActuatorNodeNum; // numeric equivalent for controller actuator node number
-		FArray1D_string MatchNodeName( 3 );
+		Array1D_string MatchNodeName( 3 );
 
 		struct AirUniqueNodes
 		{
@@ -438,7 +438,7 @@ namespace SimAirServingZones {
 		};
 
 		// Object Data
-		FArray1D< AirUniqueNodes > TestUniqueNodes;
+		Array1D< AirUniqueNodes > TestUniqueNodes;
 
 		GetObjectDefMaxArgs( "AirLoopHVAC", NumParams, MaxAlphas, MaxNumbers );
 		GetObjectDefMaxArgs( "ConnectorList", NumParams, NumAlphas, NumNumbers );
@@ -1350,14 +1350,14 @@ namespace SimAirServingZones {
 		bool FoundOASys;
 		static int TUInNode( 0 ); // inlet node number of a terminal unit
 		static Real64 MassFlowSetToler;
-		static FArray1D_int CtrlZoneNumsCool;
-		static FArray1D_int CtrlZoneNumsHeat;
-		static FArray1D_int ZoneInletNodesCool;
-		static FArray1D_int ZoneInletNodesHeat;
-		static FArray1D_int TermInletNodesCool;
-		static FArray1D_int TermInletNodesHeat;
-		static FArray1D_int SupNode;
-		static FArray1D_int SupNodeType;
+		static Array1D_int CtrlZoneNumsCool;
+		static Array1D_int CtrlZoneNumsHeat;
+		static Array1D_int ZoneInletNodesCool;
+		static Array1D_int ZoneInletNodesHeat;
+		static Array1D_int TermInletNodesCool;
+		static Array1D_int TermInletNodesHeat;
+		static Array1D_int SupNode;
+		static Array1D_int SupNodeType;
 
 		//Dimension the local subcomponent arrays
 
@@ -1368,7 +1368,7 @@ namespace SimAirServingZones {
 		bool ErrorsFound;
 		static Real64 OAReliefDiff( 0.0 ); // local for massflow change across OA system, kg/s
 
-		FArray1D_int tmpNodeARR;
+		Array1D_int tmpNodeARR;
 		int nodeCount;
 		int nodeLoop;
 		int ZoneNum;
@@ -1392,7 +1392,7 @@ namespace SimAirServingZones {
 
 			MassFlowSetToler = HVACFlowRateToler * 0.00001;
 
-			SupplyAirPathLoop: for ( SupAirPath = 1; SupAirPath <= NumSupplyAirPaths; ++SupAirPath ) {
+			for ( SupAirPath = 1; SupAirPath <= NumSupplyAirPaths; ++SupAirPath ) {
 
 				NumAllSupAirPathNodes = 0;
 				SupAirPathNodeNum = 0;
@@ -1508,13 +1508,10 @@ namespace SimAirServingZones {
 				}
 				SupNode.deallocate();
 				SupNodeType.deallocate();
-
-				SupplyAirPathLoop_loop: ;
 			}
-			SupplyAirPathLoop_exit: ;
 
-			//Now loop over the air loops
-			PrimaryAirSysLoop: for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
+			// Now loop over the air loops
+			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 
 				CtrlZoneNumsCool = 0;
 				CtrlZoneNumsHeat = 0;
@@ -1534,21 +1531,19 @@ namespace SimAirServingZones {
 				}
 
 				// loop over the air loop's output nodes
-				AirSysOutletsLoop: for ( OutNum = 1; OutNum <= AirToZoneNodeInfo( AirLoopNum ).NumSupplyNodes; ++OutNum ) {
+				for ( OutNum = 1; OutNum <= AirToZoneNodeInfo( AirLoopNum ).NumSupplyNodes; ++OutNum ) {
 					ZoneSideNodeNum = AirToZoneNodeInfo( AirLoopNum ).ZoneEquipSupplyNodeNum( OutNum );
 					// find the corresponding branch number
 					OutBranchNum = PrimaryAirSystem( AirLoopNum ).OutletBranchNum( OutNum );
 					// find the supply air path corresponding to each air loop outlet node
 					SupAirPathNum = 0;
 					// loop over the air loop's output nodes
-					SupplyAirPathLoop2: for ( SupAirPath = 1; SupAirPath <= NumSupplyAirPaths; ++SupAirPath ) {
+					for ( SupAirPath = 1; SupAirPath <= NumSupplyAirPaths; ++SupAirPath ) {
 						if ( ZoneSideNodeNum == SupplyAirPath( SupAirPath ).InletNodeNum ) {
 							SupAirPathNum = SupAirPath;
-							goto SupplyAirPathLoop2_exit;
+							break;
 						}
-						SupplyAirPathLoop2_loop: ;
 					}
-					SupplyAirPathLoop2_exit: ;
 					if ( SupAirPathNum > 0 ) {
 						NumSupAirPathOutNodes = SupplyAirPath( SupAirPathNum ).NumOutletNodes;
 					} else {
@@ -1557,15 +1552,15 @@ namespace SimAirServingZones {
 
 					// Now Loop over the Supply Air Path outlet nodes and find out which zone and which air terminal
 					// unit on that zone is connected to that supply air path.
-					SupplyAirPathOutletLoop: for ( SupAirPathOutNodeNum = 1; SupAirPathOutNodeNum <= NumSupAirPathOutNodes; ++SupAirPathOutNodeNum ) {
+					for ( SupAirPathOutNodeNum = 1; SupAirPathOutNodeNum <= NumSupAirPathOutNodes; ++SupAirPathOutNodeNum ) {
 						FoundSupPathZoneConnect = false;
 						// loop over all controlled zones.
-						ControlledZoneLoop: for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
+						for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 							if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 							// Loop over the air distribution unit inlets for each controlled zone.
 							// Look for a match between the zone splitter outlet node and the air distribution unit inlet node.
 							// When match found save the controlled zone number in CtrlZoneNumsCool or CtrlZoneNumsHeat
-							ZoneAirDistUnitInletsLoop: for ( ZoneInNum = 1; ZoneInNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInNum ) {
+							for ( ZoneInNum = 1; ZoneInNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInNum ) {
 								NumComponentsOnBranch = PrimaryAirSystem( AirLoopNum ).Branch( OutBranchNum ).TotalComponents;
 
 								//BEGIN COOLING: Check for a match between the cooling air distribution unit inlet
@@ -1625,10 +1620,7 @@ namespace SimAirServingZones {
 									//unit loop and the controlled zone loop may be exited.
 									goto ControlledZoneLoop_exit;
 								} //end check for heatingair distribution units
-								ZoneAirDistUnitInletsLoop_loop: ;
 							}
-							ZoneAirDistUnitInletsLoop_exit: ;
-							ControlledZoneLoop_loop: ;
 						}
 						ControlledZoneLoop_exit: ;
 
@@ -1642,21 +1634,19 @@ namespace SimAirServingZones {
 							ErrorsFound = true;
 						}
 
-						SupplyAirPathOutletLoop_loop: ;
 					}
-					SupplyAirPathOutletLoop_exit: ;
 
 					// What if there is no supply air path & the air loop outlet is just hooked directly to
 					// an air distribution unit of a single zone? In this case look for a match between
 					// ZoneSideNodeNum and a zone's air distribution unit inlets.
 					if ( SupAirPathNum == 0 ) {
 
-						ControlledZoneLoop2: for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
+						for ( CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum ) {
 							if ( ! ZoneEquipConfig( CtrlZoneNum ).IsControlled ) continue;
 							// Loop over the air distribution unit inlets for each controlled zone.
 							// Look for a match between the zone equip inlet node and the air distribution unit inlet node.
 							// When match found save the controlled zone number in CtrlZoneNumsCool or CtrlZoneNumsHeat
-							ZoneAirDistUnitInletsLoop2: for ( ZoneInNum = 1; ZoneInNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInNum ) {
+							for ( ZoneInNum = 1; ZoneInNum <= ZoneEquipConfig( CtrlZoneNum ).NumInletNodes; ++ZoneInNum ) {
 
 								//set supply air path flag
 								ZoneEquipConfig( CtrlZoneNum ).AirDistUnitCool( ZoneInNum ).SupplyAirPathExists = false;
@@ -1691,17 +1681,11 @@ namespace SimAirServingZones {
 
 								}
 
-								ZoneAirDistUnitInletsLoop2_loop: ;
 							}
-							ZoneAirDistUnitInletsLoop2_exit: ;
-							ControlledZoneLoop2_loop: ;
 						}
 						ControlledZoneLoop2_exit: ;
 					} // End of no supply air path case
-
-					AirSysOutletsLoop_loop: ;
 				}
-				AirSysOutletsLoop_exit: ;
 
 				// we now know the number of heated and cooled zones served by this primary air system.
 				// Allocate the subarrays in AirToZoneNodeInfo
@@ -1712,21 +1696,17 @@ namespace SimAirServingZones {
 				AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolInletNodes.allocate( NumZonesCool );
 				AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatInletNodes.allocate( NumZonesHeat );
 				// Move the controlled zone numbers from the scratch arrays into AirToZoneNodeInfo
-				CooledZonesLoop: for ( ZoneInSysIndex = 1; ZoneInSysIndex <= NumZonesCool; ++ZoneInSysIndex ) {
+				for ( ZoneInSysIndex = 1; ZoneInSysIndex <= NumZonesCool; ++ZoneInSysIndex ) {
 					AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZoneInSysIndex ) = CtrlZoneNumsCool( ZoneInSysIndex );
 					AirToZoneNodeInfo( AirLoopNum ).CoolZoneInletNodes( ZoneInSysIndex ) = ZoneInletNodesCool( ZoneInSysIndex );
 					AirToZoneNodeInfo( AirLoopNum ).TermUnitCoolInletNodes( ZoneInSysIndex ) = TermInletNodesCool( ZoneInSysIndex );
-					CooledZonesLoop_loop: ;
 				}
-				CooledZonesLoop_exit: ;
 
-				HeatedZonesLoop: for ( ZoneInSysIndex = 1; ZoneInSysIndex <= NumZonesHeat; ++ZoneInSysIndex ) {
+				for ( ZoneInSysIndex = 1; ZoneInSysIndex <= NumZonesHeat; ++ZoneInSysIndex ) {
 					AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZoneInSysIndex ) = CtrlZoneNumsHeat( ZoneInSysIndex );
 					AirToZoneNodeInfo( AirLoopNum ).HeatZoneInletNodes( ZoneInSysIndex ) = ZoneInletNodesHeat( ZoneInSysIndex );
 					AirToZoneNodeInfo( AirLoopNum ).TermUnitHeatInletNodes( ZoneInSysIndex ) = TermInletNodesHeat( ZoneInSysIndex );
-					HeatedZonesLoop_loop: ;
 				}
-				HeatedZonesLoop_exit: ;
 
 				AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled = NumZonesCool;
 				AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated = NumZonesHeat;
@@ -1764,9 +1744,7 @@ namespace SimAirServingZones {
 					PrimaryAirSystem( AirLoopNum ).MixOutNode = PrimaryAirSystem( AirLoopNum ).Mixer.NodeNumOut;
 				}
 
-				PrimaryAirSysLoop_loop: ;
 			}
-			PrimaryAirSysLoop_exit: ;
 
 			// now register zone inlet nodes as critical demand nodes in the convergence tracking
 			ZoneInletConvergence.allocate( NumOfZones );
@@ -2174,7 +2152,7 @@ namespace SimAirServingZones {
 			//    END IF
 
 			// 2 passes; 1 usually suffices; 2 is done if ResolveSysFlow detects a failure of mass balance
-			SimPasses: for ( AirLoopPass = 1; AirLoopPass <= 2; ++AirLoopPass ) {
+			for ( AirLoopPass = 1; AirLoopPass <= 2; ++AirLoopPass ) {
 
 				SysReSim = false;
 
@@ -2191,15 +2169,12 @@ namespace SimAirServingZones {
 				// At the end of the first pass, check whether a second pass is needed or not
 				if ( AirLoopPass == 1 ) {
 					// If simple system, skip second pass
-					if ( AirLoopControlInfo( AirLoopNum ).Simple ) goto SimPasses_exit;
+					if ( AirLoopControlInfo( AirLoopNum ).Simple ) break;
 					ResolveSysFlow( AirLoopNum, SysReSim );
 					// If mass balance OK, skip second pass
-					if ( ! SysReSim ) goto SimPasses_exit;
+					if ( ! SysReSim ) break;
 				}
-
-				SimPasses_loop: ; // end pass loop
 			}
-			SimPasses_exit: ;
 
 			// Air system side has been simulated, now transfer conditions across to
 			// the zone equipment side, looping through all supply air paths for this
@@ -3480,15 +3455,15 @@ namespace SimAirServingZones {
 		static Real64 Ep( 1.0 ); // zone primary air fraction
 		static Real64 Er( 0.0 ); // zone secondary recirculation fraction
 		Real64 ZoneSA; // Zone supply air flow rate
-		FArray1D< Real64 > VdzClgByZone; // saved value of cooling based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level Vps)
-		FArray1D< Real64 > VdzHtgByZone; // saved value of heating based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level Vps)
+		Array1D< Real64 > VdzClgByZone; // saved value of cooling based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level Vps)
+		Array1D< Real64 > VdzHtgByZone; // saved value of heating based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level Vps)
 		Real64 ZonePA; // Zone primary air flow rate
-		FArray1D< Real64 > VpzClgByZone; // saved value of cooling based ZonePA which is Vpz used in 62.1 tabular report
-		FArray1D< Real64 > VpzMinClgByZone; // saved value of minimum cooling based ZonePA which is VpzClg-min used in 62.1 tabular report
-		FArray1D< Real64 > VpzHtgByZone; // saved value of heating based ZonePA which is Vpz used in 62.1 tabular report
-		FArray1D< Real64 > VpzMinHtgByZone; // saved value of minimum heating based ZonePA which is VpzHtg-min used in 62.1 tabular report
-		FArray1D< Real64 > VpzClgSumBySys; // sum of saved value of cooling based ZonePA which is Vpz-sum used in 62.1 tabular report
-		FArray1D< Real64 > VpzHtgSumBySys; // sum of saved value of heating based ZonePA which is Vpz-sum used in 62.1 tabular report
+		Array1D< Real64 > VpzClgByZone; // saved value of cooling based ZonePA which is Vpz used in 62.1 tabular report
+		Array1D< Real64 > VpzMinClgByZone; // saved value of minimum cooling based ZonePA which is VpzClg-min used in 62.1 tabular report
+		Array1D< Real64 > VpzHtgByZone; // saved value of heating based ZonePA which is Vpz used in 62.1 tabular report
+		Array1D< Real64 > VpzMinHtgByZone; // saved value of minimum heating based ZonePA which is VpzHtg-min used in 62.1 tabular report
+		Array1D< Real64 > VpzClgSumBySys; // sum of saved value of cooling based ZonePA which is Vpz-sum used in 62.1 tabular report
+		Array1D< Real64 > VpzHtgSumBySys; // sum of saved value of heating based ZonePA which is Vpz-sum used in 62.1 tabular report
 		Real64 NodeTemp; // node temperature
 		Real64 NodeHumRat; // node humidity ratio
 		Real64 MassFlowRate; // Temporary variable
@@ -3496,16 +3471,16 @@ namespace SimAirServingZones {
 		Real64 HtgSupplyAirAdjustFactor; // temporary variable
 		Real64 SysOAUnc; // uncorrected system OA summing up people and area based OA for all zones for VRP
 		Real64 ZoneOAUnc; // uncorrected zone OA summing up people and area based OA for each zone
-		FArray1D< Real64 > VbzByZone; // saved value of ZoneOAUnc which is Vbz used in 62.1 tabular report
+		Array1D< Real64 > VbzByZone; // saved value of ZoneOAUnc which is Vbz used in 62.1 tabular report
 		Real64 TotalPeople; // total number of people in each zone
-		FArray1D< Real64 > PzSumBySysCool; // saved value of TotalPeople which is Pz-sum used in 62.1 tabular report
-		FArray1D< Real64 > PzSumBySysHeat; // saved value of TotalPeople which is Pz-sum used in 62.1 tabular report
+		Array1D< Real64 > PzSumBySysCool; // saved value of TotalPeople which is Pz-sum used in 62.1 tabular report
+		Array1D< Real64 > PzSumBySysHeat; // saved value of TotalPeople which is Pz-sum used in 62.1 tabular report
 		Real64 PeakPeople; // peak population based on maximum people schedule value
-		FArray1D< Real64 > PsBySysCool; // saved value of PeakPeople which is Ps used in 62.1 tabular report
-		FArray1D< Real64 > PsBySysHeat; // saved value of PeakPeople which is Ps used in 62.1 tabular report
+		Array1D< Real64 > PsBySysCool; // saved value of PeakPeople which is Ps used in 62.1 tabular report
+		Array1D< Real64 > PsBySysHeat; // saved value of PeakPeople which is Ps used in 62.1 tabular report
 		Real64 PopulationDiversity; // ratio of total system co-incident peak population to sum of people for all zones in system
-		FArray1D< Real64 > DBySysCool; // saved value of PopulatonDiversity which is D used in 62.1 tabular report
-		FArray1D< Real64 > DBySysHeat; // saved value of PopulatonDiversity which is D used in 62.1 tabular report
+		Array1D< Real64 > DBySysCool; // saved value of PopulatonDiversity which is D used in 62.1 tabular report
+		Array1D< Real64 > DBySysHeat; // saved value of PopulatonDiversity which is D used in 62.1 tabular report
 		Real64 RpPzSum; // Rp times Pz used for computing the system total Rp value for 62.1 tabular report
 		Real64 PzSum; // Pz sum for system total Pz for 62.1 tabular report
 		Real64 RaAzSum; // Ra time Az used for computing the system tota Ra value for 62.1 tabular report
@@ -4292,9 +4267,9 @@ namespace SimAirServingZones {
 						VozClgSum += VbzByZone( CtrlZoneNum ) / FinalZoneSizing( CtrlZoneNum ).ZoneADEffCooling;
 					}
 					// accumulate values for system ventilation parameters report
-					if ( FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowPPer || FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowSum || FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowMax ){
+					if ( FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowPPer || FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowSum || FinalZoneSizing( CtrlZoneNum ).OADesMethod == OAFlowMax ) {
 						RpPzSum += FinalZoneSizing( CtrlZoneNum ).DesOAFlowPPer * FinalZoneSizing( CtrlZoneNum ).TotPeopleInZone;
-					} 
+					}
 					RaAzSum += FinalZoneSizing( CtrlZoneNum ).DesOAFlowPerArea * FinalZoneSizing( CtrlZoneNum ).TotalZoneFloorArea;
 					AzSum += FinalZoneSizing( CtrlZoneNum ).TotalZoneFloorArea;
 					VbzSum += VbzByZone( CtrlZoneNum );
@@ -4499,36 +4474,36 @@ namespace SimAirServingZones {
 		Real64 ZoneOARatio; // ratio of zone OA flow to zone design cooling or heating flow
 		Real64 RetTempRise; // difference between zone return temperature and zone temperature [delta K]
 		Real64 SysCoolingEv; // System level ventilation effectiveness for cooling mode
-		static FArray1D< Real64 > EvBySysCool; // saved value of SysCoolingEv used in 62.1 tabular report
+		static Array1D< Real64 > EvBySysCool; // saved value of SysCoolingEv used in 62.1 tabular report
 		Real64 SysHeatingEv; // System level ventilation effectiveness for heating mode
-		static FArray1D< Real64 > EvBySysHeat; // saved value of SysHeatingEv used in 62.1 tabular report
+		static Array1D< Real64 > EvBySysHeat; // saved value of SysHeatingEv used in 62.1 tabular report
 		static Real64 Ep( 1.0 ); // zone primary air fraction
 		static Real64 Er( 0.0 ); // zone secondary recirculation fraction
 		static Real64 Fa( 1.0 ); // temporary variable used in multi-path VRP calc
-		static FArray1D< Real64 > FaByZoneCool; // saved value of Fa used in 62.1 tabular report
-		static FArray1D< Real64 > FaByZoneHeat; // saved value of Fa used in 62.1 tabular report
+		static Array1D< Real64 > FaByZoneCool; // saved value of Fa used in 62.1 tabular report
+		static Array1D< Real64 > FaByZoneHeat; // saved value of Fa used in 62.1 tabular report
 		static Real64 Fb( 1.0 ); // temporary variable used in multi-path VRP calc
-		static FArray1D< Real64 > FbByZoneCool; // saved value of Fb used in 62.1 tabular report
-		static FArray1D< Real64 > FbByZoneHeat; // saved value of Fb used in 62.1 tabular report
+		static Array1D< Real64 > FbByZoneCool; // saved value of Fb used in 62.1 tabular report
+		static Array1D< Real64 > FbByZoneHeat; // saved value of Fb used in 62.1 tabular report
 		static Real64 Fc( 1.0 ); // temporary variable used in multi-path VRP calc
-		static FArray1D< Real64 > FcByZoneCool; // saved value of Fc used in 62.1 tabular report
-		static FArray1D< Real64 > FcByZoneHeat; // saved value of Fc used in 62.1 tabular report
+		static Array1D< Real64 > FcByZoneCool; // saved value of Fc used in 62.1 tabular report
+		static Array1D< Real64 > FcByZoneHeat; // saved value of Fc used in 62.1 tabular report
 		static Real64 Xs( 1.0 ); // uncorrected system outdoor air fraction
-		static FArray1D< Real64 > XsBySysCool; // saved value of Xs used in 62.1 tabular report
-		static FArray1D< Real64 > XsBySysHeat; // saved value of Xs used in 62.1 tabular report
-		static FArray1D< Real64 > EvzByZoneCool; // saved value of Evz (zone vent effy) used in 62.1 tabular report
-		static FArray1D< Real64 > EvzByZoneHeat; // saved value of Evz (zone vent effy) used in 62.1 tabular report
-		static FArray1D< Real64 > EvzByZoneCoolPrev; // saved value of Evz (zone vent effy) used in 62.1 tabular report
-		static FArray1D< Real64 > EvzByZoneHeatPrev; // saved value of Evz (zone vent effy) used in 62.1 tabular report
-		static FArray1D< Real64 > VotClgBySys; // saved value of cooling ventilation required at primary AHU, used in 62.1 tabular report
-		static FArray1D< Real64 > VotHtgBySys; // saved value of heating ventilation required at primary AHU, used in 62.1 tabular report
-		static FArray1D< Real64 > VozSumClgBySys; // saved value of cooling ventilation required at clg zones
-		static FArray1D< Real64 > VozSumHtgBySys; // saved value of cooling ventilation required at htg zones
+		static Array1D< Real64 > XsBySysCool; // saved value of Xs used in 62.1 tabular report
+		static Array1D< Real64 > XsBySysHeat; // saved value of Xs used in 62.1 tabular report
+		static Array1D< Real64 > EvzByZoneCool; // saved value of Evz (zone vent effy) used in 62.1 tabular report
+		static Array1D< Real64 > EvzByZoneHeat; // saved value of Evz (zone vent effy) used in 62.1 tabular report
+		static Array1D< Real64 > EvzByZoneCoolPrev; // saved value of Evz (zone vent effy) used in 62.1 tabular report
+		static Array1D< Real64 > EvzByZoneHeatPrev; // saved value of Evz (zone vent effy) used in 62.1 tabular report
+		static Array1D< Real64 > VotClgBySys; // saved value of cooling ventilation required at primary AHU, used in 62.1 tabular report
+		static Array1D< Real64 > VotHtgBySys; // saved value of heating ventilation required at primary AHU, used in 62.1 tabular report
+		static Array1D< Real64 > VozSumClgBySys; // saved value of cooling ventilation required at clg zones
+		static Array1D< Real64 > VozSumHtgBySys; // saved value of cooling ventilation required at htg zones
 		static Real64 Evz( 1.0 ); // zone ventilation efficiency
 		static Real64 MinHeatingEvz( 1.0 ); // minimum zone ventilation efficiency for heating (to be used as system efficiency)
-		static FArray1D< Real64 > EvzMinBySysHeat; // saved value of EvzMin used in 62.1 tabular report
+		static Array1D< Real64 > EvzMinBySysHeat; // saved value of EvzMin used in 62.1 tabular report
 		static Real64 MinCoolingEvz( 1.0 ); // minimum zone ventilation efficiency for cooling (to be used as system efficiency)
-		static FArray1D< Real64 > EvzMinBySysCool; // saved value of EvzMin used in 62.1 tabular report
+		static Array1D< Real64 > EvzMinBySysCool; // saved value of EvzMin used in 62.1 tabular report
 		static Real64 ZoneOAFrac( 0.0 ); // zone OA fraction
 		static Real64 ZoneEz( 1.0 ); // zone air distribution effectiveness
 		static Real64 Vou( 0.0 ); // Uncorrected outdoor air intake for all zones per ASHRAE std 62.1

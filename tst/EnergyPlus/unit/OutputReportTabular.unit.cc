@@ -3,7 +3,7 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 // EnergyPlus Headers
 #include <EnergyPlus/OutputReportTabular.hh>
 

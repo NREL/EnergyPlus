@@ -2,7 +2,7 @@
 #define ChillerReformulatedEIR_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -569,8 +569,8 @@ namespace ChillerReformulatedEIR {
 	};
 
 	// Object Data
-	extern FArray1D< ReformulatedEIRChillerSpecs > ElecReformEIRChiller; // dimension to number of machines
-	extern FArray1D< ReportVars > ElecReformEIRChillerReport;
+	extern Array1D< ReformulatedEIRChillerSpecs > ElecReformEIRChiller; // dimension to number of machines
+	extern Array1D< ReportVars > ElecReformEIRChillerReport;
 
 	// Functions
 
@@ -638,7 +638,7 @@ namespace ChillerReformulatedEIR {
 	Real64
 	CondOutTempResidual(
 		Real64 const FalsiCondOutTemp, // RegulaFalsi condenser outlet temperature result [C]
-		FArray1< Real64 > const & Par // Parameter array used to interface with RegulaFalsi solver
+		Array1< Real64 > const & Par // Parameter array used to interface with RegulaFalsi solver
 	);
 
 	void

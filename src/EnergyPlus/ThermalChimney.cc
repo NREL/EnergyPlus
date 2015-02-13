@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -73,9 +73,9 @@ namespace ThermalChimney {
 	// Utility routines for module
 
 	// Object Data
-	FArray1D< ThermalChimneyData > ThermalChimneySys;
-	FArray1D< ThermChimZnReportVars > ZnRptThermChim;
-	FArray1D< ThermChimReportVars > ThermalChimneyReport;
+	Array1D< ThermalChimneyData > ThermalChimneySys;
+	Array1D< ThermChimZnReportVars > ZnRptThermChim;
+	Array1D< ThermChimReportVars > ThermalChimneyReport;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -485,8 +485,8 @@ namespace ThermalChimney {
 		// REAL(r64)                    :: OutletAirTempThermalChim
 		Real64 OverallThermalChimLength;
 		Real64 ThermChimTolerance;
-		FArray1D< Real64 > TempTCMassAirFlowRate( 10 ); // Temporary Value of Thermal Chimney Mass Flow Rate ()
-		FArray1D< Real64 > TempTCVolumeAirFlowRate( 10 ); // Temporary Value of Thermal Chimney Volume Flow Rate ()
+		Array1D< Real64 > TempTCMassAirFlowRate( 10 ); // Temporary Value of Thermal Chimney Mass Flow Rate ()
+		Array1D< Real64 > TempTCVolumeAirFlowRate( 10 ); // Temporary Value of Thermal Chimney Volume Flow Rate ()
 		int IterationLoop;
 		Real64 Process1; // Temporary Variable Used in the Middle of the Calculation
 		Real64 Process2; // Temporary Variable Used in the Middle of the Calculation
@@ -500,9 +500,9 @@ namespace ThermalChimney {
 		Real64 DeltaL; // OverallThermalChimLength / NTC
 		int ThermChimLoop1;
 		int ThermChimLoop2;
-		FArray2D< Real64 > EquaCoef( NTC, NTC ); // Coefficients in Linear Algebraic Euqation for FINITE DIFFERENCE
-		FArray1D< Real64 > EquaConst( NTC ); // Constants in Linear Algebraic Equation for FINITE DIFFERENCE
-		FArray1D< Real64 > ThermChimSubTemp( NTC ); // Air temperature of each thermal chimney air channel subregion
+		Array2D< Real64 > EquaCoef( NTC, NTC ); // Coefficients in Linear Algebraic Euqation for FINITE DIFFERENCE
+		Array1D< Real64 > EquaConst( NTC ); // Constants in Linear Algebraic Equation for FINITE DIFFERENCE
+		Array1D< Real64 > ThermChimSubTemp( NTC ); // Air temperature of each thermal chimney air channel subregion
 
 		for ( Loop = 1; Loop <= TotThermalChimney; ++Loop ) {
 
@@ -781,9 +781,9 @@ namespace ThermalChimney {
 
 	void
 	GaussElimination(
-		FArray2A< Real64 > EquaCoef,
-		FArray1A< Real64 > EquaConst,
-		FArray1A< Real64 > ThermChimSubTemp,
+		Array2A< Real64 > EquaCoef,
+		Array1A< Real64 > EquaConst,
+		Array1A< Real64 > ThermChimSubTemp,
 		int const NTC
 	)
 	{
@@ -820,7 +820,7 @@ namespace ThermalChimney {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		FArray1D< Real64 > tempor( NTC );
+		Array1D< Real64 > tempor( NTC );
 		Real64 tempb;
 		Real64 TCvalue;
 		Real64 TCcoefficient;

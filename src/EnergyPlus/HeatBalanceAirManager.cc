@@ -2,9 +2,9 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -381,20 +381,20 @@ namespace HeatBalanceAirManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray2D< Real64 > SVals1;
-		FArray2D< Real64 > SVals2;
+		Array2D< Real64 > SVals1;
+		Array2D< Real64 > SVals2;
 		int NumAlpha; // Number of Alphas for each GetobjectItem call
 		int NumNumber; // Number of Numbers for each GetobjectItem call
 		int maxAlpha; // max of Alphas for allocation
 		int maxNumber; // max of Numbers for allocation
 		int NumArgs;
 		int IOStat;
-		FArray1D_string cAlphaFieldNames;
-		FArray1D_string cNumericFieldNames;
-		FArray1D_bool lNumericFieldBlanks;
-		FArray1D_bool lAlphaFieldBlanks;
-		FArray1D_string cAlphaArgs;
-		FArray1D< Real64 > rNumericArgs;
+		Array1D_string cAlphaFieldNames;
+		Array1D_string cNumericFieldNames;
+		Array1D_bool lNumericFieldBlanks;
+		Array1D_bool lAlphaFieldBlanks;
+		Array1D_string cAlphaArgs;
+		Array1D< Real64 > rNumericArgs;
 		std::string cCurrentModuleObject;
 
 		int i;
@@ -402,8 +402,8 @@ namespace HeatBalanceAirManager {
 		int Loop1;
 		int JDay;
 		int Hr;
-		FArray1D_bool RepVarSet;
-		FArray1D_bool OverLap;
+		Array1D_bool RepVarSet;
+		Array1D_bool OverLap;
 		int TS;
 		bool IsNotOK;
 		bool IsBlank;
@@ -417,9 +417,9 @@ namespace HeatBalanceAirManager {
 		int Item1;
 		bool errFlag;
 		int ZLItem;
-		FArray1D< Real64 > TotInfilVentFlow;
-		FArray1D< Real64 > TotMixingFlow;
-		FArray1D< Real64 > ZoneMixingNum;
+		Array1D< Real64 > TotInfilVentFlow;
+		Array1D< Real64 > TotMixingFlow;
+		Array1D< Real64 > ZoneMixingNum;
 		int ConnectTest;
 		int ConnectionNumber;
 		int NumbNum;
@@ -2269,8 +2269,8 @@ namespace HeatBalanceAirManager {
 						GetScheduleValuesForDay( CrossMixing( Loop1 ).SchedPtr, SVals2, JDay );
 						if ( ! any_gt( SVals2, 0.0 ) ) continue;
 						if ( OverLap( Loop ) && OverLap( Loop1 ) ) continue; // Already problem for these Cross Mixings
-						HrLoop: for ( Hr = 1; Hr <= 24; ++Hr ) {
-							TSLoop: for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
+						for ( Hr = 1; Hr <= 24; ++Hr ) {
+							for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
 								if ( SVals1( Hr, TS ) == 0.0 || SVals2( Hr, TS ) == 0.0 ) continue;
 								ShowSevereError( RoutineName + "Overlapping Cross Mixings found" );
 								ShowContinueError( "Cross Mixing with receiving zone " + Zone( CrossMixing( Loop ).ZonePtr ).Name + ", source zone " + Zone( CrossMixing( Loop ).FromZone ).Name );
@@ -2279,10 +2279,7 @@ namespace HeatBalanceAirManager {
 								OverLap( Loop1 ) = true;
 								ErrorsFound = true;
 								goto HrLoop_exit;
-								TSLoop_loop: ;
 							}
-							TSLoop_exit: ;
-							HrLoop_loop: ;
 						}
 						HrLoop_exit: ;
 					}

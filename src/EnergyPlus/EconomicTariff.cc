@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/numeric.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -71,8 +71,8 @@ namespace EconomicTariff {
 	int const conversionMCF( 6 ); // thousand cubic feet
 	int const conversionCCF( 7 ); // hundred cubic feet
 
-	FArray1D_string const convEneStrings( {0,7}, { "", "kWh", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF" } );
-	FArray1D_string const convDemStrings( {0,7}, { "", "kW", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF" } );
+	Array1D_string const convEneStrings( {0,7}, { "", "kWh", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF" } );
+	Array1D_string const convDemStrings( {0,7}, { "", "kW", "Therm", "MMBtu", "MJ", "kBtu", "MCF", "CCF" } );
 
 	int const demandWindowQuarter( 1 );
 	int const demandWindowHalf( 2 );
@@ -80,7 +80,7 @@ namespace EconomicTariff {
 	int const demandWindowDay( 4 );
 	int const demandWindowWeek( 5 );
 
-	FArray1D_string const demWindowStrings( {0,5}, { "", "/Hr", "/Hr", "/Hr", "/Day", "/Wk" } );
+	Array1D_string const demWindowStrings( {0,5}, { "", "/Hr", "/Hr", "/Hr", "/Day", "/Wk" } );
 
 	int const buyFromUtility( 1 );
 	int const sellToUtility( 2 );
@@ -217,7 +217,7 @@ namespace EconomicTariff {
 	int sizeEconVar( 0 );
 
 	// holds the outbound connections for each variable
-	FArray1D_int operand; // sized to sizeOperand
+	Array1D_int operand; // sized to sizeOperand
 	int numOperand( 0 );
 	int sizeOperand( 0 );
 
@@ -234,8 +234,8 @@ namespace EconomicTariff {
 	int numComputation( 0 );
 
 	//list of pointers to variable, 0 end of line, negative indicate operations
-	FArray1D_int steps;
-	FArray1D_int stepsCopy;
+	Array1D_int steps;
+	Array1D_int stepsCopy;
 	int numSteps( 0 );
 	int sizeSteps( 0 );
 
@@ -247,14 +247,14 @@ namespace EconomicTariff {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Object Data
-	FArray1D< EconVarType > econVar;
-	FArray1D< TariffType > tariff;
-	FArray1D< QualifyType > qualify;
-	FArray1D< ChargeSimpleType > chargeSimple;
-	FArray1D< ChargeBlockType > chargeBlock;
-	FArray1D< RatchetType > ratchet;
-	FArray1D< ComputationType > computation;
-	FArray1D< StackType > stack;
+	Array1D< EconVarType > econVar;
+	Array1D< TariffType > tariff;
+	Array1D< QualifyType > qualify;
+	Array1D< ChargeSimpleType > chargeSimple;
+	Array1D< ChargeBlockType > chargeBlock;
+	Array1D< RatchetType > ratchet;
+	Array1D< ComputationType > computation;
+	Array1D< StackType > stack;
 
 	//======================================================================================================================
 	//======================================================================================================================
@@ -395,8 +395,8 @@ namespace EconomicTariff {
 		int AvgSumVar;
 		int StepTypeVar;
 		std::string UnitsVar; // Units sting, may be blank
-		FArray1D_string NamesOfKeys; // Specific key name
-		FArray1D_int IndexesForKeyVar; // Array index
+		Array1D_string NamesOfKeys; // Specific key name
+		Array1D_int IndexesForKeyVar; // Array index
 		int jFld;
 		std::string CurrentModuleObject; // for ease in renaming.
 
@@ -3222,13 +3222,13 @@ namespace EconomicTariff {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS
 
 		// values used in specific operations
-		FArray1D< Real64 > a( MaxNumMonths );
+		Array1D< Real64 > a( MaxNumMonths );
 		int aPt;
-		FArray1D< Real64 > b( MaxNumMonths );
+		Array1D< Real64 > b( MaxNumMonths );
 		int bPt;
-		FArray1D< Real64 > c( MaxNumMonths );
+		Array1D< Real64 > c( MaxNumMonths );
 		int cPt;
-		FArray1D< Real64 > d( MaxNumMonths );
+		Array1D< Real64 > d( MaxNumMonths );
 
 		int iTariff;
 		int jStep;
@@ -3298,7 +3298,7 @@ namespace EconomicTariff {
 						pushStack( abs( a ), noVar );
 					} else if ( SELECT_CASE_var == opINTEGER ) {
 						popStack( a, aPt );
-						pushStack( FArray1D_double( FArray1D_int( a ) ), noVar );
+						pushStack( Array1D_double( Array1D_int( a ) ), noVar );
 					} else if ( SELECT_CASE_var == opSIGN ) {
 						popStack( a, aPt );
 						pushStack( sign( 1.0, a ), noVar );
@@ -3589,7 +3589,7 @@ namespace EconomicTariff {
 
 	void
 	pushStack(
-		FArray1A< Real64 > const monthlyArray,
+		Array1A< Real64 > const monthlyArray,
 		int const variablePointer
 	)
 	{
@@ -3631,7 +3631,7 @@ namespace EconomicTariff {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > curMonthlyArray( MaxNumMonths );
+		Array1D< Real64 > curMonthlyArray( MaxNumMonths );
 		static int sizeIncrement( 50 );
 
 		curMonthlyArray = monthlyArray;
@@ -3684,7 +3684,7 @@ namespace EconomicTariff {
 
 	void
 	popStack(
-		FArray1A< Real64 > monthlyArray,
+		Array1A< Real64 > monthlyArray,
 		int & variablePointer
 	)
 	{
@@ -3772,10 +3772,10 @@ namespace EconomicTariff {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int curTariff;
 		int indexInChg;
-		FArray1D< Real64 > sourceVals( MaxNumMonths );
-		FArray1D< Real64 > costPer( MaxNumMonths );
-		FArray1D< Real64 > resultChg( MaxNumMonths );
-		FArray1D< Real64 > seasonMask( MaxNumMonths );
+		Array1D< Real64 > sourceVals( MaxNumMonths );
+		Array1D< Real64 > costPer( MaxNumMonths );
+		Array1D< Real64 > resultChg( MaxNumMonths );
+		Array1D< Real64 > seasonMask( MaxNumMonths );
 
 		curTariff = econVar( usingVariable ).tariffIndx;
 		indexInChg = econVar( usingVariable ).index;
@@ -3855,14 +3855,14 @@ namespace EconomicTariff {
 		int indexInChg;
 		int iBlk;
 		int jMonth;
-		FArray1D< Real64 > sourceVals( MaxNumMonths );
-		FArray1D< Real64 > blkSzMult( MaxNumMonths );
-		FArray1D< Real64 > remainVals( MaxNumMonths );
-		FArray1D< Real64 > resultChg( MaxNumMonths );
-		FArray1D< Real64 > amountForBlk( MaxNumMonths );
-		FArray1D< Real64 > curBlkSz( MaxNumMonths );
-		FArray1D< Real64 > curBlkCost( MaxNumMonths );
-		FArray1D< Real64 > seasonMask( MaxNumMonths );
+		Array1D< Real64 > sourceVals( MaxNumMonths );
+		Array1D< Real64 > blkSzMult( MaxNumMonths );
+		Array1D< Real64 > remainVals( MaxNumMonths );
+		Array1D< Real64 > resultChg( MaxNumMonths );
+		Array1D< Real64 > amountForBlk( MaxNumMonths );
+		Array1D< Real64 > curBlkSz( MaxNumMonths );
+		Array1D< Real64 > curBlkCost( MaxNumMonths );
+		Array1D< Real64 > seasonMask( MaxNumMonths );
 		bool flagAllZero;
 
 		curTariff = econVar( usingVariable ).tariffIndx;
@@ -3990,19 +3990,19 @@ namespace EconomicTariff {
 
 		int curTariff;
 		int indexInChg;
-		FArray1D< Real64 > baselineVals( MaxNumMonths );
-		FArray1D< Real64 > adjustmentVals( MaxNumMonths );
-		FArray1D< Real64 > multiplierVals( MaxNumMonths );
-		FArray1D< Real64 > offsetVals( MaxNumMonths );
-		FArray1D< Real64 > seasonFromMask( MaxNumMonths );
-		FArray1D< Real64 > seasonToMask( MaxNumMonths );
+		Array1D< Real64 > baselineVals( MaxNumMonths );
+		Array1D< Real64 > adjustmentVals( MaxNumMonths );
+		Array1D< Real64 > multiplierVals( MaxNumMonths );
+		Array1D< Real64 > offsetVals( MaxNumMonths );
+		Array1D< Real64 > seasonFromMask( MaxNumMonths );
+		Array1D< Real64 > seasonToMask( MaxNumMonths );
 		bool isMonthly( false );
-		FArray1D< Real64 > adjSeasonal( MaxNumMonths );
-		FArray1D< Real64 > adjPeak( MaxNumMonths );
-		FArray1D< Real64 > maxAdjBase( MaxNumMonths );
+		Array1D< Real64 > adjSeasonal( MaxNumMonths );
+		Array1D< Real64 > adjPeak( MaxNumMonths );
+		Array1D< Real64 > maxAdjBase( MaxNumMonths );
 		Real64 maximumVal;
 		int iMonth;
-		FArray1D< Real64 > finalResult( MaxNumMonths );
+		Array1D< Real64 > finalResult( MaxNumMonths );
 
 		curTariff = econVar( usingVariable ).tariffIndx;
 		indexInChg = econVar( usingVariable ).index;
@@ -4140,10 +4140,10 @@ namespace EconomicTariff {
 
 		int curTariff;
 		int indexInQual;
-		FArray1D< Real64 > sourceVals( MaxNumMonths );
-		FArray1D< Real64 > thresholdVals( MaxNumMonths );
-		FArray1D_int monthsQualify( MaxNumMonths );
-		FArray1D< Real64 > seasonMask( MaxNumMonths );
+		Array1D< Real64 > sourceVals( MaxNumMonths );
+		Array1D< Real64 > thresholdVals( MaxNumMonths );
+		Array1D_int monthsQualify( MaxNumMonths );
+		Array1D< Real64 > seasonMask( MaxNumMonths );
 		bool curIsMaximum;
 		bool curIsConsecutive;
 		int curNumberOfMonths;
@@ -4421,7 +4421,7 @@ namespace EconomicTariff {
 		int iTariff;
 		int jPeriod;
 		int kMonth;
-		FArray1D< Real64 > monthVal( MaxNumMonths );
+		Array1D< Real64 > monthVal( MaxNumMonths );
 		Real64 bigNumber( 0.0 ); //Autodesk Value not used but suppresses warning about huge() call
 
 		bigNumber = huge( bigNumber );
@@ -4761,10 +4761,10 @@ namespace EconomicTariff {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// all arrays are in the format: (row, column)
-		FArray1D_string columnHead;
-		FArray1D_int columnWidth;
-		FArray1D_string rowHead;
-		FArray2D_string tableBody;
+		Array1D_string columnHead;
+		Array1D_int columnWidth;
+		Array1D_string rowHead;
+		Array2D_string tableBody;
 		//other local variables
 		int elecFacilMeter;
 		int gasFacilMeter;
@@ -5291,10 +5291,10 @@ namespace EconomicTariff {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// all arrays are in the format: (row, column)
-		FArray1D_string columnHead;
-		FArray1D_int columnWidth;
-		FArray1D_string rowHead;
-		FArray2D_string tableBody;
+		Array1D_string columnHead;
+		Array1D_int columnWidth;
+		Array1D_string rowHead;
+		Array2D_string tableBody;
 		Real64 sumVal;
 		Real64 maximumVal;
 		Real64 curVal;
@@ -5474,8 +5474,8 @@ namespace EconomicTariff {
 		int kTariff;
 		int lMin;
 		int mGroup;
-		FArray1D_int groupIndex; // index number (in tariff) for the group name
-		FArray1D_int MinTariffIndex; // tariff index for the Minimum value
+		Array1D_int groupIndex; // index number (in tariff) for the group name
+		Array1D_int MinTariffIndex; // tariff index for the Minimum value
 		int numMins;
 		int curMinTariffIndex;
 		bool isFound;
@@ -5663,7 +5663,7 @@ namespace EconomicTariff {
 	void
 	GetMonthlyCostForResource(
 		int const inResourceNumber,
-		FArray1A< Real64 > outMonthlyCosts
+		Array1A< Real64 > outMonthlyCosts
 	)
 	{
 
