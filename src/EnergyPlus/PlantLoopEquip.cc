@@ -900,7 +900,7 @@ namespace PlantLoopEquip {
 				}
 
 			} else if ( EquipTypeNum == TypeOf_Generator_CTurbine ) {
-				SimCTPlantHeatRecovery( sim_component.TypeOf, sim_component.Name, TypeOf_Generator_CTurbine, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration ); //DSU
+				SimCTPlantHeatRecovery( sim_component.Name, EquipNum, InitLoopEquip, MaxLoad, MinLoad, OptLoad ); //DSU
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
 					sim_component.MinLoad = MinLoad;

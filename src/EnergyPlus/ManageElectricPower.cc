@@ -1977,8 +1977,8 @@ namespace ManageElectricPower {
 			ThermalPowerOutput = ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).ThermalProdRate;
 
 		} else if ( SELECT_CASE_var == iGeneratorCombTurbine ) { // 'Generator:CombustionTurbine'
-			SimCTGenerator( GeneratorType, GeneratorName, ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).GeneratorIndex, RunFlag, MyLoad, FirstHVACIteration );
-			GetCTGeneratorResults( GeneratorType, ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).GeneratorIndex, ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).ElectProdRate, ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).ElectricityProd, ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).ThermalProdRate, ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).ThermalProd );
+			SimCTGenerator( GeneratorName, ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).GeneratorIndex, RunFlag, MyLoad, FirstHVACIteration );
+			GetCTGeneratorResults( ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).GeneratorIndex, ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).ElectProdRate, ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).ElectricityProd, ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).ThermalProdRate, ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).ThermalProd );
 			ElectricPowerOutput = ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).ElectProdRate;
 			ThermalPowerOutput = ElecLoadCenter( LoadCenterNum ).ElecGen( GenNum ).ThermalProdRate;
 
