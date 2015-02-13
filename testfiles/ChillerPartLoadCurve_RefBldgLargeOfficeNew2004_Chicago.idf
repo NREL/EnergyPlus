@@ -1,6 +1,19 @@
-! EMSPlantOperation_LargeOff.idf
+!-Generator IDFEditor 1.42
+!-Option OriginalOrderTop UseSpecialFormat
+!-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
+!-      Use '!' comments if they need to be retained when using the IDFEditor.
+! ChillerPartLoadCurve_RefBldgLargeOfficeNew2004_Chicago.idf
+! Added an additional part load curve type for chillers. 
 !
-! Description:  12 story plus basement, office building, derived from DOE Commerical Reference Building model
+! This example file is based on Version 1.3_5.0 and was transitioned to Version 6.0 using the transition utility
+!
+! DOE Commercial Reference Building
+! Large office, new construction 90.1-2004
+! Version 1.3_5.0
+! EnergyPlus Version 6.0
+! ASHRAE Standards 90.1-2004 and 62-1999
+!
+! Description:  12 story plus basement, office building.
 ! Form:         Area = 46,320 m2 (498,588 ft2); Number of Stories = 12; Shape = rectangle, Aspect ratio = 1.5
 ! Envelope:     Envelope thermal properties vary with climate according to ASHRAE Standard 90.1-2004.
 !               Opaque constructions: mass walls; built-up flat roof (insulation above deck); slab-on-grade floor
@@ -31,6 +44,33 @@
 ! Pumps:                          Yes
 ! Boilers:                        Boiler:HotWater (gas-fired)
 ! Chillers:                       Chiller:Electric:ReformulatedEIR (water-cooled)
+!***** NOTICE *****
+!***** The Reference Buildings were prepared as an account of work sponsored by an *****
+!***** agency of the United States government. Neither the United States *****
+!***** government nor any agency thereof, nor any of their employees, makes *****
+!***** any warranty, express or implied, or assumes any legal liability or *****
+!***** responsibility for the accuracy, completeness, or usefulness of any *****
+!***** information, apparatus, product, or process disclosed, or represents *****
+!***** that its use would not infringe privately owned rights. Reference *****
+!***** herein to any specific commercial product, process, or service by *****
+!***** trade name, trademark, manufacturer, or otherwise does not necessarily *****
+!***** constitute or imply its endorsement, recommendation, or favoring by *****
+!***** the United States government or any agency thereof. The views and *****
+!***** opinions of authors expressed herein do not necessarily state or *****
+!***** reflect those of the United States government or any agency thereof. *****
+!***** Access to and use of the Reference Buildings imposes the following obligations *****
+!***** on the user. The user agrees to credit DOE, NREL, PNNL, and LBNL in *****
+!***** any publication(s) that that result from the use of Reference Buildings. *****
+!***** However, the names of DOE/NREL/PNNL/LBNL may not be used in any *****
+!***** advertising or publicity that implies endorsement or promotion of any *****
+!***** products, services or commercial entities. *****
+! Reference citation for the Commercial Reference Buildings:
+! Deru, M.; Field, K.; Studer, D.; Benne, K.; Griffith, B.; Torcellini, P;
+! Halverson, M.; Winiarski, D.; Liu, B.; Rosenberg, M.; Huang, J.;
+! Yazdanian, M.; Crawley, D. (2010).
+! U.S. Department of Energy Commercial Reference Building Models of the National Building Stock.
+! Washington, DC: U.S. Department of Energy, Energy Efficiency and
+! Renewable Energy, Office of Building Technologies.
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 19
 
@@ -41,7 +81,7 @@
     YES,                     !- Do System Sizing Calculation
     YES,                     !- Do Plant Sizing Calculation
     YES,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    NO;                      !- Run Simulation for Weather File Run Periods
 
   Building,
     Ref Bldg Large Office New2004_v1.3_5.0,  !- Name
@@ -54,7 +94,7 @@
     6;                       !- Minimum Number of Warmup Days
 
   RunPeriod,
-    Annual,                  !- Name
+    ,                        !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     12,                      !- End Month
@@ -3149,7 +3189,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ,                        !- Clothing Insulation Calculation Method
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3171,7 +3211,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ,                        !- Clothing Insulation Calculation Method
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3193,7 +3233,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ,                        !- Clothing Insulation Calculation Method
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3215,7 +3255,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ,                        !- Clothing Insulation Calculation Method
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3237,7 +3277,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ,                        !- Clothing Insulation Calculation Method
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3259,7 +3299,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ,                        !- Clothing Insulation Calculation Method
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3281,7 +3321,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ,                        !- Clothing Insulation Calculation Method
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3303,7 +3343,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ,                        !- Clothing Insulation Calculation Method
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3325,7 +3365,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ,                        !- Clothing Insulation Calculation Method
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3347,7 +3387,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ,                        !- Clothing Insulation Calculation Method
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3369,7 +3409,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ,                        !- Clothing Insulation Calculation Method
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3391,7 +3431,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ,                        !- Clothing Insulation Calculation Method
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3413,7 +3453,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ,                        !- Clothing Insulation Calculation Method
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3435,7 +3475,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ,                        !- Clothing Insulation Calculation Method
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3457,7 +3497,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ,                        !- Clothing Insulation Calculation Method
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -3479,7 +3519,7 @@
     ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
-    ,                        !- Clothing Insulation Calculation Method
+    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
     ,                        !- Clothing Insulation Calculation Method Schedule Name
     CLOTHING_SCH,            !- Clothing Insulation Schedule Name
     AIR_VELO_SCH,            !- Air Velocity Schedule Name
@@ -7223,8 +7263,8 @@
     AutoSize,                !- Reference Condenser Water Flow Rate {m3/s}
     WC Screw Default 90.1-2004 Cap_fT,  !- Cooling Capacity Function of Temperature Curve Name
     WC Screw Default 90.1-2004 EIR_fT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
-	,				 		 !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
-    ReformEIRChiller Carrier 19XR 1259kW/6.26COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+	UseLift,				 !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
+    EIRFPLR Custom Curve,    !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.1,                     !- Minimum Part Load Ratio
     1,                       !- Maximum Part Load Ratio
     1,                       !- Optimum Part Load Ratio
@@ -7239,7 +7279,7 @@
     ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
     ,                        !- Heat Recovery Inlet Node Name
     ,                        !- Heat Recovery Outlet Node Name
-    0.8;                     !- Sizing Factor
+    0.5;                     !- Sizing Factor
 
   SetpointManager:Scheduled,
     CoolSys1 Chiller 1 Setpoint Manager,  !- Name
@@ -7257,7 +7297,7 @@
     AutoSize,                !- Reference Condenser Water Flow Rate {m3/s}
     WC Screw Default 90.1-2004 Cap_fT,  !- Cooling Capacity Function of Temperature Curve Name
     WC Screw Default 90.1-2004 EIR_fT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
-	,				 		 !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
+	,				 		 !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type 
     ReformEIRChiller Carrier 19XR 1259kW/6.26COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.1,                     !- Minimum Part Load Ratio
     1,                       !- Maximum Part Load Ratio
@@ -7273,7 +7313,7 @@
     ,                        !- Design Heat Recovery Water Flow Rate {m3/s}
     ,                        !- Heat Recovery Inlet Node Name
     ,                        !- Heat Recovery Outlet Node Name
-    0.2;                     !- Sizing Factor
+    0.5;                     !- Sizing Factor
 
   SetpointManager:Scheduled,
     CoolSys1 Chiller 2 Setpoint Manager,  !- Name
@@ -7358,6 +7398,23 @@
     0.87,                    !- Motor Efficiency
     0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream
     Intermittent;            !- Pump Control Type
+
+  PlantEquipmentList,
+    CoolSys1 Equipment List, !- Name
+    Chiller:Electric:ReformulatedEIR,  !- Equipment 1 Object Type
+    CoolSys1 Chiller 1,      !- Equipment 1 Name
+    Chiller:Electric:ReformulatedEIR,  !- Equipment 2 Object Type
+    CoolSys1 Chiller 2;      !- Equipment 2 Name
+
+  PlantEquipmentList,
+    HeatSys1 Equipment List, !- Name
+    Boiler:HotWater,         !- Equipment 1 Object Type
+    HeatSys1 Boiler;         !- Equipment 1 Name
+
+  CondenserEquipmentList,
+    TowerWaterSys Equipment List,  !- Name
+    CoolingTower:SingleSpeed,!- Equipment 1 Object Type
+    TowerWaterSys CoolTower; !- Equipment 1 Name
 
 ! ***SIZING & CONTROLS***
 
@@ -7525,6 +7582,33 @@
     Dimensionless,           !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
+  Curve:ChillerPartLoadWithLift,
+    EIRFPLR Custom Curve,  	!- Name  
+    0.093291598,    		!- Coefficient1 Constant
+    -0.234322952,   		!- Coefficient2 x
+    0.426950368,     		!- Coefficient3 x**2
+    0.188624721,    		!- Coefficient4 y
+    -0.608010978,    		!- Coefficient5 y**2
+    0.992031248,     		!- Coefficient6 x*y
+    0.000000E+00,     		!- Coefficient7 x**3
+    0.502338322,      		!- Coefficient8 y**3
+    0.000000E+00,     		!- Coefficient9 x**2*y
+    0.000000E+00,			!- Coefficinet 10 x*y**2
+    -0.360902326, 			!- Coefficient 11 x**2*y**2
+    -0.097978985,			!- Coefficient 12 z*y**3 
+    0.2562,        			!- Minimum Value of x
+    1.0365,        			!- Maximum Value of x
+    0.1,          			!- Minimum Value of y
+    1,           			!- Maximum Value of y
+   -0.035,          		!- Minimum Value of z
+    0.3144,           		!- Maximum Value of z
+    ,                 		!- Minimum Curve Output
+    ,                		!- Maximum Curve Output
+    Dimensionless,    		!- Input Unit Type for x
+    Dimensionless,    		!- Input Unit Type for y
+    Dimensionless,    		!- Input Unit Type for z
+    Dimensionless;   		!- Output Unit Type
+
   SetpointManager:Scheduled,
     CoolSys1 Loop Setpoint Manager,  !- Name
     Temperature,             !- Control Variable
@@ -7539,153 +7623,39 @@
 
   PlantEquipmentOperationSchemes,
     CoolSys1 Loop Operation Scheme List,  !- Name
-    PlantEquipmentOperation:UserDefined,  !- Control Scheme 1 Object Type
+    PlantEquipmentOperation:CoolingLoad,  !- Control Scheme 1 Object Type
     CoolSys1 Operation Scheme,  !- Control Scheme 1 Name
     ALWAYS_ON;               !- Control Scheme 1 Schedule Name
 
   PlantEquipmentOperationSchemes,
     HeatSys1 Loop Operation Scheme List,  !- Name
-    PlantEquipmentOperation:UserDefined,  !- Control Scheme 1 Object Type
+    PlantEquipmentOperation:HeatingLoad,  !- Control Scheme 1 Object Type
     HeatSys1 Operation Scheme,  !- Control Scheme 1 Name
     ALWAYS_ON;               !- Control Scheme 1 Schedule Name
 
   CondenserEquipmentOperationSchemes,
     TowerWaterSys Loop Operation Scheme List,  !- Name
-    PlantEquipmentOperation:UserDefined,  !- Control Scheme 1 Object Type
+    PlantEquipmentOperation:CoolingLoad,  !- Control Scheme 1 Object Type
     TowerWaterSys Operation Scheme,  !- Control Scheme 1 Name
     ALWAYS_ON;               !- Control Scheme 1 Schedule Name
 
-  Output:EnergyManagementSystem,
-    Verbose,                 !- Actuator Availability Dictionary Reporting
-    Verbose,                 !- Internal Variable Availability Dictionary Reporting
-    ErrorsOnly;              !- EMS Runtime Language Debug Output Level
-
-  PlantEquipmentOperation:UserDefined,
+  PlantEquipmentOperation:HeatingLoad,
     HeatSys1 Operation Scheme,  !- Name
-    Heating_dispatch,        !- Main Model Program Calling Manager Name
-    ,                        !- Initialization Program Calling Manager Name
-    Boiler:HotWater,         !- Equipment 1 Object Type
-    HeatSys1 Boiler;         !- Equipment 1 Name
+    0.0,                     !- Load Range 1 Lower Limit {W}
+    1000000000000000,        !- Load Range 1 Upper Limit {W}
+    HeatSys1 Equipment List; !- Range 1 Equipment List Name
 
-  EnergyManagementSystem:ProgramCallingManager,
-    Heating_dispatch,        !- Name
-    UserDefinedComponentModel,  !- EnergyPlus Model Calling Point
-    Heating_dispatch_Values; !- Program Name 1
-
-  EnergyManagementSystem:Program,
-    Heating_dispatch_Values, !- Name
-    IF HeatSys1_LoopDmnd > 0.0,  !- Program Line 1
-    SET Boiler_Disptch = HeatSys1_LoopDmnd,  !- Program Line 2
-    ELSE,                    !- <none>
-    SET Boiler_Disptch = 0.0,!- <none>
-    ENDIF;                   !- <none>
-
-  EnergyManagementSystem:InternalVariable,
-    HeatSys1_LoopDmnd,       !- Name
-    HeatSys1 Operation Scheme,  !- Internal Data Index Key Name
-    Supply Side Current Demand Rate;  !- Internal Data Type
-
-  EnergyManagementSystem:Actuator,
-    Boiler_Disptch,          !- Name
-    HeatSys1 Operation Scheme:HeatSys1 Boiler,  !- Actuated Component Unique Name
-    Plant Equipment Operation,  !- Actuated Component Type
-    Distributed Load Rate;   !- Actuated Component Control Type
-
-  PlantEquipmentOperation:UserDefined,
+  PlantEquipmentOperation:CoolingLoad,
     CoolSys1 Operation Scheme,  !- Name
-    Cooling_dispatch,        !- Main Model Program Calling Manager Name
-    Init_Chiller_Capacity,   !- Initialization Program Calling Manager Name
-    Chiller:Electric:ReformulatedEIR,  !- Equipment 1 Object Type
-    CoolSys1 Chiller 1,      !- Equipment 1 Name
-    Chiller:Electric:ReformulatedEIR,  !- Equipment 2 Object Type
-    CoolSys1 Chiller 2;      !- Equipment 2 Name
+    0.0,                     !- Load Range 1 Lower Limit {W}
+    100000000000000,         !- Load Range 1 Upper Limit {W}
+    CoolSys1 Equipment List; !- Range 1 Equipment List Name
 
-  EnergyManagementSystem:ProgramCallingManager,
-    Init_Chiller_Capacity,   !- Name
-    UserDefinedComponentModel,  !- EnergyPlus Model Calling Point
-    Init_Chiller_Capacity_Values;  !- Program Name 1
-
-  EnergyManagementSystem:Program,
-    Init_Chiller_Capacity_Values,  !- Name
-    Set totChilCap = Chil1_Cap + Chil2_Cap;  !- Program Line 1
-
-  EnergyManagementSystem:GlobalVariable,
-    totChilCap;              !- Erl Variable 1 Name
-
-  EnergyManagementSystem:ProgramCallingManager,
-    Cooling_dispatch,        !- Name
-    UserDefinedComponentModel,  !- EnergyPlus Model Calling Point
-    Cooling_dispatch_Values; !- Program Name 1
-
-  EnergyManagementSystem:Program,
-    Cooling_dispatch_Values, !- Name
-    IF CoolSys1_LoopDmnd < 0.0,  !- Program Line 1
-    Set UniformPLR  = CoolSys1_LoopDmnd / totChilCap,  !- Program Line 2
-    Set UniformPLR  =  @min UniformPLR 1.0,  !- <none>
-    SET Chil1_Disptch = UniformPLR*Chil1_Cap,  !- <none>
-    SET Chil2_Disptch = UniformPLR*Chil2_Cap,  !- <none>
-    ELSE,                    !- <none>
-    SET Chil1_Disptch = 0.0, !- <none>
-    SET Chil2_Disptch = 0.0, !- <none>
-    ENDIF;                   !- <none>
-
-  EnergyManagementSystem:InternalVariable,
-    CoolSys1_LoopDmnd,       !- Name
-    CoolSys1 Operation Scheme,  !- Internal Data Index Key Name
-    Supply Side Current Demand Rate;  !- Internal Data Type
-
-  EnergyManagementSystem:InternalVariable,
-    Chil1_Cap,               !- Name
-    CoolSys1 Chiller 1,      !- Internal Data Index Key Name
-    Chiller Nominal Capacity;!- Internal Data Type
-
-  EnergyManagementSystem:InternalVariable,
-    Chil2_Cap,               !- Name
-    CoolSys1 Chiller 2,      !- Internal Data Index Key Name
-    Chiller Nominal Capacity;!- Internal Data Type
-
-  EnergyManagementSystem:Actuator,
-    Chil1_Disptch,           !- Name
-    CoolSys1 Operation Scheme:CoolSys1 Chiller 1,  !- Actuated Component Unique Name
-    Plant Equipment Operation,  !- Actuated Component Type
-    Distributed Load Rate;   !- Actuated Component Control Type
-
-  EnergyManagementSystem:Actuator,
-    Chil2_Disptch,           !- Name
-    CoolSys1 Operation Scheme:CoolSys1 Chiller 2,  !- Actuated Component Unique Name
-    Plant Equipment Operation,  !- Actuated Component Type
-    Distributed Load Rate;   !- Actuated Component Control Type
-
-  PlantEquipmentOperation:UserDefined,
+  PlantEquipmentOperation:CoolingLoad,
     TowerWaterSys Operation Scheme,  !- Name
-    Tower_dispatch,          !- Main Model Program Calling Manager Name
-    ,                        !- Initialization Program Calling Manager Name
-    CoolingTower:SingleSpeed,!- Equipment 1 Object Type
-    TowerWaterSys CoolTower; !- Equipment 1 Name
-
-  EnergyManagementSystem:ProgramCallingManager,
-    Tower_dispatch,          !- Name
-    UserDefinedComponentModel,  !- EnergyPlus Model Calling Point
-    Tower_dispatch_Values;   !- Program Name 1
-
-  EnergyManagementSystem:Program,
-    Tower_dispatch_Values,   !- Name
-    IF TowerWaterSys_LoopDmnd < 0.0,  !- Program Line 1
-    SET Tower_Disptch = TowerWaterSys_LoopDmnd,  !- Program Line 2
-    ELSE,                    !- <none>
-    SET Tower_Disptch = 0.0, !- <none>
-    ENDIF;                   !- <none>
-
-  EnergyManagementSystem:InternalVariable,
-    TowerWaterSys_LoopDmnd,  !- Name
-    TowerWaterSys Operation Scheme,  !- Internal Data Index Key Name
-    Supply Side Current Demand Rate;  !- Internal Data Type
-
-  EnergyManagementSystem:Actuator,
-    Tower_Disptch,           !- Name
-    TowerWaterSys Operation Scheme:TowerWaterSys CoolTower,  !- Actuated Component Unique Name
-    Plant Equipment Operation,  !- Actuated Component Type
-    Distributed Load Rate;   !- Actuated Component Control Type
+    0.0,                     !- Load Range 1 Lower Limit {W}
+    1000000000000,           !- Load Range 1 Upper Limit {W}
+    TowerWaterSys Equipment List;  !- Range 1 Equipment List Name
 
 ! ***LOOPS***
 
@@ -9385,12 +9355,6 @@
   Output:Variable,*,Chiller Electric Energy,HOURLY;
 
   Output:Variable,*,Chiller COP,HOURLY;
-
-  Output:Variable,*,Plant Component Distributed Demand Rate,HOURLY;
-
-  Output:Variable,*,Chiller Electric Power,HOURLY;
-
-  Output:Variable,*,Chiller Evaporator Cooling Rate,HOURLY;
 
   Output:Variable,*,Plant System Cycle On Off Status,HOURLY;
 
