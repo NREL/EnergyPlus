@@ -36,6 +36,7 @@ namespace OutsideEnergySources {
 		std::string ScheduleID; // equipment availability schedule
 		std::string Name; // user identifier
 		Real64 NomCap; // design nominal capacity of district service
+		bool NomCapWasAutoSized; // ture if Nominal Capacity was autosize on input
 		int CapFractionSchedNum; // capacity modifier schedule number
 		int InletNodeNum; // Node number on the inlet side of the plant
 		int OutletNodeNum; // Node number on the inlet side of the plant
@@ -52,11 +53,11 @@ namespace OutsideEnergySources {
 		bool OneTimeInitFlag;
 		bool BeginEnvrnInitFlag;
 		bool CheckEquipName;
-		bool isThisSized;
 
 		// Default Constructor
 		OutsideEnergySourceSpecs() :
 			NomCap( 0.0 ),
+			NomCapWasAutoSized( false ),
 			CapFractionSchedNum( 0 ),
 			InletNodeNum( 0 ),
 			OutletNodeNum( 0 ),
@@ -70,8 +71,7 @@ namespace OutsideEnergySources {
 			CompNum( 0 ),
 			OneTimeInitFlag( true ),
 			BeginEnvrnInitFlag( true ),
-			CheckEquipName( true ),
-			isThisSized( false )
+			CheckEquipName( true )
 		{}
 
 	};
