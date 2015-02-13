@@ -326,7 +326,7 @@ namespace PlantLoopEquip {
 				}
 
 			} else if ( EquipTypeNum == TypeOf_Chiller_Absorption ) {
-				SimBLASTAbsorber( sim_component.TypeOf, sim_component.Name, EquipFlowCtrl, LoopNum, LoopSideNum, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign );
+				SimBLASTAbsorber( sim_component.Name, EquipFlowCtrl, LoopNum, LoopSideNum, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign );
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
 					sim_component.MinLoad = MinLoad;
