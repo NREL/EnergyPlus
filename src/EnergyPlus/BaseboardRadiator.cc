@@ -132,7 +132,6 @@ namespace BaseboardRadiator {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const MaxIter( 30 );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 
@@ -475,7 +474,6 @@ namespace BaseboardRadiator {
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop;
 		static FArray1D_bool MyEnvrnFlag;
-		Real64 RhoAirStdInit;
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
 		bool errFlag;
@@ -519,7 +517,6 @@ namespace BaseboardRadiator {
 
 		// Do the Begin Environment initializations
 		if ( BeginEnvrnFlag && MyEnvrnFlag( BaseboardNum ) && ! SetLoopIndexFlag( BaseboardNum ) ) {
-			RhoAirStdInit = StdRhoAir;
 			WaterInletNode = Baseboard( BaseboardNum ).WaterInletNode;
 			rho = GetDensityGlycol( PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
 			Baseboard( BaseboardNum ).WaterMassFlowRateMax = rho * Baseboard( BaseboardNum ).WaterVolFlowRateMax;
@@ -601,7 +598,6 @@ namespace BaseboardRadiator {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int WaterInletNode;
-		int PltSizNum; // do loop index for plant sizing
 		int PltSizHeatNum; // index of plant sizing object for 1st heating loop
 		Real64 DesCoilLoad;
 		int SolFla; // Flag of solver
@@ -612,7 +608,6 @@ namespace BaseboardRadiator {
 		bool ErrorsFound; // If errors detected in input
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
-		Real64 tmpWaterVolFlowRateMax; // local design plant fluid flow rate
 		bool FlowAutoSize; // Indicator to autosizing water volume flow
 		bool UAAutoSize; // Indicator to autosizing UA
 		Real64 WaterVolFlowRateMaxDes; // Design water volume flow for reproting
@@ -629,7 +624,6 @@ namespace BaseboardRadiator {
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, and FractionOfAutosizedHeatingCapacity )
 
 		PltSizHeatNum = 0;
-		PltSizNum = 0;
 		DesCoilLoad = 0.0;
 		ErrorsFound = false;
 		FlowAutoSize = false;
@@ -1159,15 +1153,12 @@ namespace BaseboardRadiator {
 		return Residuum;
 	}
 
+	// unused function!?
 	void
 	UpdateBaseboardPlantConnection(
 		int const BaseboardTypeNum, // type index
 		std::string const & BaseboardName, // component name
-		int const EquipFlowCtrl, // Flow control mode for the equipment
-		int const LoopNum, // Plant loop index for where called from
-		int const LoopSide, // Plant loop side index for where called from
 		int & CompIndex, // Chiller number pointer
-		bool const FirstHVACIteration,
 		bool & InitLoopEquip // If not zero, calculate the max load for operating conditions
 	)
 	{
@@ -1214,8 +1205,6 @@ namespace BaseboardRadiator {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		int BaseboardNum;
-		int InletNodeNum;
-		int OutletNodeNum;
 
 		// Find the correct baseboard
 		if ( CompIndex == 0 ) {
