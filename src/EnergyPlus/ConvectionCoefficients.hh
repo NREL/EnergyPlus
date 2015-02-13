@@ -1207,7 +1207,6 @@ namespace ConvectionCoefficients {
 		Real64 const SurfTemp,
 		Real64 const AirTemp,
 		Real64 const WindAtZ,
-		Real64 const WindDirect, // Wind direction measured clockwise from geographhic North
 		Real64 const RoofArea,
 		Real64 const RoofPerimeter
 	);

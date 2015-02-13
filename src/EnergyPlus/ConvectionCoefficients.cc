@@ -325,7 +325,7 @@ namespace ConvectionCoefficients {
 			MyEnvirnFlag = false;
 		}
 		if ( ! BeginEnvrnFlag ) MyEnvirnFlag = true;
-		ZoneLoop1: for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
 			{ auto const SELECT_CASE_var( Zone( ZoneNum ).InsideConvectionAlgo );
 			// Ceiling Diffuser and Trombe Wall only make sense at Zone Level
@@ -340,12 +340,11 @@ namespace ConvectionCoefficients {
 
 			}}
 
-			ZoneLoop1_loop: ;
 		}
-		ZoneLoop1_exit: ;
-		ZoneLoop2: for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
-			SurfLoop: for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+
+			for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
 
 				if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 
@@ -423,13 +422,9 @@ namespace ConvectionCoefficients {
 
 				if ( Surface( SurfNum ).EMSOverrideIntConvCoef ) HConvIn( SurfNum ) = Surface( SurfNum ).EMSValueForIntConvCoef;
 
-				SurfLoop_loop: ;
 			}
-			SurfLoop_exit: ;
 
-			ZoneLoop2_loop: ;
 		}
-		ZoneLoop2_exit: ;
 
 	}
 
@@ -1128,7 +1123,6 @@ namespace ConvectionCoefficients {
 		int Status;
 		int Found;
 		static bool ErrorsFound( false );
-		static bool errFlag( false );
 		static bool IsValidType( false );
 		int ExtValue;
 		int IntValue;
@@ -1139,7 +1133,6 @@ namespace ConvectionCoefficients {
 		int NumField;
 		std::string CurrentModuleObject;
 		int PotentialAssignedValue;
-		int ZoneNum;
 		int SurfNum;
 
 		// first get user-defined H models so they can be processed for later objects
@@ -1439,7 +1432,6 @@ namespace ConvectionCoefficients {
 							//                       '<='//TRIM(RoundSigDigits(HighHConvLimit,1)),(Numbers(NumField)<=HighHConvLimit))
 							ShowContinueError( "Limits are set (or default) in HeatBalanceAlgorithm object." );
 							ErrorsFound = true;
-							errFlag = false;
 						}
 						UserExtConvectionCoeffs( TotExtConvCoeff ).OverrideType = ConvCoefValue;
 						UserExtConvectionCoeffs( TotExtConvCoeff ).OverrideValue = Numbers( NumField );
@@ -1523,7 +1515,6 @@ namespace ConvectionCoefficients {
 							//                       '<='//TRIM(RoundSigDigits(HighHConvLimit,1)),(Numbers(NumField)<=HighHConvLimit))
 							ShowContinueError( "Limits are set (or default) in HeatBalanceAlgorithm object." );
 							ErrorsFound = true;
-							errFlag = false;
 						}
 						UserIntConvectionCoeffs( TotIntConvCoeff ).OverrideType = ConvCoefValue;
 						UserIntConvectionCoeffs( TotIntConvCoeff ).OverrideValue = Numbers( NumField );
@@ -1651,7 +1642,6 @@ namespace ConvectionCoefficients {
 							//                       '<='//TRIM(RoundSigDigits(HighHConvLimit,1)),(Numbers(NumField)<=HighHConvLimit))
 							ShowContinueError( "Limits are set (or default) in HeatBalanceAlgorithm object." );
 							ErrorsFound = true;
-							errFlag = false;
 						}
 						UserExtConvectionCoeffs( TotExtConvCoeff ).OverrideType = ConvCoefValue;
 						UserExtConvectionCoeffs( TotExtConvCoeff ).OverrideValue = Numbers( NumField );
@@ -1728,7 +1718,6 @@ namespace ConvectionCoefficients {
 							//                       '<='//TRIM(RoundSigDigits(HighHConvLimit,1)),(Numbers(NumField)<=HighHConvLimit))
 							ShowContinueError( "Limits are set (or default) in HeatBalanceAlgorithm object." );
 							ErrorsFound = true;
-							errFlag = false;
 						}
 						UserIntConvectionCoeffs( TotIntConvCoeff ).OverrideType = ConvCoefValue;
 						UserIntConvectionCoeffs( TotIntConvCoeff ).OverrideValue = Numbers( NumField );
@@ -3718,7 +3707,6 @@ namespace ConvectionCoefficients {
 		// na
 
 		// Locals
-		Real64 const OneThird( ( 1.0 / 3.0 ) ); // 1/3 in highest precision
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -4696,7 +4684,6 @@ namespace ConvectionCoefficients {
 		int ExtWindowCount;
 		Real64 thisAzimuth;
 		Real64 thisArea;
-		int thisZone;
 		FArray1D< Real64 > RoofBoundZvals( 8 );
 		FArray1D< Real64 > TestDist( 4 );
 		//  TYPE(Vector), DIMENSION(4) :: BoundSurf
@@ -4884,7 +4871,6 @@ namespace ConvectionCoefficients {
 			if ( ! Surface( SurfLoop ).HeatTransSurf ) continue;
 			thisAzimuth = Surface( SurfLoop ).Azimuth;
 			thisArea = Surface( SurfLoop ).Area;
-			thisZone = Surface( SurfLoop ).Zone;
 			if ( ( Surface( SurfLoop ).Tilt >= 45.0 ) && ( Surface( SurfLoop ).Tilt < 135.0 ) ) {
 				//treat as vertical wall
 				if ( ( thisAzimuth >= NorthFacade.AzimuthRangeLow ) || ( thisAzimuth < NorthFacade.AzimuthRangeHi ) ) {
@@ -6070,7 +6056,7 @@ namespace ConvectionCoefficients {
 			} else {
 				SurfWindSpeed = Surface( SurfNum ).WindSpeed;
 			}
-			Hf = CalcClearRoof( SurfNum, TH( SurfNum, 1, 1 ), Surface( SurfNum ).OutDryBulbTemp, SurfWindSpeed, WindDir, Surface( SurfNum ).OutConvFaceArea, Surface( SurfNum ).OutConvFacePerimeter );
+			Hf = CalcClearRoof( SurfNum, TH( SurfNum, 1, 1 ), Surface( SurfNum ).OutDryBulbTemp, SurfWindSpeed, Surface( SurfNum ).OutConvFaceArea, Surface( SurfNum ).OutConvFacePerimeter );
 		} else if ( SELECT_CASE_var == HcExt_BlockenWindward ) {
 			Hf = CalcBlockenWindward( WindSpeed, WindDir, Surface( SurfNum ).Azimuth );
 		} else if ( SELECT_CASE_var == HcExt_EmmelVertical ) {
@@ -9352,9 +9338,6 @@ namespace ConvectionCoefficients {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 HcSmooth;
 		Real64 Hn;
-		Real64 DeltaTemp;
-
-		DeltaTemp = SurfaceTemp - AirTemp;
 
 		Hn = CalcHnASHRAETARPExterior( SurfaceTemp, AirTemp, CosineTilt );
 
@@ -9415,9 +9398,6 @@ namespace ConvectionCoefficients {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 HcSmooth;
 		Real64 Hn;
-		Real64 DeltaTemp;
-
-		DeltaTemp = SurfaceTemp - AirTemp;
 
 		Hn = CalcHnASHRAETARPExterior( SurfaceTemp, AirTemp, CosineTilt );
 
@@ -9817,7 +9797,6 @@ namespace ConvectionCoefficients {
 		Real64 const SurfTemp,
 		Real64 const AirTemp,
 		Real64 const WindAtZ,
-		Real64 const WindDirect, // Wind direction measured clockwise from geographhic North
 		Real64 const RoofArea,
 		Real64 const RoofPerimeter
 	)
