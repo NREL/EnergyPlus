@@ -2196,7 +2196,7 @@ namespace RuntimeLanguageProcessor {
 				ReturnValue = SetErlValueNumber( PsyHfgAirFnWTdb( Operand( 1 ).Number, Operand( 2 ).Number ) ); // result =>   heat of vaporization for moist air {J/kg} | Humidity ratio (kg water vapor/kg dry air) | drybulb (C)
 			} else if ( SELECT_CASE_var == FuncHgAirFnWTdb ) {
 				// confusing ?  seems like this is really classical Hfg, heat of vaporization
-				ReturnValue = SetErlValueNumber( PsyHgAirFnWTdb( Operand( 1 ).Number, Operand( 2 ).Number ) ); // result =>   enthalpy of the gas {units?} | Humidity ratio (kg water vapor/kg dry air) | drybulb (C)
+				ReturnValue = SetErlValueNumber( PsyHgAirFnWTdb( Operand( 1 ).Number ) ); // result =>   enthalpy of the gas {units?} | drybulb (C)
 			} else if ( SELECT_CASE_var == FuncTdpFnTdbTwbPb ) {
 				ReturnValue = SetErlValueNumber( PsyTdpFnTdbTwbPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, EMSBuiltInFunction ) ); // result =>   dew-point temperature {C} | drybulb (C) | wetbulb (C) | pressure (Pa)
 			} else if ( SELECT_CASE_var == FuncTdpFnWPb ) {

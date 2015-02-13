@@ -267,7 +267,6 @@ namespace Psychrometrics {
 	inline
 	Real64
 	PsyHgAirFnWTdb(
-		Real64 const w, // humidity ratio {kgWater/kgDryAir} !unused1208
 		Real64 const T // input temperature {Celsius}
 	)
 	{
@@ -284,7 +283,7 @@ namespace Psychrometrics {
 
 		// REFERENCES:
 		// see ASHRAE Fundamentals Psychrometric Chapter
-		// USAGE:  hg = PsyHgAirFnWTdb(w,T)
+		// USAGE:  hg = PsyHgAirFnWTdb(T)
 
 		// This formulation currently does not use W since it returns results that are in J/kg and the
 		//  amount of energy is on a per unit of moisture basis.
