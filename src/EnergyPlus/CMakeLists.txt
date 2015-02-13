@@ -12,6 +12,28 @@ if(NOT PROFILE_USE)
   configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
 endif()
 
+# Configure IDD file at build time so that we can use generator expressions
+# to account for the debug / release subfolders if applicable.
+# Generator expressions are not supported in the OUTPUT portion of a custom command
+# so we use a file to mark the time stamp.
+# The IDD is a dependency of the EnergyPlus target and will be built along side the energyplus executable.
+set(IDD_SOURCE_PATH "${CMAKE_SOURCE_DIR}/idd/Energy+.idd.in")
+set(IDD_OUTPUT_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Energy+.idd)
+set(IDD_STAMP_PATH "${CMAKE_CURRENT_BINARY_DIR}/idd.stamp")
+add_custom_command(OUTPUT "${IDD_STAMP_PATH}"
+  COMMAND "${CMAKE_COMMAND}" 
+  -D CMAKE_VERSION_MAJOR:STRING="${CMAKE_VERSION_MAJOR}" 
+  -D CMAKE_VERSION_MINOR:STRING="${CMAKE_VERSION_MINOR}" 
+  -D CMAKE_VERSION_PATCH:STRING="${CMAKE_VERSION_PATCH}" 
+  -D IDD_STAMP_PATH:STRING="${IDD_STAMP_PATH}" 
+  -D IDD_SOURCE_PATH:STRING="${IDD_SOURCE_PATH}" 
+  -D IDD_OUTPUT_PATH:STRING="${IDD_OUTPUT_PATH}"
+  -P "${CMAKE_SOURCE_DIR}/cmake/configure_idd.cmake"
+  DEPENDS "${IDD_SOURCE_PATH}"
+)
+install( FILES "${IDD_OUTPUT_PATH}" DESTINATION ./ )
+install( FILES "${IDD_OUTPUT_PATH}" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}-Energy+.idd" )
+
 SET( SRC
   Timer.h
   AirflowNetworkBalanceManager.cc
@@ -573,10 +595,10 @@ install( TARGETS energyplusapi
 if (CMAKE_COMPILER_IS_GNUCXX AND ENABLE_LTO)
   target_link_libraries( energypluslib2 energypluslib )
   target_link_libraries( energypluslib energypluslib2 )
-  add_executable( energyplus main.cc  "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
+  add_executable( energyplus main.cc  "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" "${IDD_STAMP_PATH}" )
   target_link_libraries( energyplus energypluslib energypluslib2 )
 else()
-  add_executable( energyplus main.cc  )
+  add_executable( energyplus main.cc "${IDD_STAMP_PATH}")
   target_link_libraries( energyplus energyplusapi )
 endif()
 

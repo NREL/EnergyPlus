@@ -1,6 +1,6 @@
 Project(EnergyPlus)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} )
 
@@ -150,8 +150,6 @@ if( BUILD_FORTRAN )
   cmake_add_fortran_subdirectory(src/Slab PROJECT Slab NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ConvertESOMTR PROJECT ConvertESOMTR NO_EXTERNAL_INSTALL )
 endif()
-
-configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" )
 
 if( BUILD_PACKAGE )
   set(CPACK_INSTALL_CMAKE_PROJECTS

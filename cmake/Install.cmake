@@ -32,8 +32,6 @@ configure_file(cmake/license.in.txt "${CMAKE_BINARY_DIR}/license.txt" @ONLY)
 install(FILES "${CMAKE_BINARY_DIR}/license.txt" DESTINATION "./")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/license.txt")
 
-install( FILES "${CMAKE_BINARY_DIR}/Products/Energy+.idd" DESTINATION ./ )
-
 # Install files that are in the current repo
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/datasets/AirCooledChiller.idf" DESTINATION "./DataSets")
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/datasets/ASHRAE_2005_HOF_Materials.idf" DESTINATION "./DataSets")
@@ -150,7 +148,6 @@ install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/${RULES_XLS}" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/Report%20Variables%208-1-0-009%20to%208-2-0.csv" "PreProcess/IDFVersionUpdater/" "Report Variables 8-1-0-009 to 8-2-0.csv")
 install(FILES "${CMAKE_SOURCE_DIR}/idd/V8-1-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
-install( FILES "${CMAKE_BINARY_DIR}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}-Energy+.idd" )
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/VariableNameListAudit.xlsx" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" "PreProcess/HVACCurveFitTool/")
 
