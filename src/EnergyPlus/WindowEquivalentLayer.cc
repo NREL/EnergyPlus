@@ -159,7 +159,6 @@ namespace WindowEquivalentLayer {
 		// Locals
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS
 		int ConstrNum; // Construction number
-		int EQLConNum; // Construction number for equivalent layer windows
 		int SurfNum; // surface number
 		// Flow
 
@@ -229,9 +228,6 @@ namespace WindowEquivalentLayer {
 		int gLayer; // gap layer index
 		int sLayer; // glazing and shade layers (non-gas layers) index
 		int EQLNum; // equivalent layer window construction index
-		int NumGLayers; // number of gap layers
-		int NumSLayers; // number of glazing and shade layers (non-gas layers)
-		int DoWhat; // DoWhat =1, index for diffuse, and =2 index for beam
 		FArray2D< Real64 > SysAbs1( CFSMAXNL+1, 2 ); // layers absorptance and system transmittance
 		// Flow
 
@@ -357,8 +353,6 @@ namespace WindowEquivalentLayer {
 			}
 			// beam beam transmittance is the same for front and back side
 			CFS( EQLNum ).L( sLayer ).SWP_MAT.TAUSBBB = CFS( EQLNum ).L( sLayer ).SWP_MAT.TAUSFBB;
-			NumSLayers = sLayer;
-			NumGLayers = gLayer;
 			CFS( EQLNum ).NL = sLayer;
 
 			// checks optical properties and fill in default values for diffuse optical
@@ -553,22 +547,14 @@ namespace WindowEquivalentLayer {
 		FArray1D< Real64 > Q( {0,CFSMAXNL} );
 		FArray1D< Real64 > H( {0,CFSMAXNL+1} );
 		FArray2D< Real64 > Abs1( CFSMAXNL+1, 2 );
-		Real64 QRSW;
-		Real64 QRLW;
-		Real64 QCONV;
 		Real64 QOCFRoom;
-		Real64 QROOM;
 		Real64 UCG;
 		Real64 SHGC;
-		Real64 SHGCCheck;
 		Real64 IncA;
 		Real64 VProfA;
 		Real64 HProfA;
 		int NL;
 		int I;
-		int iL;
-		int iLC1;
-		bool DoShadeControlR;
 		bool CFSSHGC;
 		// Flow
 
@@ -758,17 +744,13 @@ namespace WindowEquivalentLayer {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NL; // Number of layers
 		Real64 TIN;
-		Real64 TMrtK;
 		Real64 TRMIN;
 		Real64 Tout;
 		Real64 TRMOUT;
 		Real64 UCG;
 		Real64 SHGC;
-		Real64 QRLW;
-		Real64 QIGLW;
 		Real64 QRLWX;
 		Real64 QCONV;
-		Real64 TSX;
 		FArray1D< Real64 > QOCF( CFSMAXNL );
 		Real64 QOCFRoom;
 		FArray1D< Real64 > JB( {0,CFSMAXNL} );
@@ -791,12 +773,10 @@ namespace WindowEquivalentLayer {
 		Real64 NodeTemp;
 		Real64 CpAir;
 		Real64 RefAirTemp; // reference air temperatures
-		int tmpGasType;
 		int SurfNumAdj; // An interzone surface's number in the adjacent zone
 		int ZoneNumAdj; // An interzone surface's adjacent zone number
 		Real64 LWAbsIn; // effective long wave absorptance/emissivity back side
 		Real64 LWAbsOut; // effective long wave absorptance/emissivity front side
-		Real64 QLWAbsIn; // Inside surface long wave absorbed flux, W/m2
 		Real64 outir;
 		Real64 rmir;
 		Real64 Ebout;
@@ -805,7 +785,6 @@ namespace WindowEquivalentLayer {
 		Real64 tsky; // sky temperature
 		Real64 HcIn; // inside convection coeficient at this timestep, W/m2K
 		Real64 ConvHeatFlowNatural; // Convective heat flow from gap between glass and interior shade or blind (W)
-		Real64 ConvHeatFlowForced; // Convective heat flow from forced airflow gap (W)
 		Real64 NetIRHeatGainWindow; // net radiation gain from the window surface to the zone (W)
 		Real64 ConvHeatGainWindow; // net convection heat gain from inside surface of window to zone air (W)
 		int InSideLayerType; // interior shade type
@@ -1698,12 +1677,9 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 TAU_BD0;
 		FArray1D< Real64 > P( hipDIM );
 		Real64 SumRefAndTran;
 		// flow
-
-		TAU_BD0 = TAU_BT0 - TAU_BB0;
 
 		P( hipRHO_BT0 ) = RHO_BT0;
 		P( hipTAU_BT0 ) = TAU_BT0;
@@ -2780,7 +2756,7 @@ namespace WindowEquivalentLayer {
 		Real64 F51;
 		Real64 F52;
 		Real64 F53;
-		Real64 F54;
+		// Real64 F54;
 		Real64 F61;
 		Real64 F62;
 		Real64 F63;
@@ -2865,7 +2841,7 @@ namespace WindowEquivalentLayer {
 		F51 = ( W + BG - ( AB + CG ) ) / ( 2.0 * BC );
 		F52 = ( S + CG - ( BG + CN ) ) / ( 2.0 * BC );
 		F53 = ( BK + CN - 2.0 * S ) / ( 2.0 * BC );
-		F54 = ( S + BC - BK ) / ( 2.0 * BC );
+		// F54 = ( S + BC - BK ) / ( 2.0 * BC );
 		F61 = ( S + AB - BG ) / ( 2.0 * AB );
 		F62 = ( AN + BG - 2.0 * S ) / ( 2.0 * AB );
 		F63 = ( S + AK - ( AN + BK ) ) / ( 2.0 * AB );
@@ -3131,7 +3107,7 @@ namespace WindowEquivalentLayer {
 		Real64 F51;
 		Real64 F52;
 		Real64 F53;
-		Real64 F54;
+		// Real64 F54;
 		Real64 F61;
 		Real64 F62;
 		Real64 F63;
@@ -3216,7 +3192,7 @@ namespace WindowEquivalentLayer {
 		F51 = ( W + BG - ( AB + CG ) ) / ( 2.0 * BC );
 		F52 = ( S + CG - ( BG + CN ) ) / ( 2.0 * BC );
 		F53 = ( BK + CN - 2.0 * S ) / ( 2.0 * BC );
-		F54 = ( S + BC - BK ) / ( 2.0 * BC );
+		// F54 = ( S + BC - BK ) / ( 2.0 * BC );
 		F61 = ( S + AB - BG ) / ( 2.0 * AB );
 		F62 = ( AN + BG - 2.0 * S ) / ( 2.0 * AB );
 		F63 = ( S + AK - ( AN + BK ) ) / ( 2.0 * AB );
@@ -3887,7 +3863,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 TAUBF_BT_PERP;
 		Real64 AK; // length of diagonal strings
 		Real64 CG;
 		Real64 Z1_BD; // diffuse source termps
@@ -4225,13 +4200,11 @@ namespace WindowEquivalentLayer {
 		Real64 XB;
 		Real64 XC;
 		Real64 XD;
-		Real64 XE;
 		Real64 XF;
 		Real64 YA;
 		Real64 YB;
 		Real64 YC;
 		Real64 YD;
-		Real64 YE;
 		Real64 YF;
 		int CORR;
 		// Flow
@@ -4262,23 +4235,18 @@ namespace WindowEquivalentLayer {
 				if ( std::abs( Slope ) < SMALL_ERROR ) {
 					XD = 0.0;
 					YD = YA;
-					XE = 0.0;
-					YE = YD;
-					//Bug XF, YF not set but used below (XE, YE are set but NOT used)
+					//Bug XF, YF not set but used below
 				} else {
 					if ( ( PHI + OMEGA ) < 0.0 ) {
 						XC = -XC;
 						Slope = -Slope;
 						XD = ( YB - Slope * XB ) / ( -1.0 / Slope - Slope );
 						XF = ( YA - Slope * XA ) / ( -1.0 / Slope - Slope );
-						XE = XA + 2.0 * std::abs( XA - XF );
 					} else {
 						XD = ( YA - Slope * XA ) / ( -1.0 / Slope - Slope );
 						XF = ( YB - Slope * XB ) / ( -1.0 / Slope - Slope );
-						XE = XB - 2.0 * std::abs( XB - XF );
 					}
 					YD = -XD / Slope;
-					YE = -XE / Slope;
 					YF = -XF / Slope;
 				}
 
@@ -4336,23 +4304,18 @@ namespace WindowEquivalentLayer {
 					if ( std::abs( Slope ) < SMALL_ERROR ) {
 						XD = 0.0;
 						YD = YA;
-						XE = 0.0;
-						YE = YD;
-						//Bug XF, YF not set but used below (XE, YE are set but NOT used)
+						//Bug XF, YF not set but used below
 					} else {
 						if ( ( PHI + OMEGA ) < 0.0 ) {
 							XC = -XC;
 							Slope = -Slope;
 							XD = ( YB - Slope * XB ) / ( -1.0 / Slope - Slope );
 							XF = ( YA - Slope * XA ) / ( -1.0 / Slope - Slope );
-							XE = XA + 2.0 * std::abs( XA - XF );
 						} else {
 							XD = ( YA - Slope * XA ) / ( -1.0 / Slope - Slope );
 							XF = ( YB - Slope * XB ) / ( -1.0 / Slope - Slope );
-							XE = XB - 2.0 * std::abs( XB - XF );
 						}
 						YD = -XD / Slope;
-						YE = -XE / Slope;
 						YF = -XF / Slope;
 					}
 					T_CORR_D = std::sqrt( pow_2( XC - XD ) + pow_2( YC - YD ) ); // Slat thickness perpendicular to light direction
@@ -4961,7 +4924,6 @@ namespace WindowEquivalentLayer {
 		//   due to open channel flow, W/m2
 		FArray1D< Real64 > QOCF_B( FS.NL ); // heat flux to indoor-facing surface of layer i, from gap i,
 		//   due to open channel flow, W/m2
-		Real64 Rvalue; // R-value in IP units [hr.ft2.F/BTU]
 		Real64 TAE_IN; // Indoor and outdoor effective ambient temperatures [K]
 		Real64 TAE_OUT;
 		FArray1D< Real64 > HR( {0,FS.NL} ); // Radiant heat transfer coefficient [W/m2K]
@@ -4975,7 +4937,6 @@ namespace WindowEquivalentLayer {
 		FArray1D< Real64 > EPSF( {0,FS.NL+1} ); // longwave emisivity,   front    !  increase the scope of the arrays
 		FArray1D< Real64 > EPSB( {0,FS.NL+1} ); // longwave emisivity,   back     !  to include indoor and outdoor
 		FArray1D< Real64 > TAU( {0,FS.NL+1} ); // longwave transmittance         !  nodes - more general
-		Real64 RTOT; // total resistance from TAE_OUT to TAE_IN [m2K/W]
 		FArray2D< Real64 > HC2D( 6, 6 ); // convective heat transfer coefficients between layers i and j
 		FArray2D< Real64 > HR2D( 6, 6 ); // radiant heat transfer coefficients between layers i and j
 		FArray1D< Real64 > HCIout( 6 ); // convective and radiant heat transfer coefficients between
@@ -5006,7 +4967,6 @@ namespace WindowEquivalentLayer {
 		Real64 SaveHCNLm; // place to save HC(NL-1) - two resistance networks differ
 		Real64 SaveHCNL; // place to save HC(NL)   - two resistance networks differ
 		// in their definitions of these heat transfer coefficients
-		bool DoPrint; // set true to print debugging info
 		// Flow
 
 		ASHWAT_Thermal = false; // init to failure
@@ -5339,10 +5299,8 @@ namespace WindowEquivalentLayer {
 		FHR_OUT = 0.0;
 		FHR_IN = 0.0;
 		Q_IN = 0.0;
-		RTOT = 0.0;
 		UCG = 0.0;
 		SHGC = 0.0;
-		Rvalue = 0.0;
 		HC2D = 0.0;
 		HR2D = 0.0;
 		HCIout = 0.0;
@@ -5632,7 +5590,6 @@ namespace WindowEquivalentLayer {
 		}
 		Q_IN += SOURCEdv( NL + 1 ); // this line not needed
 		UCG = Q_IN;
-		Rvalue = 5.678 / UCG;
 
 		//  calculate SHGC
 
@@ -5850,17 +5807,17 @@ namespace WindowEquivalentLayer {
 		FArray1D< Real64 > X( 20 );
 		// real FSg_g, FSdf_g, FSdb_g, FSm_g
 		Real64 FSg_df;
-		Real64 FSdf_df;
-		Real64 FSdb_df;
+		// Real64 FSdf_df;
+		// Real64 FSdb_df;
 		Real64 FSm_df;
 		Real64 FSg_db;
-		Real64 FSdf_db;
-		Real64 FSdb_db;
+		// Real64 FSdf_db;
+		// Real64 FSdb_db;
 		Real64 FSm_db;
 		Real64 FSg_m;
-		Real64 FSdf_m;
-		Real64 FSdb_m;
-		Real64 FSm_m;
+		// Real64 FSdf_m;
+		// Real64 FSdb_m;
+		// Real64 FSm_m;
 
 		//  Calculate 4 emissivities/absorptivities
 
@@ -6000,10 +5957,8 @@ namespace WindowEquivalentLayer {
 		Real64 const CK,
 		Real64 const ACP, // gas specific heat coeffs, CP = ACP + BCP*TM + CCP*TM*TM
 		Real64 const BCP,
-		Real64 const CCP,
 		Real64 const AVISC, // gas viscosity coeffs, VISC = AVISC + BVISC*TM + CVISC*TM*TM
 		Real64 const BVISC,
-		Real64 const CVISC,
 		Real64 const RHOGAS // gas density, kg/m3
 	)
 	{
@@ -6025,7 +5980,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Return value
-		Real64 FRA;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -6052,9 +6006,7 @@ namespace WindowEquivalentLayer {
 		CP = ACP + BCP * TM + BCP * TM * TM;
 		VISC = AVISC + BVISC * TM + BVISC * TM * TM;
 
-		FRA = ( GravityConstant * RHOGAS * RHOGAS * DT * T * T * T * CP ) / ( VISC * K * TM * Z * Z );
-
-		return FRA;
+		return ( GravityConstant * RHOGAS * RHOGAS * DT * T * T * T * CP ) / ( VISC * K * TM * Z * Z );
 	}
 
 	Real64
@@ -6126,7 +6078,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Return value
-		Real64 HConvGap;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -6152,12 +6103,11 @@ namespace WindowEquivalentLayer {
 		T = G.TAS_EFF;
 		TM = ( T1 + T2 ) / 2.0;
 		DT = T1 - T2;
-		RA = FRA( TM, T, DT, G.FG.AK, G.FG.BK, G.FG.CK, G.FG.ACP, G.FG.BCP, G.FG.CCP, G.FG.AVISC, G.FG.BVISC, G.FG.CVISC, G.RHOGAS );
+		RA = FRA( TM, T, DT, G.FG.AK, G.FG.BK, G.FG.CK, G.FG.ACP, G.FG.BCP, G.FG.AVISC, G.FG.BVISC, G.RHOGAS );
 		NU = FNU( RA );
 
 		KGAS = G.FG.AK + G.FG.BK * TM + G.FG.CK * TM * TM;
-		HConvGap = NU * KGAS / T;
-		return HConvGap;
+		return NU * KGAS / T;
 	}
 
 	Real64
@@ -6233,7 +6183,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Return value
-		Real64 HIC_ASHRAE;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -6251,8 +6200,7 @@ namespace WindowEquivalentLayer {
 
 		// Flow
 
-		HIC_ASHRAE = 1.46 * root_4( std::abs( TG - TI ) / max( L, 0.001 ) );
-		return HIC_ASHRAE;
+		return 1.46 * root_4( std::abs( TG - TI ) / max( L, 0.001 ) );
 	}
 
 	void
@@ -6295,7 +6243,6 @@ namespace WindowEquivalentLayer {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 b;
 		Real64 Tavg;
-		Real64 P;
 		Real64 rho;
 		Real64 beta;
 		Real64 dvisc;
@@ -6387,7 +6334,6 @@ namespace WindowEquivalentLayer {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// a
 		Real64 Tavg;
-		Real64 P;
 		Real64 rho;
 		Real64 beta;
 		Real64 dvisc;
@@ -6514,7 +6460,6 @@ namespace WindowEquivalentLayer {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 Tavg;
-		Real64 P;
 		Real64 rho;
 		Real64 beta;
 		Real64 dvisc;
@@ -6698,11 +6643,7 @@ namespace WindowEquivalentLayer {
 		FArray1D< Real64 > H( {0,FS.NL+1} );
 		FArray1D< Real64 > SOURCE( FS.NL+1 );
 		Real64 ISOL;
-		Real64 UX;
 		Real64 SHGC;
-		Real64 QRLW;
-		Real64 QCONV;
-		Real64 QROOM;
 		// Flow
 
 		CFSUFactor = false;
@@ -7195,7 +7136,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		bool OKAY;
 		// Flow
 
 		LSWP_ON = L.SWP_EL; // init to normal properties
@@ -7206,15 +7146,15 @@ namespace WindowEquivalentLayer {
 			// HBX note: ltyGZS here iff modelOption F=x; spectral cases elsewhere
 			Specular_SWP( LSWP_ON, THETA );
 		} else if ( L.LTYPE == ltyVBHOR ) {
-			OKAY = VB_SWP( L, LSWP_ON, OMEGA_V );
+			VB_SWP( L, LSWP_ON, OMEGA_V );
 		} else if ( L.LTYPE == ltyVBVER ) {
-			OKAY = VB_SWP( L, LSWP_ON, OMEGA_H );
+			VB_SWP( L, LSWP_ON, OMEGA_H );
 		} else if ( L.LTYPE == ltyDRAPE ) {
-			OKAY = PD_SWP( L, LSWP_ON, OMEGA_V, OMEGA_H );
+			PD_SWP( L, LSWP_ON, OMEGA_V, OMEGA_H );
 		} else if ( L.LTYPE == ltyROLLB ) {
-			OKAY = RB_SWP( L, LSWP_ON, THETA );
+			RB_SWP( L, LSWP_ON, THETA );
 		} else if ( L.LTYPE == ltyINSCRN ) {
-			OKAY = IS_SWP( L, LSWP_ON, THETA );
+			IS_SWP( L, LSWP_ON, THETA );
 		} else if ( L.LTYPE == ltyNONE || L.LTYPE == ltyROOM ) {
 			// none or room: do nothing
 		} else {
@@ -7499,11 +7439,10 @@ namespace WindowEquivalentLayer {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 RAT_TAU;
 		Real64 RAT_1MR;
-		static bool Specular_OffNormalReturn( true );
 		// Flow
 
 		// Modified by BAN April 19, 2013
-		Specular_OffNormalReturn = Specular_OffNormal( THETA, RAT_1MR, RAT_TAU );
+		Specular_OffNormal( THETA, RAT_1MR, RAT_TAU );
 
 		if ( OPT == hipRHO ) {
 			Specular_F = RAT_1MR;
@@ -7944,7 +7883,6 @@ namespace WindowEquivalentLayer {
 		//  na
 
 		// Return value
-		bool PD_SWP;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -7960,13 +7898,10 @@ namespace WindowEquivalentLayer {
 		bool DODIFFUSE;
 		Real64 RHOBF_BT0;
 		Real64 RHOFF_BT0;
-		Real64 TAUBF_BT0;
-		Real64 TAUFF_BT0;
 		Real64 TAUX;
 		// Flow
 
-		PD_SWP = false;
-		if ( ! ( L.LTYPE == ltyDRAPE ) ) return PD_SWP;
+		if ( ! ( L.LTYPE == ltyDRAPE ) ) return false;
 
 		DODIFFUSE = ! ( present( OHM_V_RAD ) && present( OHM_H_RAD ) );
 
@@ -7986,8 +7921,7 @@ namespace WindowEquivalentLayer {
 			PD_BEAM( L.S, L.W, OHM_V_RAD, OHM_H_RAD, RHOBF_BT0, L.SWP_MAT.TAUSBBB, L.SWP_MAT.TAUSBBD, L.SWP_MAT.RHOSBDD, L.SWP_MAT.TAUS_DD, RHOFF_BT0, L.SWP_MAT.TAUSFBB, L.SWP_MAT.TAUSFBD, L.SWP_MAT.RHOSFDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSBBD, LSWP.TAUSBBB, LSWP.TAUSBBD );
 
 		}
-		PD_SWP = true;
-		return PD_SWP;
+		return true;
 	}
 
 	bool
@@ -8013,7 +7947,6 @@ namespace WindowEquivalentLayer {
 		using DataGlobals::DegToRadians;
 
 		// Return value
-		bool VB_LWP;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -8033,8 +7966,7 @@ namespace WindowEquivalentLayer {
 		Real64 TAULX;
 		// Flow
 
-		VB_LWP = false;
-		if ( ! IsVBLayer( L ) ) return VB_LWP;
+		if ( ! IsVBLayer( L ) ) return false;
 
 		// slat reflectances
 		RHODFS_SLAT = 1.0 - L.LWP_MAT.EPSLB - L.LWP_MAT.TAUL; // downward surface
@@ -8047,8 +7979,7 @@ namespace WindowEquivalentLayer {
 		VB_DIFF( L.S, L.W, - DegToRadians * L.PHI_DEG, RHODFS_SLAT, RHOUFS_SLAT, L.LWP_MAT.TAUL, RHOLB, TAULX );
 		LLWP.EPSLB = 1.0 - RHOLB - LLWP.TAUL;
 
-		VB_LWP = true;
-		return VB_LWP;
+		return true;
 	}
 
 	bool
@@ -8075,7 +8006,6 @@ namespace WindowEquivalentLayer {
 		using DataGlobals::DegToRadians;
 
 		// Return value
-		bool VB_SWP;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -8094,8 +8024,7 @@ namespace WindowEquivalentLayer {
 		bool DODIFFUSE;
 		// Flow
 
-		VB_SWP = false;
-		if ( ! IsVBLayer( L ) ) return VB_SWP;
+		if ( ! IsVBLayer( L ) ) return false;
 
 		SL_WR = VB_SLAT_RADIUS_RATIO( L.W, L.C );
 
@@ -8112,8 +8041,7 @@ namespace WindowEquivalentLayer {
 
 			VB_SOL46_CURVE( L.S, L.W, SL_WR, - DegToRadians * L.PHI_DEG, OMEGA, L.SWP_MAT.RHOSBDD, L.SWP_MAT.RHOSFDD, L.SWP_MAT.TAUS_DD, LSWP.RHOSBBD, LSWP.TAUSBBB, LSWP.TAUSBBD );
 		}
-		VB_SWP = true;
-		return VB_SWP;
+		return true;
 	}
 
 	bool
@@ -8205,7 +8133,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Return value
-		Real64 VB_CriticalSlatAngle;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -8225,8 +8152,7 @@ namespace WindowEquivalentLayer {
 		// TODO handle vert blind cases etc
 		RAT = L.S * std::cos( OMEGA_DEG ) / L.W;
 		// limit upward slat angle to horiz = max visibility
-		VB_CriticalSlatAngle = max( 0.0, RadiansToDeg * std::asin( RAT ) - OMEGA_DEG );
-		return VB_CriticalSlatAngle;
+		return max( 0.0, RadiansToDeg * std::asin( RAT ) - OMEGA_DEG );
 	}
 
 	bool
@@ -8332,7 +8258,6 @@ namespace WindowEquivalentLayer {
 		bool LOK;
 		bool DOK;
 		bool BOK;
-		bool CFSLAYERFlag;
 		// Flow
 
 		LOK = false;
@@ -8379,7 +8304,6 @@ namespace WindowEquivalentLayer {
 				}
 			}
 		}
-		CFSLAYERFlag = LOK && DOK && BOK;
 	}
 
 	bool
@@ -8402,7 +8326,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Return value
-		bool IsGZSLayer;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -8417,8 +8340,7 @@ namespace WindowEquivalentLayer {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
-		IsGZSLayer = L.LTYPE == ltyGZS;
-		return IsGZSLayer;
+		return L.LTYPE == ltyGZS;
 	}
 
 	bool
@@ -8441,7 +8363,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Return value
-		bool IsGlazeLayerX;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -8456,8 +8377,7 @@ namespace WindowEquivalentLayer {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
-		IsGlazeLayerX = L.LTYPE == ltyGLAZE || IsGZSLayer( L );
-		return IsGlazeLayerX;
+		return L.LTYPE == ltyGLAZE || IsGZSLayer( L );
 	}
 
 	bool
@@ -8480,7 +8400,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Return value
-		bool IsControlledShade;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -8495,8 +8414,7 @@ namespace WindowEquivalentLayer {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
-		IsControlledShade = IsVBLayer( L ) && L.CNTRL != lscNONE;
-		return IsControlledShade;
+		return IsVBLayer( L ) && L.CNTRL != lscNONE;
 	}
 
 	bool
@@ -8519,7 +8437,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Return value
-		bool IsVBLayer;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -8535,8 +8452,7 @@ namespace WindowEquivalentLayer {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		IsVBLayer = L.LTYPE == ltyVBHOR || L.LTYPE == ltyVBVER;
-		return IsVBLayer;
+		return L.LTYPE == ltyVBHOR || L.LTYPE == ltyVBVER;
 	}
 
 	void
@@ -8677,7 +8593,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Return value
-		float DensityCFSFillGas;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -8693,9 +8608,7 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Flow
-		DensityCFSFillGas = ( P * FG.MHAT ) / ( UniversalGasConst * max( T, 1.0 ) );
-
-		return DensityCFSFillGas;
+		return ( P * FG.MHAT ) / ( UniversalGasConst * max( T, 1.0 ) );
 	}
 
 	int
@@ -8854,8 +8767,6 @@ namespace WindowEquivalentLayer {
 		// Locals
 		// may be within L
 		static std::string const RoutineName( "FillDefaultsSWP: " );
-		bool OK;
-		bool ErrorsFound;
 		// Flow
 
 		// default back taus to front (often equal)
@@ -8877,7 +8788,7 @@ namespace WindowEquivalentLayer {
 		} else if ( L.LTYPE == ltyROLLB ) {
 			// estimate diffuse properties if any < 0
 			if ( min( SWP.RHOSBDD, SWP.RHOSFDD, SWP.TAUS_DD ) < 0.0 ) {
-				OK = RB_SWP( L, SWP ); // TODO RB
+				RB_SWP( L, SWP ); // TODO RB
 			}
 		} else if ( L.LTYPE == ltyINSCRN ) {
 			if ( SWP.TAUSFBB < 0.0 ) {
@@ -8885,7 +8796,7 @@ namespace WindowEquivalentLayer {
 				if ( SWP.TAUSBBB < 0.0 ) SWP.TAUSBBB = SWP.TAUSFBB;
 			}
 			if ( min( SWP.RHOSBDD, SWP.RHOSFDD, SWP.TAUS_DD ) < 0.0 ) {
-				OK = IS_SWP( L, SWP ); // TODO IS
+				IS_SWP( L, SWP ); // TODO IS
 			}
 		} else if ( L.LTYPE == ltyNONE || L.LTYPE == ltyROOM ) {
 			// none or room: do nothing
@@ -8994,7 +8905,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Return value
-		Real64 EffectiveEPSLF;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -9023,8 +8933,7 @@ namespace WindowEquivalentLayer {
 				TX *= FS.L( iL ).LWP_EL.TAUL;
 			}
 		}
-		EffectiveEPSLF = E;
-		return EffectiveEPSLF;
+		return E;
 	}
 
 	Real64
@@ -9047,7 +8956,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Return value
-		Real64 EffectiveEPSLB;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -9076,8 +8984,7 @@ namespace WindowEquivalentLayer {
 				TX *= FS.L( iL ).LWP_EL.TAUL;
 			}
 		}
-		EffectiveEPSLB = E;
-		return EffectiveEPSLB;
+		return E;
 	}
 
 	bool
@@ -9225,13 +9132,10 @@ namespace WindowEquivalentLayer {
 		Real64 ProfAngHor; // Solar profile angle (radians) for horizontal blind
 		Real64 ProfAngVer; // Solar profile angle (radians) for vertical blind
 		Real64 IncAng; // incident angle degree
-		Real64 IncidAngle; // = ACOS(SOLCOS(3))
 		static FArray2D< Real64 > Abs1( CFSMAXNL+1, 2 );
 		int Lay; // window layer index
 		int EQLNum; // equivalent layer window construction index
 		int ConstrNum; // construction index
-		int I; // index
-		int J; // index
 		// Flow
 
 		IncAng = 0.0; //Autodesk:Init Added to elim use uninitialized
@@ -9367,7 +9271,7 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Return value
-		Real64 InsideLWEmiss; // LW inside emissivity
+		// LW inside emissivity
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -9407,7 +9311,7 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Return value
-		Real64 OutSideLWEmiss; // LW outside emissivity
+		// LW outside emissivity
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -9425,9 +9329,8 @@ namespace WindowEquivalentLayer {
 
 		// FLOW:
 		EQLNum = Construct( ConstrNum ).EQLConsPtr;
-		OutSideLWEmiss = EffectiveEPSLF( CFS( EQLNum ) );
 
-		return OutSideLWEmiss;
+		return EffectiveEPSLF( CFS( EQLNum ) );
 	}
 
 	Real64
@@ -9456,7 +9359,7 @@ namespace WindowEquivalentLayer {
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 
 		// Return value
-		Real64 hcin; // interior surface convection coefficient
+		// interior surface convection coefficient
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -9499,9 +9402,8 @@ namespace WindowEquivalentLayer {
 
 		// eq. 135 in ISO 15099 (only need this one because tilt is 90 deg)
 		Nuint = 0.56 * root_4( RaH * sineTilt );
-		hcin = Nuint * lambda / Height;
 
-		return hcin;
+		return Nuint * lambda / Height;
 	}
 
 	//     NOTICE
