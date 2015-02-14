@@ -2897,6 +2897,7 @@ protected: // Methods
 	}
 
 	// Switch to Size Construction
+	inline
 	void
 	reconstruct_by_size( size_type const size )
 	{
@@ -2913,6 +2914,28 @@ protected: // Methods
 #if defined(OBJEXXFCL_ARRAY_INIT) || defined(OBJEXXFCL_ARRAY_INIT_DEBUG)
 		initialize( Traits::initial_array_value() );
 #endif // OBJEXXFCL_ARRAY_INIT || OBJEXXFCL_ARRAY_INIT_DEBUG
+	}
+
+	// Conformable Move
+	inline
+	void
+	conformable_move( Array & a )
+	{
+		assert( this != &a );
+		assert( owner_ == a.owner_ );
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+		if ( owner_ ) delete[] data_;
+#else
+		if ( owner_ ) del_array();
+#endif
+		data_size_ = a.data_size_;
+		data_ = a.data_;
+		sdata_ = data_ - shift_;
+		a.data_size_ = 0u;
+		a.data_ = nullptr;
+		a.size_ = 0u;
+		a.shift_ = 0;
+		a.sdata_ = nullptr;
 	}
 
 protected: // Static Methods

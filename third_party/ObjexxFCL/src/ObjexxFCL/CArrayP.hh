@@ -295,14 +295,16 @@ public: // Assignment
 	CArrayP &
 	operator =( CArrayP && a ) NOEXCEPT
 	{
-		assert( this != &a );
-		size_ = a.size_;
-		delete[] data_; data_ = a.data_;
-		owner_ = a.owner_;
-		a.size_ = 0u;
-		a.data_ = nullptr;
-		a.owner_ = true;
-		return *this;
+		if ( owner_ && a.owner_ ) {
+			assert( this != &a );
+			size_ = a.size_;
+			delete[] data_; data_ = a.data_;
+			a.size_ = 0u;
+			a.data_ = nullptr;
+			return *this;
+		} else {
+			return operator =( a );
+		}
 	}
 
 	// Copy Assignment Template

@@ -62,6 +62,7 @@ public: // Types
 	typedef  ArrayInitializer< T, ObjexxFCL::Array6D >  Initializer;
 	typedef  typename Initializer::Function  InitializerFunction;
 
+	using Super::clear_move;
 	using Super::conformable;
 	using Super::contains;
 	using Super::index;
@@ -530,7 +531,24 @@ public: // Assignment: Array
 	Array6D &
 	operator =( Array6D && a ) NOEXCEPT
 	{
-		Super::operator =( std::move( a ) );
+		if ( conformable( a ) ) {
+			Base::conformable_move( a );
+		} else {
+			Base::operator =( std::move( a ) );
+			I1_ = a.I1_;
+			I2_ = a.I2_;
+			I3_ = a.I3_;
+			I4_ = a.I4_;
+			I5_ = a.I5_;
+			I6_ = a.I6_;
+			z1_ = a.z1_;
+			z2_ = a.z2_;
+			z3_ = a.z3_;
+			z4_ = a.z4_;
+			z5_ = a.z5_;
+			z6_ = a.z6_;
+		}
+		a.clear_move();
 		return *this;
 	}
 

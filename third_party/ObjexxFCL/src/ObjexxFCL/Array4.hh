@@ -390,24 +390,6 @@ public: // Assignment: Array
 		return *this;
 	}
 
-	// Move Assignment
-	inline
-	Array4 &
-	operator =( Array4 && a ) NOEXCEPT
-	{
-		Super::operator =( std::move( a ) );
-		I1_ = a.I1_;
-		I2_ = a.I2_;
-		I3_ = a.I3_;
-		I4_ = a.I4_;
-		z1_ = a.z1_;
-		z2_ = a.z2_;
-		z3_ = a.z3_;
-		z4_ = a.z4_;
-		a.clear_move();
-		return *this;
-	}
-
 	// Copy Assignment Template
 	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline

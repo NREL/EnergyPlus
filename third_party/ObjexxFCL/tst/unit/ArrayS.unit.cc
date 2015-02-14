@@ -110,6 +110,17 @@ TEST( ArraySTest, Array2D1SSlice )
 	EXPECT_EQ( 22, S( 2 ) );
 }
 
+TEST( ArraySTest, Array2D1SSlice65 )
+{
+	Array2D_int A( 6, 5, 999 );
+	Array1S_int S( A( _, 2 ) );
+	EXPECT_EQ( 6u, S.size() );
+	EXPECT_EQ( 1, S.l() );
+	EXPECT_EQ( 6, S.u() );
+	EXPECT_EQ( 1, S.l1() );
+	EXPECT_EQ( 6, S.u1() );
+}
+
 TEST( ArraySTest, Array2D2SSlice )
 {
 	Array2D_int A( 3, 3, { 11, 12, 13, 21, 22, 23, 31, 32, 33 } );

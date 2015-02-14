@@ -62,6 +62,7 @@ public: // Types
 	typedef  ArrayInitializer< T, ObjexxFCL::Array1D >  Initializer;
 	typedef  typename Initializer::Function  InitializerFunction;
 
+	using Super::clear_move;
 	using Super::conformable;
 	using Super::contains;
 	using Super::index;
@@ -606,7 +607,13 @@ public: // Assignment: Array
 	Array1D &
 	operator =( Array1D && a ) NOEXCEPT
 	{
-		Super::operator =( std::move( a ) );
+		if ( conformable( a ) ) {
+			Base::conformable_move( a );
+		} else {
+			Base::operator =( std::move( a ) );
+			I_ = a.I_;
+		}
+		a.clear_move();
 		return *this;
 	}
 

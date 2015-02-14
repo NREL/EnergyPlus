@@ -864,6 +864,14 @@ TEST( Array1Test, EoshiftNeg )
 	EXPECT_TRUE( eq( Array1D_int( { 8, 8, 1, 2, 3 } ), eoshift( A, -2, 8 ) ) );
 }
 
+TEST( Array1Test, EoshiftMoveAssignment )
+{
+	Array1D_int A( { 0, 4 }, { 0, 1, 2, 3, 4 } ); // Not 1-based
+	A = eoshift( A, 2 ); // eoshift is 1-based but move assignment is conformable so A index ranges shouldn't change
+	EXPECT_TRUE( eq( Array1D_int( { 0, 4 }, { 2, 3, 4, 0, 0 } ), A ) );
+	EXPECT_TRUE( equal_dimensions( Array1D_int( { 0, 4 }, { 2, 3, 4, 0, 0 } ), A ) ); // Conformable move shouldn't change index ranges
+}
+
 TEST( Array1Test, CshiftPos )
 {
 	Array1D_int A( 5, { 1, 2, 3, 4, 5 } );
