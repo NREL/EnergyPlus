@@ -405,12 +405,24 @@ namespace EvaporativeFluidCoolers {
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).WaterOutletNodeNum = GetOnlySingleNode( AlphArray( 3 ), ErrorsFound, cCurrentModuleObject, AlphArray( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			TestCompSet( cCurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Chilled Water Nodes" );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRate = NumArray( 1 );
+			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRate == AutoSize ) {
+				SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRateWasAutoSized = true;
+			}
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedFanPower = NumArray( 2 );
+			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedFanPower == AutoSize ) {
+				SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedFanPowerWasAutoSized = true;
+			}
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignSprayWaterFlowRate = NumArray( 3 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).HeatRejectCapNomCapSizingRatio = NumArray( 4 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedStandardDesignCapacity = NumArray( 5 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA = NumArray( 6 );
+			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA == AutoSize ){
+				SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUAWasAutoSized = true;
+			}
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate = NumArray( 7 );
+			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate == AutoSize ) {
+				SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRateWasAutoSized = true;
+			}
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedUserSpecifiedDesignCapacity = NumArray( 8 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringWaterTemp = NumArray( 9 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringAirTemp = NumArray( 10 );
@@ -612,10 +624,22 @@ namespace EvaporativeFluidCoolers {
 			TestCompSet( cCurrentModuleObject, AlphArray( 1 ), AlphArray( 2 ), AlphArray( 3 ), "Chilled Water Nodes" );
 
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRate = NumArray( 1 );
+			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRate == AutoSize ){
+				SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRateWasAutoSized = true;
+			}
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedFanPower = NumArray( 2 );
+			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedFanPower == AutoSize ) {
+				SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedFanPowerWasAutoSized = true;
+			}
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedAirFlowRate = NumArray( 3 );
+			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedAirFlowRate == AutoSize ) {
+				SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedAirFlowRateWasAutoSized = true;
+			}
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedAirFlowRateSizingFactor = NumArray( 4 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedFanPower = NumArray( 5 );
+			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedFanPower == AutoSize ){
+				SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedFanPowerWasAutoSized = true;
+			}
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedFanPowerSizingFactor = NumArray( 6 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignSprayWaterFlowRate = NumArray( 7 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).HeatRejectCapNomCapSizingRatio = NumArray( 8 );
@@ -623,7 +647,13 @@ namespace EvaporativeFluidCoolers {
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedStandardDesignCapacity = NumArray( 10 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedStandardDesignCapacitySizingFactor = NumArray( 11 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA = NumArray( 12 );
+			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA == AutoSize ) {
+				SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUAWasAutoSized = true;
+			}
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUA = NumArray( 13 );
+			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUA == AutoSize ) {
+				SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUAWasAutoSized = true;
+			}
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUASizingFactor = NumArray( 14 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate = NumArray( 15 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedUserSpecifiedDesignCapacity = NumArray( 16 );
@@ -1082,7 +1112,6 @@ namespace EvaporativeFluidCoolers {
 
 		// Begin environment initializations
 		if ( MyEnvrnFlag( EvapFluidCoolerNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
-			if ( ! PlantFirstSizeCompleted ) SizeEvapFluidCooler( EvapFluidCoolerNum );
 
 			rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, RoutineName );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesWaterMassFlowRate = SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate * rho;
@@ -1151,6 +1180,8 @@ namespace EvaporativeFluidCoolers {
 		using namespace OutputReportPredefined;
 		using InputProcessor::SameString;
 		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToReport;
+		using DataPlant::PlantFinalSizesOkayToReport;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1196,7 +1227,7 @@ namespace EvaporativeFluidCoolers {
 
 		PltSizCondNum = PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).PlantSizNum;
 
-		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate == AutoSize && SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num != PIM_StandardDesignCapacity ) {
+		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRateWasAutoSized && SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num != PIM_StandardDesignCapacity ) {
 			if ( PltSizCondNum > 0 ) {
 				if ( PlantSizData( PltSizCondNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 					tmpDesignWaterFlowRate = PlantSizData( PltSizCondNum ).DesVolFlowRate * SimpleEvapFluidCooler( EvapFluidCoolerNum ).SizFac;
@@ -1206,10 +1237,21 @@ namespace EvaporativeFluidCoolers {
 					tmpDesignWaterFlowRate = 0.0;
 					if ( PlantFirstSizesOkayToFinalize ) SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate = tmpDesignWaterFlowRate;
 				}
-				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, "Design Water Flow Rate [m3/s]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate );
+				if ( PlantFirstSizesOkayToFinalize ) {
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"Design Water Flow Rate [m3/s]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate );	
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"Initial Design Water Flow Rate [m3/s]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate );	
+					}
+				}
 			} else {
-				ShowSevereError( "Autosizing error for evaporative fluid cooler object = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-				ShowFatalError( "Autosizing of evaporative fluid cooler condenser flow rate requires a loop Sizing:Plant object." );
+				if ( PlantFirstSizesOkayToFinalize ) { 
+					ShowSevereError( "Autosizing error for evaporative fluid cooler object = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+					ShowFatalError( "Autosizing of evaporative fluid cooler condenser flow rate requires a loop Sizing:Plant object." );
+				}
 			}
 			// Check when the user specified Condenser/Evaporative Fluid Cooler water design setpoint
 			// temperature is less than design inlet air wet bulb temperature
@@ -1227,7 +1269,8 @@ namespace EvaporativeFluidCoolers {
 			}
 		}
 
-		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num == PIM_UFactor && SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA != AutoSize ) {
+		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num == PIM_UFactor 
+				&& ! SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUAWasAutoSized ) {
 			if ( PltSizCondNum > 0 ) {
 				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
@@ -1241,17 +1284,33 @@ namespace EvaporativeFluidCoolers {
 		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num == PIM_StandardDesignCapacity ) {
 			// Design water flow rate is assumed to be 3 gpm per ton (SI equivalent 5.382E-8 m3/s per watt)
 			tmpDesignWaterFlowRate = 5.382e-8 * SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedStandardDesignCapacity;
-			SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate = tmpDesignWaterFlowRate;
-			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_SingleSpeed ) {
-				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( cEvapFluidCooler_SingleSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, "Design water flow rate based on evaporative fluid cooler Standard Design Capacity [m3/s]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate );
-			} else if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
-				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( cEvapFluidCooler_TwoSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, "Design water flow rate based on evaporative fluid cooler high-speed Standard Design Capacity [m3/s]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate );
+			if ( PlantFirstSizesOkayToFinalize ) {
+				SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate = tmpDesignWaterFlowRate;
+				if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_SingleSpeed ) {
+					if ( PlantFinalSizesOkayToReport ) { 
+						ReportSizingOutput( cEvapFluidCooler_SingleSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"Design Water Flow Rate based on evaporative fluid cooler Standard Design Capacity [m3/s]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate );
+					}
+					if ( PlantFirstSizesOkayToReport ) { 
+						ReportSizingOutput( cEvapFluidCooler_SingleSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"Inital Design Water Flow Rate based on evaporative fluid cooler Standard Design Capacity [m3/s]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate );
+					}
+				} else if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
+					if ( PlantFinalSizesOkayToReport ) { 
+						ReportSizingOutput( cEvapFluidCooler_TwoSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"Design Water Flow Rate based on evaporative fluid cooler high-speed Standard Design Capacity [m3/s]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate );
+					}
+					if ( PlantFirstSizesOkayToReport ) { 
+						ReportSizingOutput( cEvapFluidCooler_TwoSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"Initial Design Water Flow Rate based on evaporative fluid cooler high-speed Standard Design Capacity [m3/s]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate );
+					}
+				}
 			}
 		}
 
 		RegisterPlantCompDesignFlow( SimpleEvapFluidCooler( EvapFluidCoolerNum ).WaterInletNodeNum, tmpDesignWaterFlowRate );
 
-		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedFanPower == AutoSize ) {
+		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedFanPowerWasAutoSized ) {
 			// We assume the nominal fan power is 0.0105 times the design load
 			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num == PIM_StandardDesignCapacity ) {
 				tmpHighSpeedFanPower = 0.0105 * SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedStandardDesignCapacity;
@@ -1275,31 +1334,65 @@ namespace EvaporativeFluidCoolers {
 						if ( PlantFirstSizesOkayToFinalize ) SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedFanPower = tmpHighSpeedFanPower;
 					}
 				} else {
-					ShowSevereError( "Autosizing of evaporative fluid cooler fan power requires a loop Sizing:Plant object." );
-					ShowFatalError( " Occurs in evaporative fluid cooler object= " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+					if ( PlantFirstSizesOkayToFinalize ) { 
+						ShowSevereError( "Autosizing of evaporative fluid cooler fan power requires a loop Sizing:Plant object." );
+						ShowFatalError( " Occurs in evaporative fluid cooler object= " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+					}
 				}
 			}
-			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_SingleSpeed ) {
-				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( cEvapFluidCooler_SingleSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, "Fan Power at Design Air Flow Rate [W]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedFanPower );
-			} else if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
-				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( cEvapFluidCooler_TwoSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, "Fan Power at High Fan Speed [W]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedFanPower );
+			if ( PlantFirstSizesOkayToFinalize ) {
+				if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_SingleSpeed ) {
+					if ( PlantFinalSizesOkayToReport ) { 
+						ReportSizingOutput( cEvapFluidCooler_SingleSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"Fan Power at Design Air Flow Rate [W]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedFanPower );
+					}
+					if ( PlantFirstSizesOkayToReport ) { 
+						ReportSizingOutput( cEvapFluidCooler_SingleSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"Initial Fan Power at Design Air Flow Rate [W]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedFanPower );
+					}
+				} else if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
+					if ( PlantFinalSizesOkayToReport ) { 
+						ReportSizingOutput( cEvapFluidCooler_TwoSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"Fan Power at High Fan Speed [W]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedFanPower );
+					}
+					if ( PlantFirstSizesOkayToReport ) { 
+						ReportSizingOutput( cEvapFluidCooler_TwoSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"Initial Fan Power at High Fan Speed [W]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedFanPower );
+					}
+				}
 			}
 		}
 
-		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRate == AutoSize ) {
+		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRateWasAutoSized ) {
 			// Plant Sizing Object is not required to AUTOSIZE this field since its simply a multiple of another field.
 
 			tmpHighSpeedAirFlowRate = tmpHighSpeedFanPower * 0.5 * ( 101325.0 / StdBaroPress ) / 190.0;
-			if ( PlantFirstSizesOkayToFinalize ) SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
+			if ( PlantFirstSizesOkayToFinalize ) {
+				SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
 
-			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_SingleSpeed ) {
-				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( cEvapFluidCooler_SingleSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, "Design Air Flow Rate [m3/s]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRate );
-			} else if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
-				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( cEvapFluidCooler_TwoSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, "Air Flow Rate at High Fan Speed [m3/s]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRate );
+				if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_SingleSpeed ) {
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( cEvapFluidCooler_SingleSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"Design Air Flow Rate [m3/s]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRate );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( cEvapFluidCooler_SingleSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"Initial Design Air Flow Rate [m3/s]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRate );
+					}
+				} else if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( cEvapFluidCooler_TwoSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"Air Flow Rate at High Fan Speed [m3/s]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRate );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( cEvapFluidCooler_TwoSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"Initial Air Flow Rate at High Fan Speed [m3/s]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRate );
+					}
+				}
 			}
 		}
 
-		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA == AutoSize && SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num == PIM_UFactor ) {
+		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUAWasAutoSized && SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num == PIM_UFactor ) {
 			if ( PltSizCondNum > 0 ) {
 				if ( PlantSizData( PltSizCondNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 					// This conditional statement is to trap when the user specified Condenser/Evaporative Fluid Cooler water design setpoint
@@ -1367,14 +1460,32 @@ namespace EvaporativeFluidCoolers {
 					tmpHighSpeedEvapFluidCoolerUA = 0.0;
 					if ( PlantFirstSizesOkayToFinalize ) SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA = tmpHighSpeedEvapFluidCoolerUA;
 				}
-				if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_SingleSpeed ) {
-					if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( cEvapFluidCooler_SingleSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, "U-Factor Times Area Value at Design Air Flow Rate [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA );
-				} else if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
-					if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( cEvapFluidCooler_TwoSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, "U-Factor Times Area Value at High Fan Speed [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA );
+				if ( PlantFirstSizesOkayToFinalize ) {
+					if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_SingleSpeed ) {
+						if ( PlantFinalSizesOkayToReport ) {
+							ReportSizingOutput( cEvapFluidCooler_SingleSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+								"U-Factor Times Area Value at Design Air Flow Rate [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA );
+						}
+						if ( PlantFirstSizesOkayToReport ) {
+							ReportSizingOutput( cEvapFluidCooler_SingleSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+								"Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA );
+						}
+					} else if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
+						if ( PlantFinalSizesOkayToReport ) {
+							ReportSizingOutput( cEvapFluidCooler_TwoSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+								"U-Factor Times Area Value at High Fan Speed [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA );
+						}
+						if ( PlantFirstSizesOkayToReport ) {
+							ReportSizingOutput( cEvapFluidCooler_TwoSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+								"Initial U-Factor Times Area Value at High Fan Speed [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA );
+						}
+					}
 				}
 			} else {
-				ShowSevereError( "Autosizing error for evaporative fluid cooler object = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
-				ShowFatalError( "Autosizing of evaporative fluid cooler UA requires a loop Sizing:Plant object." );
+				if ( PlantFirstSizesOkayToFinalize ) {
+					ShowSevereError( "Autosizing error for evaporative fluid cooler object = " + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name );
+					ShowFatalError( "Autosizing of evaporative fluid cooler UA requires a loop Sizing:Plant object." );
+				}
 			}
 		}
 
@@ -1411,10 +1522,26 @@ namespace EvaporativeFluidCoolers {
 			} else {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA = 0.0;
 			}
-			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_SingleSpeed ) {
-				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( cEvapFluidCooler_SingleSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, "U-Factor Times Area Value at Design Air Flow Rate [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA );
-			} else if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
-				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( cEvapFluidCooler_TwoSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, "U-Factor Times Area Value at High Fan Speed [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA );
+			if ( PlantFirstSizesOkayToFinalize ) { 
+				if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_SingleSpeed ) {
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( cEvapFluidCooler_SingleSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"U-Factor Times Area Value at Design Air Flow Rate [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( cEvapFluidCooler_SingleSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA );
+					}
+				} else if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( cEvapFluidCooler_TwoSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"U-Factor Times Area Value at High Fan Speed [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( cEvapFluidCooler_TwoSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"Initial U-Factor Times Area Value at High Fan Speed [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA );
+					}
+				}
 			}
 		}
 
@@ -1473,30 +1600,69 @@ namespace EvaporativeFluidCoolers {
 			} else {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA = 0.0;
 			}
-			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_SingleSpeed ) {
-				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( cEvapFluidCooler_SingleSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, "U-Factor Times Area Value at Design Air Flow Rate [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA );
-			} else if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
-				if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( cEvapFluidCooler_TwoSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, "U-Factor Times Area Value at High Fan Speed [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA );
+			if ( PlantFirstSizesOkayToFinalize ) {
+				if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_SingleSpeed ) {
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( cEvapFluidCooler_SingleSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"U-Factor Times Area Value at Design Air Flow Rate [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( cEvapFluidCooler_SingleSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"Initial U-Factor Times Area Value at Design Air Flow Rate [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA );
+					}
+				} else if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( cEvapFluidCooler_TwoSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"U-Factor Times Area Value at High Fan Speed [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( cEvapFluidCooler_TwoSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+							"Initial U-Factor Times Area Value at High Fan Speed [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA );
+					}
+				}
 			}
 		}
 
-		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedAirFlowRate == AutoSize && PlantFirstSizesOkayToFinalize ) {
+		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedAirFlowRateWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedAirFlowRate = SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedAirFlowRateSizingFactor * SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRate;
-			ReportSizingOutput( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, "Air Flow Rate at Low Fan Speed [m3/s]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedAirFlowRate );
+			if ( PlantFinalSizesOkayToReport ) {
+				ReportSizingOutput( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+					"Air Flow Rate at Low Fan Speed [m3/s]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedAirFlowRate );
+			}
+			if ( PlantFirstSizesOkayToReport ) {
+				ReportSizingOutput( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+					"Initial Air Flow Rate at Low Fan Speed [m3/s]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedAirFlowRate );
+			}
 		}
 
-		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedFanPower == AutoSize && PlantFirstSizesOkayToFinalize ) {
+		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedFanPowerWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedFanPower = SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedFanPowerSizingFactor * SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedFanPower;
-			ReportSizingOutput( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, "Fan Power at Low Fan Speed [W]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedFanPower );
+			if ( PlantFinalSizesOkayToReport ) {
+				ReportSizingOutput( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+					"Fan Power at Low Fan Speed [W]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedFanPower );
+			}
+			if ( PlantFirstSizesOkayToReport ) {
+				ReportSizingOutput( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+					"Initial Fan Power at Low Fan Speed [W]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedFanPower );
+			}
 		}
 
-		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUA == AutoSize && PlantFirstSizesOkayToFinalize ) {
+		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUAWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUA = SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUASizingFactor * SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA;
-			ReportSizingOutput( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, "U-Factor Times Area Value at Low Fan Speed [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUA );
+			if ( PlantFinalSizesOkayToReport ) {
+				ReportSizingOutput( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+					"U-Factor Times Area Value at Low Fan Speed [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUA );
+			}
+			if ( PlantFirstSizesOkayToReport ) {
+				ReportSizingOutput( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+					"Initial U-Factor Times Area Value at Low Fan Speed [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUA );
+			}
 		}
 
-		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num == PIM_StandardDesignCapacity && SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
-			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate >= SmallWaterVolFlow && SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedStandardDesignCapacity > 0.0 ) {
+		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num == PIM_StandardDesignCapacity 
+				&& SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
+			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate >= SmallWaterVolFlow 
+					&& SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedStandardDesignCapacity > 0.0 ) {
 				// Standard design capacity doesn't include compressor heat;
 				// predefined factor was 1.25 W heat rejection per W of delivered cooling, now user input with default 1.25
 				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
@@ -1528,11 +1694,22 @@ namespace EvaporativeFluidCoolers {
 			} else {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUA = 0.0;
 			}
-			if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, "U-Factor Times Area Value at Low Fan Speed [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUA );
+			if ( PlantFirstSizesOkayToFinalize ) {
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+						"U-Factor Times Area Value at Low Fan Speed [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUA );
+				}
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+						"Initial U-Factor Times Area Value at Low Fan Speed [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUA );
+				}
+			}
 		}
 
-		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num == PIM_UserSpecifiedDesignCapacity && SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
-			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate >= SmallWaterVolFlow && SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedUserSpecifiedDesignCapacity > 0.0 ) {
+		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num == PIM_UserSpecifiedDesignCapacity 
+				&& SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
+			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate >= SmallWaterVolFlow 
+					&& SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedUserSpecifiedDesignCapacity > 0.0 ) {
 				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringWaterTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				DesEvapFluidCoolerLoad = SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedUserSpecifiedDesignCapacity;
@@ -1579,10 +1756,20 @@ namespace EvaporativeFluidCoolers {
 			} else {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUA = 0.0;
 			}
-			if ( PlantFirstSizesOkayToFinalize ) ReportSizingOutput( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, "U-Factor Times Area Value at Low Fan Speed [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUA );
+			if ( PlantFirstSizesOkayToFinalize ) {
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+						"U-Factor Times Area Value at Low Fan Speed [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUA );
+				}
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
+						"Initial U-Factor Times Area Value at Low Fan Speed [W/C]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUA );
+				}
+
+			}
 		}
 
-		if ( PlantFirstSizesOkayToFinalize ) {
+		if ( PlantFinalSizesOkayToReport ) {
 			//create predefined report
 			equipName = SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name;
 			PreDefTableEntry( pdchMechType, equipName, SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType );
