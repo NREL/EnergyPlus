@@ -14,7 +14,6 @@ namespace EnergyPlus {
 namespace SurfaceGroundHeatExchanger {
 
 	// Using/Aliasing
-	using DataHeatBalance::MaxCTFTerms;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
@@ -24,6 +23,10 @@ namespace SurfaceGroundHeatExchanger {
 
 	extern int const SurfCond_Ground;
 	extern int const SurfCond_Exposed;
+
+namespace loc {
+	extern int const MaxCTFTerms; // Maximum number of CTF terms allowed to still allow stability //Note Duplicate of DataHeatBalance::MaxCTFTerms to avoid static initialization order bug: Keep them in sync
+} // loc
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -249,21 +252,21 @@ namespace SurfaceGroundHeatExchanger {
 			QtopConstCoef( 0.0 ),
 			QtopVarCoef( 0.0 ),
 			NumCTFTerms( 0 ),
-			CTFin( {0,MaxCTFTerms-1}, 0.0 ),
-			CTFout( {0,MaxCTFTerms-1}, 0.0 ),
-			CTFcross( {0,MaxCTFTerms-1}, 0.0 ),
-			CTFflux( {0,MaxCTFTerms-1}, 0.0 ),
-			CTFSourceIn( {0,MaxCTFTerms-1}, 0.0 ),
-			CTFSourceOut( {0,MaxCTFTerms-1}, 0.0 ),
-			CTFTSourceOut( {0,MaxCTFTerms-1}, 0.0 ),
-			CTFTSourceIn( {0,MaxCTFTerms-1}, 0.0 ),
-			CTFTSourceQ( {0,MaxCTFTerms-1}, 0.0 ),
-			TbtmHistory( {0,MaxCTFTerms-1}, 0.0 ),
-			TtopHistory( {0,MaxCTFTerms-1}, 0.0 ),
-			TsrcHistory( {0,MaxCTFTerms-1}, 0.0 ),
-			QbtmHistory( {0,MaxCTFTerms-1}, 0.0 ),
-			QtopHistory( {0,MaxCTFTerms-1}, 0.0 ),
-			QsrcHistory( {0,MaxCTFTerms-1}, 0.0 ),
+			CTFin( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			CTFout( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			CTFcross( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			CTFflux( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			CTFSourceIn( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			CTFSourceOut( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			CTFTSourceOut( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			CTFTSourceIn( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			CTFTSourceQ( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			TbtmHistory( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			TtopHistory( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			TsrcHistory( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			QbtmHistory( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			QtopHistory( {0,loc::MaxCTFTerms-1}, 0.0 ),
+			QsrcHistory( {0,loc::MaxCTFTerms-1}, 0.0 ),
 			QSrc( 0.0 ),
 			QSrcAvg( 0.0 ),
 			LastQSrc( 0.0 ),
@@ -308,21 +311,21 @@ namespace SurfaceGroundHeatExchanger {
 			QtopConstCoef( QtopConstCoef ),
 			QtopVarCoef( QtopVarCoef ),
 			NumCTFTerms( NumCTFTerms ),
-			CTFin( {0,MaxCTFTerms-1}, CTFin ),
-			CTFout( {0,MaxCTFTerms-1}, CTFout ),
-			CTFcross( {0,MaxCTFTerms-1}, CTFcross ),
-			CTFflux( {0,MaxCTFTerms-1}, CTFflux ),
-			CTFSourceIn( {0,MaxCTFTerms-1}, CTFSourceIn ),
-			CTFSourceOut( {0,MaxCTFTerms-1}, CTFSourceOut ),
-			CTFTSourceOut( {0,MaxCTFTerms-1}, CTFTSourceOut ),
-			CTFTSourceIn( {0,MaxCTFTerms-1}, CTFTSourceIn ),
-			CTFTSourceQ( {0,MaxCTFTerms-1}, CTFTSourceQ ),
-			TbtmHistory( {0,MaxCTFTerms-1}, TbtmHistory ),
-			TtopHistory( {0,MaxCTFTerms-1}, TtopHistory ),
-			TsrcHistory( {0,MaxCTFTerms-1}, TsrcHistory ),
-			QbtmHistory( {0,MaxCTFTerms-1}, QbtmHistory ),
-			QtopHistory( {0,MaxCTFTerms-1}, QtopHistory ),
-			QsrcHistory( {0,MaxCTFTerms-1}, QsrcHistory ),
+			CTFin( {0,loc::MaxCTFTerms-1}, CTFin ),
+			CTFout( {0,loc::MaxCTFTerms-1}, CTFout ),
+			CTFcross( {0,loc::MaxCTFTerms-1}, CTFcross ),
+			CTFflux( {0,loc::MaxCTFTerms-1}, CTFflux ),
+			CTFSourceIn( {0,loc::MaxCTFTerms-1}, CTFSourceIn ),
+			CTFSourceOut( {0,loc::MaxCTFTerms-1}, CTFSourceOut ),
+			CTFTSourceOut( {0,loc::MaxCTFTerms-1}, CTFTSourceOut ),
+			CTFTSourceIn( {0,loc::MaxCTFTerms-1}, CTFTSourceIn ),
+			CTFTSourceQ( {0,loc::MaxCTFTerms-1}, CTFTSourceQ ),
+			TbtmHistory( {0,loc::MaxCTFTerms-1}, TbtmHistory ),
+			TtopHistory( {0,loc::MaxCTFTerms-1}, TtopHistory ),
+			TsrcHistory( {0,loc::MaxCTFTerms-1}, TsrcHistory ),
+			QbtmHistory( {0,loc::MaxCTFTerms-1}, QbtmHistory ),
+			QtopHistory( {0,loc::MaxCTFTerms-1}, QtopHistory ),
+			QsrcHistory( {0,loc::MaxCTFTerms-1}, QsrcHistory ),
 			QSrc( QSrc ),
 			QSrcAvg( QSrcAvg ),
 			LastQSrc( LastQSrc ),

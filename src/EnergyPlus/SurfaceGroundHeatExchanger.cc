@@ -69,10 +69,8 @@ namespace SurfaceGroundHeatExchanger {
 	// Use statements for data only modules
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
-	using DataGlobals::BeginTimeStepFlag;
 	using DataGlobals::KelvinConv;
 	using namespace DataLoopNode;
-	using DataHeatBalance::MaxCTFTerms;
 
 	// Use statements for access to subroutines in other modules
 
@@ -85,6 +83,10 @@ namespace SurfaceGroundHeatExchanger {
 
 	int const SurfCond_Ground( 1 );
 	int const SurfCond_Exposed( 2 );
+
+namespace loc {
+	int const MaxCTFTerms( 19 ); // Maximum number of CTF terms allowed to still allow stability //Note Duplicate of DataHeatBalance::MaxCTFTerms to avoid static initialization order bug: Keep them in sync
+} // loc
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -467,12 +469,10 @@ namespace SurfaceGroundHeatExchanger {
 		// USE STATEMENTS:
 
 		// Using/Aliasing
-		using DataGlobals::BeginTimeStepFlag;
 		using DataGlobals::Pi;
 		using DataGlobals::BeginEnvrnFlag;
 		using namespace DataEnvironment;
 		using DataLoopNode::Node;
-		using DataHeatBalance::MaxCTFTerms;
 		using DataHeatBalance::TotConstructs;
 		using DataHeatBalance::Construct;
 		using DataHeatBalance::Material;
@@ -697,6 +697,7 @@ namespace SurfaceGroundHeatExchanger {
 
 		// Using/Aliasing
 		using DataLoopNode::Node;
+		using DataGlobals::BeginTimeStepFlag;
 		using DataHVACGlobals::TimeStepSys;
 		using DataHVACGlobals::SysTimeElapsed;
 		using DataHVACGlobals::FirstTimeStepSysFlag;
@@ -1034,7 +1035,6 @@ namespace SurfaceGroundHeatExchanger {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Term;
 
 		// add current surface temperatures to history data
 		SurfaceGHEQTF( SurfaceGHENum ).TbtmHistory( 0 ) = Tbottom;
@@ -1042,7 +1042,7 @@ namespace SurfaceGroundHeatExchanger {
 
 		// Top Surface Coefficients
 		SurfaceGHEQTF( SurfaceGHENum ).QtopConstCoef = 0.0;
-		for ( Term = 0; Term <= SurfaceGHEQTF( SurfaceGHENum ).NumCTFTerms - 1; ++Term ) {
+		for ( int Term = 0; Term <= SurfaceGHEQTF( SurfaceGHENum ).NumCTFTerms - 1; ++Term ) {
 
 			SurfaceGHEQTF( SurfaceGHENum ).QtopConstCoef += ( SurfaceGHEQTF( SurfaceGHENum ).CTFout( Term ) * SurfaceGHEQTF( SurfaceGHENum ).TtopHistory( Term ) ) - ( SurfaceGHEQTF( SurfaceGHENum ).CTFcross( Term ) * SurfaceGHEQTF( SurfaceGHENum ).TbtmHistory( Term ) ) + ( SurfaceGHEQTF( SurfaceGHENum ).CTFflux( Term ) * SurfaceGHEQTF( SurfaceGHENum ).QtopHistory( Term ) ) + ( SurfaceGHEQTF( SurfaceGHENum ).CTFSourceOut( Term ) * SurfaceGHEQTF( SurfaceGHENum ).QsrcHistory( Term ) );
 

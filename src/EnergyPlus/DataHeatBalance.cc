@@ -59,7 +59,7 @@ namespace DataHeatBalance {
 
 	// Parameters for the definition and limitation of arrays:
 	int const MaxLayersInConstruct( 11 ); // Maximum number of layers allowed in a single construction
-	int const MaxCTFTerms( 19 ); // Maximum number of CTF terms allowed to still allow stability
+	int const MaxCTFTerms( 19 ); // Maximum number of CTF terms allowed to still allow stability //Note Sync with SurfaceGroundHeatExchanger::local::MaxCTFTerms
 	int MaxSolidWinLayers( 0 ); // Maximum number of solid layers in a window construction
 										// ** has to be big enough to hold no matter what window model
 										//    each window model should validate layers individually
