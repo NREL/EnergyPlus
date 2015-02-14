@@ -121,7 +121,6 @@ namespace ZoneAirLoopEquipmentManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		bool SimZone;
 		int AirDistUnitNum;
 
 		// Beginning of Code
@@ -152,8 +151,6 @@ namespace ZoneAirLoopEquipmentManager {
 		//  CALL RecordZoneAirLoopEquipment
 
 		//  CALL ReportZoneAirLoopEquipment
-
-		SimZone = false;
 
 	}
 

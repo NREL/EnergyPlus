@@ -709,7 +709,6 @@ namespace ZoneDehumidifier {
 		Real64 AirMassFlowRate; // Air mass flow rate through this dehumidifier (kg/s)
 		Real64 Cp; // Heat capacity of inlet air (J/kg-C)
 		static int AirInletNodeNum( 0 ); // Node number for the inlet air to the dehumidifier
-		static int AirOutletNodeNum( 0 ); // Node number for the outlet air from the dehumidifier
 
 		SensibleOutput = 0.0;
 		LatentOutput = 0.0;
@@ -723,7 +722,6 @@ namespace ZoneDehumidifier {
 		ElectricPowerOnCycle = 0.0;
 
 		AirInletNodeNum = ZoneDehumid( ZoneDehumNum ).AirInletNodeNum;
-		AirOutletNodeNum = ZoneDehumid( ZoneDehumNum ).AirOutletNodeNum;
 
 		InletAirTemp = Node( AirInletNodeNum ).Temp;
 		InletAirHumRat = Node( AirInletNodeNum ).HumRat;
