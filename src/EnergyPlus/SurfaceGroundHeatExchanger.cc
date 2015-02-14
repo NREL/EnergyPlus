@@ -10,6 +10,7 @@
 #include <BranchNodeConnections.hh>
 #include <ConvectionCoefficients.hh>
 #include <DataEnvironment.hh>
+#include <DataHeatBalance.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>

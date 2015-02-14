@@ -6,7 +6,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
-#include <DataHeatBalance.hh>
 #include <DataGlobals.hh>
 
 namespace EnergyPlus {
