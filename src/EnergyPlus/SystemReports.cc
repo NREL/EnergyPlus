@@ -3923,7 +3923,7 @@ namespace SystemReports {
 
 		Real64 AirSysEnthReturnAir; // enthalpy of the return air (mixing box inlet node, return side) [kJ/kgK]
 		Real64 AirSysEnthMixedAir; // enthalpy of the mixed air (mixing box outlet node, mixed air side) [kJ/kgK]
-		Real64 AirSysZoneVentLoad; // ventilation load attributed to a particular zone from primary air system [J?]
+		Real64 AirSysZoneVentLoad; // ventilation load attributed to a particular zone from primary air system [J]
 		Real64 ADUCoolFlowrate; // Air distribution unit cooling air mass flow rate [kg/s]
 		Real64 ADUHeatFlowrate; // Air distribution unit heating air mass flow rate [kg/s]
 		Real64 AirSysTotalMixFlowRate; // Mixed air mass flow rate [kg/s]
@@ -3935,7 +3935,7 @@ namespace SystemReports {
 		Real64 ZFAUEnthMixedAir; // Zone forced Air unit enthalpy of the mixed air [kJ/kgK]
 		Real64 ZFAUEnthOutdoorAir; // Zone forced Air unit enthalpy of the outdoor air [kJ/kgK]
 		Real64 ZFAUFlowRate; // Zone forced Air unit air mass flow rate [kg/s]
-		Real64 ZFAUZoneVentLoad; // ventilation load attributed to a particular zone from zone forced air units [J?]
+		Real64 ZFAUZoneVentLoad; // ventilation load attributed to a particular zone from zone forced air units [J]
 		Real64 ZFAUOutAirFlow; // outside air flow rate for zone from zone forced air units.
 		int ZoneInletAirNode; // Zone forced Air unit zone inlet node number
 
