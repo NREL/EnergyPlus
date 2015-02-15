@@ -9,6 +9,7 @@ ADD_DEFINITIONS("-DXML_STATIC")
 IF ( MSVC ) # Visual C++ (VS 2013)
 
     # Disabled Warnings: Enable some of these as more serious warnings are addressed
+    #  4068 Unknown pragma
     #  4101 Unreferenced local variable
     #  4102 Unreferenced label
     #  4244 Narrowing conversions
@@ -25,7 +26,7 @@ IF ( MSVC ) # Visual C++ (VS 2013)
     ADD_CXX_DEFINITIONS("/MP") # Enables multi-processor compilation of source within a single project
     ADD_CXX_DEFINITIONS("/W1") # Increase to /W2 then /W3 as more serious warnings are addressed
 
-    ADD_CXX_DEFINITIONS("/wd4101 /wd4102 /wd4244 /wd4258 /wd4355 /wd4996") # Disables warning messages listed above
+    ADD_CXX_DEFINITIONS("/wd4068 /wd4101 /wd4102 /wd4244 /wd4258 /wd4355 /wd4996") # Disables warning messages listed above
     ADD_CXX_DEFINITIONS("/DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
     ADD_CXX_DEFINITIONS("/DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
 
