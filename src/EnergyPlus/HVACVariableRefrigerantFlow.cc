@@ -6008,7 +6008,7 @@ namespace HVACVariableRefrigerantFlow {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
-		// lookup function for OA inlet node
+		// lookup function for VRF terminal unit OA inlet node
 
 		if( GetVRFInputFlag ) {
 			GetVRFInput();
@@ -6033,7 +6033,7 @@ namespace HVACVariableRefrigerantFlow {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
-		// lookup function for OA inlet node
+		// lookup function for VRF terminal unit zone inlet node
 
 		if( GetVRFInputFlag ) {
 			GetVRFInput();
@@ -6058,7 +6058,7 @@ namespace HVACVariableRefrigerantFlow {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
-		// lookup function for OA inlet node
+		// lookup function for VRF terminal unit mixed air node
 
 		if( GetVRFInputFlag ) {
 			GetVRFInput();
@@ -6083,7 +6083,7 @@ namespace HVACVariableRefrigerantFlow {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
-		// lookup function for OA inlet node
+		// lookup function for VRF terminal unit return air node
 
 		if( GetVRFInputFlag ) {
 			GetVRFInput();

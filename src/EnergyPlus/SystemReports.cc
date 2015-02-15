@@ -41,6 +41,7 @@
 #include <UtilityRoutines.hh>
 #include <WindowAC.hh>
 #include <HVACVariableRefrigerantFlow.hh>
+#include <OutdoorAirUnit.hh>
 #include <ZonePlenum.hh>
 
 namespace EnergyPlus {
@@ -3873,6 +3874,9 @@ namespace SystemReports {
 		using HVACVariableRefrigerantFlow::GetVRFTUMixedAirNode;
 		using HVACVariableRefrigerantFlow::GetVRFTUZoneInletAirNode;
 		using HVACVariableRefrigerantFlow::GetVRFTUReturnAirNode;
+		using OutdoorAirUnit::GetOutdoorAirUnitOutAirNode;
+		using OutdoorAirUnit::GetOutdoorAirUnitZoneInletNode;
+		using OutdoorAirUnit::GetOutdoorAirUnitReturnAirNode;
 		using PackagedTerminalHeatPump::GetPTUnitOutAirNode;
 		using PackagedTerminalHeatPump::GetPTUnitMixedAirNode;
 		using PackagedTerminalHeatPump::GetPTUnitZoneInletAirNode;
@@ -3913,36 +3917,37 @@ namespace SystemReports {
 		int ZoneInNum; // counter for zone air distribution inlets
 		int ReturnAirNode; // node number for return node on primary air loop
 		int MixedAirNode; // mixed air node number (right after the mixing box) on primary air loop
-		int AirLoopNum;
-		int AirDistCoolInletNodeNum;
-		int AirDistHeatInletNodeNum;
+		int AirLoopNum; // index to AirloopHVAC
+		int AirDistCoolInletNodeNum; // Air distribution unit inlet node number
+		int AirDistHeatInletNodeNum; // Air distribution unit outlet node number
 
-		Real64 AirSysEnthReturnAir; // enthalpy of the return air (mixing box inlet node, return side)
-		Real64 AirSysEnthMixedAir; // enthalpy of the mixed air (mixing box outlet node, mixed air side)
-		Real64 AirSysZoneVentLoad; // ventilation load attributed to a particular zone from primary air system
-		Real64 ADUCoolFlowrate;
-		Real64 ADUHeatFlowrate;
-		Real64 AirSysTotalMixFlowRate; // Mixed air flow
-		Real64 AirSysOutAirFlow; // outside air flow rate for zone from primary air system
+		Real64 AirSysEnthReturnAir; // enthalpy of the return air (mixing box inlet node, return side) [kJ/kgK]
+		Real64 AirSysEnthMixedAir; // enthalpy of the mixed air (mixing box outlet node, mixed air side) [kJ/kgK]
+		Real64 AirSysZoneVentLoad; // ventilation load attributed to a particular zone from primary air system [J?]
+		Real64 ADUCoolFlowrate; // Air distribution unit cooling air mass flow rate [kg/s]
+		Real64 ADUHeatFlowrate; // Air distribution unit heating air mass flow rate [kg/s]
+		Real64 AirSysTotalMixFlowRate; // Mixed air mass flow rate [kg/s]
+		Real64 AirSysOutAirFlow; // outside air flow rate for zone from primary air system [kg/s]
 
-		Real64 ZFAUEnthReturnAir; // Zone forced Air unit enthalpy of the return air
-		Real64 ZFAUTempMixedAir; // Zone forced Air unit dry-bulb temperature of the mixed air
-		Real64 ZFAUHumRatMixedAir; // Zone forced Air unit humidity ratio of the mixed air
-		Real64 ZFAUEnthMixedAir; // Zone forced Air unit enthalpy of the mixed air
-		Real64 ZFAUFlowRate;
-		Real64 ZFAUZoneVentLoad; // ventilation load attributed to a particular zone from zone forced air units
+		Real64 ZFAUEnthReturnAir; // Zone forced Air unit enthalpy of the return air [kJ/kgK]
+		Real64 ZFAUTempMixedAir; // Zone forced Air unit dry-bulb temperature of the mixed air [C]
+		Real64 ZFAUHumRatMixedAir; // Zone forced Air unit humidity ratio of the mixed air [kg/kg]
+		Real64 ZFAUEnthMixedAir; // Zone forced Air unit enthalpy of the mixed air [kJ/kgK]
+		Real64 ZFAUEnthOutdoorAir; // Zone forced Air unit enthalpy of the outdoor air [kJ/kgK]
+		Real64 ZFAUFlowRate; // Zone forced Air unit air mass flow rate [kg/s]
+		Real64 ZFAUZoneVentLoad; // ventilation load attributed to a particular zone from zone forced air units [J?]
 		Real64 ZFAUOutAirFlow; // outside air flow rate for zone from zone forced air units.
-		int ZoneInletAirNode;
+		int ZoneInletAirNode; // Zone forced Air unit zone inlet node number
 
 		Real64 ZoneVentLoad; // ventilation load attributed to a particular zone
 		Real64 ZoneLoad; // ventilation load attributed to a particular zone
-		Real64 OutAirFlow; // Total outside air flow
+		Real64 OutAirFlow; // Total outside air mass flow from zone equipment and air loop equipment [kg/s]
 		Real64 ZoneFlowFrac; // fraction of mixed air flowing to a zone
-		Real64 ZoneVolume; // Volume of zone
-		Real64 currentZoneAirDensity; // current zone air density (outside barometric pressure)
+		Real64 ZoneVolume; // Volume of zone [m3]
+		Real64 currentZoneAirDensity; // current zone air density (outside barometric pressure) [kg/m3]
 
-		int ActualZoneNum;
-		int OutAirNode;
+		int ActualZoneNum; // Zone forced Air zone number
+		int OutAirNode; // Zone forced Air unit outdoor air node number
 		int thisZoneEquipNum; // loop counter
 
 		//  CALL GetComponentEnergyUse
@@ -4123,13 +4128,30 @@ namespace SystemReports {
 				} else if ( SELECT_CASE_var == ZoneUnitarySystem_Num ) {
 					// add accounting for OA when unitary system is used as zone equipment
 
-					//																										ZoneHVAC:OutdoorAirUnit ?????
-				} else if ( SELECT_CASE_var == UnitHeater_Num || SELECT_CASE_var == VentilatedSlab_Num || SELECT_CASE_var == OutdoorAirUnit_Num ||
-					//					ZoneHVAC:EvaporativeCoolerUnit ?????
+				} else if( SELECT_CASE_var == OutdoorAirUnit_Num ) {
+					OutAirNode = GetOutdoorAirUnitOutAirNode( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ) );
+					if( OutAirNode > 0 ) ZFAUOutAirFlow += Node( OutAirNode ).MassFlowRate;
+
+					ZoneInletAirNode = GetOutdoorAirUnitZoneInletNode( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ) );
+					if( ZoneInletAirNode > 0 ) ZFAUFlowRate = max( Node( ZoneInletAirNode ).MassFlowRate, 0.0 );
+					ReturnAirNode = GetOutdoorAirUnitReturnAirNode( ZoneEquipList( ZoneEquipConfig( CtrlZoneNum ).EquipListIndex ).EquipIndex( thisZoneEquipNum ) );
+					if( ( OutAirNode > 0 ) && ( ReturnAirNode > 0 )  ) {
+						//						ZFAUEnthMixedAir = PsyHFnTdbW( Node( MixedAirNode ).Temp, Node( MixedAirNode ).HumRat );
+						ZFAUEnthReturnAir = PsyHFnTdbW( Node( ReturnAirNode ).Temp, Node( ReturnAirNode ).HumRat );
+						ZFAUEnthOutdoorAir = PsyHFnTdbW( Node( OutAirNode ).Temp, Node( OutAirNode ).HumRat );
+						//Calculate the zone ventilation load for this supply air path (i.e. zone inlet)
+						ZFAUZoneVentLoad += ( ZFAUFlowRate )* ( ZFAUEnthOutdoorAir - ZFAUEnthReturnAir ) * TimeStepSys * SecInHour; //*KJperJ
+					} else {
+						ZFAUZoneVentLoad += 0.0;
+					}
+
+				} else if ( SELECT_CASE_var == UnitHeater_Num || SELECT_CASE_var == VentilatedSlab_Num ||
+					//	ZoneHVAC:EvaporativeCoolerUnit ?????
 					SELECT_CASE_var == ZoneEvaporativeCoolerUnit_Num || SELECT_CASE_var == AirDistUnit_Num || SELECT_CASE_var == DirectAir_Num ||
 					SELECT_CASE_var == BBWaterConvective_Num || SELECT_CASE_var == BBElectricConvective_Num || SELECT_CASE_var == HiTempRadiant_Num ||
-					//																	not sure how HeatExchanger:* could be used as zone equipment ?????
+					//	not sure how HeatExchanger:* could be used as zone equipment ?????
 					SELECT_CASE_var == LoTempRadiant_Num || SELECT_CASE_var == ZoneExhaustFan_Num || SELECT_CASE_var == HeatXchngr_Num || 
+					// HPWaterHeater can be used as zone equipment
 					SELECT_CASE_var == HPWaterHeater_Num || SELECT_CASE_var == BBWater_Num || SELECT_CASE_var == ZoneDXDehumidifier_Num || 
 					SELECT_CASE_var == BBSteam_Num || SELECT_CASE_var == BBElectric_Num || SELECT_CASE_var == RefrigerationAirChillerSet_Num || 
 					SELECT_CASE_var == UserDefinedZoneHVACForcedAir_Num ) {

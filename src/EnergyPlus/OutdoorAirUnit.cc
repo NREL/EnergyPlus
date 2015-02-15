@@ -215,6 +215,7 @@ namespace OutdoorAirUnit {
 			if ( OAUnitNum == 0 ) {
 				ShowFatalError( "ZoneHVAC:OutdoorAirUnit not found=" + CompName );
 			}
+			CompIndex = OAUnitNum;
 		} else {
 			OAUnitNum = CompIndex;
 			if ( OAUnitNum > NumOfOAUnits || OAUnitNum < 1 ) {
@@ -1679,7 +1680,7 @@ namespace OutdoorAirUnit {
 		int ControlNode; // the hot water or cold water inlet node
 		int InletNode; // Unit air inlet node
 		int SFanOutletNode; // Unit supply fan outlet node
-		int ZoneAirInNode; // zone supply air node
+//		int ZoneAirInNode; // zone supply air node
 		Real64 MaxWaterFlow; // maximum water flow for heating or cooling [kg/sec]
 		Real64 MinWaterFlow; // minimum water flow for heating or cooling [kg/sec]
 		int OutletNode; // air outlet node
@@ -2658,6 +2659,81 @@ namespace OutdoorAirUnit {
 		}
 
 		return GetOutdoorAirUnitReturnAirNode;
+
+	}
+
+	int
+		GetOAUnitOutAirNode( int const OAUnitNum ) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         R. Raustad (copy of B Griffith routine)
+		//       DATE WRITTEN   Jan  2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// lookup function for OA inlet node
+
+		if( GetOutdoorAirUnitInputFlag ) {
+			GetOutdoorAirUnitInputs();
+			GetOutdoorAirUnitInputFlag = false;
+		}
+
+		if( OAUnitNum > 0 && OAUnitNum <= NumOfOAUnits ) {
+			return OutAirUnit( OAUnitNum ).OutsideAirNode;
+		} else {
+			return 0;
+		}
+
+	}
+
+	int
+		GetOAUnitZoneInletAirNode( int const OAUnitNum ) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         R. Raustad (copy of B Griffith routine)
+		//       DATE WRITTEN   Jan  2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// lookup function for OA unit zone inlet node
+
+		if( GetOutdoorAirUnitInputFlag ) {
+			GetOutdoorAirUnitInputs();
+			GetOutdoorAirUnitInputFlag = false;
+		}
+
+		if( OAUnitNum > 0 && OAUnitNum <= NumOfOAUnits ) {
+			return OutAirUnit( OAUnitNum ).AirOutletNode;
+		} else {
+			return 0;
+		}
+
+	}
+
+	int
+		GetOAUnitReturnAirNode( int const OAUnitNum ) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         R. Raustad (copy of B Griffith routine)
+		//       DATE WRITTEN   Jan  2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// lookup function for OA unit return air node
+
+		if( GetOutdoorAirUnitInputFlag ) {
+			GetOutdoorAirUnitInputs();
+			GetOutdoorAirUnitInputFlag = false;
+		}
+
+		if( OAUnitNum > 0 && OAUnitNum <= NumOfOAUnits ) {
+			return OutAirUnit( OAUnitNum ).AirInletNode;
+		} else {
+			return 0;
+		}
 
 	}
 
