@@ -739,24 +739,6 @@ public: // Modifier
 
 public: // Subscript
 
-	// CArrayP[ i ] const: 0-Based Indexing
-	inline
-	T const &
-	operator []( size_type const i ) const
-	{
-		assert( i < size_ );
-		return data_[ i ];
-	}
-
-	// CArrayP[ i ]: 0-Based Indexing
-	inline
-	T &
-	operator []( size_type const i )
-	{
-		assert( i < size_ );
-		return data_[ i ];
-	}
-
 	// CArrayP( i ) const: 1-Based Indexing
 	inline
 	T const &
