@@ -117,9 +117,6 @@ namespace GroundHeatExchangers {
 		virtual void
 		calcGroundHeatExchanger()=0;
 
-		//virtual void
-		//updateGroundHeatExchanger()=0;
-
 		virtual void
 		initGLHESimVars()=0;
 
@@ -220,6 +217,9 @@ namespace GroundHeatExchangers {
 
 		void
 		calcGroundHeatExchanger();
+
+		Real64
+		slinkyResistance();
 
 		void
 		calcGFunctions();
