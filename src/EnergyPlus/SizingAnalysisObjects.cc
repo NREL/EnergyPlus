@@ -16,7 +16,7 @@
 namespace EnergyPlus {
 	ZoneTimestepObject::ZoneTimestepObject( )
 	{
-		kindofSim			= 0;
+		kindOfSim			= 0;
 		envrnNum			= 0;
 		designDayNum		= 0;
 		dayOfSim			= 0;
@@ -29,25 +29,25 @@ namespace EnergyPlus {
 
 
 	ZoneTimestepObject::ZoneTimestepObject(
-		int kindOfSim,
+		int kindSim,
 		int environmentNum,
-		int designDayNum,
-		int dayOfSim,
-		int hourOfDay,
-		int stepEndMinute,
-		Real64 timeStepDuration,
+		int desDayNum,
+		int daySim,
+		int hourDay,
+		int stepEndMin,
+		Real64 timeStepDurat,
 		int numOfTimeStepsPerHour
 	){
 		Real64 const minutesPerHour( 60.0 );
 		int const hoursPerDay( 24 );
 
-		kindofSim		= kindOfSim;
+		kindOfSim		= kindSim;
 		envrnNum		= environmentNum;
-		designDayNum	= designDayNum;
-		dayOfSim		= dayOfSim;
-		hourOfDay		= hourOfDay;
-		stepEndMinute	= stepEndMinute;
-		timeStepDuration	= timeStepDuration;
+		designDayNum	= desDayNum;
+		dayOfSim		= daySim;
+		hourOfDay		= hourDay;
+		stepEndMinute	= stepEndMin;
+		timeStepDuration	= timeStepDurat;
 
 		stepStartMinute = stepEndMinute - timeStepDuration * minutesPerHour;
 
@@ -66,7 +66,7 @@ namespace EnergyPlus {
 	int logCounter( 0 );
 	//find which sizing envrn index
 
-	if (tmpztStepStamp.kindofSim == ksHVACSizeDesignDay) {
+	if (tmpztStepStamp.kindOfSim == ksHVACSizeDesignDay) {
 		for (int i = 0; i < NumOfDesignDaysInLogSet; i++ ){
 			if ( tmpztStepStamp.envrnNum == EnvrnIndexMapByEnvrn[ logCounter ] ){
 				logEnvrnIndex = logCounter;
@@ -91,7 +91,7 @@ namespace EnergyPlus {
 		
 		index =  GetZtStepIndex( tmpztStepStamp ); 
 
-		ztStepObj[ index ].kindofSim		= tmpztStepStamp.kindofSim;
+		ztStepObj[ index ].kindOfSim		= tmpztStepStamp.kindOfSim;
 		ztStepObj[ index ].envrnNum			= tmpztStepStamp.envrnNum;
 		ztStepObj[ index ].designDayNum		= tmpztStepStamp.designDayNum;
 		ztStepObj[ index ].dayOfSim			= tmpztStepStamp.dayOfSim;
@@ -258,7 +258,7 @@ namespace EnergyPlus {
 		}
 	}
 
-	int const SizingLoggerFramework::SetupVariableSizingLog(
+	int SizingLoggerFramework::SetupVariableSizingLog(
 //		int const SupplySideInletNodeNum  // change to pointer setup 
 		Real64 & rVariable,
 		int stepsInAverage

@@ -13,6 +13,7 @@ set( test_src
   HVACStandaloneERV.unit.cc
   OutputProcessor.unit.cc
   OutputReportTabular.unit.cc
+  SizingAnalysisObjects.unit.cc
   SizingManager.unit.cc
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc

@@ -33,7 +33,7 @@ public:
 class ZoneTimestepObject {
 public:
 
-	int kindofSim			= 0;
+	int kindOfSim			= 0;
 	int envrnNum			= 0;
 	int designDayNum		= 0;
 	int dayOfSim			= 0;    // since start of simulation
@@ -50,13 +50,13 @@ public:
 	std::vector< SystemTimestepObject > subSteps; //nested object array for system timesteps inside here.
 	
 	ZoneTimestepObject (
-		int kindOfSim,
+		int kindSim,
 		int environmentNum,
-		int designDayNum,
-		int dayOfSim,
-		int hourOfDay,
-		int stepEndMinute,
-		Real64 timeStepDuration,
+		int desDayNum,
+		int daySim,
+		int hourDay,
+		int stepEndMin,
+		Real64 timeStepDurat,
 		int numOfTimeStepsPerHour
 	);
 
@@ -119,7 +119,7 @@ private:
 class SizingLoggerFramework {
 public:
 	std::vector <SizingLog> logObjs;
-	int const SetupVariableSizingLog(
+	int SetupVariableSizingLog(
 		Real64 & rVariable,
 		int stepsInAverage
 	);
@@ -134,7 +134,7 @@ public:
 		int const HVACSizingIterCount
 	);
 private:
-	int NumOfLogs;
+	int NumOfLogs = 0;
 
 
 };
