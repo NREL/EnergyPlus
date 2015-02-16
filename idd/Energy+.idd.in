@@ -18803,6 +18803,7 @@ RoomAir:Node,
       \memo Define an air node for some types of nodal room air models
   A1, \field Name
       \type alpha
+      \reference RoomAirNodes
   A2, \field Node Type
       \required-field
       \type choice
@@ -20026,11 +20027,11 @@ ElectricEquipment:ITE:AirCooled,
        \key RoomAirModel
        \default AdjustedSupply
   A11, \field Air Inlet Room Air Model Node Name
-       \note Name of a RoomAir:Node object which is connect to the ITE air inlet.
+       \note Name of a RoomAir:Node object which is connected to the ITE air inlet.
        \type object-list
        \object-list RoomAirNodes
   A12, \field Air Outlet Room Air Model Node Name
-       \note Name of a RoomAir:Node object which is connect to the ITE air outlet.
+       \note Name of a RoomAir:Node object which is connected to the ITE air outlet.
        \type object-list
        \object-list RoomAirNodes
   A13, \field Supply Air Node Name
@@ -29421,7 +29422,6 @@ HVACTemplate:System:DedicatedOutdoorAir,
       \key  FixedSetpoint
       \key  Scheduled
       \key  OutdoorAirTemperatureReset
-	  \key  None
       \default FixedSetpoint
   N6, \field Cooling Coil Design Setpoint
       \note  Used for sizing and as constant setpoint if no Cooling Coil Setpoint Schedule Name is specified.
@@ -29482,7 +29482,6 @@ HVACTemplate:System:DedicatedOutdoorAir,
       \key  FixedSetpoint
       \key  Scheduled
       \key  OutdoorAirTemperatureReset
-	  \key  None
       \default FixedSetpoint
  N14, \field Heating Coil Design Setpoint
       \note   Used for sizing and as constant setpoint if no Heating Coil Setpoint Schedule Name is specified.
@@ -61546,7 +61545,6 @@ GroundHeatExchanger:Vertical,
   N7,   \field Ground Temperature
         \units C
         \minimum> 0.0
-	    \ip-units gal/min
   N8,   \field Grout Thermal Conductivity
         \units W/m-K
         \minimum> 0.0
@@ -65646,8 +65644,6 @@ EnergyManagementSystem:Sensor,
   A3 ; \field Output:Variable or Output:Meter Name
        \required-field
        \type external-list
-       \external-list autoRDDvariable
-       \external-list autoRDDmeter
        \external-list autoRDDvariableMeter
 
 EnergyManagementSystem:Actuator,
