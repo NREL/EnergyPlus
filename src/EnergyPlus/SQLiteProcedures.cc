@@ -2005,21 +2005,6 @@ void SQLite::updateSQLiteSimulationRecord( bool const completed, bool const comp
 	}
 }
 
-// void SQLite::createSQLiteZoneListTable()
-// {
-// for(int listNum = 1; listNum <= DataHeatBalance::NumOfZoneLists; ++listNum) {
-// 	auto const & zoneList = DataHeatBalance::ZoneList(listNum);
-// 	for(int zoneNum = 1; zoneNum <= zoneList.NumOfZones; ++zoneNum) {
-// 		sqliteBindInteger(m_zoneListInsertStmt, 1, listNum);
-// 		sqliteBindText(m_zoneListInsertStmt, 2, zoneList.Name);
-// 		sqliteBindForeignKey(m_zoneListInsertStmt, 3, zoneList.Zone(zoneNum));
-
-// 		sqliteStepCommand(m_zoneListInsertStmt);
-// 		sqliteResetCommand(m_zoneListInsertStmt);
-// 	}
-// }
-// }
-
 void SQLite::createZoneExtendedOutput()
 {
 	if( m_writeOutputToSQLite ) {

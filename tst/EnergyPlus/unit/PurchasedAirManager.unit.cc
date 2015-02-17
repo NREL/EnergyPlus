@@ -32,15 +32,6 @@ TEST( SizePurchasedAirTest, Test1 )
 	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios( ); }
 //	eso_stream = gio::out_stream( OutputFileStandard );
 
-	//CreateSQLiteDatabase(); (lifted from SimulationManager.cc)
-	try {
-		EnergyPlus::sqlite = std::unique_ptr<SQLite>( new SQLite( ) );
-	}
-	catch ( const std::runtime_error& error ) {
-		// Maybe this could be higher in the call stack, and then handle all runtime exceptions this way.
-		ShowFatalError( error.what( ) );
-	}
-
 	//ZoneEquipConfig.allocate( 1 );
 	//ZoneEquipConfig( 1 ).ZoneName = "Zone 1";
 	//ZoneEquipConfig( 1 ).ActualZoneNum = 1;
