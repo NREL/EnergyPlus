@@ -332,18 +332,16 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 nodiff=.false.
 
 !    !!!    Changes for this version
-   ! These will be conflicted, but uncommented when that branch is merged to develop
-   !           CASE('CHILLER:ELECTRIC:REFORMULATEDEIR')
-   !             nodiff=.false.
-   !             CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-   !             ! fields 1-9 aren't affected
-   !             OutArgs(1:9)=InArgs(1:9)
-   !             ! add a blank for the new curve type field
-   !             OutArgs(10)=blank
-   !             ! then we just push the rest of the fields down 1
-   !             OutArgs(11:)=InArgs(10:)
-   !             CurArgs = CurArgs + 1
-                
+              CASE('CHILLER:ELECTRIC:REFORMULATEDEIR')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! fields 1-9 aren't affected
+                OutArgs(1:9)=InArgs(1:9)
+                ! add a blank for the new curve type field
+                OutArgs(10)=blank
+                ! then we just push the rest of the fields down 1
+                OutArgs(11:)=InArgs(10:)
+                CurArgs = CurArgs + 1
                 
               CASE('SITE:GROUNDDOMAIN')
                 ! Object rename
@@ -358,8 +356,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(1:10) = InArgs(1:10)
                 OutArgs(11:CurArgs-1) = InArgs(12:CurArgs)
                 CurArgs = CurArgs - 1
-    !!!   Changes for report variables, meters, tables -- update names
 
+    !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
