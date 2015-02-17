@@ -778,7 +778,10 @@ namespace DualDuct {
 				PeopleFlow = 0.0;
 				for ( Loop = 1; Loop <= TotPeople; ++Loop ) {
 					if ( People( Loop ).ZonePtr != Damper( DamperNum ).ActualZoneNum ) continue;
-					PeopleFlow += People( Loop ).NumberOfPeople * OARequirements( Damper( DamperNum ).OARequirementsPtr ).OAFlowPerPerson;
+					int damperOAFlowMethod = OARequirements( Damper( DamperNum ).OARequirementsPtr ).OAFlowMethod;
+					if ( damperOAFlowMethod == OAFlowPPer || damperOAFlowMethod == OAFlowSum || damperOAFlowMethod == OAFlowMax ){
+						PeopleFlow += People( Loop ).NumberOfPeople * OARequirements( Damper( DamperNum ).OARequirementsPtr ).OAFlowPerPerson;
+					}
 				}
 				Damper( DamperNum ).OAPerPersonByDesignLevel = PeopleFlow;
 

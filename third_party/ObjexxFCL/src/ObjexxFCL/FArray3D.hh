@@ -30,9 +30,6 @@ class FArray3D : public FArray3< T >, public ObserverMulti
 private: // Types
 
 	typedef  FArray3< T >  Super;
-	typedef  typename Super::real_FArray  real_FArray;
-	typedef  typename Super::proxy_FArray  proxy_FArray;
-	typedef  typename Super::arg_FArray  arg_FArray;
 	typedef  internal::InitializerSentinel  InitializerSentinel;
 
 private: // Friend
@@ -70,19 +67,19 @@ public: // Types
 	typedef  typename Initializer::Function  InitializerFunction;
 
 	using Super::conformable;
+	using Super::initialize;
 	using Super::isize1;
 	using Super::isize2;
 	using Super::isize3;
 	using Super::l;
 	using Super::operator ();
-	using Super::reassign;
 	using Super::resize;
 	using Super::shift_set;
 	using Super::size1;
 	using Super::size2;
 	using Super::size3;
 	using Super::size_of;
-	using Super::swap3DB;
+	using Super::swap3;
 	using Super::u;
 	using Super::data_;
 	using Super::data_size_;
@@ -155,7 +152,7 @@ public: // Creation
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 					for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-						reassign( l, a( i1, i2, i3 ) );
+						initialize( l, a( i1, i2, i3 ) );
 					}
 				}
 			}
@@ -180,7 +177,7 @@ public: // Creation
 				for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 					for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 						for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-							reassign( l, a( i1, i2, i3 ) );
+							initialize( l, a( i1, i2, i3 ) );
 						}
 					}
 				}
@@ -312,7 +309,7 @@ public: // Creation
 			if ( a.dimensions_initialized() ) {
 				assert( conformable( a ) );
 				for ( size_type i = 0, e = size_; i < e; ++i ) {
-					reassign( i, a[ i ] );
+					initialize( i, a[ i ] );
 				}
 			}
 		}
@@ -358,7 +355,7 @@ public: // Creation
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 					for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-						reassign( l, a( i1, i2, i3 ) );
+						initialize( l, a( i1, i2, i3 ) );
 					}
 				}
 			}
@@ -383,7 +380,7 @@ public: // Creation
 				for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 					for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 						for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-							reassign( l, a( i1, i2, i3 ) );
+							initialize( l, a( i1, i2, i3 ) );
 						}
 					}
 				}
@@ -406,7 +403,7 @@ public: // Creation
 			if ( a.dimensions_initialized() ) {
 				assert( conformable( a ) );
 				for ( size_type i = 0, e = size_; i < e; ++i ) {
-					reassign( i, a[ i ] );
+					initialize( i, a[ i ] );
 				}
 			}
 		}
@@ -427,7 +424,7 @@ public: // Creation
 			if ( a.dimensions_initialized() ) {
 				assert( size_ == a.size() );
 				for ( size_type i = 0, e = size_; i < e; ++i ) {
-					reassign( i, a[ i ] );
+					initialize( i, a[ i ] );
 				}
 			}
 		}
@@ -448,7 +445,7 @@ public: // Creation
 			if ( a.dimensions_initialized() ) {
 				assert( size_ == a.size() );
 				for ( size_type i = 0, e = size_; i < e; ++i ) {
-					reassign( i, a[ i ] );
+					initialize( i, a[ i ] );
 				}
 			}
 		}
@@ -869,32 +866,12 @@ public: // Assignment: Value
 
 public: // Subscript
 
-	// Const Tail Starting at array( i1, i2, i3 )
-	inline
-	Tail const
-	a( int const i1, int const i2, int const i3 ) const
-	{
-		assert( ( I1_.contains( i1 ) ) && ( I2_.contains( i2 ) ) && ( I3_.contains( i3 ) ) );
-		size_type const offset( ( ( ( ( i3 * z2_ ) + i2 ) * z1_ ) + i1 ) - shift_ );
-		return Tail( static_cast< T const * >( data_ + offset ), data_size_ - offset );
-	}
-
-	// Tail Starting at array( i1, i2, i3 )
-	inline
-	Tail
-	a( int const i1, int const i2, int const i3 )
-	{
-		assert( ( I1_.contains( i1 ) ) && ( I2_.contains( i2 ) ) && ( I3_.contains( i3 ) ) );
-		size_type const offset( ( ( ( ( i3 * z2_ ) + i2 ) * z1_ ) + i1 ) - shift_ );
-		return Tail( data_ + offset, data_size_ - offset );
-	}
-
 	// Linear Index
 	inline
 	size_type
 	index( int const i1, int const i2, int const i3 ) const
 	{
-		assert( ( I1_.initialized() ) && ( I2_.initialized() ) && ( I3_.initialized() ) );
+		assert( dimensions_initialized() );
 		return ( ( ( ( ( i3 * z2_ ) + i2 ) * z1_ ) + i1 ) - shift_ );
 	}
 
@@ -914,6 +891,26 @@ public: // Subscript
 	{
 		assert( i < size_ );
 		return data_[ i ];
+	}
+
+	// Const Tail Starting at array( i1, i2, i3 )
+	inline
+	Tail const
+	a( int const i1, int const i2, int const i3 ) const
+	{
+		assert( contains( i1, i2, i3 ) );
+		size_type const offset( ( ( ( ( i3 * z2_ ) + i2 ) * z1_ ) + i1 ) - shift_ );
+		return Tail( static_cast< T const * >( data_ + offset ), data_size_ - offset );
+	}
+
+	// Tail Starting at array( i1, i2, i3 )
+	inline
+	Tail
+	a( int const i1, int const i2, int const i3 )
+	{
+		assert( contains( i1, i2, i3 ) );
+		size_type const offset( ( ( ( ( i3 * z2_ ) + i2 ) * z1_ ) + i1 ) - shift_ );
+		return Tail( data_ + offset, data_size_ - offset );
 	}
 
 public: // Predicate
@@ -1199,8 +1196,10 @@ public: // Modifier
 				int const b3( std::max( I3.l(), l3() ) ), e3( std::min( I3.u(), u3() ) );
 				for ( int i3 = b3; i3 <= e3; ++i3 ) {
 					for ( int i2 = b2; i2 <= e2; ++i2 ) {
-						for ( int i1 = b1; i1 <= e1; ++i1 ) {
-							o( i1, i2, i3 ) = operator ()( i1, i2, i3 );
+						size_type l( index( b1, i2, i3 ) );
+						size_type m( o.index( b1, i2, i3 ) );
+						for ( int i1 = b1; i1 <= e1; ++i1, ++l, ++m ) {
+							o[ m ] = operator []( l );
 						}
 					}
 				}
@@ -1222,8 +1221,10 @@ public: // Modifier
 				int const b3( std::max( I3.l(), l3() ) ), e3( std::min( I3.u(), u3() ) );
 				for ( int i3 = b3; i3 <= e3; ++i3 ) {
 					for ( int i2 = b2; i2 <= e2; ++i2 ) {
-						for ( int i1 = b1; i1 <= e1; ++i1 ) {
-							o( i1, i2, i3 ) = operator ()( i1, i2, i3 );
+						size_type l( index( b1, i2, i3 ) );
+						size_type m( o.index( b1, i2, i3 ) );
+						for ( int i1 = b1; i1 <= e1; ++i1, ++l, ++m ) {
+							o[ m ] = operator []( l );
 						}
 					}
 				}
@@ -1246,8 +1247,10 @@ public: // Modifier
 				int const b3( std::max( a.l3(), l3() ) ), e3( std::min( a.u3(), u3() ) );
 				for ( int i3 = b3; i3 <= e3; ++i3 ) {
 					for ( int i2 = b2; i2 <= e2; ++i2 ) {
-						for ( int i1 = b1; i1 <= e1; ++i1 ) {
-							o( i1, i2, i3 ) = operator ()( i1, i2, i3 );
+						size_type l( index( b1, i2, i3 ) );
+						size_type m( o.index( b1, i2, i3 ) );
+						for ( int i1 = b1; i1 <= e1; ++i1, ++l, ++m ) {
+							o[ m ] = operator []( l );
 						}
 					}
 				}
@@ -1270,8 +1273,10 @@ public: // Modifier
 				int const b3( std::max( a.l3(), l3() ) ), e3( std::min( a.u3(), u3() ) );
 				for ( int i3 = b3; i3 <= e3; ++i3 ) {
 					for ( int i2 = b2; i2 <= e2; ++i2 ) {
-						for ( int i1 = b1; i1 <= e1; ++i1 ) {
-							o( i1, i2, i3 ) = operator ()( i1, i2, i3 );
+						size_type l( index( b1, i2, i3 ) );
+						size_type m( o.index( b1, i2, i3 ) );
+						for ( int i1 = b1; i1 <= e1; ++i1, ++l, ++m ) {
+							o[ m ] = operator []( l );
 						}
 					}
 				}
@@ -1314,7 +1319,7 @@ public: // Modifier
 	{
 		if ( ( initializer_.is_active() ) && ( dimensions_initialized() ) ) {
 			if ( initializer_.is_value() ) {
-				reassign( initializer_.value() );
+				initialize( initializer_.value() );
 			} else if ( initializer_.is_function() ) {
 				initializer_.function()( *this );
 			}
@@ -1328,7 +1333,7 @@ public: // Modifier
 	swap( FArray3D & v )
 	{
 		using std::swap;
-		swap3DB( v );
+		swap3( v );
 		I1_.swap_no_notify( v.I1_ );
 		I2_.swap_no_notify( v.I2_ );
 		I3_.swap_no_notify( v.I3_ );
@@ -1373,7 +1378,7 @@ protected: // Functions
 
 private: // Functions
 
-	// Setup for IndexRange Constructor
+	// Set Up for IndexRange Constructor
 	inline
 	void
 	setup_real()
@@ -1664,10 +1669,11 @@ operator ==( FArray3S< T > const & a, FArray3S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) == b( i1, i2, i3 ) );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) == b( i1, i2, i3 ) );
 			}
 		}
 	}
@@ -1682,10 +1688,11 @@ operator !=( FArray3S< T > const & a, FArray3S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) != b( i1, i2, i3 ) );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) != b( i1, i2, i3 ) );
 			}
 		}
 	}
@@ -1700,10 +1707,11 @@ operator <( FArray3S< T > const & a, FArray3S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) < b( i1, i2, i3 ) );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) < b( i1, i2, i3 ) );
 			}
 		}
 	}
@@ -1718,10 +1726,11 @@ operator <=( FArray3S< T > const & a, FArray3S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) <= b( i1, i2, i3 ) );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) <= b( i1, i2, i3 ) );
 			}
 		}
 	}
@@ -1736,10 +1745,11 @@ operator >( FArray3S< T > const & a, FArray3S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) > b( i1, i2, i3 ) );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) > b( i1, i2, i3 ) );
 			}
 		}
 	}
@@ -1754,10 +1764,11 @@ operator >=( FArray3S< T > const & a, FArray3S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) >= b( i1, i2, i3 ) );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) >= b( i1, i2, i3 ) );
 			}
 		}
 	}
@@ -1772,11 +1783,11 @@ operator ==( FArray3S< T > const & a, FArray3< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
-	typename FArray3< T >::size_type l( 0 );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) == b[ l ] );
+				r[ l ] = ( a( i1, i2, i3 ) == b[ l ] );
 			}
 		}
 	}
@@ -1791,11 +1802,11 @@ operator !=( FArray3S< T > const & a, FArray3< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
-	typename FArray3< T >::size_type l( 0 );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) != b[ l ] );
+				r[ l ] = ( a( i1, i2, i3 ) != b[ l ] );
 			}
 		}
 	}
@@ -1810,11 +1821,11 @@ operator <( FArray3S< T > const & a, FArray3< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
-	typename FArray3< T >::size_type l( 0 );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) < b[ l ] );
+				r[ l ] = ( a( i1, i2, i3 ) < b[ l ] );
 			}
 		}
 	}
@@ -1829,11 +1840,11 @@ operator <=( FArray3S< T > const & a, FArray3< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
-	typename FArray3< T >::size_type l( 0 );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) <= b[ l ] );
+				r[ l ] = ( a( i1, i2, i3 ) <= b[ l ] );
 			}
 		}
 	}
@@ -1848,11 +1859,11 @@ operator >( FArray3S< T > const & a, FArray3< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
-	typename FArray3< T >::size_type l( 0 );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) > b[ l ] );
+				r[ l ] = ( a( i1, i2, i3 ) > b[ l ] );
 			}
 		}
 	}
@@ -1867,11 +1878,11 @@ operator >=( FArray3S< T > const & a, FArray3< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
-	typename FArray3< T >::size_type l( 0 );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) >= b[ l ] );
+				r[ l ] = ( a( i1, i2, i3 ) >= b[ l ] );
 			}
 		}
 	}
@@ -1939,10 +1950,11 @@ FArray3D< bool >
 operator ==( FArray3S< T > const & a, T const & t )
 {
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) == t );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) == t );
 			}
 		}
 	}
@@ -1956,10 +1968,11 @@ FArray3D< bool >
 operator !=( FArray3S< T > const & a, T const & t )
 {
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) != t );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) != t );
 			}
 		}
 	}
@@ -1973,10 +1986,11 @@ FArray3D< bool >
 operator <( FArray3S< T > const & a, T const & t )
 {
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) < t );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) < t );
 			}
 		}
 	}
@@ -1990,10 +2004,11 @@ FArray3D< bool >
 operator <=( FArray3S< T > const & a, T const & t )
 {
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) <= t );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) <= t );
 			}
 		}
 	}
@@ -2007,10 +2022,11 @@ FArray3D< bool >
 operator >( FArray3S< T > const & a, T const & t )
 {
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) > t );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) > t );
 			}
 		}
 	}
@@ -2024,10 +2040,11 @@ FArray3D< bool >
 operator >=( FArray3S< T > const & a, T const & t )
 {
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) >= t );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) >= t );
 			}
 		}
 	}
@@ -2098,10 +2115,11 @@ operator ==( MArray3< A, T > const & a, MArray3< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) == b( i1, i2, i3 ) );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) == b( i1, i2, i3 ) );
 			}
 		}
 	}
@@ -2116,10 +2134,11 @@ operator !=( MArray3< A, T > const & a, MArray3< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) != b( i1, i2, i3 ) );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) != b( i1, i2, i3 ) );
 			}
 		}
 	}
@@ -2134,10 +2153,11 @@ operator <( MArray3< A, T > const & a, MArray3< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) < b( i1, i2, i3 ) );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) < b( i1, i2, i3 ) );
 			}
 		}
 	}
@@ -2152,10 +2172,11 @@ operator <=( MArray3< A, T > const & a, MArray3< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) <= b( i1, i2, i3 ) );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) <= b( i1, i2, i3 ) );
 			}
 		}
 	}
@@ -2170,10 +2191,11 @@ operator >( MArray3< A, T > const & a, MArray3< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) > b( i1, i2, i3 ) );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) > b( i1, i2, i3 ) );
 			}
 		}
 	}
@@ -2188,10 +2210,11 @@ operator >=( MArray3< A, T > const & a, MArray3< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) >= b( i1, i2, i3 ) );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) >= b( i1, i2, i3 ) );
 			}
 		}
 	}
@@ -2206,11 +2229,11 @@ operator ==( MArray3< A, T > const & a, FArray3< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
-	typename FArray3< T >::size_type l( 0 );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) == b[ l ] );
+				r[ l ] = ( a( i1, i2, i3 ) == b[ l ] );
 			}
 		}
 	}
@@ -2225,11 +2248,11 @@ operator !=( MArray3< A, T > const & a, FArray3< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
-	typename FArray3< T >::size_type l( 0 );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) != b[ l ] );
+				r[ l ] = ( a( i1, i2, i3 ) != b[ l ] );
 			}
 		}
 	}
@@ -2244,11 +2267,11 @@ operator <( MArray3< A, T > const & a, FArray3< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
-	typename FArray3< T >::size_type l( 0 );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) < b[ l ] );
+				r[ l ] = ( a( i1, i2, i3 ) < b[ l ] );
 			}
 		}
 	}
@@ -2263,11 +2286,11 @@ operator <=( MArray3< A, T > const & a, FArray3< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
-	typename FArray3< T >::size_type l( 0 );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) <= b[ l ] );
+				r[ l ] = ( a( i1, i2, i3 ) <= b[ l ] );
 			}
 		}
 	}
@@ -2282,11 +2305,11 @@ operator >( MArray3< A, T > const & a, FArray3< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
-	typename FArray3< T >::size_type l( 0 );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) > b[ l ] );
+				r[ l ] = ( a( i1, i2, i3 ) > b[ l ] );
 			}
 		}
 	}
@@ -2301,11 +2324,11 @@ operator >=( MArray3< A, T > const & a, FArray3< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
-	typename FArray3< T >::size_type l( 0 );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) >= b[ l ] );
+				r[ l ] = ( a( i1, i2, i3 ) >= b[ l ] );
 			}
 		}
 	}
@@ -2374,10 +2397,11 @@ operator ==( MArray3< A, T > const & a, FArray3S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) == b( i1, i2, i3 ) );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) == b( i1, i2, i3 ) );
 			}
 		}
 	}
@@ -2392,10 +2416,11 @@ operator !=( MArray3< A, T > const & a, FArray3S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) != b( i1, i2, i3 ) );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) != b( i1, i2, i3 ) );
 			}
 		}
 	}
@@ -2410,10 +2435,11 @@ operator <( MArray3< A, T > const & a, FArray3S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) < b( i1, i2, i3 ) );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) < b( i1, i2, i3 ) );
 			}
 		}
 	}
@@ -2428,10 +2454,11 @@ operator <=( MArray3< A, T > const & a, FArray3S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) <= b( i1, i2, i3 ) );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) <= b( i1, i2, i3 ) );
 			}
 		}
 	}
@@ -2446,10 +2473,11 @@ operator >( MArray3< A, T > const & a, FArray3S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) > b( i1, i2, i3 ) );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) > b( i1, i2, i3 ) );
 			}
 		}
 	}
@@ -2464,10 +2492,11 @@ operator >=( MArray3< A, T > const & a, FArray3S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) >= b( i1, i2, i3 ) );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) >= b( i1, i2, i3 ) );
 			}
 		}
 	}
@@ -2535,10 +2564,11 @@ FArray3D< bool >
 operator ==( MArray3< A, T > const & a, T const & t )
 {
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) == t );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) == t );
 			}
 		}
 	}
@@ -2552,10 +2582,11 @@ FArray3D< bool >
 operator !=( MArray3< A, T > const & a, T const & t )
 {
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) != t );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) != t );
 			}
 		}
 	}
@@ -2569,10 +2600,11 @@ FArray3D< bool >
 operator <( MArray3< A, T > const & a, T const & t )
 {
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) < t );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) < t );
 			}
 		}
 	}
@@ -2586,10 +2618,11 @@ FArray3D< bool >
 operator <=( MArray3< A, T > const & a, T const & t )
 {
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) <= t );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) <= t );
 			}
 		}
 	}
@@ -2603,10 +2636,11 @@ FArray3D< bool >
 operator >( MArray3< A, T > const & a, T const & t )
 {
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) > t );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) > t );
 			}
 		}
 	}
@@ -2620,10 +2654,11 @@ FArray3D< bool >
 operator >=( MArray3< A, T > const & a, T const & t )
 {
 	FArray3D< bool > r( FArray3D< bool >::shape( a ) );
+	FArray3D< bool >::size_type l( 0 );
 	for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-				r( i1, i2, i3 ) = ( a( i1, i2, i3 ) >= t );
+			for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+				r[ l ] = ( a( i1, i2, i3 ) >= t );
 			}
 		}
 	}

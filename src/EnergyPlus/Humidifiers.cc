@@ -440,7 +440,6 @@ namespace Humidifiers {
 				SetupOutputVariable( "Humidifier Mains Water Volume [m3]", Humidifier( HumNum ).WaterCons, "System", "Sum", Humidifier( HumNum ).Name, _, "MAINSWATER", "HUMIDIFIER", _, "System" );
 
 			}
-
 			if ( Humidifier( HumNum ).HumType_Code == Humidifier_Steam_Electric ) {
 				SetupOutputVariable( "Humidifier Electric Power [W]", Humidifier( HumNum ).ElecUseRate, "System", "Average", Humidifier( HumNum ).Name );
 				SetupOutputVariable( "Humidifier Electric Energy [J]", Humidifier( HumNum ).ElecUseEnergy, "System", "Sum", Humidifier( HumNum ).Name, _, "ELECTRICITY", "HUMIDIFIER", _, "System" );
@@ -517,6 +516,7 @@ namespace Humidifiers {
 
 		if ( ! SysSizingCalc && MySetPointCheckFlag && DoSetPointTest ) {
 			for ( NumHum = 1; NumHum <= NumHumidifiers; ++NumHum ) {
+
 				if ( AirOutNode > 0 ) {
 					if ( Node( AirOutNode ).HumRatMin == SensedNodeFlagValue ) {
 						if ( ! AnyEnergyManagementSystemInModel ) {
@@ -668,6 +668,7 @@ namespace Humidifiers {
 						ReportSizingOutput( HumidifierType(  HumType_Code ),  Name, "User-Specified Nominal Capacity Volume [m3/s]",  NomCapVol );
 					}
 				} else {	// Sizing run done  
+
 					CheckZoneSizing( "Humidifier:SizeHumidifier",  Name );
 					AirDensity = FinalZoneSizing( CurZoneEqNum ).DesCoolDens;
 					MassFlowDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow ) * AirDensity;
@@ -793,9 +794,6 @@ namespace Humidifiers {
 				 NomPower = NomPowerDes;
 				ReportSizingOutput( HumidifierType(  HumType_Code ),  Name, "Design Size Rated Power [W]", NomPowerDes );
 			} else {
-				if (  NomPower >= 0.0 &&  NomCap > 0.0 ) {
-					NomPowerUser =  NomPower;
-					ReportSizingOutput( HumidifierType(  HumType_Code ),  Name, "Design Size Rated Power [W]", NomPowerDes, "User-Specified Rated Power [W]", NomPowerUser );
 					if ( DisplayExtraWarnings ) {
 						if ( ( std::abs( NomPowerDes - NomPowerUser ) / NomPowerUser ) > AutoVsHardSizingThreshold ) {
 							ShowMessage( "SizeHumidifier: Potential issue with equipment sizing for " + HumidifierType(  HumType_Code ) + " =\"" +  Name + "\"." );
@@ -805,9 +803,6 @@ namespace Humidifiers {
 							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 						}
 					}
-					if (  NomPower < NominalPower ) {
-						ShowWarningError( HumidifierType(  HumType_Code ) + ": specified Rated Power is less than nominal Rated Power for " + ModuleObjectType + " steam humidifier = " +  Name + ". " );
-						ShowContinueError( " specified Rated Power = " + RoundSigDigits(  NomPower, 2 ) );
 						ShowContinueError( " while expecting a minimum Rated Power = " + RoundSigDigits( NominalPower, 2 ) );
 					}
 				} else {
@@ -975,7 +970,6 @@ namespace Humidifiers {
 			AirOutTemp = AirInTemp;
 			AirOutHumRat = AirInHumRat;
 		}
-
 		if ( WaterAdd > 0.0 ) {
 			ElecUseRate = ( WaterAdd / NomCap ) * NomPower + FanPower + StandbyPower;
 		} else if ( GetCurrentScheduleValue( SchedPtr ) > 0.0 ) {
@@ -985,8 +979,7 @@ namespace Humidifiers {
 		}
 		WaterConsRate = WaterAdd / WaterDens;
 		AirOutMassFlowRate = AirInMassFlowRate;
-
-	}
+}
 
 	void
 	HumidifierData::CalcGasSteamHumidifier(
@@ -1314,7 +1307,7 @@ namespace Humidifiers {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -8,6 +8,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <SizingManager.hh>
 #include <CostEstimateManager.hh>
 #include <DataEnvironment.hh>
@@ -221,19 +222,19 @@ namespace SizingManager {
 			Available = true;
 			OutputFileZoneSizing = GetNewUnitNumber();
 			if ( SizingFileColSep == CharComma ) {
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileZoneSizing, "epluszsz.csv", flags ); write_stat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileZoneSizing, DataStringGlobals::outputZszCsvFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file \"epluszsz.csv\" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+ DataStringGlobals::outputZszCsvFileName +" for output (write)." );
 				}
 			} else if ( SizingFileColSep == CharTab ) {
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileZoneSizing, "epluszsz.tab", flags ); write_stat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileZoneSizing, DataStringGlobals::outputZszTabFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file \"epluszsz.tab\" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+DataStringGlobals::outputZszTabFileName+" for output (write)." );
 				}
 			} else {
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileZoneSizing, "epluszsz.txt", flags ); write_stat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileZoneSizing, DataStringGlobals::outputZszTxtFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file \"epluszsz.txt\" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+ DataStringGlobals::outputZszTxtFileName +" for output (write)." );
 				}
 			}
 
@@ -433,19 +434,19 @@ namespace SizingManager {
 			Available = true;
 			OutputFileSysSizing = GetNewUnitNumber();
 			if ( SizingFileColSep == CharComma ) {
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileSysSizing, "eplusssz.csv", flags ); write_stat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileSysSizing, DataStringGlobals::outputSszCsvFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file \"eplusssz.csv\" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+ DataStringGlobals::outputSszCsvFileName +" for output (write)." );
 				}
 			} else if ( SizingFileColSep == CharTab ) {
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileSysSizing, "eplusssz.tab", flags ); write_stat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileSysSizing, DataStringGlobals::outputSszTabFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file \"eplusssz.tab\" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+ DataStringGlobals::outputSszTabFileName +" for output (write)." );
 				}
 			} else {
-				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileSysSizing, "eplusssz.txt", flags ); write_stat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileSysSizing, DataStringGlobals::outputSszTxtFileName, flags ); write_stat = flags.ios(); }
 				if ( write_stat != 0 ) {
-					ShowFatalError( RoutineName + "Could not open file \"eplusssz.txt\" for output (write)." );
+					ShowFatalError( RoutineName + "Could not open file "+DataStringGlobals::outputSszTxtFileName+ " for output (write)." );
 				}
 			}
 			SimAir = true;
@@ -757,67 +758,9 @@ namespace SizingManager {
 					ErrorsFound = true;
 					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
 				}
-
 				OARequirements( OAIndex ).Name = Alphas( 1 );
 
-				if ( NumAlphas > 1 ) {
-					if ( SameString( Alphas( 2 ), "Flow/Person" ) ) {
-						OARequirements( OAIndex ).OAFlowMethod = OAFlowPPer;
-					} else if ( SameString( Alphas( 2 ), "Flow/Zone" ) ) {
-						OARequirements( OAIndex ).OAFlowMethod = OAFlow;
-					} else if ( SameString( Alphas( 2 ), "Flow/Area" ) ) {
-						OARequirements( OAIndex ).OAFlowMethod = OAFlowPerArea;
-					} else if ( SameString( Alphas( 2 ), "AirChanges/Hour" ) ) {
-						OARequirements( OAIndex ).OAFlowMethod = OAFlowACH;
-					} else if ( SameString( Alphas( 2 ), "Sum" ) ) {
-						OARequirements( OAIndex ).OAFlowMethod = OAFlowSum;
-					} else if ( SameString( Alphas( 2 ), "Maximum" ) ) {
-						OARequirements( OAIndex ).OAFlowMethod = OAFlowMax;
-					} else {
-						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OARequirements( OAIndex ).Name + "\"," );
-						ShowContinueError( "...Invalid " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\"," );
-						ShowContinueError( "...Valid choices are Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum." );
-						ErrorsFound = true;
-					}
-				} else {
-					// default value for Outdoor Air Method
-					OARequirements( OAIndex ).OAFlowMethod = OAFlowPPer;
-				}
-				if ( NumNumbers > 0 ) {
-					OARequirements( OAIndex ).OAFlowPerPerson = Numbers( 1 );
-				} else {
-					// default value for Outdoor Air Flow per Person
-					OARequirements( OAIndex ).OAFlowPerPerson = 0.00944;
-				}
-				// remaining fields default to 0
-				if ( NumNumbers > 1 ) {
-					OARequirements( OAIndex ).OAFlowPerArea = Numbers( 2 );
-				}
-				if ( NumNumbers > 2 ) {
-					OARequirements( OAIndex ).OAFlowPerZone = Numbers( 3 );
-				}
-				if ( NumNumbers > 3 ) {
-					OARequirements( OAIndex ).OAFlowACH = Numbers( 4 );
-				}
-				if ( NumAlphas > 2 ) {
-					if ( ! lAlphaBlanks( 3 ) ) {
-						OARequirements( OAIndex ).OAFlowFracSchPtr = GetScheduleIndex( Alphas( 3 ) );
-						if ( OARequirements( OAIndex ).OAFlowFracSchPtr > 0 ) {
-							if ( ! CheckScheduleValueMinMax( OARequirements( OAIndex ).OAFlowFracSchPtr, ">=", 0.0, "<=", 1.0 ) ) {
-								ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OARequirements( OAIndex ).Name + "\"," );
-								ShowContinueError( "Error found in " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
-								ShowContinueError( "Schedule values must be (>=0., <=1.)" );
-								ErrorsFound = true;
-							} else {
-								OARequirements( OAIndex ).MaxOAFractionSchValue = GetScheduleMaxValue( OARequirements( OAIndex ).OAFlowFracSchPtr );
-							}
-						} else {
-							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OARequirements( OAIndex ).Name + "\"," );
-							ShowContinueError( "...Not Found " + cAlphaFields( 3 ) + "=\"" + Alphas( 3 ) + "\"." );
-							ErrorsFound = true;
-						}
-					}
-				}
+				ProcessInputOARequirements( CurrentModuleObject, OAIndex, Alphas, NumAlphas, Numbers, NumNumbers, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields, ErrorsFound );
 
 			}
 
@@ -835,6 +778,155 @@ namespace SizingManager {
 		}
 
 	}
+
+	void
+	ProcessInputOARequirements(
+		std::string const & CurrentModuleObject,
+		int const OAIndex,
+		FArray1_string const & Alphas,
+		int & NumAlphas,
+		FArray1< Real64 > const & Numbers,
+		int & NumNumbers,
+		FArray1_bool const & lNumericBlanks, //Unused
+		FArray1_bool const & lAlphaBlanks,
+		FArray1_string const & cAlphaFields,
+		FArray1_string const & cNumericFields, //Unused
+		bool & ErrorsFound // If errors found in input
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         R. Raustad - FSEC
+		//       DATE WRITTEN   February 2010
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Obtains input data for the OA Requirements object and stores it in
+		// appropriate data structure.
+
+		// METHODOLOGY EMPLOYED:
+		// Uses InputProcessor "Get" routines to obtain data.
+		// This object requires only a name where the default values are assumed
+		// if subsequent fields are not entered.
+
+		// REFERENCES:
+		// na
+
+		using InputProcessor::VerifyName;
+		using InputProcessor::SameString;
+		using ScheduleManager::GetScheduleIndex;
+		using ScheduleManager::CheckScheduleValueMinMax;
+		using ScheduleManager::GetScheduleMaxValue;
+		using namespace DataIPShortCuts;
+		using General::RoundSigDigits;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// na
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "GetOARequirements: " ); // include trailing blank space
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+
+
+		if ( NumAlphas > 1 ) {
+			if ( SameString( Alphas( 2 ), "Flow/Person" ) ) {
+				OARequirements( OAIndex ).OAFlowMethod = OAFlowPPer;
+			}
+			else if ( SameString( Alphas( 2 ), "Flow/Zone" ) ) {
+				OARequirements( OAIndex ).OAFlowMethod = OAFlow;
+			}
+			else if ( SameString( Alphas( 2 ), "Flow/Area" ) ) {
+				OARequirements( OAIndex ).OAFlowMethod = OAFlowPerArea;
+			}
+			else if ( SameString( Alphas( 2 ), "AirChanges/Hour" ) ) {
+				OARequirements( OAIndex ).OAFlowMethod = OAFlowACH;
+			}
+			else if ( SameString( Alphas( 2 ), "Sum" ) ) {
+				OARequirements( OAIndex ).OAFlowMethod = OAFlowSum;
+			}
+			else if ( SameString( Alphas( 2 ), "Maximum" ) ) {
+				OARequirements( OAIndex ).OAFlowMethod = OAFlowMax;
+			}
+			else {
+				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OARequirements( OAIndex ).Name + "\"," );
+				ShowContinueError( "...Invalid " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\"," );
+				ShowContinueError( "...Valid choices are Flow/Person, Flow/Zone, Flow/Area, AirChanges/Hour, Sum, Maximum." );
+				ErrorsFound = true;
+			}
+		}
+		else {
+			// default value for Outdoor Air Method
+			OARequirements( OAIndex ).OAFlowMethod = OAFlowPPer;
+		}
+		if ( NumNumbers > 0 ) {
+			OARequirements( OAIndex ).OAFlowPerPerson = Numbers( 1 );
+		}
+		else {
+			// default value for Outdoor Air Flow per Person when per person flow is counted 
+			OARequirements( OAIndex ).OAFlowPerPerson = 0.00944;
+		}
+		// if one of the methods that should not use the flow per person field is chosen then zero out the flow per person to avoid it 
+		// being counted later #4378
+		if ( OARequirements( OAIndex ).OAFlowMethod != OAFlowPPer && OARequirements( OAIndex ).OAFlowMethod != OAFlowSum && OARequirements( OAIndex ).OAFlowMethod != OAFlowMax ){
+			OARequirements( OAIndex ).OAFlowPerPerson = 0.0;
+		}
+		// remaining fields default to 0
+		if ( NumNumbers > 1 ) {
+			if ( OARequirements( OAIndex ).OAFlowMethod == OAFlowPerArea || OARequirements( OAIndex ).OAFlowMethod == OAFlowSum || OARequirements( OAIndex ).OAFlowMethod == OAFlowMax ){
+				OARequirements( OAIndex ).OAFlowPerArea = Numbers( 2 );
+			}
+			else {
+				OARequirements( OAIndex ).OAFlowPerArea = 0.0;
+			}
+		}
+		if ( NumNumbers > 2 ) {
+			if ( OARequirements( OAIndex ).OAFlowMethod == OAFlow || OARequirements( OAIndex ).OAFlowMethod == OAFlowSum || OARequirements( OAIndex ).OAFlowMethod == OAFlowMax ){
+				OARequirements( OAIndex ).OAFlowPerZone = Numbers( 3 );
+			}
+			else {
+				OARequirements( OAIndex ).OAFlowPerZone = 0.0;
+			}
+		}
+		if ( NumNumbers > 3 ) {
+			if ( OARequirements( OAIndex ).OAFlowMethod == OAFlowACH || OARequirements( OAIndex ).OAFlowMethod == OAFlowSum || OARequirements( OAIndex ).OAFlowMethod == OAFlowMax ){
+				OARequirements( OAIndex ).OAFlowACH = Numbers( 4 );
+			}
+			else {
+				OARequirements( OAIndex ).OAFlowACH = 0.0;
+			}
+		}
+		if ( NumAlphas > 2 ) {
+			if ( !lAlphaBlanks( 3 ) ) {
+				OARequirements( OAIndex ).OAFlowFracSchPtr = GetScheduleIndex( Alphas( 3 ) );
+				if ( OARequirements( OAIndex ).OAFlowFracSchPtr > 0 ) {
+					if ( !CheckScheduleValueMinMax( OARequirements( OAIndex ).OAFlowFracSchPtr, ">=", 0.0, "<=", 1.0 ) ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OARequirements( OAIndex ).Name + "\"," );
+						ShowContinueError( "Error found in " + cAlphaFields( 3 ) + " = " + Alphas( 3 ) );
+						ShowContinueError( "Schedule values must be (>=0., <=1.)" );
+						ErrorsFound = true;
+					}
+					else {
+						OARequirements( OAIndex ).MaxOAFractionSchValue = GetScheduleMaxValue( OARequirements( OAIndex ).OAFlowFracSchPtr );
+					}
+				}
+				else {
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OARequirements( OAIndex ).Name + "\"," );
+					ShowContinueError( "...Not Found " + cAlphaFields( 3 ) + "=\"" + Alphas( 3 ) + "\"." );
+					ErrorsFound = true;
+				}
+			}
+		}
+
+	}
+
 
 	void
 	GetZoneAirDistribution()

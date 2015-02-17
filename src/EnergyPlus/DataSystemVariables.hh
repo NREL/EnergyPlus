@@ -55,6 +55,7 @@ namespace DataSystemVariables {
 	//  each individual HVAC controller with all controller iterations
 
 	extern std::string const MinReportFrequencyEnvVar; // environment var for reporting frequency.
+	extern std::string const cDisplayInputInAuditEnvVar; // environmental variable that enables the echoing of the input file into the audit file
 
 	// DERIVED TYPE DEFINITIONS
 	// na

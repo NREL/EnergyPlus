@@ -5,10 +5,8 @@ set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products"
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
-configure_file( CreateNewIDFUsingRulesV8_2_0.in.f90 "${CMAKE_CURRENT_BINARY_DIR}/CreateNewIDFUsingRulesV8_2_0.f90" )
-configure_file( IDDAssignV8_2_0.in.f90 "${CMAKE_CURRENT_BINARY_DIR}/IDDAssignV8_2_0.f90" )
-configure_file( CreateNewIDFUsingRulesV8_2_0.in.f90 "${CMAKE_CURRENT_BINARY_DIR}/CreateNewIDFUsingRulesV8_3_0.f90" )
-configure_file( IDDAssignV8_2_0.in.f90 "${CMAKE_CURRENT_BINARY_DIR}/IDDAssignV8_3_0.f90" )
+#configure_file( CreateNewIDFUsingRulesV8_3_0.in.f90 "${CMAKE_CURRENT_BINARY_DIR}/CreateNewIDFUsingRulesV8_3_0.f90" )
+#configure_file( IDDAssignV8_3_0.in.f90 "${CMAKE_CURRENT_BINARY_DIR}/IDDAssignV8_3_0.f90" )
 
 # first create a static library of shared stuff
 SET(LIB_SRC
@@ -25,11 +23,6 @@ SET(LIB_SRC
   VCompareUtilityRoutines.f90
 )
 add_library( TransitionLib STATIC ${LIB_SRC} )
-
-# then create all the binaries using just the Transition source that brings in other files
-SET(SRC
-  Transition.f90
-)
 
 list( APPEND VERSIONS 1_0_0 )
 list( APPEND VERSIONS 1_0_1 )
@@ -87,6 +80,12 @@ math(EXPR ii "${i} - 1")
 LIST(GET VERSIONS ${ii} OLD_VERSION)
 LIST(GET VERSIONS ${i} NEW_VERSION)
 
+# then create all the binaries using just the Transition source and the appropriate version of the main sub
+SET(SRC
+  Transition.f90
+  CreateNewIDFUsingRulesV${NEW_VERSION}.f90
+)
+
 STRING( REPLACE _ - OLD-VERSION ${OLD_VERSION} )
 STRING( REPLACE _ - NEW-VERSION ${NEW_VERSION} )
 
@@ -96,8 +95,8 @@ SET(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${LAST_NAME} )
 ADD_EXECUTABLE( "${LAST_NAME}" ${SRC} )
 TARGET_LINK_LIBRARIES( "${LAST_NAME}" TransitionLib )
 
-SET_PROPERTY( TARGET "${LAST_NAME}"
-              PROPERTY COMPILE_DEFINITIONS V${NEW_VERSION} )
+#SET_PROPERTY( TARGET "${LAST_NAME}"
+#              PROPERTY COMPILE_DEFINITIONS "V${NEW_VERSION}" )
 
 ENDFOREACH()
 

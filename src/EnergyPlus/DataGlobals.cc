@@ -41,6 +41,9 @@ namespace DataGlobals {
 	// Data
 	// -only module should be available to other modules and routines.
 	// Thus, all variables in this module must be PUBLIC.
+	bool runReadVars(false);
+	bool DDOnlySimulation(false);
+	bool AnnualSimulation(false);
 
 	// MODULE PARAMETER DEFINITIONS:
 	int const BeginDay( 1 );
@@ -63,7 +66,6 @@ namespace DataGlobals {
 	Real64 const TwoPi( 2.0 * Pi ); // 2*Pi 6.2831853071795864769252868
 	Real64 const GravityConstant( 9.807 );
 	Real64 const DegToRadians( Pi / 180.0 ); // Conversion for Degrees to Radians
-	Real64 const DegToRad( Pi / 180.0 ); // Conversion for Degrees to Radians
 	Real64 const RadToDeg( 180.0 / Pi ); // Conversion for Radians to Degrees
 	Real64 const SecInHour( 3600.0 ); // Conversion for hours to seconds
 	Real64 const HoursInDay( 24.0 ); // Number of Hourse in Day
@@ -162,10 +164,12 @@ namespace DataGlobals {
 	bool DisplayUnusedSchedules( false ); // True when selection for  "DisplayUnusedSchedules" is entered
 	bool DisplayAdvancedReportVariables( false ); // True when selection for  "DisplayAdvancedReportVariables" is entered
 	bool DisplayZoneAirHeatBalanceOffBalance( false ); // True when selection for  "DisplayZoneAirHeatBalanceOffBalance" is entered
+	bool DisplayInputInAudit( false ); // True when environmental variable "DisplayInputInAudit" is used
 	bool CreateMinimalSurfaceVariables( false ); // True when selection for  "CreateMinimalSurfaceVariables" is entered
 	Real64 CurrentTime( 0.0 ); // CurrentTime, in fractional hours, from start of day. Uses Loads time step.
 	int SimTimeSteps( 0 ); // Number of (Loads) timesteps since beginning of run period (environment).
-	int MinutesPerTimeStep; // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
+	int MinutesPerTimeStep( 0 ); // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
+	Real64 TimeStepZoneSec( 0.0 ); // Seconds per time step
 	bool MetersHaveBeenInitialized( false );
 	bool KickOffSimulation( false ); // Kick off simulation -- meaning run each environment for 1 or 2 time steps.
 	bool KickOffSizing( false ); // Kick off sizing -- meaning run each environment for 1 or 2 time steps.
@@ -187,7 +191,7 @@ namespace DataGlobals {
 	void ( *fMessagePtr )( std::string const & );
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted

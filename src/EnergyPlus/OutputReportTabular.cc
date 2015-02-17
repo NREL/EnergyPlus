@@ -15,6 +15,7 @@
 #include <ObjexxFCL/Time_Date.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <OutputReportTabular.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataCostEstimate.hh>
@@ -104,6 +105,7 @@ namespace OutputReportTabular {
 	using DataGlobals::TimeStep;
 	using DataGlobals::SecInHour;
 	using DataGlobals::TimeStepZone;
+	using DataGlobals::TimeStepZoneSec;
 	using DataGlobals::CurrentTime;
 	using DataGlobals::NumOfZones;
 	using DataGlobals::OutputFileDebug;
@@ -141,6 +143,7 @@ namespace OutputReportTabular {
 	int const unitsStyleJtoMJ( 2 );
 	int const unitsStyleJtoGJ( 3 );
 	int const unitsStyleInchPound( 4 );
+	int const unitsStyleNotFound( 5 );
 
 	int const isAverage( 1 );
 	int const isSum( 2 );
@@ -716,7 +719,7 @@ namespace OutputReportTabular {
 			++MonthlyFieldSetInputCount;
 			// if larger than current size grow the array
 			if ( MonthlyFieldSetInputCount > sizeMonthlyFieldSetInput ) {
-				MonthlyFieldSetInput.redimension( sizeMonthlyFieldSetInput += sizeIncrement );
+				MonthlyFieldSetInput.redimension( sizeMonthlyFieldSetInput *= 2 ); //Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
 			}
 		}
 		// initialize new record)
@@ -1321,16 +1324,9 @@ namespace OutputReportTabular {
 					}
 				}
 				// the first and only report is assigned to the found object name
-				if ( found != 0 ) {
+				if ( !warningAboutKeyNotFound( found, iInObj, CurrentModuleObject ) ) {
 					BinObjVarID( firstReport ).namesOfObj = objNames( found );
 					BinObjVarID( firstReport ).varMeterNum = objVarIDs( found );
-				} else {
-					ShowWarningError( CurrentModuleObject + ": Specified key not found, the first key will be used: " + OutputTableBinned( iInObj ).keyValue );
-					BinObjVarID( firstReport ).namesOfObj = objNames( 1 );
-					BinObjVarID( firstReport ).varMeterNum = objVarIDs( 1 );
-					if ( objVarIDs( 1 ) == 0 ) {
-						ShowWarningError( CurrentModuleObject + ": Specified meter or variable not found: " + objNames( 1 ) );
-					}
 				}
 				// reset the number of tables to one
 				OutputTableBinned( iInObj ).numTables = 1;
@@ -1357,6 +1353,19 @@ namespace OutputReportTabular {
 		AlphArray.deallocate();
 		NumArray.deallocate();
 
+	}
+
+	bool
+	warningAboutKeyNotFound( int foundIndex, int inObjIndex, const std::string & moduleName )
+	{
+		if ( foundIndex == 0 ) {
+			ShowWarningError( moduleName + ": Specified key not found: " + OutputTableBinned( inObjIndex ).keyValue + " for variable: " + OutputTableBinned( inObjIndex ).varOrMeter );
+			return true;
+		}
+		else {
+			return false;
+		}
+	
 	}
 
 	void
@@ -1486,18 +1495,8 @@ namespace OutputReportTabular {
 			}
 			//MonthlyUnitConversion
 			if ( NumAlphas >= 2 ) {
-				if ( SameString( AlphArray( 2 ), "None" ) ) {
-					unitsStyle = unitsStyleNone;
-				} else if ( SameString( AlphArray( 2 ), "JTOKWH" ) ) {
-					unitsStyle = unitsStyleJtoKWH;
-				} else if ( SameString( AlphArray( 2 ), "JTOMJ" ) ) {
-					unitsStyle = unitsStyleJtoMJ;
-				} else if ( SameString( AlphArray( 2 ), "JTOGJ" ) ) {
-					unitsStyle = unitsStyleJtoGJ;
-				} else if ( SameString( AlphArray( 2 ), "INCHPOUND" ) ) {
-					unitsStyle = unitsStyleInchPound;
-				} else {
-					unitsStyle = unitsStyleNone;
+				unitsStyle = SetUnitsStyleFromString( AlphArray( 2 ) );
+				if (unitsStyle == unitsStyleNotFound) {
 					ShowWarningError( CurrentModuleObject + ": Invalid " + cAlphaFieldNames( 2 ) + "=\"" + AlphArray( 2 ) + "\". No unit conversion will be performed. Normal SI units will be shown." );
 				}
 			} else {
@@ -1526,6 +1525,33 @@ namespace OutputReportTabular {
 		AlphArray.deallocate();
 		NumArray.deallocate();
 
+	}
+
+	int
+	SetUnitsStyleFromString(
+	std::string unitStringIn
+	)
+	{
+		int unitsStyleReturn;
+		if ( SameString( unitStringIn, "None" ) ) {
+			unitsStyleReturn = unitsStyleNone;
+		}
+		else if ( SameString( unitStringIn, "JTOKWH" ) ) {
+			unitsStyleReturn = unitsStyleJtoKWH;
+		}
+		else if ( SameString( unitStringIn, "JTOMJ" ) ) {
+			unitsStyleReturn = unitsStyleJtoMJ;
+		}
+		else if ( SameString( unitStringIn, "JTOGJ" ) ) {
+			unitsStyleReturn = unitsStyleJtoGJ;
+		}
+		else if ( SameString( unitStringIn, "INCHPOUND" ) ) {
+			unitsStyleReturn = unitsStyleInchPound;
+		}
+		else {
+			unitsStyleReturn = unitsStyleNotFound;
+		}
+		return unitsStyleReturn;
 	}
 
 	void
@@ -3075,9 +3101,9 @@ namespace OutputReportTabular {
 				curDel = del( iStyle );
 				if ( TableStyle( iStyle ) == tableStyleComma ) {
 					DisplayString( "Writing tabular output file results using comma format." );
-					tbl_stream.open( "eplustbl.csv" );
+					tbl_stream.open( DataStringGlobals::outputTblCsvFileName );
 					if ( ! tbl_stream ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.csv\" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblCsvFileName + "\" for output (write)." );
 					}
 					tbl_stream << "Program Version:" << curDel << VerString << '\n';
 					tbl_stream << "Tabular Output Report in Format: " << curDel << "Comma\n";
@@ -3091,9 +3117,9 @@ namespace OutputReportTabular {
 					tbl_stream << '\n';
 				} else if ( TableStyle( iStyle ) == tableStyleTab ) {
 					DisplayString( "Writing tabular output file results using tab format." );
-					tbl_stream.open( "eplustbl.tab" );
+					tbl_stream.open( DataStringGlobals::outputTblTabFileName );
 					if ( ! tbl_stream ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.tab\" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblTabFileName + "\" for output (write)." );
 					}
 					tbl_stream << "Program Version" << curDel << VerString << '\n';
 					tbl_stream << "Tabular Output Report in Format: " << curDel << "Tab\n";
@@ -3107,9 +3133,9 @@ namespace OutputReportTabular {
 					tbl_stream << '\n';
 				} else if ( TableStyle( iStyle ) == tableStyleHTML ) {
 					DisplayString( "Writing tabular output file results using HTML format." );
-					tbl_stream.open( "eplustbl.htm" );
+					tbl_stream.open( DataStringGlobals::outputTblHtmFileName );
 					if ( ! tbl_stream ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.htm\" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblHtmFileName + "\" for output (write)." );
 					}
 					tbl_stream << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/html4/loose.dtd\">\n";
 					tbl_stream << "<html>\n";
@@ -3138,9 +3164,9 @@ namespace OutputReportTabular {
 					tbl_stream << "  " << std::setw( 2 ) << td( 5 ) << ':' << std::setw( 2 ) << td( 6 ) << ':' << std::setw( 2 ) << td( 7 ) << std::setfill( ' ' ) << "</b></p>\n";
 				} else if ( TableStyle( iStyle ) == tableStyleXML ) {
 					DisplayString( "Writing tabular output file results using XML format." );
-					tbl_stream.open( "eplustbl.xml" );
+					tbl_stream.open( DataStringGlobals::outputTblXmlFileName );
 					if ( ! tbl_stream ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.xml\" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblXmlFileName + "\" for output (write)." );
 					}
 					tbl_stream << "<?xml version=\"1.0\"?>\n";
 					tbl_stream << "<EnergyPlusTabularReports>\n";
@@ -3159,9 +3185,9 @@ namespace OutputReportTabular {
 					tbl_stream << '\n';
 				} else {
 					DisplayString( "Writing tabular output file results using text format." );
-					tbl_stream.open( "eplustbl.txt" );
+					tbl_stream.open( DataStringGlobals::outputTblTxtFileName );
 					if ( ! tbl_stream ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.txt\" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file \"" + DataStringGlobals::outputTblTxtFileName + "\" for output (write)." );
 					}
 					tbl_stream << "Program Version: " << VerString << '\n';
 					tbl_stream << "Tabular Output Report in Format: " << curDel << "Fixed\n";
@@ -3642,7 +3668,7 @@ namespace OutputReportTabular {
 							if ( IndexTypeKey == HVACTSReporting ) {
 								curValue /= ( TimeStepSys * SecInHour );
 							} else {
-								curValue /= ( TimeStepZone * SecInHour );
+								curValue /= TimeStepZoneSec;
 							}
 						}
 						if ( curValue > oldResultValue ) {
@@ -3659,7 +3685,7 @@ namespace OutputReportTabular {
 							if ( IndexTypeKey == HVACTSReporting ) {
 								curValue /= ( TimeStepSys * SecInHour );
 							} else {
-								curValue /= ( TimeStepZone * SecInHour );
+								curValue /= TimeStepZoneSec;
 							}
 						}
 						if ( curValue < oldResultValue ) {
@@ -3754,7 +3780,7 @@ namespace OutputReportTabular {
 									if ( IndexTypeKey == HVACTSReporting ) {
 										scanValue /= ( TimeStepSys * SecInHour );
 									} else {
-										scanValue /= ( TimeStepZone * SecInHour );
+										scanValue /= TimeStepZoneSec;
 									}
 								}
 								MonthlyColumns( scanColumn ).reslt( Month ) = scanValue;
@@ -3796,7 +3822,7 @@ namespace OutputReportTabular {
 									if ( IndexTypeKey == HVACTSReporting ) {
 										scanValue /= ( TimeStepSys * SecInHour );
 									} else {
-										scanValue /= ( TimeStepZone * SecInHour );
+										scanValue /= TimeStepZoneSec;
 									}
 								}
 								if ( scanValue > oldScanValue ) {
@@ -3808,7 +3834,7 @@ namespace OutputReportTabular {
 									if ( IndexTypeKey == HVACTSReporting ) {
 										scanValue /= ( TimeStepSys * SecInHour );
 									} else {
-										scanValue /= ( TimeStepZone * SecInHour );
+										scanValue /= TimeStepZoneSec;
 									}
 								}
 								if ( scanValue < oldScanValue ) {
@@ -4198,7 +4224,7 @@ namespace OutputReportTabular {
 			for ( iResource = 1; iResource <= numResourceTypes; ++iResource ) {
 				curMeterNumber = meterNumTotalsBEPS( iResource );
 				if ( curMeterNumber > 0 ) {
-					curDemandValue = GetCurrentMeterValue( curMeterNumber ) / ( TimeStepZone * SecInHour );
+					curDemandValue = GetCurrentMeterValue( curMeterNumber ) / TimeStepZoneSec;
 					// check if current value is greater than existing peak demand value
 					if ( curDemandValue > gatherDemandTotal( iResource ) ) {
 						gatherDemandTotal( iResource ) = curDemandValue;
@@ -4212,12 +4238,12 @@ namespace OutputReportTabular {
 						for ( jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse ) {
 							curMeterNumber = meterNumEndUseBEPS( jEndUse, iResource );
 							if ( curMeterNumber > 0 ) {
-								curDemandValue = GetCurrentMeterValue( curMeterNumber ) / ( TimeStepZone * SecInHour );
+								curDemandValue = GetCurrentMeterValue( curMeterNumber ) / TimeStepZoneSec;
 								gatherDemandEndUse( jEndUse, iResource ) = curDemandValue;
 								for ( kEndUseSub = 1; kEndUseSub <= EndUseCategory( jEndUse ).NumSubcategories; ++kEndUseSub ) {
 									curMeterNumber = meterNumEndUseSubBEPS( iResource, jEndUse, kEndUseSub );
 									if ( curMeterNumber > 0 ) {
-										curDemandValue = GetCurrentMeterValue( curMeterNumber ) / ( TimeStepZone * SecInHour );
+										curDemandValue = GetCurrentMeterValue( curMeterNumber ) / TimeStepZoneSec;
 										gatherDemandEndUseSub( iResource, jEndUse, kEndUseSub ) = curDemandValue;
 									}
 								}
@@ -4793,7 +4819,7 @@ namespace OutputReportTabular {
 				WriteTimeBinTables();
 			}
 		}
-		EchoInputFile = FindUnitNumber( "eplusout.audit" );
+		EchoInputFile = FindUnitNumber( DataStringGlobals::outputAuditFileName );
 		gio::write( EchoInputFile, fmtLD ) << "MonthlyInputCount=" << MonthlyInputCount;
 		gio::write( EchoInputFile, fmtLD ) << "sizeMonthlyInput=" << sizeMonthlyInput;
 		gio::write( EchoInputFile, fmtLD ) << "MonthlyFieldSetInputCount=" << MonthlyFieldSetInputCount;
@@ -4909,7 +4935,7 @@ namespace OutputReportTabular {
 		bool coolingDesignlinepassed;
 		bool desConditionlinepassed;
 
-		{ IOFlags flags; gio::inquire( "in.stat", flags ); fileExists = flags.exists(); }
+		{ IOFlags flags; gio::inquire( DataStringGlobals::inStatFileName, flags ); fileExists = flags.exists(); }
 		readStat = 0;
 		isASHRAE = false;
 		iscalc = false;
@@ -4922,9 +4948,9 @@ namespace OutputReportTabular {
 		lineTypeinterim = 0;
 		if ( fileExists ) {
 			statFile = GetNewUnitNumber();
-			{ IOFlags flags; flags.ACTION( "READ" ); gio::open( statFile, "in.stat", flags ); readStat = flags.ios(); }
+			{ IOFlags flags; flags.ACTION( "READ" ); gio::open( statFile, DataStringGlobals::inStatFileName, flags ); readStat = flags.ios(); }
 			if ( readStat != 0 ) {
-				ShowFatalError( "FillWeatherPredefinedEntries: Could not open file \"in.stat\" for input (read)." );
+				ShowFatalError( "FillWeatherPredefinedEntries: Could not open file "+DataStringGlobals::inStatFileName+" for input (read)." );
 			}
 			IOFlags flags;
 			while ( readStat == 0 ) { //end of file, or error
@@ -5828,8 +5854,11 @@ namespace OutputReportTabular {
 		//CALL PreDefTableEntry(pdchLeedGenData,'Heating Degree Days','-')
 		//CALL PreDefTableEntry(pdchLeedGenData,'Cooling Degree Days','-')
 		PreDefTableEntry( pdchLeedGenData, "HDD and CDD data source", "Weather File Stat" );
-		PreDefTableEntry( pdchLeedGenData, "Total gross floor area [m2]", "-" );
-
+		if ( unitsStyle == unitsStyleInchPound ) {
+			PreDefTableEntry( pdchLeedGenData, "Total gross floor area [ft2]", "-" );
+		} else {
+			PreDefTableEntry( pdchLeedGenData, "Total gross floor area [m2]", "-" );
+		}
 	}
 
 	void
@@ -7074,7 +7103,11 @@ namespace OutputReportTabular {
 
 			tableBody = "";
 			tableBody( 1, 1 ) = RealToStr( convBldgGrossFloorArea, 2 );
-			PreDefTableEntry( pdchLeedGenData, "Total gross floor area [m2]", RealToStr( convBldgGrossFloorArea, 2 ) );
+			if ( unitsStyle == unitsStyleInchPound ) {
+				PreDefTableEntry( pdchLeedGenData, "Total gross floor area [ft2]", RealToStr( convBldgGrossFloorArea, 2 ) );
+			} else {
+				PreDefTableEntry( pdchLeedGenData, "Total gross floor area [m2]", RealToStr( convBldgGrossFloorArea, 2 ) );
+			}
 			tableBody( 2, 1 ) = RealToStr( convBldgCondFloorArea, 2 );
 			tableBody( 3, 1 ) = RealToStr( convBldgGrossFloorArea - convBldgCondFloorArea, 2 );
 
