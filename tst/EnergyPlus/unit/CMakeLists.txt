@@ -8,6 +8,7 @@ set( test_src
   HeatBalanceManager.unit.cc
   HVACStandaloneERV.unit.cc
   MixedAir.unit.cc
+  PurchasedAirManager.unit.cc
   OutputProcessor.unit.cc
   OutputReportTabular.unit.cc
   SizingManager.unit.cc
