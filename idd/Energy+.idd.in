@@ -48082,7 +48082,7 @@ Humidifier:Steam:Electric,
       \object-list WaterStorageTankNames
 
 Humidifier:Steam:Gas,
-      \memo Natural gas fired steam humidifier with fan.
+      \memo Natural gas fired steam humidifier with optional blower fan.
   A1, \field Name
       \required-field
   A2, \field Availability Schedule Name
@@ -48098,16 +48098,34 @@ Humidifier:Steam:Gas,
       \ip-units gal/min
       \autosizable
       \note The nominal full capacity water addition rate in m3/s of water at 5.05 C
-  N2, \field Thermal Efficiency
+  N2, \field Rated Gas Use Rate
+      \type real
+      \units W
+      \minimum 0.0
+      \ip-units W
+      \autosizable
+      \note if auto-sized, the rated gas use rate is calculated from the rated 
+      \note capacity and enthalpy rise of water from 20.0C to 100.0C steam and user
+      \note input thermal efficiency value specified in the next input field. If this 
+      \note input field is hard-sized and Inlet Water Temperature Option input field is 
+      \note selected as FixedInletWaterTemperature, then the thermal efficiency input       
+      \note field will not be used or else if the Inlet Water Temperature Option input 
+      \note field is selected as VariableInletWaterTemperature, then the thermal efficiency 
+      \note input value is overridden by a value calculated from the capacity, rated gas use 
+      \note rate and design condition.
+  N3, \field Thermal Efficiency
       \type real
       \units dimensionless
       \minimum> 0.0
       \maximum 1.0
-      \default 0.80  
+      \default 0.80   
       \note Based on the higher heating value of fuel.
-      \note The rated or nominal gas use rate is autosized internally using the rated capacity, 
-      \note enthalpy rise of water from 20.0C to 100.0C steam and user input thermal efficiency
-      \note value specified in the next input field. 
+      \note If “Rated Gas Use Rate” in the field above is not auto-sized and the Inlet Water 
+      \note Temperature Option input field is specified as FixedInletWaterTemperature, then the 
+      \note thermal efficiency specified will not be used in the calculation, or else if the 
+      \note Inlet Water Temperature Option input field is selected as VariableInletWaterTemperature, 
+      \note then the thermal efficiency value is overridden by a value calculated from the capacity, 
+      \note rated gas use rate and design condition.
   A3, \field Thermal Efficiency Modifier Curve Name
       \type object-list
       \object-list UniVariateCurves
@@ -48117,7 +48135,7 @@ Humidifier:Steam:Gas,
       \note Cubic = C1 + C2*PLR + C3*PLR^2 + C4*PLR^3
       \note This is thermal efficiency modifier curve name of gas fired steam humidifier.
       \note This curve is normalized, i.e., curve output value at rated condition is 1.0. 
-  N3, \field Rated Fan Power
+  N4, \field Rated Fan Power
       \type real
       \units W
       \minimum 0.0
@@ -48125,7 +48143,7 @@ Humidifier:Steam:Gas,
       \note The nominal full capacity electric power input to the blower fan in Watts. If no 
       \note blower fan is required to inject the dry steam to the supply air stream, then 
       \note this input field is set to zero.
-  N4, \field Auxiliary Electric Power
+  N5, \field Auxiliary Electric Power
       \type real
       \units W
       \minimum 0.0
@@ -48151,8 +48169,8 @@ Humidifier:Steam:Gas,
       \note inlet water temperature of 20C will be assumed.  
       \type choice
       \key FixedInletWaterTemperature
-      \key VariableInletWaterTemperature
-      \default FixedInletWaterTemperature
+      \key VariableInletWaterTemperature 
+      \default FixedInletWaterTemperature  
   
 Dehumidifier:Desiccant:NoFans,
        \memo This object models a solid desiccant dehumidifier. The process

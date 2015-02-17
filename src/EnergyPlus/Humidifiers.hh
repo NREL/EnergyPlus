@@ -40,259 +40,160 @@ namespace Humidifiers {
 
 	// Types
 
-	struct HumidifierData
-	{
-		// Members
-		std::string Name; // unique name of component
-		//    CHARACTER(len=MaxNameLength) :: HumType           =' ' ! Type of humidifier
-		int HumType_Code; // Pointer to Humidifier in list of humidifiers
-		int EquipIndex; // Pointer to Humidifier in list of humidifiers
-		std::string Sched; // name of availability schedule
-		int SchedPtr; // index of availability schedule
-		Real64 NomCapVol; // nominal capacity [m3/s of water]
-		Real64 NomCap; // nominal capacity [kg/s of water]
-		Real64 NomPower; // power consumption at full output [watts]
-		Real64 ThermalEffRated; // rated thermal efficiency of the gas fired humidifier [-]
-		Real64 CurMakeupWaterTemp; // makeup water temperature from main water [C] 
-		int EfficiencyCurvePtr; // index to efficiency curve
-		int EfficiencyCurveType; // type of efficiency curve
-		int InletWaterTempOption; // type inlet water temperature fixed or variable 
-		Real64 FanPower; // nominal fan power [watts]
-		Real64 StandbyPower; // standby power consumption [watts]
-		int AirInNode; // air inlet node of humidifier
-		int AirOutNode; // air outlet node of humidifier
-		Real64 AirInTemp; // inlet air temperature [C]
-		Real64 AirInHumRat; // inlet air humidity ratio [kg water / kg air]
-		Real64 AirInEnthalpy; // inlet air specific enthalpy [J/kg]
-		Real64 AirInMassFlowRate; // inlet air mass flow rate [kg/s]
-		Real64 AirOutTemp; // outlet air temperature [C]
-		Real64 AirOutHumRat; // outlet air humidity ratio [kg water / kg air]
-		Real64 AirOutEnthalpy; // outlet air specific enthalpy [J/kg]
-		Real64 AirOutMassFlowRate; // outlet air mass flow rate [kg/s]
-		Real64 HumRatSet; // humidity ratio setpoint [kg water / kg air]
-		Real64 WaterAdd; // water output (and consumption) [kg/s]
-		Real64 ElecUseEnergy; // electricity consumption [J]
-		Real64 ElecUseRate; // electricity consumption [W]
-		Real64 WaterCons; // water consumption in cubic meters
-		Real64 WaterConsRate; // water consumption rate in m3/s
-		bool SuppliedByWaterSystem; // true means there is storage tank, otherwise mains
-		int WaterTankID; // index pointer to water storage tank
-		int WaterTankDemandARRID; // index pointer to WaterStorage Demand arrays.
-		Real64 TankSupplyVdot;
-		Real64 TankSupplyVol;
-		Real64 StarvedSupplyVdot;
-		Real64 StarvedSupplyVol;
-		int TankSupplyID; // index pointer to WaterStorage supply arrays.
+	class HumidifierData {
 
-		// Default Constructor
-		HumidifierData() :
-			HumType_Code( 0 ),
-			EquipIndex( 0 ),
-			SchedPtr( 0 ),
-			NomCapVol( 0.0 ),
-			NomCap( 0.0 ),
-			NomPower( 0.0 ),
-			ThermalEffRated( 1.0 ),
-			CurMakeupWaterTemp( 0.0 ),
-			EfficiencyCurvePtr( 0 ),
-			EfficiencyCurveType( 0 ),
-			InletWaterTempOption( 0 ),
-			FanPower( 0.0 ),
-			StandbyPower( 0.0 ),
-			AirInNode( 0 ),
-			AirOutNode( 0 ),
-			AirInTemp( 0.0 ),
-			AirInHumRat( 0.0 ),
-			AirInEnthalpy( 0.0 ),
-			AirInMassFlowRate( 0.0 ),
-			AirOutTemp( 0.0 ),
-			AirOutHumRat( 0.0 ),
-			AirOutEnthalpy( 0.0 ),
-			AirOutMassFlowRate( 0.0 ),
-			HumRatSet( 0.0 ),
-			WaterAdd( 0.0 ),
-			ElecUseEnergy( 0.0 ),
-			ElecUseRate( 0.0 ),
-			WaterCons( 0.0 ),
-			WaterConsRate( 0.0 ),
-			SuppliedByWaterSystem( false ),
-			WaterTankID( 0 ),
-			WaterTankDemandARRID( 0 ),
-			TankSupplyVdot( 0.0 ),
-			TankSupplyVol( 0.0 ),
-			StarvedSupplyVdot( 0.0 ),
-			StarvedSupplyVol( 0.0 ),
-			TankSupplyID( 0 )
-		{}
+		private:
+		public:
 
-		//// Member Constructor
-		//HumidifierData(
-		//	std::string const & Name, // unique name of component
-		//	int const HumType_Code, // Pointer to Humidifier in list of humidifiers
-		//	int const EquipIndex, // Pointer to Humidifier in list of humidifiers
-		//	std::string const & Sched, // name of availability schedule
-		//	int const SchedPtr, // index of availability schedule
-		//	Real64 const NomCapVol, // nominal capacity [m3/s of water]
-		//	Real64 const NomCap, // nominal capacity [kg/s of water]
-		//	Real64 const NomPower, // power consumption at full output [watts]
-		//    Real64 const ThermalEffRated, // rated thermal efficiency of the gas fired humidifier [-]
-		//	Real64 const CurMakeupWaterTemp, // makeup water temperature from main water [C] 
-		//	int const EfficiencyCurvePtr, // index to efficiency curve
-		//	int const EfficiencyCurveType, // type of efficiency curve
-		//	int const InletWaterTempOption, // type inlet water temperature fixed or variable 
-		//	Real64 const FanPower, // nominal fan power [watts]
-		//	Real64 const StandbyPower, // standby power consumption [watts]
-		//	int const AirInNode, // air inlet node of humidifier
-		//	int const AirOutNode, // air outlet node of humidifier
-		//	Real64 const AirInTemp, // inlet air temperature [C]
-		//	Real64 const AirInHumRat, // inlet air humidity ratio [kg water / kg air]
-		//	Real64 const AirInEnthalpy, // inlet air specific enthalpy [J/kg]
-		//	Real64 const AirInMassFlowRate, // inlet air mass flow rate [kg/s]
-		//	Real64 const AirOutTemp, // outlet air temperature [C]
-		//	Real64 const AirOutHumRat, // outlet air humidity ratio [kg water / kg air]
-		//	Real64 const AirOutEnthalpy, // outlet air specific enthalpy [J/kg]
-		//	Real64 const AirOutMassFlowRate, // outlet air mass flow rate [kg/s]
-		//	Real64 const HumRatSet, // humidity ratio setpoint [kg water / kg air]
-		//	Real64 const WaterAdd, // water output (and consumption) [kg/s]
-		//	Real64 const ElecUseEnergy, // electricity consumption [J]
-		//	Real64 const ElecUseRate, // electricity consumption [W]
-		//	Real64 const WaterCons, // water consumption in cubic meters
-		//	Real64 const WaterConsRate, // water consumption rate in m3/s
-		//	bool const SuppliedByWaterSystem, // true means there is storage tank, otherwise mains
-		//	int const WaterTankID, // index pointer to water storage tank
-		//	int const WaterTankDemandARRID, // index pointer to WaterStorage Demand arrays.
-		//	Real64 const TankSupplyVdot,
-		//	Real64 const TankSupplyVol,
-		//	Real64 const StarvedSupplyVdot,
-		//	Real64 const StarvedSupplyVol,
-		//	int const TankSupplyID // index pointer to WaterStorage supply arrays.
-		//) :
-		//	Name( Name ),
-		//	HumType_Code( HumType_Code ),
-		//	EquipIndex( EquipIndex ),
-		//	Sched( Sched ),
-		//	SchedPtr( SchedPtr ),
-		//	NomCapVol( NomCapVol ),
-		//	NomCap( NomCap ),
-		//	NomPower( NomPower ),
-		//	ThermalEffRated( ThermalEffRated ),
-		//	CurMakeupWaterTemp( CurMakeupWaterTemp ),
-		//	EfficiencyCurvePtr( EfficiencyCurvePtr ),
-		//	EfficiencyCurveType( EfficiencyCurveType ),
-		//	InletWaterTempOption( InletWaterTempOption ),
-		//	FanPower( FanPower ),
-		//	StandbyPower( StandbyPower ),
-		//	AirInNode( AirInNode ),
-		//	AirOutNode( AirOutNode ),
-		//	AirInTemp( AirInTemp ),
-		//	AirInHumRat( AirInHumRat ),
-		//	AirInEnthalpy( AirInEnthalpy ),
-		//	AirInMassFlowRate( AirInMassFlowRate ),
-		//	AirOutTemp( AirOutTemp ),
-		//	AirOutHumRat( AirOutHumRat ),
-		//	AirOutEnthalpy( AirOutEnthalpy ),
-		//	AirOutMassFlowRate( AirOutMassFlowRate ),
-		//	HumRatSet( HumRatSet ),
-		//	WaterAdd( WaterAdd ),
-		//	ElecUseEnergy( ElecUseEnergy ),
-		//	ElecUseRate( ElecUseRate ),
-		//	WaterCons( WaterCons ),
-		//	WaterConsRate( WaterConsRate ),
-		//	SuppliedByWaterSystem( SuppliedByWaterSystem ),
-		//	WaterTankID( WaterTankID ),
-		//	WaterTankDemandARRID( WaterTankDemandARRID ),
-		//	TankSupplyVdot( TankSupplyVdot ),
-		//	TankSupplyVol( TankSupplyVol ),
-		//	StarvedSupplyVdot( StarvedSupplyVdot ),
-		//	StarvedSupplyVol( StarvedSupplyVol ),
-		//	TankSupplyID( TankSupplyID )
-		//{}
+				// Members
+				std::string Name; // unique name of component
+				//    CHARACTER(len=MaxNameLength) :: HumType           =' ' ! Type of humidifier
+				int HumType_Code; // Pointer to Humidifier in list of humidifiers
+				int EquipIndex; // Pointer to Humidifier in list of humidifiers
+				std::string Sched; // name of availability schedule
+				int SchedPtr; // index of availability schedule
+				Real64 NomCapVol; // nominal capacity [m3/s of water]
+				Real64 NomCap; // nominal capacity [kg/s of water]
+				Real64 NomPower; // power consumption at full output [watts]
+				Real64 ThermalEffRated; // rated thermal efficiency of the gas fired humidifier [-]
+				Real64 CurMakeupWaterTemp; // makeup water temperature from main water [C] 
+				int EfficiencyCurvePtr; // index to efficiency curve
+				int EfficiencyCurveType; // type of efficiency curve
+				int InletWaterTempOption; // type inlet water temperature fixed or variable 
+				Real64 FanPower; // nominal fan power [watts]
+				Real64 StandbyPower; // standby power consumption [watts]
+				int AirInNode; // air inlet node of humidifier
+				int AirOutNode; // air outlet node of humidifier
+				Real64 AirInTemp; // inlet air temperature [C]
+				Real64 AirInHumRat; // inlet air humidity ratio [kg water / kg air]
+				Real64 AirInEnthalpy; // inlet air specific enthalpy [J/kg]
+				Real64 AirInMassFlowRate; // inlet air mass flow rate [kg/s]
+				Real64 AirOutTemp; // outlet air temperature [C]
+				Real64 AirOutHumRat; // outlet air humidity ratio [kg water / kg air]
+				Real64 AirOutEnthalpy; // outlet air specific enthalpy [J/kg]
+				Real64 AirOutMassFlowRate; // outlet air mass flow rate [kg/s]
+				Real64 HumRatSet; // humidity ratio setpoint [kg water / kg air]
+				Real64 WaterAdd; // water output (and consumption) [kg/s]
+				Real64 ElecUseEnergy; // electricity consumption [J]
+				Real64 ElecUseRate; // electricity consumption [W]
+				Real64 WaterCons; // water consumption in cubic meters
+				Real64 WaterConsRate; // water consumption rate in m3/s
+				bool SuppliedByWaterSystem; // true means there is storage tank, otherwise mains
+				int WaterTankID; // index pointer to water storage tank
+				int WaterTankDemandARRID; // index pointer to WaterStorage Demand arrays.
+				Real64 TankSupplyVdot;
+				Real64 TankSupplyVol;
+				Real64 StarvedSupplyVdot;
+				Real64 StarvedSupplyVol;
+				int TankSupplyID; // index pointer to WaterStorage supply arrays.
+				bool MySizeFlag;
+				bool MyEnvrnFlag;
+				bool MySetPointCheckFlag;
+				// report variables for gas humidifier
+				Real64 ThermalEff; // current actual thermal efficiency gas humidifier [-]
+				Real64 GasUseRate; // gas consumption rate [W]
+				Real64 GasUseEnergy; // gas energy consumption [J]
+				Real64 AuxElecUseRate; // auxiliary electric power input [W]
+				Real64 AuxElecUseEnergy; //  auxiliary electric energy consumption [J]'
+
+
+				// Default Constructor
+				HumidifierData() :
+					Name( "" ),
+					HumType_Code( 0 ),
+					EquipIndex( 0 ),
+					SchedPtr( 0 ),
+					NomCapVol( 0.0 ),
+					NomCap( 0.0 ),
+					NomPower( 0.0 ),
+					ThermalEffRated( 1.0 ),
+					CurMakeupWaterTemp( 0.0 ),
+					EfficiencyCurvePtr( 0 ),
+					EfficiencyCurveType( 0 ),
+					InletWaterTempOption( 0 ),
+					FanPower( 0.0 ),
+					StandbyPower( 0.0 ),
+					AirInNode( 0 ),
+					AirOutNode( 0 ),
+					AirInTemp( 0.0 ),
+					AirInHumRat( 0.0 ),
+					AirInEnthalpy( 0.0 ),
+					AirInMassFlowRate( 0.0 ),
+					AirOutTemp( 0.0 ),
+					AirOutHumRat( 0.0 ),
+					AirOutEnthalpy( 0.0 ),
+					AirOutMassFlowRate( 0.0 ),
+					HumRatSet( 0.0 ),
+					WaterAdd( 0.0 ),
+					ElecUseEnergy( 0.0 ),
+					ElecUseRate( 0.0 ),
+					WaterCons( 0.0 ),
+					WaterConsRate( 0.0 ),
+					SuppliedByWaterSystem( false ),
+					WaterTankID( 0 ),
+					WaterTankDemandARRID( 0 ),
+					TankSupplyVdot( 0.0 ),
+					TankSupplyVol( 0.0 ),
+					StarvedSupplyVdot( 0.0 ),
+					StarvedSupplyVol( 0.0 ),
+					TankSupplyID( 0 ),
+					MySizeFlag( true ),
+					MyEnvrnFlag( true ),
+					MySetPointCheckFlag( true ),
+					ThermalEff( 0.0 ),
+					GasUseEnergy( 0.0 ),
+					GasUseRate( 0.0 ),
+					AuxElecUseRate( 0.0 ),
+					AuxElecUseEnergy( 0.0 )
+				{}
+
+				void
+				InitHumidifier(); // number of the current humidifier being simulated
+
+				void
+				SizeHumidifier(); // number of the current humidifier being sized
+
+				void
+				ControlHumidifier(
+					Real64 & WaterAddNeeded // moisture addition rate needed to meet minimum humidity ratio setpoint [kg/s]
+					);
+
+				void
+				CalcElecSteamHumidifier(
+					Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
+					);
+
+				void
+				CalcGasSteamHumidifier(
+					Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
+					);
+
+				void
+				UpdateReportWaterSystem(); // number of the current humidifier being simulated
+
+				void
+				UpdateHumidifier(); // number of the current humidifier being simulated
+
+				void
+				ReportHumidifier(); // number of the current humidifier being simulated
 
 	};
 
 
-	struct ReportVars {
-		// Members
-		Real64 ThermalEff; // current actual thermal efficiency gas humidifier [-]
-		Real64 GasUseRate; // gas consumption rate [W]
-		Real64 GasUseEnergy; // gas energy consumption [J]
-		Real64 AuxElecUseRate; // auxiliary electric power input [W]
-		Real64 AuxElecUseEnergy; //  auxiliary electric energy consumption [J]
-
-		// Default Constructor
-		ReportVars() :
-		ThermalEff( 0.0 ),
-		GasUseEnergy( 0.0 ),
-		GasUseRate( 0.0 ),
-		AuxElecUseRate( 0.0 ),
-		AuxElecUseEnergy( 0.0 )
-		{}
-
-		//// Member Constructor
-		//ReportVars(
-		//Real64 const ThermalEff, // current actual thermal efficiency gas humidifier [-]
-		//Real64 const GasUseRate, // gas consumption rate [W]
-		//Real64 const GasUseEnergy, // gas energy consumption [J]
-		//Real64 const AuxElecUseRate, // auxiliary electric power input [W]
-		//Real64 const AuxElecUseEnergy //  auxiliary electric energy consumption [W]
-		//) :
-		//ThermalEff( ThermalEff ),
-		//GasUseRate( GasUseRate ),
-		//GasUseEnergy( GasUseEnergy ),
-		//AuxElecUseRate( AuxElecUseRate ),
-		//AuxElecUseEnergy( AuxElecUseEnergy )
-		//{}
-
-		};
-
 	// Object Data
 	extern FArray1D< HumidifierData > Humidifier;
-	extern FArray1D< ReportVars > HumidifierReport;
 
 	// Functions
-
 	void
 	SimHumidifier(
 		std::string const & CompName, // name of the humidifier unit
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		int & CompIndex // Pointer to Humidifier Unit
-	);
+		);
 
 	void
 	GetHumidifierInput();
 
-	void
-	InitHumidifier( int const HumNum ); // number of the current humidifier being simulated
-
-	void
-	SizeHumidifier( int const HumNum ); // number of the current humidifier being sized
-
-	void
-	ControlHumidifier(
-		int const HumNum, // number of the current humidifier being simulated
-		Real64 & WaterAddNeeded // moisture addition rate needed to meet minimum humidity ratio setpoint [kg/s]
-	);
-
-	void
-	CalcElecSteamHumidifier(
-		int const HumNum, // number of the current humidifier being simulated
-		Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
-	);
-
-	void
-	CalcGasSteamHumidifier(
-		int const HumNum, // number of the current humidifier being simulated
-		Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
-	);
-
-	void
-	UpdateReportWaterSystem( int const HumNum ); // number of the current humidifier being simulated
-
-	void
-	UpdateHumidifier( int const HumNum ); // number of the current humidifier being simulated
-
-	void
-	ReportHumidifier( int const HumNum ); // number of the current humidifier being simulated
 
 	//     NOTICE
 
