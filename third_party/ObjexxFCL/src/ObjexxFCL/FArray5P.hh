@@ -29,8 +29,6 @@ class FArray5P : public FArray5< T >, public ObserverMulti
 private: // Types
 
 	typedef  FArray5< T >  Super;
-	typedef  typename Super::real_FArray  real_FArray;
-	typedef  typename Super::proxy_FArray  proxy_FArray;
 	typedef  internal::ProxySentinel  ProxySentinel;
 
 private: // Friend
@@ -113,7 +111,7 @@ public: // Creation
 
 	// Real Constructor
 	inline
-	FArray5P( real_FArray const & a ) :
+	FArray5P( FArray5D< T > const & a ) :
 	 Super( a, ProxySentinel() ),
 	 I1_( a.I1_ ),
 	 I2_( a.I2_ ),
@@ -214,7 +212,7 @@ public: // Creation
 
 	// Real + IndexRange Constructor
 	inline
-	FArray5P( real_FArray const & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5 ) :
+	FArray5P( FArray5D< T > const & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5 ) :
 	 Super( a, ProxySentinel() ),
 	 I1_( I1 ),
 	 I2_( I2 ),
@@ -311,7 +309,7 @@ public: // Creation
 
 	// Non-Const Real Constructor
 	inline
-	FArray5P( real_FArray & a ) :
+	FArray5P( FArray5D< T > & a ) :
 	 Super( a, ProxySentinel() ),
 	 I1_( a.I1_ ),
 	 I2_( a.I2_ ),
@@ -412,7 +410,7 @@ public: // Creation
 
 	// Non-Const Real + IndexRange Constructor
 	inline
-	FArray5P( real_FArray & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5 ) :
+	FArray5P( FArray5D< T > & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5 ) :
 	 Super( a, ProxySentinel() ),
 	 I1_( I1 ),
 	 I2_( I2 ),
@@ -793,6 +791,15 @@ public: // Assignment: Value
 
 public: // Subscript
 
+	// Linear Index
+	inline
+	size_type
+	index( int const i1, int const i2, int const i3, int const i4, int const i5 ) const
+	{
+		assert( ( ( I1_.initialized() ) && ( I2_.initialized() ) && ( I3_.initialized() ) && ( I4_.initialized() ) && ( I5_.initialized() ) ) );
+		return ( ( ( ( ( ( ( ( ( i5 * z4_ ) + i4 ) * z3_ ) + i3 ) * z2_ ) + i2 ) * z1_ ) + i1 ) - shift_ );
+	}
+
 	// Const Tail Starting at array( i1, i2, i3, i4, i5 )
 	inline
 	Tail const
@@ -812,15 +819,6 @@ public: // Subscript
 		assert( ( I1_.contains( i1 ) ) && ( I2_.contains( i2 ) ) && ( I3_.contains( i3 ) ) && ( I4_.contains( i4 ) ) && ( I5_.contains( i5 ) ) );
 		size_type const offset( ( ( ( ( ( ( ( ( i5 * z4_ ) + i4 ) * z3_ ) + i3 ) * z2_ ) + i2 ) * z1_ ) + i1 ) - shift_ );
 		return Tail( data_ + offset, ( data_size_ != npos ? data_size_ - offset : npos ) );
-	}
-
-	// Linear Index
-	inline
-	size_type
-	index( int const i1, int const i2, int const i3, int const i4, int const i5 ) const
-	{
-		assert( ( ( I1_.initialized() ) && ( I2_.initialized() ) && ( I3_.initialized() ) && ( I4_.initialized() ) && ( I5_.initialized() ) ) );
-		return ( ( ( ( ( ( ( ( ( i5 * z4_ ) + i4 ) * z3_ ) + i3 ) * z2_ ) + i2 ) * z1_ ) + i1 ) - shift_ );
 	}
 
 public: // Predicate
@@ -1097,7 +1095,7 @@ public: // Modifier
 	// Attach to Real Array
 	inline
 	FArray5P &
-	attach( real_FArray const & a )
+	attach( FArray5D< T > const & a )
 	{
 		Base::attach( a );
 		z1_ = a.z1_;
@@ -1118,7 +1116,7 @@ public: // Modifier
 	// Attach to Non-Const Real Array
 	inline
 	FArray5P &
-	attach( real_FArray & a )
+	attach( FArray5D< T > & a )
 	{
 		Base::attach( a );
 		z1_ = a.z1_;
@@ -1183,7 +1181,7 @@ public: // Modifier
 	FArray5P &
 	attach( Base const & a )
 	{
-		Base::attach( a, 5 );
+		Base::attach< 5 >( a );
 		z1_ = z2_ = z3_ = z4_ = 1;
 		I1_ = 1;
 		I2_ = 1;
@@ -1201,7 +1199,7 @@ public: // Modifier
 	FArray5P &
 	attach( Base & a )
 	{
-		Base::attach( a, 5 );
+		Base::attach< 5 >( a );
 		z1_ = z2_ = z3_ = z4_ = 1;
 		I1_ = 1;
 		I2_ = 1;
@@ -1219,7 +1217,7 @@ public: // Modifier
 	FArray5P &
 	attach( Tail const & s )
 	{
-		Base::attach( s, 5 );
+		Base::attach< 5 >( s );
 		z1_ = z2_ = z3_ = z4_ = 1;
 		I1_ = 1;
 		I2_ = 1;
@@ -1236,7 +1234,7 @@ public: // Modifier
 	FArray5P &
 	attach( Tail & s )
 	{
-		Base::attach( s, 5 );
+		Base::attach< 5 >( s );
 		z1_ = z2_ = z3_ = z4_ = 1;
 		I1_ = 1;
 		I2_ = 1;
@@ -1253,7 +1251,7 @@ public: // Modifier
 	FArray5P &
 	attach( T const & t )
 	{
-		Base::attach( t, 5 );
+		Base::attach< 5 >( t );
 		z1_ = z2_ = z3_ = z4_ = 1;
 		I1_ = 1;
 		I2_ = 1;
@@ -1270,7 +1268,7 @@ public: // Modifier
 	FArray5P &
 	attach( T & t )
 	{
-		Base::attach( t, 5 );
+		Base::attach< 5 >( t );
 		z1_ = z2_ = z3_ = z4_ = 1;
 		I1_ = 1;
 		I2_ = 1;

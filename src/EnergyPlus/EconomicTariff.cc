@@ -3004,7 +3004,7 @@ namespace EconomicTariff {
 		using DataGlobals::HourOfDay;
 		using DataGlobals::TimeStep;
 		using DataGlobals::SecInHour;
-		using DataGlobals::TimeStepZone;
+		using DataGlobals::TimeStepZoneSec;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataEnvironment::Month;
 
@@ -3049,7 +3049,7 @@ namespace EconomicTariff {
 				// remember the demand is still energy over a period of time divided by the
 				// length of time. This gathers the energy also.
 				tariff( iTariff ).collectEnergy += curInstantValue;
-				tariff( iTariff ).collectTime += ( TimeStepZone * SecInHour );
+				tariff( iTariff ).collectTime += TimeStepZoneSec;
 				//added *SecInHour when adding RTP support August 2008
 				if ( tariff( iTariff ).collectTime >= tariff( iTariff ).demWinTime * SecInHour ) {
 					//get current value that has been converted into desired units

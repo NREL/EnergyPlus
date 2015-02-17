@@ -31441,6 +31441,8 @@ DO iSys = 1, numCompactDedOutAir
       coolCoilUnitOutlet = TRIM(FldVal(base + doasNameOff))//' Cooling Coil Outlet'
     END IF
     lastOutlet       = TRIM(coolCoilUnitOutlet)
+  ELSE ! If there is no cooling coil, set to fan outlet in case the cooling setpoint is needed for heat recovery controls
+      coolCoilUnitOutlet = TRIM(FldVal(base + doasNameOff))//' Supply Fan Outlet'
   END IF
 
   ! desuperheater reheat coil
@@ -31691,8 +31693,8 @@ DO iSys = 1, numCompactDedOutAir
     CALL AddToObjFld('Schedule Name', base + doasSysAvailSchedNameOff,'',.TRUE.)
   END IF
 
-  ! Cooling coil setpoint manager
-  IF (coolCoilKind .NE. ccNone) THEN
+  ! Cooling coil setpoint manager (If there is no cooling coil and no heating coil but there is heat recovery, then need this)
+  IF ((coolCoilKind .NE. ccNone) .OR. ((heatRecovery .NE. htrecNone) .AND. heatCoilType .EQ. ctNone)) THEN
     CALL CreateNewObj('NodeList')
     CALL AddToObjFld('Name', base + doasNameOff,' Cooling Setpoint Nodes')
     IF (dehumidCtrlKind .EQ. dehumidCoolRhtDesuper) THEN
@@ -31727,7 +31729,7 @@ DO iSys = 1, numCompactDedOutAir
     ELSE
       CALL AddToObjFld('Setpoint Node or NodeList Name', base + doasNameOff,' Cooling Setpoint Nodes',.TRUE.)
     END IF
-    IF (supFanPlacement .EQ. sfpDrawThru) THEN
+    IF ((supFanPlacement .EQ. sfpDrawThru) .AND. (coolCoilKind .NE. ccNone)) THEN
       !***SetpointManager:MixedAir
       CALL CreateNewObj('SetpointManager:MixedAir')
       CALL AddToObjFld('Name', base + doasNameOff,' Cooling Coil Air Temp Manager')

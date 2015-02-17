@@ -82,15 +82,19 @@ getAbsolutePath( std::string const& path )
 
 	std::string pathTail;
 	if ( parentPath == "." )
-		pathTail = pathChar + path;
+		pathTail = path;
 	else
-		pathTail = pathChar + path.substr(parentPath.size(), path.size() - parentPath.size());
+		pathTail = path.substr(parentPath.size(), path.size() - parentPath.size());
 
 	char *absolutePathTemp = realpath(parentPath.c_str(), NULL);
 	if (absolutePathTemp != NULL) {
 		std::string absoluteParentPath(absolutePathTemp);
 	    free(absolutePathTemp);
-		return absoluteParentPath + pathTail;
+	    if (pathTail.size() == 0)
+	    	return absoluteParentPath;
+	    else
+	    	return absoluteParentPath + pathChar + pathTail;
+
 	}
 	else {
 		DisplayString("ERROR: Could not resolve path for " + path + ".");
@@ -110,7 +114,16 @@ getProgramPath()
 	uint32_t pathSize = sizeof(executableRelativePath);
 	_NSGetExecutablePath(executableRelativePath, &pathSize);
 #elif __linux__
-	ssize_t len = readlink("/proc/self/exe", executableRelativePath, sizeof(executableRelativePath)-1);
+  ssize_t len = readlink("/proc/self/exe", executableRelativePath, sizeof(executableRelativePath)-1);
+  if (len == -1)
+  {
+    DisplayString("ERROR: Unable to locate executable.");
+    exit(EXIT_FAILURE);
+  }
+  else
+  {
+    executableRelativePath[len] = '\0';
+  }
 #elif _WIN32
 	GetModuleFileName(NULL, executableRelativePath, sizeof(executableRelativePath));
 #endif

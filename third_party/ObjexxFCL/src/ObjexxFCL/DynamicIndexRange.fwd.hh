@@ -18,9 +18,6 @@ namespace ObjexxFCL {
 // Forward
 class DynamicIndexRange;
 
-// Types
-typedef  DynamicIndexRange  DRange;
-
 } // ObjexxFCL
 
 #endif // ObjexxFCL_DynamicIndexRange_fwd_hh_INCLUDED

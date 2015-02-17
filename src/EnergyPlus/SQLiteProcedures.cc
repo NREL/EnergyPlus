@@ -290,21 +290,21 @@ bool SQLite::writeTabularDataToSQLite() const
 
 void SQLite::sqliteBegin()
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		sqliteExecuteCommand("BEGIN;");
 	}
 }
 
 void SQLite::sqliteCommit()
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		sqliteExecuteCommand("COMMIT;");
 	}
 }
 
 void SQLite::sqliteWriteMessage(const std::string & message)
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		m_errorStream << "SQLite3 message, " << message << std::endl;
 	}
 }
@@ -1260,7 +1260,7 @@ void SQLite::initializeTabularDataView()
 
 void SQLite::initializeIndexes()
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		sqliteExecuteCommand("CREATE INDEX rddMTR ON ReportDataDictionary (IsMeter);");
 		sqliteExecuteCommand("CREATE INDEX redRD ON ReportExtendedData (ReportDataIndex);");
 
@@ -1357,7 +1357,7 @@ void SQLite::parseUnitsAndDescription(const std::string & combinedString, std::s
 	std::size_t leftPos = combinedString.find("[");
 	std::size_t rightPos = combinedString.find("]");
 
-	if( (leftPos < rightPos) && (leftPos != std::string::npos) && (rightPos != std::string::npos) ) {
+	if ( (leftPos < rightPos) && (leftPos != std::string::npos) && (rightPos != std::string::npos) ) {
 		units = combinedString.substr(leftPos + 1,rightPos - leftPos - 1);
 		description = combinedString.substr(0,leftPos - 1);
 	} else {
@@ -1384,7 +1384,7 @@ void SQLite::createSQLiteReportDictionaryRecord (
 		Optional_string_const scheduleName
 )
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		sqliteBindInteger(m_reportDictionaryInsertStmt, 1, reportVariableReportID);
 		sqliteBindLogical(m_reportDictionaryInsertStmt, 2, isMeter);
 		sqliteBindText(m_reportDictionaryInsertStmt, 3, storageType(storeTypeIndex));
@@ -1394,7 +1394,7 @@ void SQLite::createSQLiteReportDictionaryRecord (
 		sqliteBindText(m_reportDictionaryInsertStmt, 7, variableName);
 		sqliteBindText(m_reportDictionaryInsertStmt, 8, reportingFreqName(reportingFreq));
 
-		if(scheduleName.present()) {
+		if ( scheduleName.present() ) {
 			sqliteBindText(m_reportDictionaryInsertStmt, 9, scheduleName());
 		} else {
 			sqliteBindNULL(m_reportDictionaryInsertStmt, 9);
@@ -1418,7 +1418,7 @@ void SQLite::createSQLiteReportDataRecord(
 		Optional_int_const minutesPerTimeStep
 )
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		static int dataIndex = 0;
 		static int extendedDataIndex = 0;
 
@@ -1450,7 +1450,7 @@ void SQLite::createSQLiteReportDataRecord(
 
 			++extendedDataIndex;
 
-			if(minutesPerTimeStep.present()) { // This is for data created by a 'Report Meter' statement
+			if ( minutesPerTimeStep.present() ) { // This is for data created by a 'Report Meter' statement
 				switch(reportingInterval()) {
 					case LocalReportHourly:
 					case LocalReportDaily:
@@ -1539,7 +1539,7 @@ void SQLite::createSQLiteTimeIndexRecord(
 	bool const warmupFlag
 )
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		int intStartMinute = 0;
 		int intervalInMinutes = 60;
 
@@ -1694,7 +1694,7 @@ void SQLite::addSQLiteZoneSizingRecord(
 )
 {
 	static int zoneSizingIndex = 0;
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		++zoneSizingIndex;
 		sqliteBindInteger(m_zoneSizingInsertStmt, 1, zoneSizingIndex);
 		sqliteBindText(m_zoneSizingInsertStmt, 2, zoneName);
@@ -1724,7 +1724,7 @@ void SQLite::addSQLiteSystemSizingRecord(
 )
 {
 	static int systemSizingIndex = 0;
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		++systemSizingIndex;
 		std::string description;
 		std::string units;
@@ -1750,7 +1750,7 @@ void SQLite::addSQLiteComponentSizingRecord(
 )
 {
 	static int componentSizingIndex = 0;
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		++componentSizingIndex;
 
 		std::string description;
@@ -1780,7 +1780,7 @@ void SQLite::createSQLiteDaylightMapTitle(
 	Real64 const zCoord
 )
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		// for some reason it is adding extra mapNumbers that are getting UNIQUE constraint ignored.
 		// Might need to look into it, basically I think something is getting double inserted (12/06/14)
 		sqliteBindInteger(m_daylightMapTitleInsertStmt, 1, mapNum);
@@ -1802,10 +1802,10 @@ void SQLite::createSQLiteDaylightMap(
 	int const dayOfMonth,
 	int const hourOfDay,
 	int const nX,
-	FArray1S< Real64 > const x,
+	FArray1< Real64 > const & x,
 	int const nY,
-	FArray1S< Real64 > const y,
-	FArray2S< Real64 > const illuminance
+	FArray1< Real64 > const & y,
+	FArray2< Real64 > const & illuminance
 )
 {
 	static int hourlyReportIndex = 0;
@@ -1822,8 +1822,8 @@ void SQLite::createSQLiteDaylightMap(
 		sqliteStepCommand(m_daylightMapHourlyTitleInsertStmt);
 		sqliteResetCommand(m_daylightMapHourlyTitleInsertStmt);
 
-		for(int yIndex = 1; yIndex <= nY; ++yIndex) {
-			for(int xIndex = 1; xIndex <= nX; ++xIndex) {
+		for ( int yIndex = 1; yIndex <= nY; ++yIndex ) {
+			for ( int xIndex = 1; xIndex <= nX; ++xIndex ) {
 				++hourlyDataIndex;
 				sqliteBindInteger(m_daylightMapHourlyDataInsertStmt, 1, hourlyDataIndex);
 				sqliteBindForeignKey(m_daylightMapHourlyDataInsertStmt, 2, hourlyReportIndex);
@@ -1848,7 +1848,7 @@ void SQLite::createSQLiteTabularDataRecords(
 )
 {
 	static int tabularDataIndex = 0;
-	if(m_writeTabularDataToSQLite) {
+	if ( m_writeTabularDataToSQLite ) {
 		size_t sizeColumnLabels = columnLabels.size();
 		size_t sizeRowLabels = rowLabels.size();
 
@@ -1857,7 +1857,7 @@ void SQLite::createSQLiteTabularDataRecords(
 		int const tableNameIndex = createSQLiteStringTableRecord(tableName, TableNameId);
 		int unitsIndex;
 
-		for(size_t iCol = 0, k = body.index(1,1); iCol < sizeColumnLabels; ++iCol) {
+		for ( size_t iCol = 0, k = body.index(1,1); iCol < sizeColumnLabels; ++iCol ) {
 			std::string colUnits;
 			std::string colDescription;
 			parseUnitsAndDescription(columnLabels[iCol], colUnits, colDescription);
@@ -1868,7 +1868,7 @@ void SQLite::createSQLiteTabularDataRecords(
 				unitsIndex = createSQLiteStringTableRecord(colUnits, UnitsId);
 			}
 
-			for(size_t iRow = 0; iRow < sizeRowLabels; ++iRow) {
+			for ( size_t iRow = 0; iRow < sizeRowLabels; ++iRow ) {
 				++tabularDataIndex;
 				std::string rowUnits;
 				std::string rowDescription;
@@ -1938,7 +1938,7 @@ int SQLite::createSQLiteStringTableRecord(std::string const & stringValue, int c
 
 void SQLite::createSQLiteSimulationsRecord( int const id, const std::string& verString, const std::string& currentDateTime )
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		sqliteBindInteger(m_simulationsInsertStmt, 1, id);
 		sqliteBindText(m_simulationsInsertStmt, 2, verString);
 		sqliteBindText(m_simulationsInsertStmt, 3, currentDateTime);
@@ -1973,7 +1973,7 @@ void SQLite::createSQLiteErrorRecord(
 
 void SQLite::updateSQLiteErrorRecord( std::string const & errorMessage )
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		sqliteBindText(m_errorUpdateStmt, 1, "  " + errorMessage);
 
 		sqliteStepCommand(m_errorUpdateStmt);
@@ -1994,7 +1994,7 @@ void SQLite::updateSQLiteSimulationRecord( int const id, int const numOfTimeStep
 
 void SQLite::updateSQLiteSimulationRecord( bool const completed, bool const completedSuccessfully, int const id )
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		sqliteBindLogical(m_simulationUpdateStmt, 1, completed);
 		sqliteBindLogical(m_simulationUpdateStmt, 2, completedSuccessfully);
 		sqliteBindForeignKey(m_simulationUpdateStmt, 3, id); // seems to always be 1, SimulationManager::ManageSimulation()

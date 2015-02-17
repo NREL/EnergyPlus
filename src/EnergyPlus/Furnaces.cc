@@ -7348,7 +7348,7 @@ namespace Furnaces {
 	Real64
 	CalcFurnaceResidual(
 		Real64 const PartLoadRatio, // DX cooling coil part load ratio
-		Optional< FArray1S< Real64 > const > Par // Function parameters
+		FArray1< Real64 > const & Par // Function parameters
 	)
 	{
 
@@ -7417,17 +7417,17 @@ namespace Furnaces {
 		bool errFlag; // flag denoting error in runtime calculation
 
 		// Convert parameters to usable variables
-		FurnaceNum = int( Par()( 1 ) );
-		if ( Par()( 2 ) == 1.0 ) {
+		FurnaceNum = int( Par( 1 ) );
+		if ( Par( 2 ) == 1.0 ) {
 			FirstHVACIteration = true;
 		} else {
 			FirstHVACIteration = false;
 		}
-		FanOpMode = int( Par()( 3 ) );
-		CompOp = int( Par()( 4 ) );
-		LoadToBeMet = Par()( 5 );
+		FanOpMode = int( Par( 3 ) );
+		CompOp = int( Par( 4 ) );
+		LoadToBeMet = Par( 5 );
 
-		if ( Par()( 6 ) == 1.0 ) {
+		if ( Par( 6 ) == 1.0 ) {
 			CoolPartLoadRatio = PartLoadRatio;
 			HeatPartLoadRatio = 0.0;
 			HeatCoilLoad = 0.0;
@@ -7435,28 +7435,29 @@ namespace Furnaces {
 			CoolPartLoadRatio = 0.0;
 			HeatPartLoadRatio = PartLoadRatio;
 
-			if ( Furnace( FurnaceNum ).HeatingCoilType_Num == Coil_HeatingGas || Furnace( FurnaceNum ).HeatingCoilType_Num == Coil_HeatingElectric || Furnace( FurnaceNum ).HeatingCoilType_Num == Coil_HeatingWater || Furnace( FurnaceNum ).HeatingCoilType_Num == Coil_HeatingSteam ) {
+			auto const HeatingCoilType_Num( Furnace( FurnaceNum ).HeatingCoilType_Num );
+			if ( HeatingCoilType_Num == Coil_HeatingGas || HeatingCoilType_Num == Coil_HeatingElectric || HeatingCoilType_Num == Coil_HeatingWater || HeatingCoilType_Num == Coil_HeatingSteam ) {
 				HeatCoilLoad = Furnace( FurnaceNum ).DesignHeatingCapacity * PartLoadRatio;
 			} else {
 				HeatCoilLoad = 0.0;
 			}
 		}
 
-		//  OnOffAirFlowRatio = Par()(8)
+		//  OnOffAirFlowRatio = Par(8)
 		if ( Furnace( FurnaceNum ).FurnaceType_Num == UnitarySys_HeatPump_WaterToAir ) {
 			HeatPumpRunFrac( FurnaceNum, PartLoadRatio, errFlag, RuntimeFrac );
 			Furnace( FurnaceNum ).CompPartLoadRatio = PartLoadRatio;
 			Furnace( FurnaceNum ).WSHPRuntimeFrac = RuntimeFrac;
 		}
 
-		if ( Par()( 9 ) == 1.0 ) {
+		if ( Par( 9 ) == 1.0 ) {
 			HXUnitOn = true;
 		} else {
 			HXUnitOn = false;
 		}
 
-		if ( Par()( 10 ) > 0.0 ) {
-			//    Par()(10) = Furnace(FurnaceNum)%HeatPartLoadRatio
+		if ( Par( 10 ) > 0.0 ) {
+			//    Par(10) = Furnace(FurnaceNum)%HeatPartLoadRatio
 			//    FanOpMode = CycFan and Furnace(FurnaceNum)%HeatPartLoadRatio must be > 0 for Part(10) to be greater than 0
 			//    This variable used when in heating mode and dehumidification (cooling) is required.
 			CoolingHeatingPLRRatio = min( 1.0, CoolPartLoadRatio / Furnace( FurnaceNum ).HeatPartLoadRatio );
@@ -7470,7 +7471,7 @@ namespace Furnaces {
 		CalcFurnaceOutput( FurnaceNum, FirstHVACIteration, FanOpMode, CompOp, CoolPartLoadRatio, HeatPartLoadRatio, HeatCoilLoad, 0.0, SensibleLoadMet, LatentLoadMet, OnOffAirFlowRatio, HXUnitOn, CoolingHeatingPLRRatio );
 
 		// Calculate residual based on output calculation flag
-		if ( Par()( 7 ) == 1.0 ) {
+		if ( Par( 7 ) == 1.0 ) {
 			if ( LoadToBeMet == 0.0 ) {
 				Residuum = ( SensibleLoadMet - LoadToBeMet ) / 100.0;
 			} else {
@@ -7490,7 +7491,7 @@ namespace Furnaces {
 	Real64
 	CalcWaterToAirResidual(
 		Real64 const PartLoadRatio, // DX cooling coil part load ratio
-		Optional< FArray1S< Real64 > const > Par // Function parameters
+		FArray1< Real64 > const & Par // Function parameters
 	)
 	{
 
@@ -7560,17 +7561,17 @@ namespace Furnaces {
 		bool HXUnitOn; // flag to enable HX based on zone moisture load (not valid for water-to-air HP's
 
 		// Convert parameters to usable variables
-		FurnaceNum = int( Par()( 1 ) );
-		if ( Par()( 2 ) == 1.0 ) {
+		FurnaceNum = int( Par( 1 ) );
+		if ( Par( 2 ) == 1.0 ) {
 			FirstHVACIteration = true;
 		} else {
 			FirstHVACIteration = false;
 		}
-		FanOpMode = int( Par()( 3 ) );
-		CompOp = int( Par()( 4 ) );
-		LoadToBeMet = Par()( 5 );
+		FanOpMode = int( Par( 3 ) );
+		CompOp = int( Par( 4 ) );
+		LoadToBeMet = Par( 5 );
 
-		if ( Par()( 6 ) == 1.0 ) {
+		if ( Par( 6 ) == 1.0 ) {
 			CoolPartLoadRatio = PartLoadRatio;
 			HeatPartLoadRatio = 0.0;
 			HeatCoilLoad = 0.0;
@@ -7578,13 +7579,13 @@ namespace Furnaces {
 			CoolPartLoadRatio = 0.0;
 			HeatPartLoadRatio = PartLoadRatio;
 		}
-		ZoneSensLoadMetFanONCompOFF = Par()( 8 );
+		ZoneSensLoadMetFanONCompOFF = Par( 8 );
 		//calculate the run time fraction
 		HeatPumpRunFrac( FurnaceNum, PartLoadRatio, errFlag, RuntimeFrac );
 
 		//update the fan part load factor
 		//see 'Note' under INITIAL CALCULATIONS
-		if ( Par()( 6 ) == 1.0 ) {
+		if ( Par( 6 ) == 1.0 ) {
 			if ( RuntimeFrac > 0.0 ) {
 				OnOffFanPartLoadFraction = CoolPartLoadRatio / RuntimeFrac;
 			} else {
@@ -7615,7 +7616,7 @@ namespace Furnaces {
 		//Set input parameters for heat pump coil model
 		HPCoilSensDemand = LoadToBeMet - RuntimeFrac * ZoneSensLoadMetFanONCompOFF;
 		//  HPCoilSensDemand = LoadToBeMet  - PartLoadRatio*ZoneSensLoadMetFanONCompOFF
-		if ( Par()( 6 ) == 1.0 ) {
+		if ( Par( 6 ) == 1.0 ) {
 			Furnace( FurnaceNum ).HeatingCoilSensDemand = 0.0;
 			Furnace( FurnaceNum ).CoolingCoilSensDemand = std::abs( HPCoilSensDemand );
 		} else {
@@ -7627,7 +7628,7 @@ namespace Furnaces {
 		//Calculate the zone loads met and the new part load ratio and for the specified run time
 		Dummy = 0.0;
 		OnOffAirFlowRatio = 1.0;
-		if ( Par()( 9 ) == 1.0 ) {
+		if ( Par( 9 ) == 1.0 ) {
 			HXUnitOn = true;
 		} else {
 			HXUnitOn = false;
@@ -7639,7 +7640,7 @@ namespace Furnaces {
 		CalcFurnaceOutput( FurnaceNum, FirstHVACIteration, FanOpMode, CompOp, CoolPartLoadRatio, HeatPartLoadRatio, Dummy, Dummy, ZoneSensLoadMet, ZoneLatLoadMet, OnOffAirFlowRatio, HXUnitOn );
 
 		// Calculate residual based on output calculation flag
-		if ( Par()( 7 ) == 1.0 ) {
+		if ( Par( 7 ) == 1.0 ) {
 			Residuum = ( ZoneSensLoadMet - LoadToBeMet ) / LoadToBeMet;
 		} else {
 			Residuum = ( ZoneLatLoadMet - LoadToBeMet ) / LoadToBeMet;
@@ -8076,7 +8077,7 @@ namespace Furnaces {
 	Real64
 	HotWaterCoilResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		Optional< FArray1S< Real64 > const > Par // Par(5) is the requested coil load
+		FArray1< Real64 > const & Par // Par(5) is the requested coil load
 	)
 	{
 
@@ -8125,22 +8126,13 @@ namespace Furnaces {
 		Real64 mdot;
 		bool SuppHeatingCoilFlag; // .TRUE. if supplemental heating coil
 
-		FurnaceNum = int( Par()( 1 ) );
-		if ( Par()( 2 ) > 0.0 ) {
-			FirstHVACIteration = true;
-		} else {
-			FirstHVACIteration = false;
-		}
-		QCoilRequested = Par()( 3 );
-		if ( Par()( 4 ) > 0.0 ) {
-			SuppHeatingCoilFlag = true;
-		} else {
-			SuppHeatingCoilFlag = false;
-		}
+		FurnaceNum = int( Par( 1 ) );
+		FirstHVACIteration = ( Par( 2 ) > 0.0 );
+		QCoilRequested = Par( 3 );
+		SuppHeatingCoilFlag = ( Par( 4 ) > 0.0 );
 		QCoilActual = QCoilRequested;
 		mdot = HWFlow;
 		if ( ! SuppHeatingCoilFlag ) {
-
 			SetComponentFlowRate( mdot, Furnace( FurnaceNum ).CoilControlNode, Furnace( FurnaceNum ).CoilOutletNode, Furnace( FurnaceNum ).LoopNum, Furnace( FurnaceNum ).LoopSide, Furnace( FurnaceNum ).BranchNum, Furnace( FurnaceNum ).CompNum );
 			SimulateWaterCoilComponents( Furnace( FurnaceNum ).HeatingCoilName, FirstHVACIteration, Furnace( FurnaceNum ).HeatingCoilIndex, QCoilActual, Furnace( FurnaceNum ).OpMode );
 		} else {
@@ -8985,7 +8977,7 @@ namespace Furnaces {
 	Real64
 	VSHPCyclingResidual(
 		Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = FurnaceNum
+		FArray1< Real64 > const & Par // par(1) = FurnaceNum
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -9048,29 +9040,25 @@ namespace Furnaces {
 		Real64 ResScale; // Residual scale
 		int CompOp; // compressor operation; 1=on, 0=off
 
-		FurnaceNum = int( Par()( 1 ) );
-		ZoneNum = int( Par()( 2 ) );
+		FurnaceNum = int( Par( 1 ) );
+		ZoneNum = int( Par( 2 ) );
 		// FirstHVACIteration is a logical, Par is REAL(r64), so make 1.0=TRUE and 0.0=FALSE
-		if ( Par()( 3 ) == 1.0 ) {
-			FirstHVACIteration = true;
-		} else {
-			FirstHVACIteration = false;
-		}
-		OpMode = int( Par()( 4 ) );
+		FirstHVACIteration = ( Par( 3 ) == 1.0 );
+		OpMode = int( Par( 4 ) );
 
 		QZnReq = 0.0;
 		QZnLat = 0.0;
 
-		LoadToBeMet = Par()( 5 );
-		if ( Par()( 10 ) == 1.0 ) {
-			QZnReq = Par()( 5 );
+		LoadToBeMet = Par( 5 );
+		if ( Par( 10 ) == 1.0 ) {
+			QZnReq = Par( 5 );
 		} else {
-			QZnLat = Par()( 5 );
+			QZnLat = Par( 5 );
 		}
 
-		OnOffAirFlowRatio = Par()( 6 );
-		SupHeaterLoad = Par()( 7 );
-		CompOp = int( Par()( 9 ) );
+		OnOffAirFlowRatio = Par( 6 );
+		SupHeaterLoad = Par( 7 );
+		CompOp = int( Par( 9 ) );
 
 		CalcVarSpeedHeatPump( FurnaceNum, FirstHVACIteration, CompOp, 1, 0.0, PartLoadFrac, ZoneSensLoadMet, ZoneLatLoadMet, QZnReq, QZnLat, OnOffAirFlowRatio, SupHeaterLoad );
 
@@ -9082,7 +9070,7 @@ namespace Furnaces {
 		}
 
 		// Calculate residual based on output calculation flag
-		if ( Par()( 10 ) == 1.0 ) {
+		if ( Par( 10 ) == 1.0 ) {
 			VSHPCyclingResidual = ( ZoneSensLoadMet - LoadToBeMet ) / ResScale;
 		} else {
 			VSHPCyclingResidual = ( ZoneLatLoadMet - LoadToBeMet ) / ResScale;
@@ -9097,7 +9085,7 @@ namespace Furnaces {
 	Real64
 	VSHPSpeedResidual(
 		Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = MSHPNum
+		FArray1< Real64 > const & Par // par(1) = MSHPNum
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -9161,30 +9149,26 @@ namespace Furnaces {
 		int SpeedNum; // Speed number
 		int CompOp; // compressor operation; 1=on, 0=off
 
-		FurnaceNum = int( Par()( 1 ) );
-		ZoneNum = int( Par()( 2 ) );
+		FurnaceNum = int( Par( 1 ) );
+		ZoneNum = int( Par( 2 ) );
 		// FirstHVACIteration is a logical, Par is REAL(r64), so make 1.0=TRUE and 0.0=FALSE
-		if ( Par()( 3 ) == 1.0 ) {
-			FirstHVACIteration = true;
-		} else {
-			FirstHVACIteration = false;
-		}
-		OpMode = int( Par()( 4 ) );
+		FirstHVACIteration = ( Par( 3 ) == 1.0 );
+		OpMode = int( Par( 4 ) );
 
 		QZnReq = 0.0;
 		QZnLat = 0.0;
 
-		LoadToBeMet = Par()( 5 );
-		if ( Par()( 10 ) == 1.0 ) {
-			QZnReq = Par()( 5 );
+		LoadToBeMet = Par( 5 );
+		if ( Par( 10 ) == 1.0 ) {
+			QZnReq = Par( 5 );
 		} else {
-			QZnLat = Par()( 5 );
+			QZnLat = Par( 5 );
 		}
 
-		OnOffAirFlowRatio = Par()( 6 );
-		SupHeaterLoad = Par()( 7 );
-		SpeedNum = int( Par()( 8 ) );
-		CompOp = int( Par()( 9 ) );
+		OnOffAirFlowRatio = Par( 6 );
+		SupHeaterLoad = Par( 7 );
+		SpeedNum = int( Par( 8 ) );
+		CompOp = int( Par( 9 ) );
 
 		CalcVarSpeedHeatPump( FurnaceNum, FirstHVACIteration, CompOp, SpeedNum, SpeedRatio, 1.0, ZoneSensLoadMet, ZoneLatLoadMet, QZnReq, QZnLat, OnOffAirFlowRatio, SupHeaterLoad );
 
@@ -9196,7 +9180,7 @@ namespace Furnaces {
 		}
 
 		// Calculate residual based on output calculation flag
-		if ( Par()( 10 ) == 1.0 ) {
+		if ( Par( 10 ) == 1.0 ) {
 			VSHPSpeedResidual = ( ZoneSensLoadMet - LoadToBeMet ) / ResScale;
 		} else {
 			VSHPSpeedResidual = ( ZoneLatLoadMet - LoadToBeMet ) / ResScale;

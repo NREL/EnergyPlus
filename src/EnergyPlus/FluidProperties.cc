@@ -4807,7 +4807,7 @@ namespace FluidProperties {
 			//}
 			//assert( std::is_sorted( glycol_CpTemps.begin(), glycol_CpTemps.end() ) ); // Sorted temperature array is assumed: Enable if/when arrays have begin()/end()
 			assert( glycol_CpTemps.size() <= static_cast< std::size_t >( std::numeric_limits< int >::max() ) ); // Array indexes are int now so this is future protection
-			int beg( 1 ), mid, end( static_cast< int >( glycol_CpTemps.size() ) ); // 1-based indexing
+			int beg( 1 ), mid, end( glycol_CpTemps.isize() ); // 1-based indexing
 			assert( end > 0 );
 			while ( beg + 1 < end ) {
 				mid = ( ( beg + end ) >> 1 ); // bit shifting is faster than /2

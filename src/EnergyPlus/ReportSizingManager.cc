@@ -855,7 +855,7 @@ namespace ReportSizingManager {
 						AutosizeDes = ZoneEqSizing ( CurZoneEqNum ).DesCoolingLoad;
 						DesVolFlow = DataFlowUsedForSizing;
 					} else {
-						if ( SameString( CompType, "COIL:COOLING:WATER" ) || SameString( CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) ) {
+						if ( SameString( CompType, "COIL:COOLING:WATER" ) || SameString( CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") || SameString( CompType, "ZONEHVAC:IDEALLOADSAIRSYSTEM" ) ) {
 							if ( TermUnitIU ) {
 								AutosizeDes = TermUnitSizing( CurZoneEqNum ).DesCoolingLoad;
 							} else if ( ZoneEqFanCoil ) {

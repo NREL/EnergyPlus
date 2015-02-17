@@ -196,7 +196,7 @@ namespace OutputProcessor {
 	int RunPeriodStampReportNbr; // RunPeriod Report number
 	std::string RunPeriodStampReportChr; // RunPeriod Report number (character -- for printing)
 	bool TrackingRunPeriodVariables( false ); // Requested RunPeriod Report Variables
-	Real64 SecondsPerTimeStep; // Seconds from NumTimeStepInHour
+	Real64 TimeStepZoneSec; // Seconds from NumTimeStepInHour
 	bool ErrorsLogged( false );
 	bool ProduceVariableDictionary( false );
 
@@ -344,7 +344,7 @@ namespace OutputProcessor {
 
 		OutputInitialized = true;
 
-		SecondsPerTimeStep = double( MinutesPerTimeStep ) * 60.0;
+		TimeStepZoneSec = double( MinutesPerTimeStep ) * 60.0;
 
 		InitializeMeters();
 
@@ -3361,51 +3361,51 @@ namespace OutputProcessor {
 			int const RT_forIPUnits( EnergyMeters( Loop ).RT_forIPUnits );
 			if ( RT_forIPUnits == RT_IPUnits_Electricity ) {
 				PreDefTableEntry( pdchEMelecannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue * convertJtoGJ );
-				PreDefTableEntry( pdchEMelecminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep );
+				PreDefTableEntry( pdchEMelecminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec );
 				PreDefTableEntry( pdchEMelecminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMelecmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep );
+				PreDefTableEntry( pdchEMelecmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec );
 				PreDefTableEntry( pdchEMelecmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_Gas ) {
 				PreDefTableEntry( pdchEMgasannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue * convertJtoGJ );
-				PreDefTableEntry( pdchEMgasminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep );
+				PreDefTableEntry( pdchEMgasminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec );
 				PreDefTableEntry( pdchEMgasminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMgasmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep );
+				PreDefTableEntry( pdchEMgasmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec );
 				PreDefTableEntry( pdchEMgasmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_Cooling ) {
 				PreDefTableEntry( pdchEMcoolannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue * convertJtoGJ );
-				PreDefTableEntry( pdchEMcoolminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep );
+				PreDefTableEntry( pdchEMcoolminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec );
 				PreDefTableEntry( pdchEMcoolminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMcoolmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep );
+				PreDefTableEntry( pdchEMcoolmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec );
 				PreDefTableEntry( pdchEMcoolmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_Water ) {
 				PreDefTableEntry( pdchEMwaterannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue );
-				PreDefTableEntry( pdchEMwaterminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep );
+				PreDefTableEntry( pdchEMwaterminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec );
 				PreDefTableEntry( pdchEMwaterminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMwatermaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep );
+				PreDefTableEntry( pdchEMwatermaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec );
 				PreDefTableEntry( pdchEMwatermaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_OtherKG ) {
 				PreDefTableEntry( pdchEMotherKGannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue );
-				PreDefTableEntry( pdchEMotherKGminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep, 3 );
+				PreDefTableEntry( pdchEMotherKGminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec, 3 );
 				PreDefTableEntry( pdchEMotherKGminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMotherKGmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep, 3 );
+				PreDefTableEntry( pdchEMotherKGmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec, 3 );
 				PreDefTableEntry( pdchEMotherKGmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_OtherM3 ) {
 				PreDefTableEntry( pdchEMotherM3annual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue, 3 );
-				PreDefTableEntry( pdchEMotherM3minvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep, 3 );
+				PreDefTableEntry( pdchEMotherM3minvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec, 3 );
 				PreDefTableEntry( pdchEMotherM3minvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMotherM3maxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep, 3 );
+				PreDefTableEntry( pdchEMotherM3maxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec, 3 );
 				PreDefTableEntry( pdchEMotherM3maxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_OtherL ) {
 				PreDefTableEntry( pdchEMotherLannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue, 3 );
-				PreDefTableEntry( pdchEMotherLminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep, 3 );
+				PreDefTableEntry( pdchEMotherLminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec, 3 );
 				PreDefTableEntry( pdchEMotherLminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMotherLmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep, 3 );
+				PreDefTableEntry( pdchEMotherLmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec, 3 );
 				PreDefTableEntry( pdchEMotherLmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
 			} else {
 				PreDefTableEntry( pdchEMotherJannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue * convertJtoGJ );
-				PreDefTableEntry( pdchEMotherJminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep );
+				PreDefTableEntry( pdchEMotherJminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec );
 				PreDefTableEntry( pdchEMotherJminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMotherJmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep );
+				PreDefTableEntry( pdchEMotherJmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec );
 				PreDefTableEntry( pdchEMotherJmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
 			}
 		}
@@ -7178,36 +7178,40 @@ GetMeteredVariables(
 		if ( RVar().MeterArrayPtr == 0 ) continue;
 		NumOnMeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).NumOnMeters;
 		MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( 1 );
-		++NumVariables;
-		VarIndexes( NumVariables ) = Loop;
-		VarTypes( NumVariables ) = 2;
-		IndexTypes( NumVariables ) = RVariableTypes( Loop ).IndexType;
-		UnitsStrings( NumVariables ) = RVariableTypes( Loop ).UnitsString;
+		if ( MeterPtr ) {
+			++NumVariables;
+			VarIndexes( NumVariables ) = Loop;
+			VarTypes( NumVariables ) = 2;
+			IndexTypes( NumVariables ) = RVariableTypes( Loop ).IndexType;
+			UnitsStrings( NumVariables ) = RVariableTypes( Loop ).UnitsString;
 
-		ResourceTypes( NumVariables ) = AssignResourceTypeNum( MakeUPPERCase( EnergyMeters( MeterPtr ).ResourceType ) );
-		if ( present( Names ) ) {
-			Names()( NumVariables ) = RVariableTypes( Loop ).VarNameUC;
-		}
-		if ( present( EndUses ) ) {
-			for ( MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum ) {
-				MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( MeterNum );
-				if ( EnergyMeters( MeterPtr ).EndUse != "" ) {
-					EndUses()( NumVariables ) = MakeUPPERCase( EnergyMeters( MeterPtr ).EndUse );
-					break;
+			ResourceTypes( NumVariables ) = AssignResourceTypeNum( MakeUPPERCase( EnergyMeters( MeterPtr ).ResourceType ) );
+			if ( present( Names ) ) {
+				Names()( NumVariables ) = RVariableTypes( Loop ).VarNameUC;
+			}
+			if ( present( EndUses ) ) {
+				for ( MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum ) {
+					MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( MeterNum );
+					if ( EnergyMeters( MeterPtr ).EndUse != "" ) {
+						EndUses()( NumVariables ) = MakeUPPERCase( EnergyMeters( MeterPtr ).EndUse );
+						break;
+					}
 				}
 			}
-		}
-		if ( present( Groups ) ) {
-			for ( MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum ) {
-				MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( MeterNum );
-				if ( EnergyMeters( MeterPtr ).Group != "" ) {
-					Groups()( NumVariables ) = MakeUPPERCase( EnergyMeters( MeterPtr ).Group );
-					break;
+			if ( present( Groups ) ) {
+				for ( MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum ) {
+					MeterPtr = VarMeterArrays( RVar().MeterArrayPtr ).OnMeters( MeterNum );
+					if ( EnergyMeters( MeterPtr ).Group != "" ) {
+						Groups()( NumVariables ) = MakeUPPERCase( EnergyMeters( MeterPtr ).Group );
+						break;
+					}
 				}
 			}
-		}
-		if ( present( VarIDs ) ) {
-			VarIDs()( NumVariables ) = RVar().ReportID;
+			if ( present( VarIDs ) ) {
+				VarIDs()( NumVariables ) = RVar().ReportID;
+			}
+		} else {
+			ShowWarningError( "Referenced variable or meter used in the wrong context \"" + ComponentName + "\" of type \"" + ComponentType + "\"" );
 		}
 	}
 
@@ -8070,7 +8074,7 @@ AddToOutputVariableList(
 }
 
 //     NOTICE
-//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted
