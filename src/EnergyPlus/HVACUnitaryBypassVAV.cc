@@ -2609,7 +2609,7 @@ namespace HVACUnitaryBypassVAV {
 	Real64
 	DOE2DXCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // Par(1) = DX coil number
+		FArray1< Real64 > const & Par // Par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2655,13 +2655,13 @@ namespace HVACUnitaryBypassVAV {
 		Real64 OutletAirTemp; // Outlet air temperature [C]
 		Real64 OnOffAirFlowFrac; // Ratio of compressor ON to compressor OFF air mass flow rate
 
-		CoilIndex = int( Par()( 1 ) );
-		OnOffAirFlowFrac = Par()( 3 );
+		CoilIndex = int( Par( 1 ) );
+		OnOffAirFlowFrac = Par( 3 );
 
 		CalcDoe2DXCoil( CoilIndex, On, false, PartLoadFrac, ContFanCycCoil, _, OnOffAirFlowFrac );
 
 		OutletAirTemp = DXCoilOutletTemp( CoilIndex );
-		Residuum = Par()( 2 ) - OutletAirTemp;
+		Residuum = Par( 2 ) - OutletAirTemp;
 
 		return Residuum;
 	}
@@ -2669,7 +2669,7 @@ namespace HVACUnitaryBypassVAV {
 	Real64
 	HXAssistDXCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // Par(1) = DX coil number
+		FArray1< Real64 > const & Par // Par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2717,24 +2717,16 @@ namespace HVACUnitaryBypassVAV {
 		bool FirstHVACIter; // Local Flag denoting the first pass on the air loop simulation
 		bool HXUnitOn; // flag to enable heat exchanger
 
-		CoilIndex = int( Par()( 1 ) );
-		OnOffAirFlowFrac = Par()( 3 );
-		CBVAVNumTemp = int( Par()( 4 ) );
-		if ( Par()( 5 ) == 1.0 ) {
-			FirstHVACIter = true;
-		} else {
-			FirstHVACIter = false;
-		}
-		if ( Par()( 6 ) == 1.0 ) {
-			HXUnitOn = true;
-		} else {
-			HXUnitOn = false;
-		}
+		CoilIndex = int( Par( 1 ) );
+		OnOffAirFlowFrac = Par( 3 );
+		CBVAVNumTemp = int( Par( 4 ) );
+		FirstHVACIter = ( Par( 5 ) == 1.0 );
+		HXUnitOn = ( Par( 6 ) == 1.0 );
 
 		SimHXAssistedCoolingCoil( CBVAV( CBVAVNumTemp ).DXCoolCoilName, FirstHVACIter, On, PartLoadFrac, CoilIndex, ContFanCycCoil, HXUnitOn );
 
 		OutletAirTemp = Node( CBVAV( CBVAVNumTemp ).DXCoilOutletNode ).Temp;
-		Residuum = Par()( 2 ) - OutletAirTemp;
+		Residuum = Par( 2 ) - OutletAirTemp;
 
 		return Residuum;
 	}
@@ -2742,7 +2734,7 @@ namespace HVACUnitaryBypassVAV {
 	Real64
 	DXHeatingCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // Par(1) = DX coil number
+		FArray1< Real64 > const & Par // Par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2788,13 +2780,13 @@ namespace HVACUnitaryBypassVAV {
 		Real64 OutletAirTemp; // Outlet air temperature [C]
 		Real64 OnOffAirFlowFrac; // Ratio of compressor ON to compressor OFF air mass flow rate
 
-		CoilIndex = int( Par()( 1 ) );
-		OnOffAirFlowFrac = Par()( 3 );
+		CoilIndex = int( Par( 1 ) );
+		OnOffAirFlowFrac = Par( 3 );
 
 		CalcDXHeatingCoil( CoilIndex, PartLoadFrac, ContFanCycCoil, OnOffAirFlowFrac );
 
 		OutletAirTemp = DXCoilOutletTemp( CoilIndex );
-		Residuum = Par()( 2 ) - OutletAirTemp;
+		Residuum = Par( 2 ) - OutletAirTemp;
 
 		return Residuum;
 	}
@@ -2802,7 +2794,7 @@ namespace HVACUnitaryBypassVAV {
 	Real64
 	MultiModeDXCoilResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = DX coil number
+		FArray1< Real64 > const & Par // Par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2851,12 +2843,12 @@ namespace HVACUnitaryBypassVAV {
 		int DehumidMode; // dehumidification mode (par3)
 		int FanOpMode; // allows parent object to control fan mode
 
-		CoilIndex = int( Par()( 1 ) );
-		DehumidMode = int( Par()( 3 ) );
+		CoilIndex = int( Par( 1 ) );
+		DehumidMode = int( Par( 3 ) );
 		FanOpMode = 2;
 		SimDXCoilMultiMode( "", On, false, PartLoadRatio, DehumidMode, CoilIndex, FanOpMode );
 		OutletAirTemp = DXCoilOutletTemp( CoilIndex );
-		Residuum = Par()( 2 ) - OutletAirTemp;
+		Residuum = Par( 2 ) - OutletAirTemp;
 
 		return Residuum;
 	}
@@ -3177,7 +3169,7 @@ namespace HVACUnitaryBypassVAV {
 	Real64
 	HotWaterCoilResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		Optional< FArray1S< Real64 > const > Par // Par(5) is the requested coil load
+		FArray1< Real64 > const & Par // Par(1) = DX coil number
 	)
 	{
 
@@ -3224,13 +3216,9 @@ namespace HVACUnitaryBypassVAV {
 		Real64 HeatCoilLoad; // requested coild load, W
 		Real64 mdot;
 
-		CBVAVNum = int( Par()( 1 ) );
-		if ( Par()( 2 ) > 0.0 ) {
-			FirstHVACSoln = true;
-		} else {
-			FirstHVACSoln = false;
-		}
-		HeatCoilLoad = Par()( 3 );
+		CBVAVNum = int( Par( 1 ) );
+		FirstHVACSoln = ( Par( 2 ) > 0.0 );
+		HeatCoilLoad = Par( 3 );
 		QCoilActual = HeatCoilLoad;
 		mdot = HWFlow;
 		SetComponentFlowRate( mdot, CBVAV( CBVAVNum ).CoilControlNode, CBVAV( CBVAVNum ).CoilOutletNode, CBVAV( CBVAVNum ).LoopNum, CBVAV( CBVAVNum ).LoopSide, CBVAV( CBVAVNum ).BranchNum, CBVAV( CBVAVNum ).CompNum );

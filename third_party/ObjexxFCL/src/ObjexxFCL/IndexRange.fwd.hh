@@ -18,9 +18,6 @@ namespace ObjexxFCL {
 // Forward
 class IndexRange;
 
-// Types
-typedef  IndexRange  IRange;
-
 } // ObjexxFCL
 
 #endif // ObjexxFCL_IndexRange_fwd_hh_INCLUDED

@@ -30,9 +30,6 @@ class FArray1D : public FArray1< T >, public ObserverMulti
 private: // Types
 
 	typedef  FArray1< T >  Super;
-	typedef  typename Super::real_FArray  real_FArray;
-	typedef  typename Super::proxy_FArray  proxy_FArray;
-	typedef  typename Super::arg_FArray  arg_FArray;
 	typedef  internal::InitializerSentinel  InitializerSentinel;
 
 private: // Friend
@@ -70,15 +67,15 @@ public: // Types
 	typedef  typename Initializer::Function  InitializerFunction;
 
 	using Super::conformable;
+	using Super::initialize;
 	using Super::isize1;
 	using Super::l;
 	using Super::operator ();
-	using Super::reassign;
 	using Super::resize;
 	using Super::shift_set;
 	using Super::size1;
 	using Super::size_of;
-	using Super::swap1DB;
+	using Super::swap1;
 	using Super::u;
 	using Super::data_;
 	using Super::data_size_;
@@ -139,7 +136,7 @@ public: // Creation
 		if ( dimensions_initialized() ) {
 			size_type l( 0 );
 			for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-				reassign( l, a( i ) );
+				initialize( l, a( i ) );
 			}
 		}
 		insert_as_observer();
@@ -158,7 +155,7 @@ public: // Creation
 			if ( a.dimensions_initialized() ) {
 				size_type l( 0 );
 				for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-					reassign( l, a( i ) );
+					initialize( l, a( i ) );
 				}
 			}
 		}
@@ -271,7 +268,7 @@ public: // Creation
 			if ( a.dimensions_initialized() ) {
 				assert( conformable( a ) );
 				for ( size_type i = 0, e = size_; i < e; ++i ) {
-					reassign( i, a[ i ] );
+					initialize( i, a[ i ] );
 				}
 			}
 		}
@@ -291,7 +288,7 @@ public: // Creation
 			if ( a.dimensions_initialized() ) {
 				assert( size_ == a.size() );
 				for ( size_type i = 0, e = size_; i < e; ++i ) {
-					reassign( i, a[ i ] );
+					initialize( i, a[ i ] );
 				}
 			}
 		}
@@ -441,7 +438,7 @@ public: // Creation
 			if ( a.dimensions_initialized() ) {
 				assert( conformable( a ) );
 				for ( size_type i = 0, e = size_; i < e; ++i ) {
-					reassign( i, a[ i ] );
+					initialize( i, a[ i ] );
 				}
 			}
 		}
@@ -481,7 +478,7 @@ public: // Creation
 			assert( conformable( a ) );
 			size_type l( 0 );
 			for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-				reassign( l, a( i ) );
+				initialize( l, a( i ) );
 			}
 		}
 		insert_as_observer();
@@ -500,7 +497,7 @@ public: // Creation
 				assert( conformable( a ) );
 				size_type l( 0 );
 				for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-					reassign( l, a( i ) );
+					initialize( l, a( i ) );
 				}
 			}
 		}
@@ -519,7 +516,7 @@ public: // Creation
 			if ( a.dimensions_initialized() ) {
 				assert( conformable( a ) );
 				for ( size_type i = 0, e = size_; i < e; ++i ) {
-					reassign( i, a[ i ] );
+					initialize( i, a[ i ] );
 				}
 			}
 		}
@@ -538,7 +535,7 @@ public: // Creation
 			if ( a.dimensions_initialized() ) {
 				assert( size_ == a.size() );
 				for ( size_type i = 0, e = size_; i < e; ++i ) {
-					reassign( i, a[ i ] );
+					initialize( i, a[ i ] );
 				}
 			}
 		}
@@ -557,7 +554,7 @@ public: // Creation
 			if ( a.dimensions_initialized() ) {
 				assert( size_ == a.size() );
 				for ( size_type i = 0, e = size_; i < e; ++i ) {
-					reassign( i, a[ i ] );
+					initialize( i, a[ i ] );
 				}
 			}
 		}
@@ -1328,30 +1325,12 @@ public: // Assignment: Value
 
 public: // Subscript
 
-	// Const Tail Starting at array( i )
-	inline
-	Tail const
-	a( int const i ) const
-	{
-		assert( I_.contains( i ) );
-		return Tail( static_cast< T const * >( sdata_ + i ), data_size_ - ( i - shift_ ) );
-	}
-
-	// Tail Starting at array( i )
-	inline
-	Tail
-	a( int const i )
-	{
-		assert( I_.contains( i ) );
-		return Tail( sdata_ + i, data_size_ - ( i - shift_ ) );
-	}
-
 	// Linear Index
 	inline
 	size_type
 	index( int const i ) const
 	{
-		assert( I_.initialized() );
+		assert( dimensions_initialized() );
 		return ( i - shift_ );
 	}
 
@@ -1371,6 +1350,24 @@ public: // Subscript
 	{
 		assert( i < size_ );
 		return data_[ i ];
+	}
+
+	// Const Tail Starting at array( i )
+	inline
+	Tail const
+	a( int const i ) const
+	{
+		assert( contains( i ) );
+		return Tail( static_cast< T const * >( sdata_ + i ), data_size_ - ( i - shift_ ) );
+	}
+
+	// Tail Starting at array( i )
+	inline
+	Tail
+	a( int const i )
+	{
+		assert( contains( i ) );
+		return Tail( sdata_ + i, data_size_ - ( i - shift_ ) );
 	}
 
 public: // Predicate
@@ -1621,32 +1618,30 @@ public: // Modifier
 	FArray1D &
 	redimension( IR const & I, T const & t )
 	{
-		if ( dimensions_initialized() ) {
-			if ( I.initialized() ) {
-				FArray1D o( I );
-				auto const l_( l() );
-				auto const I_l_( I.l() );
-				auto const l_max_( std::max( l_, I_l_ ) );
-				auto const u_( u() );
-				auto const I_u_( I.u() );
-				auto const u_min_( std::min( u_, I_u_ ) );
-				if ( I_l_ < l_ ) {
-					for ( int i = I_l_, e = std::min( l_ - 1, I_u_ ); i <= e; ++i ) { // Fill new lower elements
-						o( i ) = t;
-					}
+		if ( dimensions_initialized() && I.initialized() ) {
+			FArray1D o( I );
+			auto const l_( l() );
+			auto const I_l_( I.l() );
+			auto const l_max_( std::max( l_, I_l_ ) );
+			auto const u_( u() );
+			auto const I_u_( I.u() );
+			auto const u_min_( std::min( u_, I_u_ ) );
+			if ( I_l_ < l_ ) {
+				for ( int i = I_l_, e = std::min( l_ - 1, I_u_ ); i <= e; ++i ) { // Fill new lower elements
+					o( i ) = t;
 				}
-				if ( l_max_ <= u_min_ ) { // Ranges overlap
-					for ( int i = l_max_; i <= u_min_; ++i ) { // Copy array data in overlap
-						o( i ) = operator ()( i );
-					}
-				}
-				if ( u_ < I_u_ ) {
-					for ( int i = std::max( u_ + 1, I_l_ ); i <= I_u_; ++i ) { // Fill new upper elements
-						o( i ) = t;
-					}
-				}
-				return swap( o );
 			}
+			if ( l_max_ <= u_min_ ) { // Ranges overlap
+				for ( int i = l_max_; i <= u_min_; ++i ) { // Copy array data in overlap
+					o( i ) = operator ()( i );
+				}
+			}
+			if ( u_ < I_u_ ) {
+				for ( int i = std::max( u_ + 1, I_l_ ); i <= I_u_; ++i ) { // Fill new upper elements
+					o( i ) = t;
+				}
+			}
+			return swap( o );
 		}
 		FArray1D o( I, t );
 		return swap( o );
@@ -1742,7 +1737,7 @@ public: // Modifier
 	{
 		if ( ( initializer_.is_active() ) && ( dimensions_initialized() ) ) {
 			if ( initializer_.is_value() ) {
-				reassign( initializer_.value() );
+				initialize( initializer_.value() );
 			} else if ( initializer_.is_function() ) {
 				initializer_.function()( *this );
 			}
@@ -1756,7 +1751,7 @@ public: // Modifier
 	swap( FArray1D & v )
 	{
 		using std::swap;
-		swap1DB( v );
+		swap1( v );
 		I_.swap_no_notify( v.I_ );
 		swap( initializer_, v.initializer_ );
 		notify(); // So proxy FArrays can reattach
@@ -1797,7 +1792,7 @@ protected: // Functions
 
 private: // Functions
 
-	// Setup for IndexRange Constructor
+	// Set Up for IndexRange Constructor
 	inline
 	void
 	setup_real()
@@ -2162,7 +2157,7 @@ operator ==( FArray1S< T > const & a, FArray1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray1D< bool > r( FArray1D< bool >::shape( a ) );
-	typename FArray1< T >::size_type l( 0 );
+	FArray1D< bool >::size_type l( 0 );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) == b[ l ] );
 	}
@@ -2177,7 +2172,7 @@ operator !=( FArray1S< T > const & a, FArray1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray1D< bool > r( FArray1D< bool >::shape( a ) );
-	typename FArray1< T >::size_type l( 0 );
+	FArray1D< bool >::size_type l( 0 );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) != b[ l ] );
 	}
@@ -2192,7 +2187,7 @@ operator <( FArray1S< T > const & a, FArray1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray1D< bool > r( FArray1D< bool >::shape( a ) );
-	typename FArray1< T >::size_type l( 0 );
+	FArray1D< bool >::size_type l( 0 );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) < b[ l ] );
 	}
@@ -2207,7 +2202,7 @@ operator <=( FArray1S< T > const & a, FArray1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray1D< bool > r( FArray1D< bool >::shape( a ) );
-	typename FArray1< T >::size_type l( 0 );
+	FArray1D< bool >::size_type l( 0 );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) <= b[ l ] );
 	}
@@ -2222,7 +2217,7 @@ operator >( FArray1S< T > const & a, FArray1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray1D< bool > r( FArray1D< bool >::shape( a ) );
-	typename FArray1< T >::size_type l( 0 );
+	FArray1D< bool >::size_type l( 0 );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) > b[ l ] );
 	}
@@ -2237,7 +2232,7 @@ operator >=( FArray1S< T > const & a, FArray1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray1D< bool > r( FArray1D< bool >::shape( a ) );
-	typename FArray1< T >::size_type l( 0 );
+	FArray1D< bool >::size_type l( 0 );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) >= b[ l ] );
 	}
@@ -2524,7 +2519,7 @@ operator ==( MArray1< A, T > const & a, FArray1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray1D< bool > r( FArray1D< bool >::shape( a ) );
-	typename FArray1< T >::size_type l( 0 );
+	FArray1D< bool >::size_type l( 0 );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) == b[ l ] );
 	}
@@ -2539,7 +2534,7 @@ operator !=( MArray1< A, T > const & a, FArray1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray1D< bool > r( FArray1D< bool >::shape( a ) );
-	typename FArray1< T >::size_type l( 0 );
+	FArray1D< bool >::size_type l( 0 );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) != b[ l ] );
 	}
@@ -2554,7 +2549,7 @@ operator <( MArray1< A, T > const & a, FArray1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray1D< bool > r( FArray1D< bool >::shape( a ) );
-	typename FArray1< T >::size_type l( 0 );
+	FArray1D< bool >::size_type l( 0 );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) < b[ l ] );
 	}
@@ -2569,7 +2564,7 @@ operator <=( MArray1< A, T > const & a, FArray1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray1D< bool > r( FArray1D< bool >::shape( a ) );
-	typename FArray1< T >::size_type l( 0 );
+	FArray1D< bool >::size_type l( 0 );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) <= b[ l ] );
 	}
@@ -2584,7 +2579,7 @@ operator >( MArray1< A, T > const & a, FArray1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray1D< bool > r( FArray1D< bool >::shape( a ) );
-	typename FArray1< T >::size_type l( 0 );
+	FArray1D< bool >::size_type l( 0 );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) > b[ l ] );
 	}
@@ -2599,7 +2594,7 @@ operator >=( MArray1< A, T > const & a, FArray1< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray1D< bool > r( FArray1D< bool >::shape( a ) );
-	typename FArray1< T >::size_type l( 0 );
+	FArray1D< bool >::size_type l( 0 );
 	for ( int i = 1, e = r.u(); i <= e; ++i, ++l ) {
 		r( i ) = ( a( i ) >= b[ l ] );
 	}

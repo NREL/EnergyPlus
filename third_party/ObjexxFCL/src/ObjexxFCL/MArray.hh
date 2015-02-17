@@ -69,8 +69,8 @@ protected: // Creation
 
 	// Constructor
 	inline
-	MArray( A & array, T Class::* pmem ) :
-	 array_( array ),
+	MArray( A & a, T Class::* pmem ) :
+	 array_( a ),
 	 pmem_( pmem )
 	{}
 

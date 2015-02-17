@@ -233,27 +233,27 @@ count( FArray2< bool > const & a, int const dim )
 	switch ( dim ) {
 	case 1:
 		{
-			FArray1D< size_type > res( static_cast< int >( as2 ) );
-			for ( size_type i2 = 0, l = 0; i2 < as2; ++i2 ) {
-				size_type c( 0u );
-				for ( size_type i1 = 0; i1 < as1; ++i1, ++l ) {
-					if ( a[ l ] ) ++c;
-				}
-				res[ i2 ] = c;
+		FArray1D< size_type > res( static_cast< int >( as2 ) );
+		for ( size_type i2 = 0, l = 0; i2 < as2; ++i2 ) {
+			size_type c( 0u );
+			for ( size_type i1 = 0; i1 < as1; ++i1, ++l ) {
+				if ( a[ l ] ) ++c;
 			}
-			return res;
+			res[ i2 ] = c;
+		}
+		return res;
 		}
 	case 2:
 		{
-			FArray1D< size_type > res( static_cast< int >( as1 ) );
-			for ( size_type i1 = 0; i1 < as1; ++i1 ) {
-				size_type c( 0u );
-				for ( size_type i2 = 0, l = i1; i2 < as2; ++i2, l += as1 ) {
-					if ( a[ l ] ) ++c;
-				}
-				res[ i1 ] = c;
+		FArray1D< size_type > res( static_cast< int >( as1 ) );
+		for ( size_type i1 = 0; i1 < as1; ++i1 ) {
+			size_type c( 0u );
+			for ( size_type i2 = 0, l = i1; i2 < as2; ++i2, l += as1 ) {
+				if ( a[ l ] ) ++c;
 			}
-			return res;
+			res[ i1 ] = c;
+		}
+		return res;
 		}
 	default:
 		assert( false );
@@ -261,14 +261,14 @@ count( FArray2< bool > const & a, int const dim )
 	}
 }
 
-// is_contiguous /////
+// contiguous /////
 
 template< typename T >
 inline
 bool
-is_contiguous( FArray< T > const & a )
+contiguous( FArray< T > const & a )
 {
-	return a.is_contiguous();
+	return a.contiguous();
 }
 
 // lbound /////
@@ -1498,27 +1498,27 @@ sum( FArray2< T > const & a, int const dim )
 	switch ( dim ) {
 	case 1:
 		{
-			FArray1D< T > res( static_cast< int >( as2 ), T( 0 ) );
-			for ( size_type i2 = 0, l = 0; i2 < as2; ++i2 ) {
-				T s( 0 );
-				for ( size_type i1 = 0; i1 < as1; ++i1, ++l ) {
-					s += a[ l ];
-				}
-				res[ i2 ] = s;
+		FArray1D< T > res( static_cast< int >( as2 ) );
+		for ( size_type i2 = 0, l = 0; i2 < as2; ++i2 ) {
+			T s( 0 );
+			for ( size_type i1 = 0; i1 < as1; ++i1, ++l ) {
+				s += a[ l ];
 			}
-			return res;
+			res[ i2 ] = s;
+		}
+		return res;
 		}
 	case 2:
 		{
-			FArray1D< T > res( static_cast< int >( as1 ), T( 0 ) );
-			for ( size_type i1 = 0; i1 < as1; ++i1 ) {
-				T s( 0 );
-				for ( size_type i2 = 0, l = i1; i2 < as2; ++i2, l += as1 ) {
-					s += a[ l ];
-				}
-				res[ i1 ] = s;
+		FArray1D< T > res( static_cast< int >( as1 ) );
+		for ( size_type i1 = 0; i1 < as1; ++i1 ) {
+			T s( 0 );
+			for ( size_type i2 = 0, l = i1; i2 < as2; ++i2, l += as1 ) {
+				s += a[ l ];
 			}
-			return res;
+			res[ i1 ] = s;
+		}
+		return res;
 		}
 	default:
 		assert( false );
@@ -1590,27 +1590,27 @@ product( FArray2< T > const & a, int const dim )
 	switch ( dim ) {
 	case 1:
 		{
-			FArray1D< T > res( static_cast< int >( as2 ), T( 1 ) );
-			for ( size_type i2 = 0, l = 0; i2 < as2; ++i2 ) {
-				T p( 1 );
-				for ( size_type i1 = 0; i1 < as1; ++i1, ++l ) {
-					p *= a[ l ];
-				}
-				res[ i2 ] = p;
+		FArray1D< T > res( static_cast< int >( as2 ) );
+		for ( size_type i2 = 0, l = 0; i2 < as2; ++i2 ) {
+			T p( 1 );
+			for ( size_type i1 = 0; i1 < as1; ++i1, ++l ) {
+				p *= a[ l ];
 			}
-			return res;
+			res[ i2 ] = p;
+		}
+		return res;
 		}
 	case 2:
 		{
-			FArray1D< T > res( static_cast< int >( as1 ), T( 1 ) );
-			for ( size_type i1 = 0; i1 < as1; ++i1 ) {
-				T p( 1 );
-				for ( size_type i2 = 0, l = i1; i2 < as2; ++i2, l += as1 ) {
-					p *= a[ l ];
-				}
-				res[ i1 ] = p;
+		FArray1D< T > res( static_cast< int >( as1 ) );
+		for ( size_type i1 = 0; i1 < as1; ++i1 ) {
+			T p( 1 );
+			for ( size_type i2 = 0, l = i1; i2 < as2; ++i2, l += as1 ) {
+				p *= a[ l ];
 			}
-			return res;
+			res[ i1 ] = p;
+		}
+		return res;
 		}
 	default:
 		assert( false );
@@ -2179,32 +2179,32 @@ minloc( FArray2< T > const & a, int const dim )
 	switch ( dim ) {
 	case 1:
 		{
-			FArray1D< int > loc( as2, as2 > 0 ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-			for ( int i2 = 1; i2 <= as2; ++i2 ) {
-				T r( std::numeric_limits< T >::max() );
-				for ( int i1 = 1; i1 <= as1; ++i1, ++l ) {
-					if ( a[ l ] < r ) {
-						r = a[ l ];
-						loc( i2 ) = i1;
-					}
+		FArray1D< int > loc( as2, as2 > 0 ? 1 : 0 ); // F2008 standard => 0 for empty arrays
+		for ( int i2 = 1; i2 <= as2; ++i2 ) {
+			T r( std::numeric_limits< T >::max() );
+			for ( int i1 = 1; i1 <= as1; ++i1, ++l ) {
+				if ( a[ l ] < r ) {
+					r = a[ l ];
+					loc( i2 ) = i1;
 				}
 			}
-			return loc;
+		}
+		return loc;
 		}
 	case 2:
 		{
-			FArray1D< int > loc( as1, as1 > 0 ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-			for ( int i1 = 1; i1 <= as1; ++i1 ) {
-				T r( std::numeric_limits< T >::max() );
-				l = i1 - 1;
-				for ( int i2 = 1; i2 <= as2; ++i2, l += as1 ) {
-					if ( a[ l ] < r ) {
-						r = a[ l ];
-						loc( i1 ) = i2;
-					}
+		FArray1D< int > loc( as1, as1 > 0 ? 1 : 0 ); // F2008 standard => 0 for empty arrays
+		for ( int i1 = 1; i1 <= as1; ++i1 ) {
+			T r( std::numeric_limits< T >::max() );
+			l = i1 - 1;
+			for ( int i2 = 1; i2 <= as2; ++i2, l += as1 ) {
+				if ( a[ l ] < r ) {
+					r = a[ l ];
+					loc( i1 ) = i2;
 				}
 			}
-			return loc;
+		}
+		return loc;
 		}
 	default:
 		assert( false );
@@ -2578,32 +2578,32 @@ maxloc( FArray2< T > const & a, int const dim )
 	switch ( dim ) {
 	case 1:
 		{
-			FArray1D< int > loc( as2, as2 > 0 ? 1 : 0 );
-			for ( int i2 = 1; i2 <= as2; ++i2 ) {
-				T r( std::numeric_limits< T >::lowest() );
-				for ( int i1 = 1; i1 <= as1; ++i1, ++l ) {
-					if ( a[ l ] > r ) {
-						r = a[ l ];
-						loc( i2 ) = i1;
-					}
+		FArray1D< int > loc( as2, as2 > 0 ? 1 : 0 );
+		for ( int i2 = 1; i2 <= as2; ++i2 ) {
+			T r( std::numeric_limits< T >::lowest() );
+			for ( int i1 = 1; i1 <= as1; ++i1, ++l ) {
+				if ( a[ l ] > r ) {
+					r = a[ l ];
+					loc( i2 ) = i1;
 				}
 			}
-			return loc;
+		}
+		return loc;
 		}
 	case 2:
 		{
-			FArray1D< int > loc( as1, as1 > 0 ? 1 : 0 );
-			for ( int i1 = 1; i1 <= as1; ++i1 ) {
-				T r( std::numeric_limits< T >::lowest() );
-				l = i1 - 1;
-				for ( int i2 = 1; i2 <= as2; ++i2, l += as1 ) {
-					if ( a[ l ] > r ) {
-						r = a[ l ];
-						loc( i1 ) = i2;
-					}
+		FArray1D< int > loc( as1, as1 > 0 ? 1 : 0 );
+		for ( int i1 = 1; i1 <= as1; ++i1 ) {
+			T r( std::numeric_limits< T >::lowest() );
+			l = i1 - 1;
+			for ( int i2 = 1; i2 <= as2; ++i2, l += as1 ) {
+				if ( a[ l ] > r ) {
+					r = a[ l ];
+					loc( i1 ) = i2;
 				}
 			}
-			return loc;
+		}
+		return loc;
 		}
 	default:
 		assert( false );

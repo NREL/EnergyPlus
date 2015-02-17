@@ -1107,7 +1107,7 @@ namespace BaseboardRadiator {
 	Real64
 	HWBaseboardUAResidual(
 		Real64 const UA, // UA of coil
-		Optional< FArray1S< Real64 > const > Par // par(1) = design coil load [W]
+		FArray1< Real64 > const & Par // par(1) = design coil load [W]
 	)
 	{
 
@@ -1151,10 +1151,10 @@ namespace BaseboardRadiator {
 		int BaseboardIndex;
 		Real64 LoadMet;
 
-		BaseboardIndex = int( Par()( 2 ) );
+		BaseboardIndex = int( Par( 2 ) );
 		Baseboard( BaseboardIndex ).UA = UA;
 		SimHWConvective( BaseboardIndex, LoadMet );
-		Residuum = ( Par()( 1 ) - LoadMet ) / Par()( 1 );
+		Residuum = ( Par( 1 ) - LoadMet ) / Par( 1 );
 
 		return Residuum;
 	}

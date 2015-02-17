@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -390,73 +389,73 @@ namespace HVACDXSystem {
 	Real64
 	DXCoilVarSpeedResidual(
 		Real64 const SpeedRatio, // compressor speed ratio (1.0 is max, 0.0 is min)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = DX coil number
+		FArray1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	DXCoilVarSpeedHumRatResidual(
 		Real64 const SpeedRatio, // compressor speed ratio (1.0 is max, 0.0 is min)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = DX coil number
+		FArray1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	DXCoilCyclingResidual(
 		Real64 const CycRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = DX coil number
+		FArray1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	DXCoilCyclingHumRatResidual(
 		Real64 const CycRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = DX coil number
+		FArray1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	DOE2DXCoilResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = DX coil number
+		FArray1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	DOE2DXCoilHumRatResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = DX coil number
+		FArray1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	MultiModeDXCoilResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = DX coil number
+		FArray1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	MultiModeDXCoilHumRatResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = DX coil number
+		FArray1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	HXAssistedCoolCoilTempResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = DX coil number
+		FArray1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	HXAssistedCoolCoilHRResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = DX coil number
+		FArray1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	TESCoilResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = DX coil number
+		FArray1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	TESCoilHumRatResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = DX coil number
+		FArray1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	void
@@ -486,7 +485,7 @@ namespace HVACDXSystem {
 	Real64
 	VSCoilCyclingResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = DX coil number
+		FArray1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	//******************************************************************************
@@ -494,13 +493,13 @@ namespace HVACDXSystem {
 	Real64
 	VSCoilSpeedResidual(
 		Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = DX coil number
+		FArray1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	Real64
 	VSCoilCyclingHumResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = DX coil number
+		FArray1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	//******************************************************************************
@@ -508,7 +507,7 @@ namespace HVACDXSystem {
 	Real64
 	VSCoilSpeedHumResidual(
 		Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = DX coil number
+		FArray1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	//        End of Calculation subroutines for the DXCoolingSystem Module

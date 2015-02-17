@@ -46,11 +46,11 @@ operator <<( std::ostream & stream, FArray1S< T > const & a )
 
 		// Save current stream state and set persistent state
 		std::ios_base::fmtflags const old_flags( stream.flags() );
-		std::streamsize const old_precision( stream.precision( Traits::precision() ) );
+		std::streamsize const old_precision( stream.precision( Traits::precision ) );
 		stream << std::right << std::showpoint << std::uppercase;
 
 		// Output array to stream
-		int const w( Traits::iwidth() );
+		int const w( Traits::iwidth );
 		for ( int i = 1, e = a.u(); i < e; ++i ) {
 			stream << setw( w ) << a( i ) << ' ';
 			if ( ! stream ) break;
@@ -114,7 +114,7 @@ LD( FArray1S< T > const & a )
 	std::string s;
 	std::size_t const n( a.size() );
 	if ( n > 0u ) {
-		s.reserve( n * TypeTraits< T >::width() );
+		s.reserve( n * TypeTraits< T >::width );
 		for ( int i = 1, e = a.u(); i <= e; ++i ) {
 			s.append( fmt::LD( a( i ) ) );
 		}

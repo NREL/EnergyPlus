@@ -258,9 +258,6 @@ private: // Data
 
 }; // DimensionSlice
 
-// Types
-typedef  DimensionSlice  DSlice;
-
 } // ObjexxFCL
 
 #endif // ObjexxFCL_DimensionSlice_hh_INCLUDED

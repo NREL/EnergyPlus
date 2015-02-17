@@ -309,7 +309,7 @@ namespace InputProcessor {
 		gio::write( EchoInputFile, fmtLD ) << " Total Number of Fields=" << NumAlphaArgsFound + NumNumericArgsFound;
 
 		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File -- Start";
-		if ( !DisplayInputInAudit ){
+		if ( !DisplayInputInAudit ) {
 			gio::write( EchoInputFile, fmtLD ) << " Echo of input lines is off. May be activated by setting the environmental variable DISPLAYINPUTINAUDIT=YES";
 		}
 
@@ -2632,7 +2632,7 @@ namespace InputProcessor {
 			if ( EchoInputLine ) {
 				++NumLines;
 				if ( DisplayInputInAudit ) {
-					if ( echo_stream ) *echo_stream << std::setw(7) << NumLines << ' ' << InputLine << NL;
+					if ( echo_stream ) *echo_stream << std::setw( 7 ) << NumLines << ' ' << InputLine << NL;
 				}
 			}
 			EchoInputLine = true;
