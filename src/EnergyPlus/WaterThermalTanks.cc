@@ -1331,6 +1331,12 @@ namespace WaterThermalTanks {
 						
 					} else if ( HPWH.CondenserConfig == HPWH_CONDENSER_WRAPPED ) {
 						
+						// Dummy condenser Inlet/Outlet Nodes
+						HPWHSaveNode.InletNodeName1 = "DUMMY CONDENSER INLET uMKYjHgn"; // some random characters to make it really unlikely that this will be duplicated on accident in an input file
+						HPWH.CondWaterInletNode = GetOnlySingleNode( HPWHSaveNode.InletNodeName1, ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsParent );
+						HPWHSaveNode.OutletNodeName1 = "DUMMY CONDENSER OUTLET Gwp72rxh"; // more random characters
+						HPWH.CondWaterOutletNode = GetOnlySingleNode(HPWHSaveNode.OutletNodeName1, ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsParent );
+						
 						// Wrapped Condenser Location
 						HPWH.WrappedCondenserBottomLocation = rNumericArgs( 2 + nNumericOffset );
 						HPWH.WrappedCondenserTopLocation = rNumericArgs( 3 + nNumericOffset );
@@ -1487,16 +1493,21 @@ namespace WaterThermalTanks {
 						ShowContinueError( "can only be used with " + ExpectedCoilType );
 						ErrorsFound = true;
 					}
+					
+					// Hook up our dummy nodes to the coil.
+					if ( HPWH.DXCoilTypeNum == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterWrapped ) {
+						DXCoils::DXCoilData &Coil =DXCoil( HPWH.DXCoilNum );
+						Coil.WaterInNode = GetOnlySingleNode( HPWHSaveNode.OutletNodeName1, ErrorsFound, cCurrentModuleObject, Coil.Name, NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+						
+						Coil.WaterOutNode = GetOnlySingleNode( HPWHSaveNode.InletNodeName1, ErrorsFound, cCurrentModuleObject, Coil.Name, NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+						
+						TestCompSet( cCurrentModuleObject, Coil.Name, HPWHSaveNode.OutletNodeName1, HPWHSaveNode.InletNodeName1, "Water Nodes" );
+						
+					}
 
 					// Set up comp set for condenser water side nodes (reverse inlet/outlet for water heater)
-					if (HPWH.CondenserConfig == HPWH_CONDENSER_PUMPED) {
-						SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.DXCoilType, HPWH.DXCoilName, HPWHSaveNode.InletNodeName1, HPWHSaveNode.OutletNodeName1 );
-						SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.TankType, HPWH.TankName, HPWHSaveNode.OutletNodeName1, HPWHSaveNode.InletNodeName1 );
-					} else if (HPWH.CondenserConfig == HPWH_CONDENSER_WRAPPED) {
-						// TODO: figure out how to hook up the condenser
-					} else {
-						assert(0);
-					}
+					SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.DXCoilType, HPWH.DXCoilName, HPWHSaveNode.InletNodeName1, HPWHSaveNode.OutletNodeName1 );
+					SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.TankType, HPWH.TankName, HPWHSaveNode.OutletNodeName1, HPWHSaveNode.InletNodeName1 );
 					
 					// Minimum Inlet Air Temperature for Compressor Operation
 					HPWH.MinAirTempForHPOperation = rNumericArgs( 4 + nNumericOffset );
