@@ -18,9 +18,6 @@ namespace ObjexxFCL {
 // Forward
 class DimensionSlice;
 
-// Types
-typedef  DimensionSlice  DSlice;
-
 } // ObjexxFCL
 
 #endif // ObjexxFCL_DimensionSlice_fwd_hh_INCLUDED

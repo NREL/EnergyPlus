@@ -1068,7 +1068,7 @@ namespace HVACCooledBeam {
 	Real64
 	CoolBeamResidual(
 		Real64 const CWFlow, // cold water flow rate in kg/s
-		Optional< FArray1S< Real64 > const > Par
+		FArray1< Real64 > const & Par
 	)
 	{
 
@@ -1113,10 +1113,10 @@ namespace HVACCooledBeam {
 		static Real64 UnitOutput( 0.0 );
 		static Real64 TWOut( 0.0 );
 
-		CBIndex = int( Par()( 1 ) );
-		ZoneNodeIndex = int( Par()( 2 ) );
+		CBIndex = int( Par( 1 ) );
+		ZoneNodeIndex = int( Par( 2 ) );
 		CalcCoolBeam( CBIndex, ZoneNodeIndex, CWFlow, UnitOutput, TWOut );
-		Residuum = ( Par()( 3 ) - UnitOutput ) / ( Par()( 5 ) - Par()( 4 ) );
+		Residuum = ( Par( 3 ) - UnitOutput ) / ( Par( 5 ) - Par( 4 ) );
 
 		return Residuum;
 	}

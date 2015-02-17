@@ -1,9 +1,5 @@
 set( target_name objexx )
 
-if(MSVC)
-  ADD_DEFINITIONS("-Za") # Disables MS language extensions
-endif()
-
 if (UNIX)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 endif()

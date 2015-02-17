@@ -164,8 +164,7 @@ namespace PlantPipingSystemsManager {
 	}
 
 	void
-	CheckIfAnyBasements(
-	)
+	CheckIfAnyBasements()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -197,11 +196,7 @@ namespace PlantPipingSystemsManager {
 
 		int const numBasementsCheck( GetNumObjectsFound( ObjName_ZoneCoupled_Basement ) );
 
-		if ( numBasementsCheck > 0 ) {
-			AnyBasementsInModel = true;
-		} else {
-			AnyBasementsInModel = false;
-		}
+		AnyBasementsInModel = ( numBasementsCheck > 0 );
 
 	}
 
@@ -300,140 +295,141 @@ namespace PlantPipingSystemsManager {
 	InitAndSimGroundDomains()
 	{
 
-			// SUBROUTINE INFORMATION:
-			//       AUTHOR         Matt Mitchell
-			//       DATE WRITTEN   Spring 2014
-			//       MODIFIED       na
-			//       RE-ENGINEERED  na
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   Spring 2014
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
 
-			// PURPOSE OF THIS SUBROUTINE:
-			// <description>
+		// PURPOSE OF THIS SUBROUTINE:
+		// <description>
 
-			// METHODOLOGY EMPLOYED:
-			// <description>
+		// METHODOLOGY EMPLOYED:
+		// <description>
 
-			// REFERENCES:
-			// na
+		// REFERENCES:
+		// na
 
-			// Using/Aliasing
-			using DataEnvironment::DayOfMonth;
-			using DataEnvironment::DayOfWeek;
-			using DataHVACGlobals::TimeStepSys;
-			using DataHVACGlobals::SysTimeElapsed;
-			using DataGlobals::BeginSimFlag;
-			using DataGlobals::BeginEnvrnFlag;
-			using DataGlobals::DayOfSim;
-			using DataGlobals::HourOfDay;
-			using DataGlobals::TimeStep;
-			using DataGlobals::TimeStepZone;
-			using DataGlobals::SecInHour;
-			using DataGlobals::InitConvTemp;
-			using DataGlobals::WarmupFlag;
-			using DataGlobals::AnyBasementsInModel;
-			using DataGlobals::OutputFileInits;
+		// Using/Aliasing
+		using DataEnvironment::DayOfMonth;
+		using DataEnvironment::DayOfWeek;
+		using DataHVACGlobals::TimeStepSys;
+		using DataHVACGlobals::SysTimeElapsed;
+		using DataGlobals::BeginSimFlag;
+		using DataGlobals::BeginEnvrnFlag;
+		using DataGlobals::DayOfSim;
+		using DataGlobals::HourOfDay;
+		using DataGlobals::TimeStep;
+		using DataGlobals::TimeStepZone;
+		using DataGlobals::TimeStepZoneSec;
+		using DataGlobals::SecInHour;
+		using DataGlobals::InitConvTemp;
+		using DataGlobals::WarmupFlag;
+		using DataGlobals::AnyBasementsInModel;
+		using DataGlobals::OutputFileInits;
 
-			// Locals
-			// SUBROUTINE ARGUMENT DEFINITIONS:
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
 
-			// SUBROUTINE PARAMETER DEFINITIONS:
-			static std::string const RoutineName( "InitAndSimGroundDomain" );
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "InitAndSimGroundDomain" );
 
-			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-			static bool GetInputFlag( true ); // First time, input is "gotten"
-			static bool WriteEIOFlag( true ); // Set to false once eio information is written
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static bool GetInputFlag( true ); // First time, input is "gotten"
+		static bool WriteEIOFlag( true ); // Set to false once eio information is written
 
-			static gio::Fmt DomainCellsToEIOHeader( "('! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells')" );
-			static gio::Fmt DomainCellsToEIO( "(A,',',I5',',I5',',I5)" );
+		static gio::Fmt DomainCellsToEIOHeader( "('! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells')" );
+		static gio::Fmt DomainCellsToEIO( "(A,',',I5',',I5',',I5)" );
 
-			int DomainNum = 0;
+		int DomainNum = 0;
 
-			// Read input if necessary
-			if ( GetInputFlag ) {
-				GetPipingSystemsInput();
-				GetInputFlag = false;
+		// Read input if necessary
+		if ( GetInputFlag ) {
+			GetPipingSystemsInput();
+			GetInputFlag = false;
+		}
+
+		for ( DomainNum = 1; DomainNum <= isize( PipingSystemDomains ); ++DomainNum ) {
+			if ( PipingSystemDomains( DomainNum ).DomainNeedsToBeMeshed ) {
+				DevelopMesh( DomainNum );
 			}
 
-			for ( DomainNum = 1; DomainNum <= isize( PipingSystemDomains ); ++DomainNum ) {
-				if ( PipingSystemDomains( DomainNum ).DomainNeedsToBeMeshed ) {
-					DevelopMesh( DomainNum );
-				}
+			PipingSystemDomains( DomainNum ).DomainNeedsToBeMeshed = false;
 
-				PipingSystemDomains( DomainNum ).DomainNeedsToBeMeshed = false;
+			// The time init should be done here before we DoOneTimeInits because the DoOneTimeInits
+			// includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
+			// which would be carried over from the previous environment
+			PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds = ( ( DayOfSim - 1 ) * 24 + ( HourOfDay - 1 ) + ( TimeStep - 1 ) * TimeStepZone + SysTimeElapsed ) * SecInHour;
 
-				// The time init should be done here before we DoOneTimeInits because the DoOneTimeInits
-				// includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
-				// which would be carried over from the previous environment
-				PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds = ( ( DayOfSim - 1 ) * 24 + ( HourOfDay - 1 ) + ( TimeStep - 1 ) * TimeStepZone + SysTimeElapsed ) * SecInHour;
+			// There are also some inits that are "close to one time" inits...( one-time in standalone, each envrn in E+ )
+			if ( ( BeginSimFlag && PipingSystemDomains( DomainNum ).BeginSimInit ) || ( BeginEnvrnFlag && PipingSystemDomains( DomainNum ).BeginSimEnvrn ) ) {
 
-				// There are also some inits that are "close to one time" inits...( one-time in standalone, each envrn in E+ )
-				if ( ( BeginSimFlag && PipingSystemDomains( DomainNum ).BeginSimInit ) || ( BeginEnvrnFlag && PipingSystemDomains( DomainNum ).BeginSimEnvrn ) ) {
+				DoOneTimeInitializations( DomainNum, _ );
 
-					DoOneTimeInitializations( DomainNum,_ );
+				PipingSystemDomains( DomainNum ).BeginSimInit = false;
+				PipingSystemDomains( DomainNum ).BeginSimEnvrn = false;
+			}
 
-					PipingSystemDomains( DomainNum ).BeginSimInit = false;
-					PipingSystemDomains( DomainNum ).BeginSimEnvrn = false;
-				}
+			if ( !BeginSimFlag ) PipingSystemDomains( DomainNum ).BeginSimInit = true;
+			if ( !BeginEnvrnFlag ) PipingSystemDomains( DomainNum ).BeginSimEnvrn = true;
 
-				if ( !BeginSimFlag ) PipingSystemDomains( DomainNum ).BeginSimInit = true;
-				if ( !BeginEnvrnFlag ) PipingSystemDomains( DomainNum ).BeginSimEnvrn = true;
-
-				// Reset the heat fluxs if domain update has been completed
-				if ( PipingSystemDomains( DomainNum ).ResetHeatFluxFlag ) {
-					PipingSystemDomains( DomainNum ).AggregateHeatFlux = 0;
+			// Reset the heat fluxs if domain update has been completed
+			if ( PipingSystemDomains( DomainNum ).ResetHeatFluxFlag ) {
+				PipingSystemDomains( DomainNum ).AggregateHeatFlux = 0;
 					PipingSystemDomains( DomainNum ).AggregateWallHeatFlux = 0;
 					PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux = 0;
-					PipingSystemDomains( DomainNum ).NumHeatFlux = 0;
-					PipingSystemDomains( DomainNum ).ResetHeatFluxFlag = false;
-				}
-
-				// Aggregate the heat flux
-				// Zone-coupled slab
-				if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
-					PipingSystemDomains( DomainNum ).AggregateHeatFlux += GetZoneInterfaceHeatFlux( DomainNum );
-					PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
-					PipingSystemDomains( DomainNum ).HeatFlux = PipingSystemDomains( DomainNum ).AggregateHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
-				} else { // Coupled basement
-					// basement walls
-					PipingSystemDomains( DomainNum ).AggregateWallHeatFlux += GetBasementWallHeatFlux( DomainNum );
-					// basement floor
-					PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux += GetBasementFloorHeatFlux( DomainNum );
-
-					PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
-					PipingSystemDomains( DomainNum ).WallHeatFlux = PipingSystemDomains( DomainNum ).AggregateWallHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
-					PipingSystemDomains( DomainNum ).FloorHeatFlux = PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
-				}
-
-				// Select run interval
-				if ( PipingSystemDomains( DomainNum ).SimTimestepFlag ) {
-					// Keep on going!
-					PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = TimeStepZone * SecInHour;
-				} else if ( PipingSystemDomains( DomainNum ).SimHourlyFlag ) {
-					// Passes by if not time to run
-					if ( TimeStep != 1 ) continue;
-						PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = SecInHour;
-				}
-
-				// Shift history arrays only if necessary
-				if ( std::abs( PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds - PipingSystemDomains( DomainNum ).Cur.PrevSimTimeSeconds ) > 1.0e-6 ) {
-					PipingSystemDomains( DomainNum ).Cur.PrevSimTimeSeconds = PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds;
-					ShiftTemperaturesForNewTimeStep( DomainNum );
-					PipingSystemDomains( DomainNum ).DomainNeedsSimulation = true;
-				}
-				PerformIterationLoop( DomainNum, _ );
+				PipingSystemDomains( DomainNum ).NumHeatFlux = 0;
+				PipingSystemDomains( DomainNum ).ResetHeatFluxFlag = false;
 			}
 
-			if ( WriteEIOFlag ) {
-				// Write eio header
-				gio::write( OutputFileInits, DomainCellsToEIOHeader );
+			// Aggregate the heat flux
+			// Zone-coupled slab
+			if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
+				PipingSystemDomains( DomainNum ).AggregateHeatFlux += GetZoneInterfaceHeatFlux( DomainNum );
+				PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
+				PipingSystemDomains( DomainNum ).HeatFlux = PipingSystemDomains( DomainNum ).AggregateHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
+			} else { // Coupled basement
+				// basement walls
+				PipingSystemDomains( DomainNum ).AggregateWallHeatFlux += GetBasementWallHeatFlux( DomainNum );
+				// basement floor
+				PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux += GetBasementFloorHeatFlux( DomainNum );
 
-				// Write eio data
-				for ( DomainNum = 1; DomainNum <= isize( PipingSystemDomains ); ++DomainNum ) {
-					gio::write( OutputFileInits, DomainCellsToEIO ) << PipingSystemDomains( DomainNum ).Name << PipingSystemDomains( DomainNum ).NumDomainCells
-						<< PipingSystemDomains( DomainNum ).NumGroundSurfCells << PipingSystemDomains( DomainNum ).NumInsulationCells;
-				}
-				WriteEIOFlag = false;
+				PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
+				PipingSystemDomains( DomainNum ).WallHeatFlux = PipingSystemDomains( DomainNum ).AggregateWallHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
+				PipingSystemDomains( DomainNum ).FloorHeatFlux = PipingSystemDomains( DomainNum ).AggregateFloorHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
 			}
+
+			// Select run interval
+			if ( PipingSystemDomains( DomainNum ).SimTimestepFlag ) {
+				// Keep on going!
+				PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = TimeStepZoneSec;
+			} else if ( PipingSystemDomains( DomainNum ).SimHourlyFlag ) {
+				// Passes by if not time to run
+				if ( TimeStep != 1 ) continue;
+					PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = SecInHour;
+			}
+
+			// Shift history arrays only if necessary
+			if ( std::abs( PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds - PipingSystemDomains( DomainNum ).Cur.PrevSimTimeSeconds ) > 1.0e-6 ) {
+				PipingSystemDomains( DomainNum ).Cur.PrevSimTimeSeconds = PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds;
+				ShiftTemperaturesForNewTimeStep( DomainNum );
+				PipingSystemDomains( DomainNum ).DomainNeedsSimulation = true;
+			}
+			PerformIterationLoop( DomainNum, _ );
 		}
+
+		if ( WriteEIOFlag ) {
+			// Write eio header
+			gio::write( OutputFileInits, DomainCellsToEIOHeader );
+
+			// Write eio data
+			for ( DomainNum = 1; DomainNum <= isize( PipingSystemDomains ); ++DomainNum ) {
+				gio::write( OutputFileInits, DomainCellsToEIO ) << PipingSystemDomains( DomainNum ).Name << PipingSystemDomains( DomainNum ).NumDomainCells
+					<< PipingSystemDomains( DomainNum ).NumGroundSurfCells << PipingSystemDomains( DomainNum ).NumInsulationCells;
+			}
+			WriteEIOFlag = false;
+		}
+	}
 
 	//*********************************************************************************************!
 
@@ -9704,7 +9700,7 @@ namespace PlantPipingSystemsManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

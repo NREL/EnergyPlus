@@ -3192,7 +3192,7 @@ namespace UnitVentilator {
 	Real64
 	CalcUnitVentilatorResidual(
 		Real64 const PartLoadRatio, // Coil Part Load Ratio
-		Optional< FArray1S< Real64 > const > Par // Function parameters
+		FArray1< Real64 > const & Par // Function parameters
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -3235,13 +3235,9 @@ namespace UnitVentilator {
 		Real64 QUnitOut; // heating/Cooling provided by unit ventilator [watts]
 
 		// Convert parameters to usable variables
-		UnitVentNum = int( Par()( 1 ) );
-		if ( Par()( 2 ) == 1.0 ) {
-			FirstHVACIteration = true;
-		} else {
-			FirstHVACIteration = false;
-		}
-		OpMode = int( Par()( 3 ) );
+		UnitVentNum = int( Par( 1 ) );
+		FirstHVACIteration = ( Par( 2 ) == 1.0 );
+		OpMode = int( Par( 3 ) );
 		CalcUnitVentilatorComponents( UnitVentNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadRatio );
 		// Calculate residual based on output calculation flag
 		if ( QZnReq != 0.0 ) {
