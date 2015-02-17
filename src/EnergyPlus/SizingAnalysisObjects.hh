@@ -144,35 +144,35 @@ class  PlantCoinicidentAnalysis {
 public:
 
 	//this object collects data and methods for analyzing coincident sizing for a single plant loop
-	int PlantLoopIndex = 0; // index in plant loop data structure.
-	int SupplySideInletNodeNum = 0; // node index for supply side inlet node
-	int PlantSizingIndex = 0;
-	int NumTimeStepsInAvg = 0;
+	int plantLoopIndex = 0; // index in plant loop data structure.
+	int supplySideInletNodeNum = 0; // node index for supply side inlet node
+	int plantSizingIndex = 0;
+	int numTimeStepsInAvg = 0;
 	ZoneTimestepObject newFoundMassFlowRateTimeStamp;
-	Real64 PeakMdotCoincidentReturnTemp;
-	Real64 PeakMdotCoincidentDemand;
+	Real64 peakMdotCoincidentReturnTemp;
+	Real64 peakMdotCoincidentDemand;
 
-	bool AnotherIterationDesired = false ;
+	bool anotherIterationDesired = false ;
 
 	int supplyInletNodeFlow_LogIndex; // loop flow rate index for vector of log objects in the logger framework
 	int supplyInletNodeTemp_LogIndex; // loop return temperature index for vector of log objects in the logger framework
 
 	// variables related to loop demand
 	int loopDemand_LogIndex; // Loop demand load index for vector of log objects in the logger framework
-	bool PeakDemandAndFlowMismatch;
-	ZoneTimestepObject newFoundMaxDemandTimeStamp;
+	bool peakDemandAndFlowMismatch;
+	ZoneTimestepObject NewFoundMaxDemandTimeStamp;
 
-	Real64 PeakDemandReturnTemp;
-	Real64 PeakDemandMassFlow;
+	Real64 peakDemandReturnTemp;
+	Real64 peakDemandMassFlow;
 
 
 	PlantCoinicidentAnalysis (
-		std::string plantLoopName,
+		std::string loopName,
 		int loopIndex,
-		int NodeNum,
+		int nodeNum,
 		Real64 density,
 			Real64 cp,
-		int numTimeStepsInAvg,
+		int numStepsInAvg,
 		int sizingIndex
 	);
 
@@ -187,10 +187,10 @@ private:
 	Real64 newAdjustedMassFlowRate = 0.0; // with sizing factor included...
 	Real64 newFoundMassFlowRate = 0.0;
 
-	const Real64 SignificantNormalizedChange = 0.005 ;
-	Real64 DensityForSizing = 0.0;
-	Real64 SpecificHeatForSizing = 0.0;
-	Real64 PlantSizingFraction = 0.0;
+	const Real64 significantNormalizedChange = 0.005 ;
+	Real64 densityForSizing = 0.0;
+	Real64 specificHeatForSizing = 0.0;
+	Real64 plantSizingFraction = 0.0;
 	Real64 previousVolDesignFlowRate = 0.0;
 	Real64 newVolDesignFlowRate = 0.0;
 	

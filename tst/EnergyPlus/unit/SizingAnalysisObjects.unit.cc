@@ -6,14 +6,21 @@
 // EnergyPlus Headers
 #include <EnergyPlus/SizingAnalysisObjects.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <OutputReportPredefined.hh>
 
 using namespace EnergyPlus;
 using namespace WeatherManager;
 using namespace OutputProcessor;
 using namespace DataGlobals;
-using DataGlobals::NumOfTimeStepInHour;
-using DataGlobals::KindOfSim;
-using DataGlobals::TimeStepZone;
+using namespace DataPlant;
+using namespace DataSizing;
+using namespace OutputReportPredefined;
+
+//using DataGlobals::NumOfTimeStepInHour;
+//using DataGlobals::KindOfSim;
+//using DataGlobals::TimeStepZone;
 
 
 
@@ -66,10 +73,36 @@ public:
 		TimeValue.allocate( 2 );
 		TimeValue( 1 ).TimeStep >>= TimeStepZone;
 
+		PlantSizData.allocate( 1 );
+
+		PlantSizData( 1 ).SizingFactorOption = NoSizingFactorMode;
+		PlantSizData( 1 ).DesVolFlowRate = 0.002;
+		PlantSizData( 1 ).DeltaT = 10;
+
+		TotNumLoops = 1;
+		PlantLoop.allocate( TotNumLoops );
+		for ( int l = 1; l <= TotNumLoops; ++l ) {
+			auto & loop( PlantLoop( l ) );
+			loop.LoopSide.allocate( 2 );
+		}
+		PlantLoop( 1 ).Name = "Test Plant Loop 1";
+		PlantLoop( 1 ).MaxVolFlowRateWasAutoSized = true;
+		PlantLoop( 1 ).MaxVolFlowRate = 0.002;
+		PlantLoop( 1 ).MaxMassFlowRate = 2.0;
+		PlantLoop( 1 ).VolumeWasAutoSized = true;
+
+		SetPredefinedTables();
 
 	}
 
-
+	~SizingAnalysisObjectsTest( )
+	{
+		TotNumLoops = 0;
+		PlantLoop.clear();
+		Environment.clear();
+		PlantSizData.clear();
+		TimeValue.clear();
+	}
 
 
 };
@@ -295,5 +328,77 @@ TEST_F( SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour )
 
 		//store this in the logger framework
 	sizingLoggerFrameObj.logObjs.push_back(TestLogObj );
+}
+
+TEST_F( SizingAnalysisObjectsTest , PlantCoincidentAnalyObjTest)
+{
+
+	std::string loopName;
+	int loopNum;
+	int nodeNum;
+	Real64 density;
+	Real64 cp;
+	int timestepsInAvg;
+	int plantSizingIndex;
+
+	loopName = "Test Plant Loop 1";
+	loopNum = 1;
+	nodeNum = 1;
+	density = 1000;
+	cp = 1.0;
+	timestepsInAvg = 1;
+	plantSizingIndex = 1;
+
+	PlantCoinicidentAnalysis TestAnalysisObj( 
+		loopName,
+		loopNum,
+		nodeNum,
+		density,
+		cp,
+		timestepsInAvg,
+		plantSizingIndex
+		);
+
+	// fill first step in log with zone step data
+	int KindOfSim( 4 );
+	int Envrn( 4 );
+	int DDnum( 1 );
+	int DayOfSim( 1 );
+	int HourofDay( 1 );
+	int CurMin( 15 );
+	Real64 timeStepDuration( 0.25 );
+	int numTimeStepsInHour ( 4 );
+
+	ZoneTimestepObject tmpztStepStamp1( // call constructor
+		KindOfSim,
+		Envrn,
+		DDnum,
+		DayOfSim,
+		HourofDay,
+		CurMin,
+		timeStepDuration,
+		numTimeStepsInHour
+	); 
+	LogVal = 1.5; // kg/s
+	tmpztStepStamp1.runningAvgDataValue = 1.5;
+	sizingLoggerFrameObj.logObjs[logIndex].FillZoneStep( tmpztStepStamp1 );
+
+	TestAnalysisObj.newFoundMassFlowRateTimeStamp = tmpztStepStamp1;
+	TestAnalysisObj.peakMdotCoincidentDemand = 1000.0;
+	TestAnalysisObj.peakMdotCoincidentReturnTemp = 10.0;
+	TestAnalysisObj.NewFoundMaxDemandTimeStamp = tmpztStepStamp1;
+	TestAnalysisObj.peakDemandMassFlow = 1.5;
+	TestAnalysisObj.peakDemandReturnTemp = 10.0;
+	
+	EXPECT_DOUBLE_EQ( 0.002, PlantLoop( 1 ).MaxVolFlowRate ); //  m3/s
+
+	TestAnalysisObj.ResolveDesignFlowRate( 1 );
+
+	EXPECT_DOUBLE_EQ( 0.0015, PlantLoop( 1 ).MaxVolFlowRate ); //  m3/s
+	EXPECT_DOUBLE_EQ( 1.5, PlantLoop( 1 ).MaxMassFlowRate ); //  m3/s
+	EXPECT_TRUE( TestAnalysisObj.anotherIterationDesired );
+
+
+
 }
 

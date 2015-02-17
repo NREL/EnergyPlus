@@ -110,19 +110,19 @@ namespace EnergyPlus {
 		for ( auto &P : plantCoincAnalyObjs ) {
 			//call setup log routine for each coincident plant analysis object 
 			P.supplyInletNodeFlow_LogIndex = sizingLogger.SetupVariableSizingLog( 
-				Node(P.SupplySideInletNodeNum).MassFlowRate,
-				P.NumTimeStepsInAvg );
+				Node(P.supplySideInletNodeNum).MassFlowRate,
+				P.numTimeStepsInAvg );
 			P.supplyInletNodeTemp_LogIndex = sizingLogger.SetupVariableSizingLog( 
-				Node(P.SupplySideInletNodeNum).Temp,
-				P.NumTimeStepsInAvg );
-			if ( PlantSizData(P.PlantSizingIndex).LoopType == HeatingLoop ) {
+				Node(P.supplySideInletNodeNum).Temp,
+				P.numTimeStepsInAvg );
+			if ( PlantSizData(P.plantSizingIndex).LoopType == HeatingLoop ) {
 				P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog( 
-					PlantReport(P.PlantLoopIndex ).HeatingDemand,
-					P.NumTimeStepsInAvg ) ;
-			} else if ( PlantSizData(P.PlantSizingIndex).LoopType == CoolingLoop ) {
+					PlantReport(P.plantLoopIndex ).HeatingDemand,
+					P.numTimeStepsInAvg ) ;
+			} else if ( PlantSizData(P.plantSizingIndex).LoopType == CoolingLoop ) {
 				P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog( 
-					PlantReport(P.PlantLoopIndex ).CoolingDemand,
-					P.NumTimeStepsInAvg ) ;
+					PlantReport(P.plantLoopIndex ).CoolingDemand,
+					P.numTimeStepsInAvg ) ;
 			}
 
 		}
@@ -150,16 +150,16 @@ namespace EnergyPlus {
 		for ( auto &P : plantCoincAnalyObjs ) {
 			//step 1 find maximum flow rate on concurrent return temp and load
 			P.newFoundMassFlowRateTimeStamp = sizingLogger.logObjs[ P.supplyInletNodeFlow_LogIndex ].GetLogVariableDataMax( );
-			P.PeakMdotCoincidentDemand = sizingLogger.logObjs[ P.loopDemand_LogIndex].GetLogVariableDataAtTimestamp ( P.newFoundMassFlowRateTimeStamp );
-			P.PeakMdotCoincidentReturnTemp = sizingLogger.logObjs[ P.supplyInletNodeTemp_LogIndex].GetLogVariableDataAtTimestamp ( P.newFoundMassFlowRateTimeStamp );
+			P.peakMdotCoincidentDemand = sizingLogger.logObjs[ P.loopDemand_LogIndex].GetLogVariableDataAtTimestamp ( P.newFoundMassFlowRateTimeStamp );
+			P.peakMdotCoincidentReturnTemp = sizingLogger.logObjs[ P.supplyInletNodeTemp_LogIndex].GetLogVariableDataAtTimestamp ( P.newFoundMassFlowRateTimeStamp );
 
 			// step 2 find maximum load and concurrent flow and return temp
-			P.newFoundMaxDemandTimeStamp = sizingLogger.logObjs[ P.loopDemand_LogIndex ].GetLogVariableDataMax( );
-			P.PeakDemandMassFlow = sizingLogger.logObjs[ P.supplyInletNodeFlow_LogIndex ].GetLogVariableDataAtTimestamp( P.newFoundMaxDemandTimeStamp );
-			P.PeakDemandReturnTemp = sizingLogger.logObjs[ P.supplyInletNodeTemp_LogIndex ].GetLogVariableDataAtTimestamp( P.newFoundMaxDemandTimeStamp );
+			P.NewFoundMaxDemandTimeStamp = sizingLogger.logObjs[ P.loopDemand_LogIndex ].GetLogVariableDataMax( );
+			P.peakDemandMassFlow = sizingLogger.logObjs[ P.supplyInletNodeFlow_LogIndex ].GetLogVariableDataAtTimestamp( P.NewFoundMaxDemandTimeStamp );
+			P.peakDemandReturnTemp = sizingLogger.logObjs[ P.supplyInletNodeTemp_LogIndex ].GetLogVariableDataAtTimestamp( P.NewFoundMaxDemandTimeStamp );
 
 			P.ResolveDesignFlowRate( HVACSizingIterCount );
-			if ( P.AnotherIterationDesired ){
+			if ( P.anotherIterationDesired ){
 				plantCoinAnalyRequestsAnotherIteration = true;
 			}
 		}

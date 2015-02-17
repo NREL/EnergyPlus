@@ -392,20 +392,21 @@ namespace EnergyPlus {
 	}
 	
 	PlantCoinicidentAnalysis::PlantCoinicidentAnalysis ( 
-		std::string plantLoopName,
+		std::string loopName,
 		int loopIndex,
-		int NodeNum,
+		int nodeNum,
 		Real64 density,
-		Real64 cp,
-		int numTimeStepsInAvg,
-		int sizingIndex) {
-			name= plantLoopName;
-			PlantLoopIndex = loopIndex;
-			SupplySideInletNodeNum = NodeNum;
-			DensityForSizing = density;
-			SpecificHeatForSizing = cp;
-			NumTimeStepsInAvg = numTimeStepsInAvg;
-			PlantSizingIndex = sizingIndex;
+			Real64 cp,
+		int numStepsInAvg,
+		int sizingIndex
+		) {
+			name= loopName;
+			plantLoopIndex = loopIndex;
+			supplySideInletNodeNum = nodeNum;
+			densityForSizing = density;
+			specificHeatForSizing = cp;
+			numTimeStepsInAvg = numStepsInAvg;
+			plantSizingIndex = sizingIndex;
 	}
 		
 
@@ -436,7 +437,7 @@ namespace EnergyPlus {
 		Real64 peakLoadCalculatedMassFlow;
 		std::string chIteration;
 
-		previousVolDesignFlowRate	= PlantSizData( PlantLoopIndex ).DesVolFlowRate;
+		previousVolDesignFlowRate	= PlantSizData( plantLoopIndex ).DesVolFlowRate;
 
 		if (newFoundMassFlowRateTimeStamp.runningAvgDataValue > 0.0 ) {
 			newFoundMassFlowRate		= newFoundMassFlowRateTimeStamp.runningAvgDataValue;
@@ -445,33 +446,33 @@ namespace EnergyPlus {
 		}
 
 		//step 3 calculate mdot from max load and delta T
-		if ( (newFoundMaxDemandTimeStamp.runningAvgDataValue > 0.0) &&
-			((SpecificHeatForSizing * PlantSizData( PlantSizingIndex ).DeltaT) > 0.0))  {
-				peakLoadCalculatedMassFlow = newFoundMaxDemandTimeStamp.runningAvgDataValue / 
-											(SpecificHeatForSizing * PlantSizData( PlantSizingIndex ).DeltaT);
+		if ( (NewFoundMaxDemandTimeStamp.runningAvgDataValue > 0.0) &&
+			((specificHeatForSizing * PlantSizData( plantSizingIndex ).DeltaT) > 0.0))  {
+				peakLoadCalculatedMassFlow = NewFoundMaxDemandTimeStamp.runningAvgDataValue / 
+											(specificHeatForSizing * PlantSizData( plantSizingIndex ).DeltaT);
 		} else {
 			peakLoadCalculatedMassFlow = 0.0;
 		}
 
 		newFoundMassFlowRate = max( newFoundMassFlowRate, peakLoadCalculatedMassFlow ); //step 4, take larger of the two
 
-		newFoundVolFlowRate = newFoundMassFlowRate / DensityForSizing;
+		newFoundVolFlowRate = newFoundMassFlowRate / densityForSizing;
 
 		// now apply the correct sizing factor depending on input option
-		if ( PlantSizData( PlantLoopIndex ).SizingFactorOption == NoSizingFactorMode ) {
+		if ( PlantSizData( plantLoopIndex ).SizingFactorOption == NoSizingFactorMode ) {
 			SizingFac = 1.0;
-		} else if ( PlantSizData( PlantLoopIndex ).SizingFactorOption == GlobalHeatingSizingFactorMode ) { 
+		} else if ( PlantSizData( plantLoopIndex ).SizingFactorOption == GlobalHeatingSizingFactorMode ) { 
 			SizingFac = GlobalHeatSizingFactor;
-		} else if ( PlantSizData( PlantLoopIndex ).SizingFactorOption == GlobalCoolingSizingFactorMode ) {
+		} else if ( PlantSizData( plantLoopIndex ).SizingFactorOption == GlobalCoolingSizingFactorMode ) {
 			SizingFac = GlobalCoolSizingFactor;
-		} else if (  PlantSizData( PlantLoopIndex ).SizingFactorOption == LoopComponentSizingFactorMode ) {
+		} else if (  PlantSizData( plantLoopIndex ).SizingFactorOption == LoopComponentSizingFactorMode ) {
 			//multiplier used for pumps, often 1.0, from component level sizing fractions
-			SizingFac = PlantLoop( PlantLoopIndex ).LoopSide( SupplySide ).Branch( 1 ).PumpSizFac;
+			SizingFac = PlantLoop( plantLoopIndex ).LoopSide( SupplySide ).Branch( 1 ).PumpSizFac;
 		}
 
 		newAdjustedMassFlowRate		= newFoundMassFlowRate * SizingFac; // apply overall heating or cooling sizing factor
 
-		newVolDesignFlowRate		= newAdjustedMassFlowRate / DensityForSizing;
+		newVolDesignFlowRate		= newAdjustedMassFlowRate / densityForSizing;
 
 		//compare threshold, 
 		SetNewSizes = false;
@@ -481,25 +482,25 @@ namespace EnergyPlus {
 
 			NormalizedChange = std::abs((newVolDesignFlowRate - previousVolDesignFlowRate) 
 									/ previousVolDesignFlowRate);
-			if (NormalizedChange > SignificantNormalizedChange ) {
-				AnotherIterationDesired = true;
+			if (NormalizedChange > significantNormalizedChange ) {
+				anotherIterationDesired = true;
 				SetNewSizes = true;
 			} else {
-				AnotherIterationDesired = false;
+				anotherIterationDesired = false;
 			}
 		}
 
 		if ( SetNewSizes ) {
 		// set new size values for rest of simulation
-			PlantSizData( PlantLoopIndex ).DesVolFlowRate = newVolDesignFlowRate;
+			PlantSizData( plantLoopIndex ).DesVolFlowRate = newVolDesignFlowRate;
 
-			if (PlantLoop( PlantLoopIndex ).MaxVolFlowRateWasAutoSized ) {
-				PlantLoop( PlantLoopIndex ).MaxVolFlowRate = newVolDesignFlowRate;
-				PlantLoop( PlantLoopIndex ).MaxMassFlowRate =  newAdjustedMassFlowRate;
+			if (PlantLoop( plantLoopIndex ).MaxVolFlowRateWasAutoSized ) {
+				PlantLoop( plantLoopIndex ).MaxVolFlowRate = newVolDesignFlowRate;
+				PlantLoop( plantLoopIndex ).MaxMassFlowRate =  newAdjustedMassFlowRate;
 			}
-			if ( PlantLoop( PlantLoopIndex ).VolumeWasAutoSized ) {
-				PlantLoop( PlantLoopIndex ).Volume = PlantLoop( PlantLoopIndex ).MaxVolFlowRate * TimeStepZone * SecInHour / 0.8;
-				PlantLoop( PlantLoopIndex ).Mass = PlantLoop( PlantLoopIndex ).Volume* DensityForSizing;
+			if ( PlantLoop( plantLoopIndex ).VolumeWasAutoSized ) {
+				PlantLoop( plantLoopIndex ).Volume = PlantLoop( plantLoopIndex ).MaxVolFlowRate * TimeStepZone * SecInHour / 0.8;
+				PlantLoop( plantLoopIndex ).Mass = PlantLoop( plantLoopIndex ).Volume* densityForSizing;
 			}
 
 
@@ -507,20 +508,20 @@ namespace EnergyPlus {
 				//report to sizing summary table called Plant Loop Coincident Design Fluid Flow Rates
 //		PreDefTableEntry( pdchPlantSizPass, PlantLoop( PlantLoopIndex ).Name, HVACSizingIterCount );
 		chIteration = TrimSigDigits(HVACSizingIterCount);
-		PreDefTableEntry( pdchPlantSizPrevVdot, PlantLoop( PlantLoopIndex ).Name + " Sizing Pass " + chIteration , previousVolDesignFlowRate , 6 );
-		PreDefTableEntry( pdchPlantSizMeasVdot, PlantLoop( PlantLoopIndex ).Name + " Sizing Pass " + chIteration , newFoundVolFlowRate , 6 );
-		PreDefTableEntry( pdchPlantSizCalcVdot, PlantLoop( PlantLoopIndex ).Name + " Sizing Pass " + chIteration , newVolDesignFlowRate , 6 );
+		PreDefTableEntry( pdchPlantSizPrevVdot, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , previousVolDesignFlowRate , 6 );
+		PreDefTableEntry( pdchPlantSizMeasVdot, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , newFoundVolFlowRate , 6 );
+		PreDefTableEntry( pdchPlantSizCalcVdot, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , newVolDesignFlowRate , 6 );
 
 		if (SetNewSizes) {
-			PreDefTableEntry( pdchPlantSizCoincYesNo, PlantLoop( PlantLoopIndex ).Name + " Sizing Pass " + chIteration , "Yes" );
+			PreDefTableEntry( pdchPlantSizCoincYesNo, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , "Yes" );
 		} else {
-			PreDefTableEntry( pdchPlantSizCoincYesNo, PlantLoop( PlantLoopIndex ).Name + " Sizing Pass " + chIteration , "No" );
+			PreDefTableEntry( pdchPlantSizCoincYesNo, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , "No" );
 		}
 
-		PreDefTableEntry( pdchPlantSizDesDay, PlantLoop( PlantLoopIndex ).Name + " Sizing Pass " + chIteration , Environment(newFoundMassFlowRateTimeStamp.envrnNum).Title );
-		PreDefTableEntry( pdchPlantSizPkTimeDayOfSim, PlantLoop( PlantLoopIndex ).Name + " Sizing Pass " + chIteration , newFoundMassFlowRateTimeStamp.dayOfSim );
-		PreDefTableEntry( pdchPlantSizPkTimeHour, PlantLoop( PlantLoopIndex ).Name + " Sizing Pass " + chIteration , newFoundMassFlowRateTimeStamp.hourOfDay - 1 );
-		PreDefTableEntry( pdchPlantSizPkTimeMin, PlantLoop( PlantLoopIndex ).Name + " Sizing Pass " + chIteration , newFoundMassFlowRateTimeStamp.stepStartMinute, 0 );
+		PreDefTableEntry( pdchPlantSizDesDay, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , Environment(newFoundMassFlowRateTimeStamp.envrnNum).Title );
+		PreDefTableEntry( pdchPlantSizPkTimeDayOfSim, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , newFoundMassFlowRateTimeStamp.dayOfSim );
+		PreDefTableEntry( pdchPlantSizPkTimeHour, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , newFoundMassFlowRateTimeStamp.hourOfDay - 1 );
+		PreDefTableEntry( pdchPlantSizPkTimeMin, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , newFoundMassFlowRateTimeStamp.stepStartMinute, 0 );
 	
 	}
 }
