@@ -22,8 +22,8 @@ namespace EnergyPlus {
 class SQLiteProcedures
 {
 protected:
-	SQLiteProcedures( std::ostream & errorStream, std::shared_ptr<sqlite3> & db );
-	SQLiteProcedures( std::ostream & errorStream, bool writeOutputToSQLite, std::string const & dbName, std::string const & errorFileName );
+	SQLiteProcedures( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db );
+	SQLiteProcedures( std::shared_ptr<std::ostream> const & errorStream, bool writeOutputToSQLite, std::string const & dbName, std::string const & errorFileName );
 
 	int sqliteExecuteCommand(const std::string & commandBuffer);
 	int sqlitePrepareStatement(sqlite3_stmt* & stmt, const std::string & stmtBuffer);
@@ -44,7 +44,7 @@ protected:
 	// int sqliteFinalizeCommand(sqlite3_stmt * stmt);
 
 	bool m_writeOutputToSQLite;
-	std::ostream & m_errorStream;
+	std::shared_ptr<std::ostream> m_errorStream;
 	sqlite3 * m_connection;
 	std::shared_ptr<sqlite3> m_db;
 };
@@ -55,10 +55,10 @@ public:
 	// This allows for testing of private methods in SQLite
 	friend class SQLiteFixture;
 
-	void addScheduleData( int const number, std::string const & name, std::string const & type, double const & minValue, double const & maxValue );
+	void addScheduleData( int const number, std::string const name, std::string const type, double const minValue, double const maxValue );
 	void addZoneData( int const number, DataHeatBalance::ZoneData const & zoneData );
 	void addZoneListData( int const number, DataHeatBalance::ZoneListData const & zoneListData );
-	void addSurfaceData( int const number, DataSurfaces::SurfaceData const & surfaceData, std::string const & surfaceClass );
+	void addSurfaceData( int const number, DataSurfaces::SurfaceData const & surfaceData, std::string const surfaceClass );
 	void addZoneGroupData( int const number, DataHeatBalance::ZoneGroupData const & zoneGroupData );
 	void addMaterialData( int const number, DataHeatBalance::MaterialProperties const & materialData );
 	void addConstructionData( int const number, DataHeatBalance::ConstructionData const & constructionData, double const & constructionUValue );
@@ -76,7 +76,7 @@ public:
 
 	// Open the DB and prepare for writing data
 	// Create all of the tables on construction
-	SQLite( std::ostream & errorStream, std::string const & dbName, std::string const & errorFileName, bool writeOutputToSQLite = false, bool writeTabularDataToSQLite = false );
+	SQLite( std::shared_ptr<std::ostream> errorStream, std::string const & dbName, std::string const & errorFileName, bool writeOutputToSQLite = false, bool writeTabularDataToSQLite = false );
 
 	// Close database and free prepared statements
 	virtual ~SQLite();
@@ -318,15 +318,15 @@ private:
 	class SQLiteData : public SQLiteProcedures
 	{
 		protected:
-			SQLiteData( std::ostream & errorStream, std::shared_ptr<sqlite3> & db );
+			SQLiteData( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db );
 			virtual bool insertIntoSQLite( sqlite3_stmt * insertStmt ) = 0;
 	};
 
 	class Schedule : SQLiteData
 	{
 		public:
-			Schedule( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const scheduleNumber, std::string const & scheduleName, 
-					std::string const & scheduleType, double const & scheduleMinValue, double const & scheduleMaxValue ) :
+			Schedule( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const scheduleNumber, std::string const scheduleName, 
+					std::string const scheduleType, double const scheduleMinValue, double const scheduleMaxValue ) :
 				SQLiteData( errorStream, db ),
 				number( scheduleNumber ),
 				name( scheduleName ),
@@ -339,16 +339,16 @@ private:
 
 		private:
 			int const number;
-			std::string const & name;
-			std::string const & type;
-			double const & minValue;
-			double const & maxValue;
+			std::string const name;
+			std::string const type;
+			double const minValue;
+			double const maxValue;
 	};
 
 	class Surface : SQLiteData
 	{
 		public:
-			Surface( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const surfaceNumber, DataSurfaces::SurfaceData const & surfaceData, std::string const & surfaceClass ) :
+			Surface( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const surfaceNumber, DataSurfaces::SurfaceData const & surfaceData, std::string const surfaceClass ) :
 				SQLiteData( errorStream, db ),
 				number( surfaceNumber ),
 				name( surfaceData.Name ),
@@ -378,7 +378,7 @@ private:
 			int const number;
 			std::string const & name;
 			int const & construction;
-			std::string const & surfaceClass;
+			std::string const surfaceClass;
 			double const & area;
 			double const & grossArea;
 			double const & perimeter;
@@ -400,7 +400,7 @@ private:
 	class Zone : SQLiteData
 	{
 		public:
-			Zone( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const zoneNumber, DataHeatBalance::ZoneData const & zoneData ) :
+			Zone( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const zoneNumber, DataHeatBalance::ZoneData const & zoneData ) :
 				SQLiteData( errorStream, db ),
 				number( zoneNumber ),
 				name( zoneData.Name ),
@@ -466,7 +466,7 @@ private:
 	class ZoneList : SQLiteData
 	{
 		public:
-			ZoneList( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const zoneListNumber, DataHeatBalance::ZoneListData const & zoneListData ) :
+			ZoneList( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const zoneListNumber, DataHeatBalance::ZoneListData const & zoneListData ) :
 				SQLiteData( errorStream, db ),
 				number( zoneListNumber ),
 				name( zoneListData.Name ),
@@ -485,7 +485,7 @@ private:
 	class ZoneGroup : SQLiteData
 	{
 		public:
-			ZoneGroup( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const zoneGroupNumber, DataHeatBalance::ZoneGroupData const & zoneGroupData ) :
+			ZoneGroup( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const zoneGroupNumber, DataHeatBalance::ZoneGroupData const & zoneGroupData ) :
 				SQLiteData( errorStream, db ),
 				number( zoneGroupNumber ),
 				name( zoneGroupData.Name ),
@@ -505,7 +505,7 @@ private:
 	class Material : SQLiteData
 	{
 		public:
-			Material( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const materialNumber, DataHeatBalance::MaterialProperties const & materialData ) :
+			Material( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const materialNumber, DataHeatBalance::MaterialProperties const & materialData ) :
 				SQLiteData( errorStream, db ),
 				number( materialNumber ),
 				name( materialData.Name ),
@@ -545,7 +545,7 @@ private:
 	class Construction : SQLiteData
 	{
 		public:
-			Construction( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const constructionNumber, DataHeatBalance::ConstructionData const & constructionData, double const & constructionUValue ) :
+			Construction( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const constructionNumber, DataHeatBalance::ConstructionData const & constructionData, double const & constructionUValue ) :
 				SQLiteData( errorStream, db ),
 				number( constructionNumber ),
 				name( constructionData.Name ),
@@ -593,7 +593,7 @@ private:
 			class ConstructionLayer : SQLiteData
 			{
 				public:
-					ConstructionLayer( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const & constructNumber, int const layerNumber, int const & layerPoint ) :
+					ConstructionLayer( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const & constructNumber, int const layerNumber, int const & layerPoint ) :
 						SQLiteData( errorStream, db ),
 						constructNumber( constructNumber ),
 						layerNumber( layerNumber ),
@@ -614,7 +614,7 @@ private:
 	class NominalLighting : SQLiteData
 	{
 		public:
-			NominalLighting( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const nominalLightingNumber, DataHeatBalance::LightsData const & nominalLightingData ) :
+			NominalLighting( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const nominalLightingNumber, DataHeatBalance::LightsData const & nominalLightingData ) :
 				SQLiteData( errorStream, db ),
 				number( nominalLightingNumber ),
 				name( nominalLightingData.Name ),
@@ -648,7 +648,7 @@ private:
 	class NominalPeople : SQLiteData
 	{
 		public:
-			NominalPeople( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const nominalPeopleNumber, DataHeatBalance::PeopleData const & nominalPeopleData ) :
+			NominalPeople( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const nominalPeopleNumber, DataHeatBalance::PeopleData const & nominalPeopleData ) :
 				SQLiteData( errorStream, db ),
 				number( nominalPeopleNumber ),
 				name( nominalPeopleData.Name ),
@@ -700,7 +700,7 @@ private:
 	class NominalElectricEquipment : SQLiteData
 	{
 		public:
-			NominalElectricEquipment( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const nominalElectricEquipmentNumber, DataHeatBalance::ZoneEquipData const & nominalElectricEquipmentData ) :
+			NominalElectricEquipment( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const nominalElectricEquipmentNumber, DataHeatBalance::ZoneEquipData const & nominalElectricEquipmentData ) :
 				SQLiteData( errorStream, db ),
 				number( nominalElectricEquipmentNumber ),
 				name( nominalElectricEquipmentData.Name ),
@@ -732,7 +732,7 @@ private:
 	class NominalGasEquipment : SQLiteData
 	{
 		public:
-			NominalGasEquipment( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const nominalGasEquipmentNumber, DataHeatBalance::ZoneEquipData const & nominalGasEquipmentData ) :
+			NominalGasEquipment( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const nominalGasEquipmentNumber, DataHeatBalance::ZoneEquipData const & nominalGasEquipmentData ) :
 				SQLiteData( errorStream, db ),
 				number( nominalGasEquipmentNumber ),
 				name( nominalGasEquipmentData.Name ),
@@ -764,7 +764,7 @@ private:
 	class NominalSteamEquipment : SQLiteData
 	{
 		public:
-			NominalSteamEquipment( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const nominalSteamEquipmentNumber, DataHeatBalance::ZoneEquipData const & nominalSteamEquipmentData ) :
+			NominalSteamEquipment( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const nominalSteamEquipmentNumber, DataHeatBalance::ZoneEquipData const & nominalSteamEquipmentData ) :
 				SQLiteData( errorStream, db ),
 				number( nominalSteamEquipmentNumber ),
 				name( nominalSteamEquipmentData.Name ),
@@ -796,7 +796,7 @@ private:
 	class NominalHotWaterEquipment : SQLiteData
 	{
 		public:
-			NominalHotWaterEquipment( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const nominalHotWaterEquipmentNumber, DataHeatBalance::ZoneEquipData const & nominalHotWaterEquipmentData ) :
+			NominalHotWaterEquipment( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const nominalHotWaterEquipmentNumber, DataHeatBalance::ZoneEquipData const & nominalHotWaterEquipmentData ) :
 				SQLiteData( errorStream, db ),
 				number( nominalHotWaterEquipmentNumber ),
 				name( nominalHotWaterEquipmentData.Name ),
@@ -828,7 +828,7 @@ private:
 	class NominalOtherEquipment : SQLiteData
 	{
 		public:
-			NominalOtherEquipment( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const nominalOtherEquipmentNumber, DataHeatBalance::ZoneEquipData const & nominalOtherEquipmentData ) :
+			NominalOtherEquipment( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const nominalOtherEquipmentNumber, DataHeatBalance::ZoneEquipData const & nominalOtherEquipmentData ) :
 				SQLiteData( errorStream, db ),
 				number( nominalOtherEquipmentNumber ),
 				name( nominalOtherEquipmentData.Name ),
@@ -860,7 +860,7 @@ private:
 	class NominalBaseboardHeat : SQLiteData
 	{
 		public:
-			NominalBaseboardHeat( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const nominalBaseboardHeatNumber, DataHeatBalance::BBHeatData const & nominalBaseboardHeatData ) :
+			NominalBaseboardHeat( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const nominalBaseboardHeatNumber, DataHeatBalance::BBHeatData const & nominalBaseboardHeatData ) :
 				SQLiteData( errorStream, db ),
 				number( nominalBaseboardHeatNumber ),
 				name( nominalBaseboardHeatData.Name ),
@@ -894,7 +894,7 @@ private:
 	class Infiltration : SQLiteData
 	{
 		public:
-			Infiltration( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const infiltrationNumber, DataHeatBalance::InfiltrationData const & infiltrationData ) :
+			Infiltration( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const infiltrationNumber, DataHeatBalance::InfiltrationData const & infiltrationData ) :
 				SQLiteData( errorStream, db ),
 				number( infiltrationNumber ),
 				name( infiltrationData.Name ),
@@ -916,7 +916,7 @@ private:
 	class Ventilation : SQLiteData
 	{
 		public:
-			Ventilation( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const ventilationNumber, DataHeatBalance::VentilationData const & ventilationData ) :
+			Ventilation( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const ventilationNumber, DataHeatBalance::VentilationData const & ventilationData ) :
 				SQLiteData( errorStream, db ),
 				number( ventilationNumber ),
 				name( ventilationData.Name ),
@@ -938,7 +938,7 @@ private:
 	class RoomAirModel : SQLiteData
 	{
 		public:
-			RoomAirModel( std::ostream & errorStream, std::shared_ptr<sqlite3> & db, int const roomAirModelNumber, DataRoomAirModel::AirModelData const & roomAirModelData ) :
+			RoomAirModel( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db, int const roomAirModelNumber, DataRoomAirModel::AirModelData const & roomAirModelData ) :
 				SQLiteData( errorStream, db ),
 				number( roomAirModelNumber ),
 				airModelName( roomAirModelData.AirModelName ),

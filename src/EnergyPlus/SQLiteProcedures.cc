@@ -61,9 +61,8 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase()
 				}
 			}
 		}
-		std::ofstream errorStream;
-		errorStream.open(DataStringGlobals::outputSqliteErrFileName, std::ofstream::out | std::ofstream::trunc);
-		return std::unique_ptr<SQLite>(new SQLite( errorStream, DataStringGlobals::outputSqlFileName, DataStringGlobals::outputSqliteErrFileName, writeOutputToSQLite, writeTabularDataToSQLite ));
+		std::shared_ptr<std::ofstream> errorStream = std::make_shared<std::ofstream>( DataStringGlobals::outputSqliteErrFileName, std::ofstream::out | std::ofstream::trunc );
+		return std::unique_ptr<SQLite>(new SQLite( std::move( errorStream ), DataStringGlobals::outputSqlFileName, DataStringGlobals::outputSqliteErrFileName, writeOutputToSQLite, writeTabularDataToSQLite ));
 	} catch( const std::runtime_error& error ) {
 		ShowFatalError(error.what());
 		return nullptr;
@@ -83,12 +82,12 @@ void CreateSQLiteZoneExtendedOutput()
 			sqlite->addZoneGroupData( groupNum, DataHeatBalance::ZoneGroup(groupNum) );
 		}
 		for( int scheduleNumber = 1, numberOfSchedules = ScheduleManager::GetNumberOfSchedules(); scheduleNumber <= numberOfSchedules; ++scheduleNumber) {
-			sqlite->addScheduleData( scheduleNumber, ScheduleManager::GetScheduleName(scheduleNumber), ScheduleManager::GetScheduleType(scheduleNumber),
+			sqlite->addScheduleData( scheduleNumber, std::move( ScheduleManager::GetScheduleName(scheduleNumber) ), std::move( ScheduleManager::GetScheduleType(scheduleNumber) ),
 									 ScheduleManager::GetScheduleMinValue(scheduleNumber), ScheduleManager::GetScheduleMaxValue(scheduleNumber) );
 		}
 		for( int surfaceNumber = 1; surfaceNumber <= DataSurfaces::TotSurfaces; ++surfaceNumber ) {
 			auto const & surface = DataSurfaces::Surface(surfaceNumber);
-			sqlite->addSurfaceData( surfaceNumber, surface, DataSurfaces::cSurfaceClass(surface.Class) );
+			sqlite->addSurfaceData( surfaceNumber, surface, std::move( DataSurfaces::cSurfaceClass(surface.Class) ) );
 		}
 		for(int materialNum = 1; materialNum <= DataHeatBalance::TotMaterials; ++materialNum) {
 			sqlite->addMaterialData( materialNum, DataHeatBalance::Material(materialNum) );
@@ -139,7 +138,7 @@ void CreateSQLiteZoneExtendedOutput()
 	}
 }
 
-SQLite::SQLite( std::ostream & errorStream, std::string const & dbName, std::string const & errorFileName, bool writeOutputToSQLite, bool writeTabularDataToSQLite )
+SQLite::SQLite( std::shared_ptr<std::ostream> errorStream, std::string const & dbName, std::string const & errorFileName, bool writeOutputToSQLite, bool writeTabularDataToSQLite )
 	:
 	SQLiteProcedures(errorStream, writeOutputToSQLite, dbName, errorFileName),
 	m_writeTabularDataToSQLite(writeTabularDataToSQLite),
@@ -306,7 +305,7 @@ void SQLite::sqliteCommit()
 void SQLite::sqliteWriteMessage(const std::string & message)
 {
 	if ( m_writeOutputToSQLite ) {
-		m_errorStream << "SQLite3 message, " << message << std::endl;
+		*m_errorStream << "SQLite3 message, " << message << std::endl;
 	}
 }
 
@@ -2078,10 +2077,10 @@ void SQLite::createSQLiteEnvironmentPeriodRecord( const int curEnvirNum, const s
 	}
 }
 
-void SQLite::addScheduleData( int const number, std::string const & name, std::string const & type, double const & minValue, double const & maxValue )
+void SQLite::addScheduleData( int const number, std::string const name, std::string const type, double const minValue, double const maxValue )
 {
 	schedules.push_back(
-		std::unique_ptr<Schedule>(new Schedule(m_errorStream, m_db, number, name, type, minValue, maxValue))
+		std::unique_ptr<Schedule>(new Schedule(m_errorStream, m_db, number, std::move( name ), std::move( type ), minValue, maxValue))
 	);
 }
 
@@ -2099,10 +2098,10 @@ void SQLite::addZoneListData( int const number, DataHeatBalance::ZoneListData co
 	);
 }
 
-void SQLite::addSurfaceData( int const number, DataSurfaces::SurfaceData const & surfaceData, std::string const & surfaceClass )
+void SQLite::addSurfaceData( int const number, DataSurfaces::SurfaceData const & surfaceData, std::string const surfaceClass )
 {
 	surfaces.push_back(
-		std::unique_ptr<Surface>(new Surface(m_errorStream, m_db, number, surfaceData, surfaceClass))
+		std::unique_ptr<Surface>(new Surface(m_errorStream, m_db, number, surfaceData, std::move( surfaceClass )))
 	);
 }
 
@@ -2573,12 +2572,12 @@ bool SQLite::Zone::insertIntoSQLite( sqlite3_stmt * insertStmt )
 	return validInsert;
 }
 
-SQLite::SQLiteData::SQLiteData( std::ostream & errorStream, std::shared_ptr<sqlite3> & db )
+SQLite::SQLiteData::SQLiteData( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db )
 	:
 	SQLiteProcedures( errorStream, db )
 {}
 
-SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, std::shared_ptr<sqlite3> & db )
+SQLiteProcedures::SQLiteProcedures( std::shared_ptr<std::ostream> const & errorStream, std::shared_ptr<sqlite3> const & db )
 	:
 	m_db(db),
 	m_writeOutputToSQLite(true),
@@ -2586,7 +2585,7 @@ SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, std::shared_ptr<
 	m_errorStream(errorStream)
 {}
 
-SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, bool writeOutputToSQLite, std::string const & dbName, std::string const & errorFileName )
+SQLiteProcedures::SQLiteProcedures( std::shared_ptr<std::ostream> const & errorStream, bool writeOutputToSQLite, std::string const & dbName, std::string const & errorFileName )
 	:
 	m_writeOutputToSQLite(writeOutputToSQLite),
 	m_connection(nullptr),
@@ -2599,7 +2598,7 @@ SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, bool writeOutput
 		// Test if we can write to the sqlite error file
 		//  Does there need to be a seperate sqlite.err file at all?  Consider using eplusout.err
 		if( m_errorStream ) {
-			m_errorStream << "SQLite3 message, " << errorFileName << " open for processing!" << std::endl;
+			*m_errorStream << "SQLite3 message, " << errorFileName << " open for processing!" << std::endl;
 		} else {
 			ok = false;
 		}
@@ -2622,14 +2621,14 @@ SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, bool writeOutput
 			rc = sqlite3_exec(m_connection, "CREATE TABLE Test(x INTEGER PRIMARY KEY)", nullptr, 0, &zErrMsg);
 			sqlite3_close(m_connection);
 			if( rc ) {
-				m_errorStream << "SQLite3 message, can't get exclusive lock on existing database: " << sqlite3_errmsg(m_connection) << std::endl;
+				*m_errorStream << "SQLite3 message, can't get exclusive lock on existing database: " << sqlite3_errmsg(m_connection) << std::endl;
 				ok = false;
 			} else {
 				if (dbName != ":memory:") {
 					// Remove test db
 					rc = remove( dbName.c_str() );
 					if( rc ) {
-						m_errorStream << "SQLite3 message, can't remove old database: " << sqlite3_errmsg(m_connection) << std::endl;
+						*m_errorStream << "SQLite3 message, can't remove old database: " << sqlite3_errmsg(m_connection) << std::endl;
 						ok = false;
 					}
 				}
@@ -2642,7 +2641,7 @@ SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, bool writeOutput
 			rc = sqlite3_open_v2(dbName.c_str(), &m_connection, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
 			m_db = std::shared_ptr<sqlite3>(m_connection, sqlite3_close);
 			if( rc ) {
-				m_errorStream << "SQLite3 message, can't open new database: " << sqlite3_errmsg(m_connection) << std::endl;
+				*m_errorStream << "SQLite3 message, can't open new database: " << sqlite3_errmsg(m_connection) << std::endl;
 				ok = false;
 			}
 		}
@@ -2659,7 +2658,7 @@ int SQLiteProcedures::sqliteExecuteCommand(const std::string & commandBuffer)
 
 	int rc = sqlite3_exec(m_db.get(), commandBuffer.c_str(), NULL, 0, &zErrMsg);
 	if( rc != SQLITE_OK ) {
-		m_errorStream << zErrMsg;
+		*m_errorStream << zErrMsg;
 	}
 	sqlite3_free(zErrMsg);
 
@@ -2670,7 +2669,7 @@ int SQLiteProcedures::sqlitePrepareStatement(sqlite3_stmt* & stmt, const std::st
 {
 	int rc = sqlite3_prepare_v2(m_db.get(), stmtBuffer.c_str(), -1, &stmt, nullptr);
 	if( rc != SQLITE_OK ) {
-		m_errorStream << "SQLite3 message, sqlite3_prepare_v2 message: " << stmtBuffer << std::endl;
+		*m_errorStream << "SQLite3 message, sqlite3_prepare_v2 message: " << stmtBuffer << std::endl;
 	}
 
 	return rc;
@@ -2680,7 +2679,7 @@ int SQLiteProcedures::sqliteBindText(sqlite3_stmt * stmt, const int stmtInsertLo
 {
 	int rc = sqlite3_bind_text(stmt, stmtInsertLocationIndex, textBuffer.c_str(), -1, SQLITE_TRANSIENT);
 	if( rc != SQLITE_OK ) {
-		m_errorStream << "SQLite3 message, sqlite3_bind_text failed: " << textBuffer << std::endl;
+		*m_errorStream << "SQLite3 message, sqlite3_bind_text failed: " << textBuffer << std::endl;
 	}
 
 	return rc;
@@ -2690,7 +2689,7 @@ int SQLiteProcedures::sqliteBindInteger(sqlite3_stmt * stmt, const int stmtInser
 {
 	int rc = sqlite3_bind_int(stmt, stmtInsertLocationIndex, intToInsert);
 	if( rc != SQLITE_OK ) {
-		m_errorStream << "SQLite3 message, sqlite3_bind_int failed: " << intToInsert << std::endl;
+		*m_errorStream << "SQLite3 message, sqlite3_bind_int failed: " << intToInsert << std::endl;
 	}
 
 	return rc;
@@ -2700,7 +2699,7 @@ int SQLiteProcedures::sqliteBindDouble(sqlite3_stmt * stmt, const int stmtInsert
 {
 	int rc = sqlite3_bind_double(stmt, stmtInsertLocationIndex, doubleToInsert);
 	if( rc != SQLITE_OK ) {
-		m_errorStream << "SQLite3 message, sqlite3_bind_double failed: " << doubleToInsert << std::endl;
+		*m_errorStream << "SQLite3 message, sqlite3_bind_double failed: " << doubleToInsert << std::endl;
 	}
 
 	return rc;
@@ -2710,7 +2709,7 @@ int SQLiteProcedures::sqliteBindNULL(sqlite3_stmt * stmt, const int stmtInsertLo
 {
 	int rc = sqlite3_bind_null(stmt, stmtInsertLocationIndex);
 	if( rc != SQLITE_OK ) {
-		m_errorStream << "SQLite3 message, sqlite3_bind_null failed" << std::endl;
+		*m_errorStream << "SQLite3 message, sqlite3_bind_null failed" << std::endl;
 	}
 
 	return rc;
@@ -2725,7 +2724,7 @@ int SQLiteProcedures::sqliteBindForeignKey(sqlite3_stmt * stmt, const int stmtIn
 		rc = sqlite3_bind_null(stmt, stmtInsertLocationIndex);
 	}
 	if( rc != SQLITE_OK ) {
-		m_errorStream << "SQLite3 message, sqliteBindForeignKey failed: " << intToInsert << std::endl;
+		*m_errorStream << "SQLite3 message, sqliteBindForeignKey failed: " << intToInsert << std::endl;
 	}
 
 	return rc;
@@ -2760,7 +2759,7 @@ int SQLiteProcedures::sqliteStepCommand(sqlite3_stmt * stmt)
 	case SQLITE_ROW:
 		break;
 	default:
-		m_errorStream << "SQLite3 message, sqlite3_step message: " << sqlite3_errmsg(m_db.get()) << std::endl;
+		*m_errorStream << "SQLite3 message, sqlite3_step message: " << sqlite3_errmsg(m_db.get()) << std::endl;
 		break;
 	}
 

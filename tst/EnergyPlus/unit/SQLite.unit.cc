@@ -20,15 +20,15 @@ namespace EnergyPlus {
 		static void TearDownTestCase() { }
 
 		std::unique_ptr<SQLite> sqlite_test;
-		std::ostringstream ss;
+		std::shared_ptr<std::ostringstream> ss = std::make_shared<std::ostringstream>();
 
 		virtual void SetUp() {
 			ASSERT_NO_THROW(sqlite_test = std::unique_ptr<SQLite>(new SQLite( ss, ":memory:", "std::ostringstream", true, true )));
 			ASSERT_TRUE(sqlite_test->writeOutputToSQLite());
 			ASSERT_TRUE(sqlite_test->writeTabularDataToSQLite());
 			sqlite_test->sqliteExecuteCommand("PRAGMA foreign_keys = ON;");
-			EXPECT_EQ("SQLite3 message, std::ostringstream open for processing!\n", ss.str());
-			ss.str(std::string());
+			EXPECT_EQ("SQLite3 message, std::ostringstream open for processing!\n", ss->str());
+			ss->str(std::string());
 		}
 
 		virtual void TearDown() {
@@ -121,11 +121,11 @@ namespace EnergyPlus {
 
 	TEST_F( SQLiteFixture, sqliteWriteMessage ) {
 		sqlite_test->sqliteWriteMessage("");
-		EXPECT_EQ("SQLite3 message, \n", ss.str());
-		ss.str(std::string());
+		EXPECT_EQ("SQLite3 message, \n", ss->str());
+		ss->str(std::string());
 		sqlite_test->sqliteWriteMessage("test message");
-		EXPECT_EQ("SQLite3 message, test message\n", ss.str());
-		ss.str(std::string());
+		EXPECT_EQ("SQLite3 message, test message\n", ss->str());
+		ss->str(std::string());
 	}
 
 	TEST_F( SQLiteFixture, initializeIndexes ) {
@@ -329,8 +329,8 @@ namespace EnergyPlus {
 		sqlite_test->sqliteBegin();
 		sqlite_test->createSQLiteTimeIndexRecord( -999, 1, 1, 0 );
 		sqlite_test->sqliteCommit();
-		EXPECT_EQ("SQLite3 message, Illegal reportingInterval passed to CreateSQLiteTimeIndexRecord: -999\n", ss.str());
-		ss.str(std::string());
+		EXPECT_EQ("SQLite3 message, Illegal reportingInterval passed to CreateSQLiteTimeIndexRecord: -999\n", ss->str());
+		ss->str(std::string());
 
 		EXPECT_EQ(7, result.size());
 
@@ -387,14 +387,14 @@ namespace EnergyPlus {
 		sqlite_test->sqliteBegin();
 		sqlite_test->createSQLiteReportDataRecord( 1, 999.9, -999, 0, 1310459, 100, 7031530, 15 );
 		sqlite_test->sqliteCommit();
-		EXPECT_EQ("SQLite3 message, Illegal reportingInterval passed to CreateSQLiteMeterRecord: -999\n", ss.str());
-		ss.str(std::string());
+		EXPECT_EQ("SQLite3 message, Illegal reportingInterval passed to CreateSQLiteMeterRecord: -999\n", ss->str());
+		ss->str(std::string());
 
 		sqlite_test->sqliteBegin();
 		sqlite_test->createSQLiteReportDataRecord( 1, 999.9, -100, 0, 1310459, 100, 7031530, _ );
 		sqlite_test->sqliteCommit();
-		EXPECT_EQ("SQLite3 message, Illegal reportingInterval passed to CreateSQLiteMeterRecord: -100\n", ss.str());
-		ss.str(std::string());
+		EXPECT_EQ("SQLite3 message, Illegal reportingInterval passed to CreateSQLiteMeterRecord: -100\n", ss->str());
+		ss->str(std::string());
 
 		EXPECT_EQ(4, reportData.size());
 		EXPECT_EQ(2, reportExtendedData.size());
