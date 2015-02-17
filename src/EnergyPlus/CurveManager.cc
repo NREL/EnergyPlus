@@ -2533,7 +2533,7 @@ namespace CurveManager {
 					// CurrentModuleObject='Curve:BiQuadratic/QuadraticLinear/BiCubic/CubicLinear'
 					SetupOutputVariable( "Performance Curve Input Variable 1 Value []", PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
 					SetupOutputVariable( "Performance Curve Input Variable 2 Value []", PerfCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
-				} else if ( ( SELECT_CASE_var1 == TriQuadratic) || ( SELECT_CASE_var1 == ChillerPartLoadWithLift ) ) {
+				} else if ( ( SELECT_CASE_var1 == TriQuadratic ) || ( SELECT_CASE_var1 == ChillerPartLoadWithLift ) ) {
 					// CurrentModuleObject='Curve:TriQuadratic'
 					SetupOutputVariable( "Performance Curve Input Variable 1 Value []", PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
 					SetupOutputVariable( "Performance Curve Input Variable 2 Value []", PerfCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
