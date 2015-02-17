@@ -98,7 +98,8 @@ namespace DXCoils {
 	extern int NumVRFCoolingCoils; // number of VRF heat pump cooling coils
 	extern int NumDXHeatingCoils; // number of DX heat pump heating coils
 	extern int NumDoe2DXCoils; // number of doe2 DX  coils
-	extern int NumDXHeatPumpWaterHeaterCoils; // number of DX  water heater coils
+	extern int NumDXHeatPumpWaterHeaterPumpedCoils; // number of DX  water heater coils, pumped
+	extern int NumDXHeatPumpWaterHeaterWrappedCoils; // number of wrapped tank HPWH coils
 	extern int NumDXMulSpeedCoils; // number of DX coils with multi-speed compressor
 	extern int NumDXMulModeCoils; // number of DX coils with multi-mode performance
 
@@ -1480,7 +1481,7 @@ namespace DXCoils {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -1473,9 +1473,18 @@ namespace WaterThermalTanks {
 						ErrorsFound = true;
 					}
 					HPWH.DXCoilType = DXCoil(HPWH.DXCoilNum).DXCoilType;
-					if ( ! SameString( HPWH.DXCoilType, "Coil:WaterHeating:AirToWaterHeatPump" ) ) {
+					HPWH.DXCoilTypeNum = DXCoil(HPWH.DXCoilNum).DXCoilType_Num;
+					if ( !( (HPWH.DXCoilTypeNum == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterPumped && HPWH.CondenserConfig == HPWH_CONDENSER_PUMPED) || (HPWH.DXCoilTypeNum == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterWrapped && HPWH.CondenserConfig == HPWH_CONDENSER_WRAPPED) ) ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
-						ShowContinueError( "Heat pump water heater can only be used with Coil:WaterHeating:AirToWaterHeatPump." );
+						std::string ExpectedCoilType;
+						if ( HPWH.CondenserConfig == HPWH_CONDENSER_PUMPED ) {
+							ExpectedCoilType = DataHVACGlobals::cAllCoilTypes( DataHVACGlobals::CoilDX_HeatPumpWaterHeaterPumped );
+						} else if ( HPWH.CondenserConfig == HPWH_CONDENSER_WRAPPED ) {
+							ExpectedCoilType = DataHVACGlobals::cAllCoilTypes( DataHVACGlobals::CoilDX_HeatPumpWaterHeaterWrapped );
+						} else {
+							assert(0);
+						}
+						ShowContinueError( "can only be used with " + ExpectedCoilType );
 						ErrorsFound = true;
 					}
 
@@ -4942,8 +4951,10 @@ namespace WaterThermalTanks {
 			if ( OutletAirSplitterNode > 0 ) Node( OutletAirSplitterNode ).MassFlowRate = 0.0;
 			//these are water nodes are not managed by plant. the HP connects
 			// directly to the WH without using plant. will not change this code for DSU because of this
-			Node( HPWaterInletNode ).MassFlowRate = 0.0;
-			Node( HPWaterOutletNode ).MassFlowRate = 0.0;
+			if ( HPWaterHeater(HPNum).CondenserConfig == HPWH_CONDENSER_PUMPED ) {
+				Node( HPWaterInletNode ).MassFlowRate = 0.0;
+				Node( HPWaterOutletNode ).MassFlowRate = 0.0;
+			}
 
 			//   set the max mass flow rate for outdoor fans
 			Node( HPWaterHeater( HPNum ).FanOutletNode ).MassFlowRateMax = MdotAir;
@@ -9248,11 +9259,13 @@ namespace WaterThermalTanks {
 					//       set the heat pump air- and water-side mass flow rate
 					MdotWater = HPWaterHeater( HPNum ).OperatingWaterFlowRate * RhoH2O( WaterThermalTank( WaterThermalTankNum ).TankTemp );
 					MdotAir = HPWaterHeater( HPNum ).OperatingAirFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, WaterThermalTank( WaterThermalTankNum ).AmbientTemp, AmbientHumRat );
-
-					//       set the condenser inlet node mass flow rate and temperature
-					Node( HPWaterHeater( HPNum ).CondWaterInletNode ).MassFlowRate = MdotWater;
-					Node( HPWaterHeater( HPNum ).CondWaterInletNode ).Temp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
-
+					
+					if ( HPWaterHeater(HPNum).CondenserConfig == HPWH_CONDENSER_PUMPED ){
+						// set the condenser inlet node mass flow rate and temperature
+						Node( HPWaterHeater( HPNum ).CondWaterInletNode ).MassFlowRate = MdotWater;
+						Node( HPWaterHeater( HPNum ).CondWaterInletNode ).Temp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
+					}
+					
 					//       initialize temperatures for HPWH DX Coil heating capacity and COP curves
 					HPWHInletDBTemp = WaterThermalTank( WaterThermalTankNum ).AmbientTemp;
 					HPWHInletWBTemp = PsyTwbFnTdbWPb( HPWHInletDBTemp, AmbientHumRat, OutBaroPress );

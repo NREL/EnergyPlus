@@ -1073,6 +1073,7 @@ namespace WaterThermalTanks {
 		int WHUseOutletNode; // Water heater tank use side outlet node
 		int WHUseSidePlantLoopNum; // if not zero, then this water heater is on plant loop #
 		std::string DXCoilType; // Type of DX coil (Coil:DX:HeatPumpWaterHeater)
+		int DXCoilTypeNum; // Type Number of DX coil
 		std::string DXCoilName; // Name of DX coil
 		int DXCoilNum; // Index of DX coil
 		int DXCoilAirInletNode; // Inlet air node number of DX coil
@@ -1167,6 +1168,7 @@ namespace WaterThermalTanks {
 			WHUseOutletNode( 0 ),
 			WHUseSidePlantLoopNum( 0 ),
 			DXCoilNum( 0 ),
+			DXCoilTypeNum( 0 ),
 			DXCoilAirInletNode( 0 ),
 			DXCoilPLFFPLR( 0 ),
 			FanType_Num( 0 ),
@@ -1263,6 +1265,7 @@ namespace WaterThermalTanks {
 			std::string const & DXCoilType, // Type of DX coil (Coil:DX:HeatPumpWaterHeater)
 			std::string const & DXCoilName, // Name of DX coil
 			int const DXCoilNum, // Index of DX coil
+			int const DXCoilTypeNum, // DX Coil type number
 			int const DXCoilAirInletNode, // Inlet air node number of DX coil
 			int const DXCoilPLFFPLR, // Index to HPWH's DX Coil PLF as a function of PLR curve
 			std::string const & FanType, // Type of Fan (Fan:OnOff)
@@ -1358,6 +1361,7 @@ namespace WaterThermalTanks {
 			DXCoilType( DXCoilType ),
 			DXCoilName( DXCoilName ),
 			DXCoilNum( DXCoilNum ),
+			DXCoilTypeNum( DXCoilTypeNum ),
 			DXCoilAirInletNode( DXCoilAirInletNode ),
 			DXCoilPLFFPLR( DXCoilPLFFPLR ),
 			FanType( FanType ),

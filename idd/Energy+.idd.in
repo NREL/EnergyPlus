@@ -46465,7 +46465,7 @@ Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit,
         \note db = entering air dry-bulb temperature (C)
         \note ewt = water entering temperature seen by the evaporator (C)
 
-Coil:WaterHeating:AirToWaterHeatPump,
+Coil:WaterHeating:AirToWaterHeatPump:Pumped,
        \memo Heat pump water heater (HPWH) heating coil, air-to-water direct-expansion (DX)
        \memo system which includes a water heating coil, evaporator air coil, evaporator
        \memo fan, electric compressor, and water pump. Part of a WaterHeater:HeatPumpPumpedCondenser system.
@@ -46685,6 +46685,165 @@ Coil:WaterHeating:AirToWaterHeatPump,
        \note Use curve coefficients of 1,0,0 or leave this field blank when neglecting performance impacts
        \note due to variations in water flow rate fraction.
   A16; \field Part Load Fraction Correlation Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \object-list UniVariateTables
+       \note Part Load Fraction Correlation (function of part load ratio) should be quadratic or cubic.
+       \note Quadratic curve = a + b(PLR) + c(PLR)^2.
+       \note Cubic curve = a + b(PLR) + c(PLR)^2 + d(PLR)^3.
+       \note PLR = part load ratio (heating delivered/steady state heating capacity).
+       \note Use curve coefficients of 1,0,0 or leave this field blank when neglecting performance impacts
+       \note due to variations in part load ratio.
+
+Coil:WaterHeating:AirToWaterHeatPump:Wrapped,
+       \memo Heat pump water heater (HPWH) heating coil, air-to-water direct-expansion (DX)
+       \memo system which includes a water heating coil, evaporator air coil, evaporator
+       \memo fan, electric compressor, and water pump. Part of a WaterHeater:HeatPumpPumpedCondenser system.
+       \min-fields 14
+  A1 , \field Name
+       \required-field
+       \type alpha
+       \reference HeatPumpWaterHeaterDXCoils
+       \note Unique name for this instance of a heat pump water heater DX coil.
+  N1 , \field Rated Heating Capacity
+       \required-field
+       \type real
+       \units W
+       \minimum> 0
+       \note Heating capacity at the rated inlet air temperatures, rated condenser inlet
+       \note water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump heat.
+  N2 , \field Rated COP
+       \type real
+       \units W/W
+       \minimum> 0
+       \default 3.2
+       \note Heating coefficient of performance at the rated inlet air temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Can optionally include condenser pump power and evaporator fan power (see fields below).
+  N3 , \field Rated Sensible Heat Ratio
+       \type real
+       \minimum 0.5
+       \maximum 1
+       \default 0.85
+       \note Gross air-side sensible heat ratio at the rated inlet air temperatures,
+       \note rated condenser inlet water temperature, rated air flow rate, and rated water flow rate.
+       \note Sensible heat ratio equals gross sensible cooling capacity divided by gross total cooling
+       \note capacity. Rated SHR (gross) should not include evaporator fan heat, only sensible cooling
+       \note and dehumidification by the coil alone.
+  N4 , \field Rated Evaporator Inlet Air Dry-Bulb Temperature
+       \type real
+       \units C
+       \minimum> 5
+       \default 19.7
+       \note Evaporator inlet air dry-bulb temperature corresponding to rated coil performance
+       \note (heating capacity, COP and SHR).
+  N5 , \field Rated Evaporator Inlet Air Wet-Bulb Temperature
+       \type real
+       \units C
+       \minimum> 5
+       \default 13.5
+       \note Evaporator inlet air wet-bulb temperature corresponding to rated coil performance
+       \note (heating capacity, COP and SHR).
+  N6 , \field Rated Condenser Water Temperature
+       \type real
+       \units C
+       \minimum> 25
+       \default 57.5
+       \note Condenser inlet water temperature corresponding to rated coil performance
+       \note (heating capacity, COP and SHR).
+  N7 , \field Rated Evaporator Air Flow Rate
+       \type real
+       \units m3/s
+       \minimum> 0
+       \autocalculatable
+       \note Evaporator air flow rate corresponding to rated coil performance
+       \note (heating capacity, COP and SHR).
+       \note Default is 5.035E-5 m3/s/W (31.25 cfm/MBH) of rated heating capacity when autocalculated.
+  A2 , \field Evaporator Fan Power Included in Rated COP
+       \type choice
+       \key Yes
+       \key No
+       \default Yes
+       \note Select Yes if the evaporator fan power is included in the rated COP. This choice field
+       \note impacts the calculation of compressor electric power.
+  A3,  \field Evaporator Air Inlet Node Name
+       \required-field
+       \type node
+       \note The node from which the DX coil draws its inlet air.
+  A4,  \field Evaporator Air Outlet Node Name
+       \required-field
+       \type node
+       \note The node to which the DX coil sends its outlet air.
+  N8,  \field Crankcase Heater Capacity
+       \type real
+       \minimum 0
+       \default 0
+       \units W
+       \note The compressor crankcase heater only operates when the dry-bulb temperature of air
+       \note surrounding the compressor is below the Maximum Ambient Temperature for Crankcase
+       \note Heater Operation and the DX coil is off.  The ambient temperature surrounding the
+       \note compressor is set by the WaterHeater:HeatPumpPumpedCondenser parent object (field Compressor Location).
+  N9,  \field Maximum Ambient Temperature for Crankcase Heater Operation
+       \type real
+       \minimum 0
+       \default 10
+       \units C
+       \note The compressor crankcase heater only operates when the dry-bulb temperature of air
+       \note surrounding the compressor is below the Maximum Outdoor Temperature for Crankcase
+       \note Heater Operation and the unit is off. The ambient temperature surrounding the
+       \note compressor is set by the WaterHeater:HeatPumpPumpedCondenser parent object (field Compressor Location).
+  A5,  \field Evaporator Air Temperature Type for Curve Objects
+       \type choice
+       \key DryBulbTemperature
+       \key WetBulbTemperature
+       \default WetBulbTemperature
+       \note Determines temperature type for heating capacity curves and
+       \note heating COP curves. This input determines whether
+       \note the inlet air dry-bulb or wet-bulb temperature is used to evaluate these curves.
+  A6,  \field Heating Capacity Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCubicCurves
+       \object-list BiVariateTables
+       \note Heating capacity modifier curve (function of temperature) should be biquadratic or cubic.
+       \note Biquadratic curve = a + b(ta) + c(ta)^2 + d(tw) + e(tw)^2 + f(ta)(tw).
+       \note Cubic curve = a + b(ta) + c(ta)^2 + d(ta)^3.
+       \note ta = evaporator inlet air [dry-bulb or wet-bulb] temperature (C).
+       \note tw = condenser inlet water temperature (C).
+       \note The field Evaporator Air Temperature Type for Curve Objects determines if dry-bulb or wet-bulb
+       \note is used as the evaporator inlet air temperature (ta).
+  A7,  \field Heating Capacity Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \object-list UniVariateTables
+       \note Heating capacity modifier curve (function of air flow fraction) should be quadratic or cubic.
+       \note Quadratic curve = a + b(ff) + c(ff)^2.
+       \note Cubic curve = a + b(ff) + c(ff)^2 + d(ff)^3.
+       \note ff = fraction of the rated evaporator air flow rate.
+       \note Use curve coefficients of 1,0,0 or leave this field blank when neglecting performance impacts
+       \note due to variations in air flow rate fraction.
+  A8,  \field Heating COP Function of Temperature Curve Name
+       \type object-list
+       \object-list BiquadraticCubicCurves
+       \object-list BiVariateTables
+       \note Heating COP modifier curve (function of temperature) should be biquadratic or cubic.
+       \note Biquadratic curve = a + b(ta) + c(ta)^2 + d(tw) + e(tw)^2 + f(ta)(tw).
+       \note Cubic curve = a + b(ta) + c(ta)^2 + d(ta)^3.
+       \note ta = evaporator inlet air [dry-bulb or wet-bulb] temperature (C).
+       \note tw = condenser inlet water temperature (C).
+       \note The field Evaporator Air Temperature Type for Curve Objects determines if dry-bulb or wet-bulb
+       \note is used as the evaporator inlet air temperature (ta).
+  A9,  \field Heating COP Function of Air Flow Fraction Curve Name
+       \type object-list
+       \object-list QuadraticCubicCurves
+       \object-list UniVariateTables
+       \note Heating COP modifier curve (function of air flow fraction) should be quadratic or cubic.
+       \note Quadratic curve = a + b(ff) + c(ff)^2.
+       \note Cubic curve = a + b(ff) + c(ff)^2 + d(ff)^3.
+       \note ff = fraction of the rated evaporator air flow rate.
+       \note Use curve coefficients of 1,0,0 or leave this field blank when neglecting performance impacts
+       \note due to variations in air flow rate fraction.
+  A10; \field Part Load Fraction Correlation Curve Name
        \type object-list
        \object-list QuadraticCubicCurves
        \object-list UniVariateTables
@@ -62937,7 +63096,7 @@ WaterHeater:HeatPumpPumpedCondenser,
        \min-fields 31
        \memo This object models an air-source heat pump for water heating.
        \memo WaterHeater:HeatPumpPumpedCondenser is a compound object that references other component objects -
-       \memo Coil:WaterHeating:AirToWaterHeatPump, Fan:OnOff, WaterHeater:Mixed
+       \memo Coil:WaterHeating:AirToWaterHeatPump:Pumped, Fan:OnOff, WaterHeater:Mixed
   A1 , \field Name
        \required-field
        \type alpha
@@ -63056,7 +63215,7 @@ WaterHeater:HeatPumpPumpedCondenser,
        \required-field
        \type object-list
        \object-list HeatPumpWaterHeaterDXCoils
-       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump object.
+       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:Pumped object.
   N4 , \field Minimum Inlet Air Temperature for Compressor Operation
        \type real
        \units C
@@ -63145,7 +63304,7 @@ WaterHeater:HeatPumpWrappedCondenser,
        \min-fields 31
        \memo This object models an air-source heat pump for water heating.
        \memo WaterHeater:HeatPumpWrappedCondenser is a compound object that references other component objects -
-       \memo Coil:WaterHeating:AirToWaterHeatPump, Fan:OnOff, WaterHeater:Mixed
+       \memo Coil:WaterHeating:AirToWaterHeatPump:Pumped, Fan:OnOff, WaterHeater:Mixed
   A1 , \field Name
        \required-field
        \type alpha
@@ -63257,7 +63416,7 @@ WaterHeater:HeatPumpWrappedCondenser,
        \required-field
        \type object-list
        \object-list HeatPumpWaterHeaterDXCoils
-       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump object.
+       \note Must match the name used in the corresponding Coil:WaterHeating:AirToWaterHeatPump:Pumped object.
   N5 , \field Minimum Inlet Air Temperature for Compressor Operation
        \type real
        \units C
