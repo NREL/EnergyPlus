@@ -7318,7 +7318,7 @@ namespace WaterThermalTanks {
 	Real64
 	PLRResidualMixedTank(
 		Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = HP set point temperature [C]
+		FArray1< Real64 > const & Par // par(1) = HP set point temperature [C]
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -7367,18 +7367,14 @@ namespace WaterThermalTanks {
 		Real64 NewTankTemp; // resulting tank temperature [C]
 		bool FirstHVACIteration; // FirstHVACIteration flag
 
-		WaterThermalTankNum = int( Par()( 3 ) );
-		WaterThermalTank( WaterThermalTankNum ).Mode = int( Par()( 2 ) );
-		WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = Par()( 5 ) * HPPartLoadRatio;
+		WaterThermalTankNum = int( Par( 3 ) );
+		WaterThermalTank( WaterThermalTankNum ).Mode = int( Par( 2 ) );
+		WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = Par( 5 ) * HPPartLoadRatio;
 		// FirstHVACIteration is a logical, Par is real, so make 1.0=TRUE and 0.0=FALSE
-		if ( Par()( 4 ) == 1.0 ) {
-			FirstHVACIteration = true;
-		} else {
-			FirstHVACIteration = false;
-		}
+		FirstHVACIteration = ( Par( 4 ) == 1.0 );
 		CalcWaterThermalTankMixed( WaterThermalTankNum );
 		NewTankTemp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
-		PLRResidualMixedTank = Par()( 1 ) - NewTankTemp;
+		PLRResidualMixedTank = Par( 1 ) - NewTankTemp;
 		return PLRResidualMixedTank;
 
 	}
@@ -7386,7 +7382,7 @@ namespace WaterThermalTanks {
 	Real64
 	PLRResidualStratifiedTank(
 		Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = HP set point temperature [C]
+		FArray1< Real64 > const & Par // par(1) = HP set point temperature [C]
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -7435,18 +7431,14 @@ namespace WaterThermalTanks {
 		Real64 NewTankTemp; // resulting tank temperature [C]
 		bool FirstHVACIteration; // FirstHVACIteration flag
 
-		WaterThermalTankNum = int( Par()( 3 ) );
-		WaterThermalTank( WaterThermalTankNum ).Mode = int( Par()( 2 ) );
-		WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = Par()( 5 ) * HPPartLoadRatio;
+		WaterThermalTankNum = int( Par( 3 ) );
+		WaterThermalTank( WaterThermalTankNum ).Mode = int( Par( 2 ) );
+		WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = Par( 5 ) * HPPartLoadRatio;
 		// FirstHVACIteration is a logical, Par is real, so make 1.0=TRUE and 0.0=FALSE
-		if ( Par()( 4 ) == 1.0 ) {
-			FirstHVACIteration = true;
-		} else {
-			FirstHVACIteration = false;
-		}
+		FirstHVACIteration = ( Par( 4 ) == 1.0 );
 		CalcWaterThermalTankStratified( WaterThermalTankNum );
 		NewTankTemp = FindStratifiedTankSensedTemp( WaterThermalTankNum, HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).ControlSensorLocation );
-		PLRResidualStratifiedTank = Par()( 1 ) - NewTankTemp;
+		PLRResidualStratifiedTank = Par( 1 ) - NewTankTemp;
 		return PLRResidualStratifiedTank;
 
 	}

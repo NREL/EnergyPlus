@@ -3,8 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -73,7 +71,7 @@ namespace FuelCellElectricGenerator {
 	Real64
 	FuelCellProductGasEnthResidual(
 		Real64 const TprodGas, // temperature, this is "x" being searched
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = Generator Number
+		FArray1< Real64 > const & Par // par(1) = Generator Number
 	);
 
 	void

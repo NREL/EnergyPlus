@@ -64,8 +64,8 @@ public: // Creation
 
 	// Pointer + Size Constructor
 	inline
-	FArrayTail( T const * array, size_type const size ) :
-	 data_( const_cast< T * >( array ) ),
+	FArrayTail( T const * a, size_type const size ) :
+	 data_( const_cast< T * >( a ) ),
 	 size_( size )
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
 	 , const_proxy_( true )
@@ -84,8 +84,8 @@ public: // Creation
 
 	// Non-Const Pointer + Size Constructor
 	inline
-	FArrayTail( T * array, size_type const size ) :
-	 data_( array ),
+	FArrayTail( T * a, size_type const size ) :
+	 data_( a ),
 	 size_( size ),
 	 const_proxy_( false )
 	{}

@@ -479,7 +479,7 @@ public: // Assignment: Array
 						for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 							for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 								for ( int i1 = 1; i1 <= u1_; ++i1 ) {
-									assert( T( a( i1, i2, i3, i4, i5, i6 ) ) != T( 0 ) );
+									assert( a( i1, i2, i3, i4, i5, i6 ) != T( 0 ) );
 									operator ()( i1, i2, i3, i4, i5, i6 ) /= a( i1, i2, i3, i4, i5, i6 );
 								}
 							}
@@ -672,7 +672,7 @@ public: // Assignment: Array
 						for ( int j3 = a.l3(), e3 = a.u3(); j3 <= e3; ++j3 ) {
 							for ( int j2 = a.l2(), e2 = a.u2(); j2 <= e2; ++j2 ) {
 								for ( int j1 = a.l1(), e1 = a.u1(); j1 <= e1; ++j1, ++l ) {
-									assert( T( a( j1, j2, j3, j4, j5, j6 ) ) != T( 0 ) );
+									assert( a( j1, j2, j3, j4, j5, j6 ) != T( 0 ) );
 									c[ l ] = a( j1, j2, j3, j4, j5, j6 );
 								}
 							}
@@ -701,7 +701,7 @@ public: // Assignment: Array
 						for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 							for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
 								for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
-									assert( T( a( j1, j2, j3, j4, j5, j6 ) ) != T( 0 ) );
+									assert( a( j1, j2, j3, j4, j5, j6 ) != T( 0 ) );
 									operator ()( i1, i2, i3, i4, i5, i6 ) /= a( j1, j2, j3, j4, j5, j6 );
 								}
 							}
@@ -795,7 +795,7 @@ public: // Assignment: Array
 					for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 						for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
 							for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
-								assert( T( a( j1, j2, j3, j4, j5 ) ) != T( 0 ) );
+								assert( a( j1, j2, j3, j4, j5 ) != T( 0 ) );
 								operator ()( i1, i2, i3, i4, i5, i6 ) /= a( j1, j2, j3, j4, j5, j6 );
 							}
 						}

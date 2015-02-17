@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -1813,13 +1812,13 @@ namespace WaterThermalTanks {
 	Real64
 	PLRResidualMixedTank(
 		Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = HP set point temperature [C]
+		FArray1< Real64 > const & Par // par(1) = HP set point temperature [C]
 	);
 
 	Real64
 	PLRResidualStratifiedTank(
 		Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = HP set point temperature [C]
+		FArray1< Real64 > const & Par // par(1) = HP set point temperature [C]
 	);
 
 	Real64
