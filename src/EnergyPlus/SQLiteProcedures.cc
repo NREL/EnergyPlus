@@ -36,9 +36,9 @@ const int SQLite::UnitsId             =  6;
 
 std::unique_ptr<SQLite> sqlite;
 
-std::unique_ptr<SQLite> CreateSQLiteDatabase() {
-	try 
-	{
+std::unique_ptr<SQLite> CreateSQLiteDatabase()
+{
+	try {
 		int numberOfSQLiteObjects = InputProcessor::GetNumObjectsFound("Output:SQLite");
 		bool writeOutputToSQLite = false;
 		bool writeTabularDataToSQLite = false;
@@ -70,7 +70,8 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase() {
 	}
 }
 
-void CreateSQLiteZoneExtendedOutput() {
+void CreateSQLiteZoneExtendedOutput()
+{
 	if( sqlite && sqlite->writeOutputToSQLite() ) {
 		for( int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
 			sqlite->addZoneData( zoneNum, DataHeatBalance::Zone(zoneNum) );
@@ -82,8 +83,8 @@ void CreateSQLiteZoneExtendedOutput() {
 			sqlite->addZoneGroupData( groupNum, DataHeatBalance::ZoneGroup(groupNum) );
 		}
 		for( int scheduleNumber = 1, numberOfSchedules = ScheduleManager::GetNumberOfSchedules(); scheduleNumber <= numberOfSchedules; ++scheduleNumber) {
-			sqlite->addScheduleData( scheduleNumber, ScheduleManager::GetScheduleName(scheduleNumber), ScheduleManager::GetScheduleType(scheduleNumber), 
-				ScheduleManager::GetScheduleMinValue(scheduleNumber), ScheduleManager::GetScheduleMaxValue(scheduleNumber) );
+			sqlite->addScheduleData( scheduleNumber, ScheduleManager::GetScheduleName(scheduleNumber), ScheduleManager::GetScheduleType(scheduleNumber),
+									 ScheduleManager::GetScheduleMinValue(scheduleNumber), ScheduleManager::GetScheduleMaxValue(scheduleNumber) );
 		}
 		for( int surfaceNumber = 1; surfaceNumber <= DataSurfaces::TotSurfaces; ++surfaceNumber ) {
 			auto const & surface = DataSurfaces::Surface(surfaceNumber);
@@ -139,7 +140,7 @@ void CreateSQLiteZoneExtendedOutput() {
 }
 
 SQLite::SQLite( std::ostream & errorStream, std::string const & dbName, std::string const & errorFileName, bool writeOutputToSQLite, bool writeTabularDataToSQLite )
-	: 
+	:
 	SQLiteProcedures(errorStream, writeOutputToSQLite, dbName, errorFileName),
 	m_writeTabularDataToSQLite(writeTabularDataToSQLite),
 	m_sqlDBTimeIndex(0),
@@ -313,31 +314,31 @@ void SQLite::initializeReportDataDictionaryTable()
 {
 	const std::string newTableSQL =
 		"CREATE TABLE ReportDataDictionary("
-			"ReportDataDictionaryIndex INTEGER PRIMARY KEY, "
-			"IsMeter INTEGER, "
-			"Type TEXT, "
-			"IndexGroup TEXT, "
-			"TimestepType TEXT, "
-			"KeyValue TEXT, "
-			"Name TEXT, "
-			"ReportingFrequency TEXT, "
-			"ScheduleName TEXT, "
-			"Units TEXT);";
+		"ReportDataDictionaryIndex INTEGER PRIMARY KEY, "
+		"IsMeter INTEGER, "
+		"Type TEXT, "
+		"IndexGroup TEXT, "
+		"TimestepType TEXT, "
+		"KeyValue TEXT, "
+		"Name TEXT, "
+		"ReportingFrequency TEXT, "
+		"ScheduleName TEXT, "
+		"Units TEXT);";
 
 	sqliteExecuteCommand(newTableSQL);
 
 	const std::string preparedSQL =
 		"INSERT INTO ReportDataDictionary ("
-			"ReportDataDictionaryIndex, "
-			"IsMeter, "
-			"Type, "
-			"IndexGroup, "
-			"TimestepType, "
-			"KeyValue, "
-			"Name, "
-			"ReportingFrequency, "
-			"ScheduleName, "
-			"Units) "
+		"ReportDataDictionaryIndex, "
+		"IsMeter, "
+		"Type, "
+		"IndexGroup, "
+		"TimestepType, "
+		"KeyValue, "
+		"Name, "
+		"ReportingFrequency, "
+		"ScheduleName, "
+		"Units) "
 		"VALUES(?,?,?,?,?,?,?,?,?,?);";
 
 	sqlitePrepareStatement(m_reportDictionaryInsertStmt,preparedSQL);
@@ -347,66 +348,66 @@ void SQLite::initializeReportDataTables()
 {
 	const std::string reportDataTableSQL =
 		"CREATE TABLE ReportData ("
-			"ReportDataIndex INTEGER PRIMARY KEY, "
-			"TimeIndex INTEGER, "
-			"ReportDataDictionaryIndex INTEGER, "
-			"Value REAL, "
-			"FOREIGN KEY(TimeIndex) REFERENCES Time(TimeIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE "
-			"FOREIGN KEY(ReportDataDictionaryIndex) REFERENCES ReportDataDictionary(ReportDataDictionaryIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE "
+		"ReportDataIndex INTEGER PRIMARY KEY, "
+		"TimeIndex INTEGER, "
+		"ReportDataDictionaryIndex INTEGER, "
+		"Value REAL, "
+		"FOREIGN KEY(TimeIndex) REFERENCES Time(TimeIndex) "
+		"ON DELETE CASCADE ON UPDATE CASCADE "
+		"FOREIGN KEY(ReportDataDictionaryIndex) REFERENCES ReportDataDictionary(ReportDataDictionaryIndex) "
+		"ON DELETE CASCADE ON UPDATE CASCADE "
 		");";
 
 	sqliteExecuteCommand(reportDataTableSQL);
 
 	const std::string reportDataInsertSQL =
 		"INSERT INTO ReportData ("
-			"ReportDataIndex, "
-			"TimeIndex, "
-			"ReportDataDictionaryIndex, "
-			"Value) "
+		"ReportDataIndex, "
+		"TimeIndex, "
+		"ReportDataDictionaryIndex, "
+		"Value) "
 		"VALUES(?,?,?,?);";
 
 	sqlitePrepareStatement(m_reportDataInsertStmt,reportDataInsertSQL);
 
 	const std::string reportExtendedDataTableSQL =
 		"CREATE TABLE ReportExtendedData ("
-			"ReportExtendedDataIndex INTEGER PRIMARY KEY, "
-			"ReportDataIndex INTEGER, "
-			"MaxValue REAL, "
-			"MaxMonth INTEGER, "
-			"MaxDay INTEGER, "
-			"MaxHour INTEGER, "
-			"MaxStartMinute INTEGER, "
-			"MaxMinute INTEGER, "
-			"MinValue REAL, "
-			"MinMonth INTEGER, "
-			"MinDay INTEGER, "
-			"MinHour INTEGER, "
-			"MinStartMinute INTEGER, "
-			"MinMinute INTEGER, "
-			"FOREIGN KEY(ReportDataIndex) REFERENCES ReportData(ReportDataIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE "
+		"ReportExtendedDataIndex INTEGER PRIMARY KEY, "
+		"ReportDataIndex INTEGER, "
+		"MaxValue REAL, "
+		"MaxMonth INTEGER, "
+		"MaxDay INTEGER, "
+		"MaxHour INTEGER, "
+		"MaxStartMinute INTEGER, "
+		"MaxMinute INTEGER, "
+		"MinValue REAL, "
+		"MinMonth INTEGER, "
+		"MinDay INTEGER, "
+		"MinHour INTEGER, "
+		"MinStartMinute INTEGER, "
+		"MinMinute INTEGER, "
+		"FOREIGN KEY(ReportDataIndex) REFERENCES ReportData(ReportDataIndex) "
+		"ON DELETE CASCADE ON UPDATE CASCADE "
 		");";
 
 	sqliteExecuteCommand(reportExtendedDataTableSQL);
 
 	const std::string reportExtendedDataInsertSQL =
 		"INSERT INTO ReportExtendedData ("
-			"ReportExtendedDataIndex, "
-			"ReportDataIndex, "
-			"MaxValue, "
-			"MaxMonth, "
-			"MaxDay, "
-			"MaxHour, "
-			"MaxStartMinute, "
-			"MaxMinute, "
-			"MinValue, "
-			"MinMonth, "
-			"MinDay, "
-			"MinHour, "
-			"MinStartMinute, "
-			"MinMinute) "
+		"ReportExtendedDataIndex, "
+		"ReportDataIndex, "
+		"MaxValue, "
+		"MaxMonth, "
+		"MaxDay, "
+		"MaxHour, "
+		"MaxStartMinute, "
+		"MaxMinute, "
+		"MinValue, "
+		"MinMonth, "
+		"MinDay, "
+		"MinHour, "
+		"MinStartMinute, "
+		"MinMinute) "
 		"VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
 
 	sqlitePrepareStatement(m_reportExtendedDataInsertStmt,reportExtendedDataInsertSQL);
@@ -416,35 +417,35 @@ void SQLite::initializeTimeIndicesTable()
 {
 	const std::string timeTableSQL =
 		"CREATE TABLE Time ("
-			"TimeIndex INTEGER PRIMARY KEY, "
-			"Month INTEGER, "
-			"Day INTEGER, "
-			"Hour INTEGER, "
-			"Minute INTEGER, "
-			"Dst INTEGER, "
-			"Interval INTEGER, "
-			"IntervalType INTEGER, "
-			"SimulationDays INTEGER, "
-			"DayType TEXT, "
-			"EnvironmentPeriodIndex INTEGER, "
-			"WarmupFlag INTEGER);";
+		"TimeIndex INTEGER PRIMARY KEY, "
+		"Month INTEGER, "
+		"Day INTEGER, "
+		"Hour INTEGER, "
+		"Minute INTEGER, "
+		"Dst INTEGER, "
+		"Interval INTEGER, "
+		"IntervalType INTEGER, "
+		"SimulationDays INTEGER, "
+		"DayType TEXT, "
+		"EnvironmentPeriodIndex INTEGER, "
+		"WarmupFlag INTEGER);";
 
 	sqliteExecuteCommand(timeTableSQL);
 
 	const std::string timeIndexInsertSQL =
 		"INSERT INTO Time ("
-			"TimeIndex, "
-			"Month, "
-			"Day, "
-			"Hour, "
-			"Minute, "
-			"DST, "
-			"Interval, "
-			"IntervalType, "
-			"SimulationDays, "
-			"DayType, "
-			"EnvironmentPeriodIndex, "
-			"WarmupFlag) "
+		"TimeIndex, "
+		"Month, "
+		"Day, "
+		"Hour, "
+		"Minute, "
+		"DST, "
+		"Interval, "
+		"IntervalType, "
+		"SimulationDays, "
+		"DayType, "
+		"EnvironmentPeriodIndex, "
+		"WarmupFlag) "
 		"VALUES(?,?,?,?,?,?,?,?,?,?,?,?);";
 
 	sqlitePrepareStatement(m_timeIndexInsertStmt,timeIndexInsertSQL);
@@ -454,70 +455,70 @@ void SQLite::initializeZoneInfoTable()
 {
 	const std::string zonesTableSQL =
 		"CREATE TABLE Zones ("
-			"ZoneIndex INTEGER PRIMARY KEY, "
-			"ZoneName TEXT, "
-			"RelNorth REAL, "
-			"OriginX REAL, "
-			"OriginY REAL, "
-			"OriginZ REAL, "
-			"CentroidX REAL, "
-			"CentroidY REAL, "
-			"CentroidZ REAL, "
-			"OfType INTEGER, "
-			"Multiplier REAL, "
-			"ListMultiplier REAL, "
-			"MinimumX REAL, "
-			"MaximumX REAL, "
-			"MinimumY REAL, "
-			"MaximumY REAL, "
-			"MinimumZ REAL, "
-			"MaximumZ REAL, "
-			"CeilingHeight REAL, "
-			"Volume REAL, "
-			"InsideConvectionAlgo INTEGER, "
-			"OutsideConvectionAlgo INTEGER, "
-			"FloorArea REAL, "
-			"ExtGrossWallArea REAL, "
-			"ExtNetWallArea REAL, "
-			"ExtWindowArea REAL, "
-			"IsPartOfTotalArea INTEGER);";
+		"ZoneIndex INTEGER PRIMARY KEY, "
+		"ZoneName TEXT, "
+		"RelNorth REAL, "
+		"OriginX REAL, "
+		"OriginY REAL, "
+		"OriginZ REAL, "
+		"CentroidX REAL, "
+		"CentroidY REAL, "
+		"CentroidZ REAL, "
+		"OfType INTEGER, "
+		"Multiplier REAL, "
+		"ListMultiplier REAL, "
+		"MinimumX REAL, "
+		"MaximumX REAL, "
+		"MinimumY REAL, "
+		"MaximumY REAL, "
+		"MinimumZ REAL, "
+		"MaximumZ REAL, "
+		"CeilingHeight REAL, "
+		"Volume REAL, "
+		"InsideConvectionAlgo INTEGER, "
+		"OutsideConvectionAlgo INTEGER, "
+		"FloorArea REAL, "
+		"ExtGrossWallArea REAL, "
+		"ExtNetWallArea REAL, "
+		"ExtWindowArea REAL, "
+		"IsPartOfTotalArea INTEGER);";
 
 	sqliteExecuteCommand(zonesTableSQL);
 
 	const std::string zoneInfoInsertSQL =
 		"INSERT INTO Zones ("
-			"ZoneIndex, "
-			"ZoneName, "
-			"RelNorth, "
-			"OriginX, "
-			"OriginY, "
+		"ZoneIndex, "
+		"ZoneName, "
+		"RelNorth, "
+		"OriginX, "
+		"OriginY, "
 
-			"OriginZ, "
-			"CentroidX, "
-			"CentroidY, "
-			"CentroidZ, "
-			"OfType, "
+		"OriginZ, "
+		"CentroidX, "
+		"CentroidY, "
+		"CentroidZ, "
+		"OfType, "
 
-			"Multiplier, "
-			"ListMultiplier, "
-			"MinimumX, "
-			"MaximumX, "
-			"MinimumY, "
+		"Multiplier, "
+		"ListMultiplier, "
+		"MinimumX, "
+		"MaximumX, "
+		"MinimumY, "
 
-			"MaximumY, "
-			"MinimumZ, "
-			"MaximumZ, "
-			"CeilingHeight, "
-			"Volume, "
+		"MaximumY, "
+		"MinimumZ, "
+		"MaximumZ, "
+		"CeilingHeight, "
+		"Volume, "
 
-			"InsideConvectionAlgo, "
-			"OutsideConvectionAlgo, "
-			"FloorArea, "
-			"ExtGrossWallArea, "
-			"ExtNetWallArea, "
+		"InsideConvectionAlgo, "
+		"OutsideConvectionAlgo, "
+		"FloorArea, "
+		"ExtGrossWallArea, "
+		"ExtNetWallArea, "
 
-			"ExtWindowArea, "
-			"IsPartOfTotalArea) "
+		"ExtWindowArea, "
+		"IsPartOfTotalArea) "
 		"VALUES (?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?,?,?,?, ?,?);";
 
 	sqlitePrepareStatement(m_zoneInfoInsertStmt,zoneInfoInsertSQL);
@@ -527,21 +528,21 @@ void SQLite::initializeZoneInfoZoneListTable()
 {
 	const std::string zoneInfoZoneListTableSQL =
 		"CREATE TABLE ZoneInfoZoneLists ("
-			"ZoneListIndex INTEGER NOT NULL, "
-			"ZoneIndex INTEGER NOT NULL, "
-			"PRIMARY KEY(ZoneListIndex, ZoneIndex), "
-			"FOREIGN KEY(ZoneListIndex) REFERENCES ZoneLists(ZoneListIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE, "
-			"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE "
-			");";
+		"ZoneListIndex INTEGER NOT NULL, "
+		"ZoneIndex INTEGER NOT NULL, "
+		"PRIMARY KEY(ZoneListIndex, ZoneIndex), "
+		"FOREIGN KEY(ZoneListIndex) REFERENCES ZoneLists(ZoneListIndex) "
+		"ON DELETE CASCADE ON UPDATE CASCADE, "
+		"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
+		"ON DELETE CASCADE ON UPDATE CASCADE "
+		");";
 
 	sqliteExecuteCommand(zoneInfoZoneListTableSQL);
 
 	const std::string zoneInfoZoneListInsertSQL =
 		"INSERT INTO ZoneInfoZoneLists ("
-			"ZoneListIndex, "
-			"ZoneIndex) "
+		"ZoneListIndex, "
+		"ZoneIndex) "
 		"VALUES (?,?);";
 
 	sqlitePrepareStatement(m_zoneInfoZoneListInsertStmt,zoneInfoZoneListInsertSQL);
@@ -551,26 +552,26 @@ void SQLite::initializeNominalPeopleTable()
 {
 	const std::string nominalPeopleTableSQL =
 		"CREATE TABLE NominalPeople ( "
-			"NominalPeopleIndex INTEGER PRIMARY KEY, ObjectName TEXT, ZoneIndex INTEGER,"
-			"NumberOfPeople INTEGER, NumberOfPeopleScheduleIndex INTEGER, ActivityScheduleIndex INTEGER, FractionRadiant REAL, "
-			"FractionConvected REAL, WorkEfficiencyScheduleIndex INTEGER, ClothingEfficiencyScheduleIndex INTEGER, "
-			"AirVelocityScheduleIndex INTEGER, Fanger INTEGER, Pierce INTEGER, KSU INTEGER, "
-			"MRTCalcType INTEGER, SurfaceIndex INTEGER, "
-			"AngleFactorListName TEXT, AngleFactorList INTEGER, UserSpecifeidSensibleFraction REAL, Show55Warning INTEGER, "
-			"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE, "
-			"FOREIGN KEY(NumberOfPeopleScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
-				"ON UPDATE CASCADE, "
-			"FOREIGN KEY(ActivityScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
-				"ON UPDATE CASCADE, "
-			"FOREIGN KEY(WorkEfficiencyScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
-				"ON UPDATE CASCADE, "
-			"FOREIGN KEY(ClothingEfficiencyScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
-				"ON UPDATE CASCADE, "
-			"FOREIGN KEY(AirVelocityScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
-				"ON UPDATE CASCADE, "
-			"FOREIGN KEY(SurfaceIndex) REFERENCES Surfaces(SurfaceIndex) "
-				"ON UPDATE CASCADE "
+		"NominalPeopleIndex INTEGER PRIMARY KEY, ObjectName TEXT, ZoneIndex INTEGER,"
+		"NumberOfPeople INTEGER, NumberOfPeopleScheduleIndex INTEGER, ActivityScheduleIndex INTEGER, FractionRadiant REAL, "
+		"FractionConvected REAL, WorkEfficiencyScheduleIndex INTEGER, ClothingEfficiencyScheduleIndex INTEGER, "
+		"AirVelocityScheduleIndex INTEGER, Fanger INTEGER, Pierce INTEGER, KSU INTEGER, "
+		"MRTCalcType INTEGER, SurfaceIndex INTEGER, "
+		"AngleFactorListName TEXT, AngleFactorList INTEGER, UserSpecifeidSensibleFraction REAL, Show55Warning INTEGER, "
+		"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
+		"ON DELETE CASCADE ON UPDATE CASCADE, "
+		"FOREIGN KEY(NumberOfPeopleScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
+		"ON UPDATE CASCADE, "
+		"FOREIGN KEY(ActivityScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
+		"ON UPDATE CASCADE, "
+		"FOREIGN KEY(WorkEfficiencyScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
+		"ON UPDATE CASCADE, "
+		"FOREIGN KEY(ClothingEfficiencyScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
+		"ON UPDATE CASCADE, "
+		"FOREIGN KEY(AirVelocityScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
+		"ON UPDATE CASCADE, "
+		"FOREIGN KEY(SurfaceIndex) REFERENCES Surfaces(SurfaceIndex) "
+		"ON UPDATE CASCADE "
 		");";
 
 	sqliteExecuteCommand(nominalPeopleTableSQL);
@@ -585,13 +586,13 @@ void SQLite::initializeNominalLightingTable()
 {
 	const std::string nominalLightingTableSQL =
 		"CREATE TABLE NominalLighting ( "
-			"NominalLightingIndex INTEGER PRIMARY KEY, ObjectName TEXT, "
-			"ZoneIndex INTEGER, ScheduleIndex INTEGER, DesignLevel REAL, FractionReturnAir REAL, FractionRadiant REAL, "
-			"FractionShortWave REAL, FractionReplaceable REAL, FractionConvected REAL, EndUseSubcategory TEXT, "
-			"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE, "
-			"FOREIGN KEY(ScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
-				"ON UPDATE CASCADE "
+		"NominalLightingIndex INTEGER PRIMARY KEY, ObjectName TEXT, "
+		"ZoneIndex INTEGER, ScheduleIndex INTEGER, DesignLevel REAL, FractionReturnAir REAL, FractionRadiant REAL, "
+		"FractionShortWave REAL, FractionReplaceable REAL, FractionConvected REAL, EndUseSubcategory TEXT, "
+		"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
+		"ON DELETE CASCADE ON UPDATE CASCADE, "
+		"FOREIGN KEY(ScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
+		"ON UPDATE CASCADE "
 		");";
 
 	sqliteExecuteCommand(nominalLightingTableSQL);
@@ -606,15 +607,15 @@ void SQLite::initializeNominalElectricEquipmentTable()
 {
 	const std::string nominalElectricEquipmentTableSQL =
 		"CREATE TABLE NominalElectricEquipment ("
-			"NominalElectricEquipmentIndex INTEGER PRIMARY KEY, "
-			"ObjectName TEXT, "
-			"ZoneIndex INTEGER, ScheduleIndex INTEGER, DesignLevel REAL, "
-			"FractionLatent REAL, FractionRadiant REAL, FractionLost REAL, "
-			"FractionConvected REAL, EndUseSubcategory TEXT, "
-			"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE, "
-			"FOREIGN KEY(ScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
-				"ON UPDATE CASCADE "
+		"NominalElectricEquipmentIndex INTEGER PRIMARY KEY, "
+		"ObjectName TEXT, "
+		"ZoneIndex INTEGER, ScheduleIndex INTEGER, DesignLevel REAL, "
+		"FractionLatent REAL, FractionRadiant REAL, FractionLost REAL, "
+		"FractionConvected REAL, EndUseSubcategory TEXT, "
+		"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
+		"ON DELETE CASCADE ON UPDATE CASCADE, "
+		"FOREIGN KEY(ScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
+		"ON UPDATE CASCADE "
 		");";
 
 	sqliteExecuteCommand(nominalElectricEquipmentTableSQL);
@@ -629,14 +630,14 @@ void SQLite::initializeNominalGasEquipmentTable()
 {
 	const std::string nominalGasEquipmentTableSQL =
 		"CREATE TABLE NominalGasEquipment( "
-			"NominalGasEquipmentIndex INTEGER PRIMARY KEY, ObjectName TEXT, "
-			"ZoneIndex INTEGER, ScheduleIndex INTEGER, "
-			"DesignLevel REAL, FractionLatent REAL, FractionRadiant REAL, FractionLost REAL, "
-			"FractionConvected REAL, EndUseSubcategory TEXT, "
-			"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE, "
-			"FOREIGN KEY(ScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
-				"ON UPDATE CASCADE "
+		"NominalGasEquipmentIndex INTEGER PRIMARY KEY, ObjectName TEXT, "
+		"ZoneIndex INTEGER, ScheduleIndex INTEGER, "
+		"DesignLevel REAL, FractionLatent REAL, FractionRadiant REAL, FractionLost REAL, "
+		"FractionConvected REAL, EndUseSubcategory TEXT, "
+		"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
+		"ON DELETE CASCADE ON UPDATE CASCADE, "
+		"FOREIGN KEY(ScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
+		"ON UPDATE CASCADE "
 		");";
 
 	sqliteExecuteCommand(nominalGasEquipmentTableSQL);
@@ -651,14 +652,14 @@ void SQLite::initializeNominalSteamEquipmentTable()
 {
 	const std::string nominalSteamEquipmentTableSQL =
 		"CREATE TABLE NominalSteamEquipment( "
-			"NominalSteamEquipmentIndex INTEGER PRIMARY KEY, ObjectName TEXT, "
-			"ZoneIndex INTEGER, ScheduleIndex INTEGER, DesignLevel REAL, "
-			"FractionLatent REAL, FractionRadiant REAL, FractionLost REAL, "
-			"FractionConvected REAL, EndUseSubcategory TEXT, "
-			"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE, "
-			"FOREIGN KEY(ScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
-				"ON UPDATE CASCADE "
+		"NominalSteamEquipmentIndex INTEGER PRIMARY KEY, ObjectName TEXT, "
+		"ZoneIndex INTEGER, ScheduleIndex INTEGER, DesignLevel REAL, "
+		"FractionLatent REAL, FractionRadiant REAL, FractionLost REAL, "
+		"FractionConvected REAL, EndUseSubcategory TEXT, "
+		"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
+		"ON DELETE CASCADE ON UPDATE CASCADE, "
+		"FOREIGN KEY(ScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
+		"ON UPDATE CASCADE "
 		");";
 
 	sqliteExecuteCommand(nominalSteamEquipmentTableSQL);
@@ -673,14 +674,14 @@ void SQLite::initializeNominalHotWaterEquipmentTable()
 {
 	const std::string nominalHotWaterEquipmentTableSQL =
 		"CREATE TABLE NominalHotWaterEquipment("
-			"NominalHotWaterEquipmentIndex INTEGER PRIMARY KEY, "
-			"ObjectName TEXT, "
-			"ZoneIndex INTEGER, SchedNo INTEGER, DesignLevel REAL, FractionLatent REAL, FractionRadiant REAL, FractionLost REAL, "
-			"FractionConvected REAL, EndUseSubcategory TEXT, "
-			"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE, "
-			"FOREIGN KEY(SchedNo) REFERENCES Schedules(ScheduleIndex) "
-				"ON UPDATE CASCADE "
+		"NominalHotWaterEquipmentIndex INTEGER PRIMARY KEY, "
+		"ObjectName TEXT, "
+		"ZoneIndex INTEGER, SchedNo INTEGER, DesignLevel REAL, FractionLatent REAL, FractionRadiant REAL, FractionLost REAL, "
+		"FractionConvected REAL, EndUseSubcategory TEXT, "
+		"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
+		"ON DELETE CASCADE ON UPDATE CASCADE, "
+		"FOREIGN KEY(SchedNo) REFERENCES Schedules(ScheduleIndex) "
+		"ON UPDATE CASCADE "
 		");";
 
 	sqliteExecuteCommand(nominalHotWaterEquipmentTableSQL);
@@ -695,14 +696,14 @@ void SQLite::initializeNominalOtherEquipmentTable()
 {
 	const std::string nominalOtherEquipmentTableSQL =
 		"CREATE TABLE NominalOtherEquipment( "
-			"NominalOtherEquipmentIndex INTEGER PRIMARY KEY, ObjectName TEXT, "
-			"ZoneIndex INTEGER, ScheduleIndex INTEGER, DesignLevel REAL, FractionLatent REAL, "
-			"FractionRadiant REAL, FractionLost REAL, "
-			"FractionConvected REAL, EndUseSubcategory TEXT, "
-			"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE, "
-			"FOREIGN KEY(ScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
-				"ON UPDATE CASCADE "
+		"NominalOtherEquipmentIndex INTEGER PRIMARY KEY, ObjectName TEXT, "
+		"ZoneIndex INTEGER, ScheduleIndex INTEGER, DesignLevel REAL, FractionLatent REAL, "
+		"FractionRadiant REAL, FractionLost REAL, "
+		"FractionConvected REAL, EndUseSubcategory TEXT, "
+		"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
+		"ON DELETE CASCADE ON UPDATE CASCADE, "
+		"FOREIGN KEY(ScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
+		"ON UPDATE CASCADE "
 		");";
 
 	sqliteExecuteCommand(nominalOtherEquipmentTableSQL);
@@ -717,13 +718,13 @@ void SQLite::initializeNominalBaseboardHeatTable()
 {
 	const std::string nominalBaseboardHeatersTableSQL =
 		"CREATE TABLE NominalBaseboardHeaters ( "
-			"NominalBaseboardHeaterIndex INTEGER PRIMARY KEY, ObjectName TEXT, "
-			"ZoneIndex INTEGER, ScheduleIndex INTEGER, CapatLowTemperature REAL, LowTemperature REAL, CapatHighTemperature REAL, "
-			"HighTemperature REAL, FractionRadiant REAL, FractionConvected REAL, EndUseSubcategory TEXT, "
-			"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE, "
-			"FOREIGN KEY(ScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
-				"ON UPDATE CASCADE "
+		"NominalBaseboardHeaterIndex INTEGER PRIMARY KEY, ObjectName TEXT, "
+		"ZoneIndex INTEGER, ScheduleIndex INTEGER, CapatLowTemperature REAL, LowTemperature REAL, CapatHighTemperature REAL, "
+		"HighTemperature REAL, FractionRadiant REAL, FractionConvected REAL, EndUseSubcategory TEXT, "
+		"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
+		"ON DELETE CASCADE ON UPDATE CASCADE, "
+		"FOREIGN KEY(ScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
+		"ON UPDATE CASCADE "
 		");";
 
 	sqliteExecuteCommand(nominalBaseboardHeatersTableSQL);
@@ -738,18 +739,18 @@ void SQLite::initializeSurfacesTable()
 {
 	const std::string surfacesTableSQL =
 		"CREATE TABLE Surfaces ( "
-			"SurfaceIndex INTEGER PRIMARY KEY, SurfaceName TEXT, ConstructionIndex INTEGER, "
-			"ClassName TEXT, Area REAL, GrossArea REAL, Perimeter REAL, "
-			"Azimuth REAL, Height REAL, Reveal REAL, "
-			"Shape INTEGER, Sides INTEGER, Tilt REAL, Width REAL, HeatTransferSurf INTEGER, "
-			"BaseSurfaceIndex INTEGER, ZoneIndex INTEGER, ExtBoundCond INTEGER,  "
-			"ExtSolar INTEGER, ExtWind INTEGER, "
-			"FOREIGN KEY(ConstructionIndex) REFERENCES Constructions(ConstructionIndex) "
-				"ON UPDATE CASCADE, "
-			"FOREIGN KEY(BaseSurfaceIndex) REFERENCES Surfaces(SurfaceIndex) "
-				"ON UPDATE CASCADE, "
-			"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE "
+		"SurfaceIndex INTEGER PRIMARY KEY, SurfaceName TEXT, ConstructionIndex INTEGER, "
+		"ClassName TEXT, Area REAL, GrossArea REAL, Perimeter REAL, "
+		"Azimuth REAL, Height REAL, Reveal REAL, "
+		"Shape INTEGER, Sides INTEGER, Tilt REAL, Width REAL, HeatTransferSurf INTEGER, "
+		"BaseSurfaceIndex INTEGER, ZoneIndex INTEGER, ExtBoundCond INTEGER,  "
+		"ExtSolar INTEGER, ExtWind INTEGER, "
+		"FOREIGN KEY(ConstructionIndex) REFERENCES Constructions(ConstructionIndex) "
+		"ON UPDATE CASCADE, "
+		"FOREIGN KEY(BaseSurfaceIndex) REFERENCES Surfaces(SurfaceIndex) "
+		"ON UPDATE CASCADE, "
+		"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
+		"ON DELETE CASCADE ON UPDATE CASCADE "
 		");";
 
 	sqliteExecuteCommand(surfacesTableSQL);
@@ -764,10 +765,10 @@ void SQLite::initializeConstructionsTables()
 {
 	const std::string constructionsTableSQL =
 		"CREATE TABLE Constructions ( "
-			"ConstructionIndex INTEGER PRIMARY KEY, Name TEXT, TotalLayers INTEGER, "
-			"TotalSolidLayers INTEGER, TotalGlassLayers INTEGER, InsideAbsorpVis REAL, OutsideAbsorpVis REAL, "
-			"InsideAbsorpSolar REAL, OutsideAbsorpSolar REAL, InsideAbsorpThermal REAL, OutsideAbsorpThermal REAL, "
-			"OutsideRoughness INTEGER, TypeIsWindow INTEGER, Uvalue REAL"
+		"ConstructionIndex INTEGER PRIMARY KEY, Name TEXT, TotalLayers INTEGER, "
+		"TotalSolidLayers INTEGER, TotalGlassLayers INTEGER, InsideAbsorpVis REAL, OutsideAbsorpVis REAL, "
+		"InsideAbsorpSolar REAL, OutsideAbsorpSolar REAL, InsideAbsorpThermal REAL, OutsideAbsorpThermal REAL, "
+		"OutsideRoughness INTEGER, TypeIsWindow INTEGER, Uvalue REAL"
 		");";
 
 	sqliteExecuteCommand(constructionsTableSQL);
@@ -779,12 +780,12 @@ void SQLite::initializeConstructionsTables()
 
 	const std::string constructionLayersTableSQL =
 		"CREATE TABLE ConstructionLayers ( "
-			"ConstructionLayersIndex INTEGER PRIMARY KEY, "
-			"ConstructionIndex INTEGER, LayerIndex INTEGER, MaterialIndex INTEGER, "
-			"FOREIGN KEY(ConstructionIndex) REFERENCES Constructions(ConstructionIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE, "
-			"FOREIGN KEY(MaterialIndex) REFERENCES Materials(MaterialIndex) "
-				"ON UPDATE CASCADE "
+		"ConstructionLayersIndex INTEGER PRIMARY KEY, "
+		"ConstructionIndex INTEGER, LayerIndex INTEGER, MaterialIndex INTEGER, "
+		"FOREIGN KEY(ConstructionIndex) REFERENCES Constructions(ConstructionIndex) "
+		"ON DELETE CASCADE ON UPDATE CASCADE, "
+		"FOREIGN KEY(MaterialIndex) REFERENCES Materials(MaterialIndex) "
+		"ON UPDATE CASCADE "
 		");";
 
 	sqliteExecuteCommand(constructionLayersTableSQL);
@@ -799,10 +800,10 @@ void SQLite::initializeMaterialsTable()
 {
 	const std::string materialsTableSQL =
 		"CREATE TABLE Materials ( "
-			"MaterialIndex INTEGER PRIMARY KEY, "
-			"Name TEXT, MaterialType INTEGER, Roughness INTEGER, "
-			"Conductivity REAL, Density REAL, IsoMoistCap REAL, Porosity REAL, Resistance REAL, "
-			"ROnly INTEGER, SpecHeat REAL, ThermGradCoef REAL, Thickness REAL, VaporDiffus REAL "
+		"MaterialIndex INTEGER PRIMARY KEY, "
+		"Name TEXT, MaterialType INTEGER, Roughness INTEGER, "
+		"Conductivity REAL, Density REAL, IsoMoistCap REAL, Porosity REAL, Resistance REAL, "
+		"ROnly INTEGER, SpecHeat REAL, ThermGradCoef REAL, Thickness REAL, VaporDiffus REAL "
 		");";
 
 	sqliteExecuteCommand(materialsTableSQL);
@@ -817,7 +818,7 @@ void SQLite::initializeZoneListTable()
 {
 	const std::string zoneListsTableSQL =
 		"CREATE TABLE ZoneLists ( "
-			"ZoneListIndex INTEGER PRIMARY KEY, Name TEXT);";
+		"ZoneListIndex INTEGER PRIMARY KEY, Name TEXT);";
 
 	sqliteExecuteCommand(zoneListsTableSQL);
 
@@ -831,13 +832,13 @@ void SQLite::initializeZoneGroupTable()
 {
 	const std::string zoneGroupsTableSQL =
 		"CREATE TABLE ZoneGroups ( "
-			"ZoneGroupIndex INTEGER PRIMARY KEY, "
-			"ZoneGroupName TEXT, "
-			"ZoneListIndex INTEGER, "
-			"ZoneListMultiplier INTEGER, "
-			"FOREIGN KEY(ZoneListIndex) REFERENCES ZoneLists(ZoneListIndex) "
-				"ON UPDATE CASCADE "
-			");";
+		"ZoneGroupIndex INTEGER PRIMARY KEY, "
+		"ZoneGroupName TEXT, "
+		"ZoneListIndex INTEGER, "
+		"ZoneListMultiplier INTEGER, "
+		"FOREIGN KEY(ZoneListIndex) REFERENCES ZoneLists(ZoneListIndex) "
+		"ON UPDATE CASCADE "
+		");";
 
 	sqliteExecuteCommand(zoneGroupsTableSQL);
 
@@ -851,13 +852,13 @@ void SQLite::initializeNominalInfiltrationTable()
 {
 	const std::string nominalInfiltrationTableSQL =
 		"CREATE TABLE NominalInfiltration ( "
-			"NominalInfiltrationIndex INTEGER PRIMARY KEY, "
-			"ObjectName TEXT, "
-			"ZoneIndex INTEGER, ScheduleIndex INTEGER, DesignLevel REAL, "
-			"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE, "
-			"FOREIGN KEY(ScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
-				"ON UPDATE CASCADE "
+		"NominalInfiltrationIndex INTEGER PRIMARY KEY, "
+		"ObjectName TEXT, "
+		"ZoneIndex INTEGER, ScheduleIndex INTEGER, DesignLevel REAL, "
+		"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
+		"ON DELETE CASCADE ON UPDATE CASCADE, "
+		"FOREIGN KEY(ScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
+		"ON UPDATE CASCADE "
 		");";
 
 	sqliteExecuteCommand(nominalInfiltrationTableSQL);
@@ -873,13 +874,13 @@ void SQLite::initializeNominalVentilationTable()
 {
 	const std::string nominalVentilationTableSQL =
 		"CREATE TABLE NominalVentilation ( "
-			"NominalVentilationIndex INTEGER PRIMARY KEY, "
-			"ObjectName TEXT, "
-			"ZoneIndex INTEGER, ScheduleIndex INTEGER, DesignLevel REAL, "
-			"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE, "
-			"FOREIGN KEY(ScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
-				"ON UPDATE CASCADE "
+		"NominalVentilationIndex INTEGER PRIMARY KEY, "
+		"ObjectName TEXT, "
+		"ZoneIndex INTEGER, ScheduleIndex INTEGER, DesignLevel REAL, "
+		"FOREIGN KEY(ZoneIndex) REFERENCES Zones(ZoneIndex) "
+		"ON DELETE CASCADE ON UPDATE CASCADE, "
+		"FOREIGN KEY(ScheduleIndex) REFERENCES Schedules(ScheduleIndex) "
+		"ON UPDATE CASCADE "
 		");";
 
 	sqliteExecuteCommand(nominalVentilationTableSQL);
@@ -894,9 +895,9 @@ void SQLite::initializeZoneSizingTable()
 {
 	const std::string zoneSizesTableSQL =
 		"CREATE TABLE ZoneSizes ( "
-			"ZoneSizesIndex INTEGER PRIMARY KEY, ZoneName TEXT, LoadType TEXT, "
-			"CalcDesLoad REAL, UserDesLoad REAL, CalcDesFlow REAL, UserDesFlow REAL, DesDayName TEXT, PeakHrMin TEXT, "
-			"PeakTemp REAL, PeakHumRat REAL, CalcOutsideAirFlow REAL"
+		"ZoneSizesIndex INTEGER PRIMARY KEY, ZoneName TEXT, LoadType TEXT, "
+		"CalcDesLoad REAL, UserDesLoad REAL, CalcDesFlow REAL, UserDesFlow REAL, DesDayName TEXT, PeakHrMin TEXT, "
+		"PeakTemp REAL, PeakHumRat REAL, CalcOutsideAirFlow REAL"
 		");";
 
 	sqliteExecuteCommand(zoneSizesTableSQL);
@@ -966,10 +967,10 @@ void SQLite::initializeDaylightMapTables()
 {
 	const std::string daylightMapsTableSQL =
 		"CREATE TABLE DaylightMaps ( "
-			"MapNumber INTEGER PRIMARY KEY, MapName TEXT, "
-			"Environment TEXT, Zone INTEGER, ReferencePt1 TEXT, ReferencePt2 TEXT, Z REAL, "
-			"FOREIGN KEY(Zone) REFERENCES Zones(ZoneIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE "
+		"MapNumber INTEGER PRIMARY KEY, MapName TEXT, "
+		"Environment TEXT, Zone INTEGER, ReferencePt1 TEXT, ReferencePt2 TEXT, Z REAL, "
+		"FOREIGN KEY(Zone) REFERENCES Zones(ZoneIndex) "
+		"ON DELETE CASCADE ON UPDATE CASCADE "
 		");";
 
 	sqliteExecuteCommand(daylightMapsTableSQL);
@@ -981,10 +982,10 @@ void SQLite::initializeDaylightMapTables()
 
 	const std::string daylightMapHourlyReportsTableSQL =
 		"CREATE TABLE DaylightMapHourlyReports ( "
-			"HourlyReportIndex INTEGER PRIMARY KEY, "
-			"MapNumber INTEGER, Month INTEGER, DayOfMonth INTEGER, Hour INTEGER, "
-			"FOREIGN KEY(MapNumber) REFERENCES DaylightMaps(MapNumber) "
-				"ON DELETE CASCADE ON UPDATE CASCADE "
+		"HourlyReportIndex INTEGER PRIMARY KEY, "
+		"MapNumber INTEGER, Month INTEGER, DayOfMonth INTEGER, Hour INTEGER, "
+		"FOREIGN KEY(MapNumber) REFERENCES DaylightMaps(MapNumber) "
+		"ON DELETE CASCADE ON UPDATE CASCADE "
 		");";
 
 	sqliteExecuteCommand(daylightMapHourlyReportsTableSQL);
@@ -996,10 +997,10 @@ void SQLite::initializeDaylightMapTables()
 
 	const std::string daylightMapHourlyDataTableSQL =
 		"CREATE TABLE DaylightMapHourlyData ( "
-			"HourlyDataIndex INTEGER PRIMARY KEY, HourlyReportIndex INTEGER, "
-			"X REAL, Y REAL, Illuminance REAL, "
-			"FOREIGN KEY(HourlyReportIndex) REFERENCES DaylightMapHourlyReports(HourlyReportIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE "
+		"HourlyDataIndex INTEGER PRIMARY KEY, HourlyReportIndex INTEGER, "
+		"X REAL, Y REAL, Illuminance REAL, "
+		"FOREIGN KEY(HourlyReportIndex) REFERENCES DaylightMapHourlyReports(HourlyReportIndex) "
+		"ON DELETE CASCADE ON UPDATE CASCADE "
 		");";
 
 	sqliteExecuteCommand(daylightMapHourlyDataTableSQL);
@@ -1015,33 +1016,33 @@ void SQLite::initializeViews()
 	const std::string reportVariableWithTimeViewSQL =
 		"CREATE VIEW ReportVariableWithTime AS "
 		"SELECT rd.ReportDataIndex, rd.TimeIndex, rd.ReportDataDictionaryIndex, red.ReportExtendedDataIndex, rd.Value, "
-			"t.Month, t.Day, t.Hour, t.Minute, t.Dst, t.Interval, t.IntervalType, t.SimulationDays, t.DayType, t.EnvironmentPeriodIndex, t.WarmupFlag, "
-			"rdd.IsMeter, rdd.Type, rdd.IndexGroup, rdd.TimestepType, rdd.KeyValue, rdd.Name, rdd.ReportingFrequency, rdd.ScheduleName, rdd.Units, "
-			"red.MaxValue, red.MaxMonth, red.MaxDay, red.MaxStartMinute, red.MaxMinute, red.MinValue, red.MinMonth, red.MinDay, red.MinStartMinute, red.MinMinute "
+		"t.Month, t.Day, t.Hour, t.Minute, t.Dst, t.Interval, t.IntervalType, t.SimulationDays, t.DayType, t.EnvironmentPeriodIndex, t.WarmupFlag, "
+		"rdd.IsMeter, rdd.Type, rdd.IndexGroup, rdd.TimestepType, rdd.KeyValue, rdd.Name, rdd.ReportingFrequency, rdd.ScheduleName, rdd.Units, "
+		"red.MaxValue, red.MaxMonth, red.MaxDay, red.MaxStartMinute, red.MaxMinute, red.MinValue, red.MinMonth, red.MinDay, red.MinStartMinute, red.MinMinute "
 		"FROM ReportData As rd "
 		"INNER JOIN ReportDataDictionary As rdd "
-			"ON rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex "
+		"ON rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex "
 		"LEFT OUTER JOIN ReportExtendedData As red "
-			"ON rd.ReportDataIndex = red.ReportDataIndex "
+		"ON rd.ReportDataIndex = red.ReportDataIndex "
 		"INNER JOIN Time As t "
-			"ON rd.TimeIndex = t.TimeIndex;";
+		"ON rd.TimeIndex = t.TimeIndex;";
 
 	sqliteExecuteCommand(reportVariableWithTimeViewSQL);
 
 	const std::string reportVariableDataViewSQL =
 		"CREATE VIEW ReportVariableData AS "
 		"SELECT rd.ReportDataIndex As rowid, rd.TimeIndex, rd.ReportDataDictionaryIndex As ReportVariableDataDictionaryIndex, "
-			"rd.Value As VariableValue, red.ReportExtendedDataIndex As ReportVariableExtendedDataIndex "
+		"rd.Value As VariableValue, red.ReportExtendedDataIndex As ReportVariableExtendedDataIndex "
 		"FROM ReportData As rd "
 		"LEFT OUTER JOIN ReportExtendedData As red "
-			"ON rd.ReportDataIndex = red.ReportDataIndex;";
+		"ON rd.ReportDataIndex = red.ReportDataIndex;";
 
 	sqliteExecuteCommand(reportVariableDataViewSQL);
 
 	const std::string reportVariableDataDictionaryViewSQL =
 		"CREATE VIEW ReportVariableDataDictionary AS "
 		"SELECT rdd.ReportDataDictionaryIndex As ReportVariableDataDictionaryIndex, rdd.Type As VariableType, rdd.IndexGroup, rdd.TimestepType, "
-			"rdd.KeyValue, rdd.Name As VariableName, rdd.ReportingFrequency, rdd.ScheduleName, rdd.Units As VariableUnits "
+		"rdd.KeyValue, rdd.Name As VariableName, rdd.ReportingFrequency, rdd.ScheduleName, rdd.Units As VariableUnits "
 		"FROM ReportDataDictionary As rdd;";
 
 	sqliteExecuteCommand(reportVariableDataDictionaryViewSQL);
@@ -1049,7 +1050,7 @@ void SQLite::initializeViews()
 	const std::string reportVariableExtendedDataViewSQL =
 		"CREATE VIEW ReportVariableExtendedData AS "
 		"SELECT red.ReportExtendedDataIndex As ReportVariableExtendedDataIndex, red.MaxValue, red.MaxMonth, red.MaxDay, "
-			"red.MaxStartMinute, red.MaxMinute, red.MinValue, red.MinMonth, red.MinDay, red.MinStartMinute, red.MinMinute "
+		"red.MaxStartMinute, red.MaxMinute, red.MinValue, red.MinMonth, red.MinDay, red.MinStartMinute, red.MinMinute "
 		"FROM ReportExtendedData As red;";
 
 	sqliteExecuteCommand(reportVariableExtendedDataViewSQL);
@@ -1057,12 +1058,12 @@ void SQLite::initializeViews()
 	const std::string reportMeterDataViewSQL =
 		"CREATE VIEW ReportMeterData AS "
 		"SELECT rd.ReportDataIndex As rowid, rd.TimeIndex, rd.ReportDataDictionaryIndex As ReportMeterDataDictionaryIndex, "
-			"rd.Value As VariableValue, red.ReportExtendedDataIndex As ReportVariableExtendedDataIndex "
+		"rd.Value As VariableValue, red.ReportExtendedDataIndex As ReportVariableExtendedDataIndex "
 		"FROM ReportData As rd "
 		"LEFT OUTER JOIN ReportExtendedData As red "
-			"ON rd.ReportDataIndex = red.ReportDataIndex "
+		"ON rd.ReportDataIndex = red.ReportDataIndex "
 		"INNER JOIN ReportDataDictionary As rdd "
-			"ON rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex "
+		"ON rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex "
 		"WHERE rdd.IsMeter = 1;";
 
 	sqliteExecuteCommand(reportMeterDataViewSQL);
@@ -1070,7 +1071,7 @@ void SQLite::initializeViews()
 	const std::string reportMeterDataDictionaryViewSQL =
 		"CREATE VIEW ReportMeterDataDictionary AS "
 		"SELECT rdd.ReportDataDictionaryIndex As ReportMeterDataDictionaryIndex, rdd.Type As VariableType, rdd.IndexGroup, rdd.TimestepType, "
-			"rdd.KeyValue, rdd.Name As VariableName, rdd.ReportingFrequency, rdd.ScheduleName, rdd.Units As VariableUnits "
+		"rdd.KeyValue, rdd.Name As VariableName, rdd.ReportingFrequency, rdd.ScheduleName, rdd.Units As VariableUnits "
 		"FROM ReportDataDictionary As rdd "
 		"WHERE rdd.IsMeter = 1;";
 
@@ -1079,12 +1080,12 @@ void SQLite::initializeViews()
 	const std::string reportMeterExtendedDataViewSQL =
 		"CREATE VIEW ReportMeterExtendedData AS "
 		"SELECT red.ReportExtendedDataIndex As ReportMeterExtendedDataIndex, red.MaxValue, red.MaxMonth, red.MaxDay, "
-			"red.MaxStartMinute, red.MaxMinute, red.MinValue, red.MinMonth, red.MinDay, red.MinStartMinute, red.MinMinute "
+		"red.MaxStartMinute, red.MaxMinute, red.MinValue, red.MinMonth, red.MinDay, red.MinStartMinute, red.MinMinute "
 		"FROM ReportExtendedData As red "
 		"LEFT OUTER JOIN ReportData As rd "
-			"ON rd.ReportDataIndex = red.ReportDataIndex "
+		"ON rd.ReportDataIndex = red.ReportDataIndex "
 		"INNER JOIN ReportDataDictionary As rdd "
-			"ON rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex "
+		"ON rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex "
 		"WHERE rdd.IsMeter = 1;";
 
 	sqliteExecuteCommand(reportMeterExtendedDataViewSQL);
@@ -1113,9 +1114,9 @@ void SQLite::initializeSimulationsTable()
 	sqlitePrepareStatement(m_simulationUpdateStmt,simulationUpdateSQL);
 
 	const std::string simulationDataUpdateSQL =
-	"UPDATE Simulations SET "
-	"NumTimestepsPerHour = ? "
-	"WHERE SimulationIndex = ?";
+		"UPDATE Simulations SET "
+		"NumTimestepsPerHour = ? "
+		"WHERE SimulationIndex = ?";
 
 	sqlitePrepareStatement(m_simulationDataUpdateStmt,simulationDataUpdateSQL);
 }
@@ -1124,10 +1125,10 @@ void SQLite::initializeErrorsTable()
 {
 	const std::string errorsTableSQL =
 		"CREATE TABLE Errors ( "
-			"ErrorIndex INTEGER PRIMARY KEY, SimulationIndex INTEGER, "
-			"ErrorType INTEGER, ErrorMessage TEXT, Count INTEGER, "
-			"FOREIGN KEY(SimulationIndex) REFERENCES Simulations(SimulationIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE "
+		"ErrorIndex INTEGER PRIMARY KEY, SimulationIndex INTEGER, "
+		"ErrorType INTEGER, ErrorMessage TEXT, Count INTEGER, "
+		"FOREIGN KEY(SimulationIndex) REFERENCES Simulations(SimulationIndex) "
+		"ON DELETE CASCADE ON UPDATE CASCADE "
 		");";
 
 	sqliteExecuteCommand(errorsTableSQL);
@@ -1148,10 +1149,10 @@ void SQLite::initializeEnvironmentPeriodsTable()
 {
 	const std::string environmentPeriodsTableSQL =
 		"CREATE TABLE EnvironmentPeriods ( "
-			"EnvironmentPeriodIndex INTEGER PRIMARY KEY, "
-			"SimulationIndex INTEGER, EnvironmentName TEXT, EnvironmentType INTEGER, "
-			"FOREIGN KEY(SimulationIndex) REFERENCES Simulations(SimulationIndex) "
-				"ON DELETE CASCADE ON UPDATE CASCADE "
+		"EnvironmentPeriodIndex INTEGER PRIMARY KEY, "
+		"SimulationIndex INTEGER, EnvironmentName TEXT, EnvironmentType INTEGER, "
+		"FOREIGN KEY(SimulationIndex) REFERENCES Simulations(SimulationIndex) "
+		"ON DELETE CASCADE ON UPDATE CASCADE "
 		");";
 
 	sqliteExecuteCommand(environmentPeriodsTableSQL);
@@ -1165,10 +1166,10 @@ void SQLite::initializeEnvironmentPeriodsTable()
 void SQLite::initializeTabularDataTable()
 {
 	const std::string sql =
-	"CREATE TABLE StringTypes ( "
-	"StringTypeIndex INTEGER PRIMARY KEY, "
-	"Value TEXT"
-	");";
+		"CREATE TABLE StringTypes ( "
+		"StringTypeIndex INTEGER PRIMARY KEY, "
+		"Value TEXT"
+		");";
 
 	sqliteExecuteCommand(sql);
 
@@ -1181,12 +1182,12 @@ void SQLite::initializeTabularDataTable()
 
 	const std::string sql2 =
 		"CREATE TABLE Strings ( "
-			"StringIndex INTEGER PRIMARY KEY, "
-			"StringTypeIndex INTEGER, "
-			"Value TEXT, "
-			"UNIQUE(StringTypeIndex, Value), "
-			"FOREIGN KEY(StringTypeIndex) REFERENCES StringTypes(StringTypeIndex) "
-				"ON UPDATE CASCADE "
+		"StringIndex INTEGER PRIMARY KEY, "
+		"StringTypeIndex INTEGER, "
+		"Value TEXT, "
+		"UNIQUE(StringTypeIndex, Value), "
+		"FOREIGN KEY(StringTypeIndex) REFERENCES StringTypes(StringTypeIndex) "
+		"ON UPDATE CASCADE "
 		");";
 
 	sqliteExecuteCommand(sql2);
@@ -1200,7 +1201,7 @@ void SQLite::initializeTabularDataTable()
 	sqlitePrepareStatement(m_stringsLookUpStmt,sql4);
 
 	const std::string sql5 =
-	"CREATE TABLE TabularData ( "
+		"CREATE TABLE TabularData ( "
 		"TabularDataIndex INTEGER PRIMARY KEY, "
 		"ReportNameIndex INTEGER, "
 		"ReportForStringIndex INTEGER, "
@@ -1214,20 +1215,20 @@ void SQLite::initializeTabularDataTable()
 		"Value TEXT "
 		"Value TEXT, "
 		"FOREIGN KEY(ReportNameIndex) REFERENCES Strings(StringIndex) "
-			"ON UPDATE CASCADE "
+		"ON UPDATE CASCADE "
 		"FOREIGN KEY(ReportForStringIndex) REFERENCES Strings(StringIndex) "
-			"ON UPDATE CASCADE "
+		"ON UPDATE CASCADE "
 		"FOREIGN KEY(TableNameIndex) REFERENCES Strings(StringIndex) "
-			"ON UPDATE CASCADE "
+		"ON UPDATE CASCADE "
 		"FOREIGN KEY(RowNameIndex) REFERENCES Strings(StringIndex) "
-			"ON UPDATE CASCADE "
+		"ON UPDATE CASCADE "
 		"FOREIGN KEY(ColumnNameIndex) REFERENCES Strings(StringIndex) "
-			"ON UPDATE CASCADE "
+		"ON UPDATE CASCADE "
 		"FOREIGN KEY(UnitsIndex) REFERENCES Strings(StringIndex) "
-			"ON UPDATE CASCADE "
+		"ON UPDATE CASCADE "
 		"FOREIGN KEY(SimulationIndex) REFERENCES Simulations(SimulationIndex) "
-			"ON DELETE CASCADE ON UPDATE CASCADE "
-	");";
+		"ON DELETE CASCADE ON UPDATE CASCADE "
+		");";
 
 	sqliteExecuteCommand(sql5);
 
@@ -1239,21 +1240,21 @@ void SQLite::initializeTabularDataTable()
 void SQLite::initializeTabularDataView()
 {
 	const std::string sql = "CREATE VIEW TabularDataWithStrings AS SELECT "
-		"td.TabularDataIndex, "
-		"td.Value As Value, "
-		"reportn.Value As ReportName, "
-		"fs.Value As ReportForString, "
-		"tn.Value As TableName, "
-		"rn.Value As RowName, "
-		"cn.Value As ColumnName, "
-		"u.Value As Units "
-		"FROM TabularData As td "
-		"INNER JOIN Strings As reportn ON reportn.StringIndex=td.ReportNameIndex "
-		"INNER JOIN Strings As fs ON fs.StringIndex=td.ReportForStringIndex "
-		"INNER JOIN Strings As tn ON tn.StringIndex=td.TableNameIndex "
-		"INNER JOIN Strings As rn ON rn.StringIndex=td.RowNameIndex "
-		"INNER JOIN Strings As cn ON cn.StringIndex=td.ColumnNameIndex "
-		"INNER JOIN Strings As u ON u.StringIndex=td.UnitsIndex;";
+							"td.TabularDataIndex, "
+							"td.Value As Value, "
+							"reportn.Value As ReportName, "
+							"fs.Value As ReportForString, "
+							"tn.Value As TableName, "
+							"rn.Value As RowName, "
+							"cn.Value As ColumnName, "
+							"u.Value As Units "
+							"FROM TabularData As td "
+							"INNER JOIN Strings As reportn ON reportn.StringIndex=td.ReportNameIndex "
+							"INNER JOIN Strings As fs ON fs.StringIndex=td.ReportForStringIndex "
+							"INNER JOIN Strings As tn ON tn.StringIndex=td.TableNameIndex "
+							"INNER JOIN Strings As rn ON rn.StringIndex=td.RowNameIndex "
+							"INNER JOIN Strings As cn ON cn.StringIndex=td.ColumnNameIndex "
+							"INNER JOIN Strings As u ON u.StringIndex=td.UnitsIndex;";
 
 	sqliteExecuteCommand(sql);
 }
@@ -1372,16 +1373,16 @@ int SQLite::logicalToInteger(const bool value)
 }
 
 void SQLite::createSQLiteReportDictionaryRecord (
-		int const reportVariableReportID,
-		int const storeTypeIndex,
-		std::string const & indexGroup,
-		std::string const & keyedValueString,
-		std::string const & variableName,
-		int const indexType,
-		std::string const & units,
-		int const reportingFreq,
-		bool isMeter,
-		Optional_string_const scheduleName
+	int const reportVariableReportID,
+	int const storeTypeIndex,
+	std::string const & indexGroup,
+	std::string const & keyedValueString,
+	std::string const & variableName,
+	int const indexType,
+	std::string const & units,
+	int const reportingFreq,
+	bool isMeter,
+	Optional_string_const scheduleName
 )
 {
 	if ( m_writeOutputToSQLite ) {
@@ -1408,14 +1409,14 @@ void SQLite::createSQLiteReportDictionaryRecord (
 }
 
 void SQLite::createSQLiteReportDataRecord(
-		int const recordIndex,
-		Real64 const value,
-		Optional_int_const reportingInterval,
-		Optional< Real64 const > minValue,
-		Optional_int_const minValueDate,
-		Optional< Real64 const > maxValue,
-		Optional_int_const maxValueDate,
-		Optional_int_const minutesPerTimeStep
+	int const recordIndex,
+	Real64 const value,
+	Optional_int_const reportingInterval,
+	Optional< Real64 const > minValue,
+	Optional_int_const minValueDate,
+	Optional< Real64 const > maxValue,
+	Optional_int_const maxValueDate,
+	Optional_int_const minutesPerTimeStep
 )
 {
 	if ( m_writeOutputToSQLite ) {
@@ -1452,72 +1453,72 @@ void SQLite::createSQLiteReportDataRecord(
 
 			if ( minutesPerTimeStep.present() ) { // This is for data created by a 'Report Meter' statement
 				switch(reportingInterval()) {
-					case LocalReportHourly:
-					case LocalReportDaily:
-					case LocalReportMonthly:
-					case LocalReportSim:
-						sqliteBindInteger(m_reportExtendedDataInsertStmt, 1, extendedDataIndex);
-						sqliteBindForeignKey(m_reportExtendedDataInsertStmt, 2, dataIndex);
+				case LocalReportHourly:
+				case LocalReportDaily:
+				case LocalReportMonthly:
+				case LocalReportSim:
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 1, extendedDataIndex);
+					sqliteBindForeignKey(m_reportExtendedDataInsertStmt, 2, dataIndex);
 
-						sqliteBindDouble(m_reportExtendedDataInsertStmt, 3, maxValue);
-						sqliteBindInteger(m_reportExtendedDataInsertStmt, 4, maxMonth);
-						sqliteBindInteger(m_reportExtendedDataInsertStmt, 5, maxDay);
-						sqliteBindInteger(m_reportExtendedDataInsertStmt, 6, maxHour);
-						sqliteBindInteger(m_reportExtendedDataInsertStmt, 7, maxMinute - minutesPerTimeStep + 1);
-						sqliteBindInteger(m_reportExtendedDataInsertStmt, 8, maxMinute);
+					sqliteBindDouble(m_reportExtendedDataInsertStmt, 3, maxValue);
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 4, maxMonth);
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 5, maxDay);
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 6, maxHour);
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 7, maxMinute - minutesPerTimeStep + 1);
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 8, maxMinute);
 
-						sqliteBindDouble(m_reportExtendedDataInsertStmt, 9, minValue);
-						sqliteBindInteger(m_reportExtendedDataInsertStmt, 10, minMonth);
-						sqliteBindInteger(m_reportExtendedDataInsertStmt, 11, minDay);
-						sqliteBindInteger(m_reportExtendedDataInsertStmt, 12, minHour);
-						sqliteBindInteger(m_reportExtendedDataInsertStmt, 13, minMinute - minutesPerTimeStep + 1);
-						sqliteBindInteger(m_reportExtendedDataInsertStmt, 14, minMinute);
+					sqliteBindDouble(m_reportExtendedDataInsertStmt, 9, minValue);
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 10, minMonth);
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 11, minDay);
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 12, minHour);
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 13, minMinute - minutesPerTimeStep + 1);
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 14, minMinute);
 
-						sqliteStepCommand(m_reportExtendedDataInsertStmt);
-						sqliteResetCommand(m_reportExtendedDataInsertStmt);
-						break;
+					sqliteStepCommand(m_reportExtendedDataInsertStmt);
+					sqliteResetCommand(m_reportExtendedDataInsertStmt);
+					break;
 
-					case LocalReportTimeStep:
-						--extendedDataIndex; // Reset the data index to account for the error
-						break;
+				case LocalReportTimeStep:
+					--extendedDataIndex; // Reset the data index to account for the error
+					break;
 
-					default:
-						--extendedDataIndex; // Reset the data index to account for the error
-						std::stringstream ss;
-						ss << "Illegal reportingInterval passed to CreateSQLiteMeterRecord: " << reportingInterval;
-						sqliteWriteMessage(ss.str());
+				default:
+					--extendedDataIndex; // Reset the data index to account for the error
+					std::stringstream ss;
+					ss << "Illegal reportingInterval passed to CreateSQLiteMeterRecord: " << reportingInterval;
+					sqliteWriteMessage(ss.str());
 				}
 			} else { // This is for data created by a 'Report Variable' statement
 				switch(reportingInterval()) {
-					case LocalReportDaily:
-					case LocalReportMonthly:
-					case LocalReportSim:
-						sqliteBindInteger(m_reportExtendedDataInsertStmt, 1, extendedDataIndex);
-						sqliteBindForeignKey(m_reportExtendedDataInsertStmt, 2, dataIndex);
+				case LocalReportDaily:
+				case LocalReportMonthly:
+				case LocalReportSim:
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 1, extendedDataIndex);
+					sqliteBindForeignKey(m_reportExtendedDataInsertStmt, 2, dataIndex);
 
-						sqliteBindDouble(m_reportExtendedDataInsertStmt, 3, maxValue);
-						sqliteBindInteger(m_reportExtendedDataInsertStmt, 4, maxMonth);
-						sqliteBindInteger(m_reportExtendedDataInsertStmt, 5, maxDay);
-						sqliteBindInteger(m_reportExtendedDataInsertStmt, 6, maxHour);
-						sqliteBindNULL(m_reportExtendedDataInsertStmt, 7);
-						sqliteBindInteger(m_reportExtendedDataInsertStmt, 8, maxMinute);
+					sqliteBindDouble(m_reportExtendedDataInsertStmt, 3, maxValue);
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 4, maxMonth);
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 5, maxDay);
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 6, maxHour);
+					sqliteBindNULL(m_reportExtendedDataInsertStmt, 7);
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 8, maxMinute);
 
-						sqliteBindDouble(m_reportExtendedDataInsertStmt, 9, minValue);
-						sqliteBindInteger(m_reportExtendedDataInsertStmt, 10, minMonth);
-						sqliteBindInteger(m_reportExtendedDataInsertStmt, 11, minDay);
-						sqliteBindInteger(m_reportExtendedDataInsertStmt, 12, minHour);
-						sqliteBindNULL(m_reportExtendedDataInsertStmt, 13);
-						sqliteBindInteger(m_reportExtendedDataInsertStmt, 14, minMinute);
+					sqliteBindDouble(m_reportExtendedDataInsertStmt, 9, minValue);
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 10, minMonth);
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 11, minDay);
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 12, minHour);
+					sqliteBindNULL(m_reportExtendedDataInsertStmt, 13);
+					sqliteBindInteger(m_reportExtendedDataInsertStmt, 14, minMinute);
 
-						sqliteStepCommand(m_reportExtendedDataInsertStmt);
-						sqliteResetCommand(m_reportExtendedDataInsertStmt);
-						break;
+					sqliteStepCommand(m_reportExtendedDataInsertStmt);
+					sqliteResetCommand(m_reportExtendedDataInsertStmt);
+					break;
 
-					default:
-						--extendedDataIndex; // Reset the data index to account for the error
-						std::stringstream ss;
-						ss << "Illegal reportingInterval passed to CreateSQLiteMeterRecord: " << reportingInterval;
-						sqliteWriteMessage(ss.str());
+				default:
+					--extendedDataIndex; // Reset the data index to account for the error
+					std::stringstream ss;
+					ss << "Illegal reportingInterval passed to CreateSQLiteMeterRecord: " << reportingInterval;
+					sqliteWriteMessage(ss.str());
 				}
 			}
 		}
@@ -1548,8 +1549,8 @@ void SQLite::createSQLiteTimeIndexRecord(
 		switch(reportingInterval) {
 		case LocalReportEach:
 		case LocalReportTimeStep: {
-			if ( !month.present() || !dayOfMonth.present() || !hour.present() || 
-				 !endMinute.present() || !startMinute.present() || !dst.present() || !dayType.present() ) {
+			if ( !month.present() || !dayOfMonth.present() || !hour.present() ||
+					!endMinute.present() || !startMinute.present() || !dst.present() || !dayType.present() ) {
 				break;
 			}
 			++m_sqlDBTimeIndex;
@@ -2006,17 +2007,17 @@ void SQLite::updateSQLiteSimulationRecord( bool const completed, bool const comp
 
 // void SQLite::createSQLiteZoneListTable()
 // {
-	// for(int listNum = 1; listNum <= DataHeatBalance::NumOfZoneLists; ++listNum) {
-	// 	auto const & zoneList = DataHeatBalance::ZoneList(listNum);
-	// 	for(int zoneNum = 1; zoneNum <= zoneList.NumOfZones; ++zoneNum) {
-	// 		sqliteBindInteger(m_zoneListInsertStmt, 1, listNum);
-	// 		sqliteBindText(m_zoneListInsertStmt, 2, zoneList.Name);
-	// 		sqliteBindForeignKey(m_zoneListInsertStmt, 3, zoneList.Zone(zoneNum));
+// for(int listNum = 1; listNum <= DataHeatBalance::NumOfZoneLists; ++listNum) {
+// 	auto const & zoneList = DataHeatBalance::ZoneList(listNum);
+// 	for(int zoneNum = 1; zoneNum <= zoneList.NumOfZones; ++zoneNum) {
+// 		sqliteBindInteger(m_zoneListInsertStmt, 1, listNum);
+// 		sqliteBindText(m_zoneListInsertStmt, 2, zoneList.Name);
+// 		sqliteBindForeignKey(m_zoneListInsertStmt, 3, zoneList.Zone(zoneNum));
 
-	// 		sqliteStepCommand(m_zoneListInsertStmt);
-	// 		sqliteResetCommand(m_zoneListInsertStmt);
-	// 	}
-	// }
+// 		sqliteStepCommand(m_zoneListInsertStmt);
+// 		sqliteResetCommand(m_zoneListInsertStmt);
+// 	}
+// }
 // }
 
 void SQLite::createZoneExtendedOutput()
@@ -2092,103 +2093,122 @@ void SQLite::createSQLiteEnvironmentPeriodRecord( const int curEnvirNum, const s
 	}
 }
 
-void SQLite::addScheduleData( int const number, std::string const & name, std::string const & type, double const & minValue, double const & maxValue ) {
+void SQLite::addScheduleData( int const number, std::string const & name, std::string const & type, double const & minValue, double const & maxValue )
+{
 	schedules.push_back(
 		std::unique_ptr<Schedule>(new Schedule(m_errorStream, m_db, number, name, type, minValue, maxValue))
 	);
 }
 
-void SQLite::addZoneData( int const number, DataHeatBalance::ZoneData const & zoneData ) {
+void SQLite::addZoneData( int const number, DataHeatBalance::ZoneData const & zoneData )
+{
 	zones.push_back(
 		std::unique_ptr<Zone>(new Zone(m_errorStream, m_db, number, zoneData))
 	);
 }
 
-void SQLite::addZoneListData( int const number, DataHeatBalance::ZoneListData const & zoneListData ) {
+void SQLite::addZoneListData( int const number, DataHeatBalance::ZoneListData const & zoneListData )
+{
 	zoneLists.push_back(
 		std::unique_ptr<ZoneList>(new ZoneList(m_errorStream, m_db, number, zoneListData))
 	);
 }
 
-void SQLite::addSurfaceData( int const number, DataSurfaces::SurfaceData const & surfaceData, std::string const & surfaceClass ) {
+void SQLite::addSurfaceData( int const number, DataSurfaces::SurfaceData const & surfaceData, std::string const & surfaceClass )
+{
 	surfaces.push_back(
 		std::unique_ptr<Surface>(new Surface(m_errorStream, m_db, number, surfaceData, surfaceClass))
 	);
 }
 
-void SQLite::addZoneGroupData( int const number, DataHeatBalance::ZoneGroupData const & zoneGroupData ) {
+void SQLite::addZoneGroupData( int const number, DataHeatBalance::ZoneGroupData const & zoneGroupData )
+{
 	zoneGroups.push_back(
 		std::unique_ptr<ZoneGroup>(new ZoneGroup(m_errorStream, m_db, number, zoneGroupData))
 	);
 }
 
-void SQLite::addMaterialData( int const number, DataHeatBalance::MaterialProperties const & materialData ) {
+void SQLite::addMaterialData( int const number, DataHeatBalance::MaterialProperties const & materialData )
+{
 	materials.push_back(
 		std::unique_ptr<Material>(new Material(m_errorStream, m_db, number, materialData))
 	);
 }
-void SQLite::addConstructionData( int const number, DataHeatBalance::ConstructionData const & constructionData, double const & constructionUValue ) {
+void SQLite::addConstructionData( int const number, DataHeatBalance::ConstructionData const & constructionData, double const & constructionUValue )
+{
 	constructions.push_back(
 		std::unique_ptr<Construction>(new Construction(m_errorStream, m_db, number, constructionData, constructionUValue))
 	);
 }
-void SQLite::addNominalLightingData( int const number, DataHeatBalance::LightsData const & nominalLightingData ) {
+void SQLite::addNominalLightingData( int const number, DataHeatBalance::LightsData const & nominalLightingData )
+{
 	nominalLightings.push_back(
 		std::unique_ptr<NominalLighting>(new NominalLighting(m_errorStream, m_db, number, nominalLightingData))
 	);
 }
-void SQLite::addNominalPeopleData( int const number, DataHeatBalance::PeopleData const & nominalPeopleData ) {
+void SQLite::addNominalPeopleData( int const number, DataHeatBalance::PeopleData const & nominalPeopleData )
+{
 	nominalPeoples.push_back(
 		std::unique_ptr<NominalPeople>(new NominalPeople(m_errorStream, m_db, number, nominalPeopleData))
 	);
 }
-void SQLite::addNominalElectricEquipmentData( int const number, DataHeatBalance::ZoneEquipData const & nominalElectricEquipmentData ) {
+void SQLite::addNominalElectricEquipmentData( int const number, DataHeatBalance::ZoneEquipData const & nominalElectricEquipmentData )
+{
 	nominalElectricEquipments.push_back(
 		std::unique_ptr<NominalElectricEquipment>(new NominalElectricEquipment(m_errorStream, m_db, number, nominalElectricEquipmentData))
 	);
 }
-void SQLite::addNominalGasEquipmentData( int const number, DataHeatBalance::ZoneEquipData const & nominalGasEquipmentData ) {
+void SQLite::addNominalGasEquipmentData( int const number, DataHeatBalance::ZoneEquipData const & nominalGasEquipmentData )
+{
 	nominalGasEquipments.push_back(
 		std::unique_ptr<NominalGasEquipment>(new NominalGasEquipment(m_errorStream, m_db, number, nominalGasEquipmentData))
 	);
 }
-void SQLite::addNominalSteamEquipmentData( int const number, DataHeatBalance::ZoneEquipData const & nominalSteamEquipmentData ) {
+void SQLite::addNominalSteamEquipmentData( int const number, DataHeatBalance::ZoneEquipData const & nominalSteamEquipmentData )
+{
 	nominalSteamEquipments.push_back(
 		std::unique_ptr<NominalSteamEquipment>(new NominalSteamEquipment(m_errorStream, m_db, number, nominalSteamEquipmentData))
 	);
 }
-void SQLite::addNominalHotWaterEquipmentData( int const number, DataHeatBalance::ZoneEquipData const & nominalHotWaterEquipmentData ) {
+void SQLite::addNominalHotWaterEquipmentData( int const number, DataHeatBalance::ZoneEquipData const & nominalHotWaterEquipmentData )
+{
 	nominalHotWaterEquipments.push_back(
 		std::unique_ptr<NominalHotWaterEquipment>(new NominalHotWaterEquipment(m_errorStream, m_db, number, nominalHotWaterEquipmentData))
 	);
 }
-void SQLite::addNominalOtherEquipmentData( int const number, DataHeatBalance::ZoneEquipData const & nominalOtherEquipmentData ) {
+void SQLite::addNominalOtherEquipmentData( int const number, DataHeatBalance::ZoneEquipData const & nominalOtherEquipmentData )
+{
 	nominalOtherEquipments.push_back(
 		std::unique_ptr<NominalOtherEquipment>(new NominalOtherEquipment(m_errorStream, m_db, number, nominalOtherEquipmentData))
 	);
 }
-void SQLite::addNominalBaseboardData( int const number, DataHeatBalance::BBHeatData const & nominalBaseboardData ) {
+void SQLite::addNominalBaseboardData( int const number, DataHeatBalance::BBHeatData const & nominalBaseboardData )
+{
 	nominalBaseboardHeats.push_back(
 		std::unique_ptr<NominalBaseboardHeat>(new NominalBaseboardHeat(m_errorStream, m_db, number, nominalBaseboardData))
 	);
 }
-void SQLite::addInfiltrationData( int const number, DataHeatBalance::InfiltrationData const & infiltrationData ) {
+void SQLite::addInfiltrationData( int const number, DataHeatBalance::InfiltrationData const & infiltrationData )
+{
 	infiltrations.push_back(
 		std::unique_ptr<Infiltration>(new Infiltration(m_errorStream, m_db, number, infiltrationData))
 	);
 }
-void SQLite::addVentilationData( int const number, DataHeatBalance::VentilationData const & ventilationData ) {
+void SQLite::addVentilationData( int const number, DataHeatBalance::VentilationData const & ventilationData )
+{
 	ventilations.push_back(
 		std::unique_ptr<Ventilation>(new Ventilation(m_errorStream, m_db, number, ventilationData))
 	);
 }
-void SQLite::addRoomAirModelData( int const number, DataRoomAirModel::AirModelData const & roomAirModelData ) {
+void SQLite::addRoomAirModelData( int const number, DataRoomAirModel::AirModelData const & roomAirModelData )
+{
 	roomAirModels.push_back(
 		std::unique_ptr<RoomAirModel>(new RoomAirModel(m_errorStream, m_db, number, roomAirModelData))
 	);
 }
 
-bool SQLite::ZoneGroup::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+bool SQLite::ZoneGroup::insertIntoSQLite ( sqlite3_stmt * insertStmt )
+{
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, name);
 	sqliteBindForeignKey(insertStmt, 3, zoneList);
@@ -2199,7 +2219,8 @@ bool SQLite::ZoneGroup::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
 	sqliteResetCommand(insertStmt);
 	return validInsert;
 }
-bool SQLite::Material::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+bool SQLite::Material::insertIntoSQLite ( sqlite3_stmt * insertStmt )
+{
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, name);
 	sqliteBindInteger(insertStmt, 3, group);
@@ -2220,7 +2241,8 @@ bool SQLite::Material::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
 	sqliteResetCommand(insertStmt);
 	return validInsert;
 }
-bool SQLite::Construction::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+bool SQLite::Construction::insertIntoSQLite ( sqlite3_stmt * insertStmt )
+{
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, name);
 	sqliteBindInteger(insertStmt, 3, totLayers);
@@ -2241,7 +2263,8 @@ bool SQLite::Construction::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
 	sqliteResetCommand(insertStmt);
 	return validInsert;
 }
-bool SQLite::Construction::insertIntoSQLite ( sqlite3_stmt * insertStmt, sqlite3_stmt * subInsertStmt ) {
+bool SQLite::Construction::insertIntoSQLite ( sqlite3_stmt * insertStmt, sqlite3_stmt * subInsertStmt )
+{
 	bool constructionInsertValid = insertIntoSQLite( insertStmt );
 	if ( !constructionInsertValid ) return false;
 
@@ -2252,7 +2275,8 @@ bool SQLite::Construction::insertIntoSQLite ( sqlite3_stmt * insertStmt, sqlite3
 	}
 	return valid;
 }
-bool SQLite::Construction::ConstructionLayer::insertIntoSQLite( sqlite3_stmt * insertStmt ) {
+bool SQLite::Construction::ConstructionLayer::insertIntoSQLite( sqlite3_stmt * insertStmt )
+{
 	sqliteBindForeignKey(insertStmt, 1, constructNumber);
 	sqliteBindInteger(insertStmt, 2, layerNumber);
 	sqliteBindForeignKey(insertStmt, 3, layerPoint);
@@ -2262,7 +2286,8 @@ bool SQLite::Construction::ConstructionLayer::insertIntoSQLite( sqlite3_stmt * i
 	sqliteResetCommand(insertStmt);
 	return validInsert;
 }
-bool SQLite::NominalLighting::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+bool SQLite::NominalLighting::insertIntoSQLite ( sqlite3_stmt * insertStmt )
+{
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, name);
 	sqliteBindForeignKey(insertStmt, 3, zonePtr);
@@ -2280,7 +2305,8 @@ bool SQLite::NominalLighting::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
 	sqliteResetCommand(insertStmt);
 	return validInsert;
 }
-bool SQLite::NominalPeople::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+bool SQLite::NominalPeople::insertIntoSQLite ( sqlite3_stmt * insertStmt )
+{
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, name);
 	sqliteBindForeignKey(insertStmt, 3, zonePtr);
@@ -2307,7 +2333,8 @@ bool SQLite::NominalPeople::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
 	sqliteResetCommand(insertStmt);
 	return validInsert;
 }
-bool SQLite::NominalElectricEquipment::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+bool SQLite::NominalElectricEquipment::insertIntoSQLite ( sqlite3_stmt * insertStmt )
+{
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, name);
 	sqliteBindForeignKey(insertStmt, 3, zonePtr);
@@ -2324,7 +2351,8 @@ bool SQLite::NominalElectricEquipment::insertIntoSQLite ( sqlite3_stmt * insertS
 	sqliteResetCommand(insertStmt);
 	return validInsert;
 }
-bool SQLite::NominalGasEquipment::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+bool SQLite::NominalGasEquipment::insertIntoSQLite ( sqlite3_stmt * insertStmt )
+{
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, name);
 	sqliteBindForeignKey(insertStmt, 3, zonePtr);
@@ -2341,7 +2369,8 @@ bool SQLite::NominalGasEquipment::insertIntoSQLite ( sqlite3_stmt * insertStmt )
 	sqliteResetCommand(insertStmt);
 	return validInsert;
 }
-bool SQLite::NominalSteamEquipment::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+bool SQLite::NominalSteamEquipment::insertIntoSQLite ( sqlite3_stmt * insertStmt )
+{
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, name);
 	sqliteBindForeignKey(insertStmt, 3, zonePtr);
@@ -2358,7 +2387,8 @@ bool SQLite::NominalSteamEquipment::insertIntoSQLite ( sqlite3_stmt * insertStmt
 	sqliteResetCommand(insertStmt);
 	return validInsert;
 }
-bool SQLite::NominalHotWaterEquipment::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+bool SQLite::NominalHotWaterEquipment::insertIntoSQLite ( sqlite3_stmt * insertStmt )
+{
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, name);
 	sqliteBindForeignKey(insertStmt, 3, zonePtr);
@@ -2375,7 +2405,8 @@ bool SQLite::NominalHotWaterEquipment::insertIntoSQLite ( sqlite3_stmt * insertS
 	sqliteResetCommand(insertStmt);
 	return validInsert;
 }
-bool SQLite::NominalOtherEquipment::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+bool SQLite::NominalOtherEquipment::insertIntoSQLite ( sqlite3_stmt * insertStmt )
+{
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, name);
 	sqliteBindForeignKey(insertStmt, 3, zonePtr);
@@ -2392,7 +2423,8 @@ bool SQLite::NominalOtherEquipment::insertIntoSQLite ( sqlite3_stmt * insertStmt
 	sqliteResetCommand(insertStmt);
 	return validInsert;
 }
-bool SQLite::NominalBaseboardHeat::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+bool SQLite::NominalBaseboardHeat::insertIntoSQLite ( sqlite3_stmt * insertStmt )
+{
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, name);
 	sqliteBindForeignKey(insertStmt, 3, zonePtr);
@@ -2410,7 +2442,8 @@ bool SQLite::NominalBaseboardHeat::insertIntoSQLite ( sqlite3_stmt * insertStmt 
 	sqliteResetCommand(insertStmt);
 	return validInsert;
 }
-bool SQLite::Infiltration::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+bool SQLite::Infiltration::insertIntoSQLite ( sqlite3_stmt * insertStmt )
+{
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, name);
 	sqliteBindForeignKey(insertStmt, 3, zonePtr);
@@ -2422,7 +2455,8 @@ bool SQLite::Infiltration::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
 	sqliteResetCommand(insertStmt);
 	return validInsert;
 }
-bool SQLite::Ventilation::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+bool SQLite::Ventilation::insertIntoSQLite ( sqlite3_stmt * insertStmt )
+{
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, name);
 	sqliteBindForeignKey(insertStmt, 3, zonePtr);
@@ -2434,7 +2468,8 @@ bool SQLite::Ventilation::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
 	sqliteResetCommand(insertStmt);
 	return validInsert;
 }
-bool SQLite::RoomAirModel::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
+bool SQLite::RoomAirModel::insertIntoSQLite ( sqlite3_stmt * insertStmt )
+{
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, airModelName);
 	sqliteBindInteger(insertStmt, 3, airModelType);
@@ -2447,7 +2482,8 @@ bool SQLite::RoomAirModel::insertIntoSQLite ( sqlite3_stmt * insertStmt ) {
 	return validInsert;
 }
 
-bool SQLite::Surface::insertIntoSQLite( sqlite3_stmt * insertStmt ) {
+bool SQLite::Surface::insertIntoSQLite( sqlite3_stmt * insertStmt )
+{
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, name);
 	sqliteBindForeignKey(insertStmt, 3, construction);
@@ -2475,17 +2511,19 @@ bool SQLite::Surface::insertIntoSQLite( sqlite3_stmt * insertStmt ) {
 	return validInsert;
 }
 
-bool SQLite::ZoneList::insertIntoSQLite( sqlite3_stmt * insertStmt ) {
+bool SQLite::ZoneList::insertIntoSQLite( sqlite3_stmt * insertStmt )
+{
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, name);
 
 	int rc = sqliteStepCommand(insertStmt);
 	bool validInsert = sqliteStepValidity( rc );
 	sqliteResetCommand(insertStmt);
-	return validInsert;	
+	return validInsert;
 }
 
-bool SQLite::ZoneList::insertIntoSQLite( sqlite3_stmt * insertStmt, sqlite3_stmt * subInsertStmt ) {
+bool SQLite::ZoneList::insertIntoSQLite( sqlite3_stmt * insertStmt, sqlite3_stmt * subInsertStmt )
+{
 	bool zoneListInsertValid = insertIntoSQLite( insertStmt );
 	if ( !zoneListInsertValid ) return false;
 	bool valid = true;
@@ -2497,10 +2535,11 @@ bool SQLite::ZoneList::insertIntoSQLite( sqlite3_stmt * insertStmt, sqlite3_stmt
 		sqliteResetCommand(subInsertStmt);
 		if ( valid && !validInsert ) valid = false;
 	}
-	return valid;	
+	return valid;
 }
 
-bool SQLite::Schedule::insertIntoSQLite( sqlite3_stmt * insertStmt ) {
+bool SQLite::Schedule::insertIntoSQLite( sqlite3_stmt * insertStmt )
+{
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, name);
 	sqliteBindText(insertStmt, 3, type);
@@ -2513,7 +2552,8 @@ bool SQLite::Schedule::insertIntoSQLite( sqlite3_stmt * insertStmt ) {
 	return validInsert;
 }
 
-bool SQLite::Zone::insertIntoSQLite( sqlite3_stmt * insertStmt ) {
+bool SQLite::Zone::insertIntoSQLite( sqlite3_stmt * insertStmt )
+{
 	sqliteBindInteger(insertStmt, 1, number);
 	sqliteBindText(insertStmt, 2, name);
 	sqliteBindDouble(insertStmt, 3, relNorth);
@@ -2551,7 +2591,7 @@ bool SQLite::Zone::insertIntoSQLite( sqlite3_stmt * insertStmt ) {
 SQLite::SQLiteData::SQLiteData( std::ostream & errorStream, std::shared_ptr<sqlite3> & db )
 	:
 	SQLiteProcedures( errorStream, db )
-	{}
+{}
 
 SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, std::shared_ptr<sqlite3> & db )
 	:
@@ -2559,7 +2599,7 @@ SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, std::shared_ptr<
 	m_writeOutputToSQLite(true),
 	m_connection(nullptr),
 	m_errorStream(errorStream)
-	{}
+{}
 
 SQLiteProcedures::SQLiteProcedures( std::ostream & errorStream, bool writeOutputToSQLite, std::string const & dbName, std::string const & errorFileName )
 	:
@@ -2711,16 +2751,17 @@ int SQLiteProcedures::sqliteBindLogical(sqlite3_stmt * stmt, const int stmtInser
 	return sqliteBindInteger(stmt,stmtInsertLocationIndex, valueToInsert ? 1 : 0);
 }
 
-bool SQLiteProcedures::sqliteStepValidity( int const rc ) {
+bool SQLiteProcedures::sqliteStepValidity( int const rc )
+{
 	bool isValid = false;
 	switch(rc) {
-		case SQLITE_DONE:
-		case SQLITE_OK:
-		case SQLITE_ROW:
-			isValid = true;
-			break;
-		default:
-			break;
+	case SQLITE_DONE:
+	case SQLITE_OK:
+	case SQLITE_ROW:
+		isValid = true;
+		break;
+	default:
+		break;
 	}
 	return isValid;
 }
