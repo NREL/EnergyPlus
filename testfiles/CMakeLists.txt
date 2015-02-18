@@ -69,6 +69,7 @@ ADD_SIMULATION_TEST(IDF_FILE 5ZoneWarmestVFD.idf EPW_FILE USA_IL_Chicago-OHare.I
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneWarmestVFD_FCMAuto.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneWaterCooled_Baseboard.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneWaterCooled_BaseboardScalableSizing.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE 5ZoneWaterCooled_GasFiredSteamHumidifier.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneWaterCooled_HighRHControl.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneWaterCooled_MultizoneAverageRHControl.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneWaterCooled_MultizoneMinMaxRHControl.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
