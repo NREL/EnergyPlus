@@ -445,7 +445,7 @@ namespace DataPlant {
 			EndingLoopNum = SingleLoopSearch;
 		}
 
-		PlantLoops: for ( LoopCtr = StartingLoopNum; LoopCtr <= EndingLoopNum; ++LoopCtr ) {
+		for ( LoopCtr = StartingLoopNum; LoopCtr <= EndingLoopNum; ++LoopCtr ) {
 			auto & this_loop( PlantLoop( LoopCtr ) );
 			for ( LoopSideCtr = 1; LoopSideCtr <= 2; ++LoopSideCtr ) {
 				auto & this_loop_side( this_loop.LoopSide( LoopSideCtr ) );
@@ -487,9 +487,7 @@ namespace DataPlant {
 					}
 				}
 			}
-			PlantLoops_loop: ;
 		}
-		PlantLoops_exit: ;
 
 		if ( ! FoundComponent ) {
 			if ( CompType >= 1 && CompType <= NumSimPlantEquipTypes ) {
@@ -583,7 +581,7 @@ namespace DataPlant {
 		}
 		FoundNode = false;
 
-		PlantLoops: for ( LoopCtr = 1; LoopCtr <= TotNumLoops; ++LoopCtr ) {
+		for ( LoopCtr = 1; LoopCtr <= TotNumLoops; ++LoopCtr ) {
 			auto & this_loop( PlantLoop( LoopCtr ) );
 			for ( LoopSideCtr = 1; LoopSideCtr <= 2; ++LoopSideCtr ) {
 				auto & this_loop_side( this_loop.LoopSide( LoopSideCtr ) );
@@ -612,9 +610,7 @@ namespace DataPlant {
 					}
 				}
 			}
-			PlantLoops_loop: ;
 		}
-		PlantLoops_exit: ;
 
 		if ( ! FoundNode ) {
 			ShowSevereError( "ScanPlantLoopsForNodeNum: Plant Node was not found as inlet node (for component) on any plant loops" );
