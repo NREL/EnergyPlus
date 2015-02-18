@@ -1713,6 +1713,59 @@ namespace DataSurfaces {
 			ComplexFen( ComplexFen )
 		{}
 
+		void
+		InitSolarHeatGains()
+		{
+			FrameQRadOutAbs = 0.0;
+			FrameQRadInAbs = 0.0;
+			DividerQRadOutAbs = 0.0;
+			DividerQRadInAbs = 0.0;
+			ExtBeamAbsByShade = 0.0;
+			ExtDiffAbsByShade = 0.0;
+			IntBeamAbsByShade = 0.0;
+			IntSWAbsByShade = 0.0;
+			InitialDifSolAbsByShade = 0.0;
+			IntLWAbsByShade = 0.0;
+			ConvHeatFlowNatural = 0.0;
+			ConvHeatGainToZoneAir = 0.0;
+			RetHeatGainToZoneAir = 0.0;
+			DividerConduction = 0.0;
+			BlTsolBmBm = 0.0;
+			BlTsolBmDif = 0.0;
+			BlTsolDifDif = 0.0;
+			BlGlSysTsolBmBm = 0.0;
+			BlGlSysTsolDifDif = 0.0;
+			ScTsolBmBm = 0.0;
+			ScTsolBmDif = 0.0;
+			ScTsolDifDif = 0.0;
+			ScGlSysTsolBmBm = 0.0;
+			ScGlSysTsolDifDif = 0.0;
+			GlTsolBmBm = 0.0;
+			GlTsolBmDif = 0.0;
+			GlTsolDifDif = 0.0;
+			BmSolTransThruIntWinRep = 0.0;
+			BmSolAbsdOutsReveal = 0.0;
+			BmSolRefldOutsRevealReport = 0.0;
+			BmSolAbsdInsReveal = 0.0;
+			BmSolRefldInsReveal = 0.0;
+			BmSolRefldInsRevealReport = 0.0;
+			OutsRevealDiffOntoGlazing = 0.0;
+			InsRevealDiffOntoGlazing = 0.0;
+			InsRevealDiffIntoZone = 0.0;
+			OutsRevealDiffOntoFrame = 0.0;
+			InsRevealDiffOntoFrame = 0.0;
+			InsRevealDiffOntoGlazingReport = 0.0;
+			InsRevealDiffIntoZoneReport = 0.0;
+			InsRevealDiffOntoFrameReport = 0.0;
+			BmSolAbsdInsRevealReport = 0.0;
+			BmSolTransThruIntWinRepEnergy = 0.0;
+			BmSolRefldOutsRevealRepEnergy = 0.0;
+			BmSolRefldInsRevealRepEnergy = 0.0;
+			ProfileAngHor = 0.0;
+			ProfileAngVert = 0.0;
+			SkySolarInc = 0.0;
+			GndSolarInc = 0.0;
+		}
 	};
 
 	struct FrameDividerProperties
@@ -2484,7 +2537,7 @@ namespace DataSurfaces {
 
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

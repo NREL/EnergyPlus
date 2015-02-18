@@ -11331,7 +11331,7 @@ Label50: ;
 	Real64
 	CalcTwoSpeedDXCoilIEERResidual(
 		Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = DX coil number
+		FArray1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -11404,18 +11404,18 @@ Label50: ;
 		Real64 HighSpeedNetCoolingCap;
 		Real64 LowSpeedNetCoolingCap;
 
-		DXCoilNum = int( Par()( 1 ) );
-		TargetCoilLeavingDryBulb = Par()( 2 );
-		TargetNetCapacity = Par()( 3 );
-		OutdoorUnitInletDryBulb = Par()( 4 );
-		IndoorUnitInletWetBulb = Par()( 5 );
-		IndoorUnitInletDryBulb = Par()( 6 );
-		NetCoolingCapRated = Par()( 7 );
-		FanPowerPerEvapAirFlowRate = Par()( 8 );
-		FanInletNodeNum = int( Par()( 9 ) );
-		FanOutletNodeNum = int( Par()( 10 ) );
-		FanExternalStaticFull = Par()( 11 );
-		FanIndex = int( Par()( 12 ) );
+		DXCoilNum = int( Par( 1 ) );
+		TargetCoilLeavingDryBulb = Par( 2 );
+		TargetNetCapacity = Par( 3 );
+		OutdoorUnitInletDryBulb = Par( 4 );
+		IndoorUnitInletWetBulb = Par( 5 );
+		IndoorUnitInletDryBulb = Par( 6 );
+		NetCoolingCapRated = Par( 7 );
+		FanPowerPerEvapAirFlowRate = Par( 8 );
+		FanInletNodeNum = int( Par( 9 ) );
+		FanOutletNodeNum = int( Par( 10 ) );
+		FanExternalStaticFull = Par( 11 );
+		FanIndex = int( Par( 12 ) );
 
 		if ( DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 ) > 0.0 ) {
 			AirMassFlowRatio = SupplyAirMassFlowRate / DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 );

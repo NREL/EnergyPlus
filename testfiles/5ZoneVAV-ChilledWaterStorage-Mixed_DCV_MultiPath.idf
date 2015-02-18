@@ -1571,8 +1571,8 @@
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZN_1_FLR_1_SEC_1,!- Name
-    FLOW/ZONE,               !- Outdoor Air Method
-    ,                        !- Outdoor Air Flow per Person {m3/s-person}
+    Flow/Person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
@@ -2063,8 +2063,8 @@
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZN_1_FLR_1_SEC_2,!- Name
-    FLOW/ZONE,               !- Outdoor Air Method
-    ,                        !- Outdoor Air Flow per Person {m3/s-person}
+    Flow/Person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
@@ -2514,8 +2514,8 @@
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZN_1_FLR_1_SEC_3,!- Name
-    FLOW/ZONE,               !- Outdoor Air Method
-    ,                        !- Outdoor Air Flow per Person {m3/s-person}
+    Flow/Person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
@@ -2984,8 +2984,8 @@
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZN_1_FLR_1_SEC_4,!- Name
-    FLOW/ZONE,               !- Outdoor Air Method
-    ,                        !- Outdoor Air Flow per Person {m3/s-person}
+    Flow/Person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
@@ -3547,8 +3547,8 @@
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZN_1_FLR_1_SEC_5,!- Name
-    FLOW/ZONE,               !- Outdoor Air Method
-    ,                        !- Outdoor Air Flow per Person {m3/s-person}
+    Flow/Person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 

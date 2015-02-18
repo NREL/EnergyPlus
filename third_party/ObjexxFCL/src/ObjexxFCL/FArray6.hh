@@ -34,9 +34,6 @@ class FArray6 : public FArray< T >
 private: // Types
 
 	typedef  FArray< T >  Super;
-	typedef  FArray6D< T >  real_FArray;
-	typedef  FArray6P< T >  proxy_FArray;
-	typedef  FArray6A< T >  arg_FArray;
 
 private: // Friend
 
@@ -666,7 +663,7 @@ public: // Assignment: Array
 					for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 						for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 							for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-								assert( T( a( i1, i2, i3, i4, i5, i6 ) ) != T( 0 ) );
+								assert( a( i1, i2, i3, i4, i5, i6 ) != T( 0 ) );
 								data_[ l ] /= a( i1, i2, i3, i4, i5, i6 );
 							}
 						}
@@ -770,7 +767,7 @@ public: // Assignment: Array
 						for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 							for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 								for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-									assert( T( a( i1, i2, i3, i4, i5, i6 ) ) != T( 0 ) );
+									assert( a( i1, i2, i3, i4, i5, i6 ) != T( 0 ) );
 									data_[ l ] /= a( i1, i2, i3, i4, i5, i6 );
 								}
 							}
@@ -1060,6 +1057,15 @@ public: // Subscript
 		return sdata_[ ( ( ( ( ( ( ( ( ( i6 * z5_ ) + i5 ) * z4_ ) + i4 ) * z3_ ) + i3 ) * z2_ ) + i2 ) * z1_ ) + i1 ];
 	}
 
+	// Linear Index
+	inline
+	size_type
+	index( int const i1, int const i2, int const i3, int const i4, int const i5, int const i6 ) const
+	{
+		assert( dimensions_initialized() );
+		return ( ( ( ( ( ( ( ( ( ( i6 * z5_ ) + i5 ) * z4_ ) + i4 ) * z3_ ) + i3 ) * z2_ ) + i2 ) * z1_ ) + i1 ) - shift_;
+	}
+
 	// Const Tail Starting at array( i1, i2, i3, i4, i5, i6 )
 	inline
 	Tail const
@@ -1079,15 +1085,6 @@ public: // Subscript
 		assert( contains( i1, i2, i3, i4, i5, i6 ) );
 		size_type const offset( ( ( ( ( ( ( ( ( ( ( i6 * z5_ ) + i5 ) * z4_ ) + i4 ) * z3_ ) + i3 ) * z2_ ) + i2 ) * z1_ ) + i1 ) - shift_ );
 		return Tail( data_ + offset, ( data_size_ != npos ? data_size_ - offset : npos ) );
-	}
-
-	// Linear Index
-	inline
-	size_type
-	index( int const i1, int const i2, int const i3, int const i4, int const i5, int const i6 ) const
-	{
-		assert( dimensions_initialized() );
-		return ( ( ( ( ( ( ( ( ( ( i6 * z5_ ) + i5 ) * z4_ ) + i4 ) * z3_ ) + i3 ) * z2_ ) + i2 ) * z1_ ) + i1 ) - shift_;
 	}
 
 public: // Slice Proxy Generators
@@ -3122,7 +3119,7 @@ public: // Predicate
 	bool
 	conformable( FArray6< U > const & a ) const
 	{
-		return ( ( size1() == a.size1() ) && ( size2() == a.size2() ) && ( size3() == a.size3() ) && ( size4() == a.size4() ) && ( size5() == a.size5() ) && ( size6() == a.size6() ) );
+		return ( ( z1_ == a.z1_ ) && ( z2_ == a.z2_ ) && ( z3_ == a.z3_ ) && ( z4_ == a.z4_ ) && ( z5_ == a.z5_ ) && ( size6() == a.size6() ) );
 	}
 
 	// Conformable?
@@ -3131,7 +3128,7 @@ public: // Predicate
 	bool
 	conformable( FArray6S< U > const & a ) const
 	{
-		return ( ( size1() == a.size1() ) && ( size2() == a.size2() ) && ( size3() == a.size3() ) && ( size4() == a.size4() ) && ( size5() == a.size5() ) && ( size6() == a.size6() ) );
+		return ( ( z1_ == a.size1() ) && ( z2_ == a.size2() ) && ( z3_ == a.size3() ) && ( z4_ == a.size4() ) && ( z5_ == a.size5() ) && ( size6() == a.size6() ) );
 	}
 
 	// Conformable?
@@ -3140,7 +3137,7 @@ public: // Predicate
 	bool
 	conformable( MArray6< A, M > const & a ) const
 	{
-		return ( ( size1() == a.size1() ) && ( size2() == a.size2() ) && ( size3() == a.size3() ) && ( size4() == a.size4() ) && ( size5() == a.size5() ) && ( size6() == a.size6() ) );
+		return ( ( z1_ == a.size1() ) && ( z2_ == a.size2() ) && ( z3_ == a.size3() ) && ( z4_ == a.size4() ) && ( z5_ == a.size5() ) && ( size6() == a.size6() ) );
 	}
 
 	// Equal Dimensions?
@@ -3150,6 +3147,24 @@ public: // Predicate
 	equal_dimensions( FArray6< U > const & a ) const
 	{
 		return ( ( I1() == a.I1() ) && ( I2() == a.I2() ) && ( I3() == a.I3() ) && ( I4() == a.I4() ) && ( I5() == a.I5() ) && ( I6() == a.I6() ) );
+	}
+
+	// Equal Dimensions?
+	template< typename U >
+	inline
+	bool
+	equal_dimensions( FArray6S< U > const & a ) const
+	{
+		return ( ( l1() == 1 ) && ( u1() == a.u1() ) && ( l2() == 1 ) && ( u2() == a.u2() ) && ( l3() == 1 ) && ( u3() == a.u3() ) && ( l4() == 1 ) && ( u4() == a.u4() ) && ( l5() == 1 ) && ( u5() == a.u5() ) && ( l6() == 1 ) && ( u6() == a.u6() ) );
+	}
+
+	// Equal Dimensions?
+	template< class A, typename M >
+	inline
+	bool
+	equal_dimensions( MArray6< A, M > const & a ) const
+	{
+		return ( ( l1() == 1 ) && ( u1() == a.u1() ) && ( l2() == 1 ) && ( u2() == a.u2() ) && ( l3() == 1 ) && ( u3() == a.u3() ) && ( l4() == 1 ) && ( u4() == a.u4() ) && ( l5() == 1 ) && ( u5() == a.u5() ) && ( l6() == 1 ) && ( u6() == a.u6() ) );
 	}
 
 public: // Inspector
@@ -3241,20 +3256,20 @@ public: // Inspector
 	{
 		switch ( d ) {
 		case 1:
-			return size1();
+			return z1_;
 		case 2:
-			return size2();
+			return z2_;
 		case 3:
-			return size3();
+			return z3_;
 		case 4:
-			return size4();
+			return z4_;
 		case 5:
-			return size5();
+			return z5_;
 		case 6:
 			return size6();
 		default:
 			assert( false );
-			return size1();
+			return z1_;
 		}
 	}
 
@@ -5237,7 +5252,7 @@ protected: // Functions
 	// Swap
 	inline
 	void
-	swap6DB( FArray6 & v )
+	swap6( FArray6 & v )
 	{
 		swapB( v );
 		std::swap( z1_, v.z1_ );
