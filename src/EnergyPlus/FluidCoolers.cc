@@ -1660,7 +1660,7 @@ namespace FluidCoolers {
 	Real64
 	SimpleFluidCoolerUAResidual(
 		Real64 const UA, // UA of fluid cooler
-		Optional< FArray1S< Real64 > const > Par // par(1) = design fluid cooler load [W]
+		FArray1< Real64 > const & Par // par(1) = design fluid cooler load [W]
 	)
 	{
 
@@ -1710,10 +1710,10 @@ namespace FluidCoolers {
 		Real64 OutWaterTemp; // outlet water temperature [C]
 		Real64 Output; // Fluid cooler  output [W]
 
-		FluidCoolerIndex = int( Par()( 2 ) );
-		SimSimpleFluidCooler( FluidCoolerIndex, Par()( 3 ), Par()( 4 ), UA, OutWaterTemp );
-		Output = Par()( 5 ) * Par()( 3 ) * ( SimpleFluidCoolerInlet( FluidCoolerIndex ).WaterTemp - OutWaterTemp );
-		Residuum = ( Par()( 1 ) - Output ) / Par()( 1 );
+		FluidCoolerIndex = int( Par( 2 ) );
+		SimSimpleFluidCooler( FluidCoolerIndex, Par( 3 ), Par( 4 ), UA, OutWaterTemp );
+		Output = Par( 5 ) * Par( 3 ) * ( SimpleFluidCoolerInlet( FluidCoolerIndex ).WaterTemp - OutWaterTemp );
+		Residuum = ( Par( 1 ) - Output ) / Par( 1 );
 		return Residuum;
 	}
 

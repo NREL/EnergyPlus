@@ -3,8 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -660,7 +658,7 @@ namespace ChillerReformulatedEIR {
 	Real64
 	CondOutTempResidual(
 		Real64 const FalsiCondOutTemp, // RegulaFalsi condenser outlet temperature result [C]
-		Optional< FArray1S< Real64 > const > Par = _ // Parameter array used to interface with RegulaFalsi solver
+		FArray1< Real64 > const & Par // Parameter array used to interface with RegulaFalsi solver
 	);
 
 	void

@@ -238,9 +238,8 @@ namespace ScheduleManager {
 	Real64
 	LookUpScheduleValue(
 		int const ScheduleIndex,
-		Optional_int ThisHour = _,
-		Optional_int ThisTimeStep = _,
-		Optional_int ThisDayOfYear = _
+		int const ThisHour = -1, // Negative => unspecified
+		int const ThisTimeStep = -1 // Negative => unspecified
 	);
 
 	int

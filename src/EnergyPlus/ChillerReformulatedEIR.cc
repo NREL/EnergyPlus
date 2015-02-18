@@ -1757,7 +1757,7 @@ namespace ChillerReformulatedEIR {
 	Real64
 	CondOutTempResidual(
 		Real64 const FalsiCondOutTemp, // RegulaFalsi condenser outlet temperature result [C]
-		Optional< FArray1S< Real64 > const > Par // Parameter array used to interface with RegulaFalsi solver
+		FArray1< Real64 > const & Par // Parameter array used to interface with RegulaFalsi solver
 	)
 	{
 
@@ -1808,20 +1808,12 @@ namespace ChillerReformulatedEIR {
 		// CondOutletTemp = Value calculated by CalcReformEIRChillerModel subroutine as shown below
 		// CondOutletTemp = QCondenser/CondMassFlowRate/CPCW(CondInletTemp) + CondInletTemp
 
-		EIRChillNum = int( Par()( 1 ) );
-		MyLoad = Par()( 2 );
-		if ( int( Par()( 3 ) ) == 1 ) {
-			RunFlag = true;
-		} else {
-			RunFlag = false;
-		}
-		if ( int( Par()( 4 ) ) == 1 ) {
-			FirstIteration = true;
-		} else {
-			FirstIteration = false;
-		}
+		EIRChillNum = int( Par( 1 ) );
+		MyLoad = Par( 2 );
+		RunFlag = ( int( Par( 3 ) ) == 1 );
+		FirstIteration = ( int( Par( 4 ) ) == 1 );
 		//FlowLock = INT(Par(5))   !DSU
-		EquipFlowCtrl = int( Par()( 6 ) );
+		EquipFlowCtrl = int( Par( 6 ) );
 
 		CalcReformEIRChillerModel( EIRChillNum, MyLoad, RunFlag, FirstIteration, EquipFlowCtrl, FalsiCondOutTemp );
 		CondOutTempResidual = FalsiCondOutTemp - CondOutletTemp; // CondOutletTemp is module level variable, final value used for reporting

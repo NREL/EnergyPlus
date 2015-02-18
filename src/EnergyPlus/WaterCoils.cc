@@ -4430,7 +4430,7 @@ Label999: ;
 	Real64
 	SimpleHeatingCoilUAResidual(
 		Real64 const UA, // UA of coil
-		Optional< FArray1S< Real64 > const > Par // par(1) = design coil load [W]
+		FArray1< Real64 > const & Par // par(1) = design coil load [W]
 	)
 	{
 
@@ -4475,16 +4475,12 @@ Label999: ;
 		int FanOpMode;
 		Real64 PartLoadRatio;
 
-		CoilIndex = int( Par()( 2 ) );
-		if ( Par()( 3 ) == 1.0 ) {
-			FanOpMode = CycFanCycCoil;
-		} else {
-			FanOpMode = ContFanCycCoil;
-		}
-		PartLoadRatio = Par()( 4 );
+		CoilIndex = int( Par( 2 ) );
+		FanOpMode = ( Par( 3 ) == 1.0 ? CycFanCycCoil : ContFanCycCoil );
+		PartLoadRatio = Par( 4 );
 		WaterCoil( CoilIndex ).UACoilVariable = UA;
 		CalcSimpleHeatingCoil( CoilIndex, FanOpMode, PartLoadRatio, SimCalc );
-		Residuum = ( Par()( 1 ) - WaterCoil( CoilIndex ).TotWaterHeatingCoilRate ) / Par()( 1 );
+		Residuum = ( Par( 1 ) - WaterCoil( CoilIndex ).TotWaterHeatingCoilRate ) / Par( 1 );
 		DataDesignCoilCapacity = WaterCoil ( CoilIndex ).TotWaterHeatingCoilRate;
 
 		return Residuum;
@@ -4493,7 +4489,7 @@ Label999: ;
 	Real64
 	SimpleCoolingCoilUAResidual(
 		Real64 const UA, // UA of coil
-		Optional< FArray1S< Real64 > const > Par // par(1) = design coil load [W]
+		FArray1< Real64 > const & Par // par(1) = design coil load [W]
 	)
 	{
 
@@ -4538,13 +4534,9 @@ Label999: ;
 		int FanOpMode;
 		Real64 PartLoadRatio;
 
-		CoilIndex = int( Par()( 2 ) );
-		if ( Par()( 3 ) == 1.0 ) {
-			FanOpMode = CycFanCycCoil;
-		} else {
-			FanOpMode = ContFanCycCoil;
-		}
-		PartLoadRatio = Par()( 4 );
+		CoilIndex = int( Par( 2 ) );
+		FanOpMode = ( Par( 3 ) == 1.0 ? CycFanCycCoil : ContFanCycCoil );
+		PartLoadRatio = Par( 4 );
 		WaterCoil( CoilIndex ).UACoilExternal = UA;
 		WaterCoil( CoilIndex ).UACoilInternal = WaterCoil( CoilIndex ).UACoilExternal * 3.3;
 		WaterCoil( CoilIndex ).UACoilTotal = 1.0 / ( 1.0 / WaterCoil( CoilIndex ).UACoilExternal + 1.0 / WaterCoil( CoilIndex ).UACoilInternal );
@@ -4555,7 +4547,7 @@ Label999: ;
 
 		CoolingCoil( CoilIndex, true, DesignCalc, FanOpMode, PartLoadRatio );
 
-		Residuum = ( Par()( 1 ) - WaterCoil( CoilIndex ).TotWaterCoolingCoilRate ) / Par()( 1 );
+		Residuum = ( Par( 1 ) - WaterCoil( CoilIndex ).TotWaterCoolingCoilRate ) / Par( 1 );
 
 		return Residuum;
 	}
@@ -5534,7 +5526,7 @@ Label10: ;
 	Real64
 	EnthalpyResidual(
 		Real64 const Tprov, // test value of Tdb [C]
-		Optional< FArray1S< Real64 > const > Par // Par(1) = desired enthaply H [J/kg]
+		FArray1< Real64 > const & Par // Par(1) = desired enthaply H [J/kg]
 	)
 	{
 
@@ -5576,7 +5568,7 @@ Label10: ;
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		Residuum = Par()( 1 ) - PsyHFnTdbRhPb( Tprov, Par()( 2 ), Par()( 3 ) );
+		Residuum = Par( 1 ) - PsyHFnTdbRhPb( Tprov, Par( 2 ), Par( 3 ) );
 
 		return Residuum;
 	}
