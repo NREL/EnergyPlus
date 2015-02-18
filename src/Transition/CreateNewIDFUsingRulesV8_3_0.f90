@@ -9,7 +9,8 @@ CONTAINS
 
 SUBROUTINE SetThisVersionVariables()
       VerString='Conversion 8.2 => 8.3'
-      VersionNum=8.3
+      VersionNum=8.2
+      sVersionNum='8.2'
       IDDFileNameWithPath=TRIM(ProgramPath)//'V8-2-0-Energy+.idd'
       NewIDDFileNameWithPath=TRIM(ProgramPath)//'V8-3-0-Energy+.idd'
       RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 8-2-0 to 8-3-0.csv'
@@ -203,6 +204,23 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
             EXIT
           ENDIF
 
+          ! Clean up from any previous passes, then re-allocate
+          IF(ALLOCATED(DeleteThisRecord)) DEALLOCATE(DeleteThisRecord)
+          IF(ALLOCATED(Alphas)) DEALLOCATE(Alphas)
+          IF(ALLOCATED(Numbers)) DEALLOCATE(Numbers)
+          IF(ALLOCATED(InArgs)) DEALLOCATE(InArgs)
+          IF(ALLOCATED(AorN)) DEALLOCATE(AorN)
+          IF(ALLOCATED(ReqFld)) DEALLOCATE(ReqFld)
+          IF(ALLOCATED(FldNames)) DEALLOCATE(FldNames)
+          IF(ALLOCATED(FldDefaults)) DEALLOCATE(FldDefaults)
+          IF(ALLOCATED(FldUnits)) DEALLOCATE(FldUnits)
+          IF(ALLOCATED(NwAorN)) DEALLOCATE(NwAorN)
+          IF(ALLOCATED(NwReqFld)) DEALLOCATE(NwReqFld)
+          IF(ALLOCATED(NwFldNames)) DEALLOCATE(NwFldNames)
+          IF(ALLOCATED(NwFldDefaults)) DEALLOCATE(NwFldDefaults)
+          IF(ALLOCATED(NwFldUnits)) DEALLOCATE(NwFldUnits)
+          IF(ALLOCATED(OutArgs)) DEALLOCATE(OutArgs)
+          IF(ALLOCATED(MatchArg)) DEALLOCATE(MatchArg)
           ALLOCATE(Alphas(MaxAlphaArgsFound),Numbers(MaxNumericArgsFound))
           ALLOCATE(InArgs(MaxTotalArgs))
           ALLOCATE(AorN(MaxTotalArgs),ReqFld(MaxTotalArgs),FldNames(MaxTotalArgs),FldDefaults(MaxTotalArgs),FldUnits(MaxTotalArgs))
@@ -238,11 +256,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
             IF (DeleteThisRecord(Num)) CYCLE
             DO xcount=IDFRecords(Num)%CommtS+1,IDFRecords(Num)%CommtE
               WRITE(DifLfn,fmta) TRIM(Comments(xcount))
-              if (xcount == IDFRecords(Num)%CommtE) WRITE(DifLfn,fmta) ' '
+              if (xcount == IDFRecords(Num)%CommtE) WRITE(DifLfn,fmta) ''
             ENDDO
             IF (NoVersion .and. Num == 1) THEN
               CALL GetNewObjectDefInIDD('VERSION',NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-              OutArgs(1)='8.0'
+              OutArgs(1) = sVersionNum
               CurArgs=1
               CALL WriteOutIDFLinesAsComments(DifLfn,'Version',CurArgs,OutArgs,NwFldNames,NwFldUnits)
             ENDIF
@@ -321,17 +339,17 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               SELECT CASE (MakeUPPERCase(TRIM(IDFRecords(Num)%Name)))
 
               CASE ('VERSION')
-                IF ((InArgs(1)(1:3) == '8.3').and. ArgFile) THEN
+                IF ((InArgs(1)(1:3)) == '8.3' .and. ArgFile) THEN
                   CALL ShowWarningError('File is already at latest version.  No new diff file made.',Auditf)
                   CLOSE(diflfn,STATUS='DELETE')
                   LatestVersion=.true.
                   EXIT
                 ENDIF
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1)='8.3'
+                OutArgs(1) = sVersionNum
                 nodiff=.false.
 
-!    !!!    Changes for this version
+    !!!    Changes for this version
               CASE('CHILLER:ELECTRIC:REFORMULATEDEIR')
                 nodiff=.false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -340,7 +358,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ! add a blank for the new curve type field
                 OutArgs(10)=blank
                 ! then we just push the rest of the fields down 1
-                OutArgs(11:)=InArgs(10:)
+                OutArgs(11:CurArgs+1)=InArgs(10:CurArgs)
                 CurArgs = CurArgs + 1
                 
               CASE('SITE:GROUNDDOMAIN')
@@ -842,7 +860,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           IF (IDFRecords(NumIDFRecords)%CommtE /= CurComment) THEN
             DO xcount=IDFRecords(NumIDFRecords)%CommtE+1,CurComment
               WRITE(DifLfn,fmta) TRIM(Comments(xcount))
-              if (xcount == IDFRecords(Num)%CommtE) WRITE(DifLfn,fmta) ' '
+              if (xcount == IDFRecords(Num)%CommtE) WRITE(DifLfn,fmta) ''
             ENDDO
           ENDIF
 
@@ -874,25 +892,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
       ENDIF
 
       CALL CreateNewName('Reallocate',CreatedOutputName,' ')
-
-      IF (Allocated(DeleteThisRecord)) THEN
-        DEALLOCATE(DeleteThisRecord)
-        DEALLOCATE(Alphas)
-        DEALLOCATE(Numbers)
-        DEALLOCATE(InArgs)
-        DEALLOCATE(AorN)
-        DEALLOCATE(ReqFld)
-        DEALLOCATE(FldNames)
-        DEALLOCATE(FldDefaults)
-        DEALLOCATE(FldUnits)
-        DEALLOCATE(NwAorN)
-        DEALLOCATE(NwReqFld)
-        DEALLOCATE(NwFldNames)
-        DEALLOCATE(NwFldDefaults)
-        DEALLOCATE(NwFldUnits)
-        DEALLOCATE(OutArgs)
-        DEALLOCATE(MatchArg)
-      ENDIF
 
     ENDDO
 
