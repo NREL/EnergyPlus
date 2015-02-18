@@ -229,10 +229,10 @@ namespace ChillerReformulatedEIR {
 			ChillerEIRFPLRTempMax( 0.0 ),
 			ChillerEIRFPLRPLRMin( 0.0 ),
 			ChillerEIRFPLRPLRMax( 0.0 ),
-			ChillerLiftNomMin(0.0), //zrp_Aug2014 
-			ChillerLiftNomMax(10.0),
-			ChillerTdevNomMin(0.0),
-			ChillerTdevNomMax(10.0),
+			ChillerLiftNomMin( 0.0 ), //zrp_Aug2014 
+			ChillerLiftNomMax( 10.0 ),
+			ChillerTdevNomMin( 0.0 ),
+			ChillerTdevNomMax( 10.0 ),
 			CAPFTXIter( 0 ),
 			CAPFTXIterIndex( 0 ),
 			CAPFTYIter( 0 ),
@@ -374,7 +374,7 @@ namespace ChillerReformulatedEIR {
 			EIRFTName( EIRFTName ),
 			EIRFPLRName( EIRFPLRName ),
 			CondenserType( CondenserType ),
-			PartLoadCurveType(PartLoadCurveType),
+			PartLoadCurveType( PartLoadCurveType ),
 			RefCap( RefCap ),
 			RefCOP( RefCOP ),
 			FlowMode( FlowMode ),
@@ -428,10 +428,10 @@ namespace ChillerReformulatedEIR {
 			ChillerEIRFPLRTempMax( ChillerEIRFPLRTempMax ),
 			ChillerEIRFPLRPLRMin( ChillerEIRFPLRPLRMin ),
 			ChillerEIRFPLRPLRMax( ChillerEIRFPLRPLRMax ),
-			ChillerLiftNomMin(ChillerLiftNomMin), //zrp_Aug2014
-			ChillerLiftNomMax(ChillerLiftNomMax),
-			ChillerTdevNomMin(ChillerTdevNomMin),
-			ChillerTdevNomMax(ChillerTdevNomMax),
+			ChillerLiftNomMin( ChillerLiftNomMin ), //zrp_Aug2014
+			ChillerLiftNomMax( ChillerLiftNomMax ),
+			ChillerTdevNomMin( ChillerTdevNomMin ),
+			ChillerTdevNomMax( ChillerTdevNomMax ),
 			CAPFTXIter( CAPFTXIter ),
 			CAPFTXIterIndex( CAPFTXIterIndex ),
 			CAPFTYIter( CAPFTYIter ),

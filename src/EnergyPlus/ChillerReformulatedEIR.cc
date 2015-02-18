@@ -99,7 +99,7 @@ namespace ChillerReformulatedEIR {
 
 	//chiller part load curve types
 	int const PLR_UseLeavingCondenserWaterTemperature( 1 ); //Type 1_UseLeavingCondenserWaterTemperature 
-	int const PLR_UseLift ( 2 ); //Type 2_UseLift
+	int const PLR_UseLift( 2 ); //Type 2_UseLift
 	
 	// MODULE VARIABLE DECLARATIONS:
 	int NumElecReformEIRChillers( 0 ); // Number of electric reformulated EIR chillers specified in input
