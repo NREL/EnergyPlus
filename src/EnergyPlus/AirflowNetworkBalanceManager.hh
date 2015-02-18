@@ -234,11 +234,8 @@ namespace AirflowNetworkBalanceManager {
 	GetZoneInfilAirChangeRate( int const ZoneNum ); // hybrid ventilation system controlled zone number
 
 	// derived class or struct
-	class OccupantVentilationControlProp {
-	
-	private:
+	struct OccupantVentilationControlProp {
 
-	public:
 		std::string Name; // Provide a unique object name
 		Real64 MinOpeningTime; // Minimum Opening Time
 		Real64 MinClosingTime; // Minimum Closing Time

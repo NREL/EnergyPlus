@@ -586,7 +586,7 @@ namespace AirflowNetworkBalanceManager {
 						else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OccupantVentilationControl( i ).Name + "\", invalid" );
 							ShowContinueError( "...illegal " + cAlphaFields( 2 ) + " type for this object = " + GetCurveType( OccupantVentilationControl( i ).ComfortLowTempCurveNum ) );
-							ShowContinueError( "Curve type must be either Linear or Quadrtic." );
+							ShowContinueError( "Curve type must be either Linear or Quadratic." );
 							ErrorsFound = true;
 						}}
 					}
@@ -606,7 +606,7 @@ namespace AirflowNetworkBalanceManager {
 						else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OccupantVentilationControl( i ).Name + "\", invalid" );
 							ShowContinueError( "...illegal " + cAlphaFields( 3 ) + " type for this object = " + GetCurveType( OccupantVentilationControl( i ).ComfortHighTempCurveNum ) );
-							ShowContinueError( "Curve type must be either Linear or Quadrtic." );
+							ShowContinueError( "Curve type must be either Linear or Quadratic." );
 							ErrorsFound = true;
 						}}
 					} else {
@@ -656,7 +656,7 @@ namespace AirflowNetworkBalanceManager {
 					}
 				}
 				if ( !lAlphaBlanks( 5 ) ) {
-					OccupantVentilationControl( i ).OpeningProbSchName = Alphas( 5 ); // a shcedule name for opening probability
+					OccupantVentilationControl( i ).OpeningProbSchName = Alphas( 5 ); // a schedule name for opening probability
 					OccupantVentilationControl( i ).OpeningProbSchNum = GetScheduleIndex( OccupantVentilationControl( i ).OpeningProbSchName );
 					if ( OccupantVentilationControl( i ).OpeningProbSchNum == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 5 ) + " not found = " + OccupantVentilationControl( i ).OpeningProbSchName );
@@ -665,7 +665,7 @@ namespace AirflowNetworkBalanceManager {
 					}
 				}
 				if ( !lAlphaBlanks( 6 ) ) {
-					OccupantVentilationControl( i ).ClosingProbSchName = Alphas( 6 ); // a shcedule name for closing probability
+					OccupantVentilationControl( i ).ClosingProbSchName = Alphas( 6 ); // a schedule name for closing probability
 					OccupantVentilationControl( i ).ClosingProbSchNum = GetScheduleIndex( OccupantVentilationControl( i ).ClosingProbSchName );
 					if ( OccupantVentilationControl( i ).OpeningProbSchNum == 0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 6 ) + " not found = " + OccupantVentilationControl( i ).ClosingProbSchName );
@@ -3398,8 +3398,7 @@ namespace AirflowNetworkBalanceManager {
 						MultizoneSurfaceData( i ).CloseElapsedTime += ( CurrentEndTime - CurrentEndTimeLast ) * 60.0;
 					}
 					j = MultizoneSurfaceData( i ).SurfNum;
-					OccupantVentilationControl( MultizoneSurfaceData( i ).OccupantVentilationControlNum ).calc( Surface( j ).Zone, j, MultizoneSurfaceData( i ).PrevOpeningstatus, MultizoneSurfaceData( i ).OpenElapsedTime, MultizoneSurfaceData( i ).CloseElapsedTime,
-						MultizoneSurfaceData( i ).OpeningStatus, MultizoneSurfaceData( i ).OpeningProbStatus, MultizoneSurfaceData( i ).ClosingProbStatus );
+					OccupantVentilationControl( MultizoneSurfaceData( i ).OccupantVentilationControlNum ).calc( Surface( j ).Zone, j, MultizoneSurfaceData( i ).PrevOpeningstatus, MultizoneSurfaceData( i ).OpenElapsedTime, MultizoneSurfaceData( i ).CloseElapsedTime, MultizoneSurfaceData( i ).OpeningStatus, MultizoneSurfaceData( i ).OpeningProbStatus, MultizoneSurfaceData( i ).ClosingProbStatus );
 					if ( MultizoneSurfaceData( i ).OpeningStatus == 1 ) {
 						MultizoneSurfaceData( i ).OpenFactor = MultizoneSurfaceData( i ).OpenFactorLast;
 					}
@@ -7610,9 +7609,9 @@ Label90: ;
 			SchValue = GetCurrentScheduleValue( OpeningProbSchNum );
 			RandomValue = Real64( rand( ) ) / RAND_MAX;
 			if ( SchValue > RandomValue ) {
-					return true;
+				return true;
 			} else {
-					return false;
+				return false;
 			}
 		}
 
