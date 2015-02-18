@@ -1054,7 +1054,7 @@ namespace HVACUnitarySystem {
 			}
 
 			if ( UnitarySystem( UnitarySysNum ).DehumidControlType_Num != DehumidControl_None ) {
-				H2OHtOfVap = PsyHfgAirFnWTdb( Node( UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone ).HumRat, Node( UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone ).Temp );
+				H2OHtOfVap = PsyHfgAirFnWTdb( Node( UnitarySystem( UnitarySysNum ).NodeNumOfControlledZone ).Temp );
 
 				// positive MoistureLoad means no dehumidification load
 				MoistureLoad = min( 0.0, MoistureLoad * H2OHtOfVap );

@@ -6175,7 +6175,7 @@ namespace DXCoils {
 			InletWaterTemp = Node( CondInletNode ).Temp;
 			CondInletMassFlowRate = Node( CondInletNode ).MassFlowRate / PartLoadRatio;
 			EvapInletMassFlowRate = Node( EvapInletNode ).MassFlowRate / PartLoadRatio;
-			CpWater = CPHW( InletWaterTemp );
+			CpWater = CPHW();
 			CompressorPower = 0.0;
 			OperatingHeatingPower = 0.0;
 			TankHeatingCOP = 0.0;
@@ -9724,7 +9724,7 @@ Label50: ;
 					OutletAirHumRat = HSOutletAirHumRat;
 					OutletAirDryBulbTemp = HSOutletAirDryBulbTemp;
 				} else {
-					Hfg = PsyHfgAirFnWTdb( MinAirHumRat, HSOutletAirDryBulbTemp * SpeedRatio + ( 1.0 - SpeedRatio ) * LSOutletAirDryBulbTemp );
+					Hfg = PsyHfgAirFnWTdb( HSOutletAirDryBulbTemp * SpeedRatio + ( 1.0 - SpeedRatio ) * LSOutletAirDryBulbTemp );
 					// Average outlet HR
 					OutletAirHumRat = InletAirHumRat - DXCoil( DXCoilNum ).LatCoolingEnergyRate / Hfg / DXCoil( DXCoilNum ).InletAirMassFlowRate;
 					OutletAirDryBulbTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
@@ -9902,7 +9902,7 @@ Label50: ;
 					}
 					DXCoil( DXCoilNum ).LatCoolingEnergyRate = DXCoil( DXCoilNum ).TotalCoolingEnergyRate - DXCoil( DXCoilNum ).SensCoolingEnergyRate;
 					// Calculate avarage outlet conditions
-					Hfg = PsyHfgAirFnWTdb( MinAirHumRat, OutletAirDryBulbTemp * CycRatio + ( 1.0 - CycRatio ) * InletAirDryBulbTemp );
+					Hfg = PsyHfgAirFnWTdb( OutletAirDryBulbTemp * CycRatio + ( 1.0 - CycRatio ) * InletAirDryBulbTemp );
 					OutletAirHumRat = InletAirHumRat - DXCoil( DXCoilNum ).LatCoolingEnergyRate / Hfg / DXCoil( DXCoilNum ).InletAirMassFlowRate;
 					OutletAirDryBulbTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
 					if ( OutletAirDryBulbTemp < OutletAirDryBulbTempSat ) { // Limit to saturated conditions at OutletAirEnthalpy
