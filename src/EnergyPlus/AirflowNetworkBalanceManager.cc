@@ -161,6 +161,13 @@ namespace AirflowNetworkBalanceManager {
 	int const VentCtrNum_ZoneLevel( 7 ); // ZoneLevel control for a heat transfer subsurface
 	int const VentCtrNum_AdjTemp( 8 ); // Temperature venting control based on adjacent zone conditions
 	int const VentCtrNum_AdjEnth( 9 ); // Enthalpy venting control based on adjacent zone conditions
+	int const FeeeOperation( 0 ); // Free operatio
+	int const MinCheckForceOpen( 1 ); // Force open when opening elapsed time is less than minimum opening time 
+	int const MinCheckForceClose( 2 ); // Force open when closing elapsed time is less than minimum closing time 
+	int const ProbNoAction( 0 ); // No action from probability check
+	int const ProbForceOpen( 1 ); // Force open from probability check
+	int const ProbForceClose( 1 ); // Force close from probability check
+	int const ProbKeepStatus( 2 ); // Keep status at the previous time step from probability check
 	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS:
@@ -575,15 +582,10 @@ namespace AirflowNetworkBalanceManager {
 						ShowContinueError( "Thermal comfort will not be performed and minimum opening and closing times are checked only. Simulation continues." );
 					}
 					else {
-						// Verify Curve Object, only legal type is BiQuadratic
+						// Verify Curve Object, only legal type is linear or quadratic
 						{ auto const SELECT_CASE_var( GetCurveType( OccupantVentilationControl( i ).ComfortLowTempCurveNum ) );
-						if ( SELECT_CASE_var == "LINEAR" ) {
-//							Boiler( BoilerNum ).EfficiencyCurveType = Linear;
-						}
-						else if ( SELECT_CASE_var == "QUADRATIC" ) {
-//							Boiler( BoilerNum ).EfficiencyCurveType = Quadratic;
-						}
-						else {
+						if (SELECT_CASE_var == "LINEAR" || SELECT_CASE_var == "QUADRATIC" ) {
+						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OccupantVentilationControl( i ).Name + "\", invalid" );
 							ShowContinueError( "...illegal " + cAlphaFields( 2 ) + " type for this object = " + GetCurveType( OccupantVentilationControl( i ).ComfortLowTempCurveNum ) );
 							ShowContinueError( "Curve type must be either Linear or Quadratic." );
@@ -3399,10 +3401,10 @@ namespace AirflowNetworkBalanceManager {
 					}
 					j = MultizoneSurfaceData( i ).SurfNum;
 					OccupantVentilationControl( MultizoneSurfaceData( i ).OccupantVentilationControlNum ).calc( Surface( j ).Zone, j, MultizoneSurfaceData( i ).PrevOpeningstatus, MultizoneSurfaceData( i ).OpenElapsedTime, MultizoneSurfaceData( i ).CloseElapsedTime, MultizoneSurfaceData( i ).OpeningStatus, MultizoneSurfaceData( i ).OpeningProbStatus, MultizoneSurfaceData( i ).ClosingProbStatus );
-					if ( MultizoneSurfaceData( i ).OpeningStatus == 1 ) {
+					if ( MultizoneSurfaceData( i ).OpeningStatus == MinCheckForceOpen ) {
 						MultizoneSurfaceData( i ).OpenFactor = MultizoneSurfaceData( i ).OpenFactorLast;
 					}
-					if ( MultizoneSurfaceData( i ).OpeningStatus == 2 ) {
+					if ( MultizoneSurfaceData( i ).OpeningStatus == MinCheckForceClose ) {
 						MultizoneSurfaceData( i ).OpenFactor = 0.0;
 					}
 				}
@@ -3695,12 +3697,12 @@ namespace AirflowNetworkBalanceManager {
 			j = MultizoneSurfaceData( i ).SurfNum;
 			if ( SurfaceWindow( j ).OriginalClass == SurfaceClass_Window || SurfaceWindow( j ).OriginalClass == SurfaceClass_Door || SurfaceWindow( j ).OriginalClass == SurfaceClass_GlassDoor ) {
 				if ( MultizoneSurfaceData( i ).OccupantVentilationControlNum > 0 ) {
-					if ( MultizoneSurfaceData( i ).OpeningStatus == 0 ) {
-						if ( MultizoneSurfaceData( i ).OpeningProbStatus == 1 ) {
+					if ( MultizoneSurfaceData( i ).OpeningStatus == FeeeOperation ) {
+						if ( MultizoneSurfaceData( i ).OpeningProbStatus == ProbForceOpen ) {
 							MultizoneSurfaceData( i ).OpenFactor = MultizoneSurfaceData( i ).Factor;
-						} else if ( MultizoneSurfaceData( i ).ClosingProbStatus == 1 ) {
+						} else if ( MultizoneSurfaceData( i ).ClosingProbStatus == ProbForceClose ) {
 							MultizoneSurfaceData( i ).OpenFactor = 0.0;
-						} else if ( MultizoneSurfaceData( i ).ClosingProbStatus == 2 || MultizoneSurfaceData( i ).OpeningProbStatus == 2 ) {
+						} else if ( MultizoneSurfaceData( i ).ClosingProbStatus == ProbKeepStatus || MultizoneSurfaceData( i ).OpeningProbStatus == ProbKeepStatus ) {
 							MultizoneSurfaceData( i ).OpenFactor = MultizoneSurfaceData( i ).OpenFactorLast;
 						} else {
 							AirflowNetworkVentingControl( i, MultizoneSurfaceData( i ).OpenFactor );
@@ -7502,23 +7504,22 @@ Label90: ;
 		Real64 Tcomfort; // Thermal comfort temperature
 		Real64 ComfortBand; // Thermal comfort band
 		Real64 Toperative; // Oprative temperature
-		Real64 OutDryBulb;
+		Real64 OutDryBulb; // Outdoor dry-bulb temperature
 
 		// flow
 
-//		if ( PrevOpeningstatus == 1 ) {
 		if ( TimeOpenDuration > 0 ) {
 			if ( TimeOpenDuration >= MinOpeningTime ) {
-				OpeningStatus = 0; // free operation
+				OpeningStatus = FeeeOperation; // free operation
 			} else {
-				OpeningStatus = 1; // forced to open
+				OpeningStatus = MinCheckForceOpen; // forced to open
 			}
 		}
 		if ( TimeCloseDuration > 0 ) {
-				if ( TimeCloseDuration >= MinClosingTime ) {
-				OpeningStatus = 0; // free operation
+			if ( TimeCloseDuration >= MinClosingTime ) {
+				OpeningStatus = FeeeOperation; // free operation
 			} else {
-				OpeningStatus = 2; // forced to close
+				OpeningStatus = MinCheckForceClose; // forced to close
 			}
 		}
 
@@ -7535,22 +7536,22 @@ Label90: ;
 
 		if ( Toperative > ( Tcomfort + ComfortBand ) ) {
 			if ( openingProbability( ZoneNum, TimeCloseDuration ) ) {
-				OpeningProbStatus = 1; // forced to open
+				OpeningProbStatus = ProbForceOpen; // forced to open
 			} else {
-				OpeningProbStatus = 2; // Keep previous status
+				OpeningProbStatus = ProbKeepStatus; // Keep previous status
 			}
 		} else {
-			OpeningProbStatus = 0; // free operation
+			OpeningProbStatus = ProbNoAction; // free operation
 		}
 
 		if ( Toperative < ( Tcomfort - ComfortBand ) ) {
 			if ( closingProbability( TimeOpenDuration ) ) {
-				ClosingProbStatus = 1; // forced to close
+				ClosingProbStatus = ProbForceClose; // forced to close
 			} else {
-				ClosingProbStatus = 2; // Keep previous status 
+				ClosingProbStatus = ProbKeepStatus; // Keep previous status 
 			}
 		} else {
-			ClosingProbStatus = 0; // free operation
+			ClosingProbStatus = ProbNoAction; // free operation
 		}
 
 	}
