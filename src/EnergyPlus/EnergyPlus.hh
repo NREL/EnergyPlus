@@ -8,6 +8,8 @@
 // C++ Headers
 #include <cstdint> // C++11
 
+#define UNUSED(expr) (void)(expr)
+
 // ObjexxFCL
 namespace ObjexxFCL {
 namespace fmt {
