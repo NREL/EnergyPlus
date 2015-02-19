@@ -515,7 +515,6 @@ namespace Humidifiers {
 		}
 
 		if ( ! SysSizingCalc && MySetPointCheckFlag && DoSetPointTest ) {
-			for ( NumHum = 1; NumHum <= NumHumidifiers; ++NumHum ) {
 				if ( AirOutNode > 0 ) {
 					if ( Node( AirOutNode ).HumRatMin == SensedNodeFlagValue ) {
 						if ( ! AnyEnergyManagementSystemInModel ) {
@@ -534,7 +533,6 @@ namespace Humidifiers {
 						}
 					}
 				}
-			}
 			MySetPointCheckFlag = false;
 		}
 
@@ -767,7 +765,7 @@ namespace Humidifiers {
 			if (  HumType_Code == Humidifier_Steam_Gas ) {
 
 				if ( !IsAutoSize ) {
-					// override the user specified rated thermal efficiency
+					// override user specified rated thermal efficiency
 					if (  NomPower >= NominalPower ) {
 						 ThermalEffRated = NominalPower /  NomPower;
 					} else {
