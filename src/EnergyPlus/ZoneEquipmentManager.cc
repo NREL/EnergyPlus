@@ -3764,12 +3764,7 @@ namespace ZoneEquipmentManager {
 				// Update the rest of the Return Air Node conditions, if the return air system exists!
 				Node( ReturnNode ).Press = Node( ZoneNode ).Press;
 
-<<<<<<< HEAD
-				H2OHtOfVap = PsyHgAirFnWTdb( Node( ReturnNode ).Temp );
-=======
 				H2OHtOfVap = PsyHgAirFnWTdb( Node( ZoneNode ).HumRat, Node( ReturnNode ).Temp );
-				RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ReturnNode ).Temp, Node( ZoneNode ).HumRat );
->>>>>>> Psychrometric_warnings
 
 				// Include impact of under case returns for refrigerated display case when updating the return air node humidity
 				if ( ! Zone( ActualZoneNum ).NoHeatToReturnAir ) {
