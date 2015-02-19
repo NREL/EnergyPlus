@@ -1180,15 +1180,14 @@ namespace PlantLoopSolver {
 			for ( CompCounter = StartingComponent; CompCounter <= EndingComponent; ++CompCounter ) {
 
 				auto & this_comp( branch.Comp( CompCounter ) );
+				auto const CurOpSchemeType( this_comp.CurOpSchemeType );
 
-				{ auto const SELECT_CASE_var( this_comp.CurOpSchemeType );
-				if ( SELECT_CASE_var == WSEconOpSchemeType ) { //~ coils
+				switch ( CurOpSchemeType ) {
+				case WSEconOpSchemeType: //~ coils
 					this_comp.MyLoad = UpdatedDemandToLoopSetPoint;
 					SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
-				} else if ( ( SELECT_CASE_var >= LoadRangeBasedMin ) && ( SELECT_CASE_var <= LoadRangeBasedMax ) ) { //~ load range based
-					EncounteredLRBObjDuringPass1 = true;
-					break; // don't do any more components on this branch
-				} else if ( SELECT_CASE_var == PumpOpSchemeType ) { //~ pump
+					break;
+				case PumpOpSchemeType: //~ pump
 					PumpLocation.LoopNum = LoopNum;
 					PumpLocation.LoopSideNum = LoopSideNum;
 					PumpLocation.BranchNum = BranchCounter;
@@ -1198,11 +1197,12 @@ namespace PlantLoopSolver {
 					} else {
 						SimulateAllLoopSidePumps( LoopNum, LoopSideNum, PumpLocation, FlowRequest );
 					}
-
-				} else if ( SELECT_CASE_var == CompSetPtBasedSchemeType ) {
+					break;
+				case CompSetPtBasedSchemeType:
 					ManagePlantLoadDistribution( LoopNum, LoopSideNum, BranchCounter, CompCounter, LoadToLoopSetPoint, LoadToLoopSetPointThatWasntMet, FirstHVACIteration, LoopShutDownFlag, LoadDistributionWasPerformed );
 					SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
-				} else if ( SELECT_CASE_var == EMSOpSchemeType ) {
+					break;
+				case EMSOpSchemeType:
 					if ( LoopSideNum == SupplySide ) {
 						curCompOpSchemePtr = this_comp.CurCompLevelOpNum;
 						OpSchemePtr = this_comp.OpScheme( curCompOpSchemePtr ).OpSchemePtr;
@@ -1210,9 +1210,15 @@ namespace PlantLoopSolver {
 					}
 					ManagePlantLoadDistribution( LoopNum, LoopSideNum, BranchCounter, CompCounter, UpdatedDemandToLoopSetPoint, LoadToLoopSetPointThatWasntMet, FirstHVACIteration, LoopShutDownFlag, LoadDistributionWasPerformed );
 					SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
-				} else { //demand, , etc.
-					SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
-				}}
+					break;
+				default:
+					if ( ( CurOpSchemeType >= LoadRangeBasedMin ) && ( CurOpSchemeType <= LoadRangeBasedMax ) ) { //~ load range based
+						EncounteredLRBObjDuringPass1 = true;
+						goto components_end; // don't do any more components on this branch
+					} else { //demand, , etc.
+						SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
+					}
+				}
 
 				// Update loop demand as needed for changes this component may have made
 				UpdateAnyLoopDemandAlterations( LoopNum, LoopSideNum, BranchCounter, CompCounter );
@@ -1221,6 +1227,7 @@ namespace PlantLoopSolver {
 				LastComponentSimulated( BranchIndex ) = CompCounter;
 
 			} //~ CompCounter
+			components_end: ;
 
 			if ( loop.FlowLock == FlowLocked ) {
 				SimPressureDropSystem( LoopNum, FirstHVACIteration, PressureCall_Calc, LoopSideNum, BranchCounter );
@@ -1252,18 +1259,18 @@ namespace PlantLoopSolver {
 			EndingComponent = branch.TotalComponents;
 			for ( CompCounter = StartingComponent; CompCounter <= EndingComponent; ++CompCounter ) {
 
-				{ auto const SELECT_CASE_var( branch.Comp( CompCounter ).CurOpSchemeType );
-				if ( SELECT_CASE_var == NoControlOpSchemeType ) { //~ pipes, for example
+				auto const CurOpSchemeType( branch.Comp( CompCounter ).CurOpSchemeType );
+
+				switch ( CurOpSchemeType ) {
+				case NoControlOpSchemeType: //~ pipes, for example
 					SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
-				} else if ( ( SELECT_CASE_var == DemandOpSchemeType ) || ( SELECT_CASE_var == CompSetPtBasedSchemeType ) || ( SELECT_CASE_var == FreeRejectionOpSchemeType ) ) { //~ other control types
+					break;
+				case DemandOpSchemeType:
+				case CompSetPtBasedSchemeType:
+				case FreeRejectionOpSchemeType: //~ other control types
 					EncounteredNonLBObjDuringPass2 = true;
-					break; // don't do anymore components on this branch
-				} else if ( ( SELECT_CASE_var >= LoadRangeBasedMin ) && ( SELECT_CASE_var <= LoadRangeBasedMax ) ) { //~ load range based
-					if ( ! LoadDistributionWasPerformed ) { //~ Still need to distribute load among load range based components
-						ManagePlantLoadDistribution( LoopNum, LoopSideNum, BranchCounter, CompCounter, LoadToLoopSetPoint, LoadToLoopSetPointThatWasntMet, FirstHVACIteration, LoopShutDownFlag, LoadDistributionWasPerformed );
-					}
-					SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
-				} else if ( SELECT_CASE_var == PumpOpSchemeType ) { //~ pump
+					goto components2_end; // don't do anymore components on this branch
+				case PumpOpSchemeType: //~ pump
 					PumpLocation.LoopNum = LoopNum;
 					PumpLocation.LoopSideNum = LoopSideNum;
 					PumpLocation.BranchNum = BranchCounter;
@@ -1273,12 +1280,21 @@ namespace PlantLoopSolver {
 					} else {
 						SimulateAllLoopSidePumps( LoopNum, LoopSideNum, PumpLocation, FlowRequest );
 					}
-				}}
+					break;
+				default:
+					if ( ( CurOpSchemeType >= LoadRangeBasedMin ) && ( CurOpSchemeType <= LoadRangeBasedMax ) ) { //~ load range based
+						if ( ! LoadDistributionWasPerformed ) { //~ Still need to distribute load among load range based components
+							ManagePlantLoadDistribution( LoopNum, LoopSideNum, BranchCounter, CompCounter, LoadToLoopSetPoint, LoadToLoopSetPointThatWasntMet, FirstHVACIteration, LoopShutDownFlag, LoadDistributionWasPerformed );
+						}
+						SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
+					}
+				}
 
 				//~ If we didn't EXIT early, we must have simulated, so update array
 				LastComponentSimulated( BranchIndex ) = CompCounter;
 
 			} //~ CompCounter
+			components2_end: ;
 
 			//~ If we are locked, go ahead and simulate the pressure components on this branch
 			if ( loop.FlowLock == FlowLocked ) {
@@ -1303,12 +1319,13 @@ namespace PlantLoopSolver {
 			EndingComponent = branch.TotalComponents;
 			for ( CompCounter = StartingComponent; CompCounter <= EndingComponent; ++CompCounter ) {
 
-				{ auto const SELECT_CASE_var( branch.Comp( CompCounter ).CurOpSchemeType );
-				if ( SELECT_CASE_var == DemandOpSchemeType ) { //~ coils
+				auto const CurOpSchemeType( branch.Comp( CompCounter ).CurOpSchemeType );
+
+				switch ( CurOpSchemeType ) {
+				case DemandOpSchemeType: //~ coils
 					SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
-				} else if ( ( SELECT_CASE_var >= LoadRangeBasedMin ) && ( SELECT_CASE_var <= LoadRangeBasedMax ) ) { //~ load range based
-					ShowFatalError( "Encountered Load Based Object after other components, invalid." );
-				} else if ( SELECT_CASE_var == PumpOpSchemeType ) { //~ pump
+					break;
+				case PumpOpSchemeType: //~ pump
 					PumpLocation.LoopNum = LoopNum;
 					PumpLocation.LoopSideNum = LoopSideNum;
 					PumpLocation.BranchNum = BranchCounter;
@@ -1318,9 +1335,14 @@ namespace PlantLoopSolver {
 					} else {
 						SimulateAllLoopSidePumps( LoopNum, LoopSideNum, PumpLocation, FlowRequest );
 					}
-				} else { //~ Typical control equipment
-					SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
-				}}
+					break;
+				default:
+					if ( ( CurOpSchemeType >= LoadRangeBasedMin ) && ( CurOpSchemeType <= LoadRangeBasedMax ) ) { //~ load range based
+						ShowFatalError( "Encountered Load Based Object after other components, invalid." );
+					} else { //~ Typical control equipment
+						SimPlantEquip( LoopNum, LoopSideNum, BranchCounter, CompCounter, FirstHVACIteration, DummyInit, DoNotGetCompSizFac );
+					}
+				}
 
 				//~ If we didn't EXIT early, we must have simulated, so update array
 				LastComponentSimulated( BranchIndex ) = CompCounter;
@@ -1431,17 +1453,20 @@ namespace PlantLoopSolver {
 		}
 
 		//~ Now loop through all the pumps and simulate them, keeping track of their status
+		auto & loop_side( PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ) );
+		auto & loop_side_branch( loop_side.Branch );
 		for ( PumpCounter = PumpIndexStart; PumpCounter <= PumpIndexEnd; ++PumpCounter ) {
 
 			//~ Set some variables
-			PumpBranchNum = PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).Pumps( PumpCounter ).BranchNum;
-			PumpCompNum = PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).Pumps( PumpCounter ).CompNum;
-			PumpOutletNode = PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).Pumps( PumpCounter ).PumpOutletNode;
+			auto & pump( loop_side.Pumps( PumpCounter ) );
+			PumpBranchNum = pump.BranchNum;
+			PumpCompNum = pump.CompNum;
+			PumpOutletNode = pump.PumpOutletNode;
 
 			AdjustPumpFlowRequestByEMSControls( PumpLoopNum, PumpLoopSideNum, PumpBranchNum, PumpCompNum, FlowToRequest );
 
 			// Call SimPumps, routine takes a flow request, and returns some info about the status of the pump
-			SimPumps( PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).Pumps( PumpCounter ).PumpName, PumpLoopNum, FlowToRequest, ThisPumpRunning, PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).Branch( PumpBranchNum ).PumpIndex, PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).Pumps( PumpCounter ).PumpHeatToFluid );
+			SimPumps( pump.PumpName, PumpLoopNum, FlowToRequest, ThisPumpRunning, loop_side_branch( PumpBranchNum ).PumpIndex, pump.PumpHeatToFluid );
 
 			//~ Pull some state information from the pump outlet node
 			ThisPumpFlowRate = Node( PumpOutletNode ).MassFlowRate;
@@ -1449,14 +1474,14 @@ namespace PlantLoopSolver {
 			ThisPumpMaxAvail = Node( PumpOutletNode ).MassFlowRateMaxAvail;
 
 			//~ Now update the data structure
-			PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).Pumps( PumpCounter ).CurrentMinAvail = ThisPumpMinAvail;
-			PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).Pumps( PumpCounter ).CurrentMaxAvail = ThisPumpMaxAvail;
+			pump.CurrentMinAvail = ThisPumpMinAvail;
+			pump.CurrentMaxAvail = ThisPumpMaxAvail;
 
 		}
 
 		//~ Update the LoopSide pump heat totality here
-		if ( PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).TotalPumps > 0 ) {
-			PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).TotalPumpHeat = sum( PlantLoop( PumpLoopNum ).LoopSide( PumpLoopSideNum ).Pumps.PumpHeatToFluid() );
+		if ( loop_side.TotalPumps > 0 ) {
+			loop_side.TotalPumpHeat = sum( loop_side.Pumps.PumpHeatToFluid() );
 		}
 
 	}

@@ -18,9 +18,6 @@ namespace ObjexxFCL {
 // Forward
 class StaticIndexRange;
 
-// Types
-typedef  StaticIndexRange  SRange;
-
 } // ObjexxFCL
 
 #endif // ObjexxFCL_StaticIndexRange_fwd_hh_INCLUDED

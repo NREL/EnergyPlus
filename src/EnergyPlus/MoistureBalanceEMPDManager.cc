@@ -449,7 +449,7 @@ namespace MoistureBalanceEMPDManager {
 			ZoneNum = Surface( SurfNum ).Zone;
 			RALPHA = ZoneAirHumRat( ZoneNum ) * OutBaroPress / ( 461.52 * ( TempZone + KelvinConv ) * ( ZoneAirHumRat( ZoneNum ) + 0.62198 ) );
 			BB = HM / ( RHOBULK * material.EMPDVALUE * AT );
-			CC = BB * RALPHA + BR / AT * ( TempSurfIn - TempSurfInOld ) / ( TimeStepZone * SecInHour );
+			CC = BB * RALPHA + BR / AT * ( TempSurfIn - TempSurfInOld ) / TimeStepZoneSec;
 			SolverMoistureBalanceEMPD( MoistEMPDNew( SurfNum ), MoistEMPDOld( SurfNum ), 1.0, BB, CC );
 
 			Flag = 0;
@@ -521,7 +521,7 @@ namespace MoistureBalanceEMPDManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		VARNEW = ( VAROLD + TimeStepZone * SecInHour * C / A ) / ( 1.0 + TimeStepZone * SecInHour * B / A );
+		VARNEW = ( VAROLD + TimeStepZoneSec * C / A ) / ( 1.0 + TimeStepZoneSec * B / A );
 
 	}
 

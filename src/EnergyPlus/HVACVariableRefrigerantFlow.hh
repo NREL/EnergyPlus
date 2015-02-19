@@ -1306,7 +1306,7 @@ namespace HVACVariableRefrigerantFlow {
 	Real64
 	PLRResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = VRFTUNum
+		FArray1< Real64 > const & Par // par(1) = VRFTUNum
 	);
 
 	void

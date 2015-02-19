@@ -1126,9 +1126,6 @@ private: // Data
 
 }; // DynamicIndexRange
 
-// Types
-typedef  DynamicIndexRange  DRange;
-
 // Functions
 
 // Swap

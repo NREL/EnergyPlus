@@ -37,7 +37,8 @@ TEST( FArrayTest, DefaultConstruction )
 
 TEST( FArrayTest, Construction2DIndexRangeInitializerList )
 {
-	FArray2D_int r( SRange( -1, 1 ), SRange( -1, 1 ), { 1, 2, 3, 4, 5, 6, 7, 8, 9 } );
+	typedef  StaticIndexRange  SR;
+	FArray2D_int r( SR( -1, 1 ), SR( -1, 1 ), { 1, 2, 3, 4, 5, 6, 7, 8, 9 } );
 	EXPECT_EQ( -1, r.l1() );
 	EXPECT_EQ( -1, lbound( r, 1 ) );
 	EXPECT_EQ( 1, r.u1() );
@@ -64,18 +65,20 @@ TEST( FArrayTest, Construction2DDifferentValueType )
 
 TEST( FArrayTest, Assignment2D )
 {
+	typedef  DynamicIndexRange  DR;
 	FArray2D_int A( 3, 3, 33 );
-	FArray2D_int B( DRange( 0, 4 ), DRange( 0, 4 ), 44 );
+	FArray2D_int B( DR( 0, 4 ), DR( 0, 4 ), 44 );
 	A = B;
 	EXPECT_TRUE( eq( B, A ) );
 }
 
 TEST( FArrayTest, Assignment2DRedimensionDifferentValueType )
 {
+	typedef  DynamicIndexRange  DR;
 	FArray2D_int A( 3, 3, 33 );
-	FArray2D_double B( DRange( 0, 4 ), DRange( 0, 4 ), 4.4 );
+	FArray2D_double B( DR( 0, 4 ), DR( 0, 4 ), 4.4 );
 	A = B;
-	EXPECT_TRUE( eq( FArray2D_int( DRange( 0, 4 ), DRange( 0, 4 ), 4 ), A ) );
+	EXPECT_TRUE( eq( FArray2D_int( DR( 0, 4 ), DR( 0, 4 ), 4 ), A ) );
 }
 
 TEST( FArrayTest, Assignment2DNoOverlapProxy )
@@ -189,10 +192,11 @@ TEST( FArrayTest, Operators6D )
 
 TEST( FArrayTest, Redimension2D )
 {
+	typedef  DynamicIndexRange  DR;
 	FArray2D_int A( 4, 4, 44 );
 	A.redimension( 5, 5, 55 ); // Redimension by index ranges
-	EXPECT_EQ( DRange( 1, 5 ), A.I1() );
-	EXPECT_EQ( DRange( 1, 5 ), A.I2() );
+	EXPECT_EQ( DR( 1, 5 ), A.I1() );
+	EXPECT_EQ( DR( 1, 5 ), A.I2() );
 	EXPECT_EQ( 5U, A.size1() );
 	EXPECT_EQ( 5U, A.size2() );
 	EXPECT_EQ( 5U * 5U, A.size() );
@@ -230,11 +234,12 @@ TEST( FArrayTest, Redimension2DDimension )
 
 TEST( FArrayTest, Redimension3DFill )
 {
+	typedef  DynamicIndexRange  DR;
 	FArray3D_int A( 4, 4, 4, 44 );
 	A.redimension( 5, 5, 5, 55 ); // Redimension by index ranges
-	EXPECT_EQ( DRange( 1, 5 ), A.I1() );
-	EXPECT_EQ( DRange( 1, 5 ), A.I2() );
-	EXPECT_EQ( DRange( 1, 5 ), A.I3() );
+	EXPECT_EQ( DR( 1, 5 ), A.I1() );
+	EXPECT_EQ( DR( 1, 5 ), A.I2() );
+	EXPECT_EQ( DR( 1, 5 ), A.I3() );
 	EXPECT_EQ( 5u, A.size1() );
 	EXPECT_EQ( 5u, A.size2() );
 	EXPECT_EQ( 5u, A.size3() );
@@ -254,11 +259,12 @@ TEST( FArrayTest, Redimension3DFill )
 
 TEST( FArrayTest, Swap3D )
 {
+	typedef  DynamicIndexRange  DR;
 	FArray3D_int A( 4, 4, 4, 44 );
 	FArray3D_int( 5, 5, 5, 55 ).swap( A );
-	EXPECT_EQ( DRange( 1, 5 ), A.I1() );
-	EXPECT_EQ( DRange( 1, 5 ), A.I2() );
-	EXPECT_EQ( DRange( 1, 5 ), A.I3() );
+	EXPECT_EQ( DR( 1, 5 ), A.I1() );
+	EXPECT_EQ( DR( 1, 5 ), A.I2() );
+	EXPECT_EQ( DR( 1, 5 ), A.I3() );
 	EXPECT_EQ( 5u, A.size1() );
 	EXPECT_EQ( 5u, A.size2() );
 	EXPECT_EQ( 5u, A.size3() );
@@ -404,7 +410,7 @@ TEST( FArrayTest, Matmul22 )
 
 TEST( FArrayTest, Matrix2DMultiplication )
 {
-	SRange I1( 3 ), I2( 3 );
+	StaticIndexRange I1( 3 ), I2( 3 );
 
 	FArray2D_int A( I1, I2 );
 	for ( int i = A.l1(), ie = A.u1(); i <= ie; ++i ) {
@@ -437,7 +443,7 @@ TEST( FArrayTest, Matrix2DMultiplication )
 
 TEST( FArrayTest, Matrix2DMultiplicationTranspose )
 {
-	SRange I1( 3 ), I2( 3 );
+	StaticIndexRange I1( 3 ), I2( 3 );
 
 	FArray2D_int A( I1, I2 );
 	for ( int i = A.l1(), ie = A.u1(); i <= ie; ++i ) {

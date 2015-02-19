@@ -1616,7 +1616,7 @@ namespace OutputReportPredefined {
 			++numTableEntry;
 			// if larger than current size grow the array
 			if ( numTableEntry > sizeTableEntry ) {
-				tableEntry.redimension( sizeTableEntry += sizeIncrement );
+				tableEntry.redimension( sizeTableEntry *= 2 ); //Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
 			}
 		}
 	}
@@ -1668,7 +1668,7 @@ namespace OutputReportPredefined {
 			++numCompSizeTableEntry;
 			// if larger than current size grow the array
 			if ( numCompSizeTableEntry > sizeCompSizeTableEntry ) {
-				CompSizeTableEntry.redimension( sizeCompSizeTableEntry += sizeIncrement );
+				CompSizeTableEntry.redimension( sizeCompSizeTableEntry *= 2 ); //Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
 			}
 		}
 		CompSizeTableEntry( numCompSizeTableEntry ).typeField = FieldType;
@@ -1726,7 +1726,7 @@ namespace OutputReportPredefined {
 			++numShadowRelate;
 			// if larger than current size grow the array
 			if ( numShadowRelate > sizeShadowRelate ) {
-				ShadowRelate.redimension( sizeShadowRelate += sizeIncrement );
+				ShadowRelate.redimension( sizeShadowRelate *= 2 ); //Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
 			}
 		}
 		ShadowRelate( numShadowRelate ).castSurf = castingField;
@@ -1782,7 +1782,7 @@ namespace OutputReportPredefined {
 			++numReportName;
 			// if larger than current size grow the array
 			if ( numReportName > sizeReportName ) {
-				reportName.redimension( sizeReportName += sizeIncrement );
+				reportName.redimension( sizeReportName *= 2 ); //Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
 			}
 		}
 		// initialize new record
@@ -1840,7 +1840,7 @@ namespace OutputReportPredefined {
 			++numSubTable;
 			// if larger than current size then grow the array
 			if ( numSubTable > sizeSubTable ) {
-				subTable.redimension( sizeSubTable += sizeIncrement );
+				subTable.redimension( sizeSubTable *= 2 ); //Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
 			}
 		}
 		// initialize new record)
@@ -1937,7 +1937,7 @@ namespace OutputReportPredefined {
 			++numColumnTag;
 			// if larger than current size grow the array
 			if ( numColumnTag > sizeColumnTag ) {
-				columnTag.redimension( sizeColumnTag += sizeIncrement );
+				columnTag.redimension( sizeColumnTag *= 2 ); //Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
 			}
 		}
 		// initialize new record)

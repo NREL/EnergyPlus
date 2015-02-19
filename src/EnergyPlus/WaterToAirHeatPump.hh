@@ -3,8 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -408,7 +406,7 @@ namespace WaterToAirHeatPump {
 	Real64
 	CalcCompSuctionTempResidual(
 		Real64 const CompSuctionTemp, // HP compressor suction temperature (C)
-		Optional< FArray1S< Real64 > const > Par = _ // Function parameters
+		FArray1< Real64 > const & Par // Function parameters
 	);
 
 	void

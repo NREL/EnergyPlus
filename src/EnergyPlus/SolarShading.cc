@@ -106,11 +106,8 @@ namespace SolarShading {
 	// Homogeneous Coordinates are represented in integers (64 bit). This changes the surface coordinates from meters
 	// to .01 millimeters -- making that the resolution for shadowing, polygon clipping, etc.
 	Real64 const sqHCMULT( HCMULT * HCMULT ); // Square of HCMult used in Homogeneous coordinates
+	Real64 const sqHCMULT_fac( 0.5 / sqHCMULT ); // ( 0.5 / sqHCMULT ) factor
 	Real64 const kHCMULT( 1.0 / ( HCMULT * HCMULT ) ); // half of inverse square of HCMult used in Homogeneous coordinates
-
-	//INTEGER,          PRIVATE, PARAMETER :: MAXCMB = 2000   ! Length of SHDCMB array
-	//INTEGER,          PARAMETER :: MaxHCS = 15000 ! 200      ! Maximum number of HC surfaces (was 56)
-	//INTEGER,          PARAMETER :: MaxHCV = 12      ! Maximum number of HC vertices
 
 	// Parameters for use with the variable OverlapStatus...
 	int const NoOverlap( 1 );
@@ -126,7 +123,7 @@ namespace SolarShading {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	int MaxHCV( 12 ); // Maximum number of HC vertices
+	int MaxHCV( 15 ); // Maximum number of HC vertices
 	// (needs to be based on maxnumvertices)
 	int MaxHCS( 15000 ); // 200      ! Maximum number of HC surfaces (was 56)
 	// Following are initially set in AllocateModuleArrays
@@ -263,7 +260,8 @@ namespace SolarShading {
 			if ( GetInputFlag ) {
 				GetShadowingInput();
 				GetInputFlag = false;
-				MaxHCV = max( 12, MaxVerticesPerSurface + 1 );
+				MaxHCV = ( ( ( max( 15, MaxVerticesPerSurface ) + 16 ) / 16 ) * 16 ) - 1; // Assure MaxHCV+1 is multiple of 16 for 128 B alignment
+				assert( ( MaxHCV + 1 ) % 16 == 0 );
 			}
 
 			if ( firstTime ) DisplayString( "Allocate Solar Module Arrays" );
@@ -732,15 +730,15 @@ namespace SolarShading {
 		// Weiler-Atherton
 		MAXHCArrayBounds = 2 * ( MaxVerticesPerSurface + 1 );
 		MAXHCArrayIncrement = MaxVerticesPerSurface + 1;
-		XTEMP.dimension( ( MaxVerticesPerSurface + 1 ) * 2, 0.0 );
-		YTEMP.dimension( ( MaxVerticesPerSurface + 1 ) * 2, 0.0 );
+		XTEMP.dimension( 2 * ( MaxVerticesPerSurface + 1 ), 0.0 );
+		YTEMP.dimension( 2 * ( MaxVerticesPerSurface + 1 ), 0.0 );
 		XVC.dimension( MaxVerticesPerSurface + 1, 0.0 );
 		XVS.dimension( MaxVerticesPerSurface + 1, 0.0 );
 		YVC.dimension( MaxVerticesPerSurface + 1, 0.0 );
 		YVS.dimension( MaxVerticesPerSurface + 1, 0.0 );
 		ZVC.dimension( MaxVerticesPerSurface + 1, 0.0 );
 
-		//Sutherland-Hodgman
+		// Sutherland-Hodgman
 		ATEMP.dimension( 2 * ( MaxVerticesPerSurface + 1 ), 0.0 );
 		BTEMP.dimension( 2 * ( MaxVerticesPerSurface + 1 ), 0.0 );
 		CTEMP.dimension( 2 * ( MaxVerticesPerSurface + 1 ), 0.0 );
@@ -2109,27 +2107,22 @@ namespace SolarShading {
 
 			NVS = NABOVE + 2;
 			NumVertInShadowOrClippedSurface = NABOVE + 2;
+			Real64 ZVT_N, ZVT_P( ZVT( 1 ) );
 			XVT( NVT + 1 ) = XVT( 1 );
 			YVT( NVT + 1 ) = YVT( 1 );
-			ZVT( NVT + 1 ) = ZVT( 1 );
-			for ( int N = 1; N <= NVT; ++N ) {
-				Real64 const ZVT_N( ZVT( N ) );
-				Real64 const ZVT_P( ZVT( N + 1 ) );
+			ZVT( NVT + 1 ) = ZVT_P;
+			for ( int N = 1, P = 2; N <= NVT; ++N, ++P ) {
+				ZVT_N = ZVT_P;
+				ZVT_P = ZVT( P );
 				if ( ZVT_N >= 0.0 && ZVT_P < 0.0 ) { // Line enters plane of receiving surface
-
 					Real64 const ZVT_fac( 1.0 / ( ZVT_P - ZVT_N ) );
-					XIN = ( ZVT_P * XVT( N ) - ZVT_N * XVT( N + 1 ) ) * ZVT_fac;
-					YIN = ( ZVT_P * YVT( N ) - ZVT_N * YVT( N + 1 ) ) * ZVT_fac;
-					//? Just keeps going on to next N: break here?
-
+					XIN = ( ZVT_P * XVT( N ) - ZVT_N * XVT( P ) ) * ZVT_fac;
+					YIN = ( ZVT_P * YVT( N ) - ZVT_N * YVT( P ) ) * ZVT_fac;
 				} else if ( ZVT_N <= 0.0 && ZVT_P > 0.0 ) { // Line exits plane of receiving surface
-
 					NEXT = N + 1;
 					Real64 const ZVT_fac( 1.0 / ( ZVT_P - ZVT_N ) );
-					XOUT = ( ZVT_P * XVT( N ) - ZVT_N * XVT( N + 1 ) ) * ZVT_fac;
-					YOUT = ( ZVT_P * YVT( N ) - ZVT_N * YVT( N + 1 ) ) * ZVT_fac;
-					//? Just keeps going on to next N: break here?
-
+					XOUT = ( ZVT_P * XVT( N ) - ZVT_N * XVT( P ) ) * ZVT_fac;
+					YOUT = ( ZVT_P * YVT( N ) - ZVT_N * YVT( P ) ) * ZVT_fac;
 				}
 			}
 
@@ -2298,34 +2291,50 @@ namespace SolarShading {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		if ( NS > MaxHCS * 2 ) {
+		if ( NS > 2 * MaxHCS ) {
 			ShowFatalError( "Solar Shading: HTrans: Too many Figures (>" + TrimSigDigits( MaxHCS ) + ')' );
 		}
 
 		HCNV( NS ) = NumVertices;
 
+		//Tuned Linear indexing
+
+		assert( equal_dimensions( HCX, HCY ) );
+		assert( equal_dimensions( HCX, HCA ) );
+		assert( equal_dimensions( HCX, HCB ) );
+		assert( equal_dimensions( HCX, HCC ) );
+		auto const l1( HCX.index( 1, NS ) );
 		if ( I != 0 ) { // Transform vertices of figure ns.
 
 			// See comment at top of module regarding HCMULT
-			for ( int N = 1; N <= NumVertices; ++N ) {
-				HCX( N, NS ) = nint64( XVS( N ) * HCMULT );
-				HCY( N, NS ) = nint64( YVS( N ) * HCMULT );
+			auto l( l1 );
+			for ( int N = 1; N <= NumVertices; ++N, ++l ) { // [ l ] == ( N, NS )
+				HCX[ l ] = nint64( XVS( N ) * HCMULT );
+				HCY[ l ] = nint64( YVS( N ) * HCMULT );
 			}
 
 		}
 
 		// Establish extra point for finding lines between points.
 
-		HCX( NumVertices + 1, NS ) = HCX( 1, NS );
-		HCY( NumVertices + 1, NS ) = HCY( 1, NS );
+		auto l( HCX.index( NumVertices + 1, NS ) );
+		Int64 HCX_m( HCX[ l ] = HCX[ l1 ] ); // [ l ] == ( NumVertices + 1, NS ), [ l1 ] == ( 1, NS )
+		Int64 HCY_m( HCY[ l ] = HCY[ l1 ] ); // [ l ] == ( NumVertices + 1, NS ), [ l1 ] == ( 1, NS )
 
 		// Determine lines between points.
+		l = l1;
+		auto m( l1 + 1u );
+		Int64 HCX_l;
+		Int64 HCY_l;
 		Real64 SUM( 0.0 ); // Sum variable
-		for ( int N = 1; N <= NumVertices; ++N ) {
-			HCA( N, NS ) = HCY( N, NS ) - HCY( N + 1, NS );
-			HCB( N, NS ) = HCX( N + 1, NS ) - HCX( N, NS );
-			HCC( N, NS ) = ( HCY( N + 1, NS ) * HCX( N, NS ) ) - ( HCX( N + 1, NS ) * HCY( N, NS ) );
-			SUM += HCC( N, NS );
+		for ( int N = 1; N <= NumVertices; ++N, ++l, ++m ) { // [ l ] == ( N, NS ), [ m ] == ( N + 1, NS )
+			HCX_l = HCX_m;
+			HCY_l = HCY_m;
+			HCX_m = HCX[ m ];
+			HCY_m = HCY[ m ];
+			HCA[ l ] = HCY_l - HCY_m;
+			HCB[ l ] = HCX_m - HCX_l;
+			SUM += HCC[ l ] = ( HCY_m * HCX_l ) - ( HCX_m * HCY_l );
 		}
 
 		// Compute area of polygon.
@@ -2333,7 +2342,7 @@ namespace SolarShading {
 		//  DO N = 1, NumVertices
 		//    SUM = SUM + HCX(N,NS)*HCY(N+1,NS) - HCY(N,NS)*HCX(N+1,NS) ! Since HCX and HCY integerized, value of SUM should be ok
 		//  END DO
-		HCAREA( NS ) = ( 0.5 * SUM ) / ( sqHCMULT );
+		HCAREA( NS ) = SUM * sqHCMULT_fac;
 		//  HCAREA(NS)=0.5d0*SUM*(kHCMULT)
 
 	}
@@ -2349,33 +2358,41 @@ namespace SolarShading {
 
 		// Locals
 
-		if ( NS > MaxHCS * 2 ) {
+		if ( NS > 2 * MaxHCS ) {
 			ShowFatalError( "Solar Shading: HTrans0: Too many Figures (>" + TrimSigDigits( MaxHCS ) + ')' );
 		}
 
-		assert( equal_dimensions( HCX, HCY ) ); // For linear indexing
-		assert( equal_dimensions( HCX, HCA ) ); // For linear indexing
-		assert( equal_dimensions( HCX, HCB ) ); // For linear indexing
-		assert( equal_dimensions( HCX, HCC ) ); // For linear indexing
+		HCNV( NS ) = NumVertices;
+
+		//Tuned Linear indexing
+
+		assert( equal_dimensions( HCX, HCY ) );
+		assert( equal_dimensions( HCX, HCA ) );
+		assert( equal_dimensions( HCX, HCB ) );
+		assert( equal_dimensions( HCX, HCC ) );
 
 		auto const l1( HCX.index( 1, NS ) );
 
-		HCNV( NS ) = NumVertices;
 		auto l( HCX.index( NumVertices + 1, NS ) );
-		HCX[ l ] = HCX[ l1 ]; // [ l1 ] == ( 1, NS )
-		HCY[ l ] = HCY[ l1 ]; // [ l1 ] == ( 1, NS )
+		Int64 HCX_m( HCX[ l ] = HCX[ l1 ] ); // [ l1 ] == ( 1, NS )
+		Int64 HCY_m( HCY[ l ] = HCY[ l1 ] ); // [ l1 ] == ( 1, NS )
 
-		//Tuned Linear indexing
 		l = l1;
-		auto m( l + 1u );
+		auto m( l1 + 1u );
+		Int64 HCX_l;
+		Int64 HCY_l;
 		Real64 SUM( 0.0 );
 		for ( int N = 1; N <= NumVertices; ++N, ++l, ++m ) { // [ l ] == ( N, NS ), [ m ] == ( N + 1, NS )
-			HCA[ l ] = HCY[ l ] - HCY[ m ];
-			HCB[ l ] = HCX[ m ] - HCX[ l ];
-			SUM += HCC[ l ] = ( HCY[ m ] * HCX[ l ] ) - ( HCX[ m ] * HCY[ l ] );
+			HCX_l = HCX_m;
+			HCY_l = HCY_m;
+			HCX_m = HCX[ m ];
+			HCY_m = HCY[ m ];
+			HCA[ l ] = HCY_l - HCY_m;
+			HCB[ l ] = HCX_m - HCX_l;
+			SUM += HCC[ l ] = ( HCY_m * HCX_l ) - ( HCX_m * HCY_l );
 		}
 
-		HCAREA( NS ) = ( 0.5 * SUM ) / ( sqHCMULT );
+		HCAREA( NS ) = SUM * sqHCMULT_fac;
 
 	}
 
@@ -2388,40 +2405,48 @@ namespace SolarShading {
 		// Using/Aliasing
 		using General::TrimSigDigits;
 
-		if ( NS > MaxHCS * 2 ) {
+		if ( NS > 2 * MaxHCS ) {
 			ShowFatalError( "Solar Shading: HTrans1: Too many Figures (>" + TrimSigDigits( MaxHCS ) + ')' );
 		}
 
-		assert( equal_dimensions( HCX, HCY ) ); // For linear indexing
-		assert( equal_dimensions( HCX, HCA ) ); // For linear indexing
-		assert( equal_dimensions( HCX, HCB ) ); // For linear indexing
-		assert( equal_dimensions( HCX, HCC ) ); // For linear indexing
+		HCNV( NS ) = NumVertices;
+
+		//Tuned Linear indexing
+
+		assert( equal_dimensions( HCX, HCY ) );
+		assert( equal_dimensions( HCX, HCA ) );
+		assert( equal_dimensions( HCX, HCB ) );
+		assert( equal_dimensions( HCX, HCC ) );
+
+		auto const l1( HCX.index( 1, NS ) );
 
 		// only in HTRANS1
-		//Tuned Linear indexing
-		auto const l1( HCX.index( 1, NS ) );
 		auto l( l1 );
 		for ( int N = 1; N <= NumVertices; ++N, ++l ) { // [ l ] == ( N, NS )
 			HCX[ l ] = nint64( XVS( N ) * HCMULT );
 			HCY[ l ] = nint64( YVS( N ) * HCMULT );
 		}
 
-		HCNV( NS ) = NumVertices;
 		l = HCX.index( NumVertices + 1, NS );
-		HCX[ l ] = HCX[ l1 ]; // [ l1 ] == ( 1, NS )
-		HCY[ l ] = HCY[ l1 ]; // [ l1 ] == ( 1, NS )
+		Int64 HCX_m( HCX[ l ] = HCX[ l1 ] ); // [ l1 ] == ( 1, NS )
+		Int64 HCY_m( HCY[ l ] = HCY[ l1 ] );
 
-		//Tuned Linear indexing
 		l = l1;
-		auto m( l + 1u );
+		auto m( l1 + 1u );
+		Int64 HCX_l;
+		Int64 HCY_l;
 		Real64 SUM( 0.0 );
 		for ( int N = 1; N <= NumVertices; ++N, ++l, ++m ) { // [ l ] == ( N, NS ), [ m ] == ( N + 1, NS )
-			HCA[ l ] = HCY[ l ] - HCY[ m ];
-			HCB[ l ] = HCX[ m ] - HCX[ l ];
-			SUM += HCC[ l ] = ( HCY[ m ] * HCX[ l ] ) - ( HCX[ m ] * HCY[ l ] );
+			HCX_l = HCX_m;
+			HCY_l = HCY_m;
+			HCX_m = HCX[ m ];
+			HCY_m = HCY[ m ];
+			HCA[ l ] = HCY_l - HCY_m;
+			HCB[ l ] = HCX_m - HCX_l;
+			SUM += HCC[ l ] = ( HCY_m * HCX_l ) - ( HCX_m * HCY_l );
 		}
 
-		HCAREA( NS ) = ( 0.5 * SUM ) / ( sqHCMULT );
+		HCAREA( NS ) = SUM * sqHCMULT_fac;
 
 	}
 
@@ -2549,8 +2574,6 @@ namespace SolarShading {
 		// na
 
 		// Locals
-		FArray1D< Real64 > XTEMP1; // Temporary 'X' values for HC vertices of the overlap
-		FArray1D< Real64 > YTEMP1; // Temporary 'Y' values for HC vertices of the overlap
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -2598,16 +2621,8 @@ namespace SolarShading {
 				YUntrunc = ( HCA( M, NS2 ) * HCC( N, NS1 ) - HCC( M, NS2 ) * HCA( N, NS1 ) ) / W;
 				if ( NV3 > isize( XTEMP ) ) {
 					//        write(outputfiledebug,*) 'nv3=',nv3,' SIZE(xtemp)=',SIZE(xtemp)
-					XTEMP1.dimension( isize( XTEMP ) + 10, 0.0 );
-					YTEMP1.dimension( isize( YTEMP ) + 10, 0.0 );
-					XTEMP1( {1,NV3 - 1} ) = XTEMP( {1,NV3 - 1} );
-					YTEMP1( {1,NV3 - 1} ) = YTEMP( {1,NV3 - 1} );
-					XTEMP.allocate( isize( XTEMP1 ) );
-					YTEMP.allocate( isize( YTEMP1 ) );
-					XTEMP = XTEMP1;
-					YTEMP = YTEMP1;
-					XTEMP1.deallocate();
-					YTEMP1.deallocate();
+					XTEMP.redimension( isize( XTEMP ) + 10, 0.0 );
+					YTEMP.redimension( isize( YTEMP ) + 10, 0.0 );
 				}
 				XTEMP( NV3 ) = nint64( XUntrunc );
 				YTEMP( NV3 ) = nint64( YUntrunc );
@@ -2676,32 +2691,28 @@ namespace SolarShading {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		typedef  FArray2D< Int64 >::size_type  size_type;
 		bool INTFLAG; // For overlap status
-		int E; // Edge loop index
-		int P; // Point loop index
 		int S; // Test vertex
-		int K; // Duplicate test index
 		int KK; // Duplicate test index
 		int NVOUT; // Current output length for loops
 		int NVTEMP;
 
 		Real64 W; // Normalization factor
 		Real64 HFunct;
-		//  REAL(r64), DIMENSION(2*(MaxVerticesPerSurface + 1))  :: ATEMP    ! Temporary 'A' values for HC vertices of the overlap
-		//  REAL(r64), DIMENSION(2*(MaxVerticesPerSurface + 1))  :: BTEMP    ! Temporary 'B' values for HC vertices of the overlap
-		//  REAL(r64), DIMENSION(2*(MaxVerticesPerSurface + 1))  :: CTEMP    ! Temporary 'C' values for HC vertices of the overlap
-		//  REAL(r64), DIMENSION(2*(MaxVerticesPerSurface + 1))  :: XTEMP1   ! Temporary 'X' values for HC vertices of the overlap
-		//  REAL(r64), DIMENSION(2*(MaxVerticesPerSurface + 1))  :: YTEMP1   ! Temporary 'Y' values for HC vertices of the overlap
 
 #ifdef EP_Count_Calls
 		++NumClipPoly_Calls;
 #endif
-		// Populate the arrays with the original polygon
-		assert( equal_dimensions( HCX, HCY ) ); // For linear indexing
+		//Tuned Linear indexing
+
+		assert( equal_dimensions( HCX, HCY ) );
 		assert( equal_dimensions( HCX, HCA ) );
 		assert( equal_dimensions( HCX, HCB ) );
 		assert( equal_dimensions( HCX, HCC ) );
-		for ( FArray2D< Real64 >::size_type j = 0, l = HCX.index( 1, NS1 ), e = NV1; j < e; ++j, ++l ) { //Tuned
+
+		// Populate the arrays with the original polygon
+		for ( size_type j = 0, l = HCX.index( 1, NS1 ), e = NV1; j < e; ++j, ++l ) {
 			XTEMP[ j ] = HCX[ l ]; // [ l ] == ( j+1, NS1 )
 			YTEMP[ j ] = HCY[ l ];
 			ATEMP[ j ] = HCA[ l ];
@@ -2715,36 +2726,40 @@ namespace SolarShading {
 		KK = 0;
 
 		auto l( HCA.index( 1, NS2 ) );
-		for ( E = 1; E <= NV2; ++E, ++l ) { // Loop over edges of the clipping polygon
-			for ( P = 1; P <= NVOUT; ++P ) {
+		for ( int E = 1; E <= NV2; ++E, ++l ) { // Loop over edges of the clipping polygon
+			for ( int P = 1; P <= NVOUT; ++P ) {
 				XTEMP1( P ) = XTEMP( P );
 				YTEMP1( P ) = YTEMP( P );
 			}
 			S = NVOUT;
-			Int64 const HCA_E( HCA[ l ] );
-			Int64 const HCB_E( HCB[ l ] );
-			Int64 const HCC_E( HCC[ l ] );
-			for ( P = 1; P <= NVOUT; ++P ) {
-				HFunct = XTEMP1( P ) * HCA_E + YTEMP1( P ) * HCB_E + HCC_E;
+			Real64 const HCA_E( HCA[ l ] );
+			Real64 const HCB_E( HCB[ l ] );
+			Real64 const HCC_E( HCC[ l ] );
+			Real64 XTEMP1_S( XTEMP1( S ) );
+			Real64 YTEMP1_S( YTEMP1( S ) );
+			for ( int P = 1; P <= NVOUT; ++P ) {
+				Real64 const XTEMP1_P( XTEMP1( P ) );
+				Real64 const YTEMP1_P( YTEMP1( P ) );
+				HFunct = XTEMP1_P * HCA_E + YTEMP1_P * HCB_E + HCC_E;
 				// S is constant within this block
-				Real64 const ATEMP_S( ATEMP( S ) );
-				Real64 const BTEMP_S( BTEMP( S ) );
-				Real64 const CTEMP_S( CTEMP( S ) );
 				if ( HFunct <= 0.0 ) { // Vertex is not in the clipping plane
-					HFunct = XTEMP1( S ) * HCA_E + YTEMP1( S ) * HCB_E + HCC_E;
+					HFunct = XTEMP1_S * HCA_E + YTEMP1_S * HCB_E + HCC_E;
 					if ( HFunct > 0.0 ) { // Test vertex is in the clipping plane
 
 						// Find/store the intersection of the clip edge and the line connecting S and P
 						KK = NVTEMP;
 						++NVTEMP;
+						Real64 const ATEMP_S( ATEMP( S ) );
+						Real64 const BTEMP_S( BTEMP( S ) );
+						Real64 const CTEMP_S( CTEMP( S ) );
 						W = HCB_E * ATEMP_S - HCA_E * BTEMP_S;
 						if ( W != 0.0 ) {
 							Real64 const W_inv( 1.0 / W );
 							XTEMP( NVTEMP ) = nint64( ( HCC_E * BTEMP_S - HCB_E * CTEMP_S ) * W_inv );
 							YTEMP( NVTEMP ) = nint64( ( HCA_E * CTEMP_S - HCC_E * ATEMP_S ) * W_inv );
 						} else {
-							XTEMP( NVTEMP ) = SafeDivide( ( HCC_E * BTEMP_S - HCB_E * CTEMP_S ), W );
-							YTEMP( NVTEMP ) = SafeDivide( ( HCA_E * CTEMP_S - HCC_E * ATEMP_S ), W );
+							XTEMP( NVTEMP ) = SafeDivide( HCC_E * BTEMP_S - HCB_E * CTEMP_S, W );
+							YTEMP( NVTEMP ) = SafeDivide( HCA_E * CTEMP_S - HCC_E * ATEMP_S, W );
 						}
 						INTFLAG = true;
 
@@ -2752,11 +2767,11 @@ namespace SolarShading {
 							if ( KK != 0 ) {
 								auto const x( XTEMP( NVTEMP ) );
 								auto const y( YTEMP( NVTEMP ) );
-								for ( K = 1; K <= KK; ++K ) {
+								for ( int K = 1; K <= KK; ++K ) {
 									if ( std::abs( x - XTEMP( K ) ) > 2.0 ) continue;
 									if ( std::abs( y - YTEMP( K ) ) > 2.0 ) continue;
 									NVTEMP = KK;
-									break; // K DO loop
+									break; // K loop
 								}
 							}
 						}
@@ -2777,36 +2792,39 @@ namespace SolarShading {
 						MAXHCArrayBounds = NewArrayBounds;
 					}
 
-					XTEMP( NVTEMP ) = XTEMP1( P );
-					YTEMP( NVTEMP ) = YTEMP1( P );
+					XTEMP( NVTEMP ) = XTEMP1_P;
+					YTEMP( NVTEMP ) = YTEMP1_P;
 
 					if ( E == NV2 ) { // Remove near-duplicates on last edge
 						if ( KK != 0 ) {
 							auto const x( XTEMP( NVTEMP ) );
 							auto const y( YTEMP( NVTEMP ) );
-							for ( K = 1; K <= KK; ++K ) {
+							for ( int K = 1; K <= KK; ++K ) {
 								if ( std::abs( x - XTEMP( K ) ) > 2.0 ) continue;
 								if ( std::abs( y - YTEMP( K ) ) > 2.0 ) continue;
 								NVTEMP = KK;
-								break; // K DO loop
+								break; // K loop
 							}
 						}
 					}
 
 				} else {
-					HFunct = XTEMP1( S ) * HCA_E + YTEMP1( S ) * HCB_E + HCC_E;
+					HFunct = XTEMP1_S * HCA_E + YTEMP1_S * HCB_E + HCC_E;
 					if ( HFunct <= 0.0 ) { // Test vertex is not in the clipping plane
 
 						KK = NVTEMP;
 						++NVTEMP;
+						Real64 const ATEMP_S( ATEMP( S ) );
+						Real64 const BTEMP_S( BTEMP( S ) );
+						Real64 const CTEMP_S( CTEMP( S ) );
 						W = HCB_E * ATEMP_S - HCA_E * BTEMP_S;
 						if ( W != 0.0 ) {
 							Real64 const W_inv( 1.0 / W );
 							XTEMP( NVTEMP ) = nint64( ( HCC_E * BTEMP_S - HCB_E * CTEMP_S ) * W_inv );
 							YTEMP( NVTEMP ) = nint64( ( HCA_E * CTEMP_S - HCC_E * ATEMP_S ) * W_inv );
 						} else {
-							XTEMP( NVTEMP ) = SafeDivide( ( HCC_E * BTEMP_S - HCB_E * CTEMP_S ), W );
-							YTEMP( NVTEMP ) = SafeDivide( ( HCA_E * CTEMP_S - HCC_E * ATEMP_S ), W );
+							XTEMP( NVTEMP ) = SafeDivide( HCC_E * BTEMP_S - HCB_E * CTEMP_S, W );
+							YTEMP( NVTEMP ) = SafeDivide( HCA_E * CTEMP_S - HCC_E * ATEMP_S, W );
 						}
 						INTFLAG = true;
 
@@ -2814,11 +2832,11 @@ namespace SolarShading {
 							if ( KK != 0 ) {
 								auto const x( XTEMP( NVTEMP ) );
 								auto const y( YTEMP( NVTEMP ) );
-								for ( K = 1; K <= KK; ++K ) {
+								for ( int K = 1; K <= KK; ++K ) {
 									if ( std::abs( x - XTEMP( K ) ) > 2.0 ) continue;
 									if ( std::abs( y - YTEMP( K ) ) > 2.0 ) continue;
 									NVTEMP = KK;
-									break; // K DO loop
+									break; // K loop
 								}
 							}
 						}
@@ -2826,21 +2844,32 @@ namespace SolarShading {
 					}
 				}
 				S = P;
+				XTEMP1_S = XTEMP1_P;
+				YTEMP1_S = YTEMP1_P;
 			} // end loop over points of subject polygon
 
 			NVOUT = NVTEMP;
+			if ( NVOUT == 0 ) break; // Added to avoid array bounds violation of XTEMP1 and YTEMP1 and wasted looping
 			NVTEMP = 0;
 
 			if ( E != NV2 ) {
 				if ( NVOUT > 2 ) { // Compute HC values for edges of output polygon
-					for ( P = 1; P <= NVOUT - 1; ++P ) {
-						ATEMP( P ) = YTEMP( P ) - YTEMP( P + 1 );
-						BTEMP( P ) = XTEMP( P + 1 ) - XTEMP( P );
-						CTEMP( P ) = XTEMP( P ) * YTEMP( P + 1 ) - YTEMP( P ) * XTEMP( P + 1 );
+					Real64 const X_1( XTEMP( 1 ) );
+					Real64 const Y_1( YTEMP( 1 ) );
+					Real64 X_P( X_1 ), X_P1;
+					Real64 Y_P( Y_1 ), Y_P1;
+					for ( int P = 1; P < NVOUT; ++P ) {
+						X_P1 = XTEMP( P + 1 );
+						Y_P1 = YTEMP( P + 1 );
+						ATEMP( P ) = Y_P - Y_P1;
+						BTEMP( P ) = X_P1 - X_P;
+						CTEMP( P ) = X_P * Y_P1 - Y_P * X_P1;
+						X_P = X_P1;
+						Y_P = Y_P1;
 					}
-					ATEMP( NVOUT ) = YTEMP( NVOUT ) - YTEMP( 1 );
-					BTEMP( NVOUT ) = XTEMP( 1 ) - XTEMP( NVOUT );
-					CTEMP( NVOUT ) = XTEMP( NVOUT ) * YTEMP( 1 ) - YTEMP( NVOUT ) * XTEMP( 1 );
+					ATEMP( NVOUT ) = Y_P1 - Y_1;
+					BTEMP( NVOUT ) = X_1 - X_P1;
+					CTEMP( NVOUT ) = X_P1 * Y_1 - Y_P1 * X_1;
 				}
 			}
 
@@ -3201,7 +3230,7 @@ namespace SolarShading {
 				auto l( HCX.index( 1, NS3 ) );
 				for ( N = 1; N <= NV3; ++N, ++l ) {
 					HCX[ l ] = nint64( XTEMP( N ) ); // [ l ] == ( N, NS3 )
-					HCY[ l ] = nint64( YTEMP( N ) ); // [ l ] == ( N, NS3 )
+					HCY[ l ] = nint64( YTEMP( N ) );
 				}
 			}
 
@@ -3214,12 +3243,13 @@ namespace SolarShading {
 				if ( HCAREA( NS1 ) * HCAREA( NS2 ) > 0.0 ) HCAREA( NS3 ) = -HCAREA( NS3 ); // Determine sign of area of overlap
 				Real64 const HCT_1( HCT( NS1 ) );
 				Real64 const HCT_2( HCT( NS2 ) );
-				HCT( NS3 ) = HCT_2 * HCT_1; // Determine transmission of overlap
-				if ( HCT_2 != 1.0 && HCT_2 != 0.0 && HCT_1 != 1.0 && HCT_1 != 0.0 ) {
-					if ( HCT_2 >= 0.5 && HCT_1 >= 0.5 ) {
-						HCT( NS3 ) = 1.0 - HCT( NS3 );
+				Real64 HCT_3( HCT_2 * HCT_1 ); // Determine transmission of overlap
+				if ( HCT_2 >= 0.5 && HCT_1 >= 0.5 ) {
+					if ( HCT_2 != 1.0 && HCT_1 != 1.0 ) {
+						HCT_3 = 1.0 - HCT_3;
 					}
 				}
+				HCT( NS3 ) = HCT_3;
 			}
 
 		} else if ( NV3 > MaxHCV ) {
@@ -3480,7 +3510,7 @@ namespace SolarShading {
 		Real64 Fac1WoShdg; // Intermediate calculation factor, without shading
 		Real64 Fac1WithShdg; // Intermediate calculation factor, with shading
 
-		//Recover the sun direction from the array stored in previous loop
+		// Recover the sun direction from the array stored in previous loop
 		SUNCOS = SUNCOSTS( {1,3}, iHour, iTimeStep );
 
 		CTHETA = 0.0;
@@ -3631,7 +3661,6 @@ namespace SolarShading {
 		FArray1D_int GSS; // List of shadowing surfaces numbers for a receiving surface
 		FArray1D_int BKS; // List of back surface numbers for a receiving surface
 		FArray1D_int SBS; // List of subsurfaces for a receiving surface
-		FArray1D_int ListTemp; // Temporary array for reallocations
 		static int MaxGSS( 50 ); // Current Max for GSS array
 		static int MaxBKS( 50 ); // Current Max for BKS array
 		static int MaxSBS( 50 ); // Current Max for SBS array
@@ -3659,15 +3688,15 @@ namespace SolarShading {
 
 		CastingSurface.dimension( TotSurfaces, false );
 
-		HCA.dimension( MaxHCV + 1, MaxHCS * 2, 0 );
-		HCB.dimension( MaxHCV + 1, MaxHCS * 2, 0 );
-		HCC.dimension( MaxHCV + 1, MaxHCS * 2, 0 );
-		HCX.dimension( MaxHCV + 1, MaxHCS * 2, 0 );
-		HCY.dimension( MaxHCV + 1, MaxHCS * 2, 0 );
-		HCAREA.dimension( MaxHCS * 2, 0.0 );
-		HCNS.dimension( MaxHCS * 2, 0 );
-		HCNV.dimension( MaxHCS * 2, 0 );
-		HCT.dimension( MaxHCS * 2, 0.0 );
+		HCA.dimension( MaxHCV + 1, 2 * MaxHCS, 0 );
+		HCB.dimension( MaxHCV + 1, 2 * MaxHCS, 0 );
+		HCC.dimension( MaxHCV + 1, 2 * MaxHCS, 0 );
+		HCX.dimension( MaxHCV + 1, 2 * MaxHCS, 0 );
+		HCY.dimension( MaxHCV + 1, 2 * MaxHCS, 0 );
+		HCAREA.dimension( 2 * MaxHCS, 0.0 );
+		HCNS.dimension( 2 * MaxHCS, 0 );
+		HCNV.dimension( 2 * MaxHCS, 0 );
+		HCT.dimension( 2 * MaxHCS, 0.0 );
 
 		GSS.dimension( MaxGSS, 0 );
 		BKS.dimension( MaxGSS, 0 );
@@ -3716,14 +3745,7 @@ namespace SolarShading {
 
 						++NGSS;
 						if ( NGSS > MaxGSS ) {
-							ListTemp.allocate( MaxGSS * 2 );
-							ListTemp = 0;
-							ListTemp( {1,MaxGSS} ) = GSS( {1,MaxGSS} );
-							GSS.deallocate();
-							GSS.allocate( MaxGSS * 2 );
-							GSS = ListTemp;
-							MaxGSS *= 2;
-							ListTemp.deallocate();
+							GSS.redimension( MaxGSS *= 2, 0 );
 						}
 						GSS( NGSS ) = GSSNR;
 
@@ -3733,14 +3755,7 @@ namespace SolarShading {
 						if ( ! CannotShade ) { // Update the shadowing surface data if shading is possible
 							++NGSS;
 							if ( NGSS > MaxGSS ) {
-								ListTemp.allocate( MaxGSS * 2 );
-								ListTemp = 0;
-								ListTemp( {1,MaxGSS} ) = GSS( {1,MaxGSS} );
-								GSS.deallocate();
-								GSS.allocate( MaxGSS * 2 );
-								GSS = ListTemp;
-								MaxGSS *= 2;
-								ListTemp.deallocate();
+								GSS.redimension( MaxGSS *= 2, 0 );
 							}
 							GSS( NGSS ) = GSSNR;
 						}
@@ -3757,14 +3772,7 @@ namespace SolarShading {
 					if ( Surface( GSSNR ).BaseSurf == GRSNR ) { // Shadowing subsurface of receiving surface
 						++NGSS;
 						if ( NGSS > MaxGSS ) {
-							ListTemp.allocate( MaxGSS * 2 );
-							ListTemp = 0;
-							ListTemp( {1,MaxGSS} ) = GSS( {1,MaxGSS} );
-							GSS.deallocate();
-							GSS.allocate( MaxGSS * 2 );
-							GSS = ListTemp;
-							MaxGSS *= 2;
-							ListTemp.deallocate();
+							GSS.redimension( MaxGSS *= 2, 0 );
 						}
 						GSS( NGSS ) = GSSNR;
 					}
@@ -3787,14 +3795,7 @@ namespace SolarShading {
 				// severe error if not
 				++NSBS;
 				if ( NSBS > MaxSBS ) {
-					ListTemp.allocate( MaxSBS * 2 );
-					ListTemp = 0;
-					ListTemp( {1,MaxSBS} ) = SBS( {1,MaxSBS} );
-					SBS.deallocate();
-					SBS.allocate( MaxSBS * 2 );
-					SBS = ListTemp;
-					MaxSBS *= 2;
-					ListTemp.deallocate();
+					SBS.redimension( MaxSBS *= 2, 0 );
 				}
 				SBS( NSBS ) = SBSNR;
 
@@ -3822,14 +3823,7 @@ namespace SolarShading {
 					CHKBKS( BackSurfaceNumber, GRSNR ); // CHECK FOR CONVEX ZONE; severe error if not
 					++NBKS;
 					if ( NBKS > MaxBKS ) {
-						ListTemp.allocate( MaxBKS * 2 );
-						ListTemp = 0;
-						ListTemp( {1,MaxBKS} ) = BKS( {1,MaxBKS} );
-						BKS.deallocate();
-						BKS.allocate( MaxBKS * 2 );
-						BKS = ListTemp;
-						MaxBKS *= 2;
-						ListTemp.deallocate();
+						BKS.redimension( MaxBKS *= 2, 0 );
 					}
 					BKS( NBKS ) = BackSurfaceNumber;
 
@@ -4153,6 +4147,7 @@ namespace SolarShading {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		typedef  FArray2D< Int64 >::size_type  size_type;
 		int I;
 		int M;
 		int N;
@@ -4166,6 +4161,11 @@ namespace SolarShading {
 		int NS1; // Number of the figure being overlapped
 		int NS2; // Number of the figure doing overlapping
 		int NS3; // Location to place results of overlap
+
+		//Tuned Linear indexing
+
+		assert( equal_dimensions( HCX, HCY ) );
+		assert( equal_dimensions( HCX, HCA ) );
 
 		if ( OneTimeFlag ) {
 			XVT.allocate( MaxVerticesPerSurface + 1 );
@@ -4210,12 +4210,17 @@ namespace SolarShading {
 			// Adjust near-duplicate points.
 
 			NVR = HCNV( 1 );
-			for ( N = 1; N <= NVT; ++N ) {
-				for ( M = 1; M <= NVR; ++M ) {
-					if ( std::abs( HCX( M, 1 ) - HCX( N, NS3 ) ) > 6 ) continue;
-					if ( std::abs( HCY( M, 1 ) - HCY( N, NS3 ) ) > 6 ) continue;
-					HCX( N, NS3 ) = HCX( M, 1 );
-					HCY( N, NS3 ) = HCY( M, 1 );
+			auto l3( HCX.index( 1, NS3 ) );
+			for ( N = 1; N <= NVT; ++N, ++l3 ) {
+				auto const x3( HCX[ l3 ] ); // [ l3 ] == ( N, NS3 )
+				auto const y3( HCY[ l3 ] );
+				size_type l1( 0 );
+				for ( M = 1; M <= NVR; ++M, ++l1 ) {
+					if ( std::abs( HCX[ l1 ] - x3 ) > 6 ) continue; // [ l1 ] == ( M, 1 )
+					if ( std::abs( HCY[ l1 ] - y3 ) > 6 ) continue;
+					HCX[ l3 ] = HCX[ l1 ];
+					HCY[ l3 ] = HCY[ l1 ];
+					break;
 				}
 			}
 
@@ -4287,15 +4292,10 @@ namespace SolarShading {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int I;
-		int N;
-		int M;
-		int NVR;
-		Real64 A; // Area
+		typedef  FArray2D< Int64 >::size_type  size_type;
 		int GSSNR; // General shadowing surface number
 		int MainOverlapStatus; // Overlap status of the main overlap calculation not the check for
 		// multiple overlaps (unless there was an error)
-		int NVT;
 		static FArray1D< Real64 > XVT;
 		static FArray1D< Real64 > YVT;
 		static FArray1D< Real64 > ZVT;
@@ -4304,7 +4304,6 @@ namespace SolarShading {
 		int NS2; // Number of the figure doing overlapping
 		int NS3; // Location to place results of overlap
 		Real64 SchValue; // Value for Schedule of shading transmittence
-		int ExitLoopStatus;
 
 		if ( OneTimeFlag ) {
 			XVT.dimension( MaxVerticesPerSurface + 1, 0.0 );
@@ -4323,18 +4322,17 @@ namespace SolarShading {
 
 		} else {
 
+			int ExitLoopStatus( -1 );
 			auto const & GenSurf( ShadowComb( CurSurf ).GenSurf );
-			ShadowingSurfaces: for ( I = 1; I <= NGSS; ++I ) { // Loop through all shadowing surfaces...
+			auto const sunIsUp( SunIsUpValue );
+			for ( int I = 1; I <= NGSS; ++I ) { // Loop through all shadowing surfaces...
 
 				GSSNR = GenSurf( I );
-				CurrentSurfaceBeingShadowed = GSSNR;
-				CurrentShadowingSurface = I;
 
-				ExitLoopStatus = -1;
-
-				if ( CTHETA( GSSNR ) > SunIsUpValue ) continue; //.001) CYCLE ! NO SHADOW IF GSS IN SUNLIGHT.
+				if ( CTHETA( GSSNR ) > sunIsUp ) continue; //.001) CYCLE ! NO SHADOW IF GSS IN SUNLIGHT.
 
 				auto const & surface( Surface( GSSNR ) );
+				bool const notHeatTransSurf( ! surface.HeatTransSurf );
 
 				//     This used to check to see if the shadowing surface was not opaque (within the scheduled dates of
 				//            transmittance value.  Perhaps it ignored it if it were outside the range.  (if so, was an error)
@@ -4343,25 +4341,12 @@ namespace SolarShading {
 				//---former stmt      IF ((.NOT.Surface(GSSNR)%HeatTransSurf) .AND. &
 				//---former stmt            GetCurrentScheduleValue(Surface(GSSNR)%SchedShadowSurfIndex,IHOUR) == 0.0) CYCLE
 
-				if ( ! surface.HeatTransSurf ) {
-					if ( surface.IsTransparent ) continue;
+				if ( notHeatTransSurf ) {
+					if ( surface.IsTransparent ) continue; // No shadow if shading surface is transparent
 					if ( surface.SchedShadowSurfIndex > 0 ) {
 						if ( LookUpScheduleValue( surface.SchedShadowSurfIndex, iHour ) == 1.0 ) continue;
-					}
-				}
-
-				//      No shadow if shading surface is transparent
-				if ( ! CalcSkyDifShading ) {
-					if ( ! surface.HeatTransSurf ) {
-						if ( surface.IsTransparent ) continue;
-						if ( surface.SchedShadowSurfIndex > 0 ) {
+						if ( ! CalcSkyDifShading ) {
 							if ( LookUpScheduleValue( surface.SchedShadowSurfIndex, iHour, TS ) == 1.0 ) continue;
-						}
-					}
-				} else {
-					if ( ! surface.HeatTransSurf ) {
-						if ( surface.SchedShadowSurfIndex > 0 ) {
-							if ( surface.IsTransparent ) continue;
 						}
 					}
 				}
@@ -4371,7 +4356,7 @@ namespace SolarShading {
 
 				// Transform shadow casting surface from cartesian to homogeneous coordinates according to surface type.
 
-				if ( ( surface.BaseSurf != 0 ) && ( ! surface.HeatTransSurf ) ) {
+				if ( ( notHeatTransSurf ) && ( surface.BaseSurf != 0 ) ) {
 
 					// For shadowing subsurface coordinates of shadow casting surface are relative to the receiving surface
 					// project shadow to the receiving surface
@@ -4380,22 +4365,23 @@ namespace SolarShading {
 					auto const & XV( ShadeV( GSSNR ).XV );
 					auto const & YV( ShadeV( GSSNR ).YV );
 					auto const & ZV( ShadeV( GSSNR ).ZV );
-					for ( N = 1; N <= NVS; ++N ) {
+					for ( int N = 1; N <= NVS; ++N ) {
 						XVS( N ) = XV( N ) - XShadowProjection * ZV( N );
 						YVS( N ) = YV( N ) - YShadowProjection * ZV( N );
 					}
 
 				} else {
 					// Transform coordinates of shadow casting surface from general system to the system relative to the receiving surface
+					int NVT;
 					CTRANS( GSSNR, NGRS, NVT, XVT, YVT, ZVT );
 					CLIP( NVT, XVT, YVT, ZVT ); // Clip portions of the shadow casting surface which are behind the receiving surface
 
 					if ( NumVertInShadowOrClippedSurface <= 2 ) continue;
 
-					// Project shadow from shadow casting surface along sun's rays to receiving surface  Shadow vertices
+					// Project shadow from shadow casting surface along sun's rays to receiving surface Shadow vertices
 					// become clockwise sequential
 
-					for ( N = 1; N <= NumVertInShadowOrClippedSurface; ++N ) {
+					for ( int N = 1; N <= NumVertInShadowOrClippedSurface; ++N ) {
 						XVS( N ) = XVC( N ) - XShadowProjection * ZVC( N );
 						YVS( N ) = YVC( N ) - YShadowProjection * ZVC( N );
 					}
@@ -4409,22 +4395,22 @@ namespace SolarShading {
 
 				// Adjust near-duplicate points.
 
-				assert( equal_dimensions( HCX, HCY ) ); // For linear indexing
-				assert( HCX.index( 1, 1 ) == 0u ); // For linear indexing
-				FArray2D< Int64 >::size_type l, j( HCX.index( 1, NS3 ) );
-				NVR = HCNV( 1 );
-				for ( N = 1; N <= NumVertInShadowOrClippedSurface; ++N, ++j ) {
-					auto HCX_N( HCX[ j ] ); // [ j ] == ( N, NS3 )
-					auto HCY_N( HCY[ j ] );
-					l = 0u;
-					for ( M = 1; M <= NVR; ++M, ++l ) { // [ l ] == ( M, 1 )
-						if ( std::abs( HCX[ l ] - HCX_N ) > 6 ) continue;
-						if ( std::abs( HCY[ l ] - HCY_N ) > 6 ) continue;
-						HCX_N = HCX[ l ]; //? This is fishy: Ends up with last values that get past the abs checks
-						HCY_N = HCY[ l ];
+				assert( equal_dimensions( HCX, HCY ) );
+				assert( HCX.index( 1, 1 ) == 0u );
+				size_type j( HCX.index( 1, NS3 ) );
+				size_type NVR( HCNV( 1 ) );
+				for ( int N = 1; N <= NumVertInShadowOrClippedSurface; ++N, ++j ) { //Tuned Logic change: break after 1st "close" point found
+					auto const HCX_N( HCX[ j ] ); // [ j ] == ( N, NS3 )
+					auto const HCY_N( HCY[ j ] );
+					for ( size_type l = 0; l < NVR; ++l ) { // [ l ] == ( l+1, 1 )
+						auto const delX( std::abs( HCX[ l ] - HCX_N ) );
+						if ( delX > 6 ) continue;
+						auto const delY( std::abs( HCY[ l ] - HCY_N ) );
+						if ( delY > 6 ) continue;
+						if ( delX > 0 ) HCX[ j ] = HCX[ l ]; // [ j ] == ( N, NS3 )
+						if ( delY > 0 ) HCY[ j ] = HCY[ l ];
+						break;
 					}
-					HCX[ j ] = HCX_N; // [ j ] == ( N, NS3 )
-					HCY[ j ] = HCY_N;
 				}
 				HTRANS0( NS3, NumVertInShadowOrClippedSurface );
 				if ( ! CalcSkyDifShading ) {
@@ -4441,6 +4427,8 @@ namespace SolarShading {
 
 				// Determine overlap of shadow with receiving surface
 
+				CurrentShadowingSurface = I;
+				CurrentSurfaceBeingShadowed = GSSNR;
 				NS1 = 1;
 				NS2 = NS3;
 				DeterminePolygonOverlap( NS1, NS2, NS3 );
@@ -4450,26 +4438,19 @@ namespace SolarShading {
 				ExitLoopStatus = MainOverlapStatus;
 
 				if ( MainOverlapStatus == NoOverlap ) { // No overlap of general surface shadow and receiving surface
-					continue;
-
+					// Continue
 				} else if ( ( MainOverlapStatus == FirstSurfWithinSecond ) || ( MainOverlapStatus == TooManyVertices ) || ( MainOverlapStatus == TooManyFigures ) ) {
 					goto ShadowingSurfaces_exit;
-
 				} else if ( ( MainOverlapStatus == SecondSurfWithinFirst ) || ( MainOverlapStatus == PartialOverlap ) ) {
 					// Determine overlaps with previous shadows.
 					LOCHCA = NS3;
 					NGSSHC = LOCHCA - FGSSHC + 1;
-					if ( NGSSHC <= 1 ) continue;
-					MULTOL( LOCHCA, FGSSHC - 1, NGSSHC - 1 ); // HOYT - Remove this call
-
+					if ( NGSSHC > 1 ) MULTOL( LOCHCA, FGSSHC - 1, NGSSHC - 1 ); // HOYT - Remove this call
 				} else {
 					goto ShadowingSurfaces_exit;
-
 				}
 
 				ExitLoopStatus = -1;
-
-				ShadowingSurfaces_loop: ;
 			}
 			ShadowingSurfaces_exit: ;
 
@@ -4491,9 +4472,9 @@ namespace SolarShading {
 				if ( NGSSHC <= 0 ) {
 					SAREA( HTS ) = HCAREA( 1 ); // Surface fully sunlit
 				} else {
-					A = HCAREA( 1 );
-					for ( I = 1; I <= NGSSHC; ++I ) {
-						A += HCAREA( FGSSHC - 1 + I ) * ( 1.0 - HCT( FGSSHC - 1 + I ) );
+					Real64 A( HCAREA( 1 ) ); // Area
+					for ( int i = FGSSHC, e = FGSSHC + NGSSHC - 1; i <= e; ++i ) {
+						A += HCAREA( i ) * ( 1.0 - HCT( i ) );
 					}
 					SAREA( HTS ) = A;
 					if ( SAREA( HTS ) <= 0.0 ) { // Surface fully shaded
@@ -4564,9 +4545,7 @@ namespace SolarShading {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int I; // DO loop index
-		int J;
-		int IBKS; // Back surface DO loop index
+		typedef  FArray2D< Int64 >::size_type  size_type;
 		int JBKS; // Counter of back surfaces with non-zero overlap with HTSS
 		int JBKSbase; // Back base surface counter
 		int BackSurfNum; // Back surface number
@@ -4576,6 +4555,13 @@ namespace SolarShading {
 		// (all incoming beam assumed to strike floor),
 		// FALSE means exact interior solar distribution
 		// (track which back surfaces beam illuminates)
+
+		//Tuned Linear indexing
+
+		assert( equal_dimensions( HCX, HCY ) );
+		assert( equal_dimensions( HCX, HCA ) );
+		assert( equal_dimensions( HCX, HCB ) );
+		assert( equal_dimensions( HCX, HCC ) );
 
 		if ( SAREA( HTSS ) > 0.0 ) {
 
@@ -4597,16 +4583,20 @@ namespace SolarShading {
 				// only by reveal (FCW 6/28/02).
 				if ( WindowRevealStatus( HTSS, iHour, TS ) == WindowShadedOnlyByReveal ) NRVLHC = 1;
 				if ( NRVLHC > 0 ) {
-					for ( I = 1; I <= NRVLHC; ++I ) {
-						HCT( FSBSHC - 1 + I ) = HCT( FRVLHC - 1 + I );
-						HCNV( FSBSHC - 1 + I ) = HCNV( FRVLHC - 1 + I );
-						HCAREA( FSBSHC - 1 + I ) = HCAREA( FRVLHC - 1 + I );
-						for ( J = 1; J <= MaxHCV; ++J ) {
-							HCX( J, FSBSHC - 1 + I ) = HCX( J, FRVLHC - 1 + I );
-							HCY( J, FSBSHC - 1 + I ) = HCY( J, FRVLHC - 1 + I );
-							HCA( J, FSBSHC - 1 + I ) = HCA( J, FRVLHC - 1 + I );
-							HCB( J, FSBSHC - 1 + I ) = HCB( J, FRVLHC - 1 + I );
-							HCC( J, FSBSHC - 1 + I ) = HCC( J, FRVLHC - 1 + I );
+					for ( int I = 1; I <= NRVLHC; ++I ) {
+						int const iS( FSBSHC - 1 + I );
+						int const iR( FRVLHC - 1 + I );
+						HCT( iS ) = HCT( iR );
+						HCNV( iS ) = HCNV( iR );
+						HCAREA( iS ) = HCAREA( iR );
+						size_type lS( HCX.index( 1, iS ) );
+						size_type lR( HCX.index( 1, iR ) );
+						for ( int J = 1; J <= MaxHCV; ++J, ++lS, ++lR ) { // [ lS ] == ( J, iS ), [ lR ] == ( J, iR )
+							HCX[ lS ] = HCX[ lR ];
+							HCY[ lS ] = HCY[ lR ];
+							HCA[ lS ] = HCA[ lR ];
+							HCB[ lS ] = HCB[ lR ];
+							HCC[ lS ] = HCC[ lR ];
 						}
 					}
 					NSBSHC = NRVLHC;
@@ -4624,7 +4614,7 @@ namespace SolarShading {
 				JBKS = 0;
 				JBKSbase = 0;
 
-				for ( IBKS = 1; IBKS <= NBKSHC; ++IBKS ) { // Loop over back surfaces to GRSNR this hour. NBKSHC is the number of
+				for ( int IBKS = 1; IBKS <= NBKSHC; ++IBKS ) { // Loop over back surfaces to GRSNR this hour. NBKSHC is the number of
 					// back surfaces that would receive beam radiation from the base surface, GRSNR,
 					// if the base surface was transparent. In general, some (at least one) or all of these
 					// will receive beam radiation from the exterior window subsurface, HTSS, of GRSNR,
@@ -4644,7 +4634,7 @@ namespace SolarShading {
 					NINSHC = LOCHCA - FINSHC + 1;
 					if ( NINSHC <= 0 ) continue;
 					OverlapArea = HCAREA( FINSHC );
-					for ( J = 2; J <= NINSHC; ++J ) {
+					for ( int J = 2; J <= NINSHC; ++J ) {
 						OverlapArea += HCAREA( FINSHC - 1 + J ) * ( 1.0 - HCT( FINSHC - 1 + J ) );
 					}
 
@@ -6387,11 +6377,11 @@ namespace SolarShading {
 										AdjZoneNum = Surface( AdjSurfNum ).Zone;
 										DBZoneIntWin( AdjZoneNum ) += BOverlap * TransBeamWin; //[m2]
 										SurfaceWindow( BackSurfNum ).BmSolTransThruIntWinRep += BOverlap * TransBeamWin * BeamSolarRad; //[W]
-										SurfaceWindow( BackSurfNum ).BmSolTransThruIntWinRepEnergy = SurfaceWindow( BackSurfNum ).BmSolTransThruIntWinRep * TimeStepZone * SecInHour;
+										SurfaceWindow( BackSurfNum ).BmSolTransThruIntWinRepEnergy = SurfaceWindow( BackSurfNum ).BmSolTransThruIntWinRep * TimeStepZoneSec;
 									}
 								} // End of check if back surface is opaque or window
 								BmIncInsSurfAmountRep( BackSurfNum ) += BOverlap;
-								BmIncInsSurfAmountRepEnergy( BackSurfNum ) = BmIncInsSurfAmountRep( BackSurfNum ) * TimeStepZone * SecInHour;
+								BmIncInsSurfAmountRepEnergy( BackSurfNum ) = BmIncInsSurfAmountRep( BackSurfNum ) * TimeStepZoneSec;
 							} // End of loop over back surfaces
 						} else if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) {
 							// For complex window calculation goes over outgoing basis directions
@@ -6502,7 +6492,7 @@ namespace SolarShading {
 														AdjZoneNum = Surface( AdjSurfNum ).Zone;
 														DBZoneIntWin( AdjZoneNum ) += CFDirBoverlap( CurTrnDir, IBack ) * SurfaceWindow( BackSurfaceNumber ).ComplexFen.State( CurBackState ).IntegratedBkTrans( bestBackTrn );
 														SurfaceWindow( BackSurfaceNumber ).BmSolTransThruIntWinRep += CFDirBoverlap( CurTrnDir, IBack ) * SurfaceWindow( BackSurfaceNumber ).ComplexFen.State( CurBackState ).IntegratedBkTrans( bestBackTrn ) * BeamSolarRad; //[W]
-														SurfaceWindow( BackSurfaceNumber ).BmSolTransThruIntWinRepEnergy = SurfaceWindow( BackSurfaceNumber ).BmSolTransThruIntWinRep * TimeStepZone * SecInHour;
+														SurfaceWindow( BackSurfaceNumber ).BmSolTransThruIntWinRepEnergy = SurfaceWindow( BackSurfaceNumber ).BmSolTransThruIntWinRep * TimeStepZoneSec;
 													}
 												}
 											}
@@ -6637,11 +6627,11 @@ namespace SolarShading {
 										AdjZoneNum = Surface( AdjSurfNum ).Zone;
 										DBZoneIntWin( AdjZoneNum ) += BOverlap * TransBeamWin; //[m2]
 										SurfaceWindow( BackSurfNum ).BmSolTransThruIntWinRep += BOverlap * TransBeamWin * BeamSolarRad; //[W]
-										SurfaceWindow( BackSurfNum ).BmSolTransThruIntWinRepEnergy = SurfaceWindow( BackSurfNum ).BmSolTransThruIntWinRep * TimeStepZone * SecInHour;
+										SurfaceWindow( BackSurfNum ).BmSolTransThruIntWinRepEnergy = SurfaceWindow( BackSurfNum ).BmSolTransThruIntWinRep * TimeStepZoneSec;
 									}
 								} // End of check if back surface is opaque or window
 								BmIncInsSurfAmountRep( BackSurfNum ) += BOverlap;
-								BmIncInsSurfAmountRepEnergy( BackSurfNum ) = BmIncInsSurfAmountRep( BackSurfNum ) * TimeStepZone * SecInHour;
+								BmIncInsSurfAmountRepEnergy( BackSurfNum ) = BmIncInsSurfAmountRep( BackSurfNum ) * TimeStepZoneSec;
 							} // End of loop over back surfaces
 
 							//  *****************************
@@ -6740,7 +6730,7 @@ namespace SolarShading {
 				if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 				if ( SolarDistribution == FullInteriorExterior ) {
 					BmIncInsSurfAmountRep( SurfNum ) *= BeamSolarRad;
-					BmIncInsSurfAmountRepEnergy( SurfNum ) = BmIncInsSurfAmountRep( SurfNum ) * TimeStepZone * SecInHour;
+					BmIncInsSurfAmountRepEnergy( SurfNum ) = BmIncInsSurfAmountRep( SurfNum ) * TimeStepZoneSec;
 					BmIncInsSurfIntensRep( SurfNum ) = BmIncInsSurfAmountRep( SurfNum ) / ( Surface( SurfNum ).Area + SurfaceWindow( SurfNum ).DividerArea );
 				} else { // Simple interior solar distribution. All beam falls on floor.
 					if ( ISABSF( SurfNum ) > 0.0 && Surface( SurfNum ).HeatTransSurf ) {
@@ -6756,7 +6746,7 @@ namespace SolarShading {
 						}
 					}
 					BmIncInsSurfAmountRep( SurfNum ) = Surface( SurfNum ).Area * BmIncInsSurfIntensRep( SurfNum );
-					BmIncInsSurfAmountRepEnergy( SurfNum ) = BmIncInsSurfAmountRep( SurfNum ) * TimeStepZone * SecInHour;
+					BmIncInsSurfAmountRepEnergy( SurfNum ) = BmIncInsSurfAmountRep( SurfNum ) * TimeStepZoneSec;
 				}
 				if ( Surface( SurfNum ).Class == SurfaceClass_Window || Surface( SurfNum ).Class == SurfaceClass_TDD_Dome ) {
 
@@ -6786,11 +6776,11 @@ namespace SolarShading {
 
 							WinBmSolar( SurfNum ) = BeamSolarRad * WinTransBmSolar( SurfNum );
 							WinDifSolar( SurfNum ) = SkySolarTrans * Surface( SurfNum ).Area + GndSolarTrans * Surface( SurfNum ).Area;
-							WinBmSolarEnergy( SurfNum ) = WinBmSolar( SurfNum ) * TimeStepZone * SecInHour;
-							WinDifSolarEnergy( SurfNum ) = WinDifSolar( SurfNum ) * TimeStepZone * SecInHour;
+							WinBmSolarEnergy( SurfNum ) = WinBmSolar( SurfNum ) * TimeStepZoneSec;
+							WinDifSolarEnergy( SurfNum ) = WinDifSolar( SurfNum ) * TimeStepZoneSec;
 
 							WinTransSolar( SurfNum ) = WinBmSolar( SurfNum ) + WinDifSolar( SurfNum ); //[W]
-							WinTransSolarEnergy( SurfNum ) = WinTransSolar( SurfNum ) * TimeStepZone * SecInHour;
+							WinTransSolarEnergy( SurfNum ) = WinTransSolar( SurfNum ) * TimeStepZoneSec;
 
 							TDDPipe( PipeNum ).TransmittedSolar = WinTransSolar( SurfNum );
 							//TDDPipe(PipeNum)%TransSolBeam = TBmBm ! Reported above
@@ -6807,11 +6797,11 @@ namespace SolarShading {
 
 							WinBmSolar( SurfNum ) = BeamSolarRad * WinTransBmSolar( SurfNum );
 							WinDifSolar( SurfNum ) = DifSolarInc * WinTransDifSolar( SurfNum );
-							WinBmSolarEnergy( SurfNum ) = WinBmSolar( SurfNum ) * TimeStepZone * SecInHour;
-							WinDifSolarEnergy( SurfNum ) = WinDifSolar( SurfNum ) * TimeStepZone * SecInHour;
+							WinBmSolarEnergy( SurfNum ) = WinBmSolar( SurfNum ) * TimeStepZoneSec;
+							WinDifSolarEnergy( SurfNum ) = WinDifSolar( SurfNum ) * TimeStepZoneSec;
 
 							WinTransSolar( SurfNum ) = WinBmSolar( SurfNum ) + WinDifSolar( SurfNum ); //[W]
-							WinTransSolarEnergy( SurfNum ) = WinTransSolar( SurfNum ) * TimeStepZone * SecInHour;
+							WinTransSolarEnergy( SurfNum ) = WinTransSolar( SurfNum ) * TimeStepZoneSec;
 
 						} else { // Regular window
 							SkySolarInc = SurfaceWindow( SurfNum ).SkySolarInc;
@@ -6822,17 +6812,17 @@ namespace SolarShading {
 							// transmittance for sky and ground diffuse radiation (including beam radiation reflected from the ground)
 							// so these calculations should be correct
 							WinDifSolar( SurfNum ) = DifSolarInc * WinTransDifSolar( SurfNum );
-							WinBmSolarEnergy( SurfNum ) = WinBmSolar( SurfNum ) * TimeStepZone * SecInHour;
-							WinDifSolarEnergy( SurfNum ) = WinDifSolar( SurfNum ) * TimeStepZone * SecInHour;
+							WinBmSolarEnergy( SurfNum ) = WinBmSolar( SurfNum ) * TimeStepZoneSec;
+							WinDifSolarEnergy( SurfNum ) = WinDifSolar( SurfNum ) * TimeStepZoneSec;
 							if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
 								if ( Blind( SurfaceWindow( SurfNum ).BlindNumber ).SlatOrientation == Horizontal ) {
 									WinDifSolar( SurfNum ) = SkySolarInc * WinTransDifSolarSky( SurfNum ) + GndSolarInc * WinTransDifSolarGnd( SurfNum );
-									WinDifSolarEnergy( SurfNum ) = WinDifSolar( SurfNum ) * TimeStepZone * SecInHour;
+									WinDifSolarEnergy( SurfNum ) = WinDifSolar( SurfNum ) * TimeStepZoneSec;
 								}
 							}
 
 							WinTransSolar( SurfNum ) = WinBmSolar( SurfNum ) + WinDifSolar( SurfNum ); //[W]
-							WinTransSolarEnergy( SurfNum ) = WinTransSolar( SurfNum ) * TimeStepZone * SecInHour;
+							WinTransSolarEnergy( SurfNum ) = WinTransSolar( SurfNum ) * TimeStepZoneSec;
 
 						}
 
@@ -6840,19 +6830,19 @@ namespace SolarShading {
 						WinBmBmSolar( SurfNum ) = BeamSolarRad * WinTransBmBmSolar;
 
 						WinBmDifSolar( SurfNum ) = BeamSolarRad * WinTransBmDifSolar;
-						WinBmBmSolarEnergy( SurfNum ) = WinBmBmSolar( SurfNum ) * TimeStepZone * SecInHour;
-						WinBmDifSolarEnergy( SurfNum ) = WinBmDifSolar( SurfNum ) * TimeStepZone * SecInHour;
+						WinBmBmSolarEnergy( SurfNum ) = WinBmBmSolar( SurfNum ) * TimeStepZoneSec;
+						WinBmDifSolarEnergy( SurfNum ) = WinBmDifSolar( SurfNum ) * TimeStepZoneSec;
 
 						WinDirSolTransAtIncAngle( SurfNum ) = TBmBm + TBmDif; // For TDD:DIFFUSER this is the TDD transmittance
 
 						// Solar not added by TDD:DOME; added to zone via TDD:DIFFUSER
 						if ( Surface( SurfNum ).Class != SurfaceClass_TDD_Dome ) {
 							ZoneTransSolar( ZoneNum ) += WinTransSolar( SurfNum ); //[W]
-							ZoneTransSolarEnergy( ZoneNum ) = ZoneTransSolar( ZoneNum ) * TimeStepZone * SecInHour; //[J]
+							ZoneTransSolarEnergy( ZoneNum ) = ZoneTransSolar( ZoneNum ) * TimeStepZoneSec; //[J]
 							ZoneBmSolFrExtWinsRep( ZoneNum ) += WinBmSolar( SurfNum );
 							ZoneDifSolFrExtWinsRep( ZoneNum ) += WinDifSolar( SurfNum );
-							ZoneBmSolFrExtWinsRepEnergy( ZoneNum ) = ZoneBmSolFrExtWinsRep( ZoneNum ) * TimeStepZone * SecInHour; //[J]
-							ZoneDifSolFrExtWinsRepEnergy( ZoneNum ) = ZoneDifSolFrExtWinsRep( ZoneNum ) * TimeStepZone * SecInHour; //[J]
+							ZoneBmSolFrExtWinsRepEnergy( ZoneNum ) = ZoneBmSolFrExtWinsRep( ZoneNum ) * TimeStepZoneSec; //[J]
+							ZoneDifSolFrExtWinsRepEnergy( ZoneNum ) = ZoneDifSolFrExtWinsRep( ZoneNum ) * TimeStepZoneSec; //[J]
 						}
 
 					}
@@ -6866,7 +6856,7 @@ namespace SolarShading {
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			DBZone( ZoneNum ) += DBZoneIntWin( ZoneNum );
 			ZoneBmSolFrIntWinsRep( ZoneNum ) = DBZoneIntWin( ZoneNum ) * BeamSolarRad;
-			ZoneBmSolFrIntWinsRepEnergy( ZoneNum ) = ZoneBmSolFrIntWinsRep( ZoneNum ) * TimeStepZone * SecInHour; //[J]
+			ZoneBmSolFrIntWinsRepEnergy( ZoneNum ) = ZoneBmSolFrIntWinsRep( ZoneNum ) * TimeStepZoneSec; //[J]
 		}
 
 		// RJH - Calculate initial distribution of diffuse solar transmitted by exterior windows into each zone
@@ -9104,7 +9094,7 @@ namespace SolarShading {
 					BmSolRefldOutsReveal = A1ill * ( 1.0 - SurfaceWindow( SurfNum ).OutsideRevealSolAbs ) * CosBeta * tmp_SunlitFracWithoutReveal;
 
 					SurfaceWindow( SurfNum ).BmSolRefldOutsRevealReport += BeamSolarRad * BmSolRefldOutsReveal;
-					SurfaceWindow( SurfNum ).BmSolRefldOutsRevealRepEnergy = SurfaceWindow( SurfNum ).BmSolRefldOutsRevealReport * TimeStepZone * SecInHour;
+					SurfaceWindow( SurfNum ).BmSolRefldOutsRevealRepEnergy = SurfaceWindow( SurfNum ).BmSolRefldOutsRevealReport * TimeStepZoneSec;
 
 					// Reflected solar from outside horizontal and vertical reveal incident on glazing
 					SurfaceWindow( SurfNum ).OutsRevealDiffOntoGlazing += FracToGlassOuts * BmSolRefldOutsReveal / Surface( SurfNum ).Area;
@@ -9143,7 +9133,7 @@ namespace SolarShading {
 						SurfaceWindow( SurfNum ).BmSolRefldInsReveal += BmSolRefldInsReveal;
 
 						SurfaceWindow( SurfNum ).BmSolRefldInsRevealReport += BeamSolarRad * BmSolRefldInsReveal; // W, BeamSolarRad in W/m2
-						SurfaceWindow( SurfNum ).BmSolRefldInsRevealRepEnergy = SurfaceWindow( SurfNum ).BmSolRefldInsRevealReport * TimeStepZone * SecInHour;
+						SurfaceWindow( SurfNum ).BmSolRefldInsRevealRepEnergy = SurfaceWindow( SurfNum ).BmSolRefldInsRevealReport * TimeStepZoneSec;
 
 						// Reflected solar from inside horizontal and vertical reveal incident on glazing
 						SurfaceWindow( SurfNum ).InsRevealDiffOntoGlazing += FracToGlassIns * BmSolRefldInsReveal / Surface( SurfNum ).Area;
@@ -10605,19 +10595,13 @@ namespace SolarShading {
 		Real64 TotAOverlap; // Total overlap area for given outgoing direction
 		Real64 TotARhoVisOverlap; // Total overlap area time reflectance for given outgoing direction
 
-		XVT.allocate( MaxVerticesPerSurface + 1 );
-		YVT.allocate( MaxVerticesPerSurface + 1 );
-		ZVT.allocate( MaxVerticesPerSurface + 1 );
-		XVT = 0.0;
-		YVT = 0.0;
-		ZVT = 0.0;
+		XVT.dimension( MaxVerticesPerSurface + 1, 0.0 );
+		YVT.dimension( MaxVerticesPerSurface + 1, 0.0 );
+		ZVT.dimension( MaxVerticesPerSurface + 1, 0.0 );
 
-		Geom.AOverlap.allocate( Geom.Trn.NBasis, Window.NBkSurf );
-		Geom.AOverlap = 0.0;
-		Geom.ARhoVisOverlap.allocate( Geom.Trn.NBasis, Window.NBkSurf );
-		Geom.ARhoVisOverlap = 0.0;
-		Geom.AveRhoVisOverlap.allocate( Geom.Trn.NBasis );
-		Geom.AveRhoVisOverlap = 0.0;
+		Geom.AOverlap.dimension( Geom.Trn.NBasis, Window.NBkSurf, 0.0 );
+		Geom.ARhoVisOverlap.dimension( Geom.Trn.NBasis, Window.NBkSurf, 0.0 );
+		Geom.AveRhoVisOverlap.dimension( Geom.Trn.NBasis, 0.0 );
 
 		// First to calculate and store coordinates of the window surface
 		LOCHCA = 1;
@@ -10752,10 +10736,6 @@ namespace SolarShading {
 
 		// Reset back shadowing counter since complex windows do not need it anymore
 		LOCHCA = 1;
-
-		XVT.deallocate();
-		YVT.deallocate();
-		ZVT.deallocate();
 
 	}
 

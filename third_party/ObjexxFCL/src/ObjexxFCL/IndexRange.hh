@@ -716,15 +716,11 @@ private: // Data
 
 	int l_; // Lower index
 	int u_; // Upper index
-
 	size_type size_; // Size (npos iff unbounded)
 
 }; // IndexRange
 
-// Types
-typedef  IndexRange  IRange;
-
-// Comparison
+// Functions
 
 // IndexRange == IndexRange
 inline
@@ -773,8 +769,6 @@ operator >=( IndexRange const & I, IndexRange const & J )
 {
 	return ( I.positive() && J.positive() && ( I.l() >= J.u() ) );
 }
-
-// I/O
 
 // Stream Input
 std::istream &
