@@ -234,6 +234,7 @@ namespace Psychrometrics {
 	inline
 	Real64
 	PsyHfgAirFnWTdb(
+		Real64 const w, // humidity ratio {kgWater/kgDryAir} !unused1208
 		Real64 const T // input temperature {Celsius}
 	)
 	{
@@ -251,7 +252,7 @@ namespace Psychrometrics {
 
 		// REFERENCES:
 		// see ASHRAE Fundamentals Psychrometric Chapter
-		// USAGE:  hfg = PsyHfgAirFnWTdb(T)
+		// USAGE:  hfg = PsyHfgAirFnWTdb(w,T)
 
 		// Return value
 		// result => heat of vaporization for moist air {J/kg}
@@ -266,6 +267,7 @@ namespace Psychrometrics {
 	inline
 	Real64
 	PsyHgAirFnWTdb(
+		Real64 const w, // humidity ratio {kgWater/kgDryAir} !unused1208
 		Real64 const T // input temperature {Celsius}
 	)
 	{
@@ -282,7 +284,7 @@ namespace Psychrometrics {
 
 		// REFERENCES:
 		// see ASHRAE Fundamentals Psychrometric Chapter
-		// USAGE:  hg = PsyHgAirFnWTdb(T)
+		// USAGE:  hg = PsyHgAirFnWTdb(w,T)
 
 		// This formulation currently does not use W since it returns results that are in J/kg and the
 		//  amount of energy is on a per unit of moisture basis.
@@ -1229,7 +1231,9 @@ namespace Psychrometrics {
 
 	inline
 	Real64
-	CPCW()
+	CPCW(
+		Real64 const Temperature // unused1208
+	)
 	{
 		// FUNCTION INFORMATION:
 		//       AUTHOR         RUSSELL D. TAYLOR
@@ -1243,7 +1247,9 @@ namespace Psychrometrics {
 
 	inline
 	Real64
-	CPHW()
+	CPHW(
+		Real64 const Temperature // unused1208
+	)
 	{
 		// FUNCTION INFORMATION:
 		//       AUTHOR         RUSSELL D. TAYLOR

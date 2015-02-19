@@ -1119,7 +1119,7 @@ namespace PhotovoltaicThermalCollectors {
 						BypassFraction = 0.0;
 					}
 				} else if ( PVT( PVTnum ).WorkingFluidType == LiquidWorkingFluid ) {
-					CpInlet = CPHW();
+					CpInlet = CPHW( Tinlet );
 					if ( mdot * CpInlet != 0.0 ) { // protect divide by zero
 						PotentialOutletTemp = Tinlet + PotentialHeatGain / ( mdot * CpInlet );
 					} else {
@@ -1150,7 +1150,7 @@ namespace PhotovoltaicThermalCollectors {
 					WetBulbInlet = PsyTwbFnTdbWPb( Tinlet, Winlet, OutBaroPress, RoutineName );
 					DewPointInlet = PsyTdpFnTdbTwbPb( Tinlet, WetBulbInlet, OutBaroPress, RoutineName );
 				} else if ( PVT( PVTnum ).WorkingFluidType == LiquidWorkingFluid ) {
-					CpInlet = CPHW();
+					CpInlet = CPHW( Tinlet );
 				}
 
 				Tcollector = ( 2.0 * mdot * CpInlet * Tinlet + PVT( PVTnum ).AreaCol * ( HrGround * OutDryBulbTemp + HrSky * SkyTemp + HrAir * Surface( SurfNum ).OutDryBulbTemp + HcExt * Surface( SurfNum ).OutDryBulbTemp ) ) / ( 2.0 * mdot * CpInlet + PVT( PVTnum ).AreaCol * ( HrGround + HrSky + HrAir + HcExt ) );

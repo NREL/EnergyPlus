@@ -2142,7 +2142,7 @@ namespace HVACManager {
 			}
 			// Report infiltration latent gains and losses
 			CpAir = PsyCpAirFnWTdb( OutHumRat, Zone( ZoneLoop ).OutDryBulbTemp );
-			H2OHtOfVap = PsyHgAirFnWTdb( Zone( ZoneLoop ).OutDryBulbTemp );
+			H2OHtOfVap = PsyHgAirFnWTdb( OutHumRat, Zone( ZoneLoop ).OutDryBulbTemp );
 			if ( ZoneAirHumRat( ZoneLoop ) > OutHumRat ) {
 
 				ZnAirRpt( ZoneLoop ).InfilLatentLoss = 0.001 * MCPI( ZoneLoop ) / CpAir * ( ZoneAirHumRat( ZoneLoop ) - OutHumRat ) * H2OHtOfVap * TimeStepSys * SecInHour * 1000.0 * ADSCorrectionFactor;
@@ -2219,7 +2219,7 @@ namespace HVACManager {
 					if ( VentZoneNum > 1 ) continue;
 
 					// Report ventilation latent gains and losses
-					H2OHtOfVap = PsyHgAirFnWTdb( Zone( ZoneLoop ).OutDryBulbTemp );
+					H2OHtOfVap = PsyHgAirFnWTdb( OutHumRat, Zone( ZoneLoop ).OutDryBulbTemp );
 					if ( ZoneAirHumRat( ZoneLoop ) > OutHumRat ) {
 						ZnAirRpt( ZoneLoop ).VentilLatentLoss = 0.001 * MCPV( ZoneLoop ) / CpAir * ( ZoneAirHumRat( ZoneLoop ) - OutHumRat ) * H2OHtOfVap * TimeStepSys * SecInHour * 1000.0 * ADSCorrectionFactor;
 						ZnAirRpt( ZoneLoop ).VentilLatentGain = 0.0;
@@ -2272,7 +2272,7 @@ namespace HVACManager {
 					ZnAirRpt( ZoneLoop ).MixMdot += Mixing( MixNum ).DesiredAirFlowRate * AirDensity * ADSCorrectionFactor;
 					ZnAirRpt( ZoneLoop ).MixVdotStdDensity += Mixing( MixNum ).DesiredAirFlowRate * ( AirDensity / StdRhoAir ) * ADSCorrectionFactor;
 					MixSenLoad( ZoneLoop ) += Mixing( MixNum ).DesiredAirFlowRate * AirDensity * CpAir * ( MAT( ZoneLoop ) - MAT( Mixing( MixNum ).FromZone ) );
-					H2OHtOfVap = PsyHgAirFnWTdb( ( MAT( ZoneLoop ) + MAT( Mixing( MixNum ).FromZone ) ) / 2.0 );
+					H2OHtOfVap = PsyHgAirFnWTdb( ( ZoneAirHumRat( ZoneLoop ) + ZoneAirHumRat( Mixing( MixNum ).FromZone ) ) / 2.0, ( MAT( ZoneLoop ) + MAT( Mixing( MixNum ).FromZone ) ) / 2.0 );
 					//        MixLatLoad(ZoneLoop) = MixLatLoad(ZoneLoop)+MixingMassFlowZone(ZoneLoop)*(ZoneAirHumRat(ZoneLoop)- &
 					//                     ZoneAirHumRat(Mixing(MixNum)%FromZone))*H2OHtOfVap
 					MixLatLoad( ZoneLoop ) += Mixing( MixNum ).DesiredAirFlowRate * AirDensity * ( ZoneAirHumRat( ZoneLoop ) - ZoneAirHumRat( Mixing( MixNum ).FromZone ) ) * H2OHtOfVap;
@@ -2292,7 +2292,7 @@ namespace HVACManager {
 					ZnAirRpt( ZoneLoop ).MixMdot += MVFC( MixNum ) * AirDensity * ADSCorrectionFactor;
 					ZnAirRpt( ZoneLoop ).MixVdotStdDensity += MVFC( MixNum ) * ( AirDensity / StdRhoAir ) * ADSCorrectionFactor;
 					MixSenLoad( ZoneLoop ) += MVFC( MixNum ) * AirDensity * CpAir * ( MAT( ZoneLoop ) - MAT( CrossMixing( MixNum ).FromZone ) );
-					H2OHtOfVap = PsyHgAirFnWTdb( ( MAT( ZoneLoop ) + MAT( CrossMixing( MixNum ).FromZone ) ) / 2.0 );
+					H2OHtOfVap = PsyHgAirFnWTdb( ( ZoneAirHumRat( ZoneLoop ) + ZoneAirHumRat( CrossMixing( MixNum ).FromZone ) ) / 2.0, ( MAT( ZoneLoop ) + MAT( CrossMixing( MixNum ).FromZone ) ) / 2.0 );
 					//       MixLatLoad(ZoneLoop) = MixLatLoad(ZoneLoop)+MixingMassFlowZone(ZoneLoop)*(ZoneAirHumRat(ZoneLoop)- &
 					//                     ZoneAirHumRat(CrossMixing(MixNum)%FromZone))*H2OHtOfVap
 					MixLatLoad( ZoneLoop ) += MVFC( MixNum ) * AirDensity * ( ZoneAirHumRat( ZoneLoop ) - ZoneAirHumRat( CrossMixing( MixNum ).FromZone ) ) * H2OHtOfVap;
@@ -2314,7 +2314,7 @@ namespace HVACManager {
 								ZoneB = RefDoorMixing( ZoneLoop ).MateZonePtr( j );
 								AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, ( MAT( ZoneLoop ) + MAT( ZoneB ) ) / 2.0, ( ZoneAirHumRat( ZoneLoop ) + ZoneAirHumRat( ZoneB ) ) / 2.0, BlankString );
 								CpAir = PsyCpAirFnWTdb( ( ZoneAirHumRat( ZoneLoop ) + ZoneAirHumRat( ZoneB ) ) / 2.0, ( MAT( ZoneLoop ) + MAT( ZoneB ) ) / 2.0 );
-								H2OHtOfVap = PsyHgAirFnWTdb( ( MAT( ZoneLoop ) + MAT( ZoneB ) ) / 2.0 );
+								H2OHtOfVap = PsyHgAirFnWTdb( ( ZoneAirHumRat( ZoneLoop ) + ZoneAirHumRat( ZoneB ) ) / 2.0, ( MAT( ZoneLoop ) + MAT( ZoneB ) ) / 2.0 );
 								ZnAirRpt( ZoneLoop ).MixVolume += RefDoorMixing( ZoneLoop ).VolRefDoorFlowRate( j ) * TimeStepSys * SecInHour * ADSCorrectionFactor;
 								ZnAirRpt( ZoneLoop ).MixVdotCurDensity += RefDoorMixing( ZoneLoop ).VolRefDoorFlowRate( j ) * ADSCorrectionFactor;
 								ZnAirRpt( ZoneLoop ).MixMass += RefDoorMixing( ZoneLoop ).VolRefDoorFlowRate( j ) * AirDensity * TimeStepSys * SecInHour * ADSCorrectionFactor;
@@ -2334,7 +2334,7 @@ namespace HVACManager {
 									if ( RefDoorMixing( ZoneA ).VolRefDoorFlowRate( j ) > 0.0 ) {
 										AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, ( MAT( ZoneLoop ) + MAT( ZoneA ) ) / 2.0, ( ZoneAirHumRat( ZoneLoop ) + ZoneAirHumRat( ZoneA ) ) / 2.0, BlankString );
 										CpAir = PsyCpAirFnWTdb( ( ZoneAirHumRat( ZoneLoop ) + ZoneAirHumRat( ZoneA ) ) / 2.0, ( MAT( ZoneLoop ) + MAT( ZoneA ) ) / 2.0 );
-										H2OHtOfVap = PsyHgAirFnWTdb( ( MAT( ZoneLoop ) + MAT( ZoneA ) ) / 2.0 );
+										H2OHtOfVap = PsyHgAirFnWTdb( ( ZoneAirHumRat( ZoneLoop ) + ZoneAirHumRat( ZoneA ) ) / 2.0, ( MAT( ZoneLoop ) + MAT( ZoneA ) ) / 2.0 );
 										ZnAirRpt( ZoneLoop ).MixVolume += RefDoorMixing( ZoneA ).VolRefDoorFlowRate( j ) * TimeStepSys * SecInHour * ADSCorrectionFactor;
 										ZnAirRpt( ZoneLoop ).MixVdotCurDensity += RefDoorMixing( ZoneA ).VolRefDoorFlowRate( j ) * ADSCorrectionFactor;
 										ZnAirRpt( ZoneLoop ).MixMass += RefDoorMixing( ZoneA ).VolRefDoorFlowRate( j ) * AirDensity * TimeStepSys * SecInHour * ADSCorrectionFactor;
@@ -2388,7 +2388,7 @@ namespace HVACManager {
 						ZnAirRpt( ZoneLoop ).OABalanceHeatLoss = 0.0;
 						ZnAirRpt( ZoneLoop ).OABalanceHeatGain = -MDotCPOA( ZoneLoop ) * ( MAT( ZoneLoop ) - Zone( ZoneLoop ).OutDryBulbTemp ) * TimeStepSys * SecInHour * ADSCorrectionFactor;
 					}
-					H2OHtOfVap = PsyHgAirFnWTdb( Zone( ZoneLoop ).OutDryBulbTemp );
+					H2OHtOfVap = PsyHgAirFnWTdb( OutHumRat, Zone( ZoneLoop ).OutDryBulbTemp );
 					if ( ZoneAirHumRat( ZoneLoop ) > OutHumRat ) {
 						ZnAirRpt( ZoneLoop ).OABalanceLatentLoss = 0.001 * MDotOA( ZoneLoop ) * ( ZoneAirHumRat( ZoneLoop ) - OutHumRat ) * H2OHtOfVap * TimeStepSys * SecInHour * 1000.0 * ADSCorrectionFactor;
 						ZnAirRpt( ZoneLoop ).OABalanceLatentGain = 0.0;

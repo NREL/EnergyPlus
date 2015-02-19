@@ -1797,7 +1797,7 @@ namespace MicroturbineElectricGenerator {
 					}
 				}
 				//       Calculate exhaust air humidity ratio
-				H2OHtOfVap = PsyHfgAirFnWTdb( 16.0 );
+				H2OHtOfVap = PsyHfgAirFnWTdb( 1.0, 16.0 ); // W not used, passing 1.0 as dummy.
 				// Assume fuel is at 16C (ASHRAE HOF)
 				if ( H2OHtOfVap > 0.0 ) {
 					MTGenerator( GeneratorNum ).ExhaustAirHumRat = CombustionAirInletW + MTGenerator( GeneratorNum ).FuelMdot * ( ( FuelHigherHeatingValue - FuelLowerHeatingValue ) * KJtoJ / H2OHtOfVap ) / ExhAirMassFlowRate;
