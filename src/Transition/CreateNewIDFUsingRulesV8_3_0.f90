@@ -355,8 +355,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 ! fields 1-9 aren't affected
                 OutArgs(1:9)=InArgs(1:9)
-                ! add a blank for the new curve type field
-                OutArgs(10)=blank
+                ! add the new curve type field
+                OutArgs(10)='LeavingCondenserWaterTemperature'
                 ! then we just push the rest of the fields down 1
                 OutArgs(11:CurArgs+1)=InArgs(10:CurArgs)
                 CurArgs = CurArgs + 1
