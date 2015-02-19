@@ -62,7 +62,7 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase()
 			}
 		}
 		std::shared_ptr<std::ofstream> errorStream = std::make_shared<std::ofstream>( DataStringGlobals::outputSqliteErrFileName, std::ofstream::out | std::ofstream::trunc );
-		return std::unique_ptr<SQLite>(new SQLite( std::move( errorStream ), DataStringGlobals::outputSqlFileName, DataStringGlobals::outputSqliteErrFileName, writeOutputToSQLite, writeTabularDataToSQLite ));
+		return std::unique_ptr<SQLite>(new SQLite( errorStream, DataStringGlobals::outputSqlFileName, DataStringGlobals::outputSqliteErrFileName, writeOutputToSQLite, writeTabularDataToSQLite ));
 	} catch( const std::runtime_error& error ) {
 		ShowFatalError(error.what());
 		return nullptr;
@@ -82,12 +82,12 @@ void CreateSQLiteZoneExtendedOutput()
 			sqlite->addZoneGroupData( groupNum, DataHeatBalance::ZoneGroup(groupNum) );
 		}
 		for( int scheduleNumber = 1, numberOfSchedules = ScheduleManager::GetNumberOfSchedules(); scheduleNumber <= numberOfSchedules; ++scheduleNumber) {
-			sqlite->addScheduleData( scheduleNumber, std::move( ScheduleManager::GetScheduleName(scheduleNumber) ), std::move( ScheduleManager::GetScheduleType(scheduleNumber) ),
+			sqlite->addScheduleData( scheduleNumber, ScheduleManager::GetScheduleName(scheduleNumber), ScheduleManager::GetScheduleType(scheduleNumber),
 									 ScheduleManager::GetScheduleMinValue(scheduleNumber), ScheduleManager::GetScheduleMaxValue(scheduleNumber) );
 		}
 		for( int surfaceNumber = 1; surfaceNumber <= DataSurfaces::TotSurfaces; ++surfaceNumber ) {
 			auto const & surface = DataSurfaces::Surface(surfaceNumber);
-			sqlite->addSurfaceData( surfaceNumber, surface, std::move( DataSurfaces::cSurfaceClass(surface.Class) ) );
+			sqlite->addSurfaceData( surfaceNumber, surface, DataSurfaces::cSurfaceClass(surface.Class) );
 		}
 		for(int materialNum = 1; materialNum <= DataHeatBalance::TotMaterials; ++materialNum) {
 			sqlite->addMaterialData( materialNum, DataHeatBalance::Material(materialNum) );
@@ -2080,7 +2080,7 @@ void SQLite::createSQLiteEnvironmentPeriodRecord( const int curEnvirNum, const s
 void SQLite::addScheduleData( int const number, std::string const name, std::string const type, double const minValue, double const maxValue )
 {
 	schedules.push_back(
-		std::unique_ptr<Schedule>(new Schedule(m_errorStream, m_db, number, std::move( name ), std::move( type ), minValue, maxValue))
+		std::unique_ptr<Schedule>(new Schedule(m_errorStream, m_db, number, name, type, minValue, maxValue))
 	);
 }
 
@@ -2101,7 +2101,7 @@ void SQLite::addZoneListData( int const number, DataHeatBalance::ZoneListData co
 void SQLite::addSurfaceData( int const number, DataSurfaces::SurfaceData const & surfaceData, std::string const surfaceClass )
 {
 	surfaces.push_back(
-		std::unique_ptr<Surface>(new Surface(m_errorStream, m_db, number, surfaceData, std::move( surfaceClass )))
+		std::unique_ptr<Surface>(new Surface(m_errorStream, m_db, number, surfaceData, surfaceClass))
 	);
 }
 
