@@ -869,7 +869,7 @@ namespace SwimmingPool {
 		if ( PSatPool < PParAir ) PSatPool = PParAir;
 		EvapRate = ( 0.1 * ( Surface( SurfNum ).Area / CFA ) * Pool( PoolNum ).CurActivityFactor * ( ( PSatPool - PParAir ) * CFinHg ) ) * CFMF * Pool( PoolNum ).CurCoverEvapFac;
 		Pool( PoolNum ).MakeUpWaterMassFlowRate = EvapRate;
-		EvapEnergyLossPerArea = -EvapRate *  PsyHfgAirFnWTdb( MAT( ZoneNum ) ) / Surface( SurfNum ).Area;
+		EvapEnergyLossPerArea = -EvapRate *  PsyHfgAirFnWTdb( ZoneAirHumRatAvg( ZoneNum ), MAT( ZoneNum ) ) / Surface( SurfNum ).Area;
 		Pool( PoolNum ).EvapHeatLossRate = EvapEnergyLossPerArea * Surface( SurfNum ).Area;
 
 		// LW and SW radiation term modification: any "excess" radiation blocked by the cover gets convected
@@ -919,7 +919,7 @@ namespace SwimmingPool {
 
 		// Finally take care of the latent and convective gains resulting from the pool
 		SumConvPool( ZoneNum ) += Pool( PoolNum ).RadConvertToConvect;
-		SumLatentPool( ZoneNum ) += EvapRate *  PsyHfgAirFnWTdb( MAT( ZoneNum ) );
+		SumLatentPool( ZoneNum ) += EvapRate *  PsyHfgAirFnWTdb( ZoneAirHumRatAvg( ZoneNum ), MAT( ZoneNum ) );
 	}
 
 	void

@@ -2193,10 +2193,10 @@ namespace RuntimeLanguageProcessor {
 				ReturnValue = SetErlValueNumber( PsyCpAirFnWTdb( Operand( 1 ).Number, Operand( 2 ).Number ) ); // result =>   heat capacity of air {J/kg-C} | Humidity ratio (kg water vapor/kg dry air) | drybulb (C)
 			} else if ( SELECT_CASE_var == FuncHfgAirFnWTdb ) {
 				//BG comment these two psych funct seems confusing (?) is this the enthalpy of water in the air?
-				ReturnValue = SetErlValueNumber( PsyHfgAirFnWTdb( Operand( 1 ).Number ) ); // result =>   heat of vaporization for moist air {J/kg} | drybulb (C)
+				ReturnValue = SetErlValueNumber( PsyHfgAirFnWTdb( Operand( 1 ).Number, Operand( 2 ).Number ) ); // result =>   heat of vaporization for moist air {J/kg} | Humidity ratio (kg water vapor/kg dry air) | drybulb (C)
 			} else if ( SELECT_CASE_var == FuncHgAirFnWTdb ) {
 				// confusing ?  seems like this is really classical Hfg, heat of vaporization
-				ReturnValue = SetErlValueNumber( PsyHgAirFnWTdb( Operand( 1 ).Number ) ); // result =>   enthalpy of the gas {units?} | drybulb (C)
+				ReturnValue = SetErlValueNumber( PsyHgAirFnWTdb( Operand( 1 ).Number, Operand( 2 ).Number ) ); // result =>   enthalpy of the gas {units?} | Humidity ratio (kg water vapor/kg dry air) | drybulb (C)
 			} else if ( SELECT_CASE_var == FuncTdpFnTdbTwbPb ) {
 				ReturnValue = SetErlValueNumber( PsyTdpFnTdbTwbPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, EMSBuiltInFunction ) ); // result =>   dew-point temperature {C} | drybulb (C) | wetbulb (C) | pressure (Pa)
 			} else if ( SELECT_CASE_var == FuncTdpFnWPb ) {
@@ -2240,9 +2240,9 @@ namespace RuntimeLanguageProcessor {
 				//                        PsyTsatFnPb(Operand(1)%Number, & ! pressure (Pa)
 				//                                    'EMS Built-In Function') )
 			} else if ( SELECT_CASE_var == FuncCpCW ) {
-				ReturnValue = SetErlValueNumber( CPCW() ); // result => specific heat of water (J/kg-K) = 4180.d0 | temperature (C) unused
+				ReturnValue = SetErlValueNumber( CPCW( Operand( 1 ).Number ) ); // result => specific heat of water (J/kg-K) = 4180.d0 | temperature (C) unused
 			} else if ( SELECT_CASE_var == FuncCpHW ) {
-				ReturnValue = SetErlValueNumber( CPHW() ); // result => specific heat of water (J/kg-K) = 4180.d0 | temperature (C) unused
+				ReturnValue = SetErlValueNumber( CPHW( Operand( 1 ).Number ) ); // result => specific heat of water (J/kg-K) = 4180.d0 | temperature (C) unused
 			} else if ( SELECT_CASE_var == FuncRhoH2O ) {
 				ReturnValue = SetErlValueNumber( RhoH2O( Operand( 1 ).Number ) ); // result => density of water (kg/m3) | temperature (C)
 			} else if ( SELECT_CASE_var == FuncFatalHaltEp ) {

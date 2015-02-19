@@ -3319,7 +3319,7 @@ namespace ZoneTempPredictorCorrector {
 
 			// The density of air and latent heat of vaporization are calculated as functions.
 			RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName );
-			H2OHtOfVap = PsyHgAirFnWTdb( ZT( ZoneNum ) );
+			H2OHtOfVap = PsyHgAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) );
 
 			// Assume that the system will have flow
 			if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS || ( SimulateAirflowNetwork == AirflowNetworkControlSimpleADS && AirflowNetworkFanActivated ) ) {
@@ -4167,7 +4167,7 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName );
-		H2OHtOfVap = PsyHgAirFnWTdb( ZT( ZoneNum ) );
+		H2OHtOfVap = PsyHgAirFnWTdb( ZoneAirHumRat( ZoneNum ), ZT( ZoneNum ) );
 
 		// Check for the flow and NO flow condition
 		if ( ZoneMassFlowRate > 0.0 ) {

@@ -234,6 +234,7 @@ namespace Psychrometrics {
 	inline
 	Real64
 	PsyHfgAirFnWTdb(
+		Real64 const w, // humidity ratio {kgWater/kgDryAir} !unused1208
 		Real64 const T // input temperature {Celsius}
 	)
 	{
@@ -251,13 +252,15 @@ namespace Psychrometrics {
 
 		// REFERENCES:
 		// see ASHRAE Fundamentals Psychrometric Chapter
-		// USAGE:  hfg = PsyHfgAirFnWTdb(T)
+		// USAGE:  hfg = PsyHfgAirFnWTdb(w,T)
 
 		// Return value
 		// result => heat of vaporization for moist air {J/kg}
 
 		// This formulation currently does not use W since it returns results that are in J/kg and the
 		//  amount of energy is on a per unit of moisture basis.
+
+		UNUSED( w );
 
 		Real64 const Temperature( max( T, 0.0 ) ); // input temperature {Celsius} - corrected for >= 0C
 		return ( 2500940.0 + 1858.95 * Temperature ) - ( 4180.0 * Temperature ); // enthalpy of the gas - enthalpy of the fluid
@@ -266,6 +269,7 @@ namespace Psychrometrics {
 	inline
 	Real64
 	PsyHgAirFnWTdb(
+		Real64 const w, // humidity ratio {kgWater/kgDryAir} !unused1208
 		Real64 const T // input temperature {Celsius}
 	)
 	{
@@ -282,10 +286,12 @@ namespace Psychrometrics {
 
 		// REFERENCES:
 		// see ASHRAE Fundamentals Psychrometric Chapter
-		// USAGE:  hg = PsyHgAirFnWTdb(T)
+		// USAGE:  hg = PsyHgAirFnWTdb(w,T)
 
 		// This formulation currently does not use W since it returns results that are in J/kg and the
 		//  amount of energy is on a per unit of moisture basis.
+
+		UNUSED( w );
 
 		return 2500940.0 + 1858.95 * T; // enthalpy of the gas {units?}
 	}
@@ -1229,7 +1235,9 @@ namespace Psychrometrics {
 
 	inline
 	Real64
-	CPCW()
+	CPCW(
+		Real64 const Temperature // unused1208
+	)
 	{
 		// FUNCTION INFORMATION:
 		//       AUTHOR         RUSSELL D. TAYLOR
@@ -1238,12 +1246,16 @@ namespace Psychrometrics {
 		// PURPOSE OF THIS FUNCTION:
 		// This function provides the specific heat of chilled water. CPCW (J/Kg/k)
 
+		UNUSED( Temperature );
+
 		return 4180.0;
 	}
 
 	inline
 	Real64
-	CPHW()
+	CPHW(
+		Real64 const Temperature // unused1208
+	)
 	{
 		// FUNCTION INFORMATION:
 		//       AUTHOR         RUSSELL D. TAYLOR
@@ -1251,6 +1263,8 @@ namespace Psychrometrics {
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function provides the specific heat of hot water. CPHW (J/Kg/k)
+
+		UNUSED( Temperature );
 
 		return 4180.0;
 	}

@@ -1182,7 +1182,7 @@ namespace NodeInputManager {
 				if ( ! ( ( Node( iNode ).FluidIndex > 0 ) && ( Node( iNode ).FluidIndex <= NumOfGlycols ) ) ) {
 					rho = RhoWaterStdInit;
 					rhoStd = RhoWaterStdInit;
-					Cp = CPCW();
+					Cp = CPCW( Node( iNode ).Temp );
 				} else {
 					Cp = GetSpecificHeatGlycol( nodeFluidNames[iNode - 1], Node( iNode ).Temp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
 					rhoStd = GetDensityGlycol( nodeFluidNames[iNode - 1], InitConvTemp, Node( iNode ).FluidIndex, nodeReportingStrings[iNode - 1] );
@@ -1205,7 +1205,7 @@ namespace NodeInputManager {
 					MoreNodeInfo( iNode ).RelHumidity = 0.0;
 				} else if ( Node( iNode ).Quality == 0.0 ) { //The node has condensate water through it
 					MoreNodeInfo( iNode ).VolFlowRateStdRho = Node( iNode ).MassFlowRate / RhoWaterStdInit;
-					MoreNodeInfo( iNode ).ReportEnthalpy = CPCW() * Node( iNode ).Temp;
+					MoreNodeInfo( iNode ).ReportEnthalpy = CPCW( Node( iNode ).Temp ) * Node( iNode ).Temp;
 					MoreNodeInfo( iNode ).WetBulbTemp = 0.0;
 					MoreNodeInfo( iNode ).RelHumidity = 0.0;
 				}
@@ -1224,7 +1224,7 @@ namespace NodeInputManager {
 						MoreNodeInfo( iNode ).WetBulbTemp = 0.0;
 					}
 				} else {
-					MoreNodeInfo( iNode ).ReportEnthalpy = CPCW() * Node( iNode ).Temp;
+					MoreNodeInfo( iNode ).ReportEnthalpy = CPCW( Node( iNode ).Temp ) * Node( iNode ).Temp;
 					MoreNodeInfo( iNode ).WetBulbTemp = 0.0;
 				}
 			}

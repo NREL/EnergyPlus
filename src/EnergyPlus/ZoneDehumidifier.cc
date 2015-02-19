@@ -842,7 +842,7 @@ namespace ZoneDehumidifier {
 			}
 
 			LatentOutput = WaterRemovalMassRate * PLR; // Average moisture removal rate, kg/s, for this timestep
-			hfg = PsyHfgAirFnWTdb( InletAirTemp );
+			hfg = PsyHfgAirFnWTdb( InletAirHumRat, InletAirTemp );
 			SensibleOutput = ( LatentOutput * hfg ) + ElectricPowerAvg; // Average sensible output, Watts
 			// Send SensibleOutput to zone air heat balance via SysDepZoneLoads in ZoneEquipmentManager
 
