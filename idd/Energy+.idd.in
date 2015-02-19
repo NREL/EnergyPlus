@@ -57223,24 +57223,23 @@ Chiller:Electric:ReformulatedEIR,
        \note curve = a + b*CWS + c*CWS**2 + d*LCT + e*LCT**2 + f*CWS*LCT
        \note CWS = supply (leaving) chilled water temperature(C)
        \note LCT = leaving condenser fluid temperature(C)
-  A4, \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
-       \note Two part-load curves are available. 
-       \note The previous one uses the leaving condenser water temperature.
-       \note The new one uses the normalized lift. Lift is the temperature difference between the
+  A4 , \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
+       \note Two curve types are available: 
+       \note Type LeavingCondenserWaterTemperature: based on the leaving condenser water temperature.
+       \note Type Lift: based on the normalized lift, which is the temperature difference between the
        \note leaving condenser water temperature and the leaving evaporator water temperature. 
-       \note Two new terms are included in the new curve to improve model accuracy when the leaving chilled 
-       \note water temperature deviates from the design conditions especially at high part-load conditions.
        \required-field
        \type choice
-       \key UseLeavingCondenserWaterTemperature
-       \key UseLift
-       \default UseLeavingCondenserWaterTemperature
+       \key LeavingCondenserWaterTemperature
+       \key Lift
+       \default LeavingCondenserWaterTemperature
   A5 , \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
        \note Electric Input Ratio (EIR) as a function of Part Load Ratio (PLR)
        \note EIR = 1/COP
        \required-field
        \type object-list
        \object-list BicubicCurves
+       \object-list BiVariateTables
        \object-list ChillerPartLoadWithLiftCurves
        \note two types of part-load curves are available: BicubicCurves or ChillerPartLoadWithLiftCurves
        \note Type 1: BicubicCurves; 

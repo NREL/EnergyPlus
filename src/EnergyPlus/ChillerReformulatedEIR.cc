@@ -98,8 +98,8 @@ namespace ChillerReformulatedEIR {
 	int const LeavingSetPointModulated( 203 );
 
 	//chiller part load curve types
-	int const PLR_UseLeavingCondenserWaterTemperature( 1 ); //Type 1_UseLeavingCondenserWaterTemperature 
-	int const PLR_UseLift( 2 ); //Type 2_UseLift
+	int const PLR_LeavingCondenserWaterTemperature( 1 ); //Type 1_LeavingCondenserWaterTemperature 
+	int const PLR_Lift( 2 ); //Type 2_Lift
 	
 	// MODULE VARIABLE DECLARATIONS:
 	int NumElecReformEIRChillers( 0 ); // Number of electric reformulated EIR chillers specified in input
@@ -355,9 +355,9 @@ namespace ChillerReformulatedEIR {
 				ErrorsFound = true;
 			}
 
-			//The default type of part-load curve is: UseLeavingCondenserWaterTemperature
+			//The default type of part-load curve is: LeavingCondenserWaterTemperature
 			if ( lAlphaFieldBlanks( 4 ) ) {
-				PartLoadCurveType = "UseLeavingCondenserWaterTemperature";
+				PartLoadCurveType = "LeavingCondenserWaterTemperature";
 			}
 			else {
 				PartLoadCurveType = cAlphaArgs( 4 );
@@ -371,12 +371,12 @@ namespace ChillerReformulatedEIR {
 				ErrorsFound = true;
 			}
 			
-			//Check the type of part-load curves implemented: 1_UseLeavingCondenserWaterTemperature, 2_UseLift    zrp_Aug2014
-			if ( SameString( PartLoadCurveType, "UseLeavingCondenserWaterTemperature" ) && SameString( GetCurveType( ElecReformEIRChiller( EIRChillerNum ).ChillerEIRFPLR ), "BICUBIC" ) ) {
-				ElecReformEIRChiller( EIRChillerNum ).PartLoadCurveType = PLR_UseLeavingCondenserWaterTemperature;
+			//Check the type of part-load curves implemented: 1_LeavingCondenserWaterTemperature, 2_Lift    zrp_Aug2014
+			if ( SameString( PartLoadCurveType, "LeavingCondenserWaterTemperature" ) && SameString( GetCurveType( ElecReformEIRChiller( EIRChillerNum ).ChillerEIRFPLR ), "BICUBIC" ) ) {
+				ElecReformEIRChiller( EIRChillerNum ).PartLoadCurveType = PLR_LeavingCondenserWaterTemperature;
 			}
-			else if ( SameString( PartLoadCurveType, "UseLift" ) && SameString( GetCurveType( ElecReformEIRChiller( EIRChillerNum ).ChillerEIRFPLR ), "CHILLERPARTLOADWITHLIFT" ) ) {
-				ElecReformEIRChiller( EIRChillerNum ).PartLoadCurveType = PLR_UseLift;
+			else if ( SameString( PartLoadCurveType, "Lift" ) && SameString( GetCurveType( ElecReformEIRChiller( EIRChillerNum ).ChillerEIRFPLR ), "CHILLERPARTLOADWITHLIFT" ) ) {
+				ElecReformEIRChiller( EIRChillerNum ).PartLoadCurveType = PLR_Lift;
 			}
 			else {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
@@ -1250,9 +1250,9 @@ namespace ChillerReformulatedEIR {
 
 			
 			if ( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLR > 0 ) {
-				if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_UseLeavingCondenserWaterTemperature ) {
+				if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_LeavingCondenserWaterTemperature ) {
 					CurveVal = CurveValue( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLR, ElecReformEIRChiller( EIRChillNum ).TempRefCondOut, 1.0 );
-				} else if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_UseLift ) {
+				} else if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_Lift ) {
 					CurveVal = CurveValue( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLR, 1.0, 1.0, 0.0 ); // zrp_Aug2014
 				}
 				if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
@@ -1261,9 +1261,9 @@ namespace ChillerReformulatedEIR {
 					ShowContinueError( "Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
 				}
 
-				if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_UseLeavingCondenserWaterTemperature ) {
+				if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_LeavingCondenserWaterTemperature ) {
 					GetCurveMinMaxValues( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLR, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRTempMin, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRTempMax, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRPLRMin, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRPLRMax );
-				} else if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_UseLift ) { // zrp_Aug2014
+				} else if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_Lift ) { // zrp_Aug2014
 					GetCurveMinMaxValues( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLR, ElecReformEIRChiller( EIRChillNum ).ChillerLiftNomMin, ElecReformEIRChiller( EIRChillNum ).ChillerLiftNomMax, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRPLRMin, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRPLRMax, ElecReformEIRChiller( EIRChillNum ).ChillerTdevNomMin, ElecReformEIRChiller( EIRChillNum ).ChillerTdevNomMax ); 
 				}
 
@@ -1289,7 +1289,7 @@ namespace ChillerReformulatedEIR {
 			DeltaTCond = ( CondenserCapacity ) / ( ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate * Density * SpecificHeat );
 			ElecReformEIRChiller( EIRChillNum ).TempRefCondIn = ElecReformEIRChiller( EIRChillNum ).TempRefCondOut - DeltaTCond;
 
-			if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_UseLeavingCondenserWaterTemperature ) {
+			if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_LeavingCondenserWaterTemperature ) {
 			//     Check EIRFPLR curve output. Calculate condenser inlet temp based on reference condenser outlet temp,
 			//     chiller capacity, and mass flow rate. Starting with the calculated condenser inlet temp and PLR = 0,
 			//     calculate the condenser outlet temp proportional to PLR and test the EIRFPLR curve output for negative numbers.
@@ -1337,9 +1337,9 @@ namespace ChillerReformulatedEIR {
 		} else { // just get curve min/max values if capacity or cond volume flow rate = 0
 			GetCurveMinMaxValues( ElecReformEIRChiller( EIRChillNum ).ChillerCapFT, ElecReformEIRChiller( EIRChillNum ).ChillerCAPFTXTempMin, ElecReformEIRChiller( EIRChillNum ).ChillerCAPFTXTempMax, ElecReformEIRChiller( EIRChillNum ).ChillerCAPFTYTempMin, ElecReformEIRChiller( EIRChillNum ).ChillerCAPFTYTempMax );
 			GetCurveMinMaxValues( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFT, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFTXTempMin, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFTXTempMax, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFTYTempMin, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFTYTempMax );
-			if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_UseLeavingCondenserWaterTemperature ) {
+			if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_LeavingCondenserWaterTemperature ) {
 				GetCurveMinMaxValues( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLR, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRTempMin, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRTempMax, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRPLRMin, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRPLRMax );
-			} else if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_UseLift ) { // zrp_Aug2014
+			} else if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_Lift ) { // zrp_Aug2014
 				GetCurveMinMaxValues( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLR, ElecReformEIRChiller( EIRChillNum ).ChillerLiftNomMin, ElecReformEIRChiller( EIRChillNum ).ChillerLiftNomMax, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRPLRMin, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRPLRMax, ElecReformEIRChiller( EIRChillNum ).ChillerTdevNomMin, ElecReformEIRChiller( EIRChillNum ).ChillerTdevNomMax );
 			}
 		}
@@ -1424,20 +1424,20 @@ namespace ChillerReformulatedEIR {
 			//  Find min/max condenser outlet temperature used by curve objects
 			CAPFTYTmin = ElecReformEIRChiller( EIRChillNum ).ChillerCAPFTYTempMin;
 			EIRFTYTmin = ElecReformEIRChiller( EIRChillNum ).ChillerEIRFTYTempMin;
-			if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_UseLeavingCondenserWaterTemperature ) {
+			if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_LeavingCondenserWaterTemperature ) {
 				EIRFPLRTmin = ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRTempMin;
 				Tmin = min( CAPFTYTmin, EIRFTYTmin, EIRFPLRTmin );
-			} else if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_UseLift ) { // zrp_Aug2014
+			} else if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_Lift ) { // zrp_Aug2014
 				Tmin = min( CAPFTYTmin, EIRFTYTmin );
 			}
 
 
 			CAPFTYTmax = ElecReformEIRChiller( EIRChillNum ).ChillerCAPFTYTempMax;
 			EIRFTYTmax = ElecReformEIRChiller( EIRChillNum ).ChillerEIRFTYTempMax;
-			if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_UseLeavingCondenserWaterTemperature ) {
+			if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_LeavingCondenserWaterTemperature ) {
 				EIRFPLRTmax = ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRTempMax;
 				Tmax = max( CAPFTYTmax, EIRFTYTmax, EIRFPLRTmax );
-			} else if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_UseLift ) { // zrp_Aug2014
+			} else if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_Lift ) { // zrp_Aug2014
 				Tmax = max( CAPFTYTmax, EIRFTYTmax );
 			}
 
@@ -1911,7 +1911,7 @@ namespace ChillerReformulatedEIR {
 		Real64 ChillerLiftNom; 	//Normalized chiller lift
 		Real64 ChillerTdev; 	//Deviation of leaving chilled water temperature from the reference condition
 		Real64 ChillerTdevNom; 	//Normalized ChillerTdev
-		int PartLoadCurveType; 	//Part Load Ratio Curve Type: 1_UseLeavingCondenserWaterTemperature; 2_UseLift
+		int PartLoadCurveType; 	//Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift
 		
 		int EvapInletNode; // evaporator inlet node number
 		int EvapOutletNode; // evaporator outlet node number
@@ -2279,10 +2279,10 @@ namespace ChillerReformulatedEIR {
 
 		ChillerEIRFT = max( 0.0, CurveValue( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFT, EvapOutletTemp, AvgCondSinkTemp ) );
 
-		// Part Load Ratio Curve Type: 1_UseLeavingCondenserWaterTemperature; 2_UseLift  zrp_Aug2014
-		if ( PartLoadCurveType == PLR_UseLeavingCondenserWaterTemperature ) {   		
+		// Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift  zrp_Aug2014
+		if ( PartLoadCurveType == PLR_LeavingCondenserWaterTemperature ) {   		
 			ChillerEIRFPLR = max( 0.0, CurveValue( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLR, AvgCondSinkTemp, PartLoadRat ) );			
-		} else if ( PartLoadCurveType == PLR_UseLift) { 		
+		} else if ( PartLoadCurveType == PLR_Lift) { 		
 			ChillerLift = AvgCondSinkTemp - EvapOutletTemp;
 			ChillerTdev = std::abs(EvapOutletTemp - ElecReformEIRChiller(EIRChillNum).TempRefEvapOut);
 			ChillerLiftRef = ElecReformEIRChiller( EIRChillNum ).TempRefCondOut - ElecReformEIRChiller( EIRChillNum ).TempRefEvapOut;
@@ -2423,7 +2423,7 @@ namespace ChillerReformulatedEIR {
 		EIRFTYTmin = ElecReformEIRChiller( EIRChillNum ).ChillerEIRFTYTempMin;
 		EIRFTYTmax = ElecReformEIRChiller( EIRChillNum ).ChillerEIRFTYTempMax;
 
-		if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_UseLeavingCondenserWaterTemperature ) {
+		if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_LeavingCondenserWaterTemperature ) {
 			EIRFPLRTmin = ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRTempMin;
 			EIRFPLRTmax = ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRTempMax;
 		}
@@ -2455,7 +2455,7 @@ namespace ChillerReformulatedEIR {
 			}
 		}
 
-		if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_UseLeavingCondenserWaterTemperature ) {
+		if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_LeavingCondenserWaterTemperature ) {
 			if ( CondOutletTemp < EIRFPLRTmin || CondOutletTemp > EIRFPLRTmax ) {
 				++ElecReformEIRChiller( EIRChillNum ).EIRFPLRTIter;
 				if ( ElecReformEIRChiller( EIRChillNum ).EIRFPLRTIter == 1 ) {
@@ -2528,9 +2528,9 @@ namespace ChillerReformulatedEIR {
 			}
 		}
 
-		if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_UseLeavingCondenserWaterTemperature )  {
+		if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_LeavingCondenserWaterTemperature )  {
 			ChillerEIRFPLR = CurveValue( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLR, CondOutletTemp, ChillerPartLoadRatio );
-		} else if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_UseLift ){
+		} else if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_Lift ){
 			ChillerLift = CondOutletTemp - EvapOutletTemp;
 			ChillerTdev = std::abs( EvapOutletTemp - ElecReformEIRChiller( EIRChillNum ).TempRefEvapOut );
 			ChillerLiftRef = ElecReformEIRChiller( EIRChillNum ).TempRefCondOut - ElecReformEIRChiller( EIRChillNum ).TempRefEvapOut;

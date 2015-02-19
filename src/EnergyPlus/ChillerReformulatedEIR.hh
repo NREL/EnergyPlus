@@ -64,7 +64,7 @@ namespace ChillerReformulatedEIR {
 		std::string EIRFTName; // EIRFT curve name
 		std::string EIRFPLRName; // EIRPLR curve name
 		int CondenserType; // Type of Condenser. Water Cooled is the only available option for now
-		int PartLoadCurveType; 	// Part Load Ratio Curve Type: 1_UseLeavingCondenserWaterTemperature; 2_UseLift //zrp
+		int PartLoadCurveType; 	// Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift //zrp
 		Real64 RefCap; // Reference capacity of the chiller [W]
 		Real64 RefCOP; // Reference coefficient of performance [W/W]
 		int FlowMode; // one of 3 modes for componet flow during operation
@@ -274,7 +274,7 @@ namespace ChillerReformulatedEIR {
 			std::string const & EIRFTName, // EIRFT curve name
 			std::string const & EIRFPLRName, // EIRPLR curve name
 			int const CondenserType, // Type of Condenser. Water Cooled is the only available option for now
-			int const PartLoadCurveType, // Part Load Ratio Curve Type: 1_UseLeavingCondenserWaterTemperature; 2_UseLift
+			int const PartLoadCurveType, // Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift
 			Real64 const RefCap, // Reference capacity of the chiller [W]
 			Real64 const RefCOP, // Reference coefficient of performance [W/W]
 			int const FlowMode, // one of 3 modes for componet flow during operation
