@@ -57161,7 +57161,7 @@ Chiller:Electric:EIR,
        \type node
 
 Chiller:Electric:ReformulatedEIR,
-\min-fields 21
+\min-fields 22
    \memo This chiller model is an empirical model, a reformulated version of Chiller:Electric:EIR
    \memo where the performance is a function of condenser leaving fluid Temperature instead of
    \memo condenser entering fluid Temperature. Chiller performance at off-reference conditions is
@@ -57241,22 +57241,26 @@ Chiller:Electric:ReformulatedEIR,
        \object-list BicubicCurves
        \object-list BiVariateTables
        \object-list ChillerPartLoadWithLiftCurves
-       \note two types of part-load curves are available: BicubicCurves or ChillerPartLoadWithLiftCurves
-       \note Type 1: BicubicCurves; 
-       \note Calculated based on LCT and PLR       
-       \note curve = a + b*LCT + c*LCT**2 + d*PLR + e*PLR**2 + f*LCT*PLR + g*0 + h*PLR**3
+       \object-list MultiVariateTables
+       \note The form of this curve is based on the input for 
+       \note Electric Input to Cooling Output RatioFunction of Part Load Ratio Curve Type
+       \note Type=LeavingCondenserWaterTemperature: Calculated based on LCT and PLR
+       \note Curve object type should be Curve:Bicubic or Table:TwoIndependentVariables 
+       \note Bicubic curve = a + b*LCT + c*LCT**2 + d*PLR + e*PLR**2 + f*LCT*PLR + g*0 + h*PLR**3
        \note + i*0 + j*0
        \note PLR = part load ratio (cooling load/steady state capacity)
        \note LCT = leaving condenser fluid temperature(C)
-       \note Type 2: ChillerPartLoadWithLiftCurves 
-       \note Calculated based on dT*, Tdev* and PLR
-       \note curve = a + b*(dT*) + c*(dT*)**2 + d*PLR + e*PLR**2 + f*(dT*)*PLR + g*(dT*)**3
+       \note Type=Lift: Calculated based on dT*, Tdev* and PLR 
+       \note Curve object type should be Curve:ChillerPartLoadWithLiftCurves or Table:MultiVariableLookup
+       \note ChillerPartLoadWithLiftCurves curve = a + b*(dT*) + c*(dT*)**2 + d*PLR + e*PLR**2 + f*(dT*)*PLR + g*(dT*)**3
        \note + h*PLR**3 + i*(dT*)**2*PLR + j*(dT*)*PLR**2 + k*(dT*)**2*PLR**2 + l*(Tdev*)*PLR**3
-       \note Tdev = Leaving Chilled Water Temperature - Reference Chilled Water Temperature
-       \note Tdev* = normalized Tdev = Tdev / dTref
-       \note dT* = normalized fractional Lift = dT / dTref
-       \note dT = Lift = Leaving Condenser Water Temperature - Leaving Chilled Water Temperature(C)
+       \note x = dT* = normalized fractional Lift = dT / dTref
+       \note y = PLR = part load ratio (cooling load/steady state capacity)
+       \note z = Tdev* = normalized Tdev = Tdev / dTref
+       \note Where:
+       \note dT = Lift = Leaving Condenser Water Temperature - Leaving Chilled Water Temperature
        \note dTref = dT at the reference condition
+       \note Tdev = Leaving Chilled Water Temperature - Reference Chilled Water Temperature
   N7 , \field Minimum Part Load Ratio
        \type real
        \note Part load ratio below which the chiller starts cycling on/off to meet the load.
@@ -76651,16 +76655,24 @@ Curve:DoubleExponentialDecay,
        \default Dimensionless
 
 Curve:ChillerPartLoadWithLift,
-       \memo This new chiller part-load performance curve has three independent variables.
+       \memo This chiller part-load performance curve has three independent variables.
        \memo Input consists of the curve name, the twelve coefficients, and the maximum
        \memo and minimum valid independent variable values. Optional inputs for the curve minimum
        \memo and maximum may be used to limit the output of the performance curve.
+       \memo curve = C1 + C2*x + C3*x**2 + C4*y + C5*y**2 + C6*x*y + C7*x**3
+       \memo + C8*y**3 + C9*x**2*y + C10*x*y**2 + C11*x**2*y**2 + C12*z*y**3
+       \memo x = dT* = normalized fractional Lift = dT / dTref
+       \memo y = PLR = part load ratio (cooling load/steady state capacity)
+       \memo z = Tdev* = normalized Tdev = Tdev / dTref
+       \memo Where:
+       \memo dT = Lift = Leaving Condenser Water Temperature - Leaving Chilled Water Temperature
+       \memo dTref = dT at the reference condition
+       \memo Tdev = Leaving Chilled Water Temperature - Reference Chilled Water Temperature
   A1 , \field Name
        \required-field
        \type alpha
        \reference ChillerPartLoadWithLiftCurves
        \reference AllCurves
-       \note See Input Output Reference for curve description
   N1 , \field Coefficient1 C1
        \required-field
        \type real
