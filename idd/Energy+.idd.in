@@ -57241,8 +57241,8 @@ Chiller:Electric:ReformulatedEIR,
        \object-list BicubicCurves
        \object-list BiVariateTables
        \object-list ChillerPartLoadWithLiftCurves
-       \note two types of part-load curves are available: BicubicCurves or ChillerPartLoadWithLiftCurves
-       \note Type 1: BicubicCurves; 
+       \note Recommended curve object types are BicubicCurves and ChillerPartLoadWithLiftCurves
+       \note Type 1: BicubicCurves
        \note Calculated based on LCT and PLR       
        \note curve = a + b*LCT + c*LCT**2 + d*PLR + e*PLR**2 + f*LCT*PLR + g*0 + h*PLR**3
        \note + i*0 + j*0
