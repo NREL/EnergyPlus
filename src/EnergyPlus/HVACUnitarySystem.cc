@@ -8199,7 +8199,7 @@ namespace HVACUnitarySystem {
 
 		if ( SELECT_CASE_var == CoilDX_CoolingSingleSpeed ) { // Coil:Cooling:DX:SingleSpeed
 
-			SimDXCoil( BlankString, CompOn, FirstHVACIteration, CompIndex, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadRatio, _, CoilCoolHeatRat );
+			SimDXCoil( BlankString, CompOn, FirstHVACIteration, CompIndex, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadRatio, OnOffAirFlowRatio, CoilCoolHeatRat );
 			UnitarySystem( UnitarySysNum ).CoolCompPartLoadRatio = PartLoadRatio * double( CompOn );
 
 		} else if ( ( SELECT_CASE_var == CoilDX_CoolingHXAssisted ) || ( SELECT_CASE_var == CoilWater_CoolingHXAssisted ) ) { // CoilSystem:Cooling:*:HeatExchangerAssisted
@@ -8208,7 +8208,7 @@ namespace HVACUnitarySystem {
 				mdot = min( Node( UnitarySystem( UnitarySysNum ).CoolCoilFluidOutletNodeNum ).MassFlowRateMaxAvail, UnitarySystem( UnitarySysNum ).MaxCoolCoilFluidFlow * PartLoadRatio );
 				Node( UnitarySystem( UnitarySysNum ).CoolCoilFluidInletNode ).MassFlowRate = mdot;
 			}
-			SimHXAssistedCoolingCoil( BlankString, FirstHVACIteration, CompOn, PartLoadRatio, CompIndex, UnitarySystem( UnitarySysNum ).FanOpMode, HXUnitOn, _, EconomizerFlag );
+			SimHXAssistedCoolingCoil( BlankString, FirstHVACIteration, CompOn, PartLoadRatio, CompIndex, UnitarySystem( UnitarySysNum ).FanOpMode, HXUnitOn, OnOffAirFlowRatio, EconomizerFlag );
 			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingHXAssisted ) UnitarySystem( UnitarySysNum ).CoolCompPartLoadRatio = PartLoadRatio * double( CompOn );
 
 		} else if ( SELECT_CASE_var == CoilDX_CoolingTwoSpeed ) { // Coil:Cooling:DX:TwoSpeed
