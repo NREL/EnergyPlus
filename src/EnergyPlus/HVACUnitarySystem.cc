@@ -510,8 +510,10 @@ namespace HVACUnitarySystem {
 		}
 
 		if ( ! SysSizingCalc && MySizingCheckFlag( UnitarySysNum ) ) {
-			if ( UnitarySystem( UnitarySysNum ).FanExists && ( UnitarySystem( UnitarySysNum ).CoolCoilExists && ( UnitarySystem( UnitarySysNum ).HeatCoilExists || UnitarySystem( UnitarySysNum ).SuppCoilExists ) ) ) AirLoopControlInfo( AirLoopNum ).UnitarySys = true;
-			AirLoopControlInfo( AirLoopNum ).UnitarySysSimulating = true;
+			if ( AirLoopNum > 0 ) {
+				if ( UnitarySystem( UnitarySysNum ).FanExists && ( UnitarySystem( UnitarySysNum ).CoolCoilExists && ( UnitarySystem( UnitarySysNum ).HeatCoilExists || UnitarySystem( UnitarySysNum ).SuppCoilExists ) ) ) AirLoopControlInfo( AirLoopNum ).UnitarySys = true;
+				AirLoopControlInfo( AirLoopNum ).UnitarySysSimulating = true;
+			}
 			SizeUnitarySystem( UnitarySysNum, FirstHVACIteration, AirLoopNum );
 			MySizingCheckFlag( UnitarySysNum ) = false;
 			if ( AirLoopNum > 0 ) {
@@ -739,8 +741,8 @@ namespace HVACUnitarySystem {
 				}
 			}
 			if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingGas || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingElectric ) {
-				SimulateHeatingCoilComponents( UnitarySystem( UnitarySysNum ).HeatingCoilName, FirstHVACIteration, 1.0, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, _, _, UnitarySystem( UnitarySysNum ).FanOpMode, 1.0 );
-				UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = GetHeatingCoilCapacity( cAllCoilTypes( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num ), UnitarySystem( UnitarySysNum ).HeatingCoilName, errFlag );
+//				SimulateHeatingCoilComponents( UnitarySystem( UnitarySysNum ).HeatingCoilName, FirstHVACIteration, 1.0, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, _, _, UnitarySystem( UnitarySysNum ).FanOpMode, 1.0 );
+//				UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = GetHeatingCoilCapacity( cAllCoilTypes( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num ), UnitarySystem( UnitarySysNum ).HeatingCoilName, errFlag );
 			}
 			MyEnvrnFlag( UnitarySysNum ) = false;
 		}
@@ -1735,6 +1737,7 @@ namespace HVACUnitarySystem {
 		using General::TrimSigDigits;
 		using WaterCoils::SetCoilDesFlow;
 		using WaterCoils::GetWaterCoilCapacity;
+		using WaterCoils::SimulateWaterCoilComponents;
 		using namespace Psychrometrics;
 		using HVACDXSystem::GetCoolingCoilTypeNameAndIndex;
 		using EMSManager::ManageEMS;
@@ -1802,6 +1805,7 @@ namespace HVACUnitarySystem {
 		int SupFanNum; // supply fan index
 		int SaveCurDuctType; // used during sizing to save the current duct type
 		bool IsAutoSize; // used to catch autosized vs hardsized fields
+		Real64 QActual; // water coil output [W]
 
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
 		std::string CompName; // component name
@@ -1926,7 +1930,7 @@ namespace HVACUnitarySystem {
 			EqSizing.CoolingAirVolFlow = SysCoolingFlow;
 
 // Cooling airflow should be known at this point. Now find autosized design cooling capacity.
-			if ( CoolingSAFlowMethod != FlowPerCoolingCapacity && UnitarySystem( UnitarySysNum ).RequestAutoSize ) {
+			if ( CoolingSAFlowMethod != FlowPerCoolingCapacity && UnitarySystem( UnitarySysNum ).DesignCoolingCapacity == AutoSize ) {
 				SizingMethod = CoolingCapacitySizing;
 				DataFlowUsedForSizing = EqSizing.CoolingAirVolFlow;
 				TempSize = AutoSize;
@@ -1975,9 +1979,9 @@ namespace HVACUnitarySystem {
 				DataFlowUsedForSizing = TempSize;
 				TempSize = AutoSize;
 				DataFracOfAutosizedCoolingCapacity = 1.0;
+				DataHeatSizeRatio = UnitarySystem( UnitarySysNum ).HeatingSizingRatio;
 				if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical ) {
 					DataTotCapCurveIndex = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
-					DataHeatSizeRatio = UnitarySystem( UnitarySysNum ).HeatingSizingRatio;
 					DataIsDXCoil = true;
 				}
 				if( CurSysNum > 0 ) AirLoopControlInfo( AirLoopNum ).UnitarySysSimulating = false; // set to false to allow calculation of actual heating capacity
@@ -1999,13 +2003,13 @@ namespace HVACUnitarySystem {
 			EqSizing.HeatingAirVolFlow = SysHeatingFlow;
 
 // Heating airflow should be known at this point. Now find autosized design heating capacity.
-			if ( HeatingSAFlowMethod != FlowPerHeatingCapacity && UnitarySystem( UnitarySysNum ).RequestAutoSize ) {
+			if ( HeatingSAFlowMethod != FlowPerHeatingCapacity && UnitarySystem( UnitarySysNum ).DesignHeatingCapacity == AutoSize ) {
 				SizingMethod = HeatingCapacitySizing;
 				DataFlowUsedForSizing = EqSizing.HeatingAirVolFlow;
 				TempSize = AutoSize;
+				DataHeatSizeRatio = UnitarySystem( UnitarySysNum ).HeatingSizingRatio;
 				if( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating ) {
 					DataTotCapCurveIndex = GetDXCoilCapFTCurveIndex( UnitarySystem( UnitarySysNum ).HeatingCoilIndex, ErrFound );
-					DataHeatSizeRatio = UnitarySystem( UnitarySysNum ).HeatingSizingRatio;
 					DataIsDXCoil = true;
 				}
 				if( CurSysNum > 0 ) AirLoopControlInfo( AirLoopNum ).UnitarySysSimulating = false; // set to false to allow calculation of actual heating capacity
@@ -2015,12 +2019,11 @@ namespace HVACUnitarySystem {
 				EqSizing.HeatingCapacity = true;
 				EqSizing.DesHeatingLoad = HeatCapAtPeak;
 			} else {
-				HeatCapAtPeak = UnitarySystem( UnitarySysNum ).DesignCoolingCapacity;
+				HeatCapAtPeak = UnitarySystem( UnitarySysNum ).DesignHeatingCapacity;
 			}
 //			if ( ! UnitarySystem( UnitarySysNum ).CoolCoilExists )DXCoolCap = HeatCapAtPeak;
 			DataIsDXCoil = false;
 			DataTotCapCurveIndex = 0;
-			DataHeatSizeRatio = 1.0;
 			DataFlowUsedForSizing = 0.0;
 		}
 
@@ -2152,51 +2155,18 @@ namespace HVACUnitarySystem {
 
 		}
 
-// Should try to get rid of most of this if possible
-		{ auto const SELECT_CASE_var( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num );
-		if ( SELECT_CASE_var == CoilDX_CoolingSingleSpeed ) {
-//			SimDXCoil( BlankString, On, true, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, 1, 0.0 );
-//			DXCoolCap = GetCoilCapacityByIndexType( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, UnitarySystem( UnitarySysNum ).CoolingCoilType_Num, ErrFound );
-		} else if ( ( SELECT_CASE_var == CoilDX_CoolingHXAssisted ) || ( SELECT_CASE_var == CoilWater_CoolingHXAssisted ) ) {
-			Node( UnitarySystem( UnitarySysNum ).CoolCoilInletNodeNum ).MassFlowRate = EqSizing.CoolingAirVolFlow;
-			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilWater_CoolingHXAssisted ) {
-				HXCoilName = GetHXDXCoilName( cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ), UnitarySystem( UnitarySysNum ).CoolingCoilName, ErrFound );
-				ActualCoolCoilType = GetCoilObjectTypeNum( cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ), UnitarySystem( UnitarySysNum ).CoolingCoilName, ErrFound, true );
-// this parent won't autosize air flow if we set it like this
-				SetCoilDesFlow( cAllCoilTypes( ActualCoolCoilType ), HXCoilName, EqSizing.CoolingAirVolFlow, ErrFound );
-			}
-			SimHXAssistedCoolingCoil( BlankString, true, On, 1.0, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, 1, false, 1.0, false );
-			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilWater_CoolingHXAssisted ) {
-// water coils are a hard one to autosize capacity (i.e., it's hard for the parent to know what capacity the water coil will size to)
-				DXCoolCap = GetWaterCoilCapacity( MakeUPPERCase( cAllCoilTypes( ActualCoolCoilType ) ), HXCoilName, ErrFound );
-			} else {
-				DXCoolCap = GetCoilCapacity( cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ), UnitarySystem( UnitarySysNum ).CoolingCoilName, ErrFound );
-			}
-		} else if ( SELECT_CASE_var == Coil_CoolingWaterDetailed ) {
-			SetCoilDesFlow( cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ), UnitarySystem( UnitarySysNum ).CoolingCoilName, EqSizing.CoolingAirVolFlow, ErrFound );
-		} else if ( SELECT_CASE_var == Coil_CoolingWaterToAirHPSimple ) {
-			SimWatertoAirHPSimple( BlankString, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, UnitarySystem( UnitarySysNum ).CoolingCoilSensDemand, UnitarySystem( UnitarySysNum ).CoolingCoilLatentDemand, 0, 0.0, UnitarySystem( UnitarySysNum ).MaxONOFFCyclesperHour, UnitarySystem( UnitarySysNum ).HPTimeConstant, UnitarySystem( UnitarySysNum ).FanDelayTime, 0, 0.0, FirstHVACIteration );
-			DXCoolCap = GetSimpleCoilCapacity( cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ), UnitarySystem( UnitarySysNum ).CoolingCoilName, ErrFound );
-			EqSizing.DesCoolingLoad = DXCoolCap;
-			if( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHPSimple ) EqSizing.DesHeatingLoad = DXCoolCap;
-		} else if( SELECT_CASE_var == Coil_CoolingWaterToAirHP ) {
-			SimWatertoAirHP( BlankString, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, UnitarySystem( UnitarySysNum ).MaxCoolAirMassFlow, UnitarySystem( UnitarySysNum ).FanOpMode, FirstHVACIteration, 0.0, UnitarySystem( UnitarySysNum ).MaxONOFFCyclesperHour, UnitarySystem( UnitarySysNum ).HPTimeConstant, UnitarySystem( UnitarySysNum ).FanDelayTime, UnitarySystem( UnitarySysNum ).InitHeatPump, 0.0, 0.0, 0, 0.0 );
-			DXCoolCap = GetWAHPCoilCapacity( cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ), UnitarySystem( UnitarySysNum ).CoolingCoilName, ErrFound );
-			EqSizing.DesCoolingLoad = DXCoolCap;
-			if( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHP ) EqSizing.DesHeatingLoad = DXCoolCap;
-		} else if( ( SELECT_CASE_var == Coil_CoolingWaterToAirHPVSEquationFit ) || ( SELECT_CASE_var == Coil_CoolingAirToAirVariableSpeed ) ) {
+		if( ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterToAirHPVSEquationFit ) || ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed ) ) {
 
 			if ( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling > 0 ) {
 				if ( ! allocated( UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate ) ) UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling );
-
 				if ( ! allocated( UnitarySystem( UnitarySysNum ).CoolMassFlowRate ) ) UnitarySystem( UnitarySysNum ).CoolMassFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling );
-
 				if ( ! allocated( UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio ) ) UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling );
 			}
 
 			SimVariableSpeedCoils( BlankString, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, 0, UnitarySystem( UnitarySysNum ).MaxONOFFCyclesperHour, UnitarySystem( UnitarySysNum ).HPTimeConstant, UnitarySystem( UnitarySysNum ).FanDelayTime, 0, 0.0, 1, 0.0, 0.0, 0.0, 0.0 ); //conduct the sizing operation in the VS WSHP
 			UnitarySystem( UnitarySysNum ).NumOfSpeedCooling = VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).NumOfSpeeds;
 			DXCoolCap = GetCoilCapacityVariableSpeed( cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ), UnitarySystem( UnitarySysNum ).CoolingCoilName, ErrFound );
+			EqSizing.DesCoolingLoad = DXCoolCap;
 			MulSpeedFlowScale = VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).RatedAirVolFlowRate / VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).MSRatedAirVolFlowRate( VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).NormSpedLevel );
 			for ( Iter = 1; Iter <= UnitarySystem( UnitarySysNum ).NumOfSpeedCooling; ++Iter ) {
 				UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) = VarSpeedCoil( UnitarySystem( UnitarySysNum ).CoolingCoilIndex ).MSRatedAirVolFlowRate( Iter ) * MulSpeedFlowScale;
@@ -2214,13 +2184,11 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).IdleMassFlowRate = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 1 );
 			UnitarySystem( UnitarySysNum ).IdleSpeedRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 1 );
 
-		} else if ( SELECT_CASE_var == CoilDX_MultiSpeedCooling ) {
+		} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_MultiSpeedCooling ) {
 
 			if ( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling > 0 ) {
 				if ( ! allocated( UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate ) ) UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling );
-
 				if ( ! allocated( UnitarySystem( UnitarySysNum ).CoolMassFlowRate ) ) UnitarySystem( UnitarySysNum ).CoolMassFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling );
-
 				if ( ! allocated( UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio ) ) UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling );
 			}
 
@@ -2238,23 +2206,19 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow * DesignSpecMSHP( MSHPIndex ).CoolingVolFlowRatio( Iter );
 					UnitarySystem( UnitarySysNum ).CoolMassFlowRate( Iter ) = UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) * StdRhoAir;
 					UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( Iter ) = UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) / UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( DesignSpecMSHP( MSHPIndex ).NumOfSpeedCooling );
-
 				}
 				UnitarySystem( UnitarySysNum ).IdleVolumeAirRate = UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( 1 );
 				UnitarySystem( UnitarySysNum ).IdleMassFlowRate = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 1 );
 				UnitarySystem( UnitarySysNum ).IdleSpeedRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 1 );
 			}
 
-		} else {
-		}}
+		}
 
 		if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_MultiSpeedHeating || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingElectric_MultiStage || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingGas_MultiStage ) {
 
 			if ( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating > 0 ) {
 				if ( ! allocated( UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate ) ) UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
-
 				if ( ! allocated( UnitarySystem( UnitarySysNum ).HeatMassFlowRate ) ) UnitarySystem( UnitarySysNum ).HeatMassFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
-
 				if ( ! allocated( UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio ) ) UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
 			}
 
@@ -2278,9 +2242,7 @@ namespace HVACUnitarySystem {
 
 			if ( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating > 0 ) {
 				if ( ! allocated( UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate ) ) UnitarySystem( UnitarySysNum ).HeatVolumeFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
-
 				if ( ! allocated( UnitarySystem( UnitarySysNum ).HeatMassFlowRate ) ) UnitarySystem( UnitarySysNum ).HeatMassFlowRate.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
-
 				if ( ! allocated( UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio ) ) UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio.allocate( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
 			}
 
@@ -2344,42 +2306,41 @@ namespace HVACUnitarySystem {
 			UnitarySystem( UnitarySysNum ).LatLoadLoss = 0.0;
 		}
 
-		if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
-
-			SizingMethod = HeatingCapacitySizing;
-
-// setting an input field to autosize will trip the "no sizing objects" warning if the input file does not have autosized input fields
-			if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWater && UnitarySystem( UnitarySysNum ).DesignHeatingCapacity == 0.0 ) {
-				DataConstantUsedForSizing = EqSizing.DesHeatingLoad;
-				DataFractionUsedForSizing = 1.0;
-				SizingMethod = AutoCalculateSizing;
-				UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = AutoSize;
-			}
-
-			PrintFlag = true;
-			TempSize = UnitarySystem( UnitarySysNum ).DesignHeatingCapacity;
-			SizingString = "Nominal Heating Capacity [W]";
-			if( CurSysNum > 0 ) AirLoopControlInfo( AirLoopNum ).UnitarySysSimulating = false; // set to false to allow calculation of parent object heating capacity
-			RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-			if( CurSysNum > 0 ) AirLoopControlInfo( AirLoopNum ).UnitarySysSimulating = true;
-			UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = TempSize;
-			DataConstantUsedForSizing = 0.0;
-			DataFractionUsedForSizing = 0.0;
-
-		}
-
-		UnitaryHeatCap = UnitarySystem( UnitarySysNum ).DesignHeatingCapacity;
-
 		if ( UnitarySystem( UnitarySysNum ).CoolCoilExists ) {
 
 			SizingMethod = CoolingCapacitySizing;
-
-// setting an input field to autosize will trip the "no sizing objects" warning if the input file does not have autosized input fields
-			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWater && UnitarySystem( UnitarySysNum ).DesignCoolingCapacity == 0.0 ) {
-				DataConstantUsedForSizing = EqSizing.DesCoolingLoad;
+			// water coils must report their size to parent objects (or split out sizing routines for water coils so they can be call from here)
+			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWater || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterDetailed ) {
+				SimulateWaterCoilComponents( UnitarySystem( UnitarySysNum ).CoolingCoilName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, QActual, UnitarySystem( UnitarySysNum ).FanOpMode, 1.0 );
+				DataConstantUsedForSizing = GetWaterCoilCapacity( MakeUPPERCase( cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ) ), UnitarySystem( UnitarySysNum ).CoolingCoilName, ErrFound );
+				EqSizing.DesCoolingLoad = DataConstantUsedForSizing;
 				DataFractionUsedForSizing = 1.0;
 				SizingMethod = AutoCalculateSizing;
 				UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = AutoSize;
+			} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilWater_CoolingHXAssisted ) {
+				HXCoilName = GetHXDXCoilName( cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ), UnitarySystem( UnitarySysNum ).CoolingCoilName, ErrFound );
+				ActualCoolCoilType = GetCoilObjectTypeNum( cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ), UnitarySystem( UnitarySysNum ).CoolingCoilName, ErrFound, true );
+				SimHXAssistedCoolingCoil( BlankString, true, On, 1.0, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, 1, false, 1.0, false );
+				DataConstantUsedForSizing = GetWaterCoilCapacity( MakeUPPERCase( cAllCoilTypes( ActualCoolCoilType ) ), HXCoilName, ErrFound );
+				EqSizing.DesCoolingLoad = DataConstantUsedForSizing;
+				DataFractionUsedForSizing = 1.0;
+				SizingMethod = AutoCalculateSizing;
+				UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = AutoSize;
+			} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterToAirHPSimple ) {
+				SimWatertoAirHPSimple( BlankString, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, UnitarySystem( UnitarySysNum ).CoolingCoilSensDemand, UnitarySystem( UnitarySysNum ).CoolingCoilLatentDemand, 0, 0.0, UnitarySystem( UnitarySysNum ).MaxONOFFCyclesperHour, UnitarySystem( UnitarySysNum ).HPTimeConstant, UnitarySystem( UnitarySysNum ).FanDelayTime, 0, 0.0, FirstHVACIteration );
+				DataConstantUsedForSizing = GetSimpleCoilCapacity( cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ), UnitarySystem( UnitarySysNum ).CoolingCoilName, ErrFound );
+				EqSizing.DesCoolingLoad = DataConstantUsedForSizing;
+				DataFractionUsedForSizing = 1.0;
+				SizingMethod = AutoCalculateSizing;
+				UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = AutoSize;
+				if( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHPSimple || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHP ) EqSizing.DesHeatingLoad = DataConstantUsedForSizing;
+			} else if( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterToAirHP ) {
+				SimWatertoAirHP( BlankString, UnitarySystem( UnitarySysNum ).CoolingCoilIndex, UnitarySystem( UnitarySysNum ).MaxCoolAirMassFlow, UnitarySystem( UnitarySysNum ).FanOpMode, FirstHVACIteration, 0.0, UnitarySystem( UnitarySysNum ).MaxONOFFCyclesperHour, UnitarySystem( UnitarySysNum ).HPTimeConstant, UnitarySystem( UnitarySysNum ).FanDelayTime, UnitarySystem( UnitarySysNum ).InitHeatPump, 0.0, 0.0, 0, 0.0 );
+				DataConstantUsedForSizing = GetWAHPCoilCapacity( cAllCoilTypes( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num ), UnitarySystem( UnitarySysNum ).CoolingCoilName, ErrFound );
+				EqSizing.DesCoolingLoad = DataConstantUsedForSizing;
+				DataFractionUsedForSizing = 1.0;
+				SizingMethod = AutoCalculateSizing;
+				if( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHP || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHPSimple ) EqSizing.DesHeatingLoad = DataConstantUsedForSizing;
 			}
 
 			PrintFlag = true;
@@ -2391,6 +2352,36 @@ namespace HVACUnitarySystem {
 			DataFractionUsedForSizing = 0.0;
 
 		}
+
+		if ( UnitarySystem( UnitarySysNum ).HeatCoilExists ) {
+
+			SizingMethod = HeatingCapacitySizing;
+
+			// water coils must report their size to parent objects (or split out sizing routines for water coils so they can be call from here)
+			if ( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWater ) {
+				SimulateWaterCoilComponents( UnitarySystem( UnitarySysNum ).HeatingCoilName, FirstHVACIteration, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, QActual, UnitarySystem( UnitarySysNum ).FanOpMode, 1.0 );
+				DataConstantUsedForSizing = GetWaterCoilCapacity( MakeUPPERCase( cAllCoilTypes( UnitarySystem( UnitarySysNum ).HeatingCoilType_Num ) ), UnitarySystem( UnitarySysNum ).HeatingCoilName, ErrFound );
+				EqSizing.DesHeatingLoad = DataConstantUsedForSizing;
+				DataFractionUsedForSizing = 1.0;
+				SizingMethod = AutoCalculateSizing;
+				UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = AutoSize;
+			}
+
+			PrintFlag = true;
+			TempSize = UnitarySystem( UnitarySysNum ).DesignHeatingCapacity;
+			SizingString = "Nominal Heating Capacity [W]";
+			if( CurSysNum > 0 ) AirLoopControlInfo( AirLoopNum ).UnitarySysSimulating = false; // set to false to allow calculation of parent object heating capacity
+			RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterToAirHPSimple ) DXCoolCap = TempSize;
+			if( CurSysNum > 0 ) AirLoopControlInfo( AirLoopNum ).UnitarySysSimulating = true;
+			UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = TempSize;
+			DataConstantUsedForSizing = 0.0;
+			DataFractionUsedForSizing = 0.0;
+			DataHeatSizeRatio = 1.0;
+
+		}
+
+		UnitaryHeatCap = UnitarySystem( UnitarySysNum ).DesignHeatingCapacity;
 
 		if ( UnitarySystem( UnitarySysNum ).HeatCoilExists || UnitarySystem( UnitarySysNum ).SuppCoilExists ) {
 
@@ -3361,6 +3352,12 @@ namespace HVACUnitarySystem {
 					if ( UnitarySystem( UnitarySysNum ).HeatingCoilIndex == 0 ) {
 						ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ShowContinueError( "Illegal " + cAlphaFields( iHeatingCoilNameAlphaNum ) + " = " + HeatingCoilName );
+						ErrorsFound = true;
+						errFlag = false;
+					}
+
+					if ( errFlag ) {
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 						ErrorsFound = true;
 						errFlag = false;
 					}
@@ -7300,7 +7297,7 @@ namespace HVACUnitarySystem {
 
 		if ( SELECT_CASE_var == CoilDX_HeatingEmpirical ) { // COIL:HEATING:DX:SINGLESPEED
 
-			SimDXCoil( CompName, CompOn, FirstHVACIteration, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadRatio );
+			SimDXCoil( CompName, CompOn, FirstHVACIteration, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadRatio, OnOffAirFlowRatio );
 			UnitarySystem( UnitarySysNum ).HeatCompPartLoadRatio = PartLoadRatio * double( CompOn );
 
 		} else if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
@@ -11935,7 +11932,8 @@ namespace HVACUnitarySystem {
 		// Argument array dimensioning
 
 		// Locals
-		bool SuppHeatingCoilFlag;
+		Real64 CoilLoad; // heating coil load to be met [W]
+		bool SuppHeatingCoilFlag; // true if heating coil is a supplemental heater in a parent object
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// Par(2) = desired air outlet temperature [C]
@@ -11967,8 +11965,9 @@ namespace HVACUnitarySystem {
 			SuppHeatingCoilFlag = false;
 		}
 		FanOpMode = Par()( 4 );
+		CoilLoad = UnitarySystem( UnitarySysNum ).DesignHeatingCapacity * PartLoadFrac;
 		if ( ! SuppHeatingCoilFlag ) {
-			SimulateHeatingCoilComponents( UnitarySystem( UnitarySysNum ).HeatingCoilName, FirstHVACIteration, _, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, _, _, FanOpMode, PartLoadFrac );
+			SimulateHeatingCoilComponents( UnitarySystem( UnitarySysNum ).HeatingCoilName, FirstHVACIteration, CoilLoad, UnitarySystem( UnitarySysNum ).HeatingCoilIndex, _, _, FanOpMode, PartLoadFrac );
 			OutletAirTemp = Node( UnitarySystem( UnitarySysNum ).HeatCoilOutletNodeNum ).Temp;
 		} else {
 			SimulateHeatingCoilComponents( UnitarySystem( UnitarySysNum ).SuppHeatCoilName, FirstHVACIteration, _, UnitarySystem( UnitarySysNum ).SuppHeatCoilIndex, _, true, FanOpMode, PartLoadFrac );
