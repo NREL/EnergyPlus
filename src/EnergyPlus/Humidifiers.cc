@@ -633,6 +633,7 @@ namespace Humidifiers {
 		Real64 WaterSatEnthalpy; // enthalpy of saturated water at 100C, J/kg
 		bool IsAutoSize;			// Indicator to autosize
 		bool HardSizeNoDesRun;		// Indicator to a hard-sized field with no design sizing data
+		static bool ErrorsFound( false ); // TRUE if errors detected in input
 		Real64 NomPowerDes;			// Autosized nominal power for reporting 
 		Real64 NomPowerUser;		// Hardsized nominal power for reporting  
 		Real64 MassFlowDes;			// Design air mass flow rate   
@@ -769,12 +770,12 @@ namespace Humidifiers {
 					if (  NomPower >= NominalPower ) {
 						 ThermalEffRated = NominalPower /  NomPower;
 					} else {
-						 ThermalEffRated = 1.0;
-						ShowMessage( "SizeHumidifier: capacity and thermal efficiency mismatch for " + HumidifierType(  HumType_Code ) + " =\"" +  Name + "\"." );
+						ShowMessage( CalledFrom + ": capacity and thermal efficiency mismatch for " + HumidifierType( HumType_Code ) + " =\"" + Name + "\"." );
 						ShowContinueError( "User-Specified Rated Gas Use Rate of " + RoundSigDigits(  NomPower, 2 ) + " [W]" );
 						ShowContinueError( "User-Specified or Autosized Rated Capacity of " + RoundSigDigits(  NomCapVol, 2 ) + " [m3/s]" );
-						ShowContinueError( "The Rated Gas Use Rate at the Rated Capacity of " + RoundSigDigits(  NomCapVol, 2 ) + " [m3/s]" + " must be greater than the ideal, i.e., 100% thermal efficiideal gas use rate of " + RoundSigDigits( NomPowerDes, 2 ) + " [W]" );
+						ShowContinueError( "Rated Gas Use Rate at the Rated Capacity of " + RoundSigDigits(  NomCapVol, 2 ) + " [m3/s]" + " must be greater than the ideal, i.e., 100% thermal efficiency gas use rate of " + RoundSigDigits( NomPowerDes, 2 ) + " [W]" );
 						ShowContinueError( "Resize the Rated Gas Use Rate by dividing the ideal gas use rate with expected thermal efficiency. " );
+						ErrorsFound = true;
 					}					
 				} else {
 					if (  ThermalEffRated > 0.0 ) {
@@ -813,6 +814,10 @@ namespace Humidifiers {
 					ShowContinueError( " For zero nominal capacity humidifier the rated power is zero." );
 				}
 			}
+		}
+
+		if ( ErrorsFound ) {
+			ShowFatalError( CalledFrom + "Mismatch was found in the Rated Gas Use Rate and Thermal Efficiency for gas fired steam humidifier = " + Name + ". " );
 		}
 	}
 
@@ -1045,7 +1050,7 @@ namespace Humidifiers {
 		Real64 WaterDens; // density of liquid water [kg/m3]
 		Real64 ThermEffCurveOutput; // thermal efficiency modifier normalized curve output value [-]
 		Real64 PartLoadRatio; // gas fired humidifier part load ratio [-]
-		Real64 TheorGasUseRate; // ideal gas use rate [W]
+		Real64 GasUseRateAtRatedEff; // gas use rate at rated thermal efficiency [W]
 		Real64 WaterSpecHeatAvg; // specific heat of water [J/kgK]
 		Real64 SteamSatEnthalpy; // enthalpy of saturated steam at 100C [J/kg]
 		Real64 WaterSatEnthalpy; // enthalpy of saturated water at 100C [J/kg]
@@ -1104,7 +1109,7 @@ namespace Humidifiers {
 		}
 		if ( WaterAdd > 0.0 ) {
 			if ( InletWaterTempOption == FixedInletWaterTemperature ) {
-				TheorGasUseRate = ( WaterAdd / NomCap ) *  NomPower;
+				GasUseRateAtRatedEff = ( WaterAdd / NomCap ) *  NomPower;
 			} else if ( InletWaterTempOption == VariableInletWaterTemperature ) {
 				if ( SuppliedByWaterSystem ) { // use water use storage tank supply temperaure
 					 CurMakeupWaterTemp = WaterStorage(  WaterTankID ).TwaterSupply(  TankSupplyID );
@@ -1117,9 +1122,9 @@ namespace Humidifiers {
 				SteamSatEnthalpy = GetSatEnthalpyRefrig( fluidNameSteam, TSteam, 1.0, RefrigerantIndex, RoutineName );
 				WaterSatEnthalpy = GetSatEnthalpyRefrig( fluidNameSteam, TSteam, 0.0, RefrigerantIndex, RoutineName );
 				WaterSpecHeatAvg = 0.5 * ( GetSpecificHeatGlycol( fluidNameWater, TSteam, WaterIndex, RoutineName ) + GetSpecificHeatGlycol( fluidNameWater, Tref, WaterIndex, RoutineName ) );
-				TheorGasUseRate = WaterAdd * ( ( SteamSatEnthalpy - WaterSatEnthalpy ) + WaterSpecHeatAvg * ( TSteam - Tref ) ) / ThermalEffRated;
+				GasUseRateAtRatedEff = WaterAdd * ( ( SteamSatEnthalpy - WaterSatEnthalpy ) + WaterSpecHeatAvg * ( TSteam - Tref ) ) / ThermalEffRated;
 			}
-			PartLoadRatio = TheorGasUseRate / NomPower;			
+			PartLoadRatio = GasUseRateAtRatedEff / NomPower;
 			if (  EfficiencyCurvePtr > 0 ) { // calculate normalized thermal efficiency based on curve object type
 				if ( EfficiencyCurveType == Linear || EfficiencyCurveType == Quadratic || EfficiencyCurveType == Cubic ) {
 					ThermEffCurveOutput = CurveValue( EfficiencyCurvePtr, PartLoadRatio );
@@ -1129,7 +1134,7 @@ namespace Humidifiers {
 			}
 			ThermalEff = ThermalEffRated * ThermEffCurveOutput;
 			if ( ThermEffCurveOutput != 0.0 ) {
-				 GasUseRate = TheorGasUseRate / ThermEffCurveOutput;
+				GasUseRate = GasUseRateAtRatedEff / ThermEffCurveOutput;
 			} 
 			AuxElecUseRate = FanPower + StandbyPower;
 
