@@ -73,6 +73,10 @@ namespace GroundHeatExchangers {
 		bool myFlag;
 		bool myEnvrnFlag;
 		Real64 lastQnSubHr;
+		Real64 HXResistance; // The thermal resistance of the GHX, (K per W/m)
+		Real64 totalTubeLength; // The total length of pipe. NumBoreholes * BoreholeDepth OR Pi * Dcoil * NumCoils
+		Real64 timeSS;
+		Real64 timeSSFactor;
 
 		// Default Constructor
 		GLHEBase() :
@@ -107,21 +111,48 @@ namespace GroundHeatExchangers {
 			QGLHE( 0.0 ),
 			myFlag( true ),
 			myEnvrnFlag( true ),
-			lastQnSubHr( 0.0 )
+			lastQnSubHr( 0.0 ),
+			HXResistance( 0.0 ),
+			timeSS( 0.0 ),
+			timeSSFactor( 0.0 )
 
 		{}
+
+		virtual void
+		calcGFunctions()=0;
 
 		void
 		calcAggregateLoad();
 
-		virtual void
-		calcGroundHeatExchanger()=0;
+		void
+		updateGHX();
+
+		void
+		calcGroundHeatExchanger();
 
 		virtual void
 		initGLHESimVars()=0;
 
+		virtual void
+		calcHXResistance()=0;
+
+		Real64
+		interpGFunc( Real64 );
+
 		virtual Real64
-		interpGFunc( Real64 )=0;
+		getGFunc( Real64 )=0;
+
+		virtual void
+		getAnnualTimeConstant()=0;
+
+		Real64
+		getKAGrndTemp(
+		Real64 const z,
+		Real64 const dayOfYear,
+		Real64 const aveGroundTemp,
+		Real64 const aveGroundTempAmplitude,
+		Real64 const phaseShift
+	);
 
 	};
 
@@ -135,7 +166,6 @@ namespace GroundHeatExchangers {
 		Real64 boreholeRadius;
 		Real64 kGrout; // Grout thermal conductivity                [W/(mK)]
 		Real64 UtubeDist; // Distance between the legs of the Utube    [m]
-		Real64 resistanceBhole; // The thermal resistance of the borehole, (K per W/m)
 		bool runFlag;
 
 		// Default Constructor
@@ -147,26 +177,30 @@ namespace GroundHeatExchangers {
 			boreholeRadius( 0.0 ),
 			kGrout( 0.0 ),
 			UtubeDist( 0.0 ),
-			resistanceBhole( 0.0 ),
 			runFlag( false )
 
 		{}
 
-		//void
-		//updateGroundHeatExchanger();
+		void
+		calcGFunctions();
 
 		void
-		calcGroundHeatExchanger();
-
-		void
-		boreholeResistance();
+		calcHXResistance();
 
 		void
 		initGLHESimVars();
 
+		void
+		getAnnualTimeConstant();
+
+		//Real64
+		//interpGFunc(
+		//Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
+		//);
+
 		Real64
-		interpGFunc(
-		Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
+		getGFunc(
+		Real64 const LNTTsVal
 		);
 
 	};
@@ -188,7 +222,7 @@ namespace GroundHeatExchangers {
 		Real64 averageGroundTempAmplitude;
 		Real64 phaseShiftOfMinGroundTempDays;
 		int monthOfMinSurfTemp;
-		Real64 maxLengthOfSimulationInYears;
+		Real64 maxSimYears;
 		Real64 minSurfTemp;
 		FArray1D< Real64 > X0;
 		FArray1D< Real64 > Y0;
@@ -210,16 +244,12 @@ namespace GroundHeatExchangers {
 			averageGroundTempAmplitude( 0.0 ),
 			phaseShiftOfMinGroundTempDays( 0.0 ),
 			monthOfMinSurfTemp( 0 ),
-			maxLengthOfSimulationInYears( 0.0 ),
+			maxSimYears( 0.0 ),
 			minSurfTemp( 0.0 )
-
 		{}
 
 		void
-		calcGroundHeatExchanger();
-
-		Real64
-		slinkyResistance();
+		calcHXResistance();
 
 		void
 		calcGFunctions();
@@ -227,10 +257,13 @@ namespace GroundHeatExchangers {
 		void
 		initGLHESimVars();
 
-		Real64
-		interpGFunc(
-		Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
-		);
+		void
+		getAnnualTimeConstant();
+
+		//Real64
+		//interpGFunc(
+		//Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
+		//);
 
 		Real64
 		doubleIntegral(
@@ -307,13 +340,16 @@ namespace GroundHeatExchangers {
 		Real64 const t
 		);
 
+		Real64
+		getGFunc(
+		Real64 const LNTTsVal
+		);
+
 	};
 
 	// Object Data
 	extern FArray1D< GLHEVert > verticalGLHE; // Vertical GLHEs
 	extern FArray1D< GLHESlinky > slinkyGLHE; // Slinky GLHEs
-
-	// Functions
 
 	void
 	SimGroundHeatExchangers(
@@ -327,7 +363,6 @@ namespace GroundHeatExchangers {
 
 	void
 	GetGroundHeatExchangerInput();
-
 
 	//     NOTICE
 

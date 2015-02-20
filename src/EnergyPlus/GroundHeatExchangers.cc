@@ -1,5 +1,6 @@
 // C++ Headers
 #include <cmath>
+#include <fstream>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
@@ -193,12 +194,14 @@ namespace GroundHeatExchangers {
 				return;
 			}
 
-			//INITIALIZE
+			// Initialize HX
 			thisGLHE.initGLHESimVars();
 
-			//SIMULATE HEAT EXCHANGER
+			// Simulat HX
 			thisGLHE.calcGroundHeatExchanger();
-			//thisGLHE.updateGroundHeatExchanger();
+			
+			// Update HX Report Vars
+			thisGLHE.updateGHX();
 
 		} else if ( type == "GROUNDHEATEXCHANGER:SLINKY") {
 		
@@ -229,19 +232,29 @@ namespace GroundHeatExchangers {
 				return;
 			}
 
-			//INITIALIZE
+			// Initialize HX
 			thisGLHE.initGLHESimVars();
 
-			//SIMULATE HEAT EXCHANGER
+			// Simulat HX
 			thisGLHE.calcGroundHeatExchanger();
-
+			
+			// Update HX Report Vars
+			thisGLHE.updateGHX();
 		}
-
 	}
+
+	void 
+	GLHEVert::calcGFunctions()
+	{
+		// Nothing to see here. Move along.
+		// Just a stub out for future work. 
+	};
 
 	//******************************************************************************
 
-	void GLHESlinky::calcGFunctions(){
+	void 
+	GLHESlinky::calcGFunctions()
+	{
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Matt Mitchell
@@ -260,7 +273,6 @@ namespace GroundHeatExchangers {
 		Real64 tLg;
 		Real64 t;
 		Real64 convertYearsToSeconds( 356 * 24 * 60 * 60 );
-		int numGFunctions;
 		int NT;
 		int numLC;
 		int numRC;
@@ -283,6 +295,8 @@ namespace GroundHeatExchangers {
 		int J0;
 		Real64 doubleIntegralVal;
 		Real64 midFieldVal;
+		Real64 SubAGG( 15.0 );
+		Real64 AGG = ( 192.0 );
 
 		//ShowString( "Calculating G-Functions" );
 
@@ -290,13 +304,19 @@ namespace GroundHeatExchangers {
 		Y0.allocate( numTrenches );
 
 		// Calculate the number of g-functions required
-		tLg_max = std::log10( maxLengthOfSimulationInYears * convertYearsToSeconds / ts );
-		numGFunctions = ( tLg_max - tLg_min ) / ( tLg_grid ) + 1;
+		tLg_max = std::log10( maxSimYears * convertYearsToSeconds / ts );
+		NPairs = ( tLg_max - tLg_min ) / ( tLg_grid ) + 1;
+
 
 		// Allocate and setup g-function arrays
-		GFNC.allocate( numGFunctions );
-		LNTTS.allocate( numGFunctions );
-		for ( i = 1; i <= numGFunctions; i++ ) {
+		GFNC.allocate( NPairs );
+		LNTTS.allocate( NPairs );
+		QnMonthlyAgg.allocate( maxSimYears * 12 );
+		QnHr.allocate( 730 + AGG + SubAGG );
+		QnSubHr.allocate( ( SubAGG + 1 ) * maxTSinHr + 1 );
+		LastHourN.allocate( SubAGG + 1 );
+
+		for ( i = 1; i <= NPairs; i++ ) {
 			GFNC( i ) = 0.0;
 			LNTTS( i ) = 0.0;
 		}
@@ -326,7 +346,7 @@ namespace GroundHeatExchangers {
 		}
 		
 		// Calculate the corresponding time of each temperature response factor
-		for ( NT = 1; NT <= numGFunctions; NT++ ) {
+		for ( NT = 1; NT <= NPairs; NT++ ) {
 			tLg = tLg_min + tLg_grid * ( NT - 1 );
 			t = std::pow( 10, tLg ) * ts;
 
@@ -796,386 +816,27 @@ namespace GroundHeatExchangers {
 	//******************************************************************************
 
 	void
-	GLHESlinky::calcGroundHeatExchanger(){
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR:          Matt Mitchell
-		//       DATE WRITTEN:    February, 2015
-		//       MODIFIED         na
-		//       RE-ENGINEERED    na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Calculates g-functions for the slinky ground heat exchanger model
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool firstTime( true );
-
-		// Calculate g-functions
-		if ( firstTime ) {
-			calcGFunctions();
-			firstTime = false;
-		}
-
-		//		// SUBROUTINE INFORMATION:
-		////       AUTHOR:          Dan Fisher
-		////       DATE WRITTEN:    August, 2000
-		////       MODIFIED         Arun Murugappan
-		////       RE-ENGINEERED    na
-
-		//// PURPOSE OF THIS SUBROUTINE:
-		//// This is the main routine to simulate the operation of vertical
-		//// closed-loop ground heat exchangers (GLHE).
-
-		//// METHODOLOGY EMPLOYED:
-		//// The borehole and fluid temperatures are calculated from the response to
-		//// the current heat transfer rate and the response to the history of past
-		//// applied heat pulses. The response to each pulse is calculated from a non-
-		//// dimensionalized response function, or G-function, that is specific to the
-		//// given borehole field arrangement, depth and spacing. The data defining
-		//// this function is read from input.
-		//// The heat pulse histories need to be recorded over an extended period (months).
-		//// To aid computational efficiency past pulses are continuously agregated into
-		//// equivalent heat pulses of longer duration, as each pulse becomes less recent.
-
-		//// REFERENCES:
-		//// Eskilson, P. 'Thermal Analysis of Heat Extraction Boreholes' Ph.D. Thesis:
-		////   Dept. of Mathematical Physics, University of Lund, Sweden, June 1987.
-		//// Yavuzturk, C., J.D. Spitler. 1999. 'A Short Time Step Response Factor Model
-		////   for Vertical Ground Loop Heat Exchangers. ASHRAE Transactions. 105(2): 475-485.
-
-		//// Using/Aliasing
-		using DataPlant::PlantLoop;
-		using FluidProperties::GetSpecificHeatGlycol;
-		using FluidProperties::GetDensityGlycol;
-		using PlantUtilities::SafeCopyPlantNode;
-		using General::TrimSigDigits;
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS
-		static std::string const RoutineName( "CalcSlinkyGroundHeatExchanger" );
-
-		////LOCAL BHORE HOLE PARAMETERS
-		Real64 fluidDensity;
-		Real64 kGroundFactor;
-		Real64 cpFluid;
-		//Real64 gFuncVal; // Interpolated G function value at a sub-hour
-		//static Real64 ToutNew( 19.375 );
-		//Real64 fluidAveTemp;
-		//Real64 groundDiffusivity;
-		//Real64 timeSS; // Steady state time
-		//Real64 timeSSFactor; // Steady state time factor for calculation
-		//Real64 XI;
-		//Real64 C_1;
-		//int numOfMonths; // the number of months of simulation elapsed
-		//int currentMonth; // The Month upto which the Montly blocks are superposed
-		//Real64 sumQnMonthly; // tmp variable which holds the sum of the Temperature diffrence
-		//// due to Aggregated heat extraction/rejection step
-		//Real64 sumQnHourly; // same as above for hourly
-		//Real64 sumQnSubHourly; // same as above for subhourly( with no aggreation]
-		//Real64 RQMonth;
-		//Real64 RQHour;
-		//Real64 RQSubHr;
-		//int I;
-		//Real64 tmpQnSubHourly; // current Qn subhourly value
-		//int hourlyLimit; // number of hours to be taken into account in superposition
-		//int subHourlyLimit; // number of subhourlys to be taken into account in subhourly superposition
-		Real64 sumTotal; // sum of all the Qn (load) blocks
-		//Real64 C0; // **Intermediate constants used
-		//Real64 C1; // **Intermediate constants used
-		//Real64 C2; // **in explicit  calcualtion of the
-		//Real64 C3; // **temperature at the U tube outlet.
-		//static int PrevN( 1 ); // The saved value of N at previous time step
-		//int IndexN; // Used to index the LastHourN array
-		//static bool updateCurSimTime( true ); // Used to reset the CurSimTime to reset after WarmupFlag
-		//static bool triggerDesignDayReset( false );
-		//Real64 const deltaTempLimit( 100.0 ); // temp limit for warnings
-		//Real64 GLHEdeltaTemp; // ABS(Outlet temp -inlet temp)
-		//static int numErrorCalls( 0 );
-
-		//Autodesk:Uninit Initialize variables used uninitialized
-		sumTotal = 0.0; //Autodesk:Uninit Force default initialization
-
-		inletTemp = Node( inletNodeNum ).Temp;
-
-		cpFluid = GetSpecificHeatGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
-		fluidDensity = GetDensityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
-
-		kGroundFactor = 2.0 * Pi * kGround;
-		//groundDiffusivity = kGround / cpRhoGround;
-
-		//// calculate annual time constant for ground conduction
-		////timeSS = ( pow_2( boreholeLength ) / ( 9.0 * groundDiffusivity ) ) / SecInHour / 8760.0;
-		//timeSSFactor = 1.0; //timeSS * 8760.0;
-
-		//if ( triggerDesignDayReset && WarmupFlag ) updateCurSimTime = true;
-		//if ( DayOfSim == 1 && updateCurSimTime ) {
-		//	currentSimTime = 0.0;
-		//	prevTimeSteps = 0.0;
-		//	QnHr = 0.0;
-		//	QnMonthlyAgg = 0.0;
-		//	QnSubHr = 0.0;
-		//	LastHourN = 1;
-		//	N = 1;
-		//	updateCurSimTime = false;
-		//	triggerDesignDayReset = false;
-		//}
-
-		//currentSimTime = ( DayOfSim - 1 ) * 24 + HourOfDay - 1 + ( TimeStep - 1 ) * TimeStepZone + SysTimeElapsed; //+ TimeStepsys
-		//locHourOfDay = mod( currentSimTime, hrsPerDay ) + 1;
-		//locDayOfSim = currentSimTime / 24 + 1;
-
-		//if ( DayOfSim > 1 ) {
-		//	updateCurSimTime = true;
-		//}
-
-		//if ( ! WarmupFlag ) {
-		//	triggerDesignDayReset = true;
-		//}
-
-		//if ( currentSimTime <= 0.0 ) {
-		//	prevTimeSteps = 0.0; // this resets history when rounding 24:00 hours during warmup avoids hard crash later
-		//	outletTemp = inletTemp;
-		//	calcAggregateLoad(); //Just allocates and initializes prevHour array
-		//	return;
-		//}
-
-		//// Store currentSimTime in prevTimeSteps only if a time step occurs
-
-		//if ( prevTimeSteps( 1 ) != currentSimTime ) {
-		//	prevTimeSteps = eoshift( prevTimeSteps, -1, currentSimTime );
-		//	++N;
-		//}
-
-		//if ( N != PrevN ) {
-		//	PrevN = N;
-		//	//for ( I = 1; I <= numVerticalGLHEs; ++I ) {
-		//	QnSubHr = eoshift( QnSubHr, -1, lastQnSubHr );
-		//	//}
-		//}
-
-		//calcAggregateLoad();
-
-		//// Update the borehole resistance each time
-		//boreholeResistance();
-
-		//if ( N == 1 ) {
-		//	if ( massFlowRate <= 0.0 ) {
-		//		tmpQnSubHourly = 0.0;
-		//		fluidAveTemp = tempGround;
-		//		ToutNew = inletTemp;
-		//	} else {
-		//		XI = std::log( currentSimTime / ( timeSSFactor ) );
-		//		gFuncVal = interpGFunc( XI );
-
-		//		C_1 = ( boreholeLength * numBoreholes ) / ( 2.0 * massFlowRate * cpFluid );
-		//		tmpQnSubHourly = ( tempGround - inletTemp ) / ( gFuncVal / ( kGroundFactor ) + resistanceBhole + C_1 );
-		//		fluidAveTemp = tempGround - tmpQnSubHourly * resistanceBhole;
-		//		ToutNew = tempGround - tmpQnSubHourly * ( gFuncVal / ( kGroundFactor ) + resistanceBhole - C_1 );
-		//	}
-		//} else {
-		//	// no monthly super position
-		//	if ( currentSimTime < ( hrsPerMonth + AGG + SubAGG ) ) {
-
-		//		// Calculate the Sub Hourly Superposition
-		//		sumQnSubHourly = 0.0;
-		//		if ( int( currentSimTime ) < SubAGG ) {
-		//			IndexN = int( currentSimTime ) + 1;
-		//		} else {
-		//			IndexN = SubAGG + 1;
-		//		}
-		//		subHourlyLimit = N - LastHourN( IndexN ); //Check this when running simulation
-
-		//		SUBHRLY_LOOP: for ( I = 1; I <= subHourlyLimit; ++I ) {
-		//			if ( I == subHourlyLimit ) {
-		//				if ( int( currentSimTime ) >= SubAGG ) {
-		//					XI = std::log( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
-		//					gFuncVal = interpGFunc( XI );
-		//					RQSubHr = gFuncVal / ( kGroundFactor );
-		//					sumQnSubHourly += ( QnSubHr( I ) - QnHr( IndexN ) ) * RQSubHr;
-		//				} else {
-		//					XI = std::log( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
-		//					gFuncVal = interpGFunc( XI );
-		//					RQSubHr = gFuncVal / ( kGroundFactor );
-		//					sumQnSubHourly += QnSubHr( I ) * RQSubHr;
-		//				}
-		//				goto SUBHRLY_LOOP_exit;
-		//			}
-		//			//prevTimeSteps(I+1) This is "I+1" because prevTimeSteps(1) = CurrentTimestep
-		//			XI = std::log( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
-		//			gFuncVal = interpGFunc( XI );
-		//			RQSubHr = gFuncVal / ( kGroundFactor );
-		//			sumQnSubHourly += ( QnSubHr( I ) - QnSubHr( I + 1 ) ) * RQSubHr;
-		//			SUBHRLY_LOOP_loop: ;
-		//		}
-		//		SUBHRLY_LOOP_exit: ;
-
-		//		// Calculate the Hourly Superposition
-
-		//		hourlyLimit = int( currentSimTime );
-		//		sumQnHourly = 0.0;
-		//		HOURLY_LOOP: for ( I = SubAGG + 1; I <= hourlyLimit; ++I ) {
-		//			if ( I == hourlyLimit ) {
-		//				XI = std::log( currentSimTime / ( timeSSFactor ) );
-		//				gFuncVal = interpGFunc( XI );
-		//				RQHour = gFuncVal / ( kGroundFactor );
-		//				sumQnHourly += QnHr( I ) * RQHour;
-		//				goto HOURLY_LOOP_exit;
-		//			}
-		//			XI = std::log( ( currentSimTime - int( currentSimTime ) + I ) / ( timeSSFactor ) );
-		//			gFuncVal = interpGFunc( XI );
-		//			RQHour = gFuncVal / ( kGroundFactor );
-		//			sumQnHourly += ( QnHr( I ) - QnHr( I + 1 ) ) * RQHour;
-		//			HOURLY_LOOP_loop: ;
-		//		}
-		//		HOURLY_LOOP_exit: ;
-
-		//		// Find the total Sum of the Temperature difference due to all load blocks
-		//		sumTotal = sumQnSubHourly + sumQnHourly;
-
-		//		//Calulate the subhourly temperature due the Last Time steps Load
-		//		XI = std::log( ( currentSimTime - prevTimeSteps( 2 ) ) / ( timeSSFactor ) );
-		//		gFuncVal = interpGFunc( XI );
-		//		RQSubHr = gFuncVal / ( kGroundFactor );
-
-		//		if ( massFlowRate <= 0.0 ) {
-		//			tmpQnSubHourly = 0.0;
-		//			fluidAveTemp = tempGround - sumTotal; // Q(N)*RB = 0
-		//			ToutNew = inletTemp;
-		//		} else {
-		//			//Dr.Spitler's Explicit set of equations to calculate the New Outlet Temperature of the U-Tube
-		//			C0 = RQSubHr;
-		//			C1 = tempGround - ( sumTotal - QnSubHr( 1 ) * RQSubHr );
-		//			C2 = boreholeLength * numBoreholes / ( 2.0 * massFlowRate * cpFluid );
-		//			C3 = massFlowRate * cpFluid / ( boreholeLength * numBoreholes );
-		//			tmpQnSubHourly = ( C1 - inletTemp ) / ( resistanceBhole + C0 - C2 + ( 1 / C3 ) );
-		//			fluidAveTemp = C1 - ( C0 + resistanceBhole ) * tmpQnSubHourly;
-		//			ToutNew = C1 + ( C2 - C0 - resistanceBhole ) * tmpQnSubHourly;
-		//		}
-
-		//	} else { // Monthly Aggregation and super position
-
-		//		numOfMonths = ( currentSimTime + 1 ) / hrsPerMonth;
-
-		//		if ( currentSimTime < ( ( numOfMonths ) * hrsPerMonth ) + AGG + SubAGG ) {
-		//			currentMonth = numOfMonths - 1;
-		//		} else {
-		//			currentMonth = numOfMonths;
-		//		}
-
-		//		//monthly superposition
-		//		sumQnMonthly = 0.0;
-		//		SUMMONTHLY: for ( I = 1; I <= currentMonth; ++I ) {
-		//			if ( I == 1 ) {
-		//				XI = std::log( currentSimTime / ( timeSSFactor ) );
-		//				gFuncVal = interpGFunc( XI );
-		//				RQMonth = gFuncVal / ( kGroundFactor );
-		//				sumQnMonthly += QnMonthlyAgg( I ) * RQMonth;
-		//				goto SUMMONTHLY_loop;
-		//			}
-		//			XI = std::log( ( currentSimTime - ( I - 1 ) * hrsPerMonth ) / ( timeSSFactor ) );
-		//			gFuncVal = interpGFunc( XI );
-		//			RQMonth = gFuncVal / ( kGroundFactor );
-		//			sumQnMonthly += ( QnMonthlyAgg( I ) - QnMonthlyAgg( I - 1 ) ) * RQMonth;
-		//			SUMMONTHLY_loop: ;
-		//		}
-		//		SUMMONTHLY_exit: ;
-
-		//		// Hourly Supr position
-		//		hourlyLimit = int( currentSimTime - currentMonth * hrsPerMonth );
-		//		sumQnHourly = 0.0;
-		//		HOURLYLOOP: for ( I = 1 + SubAGG; I <= hourlyLimit; ++I ) {
-		//			if ( I == hourlyLimit ) {
-		//				XI = std::log( ( currentSimTime - int( currentSimTime ) + I ) / ( timeSSFactor ) );
-		//				gFuncVal = interpGFunc( XI );
-		//				RQHour = gFuncVal / ( kGroundFactor );
-		//				sumQnHourly += ( QnHr( I ) - QnMonthlyAgg( currentMonth ) ) * RQHour;
-		//				goto HOURLYLOOP_exit;
-		//			}
-		//			XI = std::log( ( currentSimTime - int( currentSimTime ) + I ) / ( timeSSFactor ) );
-		//			gFuncVal = interpGFunc( XI );
-		//			RQHour = gFuncVal / ( kGroundFactor );
-		//			sumQnHourly += ( QnHr( I ) - QnHr( I + 1 ) ) * RQHour;
-		//			HOURLYLOOP_loop: ;
-		//		}
-		//		HOURLYLOOP_exit: ;
-
-		//		// Subhourly Superposition
-		//		subHourlyLimit = N - LastHourN( SubAGG + 1 );
-		//		sumQnSubHourly = 0.0;
-		//		SUBHRLOOP: for ( I = 1; I <= subHourlyLimit; ++I ) {
-		//			if ( I == subHourlyLimit ) {
-		//				XI = std::log( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
-		//				gFuncVal = interpGFunc( XI );
-		//				RQSubHr = gFuncVal / ( kGroundFactor );
-		//				sumQnSubHourly += ( QnSubHr( I ) - QnHr( SubAGG + 1 ) ) * RQSubHr;
-		//				goto SUBHRLOOP_exit;
-		//			}
-		//			XI = std::log( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
-		//			gFuncVal = interpGFunc( XI );
-		//			RQSubHr = gFuncVal / ( kGroundFactor );
-		//			sumQnSubHourly += ( QnSubHr( I ) - QnSubHr( I + 1 ) ) * RQSubHr;
-		//			SUBHRLOOP_loop: ;
-		//		}
-		//		SUBHRLOOP_exit: ;
-
-		//		sumTotal = sumQnMonthly + sumQnHourly + sumQnSubHourly;
-
-		//		//Calulate the subhourly temperature due the Last Time steps Load
-
-		//		XI = std::log( ( currentSimTime - prevTimeSteps( 2 ) ) / ( timeSSFactor ) );
-		//		gFuncVal = interpGFunc( XI );
-		//		RQSubHr = gFuncVal / ( kGroundFactor );
-
-		//		if ( massFlowRate <= 0.0 ) {
-		//			tmpQnSubHourly = 0.0;
-		//			fluidAveTemp = tempGround - sumTotal; // Q(N)*RB = 0
-		//			ToutNew = inletTemp;
-		//		} else {
-		//			// Explicit set of equations to calculate the New Outlet Temperature of the U-Tube
-		//			C0 = RQSubHr;
-		//			C1 = tempGround - ( sumTotal - QnSubHr( 1 ) * RQSubHr );
-		//			C2 = boreholeLength * numBoreholes / ( 2 * massFlowRate * cpFluid );
-		//			C3 = massFlowRate * cpFluid / ( boreholeLength * numBoreholes );
-		//			tmpQnSubHourly = ( C1 - inletTemp ) / ( resistanceBhole + C0 - C2 + ( 1 / C3 ) );
-		//			fluidAveTemp = C1 - ( C0 + resistanceBhole ) * tmpQnSubHourly;
-		//			ToutNew = C1 + ( C2 - C0 - resistanceBhole ) * tmpQnSubHourly;
-		//		}
-		//	} //  end of AGG OR NO AGG
-		//} // end of N  = 1 branch
-		//boreholeTemp = tempGround - sumTotal; //Autodesk:Uninit sumTotal could have been uninitialized here
-		////Load the QnSubHourly Array with a new value at end of every timestep
-
-		//lastQnSubHr = tmpQnSubHourly;
-		//outletTemp = ToutNew;
-		////QGLHE = tmpQnSubHourly;
-		//QGLHE = tmpQnSubHourly * boreholeLength * numBoreholes;
-		//aveFluidTemp = fluidAveTemp;
-
-		//SafeCopyPlantNode( inletNodeNum, outletNodeNum );
-
-		//Node( outletNodeNum ).Temp = outletTemp;
-		//Node( outletNodeNum ).Enthalpy = outletTemp * GetSpecificHeatGlycol( PlantLoop( loopNum ).FluidName, outletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
-
-		//GLHEdeltaTemp = std::abs( outletTemp - inletTemp );
-		//
-		//if ( GLHEdeltaTemp > deltaTempLimit && numErrorCalls < numVerticalGLHEs && ! WarmupFlag ) {
-		//	fluidDensity = GetDensityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
-		//	designMassFlow = designFlow * fluidDensity;
-		//	ShowWarningError( "Check GLHE design inputs & g-functions for consistency" );
-		//	ShowContinueError( "For GroundHeatExchanger:Vertical " + name + "GLHE delta Temp > 100C." );
-		//	ShowContinueError( "This can be encountered in cases where the GLHE mass flow rate is either significantly" );
-		//	ShowContinueError( " lower than the design value, or cases where the mass flow rate rapidly changes." );
-		//	ShowContinueError( "GLHE Current Flow Rate=" + TrimSigDigits( massFlowRate, 3 ) + "; GLHE Design Flow Rate=" + TrimSigDigits( designMassFlow, 3 ) );
-		//	++numErrorCalls;
-		//}
-
-
+	GLHEVert::getAnnualTimeConstant()
+	{
+		// calculate annual time constant for ground conduction
+		timeSS = ( pow_2( boreholeLength ) / ( 9.0 * diffusivityGround ) ) / SecInHour / 8760.0;
+		timeSSFactor = timeSS * 8760.0;
 	};
 
 	//******************************************************************************
 
 	void
-	GLHEVert::calcGroundHeatExchanger()
+	GLHESlinky::getAnnualTimeConstant()
+	{
+		// calculate annual time constant for ground conduction
+		timeSS = ( pow_2( totalTubeLength ) / ( 9.0 * diffusivityGround ) ) / SecInHour / 8760.0;
+		timeSSFactor = 1.0;
+	};
+
+	//******************************************************************************
+
+	void
+	GLHEBase::calcGroundHeatExchanger()
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Dan Fisher
@@ -1208,23 +869,22 @@ namespace GroundHeatExchangers {
 		using DataPlant::PlantLoop;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using FluidProperties::GetDensityGlycol;
-		using PlantUtilities::SafeCopyPlantNode;
 		using General::TrimSigDigits;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
-		static std::string const RoutineName( "CalcVerticalGroundHeatExchanger" );
+		static std::string const RoutineName( "CalcGroundHeatExchanger" );
 
-		//LOCAL BHORE HOLE PARAMETERS
+		//LOCAL PARAMETERS
 		Real64 fluidDensity;
 		Real64 kGroundFactor;
 		Real64 cpFluid;
 		Real64 gFuncVal; // Interpolated G function value at a sub-hour
 		static Real64 ToutNew( 19.375 );
 		Real64 fluidAveTemp;
-		Real64 groundDiffusivity;
-		Real64 timeSS; // Steady state time
-		Real64 timeSSFactor; // Steady state time factor for calculation
+		//Real64 groundDiffusivity;
+		//Real64 timeSS; // Steady state time
+		//Real64 timeSSFactor; // Steady state time factor for calculation
 		Real64 XI;
 		Real64 C_1;
 		int numOfMonths; // the number of months of simulation elapsed
@@ -1240,7 +900,7 @@ namespace GroundHeatExchangers {
 		Real64 tmpQnSubHourly; // current Qn subhourly value
 		int hourlyLimit; // number of hours to be taken into account in superposition
 		int subHourlyLimit; // number of subhourlys to be taken into account in subhourly superposition
-		Real64 sumTotal; // sum of all the Qn (load) blocks
+		Real64 sumTotal( 0.0 ); // sum of all the Qn (load) blocks
 		Real64 C0; // **Intermediate constants used
 		Real64 C1; // **Intermediate constants used
 		Real64 C2; // **in explicit  calcualtion of the
@@ -1249,12 +909,13 @@ namespace GroundHeatExchangers {
 		int IndexN; // Used to index the LastHourN array
 		static bool updateCurSimTime( true ); // Used to reset the CurSimTime to reset after WarmupFlag
 		static bool triggerDesignDayReset( false );
-		Real64 const deltaTempLimit( 100.0 ); // temp limit for warnings
-		Real64 GLHEdeltaTemp; // ABS(Outlet temp -inlet temp)
-		static int numErrorCalls( 0 );
+		static bool firstTime( true );
 
-		//Autodesk:Uninit Initialize variables used uninitialized
-		sumTotal = 0.0; //Autodesk:Uninit Force default initialization
+		// Calculate G-Functions
+		if ( firstTime ) {
+			calcGFunctions();
+			firstTime = false;
+		}
 
 		inletTemp = Node( inletNodeNum ).Temp;
 
@@ -1262,22 +923,17 @@ namespace GroundHeatExchangers {
 		fluidDensity = GetDensityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
 
 		kGroundFactor = 2.0 * Pi * kGround;
-		groundDiffusivity = kGround / cpRhoGround;
 
-		// calculate annual time constant for ground conduction
-		timeSS = ( pow_2( boreholeLength ) / ( 9.0 * groundDiffusivity ) ) / SecInHour / 8760.0;
-		timeSSFactor = timeSS * 8760.0;
+		getAnnualTimeConstant();
 
 		if ( triggerDesignDayReset && WarmupFlag ) updateCurSimTime = true;
 		if ( DayOfSim == 1 && updateCurSimTime ) {
 			currentSimTime = 0.0;
 			prevTimeSteps = 0.0;
-			//for ( I = 1; I <= numVerticalGLHEs; ++I ) {
 			QnHr = 0.0;
 			QnMonthlyAgg = 0.0;
 			QnSubHr = 0.0;
 			LastHourN = 1;
-			//}
 			N = 1;
 			updateCurSimTime = false;
 			triggerDesignDayReset = false;
@@ -1311,15 +967,13 @@ namespace GroundHeatExchangers {
 
 		if ( N != PrevN ) {
 			PrevN = N;
-			//for ( I = 1; I <= numVerticalGLHEs; ++I ) {
 			QnSubHr = eoshift( QnSubHr, -1, lastQnSubHr );
-			//}
 		}
 
 		calcAggregateLoad();
 
-		// Update the borehole resistance each time
-		boreholeResistance();
+		// Update the heat exchanger resistance each time
+		calcHXResistance();
 
 		if ( N == 1 ) {
 			if ( massFlowRate <= 0.0 ) {
@@ -1330,16 +984,17 @@ namespace GroundHeatExchangers {
 				XI = std::log( currentSimTime / ( timeSSFactor ) );
 				gFuncVal = interpGFunc( XI );
 
-				C_1 = ( boreholeLength * numBoreholes ) / ( 2.0 * massFlowRate * cpFluid );
-				tmpQnSubHourly = ( tempGround - inletTemp ) / ( gFuncVal / ( kGroundFactor ) + resistanceBhole + C_1 );
-				fluidAveTemp = tempGround - tmpQnSubHourly * resistanceBhole;
-				ToutNew = tempGround - tmpQnSubHourly * ( gFuncVal / ( kGroundFactor ) + resistanceBhole - C_1 );
+				C_1 = ( totalTubeLength ) / ( 2.0 * massFlowRate * cpFluid );
+				tmpQnSubHourly = ( tempGround - inletTemp ) / ( gFuncVal / ( kGroundFactor ) + HXResistance + C_1 );
+				fluidAveTemp = tempGround - tmpQnSubHourly * HXResistance;
+				ToutNew = tempGround - tmpQnSubHourly * ( gFuncVal / ( kGroundFactor ) + HXResistance - C_1 );
 			}
 		} else {
 			// no monthly super position
 			if ( currentSimTime < ( hrsPerMonth + AGG + SubAGG ) ) {
 
 				// Calculate the Sub Hourly Superposition
+
 				sumQnSubHourly = 0.0;
 				if ( int( currentSimTime ) < SubAGG ) {
 					IndexN = int( currentSimTime ) + 1;
@@ -1408,11 +1063,11 @@ namespace GroundHeatExchangers {
 					//Dr.Spitler's Explicit set of equations to calculate the New Outlet Temperature of the U-Tube
 					C0 = RQSubHr;
 					C1 = tempGround - ( sumTotal - QnSubHr( 1 ) * RQSubHr );
-					C2 = boreholeLength * numBoreholes / ( 2.0 * massFlowRate * cpFluid );
-					C3 = massFlowRate * cpFluid / ( boreholeLength * numBoreholes );
-					tmpQnSubHourly = ( C1 - inletTemp ) / ( resistanceBhole + C0 - C2 + ( 1 / C3 ) );
-					fluidAveTemp = C1 - ( C0 + resistanceBhole ) * tmpQnSubHourly;
-					ToutNew = C1 + ( C2 - C0 - resistanceBhole ) * tmpQnSubHourly;
+					C2 = totalTubeLength / ( 2.0 * massFlowRate * cpFluid );
+					C3 = massFlowRate * cpFluid / ( totalTubeLength );
+					tmpQnSubHourly = ( C1 - inletTemp ) / ( HXResistance + C0 - C2 + ( 1 / C3 ) );
+					fluidAveTemp = C1 - ( C0 + HXResistance ) * tmpQnSubHourly;
+					ToutNew = C1 + ( C2 - C0 - HXResistance ) * tmpQnSubHourly;
 				}
 
 			} else { // Monthly Aggregation and super position
@@ -1426,6 +1081,7 @@ namespace GroundHeatExchangers {
 				}
 
 				//monthly superposition
+
 				sumQnMonthly = 0.0;
 				SUMMONTHLY: for ( I = 1; I <= currentMonth; ++I ) {
 					if ( I == 1 ) {
@@ -1443,7 +1099,8 @@ namespace GroundHeatExchangers {
 				}
 				SUMMONTHLY_exit: ;
 
-				// Hourly Supr position
+				// Hourly Superposition
+
 				hourlyLimit = int( currentSimTime - currentMonth * hrsPerMonth );
 				sumQnHourly = 0.0;
 				HOURLYLOOP: for ( I = 1 + SubAGG; I <= hourlyLimit; ++I ) {
@@ -1463,6 +1120,7 @@ namespace GroundHeatExchangers {
 				HOURLYLOOP_exit: ;
 
 				// Subhourly Superposition
+
 				subHourlyLimit = N - LastHourN( SubAGG + 1 );
 				sumQnSubHourly = 0.0;
 				SUBHRLOOP: for ( I = 1; I <= subHourlyLimit; ++I ) {
@@ -1497,22 +1155,42 @@ namespace GroundHeatExchangers {
 					// Explicit set of equations to calculate the New Outlet Temperature of the U-Tube
 					C0 = RQSubHr;
 					C1 = tempGround - ( sumTotal - QnSubHr( 1 ) * RQSubHr );
-					C2 = boreholeLength * numBoreholes / ( 2 * massFlowRate * cpFluid );
-					C3 = massFlowRate * cpFluid / ( boreholeLength * numBoreholes );
-					tmpQnSubHourly = ( C1 - inletTemp ) / ( resistanceBhole + C0 - C2 + ( 1 / C3 ) );
-					fluidAveTemp = C1 - ( C0 + resistanceBhole ) * tmpQnSubHourly;
-					ToutNew = C1 + ( C2 - C0 - resistanceBhole ) * tmpQnSubHourly;
+					C2 = totalTubeLength / ( 2 * massFlowRate * cpFluid );
+					C3 = massFlowRate * cpFluid / ( totalTubeLength );
+					tmpQnSubHourly = ( C1 - inletTemp ) / ( HXResistance + C0 - C2 + ( 1 / C3 ) );
+					fluidAveTemp = C1 - ( C0 + HXResistance ) * tmpQnSubHourly;
+					ToutNew = C1 + ( C2 - C0 - HXResistance ) * tmpQnSubHourly;
 				}
 			} //  end of AGG OR NO AGG
 		} // end of N  = 1 branch
-		boreholeTemp = tempGround - sumTotal; //Autodesk:Uninit sumTotal could have been uninitialized here
+		boreholeTemp = tempGround - sumTotal; 
 		//Load the QnSubHourly Array with a new value at end of every timestep
 
 		lastQnSubHr = tmpQnSubHourly;
 		outletTemp = ToutNew;
-		//QGLHE = tmpQnSubHourly;
-		QGLHE = tmpQnSubHourly * boreholeLength * numBoreholes;
+		QGLHE = tmpQnSubHourly * totalTubeLength;
 		aveFluidTemp = fluidAveTemp;
+
+	}
+
+	//******************************************************************************
+
+	void
+	GLHEBase::updateGHX()
+	{
+		using DataPlant::PlantLoop;
+		using FluidProperties::GetSpecificHeatGlycol;
+		using FluidProperties::GetDensityGlycol;
+		using General::TrimSigDigits;
+		using PlantUtilities::SafeCopyPlantNode;
+
+		// SUBROUTINE ARGUMENT DEFINITIONS
+		static std::string const RoutineName( "UpdateGroundHeatExchanger" );
+
+		Real64 fluidDensity;
+		Real64 const deltaTempLimit( 100.0 ); // temp limit for warnings
+		Real64 GLHEdeltaTemp; // ABS(Outlet temp -inlet temp)
+		static int numErrorCalls( 0 );
 
 		SafeCopyPlantNode( inletNodeNum, outletNodeNum );
 
@@ -1531,8 +1209,8 @@ namespace GroundHeatExchangers {
 			ShowContinueError( "GLHE Current Flow Rate=" + TrimSigDigits( massFlowRate, 3 ) + "; GLHE Design Flow Rate=" + TrimSigDigits( designMassFlow, 3 ) );
 			++numErrorCalls;
 		}
-
-	}
+	
+	};
 
 	//******************************************************************************
 
@@ -1735,6 +1413,12 @@ namespace GroundHeatExchangers {
 				verticalGLHE( GLHENum ).maxSimYears = rNumericArgs( 13 );
 				verticalGLHE( GLHENum ).gReferenceRatio = rNumericArgs( 14 );
 
+				// total tube length
+				verticalGLHE( GLHENum ).totalTubeLength = verticalGLHE( GLHENum ).numBoreholes * verticalGLHE( GLHENum ).boreholeLength;
+
+				// ground thermal diffusivity
+				verticalGLHE( GLHENum ).diffusivityGround = verticalGLHE( GLHENum ).kGround / verticalGLHE( GLHENum ).cpRhoGround;
+
 				//   Not many checks
 
 				if ( verticalGLHE( GLHENum ).pipeThick >= verticalGLHE( GLHENum ).pipeOutDia / 2.0 ) {
@@ -1855,10 +1539,14 @@ namespace GroundHeatExchangers {
 				slinkyGLHE( GLHENum ).trenchLength = rNumericArgs( 13 );
 				slinkyGLHE( GLHENum ).numTrenches = rNumericArgs( 14 );
 				slinkyGLHE( GLHENum ).trenchSpacing = rNumericArgs( 15 );
-				slinkyGLHE( GLHENum ).maxLengthOfSimulationInYears = rNumericArgs( 19 );
+				slinkyGLHE( GLHENum ).maxSimYears = rNumericArgs( 19 );
 
 				// Number of coils
 				slinkyGLHE( GLHENum ).numCoils = slinkyGLHE( GLHENum ).trenchLength / slinkyGLHE( GLHENum ).coilPitch;
+				
+				// Total tube length
+				slinkyGLHE( GLHENum ).totalTubeLength = Pi * slinkyGLHE( GLHENum ).coilDiameter * slinkyGLHE( GLHENum ).trenchLength 
+													* slinkyGLHE( GLHENum ). numTrenches / slinkyGLHE( GLHENum ). coilPitch;
 
 				// Farfield model parameters, validated min/max by IP
 				slinkyGLHE( GLHENum ).useGroundTempDataForKusuda = lNumericFieldBlanks( 16 ) || lNumericFieldBlanks( 17 ) || lNumericFieldBlanks( 18 );
@@ -1929,9 +1617,16 @@ namespace GroundHeatExchangers {
 						}
 					}
 				
-				slinkyGLHE( GLHENum ).phaseShiftOfMinGroundTempDays = slinkyGLHE( GLHENum ).monthOfMinSurfTemp * AvgDaysInMonth;
+					slinkyGLHE( GLHENum ).phaseShiftOfMinGroundTempDays = slinkyGLHE( GLHENum ).monthOfMinSurfTemp * AvgDaysInMonth;
 
 				}
+
+				if ( ! allocated ) {
+					prevTimeSteps.allocate( ( slinkyGLHE( GLHENum ).SubAGG + 1 ) * maxTSinHr + 1 );
+					prevTimeSteps = 0.0;
+					allocated = true;
+				}
+
 				//   Not many checks
 
 				if ( slinkyGLHE( GLHENum ).pipeThick >= slinkyGLHE( GLHENum ).pipeOutDia / 2.0 ) {
@@ -1964,7 +1659,7 @@ namespace GroundHeatExchangers {
 	//******************************************************************************
 
 	void
-	GLHEVert::boreholeResistance()
+	GLHEVert::calcHXResistance()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -2069,13 +1764,13 @@ namespace GroundHeatExchangers {
 		}
 
 		Rgrout = 1.0 / ( kGrout * ( B0 * std::pow( boreholeRadius / pipeOuterRad, B1 ) ) );
-		resistanceBhole = Rcond + Rconv + Rgrout;
+		HXResistance = Rcond + Rconv + Rgrout;
 	}
 
 	//******************************************************************************
 
-	Real64
-	GLHESlinky::slinkyResistance()
+	void
+	GLHESlinky::calcHXResistance()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -2146,25 +1841,16 @@ namespace GroundHeatExchangers {
 		//   Conduction Resistance
 		Rcond = std::log( pipeOuterRad / pipeInnerRad ) / ( 2.0 * Pi * kPipe ) / 2.0; // pipe in parallel so /2
 
-		return Rcond + Rconv;
+		HXResistance = Rcond + Rconv;
 	}
 
 	//******************************************************************************
 
 	Real64
-	GLHESlinky::interpGFunc(
+	GLHEBase::interpGFunc(
 		Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
 	)
 	{
-		return 0;
-	}
-
-	Real64
-	GLHEVert::interpGFunc(
-		Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
-	)
-	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Chris L. Marshall, Jeffrey D. Spitler
 		//       DATE WRITTEN   1993
@@ -2208,25 +1894,12 @@ namespace GroundHeatExchangers {
 		int High;
 		bool Found;
 
-		//NumPairs = this->NPairs;
-		RATIO = boreholeRadius / boreholeLength;
-
 		// The following IF loop determines the g-function for the case
 		// when LnTTsVal is less than the first element of the LnTTs array.
 		// In this case, the g-function must be found by extrapolation.
 
 		if ( LnTTsVal <= LNTTS( 1 ) ) {
 			gFuncVal = ( ( LnTTsVal - LNTTS( 1 ) ) / ( LNTTS( 2 ) - LNTTS( 1 ) ) ) * ( GFNC( 2 ) - GFNC( 1 ) ) + GFNC( 1 );
-
-			// The following IF statement determines the condition of the ratio
-			// between the borehole radius and the active borehole length.
-			// If RATIO does not equal 0.0005 then a correction factor for
-			// the g-function must be used.
-
-			if ( RATIO != gReferenceRatio ) {
-				gFuncVal -= std::log( boreholeRadius / ( boreholeLength * gReferenceRatio ) );
-			}
-
 			return gFuncVal;
 		}
 
@@ -2236,12 +1909,6 @@ namespace GroundHeatExchangers {
 
 		if ( LnTTsVal > LNTTS( NPairs ) ) {
 			gFuncVal = ( ( LnTTsVal - LNTTS( NPairs ) ) / ( LNTTS( NPairs - 1 ) - LNTTS( NPairs ) ) ) * ( GFNC( NPairs - 1 ) - GFNC( NPairs ) ) + GFNC( NPairs );
-
-			// Apply correction factor if necessary
-			if ( RATIO != gReferenceRatio ) {
-				gFuncVal -= std::log( boreholeRadius / ( boreholeLength * gReferenceRatio ) );
-			}
-
 			return gFuncVal;
 		}
 
@@ -2272,10 +1939,6 @@ namespace GroundHeatExchangers {
 		//the gFuncVal after applying the correction
 		if ( Found ) {
 			gFuncVal = GFNC( Mid );
-			// Apply correction factor if necessary
-			if ( RATIO != gReferenceRatio ) {
-				gFuncVal -= std::log( boreholeRadius / ( boreholeLength * gReferenceRatio ) );
-			}
 			return gFuncVal;
 		}
 
@@ -2286,13 +1949,44 @@ namespace GroundHeatExchangers {
 
 			gFuncVal = ( ( LnTTsVal - LNTTS( Mid ) ) / ( LNTTS( Mid - 1 ) - LNTTS( Mid ) ) ) * ( GFNC( Mid - 1 ) - GFNC( Mid ) ) + GFNC( Mid );
 
-			// Apply correction factor if necessary
-			if ( RATIO != gReferenceRatio ) {
-				gFuncVal -= std::log( boreholeRadius / ( boreholeLength * gReferenceRatio ) );
-			}
 			return gFuncVal;
 		}
 	}
+
+	//******************************************************************************
+
+	Real64
+	GLHESlinky::getGFunc(
+		Real64 const LNTTS
+	)
+	{
+		return interpGFunc( LNTTS );
+	};
+
+	//******************************************************************************
+
+	Real64
+	GLHEVert::getGFunc(
+		Real64 const LNTTS
+	)
+	{
+		Real64 RATIO;
+		Real64 gFuncVal;
+
+		gFuncVal = interpGFunc( LNTTS );
+
+		RATIO = boreholeRadius / boreholeLength;
+
+
+		if ( RATIO != gReferenceRatio ) {
+			gFuncVal -= std::log( boreholeRadius / ( boreholeLength * gReferenceRatio ) );
+		}
+
+		return gFuncVal;
+		
+
+
+	};
 
 	//******************************************************************************
 
@@ -2368,7 +2062,6 @@ namespace GroundHeatExchangers {
 			QnHr = 0.0;
 			QnMonthlyAgg = 0.0;
 			QnSubHr = 0.0;
-			//QGLHE = 0.0;
 			LastHourN = 0;
 			prevTimeSteps = 0.0;
 			currentSimTime = 0.0;
@@ -2446,15 +2139,14 @@ namespace GroundHeatExchangers {
 			InitComponentNodes( 0.0, designMassFlow, inletNodeNum, outletNodeNum, loopNum, loopSideNum, branchNum, compNum );
 
 			lastQnSubHr = 0.0;
-			Node( inletNodeNum ).Temp = tempGround;
-			Node( outletNodeNum ).Temp = tempGround;
+			Node( inletNodeNum ).Temp = getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays );
+			Node( outletNodeNum ).Temp = getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays );
 
 			// zero out all history arrays
 
 			QnHr = 0.0;
 			QnMonthlyAgg = 0.0;
 			QnSubHr = 0.0;
-			//QGLHE = 0.0;
 			LastHourN = 0;
 			prevTimeSteps = 0.0;
 			currentSimTime = 0.0;
@@ -2467,6 +2159,50 @@ namespace GroundHeatExchangers {
 		// Reset local environment init flag
 		if ( ! BeginEnvrnFlag ) myEnvrnFlag = true;
 	
+	}
+
+	//******************************************************************************
+
+	Real64
+	GLHEBase::getKAGrndTemp(
+		Real64 const z, // Depth
+		Real64 const dayOfYear, // Day of year
+		Real64 const aveGroundTemp, // Average annual ground tempeature
+		Real64 const aveGroundTempAmplitude, // Average amplitude of annual ground temperature
+		Real64 const phaseShiftInDays // Phase shift
+	)
+	{
+	
+		// AUTHOR         Matt Mitchell
+		// DATE WRITTEN   February 2015
+		// MODIFIED       na
+		// RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// Returns a ground temperature
+
+		// METHODOLOGY EMPLOYED:
+		// Kusuda and Achenbach correlation is used
+
+		//Kusuda and Achenbach
+		// Using/Aliasing
+		using DataGlobals::SecsInDay;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Real64 Term1;
+		Real64 Term2;
+		Real64 SecsInYear;
+
+		SecsInYear = SecsInDay * 365.0;
+
+		Term1 = -z * std::sqrt( Pi / ( SecsInYear * diffusivityGround ) );
+		Term2 = ( 2 * Pi / SecsInYear ) * ( ( DayOfSim - phaseShiftInDays ) * SecsInDay - ( z / 2 ) * std::sqrt( SecsInYear / ( Pi * diffusivityGround ) ) );
+		
+		return  aveGroundTemp - aveGroundTempAmplitude * std::exp( Term1 ) * std::cos( Term2 );
+		
 	}
 
 	//******************************************************************************
