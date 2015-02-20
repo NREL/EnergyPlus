@@ -8,7 +8,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <OutputReportPredefined.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 
 using namespace EnergyPlus;
 using namespace WeatherManager;
@@ -17,11 +17,6 @@ using namespace DataGlobals;
 using namespace DataPlant;
 using namespace DataSizing;
 using namespace OutputReportPredefined;
-
-//using DataGlobals::NumOfTimeStepInHour;
-//using DataGlobals::KindOfSim;
-//using DataGlobals::TimeStepZone;
-
 
 
 class SizingAnalysisObjectsTest : public :: testing::Test
@@ -95,6 +90,7 @@ public:
 
 	}
 
+	//destructor
 	~SizingAnalysisObjectsTest( )
 	{
 		TotNumLoops = 0;
@@ -108,18 +104,10 @@ public:
 };
 
 
-
 TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
 {
 
-// first add a log to the framework
-//	int averagingWindow;
-	//int logIndex;
 	int const ZoneIndex ( 1 );
-	Real64 checkVal;
-
-
-	//setup globals, weather and output processor data
 
 	// first step
 	KindOfSim = 4;

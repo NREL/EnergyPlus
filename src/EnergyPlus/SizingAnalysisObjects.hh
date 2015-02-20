@@ -48,7 +48,7 @@ public:
 	bool hasSystemSubSteps	= false;
 	int numSubSteps = 0;
 	std::vector< SystemTimestepObject > subSteps; //nested object array for system timesteps inside here.
-	
+
 	ZoneTimestepObject (
 		int kindSim,
 		int environmentNum,

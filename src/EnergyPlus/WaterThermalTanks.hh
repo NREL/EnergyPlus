@@ -373,6 +373,7 @@ namespace WaterThermalTanks {
 		Real64 PlantUseMassFlowRateMax; // Plant demand-side max flow request on use side (kg/s)
 		Real64 SavedUseOutletTemp; // Use side outlet temp saved for demand-side flow control (C)
 		Real64 UseDesignVolFlowRate; // Use side plant volume flow rate (input data, autosizable) m3/s
+		bool UseDesignVolFlowRateWasAutoSized; // true if use flow rate was autosize on input
 		int UseBranchControlType; // Use side plant branch control type e.g active, passive, bypass
 		int UseSidePlantSizNum; // index in plant sizing that the use side is on
 		bool UseSideSeries;
@@ -392,6 +393,7 @@ namespace WaterThermalTanks {
 		Real64 PlantSourceMassFlowRateMax; // Plant demand-side max flow request on source side (kg/s)
 		Real64 SavedSourceOutletTemp; // Source side outlet temp saved for demand-side flow control (C)
 		Real64 SourceDesignVolFlowRate; // Source side plant volume flow rate (input, autosizable) m3/s
+		bool SourceDesignVolFlowRateWasAutoSized; // true if source flow rate was autosize on input
 		int SourceBranchControlType; // source side plant branch control type e.g active, passive, bypass
 		int SourceSidePlantSizNum; // index in plant sizing that the source side is on
 		bool SourceSideSeries;

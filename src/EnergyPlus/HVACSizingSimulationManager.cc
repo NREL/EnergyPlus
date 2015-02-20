@@ -31,15 +31,11 @@
 namespace EnergyPlus { 
 
 
-	void HVACSizingSimulationManager::DetermineSizingAnalysesNeeded(){
-	
-		int NumPlantLoopsWithCoincidentSizing;
-		bool anyAdvancedSizingNeeded = false;
-
+	void HVACSizingSimulationManager::DetermineSizingAnalysesNeeded()
+	{
 		using DataSizing::PlantSizData;
 		using DataSizing::NumPltSizInput;
 		using DataSizing::Coincident;
-
 
 		//currently the only type of advanced sizing analysis available is for coincident plant sizing
 		// expect more specialized sizing analysis objects to be added, so minimizing code here and jump to a worker method once we know an instance is to be created.
@@ -51,56 +47,53 @@ namespace EnergyPlus {
 
 				//create an instance of analysis object for each loop
 				CreateNewCoincidentPlantAnalysisObject ( PlantSizData(i).PlantLoopName, i );
-				anyAdvancedSizingNeeded = true;
+
 			}
 		}
 		
 	}
 
 	void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(
-			std::string const PlantLoopName,
-			int const PlantSizingIndex
-		) {
-			Real64 density;
-			Real64 cp;
-			using DataPlant::PlantLoop;
-			using DataPlant::TotNumLoops;
-			using DataPlant::SupplySide;
-			using DataGlobals::InitConvTemp;
-			using namespace FluidProperties;
-			using DataSizing::PlantSizData;
+		std::string const PlantLoopName,
+		int const PlantSizingIndex ) 
+	{
+		Real64 density;
+		Real64 cp;
+		using DataPlant::PlantLoop;
+		using DataPlant::TotNumLoops;
+		using DataPlant::SupplySide;
+		using DataGlobals::InitConvTemp;
+		using namespace FluidProperties;
+		using DataSizing::PlantSizData;
 
 
-			//find plant loop number
-			for (int i = 1; i <= TotNumLoops; i++ ){
-			
-				if (PlantLoopName == PlantLoop( i ).Name) { //found it
+		//find plant loop number
+		for (int i = 1; i <= TotNumLoops; i++ ){
+			if ( PlantLoopName == PlantLoop( i ).Name ) { //found it
 
-					density = GetDensityGlycol( PlantLoop( i ).FluidName, 
+				density = GetDensityGlycol( PlantLoop( i ).FluidName, 
 								InitConvTemp, PlantLoop( i ).FluidIndex, 
 								"createNewCoincidentPlantAnalysisObject" );
-					cp = GetSpecificHeatGlycol( PlantLoop( i ).FluidName, 
+				cp = GetSpecificHeatGlycol( PlantLoop( i ).FluidName, 
 								InitConvTemp, PlantLoop( i ).FluidIndex, 
 								"createNewCoincidentPlantAnalysisObject" );
 
-					PlantCoinicidentAnalysis tmpAnalysisObj ( // call constructor
-						PlantLoopName,
-						i,
-						PlantLoop( i ).LoopSide( SupplySide ).NodeNumIn,
-						density,
-						cp,
-						PlantSizData( PlantSizingIndex ).NumTimeStepsInAvg,
-						PlantSizingIndex
-					);
-					plantCoincAnalyObjs.push_back( tmpAnalysisObj ); //store new object in vector
-					}
+				PlantCoinicidentAnalysis tmpAnalysisObj ( // call constructor
+					PlantLoopName,
+					i,
+					PlantLoop( i ).LoopSide( SupplySide ).NodeNumIn,
+					density,
+					cp,
+					PlantSizData( PlantSizingIndex ).NumTimeStepsInAvg,
+					PlantSizingIndex );
+
+				plantCoincAnalyObjs.push_back( tmpAnalysisObj ); //store new object in vector
 			}
-
-
+		}
 	}
 
-	void HVACSizingSimulationManager::SetupSizingAnalyses(){
-		
+	void HVACSizingSimulationManager::SetupSizingAnalyses()
+	{
 		using DataLoopNode::Node;
 		using DataPlant::PlantReport;
 		using DataSizing::PlantSizData;
@@ -128,7 +121,8 @@ namespace EnergyPlus {
 		}
 	}
 
-	void HVACSizingSimulationManager::PostProcessLogs() {
+	void HVACSizingSimulationManager::PostProcessLogs() 
+	{
 		//this function calls methods on log objects to do general processing on all the logged data in the framework
 		for ( auto &L : sizingLogger.logObjs ) {
 			L.AverageSysTimeSteps(); // collapse subtimestep data into zone step data
@@ -137,8 +131,8 @@ namespace EnergyPlus {
 	}
 
 	void HVACSizingSimulationManager::ProcessCoincidentPlantSizeAdjustments(
-		int const HVACSizingIterCount
-	){
+		int const HVACSizingIterCount )
+	{
 
 		using namespace DataPlant;
 		using namespace PlantManager;
@@ -168,8 +162,8 @@ namespace EnergyPlus {
 		FinalSizingHVACSizingSimIteration = plantCoinAnalyRequestsAnotherIteration;
 
 	}
-	void HVACSizingSimulationManager::RedoKickOffAndResize(){
-	
+	void HVACSizingSimulationManager::RedoKickOffAndResize()
+	{
 		using DataGlobals::KickOffSimulation;
 		using DataGlobals::RedoSizesHVACSimulation;
 		using namespace WeatherManager;
@@ -188,7 +182,6 @@ namespace EnergyPlus {
 
 	namespace HVACSizingSimulationManagerNamespace { 
 
-//		using namespace DataPrecisionGlobals;
 		using namespace WeatherManager;
 		using namespace DataGlobals;
 		using namespace DataReportingFlags;
@@ -401,11 +394,13 @@ namespace EnergyPlus {
 		return;
 		}
 
-		void UpdateSizingLogsZoneStep (){
+		void UpdateSizingLogsZoneStep ()
+		{
 			sizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep();
 		}
 
-		void UpdateSizingLogsSystemStep() {
+		void UpdateSizingLogsSystemStep() 
+		{
 			sizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep();
 		}
 	}

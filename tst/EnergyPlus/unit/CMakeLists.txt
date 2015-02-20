@@ -10,6 +10,7 @@ set( test_src
   DXCoils.unit.cc
   ExteriorEnergyUse.unit.cc
   HeatBalanceManager.unit.cc
+  HVACSizingSimulationManager.unit.cc
   HVACStandaloneERV.unit.cc
   OutputProcessor.unit.cc
   OutputReportTabular.unit.cc
