@@ -4345,7 +4345,7 @@ namespace CondenserLoopTowers {
 	Real64
 	VSMerkelResidual(
 		Real64 const AirFlowRateRatio, // fan speed ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = Tower number
+		FArray1< Real64 > const & Par // par(1) = Tower number
 	)
 	{
 
@@ -4406,14 +4406,14 @@ namespace CondenserLoopTowers {
 		Real64 Qdot;
 		Real64 OutletWaterTempTrial;
 
-		TowerNum = int( Par()( 1 ) );
-		TargetLoad = Par()( 2 );
-		WaterMassFlowRatePerCell = Par()( 3 );
-		UAdesignPerCell = Par()( 4 );
-		UAwetbulbAdjFac = Par()( 5 );
-		UAwaterflowAdjFac = Par()( 6 );
-		CpWater = Par()( 7 );
-		TotalWaterMassFlowRate = Par()( 8 );
+		TowerNum = int( Par( 1 ) );
+		TargetLoad = Par( 2 );
+		WaterMassFlowRatePerCell = Par( 3 );
+		UAdesignPerCell = Par( 4 );
+		UAwetbulbAdjFac = Par( 5 );
+		UAwaterflowAdjFac = Par( 6 );
+		CpWater = Par( 7 );
+		TotalWaterMassFlowRate = Par( 8 );
 
 		AirFlowRatePerCell = AirFlowRateRatio * SimpleTower( TowerNum ).HighSpeedAirFlowRate / SimpleTower( TowerNum ).NumCell;
 
@@ -5335,7 +5335,7 @@ namespace CondenserLoopTowers {
 	Real64
 	SimpleTowerUAResidual(
 		Real64 const UA, // UA of cooling tower
-		Optional< FArray1S< Real64 > const > Par // par(1) = design tower load [W]
+		FArray1< Real64 > const & Par // par(1) = design tower load [W]
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -5383,17 +5383,17 @@ namespace CondenserLoopTowers {
 		Real64 OutWaterTemp; // outlet water temperature [C]
 		Real64 CoolingOutput; // tower cooling output [W]
 
-		TowerIndex = int( Par()( 2 ) );
-		SimSimpleTower( TowerIndex, Par()( 3 ), Par()( 4 ), UA, OutWaterTemp );
-		CoolingOutput = Par()( 5 ) * Par()( 3 ) * ( SimpleTowerInlet( TowerIndex ).WaterTemp - OutWaterTemp );
-		Residuum = ( Par()( 1 ) - CoolingOutput ) / Par()( 1 );
+		TowerIndex = int( Par( 2 ) );
+		SimSimpleTower( TowerIndex, Par( 3 ), Par( 4 ), UA, OutWaterTemp );
+		CoolingOutput = Par( 5 ) * Par( 3 ) * ( SimpleTowerInlet( TowerIndex ).WaterTemp - OutWaterTemp );
+		Residuum = ( Par( 1 ) - CoolingOutput ) / Par( 1 );
 		return Residuum;
 	}
 
 	Real64
 	SimpleTowerTrResidual(
 		Real64 const Trange, // cooling tower range temperature [C]
-		Optional< FArray1S< Real64 > const > Par // par(1) = tower number
+		FArray1< Real64 > const & Par // par(1) = tower number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -5443,10 +5443,10 @@ namespace CondenserLoopTowers {
 		Real64 InletAirWB; // inlet air wet-bulb temperature [C]
 		Real64 Tapproach; // tower approach temperature [C]
 
-		TowerIndex = int( Par()( 1 ) );
-		WaterFlowRateRatio = Par()( 2 );
-		AirFlowRateRatio = Par()( 3 );
-		InletAirWB = Par()( 4 );
+		TowerIndex = int( Par( 1 ) );
+		WaterFlowRateRatio = Par( 2 );
+		AirFlowRateRatio = Par( 3 );
+		InletAirWB = Par( 4 );
 		Tapproach = 0.0;
 
 		// call model to determine approach temperature given other independent variables (range temp is being varied to find balance)
@@ -5460,7 +5460,7 @@ namespace CondenserLoopTowers {
 	Real64
 	SimpleTowerApproachResidual(
 		Real64 const FlowRatio, // water or air flow ratio of cooling tower
-		Optional< FArray1S< Real64 > const > Par // par(1) = tower number
+		FArray1< Real64 > const & Par // par(1) = tower number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -5514,17 +5514,17 @@ namespace CondenserLoopTowers {
 		Real64 TapproachActual; // actual tower approach temperature [C]
 		Real64 TapproachDesired; // desired tower approach temperature [C]
 
-		TowerIndex = int( Par()( 1 ) );
-		if ( Par()( 6 ) == 0.0 ) {
-			AirFlowRateRatio = Par()( 2 );
+		TowerIndex = int( Par( 1 ) );
+		if ( Par( 6 ) == 0.0 ) {
+			AirFlowRateRatio = Par( 2 );
 			WaterFlowRateRatio = FlowRatio;
 		} else {
 			AirFlowRateRatio = FlowRatio;
-			WaterFlowRateRatio = Par()( 2 );
+			WaterFlowRateRatio = Par( 2 );
 		}
-		InletAirWB = Par()( 3 );
-		Trange = Par()( 4 );
-		TapproachDesired = Par()( 5 );
+		InletAirWB = Par( 3 );
+		Trange = Par( 4 );
+		TapproachDesired = Par( 5 );
 		TapproachActual = 0.0;
 
 		// call model to determine tower approach temperature given other independent variables

@@ -43,33 +43,28 @@ std::ostream &
 operator <<( std::ostream & stream, MArray3< A, T > const & a )
 {
 	if ( ( stream ) && ( a.size() > 0u ) ) { // Write array to stream in row-major order
-
-		// Types
-		using std::setw;
 		typedef  TypeTraits< T >  Traits;
 
 		// Save current stream state and set persistent state
 		std::ios_base::fmtflags const old_flags( stream.flags() );
-		std::streamsize const old_precision( stream.precision( Traits::precision() ) );
+		std::streamsize const old_precision( stream.precision( Traits::precision ) );
 		stream << std::right << std::showpoint << std::uppercase;
 
 		// Output array to stream
-		int const w( Traits::iwidth() );
+		int const w( Traits::iwidth );
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-				for ( int i3 = 1, e3 = a.u3(); i3 < e3; ++i3 ) {
-					stream << setw( w ) << a( i1, i2, i3 ) << ' ';
+				for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
+					stream << std::setw( w ) << a( i1, i2, i3 ) << ' ';
 					if ( ! stream ) break;
-				} stream << setw( w ) << a( i1, i2, a.u3() ) << '\n';
+				} if ( ! stream ) break;
 			} if ( ! stream ) break;
 		}
 
 		// Restore previous stream state
 		stream.precision( old_precision );
 		stream.flags( old_flags );
-
 	}
-
 	return stream;
 }
 
@@ -84,13 +79,10 @@ read_binary( std::istream & stream, MArray3< A, T > & a )
 		for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-					if ( stream ) {
-						stream.read( ( std::istream::char_type * )&a( i1, i2, i3 ), type_size );
-					} else {
-						break;
-					}
-				}
-			}
+					stream.read( ( std::istream::char_type * )&a( i1, i2, i3 ), type_size );
+					if ( ! stream ) break;
+				} if ( ! stream ) break;
+			} if ( ! stream ) break;
 		}
 	}
 	return stream;
@@ -107,13 +99,10 @@ write_binary( std::ostream & stream, MArray3< A, T > const & a )
 		for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-					if ( stream ) {
-						stream.write( ( std::ostream::char_type const * )&a( i1, i2, i3 ), type_size );
-					} else {
-						break;
-					}
-				}
-			}
+					stream.write( ( std::ostream::char_type const * )&a( i1, i2, i3 ), type_size );
+					if ( ! stream ) break;
+				} if ( ! stream ) break;
+			} if ( ! stream ) break;
 		}
 	}
 	return stream;
@@ -130,7 +119,7 @@ LD( MArray3< A, T > const & a )
 	std::string s;
 	std::size_t const n( a.size() );
 	if ( n > 0u ) {
-		s.reserve( n * TypeTraits< T >::width() );
+		s.reserve( n * TypeTraits< T >::width );
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {

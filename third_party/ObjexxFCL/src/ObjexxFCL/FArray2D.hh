@@ -30,9 +30,6 @@ class FArray2D : public FArray2< T >, public ObserverMulti
 private: // Types
 
 	typedef  FArray2< T >  Super;
-	typedef  typename Super::real_FArray  real_FArray;
-	typedef  typename Super::proxy_FArray  proxy_FArray;
-	typedef  typename Super::arg_FArray  arg_FArray;
 	typedef  internal::InitializerSentinel  InitializerSentinel;
 
 private: // Friend
@@ -70,17 +67,17 @@ public: // Types
 	typedef  typename Initializer::Function  InitializerFunction;
 
 	using Super::conformable;
+	using Super::initialize;
 	using Super::isize1;
 	using Super::isize2;
 	using Super::l;
 	using Super::operator ();
-	using Super::reassign;
 	using Super::resize;
 	using Super::shift_set;
 	using Super::size1;
 	using Super::size2;
 	using Super::size_of;
-	using Super::swap2DB;
+	using Super::swap2;
 	using Super::u;
 	using Super::data_;
 	using Super::data_size_;
@@ -147,7 +144,7 @@ public: // Creation
 			size_type l( 0 );
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-					reassign( l, a( i1, i2 ) );
+					initialize( l, a( i1, i2 ) );
 				}
 			}
 		}
@@ -169,7 +166,7 @@ public: // Creation
 				size_type l( 0 );
 				for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 					for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-						reassign( l, a( i1, i2 ) );
+						initialize( l, a( i1, i2 ) );
 					}
 				}
 			}
@@ -292,7 +289,7 @@ public: // Creation
 			if ( a.dimensions_initialized() ) {
 				assert( conformable( a ) );
 				for ( size_type i = 0, e = size_; i < e; ++i ) {
-					reassign( i, a[ i ] );
+					initialize( i, a[ i ] );
 				}
 			}
 		}
@@ -335,7 +332,7 @@ public: // Creation
 			size_type l( 0 );
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-					reassign( l, a( i1, i2 ) );
+					initialize( l, a( i1, i2 ) );
 				}
 			}
 		}
@@ -357,7 +354,7 @@ public: // Creation
 				size_type l( 0 );
 				for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 					for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-						reassign( l, a( i1, i2 ) );
+						initialize( l, a( i1, i2 ) );
 					}
 				}
 			}
@@ -378,7 +375,7 @@ public: // Creation
 			if ( a.dimensions_initialized() ) {
 				assert( conformable( a ) );
 				for ( size_type i = 0, e = size_; i < e; ++i ) {
-					reassign( i, a[ i ] );
+					initialize( i, a[ i ] );
 				}
 			}
 		}
@@ -398,7 +395,7 @@ public: // Creation
 			if ( a.dimensions_initialized() ) {
 				assert( size_ == a.size() );
 				for ( size_type i = 0, e = size_; i < e; ++i ) {
-					reassign( i, a[ i ] );
+					initialize( i, a[ i ] );
 				}
 			}
 		}
@@ -418,7 +415,7 @@ public: // Creation
 			if ( a.dimensions_initialized() ) {
 				assert( size_ == a.size() );
 				for ( size_type i = 0, e = size_; i < e; ++i ) {
-					reassign( i, a[ i ] );
+					initialize( i, a[ i ] );
 				}
 			}
 		}
@@ -861,32 +858,12 @@ public: // Assignment: Value
 
 public: // Subscript
 
-	// Const Tail Starting at array( i1, i2 )
-	inline
-	Tail const
-	a( int const i1, int const i2 ) const
-	{
-		assert( ( I1_.contains( i1 ) ) && ( I2_.contains( i2 ) ) );
-		size_type const offset( ( ( i2 * z1_ ) + i1 ) - shift_ );
-		return Tail( static_cast< T const * >( data_ + offset ), data_size_ - offset );
-	}
-
-	// Tail Starting at array( i1, i2 )
-	inline
-	Tail
-	a( int const i1, int const i2 )
-	{
-		assert( ( I1_.contains( i1 ) ) && ( I2_.contains( i2 ) ) );
-		size_type const offset( ( ( i2 * z1_ ) + i1 ) - shift_ );
-		return Tail( data_ + offset, data_size_ - offset );
-	}
-
 	// Linear Index
 	inline
 	size_type
 	index( int const i1, int const i2 ) const
 	{
-		assert( ( I1_.initialized() ) && ( I2_.initialized() ) );
+		assert( dimensions_initialized() );
 		return ( ( ( i2 * z1_ ) + i1 ) - shift_ );
 	}
 
@@ -906,6 +883,26 @@ public: // Subscript
 	{
 		assert( i < size_ );
 		return data_[ i ];
+	}
+
+	// Const Tail Starting at array( i1, i2 )
+	inline
+	Tail const
+	a( int const i1, int const i2 ) const
+	{
+		assert( contains( i1, i2 ) );
+		size_type const offset( ( ( i2 * z1_ ) + i1 ) - shift_ );
+		return Tail( static_cast< T const * >( data_ + offset ), data_size_ - offset );
+	}
+
+	// Tail Starting at array( i1, i2 )
+	inline
+	Tail
+	a( int const i1, int const i2 )
+	{
+		assert( contains( i1, i2 ) );
+		size_type const offset( ( ( i2 * z1_ ) + i1 ) - shift_ );
+		return Tail( data_ + offset, data_size_ - offset );
 	}
 
 public: // Predicate
@@ -1280,7 +1277,7 @@ public: // Modifier
 	{
 		if ( ( initializer_.is_active() ) && ( dimensions_initialized() ) ) {
 			if ( initializer_.is_value() ) {
-				reassign( initializer_.value() );
+				initialize( initializer_.value() );
 			} else if ( initializer_.is_function() ) {
 				initializer_.function()( *this );
 			}
@@ -1294,7 +1291,7 @@ public: // Modifier
 	swap( FArray2D & v )
 	{
 		using std::swap;
-		swap2DB( v );
+		swap2( v );
 		I1_.swap_no_notify( v.I1_ );
 		I2_.swap_no_notify( v.I2_ );
 		swap( initializer_, v.initializer_ );
@@ -1337,7 +1334,7 @@ protected: // Functions
 
 private: // Functions
 
-	// Setup for IndexRange Constructor
+	// Set Up for IndexRange Constructor
 	inline
 	void
 	setup_real()
@@ -1623,9 +1620,10 @@ operator ==( FArray2S< T > const & a, FArray2S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) == b( i1, i2 ) );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) == b( i1, i2 ) );
 		}
 	}
 	return r;
@@ -1639,9 +1637,10 @@ operator !=( FArray2S< T > const & a, FArray2S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) != b( i1, i2 ) );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) != b( i1, i2 ) );
 		}
 	}
 	return r;
@@ -1655,9 +1654,10 @@ operator <( FArray2S< T > const & a, FArray2S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) < b( i1, i2 ) );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) < b( i1, i2 ) );
 		}
 	}
 	return r;
@@ -1671,9 +1671,10 @@ operator <=( FArray2S< T > const & a, FArray2S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) <= b( i1, i2 ) );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) <= b( i1, i2 ) );
 		}
 	}
 	return r;
@@ -1687,9 +1688,10 @@ operator >( FArray2S< T > const & a, FArray2S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) > b( i1, i2 ) );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) > b( i1, i2 ) );
 		}
 	}
 	return r;
@@ -1703,9 +1705,10 @@ operator >=( FArray2S< T > const & a, FArray2S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) >= b( i1, i2 ) );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) >= b( i1, i2 ) );
 		}
 	}
 	return r;
@@ -1719,10 +1722,10 @@ operator ==( FArray2S< T > const & a, FArray2< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
-	typename FArray2< T >::size_type l( 0 );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-			r( i1, i2 ) = ( a( i1, i2 ) == b[ l ] );
+			r[ l ] = ( a( i1, i2 ) == b[ l ] );
 		}
 	}
 	return r;
@@ -1736,10 +1739,10 @@ operator !=( FArray2S< T > const & a, FArray2< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
-	typename FArray2< T >::size_type l( 0 );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-			r( i1, i2 ) = ( a( i1, i2 ) != b[ l ] );
+			r[ l ] = ( a( i1, i2 ) != b[ l ] );
 		}
 	}
 	return r;
@@ -1753,10 +1756,10 @@ operator <( FArray2S< T > const & a, FArray2< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
-	typename FArray2< T >::size_type l( 0 );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-			r( i1, i2 ) = ( a( i1, i2 ) < b[ l ] );
+			r[ l ] = ( a( i1, i2 ) < b[ l ] );
 		}
 	}
 	return r;
@@ -1770,10 +1773,10 @@ operator <=( FArray2S< T > const & a, FArray2< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
-	typename FArray2< T >::size_type l( 0 );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-			r( i1, i2 ) = ( a( i1, i2 ) <= b[ l ] );
+			r[ l ] = ( a( i1, i2 ) <= b[ l ] );
 		}
 	}
 	return r;
@@ -1787,10 +1790,10 @@ operator >( FArray2S< T > const & a, FArray2< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
-	typename FArray2< T >::size_type l( 0 );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-			r( i1, i2 ) = ( a( i1, i2 ) > b[ l ] );
+			r[ l ] = ( a( i1, i2 ) > b[ l ] );
 		}
 	}
 	return r;
@@ -1804,10 +1807,10 @@ operator >=( FArray2S< T > const & a, FArray2< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
-	typename FArray2< T >::size_type l( 0 );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-			r( i1, i2 ) = ( a( i1, i2 ) >= b[ l ] );
+			r[ l ] = ( a( i1, i2 ) >= b[ l ] );
 		}
 	}
 	return r;
@@ -1874,9 +1877,10 @@ FArray2D< bool >
 operator ==( FArray2S< T > const & a, T const & t )
 {
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) == t );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) == t );
 		}
 	}
 	return r;
@@ -1889,9 +1893,10 @@ FArray2D< bool >
 operator !=( FArray2S< T > const & a, T const & t )
 {
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) != t );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) != t );
 		}
 	}
 	return r;
@@ -1904,9 +1909,10 @@ FArray2D< bool >
 operator <( FArray2S< T > const & a, T const & t )
 {
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) < t );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) < t );
 		}
 	}
 	return r;
@@ -1919,9 +1925,10 @@ FArray2D< bool >
 operator <=( FArray2S< T > const & a, T const & t )
 {
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) <= t );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) <= t );
 		}
 	}
 	return r;
@@ -1934,9 +1941,10 @@ FArray2D< bool >
 operator >( FArray2S< T > const & a, T const & t )
 {
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) > t );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) > t );
 		}
 	}
 	return r;
@@ -1949,9 +1957,10 @@ FArray2D< bool >
 operator >=( FArray2S< T > const & a, T const & t )
 {
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) >= t );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) >= t );
 		}
 	}
 	return r;
@@ -2021,9 +2030,10 @@ operator ==( MArray2< A, T > const & a, MArray2< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) == b( i1, i2 ) );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) == b( i1, i2 ) );
 		}
 	}
 	return r;
@@ -2037,9 +2047,10 @@ operator !=( MArray2< A, T > const & a, MArray2< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) != b( i1, i2 ) );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) != b( i1, i2 ) );
 		}
 	}
 	return r;
@@ -2053,9 +2064,10 @@ operator <( MArray2< A, T > const & a, MArray2< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) < b( i1, i2 ) );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) < b( i1, i2 ) );
 		}
 	}
 	return r;
@@ -2069,9 +2081,10 @@ operator <=( MArray2< A, T > const & a, MArray2< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) <= b( i1, i2 ) );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) <= b( i1, i2 ) );
 		}
 	}
 	return r;
@@ -2085,9 +2098,10 @@ operator >( MArray2< A, T > const & a, MArray2< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) > b( i1, i2 ) );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) > b( i1, i2 ) );
 		}
 	}
 	return r;
@@ -2101,9 +2115,10 @@ operator >=( MArray2< A, T > const & a, MArray2< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) >= b( i1, i2 ) );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) >= b( i1, i2 ) );
 		}
 	}
 	return r;
@@ -2117,10 +2132,10 @@ operator ==( MArray2< A, T > const & a, FArray2< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
-	typename FArray2< T >::size_type l( 0 );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-			r( i1, i2 ) = ( a( i1, i2 ) == b[ l ] );
+			r[ l ] = ( a( i1, i2 ) == b[ l ] );
 		}
 	}
 	return r;
@@ -2134,10 +2149,10 @@ operator !=( MArray2< A, T > const & a, FArray2< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
-	typename FArray2< T >::size_type l( 0 );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-			r( i1, i2 ) = ( a( i1, i2 ) != b[ l ] );
+			r[ l ] = ( a( i1, i2 ) != b[ l ] );
 		}
 	}
 	return r;
@@ -2151,10 +2166,10 @@ operator <( MArray2< A, T > const & a, FArray2< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
-	typename FArray2< T >::size_type l( 0 );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-			r( i1, i2 ) = ( a( i1, i2 ) < b[ l ] );
+			r[ l ] = ( a( i1, i2 ) < b[ l ] );
 		}
 	}
 	return r;
@@ -2168,10 +2183,10 @@ operator <=( MArray2< A, T > const & a, FArray2< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
-	typename FArray2< T >::size_type l( 0 );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-			r( i1, i2 ) = ( a( i1, i2 ) <= b[ l ] );
+			r[ l ] = ( a( i1, i2 ) <= b[ l ] );
 		}
 	}
 	return r;
@@ -2185,10 +2200,10 @@ operator >( MArray2< A, T > const & a, FArray2< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
-	typename FArray2< T >::size_type l( 0 );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-			r( i1, i2 ) = ( a( i1, i2 ) > b[ l ] );
+			r[ l ] = ( a( i1, i2 ) > b[ l ] );
 		}
 	}
 	return r;
@@ -2202,10 +2217,10 @@ operator >=( MArray2< A, T > const & a, FArray2< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
-	typename FArray2< T >::size_type l( 0 );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-			r( i1, i2 ) = ( a( i1, i2 ) >= b[ l ] );
+			r[ l ] = ( a( i1, i2 ) >= b[ l ] );
 		}
 	}
 	return r;
@@ -2273,9 +2288,10 @@ operator ==( MArray2< A, T > const & a, FArray2S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) == b( i1, i2 ) );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) == b( i1, i2 ) );
 		}
 	}
 	return r;
@@ -2289,9 +2305,10 @@ operator !=( MArray2< A, T > const & a, FArray2S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) != b( i1, i2 ) );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) != b( i1, i2 ) );
 		}
 	}
 	return r;
@@ -2305,9 +2322,10 @@ operator <( MArray2< A, T > const & a, FArray2S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) < b( i1, i2 ) );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) < b( i1, i2 ) );
 		}
 	}
 	return r;
@@ -2321,9 +2339,10 @@ operator <=( MArray2< A, T > const & a, FArray2S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) <= b( i1, i2 ) );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) <= b( i1, i2 ) );
 		}
 	}
 	return r;
@@ -2337,9 +2356,10 @@ operator >( MArray2< A, T > const & a, FArray2S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) > b( i1, i2 ) );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) > b( i1, i2 ) );
 		}
 	}
 	return r;
@@ -2353,9 +2373,10 @@ operator >=( MArray2< A, T > const & a, FArray2S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) >= b( i1, i2 ) );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) >= b( i1, i2 ) );
 		}
 	}
 	return r;
@@ -2422,9 +2443,10 @@ FArray2D< bool >
 operator ==( MArray2< A, T > const & a, T const & t )
 {
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) == t );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) == t );
 		}
 	}
 	return r;
@@ -2437,9 +2459,10 @@ FArray2D< bool >
 operator !=( MArray2< A, T > const & a, T const & t )
 {
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) != t );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) != t );
 		}
 	}
 	return r;
@@ -2452,9 +2475,10 @@ FArray2D< bool >
 operator <( MArray2< A, T > const & a, T const & t )
 {
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) < t );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) < t );
 		}
 	}
 	return r;
@@ -2467,9 +2491,10 @@ FArray2D< bool >
 operator <=( MArray2< A, T > const & a, T const & t )
 {
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) <= t );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) <= t );
 		}
 	}
 	return r;
@@ -2482,9 +2507,10 @@ FArray2D< bool >
 operator >( MArray2< A, T > const & a, T const & t )
 {
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) > t );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) > t );
 		}
 	}
 	return r;
@@ -2497,9 +2523,10 @@ FArray2D< bool >
 operator >=( MArray2< A, T > const & a, T const & t )
 {
 	FArray2D< bool > r( FArray2D< bool >::shape( a ) );
+	FArray2D< bool >::size_type l( 0 );
 	for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-			r( i1, i2 ) = ( a( i1, i2 ) >= t );
+		for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+			r[ l ] = ( a( i1, i2 ) >= t );
 		}
 	}
 	return r;
@@ -2728,7 +2755,7 @@ operator ||( FArray2< T > const & a, FArray2< T > const & b )
 	return r;
 }
 
-// Transpose: Fortran-Compatible 1-Based Indexing
+// Array Transpose: Fortran-Compatible 1-Based Indexing
 template< typename T >
 inline
 FArray2D< T >
@@ -2746,7 +2773,7 @@ transpose( FArray2< T > const & a )
 	return aT;
 }
 
-// Transposed: Preserved Indexing
+// Array Transposed: Preserved Indexing
 template< typename T >
 inline
 FArray2D< T >
@@ -3021,25 +3048,26 @@ operator ||( FArray2S< T > const & a, FArray2S< T > const & b )
 	return r;
 }
 
-// Transpose: Fortran-Compatible 1-Based Indexing
+// Slice Transpose: Fortran-Compatible 1-Based Indexing
 template< typename T >
 inline
 FArray2D< T >
 transpose( FArray2S< T > const & a )
 {
 	typedef  typename FArray2S< T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
+	int const as1( a.isize1() );
+	int const as2( a.isize2() );
 	FArray2D< T > aT( as2, as1 );
-	for ( int i2 = 1, e2 = a.u1(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = a.u2(); i1 <= e1; ++i1 ) {
-			aT( i1, i2 ) = a( i2, i1 );
+	size_type l( 0 );
+	for ( int i2 = 1; i2 <= as2; ++i2 ) {
+		for ( int i1 = 1; i1 <= as1; ++i1, ++l ) {
+			aT[ l ] = a( i2, i1 );
 		}
 	}
 	return aT;
 }
 
-// Transposed: Preserved Indexing
+// Slice Transposed: Preserved Indexing
 template< typename T >
 inline
 FArray2D< T >
@@ -3305,25 +3333,26 @@ operator ||( MArray2< A, T > const & a, MArray2< A, T > const & b )
 	return r;
 }
 
-// Transpose: Fortran-Compatible 1-Based Indexing
+// MArray Transpose: Fortran-Compatible 1-Based Indexing
 template< class A, typename T >
 inline
 FArray2D< T >
 transpose( MArray2< A, T > const & a )
 {
 	typedef  typename MArray2< A, T >::size_type  size_type;
-	size_type const as1( a.size1() );
-	size_type const as2( a.size2() );
+	int const as1( a.isize1() );
+	int const as2( a.isize2() );
 	FArray2D< T > aT( as2, as1 );
-	for ( int i2 = 1, e2 = a.u1(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = a.u2(); i1 <= e1; ++i1 ) {
-			aT( i1, i2 ) = a( i2, i1 );
+	size_type l( 0 );
+	for ( int i2 = 1; i2 <= as2; ++i2 ) {
+		for ( int i1 = 1; i1 <= as1; ++i1, ++l ) {
+			aT[ l ] = a( i2, i1 );
 		}
 	}
 	return aT;
 }
 
-// Transposed: Preserved Indexing
+// MArray Transposed: Preserved Indexing
 template< class A, typename T >
 inline
 FArray2D< T >

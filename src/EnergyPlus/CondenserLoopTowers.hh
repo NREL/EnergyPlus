@@ -3,8 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -669,7 +667,7 @@ namespace CondenserLoopTowers {
 	Real64
 	VSMerkelResidual(
 		Real64 const AirFlowRateRatio, // fan speed ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = Tower number
+		FArray1< Real64 > const & Par // par(1) = Tower number
 	);
 
 	void
@@ -719,19 +717,19 @@ namespace CondenserLoopTowers {
 	Real64
 	SimpleTowerUAResidual(
 		Real64 const UA, // UA of cooling tower
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = design tower load [W]
+		FArray1< Real64 > const & Par // par(1) = design tower load [W]
 	);
 
 	Real64
 	SimpleTowerTrResidual(
 		Real64 const Trange, // cooling tower range temperature [C]
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = tower number
+		FArray1< Real64 > const & Par // par(1) = tower number
 	);
 
 	Real64
 	SimpleTowerApproachResidual(
 		Real64 const FlowRatio, // water or air flow ratio of cooling tower
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = tower number
+		FArray1< Real64 > const & Par // par(1) = tower number
 	);
 
 	// End of the CondenserLoopTowers Module Simulation Subroutines

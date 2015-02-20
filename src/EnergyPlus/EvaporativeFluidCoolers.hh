@@ -3,8 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -381,7 +379,7 @@ namespace EvaporativeFluidCoolers {
 	Real64
 	SimpleEvapFluidCoolerUAResidual(
 		Real64 const UA, // UA of evaporative fluid cooler
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = design evaporative fluid cooler load [W]
+		FArray1< Real64 > const & Par // par(1) = design evaporative fluid cooler load [W]
 	);
 
 	// End of the EvaporativeFluidCoolers Module Simulation Subroutines

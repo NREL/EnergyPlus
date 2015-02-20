@@ -6,7 +6,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/FArray2D.hh>
 #include <ObjexxFCL/FArray3D.hh>
 
@@ -32,11 +31,8 @@ namespace SolarShading {
 	// Homogeneous Coordinates are represented in integers (64 bit). This changes the surface coordinates from meters
 	// to .01 millimeters -- making that the resolution for shadowing, polygon clipping, etc.
 	extern Real64 const sqHCMULT; // Square of HCMult used in Homogeneous coordinates
+	extern Real64 const sqHCMULT_fac; // ( 0.5 / sqHCMULT ) factor
 	extern Real64 const kHCMULT; // half of inverse square of HCMult used in Homogeneous coordinates
-
-	//INTEGER,          PRIVATE, PARAMETER :: MAXCMB = 2000   ! Length of SHDCMB array
-	//INTEGER,          PARAMETER :: MaxHCS = 15000 ! 200      ! Maximum number of HC surfaces (was 56)
-	//INTEGER,          PARAMETER :: MaxHCV = 12      ! Maximum number of HC vertices
 
 	// Parameters for use with the variable OverlapStatus...
 	extern int const NoOverlap;

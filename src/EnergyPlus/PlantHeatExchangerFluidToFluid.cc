@@ -1755,7 +1755,7 @@ namespace PlantHeatExchangerFluidToFluid {
 	Real64
 	HXDemandSideLoopFlowResidual(
 		Real64 const DmdSideMassFlowRate,
-		Optional< FArray1S< Real64 > const > Par // Par(1) = HX index number
+		FArray1< Real64 > const & Par // Par(1) = HX index number
 	)
 	{
 
@@ -1802,14 +1802,14 @@ namespace PlantHeatExchangerFluidToFluid {
 		Real64 SupSideMdot; // mass flow rate of fluid entering from supply side loop
 
 		MdotTrial = DmdSideMassFlowRate;
-		CompNum = int( Par()( 1 ) );
+		CompNum = int( Par( 1 ) );
 		SupSideMdot = Node( FluidHX( CompNum ).SupplySideLoop.InletNodeNum ).MassFlowRate;
 
 		CalcFluidHeatExchanger( CompNum, SupSideMdot, MdotTrial );
 
 		SupSideLoopOutletTemp = FluidHX( CompNum ).SupplySideLoop.OutletTemp;
 
-		Residuum = Par()( 2 ) - SupSideLoopOutletTemp;
+		Residuum = Par( 2 ) - SupSideLoopOutletTemp;
 
 		return Residuum;
 

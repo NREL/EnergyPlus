@@ -69,7 +69,7 @@ namespace ManageElectricPower {
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::NumOfTimeStepInHour;
-	using DataGlobals::TimeStepZone;
+	using DataGlobals::TimeStepZoneSec;
 	using DataGlobals::SecInHour;
 	using DataGlobals::ScheduleAlwaysOn;
 	using DataHVACGlobals::TimeStepSys;
@@ -342,7 +342,7 @@ namespace ManageElectricPower {
 		ElecProducedPV = GetInstantMeterValue( ElecProducedPVIndex, 2 );
 		ElecProducedWT = GetInstantMeterValue( ElecProducedWTIndex, 2 );
 
-		WholeBldgElectSummary.TotalBldgElecDemand = ElecFacilityBldg / ( TimeStepZone * SecInHour );
+		WholeBldgElectSummary.TotalBldgElecDemand = ElecFacilityBldg / TimeStepZoneSec;
 		WholeBldgElectSummary.TotalHVACElecDemand = ElecFacilityHVAC / ( TimeStepSys * SecInHour );
 		WholeBldgElectSummary.TotalElectricDemand = WholeBldgElectSummary.TotalBldgElecDemand + WholeBldgElectSummary.TotalHVACElecDemand;
 		WholeBldgElectSummary.ElecProducedPVRate = ElecProducedPV / ( TimeStepSys * SecInHour );
@@ -581,7 +581,7 @@ namespace ManageElectricPower {
 				// The TRACK CUSTOM METER scheme tries to have the generators meet all of the
 				//   electrical demand from a meter, it can also be a user-defined Custom Meter
 				//   and PV is ignored.
-				CustomMeterDemand = GetInstantMeterValue( ElecLoadCenter( LoadCenterNum ).DemandMeterPtr, 1 ) / ( TimeStepZone * SecInHour ) + GetInstantMeterValue( ElecLoadCenter( LoadCenterNum ).DemandMeterPtr, 2 ) / ( TimeStepSys * SecInHour );
+				CustomMeterDemand = GetInstantMeterValue( ElecLoadCenter( LoadCenterNum ).DemandMeterPtr, 1 ) / TimeStepZoneSec + GetInstantMeterValue( ElecLoadCenter( LoadCenterNum ).DemandMeterPtr, 2 ) / ( TimeStepSys * SecInHour );
 
 				RemainingLoad = CustomMeterDemand;
 				LoadCenterElectricLoad = RemainingLoad;
@@ -3268,8 +3268,6 @@ namespace ManageElectricPower {
 
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
-		using DataGlobals::TimeStepZone;
-		using DataGlobals::SecInHour;
 		using DataGlobals::MetersHaveBeenInitialized;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataHeatBalance::ZnAirRpt;
@@ -3351,10 +3349,10 @@ namespace ManageElectricPower {
 
 					if ( MetersHaveBeenInitialized ) {
 						MeterPtr = Transformer( TransfNum ).WiredMeterPtrs( MeterNum );
-						ElecLoad += GetInstantMeterValue( MeterPtr, 1 ) / ( TimeStepZone * SecInHour ) + GetInstantMeterValue( MeterPtr, 2 ) / ( TimeStepSys * SecInHour );
+						ElecLoad += GetInstantMeterValue( MeterPtr, 1 ) / TimeStepZoneSec + GetInstantMeterValue( MeterPtr, 2 ) / ( TimeStepSys * SecInHour );
 						// PastElecLoad store the metered value in the previous time step. This value will be used to check whether
 						// a transformer is overloaded or not.
-						PastElecLoad += GetCurrentMeterValue( MeterPtr ) / ( TimeStepZone * SecInHour );
+						PastElecLoad += GetCurrentMeterValue( MeterPtr ) / TimeStepZoneSec;
 					} else {
 						ElecLoad = 0.0;
 						PastElecLoad = 0.0;

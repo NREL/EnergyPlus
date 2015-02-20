@@ -331,7 +331,7 @@ public: // Assignment: Array
 		if ( a.dimensions_initialized() ) {
 			for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 				for ( int i1 = 1; i1 <= u1_; ++i1 ) {
-					assert( T( a( i1, i2 ) ) != T( 0 ) );
+					assert( a( i1, i2 ) != T( 0 ) );
 					operator () ( i1, i2 ) /= a( i1, i2 );
 				}
 			}
@@ -444,7 +444,7 @@ public: // Assignment: Array
 			size_type l( 0 );
 			for ( int j2 = a.l2(), e2 = a.u2(); j2 <= e2; ++j2 ) {
 				for ( int j1 = a.l1(), e1 = a.u1(); j1 <= e1; ++j1, ++l ) {
-					assert( T( a( j1, j2 ) ) != T( 0 ) );
+					assert( a( j1, j2 ) != T( 0 ) );
 					c[ l ] = a( j1, j2 );
 				}
 			}
@@ -457,7 +457,7 @@ public: // Assignment: Array
 		} else { // Not overlap-safe
 			for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
 				for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
-					assert( T( a( j1, j2 ) ) != T( 0 ) );
+					assert( a( j1, j2 ) != T( 0 ) );
 					operator ()( i1, i2 ) /= a( j1, j2 );
 				}
 			}
@@ -519,7 +519,7 @@ public: // Assignment: Array
 		assert( conformable( a ) );
 		for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
 			for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
-				assert( T( a( j1, j2 ) ) != T( 0 ) );
+				assert( a( j1, j2 ) != T( 0 ) );
 				operator ()( i1, i2 ) /= a( j1, j2 );
 			}
 		}

@@ -4008,7 +4008,7 @@ namespace PackagedTerminalHeatPump {
 		Real64 NoCompOutput; // output when no active compressor [W]
 		Real64 ErrorToler; // error tolerance
 		int SolFla; // Flag of RegulaFalsi solver
-		FArray1D< Real64 > Par( 8 ); // Parameters passed to RegulaFalsi
+		static FArray1D< Real64 > Par( 8 ); // Parameters passed to RegulaFalsi
 		std::string IterNum; // Max number of iterations for warning message
 		Real64 CpAir; // air specific heat
 		Real64 OutsideDryBulbTemp; // Outside air temperature at external node height
@@ -4280,11 +4280,19 @@ namespace PackagedTerminalHeatPump {
 		Real64 PartLoadFraction; // heating or cooling part load fraction
 		Real64 MaxHotWaterFlow; // coil maximum hot water mass flow rate, kg/s
 		Real64 HotWaterMdot; // actual hot water mass flow rate
-		FArray1D< Real64 > Par( 3 );
+		static FArray1D< Real64 > Par( 3 );
 		int SolFlag;
 		Real64 MinFlow; // minimum fluid flow rate, kg/s
 		int ControlCompTypeNum; // temporary component index number
 		static int ATMixOutNode( 0 ); // outlet node of ATM Mixer
+
+		//Tuned Named constants to avoid heap allocation when passed to Optional args
+		bool const True( true );
+		bool const False( false );
+		int const iZero( 0 );
+		int const iOne( 1 );
+		Real64 const dZero( 0.0 );
+		Real64 const dOne( 1.0 );
 
 		// FLOW
 
@@ -4337,7 +4345,7 @@ namespace PackagedTerminalHeatPump {
 				SaveCompressorPLR = DXCoilPartLoadRatio( PTUnit( PTUnitNum ).DXCoolCoilIndexNum );
 			} else if ( SELECT_CASE_var == PTWSHPUnit ) {
 				HeatPumpRunFrac( PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac );
-				SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXCoolCoilIndexNum, QZnReq, 1.0, OpMode, WSHPRuntimeFrac, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 1, PartLoadFrac, FirstHVACIteration, OnOffAirFlowRatio );
+				SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXCoolCoilIndexNum, QZnReq, dOne, OpMode, WSHPRuntimeFrac, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, iOne, PartLoadFrac, FirstHVACIteration, OnOffAirFlowRatio );
 				SaveCompressorPLR = PartLoadFrac;
 			} else {
 			}}
@@ -4345,12 +4353,12 @@ namespace PackagedTerminalHeatPump {
 			{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).UnitType_Num );
 			if ( ( SELECT_CASE_var == PTACUnit ) || ( SELECT_CASE_var == PTHPUnit ) ) {
 				if ( PTUnit( PTUnitNum ).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted ) {
-					SimHXAssistedCoolingCoil( PTUnit( PTUnitNum ).DXCoolCoilName, FirstHVACIteration, Off, 0.0, PTUnit( PTUnitNum ).CoolCoilCompIndex, PTUnit( PTUnitNum ).OpMode, HXUnitOn );
+					SimHXAssistedCoolingCoil( PTUnit( PTUnitNum ).DXCoolCoilName, FirstHVACIteration, Off, dZero, PTUnit( PTUnitNum ).CoolCoilCompIndex, PTUnit( PTUnitNum ).OpMode, HXUnitOn );
 				} else {
-					SimDXCoil( PTUnit( PTUnitNum ).DXCoolCoilName, Off, FirstHVACIteration, PTUnit( PTUnitNum ).CoolCoilCompIndex, PTUnit( PTUnitNum ).OpMode, 0.0, OnOffAirFlowRatio );
+					SimDXCoil( PTUnit( PTUnitNum ).DXCoolCoilName, Off, FirstHVACIteration, PTUnit( PTUnitNum ).CoolCoilCompIndex, PTUnit( PTUnitNum ).OpMode, dZero, OnOffAirFlowRatio );
 				}
 			} else if ( SELECT_CASE_var == PTWSHPUnit ) {
-				SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXCoolCoilIndexNum, 0.0, 0.0, OpMode, 0.0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, FirstHVACIteration );
+				SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXCoolCoilIndexNum, dZero, dZero, OpMode, dZero, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, iZero, dZero, FirstHVACIteration );
 			} else {
 			}}
 		}
@@ -4358,7 +4366,7 @@ namespace PackagedTerminalHeatPump {
 			if ( PTUnit( PTUnitNum ).UnitType_Num == PTACUnit ) {
 				QCoilReq = PTUnit( PTUnitNum ).ACHeatCoilCap * PartLoadFrac;
 				if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingGas || PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingElectric ) {
-					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).ACHeatCoilName, FirstHVACIteration, QCoilReq, PTUnit( PTUnitNum ).ACHeatCoilIndex, QActual, false, OpMode, PartLoadFrac );
+					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).ACHeatCoilName, FirstHVACIteration, QCoilReq, PTUnit( PTUnitNum ).ACHeatCoilIndex, QActual, False, OpMode, PartLoadFrac );
 				} else if ( PTUnit( PTUnitNum ).ACHeatCoilType_Num == Coil_HeatingWater ) {
 					//       set water inlet node mass flow rate proportional to PLR. Limit water flow rate based on "available" upper limit.
 					mdot = PTUnit( PTUnitNum ).MaxHeatCoilFluidFlow * PartLoadFrac;
@@ -4381,16 +4389,16 @@ namespace PackagedTerminalHeatPump {
 						SaveCompressorPLR = DXCoilPartLoadRatio( PTUnit( PTUnitNum ).DXHeatCoilIndexNum );
 					} else if ( SELECT_CASE_var == PTWSHPUnit ) {
 						HeatPumpRunFrac( PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac );
-						SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndex, QZnReq, 0.0, OpMode, WSHPRuntimeFrac, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 1, PartLoadFrac, FirstHVACIteration, OnOffAirFlowRatio );
+						SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndex, QZnReq, dZero, OpMode, WSHPRuntimeFrac, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, iOne, PartLoadFrac, FirstHVACIteration, OnOffAirFlowRatio );
 						SaveCompressorPLR = PartLoadFrac;
 					} else {
 					}}
 				} else {
 					{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).UnitType_Num );
 					if ( SELECT_CASE_var == PTHPUnit ) {
-						SimDXCoil( PTUnit( PTUnitNum ).DXHeatCoilName, Off, FirstHVACIteration, PTUnit( PTUnitNum ).DXHeatCoilIndex, PTUnit( PTUnitNum ).OpMode, 0.0, OnOffAirFlowRatio );
+						SimDXCoil( PTUnit( PTUnitNum ).DXHeatCoilName, Off, FirstHVACIteration, PTUnit( PTUnitNum ).DXHeatCoilIndex, PTUnit( PTUnitNum ).OpMode, dZero, OnOffAirFlowRatio );
 					} else if ( SELECT_CASE_var == PTWSHPUnit ) {
-						SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndex, 0.0, 0.0, OpMode, 0.0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, FirstHVACIteration );
+						SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndex, dZero, dZero, OpMode, dZero, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, iZero, dZero, FirstHVACIteration );
 
 					} else {
 					}}
@@ -4416,9 +4424,9 @@ namespace PackagedTerminalHeatPump {
 			} else {
 				{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).UnitType_Num );
 				if ( SELECT_CASE_var == PTHPUnit ) {
-					SimDXCoil( PTUnit( PTUnitNum ).DXHeatCoilName, Off, FirstHVACIteration, PTUnit( PTUnitNum ).DXHeatCoilIndex, PTUnit( PTUnitNum ).OpMode, 0.0, OnOffAirFlowRatio );
+					SimDXCoil( PTUnit( PTUnitNum ).DXHeatCoilName, Off, FirstHVACIteration, PTUnit( PTUnitNum ).DXHeatCoilIndex, PTUnit( PTUnitNum ).OpMode, dZero, OnOffAirFlowRatio );
 				} else if ( SELECT_CASE_var == PTWSHPUnit ) {
-					SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndex, 0.0, 0.0, OpMode, 0.0, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, 0, 0.0, FirstHVACIteration );
+					SimWatertoAirHPSimple( BlankString, PTUnit( PTUnitNum ).DXHeatCoilIndex, dZero, dZero, OpMode, dZero, PTUnit( PTUnitNum ).MaxONOFFCyclesperHour, PTUnit( PTUnitNum ).HPTimeConstant, PTUnit( PTUnitNum ).FanDelayTime, iZero, dZero, FirstHVACIteration );
 
 				} else {
 				}}
@@ -4433,7 +4441,7 @@ namespace PackagedTerminalHeatPump {
 			if ( SupHeaterLoad < SmallLoad ) {
 				{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).SuppHeatCoilType_Num );
 				if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
-					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit( PTUnitNum ).SuppHeatCoilIndex, QActual, true, PTUnit( PTUnitNum ).OpMode );
+					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit( PTUnitNum ).SuppHeatCoilIndex, QActual, True, PTUnit( PTUnitNum ).OpMode );
 				} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 					mdot = 0.0;
 					SetComponentFlowRate( mdot, PTUnit( PTUnitNum ).HotWaterControlNode, PTUnit( PTUnitNum ).PlantCoilOutletNode, PTUnit( PTUnitNum ).LoopNum, PTUnit( PTUnitNum ).LoopSide, PTUnit( PTUnitNum ).BranchNum, PTUnit( PTUnitNum ).CompNum );
@@ -4446,7 +4454,7 @@ namespace PackagedTerminalHeatPump {
 			} else {
 				{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).SuppHeatCoilType_Num );
 				if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
-					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit( PTUnitNum ).SuppHeatCoilIndex, QActual, true, PTUnit( PTUnitNum ).OpMode );
+					SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit( PTUnitNum ).SuppHeatCoilIndex, QActual, True, PTUnit( PTUnitNum ).OpMode );
 				} else if ( SELECT_CASE_var == Coil_HeatingWater ) {
 					MaxHotWaterFlow = PTUnit( PTUnitNum ).MaxSuppCoilFluidFlow;
 					SetComponentFlowRate( MaxHotWaterFlow, PTUnit( PTUnitNum ).HotWaterControlNode, PTUnit( PTUnitNum ).PlantCoilOutletNode, PTUnit( PTUnitNum ).LoopNum, PTUnit( PTUnitNum ).LoopSide, PTUnit( PTUnitNum ).BranchNum, PTUnit( PTUnitNum ).CompNum );
@@ -4653,7 +4661,7 @@ namespace PackagedTerminalHeatPump {
 	Real64
 	HotWaterCoilResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		Optional< FArray1S< Real64 > const > Par // Par(5) is the requested coil load
+		FArray1< Real64 > const & Par // Par(5) is the requested coil load
 	)
 	{
 
@@ -4702,13 +4710,9 @@ namespace PackagedTerminalHeatPump {
 		Real64 QCoilActual; // delivered coild load, W
 		Real64 mdot;
 
-		PTUnitNum = int( Par()( 1 ) );
-		if ( Par()( 2 ) > 0.0 ) {
-			FirstHVACSoln = true;
-		} else {
-			FirstHVACSoln = false;
-		}
-		SupHeaterLoad = Par()( 3 );
+		PTUnitNum = int( Par( 1 ) );
+		FirstHVACSoln = ( Par( 2 ) > 0.0 );
+		SupHeaterLoad = Par( 3 );
 		QCoilActual = SupHeaterLoad;
 		mdot = HWFlow;
 
@@ -4727,7 +4731,7 @@ namespace PackagedTerminalHeatPump {
 	Real64
 	SupSATResidual(
 		Real64 & TempSupHeater, // supplemental heater load at maximum SAT
-		Optional< FArray1S< Real64 > const > Par // par(1) = PTUnitNum
+		FArray1< Real64 > const & Par // par(1) = PTUnitNum
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -4771,13 +4775,9 @@ namespace PackagedTerminalHeatPump {
 		int PTUnitNum; // PTHP index
 		bool FirstHVACIteration; // FirstHVACIteration flag
 
-		PTUnitNum = int( Par()( 1 ) );
+		PTUnitNum = int( Par( 1 ) );
 		// FirstHVACIteration is a logical, Par is real, so make 1.0=TRUE and 0.0=FALSE
-		if ( Par()( 2 ) == 1.0 ) {
-			FirstHVACIteration = true;
-		} else {
-			FirstHVACIteration = false;
-		}
+		FirstHVACIteration = ( Par( 2 ) == 1.0 );
 		SimulateHeatingCoilComponents( PTUnit( PTUnitNum ).SuppHeatCoilName, FirstHVACIteration, TempSupHeater, PTUnit( PTUnitNum ).SuppHeatCoilIndex );
 		SupSATResidual = Node( PTUnit( PTUnitNum ).AirOutNode ).Temp - PTUnit( PTUnitNum ).MaxSATSupHeat;
 
@@ -4787,7 +4787,7 @@ namespace PackagedTerminalHeatPump {
 	Real64
 	PLRResidual(
 		Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = PTUnitNum
+		FArray1< Real64 > const & Par // par(1) = PTUnitNum
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -4845,25 +4845,17 @@ namespace PackagedTerminalHeatPump {
 		Real64 ActualOutput; // delivered capacity of PTHP
 		bool HXUnitOn; // flag to enable heat exchanger
 
-		PTUnitNum = int( Par()( 1 ) );
-		ZoneNum = int( Par()( 2 ) );
+		PTUnitNum = int( Par( 1 ) );
+		ZoneNum = int( Par( 2 ) );
 		// FirstHVACIteration is a logical, Par is real, so make 1.0=TRUE and 0.0=FALSE
-		if ( Par()( 3 ) == 1.0 ) {
-			FirstHVACIteration = true;
-		} else {
-			FirstHVACIteration = false;
-		}
-		OpMode = int( Par()( 4 ) );
-		QZnReq = Par()( 5 );
+		FirstHVACIteration = ( Par( 3 ) == 1.0 );
+		OpMode = int( Par( 4 ) );
+		QZnReq = Par( 5 );
 		QZnReqTemp = QZnReq;
 		if ( std::abs( QZnReq ) < 100.0 ) QZnReqTemp = sign( 100.0, QZnReq );
-		OnOffAirFlowRatio = Par()( 6 );
-		SupHeaterLoad = Par()( 7 ) * PartLoadFrac;
-		if ( Par()( 8 ) == 1.0 ) {
-			HXUnitOn = true;
-		} else {
-			HXUnitOn = false;
-		}
+		OnOffAirFlowRatio = Par( 6 );
+		SupHeaterLoad = Par( 7 ) * PartLoadFrac;
+		HXUnitOn = ( Par( 8 ) == 1.0 );
 
 		CalcPTUnit( PTUnitNum, FirstHVACIteration, PartLoadFrac, ActualOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
 		PLRResidual = ( ActualOutput - QZnReq ) / QZnReqTemp;
@@ -5610,7 +5602,7 @@ namespace PackagedTerminalHeatPump {
 		Real64 LatOutput; // latent capacity output
 		Real64 ErrorToler; // error tolerance
 		int SolFla; // Flag of RegulaFalsi solver
-		FArray1D< Real64 > Par( 11 ); // Parameters passed to RegulaFalsi
+		static FArray1D< Real64 > Par( 11 ); // Parameters passed to RegulaFalsi
 		Real64 CpAir; // air specific heat
 		Real64 QCoilActual; // coil load actually delivered returned to calling component
 		int i; // Speed index
@@ -5870,7 +5862,7 @@ namespace PackagedTerminalHeatPump {
 	Real64
 	VSHPCyclingResidual(
 		Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = FurnaceNum
+		FArray1< Real64 > const & Par // par(1) = FurnaceNum
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -5935,35 +5927,27 @@ namespace PackagedTerminalHeatPump {
 		Real64 ResScale; // Residual scale
 		int CompOp; // compressor operation; 1=on, 0=off
 
-		PTUnitNum = int( Par()( 1 ) );
-		ZoneNum = int( Par()( 2 ) );
+		PTUnitNum = int( Par( 1 ) );
+		ZoneNum = int( Par( 2 ) );
 		// FirstHVACIteration is a logical, Par is REAL(r64), so make 1.0=TRUE and 0.0=FALSE
-		if ( Par()( 3 ) == 1.0 ) {
-			FirstHVACIteration = true;
-		} else {
-			FirstHVACIteration = false;
-		}
-		OpMode = int( Par()( 4 ) );
+		FirstHVACIteration =  ( Par( 3 ) == 1.0 );
+		OpMode = int( Par( 4 ) );
 
 		QZnReq = 0.0;
 		QZnLat = 0.0;
 
-		LoadToBeMet = Par()( 5 );
-		if ( Par()( 10 ) == 1.0 ) {
-			QZnReq = Par()( 5 );
+		LoadToBeMet = Par( 5 );
+		if ( Par( 10 ) == 1.0 ) {
+			QZnReq = Par( 5 );
 		} else {
-			QZnLat = Par()( 5 );
+			QZnLat = Par( 5 );
 		}
 
-		OnOffAirFlowRatio = Par()( 6 );
-		SupHeaterLoad = Par()( 7 );
-		CompOp = int( Par()( 9 ) );
+		OnOffAirFlowRatio = Par( 6 );
+		SupHeaterLoad = Par( 7 );
+		CompOp = int( Par( 9 ) );
 
-		if ( Par()( 11 ) > 0.0 ) {
-			HXUnitOn = true;
-		} else {
-			HXUnitOn = false;
-		}
+		HXUnitOn = ( Par( 11 ) > 0.0 );
 
 		CalcVarSpeedHeatPump( PTUnitNum, ZoneNum, FirstHVACIteration, CompOp, 1, 0.0, PartLoadFrac, ZoneSensLoadMet, ZoneLatLoadMet, QZnReq, QZnLat, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
 
@@ -5973,7 +5957,7 @@ namespace PackagedTerminalHeatPump {
 		}
 
 		// Calculate residual based on output calculation flag
-		if ( Par()( 10 ) == 1.0 ) {
+		if ( Par( 10 ) == 1.0 ) {
 			VSHPCyclingResidual = ( ZoneSensLoadMet - LoadToBeMet ) / ResScale;
 		} else {
 			VSHPCyclingResidual = ( ZoneLatLoadMet - LoadToBeMet ) / ResScale;
@@ -5988,7 +5972,7 @@ namespace PackagedTerminalHeatPump {
 	Real64
 	VSHPSpeedResidual(
 		Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = MSHPNum
+		FArray1< Real64 > const & Par // par(1) = MSHPNum
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -6054,36 +6038,28 @@ namespace PackagedTerminalHeatPump {
 		int SpeedNum; // Speed number
 		int CompOp; // compressor operation; 1=on, 0=off
 
-		PTUnitNum = int( Par()( 1 ) );
-		ZoneNum = int( Par()( 2 ) );
+		PTUnitNum = int( Par( 1 ) );
+		ZoneNum = int( Par( 2 ) );
 		// FirstHVACIteration is a logical, Par is REAL(r64), so make 1.0=TRUE and 0.0=FALSE
-		if ( Par()( 3 ) == 1.0 ) {
-			FirstHVACIteration = true;
-		} else {
-			FirstHVACIteration = false;
-		}
-		OpMode = int( Par()( 4 ) );
+		FirstHVACIteration = ( Par( 3 ) == 1.0 );
+		OpMode = int( Par( 4 ) );
 
 		QZnReq = 0.0;
 		QZnLat = 0.0;
 
-		LoadToBeMet = Par()( 5 );
-		if ( Par()( 10 ) == 1.0 ) {
-			QZnReq = Par()( 5 );
+		LoadToBeMet = Par( 5 );
+		if ( Par( 10 ) == 1.0 ) {
+			QZnReq = Par( 5 );
 		} else {
-			QZnLat = Par()( 5 );
+			QZnLat = Par( 5 );
 		}
 
-		OnOffAirFlowRatio = Par()( 6 );
-		SupHeaterLoad = Par()( 7 );
-		SpeedNum = int( Par()( 8 ) );
-		CompOp = int( Par()( 9 ) );
+		OnOffAirFlowRatio = Par( 6 );
+		SupHeaterLoad = Par( 7 );
+		SpeedNum = int( Par( 8 ) );
+		CompOp = int( Par( 9 ) );
 
-		if ( Par()( 11 ) > 0.0 ) {
-			HXUnitOn = true;
-		} else {
-			HXUnitOn = false;
-		}
+		HXUnitOn = ( Par( 11 ) > 0.0 );
 
 		CalcVarSpeedHeatPump( PTUnitNum, ZoneNum, FirstHVACIteration, CompOp, SpeedNum, SpeedRatio, 1.0, ZoneSensLoadMet, ZoneLatLoadMet, QZnReq, QZnLat, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
 
@@ -6093,7 +6069,7 @@ namespace PackagedTerminalHeatPump {
 		}
 
 		// Calculate residual based on output calculation flag
-		if ( Par()( 10 ) == 1.0 ) {
+		if ( Par( 10 ) == 1.0 ) {
 			VSHPSpeedResidual = ( ZoneSensLoadMet - LoadToBeMet ) / ResScale;
 		} else {
 			VSHPSpeedResidual = ( ZoneLatLoadMet - LoadToBeMet ) / ResScale;
@@ -6187,7 +6163,7 @@ namespace PackagedTerminalHeatPump {
 		Real64 mdot; // local temporary for mass flow rate
 		Real64 MaxHotWaterFlow; // coil maximum hot water mass flow rate, kg/s
 		Real64 HotWaterMdot; // actual hot water mass flow rate
-		FArray1D< Real64 > Par( 3 );
+		static FArray1D< Real64 > Par( 3 );
 		int SolFlag;
 		static int ATMixOutNode( 0 ); // outlet node of ATM Mixer
 
