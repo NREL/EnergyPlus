@@ -583,38 +583,31 @@ namespace AirflowNetworkBalanceManager {
 					}
 					else {
 						// Verify Curve Object, only legal type is linear or quadratic
-						{ auto const SELECT_CASE_var( GetCurveType( OccupantVentilationControl( i ).ComfortLowTempCurveNum ) );
-						if (SELECT_CASE_var == "LINEAR" || SELECT_CASE_var == "QUADRATIC" ) {
-						} else {
+						auto curveType = GetCurveType( OccupantVentilationControl( i ).ComfortLowTempCurveNum );
+						if(!(curveType == "LINEAR" || curveType == "QUADRATIC")) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OccupantVentilationControl( i ).Name + "\", invalid" );
 							ShowContinueError( "...illegal " + cAlphaFields( 2 ) + " type for this object = " + GetCurveType( OccupantVentilationControl( i ).ComfortLowTempCurveNum ) );
 							ShowContinueError( "Curve type must be either Linear or Quadratic." );
 							ErrorsFound = true;
-						}}
+						}
 					}
 				}
 				if ( !lAlphaBlanks( 3 ) ) {
 					OccupantVentilationControl( i ).ComfortHighTempCurveName = Alphas( 3 );
 					OccupantVentilationControl( i ).ComfortHighTempCurveNum = GetCurveIndex( Alphas( 3 ) ); // convert curve name to number
 					if ( OccupantVentilationControl( i ).ComfortHighTempCurveNum > 0 ) {
-						// Verify Curve Object, only legal type is BiQuadratic
-						{ auto const SELECT_CASE_var( GetCurveType( OccupantVentilationControl( i ).ComfortHighTempCurveNum ) );
-						if ( SELECT_CASE_var == "LINEAR" ) {
-							//							Boiler( BoilerNum ).EfficiencyCurveType = Linear;
-						}
-						else if ( SELECT_CASE_var == "QUADRATIC" ) {
-							//							Boiler( BoilerNum ).EfficiencyCurveType = Quadratic;
-						}
-						else {
+						// Verify Curve Object, only legal type is linear or quadratic
+						auto curveType = GetCurveType(OccupantVentilationControl(i).ComfortLowTempCurveNum);
+						if(!(curveType == "LINEAR" || curveType == "QUADRATIC")) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OccupantVentilationControl( i ).Name + "\", invalid" );
 							ShowContinueError( "...illegal " + cAlphaFields( 3 ) + " type for this object = " + GetCurveType( OccupantVentilationControl( i ).ComfortHighTempCurveNum ) );
 							ShowContinueError( "Curve type must be either Linear or Quadratic." );
 							ErrorsFound = true;
-						}}
+						}
 					} else {
 						ShowWarningError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 3 ) + " not found = " + OccupantVentilationControl( i ).ComfortHighTempCurveName );
 						ShowContinueError( "..for specified " + cAlphaFields( 1 ) + " = " + Alphas( 1 ) );
-						ShowContinueError( "A single curve of thermal comfort low temperature is used only. Simulation continues." );
+						ShowContinueError( "A single curve of thermal comfort low temperature is used. Simulation continues." );
 					}
 				}
 				if ( OccupantVentilationControl( i ).ComfortHighTempCurveNum > 0 ) {
