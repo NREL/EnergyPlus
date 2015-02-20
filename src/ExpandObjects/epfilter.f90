@@ -13778,7 +13778,17 @@ DO iSys = 1, numCompactSysUnit
     CALL AddToObjStr('Heating Fraction of Autosized Heating Supply Air Flow Rate','')
     CALL AddToObjStr('Heating Fraction of Autosized Cooling Supply Air Flow Rate','')
     CALL AddToObjStr('Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}','')
-    CALL AddToObjStr('System Outdoor Air Method','ZoneSum',.true.)
+    CALL AddToObjStr('System Outdoor Air Method','ZoneSum')
+    CALL AddToObjStr('Zone Maximum Outdoor Air Fraction','1.0')
+    CALL AddToObjStr('Cooling Design Capacity Method','CoolingDesignCapacity')
+    CALL AddToObjStr('Cooling Design Capacity {W}','autosize')
+    CALL AddToObjStr('Cooling Design Capacity Per Floor Area {W/m2}','')
+    CALL AddToObjStr('Fraction of Autosized Cooling Design Capacity','')
+    CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+    CALL AddToObjStr('Heating Design Capacity {W}','autosize')
+    CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+    CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
+    CALL AddToObjStr('Central Cooling Capacity Control Method','VAV',.true.)
   ELSE
     CALL AddToObjStr('Cooling Supply Air Flow Rate Method','Flow/System')
     CALL AddToObjFld('Cooling Supply Air Flow Rate {m3/s}', base + usSupplyMaxRateOff,' ')
@@ -14164,21 +14174,21 @@ DO iSys = 1, numCompactSysUnit
     CALL AddToObjFld('Name', base + usAirHandlerNameOff,' Furnace with DX Cooling')
   END IF
   CALL AddToObjStr('Availability Schedule Name','HVACTemplate-Always 1')
-  CALL AddToObjFld('Furnace inlet node name', base + usAirHandlerNameOff, TRIM(furnaceInlet))
-  CALL AddToObjFld('Furnace outlet node name', base + usAirHandlerNameOff, TRIM(furnaceOutlet))
+  CALL AddToObjFld('Furnace Air Inlet Node Name', base + usAirHandlerNameOff, TRIM(furnaceInlet))
+  CALL AddToObjFld('Furnace Air Outlet Node Name', base + usAirHandlerNameOff, TRIM(furnaceOutlet))
   IF (isSupplyFanCycling) THEN
-    CALL AddToObjStr('Fan Operating Mode Schedule Name','HVACTemplate-Always 0')
+    CALL AddToObjStr('Supply Air Fan Operating Mode Schedule Name','HVACTemplate-Always 0')
     SchType='0'
   ELSE
-    CALL AddToObjFld('Fan Operating Mode Schedule Name', base + usSupplyFanModeOff,'')
+    CALL AddToObjFld('Supply Air Fan Operating Mode Schedule Name', base + usSupplyFanModeOff,'')
   END IF
-  CALL AddToObjStr('Maximum supply air temperature from furnace heater {C}','80')
+  CALL AddToObjStr('Maximum Supply Air Temperature {C}','80')
   IF (coolCoilKind .EQ. ccNone) THEN
-    CALL AddToObjStr('Design air flow rate through the furnace {m3/s}', 'autosize')
+    CALL AddToObjStr('Heating Supply Air Flow Rate {m3/s}', 'autosize')
   ELSE
-    CALL AddToObjStr('Supply air volumetric flow rate during cooling operation {m3/s}', 'autosize')
-    CALL AddToObjStr('Supply air volumetric flow rate during heating operation {m3/s}', 'autosize')
-    CALL AddToObjStr('Supply air volumetric flow rate when no cooling or heating is needed {m3/s}', 'autosize')
+    CALL AddToObjStr('Cooling Supply Air Flow Rate {m3/s}', 'autosize')
+    CALL AddToObjStr('Heating Supply Air Flow Rate {m3/s}', 'autosize')
+    CALL AddToObjStr('No Load Supply Air Flow Rate {m3/s}', 'autosize')
   ENDIF
   CALL AddToObjFld('Controlling Zone or Thermostat Location', base + usControlZoneOff,' ')
   !CALL AddToObjStr('Fraction of Supply Air Flow That Goes Through the Controlling Zone','autosize')
@@ -15163,9 +15173,9 @@ DO iSys = 1, numCompactSysUnitHP
   CALL AddToObjStr('Availability Schedule Name', 'HVACTemplate-Always 1')
   CALL AddToObjFld('Air Inlet Node Name', base + uhpsAirHandlerNameOff, TRIM(unitInlet))
   CALL AddToObjFld('Air Outlet Node Name', base + uhpsAirHandlerNameOff, TRIM(unitOutlet))
-  CALL AddToObjFld('Supply Air Flow Rate During Cooling Operation', base + uhpsSupplyCoolFlowRateOff,'')
-  CALL AddToObjFld('Supply Air Flow Rate During Heating Operation', base + uhpsSupplyHeatFlowRateOff,'')
-  CALL AddToObjFld('Supply Air Flow Rate When No Cooling or Heating is Needed', base + uhpsSupplyNoLoadFlowRateOff,'')
+  CALL AddToObjFld('Cooling Supply Air Flow Rate', base + uhpsSupplyCoolFlowRateOff,'')
+  CALL AddToObjFld('Heating Supply Air Flow Rate', base + uhpsSupplyHeatFlowRateOff,'')
+  CALL AddToObjFld('No Load Supply Air Flow Rate', base + uhpsSupplyNoLoadFlowRateOff,'')
   CALL AddToObjFld('Controlling Zone or Thermostat Location', base + uhpsControlZoneOff,'')
   !CALL AddToObjStr('Fraction of Supply Air Flow That Goes Through the Controlling Zone','autosize')
   CALL AddToObjStr('Supply Air Fan Object Type','Fan:OnOff')
@@ -16309,23 +16319,23 @@ DO iSys = 1, numCompactSysUnitarySystem
   CALL AddToObjStr('Latent Load Control','')
   CALL AddToObjStr('Supplemental Heating Coil Object Type',TRIM(supheatCoilObjectType))
   CALL AddToObjStr('Supplemental Heating Coil Name',TRIM(supheatCoilObjectName))
-  CALL AddToObjStr('Supply Air Flow Rate Method During Cooling Operation','SupplyAirFlowRate')
-  CALL AddToObjFld('Supply Air Flow Rate During Cooling Operation {m3/s}', base + ussSupplyCoolFlowRateOff,'')
-  CALL AddToObjStr('Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2','')
-  CALL AddToObjStr('Fraction of Autosized Design Cooling Supply Air Flow Rate','')
-  CALL AddToObjStr('Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W','')
-  CALL AddToObjStr('Supply Air Flow Rate Method During Heating Operation','SupplyAirFlowRate')
-  CALL AddToObjFld('Supply Air Flow Rate During Heating Operation {m3/s}', base + ussSupplyHeatFlowRateOff,'')
-  CALL AddToObjStr('Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2','')
-  CALL AddToObjStr('Fraction of Autosized Design Heating Supply Air Flow Rate','')
-  CALL AddToObjStr('Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W','')
-  CALL AddToObjStr('Supply Air Flow Rate Method When No Cooling or Heating is Required','SupplyAirFlowRate')
-  CALL AddToObjFld('Supply Air Flow Rate When No Cooling or Heating is Required {m3/s}', base + ussSupplyNoLoadFlowRateOff,'')
-  CALL AddToObjStr('Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required {m3/s-m2','')
-  CALL AddToObjStr('Fraction of Autosized Design Cooling Supply Air Flow Rate','')
-  CALL AddToObjStr('Fraction of Autosized Design Heating Supply Air Flow Rate','')
-  CALL AddToObjStr('Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W','')
-  CALL AddToObjStr('Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W','')
+  CALL AddToObjStr('Cooling Supply Air Flow Rate Method','SupplyAirFlowRate')
+  CALL AddToObjFld('Cooling Supply Air Flow Rate {m3/s}', base + ussSupplyCoolFlowRateOff,'')
+  CALL AddToObjStr('Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2','')
+  CALL AddToObjStr('Cooling Fraction of Autosized Cooling Supply Air Flow Rate','')
+  CALL AddToObjStr('Cooling Supply Air Flow Rate Per Unit of Capacity {m3/s-W','')
+  CALL AddToObjStr('Heating Supply Air Flow Rate Method','SupplyAirFlowRate')
+  CALL AddToObjFld('Heating Supply Air Flow Rate {m3/s}', base + ussSupplyHeatFlowRateOff,'')
+  CALL AddToObjStr('Heating Supply Air Flow Rate Per Floor Area {m3/s-m2','')
+  CALL AddToObjStr('Heating Fraction of Autosized Heating Supply Air Flow Rate','')
+  CALL AddToObjStr('Heating Supply Air Flow Rate Per Unit of Capacity {m3/s-W','')
+  CALL AddToObjStr('No Load Supply Air Flow Rate Method','SupplyAirFlowRate')
+  CALL AddToObjFld('No Load Supply Air Flow Rate {m3/s}', base + ussSupplyNoLoadFlowRateOff,'')
+  CALL AddToObjStr('No Load Supply Air Flow Rate Per Floor Area {m3/s-m2','')
+  CALL AddToObjStr('No Load Fraction of Autosized Cooling Supply Air Flow Rate','')
+  CALL AddToObjStr('No Load Fraction of Autosized Heating Supply Air Flow Rate','')
+  CALL AddToObjStr('No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W','')
+  CALL AddToObjStr('No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W','')
   CALL AddToObjStr('Maximum Supply Air Temperature {C}', 'Autosize')
   CALL AddToObjFld('Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}', base + ussSuppReHeatMaxODBOff,'')
   CALL AddToObjStr('Outdoor Dry-Bulb Temperature Sensor Node Name', '')
@@ -16352,26 +16362,14 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Unitary System MultiSpeed Performance')
     CALL AddToObjFld('Number of Speeds for Heating', base + ussHeatCoilNumSpeedOff,'')
     CALL AddToObjFld('Number of Speeds for Cooling', base + ussCoolCoilNumSpeedOff,'')
-    CALL AddToObjStr('Speed 1 Supply Air Flow Ratio During Heating Operation', 'autosize')
-    CALL AddToObjStr('Speed 1 Supply Air Flow Ratio During Cooling Operation', 'autosize')
-    CALL AddToObjStr('Speed 2 Supply Air Flow Ratio During Heating Operation', 'autosize')
-    CALL AddToObjStr('Speed 2 Supply Air Flow Ratio During Cooling Operation', 'autosize')
-    CALL AddToObjStr('Speed 3 Supply Air Flow Ratio During Heating Operation', 'autosize')
-    CALL AddToObjStr('Speed 3 Supply Air Flow Ratio During Cooling Operation', 'autosize')
-    CALL AddToObjStr('Speed 4 Supply Air Flow Ratio During Heating Operation', 'autosize')
-    CALL AddToObjStr('Speed 4 Supply Air Flow Ratio During Cooling Operation', 'autosize',.TRUE.)
-!    CALL AddToObjStr('Speed 5 Supply Air Flow Ratio During Heating Operation', 'autosize')
-!    CALL AddToObjStr('Speed 5 Supply Air Flow Ratio During Cooling Operation', 'autosize')
-!    CALL AddToObjStr('Speed 6 Supply Air Flow Ratio During Heating Operation', 'autosize')
-!    CALL AddToObjStr('Speed 6 Supply Air Flow Ratio During Cooling Operation', 'autosize')
-!    CALL AddToObjStr('Speed 7 Supply Air Flow Ratio During Heating Operation', 'autosize')
-!    CALL AddToObjStr('Speed 7 Supply Air Flow Ratio During Cooling Operation', 'autosize')
-!    CALL AddToObjStr('Speed 8 Supply Air Flow Ratio During Heating Operation', 'autosize')
-!    CALL AddToObjStr('Speed 8 Supply Air Flow Ratio During Cooling Operation', 'autosize')
-!    CALL AddToObjStr('Speed 9 Supply Air Flow Ratio During Heating Operation', 'autosize')
-!    CALL AddToObjStr('Speed 9 Supply Air Flow Ratio During Cooling Operation', 'autosize')
-!    CALL AddToObjStr('Speed 10 Supply Air Flow Ratio During Heating Operation', 'autosize')
-!    CALL AddToObjStr('Speed 10 Supply Air Flow Ratio During Cooling Operation', 'autosize',.TRUE.)
+    CALL AddToObjStr('Heating Speed 1 Supply Air Flow Ratio', 'autosize')
+    CALL AddToObjStr('Cooling Speed 1 Supply Air Flow Ratio', 'autosize')
+    CALL AddToObjStr('Heating Speed 2 Supply Air Flow Ratio', 'autosize')
+    CALL AddToObjStr('Cooling Speed 2 Supply Air Flow Ratio', 'autosize')
+    CALL AddToObjStr('Heating Speed 3 Supply Air Flow Ratio', 'autosize')
+    CALL AddToObjStr('Cooling Speed 3 Supply Air Flow Ratio', 'autosize')
+    CALL AddToObjStr('Heating Speed 4 Supply Air Flow Ratio', 'autosize')
+    CALL AddToObjStr('Cooling Speed 4 Supply Air Flow Ratio', 'autosize',.TRUE.)
   END IF
 
   ! add new schedule if needed (from Supply Fan Operating Mode Schedule, above)
@@ -19915,10 +19913,11 @@ DO iSys = 1, numCompactSysConstVol
       CALL AddToObjStr('Performance Input Method','NominalCapacity')
       CALL AddToObjFld('Rated Capacity',base + cvsHeatCoilCapOff,'')
     END IF
-    CALL AddToObjStr('Design Inlet Water Temperature','82.2')
-    CALL AddToObjStr('Design Inlet Air Temperature','16.6')
-    CALL AddToObjStr('Design Outlet Water Temperature','71.1')
-    CALL AddToObjStr('Design Outlet Air Temperature','32.2',.TRUE.)
+    CALL AddToObjStr('Rated Inlet Water Temperature','82.2')
+    CALL AddToObjStr('Rated Inlet Air Temperature','16.6')
+    CALL AddToObjStr('Rated Outlet Water Temperature','71.1')
+    CALL AddToObjStr('Rated Outlet Air Temperature','32.2')
+    CALL AddToObjStr('Rated Ratio for Air and Water Convection','0.5',.true.)
     !***Branch
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Heating Coil HW Branch')
@@ -22946,20 +22945,20 @@ DO iZone = 1, numCompactZoneVRF
   !CR8001
   !CALL AddToObjFld('Supply air volumetric flow rate during cooling operation {m3/s}',   &
   !   base + vrfzSupplyCoolFlowRateOff,'')
-  CALL AddToObjStr('Supply Air Flow Rate During Cooling Operation {m3/s}','autosize')
-  CALL AddToObjFld('Supply Air Flow Rate When No Cooling is Needed {m3/s}',   &
+  CALL AddToObjStr('Cooling Supply Air Flow Rate {m3/s}','autosize')
+  CALL AddToObjFld('No Cooling Supply Air Flow Rate {m3/s}',   &
      base + vrfzSupplyNoCoolFlowRateOff,'')
-  CALL AddToObjStr('Supply Air Flow Rate During Heating Operation {m3/s}','autosize')
-  CALL AddToObjFld('Supply Air Flow Rate When No Heating is Needed {m3/s}',   &
+  CALL AddToObjStr('Heating Supply Air Flow Rate {m3/s}','autosize')
+  CALL AddToObjFld('No Heating Supply Air Flow Rate {m3/s}',   &
      base + vrfzSupplyNoHeatFlowRateOff,'')
   IF (isDedOutAirNameBlank) THEN
-    CALL AddToObjStr('Outdoor Air Flow Rate During Cooling Operation {m3/s}','autosize')
-    CALL AddToObjStr('Outdoor Air Flow Rate During Heating Operation {m3/s}','autosize')
-    CALL AddToObjStr('Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}','autosize')
+    CALL AddToObjStr('Cooling Outdoor Air Flow Rate {m3/s}','autosize')
+    CALL AddToObjStr('Heating Outdoor Air Flow Rate {m3/s}','autosize')
+    CALL AddToObjStr('No Load Outdoor Air Flow Rate {m3/s}','autosize')
   ELSE
-    CALL AddToObjStr('Outdoor Air Flow Rate During Cooling Operation {m3/s}','0.0')
-    CALL AddToObjStr('Outdoor Air Flow Rate During Heating Operation {m3/s}','0.0')
-    CALL AddToObjStr('Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}','0.0')
+    CALL AddToObjStr('Cooling Outdoor Air Flow Rate {m3/s}','0.0')
+    CALL AddToObjStr('Heating Outdoor Air Flow Rate {m3/s}','0.0')
+    CALL AddToObjStr('No Load Outdoor Air Flow Rate {m3/s}','0.0')
   END IF
   SchType=' '
   SELECT CASE (fanMode)
@@ -25032,31 +25031,31 @@ DO iZone = 1, numCompactPTAC
   !CR8001
   !CALL AddToObjFld('Supply air volumetric flow rate during cooling operation {m3/s}',   &
   !   base + ptaczSupplyCoolFlowRateOff,'')
-  CALL AddToObjStr('Supply air volumetric flow rate during cooling operation {m3/s}','autosize')
+  CALL AddToObjStr('Cooling Supply Air Flow Rate {m3/s}','autosize')
   !CR8001
   !CALL AddToObjFld('Supply air volumetric flow rate during heating operation {m3/s}',   &
   !   base + ptaczSupplyHeatFlowRateOff,'')
-  CALL AddToObjStr('Supply air volumetric flow rate during heating operation {m3/s}','autosize')
-  CALL AddToObjFld('Supply air volumetric flow rate when no cooling or heating is needed {m3/s}',   &
+  CALL AddToObjStr('Heating Supply Air Flow Rate {m3/s}','autosize')
+  CALL AddToObjFld('No Load Supply Air Flow Rate {m3/s}',   &
      base + ptaczSupplyNoLoadFlowRateOff,'')
   IF (isDedOutAirNameBlank) THEN
-    CALL AddToObjStr('Outside air volumetric flow rate during cooling operation {m3/s}','autosize')
-    CALL AddToObjStr('Outside air volumetric flow rate during heating operation {m3/s}','autosize')
-    CALL AddToObjStr('Outside air volumetric flow rate when no cooling or heating is needed {m3/s}','autosize')
+    CALL AddToObjStr('Cooling Outdoor Air Flow Rate {m3/s}','autosize')
+    CALL AddToObjStr('Heating Outdoor Air Flow Rate {m3/s}','autosize')
+    CALL AddToObjStr('No Load Outdoor Air Flow Rate {m3/s}','autosize')
   ELSE
-    CALL AddToObjStr('Outside air volumetric flow rate during cooling operation {m3/s}','0.0')
-    CALL AddToObjStr('Outside air volumetric flow rate during heating operation {m3/s}','0.0')
-    CALL AddToObjStr('Outside air volumetric flow rate when no cooling or heating is needed {m3/s}','0.0')
+    CALL AddToObjStr('Cooling Outdoor Air Flow Rate {m3/s}','0.0')
+    CALL AddToObjStr('Heating Outdoor Air Flow Rate {m3/s}','0.0')
+    CALL AddToObjStr('No Load Outdoor Air Flow Rate {m3/s}','0.0')
   END IF
   CALL AddToObjStr('Supply Air Fan Object Type','Fan:OnOff')
   CALL AddToObjFld('Supply Air Fan Name', base + ptaczNameOff,' PTAC Supply Fan')
   SELECT CASE (heatCoilKind)
     CASE (hcElectric)
-      CALL AddToObjStr('Supplemental Heating Coil Object Type','Coil:Heating:Electric')
+      CALL AddToObjStr('Heating Coil Object Type','Coil:Heating:Electric')
     CASE (hcWater)
-      CALL AddToObjStr('Supplemental Heating Coil Object Type','Coil:Heating:Water')
+      CALL AddToObjStr('Heating Coil Object Type','Coil:Heating:Water')
     CASE (hcGas)
-      CALL AddToObjStr('Supplemental Heating Coil Object Type','Coil:Heating:Gas')
+      CALL AddToObjStr('Heating Coil Object Type','Coil:Heating:Gas')
   END SELECT
   CALL AddToObjFld('Heating Coil Name', base + ptaczNameOff,' PTAC Heating Coil')
   CALL AddToObjStr('Cooling Coil Object Type','Coil:Cooling:DX:SingleSpeed')
@@ -25636,32 +25635,32 @@ DO iZone = 1, numCompactPTHP
   !CR8001
   !CALL AddToObjFld('Supply air volumetric flow rate during cooling operation {m3/s}',   &
   !   base + pthpzSupplyCoolFlowRateOff,'')
-  CALL AddToObjStr('Supply air volumetric flow rate during cooling operation {m3/s}','autosize')
+  CALL AddToObjStr('Cooling Supply Air Flow Rate {m3/s}','autosize')
   !CR8001
   !CALL AddToObjFld('Supply air volumetric flow rate during heating operation {m3/s}',   &
   !   base + pthpzSupplyHeatFlowRateOff,'')
-  CALL AddToObjStr('Supply air volumetric flow rate during heating operation {m3/s}','autosize')
-  CALL AddToObjFld('Supply air volumetric flow rate when no cooling or heating is needed {m3/s}',   &
+  CALL AddToObjStr('Heating Supply Air Flow Rate {m3/s}','autosize')
+  CALL AddToObjFld('No Load Supply Air Flow Rate {m3/s}',   &
      base + pthpzSupplyNoLoadFlowRateOff,'')
   IF (isDedOutAirNameBlank) THEN
-    CALL AddToObjStr('Outside air volumetric flow rate during cooling operation {m3/s}','autosize')
-    CALL AddToObjStr('Outside air volumetric flow rate during heating operation {m3/s}','autosize')
-    CALL AddToObjStr('Outside air volumetric flow rate when no cooling or heating is needed {m3/s}','autosize')
+    CALL AddToObjStr('Cooling Outdoor Air Flow Rate {m3/s}','autosize')
+    CALL AddToObjStr('Heating Outdoor Air Flow Rate {m3/s}','autosize')
+    CALL AddToObjStr('No Load Outdoor Air Flow Rate {m3/s}','autosize')
   ELSE
-    CALL AddToObjStr('Outside air volumetric flow rate during cooling operation {m3/s}','0.0')
-    CALL AddToObjStr('Outside air volumetric flow rate during heating operation {m3/s}','0.0')
-    CALL AddToObjStr('Outside air volumetric flow rate when no cooling or heating is needed {m3/s}','0.0')
+    CALL AddToObjStr('Cooling Outdoor Air Flow Rate {m3/s}','0.0')
+    CALL AddToObjStr('Heating Outdoor Air Flow Rate {m3/s}','0.0')
+    CALL AddToObjStr('No Load Outdoor Air Flow Rate {m3/s}','0.0')
   END IF
   CALL AddToObjStr('Supply Air Fan Object Type','Fan:OnOff')
   CALL AddToObjFld('Supply Air Fan Name', base + pthpzNameOff,' PTHP Supply Fan')
   CALL AddToObjStr('Heating Coil Object Type','Coil:Heating:DX:SingleSpeed')
   CALL AddToObjFld('Heating Coil Name', base + pthpzNameOff,' PTHP Heating Coil')
-  CALL AddToObjStr('Heating convergence tolerance {dimensionless}','0.001')
-  CALL AddToObjFld('Minimum outdoor dry-bulb temperature for compressor operation {C}',   &
+  CALL AddToObjStr('Heating Convergence Tolerance {dimensionless}','0.001')
+  CALL AddToObjFld('Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}',   &
      base + pthpzHPHeatMinODBOff,'')
   CALL AddToObjStr('Cooling Coil Object Type','Coil:Cooling:DX:SingleSpeed')
   CALL AddToObjFld('Cooling Coil Name', base + pthpzNameOff,' PTHP Cooling Coil')
-  CALL AddToObjStr('Cooling convergence tolerance {dimensionless}','0.001')
+  CALL AddToObjStr('Cooling Convergence Tolerance {dimensionless}','0.001')
   SELECT CASE (suppHeatCoilKind)
     CASE (shcElectric)
       CALL AddToObjStr('Supplemental Heating Coil Object Type','Coil:Heating:Electric')
@@ -25671,8 +25670,8 @@ DO iZone = 1, numCompactPTHP
       CALL AddToObjStr('Supplemental Heating Coil Object Type','Coil:Heating:Water')
   END SELECT
   CALL AddToObjFld('Supplemental Heating Coil Name', base + pthpzNameOff,' PTHP Supp Heating Coil')
-  CALL AddToObjStr('Maximum supply air temperature from supplemental heater {C}','autosize')
-  CALL AddToObjFld('Maximum outdoor dry-bulb temperature for supplemental heater operation {C}',   &
+  CALL AddToObjStr('Maximum Supply Air Temperature from Supplemental Heater {C}','autosize')
+  CALL AddToObjFld('Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}',   &
      base + pthpzSuppHeatMaxODBOff,'')
   CALL AddToObjFld('Fan Placement', base + pthpzFanPlacementOff,'')
   SchType=' '
@@ -30147,21 +30146,21 @@ DO iZone = 1, numCompactWaterAirHP
   !CR8001
   !CALL AddToObjFld('Supply air volumetric flow rate during cooling operation {m3/s}',   &
   !   base + wahpSupplyCoolFlowRateOff,'')
-  CALL AddToObjStr('Supply air volumetric flow rate during cooling operation {m3/s}','autosize')
+  CALL AddToObjStr('Cooling Supply Air Flow Rate {m3/s}','autosize')
   !CR8001
   !CALL AddToObjFld('Supply air volumetric flow rate during heating operation {m3/s}',   &
   !   base + wahpSupplyHeatFlowRateOff,'')
-  CALL AddToObjStr('Supply air volumetric flow rate during heating operation {m3/s}','autosize')
-  CALL AddToObjFld('Supply air volumetric flow rate when no cooling or heating is needed {m3/s}',   &
+  CALL AddToObjStr('Heating Supply Air Flow Rate {m3/s}','autosize')
+  CALL AddToObjFld('No Load Supply Air Flow Rate {m3/s}',   &
      base + wahpSupplyNoLoadFlowRateOff,'')
   IF (isDedOutAirNameBlank) THEN
-    CALL AddToObjStr('Outside air volumetric flow rate during cooling operation {m3/s}','autosize')
-    CALL AddToObjStr('Outside air volumetric flow rate during heating operation {m3/s}','autosize')
-    CALL AddToObjStr('Outside air volumetric flow rate when no cooling or heating is needed {m3/s}','autosize')
+    CALL AddToObjStr('Cooling Outdoor Air Flow Rate {m3/s}','autosize')
+    CALL AddToObjStr('Heating Outdoor Air Flow Rate {m3/s}','autosize')
+    CALL AddToObjStr('No Load Outdoor Air Flow Rate {m3/s}','autosize')
   ELSE
-    CALL AddToObjStr('Outside air volumetric flow rate during cooling operation {m3/s}','0.0')
-    CALL AddToObjStr('Outside air volumetric flow rate during heating operation {m3/s}','0.0')
-    CALL AddToObjStr('Outside air volumetric flow rate when no cooling or heating is needed {m3/s}','0.0')
+    CALL AddToObjStr('Cooling Outdoor Air Flow Rate {m3/s}','0.0')
+    CALL AddToObjStr('Heating Outdoor Air Flow Rate {m3/s}','0.0')
+    CALL AddToObjStr('No Load Outdoor Air Flow Rate {m3/s}','0.0')
   END IF
   CALL AddToObjStr('Supply Air Fan Object Type','Fan:OnOff')
   CALL AddToObjFld('Supply Air Fan Name', base + wahpNameOff,' WAHP Supply Fan')
@@ -32588,10 +32587,11 @@ DO iSys = 1, numCompactDedOutAir
     CALL AddToObjStr('Air Outlet Node Name',  TRIM(heatCoilOutlet))
     CALL AddToObjStr('Performance Input Method','UFactorTimesAreaAndDesignWaterFlowRate')
     CALL AddToObjStr('Nominal Capacity','autosize')
-    CALL AddToObjStr('Design Inlet Water Temperature','82.2')
-    CALL AddToObjStr('Design Inlet Air Temperature','16.6')
-    CALL AddToObjStr('Design Outlet Water Temperature','71.1')
-    CALL AddToObjStr('Design Outlet Air Temperature','32.2',.TRUE.)
+    CALL AddToObjStr('Rated Inlet Water Temperature','82.2')
+    CALL AddToObjStr('Rated Inlet Air Temperature','16.6')
+    CALL AddToObjStr('Rated Outlet Water Temperature','71.1')
+    CALL AddToObjStr('Rated Outlet Air Temperature','32.2')
+    CALL AddToObjStr('Rated Ratio for Air and Water Convection','0.5',.true.)
     !***Branch
     CALL CreateNewObj('Branch')
     CALL AddToObjFld('Name', base + doasNameOff,' Heating Coil HW Branch')
