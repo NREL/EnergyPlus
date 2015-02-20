@@ -23594,6 +23594,7 @@ AirflowNetwork:OccupantVentilationControl,
       \type object-list
       \object-list LinearCurves
       \object-list QuadraticCurves
+      \object-list UniVariateTables
       \note Enter a curve name that represents thermal comfort temperature as a
       \note function of outdoor dry-bulb temperature. Up to two curves are allowed if the 
       \note performance cannot be represented by a single curve.
@@ -23609,6 +23610,7 @@ AirflowNetwork:OccupantVentilationControl,
       \type object-list
       \object-list LinearCurves
       \object-list QuadraticCurves
+      \object-list UniVariateTables
       \note Enter a curve name that represents thermal comfort temperature as a
       \note function of outdoor dry-bulb temperature. Up to two curves are allowed if the 
       \note performance cannot be represented by a single curve.

@@ -165,8 +165,7 @@ namespace AirflowNetworkBalanceManager {
 	int const MinCheckForceOpen( 1 ); // Force open when opening elapsed time is less than minimum opening time 
 	int const MinCheckForceClose( 2 ); // Force open when closing elapsed time is less than minimum closing time 
 	int const ProbNoAction( 0 ); // No action from probability check
-	int const ProbForceOpen( 1 ); // Force open from probability check
-	int const ProbForceClose( 1 ); // Force close from probability check
+	int const ProbForceChange( 1 ); // Force open or close from probability check
 	int const ProbKeepStatus( 2 ); // Keep status at the previous time step from probability check
 	static std::string const BlankString;
 
@@ -580,11 +579,10 @@ namespace AirflowNetworkBalanceManager {
 						ShowWarningError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 2 ) + " not found = " + OccupantVentilationControl( i ).ComfortLowTempCurveName );
 						ShowContinueError( "..for specified " + cAlphaFields( 1 ) + " = " + Alphas( 1 ) );
 						ShowContinueError( "Thermal comfort will not be performed and minimum opening and closing times are checked only. Simulation continues." );
-					}
-					else {
+					} else {
 						// Verify Curve Object, only legal type is linear or quadratic
 						{ auto const SELECT_CASE_var( GetCurveType( OccupantVentilationControl( i ).ComfortLowTempCurveNum ) );
-						if (SELECT_CASE_var == "LINEAR" || SELECT_CASE_var == "QUADRATIC" ) {
+						if ( SELECT_CASE_var == "LINEAR" || SELECT_CASE_var == "QUADRATIC" ) {
 						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OccupantVentilationControl( i ).Name + "\", invalid" );
 							ShowContinueError( "...illegal " + cAlphaFields( 2 ) + " type for this object = " + GetCurveType( OccupantVentilationControl( i ).ComfortLowTempCurveNum ) );
@@ -599,13 +597,8 @@ namespace AirflowNetworkBalanceManager {
 					if ( OccupantVentilationControl( i ).ComfortHighTempCurveNum > 0 ) {
 						// Verify Curve Object, only legal type is BiQuadratic
 						{ auto const SELECT_CASE_var( GetCurveType( OccupantVentilationControl( i ).ComfortHighTempCurveNum ) );
-						if ( SELECT_CASE_var == "LINEAR" ) {
-							//							Boiler( BoilerNum ).EfficiencyCurveType = Linear;
-						}
-						else if ( SELECT_CASE_var == "QUADRATIC" ) {
-							//							Boiler( BoilerNum ).EfficiencyCurveType = Quadratic;
-						}
-						else {
+						if ( SELECT_CASE_var == "LINEAR" || SELECT_CASE_var == "QUADRATIC" ) {
+						} else {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OccupantVentilationControl( i ).Name + "\", invalid" );
 							ShowContinueError( "...illegal " + cAlphaFields( 3 ) + " type for this object = " + GetCurveType( OccupantVentilationControl( i ).ComfortHighTempCurveNum ) );
 							ShowContinueError( "Curve type must be either Linear or Quadratic." );
@@ -3698,9 +3691,9 @@ namespace AirflowNetworkBalanceManager {
 			if ( SurfaceWindow( j ).OriginalClass == SurfaceClass_Window || SurfaceWindow( j ).OriginalClass == SurfaceClass_Door || SurfaceWindow( j ).OriginalClass == SurfaceClass_GlassDoor ) {
 				if ( MultizoneSurfaceData( i ).OccupantVentilationControlNum > 0 ) {
 					if ( MultizoneSurfaceData( i ).OpeningStatus == FeeeOperation ) {
-						if ( MultizoneSurfaceData( i ).OpeningProbStatus == ProbForceOpen ) {
+						if ( MultizoneSurfaceData( i ).OpeningProbStatus == ProbForceChange ) {
 							MultizoneSurfaceData( i ).OpenFactor = MultizoneSurfaceData( i ).Factor;
-						} else if ( MultizoneSurfaceData( i ).ClosingProbStatus == ProbForceClose ) {
+						} else if ( MultizoneSurfaceData( i ).ClosingProbStatus == ProbForceChange ) {
 							MultizoneSurfaceData( i ).OpenFactor = 0.0;
 						} else if ( MultizoneSurfaceData( i ).ClosingProbStatus == ProbKeepStatus || MultizoneSurfaceData( i ).OpeningProbStatus == ProbKeepStatus ) {
 							MultizoneSurfaceData( i ).OpenFactor = MultizoneSurfaceData( i ).OpenFactorLast;
@@ -7536,7 +7529,7 @@ Label90: ;
 
 		if ( Toperative > ( Tcomfort + ComfortBand ) ) {
 			if ( openingProbability( ZoneNum, TimeCloseDuration ) ) {
-				OpeningProbStatus = ProbForceOpen; // forced to open
+				OpeningProbStatus = ProbForceChange; // forced to open
 			} else {
 				OpeningProbStatus = ProbKeepStatus; // Keep previous status
 			}
@@ -7546,7 +7539,7 @@ Label90: ;
 
 		if ( Toperative < ( Tcomfort - ComfortBand ) ) {
 			if ( closingProbability( TimeOpenDuration ) ) {
-				ClosingProbStatus = ProbForceClose; // forced to close
+				ClosingProbStatus = ProbForceChange; // forced to close
 			} else {
 				ClosingProbStatus = ProbKeepStatus; // Keep previous status 
 			}
@@ -7583,8 +7576,7 @@ Label90: ;
 			}
 		} 
 
-		{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) ); // Is this missing the possibility of sometimes having no control on a zone
-			// during the simulation?
+		{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) ); // Check zone setpoints
 			if ( SELECT_CASE_var == 0 ) { // Uncontrolled
 
 			} else if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
@@ -7605,7 +7597,7 @@ Label90: ;
 		}
 			
 		if ( OpeningProbSchNum == 0 ) {
-				return true;
+			return true;
 		} else {
 			SchValue = GetCurrentScheduleValue( OpeningProbSchNum );
 			RandomValue = Real64( rand( ) ) / RAND_MAX;
