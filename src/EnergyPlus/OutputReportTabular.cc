@@ -7193,6 +7193,18 @@ namespace OutputReportTabular {
 				}
 				tableBody( 16, iResource ) = RealToStr( useVal( 15, iResource ), 2 );
 			}
+			// add warning message if end use values do not add up to total
+			Real64 curTotal = 0.0;
+			for ( iResource = 1; iResource <= 6; ++iResource ) {
+				curTotal = 0.0;
+				for ( int jUse = 1; jUse <= 14; ++jUse ) {
+					curTotal += useVal( jUse, iResource );
+				}
+				if ( abs( curTotal - collapsedTotal( iResource ) ) > ( collapsedTotal( iResource ) * 0.001 )) {
+					ShowWarningError( "In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: " + columnHead( 1 ) );
+				}
+			}
+
 			//complete the LEED end use table using the same values
 			// for certain rows in the LEED table the subcategories are necessary so first compute those values
 			leedFansParkFromFan = 0.0;
