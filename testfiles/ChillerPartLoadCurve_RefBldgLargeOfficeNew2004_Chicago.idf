@@ -2,7 +2,8 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! RefBldgLargeOfficeNew2004_Chicago.idf
+! ChillerPartLoadCurve_RefBldgLargeOfficeNew2004_Chicago.idf
+! Added an additional part load curve type for chillers. 
 !
 ! This example file is based on Version 1.3_5.0 and was transitioned to Version 6.0 using the transition utility
 !
@@ -6049,17 +6050,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Supply Air Flow Rate Method
-    ,                        !- Cooling Supply Air Flow Rate {m3/s}
-    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
-    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Supply Air Flow Rate Method
-    ,                        !- Heating Supply Air Flow Rate {m3/s}
-    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
-    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
-    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Design Air Flow Method
+    ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Design Air Flow Method
+    ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Sizing:System,
@@ -6078,17 +6079,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Supply Air Flow Rate Method
-    ,                        !- Cooling Supply Air Flow Rate {m3/s}
-    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
-    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Supply Air Flow Rate Method
-    ,                        !- Heating Supply Air Flow Rate {m3/s}
-    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
-    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
-    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Design Air Flow Method
+    ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Design Air Flow Method
+    ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Sizing:System,
@@ -6107,17 +6108,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Supply Air Flow Rate Method
-    ,                        !- Cooling Supply Air Flow Rate {m3/s}
-    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
-    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Supply Air Flow Rate Method
-    ,                        !- Heating Supply Air Flow Rate {m3/s}
-    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
-    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
-    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Design Air Flow Method
+    ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Design Air Flow Method
+    ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Sizing:System,
@@ -6136,17 +6137,17 @@
     No,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Supply Air Flow Rate Method
-    ,                        !- Cooling Supply Air Flow Rate {m3/s}
-    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
-    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Supply Air Flow Rate Method
-    ,                        !- Heating Supply Air Flow Rate {m3/s}
-    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
-    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
-    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
-    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    DesignDay,               !- Cooling Design Air Flow Method
+    ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Design Air Flow Method
+    ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Controller:OutdoorAir,
@@ -7262,8 +7263,8 @@
     AutoSize,                !- Reference Condenser Water Flow Rate {m3/s}
     WC Screw Default 90.1-2004 Cap_fT,  !- Cooling Capacity Function of Temperature Curve Name
     WC Screw Default 90.1-2004 EIR_fT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
-    ,                        !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
-    ReformEIRChiller Carrier 19XR 1259kW/6.26COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+	Lift,                    !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
+    EIRFPLR Custom Curve,    !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.1,                     !- Minimum Part Load Ratio
     1,                       !- Maximum Part Load Ratio
     1,                       !- Optimum Part Load Ratio
@@ -7296,7 +7297,7 @@
     AutoSize,                !- Reference Condenser Water Flow Rate {m3/s}
     WC Screw Default 90.1-2004 Cap_fT,  !- Cooling Capacity Function of Temperature Curve Name
     WC Screw Default 90.1-2004 EIR_fT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
-    ,                        !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
+	,				 		 !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type 
     ReformEIRChiller Carrier 19XR 1259kW/6.26COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.1,                     !- Minimum Part Load Ratio
     1,                       !- Maximum Part Load Ratio
@@ -7580,6 +7581,33 @@
     Temperature,             !- Input Unit Type for X
     Dimensionless,           !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
+
+  Curve:ChillerPartLoadWithLift,
+    EIRFPLR Custom Curve,  	!- Name  
+    0.093291598,    		!- Coefficient1 Constant
+    -0.234322952,   		!- Coefficient2 x
+    0.426950368,     		!- Coefficient3 x**2
+    0.188624721,    		!- Coefficient4 y
+    -0.608010978,    		!- Coefficient5 y**2
+    0.992031248,     		!- Coefficient6 x*y
+    0.000000E+00,     		!- Coefficient7 x**3
+    0.502338322,      		!- Coefficient8 y**3
+    0.000000E+00,     		!- Coefficient9 x**2*y
+    0.000000E+00,			!- Coefficinet 10 x*y**2
+    -0.360902326, 			!- Coefficient 11 x**2*y**2
+    -0.097978985,			!- Coefficient 12 z*y**3 
+    0.2562,        			!- Minimum Value of x
+    1.0365,        			!- Maximum Value of x
+    0.1,          			!- Minimum Value of y
+    1,           			!- Maximum Value of y
+   -0.035,          		!- Minimum Value of z
+    0.3144,           		!- Maximum Value of z
+    ,                 		!- Minimum Curve Output
+    ,                		!- Maximum Curve Output
+    Dimensionless,    		!- Input Unit Type for x
+    Dimensionless,    		!- Input Unit Type for y
+    Dimensionless,    		!- Input Unit Type for z
+    Dimensionless;   		!- Output Unit Type
 
   SetpointManager:Scheduled,
     CoolSys1 Loop Setpoint Manager,  !- Name
