@@ -114,7 +114,7 @@ namespace CondenserLoopTowers {
 		Real64 DesignFanPowerPerUnitNomCap; // scalable sizing factor for fan power per capacity [W/W]
 
 		Real64 HighSpeedTowerUA; // UA of tower at high fan speed [W/C]
-		Real64 HighSpeedTowerUAWasAutoSized; // true if previous was autosize on input
+		bool HighSpeedTowerUAWasAutoSized; // true if previous was autosize on input
 		Real64 LowSpeedAirFlowRate; // Air flow rate through tower at low speed [m3/s]
 		bool LowSpeedAirFlowRateWasAutoSized; // true if previous was autosize on input
 		Real64 LowSpeedAirFlowRateSizingFactor; // sizing factor for low speed flow rate [ ]
@@ -263,9 +263,12 @@ namespace CondenserLoopTowers {
 			TowerMassFlowRateMultiplier( 0.0 ),
 			HeatRejectCapNomCapSizingRatio( 1.25 ),
 			TowerNominalCapacity( 0.0 ),
+			TowerNominalCapacityWasAutoSized( false ),
 			TowerLowSpeedNomCap( 0.0 ),
+			TowerLowSpeedNomCapWasAutoSized( false ),
 			TowerLowSpeedNomCapSizingFactor( 0.0 ),
 			TowerFreeConvNomCap( 0.0 ),
+			TowerFreeConvNomCapWasAutoSized( false ),
 			TowerFreeConvNomCapSizingFactor( 0.0 ),
 			SizFac( 0.0 ),
 			WaterInletNodeNum( 0 ),

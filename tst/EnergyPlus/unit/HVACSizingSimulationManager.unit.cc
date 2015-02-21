@@ -97,6 +97,8 @@ public:
 		PlantSizData.clear();
 		PlantLoop.clear();
 		PlantReport.clear();
+
+		Environment.clear();
 	}
 };
 
@@ -236,6 +238,8 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1 )
 // this test runs 1 system timestep for each zone timestep
 
 	int temp;
+	GlobalCoolSizingFactor = 1.0;
+	PlantSizData( NumPltSizInput ).SizingFactorOption = GlobalCoolingSizingFactorMode;
 
 	HVACSizingSimulationManager testSizeSimManagerObj;
 
@@ -311,5 +315,100 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1 )
 	EXPECT_DOUBLE_EQ( 2.4 , PlantLoop( 1 ).MaxMassFlowRate ); //resize check
 
 
+
+}
+
+TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps )
+{
+// this test emulates two design days and calls nearly all the OO code related
+// to coincident plant sizing with HVAC sizing simulation
+// this test run varies the system timestep some to test irregular 
+
+	int temp;
+	PlantSizData( NumPltSizInput ).NumTimeStepsInAvg = 2;
+	GlobalHeatSizingFactor = 1.0;
+	PlantSizData( NumPltSizInput ).SizingFactorOption = GlobalHeatingSizingFactorMode;
+
+	HVACSizingSimulationManager testSizeSimManagerObj;
+
+	testSizeSimManagerObj.DetermineSizingAnalysesNeeded ();
+
+	EXPECT_EQ( 1, testSizeSimManagerObj.plantCoincAnalyObjs[ 0 ].supplySideInletNodeNum );
+
+	testSizeSimManagerObj.SetupSizingAnalyses();
+
+	EXPECT_EQ( 2, NumOfEnvrn );
+	AddDesignSetToEnvironmentStruct( 1 );
+	EXPECT_EQ( 4, NumOfEnvrn );
+
+	//now fill with one system timesteps for each zone timestep
+	TimeStepZone = 15.0/60.0;
+	NumOfSysTimeSteps = 1;
+	TimeStepSys = TimeStepZone / NumOfSysTimeSteps;
+
+	//first HVAC Sizing Simulation DD emulation
+	KindOfSim = 4;
+	DayOfSim  = 1;
+	Envrn = 3;
+	Environment( Envrn ).DesignDayNum = 1;
+	for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
+		TimeValue( 1 ).CurMinute = 0.0;
+		TimeValue( 2 ).CurMinute = 0.0;
+		for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+
+			NumOfSysTimeSteps = TimeStep;
+			TimeStepSys = TimeStepZone / NumOfSysTimeSteps;
+
+			for ( int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop ) {
+				TimeValue( 2 ).CurMinute += TimeValue( 2 ).TimeStep * 60.0;
+
+				Node(1).MassFlowRate = HourOfDay * 0.1;
+				Node(1).Temp = 10.0;
+				PlantReport(1).HeatingDemand = HourOfDay * 10.0;
+				testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep();
+			}
+			// E+ doesn't really update zone step data until system steps are done
+			TimeValue( 1 ).CurMinute += TimeValue( 1 ).TimeStep * 60.0;
+			testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep();
+		} // TimeStep loop
+	} // ... End hour loop.
+
+	//second HVAC Sizing Simulation DD emulation
+	KindOfSim = 4;
+	DayOfSim  = 1;
+	Envrn = 4;
+	Environment( Envrn ).DesignDayNum = 2;
+
+	for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
+		TimeValue( 1 ).CurMinute = 0.0;
+		TimeValue( 2 ).CurMinute = 0.0;
+		for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+			NumOfSysTimeSteps = TimeStep;
+			TimeStepSys = TimeStepZone / NumOfSysTimeSteps;
+
+			for ( int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop ) {
+				TimeValue( 2 ).CurMinute += TimeValue( 2 ).TimeStep * 60.0;
+
+				Node(1).MassFlowRate = HourOfDay * 0.1;
+				Node(1).Temp = 10.0;
+				PlantReport(1).HeatingDemand = HourOfDay * 10.0;
+
+				testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep();
+			}
+			TimeValue( 1 ).CurMinute += TimeValue( 1 ).TimeStep * 60.0;
+			testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep();
+		} // TimeStep loop
+	} // End hour loop.
+
+
+	testSizeSimManagerObj.PostProcessLogs();
+
+	EXPECT_DOUBLE_EQ( 2.0 , PlantLoop( 1 ).MaxMassFlowRate ); // original size
+	testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments( 1 );
+	EXPECT_DOUBLE_EQ( 2.4 , PlantLoop( 1 ).MaxMassFlowRate ); //resize check
+
+	testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments( 1 );
+
+	testSizeSimManagerObj.sizingLogger.IncrementSizingPeriodSet( 1 );
 
 }
