@@ -3140,7 +3140,7 @@ namespace PlantManager {
 				}
 			}
 
-			if ( ! PlantLoop( LoopNum ).MaxVolFlowRateWasAutoSized  && ! ReSize ) {
+			if ( ! PlantLoop( LoopNum ).MaxVolFlowRateWasAutoSized ) {
 				PlantSizData( PlantSizNum ).DesVolFlowRate = PlantLoop( LoopNum ).MaxVolFlowRate;
 			} 
 			}

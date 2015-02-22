@@ -656,6 +656,9 @@ namespace EvaporativeFluidCoolers {
 			}
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedEvapFluidCoolerUASizingFactor = NumArray( 14 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate = NumArray( 15 );
+			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate == AutoSize ) {
+				SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRateWasAutoSized = true;
+			}
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedUserSpecifiedDesignCapacity = NumArray( 16 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedUserSpecifiedDesignCapacity = NumArray( 17 );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedUserSpecifiedDesignCapacitySizingFactor = NumArray( 18 );
