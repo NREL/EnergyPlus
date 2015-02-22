@@ -1513,11 +1513,11 @@ INTEGER,PARAMETER :: chleirLastFieldOff = 30
 
   ! Chiller:Electric:ReformulatedEIR (for use with HVACTemplate:Plant:Chiller:ObjectReference)
 INTEGER,PARAMETER :: chlreirNameOff = 1
-INTEGER,PARAMETER :: chlreirChWInletNodeOff = 15
-INTEGER,PARAMETER :: chlreirChWOutletNodeOff = 16
-INTEGER,PARAMETER :: chlreirCondInletNodeOff = 17
-INTEGER,PARAMETER :: chlreirCondOutletNodeOff = 18
-INTEGER,PARAMETER :: chlreirLastFieldOff = 25
+INTEGER,PARAMETER :: chlreirChWInletNodeOff = 16
+INTEGER,PARAMETER :: chlreirChWOutletNodeOff = 17
+INTEGER,PARAMETER :: chlreirCondInletNodeOff = 18
+INTEGER,PARAMETER :: chlreirCondOutletNodeOff = 19
+INTEGER,PARAMETER :: chlreirLastFieldOff = 26
 
   ! CoolingTower:SingleSpeed (for use with HVACTemplate:Plant:Tower:ObjectReference)
 INTEGER,PARAMETER :: twrssNameOff = 1
@@ -2298,7 +2298,7 @@ CALL AddObjToProcess('HVACTemplate:System:DedicatedOutdoorAir',.TRUE.,doasNameOf
 ! Detailed Plant Objects
 CALL AddObjToProcess('Boiler:HotWater',.FALSE.,                     blrhwOutletNodeOff,          blrhwLastFieldOff,         17)
 CALL AddObjToProcess('Chiller:Electric:EIR',.FALSE.,                chleirCondTypeOff,           chleirLastFieldOff,        30)
-CALL AddObjToProcess('Chiller:Electric:ReformulatedEIR',.FALSE.,    chlreirCondOutletNodeOff,    chlreirLastFieldOff,       25)
+CALL AddObjToProcess('Chiller:Electric:ReformulatedEIR',.FALSE.,    chlreirCondOutletNodeOff,    chlreirLastFieldOff,       26)
 CALL AddObjToProcess('CoolingTower:SingleSpeed',.FALSE.,            twrssOutletNodeOff,          twrssLastFieldOff,         29)
 CALL AddObjToProcess('CoolingTower:TwoSpeed',.FALSE.,               twrtsOutletNodeOff,          twrtsLastFieldOff,         32)
 CALL AddObjToProcess('CoolingTower:VariableSpeed',.FALSE.,          twrvsOutletNodeOff,          twrvsLastFieldOff,         30)
