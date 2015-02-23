@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -618,25 +617,25 @@ namespace SingleDuct {
 	Real64
 	VAVVSCoolingResidual(
 		Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
-		Optional< FArray1S< Real64 > const > Par = _ // Par(1) = REAL(SysNum)
+		FArray1< Real64 > const & Par // Par(1) = REAL(SysNum)
 	);
 
 	Real64
 	VAVVSHWNoFanResidual(
 		Real64 const HWMassFlow, // hot water mass flow rate [kg/s]
-		Optional< FArray1S< Real64 > const > Par = _ // Par(1) = REAL(SysNum)
+		FArray1< Real64 > const & Par // Par(1) = REAL(SysNum)
 	);
 
 	Real64
 	VAVVSHWFanOnResidual(
 		Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
-		Optional< FArray1S< Real64 > const > Par = _ // Par(1) = REAL(SysNum)
+		FArray1< Real64 > const & Par // Par(1) = REAL(SysNum)
 	);
 
 	Real64
 	VAVVSHCFanOnResidual(
 		Real64 const HeatingFrac, // fraction of maximum heating output
-		Optional< FArray1S< Real64 > const > Par = _ // Par(1) = REAL(SysNum)
+		FArray1< Real64 > const & Par // Par(1) = REAL(SysNum)
 	);
 
 	// End Algorithm Section of the Module
@@ -736,7 +735,7 @@ namespace SingleDuct {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

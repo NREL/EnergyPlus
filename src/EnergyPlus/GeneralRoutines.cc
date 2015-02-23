@@ -50,7 +50,7 @@
 
 namespace EnergyPlus {
 
-static gio::Fmt const fmtLD( "*" );
+static gio::Fmt fmtLD( "*" );
 
 void
 ControlCompOutput(
@@ -107,7 +107,6 @@ ControlCompOutput(
 	using BaseboardRadiator::SimHWConvective;
 	using Psychrometrics::PsyCpAirFnWTdb;
 	using VentilatedSlab::CalcVentilatedSlabComps;
-	using InputProcessor::MakeUPPERCase;
 	using General::TrimSigDigits;
 	using General::RoundSigDigits;
 	using SteamBaseboardRadiator::CalcSteamBaseboard;
@@ -1010,18 +1009,12 @@ CalcPassiveExteriorBaffleGap(
 
 	//loop through underlying surfaces and collect needed data
 	NumSurfs = size( SurfPtrARR );
-	HSkyARR.allocate( NumSurfs );
-	HSkyARR = 0.0;
-	HGroundARR.allocate( NumSurfs );
-	HGroundARR = 0.0;
-	HAirARR.allocate( NumSurfs );
-	HAirARR = 0.0;
-	LocalWindArr.allocate( NumSurfs );
-	LocalWindArr = 0.0;
-	HPlenARR.allocate( NumSurfs );
-	HPlenARR = 0.0;
-	HExtARR.allocate( NumSurfs );
-	HExtARR = 0.0;
+	HSkyARR.dimension( NumSurfs, 0.0 );
+	HGroundARR.dimension( NumSurfs, 0.0 );
+	HAirARR.dimension( NumSurfs, 0.0 );
+	LocalWindArr.dimension( NumSurfs, 0.0 );
+	HPlenARR.dimension( NumSurfs, 0.0 );
+	HExtARR.dimension( NumSurfs, 0.0 );
 
 	for ( ThisSurf = 1; ThisSurf <= NumSurfs; ++ThisSurf ) {
 		SurfPtr = SurfPtrARR( ThisSurf );
@@ -1084,7 +1077,7 @@ CalcPassiveExteriorBaffleGap(
 
 	if ( IsRain ) HExt = 1000.0;
 
-//	Tso = sum( TH( ( SurfPtrARR ), 1, 1 ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
+//	Tso = sum( TH( SurfPtrARR, 1, 1 ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
 	Tso = sum_product_sub( TH( _, 1, 1 ), Surface.Area(), SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
 //	Isc = sum( QRadSWOutIncident( SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
 	Isc = sum_product_sub( QRadSWOutIncident, Surface.Area(), SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
@@ -1149,7 +1142,7 @@ PassiveGapNusseltNumber(
 {
 
 	// SUBROUTINE INFORMATION:
-	//       AUTHOR         Adapted by B. Griffith from Fred Winkelmann's from NusseltNumber in WindowManager.f90
+	//       AUTHOR         Adapted by B. Griffith from Fred Winkelmann's from NusseltNumber in WindowManager.cc
 	//       DATE WRITTEN   September 2001
 	//       MODIFIED       B. Griffith November 2004  (same models but slightly different for general use)
 	//       RE-ENGINEERED  na
@@ -1467,15 +1460,15 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	int WAirLoop;
 
 	// Formats
-	static gio::Fmt const Format_700( "('! <#Supply Air Paths>,<Number of Supply Air Paths>')" );
-	static gio::Fmt const Format_701( "(A)" );
-	static gio::Fmt const Format_702( "('! <Supply Air Path>,<Supply Air Path Count>,<Supply Air Path Name>,<AirLoopHVAC Name>')" );
-	static gio::Fmt const Format_703( "('! <#Components on Supply Air Path>,<Number of Components>')" );
-	static gio::Fmt const Format_704( "('! <Supply Air Path Component>,<Component Count>,<Component Type>,<Component Name>,','<AirLoopHVAC Name>')" );
-	static gio::Fmt const Format_705( "('! <#Nodes on Supply Air Path>,<Number of Nodes>')" );
-	static gio::Fmt const Format_706( "('! <Supply Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>')" );
-	static gio::Fmt const Format_707( "('! <#Outlet Nodes on Supply Air Path Component>,<Number of Nodes>')" );
-	static gio::Fmt const Format_708( "('! <Supply Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,','<Inlet Node Name>,<Outlet Node Name>,<AirLoopHVAC Name>')" );
+	static gio::Fmt Format_700( "('! <#Supply Air Paths>,<Number of Supply Air Paths>')" );
+	static gio::Fmt Format_701( "(A)" );
+	static gio::Fmt Format_702( "('! <Supply Air Path>,<Supply Air Path Count>,<Supply Air Path Name>,<AirLoopHVAC Name>')" );
+	static gio::Fmt Format_703( "('! <#Components on Supply Air Path>,<Number of Components>')" );
+	static gio::Fmt Format_704( "('! <Supply Air Path Component>,<Component Count>,<Component Type>,<Component Name>,','<AirLoopHVAC Name>')" );
+	static gio::Fmt Format_705( "('! <#Nodes on Supply Air Path>,<Number of Nodes>')" );
+	static gio::Fmt Format_706( "('! <Supply Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>')" );
+	static gio::Fmt Format_707( "('! <#Outlet Nodes on Supply Air Path Component>,<Number of Nodes>')" );
+	static gio::Fmt Format_708( "('! <Supply Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,','<Inlet Node Name>,<Outlet Node Name>,<AirLoopHVAC Name>')" );
 
 	// Do by Paths
 	ShowMessage( "Testing Individual Supply Air Path Integrity" );
@@ -1601,12 +1594,9 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	}
 
 	// now the reverse.  is every zone splitter and supply plenum on supply air path
-	FoundSupplyPlenum.allocate( NumZoneSupplyPlenums );
-	FoundSupplyPlenum = false;
-	FoundZoneSplitter.allocate( NumSplitters );
-	FoundZoneSplitter = false;
+	FoundSupplyPlenum.dimension( NumZoneSupplyPlenums, false );
+	FoundZoneSplitter.dimension( NumSplitters, false );
 	FoundNames.allocate( NumZoneSupplyPlenums );
-	FoundNames = "";
 	for ( Count1 = 1; Count1 <= NumZoneSupplyPlenums; ++Count1 ) {
 		for ( BCount = 1; BCount <= NumSupplyAirPaths; ++BCount ) {
 			for ( Count = 1; Count <= SupplyAirPath( BCount ).NumOfComponents; ++Count ) {
@@ -1625,7 +1615,6 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	}
 	FoundNames.deallocate();
 	FoundNames.allocate( NumSplitters );
-	FoundNames = "";
 	for ( Count1 = 1; Count1 <= NumSplitters; ++Count1 ) {
 		for ( BCount = 1; BCount <= NumSupplyAirPaths; ++BCount ) {
 			for ( Count = 1; Count <= SupplyAirPath( BCount ).NumOfComponents; ++Count ) {
@@ -1769,15 +1758,15 @@ TestReturnAirPathIntegrity(
 	int WAirLoop;
 
 	// Formats
-	static gio::Fmt const Format_700( "('! <#Return Air Paths>,<Number of Return Air Paths>')" );
-	static gio::Fmt const Format_701( "(A)" );
-	static gio::Fmt const Format_702( "('! <Return Air Path>,<Return Air Path Count>,<Return Air Path Name>,<AirLoopHVAC Name>')" );
-	static gio::Fmt const Format_703( "('! <#Components on Return Air Path>,<Number of Components>')" );
-	static gio::Fmt const Format_704( "('! <Return Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>')" );
-	static gio::Fmt const Format_705( "('! <#Nodes on Return Air Path>,<Number of Nodes>')" );
-	static gio::Fmt const Format_706( "('! <Return Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>')" );
-	static gio::Fmt const Format_707( "('! <#Inlet Nodes on Return Air Path Component>,<Number of Nodes>')" );
-	static gio::Fmt const Format_708( "('! <Return Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,','<Inlet Node Name>,<Outlet Node Name>,<AirLoopHVAC Name>')" );
+	static gio::Fmt Format_700( "('! <#Return Air Paths>,<Number of Return Air Paths>')" );
+	static gio::Fmt Format_701( "(A)" );
+	static gio::Fmt Format_702( "('! <Return Air Path>,<Return Air Path Count>,<Return Air Path Name>,<AirLoopHVAC Name>')" );
+	static gio::Fmt Format_703( "('! <#Components on Return Air Path>,<Number of Components>')" );
+	static gio::Fmt Format_704( "('! <Return Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>')" );
+	static gio::Fmt Format_705( "('! <#Nodes on Return Air Path>,<Number of Nodes>')" );
+	static gio::Fmt Format_706( "('! <Return Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>')" );
+	static gio::Fmt Format_707( "('! <#Inlet Nodes on Return Air Path Component>,<Number of Nodes>')" );
+	static gio::Fmt Format_708( "('! <Return Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,','<Inlet Node Name>,<Outlet Node Name>,<AirLoopHVAC Name>')" );
 
 	// Do by Paths
 	ShowMessage( "Testing Individual Return Air Path Integrity" );
@@ -1983,12 +1972,9 @@ TestReturnAirPathIntegrity(
 	}
 
 	// now the reverse.  is every zone Mixer and Return plenum on Return air path
-	FoundReturnPlenum.allocate( NumZoneReturnPlenums );
-	FoundReturnPlenum = false;
-	FoundZoneMixer.allocate( NumMixers );
-	FoundZoneMixer = false;
+	FoundReturnPlenum.dimension( NumZoneReturnPlenums, false );
+	FoundZoneMixer.dimension( NumMixers, false );
 	FoundNames.allocate( NumZoneReturnPlenums );
-	FoundNames = "";
 	for ( Count1 = 1; Count1 <= NumZoneReturnPlenums; ++Count1 ) {
 		for ( BCount = 1; BCount <= NumReturnAirPaths; ++BCount ) {
 			for ( Count = 1; Count <= ReturnAirPath( BCount ).NumOfComponents; ++Count ) {
@@ -2007,7 +1993,6 @@ TestReturnAirPathIntegrity(
 	}
 	FoundNames.deallocate();
 	FoundNames.allocate( NumMixers );
-	FoundNames = "";
 	for ( Count1 = 1; Count1 <= NumMixers; ++Count1 ) {
 		for ( BCount = 1; BCount <= NumReturnAirPaths; ++BCount ) {
 			for ( Count = 1; Count <= ReturnAirPath( BCount ).NumOfComponents; ++Count ) {
@@ -2046,7 +2031,7 @@ TestReturnAirPathIntegrity(
 		for ( Count1 = 1; Count1 <= NumMixers; ++Count1 ) {
 			if ( FoundZoneMixer( Count1 ) ) continue;
 			ShowSevereError( "AirLoopHVAC:ZoneMixer=\"" + MixerCond( Count1 ).MixerName + "\", not found on any AirLoopHVAC:ReturnPath, AirTerminal:SingleDuct:SeriesPIU:Reheat," );
-			ShowContinueError( "AirTerminal:SingleDuct:ParallelPIU:Reheat or " "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction." );
+			ShowContinueError( "AirTerminal:SingleDuct:ParallelPIU:Reheat or AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction." );
 			//      ErrFound=.TRUE.
 		}
 	}
@@ -2069,7 +2054,7 @@ TestReturnAirPathIntegrity(
 //     Portions of the EnergyPlus software package have been developed and copyrighted
 //     by other individuals, companies and institutions.  These portions have been
 //     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in EnergyPlus.f90.
+//     list of contributors, see "Notice" located in main.cc.
 //     NOTICE: The U.S. Government is granted for itself and others acting on its
 //     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 //     reproduce, prepare derivative works, and perform publicly and display publicly.

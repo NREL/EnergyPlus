@@ -56,17 +56,30 @@ typedef  std::vector< Format * >  Formats;
 		io_err( stream );
 	}
 
-	// Spacing and Reversion Linefeed String
+	// Spacing and Reversion Linefeed String for a Non-Spacer
 	std::string
-	Format::spc( bool const is_spacer )
+	Format::spc( std::string const & ter )
+	{
+		if ( reverted() ) { // Reverted: Line feed before reverted output
+			reverted() = spacer() = false;
+			return ter;
+		} else { // Not reverted: Add space and set spacing state
+			spacer() = false;
+			return "";
+		}
+	}
+
+	// Spacing and Reversion Linefeed String for a Spacer
+	std::string
+	Format::spc_spacer( std::string const & ter )
 	{
 		if ( reverted() ) { // Reverted: Line feed before reverted output
 			reverted() = false;
-			spacer() = is_spacer;
-			return std::string( 1, '\n' );
+			spacer() = true;
+			return ter;
 		} else { // Not reverted: Add space and set spacing state
-			bool const add_space( is_spacer && ( ! spacer() ) ); // Add space if previous item was non-spacer and this item is spacer
-			spacer() = is_spacer;
+			bool const add_space( ! spacer() ); // Add space if previous item was non-spacer
+			spacer() = true;
 			return ( add_space ? " " : "" );
 		}
 	}
@@ -379,10 +392,10 @@ typedef  std::vector< Format * >  Formats;
 
 	// Output
 	void
-	FormatA::out( std::ostream & stream, Fstring const & s )
+	FormatA::out( std::ostream & stream, Fstring const & s, std::string const & ter )
 	{
 		std::string::size_type const l( s.length() );
-		stream << spc() << std::string( ( has_w() && ( w_ > l ) ? w_ - l : 0ul ), ' ' ) << s.str();
+		stream << spc( ter ) << std::string( ( has_w() && ( w_ > l ) ? w_ - l : 0ul ), ' ' ) << s.str();
 	}
 
 	// Input
@@ -401,310 +414,310 @@ typedef  std::vector< Format * >  Formats;
 
 	// Output
 	void
-	FormatI::out( std::ostream & stream, byte const & b )
+	FormatI::out( std::ostream & stream, byte const & b, std::string const & ter )
 	{
-		stream << spc() << fmt::I( b, w(), m() );
+		stream << spc( ter ) << fmt::I( b, w(), m() );
 	}
 
 	// Output
 	void
-	FormatI::out( std::ostream & stream, ubyte const & b )
+	FormatI::out( std::ostream & stream, ubyte const & b, std::string const & ter )
 	{
-		stream << spc() << fmt::I( b, w(), m() );
+		stream << spc( ter ) << fmt::I( b, w(), m() );
 	}
 
 	// Output
 	void
-	FormatI::out( std::ostream & stream, short int const i )
+	FormatI::out( std::ostream & stream, short int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::I( i, w(), m() );
+		stream << spc( ter ) << fmt::I( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatI::out( std::ostream & stream, unsigned short int const i )
+	FormatI::out( std::ostream & stream, unsigned short int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::I( i, w(), m() );
+		stream << spc( ter ) << fmt::I( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatI::out( std::ostream & stream, int const i )
+	FormatI::out( std::ostream & stream, int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::I( i, w(), m() );
+		stream << spc( ter ) << fmt::I( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatI::out( std::ostream & stream, unsigned int const i )
+	FormatI::out( std::ostream & stream, unsigned int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::I( i, w(), m() );
+		stream << spc( ter ) << fmt::I( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatI::out( std::ostream & stream, long int const i )
+	FormatI::out( std::ostream & stream, long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::I( i, w(), m() );
+		stream << spc( ter ) << fmt::I( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatI::out( std::ostream & stream, unsigned long int const i )
+	FormatI::out( std::ostream & stream, unsigned long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::I( i, w(), m() );
+		stream << spc( ter ) << fmt::I( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatI::out( std::ostream & stream, long long int const i )
+	FormatI::out( std::ostream & stream, long long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::I( i, w(), m() );
+		stream << spc( ter ) << fmt::I( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatI::out( std::ostream & stream, unsigned long long int const i )
+	FormatI::out( std::ostream & stream, unsigned long long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::I( i, w(), m() );
+		stream << spc( ter ) << fmt::I( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatB::out( std::ostream & stream, byte const & b )
+	FormatB::out( std::ostream & stream, byte const & b, std::string const & ter )
 	{
-		stream << spc() << fmt::B( b, w(), m() );
+		stream << spc( ter ) << fmt::B( b, w(), m() );
 	}
 
 	// Output
 	void
-	FormatB::out( std::ostream & stream, ubyte const & b )
+	FormatB::out( std::ostream & stream, ubyte const & b, std::string const & ter )
 	{
-		stream << spc() << fmt::B( b, w(), m() );
+		stream << spc( ter ) << fmt::B( b, w(), m() );
 	}
 
 	// Output
 	void
-	FormatB::out( std::ostream & stream, short int const i )
+	FormatB::out( std::ostream & stream, short int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::B( i, w(), m() );
+		stream << spc( ter ) << fmt::B( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatB::out( std::ostream & stream, unsigned short int const i )
+	FormatB::out( std::ostream & stream, unsigned short int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::B( i, w(), m() );
+		stream << spc( ter ) << fmt::B( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatB::out( std::ostream & stream, int const i )
+	FormatB::out( std::ostream & stream, int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::B( i, w(), m() );
+		stream << spc( ter ) << fmt::B( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatB::out( std::ostream & stream, unsigned int const i )
+	FormatB::out( std::ostream & stream, unsigned int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::B( i, w(), m() );
+		stream << spc( ter ) << fmt::B( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatB::out( std::ostream & stream, long int const i )
+	FormatB::out( std::ostream & stream, long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::B( i, w(), m() );
+		stream << spc( ter ) << fmt::B( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatB::out( std::ostream & stream, unsigned long int const i )
+	FormatB::out( std::ostream & stream, unsigned long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::B( i, w(), m() );
+		stream << spc( ter ) << fmt::B( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatB::out( std::ostream & stream, long long int const i )
+	FormatB::out( std::ostream & stream, long long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::B( i, w(), m() );
+		stream << spc( ter ) << fmt::B( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatB::out( std::ostream & stream, unsigned long long int const i )
+	FormatB::out( std::ostream & stream, unsigned long long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::B( i, w(), m() );
+		stream << spc( ter ) << fmt::B( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatO::out( std::ostream & stream, byte const & b )
+	FormatO::out( std::ostream & stream, byte const & b, std::string const & ter )
 	{
-		stream << spc() << fmt::O( b, w(), m() );
+		stream << spc( ter ) << fmt::O( b, w(), m() );
 	}
 
 	// Output
 	void
-	FormatO::out( std::ostream & stream, ubyte const & b )
+	FormatO::out( std::ostream & stream, ubyte const & b, std::string const & ter )
 	{
-		stream << spc() << fmt::O( b, w(), m() );
+		stream << spc( ter ) << fmt::O( b, w(), m() );
 	}
 
 	// Output
 	void
-	FormatO::out( std::ostream & stream, short int const i )
+	FormatO::out( std::ostream & stream, short int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::O( i, w(), m() );
+		stream << spc( ter ) << fmt::O( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatO::out( std::ostream & stream, unsigned short int const i )
+	FormatO::out( std::ostream & stream, unsigned short int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::O( i, w(), m() );
+		stream << spc( ter ) << fmt::O( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatO::out( std::ostream & stream, int const i )
+	FormatO::out( std::ostream & stream, int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::O( i, w(), m() );
+		stream << spc( ter ) << fmt::O( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatO::out( std::ostream & stream, unsigned int const i )
+	FormatO::out( std::ostream & stream, unsigned int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::O( i, w(), m() );
+		stream << spc( ter ) << fmt::O( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatO::out( std::ostream & stream, long int const i )
+	FormatO::out( std::ostream & stream, long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::O( i, w(), m() );
+		stream << spc( ter ) << fmt::O( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatO::out( std::ostream & stream, unsigned long int const i )
+	FormatO::out( std::ostream & stream, unsigned long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::O( i, w(), m() );
+		stream << spc( ter ) << fmt::O( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatO::out( std::ostream & stream, long long int const i )
+	FormatO::out( std::ostream & stream, long long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::O( i, w(), m() );
+		stream << spc( ter ) << fmt::O( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatO::out( std::ostream & stream, unsigned long long int const i )
+	FormatO::out( std::ostream & stream, unsigned long long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::O( i, w(), m() );
+		stream << spc( ter ) << fmt::O( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatZ::out( std::ostream & stream, byte const & b )
+	FormatZ::out( std::ostream & stream, byte const & b, std::string const & ter )
 	{
-		stream << spc() << fmt::Z( b, w(), m() );
+		stream << spc( ter ) << fmt::Z( b, w(), m() );
 	}
 
 	// Output
 	void
-	FormatZ::out( std::ostream & stream, ubyte const & b )
+	FormatZ::out( std::ostream & stream, ubyte const & b, std::string const & ter )
 	{
-		stream << spc() << fmt::Z( b, w(), m() );
+		stream << spc( ter ) << fmt::Z( b, w(), m() );
 	}
 
 	// Output
 	void
-	FormatZ::out( std::ostream & stream, short int const i )
+	FormatZ::out( std::ostream & stream, short int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::Z( i, w(), m() );
+		stream << spc( ter ) << fmt::Z( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatZ::out( std::ostream & stream, unsigned short int const i )
+	FormatZ::out( std::ostream & stream, unsigned short int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::Z( i, w(), m() );
+		stream << spc( ter ) << fmt::Z( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatZ::out( std::ostream & stream, int const i )
+	FormatZ::out( std::ostream & stream, int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::Z( i, w(), m() );
+		stream << spc( ter ) << fmt::Z( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatZ::out( std::ostream & stream, unsigned int const i )
+	FormatZ::out( std::ostream & stream, unsigned int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::Z( i, w(), m() );
+		stream << spc( ter ) << fmt::Z( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatZ::out( std::ostream & stream, long int const i )
+	FormatZ::out( std::ostream & stream, long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::Z( i, w(), m() );
+		stream << spc( ter ) << fmt::Z( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatZ::out( std::ostream & stream, unsigned long int const i )
+	FormatZ::out( std::ostream & stream, unsigned long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::Z( i, w(), m() );
+		stream << spc( ter ) << fmt::Z( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatZ::out( std::ostream & stream, long long int const i )
+	FormatZ::out( std::ostream & stream, long long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::Z( i, w(), m() );
+		stream << spc( ter ) << fmt::Z( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatZ::out( std::ostream & stream, unsigned long long int const i )
+	FormatZ::out( std::ostream & stream, unsigned long long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::Z( i, w(), m() );
+		stream << spc( ter ) << fmt::Z( i, w(), m() );
 	}
 
 	// Output
 	void
-	FormatF::out( std::ostream & stream, float const v )
+	FormatF::out( std::ostream & stream, float const v, std::string const & ter )
 	{
-		stream << spc() << fmt::F( v, w(), d(), P() );
+		stream << spc( ter ) << fmt::F( v, w(), d(), P() );
 	}
 
 	// Output
 	void
-	FormatF::out( std::ostream & stream, double const v )
+	FormatF::out( std::ostream & stream, double const v, std::string const & ter )
 	{
-		stream << spc() << fmt::F( v, w(), d(), P() );
+		stream << spc( ter ) << fmt::F( v, w(), d(), P() );
 	}
 
 	// Output
 	void
-	FormatF::out( std::ostream & stream, long double const v )
+	FormatF::out( std::ostream & stream, long double const v, std::string const & ter )
 	{
-		stream << spc() << fmt::F( v, w(), d(), P() );
+		stream << spc( ter ) << fmt::F( v, w(), d(), P() );
 	}
 
 	// Input
 	void
 	FormatG::in( std::istream & stream, bool & b )
 	{
-		std::string const s( read( stream, wid( TraitsG< bool >::w() ) ) );
+		std::string const s( read( stream, wid( TraitsG< bool >::w ) ) );
 		if ( has_prefix( s, "T", false ) || has_prefix( s, ".T", false ) ) {
 			b = true;
 		} else if ( has_prefix( s, "F", false ) || has_prefix( s, ".F", false ) || is_blank( s ) ) { // Blank is Intel Fortran extension
@@ -718,7 +731,7 @@ typedef  std::vector< Format * >  Formats;
 	void
 	FormatG::in( std::istream & stream, char & c )
 	{
-		std::string const b( read( stream, wid( TraitsG< char >::w() ) ) ); // Buffer string
+		std::string const b( read( stream, wid( TraitsG< char >::w ) ) ); // Buffer string
 		std::string::size_type const lb( b.length() ); // Might be < w() if hit end of record
 		if ( lb >= 1 ) { // Take rightmost character read
 			c = b.back();
@@ -743,177 +756,177 @@ typedef  std::vector< Format * >  Formats;
 
 	// Output
 	void
-	FormatG::out( std::ostream & stream, byte const & b )
+	FormatG::out( std::ostream & stream, byte const & b, std::string const & ter )
 	{
-		stream << spc() << fmt::G( float( b ), w(), d(), e(), P() );
+		stream << spc( ter ) << fmt::G( float( b ), w(), d(), e(), P() );
 	}
 
 	// Output
 	void
-	FormatG::out( std::ostream & stream, ubyte const & b )
+	FormatG::out( std::ostream & stream, ubyte const & b, std::string const & ter )
 	{
-		stream << spc() << fmt::G( float( b ), w(), d(), e(), P() );
+		stream << spc( ter ) << fmt::G( float( b ), w(), d(), e(), P() );
 	}
 
 	// Output
 	void
-	FormatG::out( std::ostream & stream, short int const i )
+	FormatG::out( std::ostream & stream, short int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::G( float( i ), w(), d(), e(), P() );
+		stream << spc( ter ) << fmt::G( float( i ), w(), d(), e(), P() );
 	}
 
 	// Output
 	void
-	FormatG::out( std::ostream & stream, unsigned short int const i )
+	FormatG::out( std::ostream & stream, unsigned short int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::G( float( i ), w(), d(), e(), P() );
+		stream << spc( ter ) << fmt::G( float( i ), w(), d(), e(), P() );
 	}
 
 	// Output
 	void
-	FormatG::out( std::ostream & stream, int const i )
+	FormatG::out( std::ostream & stream, int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::G( double( i ), w(), d(), e(), P() );
+		stream << spc( ter ) << fmt::G( double( i ), w(), d(), e(), P() );
 	}
 
 	// Output
 	void
-	FormatG::out( std::ostream & stream, unsigned int const i )
+	FormatG::out( std::ostream & stream, unsigned int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::G( double( i ), w(), d(), e(), P() );
+		stream << spc( ter ) << fmt::G( double( i ), w(), d(), e(), P() );
 	}
 
 	// Output
 	void
-	FormatG::out( std::ostream & stream, long int const i )
+	FormatG::out( std::ostream & stream, long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::G( ( long double )( i ), w(), d(), e(), P() );
+		stream << spc( ter ) << fmt::G( ( long double )( i ), w(), d(), e(), P() );
 	}
 
 	// Output
 	void
-	FormatG::out( std::ostream & stream, unsigned long int const i )
+	FormatG::out( std::ostream & stream, unsigned long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::G( ( long double )( i ), w(), d(), e(), P() );
+		stream << spc( ter ) << fmt::G( ( long double )( i ), w(), d(), e(), P() );
 	}
 
 	// Output
 	void
-	FormatG::out( std::ostream & stream, long long int const i )
+	FormatG::out( std::ostream & stream, long long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::G( ( long double )( i ), w(), d(), e(), P() );
+		stream << spc( ter ) << fmt::G( ( long double )( i ), w(), d(), e(), P() );
 	}
 
 	// Output
 	void
-	FormatG::out( std::ostream & stream, unsigned long long int const i )
+	FormatG::out( std::ostream & stream, unsigned long long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::G( ( long double )( i ), w(), d(), e(), P() );
+		stream << spc( ter ) << fmt::G( ( long double )( i ), w(), d(), e(), P() );
 	}
 
 	// Output
 	void
-	FormatG::out( std::ostream & stream, float const v )
+	FormatG::out( std::ostream & stream, float const v, std::string const & ter )
 	{
-		stream << spc() << fmt::G( v, w(), d(), e(), P() );
+		stream << spc( ter ) << fmt::G( v, w(), d(), e(), P() );
 	}
 
 	// Output
 	void
-	FormatG::out( std::ostream & stream, double const v )
+	FormatG::out( std::ostream & stream, double const v, std::string const & ter )
 	{
-		stream << spc() << fmt::G( v, w(), d(), e(), P() );
+		stream << spc( ter ) << fmt::G( v, w(), d(), e(), P() );
 	}
 
 	// Output
 	void
-	FormatG::out( std::ostream & stream, long double const v )
+	FormatG::out( std::ostream & stream, long double const v, std::string const & ter )
 	{
-		stream << spc() << fmt::G( v, w(), d(), e(), P() );
+		stream << spc( ter ) << fmt::G( v, w(), d(), e(), P() );
 	}
 
 	// Output
 	void
-	FormatE::out( std::ostream & stream, float const v )
+	FormatE::out( std::ostream & stream, float const v, std::string const & ter )
 	{
-		stream << spc() << fmt::E( v, w(), d(), e(), P() );
+		stream << spc( ter ) << fmt::E( v, w(), d(), e(), P() );
 	}
 
 	// Output
 	void
-	FormatE::out( std::ostream & stream, double const v )
+	FormatE::out( std::ostream & stream, double const v, std::string const & ter )
 	{
-		stream << spc() << fmt::E( v, w(), d(), e(), P() );
+		stream << spc( ter ) << fmt::E( v, w(), d(), e(), P() );
 	}
 
 	// Output
 	void
-	FormatE::out( std::ostream & stream, long double const v )
+	FormatE::out( std::ostream & stream, long double const v, std::string const & ter )
 	{
-		stream << spc() << fmt::E( v, w(), d(), e(), P() );
+		stream << spc( ter ) << fmt::E( v, w(), d(), e(), P() );
 	}
 
 	// Output
 	void
-	FormatEN::out( std::ostream & stream, float const v )
+	FormatEN::out( std::ostream & stream, float const v, std::string const & ter )
 	{
-		stream << spc() << fmt::EN( v, w(), d(), e() );
+		stream << spc( ter ) << fmt::EN( v, w(), d(), e() );
 	}
 
 	// Output
 	void
-	FormatEN::out( std::ostream & stream, double const v )
+	FormatEN::out( std::ostream & stream, double const v, std::string const & ter )
 	{
-		stream << spc() << fmt::EN( v, w(), d(), e() );
+		stream << spc( ter ) << fmt::EN( v, w(), d(), e() );
 	}
 
 	// Output
 	void
-	FormatEN::out( std::ostream & stream, long double const v )
+	FormatEN::out( std::ostream & stream, long double const v, std::string const & ter )
 	{
-		stream << spc() << fmt::EN( v, w(), d(), e() );
+		stream << spc( ter ) << fmt::EN( v, w(), d(), e() );
 	}
 
 	// Output
 	void
-	FormatES::out( std::ostream & stream, float const v )
+	FormatES::out( std::ostream & stream, float const v, std::string const & ter )
 	{
-		stream << spc() << fmt::ES( v, w(), d(), e() );
+		stream << spc( ter ) << fmt::ES( v, w(), d(), e() );
 	}
 
 	// Output
 	void
-	FormatES::out( std::ostream & stream, double const v )
+	FormatES::out( std::ostream & stream, double const v, std::string const & ter )
 	{
-		stream << spc() << fmt::ES( v, w(), d(), e() );
+		stream << spc( ter ) << fmt::ES( v, w(), d(), e() );
 	}
 
 	// Output
 	void
-	FormatES::out( std::ostream & stream, long double const v )
+	FormatES::out( std::ostream & stream, long double const v, std::string const & ter )
 	{
-		stream << spc() << fmt::ES( v, w(), d(), e() );
+		stream << spc( ter ) << fmt::ES( v, w(), d(), e() );
 	}
 
 	// Output
 	void
-	FormatD::out( std::ostream & stream, float const v )
+	FormatD::out( std::ostream & stream, float const v, std::string const & ter )
 	{
-		stream << spc() << fmt::D( v, w(), d(), e(), P() );
+		stream << spc( ter ) << fmt::D( v, w(), d(), e(), P() );
 	}
 
 	// Output
 	void
-	FormatD::out( std::ostream & stream, double const v )
+	FormatD::out( std::ostream & stream, double const v, std::string const & ter )
 	{
-		stream << spc() << fmt::D( v, w(), d(), e(), P() );
+		stream << spc( ter ) << fmt::D( v, w(), d(), e(), P() );
 	}
 
 	// Output
 	void
-	FormatD::out( std::ostream & stream, long double const v )
+	FormatD::out( std::ostream & stream, long double const v, std::string const & ter )
 	{
-		stream << spc() << fmt::D( v, w(), d(), e(), P() );
+		stream << spc( ter ) << fmt::D( v, w(), d(), e(), P() );
 	}
 
 	// Input
@@ -942,121 +955,121 @@ typedef  std::vector< Format * >  Formats;
 
 	// Output
 	void
-	FormatLD::out( std::ostream & stream, bool const b )
+	FormatLD::out( std::ostream & stream, bool const b, std::string const & ter )
 	{
-		stream << spc() << fmt::LD( b );
+		stream << spc( ter ) << fmt::LD( b );
 	}
 
 	// Output
 	void
-	FormatLD::out( std::ostream & stream, byte const & b )
+	FormatLD::out( std::ostream & stream, byte const & b, std::string const & ter )
 	{
-		stream << spc() << fmt::LD( b );
+		stream << spc( ter ) << fmt::LD( b );
 	}
 
 	// Output
 	void
-	FormatLD::out( std::ostream & stream, ubyte const & b )
+	FormatLD::out( std::ostream & stream, ubyte const & b, std::string const & ter )
 	{
-		stream << spc() << fmt::LD( b );
+		stream << spc( ter ) << fmt::LD( b );
 	}
 
 	// Output
 	void
-	FormatLD::out( std::ostream & stream, short int const i )
+	FormatLD::out( std::ostream & stream, short int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::LD( i );
+		stream << spc( ter ) << fmt::LD( i );
 	}
 
 	// Output
 	void
-	FormatLD::out( std::ostream & stream, unsigned short int const i )
+	FormatLD::out( std::ostream & stream, unsigned short int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::LD( i );
+		stream << spc( ter ) << fmt::LD( i );
 	}
 
 	// Output
 	void
-	FormatLD::out( std::ostream & stream, int const i )
+	FormatLD::out( std::ostream & stream, int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::LD( i );
+		stream << spc( ter ) << fmt::LD( i );
 	}
 
 	// Output
 	void
-	FormatLD::out( std::ostream & stream, unsigned int const i )
+	FormatLD::out( std::ostream & stream, unsigned int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::LD( i );
+		stream << spc( ter ) << fmt::LD( i );
 	}
 
 	// Output
 	void
-	FormatLD::out( std::ostream & stream, long int const i )
+	FormatLD::out( std::ostream & stream, long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::LD( i );
+		stream << spc( ter ) << fmt::LD( i );
 	}
 
 	// Output
 	void
-	FormatLD::out( std::ostream & stream, unsigned long int const i )
+	FormatLD::out( std::ostream & stream, unsigned long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::LD( i );
+		stream << spc( ter ) << fmt::LD( i );
 	}
 
 	// Output
 	void
-	FormatLD::out( std::ostream & stream, long long int const i )
+	FormatLD::out( std::ostream & stream, long long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::LD( i );
+		stream << spc( ter ) << fmt::LD( i );
 	}
 
 	// Output
 	void
-	FormatLD::out( std::ostream & stream, unsigned long long int const i )
+	FormatLD::out( std::ostream & stream, unsigned long long int const i, std::string const & ter )
 	{
-		stream << spc() << fmt::LD( i );
+		stream << spc( ter ) << fmt::LD( i );
 	}
 
 	// Output
 	void
-	FormatLD::out( std::ostream & stream, float const v )
+	FormatLD::out( std::ostream & stream, float const v, std::string const & ter )
 	{
-		stream << spc() << fmt::LD( v );
+		stream << spc( ter ) << fmt::LD( v );
 	}
 
 	// Output
 	void
-	FormatLD::out( std::ostream & stream, double const v )
+	FormatLD::out( std::ostream & stream, double const v, std::string const & ter )
 	{
-		stream << spc() << fmt::LD( v );
+		stream << spc( ter ) << fmt::LD( v );
 	}
 
 	// Output
 	void
-	FormatLD::out( std::ostream & stream, long double const v )
+	FormatLD::out( std::ostream & stream, long double const v, std::string const & ter )
 	{
-		stream << spc() << fmt::LD( v );
+		stream << spc( ter ) << fmt::LD( v );
 	}
 
 	// Output
 	void
-	FormatLD::out( std::ostream & stream, char const c )
+	FormatLD::out( std::ostream & stream, char const c, std::string const & ter )
 	{
-		stream << spc( true ) << fmt::LD( c );
+		stream << spc_spacer( ter ) << fmt::LD( c );
 	}
 
 	// Output
 	void
-	FormatLD::out( std::ostream & stream, std::string const & s )
+	FormatLD::out( std::ostream & stream, std::string const & s, std::string const & ter )
 	{
-		stream << spc( true ) << fmt::LD( s );
+		stream << spc_spacer( ter ) << fmt::LD( s );
 	}
 
 	// Output
 	void
-	FormatLD::out( std::ostream & stream, Fstring const & s )
+	FormatLD::out( std::ostream & stream, Fstring const & s, std::string const & ter )
 	{
-		stream << spc( true ) << fmt::LD( s );
+		stream << spc_spacer( ter ) << fmt::LD( s );
 	}
 
 // Add a token to the list
@@ -1123,8 +1136,8 @@ alpha_token( Tokens const & tokens )
 	// Create Format
 	Format *
 	FormatFactory::create(
-		std::string const & s,
-		Format * p
+	 std::string const & s,
+	 Format * p
 	)
 	{
 		typedef  Format::Size  Size;

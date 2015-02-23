@@ -23,7 +23,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class Fstring;
 
 inline

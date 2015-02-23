@@ -404,8 +404,8 @@ namespace ZoneTempPredictorCorrector {
 		FArray1D< NeededComfortControlTypes > TComfortControlTypes;
 
 		// Formats
-		static gio::Fmt const Format_700( "('! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, ','Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier')" );
-		static gio::Fmt const Format_701( "('Zone Volume Capacitance Multiplier,',F8.3,' ,',F8.3,',',F8.3,',',F8.3)" );
+		static gio::Fmt Format_700( "('! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, ','Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier')" );
+		static gio::Fmt Format_701( "('Zone Volume Capacitance Multiplier,',F8.3,' ,',F8.3,',',F8.3,',',F8.3)" );
 
 		// FLOW:
 		cCurrentModuleObject = cZControlTypes( iZC_TStat );
@@ -454,8 +454,7 @@ namespace ZoneTempPredictorCorrector {
 		if ( NumTempControlledZones > 0 ) {
 			TempControlledZone.allocate( NumTempControlledZones );
 			TStatControlTypes.allocate( NumTempControlledZones ); // Number of set point types
-			CTSchedMapToControlledZone.allocate( NumTempControlledZones );
-			CTSchedMapToControlledZone = 0;
+			CTSchedMapToControlledZone.dimension( NumTempControlledZones, 0 );
 
 			TempControlledZoneNum = 0;
 			for ( Item = 1; Item <= NumTStatStatements; ++Item ) {
@@ -921,8 +920,7 @@ namespace ZoneTempPredictorCorrector {
 		if ( NumComfortControlledZones > 0 ) {
 			ComfortControlledZone.allocate( NumComfortControlledZones );
 			TComfortControlTypes.allocate( NumComfortControlledZones ); // Number of set point types
-			CCmSchedMapToControlledZone.allocate( NumComfortControlledZones );
-			CCmSchedMapToControlledZone = 0;
+			CCmSchedMapToControlledZone.dimension( NumComfortControlledZones, 0 );
 
 			ComfortControlledZoneNum = 0;
 			for ( Item = 1; Item <= NumComfortTStatStatements; ++Item ) {
@@ -1005,7 +1003,7 @@ namespace ZoneTempPredictorCorrector {
 							if ( People( i ).ActivityLevelPtr > 0 ) {
 								ValidScheduleControlType = CheckScheduleValueMinMax( People( i ).ActivityLevelPtr, ">=", 72.0, "<=", 909.0 );
 								if ( ! ValidScheduleControlType ) {
-									ShowSevereError( "GetPeople Activity Level: Invalid activity level values entered " "for thermal comfort calculation" );
+									ShowSevereError( "GetPeople Activity Level: Invalid activity level values entered for thermal comfort calculation" );
 									ShowContinueError( "Outside of range values [72,909], Reference object=" + People( i ).Name );
 									ErrorsFound = true;
 								}
@@ -1018,7 +1016,7 @@ namespace ZoneTempPredictorCorrector {
 							if ( People( i ).WorkEffPtr > 0 ) {
 								ValidScheduleControlType = CheckScheduleValueMinMax( People( i ).WorkEffPtr, ">=", 0.0, "<=", 1.0 );
 								if ( ! ValidScheduleControlType ) {
-									ShowSevereError( "GetPeople work efficiency: Invalid work efficiency values entered " "for thermal comfort calculation" );
+									ShowSevereError( "GetPeople work efficiency: Invalid work efficiency values entered for thermal comfort calculation" );
 									ShowContinueError( "Outside of range values [0,1], Reference object=" + People( i ).Name );
 									ErrorsFound = true;
 								}
@@ -1031,7 +1029,7 @@ namespace ZoneTempPredictorCorrector {
 							if ( People( i ).ClothingPtr > 0 ) {
 								ValidScheduleControlType = CheckScheduleValueMinMax( People( i ).ClothingPtr, ">", 0.0, "<=", 2.0 );
 								if ( ! ValidScheduleControlType ) {
-									ShowSevereError( "GetPeople Clothing Insulation: Invalid Clothing Insulation values entered " "for thermal comfort calculation" );
+									ShowSevereError( "GetPeople Clothing Insulation: Invalid Clothing Insulation values entered for thermal comfort calculation" );
 									ShowContinueError( "Outside of range values [0.0,2.0], Reference object=" + People( i ).Name );
 									ErrorsFound = true;
 								}
@@ -1774,8 +1772,7 @@ namespace ZoneTempPredictorCorrector {
 
 		if ( NumStageCtrZone > 0 ) {
 			StageControlledZone.allocate( NumStageCtrZone );
-			StageZoneLogic.allocate( NumOfZones );
-			StageZoneLogic = false;
+			StageZoneLogic.dimension( NumOfZones, false );
 
 			StageControlledZoneNum = 0;
 			for ( Item = 1; Item <= NumStageControlledZones; ++Item ) {
@@ -1908,7 +1905,7 @@ namespace ZoneTempPredictorCorrector {
 				ShowWarningError( cCurrentModuleObject + " is applicable to only selected HVAC objects which are missing from input." );
 				ShowContinueError( "Model should include one or more of the following objects:  " );
 				ShowContinueError( "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, AirLoopHVAC:UnitarySystem, " );
-				ShowContinueError( "SetpointManager:SingleZone:OneStageCooling, " "and/or SetpointManager:SingleZone:OneStageHeating. The simulation continues..." );
+				ShowContinueError( "SetpointManager:SingleZone:OneStageCooling, and/or SetpointManager:SingleZone:OneStageHeating. The simulation continues..." );
 			}
 		} // NumStageControlledZones > 0
 
@@ -1939,7 +1936,6 @@ namespace ZoneTempPredictorCorrector {
 		// na
 
 		// Using/Aliasing
-		using DataZoneEquipment::ZoneEquipConfig;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataSurfaces::Surface;
 
@@ -1970,118 +1966,65 @@ namespace ZoneTempPredictorCorrector {
 
 		// FLOW:
 		if ( MyOneTimeFlag ) {
-			TempZoneThermostatSetPoint.allocate( NumOfZones );
-			TempZoneThermostatSetPoint = 0.0;
-			ZoneThermostatSetPointHi.allocate( NumOfZones );
-			ZoneThermostatSetPointHi = 0.0;
-			ZoneThermostatSetPointLo.allocate( NumOfZones );
-			ZoneThermostatSetPointLo = 0.0;
+			TempZoneThermostatSetPoint.dimension( NumOfZones, 0.0 );
+			ZoneThermostatSetPointHi.dimension( NumOfZones, 0.0 );
+			ZoneThermostatSetPointLo.dimension( NumOfZones, 0.0 );
 
-			LoadCorrectionFactor.allocate( NumOfZones ); //PH 3/3/04
-			LoadCorrectionFactor = 0.0;
-			TempControlType.allocate( NumOfZones );
-			TempControlType = 0;
+			LoadCorrectionFactor.dimension( NumOfZones, 0.0 ); //PH 3/3/04
+			TempControlType.dimension( NumOfZones, 0 );
 			if ( NumComfortControlledZones > 0 ) {
-				ComfortControlType.allocate( NumOfZones );
-				ComfortControlType = 0;
+				ComfortControlType.dimension( NumOfZones, 0 );
 				ZoneComfortControlsFanger.allocate( NumOfZones );
 			}
-			ZoneSetPointLast.allocate( NumOfZones );
-			ZoneSetPointLast = 0.0;
-			Setback.allocate( NumOfZones );
-			Setback = false;
-			DeadBandOrSetback.allocate( NumOfZones );
-			DeadBandOrSetback = false;
-			CurDeadBandOrSetback.allocate( NumOfZones );
-			CurDeadBandOrSetback = false;
-			SNLoadHeatEnergy.allocate( NumOfZones );
-			SNLoadHeatEnergy = 0.0;
-			SNLoadCoolEnergy.allocate( NumOfZones );
-			SNLoadCoolEnergy = 0.0;
-			SNLoadHeatRate.allocate( NumOfZones );
-			SNLoadHeatRate = 0.0;
-			SNLoadCoolRate.allocate( NumOfZones );
-			SNLoadCoolRate = 0.0;
-			SNLoadPredictedRate.allocate( NumOfZones );
-			SNLoadPredictedRate = 0.0;
-			SNLoadPredictedHSPRate.allocate( NumOfZones );
-			SNLoadPredictedHSPRate = 0.0;
-			SNLoadPredictedCSPRate.allocate( NumOfZones );
-			SNLoadPredictedCSPRate = 0.0;
-			MoisturePredictedRate.allocate( NumOfZones );
-			MoisturePredictedRate = 0.0;
-			WZoneTimeMinus1.allocate( NumOfZones );
-			WZoneTimeMinus1 = 0.0;
-			WZoneTimeMinus2.allocate( NumOfZones );
-			WZoneTimeMinus2 = 0.0;
-			WZoneTimeMinus3.allocate( NumOfZones );
-			WZoneTimeMinus3 = 0.0;
-			WZoneTimeMinus4.allocate( NumOfZones );
-			WZoneTimeMinus4 = 0.0;
-			DSWZoneTimeMinus1.allocate( NumOfZones );
-			DSWZoneTimeMinus1 = 0.0;
-			DSWZoneTimeMinus2.allocate( NumOfZones );
-			DSWZoneTimeMinus2 = 0.0;
-			DSWZoneTimeMinus3.allocate( NumOfZones );
-			DSWZoneTimeMinus3 = 0.0;
-			DSWZoneTimeMinus4.allocate( NumOfZones );
-			DSWZoneTimeMinus4 = 0.0;
-			ZoneAirHumRatTemp.allocate( NumOfZones );
-			ZoneAirHumRatTemp = 0.0;
-			WZoneTimeMinus1Temp.allocate( NumOfZones );
-			WZoneTimeMinus1Temp = 0.0;
-			WZoneTimeMinus2Temp.allocate( NumOfZones );
-			WZoneTimeMinus2Temp = 0.0;
-			WZoneTimeMinus3Temp.allocate( NumOfZones );
-			WZoneTimeMinus3Temp = 0.0;
-			WZoneTimeMinusP.allocate( NumOfZones );
-			WZoneTimeMinusP = 0.0;
-			TempIndZnLd.allocate( NumOfZones );
-			TempIndZnLd = 0.0;
-			TempDepZnLd.allocate( NumOfZones );
-			TempDepZnLd = 0.0;
-			NonAirSystemResponse.allocate( NumOfZones );
-			NonAirSystemResponse = 0.0;
-			SysDepZoneLoads.allocate( NumOfZones );
-			SysDepZoneLoads = 0.0;
-			SysDepZoneLoadsLagged.allocate( NumOfZones );
-			SysDepZoneLoadsLagged = 0.0;
-			ZoneAirRelHum.allocate( NumOfZones );
-			ZoneAirRelHum = 0.0;
-			ZoneWMX.allocate( NumOfZones );
-			ZoneWMX = 0.0;
-			ZoneWM2.allocate( NumOfZones );
-			ZoneWM2 = 0.0;
-			ZoneT1.allocate( NumOfZones );
-			ZoneT1 = 0.0;
-			ZoneW1.allocate( NumOfZones );
-			ZoneW1 = 0.0;
+			ZoneSetPointLast.dimension( NumOfZones, 0.0 );
+			Setback.dimension( NumOfZones, false );
+			DeadBandOrSetback.dimension( NumOfZones, false );
+			CurDeadBandOrSetback.dimension( NumOfZones, false );
+			SNLoadHeatEnergy.dimension( NumOfZones, 0.0 );
+			SNLoadCoolEnergy.dimension( NumOfZones, 0.0 );
+			SNLoadHeatRate.dimension( NumOfZones, 0.0 );
+			SNLoadCoolRate.dimension( NumOfZones, 0.0 );
+			SNLoadPredictedRate.dimension( NumOfZones, 0.0 );
+			SNLoadPredictedHSPRate.dimension( NumOfZones, 0.0 );
+			SNLoadPredictedCSPRate.dimension( NumOfZones, 0.0 );
+			MoisturePredictedRate.dimension( NumOfZones, 0.0 );
+			WZoneTimeMinus1.dimension( NumOfZones, 0.0 );
+			WZoneTimeMinus2.dimension( NumOfZones, 0.0 );
+			WZoneTimeMinus3.dimension( NumOfZones, 0.0 );
+			WZoneTimeMinus4.dimension( NumOfZones, 0.0 );
+			DSWZoneTimeMinus1.dimension( NumOfZones, 0.0 );
+			DSWZoneTimeMinus2.dimension( NumOfZones, 0.0 );
+			DSWZoneTimeMinus3.dimension( NumOfZones, 0.0 );
+			DSWZoneTimeMinus4.dimension( NumOfZones, 0.0 );
+			ZoneAirHumRatTemp.dimension( NumOfZones, 0.0 );
+			WZoneTimeMinus1Temp.dimension( NumOfZones, 0.0 );
+			WZoneTimeMinus2Temp.dimension( NumOfZones, 0.0 );
+			WZoneTimeMinus3Temp.dimension( NumOfZones, 0.0 );
+			WZoneTimeMinusP.dimension( NumOfZones, 0.0 );
+			TempIndZnLd.dimension( NumOfZones, 0.0 );
+			TempDepZnLd.dimension( NumOfZones, 0.0 );
+			NonAirSystemResponse.dimension( NumOfZones, 0.0 );
+			SysDepZoneLoads.dimension( NumOfZones, 0.0 );
+			SysDepZoneLoadsLagged.dimension( NumOfZones, 0.0 );
+			ZoneAirRelHum.dimension( NumOfZones, 0.0 );
+			ZoneWMX.dimension( NumOfZones, 0.0 );
+			ZoneWM2.dimension( NumOfZones, 0.0 );
+			ZoneT1.dimension( NumOfZones, 0.0 );
+			ZoneW1.dimension( NumOfZones, 0.0 );
 
-			ListSNLoadHeatEnergy.allocate( NumOfZoneLists );
-			ListSNLoadHeatEnergy = 0.0;
-			ListSNLoadCoolEnergy.allocate( NumOfZoneLists );
-			ListSNLoadCoolEnergy = 0.0;
-			ListSNLoadHeatRate.allocate( NumOfZoneLists );
-			ListSNLoadHeatRate = 0.0;
-			ListSNLoadCoolRate.allocate( NumOfZoneLists );
-			ListSNLoadCoolRate = 0.0;
+			ListSNLoadHeatEnergy.dimension( NumOfZoneLists, 0.0 );
+			ListSNLoadCoolEnergy.dimension( NumOfZoneLists, 0.0 );
+			ListSNLoadHeatRate.dimension( NumOfZoneLists, 0.0 );
+			ListSNLoadCoolRate.dimension( NumOfZoneLists, 0.0 );
 
-			GroupSNLoadHeatEnergy.allocate( NumOfZoneGroups );
-			GroupSNLoadHeatEnergy = 0.0;
-			GroupSNLoadCoolEnergy.allocate( NumOfZoneGroups );
-			GroupSNLoadCoolEnergy = 0.0;
-			GroupSNLoadHeatRate.allocate( NumOfZoneGroups );
-			GroupSNLoadHeatRate = 0.0;
-			GroupSNLoadCoolRate.allocate( NumOfZoneGroups );
-			GroupSNLoadCoolRate = 0.0;
-			AIRRAT.allocate( NumOfZones );
-			AIRRAT = 0.0;
-			ZTM1.allocate( NumOfZones );
-			ZTM1 = 0.0;
-			ZTM2.allocate( NumOfZones );
-			ZTM2 = 0.0;
-			ZTM3.allocate( NumOfZones );
-			ZTM3 = 0.0;
+			GroupSNLoadHeatEnergy.dimension( NumOfZoneGroups, 0.0 );
+			GroupSNLoadCoolEnergy.dimension( NumOfZoneGroups, 0.0 );
+			GroupSNLoadHeatRate.dimension( NumOfZoneGroups, 0.0 );
+			GroupSNLoadCoolRate.dimension( NumOfZoneGroups, 0.0 );
+			AIRRAT.dimension( NumOfZones, 0.0 );
+			ZTM1.dimension( NumOfZones, 0.0 );
+			ZTM2.dimension( NumOfZones, 0.0 );
+			ZTM3.dimension( NumOfZones, 0.0 );
 
 			// Allocate Derived Types
 			ZoneSysEnergyDemand.allocate( NumOfZones );
@@ -2247,7 +2190,7 @@ namespace ZoneTempPredictorCorrector {
 		for ( Loop = 1; Loop <= NumTempControlledZones; ++Loop ) {
 			if ( ZoneEquipInputsFilled && ! ControlledZonesChecked ) {
 				if ( ! VerifyControlledZoneForThermostat( TempControlledZone( Loop ).ZoneName ) ) {
-					ShowSevereError( RoutineName + "Zone=\"" + TempControlledZone( Loop ).ZoneName + "\" has specified a" " Thermostatic control but is not a controlled zone." );
+					ShowSevereError( RoutineName + "Zone=\"" + TempControlledZone( Loop ).ZoneName + "\" has specified a Thermostatic control but is not a controlled zone." );
 					ShowContinueError( "...must have a ZoneHVAC:EquipmentConnections specification for this zone." );
 					ErrorsFound = true;
 				}
@@ -2298,7 +2241,7 @@ namespace ZoneTempPredictorCorrector {
 		for ( Loop = 1; Loop <= NumComfortControlledZones; ++Loop ) {
 			if ( ZoneEquipInputsFilled && ! ControlledZonesChecked ) {
 				if ( ! VerifyControlledZoneForThermostat( ComfortControlledZone( Loop ).ZoneName ) ) {
-					ShowSevereError( RoutineName + "Zone=\"" + ComfortControlledZone( Loop ).ZoneName + "\" has specified a" " Comfort control but is not a controlled zone." );
+					ShowSevereError( RoutineName + "Zone=\"" + ComfortControlledZone( Loop ).ZoneName + "\" has specified a Comfort control but is not a controlled zone." );
 					ShowContinueError( "...must have a ZoneHVAC:EquipmentConnections specification for this zone." );
 					ErrorsFound = true;
 				}
@@ -2575,11 +2518,11 @@ namespace ZoneTempPredictorCorrector {
 				if ( StageControlledZone( RelativeZoneNum ).HeatSetPoint >= StageControlledZone( RelativeZoneNum ).CoolSetPoint ) {
 					++StageControlledZone( RelativeZoneNum ).StageErrCount;
 					if ( StageControlledZone( RelativeZoneNum ).StageErrCount < 2 ) {
-						ShowWarningError( "ZoneControl:Thermostat:StagedDualSetpoint: The heating setpoint is equal to or above " "the cooling setpoint in " + StageControlledZone( RelativeZoneNum ).Name );
+						ShowWarningError( "ZoneControl:Thermostat:StagedDualSetpoint: The heating setpoint is equal to or above the cooling setpoint in " + StageControlledZone( RelativeZoneNum ).Name );
 						ShowContinueError( "The zone heating setpoint is set to the cooling setpoint - 0.1C." );
 						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					} else {
-						ShowRecurringWarningErrorAtEnd( "The heating setpoint is still above " "the cooling setpoint", StageControlledZone( RelativeZoneNum ).StageErrIndex, StageControlledZone( RelativeZoneNum ).HeatSetPoint, StageControlledZone( RelativeZoneNum ).HeatSetPoint );
+						ShowRecurringWarningErrorAtEnd( "The heating setpoint is still above the cooling setpoint", StageControlledZone( RelativeZoneNum ).StageErrIndex, StageControlledZone( RelativeZoneNum ).HeatSetPoint, StageControlledZone( RelativeZoneNum ).HeatSetPoint );
 					}
 					StageControlledZone( RelativeZoneNum ).HeatSetPoint = StageControlledZone( RelativeZoneNum ).CoolSetPoint - 0.1; //???????????
 				}
@@ -2619,6 +2562,14 @@ namespace ZoneTempPredictorCorrector {
 					ZoneThermostatSetPointLo( ActualZoneNum ) = StageControlledZone( RelativeZoneNum ).HeatSetPoint - 0.5 * StageControlledZone( RelativeZoneNum ).HeatThroRange;
 					ZoneSysEnergyDemand( ActualZoneNum ).StageNum = 0;
 				}
+			}
+		}
+
+		//Tuned Precompute controlled equip zone numbers for performance
+		std::vector< int > controlledZoneEquipConfigNums;
+		for ( int ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum ) {
+			if ( Zone( ZoneEquipConfigNum ).IsControlled ) {
+				controlledZoneEquipConfigNums.push_back( ZoneEquipConfigNum );
 			}
 		}
 
@@ -2689,7 +2640,7 @@ namespace ZoneTempPredictorCorrector {
 			// Calculate the various heat balance sums
 
 			// NOTE: SumSysMCp and SumSysMCpT are not used in the predict step
-			CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT );
+			CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
 
 			TempDepCoef = SumHA + SumMCp;
 			TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT + SysDepZoneLoadsLagged( ZoneNum );
@@ -3071,7 +3022,7 @@ namespace ZoneTempPredictorCorrector {
 			// 4/  LoadToHeatingSetPoint <=0 & LoadToCoolingSetPoint >=0 -->  Dead Band Operation ! includes zero load cases
 			// First trap bad set-points
 			if ( LoadToHeatingSetPoint > LoadToCoolingSetPoint ) {
-				ShowSevereError( "SingleHeatCoolSetPoint: Effective heating set-point higher than effective cooling set-point - " "use DualSetPointWithDeadBand if using unmixed air model" );
+				ShowSevereError( "SingleHeatCoolSetPoint: Effective heating set-point higher than effective cooling set-point - use DualSetPointWithDeadBand if using unmixed air model" );
 				ShowContinueErrorTimeStamp( "occurs in Zone=" + Zone( ZoneNum ).Name );
 				ShowContinueError( "LoadToHeatingSetPoint=" + RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
 				ShowContinueError( "Zone TempDepZnLd=" + RoundSigDigits( TempDepZnLd( ZoneNum ), 2 ) );
@@ -3093,7 +3044,7 @@ namespace ZoneTempPredictorCorrector {
 				}
 				DeadBandOrSetback( ZoneNum ) = true;
 			} else { // this should never occur!
-				ShowSevereError( "SingleHeatCoolSetPoint: Unanticipated combination of heating and cooling loads - " "report to EnergyPlus Development Team" );
+				ShowSevereError( "SingleHeatCoolSetPoint: Unanticipated combination of heating and cooling loads - report to EnergyPlus Development Team" );
 				ShowContinueErrorTimeStamp( "occurs in Zone=" + Zone( ZoneNum ).Name );
 				ShowContinueError( "LoadToHeatingSetPoint=" + RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
 				ShowContinueError( "Zone TempDepZnLd=" + RoundSigDigits( TempDepZnLd( ZoneNum ), 2 ) );
@@ -3130,7 +3081,7 @@ namespace ZoneTempPredictorCorrector {
 			// 4/  LoadToHeatingSetPoint <=0 & LoadToCoolingSetPoint >=0 -->  Dead Band Operation - includes zero load cases
 			// First trap bad set-points
 			if ( LoadToHeatingSetPoint > LoadToCoolingSetPoint ) {
-				ShowSevereError( "DualSetPointWithDeadBand: Effective heating set-point higher than effective cooling set-point - " "increase deadband if using unmixed air model" );
+				ShowSevereError( "DualSetPointWithDeadBand: Effective heating set-point higher than effective cooling set-point - increase deadband if using unmixed air model" );
 				ShowContinueErrorTimeStamp( "occurs in Zone=" + Zone( ZoneNum ).Name );
 				ShowContinueError( "LoadToHeatingSetPoint=" + RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
 				ShowContinueError( "Zone TempDepZnLd=" + RoundSigDigits( TempDepZnLd( ZoneNum ), 2 ) );
@@ -3155,7 +3106,7 @@ namespace ZoneTempPredictorCorrector {
 				}
 				DeadBandOrSetback( ZoneNum ) = true;
 			} else { // this should never occur!
-				ShowSevereError( "DualSetPointWithDeadBand: Unanticipated combination of heating and cooling loads - " "report to EnergyPlus Development Team" );
+				ShowSevereError( "DualSetPointWithDeadBand: Unanticipated combination of heating and cooling loads - report to EnergyPlus Development Team" );
 				ShowContinueErrorTimeStamp( "occurs in Zone=" + Zone( ZoneNum ).Name );
 				ShowContinueError( "LoadToHeatingSetPoint=" + RoundSigDigits( LoadToHeatingSetPoint, 3 ) + ", LoadToCoolingSetPoint=" + RoundSigDigits( LoadToCoolingSetPoint, 3 ) );
 				ShowContinueError( "Zone Heating Set-point=" + RoundSigDigits( ZoneThermostatSetPointLo( ZoneNum ), 2 ) );
@@ -3338,11 +3289,11 @@ namespace ZoneTempPredictorCorrector {
 			if ( ZoneRHHumidifyingSetPoint > ZoneRHDehumidifyingSetPoint ) {
 				//      HumidityControlZone(HumidControlledZoneNum)%ErrorCount = HumidityControlZone(HumidControlledZoneNum)%ErrorCount + 1
 				if ( HumidityControlZone( HumidControlledZoneNum ).ErrorIndex == 0 ) {
-					ShowWarningMessage( "HUMIDISTAT: The humidifying setpoint is above " "the dehumidifying setpoint in " + HumidityControlZone( HumidControlledZoneNum ).ControlName );
+					ShowWarningMessage( "HUMIDISTAT: The humidifying setpoint is above the dehumidifying setpoint in " + HumidityControlZone( HumidControlledZoneNum ).ControlName );
 					ShowContinueError( "The zone humidifying setpoint is set to the dehumidifying setpoint." );
 					ShowContinueErrorTimeStamp( "Occurrence info:" );
 				}
-				ShowRecurringWarningErrorAtEnd( "The humidifying setpoint is still above " "the dehumidifying setpoint", HumidityControlZone( HumidControlledZoneNum ).ErrorIndex, ZoneRHHumidifyingSetPoint, ZoneRHHumidifyingSetPoint );
+				ShowRecurringWarningErrorAtEnd( "The humidifying setpoint is still above the dehumidifying setpoint", HumidityControlZone( HumidControlledZoneNum ).ErrorIndex, ZoneRHHumidifyingSetPoint, ZoneRHHumidifyingSetPoint );
 				ZoneRHHumidifyingSetPoint = ZoneRHDehumidifyingSetPoint;
 			}
 			if ( ZoneRHHumidifyingSetPoint == ZoneRHDehumidifyingSetPoint ) SingleSetPoint = true;
@@ -3355,7 +3306,7 @@ namespace ZoneTempPredictorCorrector {
 
 			// Calculate hourly humidity ratio from infiltration + humidity added from latent load
 			// to determine system added/subtracted moisture.
-			LatentGain = ZoneLatentGain( ZoneNum ) + SumLatentHTRadSys( ZoneNum );
+			LatentGain = ZoneLatentGain( ZoneNum ) + SumLatentHTRadSys( ZoneNum ) + SumLatentPool( ZoneNum );
 
 			SysTimeStepInSeconds = SecInHour * TimeStepSys;
 
@@ -3436,7 +3387,7 @@ namespace ZoneTempPredictorCorrector {
 				} else if ( LoadToHumidifySetPoint <= 0.0 && LoadToDehumidifySetPoint >= 0.0 ) { // deadband includes zero loads
 					ZoneSysMoistureDemand( ZoneNum ).TotalOutputRequired = 0.0;
 				} else { // this should never occur!
-					ShowSevereError( "Humidistat: Unanticipated combination of humidifying and dehumidifying loads - " "report to EnergyPlus Development Team" );
+					ShowSevereError( "Humidistat: Unanticipated combination of humidifying and dehumidifying loads - report to EnergyPlus Development Team" );
 					ShowContinueErrorTimeStamp( "occurs in Zone=" + Zone( ZoneNum ).Name );
 					ShowContinueError( "LoadToHumidifySetPoint=" + RoundSigDigits( LoadToHumidifySetPoint, 5 ) + ", LoadToDehumidifySetPoint=" + RoundSigDigits( LoadToDehumidifySetPoint, 5 ) );
 					ShowContinueError( "Zone RH Humidifying Set-point=" + RoundSigDigits( ZoneRHHumidifyingSetPoint, 1 ) );
@@ -3561,13 +3512,21 @@ namespace ZoneTempPredictorCorrector {
 		// Initializations
 		ZoneTempChange = constant_zero;
 
+		//Tuned Precompute controlled equip zone numbers for performance
+		std::vector< int > controlledZoneEquipConfigNums;
+		for ( int ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum ) {
+			if ( Zone( ZoneEquipConfigNum ).IsControlled ) {
+				controlledZoneEquipConfigNums.push_back( ZoneEquipConfigNum );
+			}
+		}
+
 		// Update zone temperatures
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
 			ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
 
 			if ( ShortenTimeStepSys ) {
-				//time step has gotten smaller, use zone timestep history to interpolate new set of "DS" history terms.
+				// time step has gotten smaller, use zone timestep history to interpolate new set of "DS" history terms.
 				if ( NumOfSysTimeSteps != NumOfSysTimeStepsLastZoneTimeStep ) { // cannot reuse existing DS data, interpolate from zone time
 					DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, MAT( ZoneNum ), XMAT( ZoneNum ), XM2T( ZoneNum ), XM3T( ZoneNum ), XM4T( ZoneNum ), MAT( ZoneNum ), DSXMAT( ZoneNum ), DSXM2T( ZoneNum ), DSXM3T( ZoneNum ), DSXM4T( ZoneNum ) );
 					DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, ZoneAirHumRat( ZoneNum ), WZoneTimeMinus1( ZoneNum ), WZoneTimeMinus2( ZoneNum ), WZoneTimeMinus3( ZoneNum ), WZoneTimeMinus4( ZoneNum ), ZoneAirHumRat( ZoneNum ), DSWZoneTimeMinus1( ZoneNum ), DSWZoneTimeMinus2( ZoneNum ), DSWZoneTimeMinus3( ZoneNum ), DSWZoneTimeMinus4( ZoneNum ) );
@@ -3600,7 +3559,6 @@ namespace ZoneTempPredictorCorrector {
 				WZoneTimeMinus1Temp( ZoneNum ) = WZoneTimeMinus1( ZoneNum );
 				WZoneTimeMinus2Temp( ZoneNum ) = WZoneTimeMinus2( ZoneNum );
 				WZoneTimeMinus3Temp( ZoneNum ) = WZoneTimeMinus3( ZoneNum );
-
 			}
 
 			AIRRAT( ZoneNum ) = Zone( ZoneNum ).Volume * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) / ( TimeStepSys * SecInHour );
@@ -3610,7 +3568,7 @@ namespace ZoneTempPredictorCorrector {
 			ManageAirModel( ZoneNum );
 
 			// Calculate the various heat balance sums
-			CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT );
+			CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
 			//    ZoneTempHistoryTerm = (3.0D0 * ZTM1(ZoneNum) - (3.0D0/2.0D0) * ZTM2(ZoneNum) + (1.0D0/3.0D0) * ZTM3(ZoneNum))
 			ZoneNodeNum = Zone( ZoneNum ).SystemZoneNodeNumber;
 
@@ -3737,7 +3695,7 @@ namespace ZoneTempPredictorCorrector {
 			SNLoadCoolEnergy( ZoneNum ) = std::abs( min( SNLoad, 0.0 ) * TimeStepSys * SecInHour );
 
 			// Final humidity calcs
-			CorrectZoneHumRat( ZoneNum );
+			CorrectZoneHumRat( ZoneNum, controlledZoneEquipConfigNums );
 
 			ZoneAirHumRat( ZoneNum ) = ZoneAirHumRatTemp( ZoneNum );
 			ZoneAirRelHum( ZoneNum ) = 100.0 * PsyRhFnTdbWPb( ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress, RoutineName );
@@ -3778,7 +3736,7 @@ namespace ZoneTempPredictorCorrector {
 				}
 			}}
 
-			CalcZoneComponentLoadSums( ZoneNum, TempDepCoef, TempIndCoef, ZnAirRpt( ZoneNum ).SumIntGains, ZnAirRpt( ZoneNum ).SumHADTsurfs, ZnAirRpt( ZoneNum ).SumMCpDTzones, ZnAirRpt( ZoneNum ).SumMCpDtInfil, ZnAirRpt( ZoneNum ).SumMCpDTsystem, ZnAirRpt( ZoneNum ).SumNonAirSystem, ZnAirRpt( ZoneNum ).CzdTdt, ZnAirRpt( ZoneNum ).imBalance ); // convection part of internal gains | surface convection heat transfer | interzone mixing | OA of various kinds except via system | air system | non air system | air mass energy storage term | measure of imbalance in zone air heat balance
+			CalcZoneComponentLoadSums( ZoneNum, TempDepCoef, TempIndCoef, ZnAirRpt( ZoneNum ).SumIntGains, ZnAirRpt( ZoneNum ).SumHADTsurfs, ZnAirRpt( ZoneNum ).SumMCpDTzones, ZnAirRpt( ZoneNum ).SumMCpDtInfil, ZnAirRpt( ZoneNum ).SumMCpDTsystem, ZnAirRpt( ZoneNum ).SumNonAirSystem, ZnAirRpt( ZoneNum ).CzdTdt, ZnAirRpt( ZoneNum ).imBalance, controlledZoneEquipConfigNums ); // convection part of internal gains | surface convection heat transfer | interzone mixing | OA of various kinds except via system | air system | non air system | air mass energy storage term | measure of imbalance in zone air heat balance
 
 		} // ZoneNum
 
@@ -4041,7 +3999,10 @@ namespace ZoneTempPredictorCorrector {
 	}
 
 	void
-	CorrectZoneHumRat( int const ZoneNum )
+	CorrectZoneHumRat(
+		int const ZoneNum,
+		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4120,13 +4081,15 @@ namespace ZoneTempPredictorCorrector {
 		ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
 
 		// Check to see if this is a controlled zone
+		ZoneEquipConfigNum = 0;
 		ControlledZoneAirFlag = false;
-		for ( ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum ) {
-			if ( ! Zone( ZoneEquipConfigNum ).IsControlled ) continue;
-			if ( ZoneEquipConfig( ZoneEquipConfigNum ).ActualZoneNum != ZoneNum ) continue;
-			ControlledZoneAirFlag = true;
-			break;
-		} // ZoneEquipConfigNum
+		for ( std::vector< int >::size_type i = 0, e = controlledZoneEquipConfigNums.size(); i < e; ++i ) {
+			if ( ZoneEquipConfig( controlledZoneEquipConfigNums[ i ] ).ActualZoneNum == ZoneNum ) {
+				ZoneEquipConfigNum = controlledZoneEquipConfigNums[ i ];
+				ControlledZoneAirFlag = true;
+				break;
+			}
+		}
 
 		// Check to see if this is a plenum zone
 		ZoneRetPlenumAirFlag = false;
@@ -4194,7 +4157,7 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 		// Calculate hourly humidity ratio from infiltration + humdidity added from latent load + system added moisture
-		LatentGain = ZoneLatentGain( ZoneNum ) + SumLatentHTRadSys( ZoneNum );
+		LatentGain = ZoneLatentGain( ZoneNum ) + SumLatentHTRadSys( ZoneNum )  + SumLatentPool( ZoneNum );
 
 		SysTimeStepInSeconds = SecInHour * TimeStepSys;
 
@@ -4387,7 +4350,8 @@ namespace ZoneTempPredictorCorrector {
 		Real64 & SumMCp, // Zone sum of MassFlowRate*Cp
 		Real64 & SumMCpT, // Zone sum of MassFlowRate*Cp*T
 		Real64 & SumSysMCp, // Zone sum of air system MassFlowRate*Cp
-		Real64 & SumSysMCpT // Zone sum of air system MassFlowRate*Cp*T
+		Real64 & SumSysMCpT, // Zone sum of air system MassFlowRate*Cp*T
+		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
 	)
 	{
 
@@ -4469,7 +4433,7 @@ namespace ZoneTempPredictorCorrector {
 		// Sum all convective internal gains: SumIntGain
 
 		SumAllInternalConvectionGains( ZoneNum, SumIntGain );
-		SumIntGain += SumConvHTRadSys( ZoneNum );
+		SumIntGain += SumConvHTRadSys( ZoneNum ) + SumConvPool( ZoneNum );
 
 		// Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
 		// low or zero)
@@ -4492,18 +4456,15 @@ namespace ZoneTempPredictorCorrector {
 		// Sum all system air flow: SumSysMCp, SumSysMCpT
 		// Check to see if this is a controlled zone
 
+		ZoneEquipConfigNum = 0;
 		ControlledZoneAirFlag = false;
-		//  If (Zone(ZoneNum)%IsControlled) Then   ! more CR 7384
-		//    ControlledZoneAirFlag = .TRUE.       ! more CR 7384
-		//    ZoneEquipConfigNum = ZoneNum         ! more CR 7384
-		//  endif
-		// BG feb 2008 repeating this do loop every time seems crazy, store ControlledZoneAirFlag in Zone structure?
-		for ( ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum ) {
-			if ( ! Zone( ZoneEquipConfigNum ).IsControlled ) continue;
-			if ( ZoneEquipConfig( ZoneEquipConfigNum ).ActualZoneNum != ZoneNum ) continue;
-			ControlledZoneAirFlag = true;
-			break; //sloppy way of finding ZoneEquipConfigNum for later use.
-		} // ZoneEquipConfigNum
+		for ( std::vector< int >::size_type i = 0, e = controlledZoneEquipConfigNums.size(); i < e; ++i ) {
+			if ( ZoneEquipConfig( controlledZoneEquipConfigNums[ i ] ).ActualZoneNum == ZoneNum ) {
+				ZoneEquipConfigNum = controlledZoneEquipConfigNums[ i ];
+				ControlledZoneAirFlag = true;
+				break;
+			}
+		}
 
 		// Check to see if this is a plenum zone
 		// BG feb 2008 repeating this do loop every time seems crazy, store ControlledZoneAirFlag in Zone structure?
@@ -4626,10 +4587,10 @@ namespace ZoneTempPredictorCorrector {
 						WinHeatGain( SurfNum ) += SurfaceWindow( SurfNum ).RetHeatGainToZoneAir;
 						if ( WinHeatGain( SurfNum ) >= 0.0 ) {
 							WinHeatGainRep( SurfNum ) = WinHeatGain( SurfNum );
-							WinHeatGainRepEnergy( SurfNum ) = WinHeatGainRep( SurfNum ) * TimeStepZone * SecInHour;
+							WinHeatGainRepEnergy( SurfNum ) = WinHeatGainRep( SurfNum ) * TimeStepZoneSec;
 						} else {
 							WinHeatLossRep( SurfNum ) = -WinHeatGain( SurfNum );
-							WinHeatLossRepEnergy( SurfNum ) = WinHeatLossRep( SurfNum ) * TimeStepZone * SecInHour;
+							WinHeatLossRepEnergy( SurfNum ) = WinHeatLossRep( SurfNum ) * TimeStepZoneSec;
 						}
 					}
 				}
@@ -4699,7 +4660,8 @@ namespace ZoneTempPredictorCorrector {
 		Real64 & SumMCpDTsystem, // Zone sum of air system MassFlowRate*Cp*(Tsup - Tz)
 		Real64 & SumNonAirSystem, // Zone sum of non air system convective heat gains
 		Real64 & CzdTdt, // Zone air energy storage term.
-		Real64 & imBalance // put all terms in eq. 5 on RHS , should be zero
+		Real64 & imBalance, // put all terms in eq. 5 on RHS , should be zero
+		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
 	)
 	{
 
@@ -4814,13 +4776,15 @@ namespace ZoneTempPredictorCorrector {
 		// Check to see if this is a controlled zone
 
 		// CR 7384 continuation needed below.  eliminate do loop for speed and clarity
+		ZoneEquipConfigNum = 0;
 		ControlledZoneAirFlag = false;
-		for ( ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum ) {
-			if ( ! ZoneEquipConfig( ZoneEquipConfigNum ).IsControlled ) continue;
-			if ( ZoneEquipConfig( ZoneEquipConfigNum ).ActualZoneNum != ZoneNum ) continue;
-			ControlledZoneAirFlag = true;
-			break;
-		} // ZoneEquipConfigNum
+		for ( std::vector< int >::size_type i = 0, e = controlledZoneEquipConfigNums.size(); i < e; ++i ) {
+			if ( ZoneEquipConfig( controlledZoneEquipConfigNums[ i ] ).ActualZoneNum == ZoneNum ) {
+				ZoneEquipConfigNum = controlledZoneEquipConfigNums[ i ];
+				ControlledZoneAirFlag = true;
+				break;
+			}
+		}
 
 		// Check to see if this is a plenum zone
 		ZoneRetPlenumAirFlag = false;
@@ -4888,7 +4852,7 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 		// non air system response.
-		SumNonAirSystem = NonAirSystemResponse( ZoneNum ) + SumConvHTRadSys( ZoneNum );
+		SumNonAirSystem = NonAirSystemResponse( ZoneNum ) + SumConvHTRadSys( ZoneNum ) + SumConvPool( ZoneNum );
 
 		// Sum all surface convection: SumHA, SumHATsurf, SumHATref (and additional contributions to SumIntGain)
 		for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
@@ -5100,7 +5064,6 @@ namespace ZoneTempPredictorCorrector {
 		using DataZoneEquipment::ZoneEquipConfig;
 
 		// Return value
-		bool IsControlled; // True if does, false if not.
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -5117,13 +5080,7 @@ namespace ZoneTempPredictorCorrector {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		if ( FindItemInList( ZoneName, ZoneEquipConfig.ZoneName(), NumOfZones ) > 0 ) {
-			IsControlled = true;
-		} else {
-			IsControlled = false;
-		}
-		return IsControlled;
-
+		return ( FindItemInList( ZoneName, ZoneEquipConfig.ZoneName(), NumOfZones ) > 0 );
 	}
 
 	void
@@ -5181,8 +5138,7 @@ namespace ZoneTempPredictorCorrector {
 		if ( SetupOscillationOutputFlag ) {
 			ZoneTempHist.allocate( NumOfZones, 4 );
 			ZoneTempHist = 0.0;
-			ZoneTempOscillate.allocate( NumOfZones );
-			ZoneTempOscillate = 0.0;
+			ZoneTempOscillate.dimension( NumOfZones, 0.0 );
 			//set up zone by zone variables
 			// CurrentModuleObject='Zone'
 			for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
@@ -5418,11 +5374,11 @@ namespace ZoneTempPredictorCorrector {
 				if ( ZoneComfortControlsFanger( ActualZoneNum ).LowPMV > ZoneComfortControlsFanger( ActualZoneNum ).HighPMV ) {
 					++ZoneComfortControlsFanger( ActualZoneNum ).DualPMVErrCount;
 					if ( ZoneComfortControlsFanger( ActualZoneNum ).DualPMVErrCount < 2 ) {
-						ShowWarningError( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint: The heating PMV setpoint is above " "the cooling PMV setpoint in " + SetPointDualHeatCoolFanger( SchedTypeIndex ).Name );
+						ShowWarningError( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint: The heating PMV setpoint is above the cooling PMV setpoint in " + SetPointDualHeatCoolFanger( SchedTypeIndex ).Name );
 						ShowContinueError( "The zone dual heating PMV setpoint is set to the dual cooling PMV setpoint." );
 						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					} else {
-						ShowRecurringWarningErrorAtEnd( "The heating PMV setpoint is still above " "the cooling PMV setpoint", ZoneComfortControlsFanger( ActualZoneNum ).DualPMVErrIndex, ZoneComfortControlsFanger( ActualZoneNum ).LowPMV, ZoneComfortControlsFanger( ActualZoneNum ).LowPMV );
+						ShowRecurringWarningErrorAtEnd( "The heating PMV setpoint is still above the cooling PMV setpoint", ZoneComfortControlsFanger( ActualZoneNum ).DualPMVErrIndex, ZoneComfortControlsFanger( ActualZoneNum ).LowPMV, ZoneComfortControlsFanger( ActualZoneNum ).LowPMV );
 					}
 					ZoneComfortControlsFanger( ActualZoneNum ).LowPMV = ZoneComfortControlsFanger( ActualZoneNum ).HighPMV;
 				}
@@ -5531,11 +5487,11 @@ namespace ZoneTempPredictorCorrector {
 					SetPointLo = ComfortControlledZone( RelativeZoneNum ).TdbMinSetPoint;
 					//          ComfortControlledZone(RelativeZoneNum)%TdbMinErrCount = ComfortControlledZone(RelativeZoneNum)%TdbMinErrCount + 1
 					if ( ComfortControlledZone( RelativeZoneNum ).TdbMinErrIndex < 2 ) {
-						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating temperature is below " "the Minimum dry-bulb temperature setpoint " + ComfortControlledZone( RelativeZoneNum ).Name );
+						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating temperature is below the Minimum dry-bulb temperature setpoint " + ComfortControlledZone( RelativeZoneNum ).Name );
 						ShowContinueError( "The zone heating setpoint is set to the Minimum dry-bulb temperature setpoint" );
 						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					}
-					ShowRecurringWarningErrorAtEnd( "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating temperature is still" " below the Minimum dry-bulb temperature setpoint ...", ComfortControlledZone( RelativeZoneNum ).TdbMinErrIndex, SetPointLo, SetPointLo );
+					ShowRecurringWarningErrorAtEnd( "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating temperature is still below the Minimum dry-bulb temperature setpoint ...", ComfortControlledZone( RelativeZoneNum ).TdbMinErrIndex, SetPointLo, SetPointLo );
 				}
 				TempZoneThermostatSetPoint( ActualZoneNum ) = SetPointLo;
 				ZoneThermostatSetPointLo( ActualZoneNum ) = TempZoneThermostatSetPoint( ActualZoneNum );
@@ -5547,11 +5503,11 @@ namespace ZoneTempPredictorCorrector {
 					SetPointLo = ComfortControlledZone( RelativeZoneNum ).TdbMaxSetPoint;
 					//          ComfortControlledZone(RelativeZoneNum)%TdbMaxErrCount = ComfortControlledZone(RelativeZoneNum)%TdbMaxErrCount + 1
 					if ( ComfortControlledZone( RelativeZoneNum ).TdbMaxErrIndex == 0 ) {
-						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling temperature is above  " "the Maximum dry-bulb temperature setpoint " + ComfortControlledZone( RelativeZoneNum ).Name );
+						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling temperature is above the Maximum dry-bulb temperature setpoint " + ComfortControlledZone( RelativeZoneNum ).Name );
 						ShowContinueError( "The zone cooling setpoint is set to the Maximum dry-bulb temperature setpoint" );
 						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					}
-					ShowRecurringWarningErrorAtEnd( "ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling temperature is still" " above the Maximum dry-bulb temperature setpoint ...", ComfortControlledZone( RelativeZoneNum ).TdbMaxErrIndex, SetPointLo, SetPointLo );
+					ShowRecurringWarningErrorAtEnd( "ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling temperature is still above the Maximum dry-bulb temperature setpoint ...", ComfortControlledZone( RelativeZoneNum ).TdbMaxErrIndex, SetPointLo, SetPointLo );
 				}
 				TempZoneThermostatSetPoint( ActualZoneNum ) = SetPointLo;
 				ZoneThermostatSetPointHi( ActualZoneNum ) = TempZoneThermostatSetPoint( ActualZoneNum );
@@ -5567,11 +5523,11 @@ namespace ZoneTempPredictorCorrector {
 				if ( SetPointLo < ComfortControlledZone( RelativeZoneNum ).TdbMinSetPoint || SetPointLo > ComfortControlledZone( RelativeZoneNum ).TdbMaxSetPoint ) {
 					//          ComfortControlledZone(RelativeZoneNum)%TdbHCErrCount = ComfortControlledZone(RelativeZoneNum)%TdbHCErrCount + 1
 					if ( ComfortControlledZone( RelativeZoneNum ).TdbHCErrIndex == 0 ) {
-						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling temperature is above  " "the Maximum or below the Minimum dry-bulb temperature setpoint " + ComfortControlledZone( RelativeZoneNum ).Name );
-						ShowContinueError( "The zone setpoint is set to the Maximum dry-bulb temperature setpoint if above or " "the Minimum dry-bulb temperature setpoint if below" );
+						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling temperature is above the Maximum or below the Minimum dry-bulb temperature setpoint " + ComfortControlledZone( RelativeZoneNum ).Name );
+						ShowContinueError( "The zone setpoint is set to the Maximum dry-bulb temperature setpoint if above or the Minimum dry-bulb temperature setpoint if below" );
 						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					}
-					ShowRecurringWarningErrorAtEnd( "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling " "temperature is still beyond the range between Maximum and Minimum dry-bulb temperature setpoint ...", ComfortControlledZone( RelativeZoneNum ).TdbHCErrIndex, SetPointLo, SetPointLo );
+					ShowRecurringWarningErrorAtEnd( "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling temperature is still beyond the range between Maximum and Minimum dry-bulb temperature setpoint ...", ComfortControlledZone( RelativeZoneNum ).TdbHCErrIndex, SetPointLo, SetPointLo );
 				}
 				TempZoneThermostatSetPoint( ActualZoneNum ) = SetPointLo;
 				ZoneThermostatSetPointHi( ActualZoneNum ) = TempZoneThermostatSetPoint( ActualZoneNum );
@@ -5584,21 +5540,21 @@ namespace ZoneTempPredictorCorrector {
 					SetPointLo = ComfortControlledZone( RelativeZoneNum ).TdbMinSetPoint;
 					//          ComfortControlledZone(RelativeZoneNum)%TdbDualMinErrCount = ComfortControlledZone(RelativeZoneNum)%TdbDualMinErrCount+1
 					if ( ComfortControlledZone( RelativeZoneNum ).TdbDualMinErrIndex == 0 ) {
-						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is below " "the Minimum dry-bulb temperature setpoint " + ComfortControlledZone( RelativeZoneNum ).Name );
+						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is below the Minimum dry-bulb temperature setpoint " + ComfortControlledZone( RelativeZoneNum ).Name );
 						ShowContinueError( "The zone dual heating setpoint is set to the Minimum dry-bulb temperature setpoint" );
 						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					}
-					ShowRecurringWarningErrorAtEnd( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is still" " below the Minimum dry-bulb temperature setpoint ...", ComfortControlledZone( RelativeZoneNum ).TdbDualMinErrIndex, SetPointLo, SetPointLo );
+					ShowRecurringWarningErrorAtEnd( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is still below the Minimum dry-bulb temperature setpoint ...", ComfortControlledZone( RelativeZoneNum ).TdbDualMinErrIndex, SetPointLo, SetPointLo );
 				}
 				if ( SetPointHi > ComfortControlledZone( RelativeZoneNum ).TdbMaxSetPoint ) {
 					SetPointHi = ComfortControlledZone( RelativeZoneNum ).TdbMaxSetPoint;
 					//          ComfortControlledZone(RelativeZoneNum)%TdbDualMaxErrCount = ComfortControlledZone(RelativeZoneNum)%TdbDualMaxErrCount + 1
 					if ( ComfortControlledZone( RelativeZoneNum ).TdbDualMaxErrIndex == 0 ) {
-						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is above  " "the Maximum dry-bulb temperature setpoint " + ComfortControlledZone( RelativeZoneNum ).Name );
+						ShowWarningMessage( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is above the Maximum dry-bulb temperature setpoint " + ComfortControlledZone( RelativeZoneNum ).Name );
 						ShowContinueError( "The zone dual cooling setpoint is set to the Maximum dry-bulb temperature setpoint" );
 						ShowContinueErrorTimeStamp( "Occurrence info:" );
 					}
-					ShowRecurringWarningErrorAtEnd( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is still" " above the Maximum dry-bulb temperature setpoint ...", ComfortControlledZone( RelativeZoneNum ).TdbDualMaxErrIndex, SetPointLo, SetPointLo );
+					ShowRecurringWarningErrorAtEnd( "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint temperature is still above the Maximum dry-bulb temperature setpoint ...", ComfortControlledZone( RelativeZoneNum ).TdbDualMaxErrIndex, SetPointLo, SetPointLo );
 				}
 
 				ZoneThermostatSetPointLo( ActualZoneNum ) = SetPointLo;
@@ -5712,7 +5668,7 @@ namespace ZoneTempPredictorCorrector {
 	Real64
 	PMVResidual(
 		Real64 const Tset,
-		Optional< FArray1S< Real64 > const > Par // par(1) = PMV set point
+		FArray1< Real64 > const & Par // par(1) = PMV set point
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -5754,9 +5710,9 @@ namespace ZoneTempPredictorCorrector {
 		int PeopleNum; // index of people object
 		Real64 PMVresult; // resulting PMV values
 
-		PeopleNum = int( Par()( 2 ) );
+		PeopleNum = int( Par( 2 ) );
 		CalcThermalComfortFanger( PeopleNum, Tset, PMVresult );
-		PMVResidual = Par()( 1 ) - PMVresult;
+		PMVResidual = Par( 1 ) - PMVresult;
 		return PMVResidual;
 
 	}
@@ -5832,14 +5788,14 @@ namespace ZoneTempPredictorCorrector {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

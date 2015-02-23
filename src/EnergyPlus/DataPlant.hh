@@ -37,26 +37,28 @@ namespace DataPlant {
 	// Used in TYPE(OperationData)%OpSchemeType
 	// As in PlantLoop(:)%OpScheme(:)%OpSchemeType
 	// Also in PlantLoop()LoopSide()Branch()Comp()%CurOpSchemeType
-	extern int const UnknownStatusOpSchemeType;
-	extern int const NoControlOpSchemeType; // Scheme Type placeholder for items such as pipes
-	extern int const LoadRBOpSchemeType; // Scheme Type for Load Range Based Operation (Deprecated)
-	extern int const HeatingRBOpSchemeType; // Scheme Type for Heating Load Range Based Operation
-	extern int const CoolingRBOpSchemeType; // Scheme Type for Cooling  Load Range Based Operation
-	extern int const WetBulbRBOpSchemeType; // Scheme Type for Wet bulb range based Operation
-	extern int const DryBulbRBOpSchemeType; // Scheme Type for Dry bulb range based Operation
-	extern int const DewPointRBOpSchemeType; // Scheme Type for Dewpoint range based Operation
-	extern int const RelHumRBOpSchemeType; // Scheme Type for relative humidity range based Operation
-	extern int const DryBulbTDBOpSchemeType; // Scheme Type for relative humidity range based Operation
-	extern int const WetBulbTDBOpSchemeType; // Scheme Type for Wet bulb range based Operation
-	extern int const DewPointTDBOpSchemeType; // Scheme Type for Wet bulb range based Operation
-	extern int const CompSetPtBasedSchemeType; // *Sankar Temp Based Control
-	extern int const UncontrolledOpSchemeType; // Scheme Type for Uncontrolled Operation
-	extern int const EMSOpSchemeType; // Scheme Type for EMS based operation user Define scheme
-	extern int const PumpOpSchemeType; // Not really an OpScheme, just a placeholder
-	extern int const DemandOpSchemeType; // Plcaeholder for demand side equipment such as coils
-	extern int const FreeRejectionOpSchemeType; // Scheme Type for waterside economizers and the like
-	extern int const WSEconOpSchemeType; // Scheme Type for waterside economizers and the like
 	// this may be changed later...
+	enum OpSchemeType { // Changed to enum: Better semantic fit and allows use in switch statements: Suggest this migration throughout EnergyPlus (and probably C++11 enum "class")
+		UnknownStatusOpSchemeType = -2,
+		NoControlOpSchemeType = -1, // Scheme Type placeholder for items such as pipes
+		LoadRBOpSchemeType = 0, // Scheme Type for Load Range Based Operation (Deprecated)
+		HeatingRBOpSchemeType = 1, // Scheme Type for Heating Load Range Based Operation
+		CoolingRBOpSchemeType = 2, // Scheme Type for Cooling  Load Range Based Operation
+		WetBulbRBOpSchemeType = 3, // Scheme Type for Wet bulb range based Operation
+		DryBulbRBOpSchemeType = 4, // Scheme Type for Dry bulb range based Operation
+		DewPointRBOpSchemeType = 5, // Scheme Type for Dewpoint range based Operation
+		RelHumRBOpSchemeType = 6, // Scheme Type for relative humidity range based Operation
+		DryBulbTDBOpSchemeType = 7, // Scheme Type for relative humidity range based Operation
+		WetBulbTDBOpSchemeType = 8, // Scheme Type for Wet bulb range based Operation
+		DewPointTDBOpSchemeType = 9, // Scheme Type for Wet bulb range based Operation
+		CompSetPtBasedSchemeType = 10, // *Sankar Temp Based Control
+		UncontrolledOpSchemeType = 11, // Scheme Type for Uncontrolled Operation
+		EMSOpSchemeType = 12, // Scheme Type for EMS based operation user Define scheme
+		PumpOpSchemeType = 13, // Not really an OpScheme, just a placeholder
+		DemandOpSchemeType = 14, // Plcaeholder for demand side equipment such as coils
+		FreeRejectionOpSchemeType = 15, // Scheme Type for waterside economizers and the like
+		WSEconOpSchemeType = 16 // Scheme Type for waterside economizers and the like
+	};
 
 	// These are useful for SELECT CASE statements rather than listing all of the individual types listed above
 	extern int const LoadRangeBasedMin;
@@ -262,6 +264,7 @@ namespace DataPlant {
 	extern int const TypeOf_UnitarySystemRecovery;
 	extern int const TypeOf_PackagedTESCoolingCoil;
 	extern int const TypeOf_CoolingTower_VarSpdMerkel;
+	extern int const TypeOf_SwimmingPool_Indoor;
 
 	// Parameters for General Equipment Types
 	extern int const NumGeneralEquipTypes;
@@ -316,7 +319,7 @@ namespace DataPlant {
 	extern Real64 const square_sum_ConvergenceHistoryARR;
 	extern Real64 const sum_square_ConvergenceHistoryARR;
 
-	// The same as TYPE DefinePriAirSysAvailMgrs in DataAirLoop.f90.  A common definition would be nicer.
+	// The same as TYPE DefinePriAirSysAvailMgrs in DataAirLoop.cc.  A common definition would be nicer.
 
 	// The next three types (all starting with RepReport) are the "shadow"
 	// derived types for the ventilation reports.  It keeps the node and
@@ -363,7 +366,7 @@ namespace DataPlant {
 
 	// these variables are arrays, allocated for the number of those particular loopsides, containing data for the vent reports
 	// they are operated on like normal in almost all cases currently, except in the routine which actually mines data and sets them up
-	// in that routine in SystemReports.f90, a POINTER is used to iterate over the different array variables below
+	// in that routine in SystemReports.cc, a POINTER is used to iterate over the different array variables below
 	// this is why the TARGET attribute is applied to them here
 	// further info can be found in SystemReports
 
@@ -2354,14 +2357,14 @@ namespace DataPlant {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

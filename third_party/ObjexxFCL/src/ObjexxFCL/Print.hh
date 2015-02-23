@@ -27,7 +27,6 @@
 #include <sstream>
 #include <string>
 #include <type_traits>
-//#include <utility>
 
 namespace ObjexxFCL {
 
@@ -40,29 +39,44 @@ public: // Creation
 	inline
 	explicit
 	Print( std::string const & fmt = "*" ) :
-		pos_( 0 ),
-		format_( FormatFactory::create( fmt ) ),
-		reverts_( 0 )
+	 pos_( 0 ),
+	 format_( FormatFactory::create( fmt ) ),
+	 own_( true ),
+	 reverts_( 0 )
 	{}
 
 	// Format Wrapper Constructor
 	inline
 	explicit
 	Print( gio::Fmt const & fmt ) :
-		pos_( 0 ),
-		format_( fmt.format_clone() ),
-		reverts_( 0 )
+	 pos_( 0 ),
+	 format_( fmt.format_clone() ),
+	 own_( true ),
+	 reverts_( 0 )
+	{}
+
+	// Format Wrapper Constructor
+	inline
+	explicit
+	Print( gio::Fmt & fmt ) :
+	 pos_( 0 ),
+	 format_( fmt.format_reset() ),
+	 own_( false ),
+	 reverts_( 0 )
 	{}
 
 	// Move Constructor
 	inline
 	Print( Print && p ) :
-		//stream_( std::move( p.stream_ ) ),
-		stream_( p.stream_.str() ), // Initialize with contents until compilers have stream move constructors
-		pos_( p.pos_ ),
-		format_( p.format_ ),
-		reverts_( p.reverts_ )
-	{}
+	 stream_( p.stream_.str() ), // Initialize with contents until compilers have stream move constructors: stream_( std::move( p.stream_ ) ),
+	 pos_( p.pos_ ),
+	 format_( p.format_ ),
+	 own_( p.own_ ),
+	 reverts_( p.reverts_ )
+	{
+		p.format_ = nullptr;
+		p.own_ = false;
+	}
 
 	// Destructor
 	inline
@@ -80,7 +94,7 @@ public: // Creation
 					stream_ << '\n'; // Add newline
 				}
 			}
-			delete format_;
+			if ( own_ ) delete format_;
 		}
 		std::cout << stream_.str(); // Transfer to cout
 		status_check();
@@ -452,6 +466,7 @@ private: // Data
 	std::ostringstream stream_; // Internal stream
 	std::streampos pos_; // Virtual stream position
 	Format * format_; // Format expression
+	bool own_; // Own the Format?
 	Format::Size reverts_; // Reversion count before last next() call
 
 }; // Print

@@ -588,7 +588,7 @@ namespace Boilers {
 					if ( ! AnyEnergyManagementSystemInModel ) {
 						if ( ! Boiler( BoilerNum ).ModulatedFlowErrDone ) {
 							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + Boiler( BoilerNum ).Name );
-							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a boiler " "in variable flow mode, use a SetpointManager" );
+							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a boiler in variable flow mode, use a SetpointManager" );
 							ShowContinueError( "  The overall loop setpoint will be assumed for Boiler. The simulation continues ... " );
 							Boiler( BoilerNum ).ModulatedFlowErrDone = true;
 						}
@@ -599,7 +599,7 @@ namespace Boilers {
 						if ( FatalError ) {
 							if ( ! Boiler( BoilerNum ).ModulatedFlowErrDone ) {
 								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + Boiler( BoilerNum ).Name );
-								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a boiler " "in variable flow mode" );
+								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a boiler in variable flow mode" );
 								ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the boiler outlet node " );
 								ShowContinueError( "  or use an EMS actuator to establish a setpoint at the boiler outlet node " );
 								ShowContinueError( "  The overall loop setpoint will be assumed for Boiler. The simulation continues ... " );
@@ -1157,7 +1157,7 @@ namespace Boilers {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

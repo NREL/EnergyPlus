@@ -43,6 +43,7 @@ namespace ExteriorEnergyUse {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::TimeStepZone;
+	using DataGlobals::TimeStepZoneSec;
 
 	// Use statements for access to subroutines in other modules
 
@@ -574,7 +575,7 @@ namespace ExteriorEnergyUse {
 
 			if ( SELECT_CASE_var == ScheduleOnly ) {
 				ExteriorLights( Item ).Power = ExteriorLights( Item ).DesignLevel * GetCurrentScheduleValue( ExteriorLights( Item ).SchedPtr );
-				ExteriorLights( Item ).CurrentUse = ExteriorLights( Item ).Power * TimeStepZone * SecInHour;
+				ExteriorLights( Item ).CurrentUse = ExteriorLights( Item ).Power * TimeStepZoneSec;
 
 			} else if ( SELECT_CASE_var == AstroClockOverride ) {
 
@@ -583,7 +584,7 @@ namespace ExteriorEnergyUse {
 					ExteriorLights( Item ).CurrentUse = 0.0;
 				} else {
 					ExteriorLights( Item ).Power = ExteriorLights( Item ).DesignLevel * GetCurrentScheduleValue( ExteriorLights( Item ).SchedPtr );
-					ExteriorLights( Item ).CurrentUse = ExteriorLights( Item ).Power * TimeStepZone * SecInHour;
+					ExteriorLights( Item ).CurrentUse = ExteriorLights( Item ).Power * TimeStepZoneSec;
 				}
 
 			} else {
@@ -594,12 +595,12 @@ namespace ExteriorEnergyUse {
 			// Reduce lighting power due to demand limiting
 			if ( ExteriorLights( Item ).ManageDemand && ( ExteriorLights( Item ).Power > ExteriorLights( Item ).DemandLimit ) ) {
 				ExteriorLights( Item ).Power = ExteriorLights( Item ).DemandLimit;
-				ExteriorLights( Item ).CurrentUse = ExteriorLights( Item ).Power * TimeStepZone * SecInHour;
+				ExteriorLights( Item ).CurrentUse = ExteriorLights( Item ).Power * TimeStepZoneSec;
 			}
 			// EMS controls
 			if ( ExteriorLights( Item ).PowerActuatorOn ) ExteriorLights( Item ).Power = ExteriorLights( Item ).PowerActuatorValue;
 
-			ExteriorLights( Item ).CurrentUse = ExteriorLights( Item ).Power * TimeStepZone * SecInHour;
+			ExteriorLights( Item ).CurrentUse = ExteriorLights( Item ).Power * TimeStepZoneSec;
 
 			//gather for tabular reports
 			if ( ! WarmupFlag ) {
@@ -617,21 +618,22 @@ namespace ExteriorEnergyUse {
 		}
 
 		for ( Item = 1; Item <= NumExteriorEqs; ++Item ) {
-			ExteriorEquipment( Item ).CurrentUse = ExteriorEquipment( Item ).DesignLevel * GetCurrentScheduleValue( ExteriorEquipment( Item ).SchedPtr ) * TimeStepZone * SecInHour;
+			ExteriorEquipment( Item ).Power = ExteriorEquipment( Item ).DesignLevel * GetCurrentScheduleValue( ExteriorEquipment( Item ).SchedPtr );
+			ExteriorEquipment( Item ).CurrentUse = ExteriorEquipment( Item ).Power * TimeStepZoneSec;
 		}
 
 	}
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

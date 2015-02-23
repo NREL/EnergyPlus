@@ -67,7 +67,7 @@ namespace ElectricBaseboardRadiator {
 		Real64 RadEnergy;
 		FArray1D< Real64 > FracDistribToSurf;
 		int HeatingCapMethod; // - Method for electric baseboard heating capacity scalable sizing calculation
-		Real64 ScaledHeatingCapacity; // - electric baseboard scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2} 
+		Real64 ScaledHeatingCapacity; // - electric baseboard scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2}
 
 		// Default Constructor
 		ElecBaseboardParams() :
@@ -126,7 +126,7 @@ namespace ElectricBaseboardRadiator {
 			Real64 const ConvEnergy,
 			Real64 const RadEnergy,
 			FArray1< Real64 > const & FracDistribToSurf,
-			int const HeatingCapMethod,    
+			int const HeatingCapMethod,
 			Real64 const ScaledHeatingCapacity
 		) :
 			EquipName( EquipName ),
@@ -238,7 +238,7 @@ namespace ElectricBaseboardRadiator {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

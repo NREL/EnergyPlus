@@ -109,19 +109,19 @@ TRANSFER( FArray< T > const & a, FArray< U > const &, I const size )
 namespace bit { // Protect from collisions with C++11 <functional> functors
 
 // Bit Size
-template< typename T >
+template< typename T, class = typename std::enable_if< std::is_unsigned< T >::value >::type >
 inline
 int
-bit_size( T, typename std::enable_if< std::is_unsigned< T >::value >::type * = 0 )
+bit_size( T )
 {
 	return std::numeric_limits< T >::digits;
 }
 
 // Bit Size
-template< typename T >
+template< typename T, class = typename std::enable_if< std::is_signed< T >::value >::type, typename = void >
 inline
 int
-bit_size( T, typename std::enable_if< std::is_signed< T >::value >::type * = 0 )
+bit_size( T )
 {
 	return std::numeric_limits< T >::digits + 1;
 }
@@ -193,20 +193,20 @@ bit_xor( T const & x, T const & y )
 }
 
 // Bit Shifted
-template< typename T, typename S >
+template< typename T, typename S, class = typename std::enable_if< std::is_unsigned< T >::value >::type >
 inline
 T
-bit_shift( T const & x, S const & shift, typename std::enable_if< std::is_unsigned< T >::value >::type * = 0 )
+bit_shift( T const & x, S const & shift )
 {
 	auto const x_bits( std::numeric_limits< T >::digits );
 	return ( shift >= S( 0 ) ? ( shift < x_bits ? x << shift : T( 0 ) ) : ( -shift < x_bits ? x >> -shift : T( 0 ) ) );
 }
 
 // Bit Shifted
-template< typename T, typename S >
+template< typename T, typename S, class = typename std::enable_if< std::is_signed< T >::value >::type, typename = void >
 inline
 T
-bit_shift( T const & x, S const & shift, typename std::enable_if< std::is_signed< T >::value >::type * = 0 ) // x<0 behavior varies in Fortran ISHFT: We do a logical shift like Intel Fortran and GFortran
+bit_shift( T const & x, S const & shift ) // x<0 behavior varies in Fortran ISHFT: We do a logical shift like Intel Fortran and GFortran
 {
 	auto const x_bits( std::numeric_limits< T >::digits + 1 );
 	auto const & u( *reinterpret_cast< typename std::make_unsigned< T const >::type * >( &x ) );
@@ -214,10 +214,10 @@ bit_shift( T const & x, S const & shift, typename std::enable_if< std::is_signed
 }
 
 // Bit Left Shifted
-template< typename T, typename S >
+template< typename T, typename S, class = typename std::enable_if< std::is_unsigned< T >::value >::type >
 inline
 T
-bit_lshift( T const & x, S const & shift, typename std::enable_if< std::is_unsigned< T >::value >::type * = 0 )
+bit_lshift( T const & x, S const & shift )
 {
 	assert( shift >= S( 0 ) );
 	auto const x_bits( std::numeric_limits< T >::digits );
@@ -225,10 +225,10 @@ bit_lshift( T const & x, S const & shift, typename std::enable_if< std::is_unsig
 }
 
 // Bit Left Shifted
-template< typename T, typename S >
+template< typename T, typename S, class = typename std::enable_if< std::is_signed< T >::value >::type, typename = void >
 inline
 T
-bit_lshift( T const & x, S const & shift, typename std::enable_if< std::is_signed< T >::value >::type * = 0 ) // x<0 behavior varies in Fortran LSHFT/LSHIFT: We do a logical shift like Intel Fortran and GFortran
+bit_lshift( T const & x, S const & shift ) // x<0 behavior varies in Fortran LSHFT/LSHIFT: We do a logical shift like Intel Fortran and GFortran
 {
 	assert( shift >= S( 0 ) );
 	auto const x_bits( std::numeric_limits< T >::digits + 1 );
@@ -236,10 +236,10 @@ bit_lshift( T const & x, S const & shift, typename std::enable_if< std::is_signe
 }
 
 // Bit Right Shifted
-template< typename T, typename S >
+template< typename T, typename S, class = typename std::enable_if< std::is_unsigned< T >::value >::type >
 inline
 T
-bit_rshift( T const & x, S const & shift, typename std::enable_if< std::is_unsigned< T >::value >::type * = 0 )
+bit_rshift( T const & x, S const & shift )
 {
 	assert( shift >= S( 0 ) );
 	auto const x_bits( std::numeric_limits< T >::digits );
@@ -247,10 +247,10 @@ bit_rshift( T const & x, S const & shift, typename std::enable_if< std::is_unsig
 }
 
 // Bit Right Shifted
-template< typename T, typename S >
+template< typename T, typename S, class = typename std::enable_if< std::is_signed< T >::value >::type, typename = void >
 inline
 T
-bit_rshift( T const & x, S const & shift, typename std::enable_if< std::is_signed< T >::value >::type * = 0 ) // x<0 behavior varies in Fortran RSHFT/RSHIFT: We do a logical shift like Intel Fortran and GFortran
+bit_rshift( T const & x, S const & shift ) // x<0 behavior varies in Fortran RSHFT/RSHIFT: We do a logical shift like Intel Fortran and GFortran
 {
 	assert( shift >= S( 0 ) );
 	auto const x_bits( std::numeric_limits< T >::digits + 1 );
@@ -258,10 +258,10 @@ bit_rshift( T const & x, S const & shift, typename std::enable_if< std::is_signe
 }
 
 // Bit Circularly Shifted
-template< typename T, typename S >
+template< typename T, typename S, class = typename std::enable_if< std::is_unsigned< T >::value >::type >
 inline
 T
-bit_cshift( T const & x, S const & shift, typename std::enable_if< std::is_unsigned< T >::value >::type * = 0 )
+bit_cshift( T const & x, S const & shift )
 {
 	auto const x_bits( std::numeric_limits< T >::digits );
 	if ( shift >= S( 0 ) ) {
@@ -274,10 +274,10 @@ bit_cshift( T const & x, S const & shift, typename std::enable_if< std::is_unsig
 }
 
 // Bit Circularly Shifted
-template< typename T, typename S >
+template< typename T, typename S, class = typename std::enable_if< std::is_signed< T >::value >::type, typename = void >
 inline
 T
-bit_cshift( T const & x, S const & shift, typename std::enable_if< std::is_signed< T >::value >::type * = 0 ) // x<0 behavior varies in Fortran ISHFTC: We do a logical shift like Intel Fortran and GFortran
+bit_cshift( T const & x, S const & shift ) // x<0 behavior varies in Fortran ISHFTC: We do a logical shift like Intel Fortran and GFortran
 {
 	auto const x_bits( std::numeric_limits< T >::digits + 1 );
 	auto const & u( *reinterpret_cast< typename std::make_unsigned< T const >::type * >( &x ) );
@@ -324,10 +324,10 @@ bit_arshift( T const & x, S const & shift )
 }
 
 // Bits Extracted
-template< typename T, typename P, typename L >
+template< typename T, typename P, typename L, class = typename std::enable_if< std::is_unsigned< T >::value >::type >
 inline
 T
-bit_bits( T const & x, P const & pos, L const & len, typename std::enable_if< std::is_unsigned< T >::value >::type * = 0 )
+bit_bits( T const & x, P const & pos, L const & len )
 {
 	assert( pos >= T( 0 ) );
 	assert( int( pos + len ) <= bit_size( x ) );
@@ -336,10 +336,10 @@ bit_bits( T const & x, P const & pos, L const & len, typename std::enable_if< st
 }
 
 // Bits Extracted
-template< typename T, typename P, typename L >
+template< typename T, typename P, typename L, class = typename std::enable_if< std::is_signed< T >::value >::type, typename = void >
 inline
 T
-bit_bits( T const & x, P const & pos, L const & len, typename std::enable_if< std::is_signed< T >::value >::type * = 0 )
+bit_bits( T const & x, P const & pos, L const & len )
 {
 	assert( pos >= T( 0 ) );
 	assert( int( pos + len ) <= bit_size( x ) );

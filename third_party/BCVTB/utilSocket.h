@@ -48,7 +48,7 @@ modification, are permitted provided that the following conditions are met:
    3. Neither the name of the University of California, Lawrence
       Berkeley National Laboratory, U.S. Dept. of Energy nor the names
       of its contributors may be used to endorse or promote products
-      derived from this software without specific prior written permission. 
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
 IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -83,7 +83,7 @@ derivative works thereof, in binary and source code form.
 ///         using BSD sockets.
 ///
 /// \author Michael Wetter,
-///         Simulation Research Group, 
+///         Simulation Research Group,
 ///         LBNL,
 ///         MWetter@lbl.gov
 ///
@@ -94,7 +94,7 @@ derivative works thereof, in binary and source code form.
 /// This file provides methods that allow clients to
 /// establish a socket connection. Clients typically call
 /// the method \c establishclientsocket()
-/// once, and then call the method 
+/// once, and then call the method
 /// \c exchangedoubleswithsocket() in each time step.
 /// At the end of the simulation, a client should call
 /// \c closeipc() to close the socket connection.
@@ -120,7 +120,7 @@ derivative works thereof, in binary and source code form.
 #include <arpa/inet.h>
 #include <sys/socket.h>
 //#include <netinet/in.h>
-#include <netdb.h> 
+#include <netdb.h>
 #endif
 
 #include <stdio.h>
@@ -133,14 +133,14 @@ derivative works thereof, in binary and source code form.
 
 #include "defines.h"
 
-FILE *f1 = NULL; 
+extern FILE *f1;
 #define HEADER_LENGTH 54 // =10 + 4*(10+1);
-int REQUIRED_READ_LENGTH  = 0;
-int REQUIRED_WRITE_LENGTH = 0;
+extern int REQUIRED_READ_LENGTH;
+extern int REQUIRED_WRITE_LENGTH;
 
 /// This will be overwritten to contain the
 /// version number of the server
-int SERVER_VERSION = 0; 
+extern int SERVER_VERSION;
 
 ////////////////////////////////////////////////////////////////
 /// Appends a character array to another character array.
@@ -180,7 +180,7 @@ int assembleBuffer(int flag,
 /// Gets an integer and does the required error checking.
 ///
 ///\param nptr Pointer to character buffer that contains the number.
-///\param endptr After return, this variable contains a pointer to the 
+///\param endptr After return, this variable contains a pointer to the
 ///            character after the last character of the number.
 ///\param base Base for the integer.
 ///\param The value contained in the character buffer.
@@ -192,11 +192,11 @@ int getIntCheckError(const char *nptr, char **endptr, const int base,
 /// Gets a double and does the required error checking.
 ///
 ///\param nptr Pointer to character buffer that contains the number.
-///\param endptr After return, this variable contains a pointer to the 
+///\param endptr After return, this variable contains a pointer to the
 ///            character after the last character of the number.
 ///\param The value contained in the character buffer.
 ///\return 0 if no error occurred.
-int getDoubleCheckError(const char *nptr, char **endptr, 
+int getDoubleCheckError(const char *nptr, char **endptr,
 			double* val);
 
 
@@ -286,7 +286,7 @@ int establishclientsocket(const char *const docname);
 ///\param boolValWri Boolean values to write.
 ///\sa int establishclientsocket(uint16_t *portNo)
 ///\return The exit value of \c send, or a negative value if an error occured.
-int writetosocket(const int *sockfd, 
+int writetosocket(const int *sockfd,
 		  const int *flaWri,
 		  const int *nDblWri, const int *nIntWri, const int *nBooWri,
 		  double *curSimTim,
@@ -303,7 +303,7 @@ int writetosocket(const int *sockfd,
 /// +1: simulation reached end time.
 /// -1: simulation terminates due to an (unspecified) error.
 /// -10: simulation terminates due to error during initialization.
-/// -20: simulation terminates due to error during time integration. 
+/// -20: simulation terminates due to error during time integration.
 ///
 ///\param sockfd Socket file descripter
 ///\param flaWri Flag to be sent to the BCVTB
@@ -319,9 +319,7 @@ int sendclientmessage(const int *sockfd, const int *flaWri);
 ///
 ///\param sockfd Socket file descripter
 ///\param flaWri should be set to a negative value.
-int sendclienterror(const int *sockfd, const int *flaWri){
-    return sendclientmessage(sockfd, flaWri);
-}
+int sendclienterror(const int *sockfd, const int *flaWri);
 
 /////////////////////////////////////////////////////////////////
 /// Returns the required socket buffer length by reading from
@@ -355,7 +353,7 @@ int getrequiredbufferlength(const int nDbl, const int nInt, const int nBoo);
 ///\param intValRea Integer values read from socket.
 ///\param boolValRea Boolean values read from socket.
 ///\sa int establishclientsocket(uint16_t *portNo)
-int readfromsocket(const int *sockfd, int *flaRea, 
+int readfromsocket(const int *sockfd, int *flaRea,
 		   int *nDblRea, int *nIntRea, int *nBooRea,
 		   double *curSimTim,
 		   double dblValRea[], int intValRea[], int booValRea[]);
@@ -395,7 +393,7 @@ int readbufferfromsocket(const int *sockfd,
 ///\param boolValRea Boolean values read from socket.
 ///\sa int establishclientsocket(uint16_t *portNo)
 ///\return The exit value of \c send or \c read, or a negative value if an error occured.
-int exchangewithsocket(const int *sockfd, 
+int exchangewithsocket(const int *sockfd,
 		       const int *flaWri, int *flaRea,
 		       const int *nDblWri, const int *nIntWri, const int *nBooWri,
 		       int *nDblRea, int *nIntRea, int *nBooRea,
@@ -419,7 +417,7 @@ int exchangewithsocket(const int *sockfd,
 ///\param dblValRea Double values read from socket.
 ///\sa int establishclientsocket(uint16_t *portNo)
 ///\return The exit value of \c send or \c read, or a negative value if an error occured.
-int exchangedoubleswithsocket(const int *sockfd, 
+int exchangedoubleswithsocket(const int *sockfd,
 			      const int *flaWri, int *flaRea,
 			      const int *nDblWri,
 			      int *nDblRea,
@@ -446,7 +444,7 @@ int exchangedoubleswithsocket(const int *sockfd,
 ///\param flaexport Flag for FMUExport.
 ///\sa int establishclientsocket(uint16_t *portNo)
 ///\return The exit value of \c send or \c read, or a negative value if an error occured.
-int exchangedoubleswithsocketFMU(const int *sockfd, 
+int exchangedoubleswithsocketFMU(const int *sockfd,
 			      const int *flaWri, int *flaRea,
 			      const int *nDblWri,
 			      int *nDblRea,
@@ -465,4 +463,3 @@ int exchangedoubleswithsocketFMU(const int *sockfd,
 int closeipc(int* sockfd);
 
 #endif /* _UTILSOCKET_H_ */
-

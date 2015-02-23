@@ -30,9 +30,6 @@ class FArray5D : public FArray5< T >, public ObserverMulti
 private: // Types
 
 	typedef  FArray5< T >  Super;
-	typedef  typename Super::real_FArray  real_FArray;
-	typedef  typename Super::proxy_FArray  proxy_FArray;
-	typedef  typename Super::arg_FArray  arg_FArray;
 	typedef  internal::InitializerSentinel  InitializerSentinel;
 
 private: // Friend
@@ -70,6 +67,7 @@ public: // Types
 	typedef  typename Initializer::Function  InitializerFunction;
 
 	using Super::conformable;
+	using Super::initialize;
 	using Super::isize1;
 	using Super::isize2;
 	using Super::isize3;
@@ -77,7 +75,6 @@ public: // Types
 	using Super::isize5;
 	using Super::l;
 	using Super::operator ();
-	using Super::reassign;
 	using Super::resize;
 	using Super::shift_set;
 	using Super::size1;
@@ -86,7 +83,7 @@ public: // Types
 	using Super::size4;
 	using Super::size5;
 	using Super::size_of;
-	using Super::swap5DB;
+	using Super::swap5;
 	using Super::u;
 	using Super::data_;
 	using Super::data_size_;
@@ -110,58 +107,58 @@ public: // Creation
 	// Copy Constructor
 	inline
 	FArray5D( FArray5D const & a ) :
-		Super( a ),
-		ObserverMulti(),
-		I1_( a.I1_ ),
-		I2_( a.I2_ ),
-		I3_( a.I3_ ),
-		I4_( a.I4_ ),
-		I5_( a.I5_ )
+	 Super( a ),
+	 ObserverMulti(),
+	 I1_( a.I1_ ),
+	 I2_( a.I2_ ),
+	 I3_( a.I3_ ),
+	 I4_( a.I4_ ),
+	 I5_( a.I5_ )
 	{
 		insert_as_observer();
 	}
 
 	// Copy Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	explicit
 	FArray5D( FArray5D< U > const & a ) :
-		Super( a ),
-		I1_( a.I1_ ),
-		I2_( a.I2_ ),
-		I3_( a.I3_ ),
-		I4_( a.I4_ ),
-		I5_( a.I5_ )
+	 Super( a ),
+	 I1_( a.I1_ ),
+	 I2_( a.I2_ ),
+	 I3_( a.I3_ ),
+	 I4_( a.I4_ ),
+	 I5_( a.I5_ )
 	{
 		insert_as_observer();
 	}
 
 	// Super Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	explicit
 	FArray5D( FArray5< U > const & a ) :
-		Super( a ),
-		I1_( a.I1() ),
-		I2_( a.I2() ),
-		I3_( a.I3() ),
-		I4_( a.I4() ),
-		I5_( a.I5() )
+	 Super( a ),
+	 I1_( a.I1() ),
+	 I2_( a.I2() ),
+	 I3_( a.I3() ),
+	 I4_( a.I4() ),
+	 I5_( a.I5() )
 	{
 		insert_as_observer();
 	}
 
 	// Slice Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	explicit
 	FArray5D( FArray5S< U > const & a ) :
-		Super( a ),
-		I1_( 1, a.u1() ),
-		I2_( 1, a.u2() ),
-		I3_( 1, a.u3() ),
-		I4_( 1, a.u4() ),
-		I5_( 1, a.u5() )
+	 Super( a ),
+	 I1_( 1, a.u1() ),
+	 I2_( 1, a.u2() ),
+	 I3_( 1, a.u3() ),
+	 I4_( 1, a.u4() ),
+	 I5_( 1, a.u5() )
 	{
 		setup_real();
 		if ( dimensions_initialized() ) {
@@ -171,7 +168,7 @@ public: // Creation
 					for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 						for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 							for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-								reassign( l, a( i1, i2, i3, i4, i5 ) );
+								initialize( l, a( i1, i2, i3, i4, i5 ) );
 							}
 						}
 					}
@@ -186,12 +183,12 @@ public: // Creation
 	inline
 	explicit
 	FArray5D( MArray5< A, M > const & a ) :
-		Super( a ),
-		I1_( 1, a.u1() ),
-		I2_( 1, a.u2() ),
-		I3_( 1, a.u3() ),
-		I4_( 1, a.u4() ),
-		I5_( 1, a.u5() )
+	 Super( a ),
+	 I1_( 1, a.u1() ),
+	 I2_( 1, a.u2() ),
+	 I3_( 1, a.u3() ),
+	 I4_( 1, a.u4() ),
+	 I5_( 1, a.u5() )
 	{
 		setup_real();
 		if ( dimensions_initialized() ) {
@@ -202,7 +199,7 @@ public: // Creation
 						for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 							for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 								for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-									reassign( l, a( i1, i2, i3, i4, i5 ) );
+									initialize( l, a( i1, i2, i3, i4, i5 ) );
 								}
 							}
 						}
@@ -217,7 +214,7 @@ public: // Creation
 	inline
 	explicit
 	FArray5D( Sticky< T > const & t ) :
-		initializer_( t )
+	 initializer_( t )
 	{
 		insert_as_observer();
 	}
@@ -225,12 +222,12 @@ public: // Creation
 	// IndexRange Constructor
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5 ) :
-		Super( size_of( I1, I2, I3, I4, I5 ) ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 )
+	 Super( size_of( I1, I2, I3, I4, I5 ) ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 )
 	{
 		setup_real();
 		insert_as_observer();
@@ -239,13 +236,13 @@ public: // Creation
 	// IndexRange + Initializer Value Constructor
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, T const & t ) :
-		Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		initializer_( t )
+	 Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 initializer_( t )
 	{
 		setup_real();
 		initialize();
@@ -255,13 +252,13 @@ public: // Creation
 	// IndexRange + Sticky Initializer Value Constructor
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< T > const & t ) :
-		Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		initializer_( t )
+	 Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 initializer_( t )
 	{
 		setup_real();
 		initialize();
@@ -271,13 +268,13 @@ public: // Creation
 	// IndexRange + Sticky Initializer Value + Initializer Value Constructor
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< T > const & t, T const & u ) :
-		Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		initializer_( t )
+	 Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 initializer_( t )
 	{
 		setup_real();
 		initialize();
@@ -288,13 +285,13 @@ public: // Creation
 	// IndexRange + Initializer Function Constructor
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, InitializerFunction const & fxn ) :
-		Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		initializer_( fxn )
+	 Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 initializer_( fxn )
 	{
 		setup_real();
 		initialize();
@@ -302,32 +299,32 @@ public: // Creation
 	}
 
 	// IndexRange + Initializer List Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, std::initializer_list< U > const l ) :
-		Super( l ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 )
+	 Super( l ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 )
 	{
-		assert( size_ == l.size() );
+		assert( size_of( I1, I2, I3, I4, I5 ) == l.size() );
 		setup_real();
 		insert_as_observer();
 	}
 
 	// IndexRange + Sticky Initializer + Initializer List Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< T > const & t, std::initializer_list< U > const l ) :
-		Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		initializer_( t )
+	 Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 initializer_( t )
 	{
 		assert( size_ == l.size() );
 		setup_real();
@@ -337,22 +334,22 @@ public: // Creation
 	}
 
 	// IndexRange + Super Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, FArray5< U > const & a ) :
-		Super( size_of( I1, I2, I3, I4, I5 ) ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 )
+	 Super( size_of( I1, I2, I3, I4, I5 ) ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 )
 	{
 		setup_real();
 		if ( dimensions_initialized() ) {
 			if ( a.dimensions_initialized() ) {
 				assert( conformable( a ) );
 				for ( size_type i = 0, e = size_; i < e; ++i ) {
-					reassign( i, a[ i ] );
+					initialize( i, a[ i ] );
 				}
 			}
 		}
@@ -360,16 +357,16 @@ public: // Creation
 	}
 
 	// IndexRange + Sticky Initializer + Super Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< T > const & t, FArray5< U > const & a ) :
-		Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		initializer_( t )
+	 Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 initializer_( t )
 	{
 		setup_real();
 		initialize();
@@ -385,15 +382,15 @@ public: // Creation
 	}
 
 	// IndexRange + Slice Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, FArray5S< U > const & a ) :
-		Super( size_of( I1, I2, I3, I4, I5 ) ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 )
+	 Super( size_of( I1, I2, I3, I4, I5 ) ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 )
 	{
 		setup_real();
 		if ( dimensions_initialized() ) {
@@ -404,7 +401,7 @@ public: // Creation
 					for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 						for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 							for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-								reassign( l, a( i1, i2, i3, i4, i5 ) );
+								initialize( l, a( i1, i2, i3, i4, i5 ) );
 							}
 						}
 					}
@@ -418,12 +415,12 @@ public: // Creation
 	template< class A, typename M >
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, MArray5< A, M > const & a ) :
-		Super( size_of( I1, I2, I3, I4, I5 ) ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 )
+	 Super( size_of( I1, I2, I3, I4, I5 ) ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 )
 	{
 		setup_real();
 		if ( dimensions_initialized() ) {
@@ -435,7 +432,7 @@ public: // Creation
 						for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 							for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 								for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-									reassign( l, a( i1, i2, i3, i4, i5 ) );
+									initialize( l, a( i1, i2, i3, i4, i5 ) );
 								}
 							}
 						}
@@ -447,22 +444,22 @@ public: // Creation
 	}
 
 	// Super + IndexRange Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	FArray5D( FArray5< U > const & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5 ) :
-		Super( size_of( I1, I2, I3, I4, I5 ) ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 )
+	 Super( size_of( I1, I2, I3, I4, I5 ) ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 )
 	{
 		setup_real();
 		if ( dimensions_initialized() ) {
 			if ( a.dimensions_initialized() ) {
 				assert( conformable( a ) );
 				for ( size_type i = 0, e = size_; i < e; ++i ) {
-					reassign( i, a[ i ] );
+					initialize( i, a[ i ] );
 				}
 			}
 		}
@@ -470,22 +467,22 @@ public: // Creation
 	}
 
 	// IndexRange + Base Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, FArray< U > const & a ) :
-		Super( size_of( I1, I2, I3, I4, I5 ) ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 )
+	 Super( size_of( I1, I2, I3, I4, I5 ) ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 )
 	{
 		setup_real();
 		if ( dimensions_initialized() ) {
 			if ( a.dimensions_initialized() ) {
 				assert( size_ == a.size() );
 				for ( size_type i = 0, e = size_; i < e; ++i ) {
-					reassign( i, a[ i ] );
+					initialize( i, a[ i ] );
 				}
 			}
 		}
@@ -493,22 +490,22 @@ public: // Creation
 	}
 
 	// Base + IndexRange Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	FArray5D( FArray< U > const & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5 ) :
-		Super( size_of( I1, I2, I3, I4, I5 ) ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 )
+	 Super( size_of( I1, I2, I3, I4, I5 ) ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 )
 	{
 		setup_real();
 		if ( dimensions_initialized() ) {
 			if ( a.dimensions_initialized() ) {
 				assert( size_ == a.size() );
 				for ( size_type i = 0, e = size_; i < e; ++i ) {
-					reassign( i, a[ i ] );
+					initialize( i, a[ i ] );
 				}
 			}
 		}
@@ -631,7 +628,7 @@ public: // Creation
 	~FArray5D()
 	{}
 
-public: // Assignment
+public: // Assignment: Array
 
 	// Copy Assignment
 	inline
@@ -658,7 +655,7 @@ public: // Assignment
 	}
 
 	// Super Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator =( FArray5< U > const & a )
@@ -669,7 +666,7 @@ public: // Assignment
 	}
 
 	// Slice Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator =( FArray5S< U > const & a )
@@ -689,7 +686,7 @@ public: // Assignment
 	}
 
 	// Initializer List Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator =( std::initializer_list< U > const l )
@@ -699,7 +696,7 @@ public: // Assignment
 	}
 
 	// += Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator +=( FArray5< U > const & a )
@@ -709,7 +706,7 @@ public: // Assignment
 	}
 
 	// -= Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator -=( FArray5< U > const & a )
@@ -719,7 +716,7 @@ public: // Assignment
 	}
 
 	// *= Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator *=( FArray5< U > const & a )
@@ -729,7 +726,7 @@ public: // Assignment
 	}
 
 	// /= Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator /=( FArray5< U > const & a )
@@ -739,7 +736,7 @@ public: // Assignment
 	}
 
 	// += Slice Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator +=( FArray5S< U > const & a )
@@ -749,7 +746,7 @@ public: // Assignment
 	}
 
 	// -= Slice Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator -=( FArray5S< U > const & a )
@@ -759,7 +756,7 @@ public: // Assignment
 	}
 
 	// *= Slice Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator *=( FArray5S< U > const & a )
@@ -769,7 +766,7 @@ public: // Assignment
 	}
 
 	// /= Slice Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator /=( FArray5S< U > const & a )
@@ -818,12 +815,76 @@ public: // Assignment
 		return *this;
 	}
 
+public: // Assignment: Array: Logical
+
+	// &&= Array Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray5D &
+	and_equals( FArray5< U > const & a )
+	{
+		Super::and_equals( a );
+		return *this;
+	}
+
+	// ||= Array Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray5D &
+	or_equals( FArray5< U > const & a )
+	{
+		Super::or_equals( a );
+		return *this;
+	}
+
+	// &&= Slice Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray5D &
+	and_equals( FArray5S< U > const & a )
+	{
+		Super::and_equals( a );
+		return *this;
+	}
+
+	// ||= Slice Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray5D &
+	or_equals( FArray5S< U > const & a )
+	{
+		Super::or_equals( a );
+		return *this;
+	}
+
+	// &&= MArray Template
+	template< class A, typename M >
+	inline
+	FArray5D &
+	and_equals( MArray5< A, M > const & a )
+	{
+		Super::and_equals( a );
+		return *this;
+	}
+
+	// ||= MArray Template
+	template< class A, typename M >
+	inline
+	FArray5D &
+	or_equals( MArray5< A, M > const & a )
+	{
+		Super::or_equals( a );
+		return *this;
+	}
+
+public: // Assignment: Value
+
 	// = Value
 	inline
 	FArray5D &
 	operator =( T const & t )
 	{
-		Super::operator =( t );
+		Base::operator =( t );
 		return *this;
 	}
 
@@ -832,7 +893,7 @@ public: // Assignment
 	FArray5D &
 	operator +=( T const & t )
 	{
-		Super::operator +=( t );
+		Base::operator +=( t );
 		return *this;
 	}
 
@@ -841,7 +902,7 @@ public: // Assignment
 	FArray5D &
 	operator -=( T const & t )
 	{
-		Super::operator -=( t );
+		Base::operator -=( t );
 		return *this;
 	}
 
@@ -850,7 +911,7 @@ public: // Assignment
 	FArray5D &
 	operator *=( T const & t )
 	{
-		Super::operator *=( t );
+		Base::operator *=( t );
 		return *this;
 	}
 
@@ -859,38 +920,18 @@ public: // Assignment
 	FArray5D &
 	operator /=( T const & t )
 	{
-		Super::operator /=( t );
+		Base::operator /=( t );
 		return *this;
 	}
 
 public: // Subscript
-
-	// Const Tail Starting at array( i1, i2, i3, i4, i5 )
-	inline
-	Tail const
-	a( int const i1, int const i2, int const i3, int const i4, int const i5 ) const
-	{
-		assert( ( I1_.contains( i1 ) ) && ( I2_.contains( i2 ) ) && ( I3_.contains( i3 ) ) && ( I4_.contains( i4 ) ) && ( I5_.contains( i5 ) ) );
-		size_type const offset( ( ( ( ( ( ( ( ( i5 * z4_ ) + i4 ) * z3_ ) + i3 ) * z2_ ) + i2 ) * z1_ ) + i1 ) - shift_ );
-		return Tail( static_cast< T const * >( data_ + offset ), data_size_ - offset );
-	}
-
-	// Tail Starting at array( i1, i2, i3, i4, i5 )
-	inline
-	Tail
-	a( int const i1, int const i2, int const i3, int const i4, int const i5 )
-	{
-		assert( ( I1_.contains( i1 ) ) && ( I2_.contains( i2 ) ) && ( I3_.contains( i3 ) ) && ( I4_.contains( i4 ) ) && ( I5_.contains( i5 ) ) );
-		size_type const offset( ( ( ( ( ( ( ( ( i5 * z4_ ) + i4 ) * z3_ ) + i3 ) * z2_ ) + i2 ) * z1_ ) + i1 ) - shift_ );
-		return Tail( data_ + offset, data_size_ - offset );
-	}
 
 	// Linear Index
 	inline
 	size_type
 	index( int const i1, int const i2, int const i3, int const i4, int const i5 ) const
 	{
-		assert( ( I1_.initialized() ) && ( I2_.initialized() ) && ( I3_.initialized() ) && ( I4_.initialized() ) && ( I5_.initialized() ) );
+		assert( dimensions_initialized() );
 		return ( ( ( ( ( ( ( ( ( i5 * z4_ ) + i4 ) * z3_ ) + i3 ) * z2_ ) + i2 ) * z1_ ) + i1 ) - shift_ );
 	}
 
@@ -910,6 +951,26 @@ public: // Subscript
 	{
 		assert( i < size_ );
 		return data_[ i ];
+	}
+
+	// Const Tail Starting at array( i1, i2, i3, i4, i5 )
+	inline
+	Tail const
+	a( int const i1, int const i2, int const i3, int const i4, int const i5 ) const
+	{
+		assert( contains( i1, i2, i3, i4, i5 ) );
+		size_type const offset( ( ( ( ( ( ( ( ( i5 * z4_ ) + i4 ) * z3_ ) + i3 ) * z2_ ) + i2 ) * z1_ ) + i1 ) - shift_ );
+		return Tail( static_cast< T const * >( data_ + offset ), data_size_ - offset );
+	}
+
+	// Tail Starting at array( i1, i2, i3, i4, i5 )
+	inline
+	Tail
+	a( int const i1, int const i2, int const i3, int const i4, int const i5 )
+	{
+		assert( contains( i1, i2, i3, i4, i5 ) );
+		size_type const offset( ( ( ( ( ( ( ( ( i5 * z4_ ) + i4 ) * z3_ ) + i3 ) * z2_ ) + i2 ) * z1_ ) + i1 ) - shift_ );
+		return Tail( data_ + offset, data_size_ - offset );
 	}
 
 public: // Predicate
@@ -1267,8 +1328,10 @@ public: // Modifier
 					for ( int i4 = b4; i4 <= e4; ++i4 ) {
 						for ( int i3 = b3; i3 <= e3; ++i3 ) {
 							for ( int i2 = b2; i2 <= e2; ++i2 ) {
-								for ( int i1 = b1; i1 <= e1; ++i1 ) {
-									o( i1, i2, i3, i4, i5 ) = operator ()( i1, i2, i3, i4, i5 );
+								size_type l( index( b1, i2, i3, i4, i5 ) );
+								size_type m( o.index( b1, i2, i3, i4, i5 ) );
+								for ( int i1 = b1; i1 <= e1; ++i1, ++l, ++m ) {
+									o[ m ] = operator []( l );
 								}
 							}
 						}
@@ -1296,8 +1359,10 @@ public: // Modifier
 					for ( int i4 = b4; i4 <= e4; ++i4 ) {
 						for ( int i3 = b3; i3 <= e3; ++i3 ) {
 							for ( int i2 = b2; i2 <= e2; ++i2 ) {
-								for ( int i1 = b1; i1 <= e1; ++i1 ) {
-									o( i1, i2, i3, i4, i5 ) = operator ()( i1, i2, i3, i4, i5 );
+								size_type l( index( b1, i2, i3, i4, i5 ) );
+								size_type m( o.index( b1, i2, i3, i4, i5 ) );
+								for ( int i1 = b1; i1 <= e1; ++i1, ++l, ++m ) {
+									o[ m ] = operator []( l );
 								}
 							}
 						}
@@ -1326,8 +1391,10 @@ public: // Modifier
 					for ( int i4 = b4; i4 <= e4; ++i4 ) {
 						for ( int i3 = b3; i3 <= e3; ++i3 ) {
 							for ( int i2 = b2; i2 <= e2; ++i2 ) {
-								for ( int i1 = b1; i1 <= e1; ++i1 ) {
-									o( i1, i2, i3, i4, i5 ) = operator ()( i1, i2, i3, i4, i5 );
+								size_type l( index( b1, i2, i3, i4, i5 ) );
+								size_type m( o.index( b1, i2, i3, i4, i5 ) );
+								for ( int i1 = b1; i1 <= e1; ++i1, ++l, ++m ) {
+									o[ m ] = operator []( l );
 								}
 							}
 						}
@@ -1356,8 +1423,10 @@ public: // Modifier
 					for ( int i4 = b4; i4 <= e4; ++i4 ) {
 						for ( int i3 = b3; i3 <= e3; ++i3 ) {
 							for ( int i2 = b2; i2 <= e2; ++i2 ) {
-								for ( int i1 = b1; i1 <= e1; ++i1 ) {
-									o( i1, i2, i3, i4, i5 ) = operator ()( i1, i2, i3, i4, i5 );
+								size_type l( index( b1, i2, i3, i4, i5 ) );
+								size_type m( o.index( b1, i2, i3, i4, i5 ) );
+								for ( int i1 = b1; i1 <= e1; ++i1, ++l, ++m ) {
+									o[ m ] = operator []( l );
 								}
 							}
 						}
@@ -1402,7 +1471,7 @@ public: // Modifier
 	{
 		if ( ( initializer_.is_active() ) && ( dimensions_initialized() ) ) {
 			if ( initializer_.is_value() ) {
-				reassign( initializer_.value() );
+				initialize( initializer_.value() );
 			} else if ( initializer_.is_function() ) {
 				initializer_.function()( *this );
 			}
@@ -1415,13 +1484,14 @@ public: // Modifier
 	FArray5D &
 	swap( FArray5D & v )
 	{
-		swap5DB( v );
+		using std::swap;
+		swap5( v );
 		I1_.swap_no_notify( v.I1_ );
 		I2_.swap_no_notify( v.I2_ );
 		I3_.swap_no_notify( v.I3_ );
 		I4_.swap_no_notify( v.I4_ );
 		I5_.swap_no_notify( v.I5_ );
-		std::swap( initializer_, v.initializer_ );
+		swap( initializer_, v.initializer_ );
 		notify(); // So proxy FArrays can reattach
 		v.notify(); // So proxy FArrays can reattach
 		return *this;
@@ -1464,7 +1534,7 @@ protected: // Functions
 
 private: // Functions
 
-	// Setup for IndexRange Constructor
+	// Set Up for IndexRange Constructor
 	inline
 	void
 	setup_real()
@@ -1765,12 +1835,13 @@ operator ==( FArray5S< T > const & a, FArray5S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) == b( i1, i2, i3, i4, i5 ) );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) == b( i1, i2, i3, i4, i5 ) );
 					}
 				}
 			}
@@ -1787,12 +1858,13 @@ operator !=( FArray5S< T > const & a, FArray5S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) != b( i1, i2, i3, i4, i5 ) );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) != b( i1, i2, i3, i4, i5 ) );
 					}
 				}
 			}
@@ -1809,12 +1881,13 @@ operator <( FArray5S< T > const & a, FArray5S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) < b( i1, i2, i3, i4, i5 ) );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) < b( i1, i2, i3, i4, i5 ) );
 					}
 				}
 			}
@@ -1831,12 +1904,13 @@ operator <=( FArray5S< T > const & a, FArray5S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) <= b( i1, i2, i3, i4, i5 ) );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) <= b( i1, i2, i3, i4, i5 ) );
 					}
 				}
 			}
@@ -1853,12 +1927,13 @@ operator >( FArray5S< T > const & a, FArray5S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) > b( i1, i2, i3, i4, i5 ) );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) > b( i1, i2, i3, i4, i5 ) );
 					}
 				}
 			}
@@ -1875,12 +1950,13 @@ operator >=( FArray5S< T > const & a, FArray5S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) >= b( i1, i2, i3, i4, i5 ) );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) >= b( i1, i2, i3, i4, i5 ) );
 					}
 				}
 			}
@@ -1897,13 +1973,13 @@ operator ==( FArray5S< T > const & a, FArray5< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
-	typename FArray5< T >::size_type l( 0 );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) == b[ l ] );
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) == b[ l ] );
 					}
 				}
 			}
@@ -1920,13 +1996,13 @@ operator !=( FArray5S< T > const & a, FArray5< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
-	typename FArray5< T >::size_type l( 0 );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) != b[ l ] );
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) != b[ l ] );
 					}
 				}
 			}
@@ -1943,13 +2019,13 @@ operator <( FArray5S< T > const & a, FArray5< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
-	typename FArray5< T >::size_type l( 0 );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) < b[ l ] );
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) < b[ l ] );
 					}
 				}
 			}
@@ -1966,13 +2042,13 @@ operator <=( FArray5S< T > const & a, FArray5< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
-	typename FArray5< T >::size_type l( 0 );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) <= b[ l ] );
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) <= b[ l ] );
 					}
 				}
 			}
@@ -1989,13 +2065,13 @@ operator >( FArray5S< T > const & a, FArray5< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
-	typename FArray5< T >::size_type l( 0 );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) > b[ l ] );
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) > b[ l ] );
 					}
 				}
 			}
@@ -2012,13 +2088,13 @@ operator >=( FArray5S< T > const & a, FArray5< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
-	typename FArray5< T >::size_type l( 0 );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) >= b[ l ] );
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) >= b[ l ] );
 					}
 				}
 			}
@@ -2088,12 +2164,13 @@ FArray5D< bool >
 operator ==( FArray5S< T > const & a, T const & t )
 {
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) == t );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) == t );
 					}
 				}
 			}
@@ -2109,12 +2186,13 @@ FArray5D< bool >
 operator !=( FArray5S< T > const & a, T const & t )
 {
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) != t );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) != t );
 					}
 				}
 			}
@@ -2130,12 +2208,13 @@ FArray5D< bool >
 operator <( FArray5S< T > const & a, T const & t )
 {
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) < t );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) < t );
 					}
 				}
 			}
@@ -2151,12 +2230,13 @@ FArray5D< bool >
 operator <=( FArray5S< T > const & a, T const & t )
 {
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) <= t );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) <= t );
 					}
 				}
 			}
@@ -2172,12 +2252,13 @@ FArray5D< bool >
 operator >( FArray5S< T > const & a, T const & t )
 {
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) > t );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) > t );
 					}
 				}
 			}
@@ -2193,12 +2274,13 @@ FArray5D< bool >
 operator >=( FArray5S< T > const & a, T const & t )
 {
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) >= t );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) >= t );
 					}
 				}
 			}
@@ -2271,12 +2353,13 @@ operator ==( MArray5< A, T > const & a, MArray5< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) == b( i1, i2, i3, i4, i5 ) );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) == b( i1, i2, i3, i4, i5 ) );
 					}
 				}
 			}
@@ -2293,12 +2376,13 @@ operator !=( MArray5< A, T > const & a, MArray5< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) != b( i1, i2, i3, i4, i5 ) );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) != b( i1, i2, i3, i4, i5 ) );
 					}
 				}
 			}
@@ -2315,12 +2399,13 @@ operator <( MArray5< A, T > const & a, MArray5< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) < b( i1, i2, i3, i4, i5 ) );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) < b( i1, i2, i3, i4, i5 ) );
 					}
 				}
 			}
@@ -2337,12 +2422,13 @@ operator <=( MArray5< A, T > const & a, MArray5< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) <= b( i1, i2, i3, i4, i5 ) );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) <= b( i1, i2, i3, i4, i5 ) );
 					}
 				}
 			}
@@ -2359,12 +2445,13 @@ operator >( MArray5< A, T > const & a, MArray5< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) > b( i1, i2, i3, i4, i5 ) );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) > b( i1, i2, i3, i4, i5 ) );
 					}
 				}
 			}
@@ -2381,12 +2468,13 @@ operator >=( MArray5< A, T > const & a, MArray5< A, T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) >= b( i1, i2, i3, i4, i5 ) );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) >= b( i1, i2, i3, i4, i5 ) );
 					}
 				}
 			}
@@ -2403,13 +2491,13 @@ operator ==( MArray5< A, T > const & a, FArray5< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
-	typename FArray5< T >::size_type l( 0 );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) == b[ l ] );
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) == b[ l ] );
 					}
 				}
 			}
@@ -2426,13 +2514,13 @@ operator !=( MArray5< A, T > const & a, FArray5< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
-	typename FArray5< T >::size_type l( 0 );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) != b[ l ] );
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) != b[ l ] );
 					}
 				}
 			}
@@ -2449,13 +2537,13 @@ operator <( MArray5< A, T > const & a, FArray5< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
-	typename FArray5< T >::size_type l( 0 );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) < b[ l ] );
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) < b[ l ] );
 					}
 				}
 			}
@@ -2472,13 +2560,13 @@ operator <=( MArray5< A, T > const & a, FArray5< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
-	typename FArray5< T >::size_type l( 0 );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) <= b[ l ] );
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) <= b[ l ] );
 					}
 				}
 			}
@@ -2495,13 +2583,13 @@ operator >( MArray5< A, T > const & a, FArray5< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
-	typename FArray5< T >::size_type l( 0 );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) > b[ l ] );
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) > b[ l ] );
 					}
 				}
 			}
@@ -2518,13 +2606,13 @@ operator >=( MArray5< A, T > const & a, FArray5< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
-	typename FArray5< T >::size_type l( 0 );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
 					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) >= b[ l ] );
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) >= b[ l ] );
 					}
 				}
 			}
@@ -2595,12 +2683,13 @@ operator ==( MArray5< A, T > const & a, FArray5S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) == b( i1, i2, i3, i4, i5 ) );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) == b( i1, i2, i3, i4, i5 ) );
 					}
 				}
 			}
@@ -2617,12 +2706,13 @@ operator !=( MArray5< A, T > const & a, FArray5S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) != b( i1, i2, i3, i4, i5 ) );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) != b( i1, i2, i3, i4, i5 ) );
 					}
 				}
 			}
@@ -2639,12 +2729,13 @@ operator <( MArray5< A, T > const & a, FArray5S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) < b( i1, i2, i3, i4, i5 ) );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) < b( i1, i2, i3, i4, i5 ) );
 					}
 				}
 			}
@@ -2661,12 +2752,13 @@ operator <=( MArray5< A, T > const & a, FArray5S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) <= b( i1, i2, i3, i4, i5 ) );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) <= b( i1, i2, i3, i4, i5 ) );
 					}
 				}
 			}
@@ -2683,12 +2775,13 @@ operator >( MArray5< A, T > const & a, FArray5S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) > b( i1, i2, i3, i4, i5 ) );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) > b( i1, i2, i3, i4, i5 ) );
 					}
 				}
 			}
@@ -2705,12 +2798,13 @@ operator >=( MArray5< A, T > const & a, FArray5S< T > const & b )
 {
 	assert( conformable( a, b ) );
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) >= b( i1, i2, i3, i4, i5 ) );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) >= b( i1, i2, i3, i4, i5 ) );
 					}
 				}
 			}
@@ -2780,12 +2874,13 @@ FArray5D< bool >
 operator ==( MArray5< A, T > const & a, T const & t )
 {
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) == t );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) == t );
 					}
 				}
 			}
@@ -2801,12 +2896,13 @@ FArray5D< bool >
 operator !=( MArray5< A, T > const & a, T const & t )
 {
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) != t );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) != t );
 					}
 				}
 			}
@@ -2822,12 +2918,13 @@ FArray5D< bool >
 operator <( MArray5< A, T > const & a, T const & t )
 {
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) < t );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) < t );
 					}
 				}
 			}
@@ -2843,12 +2940,13 @@ FArray5D< bool >
 operator <=( MArray5< A, T > const & a, T const & t )
 {
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) <= t );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) <= t );
 					}
 				}
 			}
@@ -2864,12 +2962,13 @@ FArray5D< bool >
 operator >( MArray5< A, T > const & a, T const & t )
 {
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) > t );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) > t );
 					}
 				}
 			}
@@ -2885,12 +2984,13 @@ FArray5D< bool >
 operator >=( MArray5< A, T > const & a, T const & t )
 {
 	FArray5D< bool > r( FArray5D< bool >::shape( a ) );
+	FArray5D< bool >::size_type l( 0 );
 	for ( int i5 = 1, e5 = r.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = r.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = r.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = r.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1 ) {
-						r( i1, i2, i3, i4, i5 ) = ( a( i1, i2, i3, i4, i5 ) >= t );
+					for ( int i1 = 1, e1 = r.u1(); i1 <= e1; ++i1, ++l ) {
+						r[ l ] = ( a( i1, i2, i3, i4, i5 ) >= t );
 					}
 				}
 			}
@@ -3637,29 +3737,5 @@ operator ||( MArray5< A, T > const & a, MArray5< A, T > const & b )
 }
 
 } // ObjexxFCL
-
-#ifndef NO_STD_SWAP_OVERLOADS
-
-// std::swap Overloads for Efficiency
-//
-// Technically you cannot add template functions overloads to namespace std
-// but this works with most compilers and makes it much faster if someone uses
-// std::swap instead of swap or ObjexxFCL::swap.  The legal alternative would be
-// to add specializations of swap for each anticipated instantiation.
-
-namespace std {
-
-// std::swap( FArray5D, FArray5D )
-template< typename T >
-inline
-void
-swap( ObjexxFCL::FArray5D< T > & a, ObjexxFCL::FArray5D< T > & b )
-{
-	a.swap( b );
-}
-
-} // std
-
-#endif // NO_STD_SWAP_OVERLOADS
 
 #endif // ObjexxFCL_FArray5D_hh_INCLUDED

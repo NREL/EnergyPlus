@@ -60,6 +60,16 @@ namespace DataSizing {
 	int const NonCoincident( 1 );
 	int const Coincident( 2 );
 
+	// parameters for Cooling Peak Load TYpe
+	int const SensibleCoolingLoad( 1 );
+	int const TotalCoolingLoad( 2 );
+
+	// parameters for Central Cooling Capacity Control Method
+	int const VAV( 1 );
+	int const Bypass( 2 );
+	int const VT( 3 );
+	int const OnOff( 4 );
+
 	// paramters for supply air flow rate method
 	int const SupplyAirTemperature( 1 );
 	int const TemperatureDifference( 2 );
@@ -79,7 +89,7 @@ namespace DataSizing {
 	Real64 const AutoSize( -99999.0 );
 
 	// parameter for (time-of-peak) sizing format
-	gio::Fmt const PeakHrMinFmt( "(I2.2,':',I2.2,':00')" );
+	gio::Fmt PeakHrMinFmt( "(I2.2,':',I2.2,':00')" );
 
 	//Zone Outdoor Air Method
 	int const ZOAM_FlowPerPerson( 1 ); // set the outdoor air flow rate based on number of people in the zone
@@ -157,10 +167,10 @@ namespace DataSizing {
 	bool DataIsDXCoil( false ); // TRUE if direct-expansion coil
 	bool DataAutosizable( true ); // TRUE if component is autosizable
 	bool DataEMSOverrideON( false ); // boolean determines if user relies on EMS to override autosizing
-	bool DataScalableSizingON( false ); // boolean determines scalable flow sizing is specified 
+	bool DataScalableSizingON( false ); // boolean determines scalable flow sizing is specified
 	bool DataScalableCapSizingON( false ); // boolean determines scalable capacity sizing is specified
-	bool DataSysScalableFlowSizingON( false ); // boolean determines scalable system flow sizing is specified 
-	bool DataSysScalableCapSizingON( false ); // boolean determines scalable system capacity sizing is specified 
+	bool DataSysScalableFlowSizingON( false ); // boolean determines scalable system flow sizing is specified
+	bool DataSysScalableCapSizingON( false ); // boolean determines scalable system capacity sizing is specified
 	bool SysSizingRunDone( false ); // True if a system sizing run is successfully completed.
 	bool TermUnitSingDuct( false ); // TRUE if a non-induction single duct terminal unit
 	bool TermUnitPIU( false ); // TRUE if a powered induction terminal unit
@@ -180,6 +190,7 @@ namespace DataSizing {
 	Real64 DataDesInletAirHumRat( 0.0 ); // coil inlet air humidity ratio used for warning messages
 	Real64 DataDesInletAirTemp( 0.0 ); // coil inlet air temperature used for warning messages
 	Real64 DataDesOutletAirTemp( 0.0 ); // coil outlet air temperature used for sizing
+	Real64 DataDesOutletAirHumRat( 0.0 ); // coil air outlet humidity ratio used in sizing calculations [kg water / kg dry air]
 	Real64 DataCoolCoilCap( 0.0 ); // cooling coil capacity used for sizing with scalable inputs [W]
 	Real64 DataFlowUsedForSizing( 0.0 ); // air flow rate used for sizing with scalable inputs [m3/s]
 	Real64 DataAirFlowUsedForSizing( 0.0 ); // air flow rate used for sizing with scalable inputs [m3/s]
@@ -225,6 +236,7 @@ namespace DataSizing {
 	FArray2D< SystemSizingData > SysSizing; // Data array for system sizing (all data)
 	FArray1D< SystemSizingData > FinalSysSizing; // Data array for system sizing (max heat/cool)
 	FArray1D< SystemSizingData > CalcSysSizing; // Data array for system sizing (max heat/cool)
+	FArray1D< SysSizPeakDDNumData > SysSizPeakDDNum; // data array for peak des day indices 
 	FArray1D< TermUnitSizingData > TermUnitSizing; // Data added in sizing routines
 	FArray1D< ZoneEqSizingData > ZoneEqSizing; // Data added in zone eq component sizing routines
 	FArray1D< ZoneEqSizingData > UnitarySysEqSizing; // Data added in unitary system sizing routines
@@ -241,7 +253,7 @@ namespace DataSizing {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 	//     reproduce, prepare derivative works, and perform publicly and display publicly.

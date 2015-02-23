@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -729,7 +728,22 @@ namespace MixedAir {
 	void
 	GetOAMixerInputs();
 
-	// End of Get Input subroutines for the Module
+	void
+	ProcessOAControllerInputs(
+		std::string const & CurrentModuleObject,
+		int const OutAirNum,
+		FArray1_string const & AlphArray,
+		int & NumAlphas,
+		FArray1< Real64 > const & NumArray,
+		int & NumNums,
+		FArray1_bool const & lNumericBlanks, //Unused
+		FArray1_bool const & lAlphaBlanks,
+		FArray1_string const & cAlphaFields,
+		FArray1_string const & cNumericFields, //Unused
+		bool & ErrorsFound // If errors found in input
+	);
+
+		// End of Get Input subroutines for the Module
 	//******************************************************************************
 
 	// Beginning Initialization Section of the Module
@@ -805,7 +819,7 @@ namespace MixedAir {
 	Real64
 	MixedAirControlTempResidual(
 		Real64 const OASignal, // Relative outside air flow rate (0 to 1)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = mixed node number
+		FArray1< Real64 > const & Par // par(1) = mixed node number
 	);
 
 	FArray1D_int
@@ -945,7 +959,7 @@ namespace MixedAir {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

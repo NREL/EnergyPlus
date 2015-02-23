@@ -15,11 +15,8 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class DimensionSlice;
-
-// Types
-typedef  DimensionSlice  DSlice;
 
 } // ObjexxFCL
 

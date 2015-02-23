@@ -31,7 +31,7 @@ namespace DataViewFactorInformation {
 		std::string Name; // Zone name
 		int NumOfSurfaces; // Number of surfaces in the zone
 		FArray2D< Real64 > F; // View Factors
-		FArray2D< Real64 > ScriptF; // Hottel's Script F
+		FArray2D< Real64 > ScriptF; // Hottel's Script F //Tuned Transposed
 		FArray1D< Real64 > Area; // Surface area
 		FArray1D< Real64 > Emissivity; // Surface emissivity
 		FArray1D< Real64 > Azimuth; // Azimuth angle of the surface (in degrees)
@@ -49,7 +49,7 @@ namespace DataViewFactorInformation {
 			std::string const & Name, // Zone name
 			int const NumOfSurfaces, // Number of surfaces in the zone
 			FArray2< Real64 > const & F, // View Factors
-			FArray2< Real64 > const & ScriptF, // Hottel's Script F
+			FArray2< Real64 > const & ScriptF, // Hottel's Script F //Tuned Transposed
 			FArray1< Real64 > const & Area, // Surface area
 			FArray1< Real64 > const & Emissivity, // Surface emissivity
 			FArray1< Real64 > const & Azimuth, // Azimuth angle of the surface (in degrees)

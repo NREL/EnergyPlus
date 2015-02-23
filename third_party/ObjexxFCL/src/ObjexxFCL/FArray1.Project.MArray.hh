@@ -369,17 +369,16 @@
 	inline MA1c_double CoolCap5() const { return ma( &T::CoolCap5 ); }
 	inline MA1c_double CoolCycleTime() const { return ma( &T::CoolCycleTime ); }
 	inline MA1c_double CoolingDemand() const { return ma( &T::CoolingDemand ); }
-	inline MA1c_double CoolMixHumRat() const { return ma( &T::CoolMixHumRat ); }
-	inline MA1c_double CoolMixTemp() const { return ma( &T::CoolMixTemp ); }
-	inline MA1c_double CoolOutHumRat() const { return ma( &T::CoolOutHumRat ); }
-	inline MA1c_double CoolOutTemp() const { return ma( &T::CoolOutTemp ); }
+	inline MA1c_double MixHumRatAtCoolPeak() const { return ma( &T::MixHumRatAtCoolPeak ); }
+	inline MA1c_double MixTempAtCoolPeak() const { return ma( &T::MixTempAtCoolPeak ); }
+	inline MA1c_double MassFlowAtCoolPeak() const { return ma( &T::MassFlowAtCoolPeak ); }
 	inline MA1c_double CoolPower1() const { return ma( &T::CoolPower1 ); }
 	inline MA1c_double CoolPower2() const { return ma( &T::CoolPower2 ); }
 	inline MA1c_double CoolPower3() const { return ma( &T::CoolPower3 ); }
 	inline MA1c_double CoolPower4() const { return ma( &T::CoolPower4 ); }
 	inline MA1c_double CoolPower5() const { return ma( &T::CoolPower5 ); }
-	inline MA1c_double CoolRetHumRat() const { return ma( &T::CoolRetHumRat ); }
-	inline MA1c_double CoolRetTemp() const { return ma( &T::CoolRetTemp ); }
+	inline MA1c_double RetHumRatAtCoolPeak() const { return ma( &T::RetHumRatAtCoolPeak ); }
+	inline MA1c_double RetTempAtCoolPeak() const { return ma( &T::RetTempAtCoolPeak ); }
 	inline MA1c_double CurrentMaxAvail() const { return ma( &T::CurrentMaxAvail ); }
 	inline MA1c_double CurrentMinAvail() const { return ma( &T::CurrentMinAvail ); }
 	inline MA1c_double DCElectProdRate() const { return ma( &T::DCElectProdRate ); }
@@ -734,6 +733,7 @@
 	inline MA1c_double SenCreditToZoneEnergy() const { return ma( &T::SenCreditToZoneEnergy ); }
 	inline MA1c_double SenCreditToZoneRate() const { return ma( &T::SenCreditToZoneRate ); }
 	inline MA1c_double SensCoolCap() const { return ma( &T::SensCoolCap ); }
+	inline MA1c_double TotCoolCap( ) const { return ma( &T::TotCoolCap ); }
 	inline MA1c_double SensCoolEnergyRate() const { return ma( &T::SensCoolEnergyRate ); }
 	inline MA1c_double SensCoolingEnergy() const { return ma( &T::SensCoolingEnergy ); }
 	inline MA1c_double SensCoolingEnergyRate() const { return ma( &T::SensCoolingEnergyRate ); }
@@ -960,17 +960,16 @@
 	inline MA1_double CoolCap5() { return ma( &T::CoolCap5 ); }
 	inline MA1_double CoolCycleTime() { return ma( &T::CoolCycleTime ); }
 	inline MA1_double CoolingDemand() { return ma( &T::CoolingDemand ); }
-	inline MA1_double CoolMixHumRat() { return ma( &T::CoolMixHumRat ); }
-	inline MA1_double CoolMixTemp() { return ma( &T::CoolMixTemp ); }
-	inline MA1_double CoolOutHumRat() { return ma( &T::CoolOutHumRat ); }
-	inline MA1_double CoolOutTemp() { return ma( &T::CoolOutTemp ); }
+	inline MA1_double MixHumRatAtCoolPeak() { return ma( &T::MixHumRatAtCoolPeak ); }
+	inline MA1_double MixTempAtCoolPeak() { return ma( &T::MixTempAtCoolPeak ); }
+	inline MA1_double MassFlowAtCoolPeak() { return ma( &T::MassFlowAtCoolPeak ); }
 	inline MA1_double CoolPower1() { return ma( &T::CoolPower1 ); }
 	inline MA1_double CoolPower2() { return ma( &T::CoolPower2 ); }
 	inline MA1_double CoolPower3() { return ma( &T::CoolPower3 ); }
 	inline MA1_double CoolPower4() { return ma( &T::CoolPower4 ); }
 	inline MA1_double CoolPower5() { return ma( &T::CoolPower5 ); }
-	inline MA1_double CoolRetHumRat() { return ma( &T::CoolRetHumRat ); }
-	inline MA1_double CoolRetTemp() { return ma( &T::CoolRetTemp ); }
+	inline MA1_double RetHumRatAtCoolPeak() { return ma( &T::RetHumRatAtCoolPeak ); }
+	inline MA1_double RetTempAtCoolPeak() { return ma( &T::RetTempAtCoolPeak ); }
 	inline MA1_double CurrentMaxAvail() { return ma( &T::CurrentMaxAvail ); }
 	inline MA1_double CurrentMinAvail() { return ma( &T::CurrentMinAvail ); }
 	inline MA1_double DCElectProdRate() { return ma( &T::DCElectProdRate ); }
@@ -1325,6 +1324,7 @@
 	inline MA1_double SenCreditToZoneEnergy() { return ma( &T::SenCreditToZoneEnergy ); }
 	inline MA1_double SenCreditToZoneRate() { return ma( &T::SenCreditToZoneRate ); }
 	inline MA1_double SensCoolCap() { return ma( &T::SensCoolCap ); }
+	inline MA1_double TotCoolCap( ) { return ma( &T::TotCoolCap ); }
 	inline MA1_double SensCoolEnergyRate() { return ma( &T::SensCoolEnergyRate ); }
 	inline MA1_double SensCoolingEnergy() { return ma( &T::SensCoolingEnergy ); }
 	inline MA1_double SensCoolingEnergyRate() { return ma( &T::SensCoolingEnergyRate ); }
@@ -1482,17 +1482,14 @@
 	inline MA1c_string AssignedLoopName() const { return ma( &T::AssignedLoopName ); }
 	inline MA1c_string CompName() const { return ma( &T::CompName ); }
 	inline MA1c_string ComponentListName() const { return ma( &T::ComponentListName ); }
-	inline MA1c_string ComponentTypeName() const { return ma( &T::ComponentTypeName ); }
 	inline MA1c_string CompType() const { return ma( &T::CompType ); }
 	inline MA1c_string computeName() const { return ma( &T::computeName ); }
 	inline MA1c_string ConstituentName() const { return ma( &T::ConstituentName ); }
 	inline MA1c_string ControllerListName() const { return ma( &T::ControllerListName ); }
 	inline MA1c_string ControllerName() const { return ma( &T::ControllerName ); }
 	inline MA1c_string ControlName() const { return ma( &T::ControlName ); }
-	inline MA1c_string ControlTypeName() const { return ma( &T::ControlTypeName ); }
 	inline MA1c_string CoolDesDay() const { return ma( &T::CoolDesDay ); }
 	inline MA1c_string DamperName() const { return ma( &T::DamperName ); }
-	inline MA1c_string DataTypeName() const { return ma( &T::DataTypeName ); }
 	inline MA1c_string EquipID() const { return ma( &T::EquipID ); }
 	inline MA1c_string EquipListName() const { return ma( &T::EquipListName ); }
 	inline MA1c_string EquipName() const { return ma( &T::EquipName ); }
@@ -1546,17 +1543,14 @@
 	inline MA1_string AssignedLoopName() { return ma( &T::AssignedLoopName ); }
 	inline MA1_string CompName() { return ma( &T::CompName ); }
 	inline MA1_string ComponentListName() { return ma( &T::ComponentListName ); }
-	inline MA1_string ComponentTypeName() { return ma( &T::ComponentTypeName ); }
 	inline MA1_string CompType() { return ma( &T::CompType ); }
 	inline MA1_string computeName() { return ma( &T::computeName ); }
 	inline MA1_string ConstituentName() { return ma( &T::ConstituentName ); }
 	inline MA1_string ControllerListName() { return ma( &T::ControllerListName ); }
 	inline MA1_string ControllerName() { return ma( &T::ControllerName ); }
 	inline MA1_string ControlName() { return ma( &T::ControlName ); }
-	inline MA1_string ControlTypeName() { return ma( &T::ControlTypeName ); }
 	inline MA1_string CoolDesDay() { return ma( &T::CoolDesDay ); }
 	inline MA1_string DamperName() { return ma( &T::DamperName ); }
-	inline MA1_string DataTypeName() { return ma( &T::DataTypeName ); }
 	inline MA1_string EquipID() { return ma( &T::EquipID ); }
 	inline MA1_string EquipListName() { return ma( &T::EquipListName ); }
 	inline MA1_string EquipName() { return ma( &T::EquipName ); }

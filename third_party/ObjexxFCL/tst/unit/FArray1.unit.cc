@@ -20,6 +20,9 @@
 #include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/DimensionExpressions.hh>
 #include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Vector2.hh>
+#include <ObjexxFCL/Vector3.hh>
+#include "ObjexxFCL.unit.hh"
 
 // C++ Headers
 #include <array>
@@ -138,7 +141,7 @@ TEST( FArray1Test, ConstructionInitializerListOnlyFstring )
 	EXPECT_EQ( "Eggs", r( 3 ) );
 }
 
-TEST( FArray1Test, ConstructionArray )
+TEST( FArray1Test, ConstructionStdArray )
 {
 	FArray1D_int v( std::array< int, 3 >{ { 11, 22, 33 } } );
 	EXPECT_EQ( 3u, v.size() );
@@ -152,7 +155,7 @@ TEST( FArray1Test, ConstructionArray )
 	EXPECT_EQ( 33, v( 3 ) );
 }
 
-TEST( FArray1Test, ConstructionVector )
+TEST( FArray1Test, ConstructionStdVector )
 {
 	FArray1D_int v( std::vector< int >{ 11, 22, 33 } );
 	EXPECT_EQ( 3u, v.size() );
@@ -168,6 +171,33 @@ TEST( FArray1Test, ConstructionVector )
 	EXPECT_EQ( 33, v( 3 ) );
 }
 
+TEST( FArray1Test, ConstructionVector2 )
+{
+	FArray1D_int v( Vector2_int{ { 11, 22 } } );
+	EXPECT_EQ( 2u, v.size() );
+	EXPECT_EQ( 2u, v.size1() );
+	EXPECT_EQ( 1, v.l() );
+	EXPECT_EQ( 1, v.l1() );
+	EXPECT_EQ( 2, v.u() );
+	EXPECT_EQ( 2, v.u1() );
+	EXPECT_EQ( 11, v( 1 ) );
+	EXPECT_EQ( 22, v( 2 ) );
+}
+
+TEST( FArray1Test, ConstructionVector3 )
+{
+	FArray1D_int v( Vector3_int{ { 11, 22, 33 } } );
+	EXPECT_EQ( 3u, v.size() );
+	EXPECT_EQ( 3u, v.size1() );
+	EXPECT_EQ( 1, v.l() );
+	EXPECT_EQ( 1, v.l1() );
+	EXPECT_EQ( 3, v.u() );
+	EXPECT_EQ( 3, v.u1() );
+	EXPECT_EQ( 11, v( 1 ) );
+	EXPECT_EQ( 22, v( 2 ) );
+	EXPECT_EQ( 33, v( 3 ) );
+}
+
 static void initializer_function( FArray1D_string & array )
 {
 	array( 1 ) = "This";
@@ -176,7 +206,7 @@ static void initializer_function( FArray1D_string & array )
 	array( 4 ) = "string";
 }
 
-template < typename T >
+template< typename T >
 static void initializer_function_template( FArray1D< T > & array )
 {
 	array( 1 ) = T( 1 );
@@ -209,19 +239,22 @@ TEST( FArray1Test, ConstructionInitializerFunction )
 
 TEST( FArray1Test, ConstructionIndexRange )
 {
-	FArray1D_int r( SRange( 1, 5 ), 33 );
+	typedef  StaticIndexRange  SR;
+	typedef  DynamicIndexRange  DR;
+
+	FArray1D_int r( SR( 1, 5 ), 33 );
 	EXPECT_EQ( 1, r.l() );
 	EXPECT_EQ( 5, r.u() );
 	for ( int i = 1; i <= 5; ++i ) {
 		EXPECT_EQ( 33, r( i ) );
 		EXPECT_EQ( 33, r[ i - 1 ] );
 	}
-	FArray1P_int p( r, SRange( 1, 4 ) );
+	FArray1P_int p( r, SR( 1, 4 ) );
 	EXPECT_EQ( 1, p.l() );
 	EXPECT_EQ( 4, p.u() );
 	EXPECT_EQ( 33, p[ 0 ] );
 	EXPECT_EQ( 33, p[ 3 ] );
-	FArray1A_int a( r, DRange( 1, 3 ) );
+	FArray1A_int a( r, DR( 1, 3 ) );
 	EXPECT_EQ( 1, a.l() );
 	EXPECT_EQ( 3, a.u() );
 	EXPECT_EQ( 33, a[ 0 ] );
@@ -326,7 +359,8 @@ TEST( FArray1Test, ConstructionFstringMakeStickyInitializerList )
 
 TEST( FArray1Test, ConstructionIndexRangeInitializerList )
 {
-	FArray1D_int r( SRange( -1, 1 ), { 1, 2, 3 } );
+	typedef  StaticIndexRange  SR;
+	FArray1D_int r( SR( -1, 1 ), { 1, 2, 3 } );
 	EXPECT_EQ( -1, r.l() );
 	EXPECT_EQ( 1, r.u() );
 	for ( int i = -1; i <= 1; ++i ) {
@@ -803,15 +837,92 @@ TEST( FArray1Test, Redimension )
 	EXPECT_EQ( 17, B( 2 ) );
 	EXPECT_EQ( 33, B( 3 ) );
 	EXPECT_EQ( 44, B( 4 ) );
+
+	{
+		FArray1D_int A( 5, 1 );
+		A.redimension( { 1, 5 }, 2 );
+		EXPECT_EQ( 1, A.l() );
+		EXPECT_EQ( 5, A.u() );
+		EXPECT_TRUE( eq( A, 1 ) );
+	}
+
+	{
+		FArray1D_int A( 5, 1 );
+		A.redimension( { 2, 4 }, 2 );
+		EXPECT_EQ( 2, A.l() );
+		EXPECT_EQ( 4, A.u() );
+		EXPECT_TRUE( eq( A, 1 ) );
+	}
+
+	{
+		FArray1D_int A( 5, 1 );
+		A.redimension( { -2, 0 }, 2 );
+		EXPECT_EQ( -2, A.l() );
+		EXPECT_EQ( 0, A.u() );
+		EXPECT_TRUE( eq( A, 2 ) );
+	}
+
+	{
+		FArray1D_int A( 5, 1 );
+		A.redimension( { 7, 9 }, 2 );
+		EXPECT_EQ( 7, A.l() );
+		EXPECT_EQ( 9, A.u() );
+		EXPECT_TRUE( eq( A, 2 ) );
+	}
+
+	{
+		FArray1D_int A( 2, 1 );
+		A.redimension( { -1, 4 }, 2 );
+		EXPECT_EQ( -1, A.l() );
+		EXPECT_EQ( 4, A.u() );
+		EXPECT_EQ( 2, A( -1 ) );
+		EXPECT_EQ( 2, A( 0 ) );
+		EXPECT_EQ( 1, A( 1 ) );
+		EXPECT_EQ( 1, A( 2 ) );
+		EXPECT_EQ( 2, A( 3 ) );
+		EXPECT_EQ( 2, A( 4 ) );
+	}
+
+	{
+		FArray1D_int A( 2, 1 );
+		A.redimension( { -1, 2 }, 2 );
+		EXPECT_EQ( -1, A.l() );
+		EXPECT_EQ( 2, A.u() );
+		EXPECT_EQ( 2, A( -1 ) );
+		EXPECT_EQ( 2, A( 0 ) );
+		EXPECT_EQ( 1, A( 1 ) );
+		EXPECT_EQ( 1, A( 2 ) );
+	}
+
+	{
+		FArray1D_int A( 2, 1 );
+		A.redimension( { -1, 1 }, 2 );
+		EXPECT_EQ( -1, A.l() );
+		EXPECT_EQ( 1, A.u() );
+		EXPECT_EQ( 2, A( -1 ) );
+		EXPECT_EQ( 2, A( 0 ) );
+		EXPECT_EQ( 1, A( 1 ) );
+	}
+
+	{
+		FArray1D_int A( 2, 1 );
+		A.redimension( { 2, 4 }, 2 );
+		EXPECT_EQ( 2, A.l() );
+		EXPECT_EQ( 4, A.u() );
+		EXPECT_EQ( 1, A( 2 ) );
+		EXPECT_EQ( 2, A( 3 ) );
+		EXPECT_EQ( 2, A( 4 ) );
+	}
 }
 
 TEST( FArray1Test, Swap )
 {
+	typedef  DynamicIndexRange  DR;
 	FArray1D_int A( 4, 11 );
 	FArray1P_int P( A );
 	EXPECT_TRUE( eq( A, P ) );
 	FArray1D_int( 5, 22 ).swap( A );
-	EXPECT_EQ( DRange( 1, 5 ), A.I() );
+	EXPECT_EQ( DR( 1, 5 ), A.I() );
 	EXPECT_EQ( 5u, A.size() );
 	for ( int i = A.l(); i <= A.u(); ++i ) {
 		EXPECT_EQ( 22, A( i ) );
@@ -962,7 +1073,7 @@ TEST( FArray1FunctionsTest, Count )
 TEST( FArray1FunctionsTest, IsContiguous )
 {
 	FArray1D_double A;
-	EXPECT_TRUE( is_contiguous( A ) );
+	EXPECT_TRUE( contiguous( A ) );
 }
 
 TEST( FArray1FunctionsTest, LUBound )
@@ -1084,22 +1195,22 @@ TEST( FArray1FunctionsTest, Sum )
 {
 	FArray1D_double A( { 1.0, 2.0, 3.0, 4.0, 5.0 } );
 	double const E1 = 15.0;
-	EXPECT_TRUE( E1 == sum( A ) );
-	EXPECT_TRUE( E1 == sum( A, 1 ) );
+	EXPECT_EQ( E1, sum( A ) );
+	EXPECT_EQ( E1, sum( A, 1 ) );
 	FArray1D_bool M( { true, false, true, false, true } );
 	double const E2 = 9.0;
-	EXPECT_TRUE( E2 == sum( A, M ) );
+	EXPECT_EQ( E2, sum( A, M ) );
 }
 
 TEST( FArray1FunctionsTest, Product )
 {
 	FArray1D_double A( { 1.0, 2.0, 3.0, 4.0, 5.0 } );
 	double const E1 = 120.0;
-	EXPECT_TRUE( E1 == product( A ) );
-	EXPECT_TRUE( E1 == product( A, 1 ) );
+	EXPECT_EQ( E1, product( A ) );
+	EXPECT_EQ( E1, product( A, 1 ) );
 	FArray1D_bool M( { true, false, true, false, true } );
 	double const E2 = 15.0;
-	EXPECT_TRUE( E2 == product( A, M ) );
+	EXPECT_EQ( E2, product( A, M ) );
 }
 
 TEST( FArray1FunctionsTest, Abs )

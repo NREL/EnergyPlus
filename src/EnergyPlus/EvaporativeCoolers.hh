@@ -3,8 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -59,7 +57,7 @@ namespace EvaporativeCoolers {
 		// Members
 		std::string EvapCoolerName; // Name of the EvapCooler
 		int EquipIndex;
-		int EvapCoolerType; // Type of the EvapCooler (parameters in DataGlobalConstants.f90
+		int EvapCoolerType; // Type of the EvapCooler (parameters in DataGlobalConstants.cc
 		std::string EvapControlType; // Type of Control for the EvapCooler
 		std::string Schedule; // HeatingCoil Operation Schedule
 		int SchedPtr; // Pointer to the correct schedule
@@ -243,7 +241,7 @@ namespace EvaporativeCoolers {
 		EvapConditions(
 			std::string const & EvapCoolerName, // Name of the EvapCooler
 			int const EquipIndex,
-			int const EvapCoolerType, // Type of the EvapCooler (parameters in DataGlobalConstants.f90
+			int const EvapCoolerType, // Type of the EvapCooler (parameters in DataGlobalConstants.cc
 			std::string const & EvapControlType, // Type of Control for the EvapCooler
 			std::string const & Schedule, // HeatingCoil Operation Schedule
 			int const SchedPtr, // Pointer to the correct schedule
@@ -613,7 +611,7 @@ namespace EvaporativeCoolers {
 			int const UnitVSControlMaxIterErrorIndex, // regula falsi errors, fan speed iteration limits
 			int const UnitVSControlLimitsErrorIndex, // regula falsi errors, limits exceeded.
 			int const ZonePtr, // pointer to a zone served by an evaportive cooler unit
-		    int const HVACSizingIndex // index of a HVACSizing object for an evaportive cooler unit
+			int const HVACSizingIndex // index of a HVACSizing object for an evaportive cooler unit
 		) :
 			Name( Name ),
 			ZoneNodeNum( ZoneNodeNum ),
@@ -702,7 +700,7 @@ namespace EvaporativeCoolers {
 	extern FArray1D< EvapConditions > EvapCond;
 	extern FArray1D< ZoneEvapCoolerUnitStruct > ZoneEvapUnit;
 	extern FArray1D< ZoneEvapCoolerUnitFieldData > ZoneEvapCoolerUnitFields;
-	
+
 
 	// Functions
 
@@ -859,7 +857,7 @@ namespace EvaporativeCoolers {
 	Real64
 	VSEvapUnitLoadResidual(
 		Real64 const FanSpeedRatio,
-		Optional< FArray1S< Real64 > const > Par = _ // parameters
+		FArray1< Real64 > const & Par // parameters
 	);
 
 	void
@@ -877,7 +875,7 @@ namespace EvaporativeCoolers {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

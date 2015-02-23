@@ -1,9 +1,11 @@
 #ifndef SolarShading_hh_INCLUDED
 #define SolarShading_hh_INCLUDED
 
+// C++ Headers
+#include <fstream>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
-#include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/FArray2D.hh>
 #include <ObjexxFCL/FArray3D.hh>
 
@@ -29,11 +31,8 @@ namespace SolarShading {
 	// Homogeneous Coordinates are represented in integers (64 bit). This changes the surface coordinates from meters
 	// to .01 millimeters -- making that the resolution for shadowing, polygon clipping, etc.
 	extern Real64 const sqHCMULT; // Square of HCMult used in Homogeneous coordinates
+	extern Real64 const sqHCMULT_fac; // ( 0.5 / sqHCMULT ) factor
 	extern Real64 const kHCMULT; // half of inverse square of HCMult used in Homogeneous coordinates
-
-	//INTEGER,          PRIVATE, PARAMETER :: MAXCMB = 2000   ! Length of SHDCMB array
-	//INTEGER,          PARAMETER :: MaxHCS = 15000 ! 200      ! Maximum number of HC surfaces (was 56)
-	//INTEGER,          PARAMETER :: MaxHCV = 12      ! Maximum number of HC vertices
 
 	// Parameters for use with the variable OverlapStatus...
 	extern int const NoOverlap;
@@ -80,7 +79,7 @@ namespace SolarShading {
 	extern int ShadowingCalcFrequency; // Frequency for Shadowing Calculations
 	extern int ShadowingDaysLeft; // Days left in current shadowing period
 	extern bool debugging;
-	extern int OutputFileShading;
+	extern std::ofstream shd_stream; // Shading file stream
 	extern FArray1D_int HCNS; // Surface number of back surface HC figures
 	extern FArray1D_int HCNV; // Number of vertices of each HC figure
 	extern FArray2D< Int64 > HCA; // 'A' homogeneous coordinates of sides
@@ -155,7 +154,6 @@ namespace SolarShading {
 	extern FArray1D< SurfaceErrorTracking > TrackTooManyFigures;
 	extern FArray1D< SurfaceErrorTracking > TrackTooManyVertices;
 	extern FArray1D< SurfaceErrorTracking > TrackBaseSubSurround;
-	extern FArray1D< SurfaceErrorTracking > TempSurfErrorTracking;
 
 	// Functions
 
@@ -435,9 +433,9 @@ namespace SolarShading {
 
 	void
 	CalcInteriorWinTransDifSolInitialDistribution(
-		int & ZoneNum, // Zone index number
-		int & IntWinSurfNum, // Interior Window Surface number in Zone ZoneNum
-		Real64 & IntWinDifSolarTransW // Diffuse Solar transmitted through Interior Window IntWinSurfNum from adjacent zone [W]
+		int const ZoneNum, // Zone index number
+		int const IntWinSurfNum, // Interior Window Surface number in Zone ZoneNum
+		Real64 const IntWinDifSolarTransW // Diffuse Solar transmitted through Interior Window IntWinSurfNum from adjacent zone [W]
 	);
 
 	void
@@ -459,7 +457,7 @@ namespace SolarShading {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

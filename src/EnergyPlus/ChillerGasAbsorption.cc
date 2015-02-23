@@ -316,8 +316,7 @@ namespace ChillerGasAbsorption {
 		GasAbsorber.allocate( NumGasAbsorbers );
 
 		GasAbsorberReport.allocate( NumGasAbsorbers );
-		CheckEquipName.allocate( NumGasAbsorbers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumGasAbsorbers, true );
 
 		//LOAD ARRAYS
 
@@ -453,7 +452,7 @@ namespace ChillerGasAbsorption {
 			} else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid value" );
 				ShowContinueError( "Invalid " + cAlphaFieldNames( 18 ) + '=' + cAlphaArgs( 18 ) );
-				ShowContinueError( "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2," "OtherFuel1 or OtherFuel2" );
+				ShowContinueError( "Valid choices are Electricity, NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil#1, FuelOil#2,OtherFuel1 or OtherFuel2" );
 				ErrorsFound = true;
 			}}
 
@@ -596,8 +595,7 @@ namespace ChillerGasAbsorption {
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
 			MyPlantScanFlag.allocate( NumGasAbsorbers );
-			MyEnvrnFlag.allocate( NumGasAbsorbers );
-			MyEnvrnFlag = true;
+			MyEnvrnFlag.dimension( NumGasAbsorbers, true );
 			MyOneTimeFlag = false;
 			MyPlantScanFlag = true;
 		}
@@ -1981,7 +1979,7 @@ namespace ChillerGasAbsorption {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

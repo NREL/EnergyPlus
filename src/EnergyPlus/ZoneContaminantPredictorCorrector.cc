@@ -245,8 +245,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 		// FLOW:
 
-		RepVarSet.allocate( NumOfZones );
-		RepVarSet = true;
+		RepVarSet.dimension( NumOfZones, true );
 
 		MaxAlpha = -100;
 		MaxNumber = -100;
@@ -1132,58 +1131,34 @@ namespace ZoneContaminantPredictorCorrector {
 		if ( MyOneTimeFlag ) {
 			// CO2
 			if ( Contaminant.CO2Simulation ) {
-				ZoneCO2SetPoint.allocate( NumOfZones );
-				ZoneCO2SetPoint = 0.0;
-				CO2PredictedRate.allocate( NumOfZones );
-				CO2PredictedRate = 0.0;
-				CO2ZoneTimeMinus1.allocate( NumOfZones );
-				CO2ZoneTimeMinus1 = 0.0;
-				CO2ZoneTimeMinus2.allocate( NumOfZones );
-				CO2ZoneTimeMinus2 = 0.0;
-				CO2ZoneTimeMinus3.allocate( NumOfZones );
-				CO2ZoneTimeMinus3 = 0.0;
-				CO2ZoneTimeMinus4.allocate( NumOfZones );
-				CO2ZoneTimeMinus4 = 0.0;
-				DSCO2ZoneTimeMinus1.allocate( NumOfZones );
-				DSCO2ZoneTimeMinus1 = 0.0;
-				DSCO2ZoneTimeMinus2.allocate( NumOfZones );
-				DSCO2ZoneTimeMinus2 = 0.0;
-				DSCO2ZoneTimeMinus3.allocate( NumOfZones );
-				DSCO2ZoneTimeMinus3 = 0.0;
-				DSCO2ZoneTimeMinus4.allocate( NumOfZones );
-				DSCO2ZoneTimeMinus4 = 0.0;
-				CO2ZoneTimeMinus1Temp.allocate( NumOfZones );
-				CO2ZoneTimeMinus1Temp = 0.0;
-				CO2ZoneTimeMinus2Temp.allocate( NumOfZones );
-				CO2ZoneTimeMinus2Temp = 0.0;
-				CO2ZoneTimeMinus3Temp.allocate( NumOfZones );
-				CO2ZoneTimeMinus3Temp = 0.0;
-				ZoneCO2MX.allocate( NumOfZones );
-				ZoneCO2MX = 0.0;
-				ZoneCO2M2.allocate( NumOfZones );
-				ZoneCO2M2 = 0.0;
-				ZoneCO21.allocate( NumOfZones );
-				ZoneCO21 = 0.0;
+				ZoneCO2SetPoint.dimension( NumOfZones, 0.0 );
+				CO2PredictedRate.dimension( NumOfZones, 0.0 );
+				CO2ZoneTimeMinus1.dimension( NumOfZones, 0.0 );
+				CO2ZoneTimeMinus2.dimension( NumOfZones, 0.0 );
+				CO2ZoneTimeMinus3.dimension( NumOfZones, 0.0 );
+				CO2ZoneTimeMinus4.dimension( NumOfZones, 0.0 );
+				DSCO2ZoneTimeMinus1.dimension( NumOfZones, 0.0 );
+				DSCO2ZoneTimeMinus2.dimension( NumOfZones, 0.0 );
+				DSCO2ZoneTimeMinus3.dimension( NumOfZones, 0.0 );
+				DSCO2ZoneTimeMinus4.dimension( NumOfZones, 0.0 );
+				CO2ZoneTimeMinus1Temp.dimension( NumOfZones, 0.0 );
+				CO2ZoneTimeMinus2Temp.dimension( NumOfZones, 0.0 );
+				CO2ZoneTimeMinus3Temp.dimension( NumOfZones, 0.0 );
+				ZoneCO2MX.dimension( NumOfZones, 0.0 );
+				ZoneCO2M2.dimension( NumOfZones, 0.0 );
+				ZoneCO21.dimension( NumOfZones, 0.0 );
 
 				ZoneSysContDemand.allocate( NumOfZones );
-				ZoneCO2Gain.allocate( NumOfZones );
-				ZoneCO2Gain = 0.0;
-				ZoneCO2GainFromPeople.allocate( NumOfZones );
-				ZoneCO2GainFromPeople = 0.0;
-				MixingMassFlowCO2.allocate( NumOfZones );
-				MixingMassFlowCO2 = 0.0;
-				ZoneAirDensityCO.allocate( NumOfZones );
-				ZoneAirDensityCO = 0.0;
-				AZ.allocate( NumOfZones );
-				AZ = 0.0;
-				BZ.allocate( NumOfZones );
-				BZ = 0.0;
-				CZ.allocate( NumOfZones );
-				CZ = 0.0;
+				ZoneCO2Gain.dimension( NumOfZones, 0.0 );
+				ZoneCO2GainFromPeople.dimension( NumOfZones, 0.0 );
+				MixingMassFlowCO2.dimension( NumOfZones, 0.0 );
+				ZoneAirDensityCO.dimension( NumOfZones, 0.0 );
+				AZ.dimension( NumOfZones, 0.0 );
+				BZ.dimension( NumOfZones, 0.0 );
+				CZ.dimension( NumOfZones, 0.0 );
 			}
 
-			CONTRAT.allocate( NumOfZones );
-			CONTRAT = 0.0;
+			CONTRAT.dimension( NumOfZones, 0.0 );
 
 			// Allocate Derived Types
 
@@ -1200,56 +1175,33 @@ namespace ZoneContaminantPredictorCorrector {
 
 			// Generic contaminant
 			if ( Contaminant.GenericContamSimulation ) {
-				ZoneGCSetPoint.allocate( NumOfZones );
-				ZoneGCSetPoint = 0.0;
-				GCPredictedRate.allocate( NumOfZones );
-				GCPredictedRate = 0.0;
-				GCZoneTimeMinus1.allocate( NumOfZones );
-				GCZoneTimeMinus1 = 0.0;
-				GCZoneTimeMinus2.allocate( NumOfZones );
-				GCZoneTimeMinus2 = 0.0;
-				GCZoneTimeMinus3.allocate( NumOfZones );
-				GCZoneTimeMinus3 = 0.0;
-				GCZoneTimeMinus4.allocate( NumOfZones );
-				GCZoneTimeMinus4 = 0.0;
-				DSGCZoneTimeMinus1.allocate( NumOfZones );
-				DSGCZoneTimeMinus1 = 0.0;
-				DSGCZoneTimeMinus2.allocate( NumOfZones );
-				DSGCZoneTimeMinus2 = 0.0;
-				DSGCZoneTimeMinus3.allocate( NumOfZones );
-				DSGCZoneTimeMinus3 = 0.0;
-				DSGCZoneTimeMinus4.allocate( NumOfZones );
-				DSGCZoneTimeMinus4 = 0.0;
-				GCZoneTimeMinus1Temp.allocate( NumOfZones );
-				GCZoneTimeMinus1Temp = 0.0;
-				GCZoneTimeMinus2Temp.allocate( NumOfZones );
-				GCZoneTimeMinus2Temp = 0.0;
-				GCZoneTimeMinus3Temp.allocate( NumOfZones );
-				GCZoneTimeMinus3Temp = 0.0;
-				ZoneGCMX.allocate( NumOfZones );
-				ZoneGCMX = 0.0;
-				ZoneGCM2.allocate( NumOfZones );
-				ZoneGCM2 = 0.0;
-				ZoneGC1.allocate( NumOfZones );
-				ZoneGC1 = 0.0;
+				ZoneGCSetPoint.dimension( NumOfZones, 0.0 );
+				GCPredictedRate.dimension( NumOfZones, 0.0 );
+				GCZoneTimeMinus1.dimension( NumOfZones, 0.0 );
+				GCZoneTimeMinus2.dimension( NumOfZones, 0.0 );
+				GCZoneTimeMinus3.dimension( NumOfZones, 0.0 );
+				GCZoneTimeMinus4.dimension( NumOfZones, 0.0 );
+				DSGCZoneTimeMinus1.dimension( NumOfZones, 0.0 );
+				DSGCZoneTimeMinus2.dimension( NumOfZones, 0.0 );
+				DSGCZoneTimeMinus3.dimension( NumOfZones, 0.0 );
+				DSGCZoneTimeMinus4.dimension( NumOfZones, 0.0 );
+				GCZoneTimeMinus1Temp.dimension( NumOfZones, 0.0 );
+				GCZoneTimeMinus2Temp.dimension( NumOfZones, 0.0 );
+				GCZoneTimeMinus3Temp.dimension( NumOfZones, 0.0 );
+				ZoneGCMX.dimension( NumOfZones, 0.0 );
+				ZoneGCM2.dimension( NumOfZones, 0.0 );
+				ZoneGC1.dimension( NumOfZones, 0.0 );
 
 				if ( ! allocated( ZoneSysContDemand ) ) ZoneSysContDemand.allocate( NumOfZones );
-				ZoneGCGain.allocate( NumOfZones );
-				ZoneGCGain = 0.0;
-				MixingMassFlowGC.allocate( NumOfZones );
-				MixingMassFlowGC = 0.0;
-				ZoneAirDensityGC.allocate( NumOfZones );
-				ZoneAirDensityGC = 0.0;
-				AZGC.allocate( NumOfZones );
-				AZGC = 0.0;
-				BZGC.allocate( NumOfZones );
-				BZGC = 0.0;
-				CZGC.allocate( NumOfZones );
-				CZGC = 0.0;
+				ZoneGCGain.dimension( NumOfZones, 0.0 );
+				MixingMassFlowGC.dimension( NumOfZones, 0.0 );
+				ZoneAirDensityGC.dimension( NumOfZones, 0.0 );
+				AZGC.dimension( NumOfZones, 0.0 );
+				BZGC.dimension( NumOfZones, 0.0 );
+				CZGC.dimension( NumOfZones, 0.0 );
 			}
 
-			CONTRATGC.allocate( NumOfZones );
-			CONTRATGC = 0.0;
+			CONTRATGC.dimension( NumOfZones, 0.0 );
 
 			// Allocate Derived Types
 
@@ -1351,7 +1303,7 @@ namespace ZoneContaminantPredictorCorrector {
 						}
 					}
 				} else {
-					ShowSevereError( "ZoneControl:ContaminantController: a corresponding AirLoopHVAC is not found for the " "controlled zone =" + Zone( ZoneNum ).Name );
+					ShowSevereError( "ZoneControl:ContaminantController: a corresponding AirLoopHVAC is not found for the controlled zone =" + Zone( ZoneNum ).Name );
 					ErrorsFound = true;
 				}
 			}
@@ -1423,7 +1375,7 @@ namespace ZoneContaminantPredictorCorrector {
 				if ( Sch == 0.0 || BeginEnvrnFlag || WarmupFlag ) {
 					ZoneContamGenericDecay( Loop ).GCTime = 0.0;
 				} else {
-					ZoneContamGenericDecay( Loop ).GCTime += TimeStepZone * SecInHour;
+					ZoneContamGenericDecay( Loop ).GCTime += TimeStepZoneSec;
 				}
 				GCGain = ZoneContamGenericDecay( Loop ).GCInitEmiRate * Sch * std::exp( -ZoneContamGenericDecay( Loop ).GCTime / ZoneContamGenericDecay( Loop ).GCDelayTime );
 				ZoneContamGenericDecay( Loop ).GCGenRate = GCGain;
@@ -2356,7 +2308,7 @@ namespace ZoneContaminantPredictorCorrector {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -831,13 +831,6 @@ namespace DataAirSystems {
 	extern FArray1D< ConnectAirSysComp > AirSysCompToPlant; // Connections between loops
 	extern FArray1D< ConnectAirSysSubComp > AirSysSubCompToPlant; // Connections between loops
 	extern FArray1D< ConnectAirSysSubSubComp > AirSysSubSubCompToPlant; // Connections between loops
-	extern FArray1D< ConnectionPoint > TempDemandSideConnect;
-	extern FArray1D< ConnectZoneComp > TempZoneCompToPlant; // Connections between loops
-	extern FArray1D< ConnectZoneSubComp > TempZoneSubCompToPlant; // Connections between loops
-	extern FArray1D< ConnectZoneSubSubComp > TempZoneSubSubCompToPlant; // Connections between loops
-	extern FArray1D< ConnectAirSysComp > TempAirSysCompToPlant; // Connections between loops
-	extern FArray1D< ConnectAirSysSubComp > TempAirSysSubCompToPlant; // Connections between loops
-	extern FArray1D< ConnectAirSysSubSubComp > TempAirSysSubSubCompToPlant; // Connections between loops
 
 } // DataAirSystems
 

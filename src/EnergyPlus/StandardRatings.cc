@@ -412,7 +412,7 @@ namespace StandardRatings {
 	Real64
 	ReformEIRChillerCondInletTempResidual(
 		Real64 const CondenserOutletTemp, // Condenser outlet temperature (boundary condition or guess value) [C]
-		Optional< FArray1S< Real64 > const > Par // par(1)  = Condenser inlet temperature at AHRI Standard
+		FArray1< Real64 > const & Par // par(1)  = Condenser inlet temperature at AHRI Standard
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -475,28 +475,28 @@ namespace StandardRatings {
 		static Real64 ReformEIRChillerEIRFT( 0.0 ); // Chiller electric input ratio (EIR = 1 / COP) as a function of temperature
 		static Real64 ReformEIRChillerEIRFPLR( 0.0 ); // Chiller EIR as a function of part-load ratio (PLR)
 
-		EvapOutletTemp = Par()( 2 );
+		EvapOutletTemp = Par( 2 );
 
-		ReformEIRChillerCapFT = CurveValue( int( Par()( 6 ) ), EvapOutletTemp, CondenserOutletTemp );
+		ReformEIRChillerCapFT = CurveValue( int( Par( 6 ) ), EvapOutletTemp, CondenserOutletTemp );
 
-		ReformEIRChillerEIRFT = CurveValue( int( Par()( 7 ) ), EvapOutletTemp, CondenserOutletTemp );
+		ReformEIRChillerEIRFT = CurveValue( int( Par( 7 ) ), EvapOutletTemp, CondenserOutletTemp );
 
 		// Available chiller capacity as a function of temperature
-		AvailChillerCap = Par()( 9 ) * ReformEIRChillerCapFT;
+		AvailChillerCap = Par( 9 ) * ReformEIRChillerCapFT;
 
-		ReformEIRChillerEIRFPLR = CurveValue( int( Par()( 8 ) ), CondenserOutletTemp, Par()( 4 ) );
+		ReformEIRChillerEIRFPLR = CurveValue( int( Par( 8 ) ), CondenserOutletTemp, Par( 4 ) );
 
-		Power = ( AvailChillerCap / Par()( 10 ) ) * ReformEIRChillerEIRFPLR * ReformEIRChillerEIRFT;
+		Power = ( AvailChillerCap / Par( 10 ) ) * ReformEIRChillerEIRFPLR * ReformEIRChillerEIRFT;
 
-		QEvap = AvailChillerCap * Par()( 4 );
+		QEvap = AvailChillerCap * Par( 4 );
 
-		QCond = Power * Par()( 11 ) + QEvap;
+		QCond = Power * Par( 11 ) + QEvap;
 
-		if ( Par()( 6 ) > MassFlowTolerance ) {
-			CondenserInletTemp = CondenserOutletTemp - QCond / Par()( 5 ) / Par()( 3 );
+		if ( Par( 6 ) > MassFlowTolerance ) {
+			CondenserInletTemp = CondenserOutletTemp - QCond / Par( 5 ) / Par( 3 );
 		}
 
-		Residuum = ( Par()( 1 ) - CondenserInletTemp ) / Par()( 1 );
+		Residuum = ( Par( 1 ) - CondenserInletTemp ) / Par( 1 );
 
 		return Residuum;
 	}
@@ -548,8 +548,8 @@ namespace StandardRatings {
 		static bool MyOneTimeFlag( true );
 
 		// Formats
-		static gio::Fmt const Format_990( "('! <Chiller Standard Rating Information>, Component Type, Component Name, ','IPLV in SI Units {W/W}, ','IPLV in IP Units {Btu/W-h}')" );
-		static gio::Fmt const Format_991( "(' Chiller Standard Rating Information, ',A,', ',A,', ',A,', ',A)" );
+		static gio::Fmt Format_990( "('! <Chiller Standard Rating Information>, Component Type, Component Name, ','IPLV in SI Units {W/W}, ','IPLV in IP Units {Btu/W-h}')" );
+		static gio::Fmt Format_991( "(' Chiller Standard Rating Information, ',A,', ',A,', ',A,', ',A)" );
 
 		if ( MyOneTimeFlag ) {
 			gio::write( OutputFileInits, Format_990 );
@@ -2112,12 +2112,12 @@ namespace StandardRatings {
 		static bool MyHeatOneTimeFlag( true );
 
 		// Formats
-		static gio::Fmt const Format_990( "('! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, ','Standard Rating (Net) Cooling Capacity {W}, ','Standard Rated Net COP {W/W}, ','EER {Btu/W-h}, ','SEER {Btu/W-h}, ','IEER {Btu/W-h}')" );
-		static gio::Fmt const Format_991( "(' DX Cooling Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)" );
-		static gio::Fmt const Format_992( "('! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, ','High Temperature Heating (net) Rating Capacity {W}, ','Low Temperature Heating (net) Rating Capacity {W}, ','HSPF {Btu/W-h}, ','Region Number')" );
-		static gio::Fmt const Format_993( "(' DX Heating Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A)" );
-		static gio::Fmt const Format_994( "('! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, ','Standard Rating (Net) Cooling Capacity {W}, ','Standard Rated Net COP {W/W}, ','EER {Btu/W-h}, ','SEER {Btu/W-h}, ','IEER {Btu/W-h}')" );
-		static gio::Fmt const Format_995( "(' DX Cooling Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)" );
+		static gio::Fmt Format_990( "('! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, ','Standard Rating (Net) Cooling Capacity {W}, ','Standard Rated Net COP {W/W}, ','EER {Btu/W-h}, ','SEER {Btu/W-h}, ','IEER {Btu/W-h}')" );
+		static gio::Fmt Format_991( "(' DX Cooling Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)" );
+		static gio::Fmt Format_992( "('! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, ','High Temperature Heating (net) Rating Capacity {W}, ','Low Temperature Heating (net) Rating Capacity {W}, ','HSPF {Btu/W-h}, ','Region Number')" );
+		static gio::Fmt Format_993( "(' DX Heating Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A)" );
+		static gio::Fmt Format_994( "('! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, ','Standard Rating (Net) Cooling Capacity {W}, ','Standard Rated Net COP {W/W}, ','EER {Btu/W-h}, ','SEER {Btu/W-h}, ','IEER {Btu/W-h}')" );
+		static gio::Fmt Format_995( "(' DX Cooling Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)" );
 
 		{ auto const SELECT_CASE_var( CompTypeNum );
 
@@ -2158,7 +2158,7 @@ namespace StandardRatings {
 				MyCoolOneTimeFlag = false;
 			}
 
-			gio::write( OutputFileInits, Format_995 ) << CompType << CompName << RoundSigDigits( CoolCapVal, 1 ) << " " << " " << RoundSigDigits( SEERValueIP, 2 ) << " ";
+			gio::write( OutputFileInits, Format_995 ) << CompType << CompName << RoundSigDigits( CoolCapVal, 1 ) << ' ' << ' ' << RoundSigDigits( SEERValueIP, 2 ) << ' ';
 
 			PreDefTableEntry( pdchDXCoolCoilType, CompName, CompType );
 			PreDefTableEntry( pdchDXCoolCoilNetCapSI, CompName, CoolCapVal, 1 );
@@ -2595,7 +2595,7 @@ namespace StandardRatings {
 
 				if ( DisplayExtraWarnings ) {
 					ShowContinueError( RoutineName + "The max and/or min limits specified in the corresponding curve objects" );
-					ShowContinueError( " do not include the AHRI test conditions required to calculate one or more of" " the Standard Rating values." );
+					ShowContinueError( " do not include the AHRI test conditions required to calculate one or more of the Standard Rating values." );
 				}
 
 				// For Standard Rating Cooling Capacity:
@@ -2714,7 +2714,7 @@ namespace StandardRatings {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

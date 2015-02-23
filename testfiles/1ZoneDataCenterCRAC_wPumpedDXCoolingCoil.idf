@@ -48,14 +48,27 @@
     No,                      !- Do Zone Sizing Calculation
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
-    no,                      !- Run Simulation for Sizing Periods
-    Yes;                     !- Run Simulation for Weather File Run Periods
+    Yes,                      !- Run Simulation for Sizing Periods
+    No;                     !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
-    Annual,                  !- Name
+    Jan,                  !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
-    12,                      !- End Month
+    1,                      !- End Month
+    31,                      !- End Day of Month
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
+
+  RunPeriod,
+    Jul,                  !- Name
+    7,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    7,                      !- End Month
     31,                      !- End Day of Month
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
@@ -828,25 +841,113 @@
     For: AllDays,            !- Field 2
     Until: 24:00,29.3;       !- Field 3
 
-  ElectricEquipment,
-    Data Center Equipment,   !- Name
-    Main Zone,               !- Zone or ZoneList Name
-    Data Center Equipment Schedule,  !- Schedule Name
-    Watts/area,              !- Design Level Calculation Method
-    ,                        !- Design Level {W}
-    550.0,                   !- Watts per Zone Floor Area {W/m2}
-    ,                        !- Watts per Person {W/person}
-    0,                       !- Fraction Latent
-    0,                       !- Fraction Radiant
-    0,                       !- Fraction Lost
-    Data Center IT equipment;!- End-Use Subcategory
+ElectricEquipment:ITE:AirCooled,
+    Data Center Servers,     !- Name
+    Main Zone,               !- Zone Name
+    Watts/Unit,              !- Design Power Input Calculation Method
+    500,                     !- Watts per Unit {W}
+    200,                     !- Number of Units
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    Data Center Operation Schedule,  !- Design Power Input Schedule Name
+    Data Center CPU Loading Schedule,  !- CPU Loading  Schedule Name
+    Model 5250 Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name
+    0.4,                     !- Design Fan Power Input Fraction
+    0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}
+    Model 5250 AifFlow fLoadTemp,  !- Air Flow Function of Loading and Air Temperature Curve Name
+    ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name
+    15,                      !- Design Entering Air Temperature {C}
+    A3,                      !- Environmental Class
+    AdjustedSupply,          !- Air Inlet Connection Type
+    ,                        !- Air Inlet Room Air Model Node Name
+    ,                        !- Air Outlet Room Air Model Node Name
+    Main Zone Inlet Node,    !- Supply Air Node Name
+    0.1,                     !- Design Recirculation Fraction
+    Data Center Recirculation fLoadTemp,  !- Recirculation Function of Loading and Supply Temperature Curve Name
+    0.9,                     !- Design Electric Power Supply Efficiency
+    UPS Efficiency fPLR,     !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name
+    1,                       !- Fraction of Electric Power Supply Losses to Zone
+    ITE-CPU,                 !- CPU End-Use Subcategory
+    ITE-Fans,                !- Fan End-Use Subcategory
+    ITE-UPS;                 !- Electric Power Supply End-Use Subcategory
+
+  Curve:Quadratic,
+    ECM FanPower fFlow,          !- Name
+    0.0,                     !- Coefficient1 Constant
+    1.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    99.0;                     !- Maximum Value of x
+
+  Curve:Quadratic,
+    UPS Efficiency fPLR,          !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    99.0;                     !- Maximum Value of x
+
+  Curve:Biquadratic,
+    Model 5250 Power fLoadTemp,  !- Name
+    -1.0,                    !- Coefficient1 Constant
+    1.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.06667,                 !- Coefficient4 y
+    0.0,                     !- Coefficient5 y**2
+    0.0,                     !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    -10,                     !- Minimum Value of y
+    99.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    99.0,                    !- Maximum Curve Output
+    Dimensionless,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    Model 5250 AifFlow fLoadTemp,  !- Name
+    -1.4,                    !- Coefficient1 Constant
+    0.9,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.1,                     !- Coefficient4 y
+    0.0,                     !- Coefficient5 y**2
+    0.0,                     !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    -10,                     !- Minimum Value of y
+    99.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    99.0,                    !- Maximum Curve Output
+    Dimensionless,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    Data Center Recirculation fLoadTemp,  !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Coefficient4 y
+    0.0,                     !- Coefficient5 y**2
+    0.0,                     !- Coefficient6 x*y
+    0.0,                     !- Minimum Value of x
+    1.5,                     !- Maximum Value of x
+    -10,                     !- Minimum Value of y
+    99.0,                    !- Maximum Value of y
+    0.0,                     !- Minimum Curve Output
+    99.0,                    !- Maximum Curve Output
+    Dimensionless,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Schedule:Constant, Data Center Operation Schedule, Any Number, 1.0;
 
   Schedule:Compact,
-    Data Center Equipment Schedule,  !- Name
+    Data Center CPU Loading Schedule,  !- Name
     Any Number,              !- Schedule Type Limits Name
     Through: 1/31,           !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,0.25,       !- Field 3
+    Until: 24:00,1.0,       !- Field 3
     Through: 2/29,           !- Field 5
     For: AllDays,            !- Field 6
     Until: 24:00,0.50,       !- Field 7
@@ -864,7 +965,7 @@
     Until: 24:00,0.50,       !- Field 23
     Through: 7/31,           !- Field 25
     For: AllDays,            !- Field 26
-    Until: 24:00,0.75,       !- Field 27
+    Until: 24:00,0.1,        !- Field 27
     Through: 8/31,           !- Field 29
     For: AllDays,            !- Field 30
     Until: 24:00,1.0,        !- Field 31
@@ -973,6 +1074,74 @@
   Output:Variable,*,Fan Rise in Air Temperature,timestep;
 
   Output:Variable,*,Schedule Value,timestep;
+
+Output:Variable,*,ITE CPU Electric Power,timestep; !- Zone Average [W]
+Output:Variable,*,ITE Fan Electric Power,timestep; !- Zone Average [W]
+Output:Variable,*,ITE UPS Electric Power,timestep; !- Zone Average [W]
+Output:Variable,*,ITE CPU Electric Power at Design Inlet Conditions,timestep; !- Zone Average [W]
+Output:Variable,*,ITE Fan Electric Power at Design Inlet Conditions,timestep; !- Zone Average [W]
+Output:Variable,*,ITE UPS Heat Gain to Zone Rate,timestep; !- Zone Average [W]
+Output:Variable,*,ITE Total Heat Gain to Zone Rate,timestep; !- Zone Average [W]
+Output:Variable,*,ITE CPU Electric Energy,timestep; !- Zone Sum [J]
+Output:Variable,*,ITE Fan Electric Energy,timestep; !- Zone Sum [J]
+Output:Variable,*,ITE UPS Electric Energy,timestep; !- Zone Sum [J]
+Output:Variable,*,ITE CPU Electric Energy at Design Inlet Conditions,timestep; !- Zone Sum [J]
+Output:Variable,*,ITE Fan Electric Energy at Design Inlet Conditions,timestep; !- Zone Sum [J]
+Output:Variable,*,ITE UPS Heat Gain to Zone Energy,timestep; !- Zone Sum [J]
+Output:Variable,*,ITE Total Heat Gain to Zone Energy,timestep; !- Zone Sum [J]
+Output:Variable,*,ITE Standard Density Air Volume Flow Rate,timestep; !- Zone Average [m3/s]
+Output:Variable,*,ITE Current Density Air Volume Flow Rate,timestep; !- Zone Average [m3/s]
+Output:Variable,*,ITE Air Mass Flow Rate,timestep; !- Zone Average [kg/s]
+Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature,timestep; !- Zone Average [C]
+Output:Variable,*,ITE Air Inlet Dewpoint Temperature,timestep; !- Zone Average [C]
+Output:Variable,*,ITE Air Inlet Relative Humidity,timestep; !- Zone Average [%]
+Output:Variable,*,ITE Air Outlet Dry-Bulb Temperature,timestep; !- Zone Average [C]
+Output:Variable,*,ITE Supply Heat Index,timestep; !- Zone Average []
+Output:Variable,*,ITE Air Inlet Operating Range Exceeded Time,timestep; !- Zone Sum [hr]
+Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time,timestep; !- Zone Sum [hr]
+Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time,timestep; !- Zone Sum [hr]
+Output:Variable,*,ITE Air Inlet Dewpoint Temperature Above Operating Range Time,timestep; !- Zone Sum [hr]
+Output:Variable,*,ITE Air Inlet Dewpoint Temperature Below Operating Range Time,timestep; !- Zone Sum [hr]
+Output:Variable,*,ITE Air Inlet Relative Humidity Above Operating Range Time,timestep; !- Zone Sum [hr]
+Output:Variable,*,ITE Air Inlet Relative Humidity Below Operating Range Time,timestep; !- Zone Sum [hr]
+Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Difference Above Operating Range,timestep; !- Zone Average [deltaC]
+Output:Variable,*,ITE Air Inlet Dry-Bulb Temperature Difference Below Operating Range,timestep; !- Zone Average [deltaC]
+Output:Variable,*,ITE Air Inlet Dewpoint Temperature Difference Above Operating Range,timestep; !- Zone Average [deltaC]
+Output:Variable,*,ITE Air Inlet Dewpoint Temperature Difference Below Operating Range,timestep; !- Zone Average [deltaC]
+Output:Variable,*,ITE Air Inlet Relative Humidity Difference Above Operating Range,timestep; !- Zone Average [%]
+Output:Variable,*,ITE Air Inlet Relative Humidity Difference Below Operating Range,timestep; !- Zone Average [%]
+Output:Variable,*,Zone ITE CPU Electric Power,timestep; !- Zone Average [W]
+Output:Variable,*,Zone ITE Fan Electric Power,timestep; !- Zone Average [W]
+Output:Variable,*,Zone ITE UPS Electric Power,timestep; !- Zone Average [W]
+Output:Variable,*,Zone ITE CPU Electric Power at Design Inlet Conditions,timestep; !- Zone Average [W]
+Output:Variable,*,Zone ITE Fan Electric Power at Design Inlet Conditions,timestep; !- Zone Average [W]
+Output:Variable,*,Zone ITE UPS Heat Gain to Zone Rate,timestep; !- Zone Average [W]
+Output:Variable,*,Zone ITE Total Heat Gain to Zone Rate,timestep; !- Zone Average [W]
+Output:Variable,*,Zone ITE CPU Electric Energy,timestep; !- Zone Sum [J]
+Output:Variable,*,Zone ITE Fan Electric Energy,timestep; !- Zone Sum [J]
+Output:Variable,*,Zone ITE UPS Electric Energy,timestep; !- Zone Sum [J]
+Output:Variable,*,Zone ITE CPU Electric Energy at Design Inlet Conditions,timestep; !- Zone Sum [J]
+Output:Variable,*,Zone ITE Fan Electric Energy at Design Inlet Conditions,timestep; !- Zone Sum [J]
+Output:Variable,*,Zone ITE UPS Heat Gain to Zone Energy,timestep; !- Zone Sum [J]
+Output:Variable,*,Zone ITE Total Heat Gain to Zone Energy,timestep; !- Zone Sum [J]
+Output:Variable,*,Zone ITE Standard Density Air Volume Flow Rate,timestep; !- Zone Average [m3/s]
+Output:Variable,*,Zone ITE Air Mass Flow Rate,timestep; !- Zone Average [kg/s]
+Output:Variable,*,Zone ITE Average Supply Heat Index,timestep; !- Zone Average []
+Output:Variable,*,Zone ITE Any Air Inlet Operating Range Exceeded Time,timestep; !- Zone Sum [hr]
+Output:Variable,*,Zone ITE Any Air Inlet Dry-Bulb Temperature Above Operating Range Time,timestep; !- Zone Sum [hr]
+Output:Variable,*,Zone ITE Any Air Inlet Dry-Bulb Temperature Below Operating Range Time,timestep; !- Zone Sum [hr]
+Output:Variable,*,Zone ITE Any Air Inlet Dewpoint Temperature Above Operating Range Time,timestep; !- Zone Sum [hr]
+Output:Variable,*,Zone ITE Any Air Inlet Dewpoint Temperature Below Operating Range Time,timestep; !- Zone Sum [hr]
+Output:Variable,*,Zone ITE Any Air Inlet Relative Humidity Above Operating Range Time,timestep; !- Zone Sum [hr]
+Output:Variable,*,Zone ITE Any Air Inlet Relative Humidity Below Operating Range Time,timestep; !- Zone Sum [hr]
+Output:Variable,*,Zone Air Temperature,timestep; !- HVAC Average [C]
+Output:Variable,*,Zone Air Heat Balance Internal Convective Heat Gain Rate,timestep; !- HVAC Average [W]
+Output:Variable,*,Zone Air Heat Balance Surface Convection Rate,timestep; !- HVAC Average [W]
+Output:Variable,*,Zone Air Heat Balance Interzone Air Transfer Rate,timestep; !- HVAC Average [W]
+Output:Variable,*,Zone Air Heat Balance Outdoor Air Transfer Rate,timestep; !- HVAC Average [W]
+Output:Variable,*,Zone Air Heat Balance System Air Transfer Rate,timestep; !- HVAC Average [W]
+Output:Variable,*,Zone Air Heat Balance System Convective Heat Gain Rate,timestep; !- HVAC Average [W]
+Output:Variable,*,Zone Air Heat Balance Air Energy Storage Rate,timestep; !- HVAC Average [W]
 
 ! custom EMS output variables
 ! SCOP

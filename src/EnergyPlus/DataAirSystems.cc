@@ -55,13 +55,6 @@ namespace DataAirSystems {
 	FArray1D< ConnectAirSysComp > AirSysCompToPlant; // Connections between loops
 	FArray1D< ConnectAirSysSubComp > AirSysSubCompToPlant; // Connections between loops
 	FArray1D< ConnectAirSysSubSubComp > AirSysSubSubCompToPlant; // Connections between loops
-	FArray1D< ConnectionPoint > TempDemandSideConnect;
-	FArray1D< ConnectZoneComp > TempZoneCompToPlant; // Connections between loops
-	FArray1D< ConnectZoneSubComp > TempZoneSubCompToPlant; // Connections between loops
-	FArray1D< ConnectZoneSubSubComp > TempZoneSubSubCompToPlant; // Connections between loops
-	FArray1D< ConnectAirSysComp > TempAirSysCompToPlant; // Connections between loops
-	FArray1D< ConnectAirSysSubComp > TempAirSysSubCompToPlant; // Connections between loops
-	FArray1D< ConnectAirSysSubSubComp > TempAirSysSubSubCompToPlant; // Connections between loops
 
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
@@ -70,7 +63,7 @@ namespace DataAirSystems {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

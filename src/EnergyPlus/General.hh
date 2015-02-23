@@ -45,10 +45,21 @@ namespace General {
 		int const MaxIte, // maximum number of allowed iterations
 		int & Flag, // integer storing exit status
 		Real64 & XRes, // value of x that solves f(x [,Par]) = 0
-		std::function< Real64( Real64 const, Optional< FArray1S< Real64 > const > ) > f,
+		std::function< Real64( Real64 const, FArray1< Real64 > const & ) > f,
 		Real64 const X_0, // 1st bound of interval that contains the solution
 		Real64 const X_1, // 2nd bound of interval that contains the solution
-		Optional< FArray1S< Real64 > const > Par = _ // array with additional parameters used for function evaluation
+		FArray1< Real64 > const & Par // array with additional parameters used for function evaluation
+	);
+
+	void
+	SolveRegulaFalsi(
+		Real64 const Eps, // required absolute accuracy
+		int const MaxIte, // maximum number of allowed iterations
+		int & Flag, // integer storing exit status
+		Real64 & XRes, // value of x that solves f(x) = 0
+		std::function< Real64( Real64 const ) > f,
+		Real64 const X_0, // 1st bound of interval that contains the solution
+		Real64 const X_1 // 2nd bound of interval that contains the solution
 	);
 
 	Real64
@@ -329,12 +340,16 @@ namespace General {
 		Optional_string Option2 = _
 	);
 
+	inline
 	void
 	ReallocateRealArray(
 		FArray1D< Real64 > & Array,
 		int & ArrayMax, // Current and resultant dimension for Array
 		int const ArrayInc // increment for redimension
-	);
+	)
+	{
+		Array.redimension( ArrayMax += ArrayInc, 0.0 );
+	}
 
 	void
 	CheckCreatedZoneItemName(
@@ -376,7 +391,7 @@ namespace General {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

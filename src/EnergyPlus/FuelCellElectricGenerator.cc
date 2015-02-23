@@ -55,7 +55,7 @@ namespace FuelCellElectricGenerator {
 	// Once the ElectricPowerManager determines that the FuelCell Generator
 	// is available to meet an electric load demand, it calls SimFuelCellGenerator
 	// which in turn calls the FuelCell model.
-	// See DataGenerators.f90 for structures and variables
+	// See DataGenerators.cc for structures and variables
 
 	// REFERENCES:
 	// IEA/ECBCS Annex 42 model specification for Solid oxide and proton exchange membrane fuel cells
@@ -275,8 +275,7 @@ namespace FuelCellElectricGenerator {
 
 			//ALLOCATE ARRAYS
 			FuelCell.allocate( NumFuelCellGenerators ); // inits handeled in derived type definitions
-			CheckEquipName.allocate( NumFuelCellGenerators );
-			CheckEquipName = true;
+			CheckEquipName.dimension( NumFuelCellGenerators, true );
 
 			// first load in FuelCell names
 			for ( GeneratorNum = 1; GeneratorNum <= NumFuelCellGenerators; ++GeneratorNum ) {
@@ -1624,7 +1623,7 @@ namespace FuelCellElectricGenerator {
 
 			}
 			if ( SolverFlag == -1 ) {
-				ShowWarningError( "CalcFuelCellGeneratorModel: " "Regula falsi problem, flag = -1, check accuracy and iterations, did not converge" );
+				ShowWarningError( "CalcFuelCellGeneratorModel: Regula falsi problem, flag = -1, check accuracy and iterations, did not converge" );
 
 			}
 			if ( SolverFlag > 0 ) {
@@ -1859,7 +1858,7 @@ namespace FuelCellElectricGenerator {
 	Real64
 	FuelCellProductGasEnthResidual(
 		Real64 const TprodGas, // temperature, this is "x" being searched
-		Optional< FArray1S< Real64 > const > Par // par(1) = Generator Number
+		FArray1< Real64 > const & Par // par(1) = Generator Number
 	)
 	{
 
@@ -1907,9 +1906,9 @@ namespace FuelCellElectricGenerator {
 		Real64 desiredHprodGases;
 		Real64 NdotProdGases;
 
-		GeneratorNum = std::floor( Par()( 1 ) );
-		desiredHprodGases = Par()( 2 );
-		NdotProdGases = Par()( 3 );
+		GeneratorNum = std::floor( Par( 1 ) );
+		desiredHprodGases = Par( 2 );
+		NdotProdGases = Par( 3 );
 
 		FigureProductGasesEnthalpy( GeneratorNum, TprodGas, thisHmolalProdGases );
 

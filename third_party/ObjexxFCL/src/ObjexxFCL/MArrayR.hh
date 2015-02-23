@@ -71,15 +71,15 @@ protected: // Creation
 	// Copy Constructor
 	inline
 	MArrayR( MArrayR const & a ) :
-		Super( a )
+	 Super( a )
 	{
 		assert( a.rank() == Rank );
 	}
 
 	// Constructor
 	inline
-	MArrayR( A & array, T Class::* pmem ) :
-		Super( array, pmem )
+	MArrayR( A & a, T Class::* pmem ) :
+	 Super( a, pmem )
 	{}
 
 public: // Creation

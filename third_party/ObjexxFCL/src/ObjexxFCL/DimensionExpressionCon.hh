@@ -31,25 +31,25 @@ public: // Creation
 	// Copy Constructor
 	inline
 	DimensionExpressionCon( DimensionExpressionCon const & exp ) :
-		Super(),
-		value_( exp.value_ ),
-		integer_( exp.integer_ )
+	 Super(),
+	 value_( exp.value_ ),
+	 integer_( exp.integer_ )
 	{}
 
 	// int Constructor
 	inline
 	explicit
 	DimensionExpressionCon( int const value ) :
-		value_( static_cast< double >( value ) ),
-		integer_( true )
+	 value_( static_cast< double >( value ) ),
+	 integer_( true )
 	{}
 
 	// double Constructor
 	inline
 	explicit
 	DimensionExpressionCon( double const value ) :
-		value_( value ),
-		integer_( false )
+	 value_( value ),
+	 integer_( false )
 	{}
 
 	// Clone

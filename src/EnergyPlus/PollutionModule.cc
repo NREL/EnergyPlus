@@ -323,7 +323,7 @@ namespace PollutionModule {
 			{ auto const SELECT_CASE_var( MakeUPPERCase( FuelType.FuelTypeNames( Loop ) ) );
 			if ( ( SELECT_CASE_var == "NATURALGAS" ) || ( SELECT_CASE_var == "NATURAL GAS" ) || ( SELECT_CASE_var == "GAS" ) ) {
 				if ( Pollution.NatGasCoef.FuelFactorUsed ) {
-					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered. Previous entry will be used." );
 					continue;
 				}
 				Pollution.NatGasCoef.FuelFactorUsed = true;
@@ -399,7 +399,7 @@ namespace PollutionModule {
 
 			} else if ( ( SELECT_CASE_var == "RESIDUALOIL" ) || ( SELECT_CASE_var == "RESIDUAL OIL" ) || ( SELECT_CASE_var == "FUEL OIL #2" ) || ( SELECT_CASE_var == "FUELOIL#2" ) ) {
 				if ( Pollution.FuelOil2Coef.FuelFactorUsed ) {
-					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered. Previous entry will be used." );
 					continue;
 				}
 				Pollution.FuelOil2Coef.FuelFactorUsed = true;
@@ -475,7 +475,7 @@ namespace PollutionModule {
 
 			} else if ( ( SELECT_CASE_var == "DISTILLATEOIL" ) || ( SELECT_CASE_var == "DISTILLATE OIL" ) || ( SELECT_CASE_var == "FUEL OIL #1" ) || ( SELECT_CASE_var == "FUELOIL#1" ) || ( SELECT_CASE_var == "FUEL OIL" ) ) {
 				if ( Pollution.FuelOil1Coef.FuelFactorUsed ) {
-					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered. Previous entry will be used." );
 					continue;
 				}
 				Pollution.FuelOil1Coef.FuelFactorUsed = true;
@@ -551,7 +551,7 @@ namespace PollutionModule {
 
 			} else if ( SELECT_CASE_var == "COAL" ) {
 				if ( Pollution.CoalCoef.FuelFactorUsed ) {
-					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered. Previous entry will be used." );
 					continue;
 				}
 				Pollution.CoalCoef.FuelFactorUsed = true;
@@ -627,7 +627,7 @@ namespace PollutionModule {
 
 			} else if ( ( SELECT_CASE_var == "ELECTRICITY" ) || ( SELECT_CASE_var == "ELECTRIC" ) || ( SELECT_CASE_var == "ELEC" ) ) {
 				if ( Pollution.ElecCoef.FuelFactorUsed ) {
-					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered. Previous entry will be used." );
 					continue;
 				}
 				Pollution.ElecCoef.FuelFactorUsed = true;
@@ -703,7 +703,7 @@ namespace PollutionModule {
 
 			} else if ( SELECT_CASE_var == "GASOLINE" ) {
 				if ( Pollution.GasolineCoef.FuelFactorUsed ) {
-					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered. Previous entry will be used." );
 					continue;
 				}
 				Pollution.GasolineCoef.FuelFactorUsed = true;
@@ -779,7 +779,7 @@ namespace PollutionModule {
 
 			} else if ( ( SELECT_CASE_var == "PROPANE" ) || ( SELECT_CASE_var == "LPG" ) || ( SELECT_CASE_var == "PROPANEGAS" ) || ( SELECT_CASE_var == "PROPANE GAS" ) ) {
 				if ( Pollution.PropaneCoef.FuelFactorUsed ) {
-					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered. Previous entry will be used." );
 					continue;
 				}
 				Pollution.PropaneCoef.FuelFactorUsed = true;
@@ -855,7 +855,7 @@ namespace PollutionModule {
 
 			} else if ( SELECT_CASE_var == "DIESEL" ) {
 				if ( Pollution.DieselCoef.FuelFactorUsed ) {
-					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered. Previous entry will be used." );
 					continue;
 				}
 				Pollution.DieselCoef.FuelFactorUsed = true;
@@ -931,7 +931,7 @@ namespace PollutionModule {
 
 			} else if ( SELECT_CASE_var == "OTHERFUEL1" ) {
 				if ( Pollution.OtherFuel1Coef.FuelFactorUsed ) {
-					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered. Previous entry will be used." );
 					continue;
 				}
 				Pollution.OtherFuel1Coef.FuelFactorUsed = true;
@@ -1007,7 +1007,7 @@ namespace PollutionModule {
 
 			} else if ( SELECT_CASE_var == "OTHERFUEL2" ) {
 				if ( Pollution.OtherFuel2Coef.FuelFactorUsed ) {
-					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered." " Previous entry will be used." );
+					ShowWarningError( cCurrentModuleObject + ": " + FuelType.FuelTypeNames( Loop ) + " already entered. Previous entry will be used." );
 					continue;
 				}
 				Pollution.OtherFuel2Coef.FuelFactorUsed = true;
@@ -1465,8 +1465,8 @@ namespace PollutionModule {
 		// in progress
 		if ( NumFuelFactors == 0 || NumEnvImpactFactors == 0 ) {
 			if ( ReportingThisVariable( "Environmental Impact Total N2O Emissions Carbon Equivalent Mass" ) || ReportingThisVariable( "Environmental Impact Total CH4 Emissions Carbon Equivalent Mass" ) || ReportingThisVariable( "Environmental Impact Total CO2 Emissions Carbon Equivalent Mass" ) || ReportingThisVariable( "Carbon Equivalent:Facility" ) || ReportingThisVariable( "CarbonEquivalentEmissions:Carbon Equivalent" ) ) {
-				ShowWarningError( "GetPollutionFactorInput: Requested reporting for Carbon Equivalent Pollution, " "but insufficient information is entered." );
-				ShowContinueError( "Both \"FuelFactors\" and \"EnvironmentalImpactFactors\" must be entered or the " "displayed carbon pollution will all be zero." );
+				ShowWarningError( "GetPollutionFactorInput: Requested reporting for Carbon Equivalent Pollution, but insufficient information is entered." );
+				ShowContinueError( "Both \"FuelFactors\" and \"EnvironmentalImpactFactors\" must be entered or the displayed carbon pollution will all be zero." );
 			}
 		}
 
@@ -1601,94 +1601,94 @@ namespace PollutionModule {
 		if ( Pollution.ElecCoef.FuelFactorUsed ) {
 			Pollution.ElecComp.CO2Pollution = 0.0;
 			if ( Pollution.ElecCoef.CO2Sched == 0 ) {
-				ElecValue = Pollution.ElecCoef.CO2 / 1000.0;
+				ElecValue = Pollution.ElecCoef.CO2 * 0.001;
 			} else {
-				ElecValue = Pollution.ElecCoef.CO2 * GetCurrentScheduleValue( Pollution.ElecCoef.CO2Sched ) / 1000.0;
+				ElecValue = Pollution.ElecCoef.CO2 * GetCurrentScheduleValue( Pollution.ElecCoef.CO2Sched ) * 0.001;
 			}
-			Pollution.ElecComp.CO2Pollution = ( FuelType.Elec / 1.0e6 ) * ElecValue;
+			Pollution.ElecComp.CO2Pollution = ( FuelType.Elec * 1.0e-6 ) * ElecValue;
 		}
 		if ( Pollution.NatGasCoef.FuelFactorUsed ) {
 			Pollution.NatGasComp.CO2Pollution = 0.0;
 			if ( Pollution.NatGasCoef.CO2Sched == 0 ) {
-				NatGasValue = Pollution.NatGasCoef.CO2 / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.CO2 * 0.001;
 			} else {
-				NatGasValue = Pollution.NatGasCoef.CO2 * GetCurrentScheduleValue( Pollution.NatGasCoef.CO2Sched ) / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.CO2 * GetCurrentScheduleValue( Pollution.NatGasCoef.CO2Sched ) * 0.001;
 			}
-			Pollution.NatGasComp.CO2Pollution = ( FuelType.NatGas / 1.0e6 ) * NatGasValue;
+			Pollution.NatGasComp.CO2Pollution = ( FuelType.NatGas * 1.0e-6 ) * NatGasValue;
 		}
 		if ( Pollution.FuelOil1Coef.FuelFactorUsed ) {
 			Pollution.FuelOil1Comp.CO2Pollution = 0.0;
 			if ( Pollution.FuelOil1Coef.CO2Sched == 0 ) {
-				FuelOil1Value = Pollution.FuelOil1Coef.CO2 / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.CO2 * 0.001;
 			} else {
-				FuelOil1Value = Pollution.FuelOil1Coef.CO2 * GetCurrentScheduleValue( Pollution.FuelOil1Coef.CO2Sched ) / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.CO2 * GetCurrentScheduleValue( Pollution.FuelOil1Coef.CO2Sched ) * 0.001;
 			}
-			Pollution.FuelOil1Comp.CO2Pollution = ( FuelType.FuelOil1 / 1.0e6 ) * FuelOil1Value;
+			Pollution.FuelOil1Comp.CO2Pollution = ( FuelType.FuelOil1 * 1.0e-6 ) * FuelOil1Value;
 		}
 		if ( Pollution.FuelOil2Coef.FuelFactorUsed ) {
 			Pollution.FuelOil2Comp.CO2Pollution = 0.0;
 			if ( Pollution.FuelOil2Coef.CO2Sched == 0 ) {
-				FuelOil2Value = Pollution.FuelOil2Coef.CO2 / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.CO2 * 0.001;
 			} else {
-				FuelOil2Value = Pollution.FuelOil2Coef.CO2 * GetCurrentScheduleValue( Pollution.FuelOil2Coef.CO2Sched ) / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.CO2 * GetCurrentScheduleValue( Pollution.FuelOil2Coef.CO2Sched ) * 0.001;
 			}
-			Pollution.FuelOil2Comp.CO2Pollution = ( FuelType.FuelOil2 / 1.0e6 ) * FuelOil2Value;
+			Pollution.FuelOil2Comp.CO2Pollution = ( FuelType.FuelOil2 * 1.0e-6 ) * FuelOil2Value;
 		}
 		if ( Pollution.CoalCoef.FuelFactorUsed ) {
 			Pollution.CoalComp.CO2Pollution = 0.0;
 			if ( Pollution.CoalCoef.CO2Sched == 0 ) {
-				CoalValue = Pollution.CoalCoef.CO2 / 1000.0;
+				CoalValue = Pollution.CoalCoef.CO2 * 0.001;
 			} else {
-				CoalValue = Pollution.CoalCoef.CO2 * GetCurrentScheduleValue( Pollution.CoalCoef.CO2Sched ) / 1000.0;
+				CoalValue = Pollution.CoalCoef.CO2 * GetCurrentScheduleValue( Pollution.CoalCoef.CO2Sched ) * 0.001;
 			}
-			Pollution.CoalComp.CO2Pollution = ( FuelType.Coal / 1.0e6 ) * CoalValue;
+			Pollution.CoalComp.CO2Pollution = ( FuelType.Coal * 1.0e-6 ) * CoalValue;
 		}
 		if ( Pollution.GasolineCoef.FuelFactorUsed ) {
 			Pollution.GasolineComp.CO2Pollution = 0.0;
 			if ( Pollution.GasolineCoef.CO2Sched == 0 ) {
-				GasolineValue = Pollution.GasolineCoef.CO2 / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.CO2 * 0.001;
 			} else {
-				GasolineValue = Pollution.GasolineCoef.CO2 * GetCurrentScheduleValue( Pollution.GasolineCoef.CO2Sched ) / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.CO2 * GetCurrentScheduleValue( Pollution.GasolineCoef.CO2Sched ) * 0.001;
 			}
-			Pollution.GasolineComp.CO2Pollution = ( FuelType.Gasoline / 1.0e6 ) * GasolineValue;
+			Pollution.GasolineComp.CO2Pollution = ( FuelType.Gasoline * 1.0e-6 ) * GasolineValue;
 		}
 		if ( Pollution.PropaneCoef.FuelFactorUsed ) {
 			Pollution.PropaneComp.CO2Pollution = 0.0;
 			if ( Pollution.PropaneCoef.CO2Sched == 0 ) {
-				PropaneValue = Pollution.PropaneCoef.CO2 / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.CO2 * 0.001;
 			} else {
-				PropaneValue = Pollution.PropaneCoef.CO2 * GetCurrentScheduleValue( Pollution.PropaneCoef.CO2Sched ) / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.CO2 * GetCurrentScheduleValue( Pollution.PropaneCoef.CO2Sched ) * 0.001;
 			}
-			Pollution.PropaneComp.CO2Pollution = ( FuelType.Propane / 1.0e6 ) * PropaneValue;
+			Pollution.PropaneComp.CO2Pollution = ( FuelType.Propane * 1.0e-6 ) * PropaneValue;
 		}
 		if ( Pollution.DieselCoef.FuelFactorUsed ) {
 			Pollution.DieselComp.CO2Pollution = 0.0;
 			if ( Pollution.DieselCoef.CO2Sched == 0 ) {
-				DieselValue = Pollution.DieselCoef.CO2 / 1000.0;
+				DieselValue = Pollution.DieselCoef.CO2 * 0.001;
 			} else {
-				DieselValue = Pollution.DieselCoef.CO2 * GetCurrentScheduleValue( Pollution.DieselCoef.CO2Sched ) / 1000.0;
+				DieselValue = Pollution.DieselCoef.CO2 * GetCurrentScheduleValue( Pollution.DieselCoef.CO2Sched ) * 0.001;
 			}
-			Pollution.DieselComp.CO2Pollution = ( FuelType.Diesel / 1.0e6 ) * DieselValue;
+			Pollution.DieselComp.CO2Pollution = ( FuelType.Diesel * 1.0e-6 ) * DieselValue;
 		}
 
 		if ( Pollution.OtherFuel1Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel1Comp.CO2Pollution = 0.0;
 			if ( Pollution.OtherFuel1Coef.CO2Sched == 0 ) {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.CO2 / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.CO2 * 0.001;
 			} else {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.CO2 * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.CO2Sched ) / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.CO2 * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.CO2Sched ) * 0.001;
 			}
-			Pollution.OtherFuel1Comp.CO2Pollution = ( FuelType.OtherFuel1 / 1.0e6 ) * OtherFuel1Value;
+			Pollution.OtherFuel1Comp.CO2Pollution = ( FuelType.OtherFuel1 * 1.0e-6 ) * OtherFuel1Value;
 		}
 
 		if ( Pollution.OtherFuel2Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel2Comp.CO2Pollution = 0.0;
 			if ( Pollution.OtherFuel2Coef.CO2Sched == 0 ) {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.CO2 / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.CO2 * 0.001;
 			} else {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.CO2 * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.CO2Sched ) / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.CO2 * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.CO2Sched ) * 0.001;
 			}
-			Pollution.OtherFuel2Comp.CO2Pollution = ( FuelType.OtherFuel2 / 1.0e6 ) * OtherFuel2Value;
+			Pollution.OtherFuel2Comp.CO2Pollution = ( FuelType.OtherFuel2 * 1.0e-6 ) * OtherFuel2Value;
 		}
 
 		Pollution.CO2PollutTotal = Pollution.ElecComp.CO2Pollution + Pollution.NatGasComp.CO2Pollution + Pollution.FuelOil1Comp.CO2Pollution + Pollution.FuelOil2Comp.CO2Pollution + Pollution.CoalComp.CO2Pollution + Pollution.GasolineComp.CO2Pollution + Pollution.PropaneComp.CO2Pollution + Pollution.DieselComp.CO2Pollution + Pollution.OtherFuel1Comp.CO2Pollution + Pollution.OtherFuel2Comp.CO2Pollution;
@@ -1707,92 +1707,92 @@ namespace PollutionModule {
 		if ( Pollution.ElecCoef.FuelFactorUsed ) {
 			Pollution.ElecComp.NOxPollution = 0.0;
 			if ( Pollution.ElecCoef.NOxSched == 0 ) {
-				ElecValue = Pollution.ElecCoef.NOx / 1000.0;
+				ElecValue = Pollution.ElecCoef.NOx * 0.001;
 			} else {
-				ElecValue = Pollution.ElecCoef.NOx * GetCurrentScheduleValue( Pollution.ElecCoef.NOxSched ) / 1000.0;
+				ElecValue = Pollution.ElecCoef.NOx * GetCurrentScheduleValue( Pollution.ElecCoef.NOxSched ) * 0.001;
 			}
-			Pollution.ElecComp.NOxPollution = ( FuelType.Elec / 1.0e6 ) * ElecValue;
+			Pollution.ElecComp.NOxPollution = ( FuelType.Elec * 1.0e-6 ) * ElecValue;
 		}
 		if ( Pollution.NatGasCoef.FuelFactorUsed ) {
 			Pollution.NatGasComp.NOxPollution = 0.0;
 			if ( Pollution.NatGasCoef.NOxSched == 0 ) {
-				NatGasValue = Pollution.NatGasCoef.NOx / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.NOx * 0.001;
 			} else {
-				NatGasValue = Pollution.NatGasCoef.NOx * GetCurrentScheduleValue( Pollution.NatGasCoef.NOxSched ) / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.NOx * GetCurrentScheduleValue( Pollution.NatGasCoef.NOxSched ) * 0.001;
 			}
-			Pollution.NatGasComp.NOxPollution = ( FuelType.NatGas / 1.0e6 ) * NatGasValue;
+			Pollution.NatGasComp.NOxPollution = ( FuelType.NatGas * 1.0e-6 ) * NatGasValue;
 		}
 		if ( Pollution.FuelOil1Coef.FuelFactorUsed ) {
 			Pollution.FuelOil1Comp.NOxPollution = 0.0;
 			if ( Pollution.FuelOil1Coef.NOxSched == 0 ) {
-				FuelOil1Value = Pollution.FuelOil1Coef.NOx / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.NOx * 0.001;
 			} else {
-				FuelOil1Value = Pollution.FuelOil1Coef.NOx * GetCurrentScheduleValue( Pollution.FuelOil1Coef.NOxSched ) / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.NOx * GetCurrentScheduleValue( Pollution.FuelOil1Coef.NOxSched ) * 0.001;
 			}
-			Pollution.FuelOil1Comp.NOxPollution = ( FuelType.FuelOil1 / 1.0e6 ) * FuelOil1Value;
+			Pollution.FuelOil1Comp.NOxPollution = ( FuelType.FuelOil1 * 1.0e-6 ) * FuelOil1Value;
 		}
 		if ( Pollution.FuelOil2Coef.FuelFactorUsed ) {
 			Pollution.FuelOil2Comp.NOxPollution = 0.0;
 			if ( Pollution.FuelOil2Coef.NOxSched == 0 ) {
-				FuelOil2Value = Pollution.FuelOil2Coef.NOx / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.NOx * 0.001;
 			} else {
-				FuelOil2Value = Pollution.FuelOil2Coef.NOx * GetCurrentScheduleValue( Pollution.FuelOil2Coef.NOxSched ) / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.NOx * GetCurrentScheduleValue( Pollution.FuelOil2Coef.NOxSched ) * 0.001;
 			}
-			Pollution.FuelOil2Comp.NOxPollution = ( FuelType.FuelOil2 / 1.0e6 ) * FuelOil2Value;
+			Pollution.FuelOil2Comp.NOxPollution = ( FuelType.FuelOil2 * 1.0e-6 ) * FuelOil2Value;
 		}
 		if ( Pollution.CoalCoef.FuelFactorUsed ) {
 			Pollution.CoalComp.NOxPollution = 0.0;
 			if ( Pollution.CoalCoef.NOxSched == 0 ) {
-				CoalValue = Pollution.CoalCoef.NOx / 1000.0;
+				CoalValue = Pollution.CoalCoef.NOx * 0.001;
 			} else {
-				CoalValue = Pollution.CoalCoef.NOx * GetCurrentScheduleValue( Pollution.CoalCoef.NOxSched ) / 1000.0;
+				CoalValue = Pollution.CoalCoef.NOx * GetCurrentScheduleValue( Pollution.CoalCoef.NOxSched ) * 0.001;
 			}
-			Pollution.CoalComp.NOxPollution = ( FuelType.Coal / 1.0e6 ) * CoalValue;
+			Pollution.CoalComp.NOxPollution = ( FuelType.Coal * 1.0e-6 ) * CoalValue;
 		}
 		if ( Pollution.GasolineCoef.FuelFactorUsed ) {
 			Pollution.GasolineComp.NOxPollution = 0.0;
 			if ( Pollution.GasolineCoef.NOxSched == 0 ) {
-				GasolineValue = Pollution.GasolineCoef.NOx / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.NOx * 0.001;
 			} else {
-				GasolineValue = Pollution.GasolineCoef.NOx * GetCurrentScheduleValue( Pollution.GasolineCoef.NOxSched ) / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.NOx * GetCurrentScheduleValue( Pollution.GasolineCoef.NOxSched ) * 0.001;
 			}
-			Pollution.GasolineComp.NOxPollution = ( FuelType.Gasoline / 1.0e6 ) * GasolineValue;
+			Pollution.GasolineComp.NOxPollution = ( FuelType.Gasoline * 1.0e-6 ) * GasolineValue;
 		}
 		if ( Pollution.PropaneCoef.FuelFactorUsed ) {
 			Pollution.PropaneComp.NOxPollution = 0.0;
 			if ( Pollution.PropaneCoef.NOxSched == 0 ) {
-				PropaneValue = Pollution.PropaneCoef.NOx / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.NOx * 0.001;
 			} else {
-				PropaneValue = Pollution.PropaneCoef.NOx * GetCurrentScheduleValue( Pollution.PropaneCoef.NOxSched ) / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.NOx * GetCurrentScheduleValue( Pollution.PropaneCoef.NOxSched ) * 0.001;
 			}
-			Pollution.PropaneComp.NOxPollution = ( FuelType.Propane / 1.0e6 ) * PropaneValue;
+			Pollution.PropaneComp.NOxPollution = ( FuelType.Propane * 1.0e-6 ) * PropaneValue;
 		}
 		if ( Pollution.DieselCoef.FuelFactorUsed ) {
 			Pollution.DieselComp.NOxPollution = 0.0;
 			if ( Pollution.DieselCoef.NOxSched == 0 ) {
-				DieselValue = Pollution.DieselCoef.NOx / 1000.0;
+				DieselValue = Pollution.DieselCoef.NOx * 0.001;
 			} else {
-				DieselValue = Pollution.DieselCoef.NOx * GetCurrentScheduleValue( Pollution.DieselCoef.NOxSched ) / 1000.0;
+				DieselValue = Pollution.DieselCoef.NOx * GetCurrentScheduleValue( Pollution.DieselCoef.NOxSched ) * 0.001;
 			}
-			Pollution.DieselComp.NOxPollution = ( FuelType.Diesel / 1.0e6 ) * DieselValue;
+			Pollution.DieselComp.NOxPollution = ( FuelType.Diesel * 1.0e-6 ) * DieselValue;
 		}
 		if ( Pollution.OtherFuel1Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel1Comp.NOxPollution = 0.0;
 			if ( Pollution.OtherFuel1Coef.NOxSched == 0 ) {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.NOx / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.NOx * 0.001;
 			} else {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.NOx * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.NOxSched ) / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.NOx * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.NOxSched ) * 0.001;
 			}
-			Pollution.OtherFuel1Comp.NOxPollution = ( FuelType.OtherFuel1 / 1.0e6 ) * OtherFuel1Value;
+			Pollution.OtherFuel1Comp.NOxPollution = ( FuelType.OtherFuel1 * 1.0e-6 ) * OtherFuel1Value;
 		}
 		if ( Pollution.OtherFuel2Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel2Comp.NOxPollution = 0.0;
 			if ( Pollution.OtherFuel2Coef.NOxSched == 0 ) {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.NOx / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.NOx * 0.001;
 			} else {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.NOx * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.NOxSched ) / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.NOx * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.NOxSched ) * 0.001;
 			}
-			Pollution.OtherFuel2Comp.NOxPollution = ( FuelType.OtherFuel2 / 1.0e6 ) * OtherFuel2Value;
+			Pollution.OtherFuel2Comp.NOxPollution = ( FuelType.OtherFuel2 * 1.0e-6 ) * OtherFuel2Value;
 		}
 
 		ElecValue = 0.0;
@@ -1809,92 +1809,92 @@ namespace PollutionModule {
 		if ( Pollution.ElecCoef.FuelFactorUsed ) {
 			Pollution.ElecComp.CH4Pollution = 0.0;
 			if ( Pollution.ElecCoef.CH4Sched == 0 ) {
-				ElecValue = Pollution.ElecCoef.CH4 / 1000.0;
+				ElecValue = Pollution.ElecCoef.CH4 * 0.001;
 			} else {
-				ElecValue = Pollution.ElecCoef.CH4 * GetCurrentScheduleValue( Pollution.ElecCoef.CH4Sched ) / 1000.0;
+				ElecValue = Pollution.ElecCoef.CH4 * GetCurrentScheduleValue( Pollution.ElecCoef.CH4Sched ) * 0.001;
 			}
-			Pollution.ElecComp.CH4Pollution = ( FuelType.Elec / 1.0e6 ) * ElecValue;
+			Pollution.ElecComp.CH4Pollution = ( FuelType.Elec * 1.0e-6 ) * ElecValue;
 		}
 		if ( Pollution.NatGasCoef.FuelFactorUsed ) {
 			Pollution.NatGasComp.CH4Pollution = 0.0;
 			if ( Pollution.NatGasCoef.CH4Sched == 0 ) {
-				NatGasValue = Pollution.NatGasCoef.CH4 / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.CH4 * 0.001;
 			} else {
-				NatGasValue = Pollution.NatGasCoef.CH4 * GetCurrentScheduleValue( Pollution.NatGasCoef.CH4Sched ) / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.CH4 * GetCurrentScheduleValue( Pollution.NatGasCoef.CH4Sched ) * 0.001;
 			}
-			Pollution.NatGasComp.CH4Pollution = ( FuelType.NatGas / 1.0e6 ) * NatGasValue;
+			Pollution.NatGasComp.CH4Pollution = ( FuelType.NatGas * 1.0e-6 ) * NatGasValue;
 		}
 		if ( Pollution.FuelOil1Coef.FuelFactorUsed ) {
 			Pollution.FuelOil1Comp.CH4Pollution = 0.0;
 			if ( Pollution.FuelOil1Coef.CH4Sched == 0 ) {
-				FuelOil1Value = Pollution.FuelOil1Coef.CH4 / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.CH4 * 0.001;
 			} else {
-				FuelOil1Value = Pollution.FuelOil1Coef.CH4 * GetCurrentScheduleValue( Pollution.FuelOil1Coef.CH4Sched ) / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.CH4 * GetCurrentScheduleValue( Pollution.FuelOil1Coef.CH4Sched ) * 0.001;
 			}
-			Pollution.FuelOil1Comp.CH4Pollution = ( FuelType.FuelOil1 / 1.0e6 ) * FuelOil1Value;
+			Pollution.FuelOil1Comp.CH4Pollution = ( FuelType.FuelOil1 * 1.0e-6 ) * FuelOil1Value;
 		}
 		if ( Pollution.FuelOil2Coef.FuelFactorUsed ) {
 			Pollution.FuelOil2Comp.CH4Pollution = 0.0;
 			if ( Pollution.FuelOil2Coef.CH4Sched == 0 ) {
-				FuelOil2Value = Pollution.FuelOil2Coef.CH4 / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.CH4 * 0.001;
 			} else {
-				FuelOil2Value = Pollution.FuelOil2Coef.CH4 * GetCurrentScheduleValue( Pollution.FuelOil2Coef.CH4Sched ) / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.CH4 * GetCurrentScheduleValue( Pollution.FuelOil2Coef.CH4Sched ) * 0.001;
 			}
-			Pollution.FuelOil2Comp.CH4Pollution = ( FuelType.FuelOil2 / 1.0e6 ) * FuelOil2Value;
+			Pollution.FuelOil2Comp.CH4Pollution = ( FuelType.FuelOil2 * 1.0e-6 ) * FuelOil2Value;
 		}
 		if ( Pollution.CoalCoef.FuelFactorUsed ) {
 			Pollution.CoalComp.CH4Pollution = 0.0;
 			if ( Pollution.CoalCoef.CH4Sched == 0 ) {
-				CoalValue = Pollution.CoalCoef.CH4 / 1000.0;
+				CoalValue = Pollution.CoalCoef.CH4 * 0.001;
 			} else {
-				CoalValue = Pollution.CoalCoef.CH4 * GetCurrentScheduleValue( Pollution.CoalCoef.CH4Sched ) / 1000.0;
+				CoalValue = Pollution.CoalCoef.CH4 * GetCurrentScheduleValue( Pollution.CoalCoef.CH4Sched ) * 0.001;
 			}
-			Pollution.CoalComp.CH4Pollution = ( FuelType.Coal / 1.0e6 ) * CoalValue;
+			Pollution.CoalComp.CH4Pollution = ( FuelType.Coal * 1.0e-6 ) * CoalValue;
 		}
 		if ( Pollution.GasolineCoef.FuelFactorUsed ) {
 			Pollution.GasolineComp.CH4Pollution = 0.0;
 			if ( Pollution.GasolineCoef.CH4Sched == 0 ) {
-				GasolineValue = Pollution.GasolineCoef.CH4 / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.CH4 * 0.001;
 			} else {
-				GasolineValue = Pollution.GasolineCoef.CH4 * GetCurrentScheduleValue( Pollution.GasolineCoef.CH4Sched ) / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.CH4 * GetCurrentScheduleValue( Pollution.GasolineCoef.CH4Sched ) * 0.001;
 			}
-			Pollution.GasolineComp.CH4Pollution = ( FuelType.Gasoline / 1.0e6 ) * GasolineValue;
+			Pollution.GasolineComp.CH4Pollution = ( FuelType.Gasoline * 1.0e-6 ) * GasolineValue;
 		}
 		if ( Pollution.PropaneCoef.FuelFactorUsed ) {
 			Pollution.PropaneComp.CH4Pollution = 0.0;
 			if ( Pollution.PropaneCoef.CH4Sched == 0 ) {
-				PropaneValue = Pollution.PropaneCoef.CH4 / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.CH4 * 0.001;
 			} else {
-				PropaneValue = Pollution.PropaneCoef.CH4 * GetCurrentScheduleValue( Pollution.PropaneCoef.CH4Sched ) / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.CH4 * GetCurrentScheduleValue( Pollution.PropaneCoef.CH4Sched ) * 0.001;
 			}
-			Pollution.PropaneComp.CH4Pollution = ( FuelType.Propane / 1.0e6 ) * PropaneValue;
+			Pollution.PropaneComp.CH4Pollution = ( FuelType.Propane * 1.0e-6 ) * PropaneValue;
 		}
 		if ( Pollution.DieselCoef.FuelFactorUsed ) {
 			Pollution.DieselComp.CH4Pollution = 0.0;
 			if ( Pollution.DieselCoef.CH4Sched == 0 ) {
-				DieselValue = Pollution.DieselCoef.CH4 / 1000.0;
+				DieselValue = Pollution.DieselCoef.CH4 * 0.001;
 			} else {
-				DieselValue = Pollution.DieselCoef.CH4 * GetCurrentScheduleValue( Pollution.DieselCoef.CH4Sched ) / 1000.0;
+				DieselValue = Pollution.DieselCoef.CH4 * GetCurrentScheduleValue( Pollution.DieselCoef.CH4Sched ) * 0.001;
 			}
-			Pollution.DieselComp.CH4Pollution = ( FuelType.Diesel / 1.0e6 ) * DieselValue;
+			Pollution.DieselComp.CH4Pollution = ( FuelType.Diesel * 1.0e-6 ) * DieselValue;
 		}
 		if ( Pollution.OtherFuel1Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel1Comp.CH4Pollution = 0.0;
 			if ( Pollution.OtherFuel1Coef.CH4Sched == 0 ) {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.CH4 / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.CH4 * 0.001;
 			} else {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.CH4 * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.CH4Sched ) / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.CH4 * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.CH4Sched ) * 0.001;
 			}
-			Pollution.OtherFuel1Comp.CH4Pollution = ( FuelType.OtherFuel1 / 1.0e6 ) * OtherFuel1Value;
+			Pollution.OtherFuel1Comp.CH4Pollution = ( FuelType.OtherFuel1 * 1.0e-6 ) * OtherFuel1Value;
 		}
 		if ( Pollution.OtherFuel2Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel2Comp.CH4Pollution = 0.0;
 			if ( Pollution.OtherFuel2Coef.CH4Sched == 0 ) {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.CH4 / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.CH4 * 0.001;
 			} else {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.CH4 * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.CH4Sched ) / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.CH4 * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.CH4Sched ) * 0.001;
 			}
-			Pollution.OtherFuel2Comp.CH4Pollution = ( FuelType.OtherFuel2 / 1.0e6 ) * OtherFuel2Value;
+			Pollution.OtherFuel2Comp.CH4Pollution = ( FuelType.OtherFuel2 * 1.0e-6 ) * OtherFuel2Value;
 		}
 
 		Pollution.CH4PollutTotal = Pollution.ElecComp.CH4Pollution + Pollution.NatGasComp.CH4Pollution + Pollution.FuelOil1Comp.CH4Pollution + Pollution.FuelOil2Comp.CH4Pollution + Pollution.CoalComp.CH4Pollution + Pollution.GasolineComp.CH4Pollution + Pollution.PropaneComp.CH4Pollution + Pollution.DieselComp.CH4Pollution + Pollution.OtherFuel1Comp.CH4Pollution + Pollution.OtherFuel1Comp.CH4Pollution;
@@ -1913,92 +1913,92 @@ namespace PollutionModule {
 		if ( Pollution.ElecCoef.FuelFactorUsed ) {
 			Pollution.ElecComp.COPollution = 0.0;
 			if ( Pollution.ElecCoef.COSched == 0 ) {
-				ElecValue = Pollution.ElecCoef.CO / 1000.0;
+				ElecValue = Pollution.ElecCoef.CO * 0.001;
 			} else {
-				ElecValue = Pollution.ElecCoef.CO * GetCurrentScheduleValue( Pollution.ElecCoef.COSched ) / 1000.0;
+				ElecValue = Pollution.ElecCoef.CO * GetCurrentScheduleValue( Pollution.ElecCoef.COSched ) * 0.001;
 			}
-			Pollution.ElecComp.COPollution = ( FuelType.Elec / 1.0e6 ) * ElecValue;
+			Pollution.ElecComp.COPollution = ( FuelType.Elec * 1.0e-6 ) * ElecValue;
 		}
 		if ( Pollution.NatGasCoef.FuelFactorUsed ) {
 			Pollution.NatGasComp.COPollution = 0.0;
 			if ( Pollution.NatGasCoef.COSched == 0 ) {
-				NatGasValue = Pollution.NatGasCoef.CO / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.CO * 0.001;
 			} else {
-				NatGasValue = Pollution.NatGasCoef.CO * GetCurrentScheduleValue( Pollution.NatGasCoef.COSched ) / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.CO * GetCurrentScheduleValue( Pollution.NatGasCoef.COSched ) * 0.001;
 			}
-			Pollution.NatGasComp.COPollution = ( FuelType.NatGas / 1.0e6 ) * NatGasValue;
+			Pollution.NatGasComp.COPollution = ( FuelType.NatGas * 1.0e-6 ) * NatGasValue;
 		}
 		if ( Pollution.FuelOil1Coef.FuelFactorUsed ) {
 			Pollution.FuelOil1Comp.COPollution = 0.0;
 			if ( Pollution.FuelOil1Coef.COSched == 0 ) {
-				FuelOil1Value = Pollution.FuelOil1Coef.CO / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.CO * 0.001;
 			} else {
-				FuelOil1Value = Pollution.FuelOil1Coef.CO * GetCurrentScheduleValue( Pollution.FuelOil1Coef.COSched ) / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.CO * GetCurrentScheduleValue( Pollution.FuelOil1Coef.COSched ) * 0.001;
 			}
-			Pollution.FuelOil1Comp.COPollution = ( FuelType.FuelOil1 / 1.0e6 ) * FuelOil1Value;
+			Pollution.FuelOil1Comp.COPollution = ( FuelType.FuelOil1 * 1.0e-6 ) * FuelOil1Value;
 		}
 		if ( Pollution.FuelOil2Coef.FuelFactorUsed ) {
 			Pollution.FuelOil2Comp.COPollution = 0.0;
 			if ( Pollution.FuelOil2Coef.COSched == 0 ) {
-				FuelOil2Value = Pollution.FuelOil2Coef.CO / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.CO * 0.001;
 			} else {
-				FuelOil2Value = Pollution.FuelOil2Coef.CO * GetCurrentScheduleValue( Pollution.FuelOil2Coef.COSched ) / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.CO * GetCurrentScheduleValue( Pollution.FuelOil2Coef.COSched ) * 0.001;
 			}
-			Pollution.FuelOil2Comp.COPollution = ( FuelType.FuelOil2 / 1.0e6 ) * FuelOil2Value;
+			Pollution.FuelOil2Comp.COPollution = ( FuelType.FuelOil2 * 1.0e-6 ) * FuelOil2Value;
 		}
 		if ( Pollution.CoalCoef.FuelFactorUsed ) {
 			Pollution.CoalComp.COPollution = 0.0;
 			if ( Pollution.CoalCoef.COSched == 0 ) {
-				CoalValue = Pollution.CoalCoef.CO / 1000.0;
+				CoalValue = Pollution.CoalCoef.CO * 0.001;
 			} else {
-				CoalValue = Pollution.CoalCoef.CO * GetCurrentScheduleValue( Pollution.CoalCoef.COSched ) / 1000.0;
+				CoalValue = Pollution.CoalCoef.CO * GetCurrentScheduleValue( Pollution.CoalCoef.COSched ) * 0.001;
 			}
-			Pollution.CoalComp.COPollution = ( FuelType.Coal / 1.0e6 ) * CoalValue;
+			Pollution.CoalComp.COPollution = ( FuelType.Coal * 1.0e-6 ) * CoalValue;
 		}
 		if ( Pollution.GasolineCoef.FuelFactorUsed ) {
 			Pollution.GasolineComp.COPollution = 0.0;
 			if ( Pollution.GasolineCoef.COSched == 0 ) {
-				GasolineValue = Pollution.GasolineCoef.CO / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.CO * 0.001;
 			} else {
-				GasolineValue = Pollution.GasolineCoef.CO * GetCurrentScheduleValue( Pollution.GasolineCoef.COSched ) / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.CO * GetCurrentScheduleValue( Pollution.GasolineCoef.COSched ) * 0.001;
 			}
-			Pollution.GasolineComp.COPollution = ( FuelType.Gasoline / 1.0e6 ) * GasolineValue;
+			Pollution.GasolineComp.COPollution = ( FuelType.Gasoline * 1.0e-6 ) * GasolineValue;
 		}
 		if ( Pollution.PropaneCoef.FuelFactorUsed ) {
 			Pollution.PropaneComp.COPollution = 0.0;
 			if ( Pollution.PropaneCoef.COSched == 0 ) {
-				PropaneValue = Pollution.PropaneCoef.CO / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.CO * 0.001;
 			} else {
-				PropaneValue = Pollution.PropaneCoef.CO * GetCurrentScheduleValue( Pollution.PropaneCoef.COSched ) / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.CO * GetCurrentScheduleValue( Pollution.PropaneCoef.COSched ) * 0.001;
 			}
-			Pollution.PropaneComp.COPollution = ( FuelType.Propane / 1.0e6 ) * PropaneValue;
+			Pollution.PropaneComp.COPollution = ( FuelType.Propane * 1.0e-6 ) * PropaneValue;
 		}
 		if ( Pollution.DieselCoef.FuelFactorUsed ) {
 			Pollution.DieselComp.COPollution = 0.0;
 			if ( Pollution.DieselCoef.COSched == 0 ) {
-				DieselValue = Pollution.DieselCoef.CO / 1000.0;
+				DieselValue = Pollution.DieselCoef.CO * 0.001;
 			} else {
-				DieselValue = Pollution.DieselCoef.CO * GetCurrentScheduleValue( Pollution.DieselCoef.COSched ) / 1000.0;
+				DieselValue = Pollution.DieselCoef.CO * GetCurrentScheduleValue( Pollution.DieselCoef.COSched ) * 0.001;
 			}
-			Pollution.DieselComp.COPollution = ( FuelType.Diesel / 1.0e6 ) * DieselValue;
+			Pollution.DieselComp.COPollution = ( FuelType.Diesel * 1.0e-6 ) * DieselValue;
 		}
 		if ( Pollution.OtherFuel1Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel1Comp.COPollution = 0.0;
 			if ( Pollution.OtherFuel1Coef.COSched == 0 ) {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.CO / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.CO * 0.001;
 			} else {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.CO * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.COSched ) / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.CO * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.COSched ) * 0.001;
 			}
-			Pollution.OtherFuel1Comp.COPollution = ( FuelType.OtherFuel1 / 1.0e6 ) * OtherFuel1Value;
+			Pollution.OtherFuel1Comp.COPollution = ( FuelType.OtherFuel1 * 1.0e-6 ) * OtherFuel1Value;
 		}
 		if ( Pollution.OtherFuel2Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel2Comp.COPollution = 0.0;
 			if ( Pollution.OtherFuel2Coef.COSched == 0 ) {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.CO / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.CO * 0.001;
 			} else {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.CO * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.COSched ) / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.CO * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.COSched ) * 0.001;
 			}
-			Pollution.OtherFuel2Comp.COPollution = ( FuelType.OtherFuel2 / 1.0e6 ) * OtherFuel2Value;
+			Pollution.OtherFuel2Comp.COPollution = ( FuelType.OtherFuel2 * 1.0e-6 ) * OtherFuel2Value;
 		}
 
 		ElecValue = 0.0;
@@ -2015,92 +2015,92 @@ namespace PollutionModule {
 		if ( Pollution.ElecCoef.FuelFactorUsed ) {
 			Pollution.ElecComp.N2OPollution = 0.0;
 			if ( Pollution.ElecCoef.N2OSched == 0 ) {
-				ElecValue = Pollution.ElecCoef.N2O / 1000.0;
+				ElecValue = Pollution.ElecCoef.N2O * 0.001;
 			} else {
-				ElecValue = Pollution.ElecCoef.N2O * GetCurrentScheduleValue( Pollution.ElecCoef.N2OSched ) / 1000.0;
+				ElecValue = Pollution.ElecCoef.N2O * GetCurrentScheduleValue( Pollution.ElecCoef.N2OSched ) * 0.001;
 			}
-			Pollution.ElecComp.N2OPollution = ( FuelType.Elec / 1.0e6 ) * ElecValue;
+			Pollution.ElecComp.N2OPollution = ( FuelType.Elec * 1.0e-6 ) * ElecValue;
 		}
 		if ( Pollution.NatGasCoef.FuelFactorUsed ) {
 			Pollution.NatGasComp.N2OPollution = 0.0;
 			if ( Pollution.NatGasCoef.N2OSched == 0 ) {
-				NatGasValue = Pollution.NatGasCoef.N2O / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.N2O * 0.001;
 			} else {
-				NatGasValue = Pollution.NatGasCoef.N2O * GetCurrentScheduleValue( Pollution.NatGasCoef.N2OSched ) / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.N2O * GetCurrentScheduleValue( Pollution.NatGasCoef.N2OSched ) * 0.001;
 			}
-			Pollution.NatGasComp.N2OPollution = ( FuelType.NatGas / 1.0e6 ) * NatGasValue;
+			Pollution.NatGasComp.N2OPollution = ( FuelType.NatGas * 1.0e-6 ) * NatGasValue;
 		}
 		if ( Pollution.FuelOil1Coef.FuelFactorUsed ) {
 			Pollution.FuelOil1Comp.N2OPollution = 0.0;
 			if ( Pollution.FuelOil1Coef.N2OSched == 0 ) {
-				FuelOil1Value = Pollution.FuelOil1Coef.N2O / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.N2O * 0.001;
 			} else {
-				FuelOil1Value = Pollution.FuelOil1Coef.N2O * GetCurrentScheduleValue( Pollution.FuelOil1Coef.N2OSched ) / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.N2O * GetCurrentScheduleValue( Pollution.FuelOil1Coef.N2OSched ) * 0.001;
 			}
-			Pollution.FuelOil1Comp.N2OPollution = ( FuelType.FuelOil1 / 1.0e6 ) * FuelOil1Value;
+			Pollution.FuelOil1Comp.N2OPollution = ( FuelType.FuelOil1 * 1.0e-6 ) * FuelOil1Value;
 		}
 		if ( Pollution.FuelOil2Coef.FuelFactorUsed ) {
 			Pollution.FuelOil2Comp.N2OPollution = 0.0;
 			if ( Pollution.FuelOil2Coef.N2OSched == 0 ) {
-				FuelOil2Value = Pollution.FuelOil2Coef.N2O / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.N2O * 0.001;
 			} else {
-				FuelOil2Value = Pollution.FuelOil2Coef.N2O * GetCurrentScheduleValue( Pollution.FuelOil2Coef.N2OSched ) / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.N2O * GetCurrentScheduleValue( Pollution.FuelOil2Coef.N2OSched ) * 0.001;
 			}
-			Pollution.FuelOil2Comp.N2OPollution = ( FuelType.FuelOil2 / 1.0e6 ) * FuelOil2Value;
+			Pollution.FuelOil2Comp.N2OPollution = ( FuelType.FuelOil2 * 1.0e-6 ) * FuelOil2Value;
 		}
 		if ( Pollution.CoalCoef.FuelFactorUsed ) {
 			Pollution.CoalComp.N2OPollution = 0.0;
 			if ( Pollution.CoalCoef.N2OSched == 0 ) {
-				CoalValue = Pollution.CoalCoef.N2O / 1000.0;
+				CoalValue = Pollution.CoalCoef.N2O * 0.001;
 			} else {
-				CoalValue = Pollution.CoalCoef.N2O * GetCurrentScheduleValue( Pollution.CoalCoef.N2OSched ) / 1000.0;
+				CoalValue = Pollution.CoalCoef.N2O * GetCurrentScheduleValue( Pollution.CoalCoef.N2OSched ) * 0.001;
 			}
-			Pollution.CoalComp.N2OPollution = ( FuelType.Coal / 1.0e6 ) * CoalValue;
+			Pollution.CoalComp.N2OPollution = ( FuelType.Coal * 1.0e-6 ) * CoalValue;
 		}
 		if ( Pollution.GasolineCoef.FuelFactorUsed ) {
 			Pollution.GasolineComp.N2OPollution = 0.0;
 			if ( Pollution.GasolineCoef.N2OSched == 0 ) {
-				GasolineValue = Pollution.GasolineCoef.N2O / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.N2O * 0.001;
 			} else {
-				GasolineValue = Pollution.GasolineCoef.N2O * GetCurrentScheduleValue( Pollution.GasolineCoef.N2OSched ) / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.N2O * GetCurrentScheduleValue( Pollution.GasolineCoef.N2OSched ) * 0.001;
 			}
-			Pollution.GasolineComp.N2OPollution = ( FuelType.Gasoline / 1.0e6 ) * GasolineValue;
+			Pollution.GasolineComp.N2OPollution = ( FuelType.Gasoline * 1.0e-6 ) * GasolineValue;
 		}
 		if ( Pollution.PropaneCoef.FuelFactorUsed ) {
 			Pollution.PropaneComp.N2OPollution = 0.0;
 			if ( Pollution.PropaneCoef.N2OSched == 0 ) {
-				PropaneValue = Pollution.PropaneCoef.N2O / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.N2O * 0.001;
 			} else {
-				PropaneValue = Pollution.PropaneCoef.N2O * GetCurrentScheduleValue( Pollution.PropaneCoef.N2OSched ) / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.N2O * GetCurrentScheduleValue( Pollution.PropaneCoef.N2OSched ) * 0.001;
 			}
-			Pollution.PropaneComp.N2OPollution = ( FuelType.Propane / 1.0e6 ) * PropaneValue;
+			Pollution.PropaneComp.N2OPollution = ( FuelType.Propane * 1.0e-6 ) * PropaneValue;
 		}
 		if ( Pollution.DieselCoef.FuelFactorUsed ) {
 			Pollution.DieselComp.N2OPollution = 0.0;
 			if ( Pollution.DieselCoef.N2OSched == 0 ) {
-				DieselValue = Pollution.DieselCoef.N2O / 1000.0;
+				DieselValue = Pollution.DieselCoef.N2O * 0.001;
 			} else {
-				DieselValue = Pollution.DieselCoef.N2O * GetCurrentScheduleValue( Pollution.DieselCoef.N2OSched ) / 1000.0;
+				DieselValue = Pollution.DieselCoef.N2O * GetCurrentScheduleValue( Pollution.DieselCoef.N2OSched ) * 0.001;
 			}
-			Pollution.DieselComp.N2OPollution = ( FuelType.Diesel / 1.0e6 ) * DieselValue;
+			Pollution.DieselComp.N2OPollution = ( FuelType.Diesel * 1.0e-6 ) * DieselValue;
 		}
 		if ( Pollution.OtherFuel1Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel1Comp.N2OPollution = 0.0;
 			if ( Pollution.OtherFuel1Coef.N2OSched == 0 ) {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.N2O / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.N2O * 0.001;
 			} else {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.N2O * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.N2OSched ) / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.N2O * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.N2OSched ) * 0.001;
 			}
-			Pollution.OtherFuel1Comp.N2OPollution = ( FuelType.OtherFuel1 / 1.0e6 ) * OtherFuel1Value;
+			Pollution.OtherFuel1Comp.N2OPollution = ( FuelType.OtherFuel1 * 1.0e-6 ) * OtherFuel1Value;
 		}
 		if ( Pollution.OtherFuel2Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel2Comp.N2OPollution = 0.0;
 			if ( Pollution.OtherFuel2Coef.N2OSched == 0 ) {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.N2O / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.N2O * 0.001;
 			} else {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.N2O * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.N2OSched ) / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.N2O * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.N2OSched ) * 0.001;
 			}
-			Pollution.OtherFuel2Comp.N2OPollution = ( FuelType.OtherFuel2 / 1.0e6 ) * OtherFuel2Value;
+			Pollution.OtherFuel2Comp.N2OPollution = ( FuelType.OtherFuel2 * 1.0e-6 ) * OtherFuel2Value;
 		}
 
 		Pollution.N2OPollutTotal = Pollution.ElecComp.N2OPollution + Pollution.NatGasComp.N2OPollution + Pollution.FuelOil1Comp.N2OPollution + Pollution.FuelOil2Comp.N2OPollution + Pollution.CoalComp.N2OPollution + Pollution.GasolineComp.N2OPollution + Pollution.PropaneComp.N2OPollution + Pollution.DieselComp.N2OPollution + Pollution.OtherFuel1Comp.N2OPollution + Pollution.OtherFuel2Comp.N2OPollution;
@@ -2119,92 +2119,92 @@ namespace PollutionModule {
 		if ( Pollution.ElecCoef.FuelFactorUsed ) {
 			Pollution.ElecComp.SO2Pollution = 0.0;
 			if ( Pollution.ElecCoef.SO2Sched == 0 ) {
-				ElecValue = Pollution.ElecCoef.SO2 / 1000.0;
+				ElecValue = Pollution.ElecCoef.SO2 * 0.001;
 			} else {
-				ElecValue = Pollution.ElecCoef.SO2 * GetCurrentScheduleValue( Pollution.ElecCoef.SO2Sched ) / 1000.0;
+				ElecValue = Pollution.ElecCoef.SO2 * GetCurrentScheduleValue( Pollution.ElecCoef.SO2Sched ) * 0.001;
 			}
-			Pollution.ElecComp.SO2Pollution = ( FuelType.Elec / 1.0e6 ) * ElecValue;
+			Pollution.ElecComp.SO2Pollution = ( FuelType.Elec * 1.0e-6 ) * ElecValue;
 		}
 		if ( Pollution.NatGasCoef.FuelFactorUsed ) {
 			Pollution.NatGasComp.SO2Pollution = 0.0;
 			if ( Pollution.NatGasCoef.SO2Sched == 0 ) {
-				NatGasValue = Pollution.NatGasCoef.SO2 / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.SO2 * 0.001;
 			} else {
-				NatGasValue = Pollution.NatGasCoef.SO2 * GetCurrentScheduleValue( Pollution.NatGasCoef.SO2Sched ) / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.SO2 * GetCurrentScheduleValue( Pollution.NatGasCoef.SO2Sched ) * 0.001;
 			}
-			Pollution.NatGasComp.SO2Pollution = ( FuelType.NatGas / 1.0e6 ) * NatGasValue;
+			Pollution.NatGasComp.SO2Pollution = ( FuelType.NatGas * 1.0e-6 ) * NatGasValue;
 		}
 		if ( Pollution.FuelOil1Coef.FuelFactorUsed ) {
 			Pollution.FuelOil1Comp.SO2Pollution = 0.0;
 			if ( Pollution.FuelOil1Coef.SO2Sched == 0 ) {
-				FuelOil1Value = Pollution.FuelOil1Coef.SO2 / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.SO2 * 0.001;
 			} else {
-				FuelOil1Value = Pollution.FuelOil1Coef.SO2 * GetCurrentScheduleValue( Pollution.FuelOil1Coef.SO2Sched ) / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.SO2 * GetCurrentScheduleValue( Pollution.FuelOil1Coef.SO2Sched ) * 0.001;
 			}
-			Pollution.FuelOil1Comp.SO2Pollution = ( FuelType.FuelOil1 / 1.0e6 ) * FuelOil1Value;
+			Pollution.FuelOil1Comp.SO2Pollution = ( FuelType.FuelOil1 * 1.0e-6 ) * FuelOil1Value;
 		}
 		if ( Pollution.FuelOil2Coef.FuelFactorUsed ) {
 			Pollution.FuelOil2Comp.SO2Pollution = 0.0;
 			if ( Pollution.FuelOil2Coef.SO2Sched == 0 ) {
-				FuelOil2Value = Pollution.FuelOil2Coef.SO2 / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.SO2 * 0.001;
 			} else {
-				FuelOil2Value = Pollution.FuelOil2Coef.SO2 * GetCurrentScheduleValue( Pollution.FuelOil2Coef.SO2Sched ) / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.SO2 * GetCurrentScheduleValue( Pollution.FuelOil2Coef.SO2Sched ) * 0.001;
 			}
-			Pollution.FuelOil2Comp.SO2Pollution = ( FuelType.FuelOil2 / 1.0e6 ) * FuelOil2Value;
+			Pollution.FuelOil2Comp.SO2Pollution = ( FuelType.FuelOil2 * 1.0e-6 ) * FuelOil2Value;
 		}
 		if ( Pollution.CoalCoef.FuelFactorUsed ) {
 			Pollution.CoalComp.SO2Pollution = 0.0;
 			if ( Pollution.CoalCoef.SO2Sched == 0 ) {
-				CoalValue = Pollution.CoalCoef.SO2 / 1000.0;
+				CoalValue = Pollution.CoalCoef.SO2 * 0.001;
 			} else {
-				CoalValue = Pollution.CoalCoef.SO2 * GetCurrentScheduleValue( Pollution.CoalCoef.SO2Sched ) / 1000.0;
+				CoalValue = Pollution.CoalCoef.SO2 * GetCurrentScheduleValue( Pollution.CoalCoef.SO2Sched ) * 0.001;
 			}
-			Pollution.CoalComp.SO2Pollution = ( FuelType.Coal / 1.0e6 ) * CoalValue;
+			Pollution.CoalComp.SO2Pollution = ( FuelType.Coal * 1.0e-6 ) * CoalValue;
 		}
 		if ( Pollution.GasolineCoef.FuelFactorUsed ) {
 			Pollution.GasolineComp.SO2Pollution = 0.0;
 			if ( Pollution.GasolineCoef.SO2Sched == 0 ) {
-				GasolineValue = Pollution.GasolineCoef.SO2 / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.SO2 * 0.001;
 			} else {
-				GasolineValue = Pollution.GasolineCoef.SO2 * GetCurrentScheduleValue( Pollution.GasolineCoef.SO2Sched ) / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.SO2 * GetCurrentScheduleValue( Pollution.GasolineCoef.SO2Sched ) * 0.001;
 			}
-			Pollution.GasolineComp.SO2Pollution = ( FuelType.Gasoline / 1.0e6 ) * GasolineValue;
+			Pollution.GasolineComp.SO2Pollution = ( FuelType.Gasoline * 1.0e-6 ) * GasolineValue;
 		}
 		if ( Pollution.PropaneCoef.FuelFactorUsed ) {
 			Pollution.PropaneComp.SO2Pollution = 0.0;
 			if ( Pollution.PropaneCoef.SO2Sched == 0 ) {
-				PropaneValue = Pollution.PropaneCoef.SO2 / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.SO2 * 0.001;
 			} else {
-				PropaneValue = Pollution.PropaneCoef.SO2 * GetCurrentScheduleValue( Pollution.PropaneCoef.SO2Sched ) / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.SO2 * GetCurrentScheduleValue( Pollution.PropaneCoef.SO2Sched ) * 0.001;
 			}
-			Pollution.PropaneComp.SO2Pollution = ( FuelType.Propane / 1.0e6 ) * PropaneValue;
+			Pollution.PropaneComp.SO2Pollution = ( FuelType.Propane * 1.0e-6 ) * PropaneValue;
 		}
 		if ( Pollution.DieselCoef.FuelFactorUsed ) {
 			Pollution.DieselComp.SO2Pollution = 0.0;
 			if ( Pollution.DieselCoef.SO2Sched == 0 ) {
-				DieselValue = Pollution.DieselCoef.SO2 / 1000.0;
+				DieselValue = Pollution.DieselCoef.SO2 * 0.001;
 			} else {
-				DieselValue = Pollution.DieselCoef.SO2 * GetCurrentScheduleValue( Pollution.DieselCoef.SO2Sched ) / 1000.0;
+				DieselValue = Pollution.DieselCoef.SO2 * GetCurrentScheduleValue( Pollution.DieselCoef.SO2Sched ) * 0.001;
 			}
-			Pollution.DieselComp.SO2Pollution = ( FuelType.Diesel / 1.0e6 ) * DieselValue;
+			Pollution.DieselComp.SO2Pollution = ( FuelType.Diesel * 1.0e-6 ) * DieselValue;
 		}
 		if ( Pollution.OtherFuel1Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel1Comp.SO2Pollution = 0.0;
 			if ( Pollution.OtherFuel1Coef.SO2Sched == 0 ) {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.SO2 / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.SO2 * 0.001;
 			} else {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.SO2 * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.SO2Sched ) / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.SO2 * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.SO2Sched ) * 0.001;
 			}
-			Pollution.OtherFuel1Comp.SO2Pollution = ( FuelType.OtherFuel1 / 1.0e6 ) * OtherFuel1Value;
+			Pollution.OtherFuel1Comp.SO2Pollution = ( FuelType.OtherFuel1 * 1.0e-6 ) * OtherFuel1Value;
 		}
 		if ( Pollution.OtherFuel2Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel2Comp.SO2Pollution = 0.0;
 			if ( Pollution.OtherFuel2Coef.SO2Sched == 0 ) {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.SO2 / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.SO2 * 0.001;
 			} else {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.SO2 * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.SO2Sched ) / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.SO2 * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.SO2Sched ) * 0.001;
 			}
-			Pollution.OtherFuel2Comp.SO2Pollution = ( FuelType.OtherFuel2 / 1.0e6 ) * OtherFuel2Value;
+			Pollution.OtherFuel2Comp.SO2Pollution = ( FuelType.OtherFuel2 * 1.0e-6 ) * OtherFuel2Value;
 		}
 
 		ElecValue = 0.0;
@@ -2221,92 +2221,92 @@ namespace PollutionModule {
 		if ( Pollution.ElecCoef.FuelFactorUsed ) {
 			Pollution.ElecComp.PMPollution = 0.0;
 			if ( Pollution.ElecCoef.PMSched == 0 ) {
-				ElecValue = Pollution.ElecCoef.PM / 1000.0;
+				ElecValue = Pollution.ElecCoef.PM * 0.001;
 			} else {
-				ElecValue = Pollution.ElecCoef.PM * GetCurrentScheduleValue( Pollution.ElecCoef.PMSched ) / 1000.0;
+				ElecValue = Pollution.ElecCoef.PM * GetCurrentScheduleValue( Pollution.ElecCoef.PMSched ) * 0.001;
 			}
-			Pollution.ElecComp.PMPollution = ( FuelType.Elec / 1.0e6 ) * ElecValue;
+			Pollution.ElecComp.PMPollution = ( FuelType.Elec * 1.0e-6 ) * ElecValue;
 		}
 		if ( Pollution.NatGasCoef.FuelFactorUsed ) {
 			Pollution.NatGasComp.PMPollution = 0.0;
 			if ( Pollution.NatGasCoef.PMSched == 0 ) {
-				NatGasValue = Pollution.NatGasCoef.PM / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.PM * 0.001;
 			} else {
-				NatGasValue = Pollution.NatGasCoef.PM * GetCurrentScheduleValue( Pollution.NatGasCoef.PMSched ) / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.PM * GetCurrentScheduleValue( Pollution.NatGasCoef.PMSched ) * 0.001;
 			}
-			Pollution.NatGasComp.PMPollution = ( FuelType.NatGas / 1.0e6 ) * NatGasValue;
+			Pollution.NatGasComp.PMPollution = ( FuelType.NatGas * 1.0e-6 ) * NatGasValue;
 		}
 		if ( Pollution.FuelOil1Coef.FuelFactorUsed ) {
 			Pollution.FuelOil1Comp.PMPollution = 0.0;
 			if ( Pollution.FuelOil1Coef.PMSched == 0 ) {
-				FuelOil1Value = Pollution.FuelOil1Coef.PM / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.PM * 0.001;
 			} else {
-				FuelOil1Value = Pollution.FuelOil1Coef.PM * GetCurrentScheduleValue( Pollution.FuelOil1Coef.PMSched ) / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.PM * GetCurrentScheduleValue( Pollution.FuelOil1Coef.PMSched ) * 0.001;
 			}
-			Pollution.FuelOil1Comp.PMPollution = ( FuelType.FuelOil1 / 1.0e6 ) * FuelOil1Value;
+			Pollution.FuelOil1Comp.PMPollution = ( FuelType.FuelOil1 * 1.0e-6 ) * FuelOil1Value;
 		}
 		if ( Pollution.FuelOil2Coef.FuelFactorUsed ) {
 			Pollution.FuelOil2Comp.PMPollution = 0.0;
 			if ( Pollution.FuelOil2Coef.PMSched == 0 ) {
-				FuelOil2Value = Pollution.FuelOil2Coef.PM / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.PM * 0.001;
 			} else {
-				FuelOil2Value = Pollution.FuelOil2Coef.PM * GetCurrentScheduleValue( Pollution.FuelOil2Coef.PMSched ) / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.PM * GetCurrentScheduleValue( Pollution.FuelOil2Coef.PMSched ) * 0.001;
 			}
-			Pollution.FuelOil2Comp.PMPollution = ( FuelType.FuelOil2 / 1.0e6 ) * FuelOil2Value;
+			Pollution.FuelOil2Comp.PMPollution = ( FuelType.FuelOil2 * 1.0e-6 ) * FuelOil2Value;
 		}
 		if ( Pollution.CoalCoef.FuelFactorUsed ) {
 			Pollution.CoalComp.PMPollution = 0.0;
 			if ( Pollution.CoalCoef.PMSched == 0 ) {
-				CoalValue = Pollution.CoalCoef.PM / 1000.0;
+				CoalValue = Pollution.CoalCoef.PM * 0.001;
 			} else {
-				CoalValue = Pollution.CoalCoef.PM * GetCurrentScheduleValue( Pollution.CoalCoef.PMSched ) / 1000.0;
+				CoalValue = Pollution.CoalCoef.PM * GetCurrentScheduleValue( Pollution.CoalCoef.PMSched ) * 0.001;
 			}
-			Pollution.CoalComp.PMPollution = ( FuelType.Coal / 1.0e6 ) * CoalValue;
+			Pollution.CoalComp.PMPollution = ( FuelType.Coal * 1.0e-6 ) * CoalValue;
 		}
 		if ( Pollution.GasolineCoef.FuelFactorUsed ) {
 			Pollution.GasolineComp.PMPollution = 0.0;
 			if ( Pollution.GasolineCoef.PMSched == 0 ) {
-				GasolineValue = Pollution.GasolineCoef.PM / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.PM * 0.001;
 			} else {
-				GasolineValue = Pollution.GasolineCoef.PM * GetCurrentScheduleValue( Pollution.GasolineCoef.PMSched ) / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.PM * GetCurrentScheduleValue( Pollution.GasolineCoef.PMSched ) * 0.001;
 			}
-			Pollution.GasolineComp.PMPollution = ( FuelType.Gasoline / 1.0e6 ) * GasolineValue;
+			Pollution.GasolineComp.PMPollution = ( FuelType.Gasoline * 1.0e-6 ) * GasolineValue;
 		}
 		if ( Pollution.PropaneCoef.FuelFactorUsed ) {
 			Pollution.PropaneComp.PMPollution = 0.0;
 			if ( Pollution.PropaneCoef.PMSched == 0 ) {
-				PropaneValue = Pollution.PropaneCoef.PM / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.PM * 0.001;
 			} else {
-				PropaneValue = Pollution.PropaneCoef.PM * GetCurrentScheduleValue( Pollution.PropaneCoef.PMSched ) / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.PM * GetCurrentScheduleValue( Pollution.PropaneCoef.PMSched ) * 0.001;
 			}
-			Pollution.PropaneComp.PMPollution = ( FuelType.Propane / 1.0e6 ) * PropaneValue;
+			Pollution.PropaneComp.PMPollution = ( FuelType.Propane * 1.0e-6 ) * PropaneValue;
 		}
 		if ( Pollution.DieselCoef.FuelFactorUsed ) {
 			Pollution.DieselComp.PMPollution = 0.0;
 			if ( Pollution.DieselCoef.PMSched == 0 ) {
-				DieselValue = Pollution.DieselCoef.PM / 1000.0;
+				DieselValue = Pollution.DieselCoef.PM * 0.001;
 			} else {
-				DieselValue = Pollution.DieselCoef.PM * GetCurrentScheduleValue( Pollution.DieselCoef.PMSched ) / 1000.0;
+				DieselValue = Pollution.DieselCoef.PM * GetCurrentScheduleValue( Pollution.DieselCoef.PMSched ) * 0.001;
 			}
-			Pollution.DieselComp.PMPollution = ( FuelType.Diesel / 1.0e6 ) * DieselValue;
+			Pollution.DieselComp.PMPollution = ( FuelType.Diesel * 1.0e-6 ) * DieselValue;
 		}
 		if ( Pollution.OtherFuel1Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel1Comp.PMPollution = 0.0;
 			if ( Pollution.OtherFuel1Coef.PMSched == 0 ) {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.PM / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.PM * 0.001;
 			} else {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.PM * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.PMSched ) / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.PM * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.PMSched ) * 0.001;
 			}
-			Pollution.OtherFuel1Comp.PMPollution = ( FuelType.OtherFuel1 / 1.0e6 ) * OtherFuel1Value;
+			Pollution.OtherFuel1Comp.PMPollution = ( FuelType.OtherFuel1 * 1.0e-6 ) * OtherFuel1Value;
 		}
 		if ( Pollution.OtherFuel2Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel2Comp.PMPollution = 0.0;
 			if ( Pollution.OtherFuel2Coef.PMSched == 0 ) {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.PM / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.PM * 0.001;
 			} else {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.PM * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.PMSched ) / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.PM * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.PMSched ) * 0.001;
 			}
-			Pollution.OtherFuel2Comp.PMPollution = ( FuelType.OtherFuel2 / 1.0e6 ) * OtherFuel2Value;
+			Pollution.OtherFuel2Comp.PMPollution = ( FuelType.OtherFuel2 * 1.0e-6 ) * OtherFuel2Value;
 		}
 
 		ElecValue = 0.0;
@@ -2323,92 +2323,92 @@ namespace PollutionModule {
 		if ( Pollution.ElecCoef.FuelFactorUsed ) {
 			Pollution.ElecComp.PM10Pollution = 0.0;
 			if ( Pollution.ElecCoef.PM10Sched == 0 ) {
-				ElecValue = Pollution.ElecCoef.PM10 / 1000.0;
+				ElecValue = Pollution.ElecCoef.PM10 * 0.001;
 			} else {
-				ElecValue = Pollution.ElecCoef.PM10 * GetCurrentScheduleValue( Pollution.ElecCoef.PM10Sched ) / 1000.0;
+				ElecValue = Pollution.ElecCoef.PM10 * GetCurrentScheduleValue( Pollution.ElecCoef.PM10Sched ) * 0.001;
 			}
-			Pollution.ElecComp.PM10Pollution = ( FuelType.Elec / 1.0e6 ) * ElecValue;
+			Pollution.ElecComp.PM10Pollution = ( FuelType.Elec * 1.0e-6 ) * ElecValue;
 		}
 		if ( Pollution.NatGasCoef.FuelFactorUsed ) {
 			Pollution.NatGasComp.PM10Pollution = 0.0;
 			if ( Pollution.NatGasCoef.PM10Sched == 0 ) {
-				NatGasValue = Pollution.NatGasCoef.PM10 / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.PM10 * 0.001;
 			} else {
-				NatGasValue = Pollution.NatGasCoef.PM10 * GetCurrentScheduleValue( Pollution.NatGasCoef.PM10Sched ) / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.PM10 * GetCurrentScheduleValue( Pollution.NatGasCoef.PM10Sched ) * 0.001;
 			}
-			Pollution.NatGasComp.PM10Pollution = ( FuelType.NatGas / 1.0e6 ) * NatGasValue;
+			Pollution.NatGasComp.PM10Pollution = ( FuelType.NatGas * 1.0e-6 ) * NatGasValue;
 		}
 		if ( Pollution.FuelOil1Coef.FuelFactorUsed ) {
 			Pollution.FuelOil1Comp.PM10Pollution = 0.0;
 			if ( Pollution.FuelOil1Coef.PM10Sched == 0 ) {
-				FuelOil1Value = Pollution.FuelOil1Coef.PM10 / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.PM10 * 0.001;
 			} else {
-				FuelOil1Value = Pollution.FuelOil1Coef.PM10 * GetCurrentScheduleValue( Pollution.FuelOil1Coef.PM10Sched ) / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.PM10 * GetCurrentScheduleValue( Pollution.FuelOil1Coef.PM10Sched ) * 0.001;
 			}
-			Pollution.FuelOil1Comp.PM10Pollution = ( FuelType.FuelOil1 / 1.0e6 ) * FuelOil1Value;
+			Pollution.FuelOil1Comp.PM10Pollution = ( FuelType.FuelOil1 * 1.0e-6 ) * FuelOil1Value;
 		}
 		if ( Pollution.FuelOil2Coef.FuelFactorUsed ) {
 			Pollution.FuelOil2Comp.PM10Pollution = 0.0;
 			if ( Pollution.FuelOil2Coef.PM10Sched == 0 ) {
-				FuelOil2Value = Pollution.FuelOil2Coef.PM10 / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.PM10 * 0.001;
 			} else {
-				FuelOil2Value = Pollution.FuelOil2Coef.PM10 * GetCurrentScheduleValue( Pollution.FuelOil2Coef.PM10Sched ) / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.PM10 * GetCurrentScheduleValue( Pollution.FuelOil2Coef.PM10Sched ) * 0.001;
 			}
-			Pollution.FuelOil2Comp.PM10Pollution = ( FuelType.FuelOil2 / 1.0e6 ) * FuelOil2Value;
+			Pollution.FuelOil2Comp.PM10Pollution = ( FuelType.FuelOil2 * 1.0e-6 ) * FuelOil2Value;
 		}
 		if ( Pollution.CoalCoef.FuelFactorUsed ) {
 			Pollution.CoalComp.PM10Pollution = 0.0;
 			if ( Pollution.CoalCoef.PM10Sched == 0 ) {
-				CoalValue = Pollution.CoalCoef.PM10 / 1000.0;
+				CoalValue = Pollution.CoalCoef.PM10 * 0.001;
 			} else {
-				CoalValue = Pollution.CoalCoef.PM10 * GetCurrentScheduleValue( Pollution.CoalCoef.PM10Sched ) / 1000.0;
+				CoalValue = Pollution.CoalCoef.PM10 * GetCurrentScheduleValue( Pollution.CoalCoef.PM10Sched ) * 0.001;
 			}
-			Pollution.CoalComp.PM10Pollution = ( FuelType.Coal / 1.0e6 ) * CoalValue;
+			Pollution.CoalComp.PM10Pollution = ( FuelType.Coal * 1.0e-6 ) * CoalValue;
 		}
 		if ( Pollution.GasolineCoef.FuelFactorUsed ) {
 			Pollution.GasolineComp.PM10Pollution = 0.0;
 			if ( Pollution.GasolineCoef.PM10Sched == 0 ) {
-				GasolineValue = Pollution.GasolineCoef.PM10 / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.PM10 * 0.001;
 			} else {
-				GasolineValue = Pollution.GasolineCoef.PM10 * GetCurrentScheduleValue( Pollution.GasolineCoef.PM10Sched ) / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.PM10 * GetCurrentScheduleValue( Pollution.GasolineCoef.PM10Sched ) * 0.001;
 			}
-			Pollution.GasolineComp.PM10Pollution = ( FuelType.Gasoline / 1.0e6 ) * GasolineValue;
+			Pollution.GasolineComp.PM10Pollution = ( FuelType.Gasoline * 1.0e-6 ) * GasolineValue;
 		}
 		if ( Pollution.PropaneCoef.FuelFactorUsed ) {
 			Pollution.PropaneComp.PM10Pollution = 0.0;
 			if ( Pollution.PropaneCoef.PM10Sched == 0 ) {
-				PropaneValue = Pollution.PropaneCoef.PM10 / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.PM10 * 0.001;
 			} else {
-				PropaneValue = Pollution.PropaneCoef.PM10 * GetCurrentScheduleValue( Pollution.PropaneCoef.PM10Sched ) / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.PM10 * GetCurrentScheduleValue( Pollution.PropaneCoef.PM10Sched ) * 0.001;
 			}
-			Pollution.PropaneComp.PM10Pollution = ( FuelType.Propane / 1.0e6 ) * PropaneValue;
+			Pollution.PropaneComp.PM10Pollution = ( FuelType.Propane * 1.0e-6 ) * PropaneValue;
 		}
 		if ( Pollution.DieselCoef.FuelFactorUsed ) {
 			Pollution.DieselComp.PM10Pollution = 0.0;
 			if ( Pollution.DieselCoef.PM10Sched == 0 ) {
-				DieselValue = Pollution.DieselCoef.PM10 / 1000.0;
+				DieselValue = Pollution.DieselCoef.PM10 * 0.001;
 			} else {
-				DieselValue = Pollution.DieselCoef.PM10 * GetCurrentScheduleValue( Pollution.DieselCoef.PM10Sched ) / 1000.0;
+				DieselValue = Pollution.DieselCoef.PM10 * GetCurrentScheduleValue( Pollution.DieselCoef.PM10Sched ) * 0.001;
 			}
-			Pollution.DieselComp.PM10Pollution = ( FuelType.Diesel / 1.0e6 ) * DieselValue;
+			Pollution.DieselComp.PM10Pollution = ( FuelType.Diesel * 1.0e-6 ) * DieselValue;
 		}
 		if ( Pollution.OtherFuel1Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel1Comp.PM10Pollution = 0.0;
 			if ( Pollution.OtherFuel1Coef.PM10Sched == 0 ) {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.PM10 / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.PM10 * 0.001;
 			} else {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.PM10 * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.PM10Sched ) / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.PM10 * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.PM10Sched ) * 0.001;
 			}
-			Pollution.OtherFuel1Comp.PM10Pollution = ( FuelType.OtherFuel1 / 1.0e6 ) * OtherFuel1Value;
+			Pollution.OtherFuel1Comp.PM10Pollution = ( FuelType.OtherFuel1 * 1.0e-6 ) * OtherFuel1Value;
 		}
 		if ( Pollution.OtherFuel2Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel2Comp.PM10Pollution = 0.0;
 			if ( Pollution.OtherFuel2Coef.PM10Sched == 0 ) {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.PM10 / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.PM10 * 0.001;
 			} else {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.PM10 * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.PM10Sched ) / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.PM10 * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.PM10Sched ) * 0.001;
 			}
-			Pollution.OtherFuel2Comp.PM10Pollution = ( FuelType.OtherFuel2 / 1.0e6 ) * OtherFuel2Value;
+			Pollution.OtherFuel2Comp.PM10Pollution = ( FuelType.OtherFuel2 * 1.0e-6 ) * OtherFuel2Value;
 		}
 
 		ElecValue = 0.0;
@@ -2425,92 +2425,92 @@ namespace PollutionModule {
 		if ( Pollution.ElecCoef.FuelFactorUsed ) {
 			Pollution.ElecComp.PM25Pollution = 0.0;
 			if ( Pollution.ElecCoef.PM25Sched == 0 ) {
-				ElecValue = Pollution.ElecCoef.PM25 / 1000.0;
+				ElecValue = Pollution.ElecCoef.PM25 * 0.001;
 			} else {
-				ElecValue = Pollution.ElecCoef.PM25 * GetCurrentScheduleValue( Pollution.ElecCoef.PM25Sched ) / 1000.0;
+				ElecValue = Pollution.ElecCoef.PM25 * GetCurrentScheduleValue( Pollution.ElecCoef.PM25Sched ) * 0.001;
 			}
-			Pollution.ElecComp.PM25Pollution = ( FuelType.Elec / 1.0e6 ) * ElecValue;
+			Pollution.ElecComp.PM25Pollution = ( FuelType.Elec * 1.0e-6 ) * ElecValue;
 		}
 		if ( Pollution.NatGasCoef.FuelFactorUsed ) {
 			Pollution.NatGasComp.PM25Pollution = 0.0;
 			if ( Pollution.NatGasCoef.PM25Sched == 0 ) {
-				NatGasValue = Pollution.NatGasCoef.PM25 / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.PM25 * 0.001;
 			} else {
-				NatGasValue = Pollution.NatGasCoef.PM25 * GetCurrentScheduleValue( Pollution.NatGasCoef.PM25Sched ) / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.PM25 * GetCurrentScheduleValue( Pollution.NatGasCoef.PM25Sched ) * 0.001;
 			}
-			Pollution.NatGasComp.PM25Pollution = ( FuelType.NatGas / 1.0e6 ) * NatGasValue;
+			Pollution.NatGasComp.PM25Pollution = ( FuelType.NatGas * 1.0e-6 ) * NatGasValue;
 		}
 		if ( Pollution.FuelOil1Coef.FuelFactorUsed ) {
 			Pollution.FuelOil1Comp.PM25Pollution = 0.0;
 			if ( Pollution.FuelOil1Coef.PM25Sched == 0 ) {
-				FuelOil1Value = Pollution.FuelOil1Coef.PM25 / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.PM25 * 0.001;
 			} else {
-				FuelOil1Value = Pollution.FuelOil1Coef.PM25 * GetCurrentScheduleValue( Pollution.FuelOil1Coef.PM25Sched ) / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.PM25 * GetCurrentScheduleValue( Pollution.FuelOil1Coef.PM25Sched ) * 0.001;
 			}
-			Pollution.FuelOil1Comp.PM25Pollution = ( FuelType.FuelOil1 / 1.0e6 ) * FuelOil1Value;
+			Pollution.FuelOil1Comp.PM25Pollution = ( FuelType.FuelOil1 * 1.0e-6 ) * FuelOil1Value;
 		}
 		if ( Pollution.FuelOil2Coef.FuelFactorUsed ) {
 			Pollution.FuelOil2Comp.PM25Pollution = 0.0;
 			if ( Pollution.FuelOil2Coef.PM25Sched == 0 ) {
-				FuelOil2Value = Pollution.FuelOil2Coef.PM25 / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.PM25 * 0.001;
 			} else {
-				FuelOil2Value = Pollution.FuelOil2Coef.PM25 * GetCurrentScheduleValue( Pollution.FuelOil2Coef.PM25Sched ) / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.PM25 * GetCurrentScheduleValue( Pollution.FuelOil2Coef.PM25Sched ) * 0.001;
 			}
-			Pollution.FuelOil2Comp.PM25Pollution = ( FuelType.FuelOil2 / 1.0e6 ) * FuelOil2Value;
+			Pollution.FuelOil2Comp.PM25Pollution = ( FuelType.FuelOil2 * 1.0e-6 ) * FuelOil2Value;
 		}
 		if ( Pollution.CoalCoef.FuelFactorUsed ) {
 			Pollution.CoalComp.PM25Pollution = 0.0;
 			if ( Pollution.CoalCoef.PM25Sched == 0 ) {
-				CoalValue = Pollution.CoalCoef.PM25 / 1000.0;
+				CoalValue = Pollution.CoalCoef.PM25 * 0.001;
 			} else {
-				CoalValue = Pollution.CoalCoef.PM25 * GetCurrentScheduleValue( Pollution.CoalCoef.PM25Sched ) / 1000.0;
+				CoalValue = Pollution.CoalCoef.PM25 * GetCurrentScheduleValue( Pollution.CoalCoef.PM25Sched ) * 0.001;
 			}
-			Pollution.CoalComp.PM25Pollution = ( FuelType.Coal / 1.0e6 ) * CoalValue;
+			Pollution.CoalComp.PM25Pollution = ( FuelType.Coal * 1.0e-6 ) * CoalValue;
 		}
 		if ( Pollution.GasolineCoef.FuelFactorUsed ) {
 			Pollution.GasolineComp.PM25Pollution = 0.0;
 			if ( Pollution.GasolineCoef.PM25Sched == 0 ) {
-				GasolineValue = Pollution.GasolineCoef.PM25 / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.PM25 * 0.001;
 			} else {
-				GasolineValue = Pollution.GasolineCoef.PM25 * GetCurrentScheduleValue( Pollution.GasolineCoef.PM25Sched ) / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.PM25 * GetCurrentScheduleValue( Pollution.GasolineCoef.PM25Sched ) * 0.001;
 			}
-			Pollution.GasolineComp.PM25Pollution = ( FuelType.Gasoline / 1.0e6 ) * GasolineValue;
+			Pollution.GasolineComp.PM25Pollution = ( FuelType.Gasoline * 1.0e-6 ) * GasolineValue;
 		}
 		if ( Pollution.PropaneCoef.FuelFactorUsed ) {
 			Pollution.PropaneComp.PM25Pollution = 0.0;
 			if ( Pollution.PropaneCoef.PM25Sched == 0 ) {
-				PropaneValue = Pollution.PropaneCoef.PM25 / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.PM25 * 0.001;
 			} else {
-				PropaneValue = Pollution.PropaneCoef.PM25 * GetCurrentScheduleValue( Pollution.PropaneCoef.PM25Sched ) / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.PM25 * GetCurrentScheduleValue( Pollution.PropaneCoef.PM25Sched ) * 0.001;
 			}
-			Pollution.PropaneComp.PM25Pollution = ( FuelType.Propane / 1.0e6 ) * PropaneValue;
+			Pollution.PropaneComp.PM25Pollution = ( FuelType.Propane * 1.0e-6 ) * PropaneValue;
 		}
 		if ( Pollution.DieselCoef.FuelFactorUsed ) {
 			Pollution.DieselComp.PM25Pollution = 0.0;
 			if ( Pollution.DieselCoef.PM25Sched == 0 ) {
-				DieselValue = Pollution.DieselCoef.PM25 / 1000.0;
+				DieselValue = Pollution.DieselCoef.PM25 * 0.001;
 			} else {
-				DieselValue = Pollution.DieselCoef.PM25 * GetCurrentScheduleValue( Pollution.DieselCoef.PM25Sched ) / 1000.0;
+				DieselValue = Pollution.DieselCoef.PM25 * GetCurrentScheduleValue( Pollution.DieselCoef.PM25Sched ) * 0.001;
 			}
-			Pollution.DieselComp.PM25Pollution = ( FuelType.Diesel / 1.0e6 ) * DieselValue;
+			Pollution.DieselComp.PM25Pollution = ( FuelType.Diesel * 1.0e-6 ) * DieselValue;
 		}
 		if ( Pollution.OtherFuel1Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel1Comp.PM25Pollution = 0.0;
 			if ( Pollution.OtherFuel1Coef.PM25Sched == 0 ) {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.PM25 / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.PM25 * 0.001;
 			} else {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.PM25 * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.PM25Sched ) / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.PM25 * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.PM25Sched ) * 0.001;
 			}
-			Pollution.OtherFuel1Comp.PM25Pollution = ( FuelType.OtherFuel1 / 1.0e6 ) * OtherFuel1Value;
+			Pollution.OtherFuel1Comp.PM25Pollution = ( FuelType.OtherFuel1 * 1.0e-6 ) * OtherFuel1Value;
 		}
 		if ( Pollution.OtherFuel2Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel2Comp.PM25Pollution = 0.0;
 			if ( Pollution.OtherFuel2Coef.PM25Sched == 0 ) {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.PM25 / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.PM25 * 0.001;
 			} else {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.PM25 * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.PM25Sched ) / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.PM25 * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.PM25Sched ) * 0.001;
 			}
-			Pollution.OtherFuel2Comp.PM25Pollution = ( FuelType.OtherFuel2 / 1.0e6 ) * OtherFuel2Value;
+			Pollution.OtherFuel2Comp.PM25Pollution = ( FuelType.OtherFuel2 * 1.0e-6 ) * OtherFuel2Value;
 		}
 
 		ElecValue = 0.0;
@@ -2527,92 +2527,92 @@ namespace PollutionModule {
 		if ( Pollution.ElecCoef.FuelFactorUsed ) {
 			Pollution.ElecComp.NH3Pollution = 0.0;
 			if ( Pollution.ElecCoef.NH3Sched == 0 ) {
-				ElecValue = Pollution.ElecCoef.NH3 / 1000.0;
+				ElecValue = Pollution.ElecCoef.NH3 * 0.001;
 			} else {
-				ElecValue = Pollution.ElecCoef.NH3 * GetCurrentScheduleValue( Pollution.ElecCoef.NH3Sched ) / 1000.0;
+				ElecValue = Pollution.ElecCoef.NH3 * GetCurrentScheduleValue( Pollution.ElecCoef.NH3Sched ) * 0.001;
 			}
-			Pollution.ElecComp.NH3Pollution = ( FuelType.Elec / 1.0e6 ) * ElecValue;
+			Pollution.ElecComp.NH3Pollution = ( FuelType.Elec * 1.0e-6 ) * ElecValue;
 		}
 		if ( Pollution.NatGasCoef.FuelFactorUsed ) {
 			Pollution.NatGasComp.NH3Pollution = 0.0;
 			if ( Pollution.NatGasCoef.NH3Sched == 0 ) {
-				NatGasValue = Pollution.NatGasCoef.NH3 / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.NH3 * 0.001;
 			} else {
-				NatGasValue = Pollution.NatGasCoef.NH3 * GetCurrentScheduleValue( Pollution.NatGasCoef.NH3Sched ) / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.NH3 * GetCurrentScheduleValue( Pollution.NatGasCoef.NH3Sched ) * 0.001;
 			}
-			Pollution.NatGasComp.NH3Pollution = ( FuelType.NatGas / 1.0e6 ) * NatGasValue;
+			Pollution.NatGasComp.NH3Pollution = ( FuelType.NatGas * 1.0e-6 ) * NatGasValue;
 		}
 		if ( Pollution.FuelOil1Coef.FuelFactorUsed ) {
 			Pollution.FuelOil1Comp.NH3Pollution = 0.0;
 			if ( Pollution.FuelOil1Coef.NH3Sched == 0 ) {
-				FuelOil1Value = Pollution.FuelOil1Coef.NH3 / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.NH3 * 0.001;
 			} else {
-				FuelOil1Value = Pollution.FuelOil1Coef.NH3 * GetCurrentScheduleValue( Pollution.FuelOil1Coef.NH3Sched ) / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.NH3 * GetCurrentScheduleValue( Pollution.FuelOil1Coef.NH3Sched ) * 0.001;
 			}
-			Pollution.FuelOil1Comp.NH3Pollution = ( FuelType.FuelOil1 / 1.0e6 ) * FuelOil1Value;
+			Pollution.FuelOil1Comp.NH3Pollution = ( FuelType.FuelOil1 * 1.0e-6 ) * FuelOil1Value;
 		}
 		if ( Pollution.FuelOil2Coef.FuelFactorUsed ) {
 			Pollution.FuelOil2Comp.NH3Pollution = 0.0;
 			if ( Pollution.FuelOil2Coef.NH3Sched == 0 ) {
-				FuelOil2Value = Pollution.FuelOil2Coef.NH3 / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.NH3 * 0.001;
 			} else {
-				FuelOil2Value = Pollution.FuelOil2Coef.NH3 * GetCurrentScheduleValue( Pollution.FuelOil2Coef.NH3Sched ) / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.NH3 * GetCurrentScheduleValue( Pollution.FuelOil2Coef.NH3Sched ) * 0.001;
 			}
-			Pollution.FuelOil2Comp.NH3Pollution = ( FuelType.FuelOil2 / 1.0e6 ) * FuelOil2Value;
+			Pollution.FuelOil2Comp.NH3Pollution = ( FuelType.FuelOil2 * 1.0e-6 ) * FuelOil2Value;
 		}
 		if ( Pollution.CoalCoef.FuelFactorUsed ) {
 			Pollution.CoalComp.NH3Pollution = 0.0;
 			if ( Pollution.CoalCoef.NH3Sched == 0 ) {
-				CoalValue = Pollution.CoalCoef.NH3 / 1000.0;
+				CoalValue = Pollution.CoalCoef.NH3 * 0.001;
 			} else {
-				CoalValue = Pollution.CoalCoef.NH3 * GetCurrentScheduleValue( Pollution.CoalCoef.NH3Sched ) / 1000.0;
+				CoalValue = Pollution.CoalCoef.NH3 * GetCurrentScheduleValue( Pollution.CoalCoef.NH3Sched ) * 0.001;
 			}
-			Pollution.CoalComp.NH3Pollution = ( FuelType.Coal / 1.0e6 ) * CoalValue;
+			Pollution.CoalComp.NH3Pollution = ( FuelType.Coal * 1.0e-6 ) * CoalValue;
 		}
 		if ( Pollution.GasolineCoef.FuelFactorUsed ) {
 			Pollution.GasolineComp.NH3Pollution = 0.0;
 			if ( Pollution.GasolineCoef.NH3Sched == 0 ) {
-				GasolineValue = Pollution.GasolineCoef.NH3 / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.NH3 * 0.001;
 			} else {
-				GasolineValue = Pollution.GasolineCoef.NH3 * GetCurrentScheduleValue( Pollution.GasolineCoef.NH3Sched ) / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.NH3 * GetCurrentScheduleValue( Pollution.GasolineCoef.NH3Sched ) * 0.001;
 			}
-			Pollution.GasolineComp.NH3Pollution = ( FuelType.Gasoline / 1.0e6 ) * GasolineValue;
+			Pollution.GasolineComp.NH3Pollution = ( FuelType.Gasoline * 1.0e-6 ) * GasolineValue;
 		}
 		if ( Pollution.PropaneCoef.FuelFactorUsed ) {
 			Pollution.PropaneComp.NH3Pollution = 0.0;
 			if ( Pollution.PropaneCoef.NH3Sched == 0 ) {
-				PropaneValue = Pollution.PropaneCoef.NH3 / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.NH3 * 0.001;
 			} else {
-				PropaneValue = Pollution.PropaneCoef.NH3 * GetCurrentScheduleValue( Pollution.PropaneCoef.NH3Sched ) / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.NH3 * GetCurrentScheduleValue( Pollution.PropaneCoef.NH3Sched ) * 0.001;
 			}
-			Pollution.PropaneComp.NH3Pollution = ( FuelType.Propane / 1.0e6 ) * PropaneValue;
+			Pollution.PropaneComp.NH3Pollution = ( FuelType.Propane * 1.0e-6 ) * PropaneValue;
 		}
 		if ( Pollution.DieselCoef.FuelFactorUsed ) {
 			Pollution.DieselComp.NH3Pollution = 0.0;
 			if ( Pollution.DieselCoef.NH3Sched == 0 ) {
-				DieselValue = Pollution.DieselCoef.NH3 / 1000.0;
+				DieselValue = Pollution.DieselCoef.NH3 * 0.001;
 			} else {
-				DieselValue = Pollution.DieselCoef.NH3 * GetCurrentScheduleValue( Pollution.DieselCoef.NH3Sched ) / 1000.0;
+				DieselValue = Pollution.DieselCoef.NH3 * GetCurrentScheduleValue( Pollution.DieselCoef.NH3Sched ) * 0.001;
 			}
-			Pollution.DieselComp.NH3Pollution = ( FuelType.Diesel / 1.0e6 ) * DieselValue;
+			Pollution.DieselComp.NH3Pollution = ( FuelType.Diesel * 1.0e-6 ) * DieselValue;
 		}
 		if ( Pollution.OtherFuel1Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel1Comp.NH3Pollution = 0.0;
 			if ( Pollution.OtherFuel1Coef.NH3Sched == 0 ) {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.NH3 / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.NH3 * 0.001;
 			} else {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.NH3 * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.NH3Sched ) / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.NH3 * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.NH3Sched ) * 0.001;
 			}
-			Pollution.OtherFuel1Comp.NH3Pollution = ( FuelType.OtherFuel1 / 1.0e6 ) * OtherFuel1Value;
+			Pollution.OtherFuel1Comp.NH3Pollution = ( FuelType.OtherFuel1 * 1.0e-6 ) * OtherFuel1Value;
 		}
 		if ( Pollution.OtherFuel2Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel2Comp.NH3Pollution = 0.0;
 			if ( Pollution.OtherFuel2Coef.NH3Sched == 0 ) {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.NH3 / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.NH3 * 0.001;
 			} else {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.NH3 * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.NH3Sched ) / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.NH3 * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.NH3Sched ) * 0.001;
 			}
-			Pollution.OtherFuel2Comp.NH3Pollution = ( FuelType.OtherFuel2 / 1.0e6 ) * OtherFuel2Value;
+			Pollution.OtherFuel2Comp.NH3Pollution = ( FuelType.OtherFuel2 * 1.0e-6 ) * OtherFuel2Value;
 		}
 
 		ElecValue = 0.0;
@@ -2629,92 +2629,92 @@ namespace PollutionModule {
 		if ( Pollution.ElecCoef.FuelFactorUsed ) {
 			Pollution.ElecComp.NMVOCPollution = 0.0;
 			if ( Pollution.ElecCoef.NMVOCSched == 0 ) {
-				ElecValue = Pollution.ElecCoef.NMVOC / 1000.0;
+				ElecValue = Pollution.ElecCoef.NMVOC * 0.001;
 			} else {
-				ElecValue = Pollution.ElecCoef.NMVOC * GetCurrentScheduleValue( Pollution.ElecCoef.NMVOCSched ) / 1000.0;
+				ElecValue = Pollution.ElecCoef.NMVOC * GetCurrentScheduleValue( Pollution.ElecCoef.NMVOCSched ) * 0.001;
 			}
-			Pollution.ElecComp.NMVOCPollution = ( FuelType.Elec / 1.0e6 ) * ElecValue;
+			Pollution.ElecComp.NMVOCPollution = ( FuelType.Elec * 1.0e-6 ) * ElecValue;
 		}
 		if ( Pollution.NatGasCoef.FuelFactorUsed ) {
 			Pollution.NatGasComp.NMVOCPollution = 0.0;
 			if ( Pollution.NatGasCoef.NMVOCSched == 0 ) {
-				NatGasValue = Pollution.NatGasCoef.NMVOC / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.NMVOC * 0.001;
 			} else {
-				NatGasValue = Pollution.NatGasCoef.NMVOC * GetCurrentScheduleValue( Pollution.NatGasCoef.NMVOCSched ) / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.NMVOC * GetCurrentScheduleValue( Pollution.NatGasCoef.NMVOCSched ) * 0.001;
 			}
-			Pollution.NatGasComp.NMVOCPollution = ( FuelType.NatGas / 1.0e6 ) * NatGasValue;
+			Pollution.NatGasComp.NMVOCPollution = ( FuelType.NatGas * 1.0e-6 ) * NatGasValue;
 		}
 		if ( Pollution.FuelOil1Coef.FuelFactorUsed ) {
 			Pollution.FuelOil1Comp.NMVOCPollution = 0.0;
 			if ( Pollution.FuelOil1Coef.NMVOCSched == 0 ) {
-				FuelOil1Value = Pollution.FuelOil1Coef.NMVOC / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.NMVOC * 0.001;
 			} else {
-				FuelOil1Value = Pollution.FuelOil1Coef.NMVOC * GetCurrentScheduleValue( Pollution.FuelOil1Coef.NMVOCSched ) / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.NMVOC * GetCurrentScheduleValue( Pollution.FuelOil1Coef.NMVOCSched ) * 0.001;
 			}
-			Pollution.FuelOil1Comp.NMVOCPollution = ( FuelType.FuelOil1 / 1.0e6 ) * FuelOil1Value;
+			Pollution.FuelOil1Comp.NMVOCPollution = ( FuelType.FuelOil1 * 1.0e-6 ) * FuelOil1Value;
 		}
 		if ( Pollution.FuelOil2Coef.FuelFactorUsed ) {
 			Pollution.FuelOil2Comp.NMVOCPollution = 0.0;
 			if ( Pollution.FuelOil2Coef.NMVOCSched == 0 ) {
-				FuelOil2Value = Pollution.FuelOil2Coef.NMVOC / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.NMVOC * 0.001;
 			} else {
-				FuelOil2Value = Pollution.FuelOil2Coef.NMVOC * GetCurrentScheduleValue( Pollution.FuelOil2Coef.NMVOCSched ) / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.NMVOC * GetCurrentScheduleValue( Pollution.FuelOil2Coef.NMVOCSched ) * 0.001;
 			}
-			Pollution.FuelOil2Comp.NMVOCPollution = ( FuelType.FuelOil2 / 1.0e6 ) * FuelOil2Value;
+			Pollution.FuelOil2Comp.NMVOCPollution = ( FuelType.FuelOil2 * 1.0e-6 ) * FuelOil2Value;
 		}
 		if ( Pollution.CoalCoef.FuelFactorUsed ) {
 			Pollution.CoalComp.NMVOCPollution = 0.0;
 			if ( Pollution.CoalCoef.NMVOCSched == 0 ) {
-				CoalValue = Pollution.CoalCoef.NMVOC / 1000.0;
+				CoalValue = Pollution.CoalCoef.NMVOC * 0.001;
 			} else {
-				CoalValue = Pollution.CoalCoef.NMVOC * GetCurrentScheduleValue( Pollution.CoalCoef.NMVOCSched ) / 1000.0;
+				CoalValue = Pollution.CoalCoef.NMVOC * GetCurrentScheduleValue( Pollution.CoalCoef.NMVOCSched ) * 0.001;
 			}
-			Pollution.CoalComp.NMVOCPollution = ( FuelType.Coal / 1.0e6 ) * CoalValue;
+			Pollution.CoalComp.NMVOCPollution = ( FuelType.Coal * 1.0e-6 ) * CoalValue;
 		}
 		if ( Pollution.GasolineCoef.FuelFactorUsed ) {
 			Pollution.GasolineComp.NMVOCPollution = 0.0;
 			if ( Pollution.GasolineCoef.NMVOCSched == 0 ) {
-				GasolineValue = Pollution.GasolineCoef.NMVOC / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.NMVOC * 0.001;
 			} else {
-				GasolineValue = Pollution.GasolineCoef.NMVOC * GetCurrentScheduleValue( Pollution.GasolineCoef.NMVOCSched ) / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.NMVOC * GetCurrentScheduleValue( Pollution.GasolineCoef.NMVOCSched ) * 0.001;
 			}
-			Pollution.GasolineComp.NMVOCPollution = ( FuelType.Gasoline / 1.0e6 ) * GasolineValue;
+			Pollution.GasolineComp.NMVOCPollution = ( FuelType.Gasoline * 1.0e-6 ) * GasolineValue;
 		}
 		if ( Pollution.PropaneCoef.FuelFactorUsed ) {
 			Pollution.PropaneComp.NMVOCPollution = 0.0;
 			if ( Pollution.PropaneCoef.NMVOCSched == 0 ) {
-				PropaneValue = Pollution.PropaneCoef.NMVOC / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.NMVOC * 0.001;
 			} else {
-				PropaneValue = Pollution.PropaneCoef.NMVOC * GetCurrentScheduleValue( Pollution.PropaneCoef.NMVOCSched ) / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.NMVOC * GetCurrentScheduleValue( Pollution.PropaneCoef.NMVOCSched ) * 0.001;
 			}
-			Pollution.PropaneComp.NMVOCPollution = ( FuelType.Propane / 1.0e6 ) * PropaneValue;
+			Pollution.PropaneComp.NMVOCPollution = ( FuelType.Propane * 1.0e-6 ) * PropaneValue;
 		}
 		if ( Pollution.DieselCoef.FuelFactorUsed ) {
 			Pollution.DieselComp.NMVOCPollution = 0.0;
 			if ( Pollution.DieselCoef.NMVOCSched == 0 ) {
-				DieselValue = Pollution.DieselCoef.NMVOC / 1000.0;
+				DieselValue = Pollution.DieselCoef.NMVOC * 0.001;
 			} else {
-				DieselValue = Pollution.DieselCoef.NMVOC * GetCurrentScheduleValue( Pollution.DieselCoef.NMVOCSched ) / 1000.0;
+				DieselValue = Pollution.DieselCoef.NMVOC * GetCurrentScheduleValue( Pollution.DieselCoef.NMVOCSched ) * 0.001;
 			}
-			Pollution.DieselComp.NMVOCPollution = ( FuelType.Diesel / 1.0e6 ) * DieselValue;
+			Pollution.DieselComp.NMVOCPollution = ( FuelType.Diesel * 1.0e-6 ) * DieselValue;
 		}
 		if ( Pollution.OtherFuel1Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel1Comp.NMVOCPollution = 0.0;
 			if ( Pollution.OtherFuel1Coef.NMVOCSched == 0 ) {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.NMVOC / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.NMVOC * 0.001;
 			} else {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.NMVOC * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.NMVOCSched ) / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.NMVOC * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.NMVOCSched ) * 0.001;
 			}
-			Pollution.OtherFuel1Comp.NMVOCPollution = ( FuelType.OtherFuel1 / 1.0e6 ) * OtherFuel1Value;
+			Pollution.OtherFuel1Comp.NMVOCPollution = ( FuelType.OtherFuel1 * 1.0e-6 ) * OtherFuel1Value;
 		}
 		if ( Pollution.OtherFuel2Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel2Comp.NMVOCPollution = 0.0;
 			if ( Pollution.OtherFuel2Coef.NMVOCSched == 0 ) {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.NMVOC / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.NMVOC * 0.001;
 			} else {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.NMVOC * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.NMVOCSched ) / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.NMVOC * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.NMVOCSched ) * 0.001;
 			}
-			Pollution.OtherFuel2Comp.NMVOCPollution = ( FuelType.OtherFuel2 / 1.0e6 ) * OtherFuel2Value;
+			Pollution.OtherFuel2Comp.NMVOCPollution = ( FuelType.OtherFuel2 * 1.0e-6 ) * OtherFuel2Value;
 		}
 
 		ElecValue = 0.0;
@@ -2731,92 +2731,92 @@ namespace PollutionModule {
 		if ( Pollution.ElecCoef.FuelFactorUsed ) {
 			Pollution.ElecComp.HgPollution = 0.0;
 			if ( Pollution.ElecCoef.HgSched == 0 ) {
-				ElecValue = Pollution.ElecCoef.Hg / 1000.0;
+				ElecValue = Pollution.ElecCoef.Hg * 0.001;
 			} else {
-				ElecValue = Pollution.ElecCoef.Hg * GetCurrentScheduleValue( Pollution.ElecCoef.HgSched ) / 1000.0;
+				ElecValue = Pollution.ElecCoef.Hg * GetCurrentScheduleValue( Pollution.ElecCoef.HgSched ) * 0.001;
 			}
-			Pollution.ElecComp.HgPollution = ( FuelType.Elec / 1.0e6 ) * ElecValue;
+			Pollution.ElecComp.HgPollution = ( FuelType.Elec * 1.0e-6 ) * ElecValue;
 		}
 		if ( Pollution.NatGasCoef.FuelFactorUsed ) {
 			Pollution.NatGasComp.HgPollution = 0.0;
 			if ( Pollution.NatGasCoef.HgSched == 0 ) {
-				NatGasValue = Pollution.NatGasCoef.Hg / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.Hg * 0.001;
 			} else {
-				NatGasValue = Pollution.NatGasCoef.Hg * GetCurrentScheduleValue( Pollution.NatGasCoef.HgSched ) / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.Hg * GetCurrentScheduleValue( Pollution.NatGasCoef.HgSched ) * 0.001;
 			}
-			Pollution.NatGasComp.HgPollution = ( FuelType.NatGas / 1.0e6 ) * NatGasValue;
+			Pollution.NatGasComp.HgPollution = ( FuelType.NatGas * 1.0e-6 ) * NatGasValue;
 		}
 		if ( Pollution.FuelOil1Coef.FuelFactorUsed ) {
 			Pollution.FuelOil1Comp.HgPollution = 0.0;
 			if ( Pollution.FuelOil1Coef.HgSched == 0 ) {
-				FuelOil1Value = Pollution.FuelOil1Coef.Hg / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.Hg * 0.001;
 			} else {
-				FuelOil1Value = Pollution.FuelOil1Coef.Hg * GetCurrentScheduleValue( Pollution.FuelOil1Coef.HgSched ) / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.Hg * GetCurrentScheduleValue( Pollution.FuelOil1Coef.HgSched ) * 0.001;
 			}
-			Pollution.FuelOil1Comp.HgPollution = ( FuelType.FuelOil1 / 1.0e6 ) * FuelOil1Value;
+			Pollution.FuelOil1Comp.HgPollution = ( FuelType.FuelOil1 * 1.0e-6 ) * FuelOil1Value;
 		}
 		if ( Pollution.FuelOil2Coef.FuelFactorUsed ) {
 			Pollution.FuelOil2Comp.HgPollution = 0.0;
 			if ( Pollution.FuelOil2Coef.HgSched == 0 ) {
-				FuelOil2Value = Pollution.FuelOil2Coef.Hg / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.Hg * 0.001;
 			} else {
-				FuelOil2Value = Pollution.FuelOil2Coef.Hg * GetCurrentScheduleValue( Pollution.FuelOil2Coef.HgSched ) / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.Hg * GetCurrentScheduleValue( Pollution.FuelOil2Coef.HgSched ) * 0.001;
 			}
-			Pollution.FuelOil2Comp.HgPollution = ( FuelType.FuelOil2 / 1.0e6 ) * FuelOil2Value;
+			Pollution.FuelOil2Comp.HgPollution = ( FuelType.FuelOil2 * 1.0e-6 ) * FuelOil2Value;
 		}
 		if ( Pollution.CoalCoef.FuelFactorUsed ) {
 			Pollution.CoalComp.HgPollution = 0.0;
 			if ( Pollution.CoalCoef.HgSched == 0 ) {
-				CoalValue = Pollution.CoalCoef.Hg / 1000.0;
+				CoalValue = Pollution.CoalCoef.Hg * 0.001;
 			} else {
-				CoalValue = Pollution.CoalCoef.Hg * GetCurrentScheduleValue( Pollution.CoalCoef.HgSched ) / 1000.0;
+				CoalValue = Pollution.CoalCoef.Hg * GetCurrentScheduleValue( Pollution.CoalCoef.HgSched ) * 0.001;
 			}
-			Pollution.CoalComp.HgPollution = ( FuelType.Coal / 1.0e6 ) * CoalValue;
+			Pollution.CoalComp.HgPollution = ( FuelType.Coal * 1.0e-6 ) * CoalValue;
 		}
 		if ( Pollution.GasolineCoef.FuelFactorUsed ) {
 			Pollution.GasolineComp.HgPollution = 0.0;
 			if ( Pollution.GasolineCoef.HgSched == 0 ) {
-				GasolineValue = Pollution.GasolineCoef.Hg / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.Hg * 0.001;
 			} else {
-				GasolineValue = Pollution.GasolineCoef.Hg * GetCurrentScheduleValue( Pollution.GasolineCoef.HgSched ) / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.Hg * GetCurrentScheduleValue( Pollution.GasolineCoef.HgSched ) * 0.001;
 			}
-			Pollution.GasolineComp.HgPollution = ( FuelType.Gasoline / 1.0e6 ) * GasolineValue;
+			Pollution.GasolineComp.HgPollution = ( FuelType.Gasoline * 1.0e-6 ) * GasolineValue;
 		}
 		if ( Pollution.PropaneCoef.FuelFactorUsed ) {
 			Pollution.PropaneComp.HgPollution = 0.0;
 			if ( Pollution.PropaneCoef.HgSched == 0 ) {
-				PropaneValue = Pollution.PropaneCoef.Hg / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.Hg * 0.001;
 			} else {
-				PropaneValue = Pollution.PropaneCoef.Hg * GetCurrentScheduleValue( Pollution.PropaneCoef.HgSched ) / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.Hg * GetCurrentScheduleValue( Pollution.PropaneCoef.HgSched ) * 0.001;
 			}
-			Pollution.PropaneComp.HgPollution = ( FuelType.Propane / 1.0e6 ) * PropaneValue;
+			Pollution.PropaneComp.HgPollution = ( FuelType.Propane * 1.0e-6 ) * PropaneValue;
 		}
 		if ( Pollution.DieselCoef.FuelFactorUsed ) {
 			Pollution.DieselComp.HgPollution = 0.0;
 			if ( Pollution.DieselCoef.HgSched == 0 ) {
-				DieselValue = Pollution.DieselCoef.Hg / 1000.0;
+				DieselValue = Pollution.DieselCoef.Hg * 0.001;
 			} else {
-				DieselValue = Pollution.DieselCoef.Hg * GetCurrentScheduleValue( Pollution.DieselCoef.HgSched ) / 1000.0;
+				DieselValue = Pollution.DieselCoef.Hg * GetCurrentScheduleValue( Pollution.DieselCoef.HgSched ) * 0.001;
 			}
-			Pollution.DieselComp.HgPollution = ( FuelType.Diesel / 1.0e6 ) * DieselValue;
+			Pollution.DieselComp.HgPollution = ( FuelType.Diesel * 1.0e-6 ) * DieselValue;
 		}
 		if ( Pollution.OtherFuel1Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel1Comp.HgPollution = 0.0;
 			if ( Pollution.OtherFuel1Coef.HgSched == 0 ) {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.Hg / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.Hg * 0.001;
 			} else {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.Hg * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.HgSched ) / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.Hg * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.HgSched ) * 0.001;
 			}
-			Pollution.OtherFuel1Comp.HgPollution = ( FuelType.OtherFuel1 / 1.0e6 ) * OtherFuel1Value;
+			Pollution.OtherFuel1Comp.HgPollution = ( FuelType.OtherFuel1 * 1.0e-6 ) * OtherFuel1Value;
 		}
 		if ( Pollution.OtherFuel2Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel2Comp.HgPollution = 0.0;
 			if ( Pollution.OtherFuel2Coef.HgSched == 0 ) {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.Hg / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.Hg * 0.001;
 			} else {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.Hg * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.HgSched ) / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.Hg * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.HgSched ) * 0.001;
 			}
-			Pollution.OtherFuel2Comp.HgPollution = ( FuelType.OtherFuel2 / 1.0e6 ) * OtherFuel2Value;
+			Pollution.OtherFuel2Comp.HgPollution = ( FuelType.OtherFuel2 * 1.0e-6 ) * OtherFuel2Value;
 		}
 
 		ElecValue = 0.0;
@@ -2833,92 +2833,92 @@ namespace PollutionModule {
 		if ( Pollution.ElecCoef.FuelFactorUsed ) {
 			Pollution.ElecComp.PbPollution = 0.0;
 			if ( Pollution.ElecCoef.PbSched == 0 ) {
-				ElecValue = Pollution.ElecCoef.Pb / 1000.0;
+				ElecValue = Pollution.ElecCoef.Pb * 0.001;
 			} else {
-				ElecValue = Pollution.ElecCoef.Pb * GetCurrentScheduleValue( Pollution.ElecCoef.PbSched ) / 1000.0;
+				ElecValue = Pollution.ElecCoef.Pb * GetCurrentScheduleValue( Pollution.ElecCoef.PbSched ) * 0.001;
 			}
-			Pollution.ElecComp.PbPollution = ( FuelType.Elec / 1.0e6 ) * ElecValue;
+			Pollution.ElecComp.PbPollution = ( FuelType.Elec * 1.0e-6 ) * ElecValue;
 		}
 		if ( Pollution.NatGasCoef.FuelFactorUsed ) {
 			Pollution.NatGasComp.PbPollution = 0.0;
 			if ( Pollution.NatGasCoef.PbSched == 0 ) {
-				NatGasValue = Pollution.NatGasCoef.Pb / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.Pb * 0.001;
 			} else {
-				NatGasValue = Pollution.NatGasCoef.Pb * GetCurrentScheduleValue( Pollution.NatGasCoef.PbSched ) / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.Pb * GetCurrentScheduleValue( Pollution.NatGasCoef.PbSched ) * 0.001;
 			}
-			Pollution.NatGasComp.PbPollution = ( FuelType.NatGas / 1.0e6 ) * NatGasValue;
+			Pollution.NatGasComp.PbPollution = ( FuelType.NatGas * 1.0e-6 ) * NatGasValue;
 		}
 		if ( Pollution.FuelOil1Coef.FuelFactorUsed ) {
 			Pollution.FuelOil1Comp.PbPollution = 0.0;
 			if ( Pollution.FuelOil1Coef.PbSched == 0 ) {
-				FuelOil1Value = Pollution.FuelOil1Coef.Pb / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.Pb * 0.001;
 			} else {
-				FuelOil1Value = Pollution.FuelOil1Coef.Pb * GetCurrentScheduleValue( Pollution.FuelOil1Coef.PbSched ) / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.Pb * GetCurrentScheduleValue( Pollution.FuelOil1Coef.PbSched ) * 0.001;
 			}
-			Pollution.FuelOil1Comp.PbPollution = ( FuelType.FuelOil1 / 1.0e6 ) * FuelOil1Value;
+			Pollution.FuelOil1Comp.PbPollution = ( FuelType.FuelOil1 * 1.0e-6 ) * FuelOil1Value;
 		}
 		if ( Pollution.FuelOil2Coef.FuelFactorUsed ) {
 			Pollution.FuelOil2Comp.PbPollution = 0.0;
 			if ( Pollution.FuelOil2Coef.PbSched == 0 ) {
-				FuelOil2Value = Pollution.FuelOil2Coef.Pb / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.Pb * 0.001;
 			} else {
-				FuelOil2Value = Pollution.FuelOil2Coef.Pb * GetCurrentScheduleValue( Pollution.FuelOil2Coef.PbSched ) / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.Pb * GetCurrentScheduleValue( Pollution.FuelOil2Coef.PbSched ) * 0.001;
 			}
-			Pollution.FuelOil2Comp.PbPollution = ( FuelType.FuelOil2 / 1.0e6 ) * FuelOil2Value;
+			Pollution.FuelOil2Comp.PbPollution = ( FuelType.FuelOil2 * 1.0e-6 ) * FuelOil2Value;
 		}
 		if ( Pollution.CoalCoef.FuelFactorUsed ) {
 			Pollution.CoalComp.PbPollution = 0.0;
 			if ( Pollution.CoalCoef.PbSched == 0 ) {
-				CoalValue = Pollution.CoalCoef.Pb / 1000.0;
+				CoalValue = Pollution.CoalCoef.Pb * 0.001;
 			} else {
-				CoalValue = Pollution.CoalCoef.Pb * GetCurrentScheduleValue( Pollution.CoalCoef.PbSched ) / 1000.0;
+				CoalValue = Pollution.CoalCoef.Pb * GetCurrentScheduleValue( Pollution.CoalCoef.PbSched ) * 0.001;
 			}
-			Pollution.CoalComp.PbPollution = ( FuelType.Coal / 1.0e6 ) * CoalValue;
+			Pollution.CoalComp.PbPollution = ( FuelType.Coal * 1.0e-6 ) * CoalValue;
 		}
 		if ( Pollution.GasolineCoef.FuelFactorUsed ) {
 			Pollution.GasolineComp.PbPollution = 0.0;
 			if ( Pollution.GasolineCoef.PbSched == 0 ) {
-				GasolineValue = Pollution.GasolineCoef.Pb / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.Pb * 0.001;
 			} else {
-				GasolineValue = Pollution.GasolineCoef.Pb * GetCurrentScheduleValue( Pollution.GasolineCoef.PbSched ) / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.Pb * GetCurrentScheduleValue( Pollution.GasolineCoef.PbSched ) * 0.001;
 			}
-			Pollution.GasolineComp.PbPollution = ( FuelType.Gasoline / 1.0e6 ) * GasolineValue;
+			Pollution.GasolineComp.PbPollution = ( FuelType.Gasoline * 1.0e-6 ) * GasolineValue;
 		}
 		if ( Pollution.PropaneCoef.FuelFactorUsed ) {
 			Pollution.PropaneComp.PbPollution = 0.0;
 			if ( Pollution.PropaneCoef.PbSched == 0 ) {
-				PropaneValue = Pollution.PropaneCoef.Pb / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.Pb * 0.001;
 			} else {
-				PropaneValue = Pollution.PropaneCoef.Pb * GetCurrentScheduleValue( Pollution.PropaneCoef.PbSched ) / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.Pb * GetCurrentScheduleValue( Pollution.PropaneCoef.PbSched ) * 0.001;
 			}
-			Pollution.PropaneComp.PbPollution = ( FuelType.Propane / 1.0e6 ) * PropaneValue;
+			Pollution.PropaneComp.PbPollution = ( FuelType.Propane * 1.0e-6 ) * PropaneValue;
 		}
 		if ( Pollution.DieselCoef.FuelFactorUsed ) {
 			Pollution.DieselComp.PbPollution = 0.0;
 			if ( Pollution.DieselCoef.PbSched == 0 ) {
-				DieselValue = Pollution.DieselCoef.Pb / 1000.0;
+				DieselValue = Pollution.DieselCoef.Pb * 0.001;
 			} else {
-				DieselValue = Pollution.DieselCoef.Pb * GetCurrentScheduleValue( Pollution.DieselCoef.PbSched ) / 1000.0;
+				DieselValue = Pollution.DieselCoef.Pb * GetCurrentScheduleValue( Pollution.DieselCoef.PbSched ) * 0.001;
 			}
-			Pollution.DieselComp.PbPollution = ( FuelType.Diesel / 1.0e6 ) * DieselValue;
+			Pollution.DieselComp.PbPollution = ( FuelType.Diesel * 1.0e-6 ) * DieselValue;
 		}
 		if ( Pollution.OtherFuel1Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel1Comp.PbPollution = 0.0;
 			if ( Pollution.OtherFuel1Coef.PbSched == 0 ) {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.Pb / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.Pb * 0.001;
 			} else {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.Pb * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.PbSched ) / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.Pb * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.PbSched ) * 0.001;
 			}
-			Pollution.OtherFuel1Comp.PbPollution = ( FuelType.OtherFuel1 / 1.0e6 ) * OtherFuel1Value;
+			Pollution.OtherFuel1Comp.PbPollution = ( FuelType.OtherFuel1 * 1.0e-6 ) * OtherFuel1Value;
 		}
 		if ( Pollution.OtherFuel2Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel2Comp.PbPollution = 0.0;
 			if ( Pollution.OtherFuel2Coef.PbSched == 0 ) {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.Pb / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.Pb * 0.001;
 			} else {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.Pb * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.PbSched ) / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.Pb * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.PbSched ) * 0.001;
 			}
-			Pollution.OtherFuel2Comp.PbPollution = ( FuelType.OtherFuel2 / 1.0e6 ) * OtherFuel2Value;
+			Pollution.OtherFuel2Comp.PbPollution = ( FuelType.OtherFuel2 * 1.0e-6 ) * OtherFuel2Value;
 		}
 
 		ElecValue = 0.0;
@@ -2939,7 +2939,7 @@ namespace PollutionModule {
 			} else {
 				ElecValue = Pollution.ElecCoef.Water * GetCurrentScheduleValue( Pollution.ElecCoef.WaterSched );
 			}
-			Pollution.ElecComp.WaterPollution = ( FuelType.Elec / 1.0e6 ) * ElecValue;
+			Pollution.ElecComp.WaterPollution = ( FuelType.Elec * 1.0e-6 ) * ElecValue;
 		}
 		if ( Pollution.NatGasCoef.FuelFactorUsed ) {
 			Pollution.NatGasComp.WaterPollution = 0.0;
@@ -2948,7 +2948,7 @@ namespace PollutionModule {
 			} else {
 				NatGasValue = Pollution.NatGasCoef.Water * GetCurrentScheduleValue( Pollution.NatGasCoef.WaterSched );
 			}
-			Pollution.NatGasComp.WaterPollution = ( FuelType.NatGas / 1.0e6 ) * NatGasValue;
+			Pollution.NatGasComp.WaterPollution = ( FuelType.NatGas * 1.0e-6 ) * NatGasValue;
 		}
 		if ( Pollution.FuelOil1Coef.FuelFactorUsed ) {
 			Pollution.FuelOil1Comp.WaterPollution = 0.0;
@@ -2957,7 +2957,7 @@ namespace PollutionModule {
 			} else {
 				FuelOil1Value = Pollution.FuelOil1Coef.Water * GetCurrentScheduleValue( Pollution.FuelOil1Coef.WaterSched );
 			}
-			Pollution.FuelOil1Comp.WaterPollution = ( FuelType.FuelOil1 / 1.0e6 ) * FuelOil1Value;
+			Pollution.FuelOil1Comp.WaterPollution = ( FuelType.FuelOil1 * 1.0e-6 ) * FuelOil1Value;
 		}
 		if ( Pollution.FuelOil2Coef.FuelFactorUsed ) {
 			Pollution.FuelOil2Comp.WaterPollution = 0.0;
@@ -2966,7 +2966,7 @@ namespace PollutionModule {
 			} else {
 				FuelOil2Value = Pollution.FuelOil2Coef.Water * GetCurrentScheduleValue( Pollution.FuelOil2Coef.WaterSched );
 			}
-			Pollution.FuelOil2Comp.WaterPollution = ( FuelType.FuelOil2 / 1.0e6 ) * FuelOil2Value;
+			Pollution.FuelOil2Comp.WaterPollution = ( FuelType.FuelOil2 * 1.0e-6 ) * FuelOil2Value;
 		}
 		if ( Pollution.CoalCoef.FuelFactorUsed ) {
 			Pollution.CoalComp.WaterPollution = 0.0;
@@ -2975,7 +2975,7 @@ namespace PollutionModule {
 			} else {
 				CoalValue = Pollution.CoalCoef.Water * GetCurrentScheduleValue( Pollution.CoalCoef.WaterSched );
 			}
-			Pollution.CoalComp.WaterPollution = ( FuelType.Coal / 1.0e6 ) * CoalValue;
+			Pollution.CoalComp.WaterPollution = ( FuelType.Coal * 1.0e-6 ) * CoalValue;
 		}
 		if ( Pollution.GasolineCoef.FuelFactorUsed ) {
 			Pollution.GasolineComp.WaterPollution = 0.0;
@@ -2984,7 +2984,7 @@ namespace PollutionModule {
 			} else {
 				GasolineValue = Pollution.GasolineCoef.Water * GetCurrentScheduleValue( Pollution.GasolineCoef.WaterSched );
 			}
-			Pollution.GasolineComp.WaterPollution = ( FuelType.Gasoline / 1.0e6 ) * GasolineValue;
+			Pollution.GasolineComp.WaterPollution = ( FuelType.Gasoline * 1.0e-6 ) * GasolineValue;
 		}
 		if ( Pollution.PropaneCoef.FuelFactorUsed ) {
 			Pollution.PropaneComp.WaterPollution = 0.0;
@@ -2993,7 +2993,7 @@ namespace PollutionModule {
 			} else {
 				PropaneValue = Pollution.PropaneCoef.Water * GetCurrentScheduleValue( Pollution.PropaneCoef.WaterSched );
 			}
-			Pollution.PropaneComp.WaterPollution = ( FuelType.Propane / 1.0e6 ) * PropaneValue;
+			Pollution.PropaneComp.WaterPollution = ( FuelType.Propane * 1.0e-6 ) * PropaneValue;
 		}
 		if ( Pollution.DieselCoef.FuelFactorUsed ) {
 			Pollution.DieselComp.WaterPollution = 0.0;
@@ -3002,7 +3002,7 @@ namespace PollutionModule {
 			} else {
 				DieselValue = Pollution.DieselCoef.Water * GetCurrentScheduleValue( Pollution.DieselCoef.WaterSched );
 			}
-			Pollution.DieselComp.WaterPollution = ( FuelType.Diesel / 1.0e6 ) * DieselValue;
+			Pollution.DieselComp.WaterPollution = ( FuelType.Diesel * 1.0e-6 ) * DieselValue;
 		}
 		if ( Pollution.OtherFuel1Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel1Comp.WaterPollution = 0.0;
@@ -3011,7 +3011,7 @@ namespace PollutionModule {
 			} else {
 				OtherFuel1Value = Pollution.OtherFuel1Coef.Water * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.WaterSched );
 			}
-			Pollution.OtherFuel1Comp.WaterPollution = ( FuelType.OtherFuel1 / 1.0e6 ) * OtherFuel1Value;
+			Pollution.OtherFuel1Comp.WaterPollution = ( FuelType.OtherFuel1 * 1.0e-6 ) * OtherFuel1Value;
 		}
 		if ( Pollution.OtherFuel2Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel2Comp.WaterPollution = 0.0;
@@ -3020,7 +3020,7 @@ namespace PollutionModule {
 			} else {
 				OtherFuel2Value = Pollution.OtherFuel2Coef.Water * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.WaterSched );
 			}
-			Pollution.OtherFuel2Comp.WaterPollution = ( FuelType.OtherFuel2 / 1.0e6 ) * OtherFuel2Value;
+			Pollution.OtherFuel2Comp.WaterPollution = ( FuelType.OtherFuel2 * 1.0e-6 ) * OtherFuel2Value;
 		}
 
 		ElecValue = 0.0;
@@ -3037,92 +3037,92 @@ namespace PollutionModule {
 		if ( Pollution.ElecCoef.FuelFactorUsed ) {
 			Pollution.ElecComp.NucHiPollution = 0.0;
 			if ( Pollution.ElecCoef.NucHiSched == 0 ) {
-				ElecValue = Pollution.ElecCoef.NucHi / 1000.0;
+				ElecValue = Pollution.ElecCoef.NucHi * 0.001;
 			} else {
-				ElecValue = Pollution.ElecCoef.NucHi * GetCurrentScheduleValue( Pollution.ElecCoef.NucHiSched ) / 1000.0;
+				ElecValue = Pollution.ElecCoef.NucHi * GetCurrentScheduleValue( Pollution.ElecCoef.NucHiSched ) * 0.001;
 			}
-			Pollution.ElecComp.NucHiPollution = ( FuelType.Elec / 1.0e6 ) * ElecValue;
+			Pollution.ElecComp.NucHiPollution = ( FuelType.Elec * 1.0e-6 ) * ElecValue;
 		}
 		if ( Pollution.NatGasCoef.FuelFactorUsed ) {
 			Pollution.NatGasComp.NucHiPollution = 0.0;
 			if ( Pollution.NatGasCoef.NucHiSched == 0 ) {
-				NatGasValue = Pollution.NatGasCoef.NucHi / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.NucHi * 0.001;
 			} else {
-				NatGasValue = Pollution.NatGasCoef.NucHi * GetCurrentScheduleValue( Pollution.NatGasCoef.NucHiSched ) / 1000.0;
+				NatGasValue = Pollution.NatGasCoef.NucHi * GetCurrentScheduleValue( Pollution.NatGasCoef.NucHiSched ) * 0.001;
 			}
-			Pollution.NatGasComp.NucHiPollution = ( FuelType.NatGas / 1.0e6 ) * NatGasValue;
+			Pollution.NatGasComp.NucHiPollution = ( FuelType.NatGas * 1.0e-6 ) * NatGasValue;
 		}
 		if ( Pollution.FuelOil1Coef.FuelFactorUsed ) {
 			Pollution.FuelOil1Comp.NucHiPollution = 0.0;
 			if ( Pollution.FuelOil1Coef.NucHiSched == 0 ) {
-				FuelOil1Value = Pollution.FuelOil1Coef.NucHi / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.NucHi * 0.001;
 			} else {
-				FuelOil1Value = Pollution.FuelOil1Coef.NucHi * GetCurrentScheduleValue( Pollution.FuelOil1Coef.NucHiSched ) / 1000.0;
+				FuelOil1Value = Pollution.FuelOil1Coef.NucHi * GetCurrentScheduleValue( Pollution.FuelOil1Coef.NucHiSched ) * 0.001;
 			}
-			Pollution.FuelOil1Comp.NucHiPollution = ( FuelType.FuelOil1 / 1.0e6 ) * FuelOil1Value;
+			Pollution.FuelOil1Comp.NucHiPollution = ( FuelType.FuelOil1 * 1.0e-6 ) * FuelOil1Value;
 		}
 		if ( Pollution.FuelOil2Coef.FuelFactorUsed ) {
 			Pollution.FuelOil2Comp.NucHiPollution = 0.0;
 			if ( Pollution.FuelOil2Coef.NucHiSched == 0 ) {
-				FuelOil2Value = Pollution.FuelOil2Coef.NucHi / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.NucHi * 0.001;
 			} else {
-				FuelOil2Value = Pollution.FuelOil2Coef.NucHi * GetCurrentScheduleValue( Pollution.FuelOil2Coef.NucHiSched ) / 1000.0;
+				FuelOil2Value = Pollution.FuelOil2Coef.NucHi * GetCurrentScheduleValue( Pollution.FuelOil2Coef.NucHiSched ) * 0.001;
 			}
-			Pollution.FuelOil2Comp.NucHiPollution = ( FuelType.FuelOil2 / 1.0e6 ) * FuelOil2Value;
+			Pollution.FuelOil2Comp.NucHiPollution = ( FuelType.FuelOil2 * 1.0e-6 ) * FuelOil2Value;
 		}
 		if ( Pollution.CoalCoef.FuelFactorUsed ) {
 			Pollution.CoalComp.NucHiPollution = 0.0;
 			if ( Pollution.CoalCoef.NucHiSched == 0 ) {
-				CoalValue = Pollution.CoalCoef.NucHi / 1000.0;
+				CoalValue = Pollution.CoalCoef.NucHi * 0.001;
 			} else {
-				CoalValue = Pollution.CoalCoef.NucHi * GetCurrentScheduleValue( Pollution.CoalCoef.NucHiSched ) / 1000.0;
+				CoalValue = Pollution.CoalCoef.NucHi * GetCurrentScheduleValue( Pollution.CoalCoef.NucHiSched ) * 0.001;
 			}
-			Pollution.CoalComp.NucHiPollution = ( FuelType.Coal / 1.0e6 ) * CoalValue;
+			Pollution.CoalComp.NucHiPollution = ( FuelType.Coal * 1.0e-6 ) * CoalValue;
 		}
 		if ( Pollution.GasolineCoef.FuelFactorUsed ) {
 			Pollution.GasolineComp.NucHiPollution = 0.0;
 			if ( Pollution.GasolineCoef.NucHiSched == 0 ) {
-				GasolineValue = Pollution.GasolineCoef.NucHi / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.NucHi * 0.001;
 			} else {
-				GasolineValue = Pollution.GasolineCoef.NucHi * GetCurrentScheduleValue( Pollution.GasolineCoef.NucHiSched ) / 1000.0;
+				GasolineValue = Pollution.GasolineCoef.NucHi * GetCurrentScheduleValue( Pollution.GasolineCoef.NucHiSched ) * 0.001;
 			}
-			Pollution.GasolineComp.NucHiPollution = ( FuelType.Gasoline / 1.0e6 ) * GasolineValue;
+			Pollution.GasolineComp.NucHiPollution = ( FuelType.Gasoline * 1.0e-6 ) * GasolineValue;
 		}
 		if ( Pollution.PropaneCoef.FuelFactorUsed ) {
 			Pollution.PropaneComp.NucHiPollution = 0.0;
 			if ( Pollution.PropaneCoef.NucHiSched == 0 ) {
-				PropaneValue = Pollution.PropaneCoef.NucHi / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.NucHi * 0.001;
 			} else {
-				PropaneValue = Pollution.PropaneCoef.NucHi * GetCurrentScheduleValue( Pollution.PropaneCoef.NucHiSched ) / 1000.0;
+				PropaneValue = Pollution.PropaneCoef.NucHi * GetCurrentScheduleValue( Pollution.PropaneCoef.NucHiSched ) * 0.001;
 			}
-			Pollution.PropaneComp.NucHiPollution = ( FuelType.Propane / 1.0e6 ) * PropaneValue;
+			Pollution.PropaneComp.NucHiPollution = ( FuelType.Propane * 1.0e-6 ) * PropaneValue;
 		}
 		if ( Pollution.DieselCoef.FuelFactorUsed ) {
 			Pollution.DieselComp.NucHiPollution = 0.0;
 			if ( Pollution.DieselCoef.NucHiSched == 0 ) {
-				DieselValue = Pollution.DieselCoef.NucHi / 1000.0;
+				DieselValue = Pollution.DieselCoef.NucHi * 0.001;
 			} else {
-				DieselValue = Pollution.DieselCoef.NucHi * GetCurrentScheduleValue( Pollution.DieselCoef.NucHiSched ) / 1000.0;
+				DieselValue = Pollution.DieselCoef.NucHi * GetCurrentScheduleValue( Pollution.DieselCoef.NucHiSched ) * 0.001;
 			}
-			Pollution.DieselComp.NucHiPollution = ( FuelType.Diesel / 1.0e6 ) * DieselValue;
+			Pollution.DieselComp.NucHiPollution = ( FuelType.Diesel * 1.0e-6 ) * DieselValue;
 		}
 		if ( Pollution.OtherFuel1Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel1Comp.NucHiPollution = 0.0;
 			if ( Pollution.OtherFuel1Coef.NucHiSched == 0 ) {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.NucHi / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.NucHi * 0.001;
 			} else {
-				OtherFuel1Value = Pollution.OtherFuel1Coef.NucHi * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.NucHiSched ) / 1000.0;
+				OtherFuel1Value = Pollution.OtherFuel1Coef.NucHi * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.NucHiSched ) * 0.001;
 			}
-			Pollution.OtherFuel1Comp.NucHiPollution = ( FuelType.OtherFuel1 / 1.0e6 ) * OtherFuel1Value;
+			Pollution.OtherFuel1Comp.NucHiPollution = ( FuelType.OtherFuel1 * 1.0e-6 ) * OtherFuel1Value;
 		}
 		if ( Pollution.OtherFuel2Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel2Comp.NucHiPollution = 0.0;
 			if ( Pollution.OtherFuel2Coef.NucHiSched == 0 ) {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.NucHi / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.NucHi * 0.001;
 			} else {
-				OtherFuel2Value = Pollution.OtherFuel2Coef.NucHi * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.NucHiSched ) / 1000.0;
+				OtherFuel2Value = Pollution.OtherFuel2Coef.NucHi * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.NucHiSched ) * 0.001;
 			}
-			Pollution.OtherFuel2Comp.NucHiPollution = ( FuelType.OtherFuel2 / 1.0e6 ) * OtherFuel2Value;
+			Pollution.OtherFuel2Comp.NucHiPollution = ( FuelType.OtherFuel2 * 1.0e-6 ) * OtherFuel2Value;
 		}
 
 		ElecValue = 0.0;
@@ -3143,7 +3143,7 @@ namespace PollutionModule {
 			} else {
 				ElecValue = Pollution.ElecCoef.NucLo * GetCurrentScheduleValue( Pollution.ElecCoef.NucLoSched );
 			}
-			Pollution.ElecComp.NucLoPollution = ( FuelType.Elec / 1.0e6 ) * ElecValue;
+			Pollution.ElecComp.NucLoPollution = ( FuelType.Elec * 1.0e-6 ) * ElecValue;
 		}
 		if ( Pollution.NatGasCoef.FuelFactorUsed ) {
 			Pollution.NatGasComp.NucLoPollution = 0.0;
@@ -3152,7 +3152,7 @@ namespace PollutionModule {
 			} else {
 				NatGasValue = Pollution.NatGasCoef.NucLo * GetCurrentScheduleValue( Pollution.NatGasCoef.NucLoSched );
 			}
-			Pollution.NatGasComp.NucLoPollution = ( FuelType.NatGas / 1.0e6 ) * NatGasValue;
+			Pollution.NatGasComp.NucLoPollution = ( FuelType.NatGas * 1.0e-6 ) * NatGasValue;
 		}
 		if ( Pollution.FuelOil1Coef.FuelFactorUsed ) {
 			Pollution.FuelOil1Comp.NucLoPollution = 0.0;
@@ -3161,7 +3161,7 @@ namespace PollutionModule {
 			} else {
 				FuelOil1Value = Pollution.FuelOil1Coef.NucLo * GetCurrentScheduleValue( Pollution.FuelOil1Coef.NucLoSched );
 			}
-			Pollution.FuelOil1Comp.NucLoPollution = ( FuelType.FuelOil1 / 1.0e6 ) * FuelOil1Value;
+			Pollution.FuelOil1Comp.NucLoPollution = ( FuelType.FuelOil1 * 1.0e-6 ) * FuelOil1Value;
 		}
 		if ( Pollution.FuelOil2Coef.FuelFactorUsed ) {
 			Pollution.FuelOil2Comp.NucLoPollution = 0.0;
@@ -3170,7 +3170,7 @@ namespace PollutionModule {
 			} else {
 				FuelOil2Value = Pollution.FuelOil2Coef.NucLo * GetCurrentScheduleValue( Pollution.FuelOil2Coef.NucLoSched );
 			}
-			Pollution.FuelOil2Comp.NucLoPollution = ( FuelType.FuelOil2 / 1.0e6 ) * FuelOil2Value;
+			Pollution.FuelOil2Comp.NucLoPollution = ( FuelType.FuelOil2 * 1.0e-6 ) * FuelOil2Value;
 		}
 		if ( Pollution.CoalCoef.FuelFactorUsed ) {
 			Pollution.CoalComp.NucLoPollution = 0.0;
@@ -3179,7 +3179,7 @@ namespace PollutionModule {
 			} else {
 				CoalValue = Pollution.CoalCoef.NucLo * GetCurrentScheduleValue( Pollution.CoalCoef.NucLoSched );
 			}
-			Pollution.CoalComp.NucLoPollution = ( FuelType.Coal / 1.0e6 ) * CoalValue;
+			Pollution.CoalComp.NucLoPollution = ( FuelType.Coal * 1.0e-6 ) * CoalValue;
 		}
 		if ( Pollution.GasolineCoef.FuelFactorUsed ) {
 			Pollution.GasolineComp.NucLoPollution = 0.0;
@@ -3188,7 +3188,7 @@ namespace PollutionModule {
 			} else {
 				GasolineValue = Pollution.GasolineCoef.NucLo * GetCurrentScheduleValue( Pollution.GasolineCoef.NucLoSched );
 			}
-			Pollution.GasolineComp.NucLoPollution = ( FuelType.Gasoline / 1.0e6 ) * GasolineValue;
+			Pollution.GasolineComp.NucLoPollution = ( FuelType.Gasoline * 1.0e-6 ) * GasolineValue;
 		}
 		if ( Pollution.PropaneCoef.FuelFactorUsed ) {
 			Pollution.PropaneComp.NucLoPollution = 0.0;
@@ -3197,7 +3197,7 @@ namespace PollutionModule {
 			} else {
 				PropaneValue = Pollution.PropaneCoef.NucLo * GetCurrentScheduleValue( Pollution.PropaneCoef.NucLoSched );
 			}
-			Pollution.PropaneComp.NucLoPollution = ( FuelType.Propane / 1.0e6 ) * PropaneValue;
+			Pollution.PropaneComp.NucLoPollution = ( FuelType.Propane * 1.0e-6 ) * PropaneValue;
 		}
 		if ( Pollution.DieselCoef.FuelFactorUsed ) {
 			Pollution.DieselComp.NucLoPollution = 0.0;
@@ -3206,7 +3206,7 @@ namespace PollutionModule {
 			} else {
 				DieselValue = Pollution.DieselCoef.NucLo * GetCurrentScheduleValue( Pollution.DieselCoef.NucLoSched );
 			}
-			Pollution.DieselComp.NucLoPollution = ( FuelType.Diesel / 1.0e6 ) * DieselValue;
+			Pollution.DieselComp.NucLoPollution = ( FuelType.Diesel * 1.0e-6 ) * DieselValue;
 		}
 		if ( Pollution.OtherFuel1Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel1Comp.NucLoPollution = 0.0;
@@ -3215,7 +3215,7 @@ namespace PollutionModule {
 			} else {
 				OtherFuel1Value = Pollution.OtherFuel1Coef.NucLo * GetCurrentScheduleValue( Pollution.OtherFuel1Coef.NucLoSched );
 			}
-			Pollution.OtherFuel1Comp.NucLoPollution = ( FuelType.OtherFuel1 / 1.0e6 ) * OtherFuel1Value;
+			Pollution.OtherFuel1Comp.NucLoPollution = ( FuelType.OtherFuel1 * 1.0e-6 ) * OtherFuel1Value;
 		}
 		if ( Pollution.OtherFuel2Coef.FuelFactorUsed ) {
 			Pollution.OtherFuel2Comp.NucLoPollution = 0.0;
@@ -3224,7 +3224,7 @@ namespace PollutionModule {
 			} else {
 				OtherFuel2Value = Pollution.OtherFuel2Coef.NucLo * GetCurrentScheduleValue( Pollution.OtherFuel2Coef.NucLoSched );
 			}
-			Pollution.OtherFuel2Comp.NucLoPollution = ( FuelType.OtherFuel2 / 1.0e6 ) * OtherFuel2Value;
+			Pollution.OtherFuel2Comp.NucLoPollution = ( FuelType.OtherFuel2 * 1.0e-6 ) * OtherFuel2Value;
 		}
 
 		Pollution.TotCarbonEquivFromN2O = Pollution.N2OPollutTotal * Pollution.CarbonEquivN2O;
@@ -3686,7 +3686,7 @@ namespace PollutionModule {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

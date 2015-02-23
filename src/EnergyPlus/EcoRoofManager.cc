@@ -289,7 +289,7 @@ namespace EcoRoofManager {
 
 		if ( EcoRoofbeginFlag ) {
 			EcoRoofbeginFlag = false;
-			if ( Surface( SurfNum ).HeatTransferAlgorithm != HeatTransferModel_CTF ) ShowWarningError( "CalcEcoRoof: EcoRoof simulation but HeatBalanceAlgorithm is not ConductionTransferFunction(CTF)." " Has not been tested under other solution approaches." );
+			if ( Surface( SurfNum ).HeatTransferAlgorithm != HeatTransferModel_CTF ) ShowWarningError( "CalcEcoRoof: EcoRoof simulation but HeatBalanceAlgorithm is not ConductionTransferFunction(CTF). Has not been tested under other solution approaches." );
 			// ONLY READ ECOROOF PROPERTIES IN THE FIRST TIME
 			Zf = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).HeightOfPlants; // Plant height (m)
 			LAI = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).LAI; // Leaf Area Index
@@ -388,7 +388,7 @@ namespace EcoRoofManager {
 			if ( Construct( ConstrNum ).CTFCross( 0 ) > 0.01 ) {
 				QuickConductionSurf = true;
 				F1temp = Construct( ConstrNum ).CTFCross( 0 ) / ( Construct( ConstrNum ).CTFInside( 0 ) + HConvIn( SurfNum ) );
-				Qsoilpart1 = -CTFConstOutPart( SurfNum ) + F1temp * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + Construct( ConstrNum ).CTFSourceIn( 0 ) * QsrcHist( SurfNum, 1 ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf( SurfNum ) );
+				Qsoilpart1 = -CTFConstOutPart( SurfNum ) + F1temp * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + Construct( ConstrNum ).CTFSourceIn( 0 ) * QsrcHist( 1, SurfNum ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf( SurfNum ) );
 			} else {
 				Qsoilpart1 = -CTFConstOutPart( SurfNum ) + Construct( ConstrNum ).CTFCross( 0 ) * TempSurfIn( SurfNum );
 				F1temp = 0.0;
@@ -405,7 +405,7 @@ namespace EcoRoofManager {
 			// Table 1 for sigmaf_max and min (0.20 to 0.9)
 
 			EpsilonOne = epsilonf + epsilong - epsilong * epsilonf; // Checked (eqn. 6 in FASST Veg Models)
-			RH = OutRelHum; // Get humidity in % from the DataEnvironment.f90
+			RH = OutRelHum; // Get humidity in % from the DataEnvironment.cc
 			eair = ( RH / 100.0 ) * 611.2 * std::exp( 17.67 * Ta / ( Tak - 29.65 ) );
 			qa = ( 0.622 * eair ) / ( Pa - 1.000 * eair ); // Mixing Ratio of air
 			Rhoa = Pa / ( Rair * Tak ); // Density of air. kg/m^3
@@ -668,7 +668,7 @@ namespace EcoRoofManager {
 		static Real64 TopDepth; // Thickness of "near-surface" soil layer
 		static Real64 RootDepth( 0.0 ); // Thickness of "root zone" soil layer //Autodesk Was used uninitialized
 		// Note TopDepth+RootDepth = thickness of ecoroof soil layer
-		static Real64 SecondsPerTimeStep; // Seconds per TimeStep
+		static Real64 TimeStepZoneSec; // Seconds per TimeStep
 		Real64 SoilConductivity; // Moisture dependent conductivity to be fed back into CTF Calculator
 		Real64 SoilSpecHeat; // Moisture dependent Spec. Heat to be fed back into CTF Calculator
 		Real64 SoilAbsorpSolar; // Moisture dependent Solar absorptance (1-albedo)
@@ -745,7 +745,7 @@ namespace EcoRoofManager {
 
 			RootDepth = SoilThickness - TopDepth;
 			//Next create a timestep in seconds
-			SecondsPerTimeStep = MinutesPerTimeStep * 60.0;
+			TimeStepZoneSec = MinutesPerTimeStep * 60.0;
 
 			UpdatebeginFlag = false;
 		}
@@ -890,7 +890,7 @@ namespace EcoRoofManager {
 
 			//Next, using the soil parameters, solve for the soil moisture
 			SoilConductivityAveTop = ( SoilHydroConductivityTop + SoilHydroConductivityRoot ) * 0.5;
-			Moisture += ( SecondsPerTimeStep / TopDepth ) * ( ( SoilConductivityAveTop * ( CapillaryPotentialTop - CapillaryPotentialRoot ) / TopDepth ) - SoilConductivityAveTop );
+			Moisture += ( TimeStepZoneSec / TopDepth ) * ( ( SoilConductivityAveTop * ( CapillaryPotentialTop - CapillaryPotentialRoot ) / TopDepth ) - SoilConductivityAveTop );
 
 			//Now limit the soil from going over the moisture maximum and takes excess to create runoff
 			if ( Moisture >= MoistureMax ) { //This statement makes sure that the top layer is not over the moisture maximum for the soil.
@@ -913,7 +913,7 @@ namespace EcoRoofManager {
 
 			//Using the parameters above, distribute the Root Layer moisture
 			TestMoisture = MeanRootMoisture;
-			MeanRootMoisture += ( SecondsPerTimeStep / RootDepth ) * ( ( SoilConductivityAveTop * ( CapillaryPotentialTop - CapillaryPotentialRoot ) / RootDepth ) + SoilConductivityAveTop - SoilConductivityAveRoot );
+			MeanRootMoisture += ( TimeStepZoneSec / RootDepth ) * ( ( SoilConductivityAveTop * ( CapillaryPotentialTop - CapillaryPotentialRoot ) / RootDepth ) + SoilConductivityAveTop - SoilConductivityAveRoot );
 
 			//Limit the moisture from going over the saturation limit and create runoff:
 			if ( MeanRootMoisture >= MoistureMax ) {
@@ -927,7 +927,7 @@ namespace EcoRoofManager {
 			}
 
 			//Next, track runoff from the bottom of the soil:
-			CurrentRunoff += SoilConductivityAveRoot * SecondsPerTimeStep;
+			CurrentRunoff += SoilConductivityAveRoot * TimeStepZoneSec;
 
 			//~~~END SF EDITS
 		}
@@ -1045,7 +1045,7 @@ namespace EcoRoofManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

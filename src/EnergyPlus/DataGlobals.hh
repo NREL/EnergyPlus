@@ -2,6 +2,7 @@
 #define DataGlobals_hh_INCLUDED
 
 // C++ Headers
+#include <iosfwd>
 #include <string>
 
 // EnergyPlus Headers
@@ -14,6 +15,10 @@ namespace DataGlobals {
 	// Data
 	// -only module should be available to other modules and routines.
 	// Thus, all variables in this module must be PUBLIC.
+
+	extern bool runReadVars;
+	extern bool DDOnlySimulation;
+	extern bool AnnualSimulation;
 
 	// MODULE PARAMETER DEFINITIONS:
 	extern int const BeginDay;
@@ -33,8 +38,10 @@ namespace DataGlobals {
 	extern Real64 const MaxEXPArg; // maximum exponent in EXP() function
 	extern Real64 const Pi; // Pi 3.1415926535897932384626435
 	extern Real64 const PiOvr2; // Pi/2
+	extern Real64 const TwoPi; // 2*Pi 6.2831853071795864769252868
 	extern Real64 const GravityConstant;
 	extern Real64 const DegToRadians; // Conversion for Degrees to Radians
+	extern Real64 const RadToDeg; // Conversion for Radians to Degrees
 	extern Real64 const SecInHour; // Conversion for hours to seconds
 	extern Real64 const HoursInDay; // Number of Hourse in Day
 	extern Real64 const SecsInDay; // Number of seconds in Day
@@ -104,12 +111,14 @@ namespace DataGlobals {
 	extern Real64 TimeStepZone; // Zone time step in fractional hours
 	extern bool WarmupFlag; // True during the warmup portion of a simulation
 	extern int OutputFileStandard; // Unit number for the standard output file (hourly data only)
+	extern std::ostream * eso_stream; // Internal stream used for eso output (used for performance)
 	extern int StdOutputRecordCount; // Count of Standard output records
 	extern int OutputFileInits; // Unit number for the standard Initialization output file
 	extern int OutputFileDebug; // Unit number for debug outputs
 	extern int OutputFileZoneSizing; // Unit number of zone sizing calc output file
 	extern int OutputFileSysSizing; // Unit number of system sizing calc output file
 	extern int OutputFileMeters; // Unit number for meters output
+	extern std::ostream * mtr_stream; // Internal stream used for mtr output (used for performance)
 	extern int StdMeterRecordCount; // Count of Meter output records
 	extern int OutputFileBNDetails; // Unit number for Branch-Node Details
 	extern bool ZoneSizingCalc; // TRUE if zone sizing calculation
@@ -130,10 +139,12 @@ namespace DataGlobals {
 	extern bool DisplayUnusedSchedules; // True when selection for  "DisplayUnusedSchedules" is entered
 	extern bool DisplayAdvancedReportVariables; // True when selection for  "DisplayAdvancedReportVariables" is entered
 	extern bool DisplayZoneAirHeatBalanceOffBalance; // True when selection for  "DisplayZoneAirHeatBalanceOffBalance" is entered
+	extern bool DisplayInputInAudit; // True when environmental variable "DisplayInputInAudit" is used
 	extern bool CreateMinimalSurfaceVariables; // True when selection for  "CreateMinimalSurfaceVariables" is entered
 	extern Real64 CurrentTime; // CurrentTime, in fractional hours, from start of day. Uses Loads time step.
 	extern int SimTimeSteps; // Number of (Loads) timesteps since beginning of run period (environment).
 	extern int MinutesPerTimeStep; // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
+	extern Real64 TimeStepZoneSec; // Seconds per time step
 	extern bool MetersHaveBeenInitialized;
 	extern bool KickOffSimulation; // Kick off simulation -- meaning run each environment for 1 or 2 time steps.
 	extern bool KickOffSizing; // Kick off sizing -- meaning run each environment for 1 or 2 time steps.
@@ -148,6 +159,11 @@ namespace DataGlobals {
 	extern bool doLoadComponentPulseNow; // true for the time step that is the "pulse" for the load component report
 	extern bool ShowDecayCurvesInEIO; // true if the Radiant to Convective Decay Curves should appear in the EIO file
 	extern bool AnySlabsInModel; // true if there are any zone-coupled ground domains in the input file
+	extern bool AnyBasementsInModel; // true if there are any basements in the input file
+
+	extern int Progress;
+	extern void ( *fProgressPtr )( int const );
+	extern void ( *fMessagePtr )( std::string const & );
 
 } // DataGlobals
 

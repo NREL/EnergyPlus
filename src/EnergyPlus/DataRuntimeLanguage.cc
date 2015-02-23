@@ -109,7 +109,7 @@ namespace DataRuntimeLanguage {
 	int const FuncWFnTdbRhPb( 52 ); // accessor for E+ psych routine
 	int const FuncPsatFnTemp( 53 ); // accessor for E+ psych routine
 	int const FuncTsatFnHPb( 54 ); // accessor for E+ psych routine
-	int const FuncTsatFnPb( 55 ); // not public in PsychRoutines.f90 so not really available in EMS.
+	int const FuncTsatFnPb( 55 ); // not public in PsychRoutines.cc so not really available in EMS.
 	int const FuncCpCW( 56 ); // accessor for E+ psych routine
 	int const FuncCpHW( 57 ); // accessor for E+ psych routine
 	int const FuncRhoH2O( 58 ); // accessor for E+ psych routine
@@ -203,6 +203,9 @@ namespace DataRuntimeLanguage {
 	ErlValueType Null( 0, 0.0, "", 0, 0, false, 0, "" ); // special "null" Erl variable value instance
 	ErlValueType False( 0, 0.0, "", 0, 0, false, 0, "" ); // special "false" Erl variable value instance
 	ErlValueType True( 0, 0.0, "", 0, 0, false, 0, "" ); // special "True" Erl variable value instance, gets reset
+
+	// EMS Actuator fast duplicate check lookup support
+	std::unordered_set< std::tuple< std::string, std::string, std::string >, EMSActuatorKey_hash > EMSActuator_lookup; // Fast duplicate lookup structure
 
 	// Functions
 
@@ -362,7 +365,7 @@ namespace DataRuntimeLanguage {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

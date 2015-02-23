@@ -69,7 +69,7 @@ namespace ManageElectricPower {
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::NumOfTimeStepInHour;
-	using DataGlobals::TimeStepZone;
+	using DataGlobals::TimeStepZoneSec;
 	using DataGlobals::SecInHour;
 	using DataGlobals::ScheduleAlwaysOn;
 	using DataHVACGlobals::TimeStepSys;
@@ -342,7 +342,7 @@ namespace ManageElectricPower {
 		ElecProducedPV = GetInstantMeterValue( ElecProducedPVIndex, 2 );
 		ElecProducedWT = GetInstantMeterValue( ElecProducedWTIndex, 2 );
 
-		WholeBldgElectSummary.TotalBldgElecDemand = ElecFacilityBldg / ( TimeStepZone * SecInHour );
+		WholeBldgElectSummary.TotalBldgElecDemand = ElecFacilityBldg / TimeStepZoneSec;
 		WholeBldgElectSummary.TotalHVACElecDemand = ElecFacilityHVAC / ( TimeStepSys * SecInHour );
 		WholeBldgElectSummary.TotalElectricDemand = WholeBldgElectSummary.TotalBldgElecDemand + WholeBldgElectSummary.TotalHVACElecDemand;
 		WholeBldgElectSummary.ElecProducedPVRate = ElecProducedPV / ( TimeStepSys * SecInHour );
@@ -581,7 +581,7 @@ namespace ManageElectricPower {
 				// The TRACK CUSTOM METER scheme tries to have the generators meet all of the
 				//   electrical demand from a meter, it can also be a user-defined Custom Meter
 				//   and PV is ignored.
-				CustomMeterDemand = GetInstantMeterValue( ElecLoadCenter( LoadCenterNum ).DemandMeterPtr, 1 ) / ( TimeStepZone * SecInHour ) + GetInstantMeterValue( ElecLoadCenter( LoadCenterNum ).DemandMeterPtr, 2 ) / ( TimeStepSys * SecInHour );
+				CustomMeterDemand = GetInstantMeterValue( ElecLoadCenter( LoadCenterNum ).DemandMeterPtr, 1 ) / TimeStepZoneSec + GetInstantMeterValue( ElecLoadCenter( LoadCenterNum ).DemandMeterPtr, 2 ) / ( TimeStepSys * SecInHour );
 
 				RemainingLoad = CustomMeterDemand;
 				LoadCenterElectricLoad = RemainingLoad;
@@ -2093,8 +2093,7 @@ namespace ManageElectricPower {
 
 		// need to do initial setups
 		if ( MyOneTimeSetupFlag ) {
-			MyCoGenSetupFlag.allocate( NumLoadCenters );
-			MyCoGenSetupFlag = true;
+			MyCoGenSetupFlag.dimension( NumLoadCenters, true );
 			ThermalLoad = 0.0;
 			MyOneTimeSetupFlag = false;
 			return;
@@ -2774,12 +2773,9 @@ namespace ManageElectricPower {
 					//        The arrary size needs to be increased when count = MaxRainflowArrayBounds. Please note that (MaxRainflowArrayBounds +1)
 					//        is the index used in the subroutine RainFlow. So we cannot reallocate array size until count = MaxRainflowArrayBounds +1.
 					if ( ElecStorage( ElecStorNum ).count0 == MaxRainflowArrayBounds ) {
-						SaveArrayBounds = MaxRainflowArrayBounds + 1;
-						ReallocateRealArray( ElecStorage( ElecStorNum ).B10, SaveArrayBounds, MaxRainflowArrayInc );
-						SaveArrayBounds = MaxRainflowArrayBounds + 1;
-						ReallocateRealArray( ElecStorage( ElecStorNum ).X0, SaveArrayBounds, MaxRainflowArrayInc );
-						//           Decrement by 1 is needed because the last input parameter of RainFlow is MaxRainflowArrayBounds+1
-						MaxRainflowArrayBounds = SaveArrayBounds - 1;
+						ElecStorage( ElecStorNum ).B10.redimension( MaxRainflowArrayBounds + 1 + MaxRainflowArrayInc, 0.0 );
+						ElecStorage( ElecStorNum ).X0.redimension( MaxRainflowArrayBounds + 1 + MaxRainflowArrayInc, 0.0 );
+						MaxRainflowArrayBounds += MaxRainflowArrayInc;
 					}
 
 					Rainflow( ElecStorage( ElecStorNum ).CycleBinNum, Input0, ElecStorage( ElecStorNum ).B10, ElecStorage( ElecStorNum ).X0, ElecStorage( ElecStorNum ).count0, ElecStorage( ElecStorNum ).Nmb0, ElecStorage( ElecStorNum ).OneNmb0, MaxRainflowArrayBounds + 1 );
@@ -3272,8 +3268,6 @@ namespace ManageElectricPower {
 
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
-		using DataGlobals::TimeStepZone;
-		using DataGlobals::SecInHour;
 		using DataGlobals::MetersHaveBeenInitialized;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataHeatBalance::ZnAirRpt;
@@ -3355,10 +3349,10 @@ namespace ManageElectricPower {
 
 					if ( MetersHaveBeenInitialized ) {
 						MeterPtr = Transformer( TransfNum ).WiredMeterPtrs( MeterNum );
-						ElecLoad += GetInstantMeterValue( MeterPtr, 1 ) / ( TimeStepZone * SecInHour ) + GetInstantMeterValue( MeterPtr, 2 ) / ( TimeStepSys * SecInHour );
+						ElecLoad += GetInstantMeterValue( MeterPtr, 1 ) / TimeStepZoneSec + GetInstantMeterValue( MeterPtr, 2 ) / ( TimeStepSys * SecInHour );
 						// PastElecLoad store the metered value in the previous time step. This value will be used to check whether
 						// a transformer is overloaded or not.
-						PastElecLoad += GetCurrentMeterValue( MeterPtr ) / ( TimeStepZone * SecInHour );
+						PastElecLoad += GetCurrentMeterValue( MeterPtr ) / TimeStepZoneSec;
 					} else {
 						ElecLoad = 0.0;
 						PastElecLoad = 0.0;
@@ -3406,7 +3400,7 @@ namespace ManageElectricPower {
 						ShowSevereError( "Transformer Overloaded" );
 						ShowContinueError( "Entered in ElectricLoadCenter:Transformer =" + Transformer( TransfNum ).Name );
 					}
-					ShowRecurringSevereErrorAtEnd( "Transformer Overloaded: " "Entered in ElectricLoadCenter:Transformer =" + Transformer( TransfNum ).Name, Transformer( TransfNum ).OverloadErrorIndex );
+					ShowRecurringSevereErrorAtEnd( "Transformer Overloaded: Entered in ElectricLoadCenter:Transformer =" + Transformer( TransfNum ).Name, Transformer( TransfNum ).OverloadErrorIndex );
 				}
 
 				TempChange = std::pow( PUL, 1.6 ) * Transformer( TransfNum ).TempRise;
@@ -3688,8 +3682,8 @@ namespace ManageElectricPower {
 		// na
 
 		// Argument array dimensioning
-		A.dim( {0,dim} );
-		B.dim( {0,dim} );
+		A.dim( {1,dim} );
+		B.dim( {1,dim} );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3727,7 +3721,7 @@ namespace ManageElectricPower {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

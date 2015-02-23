@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -1102,15 +1101,15 @@ namespace DXCoils {
 		FArray1D< std::string > FieldNames;
 
 		// Default Constructor
-		PerfModeData ():
-			FieldNames( )  
+		PerfModeData () :
+			FieldNames( )
 		{}
 
 		// Member Constructor
 		PerfModeData(
 			FArray1D< std::string > const & FieldNames // Name of the HeatingCoil numeric field descriptions
-	) :
-	    FieldNames( FieldNames )
+		) :
+			FieldNames( FieldNames )
 		{}
 	};
 
@@ -1324,7 +1323,7 @@ namespace DXCoils {
 	Real64
 	CalcTwoSpeedDXCoilIEERResidual(
 		Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = DX coil number
+		FArray1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	// ======================  Utility routines ======================================
@@ -1491,7 +1490,7 @@ namespace DXCoils {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

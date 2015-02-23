@@ -287,23 +287,16 @@ namespace HVACSingleDuctInduc {
 		NumIndUnits = NumFourPipes;
 		// allocate the data structures
 		IndUnit.allocate( NumIndUnits );
-		CheckEquipName.allocate( NumIndUnits );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumIndUnits, true );
 
 		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = "";
-		Numbers.allocate( NumNumbers );
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNumbers );
-		lNumericBlanks = true;
+		Numbers.dimension( NumNumbers, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNumbers, true );
 
 		// loop over Series PIUs; get and load the input data
 		for ( IUIndex = 1; IUIndex <= NumFourPipes; ++IUIndex ) {
@@ -1226,7 +1219,7 @@ namespace HVACSingleDuctInduc {
 	Real64
 	FourPipeIUHeatingResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		Optional< FArray1S< Real64 > const > Par // Par(5) is the requested zone load
+		FArray1< Real64 > const & Par // Par(5) is the requested zone load
 	)
 	{
 
@@ -1273,16 +1266,12 @@ namespace HVACSingleDuctInduc {
 		Real64 MinCWFlow;
 		Real64 UnitOutput;
 
-		IUIndex = int( Par()( 1 ) );
-		if ( Par()( 2 ) > 0.0 ) {
-			FirstHVACSoln = true;
-		} else {
-			FirstHVACSoln = false;
-		}
-		ZoneNodeIndex = int( Par()( 3 ) );
-		MinCWFlow = Par()( 4 );
+		IUIndex = int( Par( 1 ) );
+		FirstHVACSoln = ( Par( 2 ) > 0.0 );
+		ZoneNodeIndex = int( Par( 3 ) );
+		MinCWFlow = Par( 4 );
 		CalcFourPipeIndUnit( IUIndex, FirstHVACSoln, ZoneNodeIndex, HWFlow, MinCWFlow, UnitOutput );
-		Residuum = ( Par()( 5 ) - UnitOutput ) / ( Par()( 7 ) - Par()( 6 ) );
+		Residuum = ( Par( 5 ) - UnitOutput ) / ( Par( 7 ) - Par( 6 ) );
 
 		return Residuum;
 	}
@@ -1290,7 +1279,7 @@ namespace HVACSingleDuctInduc {
 	Real64
 	FourPipeIUCoolingResidual(
 		Real64 const CWFlow, // cold water flow rate in kg/s
-		Optional< FArray1S< Real64 > const > Par // Par()(5) is the requested zone load
+		FArray1< Real64 > const & Par // Par(5) is the requested zone load
 	)
 	{
 
@@ -1337,16 +1326,12 @@ namespace HVACSingleDuctInduc {
 		Real64 MinHWFlow;
 		Real64 UnitOutput;
 
-		IUIndex = int( Par()( 1 ) );
-		if ( Par()( 2 ) > 0.0 ) {
-			FirstHVACSoln = true;
-		} else {
-			FirstHVACSoln = false;
-		}
-		ZoneNodeIndex = int( Par()( 3 ) );
-		MinHWFlow = Par()( 4 );
+		IUIndex = int( Par( 1 ) );
+		FirstHVACSoln = ( Par( 2 ) > 0.0 );
+		ZoneNodeIndex = int( Par( 3 ) );
+		MinHWFlow = Par( 4 );
 		CalcFourPipeIndUnit( IUIndex, FirstHVACSoln, ZoneNodeIndex, MinHWFlow, CWFlow, UnitOutput );
-		Residuum = ( Par()( 5 ) - UnitOutput ) / ( Par()( 7 ) - Par()( 6 ) );
+		Residuum = ( Par( 5 ) - UnitOutput ) / ( Par( 7 ) - Par( 6 ) );
 
 		return Residuum;
 	}
@@ -1418,7 +1403,7 @@ namespace HVACSingleDuctInduc {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
