@@ -15,6 +15,7 @@
 #include <DataLoopNode.hh>
 #include <DataPlant.hh>
 #include <DataPrecisionGlobals.hh>
+#include <DisplayRoutines.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
@@ -169,7 +170,7 @@ namespace GroundHeatExchangers {
 
 			// Find the correct GLHE
 			if ( compIndex == 0 ) {
-				GLHENum = FindItemInList( name, verticalGLHE.name(), numVerticalGLHEs );
+				GLHENum = FindItemInList( name, verticalGLHE.Name(), numVerticalGLHEs );
 				if ( GLHENum == 0 ) {
 					ShowFatalError( "SimGroundHeatExchangers: Unit not found=" + name );
 				}
@@ -180,8 +181,8 @@ namespace GroundHeatExchangers {
 					ShowFatalError( "SimGroundHeatExchangers:  Invalid compIndex passed=" + TrimSigDigits( GLHENum ) + ", Number of Units=" + TrimSigDigits( numVerticalGLHEs ) + ", Entered Unit name=" + name );
 				}
 				if ( checkEquipName( GLHENum ) ) {
-					if ( name != verticalGLHE( GLHENum ).name ) {
-						ShowFatalError( "SimGroundHeatExchangers: Invalid compIndex passed=" + TrimSigDigits( numVerticalGLHEs ) + ", Unit name=" + name + ", stored Unit name for that index=" + verticalGLHE( GLHENum ).name );
+					if ( name != verticalGLHE( GLHENum ).Name ) {
+						ShowFatalError( "SimGroundHeatExchangers: Invalid compIndex passed=" + TrimSigDigits( numVerticalGLHEs ) + ", Unit name=" + name + ", stored Unit name for that index=" + verticalGLHE( GLHENum ).Name );
 					}
 					checkEquipName( GLHENum ) = false;
 				}
@@ -207,7 +208,7 @@ namespace GroundHeatExchangers {
 		
 			// Find the correct GLHE
 			if ( compIndex == 0 ) {
-				GLHENum = FindItemInList( name, slinkyGLHE.name(), numSlinkyGLHEs );
+				GLHENum = FindItemInList( name, slinkyGLHE.Name(), numSlinkyGLHEs );
 				if ( GLHENum == 0 ) {
 					ShowFatalError( "SimGroundHeatExchangers: Unit not found=" + name );
 				}
@@ -218,8 +219,8 @@ namespace GroundHeatExchangers {
 					ShowFatalError( "SimGroundHeatExchangers:  Invalid compIndex passed=" + TrimSigDigits( GLHENum ) + ", Number of Units=" + TrimSigDigits( numSlinkyGLHEs ) + ", Entered Unit name=" + name );
 				}
 				if ( checkEquipName( GLHENum ) ) {
-					if ( name != slinkyGLHE( GLHENum ).name ) {
-						ShowFatalError( "SimGroundHeatExchangers: Invalid compIndex passed=" + TrimSigDigits( numSlinkyGLHEs ) + ", Unit name=" + name + ", stored Unit name for that index=" + slinkyGLHE( GLHENum ).name );
+					if ( name != slinkyGLHE( GLHENum ).Name ) {
+						ShowFatalError( "SimGroundHeatExchangers: Invalid compIndex passed=" + TrimSigDigits( numSlinkyGLHEs ) + ", Unit name=" + name + ", stored Unit name for that index=" + slinkyGLHE( GLHENum ).Name );
 					}
 					checkEquipName( GLHENum ) = false;
 				}
@@ -242,6 +243,8 @@ namespace GroundHeatExchangers {
 			thisGLHE.updateGHX();
 		}
 	}
+
+	//******************************************************************************
 
 	void 
 	GLHEVert::calcGFunctions()
@@ -298,7 +301,7 @@ namespace GroundHeatExchangers {
 		Real64 SubAGG( 15.0 );
 		Real64 AGG = ( 192.0 );
 
-		//ShowString( "Calculating G-Functions" );
+		DisplayString( "Calculating G-Functions" );
 
 		X0.allocate( numCoils );
 		Y0.allocate( numTrenches );
@@ -982,7 +985,7 @@ namespace GroundHeatExchangers {
 				ToutNew = inletTemp;
 			} else {
 				XI = std::log( currentSimTime / ( timeSSFactor ) );
-				gFuncVal = interpGFunc( XI );
+				gFuncVal = getGFunc( XI );
 
 				C_1 = ( totalTubeLength ) / ( 2.0 * massFlowRate * cpFluid );
 				tmpQnSubHourly = ( tempGround - inletTemp ) / ( gFuncVal / ( kGroundFactor ) + HXResistance + C_1 );
@@ -1007,12 +1010,12 @@ namespace GroundHeatExchangers {
 					if ( I == subHourlyLimit ) {
 						if ( int( currentSimTime ) >= SubAGG ) {
 							XI = std::log( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
-							gFuncVal = interpGFunc( XI );
+							gFuncVal = getGFunc( XI );
 							RQSubHr = gFuncVal / ( kGroundFactor );
 							sumQnSubHourly += ( QnSubHr( I ) - QnHr( IndexN ) ) * RQSubHr;
 						} else {
 							XI = std::log( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
-							gFuncVal = interpGFunc( XI );
+							gFuncVal = getGFunc( XI );
 							RQSubHr = gFuncVal / ( kGroundFactor );
 							sumQnSubHourly += QnSubHr( I ) * RQSubHr;
 						}
@@ -1020,7 +1023,7 @@ namespace GroundHeatExchangers {
 					}
 					//prevTimeSteps(I+1) This is "I+1" because prevTimeSteps(1) = CurrentTimestep
 					XI = std::log( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
-					gFuncVal = interpGFunc( XI );
+					gFuncVal = getGFunc( XI );
 					RQSubHr = gFuncVal / ( kGroundFactor );
 					sumQnSubHourly += ( QnSubHr( I ) - QnSubHr( I + 1 ) ) * RQSubHr;
 					SUBHRLY_LOOP_loop: ;
@@ -1034,13 +1037,13 @@ namespace GroundHeatExchangers {
 				HOURLY_LOOP: for ( I = SubAGG + 1; I <= hourlyLimit; ++I ) {
 					if ( I == hourlyLimit ) {
 						XI = std::log( currentSimTime / ( timeSSFactor ) );
-						gFuncVal = interpGFunc( XI );
+						gFuncVal = getGFunc( XI );
 						RQHour = gFuncVal / ( kGroundFactor );
 						sumQnHourly += QnHr( I ) * RQHour;
 						goto HOURLY_LOOP_exit;
 					}
 					XI = std::log( ( currentSimTime - int( currentSimTime ) + I ) / ( timeSSFactor ) );
-					gFuncVal = interpGFunc( XI );
+					gFuncVal = getGFunc( XI );
 					RQHour = gFuncVal / ( kGroundFactor );
 					sumQnHourly += ( QnHr( I ) - QnHr( I + 1 ) ) * RQHour;
 					HOURLY_LOOP_loop: ;
@@ -1052,7 +1055,7 @@ namespace GroundHeatExchangers {
 
 				//Calulate the subhourly temperature due the Last Time steps Load
 				XI = std::log( ( currentSimTime - prevTimeSteps( 2 ) ) / ( timeSSFactor ) );
-				gFuncVal = interpGFunc( XI );
+				gFuncVal = getGFunc( XI );
 				RQSubHr = gFuncVal / ( kGroundFactor );
 
 				if ( massFlowRate <= 0.0 ) {
@@ -1086,13 +1089,13 @@ namespace GroundHeatExchangers {
 				SUMMONTHLY: for ( I = 1; I <= currentMonth; ++I ) {
 					if ( I == 1 ) {
 						XI = std::log( currentSimTime / ( timeSSFactor ) );
-						gFuncVal = interpGFunc( XI );
+						gFuncVal = getGFunc( XI );
 						RQMonth = gFuncVal / ( kGroundFactor );
 						sumQnMonthly += QnMonthlyAgg( I ) * RQMonth;
 						goto SUMMONTHLY_loop;
 					}
 					XI = std::log( ( currentSimTime - ( I - 1 ) * hrsPerMonth ) / ( timeSSFactor ) );
-					gFuncVal = interpGFunc( XI );
+					gFuncVal = getGFunc( XI );
 					RQMonth = gFuncVal / ( kGroundFactor );
 					sumQnMonthly += ( QnMonthlyAgg( I ) - QnMonthlyAgg( I - 1 ) ) * RQMonth;
 					SUMMONTHLY_loop: ;
@@ -1106,13 +1109,13 @@ namespace GroundHeatExchangers {
 				HOURLYLOOP: for ( I = 1 + SubAGG; I <= hourlyLimit; ++I ) {
 					if ( I == hourlyLimit ) {
 						XI = std::log( ( currentSimTime - int( currentSimTime ) + I ) / ( timeSSFactor ) );
-						gFuncVal = interpGFunc( XI );
+						gFuncVal = getGFunc( XI );
 						RQHour = gFuncVal / ( kGroundFactor );
 						sumQnHourly += ( QnHr( I ) - QnMonthlyAgg( currentMonth ) ) * RQHour;
 						goto HOURLYLOOP_exit;
 					}
 					XI = std::log( ( currentSimTime - int( currentSimTime ) + I ) / ( timeSSFactor ) );
-					gFuncVal = interpGFunc( XI );
+					gFuncVal = getGFunc( XI );
 					RQHour = gFuncVal / ( kGroundFactor );
 					sumQnHourly += ( QnHr( I ) - QnHr( I + 1 ) ) * RQHour;
 					HOURLYLOOP_loop: ;
@@ -1126,13 +1129,13 @@ namespace GroundHeatExchangers {
 				SUBHRLOOP: for ( I = 1; I <= subHourlyLimit; ++I ) {
 					if ( I == subHourlyLimit ) {
 						XI = std::log( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
-						gFuncVal = interpGFunc( XI );
+						gFuncVal = getGFunc( XI );
 						RQSubHr = gFuncVal / ( kGroundFactor );
 						sumQnSubHourly += ( QnSubHr( I ) - QnHr( SubAGG + 1 ) ) * RQSubHr;
 						goto SUBHRLOOP_exit;
 					}
 					XI = std::log( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
-					gFuncVal = interpGFunc( XI );
+					gFuncVal = getGFunc( XI );
 					RQSubHr = gFuncVal / ( kGroundFactor );
 					sumQnSubHourly += ( QnSubHr( I ) - QnSubHr( I + 1 ) ) * RQSubHr;
 					SUBHRLOOP_loop: ;
@@ -1144,7 +1147,7 @@ namespace GroundHeatExchangers {
 				//Calulate the subhourly temperature due the Last Time steps Load
 
 				XI = std::log( ( currentSimTime - prevTimeSteps( 2 ) ) / ( timeSSFactor ) );
-				gFuncVal = interpGFunc( XI );
+				gFuncVal = getGFunc( XI );
 				RQSubHr = gFuncVal / ( kGroundFactor );
 
 				if ( massFlowRate <= 0.0 ) {
@@ -1203,7 +1206,7 @@ namespace GroundHeatExchangers {
 			fluidDensity = GetDensityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
 			designMassFlow = designFlow * fluidDensity;
 			ShowWarningError( "Check GLHE design inputs & g-functions for consistency" );
-			ShowContinueError( "For GroundHeatExchanger:Vertical " + name + "GLHE delta Temp > 100C." );
+			ShowContinueError( "For GroundHeatExchanger: " + Name + "GLHE delta Temp > 100C." );
 			ShowContinueError( "This can be encountered in cases where the GLHE mass flow rate is either significantly" );
 			ShowContinueError( " lower than the design value, or cases where the mass flow rate rapidly changes." );
 			ShowContinueError( "GLHE Current Flow Rate=" + TrimSigDigits( massFlowRate, 3 ) + "; GLHE Design Flow Rate=" + TrimSigDigits( designMassFlow, 3 ) );
@@ -1378,12 +1381,12 @@ namespace GroundHeatExchangers {
 				isBlank = false;
 
 				//get object name
-				VerifyName( cAlphaArgs( 1 ), verticalGLHE.name(), GLHENum - 1, isNotOK, isBlank, cCurrentModuleObject + " name" );
+				VerifyName( cAlphaArgs( 1 ), verticalGLHE.Name(), GLHENum - 1, isNotOK, isBlank, cCurrentModuleObject + " name" );
 				if ( isNotOK ) {
 					errorsFound = true;
 					if ( isBlank ) cAlphaArgs( 1 ) = "xxxxx";
 				}
-				verticalGLHE( GLHENum ).name = cAlphaArgs( 1 );
+				verticalGLHE( GLHENum ).Name = cAlphaArgs( 1 );
 
 				//get inlet node num
 				verticalGLHE( GLHENum ).inletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), errorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
@@ -1422,7 +1425,7 @@ namespace GroundHeatExchangers {
 				//   Not many checks
 
 				if ( verticalGLHE( GLHENum ).pipeThick >= verticalGLHE( GLHENum ).pipeOutDia / 2.0 ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + verticalGLHE( GLHENum ).name + "\", invalid value in field." );
+					ShowSevereError( cCurrentModuleObject + "=\"" + verticalGLHE( GLHENum ).Name + "\", invalid value in field." );
 					ShowContinueError( "..." + cNumericFieldNames( 12 ) + "=[" + RoundSigDigits( verticalGLHE( GLHENum ).pipeThick, 3 ) + "]." );
 					ShowContinueError( "..." + cNumericFieldNames( 10 ) + "=[" + RoundSigDigits( verticalGLHE( GLHENum ).pipeOutDia, 3 ) + "]." );
 					ShowContinueError( "...Radius will be <=0." );
@@ -1430,7 +1433,7 @@ namespace GroundHeatExchangers {
 				}
 
 				if ( verticalGLHE( GLHENum ).maxSimYears < MaxNumberSimYears ) {
-					ShowWarningError( cCurrentModuleObject + "=\"" + verticalGLHE( GLHENum ).name + "\", invalid value in field." );
+					ShowWarningError( cCurrentModuleObject + "=\"" + verticalGLHE( GLHENum ).Name + "\", invalid value in field." );
 					ShowContinueError( "..." + cNumericFieldNames( 13 ) + " less than RunPeriod Request" );
 					ShowContinueError( "Requested input=" + TrimSigDigits( verticalGLHE( GLHENum ).maxSimYears ) + " will be set to " + TrimSigDigits( MaxNumberSimYears ) );
 					verticalGLHE( GLHENum ).maxSimYears = MaxNumberSimYears;
@@ -1469,12 +1472,12 @@ namespace GroundHeatExchangers {
 
 			//Set up report variables
 			for ( GLHENum = 1; GLHENum <= numVerticalGLHEs; ++GLHENum ) {
-				SetupOutputVariable( "Ground Heat Exchanger Average Borehole Temperature [C]", verticalGLHE( GLHENum ).boreholeTemp, "System", "Average", verticalGLHE( GLHENum ).name );
-				SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate [W]", verticalGLHE( GLHENum ).QGLHE, "System", "Average", verticalGLHE( GLHENum ).name );
-				SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature [C]", verticalGLHE( GLHENum ).inletTemp, "System", "Average", verticalGLHE( GLHENum ).name );
-				SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature [C]", verticalGLHE( GLHENum ).outletTemp, "System", "Average", verticalGLHE( GLHENum ).name );
-				SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate [kg/s]", verticalGLHE( GLHENum ).massFlowRate, "System", "Average", verticalGLHE( GLHENum ).name );
-				SetupOutputVariable( "Ground Heat Exchanger Average Fluid Temperature [C]", verticalGLHE( GLHENum ).aveFluidTemp, "System", "Average", verticalGLHE( GLHENum ).name );
+				SetupOutputVariable( "Ground Heat Exchanger Average Borehole Temperature [C]", verticalGLHE( GLHENum ).boreholeTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate [W]", verticalGLHE( GLHENum ).QGLHE, "System", "Average", verticalGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature [C]", verticalGLHE( GLHENum ).inletTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature [C]", verticalGLHE( GLHENum ).outletTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate [kg/s]", verticalGLHE( GLHENum ).massFlowRate, "System", "Average", verticalGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Average Fluid Temperature [C]", verticalGLHE( GLHENum ).aveFluidTemp, "System", "Average", verticalGLHE( GLHENum ).Name );
 			}
 
 		}
@@ -1498,12 +1501,12 @@ namespace GroundHeatExchangers {
 				isBlank = false;
 
 				//get object name
-				VerifyName( cAlphaArgs( 1 ), slinkyGLHE.name(), GLHENum - 1, isNotOK, isBlank, cCurrentModuleObject + " name" );
+				VerifyName( cAlphaArgs( 1 ), slinkyGLHE.Name(), GLHENum - 1, isNotOK, isBlank, cCurrentModuleObject + " name" );
 				if ( isNotOK ) {
 					errorsFound = true;
 					if ( isBlank ) cAlphaArgs( 1 ) = "xxxxx";
 				}
-				slinkyGLHE( GLHENum ).name = cAlphaArgs( 1 );
+				slinkyGLHE( GLHENum ).Name = cAlphaArgs( 1 );
 
 				//get inlet node num
 				slinkyGLHE( GLHENum ).inletNodeNum = GetOnlySingleNode( cAlphaArgs( 2 ), errorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
@@ -1556,7 +1559,7 @@ namespace GroundHeatExchangers {
 					// Vertical configuration
 					if ( slinkyGLHE( GLHENum ).trenchDepth - slinkyGLHE(GLHENum).coilDiameter < 0.0 ) {
 						// Error: part of the coil is above ground
-						ShowSevereError( cCurrentModuleObject + "=\"" + slinkyGLHE( GLHENum ).name + "\", invalid value in field." );
+						ShowSevereError( cCurrentModuleObject + "=\"" + slinkyGLHE( GLHENum ).Name + "\", invalid value in field." );
 						ShowContinueError( "..." + cNumericFieldNames( 13 ) + "=[" + RoundSigDigits( slinkyGLHE( GLHENum ).trenchDepth, 3 ) + "]." );
 						ShowContinueError( "..." + cNumericFieldNames( 10 ) + "=[" + RoundSigDigits( slinkyGLHE( GLHENum ).coilDepth, 3 ) + "]." );
 						ShowContinueError( "...Average coil depth will be <=0." );
@@ -1584,7 +1587,7 @@ namespace GroundHeatExchangers {
 					// then we must get it from the surface ground temperatures
 
 					if ( !PubGroundTempSurfFlag ) {
-						ShowSevereError( "Input problem for " + cCurrentModuleObject + '=' + slinkyGLHE( GLHENum ).name );
+						ShowSevereError( "Input problem for " + cCurrentModuleObject + '=' + slinkyGLHE( GLHENum ).Name );
 						ShowContinueError( "No Site:GroundTemperature:Shallow object found in the input file" );
 						ShowContinueError( "This is required for the ground domain if farfield parameters are" );
 						ShowContinueError( " not directly entered into the input object." );
@@ -1630,7 +1633,7 @@ namespace GroundHeatExchangers {
 				//   Not many checks
 
 				if ( slinkyGLHE( GLHENum ).pipeThick >= slinkyGLHE( GLHENum ).pipeOutDia / 2.0 ) {
-					ShowSevereError( cCurrentModuleObject + "=\"" + slinkyGLHE( GLHENum ).name + "\", invalid value in field." );
+					ShowSevereError( cCurrentModuleObject + "=\"" + slinkyGLHE( GLHENum ).Name + "\", invalid value in field." );
 					ShowContinueError( "..." + cNumericFieldNames( 12 ) + "=[" + RoundSigDigits( slinkyGLHE( GLHENum ).pipeThick, 3 ) + "]." );
 					ShowContinueError( "..." + cNumericFieldNames( 10 ) + "=[" + RoundSigDigits( slinkyGLHE( GLHENum ).pipeOutDia, 3 ) + "]." );
 					ShowContinueError( "...Radius will be <=0." );
@@ -1645,12 +1648,12 @@ namespace GroundHeatExchangers {
 
 			//Set up report variables
 			for ( GLHENum = 1; GLHENum <= numSlinkyGLHEs; ++GLHENum ) {
-				SetupOutputVariable( "Ground Heat Exchanger Average Borehole Temperature [C]", slinkyGLHE( GLHENum ).boreholeTemp, "System", "Average", slinkyGLHE( GLHENum ).name );
-				SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate [W]", slinkyGLHE( GLHENum ).QGLHE, "System", "Average", slinkyGLHE( GLHENum ).name );
-				SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature [C]", slinkyGLHE( GLHENum ).inletTemp, "System", "Average", slinkyGLHE( GLHENum ).name );
-				SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature [C]", slinkyGLHE( GLHENum ).outletTemp, "System", "Average", slinkyGLHE( GLHENum ).name );
-				SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate [kg/s]", slinkyGLHE( GLHENum ).massFlowRate, "System", "Average", slinkyGLHE( GLHENum ).name );
-				SetupOutputVariable( "Ground Heat Exchanger Average Fluid Temperature [C]", slinkyGLHE( GLHENum ).aveFluidTemp, "System", "Average", slinkyGLHE( GLHENum ).name );
+				SetupOutputVariable( "Ground Heat Exchanger Average Borehole Temperature [C]", slinkyGLHE( GLHENum ).boreholeTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Heat Transfer Rate [W]", slinkyGLHE( GLHENum ).QGLHE, "System", "Average", slinkyGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Inlet Temperature [C]", slinkyGLHE( GLHENum ).inletTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Outlet Temperature [C]", slinkyGLHE( GLHENum ).outletTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Mass Flow Rate [kg/s]", slinkyGLHE( GLHENum ).massFlowRate, "System", "Average", slinkyGLHE( GLHENum ).Name );
+				SetupOutputVariable( "Ground Heat Exchanger Average Fluid Temperature [C]", slinkyGLHE( GLHENum ).aveFluidTemp, "System", "Average", slinkyGLHE( GLHENum ).Name );
 			}
 		}
 
@@ -1977,15 +1980,11 @@ namespace GroundHeatExchangers {
 
 		RATIO = boreholeRadius / boreholeLength;
 
-
 		if ( RATIO != gReferenceRatio ) {
 			gFuncVal -= std::log( boreholeRadius / ( boreholeLength * gReferenceRatio ) );
 		}
 
 		return gFuncVal;
-		
-
-
 	};
 
 	//******************************************************************************
@@ -2038,7 +2037,7 @@ namespace GroundHeatExchangers {
 		if ( myFlag ) {
 			// Locate the hx on the plant loops for later usage
 			errFlag = false;
-			ScanPlantLoopsForObject( name, TypeOf_GrndHtExchgVertical, loopNum, loopSideNum, branchNum, compNum, _, _, _, _, _, errFlag );
+			ScanPlantLoopsForObject( Name, TypeOf_GrndHtExchgVertical, loopNum, loopSideNum, branchNum, compNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
 				ShowFatalError( "initGLHESimVars: Program terminated due to previous condition(s)." );
 			}
@@ -2123,7 +2122,7 @@ namespace GroundHeatExchangers {
 		if ( myFlag ) {
 			// Locate the hx on the plant loops for later usage
 			errFlag = false;
-			ScanPlantLoopsForObject( name, TypeOf_GrndHtExchgSlinky, loopNum, loopSideNum, branchNum, compNum, _, _, _, _, _, errFlag );
+			ScanPlantLoopsForObject( Name, TypeOf_GrndHtExchgSlinky, loopNum, loopSideNum, branchNum, compNum, _, _, _, _, _, errFlag );
 			if ( errFlag ) {
 				ShowFatalError( "initGLHESimVars: Program terminated due to previous condition(s)." );
 			}

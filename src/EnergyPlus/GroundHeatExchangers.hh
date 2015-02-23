@@ -32,7 +32,7 @@ namespace GroundHeatExchangers {
 		// Members
 		bool available; // need an array of logicals--load identifiers of available equipment
 		bool on; // simulate the machine at it's operating part load ratio
-		std::string name; // user identifier
+		std::string Name; // user identifier
 		int loopNum;
 		int loopSideNum;
 		int branchNum;
