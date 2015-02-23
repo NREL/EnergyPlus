@@ -4,6 +4,7 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src/EnergyPlus )
 set( test_src
   DataPlant.unit.cc
   DXCoils.unit.cc
+  EvaporativeCoolers.unit.cc
   ExteriorEnergyUse.unit.cc
   HeatBalanceManager.unit.cc
   HVACStandaloneERV.unit.cc
@@ -23,12 +24,6 @@ set( test_src
 
 set( test_dependencies
   energyplusapi
-#  objexx
-#  sqlite
-#  bcvtb 
-#  epexpat 
-#  epfmiimport 
-#  DElight
  )
 
 if(CMAKE_HOST_UNIX)
@@ -38,6 +33,6 @@ if(CMAKE_HOST_UNIX)
 endif()
 
 # Executable name will be EnergyPlus_tests
-# Execute EnergyPlus_tests --help for options using gtest runner
-# Execute EnergyPlus_tests with no arguments to run all tests
+# Execute energyplus_tests --help for options using gtest runner
+# Execute energyplus_tests with no arguments to run all tests
 CREATE_TEST_TARGETS( energyplus "${test_src}" "${test_dependencies}" )

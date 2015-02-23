@@ -444,7 +444,7 @@ namespace EvaporativeCoolers {
 
 	void
 	CalcSecondaryAirOutletCondition(
-		int const  EvapCoolNum,
+		int const EvapCoolNum,
 		int const OperatingMode,
 		Real64 const AirMassFlowSec,
 		Real64 const EDBTSec,
