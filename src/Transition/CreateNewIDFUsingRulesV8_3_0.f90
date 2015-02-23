@@ -123,6 +123,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   REAL :: IndirectOldFieldFive
   REAL :: IndirectOldFieldSix
   REAL :: IndirectNewFieldThirteen
+  CHARACTER(len=10) :: IndirectNewFieldString
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -405,7 +406,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ! Calculate a new 13 from old 7 and 8
                 ! Again relying on the input processor to protect from NaN
                 IndirectNewFieldThirteen = IndirectOldFieldSix / IndirectOldFieldFive
-                WRITE(OutArgs(13),'(F5.3)') IndirectNewFieldThirteen
+                WRITE(IndirectNewFieldString,'(F10.5)') IndirectNewFieldThirteen
+                OutArgs(13) = TRIM(ADJUSTL(IndirectNewFieldString))
                 ! new F14 is just blank
                 OutArgs(14) = ''
                 ! new F15,16 are shifted
