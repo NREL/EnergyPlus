@@ -48165,9 +48165,9 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \type node
   A6 , \field Air Outlet Node Name
        \type node
-  A7 , \Field Sensor Node Name
+  A7 , \field Sensor Node Name
        \type node
-  A8 , \Field Water Supply Storage Tank Name
+  A8 , \field Water Supply Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
   N4 , \field Drift Loss Fraction
