@@ -64,6 +64,7 @@ namespace ChillerReformulatedEIR {
 		std::string EIRFTName; // EIRFT curve name
 		std::string EIRFPLRName; // EIRPLR curve name
 		int CondenserType; // Type of Condenser. Water Cooled is the only available option for now
+		int PartLoadCurveType; 	// Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift //zrp
 		Real64 RefCap; // Reference capacity of the chiller [W]
 		bool RefCapWasAutoSized; //reference capacity was autosized on input
 		Real64 RefCOP; // Reference coefficient of performance [W/W]
@@ -128,6 +129,10 @@ namespace ChillerReformulatedEIR {
 		Real64 ChillerEIRFPLRTempMax; // Maximum value of EIRFPLR curve condenser outlet temperature [C]
 		Real64 ChillerEIRFPLRPLRMin; // Minimum value of EIRFPLR curve part-load ratio
 		Real64 ChillerEIRFPLRPLRMax; // Maximum value of EIRFPLR curve part-load ratio
+		Real64 ChillerLiftNomMin;	 // Minimum value of EIRFPLR curve Normalized Chiller lift 
+		Real64 ChillerLiftNomMax;	 // Maximum value of EIRFPLR curve Normalized Chiller lift 
+		Real64 ChillerTdevNomMin;	 // Minimum value of EIRFPLR curve Normalized Tdev
+		Real64 ChillerTdevNomMax;	 // Maximum value of EIRFPLR curve Normalized Tdev
 		int CAPFTXIter; // Iteration counter for evaporator outlet temperature CAPFT warning messages
 		int CAPFTXIterIndex; // Index for evaporator outlet temperature CAPFT warning messages
 		int CAPFTYIter; // Iteration counter for condenser outlet temperature CAPFT warning messages
@@ -171,6 +176,7 @@ namespace ChillerReformulatedEIR {
 		ReformulatedEIRChillerSpecs() :
 			TypeNum( 0 ),
 			CondenserType( 0 ),
+			PartLoadCurveType( 0 ),
 			RefCap( 0.0 ),
 			RefCapWasAutoSized( false ),
 			RefCOP( 0.0 ),
@@ -228,6 +234,10 @@ namespace ChillerReformulatedEIR {
 			ChillerEIRFPLRTempMax( 0.0 ),
 			ChillerEIRFPLRPLRMin( 0.0 ),
 			ChillerEIRFPLRPLRMax( 0.0 ),
+			ChillerLiftNomMin( 0.0 ), //zrp_Aug2014 
+			ChillerLiftNomMax( 10.0 ),
+			ChillerTdevNomMin( 0.0 ),
+			ChillerTdevNomMax( 10.0 ),
 			CAPFTXIter( 0 ),
 			CAPFTXIterIndex( 0 ),
 			CAPFTYIter( 0 ),
@@ -261,7 +271,6 @@ namespace ChillerReformulatedEIR {
 			CondMassFlowIndex( 0 ),
 			PossibleSubcooling( false )
 		{}
-
 	};
 
 	struct ReportVars
