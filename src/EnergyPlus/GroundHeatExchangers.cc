@@ -303,6 +303,8 @@ namespace GroundHeatExchangers {
 
 		DisplayString( "Calculating G-Functions" );
 
+		//std::ofstream static file("gFuncOutput.csv", std::ofstream::out);
+
 		X0.allocate( numCoils );
 		Y0.allocate( numTrenches );
 
@@ -366,6 +368,9 @@ namespace GroundHeatExchangers {
 				for ( n1 = 1; n1 <= numLC; n1++ ) {
 					for ( m = 1; m <= numTrenches; m++ ) {
 						for ( n = 1; n <= numCoils; n++ ) {
+
+							doubleIntegralVal = 0.0;
+							midFieldVal = 0.0;
 
 							// Calculate the distance between ring centers
 							disRing = distToCenter( m, n, m1, n1 );
@@ -435,6 +440,9 @@ namespace GroundHeatExchangers {
 							}
 
 							gFunc += gFuncin;
+
+							//file << n << "," << m << "," << n1 << "," << m1 << "," << gFunc << "," << gFuncin << "," << doubleIntegralVal << "," << midFieldVal << "," << valStored(mm1, nn1) << ","
+							//	<< ( gFunc * ( coilDiameter / 2.0 ) ) / ( 4 * Pi * fraction * numTrenches * numCoils ) << std::endl;
 
 						} // n
 					} // m
@@ -538,7 +546,7 @@ namespace GroundHeatExchangers {
 		errFunc1 = std::erfc( 0.5 * distance / sqrtAlphaT );
 		errFunc2 = std::erfc( 0.5 * sqrtDistDepth / sqrtAlphaT );
 	
-		return 4 * pow_2( Pi ) * errFunc1 / distance - errFunc2 / sqrtDistDepth;
+		return 4 * pow_2( Pi ) * ( errFunc1 / distance - errFunc2 / sqrtDistDepth );
 	};
 
 	//******************************************************************************
@@ -1380,8 +1388,21 @@ namespace GroundHeatExchangers {
 				isNotOK = false;
 				isBlank = false;
 
+				// Create temporary array of previous names to pass to VerifyName
+				FArray1D <std::string> tmpNames;
+				tmpNames.allocate( numVerticalGLHEs - 1 );
+
+				// Populate temporary array with previous entrys
+				for (int i = 1; i < numVerticalGLHEs - 1; i++) {
+					tmpNames( i ) = verticalGLHE( i ).Name;
+				}
+
 				//get object name
-				VerifyName( cAlphaArgs( 1 ), verticalGLHE.Name(), GLHENum - 1, isNotOK, isBlank, cCurrentModuleObject + " name" );
+				VerifyName( cAlphaArgs( 1 ), tmpNames, GLHENum - 1, isNotOK, isBlank, cCurrentModuleObject + " name" );
+
+				// Deallocate temporary array when no longer needed
+				tmpNames.deallocate();
+
 				if ( isNotOK ) {
 					errorsFound = true;
 					if ( isBlank ) cAlphaArgs( 1 ) = "xxxxx";
@@ -1500,8 +1521,21 @@ namespace GroundHeatExchangers {
 				isNotOK = false;
 				isBlank = false;
 
+				// Create temporary array of previous names to pass to VerifyName
+				FArray1D <std::string> tmpNames;
+				tmpNames.allocate( numSlinkyGLHEs - 1 );
+
+				// Populate temporary array with previous entrys
+				for (int i = 1; i < numSlinkyGLHEs - 1; i++) {
+					tmpNames( i ) = slinkyGLHE( i ).Name;
+				}
+
 				//get object name
-				VerifyName( cAlphaArgs( 1 ), slinkyGLHE.Name(), GLHENum - 1, isNotOK, isBlank, cCurrentModuleObject + " name" );
+				VerifyName( cAlphaArgs( 1 ), tmpNames, GLHENum - 1, isNotOK, isBlank, cCurrentModuleObject + " name" );
+
+				// Deallocate temporary array when no longer needed
+				tmpNames.deallocate();
+
 				if ( isNotOK ) {
 					errorsFound = true;
 					if ( isBlank ) cAlphaArgs( 1 ) = "xxxxx";
