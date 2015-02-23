@@ -48059,15 +48059,6 @@ EvaporativeCooler:Indirect:ResearchSpecial,
   A12, \field Relief Air Inlet Node Name
        \type node
   A13, \field Water Supply Storage Tank Name
-  A5 , \field Control Type
-  N7 , \field Dewpoint Effectiveness Factor
-  A6 , \field Secondary Air Inlet Node Name
-       \type node
-  A7 , \field Sensor Node Name
-       \type node
-  A8 , \field Relief Air Inlet Node Name
-       \type node
-  A9 , \field Water Supply Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
   N11, \field Drift Loss Fraction

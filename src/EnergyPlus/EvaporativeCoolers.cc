@@ -2727,8 +2727,7 @@ namespace EvaporativeCoolers {
 	// *****************************************************************************
 
 	void
-	UpdateEvapCooler( int const EvapCoolNum )
-	{
+		UpdateEvapCooler( int const EvapCoolNum ) {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard J. Liesen
@@ -2783,12 +2782,14 @@ namespace EvaporativeCoolers {
 		Node( OutletNode ).Enthalpy = EvapCond( EvapCoolNum ).OutletEnthalpy;
 		Node( OutletNode ).Press = EvapCond( EvapCoolNum ).OutletPressure;
 
-		// set outlet nodes of the secondary air side of the EvapCooler (mass Flow Rate Only)
-		if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectRDDSpecial && EvapCond( EvapCoolNum ).EvapCoolerOperationControlFlag ) {
-			Node( OutletNodeSec ).Temp = EvapCond( EvapCoolNum ).SecOutletTemp;
-			Node( OutletNodeSec ).HumRat = EvapCond( EvapCoolNum ).SecOutletHumRat;
-			Node( OutletNodeSec ).Enthalpy = EvapCond( EvapCoolNum ).SecOutletEnthalpy;
-			Node( OutletNodeSec ).MassFlowRate = EvapCond( EvapCoolNum ).SecOutletMassFlowRate;
+		if ( EvapCond( EvapCoolNum ).SecondaryOutletNode > 0 ) {
+			// set outlet nodes of the secondary air side of the EvapCooler (mass Flow Rate Only)
+			if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectRDDSpecial && EvapCond( EvapCoolNum ).EvapCoolerOperationControlFlag ) {
+				Node( OutletNodeSec ).Temp = EvapCond( EvapCoolNum ).SecOutletTemp;
+				Node( OutletNodeSec ).HumRat = EvapCond( EvapCoolNum ).SecOutletHumRat;
+				Node( OutletNodeSec ).Enthalpy = EvapCond( EvapCoolNum ).SecOutletEnthalpy;
+				Node( OutletNodeSec ).MassFlowRate = EvapCond( EvapCoolNum ).SecOutletMassFlowRate;
+			}
 		}
 
 		// Set the outlet nodes for properties that just pass through & not used
