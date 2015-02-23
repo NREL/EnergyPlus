@@ -2226,8 +2226,8 @@ namespace StandardRatings {
 		static std::string CompNameNew;
 
 		// Formats
-		static gio::Fmt const Format_101( "('! <DX Cooling Coil ASHRAE 127 Standard Ratings Information>, Component Type, Component Name, Standard 127 Classification, ','Rated Net Cooling Capacity Test A {W}, ','Rated Total Electric Power Test A {W}, ','Rated Net Cooling Capacity Test B {W}, ','Rated Total Electric Power Test B {W}, ','Rated Net Cooling Capacity Test C {W}, ','Rated Total Electric Power Test C {W}, ','Rated Net Cooling Capacity Test D {W}, ','Rated Total Electric Power Test D {W} ')" );
-		static gio::Fmt const Format_102( "(' DX Cooling Coil ASHRAE 127 Standard Ratings Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)" );
+		static gio::Fmt Format_101( "('! <DX Cooling Coil ASHRAE 127 Standard Ratings Information>, Component Type, Component Name, Standard 127 Classification, ','Rated Net Cooling Capacity Test A {W}, ','Rated Total Electric Power Test A {W}, ','Rated Net Cooling Capacity Test B {W}, ','Rated Total Electric Power Test B {W}, ','Rated Net Cooling Capacity Test C {W}, ','Rated Total Electric Power Test C {W}, ','Rated Net Cooling Capacity Test D {W}, ','Rated Total Electric Power Test D {W} ')" );
+		static gio::Fmt Format_102( "(' DX Cooling Coil ASHRAE 127 Standard Ratings Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)" );
 
 
 		{ auto const SELECT_CASE_var( CompTypeNum );
