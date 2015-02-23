@@ -107,7 +107,6 @@ namespace EvaporativeCoolers {
 	bool GetInputZoneEvapUnit( true );
 
 	// Indirect Evaporative Coolers Research Special Operating Modes
-	int EvapCoolerRDDOperatingMode( 0 ); // the indirect evaporative cooler Research Special operating mode variable
 	int const None( 0 ); // the indirect evaporative cooler Research Special is scheduled off or turned off
 	int const DryModulated( 1 ); // the indirect evaporative cooler Research Special is modulated in Dry Mode
 	int const DryFull( 2 ); // the indirect evaporative cooler Research Special is run in full capacity in Dry Mode
@@ -1799,12 +1798,13 @@ namespace EvaporativeCoolers {
 	}
 
 	void
-		CalcIndirectResearchSpecialEvapCoolerAdvanced(
+	CalcIndirectResearchSpecialEvapCoolerAdvanced(
 		int const EvapCoolNum,
 		Real64 const InletDryBulbTempSec,
 		Real64 const InletWetBulbTempSec,
 		Real64 const InletDewPointTempSec,
-		Real64 const InletHumRatioSec ) {
+		Real64 const InletHumRatioSec
+	) {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         B. Bigusse
@@ -1888,7 +1888,7 @@ namespace EvaporativeCoolers {
 
 		FlowRatioSecDry = 0.0;
 		FlowRatioSecWet = 0.0;
-		EvapCoolerRDDOperatingMode = None;
+		EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode = None;
 		TEDB = EvapCond( EvapCoolNum ).InletTemp;
 		TEWB = EvapCond( EvapCoolNum ).InletWetBulbTemp;
 		SysTempSetPoint = EvapCond( EvapCoolNum ).DesiredOutletTemp;
@@ -1901,24 +1901,24 @@ namespace EvaporativeCoolers {
 
 		// Now determine the operating modes of indirect evaporative cooler research special. There are five allowed operating modes
 		if ( ( TEDB <=  SysTempSetPoint ) || ( TEDB > EvapCond( EvapCoolNum ).MaxOATDBEvapCooler && InletWetBulbTempSec > EvapCond( EvapCoolNum ).MaxOATWBEvapCooler ) || ( TEDB <= InletDryBulbTempSec ) ) {
-			EvapCoolerRDDOperatingMode = None;
+			EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode = None;
 		} else if ( ( InletDryBulbTempSec < EvapCond( EvapCoolNum ).MinOATDBEvapCooler && TdbOutSysDryMin < SysTempSetPoint ) ) {
-			EvapCoolerRDDOperatingMode = DryModulated; // dry mode capacity modulated
+			EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode = DryModulated; // dry mode capacity modulated
 		} else if ( ( InletDryBulbTempSec < EvapCond( EvapCoolNum ).MinOATDBEvapCooler && SysTempSetPoint <= TdbOutSysDryMin ) ) {
-			EvapCoolerRDDOperatingMode = DryFull; // dry mode in full capacity
+			EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode = DryFull; // dry mode in full capacity
 		} else if ( ( InletDryBulbTempSec >= EvapCond( EvapCoolNum ).MinOATDBEvapCooler && InletWetBulbTempSec < EvapCond( EvapCoolNum ).MaxOATWBEvapCooler && SysTempSetPoint <= TdbOutSysWetMin ) ) {
-			EvapCoolerRDDOperatingMode = WetFull; // wet mode in full capacity		
+			EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode = WetFull; // wet mode in full capacity		
 		} else if ( ( InletDryBulbTempSec >= EvapCond( EvapCoolNum ).MinOATDBEvapCooler && InletWetBulbTempSec < EvapCond( EvapCoolNum ).MaxOATWBEvapCooler && TdbOutSysWetMin < SysTempSetPoint ) ) { // && SysTempSetPoint < TdbOutSysDryMin
-			EvapCoolerRDDOperatingMode = WetModulated; // wet mode capacity modulated
+			EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode = WetModulated; // wet mode capacity modulated
 		} else if ( ( InletDryBulbTempSec >= EvapCond( EvapCoolNum ).MinOATDBEvapCooler && InletDryBulbTempSec < EvapCond( EvapCoolNum ).MaxOATDBEvapCooler && InletWetBulbTempSec < EvapCond( EvapCoolNum ).MaxOATWBEvapCooler && SysTempSetPoint < TdbOutSysDryMin && TdbOutSysWetMin < SysTempSetPoint ) ) {
-			EvapCoolerRDDOperatingMode = DryWetModulated; // modulated in dry and wet mode, and the lower total power will be used
+			EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode = DryWetModulated; // modulated in dry and wet mode, and the lower total power will be used
 		} else {
-			EvapCoolerRDDOperatingMode = None;  // this condition should not happen unless the bounds do not cover all combinations possible
+			EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode = None;  // this condition should not happen unless the bounds do not cover all combinations possible
 		}
 		MassFlowRateSecMin = 0.0; 
 		AirMassFlowSec = MassFlowRateSecMax;
 		PartLoad = EvapCond( EvapCoolNum ).PartLoadFract;
-		{ auto const SELECT_CASE_var( EvapCoolerRDDOperatingMode );
+		{ auto const SELECT_CASE_var( EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode );
 		if ( SELECT_CASE_var == DryModulated ) {
 			Par( 1 ) = double( EvapCoolNum );
 			Par( 2 ) = double( DryModulated );
@@ -2055,14 +2055,14 @@ namespace EvaporativeCoolers {
 			EvapCoolerTotalElectricPowerWet = IndEvapCoolerPower( EvapCoolNum, WetModulated, FlowRatioSecWet );
 			// compare the dry and wet operation total electric power
 			if ( EvapCoolerTotalElectricPowerDry < EvapCoolerTotalElectricPowerWet ) {
-				EvapCoolerRDDOperatingMode = DryModulated;
+				EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode = DryModulated;
 				FlowRatioSec = FlowRatioSecDry;
 				EvapCond( EvapCoolNum ).SecInletMassFlowRate = AirMassFlowSecDry;
 				CalcIndirectRDDEvapCoolerOutletTemp( EvapCoolNum, DryModulated, AirMassFlowSecDry, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec );
 				EvapCond( EvapCoolNum ).EvapCoolerPower = IndEvapCoolerPower( EvapCoolNum, DryModulated, FlowRatioSec );
 				EvapCond( EvapCoolNum ).IECOperatingStatus = 1;
 			} else {
-				EvapCoolerRDDOperatingMode = WetModulated;
+				EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode = WetModulated;
 				FlowRatioSec = FlowRatioSecWet;
 				EvapCond( EvapCoolNum ).SecInletMassFlowRate = AirMassFlowSecWet;
 				CalcIndirectRDDEvapCoolerOutletTemp( EvapCoolNum, WetModulated, AirMassFlowSecWet, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec );
@@ -2122,7 +2122,7 @@ namespace EvaporativeCoolers {
 		}
 		}
 		if ( PartLoad == 1.0 ) {
-			if ( EvapCoolerRDDOperatingMode == WetModulated || EvapCoolerRDDOperatingMode == WetFull ) {
+			if ( EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode == WetModulated || EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode == WetFull ) {
 				BoundTemp = TEDB - EvapCond( EvapCoolNum ).DPBoundFactor * ( TEDB - InletDewPointTempSec );
 				if ( EvapCond( EvapCoolNum ).OutletTemp < BoundTemp ) {
 					EvapCond( EvapCoolNum ).OutletTemp = BoundTemp;
@@ -2138,7 +2138,7 @@ namespace EvaporativeCoolers {
 			//part load set to zero so no cooling
 			EvapCond( EvapCoolNum ).OutletTemp = EvapCond( EvapCoolNum ).InletTemp;
 		}
-		if ( EvapCoolerRDDOperatingMode != None ) {
+		if ( EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode != None ) {
 			// There is a constant humidity ratio across the primary side but a reduction in the dry bulb temp
 			EvapCond( EvapCoolNum ).OuletWetBulbTemp = PsyTwbFnTdbWPb( EvapCond( EvapCoolNum ).OutletTemp, EvapCond( EvapCoolNum ).InletHumRat, OutBaroPress );
 			EvapCond( EvapCoolNum ).OutletHumRat = EvapCond( EvapCoolNum ).InletHumRat;
@@ -2147,7 +2147,7 @@ namespace EvaporativeCoolers {
 			QHX = EvapCond( EvapCoolNum ).VolFlowRate * RhoAir * ( EvapCond( EvapCoolNum ).InletEnthalpy - EvapCond( EvapCoolNum ).OutletEnthalpy );
 			if ( QHX > SmallLoad ) {
 				// get secondary air outlet condition
-				CalcSecondaryAirOutletCondition( EvapCoolNum, EvapCoolerRDDOperatingMode, EvapCond( EvapCoolNum ).SecInletMassFlowRate, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec, QHX, QHXLatent );
+				CalcSecondaryAirOutletCondition( EvapCoolNum, EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode, EvapCond( EvapCoolNum ).SecInletMassFlowRate, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec, QHX, QHXLatent );
 				RhoWater = RhoH2O( OutDryBulbTemp ); // this if it is at the outside air inlet node condition
 				hfg = PsyHfgAirFnWTdb( InletHumRatioSec, InletDryBulbTempSec );
 				EvapVdot = ( QHXLatent ) / ( hfg * RhoWater );
@@ -2171,7 +2171,7 @@ namespace EvaporativeCoolers {
 				EvapCond( EvapCoolNum ).SecInletMassFlowRate = 0.0;
 				EvapCond( EvapCoolNum ).IECOperatingStatus = 0;
 				EvapCond( EvapCoolNum ).StageEff = 0.0;
-				CalcSecondaryAirOutletCondition( EvapCoolNum, EvapCoolerRDDOperatingMode, 0.0, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec, QHX, QHXLatent );
+				CalcSecondaryAirOutletCondition( EvapCoolNum, EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode, 0.0, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec, QHX, QHXLatent );
 			}
 
 		} else {
@@ -2195,8 +2195,8 @@ namespace EvaporativeCoolers {
 
 	Real64
 	CalcEvapCoolRDDSecFlowResidual( 
-	Real64 const AirMassFlowSec, // secondary air mass flow rate in kg/s
-	Optional< FArray1S< Real64 > const > Par // Par(2) is desired outlet temperature of Evap Cooler
+		Real64 const AirMassFlowSec, // secondary air mass flow rate in kg/s
+		Optional< FArray1S< Real64 > const > Par // Par(2) is desired outlet temperature of Evap Cooler
 	)
 	{
 			// SUBROUTINE INFORMATION:
@@ -2254,12 +2254,12 @@ namespace EvaporativeCoolers {
 
 	void
 	CalcIndirectRDDEvapCoolerOutletTemp( 
-	int const EvapCoolNum, 
-	int const DryOrWetOperatingMode, 
-	Real64 const AirMassFlowSec, 
-	Real64 const EDBTSec, 
-	Real64 const EWBTSec, 
-	Real64 const EHumRatSec 
+		int const EvapCoolNum, 
+		int const DryOrWetOperatingMode, 
+		Real64 const AirMassFlowSec, 
+		Real64 const EDBTSec, 
+		Real64 const EWBTSec, 
+		Real64 const EHumRatSec 
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -2399,7 +2399,7 @@ namespace EvaporativeCoolers {
 		Real64 const EHumRatSec,
 		Real64 const QHXTotal,
 		Real64 & QHXLatent
-		) {
+	) {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         B. Nigusse
 		//       DATE WRITTEN   Oct 2014
@@ -2482,7 +2482,7 @@ namespace EvaporativeCoolers {
 		int const EvapCoolIndex, // Unit index
 		int const DryWetMode, // dry or wet operating mode of evaporator cooler
 		Real64 const FlowRatio // secondary air flow fraction
-		) {
+	) {
 
 			// SUBROUTINE INFORMATION:
 			//       AUTHOR         B. Nigusse

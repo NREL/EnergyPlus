@@ -40,7 +40,6 @@ namespace EvaporativeCoolers {
 	extern bool GetInputZoneEvapUnit;
 
 	// Indirect Evaporative Coolers Research Special Operating Modes
-	extern int EvapCoolerRDDOperatingMode; // the indirect evaporative cooler Research Special operating mode variable
 	extern int const None; // the indirect evaporative cooler Research Special is scheduled off or turned off
 	extern int const DryModulated; // the evaporative cooler Research Special is modulated in Dry Mode
 	extern int const DryFull; // the evaporative cooler Research Special is run in full capacity in Dry Mode
@@ -146,6 +145,7 @@ namespace EvaporativeCoolers {
 		int IterationLimit; // used for Used for RegulaFalsi recurring error message error -1
 		int IterationFailed; // Used for RegulaFalsi recurring error message error -2
 		// rather than wetbulb-depression approach
+		int EvapCoolerRDDOperatingMode; // the indirect evaporative cooler Research Special operating mode variable
 
 		// Default Constructor
 		EvapConditions() :
@@ -234,192 +234,8 @@ namespace EvaporativeCoolers {
 			PumpPowerModifierCurveIndex( 0 ),
 			IECOperatingStatus( 0 ),
 			IterationLimit( 0 ),
-			IterationFailed( 0 )
-		{}
-
-		// Member Constructor
-		EvapConditions(
-			std::string const & EvapCoolerName, // Name of the EvapCooler
-			int const EquipIndex,
-			int const EvapCoolerType, // Type of the EvapCooler (parameters in DataGlobalConstants.cc
-			std::string const & EvapControlType, // Type of Control for the EvapCooler
-			std::string const & Schedule, // HeatingCoil Operation Schedule
-			int const SchedPtr, // Pointer to the correct schedule
-			Real64 const VolFlowRate, // Volume Flow Rate in Evap Cooler needed for calculating SatEff
-			Real64 const OutletTemp,
-			Real64 const OuletWetBulbTemp,
-			Real64 const OutletHumRat,
-			Real64 const OutletEnthalpy,
-			Real64 const OutletPressure,
-			Real64 const OutletMassFlowRate, // MassFlow through the EvapCooler being Simulated [kg/Sec]
-			Real64 const OutletMassFlowRateMaxAvail, // [kg/Sec]
-			Real64 const OutletMassFlowRateMinAvail, // [kg/Sec]
-			bool const InitFlag,
-			int const InletNode,
-			int const OutletNode,
-			int const SecondaryInletNode, // This is usually OA node feeding into the purge/secondary side
-			int const SecondaryOutletNode, // This outlet node of the secondary side and ilet to the secondary fan 
-			int const TertiaryInletNode, // This node is used to run building exhaust into purge side.
-			Real64 const InletMassFlowRate, // Inlet is primary process air node at inlet to cooler
-			Real64 const InletMassFlowRateMaxAvail,
-			Real64 const InletMassFlowRateMinAvail,
-			Real64 const InletTemp,
-			Real64 const InletWetBulbTemp,
-			Real64 const InletHumRat,
-			Real64 const InletEnthalpy,
-			Real64 const InletPressure,
-			Real64 const SecInletMassFlowRate, // Secondary inlet is for indirect coolers
-			Real64 const SecInletMassFlowRateMaxAvail,
-			Real64 const SecInletMassFlowRateMinAvail,
-			Real64 const SecInletTemp,
-			Real64 const SecInletWetBulbTemp,
-			Real64 const SecInletHumRat,
-			Real64 const SecInletEnthalpy,
-			Real64 const SecInletPressure,
-			Real64 const SecOutletTemp, // secondary air outlet node drybulb temperature
-			Real64 const SecOuletWetBulbTemp, // secondarr air outlet node wetbulb temperature
-			Real64 const SecOutletHumRat, // secondarr air outlet node humidity ratio
-			Real64 const SecOutletEnthalpy, // secondarr air outlet node enthalpy
-			Real64 const SecOutletMassFlowRate, // Mass Flow through the secondary air side [kg/Sec]
-			Real64 const PadDepth,
-			Real64 const PadArea,
-			Real64 const RecircPumpPower,
-			Real64 const IndirectRecircPumpPower,
-			Real64 const IndirectPadDepth,
-			Real64 const IndirectPadArea,
-			Real64 const IndirectVolFlowRate,
-			Real64 const IndirectFanEff,
-			Real64 const IndirectFanDeltaPress,
-			Real64 const IndirectHXEffectiveness,
-			Real64 const DirectEffectiveness, // input saturation effectiveness for constant effectiveness model
-			Real64 const WetCoilMaxEfficiency,
-			Real64 const WetCoilFlowRatio,
-			Real64 const EvapCoolerEnergy,
-			Real64 const EvapCoolerPower,
-			int const EvapWaterSupplyMode, // where does water come from
-			std::string const & EvapWaterSupplyName, // name of water source e.g. water storage tank
-			int const EvapWaterSupTankID,
-			int const EvapWaterTankDemandARRID,
-			Real64 const DriftFraction, // excess water from drift as fraction of Evap Water Consumption rate
-			Real64 const BlowDownRatio, // excess water use for blowdown as solids ratio to be maintained
-			Real64 const EvapWaterConsumpRate, // Evap Water Consumption rate in m3/sec
-			Real64 const EvapWaterConsump, // Evap Water Consumption in m3
-			Real64 const EvapWaterStarvMakupRate, // Evap water consumed but not really available from tank m3/s
-			Real64 const EvapWaterStarvMakup, // Evap water consumed but not really available from tank m3
-			Real64 const SatEff, // Reporting for Direct Stage and Ind Dry Saturation Efficiency
-			Real64 const StageEff, // Reporting for Indirect Total Stage Efficiency
-			Real64 const DPBoundFactor, // in RDDSpecial efficency w.r.t. dewpoint
-			int const EvapControlNodeNum, // need to control to avoid over cooling
-			Real64 const DesiredOutletTemp, // setpoint manager should set this
-			Real64 const PartLoadFract, // reduces cooling performance and associated fan power
-			int const DewPointBoundFlag, // report when indirect research special cooler is bound by dewpoint
-			Real64 const MinOATDBEvapCooler, // Minimum outdoor air operating dry-bulb temperature for evaporative cooler
-			Real64 const MaxOATDBEvapCooler, // Maximum outdoor air operating dry-bulb temperature for evaporative cooler
-			bool const EvapCoolerOperationControlFlag, // turns the evap cooler on/off depending on the outdoor air temperature min and max limits 
-			Real64 const MaxOATWBEvapCooler, // Evaporative Operation Maximum Limit Outdoor Wetbulb Temperature
-			Real64 const DryCoilMaxEfficiency, // Cooler Drybulb Design Effectiveness
-			Real64 const IndirectFanPower, // Secondary Fan Design Power
-			Real64 const FanSizingSpecificPower, // Secondary Fan Sizing Specific Power in W/(m3/s)
-			Real64 const RecircPumpSizingFactor, // Water Pump Power Sizing Factor W/(m3/s) air
-			Real64 const IndirectVolFlowScalingFactor, // secondary air flow sizing Factor
-			int const WetbulbEffecCurveIndex, // wetbulb effectiveness modifier curve name as a function of flow fraction
-			int const DrybulbEffecCurveIndex, // drybulb effectiveness modifier curve name as a function of flow fraction
-			int const FanPowerModifierCurveIndex, // secondary fan power modifier curve name as a function of flow fraction
-			int const PumpPowerModifierCurveIndex, // recirculating pump power modifier curve name as a function of flow fraction
-			int const IECOperatingStatus, // operating mode status of indirect evaporative cooler research special (0: Off, 1: Dry, 2: Wet)
-			int const IterationLimit, // used for Used for RegulaFalsi recurring error message counter
-			int const IterationFailed // Used for RegulaFalsi recurring error message error -2
-		) :
-			EvapCoolerName( EvapCoolerName ),
-			EquipIndex( EquipIndex ),
-			EvapCoolerType( EvapCoolerType ),
-			EvapControlType( EvapControlType ),
-			Schedule( Schedule ),
-			SchedPtr( SchedPtr ),
-			VolFlowRate( VolFlowRate ),
-			OutletTemp( OutletTemp ),
-			OuletWetBulbTemp( OuletWetBulbTemp ),
-			OutletHumRat( OutletHumRat ),
-			OutletEnthalpy( OutletEnthalpy ),
-			OutletPressure( OutletPressure ),
-			OutletMassFlowRate( OutletMassFlowRate ),
-			OutletMassFlowRateMaxAvail( OutletMassFlowRateMaxAvail ),
-			OutletMassFlowRateMinAvail( OutletMassFlowRateMinAvail ),
-			InitFlag( InitFlag ),
-			InletNode( InletNode ),
-			OutletNode( OutletNode ),
-			SecondaryInletNode( SecondaryInletNode ),
-			SecondaryOutletNode( SecondaryOutletNode ),
-			TertiaryInletNode( TertiaryInletNode ),
-			InletMassFlowRate( InletMassFlowRate ),
-			InletMassFlowRateMaxAvail( InletMassFlowRateMaxAvail ),
-			InletMassFlowRateMinAvail( InletMassFlowRateMinAvail ),
-			InletTemp( InletTemp ),
-			InletWetBulbTemp( InletWetBulbTemp ),
-			InletHumRat( InletHumRat ),
-			InletEnthalpy( InletEnthalpy ),
-			InletPressure( InletPressure ),
-			SecInletMassFlowRate( SecInletMassFlowRate ),
-			SecInletMassFlowRateMaxAvail( SecInletMassFlowRateMaxAvail ),
-			SecInletMassFlowRateMinAvail( SecInletMassFlowRateMinAvail ),
-			SecInletTemp( SecInletTemp ),
-			SecInletWetBulbTemp( SecInletWetBulbTemp ),
-			SecInletHumRat( SecInletHumRat ),
-			SecInletEnthalpy( SecInletEnthalpy ),
-			SecInletPressure( SecInletPressure ),
-			SecOutletTemp( SecOutletTemp ),
-			SecOuletWetBulbTemp( SecOuletWetBulbTemp ),
-			SecOutletHumRat( SecOutletHumRat ),
-			SecOutletEnthalpy( SecOutletEnthalpy ),
-			SecOutletMassFlowRate( SecOutletMassFlowRate ),
-			PadDepth( PadDepth ),
-			PadArea( PadArea ),
-			RecircPumpPower( RecircPumpPower ),
-			IndirectRecircPumpPower( IndirectRecircPumpPower ),
-			IndirectPadDepth( IndirectPadDepth ),
-			IndirectPadArea( IndirectPadArea ),
-			IndirectVolFlowRate( IndirectVolFlowRate ),
-			IndirectFanEff( IndirectFanEff ),
-			IndirectFanDeltaPress( IndirectFanDeltaPress ),
-			IndirectHXEffectiveness( IndirectHXEffectiveness ),
-			DirectEffectiveness( DirectEffectiveness ),
-			WetCoilMaxEfficiency( WetCoilMaxEfficiency ),
-			WetCoilFlowRatio( WetCoilFlowRatio ),
-			EvapCoolerEnergy( EvapCoolerEnergy ),
-			EvapCoolerPower( EvapCoolerPower ),
-			EvapWaterSupplyMode( EvapWaterSupplyMode ),
-			EvapWaterSupplyName( EvapWaterSupplyName ),
-			EvapWaterSupTankID( EvapWaterSupTankID ),
-			EvapWaterTankDemandARRID( EvapWaterTankDemandARRID ),
-			DriftFraction( DriftFraction ),
-			BlowDownRatio( BlowDownRatio ),
-			EvapWaterConsumpRate( EvapWaterConsumpRate ),
-			EvapWaterConsump( EvapWaterConsump ),
-			EvapWaterStarvMakupRate( EvapWaterStarvMakupRate ),
-			EvapWaterStarvMakup( EvapWaterStarvMakup ),
-			SatEff( SatEff ),
-			StageEff( StageEff ),
-			DPBoundFactor( DPBoundFactor ),
-			EvapControlNodeNum( EvapControlNodeNum ),
-			DesiredOutletTemp( DesiredOutletTemp ),
-			PartLoadFract( PartLoadFract ),
-			DewPointBoundFlag( DewPointBoundFlag ),
-			MinOATDBEvapCooler( MinOATDBEvapCooler ),
-			MaxOATDBEvapCooler( MaxOATDBEvapCooler ),
-			EvapCoolerOperationControlFlag( EvapCoolerOperationControlFlag ),
-			MaxOATWBEvapCooler( MaxOATWBEvapCooler ),
-			DryCoilMaxEfficiency( DryCoilMaxEfficiency ),
-			IndirectFanPower( IndirectFanPower ),
-			FanSizingSpecificPower( FanSizingSpecificPower ),
-			RecircPumpSizingFactor( RecircPumpSizingFactor ),
-			IndirectVolFlowScalingFactor( IndirectVolFlowScalingFactor ),
-			WetbulbEffecCurveIndex( WetbulbEffecCurveIndex ),
-			DrybulbEffecCurveIndex( DrybulbEffecCurveIndex ),
-			FanPowerModifierCurveIndex( FanPowerModifierCurveIndex ),
-			PumpPowerModifierCurveIndex( PumpPowerModifierCurveIndex ),
-			IECOperatingStatus( IECOperatingStatus ),
-			IterationLimit( IterationLimit ),
-			IterationFailed( IterationFailed )
+			IterationFailed( 0 ),
+			EvapCoolerRDDOperatingMode( 0 )
 		{}
 
 	};
@@ -548,135 +364,6 @@ namespace EvaporativeCoolers {
 			HVACSizingIndex( 0 )
 		{}
 
-		// Member Constructor
-		ZoneEvapCoolerUnitStruct(
-			std::string const & Name, // user identifier
-			int const ZoneNodeNum,
-			int const AvailSchedIndex, // pointer to local availability schedule
-			std::string const & AvailManagerListName, // Name of an availability manager list object
-			bool const UnitIsAvailable,
-			int const FanAvailStatus,
-			int const OAInletNodeNum, // outdoor air inlet node index
-			int const UnitOutletNodeNum, // Unit air outlet (to zone) node index
-			int const UnitReliefNodeNum, // Unit relief air (from zone) node index (optional)
-			std::string const & FanObjectClassName,
-			int const FanType_Num,
-			std::string const & FanName,
-			int const FanIndex,
-			Real64 const ActualFanVolFlowRate,
-			int const FanAvailSchedPtr,
-			int const FanInletNodeNum,
-			int const FanOutletNodeNum,
-			Real64 const DesignAirVolumeFlowRate,
-			Real64 const DesignAirMassFlowRate,
-			Real64 const DesignFanSpeedRatio,
-			Real64 const FanSpeedRatio,
-			int const FanLocation,
-			int const ControlSchemeType,
-			Real64 const TimeElapsed,
-			Real64 const ThrottlingRange, // temperature range for hystersis type tstat contorl [Delta C]
-			bool const IsOnThisTimestep,
-			bool const WasOnLastTimestep,
-			Real64 const ThresholdCoolingLoad,
-			std::string const & EvapCooler_1_ObjectClassName,
-			std::string const & EvapCooler_1_Name,
-			int const EvapCooler_1_Type_Num,
-			int const EvapCooler_1_Index,
-			bool const EvapCooler_1_AvailStatus,
-			std::string const & EvapCooler_2_ObjectClassName,
-			std::string const & EvapCooler_2_Name,
-			int const EvapCooler_2_Type_Num,
-			int const EvapCooler_2_Index,
-			bool const EvapCooler_2_AvailStatus,
-			Real64 const OAInletRho, // fills internal variable, current inlet air density [kg/m3]
-			Real64 const OAInletCp, // fills internal variable, current inlet air specific heat [J/kg-c]
-			Real64 const OAInletTemp, // fills internal variable, current inlet air temperature [C]
-			Real64 const OAInletHumRat, // fills internal variable, current inlet air humidity ratio [kg/kg]
-			Real64 const OAInletMassFlowRate, // fills internal variable, current inlet air mass flow rate [kg/s]
-			Real64 const UnitOutletTemp, // filled by actuator, component outlet temperature [C]
-			Real64 const UnitOutletHumRat, // filled by actuator, component outlet humidity ratio [kg/kg]
-			Real64 const UnitOutletMassFlowRate, // filled by actuator, component outlet mass flow rate [kg/s]
-			Real64 const UnitReliefTemp, // filled by actuator, component outlet temperature [C]
-			Real64 const UnitReliefHumRat, // filled by actuator, component outlet humidity ratio [kg/kg]
-			Real64 const UnitReliefMassFlowRate, // filled by actuator, component outlet mass flow rate [kg/s]
-			Real64 const UnitTotalCoolingRate, // unit output to zone, total cooling rate [W]
-			Real64 const UnitTotalCoolingEnergy, // unit output to zone, total cooling energy [J]
-			Real64 const UnitSensibleCoolingRate, // unit output to zone, sensible cooling rate [W]
-			Real64 const UnitSensibleCoolingEnergy, // unit output to zone, sensible cooling energy [J]
-			Real64 const UnitLatentHeatingRate, // unit output to zone, latent heating rate [W]
-			Real64 const UnitLatentHeatingEnergy, // unit output to zone, latent heating energy [J]
-			Real64 const UnitLatentCoolingRate, // unit output to zone, latent cooling rate [W]
-			Real64 const UnitLatentCoolingEnergy, // unit output to zone, latent cooling energy [J]
-			Real64 const UnitFanSpeedRatio, // unit fan speed ratio, dimensionless [ ]
-			int const UnitVSControlMaxIterErrorIndex, // regula falsi errors, fan speed iteration limits
-			int const UnitVSControlLimitsErrorIndex, // regula falsi errors, limits exceeded.
-			int const ZonePtr, // pointer to a zone served by an evaportive cooler unit
-			int const HVACSizingIndex // index of a HVACSizing object for an evaportive cooler unit
-		) :
-			Name( Name ),
-			ZoneNodeNum( ZoneNodeNum ),
-			AvailSchedIndex( AvailSchedIndex ),
-			AvailManagerListName( AvailManagerListName ),
-			UnitIsAvailable( UnitIsAvailable ),
-			FanAvailStatus( FanAvailStatus ),
-			OAInletNodeNum( OAInletNodeNum ),
-			UnitOutletNodeNum( UnitOutletNodeNum ),
-			UnitReliefNodeNum( UnitReliefNodeNum ),
-			FanObjectClassName( FanObjectClassName ),
-			FanType_Num( FanType_Num ),
-			FanName( FanName ),
-			FanIndex( FanIndex ),
-			ActualFanVolFlowRate( ActualFanVolFlowRate ),
-			FanAvailSchedPtr( FanAvailSchedPtr ),
-			FanInletNodeNum( FanInletNodeNum ),
-			FanOutletNodeNum( FanOutletNodeNum ),
-			DesignAirVolumeFlowRate( DesignAirVolumeFlowRate ),
-			DesignAirMassFlowRate( DesignAirMassFlowRate ),
-			DesignFanSpeedRatio( DesignFanSpeedRatio ),
-			FanSpeedRatio( FanSpeedRatio ),
-			FanLocation( FanLocation ),
-			ControlSchemeType( ControlSchemeType ),
-			TimeElapsed( TimeElapsed ),
-			ThrottlingRange( ThrottlingRange ),
-			IsOnThisTimestep( IsOnThisTimestep ),
-			WasOnLastTimestep( WasOnLastTimestep ),
-			ThresholdCoolingLoad( ThresholdCoolingLoad ),
-			EvapCooler_1_ObjectClassName( EvapCooler_1_ObjectClassName ),
-			EvapCooler_1_Name( EvapCooler_1_Name ),
-			EvapCooler_1_Type_Num( EvapCooler_1_Type_Num ),
-			EvapCooler_1_Index( EvapCooler_1_Index ),
-			EvapCooler_1_AvailStatus( EvapCooler_1_AvailStatus ),
-			EvapCooler_2_ObjectClassName( EvapCooler_2_ObjectClassName ),
-			EvapCooler_2_Name( EvapCooler_2_Name ),
-			EvapCooler_2_Type_Num( EvapCooler_2_Type_Num ),
-			EvapCooler_2_Index( EvapCooler_2_Index ),
-			EvapCooler_2_AvailStatus( EvapCooler_2_AvailStatus ),
-			OAInletRho( OAInletRho ),
-			OAInletCp( OAInletCp ),
-			OAInletTemp( OAInletTemp ),
-			OAInletHumRat( OAInletHumRat ),
-			OAInletMassFlowRate( OAInletMassFlowRate ),
-			UnitOutletTemp( UnitOutletTemp ),
-			UnitOutletHumRat( UnitOutletHumRat ),
-			UnitOutletMassFlowRate( UnitOutletMassFlowRate ),
-			UnitReliefTemp( UnitReliefTemp ),
-			UnitReliefHumRat( UnitReliefHumRat ),
-			UnitReliefMassFlowRate( UnitReliefMassFlowRate ),
-			UnitTotalCoolingRate( UnitTotalCoolingRate ),
-			UnitTotalCoolingEnergy( UnitTotalCoolingEnergy ),
-			UnitSensibleCoolingRate( UnitSensibleCoolingRate ),
-			UnitSensibleCoolingEnergy( UnitSensibleCoolingEnergy ),
-			UnitLatentHeatingRate( UnitLatentHeatingRate ),
-			UnitLatentHeatingEnergy( UnitLatentHeatingEnergy ),
-			UnitLatentCoolingRate( UnitLatentCoolingRate ),
-			UnitLatentCoolingEnergy( UnitLatentCoolingEnergy ),
-			UnitFanSpeedRatio( UnitFanSpeedRatio ),
-			UnitVSControlMaxIterErrorIndex( UnitVSControlMaxIterErrorIndex ),
-			UnitVSControlLimitsErrorIndex( UnitVSControlLimitsErrorIndex ),
-			ZonePtr( ZonePtr ),
-			HVACSizingIndex( HVACSizingIndex )
-		{}
-
 	};
 
 	struct ZoneEvapCoolerUnitFieldData
@@ -747,46 +434,47 @@ namespace EvaporativeCoolers {
 	CalcResearchSpecialPartLoad( int & EvapCoolNum );
 
 	void
-	CalcIndirectResearchSpecialEvapCoolerAdvanced( int const EvapCoolNum,
-	Real64 const InletDryBulbTempSec,
-	Real64 const InletWetBulbTempSec,
-	Real64 const InletDewPointTempSec,
-	Real64 const InletHumRatioSec );
+	CalcIndirectResearchSpecialEvapCoolerAdvanced(
+		int const EvapCoolNum,
+		Real64 const InletDryBulbTempSec,
+		Real64 const InletWetBulbTempSec,
+		Real64 const InletDewPointTempSec,
+		Real64 const InletHumRatioSec
+	);
 
 	void
-	CalcSecondaryAirOutletCondition( int const  EvapCoolNum,
-	int const OperatingMode,
-	Real64 const AirMassFlowSec,
-	Real64 const EDBTSec,
-	Real64 const EWBTSec,
-	Real64 const EHumRatSec,
-	Real64 const QHXTotal, 
-	Real64 & QHXLatent );
+	CalcSecondaryAirOutletCondition(
+		int const  EvapCoolNum,
+		int const OperatingMode,
+		Real64 const AirMassFlowSec,
+		Real64 const EDBTSec,
+		Real64 const EWBTSec,
+		Real64 const EHumRatSec,
+		Real64 const QHXTotal, 
+		Real64 & QHXLatent
+	);
 
 	void
-	CalcIndirectRDDEvapCoolerOutletTemp( int const EvapCoolNum, 
-	int const DryOrWetOperatingMode,
-	Real64 const AirMassFlowSec,
-	Real64 const EDBTSec,
-	Real64 const EWBTSec,
-	Real64 const EHumRatSec );
+	CalcIndirectRDDEvapCoolerOutletTemp(
+		int const EvapCoolNum, 
+		int const DryOrWetOperatingMode,
+		Real64 const AirMassFlowSec,
+		Real64 const EDBTSec,
+		Real64 const EWBTSec,
+		Real64 const EHumRatSec
+	);
 
 	Real64
-	CalcEvapCoolRDDSecFlowResidual( Real64 const AirMassFlowSec,
-	Optional< FArray1S< Real64 > const > Par = _ //Par( 6 ) is desired temperature C
+	CalcEvapCoolRDDSecFlowResidual(
+		Real64 const AirMassFlowSec,
+		Optional< FArray1S< Real64 > const > Par = _ //Par( 6 ) is desired temperature C
 	);
-	
-	//Real64
-	//CalcEvapCoolRDDSecHumRatioResidual(
-	//Real64 const SecOutletHumRatio, // secondary air outlet humidity ratio
-	//Optional< FArray1S< Real64 > const > Par // Par( 7 ) is desired outlet temperature of Evap Cooler
-	//);
 
 	Real64
 	IndEvapCoolerPower(
-	int const EvapCoolIndex, // Unit index
-	int const DryWetMode, // dry or wet operating mode of evaporator cooler
-	Real64 const FlowRatio // secondary air flow fraction
+		int const EvapCoolIndex, // Unit index
+		int const DryWetMode, // dry or wet operating mode of evaporator cooler
+		Real64 const FlowRatio // secondary air flow fraction
 	);
 
 	void
