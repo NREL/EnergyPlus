@@ -60,6 +60,16 @@ namespace DataSizing {
 	int const NonCoincident( 1 );
 	int const Coincident( 2 );
 
+	// parameters for Cooling Peak Load TYpe
+	int const SensibleCoolingLoad( 1 );
+	int const TotalCoolingLoad( 2 );
+
+	// parameters for Central Cooling Capacity Control Method
+	int const VAV( 1 );
+	int const Bypass( 2 );
+	int const VT( 3 );
+	int const OnOff( 4 );
+
 	// paramters for supply air flow rate method
 	int const SupplyAirTemperature( 1 );
 	int const TemperatureDifference( 2 );
@@ -186,6 +196,7 @@ namespace DataSizing {
 	Real64 DataDesInletAirHumRat( 0.0 ); // coil inlet air humidity ratio used for warning messages
 	Real64 DataDesInletAirTemp( 0.0 ); // coil inlet air temperature used for warning messages
 	Real64 DataDesOutletAirTemp( 0.0 ); // coil outlet air temperature used for sizing
+	Real64 DataDesOutletAirHumRat( 0.0 ); // coil air outlet humidity ratio used in sizing calculations [kg water / kg dry air]
 	Real64 DataCoolCoilCap( 0.0 ); // cooling coil capacity used for sizing with scalable inputs [W]
 	Real64 DataFlowUsedForSizing( 0.0 ); // air flow rate used for sizing with scalable inputs [m3/s]
 	Real64 DataAirFlowUsedForSizing( 0.0 ); // air flow rate used for sizing with scalable inputs [m3/s]
@@ -231,6 +242,7 @@ namespace DataSizing {
 	FArray2D< SystemSizingData > SysSizing; // Data array for system sizing (all data)
 	FArray1D< SystemSizingData > FinalSysSizing; // Data array for system sizing (max heat/cool)
 	FArray1D< SystemSizingData > CalcSysSizing; // Data array for system sizing (max heat/cool)
+	FArray1D< SysSizPeakDDNumData > SysSizPeakDDNum; // data array for peak des day indices 
 	FArray1D< TermUnitSizingData > TermUnitSizing; // Data added in sizing routines
 	FArray1D< ZoneEqSizingData > ZoneEqSizing; // Data added in zone eq component sizing routines
 	FArray1D< ZoneEqSizingData > UnitarySysEqSizing; // Data added in unitary system sizing routines

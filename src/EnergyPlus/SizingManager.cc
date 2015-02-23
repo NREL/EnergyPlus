@@ -649,7 +649,6 @@ namespace SizingManager {
 			}
 			// Deallocate arrays no longer needed
 			SysSizing.deallocate();
-			CalcSysSizing.deallocate();
 		}
 
 		if ( ( DoPlantSizing ) && ( NumPltSizInput == 0 ) ) {
@@ -1884,6 +1883,7 @@ namespace SizingManager {
 		//Sizing:System;
 		int const iNameAlphaNum = 1; // A1, \field AirLoop Name
 		int const iLoadTypeSizeAlphaNum = 2; // A2, \field Type of Load to Size On
+		int const iCoolCapControlAlphaNum = 11; // A11 \field Central Cooling Capacity Control Method
 		int const iDesignOAVolFlowNumericNum = 1; // N1, \field Design Outdoor Air Flow Rate
 		int const iMinSysAirFlowRatioNumericNum = 2; // N2, \field Minimum System Air Flow Ratio
 		int const iPreheatDesignTempNumericNum = 3; // N3, \field Preheat Design Temperature
@@ -1967,8 +1967,8 @@ namespace SizingManager {
 			{ auto const loadSizeType( cAlphaArgs( iLoadTypeSizeAlphaNum ) );
 			if ( loadSizeType == "SENSIBLE" ) {
 				SysSizInput( SysSizIndex ).LoadSizeType = Sensible;
-			} else if ( loadSizeType == "LATENT" ) {
-				SysSizInput( SysSizIndex ).LoadSizeType = Latent;
+			// } else if ( loadSizeType == "LATENT" ) {
+				// SysSizInput( SysSizIndex ).LoadSizeType = Latent;
 			} else if ( loadSizeType == "TOTAL" ) {
 				SysSizInput( SysSizIndex ).LoadSizeType = Total;
 			} else if ( loadSizeType == "VENTILATIONREQUIREMENT" ) {
@@ -1976,10 +1976,41 @@ namespace SizingManager {
 			} else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( iNameAlphaNum ) + "\", invalid data." );
 				ShowContinueError( "... incorrect " + cAlphaFieldNames( iLoadTypeSizeAlphaNum ) + "=\"" + cAlphaArgs( iLoadTypeSizeAlphaNum ) + "\".");
-				ShowContinueError( "... valid values are Sensible, Latent, Total, or VentilationRequirement." );
+				ShowContinueError( "... valid values are Sensible, Total, or VentilationRequirement." );
 				ErrorsFound = true;
 			}}
-			{ auto const sizingOption( cAlphaArgs( iSizingOptionAlphaNum ) );
+			// assign CoolingPeakLoadType based on LoadSizeType for now
+			if ( SysSizInput( SysSizIndex ).LoadSizeType == Sensible ) {
+				SysSizInput( SysSizIndex ).CoolingPeakLoadType = SensibleCoolingLoad;
+			}
+			else if ( SysSizInput( SysSizIndex ).LoadSizeType == Total ) {
+				SysSizInput( SysSizIndex ).CoolingPeakLoadType = TotalCoolingLoad;
+			}
+			else {
+				SysSizInput( SysSizIndex ).CoolingPeakLoadType = SensibleCoolingLoad;
+			}
+			// set the CoolCapControl input
+			SysSizInput( SysSizIndex ).CoolCapControl = VAV;
+			{ auto const CoolCapCtrl( cAlphaArgs( iCoolCapControlAlphaNum ) );
+			if ( CoolCapCtrl == "VAV" ) {
+				SysSizInput( SysSizIndex ).CoolCapControl = VAV;
+			}
+			else if ( CoolCapCtrl == "BYPASS" ) {
+				SysSizInput( SysSizIndex ).CoolCapControl = Bypass;
+			}
+			else if ( CoolCapCtrl == "VT" ) {
+				SysSizInput( SysSizIndex ).CoolCapControl = VT;
+			}
+			else if ( CoolCapCtrl == "ONOFF" ) {
+				SysSizInput( SysSizIndex ).CoolCapControl = OnOff;
+			}
+			else {
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( iNameAlphaNum ) + "\", invalid data." );
+				ShowContinueError( "... incorrect " + cAlphaFieldNames( iCoolCapControlAlphaNum ) + "=\"" + cAlphaArgs( iCoolCapControlAlphaNum ) + "\"." );
+				ShowContinueError( "... valid values are VAV, Bypass, VT, or OnOff." );
+				ErrorsFound = true;
+			}}
+ 			{ auto const sizingOption( cAlphaArgs( iSizingOptionAlphaNum ) );
 			if ( sizingOption == "COINCIDENT" ) {
 				SysSizInput( SysSizIndex ).SizingOption = Coincident;
 			} else if ( sizingOption == "NONCOINCIDENT" ) {
@@ -2197,18 +2228,10 @@ namespace SizingManager {
 			// Determine SysSizInput electric Cooling design capacity sizing method
 			if ( SameString( cAlphaArgs( iCoolCAPMAlphaNum ), "COOLINGDESIGNCAPACITY" ) ) {
 				SysSizInput( SysSizIndex ).CoolingCapMethod = CoolingDesignCapacity;
-
-				if ( !lNumericFieldBlanks( iCoolDesignCapacityNumericNum ) ) {
-					SysSizInput( SysSizIndex ).ScaledCoolingCapacity = rNumericArgs( iCoolDesignCapacityNumericNum );
-					if ( SysSizInput( SysSizIndex ).ScaledCoolingCapacity < 0.0 && SysSizInput( SysSizIndex ).ScaledCoolingCapacity != AutoSize ) {
-						ShowSevereError( cCurrentModuleObject + " = " + SysSizInput( SysSizIndex ).AirPriLoopName );
-						ShowContinueError( "Illegal " + cNumericFieldNames( iCoolDesignCapacityNumericNum ) + " = " + TrimSigDigits( rNumericArgs( iCoolDesignCapacityNumericNum ), 7 ) );
-						ErrorsFound = true;
-					}
-				} else {
+				SysSizInput( SysSizIndex ).ScaledCoolingCapacity = rNumericArgs( iCoolDesignCapacityNumericNum );
+				if( SysSizInput( SysSizIndex ).ScaledCoolingCapacity < 0.0 && SysSizInput( SysSizIndex ).ScaledCoolingCapacity != AutoSize ) {
 					ShowSevereError( cCurrentModuleObject + " = " + SysSizInput( SysSizIndex ).AirPriLoopName );
-					ShowContinueError( "Input for " + cAlphaFieldNames( iCoolCAPMAlphaNum ) + " = " + cAlphaArgs( iCoolCAPMAlphaNum ) );
-					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iCoolDesignCapacityNumericNum ) );
+					ShowContinueError( "Illegal " + cNumericFieldNames( iCoolDesignCapacityNumericNum ) + " = " + TrimSigDigits( rNumericArgs( iCoolDesignCapacityNumericNum ), 7 ) );
 					ErrorsFound = true;
 				}
 			} else if ( SameString( cAlphaArgs( iCoolCAPMAlphaNum ), "CAPACITYPERFLOORAREA" ) ) {
@@ -2241,34 +2264,32 @@ namespace SizingManager {
 						ShowContinueError( "Illegal " + cNumericFieldNames( iCoolFracOfAutosizedCapacityNumericNum ) + " = " + TrimSigDigits( rNumericArgs( iCoolFracOfAutosizedCapacityNumericNum ), 7 ) );
 						ErrorsFound = true;
 					}
-				} else {
+				}
+				else {
 					ShowSevereError( cCurrentModuleObject + " = " + SysSizInput( SysSizIndex ).AirPriLoopName );
 					ShowContinueError( "Input for " + cAlphaFieldNames( iCoolCAPMAlphaNum ) + " = " + cAlphaArgs( iCoolCAPMAlphaNum ) );
 					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iCoolFracOfAutosizedCapacityNumericNum ) );
 					ErrorsFound = true;
 				}
-			} else {
-				//ShowSevereError(cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
-				//ShowContinueError("Illegal " + cAlphaFieldNames(iCoolCAPMAlphaNum) + " = " + cAlphaArgs(iCoolCAPMAlphaNum));
-				//ErrorsFound = true;
 			}
-
+			else if ( SameString( cAlphaArgs( iCoolCAPMAlphaNum ), "NONE" ) ) {
+				SysSizInput( SysSizIndex ).CoolingCapMethod = None;
+				SysSizInput( SysSizIndex ).ScaledCoolingCapacity = 0.0;
+			} else {
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( iNameAlphaNum ) + "\", invalid data." );
+				ShowContinueError( "... incorrect " + cAlphaFieldNames( iCoolCAPMAlphaNum ) + "=\"" + cAlphaArgs( iCoolCAPMAlphaNum ) + "\"." );
+				ShowContinueError( "... valid values are CoolingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, or None." );
+				ErrorsFound = true;
+			}
 
 			// Determine SysSizInput electric heating design capacity sizing method
 			if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "HEATINGDESIGNCAPACITY" ) ) {
 				SysSizInput( SysSizIndex ).HeatingCapMethod = HeatingDesignCapacity;
 
-				if ( !lNumericFieldBlanks( iHeatDesignCapacityNumericNum ) ) {
-					SysSizInput( SysSizIndex ).ScaledHeatingCapacity = rNumericArgs( iHeatDesignCapacityNumericNum );
-					if ( SysSizInput( SysSizIndex ).ScaledHeatingCapacity < 0.0 && SysSizInput( SysSizIndex ).ScaledHeatingCapacity != AutoSize ) {
-						ShowSevereError( cCurrentModuleObject + " = " + SysSizInput( SysSizIndex ).AirPriLoopName );
-						ShowContinueError( "Illegal " + cNumericFieldNames( iHeatDesignCapacityNumericNum ) + " = " + TrimSigDigits( rNumericArgs( iHeatDesignCapacityNumericNum ), 7 ) );
-						ErrorsFound = true;
-					}
-				} else {
+				SysSizInput( SysSizIndex ).ScaledHeatingCapacity = rNumericArgs( iHeatDesignCapacityNumericNum );
+				if( SysSizInput( SysSizIndex ).ScaledHeatingCapacity < 0.0 && SysSizInput( SysSizIndex ).ScaledHeatingCapacity != AutoSize ) {
 					ShowSevereError( cCurrentModuleObject + " = " + SysSizInput( SysSizIndex ).AirPriLoopName );
-					ShowContinueError( "Input for " + cAlphaFieldNames( iHeatCAPMAlphaNum ) + " = " + cAlphaArgs( iHeatCAPMAlphaNum ) );
-					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatDesignCapacityNumericNum ) );
+					ShowContinueError( "Illegal " + cNumericFieldNames( iHeatDesignCapacityNumericNum ) + " = " + TrimSigDigits( rNumericArgs( iHeatDesignCapacityNumericNum ), 7 ) );
 					ErrorsFound = true;
 				}
 			} else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "CAPACITYPERFLOORAREA" ) ) {
@@ -2307,10 +2328,14 @@ namespace SizingManager {
 					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatFracOfAutosizedCapacityNumericNum ) );
 					ErrorsFound = true;
 				}
+			} else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "NONE" ) ) {
+				SysSizInput( SysSizIndex ).HeatingCapMethod = None;
+				SysSizInput( SysSizIndex ).ScaledHeatingCapacity = 0.0;
 			} else {
-				//ShowSevereError(cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
-				//ShowContinueError("Illegal " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
-				//ErrorsFound = true;
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( iNameAlphaNum ) + "\", invalid data." );
+				ShowContinueError( "... incorrect " + cAlphaFieldNames( iHeatCAPMAlphaNum ) + "=\"" + cAlphaArgs( iHeatCAPMAlphaNum ) + "\"." );
+				ShowContinueError( "... valid values are HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedHeatingCapacity, or None." );
+				ErrorsFound = true;
 			}
 
 		}

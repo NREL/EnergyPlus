@@ -1749,17 +1749,17 @@ Site:GroundDomain:Slab,
         \default 5
         \units m
         \minimum> 0.0
-   N4, \field Soil Thermal Conductivity
+   N4,  \field Soil Thermal Conductivity
         \type real
         \default 1.5
         \units W/m-K
         \minimum> 0.0
-   N5, \field Soil Density
+   N5,  \field Soil Density
         \type real
         \default 2800
         \units kg/m3
         \minimum> 0.0
-   N6, \field Soil Specific Heat
+   N6,  \field Soil Specific Heat
         \type real
         \default 850
         \units J/kg-K
@@ -30776,8 +30776,9 @@ DesignSpecification:ZoneHVAC:Sizing,
 
 Sizing:System,
       \memo Specifies the input needed to perform sizing calculations for a central forced air
-      \memo system design air flow, heating capacity, and cooling capacity.
-      \min-fields 27
+      \memo system. System design air flow, heating capacity, and cooling capacity will be calculated
+      \memo using this input data.
+      \min-fields 37
   A1, \field AirLoop Name
       \required-field
       \type object-list
@@ -30787,12 +30788,10 @@ Sizing:System,
       \note Sensible and VentilationRequirement are the only available options
       \note Sensible uses the zone design air flow rates
       \note VentilationRequirement uses the system ventilation requirement
-      \required-field
       \type choice
       \key Sensible
+      \key Total
       \key VentilationRequirement
-      !\key Latent
-      !\key Total
       \default Sensible
   N1, \field Design Outdoor Air Flow Rate
       \type real
@@ -30800,11 +30799,12 @@ Sizing:System,
       \minimum 0.0
       \units m3/s
       \autosizable
-  N2, \field Minimum System Air Flow Ratio
+  N2, \field Central Heating Maximum System Air Flow Ratio
       \required-field
       \type real
       \minimum 0.0
       \maximum 1.0
+      \default 0.5
   N3, \field Preheat Design Temperature
       \required-field
       \type real
@@ -30829,7 +30829,7 @@ Sizing:System,
       \required-field
       \type real
       \units C
-  A3, \field Sizing Option
+  A3, \field Type of Zone Sum to Use
       \type choice
       \key Coincident
       \key NonCoincident
@@ -30963,8 +30963,7 @@ Sizing:System,
       \minimum 0.0
       \autosizable
       \default autosize
-      \note Enter the design cooling capacity. Required field when the cooling design capacity method
-      \note CoolingDesignCapacity.
+      \note Enter the design cooling capacity.
  N22, \field Cooling Design Capacity Per Floor Area
       \type real
       \units W/m2
@@ -30998,19 +30997,26 @@ Sizing:System,
       \minimum 0.0
       \autosizable
       \default autosize
-      \note Enter the design heating capacity. Required field when the heating design capacity method
-      \note HeatingDesignCapacity.
+      \note Enter the design heating capacity.
  N25, \field Heating Design Capacity Per Floor Area
       \type real
       \units W/m2
       \minimum 0.0
       \note Enter the heating design capacity per zone floor area. Required field when the heating design
       \note capacity method field is CapacityPerFloorArea.
- N26; \field Fraction of Autosized Heating Design Capacity
+ N26, \field Fraction of Autosized Heating Design Capacity
       \type real
       \minimum 0.0
       \note Enter the fraction of auto-sized heating design capacity. Required field when capacity the
       \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
+ A11; \field Central Cooling Capacity Control Method
+      \note Method used to control the coil's output
+      \type choice
+      \key VAV
+      \key Bypass
+      \key VT
+      \key OnOff
+      \default VAV
 
 Sizing:Plant,
       \memo Specifies the input needed to autosize plant loop flow rates and equipment capacities.
@@ -63821,8 +63827,8 @@ PlantEquipmentList,
     \memo should be OFF (not operate) within the specified lower/upper limit.
     \min-fields 1
   A1 , \field Name
-       \required-field
-       \reference PlantAndCondenserEquipmentLists
+        \required-field
+        \reference PlantAndCondenserEquipmentLists
   A2 , \field Equipment 1 Object Type
   A3 , \field Equipment 1 Name
   A4 , \field Equipment 2 Object Type

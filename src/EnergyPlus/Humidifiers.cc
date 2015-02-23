@@ -587,7 +587,7 @@ namespace Humidifiers {
 						if ( FinalSysSizing( CurSysNum ).DesOutAirVolFlow > 0.0 ) {
 							AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutDryBulbTemp, OutHumRat, CalledFrom );
 							MassFlowDes = FinalSysSizing( CurSysNum ).DesOutAirVolFlow * AirDensity;
-							InletHumRatDes = std::min( FinalSysSizing( CurSysNum ).CoolOutHumRat, FinalSysSizing( CurSysNum ).HeatOutHumRat );
+							InletHumRatDes = std::min( FinalSysSizing( CurSysNum ).OutHumRatAtCoolPeak, FinalSysSizing( CurSysNum ).HeatOutHumRat );
 							OutletHumRatDes = std::max( FinalSysSizing( CurSysNum ).CoolSupHumRat, FinalSysSizing( CurSysNum ).HeatSupHumRat );
 						} else {	// ELSE size to supply air duct flow rate
 							auto const SELECT_CASE_var( CurDuctType );
@@ -602,9 +602,9 @@ namespace Humidifiers {
 							} else {
 								AirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 							}
-							AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, FinalSysSizing( CurSysNum ).CoolMixTemp, FinalSysSizing( CurSysNum ).CoolMixHumRat, CalledFrom );
+							AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, FinalSysSizing( CurSysNum ).MixTempAtCoolPeak, FinalSysSizing( CurSysNum ).MixHumRatAtCoolPeak, CalledFrom );
 							MassFlowDes = AirVolFlow * AirDensity;
-							InletHumRatDes = min( FinalSysSizing( CurSysNum ).CoolMixHumRat, FinalSysSizing( CurSysNum ).HeatMixHumRat);
+							InletHumRatDes = min( FinalSysSizing( CurSysNum ).MixHumRatAtCoolPeak, FinalSysSizing( CurSysNum ).HeatMixHumRat);
 							OutletHumRatDes = max( FinalSysSizing( CurSysNum ).CoolSupHumRat, FinalSysSizing( CurSysNum ).HeatSupHumRat);
 						}
 					} else {
@@ -620,9 +620,9 @@ namespace Humidifiers {
 						} else {
 							AirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 						}
-						AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, FinalSysSizing( CurSysNum ).CoolMixTemp, FinalSysSizing( CurSysNum ).CoolMixHumRat, CalledFrom );    
+						AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, FinalSysSizing( CurSysNum ).MixTempAtCoolPeak, FinalSysSizing( CurSysNum ).MixHumRatAtCoolPeak, CalledFrom );    
 						MassFlowDes = AirVolFlow * AirDensity;
-						InletHumRatDes = std::min( FinalSysSizing( CurSysNum ).CoolMixHumRat, FinalSysSizing( CurSysNum ).HeatMixHumRat );
+						InletHumRatDes = std::min( FinalSysSizing( CurSysNum ).MixHumRatAtCoolPeak, FinalSysSizing( CurSysNum ).HeatMixHumRat );
 						OutletHumRatDes = std::max( FinalSysSizing( CurSysNum ).CoolSupHumRat, FinalSysSizing( CurSysNum ).HeatSupHumRat);
 					}
 				}
