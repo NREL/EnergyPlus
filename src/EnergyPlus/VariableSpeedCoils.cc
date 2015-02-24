@@ -1919,6 +1919,34 @@ namespace VariableSpeedCoils {
 					SetupOutputVariable( "Heating Coil Neighboring Speed Levels Ratio []", VarSpeedCoil( DXCoilNum ).SpeedRatioReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
 					SetupOutputVariable( "Heating Coil Recoverable Heat Transfer Rate [W]", VarSpeedCoil( DXCoilNum ).QWasteHeat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
 				}
+				else if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed ) {
+					// air source water heating coil
+					SetupOutputVariable( "Cooling Coil Water Heating Electric Power [W]", VarSpeedCoil( DXCoilNum ).Power, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", VarSpeedCoil( DXCoilNum ).QLoadTotal, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Sensible Cooling Rate [W]", VarSpeedCoil( DXCoilNum ).QSensible, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Latent Cooling Rate [W]", VarSpeedCoil( DXCoilNum ).QLatent, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Total Water Heating Rate [W]", VarSpeedCoil( DXCoilNum ).TotalHeatingEnergyRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Part Load Ratio []", VarSpeedCoil( DXCoilNum ).PartLoadRatio, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Runtime Fraction []", VarSpeedCoil( DXCoilNum ).RunFrac, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+
+					SetupOutputVariable( "Cooling Coil Air Mass Flow Rate [kg/s]", VarSpeedCoil( DXCoilNum ).AirMassFlowRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Air Inlet Temperature [C]", VarSpeedCoil( DXCoilNum ).InletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Air Inlet Humidity Ratio [kgWater/kgDryAir]", VarSpeedCoil( DXCoilNum ).InletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Air Outlet Temperature [C]", VarSpeedCoil( DXCoilNum ).OutletAirDBTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Air Outlet Humidity Ratio [kgWater/kgDryAir]", VarSpeedCoil( DXCoilNum ).OutletAirHumRat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Water Mass Flow Rate [kg/s]", VarSpeedCoil( DXCoilNum ).WaterMassFlowRate, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Water Inlet Temperature [C]", VarSpeedCoil( DXCoilNum ).InletWaterTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Water Outlet Temperature [C]", VarSpeedCoil( DXCoilNum ).OutletWaterTemp, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+
+					SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Power [W]", VarSpeedCoil( DXCoilNum ).CrankcaseHeaterPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Crankcase Heater Electric Energy [J]", VarSpeedCoil( DXCoilNum ).CrankcaseHeaterConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "HEATING", _, "System" );
+
+					SetupOutputVariable( "Cooling Coil Upper Speed Level []", VarSpeedCoil( DXCoilNum ).SpeedNumReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Neighboring Speed Levels Ratio []", VarSpeedCoil( DXCoilNum ).SpeedRatioReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+
+					SetupOutputVariable( "Cooling Coil Water Heating Pump Electric Power [W]", VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
+					SetupOutputVariable( "Cooling Coil Water Heating Pump Electric Energy [J]", VarSpeedCoil( DXCoilNum ).EvapCondPumpElecConsumption, "System", "Sum", VarSpeedCoil( DXCoilNum ).Name, _, "Electric", "HEATING", _, "System" );
+				}
 			}
 		}
 
@@ -2284,6 +2312,16 @@ namespace VariableSpeedCoils {
 		VarSpeedCoil( DXCoilNum ).CondensateVol = 0.0;
 		VarSpeedCoil( DXCoilNum ).QWasteHeat = 0.0;
 
+		//clear zeros to HPWH variables
+		VarSpeedCoil( DXCoilNum ).ElecWaterHeatingPower = 0.0; // Total electric power consumed by compressor and condenser pump [W]
+		VarSpeedCoil( DXCoilNum ).ElecWaterHeatingConsumption = 0.0; // Total electric consumption by compressor and condenser pump [J]
+		VarSpeedCoil( DXCoilNum ).TotalHeatingEnergy = 0.0; //total water heating energy
+		VarSpeedCoil( DXCoilNum ).TotalHeatingEnergyRate = 0.0; //total WH energy rate
+		VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower = 0.0; //power power
+
+		VSHPWHHeatingCapacity = 0.0; // Used by Heat Pump:Water Heater object as total water heating capacity [W]
+		VSHPWHHeatingCOP = 0.0; // Used by Heat Pump:Water Heater object as water heating COP [W/W]
+		
 	}
 
 	void
@@ -3684,6 +3722,555 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).CondensateVol = VarSpeedCoil( DXCoilNum ).CondensateVdot * ReportingConstant;
 		}
 
+	}
+
+	void
+		CalcVarSpeedHPWH(
+		int const DXCoilNum, // the number of the DX coil to be simulated
+		Real64 & RuntimeFrac, // Runtime Fraction of compressor or percent on time (on-time/cycle time)
+		Real64 const PartLoadRatio, // sensible water heating load / full load sensible water heating capacity
+		Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+		int const SpeedNum // Speed number, high bound
+		)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Bo Shen, ORNL
+		//       DATE WRITTEN   12/2014
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Calculates the gross cooling capacity of a varaible-speed heat pump water heater evaporator and
+		// heating capacity of the condenser coil given the rated heating capacity and COP.
+
+		// METHODOLOGY EMPLOYED:
+		// The routine requires the user to enter the total heating capacity and COP for the
+		// heat pump water heater along with logicals defining if fan and condenser pump are included at numerous speed levels.
+		// Since manufacturer's can rate their HPWH equipment with or without including condenser
+		// pump heat, this information is required to accurately determine the condenser's leaving
+		// water temperature. In addition, knowledge of the fan heat is required to back into
+		// a compressor COP.
+
+		// Using/Aliasing
+		using CurveManager::CurveValue;
+		using General::TrimSigDigits;
+		using DataHVACGlobals::FanElecPower;
+		using DataHVACGlobals::HPWHInletDBTemp;
+		using DataHVACGlobals::HPWHInletWBTemp;
+		using DataHVACGlobals::DXCoilTotalCapacity;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName("CalcVarSpeedHPWH");
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 OperatingHeatingCapacity; // Water heating operating capacity including the impact of capacity and COP curves (W)
+		Real64 OperatingHeatingCOP; // Water heating operating COP including the impact of capacity and COP curves (W/W)
+		Real64 OperatingHeatingPower; // Water heating operating Power (W)
+		Real64 CompressorPower; // Power consumed by compressor only (W)
+
+		Real64 TotalTankHeatingCapacity; // Water heating capacity corrected for condenser water pump heat (W)
+		Real64 TankHeatingCOP; // Water heating COP corrected for fan and condenser water pump power (W/W)
+		// (these previous 2 variables also include the impact of capacity and COP curves)
+		Real64 EvapCoolingCapacity; // Air cooling capacity corrected for evap fan and cond water pump heat (W)
+		Real64 InletWaterTemp; // Condenser water inlet temperature (C)
+		Real64 OutletWaterTemp; // Condenser water outlet temperature (C)
+		Real64 EvapInletMassFlowRate; // Evaporator air inlet mass flow rate (m3/s)
+		Real64 CondInletMassFlowRate; // Condenser water inlet mass flow rate (m3/s)
+		Real64 CpWater; // Specific heat of condenser inlet water (J/Kg/k)
+		Real64 InletAirTemp; // HPWH inlet air temperature (dry-bulb or wet-bulb) (C)
+		Real64 AirMassFlowRatio; // Ratio of evaporator inlet air mass flow rate to rated mass flow rate
+		Real64 WaterMassFlowRatio; // Ratio of evaporator inlet water mass flow rate to rated mass flow rate
+		Real64 PartLoadFraction; // Output of Part Load Fraction as a Function of Part Load Ratio curve
+		Real64 PumpHeatToWater; // Amount of pump heat attributed to heating water
+		Real64 HPRTF; // Heat pump run time fraction
+		Real64 PLF; // part-load function
+		Real64 CBFSpeed; // bypass factor as individual speed level
+		Real64 COPAirFFModFac; // air flow fraction modification
+		Real64 COPWaterFFModFac; // water flow fraction modification
+		Real64 COPTempModFac; // total capacity temperature correctio fraction
+		Real64 TOTCAPAirFFModFac; // air flow fraction modification
+		Real64 TOTCAPWaterFFModFac; // water flow fraction modification
+		Real64 TOTCAPTempModFac; // total capacity temperature correctio fraction
+		Real64 SHR; // total capacity temperature correctio fraction
+		Real64 COP; // total capacity temperature correctio fraction
+		Real64 AoEff; // effective air side surface area
+		Real64 Winput1; // power consumption at low speed
+		Real64 Winput2; // power consumption at high speed
+		Real64 LoadPressure; // evaporator inlet pressure
+		Real64 CrankcaseHeatingPower; // power due to crankcase heater
+		Real64 hDelta; // Change in air enthalpy across the cooling coil [J/kg]
+		Real64 hADP; // Apparatus dew point enthalpy [J/kg]
+		Real64 tADP; // Apparatus dew point temperature [C]
+		Real64 wADP; // Apparatus dew point humidity ratio [kg/kg]
+		Real64 hTinwADP; // Enthalpy at inlet dry-bulb and wADP [J/kg]
+		Real64 WHCAP1; // total heating capacity at low speed [W]
+		Real64 WHCAP2; // total heating capacity at high speed [W]
+		Real64 CpAir; // Specific heat of air [J/kg_C]
+		Real64 MaxHumRat; // max possible humidity
+		Real64 MaxOutletEnth; // max possible outlet enthalpy
+		Real64 ReportingConstant;
+		int EvapInletNode; // Evaporator air inlet node number
+		int EvapOutletNode; // Evaporator air outlet node number
+		int CondInletNode; // Condenser water inlet node number
+		int CondOutletNode; // Condenser water outlet node number
+		int MaxSpeed; // maximum speed level
+		int SpeedCal; // calculated speed level
+
+		//note: load side is the evaporator side, and source side is the condenser side
+		
+		CondInletNode = VarSpeedCoil( DXCoilNum ).WaterInletNodeNum;
+		CondOutletNode = VarSpeedCoil( DXCoilNum ).WaterOutletNodeNum;
+		// If heat pump water heater is OFF, set outlet to inlet and RETURN
+		if ( PartLoadRatio == 0.0 ) {
+			Node( CondOutletNode ) = Node( CondInletNode );
+			return;
+		}
+		else {
+			EvapInletNode = VarSpeedCoil( DXCoilNum ).AirInletNodeNum;
+			EvapOutletNode = VarSpeedCoil( DXCoilNum ).AirOutletNodeNum;
+			InletWaterTemp = Node( CondInletNode ).Temp;
+			CondInletMassFlowRate = Node( CondInletNode ).MassFlowRate;
+			EvapInletMassFlowRate = Node( EvapInletNode ).MassFlowRate;
+			CpWater = CPHW(InletWaterTemp);
+			CompressorPower = 0.0;
+			OperatingHeatingPower = 0.0;
+			TankHeatingCOP = 0.0;
+		}
+		
+		// determine inlet air temperature type for curve objects
+		if (VarSpeedCoil( DXCoilNum ).InletAirTemperatureType == WetBulbIndicator) {
+			InletAirTemp = HPWHInletWBTemp;
+		}
+		else {
+			InletAirTemp = HPWHInletDBTemp;
+		}
+
+		// check if indoor evaporator or outdoor evaporator
+		CrankcaseHeatingPower = 0.0;
+		if ( EvapInletNode != 0 ) {
+			LoadSideInletDBTemp = Node( EvapInletNode ).Temp;
+			LoadSideInletHumRat = Node( EvapInletNode ).HumRat;
+			LoadPressure = Node( EvapInletNode ).Press;
+			LoadSideInletWBTemp = Node( EvapInletNode ).OutAirWetBulb;
+			LoadSideInletEnth = Node( EvapInletNode ).Enthalpy;
+		}
+		else {
+			LoadSideInletDBTemp = OutDryBulbTemp;
+			LoadSideInletHumRat = OutHumRat;
+			LoadPressure = OutBaroPress;
+			LoadSideInletWBTemp = OutWetBulbTemp;
+			LoadSideInletEnth = OutEnthalpy;
+
+			// Initialize crankcase heater, operates below OAT defined in input deck for HP DX heating coil
+			if ( OutDryBulbTemp < VarSpeedCoil( DXCoilNum ).MaxOATCrankcaseHeater ) {
+				CrankcaseHeatingPower = VarSpeedCoil( DXCoilNum ).CrankcaseHeaterCapacity;
+			};
+		}
+
+
+		LoadSideMassFlowRate = EvapInletMassFlowRate;
+		SourceSideMassFlowRate = CondInletMassFlowRate; 
+		SourceSideInletTemp = InletWaterTemp;
+		SourceSideInletEnth = Node( CondInletNode ).Enthalpy;
+		VarSpeedCoil( DXCoilNum ).InletWaterEnthalpy = SourceSideInletEnth;
+		
+		MaxSpeed = VarSpeedCoil( DXCoilNum ).NumOfSpeeds;
+
+		// must be placed inside the loop, otherwise cause bug in release mode, need to be present at two places
+		if ( SpeedNum > MaxSpeed ) {
+			SpeedCal = MaxSpeed;
+		}
+		else {
+			SpeedCal = SpeedNum;
+		}
+
+		//part-load calculation
+		RuntimeFrac = 1.0;
+		VarSpeedCoil( DXCoilNum ).RunFrac = 1.0;
+		if ( ( SpeedNum == 1 ) && ( PartLoadRatio < 1.0 ) ) {
+			PLF = CurveValue( VarSpeedCoil( DXCoilNum ).PLFFPLR, PartLoadRatio );
+			if (PLF < 0.7) {
+				PLF = 0.7;
+			}
+			// calculate the run time fraction
+			VarSpeedCoil( DXCoilNum ).RunFrac = PartLoadRatio / PLF;
+			VarSpeedCoil( DXCoilNum ).PartLoadRatio = PartLoadRatio;
+
+			if ( VarSpeedCoil( DXCoilNum ).RunFrac > 1.0 ) {
+				VarSpeedCoil( DXCoilNum ).RunFrac = 1.0; // Reset coil runtime fraction to 1.0
+			}
+			else if ( VarSpeedCoil( DXCoilNum ).RunFrac < 0.0 ) {
+				VarSpeedCoil( DXCoilNum ).RunFrac = 0.0;
+			}
+
+			RuntimeFrac = VarSpeedCoil( DXCoilNum ).RunFrac;
+		}
+
+		//interpolate between speeds
+		// must be placed inside the loop, otherwise cause bug in release mode
+		if ( SpeedNum > MaxSpeed ) {
+			SpeedCal = MaxSpeed;
+		}
+		else {
+			SpeedCal = SpeedNum;
+		}
+
+
+		if ( SpeedNum == 1 || SpeedNum > MaxSpeed || SpeedRatio == 1.0 ) {
+			AirMassFlowRatio = LoadSideMassFlowRate / VarSpeedCoil( DXCoilNum ).DesignAirMassFlowRate;
+			WaterMassFlowRatio = SourceSideMassFlowRate / VarSpeedCoil( DXCoilNum ).DesignWaterMassFlowRate;
+			VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower = VarSpeedCoil( DXCoilNum ).MSWHPumpPower( SpeedCal );
+
+			COPTempModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( SpeedCal ), InletAirTemp, SourceSideInletTemp );
+			COPAirFFModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( SpeedCal ), AirMassFlowRatio );
+			COPWaterFFModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRWaterFFlow( SpeedCal ), WaterMassFlowRatio );
+
+			COP =  VarSpeedCoil( DXCoilNum ).MSRatedCOP( SpeedCal ) * COPTempModFac * COPAirFFModFac * 
+				COPWaterFFModFac;
+
+			TOTCAPTempModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapFTemp( SpeedCal ), 
+				InletAirTemp, SourceSideInletTemp );
+			//   Get capacity modifying factor (function of mass flow) for off-rated conditions
+			TOTCAPAirFFModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( SpeedCal ), 
+				AirMassFlowRatio );
+			//Get capacity modifying factor (function of mass flow) for off-rated conditions
+			TOTCAPWaterFFModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( SpeedCal ), 
+				WaterMassFlowRatio );
+
+			OperatingHeatingCapacity = VarSpeedCoil( DXCoilNum ).MSRatedTotCap( SpeedCal ) * TOTCAPTempModFac *
+				TOTCAPAirFFModFac * TOTCAPWaterFFModFac;
+
+			Winput = OperatingHeatingCapacity / COP;
+			OperatingHeatingPower = Winput;
+
+			OperatingHeatingCOP = COP ;
+			PumpHeatToWater = VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower * 
+				VarSpeedCoil( DXCoilNum ).HPWHCondPumpFracToWater;
+			TankHeatingCOP = OperatingHeatingCOP;
+
+			// account for pump heat if not included in total water heating capacity
+			if ( VarSpeedCoil( DXCoilNum ).CondPumpHeatInCapacity ) {
+				TotalTankHeatingCapacity = OperatingHeatingCapacity;
+			}
+			else {
+				TotalTankHeatingCapacity = OperatingHeatingCapacity + PumpHeatToWater;
+			}
+
+			HPRTF = RuntimeFrac;
+			// calculate evaporator total cooling capacity
+			if ( VarSpeedCoil( DXCoilNum ).FanPowerIncludedInCOP ) {
+				if ( VarSpeedCoil( DXCoilNum ).CondPumpPowerInCOP ) {
+					//       make sure fan power is full load fan power
+					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF
+						- VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower;
+					if ( OperatingHeatingPower > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / OperatingHeatingPower;
+				}
+				else {
+					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF;
+					if ( ( OperatingHeatingPower + VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower ) > 0.0 ) { 
+						TankHeatingCOP = TotalTankHeatingCapacity / 
+						( OperatingHeatingPower + VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower );
+					}
+				}
+			}
+			else {
+				if ( VarSpeedCoil( DXCoilNum ).CondPumpPowerInCOP ) {
+					//       make sure fan power is full load fan power
+					CompressorPower = OperatingHeatingPower - 
+						VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower;
+					if ( ( OperatingHeatingPower + FanElecPower / HPRTF ) > 0.0 ) {
+						TankHeatingCOP = TotalTankHeatingCapacity / 
+						( OperatingHeatingPower + FanElecPower / HPRTF );
+					}
+				}
+				else {
+					CompressorPower = OperatingHeatingPower;
+					if ( ( OperatingHeatingPower + FanElecPower / HPRTF + 
+						VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower ) > 0.0 ) {
+						TankHeatingCOP = TotalTankHeatingCapacity / 
+						( OperatingHeatingPower + FanElecPower / HPRTF + 
+						VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower );
+					}
+				}
+			}
+			
+			if ( VarSpeedCoil( DXCoilNum ).CondPumpHeatInCapacity ) {
+				EvapCoolingCapacity = TotalTankHeatingCapacity - PumpHeatToWater - CompressorPower;
+			}
+			else {
+				EvapCoolingCapacity = TotalTankHeatingCapacity - CompressorPower;
+			}
+			
+			CBFSpeed = AdjustCBF( VarSpeedCoil( DXCoilNum ).MSRatedCBF( SpeedCal ),
+				VarSpeedCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedCal ), LoadSideMassFlowRate );
+
+		}
+		else {
+			AirMassFlowRatio = LoadSideMassFlowRate / VarSpeedCoil( DXCoilNum ).DesignAirMassFlowRate;
+			WaterMassFlowRatio = SourceSideMassFlowRate / VarSpeedCoil( DXCoilNum ).DesignWaterMassFlowRate;
+			AoEff = VarSpeedCoil( DXCoilNum ).MSEffectiveAo( SpeedCal ) * SpeedRatio +
+				( 1.0 - SpeedRatio ) * VarSpeedCoil( DXCoilNum ).MSEffectiveAo( SpeedCal - 1);
+			CBFSpeed = std::exp( -AoEff / LoadSideMassFlowRate );
+
+			//calculate low speed
+			SpeedCal = SpeedNum - 1;
+
+			VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower = VarSpeedCoil( DXCoilNum ).MSWHPumpPower( SpeedCal );
+			COPTempModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( SpeedCal ), InletAirTemp, SourceSideInletTemp );
+			COPAirFFModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( SpeedCal ), AirMassFlowRatio );
+			COPWaterFFModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRWaterFFlow( SpeedCal ), WaterMassFlowRatio );
+
+			COP =  VarSpeedCoil( DXCoilNum ).MSRatedCOP( SpeedCal ) * COPTempModFac * COPAirFFModFac * COPWaterFFModFac;
+
+			TOTCAPTempModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapFTemp( SpeedCal ),
+				InletAirTemp, SourceSideInletTemp );
+			//   Get capacity modifying factor (function of mass flow) for off-rated conditions
+			TOTCAPAirFFModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( SpeedCal ),
+				AirMassFlowRatio );
+			//Get capacity modifying factor (function of mass flow) for off-rated conditions
+			TOTCAPWaterFFModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( SpeedCal ),
+				WaterMassFlowRatio );
+
+			OperatingHeatingCapacity = VarSpeedCoil( DXCoilNum ).MSRatedTotCap( SpeedCal ) * TOTCAPTempModFac *
+				TOTCAPAirFFModFac * TOTCAPWaterFFModFac;
+
+			Winput = OperatingHeatingCapacity / COP;
+			OperatingHeatingPower = Winput; 
+			Winput1 = Winput;
+			WHCAP1 = OperatingHeatingCapacity;
+			
+			//calculate upper speed
+			SpeedCal = SpeedNum;
+
+			VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower = VarSpeedCoil( DXCoilNum ).MSWHPumpPower( SpeedCal );
+			COPTempModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRFTemp( SpeedCal ), InletAirTemp, SourceSideInletTemp );
+			COPAirFFModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRAirFFlow( SpeedCal ), AirMassFlowRatio );
+			COPWaterFFModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSEIRWaterFFlow( SpeedCal ), WaterMassFlowRatio );
+
+			COP = ( 1.0 / VarSpeedCoil( DXCoilNum ).MSRatedCOP( SpeedCal ) ) * COPTempModFac * 
+				COPAirFFModFac * COPWaterFFModFac;
+
+			TOTCAPTempModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapFTemp( SpeedCal ),
+				InletAirTemp, SourceSideInletTemp );
+			//   Get capacity modifying factor (function of mass flow) for off-rated conditions
+			TOTCAPAirFFModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( SpeedCal ),
+				AirMassFlowRatio );
+			//Get capacity modifying factor (function of mass flow) for off-rated conditions
+			TOTCAPWaterFFModFac = CurveValue( VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( SpeedCal ),
+				WaterMassFlowRatio );
+
+			OperatingHeatingCapacity = VarSpeedCoil( DXCoilNum ).MSRatedTotCap( SpeedCal ) * TOTCAPTempModFac *
+				TOTCAPAirFFModFac * TOTCAPWaterFFModFac;
+
+			Winput = OperatingHeatingCapacity / COP;
+			OperatingHeatingPower = Winput;
+
+			Winput2 = Winput;
+			WHCAP2 = OperatingHeatingCapacity;
+
+			//interpolation
+			Winput = Winput2 * SpeedRatio + ( 1.0 - SpeedRatio ) * Winput1;
+			OperatingHeatingPower = Winput;
+			OperatingHeatingCapacity = WHCAP2 * SpeedRatio + ( 1.0 - SpeedRatio ) * WHCAP1;
+			VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower = VarSpeedCoil( DXCoilNum ).MSWHPumpPower( SpeedNum )* SpeedRatio +
+				( 1.0 - SpeedRatio ) * VarSpeedCoil( DXCoilNum ).MSWHPumpPower( SpeedNum - 1);
+
+			OperatingHeatingCOP = OperatingHeatingCapacity / OperatingHeatingPower;
+			TankHeatingCOP = OperatingHeatingCOP;
+			
+			PumpHeatToWater = VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower *
+				VarSpeedCoil( DXCoilNum ).HPWHCondPumpFracToWater;
+
+			// account for pump heat if not included in total water heating capacity
+			if ( VarSpeedCoil( DXCoilNum ).CondPumpHeatInCapacity ) {
+				TotalTankHeatingCapacity = OperatingHeatingCapacity;
+			}
+			else {
+				TotalTankHeatingCapacity = OperatingHeatingCapacity + PumpHeatToWater;
+			}
+
+			HPRTF = RuntimeFrac;
+			// calculate evaporator total cooling capacity
+			if ( VarSpeedCoil( DXCoilNum ).FanPowerIncludedInCOP ) {
+				if ( VarSpeedCoil( DXCoilNum ).CondPumpPowerInCOP ) {
+					//       make sure fan power is full load fan power
+					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF
+						- VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower;
+					if ( OperatingHeatingPower > 0.0 ) TankHeatingCOP = TotalTankHeatingCapacity / OperatingHeatingPower;
+				}
+				else {
+					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF;
+					if ( ( OperatingHeatingPower + VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower ) > 0.0 ) {
+						TankHeatingCOP = TotalTankHeatingCapacity /
+						( OperatingHeatingPower + VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower );
+					}
+				}
+			}
+			else {
+				if ( VarSpeedCoil( DXCoilNum ).CondPumpPowerInCOP ) {
+					//       make sure fan power is full load fan power
+					CompressorPower = OperatingHeatingPower -
+						VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower;
+					if ( ( OperatingHeatingPower + FanElecPower / HPRTF ) > 0.0 ) {
+						TankHeatingCOP = TotalTankHeatingCapacity /
+						( OperatingHeatingPower + FanElecPower / HPRTF );
+					}
+				}
+				else {
+					CompressorPower = OperatingHeatingPower;
+					if ( ( OperatingHeatingPower + FanElecPower / HPRTF +
+						VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower ) > 0.0 ) {
+						TankHeatingCOP = TotalTankHeatingCapacity /
+						( OperatingHeatingPower + FanElecPower / HPRTF +
+						VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower );
+					}
+				}
+			}
+
+			if ( VarSpeedCoil( DXCoilNum ).CondPumpHeatInCapacity ) {
+				EvapCoolingCapacity = TotalTankHeatingCapacity - PumpHeatToWater - CompressorPower;
+			}
+			else {
+				EvapCoolingCapacity = TotalTankHeatingCapacity - CompressorPower;
+			}
+		}
+
+		QSource = TotalTankHeatingCapacity;
+		QLoadTotal = EvapCoolingCapacity; 
+		DXCoilTotalCapacity = EvapCoolingCapacity;//for standard rating calculation
+		SHR = 1.0; 
+		//if indoor, calculate SHR
+		if ( EvapInletNode != 0 ) {
+			if ( CBFSpeed > 0.999 ) CBFSpeed = 0.999;
+
+			hDelta = QLoadTotal / LoadSideMassFlowRate;
+			hADP = LoadSideInletEnth - hDelta / ( 1.0 - CBFSpeed );
+			tADP = PsyTsatFnHPb( hADP, LoadPressure, RoutineName );
+			wADP = PsyWFnTdbH( tADP, hADP, RoutineName );
+			hTinwADP = PsyHFnTdbW( LoadSideInletDBTemp, wADP );
+			if ( ( LoadSideInletEnth - hADP ) > 1.e-10 ) {
+				SHR = min( ( hTinwADP - hADP ) / ( LoadSideInletEnth - hADP ), 1.0 );
+			}
+			else {
+				SHR = 1.0;
+			}
+		}
+
+		QSensible = QLoadTotal * SHR;
+
+		// determine condenser water inlet/outlet condition at full capacity
+		if ( CondInletMassFlowRate == 0.0 ) {
+			OutletWaterTemp = InletWaterTemp;
+		}
+		else {
+			OutletWaterTemp = InletWaterTemp + TotalTankHeatingCapacity / ( CpWater * CondInletMassFlowRate );
+		}
+
+		Node(CondOutletNode).Temp = OutletWaterTemp;
+
+		Node(CondOutletNode).MassFlowRate = Node( CondInletNode ).MassFlowRate;
+
+		// send heating capacity and COP to water heater module for standards rating calculation
+		// total heating capacity including condenser pump
+		VSHPWHHeatingCapacity = TotalTankHeatingCapacity;
+		// total heating COP including compressor, fan, and condenser pump
+		VSHPWHHeatingCOP = TankHeatingCOP;
+
+		VarSpeedCoil( DXCoilNum ).TotalHeatingEnergyRate = TotalTankHeatingCapacity * PartLoadRatio;
+		// calculate total compressor plus condenser pump power, fan power reported in fan module
+		VarSpeedCoil( DXCoilNum ).ElecWaterHeatingPower = ( CompressorPower + 
+			VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower ) * HPRTF;
+
+		//pass the outputs for the cooling coil section
+		VarSpeedCoil( DXCoilNum ).BasinHeaterPower = 0.0;
+		VarSpeedCoil( DXCoilNum ).CrankcaseHeaterPower = CrankcaseHeatingPower * ( 1.0 - RuntimeFrac );
+
+		//calculate coil outlet state variables
+		LoadSideOutletEnth = LoadSideInletEnth - QLoadTotal / LoadSideMassFlowRate;
+		CpAir = PsyCpAirFnWTdb( LoadSideInletHumRat, LoadSideInletDBTemp );
+		LoadSideOutletDBTemp = LoadSideInletDBTemp - QSensible / ( LoadSideMassFlowRate * CpAir );
+
+		MaxHumRat = PsyWFnTdbRhPb( LoadSideOutletDBTemp, 0.9999, VarSpeedCoil( DXCoilNum ).InletAirPressure, RoutineName );
+		MaxOutletEnth = PsyHFnTdbW( LoadSideOutletDBTemp, MaxHumRat );
+		if ( LoadSideOutletEnth > MaxOutletEnth ) {
+			LoadSideOutletEnth = MaxOutletEnth;
+		}
+		LoadSideOutletHumRat = PsyWFnTdbH( LoadSideOutletDBTemp, LoadSideOutletEnth, RoutineName );
+		if ( LoadSideOutletHumRat > MaxHumRat ) {
+			LoadSideOutletHumRat = MaxHumRat;
+		}
+
+		////Actual outlet conditions are "average" for time step
+		//if (CyclingScheme == ContFanCycCoil) {
+		//	// continuous fan, cycling compressor
+		//	VarSpeedCoil( DXCoilNum ).OutletAirEnthalpy = PartLoadRatio * LoadSideOutletEnth + (1.0 - PartLoadRatio) * LoadSideInletEnth;
+		//	VarSpeedCoil( DXCoilNum ).OutletAirHumRat = PartLoadRatio * LoadSideOutletHumRat + (1.0 - PartLoadRatio) * LoadSideInletHumRat;
+		//	VarSpeedCoil( DXCoilNum ).OutletAirDBTemp = PsyTdbFnHW(VarSpeedCoil( DXCoilNum ).OutletAirEnthalpy, VarSpeedCoil( DXCoilNum ).OutletAirHumRat);
+		//	PLRCorrLoadSideMdot = LoadSideMassFlowRate;
+		//}
+		//else {
+		// default to cycling fan, cycling compressor
+		VarSpeedCoil( DXCoilNum ).OutletAirEnthalpy = LoadSideOutletEnth;
+		VarSpeedCoil( DXCoilNum ).OutletAirHumRat = LoadSideOutletHumRat;
+		VarSpeedCoil( DXCoilNum ).OutletAirDBTemp = LoadSideOutletDBTemp;
+		PLRCorrLoadSideMdot = LoadSideMassFlowRate * PartLoadRatio;
+		//}
+
+		// scale heat transfer rates to PLR and power to RTF
+		QLoadTotal *= PartLoadRatio;
+		QSensible *= PartLoadRatio;
+		// count the powr separately
+		Winput *= RuntimeFrac; //+ VarSpeedCoil( DXCoilNum )%CrankcaseHeaterPower &
+		//+ VarSpeedCoil( DXCoilNum )%BasinHeaterPower + VarSpeedCoil( DXCoilNum )%EvapCondPumpElecPower
+		QSource *= PartLoadRatio;
+
+		//  Add power to global variable so power can be summed by parent object
+		DXElecCoolingPower = Winput;
+
+		ReportingConstant = TimeStepSys * SecInHour;
+		//Update heat pump data structure
+		VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower =
+			VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower * RuntimeFrac;// water heating pump power
+		VarSpeedCoil( DXCoilNum ).Power = Winput;
+		VarSpeedCoil( DXCoilNum ).QLoadTotal = QLoadTotal;
+		VarSpeedCoil( DXCoilNum ).QSensible = QSensible;
+		VarSpeedCoil( DXCoilNum ).QLatent = QLoadTotal - QSensible;
+		VarSpeedCoil( DXCoilNum ).QSource = QSource;
+		VarSpeedCoil( DXCoilNum ).Energy = Winput * ReportingConstant;
+		VarSpeedCoil( DXCoilNum ).EnergyLoadTotal = QLoadTotal * ReportingConstant;
+		VarSpeedCoil( DXCoilNum ).EnergySensible = QSensible * ReportingConstant;
+		VarSpeedCoil( DXCoilNum ).EnergyLatent = ( QLoadTotal - QSensible ) * ReportingConstant;
+		VarSpeedCoil( DXCoilNum ).EnergySource = QSource * ReportingConstant;
+		VarSpeedCoil( DXCoilNum ).CrankcaseHeaterConsumption = VarSpeedCoil( DXCoilNum ).CrankcaseHeaterPower * ReportingConstant;
+		VarSpeedCoil( DXCoilNum ).EvapWaterConsump = 0.0;
+		VarSpeedCoil( DXCoilNum ).BasinHeaterConsumption = 0.0;
+		//re-use EvapCondPumpElecConsumption to store WH pump energy consumption
+		VarSpeedCoil( DXCoilNum ).EvapCondPumpElecConsumption = 
+			VarSpeedCoil( DXCoilNum ).HPWHCondPumpElecNomPower * ReportingConstant;
+		if ( RuntimeFrac == 0.0 ) {
+			VarSpeedCoil( DXCoilNum ).COP = 0.0;
+		}
+		else {
+			VarSpeedCoil( DXCoilNum ).COP = QLoadTotal / Winput;
+		}
+		VarSpeedCoil( DXCoilNum ).RunFrac = RuntimeFrac;
+		VarSpeedCoil( DXCoilNum ).PartLoadRatio = PartLoadRatio;
+		VarSpeedCoil( DXCoilNum ).AirMassFlowRate = PLRCorrLoadSideMdot;
+
+		VarSpeedCoil( DXCoilNum ).WaterMassFlowRate = SourceSideMassFlowRate;
+		VarSpeedCoil( DXCoilNum ).OutletWaterTemp = SourceSideInletTemp + QSource / ( SourceSideMassFlowRate * CpWater );
+		VarSpeedCoil( DXCoilNum ).OutletWaterEnthalpy = SourceSideInletEnth + QSource / SourceSideMassFlowRate;
+		VarSpeedCoil( DXCoilNum ).QWasteHeat = 0.0;
 	}
 
 	void
