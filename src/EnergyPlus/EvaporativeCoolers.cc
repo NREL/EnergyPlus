@@ -2196,7 +2196,7 @@ namespace EvaporativeCoolers {
 	Real64
 	CalcEvapCoolRDDSecFlowResidual( 
 		Real64 const AirMassFlowSec, // secondary air mass flow rate in kg/s
-		Optional< FArray1S< Real64 > const > Par // Par(2) is desired outlet temperature of Evap Cooler
+		FArray1< Real64 > const & Par // Par(2) is desired outlet temperature of Evap Cooler
 	)
 	{
 			// SUBROUTINE INFORMATION:
@@ -2238,12 +2238,12 @@ namespace EvaporativeCoolers {
 			Real64 SysTempSetPoint; // evaporative cooler outlet setpoint temperature, drybulb
 			Real64 Residuum; // Residual to be minimized to zero
 
-			EvapCoolIndex = int( Par( )( 1 ) );
-			DryOrWetOperatingMode = int( Par( )( 2 ) );
-			SysTempSetPoint = Par( )( 3 );
-			EDBTSecAirSide = Par( )( 4 );
-			EWBTSecAirSide = Par( )( 5 );
-			EHumRatSecAirSide = Par( )( 6 );
+			EvapCoolIndex = int( Par( 1 ) );
+			DryOrWetOperatingMode = int( Par( 2 ) );
+			SysTempSetPoint = Par( 3 );
+			EDBTSecAirSide = Par( 4 );
+			EWBTSecAirSide = Par( 5 );
+			EHumRatSecAirSide = Par( 6 );
 			EvapCond( EvapCoolIndex ).SecInletMassFlowRate = AirMassFlowSec;
 			CalcIndirectRDDEvapCoolerOutletTemp( EvapCoolIndex, DryOrWetOperatingMode, AirMassFlowSec, EDBTSecAirSide, EWBTSecAirSide, EHumRatSecAirSide );
 			OutletAirTemp = EvapCond( EvapCoolIndex ).OutletTemp;
