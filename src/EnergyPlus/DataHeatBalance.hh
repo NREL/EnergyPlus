@@ -181,9 +181,9 @@ namespace DataHeatBalance {
 	extern int const AdjustInfiltrationFlow;
 
 	extern int const NumZoneIntGainDeviceTypes;
-	extern FArray1D_string const ZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45
+	extern FArray1D_string const ZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46
 
-	extern FArray1D_string const ccZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45
+	extern FArray1D_string const ccZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46
 
 	extern int const IntGainTypeOf_People;
 	extern int const IntGainTypeOf_Lights;
@@ -230,6 +230,7 @@ namespace DataHeatBalance {
 	extern int const IntGainTypeOf_ZoneHVACForcedAirUserDefined;
 	extern int const IntGainTypeOf_AirTerminalUserDefined;
 	extern int const IntGainTypeOf_PackagedTESCoilTank;
+	extern int const IntGainTypeOf_ElectricEquipmentITEAirCooled;
 
 	//Parameters for checking surface heat transfer models
 	extern Real64 const HighDiffusivityThreshold; // used to check if Material properties are out of line.
