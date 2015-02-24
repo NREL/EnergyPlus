@@ -369,6 +369,7 @@ namespace GroundHeatExchangers {
 					for ( m = 1; m <= numTrenches; m++ ) {
 						for ( n = 1; n <= numCoils; n++ ) {
 
+							// Zero out val after each iteration
 							doubleIntegralVal = 0.0;
 							midFieldVal = 0.0;
 
@@ -2174,6 +2175,8 @@ namespace GroundHeatExchangers {
 			lastQnSubHr = 0.0;
 			Node( inletNodeNum ).Temp = getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays );
 			Node( outletNodeNum ).Temp = getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays );
+
+			tempGround = getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays);
 
 			// zero out all history arrays
 
