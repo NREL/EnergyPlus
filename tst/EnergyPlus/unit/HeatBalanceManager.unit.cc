@@ -9,6 +9,7 @@
 #include <DataHeatBalance.hh>
 #include <DataIPShortCuts.hh>
 #include <DataGlobals.hh>
+#include <DataStringGlobals.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::HeatBalanceManager;
@@ -32,8 +33,8 @@ TEST( ProcessZoneDataTest, Test1 )
 //		, !- Floor Area{ m2 }
 //		AdaptiveConvectionAlgorithm;  !- Zone Inside Convection Algorithm
 
-	static bool ErrorsFound( false ); // If errors detected in input
-	static int ZoneNum( 0 ); // Zone number
+	bool ErrorsFound( false ); // If errors detected in input
+	int ZoneNum( 0 ); // Zone number
 	int NumAlphas ( 2 );
 	int NumNumbers ( 9 );
 

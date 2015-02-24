@@ -323,11 +323,11 @@ namespace ConductionTransferFunctionCalc {
 					if ( ( rho( Layer ) * cp( Layer ) ) > 0.0 ) {
 						Alpha = rk( Layer ) / ( rho( Layer ) * cp( Layer ) );
 						if ( Alpha > HighDiffusivityThreshold ) {
-							DeltaTimestep = TimeStepZone * SecInHour;
+							DeltaTimestep = TimeStepZoneSec;
 							ThicknessThreshold = std::sqrt( Alpha * DeltaTimestep * 3.0 );
 							if ( Material( CurrentLayer ).Thickness < ThicknessThreshold ) {
-								ShowSevereError( "InitConductionTransferFunctions: Found Material that is too thin and/or too " "highly conductive, material name = " + Material( CurrentLayer ).Name );
-								ShowContinueError( "High conductivity Material layers are not well supported for internal source " "constructions, material conductivity = " + RoundSigDigits( Material( CurrentLayer ).Conductivity, 3 ) + " [W/m-K]" );
+								ShowSevereError( "InitConductionTransferFunctions: Found Material that is too thin and/or too highly conductive, material name = " + Material( CurrentLayer ).Name );
+								ShowContinueError( "High conductivity Material layers are not well supported for internal source constructions, material conductivity = " + RoundSigDigits( Material( CurrentLayer ).Conductivity, 3 ) + " [W/m-K]" );
 								ShowContinueError( "Material thermal diffusivity = " + RoundSigDigits( Alpha, 3 ) + " [m2/s]" );
 								ShowContinueError( "Material with this thermal diffusivity should have thickness > " + RoundSigDigits( ThicknessThreshold, 5 ) + " [m]" );
 								if ( Material( CurrentLayer ).Thickness < ThinMaterialLayerThreshold ) {
@@ -1047,7 +1047,7 @@ namespace ConductionTransferFunctionCalc {
 									ShowContinueError( "(inside)=\"" + Material( Construct( ConstrNum ).LayerPoint( Layer ) ).Name + "\"" );
 								}
 							}
-							ShowContinueError( "The Construction report will be produced. This will show more " "details on Constructions and their materials." );
+							ShowContinueError( "The Construction report will be produced. This will show more details on Constructions and their materials." );
 							ShowContinueError( "Attempts will be made to complete the CTF process but the report may be incomplete." );
 							ShowContinueError( "Constructs reported after this construction may appear to have all 0 CTFs." );
 							ShowContinueError( "The potential causes of this problem are related to the input for the construction" );

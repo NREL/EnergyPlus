@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -337,7 +336,7 @@ namespace PackagedTerminalHeatPump {
 			CompSpeedRatio( 0.0 ),
 			ErrIndexCyc( 0 ),
 			ErrIndexVar( 0 ),
-			ZonePtr(0), 
+			ZonePtr(0),
 			HVACSizingIndex(0)
 		{}
 
@@ -637,7 +636,7 @@ namespace PackagedTerminalHeatPump {
 
 	// Object Data
 	extern FArray1D< PTUnitData > PTUnit;
-	extern FArray1D< PTUnitNumericFieldData > PTUnitUNumericFields; // holds PT unit numeric input fields character field name 
+	extern FArray1D< PTUnitNumericFieldData > PTUnitUNumericFields; // holds PT unit numeric input fields character field name
 
 	// Functions
 
@@ -721,19 +720,19 @@ namespace PackagedTerminalHeatPump {
 	Real64
 	HotWaterCoilResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		Optional< FArray1S< Real64 > const > Par = _ // Par(5) is the requested coil load
+		FArray1< Real64 > const & Par // Par(5) is the requested coil load
 	);
 
 	Real64
 	SupSATResidual(
 		Real64 & TempSupHeater, // supplemental heater load at maximum SAT
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = PTUnitNum
+		FArray1< Real64 > const & Par // par(1) = PTUnitNum
 	);
 
 	Real64
 	PLRResidual(
 		Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = PTUnitNum
+		FArray1< Real64 > const & Par // par(1) = PTUnitNum
 	);
 
 	void
@@ -811,7 +810,7 @@ namespace PackagedTerminalHeatPump {
 	Real64
 	VSHPCyclingResidual(
 		Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = FurnaceNum
+		FArray1< Real64 > const & Par // par(1) = FurnaceNum
 	);
 
 	//******************************************************************************
@@ -819,7 +818,7 @@ namespace PackagedTerminalHeatPump {
 	Real64
 	VSHPSpeedResidual(
 		Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = MSHPNum
+		FArray1< Real64 > const & Par // par(1) = MSHPNum
 	);
 
 	//******************************************************************************

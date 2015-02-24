@@ -73,11 +73,11 @@ namespace General {
 		Real64 const Eps, // required absolute accuracy
 		int const MaxIte, // maximum number of allowed iterations
 		int & Flag, // integer storing exit status
-		Real64 & XRes, // value of x that solves f(x [,Par]) = 0
-		std::function< Real64( Real64 const, Optional< FArray1S< Real64 > const > ) > f,
+		Real64 & XRes, // value of x that solves f(x,Par) = 0
+		std::function< Real64( Real64 const, FArray1< Real64 > const & ) > f,
 		Real64 const X_0, // 1st bound of interval that contains the solution
 		Real64 const X_1, // 2nd bound of interval that contains the solution
-		Optional< FArray1S< Real64 > const > Par // array with additional parameters used for function evaluation
+		FArray1< Real64 > const & Par // array with additional parameters used for function evaluation
 	)
 	{
 
@@ -88,7 +88,7 @@ namespace General {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// Find the value of x between x0 and x1 such that f(x,[,Par])
+		// Find the value of x between x0 and x1 such that f(x,Par)
 		// is equal to zero.
 
 		// METHODOLOGY EMPLOYED:
@@ -137,13 +137,8 @@ namespace General {
 		Cont = true;
 		NIte = 0;
 
-		if ( present( Par ) ) {
-			Y0 = f( X0, Par );
-			Y1 = f( X1, Par );
-		} else {
-			Y0 = f( X0, _ );
-			Y1 = f( X1, _ );
-		}
+		Y0 = f( X0, Par );
+		Y1 = f( X1, Par );
 		// check initial values
 		if ( Y0 * Y1 > 0 ) {
 			Flag = -2;
@@ -157,11 +152,139 @@ namespace General {
 			if ( std::abs( DY ) < SMALL ) DY = SMALL;
 			// new estimation
 			XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
-			if ( present( Par ) ) {
-				YTemp = f( XTemp, Par );
+			YTemp = f( XTemp, Par );
+
+			++NIte;
+
+			// check convergence
+			if ( std::abs( YTemp ) < Eps ) Conv = true;
+
+			if ( NIte > MaxIte ) StopMaxIte = true;
+
+			if ( ( ! Conv ) && ( ! StopMaxIte ) ) {
+				Cont = true;
 			} else {
-				YTemp = f( XTemp, _ );
+				Cont = false;
 			}
+
+			if ( Cont ) {
+
+				// reassign values (only if further iteration required)
+				if ( Y0 < 0.0 ) {
+					if ( YTemp < 0.0 ) {
+						X0 = XTemp;
+						Y0 = YTemp;
+					} else {
+						X1 = XTemp;
+						Y1 = YTemp;
+					}
+				} else {
+					if ( YTemp < 0.0 ) {
+						X1 = XTemp;
+						Y1 = YTemp;
+					} else {
+						X0 = XTemp;
+						Y0 = YTemp;
+					}
+				} // ( Y0 < 0 )
+
+			} // (Cont)
+
+		} // Cont
+
+		if ( Conv ) {
+			Flag = NIte;
+		} else {
+			Flag = -1;
+		}
+		XRes = XTemp;
+
+	}
+
+	void
+	SolveRegulaFalsi(
+		Real64 const Eps, // required absolute accuracy
+		int const MaxIte, // maximum number of allowed iterations
+		int & Flag, // integer storing exit status
+		Real64 & XRes, // value of x that solves f(x) = 0
+		std::function< Real64( Real64 const ) > f,
+		Real64 const X_0, // 1st bound of interval that contains the solution
+		Real64 const X_1 // 2nd bound of interval that contains the solution
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Michael Wetter
+		//       DATE WRITTEN   March 1999
+		//       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Find the value of x between x0 and x1 such that f(x)
+		// is equal to zero.
+
+		// METHODOLOGY EMPLOYED:
+		// Uses the Regula Falsi (false position) method (similar to secant method)
+
+		// REFERENCES:
+		// See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
+		// 2nd edition, 1992. Page 347 ff.
+
+		// USE STATEMENTS:
+		// na
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// = -2: f(x0) and f(x1) have the same sign
+		// = -1: no convergence
+		// >  0: number of iterations performed
+		// optional
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		Real64 const SMALL( 1.e-10 );
+
+		// INTERFACE BLOCK SPECIFICATIONS
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 X0; // present 1st bound
+		Real64 X1; // present 2nd bound
+		Real64 XTemp; // new estimate
+		Real64 Y0; // f at X0
+		Real64 Y1; // f at X1
+		Real64 YTemp; // f at XTemp
+		Real64 DY; // DY = Y0 - Y1
+		bool Conv; // flag, true if convergence is achieved
+		bool StopMaxIte; // stop due to exceeding of maximum # of iterations
+		bool Cont; // flag, if true, continue searching
+		int NIte; // number of interations
+
+		X0 = X_0;
+		X1 = X_1;
+		Conv = false;
+		StopMaxIte = false;
+		Cont = true;
+		NIte = 0;
+
+		Y0 = f( X0 );
+		Y1 = f( X1 );
+		// check initial values
+		if ( Y0 * Y1 > 0 ) {
+			Flag = -2;
+			XRes = X0;
+			return;
+		}
+
+		while ( Cont ) {
+
+			DY = Y0 - Y1;
+			if ( std::abs( DY ) < SMALL ) DY = SMALL;
+			// new estimation
+			XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+			YTemp = f( XTemp );
 
 			++NIte;
 
@@ -3004,11 +3127,11 @@ namespace General {
 
 				} else if ( SELECT_CASE_var == "" ) {
 					ShowWarningError( cCurrentModuleObject + ": No " + cAlphaFieldNames( 1 ) + " supplied." );
-					ShowContinueError( " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", " "\"CostInfo\", \"ViewFactorIinfo\"." );
+					ShowContinueError( " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", \"CostInfo\", \"ViewFactorIinfo\"." );
 
 				} else {
 					ShowWarningError( cCurrentModuleObject + ": Invalid " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) + "\" supplied." );
-					ShowContinueError( " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", " "\"CostInfo\", \"ViewFactorIinfo\"." );
+					ShowContinueError( " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", \"CostInfo\", \"ViewFactorIinfo\"." );
 
 				}}
 			}
@@ -3310,7 +3433,7 @@ namespace General {
 
 	//     NOTICE
 
-	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

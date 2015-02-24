@@ -5,7 +5,7 @@ This is the EnergyPlus Development Repository.
 
 # Contact/Support
 
- - The Department of Energy maintains a [public website for EnergyPlus](www.energyplus.gov) where you can find much more information about the program.  
+ - The Department of Energy maintains a [public website for EnergyPlus](http://www.energyplus.gov) where you can find much more information about the program.  
  - For detailed developer information, consult the [wiki](https://github.com/nrel/EnergyPlusTeam/wiki).  
  - For support questions, please utilize the [EnergyPlus Helpdesk](http://energyplus.helpserve.com/).
 
@@ -31,7 +31,7 @@ The C++ code in EnergyPlus utilizes many C++11 features, and so a modern compile
 6. Check the configuration settings, keeping them default should suffice, and click Generate.
 7. Browse to the build folder and there will be a Visual Studio solution file you can click on, EnergyPlus.sln. It will include multiple projects for each build target.  Choose the type of build (Debug or Release), then right click on EnergyPlus in the solution explorer and "Build".  This will build EnergyPlus and all of its dependencies.  The target executables will be found in the Products subfolder.
 8. The solution will include the ZERO_CHECK project as the default target to run when you execute, so when you are ready to debug, manually set the default target to EnergyPlus.
-9. In the EnergyPlus and EnergyPlusLib projects: right click on each project and select Properties. Under Configuration Properties select Debugging. In the Enviroment field, enter ```_NO_DEBUG_HEAP=1```.  The debug heap in Visual Studio doesn't play nicely with the input processor in EnergyPlus, and for debug builds, skipping this will result in a _very_ long IDD reading time.
+9. In the EnergyPlus and EnergyPlusLib projects: right click on each project and select Properties. Under Configuration Properties select Debugging. In the Environment field, enter ```_NO_DEBUG_HEAP=1```.  The debug heap in Visual Studio doesn't play nicely with the input processor in EnergyPlus, and for debug builds, skipping this will result in a _very_ long IDD reading time.
 
 ## Linux
 
@@ -61,5 +61,5 @@ These instructions were written for Mac OS X Version 10.9.  Newer versions of OS
 
 # Building Installer Packages
 
-Buildling an installer package is simply a matter of compiling the "Package" target.  On Windows you must have the NSIS tool installed first.  On Mac you must install PackageMaker.  Once the appropriate packaging tool is installed, use the CMake interface to turn on the "BUILD\_PACKAGE" option and regenerate the project.  A separate repository contains many binary pieces that are downloaded during the process of compilling the installer.  These are being transitioned to build from source where possible, in which case they will end up in this repository along with the other source.  Because this content is automatically downloaded from a separate GitHub repository during the packaging process, you will need to have an internet connection while generating an installer.  The completed installer package will be copied into the root of the build directory.
+Building an installer package is simply a matter of compiling the "Package" target.  On Windows you must have the NSIS tool installed first.  On Mac you must install PackageMaker.  Once the appropriate packaging tool is installed, use the CMake interface to turn on the "BUILD\_PACKAGE" option and regenerate the project.  A separate repository contains many binary pieces that are downloaded during the process of compiling the installer.  These are being transitioned to build from source where possible, in which case they will end up in this repository along with the other source.  Because this content is automatically downloaded from a separate GitHub repository during the packaging process, you will need to have an internet connection while generating an installer.  The completed installer package will be copied into the root of the build directory.
 

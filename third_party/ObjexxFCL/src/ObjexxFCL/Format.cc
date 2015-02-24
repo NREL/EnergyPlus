@@ -717,7 +717,7 @@ typedef  std::vector< Format * >  Formats;
 	void
 	FormatG::in( std::istream & stream, bool & b )
 	{
-		std::string const s( read( stream, wid( TraitsG< bool >::w() ) ) );
+		std::string const s( read( stream, wid( TraitsG< bool >::w ) ) );
 		if ( has_prefix( s, "T", false ) || has_prefix( s, ".T", false ) ) {
 			b = true;
 		} else if ( has_prefix( s, "F", false ) || has_prefix( s, ".F", false ) || is_blank( s ) ) { // Blank is Intel Fortran extension
@@ -731,7 +731,7 @@ typedef  std::vector< Format * >  Formats;
 	void
 	FormatG::in( std::istream & stream, char & c )
 	{
-		std::string const b( read( stream, wid( TraitsG< char >::w() ) ) ); // Buffer string
+		std::string const b( read( stream, wid( TraitsG< char >::w ) ) ); // Buffer string
 		std::string::size_type const lb( b.length() ); // Might be < w() if hit end of record
 		if ( lb >= 1 ) { // Take rightmost character read
 			c = b.back();

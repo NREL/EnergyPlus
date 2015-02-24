@@ -207,7 +207,7 @@ namespace DataSurfaceLists {
 					if ( SurfList( Item ).SurfFlowFrac( SurfNum ) < SurfListMinFlowFrac ) {
 						ShowSevereError( "The Flow Fraction for Surface " + SurfList( Item ).SurfName( SurfNum ) + " in Surface Group " + SurfList( Item ).Name + " is too low" );
 						ShowContinueError( "Flow fraction of " + RoundSigDigits( SurfList( Item ).SurfFlowFrac( SurfNum ), 6 ) + " is less than minimum criteria = " + RoundSigDigits( SurfListMinFlowFrac, 6 ) );
-						ShowContinueError( "Zero or extremely low flow fractions are not allowed. " "Remove this surface from the surface group or combine small surfaces together." );
+						ShowContinueError( "Zero or extremely low flow fractions are not allowed. Remove this surface from the surface group or combine small surfaces together." );
 						ErrorsFound = true;
 					}
 					SumOfAllFractions += SurfList( Item ).SurfFlowFrac( SurfNum );

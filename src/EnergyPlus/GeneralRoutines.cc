@@ -1077,7 +1077,7 @@ CalcPassiveExteriorBaffleGap(
 
 	if ( IsRain ) HExt = 1000.0;
 
-//	Tso = sum( TH( ( SurfPtrARR ), 1, 1 ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
+//	Tso = sum( TH( SurfPtrARR, 1, 1 ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
 	Tso = sum_product_sub( TH( _, 1, 1 ), Surface.Area(), SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
 //	Isc = sum( QRadSWOutIncident( SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
 	Isc = sum_product_sub( QRadSWOutIncident, Surface.Area(), SurfPtrARR ) / A; //Autodesk:F2C++ Functions handle array subscript usage
@@ -2031,7 +2031,7 @@ TestReturnAirPathIntegrity(
 		for ( Count1 = 1; Count1 <= NumMixers; ++Count1 ) {
 			if ( FoundZoneMixer( Count1 ) ) continue;
 			ShowSevereError( "AirLoopHVAC:ZoneMixer=\"" + MixerCond( Count1 ).MixerName + "\", not found on any AirLoopHVAC:ReturnPath, AirTerminal:SingleDuct:SeriesPIU:Reheat," );
-			ShowContinueError( "AirTerminal:SingleDuct:ParallelPIU:Reheat or " "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction." );
+			ShowContinueError( "AirTerminal:SingleDuct:ParallelPIU:Reheat or AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction." );
 			//      ErrFound=.TRUE.
 		}
 	}

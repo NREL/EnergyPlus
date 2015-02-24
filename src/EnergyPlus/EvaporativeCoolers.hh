@@ -3,8 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -516,7 +514,7 @@ namespace EvaporativeCoolers {
 			int const UnitVSControlMaxIterErrorIndex, // regula falsi errors, fan speed iteration limits
 			int const UnitVSControlLimitsErrorIndex, // regula falsi errors, limits exceeded.
 			int const ZonePtr, // pointer to a zone served by an evaportive cooler unit
-		    int const HVACSizingIndex // index of a HVACSizing object for an evaportive cooler unit
+			int const HVACSizingIndex // index of a HVACSizing object for an evaportive cooler unit
 		) :
 			Name( Name ),
 			ZoneNodeNum( ZoneNodeNum ),
@@ -605,7 +603,7 @@ namespace EvaporativeCoolers {
 	extern FArray1D< EvapConditions > EvapCond;
 	extern FArray1D< ZoneEvapCoolerUnitStruct > ZoneEvapUnit;
 	extern FArray1D< ZoneEvapCoolerUnitFieldData > ZoneEvapCoolerUnitFields;
-	
+
 
 	// Functions
 
@@ -719,7 +717,7 @@ namespace EvaporativeCoolers {
 	Real64
 	VSEvapUnitLoadResidual(
 		Real64 const FanSpeedRatio,
-		Optional< FArray1S< Real64 > const > Par = _ // parameters
+		FArray1< Real64 > const & Par // parameters
 	);
 
 	void

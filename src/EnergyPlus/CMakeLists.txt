@@ -44,6 +44,8 @@ SET( SRC
   ChillerIndirectAbsorption.hh
   ChillerReformulatedEIR.cc
   ChillerReformulatedEIR.hh
+  #CommandLineInterface.cc
+  #CommandLineInterface.hh
   CondenserLoopTowers.cc
   CondenserLoopTowers.hh
   ConductionTransferFunctionCalc.cc
@@ -214,6 +216,8 @@ SET( SRC
   Fans.hh
   FaultsManager.cc
   FaultsManager.hh
+  FileSystem.cc
+  FileSystem.hh
   FluidCoolers.cc
   FluidCoolers.hh
   FluidProperties.cc
@@ -535,54 +539,56 @@ endif()
 
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
-add_library( EnergyPlusLib STATIC ${SRC} )
-target_link_libraries( EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport DElight )
+add_library( energypluslib STATIC ${SRC} )
+target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport DElight )
 if(UNIX AND NOT APPLE)
-  target_link_libraries( EnergyPlusLib dl )
+  target_link_libraries( energypluslib dl )
+endif()
+if (WIN32)
+  target_link_libraries( energypluslib Shlwapi )
 endif()
 
-add_library( EnergyPlusLib2 STATIC ${SRC_2} )
-target_link_libraries( EnergyPlusLib2 )
+add_library( energypluslib2 STATIC ${SRC_2} )
+target_link_libraries( energypluslib2 )
 if(UNIX AND NOT APPLE)
-  target_link_libraries( EnergyPlusLib2 dl )
+  target_link_libraries( energypluslib2 dl )
 endif()
 
 
 # second we will create the shared library that is actually packaged with EnergyPlus
-add_library( EnergyPlusAPI SHARED  "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
-target_link_libraries( EnergyPlusAPI EnergyPlusLib EnergyPlusLib2 )
+add_library( energyplusapi SHARED  CommandLineInterface.hh CommandLineInterface.cc EnergyPlusPgm.cc public/EnergyPlusPgm.hh )
+target_link_libraries( energyplusapi energypluslib energypluslib2 )
 
 
 set_target_properties(
-  EnergyPlusAPI
+  energyplusapi
   PROPERTIES
   INSTALL_NAME_DIR "@executable_path"
 )
-install( TARGETS EnergyPlusAPI 
+install( TARGETS energyplusapi 
   RUNTIME DESTINATION ./ 
   LIBRARY DESTINATION ./ 
 )
 
-
 if (CMAKE_COMPILER_IS_GNUCXX AND ENABLE_LTO)
-  target_link_libraries( EnergyPlusLib2 EnergyPlusLib )
-  target_link_libraries( EnergyPlusLib EnergyPlusLib2 )
-  add_executable( EnergyPlus main.cc  "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
-  target_link_libraries( EnergyPlus EnergyPlusLib EnergyPlusLib2 )
+  target_link_libraries( energypluslib2 energypluslib )
+  target_link_libraries( energypluslib energypluslib2 )
+  add_executable( energyplus main.cc  "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
+  target_link_libraries( energyplus energypluslib energypluslib2 )
 else()
-  add_executable( EnergyPlus main.cc  )
-  target_link_libraries( EnergyPlus EnergyPlusAPI )
+  add_executable( energyplus main.cc  )
+  target_link_libraries( energyplus energyplusapi )
 endif()
 
-set_target_properties(EnergyPlus PROPERTIES VERSION ${ENERGYPLUS_VERSION})
-set_target_properties(EnergyPlusAPI PROPERTIES VERSION ${ENERGYPLUS_VERSION})
+set_target_properties(energyplus PROPERTIES VERSION ${ENERGYPLUS_VERSION})
+set_target_properties(energyplusapi PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 
-install( TARGETS EnergyPlus EnergyPlusAPI DESTINATION ./ )
+install( TARGETS energyplus energyplusapi DESTINATION ./ )
 
 if( BUILD_TESTING )
   # Build the test executable
   add_executable( TestEnergyPlusCallbacks test_ep_as_library.cc )
-  target_link_libraries( TestEnergyPlusCallbacks EnergyPlusAPI )
+  target_link_libraries( TestEnergyPlusCallbacks energyplusapi )
   add_test(NAME "integration.TestEnergyPlusCallbacks" 
            COMMAND ${CMAKE_COMMAND} 
            -DSOURCE_DIR=${CMAKE_SOURCE_DIR} 
@@ -590,7 +596,10 @@ if( BUILD_TESTING )
            -DIDF_FILE=1ZoneUncontrolled.idf
            -DEPW_FILE=USA_CO_Golden-NREL.724666_TMY3.epw
            -P ${CMAKE_SOURCE_DIR}/cmake/RunCallbackTest.cmake)  
-  set_tests_properties("integration.TestEnergyPlusCallbacks" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
-  set_tests_properties("integration.TestEnergyPlusCallbacks" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
 endif()
 
+if(UNIX AND NOT APPLE)
+  ADD_CUSTOM_COMMAND(TARGET energyplus POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E create_symlink energyplus EnergyPlus
+  COMMAND ${CMAKE_COMMAND} -E rename EnergyPlus "${CMAKE_BINARY_DIR}/Products/EnergyPlus") 
+endif()

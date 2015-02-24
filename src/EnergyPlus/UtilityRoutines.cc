@@ -20,6 +20,7 @@ extern "C" {
 #include <UtilityRoutines.hh>
 #include <BranchInputManager.hh>
 #include <BranchNodeConnections.hh>
+#include <CommandLineInterface.hh>
 #include <DataEnvironment.hh>
 #include <DataErrorTracking.hh>
 #include <DataGlobals.hh>
@@ -45,10 +46,7 @@ extern "C" {
 namespace EnergyPlus {
 
 void
-AbortEnergyPlus(
-	bool const NoIdf, // Set to true when "noidf" was found
-	bool const NoIDD // Set to true when "noidd" was found
-)
+AbortEnergyPlus()
 {
 
 	// SUBROUTINE INFORMATION:
@@ -115,7 +113,7 @@ AbortEnergyPlus(
 	bool TerminalError;
 	int write_stat;
 
-	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+	if ( sqlite ) {
 		sqlite->updateSQLiteSimulationRecord( true, false );
 	}
 
@@ -171,31 +169,6 @@ AbortEnergyPlus(
 	NumSevereDuringSizing = RoundSigDigits( TotalSevereErrorsDuringSizing );
 	strip( NumSevereDuringSizing );
 
-	if ( NoIDD ) {
-		DisplayString( "No EnergyPlus Data Dictionary (Energy+.idd) was found.  It is possible " );
-		DisplayString( "you \"double-clicked\"EnergyPlus.exe rather than using one of the methods" );
-		DisplayString( "to run Energyplus as found in the GettingStarted document in the" );
-		DisplayString( "documentation folder.  Using EP-Launch may be best -- " );
-		DisplayString( "it provides extra help for new users." );
-		ShowMessage( "No EnergyPlus Data Dictionary (Energy+.idd) was found. It is possible you \"double-clicked\" EnergyPlus.exe " );
-		ShowMessage( "rather than using one of the methods to run Energyplus as found in the GettingStarted document" );
-		ShowMessage( "in the documentation folder.  Using EP-Launch may be best -- it provides extra help for new users." );
-		{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutFmt, flags ); }
-		gio::read( "*" );
-	}
-
-	if ( NoIdf ) {
-		DisplayString( "No input file (in.idf) was found.  It is possible you \"double-clicked\"" );
-		DisplayString( "EnergyPlus.exe rather than using one of the methods to run Energyplus" );
-		DisplayString( "as found in the GettingStarted document in the documentation folder." );
-		DisplayString( "Using EP-Launch may be best -- it provides extra help for new users." );
-		ShowMessage( "No input file (in.idf) was found.  It is possible you \"double-clicked\" EnergyPlus.exe rather than" );
-		ShowMessage( "using one of the methods to run Energyplus as found in the GettingStarted document in the documentation" );
-		ShowMessage( "folder.  Using EP-Launch may be best -- it provides extra help for new users." );
-		{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutFmt, flags ); }
-		gio::read( "*" );
-	}
-
 	// catch up with timings if in middle
 	Time_Finish = epElapsedTime();
 	if ( Time_Finish < Time_Start ) Time_Finish += 24.0 * 3600.0;
@@ -217,9 +190,9 @@ AbortEnergyPlus(
 	ShowMessage( "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed );
 	DisplayString( "EnergyPlus Run Time=" + Elapsed );
 	tempfl = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, "eplusout.end", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, DataStringGlobals::outputEndFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		DisplayString( "AbortEnergyPlus: Could not open file \"eplusout.end\" for output (write)." );
+		DisplayString( "AbortEnergyPlus: Could not open file "+ DataStringGlobals::outputEndFileName +" for output (write)." );
 	}
 	gio::write( tempfl, fmtLD ) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 
@@ -409,7 +382,7 @@ EndEnergyPlus()
 	Real64 Seconds; // Elapsed Time Second Reporting
 	int write_stat;
 
-	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+	if ( sqlite ) {
 		sqlite->updateSQLiteSimulationRecord( true, true );
 	}
 
@@ -449,9 +422,9 @@ EndEnergyPlus()
 	ShowMessage( "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed );
 	DisplayString( "EnergyPlus Run Time=" + Elapsed );
 	tempfl = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, "eplusout.end", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, DataStringGlobals::outputEndFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		DisplayString( "EndEnergyPlus: Could not open file \"eplusout.end\" for output (write)." );
+		DisplayString( "EndEnergyPlus: Could not open file " + DataStringGlobals::outputEndFileName + " for output (write)." );
 	}
 	gio::write( tempfl, fmtA ) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 	gio::close( tempfl );
@@ -829,20 +802,17 @@ ShowFatalError(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	static bool NoIdf( false );
-	static bool NoIDD( false );
 
 	ShowErrorMessage( " **  Fatal  ** " + ErrorMessage, OutUnit1, OutUnit2 );
 	DisplayString( "**FATAL:" + ErrorMessage );
-	if ( has( ErrorMessage, "in.idf missing" ) ) NoIdf = true;
-	if ( has( ErrorMessage, "Energy+.idd missing" ) ) NoIDD = true;
+
 	ShowErrorMessage( " ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2 );
 	ShowErrorMessage( " ..... Reference severe error count=" + RoundSigDigits( TotalSevereErrors ), OutUnit1, OutUnit2 );
 	ShowErrorMessage( " ..... Last severe error=" + LastSevereError, OutUnit1, OutUnit2 );
-	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+	if ( sqlite ) {
 		sqlite->createSQLiteErrorRecord( 1, 2, ErrorMessage, 1 );
 	}
-	AbortEnergyPlus( NoIdf, NoIDD );
+	AbortEnergyPlus();
 
 }
 
@@ -903,7 +873,7 @@ ShowSevereError(
 
 	//  Could set a variable here that gets checked at some point?
 
-	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+	if ( sqlite ) {
 		sqlite->createSQLiteErrorRecord( 1, 1, ErrorMessage, 1 );
 	}
 
@@ -962,7 +932,7 @@ ShowSevereMessage(
 
 	//  Could set a variable here that gets checked at some point?
 
-	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+	if ( sqlite ) {
 		sqlite->createSQLiteErrorRecord( 1, 1, ErrorMessage, 0 );
 	}
 
@@ -1008,7 +978,7 @@ ShowContinueError(
 	// na
 
 	ShowErrorMessage( " **   ~~~   ** " + Message, OutUnit1, OutUnit2 );
-	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+	if ( sqlite ) {
 		sqlite->updateSQLiteErrorRecord( Message );
 	}
 
@@ -1074,13 +1044,13 @@ ShowContinueErrorTimeStamp(
 
 	if ( len( Message ) < 50 ) {
 		ShowErrorMessage( " **   ~~~   ** " + Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString(), OutUnit1, OutUnit2 );
-		if ( sqlite && sqlite->writeOutputToSQLite() ) {
+		if ( sqlite ) {
 			sqlite->updateSQLiteErrorRecord( Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString() );
 		}
 	} else {
 		ShowErrorMessage( " **   ~~~   ** " + Message );
 		ShowErrorMessage( " **   ~~~   ** " + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString(), OutUnit1, OutUnit2 );
-		if ( sqlite && sqlite->writeOutputToSQLite() ) {
+		if ( sqlite ) {
 			sqlite->updateSQLiteErrorRecord( Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString() );
 		}
 	}
@@ -1188,7 +1158,7 @@ ShowWarningError(
 	if ( DoingSizing ) ++TotalWarningErrorsDuringSizing;
 	ShowErrorMessage( " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2 );
 
-	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+	if ( sqlite ) {
 		sqlite->createSQLiteErrorRecord( 1, 0, ErrorMessage, 1 );
 	}
 
@@ -1243,7 +1213,7 @@ ShowWarningMessage(
 	}
 
 	ShowErrorMessage( " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2 );
-	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+	if ( sqlite ) {
 		sqlite->createSQLiteErrorRecord( 1, 0, ErrorMessage, 0 );
 	}
 
@@ -1589,10 +1559,10 @@ ShowErrorMessage(
 
 	if ( TotalErrors == 0 && ! ErrFileOpened ) {
 		StandardErrorOutput = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( StandardErrorOutput, "eplusout.err", flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( StandardErrorOutput, DataStringGlobals::outputErrFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
 			DisplayString( "Trying to display error: \"" + ErrorMessage + "\"" );
-			ShowFatalError( "ShowErrorMessage: Could not open file \"eplusout.err\" for output (write)." );
+			ShowFatalError( "ShowErrorMessage: Could not open file "+DataStringGlobals::outputErrFileName+" for output (write)." );
 		}
 		gio::write( StandardErrorOutput, fmtA ) << "Program Version," + VerString + ',' + IDDVerString;
 		ErrFileOpened = true;
@@ -1701,7 +1671,7 @@ ShowRecurringErrors()
 	// Using/Aliasing
 	using namespace DataErrorTracking;
 	using General::RoundSigDigits;
-    using General::strip_trailing_zeros;
+	using General::strip_trailing_zeros;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1732,7 +1702,7 @@ ShowRecurringErrors()
 			// Suppress reporting the count if it is a continue error
 			if ( has_prefix( error.Message, " **   ~~~   ** " ) ) {
 				ShowMessage( error.Message );
-				if ( sqlite && sqlite->writeOutputToSQLite() ) {
+				if ( sqlite ) {
 					sqlite->updateSQLiteErrorRecord( error.Message );
 				}
 			} else {
@@ -1741,7 +1711,7 @@ ShowRecurringErrors()
 				ShowMessage( StatMessageStart + "  This error occurred " + RoundSigDigits( error.Count ) + " total times;" );
 				ShowMessage( StatMessageStart + "  during Warmup " + RoundSigDigits( error.WarmupCount ) + " times;" );
 				ShowMessage( StatMessageStart + "  during Sizing " + RoundSigDigits( error.SizingCount ) + " times." );
-				if ( sqlite && sqlite->writeOutputToSQLite() ) {
+				if ( sqlite ) {
 					if ( has_prefix( error.Message, " ** Warning ** " ) ) {
 						sqlite->createSQLiteErrorRecord( 1, 0, error.Message.substr( 15 ), error.Count );
 					} else if ( has_prefix( error.Message, " ** Severe  ** " ) ) {

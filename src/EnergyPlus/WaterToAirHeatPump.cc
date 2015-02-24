@@ -316,7 +316,7 @@ namespace WaterToAirHeatPump {
 
 			++HPNum;
 
-			GetObjectItem( CurrentModuleObject, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, HPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -425,7 +425,7 @@ namespace WaterToAirHeatPump {
 
 			++HPNum;
 
-			GetObjectItem( CurrentModuleObject, WatertoAirHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, WatertoAirHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -1451,7 +1451,7 @@ namespace WaterToAirHeatPump {
 	Real64
 	CalcCompSuctionTempResidual(
 		Real64 const CompSuctionTemp, // HP compressor suction temperature (C)
-		Optional< FArray1S< Real64 > const > Par // Function parameters
+		FArray1< Real64 > const & Par // Function parameters
 	)
 	{
 
@@ -1500,10 +1500,9 @@ namespace WaterToAirHeatPump {
 		Real64 SuperHeatEnth;
 
 		// Convert parameters to usable variables
-		Refrigerant = "";
-		SuctionPr = Par()( 1 );
-		RefrigIndex = int( Par()( 2 ) );
-		SuperHeatEnth = Par()( 3 );
+		SuctionPr = Par( 1 );
+		RefrigIndex = int( Par( 2 ) );
+		SuperHeatEnth = Par( 3 );
 
 		CompSuctionEnth = GetSupHeatEnthalpyRefrig( Refrigerant, CompSuctionTemp, SuctionPr, RefrigIndex, RoutineName );
 

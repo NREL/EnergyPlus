@@ -628,7 +628,7 @@ namespace EconomicTariff {
 					if ( ! ( SameString( tariff( iInObj ).reportMeter, "Electricity:Facility" ) || SameString( tariff( iInObj ).reportMeter, "ElectricityPurchased:Facility" ) ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" atypical meter" );
 						ShowContinueError( "The meter chosen \"" + tariff( iInObj ).reportMeter + " is not typically used with the buyFromUtility option." );
-						ShowContinueError( "Usually the Electricity:Facility meter or the " "ElectricityPurchased:Facility is selected when the buyFromUtility option is used." );
+						ShowContinueError( "Usually the Electricity:Facility meter or the ElectricityPurchased:Facility is selected when the buyFromUtility option is used." );
 					}
 				}
 			}
@@ -814,7 +814,7 @@ namespace EconomicTariff {
 					if ( tariff( chargeSimple( iInObj ).tariffIndx ).seasonSchIndex == 0 ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
 						ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
-						ShowContinueError( " a Season other than Annual is used but no Season Schedule Name is specified" " in the UtilityCost:Tariff." );
+						ShowContinueError( " a Season other than Annual is used but no Season Schedule Name is specified in the UtilityCost:Tariff." );
 					}
 				}
 			}
@@ -900,7 +900,7 @@ namespace EconomicTariff {
 					if ( tariff( chargeBlock( iInObj ).tariffIndx ).seasonSchIndex == 0 ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid data" );
 						ShowContinueError( cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
-						ShowContinueError( " a Season other than Annual is used but no Season Schedule Name is specified" " in the UtilityCost:Tariff." );
+						ShowContinueError( " a Season other than Annual is used but no Season Schedule Name is specified in the UtilityCost:Tariff." );
 					}
 				}
 			}
@@ -2824,7 +2824,7 @@ namespace EconomicTariff {
 					}
 				}
 				if ( remainingVarFlag ) {
-					ShowWarningError( "CreateDefaultComputation: In UtilityCost:Computation: " "Circular or invalid dependencies found in tariff: " + tariff( iTariff ).tariffName );
+					ShowWarningError( "CreateDefaultComputation: In UtilityCost:Computation: Circular or invalid dependencies found in tariff: " + tariff( iTariff ).tariffName );
 					ShowContinueError( "  UtilityCost variables that may have invalid dependencies and the variables they are dependant on." );
 					for ( iVar = 1; iVar <= numEconVar; ++iVar ) {
 						if ( econVar( iVar ).tariffIndx == iTariff ) {
@@ -2842,7 +2842,7 @@ namespace EconomicTariff {
 				if ( computation( iTariff ).firstStep >= computation( iTariff ).lastStep ) {
 					computation( iTariff ).firstStep = 0;
 					computation( iTariff ).lastStep = -1;
-					ShowWarningError( "CreateDefaultComputation: In UtilityCost:Computation: " "No lines in the auto generated computation can be interpreted in tariff: " + tariff( iTariff ).tariffName );
+					ShowWarningError( "CreateDefaultComputation: In UtilityCost:Computation: No lines in the auto generated computation can be interpreted in tariff: " + tariff( iTariff ).tariffName );
 				}
 			}
 		}
@@ -3004,7 +3004,7 @@ namespace EconomicTariff {
 		using DataGlobals::HourOfDay;
 		using DataGlobals::TimeStep;
 		using DataGlobals::SecInHour;
-		using DataGlobals::TimeStepZone;
+		using DataGlobals::TimeStepZoneSec;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataEnvironment::Month;
 
@@ -3049,7 +3049,7 @@ namespace EconomicTariff {
 				// remember the demand is still energy over a period of time divided by the
 				// length of time. This gathers the energy also.
 				tariff( iTariff ).collectEnergy += curInstantValue;
-				tariff( iTariff ).collectTime += ( TimeStepZone * SecInHour );
+				tariff( iTariff ).collectTime += TimeStepZoneSec;
 				//added *SecInHour when adding RTP support August 2008
 				if ( tariff( iTariff ).collectTime >= tariff( iTariff ).demWinTime * SecInHour ) {
 					//get current value that has been converted into desired units
@@ -4858,7 +4858,9 @@ namespace EconomicTariff {
 			columnWidth = 14; //array assignment - same for all columns
 			WriteSubtitle( "Annual Cost" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost" );
+			if( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost" );
+			}
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -4906,7 +4908,9 @@ namespace EconomicTariff {
 			columnWidth = 14; //array assignment - same for all columns
 			WriteSubtitle( "Tariff Summary" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary" );
+			if( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary" );
+			}
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -4976,7 +4980,9 @@ namespace EconomicTariff {
 				columnWidth = 14; //array assignment - same for all columns
 				WriteSubtitle( "General" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", tariff( iTariff ).tariffName, "General" );
+				if( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", tariff( iTariff ).tariffName, "General" );
+				}
 				columnHead.deallocate();
 				rowHead.deallocate();
 				columnWidth.deallocate();
@@ -5179,12 +5185,12 @@ namespace EconomicTariff {
 				{ auto const SELECT_CASE_var( tariff( iTariff ).buyOrSell );
 				if ( SELECT_CASE_var == buyFromUtility ) {
 					if ( tariff( iTariff ).totalAnnualCost < 0 ) {
-						ShowWarningError( "UtilityCost:Tariff: " "A negative annual total cost when buying electricity from a utility is unusual. " );
+						ShowWarningError( "UtilityCost:Tariff: A negative annual total cost when buying electricity from a utility is unusual. " );
 						ShowContinueError( "  In UtilityCost:Tariff named " + tariff( iTariff ).tariffName );
 					}
 				} else if ( SELECT_CASE_var == sellToUtility ) {
 					if ( tariff( iTariff ).totalAnnualCost > 0 ) {
-						ShowWarningError( "UtilityCost:Tariff: " "A positive annual total cost when selling electricity to a utility is unusual. " );
+						ShowWarningError( "UtilityCost:Tariff: A positive annual total cost when selling electricity to a utility is unusual. " );
 						ShowContinueError( "  In UtilityCost:Tariff named " + tariff( iTariff ).tariffName );
 					}
 				}}
@@ -5416,7 +5422,9 @@ namespace EconomicTariff {
 		columnWidth = 14; //array assignment - same for all columns
 		WriteSubtitle( titleString );
 		WriteTable( tableBody, rowHead, columnHead, columnWidth );
-		sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", forString, titleString );
+		if( sqlite ) {
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", forString, titleString );
+		}
 		columnHead.deallocate();
 		rowHead.deallocate();
 		columnWidth.deallocate();
