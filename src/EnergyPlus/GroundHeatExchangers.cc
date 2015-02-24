@@ -166,11 +166,15 @@ namespace GroundHeatExchangers {
 			GetInput = false;
 		}
 
-		if ( type == "GROUNDHEATEXCHANGER:VERTICAL") {
+		if ( type == "GROUNDHEATEXCHANGER:VERTICAL" ) {
 
 			// Find the correct GLHE
 			if ( compIndex == 0 ) {
-				GLHENum = FindItemInList( name, verticalGLHE.Name(), numVerticalGLHEs );
+				FArray1D< std::string > tmpNames( numVerticalGLHEs );
+				for ( int i = 1; i <= numVerticalGLHEs; i++ ) {
+					tmpNames( i ) = verticalGLHE( i ).Name;
+				}
+				GLHENum = FindItemInList( name, tmpNames, numVerticalGLHEs );
 				if ( GLHENum == 0 ) {
 					ShowFatalError( "SimGroundHeatExchangers: Unit not found=" + name );
 				}
@@ -204,11 +208,15 @@ namespace GroundHeatExchangers {
 			// Update HX Report Vars
 			thisGLHE.updateGHX();
 
-		} else if ( type == "GROUNDHEATEXCHANGER:SLINKY") {
+		} else if ( type == "GROUNDHEATEXCHANGER:SLINKY" ) {
 		
 			// Find the correct GLHE
 			if ( compIndex == 0 ) {
-				GLHENum = FindItemInList( name, slinkyGLHE.Name(), numSlinkyGLHEs );
+				FArray1D< std::string > tmpNames( numSlinkyGLHEs );
+				for ( int i = 1; i <= numSlinkyGLHEs; i++ ) {
+					tmpNames( i ) = slinkyGLHE( i ).Name;
+				}
+				GLHENum = FindItemInList( name, tmpNames, numSlinkyGLHEs );
 				if ( GLHENum == 0 ) {
 					ShowFatalError( "SimGroundHeatExchangers: Unit not found=" + name );
 				}
@@ -251,7 +259,7 @@ namespace GroundHeatExchangers {
 	{
 		// Nothing to see here. Move along.
 		// Just a stub out for future work. 
-	};
+	}
 
 	//******************************************************************************
 
@@ -454,7 +462,7 @@ namespace GroundHeatExchangers {
 
 		} // NT time
 	
-	};
+	}
 	//******************************************************************************
 
 	Real64
@@ -509,7 +517,7 @@ namespace GroundHeatExchangers {
 
 		}
 
-	};
+	}
 	//******************************************************************************
 
 	Real64
@@ -547,7 +555,7 @@ namespace GroundHeatExchangers {
 		errFunc2 = std::erfc( 0.5 * sqrtDistDepth / sqrtAlphaT );
 	
 		return 4 * pow_2( Pi ) * ( errFunc1 / distance - errFunc2 / sqrtDistDepth );
-	};
+	}
 
 	//******************************************************************************
 
@@ -608,7 +616,7 @@ namespace GroundHeatExchangers {
 			return 0.5 * std::sqrt( pow_2( x - xIn ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zIn ) ) 
 				+ 0.5 * std::sqrt( pow_2( x - xOut ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zOut ) );			
 		}
-	};
+	}
 
 	//******************************************************************************
 
@@ -660,7 +668,7 @@ namespace GroundHeatExchangers {
 		return 0.5 * std::sqrt( pow_2( x - xIn ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zIn ) ) 
 				+ 0.5 * std::sqrt( pow_2( x - xOut ) + pow_2( Y0( m1 ) - Y0( m ) ) + pow_2( z - zOut ) );			
 
-	};
+	}
 	
 	//******************************************************************************
 
@@ -683,7 +691,7 @@ namespace GroundHeatExchangers {
 		// Calculates the center-to-center distance between rings
 
 		return std::sqrt( pow_2( X0( n ) - X0( n1 ) ) + pow_2( Y0( m ) - Y0( m1 ) ) );
-	};
+	}
 
 	//******************************************************************************
 
@@ -707,7 +715,7 @@ namespace GroundHeatExchangers {
 		} else {
 			return false;
 		}
-	};
+	}
 
 	//******************************************************************************
 
@@ -765,7 +773,7 @@ namespace GroundHeatExchangers {
 		}
 		
 		return ( h / 3 ) * sumIntF;
-	};
+	}
 	//******************************************************************************
 
 	Real64
@@ -822,7 +830,7 @@ namespace GroundHeatExchangers {
 
 		return ( h / 3 ) * sumIntF;
 
-	};
+	}
 
 	//******************************************************************************
 
@@ -832,7 +840,7 @@ namespace GroundHeatExchangers {
 		// calculate annual time constant for ground conduction
 		timeSS = ( pow_2( boreholeLength ) / ( 9.0 * diffusivityGround ) ) / SecInHour / 8760.0;
 		timeSSFactor = timeSS * 8760.0;
-	};
+	}
 
 	//******************************************************************************
 
@@ -842,7 +850,7 @@ namespace GroundHeatExchangers {
 		// calculate annual time constant for ground conduction
 		timeSS = ( pow_2( totalTubeLength ) / ( 9.0 * diffusivityGround ) ) / SecInHour / 8760.0;
 		timeSSFactor = 1.0;
-	};
+	}
 
 	//******************************************************************************
 
@@ -1221,7 +1229,7 @@ namespace GroundHeatExchangers {
 			++numErrorCalls;
 		}
 	
-	};
+	}
 
 	//******************************************************************************
 
@@ -1998,7 +2006,7 @@ namespace GroundHeatExchangers {
 	)
 	{
 		return interpGFunc( LNTTS );
-	};
+	}
 
 	//******************************************************************************
 
@@ -2019,7 +2027,7 @@ namespace GroundHeatExchangers {
 		}
 
 		return gFuncVal;
-	};
+	}
 
 	//******************************************************************************
 
