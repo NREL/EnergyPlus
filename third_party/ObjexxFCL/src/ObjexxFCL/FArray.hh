@@ -48,6 +48,10 @@
 #include <iostream>
 #endif // OBJEXXFCL_FARRAY_SIZE_REPORT
 
+#ifndef OBJEXXFCL_ARRAY_ALIGN
+#define OBJEXXFCL_ARRAY_ALIGN 128u
+#endif
+
 namespace ObjexxFCL {
 
 // FArray: Fortran-Compatible Array Abstract Base Class
@@ -125,7 +129,11 @@ protected: // Creation
 	FArray( FArray const & a ) :
 	 BArray( a ),
 	 data_size_( size_of( a.size_ ) ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
 	 data_( a.data_ ? new T[ data_size_ ] : nullptr ),
+#else
+	 data_( a.data_ ? new_array< T >() : nullptr ),
+#endif
 	 size_( data_size_ ),
 	 owner_( true ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
@@ -135,7 +143,7 @@ protected: // Creation
 	 sdata_( data_ - shift_ )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
-			reassign( i, a[ i ] );
+			initialize( i, a[ i ] );
 		}
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 		size_report();
@@ -148,7 +156,11 @@ protected: // Creation
 	explicit
 	FArray( FArray< U > const & a ) :
 	 data_size_( size_of( a.size() ) ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
 	 data_( a.data_ ? new T[ data_size_ ] : nullptr ),
+#else
+	 data_( a.data_ ? new_array< T >() : nullptr ),
+#endif
 	 size_( data_size_ ),
 	 owner_( true ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
@@ -158,7 +170,7 @@ protected: // Creation
 	 sdata_( data_ - shift_ )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
-			reassign( i, a[ i ] );
+			initialize( i, a[ i ] );
 		}
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 		size_report();
@@ -171,7 +183,11 @@ protected: // Creation
 	explicit
 	FArray( FArrayS< U > const & a ) :
 	 data_size_( size_of( a.size() ) ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
 	 data_( new T[ data_size_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
 	 size_( data_size_ ),
 	 owner_( true ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
@@ -191,7 +207,11 @@ protected: // Creation
 	explicit
 	FArray( MArray< A, M > const & a ) :
 	 data_size_( size_of( a.size() ) ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
 	 data_( new T[ data_size_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
 	 size_( data_size_ ),
 	 owner_( true ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
@@ -210,7 +230,11 @@ protected: // Creation
 	explicit
 	FArray( size_type const size ) :
 	 data_size_( size_of( size ) ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
 	 data_( new T[ data_size_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
 	 size_( data_size_ ),
 	 owner_( true ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
@@ -231,7 +255,11 @@ protected: // Creation
 	inline
 	FArray( size_type const size, InitializerSentinel const & ) :
 	 data_size_( size_of( size ) ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
 	 data_( new T[ data_size_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
 	 size_( data_size_ ),
 	 owner_( true ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
@@ -250,7 +278,11 @@ protected: // Creation
 	inline
 	FArray( std::initializer_list< U > const l ) :
 	 data_size_( l.size() ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
 	 data_( new T[ data_size_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
 	 size_( data_size_ ),
 	 owner_( true ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
@@ -261,7 +293,7 @@ protected: // Creation
 	{
 		auto r( l.begin() );
 		for ( size_type i = 0; i < size_; ++i, ++r ) {
-			reassign( i, *r );
+			initialize( i, *r );
 		}
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 		size_report();
@@ -273,7 +305,11 @@ protected: // Creation
 	inline
 	FArray( std::array< U, s > const & a ) :
 	 data_size_( s ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
 	 data_( new T[ data_size_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
 	 size_( data_size_ ),
 	 owner_( true ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
@@ -284,7 +320,7 @@ protected: // Creation
 	{
 		auto ia( a.begin() );
 		for ( size_type i = 0; i < size_; ++i, ++ia ) {
-			reassign( i, *ia );
+			initialize( i, *ia );
 		}
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 		size_report();
@@ -296,7 +332,11 @@ protected: // Creation
 	inline
 	FArray( std::vector< U > const & v ) :
 	 data_size_( v.size() ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
 	 data_( new T[ data_size_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
 	 size_( data_size_ ),
 	 owner_( true ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
@@ -307,7 +347,7 @@ protected: // Creation
 	{
 		auto iv( v.begin() );
 		for ( size_type i = 0; i < size_; ++i, ++iv ) {
-			reassign( i, *iv );
+			initialize( i, *iv );
 		}
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 		size_report();
@@ -319,7 +359,11 @@ protected: // Creation
 	inline
 	FArray( Vector2< U > const & v ) :
 	 data_size_( 2 ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
 	 data_( new T[ data_size_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
 	 size_( data_size_ ),
 	 owner_( true ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
@@ -340,7 +384,11 @@ protected: // Creation
 	inline
 	FArray( Vector3< U > const & v ) :
 	 data_size_( 3 ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
 	 data_( new T[ data_size_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
 	 size_( data_size_ ),
 	 owner_( true ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
@@ -460,7 +508,11 @@ public: // Creation
 	virtual
 	~FArray()
 	{
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
 		if ( owner_ ) delete[] data_;
+#else
+		if ( owner_ ) del_array();
+#endif
 	}
 
 protected: // Assignment: Array
@@ -1355,7 +1407,7 @@ public: // Predicate
 	// Contiguous?
 	inline
 	bool
-	is_contiguous() const
+	contiguous() const
 	{
 		return true;
 	}
@@ -1604,8 +1656,13 @@ public: // Modifier
 	FArray &
 	clear()
 	{
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+		if ( owner_ ) delete[] data_;
+#else
+		if ( owner_ ) del_array();
+#endif
+		data_ = nullptr;
 		data_size_ = 0;
-		if ( owner_ ) delete[] data_; data_ = nullptr;
 		size_ = 0u;
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
 		const_proxy_ = false;
@@ -1665,6 +1722,21 @@ public: // Modifier
 	data_copy_from( U const * source, size_type const size )
 	{
 		if ( data_ ) std::memcpy( data_, source, std::min( size, size_ ) );
+	}
+
+	// Swap Data of Same Size Arrays
+	inline
+	void
+	data_swap( FArray & v )
+	{
+		using std::swap;
+		assert( owner_ );
+		assert( v.owner_ );
+		assert( size_ == v.size_ );
+		swap( data_size_, v.data_size_ );
+		swap( data_, v.data_ );
+		swap( shift_, v.shift_ );
+		swap( sdata_, v.sdata_ );
 	}
 
 public: // Comparison: Predicate
@@ -2740,9 +2812,15 @@ protected: // Methods
 		assert( owner_ );
 		assert( size != npos );
 		if ( ( data_size_ != size ) || ( ! data_ ) ) {
-			data_size_ = size;
-			delete[] data_; data_ = new T[ data_size_ ]; // Allocate even if size==0 for consistency with Fortran
-			size_ = size;
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+			delete[] data_;
+			size_ = data_size_ = size;
+			data_ = new T[ data_size_ ]; // Allocate even if size==0 for consistency with Fortran
+#else
+			del_array();
+			size_ = data_size_ = size;
+			data_ = new_array< T >(); // Allocate even if size==0 for consistency with Fortran
+#endif
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 			size_report();
 #endif // OBJEXXFCL_FARRAY_SIZE_REPORT
@@ -2786,9 +2864,10 @@ protected: // Methods
 	}
 
 	// Attach Proxy/Argument Array to Const Array
+	template< int shift >
 	inline
 	void
-	attach( FArray const & a, int const shift )
+	attach( FArray const & a )
 	{
 		assert( ! owner_ );
 		data_size_ = a.data_size_;
@@ -2802,9 +2881,10 @@ protected: // Methods
 	}
 
 	// Attach Proxy/Argument Array to Array
+	template< int shift >
 	inline
 	void
-	attach( FArray & a, int const shift )
+	attach( FArray & a )
 	{
 		assert( ! owner_ );
 		data_size_ = a.data_size_;
@@ -2818,9 +2898,10 @@ protected: // Methods
 	}
 
 	// Attach Proxy/Argument Array to Const Tail
+	template< int shift >
 	inline
 	void
-	attach( Tail const & s, int const shift )
+	attach( Tail const & s )
 	{
 		assert( ! owner_ );
 		data_size_ = s.size();
@@ -2834,9 +2915,10 @@ protected: // Methods
 	}
 
 	// Attach Proxy/Argument Array to Tail
+	template< int shift >
 	inline
 	void
-	attach( Tail & s, int const shift )
+	attach( Tail & s )
 	{
 		assert( ! owner_ );
 		data_size_ = s.size();
@@ -2850,9 +2932,10 @@ protected: // Methods
 	}
 
 	// Attach Proxy/Argument Array to Const Value
+	template< int shift >
 	inline
 	void
-	attach( T const & t, int const shift )
+	attach( T const & t )
 	{
 		assert( ! owner_ );
 		data_size_ = npos; // Unknown
@@ -2866,9 +2949,10 @@ protected: // Methods
 	}
 
 	// Attach Proxy/Argument Array to Value
+	template< int shift >
 	inline
 	void
-	attach( T & t, int const shift )
+	attach( T & t )
 	{
 		assert( ! owner_ );
 		data_size_ = npos; // Unknown
@@ -2946,13 +3030,13 @@ protected: // Methods
 		template< typename V > static int test( ... );
 	public:
 		enum { value = sizeof( test< T >( 0 ) ) == sizeof( char ) };
-	}; // Has_reassign
+	};
 
-	// Uniform Reassignment
+	// Initialize
 	template< typename U, class = typename std::enable_if< Has_reassign< U >::value >::type >
 	inline
 	void
-	reassign( U const & u )
+	initialize( U const & u )
 	{
 		proxy_const_assert( not_const_proxy() );
 		assert( size_bounded() );
@@ -2961,29 +3045,29 @@ protected: // Methods
 		}
 	}
 
-	// Uniform Reassignment
+	// Initialize
 	template< typename U, class = typename std::enable_if< ! Has_reassign< U >::value >::type, typename = void >
 	inline
 	void
-	reassign( U const & u )
+	initialize( U const & u )
 	{
 		operator =( u );
 	}
 
-	// Element Reassignment
+	// Initialize an Element
 	template< typename U, class = typename std::enable_if< Has_reassign< U >::value >::type >
 	inline
 	void
-	reassign( size_type const i, U const & u )
+	initialize( size_type const i, U const & u )
 	{
 		operator []( i ).reassign( u );
 	}
 
-	// Element Reassignment
+	// Initialize an Element
 	template< typename U, class = typename std::enable_if< ! Has_reassign< U >::value >::type, typename = void >
 	inline
 	void
-	reassign( size_type const i, U const & u )
+	initialize( size_type const i, U const & u )
 	{
 		operator []( i ) = u;
 	}
@@ -2992,12 +3076,18 @@ protected: // Methods
 	void
 	reconstruct_by_size( size_type const size )
 	{
+		assert( owner_ );
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
 		delete[] data_;
-		data_size_ = size;
-		size_ = data_size_;
+		size_ = data_size_ = size;
 		data_ = new T[ data_size_ ];
+#else
+		del_array();
+		size_ = data_size_ = size;
+		data_ = new_array< T >();
+#endif
 #if defined(OBJEXXFCL_FARRAY_INIT) || defined(OBJEXXFCL_FARRAY_INIT_DEBUG)
-		reassign( Traits::initial_array_value() );
+		initialize( Traits::initial_array_value() );
 #endif // OBJEXXFCL_FARRAY_INIT || OBJEXXFCL_FARRAY_INIT_DEBUG
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 		size_report();
@@ -3186,7 +3276,7 @@ protected: // Static Methods
 		return i * multiplier;
 	}
 
-private: // Properties
+private: // Methods
 
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 
@@ -3203,6 +3293,82 @@ private: // Properties
 	}
 
 #endif // OBJEXXFCL_FARRAY_SIZE_REPORT
+
+	// Array Heap Allocator for POD Types
+	template< typename U, class = typename std::enable_if< std::is_fundamental< U >::value >::type >
+	inline
+	T *
+	new_array()
+	{
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+		return new T[ data_size_ ];
+#else
+#if defined(_WIN32)
+		return static_cast< T * >( _aligned_malloc( data_size_ * sizeof( T ), OBJEXXFCL_ARRAY_ALIGN ) );
+#elif defined(__linux__)
+		void * p;
+		return ( posix_memalign( &p, OBJEXXFCL_ARRAY_ALIGN, data_size_ * sizeof( T ) ) == 0 ? static_cast< T * >( p ) : nullptr );
+#else
+		return new T[ data_size_ ];
+#endif
+#endif
+	}
+
+	// Array Heap Allocator for Class Types
+	template< typename U, class = typename std::enable_if< ! std::is_fundamental< U >::value >::type, typename = void >
+	inline
+	T *
+	new_array()
+	{
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+		return new T[ data_size_ ];
+#else
+#if defined(_WIN32)
+		T * pT( static_cast< T * >( _aligned_malloc( data_size_ * sizeof( T ), OBJEXXFCL_ARRAY_ALIGN ) ) );
+		for ( size_t i = 0; i < data_size_; ++i ) {
+			pT[ i ] = *( new( pT + i ) T() );
+		}
+		return pT;
+#elif defined(__linux__)
+		void * p;
+		int const status( posix_memalign( &p, OBJEXXFCL_ARRAY_ALIGN, data_size_ * sizeof( T ) ) );
+		if ( status == 0 ) { // Success
+			T * pT( static_cast< T * >( p ) );
+			for ( size_t i = 0; i < data_size_; ++i ) {
+				pT[ i ] = *( new( pT + i ) T() );
+			}
+			return pT;
+		} else {
+			return nullptr;
+		}
+#else
+		return new T[ data_size_ ];
+#endif
+#endif
+	}
+
+	// Array Heap Destructor
+	inline
+	void
+	del_array()
+	{
+		assert( owner_ );
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+		delete[] data_;
+#else
+#if defined(_WIN32)
+		size_type i( data_size_ );
+		while ( i ) data_[ --i ].~T();
+		_aligned_free( data_ );
+#elif defined(__linux__)
+		size_type i( data_size_ );
+		while ( i ) data_[ --i ].~T();
+		free( data_ );
+#else
+		delete[] data_;
+#endif
+#endif
+	}
 
 public: // Data
 

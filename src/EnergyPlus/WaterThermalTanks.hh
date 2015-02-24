@@ -3,20 +3,17 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
-#include <VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
 
 namespace WaterThermalTanks {
 
 	// Using/Aliasing
-	using VariableSpeedCoils::MaxSpedLevels;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -1124,15 +1121,6 @@ namespace WaterThermalTanks {
 		Real64 HPWaterHeaterSensibleCapacity; // sensible capacity delivered when HPWH is attached to a zone (W)
 		Real64 HPWaterHeaterLatentCapacity; // latent capacity delivered when HPWH is attached to a zone (kg/s)
 		int ControlSensorLocation; // if using stratified tank, indicates control point
-		//variables for variable-speed HPWH
-		int NumofSpeed; //number of speeds for VS HPWH
-		FArray1D< Real64 > HPWHAirVolFlowRate; // air volume flow rate during heating operation
-		FArray1D< Real64 > HPWHAirMassFlowRate; // air mass flow rate during heating operation
-		FArray1D< Real64 > HPWHWaterVolFlowRate; // water volume flow rate during heating operation
-		FArray1D< Real64 > HPWHWaterMassFlowRate; // water mass flow rate during heating operation
-		FArray1D< Real64 > MSAirSpeedRatio; // air speed ratio in heating mode
-		FArray1D< Real64 > MSWaterSpeedRatio; // water speed ratio in heating mode
-		//end of variables for variable-speed HPWH
 
 		// Default Constructor
 		HeatPumpWaterHeaterData() :
@@ -1218,14 +1206,7 @@ namespace WaterThermalTanks {
 			ShowSetPointWarning( true ),
 			HPWaterHeaterSensibleCapacity( 0.0 ),
 			HPWaterHeaterLatentCapacity( 0.0 ),
-			ControlSensorLocation( HPWHControlNotSet ),
-			NumofSpeed(0),
-			HPWHAirVolFlowRate(MaxSpedLevels, 0.0),
-			HPWHAirMassFlowRate(MaxSpedLevels, 0.0),
-			HPWHWaterVolFlowRate(MaxSpedLevels, 0.0),
-			HPWHWaterMassFlowRate(MaxSpedLevels, 0.0),
-			MSAirSpeedRatio(MaxSpedLevels, 0.0),
-			MSWaterSpeedRatio(MaxSpedLevels, 0.0)
+			ControlSensorLocation( HPWHControlNotSet )
 		{}
 
 		// Member Constructor
@@ -1320,14 +1301,7 @@ namespace WaterThermalTanks {
 			bool const ShowSetPointWarning, // Warn when set point is greater than max tank temp limit
 			Real64 const HPWaterHeaterSensibleCapacity, // sensible capacity delivered when HPWH is attached to a zone (W)
 			Real64 const HPWaterHeaterLatentCapacity, // latent capacity delivered when HPWH is attached to a zone (kg/s)
-			int const ControlSensorLocation, // if using stratified tank, indicates control point
-			int const NumofSpeed,
-			FArray1< Real64 > const & HPWHAirVolFlowRate,
-			FArray1< Real64 > const & HPWHAirMassFlowRate,
-			FArray1< Real64 > const & HPWHWaterVolFlowRate,
-			FArray1< Real64 > const & HPWHWaterMassFlowRate,
-			FArray1< Real64 > const & MSAirSpeedRatio,
-			FArray1< Real64 > const & MSWaterSpeedRatio
+			int const ControlSensorLocation // if using stratified tank, indicates control point
 		) :
 			Name( Name ),
 			Type( Type ),
@@ -1419,14 +1393,7 @@ namespace WaterThermalTanks {
 			ShowSetPointWarning( ShowSetPointWarning ),
 			HPWaterHeaterSensibleCapacity( HPWaterHeaterSensibleCapacity ),
 			HPWaterHeaterLatentCapacity( HPWaterHeaterLatentCapacity ),
-			ControlSensorLocation( ControlSensorLocation ),
-			NumofSpeed(NumofSpeed),
-			HPWHAirVolFlowRate(MaxSpedLevels, HPWHAirVolFlowRate),
-			HPWHAirMassFlowRate(MaxSpedLevels, HPWHAirMassFlowRate),
-			HPWHWaterVolFlowRate(MaxSpedLevels, HPWHWaterVolFlowRate),
-			HPWHWaterMassFlowRate(MaxSpedLevels, HPWHWaterMassFlowRate),
-			MSAirSpeedRatio(MaxSpedLevels, MSAirSpeedRatio),
-			MSWaterSpeedRatio(MaxSpedLevels, MSWaterSpeedRatio)
+			ControlSensorLocation( ControlSensorLocation )
 		{}
 
 	};
@@ -1723,7 +1690,19 @@ namespace WaterThermalTanks {
 	);
 
 	void
-	CalcWaterThermalTankMixed( int const WaterThermalTankNum ); // Water Heater being simulated
+	CalcWaterThermalTankMixed(
+        int const WaterThermalTankNum // Water Heater being simulated
+    );
+	
+	void CalcMixedTankSourceSideHeatTransferRate(
+		Real64 HPWHCondenserDeltaT, // input, The temperature difference (C) across the heat pump, zero if there is no heat pump or if the heat pump is off
+		Real64 SourceInletTemp, // input, Source inlet temperature (C)
+		Real64 Cp, // Specific heat of fluid (J/kg deltaC)
+		Real64 SetPointTemp, // input, Mixed tank set point temperature
+		Real64 & SourceMassFlowRate, // source mass flow rate (kg/s)
+		Real64 & Qheatpump, // heat transfer rate from heat pump
+		Real64 & Qsource // steady state heat transfer rate from a constant source side flow
+	);
 
 	Real64
 	CalcTimeNeeded(
@@ -1780,6 +1759,15 @@ namespace WaterThermalTanks {
 	void
 	CalcWaterThermalTankStratified( int const WaterThermalTankNum ); // Water Heater being simulated
 
+	Real64
+	CalcStratifiedTankSourceSideHeatTransferRate(
+		Real64 HPWHCondenserDeltaT, // input, The temperature difference (C) across the heat pump, zero if there is no heat pump or if the heat pump is off
+		Real64 SourceInletTemp, // input, Source inlet temperature (C)
+		Real64 Cp, // Specific heat of fluid (J/kg deltaC)
+		Real64 SourceMassFlowRate, // source mass flow rate (kg/s)
+		Real64 NodeTemp // temperature of the source inlet node (C)
+	);
+	
 	void
 	CalcNodeMassFlows(
 		int const WaterThermalTankNum, // Water Heater being simulated
@@ -1801,13 +1789,13 @@ namespace WaterThermalTanks {
 	Real64
 	PLRResidualMixedTank(
 		Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = HP set point temperature [C]
+		FArray1< Real64 > const & Par // par(1) = HP set point temperature [C]
 	);
 
 	Real64
 	PLRResidualStratifiedTank(
 		Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = HP set point temperature [C]
+		FArray1< Real64 > const & Par // par(1) = HP set point temperature [C]
 	);
 
 	Real64
@@ -1864,26 +1852,9 @@ namespace WaterThermalTanks {
 		int const ControlLocationType
 	);
 
-	void 
-	SetVSHPWHFlowRates(
-		int const WaterThermalTankNum, // Water Heater tank being simulated
-		int const HPNum,
-		int const SpeedNum,
-		Real64 const SpeedRatio,
-		Real64 const WaterDens,
-		Real64 & MdotWater, // water flow rate 
-		bool const FirstHVACIteration // TRUE if First iteration of simulation
-		); 
-	
-	Real64
-	PLRResidualIterSpeed(
-		Real64 const SpeedRatio, // speed ratio between two speed levels
-		Optional< FArray1S< Real64 > const > Par //
-		);
-
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

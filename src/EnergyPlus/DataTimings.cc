@@ -4,6 +4,7 @@
 #include <ObjexxFCL/Time_Date.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <DataTimings.hh>
 #include <DataErrorTracking.hh>
 #include <DataPrecisionGlobals.hh>
@@ -321,7 +322,7 @@ namespace DataTimings {
 		return;
 #endif
 #ifdef EP_Timings
-		EchoInputFile = FindUnitNumber( "eplusout.audit" );
+		EchoInputFile = FindUnitNumber( outputAuditFile );
 		gio::write( EchoInputFile, fmtA ) << "Timing Element" + tabchar + "# calls" + tabchar + "Time {s}" + tabchar + "Time {s} (per call)";
 
 		for ( loop = 1; loop <= NumTimingElements; ++loop ) {

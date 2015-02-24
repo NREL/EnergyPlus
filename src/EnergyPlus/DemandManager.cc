@@ -226,7 +226,7 @@ namespace DemandManager {
 
 		// Using/Aliasing
 		using ScheduleManager::GetCurrentScheduleValue;
-		using DataGlobals::TimeStepZone;
+		using DataGlobals::TimeStepZoneSec;
 		using DataGlobals::SecInHour;
 		using DataHVACGlobals::TimeStepSys;
 
@@ -244,7 +244,7 @@ namespace DemandManager {
 		DemandManagerList( ListNum ).ScheduledLimit = GetCurrentScheduleValue( DemandManagerList( ListNum ).LimitSchedule );
 		DemandManagerList( ListNum ).DemandLimit = DemandManagerList( ListNum ).ScheduledLimit * DemandManagerList( ListNum ).SafetyFraction;
 
-		DemandManagerList( ListNum ).MeterDemand = GetInstantMeterValue( DemandManagerList( ListNum ).Meter, 1 ) / ( TimeStepZone * SecInHour ) + GetInstantMeterValue( DemandManagerList( ListNum ).Meter, 2 ) / ( TimeStepSys * SecInHour );
+		DemandManagerList( ListNum ).MeterDemand = GetInstantMeterValue( DemandManagerList( ListNum ).Meter, 1 ) / TimeStepZoneSec + GetInstantMeterValue( DemandManagerList( ListNum ).Meter, 2 ) / ( TimeStepSys * SecInHour );
 
 		// Calculate average demand over the averaging window including the current timestep meter demand
 		AverageDemand = DemandManagerList( ListNum ).AverageDemand + ( DemandManagerList( ListNum ).MeterDemand - DemandManagerList( ListNum ).History( 1 ) ) / DemandManagerList( ListNum ).AveragingWindow;

@@ -321,7 +321,7 @@ namespace TARCOGArgs {
 			if ( ( LayerType( i ) < MinLayType ) || ( LayerType( i ) > MaxLayType ) ) {
 				ArgCheck = 22;
 				gio::write( a, fmtI3 ) << i;
-				ErrorMessage = "Incorrect layer type for layer #" + a + ".  Layer type can either be 0 (glazing layer)," "1 (Venetian blind), 2 (woven shade), 3 (perforated), 4 (diffuse shade) or 5 (bsdf).";
+				ErrorMessage = "Incorrect layer type for layer #" + a + ".  Layer type can either be 0 (glazing layer), 1 (Venetian blind), 2 (woven shade), 3 (perforated), 4 (diffuse shade) or 5 (bsdf).";
 				return ArgCheck;
 			}
 

@@ -275,7 +275,9 @@ namespace HeatBalanceIntRadExchange {
 				auto const & surface_window( SurfaceWindow( SendSurfNum ) );
 				ConstrNumSend = Surface( SendSurfNum ).Construction;
 				auto const & construct( Construct( ConstrNumSend ) );
-				if ( construct.TypeIsWindow && surface_window.OriginalClass != SurfaceClass_TDD_Diffuser && ! construct.WindowTypeEQL ) {
+				if ( construct.WindowTypeEQL ) {
+					SendSurfTemp = surface_window.EffInsSurfTemp;
+				} else if ( construct.TypeIsWindow && surface_window.OriginalClass != SurfaceClass_TDD_Diffuser ) {
 					if ( SurfIterations == 0 && surface_window.ShadingFlag <= 0 ) {
 						SendSurfTemp = surface_window.ThetaFace( 2 * construct.TotGlassLayers ) - KelvinConv;
 					} else if ( surface_window.ShadingFlag == IntShadeOn || surface_window.ShadingFlag == IntBlindOn ) {
@@ -283,8 +285,6 @@ namespace HeatBalanceIntRadExchange {
 					} else {
 						SendSurfTemp = SurfaceTemp( SendSurfNum );
 					}
-				} else if ( construct.WindowTypeEQL ) {
-					SendSurfTemp = surface_window.EffInsSurfTemp;
 				} else {
 					SendSurfTemp = SurfaceTemp( SendSurfNum );
 				}
@@ -303,7 +303,10 @@ namespace HeatBalanceIntRadExchange {
 				auto const & construct( Construct( ConstrNumRec ) );
 				auto & surface_window( SurfaceWindow( RecSurfNum ) );
 				auto & netLWRadToRecSurf( NetLWRadToSurf( RecSurfNum ) );
-				if ( construct.TypeIsWindow && surface_window.OriginalClass != SurfaceClass_TDD_Diffuser && ! construct.WindowTypeEQL ) {
+				if ( construct.WindowTypeEQL ) {
+					RecSurfEmiss = EQLWindowInsideEffectiveEmiss( ConstrNumRec );
+					RecSurfTemp = surface_window.EffInsSurfTemp;
+				} else if ( construct.TypeIsWindow && surface_window.OriginalClass != SurfaceClass_TDD_Diffuser ) {
 					if ( SurfIterations == 0 && surface_window.ShadingFlag <= 0 ) {
 						// If the window is bare this TS and it is the first time through we use the previous TS glass
 						// temperature whether or not the window was shaded in the previous TS. If the window was shaded
@@ -319,9 +322,6 @@ namespace HeatBalanceIntRadExchange {
 						RecSurfTemp = SurfaceTemp( RecSurfNum );
 						RecSurfEmiss = construct.InsideAbsorpThermal;
 					}
-				} else if ( construct.WindowTypeEQL ) {
-					RecSurfEmiss = EQLWindowInsideEffectiveEmiss( ConstrNumRec );
-					RecSurfTemp = surface_window.EffInsSurfTemp;
 				} else {
 					RecSurfTemp = SurfaceTemp( RecSurfNum );
 					RecSurfEmiss = construct.InsideAbsorpThermal;

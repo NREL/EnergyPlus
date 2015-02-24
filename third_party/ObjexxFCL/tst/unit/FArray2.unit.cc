@@ -280,8 +280,10 @@ TEST( FArray2Test, ConstructIndexes )
 
 TEST( FArray2Test, ConstructIndexRange )
 {
+	typedef  StaticIndexRange  SR;
+
 	// Explicit index range, positive bounds
-	FArray2D_int A11( SRange( 2, 5 ), SRange( 3, 7 ) );
+	FArray2D_int A11( SR( 2, 5 ), SR( 3, 7 ) );
 	EXPECT_EQ( 20u, A11.size() );
 	EXPECT_EQ( 4u, A11.size1() );
 	EXPECT_EQ( 5u, A11.size2() );
@@ -295,7 +297,7 @@ TEST( FArray2Test, ConstructIndexRange )
 	EXPECT_FALSE( A11.initializer_active() );
 
 	// Explicit index range, negative bounds
- 	FArray2D_int A12( SRange( -5, -2 ), SRange( -7, -3 ) );
+ 	FArray2D_int A12( SR( -5, -2 ), SR( -7, -3 ) );
 	EXPECT_EQ( 20u, A12.size() );
 	EXPECT_EQ( 4u, A12.size1() );
 	EXPECT_EQ( 5u, A12.size2() );
@@ -309,7 +311,7 @@ TEST( FArray2Test, ConstructIndexRange )
 	EXPECT_FALSE( A12.initializer_active() );
 
 	// Explicit index range, bounds that cross zero
-	FArray2D_int A13( SRange( -3, 3 ), SRange( -2, 2 ) );
+	FArray2D_int A13( SR( -3, 3 ), SR( -2, 2 ) );
 	EXPECT_EQ( 35u, A13.size() );
 	EXPECT_EQ( 7u, A13.size1() );
 	EXPECT_EQ( 5u, A13.size2() );
@@ -406,8 +408,10 @@ TEST( FArray2Test, ConstructIndexesInitializerValue )
 
 TEST( FArray2Test, ConstructIndexRangeInitializerValue )
 {
+	typedef  StaticIndexRange  SR;
+
 	// Explicit index range
-	FArray2D_int A11( SRange( 2, 5 ), SRange( 3, 7 ), 31459 );
+	FArray2D_int A11( SR( 2, 5 ), SR( 3, 7 ), 31459 );
 	EXPECT_EQ( 20u, A11.size() );
 	EXPECT_EQ( 4u, A11.size1() );
 	EXPECT_EQ( 5u, A11.size2() );
@@ -426,7 +430,7 @@ TEST( FArray2Test, ConstructIndexRangeInitializerValue )
 	}
 
 	// Explicit index range, bounds that cross zero
-	FArray2D_int A12( SRange( -3, 3 ), SRange( -2, 2 ), -31459 );
+	FArray2D_int A12( SR( -3, 3 ), SR( -2, 2 ), -31459 );
 	EXPECT_EQ( 35u, A12.size() );
 	EXPECT_EQ( 7u, A12.size1() );
 	EXPECT_EQ( 5u, A12.size2() );
@@ -680,14 +684,14 @@ static void initializer_function_Fstring( FArray2D_Fstring & A )
 
 TEST( FArray2Test, ConstructIndexesInitializerFunction )
 {
-	FArray2D_int A1( 2, 3, initializer_function_int);
+	FArray2D_int A1( 2, 3, initializer_function_int );
 	EXPECT_TRUE( eq( FArray2D_int( 2, 3, { 11, 21, 12, 22, 13, 23 } ), A1 ) );
 	FArray2D_double A2( 2, 3, initializer_function_double );
 	EXPECT_TRUE( eq( FArray2D_double( 2, 3, { 1.1, 2.1, 1.2, 2.2, 1.3, 2.3 } ), A2 ) );
 	FArray2D_Fstring A3( 2, 3, initializer_function_Fstring );
 	EXPECT_TRUE( eq( FArray2D_Fstring( 2, 3, { "1,1", "2,1", "1,2", "2,2", "1,3", "2,3" } ), A3 ) );
 
-	FArray2D_int const C1( 2, 3, initializer_function_int);
+	FArray2D_int const C1( 2, 3, initializer_function_int );
 	EXPECT_TRUE( eq( FArray2D_int( 2, 3, { 11, 21, 12, 22, 13, 23 } ), C1 ) );
 	FArray2D_double const C2( 2, 3, initializer_function_double );
 	EXPECT_TRUE( eq( FArray2D_double( 2, 3, { 1.1, 2.1, 1.2, 2.2, 1.3, 2.3 } ), C2 ) );
@@ -704,7 +708,7 @@ TEST( FArray2Test, ConstructIndexRangeInitializerFunction )
 	FArray2D_Fstring A3( { 0, 1 }, { -1, 1 }, initializer_function_Fstring );
 	EXPECT_TRUE( eq( FArray2D_Fstring( { 0, 1 }, { -1, 1 }, { "0,-1", "1,-1", "0,0", "1,0", "0,1", "1,1" } ), A3 ) );
 
-	FArray2D_int const C1( { 0, 1 }, { -1, 1 }, initializer_function_int);
+	FArray2D_int const C1( { 0, 1 }, { -1, 1 }, initializer_function_int );
 	EXPECT_TRUE( eq( FArray2D_int( { 0, 1 }, { -1, 1 }, { -1, 9, 0, 10, 1, 11 } ), C1 ) );
 	FArray2D_double const C2( { 0, 1 }, { -1, 1 }, initializer_function_double );
 	EXPECT_TRUE( eq( FArray2D_double( { 0, 1 }, { -1, 1 }, { -0.1, 0.9, 0.0, 1.0, 0.1, 1.1 } ), C2 ) );
@@ -1373,7 +1377,7 @@ TEST( FArray2Test, Predicates )
 	FArray2D_int A1;
 	EXPECT_FALSE( A1.active() );
 	EXPECT_FALSE( A1.allocated() );
-	EXPECT_TRUE( A1.is_contiguous() );
+	EXPECT_TRUE( A1.contiguous() );
 	EXPECT_TRUE( A1.data_size_bounded() );
 	EXPECT_FALSE( A1.data_size_unbounded() );
 	EXPECT_TRUE( A1.empty() );
@@ -1389,7 +1393,7 @@ TEST( FArray2Test, Predicates )
 	FArray2D_int A2( 2, 3 ); // Uninitialized
 	EXPECT_TRUE( A2.active() );
 	EXPECT_TRUE( A2.allocated() );
-	EXPECT_TRUE( A2.is_contiguous() );
+	EXPECT_TRUE( A2.contiguous() );
 	EXPECT_TRUE( A2.data_size_bounded() );
 	EXPECT_FALSE( A2.data_size_unbounded() );
 	EXPECT_FALSE( A2.empty() );
@@ -1401,7 +1405,7 @@ TEST( FArray2Test, Predicates )
 	FArray2D_int A3( 2, 3, 31459 );
 	EXPECT_TRUE( A3.active() );
 	EXPECT_TRUE( A3.allocated() );
-	EXPECT_TRUE( A3.is_contiguous() );
+	EXPECT_TRUE( A3.contiguous() );
 	EXPECT_TRUE( A3.data_size_bounded() );
 	EXPECT_FALSE( A3.data_size_unbounded() );
 	EXPECT_FALSE( A3.empty() );
@@ -1417,7 +1421,7 @@ TEST( FArray2Test, Predicates )
 	FArray2D_int A4( 2, 3, { 11, 21, 12, 22, 13, 23 } );
 	EXPECT_TRUE( A4.active() );
 	EXPECT_TRUE( A4.allocated() );
-	EXPECT_TRUE( A4.is_contiguous() );
+	EXPECT_TRUE( A4.contiguous() );
 	EXPECT_TRUE( A4.data_size_bounded() );
 	EXPECT_FALSE( A4.data_size_unbounded() );
 	EXPECT_FALSE( A4.empty() );
@@ -1727,6 +1731,8 @@ TEST( FArray2Test, PredicateInitializerActive )
 
 TEST( FArray2Test, Inspectors )
 {
+	typedef  StaticIndexRange  SR;
+
 	FArray2D_int const C1;
 	// Rank
 	EXPECT_EQ( 2, C1.rank() );
@@ -1738,9 +1744,9 @@ TEST( FArray2Test, Inspectors )
 	EXPECT_EQ( 0u, C1.size( 2 ) );
 	EXPECT_EQ( C1.size2(), C1.size( 2 ) );
 	// Indexes
-	EXPECT_EQ( SRange(), C1.I( 1 ) );
+	EXPECT_EQ( SR(), C1.I( 1 ) );
 	EXPECT_EQ( C1.I1(), C1.I( 1 ) );
-	EXPECT_EQ( SRange(), C1.I( 2 ) );
+	EXPECT_EQ( SR(), C1.I( 2 ) );
 	EXPECT_EQ( C1.I2(), C1.I( 2 ) );
 	EXPECT_EQ( 1, C1.l( 1 ) );
 	EXPECT_EQ( C1.l1(), C1.l( 1 ) );
@@ -1766,9 +1772,9 @@ TEST( FArray2Test, Inspectors )
 	EXPECT_EQ( 3u, C2.size( 2 ) );
 	EXPECT_EQ( C2.size2(), C2.size( 2 ) );
 	// Indexes
-	EXPECT_EQ( SRange( 1, 2 ), C2.I( 1 ) );
+	EXPECT_EQ( SR( 1, 2 ), C2.I( 1 ) );
 	EXPECT_EQ( C2.I1(), C2.I( 1 ) );
-	EXPECT_EQ( SRange( 1, 3 ), C2.I( 2 ) );
+	EXPECT_EQ( SR( 1, 3 ), C2.I( 2 ) );
 	EXPECT_EQ( C2.I2(), C2.I( 2 ) );
 	EXPECT_EQ( 1, C2.l( 1 ) );
 	EXPECT_EQ( C2.l1(), C2.l( 1 ) );

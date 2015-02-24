@@ -91,10 +91,6 @@ namespace VariableSpeedCoils {
 	extern Real64 Winput; // Power Consumption [W]
 	extern Real64 PLRCorrLoadSideMdot; // Load Side Mdot corrected for Part Load Ratio of the unit
 
-	extern Real64 VSHPWHHeatingCapacity; // Used by Heat Pump:Water Heater object as total water heating capacity [W]
-	extern Real64 VSHPWHHeatingCOP; // Used by Heat Pump:Water Heater object as water heating COP [W/W]
-
-
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
 	// Driver/Manager Routines
@@ -223,9 +219,6 @@ namespace VariableSpeedCoils {
 		FArray1D_int MSWasteHeat;
 		// index of waste heat as a function of temperature
 		FArray1D< Real64 > MSWasteHeatFrac;
-		// water heating coil pump power at various speeds
-		FArray1D< Real64 > MSWHPumpPower;
-		FArray1D< Real64 > MSWHPumpPowerPerRatedTotCap;
 		// Waste heat fraction
 		Real64 SpeedNumReport;
 		//speed number for output
@@ -293,26 +286,6 @@ namespace VariableSpeedCoils {
 		Real64 InletSourceAirTemp; // source air temperature entering the outdoor coil [C]
 		Real64 InletSourceAirEnthalpy; // source air enthalpy entering the outdoor coil [J/kg]
 		//end variables for water system interactions
-
-		//begin varibles for HPWH
-		Real64 RatedCapWH; // Rated water heating Capacity [W]
-		int InletAirTemperatureType; // Specifies to use either air wet-bulb or dry-bulb temp for curve objects
-		Real64 WHRatedInletDBTemp; // Rated inlet air dry-bulb temperature [C]
-		Real64 WHRatedInletWBTemp; // Rated inlet air wet-bulb temperature [C]
-		Real64 WHRatedInletWaterTemp; // Rated condenser water inlet temperature [C]
-		Real64 HPWHCondPumpElecNomPower; // Nominal power input to the condenser water circulation pump [W]
-		Real64 HPWHCondPumpFracToWater; // Nominal power fraction to water for the condenser water circulation pump
-		Real64 RatedHPWHCondWaterFlow; // Rated water flow rate through the condenser of the HPWH DX coil [m3/s]
-		Real64 ElecWaterHeatingPower; // Total electric power consumed by compressor and condenser pump [W]
-		Real64 ElecWaterHeatingConsumption; // Total electric consumption by compressor and condenser pump [J]
-		bool FanPowerIncludedInCOP; // Indicates that fan heat is included in heating capacity and COP
-		bool CondPumpHeatInCapacity; // Indicates that condenser pump heat is included in heating capacity
-		bool CondPumpPowerInCOP; // Indicates that condenser pump power is included in heating COP
-		bool AirVolFlowAutoSized; // Used to report autosizing info for the HPWH DX coil
-		bool WaterVolFlowAutoSized; // Used to report autosizing info for the HPWH DX coil
-		Real64 TotalHeatingEnergy; //total water heating energy
-		Real64 TotalHeatingEnergyRate;//total WH energy rate
-		//end variables for HPWH
 
 		// Default Constructor
 		VariableSpeedCoilData() :
@@ -402,8 +375,6 @@ namespace VariableSpeedCoils {
 			MSEIRWaterFFlow( MaxSpedLevels, 0 ),
 			MSWasteHeat( MaxSpedLevels, 0 ),
 			MSWasteHeatFrac( MaxSpedLevels, 0.0 ),
-			MSWHPumpPower( MaxSpedLevels, 0.0 ),
-			MSWHPumpPowerPerRatedTotCap(MaxSpedLevels, 0.0),
 			SpeedNumReport( 0.0 ),
 			SpeedRatioReport( 0.0 ),
 			DefrostStrategy( 0 ),
@@ -452,26 +423,7 @@ namespace VariableSpeedCoils {
 			CondInletTemp( 0.0 ),
 			SourceAirMassFlowRate( 0.0 ),
 			InletSourceAirTemp( 0.0 ),
-			InletSourceAirEnthalpy( 0.0 ),
-			//begin varibles for HPWH
-			RatedCapWH( 0.0 ), // Rated water heating Capacity [W]
-			InletAirTemperatureType( 0 ), // Specifies to use either air wet-bulb or dry-bulb temp for curve objects
-			WHRatedInletDBTemp( 0.0 ), // Rated inlet air dry-bulb temperature [C]
-			WHRatedInletWBTemp( 0.0 ),  // Rated inlet air wet-bulb temperature [C]
-			WHRatedInletWaterTemp( 0.0 ),  // Rated condenser water inlet temperature [C]
-			HPWHCondPumpElecNomPower( 0.0 ),  // Nominal power input to the condenser water circulation pump [W]
-			HPWHCondPumpFracToWater( 1.0 ),  // Nominal power fraction to water for the condenser water circulation pump
-			RatedHPWHCondWaterFlow( 0.0 ), // Rated water flow rate through the condenser of the HPWH DX coil [m3/s]
-			ElecWaterHeatingPower( 0.0 ),  // Total electric power consumed by compressor and condenser pump [W]
-			ElecWaterHeatingConsumption( 0.0 ),  // Total electric consumption by compressor and condenser pump [J]
-			FanPowerIncludedInCOP( false ), // Indicates that fan heat is included in heating capacity and COP
-			CondPumpHeatInCapacity( false ), // Indicates that condenser pump heat is included in heating capacity
-			CondPumpPowerInCOP( false ), // Indicates that condenser pump power is included in heating COP
-			AirVolFlowAutoSized( false ), // Used to report autosizing info for the HPWH DX coil
-			WaterVolFlowAutoSized( false ), // Used to report autosizing info for the HPWH DX coil
-			TotalHeatingEnergy( 0.0 ),  //total water heating energy
-			TotalHeatingEnergyRate( 0.0 ) //total WH energy rate
-			//end variables for HPWH
+			InletSourceAirEnthalpy( 0.0 )
 		{}
 
 		// Member Constructor
@@ -565,8 +517,6 @@ namespace VariableSpeedCoils {
 			FArray1_int const & MSEIRWaterFFlow,
 			FArray1_int const & MSWasteHeat,
 			FArray1< Real64 > const & MSWasteHeatFrac,
-			FArray1< Real64 > const & MSWHPumpPower,
-			FArray1< Real64 > const & MSWHPumpPowerPerRatedTotCap,
 			Real64 const SpeedNumReport,
 			Real64 const SpeedRatioReport,
 			int const DefrostStrategy, // defrost strategy; 1=reverse-cycle, 2=resistive
@@ -617,26 +567,7 @@ namespace VariableSpeedCoils {
 			Real64 const CondInletTemp, // Evap condenser inlet temperature [C], report variable
 			Real64 const SourceAirMassFlowRate, // source air mass flow rate [kg/s]
 			Real64 const InletSourceAirTemp, // source air temperature entering the outdoor coil [C]
-			Real64 const InletSourceAirEnthalpy, // source air enthalpy entering the outdoor coil [J/kg]
-			//begin varibles for HPWH
-			Real64 const RatedCapWH, // Rated water heating Capacity [W]
-			int const InletAirTemperatureType, // Specifies to use either air wet-bulb or dry-bulb temp for curve objects
-			Real64 const WHRatedInletDBTemp, // Rated inlet air dry-bulb temperature [C]
-			Real64 const WHRatedInletWBTemp, // Rated inlet air wet-bulb temperature [C]
-			Real64 const WHRatedInletWaterTemp, // Rated condenser water inlet temperature [C]
-			Real64 const HPWHCondPumpElecNomPower, // Nominal power input to the condenser water circulation pump [W]
-			Real64 const HPWHCondPumpFracToWater, // Nominal power fraction to water for the condenser water circulation pump
-			Real64 const RatedHPWHCondWaterFlow, // Rated water flow rate through the condenser of the HPWH DX coil [m3/s]
-			Real64 const ElecWaterHeatingPower, // Total electric power consumed by compressor and condenser pump [W]
-			Real64 const ElecWaterHeatingConsumption, // Total electric consumption by compressor and condenser pump [J]
-			bool const FanPowerIncludedInCOP, // Indicates that fan heat is included in heating capacity and COP
-			bool const CondPumpHeatInCapacity, // Indicates that condenser pump heat is included in heating capacity
-			bool const CondPumpPowerInCOP, // Indicates that condenser pump power is included in heating COP
-			bool const AirVolFlowAutoSized, // Used to report autosizing info for the HPWH DX coil
-			bool const WaterVolFlowAutoSized, // Used to report autosizing info for the HPWH DX coil
-			Real64 const TotalHeatingEnergy, //total water heating energy
-			Real64 const TotalHeatingEnergyRate//total WH energy rate
-			//end variables for HPWH
+			Real64 const InletSourceAirEnthalpy // source air enthalpy entering the outdoor coil [J/kg]
 		) :
 			Name( Name ),
 			VarSpeedCoilType( VarSpeedCoilType ),
@@ -727,8 +658,6 @@ namespace VariableSpeedCoils {
 			MSEIRWaterFFlow( MaxSpedLevels, MSEIRWaterFFlow ),
 			MSWasteHeat( MaxSpedLevels, MSWasteHeat ),
 			MSWasteHeatFrac( MaxSpedLevels, MSWasteHeatFrac ),
-			MSWHPumpPower(MaxSpedLevels, MSWHPumpPower),
-			MSWHPumpPowerPerRatedTotCap(MaxSpedLevels, MSWHPumpPowerPerRatedTotCap),
 			SpeedNumReport( SpeedNumReport ),
 			SpeedRatioReport( SpeedRatioReport ),
 			DefrostStrategy( DefrostStrategy ),
@@ -779,26 +708,7 @@ namespace VariableSpeedCoils {
 			CondInletTemp( CondInletTemp ),
 			SourceAirMassFlowRate( SourceAirMassFlowRate ),
 			InletSourceAirTemp( InletSourceAirTemp ),
-			InletSourceAirEnthalpy( InletSourceAirEnthalpy ),
-			//begin varibles for HPWH
-			RatedCapWH( RatedCapWH ), // Rated water heating Capacity [W]
-			InletAirTemperatureType( InletAirTemperatureType ), // Specifies to use either air wet-bulb or dry-bulb temp for curve objects
-			WHRatedInletDBTemp( WHRatedInletDBTemp ), // Rated inlet air dry-bulb temperature [C]
-			WHRatedInletWBTemp( WHRatedInletWBTemp ),  // Rated inlet air wet-bulb temperature [C]
-			WHRatedInletWaterTemp( WHRatedInletWaterTemp ),  // Rated condenser water inlet temperature [C]
-			HPWHCondPumpElecNomPower( HPWHCondPumpElecNomPower ),  // Nominal power input to the condenser water circulation pump [W]
-			HPWHCondPumpFracToWater( HPWHCondPumpFracToWater ),  // Nominal power fraction to water for the condenser water circulation pump
-			RatedHPWHCondWaterFlow( RatedHPWHCondWaterFlow ), // Rated water flow rate through the condenser of the HPWH DX coil [m3/s]
-			ElecWaterHeatingPower( ElecWaterHeatingPower ),  // Total electric power consumed by compressor and condenser pump [W]
-			ElecWaterHeatingConsumption( ElecWaterHeatingConsumption ),  // Total electric consumption by compressor and condenser pump [J]
-			FanPowerIncludedInCOP( FanPowerIncludedInCOP ), // Indicates that fan heat is included in heating capacity and COP
-			CondPumpHeatInCapacity( CondPumpHeatInCapacity ), // Indicates that condenser pump heat is included in heating capacity
-			CondPumpPowerInCOP( CondPumpPowerInCOP ), // Indicates that condenser pump power is included in heating COP
-			AirVolFlowAutoSized( AirVolFlowAutoSized ), // Used to report autosizing info for the HPWH DX coil
-			WaterVolFlowAutoSized( WaterVolFlowAutoSized ), // Used to report autosizing info for the HPWH DX coil
-			TotalHeatingEnergy( TotalHeatingEnergy ),  //total water heating energy
-			TotalHeatingEnergyRate( TotalHeatingEnergyRate ) //total WH energy rate
-			//end variables for HPWH
+			InletSourceAirEnthalpy( InletSourceAirEnthalpy )
 		{}
 
 	};
@@ -916,13 +826,6 @@ namespace VariableSpeedCoils {
 		bool & ErrorsFound // set to true if problem
 	);
 
-	int
-	GetVSCoilPLFFPLR(
-		std::string const & CoilType, // must match coil types in this module
-		std::string const & CoilName, // must match coil names for the coil type
-		bool & ErrorsFound // set to true if problem
-	);
-
 	Real64
 	GetVSCoilMinOATCompressor(
 		std::string const & CoilName, // must match coil names for the coil type
@@ -1003,15 +906,6 @@ namespace VariableSpeedCoils {
 		Real64 const AirMassFlowRate, // the air mass flow rate at the given capacity [kg/s]
 		Real64 const SHR // sensible heat ratio at the given capacity and flow rate
 	);
-
-	void
-		CalcVarSpeedHPWH(
-		int const DXCoilNum, // the number of the DX coil to be simulated
-		Real64 & RuntimeFrac, // Runtime Fraction of compressor or percent on time (on-time/cycle time)
-		Real64 const PartLoadRatio, // sensible water heating load / full load sensible water heating capacity
-		Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
-		int const SpeedNum // Speed number, high bound capacity
-		);
 
 	//     NOTICE
 

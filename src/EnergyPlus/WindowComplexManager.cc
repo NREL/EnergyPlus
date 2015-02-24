@@ -66,8 +66,7 @@ namespace WindowComplexManager {
 	using DataGlobals::NumOfZones;
 	using DataGlobals::rTinyValue;
 	using DataGlobals::KelvinConv;
-	using DataGlobals::SecInHour;
-	using DataGlobals::TimeStepZone;
+	using DataGlobals::TimeStepZoneSec;
 	using namespace DataSurfaces; // , ONLY: TotSurfaces,TotWindows,Surface,SurfaceWindow   !update this later
 	using DataEnvironment::SunIsUpValue;
 	using DataEnvironment::SkyTempKelvin;
@@ -3765,7 +3764,7 @@ namespace WindowComplexManager {
 
 				SurfaceWindow( SurfNum ).ConvHeatFlowNatural = ConvHeatFlowNatural;
 				WinGapConvHtFlowRep( SurfNum ) = ConvHeatFlowNatural;
-				WinGapConvHtFlowRepEnergy( SurfNum ) = WinGapConvHtFlowRep( SurfNum ) * TimeStepZone * SecInHour;
+				WinGapConvHtFlowRepEnergy( SurfNum ) = WinGapConvHtFlowRep( SurfNum ) * TimeStepZoneSec;
 				// Window heat gain from glazing and shade/blind to zone. Consists of transmitted solar, convection
 				//   from air exiting gap, convection from zone-side of shade/blind, net IR to zone from shade and net IR to
 				//   zone from the glass adjacent to the shade/blind (zero if shade/blind IR transmittance is zero).
@@ -3805,7 +3804,7 @@ namespace WindowComplexManager {
 					ConvHeatFlowNatural = -qv( 2 ) * height * width; // qv(1) is exterior environment
 
 					WinGapConvHtFlowRep( SurfNum ) = ConvHeatFlowNatural;
-					WinGapConvHtFlowRepEnergy( SurfNum ) = WinGapConvHtFlowRep( SurfNum ) * TimeStepZone * SecInHour;
+					WinGapConvHtFlowRepEnergy( SurfNum ) = WinGapConvHtFlowRep( SurfNum ) * TimeStepZoneSec;
 				}
 			}
 
@@ -3823,7 +3822,7 @@ namespace WindowComplexManager {
 				ConvHeatFlowForced = sum( qv ); // TODO.  figure forced ventilation heat flow in Watts
 
 				WinGapConvHtFlowRep( SurfNum ) = ConvHeatFlowForced;
-				WinGapConvHtFlowRepEnergy( SurfNum ) = WinGapConvHtFlowRep( SurfNum ) * TimeStepZone * SecInHour;
+				WinGapConvHtFlowRepEnergy( SurfNum ) = WinGapConvHtFlowRep( SurfNum ) * TimeStepZoneSec;
 				// Add heat from gap airflow to zone air if destination is inside air; save the heat gain to return
 				// air in case it needs to be sent to the zone (due to no return air determined in HVAC simulation)
 				if ( SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_IndoorAir || SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_ReturnAir ) {
@@ -3871,7 +3870,7 @@ namespace WindowComplexManager {
 
 			if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn ) {
 				WinShadingAbsorbedSolar( SurfNum ) = ( SurfaceWindow( SurfNum ).ExtBeamAbsByShade + SurfaceWindow( SurfNum ).ExtDiffAbsByShade ) * ( Surface( SurfNum ).Area + SurfaceWindow( SurfNum ).DividerArea );
-				WinShadingAbsorbedSolarEnergy( SurfNum ) = WinShadingAbsorbedSolar( SurfNum ) * TimeStepZone * SecInHour;
+				WinShadingAbsorbedSolarEnergy( SurfNum ) = WinShadingAbsorbedSolar( SurfNum ) * TimeStepZoneSec;
 			}
 			if ( SunIsUp ) {
 				WinSysSolTransmittance( SurfNum ) = WinTransSolar( SurfNum ) / ( QRadSWOutIncident( SurfNum ) * ( Surface( SurfNum ).Area + SurfaceWindow( SurfNum ).DividerArea ) + 0.0001 );

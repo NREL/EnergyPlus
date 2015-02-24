@@ -839,7 +839,7 @@ namespace PlantHeatExchangerFluidToFluid {
 					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, "Loop-to-loop Temperature Difference Used to Size Heat Exchanger U-Factor Times Area Value [C]", tmpDeltaTloopToLoop );
 				}
 			} else {
-				ShowSevereError( "SizeFluidHeatExchanger: Autosizing of heat " "Exchanger UA requires a loop Sizing:Plant objects for both loops" );
+				ShowSevereError( "SizeFluidHeatExchanger: Autosizing of heat Exchanger UA requires a loop Sizing:Plant objects for both loops" );
 				ShowContinueError( "Occurs in heat exchanger object=" + FluidHX( CompNum ).Name );
 				ErrorsFound = true;
 			}
@@ -1716,7 +1716,7 @@ namespace PlantHeatExchangerFluidToFluid {
 	Real64
 	HXDemandSideLoopFlowResidual(
 		Real64 const DmdSideMassFlowRate,
-		Optional< FArray1S< Real64 > const > Par // Par(1) = HX index number
+		FArray1< Real64 > const & Par // Par(1) = HX index number
 	)
 	{
 
@@ -1763,14 +1763,14 @@ namespace PlantHeatExchangerFluidToFluid {
 		Real64 SupSideMdot; // mass flow rate of fluid entering from supply side loop
 
 		MdotTrial = DmdSideMassFlowRate;
-		CompNum = int( Par()( 1 ) );
+		CompNum = int( Par( 1 ) );
 		SupSideMdot = Node( FluidHX( CompNum ).SupplySideLoop.InletNodeNum ).MassFlowRate;
 
 		CalcFluidHeatExchanger( CompNum, SupSideMdot, MdotTrial );
 
 		SupSideLoopOutletTemp = FluidHX( CompNum ).SupplySideLoop.OutletTemp;
 
-		Residuum = Par()( 2 ) - SupSideLoopOutletTemp;
+		Residuum = Par( 2 ) - SupSideLoopOutletTemp;
 
 		return Residuum;
 

@@ -348,7 +348,7 @@ public: // Assignment: Array
 		assert( conformable( a ) );
 		if ( a.dimensions_initialized() ) {
 			for ( int i = 1; i <= u_; ++i ) {
-				assert( T( a( i ) ) != T( 0 ) );
+				assert( a( i ) != T( 0 ) );
 				operator ()( i ) /= a( i );
 			}
 		}
@@ -496,7 +496,7 @@ public: // Assignment: Array
 	{
 		assert( conformable( a ) );
 		for ( int i = 1, j = a.l(); i <= u_; ++i, ++j ) {
-			assert( T( a( j ) ) != T( 0 ) );
+			assert( a( j ) != T( 0 ) );
 			operator ()( i ) /= a( j );
 		}
 		return *this;

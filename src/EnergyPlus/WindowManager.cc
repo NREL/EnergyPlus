@@ -9,11 +9,13 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <WindowManager.hh>
 #include <ConvectionCoefficients.hh>
 #include <DataBSDFWindow.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
+#include <DataStringGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalSurface.hh>
@@ -2579,14 +2581,14 @@ namespace WindowManager {
 		Tsout = SurfOutsideTemp + TKelvin;
 		QdotConvOutRep( SurfNum ) = -surface.Area * hcout * ( Tsout - tout );
 		QdotConvOutRepPerArea( SurfNum ) = -hcout * ( Tsout - tout );
-		QConvOutReport( SurfNum ) = QdotConvOutRep( SurfNum ) * SecInHour * TimeStepZone;
+		QConvOutReport( SurfNum ) = QdotConvOutRep( SurfNum ) * TimeStepZoneSec;
 
 		Real64 const Tsout_4( pow_4( Tsout ) ); //Tuned To reduce pow calls and redundancies
 		Real64 const rad_out_per_area( -SurfOutsideEmiss * sigma * ( ( ( ( 1.0 - AirSkyRadSplit( SurfNum ) ) * surface.ViewFactorSkyIR + surface.ViewFactorGroundIR ) * ( Tsout_4 - pow_4( tout ) ) ) + ( AirSkyRadSplit( SurfNum ) * surface.ViewFactorSkyIR * ( Tsout_4 - pow_4( SkyTempKelvin ) ) ) ) );
 		QdotRadOutRep( SurfNum ) = surface.Area * rad_out_per_area;
 		QdotRadOutRepPerArea( SurfNum ) = rad_out_per_area;
 
-		QRadOutReport( SurfNum ) = QdotRadOutRep( SurfNum ) * SecInHour * TimeStepZone;
+		QRadOutReport( SurfNum ) = QdotRadOutRep( SurfNum ) * TimeStepZoneSec;
 
 	}
 
@@ -2925,7 +2927,7 @@ namespace WindowManager {
 				hr( i ) = emis( i ) * sigma * pow_3( thetas( i ) );
 				// Following line is redundant since thetas is being relaxed;
 				// removed by FCW, 3/4/03
-				//!fw if(iter >= 1) hr(i) = 0.5*(hrprev(i)+hr(i))
+				//!fw if ( iter >= 1 ) hr(i) = 0.5*(hrprev(i)+hr(i))
 				hrprev( i ) = hr( i );
 			}
 
@@ -3411,7 +3413,7 @@ namespace WindowManager {
 			SurfaceWindow( SurfNum ).TAirflowGapOutlet = TAirflowGapOutletC;
 			if ( SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 ) {
 				WinGapConvHtFlowRep( SurfNum ) = ConvHeatFlowForced;
-				WinGapConvHtFlowRepEnergy( SurfNum ) = WinGapConvHtFlowRep( SurfNum ) * TimeStepZone * SecInHour;
+				WinGapConvHtFlowRepEnergy( SurfNum ) = WinGapConvHtFlowRep( SurfNum ) * TimeStepZoneSec;
 				// Add heat from gap airflow to zone air if destination is inside air; save the heat gain to return
 				// air in case it needs to be sent to the zone (due to no return air determined in HVAC simulation)
 				if ( SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_IndoorAir || SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_ReturnAir ) {
@@ -3460,7 +3462,7 @@ namespace WindowManager {
 
 			if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn ) {
 				WinShadingAbsorbedSolar( SurfNum ) = ( SurfaceWindow( SurfNum ).ExtBeamAbsByShade + SurfaceWindow( SurfNum ).ExtDiffAbsByShade ) * ( Surface( SurfNum ).Area + SurfaceWindow( SurfNum ).DividerArea );
-				WinShadingAbsorbedSolarEnergy( SurfNum ) = WinShadingAbsorbedSolar( SurfNum ) * TimeStepZone * SecInHour;
+				WinShadingAbsorbedSolarEnergy( SurfNum ) = WinShadingAbsorbedSolar( SurfNum ) * TimeStepZoneSec;
 			}
 			if ( SunIsUp ) {
 				WinSysSolTransmittance( SurfNum ) = WinTransSolar( SurfNum ) / ( QRadSWOutIncident( SurfNum ) * ( Surface( SurfNum ).Area + SurfaceWindow( SurfNum ).DividerArea ) + 0.0001 );
@@ -6791,7 +6793,7 @@ namespace WindowManager {
 		while ( iter < MaxIterations && errtemp > errtemptol ) {
 			for ( i = 1; i <= nglface; ++i ) {
 				hr( i ) = emis( i ) * sigma * pow_3( thetas( i ) );
-				//!fw 3/4/03 if(iter >= 1) hr(i) = 0.5*(hrprev(i)+hr(i))
+				//!fw 3/4/03 if ( iter >= 1 ) hr(i) = 0.5*(hrprev(i)+hr(i))
 				hrprev( i ) = hr( i );
 			}
 
@@ -7702,7 +7704,7 @@ namespace WindowManager {
 
 		if ( PrintTransMap ) {
 			ScreenTransUnitNo = GetNewUnitNumber();
-			{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "unknown" ); gio::open( ScreenTransUnitNo, "eplusscreen.csv", flags ); if ( flags.err() ) goto Label99999; }
+			{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "unknown" ); gio::open( ScreenTransUnitNo, DataStringGlobals::outputScreenCsvFileName, flags ); if ( flags.err() ) goto Label99999; }
 			//  WRITE(ScreenTransUnitNo,*)' '
 			for ( ScreenNum = 1; ScreenNum <= NumSurfaceScreens; ++ScreenNum ) {
 				MatNum = SurfaceScreens( ScreenNum ).MaterialNumber;

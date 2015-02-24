@@ -162,7 +162,7 @@ namespace MundtSimMgr {
 			// setup Mundt model
 			ErrorsFound = false;
 			SetupMundtModel( ZoneNum, ErrorsFound );
-			if ( ErrorsFound ) ShowFatalError( "ManageMundtModel: Errors in setting up Mundt Model. " "Preceding condition(s) cause termination." );
+			if ( ErrorsFound ) ShowFatalError( "ManageMundtModel: Errors in setting up Mundt Model. Preceding condition(s) cause termination." );
 
 			// perform Mundt model calculations
 			CalcMundtModel( ZoneNum );
@@ -951,7 +951,7 @@ namespace MundtSimMgr {
 
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

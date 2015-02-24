@@ -239,19 +239,22 @@ TEST( FArray1Test, ConstructionInitializerFunction )
 
 TEST( FArray1Test, ConstructionIndexRange )
 {
-	FArray1D_int r( SRange( 1, 5 ), 33 );
+	typedef  StaticIndexRange  SR;
+	typedef  DynamicIndexRange  DR;
+
+	FArray1D_int r( SR( 1, 5 ), 33 );
 	EXPECT_EQ( 1, r.l() );
 	EXPECT_EQ( 5, r.u() );
 	for ( int i = 1; i <= 5; ++i ) {
 		EXPECT_EQ( 33, r( i ) );
 		EXPECT_EQ( 33, r[ i - 1 ] );
 	}
-	FArray1P_int p( r, SRange( 1, 4 ) );
+	FArray1P_int p( r, SR( 1, 4 ) );
 	EXPECT_EQ( 1, p.l() );
 	EXPECT_EQ( 4, p.u() );
 	EXPECT_EQ( 33, p[ 0 ] );
 	EXPECT_EQ( 33, p[ 3 ] );
-	FArray1A_int a( r, DRange( 1, 3 ) );
+	FArray1A_int a( r, DR( 1, 3 ) );
 	EXPECT_EQ( 1, a.l() );
 	EXPECT_EQ( 3, a.u() );
 	EXPECT_EQ( 33, a[ 0 ] );
@@ -356,7 +359,8 @@ TEST( FArray1Test, ConstructionFstringMakeStickyInitializerList )
 
 TEST( FArray1Test, ConstructionIndexRangeInitializerList )
 {
-	FArray1D_int r( SRange( -1, 1 ), { 1, 2, 3 } );
+	typedef  StaticIndexRange  SR;
+	FArray1D_int r( SR( -1, 1 ), { 1, 2, 3 } );
 	EXPECT_EQ( -1, r.l() );
 	EXPECT_EQ( 1, r.u() );
 	for ( int i = -1; i <= 1; ++i ) {
@@ -913,11 +917,12 @@ TEST( FArray1Test, Redimension )
 
 TEST( FArray1Test, Swap )
 {
+	typedef  DynamicIndexRange  DR;
 	FArray1D_int A( 4, 11 );
 	FArray1P_int P( A );
 	EXPECT_TRUE( eq( A, P ) );
 	FArray1D_int( 5, 22 ).swap( A );
-	EXPECT_EQ( DRange( 1, 5 ), A.I() );
+	EXPECT_EQ( DR( 1, 5 ), A.I() );
 	EXPECT_EQ( 5u, A.size() );
 	for ( int i = A.l(); i <= A.u(); ++i ) {
 		EXPECT_EQ( 22, A( i ) );
@@ -1068,7 +1073,7 @@ TEST( FArray1FunctionsTest, Count )
 TEST( FArray1FunctionsTest, IsContiguous )
 {
 	FArray1D_double A;
-	EXPECT_TRUE( is_contiguous( A ) );
+	EXPECT_TRUE( contiguous( A ) );
 }
 
 TEST( FArray1FunctionsTest, LUBound )

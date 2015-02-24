@@ -933,7 +933,7 @@ namespace NodeInputManager {
 				Found = FindItemInList( NodeID( CheckNumber ), UniqueNodeNames, NumCheckNodes );
 				if ( Found != 0 ) {
 					ShowSevereError( CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found." );
-					ShowContinueError( "...for Node Type(s)=" + NodeTypes + ", duplicate node name=\"" + CheckName + "\"." );
+					ShowContinueError( "...for Node Type(s)=" + NodeTypes + ", duplicate node name=\"" + NodeID( CheckNumber ) + "\"." );
 					ShowContinueError( "...Nodes must be unique across instances of this object." );
 					//          CALL ShowSevereError('Node Types='//TRIM(NodeTypes)//', Non Unique Name found='//TRIM(NodeID(CheckNumber)))
 					//          CALL ShowContinueError('Context='//TRIM(CurCheckContextName))
@@ -1109,16 +1109,14 @@ namespace NodeInputManager {
 				nodeReportingStrings.push_back( std::string( NodeReportingCalc + NodeID( iNode ) ) );
 				nodeFluidNames.push_back( GetGlycolNameByIndex( Node( iNode ).FluidIndex ) );
 				for ( iReq = 1; iReq <= NumOfReqVariables; ++iReq ) {
-					if( SameString( ReqRepVars( iReq ).Key, NodeID( iNode ) ) || ReqRepVars( iReq ).Key.empty() ) {
-						if( SameString( ReqRepVars( iReq ).VarName, "System Node Wetbulb Temperature" ) ) {
+					if ( SameString( ReqRepVars( iReq ).Key, NodeID( iNode ) ) || ReqRepVars( iReq ).Key.empty() ) {
+						if ( SameString( ReqRepVars( iReq ).VarName, "System Node Wetbulb Temperature" ) ) {
 							NodeWetBulbRepReq( iNode ) = true;
 							NodeWetBulbSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
-						}
-						else if( SameString( ReqRepVars( iReq ).VarName, "System Node Relative Humidity" ) ) {
+						} else if ( SameString( ReqRepVars( iReq ).VarName, "System Node Relative Humidity" ) ) {
 							NodeRelHumidityRepReq( iNode ) = true;
 							NodeRelHumiditySchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
-						}
-						else if( SameString( ReqRepVars( iReq ).VarName, "System Node Dewpoint Temperature" ) ) {
+						} else if ( SameString( ReqRepVars( iReq ).VarName, "System Node Dewpoint Temperature" ) ) {
 							NodeDewPointRepReq( iNode ) = true;
 							NodeDewPointSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
 						}
