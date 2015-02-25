@@ -3,8 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -66,6 +64,7 @@ namespace ChillerReformulatedEIR {
 		std::string EIRFTName; // EIRFT curve name
 		std::string EIRFPLRName; // EIRPLR curve name
 		int CondenserType; // Type of Condenser. Water Cooled is the only available option for now
+		int PartLoadCurveType; 	// Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift //zrp
 		Real64 RefCap; // Reference capacity of the chiller [W]
 		Real64 RefCOP; // Reference coefficient of performance [W/W]
 		int FlowMode; // one of 3 modes for componet flow during operation
@@ -126,6 +125,10 @@ namespace ChillerReformulatedEIR {
 		Real64 ChillerEIRFPLRTempMax; // Maximum value of EIRFPLR curve condenser outlet temperature [C]
 		Real64 ChillerEIRFPLRPLRMin; // Minimum value of EIRFPLR curve part-load ratio
 		Real64 ChillerEIRFPLRPLRMax; // Maximum value of EIRFPLR curve part-load ratio
+		Real64 ChillerLiftNomMin;	 // Minimum value of EIRFPLR curve Normalized Chiller lift 
+		Real64 ChillerLiftNomMax;	 // Maximum value of EIRFPLR curve Normalized Chiller lift 
+		Real64 ChillerTdevNomMin;	 // Minimum value of EIRFPLR curve Normalized Tdev
+		Real64 ChillerTdevNomMax;	 // Maximum value of EIRFPLR curve Normalized Tdev
 		int CAPFTXIter; // Iteration counter for evaporator outlet temperature CAPFT warning messages
 		int CAPFTXIterIndex; // Index for evaporator outlet temperature CAPFT warning messages
 		int CAPFTYIter; // Iteration counter for condenser outlet temperature CAPFT warning messages
@@ -170,6 +173,7 @@ namespace ChillerReformulatedEIR {
 		ReformulatedEIRChillerSpecs() :
 			TypeNum( 0 ),
 			CondenserType( 0 ),
+			PartLoadCurveType( 0 ),
 			RefCap( 0.0 ),
 			RefCOP( 0.0 ),
 			FlowMode( FlowModeNotSet ),
@@ -223,6 +227,10 @@ namespace ChillerReformulatedEIR {
 			ChillerEIRFPLRTempMax( 0.0 ),
 			ChillerEIRFPLRPLRMin( 0.0 ),
 			ChillerEIRFPLRPLRMax( 0.0 ),
+			ChillerLiftNomMin( 0.0 ), //zrp_Aug2014 
+			ChillerLiftNomMax( 10.0 ),
+			ChillerTdevNomMin( 0.0 ),
+			ChillerTdevNomMax( 10.0 ),
 			CAPFTXIter( 0 ),
 			CAPFTXIterIndex( 0 ),
 			CAPFTYIter( 0 ),
@@ -266,6 +274,7 @@ namespace ChillerReformulatedEIR {
 			std::string const & EIRFTName, // EIRFT curve name
 			std::string const & EIRFPLRName, // EIRPLR curve name
 			int const CondenserType, // Type of Condenser. Water Cooled is the only available option for now
+			int const PartLoadCurveType, // Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift
 			Real64 const RefCap, // Reference capacity of the chiller [W]
 			Real64 const RefCOP, // Reference coefficient of performance [W/W]
 			int const FlowMode, // one of 3 modes for componet flow during operation
@@ -319,6 +328,10 @@ namespace ChillerReformulatedEIR {
 			Real64 const ChillerEIRFPLRTempMax, // Maximum value of EIRFPLR curve condenser outlet temperature [C]
 			Real64 const ChillerEIRFPLRPLRMin, // Minimum value of EIRFPLR curve part-load ratio
 			Real64 const ChillerEIRFPLRPLRMax, // Maximum value of EIRFPLR curve part-load ratio
+			Real64 const ChillerLiftNomMin,	 // Minimum value of EIRFPLR curve Normalized Chiller lift 
+			Real64 const ChillerLiftNomMax,	 // Maximum value of EIRFPLR curve Normalized Chiller lift 
+			Real64 const ChillerTdevNomMin,	 // Minimum value of EIRFPLR curve Normalized Tdev
+			Real64 const ChillerTdevNomMax,	 // Maximum value of EIRFPLR curve Normalized Tdev
 			int const CAPFTXIter, // Iteration counter for evaporator outlet temperature CAPFT warning messages
 			int const CAPFTXIterIndex, // Index for evaporator outlet temperature CAPFT warning messages
 			int const CAPFTYIter, // Iteration counter for condenser outlet temperature CAPFT warning messages
@@ -359,6 +372,7 @@ namespace ChillerReformulatedEIR {
 			EIRFTName( EIRFTName ),
 			EIRFPLRName( EIRFPLRName ),
 			CondenserType( CondenserType ),
+			PartLoadCurveType( PartLoadCurveType ),
 			RefCap( RefCap ),
 			RefCOP( RefCOP ),
 			FlowMode( FlowMode ),
@@ -412,6 +426,10 @@ namespace ChillerReformulatedEIR {
 			ChillerEIRFPLRTempMax( ChillerEIRFPLRTempMax ),
 			ChillerEIRFPLRPLRMin( ChillerEIRFPLRPLRMin ),
 			ChillerEIRFPLRPLRMax( ChillerEIRFPLRPLRMax ),
+			ChillerLiftNomMin( ChillerLiftNomMin ), //zrp_Aug2014
+			ChillerLiftNomMax( ChillerLiftNomMax ),
+			ChillerTdevNomMin( ChillerTdevNomMin ),
+			ChillerTdevNomMax( ChillerTdevNomMax ),
 			CAPFTXIter( CAPFTXIter ),
 			CAPFTXIterIndex( CAPFTXIterIndex ),
 			CAPFTYIter( CAPFTYIter ),
@@ -640,7 +658,7 @@ namespace ChillerReformulatedEIR {
 	Real64
 	CondOutTempResidual(
 		Real64 const FalsiCondOutTemp, // RegulaFalsi condenser outlet temperature result [C]
-		Optional< FArray1S< Real64 > const > Par = _ // Parameter array used to interface with RegulaFalsi solver
+		FArray1< Real64 > const & Par // Parameter array used to interface with RegulaFalsi solver
 	);
 
 	void

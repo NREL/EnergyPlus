@@ -75,7 +75,7 @@ LD( FArray< T > const & a )
 	std::string s;
 	std::size_t const n( a.size() );
 	if ( n > 0u ) {
-		s.reserve( n * TypeTraits< T >::width() );
+		s.reserve( n * TypeTraits< T >::width );
 		for ( std::size_t i = 0; i < n; ++i ) {
 			s.append( fmt::LD( a[ i ] ) );
 		}

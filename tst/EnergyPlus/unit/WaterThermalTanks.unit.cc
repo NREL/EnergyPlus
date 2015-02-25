@@ -8,11 +8,6 @@
 
 using namespace EnergyPlus;
 
-bool FloatEqualTest(Real64 val1, Real64 val2, Real64 SmallNum = 0.00000001) {
-	using namespace std;
-	return ( abs(val1 - val2) < SmallNum );
-}
-
 TEST( HeatPumpWaterHeaterTests, TestQsourceCalcs )
 {
 	Real64 DeltaT = 0.0;

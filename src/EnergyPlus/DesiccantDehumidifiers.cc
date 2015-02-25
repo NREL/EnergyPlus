@@ -2741,7 +2741,7 @@ namespace DesiccantDehumidifiers {
 	Real64
 	HotWaterCoilResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		Optional< FArray1S< Real64 > const > Par // Par(5) is the requested coil load
+		FArray1< Real64 > const & Par // Par(5) is the requested coil load
 	)
 	{
 
@@ -2788,13 +2788,9 @@ namespace DesiccantDehumidifiers {
 		Real64 RegenCoilHeatLoad; // requested coild load, W
 		Real64 mdot;
 
-		DesicDehumNum = int( Par()( 1 ) );
-		if ( Par()( 2 ) > 0.0 ) {
-			FirstHVACSoln = true;
-		} else {
-			FirstHVACSoln = false;
-		}
-		RegenCoilHeatLoad = Par()( 3 );
+		DesicDehumNum = int( Par( 1 ) );
+		FirstHVACSoln = ( Par( 2 ) > 0.0 );
+		RegenCoilHeatLoad = Par( 3 );
 		RegenCoilActual = RegenCoilHeatLoad;
 		mdot = HWFlow;
 		SetComponentFlowRate( mdot, DesicDehum( DesicDehumNum ).CoilControlNode, DesicDehum( DesicDehumNum ).CoilOutletNode, DesicDehum( DesicDehumNum ).LoopNum, DesicDehum( DesicDehumNum ).LoopSide, DesicDehum( DesicDehumNum ).BranchNum, DesicDehum( DesicDehumNum ).CompNum );

@@ -3746,7 +3746,7 @@ namespace SingleDuct {
 	Real64
 	VAVVSCoolingResidual(
 		Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
-		Optional< FArray1S< Real64 > const > Par // Par(1) = REAL(SysNum)
+		FArray1< Real64 > const & Par // Par(1) = REAL(SysNum)
 	)
 	{
 
@@ -3803,20 +3803,16 @@ namespace SingleDuct {
 		int FanOp; // fan operation; 0=off, 1=on.
 		Real64 UnitOutput; // cooling output [W] (cooling is negative)
 
-		UnitIndex = int( Par()( 1 ) );
-		if ( Par()( 2 ) > 0.0 ) {
-			FirstHVACSoln = true;
-		} else {
-			FirstHVACSoln = false;
-		}
-		ZoneNodeIndex = int( Par()( 3 ) );
-		HCType = int( Par()( 4 ) );
-		MinHWFlow = Par()( 5 );
-		FanType = int( Par()( 6 ) );
-		FanOp = int( Par()( 7 ) );
+		UnitIndex = int( Par( 1 ) );
+		FirstHVACSoln = ( Par( 2 ) > 0.0 );
+		ZoneNodeIndex = int( Par( 3 ) );
+		HCType = int( Par( 4 ) );
+		MinHWFlow = Par( 5 );
+		FanType = int( Par( 6 ) );
+		FanOp = int( Par( 7 ) );
 		CalcVAVVS( UnitIndex, FirstHVACSoln, ZoneNodeIndex, HCType, MinHWFlow, 0.0, FanType, SupplyAirMassFlow, FanOp, UnitOutput );
 
-		Residuum = ( Par()( 8 ) - UnitOutput ) / Par()( 8 );
+		Residuum = ( Par( 8 ) - UnitOutput ) / Par( 8 );
 
 		return Residuum;
 	}
@@ -3824,7 +3820,7 @@ namespace SingleDuct {
 	Real64
 	VAVVSHWNoFanResidual(
 		Real64 const HWMassFlow, // hot water mass flow rate [kg/s]
-		Optional< FArray1S< Real64 > const > Par // Par(1) = REAL(SysNum)
+		FArray1< Real64 > const & Par // Par(1) = REAL(SysNum)
 	)
 	{
 
@@ -3887,33 +3883,29 @@ namespace SingleDuct {
 		Real64 MaxSteamFlow;
 		Real64 MaxSteamCoilCapacity;
 
-		UnitIndex = int( Par()( 1 ) );
-		if ( Par()( 2 ) > 0.0 ) {
-			FirstHVACSoln = true;
-		} else {
-			FirstHVACSoln = false;
-		}
-		ZoneNodeIndex = int( Par()( 3 ) );
-		HCType = int( Par()( 4 ) );
-		AirMassFlow = Par()( 5 );
-		FanType = int( Par()( 6 ) );
-		FanOp = int( Par()( 7 ) );
+		UnitIndex = int( Par( 1 ) );
+		FirstHVACSoln = ( Par( 2 ) > 0.0 );
+		ZoneNodeIndex = int( Par( 3 ) );
+		HCType = int( Par( 4 ) );
+		AirMassFlow = Par( 5 );
+		FanType = int( Par( 6 ) );
+		FanOp = int( Par( 7 ) );
 		QSteamLoad = 0.0;
 		// vary the load to be met by the steam coil to converge on a steam flow rate to meet the load
 		if ( HCType == HCoilType_SteamAirHeating ) {
 			//   backwards way of varying steam flow rate. Steam coil calculates a flow rate to meet a load.
-			MinSteamFlow = Par()( 9 );
-			MaxSteamFlow = Par()( 10 );
-			MaxSteamCoilCapacity = Par()( 11 );
+			MinSteamFlow = Par( 9 );
+			MaxSteamFlow = Par( 10 );
+			MaxSteamCoilCapacity = Par( 11 );
 			if ( ( MaxSteamFlow - MinSteamFlow ) == 0.0 ) {
-				QSteamLoad = Par()( 8 ); // Use QTotLoad, bad starting value error for RegulaFalsi will occur
+				QSteamLoad = Par( 8 ); // Use QTotLoad, bad starting value error for RegulaFalsi will occur
 			} else {
 				QSteamLoad = MaxSteamCoilCapacity * HWMassFlow / ( MaxSteamFlow - MinSteamFlow );
 			}
 		}
 		CalcVAVVS( UnitIndex, FirstHVACSoln, ZoneNodeIndex, HCType, HWMassFlow, QSteamLoad, FanType, AirMassFlow, FanOp, UnitOutput );
 
-		Residuum = ( Par()( 8 ) - UnitOutput ) / Par()( 8 );
+		Residuum = ( Par( 8 ) - UnitOutput ) / Par( 8 );
 
 		return Residuum;
 	}
@@ -3921,7 +3913,7 @@ namespace SingleDuct {
 	Real64
 	VAVVSHWFanOnResidual(
 		Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
-		Optional< FArray1S< Real64 > const > Par // Par(1) = REAL(SysNum)
+		FArray1< Real64 > const & Par // Par(1) = REAL(SysNum)
 	)
 	{
 
@@ -3978,20 +3970,16 @@ namespace SingleDuct {
 		int FanOp; // fan operation; 0=off, 1=on.
 		Real64 UnitOutput; // heating output [W]
 
-		UnitIndex = int( Par()( 1 ) );
-		if ( Par()( 2 ) > 0.0 ) {
-			FirstHVACSoln = true;
-		} else {
-			FirstHVACSoln = false;
-		}
-		ZoneNodeIndex = int( Par()( 3 ) );
-		HCType = int( Par()( 4 ) );
-		HWMassFlow = Par()( 5 );
-		FanType = int( Par()( 6 ) );
-		FanOp = int( Par()( 7 ) );
-		CalcVAVVS( UnitIndex, FirstHVACSoln, ZoneNodeIndex, HCType, HWMassFlow, Par()( 8 ), FanType, SupplyAirMassFlow, FanOp, UnitOutput );
+		UnitIndex = int( Par( 1 ) );
+		FirstHVACSoln = ( Par( 2 ) > 0.0 );
+		ZoneNodeIndex = int( Par( 3 ) );
+		HCType = int( Par( 4 ) );
+		HWMassFlow = Par( 5 );
+		FanType = int( Par( 6 ) );
+		FanOp = int( Par( 7 ) );
+		CalcVAVVS( UnitIndex, FirstHVACSoln, ZoneNodeIndex, HCType, HWMassFlow, Par( 8 ), FanType, SupplyAirMassFlow, FanOp, UnitOutput );
 
-		Residuum = ( Par()( 8 ) - UnitOutput ) / Par()( 8 );
+		Residuum = ( Par( 8 ) - UnitOutput ) / Par( 8 );
 
 		return Residuum;
 	}
@@ -3999,7 +3987,7 @@ namespace SingleDuct {
 	Real64
 	VAVVSHCFanOnResidual(
 		Real64 const HeatingFrac, // fraction of maximum heating output
-		Optional< FArray1S< Real64 > const > Par // Par(1) = REAL(SysNum)
+		FArray1< Real64 > const & Par // Par(1) = REAL(SysNum)
 	)
 	{
 
@@ -4058,23 +4046,19 @@ namespace SingleDuct {
 		Real64 AirMassFlowRate; // [kg/s]
 		Real64 HeatOut; // heating coil output [W]
 
-		UnitIndex = int( Par()( 1 ) );
-		if ( Par()( 2 ) > 0.0 ) {
-			FirstHVACSoln = true;
-		} else {
-			FirstHVACSoln = false;
-		}
-		ZoneNodeIndex = int( Par()( 3 ) );
-		HCType = int( Par()( 4 ) );
-		MaxHeatOut = Par()( 5 );
-		FanType = int( Par()( 6 ) );
-		FanOp = int( Par()( 7 ) );
+		UnitIndex = int( Par( 1 ) );
+		FirstHVACSoln = ( Par( 2 ) > 0.0 );
+		ZoneNodeIndex = int( Par( 3 ) );
+		HCType = int( Par( 4 ) );
+		MaxHeatOut = Par( 5 );
+		FanType = int( Par( 6 ) );
+		FanOp = int( Par( 7 ) );
 		HeatOut = HeatingFrac * MaxHeatOut;
 		AirMassFlowRate = max( HeatingFrac * Sys( UnitIndex ).HeatAirMassFlowRateMax, SysInlet( UnitIndex ).AirMassFlowRateMaxAvail * Sys( UnitIndex ).ZoneMinAirFrac );
 
 		CalcVAVVS( UnitIndex, FirstHVACSoln, ZoneNodeIndex, HCType, 0.0, HeatOut, FanType, AirMassFlowRate, FanOp, UnitOutput );
 
-		Residuum = ( Par()( 8 ) - UnitOutput ) / Par()( 8 );
+		Residuum = ( Par( 8 ) - UnitOutput ) / Par( 8 );
 
 		return Residuum;
 	}

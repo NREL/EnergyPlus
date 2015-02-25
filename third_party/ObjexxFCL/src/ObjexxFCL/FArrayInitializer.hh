@@ -196,6 +196,18 @@ public: // Modifier
 		}
 	}
 
+	// Swap
+	inline
+	void
+	swap( FArrayInitializer & o )
+	{
+		using std::swap;
+		swap( state_, o.state_ );
+		swap( sticky_, o.sticky_ );
+		swap( value_, o.value_ );
+		swap( function_, o.function_ );
+	}
+
 private: // Data
 
 	State state_; // State
@@ -204,6 +216,15 @@ private: // Data
 	Function function_; // Function
 
 }; // FArrayInitializer
+
+// Swap
+template< typename T, template< typename > class Array >
+inline
+void
+swap( FArrayInitializer< T, Array > & a, FArrayInitializer< T, Array > & b )
+{
+	a.swap( b );
+}
 
 } // ObjexxFCL
 

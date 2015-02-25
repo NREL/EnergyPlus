@@ -773,15 +773,15 @@ namespace GroundHeatExchangers {
 			//   Not many checks
 			if ( VerticalGlhe( GlheNum ).PipeThick >= VerticalGlhe( GlheNum ).PipeOutDia / 2.0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + VerticalGlhe( GlheNum ).Name + "\", invalid value in field." );
-				ShowContinueError( "..." + cNumericFieldNames( 13 ) + "=[" + RoundSigDigits( VerticalGlhe( GlheNum ).PipeThick, 3 ) + "]." );
-				ShowContinueError( "..." + cNumericFieldNames( 11 ) + "=[" + RoundSigDigits( VerticalGlhe( GlheNum ).PipeOutDia, 3 ) + "]." );
+				ShowContinueError( "..." + cNumericFieldNames( 12 ) + "=[" + RoundSigDigits( VerticalGlhe( GlheNum ).PipeThick, 3 ) + "]." );
+				ShowContinueError( "..." + cNumericFieldNames( 10 ) + "=[" + RoundSigDigits( VerticalGlhe( GlheNum ).PipeOutDia, 3 ) + "]." );
 				ShowContinueError( "...Radius will be <=0." );
 				ErrorsFound = true;
 			}
 
 			if ( VerticalGlhe( GlheNum ).MaxSimYears < MaxNumberSimYears ) {
 				ShowWarningError( cCurrentModuleObject + "=\"" + VerticalGlhe( GlheNum ).Name + "\", invalid value in field." );
-				ShowContinueError( "..." + cNumericFieldNames( 14 ) + " less than RunPeriod Request" );
+				ShowContinueError( "..." + cNumericFieldNames( 13 ) + " less than RunPeriod Request" );
 				ShowContinueError( "Requested input=" + TrimSigDigits( VerticalGlhe( GlheNum ).MaxSimYears ) + " will be set to " + TrimSigDigits( MaxNumberSimYears ) );
 				VerticalGlhe( GlheNum ).MaxSimYears = MaxNumberSimYears;
 			}
@@ -792,18 +792,12 @@ namespace GroundHeatExchangers {
 			VerticalGlhe( GlheNum ).AGG = 192;
 
 			// Allocation of all the dynamic arrays
-			VerticalGlhe( GlheNum ).LNTTS.allocate( VerticalGlhe( GlheNum ).NPairs );
-			VerticalGlhe( GlheNum ).LNTTS = 0.0;
-			VerticalGlhe( GlheNum ).GFNC.allocate( VerticalGlhe( GlheNum ).NPairs );
-			VerticalGlhe( GlheNum ).GFNC = 0.0;
-			VerticalGlhe( GlheNum ).QnMonthlyAgg.allocate( VerticalGlhe( GlheNum ).MaxSimYears * 12 );
-			VerticalGlhe( GlheNum ).QnMonthlyAgg = 0.0;
-			VerticalGlhe( GlheNum ).QnHr.allocate( 730 + VerticalGlhe( GlheNum ).AGG + VerticalGlhe( GlheNum ).SubAGG );
-			VerticalGlhe( GlheNum ).QnHr = 0.0;
-			VerticalGlhe( GlheNum ).QnSubHr.allocate( ( VerticalGlhe( GlheNum ).SubAGG + 1 ) * MaxTSinHr + 1 );
-			VerticalGlhe( GlheNum ).QnSubHr = 0.0;
-			VerticalGlhe( GlheNum ).LastHourN.allocate( VerticalGlhe( GlheNum ).SubAGG + 1 );
-			VerticalGlhe( GlheNum ).LastHourN = 0;
+			VerticalGlhe( GlheNum ).LNTTS.dimension( VerticalGlhe( GlheNum ).NPairs, 0.0 );
+			VerticalGlhe( GlheNum ).GFNC.dimension( VerticalGlhe( GlheNum ).NPairs, 0.0 );
+			VerticalGlhe( GlheNum ).QnMonthlyAgg.dimension( VerticalGlhe( GlheNum ).MaxSimYears * 12, 0.0 );
+			VerticalGlhe( GlheNum ).QnHr.dimension( 730 + VerticalGlhe( GlheNum ).AGG + VerticalGlhe( GlheNum ).SubAGG, 0.0 );
+			VerticalGlhe( GlheNum ).QnSubHr.dimension( ( VerticalGlhe( GlheNum ).SubAGG + 1 ) * MaxTSinHr + 1, 0.0 );
+			VerticalGlhe( GlheNum ).LastHourN.dimension( VerticalGlhe( GlheNum ).SubAGG + 1, 0 );
 
 			if ( ! Allocated ) {
 				PrevTimeSteps.allocate( ( VerticalGlhe( GlheNum ).SubAGG + 1 ) * MaxTSinHr + 1 );

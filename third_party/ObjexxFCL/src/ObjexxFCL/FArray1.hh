@@ -37,9 +37,6 @@ class FArray1 : public FArray< T >
 private: // Types
 
 	typedef  FArray< T >  Super;
-	typedef  FArray1D< T >  real_FArray;
-	typedef  FArray1P< T >  proxy_FArray;
-	typedef  FArray1A< T >  arg_FArray;
 
 private: // Friend
 
@@ -90,6 +87,7 @@ public: // Types
 	using Super::data_size_;
 	using Super::sdata_;
 	using Super::shift_;
+	using Super::size_;
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
 	using Super::not_const_proxy;
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
@@ -499,7 +497,7 @@ public: // Assignment: Array
 		if ( overlap( a ) ) { // Overlap-safe
 			CArray< T > c( a.size() );
 			for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-				assert( T( a( i ) ) != T( 0 ) );
+				assert( a( i ) != T( 0 ) );
 				c[ l ] = a( i );
 			}
 			for ( size_type i = 0; i < c.size(); ++i ) {
@@ -565,7 +563,7 @@ public: // Assignment: Array
 		assert( conformable( a ) );
 		size_type l( 0 );
 		for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-			assert( T( a( i ) ) != T( 0 ) );
+			assert( a( i ) != T( 0 ) );
 			data_[ l ] /= a( i );
 		}
 		return *this;
@@ -629,7 +627,7 @@ public: // Assignment: Array
 		if ( a.dimensions_initialized() ) {
 			size_type l( 0 );
 			for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
-				assert( T( a( i ) ) != T( 0 ) );
+				assert( a( i ) != T( 0 ) );
 				data_[ l ] /= a( i );
 			}
 		}
@@ -1134,6 +1132,15 @@ public: // Subscript
 		return sdata_[ i ];
 	}
 
+	// Linear Index
+	inline
+	size_type
+	index( int const i ) const
+	{
+		assert( dimensions_initialized() );
+		return i - shift_;
+	}
+
 	// Const Tail Starting at array( i )
 	inline
 	Tail const
@@ -1151,15 +1158,6 @@ public: // Subscript
 		proxy_const_assert( not_const_proxy() );
 		assert( contains( i ) );
 		return Tail( sdata_ + i, ( data_size_ != npos ? data_size_ - ( i - shift_ ) : npos ) );
-	}
-
-	// Linear Index
-	inline
-	size_type
-	index( int const i ) const
-	{
-		assert( dimensions_initialized() );
-		return i - shift_;
 	}
 
 public: // Slice Proxy Generators
@@ -1246,7 +1244,7 @@ public: // Predicate
 	bool
 	conformable( FArray1< U > const & a ) const
 	{
-		return ( size() == a.size() );
+		return ( size_ == a.size() );
 	}
 
 	// Conformable?
@@ -1255,7 +1253,7 @@ public: // Predicate
 	bool
 	conformable( FArray1S< U > const & a ) const
 	{
-		return ( size() == a.size() );
+		return ( size_ == a.size() );
 	}
 
 	// Conformable?
@@ -1264,7 +1262,7 @@ public: // Predicate
 	bool
 	conformable( MArray1< A, M > const & a ) const
 	{
-		return ( size() == a.size() );
+		return ( size_ == a.size() );
 	}
 
 	// Equal Dimensions?
@@ -2908,7 +2906,7 @@ protected: // Functions
 	// Swap
 	inline
 	void
-	swap1DB( FArray1 & v )
+	swap1( FArray1 & v )
 	{
 		swapB( v );
 	}

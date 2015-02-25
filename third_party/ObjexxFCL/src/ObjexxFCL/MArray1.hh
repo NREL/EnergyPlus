@@ -1869,18 +1869,18 @@ public: // Comparison: Count
 template< class A, typename T >
 inline
 MArray1< A, T >
-make_MArray1( A & array, T A::value_type::* pmem )
+make_MArray1( A & a, T A::value_type::* pmem )
 {
-	return MArray1< A, T >( array, pmem );
+	return MArray1< A, T >( a, pmem );
 }
 
 // Make a MArray1
 template< class A, typename T >
 inline
 MArray1< A, T >
-MA1( A & array, T A::value_type::* pmem )
+MA1( A & a, T A::value_type::* pmem )
 {
-	return MArray1< A, T >( array, pmem );
+	return MArray1< A, T >( a, pmem );
 }
 
 // Conformable?

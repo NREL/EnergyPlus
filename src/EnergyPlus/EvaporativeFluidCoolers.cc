@@ -2110,7 +2110,7 @@ namespace EvaporativeFluidCoolers {
 	Real64
 	SimpleEvapFluidCoolerUAResidual(
 		Real64 const UA, // UA of evaporative fluid cooler
-		Optional< FArray1S< Real64 > const > Par // par(1) = design evaporative fluid cooler load [W]
+		FArray1< Real64 > const & Par // par(1) = design evaporative fluid cooler load [W]
 	)
 	{
 
@@ -2161,10 +2161,10 @@ namespace EvaporativeFluidCoolers {
 		Real64 OutWaterTemp; // outlet water temperature [C]
 		Real64 CoolingOutput; // Evaporative fluid cooler cooling output [W]
 
-		EvapFluidCoolerIndex = int( Par()( 2 ) );
-		SimSimpleEvapFluidCooler( EvapFluidCoolerIndex, Par()( 3 ), Par()( 4 ), UA, OutWaterTemp );
-		CoolingOutput = Par()( 5 ) * Par()( 3 ) * ( SimpleEvapFluidCoolerInlet( EvapFluidCoolerIndex ).WaterTemp - OutWaterTemp );
-		Residuum = ( Par()( 1 ) - CoolingOutput ) / Par()( 1 );
+		EvapFluidCoolerIndex = int( Par( 2 ) );
+		SimSimpleEvapFluidCooler( EvapFluidCoolerIndex, Par( 3 ), Par( 4 ), UA, OutWaterTemp );
+		CoolingOutput = Par( 5 ) * Par( 3 ) * ( SimpleEvapFluidCoolerInlet( EvapFluidCoolerIndex ).WaterTemp - OutWaterTemp );
+		Residuum = ( Par( 1 ) - CoolingOutput ) / Par( 1 );
 		return Residuum;
 	}
 

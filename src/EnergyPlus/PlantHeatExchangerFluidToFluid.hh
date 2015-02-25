@@ -3,8 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -342,7 +340,7 @@ namespace PlantHeatExchangerFluidToFluid {
 	Real64
 	HXDemandSideLoopFlowResidual(
 		Real64 const DmdSideMassFlowRate,
-		Optional< FArray1S< Real64 > const > Par = _ // Par(1) = HX index number
+		FArray1< Real64 > const & Par // Par(1) = HX index number
 	);
 
 	void

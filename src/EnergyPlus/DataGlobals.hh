@@ -16,6 +16,10 @@ namespace DataGlobals {
 	// -only module should be available to other modules and routines.
 	// Thus, all variables in this module must be PUBLIC.
 
+	extern bool runReadVars;
+	extern bool DDOnlySimulation;
+	extern bool AnnualSimulation;
+
 	// MODULE PARAMETER DEFINITIONS:
 	extern int const BeginDay;
 	extern int const DuringDay;
@@ -37,7 +41,6 @@ namespace DataGlobals {
 	extern Real64 const TwoPi; // 2*Pi 6.2831853071795864769252868
 	extern Real64 const GravityConstant;
 	extern Real64 const DegToRadians; // Conversion for Degrees to Radians
-	extern Real64 const DegToRad; // Conversion for Degrees to Radians
 	extern Real64 const RadToDeg; // Conversion for Radians to Degrees
 	extern Real64 const SecInHour; // Conversion for hours to seconds
 	extern Real64 const HoursInDay; // Number of Hourse in Day
@@ -141,6 +144,7 @@ namespace DataGlobals {
 	extern Real64 CurrentTime; // CurrentTime, in fractional hours, from start of day. Uses Loads time step.
 	extern int SimTimeSteps; // Number of (Loads) timesteps since beginning of run period (environment).
 	extern int MinutesPerTimeStep; // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
+	extern Real64 TimeStepZoneSec; // Seconds per time step
 	extern bool MetersHaveBeenInitialized;
 	extern bool KickOffSimulation; // Kick off simulation -- meaning run each environment for 1 or 2 time steps.
 	extern bool KickOffSizing; // Kick off sizing -- meaning run each environment for 1 or 2 time steps.
