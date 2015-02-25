@@ -2116,7 +2116,7 @@ namespace PlantManager {
 			PlantFirstSizesOkayToFinalize = false; // set global flag for when it ready to store final sizes
 			PlantFirstSizesOkayToReport = false;
 			PlantFinalSizesOkayToReport = false;
-
+			GetCompSizFac = true;
 			for ( passNum = 1; passNum <= 4; ++passNum ) { //begin while loop to iterate over the next calls sequentially
 				InitLoopEquip = true;
 
@@ -2150,6 +2150,7 @@ namespace PlantManager {
 						SizePlantLoop( LoopNum, FinishSizingFlag );
 					}
 				}
+			GetCompSizFac = false;
 			} // iterative passes thru sizing related routines.  end while?
 
 			//Step 5 now one more time for the final
@@ -3062,7 +3063,6 @@ namespace PlantManager {
 		SimNestedLoop = false;
 
 		AllSizFac = true;
-//		GetCompSizFac = true;
 		MaxSizFac = 0.0;
 		PlantSizFac = 1.0;
 		NumBrSizFac = 0.0;
@@ -3109,6 +3109,9 @@ namespace PlantManager {
 				} else {
 					PlantSizFac = 1.0;
 				}
+				// store the sizing factor now, for later reuse, 
+				PlantSizData( PlantSizNum ).PlantSizFac = PlantSizFac;
+				// might deprecate this next bit in favor of simpler storage in PlantSizData structure
 				for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( SupplySide ).TotalBranches; ++BranchNum ) {
 					if ( PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNumIn == PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).NodeNumIn ) {
 						PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).PumpSizFac = PlantSizFac;
@@ -3117,7 +3120,7 @@ namespace PlantManager {
 						PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).PumpSizFac = PlantSizFac;
 					}
 				}
-				GetCompSizFac = false;
+
 			} else {
 				// fill PlantSizFac from data structure
 				for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( SupplySide ).TotalBranches; ++BranchNum ) {
@@ -3128,21 +3131,23 @@ namespace PlantManager {
 			}
 
 			// sum up contributions from CompDesWaterFlow
-			PlantSizData( PlantSizNum ).DesVolFlowRate = 0.0; // init for summation
-			for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( DemandSide ).TotalBranches; ++BranchNum ) {
-				for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-					SupNodeNum = PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn;
-					for ( WaterCompNum = 1; WaterCompNum <= SaveNumPlantComps; ++WaterCompNum ) {
-						if ( SupNodeNum == CompDesWaterFlow( WaterCompNum ).SupNode ) {
-							PlantSizData( PlantSizNum ).DesVolFlowRate += CompDesWaterFlow( WaterCompNum ).DesVolFlowRate;
+			if ( PlantLoop( LoopNum ).MaxVolFlowRateWasAutoSized ){
+				PlantSizData( PlantSizNum ).DesVolFlowRate = 0.0; // init for summation
+				for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( DemandSide ).TotalBranches; ++BranchNum ) {
+					for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
+						SupNodeNum = PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn;
+						for ( WaterCompNum = 1; WaterCompNum <= SaveNumPlantComps; ++WaterCompNum ) {
+							if ( SupNodeNum == CompDesWaterFlow( WaterCompNum ).SupNode ) {
+								PlantSizData( PlantSizNum ).DesVolFlowRate += CompDesWaterFlow( WaterCompNum ).DesVolFlowRate;
+							}
 						}
 					}
 				}
 			}
 
 			if ( ! PlantLoop( LoopNum ).MaxVolFlowRateWasAutoSized ) {
-				PlantSizData( PlantSizNum ).DesVolFlowRate = PlantLoop( LoopNum ).MaxVolFlowRate;
-			} 
+					PlantSizData( PlantSizNum ).DesVolFlowRate = PlantLoop( LoopNum ).MaxVolFlowRate;
+				} 
 			}
 
 		}
@@ -3152,7 +3157,7 @@ namespace PlantManager {
 			if ( ( PlantSizNum > 0 ) ) {
 
 					if ( PlantSizData( PlantSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-						PlantLoop( LoopNum ).MaxVolFlowRate = PlantSizData( PlantSizNum ).DesVolFlowRate * PlantSizFac;
+						PlantLoop( LoopNum ).MaxVolFlowRate = PlantSizData( PlantSizNum ).DesVolFlowRate * PlantSizData( PlantSizNum ).PlantSizFac;
 					} else {
 						PlantLoop( LoopNum ).MaxVolFlowRate = 0.0;
 						if ( PlantFinalSizesOkayToReport ) {

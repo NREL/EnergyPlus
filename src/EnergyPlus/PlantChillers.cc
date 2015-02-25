@@ -889,6 +889,7 @@ namespace PlantChillers {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ScheduleManager::GetScheduleIndex;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
+		using DataSizing::AutoSize;
 
 		// Locals
 		// PARAMETERS
@@ -937,6 +938,9 @@ namespace PlantChillers {
 			EngineDrivenChiller( ChillerNum ).Base.Name = cAlphaArgs( 1 );
 
 			EngineDrivenChiller( ChillerNum ).Base.NomCap = rNumericArgs( 1 );
+			if ( EngineDrivenChiller( ChillerNum ).Base.NomCap == AutoSize ) {
+				EngineDrivenChiller( ChillerNum ).Base.NomCapWasAutoSized = true;
+			}
 			if ( rNumericArgs( 1 ) == 0.0 ) {
 				ShowSevereError( "Invalid " + cNumericFieldNames( 1 ) + '=' + RoundSigDigits( rNumericArgs( 1 ), 2 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -1030,7 +1034,13 @@ namespace PlantChillers {
 			EngineDrivenChiller( ChillerNum ).TempRiseCoef = rNumericArgs( 7 );
 			EngineDrivenChiller( ChillerNum ).TempDesEvapOut = rNumericArgs( 8 );
 			EngineDrivenChiller( ChillerNum ).Base.EvapVolFlowRate = rNumericArgs( 9 );
+			if ( EngineDrivenChiller( ChillerNum ).Base.EvapVolFlowRate == AutoSize ) {
+				EngineDrivenChiller( ChillerNum ).Base.EvapVolFlowRateWasAutoSized = true;
+			}
 			EngineDrivenChiller( ChillerNum ).Base.CondVolFlowRate = rNumericArgs( 10 );
+			if ( EngineDrivenChiller( ChillerNum ).Base.CondVolFlowRate == AutoSize ) {
+				EngineDrivenChiller( ChillerNum ).Base.CondVolFlowRateWasAutoSized = true;
+			} 
 			EngineDrivenChiller( ChillerNum ).CapRatCoef( 1 ) = rNumericArgs( 11 );
 			EngineDrivenChiller( ChillerNum ).CapRatCoef( 2 ) = rNumericArgs( 12 );
 			EngineDrivenChiller( ChillerNum ).CapRatCoef( 3 ) = rNumericArgs( 13 );

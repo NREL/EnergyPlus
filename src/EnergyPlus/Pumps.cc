@@ -610,8 +610,14 @@ namespace Pumps {
 			}
 
 			PumpEquip( PumpNum ).NomSteamVolFlowRate = rNumericArgs( 1 );
+			if ( PumpEquip( PumpNum ).NomSteamVolFlowRate == AutoSize ) {
+				PumpEquip( PumpNum ).NomSteamVolFlowRateWasAutoSized = true;
+			}
 			PumpEquip( PumpNum ).NomPumpHead = rNumericArgs( 2 );
 			PumpEquip( PumpNum ).NomPowerUse = rNumericArgs( 3 );
+			if ( PumpEquip( PumpNum ).NomPowerUse == AutoSize ) {
+				PumpEquip( PumpNum ).NomPowerUseWasAutoSized = true;
+			}
 			PumpEquip( PumpNum ).MotorEffic = rNumericArgs( 4 );
 			PumpEquip( PumpNum ).FracMotorLossToFluid = rNumericArgs( 5 );
 			PumpEquip( PumpNum ).PartLoadCoef( 1 ) = rNumericArgs( 6 );
@@ -636,7 +642,7 @@ namespace Pumps {
 			PumpEquip( PumpNum ).Energy = 0.0;
 			PumpEquip( PumpNum ).Power = 0.0;
 
-			if ( PumpEquip( PumpNum ).NomSteamVolFlowRate == AutoSize ) {
+			if ( PumpEquip( PumpNum ).NomSteamVolFlowRateWasAutoSized ) {
 				PumpEquip( PumpNum ).NomVolFlowRate = AutoSize;
 				PumpEquip( PumpNum ).NomVolFlowRateWasAutoSized = true;
 			} else {
@@ -981,8 +987,6 @@ namespace Pumps {
 
 			SizePump( PumpNum );
 
-			PumpDataForTable( PumpNum );
-
 			// calculate the efficiency for each pump
 			// by calculating the efficiency for each pump being simulated.  The calculation
 			// is based on the PMPSIM code in the ASHRAE Secondary Toolkit
@@ -1022,8 +1026,6 @@ namespace Pumps {
 		//HVAC Sizing Simulation resizing calls if needed
 		if ( RedoSizesHVACSimulation && ! PlantReSizingCompleted ) {
 			SizePump( PumpNum );
-
-			PumpDataForTable( PumpNum );
 		}
 
 
@@ -1610,37 +1612,40 @@ namespace Pumps {
 		PlantSizNum = 0;
 		PumpSizFac = 1.0;
 		ErrorsFound = false;
-		// CurLoopNum > 0 only for Plant Loops; condenser loops not sized yet
+
 		if ( PumpEquip( PumpNum ).LoopNum > 0 ) {
 			PlantSizNum = PlantLoop( PumpEquip( PumpNum ).LoopNum ).PlantSizNum;
-			//  ELSE IF (CurCondLoopNum > 0) THEN
-			//    PlantSizNum = CondSupplySide(CurCondLoopNum)%PlantSizNum
 		}
-		// look for pump sizing factor on branch
-		if ( PumpEquip( PumpNum ).LoopNum > 0 ) {
-			SideLoop: for ( Side = 1; Side <= 2; ++Side ) {
-				for ( BranchNum = 1; BranchNum <= PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).TotalBranches; ++BranchNum ) {
-					for ( CompNum = 1; CompNum <= PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-						if ( PumpEquip( PumpNum ).InletNodeNum == PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn && PumpEquip( PumpNum ).OutletNodeNum == PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).Branch( BranchNum ).Comp( CompNum ).NodeNumOut ) {
-							if ( PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).Branch( BranchNum ).PumpSizFac > 0.0 ) {
-								PumpSizFac = PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).Branch( BranchNum ).PumpSizFac;
-							} else {
-								PumpSizFac = 1.0;
+		// use pump sizing factor stored in plant sizing data structure
+		if ( PlantSizNum > 0 ) { 
+			PumpSizFac = PlantSizData( PlantSizNum ).PlantSizFac;
+		} else {
+			// might be able to remove this next block
+			if ( PumpEquip( PumpNum ).LoopNum > 0 ) {
+				SideLoop: for ( Side = 1; Side <= 2; ++Side ) {
+					for ( BranchNum = 1; BranchNum <= PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).TotalBranches; ++BranchNum ) {
+						for ( CompNum = 1; CompNum <= PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
+							if ( PumpEquip( PumpNum ).InletNodeNum == PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn && PumpEquip( PumpNum ).OutletNodeNum == PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).Branch( BranchNum ).Comp( CompNum ).NodeNumOut ) {
+								if ( PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).Branch( BranchNum ).PumpSizFac > 0.0 ) {
+									PumpSizFac = PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).Branch( BranchNum ).PumpSizFac;
+								} else {
+									PumpSizFac = 1.0;
+								}
+								goto SideLoop_exit;
 							}
-							goto SideLoop_exit;
 						}
 					}
+					SideLoop_loop: ;
 				}
-				SideLoop_loop: ;
+				SideLoop_exit: ;
 			}
-			SideLoop_exit: ;
 		}
 
 		if ( PumpEquip( PumpNum ).NomVolFlowRateWasAutoSized ) {
 
 			if ( PlantSizNum > 0 ) {
 				if ( PlantSizData( PlantSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-					if ( ! PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).BranchPumpsExist ) {
+					if ( ! PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( PumpEquip( PumpNum ).LoopSideNum ).BranchPumpsExist ) {
 						// size pump to full flow of plant loop
 						if ( PumpEquip( PumpNum ).PumpType == Pump_Cond ) {
 							TempWaterDensity = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineName );
@@ -1652,7 +1657,7 @@ namespace Pumps {
 						}
 					} else {
 						// Distribute sizes evenly across all branch pumps
-						DesVolFlowRatePerBranch = PlantSizData( PlantSizNum ).DesVolFlowRate / PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).TotalPumps;
+						DesVolFlowRatePerBranch = PlantSizData( PlantSizNum ).DesVolFlowRate / PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( PumpEquip( PumpNum ).LoopSideNum ).TotalPumps;
 						if ( PumpEquip( PumpNum ).PumpType == Pump_Cond ) {
 							TempWaterDensity = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineName );
 							SteamDensity = GetSatDensityRefrig( fluidNameSteam, StartTemp, 1.0, PumpEquip( PumpNum ).FluidIndex, RoutineNameSizePumps );
@@ -1671,10 +1676,12 @@ namespace Pumps {
 					}
 				}
 				if (PlantFinalSizesOkayToReport) {
-					ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name, "Rated Flow Rate [m3/s]", PumpEquip( PumpNum ).NomVolFlowRate );
+					ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name, 
+						"Rated Flow Rate [m3/s]", PumpEquip( PumpNum ).NomVolFlowRate );
 				}
 				if (PlantFirstSizesOkayToReport) {
-					ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name, "Initial Rated Flow Rate [m3/s]", PumpEquip( PumpNum ).NomVolFlowRate );
+					ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name, 
+						"Initial Rated Flow Rate [m3/s]", PumpEquip( PumpNum ).NomVolFlowRate );
 				}
 			} else {
 				if (PlantFinalSizesOkayToReport) {
@@ -1695,11 +1702,17 @@ namespace Pumps {
 				PumpEquip( PumpNum ).NomPowerUse = 0.0;
 			}
 			if ( PlantFinalSizesOkayToReport ) {
-				ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name, "Rated Power Consumption [W]", PumpEquip( PumpNum ).NomPowerUse );
+				ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name, 
+					"Rated Power Consumption [W]", PumpEquip( PumpNum ).NomPowerUse );
 			}
 			if ( PlantFirstSizesOkayToReport ) {
-				ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name, "Initial Rated Power Consumption [W]", PumpEquip( PumpNum ).NomPowerUse );
+				ReportSizingOutput( cPumpTypes( PumpEquip( PumpNum ).PumpType ), PumpEquip( PumpNum ).Name, 
+					"Initial Rated Power Consumption [W]", PumpEquip( PumpNum ).NomPowerUse );
 			}
+		}
+
+		if (PlantFinalSizesOkayToReport) {
+			PumpDataForTable( PumpNum );
 		}
 
 		if ( ErrorsFound ) {

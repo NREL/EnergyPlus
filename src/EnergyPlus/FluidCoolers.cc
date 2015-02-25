@@ -606,7 +606,8 @@ namespace FluidCoolers {
 					ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 4 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + "= \"" + AlphArray( 4 ) + "\"." );
 					ErrorsFound = true;
 				}
-				if ( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerLowSpeedNomCap <= 0.0 ) {
+				if ( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerLowSpeedNomCap <= 0.0 
+						&& ! SimpleFluidCooler( FluidCoolerNum ).FluidCoolerLowSpeedNomCapWasAutoSized ) {
 					ShowSevereError( cCurrentModuleObject + " = \"" + AlphArray( 1 ) + "\", invalid data for \"" + cNumericFieldNames( 5 ) + "\", entered value <= 0.0, but must be > 0 for " + cAlphaFieldNames( 4 ) + "= \"" + AlphArray( 4 ) + "\"." );
 					ErrorsFound = true;
 				}

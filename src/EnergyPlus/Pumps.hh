@@ -157,6 +157,7 @@ namespace Pumps {
 		bool EMSMassFlowOverrideOn; // if true, then EMS is calling to override flow requests.
 		Real64 EMSMassFlowValue; // EMS value to use for mass flow rate [kg/s]
 		Real64 NomSteamVolFlowRate; // For Steam Pump
+		bool NomSteamVolFlowRateWasAutoSized; // true if steam volume flow rate was autosize on input
 		Real64 MinVolFlowRate; // For a Variable Flow Pump this is the minimum capacity during operation.
 		Real64 MassFlowRateMin; // For a Variable Flow Pump this is the minimum capacity during operation.
 		Real64 NomPumpHead; // design nominal head pressure of Pump, [Pa]
@@ -213,6 +214,7 @@ namespace Pumps {
 			EMSMassFlowOverrideOn( false ),
 			EMSMassFlowValue( 0.0 ),
 			NomSteamVolFlowRate( 0.0 ),
+			NomSteamVolFlowRateWasAutoSized( false ),
 			MinVolFlowRate( 0.0 ),
 			MassFlowRateMin( 0.0 ),
 			NomPumpHead( 0.0 ),

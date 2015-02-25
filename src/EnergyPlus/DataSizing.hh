@@ -1785,6 +1785,7 @@ namespace DataSizing {
 		// Calculated
 		Real64 DesVolFlowRate; // loop design flow rate in m3/s
 		bool VolFlowSizingDone; // flag to indicate when this loop has finished sizing flow rate
+		Real64 PlantSizFac; // hold the loop and pump sizing factor
 
 		// Default Constructor
 		PlantSizingData() :
@@ -1795,30 +1796,8 @@ namespace DataSizing {
 			NumTimeStepsInAvg( 0 ),
 			SizingFactorOption( 101 ),
 			DesVolFlowRate( 0.0 ),
-			VolFlowSizingDone( false )
-		{}
-
-		// Member Constructor
-		PlantSizingData(
-			std::string const & PlantLoopName, // name of PLANT LOOP or CONDENSER LOOP object
-			int const LoopType, // type of loop: 1=heating, 2=cooling, 3=condenser
-			Real64 const ExitTemp, // loop design exit (supply) temperature [C]
-			Real64 const DeltaT, // loop design temperature drop (or rise) [DelK]
-			int const ConcurrenceOption,
-			int const NumTimeStepsInAvg,
-			int const SizingFactorOption,
-			Real64 const DesVolFlowRate, // loop design flow rate in m3/s
-			bool const VolFlowSizingDone // flag to indicate when this loop has finished sizing flow rate
-		) :
-			PlantLoopName( PlantLoopName ),
-			LoopType( LoopType ),
-			ExitTemp( ExitTemp ),
-			DeltaT( DeltaT ),
-			ConcurrenceOption( ConcurrenceOption ),
-			NumTimeStepsInAvg( NumTimeStepsInAvg ),
-			SizingFactorOption( SizingFactorOption ),
-			DesVolFlowRate( DesVolFlowRate ),
-			VolFlowSizingDone( VolFlowSizingDone )
+			VolFlowSizingDone( false ),
+			PlantSizFac( 1.0 )
 		{}
 
 	};

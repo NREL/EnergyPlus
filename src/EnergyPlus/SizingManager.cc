@@ -2432,7 +2432,7 @@ namespace SizingManager {
 			if (NumNumbers > 2) {
 			  PlantSizData( PltSizIndex ).NumTimeStepsInAvg = rNumericArgs( 3 );
 			} else {
-			  PlantSizData( PltSizIndex ).NumTimeStepsInAvg = NumOfTimeStepInHour;
+			  PlantSizData( PltSizIndex ).NumTimeStepsInAvg = 1.0;
 			}
 			
 
