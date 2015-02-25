@@ -14401,3 +14401,6 @@
   Output:Diagnostics,
     DisplayAdvancedReportVariables;  !- Key 1
 
+  Output:SQLite,
+    Simple;
+

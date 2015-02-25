@@ -3004,7 +3004,7 @@ namespace EconomicTariff {
 		using DataGlobals::HourOfDay;
 		using DataGlobals::TimeStep;
 		using DataGlobals::SecInHour;
-		using DataGlobals::TimeStepZone;
+		using DataGlobals::TimeStepZoneSec;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataEnvironment::Month;
 
@@ -3049,7 +3049,7 @@ namespace EconomicTariff {
 				// remember the demand is still energy over a period of time divided by the
 				// length of time. This gathers the energy also.
 				tariff( iTariff ).collectEnergy += curInstantValue;
-				tariff( iTariff ).collectTime += ( TimeStepZone * SecInHour );
+				tariff( iTariff ).collectTime += TimeStepZoneSec;
 				//added *SecInHour when adding RTP support August 2008
 				if ( tariff( iTariff ).collectTime >= tariff( iTariff ).demWinTime * SecInHour ) {
 					//get current value that has been converted into desired units
@@ -4858,7 +4858,9 @@ namespace EconomicTariff {
 			columnWidth = 14; //array assignment - same for all columns
 			WriteSubtitle( "Annual Cost" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost" );
+			if( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost" );
+			}
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -4906,7 +4908,9 @@ namespace EconomicTariff {
 			columnWidth = 14; //array assignment - same for all columns
 			WriteSubtitle( "Tariff Summary" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary" );
+			if( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary" );
+			}
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -4976,7 +4980,9 @@ namespace EconomicTariff {
 				columnWidth = 14; //array assignment - same for all columns
 				WriteSubtitle( "General" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", tariff( iTariff ).tariffName, "General" );
+				if( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", tariff( iTariff ).tariffName, "General" );
+				}
 				columnHead.deallocate();
 				rowHead.deallocate();
 				columnWidth.deallocate();
@@ -5416,7 +5422,9 @@ namespace EconomicTariff {
 		columnWidth = 14; //array assignment - same for all columns
 		WriteSubtitle( titleString );
 		WriteTable( tableBody, rowHead, columnHead, columnWidth );
-		sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", forString, titleString );
+		if( sqlite ) {
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", forString, titleString );
+		}
 		columnHead.deallocate();
 		rowHead.deallocate();
 		columnWidth.deallocate();

@@ -3,8 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -246,7 +244,7 @@ namespace BaseboardRadiator {
 	Real64
 	HWBaseboardUAResidual(
 		Real64 const UA, // UA of coil
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = design coil load [W]
+		FArray1< Real64 > const & Par // par(1) = design coil load [W]
 	);
 
 	void

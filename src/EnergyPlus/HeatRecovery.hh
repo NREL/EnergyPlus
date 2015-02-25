@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -1258,7 +1257,7 @@ namespace HeatRecovery {
 	Real64
 	GetResidCrossFlowBothUnmixed(
 		Real64 const NTU, // number of transfer units
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = Eps, par(2) = Z
+		FArray1< Real64 > const & Par // par(1) = Eps, par(2) = Z
 	);
 
 	void

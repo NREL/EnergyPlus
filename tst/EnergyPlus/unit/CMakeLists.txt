@@ -1,21 +1,25 @@
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src/EnergyPlus )
 
-if(MSVC)
-  ADD_DEFINITIONS(/Za) # Disables MS language extensions
-endif()
-
 set( test_src
   DataPlant.unit.cc
   DXCoils.unit.cc
   ExteriorEnergyUse.unit.cc
   HeatBalanceManager.unit.cc
   HVACStandaloneERV.unit.cc
+  MixedAir.unit.cc
+  PurchasedAirManager.unit.cc
+  OutputProcessor.unit.cc
+  OutputReportTabular.unit.cc
+  ReportSizingManager.unit.cc
+  SizingManager.unit.cc
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
+  SQLite.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
   WaterThermalTanks.unit.cc
+  main.cc
 )
 
 set( test_dependencies

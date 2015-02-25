@@ -666,9 +666,6 @@ public: // Modifier
 
 }; // StaticIndexRange
 
-// Types
-typedef  StaticIndexRange  SRange;
-
 // Functions
 
 // Swap

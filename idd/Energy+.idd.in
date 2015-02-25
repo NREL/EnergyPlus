@@ -372,7 +372,7 @@ Version,
       \format singleLine
   A1 ; \field Version Identifier
       \required-field
-      \default 7.0
+      \default ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}
 
 SimulationControl,
       \unique-object
@@ -1736,17 +1736,17 @@ Site:GroundDomain:Slab,
         \default 5
         \units m
         \minimum> 0.0
-   N4, \field Soil Thermal Conductivity
+   N4,  \field Soil Thermal Conductivity
         \type real
         \default 1.5
         \units W/m-K
         \minimum> 0.0
-   N5, \field Soil Density
+   N5,  \field Soil Density
         \type real
         \default 2800
         \units kg/m3
         \minimum> 0.0
-   N6, \field Soil Specific Heat
+   N6,  \field Soil Specific Heat
         \type real
         \default 850
         \units J/kg-K
@@ -4772,8 +4772,8 @@ WindowMaterial:Glazing,
        \note coefficient used for deflection calculations. Used only with complex
        \note fenestration when deflection model is set to TemperatureAndPressureInput
        \type real
-       \minimum > 0.0
-       \maximum < 1.0
+       \minimum>  0.0
+       \maximum<  1.0
        \default 0.22
 
 WindowMaterial:GlazingGroup:Thermochromic,
@@ -5233,7 +5233,7 @@ WindowMaterial:Gas,
   N12 ;\field Specific Heat Ratio
        \type real
        \note Used only if Gas Type = Custom
-       \minimum >1.0
+       \minimum> 1.0
 
 WindowGap:SupportPillar,
     \memo used to define pillar geometry for support pillars
@@ -5353,7 +5353,7 @@ WindowMaterial:Gap,
        \required-field
        \units m
        \type real
-       \minimum >0
+       \minimum> 0
   A2 , \field Gas (or Gas Mixture)
        \note This field should reference only WindowMaterial:Gas
        \note or WindowMaterial:GasMixture objects
@@ -6684,7 +6684,7 @@ WindowMaterial:Gap:EquivalentLayer,
   N12 ;\field Specific Heat Ratio
        \type real
        \note Used only if Gas Type = Custom
-       \minimum >1.0
+       \minimum> 1.0
 
 MaterialProperty:MoisturePenetrationDepth:Settings,
     \memo Additional properties for moisture using EMPD procedure
@@ -8391,19 +8391,19 @@ WindowThermalModel:Params,
   N2 , \field Vacuum Pressure Limit
        \type real
        \units Pa
-       \minimum >0
+       \minimum> 0
        \default 13.238
   N3 , \field Initial temperature
        \note This is temperature in time of window fabrication
        \type real
        \units C
-       \minimum >0
+       \minimum> 0
        \default 25
   N4 ; \field Initial pressure
        \note This is pressure in time of window fabrication
        \type real
        \units Pa
-       \minimum >0
+       \minimum> 0
        \default 101325
 
 Construction:ComplexFenestrationState,
@@ -18802,7 +18802,8 @@ RoomAir:TemperaturePattern:SurfaceMapping,
 RoomAir:Node,
       \memo Define an air node for some types of nodal room air models
   A1, \field Name
-      \type Alpha
+      \type alpha
+      \reference RoomAirNodes
   A2, \field Node Type
       \required-field
       \type choice
@@ -20026,11 +20027,11 @@ ElectricEquipment:ITE:AirCooled,
        \key RoomAirModel
        \default AdjustedSupply
   A11, \field Air Inlet Room Air Model Node Name
-       \note Name of a RoomAir:Node object which is connect to the ITE air inlet.
+       \note Name of a RoomAir:Node object which is connected to the ITE air inlet.
        \type object-list
        \object-list RoomAirNodes
   A12, \field Air Outlet Room Air Model Node Name
-       \note Name of a RoomAir:Node object which is connect to the ITE air outlet.
+       \note Name of a RoomAir:Node object which is connected to the ITE air outlet.
        \type object-list
        \object-list RoomAirNodes
   A13, \field Supply Air Node Name
@@ -20229,7 +20230,7 @@ ZoneContaminantSourceAndSink:CarbonDioxide,
   N1 , \field Design Generation Rate
        \units m3/s
        \type real
-       \Note Positive values represent sources and negative values represent sinks.
+       \note Positive values represent sources and negative values represent sinks.
   A3 ; \field Schedule Name
        \required-field
        \type object-list
@@ -20249,7 +20250,7 @@ ZoneContaminantSourceAndSink:Generic:Constant,
        \units m3/s
        \type real
        \minimum 0.0
-       \Note The values represent source.
+       \note The values represent source.
   A3 , \field Generation Schedule Name
        \required-field
        \type object-list
@@ -20259,7 +20260,7 @@ ZoneContaminantSourceAndSink:Generic:Constant,
        \units m3/s
        \type real
        \minimum 0.0
-       \Note The value represent sink.
+       \note The value represent sink.
   A4 ; \field Removal Schedule Name
        \required-field
        \type object-list
@@ -23682,7 +23683,7 @@ Exterior:WaterEquipment,
 !*               --System Control and Controllers
 !************************************************************************************
 
-\Group HVAC Templates
+\group HVAC Templates
 
 HVACTemplate:Thermostat,
       \min-fields 5
@@ -29351,7 +29352,6 @@ HVACTemplate:System:DedicatedOutdoorAir,
       \key  FixedSetpoint
       \key  Scheduled
       \key  OutdoorAirTemperatureReset
-      \key  None
       \default FixedSetpoint
   N6, \field Cooling Coil Design Setpoint
       \note  Used for sizing and as constant setpoint if no Cooling Coil Setpoint Schedule Name is specified.
@@ -29412,7 +29412,6 @@ HVACTemplate:System:DedicatedOutdoorAir,
       \key  FixedSetpoint
       \key  Scheduled
       \key  OutdoorAirTemperatureReset
-      \key  None
       \default FixedSetpoint
  N14, \field Heating Coil Design Setpoint
       \note   Used for sizing and as constant setpoint if no Heating Coil Setpoint Schedule Name is specified.
@@ -30764,8 +30763,9 @@ DesignSpecification:ZoneHVAC:Sizing,
 
 Sizing:System,
       \memo Specifies the input needed to perform sizing calculations for a central forced air
-      \memo system design air flow, heating capacity, and cooling capacity.
-      \min-fields 27
+      \memo system. System design air flow, heating capacity, and cooling capacity will be calculated
+      \memo using this input data.
+      \min-fields 37
   A1, \field AirLoop Name
       \required-field
       \type object-list
@@ -30775,12 +30775,10 @@ Sizing:System,
       \note Sensible and VentilationRequirement are the only available options
       \note Sensible uses the zone design air flow rates
       \note VentilationRequirement uses the system ventilation requirement
-      \required-field
       \type choice
       \key Sensible
+      \key Total
       \key VentilationRequirement
-      !\key Latent
-      !\key Total
       \default Sensible
   N1, \field Design Outdoor Air Flow Rate
       \type real
@@ -30788,11 +30786,12 @@ Sizing:System,
       \minimum 0.0
       \units m3/s
       \autosizable
-  N2, \field Minimum System Air Flow Ratio
+  N2, \field Central Heating Maximum System Air Flow Ratio
       \required-field
       \type real
       \minimum 0.0
       \maximum 1.0
+      \default 0.5
   N3, \field Preheat Design Temperature
       \required-field
       \type real
@@ -30817,7 +30816,7 @@ Sizing:System,
       \required-field
       \type real
       \units C
-  A3, \field Sizing Option
+  A3, \field Type of Zone Sum to Use
       \type choice
       \key Coincident
       \key NonCoincident
@@ -30951,8 +30950,7 @@ Sizing:System,
       \minimum 0.0
       \autosizable
       \default autosize
-      \note Enter the design cooling capacity. Required field when the cooling design capacity method
-      \note CoolingDesignCapacity.
+      \note Enter the design cooling capacity.
  N22, \field Cooling Design Capacity Per Floor Area
       \type real
       \units W/m2
@@ -30986,19 +30984,26 @@ Sizing:System,
       \minimum 0.0
       \autosizable
       \default autosize
-      \note Enter the design heating capacity. Required field when the heating design capacity method
-      \note HeatingDesignCapacity.
+      \note Enter the design heating capacity.
  N25, \field Heating Design Capacity Per Floor Area
       \type real
       \units W/m2
       \minimum 0.0
       \note Enter the heating design capacity per zone floor area. Required field when the heating design
       \note capacity method field is CapacityPerFloorArea.
- N26; \field Fraction of Autosized Heating Design Capacity
+ N26, \field Fraction of Autosized Heating Design Capacity
       \type real
       \minimum 0.0
       \note Enter the fraction of auto-sized heating design capacity. Required field when capacity the
       \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
+ A11; \field Central Cooling Capacity Control Method
+      \note Method used to control the coil's output
+      \type choice
+      \key VAV
+      \key Bypass
+      \key VT
+      \key OnOff
+      \default VAV
 
 Sizing:Plant,
       \memo Specifies the input needed to autosize plant loop flow rates and equipment capacities.
@@ -31041,7 +31046,7 @@ OutputControl:Sizing:Style,
        \key Tab
        \key Fixed
 
-\Group Zone HVAC Controls and Thermostats
+\group Zone HVAC Controls and Thermostats
 
 ZoneControl:Humidistat,
        \memo Specifies zone relative humidity setpoint schedules for humidifying and dehumidifying.
@@ -39584,7 +39589,7 @@ ZoneHVAC:EquipmentConnections,
        \required-field
        \type node
 
-\Group Fans
+\group Fans
 !*****************AIR LOOP COMPONENTS*********************
 Fan:ConstantVolume,
        \memo Constant volume fan that is intended to operate continuously based on a time schedule.
@@ -40087,7 +40092,7 @@ Fan:ComponentModel,
         \retaincase
         \default General
 
-\Group Coils
+\group Coils
 
 !*****************COILS*********************
 Coil:Cooling:Water,
@@ -42615,7 +42620,7 @@ Coil:Heating:Water,
        \required-field
        \type node
   A7 , \field Performance Input Method
-       \type Choice
+       \type choice
        \key UFactorTimesAreaAndDesignWaterFlowRate
        \key NominalCapacity
        \default UFactorTimesAreaAndDesignWaterFlowRate
@@ -47807,7 +47812,7 @@ Coil:Cooling:DX:SingleSpeed:ThermalStorage,
        \note For fluid storage tanks only, maximum limit for storage tank
        \note If omitted,then the maximum temperature limit is that used for fluid property data.
 
-\Group Evaporative Coolers
+\group Evaporative Coolers
 
 EvaporativeCooler:Direct:CelDekPad,
        \memo Direct evaporative cooler with rigid media evaporative pad and recirculating water
@@ -47833,9 +47838,9 @@ EvaporativeCooler:Direct:CelDekPad,
        \type node
   A4 , \field Air Outlet Node Name
        \type node
-  A5 , \Field Control Type
+  A5 , \field Control Type
        \note This field is not currently used and can be left blank
-  A6 ; \Field Water Supply Storage Tank Name
+  A6 ; \field Water Supply Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
 
@@ -47879,9 +47884,9 @@ EvaporativeCooler:Indirect:CelDekPad,
        \type node
   A4 , \field Primary Air Outlet Node Name
        \type node
-  A5 , \Field Control Type
+  A5 , \field Control Type
        \note This field is not currently used and can be left blank
-  A6 , \Field Water Supply Storage Tank Name
+  A6 , \field Water Supply Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
   A7 ; \field Secondary Air Inlet Node Name
@@ -47923,9 +47928,9 @@ EvaporativeCooler:Indirect:WetCoil,
        \type node
   A4 , \field Primary Air Outlet Node Name
        \type node
-  A5 , \Field Control Type
+  A5 , \field Control Type
        \note This field is not currently used and can be left blank
-  A6 , \Field Water Supply Storage Tank Name
+  A6 , \field Water Supply Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
   A7 ; \field Secondary Air Inlet Node Name
@@ -47969,15 +47974,15 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \type node
   A4 , \field Primary Air Outlet Node Name
        \type node
-  A5 , \Field Control Type
+  A5 , \field Control Type
   N7 , \field Dewpoint Effectiveness Factor
-  A6 , \Field Secondary Air Inlet Node Name
+  A6 , \field Secondary Air Inlet Node Name
        \type node
-  A7 , \Field Sensor Node Name
+  A7 , \field Sensor Node Name
        \type node
-  A8 , \Field Relief Air Inlet Node Name
+  A8 , \field Relief Air Inlet Node Name
        \type node
-  A9 , \Field Water Supply Storage Tank Name
+  A9 , \field Water Supply Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
   N8 , \field Drift Loss Fraction
@@ -48018,9 +48023,9 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \type node
   A4 , \field Air Outlet Node Name
        \type node
-  A5 , \Field Sensor Node Name
+  A5 , \field Sensor Node Name
        \type node
-  A6 , \Field Water Supply Storage Tank Name
+  A6 , \field Water Supply Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
   N3 , \field Drift Loss Fraction
@@ -48036,7 +48041,7 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \note Ratio of solids in the blowdown water to solids in the make up water.
        \note A typical value is 3. If left blank then there is no blowdown.
 
-\Group Humidifiers and Dehumidifiers
+\group Humidifiers and Dehumidifiers
 
 Humidifier:Steam:Electric,
       \memo Electrically heated steam humidifier with fan.
@@ -48352,7 +48357,7 @@ Dehumidifier:Desiccant:System,
        \object-list QuadraticCurves
        \object-list CubicCurves
 
-\Group Heat Recovery
+\group Heat Recovery
 
 HeatExchanger:AirToAir:FlatPlate,
       \memo Flat plate air-to-air heat exchanger, typically used for exhaust or relief air heat
@@ -49032,7 +49037,7 @@ AirLoopHVAC:UnitarySystem,
        \key LatentOnlyLoadControl
        \key LatentWithSensibleLoadControl
        \key LatentOrSensibleLoadControl
-       \Default SensibleOnlyLoadControl
+       \default SensibleOnlyLoadControl
        \note SensibleOnlyLoadControl is selected when thermostat control is used.
        \note LatentOnlyLoadControl is selected when humidistat control is used.
        \note LatentWithSensibleLoadControl is selected when thermostat control is used and
@@ -51417,7 +51422,7 @@ Controller:OutdoorAir,
        \note setpoint and the outdoor humidity ratio is less than the indoor humidity ratio.
        \note This field is only used when the field High Humidity Control = Yes.
   A19; \field Heat Recovery Bypass Control Type
-       \type Choice
+       \type choice
        \key BypassWhenWithinEconomizerLimits
        \key BypassWhenOAFlowGreaterThanMinimum
        \default BypassWhenWithinEconomizerLimits
@@ -55777,7 +55782,7 @@ Duct,
         \required-field
         \type node
 
-\Group Pumps
+\group Pumps
 
 Pump:VariableSpeed,
        \memo This pump model is described in the ASHRAE secondary HVAC toolkit.
@@ -56126,9 +56131,9 @@ HeaderedPumps:VariableSpeed,
         \autosizable
         \ip-units gal/min
         \minimum> 0
-  N2 , \Field Number of Pumps in Bank
+  N2 , \field Number of Pumps in Bank
        \type integer
-  A4 , \Field Flow Sequencing Control Scheme
+  A4 , \field Flow Sequencing Control Scheme
         \type choice
         \key Sequential
         \default Sequential
@@ -56220,7 +56225,7 @@ TemperingValve,
       \required-field
       \type node
 
-\Group Non-Zone Equipment
+\group Non-Zone Equipment
 
 LoadProfile:Plant,
        \memo Used to simulate a scheduled plant loop demand profile.  Load and flow rate are
@@ -56250,7 +56255,7 @@ LoadProfile:Plant,
        \type object-list
        \object-list ScheduleNames
 
-\Group Solar Collectors
+\group Solar Collectors
 
 SolarCollectorPerformance:FlatPlate,
        \memo Thermal and optical performance parameters for a single flat plate solar collector
@@ -56359,7 +56364,7 @@ SolarCollector:FlatPlate:PhotovoltaicThermal,
        \type node
   A9 , \field Air Outlet Node Name
        \type node
-  N1 ; \Field Design Flow Rate
+  N1 ; \field Design Flow Rate
        \units m3/s
        \autosizable
 
@@ -56411,9 +56416,9 @@ SolarCollector:IntegralCollectorStorage,
   A4 , \field Bottom Surface Boundary Conditions Type
        \required-field
        \type choice
-       \Key OtherSideConditionsModel
-       \Key AmbientAir
-       \Default AmbientAir
+       \key OtherSideConditionsModel
+       \key AmbientAir
+       \default AmbientAir
   A5 , \field Boundary Condition Model Name
        \type alpha
        \note Enter the name of a SurfaceProperty:OtherSideConditionsModel
@@ -56440,7 +56445,7 @@ SolarCollectorPerformance:IntegralCollectorStorage,
   A2,  \field ICS Collector Type
        \required-field
        \type choice
-       \Key RectangularTank
+       \key RectangularTank
        \note Currently only RectangularTank ICS collector type is available.
   N1,  \field Gross Area
        \type real
@@ -56797,7 +56802,7 @@ SolarCollector:UnglazedTranspired:Multisystem,
 !                  must be specified for each node
 !  CLASS of the following comes first (naming convention) separated further by :
 
-\Group Plant Heating and Cooling Equipment
+\group Plant Heating and Cooling Equipment
 
 Boiler:HotWater,
     \min-fields 13
@@ -57162,7 +57167,7 @@ Chiller:Electric:EIR,
        \type node
 
 Chiller:Electric:ReformulatedEIR,
-\min-fields 21
+\min-fields 22
    \memo This chiller model is an empirical model, a reformulated version of Chiller:Electric:EIR
    \memo where the performance is a function of condenser leaving fluid Temperature instead of
    \memo condenser entering fluid Temperature. Chiller performance at off-reference conditions is
@@ -57224,17 +57229,44 @@ Chiller:Electric:ReformulatedEIR,
        \note curve = a + b*CWS + c*CWS**2 + d*LCT + e*LCT**2 + f*CWS*LCT
        \note CWS = supply (leaving) chilled water temperature(C)
        \note LCT = leaving condenser fluid temperature(C)
-  A4 , \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+  A4 , \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
+       \note Two curve types are available: 
+       \note Type LeavingCondenserWaterTemperature: based on the leaving condenser water temperature.
+       \note Type Lift: based on the normalized lift, which is the temperature difference between the
+       \note leaving condenser water temperature and the leaving evaporator water temperature. 
+       \required-field
+       \type choice
+       \key LeavingCondenserWaterTemperature
+       \key Lift
+       \default LeavingCondenserWaterTemperature
+  A5 , \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
        \note Electric Input Ratio (EIR) as a function of Part Load Ratio (PLR)
        \note EIR = 1/COP
        \required-field
        \type object-list
        \object-list BicubicCurves
        \object-list BiVariateTables
-       \note curve = a + b*LCT + c*LCT**2 + d*PLR + e*PLR**2 + f*LCT*PLR + g*0 + h*PLR**3
+       \object-list ChillerPartLoadWithLiftCurves
+       \object-list MultiVariateTables
+       \note The form of this curve is based on the input for 
+       \note Electric Input to Cooling Output RatioFunction of Part Load Ratio Curve Type
+       \note Type=LeavingCondenserWaterTemperature: Calculated based on LCT and PLR
+       \note Curve object type should be Curve:Bicubic or Table:TwoIndependentVariables 
+       \note Bicubic curve = a + b*LCT + c*LCT**2 + d*PLR + e*PLR**2 + f*LCT*PLR + g*0 + h*PLR**3
        \note + i*0 + j*0
        \note PLR = part load ratio (cooling load/steady state capacity)
        \note LCT = leaving condenser fluid temperature(C)
+       \note Type=Lift: Calculated based on dT*, Tdev* and PLR 
+       \note Curve object type should be Curve:ChillerPartLoadWithLiftCurves or Table:MultiVariableLookup
+       \note ChillerPartLoadWithLiftCurves curve = a + b*(dT*) + c*(dT*)**2 + d*PLR + e*PLR**2 + f*(dT*)*PLR + g*(dT*)**3
+       \note + h*PLR**3 + i*(dT*)**2*PLR + j*(dT*)*PLR**2 + k*(dT*)**2*PLR**2 + l*(Tdev*)*PLR**3
+       \note x = dT* = normalized fractional Lift = dT / dTref
+       \note y = PLR = part load ratio (cooling load/steady state capacity)
+       \note z = Tdev* = normalized Tdev = Tdev / dTref
+       \note Where:
+       \note dT = Lift = Leaving Condenser Water Temperature - Leaving Chilled Water Temperature
+       \note dTref = dT at the reference condition
+       \note Tdev = Leaving Chilled Water Temperature - Reference Chilled Water Temperature
   N7 , \field Minimum Part Load Ratio
        \type real
        \note Part load ratio below which the chiller starts cycling on/off to meet the load.
@@ -57260,16 +57292,16 @@ Chiller:Electric:ReformulatedEIR,
        \note and less than or equal to the Maximum Part Load Ratio.
        \minimum 0.0
        \default 0.2
-  A5 , \field Chilled Water Inlet Node Name
+  A6 , \field Chilled Water Inlet Node Name
        \type node
        \required-field
-  A6 , \field Chilled Water Outlet Node Name
+  A7 , \field Chilled Water Outlet Node Name
        \type node
        \required-field
-  A7 , \field Condenser Inlet Node Name
+  A8 , \field Condenser Inlet Node Name
        \type node
        \required-field
-  A8 , \field Condenser Outlet Node Name
+  A9 , \field Condenser Outlet Node Name
        \type node
        \required-field
   N11, \field Fraction of Compressor Electric Consumption Rejected by Condenser
@@ -57285,7 +57317,7 @@ Chiller:Electric:ReformulatedEIR,
        \type real
        \default 2.0
        \units C
-  A9, \field Chiller Flow Mode Type
+  A10, \field Chiller Flow Mode Type
        \note Select operating mode for fluid flow through the chiller. "NotModulated" is for
        \note either variable or constant pumping with flow controlled by the external plant system.
        \note "ConstantFlow" is for constant pumping with flow controlled by chiller to operate at
@@ -57304,9 +57336,9 @@ Chiller:Electric:ReformulatedEIR,
        \default 0.0
        \ip-units gal/min
        \autosizable
-  A10, \field Heat Recovery Inlet Node Name
+  A11, \field Heat Recovery Inlet Node Name
        \type node
-  A11, \field Heat Recovery Outlet Node Name
+  A12, \field Heat Recovery Outlet Node Name
        \type node
   N14, \field Sizing Factor
        \note Multiplies the autosized capacity and flow rates
@@ -57318,11 +57350,11 @@ Chiller:Electric:ReformulatedEIR,
        \type real
        \minimum 0.0
        \maximum 1.0
-  A12, \field Heat Recovery Inlet High Temperature Limit Schedule Name
+  A13, \field Heat Recovery Inlet High Temperature Limit Schedule Name
        \note This optional schedule of temperatures will turn off heat recovery if inlet exceeds the value
        \type object-list
        \object-list ScheduleNames
-  A13; \field Heat Recovery Leaving Temperature Setpoint Node Name
+  A14; \field Heat Recovery Leaving Temperature Setpoint Node Name
        \note This optional field provides control over the heat recovery
        \note Using this triggers a model more suited to series bundle and chillers with higher temperature heat recovery
        \note If this field is not used, the bundles are modeled as being in parallel
@@ -59629,7 +59661,7 @@ CoolingTower:SingleSpeed,
        \note This field is only used if the previous field is set to autocalculate and
        \note the Performance Input Method is UFactorTimesAreaAndDesignWaterFlowRate
   A4 , \field Performance Input Method
-       \type Choice
+       \type choice
        \key UFactorTimesAreaAndDesignWaterFlowRate
        \key NominalCapacity
        \default UFactorTimesAreaAndDesignWaterFlowRate
@@ -59742,7 +59774,7 @@ CoolingTower:SingleSpeed,
        \minimum 1
        \default 1
   A12, \field Cell Control
-       \type Choice
+       \type choice
        \key MinimalCell
        \key MaximalCell
        \default MinimalCell
@@ -59888,7 +59920,7 @@ CoolingTower:TwoSpeed,
        \note This field is only used if the previous field is set to autocalculate and
        \note the Performance Input Method is UFactorTimesAreaAndDesignWaterFlowRate
   A4 , \field Performance Input Method
-       \type Choice
+       \type choice
        \key UFactorTimesAreaAndDesignWaterFlowRate
        \key NominalCapacity
        \default UFactorTimesAreaAndDesignWaterFlowRate
@@ -60016,7 +60048,7 @@ CoolingTower:TwoSpeed,
        \minimum 1
        \default 1
   A11, \field Cell Control
-       \type Choice
+       \type choice
        \key MinimalCell
        \key MaximalCell
        \default MinimalCell
@@ -60059,7 +60091,7 @@ CoolingTower:VariableSpeed:Merkel,
        \note Name of tower water outlet node
   A4 , \field Performance Input Method
        \required-field
-       \type Choice
+       \type choice
        \key UFactorTimesAreaAndDesignWaterFlowRate
        \key NominalCapacity
        \default NominalCapacity
@@ -60293,7 +60325,7 @@ CoolingTower:VariableSpeed:Merkel,
        \minimum 1
        \default 1
   A15, \field Cell Control
-       \type Choice
+       \type choice
        \key MinimalCell
        \key MaximalCell
        \default MinimalCell
@@ -60491,7 +60523,7 @@ CoolingTower:VariableSpeed,
        \minimum 1
        \default 1
   A13, \field Cell Control
-       \type Choice
+       \type choice
        \key MinimalCell
        \key MaximalCell
        \default MinimalCell
@@ -60849,7 +60881,7 @@ EvaporativeFluidCooler:SingleSpeed,
        \minimum> 0.0
        \ip-units gal/min
   A4 , \field Performance Input Method
-       \type Choice
+       \type choice
        \key UFactorTimesAreaAndDesignWaterFlowRate
        \key StandardDesignCapacity
        \key UserSpecifiedDesignCapacity
@@ -61045,7 +61077,7 @@ EvaporativeFluidCooler:TwoSpeed,
        \ip-units gal/min
   A4 , \field Performance Input Method
        \required-field
-       \type Choice
+       \type choice
        \key UFactorTimesAreaAndDesignWaterFlowRate
        \key StandardDesignCapacity
        \key UserSpecifiedDesignCapacity
@@ -61237,7 +61269,7 @@ FluidCooler:SingleSpeed,
        \type node
        \note Name of fluid cooler water outlet node
   A4 , \field Performance Input Method
-       \type Choice
+       \type choice
        \key UFactorTimesAreaAndDesignWaterFlowRate
        \key NominalCapacity
        \default NominalCapacity
@@ -61321,7 +61353,7 @@ FluidCooler:TwoSpeed,
        \type node
        \note Name of fluid cooler water outlet node
   A4 , \field Performance Input Method
-       \type Choice
+       \type choice
        \key UFactorTimesAreaAndDesignWaterFlowRate
        \key NominalCapacity
        \default NominalCapacity
@@ -61476,7 +61508,6 @@ GroundHeatExchanger:Vertical,
   N7,   \field Ground Temperature
         \units C
         \minimum> 0.0
-        \ip-units gal/min
   N8,   \field Grout Thermal Conductivity
         \units W/m-K
         \minimum> 0.0
@@ -63768,8 +63799,8 @@ PlantEquipmentList,
     \memo should be OFF (not operate) within the specified lower/upper limit.
     \min-fields 1
   A1 , \field Name
-       \required-field
-       \reference PlantAndCondenserEquipmentLists
+        \required-field
+        \reference PlantAndCondenserEquipmentLists
   A2 , \field Equipment 1 Object Type
   A3 , \field Equipment 1 Name
   A4 , \field Equipment 2 Object Type
@@ -65576,8 +65607,7 @@ EnergyManagementSystem:Sensor,
   A3 ; \field Output:Variable or Output:Meter Name
        \required-field
        \type external-list
-       \external-list autoRDDvariable
-       \external-list autoRDDmeter
+       \external-list autoRDDvariableMeter
 
 EnergyManagementSystem:Actuator,
        \memo Hardware portion of EMS used to set up actuators in the model
@@ -66532,7 +66562,7 @@ ZoneHVAC:ForcedAir:UserDefined,
         \key MeetsLoadWithNominalCapacityHiOutLimit
         \required-field
    A6 , \field Plant Connection 1 Loop Flow Request Mode
-        \type Choice
+        \type choice
         \key NeedsFlowIfLoopOn
         \key NeedsFlowAndTurnsLoopOn
         \key ReceivesWhateverFlowAvailable
@@ -66555,7 +66585,7 @@ ZoneHVAC:ForcedAir:UserDefined,
         \key MeetLoadWithNominalCapacityLowOutLimit
         \key MeetLoadWithNominalCapacityHiOutLimit
    A12, \field Plant Connection 2 Loop Flow Request Mode
-        \type Choice
+        \type choice
         \key NeedsFlowIfLoopOn
         \key NeedsFlowAndTurnsLoopOn
         \key ReceivesWhateverFlowAvailable
@@ -66577,7 +66607,7 @@ ZoneHVAC:ForcedAir:UserDefined,
         \key MeetLoadWithNominalCapacityLowOutLimit
         \key MeetLoadWithNominalCapacityHiOutLimit
    A18, \field Plant Connection 3 Loop Flow Request Mode
-        \type Choice
+        \type choice
         \key NeedsFlowIfLoopOn
         \key NeedsFlowAndTurnsLoopOn
         \key ReceivesWhateverFlowAvailable
@@ -66599,7 +66629,7 @@ ZoneHVAC:ForcedAir:UserDefined,
         \key MeetLoadWithNominalCapacityLowOutLimit
         \key MeetLoadWithNominalCapacityHiOutLimit
    A24, \field Plant Connection 4 Loop Flow Request Mode
-        \type Choice
+        \type choice
         \key NeedsFlowIfLoopOn
         \key NeedsFlowAndTurnsLoopOn
         \key ReceivesWhateverFlowAvailable
@@ -69692,7 +69722,7 @@ Refrigeration:SecondarySystem,
         \type object-list
         \object-list ZoneNames
   N14,  \field Evaporator Refrigerant Inventory
-        \Units kg
+        \units kg
         \type real
         \default 0.0
         \note This value refers to the refrigerant circulating within the primary system providing
@@ -69821,7 +69851,7 @@ Refrigeration:SecondarySystem,
         \note Schedule values should be in units of Watts
         \note Leave this field blank if no restocking is to be modeled
   N10,  \field Average Refrigerant Charge Inventory
-        \Units kg
+        \units kg
         \type real
         \default 0.0
         \note This value is only used if the Cooling Source Type is DXEvaporator
@@ -70282,7 +70312,7 @@ Refrigeration:AirChiller,
         \key Floor
         \default Middle
   N16;  \field Average Refrigerant Charge Inventory
-        \Units kg
+        \units kg
         \type real
         \default 0.0
         \note This value is only used if the Cooling Source Type is DXEvaporator
@@ -70405,7 +70435,7 @@ ZoneHVAC:RefrigerationChillerSet,
      A66,A67,A68,A69,A70,A71,A72,A73,A74,A75,A76,A77,A78,A79,A80,A81,A82,A83,A84,A85, \note fields as indicated
      A86,A87,A88,A89,A90,A91,A92,A93,A94,A95,A96,A97,A98,A99,A100;                    \note fields as indicated
 
-\Group Demand Limiting Controls
+\group Demand Limiting Controls
 
 DemandManagerAssignmentList,
        \extensible:2 Duplicate the last two fields DemandManager Object Type and DemandManager Name
@@ -70965,7 +70995,7 @@ DemandManager:Thermostats,
        \type object-list
        \object-list ZoneControlThermostaticNames
 
-\Group Electric Load Center-Generator Specifications
+\group Electric Load Center-Generator Specifications
 
 Generator:InternalCombustionEngine,
        \memo This generator model is the empirical model from the Building Loads
@@ -73790,7 +73820,7 @@ ElectricLoadCenter:Distribution,
        \type object-list
        \object-list TransformerNames
 
-\Group Water Systems
+\group Water Systems
 
 WaterUse:Equipment,
        \memo A generalized object for simulating all water end uses. Hot and cold water uses are
@@ -74111,7 +74141,7 @@ WaterUse:RainCollector,
        \type object-list
        \object-list AllShadingAndHTSurfNames
 
-\Group Operational Faults
+\group Operational Faults
 !*****************Faults****************************
 ! This group of objects are used to model operational faults of HVAC systems.
 !
@@ -76630,6 +76660,110 @@ Curve:DoubleExponentialDecay,
        \key Dimensionless
        \default Dimensionless
 
+Curve:ChillerPartLoadWithLift,
+       \memo This chiller part-load performance curve has three independent variables.
+       \memo Input consists of the curve name, the twelve coefficients, and the maximum
+       \memo and minimum valid independent variable values. Optional inputs for the curve minimum
+       \memo and maximum may be used to limit the output of the performance curve.
+       \memo curve = C1 + C2*x + C3*x**2 + C4*y + C5*y**2 + C6*x*y + C7*x**3
+       \memo + C8*y**3 + C9*x**2*y + C10*x*y**2 + C11*x**2*y**2 + C12*z*y**3
+       \memo x = dT* = normalized fractional Lift = dT / dTref
+       \memo y = PLR = part load ratio (cooling load/steady state capacity)
+       \memo z = Tdev* = normalized Tdev = Tdev / dTref
+       \memo Where:
+       \memo dT = Lift = Leaving Condenser Water Temperature - Leaving Chilled Water Temperature
+       \memo dTref = dT at the reference condition
+       \memo Tdev = Leaving Chilled Water Temperature - Reference Chilled Water Temperature
+  A1 , \field Name
+       \required-field
+       \type alpha
+       \reference ChillerPartLoadWithLiftCurves
+       \reference AllCurves
+  N1 , \field Coefficient1 C1
+       \required-field
+       \type real
+  N2 , \field Coefficient2 C2
+       \required-field
+       \type real
+  N3 , \field Coefficient3 C3
+       \required-field
+       \type real
+  N4 , \field Coefficient4 C4
+       \required-field
+       \type real
+  N5 , \field Coefficient5 C5
+       \required-field
+       \type real
+  N6 , \field Coefficient6 C6
+       \required-field
+       \type real
+  N7 , \field Coefficient7 C7
+       \required-field
+       \type real
+  N8 , \field Coefficient8 C8
+       \required-field
+       \type real
+  N9 , \field Coefficient9 C9
+       \required-field
+       \type real
+  N10, \field Coefficient10 C10
+       \required-field
+       \type real
+  N11, \field Coefficient11 C11
+       \required-field
+       \type real
+  N12, \field Coefficient12 C12
+       \required-field
+       \type real
+  N13, \field Minimum Value of x
+       \required-field
+       \type real
+       \unitsBasedOnField A2
+  N14, \field Maximum Value of x
+       \required-field
+       \type real
+       \unitsBasedOnField A2
+  N15, \field Minimum Value of y
+       \required-field
+       \type real
+       \unitsBasedOnField A3
+  N16, \field Maximum Value of y
+       \required-field
+       \type real
+       \unitsBasedOnField A3
+  N17, \field Minimum Value of z
+       \required-field
+       \type real
+       \unitsBasedOnField A4
+  N18, \field Maximum Value of z
+       \required-field
+       \type real
+       \unitsBasedOnField A4
+  N19, \field Minimum Curve Output
+       \type real
+       \unitsBasedOnField A5
+       \note Specify the minimum value calculated by this curve object
+  N20, \field Maximum Curve Output
+       \type real
+       \unitsBasedOnField A5
+       \note Specify the maximum value calculated by this curve object
+  A2 , \field Input Unit Type for x
+       \type choice
+       \key Dimensionless
+       \default Dimensionless
+  A3 , \field Input Unit Type for y
+       \type choice
+       \key Dimensionless
+       \default Dimensionless
+  A4 , \field Input Unit Type for z
+       \type choice
+       \key Dimensionless
+       \default Dimensionless
+  A5;  \field Output Unit Type
+       \type choice
+       \key Dimensionless
+       \default Dimensionless
+
 \group Performance Tables
 
 Table:OneIndependentVariable,
@@ -77222,7 +77356,7 @@ Table:MultiVariableLookup,
   N3060,N3061,N3062,N3063,N3064,N3065,N3066,N3067,N3068,N3069,N3070,N3071,N3072,N3073,N3074,N3075,N3076,N3077,N3078,N3079, \note fields as indicated
   N3080,N3081,N3082,N3083,N3084,N3085,N3086,N3087,N3088,N3089,N3090,N3091,N3092,N3093,N3094,N3095,N3096,N3097,N3098,N3099; \note fields as indicated
 
-\Group Fluid Properties
+\group Fluid Properties
 
 FluidProperties:Name,
        \memo potential fluid name/type in the input file
@@ -80345,7 +80479,7 @@ FluidProperties:Concentration,
         \type real
         \unitsBasedOnField A2
 
-\Group Economics
+\group Economics
 
 CurrencyType,
        \memo If CurrencyType is not specified, it will default to USD and produce $ in the reports.
@@ -81650,7 +81784,7 @@ LifeCycleCost:UseAdjustment,
         \note The multiplier to be applied to the end-use cost for each following year. The total utility
         \note costs for the selected end-use is multiplied by this value. For no change enter 1.0.
 
-\Group Parametrics
+\group Parametrics
 
 Parametric:SetValueForRun,
        \memo Parametric objects allow a set of multiple simulations to be defined in a single idf
@@ -82703,7 +82837,7 @@ Parametric:FileNameSuffix,
   A101; \field Suffix for File Name in Run 100
         \type  alpha
 
-\Group Output Reporting
+\group Output Reporting
 
 Output:VariableDictionary,
        \memo Produces a list summarizing the output variables and meters that are available for
@@ -90763,7 +90897,7 @@ Output:Table:TimeBins,
        \note Optional input on the type of units for the variable used by other fields in the object.
 
 Output:Table:Monthly,
-       \Memo Provides a generic method of setting up tables of monthly results. The report
+       \memo Provides a generic method of setting up tables of monthly results. The report
        \memo has multiple columns that are each defined using a repeated group of fields for any
        \memo number of columns. A single Output:Table:Monthly object often produces multiple
        \memo tables in the output. A table is produced for every instance of a particular output

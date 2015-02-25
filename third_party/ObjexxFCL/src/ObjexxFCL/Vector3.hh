@@ -1835,11 +1835,11 @@ operator <<( std::ostream & stream, Vector3< T > const & v )
 
 	// Save current stream state and set persistent state
 	std::ios_base::fmtflags const old_flags( stream.flags() );
-	std::streamsize const old_precision( stream.precision( Traits::precision() ) );
+	std::streamsize const old_precision( stream.precision( Traits::precision ) );
 	stream << std::right << std::showpoint << std::uppercase;
 
 	// Output Vector3
-	std::size_t const w( Traits::width() );
+	std::size_t const w( Traits::width );
 	stream << std::setw( w ) << v.x << ' ' << std::setw( w ) << v.y << ' ' << std::setw( w ) << v.z;
 
 	// Restore previous stream state

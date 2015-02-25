@@ -1613,6 +1613,7 @@ namespace WaterCoils {
 		//  USE BranchInputManager, ONLY: MyPlantSizingIndex
 		using ReportSizingManager::ReportSizingOutput;
 		using ReportSizingManager::RequestSizing;
+		using ReportSizingManager::GetCoilDesFlowT;
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1642,12 +1643,18 @@ namespace WaterCoils {
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
 		bool bPRINT = true; // TRUE if sizing is reported to output (eio)
 		Real64 TempSize; // autosized value
+		Real64 CpAirStd; // specific heat of air at standard conditions
+		Real64 DesCoilAirFlow; // design air flow rate for the coil [m3/s]
+		Real64 DesCoilExitTemp; // design coil exit temperature [C]
 
 		ErrorsFound = false;
 		PltSizCoolNum = 0;
 		PltSizHeatNum = 0;
 		PltSizNum = 0;
+		DesCoilAirFlow = 0.0;
+		DesCoilExitTemp = 0.0;
 		LoopErrorsFound = false;
+		CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
 
 		// cooling coils
 		if ( WaterCoil( CoilNum ).WaterCoilType == CoilType_Cooling && WaterCoil( CoilNum ).RequestingAutoSize ) {
@@ -1679,9 +1686,18 @@ namespace WaterCoils {
 				bPRINT = true;
 				if ( WaterCoil ( CoilNum ).MaxWaterVolFlowRate != AutoSize ) bPRINT = false;
 				if ( CurSysNum == 0 ) bPRINT = false;
+				if ( CurSysNum > 0 && CurOASysNum == 0 ) {
+					GetCoilDesFlowT( CurSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp );
+					DataAirFlowUsedForSizing = DesCoilAirFlow;
+					DataFlowUsedForSizing = DesCoilAirFlow;
+					DataDesOutletAirTemp = DesCoilExitTemp;
+					DataDesOutletAirHumRat = PsyWFnTdbRhPb( DataDesOutletAirTemp, 0.9, StdBaroPress );
+				}
+
 				SizingString = "Design Coil Load [W]"; // there is no input field for this value and this is not the rated capacity (we should always print this!)
 				RequestSizing( CompType, CompName, CoolingCapacitySizing, SizingString, TempSize, bPRINT, RoutineName );
 				WaterCoil( CoilNum ).DesWaterCoolingCoilRate = TempSize;
+				WaterCoil( CoilNum ).InletAirMassFlowRate = StdRhoAir * DataFlowUsedForSizing; // inlet air mass flow rate is the autosized value
 				DataCapacityUsedForSizing = WaterCoil( CoilNum ).DesWaterCoolingCoilRate;
 
 				// Why isn't the water volume flow rate based on the user inputs for inlet/outlet air/water temps? Water volume flow rate is always based on autosized inputs.
@@ -1882,6 +1898,7 @@ namespace WaterCoils {
 				DataCapacityUsedForSizing = 0.0;
 				DataDesInletAirTemp = 0.0;
 				DataDesOutletAirTemp = 0.0;
+				DataDesOutletAirHumRat = 0.0;
 				DataDesInletAirHumRat = 0.0;
 				DataDesInletWaterTemp = 0.0;
 
@@ -4430,7 +4447,7 @@ Label999: ;
 	Real64
 	SimpleHeatingCoilUAResidual(
 		Real64 const UA, // UA of coil
-		Optional< FArray1S< Real64 > const > Par // par(1) = design coil load [W]
+		FArray1< Real64 > const & Par // par(1) = design coil load [W]
 	)
 	{
 
@@ -4475,16 +4492,12 @@ Label999: ;
 		int FanOpMode;
 		Real64 PartLoadRatio;
 
-		CoilIndex = int( Par()( 2 ) );
-		if ( Par()( 3 ) == 1.0 ) {
-			FanOpMode = CycFanCycCoil;
-		} else {
-			FanOpMode = ContFanCycCoil;
-		}
-		PartLoadRatio = Par()( 4 );
+		CoilIndex = int( Par( 2 ) );
+		FanOpMode = ( Par( 3 ) == 1.0 ? CycFanCycCoil : ContFanCycCoil );
+		PartLoadRatio = Par( 4 );
 		WaterCoil( CoilIndex ).UACoilVariable = UA;
 		CalcSimpleHeatingCoil( CoilIndex, FanOpMode, PartLoadRatio, SimCalc );
-		Residuum = ( Par()( 1 ) - WaterCoil( CoilIndex ).TotWaterHeatingCoilRate ) / Par()( 1 );
+		Residuum = ( Par( 1 ) - WaterCoil( CoilIndex ).TotWaterHeatingCoilRate ) / Par( 1 );
 		DataDesignCoilCapacity = WaterCoil ( CoilIndex ).TotWaterHeatingCoilRate;
 
 		return Residuum;
@@ -4493,7 +4506,7 @@ Label999: ;
 	Real64
 	SimpleCoolingCoilUAResidual(
 		Real64 const UA, // UA of coil
-		Optional< FArray1S< Real64 > const > Par // par(1) = design coil load [W]
+		FArray1< Real64 > const & Par // par(1) = design coil load [W]
 	)
 	{
 
@@ -4538,13 +4551,9 @@ Label999: ;
 		int FanOpMode;
 		Real64 PartLoadRatio;
 
-		CoilIndex = int( Par()( 2 ) );
-		if ( Par()( 3 ) == 1.0 ) {
-			FanOpMode = CycFanCycCoil;
-		} else {
-			FanOpMode = ContFanCycCoil;
-		}
-		PartLoadRatio = Par()( 4 );
+		CoilIndex = int( Par( 2 ) );
+		FanOpMode = ( Par( 3 ) == 1.0 ? CycFanCycCoil : ContFanCycCoil );
+		PartLoadRatio = Par( 4 );
 		WaterCoil( CoilIndex ).UACoilExternal = UA;
 		WaterCoil( CoilIndex ).UACoilInternal = WaterCoil( CoilIndex ).UACoilExternal * 3.3;
 		WaterCoil( CoilIndex ).UACoilTotal = 1.0 / ( 1.0 / WaterCoil( CoilIndex ).UACoilExternal + 1.0 / WaterCoil( CoilIndex ).UACoilInternal );
@@ -4555,7 +4564,7 @@ Label999: ;
 
 		CoolingCoil( CoilIndex, true, DesignCalc, FanOpMode, PartLoadRatio );
 
-		Residuum = ( Par()( 1 ) - WaterCoil( CoilIndex ).TotWaterCoolingCoilRate ) / Par()( 1 );
+		Residuum = ( Par( 1 ) - WaterCoil( CoilIndex ).TotWaterCoolingCoilRate ) / Par( 1 );
 
 		return Residuum;
 	}
@@ -5534,7 +5543,7 @@ Label10: ;
 	Real64
 	EnthalpyResidual(
 		Real64 const Tprov, // test value of Tdb [C]
-		Optional< FArray1S< Real64 > const > Par // Par(1) = desired enthaply H [J/kg]
+		FArray1< Real64 > const & Par // Par(1) = desired enthaply H [J/kg]
 	)
 	{
 
@@ -5576,7 +5585,7 @@ Label10: ;
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		Residuum = Par()( 1 ) - PsyHFnTdbRhPb( Tprov, Par()( 2 ), Par()( 3 ) );
+		Residuum = Par( 1 ) - PsyHFnTdbRhPb( Tprov, Par( 2 ), Par( 3 ) );
 
 		return Residuum;
 	}

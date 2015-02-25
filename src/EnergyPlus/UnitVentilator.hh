@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -531,7 +530,7 @@ namespace UnitVentilator {
 	Real64
 	CalcUnitVentilatorResidual(
 		Real64 const PartLoadRatio, // Coil Part Load Ratio
-		Optional< FArray1S< Real64 > const > Par = _ // Function parameters
+		FArray1< Real64 > const & Par // Function parameters
 	);
 
 	//     NOTICE

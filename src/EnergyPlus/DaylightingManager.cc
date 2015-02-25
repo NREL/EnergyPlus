@@ -9388,7 +9388,7 @@ namespace DaylightingManager {
 					RefPt += IllumMap( MapNum ).Xnum;
 				} // X
 
-				if ( sqlite->writeOutputToSQLite() ) {
+				if ( sqlite ) {
 					if ( SQFirstTime ) {
 						XValue.allocate( maxval( IllumMap( {1,TotIllumMaps} ).Xnum() ) );
 						YValue.allocate( maxval( IllumMap( {1,TotIllumMaps} ).Ynum() ) );
@@ -10273,7 +10273,7 @@ Label903: ;
 		fullmapName = Zone( ZoneNum ).Name + ':' + environmentName + ':' + mapName + " Illuminance [lux] (Hourly)";
 		gio::write( unitNo, FmtA ) << "Date/Time," + fullmapName + MapColSep + refPt1 + MapColSep + refPt2 + MapColSep + MapColSep;
 
-		if ( sqlite->writeOutputToSQLite() ) {
+		if ( sqlite ) {
 			sqlite->createSQLiteDaylightMapTitle( mapNum, fullmapName, environmentName, ZoneNum, refPt1, refPt2, zcoord );
 		}
 
@@ -10281,7 +10281,7 @@ Label903: ;
 
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

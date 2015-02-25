@@ -3,8 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -659,25 +657,25 @@ namespace HVACUnitaryBypassVAV {
 	Real64
 	DOE2DXCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // Par(1) = DX coil number
+		FArray1< Real64 > const & Par // Par(1) = DX coil number
 	);
 
 	Real64
 	HXAssistDXCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // Par(1) = DX coil number
+		FArray1< Real64 > const & Par // Par(1) = DX coil number
 	);
 
 	Real64
 	DXHeatingCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // Par(1) = DX coil number
+		FArray1< Real64 > const & Par // Par(1) = DX coil number
 	);
 
 	Real64
 	MultiModeDXCoilResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = DX coil number
+		FArray1< Real64 > const & Par // Par(1) = DX coil number
 	);
 
 	void
@@ -702,7 +700,7 @@ namespace HVACUnitaryBypassVAV {
 	Real64
 	HotWaterCoilResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		Optional< FArray1S< Real64 > const > Par = _ // Par(5) is the requested coil load
+		FArray1< Real64 > const & Par // Par(5) is the requested coil load
 	);
 
 	//     NOTICE

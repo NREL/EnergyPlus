@@ -3129,7 +3129,7 @@ namespace EvaporativeCoolers {
 	Real64
 	VSEvapUnitLoadResidual(
 		Real64 const FanSpeedRatio,
-		Optional< FArray1S< Real64 > const > Par // parameters
+		FArray1< Real64 > const & Par // parameters
 	)
 	{
 
@@ -3178,10 +3178,10 @@ namespace EvaporativeCoolers {
 		Real64 MinHumRat;
 		Real64 SensibleOutputProvided;
 
-		UnitNum = int( Par()( 1 ) );
-		ZoneNum = int( Par()( 2 ) );
-		ZoneNodeNum = int( Par()( 3 ) );
-		LoadToBeMet = Par()( 5 );
+		UnitNum = int( Par( 1 ) );
+		ZoneNum = int( Par( 2 ) );
+		ZoneNodeNum = int( Par( 3 ) );
+		LoadToBeMet = Par( 5 );
 
 		Node( ZoneEvapUnit( UnitNum ).OAInletNodeNum ).MassFlowRate = ZoneEvapUnit( UnitNum ).DesignAirMassFlowRate * FanSpeedRatio;
 		Node( ZoneEvapUnit( UnitNum ).OAInletNodeNum ).MassFlowRateMaxAvail = Node( ZoneEvapUnit( UnitNum ).OAInletNodeNum ).MassFlowRate;

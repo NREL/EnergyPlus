@@ -59,7 +59,7 @@ namespace HeatBalFiniteDiffManager {
 	using DataGlobals::OutputFileDebug;
 	using DataGlobals::NumOfTimeStepInHour;
 	using DataGlobals::DisplayExtraWarnings;
-	using DataGlobals::TimeStepZone;
+	using DataGlobals::TimeStepZoneSec;
 	using DataGlobals::HourOfDay;
 	using DataGlobals::TimeStep;
 	using DataGlobals::OutputFileInits;
@@ -86,7 +86,6 @@ namespace HeatBalFiniteDiffManager {
 	using DataHeatBalSurface::OpaqSurfInsFaceConductionFlux;
 	using DataHeatBalSurface::OpaqSurfOutsideFaceConductionFlux;
 	using DataHeatBalSurface::OpaqSurfOutsideFaceConduction;
-	using DataHeatBalSurface::QsrcHist;
 	using DataHeatBalSurface::OpaqSurfInsFaceConduction;
 	using DataHeatBalSurface::QdotRadOutRepPerArea;
 	using DataHeatBalSurface::MinSurfaceTempLimit;
@@ -840,7 +839,7 @@ namespace HeatBalFiniteDiffManager {
 
 					//check for Material layers that are too thin and highly conductivity (not appropriate for surface models)
 					if ( Alpha > HighDiffusivityThreshold && ! Material( CurrentLayer ).WarnedForHighDiffusivity ) {
-						DeltaTimestep = TimeStepZone * SecInHour;
+						DeltaTimestep = TimeStepZoneSec;
 						ThicknessThreshold = std::sqrt( Alpha * DeltaTimestep * 3.0 );
 						if ( Material( CurrentLayer ).Thickness < ThicknessThreshold ) {
 							ShowSevereError( "InitialInitHeatBalFiniteDiff: Found Material that is too thin and/or too highly conductive, material name = " + Material( CurrentLayer ).Name );
@@ -1109,7 +1108,7 @@ namespace HeatBalFiniteDiffManager {
 		Real64 AbsExt; // exterior absorptivity  movable insulation
 		EvalOutsideMovableInsulation( Surf, HMovInsul, RoughIndexMovInsul, AbsExt );
 		// Start stepping through the slab with time.
-		for ( int J = 1, J_end = nint( ( TimeStepZone * SecInHour ) / Delt ); J <= J_end; ++J ) { //PT testing higher time steps
+		for ( int J = 1, J_end = nint( TimeStepZoneSec / Delt ); J <= J_end; ++J ) { //PT testing higher time steps
 
 			int GSiter; // iteration counter for implicit repeat calculation
 			for ( GSiter = 1; GSiter <= MaxGSiter; ++GSiter ) { //  Iterate implicit equations
@@ -1670,7 +1669,7 @@ namespace HeatBalFiniteDiffManager {
 			// Report all outside BC heat fluxes
 			QdotRadOutRepPerArea( Surf ) = -( hgnd * ( TDT_i - Tgnd ) + hrad * ( -Toa_TDT_i ) + hsky * ( TDT_i - Tsky ) );
 			QdotRadOutRep( Surf ) = surface.Area * QdotRadOutRepPerArea( Surf );
-			QRadOutReport( Surf ) = QdotRadOutRep( Surf ) * SecInHour * TimeStepZone;
+			QRadOutReport( Surf ) = QdotRadOutRep( Surf ) * TimeStepZoneSec;
 
 		} // regular BC part of the ground and Rain check
 

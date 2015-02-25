@@ -5545,16 +5545,16 @@ namespace DXCoils {
 							VolFlowRate = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode );
 							if ( VolFlowRate >= SmallAirVolFlow ) {
 								if ( CurOASysNum > 0 ) { // coil is in the OA stream
-									MixTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
-									MixHumRat = FinalSysSizing( CurSysNum ).CoolOutHumRat;
+									MixTemp = FinalSysSizing( CurSysNum ).OutTempAtCoolPeak;
+									MixHumRat = FinalSysSizing( CurSysNum ).OutHumRatAtCoolPeak;
 									SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
 									SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
 								} else { // coil is on the main air loop
 									SupTemp = FinalSysSizing( CurSysNum ).CoolSupTemp;
 									SupHumRat = FinalSysSizing( CurSysNum ).CoolSupHumRat;
 									if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
-										MixTemp = FinalSysSizing( CurSysNum ).CoolMixTemp;
-										MixHumRat = FinalSysSizing( CurSysNum ).CoolMixHumRat;
+										MixTemp = FinalSysSizing( CurSysNum ).MixTempAtCoolPeak;
+										MixHumRat = FinalSysSizing( CurSysNum ).MixHumRatAtCoolPeak;
 									} else { // there is precooling of OA stream
 										if ( VolFlowRate > 0.0 ) {
 											OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / VolFlowRate;
@@ -5562,11 +5562,11 @@ namespace DXCoils {
 											OutAirFrac = 1.0;
 										}
 										OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
-										MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetTemp;
-										MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetHumRat;
+										MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).RetTempAtCoolPeak;
+										MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).RetHumRatAtCoolPeak;
 									}
 								}
-								OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
+								OutTemp = FinalSysSizing( CurSysNum ).OutTempAtCoolPeak;
 								rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
 								MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
 								MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
@@ -11331,7 +11331,7 @@ Label50: ;
 	Real64
 	CalcTwoSpeedDXCoilIEERResidual(
 		Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = DX coil number
+		FArray1< Real64 > const & Par // par(1) = DX coil number
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -11404,18 +11404,18 @@ Label50: ;
 		Real64 HighSpeedNetCoolingCap;
 		Real64 LowSpeedNetCoolingCap;
 
-		DXCoilNum = int( Par()( 1 ) );
-		TargetCoilLeavingDryBulb = Par()( 2 );
-		TargetNetCapacity = Par()( 3 );
-		OutdoorUnitInletDryBulb = Par()( 4 );
-		IndoorUnitInletWetBulb = Par()( 5 );
-		IndoorUnitInletDryBulb = Par()( 6 );
-		NetCoolingCapRated = Par()( 7 );
-		FanPowerPerEvapAirFlowRate = Par()( 8 );
-		FanInletNodeNum = int( Par()( 9 ) );
-		FanOutletNodeNum = int( Par()( 10 ) );
-		FanExternalStaticFull = Par()( 11 );
-		FanIndex = int( Par()( 12 ) );
+		DXCoilNum = int( Par( 1 ) );
+		TargetCoilLeavingDryBulb = Par( 2 );
+		TargetNetCapacity = Par( 3 );
+		OutdoorUnitInletDryBulb = Par( 4 );
+		IndoorUnitInletWetBulb = Par( 5 );
+		IndoorUnitInletDryBulb = Par( 6 );
+		NetCoolingCapRated = Par( 7 );
+		FanPowerPerEvapAirFlowRate = Par( 8 );
+		FanInletNodeNum = int( Par( 9 ) );
+		FanOutletNodeNum = int( Par( 10 ) );
+		FanExternalStaticFull = Par( 11 );
+		FanIndex = int( Par( 12 ) );
 
 		if ( DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 ) > 0.0 ) {
 			AirMassFlowRatio = SupplyAirMassFlowRate / DXCoil( DXCoilNum ).RatedAirMassFlowRate( 1 );

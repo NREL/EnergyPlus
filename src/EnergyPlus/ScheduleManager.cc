@@ -2331,9 +2331,8 @@ namespace ScheduleManager {
 	Real64
 	LookUpScheduleValue(
 		int const ScheduleIndex,
-		Optional_int ThisHour,
-		Optional_int ThisTimeStep,
-		Optional_int ThisDayOfYear
+		int const ThisHour, // Negative => unspecified
+		int const ThisTimeStep  // Negative => unspecified
 	)
 	{
 
@@ -2391,13 +2390,13 @@ namespace ScheduleManager {
 			return LookUpScheduleValue;
 		}
 
-		if ( ! present( ThisHour ) ) {
+		if ( ThisHour < 0 ) { // ThisHour unspecified
 			LookUpScheduleValue = GetCurrentScheduleValue( ScheduleIndex );
 
 			//  ELSEIF (ThisHour == 0) THEN  ! odd answers when thishour=0 (initialization of shadowing)
 			//    LookUpScheduleValue=GetCurrentScheduleValue(ScheduleIndex)
 
-		} else if ( ! present( ThisDayOfYear ) ) { // ThisHour present, check other optional parameters
+		} else { // ThisHour specified
 			//  so, current date, but maybe TimeStep added
 
 			// Determine which Week Schedule is used
@@ -2445,7 +2444,7 @@ namespace ScheduleManager {
 				}
 			}
 			WhichHour += DSTIndicator;
-			if ( present( ThisTimeStep ) ) {
+			if ( ThisTimeStep >= 0 ) { // ThisTimeStep specified
 				if ( ThisTimeStep == 0 ) {
 					WhichTimeStep = NumOfTimeStepInHour;
 				} else {
@@ -2466,8 +2465,6 @@ namespace ScheduleManager {
 				}
 			}
 
-		} else { // date present, not ready for that yet.
-			ShowFatalError( "DayofYear Requested in LookUpScheduleValue, not implemented yet" );
 		}
 
 		return LookUpScheduleValue;
