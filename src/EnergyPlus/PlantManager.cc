@@ -3128,26 +3128,26 @@ namespace PlantManager {
 						PlantSizFac = PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).PumpSizFac;
 						break;
 					}
+				}
 			}
 
-			// sum up contributions from CompDesWaterFlow
-			if ( PlantLoop( LoopNum ).MaxVolFlowRateWasAutoSized ){
-				PlantSizData( PlantSizNum ).DesVolFlowRate = 0.0; // init for summation
-				for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( DemandSide ).TotalBranches; ++BranchNum ) {
-					for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-						SupNodeNum = PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn;
-						for ( WaterCompNum = 1; WaterCompNum <= SaveNumPlantComps; ++WaterCompNum ) {
-							if ( SupNodeNum == CompDesWaterFlow( WaterCompNum ).SupNode ) {
-								PlantSizData( PlantSizNum ).DesVolFlowRate += CompDesWaterFlow( WaterCompNum ).DesVolFlowRate;
-							}
+			// sum up contributions from CompDesWaterFlow, demand side size request (non-coincident)
+			PlantSizData( PlantSizNum ).DesVolFlowRate = 0.0; // init for summation
+			for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( DemandSide ).TotalBranches; ++BranchNum ) {
+				for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
+					SupNodeNum = PlantLoop( LoopNum ).LoopSide( DemandSide ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn;
+					for ( WaterCompNum = 1; WaterCompNum <= SaveNumPlantComps; ++WaterCompNum ) {
+						if ( SupNodeNum == CompDesWaterFlow( WaterCompNum ).SupNode ) {
+							PlantSizData( PlantSizNum ).DesVolFlowRate += CompDesWaterFlow( WaterCompNum ).DesVolFlowRate;
 						}
 					}
 				}
 			}
 
-			if ( ! PlantLoop( LoopNum ).MaxVolFlowRateWasAutoSized ) {
-					PlantSizData( PlantSizNum ).DesVolFlowRate = PlantLoop( LoopNum ).MaxVolFlowRate;
-				} 
+			if ( ! PlantLoop( LoopNum ).MaxVolFlowRateWasAutoSized && ( PlantLoop( LoopNum ).MaxVolFlowRate > 0.0 ) ) {
+					// if the user puts in a large throwaway value for hard max plant loop size, they may not want this affecting anything else.
+					//  but if they put in a smaller value, then it should cap the design size, so use hard value if it is smaller than non-coincident result
+					PlantSizData( PlantSizNum ).DesVolFlowRate = std::min( PlantSizData( PlantSizNum ).DesVolFlowRate, PlantLoop( LoopNum ).MaxVolFlowRate );
 			}
 
 		}
