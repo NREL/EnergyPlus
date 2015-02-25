@@ -16,9 +16,11 @@ set( test_src
   SizingManager.unit.cc
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
+  SQLite.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
   WaterThermalTanks.unit.cc
+  main.cc
 )
 
 set( test_dependencies
