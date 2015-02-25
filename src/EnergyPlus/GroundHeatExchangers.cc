@@ -306,12 +306,8 @@ namespace GroundHeatExchangers {
 		int J0;
 		Real64 doubleIntegralVal;
 		Real64 midFieldVal;
-		Real64 SubAGG( 15.0 );
-		Real64 AGG = ( 192.0 );
 
 		DisplayString( "Calculating G-Functions" );
-
-		//std::ofstream static file("gFuncOutput.csv", std::ofstream::out);
 
 		X0.allocate( numCoils );
 		Y0.allocate( numTrenches );
@@ -449,9 +445,6 @@ namespace GroundHeatExchangers {
 							}
 
 							gFunc += gFuncin;
-
-							//file << n << "," << m << "," << n1 << "," << m1 << "," << gFunc << "," << gFuncin << "," << doubleIntegralVal << "," << midFieldVal << "," << valStored(mm1, nn1) << ","
-							//	<< ( gFunc * ( coilDiameter / 2.0 ) ) / ( 4 * Pi * fraction * numTrenches * numCoils ) << std::endl;
 
 						} // n
 					} // m
@@ -849,7 +842,6 @@ namespace GroundHeatExchangers {
 	GLHESlinky::getAnnualTimeConstant()
 	{
 		// calculate annual time constant for ground conduction
-		timeSS = ( pow_2( totalTubeLength ) / ( 9.0 * diffusivityGround ) ) / SecInHour / 8760.0;
 		timeSSFactor = 1.0;
 	}
 
@@ -1594,6 +1586,10 @@ namespace GroundHeatExchangers {
 				slinkyGLHE( GLHENum ).totalTubeLength = Pi * slinkyGLHE( GLHENum ).coilDiameter * slinkyGLHE( GLHENum ).trenchLength 
 													* slinkyGLHE( GLHENum ). numTrenches / slinkyGLHE( GLHENum ). coilPitch;
 
+				// Get Gfunction data
+				slinkyGLHE( GLHENum ).SubAGG = 15;
+				slinkyGLHE( GLHENum ).AGG = 192;
+
 				// Farfield model parameters, validated min/max by IP
 				slinkyGLHE( GLHENum ).useGroundTempDataForKusuda = lNumericFieldBlanks( 16 ) || lNumericFieldBlanks( 17 ) || lNumericFieldBlanks( 18 );
 
@@ -2107,6 +2103,7 @@ namespace GroundHeatExchangers {
 			LastHourN = 0;
 			prevTimeSteps = 0.0;
 			currentSimTime = 0.0;
+			QGLHE = 0.0;
 		}
 
 		massFlowRate = RegulateCondenserCompFlowReqOp( loopNum, loopSideNum, branchNum, compNum, designMassFlow );
@@ -2184,8 +2181,6 @@ namespace GroundHeatExchangers {
 			Node( inletNodeNum ).Temp = getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays );
 			Node( outletNodeNum ).Temp = getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays );
 
-			tempGround = getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays);
-
 			// zero out all history arrays
 
 			QnHr = 0.0;
@@ -2194,7 +2189,10 @@ namespace GroundHeatExchangers {
 			LastHourN = 0;
 			prevTimeSteps = 0.0;
 			currentSimTime = 0.0;
+			QGLHE = 0.0;
 		}
+
+		tempGround = getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays);
 
 		massFlowRate = RegulateCondenserCompFlowReqOp( loopNum, loopSideNum, branchNum, compNum, designMassFlow );
 
@@ -2245,7 +2243,7 @@ namespace GroundHeatExchangers {
 		Term1 = -z * std::sqrt( Pi / ( SecsInYear * diffusivityGround ) );
 		Term2 = ( 2 * Pi / SecsInYear ) * ( ( DayOfSim - phaseShiftInDays ) * SecsInDay - ( z / 2 ) * std::sqrt( SecsInYear / ( Pi * diffusivityGround ) ) );
 		
-		return  aveGroundTemp - aveGroundTempAmplitude * std::exp( Term1 ) * std::cos( Term2 );
+		return aveGroundTemp - aveGroundTempAmplitude * std::exp( Term1 ) * std::cos( Term2 );
 		
 	}
 
