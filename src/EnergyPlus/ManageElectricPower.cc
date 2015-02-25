@@ -3029,26 +3029,9 @@ namespace ManageElectricPower {
 
 				Pw = tmpPdraw / Numbattery;
 				q0 = ElecStorage( ElecStorNum ).LastTimeStepAvailable + ElecStorage( ElecStorNum ).LastTimeStepBound;
-				I0 = 10.0; // Initial assumption
-				T0 = qmax / I0; // Initial Assumption
-				qmaxf = qmax * k * c * T0 / ( 1.0 - std::exp( -k * T0 ) + c * ( k * T0 - 1.0 + std::exp( -k * T0 ) ) ); //Initial calculation of a function qmax(I)
-				Xf = ( qmax - q0 ) / qmaxf;
-				Ef = E0c + CurveValue( ElecStorage( ElecStorNum ).DischargeCurveNum, Xf ); //E0d+Ac*Xf+Cc*X/(Dc-Xf)
-				Volt = Ef - I0 * InternalR;
-				Inew = Pw / Volt;
-				Tnew = qmaxf / Inew;
-				error = 1.0;
-
-				while ( error > 0.0001 ) { //Iteration process to get converged current(I)
-					I0 = Inew;
-					T0 = Tnew;
-					qmaxf = qmax * k * c * T0 / ( 1.0 - std::exp( -k * T0 ) + c * ( k * T0 - 1.0 + std::exp( -k * T0 ) ) );
-					Xf = ( qmax - q0 ) / qmaxf;
-					Ef = E0c + CurveValue( ElecStorage( ElecStorNum ).DischargeCurveNum, Xf ); //E0c+Ad*Xf+Cd*X/(Dd-Xf)
-					Volt = Ef - I0 * InternalR;
-					Inew = Pw / Volt;
-					Tnew = qmaxf / Inew;
-					error = std::abs( Inew - I0 );
+				bool ok = determineCurrentForBatteryDischarge( I0, T0, Volt, Pw, q0, ElecStorage( ElecStorNum ).DischargeCurveNum, k, c, qmax, E0c, InternalR );
+				if ( !ok ){
+					ShowFatalError( "ElectricLoadCenter:Storage:Battery named=\"" + ElecStorage( ElecStorNum ).Name + "\". Battery discharge current could not be estimated due to iteration limit reached. " );
 				}
 
 				dividend = k * ElecStorage( ElecStorNum ).LastTimeStepAvailable * std::exp( -k * TimeStepSys ) + q0 * k * c * ( 1.0 - std::exp( -k * TimeStepSys ) );
@@ -3191,6 +3174,54 @@ namespace ManageElectricPower {
 	}
 
 	//*****************************************************************************************************************
+
+	bool 
+	determineCurrentForBatteryDischarge( 
+		Real64& curI0, 
+		Real64& curT0, 
+		Real64& curVolt,
+		Real64 const Pw, 
+		Real64 const q0,
+		int const CurveNum,
+		Real64 const k,
+		Real64 const c,
+		Real64 const qmax,
+		Real64 const E0c,
+		Real64 const InternalR )
+	{
+		using CurveManager::CurveValue;
+
+		curI0 = 10.0; // Initial assumption
+		curT0 = qmax / curI0; // Initial Assumption
+		Real64 qmaxf = qmax * k * c * curT0 / ( 1.0 - std::exp( -k * curT0 ) + c * ( k * curT0 - 1.0 + std::exp( -k * curT0 ) ) ); //Initial calculation of a function qmax(I)
+		Real64 Xf = ( qmax - q0 ) / qmaxf;
+		Real64 Ef = E0c + CurveValue( CurveNum, Xf ); //E0d+Ac*Xf+Cc*X/(Dc-Xf)
+		curVolt = Ef - curI0 * InternalR;
+		Real64 Inew = Pw / curVolt;
+		Real64 Tnew = qmaxf / Inew;
+		Real64 error = 1.0;
+		int countForIteration = 0;
+		bool exceedIterationLimit = false;
+
+		while ( error > 0.0001 ) { //Iteration process to get converged current(I)
+			curI0 = Inew;
+			curT0 = Tnew;
+			qmaxf = qmax * k * c * curT0 / ( 1.0 - std::exp( -k * curT0 ) + c * ( k * curT0 - 1.0 + std::exp( -k * curT0 ) ) );
+			Xf = ( qmax - q0 ) / qmaxf;
+			Ef = E0c + CurveValue( CurveNum, Xf ); //E0c+Ad*Xf+Cd*X/(Dd-Xf)
+			curVolt = Ef - curI0 * InternalR;
+			Inew = Pw / curVolt;
+			Tnew = qmaxf / Inew;
+			error = std::abs( Inew - curI0 );
+			countForIteration++;
+			if ( countForIteration > 1000 ){
+				exceedIterationLimit = true;
+				break;
+			}
+		}
+		return (!exceedIterationLimit);
+	}
+
 
 	void
 	FigureElectricalStorageZoneGains()
