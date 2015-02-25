@@ -313,7 +313,9 @@ namespace GroundHeatExchangers {
 		Y0.allocate( numTrenches );
 
 		// Calculate the number of g-functions required
-		tLg_max = std::log10( maxSimYears * convertYearsToSeconds / ts );
+		// Note: G-functions generated in base 'e' rather to maintain consistency with current code.
+		// Slinky g-functions based on original reference were generated with base 10. 
+		tLg_max = std::log( maxSimYears * convertYearsToSeconds / ts ); 
 		NPairs = ( tLg_max - tLg_min ) / ( tLg_grid ) + 1;
 
 
