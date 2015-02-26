@@ -7,14 +7,19 @@ set( test_src
   ExteriorEnergyUse.unit.cc
   HeatBalanceManager.unit.cc
   HVACStandaloneERV.unit.cc
+  MixedAir.unit.cc
+  PurchasedAirManager.unit.cc
   OutputProcessor.unit.cc
   OutputReportTabular.unit.cc
+  ReportSizingManager.unit.cc
   SizingManager.unit.cc
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
+  SQLite.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
   WaterThermalTanks.unit.cc
+  main.cc
 )
 
 set( test_dependencies

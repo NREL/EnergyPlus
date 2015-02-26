@@ -1864,11 +1864,11 @@ namespace HVACUnitarySystem {
 						OASysEqSizing( CurOASysNum ).AirVolFlow = SysCoolingFlow;
 					} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) {
 						VolFlowRate = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-						MixTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
-						MixHumRat = FinalSysSizing( CurSysNum ).CoolOutHumRat;
+						MixTemp = FinalSysSizing( CurSysNum ).OutTempAtCoolPeak;
+						MixHumRat = FinalSysSizing( CurSysNum ).OutHumRatAtCoolPeak;
 						SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
 						SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
-						OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
+						OutTemp = FinalSysSizing( CurSysNum ).OutTempAtCoolPeak;
 						rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
 						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
 						MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
@@ -1971,11 +1971,11 @@ namespace HVACUnitarySystem {
 						OASysEqSizing( CurOASysNum ).AirFlow = true;
 					} else if ( SELECT_CASE_var == FlowPerCoolingCapacity ) {
 						VolFlowRate = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
-						MixTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
-						MixHumRat = FinalSysSizing( CurSysNum ).CoolOutHumRat;
+						MixTemp = FinalSysSizing( CurSysNum ).OutTempAtCoolPeak;
+						MixHumRat = FinalSysSizing( CurSysNum ).OutHumRatAtCoolPeak;
 						SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
 						SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
-						OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
+						OutTemp = FinalSysSizing( CurSysNum ).OutTempAtCoolPeak;
 						rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
 						MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
 						MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
@@ -2085,8 +2085,8 @@ namespace HVACUnitarySystem {
 							SupTemp = FinalSysSizing( CurSysNum ).CoolSupTemp;
 							SupHumRat = FinalSysSizing( CurSysNum ).CoolSupHumRat;
 							if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
-								MixTemp = FinalSysSizing( CurSysNum ).CoolMixTemp;
-								MixHumRat = FinalSysSizing( CurSysNum ).CoolMixHumRat;
+								MixTemp = FinalSysSizing( CurSysNum ).MixTempAtCoolPeak;
+								MixHumRat = FinalSysSizing( CurSysNum ).MixHumRatAtCoolPeak;
 							} else { // there is precooling of OA stream
 								if ( VolFlowRate > 0.0 ) {
 									OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / VolFlowRate;
@@ -2094,10 +2094,10 @@ namespace HVACUnitarySystem {
 									OutAirFrac = 1.0;
 								}
 								OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
-								MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetTemp;
-								MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetHumRat;
+								MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).RetTempAtCoolPeak;
+								MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).RetHumRatAtCoolPeak;
 							}
-							OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
+							OutTemp = FinalSysSizing( CurSysNum ).OutTempAtCoolPeak;
 							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
 							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
 							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
@@ -2220,8 +2220,8 @@ namespace HVACUnitarySystem {
 							SupTemp = FinalSysSizing( CurSysNum ).CoolSupTemp;
 							SupHumRat = FinalSysSizing( CurSysNum ).CoolSupHumRat;
 							if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
-								MixTemp = FinalSysSizing( CurSysNum ).CoolMixTemp;
-								MixHumRat = FinalSysSizing( CurSysNum ).CoolMixHumRat;
+								MixTemp = FinalSysSizing( CurSysNum ).MixTempAtCoolPeak;
+								MixHumRat = FinalSysSizing( CurSysNum ).MixHumRatAtCoolPeak;
 							} else { // there is precooling of OA stream
 								if ( VolFlowRate > 0.0 ) {
 									OutAirFrac = FinalSysSizing( CurSysNum ).DesMainVolFlow / VolFlowRate;
@@ -2229,10 +2229,10 @@ namespace HVACUnitarySystem {
 									OutAirFrac = 1.0;
 								}
 								OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
-								MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetTemp;
-								MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetHumRat;
+								MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).RetTempAtCoolPeak;
+								MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).RetHumRatAtCoolPeak;
 							}
-							OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
+							OutTemp = FinalSysSizing( CurSysNum ).OutTempAtCoolPeak;
 							rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
 							MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
 							MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
@@ -8199,7 +8199,7 @@ namespace HVACUnitarySystem {
 
 		if ( SELECT_CASE_var == CoilDX_CoolingSingleSpeed ) { // Coil:Cooling:DX:SingleSpeed
 
-			SimDXCoil( BlankString, CompOn, FirstHVACIteration, CompIndex, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadRatio, _, CoilCoolHeatRat );
+			SimDXCoil( BlankString, CompOn, FirstHVACIteration, CompIndex, UnitarySystem( UnitarySysNum ).FanOpMode, PartLoadRatio, OnOffAirFlowRatio, CoilCoolHeatRat );
 			UnitarySystem( UnitarySysNum ).CoolCompPartLoadRatio = PartLoadRatio * double( CompOn );
 
 		} else if ( ( SELECT_CASE_var == CoilDX_CoolingHXAssisted ) || ( SELECT_CASE_var == CoilWater_CoolingHXAssisted ) ) { // CoilSystem:Cooling:*:HeatExchangerAssisted
@@ -8208,7 +8208,7 @@ namespace HVACUnitarySystem {
 				mdot = min( Node( UnitarySystem( UnitarySysNum ).CoolCoilFluidOutletNodeNum ).MassFlowRateMaxAvail, UnitarySystem( UnitarySysNum ).MaxCoolCoilFluidFlow * PartLoadRatio );
 				Node( UnitarySystem( UnitarySysNum ).CoolCoilFluidInletNode ).MassFlowRate = mdot;
 			}
-			SimHXAssistedCoolingCoil( BlankString, FirstHVACIteration, CompOn, PartLoadRatio, CompIndex, UnitarySystem( UnitarySysNum ).FanOpMode, HXUnitOn, _, EconomizerFlag );
+			SimHXAssistedCoolingCoil( BlankString, FirstHVACIteration, CompOn, PartLoadRatio, CompIndex, UnitarySystem( UnitarySysNum ).FanOpMode, HXUnitOn, OnOffAirFlowRatio, EconomizerFlag );
 			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingHXAssisted ) UnitarySystem( UnitarySysNum ).CoolCompPartLoadRatio = PartLoadRatio * double( CompOn );
 
 		} else if ( SELECT_CASE_var == CoilDX_CoolingTwoSpeed ) { // Coil:Cooling:DX:TwoSpeed

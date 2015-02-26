@@ -322,8 +322,7 @@ USE SetVersion
         WRITE(Auditf,fmta) ' New IDF lines will have blank fields filled with defaults as applicable'
       ENDIF
 
-  WRITE(*,*) TRIM(RepVarFileNameWithPath)
-   100  INQUIRE(File=TRIM(RepVarFileNameWithPath),EXIST=InExist)
+100   INQUIRE(File=TRIM(RepVarFileNameWithPath),EXIST=InExist)
       IF (InExist) THEN
         LFN=GetNewUnitNumber()
         OPEN(LFN,FILE=TRIM(RepVarFileNameWithPath),IOSTAT=Ios,action='READ')
