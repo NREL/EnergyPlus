@@ -99,6 +99,8 @@ namespace EnergyPlus {
 		using DataSizing::PlantSizData;
 		using DataSizing::HeatingLoop;
 		using DataSizing::CoolingLoop;
+		using DataSizing::CondenserLoop;
+		using DataSizing::SteamLoop;
 
 		for ( auto &P : plantCoincAnalyObjs ) {
 			//call setup log routine for each coincident plant analysis object 
@@ -108,11 +110,13 @@ namespace EnergyPlus {
 			P.supplyInletNodeTemp_LogIndex = sizingLogger.SetupVariableSizingLog( 
 				Node(P.supplySideInletNodeNum).Temp,
 				P.numTimeStepsInAvg );
-			if ( PlantSizData(P.plantSizingIndex).LoopType == HeatingLoop ) {
+			if ( PlantSizData(P.plantSizingIndex).LoopType == HeatingLoop 
+					|| PlantSizData(P.plantSizingIndex).LoopType == SteamLoop) {
 				P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog( 
 					PlantReport(P.plantLoopIndex ).HeatingDemand,
 					P.numTimeStepsInAvg ) ;
-			} else if ( PlantSizData(P.plantSizingIndex).LoopType == CoolingLoop ) {
+			} else if ( PlantSizData(P.plantSizingIndex).LoopType == CoolingLoop 
+						|| PlantSizData(P.plantSizingIndex).LoopType == CondenserLoop ) {
 				P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog( 
 					PlantReport(P.plantLoopIndex ).CoolingDemand,
 					P.numTimeStepsInAvg ) ;
@@ -257,7 +261,7 @@ namespace EnergyPlus {
 
 				if (!Available) break;
 				if (ErrorsFound) break;
-				if (!DoDesDaySim)  continue;
+			//	if (!DoDesDaySim)  continue;
 				if (KindOfSim == ksRunPeriodWeather) continue;
 				if (KindOfSim == ksDesignDay) continue;
 				if (KindOfSim == ksRunPeriodDesign) continue;
@@ -265,7 +269,7 @@ namespace EnergyPlus {
 				if (Environment(Envrn).HVACSizingIterationNum != HVACSizingIterCount) continue;
 
 				if (ReportDuringHVACSizingSimulation){
-					if (sqlite->writeOutputToSQLite()) {
+					if ( sqlite ) {
 						sqlite->sqliteBegin();
 						sqlite->createSQLiteEnvironmentPeriodRecord( DataEnvironment::CurEnvirNum, DataEnvironment::EnvironmentName, DataGlobals::KindOfSim );
 						sqlite->sqliteCommit();
@@ -288,7 +292,7 @@ namespace EnergyPlus {
 				while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 
 					if (ReportDuringHVACSizingSimulation) {
-						if (sqlite->writeOutputToSQLite()) sqlite->sqliteBegin(); // setup for one transaction per day
+						if ( sqlite ) sqlite->sqliteBegin(); // setup for one transaction per day
 					}
 					++DayOfSim;
 					gio::write(DayOfSimChr, fmtLD) << DayOfSim;
@@ -364,9 +368,9 @@ namespace EnergyPlus {
 						PreviousHour = HourOfDay;
 
 					} // ... End hour loop.
-
-					if (sqlite->writeOutputToSQLite()) sqlite->sqliteCommit(); // one transaction per day
-
+					if (ReportDuringHVACSizingSimulation) {
+						if ( sqlite ) sqlite->sqliteCommit(); // one transaction per day
+					}
 				} // ... End day loop.
 
 
