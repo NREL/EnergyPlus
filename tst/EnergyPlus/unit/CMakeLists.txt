@@ -5,6 +5,7 @@ set( test_src
   DataPlant.unit.cc
   DXCoils.unit.cc
   ExteriorEnergyUse.unit.cc
+  FluidCoolers.unit.cc
   HeatBalanceManager.unit.cc
   HVACStandaloneERV.unit.cc
   MixedAir.unit.cc
