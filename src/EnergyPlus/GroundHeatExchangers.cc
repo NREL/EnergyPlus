@@ -31,6 +31,8 @@ namespace GroundHeatExchangers {
 	//       AUTHOR         Arun Murugappan, Dan Fisher
 	//       DATE WRITTEN   September 2000
 	//       MODIFIED       B. Griffith, Sept 2010,plant upgrades
+	//                      Matt Mitchell, February 2015. Added Slinky GHX. 
+	//                                                    Moved models to object-oriented design.
 	//       RE-ENGINEERED  na
 
 	// PURPOSE OF THIS MODULE:
@@ -54,6 +56,8 @@ namespace GroundHeatExchangers {
 	//   Dept. of Mathematical Physics, University of Lund, Sweden, June 1987.
 	// Yavuzturk, C., J.D. Spitler. 1999. 'A Short Time Step Response Factor Model
 	//   for Vertical Ground Loop Heat Exchangers. ASHRAE Transactions. 105(2): 475-485.
+	// Xiong, Z., D.E. Fisher, J.D. Spitler. 2015. 'Development and Validation of a Slinky
+	//   Ground Heat Exchanger.' Applied Energy. Vol 114, 57-69.
 
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
@@ -98,8 +102,6 @@ namespace GroundHeatExchangers {
 
 	FArray1D_bool checkEquipName;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE CondenserTowers
-
 	// Object Data
 	FArray1D< GLHEVert > verticalGLHE; 
 	FArray1D< GLHESlinky > slinkyGLHE; 
@@ -120,7 +122,6 @@ namespace GroundHeatExchangers {
 		bool const initLoopEquip
 	)
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Dan Fisher
 		//       DATE WRITTEN:    August, 2000
@@ -266,7 +267,6 @@ namespace GroundHeatExchangers {
 	void 
 	GLHESlinky::calcGFunctions()
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Matt Mitchell
 		//       DATE WRITTEN:    February, 2015
@@ -313,11 +313,8 @@ namespace GroundHeatExchangers {
 		Y0.allocate( numTrenches );
 
 		// Calculate the number of g-functions required
-		// Note: G-functions generated in base 'e' rather to maintain consistency with current code.
-		// Slinky g-functions based on original reference were generated with base 10. 
 		tLg_max = std::log10( maxSimYears * convertYearsToSeconds / ts ); 
 		NPairs = ( tLg_max - tLg_min ) / ( tLg_grid ) + 1;
-
 
 		// Allocate and setup g-function arrays
 		GFNC.allocate( NPairs );
@@ -457,7 +454,6 @@ namespace GroundHeatExchangers {
 			LNTTS( NT ) = tLg;
 
 		} // NT time
-	
 	}
 	//******************************************************************************
 
@@ -472,7 +468,6 @@ namespace GroundHeatExchangers {
 		Real64 const t
 	)
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Matt Mitchell
 		//       DATE WRITTEN:    February, 2015
@@ -510,9 +505,7 @@ namespace GroundHeatExchangers {
 			errFunc2 = std::erfc( 0.5 * distance2 / sqrtAlphaT );
 
 			return errFunc1 / distance1 - errFunc2 / distance2;
-
 		}
-
 	}
 	//******************************************************************************
 
@@ -525,7 +518,6 @@ namespace GroundHeatExchangers {
 	Real64 const t
 	)
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Matt Mitchell
 		//       DATE WRITTEN:    February, 2015
@@ -565,7 +557,6 @@ namespace GroundHeatExchangers {
 	Real64 const theta	
 	)
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Matt Mitchell
 		//       DATE WRITTEN:    February, 2015
@@ -575,6 +566,7 @@ namespace GroundHeatExchangers {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates the distance between any two points on any two loops
 
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 x;
 		Real64 y;
 		Real64 z;
@@ -626,7 +618,6 @@ namespace GroundHeatExchangers {
 		Real64 const theta	
 	)
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Matt Mitchell
 		//       DATE WRITTEN:    February, 2015
@@ -636,6 +627,7 @@ namespace GroundHeatExchangers {
 		// PURPOSE OF THIS SUBROUTINE:
 		// Calculates the distance between any two points between real and fictitious rings
 
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 x;
 		Real64 y;
 		Real64 z;
@@ -676,7 +668,6 @@ namespace GroundHeatExchangers {
 		int const n1
 	)
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Matt Mitchell
 		//       DATE WRITTEN:    February, 2015
@@ -696,7 +687,6 @@ namespace GroundHeatExchangers {
 		int const val
 	)
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Matt Mitchell
 		//       DATE WRITTEN:    February, 2015
@@ -726,7 +716,6 @@ namespace GroundHeatExchangers {
 		Real64 const J0
 	)
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Matt Mitchell
 		//       DATE WRITTEN:    February, 2015
@@ -740,6 +729,7 @@ namespace GroundHeatExchangers {
 		// METHODOLOGY EMPLOYED:
 		// Simpson's 1/3 rule of integration
 
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 sumIntF( 0.0 );
 		Real64 theta( 0.0 );
 		Real64 theta1( 0.0 );
@@ -783,7 +773,6 @@ namespace GroundHeatExchangers {
 		int const J0
 	)
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Matt Mitchell
 		//       DATE WRITTEN:    February, 2015
@@ -797,6 +786,7 @@ namespace GroundHeatExchangers {
 		// METHODOLOGY EMPLOYED:
 		// Simpson's 1/3 rule of integration
 	
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 sumIntF( 0.0 );
 		Real64 eta( 0.0 );
 		Real64 eta1( 0.0 );
@@ -825,7 +815,6 @@ namespace GroundHeatExchangers {
 		}
 
 		return ( h / 3 ) * sumIntF;
-
 	}
 
 	//******************************************************************************
@@ -833,7 +822,15 @@ namespace GroundHeatExchangers {
 	void
 	GLHEVert::getAnnualTimeConstant()
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR:          Matt Mitchell
+		//       DATE WRITTEN:    February, 2015
+		//       MODIFIED         na
+		//       RE-ENGINEERED    na
+
+		// PURPOSE OF THIS SUBROUTINE:
 		// calculate annual time constant for ground conduction
+
 		timeSS = ( pow_2( boreholeLength ) / ( 9.0 * diffusivityGround ) ) / SecInHour / 8760.0;
 		timeSSFactor = timeSS * 8760.0;
 	}
@@ -843,7 +840,15 @@ namespace GroundHeatExchangers {
 	void
 	GLHESlinky::getAnnualTimeConstant()
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR:          Matt Mitchell
+		//       DATE WRITTEN:    February, 2015
+		//       MODIFIED         na
+		//       RE-ENGINEERED    na
+
+		// PURPOSE OF THIS SUBROUTINE:
 		// calculate annual time constant for ground conduction
+
 		timeSSFactor = 1.0;
 	}
 
@@ -877,7 +882,7 @@ namespace GroundHeatExchangers {
 		// Eskilson, P. 'Thermal Analysis of Heat Extraction Boreholes' Ph.D. Thesis:
 		//   Dept. of Mathematical Physics, University of Lund, Sweden, June 1987.
 		// Yavuzturk, C., J.D. Spitler. 1999. 'A Short Time Step Response Factor Model
-		//   for Vertical Ground Loop Heat Exchangers. ASHRAE Transactions. 105(2): 475-485.
+		//   for Vertical Ground Loop Heat Exchangers.' ASHRAE Transactions. 105(2): 475-485.
 
 		// Using/Aliasing
 		using DataPlant::PlantLoop;
@@ -896,10 +901,6 @@ namespace GroundHeatExchangers {
 		Real64 gFuncVal; // Interpolated G function value at a sub-hour
 		static Real64 ToutNew( 19.375 );
 		Real64 fluidAveTemp;
-		//Real64 groundDiffusivity;
-		//Real64 timeSS; // Steady state time
-		//Real64 timeSSFactor; // Steady state time factor for calculation
-		Real64 XI;
 		Real64 C_1;
 		int numOfMonths; // the number of months of simulation elapsed
 		int currentMonth; // The Month upto which the Montly blocks are superposed
@@ -938,6 +939,7 @@ namespace GroundHeatExchangers {
 
 		kGroundFactor = 2.0 * Pi * kGround;
 
+		// Get time constants
 		getAnnualTimeConstant();
 
 		if ( triggerDesignDayReset && WarmupFlag ) updateCurSimTime = true;
@@ -1178,6 +1180,16 @@ namespace GroundHeatExchangers {
 	void
 	GLHEBase::updateGHX()
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR:          Matt Mitchell
+		//       DATE WRITTEN:    February, 2015
+		//       MODIFIED:        na
+		//       RE-ENGINEERED:   na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Updates the outlet node and check for out of bounds temperatures
+
+		// Using/Aliasing
 		using DataPlant::PlantLoop;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using FluidProperties::GetDensityGlycol;
@@ -1209,7 +1221,6 @@ namespace GroundHeatExchangers {
 			ShowContinueError( "GLHE Current Flow Rate=" + TrimSigDigits( massFlowRate, 3 ) + "; GLHE Design Flow Rate=" + TrimSigDigits( designMassFlow, 3 ) );
 			++numErrorCalls;
 		}
-	
 	}
 
 	//******************************************************************************
@@ -1279,7 +1290,6 @@ namespace GroundHeatExchangers {
 		if ( prevHour != locHourOfDay ) {
 			prevHour = locHourOfDay;
 		}
-
 	}
 
 	//******************************************************************************
@@ -1287,7 +1297,6 @@ namespace GroundHeatExchangers {
 	void
 	GetGroundHeatExchangerInput()
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Dan Fisher
 		//       DATE WRITTEN:    August, 2000
@@ -1804,10 +1813,10 @@ namespace GroundHeatExchangers {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Cenk Yavuzturk
-		//       DATE WRITTEN   1998
-		//       MODIFIED       August, 2000
-		//       RE-ENGINEERED Dan Fisher
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   February, 2015
+		//       MODIFIED       
+		//       RE-ENGINEERED 
 
 		// PURPOSE OF THIS SUBROUTINE:
 		//    Calculates the resistance of the slinky HX from the fluid to the 
@@ -1990,6 +1999,17 @@ namespace GroundHeatExchangers {
 		Real64 const time
 	)
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR:          Matt Mitchell
+		//       DATE WRITTEN:    February, 2015
+		//       MODIFIED         na
+		//       RE-ENGINEERED    na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Gets the g-function for slinky GHXs
+		// Note: Base 10 here.
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 LNTTS;
 
 		LNTTS = std::log10( time );
@@ -2004,6 +2024,17 @@ namespace GroundHeatExchangers {
 		Real64 const time
 	)
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR:          Matt Mitchell
+		//       DATE WRITTEN:    February, 2015
+		//       MODIFIED         na
+		//       RE-ENGINEERED    na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Gets the g-function for vertical GHXs
+		// Note: Base e here.
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 RATIO;
 		Real64 gFuncVal;
 		Real64 LNTTS;
@@ -2026,7 +2057,6 @@ namespace GroundHeatExchangers {
 	void
 	GLHEVert::initGLHESimVars()
 	{
-
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Dan Fisher
 		//       DATE WRITTEN:    August, 2000
@@ -2107,13 +2137,14 @@ namespace GroundHeatExchangers {
 
 		// Reset local environment init flag
 		if ( ! BeginEnvrnFlag ) myEnvrnFlag = true;
-
 	}
 
+	//******************************************************************************
+
 	void
-	GLHESlinky::initGLHESimVars(){
-	
-			// SUBROUTINE INFORMATION:
+	GLHESlinky::initGLHESimVars()
+	{	
+		// SUBROUTINE INFORMATION:
 		//       AUTHOR:          Dan Fisher
 		//       DATE WRITTEN:    August, 2000
 		//       MODIFIED         Arun Murugappan
@@ -2208,8 +2239,7 @@ namespace GroundHeatExchangers {
 		Real64 const aveGroundTempAmplitude, // Average amplitude of annual ground temperature
 		Real64 const phaseShiftInDays // Phase shift
 	)
-	{
-	
+	{	
 		// AUTHOR         Matt Mitchell
 		// DATE WRITTEN   February 2015
 		// MODIFIED       na
@@ -2239,7 +2269,6 @@ namespace GroundHeatExchangers {
 		Term2 = ( 2 * Pi / SecsInYear ) * ( ( DayOfSim - phaseShiftInDays ) * SecsInDay - ( z / 2 ) * std::sqrt( SecsInYear / ( Pi * diffusivityGround ) ) );
 		
 		return aveGroundTemp - aveGroundTempAmplitude * std::exp( Term1 ) * std::cos( Term2 );
-		
 	}
 
 	//******************************************************************************
