@@ -2844,3 +2844,6 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
+  Output:SQLite,
+    Simple;
+
