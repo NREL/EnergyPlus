@@ -267,7 +267,7 @@ namespace EnergyPlus {
 				if (ReportDuringHVACSizingSimulation){
 					if (sqlite->writeOutputToSQLite()) {
 						sqlite->sqliteBegin();
-						sqlite->createSQLiteEnvironmentPeriodRecord();
+						sqlite->createSQLiteEnvironmentPeriodRecord( DataEnvironment::CurEnvirNum, DataEnvironment::EnvironmentName, DataGlobals::KindOfSim );
 						sqlite->sqliteCommit();
 					}
 				}
