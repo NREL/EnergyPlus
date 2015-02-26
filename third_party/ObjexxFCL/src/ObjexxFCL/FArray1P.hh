@@ -29,8 +29,6 @@ class FArray1P : public FArray1< T >, public ObserverMulti
 private: // Types
 
 	typedef  FArray1< T >  Super;
-	typedef  typename Super::real_FArray  real_FArray;
-	typedef  typename Super::proxy_FArray  proxy_FArray;
 	typedef  internal::ProxySentinel  ProxySentinel;
 
 private: // Friend
@@ -100,7 +98,7 @@ public: // Creation
 
 	// Real Constructor
 	inline
-	FArray1P( real_FArray const & a ) :
+	FArray1P( FArray1D< T > const & a ) :
 	 Super( a, ProxySentinel() ),
 	 I_( a.I_ ),
 	 source_( &a )
@@ -166,7 +164,7 @@ public: // Creation
 
 	// Real + IndexRange Constructor
 	inline
-	FArray1P( real_FArray const & a, IR const & I ) :
+	FArray1P( FArray1D< T > const & a, IR const & I ) :
 	 Super( a, ProxySentinel() ),
 	 I_( I ),
 	 source_( &a )
@@ -235,7 +233,7 @@ public: // Creation
 
 	// Non-Const Real Constructor
 	inline
-	FArray1P( real_FArray & a ) :
+	FArray1P( FArray1D< T > & a ) :
 	 Super( a, ProxySentinel() ),
 	 I_( a.I_ ),
 	 source_( &a )
@@ -301,7 +299,7 @@ public: // Creation
 
 	// Non-Const Real + IndexRange Constructor
 	inline
-	FArray1P( real_FArray & a, IR const & I ) :
+	FArray1P( FArray1D< T > & a, IR const & I ) :
 	 Super( a, ProxySentinel() ),
 	 I_( I ),
 	 source_( &a )
@@ -1002,6 +1000,15 @@ public: // Assignment: Value
 
 public: // Subscript
 
+	// Linear Index
+	inline
+	size_type
+	index( int const i ) const
+	{
+		assert( I_.initialized() );
+		return ( i - shift_ );
+	}
+
 	// Const Tail Starting at array( i )
 	inline
 	Tail const
@@ -1019,15 +1026,6 @@ public: // Subscript
 		proxy_const_assert( not_const_proxy() );
 		assert( I_.contains( i ) );
 		return Tail( sdata_ + i, ( data_size_ != npos ? data_size_ - ( i - shift_ ) : npos ) );
-	}
-
-	// Linear Index
-	inline
-	size_type
-	index( int const i ) const
-	{
-		assert( I_.initialized() );
-		return ( i - shift_ );
 	}
 
 public: // Predicate
@@ -1204,7 +1202,7 @@ public: // Modifier
 	// Attach to Real Array
 	inline
 	FArray1P &
-	attach( real_FArray const & a )
+	attach( FArray1D< T > const & a )
 	{
 		Base::attach( a );
 		I_ = a.I_;
@@ -1217,7 +1215,7 @@ public: // Modifier
 	// Attach to Non-Const Real Array
 	inline
 	FArray1P &
-	attach( real_FArray & a )
+	attach( FArray1D< T > & a )
 	{
 		Base::attach( a );
 		I_ = a.I_;
@@ -1258,7 +1256,7 @@ public: // Modifier
 	FArray1P &
 	attach( Base const & a )
 	{
-		Base::attach( a, 1 );
+		Base::attach< 1 >( a );
 		I_ = a.size();
 		if ( source_ ) source_->remove_observer( *this );
 		source_ = dynamic_cast< SubjectMulti const * >( &a );
@@ -1271,7 +1269,7 @@ public: // Modifier
 	FArray1P &
 	attach( Base & a )
 	{
-		Base::attach( a, 1 );
+		Base::attach< 1 >( a );
 		I_ = a.size();
 		if ( source_ ) source_->remove_observer( *this );
 		source_ = dynamic_cast< SubjectMulti const * >( &a );
@@ -1284,7 +1282,7 @@ public: // Modifier
 	FArray1P &
 	attach( Tail const & s )
 	{
-		Base::attach( s, 1 );
+		Base::attach< 1 >( s );
 		I_ = s.size();
 		if ( source_ ) source_->remove_observer( *this );
 		source_ = 0;
@@ -1296,7 +1294,7 @@ public: // Modifier
 	FArray1P &
 	attach( Tail & s )
 	{
-		Base::attach( s, 1 );
+		Base::attach< 1 >( s );
 		I_ = s.size();
 		if ( source_ ) source_->remove_observer( *this );
 		source_ = 0;
@@ -1308,7 +1306,7 @@ public: // Modifier
 	FArray1P &
 	attach( T const & t )
 	{
-		Base::attach( t, 1 );
+		Base::attach< 1 >( t );
 		I_ = star; // Unbounded
 		if ( source_ ) source_->remove_observer( *this );
 		source_ = 0;
@@ -1320,7 +1318,7 @@ public: // Modifier
 	FArray1P &
 	attach( T & t )
 	{
-		Base::attach( t, 1 );
+		Base::attach< 1 >( t );
 		I_ = star; // Unbounded
 		if ( source_ ) source_->remove_observer( *this );
 		source_ = 0;

@@ -296,7 +296,7 @@ namespace SteamCoils {
 
 			CoilNum = StmHeatNum;
 
-			GetObjectItem( CurrentModuleObject, StmHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
+			GetObjectItem( CurrentModuleObject, StmHeatNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( AlphArray( 1 ), SteamCoil.Name(), CoilNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
@@ -1645,7 +1645,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilIndex == 0 ) {
-			ShowSevereError( "GetCoilAirInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
+			ShowSevereError( "GetCoilAirInletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -1709,7 +1709,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilIndex == 0 ) {
-			ShowSevereError( "GetCoilAirOutletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
+			ShowSevereError( "GetCoilAirOutletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -1842,7 +1842,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilIndex == 0 ) {
-			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
+			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -1913,7 +1913,7 @@ namespace SteamCoils {
 		}
 
 		if ( IndexNum == 0 ) {
-			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
+			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -1977,7 +1977,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilIndex == 0 ) {
-			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
+			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -2048,7 +2048,7 @@ namespace SteamCoils {
 		}
 
 		if ( IndexNum == 0 ) {
-			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
+			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName );
 			ErrorsFound = true;
 			NodeNumber = 0;
 		} else {
@@ -2187,7 +2187,7 @@ namespace SteamCoils {
 		}
 
 		if ( CoilIndex == 0 ) {
-			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\"" " with Name = " + CoilName );
+			ShowSevereError( "GetCoilSteamInletNode: Could not find CoilType = \"Coil:Heating:Steam\" with Name = " + CoilName );
 			ErrorsFound = true;
 			TypeOfCoil = 0;
 		} else {

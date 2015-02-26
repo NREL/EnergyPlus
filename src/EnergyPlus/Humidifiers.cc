@@ -432,16 +432,16 @@ namespace Humidifiers {
 					if ( Node( OutNode ).HumRatMin == SensedNodeFlagValue ) {
 						if ( ! AnyEnergyManagementSystemInModel ) {
 							ShowSevereError( "Humidifiers: Missing humidity setpoint for " + HumidifierType( Humidifier( NumHum ).HumType_Code ) + " = " + Humidifier( HumNum ).Name );
-							ShowContinueError( "  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish" "a setpoint at the humidifier outlet node." );
+							ShowContinueError( "  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish a setpoint at the humidifier outlet node." );
 							ShowContinueError( "  expecting it on Node=\"" + NodeID( OutNode ) + "\"." );
 							SetPointErrorFlag = true;
 						} else {
 							CheckIfNodeSetPointManagedByEMS( OutNode, iHumidityRatioMinSetPoint, SetPointErrorFlag );
 							if ( SetPointErrorFlag ) {
 								ShowSevereError( "Humidifiers: Missing humidity setpoint for " + HumidifierType( Humidifier( NumHum ).HumType_Code ) + " = " + Humidifier( HumNum ).Name );
-								ShowContinueError( "  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish" "a setpoint at the humidifier outlet node." );
+								ShowContinueError( "  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish a setpoint at the humidifier outlet node." );
 								ShowContinueError( "  expecting it on Node=\"" + NodeID( OutNode ) + "\"." );
-								ShowContinueError( "  or use an EMS actuator to control minimum humidity ratio to establish" "a setpoint at the humidifier outlet node." );
+								ShowContinueError( "  or use an EMS actuator to control minimum humidity ratio to establish a setpoint at the humidifier outlet node." );
 							}
 						}
 					}
@@ -587,7 +587,7 @@ namespace Humidifiers {
 						if ( FinalSysSizing( CurSysNum ).DesOutAirVolFlow > 0.0 ) {
 							AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutDryBulbTemp, OutHumRat, CalledFrom );
 							MassFlowDes = FinalSysSizing( CurSysNum ).DesOutAirVolFlow * AirDensity;
-							InletHumRatDes = std::min( FinalSysSizing( CurSysNum ).CoolOutHumRat, FinalSysSizing( CurSysNum ).HeatOutHumRat );
+							InletHumRatDes = std::min( FinalSysSizing( CurSysNum ).OutHumRatAtCoolPeak, FinalSysSizing( CurSysNum ).HeatOutHumRat );
 							OutletHumRatDes = std::max( FinalSysSizing( CurSysNum ).CoolSupHumRat, FinalSysSizing( CurSysNum ).HeatSupHumRat );
 						} else {	// ELSE size to supply air duct flow rate
 							auto const SELECT_CASE_var( CurDuctType );
@@ -602,9 +602,9 @@ namespace Humidifiers {
 							} else {
 								AirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 							}
-							AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, FinalSysSizing( CurSysNum ).CoolMixTemp, FinalSysSizing( CurSysNum ).CoolMixHumRat, CalledFrom );
+							AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, FinalSysSizing( CurSysNum ).MixTempAtCoolPeak, FinalSysSizing( CurSysNum ).MixHumRatAtCoolPeak, CalledFrom );
 							MassFlowDes = AirVolFlow * AirDensity;
-							InletHumRatDes = min( FinalSysSizing( CurSysNum ).CoolMixHumRat, FinalSysSizing( CurSysNum ).HeatMixHumRat);
+							InletHumRatDes = min( FinalSysSizing( CurSysNum ).MixHumRatAtCoolPeak, FinalSysSizing( CurSysNum ).HeatMixHumRat);
 							OutletHumRatDes = max( FinalSysSizing( CurSysNum ).CoolSupHumRat, FinalSysSizing( CurSysNum ).HeatSupHumRat);
 						}
 					} else {
@@ -620,9 +620,9 @@ namespace Humidifiers {
 						} else {
 							AirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 						}
-						AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, FinalSysSizing( CurSysNum ).CoolMixTemp, FinalSysSizing( CurSysNum ).CoolMixHumRat, CalledFrom );    
+						AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, FinalSysSizing( CurSysNum ).MixTempAtCoolPeak, FinalSysSizing( CurSysNum ).MixHumRatAtCoolPeak, CalledFrom );    
 						MassFlowDes = AirVolFlow * AirDensity;
-						InletHumRatDes = std::min( FinalSysSizing( CurSysNum ).CoolMixHumRat, FinalSysSizing( CurSysNum ).HeatMixHumRat );
+						InletHumRatDes = std::min( FinalSysSizing( CurSysNum ).MixHumRatAtCoolPeak, FinalSysSizing( CurSysNum ).HeatMixHumRat );
 						OutletHumRatDes = std::max( FinalSysSizing( CurSysNum ).CoolSupHumRat, FinalSysSizing( CurSysNum ).HeatSupHumRat);
 					}
 				}
@@ -672,7 +672,7 @@ namespace Humidifiers {
 			} else {
 				if ( Humidifier( HumNum ).NomPower >= 0.0 && Humidifier( HumNum ).NomCap > 0.0 ) {
 					NomPowerUser = Humidifier( HumNum ).NomPower;
-					ReportSizingOutput( "Humidifier:Steam:Electric", Humidifier( HumNum ).Name, "Design Size Rated Power [W]", NomPowerDes, "User-Specified Rated Power [W]", NomPowerUser);
+					ReportSizingOutput( "Humidifier:Steam:Electric", Humidifier( HumNum ).Name, "Design Size Rated Power [W]", NomPowerDes, "User-Specified Rated Power [W]", NomPowerUser );
 					if ( DisplayExtraWarnings ) {
 						if ( ( std::abs( NomPowerDes - NomPowerUser ) / NomPowerUser ) > AutoVsHardSizingThreshold ) {
 							ShowMessage( "SizeHumidifier: Potential issue with equipment sizing for Humidifier:Steam:Electric=\"" + Humidifier( HumNum ).Name + "\"." );
@@ -683,12 +683,12 @@ namespace Humidifiers {
 						}
 					}
 					if ( Humidifier( HumNum ).NomPower < NominalPower ) {
-						ShowWarningError( "Humidifier:Steam:Electric: specified Rated Power is less than nominal Rated " " Power for electric steam humidifier = " + Humidifier( HumNum ).Name + ". " );
+						ShowWarningError( "Humidifier:Steam:Electric: specified Rated Power is less than nominal Rated Power for electric steam humidifier = " + Humidifier( HumNum ).Name + ". " );
 						ShowContinueError( " specified Rated Power = " + RoundSigDigits( Humidifier( HumNum ).NomPower, 2 ) );
 						ShowContinueError( " while expecting a minimum Rated Power = " + RoundSigDigits( NominalPower, 2 ) );
 					}
 				} else {
-					ShowWarningError( "Humidifier:Steam:Electric: specified nominal capacity is zero " " for electric steam humidifier = " + Humidifier( HumNum ).Name + ". " );
+					ShowWarningError( "Humidifier:Steam:Electric: specified nominal capacity is zero for electric steam humidifier = " + Humidifier( HumNum ).Name + ". " );
 					ShowContinueError( " For zero nominal capacity humidifier the rated power is zero." );
 				}
 			}
@@ -1052,7 +1052,7 @@ namespace Humidifiers {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

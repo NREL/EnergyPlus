@@ -302,7 +302,7 @@ namespace TranspiredCollector {
 		GetObjectDefMaxArgs( CurrentModuleObject, Dummy, MaxNumAlphas, MaxNumNumbers );
 
 		if ( MaxNumNumbers != 11 ) {
-			ShowSevereError( "GetTranspiredCollectorInput: " + CurrentModuleObject + " Object Definition indicates " "not = 11 Number Objects, Number Indicated=" + TrimSigDigits( MaxNumNumbers ) );
+			ShowSevereError( "GetTranspiredCollectorInput: " + CurrentModuleObject + " Object Definition indicates not = 11 Number Objects, Number Indicated=" + TrimSigDigits( MaxNumNumbers ) );
 			ErrorsFound = true;
 		}
 		Alphas.allocate( MaxNumAlphas );
@@ -329,7 +329,7 @@ namespace TranspiredCollector {
 				GetObjectDefMaxArgs( CurrentModuleMultiObject, Dummy, MaxNumAlphasSplit, MaxNumNumbersSplit );
 
 				if ( MaxNumNumbersSplit != 0 ) {
-					ShowSevereError( "GetTranspiredCollectorInput: " + CurrentModuleMultiObject + " Object Definition " "indicates not = 0 Number Objects, Number Indicated=" + TrimSigDigits( MaxNumNumbersSplit ) );
+					ShowSevereError( "GetTranspiredCollectorInput: " + CurrentModuleMultiObject + " Object Definition indicates not = 0 Number Objects, Number Indicated=" + TrimSigDigits( MaxNumNumbersSplit ) );
 					ErrorsFound = true;
 				}
 				if ( ! allocated( AlphasSplit ) ) AlphasSplit.allocate( MaxNumAlphasSplit );
@@ -465,22 +465,22 @@ namespace TranspiredCollector {
 				}
 				// check that surface is appropriate, Heat transfer, Sun, Wind,
 				if ( ! Surface( Found ).HeatTransSurf ) {
-					ShowSevereError( "Surface " + Alphas( ThisSurf + AlphaOffset ) + " not of Heat Transfer type " " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
+					ShowSevereError( "Surface " + Alphas( ThisSurf + AlphaOffset ) + " not of Heat Transfer type in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 					ErrorsFound = true;
 					continue;
 				}
 				if ( ! Surface( Found ).ExtSolar ) {
-					ShowSevereError( "Surface " + Alphas( ThisSurf + AlphaOffset ) + " not exposed to sun " " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
+					ShowSevereError( "Surface " + Alphas( ThisSurf + AlphaOffset ) + " not exposed to sun in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 					ErrorsFound = true;
 					continue;
 				}
 				if ( ! Surface( Found ).ExtWind ) {
-					ShowSevereError( "Surface " + Alphas( ThisSurf + AlphaOffset ) + " not exposed to wind " " in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
+					ShowSevereError( "Surface " + Alphas( ThisSurf + AlphaOffset ) + " not exposed to wind in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 					ErrorsFound = true;
 					continue;
 				}
 				if ( Surface( Found ).ExtBoundCond != OtherSideCondModeledExt ) {
-					ShowSevereError( "Surface " + Alphas( ThisSurf + AlphaOffset ) + " does not have OtherSideConditionsModel " "for exterior boundary conditions in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
+					ShowSevereError( "Surface " + Alphas( ThisSurf + AlphaOffset ) + " does not have OtherSideConditionsModel for exterior boundary conditions in " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 					ErrorsFound = true;
 					continue;
 				}
@@ -508,10 +508,10 @@ namespace TranspiredCollector {
 			for ( ThisSurf = 1; ThisSurf <= UTSC( Item ).NumSurfs; ++ThisSurf ) {
 				SurfID = UTSC( Item ).SurfPtrs( ThisSurf );
 				if ( std::abs( Surface( SurfID ).Azimuth - AvgAzimuth ) > 15.0 ) {
-					ShowWarningError( "Surface " + Surface( SurfID ).Name + " has Azimuth different from others in " "the group associated with " + CurrentModuleObject + " =" + UTSC( Item ).Name );
+					ShowWarningError( "Surface " + Surface( SurfID ).Name + " has Azimuth different from others in the group associated with " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				}
 				if ( std::abs( Surface( SurfID ).Tilt - AvgTilt ) > 10.0 ) {
-					ShowWarningError( "Surface " + Surface( SurfID ).Name + " has Tilt different from others in " "the group associated with " + CurrentModuleObject + " =" + UTSC( Item ).Name );
+					ShowWarningError( "Surface " + Surface( SurfID ).Name + " has Tilt different from others in the group associated with " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				}
 
 				//test that there are no windows.  Now allow windows
@@ -953,7 +953,7 @@ namespace TranspiredCollector {
 
 //		Isc = sum( QRadSWOutIncident( UTSC( UTSCNum ).SurfPtrs ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage: Replaced by below
 		Isc = sum_product_sub( QRadSWOutIncident, Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / AreaSum; //Autodesk:F2C++ Functions handle array subscript usage
-//		Tso = sum( TH( ( UTSC( UTSCNum ).SurfPtrs ), 1, 1 ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage: Replaced by below
+//		Tso = sum( TH( UTSC( UTSCNum ).SurfPtrs, 1, 1 ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage: Replaced by below
 		Tso = sum_product_sub( TH( _, 1, 1 ), Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / AreaSum; //Autodesk:F2C++ Functions handle array subscript usage
 
 		if ( Vwind > 5.0 ) {

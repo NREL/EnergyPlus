@@ -338,7 +338,7 @@ namespace FluidCoolers {
 		NumTwoSpeedFluidCoolers = GetNumObjectsFound( "FluidCooler:TwoSpeed" );
 		NumSimpleFluidCoolers = NumSingleSpeedFluidCoolers + NumTwoSpeedFluidCoolers;
 
-		if ( NumSimpleFluidCoolers <= 0 ) ShowFatalError( "No fluid cooler objects found in input, however, a branch object has specified a fluid cooler. " "Search the input for fluid cooler to determine the cause for this error." );
+		if ( NumSimpleFluidCoolers <= 0 ) ShowFatalError( "No fluid cooler objects found in input, however, a branch object has specified a fluid cooler. Search the input for fluid cooler to determine the cause for this error." );
 
 		// See if load distribution manager has already gotten the input
 		if ( allocated( SimpleFluidCooler ) ) return;
@@ -443,7 +443,7 @@ namespace FluidCoolers {
 					} else {
 						ShowSevereError( cCurrentModuleObject + "= \"" + SimpleFluidCooler( FluidCoolerNum ).Name + "\". Nominal fluid cooler capacity has been specified and design fluid cooler UA is being autosized." );
 					}
-					ShowContinueError( "Design fluid cooler UA field must be left blank " "when nominal fluid cooler capacity performance input method is used." );
+					ShowContinueError( "Design fluid cooler UA field must be left blank when nominal fluid cooler capacity performance input method is used." );
 					ErrorsFound = true;
 				}
 			} else { // Fluid cooler performance input method is not specified as a valid "choice"
@@ -540,7 +540,7 @@ namespace FluidCoolers {
 			//   High speed air flow rate must be greater than low speed air flow rate.
 			//   Can't tell yet if autosized, check later in InitFluidCooler.
 			if ( SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate <= SimpleFluidCooler( FluidCoolerNum ).LowSpeedAirFlowRate && SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate != AutoSize ) {
-				ShowSevereError( cCurrentModuleObject + "= \"" + SimpleFluidCooler( FluidCoolerNum ).Name + "\". Fluid cooler air flow rate at low fan speed must be less than the air " "flow rate at high fan speed." );
+				ShowSevereError( cCurrentModuleObject + "= \"" + SimpleFluidCooler( FluidCoolerNum ).Name + "\". Fluid cooler air flow rate at low fan speed must be less than the air flow rate at high fan speed." );
 				ErrorsFound = true;
 			}
 			if ( SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower <= 0.0 && SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower != AutoSize ) {
@@ -586,7 +586,7 @@ namespace FluidCoolers {
 					} else {
 						ShowSevereError( cCurrentModuleObject + "= \"" + SimpleFluidCooler( FluidCoolerNum ).Name + "\". Nominal capacity input method has been specified and fluid cooler UA at high fan speed is being autosized." );
 					}
-					ShowContinueError( "Fluid cooler UA at high fan speed must be left blank " "when nominal fluid cooler capacity performance input method" " is used." );
+					ShowContinueError( "Fluid cooler UA at high fan speed must be left blank when nominal fluid cooler capacity performance input method is used." );
 					ErrorsFound = true;
 				}
 				if ( SimpleFluidCooler( FluidCoolerNum ).LowSpeedFluidCoolerUA != 0.0 ) {
@@ -595,7 +595,7 @@ namespace FluidCoolers {
 					} else {
 						ShowSevereError( cCurrentModuleObject + "= \"" + SimpleFluidCooler( FluidCoolerNum ).Name + "\". Nominal capacity input method has been specified and fluid cooler UA at low fan speed is being autosized." );
 					}
-					ShowContinueError( "Fluid cooler UA at low fan speed must be left blank " "when nominal fluid cooler capacity performance input method is used." );
+					ShowContinueError( "Fluid cooler UA at low fan speed must be left blank when nominal fluid cooler capacity performance input method is used." );
 					ErrorsFound = true;
 				}
 				if ( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerLowSpeedNomCap >= SimpleFluidCooler( FluidCoolerNum ).FluidCoolerNominalCapacity ) {
@@ -923,8 +923,8 @@ namespace FluidCoolers {
 			if ( PlantSizData( PltSizCondNum ).ExitTemp <= SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp ) {
 				ShowSevereError( "Error when autosizing the UA value for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name + '.' );
 				ShowContinueError( "Design Loop Exit Temperature (" + RoundSigDigits( PlantSizData( PltSizCondNum ).ExitTemp, 2 ) + " C) must be greater than design entering air dry-bulb temperature (" + RoundSigDigits( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp, 2 ) + " C) when autosizing the fluid cooler UA." );
-				ShowContinueError( "It is recommended that the Design Loop Exit Temperature = design inlet air dry-bulb temp " "plus the Fluid Cooler design approach temperature (e.g., 4 C)." );
-				ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field " "Condenser Water Design Setpoint must be > design inlet air dry-bulb temp if autosizing " "the Fluid Cooler." );
+				ShowContinueError( "It is recommended that the Design Loop Exit Temperature = design inlet air dry-bulb temp plus the Fluid Cooler design approach temperature (e.g., 4 C)." );
+				ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > design inlet air dry-bulb temp if autosizing the Fluid Cooler." );
 				ShowFatalError( "Review and revise design input values as appropriate." );
 			}
 		}
@@ -958,8 +958,8 @@ namespace FluidCoolers {
 						if ( PlantSizData( PltSizCondNum ).ExitTemp <= SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp ) {
 							ShowSevereError( "Error when autosizing the UA value for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name + '.' );
 							ShowContinueError( "Design Loop Exit Temperature (" + RoundSigDigits( PlantSizData( PltSizCondNum ).ExitTemp, 2 ) + " C) must be greater than design entering air dry-bulb temperature (" + RoundSigDigits( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp, 2 ) + " C) when autosizing the fluid cooler UA." );
-							ShowContinueError( "It is recommended that the Design Loop Exit Temperature = design inlet air " "dry-bulb temp plus the Fluid Cooler design approach temperature (e.g., 4 C)." );
-							ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field " "Condenser Water Design Setpoint must be > design inlet air dry-bulb temp if autosizing " "the Fluid Cooler." );
+							ShowContinueError( "It is recommended that the Design Loop Exit Temperature = design inlet air dry-bulb temp plus the Fluid Cooler design approach temperature (e.g., 4 C)." );
+							ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > design inlet air dry-bulb temp if autosizing the Fluid Cooler." );
 							ShowFatalError( "Review and revise design input values as appropriate." );
 						}
 						rho = GetDensityGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
@@ -998,8 +998,8 @@ namespace FluidCoolers {
 						if ( PlantSizData( PltSizCondNum ).ExitTemp <= SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp ) {
 							ShowSevereError( "Error when autosizing the UA value for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name + '.' );
 							ShowContinueError( "Design Loop Exit Temperature (" + RoundSigDigits( PlantSizData( PltSizCondNum ).ExitTemp, 2 ) + " C) must be greater than design entering air dry-bulb temperature (" + RoundSigDigits( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp, 2 ) + " C) when autosizing the fluid cooler UA." );
-							ShowContinueError( "It is recommended that the Design Loop Exit Temperature = design inlet air " "dry-bulb temp plus the Fluid Cooler design approach temperature (e.g., 4 C)." );
-							ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field " "Condenser Water Design Setpoint must be > design inlet air dry-bulb temp if autosizing " "the Fluid Cooler." );
+							ShowContinueError( "It is recommended that the Design Loop Exit Temperature = design inlet air dry-bulb temp plus the Fluid Cooler design approach temperature (e.g., 4 C)." );
+							ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > design inlet air dry-bulb temp if autosizing the Fluid Cooler." );
 							ShowFatalError( "Review and revise design input values as appropriate." );
 						}
 						rho = GetDensityGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
@@ -1031,8 +1031,8 @@ namespace FluidCoolers {
 					if ( PlantSizData( PltSizCondNum ).ExitTemp <= SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp ) {
 						ShowSevereError( "Error when autosizing the UA value for fluid cooler = " + SimpleFluidCooler( FluidCoolerNum ).Name + '.' );
 						ShowContinueError( "Design Loop Exit Temperature (" + RoundSigDigits( PlantSizData( PltSizCondNum ).ExitTemp, 2 ) + " C) must be greater than design entering air dry-bulb temperature (" + RoundSigDigits( SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp, 2 ) + " C) when autosizing the fluid cooler UA." );
-						ShowContinueError( "It is recommended that the Design Loop Exit Temperature = design inlet air dry-bulb temp " "plus the Fluid Cooler design approach temperature (e.g., 4 C)." );
-						ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field " "Condenser Water Design Setpoint must be > design inlet air dry-bulb temp if autosizing " "the Fluid Cooler." );
+						ShowContinueError( "It is recommended that the Design Loop Exit Temperature = design inlet air dry-bulb temp plus the Fluid Cooler design approach temperature (e.g., 4 C)." );
+						ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field Condenser Water Design Setpoint must be > design inlet air dry-bulb temp if autosizing the Fluid Cooler." );
 						ShowFatalError( "Review and revise design input values as appropriate." );
 					}
 					rho = GetDensityGlycol( PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleFluidCooler( FluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
@@ -1068,7 +1068,7 @@ namespace FluidCoolers {
 						ShowContinueError( "temperatures calculated at high and low UA values. If the Design Exit Water Temperature is " );
 						ShowContinueError( "out of this range, the solution will not converge and UA will not be calculated. " );
 						ShowContinueError( "The possible solutions could be to manually input adjusted water and/or air flow rates based " );
-						ShowContinueError( "on the autosized values shown below or to adjust design fluid cooler air inlet dry-bulb " "temperature." );
+						ShowContinueError( "on the autosized values shown below or to adjust design fluid cooler air inlet dry-bulb temperature." );
 						ShowContinueError( "Plant:Sizing object inputs also influence these results (e.g. DeltaT and ExitTemp)." );
 						ShowContinueError( "Inputs to the fluid cooler object:" );
 						ShowContinueError( "Design Fluid Cooler Load [W]                       = " + RoundSigDigits( Par( 1 ), 2 ) );
@@ -1136,7 +1136,7 @@ namespace FluidCoolers {
 					ShowContinueError( "temperatures calculated at high and low UA values. If the Design Exit Water Temperature is " );
 					ShowContinueError( "out of this range, the solution will not converge and UA will not be calculated. " );
 					ShowContinueError( "The possible solutions could be to manually input adjusted water and/or air flow rates based " );
-					ShowContinueError( "on the autosized values shown below or to adjust design fluid cooler air inlet dry-bulb " "temperature." );
+					ShowContinueError( "on the autosized values shown below or to adjust design fluid cooler air inlet dry-bulb temperature." );
 					ShowContinueError( "Plant:Sizing object inputs also influence these results (e.g. DeltaT and ExitTemp)." );
 					ShowContinueError( "Inputs to the fluid cooler object:" );
 					ShowContinueError( "Design Fluid Cooler Load [W]                       = " + RoundSigDigits( Par( 1 ), 2 ) );
@@ -1217,7 +1217,7 @@ namespace FluidCoolers {
 					ShowContinueError( "temperatures calculated at high and low UA values. If the Design Exit Water Temperature is " );
 					ShowContinueError( "out of this range, the solution will not converge and UA will not be calculated. " );
 					ShowContinueError( "The possible solutions could be to manually input adjusted water and/or air flow rates based " );
-					ShowContinueError( "on the autosized values shown below or to adjust design fluid cooler air inlet dry-bulb " "temperature." );
+					ShowContinueError( "on the autosized values shown below or to adjust design fluid cooler air inlet dry-bulb temperature." );
 					ShowContinueError( "Plant:Sizing object inputs also influence these results (e.g. DeltaT and ExitTemp)." );
 					ShowContinueError( "Inputs to the fluid cooler object:" );
 					ShowContinueError( "Design Fluid Cooler Load [W]                         = " + RoundSigDigits( Par( 1 ), 2 ) );
@@ -1660,7 +1660,7 @@ namespace FluidCoolers {
 	Real64
 	SimpleFluidCoolerUAResidual(
 		Real64 const UA, // UA of fluid cooler
-		Optional< FArray1S< Real64 > const > Par // par(1) = design fluid cooler load [W]
+		FArray1< Real64 > const & Par // par(1) = design fluid cooler load [W]
 	)
 	{
 
@@ -1710,10 +1710,10 @@ namespace FluidCoolers {
 		Real64 OutWaterTemp; // outlet water temperature [C]
 		Real64 Output; // Fluid cooler  output [W]
 
-		FluidCoolerIndex = int( Par()( 2 ) );
-		SimSimpleFluidCooler( FluidCoolerIndex, Par()( 3 ), Par()( 4 ), UA, OutWaterTemp );
-		Output = Par()( 5 ) * Par()( 3 ) * ( SimpleFluidCoolerInlet( FluidCoolerIndex ).WaterTemp - OutWaterTemp );
-		Residuum = ( Par()( 1 ) - Output ) / Par()( 1 );
+		FluidCoolerIndex = int( Par( 2 ) );
+		SimSimpleFluidCooler( FluidCoolerIndex, Par( 3 ), Par( 4 ), UA, OutWaterTemp );
+		Output = Par( 5 ) * Par( 3 ) * ( SimpleFluidCoolerInlet( FluidCoolerIndex ).WaterTemp - OutWaterTemp );
+		Residuum = ( Par( 1 ) - Output ) / Par( 1 );
 		return Residuum;
 	}
 
@@ -1799,7 +1799,7 @@ namespace FluidCoolers {
 			strip( CharErrOut );
 			if ( SimpleFluidCooler( FluidCoolerNum ).OutletWaterTempErrorCount < 2 ) {
 				ShowWarningError( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType + " \"" + SimpleFluidCooler( FluidCoolerNum ).Name + "\"" );
-				ShowContinueError( " Fluid cooler water outlet temperature (" + CharErrOut + " C) is " "below the specified minimum condenser loop temp of " + stripped( CharLowOutletTemp ) + " C" );
+				ShowContinueError( " Fluid cooler water outlet temperature (" + CharErrOut + " C) is below the specified minimum condenser loop temp of " + stripped( CharLowOutletTemp ) + " C" );
 				ShowContinueErrorTimeStamp( "" );
 			} else {
 				ShowRecurringWarningErrorAtEnd( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType + " \"" + SimpleFluidCooler( FluidCoolerNum ).Name + "\" Fluid cooler water outlet temperature is below the specified minimum condenser loop temp error continues...", SimpleFluidCooler( FluidCoolerNum ).OutletWaterTempErrorIndex, OutletWaterTemp, OutletWaterTemp );

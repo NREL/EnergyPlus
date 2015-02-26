@@ -132,7 +132,7 @@ namespace OutputProcessor {
 	extern int RunPeriodStampReportNbr; // RunPeriod Report number
 	extern std::string RunPeriodStampReportChr; // RunPeriod Report number (character -- for printing)
 	extern bool TrackingRunPeriodVariables; // Requested RunPeriod Report Variables
-	extern Real64 SecondsPerTimeStep; // Seconds from NumTimeStepInHour
+	extern Real64 TimeStepZoneSec; // Seconds from NumTimeStepInHour
 	extern bool ErrorsLogged;
 	extern bool ProduceVariableDictionary;
 
@@ -1429,7 +1429,7 @@ AddToOutputVariableList(
 );
 
 //     NOTICE
-//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted

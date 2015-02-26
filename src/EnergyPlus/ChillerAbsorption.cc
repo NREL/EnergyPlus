@@ -432,7 +432,7 @@ namespace ChillerAbsorption {
 			if ( BLASTAbsorber( AbsorberNum ).GeneratorVolFlowRate == 0.0 && BLASTAbsorber( AbsorberNum ).GenHeatSourceType == NodeType_Water ) {
 				ShowSevereError( "Invalid " + cNumericFieldNames( 16 ) + '=' + RoundSigDigits( rNumericArgs( 16 ), 2 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
-				ShowContinueError( "...Generator water flow rate must be greater than 0" " when absorber generator fluid type is hot water." );
+				ShowContinueError( "...Generator water flow rate must be greater than 0 when absorber generator fluid type is hot water." );
 				ErrorsFound = true;
 			}
 
@@ -621,7 +621,7 @@ namespace ChillerAbsorption {
 					if ( ! AnyEnergyManagementSystemInModel ) {
 						if ( ! BLASTAbsorber( ChillNum ).ModulatedFlowErrDone ) {
 							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + BLASTAbsorber( ChillNum ).Name );
-							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller " "in variable flow mode, use a SetpointManager" );
+							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager" );
 							ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
 							BLASTAbsorber( ChillNum ).ModulatedFlowErrDone = true;
 						}
@@ -632,7 +632,7 @@ namespace ChillerAbsorption {
 						if ( FatalError ) {
 							if ( ! BLASTAbsorber( ChillNum ).ModulatedFlowErrDone ) {
 								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + BLASTAbsorber( ChillNum ).Name );
-								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller evaporator " "in variable flow mode" );
+								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode" );
 								ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node " );
 								ShowContinueError( "  or use an EMS actuator to establish a setpoint at the outlet node " );
 								ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );

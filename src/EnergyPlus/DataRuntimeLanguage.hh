@@ -1,6 +1,11 @@
 #ifndef DataRuntimeLanguage_hh_INCLUDED
 #define DataRuntimeLanguage_hh_INCLUDED
 
+// C++ Headers
+#include <functional>
+#include <unordered_set>
+#include <utility>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray2D.hh>
@@ -670,6 +675,32 @@ namespace DataRuntimeLanguage {
 	extern ErlValueType Null; // special "null" Erl variable value instance
 	extern ErlValueType False; // special "false" Erl variable value instance
 	extern ErlValueType True; // special "True" Erl variable value instance, gets reset
+
+	// EMS Actuator fast duplicate check lookup support
+	typedef  std::tuple< std::string, std::string, std::string >  EMSActuatorKey;
+	struct EMSActuatorKey_hash : public std::unary_function< EMSActuatorKey, std::size_t >
+	{
+		inline
+		static
+		void
+		hash_combine( std::size_t & seed, std::string const & s )
+		{
+			std::hash< std::string > hasher;
+			seed ^= hasher( s ) + 0x9e3779b9 + ( seed << 6 ) + ( seed >> 2 );
+		}
+
+		inline
+		std::size_t
+		operator ()( EMSActuatorKey const & key ) const
+		{
+			std::size_t seed( 0 );
+			hash_combine( seed, std::get< 0 >( key ) );
+			hash_combine( seed, std::get< 1 >( key ) );
+			hash_combine( seed, std::get< 2 >( key ) );
+			return seed;
+		}
+	};
+	extern std::unordered_set< std::tuple< std::string, std::string, std::string >, EMSActuatorKey_hash > EMSActuator_lookup; // Fast duplicate lookup structure
 
 	// Functions
 

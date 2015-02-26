@@ -191,7 +191,7 @@ namespace SortAndStringUtilities {
 
 		std::string const & cpivot( Alphas( 1 ) );
 		int i = 0;
-		int j = Alphas.size() + 1;
+		int j = Alphas.isize() + 1;
 
 		while ( true ) {
 			--j;

@@ -38,7 +38,7 @@ namespace InternalHeatGains {
 	InitInternalHeatGains();
 
 	void
-	CalcZoneITEq( );
+	CalcZoneITEq();
 
 	void
 	ReportInternalHeatGains();

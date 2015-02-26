@@ -397,10 +397,11 @@ namespace ZoneContaminantPredictorCorrector {
 			ZoneContamGenericPDriven( Loop ).SurfNum = FindItemInList( AlphaName( 2 ), MultizoneSurfaceData.SurfName(), AirflowNetworkNumOfSurfaces );
 			if ( ZoneContamGenericPDriven( Loop ).SurfNum == 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + " entered=" + AlphaName( 2 ) );
+				ShowContinueError( "which is not listed in AirflowNetwork:MultiZone:Surface." );
 				ErrorsFound = true;
 			}
 			// Ensure external surface
-			if ( Surface( ZoneContamGenericPDriven( Loop ).SurfNum ).ExtBoundCond != ExternalEnvironment ) {
+			if ( ZoneContamGenericPDriven( Loop ).SurfNum > 0 && Surface( MultizoneSurfaceData( ZoneContamGenericPDriven( Loop ).SurfNum ).SurfNum ).ExtBoundCond != ExternalEnvironment ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + ". The entered surface (" + AlphaName( 2 ) + ") is not an exterior surface" );
 				ErrorsFound = true;
 			}
@@ -452,13 +453,18 @@ namespace ZoneContaminantPredictorCorrector {
 			// Object report variables
 			SetupOutputVariable( "Generic Air Contaminant Pressure Driven Generation Volume Flow Rate [m3/s]", ZoneContamGenericPDriven( Loop ).GCGenRate, "Zone", "Average", ZoneContamGenericPDriven( Loop ).Name );
 
-			ZonePtr = Surface( ZoneContamGenericPDriven( Loop ).SurfNum ).Zone;
+			if ( ZoneContamGenericPDriven( Loop ).SurfNum > 0 ) {
+				ZonePtr = Surface( MultizoneSurfaceData( ZoneContamGenericPDriven( Loop ).SurfNum ).SurfNum ).Zone;
+			}
+			else {
+				ZonePtr = 0;
+			}
 			// Zone total report variables
-			if ( RepVarSet( ZonePtr ) ) {
+			if ( ZonePtr > 0 && RepVarSet( ZonePtr ) ) {
 				RepVarSet( ZonePtr ) = false;
 				SetupOutputVariable( "Zone Generic Air Contaminant Generation Volume Flow Rate [m3/s]", ZnRpt( ZonePtr ).GCRate, "Zone", "Average", Zone( ZonePtr ).Name );
 			}
-			SetupZoneInternalGain( ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericPDriven( Loop ).Name, IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericPDriven( Loop ).GCGenRate );
+			if ( ZonePtr > 0 ) SetupZoneInternalGain( ZonePtr, "ZoneContaminantSourceAndSink:GenericContaminant", ZoneContamGenericPDriven( Loop ).Name, IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam, _, _, _, _, _, _, ZoneContamGenericPDriven( Loop ).GCGenRate );
 		}
 
 		CurrentModuleObject = "ZoneContaminantSourceAndSink:Generic:CutoffModel";
@@ -1303,7 +1309,7 @@ namespace ZoneContaminantPredictorCorrector {
 						}
 					}
 				} else {
-					ShowSevereError( "ZoneControl:ContaminantController: a corresponding AirLoopHVAC is not found for the " "controlled zone =" + Zone( ZoneNum ).Name );
+					ShowSevereError( "ZoneControl:ContaminantController: a corresponding AirLoopHVAC is not found for the controlled zone =" + Zone( ZoneNum ).Name );
 					ErrorsFound = true;
 				}
 			}
@@ -1375,7 +1381,7 @@ namespace ZoneContaminantPredictorCorrector {
 				if ( Sch == 0.0 || BeginEnvrnFlag || WarmupFlag ) {
 					ZoneContamGenericDecay( Loop ).GCTime = 0.0;
 				} else {
-					ZoneContamGenericDecay( Loop ).GCTime += TimeStepZone * SecInHour;
+					ZoneContamGenericDecay( Loop ).GCTime += TimeStepZoneSec;
 				}
 				GCGain = ZoneContamGenericDecay( Loop ).GCInitEmiRate * Sch * std::exp( -ZoneContamGenericDecay( Loop ).GCTime / ZoneContamGenericDecay( Loop ).GCDelayTime );
 				ZoneContamGenericDecay( Loop ).GCGenRate = GCGain;

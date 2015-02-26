@@ -60,9 +60,9 @@ namespace DataHeatBalance {
 	// Parameters for the definition and limitation of arrays:
 	int const MaxLayersInConstruct( 11 ); // Maximum number of layers allowed in a single construction
 	int const MaxCTFTerms( 19 ); // Maximum number of CTF terms allowed to still allow stability
-	int MaxSolidWinLayers( 0 ); // Maximum number of solid layers in a window construction 
-	                                   // ** has to be big enough to hold no matter what window model
-	                                   //    each window model should validate layers individually
+	int MaxSolidWinLayers( 0 ); // Maximum number of solid layers in a window construction
+										// ** has to be big enough to hold no matter what window model
+										//    each window model should validate layers individually
 	int const MaxSpectralDataElements( 800 ); // Maximum number in Spectral Data arrays.
 
 	// Parameters to indicate material group type for use with the Material
@@ -199,10 +199,10 @@ namespace DataHeatBalance {
 	int const AddInfiltrationFlow( 1 );
 	int const AdjustInfiltrationFlow( 2 );
 
-	int const NumZoneIntGainDeviceTypes( 45 );
-	FArray1D_string const ZoneIntGainDeviceTypes( NumZoneIntGainDeviceTypes, { "PEOPLE", "LIGHTS", "ELECTRICEQUIPMENT", "GASEQUIPMENT", "HOTWATEREQUIPMENT", "STEAMEQUIPMENT", "OTHEREQUIPMENT", "ZONEBASEBOARD:OUTDOORTEMPERATURECONTROLLED", "ZONECONTAMINANTSOURCEANDSINK:CARBONDIOXIDE", "WATERUSE:EQUIPMENT", "DAYLIGHTINGDEVICE:TUBULAR", "WATERHEATER:MIXED", "WATERHEATER:STRATIFIED", "THERMALSTORAGE:CHILLEDWATER:MIXED", "THERMALSTORAGE:CHILLEDWATER:STRATIFIED", "GENERATOR:FUELCELL", "GENERATOR:MICROCHP", "ELECTRICLOADCENTER:TRANSFORMER", "ELECTRICLOADCENTER:INVERTER:SIMPLE", "ELECTRICLOADCENTER:INVERTER:FUNCTIONOFPOWER", "ELECTRICLOADCENTER:INVERTER:LOOKUPTABLE", "ELECTRICLOADCENTER:STORAGE:BATTERY", "ELECTRICLOADCENTER:STORAGE:SIMPLE", "PIPE:INDOOR", "REFRIGERATION:CASE", "REFRIGERATION:COMPRESSORRACK", "REFRIGERATION:SYSTEM:CONDENSER:AIRCOOLED", "REFRIGERATION:TRANSCRITICALSYSTEM:GASCOOLER:AIRCOOLED", "REFRIGERATION:SYSTEM:SUCTIONPIPE", "REFRIGERATION:TRANSCRITICALSYSTEM:SUCTIONPIPEMT", "REFRIGERATION:TRANSCRITICALSYSTEM:SUCTIONPIPELT", "REFRIGERATION:SECONDARYSYSTEM:RECEIVER", "REFRIGERATION:SECONDARYSYSTEM:PIPE", "REFRIGERATION:WALKIN", "PUMP:VARIABLESPEED", "PUMP:CONSTANTSPEED", "PUMP:VARIABLESPEED:CONDENSATE", "HEADEREDPUMPS:VARIABLESPEED", "HEADEREDPUMPS:CONSTANTSPEED", "ZONECONTAMINANTSOURCEANDSINK:GENERICCONTAMINANT", "PLANTCOMPONENT:USERDEFINED", "COIL:USERDEFINED", "ZONEHVAC:FORCEDAIR:USERDEFINED", "AIRTERMINAL:SINGLEDUCT:USERDEFINED", "COIL:COOLING:DX:SINGLESPEED:THERMALSTORAGE" } ); // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45
+	int const NumZoneIntGainDeviceTypes( 46 );
+	FArray1D_string const ZoneIntGainDeviceTypes( NumZoneIntGainDeviceTypes, { "PEOPLE", "LIGHTS", "ELECTRICEQUIPMENT", "GASEQUIPMENT", "HOTWATEREQUIPMENT", "STEAMEQUIPMENT", "OTHEREQUIPMENT", "ZONEBASEBOARD:OUTDOORTEMPERATURECONTROLLED", "ZONECONTAMINANTSOURCEANDSINK:CARBONDIOXIDE", "WATERUSE:EQUIPMENT", "DAYLIGHTINGDEVICE:TUBULAR", "WATERHEATER:MIXED", "WATERHEATER:STRATIFIED", "THERMALSTORAGE:CHILLEDWATER:MIXED", "THERMALSTORAGE:CHILLEDWATER:STRATIFIED", "GENERATOR:FUELCELL", "GENERATOR:MICROCHP", "ELECTRICLOADCENTER:TRANSFORMER", "ELECTRICLOADCENTER:INVERTER:SIMPLE", "ELECTRICLOADCENTER:INVERTER:FUNCTIONOFPOWER", "ELECTRICLOADCENTER:INVERTER:LOOKUPTABLE", "ELECTRICLOADCENTER:STORAGE:BATTERY", "ELECTRICLOADCENTER:STORAGE:SIMPLE", "PIPE:INDOOR", "REFRIGERATION:CASE", "REFRIGERATION:COMPRESSORRACK", "REFRIGERATION:SYSTEM:CONDENSER:AIRCOOLED", "REFRIGERATION:TRANSCRITICALSYSTEM:GASCOOLER:AIRCOOLED", "REFRIGERATION:SYSTEM:SUCTIONPIPE", "REFRIGERATION:TRANSCRITICALSYSTEM:SUCTIONPIPEMT", "REFRIGERATION:TRANSCRITICALSYSTEM:SUCTIONPIPELT", "REFRIGERATION:SECONDARYSYSTEM:RECEIVER", "REFRIGERATION:SECONDARYSYSTEM:PIPE", "REFRIGERATION:WALKIN", "PUMP:VARIABLESPEED", "PUMP:CONSTANTSPEED", "PUMP:VARIABLESPEED:CONDENSATE", "HEADEREDPUMPS:VARIABLESPEED", "HEADEREDPUMPS:CONSTANTSPEED", "ZONECONTAMINANTSOURCEANDSINK:GENERICCONTAMINANT", "PLANTCOMPONENT:USERDEFINED", "COIL:USERDEFINED", "ZONEHVAC:FORCEDAIR:USERDEFINED", "AIRTERMINAL:SINGLEDUCT:USERDEFINED", "COIL:COOLING:DX:SINGLESPEED:THERMALSTORAGE", "ELECTRICEQUIPMENT:ITE:AIRCOOLED" } ); // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46
 
-	FArray1D_string const ccZoneIntGainDeviceTypes( NumZoneIntGainDeviceTypes, { "People", "Lights", "ElectricEquipment", "GasEquipment", "HotWaterEquipment", "SteamEquipment", "OtherEquipment", "ZoneBaseboard:OutdoorTemperatureControlled", "ZoneContaminantSourceAndSink:CarbonDioxide", "WaterUse:Equipment", "DaylightingDevice:Tubular", "WaterHeater:Mixed", "WaterHeater:Stratified", "ThermalStorage:ChilledWater:Mixed", "ThermalStorage:ChilledWater:Stratified", "Generator:FuelCell", "Generator:MicroCHP", "ElectricLoadCenter:Transformer", "ElectricLoadCenter:Inverter:Simple", "ElectricLoadCenter:Inverter:FunctionOfPower", "ElectricLoadCenter:Inverter:LookUpTable", "ElectricLoadCenter:Storage:Battery", "ElectricLoadCenter:Storage:Simple", "Pipe:Indoor", "Refrigeration:Case", "Refrigeration:CompressorRack", "Refrigeration:System:Condenser:AirCooled", "Refrigeration:TranscriticalSystem:GasCooler:AirCooled", "Refrigeration:System:SuctionPipe", "Refrigeration:TranscriticalSystem:SuctionPipeMT", "Refrigeration:TranscriticalSystem:SuctionPipeLT", "Refrigeration:SecondarySystem:Receiver", "Refrigeration:SecondarySystem:Pipe", "Refrigeration:WalkIn", "Pump:VariableSpeed", "Pump:ConstantSpeed", "Pump:VariableSpeed:Condensate", "HeaderedPumps:VariableSpeed", "HeaderedPumps:ConstantSpeed", "ZoneContaminantSourceAndSink:GenericContaminant", "PlantComponent:UserDefined", "Coil:UserDefined", "ZoneHVAC:ForcedAir:UserDefined", "AirTerminal:SingleDuct:UserDefined", "Coil:Cooling:DX:SingleSpeed:ThermalStorage" } ); // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45
+	FArray1D_string const ccZoneIntGainDeviceTypes( NumZoneIntGainDeviceTypes, { "People", "Lights", "ElectricEquipment", "GasEquipment", "HotWaterEquipment", "SteamEquipment", "OtherEquipment", "ZoneBaseboard:OutdoorTemperatureControlled", "ZoneContaminantSourceAndSink:CarbonDioxide", "WaterUse:Equipment", "DaylightingDevice:Tubular", "WaterHeater:Mixed", "WaterHeater:Stratified", "ThermalStorage:ChilledWater:Mixed", "ThermalStorage:ChilledWater:Stratified", "Generator:FuelCell", "Generator:MicroCHP", "ElectricLoadCenter:Transformer", "ElectricLoadCenter:Inverter:Simple", "ElectricLoadCenter:Inverter:FunctionOfPower", "ElectricLoadCenter:Inverter:LookUpTable", "ElectricLoadCenter:Storage:Battery", "ElectricLoadCenter:Storage:Simple", "Pipe:Indoor", "Refrigeration:Case", "Refrigeration:CompressorRack", "Refrigeration:System:Condenser:AirCooled", "Refrigeration:TranscriticalSystem:GasCooler:AirCooled", "Refrigeration:System:SuctionPipe", "Refrigeration:TranscriticalSystem:SuctionPipeMT", "Refrigeration:TranscriticalSystem:SuctionPipeLT", "Refrigeration:SecondarySystem:Receiver", "Refrigeration:SecondarySystem:Pipe", "Refrigeration:WalkIn", "Pump:VariableSpeed", "Pump:ConstantSpeed", "Pump:VariableSpeed:Condensate", "HeaderedPumps:VariableSpeed", "HeaderedPumps:ConstantSpeed", "ZoneContaminantSourceAndSink:GenericContaminant", "PlantComponent:UserDefined", "Coil:UserDefined", "ZoneHVAC:ForcedAir:UserDefined", "AirTerminal:SingleDuct:UserDefined", "Coil:Cooling:DX:SingleSpeed:ThermalStorage", "ElectricEquipment:ITE:AirCooled" } ); // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46
 
 	int const IntGainTypeOf_People( 1 );
 	int const IntGainTypeOf_Lights( 2 );
@@ -249,6 +249,7 @@ namespace DataHeatBalance {
 	int const IntGainTypeOf_ZoneHVACForcedAirUserDefined( 43 );
 	int const IntGainTypeOf_AirTerminalUserDefined( 44 );
 	int const IntGainTypeOf_PackagedTESCoilTank( 45 );
+	int const IntGainTypeOf_ElectricEquipmentITEAirCooled( 46 );
 
 	//Parameters for checking surface heat transfer models
 	Real64 const HighDiffusivityThreshold( 1.e-5 ); // used to check if Material properties are out of line.
@@ -778,7 +779,7 @@ namespace DataHeatBalance {
 			} else if ( TotLayers == 1 ) {
 
 				if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group == Shade || Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group == WindowGas || Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group == WindowGasMixture || Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group == WindowBlind || Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group == Screen || Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group == ComplexWindowShade || Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group == ComplexWindowGap ) {
-					ShowSevereError( "CheckAndSetConstructionProperties: The single-layer window construction=" + Construct( ConstrNum ).Name + " has a gas, complex gap, shade, complex shade, screen or blind material; " "it should be glass of simple glazing system." );
+					ShowSevereError( "CheckAndSetConstructionProperties: The single-layer window construction=" + Construct( ConstrNum ).Name + " has a gas, complex gap, shade, complex shade, screen or blind material; it should be glass of simple glazing system." );
 					ErrorsFound = true;
 				}
 			}
@@ -1014,7 +1015,7 @@ namespace DataHeatBalance {
 		if ( Material( Construct( ConstrNum ).LayerPoint( 1 ) ).Group == IRTMaterial ) {
 			Construct( ConstrNum ).TypeIsIRT = true;
 			if ( Construct( ConstrNum ).TotLayers != 1 ) {
-				ShowSevereError( "CheckAndSetConstructionProperties: " "Infrared Transparent (IRT) Construction is limited to 1 layer " + Construct( ConstrNum ).Name );
+				ShowSevereError( "CheckAndSetConstructionProperties: Infrared Transparent (IRT) Construction is limited to 1 layer " + Construct( ConstrNum ).Name );
 				ShowContinueError( "  Too many layers in referenced construction." );
 				ErrorsFound = true;
 			}
@@ -1209,7 +1210,7 @@ namespace DataHeatBalance {
 			if ( Blind( TotBlinds ).MaxSlatAngle < Blind( TotBlinds ).MinSlatAngle ) {
 				errFlag = true;
 				ShowSevereError( "WindowMaterial:Blind=\"" + Blind( inBlindNumber ).Name + "\", Illegal value combination." );
-				ShowContinueError( "Minimum Slat Angle=[" + RoundSigDigits( Blind( TotBlinds ).MinSlatAngle, 1 ) + "], is greater than " "Maximum Slat Angle=[" + RoundSigDigits( Blind( TotBlinds ).MaxSlatAngle, 1 ) + "] deg." );
+				ShowContinueError( "Minimum Slat Angle=[" + RoundSigDigits( Blind( TotBlinds ).MinSlatAngle, 1 ) + "], is greater than Maximum Slat Angle=[" + RoundSigDigits( Blind( TotBlinds ).MaxSlatAngle, 1 ) + "] deg." );
 			}
 
 			// Error if input slat angle not in input min/max range

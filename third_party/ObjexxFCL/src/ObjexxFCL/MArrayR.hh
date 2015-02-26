@@ -78,8 +78,8 @@ protected: // Creation
 
 	// Constructor
 	inline
-	MArrayR( A & array, T Class::* pmem ) :
-	 Super( array, pmem )
+	MArrayR( A & a, T Class::* pmem ) :
+	 Super( a, pmem )
 	{}
 
 public: // Creation

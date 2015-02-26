@@ -35,9 +35,6 @@ class FArray2 : public FArray< T >
 private: // Types
 
 	typedef  FArray< T >  Super;
-	typedef  FArray2D< T >  real_FArray;
-	typedef  FArray2P< T >  proxy_FArray;
-	typedef  FArray2A< T >  arg_FArray;
 
 private: // Friend
 
@@ -88,6 +85,7 @@ public: // Types
 	using Super::data_size_;
 	using Super::sdata_;
 	using Super::shift_;
+	using Super::size_;
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
 	using Super::not_const_proxy;
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
@@ -527,7 +525,7 @@ public: // Assignment: Array
 		size_type l( 0 );
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-				assert( T( a( i1, i2 ) ) != T( 0 ) );
+				assert( a( i1, i2 ) != T( 0 ) );
 				data_[ l ] /= a( i1, i2 );
 			}
 		}
@@ -599,7 +597,7 @@ public: // Assignment: Array
 			size_type l( 0 );
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-					assert( T( a( i1, i2 ) ) != T( 0 ) );
+					assert( a( i1, i2 ) != T( 0 ) );
 					data_[ l ] /= a( i1, i2 );
 				}
 			}
@@ -821,6 +819,15 @@ public: // Subscript
 		return sdata_[ ( i2 * z1_ ) + i1 ];
 	}
 
+	// Linear Index
+	inline
+	size_type
+	index( int const i1, int const i2 ) const
+	{
+		assert( dimensions_initialized() );
+		return ( ( i2 * z1_ ) + i1 ) - shift_;
+	}
+
 	// Const Tail Starting at array( i1, i2 )
 	inline
 	Tail const
@@ -840,15 +847,6 @@ public: // Subscript
 		assert( contains( i1, i2 ) );
 		size_type const offset( ( ( i2 * z1_ ) + i1 ) - shift_ );
 		return Tail( data_ + offset, ( data_size_ != npos ? data_size_ - offset : npos ) );
-	}
-
-	// Linear Index
-	inline
-	size_type
-	index( int const i1, int const i2 ) const
-	{
-		assert( dimensions_initialized() );
-		return ( ( i2 * z1_ ) + i1 ) - shift_;
 	}
 
 public: // Slice Proxy Generators
@@ -933,7 +931,7 @@ public: // Predicate
 	bool
 	conformable( FArray2< U > const & a ) const
 	{
-		return ( ( size1() == a.size1() ) && ( size2() == a.size2() ) );
+		return ( ( z1_ == a.z1_ ) && ( size2() == a.size2() ) );
 	}
 
 	// Conformable?
@@ -942,7 +940,7 @@ public: // Predicate
 	bool
 	conformable( FArray2S< U > const & a ) const
 	{
-		return ( ( size1() == a.size1() ) && ( size2() == a.size2() ) );
+		return ( ( z1_ == a.size1() ) && ( size2() == a.size2() ) );
 	}
 
 	// Conformable?
@@ -951,7 +949,7 @@ public: // Predicate
 	bool
 	conformable( MArray2< A, M > const & a ) const
 	{
-		return ( ( size1() == a.size1() ) && ( size2() == a.size2() ) );
+		return ( ( z1_ == a.size1() ) && ( size2() == a.size2() ) );
 	}
 
 	// Equal Dimensions?
@@ -1101,12 +1099,12 @@ public: // Inspector
 	{
 		switch ( d ) {
 		case 1:
-			return size1();
+			return z1_;
 		case 2:
 			return size2();
 		default:
 			assert( false );
-			return size1();
+			return z1_;
 		}
 	}
 
@@ -1213,7 +1211,7 @@ public: // Modifier
 		FArray2 & A( *this ); // Shorthand name
 		A = T( 0 ); // Zero the array
 		T const One( T( 1 ) );
-		for ( size_type l = 0, l_end = size(), l_inc = z1_ + 1; l < l_end; l += l_inc ) {
+		for ( size_type l = 0, l_inc = z1_ + 1; l < size_; l += l_inc ) {
 			A[ l ] = One;
 		}
 		return *this;
@@ -1228,7 +1226,7 @@ public: // Modifier
 		assert( square() );
 		FArray2 & A( *this ); // Shorthand name
 		A = T( 0 ); // Zero the array
-		for ( size_type l = 0, l_end = size(), l_inc = z1_ + 1; l < l_end; l += l_inc ) {
+		for ( size_type l = 0, l_inc = z1_ + 1; l < size_; l += l_inc ) {
 			A[ l ] = d;
 		}
 		return *this;
@@ -1242,7 +1240,7 @@ public: // Modifier
 		proxy_const_assert( not_const_proxy() );
 		assert( square() );
 		FArray2 & A( *this ); // Shorthand name
-		for ( size_type l = 0, l_end = size(), l_inc = z1_ + 1; l < l_end; l += l_inc ) {
+		for ( size_type l = 0, l_inc = z1_ + 1; l < size_; l += l_inc ) {
 			A[ l ] = d;
 		}
 		return *this;
@@ -1272,24 +1270,23 @@ public: // Modifier
 	right_multiply_by( FArray2< U > const & a )
 	{
 		proxy_const_assert( not_const_proxy() );
-		size_type const s1( z1_ );
 		size_type const s2( size2() );
-		size_type const s( s1 * s2 );
-		size_type const as1( a.size1() );
+		size_type const s( z1_ * s2 );
+		size_type const as1( a.z1_ );
 		size_type const as2( a.size2() );
 		assert( s2 == as1 );
 		assert( as1 == as2 ); // Square so that this array's dimensions aren't changed
 		FArray2 & t( *this ); // Shorthand name for this array
 		T * const r( new T[ s2 ] ); // Temporary row
-		for ( size_type i = 0; i < s1; ++i ) {
+		for ( size_type i = 0; i < z1_; ++i ) {
 			for ( size_type j = 0, la = 0; j < as2; ++j ) {
 				T d( 0 );
-				for ( size_type lt = i; lt < s; lt += s1, ++la ) {
+				for ( size_type lt = i; lt < s; lt += z1_, ++la ) {
 					d += t[ lt ] * a[ la ];
 				}
 				r[ j ] = d;
 			}
-			for ( size_type l = 0, lt = i; l < s2; ++l, lt += s1 ) { // Copy in the new row
+			for ( size_type l = 0, lt = i; l < s2; ++l, lt += z1_ ) { // Copy in the new row
 				t[ lt ] = r[ l ];
 			}
 		}
@@ -1304,24 +1301,23 @@ public: // Modifier
 	right_multiply_by_transpose( FArray2< U > const & a )
 	{
 		proxy_const_assert( not_const_proxy() );
-		size_type const s1( z1_ );
 		size_type const s2( size2() );
-		size_type const s( s1 * s2 );
-		size_type const as1( a.size1() );
+		size_type const s( z1_ * s2 );
+		size_type const as1( a.z1_ );
 		size_type const as2( a.size2() );
 		assert( s2 == as2 );
 		assert( as1 == as2 ); // Square so that this array's dimensions aren't changed
 		FArray2 & t( *this ); // Shorthand name for this array
 		T * const r( new T[ s2 ] ); // Temporary row
-		for ( size_type i = 0; i < s1; ++i ) {
+		for ( size_type i = 0; i < z1_; ++i ) {
 			for ( size_type j = 0; j < as1; ++j ) {
 				T d( 0 );
-				for ( size_type lt = i, la = j; lt < s; lt += s1, la += as1 ) {
+				for ( size_type lt = i, la = j; lt < s; lt += z1_, la += as1 ) {
 					d += t[ lt ] * a[ la ];
 				}
 				r[ j ] = d;
 			}
-			for ( size_type l = 0, lt = i; l < s2; ++l, lt += s1 ) { // Copy in the new row
+			for ( size_type l = 0, lt = i; l < s2; ++l, lt += z1_ ) { // Copy in the new row
 				t[ lt ] = r[ l ];
 			}
 		}
@@ -2831,7 +2827,7 @@ protected: // Functions
 	// Swap
 	inline
 	void
-	swap2DB( FArray2 & v )
+	swap2( FArray2 & v )
 	{
 		swapB( v );
 		std::swap( z1_, v.z1_ );

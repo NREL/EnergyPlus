@@ -215,6 +215,7 @@ namespace OutdoorAirUnit {
 			if ( OAUnitNum == 0 ) {
 				ShowFatalError( "ZoneHVAC:OutdoorAirUnit not found=" + CompName );
 			}
+			CompIndex = OAUnitNum;
 		} else {
 			OAUnitNum = CompIndex;
 			if ( OAUnitNum > NumOfOAUnits || OAUnitNum < 1 ) {
@@ -684,7 +685,7 @@ namespace OutdoorAirUnit {
 							//          OutAirUnit(OAUnitNum)%OAEquip(CompNum)%ComponentType_Num= Desiccant
 
 						} else {
-							ShowSevereError( CurrentModuleObject + " = \"" + AlphArray( 1 ) + "\" invalid " "Outside Air Component=\"" + OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType + "\"." );
+							ShowSevereError( CurrentModuleObject + " = \"" + AlphArray( 1 ) + "\" invalid Outside Air Component=\"" + OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType + "\"." );
 							ErrorsFound = true;
 
 						}}
@@ -1291,8 +1292,8 @@ namespace OutdoorAirUnit {
 										MaxVolWaterFlowDes = 0.0;
 									}
 								} else {
-									ShowSevereError( "Autosizing of water flow requires a Sizing:Zone object " "or a cooling loop Sizing:Plant object" );
-									ShowContinueError( "Occurs in " "ZoneHVAC:OutdoorAirUnit" " Object=" + OutAirUnit( OAUnitNum ).Name );
+									ShowSevereError( "Autosizing of water flow requires a Sizing:Zone object or a cooling loop Sizing:Plant object" );
+									ShowContinueError( "Occurs in ZoneHVAC:OutdoorAirUnit Object=" + OutAirUnit( OAUnitNum ).Name );
 									ErrorsFound = true;
 								}
 							}
@@ -1352,8 +1353,8 @@ namespace OutdoorAirUnit {
 										MaxVolWaterFlowDes = 0.0;
 									}
 								} else {
-									ShowSevereError( "Autosizing of water flow requires a Sizing:Zone object " "or a heating loop Sizing:Plant object" );
-									ShowContinueError( "Occurs in " "ZoneHVAC:OutdoorAirUnit" " Object=" + OutAirUnit( OAUnitNum ).Name );
+									ShowSevereError( "Autosizing of water flow requires a Sizing:Zone object or a heating loop Sizing:Plant object" );
+									ShowContinueError( "Occurs in ZoneHVAC:OutdoorAirUnit Object=" + OutAirUnit( OAUnitNum ).Name );
 									ErrorsFound = true;
 								}
 							}
@@ -1415,8 +1416,8 @@ namespace OutdoorAirUnit {
 										MaxVolWaterFlowDes = 0.0;
 									}
 								} else {
-									ShowSevereError( "Autosizing of Steam flow requires a Sizing:Zone object " "or a heating loop Sizing:Plant object" );
-									ShowContinueError( "Occurs in " "ZoneHVAC:OutdoorAirUnit" " Object=" + OutAirUnit( OAUnitNum ).Name );
+									ShowSevereError( "Autosizing of Steam flow requires a Sizing:Zone object or a heating loop Sizing:Plant object" );
+									ShowContinueError( "Occurs in ZoneHVAC:OutdoorAirUnit Object=" + OutAirUnit( OAUnitNum ).Name );
 									ErrorsFound = true;
 								}
 							}
@@ -1474,8 +1475,8 @@ namespace OutdoorAirUnit {
 										MaxVolWaterFlowDes = 0.0;
 									}
 								} else {
-									ShowSevereError( "Autosizing of water flow requires a Sizing:Zone object " "or a cooling loop Sizing:Plant object" );
-									ShowContinueError( "Occurs in " "ZoneHVAC:OutdoorAirUnit" " Object=" + OutAirUnit( OAUnitNum ).Name );
+									ShowSevereError( "Autosizing of water flow requires a Sizing:Zone object or a cooling loop Sizing:Plant object" );
+									ShowContinueError( "Occurs in ZoneHVAC:OutdoorAirUnit Object=" + OutAirUnit( OAUnitNum ).Name );
 									ErrorsFound = true;
 								}
 							}
@@ -1535,8 +1536,8 @@ namespace OutdoorAirUnit {
 										MaxVolWaterFlowDes = 0.0;
 									}
 								} else {
-									ShowSevereError( "Autosizing of water flow requires a Sizing:Zone object " "or a cooling loop Sizing:Plant object" );
-									ShowContinueError( "Occurs in " "ZoneHVAC:OutdoorAirUnit" " Object=" + OutAirUnit( OAUnitNum ).Name );
+									ShowSevereError( "Autosizing of water flow requires a Sizing:Zone object or a cooling loop Sizing:Plant object" );
+									ShowContinueError( "Occurs in ZoneHVAC:OutdoorAirUnit Object=" + OutAirUnit( OAUnitNum ).Name );
 									ErrorsFound = true;
 								}
 							}
@@ -1589,7 +1590,7 @@ namespace OutdoorAirUnit {
 				} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
 					OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType_Num = Coil_GasHeat;
 				} else {
-					ShowSevereError( "ZoneHVAC:OutdoorAirUnit:EquipmentList" " = \"" "OutAirUnit(OAUnitNum)%OAEquip(CompNum)%ComponentListName" "\" invalid to sizing" "Outside Air Component=\"" + OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType + "\"." );
+					ShowSevereError( "ZoneHVAC:OutdoorAirUnit:EquipmentList = \"OutAirUnit(OAUnitNum)%OAEquip(CompNum)%ComponentListName\" invalid to sizing Outside Air Component=\"" + OutAirUnit( OAUnitNum ).OAEquip( CompNum ).ComponentType + "\"." );
 					ErrorsFound = true;
 
 				}}
@@ -1679,7 +1680,7 @@ namespace OutdoorAirUnit {
 		int ControlNode; // the hot water or cold water inlet node
 		int InletNode; // Unit air inlet node
 		int SFanOutletNode; // Unit supply fan outlet node
-		int ZoneAirInNode; // zone supply air node
+//		int ZoneAirInNode; // zone supply air node
 		Real64 MaxWaterFlow; // maximum water flow for heating or cooling [kg/sec]
 		Real64 MinWaterFlow; // minimum water flow for heating or cooling [kg/sec]
 		int OutletNode; // air outlet node
