@@ -779,3 +779,6 @@
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
 
+  Output:SQLite,
+    Simple;
+
