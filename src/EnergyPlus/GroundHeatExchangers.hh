@@ -193,14 +193,9 @@ namespace GroundHeatExchangers {
 		void
 		getAnnualTimeConstant();
 
-		//Real64
-		//interpGFunc(
-		//Real64 const LnTTsVal // The value of LN(t/TimeSS) that a g-function
-		//);
-
 		Real64
 		getGFunc(
-		Real64 const LNTTsVal
+		Real64 const time
 		);
 
 	};
@@ -342,7 +337,7 @@ namespace GroundHeatExchangers {
 
 		Real64
 		getGFunc(
-		Real64 const LNTTsVal
+		Real64 const time
 		);
 
 	};

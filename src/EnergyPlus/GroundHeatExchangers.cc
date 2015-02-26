@@ -315,7 +315,7 @@ namespace GroundHeatExchangers {
 		// Calculate the number of g-functions required
 		// Note: G-functions generated in base 'e' rather to maintain consistency with current code.
 		// Slinky g-functions based on original reference were generated with base 10. 
-		tLg_max = std::log( maxSimYears * convertYearsToSeconds / ts ); 
+		tLg_max = std::log10( maxSimYears * convertYearsToSeconds / ts ); 
 		NPairs = ( tLg_max - tLg_min ) / ( tLg_grid ) + 1;
 
 
@@ -995,8 +995,7 @@ namespace GroundHeatExchangers {
 				fluidAveTemp = tempGround;
 				ToutNew = inletTemp;
 			} else {
-				XI = std::log( currentSimTime / ( timeSSFactor ) );
-				gFuncVal = getGFunc( XI );
+				gFuncVal = getGFunc( currentSimTime / ( timeSSFactor ) );
 
 				C_1 = ( totalTubeLength ) / ( 2.0 * massFlowRate * cpFluid );
 				tmpQnSubHourly = ( tempGround - inletTemp ) / ( gFuncVal / ( kGroundFactor ) + HXResistance + C_1 );
@@ -1020,21 +1019,18 @@ namespace GroundHeatExchangers {
 				SUBHRLY_LOOP: for ( I = 1; I <= subHourlyLimit; ++I ) {
 					if ( I == subHourlyLimit ) {
 						if ( int( currentSimTime ) >= SubAGG ) {
-							XI = std::log( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
-							gFuncVal = getGFunc( XI );
+							gFuncVal = getGFunc( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
 							RQSubHr = gFuncVal / ( kGroundFactor );
 							sumQnSubHourly += ( QnSubHr( I ) - QnHr( IndexN ) ) * RQSubHr;
 						} else {
-							XI = std::log( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
-							gFuncVal = getGFunc( XI );
+							gFuncVal = getGFunc( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
 							RQSubHr = gFuncVal / ( kGroundFactor );
 							sumQnSubHourly += QnSubHr( I ) * RQSubHr;
 						}
 						goto SUBHRLY_LOOP_exit;
 					}
 					//prevTimeSteps(I+1) This is "I+1" because prevTimeSteps(1) = CurrentTimestep
-					XI = std::log( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
-					gFuncVal = getGFunc( XI );
+					gFuncVal = getGFunc( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
 					RQSubHr = gFuncVal / ( kGroundFactor );
 					sumQnSubHourly += ( QnSubHr( I ) - QnSubHr( I + 1 ) ) * RQSubHr;
 					SUBHRLY_LOOP_loop: ;
@@ -1047,14 +1043,12 @@ namespace GroundHeatExchangers {
 				sumQnHourly = 0.0;
 				HOURLY_LOOP: for ( I = SubAGG + 1; I <= hourlyLimit; ++I ) {
 					if ( I == hourlyLimit ) {
-						XI = std::log( currentSimTime / ( timeSSFactor ) );
-						gFuncVal = getGFunc( XI );
+						gFuncVal = getGFunc( currentSimTime / ( timeSSFactor ) );
 						RQHour = gFuncVal / ( kGroundFactor );
 						sumQnHourly += QnHr( I ) * RQHour;
 						goto HOURLY_LOOP_exit;
 					}
-					XI = std::log( ( currentSimTime - int( currentSimTime ) + I ) / ( timeSSFactor ) );
-					gFuncVal = getGFunc( XI );
+					gFuncVal = getGFunc( ( currentSimTime - int( currentSimTime ) + I ) / ( timeSSFactor ) );
 					RQHour = gFuncVal / ( kGroundFactor );
 					sumQnHourly += ( QnHr( I ) - QnHr( I + 1 ) ) * RQHour;
 					HOURLY_LOOP_loop: ;
@@ -1065,8 +1059,7 @@ namespace GroundHeatExchangers {
 				sumTotal = sumQnSubHourly + sumQnHourly;
 
 				//Calulate the subhourly temperature due the Last Time steps Load
-				XI = std::log( ( currentSimTime - prevTimeSteps( 2 ) ) / ( timeSSFactor ) );
-				gFuncVal = getGFunc( XI );
+				gFuncVal = getGFunc( ( currentSimTime - prevTimeSteps( 2 ) ) / ( timeSSFactor ) );
 				RQSubHr = gFuncVal / ( kGroundFactor );
 
 				if ( massFlowRate <= 0.0 ) {
@@ -1099,14 +1092,12 @@ namespace GroundHeatExchangers {
 				sumQnMonthly = 0.0;
 				SUMMONTHLY: for ( I = 1; I <= currentMonth; ++I ) {
 					if ( I == 1 ) {
-						XI = std::log( currentSimTime / ( timeSSFactor ) );
-						gFuncVal = getGFunc( XI );
+						gFuncVal = getGFunc( currentSimTime / ( timeSSFactor ) );
 						RQMonth = gFuncVal / ( kGroundFactor );
 						sumQnMonthly += QnMonthlyAgg( I ) * RQMonth;
 						goto SUMMONTHLY_loop;
 					}
-					XI = std::log( ( currentSimTime - ( I - 1 ) * hrsPerMonth ) / ( timeSSFactor ) );
-					gFuncVal = getGFunc( XI );
+					gFuncVal = getGFunc( ( currentSimTime - ( I - 1 ) * hrsPerMonth ) / ( timeSSFactor ) );
 					RQMonth = gFuncVal / ( kGroundFactor );
 					sumQnMonthly += ( QnMonthlyAgg( I ) - QnMonthlyAgg( I - 1 ) ) * RQMonth;
 					SUMMONTHLY_loop: ;
@@ -1119,14 +1110,12 @@ namespace GroundHeatExchangers {
 				sumQnHourly = 0.0;
 				HOURLYLOOP: for ( I = 1 + SubAGG; I <= hourlyLimit; ++I ) {
 					if ( I == hourlyLimit ) {
-						XI = std::log( ( currentSimTime - int( currentSimTime ) + I ) / ( timeSSFactor ) );
-						gFuncVal = getGFunc( XI );
+						gFuncVal = getGFunc( ( currentSimTime - int( currentSimTime ) + I ) / ( timeSSFactor ) );
 						RQHour = gFuncVal / ( kGroundFactor );
 						sumQnHourly += ( QnHr( I ) - QnMonthlyAgg( currentMonth ) ) * RQHour;
 						goto HOURLYLOOP_exit;
 					}
-					XI = std::log( ( currentSimTime - int( currentSimTime ) + I ) / ( timeSSFactor ) );
-					gFuncVal = getGFunc( XI );
+					gFuncVal = getGFunc( ( currentSimTime - int( currentSimTime ) + I ) / ( timeSSFactor ) );
 					RQHour = gFuncVal / ( kGroundFactor );
 					sumQnHourly += ( QnHr( I ) - QnHr( I + 1 ) ) * RQHour;
 					HOURLYLOOP_loop: ;
@@ -1139,14 +1128,12 @@ namespace GroundHeatExchangers {
 				sumQnSubHourly = 0.0;
 				SUBHRLOOP: for ( I = 1; I <= subHourlyLimit; ++I ) {
 					if ( I == subHourlyLimit ) {
-						XI = std::log( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
-						gFuncVal = getGFunc( XI );
+						gFuncVal = getGFunc( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
 						RQSubHr = gFuncVal / ( kGroundFactor );
 						sumQnSubHourly += ( QnSubHr( I ) - QnHr( SubAGG + 1 ) ) * RQSubHr;
 						goto SUBHRLOOP_exit;
 					}
-					XI = std::log( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
-					gFuncVal = getGFunc( XI );
+					gFuncVal = getGFunc( ( currentSimTime - prevTimeSteps( I + 1 ) ) / ( timeSSFactor ) );
 					RQSubHr = gFuncVal / ( kGroundFactor );
 					sumQnSubHourly += ( QnSubHr( I ) - QnSubHr( I + 1 ) ) * RQSubHr;
 					SUBHRLOOP_loop: ;
@@ -1157,8 +1144,7 @@ namespace GroundHeatExchangers {
 
 				//Calulate the subhourly temperature due the Last Time steps Load
 
-				XI = std::log( ( currentSimTime - prevTimeSteps( 2 ) ) / ( timeSSFactor ) );
-				gFuncVal = getGFunc( XI );
+				gFuncVal = getGFunc( ( currentSimTime - prevTimeSteps( 2 ) ) / ( timeSSFactor ) );
 				RQSubHr = gFuncVal / ( kGroundFactor );
 
 				if ( massFlowRate <= 0.0 ) {
@@ -2001,9 +1987,13 @@ namespace GroundHeatExchangers {
 
 	Real64
 	GLHESlinky::getGFunc(
-		Real64 const LNTTS
+		Real64 const time
 	)
 	{
+		Real64 LNTTS;
+
+		LNTTS = std::log10( time );
+
 		return interpGFunc( LNTTS );
 	}
 
@@ -2011,11 +2001,14 @@ namespace GroundHeatExchangers {
 
 	Real64
 	GLHEVert::getGFunc(
-		Real64 const LNTTS
+		Real64 const time
 	)
 	{
 		Real64 RATIO;
 		Real64 gFuncVal;
+		Real64 LNTTS;
+
+		LNTTS = std::log( time );
 
 		gFuncVal = interpGFunc( LNTTS );
 
