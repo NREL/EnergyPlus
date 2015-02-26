@@ -2345,7 +2345,7 @@ namespace SingleDuct {
 				}
 			}
 
-		} else if ( ( SysInlet( SysNum ).AirMassFlowRateMaxAvail > 0.0 ) && ( QTotLoad >= 0.0 || TempControlType( ZoneNum ) == SingleHeatingSetPoint ) ) {
+		} else if ( ( SysInlet( SysNum ).AirMassFlowRateMaxAvail > 0.0 ) && ( QTotLoad >= 0.0 || TempControlType( ZoneNum ) == SingleHeatingSetPoint ) && ( GetCurrentScheduleValue( Sys( SysNum ).SchedPtr ) > 0.0 ) ) {
 			//     IF (Sys(SysNum)%DamperHeatingAction .EQ. ReverseAction .AND. SysInlet(SysNum)%AirMassFlowRateMinAvail <= SmallMassFlow) THEN
 			// special case for heating: reverse action and damper allowed to close - set the minimum flow rate to a small but nonzero value
 			//       MassFlow = 0.01d0*SysInlet(SysNum)%AirMassFlowRateMaxAvail
