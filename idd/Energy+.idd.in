@@ -74274,6 +74274,32 @@ FaultModel:TemperatureSensorOffset:ReturnAir,
        \default 0.0
        \units deltaC
 
+FaultModel:ThermostatOffset,
+   A1, \field Name
+       \required-field
+       \type alpha
+   A2, \field Availability Schedule Name
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Severity Schedule Name
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+   N1, \field Reference Thermostat Offset
+       \required-field
+       \type real
+       \minimum> -10
+       \maximum< 10
+       \default 2
+       \units C
+   A4; \field Thermostat Name
+       \begin-extensible
+       \note Enter the name of a ZoneControl:Thermostat object.
+       \required-field
+       \type object-list
+       \object-list ZoneControlThermostaticNames
+	   
 FaultModel:EnthalpySensorOffset:ReturnAir,
    \memo This object describes return air enthalpy sensor offset
    A1, \field Name

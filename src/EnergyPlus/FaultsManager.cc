@@ -46,7 +46,7 @@ namespace FaultsManager {
 	int const iFouledCoil_FoulingFactor( 9002 );
 
 	// MODULE VARIABLE DECLARATIONS:
-	int const NumFaultTypes( 6 );
+	int const NumFaultTypes( 7 );
 
 	// FaultTypeEnum
 	int const iFault_TemperatureSensorOffset_OutdoorAir( 101 );
@@ -55,21 +55,23 @@ namespace FaultsManager {
 	int const iFault_TemperatureSensorOffset_ReturnAir( 104 );
 	int const iFault_EnthalpySensorOffset_ReturnAir( 105 );
 	int const iFault_Fouling_Coil( 106 );
+	int const iFault_ThermostatOffset( 107 );
 	// Types of faults under Group Operational Faults in IDD
 	//  1. Temperature sensor offset
 	//  2. Humidity sensor offset
 	//  3. Enthalpy sensor offset
 	//  4. Fouling coils
+	//  5. Thermostat offset
 	// coming ...
-	//  5. Pressure sensor offset
 	//  6. Fouling: chillers, boilers, cooling towers
 	//  7. Damper leakage: return air, outdoor air
 	//  8. Blockage: pipe
 	//  9. Dirty: air filter
 	//  10. Meter: air flow, water flow
 	//  11. CO2 sensor
-	//  12. more
-	FArray1D_string const cFaults( NumFaultTypes, { "FaultModel:TemperatureSensorOffset:OutdoorAir", "FaultModel:HumiditySensorOffset:OutdoorAir", "FaultModel:EnthalpySensorOffset:OutdoorAir", "FaultModel:TemperatureSensorOffset:ReturnAir", "FaultModel:EnthalpySensorOffset:ReturnAir", "FaultModel:Fouling:Coil" } );
+	//  12. Pressure sensor offset
+	//  13. more
+	FArray1D_string const cFaults( NumFaultTypes, { "FaultModel:TemperatureSensorOffset:OutdoorAir", "FaultModel:HumiditySensorOffset:OutdoorAir", "FaultModel:EnthalpySensorOffset:OutdoorAir", "FaultModel:TemperatureSensorOffset:ReturnAir", "FaultModel:EnthalpySensorOffset:ReturnAir", "FaultModel:Fouling:Coil", "FaultModel:ThermostatOffset" } );
 	//      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
 	//      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
 	//      'FaultModel:TemperatureSensorOffset:ZoneAir   ', &
@@ -81,17 +83,19 @@ namespace FaultsManager {
 	//      'FaultModel:DamperLeakage:ReturnAir           ', &
 	//      'FaultModel:DamperLeakage:OutdoorAir          ' /)
 
-	FArray1D_int const iFaultTypeEnums( NumFaultTypes, { iFault_TemperatureSensorOffset_OutdoorAir, iFault_HumiditySensorOffset_OutdoorAir, iFault_EnthalpySensorOffset_OutdoorAir, iFault_TemperatureSensorOffset_ReturnAir, iFault_EnthalpySensorOffset_ReturnAir, iFault_Fouling_Coil } );
+	FArray1D_int const iFaultTypeEnums( NumFaultTypes, { iFault_TemperatureSensorOffset_OutdoorAir, iFault_HumiditySensorOffset_OutdoorAir, iFault_EnthalpySensorOffset_OutdoorAir, iFault_TemperatureSensorOffset_ReturnAir, iFault_EnthalpySensorOffset_ReturnAir, iFault_Fouling_Coil, iFault_ThermostatOffset } );
 
 	bool AnyFaultsInModel( false ); // True if there are operationla faults in the model
 	int NumFaults( 0 ); // Number of faults (include multiple faults of same type) in the model
 	int NumFouledCoil( 0 ); // Total number of fouled coils
+	int NumFaultyThermostat( 0 ); // Total number of faulty thermostat with offset
 
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
 	FArray1D< FaultProperties > Faults;
 	FArray1D< FaultProperties > FouledCoils;
+	FArray1D< FaultProperties > FaultsThermostatOffset;
 
 	// Functions
 
@@ -148,8 +152,9 @@ namespace FaultsManager {
 		FArray1D< Real64 > rNumericArgs( 5 ); // Numeric input items for object
 
 		int i;
-		int j;
-		int j1;
+		int j; 	//Number of fault objects of type 101-105
+		int jFoulingCoil; //Number of fault objects of type 106: fouling coil
+		int jFaultyThermostat; //Number of fault objects of type 107: faulty thermostat
 		int jj;
 		int iFaults;
 		int iTotalFaults;
@@ -167,6 +172,7 @@ namespace FaultsManager {
 
 		// Coil fouling is the 6th fault
 		NumFouledCoil = GetNumObjectsFound( cFaults( 6 ) );
+		NumFaultyThermostat = GetNumObjectsFound( cFaults( 7 ) );
 
 		if ( NumFaults > 0 ) {
 			AnyFaultsInModel = true;
@@ -182,41 +188,80 @@ namespace FaultsManager {
 		// read faults input
 		Faults.allocate( NumFaults );
 		FouledCoils.allocate( NumFouledCoil );
+		FaultsThermostatOffset.allocate( NumFaultyThermostat );
+		
 		j = 0;
-		j1 = 0;
+		jFoulingCoil = 0;
+		jFaultyThermostat = 0;
+		
 		for ( i = 1; i <= NumFaultTypes; ++i ) {
-			cFault1 = cFaults( i );
+			cFault1 = cFaults( i ); // fault object string
 			iFaults = GetNumObjectsFound( cFault1 );
+			
 			for ( jj = 1; jj <= iFaults; ++jj ) {
 				GetObjectItem( cFault1, jj, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				if ( SameString( cFault1, "FaultModel:Fouling:Coil" ) ) {
-					++j1;
+				if ( SameString( cFault1, "FaultModel:ThermostatOffset" ) ) { // For Fault_type 107: ThermostatOffset
+					++jFaultyThermostat;
 
-					FouledCoils( j1 ).FaultType = cFault1;
-					FouledCoils( j1 ).FaultTypeEnum = iFaultTypeEnums( i );
-					FouledCoils( j1 ).Name = cAlphaArgs( 1 );
-					FouledCoils( j1 ).FouledCoilName = cAlphaArgs( 2 );
+					FaultsThermostatOffset( jFaultyThermostat ).FaultType = cFault1;
+					FaultsThermostatOffset( jFaultyThermostat ).FaultTypeEnum = iFaultTypeEnums( i );
+					FaultsThermostatOffset( jFaultyThermostat ).Name = cAlphaArgs( 1 );
+					FaultsThermostatOffset( jFaultyThermostat ).FaultyThermostatName = cAlphaArgs( 4 );
 
 					// Availability schedule
-					FouledCoils( j1 ).AvaiSchedule = cAlphaArgs( 3 );
-					if ( lAlphaFieldBlanks( 3 ) ) {
-						FouledCoils( j1 ).AvaiSchedPtr = -1; // returns schedule value of 1
+					FaultsThermostatOffset( jFaultyThermostat ).AvaiSchedule = cAlphaArgs( 2 );
+					if ( lAlphaFieldBlanks( 2 ) ) {
+						FaultsThermostatOffset( jFaultyThermostat ).AvaiSchedPtr = -1; // returns schedule value of 1
 					} else {
-						FouledCoils( j1 ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
-						if ( FouledCoils( j1 ).AvaiSchedPtr == 0 ) {
+						FaultsThermostatOffset( jFaultyThermostat ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
+						if ( FaultsThermostatOffset( jFaultyThermostat ).AvaiSchedPtr == 0 ) {
+							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
+							ErrorsFound = true;
+						}
+					}
+
+					// Severity schedule
+					FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedule = cAlphaArgs( 3 );
+					if ( lAlphaFieldBlanks( 3 ) ) {
+						FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedPtr = -1; // returns schedule value of 1
+					} else {
+						FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
+						if ( FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedPtr == 0 ) {
+							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
+							ErrorsFound = true;
+						}
+					}
+
+					FaultsThermostatOffset( jFaultyThermostat ).Offset = rNumericArgs( 1 );
+
+				} else if ( SameString( cFault1, "FaultModel:Fouling:Coil" ) ) { // For Fault_type 106: Fouling_Coil
+					++jFoulingCoil;
+
+					FouledCoils( jFoulingCoil ).FaultType = cFault1;
+					FouledCoils( jFoulingCoil ).FaultTypeEnum = iFaultTypeEnums( i );
+					FouledCoils( jFoulingCoil ).Name = cAlphaArgs( 1 );
+					FouledCoils( jFoulingCoil ).FouledCoilName = cAlphaArgs( 2 );
+
+					// Availability schedule
+					FouledCoils( jFoulingCoil ).AvaiSchedule = cAlphaArgs( 3 );
+					if ( lAlphaFieldBlanks( 3 ) ) {
+						FouledCoils( jFoulingCoil ).AvaiSchedPtr = -1; // returns schedule value of 1
+					} else {
+						FouledCoils( jFoulingCoil ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
+						if ( FouledCoils( jFoulingCoil ).AvaiSchedPtr == 0 ) {
 							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
 
 					// Severity schedule
-					FouledCoils( j1 ).SeveritySchedule = cAlphaArgs( 4 );
+					FouledCoils( jFoulingCoil ).SeveritySchedule = cAlphaArgs( 4 );
 					if ( lAlphaFieldBlanks( 4 ) ) {
-						FouledCoils( j1 ).SeveritySchedPtr = -1; // returns schedule value of 1
+						FouledCoils( jFoulingCoil ).SeveritySchedPtr = -1; // returns schedule value of 1
 					} else {
-						FouledCoils( j1 ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 4 ) );
-						if ( FouledCoils( j1 ).SeveritySchedPtr == 0 ) {
+						FouledCoils( jFoulingCoil ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 4 ) );
+						if ( FouledCoils( jFoulingCoil ).SeveritySchedPtr == 0 ) {
 							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not found." );
 							ErrorsFound = true;
 						}
@@ -224,22 +269,22 @@ namespace FaultsManager {
 
 					{ auto const SELECT_CASE_var( MakeUPPERCase( cAlphaArgs( 5 ) ) );
 					if ( SELECT_CASE_var == "FOULEDUARATED" ) {
-						FouledCoils( j1 ).FoulingInputMethod = iFouledCoil_UARated;
+						FouledCoils( jFoulingCoil ).FoulingInputMethod = iFouledCoil_UARated;
 
 					} else if ( SELECT_CASE_var == "FOULINGFACTOR" ) {
-						FouledCoils( j1 ).FoulingInputMethod = iFouledCoil_FoulingFactor;
+						FouledCoils( jFoulingCoil ).FoulingInputMethod = iFouledCoil_FoulingFactor;
 
 					} else {
-						FouledCoils( j1 ).FoulingInputMethod = iFouledCoil_UARated;
+						FouledCoils( jFoulingCoil ).FoulingInputMethod = iFouledCoil_UARated;
 					}}
 
-					FouledCoils( j1 ).UAFouled = rNumericArgs( 1 );
-					FouledCoils( j1 ).Rfw = rNumericArgs( 2 );
-					FouledCoils( j1 ).Rfa = rNumericArgs( 3 );
-					FouledCoils( j1 ).Aout = rNumericArgs( 4 );
-					FouledCoils( j1 ).Aratio = rNumericArgs( 5 );
+					FouledCoils( jFoulingCoil ).UAFouled = rNumericArgs( 1 );
+					FouledCoils( jFoulingCoil ).Rfw = rNumericArgs( 2 );
+					FouledCoils( jFoulingCoil ).Rfa = rNumericArgs( 3 );
+					FouledCoils( jFoulingCoil ).Aout = rNumericArgs( 4 );
+					FouledCoils( jFoulingCoil ).Aratio = rNumericArgs( 5 );
 
-				} else { // other faults
+				} else { // For Fault_type 101-105, which are of the same input structure
 					++j;
 					Faults( j ).FaultType = cFault1;
 					Faults( j ).FaultTypeEnum = iFaultTypeEnums( i );

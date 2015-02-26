@@ -2291,6 +2291,10 @@ namespace ZoneTempPredictorCorrector {
 			} //Demand manager
 		}
 
+		//zrp_0
+
+		//zrp_1
+
 		for ( Loop = 1; Loop <= NumTempControlledZones; ++Loop ) {
 			if ( TempControlledZone( Loop ).EMSOverrideHeatingSetPointOn ) {
 				ZoneNum = TempControlledZone( Loop ).ActualZoneNum;
