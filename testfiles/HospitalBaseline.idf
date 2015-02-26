@@ -106,11 +106,13 @@
 
   SimulationControl,
     Yes,                     !- Do Zone Sizing Calculation
-    Yes,                     !- Do System Sizing Calculation
+    Yes,                     !- Do System Sizing CalculationB
     Yes,                     !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
-
+    No,                      !- Run Simulation for Weather File Run Periods
+    YES,                     !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes
+    
   RunPeriod,
     ,                        !- Name
     1,                       !- Begin Month
@@ -62682,8 +62684,11 @@
     HeatSys1,                !- Plant or Condenser Loop Name
     Heating,                 !- Loop Type
     82.2000,                 !- Design Loop Exit Temperature {C}
-    5.0000;                  !- Loop Design Temperature Difference {deltaC}
-
+    5.0000,                  !- Loop Design Temperature Difference {deltaC}
+    Coincident,              !- Sizing Option
+    1,                       !- Zone Timesteps in Averaging Window
+    None;                    !- Coincident Sizing Factor Mode
+    
   SetpointManager:OutdoorAirReset,
     HeatSys1 Loop Setpoint Manager,  !- Name
     Temperature,             !- Control Variable
@@ -62790,7 +62795,7 @@
     95.0,                    !- Water Outlet Upper Temperature Limit {C}
     LeavingSetpointModulated,!- Boiler Flow Mode
     0.0000,                  !- Parasitic Electric Load {W}
-    0.5000;                  !- Sizing Factor
+    1.0000;                  !- Sizing Factor
 
   SetpointManager:OutdoorAirReset,
     HeatSys1 Boiler Setpoint Manager,  !- Name
