@@ -657,7 +657,7 @@ namespace FluidCoolers {
 			ErrorsFound = true;
 		}
 		return ErrorsFound;
-	};
+	}
 
 
 	// End of Get Input subroutines for the CondenserLoopFluidCoolers Module
