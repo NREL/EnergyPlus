@@ -6,7 +6,7 @@ set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} 
 
 set( CMAKE_VERSION_MAJOR 8 )
 set( CMAKE_VERSION_MINOR 2 )
-set( CMAKE_VERSION_PATCH 8 ) 
+set( CMAKE_VERSION_PATCH 9 ) 
 
 set( ENERGYPLUS_VERSION "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}" )
 
@@ -43,6 +43,9 @@ set(CPACK_PACKAGE_CONTACT "Kyle Benne <Kyle.Benne@nrel.gov>")
 option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
+# Turning ENABLE_GTEST_DEBUG_MODE ON will cause assertions and exceptions to halt the test case and unwind.
+# Turn this option OFF for automated testing.
+option( ENABLE_GTEST_DEBUG_MODE "Enable options to help debug test failures" ON )
 
 if( BUILD_TESTING )
   option( ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF )
@@ -178,14 +181,14 @@ endif()
 
 
 set(OPTIMIZABLE_TARGETS
-  sqlite objexx bcvtb epexpat epfmiimport miniziplib DElight EnergyPlus EnergyPlusAPI EnergyPlusLib EnergyPlusLib2 
+  sqlite objexx bcvtb epexpat epfmiimport miniziplib DElight energyplus energyplusapi energypluslib energypluslib2 
     )
 if(NOT APPLE AND NOT MSVC)
   list(APPEND OPTIMIZABLE_TARGETS parser)
 endif()
 
 if(NOT MSVC)
-  list(APPEND OPTIMIZABLE_TARGETS objexx_tests EnergyPlus_tests)
+  list(APPEND OPTIMIZABLE_TARGETS objexx_tests energyplus_tests)
 endif()
 
 if(MSVC AND (PROFILE_GENERATE OR PROFILE_USE OR ENABLE_LTO) )
@@ -256,12 +259,12 @@ elseif (CMAKE_COMPILER_IS_GNUCXX)
   if(ENABLE_LTO)
     set_target_properties(${OPTIMIZABLE_TARGETS}
       PROPERTIES LINK_FLAGS "-flto=7 -fno-use-linker-plugin" COMPILE_FLAGS "-flto=7 -fno-use-linker-plugin")
-    set_target_properties(EnergyPlus
+    set_target_properties(energyplus
       PROPERTIES LINK_FLAGS "-flto=7 -fuse-linker-plugin -fwhole-program" COMPILE_FLAGS "-flto=7 -fuse-linker-plugin -fwhole-program")
   endif()
 
   if (PROFILE_GENERATE)
-    set_target_properties(${OPTIMIZABLE_TARGETS} EnergyPlus_tests TestEnergyPlusCallbacks
+    set_target_properties(${OPTIMIZABLE_TARGETS} energyplus_tests TestEnergyPlusCallbacks
       PROPERTIES LINK_FLAGS "-fprofile-generate"  COMPILE_FLAGS "-fprofile-generate")
   endif()
 
@@ -273,12 +276,12 @@ elseif (CMAKE_COMPILER_IS_GNUCXX)
   if (PROFILE_USE AND ENABLE_LTO)
     set_target_properties(${OPTIMIZABLE_TARGETS}
       PROPERTIES LINK_FLAGS "-flto=7 -fno-use-linker-plugin -fprofile-use" COMPILE_FLAGS "-flto=7 -fno-use-linker-plugin -fprofile-use")
-    set_target_properties(EnergyPlus
+    set_target_properties(energyplus
       PROPERTIES LINK_FLAGS "-flto=7 -fuse-linker-plugin -fwhole-program -fprofile-use" COMPILE_FLAGS "-flto=7 -fuse-linker-plugin -fwhole-program -fprofile-use")
   endif()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # Clang
   if(ENABLE_LTO)
-    set_target_properties(EnergyPlus
+    set_target_properties(energyplus
       PROPERTIES LINK_FLAGS "-flto" COMPILE_FLAGS "-flto")
   endif()
 
