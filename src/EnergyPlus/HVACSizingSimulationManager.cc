@@ -252,15 +252,15 @@ namespace EnergyPlus {
 			//need to extend Environment structure array to distinguish the HVAC Sizing Simulation from the regular run of that sizing period, repeats for each set
 			AddDesignSetToEnvironmentStruct(HVACSizingIterCount);
 
-
 			WarmupFlag = true;
 			Available = true;
 			while (Available) {
 
 				GetNextEnvironment(Available, ErrorsFound);
-
 				if (!Available) break;
 				if (ErrorsFound) break;
+				sizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment( );
+
 			//	if (!DoDesDaySim)  continue;
 				if (KindOfSim == ksRunPeriodWeather) continue;
 				if (KindOfSim == ksDesignDay) continue;

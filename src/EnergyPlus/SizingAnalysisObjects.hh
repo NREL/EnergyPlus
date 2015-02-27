@@ -4,6 +4,7 @@
 // C++ Headers
 #include <string>
 #include <vector>
+#include <map>
 
 // EnergyPlus Headers
 
@@ -35,7 +36,6 @@ public:
 
 	int kindOfSim			= 0;
 	int envrnNum			= 0;
-	int designDayNum		= 0;
 	int dayOfSim			= 0;    // since start of simulation
 	int hourOfDay			= 0; 
 	int ztStepsIntoPeriod	= 0;    //count of zone timesteps into period
@@ -52,7 +52,6 @@ public:
 	ZoneTimestepObject (
 		int kindSim,
 		int environmentNum,
-		int desDayNum,
 		int daySim,
 		int hourDay,
 		int stepEndMin,
@@ -68,9 +67,14 @@ public:
 	int NumOfEnvironmentsInLogSet;
 	int NumOfDesignDaysInLogSet;
 	int NumberOfSizingPeriodsInLogSet;
-	std::vector <int> ztStepCountByEnvrn ; // array of how many zone timesteps are in each environment period, sized to number of environments in sizing set
-	std::vector <int> EnvrnIndexMapByEnvrn ; //sized to number of environments in sizing set
-	std::vector <int> EnvrnStartZtStepIndex ; //sized to number of environments in sizing set
+	//these next three should be replaced by two hash maps 
+	std::map < int, int > ztStepCountByEnvrnMap; // key is the seed original Environment number, or index in the Enviroinment Structure
+	std::map < int, int > envrnStartZtStepIndexMap; // key is the seed original Environment number
+	std::map < int, int > newEnvrnToSeedEnvrnMap; // key is the new HVAC sim envrionment number, produces Seed envrionment number 
+
+//	std::vector <int> ztStepCountByEnvrn ; // array of how many zone timesteps are in each environment period, sized to number of environments in sizing set
+//	std::vector <int> EnvrnIndexMapByEnvrn ; //sized to number of environments in sizing set
+//	std::vector <int> EnvrnStartZtStepIndex ; //sized to number of environments in sizing set
 
 	int NumOfStepsInLogSet; // sum of all zone timestep steps in log
 	int timeStepsInAverage;
@@ -105,6 +109,11 @@ public:
 
 	void ReInitLogForIteration();
 
+	void SetupNewEnvironment(
+		int const seedEnvrnNum,
+		int const newEnvrnNum
+	);
+
 private:
 
 	int GetSysStepZtStepIndex(
@@ -129,6 +138,8 @@ public:
 	void UpdateSizingLogValuesZoneStep();
 
 	void UpdateSizingLogValuesSystemStep();
+
+	void SetupSizingLogsNewEnvironment( );
 
 	void IncrementSizingPeriodSet(
 		int const HVACSizingIterCount

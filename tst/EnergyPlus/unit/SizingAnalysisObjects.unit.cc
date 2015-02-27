@@ -61,9 +61,11 @@ public:
 
 		Environment(3).KindOfEnvrn = ksHVACSizeDesignDay;
 		Environment(3).DesignDayNum = 1;
+		Environment(3).SeedEnvrnNum = 1;
 
 		Environment(4).KindOfEnvrn = ksHVACSizeDesignDay;
 		Environment(4).DesignDayNum = 2;
+		Environment(4).SeedEnvrnNum = 2;
 
 		TimeValue.allocate( 2 );
 		TimeValue( 1 ).TimeStep >>= TimeStepZone;
@@ -104,6 +106,8 @@ public:
 };
 
 
+
+
 TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
 {
 
@@ -115,6 +119,7 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
 	HourOfDay = 1;
 	Envrn = 3;
 	Environment( Envrn ).DesignDayNum = 1;
+	sizingLoggerFrameObj.SetupSizingLogsNewEnvironment();
 	TimeValue( ZoneIndex ).CurMinute = 15;
 
 	LogVal = lowLogVal;
@@ -135,6 +140,7 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
 	TimeValue( ZoneIndex ).CurMinute = 15;
 	Envrn = 4;
 	Environment( Envrn ).DesignDayNum = 2;
+	sizingLoggerFrameObj.SetupSizingLogsNewEnvironment();
 	LogVal = midLogVal;
 	sizingLoggerFrameObj.UpdateSizingLogValuesZoneStep();
 
@@ -151,21 +157,18 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 	TestLogObj.NumOfEnvironmentsInLogSet = 2;
 	TestLogObj.NumOfDesignDaysInLogSet = 2;
 	TestLogObj.NumberOfSizingPeriodsInLogSet = 0;
-	TestLogObj.ztStepCountByEnvrn.resize( TestLogObj.NumOfEnvironmentsInLogSet );
-	TestLogObj.EnvrnIndexMapByEnvrn.resize ( TestLogObj.NumOfEnvironmentsInLogSet );
-	TestLogObj.EnvrnStartZtStepIndex.resize ( TestLogObj.NumOfEnvironmentsInLogSet );
 
 	TestLogObj.NumOfStepsInLogSet = 8; // test
 
-	TestLogObj.ztStepCountByEnvrn[ 0 ] = 4;
-	TestLogObj.ztStepCountByEnvrn[ 1 ] = 4; 
+	TestLogObj.ztStepCountByEnvrnMap[ 1 ]= 4;
+	TestLogObj.ztStepCountByEnvrnMap[ 2 ]= 4;
 
 	// as for 2 DDs and a run period
-	TestLogObj.EnvrnIndexMapByEnvrn[ 0 ] = 4; 
-	TestLogObj.EnvrnIndexMapByEnvrn[ 1 ] = 5;
+	TestLogObj.envrnStartZtStepIndexMap[ 1 ] = 0;
+	TestLogObj.envrnStartZtStepIndexMap[ 2 ] = 4;
 
-	TestLogObj.EnvrnStartZtStepIndex[ 0 ] = 0;
-	TestLogObj.EnvrnStartZtStepIndex[ 1 ] = 4;
+	TestLogObj.newEnvrnToSeedEnvrnMap[ 3 ] = 1;
+	TestLogObj.newEnvrnToSeedEnvrnMap[ 4 ] = 2;
 
 	TestLogObj.ztStepObj.resize( TestLogObj.NumOfStepsInLogSet );
 
@@ -173,7 +176,7 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 
 // fill first step in log with zone step data
 	int KindOfSim( 4 );
-	int Envrn( 4 );
+	int Envrn( 3 );
 	int DDnum( 1 );
 	int DayOfSim( 1 );
 	int HourofDay( 1 );
@@ -184,7 +187,6 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 	ZoneTimestepObject tmpztStepStamp1( // call constructor
 		KindOfSim,
 		Envrn,
-		DDnum,
 		DayOfSim,
 		HourofDay,
 		CurMin,
@@ -200,7 +202,6 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 	ZoneTimestepObject tmpztStepStamp2( // call constructor
 		KindOfSim,
 		Envrn,
-		DDnum,
 		DayOfSim,
 		HourofDay,
 		CurMin,
@@ -215,7 +216,6 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 	ZoneTimestepObject tmpztStepStamp3( // call constructor
 		KindOfSim,
 		Envrn,
-		DDnum,
 		DayOfSim,
 		HourofDay,
 		CurMin,
@@ -230,7 +230,6 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 	ZoneTimestepObject tmpztStepStamp4( // call constructor
 		KindOfSim,
 		Envrn,
-		DDnum,
 		DayOfSim,
 		HourofDay,
 		CurMin,
@@ -259,20 +258,16 @@ TEST_F( SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour )
 	TestLogObj.NumOfEnvironmentsInLogSet = 2;
 	TestLogObj.NumOfDesignDaysInLogSet = 2;
 	TestLogObj.NumberOfSizingPeriodsInLogSet = 0;
-	TestLogObj.ztStepCountByEnvrn.resize( TestLogObj.NumOfEnvironmentsInLogSet );
-	TestLogObj.EnvrnIndexMapByEnvrn.resize ( TestLogObj.NumOfEnvironmentsInLogSet );
-	TestLogObj.EnvrnStartZtStepIndex.resize ( TestLogObj.NumOfEnvironmentsInLogSet );
 
 	TestLogObj.NumOfStepsInLogSet = 48; // test
+	TestLogObj.ztStepCountByEnvrnMap[ 1 ]= 24;
+	TestLogObj.ztStepCountByEnvrnMap[ 2 ]= 24;
 
-	TestLogObj.ztStepCountByEnvrn[ 0 ] = 24;
-	TestLogObj.ztStepCountByEnvrn[ 1 ] = 24; 
+	TestLogObj.envrnStartZtStepIndexMap[ 1 ] = 0;
+	TestLogObj.envrnStartZtStepIndexMap[ 2 ] = 24;
 
-	TestLogObj.EnvrnIndexMapByEnvrn[ 0 ] = 4;
-	TestLogObj.EnvrnIndexMapByEnvrn[ 1 ] = 5;
-
-	TestLogObj.EnvrnStartZtStepIndex[ 0 ] = 0;
-	TestLogObj.EnvrnStartZtStepIndex[ 1 ] = 24;
+	TestLogObj.newEnvrnToSeedEnvrnMap[ 3 ] = 1;
+	TestLogObj.newEnvrnToSeedEnvrnMap[ 4 ] = 2;
 
 	TestLogObj.ztStepObj.resize( TestLogObj.NumOfStepsInLogSet );
 
@@ -280,7 +275,7 @@ TEST_F( SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour )
 
 // fill first step in log with zone step data
 	int KindOfSim( 4 );
-	int Envrn( 4 );
+	int Envrn( 3 );
 	int DDnum( 1 );
 	int DayOfSim( 1 );
 	int HourofDay( 1 );
@@ -292,19 +287,19 @@ TEST_F( SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour )
 	for (int hr = 1; hr <= 24; hr++ ) {
 		HourofDay = hr;
 		ZoneTimestepObject tmpztStepStamp1( // call constructor
-			KindOfSim,Envrn,DDnum,DayOfSim,HourofDay,CurMin,timeStepDuration,
+			KindOfSim,Envrn,DayOfSim,HourofDay,CurMin,timeStepDuration,
 			numTimeStepsInHour
 		); 
 		TestLogObj.FillZoneStep( tmpztStepStamp1 );
 	}
 
-	Envrn = 5;
+	Envrn = 4;
 	DDnum = 2;
 	LogVal = hiLogVal;
 	for (int hr = 1; hr <= 24; hr++ ) {
 		HourofDay = hr;
 		ZoneTimestepObject tmpztStepStamp1( // call constructor
-			KindOfSim,Envrn,DDnum,DayOfSim,HourofDay,CurMin,timeStepDuration,
+			KindOfSim,Envrn,DayOfSim,HourofDay,CurMin,timeStepDuration,
 			numTimeStepsInHour
 		); 
 		TestLogObj.FillZoneStep( tmpztStepStamp1 );
@@ -360,7 +355,6 @@ TEST_F( SizingAnalysisObjectsTest , PlantCoincidentAnalyObjTest)
 	ZoneTimestepObject tmpztStepStamp1( // call constructor
 		KindOfSim,
 		Envrn,
-		DDnum,
 		DayOfSim,
 		HourofDay,
 		CurMin,

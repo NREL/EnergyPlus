@@ -954,41 +954,26 @@ namespace WeatherManager {
 		using DataGlobals::ksHVACSizeRunPeriodDesign;
 
 		int OrigNumOfEnvrn;
-		int NumDesignEnv(0);
-		int i;
 
 		OrigNumOfEnvrn = NumOfEnvrn;
-			//for (auto & e : Environment)
-			for (i = 1; i <= OrigNumOfEnvrn; i++)
-		{
-				if (Environment(i).KindOfEnvrn == ksDesignDay)
-				{
-
-					Environment.redimension(++NumOfEnvrn);
-					Environment(NumOfEnvrn) = Environment(i); // copy over seed data from current array element
-					Environment(NumOfEnvrn).KindOfEnvrn = ksHVACSizeDesignDay;
-					Environment(NumOfEnvrn).Title = Environment(i).Title + " HVAC Sizing Pass " + RoundSigDigits( HVACSizingIterCount );
-					Environment(NumOfEnvrn).DesignDayNum = i;
-					Environment(NumOfEnvrn).HVACSizingIterationNum = HVACSizingIterCount;
-					++NumDesignEnv;
-				}
-				else if (Environment(i).KindOfEnvrn == ksRunPeriodDesign)
-				{
-					Environment.redimension(++NumOfEnvrn);
-					Environment(NumOfEnvrn) = Environment(i); // copy over seed data
-					Environment(NumOfEnvrn).KindOfEnvrn = ksHVACSizeRunPeriodDesign;
-					Environment(NumOfEnvrn).Title = Environment(i).Title + " HVAC Sizing Pass " + RoundSigDigits( HVACSizingIterCount );
-					Environment(NumOfEnvrn).HVACSizingIterationNum = HVACSizingIterCount;
-					++NumDesignEnv;
-				}
-
-
+		for ( int i = 1; i <= OrigNumOfEnvrn; i++ ) {
+			if ( Environment(i).KindOfEnvrn == ksDesignDay) {
+				Environment.redimension(++NumOfEnvrn);
+				Environment(NumOfEnvrn) = Environment(i); // copy over seed data from current array element
+				Environment(NumOfEnvrn).SeedEnvrnNum = i;
+				Environment(NumOfEnvrn).KindOfEnvrn = ksHVACSizeDesignDay;
+				Environment(NumOfEnvrn).Title = Environment(i).Title + " HVAC Sizing Pass " + RoundSigDigits( HVACSizingIterCount );
+				Environment(NumOfEnvrn).HVACSizingIterationNum = HVACSizingIterCount;
+			}
+			else if (Environment(i).KindOfEnvrn == ksRunPeriodDesign) {
+				Environment.redimension(++NumOfEnvrn);
+				Environment(NumOfEnvrn) = Environment(i); // copy over seed data
+				Environment(NumOfEnvrn).SeedEnvrnNum = i;
+				Environment(NumOfEnvrn).KindOfEnvrn = ksHVACSizeRunPeriodDesign;
+				Environment(NumOfEnvrn).Title = Environment(i).Title + " HVAC Sizing Pass " + RoundSigDigits( HVACSizingIterCount );
+				Environment(NumOfEnvrn).HVACSizingIterationNum = HVACSizingIterCount;
+			}
 		}  // for each loop over Environment data strucure
-
-
-		//next is temporary for testing could be weather period, need to examine contents of structure first
-
-
 
 	}
 
@@ -6841,6 +6826,7 @@ Label9999: ;
 			Environment( EnvrnNum ).Title = DesDayInput( EnvrnNum ).Title;
 			Environment( EnvrnNum ).KindOfEnvrn = ksDesignDay;
 			Environment( EnvrnNum ).DesignDayNum = EnvrnNum;
+			Environment( EnvrnNum ).RunPeriodDesignNum = 0;
 			Environment( EnvrnNum ).TotalDays = 1;
 			Environment( EnvrnNum ).StartMonth = DesDayInput( EnvrnNum ).Month;
 			Environment( EnvrnNum ).StartDay = DesDayInput( EnvrnNum ).DayOfMonth;
@@ -9223,6 +9209,8 @@ Label9998: ;
 			Environment( Envrn ).Title = RunPeriodDesignInput( Loop ).Title;
 			Environment( Envrn ).cKindOfEnvrn = RunPeriodDesignInput( Loop ).PeriodType;
 			Environment( Envrn ).KindOfEnvrn = ksRunPeriodDesign;
+			Environment( Envrn ).DesignDayNum = 0;
+			Environment( Envrn ).RunPeriodDesignNum = Loop;
 			Environment( Envrn ).DayOfWeek = RunPeriodDesignInput( Loop ).DayOfWeek;
 			Environment( Envrn ).MonWeekDay = RunPeriodDesignInput( Loop ).MonWeekDay;
 			Environment( Envrn ).SetWeekDays = false;

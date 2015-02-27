@@ -102,6 +102,223 @@ public:
 	}
 };
 
+TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3 )
+{
+// this test emulates two design days and two sizing weather file days periods
+// calls code related to coincident plant sizing with HVAC sizing simulation
+// this test runs 3 system timesteps for each zone timestep
+
+	int temp;
+
+
+
+	Environment.clear();
+			// setup weather manager state needed
+	NumOfEnvrn = 4;
+	Environment.allocate( NumOfEnvrn );
+	Environment( 1 ).KindOfEnvrn = ksDesignDay;
+	Environment( 1 ).DesignDayNum = 1;
+
+	Environment( 2 ).KindOfEnvrn = ksDesignDay;
+	Environment( 2 ).DesignDayNum = 2;
+
+	Environment( 3 ).KindOfEnvrn = ksRunPeriodDesign;
+	Environment( 3 ).DesignDayNum = 0;
+	Environment( 3 ).TotalDays = 4;
+	
+	Environment( 4 ).KindOfEnvrn = ksRunPeriodDesign;
+	Environment( 4 ).DesignDayNum = 0;
+	Environment( 4 ).TotalDays = 4;
+
+
+	HVACSizingSimulationManager testSizeSimManagerObj;
+
+	testSizeSimManagerObj.DetermineSizingAnalysesNeeded ();
+
+	EXPECT_EQ( 1, testSizeSimManagerObj.plantCoincAnalyObjs[ 0 ].supplySideInletNodeNum );
+
+	testSizeSimManagerObj.SetupSizingAnalyses();
+
+	
+
+	EXPECT_EQ( 4, NumOfEnvrn );
+	AddDesignSetToEnvironmentStruct( 1 );
+	EXPECT_EQ( 8, NumOfEnvrn );
+
+	//now fill with three system timesteps for each zone timestep
+	TimeStepZone = 15.0/60.0;
+	NumOfSysTimeSteps = 3;
+	TimeStepSys = TimeStepZone / NumOfSysTimeSteps;
+
+
+	//first HVAC Sizing Simulation DD emulation
+	KindOfSim = ksHVACSizeDesignDay;
+	DayOfSim  = 1;
+	Envrn = 5;
+	Environment( Envrn ).DesignDayNum = 1;
+	testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment();
+
+	for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
+		TimeValue( 1 ).CurMinute = 0.0;
+		TimeValue( 2 ).CurMinute = 0.0;
+		for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+			for ( int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop ) {
+				TimeValue( 2 ).CurMinute += TimeValue( 2 ).TimeStep * 60.0;
+
+				Node(1).MassFlowRate = HourOfDay * 0.1;
+				Node(1).Temp = 10.0;
+				PlantReport(1).HeatingDemand = HourOfDay * 10.0;
+				testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep();
+			}
+			TimeValue( 1 ).CurMinute += TimeValue( 1 ).TimeStep * 60.0;
+			testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep();
+		} // TimeStep loop
+	} // ... End hour loop.
+
+	//second HVAC Sizing Simulation DD emulation
+	KindOfSim = ksHVACSizeDesignDay;
+	DayOfSim  = 1;
+	Envrn = 6;
+
+	Environment( Envrn ).DesignDayNum = 2;
+	testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment();
+	for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
+		TimeValue( 1 ).CurMinute = 0.0;
+		TimeValue( 2 ).CurMinute = 0.0;
+		for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+			for ( int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop ) {
+				TimeValue( 2 ).CurMinute += TimeValue( 2 ).TimeStep * 60.0;
+
+				Node(1).MassFlowRate = HourOfDay * 0.1;
+				Node(1).Temp = 10.0;
+				PlantReport(1).HeatingDemand = HourOfDay * 10.0;
+
+				testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep();
+			}
+			TimeValue( 1 ).CurMinute += TimeValue( 1 ).TimeStep * 60.0;
+			testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep();
+		} // TimeStep loop
+	} // End hour loop.
+
+
+	//first HVAC Sizing Simulation WEatherFileDAys emulation
+	KindOfSim = ksHVACSizeRunPeriodDesign;
+	DayOfSim  = 0;
+	Envrn = 7;
+	NumOfDayInEnvrn = 4;
+	testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment();
+	while  ( DayOfSim < NumOfDayInEnvrn ) {
+		++DayOfSim;
+		for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
+			TimeValue( 1 ).CurMinute = 0.0;
+			TimeValue( 2 ).CurMinute = 0.0;
+			for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+				for ( int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop ) {
+					TimeValue( 2 ).CurMinute += TimeValue( 2 ).TimeStep * 60.0;
+
+					Node(1).MassFlowRate = HourOfDay * 0.1;
+					Node(1).Temp = 10.0;
+					PlantReport(1).HeatingDemand = HourOfDay * 10.0;
+					testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep();
+				}
+				TimeValue( 1 ).CurMinute += TimeValue( 1 ).TimeStep * 60.0;
+				testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep();
+			} // TimeStep loop
+		} // ... End hour loop.
+	} // day loop
+
+	//second HVAC Sizing Simulation WEatherFileDAys emulation
+	KindOfSim = ksHVACSizeRunPeriodDesign;
+	DayOfSim  = 0;
+	Envrn = 8;
+	NumOfDayInEnvrn = 4;
+	testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment();
+	while  ( DayOfSim < NumOfDayInEnvrn ) {
+		++DayOfSim;
+		for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
+			TimeValue( 1 ).CurMinute = 0.0;
+			TimeValue( 2 ).CurMinute = 0.0;
+			for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+				for ( int SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop ) {
+					TimeValue( 2 ).CurMinute += TimeValue( 2 ).TimeStep * 60.0;
+
+					Node(1).MassFlowRate = HourOfDay * 0.1;
+					Node(1).Temp = 10.0;
+					PlantReport(1).HeatingDemand = HourOfDay * 10.0;
+					testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesSystemStep();
+				}
+				TimeValue( 1 ).CurMinute += TimeValue( 1 ).TimeStep * 60.0;
+				testSizeSimManagerObj.sizingLogger.UpdateSizingLogValuesZoneStep();
+			} // TimeStep loop
+		} // ... End hour loop.
+	} // day loop
+
+
+	testSizeSimManagerObj.PostProcessLogs();
+
+	// check plant resizing
+	EXPECT_DOUBLE_EQ( 2.0 , PlantLoop( 1 ).MaxMassFlowRate ); // original size
+	testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments( 1 );
+	EXPECT_DOUBLE_EQ( 2.4 , PlantLoop( 1 ).MaxMassFlowRate ); //resize check
+	
+	// check that the data are as expected in the logs
+	// first timestep
+	EXPECT_DOUBLE_EQ( 0.1 , testSizeSimManagerObj.sizingLogger
+			.logObjs[ testSizeSimManagerObj.plantCoincAnalyObjs[ 0 ].supplyInletNodeFlow_LogIndex ]
+				.ztStepObj[ 0 ].subSteps[ 0 ].LogDataValue );
+
+	EXPECT_DOUBLE_EQ( 0.1 , testSizeSimManagerObj.sizingLogger
+			.logObjs[ testSizeSimManagerObj.plantCoincAnalyObjs[ 0 ].supplyInletNodeFlow_LogIndex ]
+				.ztStepObj[ 0 ].runningAvgDataValue );
+
+	// last timestep of first hour
+	EXPECT_DOUBLE_EQ( 0.1 , testSizeSimManagerObj.sizingLogger
+			.logObjs[ testSizeSimManagerObj.plantCoincAnalyObjs[ 0 ].supplyInletNodeFlow_LogIndex ]
+				.ztStepObj[ 3 ].subSteps[ 2 ].LogDataValue );
+
+	EXPECT_DOUBLE_EQ( 0.1 , testSizeSimManagerObj.sizingLogger
+			.logObjs[ testSizeSimManagerObj.plantCoincAnalyObjs[ 0 ].supplyInletNodeFlow_LogIndex ]
+				.ztStepObj[ 3 ].runningAvgDataValue );
+
+	// first timestep of second hour
+	EXPECT_DOUBLE_EQ( 0.2 , testSizeSimManagerObj.sizingLogger
+			.logObjs[ testSizeSimManagerObj.plantCoincAnalyObjs[ 0 ].supplyInletNodeFlow_LogIndex ]
+				.ztStepObj[ 7 ].subSteps[ 0 ].LogDataValue );
+
+	EXPECT_DOUBLE_EQ( 0.2 , testSizeSimManagerObj.sizingLogger
+			.logObjs[ testSizeSimManagerObj.plantCoincAnalyObjs[ 0 ].supplyInletNodeFlow_LogIndex ]
+				.ztStepObj[ 7 ].runningAvgDataValue );
+
+	// last timestep of first DD, hour = 24
+	EXPECT_DOUBLE_EQ( 2.4 , testSizeSimManagerObj.sizingLogger
+			.logObjs[ testSizeSimManagerObj.plantCoincAnalyObjs[ 0 ].supplyInletNodeFlow_LogIndex ]
+				.ztStepObj[ 95 ].subSteps[ 2 ].LogDataValue );
+
+	EXPECT_DOUBLE_EQ( 2.4 , testSizeSimManagerObj.sizingLogger
+			.logObjs[ testSizeSimManagerObj.plantCoincAnalyObjs[ 0 ].supplyInletNodeFlow_LogIndex ]
+				.ztStepObj[ 95 ].runningAvgDataValue );
+
+	// first timestep of second DD, hour = 1
+	EXPECT_DOUBLE_EQ( 0.1 , testSizeSimManagerObj.sizingLogger
+			.logObjs[ testSizeSimManagerObj.plantCoincAnalyObjs[ 0 ].supplyInletNodeFlow_LogIndex ]
+				.ztStepObj[ 96 ].subSteps[ 0 ].LogDataValue );
+
+	EXPECT_DOUBLE_EQ( 0.1 , testSizeSimManagerObj.sizingLogger
+			.logObjs[ testSizeSimManagerObj.plantCoincAnalyObjs[ 0 ].supplyInletNodeFlow_LogIndex ]
+				.ztStepObj[ 96 ].runningAvgDataValue );
+
+	// first timestep of third sizing environment WeatherFileDays 
+	EXPECT_DOUBLE_EQ( 0.1 , testSizeSimManagerObj.sizingLogger
+			.logObjs[ testSizeSimManagerObj.plantCoincAnalyObjs[ 0 ].supplyInletNodeFlow_LogIndex ]
+				.ztStepObj[ 192 ].runningAvgDataValue);
+
+	// first timestep of fourth sizing environment WeatherFileDays 
+	EXPECT_DOUBLE_EQ( 0.1 , testSizeSimManagerObj.sizingLogger
+			.logObjs[ testSizeSimManagerObj.plantCoincAnalyObjs[ 0 ].supplyInletNodeFlow_LogIndex ]
+				.ztStepObj[ 576 ].runningAvgDataValue);
+
+}
+
 TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3 )
 {
 // this test emulates two design days and calls nearly all the OO code related
@@ -134,6 +351,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3 )
 	DayOfSim  = 1;
 	Envrn = 3;
 	Environment( Envrn ).DesignDayNum = 1;
+	testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment();
 	for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
 		TimeValue( 1 ).CurMinute = 0.0;
 		TimeValue( 2 ).CurMinute = 0.0;
@@ -156,7 +374,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3 )
 	DayOfSim  = 1;
 	Envrn = 4;
 	Environment( Envrn ).DesignDayNum = 2;
-
+	testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment();
 	for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
 		TimeValue( 1 ).CurMinute = 0.0;
 		TimeValue( 2 ).CurMinute = 0.0;
@@ -263,6 +481,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1 )
 	DayOfSim  = 1;
 	Envrn = 3;
 	Environment( Envrn ).DesignDayNum = 1;
+	testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment();
 	for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
 		TimeValue( 1 ).CurMinute = 0.0;
 		TimeValue( 2 ).CurMinute = 0.0;
@@ -287,7 +506,7 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1 )
 	DayOfSim  = 1;
 	Envrn = 4;
 	Environment( Envrn ).DesignDayNum = 2;
-
+	testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment();
 	for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
 		TimeValue( 1 ).CurMinute = 0.0;
 		TimeValue( 2 ).CurMinute = 0.0;
@@ -351,6 +570,7 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps )
 	DayOfSim  = 1;
 	Envrn = 3;
 	Environment( Envrn ).DesignDayNum = 1;
+	testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment();
 	for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
 		TimeValue( 1 ).CurMinute = 0.0;
 		TimeValue( 2 ).CurMinute = 0.0;
@@ -378,7 +598,7 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps )
 	DayOfSim  = 1;
 	Envrn = 4;
 	Environment( Envrn ).DesignDayNum = 2;
-
+	testSizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment();
 	for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
 		TimeValue( 1 ).CurMinute = 0.0;
 		TimeValue( 2 ).CurMinute = 0.0;

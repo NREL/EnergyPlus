@@ -1,6 +1,7 @@
 // C++ Headers
 #include <string>
 #include <vector>
+#include <map>
 
 // EnergyPlus Headers
 #include <SizingAnalysisObjects.hh>
@@ -18,7 +19,6 @@ namespace EnergyPlus {
 	{
 		kindOfSim			= 0;
 		envrnNum			= 0;
-		designDayNum		= 0;
 		dayOfSim			= 0;
 		hourOfDay			= 0;
 		ztStepsIntoPeriod	= 0;
@@ -31,23 +31,20 @@ namespace EnergyPlus {
 	ZoneTimestepObject::ZoneTimestepObject(
 		int kindSim,
 		int environmentNum,
-		int desDayNum,
 		int daySim,
 		int hourDay,
 		int stepEndMin,
 		Real64 timeStepDurat,
 		int numOfTimeStepsPerHour )
+		:	kindOfSim( kindSim ),
+			envrnNum( environmentNum ),
+			dayOfSim( daySim ),
+			hourOfDay( hourDay ),
+			stepEndMinute( stepEndMin ),
+			timeStepDuration( timeStepDurat )
 	{
 		Real64 const minutesPerHour( 60.0 );
 		int const hoursPerDay( 24 );
-
-		kindOfSim		= kindSim;
-		envrnNum		= environmentNum;
-		designDayNum	= desDayNum;
-		dayOfSim		= daySim;
-		hourOfDay		= hourDay;
-		stepEndMinute	= stepEndMin;
-		timeStepDuration	= timeStepDurat;
 
 		stepStartMinute = stepEndMinute - timeStepDuration * minutesPerHour;
 		if ( stepStartMinute < 0.0 ){
@@ -62,7 +59,6 @@ namespace EnergyPlus {
 
 		if ( ztStepsIntoPeriod < 0 ) ztStepsIntoPeriod = 0;
 
-
 		//We only expect this feature to be used with systems, so there will always be a system timestep update, at least one.  
 		hasSystemSubSteps =  true;
 		numSubSteps = 1;
@@ -73,35 +69,23 @@ namespace EnergyPlus {
 	int SizingLog::GetZtStepIndex (
 		const ZoneTimestepObject tmpztStepStamp )
 	{
-		using DataGlobals::ksHVACSizeDesignDay;
+
 		int vecIndex;
-		int logEnvrnIndex( 0 );
-		int logCounter( 0 );
-		//find which sizing envrn index
 
-		if (tmpztStepStamp.kindOfSim == ksHVACSizeDesignDay) {
-			for (int i = 0; i < NumOfDesignDaysInLogSet; i++ ) {
-				if ( tmpztStepStamp.envrnNum == EnvrnIndexMapByEnvrn[ logCounter ] ) {
-					logEnvrnIndex = logCounter;
-					break;
-				}
-			logCounter++;
-			}
-		}
-
-		if ( tmpztStepStamp.ztStepsIntoPeriod > 0 ) {
-			vecIndex = EnvrnStartZtStepIndex[ logEnvrnIndex ] + tmpztStepStamp.ztStepsIntoPeriod;
+		if ( tmpztStepStamp.ztStepsIntoPeriod > 0 ) { // discard any negative value for safety
+			vecIndex = envrnStartZtStepIndexMap[ newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ] ] + tmpztStepStamp.ztStepsIntoPeriod;
 		} else {
-			vecIndex = EnvrnStartZtStepIndex[ logEnvrnIndex ];
+			vecIndex = envrnStartZtStepIndexMap[  newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ]  ];
 		}
 
-		// next constrain index to lie inside correct envronment
-		if ( vecIndex < EnvrnStartZtStepIndex[ logEnvrnIndex ] ) { 
-			vecIndex = EnvrnStartZtStepIndex[ logEnvrnIndex ]; // first step in environment
+		// next for safety sake, constrain index to lie inside correct envronment
+		if ( vecIndex < envrnStartZtStepIndexMap[  newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ]  ] ) { 
+			vecIndex = envrnStartZtStepIndexMap[  newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ]  ] ; // first step in environment
 		}
-
-		if (vecIndex > (EnvrnStartZtStepIndex[ logEnvrnIndex ] + ztStepCountByEnvrn[ logEnvrnIndex ]) ) {
-			vecIndex = EnvrnStartZtStepIndex[ logEnvrnIndex ] + ztStepCountByEnvrn[ logEnvrnIndex ]; // last step in environment
+		if (vecIndex > ( envrnStartZtStepIndexMap[  newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ]  ]  
+				+ ztStepCountByEnvrnMap[  newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ]  ]) ) {
+			vecIndex = envrnStartZtStepIndexMap[  newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ]  ]  
+				+ ztStepCountByEnvrnMap[  newEnvrnToSeedEnvrnMap[ tmpztStepStamp.envrnNum ]  ]; // last step in environment
 		}
 		return vecIndex;
 	}
@@ -113,7 +97,6 @@ namespace EnergyPlus {
 
 		ztStepObj[ index ].kindOfSim		= tmpztStepStamp.kindOfSim;
 		ztStepObj[ index ].envrnNum			= tmpztStepStamp.envrnNum;
-		ztStepObj[ index ].designDayNum		= tmpztStepStamp.designDayNum;
 		ztStepObj[ index ].dayOfSim			= tmpztStepStamp.dayOfSim;
 		ztStepObj[ index ].hourOfDay		= tmpztStepStamp.hourOfDay;
 		ztStepObj[ index ].ztStepsIntoPeriod = tmpztStepStamp.ztStepsIntoPeriod;
@@ -137,18 +120,20 @@ namespace EnergyPlus {
 		lastZnStepIndex =  GetZtStepIndex( tmpztStepStamp );
 		znStepIndex = lastZnStepIndex + 1;
 
-		for ( auto & E : EnvrnStartZtStepIndex) {
+		std::map< int, int >:: iterator end = envrnStartZtStepIndexMap.end();
+		for (std::map< int, int >:: iterator itr = envrnStartZtStepIndexMap.begin(); itr != end; ++itr){
+
 			//check if at the beginning of an environment
-			if ( E == lastZnStepIndex ) { // don't advance yet
+			if ( itr->second == lastZnStepIndex ) { // don't advance yet
 				znStepIndex = lastZnStepIndex;
 			}
 			//check if at the end of an environment
-			if (E == znStepIndex ) { // don't kick over into the next environment
+			if ( itr->second == znStepIndex ) { // don't kick over into the next environment
 				znStepIndex = lastZnStepIndex;
 			}
 		}
 
-		//safety checks, or assert?
+		//last safety checks for range
 		if ( znStepIndex >= NumOfStepsInLogSet ) znStepIndex = NumOfStepsInLogSet - 1;
 		if ( znStepIndex < 0 ) znStepIndex = 0;
 
@@ -190,8 +175,9 @@ namespace EnergyPlus {
 			// figure out which index this substep needs to go into
 			// the zone step level data are not yet available for minute, but we can get the previous zone step data...
 		lastZnStepIndex = (ztIndex - 1);
-		for ( auto & E : EnvrnStartZtStepIndex) {
-			if (E == ztIndex ) { // don't drop back into the previous environment
+		std::map< int, int >:: iterator end = envrnStartZtStepIndexMap.end();
+		for (std::map< int, int >:: iterator itr = envrnStartZtStepIndexMap.begin(); itr != end; ++itr){
+			if ( itr->second == ztIndex ) { // don't drop back into the previous environment
 					lastZnStepIndex = ztIndex ;
 			}
 		}
@@ -229,20 +215,23 @@ namespace EnergyPlus {
 		Real64 divisor = 0.0;
 		divisor = double( timeStepsInAverage );
 
-		for (int k = 0; k < NumOfEnvironmentsInLogSet; k++) { // outer loop over environments in log set
+		std::map< int, int >:: iterator end = ztStepCountByEnvrnMap.end();
+		for (std::map< int, int >:: iterator itr = ztStepCountByEnvrnMap.begin(); itr != end; ++itr){
+//		for (int k = 0; k < NumOfEnvironmentsInLogSet; k++) { // outer loop over environments in log set
 
-			for (int i = 0; i < ztStepCountByEnvrn[ k ]; i++ ){ // next inner loop over zone timestep steps 
+//			for (int i = 0; i < ztStepCountByEnvrn[ k ]; i++ ){ // next inner loop over zone timestep steps 
+			for (int i = 0; i < itr->second ; i++ ){ // next inner loop over zone timestep steps 
 
 				if ( timeStepsInAverage > 0 ) {
 					RunningSum = 0.0;
 					for ( int j = 0; j < timeStepsInAverage ; j++ ) { //
 						if ( (i - j) < 0) {
-							RunningSum += ztStepObj[ EnvrnStartZtStepIndex[ k ] ].logDataValue; //just use first value to fill early steps
+							RunningSum += ztStepObj[ envrnStartZtStepIndexMap[ itr->first ] ].logDataValue; //just use first value to fill early steps
 						} else {
-							RunningSum += ztStepObj[ ((i - j) + EnvrnStartZtStepIndex[ k ]) ].logDataValue;
+							RunningSum += ztStepObj[ ( (i - j) + envrnStartZtStepIndexMap[ itr->first ] ) ].logDataValue;
 						}
 					}
-					ztStepObj[ (i + EnvrnStartZtStepIndex[ k ]) ].runningAvgDataValue = RunningSum / divisor;
+					ztStepObj[ (i + envrnStartZtStepIndexMap[ itr->first ] ) ].runningAvgDataValue = RunningSum / divisor;
 				}
 			}
 		}
@@ -280,17 +269,33 @@ namespace EnergyPlus {
 	void SizingLog::AdjustEnvrnIndexMapForIteration(
 		int const HVACSizingIterCount
 	){
-		for ( int i = 0; i < NumOfEnvironmentsInLogSet; i++ ) {
-			EnvrnIndexMapByEnvrn[ i ] = EnvrnIndexMapByEnvrn[ i ] + NumOfEnvironmentsInLogSet;
-		}
+//		std::map< int, int >:: iterator end = envrnStartZtStepIndexMap.end();
+//		for (std::map< int, int >:: iterator itr = envrnStartZtStepIndexMap.begin(); itr != end; ++itr){
+		
+//		Environment( itr->first )
+//		newEnvrnToSeedEnvrnMap
+
+//		}
+//		for ( int i = 0; i < NumOfEnvironmentsInLogSet; i++ ) {
+//			EnvrnIndexMapByEnvrn[ i ] = EnvrnIndexMapByEnvrn[ i ] + NumOfEnvironmentsInLogSet;
+//		}
 	}
 
-	void SizingLog::ReInitLogForIteration(){
+	void SizingLog::ReInitLogForIteration()
+	{
 		ZoneTimestepObject tmpNullztStepObj;
 
 		for ( auto &Zt : ztStepObj ){
 			Zt = tmpNullztStepObj;
 		}
+	}
+
+	void SizingLog::SetupNewEnvironment(
+		int const seedEnvrnNum,
+		int const newEnvrnNum
+	)
+	{
+		newEnvrnToSeedEnvrnMap[ newEnvrnNum ] = seedEnvrnNum;
 	}
 
 	int SizingLoggerFramework::SetupVariableSizingLog(
@@ -303,51 +308,52 @@ namespace EnergyPlus {
 		using DataGlobals::ksRunPeriodDesign;
 		using namespace WeatherManager;
 		int VectorLength( 0 );
-		int mapIndexCounter( 0 );
 		int const HoursPerDay( 24 );
+		int LogSetIndex;
 
 		SizingLog tmpLog;
 		tmpLog.NumOfEnvironmentsInLogSet = 0;
 		tmpLog.NumOfDesignDaysInLogSet   = 0;
 		tmpLog.NumberOfSizingPeriodsInLogSet = 0;
-		// search environments for sizing , this is coded to occur before the additions to Environment structure that will occur to run them
+
+		// search environment structure for sizing periods
+		// this is coded to occur before the additions to Environment structure that will occur to run them as HVAC Sizing sims
 		for (int i = 1; i <= NumOfEnvrn; i++ ){
 			if ( Environment( i ).KindOfEnvrn == ksDesignDay ) {
 				tmpLog.NumOfEnvironmentsInLogSet++;
 				tmpLog.NumOfDesignDaysInLogSet++;
-
 			}
-			if (Environment( i ).KindOfEnvrn == ksRunPeriodDesign ) {
+			if ( Environment( i ).KindOfEnvrn == ksRunPeriodDesign ) {
 				tmpLog.NumOfEnvironmentsInLogSet++;
 				tmpLog.NumberOfSizingPeriodsInLogSet++;
 			}
 		}
-		if (tmpLog.NumOfDesignDaysInLogSet > 0 && tmpLog.NumberOfSizingPeriodsInLogSet == 0 ) {
-		// all design days, no sizing periods. first do the usual case TODO handle sizing periods
 
+		// next fill in the count of steps into map
+		for (int i = 1; i <= NumOfEnvrn; i++ ){
 
-			tmpLog.ztStepCountByEnvrn.resize(    tmpLog.NumOfEnvironmentsInLogSet );
-			tmpLog.EnvrnStartZtStepIndex.resize( tmpLog.NumOfEnvironmentsInLogSet );
-			tmpLog.EnvrnIndexMapByEnvrn.resize(  tmpLog.NumOfEnvironmentsInLogSet );
-		//
-			for (int i = 0; i < tmpLog.NumOfEnvironmentsInLogSet; i++) {
-
-				tmpLog.ztStepCountByEnvrn[ i ] = HoursPerDay * NumOfTimeStepInHour;
-				tmpLog.EnvrnStartZtStepIndex[ i ] = i * HoursPerDay * NumOfTimeStepInHour ;
+			if ( Environment( i ).KindOfEnvrn == ksDesignDay ) {
+				tmpLog.ztStepCountByEnvrnMap[ i ] = HoursPerDay * NumOfTimeStepInHour;
 			}
-			mapIndexCounter = 0;
-			for (int i = 1; i <= NumOfEnvrn; i++ ){
-				if ( Environment( i ).KindOfEnvrn == ksDesignDay ) {
-					tmpLog.EnvrnIndexMapByEnvrn[ mapIndexCounter ] = NumOfEnvrn + mapIndexCounter + 1; //known offset for first iteration, what about subsequent iterations?
-					mapIndexCounter++;
-
-				}
+			if ( Environment( i ).KindOfEnvrn == ksRunPeriodDesign ) {
+				tmpLog.ztStepCountByEnvrnMap[ i ] = HoursPerDay * NumOfTimeStepInHour * Environment( i ).TotalDays;
 			}
 		}
 
+		int stepSum = 0;
+		std::map< int, int >:: iterator end = tmpLog.ztStepCountByEnvrnMap.end();
+		for (std::map< int, int >:: iterator itr = tmpLog.ztStepCountByEnvrnMap.begin(); itr != end; ++itr){
+			
+			tmpLog.envrnStartZtStepIndexMap [ itr->first ] = stepSum ;
+			stepSum += itr->second;
+		}
+
+
 		tmpLog.p_rVariable = & rVariable; 
 		tmpLog.timeStepsInAverage = stepsInAverage;
-		VectorLength = tmpLog.NumOfEnvironmentsInLogSet * HoursPerDay * NumOfTimeStepInHour;
+
+		VectorLength = stepSum;
+
 		tmpLog.NumOfStepsInLogSet = VectorLength;
 		tmpLog.ztStepObj.resize( VectorLength );
 
@@ -355,6 +361,16 @@ namespace EnergyPlus {
 		NumOfLogs++;
 		return NumOfLogs - 1;
 		
+	}
+
+	void SizingLoggerFramework::SetupSizingLogsNewEnvironment () 
+	{
+		using namespace WeatherManager;
+
+		for ( auto &L : logObjs ) {
+			L.SetupNewEnvironment (Environment( Envrn ).SeedEnvrnNum, Envrn) ;
+		}
+	
 	}
 
 	ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp() 
@@ -373,7 +389,6 @@ namespace EnergyPlus {
 		ZoneTimestepObject tmpztStepStamp( // call constructor
 			KindOfSim,
 			Envrn,
-			Environment( Envrn ).DesignDayNum,
 			DayOfSim,
 			HourOfDay,
 			TimeValue( ZoneIndex ).CurMinute,
@@ -421,7 +436,7 @@ namespace EnergyPlus {
 		int const HVACSizingIterCount )
 	{
 		for ( auto &L : this -> logObjs ) {
-			L.AdjustEnvrnIndexMapForIteration( HVACSizingIterCount );
+		//	L.AdjustEnvrnIndexMapForIteration( HVACSizingIterCount );
 			L.ReInitLogForIteration();
 		}
 	}
@@ -540,6 +555,9 @@ namespace EnergyPlus {
 
 
 		}
+		// should add a seperate eio summary report about what happened, did demand trap get used, what were the key values.
+
+
 				//report to sizing summary table called Plant Loop Coincident Design Fluid Flow Rates
 //		PreDefTableEntry( pdchPlantSizPass, PlantLoop( PlantLoopIndex ).Name, HVACSizingIterCount );
 		chIteration = TrimSigDigits(HVACSizingIterCount);
