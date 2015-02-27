@@ -87,6 +87,10 @@ if (MSVC)
   set(gtest_force_shared_crt ON)
 endif()
 
+if (MINGW)
+  set(CMAKE_SHARED_LIBRARY_PREFIX "")
+endif ()
+
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
