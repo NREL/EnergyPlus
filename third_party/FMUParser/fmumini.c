@@ -69,8 +69,10 @@
 #define MAXFILENAME (256)
 
 #ifdef _WIN32
+#ifndef __MINGW32__
 #define USEWIN32IOAPI
 #include <zlib/contrib/minizip/iowin32.h>
+#endif
 #endif
 /*
   mini unzip, demo of unzip package
