@@ -574,7 +574,12 @@ install( TARGETS energyplusapi
   LIBRARY DESTINATION ./ 
 )
 
-if (CMAKE_COMPILER_IS_GNUCXX AND ENABLE_LTO)
+if (MINGW)
+  target_link_libraries( energypluslib2 energypluslib )
+  target_link_libraries( energypluslib energypluslib2 )
+  add_executable( energyplus main.cc  )
+  target_link_libraries( energyplus energyplusapi )
+elseif (CMAKE_COMPILER_IS_GNUCXX AND ENABLE_LTO)
   target_link_libraries( energypluslib2 energypluslib )
   target_link_libraries( energypluslib energypluslib2 )
   add_executable( energyplus main.cc  "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
