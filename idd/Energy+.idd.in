@@ -23573,8 +23573,8 @@ AirflowNetwork:Distribution:Linkage,
       \note conduction loss is ignored.
 
 AirflowNetwork:OccupantVentilationControl,
-      \memo This object is used to provide advanced thermal comfort control of window opening  
-      \memo for both exterior and interior.
+      \memo This object is used to provide advanced thermal comfort control of window opening and closing 
+      \memo for both exterior and interior windows.
   A1, \field Name
       \required-field
       \type object-list
@@ -23620,7 +23620,7 @@ AirflowNetwork:OccupantVentilationControl,
       \maximum 100
       \default 10.0
   A4, \field Occupancy Check
-      \note If Yes, occupancy check will be performed for opening probability check.
+      \note If Yes, occupancy check will be performed as part of the opening probability check.
       \type choice
       \key Yes
       \key No
@@ -23628,11 +23628,11 @@ AirflowNetwork:OccupantVentilationControl,
   A5, \field Opening Probability Schedule Name
       \type object-list
       \object-list ScheduleNames
-      \note If this field is blank, opening probability check is by-passed and opening is true.
+      \note If this field is blank, the opening probability check is bypassed and opening is true.
   A6; \field Closing Probability Schedule Name
       \type object-list
       \object-list ScheduleNames
-      \note If this field is blank, closing probability check is by-passed and closing is true.
+      \note If this field is blank, the closing probability check is bypassed and closing is true.
 
 \group Exterior Equipment
        ! This equipment is used merely for reporting.
