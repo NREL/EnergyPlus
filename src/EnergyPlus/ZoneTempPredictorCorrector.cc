@@ -24,6 +24,7 @@
 #include <DataZoneControls.hh>
 #include <DataZoneEnergyDemands.hh>
 #include <DataZoneEquipment.hh>
+#include <FaultsManager.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
@@ -86,6 +87,7 @@ namespace ZoneTempPredictorCorrector {
 	using DataAirflowNetwork::AirflowNetworkControlMultiADS;
 	using namespace DataRoomAirModel;
 	using namespace DataZoneControls;
+	using namespace FaultsManager;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -2291,10 +2293,6 @@ namespace ZoneTempPredictorCorrector {
 			} //Demand manager
 		}
 
-		//zrp_0
-
-		//zrp_1
-
 		for ( Loop = 1; Loop <= NumTempControlledZones; ++Loop ) {
 			if ( TempControlledZone( Loop ).EMSOverrideHeatingSetPointOn ) {
 				ZoneNum = TempControlledZone( Loop ).ActualZoneNum;
@@ -2725,6 +2723,7 @@ namespace ZoneTempPredictorCorrector {
 		using General::TrimSigDigits;
 		using DataZoneControls::OccRoomTSetPointHeat;
 		using DataZoneControls::OccRoomTSetPointCool;
+		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2878,10 +2877,42 @@ namespace ZoneTempPredictorCorrector {
 				ShowSevereError( "CalcZoneAirTempSetpoints: Illegal control type for Zone=" + Zone( ActualZoneNum ).Name + ", Found value=" + TrimSigDigits( TempControlType( ActualZoneNum ) ) + ", in Schedule=" + TempControlledZone( RelativeZoneNum ).ControlTypeSchedName );
 
 			}}
-
+			
+			//Apply offset for faulty therostats_Feb. 2015, zrp
+			if ( DoWeathSim && ( NumFaultyThermostat > 0 ) ) {
+			
+				//  loop through the FaultsThermostatOffset objects to find the one for the zone
+				for ( int iFault = 1; iFault <= NumFaultyThermostat; ++iFault ) {
+				
+					if ( SameString( TempControlledZone( RelativeZoneNum ).Name, FaultsThermostatOffset( iFault ).FaultyThermostatName ) ) {
+					
+						// Check fault availability schedules
+						if ( GetCurrentScheduleValue( FaultsThermostatOffset( iFault ).AvaiSchedPtr ) > 0.0 ) {
+							
+							// Check fault severity schedules to update the reference thermostat offset
+							double rSchVal = 1.0;
+							double offsetUpdated;							
+							if ( FaultsThermostatOffset( iFault ).SeveritySchedPtr >= 0 ) {
+								rSchVal = GetCurrentScheduleValue( FaultsThermostatOffset( iFault ).SeveritySchedPtr );
+							}						
+							offsetUpdated = rSchVal * FaultsThermostatOffset( iFault ).Offset;
+							
+							// Positive offset means the sensor reading is higher than the actual value
+							TempZoneThermostatSetPoint( ActualZoneNum ) = TempZoneThermostatSetPoint( ActualZoneNum ) - offsetUpdated; 
+							ZoneThermostatSetPointLo( ActualZoneNum ) = ZoneThermostatSetPointLo( ActualZoneNum ) - offsetUpdated;
+							ZoneThermostatSetPointHi( ActualZoneNum ) = ZoneThermostatSetPointHi( ActualZoneNum ) - offsetUpdated;
+						}
+						
+						// Stop searching the FaultsThermostatOffset object for the zone
+						break;
+					}
+				}
+			}
+		
 		}
 
 		if ( NumComfortControlledZones > 0 ) CalcZoneAirComfortSetPoints();
+		
 
 	}
 

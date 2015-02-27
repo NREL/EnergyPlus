@@ -16,6 +16,7 @@ namespace FaultsManager {
 	//       AUTHOR         Tianzhen Hong, LBNL
 	//       DATE WRITTEN   August 2013
 	//       MODIFIED       Sep. 2013 Xiufeng Pang (XP) added fouling coil fault
+	//       MODIFIED       Feb. 2015 Rongpeng Zhang, added thermostat offset fault
 	//       RE-ENGINEERED
 
 	// PURPOSE OF THIS MODULE:

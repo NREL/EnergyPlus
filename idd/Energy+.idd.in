@@ -74279,11 +74279,9 @@ FaultModel:ThermostatOffset,
        \required-field
        \type alpha
    A2, \field Availability Schedule Name
-       \required-field
        \type object-list
        \object-list ScheduleNames
    A3, \field Severity Schedule Name
-       \required-field
        \type object-list
        \object-list ScheduleNames
    N1, \field Reference Thermostat Offset
