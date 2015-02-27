@@ -75,8 +75,8 @@ namespace GroundHeatExchangers {
 		Real64 lastQnSubHr;
 		Real64 HXResistance; // The thermal resistance of the GHX, (K per W/m)
 		Real64 totalTubeLength; // The total length of pipe. NumBoreholes * BoreholeDepth OR Pi * Dcoil * NumCoils
-		Real64 timeSS;
-		Real64 timeSSFactor;
+		Real64 timeSS; // Steady state time
+		Real64 timeSSFactor; // Steady state time factor for calculation
 
 		// Default Constructor
 		GLHEBase() :
