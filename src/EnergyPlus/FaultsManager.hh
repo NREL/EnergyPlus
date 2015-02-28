@@ -39,21 +39,24 @@ namespace FaultsManager {
 	extern int const iFault_EnthalpySensorOffset_ReturnAir;
 	extern int const iFault_Fouling_Coil;
 	extern int const iFault_ThermostatOffset;
+	extern int const iFault_HumidistatOffset;
 	// Types of faults under Group Operational Faults in IDD
 	//  1. Temperature sensor offset
 	//  2. Humidity sensor offset
 	//  3. Enthalpy sensor offset
 	//  4. Fouling coils
 	//  5. Thermostat offset
+	//  6. Humidistat offset
 	// coming ...
-	//  6. Fouling: chillers, boilers, cooling towers
-	//  7. Damper leakage: return air, outdoor air
-	//  8. Blockage: pipe
-	//  9. Dirty: air filter
-	//  10. Meter: air flow, water flow
-	//  11. CO2 sensor
-	//  12. Pressure sensor offset
-	//  13. more
+	//  7. Fouling: chillers, boilers, cooling towers
+	//  8. Damper leakage: return air, outdoor air
+	//  9. Blockage: pipe
+	//  10. Dirty: air filter
+	//  11. Meter: air flow, water flow
+	//  12. CO2 sensor
+	//  13. Pressure sensor offset
+	//  14. more
+	
 	extern FArray1D_string const cFaults;
 	//      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
 	//      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
@@ -72,6 +75,7 @@ namespace FaultsManager {
 	extern int NumFaults; // Number of faults (include multiple faults of same type) in the model
 	extern int NumFouledCoil; // Total number of fouled coils
 	extern int NumFaultyThermostat; // Total number of faulty thermostat with offset
+	extern int NumFaultyHumidistat; // Total number of faulty humidistat with offset
 
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -104,6 +108,7 @@ namespace FaultsManager {
 		Real64 Aratio; // Inside to outside surface area ratio
 
 		std::string FaultyThermostatName; // The faulty thermostat name
+		std::string FaultyHumidistatName; // The faulty humidistat name
 		
 		// Default Constructor
 		FaultProperties() :
@@ -140,6 +145,7 @@ namespace FaultsManager {
 			int const FaultTypeEnum,
 			std::string const & FouledCoilName, // The fouled coil name
 			std::string const & FaultyThermostatName, // The faulty thermostat name
+			std::string const & FaultyHumidistatName, // The faulty humidistat name
 			int const FouledCoilID, // Point to a fouling coil
 			int const FoulingInputMethod, // Coil fouling input method
 			Real64 const UAFouled, // Fouling coil UA under rating conditions
@@ -169,7 +175,8 @@ namespace FaultsManager {
 			Rfa( Rfa ),
 			Aout( Aout ),
 			Aratio( Aratio ),
-			FaultyThermostatName( FaultyThermostatName )
+			FaultyThermostatName( FaultyThermostatName ),
+			FaultyHumidistatName( FaultyHumidistatName )
 		{}
 
 	};
@@ -178,6 +185,7 @@ namespace FaultsManager {
 	extern FArray1D< FaultProperties > Faults;
 	extern FArray1D< FaultProperties > FouledCoils;
 	extern FArray1D< FaultProperties > FaultsThermostatOffset;
+	extern FArray1D< FaultProperties > FaultsHumidistatOffset;
 
 	// Functions
 

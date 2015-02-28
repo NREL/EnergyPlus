@@ -16,7 +16,7 @@ namespace FaultsManager {
 	//       AUTHOR         Tianzhen Hong, LBNL
 	//       DATE WRITTEN   August 2013
 	//       MODIFIED       Sep. 2013 Xiufeng Pang (XP) added fouling coil fault
-	//       MODIFIED       Feb. 2015 Rongpeng Zhang, added thermostat offset fault
+	//       MODIFIED       Feb. 2015 Rongpeng Zhang, added thermostat/humidistat offset faults 
 	//       RE-ENGINEERED
 
 	// PURPOSE OF THIS MODULE:
@@ -47,7 +47,7 @@ namespace FaultsManager {
 	int const iFouledCoil_FoulingFactor( 9002 );
 
 	// MODULE VARIABLE DECLARATIONS:
-	int const NumFaultTypes( 7 );
+	int const NumFaultTypes( 8 );
 
 	// FaultTypeEnum
 	int const iFault_TemperatureSensorOffset_OutdoorAir( 101 );
@@ -57,22 +57,25 @@ namespace FaultsManager {
 	int const iFault_EnthalpySensorOffset_ReturnAir( 105 );
 	int const iFault_Fouling_Coil( 106 );
 	int const iFault_ThermostatOffset( 107 );
+	int const iFault_HumidistatOffset( 108 );
 	// Types of faults under Group Operational Faults in IDD
 	//  1. Temperature sensor offset
 	//  2. Humidity sensor offset
 	//  3. Enthalpy sensor offset
 	//  4. Fouling coils
 	//  5. Thermostat offset
+	//  6. Humidistat offset
 	// coming ...
-	//  6. Fouling: chillers, boilers, cooling towers
-	//  7. Damper leakage: return air, outdoor air
-	//  8. Blockage: pipe
-	//  9. Dirty: air filter
-	//  10. Meter: air flow, water flow
-	//  11. CO2 sensor
-	//  12. Pressure sensor offset
-	//  13. more
-	FArray1D_string const cFaults( NumFaultTypes, { "FaultModel:TemperatureSensorOffset:OutdoorAir", "FaultModel:HumiditySensorOffset:OutdoorAir", "FaultModel:EnthalpySensorOffset:OutdoorAir", "FaultModel:TemperatureSensorOffset:ReturnAir", "FaultModel:EnthalpySensorOffset:ReturnAir", "FaultModel:Fouling:Coil", "FaultModel:ThermostatOffset" } );
+	//  7. Fouling: chillers, boilers, cooling towers
+	//  8. Damper leakage: return air, outdoor air
+	//  9. Blockage: pipe
+	//  10. Dirty: air filter
+	//  11. Meter: air flow, water flow
+	//  12. CO2 sensor
+	//  13. Pressure sensor offset
+	//  14. more
+	
+	FArray1D_string const cFaults( NumFaultTypes, { "FaultModel:TemperatureSensorOffset:OutdoorAir", "FaultModel:HumiditySensorOffset:OutdoorAir", "FaultModel:EnthalpySensorOffset:OutdoorAir", "FaultModel:TemperatureSensorOffset:ReturnAir", "FaultModel:EnthalpySensorOffset:ReturnAir", "FaultModel:Fouling:Coil", "FaultModel:ThermostatOffset", "FaultModel:HumidistatOffset" } );
 	//      'FaultModel:PressureSensorOffset:OutdoorAir   ', &
 	//      'FaultModel:TemperatureSensorOffset:SupplyAir ', &
 	//      'FaultModel:TemperatureSensorOffset:ZoneAir   ', &
@@ -84,12 +87,13 @@ namespace FaultsManager {
 	//      'FaultModel:DamperLeakage:ReturnAir           ', &
 	//      'FaultModel:DamperLeakage:OutdoorAir          ' /)
 
-	FArray1D_int const iFaultTypeEnums( NumFaultTypes, { iFault_TemperatureSensorOffset_OutdoorAir, iFault_HumiditySensorOffset_OutdoorAir, iFault_EnthalpySensorOffset_OutdoorAir, iFault_TemperatureSensorOffset_ReturnAir, iFault_EnthalpySensorOffset_ReturnAir, iFault_Fouling_Coil, iFault_ThermostatOffset } );
+	FArray1D_int const iFaultTypeEnums( NumFaultTypes, { iFault_TemperatureSensorOffset_OutdoorAir, iFault_HumiditySensorOffset_OutdoorAir, iFault_EnthalpySensorOffset_OutdoorAir, iFault_TemperatureSensorOffset_ReturnAir, iFault_EnthalpySensorOffset_ReturnAir, iFault_Fouling_Coil, iFault_ThermostatOffset, iFault_HumidistatOffset } );
 
 	bool AnyFaultsInModel( false ); // True if there are operationla faults in the model
 	int NumFaults( 0 ); // Number of faults (include multiple faults of same type) in the model
 	int NumFouledCoil( 0 ); // Total number of fouled coils
 	int NumFaultyThermostat( 0 ); // Total number of faulty thermostat with offset
+	int NumFaultyHumidistat( 0 ); // Total number of faulty humidistat with offset
 
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -97,6 +101,7 @@ namespace FaultsManager {
 	FArray1D< FaultProperties > Faults;
 	FArray1D< FaultProperties > FouledCoils;
 	FArray1D< FaultProperties > FaultsThermostatOffset;
+	FArray1D< FaultProperties > FaultsHumidistatOffset;
 
 	// Functions
 
@@ -156,6 +161,7 @@ namespace FaultsManager {
 		int j; 	//Number of fault objects of type 101-105
 		int jFoulingCoil; //Number of fault objects of type 106: fouling coil
 		int jFaultyThermostat; //Number of fault objects of type 107: faulty thermostat
+		int jFaultyHumidistat; //Number of fault objects of type 108: faulty humidistat
 		int jj;
 		int iFaults;
 		int iTotalFaults;
@@ -173,7 +179,10 @@ namespace FaultsManager {
 
 		// Coil fouling is the 6th fault
 		NumFouledCoil = GetNumObjectsFound( cFaults( 6 ) );
+		// Faulty thermostat is the 7th fault
 		NumFaultyThermostat = GetNumObjectsFound( cFaults( 7 ) );
+		// Faulty humidistat is the 8th fault
+		NumFaultyHumidistat = GetNumObjectsFound( cFaults( 8 ) );
 
 		if ( NumFaults > 0 ) {
 			AnyFaultsInModel = true;
@@ -190,10 +199,12 @@ namespace FaultsManager {
 		Faults.allocate( NumFaults );
 		FouledCoils.allocate( NumFouledCoil );
 		FaultsThermostatOffset.allocate( NumFaultyThermostat );
+		FaultsHumidistatOffset.allocate( NumFaultyHumidistat );
 		
 		j = 0;
 		jFoulingCoil = 0;
 		jFaultyThermostat = 0;
+		jFaultyHumidistat = 0;
 		
 		for ( i = 1; i <= NumFaultTypes; ++i ) {
 			cFault1 = cFaults( i ); // fault object string
@@ -202,7 +213,41 @@ namespace FaultsManager {
 			for ( jj = 1; jj <= iFaults; ++jj ) {
 				GetObjectItem( cFault1, jj, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-				if ( SameString( cFault1, "FaultModel:ThermostatOffset" ) ) { // For Fault_type 107: ThermostatOffset
+				if ( SameString( cFault1, "FaultModel:HumidistatOffset" ) ) { // For Fault_type 108: HumidistatOffset
+					++jFaultyHumidistat;
+
+					FaultsHumidistatOffset( jFaultyHumidistat ).FaultType = cFault1;
+					FaultsHumidistatOffset( jFaultyHumidistat ).FaultTypeEnum = iFaultTypeEnums( i );
+					FaultsHumidistatOffset( jFaultyHumidistat ).Name = cAlphaArgs( 1 );
+					FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatName = cAlphaArgs( 4 );
+
+					// Availability schedule
+					FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedule = cAlphaArgs( 2 );
+					if ( lAlphaFieldBlanks( 2 ) ) {
+						FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedPtr = -1; // returns schedule value of 1
+					} else {
+						FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
+						if ( FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedPtr == 0 ) {
+							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
+							ErrorsFound = true;
+						}
+					}
+
+					// Severity schedule
+					FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedule = cAlphaArgs( 3 );
+					if ( lAlphaFieldBlanks( 3 ) ) {
+						FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedPtr = -1; // returns schedule value of 1
+					} else {
+						FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
+						if ( FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedPtr == 0 ) {
+							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
+							ErrorsFound = true;
+						}
+					}
+
+					FaultsHumidistatOffset( jFaultyHumidistat ).Offset = rNumericArgs( 1 );
+
+				} else if ( SameString( cFault1, "FaultModel:ThermostatOffset" ) ) { // For Fault_type 107: ThermostatOffset
 					++jFaultyThermostat;
 
 					FaultsThermostatOffset( jFaultyThermostat ).FaultType = cFault1;
