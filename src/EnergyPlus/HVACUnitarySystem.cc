@@ -10612,6 +10612,8 @@ namespace HVACUnitarySystem {
 				if ( HeatSpeedNum == 0 ) {
 					CompOnMassFlow = UnitarySystem( UnitarySysNum ).IdleMassFlowRate;
 					CompOnFlowRatio = UnitarySystem( UnitarySysNum ).IdleSpeedRatio;
+					MSHPMassFlowRateLow = CompOnMassFlow;
+					MSHPMassFlowRateHigh = CompOnMassFlow;
 				} else if ( HeatSpeedNum == 1 ) {
 					CompOnMassFlow = UnitarySystem( UnitarySysNum ).HeatMassFlowRate( 1 );
 					CompOnFlowRatio = UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( 1 );
@@ -10664,9 +10666,13 @@ namespace HVACUnitarySystem {
 						if ( CoolSpeedNum < 1 ) {
 							CompOnMassFlow = UnitarySystem( UnitarySysNum ).IdleMassFlowRate;
 							CompOnFlowRatio = UnitarySystem( UnitarySysNum ).IdleSpeedRatio;
+							MSHPMassFlowRateLow = CompOnMassFlow;
+							MSHPMassFlowRateHigh = CompOnMassFlow;
 						} else if ( CoolSpeedNum == 1 ) {
 							CompOnMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 1 );
 							CompOnFlowRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 1 );
+							MSHPMassFlowRateLow = CompOnMassFlow;
+							MSHPMassFlowRateHigh = CompOnMassFlow;
 						} else {
 							//          SpeedRatio           = UnitarySystem(UnitarySysNum)%MSCoolingSpeedRatio(CoolSpeedNum)
 							SpeedRatio = UnitarySystem( UnitarySysNum ).CoolingSpeedRatio;
@@ -10711,6 +10717,8 @@ namespace HVACUnitarySystem {
 				if ( CoolSpeedNum == 0 ) {
 					CompOnMassFlow = UnitarySystem( UnitarySysNum ).IdleMassFlowRate;
 					CompOnFlowRatio = UnitarySystem( UnitarySysNum ).IdleSpeedRatio;
+					MSHPMassFlowRateLow = CompOnMassFlow;
+					MSHPMassFlowRateHigh = CompOnMassFlow;
 				} else if ( CoolSpeedNum == 1 ) {
 					CompOnMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 1 );
 					CompOnFlowRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 1 );
@@ -10768,9 +10776,13 @@ namespace HVACUnitarySystem {
 					if ( CoolSpeedNum < 1 ) {
 						CompOnMassFlow = UnitarySystem( UnitarySysNum ).IdleMassFlowRate;
 						CompOnFlowRatio = UnitarySystem( UnitarySysNum ).IdleSpeedRatio;
+						MSHPMassFlowRateLow = CompOnMassFlow;
+						MSHPMassFlowRateHigh = CompOnMassFlow;
 					} else if ( CoolSpeedNum == 1 ) {
 						CompOnMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 1 );
 						CompOnFlowRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 1 );
+						MSHPMassFlowRateLow = CompOnMassFlow;
+						MSHPMassFlowRateHigh = CompOnMassFlow;
 					} else {
 						//        SpeedRatio           = UnitarySystem(UnitarySysNum)%MSCoolingSpeedRatio(CoolSpeedNum)
 						SpeedRatio = UnitarySystem( UnitarySysNum ).CoolingSpeedRatio;
@@ -10816,6 +10828,8 @@ namespace HVACUnitarySystem {
 					if ( MultiOrVarSpeedHeatCoil( UnitarySysNum ) ) {
 						CompOnMassFlow = UnitarySystem( UnitarySysNum ).IdleMassFlowRate;
 						CompOnFlowRatio = UnitarySystem( UnitarySysNum ).IdleSpeedRatio;
+						MSHPMassFlowRateLow = CompOnMassFlow;
+						MSHPMassFlowRateHigh = CompOnMassFlow;
 					} else {
 						CompOnMassFlow = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirMassFlow;
 						CompOnFlowRatio = 1.0;
@@ -10824,6 +10838,8 @@ namespace HVACUnitarySystem {
 					if ( MultiOrVarSpeedCoolCoil( UnitarySysNum ) ) {
 						CompOnMassFlow = UnitarySystem( UnitarySysNum ).IdleMassFlowRate;
 						CompOnFlowRatio = UnitarySystem( UnitarySysNum ).IdleSpeedRatio;
+						MSHPMassFlowRateLow = CompOnMassFlow;
+						MSHPMassFlowRateHigh = CompOnMassFlow;
 					} else {
 						CompOnMassFlow = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirMassFlow;
 						CompOnFlowRatio = 1.0;
@@ -10836,14 +10852,20 @@ namespace HVACUnitarySystem {
 							if ( HeatSpeedNum == 0 ) {
 								CompOnMassFlow = UnitarySystem( UnitarySysNum ).IdleMassFlowRate;
 								CompOnFlowRatio = UnitarySystem( UnitarySysNum ).IdleSpeedRatio;
+								MSHPMassFlowRateLow = CompOnMassFlow;
+								MSHPMassFlowRateHigh = CompOnMassFlow;
 							} else if ( HeatSpeedNum == 1 ) {
 								CompOnMassFlow = UnitarySystem( UnitarySysNum ).HeatMassFlowRate( 1 );
 								CompOnFlowRatio = UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( 1 );
+								MSHPMassFlowRateLow = CompOnMassFlow;
+								MSHPMassFlowRateHigh = CompOnMassFlow;
 								//            CompOffMassFlow  = UnitarySystem(UnitarySysNum)%IdleMassFlowRate
 								//            CompOffFlowRatio = UnitarySystem(UnitarySysNum)%IdleMassFlowRate
 							} else if ( HeatSpeedNum > 1 ) {
 								CompOnMassFlow = UnitarySystem( UnitarySysNum ).HeatMassFlowRate( HeatSpeedNum );
 								CompOnFlowRatio = UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( HeatSpeedNum );
+								MSHPMassFlowRateHigh = UnitarySystem( UnitarySysNum ).HeatMassFlowRate( HeatSpeedNum );
+								MSHPMassFlowRateLow = UnitarySystem( UnitarySysNum ).HeatMassFlowRate( HeatSpeedNum - 1 );
 								//            CompOffMassFlow  = UnitarySystem(UnitarySysNum)%HeatMassFlowRate(HeatSpeedNum-1)
 								//            CompOffFlowRatio = UnitarySystem(UnitarySysNum)%MSHeatingSpeedRatio(HeatSpeedNum-1)
 							}
@@ -10857,14 +10879,20 @@ namespace HVACUnitarySystem {
 							if ( CoolSpeedNum == 0 ) {
 								CompOnMassFlow = UnitarySystem( UnitarySysNum ).IdleMassFlowRate;
 								CompOnFlowRatio = UnitarySystem( UnitarySysNum ).IdleSpeedRatio;
+								MSHPMassFlowRateLow = CompOnMassFlow;
+								MSHPMassFlowRateHigh = CompOnMassFlow;
 							} else if ( CoolSpeedNum == 1 ) {
 								CompOnMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 1 );
 								CompOnFlowRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 1 );
+								MSHPMassFlowRateLow = CompOnMassFlow;
+								MSHPMassFlowRateHigh = CompOnMassFlow;
 								//            CompOffMassFlow  = UnitarySystem(UnitarySysNum)%IdleMassFlowRate
 								//            CompOffFlowRatio = UnitarySystem(UnitarySysNum)%IdleMassFlowRate
 							} else if ( CoolSpeedNum > 1 ) {
 								CompOnMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum );
 								CompOnFlowRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( CoolSpeedNum );
+								MSHPMassFlowRateHigh = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum );
+								MSHPMassFlowRateLow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum - 1 );
 								//            CompOffMassFlow  = UnitarySystem(UnitarySysNum)%CoolMassFlowRate(CoolSpeedNum-1)
 								//            CompOffFlowRatio = UnitarySystem(UnitarySysNum)%MSCoolingSpeedRatio(CoolSpeedNum-1)
 							}
