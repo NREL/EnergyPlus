@@ -307,8 +307,6 @@ namespace GroundHeatExchangers {
 		Real64 doubleIntegralVal;
 		Real64 midFieldVal;
 
-		DisplayString( "Calculating G-Functions" );
-
 		X0.allocate( numCoils );
 		Y0.allocate( numTrenches );
 
