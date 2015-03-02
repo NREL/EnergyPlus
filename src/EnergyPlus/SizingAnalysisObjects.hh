@@ -16,13 +16,13 @@
 #include <DataPlant.hh>
 #include <OutputReportPredefined.hh>
 #include <General.hh>
+#include <ObjexxFCL/gio.hh>
 
 namespace EnergyPlus {
 
 
 class SystemTimestepObject {
 public: 
-
 	Real64 CurMinuteStart		= 0.0; //minutes at beginning of system timestep
 	Real64 CurMinuteEnd			= 0.0; //minutes at end of system timestep
 	Real64 TimeStepDuration		= 0.0; //in fractional hours, length of timestep
@@ -42,7 +42,6 @@ public:
 	Real64 stepStartMinute	= 0.0;  //minutes at beginning of zone timestep
 	Real64 stepEndMinute	= 0.0;  //minutes at end of zone timestep
 	Real64 timeStepDuration = 0.0;  //in fractional hours, length of timestep
-
 	Real64 logDataValue		= 0.0;
 	Real64 runningAvgDataValue = 0.0;
 	bool hasSystemSubSteps	= false;
@@ -67,22 +66,14 @@ public:
 	int NumOfEnvironmentsInLogSet;
 	int NumOfDesignDaysInLogSet;
 	int NumberOfSizingPeriodsInLogSet;
-	//these next three should be replaced by two hash maps 
 	std::map < int, int > ztStepCountByEnvrnMap; // key is the seed original Environment number, or index in the Enviroinment Structure
 	std::map < int, int > envrnStartZtStepIndexMap; // key is the seed original Environment number
 	std::map < int, int > newEnvrnToSeedEnvrnMap; // key is the new HVAC sim envrionment number, produces Seed envrionment number 
-
-//	std::vector <int> ztStepCountByEnvrn ; // array of how many zone timesteps are in each environment period, sized to number of environments in sizing set
-//	std::vector <int> EnvrnIndexMapByEnvrn ; //sized to number of environments in sizing set
-//	std::vector <int> EnvrnStartZtStepIndex ; //sized to number of environments in sizing set
-
 	int NumOfStepsInLogSet; // sum of all zone timestep steps in log
 	int timeStepsInAverage;
 	Real64 *p_rVariable;
 
 	std::vector< ZoneTimestepObject > ztStepObj; //will be sized to the sum of all steps, eg. timesteps in hour * 24 hours * 2 design days.  
-
-
 
 	void FillZoneStep(
 		ZoneTimestepObject tmpztStepStamp
@@ -156,12 +147,9 @@ public:
 	ZoneTimestepObject newFoundMassFlowRateTimeStamp;
 	Real64 peakMdotCoincidentReturnTemp;
 	Real64 peakMdotCoincidentDemand;
-
 	bool anotherIterationDesired = false ;
-
 	int supplyInletNodeFlow_LogIndex; // loop flow rate index for vector of log objects in the logger framework
 	int supplyInletNodeTemp_LogIndex; // loop return temperature index for vector of log objects in the logger framework
-
 	// variables related to loop demand
 	int loopDemand_LogIndex; // Loop demand load index for vector of log objects in the logger framework
 	bool peakDemandAndFlowMismatch;
@@ -176,7 +164,7 @@ public:
 		int loopIndex,
 		int nodeNum,
 		Real64 density,
-			Real64 cp,
+		Real64 cp,
 		int numStepsInAvg,
 		int sizingIndex
 	);
@@ -187,18 +175,15 @@ public:
 
 private:
 	std::string name = ""; // name of analysis object
-
-
 	Real64 newAdjustedMassFlowRate = 0.0; // with sizing factor included...
 	Real64 newFoundMassFlowRate = 0.0;
-
 	Real64 significantNormalizedChange = 0.005 ;
 	Real64 densityForSizing = 0.0;
 	Real64 specificHeatForSizing = 0.0;
 	Real64 plantSizingFraction = 0.0;
 	Real64 previousVolDesignFlowRate = 0.0;
 	Real64 newVolDesignFlowRate = 0.0;
-	
+
 };
 
 }

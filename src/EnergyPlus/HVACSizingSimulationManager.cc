@@ -220,12 +220,9 @@ namespace EnergyPlus {
 			using DataEnvironment::CurrentOverallSimDay;
 			using DataEnvironment::TotalOverallSimDays;
 			using General::TrimSigDigits;
-
 			using EMSManager::ManageEMS;
 			using PlantPipingSystemsManager::InitAndSimGroundDomains;
 			using ExteriorEnergyUse::ManageExteriorEnergyUse;
-
-
 			using DataSystemVariables::ReportDuringHVACSizingSimulation;
 			using DataErrorTracking::ExitDuringSimulations;
 			using DataReportingFlags::NumOfWarmupDays;
@@ -243,9 +240,7 @@ namespace EnergyPlus {
 
 			ResetEnvironmentCounter();
 
-			
-	// iterations over set of sizing periods for HVAC sizing Simulation
-		// currently just running up to max. 
+		// iterations over set of sizing periods for HVAC sizing Simulation, will break out if no more are needed
 		for (HVACSizingIterCount = 1; HVACSizingIterCount <= HVACSizingSimMaxIterations; HVACSizingIterCount++) {
 		
 
@@ -261,7 +256,7 @@ namespace EnergyPlus {
 				if (ErrorsFound) break;
 				sizeSimManagerObj.sizingLogger.SetupSizingLogsNewEnvironment( );
 
-			//	if (!DoDesDaySim)  continue;
+			//	if (!DoDesDaySim)  continue; // not sure about this, may need to force users to set this on input for this method, but maybe not
 				if (KindOfSim == ksRunPeriodWeather) continue;
 				if (KindOfSim == ksDesignDay) continue;
 				if (KindOfSim == ksRunPeriodDesign) continue;

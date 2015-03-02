@@ -440,6 +440,7 @@ namespace PhotovoltaicThermalCollectors {
 			}
 
 			PVT( Item ).DesignVolFlowRate = rNumericArgs( 1 );
+			PVT( Item ).SizingInit = true;
 			if ( PVT( Item ).DesignVolFlowRate == AutoSize ) {
 				PVT( Item ).DesignVolFlowRateWasAutoSized = true;
 			}
@@ -450,6 +451,7 @@ namespace PhotovoltaicThermalCollectors {
 				} else if ( PVT( Item ).WorkingFluidType == AirWorkingFluid ) {
 					PVT( Item ).MaxMassFlowRate = PVT( Item ).DesignVolFlowRate * StdRhoAir;
 				}
+				PVT( Item ).SizingInit = false;
 			}
 
 		}
@@ -606,6 +608,10 @@ namespace PhotovoltaicThermalCollectors {
 			MySetPointCheckFlag = false;
 		}
 
+		if ( ! SysSizingCalc && PVT( PVTnum ).SizingInit 
+				&& ( PVT( PVTnum ).WorkingFluidType == AirWorkingFluid ) ) {
+			SizePVT( PVTnum );
+		}
 
 		{ auto const SELECT_CASE_var( PVT( PVTnum ).WorkingFluidType );
 		if ( SELECT_CASE_var == LiquidWorkingFluid ) {
@@ -858,14 +864,10 @@ namespace PhotovoltaicThermalCollectors {
 				if ( ! HardSizeNoDesRun ) {
 					if ( PVT( PVTnum ).DesignVolFlowRateWasAutoSized ) {
 						PVT( PVTnum ).DesignVolFlowRate = DesignVolFlowRateDes;
-						//if ( PlantFinalSizesOkayToReport ) {
-							ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name, 
+						ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name, 
 								"Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes );
-						//}
-						//if ( PlantFirstSizesOkayToReport ) {
-						//	ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name, 
-						//		"Initial Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes );
-						//}
+						PVT( PVTnum ).SizingInit = false;
+
 					} else {
 						if ( PVT( PVTnum ).DesignVolFlowRate > 0.0 && DesignVolFlowRateDes > 0.0 ) {
 							DesignVolFlowRateUser = PVT( PVTnum ).DesignVolFlowRate;

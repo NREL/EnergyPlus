@@ -13,6 +13,7 @@
 #include <DataPlant.hh>
 #include <OutputReportPredefined.hh>
 #include <General.hh>
+#include <ObjexxFCL/gio.hh>
 
 namespace EnergyPlus {
 	ZoneTimestepObject::ZoneTimestepObject( )
@@ -444,7 +445,7 @@ namespace EnergyPlus {
 	void PlantCoinicidentAnalysis::ResolveDesignFlowRate(
 		int const HVACSizingIterCount
 	){
-	
+		using DataGlobals::OutputFileInits;
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::SecInHour;
 		using DataSizing::PlantSizData;
@@ -455,6 +456,7 @@ namespace EnergyPlus {
 		using DataSizing::GlobalHeatSizingFactor;
 		using DataSizing::GlobalCoolSizingFactor;
 		using General::TrimSigDigits;
+		using General::RoundSigDigits;
 		using namespace DataPlant;
 		using namespace OutputReportPredefined;
 		using WeatherManager::Environment;
@@ -467,6 +469,11 @@ namespace EnergyPlus {
 		Real64 newFoundVolFlowRate;
 		Real64 peakLoadCalculatedMassFlow;
 		std::string chIteration;
+		std::string chSetSizes;
+		std::string chDemandTrapUsed;
+		static gio::Fmt fmtA( "(A)" );
+		bool changedByDemand( false );
+		bool static eioHeaderDoneOnce( false );
 
 		previousVolDesignFlowRate	= PlantSizData( plantLoopIndex ).DesVolFlowRate;
 
@@ -485,6 +492,11 @@ namespace EnergyPlus {
 			peakLoadCalculatedMassFlow = 0.0;
 		}
 
+		if ( peakLoadCalculatedMassFlow > newFoundMassFlowRate ) {
+			changedByDemand = true;
+		} else {
+			changedByDemand = false;
+		}
 		newFoundMassFlowRate = max( newFoundMassFlowRate, peakLoadCalculatedMassFlow ); //step 4, take larger of the two
 
 		newFoundVolFlowRate = newFoundMassFlowRate / densityForSizing;
@@ -535,14 +547,43 @@ namespace EnergyPlus {
 				PlantLoop( plantLoopIndex ).Mass = PlantLoop( plantLoopIndex ).Volume* densityForSizing;
 			}
 
-
 		}
-		// should add a seperate eio summary report about what happened, did demand trap get used, what were the key values.
 
-
-				//report to sizing summary table called Plant Loop Coincident Design Fluid Flow Rates
-//		PreDefTableEntry( pdchPlantSizPass, PlantLoop( PlantLoopIndex ).Name, HVACSizingIterCount );
+		// add a seperate eio summary report about what happened, did demand trap get used, what were the key values.
+		if (! eioHeaderDoneOnce ){
+			gio::write( OutputFileInits, fmtA ) << "! <Plant Sizing Coincident Flow Algorithm>,Plant Loop Name, Sizing Pass {#},Measured Mass Flow{kg/s},Measured Demand {W},Demand Calculated Mass Flow{kg/s},Sizes Changed {Yes/No},Previous Volume Flow Rate {m3/s},New Volume Flow Rate {m3/s},Demand Check Applied {Yes/No},Sizing Factor {},Normalized Change {},Specific Heat{}";
+			eioHeaderDoneOnce = true;
+		}
 		chIteration = TrimSigDigits(HVACSizingIterCount);
+		if ( SetNewSizes ) {
+			chSetSizes = "Yes";
+		} else {
+			chSetSizes = "No";
+		}
+		if ( changedByDemand ) {
+			chDemandTrapUsed = "Yes";
+		} else {
+			chDemandTrapUsed = "No";
+		}
+
+		gio::write( OutputFileInits, fmtA ) << " Plant Sizing Coincident Flow Algorithm," 
+				+ name + ","
+				+ chIteration + "," 
+				+ RoundSigDigits( newFoundMassFlowRateTimeStamp.runningAvgDataValue, 7 ) + ","
+				+ RoundSigDigits( NewFoundMaxDemandTimeStamp.runningAvgDataValue, 2 ) + ","
+				+ RoundSigDigits( peakLoadCalculatedMassFlow, 7) + ","
+				+ chSetSizes + ","
+				+ RoundSigDigits( previousVolDesignFlowRate , 6 ) + ","
+				+ RoundSigDigits( newVolDesignFlowRate, 6 ) + ","
+				+ chDemandTrapUsed + ","
+				+ RoundSigDigits( SizingFac, 4) + ","
+				+ RoundSigDigits( NormalizedChange, 6 ) + ","
+				+ RoundSigDigits( specificHeatForSizing, 4 ) ;
+
+
+
+		//report to sizing summary table called Plant Loop Coincident Design Fluid Flow Rates
+
 		PreDefTableEntry( pdchPlantSizPrevVdot, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , previousVolDesignFlowRate , 6 );
 		PreDefTableEntry( pdchPlantSizMeasVdot, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , newFoundVolFlowRate , 6 );
 		PreDefTableEntry( pdchPlantSizCalcVdot, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , newVolDesignFlowRate , 6 );

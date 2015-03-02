@@ -13,6 +13,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace DataGlobals;
@@ -88,6 +89,11 @@ public:
 		TimeValue( 1 ).CurMinute = 0; // init
 		TimeValue( 2 ).TimeStep >>= TimeStepSys;
 		TimeValue( 2 ).CurMinute = 0;
+
+		int write_stat;
+		// Open the Initialization Output File (lifted from SimulationManager.cc)
+		OutputFileInits = GetNewUnitNumber( );
+		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios( ); }
 
 	}
 	

@@ -110,6 +110,7 @@ namespace PhotovoltaicThermalCollectors {
 		int WLoopBranchNum; // Water plant loop branch index                      !DSU
 		int WLoopCompNum; // Water plant loop component index                   !DSU
 		bool EnvrnInit; // manage begin environmen inits
+		bool SizingInit; // manage when sizing is complete
 		std::string PVTModelName; // Name of PVT performance object
 		int PVTModelType; // model type indicator, only simple avail now
 		int SurfNum; // surface index
@@ -141,6 +142,7 @@ namespace PhotovoltaicThermalCollectors {
 			WLoopBranchNum( 0 ),
 			WLoopCompNum( 0 ),
 			EnvrnInit( true ),
+			SizingInit( true ),
 			PVTModelType( 0 ),
 			SurfNum( 0 ),
 			PVnum( 0 ),
