@@ -7,7 +7,6 @@
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/IOFlags.hh>
 #include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/bit.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/Humidifiers.hh>
