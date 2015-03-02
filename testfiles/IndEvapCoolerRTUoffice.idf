@@ -3780,14 +3780,14 @@
     Direct DX air Loop ZN1,  !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     .008,                    !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     .008,                    !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -3803,7 +3803,17 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN1 Inlets,         !- Name
@@ -4094,14 +4104,14 @@
     Direct DX air Loop ZN3,  !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     .008,                    !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     .008,                    !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -4117,7 +4127,17 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN3 Inlets,         !- Name
@@ -4408,14 +4428,14 @@
     Direct DX air Loop ZN5,  !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     .008,                    !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     .008,                    !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -4431,7 +4451,17 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN5 Inlets,         !- Name
@@ -4722,14 +4752,14 @@
     Direct DX air Loop ZN7,  !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     .008,                    !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     .008,                    !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -4745,7 +4775,17 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN7 Inlets,         !- Name
@@ -5036,14 +5076,14 @@
     Direct DX air Loop ZN9,  !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     .008,                    !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     .008,                    !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -5059,7 +5099,17 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN9 Inlets,         !- Name
@@ -5350,14 +5400,14 @@
     Direct DX air Loop ZN11, !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     .008,                    !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     .008,                    !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -5373,7 +5423,17 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN11 Inlets,        !- Name
@@ -5664,14 +5724,14 @@
     Direct DX air Loop ZN13, !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     .008,                    !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     .008,                    !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -5687,7 +5747,17 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN13 Inlets,        !- Name
@@ -5978,14 +6048,14 @@
     Direct DX air Loop ZN15, !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     .008,                    !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     .008,                    !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -6001,7 +6071,17 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN15 Inlets,        !- Name
@@ -6292,14 +6372,14 @@
     Direct DX air Loop ZN17, !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     .008,                    !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     .008,                    !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -6315,7 +6395,17 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN17 Inlets,        !- Name
@@ -6606,14 +6696,14 @@
     Direct DX air Loop ZN19, !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     .008,                    !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     .008,                    !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -6629,7 +6719,17 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN19 Inlets,        !- Name
