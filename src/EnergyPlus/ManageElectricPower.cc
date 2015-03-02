@@ -3189,8 +3189,36 @@ namespace ManageElectricPower {
 		Real64 const E0c,
 		Real64 const InternalR )
 	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         B. Griffith
+		//       DATE WRITTEN   June-August 2008
+		//       MODIFIED       BG May 2009, added EMS
+		//                      BN (FSEC) Feb 2010 (pass out two storage values)
+		//                      Y. KyungTae & W. Wang July-August, 2011 Added a battery model
+		//       RE-ENGINEERED  J. Glazer February 2015, refactor charge calculation into a function
+
+		// PURPOSE OF THIS FUNCTION:
+		// calculate the current for battery discharge
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
 		using CurveManager::CurveValue;
 
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		curI0 = 10.0; // Initial assumption
 		curT0 = qmax / curI0; // Initial Assumption
 		Real64 qmaxf = qmax * k * c * curT0 / ( 1.0 - std::exp( -k * curT0 ) + c * ( k * curT0 - 1.0 + std::exp( -k * curT0 ) ) ); //Initial calculation of a function qmax(I)
