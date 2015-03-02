@@ -1241,7 +1241,6 @@ namespace ChillerReformulatedEIR {
 			PreDefTableEntry( pdchMechNomCap, equipName, ElecReformEIRChiller( EIRChillNum ).RefCap );
 		}
 
-		if ( PlantFirstSizesOkayToFinalize ) {
 			// Only check performance curves if Capacity and volumetric flow rate are greater than 0
 			if ( ElecReformEIRChiller( EIRChillNum ).RefCap > 0.0 && ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate > 0.0 ) {
 				//   Check the CAP-FT, EIR-FT, and PLR curves at reference conditions and warn user if different from 1.0 by more than +-10%
@@ -1264,7 +1263,7 @@ namespace ChillerReformulatedEIR {
 					}
 					GetCurveMinMaxValues( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFT, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFTXTempMin, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFTXTempMax, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFTYTempMin, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFTYTempMax );
 				}
-			}
+
 			if ( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLR > 0 ) {
 				if ( ElecReformEIRChiller( EIRChillNum ).PartLoadCurveType == PLR_LeavingCondenserWaterTemperature ) {
 					CurveVal = CurveValue( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLR, ElecReformEIRChiller( EIRChillNum ).TempRefCondOut, 1.0 );
@@ -1294,40 +1293,10 @@ namespace ChillerReformulatedEIR {
 					ShowContinueError( "by Chiller:Electric:ReformulatedEIR = " + equipName + '.' );
 					ShowContinueError( "The maximum value of PLR [y] must be from zero to 1.1, and greater than the minimum value of PLR." );
 					ErrorsFound = true;
-
 				}
-
-				//  Initialize condenser reference inlet temperature (not a user input)
-				Density = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, ElecReformEIRChiller( EIRChillNum ).TempRefCondOut, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
-
-				SpecificHeat = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, ElecReformEIRChiller( EIRChillNum ).TempRefCondOut, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
-				CondenserCapacity = ElecReformEIRChiller( EIRChillNum ).RefCap * ( 1.0 + ( 1.0 / ElecReformEIRChiller( EIRChillNum ).RefCOP ) * ElecReformEIRChiller( EIRChillNum ).CompPowerToCondenserFrac );
-				DeltaTCond = ( CondenserCapacity ) / ( ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate * Density * SpecificHeat );
-				ElecReformEIRChiller( EIRChillNum ).TempRefCondIn = ElecReformEIRChiller( EIRChillNum ).TempRefCondOut - DeltaTCond;
-
-				//     Check EIRFPLR curve output. Calculate condenser inlet temp based on reference condenser outlet temp,
-				//     chiller capacity, and mass flow rate. Starting with the calculated condenser inlet temp and PLR = 0,
 				//     calculate the condenser outlet temp proportional to PLR and test the EIRFPLR curve output for negative numbers.
-				FoundNegValue = false;
-				if ( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLR > 0 ) {
-					CurveValArray = 0.0;
-					CondTempArray = 0.0;
-					for ( CurveCheck = 0; CurveCheck <= 10; ++CurveCheck ) {
-						PLRTemp = CurveCheck / 10.0;
-						CondTemp = ElecReformEIRChiller( EIRChillNum ).TempRefCondIn + ( DeltaTCond * PLRTemp );
-						CondTemp = min( CondTemp, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRTempMax );
-						CondTemp = max( CondTemp, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRTempMin );
-						if ( PLRTemp < ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRPLRMin ) {
-							CurveValTmp = CurveValue( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLR, CondTemp, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRPLRMin );
-						} else {
-							CurveValTmp = CurveValue( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLR, CondTemp, PLRTemp );
-						}
-						if ( CurveValTmp < 0.0 ) FoundNegValue = true;
-						CurveValArray( CurveCheck + 1 ) = int( CurveValTmp * 100.0 ) / 100.0;
-						CondTempArray( CurveCheck + 1 ) = int( CondTemp * 100.0 ) / 100.0;
-					}
-				}
 			}
+
 			//  Initialize condenser reference inlet temperature (not a user input)
 			Density = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, ElecReformEIRChiller( EIRChillNum ).TempRefCondOut, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 
@@ -1357,7 +1326,7 @@ namespace ChillerReformulatedEIR {
 						if ( CurveValTmp < 0.0 ) FoundNegValue = true;
 						CurveValArray( CurveCheck + 1 ) = int( CurveValTmp * 100.0 ) / 100.0;
 						CondTempArray( CurveCheck + 1 ) = int( CondTemp * 100.0 ) / 100.0;
-
+					}
 
 					}
 
@@ -1381,7 +1350,7 @@ namespace ChillerReformulatedEIR {
 						ShowContinueError( StringVar );
 						ErrorsFound = true;
 					}
-
+			}
 				} else { // just get curve min/max values if capacity or cond volume flow rate = 0
 					GetCurveMinMaxValues( ElecReformEIRChiller( EIRChillNum ).ChillerCapFT, ElecReformEIRChiller( EIRChillNum ).ChillerCAPFTXTempMin, ElecReformEIRChiller( EIRChillNum ).ChillerCAPFTXTempMax, ElecReformEIRChiller( EIRChillNum ).ChillerCAPFTYTempMin, ElecReformEIRChiller( EIRChillNum ).ChillerCAPFTYTempMax );
 					GetCurveMinMaxValues( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFT, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFTXTempMin, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFTXTempMax, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFTYTempMin, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFTYTempMax );
@@ -1391,8 +1360,7 @@ namespace ChillerReformulatedEIR {
 						GetCurveMinMaxValues( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLR, ElecReformEIRChiller( EIRChillNum ).ChillerLiftNomMin, ElecReformEIRChiller( EIRChillNum ).ChillerLiftNomMax, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRPLRMin, ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRPLRMax, ElecReformEIRChiller( EIRChillNum ).ChillerTdevNomMin, ElecReformEIRChiller( EIRChillNum ).ChillerTdevNomMax );
 					}
 				}
-			}
-		}
+
 		if ( ErrorsFound ) {
 			ShowFatalError( "Preceding sizing errors cause program termination" );
 		}
