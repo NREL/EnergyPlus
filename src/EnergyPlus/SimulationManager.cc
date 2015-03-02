@@ -135,7 +135,7 @@ namespace SimulationManager {
 	using namespace HeatBalanceManager;
 	using namespace WeatherManager;
 	using namespace ExternalInterface;
-	using namespace ResultsSchema;
+	using namespace ResultsFramework;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -264,6 +264,9 @@ namespace SimulationManager {
 
 		// Formats
 		static gio::Fmt Format_700( "('Environment:WarmupDays,',I3)" );
+
+		// Is JSON Enabled?
+		// EnergyPlus::ResultsSchema::OutputSchema.InitializeSchema();
 
 		//CreateSQLiteDatabase();
 		sqlite = EnergyPlus::CreateSQLiteDatabase();
@@ -541,32 +544,35 @@ namespace SimulationManager {
 		if ( sqlite ) sqlite->sqliteBegin(); // for final data to write
 
 		// Output detailed ZONE time series data
-		if (OutputSchema.RIDetailedZoneTSData.RDataFrameEnabled || OutputSchema.RIDetailedZoneTSData.IDataFrameEnabled)
-			OutputSchema.RIDetailedZoneTSData.WriteFile();
+		if (OutputSchema->TimeSeriesEnabled())
+		{
+			if (OutputSchema->RIDetailedZoneTSData.RDataFrameEnabled || OutputSchema->RIDetailedZoneTSData.IDataFrameEnabled)
+				OutputSchema->RIDetailedZoneTSData.WriteFile();
 
-		// Output detailed HVAC time series data
-		if (OutputSchema.RIDetailedHVACTSData.RDataFrameEnabled || OutputSchema.RIDetailedHVACTSData.IDataFrameEnabled)
-			OutputSchema.RIDetailedHVACTSData.WriteFile();
+			// Output detailed HVAC time series data
+			if (OutputSchema->RIDetailedHVACTSData.RDataFrameEnabled || OutputSchema->RIDetailedHVACTSData.IDataFrameEnabled)
+				OutputSchema->RIDetailedHVACTSData.WriteFile();
 
-		// Output timestep time series data
-		if (OutputSchema.RITimestepTSData.RDataFrameEnabled || OutputSchema.RITimestepTSData.IDataFrameEnabled)
-			OutputSchema.RITimestepTSData.WriteFile();
+			// Output timestep time series data
+			if (OutputSchema->RITimestepTSData.RDataFrameEnabled || OutputSchema->RITimestepTSData.IDataFrameEnabled)
+				OutputSchema->RITimestepTSData.WriteFile();
 
-		// Output hourly time series data
-		if (OutputSchema.RIHourlyTSData.RDataFrameEnabled || OutputSchema.RIHourlyTSData.IDataFrameEnabled)
-			OutputSchema.RIHourlyTSData.WriteFile();
-		
-		// Output daily time series data
-		if (OutputSchema.RIDailyTSData.RDataFrameEnabled || OutputSchema.RIDailyTSData.IDataFrameEnabled)
-			OutputSchema.RIDailyTSData.WriteFile();
+			// Output hourly time series data
+			if (OutputSchema->RIHourlyTSData.RDataFrameEnabled || OutputSchema->RIHourlyTSData.IDataFrameEnabled)
+				OutputSchema->RIHourlyTSData.WriteFile();
 
-		// Output monthly time series data
-		if (OutputSchema.RIMonthlyTSData.RDataFrameEnabled || OutputSchema.RIMonthlyTSData.IDataFrameEnabled)
-			OutputSchema.RIMonthlyTSData.WriteFile();
+			// Output daily time series data
+			if (OutputSchema->RIDailyTSData.RDataFrameEnabled || OutputSchema->RIDailyTSData.IDataFrameEnabled)
+				OutputSchema->RIDailyTSData.WriteFile();
 
-		// Output run period time series data
-		if (OutputSchema.RIRunPeriodTSData.RDataFrameEnabled || OutputSchema.RIRunPeriodTSData.IDataFrameEnabled)
-			OutputSchema.RIRunPeriodTSData.WriteFile();
+			// Output monthly time series data
+			if (OutputSchema->RIMonthlyTSData.RDataFrameEnabled || OutputSchema->RIMonthlyTSData.IDataFrameEnabled)
+				OutputSchema->RIMonthlyTSData.WriteFile();
+
+			// Output run period time series data
+			if (OutputSchema->RIRunPeriodTSData.RDataFrameEnabled || OutputSchema->RIRunPeriodTSData.IDataFrameEnabled)
+				OutputSchema->RIRunPeriodTSData.WriteFile();
+		}
 
 #ifdef EP_Detailed_Timings
 		epStartTime( "Closeout Reporting=" );

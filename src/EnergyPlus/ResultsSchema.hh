@@ -13,10 +13,11 @@
 #include <DataGlobals.hh>
 #include <OutputProcessor.hh>
 
+#include <memory>
 
 namespace EnergyPlus {
 
-	namespace ResultsSchema {
+	namespace ResultsFramework {
 		using namespace OutputProcessor;
 
 		class DataFrame {
@@ -53,17 +54,24 @@ namespace EnergyPlus {
 			ResultsSchema();
 			~ResultsSchema();
 			
+			void InitializeSchema();
+
+			bool TimeSeriesEnabled();
+			bool TimeSeriesAndTabularEnabled();
+
 			void InitializeRTSDataFrame(const int ReportFrequency, const FArray1D< RealVariableType > &RVariableTypes, const int NumOfRVariable, const int IndexType = ZoneVar);
 			void InitializeITSDataFrame(const int ReportFrequency, const FArray1D< IntegerVariableType > &IVariableTypes, const int NumOfIVariable, const int IndexType = ZoneVar);
 
 			static DataFrame RIDetailedZoneTSData, RIDetailedHVACTSData, RITimestepTSData, RIHourlyTSData, RIDailyTSData, RIMonthlyTSData, RIRunPeriodTSData;
 		protected:
 			std::string UUID;
+			bool timeSeriesEnabled;
+			bool timeSeriesAndTabularEnabled;
 		};
 
-		static ResultsSchema OutputSchema;
+		extern std::unique_ptr<ResultsSchema> OutputSchema;
 
-	} // ResultsSchema
+	} // ResultsFramework
 
 } // EnergyPlus
 

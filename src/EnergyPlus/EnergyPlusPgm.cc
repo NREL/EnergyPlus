@@ -32,6 +32,7 @@
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <Psychrometrics.hh>
+#include <ResultsSchema.hh>
 #include <ScheduleManager.hh>
 #include <SimulationManager.hh>
 #include <UtilityRoutines.hh>
@@ -223,9 +224,11 @@ EnergyPlusPgm( std::string const & filepath )
 	using namespace FileSystem;
 	using namespace InputProcessor;
 	using namespace OutputProcessor;
+	using namespace ResultsFramework;
 	using namespace SimulationManager;
 	using ScheduleManager::ReportOrphanSchedules;
 	using FluidProperties::ReportOrphanFluids;
+	using ResultsFramework::OutputSchema;
 	using Psychrometrics::ShowPsychrometricSummary;
 
 	// Disable C++ i/o synching with C methods for speed
@@ -379,6 +382,13 @@ EnergyPlusPgm( std::string const & filepath )
 	DisplayString( VerString );
 
 	ProcessInput();
+
+ 	OutputSchema->InitializeSchema();
+
+	if (OutputSchema->TimeSeriesEnabled())
+		DisplayString("Found true");
+	else
+		DisplayString("Found false");
 
 	ManageSimulation();
 

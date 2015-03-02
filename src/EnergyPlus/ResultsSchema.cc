@@ -19,13 +19,15 @@
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
+#include <DisplayRoutines.hh>
 #include <General.hh>
 #include <GlobalNames.hh>
+#include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
-	namespace ResultsSchema {
+	namespace ResultsFramework {
 
 		using namespace DataHVACGlobals;
 		using namespace DataPrecisionGlobals;
@@ -38,6 +40,8 @@ namespace EnergyPlus {
 		using OutputProcessor::RealVariableType;
 
 		static gio::Fmt fmtLD("*");
+
+		std::unique_ptr<ResultsSchema> OutputSchema(new ResultsSchema);
 
 		DataFrame::DataFrame(std::string ReportFreq) {
 			//UUID = getUUID();
@@ -62,8 +66,8 @@ namespace EnergyPlus {
 		void DataFrame::NewRow(std::string ts) {
 			std::vector<double> rrow;
 			std::vector<int> irow;
-			RRows.push_back( rrow );
-			IRows.push_back( irow );
+			RRows.push_back(rrow);
+			IRows.push_back(irow);
 			TS.push_back(ts);
 			CurrentRow++;
 		}
@@ -124,7 +128,7 @@ namespace EnergyPlus {
 					values += "]";
 					cJSON_AddItemToArray(_row, _rowvec = cJSON_CreateObject());
 					cJSON_AddStringToObject(_rowvec, TS.at(row).c_str(), values.c_str());
-				 	//cJSON_AddItemToObject(_rowvec, TS.at(row).c_str(), cJSON_CreateDoubleArray(&RRows[row][0], RRows[row].size()));
+					//cJSON_AddItemToObject(_rowvec, TS.at(row).c_str(), cJSON_CreateDoubleArray(&RRows[row][0], RRows[row].size()));
 					//cJSON_AddItemToObject(_rowvec, TS.at(row).c_str(), cJSON_CreateIntArray(&IRows[row][0], RRows[row].size()));
 
 				}
@@ -133,31 +137,85 @@ namespace EnergyPlus {
 				cJSON_Delete(_root);
 			}
 			// does this need to go to error?
-			else 
+			else
 				ShowWarningError("Unable to open file for time-series output.");
 		}
 
 
 		// Class ResultsSchema
-		DataFrame ResultsSchema::RIDetailedZoneTSData("Detailed-Zone"), 
-			ResultsSchema::RIDetailedHVACTSData("Detailed-HVAC"), 
-			ResultsSchema::RITimestepTSData("Timestep"), 
-			ResultsSchema::RIHourlyTSData("Hourly"), 
-			ResultsSchema::RIDailyTSData("Daily"), 
-			ResultsSchema::RIMonthlyTSData("Monthly"), 
+		DataFrame ResultsSchema::RIDetailedZoneTSData("Detailed-Zone"),
+			ResultsSchema::RIDetailedHVACTSData("Detailed-HVAC"),
+			ResultsSchema::RITimestepTSData("Timestep"),
+			ResultsSchema::RIHourlyTSData("Hourly"),
+			ResultsSchema::RIDailyTSData("Daily"),
+			ResultsSchema::RIMonthlyTSData("Monthly"),
 			ResultsSchema::RIRunPeriodTSData("RunPeriod");
-		
+
 
 		ResultsSchema::ResultsSchema() {
 			//UUID = getUUID();
+			timeSeriesEnabled = false;
+			timeSeriesAndTabularEnabled = false;
 		}
 
 		ResultsSchema::~ResultsSchema() {
 
 		}
 
+		void ResultsSchema::InitializeSchema() {
+			DisplayString("Initializing Output schema");
+			int numberOfOutputSchemaObjects = InputProcessor::GetNumObjectsFound("Output:JSON");
+			DisplayString("No of JSON objects: " + std::to_string(numberOfOutputSchemaObjects));
+			if (numberOfOutputSchemaObjects == 1) {
+				try {
+					FArray1D_string alphas(5);
+					int numAlphas;
+					FArray1D< Real64 > numbers(2);
+					int numNumbers;
+					int status;
+					DisplayString("getobjectItem");
+					InputProcessor::GetObjectItem("Output:JSON", 1, alphas, numAlphas, numbers, numNumbers, status);
+					DisplayString("numalphas: " + std::to_string(numAlphas));
+
+					if (numAlphas > 0) {
+						std::string option = alphas(1);
+						if (InputProcessor::SameString(option, "TimeSeries")) {
+							timeSeriesEnabled = true;
+
+							DisplayString("time series enabedand set to true");
+						}
+						else if (InputProcessor::SameString(option, "TimeSeriesAndTabular")) {
+							timeSeriesEnabled = true;
+							timeSeriesAndTabularEnabled = true;
+						}
+					}
+				}
+				catch (const std::runtime_error& error) {
+					ShowFatalError(error.what());
+				}
+			}
+		}
+
+		bool ResultsSchema::TimeSeriesEnabled() {
+			return timeSeriesEnabled;
+		}
+
+		bool ResultsSchema::TimeSeriesAndTabularEnabled() {
+			return timeSeriesAndTabularEnabled;
+		}
+
 		void ResultsSchema::InitializeRTSDataFrame(const int ReportFrequency, const FArray1D< RealVariableType > &RVariableTypes, const int NumOfRVariable, const int IndexType) {
 			Reference< RealVariables > RVar;
+			
+			/*if (timeSeriesEnabled == false)
+			{
+				DisplayString("False, Initializing Data Frame, and setting to true");
+				timeSeriesEnabled = true;
+
+			}
+			else
+				DisplayString("Already True, Initializing Data Frame");
+			*/
 
 			for (int Loop = 1; Loop <= NumOfRVariable; ++Loop) {
 					RVar >>= RVariableTypes(Loop).VarPtr;
@@ -250,6 +308,6 @@ namespace EnergyPlus {
 			}
 		}
 
-	} // ResultsSchema
+	} // ResultsFramework
 
 } // EnergyPlus
