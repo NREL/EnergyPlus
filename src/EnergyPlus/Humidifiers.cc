@@ -645,25 +645,25 @@ namespace Humidifiers {
 		Real64 AirDensity;			// Density of air 
   
 
-		if (  HumType_Code == Humidifier_Steam_Electric ||  HumType_Code == Humidifier_Steam_Gas ) {
+		if ( HumType_Code == Humidifier_Steam_Electric ||  HumType_Code == Humidifier_Steam_Gas ) {
 			IsAutoSize = false;
 			HardSizeNoDesRun = false;
 			NomPowerDes = 0.0;
 			NomPowerUser = 0.0;
 
-			if (  HumType_Code == Humidifier_Steam_Electric ) {
+			if ( HumType_Code == Humidifier_Steam_Electric ) {
 				ModuleObjectType = "electric";
-			} else if (  HumType_Code == Humidifier_Steam_Gas ) {
+			} else if ( HumType_Code == Humidifier_Steam_Gas ) {
 				ModuleObjectType = "gas";
 			}
-			if (  NomCapVol == AutoSize ) {
+			if ( NomCapVol == AutoSize ) {
 				IsAutoSize = true;
 			}
 			if ( CurZoneEqNum > 0 ) {
 				if ( !IsAutoSize && !ZoneSizingRunDone ) {	// Hardsize with no sizing run
 					HardSizeNoDesRun = true;
-					if (  NomCapVol > 0.0 ) {
-						ReportSizingOutput( HumidifierType(  HumType_Code ),  Name, "User-Specified Nominal Capacity Volume [m3/s]",  NomCapVol );
+					if ( NomCapVol > 0.0 ) {
+						ReportSizingOutput( HumidifierType( HumType_Code ),  Name, "User-Specified Nominal Capacity Volume [m3/s]",  NomCapVol );
 					}
 				} else {	// Sizing run done  
 
@@ -676,8 +676,8 @@ namespace Humidifiers {
 			} else if ( CurSysNum > 0 ) {
 				if ( !IsAutoSize && !SysSizingRunDone ) {
 					HardSizeNoDesRun = true;
-					if (  NomCapVol > 0.0 ) {
-						ReportSizingOutput( HumidifierType(  HumType_Code ),  Name, "User-Specified Nominal Capacity Volume [m3/s]",  NomCapVol );
+					if ( NomCapVol > 0.0 ) {
+						ReportSizingOutput( HumidifierType( HumType_Code ),  Name, "User-Specified Nominal Capacity Volume [m3/s]",  NomCapVol );
 					}
 				} else {
 					CheckSysSizing( "Humidifier:SizeHumidifier",  Name );
@@ -735,12 +735,12 @@ namespace Humidifiers {
 					 NomCapVol = NomCapVolDes;
 					ReportSizingOutput( HumidifierType(  HumType_Code ),  Name, "Design Size Nominal Capacity Volume [m3/s]", NomCapVolDes );
 				} else {
-					if (  NomCapVol > 0.0) {
+					if ( NomCapVol > 0.0) {
 						NomCapVolUser =  NomCapVol;
-						ReportSizingOutput( HumidifierType(  HumType_Code ),  Name, "Design Size Nominal Capacity Volume [m3/s]", NomCapVolDes, "User-Specified Nominal Capacity Volume [m3/s]", NomCapVolUser );
+						ReportSizingOutput( HumidifierType( HumType_Code ),  Name, "Design Size Nominal Capacity Volume [m3/s]", NomCapVolDes, "User-Specified Nominal Capacity Volume [m3/s]", NomCapVolUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( NomCapVolDes - NomCapVolUser )/NomCapVolUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeHumidifier: Potential issue with equipment sizing for " + HumidifierType(  HumType_Code ) + " = \"" +  Name + "\"." );
+								ShowMessage( "SizeHumidifier: Potential issue with equipment sizing for " + HumidifierType( HumType_Code ) + " = \"" +  Name + "\"." );
 								ShowContinueError( "User-Specified Nominal Capacity Volume of " + RoundSigDigits( NomCapVolUser, 2 ) + " [Wm3/s]" );
 								ShowContinueError( "differs from Design Size Nominal Capacity Volume of " + RoundSigDigits( NomCapVolDes, 2 ) + " [m3/s]" );
 								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
@@ -759,26 +759,28 @@ namespace Humidifiers {
 			WaterSpecHeatAvg = 0.5 * ( GetSpecificHeatGlycol( fluidNameWater, TSteam, WaterIndex, CalledFrom ) + GetSpecificHeatGlycol( fluidNameWater, Tref, WaterIndex, CalledFrom ) );
 			NominalPower =  NomCap * ( ( SteamSatEnthalpy - WaterSatEnthalpy ) + WaterSpecHeatAvg * ( TSteam - Tref ) );
 
-			if (  NomPower == AutoSize ) {
+			if ( NomPower == AutoSize ) {
 				IsAutoSize = true;
 			}
 
-			if (  HumType_Code == Humidifier_Steam_Gas ) {
+			if ( HumType_Code == Humidifier_Steam_Gas ) {
 
 				if ( !IsAutoSize ) {
 					// override user specified rated thermal efficiency
-					if (  NomPower >= NominalPower ) {
-						 ThermalEffRated = NominalPower /  NomPower;
+					if ( NomPower >= NominalPower ) {
+						ThermalEffRated = NominalPower /  NomPower;
 					} else {
 						ShowMessage( CalledFrom + ": capacity and thermal efficiency mismatch for " + HumidifierType( HumType_Code ) + " =\"" + Name + "\"." );
-						ShowContinueError( "User-Specified Rated Gas Use Rate of " + RoundSigDigits(  NomPower, 2 ) + " [W]" );
-						ShowContinueError( "User-Specified or Autosized Rated Capacity of " + RoundSigDigits(  NomCapVol, 2 ) + " [m3/s]" );
-						ShowContinueError( "Rated Gas Use Rate at the Rated Capacity of " + RoundSigDigits(  NomCapVol, 2 ) + " [m3/s]" + " must be greater than the ideal, i.e., 100% thermal efficiency gas use rate of " + RoundSigDigits( NomPowerDes, 2 ) + " [W]" );
+						ShowContinueError( "User-Specified Rated Gas Use Rate of " + RoundSigDigits( NomPower, 2 ) + " [W]" );
+						ShowContinueError( "User-Specified or Autosized Rated Capacity of " + RoundSigDigits( NomCapVol, 2 ) + " [m3/s]" );
+						ShowContinueError( "Rated Gas Use Rate at the Rated Capacity of " + RoundSigDigits( NomCapVol, 2 ) + " [m3/s]" + " must be greater than the ideal, i.e., 100% thermal efficiency gas use rate of " + RoundSigDigits( NomPowerDes, 2 ) + " [W]" );
 						ShowContinueError( "Resize the Rated Gas Use Rate by dividing the ideal gas use rate with expected thermal efficiency. " );
-						ErrorsFound = true;
+						// Changing this from a hard-stop condition to just a limiting condition of eta=1.0
+						//ErrorsFound = true;
+						ThermalEffRated = 1.0;
 					}
 				} else {
-					if (  ThermalEffRated > 0.0 ) {
+					if ( ThermalEffRated > 0.0 ) {
 						NominalPower = NominalPower /  ThermalEffRated;
 					}
 				}
@@ -790,21 +792,21 @@ namespace Humidifiers {
 			NomPowerDes = NominalPower;
 			if ( IsAutoSize ) {
 				NomPower = NomPowerDes;
-				ReportSizingOutput( HumidifierType(  HumType_Code ),  Name, "Design Size Rated Power [W]", NomPowerDes );
+				ReportSizingOutput( HumidifierType( HumType_Code ),  Name, "Design Size Rated Power [W]", NomPowerDes );
 			} else {
-				if (  NomPower >= 0.0 &&  NomCap > 0.0 ) {
+				if ( NomPower >= 0.0 &&  NomCap > 0.0 ) {
 					NomPowerUser =  NomPower;
-					ReportSizingOutput( HumidifierType(  HumType_Code ),  Name, "Design Size Rated Power [W]", NomPowerDes, "User-Specified Rated Power [W]", NomPowerUser );
+					ReportSizingOutput( HumidifierType( HumType_Code ),  Name, "Design Size Rated Power [W]", NomPowerDes, "User-Specified Rated Power [W]", NomPowerUser );
 					if ( DisplayExtraWarnings ) {
 						if ( ( std::abs( NomPowerDes - NomPowerUser ) / NomPowerUser ) > AutoVsHardSizingThreshold ) {
-							ShowMessage( "SizeHumidifier: Potential issue with equipment sizing for " + HumidifierType(  HumType_Code ) + " =\"" +  Name + "\"." );
+							ShowMessage( "SizeHumidifier: Potential issue with equipment sizing for " + HumidifierType( HumType_Code ) + " =\"" +  Name + "\"." );
 							ShowContinueError( "User-Specified Rated Power of " + RoundSigDigits( NomPowerUser, 2 ) + " [W]" );
 							ShowContinueError( "differs from Design Size Rated Power of " + RoundSigDigits( NomPowerDes, 2 ) + " [W]" );
 							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
 							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 						}
 					}
-					if (  NomPower < NominalPower ) {
+					if ( NomPower < NominalPower ) {
 						ShowWarningError( HumidifierType( HumType_Code ) + ": specified Rated Power is less than nominal Rated Power for " + ModuleObjectType + " steam humidifier = " + Name + ". " );
 						ShowContinueError( " specified Rated Power = " + RoundSigDigits( NomPower, 2 ) );
 						ShowContinueError( " while expecting a minimum Rated Power = " + RoundSigDigits( NominalPower, 2 ) );
@@ -1112,7 +1114,7 @@ namespace Humidifiers {
 				GasUseRateAtRatedEff = ( WaterAdd / NomCap ) *  NomPower;
 			} else if ( InletWaterTempOption == VariableInletWaterTemperature ) {
 				if ( SuppliedByWaterSystem ) { // use water use storage tank supply temperaure
-					 CurMakeupWaterTemp = WaterStorage(  WaterTankID ).TwaterSupply(  TankSupplyID );
+					 CurMakeupWaterTemp = WaterStorage( WaterTankID ).TwaterSupply(  TankSupplyID );
 				} else { // use water main temperaure 
 					 CurMakeupWaterTemp = WaterMainsTemp;
 				}
@@ -1125,7 +1127,7 @@ namespace Humidifiers {
 				GasUseRateAtRatedEff = WaterAdd * ( ( SteamSatEnthalpy - WaterSatEnthalpy ) + WaterSpecHeatAvg * ( TSteam - Tref ) ) / ThermalEffRated;
 			}
 			PartLoadRatio = GasUseRateAtRatedEff / NomPower;
-			if (  EfficiencyCurvePtr > 0 ) { // calculate normalized thermal efficiency based on curve object type
+			if ( EfficiencyCurvePtr > 0 ) { // calculate normalized thermal efficiency based on curve object type
 				if ( EfficiencyCurveType == Linear || EfficiencyCurveType == Quadratic || EfficiencyCurveType == Cubic ) {
 					ThermEffCurveOutput = CurveValue( EfficiencyCurvePtr, PartLoadRatio );
 				}
