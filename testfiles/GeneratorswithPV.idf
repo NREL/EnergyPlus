@@ -1026,8 +1026,8 @@
     0.007,                   !- Sandia Database Parameter c5 {dimensionless}
     4.7,                     !- Sandia Database Parameter Ix0
     3.22,                    !- Sandia Database Parameter Ixx0
-    1.105,                   !- Sandia Database Parameter c6
-    -0.105;                  !- Sandia Database Parameter c7
+    1.105,                   !- Sandia Database Parameter c6 {dimensionless}
+    -0.105;                  !- Sandia Database Parameter c7 {dimensionless}
 
   Output:Surfaces:Drawing,DXF;
 
