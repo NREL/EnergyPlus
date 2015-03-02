@@ -23577,8 +23577,8 @@ AirflowNetwork:OccupantVentilationControl,
       \memo for both exterior and interior windows.
   A1, \field Name
       \required-field
-      \type object-list
-      \object-list AirflowNetwork:OccupantVentilationControlNames
+      \type alpha
+      \reference AirflowNetwork:OccupantVentilationControlNames
       \note Enter the name where the advanced thermal comfort control is required.
   N1, \field Minimum Opening Time
       \type real
