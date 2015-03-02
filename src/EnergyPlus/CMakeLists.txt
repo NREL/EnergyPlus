@@ -18,11 +18,7 @@ endif()
 # so we use a file to mark the time stamp.
 # The IDD is a dependency of the EnergyPlus target and will be built along side the energyplus executable.
 set(IDD_SOURCE_PATH "${CMAKE_SOURCE_DIR}/idd/Energy+.idd.in")
-set(IDD_OUTPUT_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/Energy+.idd)
-# IDD_HIDDEN_OUTPUT_PATH is a location where a copy of the configured idd will be located.
-# This path does not include the $<CONFIGURATION> subdirectory so that it can be located with cmake 2.8 
-# version of install command.
-set(IDD_HIDDEN_OUTPUT_PATH ${CMAKE_BINARY_DIR}/install_temp/.Energy+.idd)
+set(IDD_OUTPUT_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/Energy+.idd)
 set(IDD_STAMP_PATH "${CMAKE_CURRENT_BINARY_DIR}/idd.stamp")
 add_custom_command(OUTPUT "${IDD_STAMP_PATH}"
   COMMAND "${CMAKE_COMMAND}" 
@@ -32,12 +28,11 @@ add_custom_command(OUTPUT "${IDD_STAMP_PATH}"
   -D IDD_STAMP_PATH:STRING="${IDD_STAMP_PATH}" 
   -D IDD_SOURCE_PATH:STRING="${IDD_SOURCE_PATH}" 
   -D IDD_OUTPUT_PATH:STRING="${IDD_OUTPUT_PATH}"
-  -D IDD_HIDDEN_OUTPUT_PATH:STRING="${IDD_HIDDEN_OUTPUT_PATH}"
   -P "${CMAKE_SOURCE_DIR}/cmake/configure_idd.cmake"
   DEPENDS "${IDD_SOURCE_PATH}"
 )
-install( FILES "${IDD_HIDDEN_OUTPUT_PATH}" DESTINATION ./ RENAME Energy+.idd)
-install( FILES "${IDD_HIDDEN_OUTPUT_PATH}" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}-Energy+.idd" )
+install( FILES "${IDD_OUTPUT_PATH}" DESTINATION ./ )
+install( FILES "${IDD_OUTPUT_PATH}" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}-Energy+.idd" )
 
 SET( SRC
   Timer.h
