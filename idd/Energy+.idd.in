@@ -48119,7 +48119,7 @@ Humidifier:Steam:Gas,
       \maximum 1.0
       \default 0.80   
       \note Based on the higher heating value of fuel.
-      \note If “Rated Gas Use Rate” in the field above is not auto-sized and the Inlet Water 
+      \note If "Rated Gas Use Rate" in the field above is not auto-sized and the Inlet Water 
       \note Temperature Option input field is specified as FixedInletWaterTemperature, then the 
       \note thermal efficiency specified will not be used in the calculation, or else if the 
       \note Inlet Water Temperature Option input field is selected as VariableInletWaterTemperature, 
@@ -48152,9 +48152,9 @@ Humidifier:Steam:Gas,
       \note whenever the unit is available (as defined by the availability schedule). This 
       \note electric power is used for control purpose only.
   A4, \field Air Inlet Node Name
-       \type node
+      \type node
   A5, \field Air Outlet Node Name
-       \type node
+      \type node
   A6, \field Water Storage Tank Name
       \type object-list
       \object-list WaterStorageTankNames  

@@ -156,17 +156,17 @@ namespace Humidifiers {
 				void
 				ControlHumidifier(
 					Real64 & WaterAddNeeded // moisture addition rate needed to meet minimum humidity ratio setpoint [kg/s]
-					);
+				);
 
 				void
 				CalcElecSteamHumidifier(
 					Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
-					);
+				);
 
 				void
 				CalcGasSteamHumidifier(
 					Real64 const WaterAddNeeded // moisture addition rate set by controller [kg/s]
-					);
+				);
 
 				void
 				UpdateReportWaterSystem(); // number of the current humidifier being simulated
@@ -179,7 +179,6 @@ namespace Humidifiers {
 
 	};
 
-
 	// Object Data
 	extern FArray1D< HumidifierData > Humidifier;
 
@@ -189,7 +188,7 @@ namespace Humidifiers {
 		std::string const & CompName, // name of the humidifier unit
 		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
 		int & CompIndex // Pointer to Humidifier Unit
-		);
+	);
 
 	void
 	GetHumidifierInput();
