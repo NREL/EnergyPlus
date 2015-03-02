@@ -52,23 +52,23 @@ TEST( GasFiredHumidifierTest, Sizing ) {
 	thisHum.SchedPtr = ScheduleAlwaysOn;
 	
 	FinalSysSizing.allocate( CurSysNum );
-	FinalSysSizing( CurSysNum ).CoolMixTemp = 30.0;
-	FinalSysSizing( CurSysNum ).CoolMixHumRat = 0.090;
+	FinalSysSizing( CurSysNum ).MixTempAtCoolPeak = 30.0;
+	FinalSysSizing( CurSysNum ).MixHumRatAtCoolPeak = 0.090;
 	FinalSysSizing( CurSysNum ).DesMainVolFlow = 1.60894;
 	FinalSysSizing( CurSysNum ).HeatMixHumRat = 0.05;
 	FinalSysSizing( CurSysNum ).CoolSupHumRat = 0.07;
 	FinalSysSizing( CurSysNum ).HeatSupHumRat = 0.10;
 
-	// autosize nominal gas use rate
-	int write_stat;
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
-	try {
-		EnergyPlus::sqlite = std::unique_ptr<SQLite>( new SQLite() );
-	}
-	catch ( const std::runtime_error& error ) {
-			ShowFatalError( error.what() );		
-	}
+	//// autosize nominal gas use rate
+	//int write_stat;
+	//OutputFileInits = GetNewUnitNumber();
+	//{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
+	//try {
+		//EnergyPlus::sqlite = std::unique_ptr<SQLite>( new SQLite() );
+	//}
+	//catch ( const std::runtime_error& error ) {
+			//ShowFatalError( error.what() );		
+	//}
 
 	OutBaroPress = 101325.0;
 	thisHum.SizeHumidifier();
@@ -100,22 +100,22 @@ TEST( GasFiredHumidifierTest, EnergyUse ) {
 	thisHum.SchedPtr = ScheduleAlwaysOn;
 
 	FinalSysSizing.allocate( CurSysNum );
-	FinalSysSizing( CurSysNum ).CoolMixTemp = 20.0;
-	FinalSysSizing( CurSysNum ).CoolMixHumRat = 0.00089;
+	FinalSysSizing( CurSysNum ).MixTempAtCoolPeak = 20.0;
+	FinalSysSizing( CurSysNum ).MixHumRatAtCoolPeak = 0.00089;
 	FinalSysSizing( CurSysNum ).DesMainVolFlow = 1.60894;
 	FinalSysSizing( CurSysNum ).HeatMixHumRat = 0.05;
 	FinalSysSizing( CurSysNum ).CoolSupHumRat = 0.07;
 	FinalSysSizing( CurSysNum ).HeatSupHumRat = 0.10;
 
-	// autosize capacity and nominal power(or nominal gas use rate)
-	int write_stat;
-	OutputFileInits = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
-	try {
-		EnergyPlus::sqlite = std::unique_ptr<SQLite>( new SQLite() );
-	} catch ( const std::runtime_error& error ) {
-		ShowFatalError( error.what() );
-	}
+	//// autosize capacity and nominal power(or nominal gas use rate)
+	//int write_stat;
+	//OutputFileInits = GetNewUnitNumber();
+	//{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
+	//try {
+		//EnergyPlus::sqlite = std::unique_ptr<SQLite>( new SQLite() );
+	//} catch ( const std::runtime_error& error ) {
+		//ShowFatalError( error.what() );
+	//}
 
 	// resize the humidifier nominal capacity and gas use rate
 	thisHum.NomCapVol = 4.00E-5;
