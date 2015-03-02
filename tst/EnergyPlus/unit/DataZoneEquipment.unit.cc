@@ -28,4 +28,6 @@ TEST( DataZoneEquipment, TestGetSystemNodeNumberForZone )
 
 	EXPECT_EQ( 0, GetSystemNodeNumberForZone( "NonExistingZone" ) );
 	EXPECT_EQ( 1, GetSystemNodeNumberForZone( "Zone1" ) );
+
+	ZoneEquipConfig.deallocate();
 }
