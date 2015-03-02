@@ -71,4 +71,5 @@ TEST( TwoSpeedFluidCoolerInput, Test1 )
 	testResult = TestFluidCoolerTwoSpeedInputForDesign( cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames, FluidCoolerNum );
 	EXPECT_TRUE( testResult ); // error message triggered
 
+	SimpleFluidCooler.deallocate();
 }

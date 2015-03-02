@@ -540,10 +540,35 @@ namespace FluidCoolers {
 	int const &	FluidCoolerNum 
 	)
 	{
-		//the purpose of this routine is to separate the testing of inputs related to design so that it could be called from the unit tests
+		// FUNCTION INFORMATION:
+		//       AUTHOR:          Chandan Sharma
+		//       DATE WRITTEN:    August 2008
+		//       MODIFIED         Chandan Sharma, FSEC, April 2010
+		//       RE-ENGINEERED    Jason Glazer, GARD Analytics, February 2015, refactor into a separate function
 
+		// PURPOSE OF THIS FUNCTION:
+		// Separate the testing of inputs related to design so that it could be called from the unit tests
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// Based on GetTowerInput subroutine from Don Shirey, Jan 2001 and Sept/Oct 2002;
+
+		// Using/Aliasing
 		using DataSizing::AutoSize;
 		using InputProcessor::SameString;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		bool ErrorsFound = false;
 
 		//   Design entering water temperature, design entering air temperature and design entering air
