@@ -32,7 +32,7 @@ configure_file(cmake/license.in.txt "${CMAKE_BINARY_DIR}/license.txt" @ONLY)
 install(FILES "${CMAKE_BINARY_DIR}/license.txt" DESTINATION "./")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/license.txt")
 
-install( FILES "${CMAKE_BINARY_DIR}/Products/Energy+.idd" DESTINATION ./ )
+install( FILES "${CMAKE_BINARY_DIR}/Energy+.idd" DESTINATION ./ )
 
 # Install files that are in the current repo
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/datasets/AirCooledChiller.idf" DESTINATION "./DataSets")
