@@ -18,7 +18,7 @@ endif()
 # so we use a file to mark the time stamp.
 # The IDD is a dependency of the EnergyPlus target and will be built along side the energyplus executable.
 set(IDD_SOURCE_PATH "${CMAKE_SOURCE_DIR}/idd/Energy+.idd.in")
-set(IDD_OUTPUT_PATH "$<TARGET_FILE_DIR:energyplus>/Energy+.idd")
+set(IDD_OUTPUT_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/Energy+.idd)
 # IDD_HIDDEN_OUTPUT_PATH is a location where a copy of the configured idd will be located.
 # This path does not include the $<CONFIGURATION> subdirectory so that it can be located with cmake 2.8 
 # version of install command.
