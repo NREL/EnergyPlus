@@ -2092,10 +2092,8 @@
     Condenser Water Loop,    !- Plant or Condenser Loop Name
     condenser,               !- Loop Type
     29.4,                    !- Design Loop Exit Temperature {C}
-    5.6,                     !- Loop Design Temperature Difference {deltaC}
-    Coincident,              !- Sizing Option
-    1,                       !- Zone Timesteps in Averaging Window
-    None;                    !- Coincident Sizing Factor Mode
+    5.6;                     !- Loop Design Temperature Difference {deltaC}
+
     
   OutdoorAir:NodeList,
     OutsideAirInletNodes;    !- Node or NodeList Name 1
