@@ -3189,16 +3189,16 @@ namespace ManageElectricPower {
 		Real64 const E0c,
 		Real64 const InternalR )
 	{
-		// SUBROUTINE INFORMATION:
+		// FUNCTION INFORMATION:
 		//       AUTHOR         B. Griffith
 		//       DATE WRITTEN   June-August 2008
 		//       MODIFIED       BG May 2009, added EMS
 		//                      BN (FSEC) Feb 2010 (pass out two storage values)
 		//                      Y. KyungTae & W. Wang July-August, 2011 Added a battery model
-		//       RE-ENGINEERED  J. Glazer February 2015, refactor charge calculation into a function
+		//       RE-ENGINEERED  Jason Glazer, GARD Analytics, February 2015, refactor charge calculation into a function
 
 		// PURPOSE OF THIS FUNCTION:
-		// calculate the current for battery discharge
+		// Calculate the current for battery discharge in a separate function so that it could be called from the unit tests
 
 		// METHODOLOGY EMPLOYED:
 		// na
