@@ -629,6 +629,6 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps )
 
 	testSizeSimManagerObj.ProcessCoincidentPlantSizeAdjustments( 1 );
 
-	testSizeSimManagerObj.sizingLogger.IncrementSizingPeriodSet( 1 );
+	testSizeSimManagerObj.sizingLogger.IncrementSizingPeriodSet( );
 
 }

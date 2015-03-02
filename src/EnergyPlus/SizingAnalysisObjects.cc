@@ -147,7 +147,6 @@ namespace EnergyPlus {
 		using DataLoopNode::Node;
 		int lastZnStepIndex( 0 );
 		int ztIndex( 0 );
-		int systIndex ( 0 );
 		int oldNumSubSteps;
 		int newNumSubSteps;
 		Real64 const MinutesPerHour( 60.0 );
@@ -264,21 +263,6 @@ namespace EnergyPlus {
 		val = ztStepObj[index].runningAvgDataValue ;
 
 		return val;
-	}
-
-	void SizingLog::AdjustEnvrnIndexMapForIteration(
-		int const HVACSizingIterCount
-	){
-//		std::map< int, int >:: iterator end = envrnStartZtStepIndexMap.end();
-//		for (std::map< int, int >:: iterator itr = envrnStartZtStepIndexMap.begin(); itr != end; ++itr){
-		
-//		Environment( itr->first )
-//		newEnvrnToSeedEnvrnMap
-
-//		}
-//		for ( int i = 0; i < NumOfEnvironmentsInLogSet; i++ ) {
-//			EnvrnIndexMapByEnvrn[ i ] = EnvrnIndexMapByEnvrn[ i ] + NumOfEnvironmentsInLogSet;
-//		}
 	}
 
 	void SizingLog::ReInitLogForIteration()
@@ -413,7 +397,6 @@ namespace EnergyPlus {
 	{
 		int const SysIndex ( 2 );
 		Real64 const MinutesPerHour( 60.0 );
-		int const HoursPerDay( 24 );
 		using namespace OutputProcessor;
 		ZoneTimestepObject tmpztStepStamp; 
 		SystemTimestepObject tmpSysStepStamp;
@@ -432,11 +415,9 @@ namespace EnergyPlus {
 
 	}
 
-	void SizingLoggerFramework::IncrementSizingPeriodSet( 
-		int const HVACSizingIterCount )
+	void SizingLoggerFramework::IncrementSizingPeriodSet( )
 	{
 		for ( auto &L : this -> logObjs ) {
-		//	L.AdjustEnvrnIndexMapForIteration( HVACSizingIterCount );
 			L.ReInitLogForIteration();
 		}
 	}
@@ -509,6 +490,7 @@ namespace EnergyPlus {
 		newFoundVolFlowRate = newFoundMassFlowRate / densityForSizing;
 
 		// now apply the correct sizing factor depending on input option
+		SizingFac = 1.0;
 		if ( PlantSizData( plantLoopIndex ).SizingFactorOption == NoSizingFactorMode ) {
 			SizingFac = 1.0;
 		} else if ( PlantSizData( plantLoopIndex ).SizingFactorOption == GlobalHeatingSizingFactorMode ) { 

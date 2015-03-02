@@ -103,10 +103,6 @@ public:
 		ZoneTimestepObject tmpztStepStamp
 		);
 
-	void AdjustEnvrnIndexMapForIteration(
-		int const HVACSizingIterCount
-	);
-
 	void ReInitLogForIteration();
 
 	void SetupNewEnvironment(
@@ -141,9 +137,7 @@ public:
 
 	void SetupSizingLogsNewEnvironment( );
 
-	void IncrementSizingPeriodSet(
-		int const HVACSizingIterCount
-	);
+	void IncrementSizingPeriodSet( );
 private:
 	int NumOfLogs = 0;
 
@@ -198,7 +192,7 @@ private:
 	Real64 newAdjustedMassFlowRate = 0.0; // with sizing factor included...
 	Real64 newFoundMassFlowRate = 0.0;
 
-	const Real64 significantNormalizedChange = 0.005 ;
+	Real64 significantNormalizedChange = 0.005 ;
 	Real64 densityForSizing = 0.0;
 	Real64 specificHeatForSizing = 0.0;
 	Real64 plantSizingFraction = 0.0;
