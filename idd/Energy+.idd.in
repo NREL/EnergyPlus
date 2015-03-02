@@ -22300,7 +22300,7 @@ AirflowNetwork:MultiZone:Zone,
       \note This is the whole building width along the direction of the facade of this zone.
   A6; \field Occupant Ventilation Control Name
       \type object-list
-      \object-list AirflowNetwork:OccupantVentilationControlNames
+      \object-list AirflowNetworkOccupantVentilationControlNames
       \note Enter the name where Occupancy Ventilation Control is required.
 
 AirflowNetwork:MultiZone:Surface,
@@ -22415,7 +22415,7 @@ AirflowNetwork:MultiZone:Surface,
       \note Not used if Ventilation Control Mode = NoVent or ZoneLevel.
   A7; \field Occupant Ventilation Control Name
       \type object-list
-      \object-list AirflowNetwork:OccupantVentilationControlNames
+      \object-list AirflowNetworkOccupantVentilationControlNames
       \note Enter the name where Occupancy Ventilation Control is required.
 
 AirflowNetwork:MultiZone:ReferenceCrackConditions,
@@ -23578,7 +23578,7 @@ AirflowNetwork:OccupantVentilationControl,
   A1, \field Name
       \required-field
       \type alpha
-      \reference AirflowNetwork:OccupantVentilationControlNames
+      \reference AirflowNetworkOccupantVentilationControlNames
       \note Enter the name where the advanced thermal comfort control is required.
   N1, \field Minimum Opening Time
       \type real
