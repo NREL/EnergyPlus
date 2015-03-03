@@ -19965,6 +19965,7 @@ ElectricEquipment:ITE:AirCooled,
        \required-field
        \type object-list
        \object-list BiVariateCurves
+       \object-list BiVariateTables
        \note The name of a two-variable curve or table lookup object which modifies the CPU power
        \note input as a function of CPU loading (x) and air inlet node temperature (y). 
        \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and 
@@ -19985,6 +19986,7 @@ ElectricEquipment:ITE:AirCooled,
        \required-field
        \type object-list
        \object-list BiVariateCurves
+       \object-list BiVariateTables
        \note The name of a two-variable curve or table lookup object which modifies the cooling
        \note air flow rate as a function of CPU loading (x) and air inlet node temperature (y). 
        \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and 
@@ -19993,6 +19995,7 @@ ElectricEquipment:ITE:AirCooled,
        \required-field
        \type object-list
        \object-list UniVariateCurves
+       \object-list UniVariateTables
        \note The name of a single-variable curve or table lookup object which modifies the cooling
        \note fan power as a function of flow fraction (x). 
        \note This curve (table) should equal 1.0 at a flow fraction of 1.0. 
@@ -20049,6 +20052,7 @@ ElectricEquipment:ITE:AirCooled,
   A14, \field Recirculation Function of Loading and Supply Temperature Curve Name
        \type object-list
        \object-list BiVariateCurves
+       \object-list BiVariateTables
        \note The name of a two-variable curve or table lookup object which modifies the recirculation
        \note fractionas a function of CPU loading (x) and supply air node temperature (y). 
        \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and 
@@ -20064,6 +20068,7 @@ ElectricEquipment:ITE:AirCooled,
   A15, \field Electric Power Supply Efficiency Function of Part Load Ratio Curve Name
        \type object-list
        \object-list BiVariateCurves
+       \object-list BiVariateTables
        \note The name of a two-variable curve or table lookup object which modifies the recirculation
        \note fractionas a function of CPU loading (x) and supply air node temperature (y). 
        \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and 
@@ -48016,7 +48021,7 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \autosizable
   N6 , \field Secondary Air Flow Scaling Factor
        \type real
-       \units nondimensional
+       \units dimensionless
        \note This field is used when the previous field is set to autoize.  The Primary Design Air Flow Rate is scaled using this factor
        \note to calculate the secondary design air flow rate.  
   N7 , \field Secondary Air Fan Design Power
@@ -48165,9 +48170,9 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \type node
   A6 , \field Air Outlet Node Name
        \type node
-  A7 , \Field Sensor Node Name
+  A7 , \field Sensor Node Name
        \type node
-  A8 , \Field Water Supply Storage Tank Name
+  A8 , \field Water Supply Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
   N4 , \field Drift Loss Fraction

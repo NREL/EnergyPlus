@@ -467,7 +467,7 @@ namespace EvaporativeCoolers {
 	Real64
 	CalcEvapCoolRDDSecFlowResidual(
 		Real64 const AirMassFlowSec,
-		Optional< FArray1S< Real64 > const > Par = _ //Par( 6 ) is desired temperature C
+		FArray1< Real64 > const & Par //Par( 6 ) is desired temperature C
 	);
 
 	Real64
