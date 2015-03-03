@@ -871,7 +871,7 @@ namespace PlantHeatExchangerFluidToFluid {
 				}
 				if ( PlantFirstSizesOkayToReport ) {
 					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, 
-						"Inital Heat Exchanger U-Factor Times Area Value [W/C]", FluidHX( CompNum ).UA );
+						"Initial Heat Exchanger U-Factor Times Area Value [W/C]", FluidHX( CompNum ).UA );
 					ReportSizingOutput( "HeatExchanger:FluidToFluid", FluidHX( CompNum ).Name, 
 						"Initial Loop-to-loop Temperature Difference Used to Size Heat Exchanger U-Factor Times Area Value [C]", tmpDeltaTloopToLoop );
 				}

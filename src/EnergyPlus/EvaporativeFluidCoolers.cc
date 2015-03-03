@@ -1296,7 +1296,7 @@ namespace EvaporativeFluidCoolers {
 					}
 					if ( PlantFirstSizesOkayToReport ) { 
 						ReportSizingOutput( cEvapFluidCooler_SingleSpeed, SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name, 
-							"Inital Design Water Flow Rate based on evaporative fluid cooler Standard Design Capacity [m3/s]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate );
+							"Initial Design Water Flow Rate based on evaporative fluid cooler Standard Design Capacity [m3/s]", SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate );
 					}
 				} else if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
 					if ( PlantFinalSizesOkayToReport ) { 
