@@ -4723,6 +4723,7 @@ namespace SimAirServingZones {
 				SysCoolRetHumRat = 0.0;
 				SysCoolMixHumRat = 0.0;
 				SysCoolZoneAvgTemp = 0.0;
+				SysTotCoolCap = 0.0;
 
 				for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over zones cooled by central system
 					CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
