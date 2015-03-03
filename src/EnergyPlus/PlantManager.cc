@@ -949,6 +949,10 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_GrndHtExchgPond;
 							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+						} else if ( SameString( this_comp_type, "GroundHeatExchanger:Slinky" ) ) {
+							this_comp.TypeOf_Num = TypeOf_GrndHtExchgSlinky;
+							this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
+							this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
 						} else if ( SameString( this_comp_type, "Chiller:Electric:EIR" ) ) {
 							this_comp.TypeOf_Num = TypeOf_Chiller_ElectricEIR;
 							this_comp.GeneralEquipType = GenEquipTypes_Chiller;
@@ -1605,6 +1609,8 @@ namespace PlantManager {
 						} else if ( SameString( this_comp.TypeOf, "GroundHeatExchanger:Surface" ) ) {
 							GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 						} else if ( SameString( this_comp.TypeOf, "GroundHeatExchanger:Pond" ) ) {
+							GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
+						} else if ( SameString( this_comp.TypeOf, "GroundHeatExchanger:Slinky" ) ) {
 							GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
 						} else if ( SameString( this_comp.TypeOf, "PlantComponent:TemperatureSource" ) ) {
 							GeneralEquipType = GenEquipTypes_HeatExchanger;
@@ -3840,7 +3846,6 @@ namespace PlantManager {
 							this_component.FlowCtrl = ControlType_Active;
 							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
 							this_component.HowLoadServed = HowMet_PassiveCap;
-
 						} else if ( SELECT_CASE_var == TypeOf_Generator_MicroTurbine ) { //          = 48  !newer FSEC turbine
 							this_component.FlowCtrl = ControlType_Active;
 							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
@@ -4034,6 +4039,10 @@ namespace PlantManager {
 							this_component.FlowCtrl = ControlType_Active;
 							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
 							this_component.HowLoadServed = HowMet_NoneDemand;
+						} else if ( SELECT_CASE_var == TypeOf_GrndHtExchgVertical ) { // = 91
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_PassiveCap;
 						} else {
 							ShowSevereError( "SetBranchControlTypes: Caught unexpected equipment type of number" );
 

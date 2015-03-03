@@ -62334,6 +62334,156 @@ GroundHeatExchanger:HorizontalTrench,
         \note  = 0.5 : short grass, much like a manicured lawn
         \note  = 1   : standard reference state (12 cm grass)
         \note  = 1.5 : wild growth
+        
+GroundHeatExchanger:Slinky,
+        \memo This models a slinky horizontal heat exchanger 
+        \memo placed in a series of trenches
+        \memo The model uses the model developed by:
+        \memo Xiong, Z., D.E. Fisher, and J.D. Spitler. 2015.
+        \memo Development and Validation of a Slinky Ground Heat
+        \memo Exchanger Model. Applied Energy 141: 57-69.
+   A1 , \field Name
+        \required-field
+   A2 , \field Inlet Node Name
+        \type node
+        \required-field
+   A3 , \field Outlet Node Name
+        \type node
+        \required-field
+   N1 , \field Design Flow Rate
+        \type real
+        \units m3/s
+        \minimum> 0
+        \default 0.002
+   N4 , \field Soil Thermal Conductivity
+        \type real
+        \units W/m-K
+        \minimum> 0
+        \default 1.08        
+   N2 , \field Soil Density
+        \type real
+        \units kg/m3
+        \minimum> 0
+        \default 962
+   N3,  \field Soil Specific Heat
+        \required-field
+        \type real
+        \units J/kg-K
+        \minimum> 0
+        \default 2576
+   N7,  \field Pipe Thermal Conductivity
+        \type real
+        \units W/m-K
+        \minimum> 0
+        \default 0.4
+   N5,  \field Pipe Density
+        \type real
+        \units kg/m3
+        \minimum> 0
+        \default 641
+   N6,  \field Pipe Specific Heat
+        \type real
+        \units J/kg-K
+        \minimum> 0
+        \default 2405
+   N8 , \field Pipe Outer Diameter
+        \type real
+        \units m
+        \minimum> 0
+        \ip-units in
+        \default 0.02667        
+   N9 , \field Pipe Thickness
+        \type real
+        \units m
+        \minimum> 0
+        \ip-units in
+        \default 0.002413
+   A4 , \field Heat Exchanger Configuration
+        \note This is the orientation of the heat exchanger
+        \type choice
+        \key Vertical
+        \key Horizontal
+   N10 ,\field Coil Diameter
+        \note This is the diameter of the heat exchanger coil
+        \type real
+        \units m
+        \minimum> 0
+        \ip-units ft
+        \default 1.0       
+   N7 , \field Coil Pitch
+        \note This is the center-to-center distance between coils
+        \type real
+        \units m
+        \minimum> 0
+        \ip-units ft
+        \default 0.20   
+   N7 , \field Trench Depth
+        \note This is the distance from the ground surface to the
+        \note trench bottom
+        \type real
+        \units m
+        \minimum> 0
+        \ip-units ft
+        \default 1.8     
+   N2 , \field Trench Length
+        \note This is the total length of a single trench
+        \note This assumes the heat exchanger runs the full length 
+        \note of the trench
+        \type real
+        \units m
+        \minimum> 0
+        \ip-units ft
+        \default 10 
+   N3 , \field Number of Trenches
+        \note This is the number of parallel trenches that 
+        \note has a heat exchanger, one per trench
+        \type integer
+        \minimum 1
+        \default 1
+   N4 , \field Horizontal Spacing Between Pipes
+        \note This represents the average horizontal spacing 
+        \note between any two
+        \note trenches for heat exchangers that have multiple trenches
+        \type real
+        \units m
+        \minimum> 0
+        \ip-units ft
+        \default 2.0
+   N16, \field Kusuda-Achenbach Average Surface Temperature
+        \note This is the parameter for average annual surface
+        \note temperature
+        \note This is an optional input in that if it is missing, a
+        \note Site:GroundTemperature:Shallow object must be found 
+        \note in the input
+        \note The undisturbed ground temperature will be 
+        \note approximated from this object
+        \type real
+        \units C
+   N17, \field Kusuda-Achenbach Average Amplitude of Surface 
+        \note Temperature
+        \note This is the parameter for annual average amplitude from
+        \note average surface temperature
+        \note This is an optional input in that if it is missing, a
+        \note Site:GroundTemperature:Shallow object must be found 
+        \note in the input
+        \note The undisturbed ground temperature will be approximated
+        \note from this object
+        \type real
+        \units deltaC
+   N18, \field Kusuda-Achenbach Phase Shift of Minimum Surface 
+        \note Temperature
+        \note This is the parameter for phase shift from minimum
+        \note surface temperature
+        \note This is an optional input in that if it is missing, a
+        \note Site:GroundTemperature:Shallow object must be found 
+        \note in the input
+        \note The undisturbed ground temperature will be approximated
+        \note from this object
+        \type real
+        \units days
+   N19; \field Maximum Length of Simulation
+        \type real
+        \units years
 
 HeatExchanger:FluidToFluid,
         \memo A fluid/fluid heat exchanger designed to couple the supply side of one loop to the demand side of another loop
