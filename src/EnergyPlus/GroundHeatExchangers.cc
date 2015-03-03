@@ -1,6 +1,5 @@
 // C++ Headers
 #include <cmath>
-#include <fstream>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
@@ -1267,7 +1266,7 @@ namespace GroundHeatExchangers {
 		//SUBHOURLY Qn IS NOT AGGREGATED . IT IS THE BASIC LOAD
 		if ( prevHour != locHourOfDay ) {
 			SumQnHr = 0.0;
-			for ( J = 1; J <= ( N - LastHourN( 1 ) ); ++J ) { // Check during debugging if we need a +1
+			for ( J = 1; J <= ( N - LastHourN( 1 ) ); ++J ) {
 				SumQnHr += QnSubHr( J ) * std::abs( prevTimeSteps( J ) - prevTimeSteps( J + 1 ) );
 			}
 			SumQnHr /= std::abs( prevTimeSteps( 1 ) - prevTimeSteps( J ) );
@@ -2127,6 +2126,7 @@ namespace GroundHeatExchangers {
 			prevTimeSteps = 0.0;
 			currentSimTime = 0.0;
 			QGLHE = 0.0;
+			prevHour = 1;
 		}
 
 		massFlowRate = RegulateCondenserCompFlowReqOp( loopNum, loopSideNum, branchNum, compNum, designMassFlow );
@@ -2214,6 +2214,7 @@ namespace GroundHeatExchangers {
 			prevTimeSteps = 0.0;
 			currentSimTime = 0.0;
 			QGLHE = 0.0;
+			prevHour = 1;
 		}
 
 		tempGround = getKAGrndTemp( coilDepth, DayOfSim, averageGroundTemp, averageGroundTempAmplitude, phaseShiftOfMinGroundTempDays);
