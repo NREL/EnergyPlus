@@ -9522,7 +9522,13 @@ Label50: ;
 			ShowSevereError( "CalcMultiSpeedDXCoilCooling: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + " Developer error - inconsistent airflow rates." );
 			ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0, then MSHPMassFlowRateLow and MSHPMassFlowRateHigh must also be > 0.0" );
 			ShowContinueErrorTimeStamp( "" );
-			ShowContinueError( "AirMassFlow=" + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio=" + RoundSigDigits( CycRatio, 3 ) + ", MSHPMassFlowRateLow=" + RoundSigDigits( MSHPMassFlowRateLow, 3 ) + ", MSHPMassFlowRateHigh=" + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
+			ShowContinueError( "AirMassFlow = " + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio = " + RoundSigDigits( CycRatio, 3 ) + ", MSHPMassFlowRateLow = " + RoundSigDigits( MSHPMassFlowRateLow, 3 ) + ", MSHPMassFlowRateHigh = " + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
+			ShowFatalError( "Preceding condition(s) causes termination." );
+		} else if ( CycRatio > 1.0 || SpeedRatio > 1.0 ) {
+			ShowSevereError( "CalcMultiSpeedDXCoilCooling: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + " Developer error - inconsistent speed ratios." );
+			ShowContinueError( "CycRatio and SpeedRatio must be between 0.0 and 1.0" );
+			ShowContinueErrorTimeStamp( "" );
+			ShowContinueError( "CycRatio=" + RoundSigDigits( CycRatio, 1 ) + ", SpeedRatio = " + RoundSigDigits( SpeedRatio, 1 ) );
 			ShowFatalError( "Preceding condition(s) causes termination." );
 		}
 
@@ -10139,6 +10145,12 @@ Label50: ;
 			ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0, then MSHPMassFlowRateLow and MSHPMassFlowRateHigh must also be > 0.0" );
 			ShowContinueErrorTimeStamp( "" );
 			ShowContinueError( "AirMassFlow=" + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio=" + RoundSigDigits( CycRatio, 3 ) + ", MSHPMassFlowRateLow=" + RoundSigDigits( MSHPMassFlowRateLow, 3 ) + ", MSHPMassFlowRateHigh=" + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
+			ShowFatalError( "Preceding condition(s) causes termination." );
+		} else if ( CycRatio > 1.0 || SpeedRatio > 1.0 ) {
+			ShowSevereError( "CalcMultiSpeedDXCoilHeating: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + " Developer error - inconsistent speed ratios." );
+			ShowContinueError( "CycRatio and SpeedRatio must be between 0.0 and 1.0" );
+			ShowContinueErrorTimeStamp( "" );
+			ShowContinueError( "CycRatio=" + RoundSigDigits( CycRatio, 1 ) + ", SpeedRatio = " + RoundSigDigits( SpeedRatio, 1 ) );
 			ShowFatalError( "Preceding condition(s) causes termination." );
 		}
 
