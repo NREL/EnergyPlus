@@ -236,7 +236,7 @@ namespace EnergyPlus {
 			sizeSimManagerObj.SetupSizingAnalyses();
 
 			DisplayString( "Beginning HVAC Sizing Simulation" );
-			if (! ReportDuringHVACSizingSimulation) DoOutputReporting = false;
+			DoOutputReporting = true;
 
 			ResetEnvironmentCounter();
 

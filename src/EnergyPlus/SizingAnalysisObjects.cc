@@ -243,6 +243,10 @@ namespace EnergyPlus {
 		ZoneTimestepObject tmpztStepStamp;
 		MaxVal = 0.0;
 
+		if ( ! ztStepObj.empty() ) {
+			tmpztStepStamp = ztStepObj[ 1 ];
+		}
+
 		for ( auto &Zt : ztStepObj ){
 			
 			if ( Zt.runningAvgDataValue > MaxVal) {
@@ -520,6 +524,7 @@ namespace EnergyPlus {
 
 		//compare threshold, 
 		SetNewSizes = false;
+		NormalizedChange = 0.0;
 		if (   ( newVolDesignFlowRate > SmallWaterVolFlow ) // do not use zero size
 //			&& ( newVolDesignFlowRate < previousVolDesignFlowRate )// assume only shrink size from noncoincident? nah
 			)  { 

@@ -26,7 +26,7 @@ public:
 	Real64 CurMinuteStart		= 0.0; //minutes at beginning of system timestep
 	Real64 CurMinuteEnd			= 0.0; //minutes at end of system timestep
 	Real64 TimeStepDuration		= 0.0; //in fractional hours, length of timestep
-	Real64 LogDataValue			= 0.0;
+	Real64 LogDataValue			= 0.0; // raw hard value, obtained from pointer
 	int stStepsIntoZoneStep		= 0;
 };
 
@@ -66,12 +66,12 @@ public:
 	int NumOfEnvironmentsInLogSet;
 	int NumOfDesignDaysInLogSet;
 	int NumberOfSizingPeriodsInLogSet;
-	std::map < int, int > ztStepCountByEnvrnMap; // key is the seed original Environment number, or index in the Enviroinment Structure
-	std::map < int, int > envrnStartZtStepIndexMap; // key is the seed original Environment number
-	std::map < int, int > newEnvrnToSeedEnvrnMap; // key is the new HVAC sim envrionment number, produces Seed envrionment number 
+	std::map < int, int > ztStepCountByEnvrnMap; // key is the seed original Environment number, or index in the Environment Structure
+	std::map < int, int > envrnStartZtStepIndexMap; // key is the seed original Environment number, produces index in zone step vector where that period begins
+	std::map < int, int > newEnvrnToSeedEnvrnMap; // key is the new HVAC sim envrionment number, produces Seed environment number 
 	int NumOfStepsInLogSet; // sum of all zone timestep steps in log
-	int timeStepsInAverage;
-	Real64 *p_rVariable;
+	int timeStepsInAverage; // breadth back in time for running average, zone timesteps
+	Real64 *p_rVariable;    // pointer to variable being loggged
 
 	std::vector< ZoneTimestepObject > ztStepObj; //will be sized to the sum of all steps, eg. timesteps in hour * 24 hours * 2 design days.  
 
@@ -144,7 +144,7 @@ public:
 	int supplySideInletNodeNum = 0; // node index for supply side inlet node
 	int plantSizingIndex = 0;
 	int numTimeStepsInAvg = 0;
-	ZoneTimestepObject newFoundMassFlowRateTimeStamp;
+	ZoneTimestepObject newFoundMassFlowRateTimeStamp;  // result for max mass flow, as a timestamp object
 	Real64 peakMdotCoincidentReturnTemp;
 	Real64 peakMdotCoincidentDemand;
 	bool anotherIterationDesired = false ;
@@ -153,7 +153,7 @@ public:
 	// variables related to loop demand
 	int loopDemand_LogIndex; // Loop demand load index for vector of log objects in the logger framework
 	bool peakDemandAndFlowMismatch;
-	ZoneTimestepObject NewFoundMaxDemandTimeStamp;
+	ZoneTimestepObject NewFoundMaxDemandTimeStamp; // result for max loop demand, as a timestamp object
 
 	Real64 peakDemandReturnTemp;
 	Real64 peakDemandMassFlow;
@@ -177,7 +177,7 @@ private:
 	std::string name = ""; // name of analysis object
 	Real64 newAdjustedMassFlowRate = 0.0; // with sizing factor included...
 	Real64 newFoundMassFlowRate = 0.0;
-	Real64 significantNormalizedChange = 0.005 ;
+	Real64 significantNormalizedChange = 0.005 ; // criteria for if sizing algorithm yeild a change large enough worth making another pass. 
 	Real64 densityForSizing = 0.0;
 	Real64 specificHeatForSizing = 0.0;
 	Real64 plantSizingFraction = 0.0;
