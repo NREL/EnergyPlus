@@ -10707,12 +10707,15 @@ namespace HVACUnitarySystem {
 						if ( MultiOrVarSpeedCoolCoil( UnitarySysNum ) ) {
 							CoolSpeedNum = UnitarySystem( UnitarySysNum ).CoolingSpeedNum;
 							if ( CoolSpeedNum < 1 ) {
+								CompOnMassFlow = UnitarySystem( UnitarySysNum ).IdleMassFlowRate;
 								CompOffMassFlow = UnitarySystem( UnitarySysNum ).IdleMassFlowRate;
 								CompOffFlowRatio = UnitarySystem( UnitarySysNum ).IdleSpeedRatio;
 							} else if ( CoolSpeedNum == 1 ) {
+								CompOnMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 1 );
 								CompOffMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 1 );
 								CompOffFlowRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 1 );
 							} else if ( CoolSpeedNum > 1 ) {
+								CompOnMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum );
 								CompOffMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum - 1 );
 								CompOffFlowRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( CoolSpeedNum - 1 );
 							}
@@ -10721,13 +10724,24 @@ namespace HVACUnitarySystem {
 							CompOffFlowRatio = UnitarySystem( UnitarySysNum ).CoolingFanSpeedRatio;
 						}
 					} else {
-						if ( HeatSpeedNum <= 1 ) {
+						if ( HeatSpeedNum == 0 ) {
 							CompOffMassFlow = UnitarySystem( UnitarySysNum ).IdleMassFlowRate;
 							CompOffFlowRatio = UnitarySystem( UnitarySysNum ).IdleSpeedRatio;
+						} else if ( HeatSpeedNum == 1 ) {
+							CompOffMassFlow = UnitarySystem( UnitarySysNum ).HeatMassFlowRate( HeatSpeedNum );
+							CompOffFlowRatio = UnitarySystem( UnitarySysNum ).HeatMassFlowRate( HeatSpeedNum );
 						} else {
 							CompOffMassFlow = UnitarySystem( UnitarySysNum ).HeatMassFlowRate( HeatSpeedNum - 1 );
 							CompOffFlowRatio = UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( HeatSpeedNum - 1 );
 						}
+					}
+				} else {
+					if ( HeatSpeedNum <= 1 ) {
+						CompOffMassFlow = UnitarySystem( UnitarySysNum ).IdleMassFlowRate;
+						CompOffFlowRatio = UnitarySystem( UnitarySysNum ).IdleSpeedRatio;
+					} else {
+						CompOffMassFlow = UnitarySystem( UnitarySysNum ).HeatMassFlowRate( HeatSpeedNum - 1 );
+						CompOffFlowRatio = UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( HeatSpeedNum - 1 );
 					}
 				}
 			} else { // IF(MultiOrVarSpeedHeatCoil) THEN
@@ -10793,14 +10807,25 @@ namespace HVACUnitarySystem {
 				// UseCompressorOnFlow is used when the user does not enter a value for no cooling or heating flow rate
 				//    IF(UnitarySystem(UnitarySysNum)%FanOpMode == ContFanCycCoil)THEN
 				//      IF (UnitarySystem(UnitarySysNum)%AirFlowControl .EQ. UseCompressorOnFlow) THEN
-				if ( CoolSpeedNum <= 1 ) {
-					if ( UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) {
+				if ( UnitarySystem( UnitarySysNum ).FanOpMode == ContFanCycCoil ) {
+					if ( CoolSpeedNum == 0 ) {
 						CompOffMassFlow = UnitarySystem( UnitarySysNum ).IdleMassFlowRate;
 						CompOffFlowRatio = UnitarySystem( UnitarySysNum ).IdleSpeedRatio;
+					} else if ( CoolSpeedNum == 1 ) {
+						CompOffMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum );
+						CompOffFlowRatio = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum );
+					} else {
+						CompOffMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum - 1 );
+						CompOffFlowRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( CoolSpeedNum - 1 );
 					}
 				} else {
-					CompOffMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum - 1 );
-					CompOffFlowRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( CoolSpeedNum - 1 );
+					if ( CoolSpeedNum <= 1 ) {
+						CompOffMassFlow = UnitarySystem( UnitarySysNum ).IdleMassFlowRate;
+						CompOffFlowRatio = UnitarySystem( UnitarySysNum ).IdleSpeedRatio;
+					} else {
+						CompOffMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum - 1 );
+						CompOffFlowRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( CoolSpeedNum - 1 );
+					}
 				}
 			} else { // IF(MultiOrVarSpeedCoolCoil(UnitarySysNum)) THEN
 				CompOnMassFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirMassFlow;

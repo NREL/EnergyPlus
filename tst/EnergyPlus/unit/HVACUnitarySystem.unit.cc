@@ -52,6 +52,14 @@ TEST( SetOnOffMassFlowRateTest, Test1 )
 	UnitarySystem( UnitarySysNum ).HeatMassFlowRate( 3 ) = 1.0;
 	UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( 3 ) = 1.0;
 
+	UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 1 ) = 0.3;
+	UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 1 ) = 0.3;
+	UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 2 ) = 0.6;
+	UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 2 ) = 0.6;
+	UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 3 ) = 1.2;
+	UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 3 ) = 1.2;
+
+	// heating load at various speeds
 	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 3;
 	UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 0;
 	HeatingLoad = true;
@@ -68,6 +76,9 @@ TEST( SetOnOffMassFlowRateTest, Test1 )
 	EXPECT_EQ( 0.25, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.5, MSHPMassFlowRateHigh );
 
+	// constant fan mode should not drop to idle flow rate as speed = 1
+	UnitarySystem( UnitarySysNum ).FanOpMode = ContFanCycCoil;
+
 	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 1;
 	UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 0;
 	HeatingLoad = true;
@@ -76,13 +87,32 @@ TEST( SetOnOffMassFlowRateTest, Test1 )
 	EXPECT_EQ( 0.25, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.25, MSHPMassFlowRateHigh );
 
-	UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 1 ) = 0.3;
-	UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 1 ) = 0.3;
-	UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 2 ) = 0.6;
-	UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 2 ) = 0.6;
-	UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 3 ) = 1.2;
-	UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 3 ) = 1.2;
+	// heating load with moisture load (cooling coil operates)
+	MoistureLoad = -0.001;
+	UnitarySystem( UnitarySysNum ).Humidistat = true;
+	UnitarySystem( UnitarySysNum ).DehumidControlType_Num = DehumidControl_CoolReheat;
+	UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 3;
+	HeatingLoad = true;
+	CoolingLoad = false;
+	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+	EXPECT_EQ( 0.6, MSHPMassFlowRateLow );
+	EXPECT_EQ( 1.2, MSHPMassFlowRateHigh );
+	MoistureLoad = 0.0;
+	UnitarySystem( UnitarySysNum ).Humidistat = false;
+	UnitarySystem( UnitarySysNum ).DehumidControlType_Num = None;
 
+	// cycling fan mode should drop to idle flow rate as speed = 1
+	UnitarySystem( UnitarySysNum ).FanOpMode = CycFanCycCoil;
+
+	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 1;
+	UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 0;
+	HeatingLoad = true;
+	CoolingLoad = false;
+	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+	EXPECT_EQ( 0.20, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateHigh );
+
+	// cooling load at various speeds
 	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 0;
 	UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 3;
 	HeatingLoad = false;
@@ -99,6 +129,18 @@ TEST( SetOnOffMassFlowRateTest, Test1 )
 	EXPECT_EQ( 0.3, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.6, MSHPMassFlowRateHigh );
 
+	// cycling fan mode should drop to idle flow rate as speed = 1
+	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 0;
+	UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 1;
+	HeatingLoad = false;
+	CoolingLoad = true;
+	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+	EXPECT_EQ( 0.2, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.3, MSHPMassFlowRateHigh );
+
+	// constant fan mode should not drop to idle flow rate as speed = 1
+	UnitarySystem( UnitarySysNum ).FanOpMode = ContFanCycCoil;
+
 	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 0;
 	UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 1;
 	HeatingLoad = false;
@@ -106,4 +148,14 @@ TEST( SetOnOffMassFlowRateTest, Test1 )
 	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
 	EXPECT_EQ( 0.3, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.3, MSHPMassFlowRateHigh );
+
+	// no load condition (operates at idle speed)
+	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 0;
+	UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 0;
+	HeatingLoad = false;
+	CoolingLoad = false;
+	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+	EXPECT_EQ( 0.2, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.2, MSHPMassFlowRateHigh );
+
 }
