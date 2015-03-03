@@ -74345,7 +74345,7 @@ FaultModel:TemperatureSensorOffset:ReturnAir,
        \maximum< 10
        \default 0.0
        \units deltaC
-
+	   
 FaultModel:EnthalpySensorOffset:ReturnAir,
    \memo This object describes return air enthalpy sensor offset
    A1, \field Name
@@ -74371,6 +74371,54 @@ FaultModel:EnthalpySensorOffset:ReturnAir,
        \maximum< 20000
        \default 0.0
        \units J/kg
+
+FaultModel:ThermostatOffset,
+   A1, \field Name
+       \required-field
+       \type alpha
+   A2, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Severity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   N1, \field Reference Thermostat Offset
+       \required-field
+       \type real
+       \minimum> -10
+       \maximum< 10
+       \default 2
+       \units C
+   A4; \field Thermostat Name
+       \begin-extensible
+       \note Enter the name of a ZoneControl:Thermostat object.
+       \required-field
+       \type object-list
+       \object-list ZoneControlThermostaticNames
+
+FaultModel:HumidistatOffset,
+   A1, \field Name
+       \required-field
+       \type alpha
+   A2, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Severity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   N1, \field Reference Humidistat Offset
+       \required-field
+       \type real
+       \minimum> -20
+       \maximum< 20
+       \default 5
+       \units percent
+   A4; \field Humidistat Name
+       \begin-extensible
+       \note Enter the name of a ZoneControl:Humidistat object.
+       \required-field
+       \type object-list
+       \object-list ZoneControlHumidistaticNames
 
 FaultModel:Fouling:Coil,
    \memo This object describes fouling water heating or cooling coils
