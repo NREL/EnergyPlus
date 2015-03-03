@@ -126,7 +126,7 @@ TEST( VerticalGroundHeatExchangerTest, GetGFunc )
 	//Situation when correction is applied
 	thisGLHE.gReferenceRatio = 2.0;
 	thisGFunc = thisGLHE.getGFunc( time );
-	EXPECT_DOUBLE_EQ( 2.5 + 0.69314718055994530941, thisGFunc );
+	EXPECT_NEAR( 2.5 + 0.6931, thisGFunc, 0.0001);
 
 }
 
@@ -152,12 +152,12 @@ TEST( SlinkyGroundHeatExchangerTest, CalcHXResistance )
 
 	// Non-zero mass flow rate
 	thisGLHE.calcHXResistance();
-	EXPECT_DOUBLE_EQ( 0.11030797346079352, thisGLHE.HXResistance );
+	EXPECT_NEAR( 0.11030, thisGLHE.HXResistance, 0.0001 );
 
 	// Zero mass flow rate
 	thisGLHE.massFlowRate = 0.0;
 	thisGLHE.calcHXResistance();
-	EXPECT_DOUBLE_EQ( 0.070947569426448448, thisGLHE.HXResistance );
+	EXPECT_NEAR( 0.07094, thisGLHE.HXResistance, 0.0001 );
 }
 
 TEST( VerticalGroundHeatExchangerTest, CalcHXResistance )
@@ -184,28 +184,28 @@ TEST( VerticalGroundHeatExchangerTest, CalcHXResistance )
 
 	// Non-zero mass flow rate; 0.0 <= distanceRatio <= 2.5 correction factor
 	thisGLHE.calcHXResistance();
-	EXPECT_DOUBLE_EQ( 0.46965301169501888, thisGLHE.HXResistance );
+	EXPECT_NEAR( 0.46965, thisGLHE.HXResistance, 0.0001 );
 
 	// Non-zero mass flow rate; 0.25 < distanceRatio < 0.5 correction factor
 	thisGLHE.UtubeDist = 0.05;
 	thisGLHE.calcHXResistance();
-	EXPECT_DOUBLE_EQ( 0.44403289582888600, thisGLHE.HXResistance );
+	EXPECT_NEAR( 0.44403, thisGLHE.HXResistance, 0.0001 );
 
 	// Non-zero mass flow rate; 0.5 <= distanceRatio < 0.75 correction factor
 	thisGLHE.UtubeDist = 0.087;
 	thisGLHE.calcHXResistance();
-	EXPECT_DOUBLE_EQ( 0.30435221564381648, thisGLHE.HXResistance );
+	EXPECT_NEAR( 0.30435, thisGLHE.HXResistance, 0.0001 );
 
 	// Non-zero mass flow rate; all other distance ratios correction factor
 	thisGLHE.UtubeDist = 0.12;
 	thisGLHE.calcHXResistance();
-	EXPECT_DOUBLE_EQ( 0.20839061272324497, thisGLHE.HXResistance );
+	EXPECT_NEAR( 0.20839, thisGLHE.HXResistance, 0.0001 );
 
 	// Zero mass flow rate; distance ratio > 0.75 correction factor
 	thisGLHE.UtubeDist = 0.12;
 	thisGLHE.massFlowRate = 0.0;
 	thisGLHE.calcHXResistance();
-	EXPECT_DOUBLE_EQ( 0.16903020868889990, thisGLHE.HXResistance );
+	EXPECT_NEAR( 0.16903, thisGLHE.HXResistance, 0.0001 );
 }
 
 TEST( SlinkyGroundHeatExchangerTest, CalcGroundHeatExchanger )
@@ -227,11 +227,11 @@ TEST( SlinkyGroundHeatExchangerTest, CalcGroundHeatExchanger )
 
 	// Horizontal G-Functions
 	thisGLHE.calcGFunctions();
-	EXPECT_DOUBLE_EQ( 19.082374799600487, thisGLHE.GFNC( 28 ) );
+	EXPECT_NEAR( 19.08237, thisGLHE.GFNC( 28 ), 0.0001 );
 
 	// Vertical G-Functions
 	thisGLHE.verticalConfig = true;
 	thisGLHE.calcGFunctions();
-	EXPECT_DOUBLE_EQ( 18.918198584416000, thisGLHE.GFNC( 28 ) );
+	EXPECT_NEAR( 18.91819, thisGLHE.GFNC( 28 ), 0.0001 );
 
 }

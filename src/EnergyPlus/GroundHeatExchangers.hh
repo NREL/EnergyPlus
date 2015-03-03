@@ -348,7 +348,7 @@ namespace GroundHeatExchangers {
 
 	void
 	SimGroundHeatExchangers(
-		std::string const & GLHEType,
+		int const GLHETypeNum,
 		std::string const & name,
 		int & compIndex,
 		bool const runFlag,

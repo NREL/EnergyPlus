@@ -113,7 +113,7 @@ namespace GroundHeatExchangers {
 
 	void
 	SimGroundHeatExchangers(
-		std::string const & type,
+		int const typeNum,
 		std::string const & name,
 		int & compIndex,
 		bool const runFlag,
@@ -166,7 +166,7 @@ namespace GroundHeatExchangers {
 			GetInput = false;
 		}
 
-		if ( type == "GROUNDHEATEXCHANGER:VERTICAL" ) {
+		if ( typeNum == DataPlant::TypeOf_GrndHtExchgVertical ) {
 
 			// Find the correct GLHE
 			if ( compIndex == 0 ) {
@@ -208,7 +208,7 @@ namespace GroundHeatExchangers {
 			// Update HX Report Vars
 			thisGLHE.updateGHX();
 
-		} else if ( type == "GROUNDHEATEXCHANGER:SLINKY" ) {
+		} else if ( typeNum == DataPlant::TypeOf_GrndHtExchgSlinky ) {
 		
 			// Find the correct GLHE
 			if ( compIndex == 0 ) {
