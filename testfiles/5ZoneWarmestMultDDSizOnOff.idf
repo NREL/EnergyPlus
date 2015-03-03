@@ -11,7 +11,7 @@
 !                          Also illustrates the use of the "Coil Performance Input Method" for hot water coils.
 !                          And illustrates use of "Central Cooling Capacity Control Method" = OnOff
 !
-! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 3 design days, 2 run periods,
+! Simulation Location/Run: USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw, 3 design days, 2 run periods,
 !                          Run Control executes the run periods using the weather file
 !
 ! Location:                Chicago, IL
@@ -20,7 +20,7 @@
 !                          Chicago Ohare Intl Ap_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6°C MWB=23°C
 !                          Chicago Ohare Intl Ap_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2°C WB=25.5°C
 !
-! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
+! Run Period (Weather File): Winter 1/14, Summer 7/7, USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
 !
 ! Run Control:             Zone and System sizing with weather file run control (no design days run)
 !
