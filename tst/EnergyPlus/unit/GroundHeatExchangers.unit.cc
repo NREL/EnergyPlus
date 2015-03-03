@@ -234,18 +234,4 @@ TEST( SlinkyGroundHeatExchangerTest, CalcGroundHeatExchanger )
 	thisGLHE.calcGFunctions();
 	EXPECT_DOUBLE_EQ( 18.918198584416000, thisGLHE.GFNC( 28 ) );
 
-	//// Calculate Ground HX
-	//Node.allocate( 2 );
-	//thisGLHE.inletNodeNum = 1;
-	//Node( thisGLHE.inletNodeNum ).Temp = 5.0;
-
-	//PlantLoop.allocate( 1 );
-	//thisGLHE.loopNum = 1;
-
-	//PlantLoop( thisGLHE.loopNum ).FluidName = "WATER";
-	//PlantLoop( thisGLHE.loopNum ).FluidIndex = 1;
-
-	//thisGLHE.kGround = 0.4;
-
-	//thisGLHE.calcGroundHeatExchanger();
 }
