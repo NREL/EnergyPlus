@@ -8,6 +8,7 @@ set( test_src
   ExteriorEnergyUse.unit.cc
   HeatBalanceManager.unit.cc
   HVACStandaloneERV.unit.cc
+  Humidifiers.unit.cc
   MixedAir.unit.cc
   PurchasedAirManager.unit.cc
   OutputProcessor.unit.cc
@@ -22,7 +23,6 @@ set( test_src
   WaterThermalTanks.unit.cc
   main.cc
 )
-
 set( test_dependencies
   energyplusapi
 #  objexx
