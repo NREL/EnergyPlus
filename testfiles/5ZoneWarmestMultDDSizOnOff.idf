@@ -1,24 +1,28 @@
-!-Generator IDFEditor 1.36a
+!-Generator IDFEditor 1.34
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! 5ZoneWaterCooled_HighRHControl.idf
+! 5ZoneWarmestMultiDDSizOnOff.idf.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
-! Highlights:              Controls to a relative humidity set point with a chilled water coil and a simple controller
-!                          using a TempandHumRat control setting
+! Highlights:              illustrates the use of a "warmest" supply air temperature reset strategy.
+!                          Also illustrates use of alternate input for window glass and gas mixture for windows
+!                          Also illustrates use of the Simple Duct Leakage mode (see ZoneHVAC:AirDistributionUnit objects).
+!                          Also illustrates the use of the "Coil Performance Input Method" for hot water coils.
+!                          And illustrates use of "Central Cooling Capacity Control Method" = OnOff
 !
-! Simulation Location/Run: Chicago Ohare Intl Ap IL USA WMO=725300, 2 design days, 2 run periods,
+! Simulation Location/Run: USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw, 3 design days, 2 run periods,
 !                          Run Control executes the run periods using the weather file
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -16.6°C
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.6°C MCWB=  23.0°C
+! Design Days:             Chicago Ohare Intl Ap_IL_USA Annual Heating 99%, MaxDB=-16.6°C
+!                          Chicago Ohare Intl Ap_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6°C MWB=23°C
+!                          Chicago Ohare Intl Ap_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2°C WB=25.5°C
 !
-! Run Period (Weather File): Winter 1/14, Summer 7/7.
+! Run Period (Weather File): Winter 1/14, Summer 7/7, USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
 !
-! Run Control:             Zone and System sizing with weather file run control (no design days ran)
+! Run Control:             Zone and System sizing with weather file run control (no design days run)
 !
 ! Building: Single floor rectangular building 100 ft x 50 ft. 5 zones - 4 exterior, 1 interior, zone height 8 feet.
 !           Exterior zone depth is 12 feet. There is a 2 foot high return plenum: the overall building height is
@@ -60,7 +64,7 @@
 ! Internal gains description:     lighting is 1.5 watts/ft2, office equip is 1.0 watts/ft2. There is 1 occupant
 !                                 per 100 ft2 of floor area. The infiltration is 0.25 air changes per hour.
 !
-! Interzone Surfaces:             8 interzone surfaces (see diagram)
+! Interzone Surfaces:             6 interzone surfaces (see diagram)
 ! Internal Mass:                  None
 ! People:                         50
 ! Lights:                         7500 W
@@ -69,7 +73,7 @@
 !                                        3) Double pane clear, 6mm glass, 6mm air gap
 !                                        4) Double pane lowE,  6mm lowE glass outside, 6mm air gap, 6mm clear glass
 !
-! Doors:                          2 ea.     Single pane grey,  3mm glass
+! Doors:                          2 ea.:    Single pane grey,  3mm glass
 !
 ! Detached Shading:               None
 ! Daylight:                       None
@@ -78,11 +82,16 @@
 !
 ! HVAC:                           Standard VAV system with outside air economizer, hot water reheat coils,
 !                                 central chilled water cooling coil. Central Plant is single hot water
-!                                 boiler, electric compression chiller with water cooled condenser, and cooling
-!                                 tower. All equipment is autosized. ZoneControl:Humidistat and
-!                                 Set Point Manager:Single Zone Max Hum are used in SPACE2-1 to control
-!                                 relative humidity to 50% via Controller:Simple with the control variable
-!                                 set to TEMPandHUMRAT
+!                                 boiler, electric compression chiller with water cooled condenser, and
+!                                 a cooling tower. All equipment is autosized.
+!
+!                                 The supply air temperature setpoint is established by a setpoint
+!                                 manager using the "warmest" strategy: the supply air temperature
+!                                 is set to the highest temperature that will meet the cooling load
+!                                 of the warmest zone at full cfm.
+!
+!                                 At design flow the system has 5% upstream supply duct leakage and 7%
+!                                 downstream of the terminal units.
 !
 ! Zonal Equipment:                AirTerminal:SingleDuct:VAV:Reheat
 ! Central Air Handling Equipment: Yes
@@ -96,10 +105,10 @@
 ! Towers:                         CoolingTower:SingleSpeed
 !
 ! Results:
-! Standard Reports:               None
+! Standard Reports:               All Summary Predefined Reports
 ! Timestep or Hourly Variables:   Hourly
 ! Time bins Report:               None
-! HTML Report:                    None
+! HTML Report:                    Predefined All Summary
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
@@ -122,12 +131,6 @@
   SurfaceConvectionAlgorithm:Outside,SimpleCombined;
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
-
-  ConvergenceLimits,
-    1,                       !- Minimum System Timestep {minutes}
-    20,                      !- Maximum HVAC Iterations
-    4,                       !- Minimum Plant Iterations
-    10;                      !- Maximum Plant Iterations
 
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
@@ -194,6 +197,13 @@
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
 
+  Site:Location,
+    CHICAGO_IL_USA TMY2-94846,  !- Name
+    41.78,                   !- Latitude {deg}
+    -87.75,                  !- Longitude {deg}
+    -6.00,                   !- Time Zone {hr}
+    190.00;                  !- Elevation {m}
+
   SimulationControl,
     Yes,                     !- Do Zone Sizing Calculation
     Yes,                     !- Do System Sizing Calculation
@@ -201,74 +211,90 @@
     No,                      !- Run Simulation for Sizing Periods
     Yes;                     !- Run Simulation for Weather File Run Periods
 
-! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
+ ! Chicago Ohare Intl Ap_IL_USA Annual Heating 99%, MaxDB=-16.6°C
+ SizingPeriod:DesignDay,
+  Chicago Ohare Intl Ap Ann Htg 99% Condns DB,     !- Name
+          1,      !- Month
+         21,      !- Day of Month
+  WinterDesignDay,!- Day Type
+      -16.6,      !- Maximum Dry-Bulb Temperature {C}
+        0.0,      !- Daily Dry-Bulb Temperature Range {C}
+ DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
+           ,      !- Dry-Bulb Temperature Range Modifier Schedule Name
+    Wetbulb,      !- Humidity Condition Type
+      -16.6,      !- Wetbulb at Maximum Dry-Bulb {C}
+           ,      !- Humidity Indicating Day Schedule Name
+           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
+           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
+     98934.,      !- Barometric Pressure {Pa}
+        4.9,      !- Wind Speed {m/s} design conditions vs. traditional 6.71 m/s (15 mph)
+        270,      !- Wind Direction {Degrees; N=0, S=180}
+         No,      !- Rain {Yes/No}
+         No,      !- Snow on ground {Yes/No}
+         No,      !- Daylight Savings Time Indicator
+  ASHRAEClearSky, !- Solar Model Indicator
+           ,      !- Beam Solar Day Schedule Name
+           ,      !- Diffuse Solar Day Schedule Name
+           ,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
+           ,      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
+       0.00;      !- Clearness {0.0 to 1.1}
 
-  Site:Location,
-    Chicago Ohare Intl Ap IL USA WMO=725300,  !- Name
-    41.99,                   !- Latitude {deg}
-    -87.91,                  !- Longitude {deg}
-    -6.00,                   !- Time Zone {hr}
-    205.00;                  !- Elevation {m}
-
-! Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6°C
-
-  SizingPeriod:DesignDay,
-    Chicago Ohare Intl Ap Ann Htg 99% Condns DB,  !- Name
-    1,                       !- Month
-    21,                      !- Day of Month
-    WinterDesignDay,         !- Day Type
-    -16.6,                   !- Maximum Dry-Bulb Temperature {C}
-    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
-    ,                        !- Dry-Bulb Temperature Range Modifier Type
-    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
-    Wetbulb,                 !- Humidity Condition Type
-    -16.6,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
-    ,                        !- Humidity Condition Day Schedule Name
-    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
-    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
-    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
-    98886.,                  !- Barometric Pressure {Pa}
-    4.9,                     !- Wind Speed {m/s}
-    270,                     !- Wind Direction {deg}
-    No,                      !- Rain Indicator
-    No,                      !- Snow Indicator
-    No,                      !- Daylight Saving Time Indicator
-    ASHRAEClearSky,          !- Solar Model Indicator
-    ,                        !- Beam Solar Day Schedule Name
-    ,                        !- Diffuse Solar Day Schedule Name
-    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
-    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
-    0.00;                    !- Sky Clearness
-
-! Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6°C MWB=23°C
-
-  SizingPeriod:DesignDay,
-    Chicago Ohare Intl Ap Ann Clg 1% Condns DB=>MWB,  !- Name
-    7,                       !- Month
-    21,                      !- Day of Month
-    SummerDesignDay,         !- Day Type
-    31.6,                    !- Maximum Dry-Bulb Temperature {C}
-    10.5,                    !- Daily Dry-Bulb Temperature Range {deltaC}
-    ,                        !- Dry-Bulb Temperature Range Modifier Type
-    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
-    Wetbulb,                 !- Humidity Condition Type
-    23,                      !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
-    ,                        !- Humidity Condition Day Schedule Name
-    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
-    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
-    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
-    98886.,                  !- Barometric Pressure {Pa}
-    5.2,                     !- Wind Speed {m/s}
-    230,                     !- Wind Direction {deg}
-    No,                      !- Rain Indicator
-    No,                      !- Snow Indicator
-    No,                      !- Daylight Saving Time Indicator
-    ASHRAEClearSky,          !- Solar Model Indicator
-    ,                        !- Beam Solar Day Schedule Name
-    ,                        !- Diffuse Solar Day Schedule Name
-    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
-    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
-    1.00;                    !- Sky Clearness
+ ! Chicago Ohare Intl Ap_IL_USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6°C MWB=23°C
+ SizingPeriod:DesignDay,
+  Chicago Ohare Intl Ap Ann Clg 1% Condns DB=>MWB,     !- Name
+          8,      !- Month
+         21,      !- Day of Month
+  SummerDesignDay,!- Day Type
+       31.6,      !- Maximum Dry-Bulb Temperature {C}
+       10.5,      !- Daily Dry-Bulb Temperature Range {C}
+ DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
+           ,      !- Dry-Bulb Temperature Range Modifier Schedule Name
+    Wetbulb,      !- Humidity Condition Type
+         23,      !- Wetbulb at Maximum Dry-Bulb {C}
+           ,      !- Humidity Indicating Day Schedule Name
+           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
+           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
+     98934.,      !- Barometric Pressure {Pa}
+        5.2,      !- Wind Speed {m/s} design conditions vs. traditional 3.35 m/s (7mph)
+        230,      !- Wind Direction {Degrees; N=0, S=180}
+         No,      !- Rain {Yes/No}
+         No,      !- Snow on ground {Yes/No}
+         No,      !- Daylight Savings Time Indicator
+       ASHRAETau, !- Solar Model Indicator
+           ,      !- Beam Solar Day Schedule Name
+           ,      !- Diffuse Solar Day Schedule Name
+      0.455,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
+      2.050;      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
+    
+ ! Chicago Ohare Intl Ap_IL_USA Annual Cooling (WB=>MDB) .4%, MDB=31.2°C WB=25.5°C
+ SizingPeriod:DesignDay,
+  Chicago Ohare Intl Ap Ann Clg .4% Condns WB=>MDB,     !- Name
+          7,      !- Month
+         21,      !- Day of Month
+  SummerDesignDay,!- Day Type
+       31.2,      !- Maximum Dry-Bulb Temperature {C}
+       10.5,      !- Daily Dry-Bulb Temperature Range {C}
+ DefaultMultipliers, !- Dry-Bulb Temperature Range Modifier Type
+           ,      !- Dry-Bulb Temperature Range Modifier Schedule Name
+    Wetbulb,      !- Humidity Condition Type
+       25.5,      !- Wetbulb at Maximum Dry-Bulb {C}
+           ,      !- Humidity Indicating Day Schedule Name
+           ,      !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+           ,      !- Enthalpy at Maximum Dry-Bulb {J/kg}
+           ,      !- Daily Wet-Bulb Temperature Range {deltaC}
+     98934.,      !- Barometric Pressure {Pa}
+        5.2,      !- Wind Speed {m/s} design conditions vs. traditional 3.35 m/s (7mph)
+        230,      !- Wind Direction {Degrees; N=0, S=180}
+         No,      !- Rain {Yes/No}
+         No,      !- Snow on ground {Yes/No}
+         No,      !- Daylight Savings Time Indicator
+       ASHRAETau, !- Solar Model Indicator
+           ,      !- Beam Solar Day Schedule Name
+           ,      !- Diffuse Solar Day Schedule Name
+      0.455,      !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub)
+      2.050;      !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud)
 
   Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;
 
@@ -473,6 +499,15 @@
     Argon,                   !- Gas Type
     0.0127;                  !- Thickness {m}
 
+  WindowMaterial:GasMixture,
+    ArgonKryptonMix 13MM,    !- Name
+    0.0127,                  !- Thickness {m}
+    2,                       !- Number of Gases in Mixture
+    Argon,                   !- Gas 1 Type
+    0.6,                     !- Gas 1 Fraction
+    Krypton,                 !- Gas 2 Type
+    0.4;                     !- Gas 2 Fraction
+
   WindowMaterial:Glazing,
     CLEAR 3MM,               !- Name
     SpectralAverage,         !- Optical Data Type
@@ -487,6 +522,17 @@
     0.0,                     !- Infrared Transmittance at Normal Incidence
     0.84,                    !- Front Side Infrared Hemispherical Emissivity
     0.84,                    !- Back Side Infrared Hemispherical Emissivity
+    0.9;                     !- Conductivity {W/m-K}
+
+  WindowMaterial:Glazing:RefractionExtinctionMethod,
+    3MM CLEAR GLASS,         !- Name
+    0.003,                   !- Thickness {m}
+    1.526,                   !- Solar Index of Refraction
+    30.0,                    !- Solar Extinction Coefficient {1/m}
+    1.526,                   !- Visible Index of Refraction
+    30.0,                    !- Visible Extinction Coefficient {1/m}
+    0.0,                     !- Infrared Transmittance at Normal Incidence
+    0.84,                    !- Infrared Hemispherical Emissivity
     0.9;                     !- Conductivity {W/m-K}
 
   WindowMaterial:Glazing,
@@ -539,14 +585,20 @@
 
   Construction,
     Dbl Clr 3mm/13mm Air,    !- Name
-    CLEAR 3MM,               !- Outside Layer
+    3MM CLEAR GLASS,         !- Outside Layer
     AIR 13MM,                !- Layer 2
-    CLEAR 3MM;               !- Layer 3
+    3MM CLEAR GLASS;         !- Layer 3
 
   Construction,
     Dbl Clr 3mm/13mm Arg,    !- Name
     CLEAR 3MM,               !- Outside Layer
     ARGON 13MM,              !- Layer 2
+    CLEAR 3MM;               !- Layer 3
+
+  Construction,
+    Dbl Clr 3mm/13mm ArgKryp,!- Name
+    CLEAR 3MM,               !- Outside Layer
+    ArgonKryptonMix 13MM,    !- Layer 2
     CLEAR 3MM;               !- Layer 3
 
   Construction,
@@ -569,67 +621,67 @@
     OCCUPY-1,                !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Weekdays SummerDesignDay WinterDesignDay, !- Field 2
-    Until: 9:00,0.0,         !- Field 3
-    Until: 12:00,1.0,        !- Field 5
-    Until: 13:00,0.8,        !- Field 7
-    Until: 14:00,0.4,        !- Field 9
-    Until: 15:00,0.8,        !- Field 11
-    Until: 17:00,1.0,        !- Field 13
-    Until: 24:00,0.0,        !- Field 15
-    For: AllOtherDays,       !- Field 17
-    Until: 24:00,0.0;        !- Field 18
+    For: Weekdays SummerDesignDay CustomDay1 CustomDay2, !- Field 2
+    Until: 8:00,0.00,        !- Field 3
+    Until: 11:00,1.00,       !- Field 5
+    Until: 12:00,0.80,       !- Field 7
+    Until: 13:00,0.40,       !- Field 9
+    Until: 14:00,0.80,       !- Field 11
+    Until: 18:00,1.00,       !- Field 13
+    Until: 19:00,0.50,       !- Field 15
+    Until: 21:00,0.10,       !- Field 17
+    Until: 24:00,0.00,       !- Field 19
+    For: Saturday Sunday Holidays WinterDesignDay, !- Field 21
+    Until: 24:00,0.00;       !- Field 22
 
   Schedule:Compact,
     LIGHTS-1,                !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Weekdays SummerDesignDay WinterDesignDay, !- Field 2
-    Until: 9:00,0.05,        !- Field 3
-    Until: 10:00,0.9,        !- Field 5
-    Until: 11:00,0.95,       !- Field 7
-    Until: 12:00,1.0,        !- Field 9
-    Until: 13:00,0.95,       !- Field 11
-    Until: 14:00,0.8,        !- Field 13
-    Until: 15:00,0.9,        !- Field 15
-    Until: 17:00,1.0,        !- Field 17
-    Until: 24:00,0.05,       !- Field 19
-    For: AllOtherDays,       !- Field 21
-    Until: 24:00,0.05;       !- Field 22
+    For: Weekdays SummerDesignDay CustomDay1 CustomDay2, !- Field 2
+    Until: 8:00,0.05,        !- Field 3
+    Until: 9:00,0.90,        !- Field 5
+    Until: 10:00,0.95,       !- Field 7
+    Until: 11:00,1.00,       !- Field 9
+    Until: 12:00,0.95,       !- Field 11
+    Until: 13:00,0.80,       !- Field 13
+    Until: 14:00,0.90,       !- Field 15
+    Until: 18:00,1.00,       !- Field 17
+    Until: 19:00,0.60,       !- Field 19
+    Until: 20:00,0.20,       !- Field 21
+    Until: 21:00,0.20,       !- Field 23
+    Until: 24:00,0.05,       !- Field 25
+    For: Saturday Sunday Holidays WinterDesignDay, !- Field 27
+    Until: 24:00,0.05;       !- Field 28
 
   Schedule:Compact,
     EQUIP-1,                 !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Weekdays SummerDesignDay WinterDesignDay, !- Field 2
-    Until: 9:00,0.02,        !- Field 3
-    Until: 10:00,0.4,        !- Field 5
-    Until: 15:00,0.9,        !- Field 7
-    Until: 16:00,0.8,        !- Field 9
-    Until: 17:00,0.7,        !- Field 11
-    Until: 24:00,0.02,       !- Field 13
-    For: CustomDay1 CustomDay2, !- Field 15
-    Until: 9:00,0.02,        !- Field 16
-    Until: 10:00,0.4,        !- Field 18
-    Until: 15:00,0.9,        !- Field 20
-    Until: 16:00,0.8,        !- Field 22
-    Until: 17:00,0.7,        !- Field 24
-    Until: 24:00,0.02,       !- Field 26
-    For: AllOtherDays,       !- Field 28
-    Until: 24:00,0.2;        !- Field 29
+    For: Weekdays SummerDesignDay CustomDay1 CustomDay2, !- Field 2
+    Until: 8:00,0.02,        !- Field 3
+    Until: 9:00,0.40,        !- Field 5
+    Until: 14:00,0.90,       !- Field 7
+    Until: 15:00,0.80,       !- Field 9
+    Until: 16:00,0.70,       !- Field 11
+    Until: 18:00,0.50,       !- Field 13
+    Until: 20:00,0.30,       !- Field 15
+    Until: 24:00,0.02,       !- Field 17
+    For: Saturday Sunday Holidays WinterDesignDay, !- Field 19
+    Until: 24:00,0.20;       !- Field 20
 
   Schedule:Compact,
     INFIL-SCH,               !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 3/31,           !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,1.0,        !- Field 3
+    Until: 24:00,1.00,       !- Field 3
     Through: 10/31,          !- Field 5
     For: Alldays,            !- Field 6
-    Until: 24:00,0.0,        !- Field 7
+    Until: 24:00,0.00,       !- Field 7
     Through: 12/31,          !- Field 9
     For: Alldays,            !- Field 10
-    Until: 24:00,1.0;        !- Field 11
+    Until: 24:00,1.00;       !- Field 11
 
   Schedule:Compact,
     ActSchd,                 !- Name
@@ -645,7 +697,154 @@
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
-    Until: 24:00,0.0;        !- Field 3
+    Until: 24:00,0.00;       !- Field 3
+
+  Schedule:Compact,
+    Htg-SetP-Sch,            !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays CustomDay1 CustomDay2, !- Field 2
+    Until: 7:00,12.80,       !- Field 3
+    Until: 18:00,21.10,      !- Field 5
+    Until: 24:00,12.80,      !- Field 7
+    For: Weekends Holidays,  !- Field 9
+    Until: 7:00,12.80,       !- Field 10
+    Until: 13:00,21.10,      !- Field 12
+    Until: 24:00,12.80,      !- Field 14
+    For: SummerDesignDay,    !- Field 16
+    Until: 24:00,12.80,      !- Field 17
+    For: WinterDesignDay,    !- Field 19
+    Until: 24:00,21.10;      !- Field 20
+
+  Schedule:Compact,
+    Clg-SetP-Sch,            !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays CustomDay1 CustomDay2, !- Field 2
+    Until: 7:00,40.00,       !- Field 3
+    Until: 18:00,23.90,      !- Field 5
+    Until: 24:00,40.00,      !- Field 7
+    For: Weekends Holidays,  !- Field 9
+    Until: 7:00,40.00,       !- Field 10
+    Until: 13:00,23.90,      !- Field 12
+    Until: 24:00,32.20,      !- Field 14
+    For: SummerDesignDay,    !- Field 16
+    Until: 24:00,23.90,      !- Field 17
+    For: WinterDesignDay,    !- Field 19
+    Until: 24:00,40.00;      !- Field 20
+
+  Schedule:Compact,
+    Zone Control Type Sched, !- Name
+    Control Type,            !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays Weekends Holidays CustomDay1 CustomDay2, !- Field 2
+    Until: 24:00,4,          !- Field 3
+    For: SummerDesignDay,    !- Field 5
+    Until: 24:00,2,          !- Field 6
+    For: WinterDesignDay,    !- Field 8
+    Until: 24:00,1;          !- Field 9
+
+  Schedule:Compact,
+    Min OA Sched,            !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays,           !- Field 2
+    Until: 6:00,0.02,        !- Field 3
+    Until: 18:00,1.00,       !- Field 5
+    Until: 24:00,0.02,       !- Field 7
+    For: Weekends SummerDesignDay WinterDesignDay CustomDay1 CustomDay2 Holidays, !- Field 9
+    Until: 24:00,0.02;       !- Field 10
+
+  Schedule:Compact,
+    FanAvailSched,           !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 3/31,           !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.00,       !- Field 3
+    Through: 9/30,           !- Field 5
+    For: Weekdays,           !- Field 6
+    Until: 7:00,0.00,        !- Field 7
+    Until: 17:00,1.00,       !- Field 9
+    Until: 24:00,0.00,       !- Field 11
+    For: Weekends Holidays CustomDay1 CustomDay2, !- Field 13
+    Until: 24:00,0.00,       !- Field 14
+    For: SummerDesignDay WinterDesignDay, !- Field 16
+    Until: 24:00,1.00,       !- Field 17
+    Through: 12/31,          !- Field 19
+    For: AllDays,            !- Field 20
+    Until: 24:00,1.00;       !- Field 21
+
+  Schedule:Compact,
+    CoolingCoilAvailSched,   !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 3/31,           !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,0.00,       !- Field 3
+    Through: 9/30,           !- Field 5
+    For: Weekdays,           !- Field 6
+    Until: 7:00,0.00,        !- Field 7
+    Until: 17:00,1.00,       !- Field 9
+    Until: 24:00,0.00,       !- Field 11
+    For: Weekends Holidays CustomDay1 CustomDay2, !- Field 13
+    Until: 24:00,0.00,       !- Field 14
+    For: SummerDesignDay WinterDesignDay, !- Field 16
+    Until: 24:00,1.00,       !- Field 17
+    Through: 12/31,          !- Field 19
+    For: Alldays,            !- Field 20
+    Until: 24:00,0.00;       !- Field 21
+
+  Schedule:Compact,
+    CoolingPumpAvailSched,   !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 3/31,           !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,0.00,       !- Field 3
+    Through: 9/30,           !- Field 5
+    For: Alldays,            !- Field 6
+    Until: 24:00,1.00,       !- Field 7
+    Through: 12/31,          !- Field 9
+    For: Alldays,            !- Field 10
+    Until: 24:00,0.00;       !- Field 11
+
+  Schedule:Compact,
+    ReheatCoilAvailSched,    !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 3/31,           !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,1.00,       !- Field 3
+    Through: 9/30,           !- Field 5
+    For: Weekdays,           !- Field 6
+    Until: 7:00,0.00,        !- Field 7
+    Until: 17:00,1.00,       !- Field 9
+    Until: 24:00,0.00,       !- Field 11
+    For: SummerDesignDay WinterDesignDay, !- Field 13
+    Until: 24:00,1.00,       !- Field 14
+    For: Weekends Holidays CustomDay1 CustomDay2, !- Field 16
+    Until: 24:00,0.00,       !- Field 17
+    Through: 12/31,          !- Field 19
+    For: Alldays,            !- Field 20
+    Until: 24:00,1.00;       !- Field 21
+
+  Schedule:Compact,
+    CW Loop Temp Schedule,   !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,7.22;       !- Field 3
+
+  Schedule:Compact,
+    HW Loop Temp Schedule,   !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,82.00;      !- Field 3
+
+  Schedule:Compact,
+    PlantOnSched,            !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,1.00;       !- Field 3
 
   Zone,
     PLENUM-1,                !- Name
@@ -900,7 +1099,7 @@
   FenestrationSurface:Detailed,
     WF-1,                    !- Name
     WINDOW,                  !- Surface Type
-    Dbl Clr 3mm/13mm Air,    !- Construction Name
+    Dbl Clr 3mm/13mm ArgKryp,!- Construction Name
     FRONT-1,                 !- Building Surface Name
     ,                        !- Outside Boundary Condition Object
     0.50000,                 !- View Factor to Ground
@@ -1891,20 +2090,20 @@
 
   Sizing:System,
     VAV Sys 1,               !- AirLoop Name
-    sensible,                !- Type of Load to Size On
+    total,                   !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
     0.3,                     !- Central Heating Maximum System Air Flow Ratio
     7.0,                     !- Preheat Design Temperature {C}
-    0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
+    0.003,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
-    0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
+    0.0075,                  !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     12.8,                    !- Central Cooling Design Supply Air Temperature {C}
     16.7,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Type of Zone Sum to Use
+    coincident,              !- Type of Zone Sum to Use
     no,                      !- 100% Outdoor Air in Cooling
     no,                      !- 100% Outdoor Air in Heating
-    0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.0085,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0,                       !- Cooling Design Air Flow Rate {m3/s}
     ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
@@ -1926,7 +2125,7 @@
     autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    VAV;                     !- Central Cooling Capacity Control Method
+    OnOff;                     !- Central Cooling Capacity Control Method    
 
   Sizing:Plant,
     Hot Water Loop,          !- Plant or Condenser Loop Name
@@ -1945,157 +2144,6 @@
     condenser,               !- Loop Type
     29.4,                    !- Design Loop Exit Temperature {C}
     5.6;                     !- Loop Design Temperature Difference {deltaC}
-
-  Schedule:Compact,
-    Htg-SetP-Sch,            !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: Weekends HoliDay,   !- Field 2
-    Until: 7:00,12.8,        !- Field 3
-    Until: 14:00,22.2,       !- Field 5
-    Until: 24:00,12.8,       !- Field 7
-    For: SummerDesignDay,    !- Field 9
-    Until: 24:00,22.2,       !- Field 10
-    For: WinterDesignDay,    !- Field 12
-    Until: 24:00,22.2,       !- Field 13
-    For: AllOtherDays,       !- Field 15
-    Until: 7:00,12.8,        !- Field 16
-    Until: 19:00,22.2,       !- Field 18
-    Until: 24:00,12.8;       !- Field 20
-
-  Schedule:Compact,
-    Clg-SetP-Sch,            !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: Weekends HoliDay,   !- Field 2
-    Until: 7:00,40.0,        !- Field 3
-    Until: 14:00,23.2,       !- Field 5
-    Until: 24:00,32.2,       !- Field 7
-    For: SummerDesignDay,    !- Field 9
-    Until: 24:00,23.2,       !- Field 10
-    For: WinterDesignDay,    !- Field 12
-    Until: 24:00,23.0,       !- Field 13
-    For: AllOtherDays,       !- Field 15
-    Until: 7:00,40.0,        !- Field 16
-    Until: 19:00,25.0,       !- Field 18
-    Until: 24:00,40.0;       !- Field 20
-
-  Schedule:Compact,
-    Zone Control Type Sched, !- Name
-    Control Type,            !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,4;          !- Field 3
-
-  Schedule:Compact,
-    Min OA Sched,            !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: Weekdays SummerDesignDay WinterDesignDay, !- Field 2
-    Until: 7:00,0.02,        !- Field 3
-    Until: 19:00,1.0,        !- Field 5
-    Until: 24:00,0.02,       !- Field 7
-    For: AllOtherDays,       !- Field 9
-    Until: 24:00,0.02;       !- Field 10
-
-  Schedule:Compact,
-    FanAvailSched,           !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 3/31,           !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,1.0,        !- Field 3
-    Through: 9/30,           !- Field 5
-    For: Weekdays,           !- Field 6
-    Until: 7:00,0.0,         !- Field 7
-    Until: 18:00,1.0,        !- Field 9
-    Until: 24:00,0.0,        !- Field 11
-    For: Weekends Holidays CustomDay1 CustomDay2, !- Field 13
-    Until: 24:00,0.0,        !- Field 14
-    For: AllOtherDays,       !- Field 16
-    Until: 24:00,1.0,        !- Field 17
-    Through: 12/31,          !- Field 19
-    For: Alldays,            !- Field 20
-    Until: 24:00,1.0;        !- Field 21
-
-  Schedule:Compact,
-    ReheatCoilAvailSched,    !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 3/31,           !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,1.0,        !- Field 3
-    Through: 9/30,           !- Field 5
-    For: Weekdays,           !- Field 6
-    Until: 7:00,0.0,         !- Field 7
-    Until: 18:00,1.0,        !- Field 9
-    Until: 24:00,0.0,        !- Field 11
-    For: Weekends Holidays CustomDay1 CustomDay2, !- Field 13
-    Until: 24:00,0.0,        !- Field 14
-    For: AllOtherDays,       !- Field 16
-    Until: 24:00,1.0,        !- Field 17
-    Through: 12/31,          !- Field 19
-    For: Alldays,            !- Field 20
-    Until: 24:00,1.0;        !- Field 21
-
-  Schedule:Compact,
-    CoolingCoilAvailSched,   !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,1.0;        !- Field 3
-
-  Schedule:Compact,
-    CoolingPumpAvailSched,   !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,1.0;        !- Field 3
-
-  Schedule:Compact,
-    CW Loop Temp Schedule,   !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,7.22;       !- Field 3
-
-  Schedule:Compact,
-    HW Loop Temp Schedule,   !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,60.0;       !- Field 3
-
-  Schedule:Compact,
-    PlantOnSched,            !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,1.0;        !- Field 3
-
-  Schedule:Compact,
-    Seasonal Reset Supply Air Temp Sch,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 3/31,           !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,17.0,       !- Field 3
-    Through: 9/30,           !- Field 5
-    For: Alldays,            !- Field 6
-    Until: 24:00,17.5,       !- Field 7
-    Through: 12/31,          !- Field 9
-    For: Alldays,            !- Field 10
-    Until: 24:00,17.0;       !- Field 11
-
-  Schedule:Compact,
-    Seasonal Relative Humidity Sch,  !- Name
-    Humidity,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: Alldays,            !- Field 2
-    Until: 24:00,50.0;       !- Field 3
-
-  ScheduleTypeLimits,
-    Humidity,                !- Name
-    0,                       !- Lower Limit Value
-    100,                     !- Upper Limit Value
-    CONTINUOUS;              !- Numeric Type
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes;    !- Node or NodeList Name 1
@@ -2168,41 +2216,64 @@
     SPACE1-1 Control,        !- Name
     SPACE1-1,                !- Zone or ZoneList Name
     Zone Control Type Sched, !- Control Type Schedule Name
-    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
-    DualSetPoint;            !- Control 1 Name
+    ThermostatSetpoint:SingleCooling,  !- Control 1 Object Type
+    CoolingSetPoint,         !- Control 1 Name
+    ThermostatSetpoint:SingleHeating,  !- Control 2 Object Type
+    HeatingSetpoint,         !- Control 2 Name
+    ThermostatSetpoint:DualSetpoint,  !- Control 3 Object Type
+    DualSetPoint;            !- Control 3 Name
 
   ZoneControl:Thermostat,
     SPACE2-1 Control,        !- Name
     SPACE2-1,                !- Zone or ZoneList Name
     Zone Control Type Sched, !- Control Type Schedule Name
-    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
-    DualSetPoint;            !- Control 1 Name
-
-  ZoneControl:Humidistat,
-    Space2-1 Humidistat,     !- Name
-    SPACE2-1,                !- Zone Name
-    Seasonal Relative Humidity Sch;  !- Humidifying Relative Humidity Setpoint Schedule Name
+    ThermostatSetpoint:SingleCooling,  !- Control 1 Object Type
+    CoolingSetPoint,         !- Control 1 Name
+    ThermostatSetpoint:SingleHeating,  !- Control 2 Object Type
+    HeatingSetpoint,         !- Control 2 Name
+    ThermostatSetpoint:DualSetpoint,  !- Control 3 Object Type
+    DualSetPoint;            !- Control 3 Name
 
   ZoneControl:Thermostat,
     SPACE3-1 Control,        !- Name
     SPACE3-1,                !- Zone or ZoneList Name
     Zone Control Type Sched, !- Control Type Schedule Name
-    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
-    DualSetPoint;            !- Control 1 Name
+    ThermostatSetpoint:SingleCooling,  !- Control 1 Object Type
+    CoolingSetPoint,         !- Control 1 Name
+    ThermostatSetpoint:SingleHeating,  !- Control 2 Object Type
+    HeatingSetpoint,         !- Control 2 Name
+    ThermostatSetpoint:DualSetpoint,  !- Control 3 Object Type
+    DualSetPoint;            !- Control 3 Name
 
   ZoneControl:Thermostat,
     SPACE4-1 Control,        !- Name
     SPACE4-1,                !- Zone or ZoneList Name
     Zone Control Type Sched, !- Control Type Schedule Name
-    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
-    DualSetPoint;            !- Control 1 Name
+    ThermostatSetpoint:SingleCooling,  !- Control 1 Object Type
+    CoolingSetPoint,         !- Control 1 Name
+    ThermostatSetpoint:SingleHeating,  !- Control 2 Object Type
+    HeatingSetpoint,         !- Control 2 Name
+    ThermostatSetpoint:DualSetpoint,  !- Control 3 Object Type
+    DualSetPoint;            !- Control 3 Name
 
   ZoneControl:Thermostat,
     SPACE5-1 Control,        !- Name
     SPACE5-1,                !- Zone or ZoneList Name
     Zone Control Type Sched, !- Control Type Schedule Name
-    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
-    DualSetPoint;            !- Control 1 Name
+    ThermostatSetpoint:SingleCooling,  !- Control 1 Object Type
+    CoolingSetPoint,         !- Control 1 Name
+    ThermostatSetpoint:SingleHeating,  !- Control 2 Object Type
+    HeatingSetpoint,         !- Control 2 Name
+    ThermostatSetpoint:DualSetpoint,  !- Control 3 Object Type
+    DualSetPoint;            !- Control 3 Name
+
+  ThermostatSetpoint:SingleHeating,
+    HeatingSetpoint,         !- Name
+    Htg-SetP-Sch;            !- Setpoint Temperature Schedule Name
+
+  ThermostatSetpoint:SingleCooling,
+    CoolingSetpoint,         !- Name
+    Clg-SetP-Sch;            !- Setpoint Temperature Schedule Name
 
   ThermostatSetpoint:DualSetpoint,
     DualSetPoint,            !- Name
@@ -2248,31 +2319,41 @@
     SPACE1-1 ATU,            !- Name
     SPACE1-1 In Node,        !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:VAV:Reheat,  !- Air Terminal Object Type
-    SPACE1-1 VAV Reheat;     !- Air Terminal Name
+    SPACE1-1 VAV Reheat,     !- Air Terminal Name
+    0.05,                    !- Nominal Upstream Leakage Fraction
+    0.07;                    !- Constant Downstream Leakage Fraction
 
   ZoneHVAC:AirDistributionUnit,
     SPACE2-1 ATU,            !- Name
     SPACE2-1 In Node,        !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:VAV:Reheat,  !- Air Terminal Object Type
-    SPACE2-1 VAV Reheat;     !- Air Terminal Name
+    SPACE2-1 VAV Reheat,     !- Air Terminal Name
+    0.05,                    !- Nominal Upstream Leakage Fraction
+    0.07;                    !- Constant Downstream Leakage Fraction
 
   ZoneHVAC:AirDistributionUnit,
     SPACE3-1 ATU,            !- Name
     SPACE3-1 In Node,        !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:VAV:Reheat,  !- Air Terminal Object Type
-    SPACE3-1 VAV Reheat;     !- Air Terminal Name
+    SPACE3-1 VAV Reheat,     !- Air Terminal Name
+    0.05,                    !- Nominal Upstream Leakage Fraction
+    0.07;                    !- Constant Downstream Leakage Fraction
 
   ZoneHVAC:AirDistributionUnit,
     SPACE4-1 ATU,            !- Name
     SPACE4-1 In Node,        !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:VAV:Reheat,  !- Air Terminal Object Type
-    SPACE4-1 VAV Reheat;     !- Air Terminal Name
+    SPACE4-1 VAV Reheat,     !- Air Terminal Name
+    0.05,                    !- Nominal Upstream Leakage Fraction
+    0.07;                    !- Constant Downstream Leakage Fraction
 
   ZoneHVAC:AirDistributionUnit,
     SPACE5-1 ATU,            !- Name
     SPACE5-1 In Node,        !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:VAV:Reheat,  !- Air Terminal Object Type
-    SPACE5-1 VAV Reheat;     !- Air Terminal Name
+    SPACE5-1 VAV Reheat,     !- Air Terminal Name
+    0.05,                    !- Nominal Upstream Leakage Fraction
+    0.07;                    !- Constant Downstream Leakage Fraction
 
   AirTerminal:SingleDuct:VAV:Reheat,
     SPACE1-1 VAV Reheat,     !- Name
@@ -2377,14 +2458,14 @@
   Coil:Heating:Water,
     SPACE1-1 Zone Coil,      !- Name
     ReheatCoilAvailSched,    !- Availability Schedule Name
-    autosize,                !- U-Factor Times Area Value {W/K}
-    autosize,                !- Maximum Water Flow Rate {m3/s}
+    ,                        !- U-Factor Times Area Value {W/K}
+    ,                        !- Maximum Water Flow Rate {m3/s}
     SPACE1-1 Zone Coil Water In Node,  !- Water Inlet Node Name
     SPACE1-1 Zone Coil Water Out Node,  !- Water Outlet Node Name
     SPACE1-1 Zone Coil Air In Node,  !- Air Inlet Node Name
     SPACE1-1 In Node,        !- Air Outlet Node Name
-    UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
-    autosize,                !- Rated Capacity {W}
+    NominalCapacity,         !- Performance Input Method
+    10000.,                  !- Rated Capacity {W}
     82.2,                    !- Rated Inlet Water Temperature {C}
     16.6,                    !- Rated Inlet Air Temperature {C}
     71.1,                    !- Rated Outlet Water Temperature {C}
@@ -2394,14 +2475,14 @@
   Coil:Heating:Water,
     SPACE2-1 Zone Coil,      !- Name
     ReheatCoilAvailSched,    !- Availability Schedule Name
-    autosize,                !- U-Factor Times Area Value {W/K}
-    autosize,                !- Maximum Water Flow Rate {m3/s}
+    ,                        !- U-Factor Times Area Value {W/K}
+    ,                        !- Maximum Water Flow Rate {m3/s}
     SPACE2-1 Zone Coil Water In Node,  !- Water Inlet Node Name
     SPACE2-1 Zone Coil Water Out Node,  !- Water Outlet Node Name
     SPACE2-1 Zone Coil Air In Node,  !- Air Inlet Node Name
     SPACE2-1 In Node,        !- Air Outlet Node Name
-    UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
-    autosize,                !- Rated Capacity {W}
+    NominalCapacity,         !- Performance Input Method
+    10000.,                  !- Rated Capacity {W}
     82.2,                    !- Rated Inlet Water Temperature {C}
     16.6,                    !- Rated Inlet Air Temperature {C}
     71.1,                    !- Rated Outlet Water Temperature {C}
@@ -2411,14 +2492,14 @@
   Coil:Heating:Water,
     SPACE3-1 Zone Coil,      !- Name
     ReheatCoilAvailSched,    !- Availability Schedule Name
-    autosize,                !- U-Factor Times Area Value {W/K}
-    autosize,                !- Maximum Water Flow Rate {m3/s}
+    ,                        !- U-Factor Times Area Value {W/K}
+    ,                        !- Maximum Water Flow Rate {m3/s}
     SPACE3-1 Zone Coil Water In Node,  !- Water Inlet Node Name
     SPACE3-1 Zone Coil Water Out Node,  !- Water Outlet Node Name
     SPACE3-1 Zone Coil Air In Node,  !- Air Inlet Node Name
     SPACE3-1 In Node,        !- Air Outlet Node Name
-    UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
-    autosize,                !- Rated Capacity {W}
+    NominalCapacity,         !- Performance Input Method
+    10000.,                  !- Rated Capacity {W}
     82.2,                    !- Rated Inlet Water Temperature {C}
     16.6,                    !- Rated Inlet Air Temperature {C}
     71.1,                    !- Rated Outlet Water Temperature {C}
@@ -2428,14 +2509,14 @@
   Coil:Heating:Water,
     SPACE4-1 Zone Coil,      !- Name
     ReheatCoilAvailSched,    !- Availability Schedule Name
-    autosize,                !- U-Factor Times Area Value {W/K}
-    autosize,                !- Maximum Water Flow Rate {m3/s}
+    ,                        !- U-Factor Times Area Value {W/K}
+    ,                        !- Maximum Water Flow Rate {m3/s}
     SPACE4-1 Zone Coil Water In Node,  !- Water Inlet Node Name
     SPACE4-1 Zone Coil Water Out Node,  !- Water Outlet Node Name
     SPACE4-1 Zone Coil Air In Node,  !- Air Inlet Node Name
     SPACE4-1 In Node,        !- Air Outlet Node Name
-    UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
-    autosize,                !- Rated Capacity {W}
+    NominalCapacity,         !- Performance Input Method
+    10000.,                  !- Rated Capacity {W}
     82.2,                    !- Rated Inlet Water Temperature {C}
     16.6,                    !- Rated Inlet Air Temperature {C}
     71.1,                    !- Rated Outlet Water Temperature {C}
@@ -2445,14 +2526,14 @@
   Coil:Heating:Water,
     SPACE5-1 Zone Coil,      !- Name
     ReheatCoilAvailSched,    !- Availability Schedule Name
-    autosize,                !- U-Factor Times Area Value {W/K}
-    autosize,                !- Maximum Water Flow Rate {m3/s}
+    ,                        !- U-Factor Times Area Value {W/K}
+    ,                        !- Maximum Water Flow Rate {m3/s}
     SPACE5-1 Zone Coil Water In Node,  !- Water Inlet Node Name
     SPACE5-1 Zone Coil Water Out Node,  !- Water Outlet Node Name
     SPACE5-1 Zone Coil Air In Node,  !- Air Inlet Node Name
     SPACE5-1 In Node,        !- Air Outlet Node Name
-    UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
-    autosize,                !- Rated Capacity {W}
+    NominalCapacity,         !- Performance Input Method
+    10000.,                  !- Rated Capacity {W}
     82.2,                    !- Rated Inlet Water Temperature {C}
     16.6,                    !- Rated Inlet Air Temperature {C}
     71.1,                    !- Rated Outlet Water Temperature {C}
@@ -2627,23 +2708,14 @@
 
   Controller:WaterCoil,
     Central Cooling Coil Contoller 1,  !- Name
-    TemperatureAndHumidityRatio,  !- Control Variable
+    Temperature,             !- Control Variable
     Reverse,                 !- Action
     FLOW,                    !- Actuator Variable
     Main Cooling Coil 1 Outlet Node,  !- Sensor Node Name
     Main Cooling Coil 1 Water Inlet Node,  !- Actuator Node Name
-    autosize,                !- Controller Convergence Tolerance {deltaC}
+    0.002,                   !- Controller Convergence Tolerance {deltaC}
     autosize,                !- Maximum Actuated Flow {m3/s}
     0.0;                     !- Minimum Actuated Flow {m3/s}
-
-! This object uses results from ZoneControl:Humidistat and needs to reference the same zone
-
-  SetpointManager:SingleZone:Humidity:Maximum,
-    Space2-1 Humidistat Manager,  !- Name
-    ,                        !- Control Variable
-    ,                        !- Schedule Name
-    Main Cooling Coil 1 Outlet Node,  !- Setpoint Node or NodeList Name
-    SPACE2-1 Node;           !- Control Zone Air Node Name
 
   Controller:OutdoorAir,
     OA Controller 1,         !- Name
@@ -2671,14 +2743,17 @@
     FLOW,                    !- Actuator Variable
     Main Heating Coil 1 Outlet Node,  !- Sensor Node Name
     Main Heating Coil 1 Water Inlet Node,  !- Actuator Node Name
-    autosize,                !- Controller Convergence Tolerance {deltaC}
+    0.002,                   !- Controller Convergence Tolerance {deltaC}
     autosize,                !- Maximum Actuated Flow {m3/s}
     0.0;                     !- Minimum Actuated Flow {m3/s}
 
-  SetpointManager:Scheduled,
-    Supply Air Temp Manager 1,  !- Name
+  SetpointManager:Warmest,
+    Supply Air Temperature Manager 1,  !- Name
     Temperature,             !- Control Variable
-    Seasonal Reset Supply Air Temp Sch,  !- Schedule Name
+    VAV Sys 1,               !- HVAC Air Loop Name
+    11.2,                    !- Minimum Setpoint Temperature {C}
+    16.,                     !- Maximum Setpoint Temperature {C}
+    MaximumTemperature,      !- Strategy
     Supply Air Temp Nodes 1; !- Setpoint Node or NodeList Name
 
   SetpointManager:MixedAir,
@@ -3516,37 +3591,11 @@
 
   Output:Variable,*,Zone Air Temperature,hourly;
 
-  Output:Variable,*,Zone Air Relative Humidity,hourly;
-
   Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
 
   Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
 
   Output:Variable,*,Heating Coil Heating Rate,hourly;
-
-  Output:Variable,SPACE1-1 In Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE1-1 In Node,System Node Temperature,hourly;
-
-  Output:Variable,SPACE2-1 In Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE2-1 In Node,System Node Temperature,hourly;
-
-  Output:Variable,SPACE1-1 Zone Coil Water In Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE2-1 Zone Coil Water In Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE1-1 Zone Coil Water In Node,System Node Temperature,hourly;
-
-  Output:Variable,SPACE2-1 Zone Coil Water In Node,System Node Temperature,hourly;
-
-  Output:Variable,SPACE1-1 Zone Coil Water Out Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE2-1 Zone Coil Water Out Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,SPACE1-1 Zone Coil Water Out Node,System Node Temperature,hourly;
-
-  Output:Variable,SPACE2-1 Zone Coil Water Out Node,System Node Temperature,hourly;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
 
@@ -3556,21 +3605,29 @@
 
   Output:Variable,Main Cooling Coil 1 Outlet Node,System Node Temperature,hourly;
 
-  Output:Variable,Main Cooling Coil 1 Water Inlet Node,System Node Temperature,hourly;
-
   Output:Variable,Main Heating Coil 1 Outlet Node,System Node Temperature,hourly;
 
   Output:Variable,VAV Sys 1 Outlet Node,System Node Temperature,hourly;
 
   Output:Variable,VAV Sys 1 Outlet Node,System Node Mass Flow Rate,hourly;
 
-  Output:Variable,*,Zone Air Terminal VAV Damper Position,hourly;
+  Output:Variable,VAV Sys 1 Outlet Node,System Node Setpoint Temperature,hourly;
 
-  Output:Variable,*,Chiller Evaporator Cooling Rate,hourly;
+  Output:Variable,SPACE1-1 In Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE2-1 In Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE3-1 In Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE4-1 In Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,SPACE5-1 In Node,System Node Mass Flow Rate,hourly;
+
+  Output:Variable,*,Zone Air Terminal VAV Damper Position,hourly;
 
   Output:VariableDictionary,Regular;
 
-  Output:Surfaces:Drawing,dxf:wireframe;
+  Output:Surfaces:Drawing,dxf;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 
@@ -3606,10 +3663,3 @@
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
 
-
-FaultModel:HumidistatOffset, 
-   Humi_Offset_Zone2, !- Name
-   ,  				  !- Availability Schedule Name
-   , 				  !- Severity Schedule Name
-   10,        		  !- Reference Humidistat Offset
-   Space2-1 Humidistat; !- Humidistat Name
