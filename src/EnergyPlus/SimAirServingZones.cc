@@ -1143,6 +1143,9 @@ namespace SimAirServingZones {
 					} else if ( componentType == "HUMIDIFIER:STEAM:ELECTRIC" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Humidifier;
 
+					} else if ( componentType == "HUMIDIFIER:STEAM:GAS" ) {
+						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Humidifier;
+
 						// Evap Cooler Types for the air system simulation
 					} else if ( componentType == "EVAPORATIVECOOLER:DIRECT:CELDEKPAD" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = EvapCooler;
@@ -2893,7 +2896,7 @@ namespace SimAirServingZones {
 			SimMSHeatPump( CompName, FirstHVACIteration, AirLoopNum, CompIndex );
 
 			// Humidifier Types for the air system simulation
-		} else if ( SELECT_CASE_var == Humidifier ) { // 'Humidifier:Steam:Electric'
+		} else if ( SELECT_CASE_var == Humidifier ) { // 'Humidifier:Steam:Electric' and 'Humidifier:Steam:Gas'
 			SimHumidifier( CompName, FirstHVACIteration, CompIndex );
 
 			// Evap Cooler Types for the air system simulation

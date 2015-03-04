@@ -22297,12 +22297,16 @@ AirflowNetwork:MultiZone:Zone,
       \note Selecting Advanced results in EnergyPlus calculating modified Wind Pressure Coefficients
       \note to account for wind direction and turbulence effects on single sided ventilation rates.
       \note Model is only valid for zones with 2 openings, both of which are on a single facade.
-  N6; \field Facade Width
+  N6, \field Facade Width
       \type real
       \units m
       \minimum 0.0
       \default 10.0
       \note This is the whole building width along the direction of the facade of this zone.
+  A6; \field Occupant Ventilation Control Name
+      \type object-list
+      \object-list AirflowNetworkOccupantVentilationControlNames
+      \note Enter the name where Occupancy Ventilation Control is required.
 
 AirflowNetwork:MultiZone:Surface,
       \min-fields 4
@@ -22405,7 +22409,7 @@ AirflowNetwork:MultiZone:Surface,
       \default 300000.0
       \note Applicable only if Ventilation Control Mode = Enthalpy.
       \note This value must be greater than the corresponding lower value (previous field).
-  A6; \field Venting Availability Schedule Name
+  A6, \field Venting Availability Schedule Name
       \type object-list
       \object-list ScheduleNames
       \note Non-zero schedule value means venting is allowed if other venting control conditions are
@@ -22414,6 +22418,10 @@ AirflowNetwork:MultiZone:Surface,
       \note equal to 1. If this schedule is not specified then venting is allowed if
       \note other venting control conditions are satisfied.
       \note Not used if Ventilation Control Mode = NoVent or ZoneLevel.
+  A7; \field Occupant Ventilation Control Name
+      \type object-list
+      \object-list AirflowNetworkOccupantVentilationControlNames
+      \note Enter the name where Occupancy Ventilation Control is required.
 
 AirflowNetwork:MultiZone:ReferenceCrackConditions,
       \min-fields 4
@@ -23568,6 +23576,70 @@ AirflowNetwork:Distribution:Linkage,
       \note Only used if component = AirflowNetwork:Distribution:Component:Duct
       \note The zone name is where AirflowNetwork:Distribution:Component:Duct is exposed. Leave this field blank if the duct
       \note conduction loss is ignored.
+
+AirflowNetwork:OccupantVentilationControl,
+      \memo This object is used to provide advanced thermal comfort control of window opening and closing 
+      \memo for both exterior and interior windows.
+  A1, \field Name
+      \required-field
+      \type alpha
+      \reference AirflowNetworkOccupantVentilationControlNames
+      \note Enter the name where the advanced thermal comfort control is required.
+  N1, \field Minimum Opening Time
+      \type real
+      \units minutes
+      \minimum 0.0
+      \default 0.0
+  N2, \field Minimum Closing Time
+      \type real
+      \units minutes
+      \minimum 0.0
+      \default 0.0
+  A2, \field Thermal Comfort Low Temperature Curve Name
+      \type object-list
+      \object-list LinearCurves
+      \object-list QuadraticCurves
+      \object-list UniVariateTables
+      \note Enter a curve name that represents thermal comfort temperature as a
+      \note function of outdoor dry-bulb temperature. Up to two curves are allowed if the 
+      \note performance cannot be represented by a single curve.
+      \note The following two fields are used if two curves are required.
+  N3, \field Thermal Comfort Temperature Boundary Point
+      \type real
+      \units C
+      \minimum 0.0
+      \default 10.0
+      \note This point is used to allow separate low and high thermal comfort temperature
+      \note curves. If a single performance curve is used, leave this field blank.
+  A3, \field Thermal Comfort High Temperature Curve Name
+      \type object-list
+      \object-list LinearCurves
+      \object-list QuadraticCurves
+      \object-list UniVariateTables
+      \note Enter a curve name that represents thermal comfort temperature as a
+      \note function of outdoor dry-bulb temperature. Up to two curves are allowed if the 
+      \note performance cannot be represented by a single curve.
+      \note If a single performance curve is used, leave this field blank.
+  N4, \field Maximum Threshold for Persons Dissatisfied PPD
+      \type real
+      \units percent
+      \minimum 0
+      \maximum 100
+      \default 10.0
+  A4, \field Occupancy Check
+      \note If Yes, occupancy check will be performed as part of the opening probability check.
+      \type choice
+      \key Yes
+      \key No
+      \default No
+  A5, \field Opening Probability Schedule Name
+      \type object-list
+      \object-list ScheduleNames
+      \note If this field is blank, the opening probability check is bypassed and opening is true.
+  A6; \field Closing Probability Schedule Name
+      \type object-list
+      \object-list ScheduleNames
+      \note If this field is blank, the closing probability check is bypassed and closing is true.
 
 \group Exterior Equipment
        ! This equipment is used merely for reporting.
@@ -31008,7 +31080,7 @@ Sizing:System,
       \key Bypass
       \key VT
       \key OnOff
-      \default VAV
+      \default OnOff
 
 Sizing:Plant,
       \memo Specifies the input needed to autosize plant loop flow rates and equipment capacities.
@@ -48256,6 +48328,97 @@ Humidifier:Steam:Electric,
       \type object-list
       \object-list WaterStorageTankNames
 
+Humidifier:Steam:Gas,
+      \memo Natural gas fired steam humidifier with optional blower fan.
+  A1, \field Name
+      \required-field
+  A2, \field Availability Schedule Name
+      \note Availability schedule name for this system. Schedule value > 0 means the system is available.
+      \note If this field is blank, the system is always available.
+      \type object-list
+      \object-list ScheduleNames
+  N1, \field Rated Capacity
+      \note Capacity is m3/s of water at 5.05 C
+      \type real
+      \units m3/s
+      \minimum 0.0
+      \ip-units gal/min
+      \autosizable
+      \note The nominal full capacity water addition rate in m3/s of water at 5.05 C
+  N2, \field Rated Gas Use Rate
+      \type real
+      \units W
+      \minimum 0.0
+      \ip-units W
+      \autosizable
+      \note if auto-sized, the rated gas use rate is calculated from the rated 
+      \note capacity and enthalpy rise of water from 20.0C to 100.0C steam and user
+      \note input thermal efficiency value specified in the next input field. If this 
+      \note input field is hard-sized and Inlet Water Temperature Option input field is 
+      \note selected as FixedInletWaterTemperature, then the thermal efficiency input       
+      \note field will not be used or else if the Inlet Water Temperature Option input 
+      \note field is selected as VariableInletWaterTemperature, then the thermal efficiency 
+      \note input value is overridden by a value calculated from the capacity, rated gas use 
+      \note rate and design condition.
+  N3, \field Thermal Efficiency
+      \type real
+      \units dimensionless
+      \minimum> 0.0
+      \maximum 1.0
+      \default 0.80   
+      \note Based on the higher heating value of fuel.
+      \note If "Rated Gas Use Rate" in the field above is not auto-sized and the Inlet Water 
+      \note Temperature Option input field is specified as FixedInletWaterTemperature, then the 
+      \note thermal efficiency specified will not be used in the calculation, or else if the 
+      \note Inlet Water Temperature Option input field is selected as VariableInletWaterTemperature, 
+      \note then the thermal efficiency value is overridden by a value calculated from the capacity, 
+      \note rated gas use rate and design condition.
+  A3, \field Thermal Efficiency Modifier Curve Name
+      \type object-list
+      \object-list UniVariateCurves
+      \note Linear, Quadratic and Cubic efficiency curves are solely a function of PLR.
+      \note Linear = C1 + C2*PLR
+      \note Quadratic = C1 + C2*PLR + C3*PLR^2
+      \note Cubic = C1 + C2*PLR + C3*PLR^2 + C4*PLR^3
+      \note This is thermal efficiency modifier curve name of gas fired steam humidifier.
+      \note This curve is normalized, i.e., curve output value at rated condition is 1.0. 
+  N4, \field Rated Fan Power
+      \type real
+      \units W
+      \minimum 0.0
+      \ip-units W
+      \note The nominal full capacity electric power input to the blower fan in Watts. If no 
+      \note blower fan is required to inject the dry steam to the supply air stream, then 
+      \note this input field is set to zero.
+  N5, \field Auxiliary Electric Power
+      \type real
+      \units W
+      \minimum 0.0
+      \ip-units W
+      \default 0.0   
+      \note The auxiliary electric power input in watts. This amount of power will be consumed
+      \note whenever the unit is available (as defined by the availability schedule). This 
+      \note electric power is used for control purpose only.
+  A4, \field Air Inlet Node Name
+      \type node
+  A5, \field Air Outlet Node Name
+      \type node
+  A6, \field Water Storage Tank Name
+      \type object-list
+      \object-list WaterStorageTankNames  
+  A7; \field Inlet Water Temperature Option
+      \note The inlet water temperature can be fixed at 20C as it is done for electric steam 
+      \note humidifier or it can be allowed to vary with temperature of the water source.  
+      \note Currently allowed water sources are main water or water storage tank in water use objects.  
+      \note if FixedInletWaterTemperature is specified, then a fixed 20C water temperature will be 
+      \note used, or else if VariableInletWaterTemperature is specified, then inlet water will vary
+      \note depending the source water temperature. If this input field is left blank, then fixed 
+      \note inlet water temperature of 20C will be assumed.  
+      \type choice
+      \key FixedInletWaterTemperature
+      \key VariableInletWaterTemperature 
+      \default FixedInletWaterTemperature  
+  
 Dehumidifier:Desiccant:NoFans,
        \memo This object models a solid desiccant dehumidifier. The process
        \memo air stream is the air which is dehumidified. The regeneration air
@@ -62341,6 +62504,156 @@ GroundHeatExchanger:HorizontalTrench,
         \note  = 0.5 : short grass, much like a manicured lawn
         \note  = 1   : standard reference state (12 cm grass)
         \note  = 1.5 : wild growth
+        
+GroundHeatExchanger:Slinky,
+        \memo This models a slinky horizontal heat exchanger 
+        \memo placed in a series of trenches
+        \memo The model uses the model developed by:
+        \memo Xiong, Z., D.E. Fisher, and J.D. Spitler. 2015.
+        \memo Development and Validation of a Slinky Ground Heat
+        \memo Exchanger Model. Applied Energy 141: 57-69.
+   A1 , \field Name
+        \required-field
+   A2 , \field Inlet Node Name
+        \type node
+        \required-field
+   A3 , \field Outlet Node Name
+        \type node
+        \required-field
+   N1 , \field Design Flow Rate
+        \type real
+        \units m3/s
+        \minimum> 0
+        \default 0.002
+   N4 , \field Soil Thermal Conductivity
+        \type real
+        \units W/m-K
+        \minimum> 0
+        \default 1.08        
+   N2 , \field Soil Density
+        \type real
+        \units kg/m3
+        \minimum> 0
+        \default 962
+   N3,  \field Soil Specific Heat
+        \required-field
+        \type real
+        \units J/kg-K
+        \minimum> 0
+        \default 2576
+   N7,  \field Pipe Thermal Conductivity
+        \type real
+        \units W/m-K
+        \minimum> 0
+        \default 0.4
+   N5,  \field Pipe Density
+        \type real
+        \units kg/m3
+        \minimum> 0
+        \default 641
+   N6,  \field Pipe Specific Heat
+        \type real
+        \units J/kg-K
+        \minimum> 0
+        \default 2405
+   N8 , \field Pipe Outer Diameter
+        \type real
+        \units m
+        \minimum> 0
+        \ip-units in
+        \default 0.02667        
+   N9 , \field Pipe Thickness
+        \type real
+        \units m
+        \minimum> 0
+        \ip-units in
+        \default 0.002413
+   A4 , \field Heat Exchanger Configuration
+        \note This is the orientation of the heat exchanger
+        \type choice
+        \key Vertical
+        \key Horizontal
+   N10 ,\field Coil Diameter
+        \note This is the diameter of the heat exchanger coil
+        \type real
+        \units m
+        \minimum> 0
+        \ip-units ft
+        \default 1.0       
+   N7 , \field Coil Pitch
+        \note This is the center-to-center distance between coils
+        \type real
+        \units m
+        \minimum> 0
+        \ip-units ft
+        \default 0.20   
+   N7 , \field Trench Depth
+        \note This is the distance from the ground surface to the
+        \note trench bottom
+        \type real
+        \units m
+        \minimum> 0
+        \ip-units ft
+        \default 1.8     
+   N2 , \field Trench Length
+        \note This is the total length of a single trench
+        \note This assumes the heat exchanger runs the full length 
+        \note of the trench
+        \type real
+        \units m
+        \minimum> 0
+        \ip-units ft
+        \default 10 
+   N3 , \field Number of Trenches
+        \note This is the number of parallel trenches that 
+        \note has a heat exchanger, one per trench
+        \type integer
+        \minimum 1
+        \default 1
+   N4 , \field Horizontal Spacing Between Pipes
+        \note This represents the average horizontal spacing 
+        \note between any two
+        \note trenches for heat exchangers that have multiple trenches
+        \type real
+        \units m
+        \minimum> 0
+        \ip-units ft
+        \default 2.0
+   N16, \field Kusuda-Achenbach Average Surface Temperature
+        \note This is the parameter for average annual surface
+        \note temperature
+        \note This is an optional input in that if it is missing, a
+        \note Site:GroundTemperature:Shallow object must be found 
+        \note in the input
+        \note The undisturbed ground temperature will be 
+        \note approximated from this object
+        \type real
+        \units C
+   N17, \field Kusuda-Achenbach Average Amplitude of Surface 
+        \note Temperature
+        \note This is the parameter for annual average amplitude from
+        \note average surface temperature
+        \note This is an optional input in that if it is missing, a
+        \note Site:GroundTemperature:Shallow object must be found 
+        \note in the input
+        \note The undisturbed ground temperature will be approximated
+        \note from this object
+        \type real
+        \units deltaC
+   N18, \field Kusuda-Achenbach Phase Shift of Minimum Surface 
+        \note Temperature
+        \note This is the parameter for phase shift from minimum
+        \note surface temperature
+        \note This is an optional input in that if it is missing, a
+        \note Site:GroundTemperature:Shallow object must be found 
+        \note in the input
+        \note The undisturbed ground temperature will be approximated
+        \note from this object
+        \type real
+        \units days
+   N19; \field Maximum Length of Simulation
+        \type real
+        \units years
 
 HeatExchanger:FluidToFluid,
         \memo A fluid/fluid heat exchanger designed to couple the supply side of one loop to the demand side of another loop
@@ -74443,7 +74756,7 @@ FaultModel:TemperatureSensorOffset:ReturnAir,
        \maximum< 10
        \default 0.0
        \units deltaC
-
+	   
 FaultModel:EnthalpySensorOffset:ReturnAir,
    \memo This object describes return air enthalpy sensor offset
    A1, \field Name
@@ -74469,6 +74782,54 @@ FaultModel:EnthalpySensorOffset:ReturnAir,
        \maximum< 20000
        \default 0.0
        \units J/kg
+
+FaultModel:ThermostatOffset,
+   A1, \field Name
+       \required-field
+       \type alpha
+   A2, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Severity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   N1, \field Reference Thermostat Offset
+       \required-field
+       \type real
+       \minimum> -10
+       \maximum< 10
+       \default 2
+       \units C
+   A4; \field Thermostat Name
+       \begin-extensible
+       \note Enter the name of a ZoneControl:Thermostat object.
+       \required-field
+       \type object-list
+       \object-list ZoneControlThermostaticNames
+
+FaultModel:HumidistatOffset,
+   A1, \field Name
+       \required-field
+       \type alpha
+   A2, \field Availability Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Severity Schedule Name
+       \type object-list
+       \object-list ScheduleNames
+   N1, \field Reference Humidistat Offset
+       \required-field
+       \type real
+       \minimum> -20
+       \maximum< 20
+       \default 5
+       \units percent
+   A4; \field Humidistat Name
+       \begin-extensible
+       \note Enter the name of a ZoneControl:Humidistat object.
+       \required-field
+       \type object-list
+       \object-list ZoneControlHumidistaticNames
 
 FaultModel:Fouling:Coil,
    \memo This object describes fouling water heating or cooling coils
