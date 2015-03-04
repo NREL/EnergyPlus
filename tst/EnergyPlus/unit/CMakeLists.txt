@@ -2,6 +2,7 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src/EnergyPlus )
 
 set( test_src
+  AirflowNetworkSolver.unit.cc
   DataPlant.unit.cc
   DXCoils.unit.cc
   ExteriorEnergyUse.unit.cc
