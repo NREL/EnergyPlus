@@ -2,11 +2,14 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src/EnergyPlus )
 
 set( test_src
+  AdvancedAFN.unit.cc
   DataPlant.unit.cc
   DXCoils.unit.cc
   ExteriorEnergyUse.unit.cc
+  GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
   HVACStandaloneERV.unit.cc
+  Humidifiers.unit.cc
   HVACUnitarySystem.unit.cc
   MixedAir.unit.cc
   PurchasedAirManager.unit.cc
@@ -22,7 +25,6 @@ set( test_src
   WaterThermalTanks.unit.cc
   main.cc
 )
-
 set( test_dependencies
   energyplusapi
 #  objexx
