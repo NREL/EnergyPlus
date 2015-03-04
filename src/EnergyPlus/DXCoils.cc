@@ -9573,7 +9573,7 @@ Label50: ;
 						ShowContinueError( "Possible causes include inconsistent air flow rates in system components or" );
 						ShowContinueError( "inconsistent supply air fan operation modes in coil and unitary system objects." );
 					}
-					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumLS ) + "error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumLS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
+					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumLS ) + " error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumLS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
 				}
 
 				// Check for valid air volume flow per rated total cooling capacity (200 - 500 cfm/ton) at high speed
@@ -9589,7 +9589,7 @@ Label50: ;
 						ShowContinueError( "Possible causes include inconsistent air flow rates in system components or" );
 						ShowContinueError( "inconsistent supply air fan operation modes in coil and unitary system objects." );
 					}
-					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + "error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
+					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + " error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
 				}
 
 				// Adjust high speed coil bypass factor for actual maximum air flow rate.
@@ -9799,7 +9799,7 @@ Label50: ;
 						ShowContinueError( "Possible causes include inconsistent air flow rates in system components or" );
 						ShowContinueError( "inconsistent supply air fan operation modes in coil and unitary system objects." );
 					}
-					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + "error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
+					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + " error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
 				}
 
 				if ( DXCoil( DXCoilNum ).CondenserType( SpeedNumLS ) == EvapCooled ) {
@@ -10210,7 +10210,7 @@ Label50: ;
 						ShowContinueError( "Possible causes include inconsistent air flow rates in system components or" );
 						ShowContinueError( "inconsistent supply air fan operation modes in coil and unitary system objects." );
 					}
-					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed " + TrimSigDigits( SpeedNumLS ) + "error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumLS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
+					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed " + TrimSigDigits( SpeedNumLS ) + " error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumLS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
 				}
 
 				// Check for valid air volume flow per rated total cooling capacity (200 - 600 cfm/ton) at high speed
@@ -10226,7 +10226,7 @@ Label50: ;
 						ShowContinueError( "Possible causes include inconsistent air flow rates in system components or" );
 						ShowContinueError( "inconsistent supply air fan operation modes in coil and unitary system objects." );
 					}
-					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + "error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
+					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + " error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
 				}
 
 				// Get total capacity modifying factor (function of temperature) for off-rated conditions
