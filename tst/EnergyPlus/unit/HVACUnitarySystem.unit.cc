@@ -158,4 +158,10 @@ TEST( SetOnOffMassFlowRateTest, Test1 )
 	EXPECT_EQ( 0.2, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.2, MSHPMassFlowRateHigh );
 
+	// Clean up
+	MultiOrVarSpeedHeatCoil.deallocate();
+	MultiOrVarSpeedCoolCoil.deallocate();
+	Node.deallocate();
+	UnitarySystem.deallocate();
+
 }
