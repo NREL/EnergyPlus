@@ -46,4 +46,6 @@ TEST( ManageElectricPowerTest, BatteryDischargeTest )
 	q0 = 0;
 
 	EXPECT_FALSE( determineCurrentForBatteryDischarge( I0, T0, Volt, Pw, q0, CurveNum1, k, c, qmax, E0c, InternalR ) );
+
+	PerfCurve.deallocate();
 }
