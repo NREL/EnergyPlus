@@ -31125,6 +31125,7 @@ ZoneControl:Humidistat,
   \min-fields 3
   A1 , \field Name
        \required-field
+       \reference ZoneControlHumidistatNames
   A2 , \field Zone Name
        \required-field
        \type object-list
@@ -74659,7 +74660,7 @@ FaultModel:HumidistatOffset,
        \note Enter the name of a ZoneControl:Humidistat object.
        \required-field
        \type object-list
-       \object-list ZoneControlHumidistaticNames
+       \object-list ZoneControlHumidistatNames
 
 FaultModel:Fouling:Coil,
    \memo This object describes fouling water heating or cooling coils
