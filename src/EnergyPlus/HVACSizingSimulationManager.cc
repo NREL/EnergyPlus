@@ -76,17 +76,9 @@ namespace EnergyPlus {
 				cp = GetSpecificHeatGlycol( PlantLoop( i ).FluidName, 
 								InitConvTemp, PlantLoop( i ).FluidIndex, 
 								"createNewCoincidentPlantAnalysisObject" );
-
-				PlantCoinicidentAnalysis tmpAnalysisObj ( // call constructor
-					PlantLoopName,
-					i,
-					PlantLoop( i ).LoopSide( SupplySide ).NodeNumIn,
-					density,
-					cp,
-					PlantSizData( PlantSizingIndex ).NumTimeStepsInAvg,
-					PlantSizingIndex );
-
-				plantCoincAnalyObjs.push_back( tmpAnalysisObj ); //store new object in vector
+				
+				plantCoincAnalyObjs.emplace_back( PlantLoopName, i, PlantLoop( i ).LoopSide( SupplySide ).NodeNumIn, density, 
+					cp, PlantSizData( PlantSizingIndex ).NumTimeStepsInAvg, PlantSizingIndex );
 			}
 		}
 	}
@@ -375,5 +367,6 @@ namespace EnergyPlus {
 
 		WarmupFlag = false;
 		DoOutputReporting = true;
+		hvacSizingSimulationManager.reset(); // delete/reset unique_ptr
 	}
 }
