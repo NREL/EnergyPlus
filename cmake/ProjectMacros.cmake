@@ -89,6 +89,10 @@ macro( CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES )
   if( BUILD_TESTING )
     add_executable( ${BASE_NAME}_tests ${SRC} )
 
+    if( ENABLE_GTEST_DEBUG_MODE )
+    set_target_properties(${BASE_NAME}_tests PROPERTIES COMPILE_DEFINITIONS ENABLE_GTEST_DEBUG_MODE)
+    endif()
+
     CREATE_SRC_GROUPS( "${SRC}" )
     
     get_target_property(BASE_NAME_TYPE ${BASE_NAME} TYPE)
@@ -103,7 +107,6 @@ macro( CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES )
     target_link_libraries( ${BASE_NAME}_tests 
       ${ALL_DEPENDENCIES} 
       gtest 
-      gtest_main
     )
 
     ADD_GOOGLE_TESTS( ${BASE_NAME}_tests ${SRC} )

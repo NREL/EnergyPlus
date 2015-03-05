@@ -13,6 +13,7 @@
 #include <AirflowNetworkBalanceManager.hh>
 #include <AirflowNetworkSolver.hh>
 #include <BranchNodeConnections.hh>
+#include <CurveManager.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
@@ -73,6 +74,9 @@ namespace AirflowNetworkBalanceManager {
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::SecInHour;
 	using DataGlobals::DisplayExtraWarnings;
+	using DataGlobals::DayOfSim;
+	using DataGlobals::TimeStepZone;
+	using DataHVACGlobals::SysTimeElapsed;
 	using namespace DataAirflowNetwork;
 	using DataAirLoop::AirToZoneNodeInfo;
 	using DataLoopNode::NumOfNodes;
@@ -120,6 +124,9 @@ namespace AirflowNetworkBalanceManager {
 	using AirflowNetworkSolver::InitAirflowNetworkData;
 	using AirflowNetworkSolver::NetworkNumOfLinks;
 	using AirflowNetworkSolver::NetworkNumOfNodes;
+	using CurveManager::GetCurveIndex;
+	using CurveManager::GetCurveType;
+	using CurveManager::CurveValue;
 	using Fans::GetFanVolFlow;
 	using Fans::GetFanIndex;
 	using Fans::GetFanInletNode;
@@ -154,6 +161,12 @@ namespace AirflowNetworkBalanceManager {
 	int const VentCtrNum_ZoneLevel( 7 ); // ZoneLevel control for a heat transfer subsurface
 	int const VentCtrNum_AdjTemp( 8 ); // Temperature venting control based on adjacent zone conditions
 	int const VentCtrNum_AdjEnth( 9 ); // Enthalpy venting control based on adjacent zone conditions
+	int const FeeeOperation( 0 ); // Free operatio
+	int const MinCheckForceOpen( 1 ); // Force open when opening elapsed time is less than minimum opening time 
+	int const MinCheckForceClose( 2 ); // Force open when closing elapsed time is less than minimum closing time 
+	int const ProbNoAction( 0 ); // No action from probability check
+	int const ProbForceChange( 1 ); // Force open or close from probability check
+	int const ProbKeepStatus( 2 ); // Keep status at the previous time step from probability check
 	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS:
@@ -206,6 +219,10 @@ namespace AirflowNetworkBalanceManager {
 	int SupplyFanOutletNode( 0 ); // Supply air fan outlet node number
 	int SupplyFanType( 0 ); // Supply air fan type
 	Real64 OnOffFanRunTimeFraction( 0.0 ); // Run time fraction for an On/Off fan flow rate
+	Real64 CurrentEndTime( 0.0 ); // Current end time
+	Real64 CurrentEndTimeLast( 0.0 ); // last end time
+	Real64 TimeStepSysLast( 0.0 ); // last system time step
+	int AirflowNetworkNumOfOccuVentCtrls( 0 );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE AirflowNetworkBalanceManager:
 	// Name Public routines, optionally name Private routines within this module
@@ -213,6 +230,7 @@ namespace AirflowNetworkBalanceManager {
 	// Object Data
 	FArray1D< AirflowNetworkReportVars > AirflowNetworkZnRpt;
 
+	FArray1D< OccupantVentilationControlProp > OccupantVentilationControl;
 	// Functions
 
 	void
@@ -506,6 +524,9 @@ namespace AirflowNetworkBalanceManager {
 		GetObjectDefMaxArgs( "AirflowNetwork:Distribution:Linkage", TotalArgs, NumAlphas, NumNumbers );
 		MaxNums = max( MaxNums, NumNumbers );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
+		GetObjectDefMaxArgs( "AirflowNetwork:OccupantVentilationControl", TotalArgs, NumAlphas, NumNumbers );
+		MaxNums = max( MaxNums, NumNumbers );
+		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
 		cAlphaFields.allocate( MaxAlphas );
@@ -516,6 +537,143 @@ namespace AirflowNetworkBalanceManager {
 
 		ErrorsFound = false;
 		AirflowNetworkInitFlag = false;
+
+		// Read AirflowNetwork OccupantVentilationControl before reading other AirflowNetwork objects, so that this object can be called by other simple ventilation objects
+		CurrentModuleObject = "AirflowNetwork:OccupantVentilationControl";
+		AirflowNetworkNumOfOccuVentCtrls = GetNumObjectsFound( CurrentModuleObject );
+		if ( AirflowNetworkNumOfOccuVentCtrls > 0 ) {
+			OccupantVentilationControl.allocate( AirflowNetworkNumOfOccuVentCtrls );
+			for ( i = 1; i <= AirflowNetworkNumOfOccuVentCtrls; ++i ) {
+				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				IsNotOK = false;
+				IsBlank = false;
+				VerifyName( Alphas( 1 ), OccupantVentilationControl.Name( ), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+				if ( IsNotOK ) {
+					ErrorsFound = true;
+					if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+				}
+
+				OccupantVentilationControl( i ).Name = Alphas( 1 ); // Name of object
+				OccupantVentilationControl( i ).MinOpeningTime = Numbers( 1 );
+				if ( OccupantVentilationControl( i ).MinOpeningTime < 0.0 ) {
+					ShowWarningError( RoutineName + CurrentModuleObject + " object, " + cNumericFields( 1 ) + " < 0.0" );
+					ShowContinueError( "..Input value = " + RoundSigDigits( OccupantVentilationControl( i ).MinOpeningTime, 1 ) + ", Value will be reset to 0.0" );
+					ShowContinueError( "..for " + cAlphaFields( 1 ) + " = \"" + OccupantVentilationControl( i ).Name );
+					OccupantVentilationControl( i ).MinOpeningTime = 0.0;
+				}
+				OccupantVentilationControl( i ).MinClosingTime = Numbers( 2 );
+				if ( OccupantVentilationControl( i ).MinClosingTime < 0.0 ) {
+					ShowWarningError( RoutineName + CurrentModuleObject + " object, " + cNumericFields( 2 ) + " < 0.0" );
+					ShowContinueError( "..Input value = " + RoundSigDigits( OccupantVentilationControl( i ).MinClosingTime, 1 ) + ", Value will be reset to 0.0" );
+					ShowContinueError( "..for " + cAlphaFields( 1 ) + " = \"" + OccupantVentilationControl( i ).Name );
+					OccupantVentilationControl( i ).MinClosingTime = 0.0;
+				}
+				if ( NumAlphas == 1 && NumNumbers == 2 ) {
+					OccupantVentilationControl( i ).MinTimeControlOnly = true;
+				}
+				if ( !lAlphaBlanks( 2 ) ) {
+					OccupantVentilationControl( i ).ComfortLowTempCurveName = Alphas( 2 );
+					OccupantVentilationControl( i ).ComfortLowTempCurveNum = GetCurveIndex( Alphas( 2 ) ); // convert curve name to number
+					if ( OccupantVentilationControl( i ).ComfortLowTempCurveNum == 0 ) {
+						OccupantVentilationControl( i ).MinTimeControlOnly = true;
+						ShowWarningError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 2 ) + " not found = " + OccupantVentilationControl( i ).ComfortLowTempCurveName );
+						ShowContinueError( "..for specified " + cAlphaFields( 1 ) + " = " + Alphas( 1 ) );
+						ShowContinueError( "Thermal comfort will not be performed and minimum opening and closing times are checked only. Simulation continues." );
+					} else {
+						// Verify Curve Object, only legal type is linear or quadratic
+						{ auto const SELECT_CASE_var( GetCurveType( OccupantVentilationControl( i ).ComfortLowTempCurveNum ) );
+						if ( SELECT_CASE_var == "LINEAR" || SELECT_CASE_var == "QUADRATIC" ) {
+						} else {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OccupantVentilationControl( i ).Name + "\", invalid" );
+							ShowContinueError( "...illegal " + cAlphaFields( 2 ) + " type for this object = " + GetCurveType( OccupantVentilationControl( i ).ComfortLowTempCurveNum ) );
+							ShowContinueError( "Curve type must be either Linear or Quadratic." );
+							ErrorsFound = true;
+						}}
+					}
+				}
+				if ( !lAlphaBlanks( 3 ) ) {
+					OccupantVentilationControl( i ).ComfortHighTempCurveName = Alphas( 3 );
+					OccupantVentilationControl( i ).ComfortHighTempCurveNum = GetCurveIndex( Alphas( 3 ) ); // convert curve name to number
+					if ( OccupantVentilationControl( i ).ComfortHighTempCurveNum > 0 ) {
+						// Verify Curve Object, only legal type is BiQuadratic
+						{ auto const SELECT_CASE_var( GetCurveType( OccupantVentilationControl( i ).ComfortHighTempCurveNum ) );
+						if ( SELECT_CASE_var == "LINEAR" || SELECT_CASE_var == "QUADRATIC" ) {
+						} else {
+							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + OccupantVentilationControl( i ).Name + "\", invalid" );
+							ShowContinueError( "...illegal " + cAlphaFields( 3 ) + " type for this object = " + GetCurveType( OccupantVentilationControl( i ).ComfortHighTempCurveNum ) );
+							ShowContinueError( "Curve type must be either Linear or Quadratic." );
+							ErrorsFound = true;
+						}}
+					} else {
+						ShowWarningError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 3 ) + " not found = " + OccupantVentilationControl( i ).ComfortHighTempCurveName );
+						ShowContinueError( "..for specified " + cAlphaFields( 1 ) + " = " + Alphas( 1 ) );
+						ShowContinueError( "A single curve of thermal comfort low temperature is used only. Simulation continues." );
+					}
+				}
+				if ( OccupantVentilationControl( i ).ComfortHighTempCurveNum > 0 ) {
+					OccupantVentilationControl( i ).ComfortBouPoint = Numbers( 3 );
+					if ( OccupantVentilationControl( i ).ComfortBouPoint < 0.0 ) {
+						ShowWarningError( RoutineName + CurrentModuleObject + " object, " + cNumericFields( 3 ) + " < 0.0" );
+						ShowContinueError( "..Input value = " + RoundSigDigits( OccupantVentilationControl( i ).ComfortBouPoint, 1 ) + ", Value will be reset to 10.0 as default" );
+						ShowContinueError( "..for " + cAlphaFields( 1 ) + " = \"" + OccupantVentilationControl( i ).Name );
+						OccupantVentilationControl( i ).ComfortBouPoint = 10.0;
+					}
+				}
+				// Check continuity of both curves at boundary point 
+				if ( OccupantVentilationControl( i ).ComfortLowTempCurveNum > 0 && OccupantVentilationControl( i ).ComfortHighTempCurveNum ) {
+					if ( abs( CurveValue( OccupantVentilationControl( i ).ComfortLowTempCurveNum, Numbers( 3 ) ) - CurveValue( OccupantVentilationControl( i ).ComfortHighTempCurveNum, Numbers( 3 ) ) ) > 0.1) {
+						ShowSevereError( RoutineName + CurrentModuleObject + " object: The difference of both curve values at boundary point > 0.1" );
+						ShowContinueError( "Both curve names are = " + cAlphaFields( 2 ) + " and " + cAlphaFields( 3 ));
+						ShowContinueError( "The input value of " + cNumericFields( 3 ) + " = " + RoundSigDigits( OccupantVentilationControl( i ).ComfortBouPoint, 1 ));
+						ErrorsFound = true;
+					}
+				}
+				if ( !lNumericBlanks( 4 ) ) {
+					OccupantVentilationControl( i ).MaxPPD = Numbers( 4 );
+					if ( OccupantVentilationControl( i ).MaxPPD < 0.0 || OccupantVentilationControl( i ).MaxPPD > 100.0 ) {
+						ShowWarningError( RoutineName + CurrentModuleObject + " object, " + cNumericFields( 4 ) + " beyond 0.0 and 100.0" );
+						ShowContinueError( "..Input value = " + RoundSigDigits( OccupantVentilationControl( i ).MaxPPD, 1 ) + ", Value will be reset to 10.0 as default" );
+						ShowContinueError( "..for " + cAlphaFields( 1 ) + " = \"" + OccupantVentilationControl( i ).Name );
+						OccupantVentilationControl( i ).MaxPPD = 10.0;
+					}
+				}
+				if ( !lAlphaBlanks( 4 ) ) {
+					if ( SameString( Alphas( 4 ), "Yes" ) ) {
+						OccupantVentilationControl( i ).OccupancyCheck = true;
+					}
+					else if ( SameString( Alphas( 4 ), "No" ) ) {
+						OccupantVentilationControl( i ).OccupancyCheck = false;
+					}
+					else {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\" invalid " + cAlphaFields( 2 ) + "=\"" + Alphas( 2 ) + "\" illegal key." );
+						ShowContinueError( "Valid keys are: Yes or No" );
+						ErrorsFound = true;
+					}
+				}
+				if ( !lAlphaBlanks( 5 ) ) {
+					OccupantVentilationControl( i ).OpeningProbSchName = Alphas( 5 ); // a schedule name for opening probability
+					OccupantVentilationControl( i ).OpeningProbSchNum = GetScheduleIndex( OccupantVentilationControl( i ).OpeningProbSchName );
+					if ( OccupantVentilationControl( i ).OpeningProbSchNum == 0 ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 5 ) + " not found = " + OccupantVentilationControl( i ).OpeningProbSchName );
+						ShowContinueError( "..for specified " + cAlphaFields( 1 ) + " = " + Alphas( 1 ) );
+						ErrorsFound = true;
+					}
+				}
+				if ( !lAlphaBlanks( 6 ) ) {
+					OccupantVentilationControl( i ).ClosingProbSchName = Alphas( 6 ); // a schedule name for closing probability
+					OccupantVentilationControl( i ).ClosingProbSchNum = GetScheduleIndex( OccupantVentilationControl( i ).ClosingProbSchName );
+					if ( OccupantVentilationControl( i ).OpeningProbSchNum == 0 ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 6 ) + " not found = " + OccupantVentilationControl( i ).ClosingProbSchName );
+						ShowContinueError( "..for specified " + cAlphaFields( 1 ) + " = " + Alphas( 1 ) );
+						ErrorsFound = true;
+					}
+				}
+			}
+		}
+
+		if ( ErrorsFound ) {
+			ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );
+		}
 
 		// *** Read AirflowNetwork simulation parameters
 		CurrentModuleObject = "AirflowNetwork:SimulationControl";
@@ -743,6 +901,16 @@ namespace AirflowNetworkBalanceManager {
 				MultizoneZoneData( i ).VentCtrNum = VentCtrNum_None;
 				MultizoneZoneData( i ).SingleSidedCpType = Alphas( 5 );
 				MultizoneZoneData( i ).BuildWidth = Numbers( 6 );
+
+				if ( !lAlphaBlanks( 6 ) ) {
+					MultizoneZoneData( i ).OccupantVentilationControlName = Alphas( 6 );
+					MultizoneZoneData( i ).OccupantVentilationControlNum = FindItemInList( MultizoneZoneData( i ).OccupantVentilationControlName, OccupantVentilationControl.Name( ), AirflowNetworkNumOfOccuVentCtrls );
+					if ( MultizoneZoneData( i ).OccupantVentilationControlNum == 0 ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 6 ) + " not found = " + MultizoneZoneData( i ).OccupantVentilationControlName );
+						ShowContinueError( "..for specified " + cAlphaFields( 1 ) + " = " + Alphas( 1 ) );
+						ErrorsFound = true;
+					}
+				}
 				if ( SameString( MultizoneZoneData( i ).VentControl, "Temperature" ) ) MultizoneZoneData( i ).VentCtrNum = VentCtrNum_Temp;
 				if ( SameString( MultizoneZoneData( i ).VentControl, "Enthalpy" ) ) MultizoneZoneData( i ).VentCtrNum = VentCtrNum_Enth;
 				if ( SameString( MultizoneZoneData( i ).VentControl, "Constant" ) ) MultizoneZoneData( i ).VentCtrNum = VentCtrNum_Const;
@@ -994,6 +1162,15 @@ namespace AirflowNetworkBalanceManager {
 				if (MultizoneSurfaceData(i).VentSurfCtrNum < 4 || MultizoneSurfaceData(i).VentSurfCtrNum == VentCtrNum_AdjTemp || MultizoneSurfaceData(i).VentSurfCtrNum == VentCtrNum_AdjEnth) {
 					if ( ! lAlphaBlanks( 6 ) ) {
 						MultizoneSurfaceData( i ).VentingSchName = Alphas( 6 ); // Name of ventilation availability schedule
+					}
+				}
+				if ( !lAlphaBlanks( 7 ) ) {
+					MultizoneSurfaceData( i ).OccupantVentilationControlName = Alphas( 7 );
+					MultizoneSurfaceData( i ).OccupantVentilationControlNum = FindItemInList( MultizoneSurfaceData( i ).OccupantVentilationControlName, OccupantVentilationControl.Name( ), AirflowNetworkNumOfOccuVentCtrls );
+					if ( MultizoneSurfaceData( i ).OccupantVentilationControlNum == 0 ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + " object, " + cAlphaFields( 7 ) + " not found = " + MultizoneSurfaceData( i ).OccupantVentilationControlName );
+						ShowContinueError( "..for specified " + cAlphaFields( 1 ) + " = " + Alphas( 1 ) );
+						ErrorsFound = true;
 					}
 				}
 			}
@@ -2037,6 +2214,19 @@ namespace AirflowNetworkBalanceManager {
 
 		}
 
+		// Assign occupant ventilation control number from zone to surface
+		for ( i = 1; i <= AirflowNetworkNumOfSurfaces; ++i ) {
+			j = MultizoneSurfaceData( i ).SurfNum;
+			if ( SurfaceWindow( j ).OriginalClass == SurfaceClass_Window || SurfaceWindow( j ).OriginalClass == SurfaceClass_Door || SurfaceWindow( j ).OriginalClass == SurfaceClass_GlassDoor ) {
+				for ( n = 1; n <= AirflowNetworkNumOfZones; ++n ) {
+					if ( MultizoneZoneData( n ).ZoneNum ==  Surface( j ).Zone ) {
+						if ( MultizoneZoneData( n ).OccupantVentilationControlNum > 0 && MultizoneSurfaceData( i ).OccupantVentilationControlNum == 0 ) {
+							MultizoneSurfaceData( i ).OccupantVentilationControlNum = MultizoneZoneData( n ).OccupantVentilationControlNum;
+						}
+					}
+				}
+			}
+		}
 		// Read AirflowNetwork Distribution system node
 		CurrentModuleObject = "AirflowNetwork:Distribution:Node";
 		DisSysNumOfNodes = GetNumObjectsFound( CurrentModuleObject );
@@ -3056,7 +3246,7 @@ namespace AirflowNetworkBalanceManager {
 		// na
 
 		// USE STATEMENTS:
-		// na
+		using DataHVACGlobals::TimeStepSys;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3075,6 +3265,7 @@ namespace AirflowNetworkBalanceManager {
 		static bool OneTimeFlag( true );
 		static bool MyEnvrnFlag( true );
 		int i;
+		int j;
 
 		if ( OneTimeFlag ) {
 			AirflowNetworkExchangeData.allocate( NumOfZones ); // AirflowNetwork exchange data due to air-forced system
@@ -3125,6 +3316,19 @@ namespace AirflowNetworkBalanceManager {
 				if ( Contaminant.CO2Simulation ) ANCO( i ) = ZoneAirCO2( i );
 				if ( Contaminant.GenericContamSimulation ) ANGC( i ) = ZoneAirGC( i );
 			}
+			if ( AirflowNetworkNumOfOccuVentCtrls > 0 ) {
+				for ( i = 1; i <= AirflowNetworkNumOfSurfaces; ++i ) {
+					if ( MultizoneSurfaceData( i ).OccupantVentilationControlNum > 0 ) {
+						MultizoneSurfaceData( i ).PrevOpeningstatus = 0;
+						MultizoneSurfaceData( i ).CloseElapsedTime = 0.0;
+						MultizoneSurfaceData( i ).OpenElapsedTime = 0.0;
+						MultizoneSurfaceData( i ).OpeningStatus = 0;
+						MultizoneSurfaceData( i ).OpeningProbStatus = 0;
+						MultizoneSurfaceData( i ).ClosingProbStatus = 0;
+					}
+				}
+			}
+
 			MyEnvrnFlag = false;
 		}
 		if ( ! BeginEnvrnFlag ) {
@@ -3174,6 +3378,33 @@ namespace AirflowNetworkBalanceManager {
 		if ( Contaminant.CO2Simulation ) AirflowNetworkExchangeData.TotalCO2() = 0.0;
 		if ( Contaminant.GenericContamSimulation ) AirflowNetworkExchangeData.TotalGC() = 0.0;
 
+		// Occupant ventilation control
+		CurrentEndTime = CurrentTime + SysTimeElapsed;
+		if ( CurrentEndTime > CurrentEndTimeLast && TimeStepSys >= TimeStepSysLast ) {
+			for ( i = 1; i <= AirflowNetworkNumOfSurfaces; ++i ) {
+				if ( MultizoneSurfaceData( i ).OccupantVentilationControlNum > 0 ) {
+					MultizoneSurfaceData( i ).PrevOpeningstatus = MultizoneSurfaceData( i ).OpeningStatus;
+					MultizoneSurfaceData( i ).OpenFactorLast = MultizoneSurfaceData( i ).OpenFactor;
+					if ( MultizoneSurfaceData( i ).OpenFactor > 0.0 ) {
+						MultizoneSurfaceData( i ).OpenElapsedTime += ( CurrentEndTime - CurrentEndTimeLast ) * 60.0;
+						MultizoneSurfaceData( i ).CloseElapsedTime = 0.0;
+					} else {
+						MultizoneSurfaceData( i ).OpenElapsedTime = 0.0;
+						MultizoneSurfaceData( i ).CloseElapsedTime += ( CurrentEndTime - CurrentEndTimeLast ) * 60.0;
+					}
+					j = MultizoneSurfaceData( i ).SurfNum;
+					OccupantVentilationControl( MultizoneSurfaceData( i ).OccupantVentilationControlNum ).calc( Surface( j ).Zone, j, MultizoneSurfaceData( i ).PrevOpeningstatus, MultizoneSurfaceData( i ).OpenElapsedTime, MultizoneSurfaceData( i ).CloseElapsedTime, MultizoneSurfaceData( i ).OpeningStatus, MultizoneSurfaceData( i ).OpeningProbStatus, MultizoneSurfaceData( i ).ClosingProbStatus );
+					if ( MultizoneSurfaceData( i ).OpeningStatus == MinCheckForceOpen ) {
+						MultizoneSurfaceData( i ).OpenFactor = MultizoneSurfaceData( i ).OpenFactorLast;
+					}
+					if ( MultizoneSurfaceData( i ).OpeningStatus == MinCheckForceClose ) {
+						MultizoneSurfaceData( i ).OpenFactor = 0.0;
+					}
+				}
+			}
+		}
+		TimeStepSysLast = TimeStepSys;
+		CurrentEndTimeLast = CurrentEndTime;
 	}
 
 	void
@@ -3281,6 +3512,15 @@ namespace AirflowNetworkBalanceManager {
 				SetupOutputVariable( "AFN Surface Venting Window or Door Opening Modulation Multiplier []", SurfaceWindow( SurfNum ).VentingOpenFactorMultRep, "System", "Average", Surface( SurfNum ).Name );
 				SetupOutputVariable( "AFN Surface Venting Inside Setpoint Temperature [C]", SurfaceWindow( SurfNum ).InsideTempForVentingRep, "System", "Average", Surface( SurfNum ).Name );
 				SetupOutputVariable( "AFN Surface Venting Availability Status []", SurfaceWindow( SurfNum ).VentingAvailabilityRep, "System", "Average", Surface( SurfNum ).Name );
+				if ( MultizoneSurfaceData( i ).OccupantVentilationControlNum > 0 ) {
+					SetupOutputVariable( "AFN Surface Venting Window or Door Opening Factor at Previous Time Step []", MultizoneSurfaceData( i ).OpenFactorLast, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+					SetupOutputVariable( "AFN Surface Opening Elapsed Time [min]", MultizoneSurfaceData( i ).OpenElapsedTime, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+					SetupOutputVariable( "AFN Surface Closing Elapsed Time [min]", MultizoneSurfaceData( i ).CloseElapsedTime, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+					SetupOutputVariable( "AFN Surface Opening Status at Previous Time Step []", MultizoneSurfaceData( i ).PrevOpeningstatus, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+					SetupOutputVariable( "AFN Surface Opening Status []", MultizoneSurfaceData( i ).OpeningStatus, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+					SetupOutputVariable( "AFN Surface Opening Probability Status []", MultizoneSurfaceData( i ).OpeningProbStatus, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+					SetupOutputVariable( "AFN Surface Closing Probability Status []", MultizoneSurfaceData( i ).ClosingProbStatus, "System", "Average", MultizoneSurfaceData( i ).SurfName );
+				}
 			}
 		}
 
@@ -3446,10 +3686,24 @@ namespace AirflowNetworkBalanceManager {
 		}
 
 		for ( i = 1; i <= AirflowNetworkNumOfSurfaces; ++i ) {
-			MultizoneSurfaceData( i ).OpenFactor = 0.0;
+			if (MultizoneSurfaceData( i ).OccupantVentilationControlNum == 0) MultizoneSurfaceData( i ).OpenFactor = 0.0;
 			j = MultizoneSurfaceData( i ).SurfNum;
 			if ( SurfaceWindow( j ).OriginalClass == SurfaceClass_Window || SurfaceWindow( j ).OriginalClass == SurfaceClass_Door || SurfaceWindow( j ).OriginalClass == SurfaceClass_GlassDoor ) {
-				AirflowNetworkVentingControl( i, MultizoneSurfaceData( i ).OpenFactor );
+				if ( MultizoneSurfaceData( i ).OccupantVentilationControlNum > 0 ) {
+					if ( MultizoneSurfaceData( i ).OpeningStatus == FeeeOperation ) {
+						if ( MultizoneSurfaceData( i ).OpeningProbStatus == ProbForceChange ) {
+							MultizoneSurfaceData( i ).OpenFactor = MultizoneSurfaceData( i ).Factor;
+						} else if ( MultizoneSurfaceData( i ).ClosingProbStatus == ProbForceChange ) {
+							MultizoneSurfaceData( i ).OpenFactor = 0.0;
+						} else if ( MultizoneSurfaceData( i ).ClosingProbStatus == ProbKeepStatus || MultizoneSurfaceData( i ).OpeningProbStatus == ProbKeepStatus ) {
+							MultizoneSurfaceData( i ).OpenFactor = MultizoneSurfaceData( i ).OpenFactorLast;
+						} else {
+							AirflowNetworkVentingControl( i, MultizoneSurfaceData( i ).OpenFactor );
+						}
+					}					
+				} else {
+					AirflowNetworkVentingControl( i, MultizoneSurfaceData( i ).OpenFactor );
+				}
 				MultizoneSurfaceData( i ).OpenFactor *= MultizoneSurfaceData( i ).WindModifier;
 				if ( MultizoneSurfaceData( i ).HybridVentClose ) MultizoneSurfaceData( i ).OpenFactor = 0.0;
 				if ( AirflowNetworkFanActivated && ( SimulateAirflowNetwork > AirflowNetworkControlMultizone ) && MultizoneSurfaceData( i ).OpenFactor > 0.0 && Surface( j ).ExtBoundCond == ExternalEnvironment && ! WarmupFlag ) {
@@ -7225,6 +7479,158 @@ Label90: ;
 		ACH = InfilVolume / ( TimeStepSys * Zone( ZoneNum ).Volume );
 
 		return ACH;
+	}
+
+	void OccupantVentilationControlProp::calc(
+		int const ZoneNum,
+		int const SurfNum,
+		int const PrevOpeningstatus,
+		Real64 const TimeOpenDuration,
+		Real64 const TimeCloseDuration,
+		int & OpeningStatus,
+		int & OpeningProbStatus,
+		int & ClosingProbStatus
+		)
+	{
+		using DataHeatBalance::MRT;
+
+		Real64 Tcomfort; // Thermal comfort temperature
+		Real64 ComfortBand; // Thermal comfort band
+		Real64 Toperative; // Oprative temperature
+		Real64 OutDryBulb; // Outdoor dry-bulb temperature
+
+		// flow
+
+		if ( TimeOpenDuration > 0 ) {
+			if ( TimeOpenDuration >= MinOpeningTime ) {
+				OpeningStatus = FeeeOperation; // free operation
+			} else {
+				OpeningStatus = MinCheckForceOpen; // forced to open
+			}
+		}
+		if ( TimeCloseDuration > 0 ) {
+			if ( TimeCloseDuration >= MinClosingTime ) {
+				OpeningStatus = FeeeOperation; // free operation
+			} else {
+				OpeningStatus = MinCheckForceClose; // forced to close
+			}
+		}
+
+		if ( MinTimeControlOnly ) return;
+
+		OutDryBulb = OutDryBulbTempAt( Zone( ZoneNum ).Centroid.z );
+		if ( OutDryBulb < ComfortBouPoint ) {
+			Tcomfort = CurveValue( ComfortLowTempCurveNum, OutDryBulb );
+		} else {
+			Tcomfort = CurveValue( ComfortHighTempCurveNum, OutDryBulb );
+		}
+		ComfortBand = -0.0028 * ( 100 - MaxPPD ) * ( 100 - MaxPPD ) + 0.3419 * ( 100 - MaxPPD ) - 6.6275;
+		Toperative = 0.5 * ( MAT( ZoneNum ) + MRT( ZoneNum ) );
+
+		if ( Toperative > ( Tcomfort + ComfortBand ) ) {
+			if ( openingProbability( ZoneNum, TimeCloseDuration ) ) {
+				OpeningProbStatus = ProbForceChange; // forced to open
+			} else {
+				OpeningProbStatus = ProbKeepStatus; // Keep previous status
+			}
+		} else {
+			OpeningProbStatus = ProbNoAction; // free operation
+		}
+
+		if ( Toperative < ( Tcomfort - ComfortBand ) ) {
+			if ( closingProbability( TimeOpenDuration ) ) {
+				ClosingProbStatus = ProbForceChange; // forced to close
+			} else {
+				ClosingProbStatus = ProbKeepStatus; // Keep previous status 
+			}
+		} else {
+			ClosingProbStatus = ProbNoAction; // free operation
+		}
+
+	}
+
+	bool OccupantVentilationControlProp::openingProbability(
+		int const ZoneNum,
+		Real64 const TimeCloseDuration
+		)// function to perform calculations of opening probability
+	{
+		using DataHeatBalance::ZnRpt;
+		using DataHeatBalance::ZoneIntGain;
+		using DataHeatBalFanSys::ZoneThermostatSetPointLo;
+		using DataHeatBalFanSys::ZoneThermostatSetPointHi;
+		using DataHeatBalFanSys::TempControlType;
+		using DataHVACGlobals::SingleHeatingSetPoint;
+		using DataHVACGlobals::SingleCoolingSetPoint;
+		using DataHVACGlobals::SingleHeatCoolSetPoint;
+		using DataHVACGlobals::DualSetPointWithDeadBand;
+
+		Real64 SchValue;
+		Real64 RandomValue;
+
+		if ( TimeCloseDuration < MinClosingTime ) {
+			return false;
+		}
+		if ( OccupancyCheck ) {
+			if ( ZoneIntGain( ZoneNum ).NOFOCC <= 0.0 ) {
+				return false;
+			}
+		} 
+
+		{ auto const SELECT_CASE_var( TempControlType( ZoneNum ) ); // Check zone setpoints
+			if ( SELECT_CASE_var == 0 ) { // Uncontrolled
+
+			} else if ( SELECT_CASE_var == SingleHeatingSetPoint ) {
+				if ( MAT( ZoneNum ) <= ZoneThermostatSetPointLo( ZoneNum ) ) {
+					return false;
+				}
+			} else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
+				if ( MAT( ZoneNum ) >= ZoneThermostatSetPointHi( ZoneNum ) ) {
+					return false;
+				}
+			} else if ( SELECT_CASE_var == SingleHeatCoolSetPoint ) {
+				return false;
+			} else if ( SELECT_CASE_var == DualSetPointWithDeadBand ) {
+				if ( MAT( ZoneNum ) < ZoneThermostatSetPointLo( ZoneNum ) || MAT( ZoneNum ) > ZoneThermostatSetPointHi( ZoneNum ) ) {
+					return false;
+				}
+			}
+		}
+			
+		if ( OpeningProbSchNum == 0 ) {
+			return true;
+		} else {
+			SchValue = GetCurrentScheduleValue( OpeningProbSchNum );
+			RandomValue = Real64( rand( ) ) / RAND_MAX;
+			if ( SchValue > RandomValue ) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+	}
+
+	bool OccupantVentilationControlProp::closingProbability(
+		Real64 const TimeOpenDuration
+		) // function to perform calculations of closing probability
+	{
+		Real64 SchValue;
+		Real64 RandomValue;
+
+		if ( TimeOpenDuration < MinOpeningTime ) {
+			return false;
+		}
+		if ( ClosingProbSchNum == 0 ) {
+			return true;
+		} else {
+			SchValue = GetCurrentScheduleValue( ClosingProbSchNum );
+			RandomValue = Real64( rand( ) ) / RAND_MAX;
+			if ( SchValue > RandomValue ) {
+				return true;
+			} else {
+				return false;
+			}
+		}
 	}
 
 	//     NOTICE
