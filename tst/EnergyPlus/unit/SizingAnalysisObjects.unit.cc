@@ -152,7 +152,7 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 {
 // basic test of method FillZoneStep and zone time stamp constructor
 // setup a log for 4 timesteps per hour and fill the first 4 steps, then check that values are there
-	SizingLog TestLogObj;
+	SizingLog TestLogObj( LogVal );
 
 	TestLogObj.NumOfEnvironmentsInLogSet = 2;
 	TestLogObj.NumOfDesignDaysInLogSet = 2;
@@ -171,8 +171,6 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 	TestLogObj.newEnvrnToSeedEnvrnMap[ 4 ] = 2;
 
 	TestLogObj.ztStepObj.resize( TestLogObj.NumOfStepsInLogSet );
-
-	TestLogObj.p_rVariable = & LogVal; 
 
 // fill first step in log with zone step data
 	int KindOfSim( 4 );
@@ -253,7 +251,7 @@ TEST_F( SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour )
 {
 // this test uses one timestep per hour and checks as for two design days
 
-	SizingLog TestLogObj;
+	SizingLog TestLogObj( LogVal );
 
 	TestLogObj.NumOfEnvironmentsInLogSet = 2;
 	TestLogObj.NumOfDesignDaysInLogSet = 2;
@@ -270,8 +268,6 @@ TEST_F( SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour )
 	TestLogObj.newEnvrnToSeedEnvrnMap[ 4 ] = 2;
 
 	TestLogObj.ztStepObj.resize( TestLogObj.NumOfStepsInLogSet );
-
-	TestLogObj.p_rVariable = & LogVal; 
 
 // fill first step in log with zone step data
 	int KindOfSim( 4 );

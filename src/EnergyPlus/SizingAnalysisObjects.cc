@@ -67,6 +67,10 @@ namespace EnergyPlus {
 
 	}
 
+	SizingLog::SizingLog( double & rVariable ) : 
+	p_rVariable( rVariable )
+	{}
+
 	int SizingLog::GetZtStepIndex (
 		const ZoneTimestepObject tmpztStepStamp )
 	{
@@ -105,7 +109,7 @@ namespace EnergyPlus {
 		ztStepObj[ index ].stepEndMinute	= tmpztStepStamp.stepEndMinute;
 		ztStepObj[ index ].timeStepDuration	= tmpztStepStamp.timeStepDuration;
 
-		ztStepObj[ index ].logDataValue		= *p_rVariable;
+		ztStepObj[ index ].logDataValue		= p_rVariable;
 
 	}
 
@@ -190,7 +194,7 @@ namespace EnergyPlus {
 			/ tmpSysStepStamp.TimeStepDuration) ) ;
 
 		ztStepObj[ ztIndex ].subSteps[ tmpSysStepStamp.stStepsIntoZoneStep ] = tmpSysStepStamp;
-		ztStepObj[ ztIndex ].subSteps[ tmpSysStepStamp.stStepsIntoZoneStep ].LogDataValue = *p_rVariable;
+		ztStepObj[ ztIndex ].subSteps[ tmpSysStepStamp.stStepsIntoZoneStep ].LogDataValue = p_rVariable;
 
 	}
 
@@ -300,7 +304,7 @@ namespace EnergyPlus {
 		int const HoursPerDay( 24 );
 		int LogSetIndex;
 
-		SizingLog tmpLog;
+		SizingLog tmpLog( rVariable );
 		tmpLog.NumOfEnvironmentsInLogSet = 0;
 		tmpLog.NumOfDesignDaysInLogSet   = 0;
 		tmpLog.NumberOfSizingPeriodsInLogSet = 0;
@@ -337,8 +341,6 @@ namespace EnergyPlus {
 			stepSum += itr->second;
 		}
 
-
-		tmpLog.p_rVariable = & rVariable; 
 		tmpLog.timeStepsInAverage = stepsInAverage;
 
 		VectorLength = stepSum;
