@@ -272,6 +272,10 @@ EnergyPlusPgm( std::string const & filepath )
 #endif
 
 	CreateCurrentDateTimeString( CurrentDateTime );
+
+	OutputSchema->SimulationInformation.setProgramVersion( VerString );
+	OutputSchema->SimulationInformation.setStartDateTimeStamp(CurrentDateTime.substr(5));
+	
 	VerString += "," + CurrentDateTime;
 
 	get_environment_variable( DDOnlyEnvVar, cEnvValue );
@@ -383,12 +387,7 @@ EnergyPlusPgm( std::string const & filepath )
 
 	ProcessInput();
 
- 	OutputSchema->InitializeSchema();
-
-	if (OutputSchema->TimeSeriesEnabled())
-		DisplayString("Found true");
-	else
-		DisplayString("Found false");
+	OutputSchema->setupOutputOptions();
 
 	ManageSimulation();
 

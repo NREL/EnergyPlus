@@ -63,7 +63,7 @@ namespace OutputProcessor {
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::MaxNameLength;
 	using DataGlobals::OutputFileMeters;
-	using DataGlobals::OutputFileSchema;
+	//using DataGlobals::OutputFileSchema;
 	using DataGlobals::HourOfDay;
 	using DataGlobals::DayOfSim;
 	using DataGlobals::DayOfSimChr;
@@ -4154,16 +4154,16 @@ namespace OutputProcessor {
 		ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
 		
 		// add to daily TS data store
-		if (OutputSchema->TimeSeriesEnabled())
+		if (OutputSchema->timeSeriesEnabled())
 		{
 			if (reportingInterval == ReportDaily)
-				OutputSchema->RIDailyTSData.AddToCurrentRRow(repVal);
+				OutputSchema->RIDailyTSData.addToCurrentRRow(repVal);
 			// add to monthly TS data store
 			if (reportingInterval == ReportMonthly)
-				OutputSchema->RIMonthlyTSData.AddToCurrentRRow(repVal);
+				OutputSchema->RIMonthlyTSData.addToCurrentRRow(repVal);
 			// add to run period TS data store
 			if (reportingInterval == ReportSim)
-				OutputSchema->RIRunPeriodTSData.AddToCurrentRRow(repVal);
+				OutputSchema->RIRunPeriodTSData.addToCurrentRRow(repVal);
 		}
 
 		if ( sqlite ) {
@@ -4658,17 +4658,17 @@ namespace OutputProcessor {
 		ProduceMinMaxString( MinOut, minValueDate, reportingInterval );
 		ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
 
-		if (OutputSchema->TimeSeriesEnabled())
+		if (OutputSchema->timeSeriesEnabled())
 		{
 			// add to daily TS data store
 			if (reportingInterval == ReportDaily)
-				OutputSchema->RIDailyTSData.AddToCurrentIRow(repVal);
+				OutputSchema->RIDailyTSData.addToCurrentIRow(repVal);
 			// add to monthly TS data store
 			if (reportingInterval == ReportMonthly)
-				OutputSchema->RIMonthlyTSData.AddToCurrentIRow(repVal);
+				OutputSchema->RIMonthlyTSData.addToCurrentIRow(repVal);
 			// add to run period TS data store
 			if (reportingInterval == ReportSim)
-				OutputSchema->RIRunPeriodTSData.AddToCurrentIRow(repVal);
+				OutputSchema->RIRunPeriodTSData.addToCurrentIRow(repVal);
 		}
 
 		rminValue = minValue;
@@ -5579,26 +5579,26 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 		rxTime = ( MinuteNow - StartMinute ) / double( MinutesPerTimeStep );
 
 		// R and I data frames for ZoneVar
-		if (OutputSchema->TimeSeriesEnabled())
+		if (OutputSchema->timeSeriesEnabled())
 		{
 			if (IndexType == ZoneVar && OutputSchema->RIDetailedZoneTSData.RDataFrameEnabled == false)
-				OutputSchema->InitializeRTSDataFrame(ReportEach, RVariableTypes, NumOfRVariable, ZoneVar);
+				OutputSchema->initializeRTSDataFrame(ReportEach, RVariableTypes, NumOfRVariable, ZoneVar);
 			if (IndexType == ZoneVar && OutputSchema->RIDetailedZoneTSData.IDataFrameEnabled == false)
-				OutputSchema->InitializeITSDataFrame(ReportEach, IVariableTypes, NumOfIVariable, ZoneVar);
+				OutputSchema->initializeITSDataFrame(ReportEach, IVariableTypes, NumOfIVariable, ZoneVar);
 
 			// R and I data frames for HVACVar
 			if (IndexType == HVACVar && OutputSchema->RIDetailedHVACTSData.RDataFrameEnabled == false)
-				OutputSchema->InitializeRTSDataFrame(ReportEach, RVariableTypes, NumOfRVariable, HVACVar);
+				OutputSchema->initializeRTSDataFrame(ReportEach, RVariableTypes, NumOfRVariable, HVACVar);
 			if (IndexType == HVACVar && OutputSchema->RIDetailedHVACTSData.IDataFrameEnabled == false)
-				OutputSchema->InitializeITSDataFrame(ReportEach, IVariableTypes, NumOfIVariable, HVACVar);
+				OutputSchema->initializeITSDataFrame(ReportEach, IVariableTypes, NumOfIVariable, HVACVar);
 		}
 
 		std::string ts = std::to_string(Month) + "/" + std::to_string(DayOfMonth) + " " + std::to_string(HourOfDay) + ":" + std::to_string(TimeValue(1).CurMinute) + ":00";
 		
-		if (OutputSchema->TimeSeriesEnabled())
+		if (OutputSchema->timeSeriesEnabled())
 		{
-			if (IndexType == ZoneVar) OutputSchema->RIDetailedZoneTSData.NewRow(ts);
-			if (IndexType == HVACVar) OutputSchema->RIDetailedHVACTSData.NewRow(ts);
+			if (IndexType == ZoneVar) OutputSchema->RIDetailedZoneTSData.newRow(ts);
+			if (IndexType == HVACVar) OutputSchema->RIDetailedHVACTSData.newRow(ts);
 		}
 
 		// Main "Record Keeping" Loops for R and I variables
@@ -5665,10 +5665,10 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 				WriteRealData( rVar.ReportID, rVar.ReportIDChr, rVar.Which );
 				++StdOutputRecordCount;
 
-				if (OutputSchema->TimeSeriesEnabled())
+				if (OutputSchema->timeSeriesEnabled())
 				{
-					if (IndexType == ZoneVar) OutputSchema->RIDetailedZoneTSData.AddToCurrentRRow(rVar.Which);
-					if (IndexType == HVACVar) OutputSchema->RIDetailedHVACTSData.AddToCurrentRRow(rVar.Which);
+					if (IndexType == ZoneVar) OutputSchema->RIDetailedZoneTSData.addToCurrentRRow(rVar.Which);
+					if (IndexType == HVACVar) OutputSchema->RIDetailedHVACTSData.addToCurrentRRow(rVar.Which);
 				}
 			}
 		}
@@ -5734,10 +5734,10 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 				WriteIntegerData( iVar.ReportID, iVar.ReportIDChr, iVar.Which );
 				++StdOutputRecordCount;
 
-				if (OutputSchema->TimeSeriesEnabled())
+				if (OutputSchema->timeSeriesEnabled())
 				{
-					if (IndexType == ZoneVar) OutputSchema->RIDetailedZoneTSData.AddToCurrentIRow(iVar.Which);
-					if (IndexType == HVACVar) OutputSchema->RIDetailedHVACTSData.AddToCurrentIRow(iVar.Which);
+					if (IndexType == ZoneVar) OutputSchema->RIDetailedZoneTSData.addToCurrentIRow(iVar.Which);
+					if (IndexType == HVACVar) OutputSchema->RIDetailedHVACTSData.addToCurrentIRow(iVar.Which);
 				}
 			}
 		}
@@ -5751,14 +5751,14 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	// TimeStep Block (Report on Zone TimeStep)
 
 	if ( EndTimeStepFlag ) {
-		if (OutputSchema->TimeSeriesEnabled())
+		if (OutputSchema->timeSeriesEnabled())
 		{
 			if (OutputSchema->RITimestepTSData.RDataFrameEnabled == false)
-				OutputSchema->InitializeRTSDataFrame(ReportTimeStep, RVariableTypes, NumOfRVariable);
+				OutputSchema->initializeRTSDataFrame(ReportTimeStep, RVariableTypes, NumOfRVariable);
 			if (OutputSchema->RITimestepTSData.IDataFrameEnabled == false)
-				OutputSchema->InitializeITSDataFrame(ReportTimeStep, IVariableTypes, NumOfIVariable);
+				OutputSchema->initializeITSDataFrame(ReportTimeStep, IVariableTypes, NumOfIVariable);
 			std::string ts = std::to_string(Month) + "/" + std::to_string(DayOfMonth) + " " + std::to_string(HourOfDay) + ":" + std::to_string(int(TimeValue(1).CurMinute)) + ":00";
-			OutputSchema->RITimestepTSData.NewRow(ts);
+			OutputSchema->RITimestepTSData.newRow(ts);
 		}
 
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) {
@@ -5805,8 +5805,8 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 					WriteRealData( rVar.ReportID, rVar.ReportIDChr, rVar.TSValue );
 					++StdOutputRecordCount;
 					// add to timestep TS data store
-					if (OutputSchema->TimeSeriesEnabled())
-						OutputSchema->RITimestepTSData.AddToCurrentRRow(rVar.TSValue);
+					if (OutputSchema->timeSeriesEnabled())
+						OutputSchema->RITimestepTSData.addToCurrentRRow(rVar.TSValue);
 					
 				}
 				rVar.TSValue = 0.0;
@@ -5847,8 +5847,8 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 
 					WriteIntegerData( iVar.ReportID, iVar.ReportIDChr, _, iVar.TSValue );
 					++StdOutputRecordCount;
-					if (OutputSchema->TimeSeriesEnabled())
-						OutputSchema->RITimestepTSData.AddToCurrentIRow(iVar.TSValue);
+					if (OutputSchema->timeSeriesEnabled())
+						OutputSchema->RITimestepTSData.addToCurrentIRow(iVar.TSValue);
 				}
 				iVar.TSValue = 0.0;
 				iVar.thisTSStored = false;
@@ -5871,12 +5871,12 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			WriteTimeStampFormatData( eso_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, true, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
 		}
 
-		if (OutputSchema->TimeSeriesEnabled())
+		if (OutputSchema->timeSeriesEnabled())
 		{
 			if (OutputSchema->RIHourlyTSData.RDataFrameEnabled == false)
-				OutputSchema->InitializeRTSDataFrame(ReportHourly, RVariableTypes, NumOfRVariable);
+				OutputSchema->initializeRTSDataFrame(ReportHourly, RVariableTypes, NumOfRVariable);
 			std::string ts = std::to_string(Month) + "/" + std::to_string(DayOfMonth) + " " + std::to_string(HourOfDay) + ":00:00";
-			OutputSchema->RIHourlyTSData.NewRow(ts);
+			OutputSchema->RIHourlyTSData.newRow(ts);
 		}
 
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) { // Zone, HVAC
@@ -5899,8 +5899,8 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						++StdOutputRecordCount;
 						rVar.Stored = false;
 						// add time series value for hourly to data store
-						if (OutputSchema->TimeSeriesEnabled())
-							OutputSchema->RIHourlyTSData.AddToCurrentRRow(rVar.Value);
+						if (OutputSchema->timeSeriesEnabled())
+							OutputSchema->RIHourlyTSData.addToCurrentRRow(rVar.Value);
 					}
 					rVar.StoreValue += rVar.Value;
 					++rVar.NumStored;
@@ -5927,8 +5927,8 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						WriteIntegerData( iVar.ReportID, iVar.ReportIDChr, _, iVar.Value );
 						++StdOutputRecordCount;
 						iVar.Stored = false;
-						if (OutputSchema->TimeSeriesEnabled())
-							OutputSchema->RIHourlyTSData.AddToCurrentIRow(iVar.Value);
+						if (OutputSchema->timeSeriesEnabled())
+							OutputSchema->RIHourlyTSData.addToCurrentIRow(iVar.Value);
 					}
 					iVar.StoreValue += iVar.Value;
 					++iVar.NumStored;
@@ -5955,14 +5955,14 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			}
 			WriteTimeStampFormatData( eso_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, true, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
 		}
-		if (OutputSchema->TimeSeriesEnabled())
+		if (OutputSchema->timeSeriesEnabled())
 		{
 			if (OutputSchema->RIDailyTSData.RDataFrameEnabled == false)
-				OutputSchema->InitializeRTSDataFrame(ReportDaily, RVariableTypes, NumOfRVariable);
+				OutputSchema->initializeRTSDataFrame(ReportDaily, RVariableTypes, NumOfRVariable);
 			if (OutputSchema->RIDailyTSData.IDataFrameEnabled == false)
-				OutputSchema->InitializeITSDataFrame(ReportDaily, IVariableTypes, NumOfIVariable);
+				OutputSchema->initializeITSDataFrame(ReportDaily, IVariableTypes, NumOfIVariable);
 			std::string ts = std::to_string(Month) + "/" + std::to_string(DayOfMonth) + " " + std::to_string(HourOfDay) + ":00:00";
-			OutputSchema->RIDailyTSData.NewRow(ts);
+			OutputSchema->RIDailyTSData.newRow(ts);
 		}
 
 		NumHoursInMonth += 24;
@@ -5996,14 +5996,14 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			WriteTimeStampFormatData( eso_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, false, Month );
 		}
 
-		if (OutputSchema->TimeSeriesEnabled())
+		if (OutputSchema->timeSeriesEnabled())
 		{
 			if (OutputSchema->RIMonthlyTSData.RDataFrameEnabled == false)
-				OutputSchema->InitializeRTSDataFrame(ReportMonthly, RVariableTypes, NumOfRVariable);
+				OutputSchema->initializeRTSDataFrame(ReportMonthly, RVariableTypes, NumOfRVariable);
 			if (OutputSchema->RIMonthlyTSData.IDataFrameEnabled == false)
-				OutputSchema->InitializeITSDataFrame(ReportMonthly, IVariableTypes, NumOfIVariable);
+				OutputSchema->initializeITSDataFrame(ReportMonthly, IVariableTypes, NumOfIVariable);
 			std::string ts = std::to_string(Month) + "/" + std::to_string(DayOfMonth) + " " + std::to_string(HourOfDay) + ":00:00";
-			OutputSchema->RIMonthlyTSData.NewRow(ts);
+			OutputSchema->RIMonthlyTSData.newRow(ts);
 		}
 
 		NumHoursInSim += NumHoursInMonth;
@@ -6036,14 +6036,14 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			WriteTimeStampFormatData( eso_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, false );
 		}
 
-		if (OutputSchema->TimeSeriesEnabled())
+		if (OutputSchema->timeSeriesEnabled())
 		{
 			if (OutputSchema->RIRunPeriodTSData.RDataFrameEnabled == false)
-				OutputSchema->InitializeRTSDataFrame(ReportSim, RVariableTypes, NumOfRVariable);
+				OutputSchema->initializeRTSDataFrame(ReportSim, RVariableTypes, NumOfRVariable);
 			if (OutputSchema->RIRunPeriodTSData.IDataFrameEnabled == false)
-				OutputSchema->InitializeITSDataFrame(ReportSim, IVariableTypes, NumOfIVariable);
+				OutputSchema->initializeITSDataFrame(ReportSim, IVariableTypes, NumOfIVariable);
 			std::string ts = std::to_string(Month) + "/" + std::to_string(DayOfMonth) + " " + std::to_string(HourOfDay) + ":00:00";
-			OutputSchema->RIRunPeriodTSData.NewRow(ts);
+			OutputSchema->RIRunPeriodTSData.newRow(ts);
 		}
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) { // Zone, HVAC
 			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {

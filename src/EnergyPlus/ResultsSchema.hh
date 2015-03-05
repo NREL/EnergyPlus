@@ -18,9 +18,45 @@
 namespace EnergyPlus {
 
 	namespace ResultsFramework {
-		using namespace OutputProcessor;
 
-		class DataFrame {
+		// getUUID copied from Shannon's code; to be replaced with the right UUID API calls
+		std::string getUUID();
+		int randomInRange(int min, int max);
+
+		// base result object
+		class BaseResultObject {
+		public:
+			BaseResultObject();
+			void setUUID(const std::string uuid);
+			const std::string getUUID();
+
+		protected:
+			std::string UUID;
+		};
+
+		class SimInfo : public BaseResultObject {
+		public:
+			void setProgramVersion(const std::string programVersion);
+			void setSimulationEnvironment(const std::string simulationEnvironment);
+			void setInputModelURI(const std::string inputModelURI);
+			void setStartDateTimeStamp(const std::string startDateTimeStamp);
+			void setRunTime(const std::string elapsedTime);
+			void setNumErrorsWarmup(const std::string  numWarningsDuringWarmup, const std::string  numSevereDuringWarmup);
+			void setNumErrorsSizing(const std::string  numWarningsDuringSizing, const std::string  numSevereDuringSizing);
+			void setNumErrorsSummary(const std::string  numWarnings, const std::string  numSevere);
+
+			// I don't like this pointer stuff but passing back an std:string and converting back for cjson print is expensive
+			cJSON* GetJSON();
+		protected:
+			std::string ProgramVersion;
+			std::string SimulationEnvironment;
+			std::string InputModelURI;
+			std::string StartDateTimeStamp;
+			std::string RunTime;
+			std::string NumWarningsDuringWarmup, NumSevereDuringWarmup, NumWarningsDuringSizing, NumSevereDuringSizing, NumWarnings, NumSevere;
+		};
+
+		class DataFrame : public BaseResultObject {
 		public:
 			DataFrame(std::string ReportFreq);
 			~DataFrame();
@@ -31,42 +67,45 @@ namespace EnergyPlus {
 			std::vector < std::vector <int> > IRows;
 			std::vector < std::string > TS;
 
-			void AddRCol(std::string VarName, std::string VarUnits);
-			void AddICol(std::string VarName, std::string VarUnits);
+			void addRCol(std::string VarName, std::string VarUnits);
+			void addICol(std::string VarName, std::string VarUnits);
 
-			void NewRow(std::string ts);
+			void newRow(std::string ts);
 
-			void AddToCurrentRRow(double value);
-			void AddToCurrentIRow(int value);
+			void addToCurrentRRow(double value);
+			void addToCurrentIRow(int value);
 
-			void WriteFile();
+			void writeFile();
 
 			bool RDataFrameEnabled;
 			bool IDataFrameEnabled;
 		protected:
-			std::string UUID;
 			int CurrentRow;
 		};
 
 
-		class ResultsSchema {
+		class ResultsSchema : public BaseResultObject {
 		public:
 			ResultsSchema();
 			~ResultsSchema();
 			
-			void InitializeSchema();
+			void setupOutputOptions();
 
-			bool TimeSeriesEnabled();
-			bool TimeSeriesAndTabularEnabled();
+			bool timeSeriesEnabled();
+			bool timeSeriesAndTabularEnabled();
 
-			void InitializeRTSDataFrame(const int ReportFrequency, const FArray1D< RealVariableType > &RVariableTypes, const int NumOfRVariable, const int IndexType = ZoneVar);
-			void InitializeITSDataFrame(const int ReportFrequency, const FArray1D< IntegerVariableType > &IVariableTypes, const int NumOfIVariable, const int IndexType = ZoneVar);
+			void initializeRTSDataFrame(const int ReportFrequency, const FArray1D< OutputProcessor::RealVariableType > &RVariableTypes, const int NumOfRVariable, const int IndexType = OutputProcessor::ZoneVar);
+			void initializeITSDataFrame(const int ReportFrequency, const FArray1D< OutputProcessor::IntegerVariableType > &IVariableTypes, const int NumOfIVariable, const int IndexType = OutputProcessor::ZoneVar);
 
 			static DataFrame RIDetailedZoneTSData, RIDetailedHVACTSData, RITimestepTSData, RIHourlyTSData, RIDailyTSData, RIMonthlyTSData, RIRunPeriodTSData;
+
+			void writeTimeSeriesFiles();
+			void writeFile();
+
+			SimInfo SimulationInformation;
 		protected:
-			std::string UUID;
-			bool timeSeriesEnabled;
-			bool timeSeriesAndTabularEnabled;
+			bool tsEnabled;
+			bool tsAndTabularEnabled;
 		};
 
 		extern std::unique_ptr<ResultsSchema> OutputSchema;
