@@ -237,7 +237,6 @@ namespace SimulationManager {
 		using PlantPipingSystemsManager::InitAndSimGroundDomains;
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
-		using HVACSizingSimulationManagerNamespace::ManageHVACSizingSimulation;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -397,9 +396,10 @@ namespace SimulationManager {
 		GetInputForLifeCycleCost(); //must be prior to WriteTabularReports -- do here before big simulation stuff.
 
 		// if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
-		if (DoHVACSizingSimulation){
-
-			ManageHVACSizingSimulation(ErrorsFound);
+		if ( DoHVACSizingSimulation ) {
+			hvacSizingSimulationManager = CreateHVACSizingSimulationManager();
+			ManageHVACSizingSimulation( ErrorsFound );
+			hvacSizingSimulationManager.reset(); // delete unique_ptr
 		}
 
 		ShowMessage( "Beginning Simulation" );
@@ -997,10 +997,10 @@ namespace SimulationManager {
 		} else {
 			Alphas( 5 ) = "No";
 		}
-		if (DoHVACSizingSimulation) {
+		if ( DoHVACSizingSimulation ) {
 			Alphas( 6 ) = "Yes";
-			if (NumNumber >= 1){
-				HVACSizingSimMaxIterations = Number(1);
+			if ( NumNumber >= 1 ){
+				HVACSizingSimMaxIterations = Number( 1 );
 			}
 		} else {
 			Alphas( 6 ) = "No";

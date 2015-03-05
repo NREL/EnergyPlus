@@ -5001,7 +5001,6 @@ namespace HeatBalanceManager {
 		using DataSystemVariables::ReportDuringWarmup; // added for FMI
 		using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
 		using namespace DataReportingFlags;
-		using namespace HVACSizingSimulationManagerNamespace;
 		using DataGlobals::KindOfSim;
 		using DataGlobals::ksHVACSizeDesignDay;
 		// Locals

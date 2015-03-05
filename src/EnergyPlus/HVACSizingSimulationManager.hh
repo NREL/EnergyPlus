@@ -60,21 +60,31 @@ namespace EnergyPlus {
 
 	};
 
-	namespace HVACSizingSimulationManagerNamespace {
+	extern std::unique_ptr< HVACSizingSimulationManager > hvacSizingSimulationManager;
+
+	std::unique_ptr< HVACSizingSimulationManager > CreateHVACSizingSimulationManager();
+	void ManageHVACSizingSimulation( bool & ErrorsFound );
+	void UpdateSizingLogsZoneStep();
+	void UpdateSizingLogsSystemStep();
+
+	// class HVACSizingSimulationManagerFactory {
+	// public:
+	// 	HVACSizingSimulationManagerFactory();
+		
+	// private:
+	// 	std::unique_ptr< HVACSizingSimulationManager > hvacSizingSimulationManager;
+	// 	bool stillNeedToSetupOnce;
+	// };
+
+	// namespace HVACSizingSimulationManagerNamespace {
 
 
 
-		extern bool stillNeedToSetupOnce;
+		// extern bool stillNeedToSetupOnce;
 
-		void ManageHVACSizingSimulation(
-			bool & ErrorsFound
-		);
+		
 
-		void UpdateSizingLogsZoneStep();
-
-		void UpdateSizingLogsSystemStep();
-
-	}
+	// }
 
 }
 

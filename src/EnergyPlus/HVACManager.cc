@@ -225,7 +225,6 @@ namespace HVACManager {
 		using ManageElectricPower::ManageElectricLoadCenters;
 		using InternalHeatGains::UpdateInternalGainValues;
 		using ZoneEquipmentManager::CalcAirFlowSimple;
-		using namespace HVACSizingSimulationManagerNamespace;
 		using DataGlobals::KindOfSim;
 		using DataGlobals::ksHVACSizeDesignDay;
 		using DataGlobals::ksHVACSizeRunPeriodDesign;
