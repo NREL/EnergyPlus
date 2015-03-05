@@ -1,4 +1,4 @@
-// EnergyPlus::ExteriorEnergyUse Unit Tests
+// EnergyPlus::Evaporative Cooler Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -96,6 +96,8 @@ TEST( EvaporativeCoolers, CalcSecondaryAirOutletCondition )
 	EXPECT_DOUBLE_EQ( 47103.205375000471, EvaporativeCoolers::EvapCond( EvapCoolNum ).SecOutletEnthalpy );	
 	EXPECT_DOUBLE_EQ( QHXTotal, QHXLatent );
 
+	EvaporativeCoolers::EvapCond.deallocate();
+
 }
 
 TEST( EvaporativeCoolers, CalcIndirectRDDEvapCoolerOutletTemp )
@@ -140,6 +142,8 @@ TEST( EvaporativeCoolers, CalcIndirectRDDEvapCoolerOutletTemp )
 		EHumRatSec );
 
 	EXPECT_DOUBLE_EQ( 14.25, EvaporativeCoolers::EvapCond( EvapCoolNum ).OutletTemp );
+
+	EvaporativeCoolers::EvapCond.deallocate( );
 
 }
 
@@ -198,4 +202,6 @@ TEST( EvaporativeCoolers, IndEvapCoolerPower )
 
 	// check outputs for wet modulated operating condition
 	EXPECT_EQ( 150.0, EvaporativeCoolers::EvapCond( EvapCoolNum ).EvapCoolerPower );
+
+	EvaporativeCoolers::EvapCond.deallocate( );
 }

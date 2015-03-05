@@ -40,6 +40,7 @@ TEST( SizePurchasedAirTest, Test1 )
 	ZoneEqSizing.allocate( 1 );
 	CurZoneEqNum = 1;
 	ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 24 );
+	CurSysNum = 0;
 
 	FinalZoneSizing.allocate(1);
 	FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 1.0;
