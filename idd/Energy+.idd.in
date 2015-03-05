@@ -31075,7 +31075,7 @@ Sizing:System,
       \key Bypass
       \key VT
       \key OnOff
-      \default VAV
+      \default OnOff
 
 Sizing:Plant,
       \memo Specifies the input needed to autosize plant loop flow rates and equipment capacities.
