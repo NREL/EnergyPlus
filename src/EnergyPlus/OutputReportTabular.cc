@@ -2311,6 +2311,7 @@ namespace OutputReportTabular {
 			AddMonthlyFieldSetInput( curReport, "Cooling:Gas", "", aggTypeSumOrAvg );
 			AddMonthlyFieldSetInput( curReport, "WaterSystems:Gas", "", aggTypeSumOrAvg );
 			AddMonthlyFieldSetInput( curReport, "Cogeneration:Gas", "", aggTypeSumOrAvg );
+			AddMonthlyFieldSetInput( curReport, "Humidifier:Gas", "", aggTypeSumOrAvg );
 		}
 		if ( namedMonthly( 15 ).show ) {
 			curReport = AddMonthlyReport( "EndUseEnergyConsumptionDieselMonthly", 2 );
@@ -2346,6 +2347,7 @@ namespace OutputReportTabular {
 			AddMonthlyFieldSetInput( curReport, "Heating:Propane", "", aggTypeSumOrAvg );
 			AddMonthlyFieldSetInput( curReport, "WaterSystems:Propane", "", aggTypeSumOrAvg );
 			AddMonthlyFieldSetInput( curReport, "Cogeneration:Propane", "", aggTypeSumOrAvg );
+			AddMonthlyFieldSetInput( curReport, "Humidifier:Propane", "", aggTypeSumOrAvg );
 		}
 		if ( namedMonthly( 19 ).show ) {
 			curReport = AddMonthlyReport( "EndUseEnergyConsumptionGasolineMonthly", 2 );
@@ -2783,6 +2785,7 @@ namespace OutputReportTabular {
 			AddMonthlyFieldSetInput( curReport, "Air System Heating Coil Gas Energy", "", aggTypeSumOrAvg );
 			AddMonthlyFieldSetInput( curReport, "Air System Heating Coil Steam Energy", "", aggTypeSumOrAvg );
 			AddMonthlyFieldSetInput( curReport, "Air System Humidifier Electric Energy", "", aggTypeSumOrAvg );
+			AddMonthlyFieldSetInput( curReport, "Air System Humidifier Gas Energy", "", aggTypeSumOrAvg );
 			AddMonthlyFieldSetInput( curReport, "Air System Evaporative Cooler Electric Energy", "", aggTypeSumOrAvg );
 			AddMonthlyFieldSetInput( curReport, "Air System Desiccant Dehumidifier Electric Energy", "", aggTypeSumOrAvg );
 		}

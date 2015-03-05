@@ -114,6 +114,7 @@ namespace RuntimeLanguageProcessor {
 	int CurrentEnvironmentPeriodNum( 0 );
 	int ActualDateAndTimeNum( 0 );
 	int ActualTimeNum( 0 );
+	int WarmUpFlagNum( 0 );
 
 	static gio::Fmt fmtLD( "*" );
 	static gio::Fmt fmtA( "(A)" );
@@ -148,6 +149,7 @@ namespace RuntimeLanguageProcessor {
 		using DataGlobals::OutputFileDebug;
 		using DataGlobals::CurrentTime;
 		using DataGlobals::TimeStepZone;
+		using DataGlobals::WarmupFlag;
 		using DataEnvironment::Year;
 		using DataEnvironment::Month;
 		using DataEnvironment::DayOfMonth;
@@ -214,6 +216,7 @@ namespace RuntimeLanguageProcessor {
 			CurrentEnvironmentPeriodNum = NewEMSVariable( "CURRENTENVIRONMENT", 0 );
 			ActualDateAndTimeNum = NewEMSVariable( "ACTUALDATEANDTIME", 0 );
 			ActualTimeNum = NewEMSVariable( "ACTUALTIME", 0 );
+			WarmUpFlagNum = NewEMSVariable( "WARMUPFLAG", 0);
 
 			GetRuntimeLanguageUserInput(); // Load and parse all runtime language objects
 
@@ -268,6 +271,11 @@ namespace RuntimeLanguageProcessor {
 
 		tmpCurEnvirNum = double( CurEnvirNum );
 		ErlVariable( CurrentEnvironmentPeriodNum ).Value = SetErlValueNumber( tmpCurEnvirNum );
+		if ( WarmupFlag ) {
+			ErlVariable( WarmUpFlagNum ).Value = SetErlValueNumber( 1.0 );
+		} else {
+			ErlVariable( WarmUpFlagNum ).Value = SetErlValueNumber( 0.0 );
+		}
 
 	}
 

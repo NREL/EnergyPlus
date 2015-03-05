@@ -84,6 +84,7 @@ namespace RuntimeLanguageProcessor {
 	extern int CurrentEnvironmentPeriodNum;
 	extern int ActualDateAndTimeNum;
 	extern int ActualTimeNum;
+	extern int WarmUpFlagNum;
 
 	// SUBROUTINE SPECIFICATIONS:
 
