@@ -1,0 +1,21 @@
+# eplusout.sci
+
+This is the surface cost information report. This report file is obtained by including the following in the input file:
+
+~~~~~~~~~~~~~~~~~~~~
+
+    Output:Surfaces:List, CostInfo;
+~~~~~~~~~~~~~~~~~~~~
+
+The intent is to make available a separate file that lists the unique surfaces and their construction types for potential use in external calculations that need to estimate the cost of construction. Note that such cost estimating can now also be performed internal to EnergyPlus using Cost Estimate objects. The listing can also be used to check that the input for surfaces is producing the expected areas (although the DXF is probably more useful for such checking).
+
+The output file contains a list of the unique surfaces and their net and gross areas. The area information is calculated by EnergyPlus from the vertices entered for individual surfaces. The net area is the area remaining after the areas of subsurfaces are subtracted. The file contains six columns of comma-separate-data as shown in the following table:
+
+Column|Description
+------|-----------
+1|Integer counter for surfaces. The surfaces are listed in the order that they are stored internally in EnergyPlus. Note that in this report, the algorithms sort out and exclude duplicate surfaces that are entered for the interior partitions between adjacent thermal zones. Therefore the list is usually not consecutive.
+2|The name of the surface entered by the user
+3|The name of the construction for the surface entered by the user
+4|The type of the surface (e.g. wall, roof, floor, window …)
+5|The net area of the surface in m^2^
+6|The gross area of the surface in m^2^

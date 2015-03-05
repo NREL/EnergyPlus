@@ -1,0 +1,112 @@
+---
+title: "EnergyPlus Auxiliary Programs -- EnergyPlus 8.2"
+subject: |
+  Documentation of Auxiliary Programs which create or view information for
+  use in EnergyPlus.
+date: "September 27, 2013"
+keywords:
+- "copyright"
+- "software"
+- "developers"
+- "EnergyPlus"
+merge_onto:
+- "../common.yaml"
+files:
+- auxiliary-energyplus-programs.md
+- weather-converter-program.md
+- - background.md
+  - weather-format-for-simulation-programs.md
+  - weather-data-availability.md
+  - using-the-weather-converter.md
+  - definitions-file-custom-file-processing.md
+  - reportsfiles-produced-by-the-weather.md
+  - koppen-climate-classification.md
+  - ashrae-climate-classification.md
+  - energyplus-weather-file-epw-data-dictionary.md
+  - epw-csv-format-inout.md
+  - missing-weather-file-data.md
+  - source-weather-data-formats.md
+  - data-sources-uncertainty.md
+  - advanced-use-accessing-weather-conversion.md
+  - references.md
+  - web-resources.md
+- ground-heat-transfer-in-energyplus.md
+- - use-of-the-ground-temperatures-with-slabs.md
+  - slab-configuration-drawing.md
+  - running-the-slab-program.md
+  - technical-details-on-files-for-ground-heat.md
+  - slab-program-output-files.md
+  - description-of-the-objects-in.md
+  - using-ground-temperatures-with-basements.md
+  - running-the-basement-program.md
+  - technical-details-on-files-for-ground-heat-000.md
+  - basement-program-output-files.md
+  - the-basement-idd.md
+  - description-of-the-objects-in-001.md
+  - using-the-interface-surface-temperature.md
+  - references-002.md
+- view-factor-calculation-program.md
+- - using-the-view-factor-interface-program.md
+  - additional-information.md
+- using-older-version-input-files-transition.md
+- - idf-version-updater.md
+  - transition-console-program-details.md
+  - idf-version-converter-transition-file-lists.md
+  - converting-imf-files.md
+- epdrawgui.md
+- - main-tab.md
+  - option-tab.md
+- input-macros.md
+- - running-the-ep-macro-program.md
+  - incorporating-external-files.md
+  - selectively-accepting-or-skipping-lines-of.md
+  - defining-blocks-of-input.md
+  - macro-debugging-and-listing-control.md
+  - listing-format.md
+- hvac-diagram.md
+- coeffconvcoeffcheck.md
+- - coeffconv.md
+  - coeffcheck.md
+  - running-the-coeffconv-or-coeffcheck-programs.md
+- expandobjects.md
+- - hvac-template-objects-processed.md
+  - ground-heat-transfer-objects-processed.md
+  - building-surface-objects-processed.md
+- csvproc.md
+- convertesomtr.md
+- calcsoilsurftemp-program.md
+- - running-the-program.md
+  - program-inputs.md
+  - program-outputs.md
+- hvac-performance-curve-fit-tool.md
+- - inputs.md
+  - rated-data.md
+  - performance-data.md
+  - outputs.md
+  - error-message.md
+  - notes.md
+  - references-007.md
+- parametric-spreadsheets.md
+- - water-to-water-heat-pump-parameter.md
+  - water-to-air-heat-pump-parameter-coefficient.md
+  - water-to-air-heat-pump-parameter-coefficient-008.md
+  - g-function-spreadsheet.md
+- parametricpreprocessor.md
+- appgpostprocess-appendix-g-postprocessing.md
+- blasttranslator.md
+- doe2translator.md
+- running-console-applications.md
+- - modifying-the-batch-file.md
+- technical-details-of-running-energyplus.md
+- - ep-launch-program.md
+  - ep-launch-lite.md
+  - energyplus-file-extensions.md
+  - runeplus-batch-file.md
+  - running-energyplus-by-hand.md
+  - runeplus-details.md
+  - rundirmulti-batch-file.md
+  - energyplus-files.md
+- creating-input-files.md
+- - idd-conventions.md
+  - idfeditor.md
+- manipulating-output-files.md

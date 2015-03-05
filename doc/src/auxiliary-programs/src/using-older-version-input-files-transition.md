@@ -1,0 +1,4 @@
+# Using Older Version Input Files - Transition
+
+The transition program(s) are console programs that assist users in converting input files from prior release versions to the current (or interim). Sometimes many changes are made to the input file syntax; sometimes very few but the Transition program(s) can do the fastest job of making the conversions. An ObjectStatus spreadsheet is also included for those who want the details of each object's change.
+

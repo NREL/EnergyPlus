@@ -1,0 +1,5 @@
+# Library Files
+
+Library files for EnergyPlus are embodied in the DataSets and MacroDataSets folders. DataSets are IDF excerpts – you must cut and paste from them in order to use them. Items in MacroDataSets can be used in conjunction with the EPMacro preprocessor program. All files are in the necessary form for processing with EnergyPlus.
+
+The files in the DataSets and MacroDataSets folders are described in more detail in the "Output Details and Examples" document.

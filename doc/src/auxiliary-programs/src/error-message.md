@@ -1,0 +1,3 @@
+# Error Message
+
+Reports progress of the curve object generation calculation starting from reading input data to error massage output file "errorCurveObjects.txt".  This error message file provides information whether the tool run successfully or not.  Also points to the step where problem occurred.

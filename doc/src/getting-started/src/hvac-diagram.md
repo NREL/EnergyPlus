@@ -1,0 +1,3 @@
+# HVAC-Diagram
+
+Another post processing program (EnergyPlus versions 1.2 and later) is the HVAC-Diagram application. It reads one of the EnergyPlus output files (eplusout.bnd  and produces a Scalable Vector Graphics (SVG) file. More information on the HVAC Diagram program is found in the Auxiliary Programs document.

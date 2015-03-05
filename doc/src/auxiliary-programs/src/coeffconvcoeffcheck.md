@@ -1,0 +1,3 @@
+# CoeffConv/CoeffCheck
+
+These two programs are stored in the PreProcess folder of your EnergyPlus installation under a folder CoeffConv.

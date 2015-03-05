@@ -1,0 +1,5 @@
+# Running EnergyPlus on Windows Vista and/or Windows 7
+
+For all operating systems, make sure that you have read and write access to files in the main EnergyPlus folder (by default EnergyPlus is installed in C:\\EnergyPlus<version>). If you do not have this kind of access some very peculiar messages may appear when you try to run simulations.
+
+EnergyPlus has no problems running on Vista or Windows 7 computers if it is run directly by executing the EnergyPlus.exe file assuming you have prepared the in.idf and in.epw files at the same folder. There were some issues running earlier versions of EP-Launch, but most have been fixed for the latest version of EP-Launch. If EnergyPlus was installed at a user folder like C:\\ EnergyPlusV3-0-0, there should be no problems running EP-Launch. If EnergyPlus was installed at a windows system folder like 'C:\\Program files\\ EnergyPlusV3-0-0', you have to run EP-Launch every time with administrator rights by right clicking the EP-Launch.exe file and choose 'Run as Administrator'. Another way is to create a shortcut to EPLaunch and change settings appropriately.

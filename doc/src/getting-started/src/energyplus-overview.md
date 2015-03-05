@@ -1,0 +1,3 @@
+# EnergyPlus Overview
+
+Welcome to EnergyPlus!  This section offers a big picture view of what EnergyPlus is, what it does, why it exists, and what its goals are AND provides an overview to the **EnergyPlus documentation library**. While this document does not provide every detail on the program, it does give the reader a macroscopic view of EnergyPlus and how it is intended to fit into the energy analysis and thermal load simulation software continuum.

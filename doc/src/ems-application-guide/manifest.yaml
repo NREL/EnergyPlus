@@ -1,0 +1,82 @@
+---
+title: "Application Guide for EMS -- EnergyPlus 8.2"
+subtitle: "Energy Management System User Guide"
+subsubtitle: "(a.k.a. The Book of Erl)"
+subject: |
+  Guide for users wanting to use EnergyPlus in Energy Management System
+  Applications. Users can develop custom control routines for EnergyPlus
+  models. EMS is an advanced feature of EnergyPlus.
+date: "November 26, 2013"
+keywords:
+- "ems"
+- "applications"
+- "EnergyPlus"
+merge_onto:
+- "../common.yaml"
+files:
+- application-guide-for-ems.md
+- - background.md
+  - organization.md
+- energyplus-runtime-language.md
+- - statement-keywords.md
+  - variables.md
+  - expressions.md
+  - built-in-functions.md
+- internal-variables.md
+- - zone-geometry.md
+  - internal-gains.md
+  - hvac-systems.md
+  - on-site-electricity-production.md
+  - sizing.md
+- ems-sensors.md
+- - variable-types.md
+  - schedules.md
+- ems-actuators.md
+- - hvac-systems-000.md
+  - thermal-envelope.md
+  - air-movement.md
+  - internal-gains-001.md
+  - on-site-electricity-production-002.md
+  - refrigeration.md
+  - general.md
+  - sizing-003.md
+- ems-calling-points.md
+- - begin-new-environment.md
+  - after-new-environment-warmup-is-complete.md
+  - begin-timestep-before-predictor.md
+  - after-predictor-before-hvac-managers.md
+  - after-predictor-after-hvac-managers.md
+  - inside-hvac-system-iteration-loop.md
+  - end-of-zone-timestep-before-reporting.md
+  - end-of-zone-timestep-after-reporting.md
+  - end-of-system-timestep-before-hvac-reporting.md
+  - end-of-system-timestep-after-hvac-reporting.md
+  - end-of-zone-sizing.md
+  - end-of-system-sizing.md
+  - after-component-model-input-has-been-read-in.md
+  - user-defined-component-model.md
+- user-defined-component-models.md
+- - common-characteristics.md
+  - zone-forced-air-unit.md
+  - air-terminal-unit.md
+  - air-coil.md
+  - plant-component.md
+- ems-examples.md
+- - example-1.-whole-building-average-zone-air.md
+  - example-2.-traditional-setpoint.md
+  - example-3.-hygro-thermal-window-opening.md
+  - example-4.-halt-program-based-on-constraint.md
+  - example-5.-computed-schedule.md
+  - example-6.-window-shade-control.md
+  - example-7.-constant-volume-purchased-air.md
+  - example-8.-system-sizing-with-discrete.md
+  - example-9.-demand-management.md
+  - example-10.-plant-loop-override-control.md
+  - example-11.-performance-curve-result-override.md
+  - example-12.-variable-refrigerant-flow-system.md
+  - example-13.-surface-construction-actuator-for.md
+- debugging-ems-programs.md
+- - err-file.md
+  - edd-file.md
+  - line-trace.md
+  - debugging-strategies.md

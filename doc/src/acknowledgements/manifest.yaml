@@ -1,0 +1,19 @@
+---
+title: "EnergyPlus Acknowledgements and Copyright Notices -- EnergyPlus 8.2"
+subject: |
+  Acknowledgements of the developers of various portions of EnergyPlus. In
+  addition to the primary authorship of EnergyPlus by Lawrence Berkeley
+  National Laboratory (LBNL) Simulation Research Group and the University
+  of Illinois at Urbana-Champaign (UIUC).
+date: "September 27, 2013"
+keywords:
+- "copyright"
+- "software"
+- "developers"
+- "EnergyPlus"
+merge_onto:
+- "../common.yaml"
+files:
+- notices-and-acknowledgments.md
+- - other-software-included-or-referenced.md
+  - other-acknowledgments.md

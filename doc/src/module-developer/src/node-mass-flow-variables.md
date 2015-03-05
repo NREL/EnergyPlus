@@ -1,0 +1,8 @@
+# Node Mass Flow Variables
+
+The node mass flow variables merit a little more discussion. Six mass flow variables are defined at each node. They are: MassFlowRate, MassFlowRateMin, MassFlowRateMax, MassFlowRateMinAvail, MassFlowRateMaxAvail and MassFlowRateRequest. These variables hold loop mass flow rate information according to the following definitions.
+
+- MassFlowRate – this node variable holds the simulation mass flow rate for the current timestep. The remaining four variables serve as limits to MassFlowRate.
+- MassFlowRateMax, MassFlowRateMin – These node variables hold the maximum possible and the minimum allowable flow rates for a particular component. As such, they represent the "hardware limit" on the flow rate for the component. 
+- MassFlowRateMaxAvail, MassFlowRateMinAvail – these node variables represent the *loop* maximum and minimum flow rate for the current configuration of the loop on which the component resides.
+- MassFlowRateRequest  –  this node variable applies only to plant and holds the desired mass flow rate for the current timestep.  This stores a record of what flow was desired. 

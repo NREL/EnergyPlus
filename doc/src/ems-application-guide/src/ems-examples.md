@@ -1,0 +1,5 @@
+# EMS Examples
+
+This section provides examples that demonstrate how to use the EMS. Each example provides a problem statement, discusses how to approach a solution using EMS, and provides example EMS input objects. For each example a complete input data file is provided with the EnergyPlus release (you can find this in the ExampleFiles\\ directory).
+
+A range of example applications is presented here. Each is presented in isolation for simplicity, but a much more comprehensive approach to EMS programs is also possible.

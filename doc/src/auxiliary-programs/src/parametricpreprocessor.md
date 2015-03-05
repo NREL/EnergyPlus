@@ -1,0 +1,23 @@
+# ParametricPreprocessor 
+
+The parametric preprocessor used to create a series of resulting IDF files from a single source IDF file that contains parametric objects and expressions. The parametric objects in EnergyPlus are interpreted by the ParametricPreprocessor and are:
+
+Parametric:SetValueForRun
+
+Parametric:Logic
+
+Parametric:RunControl
+
+Parametric:FileNameSuffix
+
+The ParametricPreprocessor reads the source IDF file and removes the Parametric objects shown above, processes these objects and any embedded expressions and produces a series of resulting IDF files, one for each "run" described by the objects.
+
+An intermediate file called parametric.int is used that contains references to all embedded expressions that will need to be substituted into the file.
+
+An error file called parametric.err is also produced to help debug problems with the objects.
+
+The Parametric objects are described in detail in the InputOutputReference document.
+
+ParametricPreprocessor can be called at the command line with the name of the source file as the only argument.
+
+The ParametricPreprocessor is used in the batch files that come with EnergyPlus and is used by EP-Launch automatically.

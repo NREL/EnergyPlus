@@ -1,0 +1,37 @@
+---
+title: "EnergyPlus Programming Standard -- EnergyPlus 8.2"
+subject: |
+  To understand and be able to write the code. Standards for all developers
+  who are writing new modules for inclusion in EnergyPlus.
+date: "April 1, 2013"
+keywords:
+- "programming standard"
+- "EnergyPlus"
+merge_onto:
+- "../common.yaml"
+files:
+- energyplus-programming-standard.md
+- introduction.md
+- reference-documents.md
+- coding-standard.md
+- - fortran-9095.md
+  - naming-conventions.md
+  - program-variables.md
+  - module-structure-and-interaction.md
+  - programming-style.md
+  - code-documentation.md
+- external-libraries.md
+- - requirements-and-responsibilities.md
+  - build-system.md
+- software-development-procedures.md
+- - energyplus-development-step-by-step.md
+- testing.md
+- - input-file-documentation.md
+- appendix-a-definitions-and-notation.md
+- appendix-b-development-of-the-standard.md
+- - why-standards.md
+  - what-standards.md
+  - application-of-the-standard.md
+  - metrics.md
+- appendix-c-evolutionary-reengineering.md
+- appendix-d-energyplus-variable-abbreviations.md

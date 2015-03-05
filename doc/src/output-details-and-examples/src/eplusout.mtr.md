@@ -1,0 +1,3 @@
+# eplusout.mtr
+
+This is the equivalent file to the eplusout.eso file but contains only the Report Meter requests. The format and style of the file is identical to the eplusout.eso file.

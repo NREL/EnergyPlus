@@ -1,0 +1,22 @@
+---
+title: "Using EnergyPlus for Compliance -- EnergyPlus 8.2"
+subject: |
+  Hints on using EnergyPlus for Compliance with Standards and
+  Rating Systems. EnergyPlus Tabular reports are the key ingredient.
+date: "April 1, 2013"
+keywords:
+- "compliance"
+- "ASHRAE90.1"
+- "LEED"
+- "Title24"
+- "EnergyPlus"
+merge_onto:
+- "../common.yaml"
+files:
+- using-energyplus-for-compliance.md
+- introduction.md
+- - background.md
+  - compliance-objects.md
+  - tabular-summary-reports.md
+  - features-related-to-appendix-g-and-leed.md
+  - features-related-to-california-title-24.md

@@ -1,0 +1,21 @@
+---
+title: "External Interface(s) Application Guide -- EnergyPlus 8.2"
+subject: |
+  Guide for using EnergyPlus with External Interface(s)
+date: "April 1, 2013"
+keywords:
+- "external interface"
+- "applications"
+- "EnergyPlus"
+merge_onto:
+- "../common.yaml"
+files:
+- external-interfacesapplication-guide.md
+- external-interfaces.md
+- - introduction.md
+  - coupling-energyplus-with-the-building.md
+  - bcvtb-examples.md
+  - coupling-energyplus-with-functional-mock-up.md
+  - fmu-examples.md
+  - exporting-energyplus-as-a-functional-mock-up.md
+- references.md
