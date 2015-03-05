@@ -20067,14 +20067,12 @@ ElectricEquipment:ITE:AirCooled,
        \default 1.0
   A15, \field Electric Power Supply Efficiency Function of Part Load Ratio Curve Name
        \type object-list
-       \object-list BiVariateCurves
-       \object-list BiVariateTables
-       \note The name of a two-variable curve or table lookup object which modifies the recirculation
-       \note fractionas a function of CPU loading (x) and supply air node temperature (y). 
-       \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and 
-       \note Design Entering Air Temperature).This field is used only if the 
-       \note Air Node Connection Type = AdjustedSupply. If this curve is left blank, then the curve 
-       \note is assumed to always equal 1.0.
+       \object-list UniVariateCurves
+       \object-list UniVariateTables
+       \note The name of a single-variable curve or table lookup object which modifies the electric
+       \note power supply efficiency as a function of part-load ratio (x). 
+       \note This curve (table) should equal 1.0 at full load (PLR = 1.0).
+       \note If this curve is left blank, then the curve is assumed to always equal 1.0.
   N9 , \field Fraction of Electric Power Supply Losses to Zone
        \note Fraction of the electric power supply losses which are a heat gain to the zone 
        \note If this field is <1.0, the remainder of the losses are assumed to be lost to the outdoors.
