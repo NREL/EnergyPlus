@@ -5029,7 +5029,7 @@ namespace HeatBalanceManager {
 			CalcMoreNodeInfo();
 			UpdateDataandReport( ZoneTSReporting );
 			if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ){
-				UpdateSizingLogsZoneStep();
+				if ( hvacSizingSimulationManager ) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
 			}
 			
 			UpdateTabularReports( ZoneTSReporting );
@@ -5055,13 +5055,13 @@ namespace HeatBalanceManager {
 			CalcMoreNodeInfo();
 			UpdateDataandReport( ZoneTSReporting );
 			if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ){
-				UpdateSizingLogsZoneStep();
+				if ( hvacSizingSimulationManager ) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
 			}
 			
 		} else if ( UpdateDataDuringWarmupExternalInterface ) { // added for FMI
 			UpdateDataandReport( ZoneTSReporting );
 			if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ){
-				UpdateSizingLogsZoneStep();
+				if ( hvacSizingSimulationManager ) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
 			}
 		}
 		// There is no hourly reporting in the heat balance.

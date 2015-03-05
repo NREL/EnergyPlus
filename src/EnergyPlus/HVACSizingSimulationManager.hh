@@ -48,6 +48,8 @@ namespace EnergyPlus {
 			int const HVACSizingIterCount
 		);
 
+		void UpdateSizingLogsZoneStep();
+		void UpdateSizingLogsSystemStep();
 
 	private:
 		int numCoincidentPlantLoops;
@@ -62,30 +64,7 @@ namespace EnergyPlus {
 
 	extern std::unique_ptr< HVACSizingSimulationManager > hvacSizingSimulationManager;
 
-	std::unique_ptr< HVACSizingSimulationManager > CreateHVACSizingSimulationManager();
 	void ManageHVACSizingSimulation( bool & ErrorsFound );
-	void UpdateSizingLogsZoneStep();
-	void UpdateSizingLogsSystemStep();
-
-	// class HVACSizingSimulationManagerFactory {
-	// public:
-	// 	HVACSizingSimulationManagerFactory();
-		
-	// private:
-	// 	std::unique_ptr< HVACSizingSimulationManager > hvacSizingSimulationManager;
-	// 	bool stillNeedToSetupOnce;
-	// };
-
-	// namespace HVACSizingSimulationManagerNamespace {
-
-
-
-		// extern bool stillNeedToSetupOnce;
-
-		
-
-	// }
-
 }
 
 #endif

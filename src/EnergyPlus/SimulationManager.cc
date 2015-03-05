@@ -397,9 +397,8 @@ namespace SimulationManager {
 
 		// if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
 		if ( DoHVACSizingSimulation ) {
-			hvacSizingSimulationManager = CreateHVACSizingSimulationManager();
 			ManageHVACSizingSimulation( ErrorsFound );
-			hvacSizingSimulationManager.reset(); // delete unique_ptr
+			hvacSizingSimulationManager.reset(); // delete/reset unique_ptr
 		}
 
 		ShowMessage( "Beginning Simulation" );
