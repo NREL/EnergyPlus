@@ -166,6 +166,7 @@ TEST( EvaporativeCoolers, IndEvapCoolerPower )
 	CurveNum = 1;
 	EvaporativeCoolers::EvapCond( EvapCoolNum ).FanPowerModifierCurveIndex = CurveNum;
 
+	PerfCurve.allocate( 1 );
 	PerfCurve( CurveNum ).CurveType = Quadratic;
 	PerfCurve( CurveNum ).ObjectType = CurveType_Quadratic;
 	PerfCurve( CurveNum ).InterpolationType = EvaluateCurveToLimits;
@@ -204,4 +205,5 @@ TEST( EvaporativeCoolers, IndEvapCoolerPower )
 	EXPECT_EQ( 150.0, EvaporativeCoolers::EvapCond( EvapCoolNum ).EvapCoolerPower );
 
 	EvaporativeCoolers::EvapCond.deallocate( );
+	PerfCurve.deallocate( );
 }
