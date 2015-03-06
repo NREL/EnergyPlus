@@ -94,6 +94,7 @@ namespace AirflowNetworkBalanceManager {
 	using DataEnvironment::OutEnthalpy;
 	using DataEnvironment::StdRhoAir;
 	using DataEnvironment::WindSpeedAt;
+	using DataSurfaces::cExtBoundCondition;
 	using DataSurfaces::ExternalEnvironment;
 	using DataSurfaces::Surface;
 	using DataSurfaces::TotSurfaces;
@@ -1304,6 +1305,13 @@ namespace AirflowNetworkBalanceManager {
 						continue;
 					}
 				}
+			}
+			if ( MultizoneSurfaceData( i ).NodeNums( 2 ) == 0 && Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCond < 0 ) {
+				ShowSevereError( RoutineName + CurrentModuleObject + " = " + MultizoneSurfaceData( i ).SurfName );
+				ShowContinueError( "Outside boundary condtion and object are " + cExtBoundCondition( Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCond ) + " and " + Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCondName + "." );
+				ShowContinueError( "The required boundary condition is exposed to either outside or an adjacent zone." );
+				ErrorsFound = true;
+				continue;
 			}
 		}
 
