@@ -166,6 +166,7 @@ TEST( EvaporativeCoolers, IndEvapCoolerPower )
 	CurveNum = 1;
 	EvaporativeCoolers::EvapCond( EvapCoolNum ).FanPowerModifierCurveIndex = CurveNum;
 
+	NumCurves = 1;
 	PerfCurve.allocate( 1 );
 	PerfCurve( CurveNum ).CurveType = Quadratic;
 	PerfCurve( CurveNum ).ObjectType = CurveType_Quadratic;
