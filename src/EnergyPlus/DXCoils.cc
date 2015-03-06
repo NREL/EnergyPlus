@@ -1390,6 +1390,16 @@ namespace DXCoils {
 			if ( DXCoil( DXCoilNum ).SHRFTemp( 1 ) > 0 && DXCoil( DXCoilNum ).SHRFFlow( 1 ) > 0 ) {
 				DXCoil( DXCoilNum ).UserSHRCurveExists = true;
 			}
+			// get User Input flag for ASHRAE Standard 127 Standard Ratings Reporting
+			if ( lAlphaBlanks( 17 ) ) {
+				DXCoil( DXCoilNum ).ASHRAE127StdRprt = false;
+			} else {
+				if ( Alphas( 17 ) == "YES" || Alphas( 17 ) == "Yes" ) {
+					DXCoil( DXCoilNum ).ASHRAE127StdRprt = true;
+				} else {
+					DXCoil( DXCoilNum ).ASHRAE127StdRprt = false;
+				}
+			}
 
 		} // end of the Doe2 DX coil loop
 
@@ -6022,7 +6032,7 @@ namespace DXCoils {
 
 		// Call routine that computes AHRI certified rating for single-speed DX Coils
 		if ( ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed && DXCoil( DXCoilNum ).CondenserType( 1 ) == AirCooled ) || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical ) {
-			CalcDXCoilStandardRating( DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).DXCoilType_Num, 1, DXCoil( DXCoilNum ).RatedTotCap( 1 ), DXCoil( DXCoilNum ).RatedCOP( 1 ), DXCoil( DXCoilNum ).CCapFFlow( 1 ), DXCoil( DXCoilNum ).CCapFTemp( 1 ), DXCoil( DXCoilNum ).EIRFFlow( 1 ), DXCoil( DXCoilNum ).EIRFTemp( 1 ), DXCoil( DXCoilNum ).PLFFPLR( 1 ), DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ), DXCoil( DXCoilNum ).FanPowerPerEvapAirFlowRate( 1 ), DXCoil( DXCoilNum ).RegionNum, DXCoil( DXCoilNum ).MinOATCompressor, DXCoil( DXCoilNum ).OATempCompressorOn, DXCoil( DXCoilNum ).OATempCompressorOnOffBlank, DXCoil( DXCoilNum ).DefrostControl );
+			CalcDXCoilStandardRating( DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).DXCoilType_Num, 1, DXCoil( DXCoilNum ).RatedTotCap( 1 ), DXCoil( DXCoilNum ).RatedCOP( 1 ), DXCoil( DXCoilNum ).CCapFFlow( 1 ), DXCoil( DXCoilNum ).CCapFTemp( 1 ), DXCoil( DXCoilNum ).EIRFFlow( 1 ), DXCoil( DXCoilNum ).EIRFTemp( 1 ), DXCoil( DXCoilNum ).PLFFPLR( 1 ), DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ), DXCoil( DXCoilNum ).FanPowerPerEvapAirFlowRate( 1 ), DXCoil( DXCoilNum ).RegionNum, DXCoil( DXCoilNum ).MinOATCompressor, DXCoil( DXCoilNum ).OATempCompressorOn, DXCoil( DXCoilNum ).OATempCompressorOnOffBlank, DXCoil( DXCoilNum ).DefrostControl, DXCoil( DXCoilNum ).ASHRAE127StdRprt );
 		}
 		// Call routine that computes AHRI certified rating for multi-speed DX cooling Coils
 		if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedCooling || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedHeating ) {

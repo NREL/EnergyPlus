@@ -119,6 +119,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=MaxNameLength) :: OutScheduleName
 
   LOGICAL :: ErrFlag
+  
+  REAL :: IndirectOldFieldFive
+  REAL :: IndirectOldFieldSix
+  REAL :: IndirectNewFieldThirteen
+  CHARACTER(len=10) :: IndirectNewFieldString
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -375,6 +380,64 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(11:CurArgs-1) = InArgs(12:CurArgs)
                 CurArgs = CurArgs - 1
 
+              CASE('EVAPORATIVECOOLER:INDIRECT:RESEARCHSPECIAL')
+                ! data center hvac changes
+                nodiff = .false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! no change from F1-F3
+                OutArgs(1:3) = InArgs(1:3)
+                ! remove old F4
+                ! new F4, 5, 6 are blank
+                OutArgs(4:6) = ''
+                ! new F7 is old F5
+                OutArgs(7) = InArgs(5)
+                ! new F8, F9 are blank
+                OutArgs(8:9) = ''
+                ! new F10 is old F6
+                OutArgs(10) = InArgs(6)
+                ! new F11 is 1.0
+                OutArgs(11) = '1.0'
+                ! Now we need to read the values of fields 7 and 8 for calculation, so need to cast to real
+                ! Numerics should be enforced by the input processor, so I'm not going to validate much here
+                READ(InArgs(7), *) IndirectOldFieldFive
+                READ(InArgs(8), *) IndirectOldFieldSix
+                ! new F12 is just an autosize field
+                OutArgs(12) = 'Autosize'
+                ! Calculate a new 13 from old 7 and 8
+                ! Again relying on the input processor to protect from NaN
+                IndirectNewFieldThirteen = IndirectOldFieldSix / IndirectOldFieldFive
+                WRITE(IndirectNewFieldString,'(F10.5)') IndirectNewFieldThirteen
+                OutArgs(13) = TRIM(ADJUSTL(IndirectNewFieldString))
+                ! new F14 is just blank
+                OutArgs(14) = ''
+                ! new F15,16 are shifted
+                OutArgs(15:16) = InArgs(9:10)
+                ! new F17 is just autosize
+                OutArgs(17) = 'Autosize'
+                ! new F17,19 are shifted, old F11 is removed entirely
+                OutArgs(18:19) = InArgs(12:13)
+                ! new F20 is a new outlet node...hopefully not needed
+                OutArgs(20) = ''
+                ! new fields F21-25 are shifted
+                OutArgs(21:25) = InArgs(14:18)
+                ! there are some additional new fields, but they are optional and intentionally blank
+                
+              CASE('EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL')
+                ! data center hvac changes
+                nodiff = .false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! keep the same first few fields
+                OutArgs(1:3) = InArgs(1:3)
+                ! Add a blank
+                OutArgs(4) = ''
+                ! shift down one field
+                OutArgs(5) = InArgs(4)
+                ! add two blanks
+                OutArgs(6:7) = ''
+                ! shift the rest
+                OutArgs(8:13) = InArgs(5:10)
+                ! there are some additional new fields, but they are optional and intentionally blank
+                
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
