@@ -7,6 +7,7 @@ set( test_src
   DataZoneEquipment.unit.cc
   DXCoils.unit.cc
   ExteriorEnergyUse.unit.cc
+  FluidCoolers.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
   HVACStandaloneERV.unit.cc
