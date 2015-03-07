@@ -74782,9 +74782,11 @@ FaultModel:EnthalpySensorOffset:ReturnAir,
        \units J/kg
 
 FaultModel:ThermostatOffset,
+   \memo This object describes fault of thermostat offset
    A1, \field Name
        \required-field
        \type alpha
+	   \reference ThermostatOffsetFaults
    A2, \field Availability Schedule Name
        \type object-list
        \object-list ScheduleNames
@@ -74805,24 +74807,40 @@ FaultModel:ThermostatOffset,
        \type object-list
        \object-list ZoneControlThermostaticNames
 
-FaultModel:HumidistatOffset,
+FaultModel:HumidistatOffset, 
+   \memo This object describes fault of humidistat offset
    A1, \field Name
        \required-field
        \type alpha
-   A2, \field Availability Schedule Name
+   A2, \field Humidistat Offset Type 
+       \note Two types are available: 
+       \note Type ThermostatOffsetIndependent
+       \note Type ThermostatOffsetDependent
+       \type choice
+       \key ThermostatOffsetIndependent
+       \key ThermostatOffsetDependent
+       \default ThermostatOffsetIndependent
+   A3, \field Availability Schedule Name
+       \note This field is applicable for Type ThermostatOffsetIndependent
        \type object-list
        \object-list ScheduleNames
-   A3, \field Severity Schedule Name
+   A4, \field Severity Schedule Name
+       \note This field is applicable for Type ThermostatOffsetIndependent
        \type object-list
-       \object-list ScheduleNames
-   N1, \field Reference Humidistat Offset
-       \required-field
+       \object-list ScheduleNames 
+   N1, \field Reference Humidistat Offset       
+       \note Required field for Type ThermostatOffsetIndependent
        \type real
        \minimum> -20
        \maximum< 20
        \default 5
        \units percent
-   A4; \field Humidistat Name
+   A5, \field Related Thermostat Offset Fault Name
+       \note Enter the name of a FaultModel:ThermostatOffset object
+       \note Required field for Type ThermostatOffsetDependent
+       \type object-list
+       \object-list ThermostatOffsetFaults   
+   A6; \field Humidistat Name
        \begin-extensible
        \note Enter the name of a ZoneControl:Humidistat object.
        \required-field
