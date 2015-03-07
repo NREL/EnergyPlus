@@ -19980,6 +19980,7 @@ ElectricEquipment:ITE:AirCooled,
        \required-field
        \type object-list
        \object-list BiVariateCurves
+       \object-list BiVariateTables
        \note The name of a two-variable curve or table lookup object which modifies the CPU power
        \note input as a function of CPU loading (x) and air inlet node temperature (y). 
        \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and 
@@ -20000,6 +20001,7 @@ ElectricEquipment:ITE:AirCooled,
        \required-field
        \type object-list
        \object-list BiVariateCurves
+       \object-list BiVariateTables
        \note The name of a two-variable curve or table lookup object which modifies the cooling
        \note air flow rate as a function of CPU loading (x) and air inlet node temperature (y). 
        \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and 
@@ -20008,6 +20010,7 @@ ElectricEquipment:ITE:AirCooled,
        \required-field
        \type object-list
        \object-list UniVariateCurves
+       \object-list UniVariateTables
        \note The name of a single-variable curve or table lookup object which modifies the cooling
        \note fan power as a function of flow fraction (x). 
        \note This curve (table) should equal 1.0 at a flow fraction of 1.0. 
@@ -20064,6 +20067,7 @@ ElectricEquipment:ITE:AirCooled,
   A14, \field Recirculation Function of Loading and Supply Temperature Curve Name
        \type object-list
        \object-list BiVariateCurves
+       \object-list BiVariateTables
        \note The name of a two-variable curve or table lookup object which modifies the recirculation
        \note fractionas a function of CPU loading (x) and supply air node temperature (y). 
        \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and 
@@ -20078,13 +20082,12 @@ ElectricEquipment:ITE:AirCooled,
        \default 1.0
   A15, \field Electric Power Supply Efficiency Function of Part Load Ratio Curve Name
        \type object-list
-       \object-list BiVariateCurves
-       \note The name of a two-variable curve or table lookup object which modifies the recirculation
-       \note fractionas a function of CPU loading (x) and supply air node temperature (y). 
-       \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and 
-       \note Design Entering Air Temperature).This field is used only if the 
-       \note Air Node Connection Type = AdjustedSupply. If this curve is left blank, then the curve 
-       \note is assumed to always equal 1.0.
+       \object-list UniVariateCurves
+       \object-list UniVariateTables
+       \note The name of a single-variable curve or table lookup object which modifies the electric
+       \note power supply efficiency as a function of part-load ratio (x). 
+       \note This curve (table) should equal 1.0 at full load (PLR = 1.0).
+       \note If this curve is left blank, then the curve is assumed to always equal 1.0.
   N9 , \field Fraction of Electric Power Supply Losses to Zone
        \note Fraction of the electric power supply losses which are a heat gain to the zone 
        \note If this field is <1.0, the remainder of the losses are assumed to be lost to the outdoors.
@@ -40618,14 +40621,21 @@ Coil:Cooling:DX:SingleSpeed,
        \note wb = entering wet-bulb temperature seen by the DX cooling coil (C)
        \note db = entering dry-bulb temperature seen by the DX cooling coil (C)
        \note entering temperature can be outside air or pretreated air.
-  A16; \field Sensible Heat Ratio Function of Flow Fraction Curve Name
+  A16, \field Sensible Heat Ratio Function of Flow Fraction Curve Name
        \type object-list
        \object-list QuadraticCubicCurves
        \object-list UniVariateTables
        \note quadratic curve = a + b*ff + c*ff**2
        \note cubic curve = a + b*ff + c*ff**2 + d*ff**3
        \note ff = fraction of the full load flow
-
+  A17; \field Report ASHRAE Standard 127 Performance Ratings
+       \type choice
+       \key Yes
+       \key No
+       \default No
+       \note when this input field is specified as Yes then the program calculates the net cooling 
+       \note capacity and total electric power input of DX cooling coils per ANSI/ASHRAE 127.
+   
 Coil:Cooling:DX:TwoSpeed,
        \memo Direct expansion (DX) cooling coil and condensing unit (includes electric compressor
        \memo and condenser fan), two-speed (or variable-speed). Requires two sets of performance
@@ -48056,54 +48066,158 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \note If this field is blank, the system is always available.
        \type object-list
        \object-list ScheduleNames
-  N1 , \field Cooler Maximum Effectiveness
+  N1 , \field Cooler Wetbulb Design Effectiveness
        \type real
+       \note wet operation effectiveness with respect to wetbulb depression
+       \note this is the nominal design wetbulb effectiveness at design air flow rates and water rate 
        \minimum 0.0
        \maximum 2.0
-  N2 , \field Cooler Flow Ratio
+  A3 , \field Wetbulb Effectiveness Flow Ratio Modifier Curve Name
+       \note this curve modifies the wetbulb effectiveness in the previous field (eff_wb_design)
+       \note by multiplying the value by the result of this curve, eff_wb = eff_wb_design * func(HXFlowRatio)
+       \note x = HXFlowRatio = sum of the primary and secondary flow rates divided by the sum of the design flow rates
+       \type object-list
+       \object-list AllCurves
+       \note Any curve or table with one independent variable can be used:
+       \note Curve:Linear, Curve:Quadratic, Curve:Cubic, Curve:Quartic, Curve:Exponent,
+       \note Curve:ExponentialSkewNormal, Curve:Sigmoid, Curve:RectuangularHyperbola1,
+       \note Curve:RectangularHyperbola2, Curve:ExponentialDecay, Curve:DoubleExponentialDecay,
+       \note Table:OneIndependentVariable
+  N2 , \field Cooler Drybulb Design Effectiveness
        \type real
-  N3 , \field Recirculating Water Pump Power Consumption
+       \note dry operation effectiveness with respect to drybulb temperature difference
+       \note this is the nominal design dryblub effectiveness at design air flow rates, no evaporation water active
+       \minimum 0.0
+  A4 , \field Drybulb Effectiveness Flow Ratio Modifier Curve Name
+       \note this curve modifies the drybulb effectiveness in the previous field (eff_db_design)
+       \note by multiplying the value by the result of this curve, eff_db = eff_db_design * f(HXFlowRatio)
+       \note x = HXFlowRatio = sum of the primary and secondary flow rates divided by the sum of the design flow rates
+       \type object-list
+       \object-list AllCurves
+       \note Any curve or table with one independent variable can be used:
+       \note Curve:Linear, Curve:Quadratic, Curve:Cubic, Curve:Quartic, Curve:Exponent,
+       \note Curve:ExponentialSkewNormal, Curve:Sigmoid, Curve:RectuangularHyperbola1,
+       \note Curve:RectangularHyperbola2, Curve:ExponentialDecay, Curve:DoubleExponentialDecay,
+       \note Table:OneIndependentVariable
+  N3 , \field Recirculating Water Pump Design Power
        \units W
        \ip-units W
-  N4 , \field Secondary Fan Flow Rate
-       \units m3/s
-       \minimum 0.0
+       \note This is the nominal design pump power of water recirculation and spray for evaporation at design air flow
+       \note rates and cooler design effectiveness
        \autosizable
-  N5 , \field Secondary Fan Total Efficiency
+  N4 , \field Water Pump Power Sizing Factor
        \type real
+       \units W/(m3/s)
+       \note this field is used when the previous field is set to autosize. The pump power is scaled with Secondary Design Air Flow Rate
+  A5 , \field Water Pump Power Modifier Curve Name
+       \note this curve modifies the pump power in the previous field by multiplying the design power by the result of this curve.
+       \note x = ff = flow fraction on the secondary side, secondary air flow rate during operation divided by Secondary Design Air Flow Rate 
+       \type object-list
+       \object-list AllCurves
+       \note Any curve or table with one independent variable can be used:
+       \note Curve:Linear, Curve:Quadratic, Curve:Cubic, Curve:Quartic, Curve:Exponent,
+       \note Curve:ExponentialSkewNormal, Curve:Sigmoid, Curve:RectuangularHyperbola1,
+       \note Curve:RectangularHyperbola2, Curve:ExponentialDecay, Curve:DoubleExponentialDecay,
+       \note Table:OneIndependentVariable
+  N5 , \field Secondary Air Design Flow Rate  
+       \type real
+       \units m3/s
        \minimum> 0.0
-       \maximum 1.0
-  N6 , \field Secondary Fan Delta Pressure
-       \units Pa
-       \minimum 0.0
-       \ip-units inH2O
-  A3 , \field Primary Air Inlet Node Name
+       \autosizable
+  N6 , \field Secondary Air Flow Scaling Factor
+       \type real
+       \units dimensionless
+       \note This field is used when the previous field is set to autoize.  The Primary Design Air Flow Rate is scaled using this factor
+       \note to calculate the secondary design air flow rate.  
+  N7 , \field Secondary Air Fan Design Power
+       \type real
+       \units W
+       \note This is the fan power at Secondary Design Air Flow Rate
+       \note this is the nominal design power at full speed. 
+       \autosizable
+  N8 , \field Secondary Air Fan Sizing Specific Power
+       \type real
+       \units W/(m3/s)
+       \note this field is used when the previous field is set to autosize. The fan power is scaled with Secondary Design Air Flow Rate
+  A6 , \field Secondary Air Fan Power Modifier Curve Name
+       \note this curve modifies the design fan power in the previous field by multiplying the value by the result
+       \note of this curve.  It should have a value of 1.0 at a x = 1.0. 
+       \note x = ff = flow fraction on the secondary side, secondary air flow rate during operation divided by Secondary Design Air Flow Rate 
+       \type object-list
+       \object-list AllCurves
+       \note Any curve or table with one independent variable can be used:
+       \note Curve:Linear, Curve:Quadratic, Curve:Cubic, Curve:Quartic, Curve:Exponent,
+       \note Curve:ExponentialSkewNormal, Curve:Sigmoid, Curve:RectuangularHyperbola1,
+       \note Curve:RectangularHyperbola2, Curve:ExponentialDecay, Curve:DoubleExponentialDecay,
+       \note Table:OneIndependentVariable
+  A7 , \field Primary Air Inlet Node Name
        \type node
-  A4 , \field Primary Air Outlet Node Name
+  A8 , \field Primary Air Outlet Node Name
        \type node
-  A5 , \field Control Type
-  N7 , \field Dewpoint Effectiveness Factor
-  A6 , \field Secondary Air Inlet Node Name
+  N9 , \field Primary Design Air Flow Rate  
+       \type real
+       \units m3/s
+       \minimum> 0.0
+       \autosizable
+  N10, \field Dewpoint Effectiveness Factor
+  A9 , \field Secondary Air Inlet Node Name
        \type node
-  A7 , \field Sensor Node Name
+  A10, \field Secondary Air Outlet Node Name
        \type node
-  A8 , \field Relief Air Inlet Node Name
+  A11, \field Sensor Node Name
        \type node
-  A9 , \field Water Supply Storage Tank Name
+  A12, \field Relief Air Inlet Node Name
+       \type node
+  A13, \field Water Supply Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
-  N8 , \field Drift Loss Fraction
+  N11, \field Drift Loss Fraction
        \type real
        \minimum 0.0
        \note Rate of drift loss as a fraction of evaporated water flow rate
-  N9 ; \field Blowdown Concentration Ratio
+  N12, \field Blowdown Concentration Ratio
        \type real
        \minimum 2.0
        \note Characterizes the rate of blowdown in the evaporative cooler.
-       \note Blowdown is water intentionally drained from the cooler in order to offset the build up
-       \note of solids in the water that would otherwise occur because of evaporation.
+       \note Blowdown is water intentionally drained from the cooler in order to offset the build
+       \note up of solids in the water that would otherwise occur because of evaporation.
        \note Ratio of solids in the blowdown water to solids in the make up water.
        \note A typical value is 3.  If left blank then there is no blowdown.
+  N13, \field Evaporative Operation Minimum Limit Secondary Air Drybulb Temperature 
+       \type real
+       \note This input field value defines the secondary air inlet node drybulb temperature 
+       \note limits in degreeCelsius. When the secondary side entering air dry bulb temperature 
+       \note drops below this limit, then the evaporative cooler operation mode changes to dry 
+       \note heat exchanger. Users specify their own limits. If this field is left blank, then 
+       \note there is no drybulb temperature lower limit for evaporative cooler operation. If 
+       \note operating range control is desired then this input field and the next two input 
+       \note fields should be specified or all the three should be left blank or left out. If 
+       \note no minimum drybulb temperature limit is desired while there are maximum drybulb
+       \note and wetbulb temperature limits then specify very low minimum temperature limit 
+       \note value (e.g. -99.0C).
+  N14, \field Evaporative Operation Maximum Limit Outdoor Wetbulb Temperature
+       \type real
+       \note This input field value defines the secondary air inlet node wetbulb temperature 
+       \note limits in degree Celsius. When the secondary side entering air wet bulb temperature
+       \note exceeds this limit, then the evaporative cooler urns off and does not attempt to do
+       \note any cooling. If this field is left blank, then there is no wetbulb temperature 
+       \note upper limit for evaporative cooler wet operation mode. If this input field is left
+       \note blank then, the previous and the next input fields should also be left blank. If no
+       \note maximum wetbulb temperature limits is desired while there are minimum drybulb and 
+       \note maximum drybulb upper temperature limits then specify very high maximum wetbulb 
+       \note temperature limit value (e.g. 99.0 C).
+  N15; \field Dry Operation Maximum Limit Outdoor Drybulb Temperature
+       \type real
+       \note This input field value defines the secondary air inlet node drybulb temperature 
+       \note limits in degree Celsius. When the secondary side entering air drybulb temperature
+       \note exceeds this limit, then the evaporative cooler will not run in dry operation mode
+       \note or may be turned off depending on its wetbulb temperature. If this field is left
+       \note blank, then there is no drybulb temperature maximum limit for evaporative cooler
+       \note operation. If this input field is left blank then, the previous and the next input
+       \note fields should also be left blank. If no maximum drybulb temperature limit is 
+       \note desired while there are minimum drybulb and maximum wetbulb upper temperature
+       \note limits then specify very high maximum drybulb temperature limit value (e.g. 99.0 C).
+
 
 EvaporativeCooler:Direct:ResearchSpecial,
        \memo Direct evaporative cooler with user-specified effectiveness (can represent rigid pad
@@ -48117,29 +48231,60 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \note If this field is blank, the system is always available.
        \type object-list
        \object-list ScheduleNames
-  N1 , \field Cooler Effectiveness
+  N1 , \field Cooler Design Effectiveness
        \note effectiveness with respect to wet-bulb depression
        \type real
        \minimum 0.0
        \maximum 1.0
-  N2 , \field Recirculating Water Pump Power Consumption
+  A3 , \field Effectiveness Flow Ratio Modifier Curve Name
+       \note this curve modifies the design effectiveness in the previous field 
+       \note by multiplying the value by the result of this curve.  The effectiveness flow modifier curve 
+       \note is a function of flow fraction. Flow fraction is the ratio of current primary air flow rate to 
+       \note the primary air design flow rate. If this input field is left blank then, the effectiveness 
+       \note is assumed to be constant.   
+       \type object-list
+       \object-list AllCurves
+       \note Any curve or table with one independent variable can be used:
+       \note Curve:Linear, Curve:Quadratic, Curve:Cubic, Curve:Quartic, Curve:Exponent,
+       \note Curve:ExponentialSkewNormal, Curve:Sigmoid, Curve:RectuangularHyperbola1,
+       \note Curve:RectangularHyperbola2, Curve:ExponentialDecay, Curve:DoubleExponentialDecay,
+       \note Table:OneIndependentVariable   
+  N2 , \field Recirculating Water Pump Design Power
        \units W
        \ip-units W
-       \minimum 0.0
-  A3 , \field Air Inlet Node Name
+       \minimum 0.0  
+       \note This is the design water pump or spray for evaporation at the primary air design air flow rates
+       \note and cooler design effectiveness
+       \autosizable
+  N3 , \field Water Pump Power Sizing Factor
+       \type real
+       \units W/(m3/s)
+       \note this field is used when the previous field is set to autosize. The pump power is scaled with Primary Air Design Air Flow Rate
+  A4 , \field Water Pump Power Modifier Curve Name
+       \note this curve modifies the pump power in the previous field by multiplying the design power by the result of this curve.
+       \note x = ff = flow fraction on the primary air.  The flow fraction is the secondary air flow rate during current operation divided
+       \note by Primary Air Design Flow Rate
+       \type object-list
+       \object-list AllCurves
+       \note Any curve or table with one independent variable can be used:
+       \note Curve:Linear, Curve:Quadratic, Curve:Cubic, Curve:Quartic, Curve:Exponent,
+       \note Curve:ExponentialSkewNormal, Curve:Sigmoid, Curve:RectuangularHyperbola1,
+       \note Curve:RectangularHyperbola2, Curve:ExponentialDecay, Curve:DoubleExponentialDecay,
+       \note Table:OneIndependentVariable
+  A5 , \field Air Inlet Node Name
        \type node
-  A4 , \field Air Outlet Node Name
+  A6 , \field Air Outlet Node Name
        \type node
-  A5 , \field Sensor Node Name
+  A7 , \field Sensor Node Name
        \type node
-  A6 , \field Water Supply Storage Tank Name
+  A8 , \field Water Supply Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
-  N3 , \field Drift Loss Fraction
+  N4 , \field Drift Loss Fraction
        \type real
        \minimum 0.0
        \note Rate of drift loss as a fraction of evaporated water flow rate
-  N4 ; \field Blowdown Concentration Ratio
+  N5 , \field Blowdown Concentration Ratio
        \type real
        \minimum 2.0
        \note Characterizes the rate of blowdown in the evaporative cooler.
@@ -48147,6 +48292,29 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \note of solids in the water that would otherwise occur because of evaporation.
        \note Ratio of solids in the blowdown water to solids in the make up water.
        \note A typical value is 3. If left blank then there is no blowdown.
+  N6 , \field Evaporative Operation Minimum Drybulb Temperature
+       \type real
+       \minimum -99.0
+       \note This numeric field defines the evaporative cooler air inlet node drybulb temperature minimum  
+       \note limit in degrees Celsius. The evaporative cooler will be turned off when the evaporator cooler 
+       \note air inlet node dry-bulb temperature falls below this limit. The typical minimum value is 16°C. Users 
+       \note are allowed to specify their own limits. If this field is left blank, then there is no drybulb lower
+       \note temperature limit for evaporative cooler operation.
+  N7 , \field Evaporative Operation Maximum Limit Wetbulb Temperature
+       \type real
+       \note when outdoor wetbulb temperature rises above this limit the cooler shuts down.
+       \note This numeric field defines the evaporative cooler air inlet node wet-bulb temperature maximum 
+       \note limit in degrees Celsius. The evaporative cooler will be turned off when the evaporative cooler 
+       \note air inlet node wet-bulb temperature exceeds this limit. The typical maximum value is 24°C. Users 
+       \note are allowed to specify their own limits. If this field is left blank, then there is no upper 
+       \note wetbulb temperature limit for evaporative cooler operation.
+  N8 ; \field Evaporative Operation Maximum Limit Drybulb Temperature
+       \type real
+       \note This numeric field defines the evaporative cooler air inlet node dry-bulb temperature maximum 
+       \note limit in degrees Celsius. The evaporative cooler will be turned off when its air inlet node 
+       \note drybulb temperature exceeds this limit. The typical maximum value is 26°C. Users 
+       \note are allowed to specify their own limits. If this field is left blank, then there is no upper
+       \note temperature limit for evaporative cooler operation.
 
 \group Humidifiers and Dehumidifiers
 

@@ -217,6 +217,15 @@ namespace FluidCoolers {
 
 	// Functions
 
+	bool
+	TestFluidCoolerTwoSpeedInputForDesign(
+		std::string const cCurrentModuleObject,
+		FArray1D<std::string> const &  AlphArray,
+		FArray1D<std::string> const & cNumericFieldNames,
+		FArray1D<std::string> const & cAlphaFieldNames,
+		int const &	FluidCoolerNum
+		);
+
 	void
 	SimFluidCoolers(
 		std::string & FluidCoolerType,

@@ -892,7 +892,7 @@ namespace SimulationManager {
 					TimingFlag = true;
 				} else if ( SameString( Alphas( NumA ), "ReportDetailedWarmupConvergence" ) ) {
 					ReportDetailedWarmupConvergence = true;
-				} else if ( SameString( Alphas( NumA ), "ReportDuringHVACSizingSimulation")) {
+				} else if ( SameString( Alphas( NumA ), "ReportDuringHVACSizingSimulation" ) ) {
 					ReportDuringHVACSizingSimulation = true;
 				} else if ( SameString( Alphas( NumA ), "CreateMinimalSurfaceVariables" ) ) {
 					continue;
