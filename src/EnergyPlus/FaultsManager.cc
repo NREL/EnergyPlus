@@ -227,7 +227,7 @@ namespace FaultsManager {
 					
 						// Related Thermostat Offset Fault Name is required for Humidistat Offset Type: ThermostatOffsetDependent
 						if ( lAlphaFieldBlanks( 5 ) ) {
-							ShowSevereError( cFault1 + " = \"" + cAlphaFieldNames( 5 ) + "\" cannot be blank for Humidistat Offset Type = ThermostatOffsetDependent." );
+							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\": " + cAlphaFieldNames( 5 ) + " cannot be blank for Humidistat Offset Type = \"ThermostatOffsetDependent\"." );
 							ErrorsFound = true;
 						} else {
 							FaultsHumidistatOffset( jFaultyHumidistat ).FaultyThermostatName = cAlphaArgs( 5 );
@@ -262,7 +262,7 @@ namespace FaultsManager {
 
 						// Reference offset value is required for Humidistat Offset Type: ThermostatOffsetIndependent
 						if ( lNumericFieldBlanks( 1 ) ) {
-							ShowSevereError( cFault1 + " = \"" + cNumericFieldNames( 1 ) + "\" cannot be blank for Humidistat Offset Type = ThermostatOffsetIndependent." );
+							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\": " + cNumericFieldNames( 1 ) + " cannot be blank for Humidistat Offset Type = \"ThermostatOffsetIndependent\"." );
 							ErrorsFound = true;
 						} else {
 							FaultsHumidistatOffset( jFaultyHumidistat ).Offset = rNumericArgs( 1 );
