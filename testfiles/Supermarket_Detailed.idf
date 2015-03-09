@@ -5214,3 +5214,6 @@
   output:diagnostics,
     displayallwarnings;      !- Key 1
 
+  Output:SQLite,
+    Simple;
+

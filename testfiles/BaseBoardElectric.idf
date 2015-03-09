@@ -2168,3 +2168,6 @@
 
   Output:DebuggingData,0,0;
 
+  Output:SQLite,
+    Simple;
+

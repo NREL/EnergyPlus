@@ -170,7 +170,7 @@ SUBROUTINE WriteOutIDFLines(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,FieldU
       ENDIF
       Write(DifUnit,fmta) TRIM(LineOut)
     ENDDO
-    WRITE(DifUnit,fmta) ' '
+    WRITE(DifUnit,fmta) ''
 
   RETURN
 
@@ -240,7 +240,7 @@ SUBROUTINE WriteOutIDFLinesAsSingleLine(DifUnit,ObjectName,CurArgs,OutArgs,Field
         Write(DifUnit,fmta) TRIM(LineOut)
       ENDIF
     ENDDO
-    WRITE(DifUnit,fmta) ' '
+    WRITE(DifUnit,fmta) ''
 
   RETURN
 
@@ -383,7 +383,7 @@ SUBROUTINE WriteOutIDFLinesAsComments(DifUnit,ObjectName,CurArgs,OutArgs,FieldNa
       ENDIF
       Write(DifUnit,fmta) TRIM(LineOut)
     ENDDO
-    WRITE(DifUnit,fmta) ' '
+    WRITE(DifUnit,fmta) ''
 
   RETURN
 
@@ -553,7 +553,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
             ENDIF
             VArg=VArg+3
           ENDDO
-          WRITE(DifUnit,fmta) ' '
+          WRITE(DifUnit,fmta) ''
 
         CASE('SURFACE:SHADING:DETACHED','SURFACE:SHADING:DETACHED:FIXED','SURFACE:SHADING:DETACHED:BUILDING')
           IF (ObjectName == 'SURFACE:SHADING:DETACHED') THEN
@@ -586,7 +586,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
             ENDIF
             VArg=VArg+3
           ENDDO
-          WRITE(DifUnit,fmta) ' '
+          WRITE(DifUnit,fmta) ''
 
         CASE('SURFACE:SHADING:ATTACHED')
           CALL WriteOutPartialIDFLines(DifUnit,ObjectName,4,OutArgs,FieldNames,FieldUnits)
@@ -615,7 +615,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
             ENDIF
             VArg=VArg+3
           ENDDO
-          WRITE(DifUnit,fmta) ' '
+          WRITE(DifUnit,fmta) ''
 
         CASE('WINDOWGLASSSPECTRALDATA')
           CALL WriteOutPartialIDFLines(DifUnit,ObjectName,1,OutArgs,FieldNames,FieldUnits)
@@ -635,7 +635,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
             LineOut=TRIM(LineOut)//LString
             WRITE(DifUnit,fmta) TRIM(LineOut)
           ENDDO
-          WRITE(DifUnit,fmta) ' '
+          WRITE(DifUnit,fmta) ''
 
         CASE('FLUIDPROPERTYTEMPERATURES')
           CALL WriteOutPartialIDFLines(DifUnit,ObjectName,1,OutArgs,FieldNames,FieldUnits)
@@ -655,7 +655,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
             LineOut=TRIM(LineOut)//LString
             WRITE(DifUnit,fmta) TRIM(LineOut)
           ENDDO
-          WRITE(DifUnit,fmta) ' '
+          WRITE(DifUnit,fmta) ''
 
         CASE('FLUIDPROPERTYSATURATED','FLUIDPROPERTYSUPERHEATED','FLUIDPROPERTYCONCENTRATION')
           CALL WriteOutPartialIDFLines(DifUnit,ObjectName,4,OutArgs,FieldNames,FieldUnits)
@@ -675,7 +675,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
             LineOut=TRIM(LineOut)//LString
             WRITE(DifUnit,fmta) TRIM(LineOut)
           ENDDO
-          WRITE(DifUnit,fmta) ' '
+          WRITE(DifUnit,fmta) ''
 
         CASE DEFAULT
           Written=.false.
@@ -735,7 +735,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
               Arg=Arg+1
             ENDIF
           ENDDO
-          WRITE(DifUnit,fmta) ' '
+          WRITE(DifUnit,fmta) ''
           if (compactwarning) then
             CALL writePreProcessorObject(DifUnit,ProgNameConversion,'Warning',  &
              'Compact Schedule object="'//trim(OutArgs(1))//'" terminated early.  Check for accuracy.')
@@ -775,7 +775,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
             ENDIF
             VArg=VArg+3
           ENDDO
-          WRITE(DifUnit,fmta) ' '
+          WRITE(DifUnit,fmta) ''
 
         CASE('WALL:DETAILED','ROOFCEILING:DETAILED','FLOOR:DETAILED')
           CALL WriteOutPartialIDFLines(DifUnit,ObjectName,9,OutArgs,FieldNames,FieldUnits)
@@ -804,7 +804,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
             ENDIF
             VArg=VArg+3
           ENDDO
-          WRITE(DifUnit,fmta) ' '
+          WRITE(DifUnit,fmta) ''
 
         CASE('SHADING:SITE:DETAILED','SHADING:BUILDING:DETAILED')
           CALL WriteOutPartialIDFLines(DifUnit,ObjectName,3,OutArgs,FieldNames,FieldUnits)
@@ -833,7 +833,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
             ENDIF
             VArg=VArg+3
           ENDDO
-          WRITE(DifUnit,fmta) ' '
+          WRITE(DifUnit,fmta) ''
 
         CASE('SHADING:ZONE:DETAILED')
           CALL WriteOutPartialIDFLines(DifUnit,ObjectName,4,OutArgs,FieldNames,FieldUnits)
@@ -862,7 +862,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
             ENDIF
             VArg=VArg+3
           ENDDO
-          WRITE(DifUnit,fmta) ' '
+          WRITE(DifUnit,fmta) ''
 
         CASE('MATERIALPROPERTY:GLAZINGSPECTRALDATA')
           CALL WriteOutPartialIDFLines(DifUnit,ObjectName,1,OutArgs,FieldNames,FieldUnits)
@@ -882,7 +882,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
             LineOut=TRIM(LineOut)//LString
             WRITE(DifUnit,fmta) TRIM(LineOut)
           ENDDO
-          WRITE(DifUnit,fmta) ' '
+          WRITE(DifUnit,fmta) ''
 
         CASE('FLUIDPROPERTIES:TEMPERATURES')
           CALL WriteOutPartialIDFLines(DifUnit,ObjectName,1,OutArgs,FieldNames,FieldUnits)
@@ -902,7 +902,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
             LineOut=TRIM(LineOut)//LString
             WRITE(DifUnit,fmta) TRIM(LineOut)
           ENDDO
-          WRITE(DifUnit,fmta) ' '
+          WRITE(DifUnit,fmta) ''
 
         CASE('FLUIDPROPERTIES:SATURATED','FLUIDPROPERTIES:SUPERHEATED','FLUIDPROPERTIES:CONCENTRATION')
           CALL WriteOutPartialIDFLines(DifUnit,ObjectName,4,OutArgs,FieldNames,FieldUnits)
@@ -922,7 +922,7 @@ SUBROUTINE CheckSpecialObjects(DifUnit,ObjectName,CurArgs,OutArgs,FieldNames,Fie
             LineOut=TRIM(LineOut)//LString
             WRITE(DifUnit,fmta) TRIM(LineOut)
           ENDDO
-          WRITE(DifUnit,fmta) ' '
+          WRITE(DifUnit,fmta) ''
 
         CASE DEFAULT
           Written=.false.

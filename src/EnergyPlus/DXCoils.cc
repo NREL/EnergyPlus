@@ -1390,6 +1390,16 @@ namespace DXCoils {
 			if ( DXCoil( DXCoilNum ).SHRFTemp( 1 ) > 0 && DXCoil( DXCoilNum ).SHRFFlow( 1 ) > 0 ) {
 				DXCoil( DXCoilNum ).UserSHRCurveExists = true;
 			}
+			// get User Input flag for ASHRAE Standard 127 Standard Ratings Reporting
+			if ( lAlphaBlanks( 17 ) ) {
+				DXCoil( DXCoilNum ).ASHRAE127StdRprt = false;
+			} else {
+				if ( Alphas( 17 ) == "YES" || Alphas( 17 ) == "Yes" ) {
+					DXCoil( DXCoilNum ).ASHRAE127StdRprt = true;
+				} else {
+					DXCoil( DXCoilNum ).ASHRAE127StdRprt = false;
+				}
+			}
 
 		} // end of the Doe2 DX coil loop
 
@@ -5545,16 +5555,16 @@ namespace DXCoils {
 							VolFlowRate = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode );
 							if ( VolFlowRate >= SmallAirVolFlow ) {
 								if ( CurOASysNum > 0 ) { // coil is in the OA stream
-									MixTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
-									MixHumRat = FinalSysSizing( CurSysNum ).CoolOutHumRat;
+									MixTemp = FinalSysSizing( CurSysNum ).OutTempAtCoolPeak;
+									MixHumRat = FinalSysSizing( CurSysNum ).OutHumRatAtCoolPeak;
 									SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
 									SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
 								} else { // coil is on the main air loop
 									SupTemp = FinalSysSizing( CurSysNum ).CoolSupTemp;
 									SupHumRat = FinalSysSizing( CurSysNum ).CoolSupHumRat;
 									if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
-										MixTemp = FinalSysSizing( CurSysNum ).CoolMixTemp;
-										MixHumRat = FinalSysSizing( CurSysNum ).CoolMixHumRat;
+										MixTemp = FinalSysSizing( CurSysNum ).MixTempAtCoolPeak;
+										MixHumRat = FinalSysSizing( CurSysNum ).MixHumRatAtCoolPeak;
 									} else { // there is precooling of OA stream
 										if ( VolFlowRate > 0.0 ) {
 											OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / VolFlowRate;
@@ -5562,11 +5572,11 @@ namespace DXCoils {
 											OutAirFrac = 1.0;
 										}
 										OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
-										MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetTemp;
-										MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetHumRat;
+										MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).RetTempAtCoolPeak;
+										MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).RetHumRatAtCoolPeak;
 									}
 								}
-								OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
+								OutTemp = FinalSysSizing( CurSysNum ).OutTempAtCoolPeak;
 								rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
 								MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
 								MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );
@@ -6022,7 +6032,7 @@ namespace DXCoils {
 
 		// Call routine that computes AHRI certified rating for single-speed DX Coils
 		if ( ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed && DXCoil( DXCoilNum ).CondenserType( 1 ) == AirCooled ) || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical ) {
-			CalcDXCoilStandardRating( DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).DXCoilType_Num, 1, DXCoil( DXCoilNum ).RatedTotCap( 1 ), DXCoil( DXCoilNum ).RatedCOP( 1 ), DXCoil( DXCoilNum ).CCapFFlow( 1 ), DXCoil( DXCoilNum ).CCapFTemp( 1 ), DXCoil( DXCoilNum ).EIRFFlow( 1 ), DXCoil( DXCoilNum ).EIRFTemp( 1 ), DXCoil( DXCoilNum ).PLFFPLR( 1 ), DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ), DXCoil( DXCoilNum ).FanPowerPerEvapAirFlowRate( 1 ), DXCoil( DXCoilNum ).RegionNum, DXCoil( DXCoilNum ).MinOATCompressor, DXCoil( DXCoilNum ).OATempCompressorOn, DXCoil( DXCoilNum ).OATempCompressorOnOffBlank, DXCoil( DXCoilNum ).DefrostControl );
+			CalcDXCoilStandardRating( DXCoil( DXCoilNum ).Name, DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).DXCoilType_Num, 1, DXCoil( DXCoilNum ).RatedTotCap( 1 ), DXCoil( DXCoilNum ).RatedCOP( 1 ), DXCoil( DXCoilNum ).CCapFFlow( 1 ), DXCoil( DXCoilNum ).CCapFTemp( 1 ), DXCoil( DXCoilNum ).EIRFFlow( 1 ), DXCoil( DXCoilNum ).EIRFTemp( 1 ), DXCoil( DXCoilNum ).PLFFPLR( 1 ), DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ), DXCoil( DXCoilNum ).FanPowerPerEvapAirFlowRate( 1 ), DXCoil( DXCoilNum ).RegionNum, DXCoil( DXCoilNum ).MinOATCompressor, DXCoil( DXCoilNum ).OATempCompressorOn, DXCoil( DXCoilNum ).OATempCompressorOnOffBlank, DXCoil( DXCoilNum ).DefrostControl, DXCoil( DXCoilNum ).ASHRAE127StdRprt );
 		}
 		// Call routine that computes AHRI certified rating for multi-speed DX cooling Coils
 		if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedCooling || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedHeating ) {

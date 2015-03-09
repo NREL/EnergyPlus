@@ -9,7 +9,8 @@ CONTAINS
 
 SUBROUTINE SetThisVersionVariables()
       VerString='Conversion 8.2 => 8.3'
-      VersionNum=8.3
+      VersionNum=8.2
+      sVersionNum='8.2'
       IDDFileNameWithPath=TRIM(ProgramPath)//'V8-2-0-Energy+.idd'
       NewIDDFileNameWithPath=TRIM(ProgramPath)//'V8-3-0-Energy+.idd'
       RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 8-2-0 to 8-3-0.csv'
@@ -118,6 +119,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=MaxNameLength) :: OutScheduleName
 
   LOGICAL :: ErrFlag
+  
+  REAL :: IndirectOldFieldFive
+  REAL :: IndirectOldFieldSix
+  REAL :: IndirectNewFieldThirteen
+  CHARACTER(len=10) :: IndirectNewFieldString
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -203,6 +209,23 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
             EXIT
           ENDIF
 
+          ! Clean up from any previous passes, then re-allocate
+          IF(ALLOCATED(DeleteThisRecord)) DEALLOCATE(DeleteThisRecord)
+          IF(ALLOCATED(Alphas)) DEALLOCATE(Alphas)
+          IF(ALLOCATED(Numbers)) DEALLOCATE(Numbers)
+          IF(ALLOCATED(InArgs)) DEALLOCATE(InArgs)
+          IF(ALLOCATED(AorN)) DEALLOCATE(AorN)
+          IF(ALLOCATED(ReqFld)) DEALLOCATE(ReqFld)
+          IF(ALLOCATED(FldNames)) DEALLOCATE(FldNames)
+          IF(ALLOCATED(FldDefaults)) DEALLOCATE(FldDefaults)
+          IF(ALLOCATED(FldUnits)) DEALLOCATE(FldUnits)
+          IF(ALLOCATED(NwAorN)) DEALLOCATE(NwAorN)
+          IF(ALLOCATED(NwReqFld)) DEALLOCATE(NwReqFld)
+          IF(ALLOCATED(NwFldNames)) DEALLOCATE(NwFldNames)
+          IF(ALLOCATED(NwFldDefaults)) DEALLOCATE(NwFldDefaults)
+          IF(ALLOCATED(NwFldUnits)) DEALLOCATE(NwFldUnits)
+          IF(ALLOCATED(OutArgs)) DEALLOCATE(OutArgs)
+          IF(ALLOCATED(MatchArg)) DEALLOCATE(MatchArg)
           ALLOCATE(Alphas(MaxAlphaArgsFound),Numbers(MaxNumericArgsFound))
           ALLOCATE(InArgs(MaxTotalArgs))
           ALLOCATE(AorN(MaxTotalArgs),ReqFld(MaxTotalArgs),FldNames(MaxTotalArgs),FldDefaults(MaxTotalArgs),FldUnits(MaxTotalArgs))
@@ -238,11 +261,11 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
             IF (DeleteThisRecord(Num)) CYCLE
             DO xcount=IDFRecords(Num)%CommtS+1,IDFRecords(Num)%CommtE
               WRITE(DifLfn,fmta) TRIM(Comments(xcount))
-              if (xcount == IDFRecords(Num)%CommtE) WRITE(DifLfn,fmta) ' '
+              if (xcount == IDFRecords(Num)%CommtE) WRITE(DifLfn,fmta) ''
             ENDDO
             IF (NoVersion .and. Num == 1) THEN
               CALL GetNewObjectDefInIDD('VERSION',NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-              OutArgs(1)='8.0'
+              OutArgs(1) = sVersionNum
               CurArgs=1
               CALL WriteOutIDFLinesAsComments(DifLfn,'Version',CurArgs,OutArgs,NwFldNames,NwFldUnits)
             ENDIF
@@ -321,29 +344,27 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               SELECT CASE (MakeUPPERCase(TRIM(IDFRecords(Num)%Name)))
 
               CASE ('VERSION')
-                IF ((InArgs(1)(1:3) == '8.3').and. ArgFile) THEN
+                IF ((InArgs(1)(1:3)) == '8.3' .and. ArgFile) THEN
                   CALL ShowWarningError('File is already at latest version.  No new diff file made.',Auditf)
                   CLOSE(diflfn,STATUS='DELETE')
                   LatestVersion=.true.
                   EXIT
                 ENDIF
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1)='8.3'
+                OutArgs(1) = sVersionNum
                 nodiff=.false.
 
-!    !!!    Changes for this version
-   ! These will be conflicted, but uncommented when that branch is merged to develop
-   !           CASE('CHILLER:ELECTRIC:REFORMULATEDEIR')
-   !             nodiff=.false.
-   !             CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-   !             ! fields 1-9 aren't affected
-   !             OutArgs(1:9)=InArgs(1:9)
-   !             ! add a blank for the new curve type field
-   !             OutArgs(10)=blank
-   !             ! then we just push the rest of the fields down 1
-   !             OutArgs(11:)=InArgs(10:)
-   !             CurArgs = CurArgs + 1
-                
+    !!!    Changes for this version
+              CASE('CHILLER:ELECTRIC:REFORMULATEDEIR')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! fields 1-9 aren't affected
+                OutArgs(1:9)=InArgs(1:9)
+                ! add the new curve type field
+                OutArgs(10)='LeavingCondenserWaterTemperature'
+                ! then we just push the rest of the fields down 1
+                OutArgs(11:CurArgs+1)=InArgs(10:CurArgs)
+                CurArgs = CurArgs + 1
                 
               CASE('SITE:GROUNDDOMAIN')
                 ! Object rename
@@ -358,8 +379,66 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(1:10) = InArgs(1:10)
                 OutArgs(11:CurArgs-1) = InArgs(12:CurArgs)
                 CurArgs = CurArgs - 1
-    !!!   Changes for report variables, meters, tables -- update names
 
+              CASE('EVAPORATIVECOOLER:INDIRECT:RESEARCHSPECIAL')
+                ! data center hvac changes
+                nodiff = .false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! no change from F1-F3
+                OutArgs(1:3) = InArgs(1:3)
+                ! remove old F4
+                ! new F4, 5, 6 are blank
+                OutArgs(4:6) = ''
+                ! new F7 is old F5
+                OutArgs(7) = InArgs(5)
+                ! new F8, F9 are blank
+                OutArgs(8:9) = ''
+                ! new F10 is old F6
+                OutArgs(10) = InArgs(6)
+                ! new F11 is 1.0
+                OutArgs(11) = '1.0'
+                ! Now we need to read the values of fields 7 and 8 for calculation, so need to cast to real
+                ! Numerics should be enforced by the input processor, so I'm not going to validate much here
+                READ(InArgs(7), *) IndirectOldFieldFive
+                READ(InArgs(8), *) IndirectOldFieldSix
+                ! new F12 is just an autosize field
+                OutArgs(12) = 'Autosize'
+                ! Calculate a new 13 from old 7 and 8
+                ! Again relying on the input processor to protect from NaN
+                IndirectNewFieldThirteen = IndirectOldFieldSix / IndirectOldFieldFive
+                WRITE(IndirectNewFieldString,'(F10.5)') IndirectNewFieldThirteen
+                OutArgs(13) = TRIM(ADJUSTL(IndirectNewFieldString))
+                ! new F14 is just blank
+                OutArgs(14) = ''
+                ! new F15,16 are shifted
+                OutArgs(15:16) = InArgs(9:10)
+                ! new F17 is just autosize
+                OutArgs(17) = 'Autosize'
+                ! new F17,19 are shifted, old F11 is removed entirely
+                OutArgs(18:19) = InArgs(12:13)
+                ! new F20 is a new outlet node...hopefully not needed
+                OutArgs(20) = ''
+                ! new fields F21-25 are shifted
+                OutArgs(21:25) = InArgs(14:18)
+                ! there are some additional new fields, but they are optional and intentionally blank
+                
+              CASE('EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL')
+                ! data center hvac changes
+                nodiff = .false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! keep the same first few fields
+                OutArgs(1:3) = InArgs(1:3)
+                ! Add a blank
+                OutArgs(4) = ''
+                ! shift down one field
+                OutArgs(5) = InArgs(4)
+                ! add two blanks
+                OutArgs(6:7) = ''
+                ! shift the rest
+                OutArgs(8:13) = InArgs(5:10)
+                ! there are some additional new fields, but they are optional and intentionally blank
+                
+    !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
@@ -844,7 +923,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
           IF (IDFRecords(NumIDFRecords)%CommtE /= CurComment) THEN
             DO xcount=IDFRecords(NumIDFRecords)%CommtE+1,CurComment
               WRITE(DifLfn,fmta) TRIM(Comments(xcount))
-              if (xcount == IDFRecords(Num)%CommtE) WRITE(DifLfn,fmta) ' '
+              if (xcount == IDFRecords(Num)%CommtE) WRITE(DifLfn,fmta) ''
             ENDDO
           ENDIF
 
@@ -876,25 +955,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
       ENDIF
 
       CALL CreateNewName('Reallocate',CreatedOutputName,' ')
-
-      IF (Allocated(DeleteThisRecord)) THEN
-        DEALLOCATE(DeleteThisRecord)
-        DEALLOCATE(Alphas)
-        DEALLOCATE(Numbers)
-        DEALLOCATE(InArgs)
-        DEALLOCATE(AorN)
-        DEALLOCATE(ReqFld)
-        DEALLOCATE(FldNames)
-        DEALLOCATE(FldDefaults)
-        DEALLOCATE(FldUnits)
-        DEALLOCATE(NwAorN)
-        DEALLOCATE(NwReqFld)
-        DEALLOCATE(NwFldNames)
-        DEALLOCATE(NwFldDefaults)
-        DEALLOCATE(NwFldUnits)
-        DEALLOCATE(OutArgs)
-        DEALLOCATE(MatchArg)
-      ENDIF
 
     ENDDO
 

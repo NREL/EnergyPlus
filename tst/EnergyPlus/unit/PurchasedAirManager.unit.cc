@@ -10,7 +10,6 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <ObjexxFCL/gio.hh>
-#include <EnergyPlus/SQLiteProcedures.hh>
 
 
 using namespace EnergyPlus;
@@ -32,15 +31,6 @@ TEST( SizePurchasedAirTest, Test1 )
 	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios( ); }
 //	eso_stream = gio::out_stream( OutputFileStandard );
 
-	//CreateSQLiteDatabase(); (lifted from SimulationManager.cc)
-	try {
-		EnergyPlus::sqlite = std::unique_ptr<SQLite>( new SQLite( ) );
-	}
-	catch ( const std::runtime_error& error ) {
-		// Maybe this could be higher in the call stack, and then handle all runtime exceptions this way.
-		ShowFatalError( error.what( ) );
-	}
-
 	//ZoneEquipConfig.allocate( 1 );
 	//ZoneEquipConfig( 1 ).ZoneName = "Zone 1";
 	//ZoneEquipConfig( 1 ).ActualZoneNum = 1;
@@ -50,6 +40,7 @@ TEST( SizePurchasedAirTest, Test1 )
 	ZoneEqSizing.allocate( 1 );
 	CurZoneEqNum = 1;
 	ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 24 );
+	CurSysNum = 0;
 
 	FinalZoneSizing.allocate(1);
 	FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 1.0;
@@ -86,6 +77,9 @@ TEST( SizePurchasedAirTest, Test1 )
 	PurchAir( PurchAirNum ).cObjectName = "ZONEHVAC:IDEALLOADSAIRSYSTEM";
 	PurchAir( PurchAirNum ).Name = "Ideal Loads 1";
 
+	// Need this to prevent crash in RequestSizing
+	UnitarySysEqSizing.allocate(1);
+
 	SizePurchasedAir( PurchAirNum );
 	EXPECT_DOUBLE_EQ( 1.0 , PurchAir( PurchAirNum ).MaxHeatVolFlowRate );
 	EXPECT_NEAR( 509.856, PurchAir( PurchAirNum ).MaxHeatSensCap, 0.1 );
@@ -94,5 +88,12 @@ TEST( SizePurchasedAirTest, Test1 )
 
 	// Close and delete eio output file
 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
+
+	ZoneEqSizing(CurZoneEqNum).SizingMethod.deallocate();
+	ZoneEqSizing.deallocate();
+	FinalZoneSizing.deallocate();
+	PurchAir.deallocate();
+	PurchAirNumericFields.deallocate();
+	UnitarySysEqSizing.deallocate();
 
 }
