@@ -2301,7 +2301,7 @@ namespace SolarShading {
 
 			// See comment at top of module regarding HCMULT
 			auto l( l1 );
-			for ( int N = 1; N <= NumVertices; ++N, ++l ) { // [ l ] == ( N, NS )
+			for ( int N = 1; N <= NumVertices; ++N, ++l ) { // [ l ] == ( NS, N )
 				HCX[ l ] = nint64( XVS( N ) * HCMULT );
 				HCY[ l ] = nint64( YVS( N ) * HCMULT );
 			}
@@ -2311,8 +2311,8 @@ namespace SolarShading {
 		// Establish extra point for finding lines between points.
 
 		auto l( HCX.index( NS, NumVertices + 1 ) );
-		Int64 HCX_m( HCX[ l ] = HCX[ l1 ] ); // [ l ] == ( NumVertices + 1, NS ), [ l1 ] == ( 1, NS )
-		Int64 HCY_m( HCY[ l ] = HCY[ l1 ] ); // [ l ] == ( NumVertices + 1, NS ), [ l1 ] == ( 1, NS )
+		Int64 HCX_m( HCX[ l ] = HCX[ l1 ] ); // [ l ] == ( NS, NumVertices + 1 ), [ l1 ] == ( NS, 1 )
+		Int64 HCY_m( HCY[ l ] = HCY[ l1 ] ); // [ l ] == ( NS, NumVertices + 1 ), [ l1 ] == ( NS, 1 )
 
 		// Determine lines between points.
 		l = l1;
@@ -2320,7 +2320,7 @@ namespace SolarShading {
 		Int64 HCX_l;
 		Int64 HCY_l;
 		Real64 SUM( 0.0 ); // Sum variable
-		for ( int N = 1; N <= NumVertices; ++N, ++l, ++m ) { // [ l ] == ( N, NS ), [ m ] == ( N + 1, NS )
+		for ( int N = 1; N <= NumVertices; ++N, ++l, ++m ) { // [ l ] == ( NS, N ), [ m ] == ( NS, N + 1 )
 			HCX_l = HCX_m;
 			HCY_l = HCY_m;
 			HCX_m = HCX[ m ];
@@ -2367,15 +2367,15 @@ namespace SolarShading {
 		auto const l1( HCX.index( NS, 1 ) );
 
 		auto l( HCX.index( NS, NumVertices + 1 ) );
-		Int64 HCX_m( HCX[ l ] = HCX[ l1 ] ); // [ l1 ] == ( 1, NS )
-		Int64 HCY_m( HCY[ l ] = HCY[ l1 ] ); // [ l1 ] == ( 1, NS )
+		Int64 HCX_m( HCX[ l ] = HCX[ l1 ] ); // [ l1 ] == ( NS, 1 )
+		Int64 HCY_m( HCY[ l ] = HCY[ l1 ] ); // [ l1 ] == ( NS, 1 )
 
 		l = l1;
 		auto m( l1 + 1u );
 		Int64 HCX_l;
 		Int64 HCY_l;
 		Real64 SUM( 0.0 );
-		for ( int N = 1; N <= NumVertices; ++N, ++l, ++m ) { // [ l ] == ( N, NS ), [ m ] == ( N + 1, NS )
+		for ( int N = 1; N <= NumVertices; ++N, ++l, ++m ) { // [ l ] == ( NS, N ), [ m ] == ( NS, N + 1 )
 			HCX_l = HCX_m;
 			HCY_l = HCY_m;
 			HCX_m = HCX[ m ];
@@ -2415,13 +2415,13 @@ namespace SolarShading {
 
 		// only in HTRANS1
 		auto l( l1 );
-		for ( int N = 1; N <= NumVertices; ++N, ++l ) { // [ l ] == ( N, NS )
+		for ( int N = 1; N <= NumVertices; ++N, ++l ) { // [ l ] == ( NS, N )
 			HCX[ l ] = nint64( XVS( N ) * HCMULT );
 			HCY[ l ] = nint64( YVS( N ) * HCMULT );
 		}
 
 		l = HCX.index( NS, NumVertices + 1 );
-		Int64 HCX_m( HCX[ l ] = HCX[ l1 ] ); // [ l1 ] == ( 1, NS )
+		Int64 HCX_m( HCX[ l ] = HCX[ l1 ] ); // [ l1 ] == ( NS, 1 )
 		Int64 HCY_m( HCY[ l ] = HCY[ l1 ] );
 
 		l = l1;
@@ -2429,7 +2429,7 @@ namespace SolarShading {
 		Int64 HCX_l;
 		Int64 HCY_l;
 		Real64 SUM( 0.0 );
-		for ( int N = 1; N <= NumVertices; ++N, ++l, ++m ) { // [ l ] == ( N, NS ), [ m ] == ( N + 1, NS )
+		for ( int N = 1; N <= NumVertices; ++N, ++l, ++m ) { // [ l ] == ( NS, N ), [ m ] == ( NS, N + 1 )
 			HCX_l = HCX_m;
 			HCY_l = HCY_m;
 			HCX_m = HCX[ m ];
@@ -2706,7 +2706,7 @@ namespace SolarShading {
 
 		// Populate the arrays with the original polygon
 		for ( size_type j = 0, l = HCX.index( NS1, 1 ), e = NV1; j < e; ++j, ++l ) {
-			XTEMP[ j ] = HCX[ l ]; // [ l ] == ( j+1, NS1 )
+			XTEMP[ j ] = HCX[ l ]; // [ l ] == ( NS1, j+1 )
 			YTEMP[ j ] = HCY[ l ];
 			ATEMP[ j ] = HCA[ l ];
 			BTEMP[ j ] = HCB[ l ];
@@ -3367,7 +3367,7 @@ namespace SolarShading {
 		}
 
 		if ( ! DetailedSolarTimestepIntegration ) {
-			for ( iHour = 1; iHour <= 24; ++iHour ) { // Do for all hours.
+			for ( iHour = 1; iHour <= 24; ++iHour ) { // Do for all hours
 				for ( TS = 1; TS <= NumOfTimeStepInHour; ++TS ) {
 					FigureSunCosines( iHour, TS, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin );
 				}
@@ -3375,7 +3375,7 @@ namespace SolarShading {
 		} else {
 			FigureSunCosines( HourOfDay, TimeStep, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin );
 		}
-		//Initialize/update the Complex Fenestration geometry and optical properties
+		// Initialize/update the Complex Fenestration geometry and optical properties
 		UpdateComplexWindows();
 		if ( ! DetailedSolarTimestepIntegration ) {
 			for ( iHour = 1; iHour <= 24; ++iHour ) { // Do for all hours.
@@ -4205,11 +4205,11 @@ namespace SolarShading {
 			NVR = HCNV( 1 );
 			auto l3( HCX.index( NS3, 1 ) );
 			for ( N = 1; N <= NVT; ++N, ++l3 ) {
-				auto const x3( HCX[ l3 ] ); // [ l3 ] == ( N, NS3 )
+				auto const x3( HCX[ l3 ] ); // [ l3 ] == ( NS3, N )
 				auto const y3( HCY[ l3 ] );
 				size_type l1( 0 );
 				for ( M = 1; M <= NVR; ++M, ++l1 ) {
-					if ( std::abs( HCX[ l1 ] - x3 ) > 6 ) continue; // [ l1 ] == ( M, 1 )
+					if ( std::abs( HCX[ l1 ] - x3 ) > 6 ) continue; // [ l1 ] == ( 1, M )
 					if ( std::abs( HCY[ l1 ] - y3 ) > 6 ) continue;
 					HCX[ l3 ] = HCX[ l1 ];
 					HCY[ l3 ] = HCY[ l1 ];
@@ -4393,14 +4393,14 @@ namespace SolarShading {
 				size_type j( HCX.index( NS3, 1 ) );
 				size_type NVR( HCNV( 1 ) );
 				for ( int N = 1; N <= NumVertInShadowOrClippedSurface; ++N, ++j ) { //Tuned Logic change: break after 1st "close" point found
-					auto const HCX_N( HCX[ j ] ); // [ j ] == ( N, NS3 )
+					auto const HCX_N( HCX[ j ] ); // [ j ] == ( NS3, N )
 					auto const HCY_N( HCY[ j ] );
-					for ( size_type l = 0; l < NVR; ++l ) { // [ l ] == ( l+1, 1 )
+					for ( size_type l = 0; l < NVR; ++l ) { // [ l ] == ( 1, l+1 )
 						auto const delX( std::abs( HCX[ l ] - HCX_N ) );
 						if ( delX > 6 ) continue;
 						auto const delY( std::abs( HCY[ l ] - HCY_N ) );
 						if ( delY > 6 ) continue;
-						if ( delX > 0 ) HCX[ j ] = HCX[ l ]; // [ j ] == ( N, NS3 )
+						if ( delX > 0 ) HCX[ j ] = HCX[ l ]; // [ j ] == ( NS3, N )
 						if ( delY > 0 ) HCY[ j ] = HCY[ l ];
 						break;
 					}
@@ -4584,7 +4584,7 @@ namespace SolarShading {
 						HCAREA( iS ) = HCAREA( iR );
 						size_type lS( HCX.index( iS, 1 ) );
 						size_type lR( HCX.index( iR, 1 ) );
-						for ( int J = 1; J <= MaxHCV; ++J, ++lS, ++lR ) { // [ lS ] == ( J, iS ), [ lR ] == ( J, iR )
+						for ( int J = 1; J <= MaxHCV; ++J, ++lS, ++lR ) { // [ lS ] == ( iS, J ), [ lR ] == ( iR, J )
 							HCX[ lS ] = HCX[ lR ];
 							HCY[ lS ] = HCY[ lR ];
 							HCA[ lS ] = HCA[ lR ];

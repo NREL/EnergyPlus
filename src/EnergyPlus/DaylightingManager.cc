@@ -9392,7 +9392,7 @@ namespace DaylightingManager {
 					if ( SQFirstTime ) {
 						XValue.allocate( maxval( IllumMap( {1,TotIllumMaps} ).Xnum() ) );
 						YValue.allocate( maxval( IllumMap( {1,TotIllumMaps} ).Ynum() ) );
-						IllumValue.allocate( maxval( IllumMap( {1,TotIllumMaps} ).Ynum() ), maxval( IllumMap( {1,TotIllumMaps} ).Xnum() ) );
+						IllumValue.allocate( maxval( IllumMap( {1,TotIllumMaps} ).Xnum() ), maxval( IllumMap( {1,TotIllumMaps} ).Ynum() ) );
 						SQFirstTime = false;
 					}
 
@@ -9404,9 +9404,9 @@ namespace DaylightingManager {
 						for ( X = 1; X <= IllumMap( MapNum ).Xnum; ++X ) {
 							XValue( X ) = IllumMap( MapNum ).Xmin + ( X - 1 ) * IllumMap( MapNum ).Xinc;
 							IllumIndex = X + ( Y - 1 ) * IllumMap( MapNum ).Xnum;
-							IllumValue( Y, X ) = nint( IllumMapCalc( MapNum ).DaylIllumAtMapPtHr( IllumIndex ) );
+							IllumValue( X, Y ) = nint( IllumMapCalc( MapNum ).DaylIllumAtMapPtHr( IllumIndex ) );
 							if ( ! IllumMapCalc( MapNum ).MapRefPtInBounds( IllumIndex ) ) {
-								IllumValue( Y, X ) = -IllumValue( Y, X );
+								IllumValue( X, Y ) = -IllumValue( X, Y );
 							}
 						} // X Loop
 					} // Y Loop

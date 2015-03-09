@@ -121,9 +121,6 @@ namespace MatrixDataManager {
 		int NumRows;
 		int NumCols;
 		int NumElements;
-		int ElementNum;
-		int RowIndex;
-		int ColIndex;
 
 		cCurrentModuleObject = "Matrix:TwoDimension";
 		NumTwoDimMatrix = GetNumObjectsFound( cCurrentModuleObject );
@@ -159,15 +156,12 @@ namespace MatrixDataManager {
 				ShowContinueError( "Check input, total number of elements does not agree with " + cNumericFieldNames( 1 ) + " and " + cNumericFieldNames( 2 ) );
 				ErrorsFound = true;
 			}
-			MatData( MatNum ).Mat2D.allocate( NumCols, NumRows ); // This is standard order for a NumRows X NumCols matrix
 			MatData( MatNum ).MatrixType = TwoDimensional;
-			RowIndex = 1;
-			ColIndex = 1;
-			for ( ElementNum = 1; ElementNum <= NumElements; ++ElementNum ) {
-				RowIndex = ( ElementNum - 1 ) / NumCols + 1;
-				ColIndex = mod( ( ElementNum - 1 ), NumCols ) + 1;
-				MatData( MatNum ).Mat2D( ColIndex, RowIndex ) = rNumericArgs( ElementNum + 2 ); // Matrix is read in row-by-row
-				//Note: this is opposite to usual FORTRAN array storage
+			//Note With change to row-major arrays the "row" and "col" usage here is transposed
+			auto & matrix( MatData( MatNum ).Mat2D );
+			matrix.allocate( NumCols, NumRows ); // This is standard order for a NumRows X NumCols matrix
+			for ( int ElementNum = 1; ElementNum <= NumElements; ++ElementNum ) {
+				matrix[ ElementNum - 1 ] = rNumericArgs( ElementNum + 2 ); // Matrix is read in row-by-row
 			}
 
 		}
