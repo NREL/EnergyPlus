@@ -606,8 +606,11 @@ endif()
 
 # if we are building a package, we can do additional operations, such as run doc scripts
 if(BUILD_PACKAGE)
-  # Some docs are generated on the fly here
+  
+  # Some docs are generated on the fly here, create a dir for the 'built' files
   file( MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/autodocs" )
+  
+  # the output variables listing
   add_custom_command( 
     TARGET energyplus
     PRE_BUILD
@@ -615,4 +618,13 @@ if(BUILD_PACKAGE)
   )
   install(FILES "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.csv" DESTINATION "./")
   install(FILES "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.md" DESTINATION "./")
+  
+  # the change log
+  add_custom_command( 
+    TARGET energyplus
+    PRE_BUILD
+    COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/doc/tools/create_changelog.py" "${CMAKE_SOURCE_DIR}/src/EnergyPlus" "${CMAKE_BINARY_DIR}/autodocs/changelog.md"
+  )
+  install(FILES "${CMAKE_BINARY_DIR}/autodocs/changelog.md" DESTINATION "./")
+    
 endif()

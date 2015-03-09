@@ -136,15 +136,9 @@ install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/
 
 # TODO Remove version from file name or generate
 # These files names are stored in variables because they also appear as start menu shortcuts later.
-set( ADDRESSED_ISSUES Addressed_Issues-V8-2-0.html )
-set( ENHANCEMENT_LIST_ITEMS Enhancement_List_Items-V8-2-0.html )
-set( KNOWN_ISSUES Known_Issues-V8-2-0.html )
 set( RULES_XLS Rules8-1-0-to-8-2-0.xls )
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/${ADDRESSED_ISSUES}" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/Bugreprt.txt" "./")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/${ENHANCEMENT_LIST_ITEMS}" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/ep.gif" "./")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/${KNOWN_ISSUES}" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/ObjectStatus.xls" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/readme.html" "./" "readme.html" TRUE)
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/${RULES_XLS}" "./")
