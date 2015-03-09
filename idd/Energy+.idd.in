@@ -74786,7 +74786,7 @@ FaultModel:ThermostatOffset,
    A1, \field Name
        \required-field
        \type alpha
-	   \reference ThermostatOffsetFaults
+       \reference ThermostatOffsetFaults
    A2, \field Availability Schedule Name
        \type object-list
        \object-list ScheduleNames
