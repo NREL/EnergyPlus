@@ -405,8 +405,8 @@
     ,                        !- Basin Heater Setpoint Temperature
     ,                        !- Basin Heater Operating Schedule Name
     ,                        !- Sensible Heat Ratio Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Function of Flow Fraction Curve Name
-!    Yes;                     !- Report ASHRAE Standard 127 Performance Ratings
+    ,                        !- Sensible Heat Ratio Function of Flow Fraction Curve Name
+    Yes;                     !- Report ASHRAE Standard 127 Performance Ratings
 
   Table:TwoIndependentVariables,
     Cool Cap Mod func of Temperature,  !- Name
@@ -967,7 +967,7 @@ ElectricEquipment:ITE:AirCooled,
     Until: 24:00,0.50,       !- Field 23
     Through: 7/31,           !- Field 25
     For: AllDays,            !- Field 26
-    Until: 24:00,0.1,       !- Field 27
+    Until: 24:00,0.1,        !- Field 27
     Through: 8/31,           !- Field 29
     For: AllDays,            !- Field 30
     Until: 24:00,1.0,        !- Field 31
