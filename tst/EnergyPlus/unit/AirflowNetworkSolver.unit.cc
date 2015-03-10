@@ -1,18 +1,17 @@
-// EnergyPlus::DXCoils unit tests
-// DX heating coil defrost capacity with electric resistance
+// EnergyPlus::AirflowNetworkSolver unit tests
 
 // Google test headers
 #include <gtest/gtest.h>
 
 // C++ Headers
-#include <cassert>
-#include <cmath>
-#include <string>
+//#include <cassert>
+//#include <cmath>
+//#include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
+//#include <ObjexxFCL/FArray.functions.hh>
+//#include <ObjexxFCL/Fmath.hh>
+//#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <DataAirflowNetwork.hh>
@@ -24,10 +23,9 @@ using namespace AirflowNetworkBalanceManager;
 using namespace DataAirflowNetwork;
 using namespace AirflowNetworkSolver;
 
-TEST( AirflowNetworkSolverTest, Test1 )
+TEST( AirflowNetworkSolverTest, HorizontalOpening )
 {
 
-//	FArray1D< DXCoilData > DXCoil;
 	int i = 1;
 	int j = 1;
 	int CurveNum;
@@ -76,6 +74,14 @@ TEST( AirflowNetworkSolverTest, Test1 )
 	EXPECT_NEAR( 34.20649, DF( 1 ), 0.0001 );
 	EXPECT_NEAR( 2.96657, F( 2 ), 0.00001 );
 	EXPECT_EQ( 0.0, DF( 2 ) );
+
+	AirflowNetworkLinkageData.deallocate();
+	DF.deallocate();
+	F.deallocate();
+	RHOZ.deallocate();
+	MultizoneCompHorOpeningData.deallocate();
+	MultizoneSurfaceData.deallocate();
+	AirflowNetworkCompData.deallocate();
 }
 
 
