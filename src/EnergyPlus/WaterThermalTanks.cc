@@ -4206,6 +4206,7 @@ namespace WaterThermalTanks {
 		using DataHVACGlobals::HPWHCrankcaseDBTemp;
 		using DataHVACGlobals::NumPlantLoops;
 		using DataSizing::AutoSize;
+		using DataSizing::DataNonZoneNonAirloopValue;
 		using InputProcessor::SameString;
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
@@ -4751,6 +4752,7 @@ namespace WaterThermalTanks {
 				}
 				if ( HPWaterHeater( HPNum ).AirFlowRateAutoSized ) {
 					ReportSizingOutput( HPWaterHeater( HPNum ).Type, HPWaterHeater( HPNum ).Name, "Evaporator air flow rate [m3/s]", HPWaterHeater( HPNum ).OperatingAirFlowRate );
+					DataNonZoneNonAirloopValue = HPWaterHeater( HPNum ).OperatingAirFlowRate;
 				}
 				MyHPSizeFlag( HPNum ) = false;
 			}
