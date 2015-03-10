@@ -728,7 +728,8 @@ namespace Humidifiers {
 			}
 
 			if ( !HardSizeNoDesRun ) {
-				NomCapVolDes = MassFlowDes * ( OutletHumRatDes - InletHumRatDes ) / AirDensity;
+				//NomCapVolDes = MassFlowDes * ( OutletHumRatDes - InletHumRatDes ) / AirDensity;
+				NomCapVolDes = MassFlowDes * ( OutletHumRatDes - InletHumRatDes ) / RhoH2O( InitConvTemp );
 				if ( NomCapVolDes < 0.0 ) NomCapVolDes = 0.0;	// No humidity demand
 
 				if ( IsAutoSize ) {
