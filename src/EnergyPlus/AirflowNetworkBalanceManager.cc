@@ -1309,7 +1309,7 @@ namespace AirflowNetworkBalanceManager {
 			if ( MultizoneSurfaceData( i ).NodeNums( 2 ) == 0 && Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCond < 0 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + " = " + MultizoneSurfaceData( i ).SurfName );
 				ShowContinueError( "Outside boundary condition and object are " + cExtBoundCondition( Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCond ) + " and " + Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCondName + "." );
-				ShowContinueError( "The outside boundary condition must be either exposed to the outside or an adjacent zone." );
+				ShowContinueError( "The outside boundary condition must be exposed to either the outside or an adjacent zone." );
 				ErrorsFound = true;
 				continue;
 			}
