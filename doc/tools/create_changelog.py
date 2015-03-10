@@ -6,8 +6,10 @@ import getpass
 import urllib2
 import github
 
-# some settings that might change periodically (probably just the Date one)
+# this date needs to be updated with the date of the previous release
 LastReleaseDate = '2014-9-30'
+
+# this probably won't change
 EPlusRepoPath = 'http://github.com/NREL/EnergyPlus'
 
 # two command line arguments: the path to the repo base, and an output markdown file
@@ -15,7 +17,7 @@ repo = ""
 md_file = ""
 debug = False
 def usage():
-		print("""Script should be called with 2 or 3 positional arguments: 
+	print("""Script should be called with 2 or 3 positional arguments: 
  - the path to a repository 
  - the path to a markdown output file
  - and optionally a "Y" for enabling debug mode""")
@@ -60,18 +62,18 @@ for org in g.get_user().get_orgs():
 				for pr_num in pr_numbers:
 					this_pr = repo.get_issue(int(pr_num))
 					if len(this_pr.labels) != 1:
-						print("%s,%s,Pull request has wrong number of labels...expected 1" % (pr_num, this_pr.title))
+						print(" +++ AutoDocs: %s,%s,Pull request has wrong number of labels...expected 1" % (pr_num, this_pr.title))
 					else:
 						key = 'Unknown'
 						if this_pr.labels[0].name in ValidPRTypes:
 							key = this_pr.labels[0].name
 						PRS[key].append([pr_num,this_pr.title])
-						print("%s,%s,%s" % (pr_num, this_pr.title, this_pr.labels[0].name))
+						#print("%s,%s,%s" % (pr_num, this_pr.title, this_pr.labels[0].name))
 
 # Now write the nice markdown output file
 with open(md_file, 'w') as f:
 	def out(s):
-		print(s,file=f)
+		print(s, file=f)
 	def outPRClass(key, descriptor):
 		out('')
 		out('## ' + descriptor)
@@ -84,3 +86,41 @@ with open(md_file, 'w') as f:
 	outPRClass('Defect', 'Defects Repaired')
 	if debug:
 		outPRClass('Unknown', 'Other-DevelopersFixPlease')
+
+with open('/tmp/changelog.html', 'w') as f:
+	def out(s):
+		print(s, file=f)
+	def outPRClass(key, descriptor):
+		out('<h2>' + descriptor + '</h2>')
+		out('<table border="1" >')
+		out(' <tr>')
+		out('  <th>PR #</th>')
+		out('  <th>Description</th>')
+		out(' </tr>')
+		for pr in PRS[key]:
+			out(' <tr>')
+			out('  <td><a href=\"' + EPlusRepoPath + '/pull/' + pr[0] + '\">' + pr[0] + '</a></td>')
+			out('  <td>' + pr[1] + '</td>')
+			out(' </tr>')
+		out('</table>')
+	out('<html>')
+	out('<head><title>EnergyPlus ChangeLog</title></head>')
+	out('<body>')
+	out('<style>')
+	out('table, th, td {')
+	out(' border: 1px solid black;')
+	out(' border-collapse: collapse;')
+	out('}')
+	out('th,td {')
+	out(' padding: 6px;')
+	out('}')
+	out('</style>')
+	out('<h1>EnergyPlus ChangeLog</h1>')
+	out('This file is auto-generated from merged pull requests on GitHub.')
+	outPRClass('NewFeature', 'New Features')
+	outPRClass('Performance', 'Performance Enhancements')
+	outPRClass('Defect', 'Defects Repaired')
+	out('</body>')
+	out('</html>')
+
+print(" +++ AutoDocs: Completed processing changelog: processed %i merged pull requests" % len(PRS))
