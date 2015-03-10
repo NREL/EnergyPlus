@@ -10,24 +10,33 @@ import github
 LastReleaseDate = '2014-9-30'
 
 # this probably won't change
-EPlusRepoPath = 'http://github.com/NREL/EnergyPlus'
+RepoName = "NREL/EnergyPlus"
+EPlusRepoPath = 'http://github.com/' + RepoName
 
-# two command line arguments: the path to the repo base, and an output markdown file
+# command line arguments: the path to the repo base, output markdown and html file paths, and a github token
 repo = ""
 md_file = ""
+html_file = ""
+github_token = ""
 debug = False
 def usage():
-	print("""Script should be called with 2 or 3 positional arguments: 
+	print("""Script should be called with 4 positional arguments: 
  - the path to a repository 
  - the path to a markdown output file
+ - the path to a html output file
+ - a github token for performing authentication API requests
  - and optionally a "Y" for enabling debug mode""")
-if len(sys.argv) == 3:
+if len(sys.argv) == 5:
 	repo = sys.argv[1]
 	md_file = sys.argv[2]
+	html_file = sys.argv[3]
+	github_token = sys.argv[4]
 elif len(sys.argv) == 4:
 	repo = sys.argv[1]
 	md_file = sys.argv[2]
-	if sys.argv[3] == "Y":
+	html_file = sys.argv[3]
+	github_token = sys.argv[4]
+	if sys.argv[5] == "Y":
 		debug = True
 	else:
 		print("Bad debug flag, should be \"Y\" or not passed at all")
@@ -51,24 +60,19 @@ PRS = {}
 for key in set(ValidPRTypes) | set(['Unknown']):
 	PRS[key] = []
 
-# use the GitHub API to find the EnergyPlus repo...probably a better way than this
-username = raw_input('GitHub username: ')
-password = getpass.getpass('GitHub password: ')
-g = github.Github(username, password)
-for org in g.get_user().get_orgs():
-	if org.name == "National Renewable Energy Laboratory":
-		for repo in org.get_repos():
-			if repo.name == "EnergyPlus":
-				for pr_num in pr_numbers:
-					this_pr = repo.get_issue(int(pr_num))
-					if len(this_pr.labels) != 1:
-						print(" +++ AutoDocs: %s,%s,Pull request has wrong number of labels...expected 1" % (pr_num, this_pr.title))
-					else:
-						key = 'Unknown'
-						if this_pr.labels[0].name in ValidPRTypes:
-							key = this_pr.labels[0].name
-						PRS[key].append([pr_num,this_pr.title])
-						#print("%s,%s,%s" % (pr_num, this_pr.title, this_pr.labels[0].name))
+# use the GitHub API to get pull request info
+g = github.Github(github_token)
+repo = g.get_repo(RepoName)
+for pr_num in pr_numbers:
+	this_pr = repo.get_issue(int(pr_num))
+	if len(this_pr.labels) != 1:
+		print(" +++ AutoDocs: %s,%s,Pull request has wrong number of labels...expected 1" % (pr_num, this_pr.title))
+	else:
+		key = 'Unknown'
+		if this_pr.labels[0].name in ValidPRTypes:
+			key = this_pr.labels[0].name
+		PRS[key].append([pr_num,this_pr.title])
+		#print("%s,%s,%s" % (pr_num, this_pr.title, this_pr.labels[0].name))
 
 # Now write the nice markdown output file
 with open(md_file, 'w') as f:
@@ -87,7 +91,7 @@ with open(md_file, 'w') as f:
 	if debug:
 		outPRClass('Unknown', 'Other-DevelopersFixPlease')
 
-with open('/tmp/changelog.html', 'w') as f:
+with open(html_file, 'w') as f:
 	def out(s):
 		print(s, file=f)
 	def outPRClass(key, descriptor):

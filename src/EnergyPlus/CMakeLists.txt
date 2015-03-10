@@ -608,23 +608,26 @@ endif()
 if(BUILD_PACKAGE)
   
   # Some docs are generated on the fly here, create a dir for the 'built' files
-  file( MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/autodocs" )
+  set( DOCS_OUT "${CMAKE_BINARY_DIR}/autodocs" )
+  file( MAKE_DIRECTORY "${DOCS_OUT}" )
   
   # the output variables listing
   add_custom_command( 
     TARGET energyplus
     PRE_BUILD
-    COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/doc/tools/parse_output_variables.py" "${CMAKE_SOURCE_DIR}/src/EnergyPlus" "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.csv" "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.md" 
+    COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/doc/tools/parse_output_variables.py" "${CMAKE_SOURCE_DIR}/src/EnergyPlus" "${DOCS_OUT}/SetupOutputVariables.csv" "${DOCS_OUT}/SetupOutputVariables.md" 
   )
   install(FILES "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.csv" DESTINATION "./")
   install(FILES "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.md" DESTINATION "./")
   
-  # the change log
-  add_custom_command( 
-    TARGET energyplus
-    PRE_BUILD
-    COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/doc/tools/create_changelog.py" "${CMAKE_SOURCE_DIR}/src/EnergyPlus" "${CMAKE_BINARY_DIR}/autodocs/changelog.md"
-  )
-  install(FILES "${CMAKE_BINARY_DIR}/autodocs/changelog.md" DESTINATION "./")
+  # the change log, only if we do have a github token in the environment
+  if(NOT "$ENV{GITHUB_TOKEN}" STREQUAL "")
+    add_custom_command( 
+      TARGET energyplus
+      PRE_BUILD
+      COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/doc/tools/create_changelog.py" "${CMAKE_SOURCE_DIR}" "${DOCS_OUT}/changelog.md" "${DOCS_OUT}/changelog.html" "$ENV{GITHUB_TOKEN}"
+    )
+    install(FILES "${CMAKE_BINARY_DIR}/autodocs/changelog.md" DESTINATION "./")
+  endif()
     
 endif()
