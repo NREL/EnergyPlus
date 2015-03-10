@@ -793,7 +793,7 @@ namespace SimulationManager {
 
 		TimeStepZone = 1.0 / double( NumOfTimeStepInHour );
 		MinutesPerTimeStep = TimeStepZone * 60;
-		Real64 TimeStepZoneSec = TimeStepZone * SecInHour;
+		TimeStepZoneSec = TimeStepZone * SecInHour;
 
 		CurrentModuleObject = "ConvergenceLimits";
 		Num = GetNumObjectsFound( CurrentModuleObject );

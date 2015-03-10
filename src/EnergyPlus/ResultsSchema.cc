@@ -240,11 +240,12 @@ namespace EnergyPlus {
 				}
 				jsonfile << cJSON_Print(_root);
 				jsonfile.close();
-				cJSON_Delete(_root);
 			}
 			// does this need to go to error?
 			else
 				ShowWarningError("Unable to open file for time-series output.");
+
+			cJSON_Delete(_root);
 		}
 
 
