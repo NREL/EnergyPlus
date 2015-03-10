@@ -40,6 +40,7 @@ TEST( SizePurchasedAirTest, Test1 )
 	ZoneEqSizing.allocate( 1 );
 	CurZoneEqNum = 1;
 	ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 24 );
+	CurSysNum = 0;
 
 	FinalZoneSizing.allocate(1);
 	FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 1.0;
@@ -76,13 +77,23 @@ TEST( SizePurchasedAirTest, Test1 )
 	PurchAir( PurchAirNum ).cObjectName = "ZONEHVAC:IDEALLOADSAIRSYSTEM";
 	PurchAir( PurchAirNum ).Name = "Ideal Loads 1";
 
-	/*SizePurchasedAir( PurchAirNum );
+	// Need this to prevent crash in RequestSizing
+	UnitarySysEqSizing.allocate(1);
+
+	SizePurchasedAir( PurchAirNum );
 	EXPECT_DOUBLE_EQ( 1.0 , PurchAir( PurchAirNum ).MaxHeatVolFlowRate );
 	EXPECT_NEAR( 509.856, PurchAir( PurchAirNum ).MaxHeatSensCap, 0.1 );
 	EXPECT_DOUBLE_EQ( 2.0, PurchAir( PurchAirNum ).MaxCoolVolFlowRate );
 	EXPECT_NEAR( 160.0, PurchAir( PurchAirNum ).MaxCoolTotCap, 0.1 );
-	*/
+	
 	// Close and delete eio output file
 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
+
+	ZoneEqSizing(CurZoneEqNum).SizingMethod.deallocate();
+	ZoneEqSizing.deallocate();
+	FinalZoneSizing.deallocate();
+	PurchAir.deallocate();
+	PurchAirNumericFields.deallocate();
+	UnitarySysEqSizing.deallocate();
 
 }
