@@ -1,0 +1,8 @@
+# Adiabatic Boundary Conditions
+
+Adiabatic boundary conditions are applied to two surface types in EnergyPlus:
+
+#. Surfaces with adiabatic outside boundary conditions
+#. Internal Mass objects
+
+For both surface types, EnergyPlus will apply the same boundary conditions to each side of the construction so that there is no temperature difference across the surface. In this case, all heat transfer into the surface is a result of the dynamic response of the construction to varying inside boundary conditions. The surface will store and release heat only at the inside face of the surface (it is assumed that the outside face is not within the zone). If both faces are within the zone, this situation can be modeled either by creating another adiabatic or internal mass surface with the reverse construction, or, for symmetric constructions, simply doubling the area of the surface.

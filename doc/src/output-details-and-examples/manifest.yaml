@@ -1,0 +1,59 @@
+---
+title: "Output Details and Examples -- EnergyPlus 8.2"
+subject: |
+  EnergyPlus Outputs, Example Inputs and Data Set Files. EnergyPlus output
+  examples including descriptions of the simulations and results reporting
+  methods.
+date: "April 1, 2013"
+keywords:
+- "output files"
+- "examples"
+- "chart"
+- "csv"
+- "tab"
+- "html"
+- "errors"
+- "EnergyPlus"
+merge_onto:
+- "../common.yaml"
+files:
+- output-details-and-examples.md
+- introduction.md
+- output-files.md
+- - output-file-list.md
+  - eplusout.audit.md
+  - eplusout.bnd.md
+  - eplusout.dbg.md
+  - eplusout.dxf.md
+  - eplusout.edd.md
+  - eplusout.eio.md
+  - eplusout.end.md
+  - eplusout.epmidf.md
+  - eplusout.epmdet.md
+  - eplusout.err.md
+  - eplusout.eso.md
+  - eplusout.log.md
+  - eplusout.mtd.md
+  - eplusout.mtr.md
+  - eplusout.rdd.md
+  - eplusout.mdd.md
+  - eplusout.shd.md
+  - eplusout.sln.md
+  - eplusout.sql.md
+  - eplusssz.ext.md
+  - epluszsz.ext.md
+  - eplusout.ext.md
+  - eplusmtr.ext.md
+  - eplusmap.ext.md
+  - eplusout.dfs.md
+  - eplusscreen.csv.md
+  - eplustbl.ext.md
+  - readvars.rvaudit.md
+  - eplusout.svg.md
+  - eplusout.sci.md
+  - eplusout.wrl.md
+  - delight-output-files.md
+- example-input-files.md
+- data-sets.md
+- - simple-list-data-sets.md
+  - macro-data-sets.md

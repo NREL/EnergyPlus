@@ -1,0 +1,83 @@
+---
+title: "Guide for Module Developers -- EnergyPlus 8.2"
+subject: |
+  Everything You Need to Know about Developing Modules and Modifying
+  EnergyPlus (but were hesitant to ask). Guidelines for developers wishing
+  to create new capabilities within EnergyPlus.
+date: "April 1, 2013"
+keywords:
+- "module development"
+- "EnergyPlus"
+merge_onto:
+- "../common.yaml"
+files:
+- guide-for-module-developers.md
+- introduction.md
+- modules-in-energyplus.md
+- - what-is-a-module-anyway.md
+  - what-is-a-module-developer.md
+  - adding-new-features.md
+- input-concepts.md
+- - input-data-dictionary.md
+  - data-dictionary-naming-conventions.md
+  - input-data-file.md
+  - input-considerations.md
+  - advanced-input-considerations.md
+  - datasets.md
+- module-structure.md
+- - module-outline.md
+  - module-example.md
+  - changing-existing-code.md
+  - considerations-for-legacy-codes.md
+  - code-readability-vs.-speed-of-execution.md
+  - how-it-fits-together.md
+- energyplus-calling-structure.md
+- - top-level-calling-tree.md
+  - high-level-hvac-calling-tree-schematic-not.md
+  - air-system-calling-tree-schematic-not-all.md
+  - plant-calling-tree-schematic-not-all-routines.md
+  - zone-equipment-calling-tree-schematic-not-all.md
+  - inserting-the-new-module-into-the-program.md
+- hvac-network.md
+- - branches-connectors-and-nodes.md
+  - nodes-in-the-simulation.md
+  - getting-nodes.md
+  - data-flow-in-an-hvac-component-module.md
+  - interfacing-with-plant.md
+  - node-mass-flow-variables.md
+- energyplus-services.md
+- - utility-routinesfunctions.md
+  - input-services.md
+  - object-services.md
+  - branch-node-checking-and-services.md
+  - schedule-services.md
+  - data-services.md
+  - other-useful-utilities.md
+  - error-messages.md
+  - display-strings.md
+  - performance-curve-services.md
+  - fluid-property-services.md
+  - weather-services.md
+  - global-data-flags-and-parameters.md
+  - psychrometric-services.md
+  - tabular-output-utilities.md
+  - internal-zone-gains-services.md
+- output.md
+- - how-do-i-output-my-variables.md
+  - output-variable-dos-and-donts.md
+- energy-management-system.md
+- - ems-actuator-interface.md
+- runningtesting-energyplus-for-developers.md
+- - environment-variables-to-assist-running.md
+  - air-loop-simulation-environment-variables.md
+- quick-procedure-outline-for-making-code.md
+- important-rules-for-module-developers.md
+- appendix-a.-dataglobals-and-dataenvironments.md
+- - dataglobals.md
+  - dataenvironment.md
+- appendix-b.-submissions-and-check-ins.md
+- appendix-c.-documentation-specifics.md
+- appendix-d.-module-subroutine-function.md
+- appendix-e.-test-file-documentation.md
+- appendix-f.-new-or-changed-proposal-feature.md
+- appendix-g..md

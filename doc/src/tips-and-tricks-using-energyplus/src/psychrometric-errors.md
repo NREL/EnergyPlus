@@ -1,0 +1,24 @@
+# Psychrometric Errors
+
+EnergyPlus has built-in psychrometric routines that perform various calculations for the simulation modules. They typically fall into the recurring error category but may warrant some view:
+
+~~~~~~~~~~~~~~~~~~~~
+
+       ** Warning ** Calculated Relative Humidity out of range (PsyRhFnTdbWPb)
+       **   ~~~   **  Routine=NodeReportingCalc:NODE_1, Environment=CHICAGO_IL_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB, at Simulation time=07/21 00:00 - 00:10
+       **   ~~~   **  Dry-Bulb= 13.00 Humidity Ratio= 1.000E-002 Calculated Relative Humidity [%]= 104.65
+       **   ~~~   ** Relative Humidity being reset to 100.0%
+~~~~~~~~~~~~~~~~~~~~
+
+This warning notes that the calculated relative humidity is out of rage (routine name: PsyRhFnTdbWPb). It happened during routine NodeReportingCalc for NODE_1 at the environment "CHICAGO_IL_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB" during the time interval 00:00 – 00:10 on July 21. The dry bulb temperature was 13 C, the humidity ratio was .001 for a calculated relative humidity of 104.65%. It is reset to 100%.
+
+Then, at the end of the run, you will see a summary of how many times that occur and the min/max extent:
+
+~~~~~~~~~~~~~~~~~~~~
+
+       *************  ** Warning ** Calculated Relative Humidity out of range (PsyRhFnTdbWPb)
+       *************  **   ~~~   **   This error occurred 645 total times;
+       *************  **   ~~~   **   during Warmup 0 times;
+       *************  **   ~~~   **   during Sizing 0 times.
+       *************  **   ~~~   **   Max=104.652877 %  Min=104.652877 %
+~~~~~~~~~~~~~~~~~~~~

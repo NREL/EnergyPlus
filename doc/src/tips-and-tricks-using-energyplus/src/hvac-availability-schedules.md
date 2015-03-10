@@ -1,0 +1,5 @@
+# HVAC Availability Schedules
+
+*How do availability schedules work?*
+
+Apply the availability schedule to the HVAC System (i.e., Furnace or DXSystem), the coils and the fan objects. If compact HVAC objects are used, apply the availability schedule to the compact HVAC object. You will get different results depending on the selection for the night cycle option.

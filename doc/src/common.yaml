@@ -1,0 +1,14 @@
+version: "8.2"
+author: "EnergyPlus Development Team"
+copyright: |
+  <p>Documentation content copyright &copy; 1996-2014 The Board of Trustees of the
+  University of Illinois and the Regents of the University of California
+  through the Ernest Orlando Lawrence Berkeley National Laboratory.  All rights
+  reserved. EnergyPlus is a trademark of the US Department of Energy.</p>
+
+  <p>This documentation is made available under the <a
+  href="http://bigladdersoftware.com/epx/open_source_agreement.pdf">EnergyPlus
+  Open Source License v1.0</a>.</p>
+toc_path: "index.md"
+media_path: "media"
+source_path: "src"

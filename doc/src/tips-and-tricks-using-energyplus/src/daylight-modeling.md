@@ -1,0 +1,5 @@
+# Daylight Modeling
+
+*Why isn't my lighting energy being reduced with a daylighting system?*
+
+In order to see changes in the lighting electric power consumption due to daylighting, the Fraction Replaceable in the **Lights** input object must be set to 1.0. This is documented in the I/O reference, and also a warning is generated in the ERR file.

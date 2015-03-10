@@ -1,0 +1,3 @@
+# eplusmtr.<ext>
+
+The eplusmtr.csv (or txt or tab extension) is a file that can be produced by post-processing on the eplusout.mtr file. EnergyPlus distributes a post-processing program (ReadVarsESO – see next section) with the installation.

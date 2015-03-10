@@ -1,0 +1,3 @@
+# After Predictor Before HVAC Managers
+
+The calling point called "AfterPredictorBeforeHVACManagers" occurs after predictor and before the traditional HVAC managers are called. It occurs at each timestep just after the predictor executes but before SetpointManager and AvailabilityManager models are called. It is useful for a variety of control actions. However, if there are conflicts, the EMS control actions could be overwritten by other SetpointManager or AvailabilityManager actions.

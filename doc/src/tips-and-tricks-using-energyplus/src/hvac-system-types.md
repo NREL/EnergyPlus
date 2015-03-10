@@ -1,0 +1,77 @@
+# HVAC System Types
+
+*What kind of systems are available in EnergyPlus?*
+
+EnergyPlus HVAC systems input is flexible, so many different types of systems can be built using the basic available components. There are also compound components which represent common equipment types, and HVACTemplate systems which simplify the input for specific systems. This list gives an overview of HVAC objects in EnergyPlus:
+
+> HVAC Templates
+
+> HVACTemplate:ThermostatHVACTemplate:Zone:IdealLoadsAirSystemHVACTemplate:Zone:FanCoilHVACTemplate:Zone:PTACHVACTemplate:Zone:PTHPHVACTemplate:Zone:UnitaryHVACTemplate:Zone:VAVHVACTemplate:Zone:VAV:FanPoweredHVACTemplate:Zone:WaterToAirHeatPumpHVACTemplate:System:UnitaryHVACTemplate:System:Unitary:AirToAirHVACTemplate:System:VAVHVACTemplate:System:PackagedVAVHVACTemplate:System:DedicatedOutdoorAirHVACTemplate:Plant:ChilledWaterLoopHVACTemplate:Plant:ChillerHVACTemplate:Plant:TowerHVACTemplate:Plant:HotWaterLoopHVACTemplate:Plant:BoilerHVACTemplate:Plant:MixedWaterLoop
+
+> Zone HVAC Forced Air Units
+
+> ZoneHVAC:IdealLoadsAirSystemZoneHVAC:FourPipeFanCoilZoneHVAC:WindowAirConditionerZoneHVAC:PackagedTerminalAirConditionerZoneHVAC:PackagedTerminalHeatPumpZoneHVAC:WaterToAirHeatPumpZoneHVAC:Dehumidified:DXZoneHVAC:EnergyRecoveryVentilatorZoneHVAC:EnergyRecoveryVentilator:ControllerZoneHVAC:UnitVentilatorZoneHVAC:UnitHeaterZoneHVAC:OutdoorAirUnitZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+
+> Zone HVAC Radiative/Convective Units
+
+> ZoneHVAC:Baseboard:RadiantConvective:WaterZoneHVAC:Baseboard:RadiantConvective:SteamZoneHVAC:Baseboard:RadiantConvective:ElectricZoneHVAC:Baseboard:Convective:WaterZoneHVAC:Baseboard:Convective:ElectricZoneHVAC:LowTemperatureRadiant:VariableFlowZoneHVAC:LowTemperatureRadiant:ConstantFlowZoneHVAC:LowTemperatureRadiant:ElectricZoneHVAC:HighTemperatureRadiantZoneHVAC:VentilatedSlab
+
+> Zone HVAC Air Loop Terminal Units
+
+> AirTerminal:SingleDuct:UncontrolledAirTerminal:SingleDuct:ConstantVolume:ReheatAirTerminal:SingleDuct:VAV:NoReheatAirTerminal:SingleDuct:VAV:ReheatAirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFanAirTerminal:SingleDuct:VAV:HeatAndCool:NoReheatAirTerminal:SingleDuct:VAV:HeatAndCool:ReheatAirTerminal:SingleDuct:SeriesPIU:ReheatAirTerminal:SingleDuct:ParallelPIU:ReheatAirTerminal:SingleDuct:ConstantVolume:FourPipeInductionAirTerminal:SingleDuct:ConstantVolume:CooledBeamAirTerminal:DualDuct:ConstantVolumeAirTerminal:DualDuct:VAVAirTerminal:DualDuct:VAV:OutdoorAirZoneHVAC:AirDistributionUnit
+
+> Fans
+
+> Fan:ConstantVolumeFan:VariableVolumeFan:OnOffFan:ZoneExhaustFanPerformance:NightVentilationFan:ComponentModel
+
+> Coils
+
+> Coil:Cooling:WaterCoil:Cooling:Water:DetailedGeometryCoil:Cooling:DX:SingleSpeedCoil:Cooling:DX:TwoSpeedCoil:Cooling:DX:MultiSpeedCoil:Cooling:DX:TwoStageWithHumidityControlModeCoilPerformance:DX:CoolingCoil:Cooling:DX:VariableRefrigerantFlowCoil:Heating:DX:VariableRefrigerantFlowCoil:Heating:WaterCoil:Heating:SteamCoil:Heating:ElectricCoil:Heating:GasCoil:Heating:DesuperheaterCoil:Heating:DX:SingleSpeedCoil:Heating:DX:MultiSpeedCoil:Cooling:WaterToAirHeatPump:ParameterEstimationCoil:Heating:WaterToAirHeatPump:ParameterEstimationCoil:Cooling:WaterToAirHeatPump:EquationFitCoil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFitCoil:Heating:WaterToAirHeatPump:EquationFitCoil:Heating:WaterToAirHeatPump:VariableSpeedEquationFitCoil:WaterHeating:AirToWaterHeatPumpCoil:WaterHeating:DesuperheaterCoilSystem:Cooling:DXCoilSystem:Heating:DXCoilSystem:Cooling:Water:HeatExchangerAssistedCoilSystem:Cooling:DX:HeatExchangerAssisted
+
+> Evaporative Coolers
+
+> EvaporativeCooler:Direct:CelDekPadEvaporativeCooler:Indirect:CelDekPadEvaporativeCooler:Indirect:WetCoilEvaporativeCooler:Indirect:ResearchSpecial
+
+> Humidifiers and Dehumidifiers
+
+> Humidifier:Steam:ElectricDehumidifier:Desiccant:NoFansDehumidifier:Desiccant:System
+
+> Heat Recovery
+
+> HeatExchanger:AirToAir:FlatPlateHeatExchanger:AirToAir:SensibleAndLatentHeatExchanger:Desiccant:BalancedFlowHeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1
+
+> Unitary Equipment
+
+> AirLoopHVAC:Unitary:Furnace:HeatOnlyAirLoopHVAC:Unitary:Furnace:HeatCoolAirLoopHVAC:UnitaryHeatOnlyAirLoopHVAC:UnitaryHeatCoolAirLoopHVAC:UnitaryHeatPump:AirToAirAirLoopHVAC:UnitaryHeatPump:WaterToAirAirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypassAirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed
+
+> Variable Refrigerant Flow Equipment
+
+> AirConditioner:VariableRefrigerantFlow
+
+> Air Distribution
+
+> AirLoopHVACAirLoopHVAC:OutdoorAirSystem:EquipmentListAirLoopHVAC:OutdoorAirSystemOutdoorAir:MixerAirLoopHVAC:ZoneSplitterAirLoopHVAC:SupplyPlenumAirLoopHVAC:SupplyPathAirLoopHVAC:ZoneMixerAirLoopHVAC:ReturnPlenumAirLoopHVAC:ReturnPath
+
+> Pumps
+
+> Pump:VariableSpeedPump:ConstantSpeedPump:VariableSpeed:CondensateHeaderedPumps:VariableSpeedHeaderedPumps:ConstantSpeed
+
+> Solar Collectors
+
+> SolarCollectorPerformance:FlatPlateSolarCollector:FlatPlate:WaterSolarCollector:FlatPlate:PhotovoltaicThermalSolarCollectorPerformance:PhotovoltaicThermal:SimpleSolarCollector:IntegralCollectorStorageSolarCollectorPerformance:IntegralCollectorStorageSolarCollector:UnglazedTranspiredSolarCollector:UnglazedTranspired:Multisystem
+
+> Plant Heating and Cooling Equipment
+
+> Boiler:HotWaterBoiler:SteamChiller:Electric:EIRChiller:Electric:ReformulatedEIRChiller:ElectricChiller:Absorption:IndirectChiller:AbsorptionChiller:ConstantCOPChiller:EngineDrivenChiller:CombustionTurbineChillerHeater:Absorption:DirectFiredChillerHeater:Absorption:DoubleEffectHeatPump:WaterToWater:EquationFit:HeatingHeatPump:WaterToWater:EquationFit:CoolingHeatPump:WaterToWater:ParameterEstimation:CoolingHeatPump:WaterToWater:ParameterEstimation:HeatingDistrictCoolingDistrictHeating
+
+> Condenser Equipment and Heat Exchangers
+
+> CoolingTower:SingleSpeedCoolingTower:TwoSpeedCoolingTower:VariableSpeedCoolingTowerPerformance:CoolToolsCoolingTowerPerformance:YorkCalcEvaporativeFluidCooler:SingleSpeedEvaporativeFluidCooler:TwoSpeedFluidCooler:SingleSpeedFluidCooler:TwoSpeedGroundHeatExchanger:VerticalGroundHeatExchanger:PondGroundHeatExchanger:SurfaceHeatExchanger:FluidToFluid
+
+> Water Heaters and Thermal Storage
+
+> WaterHeater:MixedWaterHeater:StratifiedWaterHeater:SizingWaterHeater:HeatPumpThermalStorage:Ice:SimpleThermalStorage:Ice:DetailedThermalStorage:ChilledWater:MixedThermalStorage:ChilledWater:Stratified
+
+> Plant-Condenser Loops
+
+> PlantLoopCondenserLoopPipe:AdiabaticPipe:Adiabatic:SteamPipe:IndoorPipe:OutdoorPipe:Underground

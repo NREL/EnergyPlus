@@ -1,0 +1,54 @@
+---
+title: "Getting Started -- EnergyPlus 8.2"
+subject: |
+  Basic concepts manual -- essential information you need to run
+  EnergyPlus. Describes the capabilities of EnergyPlus and provides and
+  overview for new users wishing to learn EnergyPlus.
+date: "April 1, 2013"
+keywords:
+- "running EnergyPlus"
+- "creating input files"
+- "weather data postprocessing"
+- "energy meters"
+- "EnergyPlus"
+merge_onto:
+- "../common.yaml"
+files:
+- getting-started-with-energyplus.md
+- energyplus-overview.md
+- - what-is-energyplus.md
+  - why-does-energyplus-exist-and-what-were-its.md
+  - energyplus-documentation-library.md
+- getting-started-with-energyplus-000.md
+- running-energyplus.md
+- - introduction.md
+  - ep-launch-program.md
+  - energyplus-file-extensions.md
+- tutorial-example-for-running-energyplus.md
+- - running-energyplus-building-envelope-internal.md
+  - instructions.md
+- overall-schememethodology-for-running.md
+- - building-simulation.md
+  - a-methodology-for-using-energyplus.md
+- tutorial-exercise-2.md
+- - unitary-system-and-vav-using-hvactemplate.md
+  - instructions-001.md
+- idf-editor-brief-introduction.md
+- other-useful-programsinformation.md
+- - hvactemplate-objects.md
+  - data-sets.md
+  - slab-and-basement-programs.md
+  - coefficient-curve-generation.md
+  - useful-programs.md
+  - weatherdata.md
+  - results-processing.md
+  - hvac-diagram.md
+  - csvproc.md
+  - convertesomtr.md
+  - datafiles.md
+  - library-files.md
+- energy-meters.md
+- - standard-energy-meters.md
+  - custom-meters.md
+- standard-energyplus-units.md
+- index.md

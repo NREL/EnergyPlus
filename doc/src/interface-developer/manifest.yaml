@@ -1,0 +1,30 @@
+---
+title: "Guide for Interface Developers -- EnergyPlus 8.2"
+subject: |
+  Guidance for software developers wishing to write a user interface for
+  EnergyPlus. Everything You Need to Know about EnergyPlus Input and Output
+  to develop a user friendly interface.
+date: "April 1, 2013"
+keywords:
+- "user interface developer"
+- "EnergyPlus"
+merge_onto:
+- "../common.yaml"
+files:
+- guide-for-interface-developers.md
+- introduction.md
+- - interface-expectations.md
+- energyplus-install-contents.md
+- input-overview.md
+- - general-input-rules.md
+  - input-data-dictionary.md
+  - input-data-file.md
+- input-details.md
+- - idd-conventions.md
+  - standard-energyplus-units.md
+  - energyplus-reports.md
+- output.md
+- weather-data.md
+- running-energyplus.md
+- licensing.md
+- appendix-a.-simple-idf-file.md

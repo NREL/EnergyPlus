@@ -1,0 +1,3 @@
+# Tutorial Example for running EnergyPlus
+
+The following example is taken directly from the training course "Introduction to EnergyPlus", Exercise 1.  Of course, it is presented here without the benefit of classroom presentation and discussion but when followed step by step, should provide an introduction of actually using EnergyPlus.

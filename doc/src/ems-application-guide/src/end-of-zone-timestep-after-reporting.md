@@ -1,0 +1,3 @@
+# End of Zone Timestep After Reporting
+
+The calling point called "EndOfZoneTimestepAfterZoneReporting" occurs at the end of a zone timestep after output variable reporting is finalized. It is useful for preparing calculations that will go into effect the next timestep. Its capabilities are similar to BeginTimestepBeforePredictor, except that input data for current time, date, and weather data align with different timesteps.

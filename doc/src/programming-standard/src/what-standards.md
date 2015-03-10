@@ -1,0 +1,3 @@
+# What Standards?
+
+Standards were established for development work as well as for language coding.  This document primarily covers the standards and guidelines of language coding (currently Fortran 95/F2003).  This also establishes less formal (and more formal) techniques within the groups: design and code reviews, design and code walk-throughs, automated version control (both for source code and documents), and other practices that generally affect the quality of software products.
