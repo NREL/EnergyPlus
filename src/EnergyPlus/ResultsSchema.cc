@@ -464,8 +464,9 @@ namespace EnergyPlus {
 			if (jsonfile.is_open())	{
 				jsonfile << cJSON_Print(_root);
 				jsonfile.close();
-				cJSON_Delete(_root);
 			}
+
+			cJSON_Delete(_root);
 		}
 	} // ResultsFramework
 
