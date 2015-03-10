@@ -2431,16 +2431,16 @@
 
   FaultModel:ThermostatOffset,
     Ther_Offset_SalesFloor,	!- Name
+    SalesFloor Thermostat, 	!- Thermostat Name
     ,                     	!- Availability Schedule Name
     ,                      	!- Severity Schedule Name
-    1.0,       				!- Reference Thermostat Offset
-    SalesFloor Thermostat; 	!- Thermostat Name
+    1.0;       				!- Reference Thermostat Offset
 	
   FaultModel:HumidistatOffset, 
     Humi_Offset_SalesFloor, !- Name
+    SalesFloor Humidistat, 	!- Humidistat Name
     ThermostatOffsetDependent, !- Humidistat Offset Type
     ,  						!- Availability Schedule Name
     , 						!- Severity Schedule Name
     ,        				!- Reference Humidistat Offset
-    Ther_Offset_SalesFloor,	!- Related Thermostat Offset Fault Name
-    SalesFloor Humidistat; 	!- Humidistat Name
+    Ther_Offset_SalesFloor;	!- Related Thermostat Offset Fault Name

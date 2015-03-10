@@ -219,43 +219,43 @@ namespace FaultsManager {
 					FaultsHumidistatOffset( jFaultyHumidistat ).FaultType = cFault1;
 					FaultsHumidistatOffset( jFaultyHumidistat ).FaultTypeEnum = iFaultTypeEnums( i );
 					FaultsHumidistatOffset( jFaultyHumidistat ).Name = cAlphaArgs( 1 );
-					FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatType = cAlphaArgs( 2 );
-					FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatName = cAlphaArgs( 6 );
+					FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatName = cAlphaArgs( 2 );
+					FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatType = cAlphaArgs( 3 );
 
 					if ( SameString( FaultsHumidistatOffset( jFaultyHumidistat ).FaultyHumidistatType, "ThermostatOffsetDependent" ) ) { 
 					// For Humidistat Offset Type: ThermostatOffsetDependent
 					
 						// Related Thermostat Offset Fault Name is required for Humidistat Offset Type: ThermostatOffsetDependent
-						if ( lAlphaFieldBlanks( 5 ) ) {
-							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\": " + cAlphaFieldNames( 5 ) + " cannot be blank for Humidistat Offset Type = \"ThermostatOffsetDependent\"." );
+						if ( lAlphaFieldBlanks( 6 ) ) {
+							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\": " + cAlphaFieldNames( 6 ) + " cannot be blank for Humidistat Offset Type = \"ThermostatOffsetDependent\"." );
 							ErrorsFound = true;
 						} else {
-							FaultsHumidistatOffset( jFaultyHumidistat ).FaultyThermostatName = cAlphaArgs( 5 );
+							FaultsHumidistatOffset( jFaultyHumidistat ).FaultyThermostatName = cAlphaArgs( 6 );
 						}
 						
 					} else { 
 					// For Humidistat Offset Type: ThermostatOffsetIndependent
 					
 						// Availability schedule
-						FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedule = cAlphaArgs( 3 );
-						if ( lAlphaFieldBlanks( 3 ) ) {
+						FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedule = cAlphaArgs( 4 );
+						if ( lAlphaFieldBlanks( 4 ) ) {
 							FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedPtr = -1; // returns schedule value of 1
 						} else {
-							FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
+							FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 4 ) );
 							if ( FaultsHumidistatOffset( jFaultyHumidistat ).AvaiSchedPtr == 0 ) {
-								ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
+								ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not found." );
 								ErrorsFound = true;
 							}
 						}
 
 						// Severity schedule
-						FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedule = cAlphaArgs( 4 );
-						if ( lAlphaFieldBlanks( 4 ) ) {
+						FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedule = cAlphaArgs( 5 );
+						if ( lAlphaFieldBlanks( 5 ) ) {
 							FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedPtr = -1; // returns schedule value of 1
 						} else {
-							FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 4 ) );
+							FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 5 ) );
 							if ( FaultsHumidistatOffset( jFaultyHumidistat ).SeveritySchedPtr == 0 ) {
-								ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not found." );
+								ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 5 ) + " = \"" + cAlphaArgs( 5 ) + "\" not found." );
 								ErrorsFound = true;
 							}
 						}
@@ -277,28 +277,28 @@ namespace FaultsManager {
 					FaultsThermostatOffset( jFaultyThermostat ).FaultType = cFault1;
 					FaultsThermostatOffset( jFaultyThermostat ).FaultTypeEnum = iFaultTypeEnums( i );
 					FaultsThermostatOffset( jFaultyThermostat ).Name = cAlphaArgs( 1 );
-					FaultsThermostatOffset( jFaultyThermostat ).FaultyThermostatName = cAlphaArgs( 4 );
+					FaultsThermostatOffset( jFaultyThermostat ).FaultyThermostatName = cAlphaArgs( 2 );
 
 					// Availability schedule
-					FaultsThermostatOffset( jFaultyThermostat ).AvaiSchedule = cAlphaArgs( 2 );
-					if ( lAlphaFieldBlanks( 2 ) ) {
+					FaultsThermostatOffset( jFaultyThermostat ).AvaiSchedule = cAlphaArgs( 3 );
+					if ( lAlphaFieldBlanks( 3 ) ) {
 						FaultsThermostatOffset( jFaultyThermostat ).AvaiSchedPtr = -1; // returns schedule value of 1
 					} else {
-						FaultsThermostatOffset( jFaultyThermostat ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) );
+						FaultsThermostatOffset( jFaultyThermostat ).AvaiSchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
 						if ( FaultsThermostatOffset( jFaultyThermostat ).AvaiSchedPtr == 0 ) {
-							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 2 ) + " = \"" + cAlphaArgs( 2 ) + "\" not found." );
+							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
 
 					// Severity schedule
-					FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedule = cAlphaArgs( 3 );
-					if ( lAlphaFieldBlanks( 3 ) ) {
+					FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedule = cAlphaArgs( 4 );
+					if ( lAlphaFieldBlanks( 4 ) ) {
 						FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedPtr = -1; // returns schedule value of 1
 					} else {
-						FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 3 ) );
+						FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedPtr = GetScheduleIndex( cAlphaArgs( 4 ) );
 						if ( FaultsThermostatOffset( jFaultyThermostat ).SeveritySchedPtr == 0 ) {
-							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 3 ) + " = \"" + cAlphaArgs( 3 ) + "\" not found." );
+							ShowSevereError( cFault1 + " = \"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFieldNames( 4 ) + " = \"" + cAlphaArgs( 4 ) + "\" not found." );
 							ErrorsFound = true;
 						}
 					}
