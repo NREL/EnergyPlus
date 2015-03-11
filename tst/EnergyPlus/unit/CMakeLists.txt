@@ -12,8 +12,9 @@ set( test_src
   FluidCoolers.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
-  HVACStandaloneERV.unit.cc
   Humidifiers.unit.cc
+  HVACStandaloneERV.unit.cc
+  ManageElectricPower.unit.cc
   MixedAir.unit.cc
   PurchasedAirManager.unit.cc
   OutputProcessor.unit.cc
