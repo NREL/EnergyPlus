@@ -966,7 +966,6 @@ namespace GroundHeatExchangers {
 
 		if ( currentSimTime <= 0.0 ) {
 			prevTimeSteps = 0.0; // this resets history when rounding 24:00 hours during warmup avoids hard crash later
-			outletTemp = inletTemp;
 			calcAggregateLoad(); //Just allocates and initializes prevHour array
 			return;
 		}
