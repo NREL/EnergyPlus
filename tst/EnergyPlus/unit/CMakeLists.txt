@@ -3,6 +3,7 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src/EnergyPlus )
 
 set( test_src
   AdvancedAFN.unit.cc
+  AirflowNetworkBalanceManager.unit.cc
   DataPlant.unit.cc
   DataZoneEquipment.unit.cc
   DXCoils.unit.cc
