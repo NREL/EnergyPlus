@@ -1701,7 +1701,7 @@ namespace ReportSizingManager {
 				ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, SizingResult );
 			} else if( PrintWarningFlag && SizingResult > 0.0 ) {
 				ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString, SizingResult );
-			} else {
+			} else if ( PrintWarningFlag ) {
 				ShowSevereError( CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete." );
 				ShowContinueError( "SizingString = " + SizingString + ", SizingResult = " + TrimSigDigits( SizingResult, 1 ) );
 				// *** UNCOMMENT AFTER WARNINGS SHOW UP (or don't show up) IN ERROR FILE DIRECTING DEVELOPER TO FIX PROBLEM ***

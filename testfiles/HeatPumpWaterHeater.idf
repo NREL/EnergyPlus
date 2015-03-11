@@ -3830,7 +3830,7 @@
     HPPlantWaterInletNode,   !- Condenser Water Inlet Node Name
     HPPlantWaterOutletNode,  !- Condenser Water Outlet Node Name
     0.00115525,              !- Condenser Water Flow Rate {m3/s}
-    0.85,                    !- Evaporator Air Flow Rate {m3/s}
+    1.00695,                 !- Evaporator Air Flow Rate {m3/s}
     OutdoorAirOnly,          !- Inlet Air Configuration
     ,                        !- Air Inlet Node Name
     ,                        !- Air Outlet Node Name
@@ -3899,13 +3899,13 @@
 
   Coil:WaterHeating:AirToWaterHeatPump,
     HPWHPlantDXCoil,         !- Name
-    17028.0,                 !- Rated Heating Capacity {W}
-    3.37,                    !- Rated COP {W/W}
-    0.7,                     !- Rated Sensible Heat Ratio
+    25000.0,                 !- Rated Heating Capacity {W}
+    3.2,                     !- Rated COP {W/W}
+    0.736,                   !- Rated Sensible Heat Ratio
     29.44,                   !- Rated Evaporator Inlet Air Dry-Bulb Temperature {C}
     22.22,                   !- Rated Evaporator Inlet Air Wet-Bulb Temperature {C}
     55.72,                   !- Rated Condenser Inlet Water Temperature {C}
-    0.85,                    !- Rated Evaporator Air Flow Rate {m3/s}
+    1.00695,                 !- Rated Evaporator Air Flow Rate {m3/s}
     0.00115525,              !- Rated Condenser Water Flow Rate {m3/s}
     No,                      !- Evaporator Fan Power Included in Rated COP
     No,                      !- Condenser Pump Power Included in Rated COP
@@ -3932,7 +3932,7 @@
     PlantHPWHSch,            !- Availability Schedule Name
     0.7,                     !- Fan Total Efficiency
     100.0,                   !- Pressure Rise {Pa}
-    0.85,                    !- Maximum Flow Rate {m3/s}
+    2.6852,                  !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
     1.0,                     !- Motor In Airstream Fraction
     HPPlantAirInletNode,     !- Air Inlet Node Name

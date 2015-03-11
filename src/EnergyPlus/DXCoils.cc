@@ -5260,9 +5260,6 @@ namespace DXCoils {
 					TempSize = DXCoil( DXCoilNum ).RatedTotCap( Mode );
 					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
 					PrintFlag = false;
-					SizingMethod = AutoCalculateSizing;
-					DataConstantUsedForSizing = DXCoil( DXCoilNum ).RatedTotCap2;
-					DataFractionUsedForSizing = 1.0;
 				} else {
 					SizingMethod = CoolingCapacitySizing;
 					CompName = DXCoil( DXCoilNum ).Name;
