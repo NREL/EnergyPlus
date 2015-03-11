@@ -427,7 +427,8 @@ namespace ReportSizingManager {
 				ShowContinueError( "... DataConstantUsedForSizing and DataFractionUsedForSizing used for autocalculating " + SizingString + " must both be greater than 0." );
 				ShowFatalError( "Preceding conditions cause termination." );
 			}
-		} else if ( CurZoneEqNum > 0 ) {
+			bCheckForZero = false;
+		} else if( CurZoneEqNum > 0 ) {
 			if ( !IsAutoSize && !SizingDesRunThisZone && !SizingDesValueFromParent ) {
 				HardSizeNoDesRun = true;
 				AutosizeUser = SizingResult;

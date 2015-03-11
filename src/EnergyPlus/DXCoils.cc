@@ -5254,10 +5254,10 @@ namespace DXCoils {
 					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
 					DataCoolCoilCap = DXCoolCap;
 				} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeater ) {
-					SizingMethod = HeatingCapacitySizing;
+					SizingMethod = CoolingCapacitySizing;
 					CompName = DXCoil( DXCoilNum ).Name;
 					FieldNum = 1;
-					TempSize = DXCoil( DXCoilNum ).RatedTotCap2;
+					TempSize = DXCoil( DXCoilNum ).RatedTotCap( Mode );
 					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
 					PrintFlag = false;
 					SizingMethod = AutoCalculateSizing;
