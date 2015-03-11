@@ -1773,7 +1773,11 @@ namespace GroundHeatExchangers {
 			reynoldsNum = fluidDensity * pipeInnerDia * ( BholeMdot / fluidDensity / ( Pi * pow_2( pipeInnerRad ) ) ) / fluidViscosity;
 			prandtlNum = ( cpFluid * fluidViscosity ) / ( kFluid );
 			//   Convection Resistance
-			nusseltNum = 0.023 * std::pow( reynoldsNum, 0.8 ) * std::pow( prandtlNum, 0.35 );
+			if ( reynoldsNum <= 2300 ) {
+				nusseltNum = 4.364;
+			} else { 
+				nusseltNum = 0.023 * std::pow( reynoldsNum, 0.8 ) * std::pow( prandtlNum, 0.35 );
+			}
 			hci = nusseltNum * kFluid / pipeInnerDia;
 			Rconv = 1.0 / ( 2.0 * Pi * pipeInnerDia * hci );
 		}
@@ -1869,7 +1873,11 @@ namespace GroundHeatExchangers {
 			reynoldsNum = fluidDensity * pipeInnerDia * ( singleSlinkyMassFlowRate / fluidDensity / ( Pi * pow_2( pipeInnerRad ) ) ) / fluidViscosity;
 			prandtlNum = ( cpFluid * fluidViscosity ) / ( kFluid );
 			//   Convection Resistance
-			nusseltNum = 0.023 * std::pow( reynoldsNum, 0.8 ) * std::pow( prandtlNum, 0.35 );
+			if ( reynoldsNum <= 2300 ) {
+				nusseltNum = 4.364;
+			} else { 
+				nusseltNum = 0.023 * std::pow( reynoldsNum, 0.8 ) * std::pow( prandtlNum, 0.35 );
+			}
 			hci = nusseltNum * kFluid / pipeInnerDia;
 			Rconv = 1.0 / ( 2.0 * Pi * pipeInnerDia * hci );
 		}
