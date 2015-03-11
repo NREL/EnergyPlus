@@ -1692,20 +1692,34 @@ namespace ReportSizingManager {
 		} else {
 			// some components don't set CurZoneEqNum or CurSysNum (e.g., Plant HPWH fans)
 			HardSizeNoDesRun = true;
-			AutosizeDes = 0.0;
-			if( DataNonZoneNonAirloopValue > 0.0 ) {
+			AutosizeDes = DataNonZoneNonAirloopValue;
+			if( DataNonZoneNonAirloopValue > 0.0 && IsAutoSize ) {
 				SizingResult = DataNonZoneNonAirloopValue;
-				DataNonZoneNonAirloopValue = 0.0; // should this be reset to 0? Or rely on the next parent to set it?
 			}
-			if( PrintWarningFlag && IsAutoSize && SizingResult > 0.0 ) {
-				ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, SizingResult );
-			} else if( PrintWarningFlag && SizingResult > 0.0 ) {
-				ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString, SizingResult );
-			} else if ( PrintWarningFlag ) {
-				ShowSevereError( CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete." );
-				ShowContinueError( "SizingString = " + SizingString + ", SizingResult = " + TrimSigDigits( SizingResult, 1 ) );
-				// *** UNCOMMENT AFTER WARNINGS SHOW UP (or don't show up) IN ERROR FILE DIRECTING DEVELOPER TO FIX PROBLEM ***
-				// ShowFatalError( " Previous errors cause program termination" );
+			if ( PrintWarningFlag ) {
+				if( IsAutoSize && SizingResult > 0.0 ) {
+					ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, SizingResult );
+				} else if( SizingResult > 0.0 ) {
+					AutosizeUser = SizingResult;
+					if ( ( std::abs( AutosizeDes - AutosizeUser ) / AutosizeUser ) > AutoVsHardSizingThreshold ) {
+						ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString, AutosizeUser );
+					} else {
+						ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString, AutosizeUser );
+					}
+					if ( DisplayExtraWarnings ) {
+						if ( ( std::abs( AutosizeDes - AutosizeUser ) / AutosizeUser ) > AutoVsHardSizingThreshold ) {
+							ShowMessage( CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName );
+							ShowContinueError( "User-Specified " + SizingString + " = " + RoundSigDigits( AutosizeUser, 5 ) );
+							ShowContinueError( "differs from Design Size " + SizingString + " = " + RoundSigDigits( AutosizeDes, 5 ) );
+							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+						}
+					}
+				} else {
+					ShowSevereError( CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete." );
+					ShowContinueError( "SizingString = " + SizingString + ", SizingResult = " + TrimSigDigits( SizingResult, 1 ) );
+					// ShowFatalError( " Previous errors cause program termination" );
+				}
 			}
 		}
 
