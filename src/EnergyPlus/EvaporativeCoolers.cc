@@ -2327,7 +2327,7 @@ namespace EvaporativeCoolers {
 		} else {
 			FlowRatio = 1.0; 
 		}
-		if ( AirMassFlowSec >= 0.0 ) {
+		if ( AirMassFlowSec > 0.0 ) {
 			RhoAirSec = PsyRhoAirFnPbTdbW( OutBaroPress, EDBTSec, EHumRatSec );
 			RhoAirSys = PsyRhoAirFnPbTdbW( OutBaroPress, EvapCond( EvapCoolNum ).InletTemp, EvapCond( EvapCoolNum ).InletHumRat );
 			if ( DryOrWetOperatingMode == DryModulated || DryOrWetOperatingMode == DryFull ) {
