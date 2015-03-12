@@ -2420,11 +2420,11 @@ namespace VariableSpeedCoils {
 				}
 				else if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed) {
 					// air source water heating coil
-					SetupOutputVariable("COOLING COIL WATER HEATING ELECTRIC POWER [W]", VarSpeedCoil(DXCoilNum).Power, "System", "Average", VarSpeedCoil(DXCoilNum).Name);
-					SetupOutputVariable("COOLING COIL TOTAL COOLING RATE [W]", VarSpeedCoil(DXCoilNum).QLoadTotal, "System", "Average", VarSpeedCoil(DXCoilNum).Name);
+					SetupOutputVariable("Cooling Coil Water Heating Electric Power [W]", VarSpeedCoil(DXCoilNum).Power, "System", "Average", VarSpeedCoil(DXCoilNum).Name);
+					SetupOutputVariable("Cooling Coil Total Cooling Rate [W]", VarSpeedCoil(DXCoilNum).QLoadTotal, "System", "Average", VarSpeedCoil(DXCoilNum).Name);
 					SetupOutputVariable("Cooling Coil Sensible Cooling Rate [W]", VarSpeedCoil(DXCoilNum).QSensible, "System", "Average", VarSpeedCoil(DXCoilNum).Name);
 					SetupOutputVariable("Cooling Coil Latent Cooling Rate [W]", VarSpeedCoil(DXCoilNum).QLatent, "System", "Average", VarSpeedCoil(DXCoilNum).Name);
-					SetupOutputVariable("COOLING COIL TOTAL WATER HEATING RATE [W]", VarSpeedCoil(DXCoilNum).TotalHeatingEnergyRate, "System", "Average", VarSpeedCoil(DXCoilNum).Name);
+					SetupOutputVariable("Cooling Coil Total Water Heating Rate [W]", VarSpeedCoil(DXCoilNum).TotalHeatingEnergyRate, "System", "Average", VarSpeedCoil(DXCoilNum).Name);
 					SetupOutputVariable("Cooling Coil Part Load Ratio []", VarSpeedCoil(DXCoilNum).PartLoadRatio, "System", "Average", VarSpeedCoil(DXCoilNum).Name);
 					SetupOutputVariable("Cooling Coil Runtime Fraction []", VarSpeedCoil(DXCoilNum).RunFrac, "System", "Average", VarSpeedCoil(DXCoilNum).Name);
 
@@ -2437,7 +2437,7 @@ namespace VariableSpeedCoils {
 					SetupOutputVariable("Cooling Coil Water Inlet Temperature [C]", VarSpeedCoil(DXCoilNum).InletWaterTemp, "System", "Average", VarSpeedCoil(DXCoilNum).Name);
 					SetupOutputVariable("Cooling Coil Water Outlet Temperature [C]", VarSpeedCoil(DXCoilNum).OutletWaterTemp, "System", "Average", VarSpeedCoil(DXCoilNum).Name);
 
-					SetupOutputVariable("COOLING COIL CRANKCASE HEATER ELECTRIC POWER [W]", VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower, "System", "Average", VarSpeedCoil(DXCoilNum).Name);
+					SetupOutputVariable("Cooling Coil Crankcase Heater Electric Power [W]", VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower, "System", "Average", VarSpeedCoil(DXCoilNum).Name);
 					SetupOutputVariable("Cooling Coil Crankcase Heater Electric Energy [J]", VarSpeedCoil(DXCoilNum).CrankcaseHeaterConsumption, "System", "Sum", VarSpeedCoil(DXCoilNum).Name, _, "Electric", "HEATING", _, "System");
 
 					SetupOutputVariable("Cooling Coil Upper Speed Level []", VarSpeedCoil(DXCoilNum).SpeedNumReport, "System", "Average", VarSpeedCoil(DXCoilNum).Name);
