@@ -135,6 +135,7 @@ namespace SystemReports {
 
 	FArray1D< Real64 > SysHumidHTNG;
 	FArray1D< Real64 > SysHumidElec;
+	FArray1D< Real64 > SysHumidGas;
 	FArray1D< Real64 > SysEvapCLNG;
 	FArray1D< Real64 > SysEvapElec;
 	FArray1D< Real64 > SysHeatExHTNG;
@@ -1847,6 +1848,7 @@ namespace SystemReports {
 
 		SysHumidHTNG.allocate( NumPrimaryAirSys );
 		SysHumidElec.allocate( NumPrimaryAirSys );
+		SysHumidGas.allocate( NumPrimaryAirSys );
 		DesDehumidCLNG.allocate( NumPrimaryAirSys );
 		DesDehumidElec.allocate( NumPrimaryAirSys );
 		SysEvapCLNG.allocate( NumPrimaryAirSys );
@@ -1945,6 +1947,7 @@ namespace SystemReports {
 		SysHCCompGas = 0.0;
 		SysHCCompSteam = 0.0;
 		SysHumidElec = 0.0;
+		SysHumidGas = 0.0;
 		DesDehumidElec = 0.0;
 		SysEvapElec = 0.0;
 
@@ -2013,6 +2016,8 @@ namespace SystemReports {
 				SetupOutputVariable( "Air System Heating Coil Steam Energy [J]", SysHCCompSteam( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
 				SetupOutputVariable( "Air System Humidifier Electric Energy [J]", SysHumidElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
+
+				SetupOutputVariable( "Air System Humidifier Gas Energy [J]", SysHumidGas( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
 				SetupOutputVariable( "Air System Evaporative Cooler Electric Energy [J]", SysEvapElec( SysIndex ), "HVAC", "Sum", PrimaryAirSystem( SysIndex ).Name );
 
@@ -3038,6 +3043,7 @@ namespace SystemReports {
 		SysHCCompGas = 0.0;
 		SysHCCompSteam = 0.0;
 		SysHumidElec = 0.0;
+		SysHumidGas = 0.0;
 		DesDehumidElec = 0.0;
 		SysEvapElec = 0.0;
 
@@ -3235,7 +3241,7 @@ namespace SystemReports {
 			SysTotHTNG( AirLoopNum ) = SysFANCompHTNG( AirLoopNum ) + SysHCCompHTNG( AirLoopNum ) + SysHeatExHTNG( AirLoopNum ) + SysHumidHTNG( AirLoopNum ) + SysSolarCollectHeating( AirLoopNum ) + SysUserDefinedTerminalHeating( AirLoopNum );
 			SysTotCLNG( AirLoopNum ) = SysCCCompCLNG( AirLoopNum ) + SysHeatExCLNG( AirLoopNum ) + SysEvapCLNG( AirLoopNum ) + DesDehumidCLNG( AirLoopNum ) + SysSolarCollectCooling( AirLoopNum ) + SysUserDefinedTerminalCooling( AirLoopNum );
 			SysTotElec( AirLoopNum ) = SysFANCompElec( AirLoopNum ) + SysHCCompElec( AirLoopNum ) + SysCCCompElec( AirLoopNum ) + SysHCCompElecRes( AirLoopNum ) + SysHumidElec( AirLoopNum ) + DesDehumidElec( AirLoopNum ) + SysEvapElec( AirLoopNum );
-			SysTotGas( AirLoopNum ) = SysHCCompGas( AirLoopNum );
+			SysTotGas( AirLoopNum ) = SysHCCompGas( AirLoopNum ) + SysHumidGas( AirLoopNum );
 			SysTotSteam( AirLoopNum ) = SysHCCompSteam( AirLoopNum );
 			SysTotH2OCOLD( AirLoopNum ) = SysCCCompH2OCOLD( AirLoopNum );
 			SysTotH2OHOT( AirLoopNum ) = SysHCCompH2OHOT( AirLoopNum );
@@ -3405,6 +3411,7 @@ namespace SystemReports {
 			HEATEXCHANGER_AIRTOAIR_SENSIBLEANDLATENT,
 			HEATEXCHANGER_DESICCANT_BALANCEDFLOW,
 			HUMIDIFIER_STEAM_ELECTRIC,
+			HUMIDIFIER_STEAM_GAS,
 			OUTDOORAIR_MIXER,
 			SOLARCOLLECTOR_FLATPLATE_PHOTOVOLTAICTHERMAL,
 			SOLARCOLLECTOR_UNGLAZEDTRANSPIRED,
@@ -3489,6 +3496,7 @@ namespace SystemReports {
 			"HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT",
 			"HEATEXCHANGER:DESICCANT:BALANCEDFLOW",
 			"HUMIDIFIER:STEAM:ELECTRIC",
+			"HUMIDIFIER:STEAM:GAS",
 			"OUTDOORAIR:MIXER",
 			"SOLARCOLLECTOR:FLATPLATE:PHOTOVOLTAICTHERMAL",
 			"SOLARCOLLECTOR:UNGLAZEDTRANSPIRED",
@@ -3699,12 +3707,15 @@ namespace SystemReports {
 
 			// Humidifier Types for the air system simulation
 			break;
+		case HUMIDIFIER_STEAM_GAS:
 		case HUMIDIFIER_STEAM_ELECTRIC:
 			if ( CompLoadFlag ) SysHumidHTNG( AirLoopNum ) += std::abs( CompLoad );
 			if ( EnergyType == iRT_Water ) {
 				SysDomesticH20( AirLoopNum ) += std::abs( CompEnergy );
 			} else if ( EnergyType == iRT_Electricity ) {
 				SysHumidElec( AirLoopNum ) += CompEnergy;
+			} else if ( ( EnergyType == iRT_Natural_Gas ) || ( EnergyType == iRT_Propane ) ) {
+				SysHumidGas( AirLoopNum ) += CompEnergy;
 			}
 
 			// Evap Cooler Types for the air system simulation
