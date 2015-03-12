@@ -43,6 +43,7 @@ TEST( AirflowNetworkBalanceManagerTest, TestOtherSideCoefficients )
 
 	MultizoneSurfaceData.deallocate( );
 	MultizoneExternalNodeData.deallocate( );
+	Surface.deallocate( );
 }
 
 
