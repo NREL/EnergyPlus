@@ -31,7 +31,6 @@ namespace EnergyPlus {
 			BaseResultObject();
 			void setUUID(const std::string uuid_);
 			const std::string UUID();
-
 		protected:
 			std::string uuid;
 		};
@@ -46,8 +45,6 @@ namespace EnergyPlus {
 			void setNumErrorsWarmup(const std::string  numWarningsDuringWarmup, const std::string  numSevereDuringWarmup);
 			void setNumErrorsSizing(const std::string  numWarningsDuringSizing, const std::string  numSevereDuringSizing);
 			void setNumErrorsSummary(const std::string  numWarnings, const std::string  numSevere);
-
-			// I don't like this pointer stuff but passing back an std:string and converting back for cjson print is expensive
 			cJSON* GetJSON();
 		protected:
 			std::string ProgramVersion;
@@ -60,27 +57,36 @@ namespace EnergyPlus {
 
 		class Variable : public BaseResultObject {
 		public:
-			Variable(const std::string VarName, const int ReportFrequency, const int IndexType, const int ReportID);
+			Variable(const std::string VarName, const int ReportFrequency, const int IndexType, const int ReportID, const std::string units);
 
 			std::string variableName();
-			std::string reportFrequency();
-			int iReportFrequency();
-			int indexType();
-			int reportID();
-
 			void setVariableName(const std::string VarName);
+
+			std::string sReportFrequency();
+			int iReportFrequency();
 			void setReportFrequency(const int ReportFrequency);
+					
+			int indexType();
+			void setIndexType(const int IndexType);
+
+			int reportID();
+			void setReportID(const int Id);
+			
+			std::string units();
+			void setUnits(std::string units);
 
 			void pushValue(const double val);
-			std::vector<double> values;
-
+			std::vector<double>& values();
+			
+			cJSON* GetJSON();
 		protected:
 			std::string varName;
 			std::string sReportFreq;
+			std::string Units;
 			int iReportFreq;
-			
 			int idxType;
 			int rptID;
+			std::vector<double> Values;
 		};
 
 		class DataFrame : public BaseResultObject {
@@ -89,34 +95,27 @@ namespace EnergyPlus {
 
 			DataFrame(std::string ReportFreq);
 			~DataFrame();
-		
-			std::string ReportFrequency;
-			std::vector < std::pair <std::string, std::string> > RCols, ICols; // VarName and VarUnits
-			std::vector < std::vector <double> > RRows;
-			std::vector < std::vector <int> > IRows;
-			
-			std::vector < std::string > TS;
-			std::vector < Variable *> outputVariables;
 
 			void addVariable(Variable *var);
-			Variable* lastVariable();
 
-			void addRCol(std::string VarName, std::string VarUnits);
-			void addICol(std::string VarName, std::string VarUnits);
+			void setRDataFrameEnabled(bool state);
+			void setIDataFrameEnabled(bool state);
+			bool rDataFrameEnabled();
+			bool iDataFrameEnabled();
 
-			void newRow(std::string ts);
-
-			void addToCurrentRRow(double value);
-			void addToCurrentIRow(int value);
-
+			void newRow(const int month, const int dayOfMonth, const int hourOfDay, const int curMin);
 			void pushVariableValue(const int reportID, double value);
+			
+			Variable* lastVariable();
+			std::vector < Variable *> variables();
 
 			void writeFile();
-
-			bool RDataFrameEnabled;
-			bool IDataFrameEnabled;
 		protected:
-			int CurrentRow;
+			bool IDataFrameEnabled;
+			bool RDataFrameEnabled;
+			std::string ReportFrequency;
+			std::vector < std::string > TS;
+			std::vector < Variable *> outputVariables;
 			std::unordered_map< int, Variable * > variableMap; // for O(1) lookup when adding to data structure
 		};
 
