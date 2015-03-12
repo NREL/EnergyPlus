@@ -558,7 +558,7 @@ namespace EnergyPlus {
 
 		// add a seperate eio summary report about what happened, did demand trap get used, what were the key values.
 		if (! eioHeaderDoneOnce ){
-			gio::write( OutputFileInits, fmtA ) << "! <Plant Sizing Coincident Flow Algorithm>,Plant Loop Name, Sizing Pass {#},Measured Mass Flow{kg/s},Measured Demand {W},Demand Calculated Mass Flow{kg/s},Sizes Changed {Yes/No},Previous Volume Flow Rate {m3/s},New Volume Flow Rate {m3/s},Demand Check Applied {Yes/No},Sizing Factor {},Normalized Change {},Specific Heat{}";
+			gio::write( OutputFileInits, fmtA ) << "! <Plant Sizing Coincident Flow Algorithm>,Plant Loop Name, Sizing Pass {#},Measured Mass Flow{kg/s},Measured Demand {W},Demand Calculated Mass Flow{kg/s},Sizes Changed {Yes/No},Previous Volume Flow Rate {m3/s},New Volume Flow Rate {m3/s},Demand Check Applied {Yes/No},Sizing Factor {},Normalized Change {},Specific Heat{J/kg-K}";
 			eioHeaderDoneOnce = true;
 		}
 		chIteration = TrimSigDigits(HVACSizingIterCount);
