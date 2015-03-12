@@ -1,6 +1,8 @@
 #ifndef ResultsSchema_hh_INCLUDED
 #define ResultsSchema_hh_INCLUDED
 
+#include <unordered_map>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/Reference.hh>
@@ -27,11 +29,11 @@ namespace EnergyPlus {
 		class BaseResultObject {
 		public:
 			BaseResultObject();
-			void setUUID(const std::string uuid);
-			const std::string getUUID();
+			void setUUID(const std::string uuid_);
+			const std::string UUID();
 
 		protected:
-			std::string UUID;
+			std::string uuid;
 		};
 
 		class SimInfo : public BaseResultObject {
@@ -56,8 +58,35 @@ namespace EnergyPlus {
 			std::string NumWarningsDuringWarmup, NumSevereDuringWarmup, NumWarningsDuringSizing, NumSevereDuringSizing, NumWarnings, NumSevere;
 		};
 
+		class Variable : public BaseResultObject {
+		public:
+			Variable(const std::string VarName, const int ReportFrequency, const int IndexType, const int ReportID);
+
+			std::string variableName();
+			std::string reportFrequency();
+			int iReportFrequency();
+			int indexType();
+			int reportID();
+
+			void setVariableName(const std::string VarName);
+			void setReportFrequency(const int ReportFrequency);
+
+			void pushValue(const double val);
+			std::vector<double> values;
+
+		protected:
+			std::string varName;
+			std::string sReportFreq;
+			int iReportFreq;
+			
+			int idxType;
+			int rptID;
+		};
+
 		class DataFrame : public BaseResultObject {
 		public:
+			typedef std::pair< int, Variable* > VarPtrPair; 
+
 			DataFrame(std::string ReportFreq);
 			~DataFrame();
 		
@@ -65,7 +94,12 @@ namespace EnergyPlus {
 			std::vector < std::pair <std::string, std::string> > RCols, ICols; // VarName and VarUnits
 			std::vector < std::vector <double> > RRows;
 			std::vector < std::vector <int> > IRows;
+			
 			std::vector < std::string > TS;
+			std::vector < Variable *> outputVariables;
+
+			void addVariable(Variable *var);
+			Variable* lastVariable();
 
 			void addRCol(std::string VarName, std::string VarUnits);
 			void addICol(std::string VarName, std::string VarUnits);
@@ -75,12 +109,15 @@ namespace EnergyPlus {
 			void addToCurrentRRow(double value);
 			void addToCurrentIRow(int value);
 
+			void pushVariableValue(const int reportID, double value);
+
 			void writeFile();
 
 			bool RDataFrameEnabled;
 			bool IDataFrameEnabled;
 		protected:
 			int CurrentRow;
+			std::unordered_map< int, Variable * > variableMap; // for O(1) lookup when adding to data structure
 		};
 
 
@@ -106,6 +143,7 @@ namespace EnergyPlus {
 		protected:
 			bool tsEnabled;
 			bool tsAndTabularEnabled;
+			
 		};
 
 		extern std::unique_ptr<ResultsSchema> OutputSchema;

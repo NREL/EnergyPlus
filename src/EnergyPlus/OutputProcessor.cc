@@ -25,6 +25,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataStringGlobals.hh>
 #include <DataSystemVariables.hh>
+#include <DisplayRoutines.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
@@ -4157,13 +4158,22 @@ namespace OutputProcessor {
 		if (OutputSchema->timeSeriesEnabled())
 		{
 			if (reportingInterval == ReportDaily)
+			{
 				OutputSchema->RIDailyTSData.addToCurrentRRow(repVal);
+				OutputSchema->RIDailyTSData.pushVariableValue(reportID, repVal);
+			}
 			// add to monthly TS data store
 			if (reportingInterval == ReportMonthly)
+			{
 				OutputSchema->RIMonthlyTSData.addToCurrentRRow(repVal);
+				OutputSchema->RIMonthlyTSData.pushVariableValue(reportID, repVal);
+			}
 			// add to run period TS data store
 			if (reportingInterval == ReportSim)
+			{
 				OutputSchema->RIRunPeriodTSData.addToCurrentRRow(repVal);
+				OutputSchema->RIRunPeriodTSData.pushVariableValue(reportID, repVal);
+			}
 		}
 
 		if ( sqlite ) {
@@ -4662,13 +4672,22 @@ namespace OutputProcessor {
 		{
 			// add to daily TS data store
 			if (reportingInterval == ReportDaily)
+			{
 				OutputSchema->RIDailyTSData.addToCurrentIRow(repVal);
+				OutputSchema->RIDailyTSData.pushVariableValue(reportID, repVal);
+			}
 			// add to monthly TS data store
 			if (reportingInterval == ReportMonthly)
+			{
 				OutputSchema->RIMonthlyTSData.addToCurrentIRow(repVal);
+				OutputSchema->RIMonthlyTSData.pushVariableValue(reportID, repVal);
+			}
 			// add to run period TS data store
 			if (reportingInterval == ReportSim)
+			{
 				OutputSchema->RIRunPeriodTSData.addToCurrentIRow(repVal);
+				OutputSchema->RIRunPeriodTSData.pushVariableValue(reportID, repVal);
+			}
 		}
 
 		rminValue = minValue;
@@ -5142,7 +5161,7 @@ SetupOutputVariable(
 		AssignReportNumber( CurrentReportNumber );
 		gio::write( IDOut, fmtLD ) << CurrentReportNumber;
 		strip( IDOut );
-
+		DisplayString(RVariableTypes(CV).VarName); /* TO REMOVE */
 		RVariable.allocate();
 		RVariable().Value = 0.0;
 		RVariable().TSValue = 0.0;
@@ -5363,6 +5382,9 @@ SetupOutputVariable(
 		IVariableTypes( CV ).VarNameOnly = VarName;
 		IVariableTypes( CV ).VarNameUC = MakeUPPERCase( IVariableTypes( CV ).VarName );
 		IVariableTypes( CV ).UnitsString = UnitsString;
+		
+		DisplayString(IVariableTypes(CV).VarName);
+
 		AssignReportNumber( CurrentReportNumber );
 		gio::write( IDOut, fmtLD ) << CurrentReportNumber;
 		strip( IDOut );
@@ -5475,7 +5497,7 @@ SetupOutputVariable(
 
 	gio::write( IDOut, fmtLD ) << KeyedValue;
 	strip( IDOut );
-
+	DisplayString(IndexTypeKey + " , " + VariableTypeKey + ", " + ReportFreq + ", " + VariableName);
 	SetupOutputVariable( VariableName, ActualVariable, IndexTypeKey, VariableTypeKey, IDOut, ReportFreq, ResourceTypeKey, EndUseKey, EndUseSubKey, GroupKey, ZoneKey, ZoneMult, ZoneListMult, indexGroupKey );
 
 }
@@ -5669,6 +5691,9 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 				{
 					if (IndexType == ZoneVar) OutputSchema->RIDetailedZoneTSData.addToCurrentRRow(rVar.Which);
 					if (IndexType == HVACVar) OutputSchema->RIDetailedHVACTSData.addToCurrentRRow(rVar.Which);
+
+					if (IndexType == ZoneVar) OutputSchema->RIDetailedZoneTSData.pushVariableValue(rVar.ReportID, rVar.Which);
+					if (IndexType == HVACVar) OutputSchema->RIDetailedHVACTSData.pushVariableValue(rVar.ReportID, rVar.Which);
 				}
 			}
 		}
@@ -5738,6 +5763,9 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 				{
 					if (IndexType == ZoneVar) OutputSchema->RIDetailedZoneTSData.addToCurrentIRow(iVar.Which);
 					if (IndexType == HVACVar) OutputSchema->RIDetailedHVACTSData.addToCurrentIRow(iVar.Which);
+
+					if (IndexType == ZoneVar) OutputSchema->RIDetailedZoneTSData.pushVariableValue(iVar.ReportID, iVar.Which);
+					if (IndexType == HVACVar) OutputSchema->RIDetailedHVACTSData.pushVariableValue(iVar.ReportID, iVar.Which);
 				}
 			}
 		}
@@ -5804,10 +5832,11 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 
 					WriteRealData( rVar.ReportID, rVar.ReportIDChr, rVar.TSValue );
 					++StdOutputRecordCount;
-					// add to timestep TS data store
+					// add to timestep TS data store, but newrow takes care of this
+					/*
 					if (OutputSchema->timeSeriesEnabled())
-						OutputSchema->RITimestepTSData.addToCurrentRRow(rVar.TSValue);
-					
+						OutputSchema->RITimestepTSData.pushVariableValue(rVar.ReportID, rVar.TSValue); 
+					*/
 				}
 				rVar.TSValue = 0.0;
 				rVar.thisTSStored = false;
@@ -5847,8 +5876,14 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 
 					WriteIntegerData( iVar.ReportID, iVar.ReportIDChr, _, iVar.TSValue );
 					++StdOutputRecordCount;
+					// newrow takes care of this
+					/*
 					if (OutputSchema->timeSeriesEnabled())
+					{
 						OutputSchema->RITimestepTSData.addToCurrentIRow(iVar.TSValue);
+						OutputSchema->RITimestepTSData.pushVariableValue(iVar.ReportID, iVar.TSValue )
+					}
+					*/
 				}
 				iVar.TSValue = 0.0;
 				iVar.thisTSStored = false;
@@ -5900,7 +5935,10 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						rVar.Stored = false;
 						// add time series value for hourly to data store
 						if (OutputSchema->timeSeriesEnabled())
+						{
 							OutputSchema->RIHourlyTSData.addToCurrentRRow(rVar.Value);
+							OutputSchema->RIHourlyTSData.pushVariableValue(rVar.ReportID, rVar.Value);
+						}
 					}
 					rVar.StoreValue += rVar.Value;
 					++rVar.NumStored;
@@ -5928,7 +5966,10 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						++StdOutputRecordCount;
 						iVar.Stored = false;
 						if (OutputSchema->timeSeriesEnabled())
+						{
 							OutputSchema->RIHourlyTSData.addToCurrentIRow(iVar.Value);
+							OutputSchema->RIHourlyTSData.pushVariableValue(iVar.ReportID, iVar.Value);
+						}
 					}
 					iVar.StoreValue += iVar.Value;
 					++iVar.NumStored;
@@ -8183,6 +8224,7 @@ AddToOutputVariableList(
 		DDVariableTypes( NumVariablesForOutput ).VariableType = VariableType;
 		DDVariableTypes( NumVariablesForOutput ).VarNameOnly = VarName;
 		DDVariableTypes( NumVariablesForOutput ).UnitsString = UnitsString;
+		//DisplayString(VarName);
 	} else if ( UnitsString != DDVariableTypes( dup ).UnitsString ) { // not the same as first units
 		int dup2 = 0;// for duplicate variable name
 		while ( DDVariableTypes( dup ).Next != 0 ) {
@@ -8204,6 +8246,7 @@ AddToOutputVariableList(
 			DDVariableTypes( NumVariablesForOutput ).VarNameOnly = VarName;
 			DDVariableTypes( NumVariablesForOutput ).UnitsString = UnitsString;
 			DDVariableTypes( dup ).Next = NumVariablesForOutput;
+			//DisplayString(VarName);
 		}
 	}
 
