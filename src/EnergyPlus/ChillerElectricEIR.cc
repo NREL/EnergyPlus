@@ -1535,7 +1535,14 @@ namespace ChillerElectricEIR {
 			SetComponentFlowRate( CondMassFlowRate, CondInletNode, CondOutletNode, ElectricEIRChiller( EIRChillNum ).CDLoopNum, ElectricEIRChiller( EIRChillNum ).CDLoopSideNum, ElectricEIRChiller( EIRChillNum ).CDBranchNum, ElectricEIRChiller( EIRChillNum ).CDCompNum );
 			PullCompInterconnectTrigger( ElectricEIRChiller( EIRChillNum ).CWLoopNum, ElectricEIRChiller( EIRChillNum ).CWLoopSideNum, ElectricEIRChiller( EIRChillNum ).CWBranchNum, ElectricEIRChiller( EIRChillNum ).CWCompNum, ElectricEIRChiller( EIRChillNum ).CondMassFlowIndex, ElectricEIRChiller( EIRChillNum ).CDLoopNum, ElectricEIRChiller( EIRChillNum ).CDLoopSideNum, CriteriaType_MassFlowRate, CondMassFlowRate );
 
-			if ( CondMassFlowRate < MassFlowTolerance ) return;
+//			if ( CondMassFlowRate < MassFlowTolerance ) return;
+			if ( CondMassFlowRate < MassFlowTolerance ) {
+				if ( EvapMassFlowRate < MassFlowTolerance ) {
+					// Use SetComponentFlowRate to decide actual flow
+					SetComponentFlowRate( EvapMassFlowRate, EvapInletNode, EvapOutletNode, ElectricEIRChiller( EIRChillNum ).CWLoopNum, ElectricEIRChiller( EIRChillNum ).CWLoopSideNum, ElectricEIRChiller( EIRChillNum ).CWBranchNum, ElectricEIRChiller( EIRChillNum ).CWCompNum );
+				}
+				return;
+			}
 
 		}
 
@@ -2010,6 +2017,8 @@ namespace ChillerElectricEIR {
 		//  na
 
 		// Using/Aliasing
+		using DataBranchAirLoopPlant::MassFlowTolerance;
+		using DataGlobals::SecInHour;
 		using DataGlobals::SecInHour;
 		using DataHVACGlobals::TimeStepSys;
 		using PlantUtilities::SafeCopyPlantNode;
@@ -2088,11 +2097,20 @@ namespace ChillerElectricEIR {
 
 		} else { // Chiller is running, so pass calculated values
 			// Set node temperatures
-			Node( EvapOutletNode ).Temp = EvapOutletTemp;
-			Node( CondOutletNode ).Temp = CondOutletTemp;
-			if ( ElectricEIRChiller( Num ).CondenserType != WaterCooled ) {
-				Node( CondOutletNode ).HumRat = CondOutletHumRat;
-				Node( CondOutletNode ).Enthalpy = PsyHFnTdbW( CondOutletTemp, CondOutletHumRat );
+			if ( CondMassFlowRate < MassFlowTolerance && EvapMassFlowRate < MassFlowTolerance ) {
+				Node( EvapOutletNode ).Temp = Node( EvapInletNode ).Temp;
+				Node( CondOutletNode ).Temp = Node( CondInletNode ).Temp;
+				if ( ElectricEIRChiller( Num ).CondenserType != WaterCooled ) {
+					Node( CondOutletNode ).HumRat = Node( CondInletNode ).HumRat;
+					Node( CondOutletNode ).Enthalpy = Node( CondInletNode ).Enthalpy;
+				}
+			} else {
+				Node( EvapOutletNode ).Temp = EvapOutletTemp;
+				Node( CondOutletNode ).Temp = CondOutletTemp;
+				if ( ElectricEIRChiller( Num ).CondenserType != WaterCooled ) {
+					Node( CondOutletNode ).HumRat = CondOutletHumRat;
+					Node( CondOutletNode ).Enthalpy = PsyHFnTdbW( CondOutletTemp, CondOutletHumRat );
+				}
 			}
 
 			// Set node flow rates;  for these load based models
