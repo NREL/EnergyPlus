@@ -1,18 +1,7 @@
-// EnergyPlus::DXCoils unit tests
-// DX heating coil defrost capacity with electric resistance
+// EnergyPlus::AirflowNetworkBalanceManager unit tests
 
 // Google test headers
 #include <gtest/gtest.h>
-
-// C++ Headers
-#include <cassert>
-#include <cmath>
-#include <string>
-
-// ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <DataAirflowNetwork.hh>
@@ -43,7 +32,7 @@ TEST( AirflowNetworkBalanceManagerTest, TestOtherSideCoefficients )
 	Surface( 1 ).Azimuth = 0.0;
 	Surface( 2 ).Azimuth = 180.0;
 
-	MultizoneSurfaceData( 1 ).SurfNum =	1;
+	MultizoneSurfaceData( 1 ).SurfNum = 1;
 	MultizoneSurfaceData( 2 ).SurfNum = 2;
 
 	CalcWindPressureCoeffs( );
