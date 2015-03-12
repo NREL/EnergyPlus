@@ -144,6 +144,7 @@ namespace WaterThermalTanks {
 		Real64 MaxCapacity; // For reporting
 		int Inlets;
 		int Outlets;
+		Real64 HPWHWrappedCondenserHeatingFrac; // fraction of the heat from a wrapped condenser that enters into this node, should add up to 1.
 
 		// Default Constructor
 		StratifiedNodeData() :
@@ -169,7 +170,8 @@ namespace WaterThermalTanks {
 			Height( 0.0 ),
 			MaxCapacity( 0.0 ),
 			Inlets( 0 ),
-			Outlets( 0 )
+			Outlets( 0 ),
+			HPWHWrappedCondenserHeatingFrac(0.0)
 		{}
 
 		// Member Constructor
@@ -196,7 +198,8 @@ namespace WaterThermalTanks {
 			Real64 const Height, // Node height from top to bottom (like a thickness)
 			Real64 const MaxCapacity, // For reporting
 			int const Inlets,
-			int const Outlets
+			int const Outlets,
+			Real64 const HPWHWrappedCondenserHeatingFrac
 		) :
 			Mass( Mass ),
 			OnCycLossCoeff( OnCycLossCoeff ),
@@ -220,7 +223,8 @@ namespace WaterThermalTanks {
 			Height( Height ),
 			MaxCapacity( MaxCapacity ),
 			Inlets( Inlets ),
-			Outlets( Outlets )
+			Outlets( Outlets ),
+			HPWHWrappedCondenserHeatingFrac( HPWHWrappedCondenserHeatingFrac )
 		{}
 
 	};
@@ -1784,11 +1788,11 @@ namespace WaterThermalTanks {
 
 	Real64
 	CalcStratifiedTankSourceSideHeatTransferRate(
-		Real64 HPWHCondenserDeltaT, // input, The temperature difference (C) across the heat pump, zero if there is no heat pump or if the heat pump is off
+		Real64 Qheatpump, // input, the heat rate from the heat pump (W), zero if there is no heat pump or if the heat pump is off
 		Real64 SourceInletTemp, // input, Source inlet temperature (C)
 		Real64 Cp, // Specific heat of fluid (J/kg deltaC)
 		Real64 SourceMassFlowRate, // source mass flow rate (kg/s)
-		Real64 NodeTemp // temperature of the source inlet node (C)
+		const StratifiedNodeData & StratNode // The stratified node at the source inlet
 	);
 	
 	void

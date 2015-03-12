@@ -1256,14 +1256,6 @@ namespace WaterThermalTanks {
 					// Get the lists of IDF arguments
 					GetObjectItem( cCurrentModuleObject, HPWaterHeaterNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 					
-					// Print out IDF arguments (debugging, delete me later)
-					for (int i = 1; i <= NumAlphas; ++i) {
-						std::cout << i << " " << cAlphaFieldNames(i) << " = " << cAlphaArgs(i) << " " << lAlphaFieldBlanks(i) << std::endl;
-					}
-					for (int i = 1; i <= NumNums; ++i) {
-						std::cout << i << " " << cNumericFieldNames(i) << " = " << rNumericArgs(i) << " " << lNumericFieldBlanks(i) << std::endl;
-					}
-					
 					IsNotOK = false;
 					IsBlank = false;
 					VerifyName( cAlphaArgs( 1 ), HPWaterHeater.Name(), HPWaterHeaterNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
@@ -3560,7 +3552,48 @@ namespace WaterThermalTanks {
 								ErrorsFound = true;
 							} // ALLOCATED
 						} //InletAirConfiguration
-
+						
+						if ( Tank.TypeNum == StratifiedWaterHeater ) {
+							if ( HPWH.CondenserConfig == HPWH_CONDENSER_WRAPPED ) {
+								Real64 CurHeight(0.0);
+								Real64 SumFrac(0.0);
+								// Get the fraction of each stratified node that is wrapped by the condenser
+								for ( NodeNum = 1; NodeNum <= Tank.Nodes; ++NodeNum ) {
+									StratifiedNodeData &CurNode = Tank.Node( NodeNum );
+									if ( CurHeight < HPWH.WrappedCondenserBottomLocation && ( CurHeight + CurNode.Height ) > HPWH.WrappedCondenserBottomLocation ) {
+										// The bottom of the condenser starts partway through this node.
+										CurNode.HPWHWrappedCondenserHeatingFrac = 1.0 - ( HPWH.WrappedCondenserBottomLocation - CurHeight ) / CurNode.Height;
+									} else if ( CurHeight >= HPWH.WrappedCondenserBottomLocation && CurHeight <= HPWH.WrappedCondenserTopLocation ) {
+										if ( (CurHeight + CurNode.Height) > HPWH.WrappedCondenserTopLocation ) {
+											// the top of the condenser ends partway through this node.
+											CurNode.HPWHWrappedCondenserHeatingFrac = ( HPWH.WrappedCondenserTopLocation - CurHeight ) / CurNode.Height;
+										} else {
+											// the entire node is wrapped by the condenser
+											CurNode.HPWHWrappedCondenserHeatingFrac = 1.0;
+										}
+									} else {
+										CurNode.HPWHWrappedCondenserHeatingFrac = 0.0;
+									}
+									SumFrac += CurNode.HPWHWrappedCondenserHeatingFrac;
+									CurHeight += CurNode.Height;
+								}
+								// Normalize the fractions so they sum to 1.
+								for ( NodeNum = 1; NodeNum <= Tank.Nodes; ++NodeNum ) {
+									Tank.Node( NodeNum ).HPWHWrappedCondenserHeatingFrac /= SumFrac;
+								}
+							} else if ( HPWH.CondenserConfig == HPWH_CONDENSER_PUMPED ) {
+								ShowWarningError( cCurrentModuleObject + " = " + HPWH.Name + ":" );
+								ShowContinueError("A wrapped condenser HPWH model should not be used with a horizontal stratified tank.");
+								ShowContinueError("Ignoring condenser location and distributing heat evenly throughout the tank. Simulation continues.");
+								Real64 const SameFrac = 1.0 / Tank.Nodes;
+								for ( NodeNum = 1; NodeNum <= Tank.Nodes; ++NodeNum ) {
+									Tank.Node( NodeNum ).HPWHWrappedCondenserHeatingFrac = SameFrac;
+								}
+							} else {
+								assert(0);
+							}
+						}
+						
 					} // DO CheckWaterHeaterNum = 1, NumWaterHeater
 
 					if ( ! HPWH.FoundTank ) {
@@ -4087,42 +4120,44 @@ namespace WaterThermalTanks {
 		Real64 G; // Function that should converge to zero for the Newton-Raphson solution
 		Real64 rho; // local fluid density (kg/m3)
 		static int DummyWaterIndex( 1 );
+		
+		WaterThermalTankData &Tank = WaterThermalTank( WaterThermalTankNum );
 
 		// FLOW:
-		NumNodes = WaterThermalTank( WaterThermalTankNum ).Nodes;
-		WaterThermalTank( WaterThermalTankNum ).Node.allocate( NumNodes );
+		NumNodes = Tank.Nodes;
+		Tank.Node.allocate( NumNodes );
 
-		if ( ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum > 0 ) && allocated( PlantLoop ) ) {
-			rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, RoutineName );
+		if ( ( Tank.UseSidePlantLoopNum > 0 ) && allocated( PlantLoop ) ) {
+			rho = GetDensityGlycol( PlantLoop( Tank.UseSidePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( Tank.UseSidePlantLoopNum ).FluidIndex, RoutineName );
 		} else {
 			rho = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineName );
 		}
 
-		NodeMass = WaterThermalTank( WaterThermalTankNum ).Volume * rho / NumNodes;
+		NodeMass = Tank.Volume * rho / NumNodes;
 
 		// Mixing rate set to 50% of the max value for dt = 1.0
-		WaterThermalTank( WaterThermalTankNum ).InversionMixingRate = NodeMass * 0.5 * 1.0;
+		Tank.InversionMixingRate = NodeMass * 0.5 * 1.0;
 
-		if ( ( WaterThermalTank( WaterThermalTankNum ).Shape == TankShapeVertCylinder ) || ( WaterThermalTank( WaterThermalTankNum ).Shape == TankShapeOther ) ) {
+		if ( ( Tank.Shape == TankShapeVertCylinder ) || ( Tank.Shape == TankShapeOther ) ) {
 
-			TankHeight = WaterThermalTank( WaterThermalTankNum ).Height;
-			EndArea = WaterThermalTank( WaterThermalTankNum ).Volume / TankHeight;
+			TankHeight = Tank.Height;
+			EndArea = Tank.Volume / TankHeight;
 			NodeHeight = TankHeight / NumNodes;
-			CondCoeff = ( FluidCond + WaterThermalTank( WaterThermalTankNum ).AdditionalCond ) * EndArea / NodeHeight;
+			CondCoeff = ( FluidCond + Tank.AdditionalCond ) * EndArea / NodeHeight;
 
-			if ( WaterThermalTank( WaterThermalTankNum ).Shape == TankShapeVertCylinder ) {
+			if ( Tank.Shape == TankShapeVertCylinder ) {
 				Radius = std::sqrt( EndArea / Pi );
 				Perimeter = 2.0 * Pi * Radius;
 			} else { // TankShapeOther
-				Perimeter = WaterThermalTank( WaterThermalTankNum ).Perimeter;
+				Perimeter = Tank.Perimeter;
 			}
 
 			for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
-				WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Mass = NodeMass;
-				WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Volume = WaterThermalTank( WaterThermalTankNum ).Volume / NumNodes;
-				WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Height = NodeHeight;
-				WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).CondCoeffUp = CondCoeff;
-				WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).CondCoeffDn = CondCoeff;
+				Tank.Node( NodeNum ).Mass = NodeMass;
+				Tank.Node( NodeNum ).Volume = Tank.Volume / NumNodes;
+				Tank.Node( NodeNum ).Height = NodeHeight;
+				Tank.Node( NodeNum ).CondCoeffUp = CondCoeff;
+				Tank.Node( NodeNum ).CondCoeffDn = CondCoeff;
 
 				if ( ( NodeNum == 1 ) || ( NodeNum == NumNodes ) ) {
 					SkinArea = Perimeter * NodeHeight + EndArea;
@@ -4130,18 +4165,18 @@ namespace WaterThermalTanks {
 					SkinArea = Perimeter * NodeHeight;
 				}
 
-				WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).OnCycLossCoeff = WaterThermalTank( WaterThermalTankNum ).SkinLossCoeff * SkinArea + WaterThermalTank( WaterThermalTankNum ).AdditionalLossCoeff( NodeNum );
+				Tank.Node( NodeNum ).OnCycLossCoeff = Tank.SkinLossCoeff * SkinArea + Tank.AdditionalLossCoeff( NodeNum );
 
-				WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).OffCycLossCoeff = WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).OnCycLossCoeff + WaterThermalTank( WaterThermalTankNum ).OffCycFlueLossCoeff;
+				Tank.Node( NodeNum ).OffCycLossCoeff = Tank.Node( NodeNum ).OnCycLossCoeff + Tank.OffCycFlueLossCoeff;
 
 			} // NodeNum
 
-			WaterThermalTank( WaterThermalTankNum ).Node( 1 ).CondCoeffUp = 0.0;
-			WaterThermalTank( WaterThermalTankNum ).Node( NumNodes ).CondCoeffDn = 0.0;
-
-		} else { // WaterThermalTank(WaterThermalTankNum)%Shape == TankShapeHorizCylinder
-			TankLength = WaterThermalTank( WaterThermalTankNum ).Height; // Height is the length in the axial direction
-			EndArea = WaterThermalTank( WaterThermalTankNum ).Volume / TankLength;
+			Tank.Node( 1 ).CondCoeffUp = 0.0;
+			Tank.Node( NumNodes ).CondCoeffDn = 0.0;
+			
+		} else { // Tank%Shape == TankShapeHorizCylinder
+			TankLength = Tank.Height; // Height is the length in the axial direction
+			EndArea = Tank.Volume / TankLength;
 			Radius = std::sqrt( EndArea / Pi );
 			TankHeight = 2.0 * Radius; // Actual vertical height
 			NodeEndArea = EndArea / NumNodes;
@@ -4150,8 +4185,8 @@ namespace WaterThermalTanks {
 			H0 = 0.0;
 			ChordLength = 0.0;
 			for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
-				WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Mass = NodeMass;
-				WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Volume = WaterThermalTank( WaterThermalTankNum ).Volume / NumNodes;
+				Tank.Node( NodeNum ).Mass = NodeMass;
+				Tank.Node( NodeNum ).Volume = Tank.Volume / NumNodes;
 
 				if ( NodeNum == NumNodes ) {
 					H = TankHeight;
@@ -4185,13 +4220,13 @@ namespace WaterThermalTanks {
 
 				}
 
-				WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Height = H - H0;
+				Tank.Node( NodeNum ).Height = H - H0;
 
 				if ( NodeNum > 1 ) {
 					CrossArea = 2.0 * ChordLength * TankLength; // Use old ChordLength from previous node
-					CondCoeff = ( FluidCond + WaterThermalTank( WaterThermalTankNum ).AdditionalCond ) * CrossArea / ( 0.5 * ( H - H0 ) + 0.5 * WaterThermalTank( WaterThermalTankNum ).Node( NodeNum - 1 ).Height );
-					WaterThermalTank( WaterThermalTankNum ).Node( NodeNum - 1 ).CondCoeffUp = CondCoeff; // Set for previous node
-					WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).CondCoeffDn = CondCoeff; // Set for this node
+					CondCoeff = ( FluidCond + Tank.AdditionalCond ) * CrossArea / ( 0.5 * ( H - H0 ) + 0.5 * Tank.Node( NodeNum - 1 ).Height );
+					Tank.Node( NodeNum - 1 ).CondCoeffUp = CondCoeff; // Set for previous node
+					Tank.Node( NodeNum ).CondCoeffDn = CondCoeff; // Set for this node
 				}
 
 				ChordLength = std::sqrt( 2.0 * R * H - H * H ); // Calc new ChordLength to be used with next node
@@ -4199,16 +4234,17 @@ namespace WaterThermalTanks {
 				Perimeter = 2.0 * R * ( std::acos( ( R - H ) / R ) - std::acos( ( R - H0 ) / R ) ); // Segments of circular perimeter
 				SkinArea = Perimeter * TankLength + 2.0 * NodeEndArea;
 
-				WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).OnCycLossCoeff = WaterThermalTank( WaterThermalTankNum ).SkinLossCoeff * SkinArea + WaterThermalTank( WaterThermalTankNum ).AdditionalLossCoeff( NodeNum );
+				Tank.Node( NodeNum ).OnCycLossCoeff = Tank.SkinLossCoeff * SkinArea + Tank.AdditionalLossCoeff( NodeNum );
 
-				WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).OffCycLossCoeff = WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).OnCycLossCoeff + WaterThermalTank( WaterThermalTankNum ).OffCycFlueLossCoeff;
+				Tank.Node( NodeNum ).OffCycLossCoeff = Tank.Node( NodeNum ).OnCycLossCoeff + Tank.OffCycFlueLossCoeff;
 				// Although it doesn't make much sense to have a flue in a horizontal tank, keep it in anyway
 
 				H0 = H;
 			} // NodeNum
 
-			WaterThermalTank( WaterThermalTankNum ).Node( 1 ).CondCoeffUp = 0.0;
-			WaterThermalTank( WaterThermalTankNum ).Node( NumNodes ).CondCoeffDn = 0.0;
+			Tank.Node( 1 ).CondCoeffUp = 0.0;
+			Tank.Node( NumNodes ).CondCoeffDn = 0.0;
+			
 		}
 
 		// Loop through nodes again (from top to bottom this time) and assign heating elements, parasitics, flow inlets/outlets
@@ -4218,61 +4254,61 @@ namespace WaterThermalTanks {
 			if ( NodeNum == NumNodes ) {
 				H = -1.0; // Avoids rounding errors and ensures that anything at height 0.0 goes into the bottom node
 			} else {
-				H = H0 - WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Height;
+				H = H0 - Tank.Node( NodeNum ).Height;
 			}
 
 			// Assign heater elements to the nodes at the specified heights
-			if ( ( WaterThermalTank( WaterThermalTankNum ).HeaterHeight1 <= H0 ) && ( WaterThermalTank( WaterThermalTankNum ).HeaterHeight1 > H ) ) {
+			if ( ( Tank.HeaterHeight1 <= H0 ) && ( Tank.HeaterHeight1 > H ) ) {
 				//       sensor node will not get set if user enters 0 for this heater capacity
-				//       (WaterThermalTank(WaterThermalTankNum)%MaxCapacity > 0.0d0)) THEN
-				WaterThermalTank( WaterThermalTankNum ).HeaterNode1 = NodeNum;
-				WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).MaxCapacity = WaterThermalTank( WaterThermalTankNum ).MaxCapacity;
+				//       (Tank%MaxCapacity > 0.0d0)) THEN
+				Tank.HeaterNode1 = NodeNum;
+				Tank.Node( NodeNum ).MaxCapacity = Tank.MaxCapacity;
 			}
 
-			if ( ( WaterThermalTank( WaterThermalTankNum ).HeaterHeight2 <= H0 ) && ( WaterThermalTank( WaterThermalTankNum ).HeaterHeight2 > H ) ) {
+			if ( ( Tank.HeaterHeight2 <= H0 ) && ( Tank.HeaterHeight2 > H ) ) {
 				//       sensor node will not get set if user enters 0 for this heater capacity
-				//      .AND. (WaterThermalTank(WaterThermalTankNum)%MaxCapacity2 > 0.0d0)) THEN
-				WaterThermalTank( WaterThermalTankNum ).HeaterNode2 = NodeNum;
+				//      .AND. (Tank%MaxCapacity2 > 0.0d0)) THEN
+				Tank.HeaterNode2 = NodeNum;
 
-				if ( ( NodeNum == WaterThermalTank( WaterThermalTankNum ).HeaterNode1 ) && ( WaterThermalTank( WaterThermalTankNum ).ControlType == PrioritySimultaneous ) ) {
-					WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).MaxCapacity += WaterThermalTank( WaterThermalTankNum ).MaxCapacity2;
+				if ( ( NodeNum == Tank.HeaterNode1 ) && ( Tank.ControlType == PrioritySimultaneous ) ) {
+					Tank.Node( NodeNum ).MaxCapacity += Tank.MaxCapacity2;
 				} else {
-					WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).MaxCapacity = WaterThermalTank( WaterThermalTankNum ).MaxCapacity2;
+					Tank.Node( NodeNum ).MaxCapacity = Tank.MaxCapacity2;
 				}
 			}
 
 			// Assign parasitic heat gains to the nodes at the specified heights
-			if ( ( WaterThermalTank( WaterThermalTankNum ).OffCycParaHeight <= H0 ) && ( WaterThermalTank( WaterThermalTankNum ).OffCycParaHeight > H ) ) {
-				WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).OffCycParaLoad = WaterThermalTank( WaterThermalTankNum ).OffCycParaFracToTank * WaterThermalTank( WaterThermalTankNum ).OffCycParaLoad;
+			if ( ( Tank.OffCycParaHeight <= H0 ) && ( Tank.OffCycParaHeight > H ) ) {
+				Tank.Node( NodeNum ).OffCycParaLoad = Tank.OffCycParaFracToTank * Tank.OffCycParaLoad;
 			}
 
-			if ( ( WaterThermalTank( WaterThermalTankNum ).OnCycParaHeight <= H0 ) && ( WaterThermalTank( WaterThermalTankNum ).OnCycParaHeight > H ) ) {
-				WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).OnCycParaLoad = WaterThermalTank( WaterThermalTankNum ).OnCycParaFracToTank * WaterThermalTank( WaterThermalTankNum ).OnCycParaLoad;
+			if ( ( Tank.OnCycParaHeight <= H0 ) && ( Tank.OnCycParaHeight > H ) ) {
+				Tank.Node( NodeNum ).OnCycParaLoad = Tank.OnCycParaFracToTank * Tank.OnCycParaLoad;
 			}
 
 			// Assign inlets and outlets to the nodes at the specified heights
-			if ( ( WaterThermalTank( WaterThermalTankNum ).UseInletHeight <= H0 ) && ( WaterThermalTank( WaterThermalTankNum ).UseInletHeight > H ) ) {
-				WaterThermalTank( WaterThermalTankNum ).UseInletStratNode = NodeNum;
+			if ( ( Tank.UseInletHeight <= H0 ) && ( Tank.UseInletHeight > H ) ) {
+				Tank.UseInletStratNode = NodeNum;
 
-				if ( ( WaterThermalTank( WaterThermalTankNum ).UseInletNode > 0 ) || ( WaterThermalTank( WaterThermalTankNum ).MassFlowRateMax > 0.0 ) ) ++WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Inlets;
+				if ( ( Tank.UseInletNode > 0 ) || ( Tank.MassFlowRateMax > 0.0 ) ) ++Tank.Node( NodeNum ).Inlets;
 			}
 
-			if ( ( WaterThermalTank( WaterThermalTankNum ).UseOutletHeight <= H0 ) && ( WaterThermalTank( WaterThermalTankNum ).UseOutletHeight > H ) ) {
-				WaterThermalTank( WaterThermalTankNum ).UseOutletStratNode = NodeNum;
+			if ( ( Tank.UseOutletHeight <= H0 ) && ( Tank.UseOutletHeight > H ) ) {
+				Tank.UseOutletStratNode = NodeNum;
 
-				if ( ( WaterThermalTank( WaterThermalTankNum ).UseOutletNode > 0 ) || ( WaterThermalTank( WaterThermalTankNum ).MassFlowRateMax > 0.0 ) ) ++WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Outlets;
+				if ( ( Tank.UseOutletNode > 0 ) || ( Tank.MassFlowRateMax > 0.0 ) ) ++Tank.Node( NodeNum ).Outlets;
 			}
 
-			if ( ( WaterThermalTank( WaterThermalTankNum ).SourceInletHeight <= H0 ) && ( WaterThermalTank( WaterThermalTankNum ).SourceInletHeight > H ) && ( WaterThermalTank( WaterThermalTankNum ).SourceInletNode > 0 ) ) {
+			if ( ( Tank.SourceInletHeight <= H0 ) && ( Tank.SourceInletHeight > H ) && ( Tank.SourceInletNode > 0 ) ) {
 
-				WaterThermalTank( WaterThermalTankNum ).SourceInletStratNode = NodeNum;
-				++WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Inlets;
+				Tank.SourceInletStratNode = NodeNum;
+				++Tank.Node( NodeNum ).Inlets;
 			}
 
-			if ( ( WaterThermalTank( WaterThermalTankNum ).SourceOutletHeight <= H0 ) && ( WaterThermalTank( WaterThermalTankNum ).SourceOutletHeight > H ) && ( WaterThermalTank( WaterThermalTankNum ).SourceOutletNode > 0 ) ) {
+			if ( ( Tank.SourceOutletHeight <= H0 ) && ( Tank.SourceOutletHeight > H ) && ( Tank.SourceOutletNode > 0 ) ) {
 
-				WaterThermalTank( WaterThermalTankNum ).SourceOutletStratNode = NodeNum;
-				++WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Outlets;
+				Tank.SourceOutletStratNode = NodeNum;
+				++Tank.Node( NodeNum ).Outlets;
 			}
 
 			H0 = H;
@@ -5909,6 +5945,7 @@ namespace WaterThermalTanks {
 		Real64 Qheater1; // Heating rate of burner or electric heating element 1 (W)
 		Real64 Qheater2; // Heating rate of burner or electric heating element 2 (W)
 		Real64 Qheater; // Combined heating rate of heater 1 and 2 (W)
+		Real64 Qheatpump( 0.0 ); // heat rate from the heat pump (W)
 		Real64 Qoffcycfuel; // Fuel consumption rate of off-cycle parasitics (W)
 		Real64 Qoffcycheat; // Heating rate of fraction of off-cycle parasitics added to the tank (W)
 		Real64 Qoncycfuel; // Fuel consumption rate on-cycle parasitics added to the tank (W)
@@ -5941,9 +5978,9 @@ namespace WaterThermalTanks {
 		Real64 Eneeded; // Energy change needed over the timestep (J)
 		Real64 Eunmet; // Energy change unmet over the timestep (J)
 		Real64 Efuel; // Energy change for fuel consumed over the timestep (J)
+		HeatPumpWaterHeaterCondenserConfiguration HPWHCondenserConfig( HPWH_CONDENSER_NOT_CONFIGURED ); // Condenser configuration of HPWH
 		bool SetPointRecovered; // Flag to indicate when set point is recovered for the first time
 		static int DummyWaterIndex( 1 );
-		Real64 HPWHCondenserDeltaT; // Temperature difference across the condenser for a heat pump water heater
 
 		// References
 		WaterThermalTankData &Tank = WaterThermalTank( WaterThermalTankNum ); // Tank object
@@ -5979,11 +6016,9 @@ namespace WaterThermalTanks {
 		// Calculate the heating rate from the heat pump.
 		if ( Tank.HeatPumpNum > 0 ) {
 			HeatPumpWaterHeaterData const &HeatPump = HPWaterHeater(Tank.HeatPumpNum);
-			DataLoopNode::NodeData const &HPWHCondWaterInletNode = DataLoopNode::Node(HeatPump.CondWaterInletNode);
-			DataLoopNode::NodeData const &HPWHCondWaterOutletNode = DataLoopNode::Node(HeatPump.CondWaterOutletNode);
-			HPWHCondenserDeltaT = HPWHCondWaterOutletNode.Temp - HPWHCondWaterInletNode.Temp;
-		} else {
-			HPWHCondenserDeltaT = 0.0;
+			DXCoils::DXCoilData const &Coil = DXCoils::DXCoil( HeatPump.DXCoilNum );
+			Qheatpump = Coil.TotalHeatingEnergyRate;
+			HPWHCondenserConfig = HeatPump.CondenserConfig;
 		}
 
 		SetPointTemp1 = Tank.SetPointTemp;
@@ -6111,8 +6146,8 @@ namespace WaterThermalTanks {
 
 				// Heat transfer due to fluid flow entering an inlet node
 				Quse = UseMassFlowRate * Cp * ( UseInletTemp - NodeTemp );
-				Qsource = CalcStratifiedTankSourceSideHeatTransferRate(HPWHCondenserDeltaT, SourceInletTemp, Cp, SourceMassFlowRate, NodeTemp);
-				
+				Qsource = CalcStratifiedTankSourceSideHeatTransferRate(Qheatpump, SourceInletTemp, Cp, SourceMassFlowRate, Tank.Node( NodeNum ));
+
 				InvMixUp = 0.0;
 				if ( NodeNum > 1 ) {
 					TempUp = Tank.Node( NodeNum - 1 ).Temp;
@@ -6235,7 +6270,11 @@ namespace WaterThermalTanks {
 		}
 		NodeNum = Tank.SourceOutletStratNode;
 		if ( NodeNum > 0 ) Tank.SourceOutletTemp = Tank.Node( NodeNum ).TempAvg;
-		if ( Tank.HeatPumpNum > 0 ) Tank.SourceInletTemp = Tank.SourceOutletTemp + HPWHCondenserDeltaT;
+		if ( Tank.HeatPumpNum > 0 && HPWHCondenserConfig == HPWH_CONDENSER_PUMPED && SourceMassFlowRate > 0.0 ) {
+			Tank.SourceInletTemp = Tank.SourceOutletTemp + Qheatpump / ( SourceMassFlowRate * Cp );
+		} else {
+			Tank.SourceInletTemp = Tank.SourceOutletTemp;
+		}
 		// Revised use outlet temperature to ensure energy balance. Assumes a constant CP. CR8341/CR8570
 		if ( NodeNum > 0 ) {
 			if ( Tank.SourceMassFlowRate > 0.0 ) {
@@ -6276,11 +6315,11 @@ namespace WaterThermalTanks {
 	
 	Real64
 	CalcStratifiedTankSourceSideHeatTransferRate(
-		Real64 HPWHCondenserDeltaT, // input, The temperature difference (C) across the heat pump, zero if there is no heat pump or if the heat pump is off
+		Real64 Qheatpump, // input, the heat rate from the heat pump (W), zero if there is no heat pump or if the heat pump is off
 		Real64 SourceInletTemp, // input, Source inlet temperature (C)
 		Real64 Cp, // Specific heat of fluid (J/kg deltaC)
 		Real64 SourceMassFlowRate, // source mass flow rate (kg/s)
-		Real64 NodeTemp // temperature of the source inlet node (C)
+		const StratifiedNodeData & StratNode // The stratified node at the source inlet
 	)
 	{
 		// Function Information:
@@ -6293,10 +6332,18 @@ namespace WaterThermalTanks {
 		// Methodology:
 		// If the source side heat transfer is coming from a heat pump, then
 		Real64 Qsource;
-		if ( HPWHCondenserDeltaT > 0.0 ) {
-			Qsource = SourceMassFlowRate * Cp * HPWHCondenserDeltaT;
+		if ( Qheatpump > 0.0 ) {
+			// heat pump water heater
+			if ( SourceMassFlowRate > 0.0 ) {
+				// pumped condenser
+				Qsource = Qheatpump;
+			} else {
+				// wrapped condenser
+				Qsource = Qheatpump * StratNode.HPWHWrappedCondenserHeatingFrac;
+			}
 		} else {
-			Qsource = SourceMassFlowRate * Cp * ( SourceInletTemp - NodeTemp );
+			// constant temperature source side flows
+			Qsource = SourceMassFlowRate * Cp * ( SourceInletTemp - StratNode.Temp );
 		}
 		return Qsource;
 	}
