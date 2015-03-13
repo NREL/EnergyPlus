@@ -519,13 +519,13 @@ namespace EnergyPlus {
 
 		// now apply the correct sizing factor depending on input option
 		sizingFac = 1.0;
-		if ( PlantSizData( plantLoopIndex ).SizingFactorOption == NoSizingFactorMode ) {
+		if ( PlantSizData( plantSizingIndex ).SizingFactorOption == NoSizingFactorMode ) {
 			sizingFac = 1.0;
-		} else if ( PlantSizData( plantLoopIndex ).SizingFactorOption == GlobalHeatingSizingFactorMode ) { 
+		} else if ( PlantSizData( plantSizingIndex ).SizingFactorOption == GlobalHeatingSizingFactorMode ) { 
 			sizingFac = GlobalHeatSizingFactor;
-		} else if ( PlantSizData( plantLoopIndex ).SizingFactorOption == GlobalCoolingSizingFactorMode ) {
+		} else if ( PlantSizData( plantSizingIndex ).SizingFactorOption == GlobalCoolingSizingFactorMode ) {
 			sizingFac = GlobalCoolSizingFactor;
-		} else if (  PlantSizData( plantLoopIndex ).SizingFactorOption == LoopComponentSizingFactorMode ) {
+		} else if (  PlantSizData( plantSizingIndex ).SizingFactorOption == LoopComponentSizingFactorMode ) {
 			//multiplier used for pumps, often 1.0, from component level sizing fractions
 			sizingFac = PlantLoop( plantLoopIndex ).LoopSide( SupplySide ).Branch( 1 ).PumpSizFac;
 		}
@@ -551,7 +551,7 @@ namespace EnergyPlus {
 
 		if ( setNewSizes ) {
 		// set new size values for rest of simulation
-			PlantSizData( plantLoopIndex ).DesVolFlowRate = newVolDesignFlowRate;
+			PlantSizData( plantSizingIndex ).DesVolFlowRate = newVolDesignFlowRate;
 
 			if (PlantLoop( plantLoopIndex ).MaxVolFlowRateWasAutoSized ) {
 				PlantLoop( plantLoopIndex ).MaxVolFlowRate = newVolDesignFlowRate;
