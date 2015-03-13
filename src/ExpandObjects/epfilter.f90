@@ -3481,13 +3481,16 @@ CHARACTER(len=*), INTENT(IN) :: stringIn
 
 IF (LEN_TRIM(stringIn) .GE. 1) THEN
   IF (VERIFY(TRIM(stringIn),'-0123456789.E+') .EQ. 0) THEN
-    READ(stringIn,*) StringToReal
+    READ(stringIn,*,ERR=2222) StringToReal
   ELSE
     StringToReal = 0
   END IF
 ELSE
   StringToReal = 0
 END IF
+RETURN
+
+2222 StringToReal = 0
 END FUNCTION
 
 !----------------------------------------------------------------------------------
