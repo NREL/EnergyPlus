@@ -4435,7 +4435,7 @@ namespace WaterThermalTanks {
 
 			if ( PlantFirstSizesOkayToFinalize ) {
 
-				if ( ( WaterThermalTank( WaterThermalTankNum ).ControlType == ControlTypeCycle ) ) {
+				if ( WaterThermalTank( WaterThermalTankNum ).ControlType == ControlTypeCycle ) {
 					WaterThermalTank( WaterThermalTankNum ).MinCapacity = WaterThermalTank( WaterThermalTankNum ).MaxCapacity;
 				}
 
