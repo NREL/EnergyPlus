@@ -312,7 +312,7 @@ namespace SimulationManager {
 
 		BeginFullSimFlag = true;
 		SimsDone = false;
-		if ( DoDesDaySim || DoWeathSim ) {
+		if ( DoDesDaySim || DoWeathSim || DoHVACSizingSimulation ) {
 			DoOutputReporting = true;
 		}
 		DoingSizing = false;

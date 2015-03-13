@@ -26,7 +26,7 @@
 #include <FluidProperties.hh>
 #include <PlantManager.hh>
 #include <SimulationManager.hh>
-
+#include <UtilityRoutines.hh>
 
 namespace EnergyPlus { 
 
@@ -216,23 +216,25 @@ namespace EnergyPlus {
 		hvacSizingSimulationManager->SetupSizingAnalyses();
 
 		DisplayString( "Beginning HVAC Sizing Simulation" );
+		DoingHVACSizingSimulations = true;
 		DoOutputReporting = true;
 
 		ResetEnvironmentCounter();
 
 		// iterations over set of sizing periods for HVAC sizing Simulation, will break out if no more are needed
-		for (HVACSizingIterCount = 1; HVACSizingIterCount <= HVACSizingSimMaxIterations; HVACSizingIterCount++) {
+		for ( HVACSizingIterCount = 1; HVACSizingIterCount <= HVACSizingSimMaxIterations; HVACSizingIterCount++ ) {
 		
-			//need to extend Environment structure array to distinguish the HVAC Sizing Simulation from the regular run of that sizing period, repeats for each set
-			AddDesignSetToEnvironmentStruct(HVACSizingIterCount);
+			//need to extend Environment structure array to distinguish the HVAC Sizing Simulations from the regular run of that sizing period, repeats for each set
+			AddDesignSetToEnvironmentStruct( HVACSizingIterCount );
 
 			WarmupFlag = true;
 			Available = true;
-			while (Available) {
+			for ( int i = 1; i <= NumOfEnvrn; i++ ) { // loop over environments
 
 				GetNextEnvironment(Available, ErrorsFound);
-				if (!Available) break;
 				if (ErrorsFound) break;
+				if (!Available) continue;
+
 				hvacSizingSimulationManager->sizingLogger.SetupSizingLogsNewEnvironment();
 
 			//	if (!DoDesDaySim)  continue; // not sure about this, may need to force users to set this on input for this method, but maybe not
@@ -350,6 +352,12 @@ namespace EnergyPlus {
 
 			} // ... End environment loop.
 
+
+			if ( ErrorsFound ) {
+				ShowFatalError( "Error condition occurred.  Previous Severe Errors cause termination." );
+			}
+
+
 			hvacSizingSimulationManager->PostProcessLogs();
 
 			hvacSizingSimulationManager->ProcessCoincidentPlantSizeAdjustments( HVACSizingIterCount );
@@ -367,6 +375,7 @@ namespace EnergyPlus {
 
 		WarmupFlag = false;
 		DoOutputReporting = true;
+		DoingHVACSizingSimulations = false;
 		hvacSizingSimulationManager.reset(); // delete/reset unique_ptr
 	}
 }

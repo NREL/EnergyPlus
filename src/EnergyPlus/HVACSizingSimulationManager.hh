@@ -28,6 +28,7 @@
 #include <FluidProperties.hh>
 #include <PlantManager.hh>
 #include <SimulationManager.hh>
+#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 

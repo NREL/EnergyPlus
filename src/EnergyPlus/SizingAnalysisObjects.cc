@@ -434,7 +434,7 @@ namespace EnergyPlus {
 		int loopIndex,
 		int nodeNum,
 		Real64 density,
-			Real64 cp,
+		Real64 cp,
 		int numStepsInAvg,
 		int sizingIndex ) 
 	{
@@ -469,9 +469,9 @@ namespace EnergyPlus {
 		using DataHVACGlobals::SmallWaterVolFlow;
 		Real64 PeakDemandReturnTemp;
 		Real64 PeakDemandMassFlow;
-		bool SetNewSizes;
-		Real64 SizingFac;
-		Real64 NormalizedChange;
+		bool setNewSizes;
+		Real64 sizingFac;
+		Real64 normalizedChange;
 		Real64 newFoundVolFlowRate;
 		Real64 peakLoadCalculatedMassFlow;
 		std::string chIteration;
@@ -480,6 +480,16 @@ namespace EnergyPlus {
 		static gio::Fmt fmtA( "(A)" );
 		bool changedByDemand( false );
 		bool static eioHeaderDoneOnce( false );
+		bool nullStampProblem;
+
+		// first make sure we have valid time stamps to work with
+		if ( CheckTimeStampForNull ( newFoundMassFlowRateTimeStamp ) 
+				|| CheckTimeStampForNull ( NewFoundMaxDemandTimeStamp ) ) {
+			// problem, don't have valid stamp, don't have any info to report either
+			nullStampProblem =  true;
+		} else {
+			nullStampProblem =  false;
+		}
 
 		previousVolDesignFlowRate	= PlantSizData( plantLoopIndex ).DesVolFlowRate;
 
@@ -508,40 +518,38 @@ namespace EnergyPlus {
 		newFoundVolFlowRate = newFoundMassFlowRate / densityForSizing;
 
 		// now apply the correct sizing factor depending on input option
-		SizingFac = 1.0;
+		sizingFac = 1.0;
 		if ( PlantSizData( plantLoopIndex ).SizingFactorOption == NoSizingFactorMode ) {
-			SizingFac = 1.0;
+			sizingFac = 1.0;
 		} else if ( PlantSizData( plantLoopIndex ).SizingFactorOption == GlobalHeatingSizingFactorMode ) { 
-			SizingFac = GlobalHeatSizingFactor;
+			sizingFac = GlobalHeatSizingFactor;
 		} else if ( PlantSizData( plantLoopIndex ).SizingFactorOption == GlobalCoolingSizingFactorMode ) {
-			SizingFac = GlobalCoolSizingFactor;
+			sizingFac = GlobalCoolSizingFactor;
 		} else if (  PlantSizData( plantLoopIndex ).SizingFactorOption == LoopComponentSizingFactorMode ) {
 			//multiplier used for pumps, often 1.0, from component level sizing fractions
-			SizingFac = PlantLoop( plantLoopIndex ).LoopSide( SupplySide ).Branch( 1 ).PumpSizFac;
+			sizingFac = PlantLoop( plantLoopIndex ).LoopSide( SupplySide ).Branch( 1 ).PumpSizFac;
 		}
 
-		newAdjustedMassFlowRate		= newFoundMassFlowRate * SizingFac; // apply overall heating or cooling sizing factor
+		newAdjustedMassFlowRate		= newFoundMassFlowRate * sizingFac; // apply overall heating or cooling sizing factor
 
 		newVolDesignFlowRate		= newAdjustedMassFlowRate / densityForSizing;
 
 		//compare threshold, 
-		SetNewSizes = false;
-		NormalizedChange = 0.0;
-		if (   ( newVolDesignFlowRate > SmallWaterVolFlow ) // do not use zero size
-//			&& ( newVolDesignFlowRate < previousVolDesignFlowRate )// assume only shrink size from noncoincident? nah
-			)  { 
+		setNewSizes = false;
+		normalizedChange = 0.0;
+		if ( newVolDesignFlowRate > SmallWaterVolFlow && ! nullStampProblem ) {// do not use zero size or bad stamp data
 
-			NormalizedChange = std::abs((newVolDesignFlowRate - previousVolDesignFlowRate) 
+			normalizedChange = std::abs((newVolDesignFlowRate - previousVolDesignFlowRate) 
 									/ previousVolDesignFlowRate);
-			if (NormalizedChange > significantNormalizedChange ) {
+			if (normalizedChange > significantNormalizedChange ) {
 				anotherIterationDesired = true;
-				SetNewSizes = true;
+				setNewSizes = true;
 			} else {
 				anotherIterationDesired = false;
 			}
 		}
 
-		if ( SetNewSizes ) {
+		if ( setNewSizes ) {
 		// set new size values for rest of simulation
 			PlantSizData( plantLoopIndex ).DesVolFlowRate = newVolDesignFlowRate;
 
@@ -558,11 +566,11 @@ namespace EnergyPlus {
 
 		// add a seperate eio summary report about what happened, did demand trap get used, what were the key values.
 		if (! eioHeaderDoneOnce ){
-			gio::write( OutputFileInits, fmtA ) << "! <Plant Sizing Coincident Flow Algorithm>,Plant Loop Name, Sizing Pass {#},Measured Mass Flow{kg/s},Measured Demand {W},Demand Calculated Mass Flow{kg/s},Sizes Changed {Yes/No},Previous Volume Flow Rate {m3/s},New Volume Flow Rate {m3/s},Demand Check Applied {Yes/No},Sizing Factor {},Normalized Change {},Specific Heat{J/kg-K}";
+			gio::write( OutputFileInits, fmtA ) << "! <Plant Coincident Sizing Algorithm>,Plant Loop Name,Sizing Pass {#},Measured Mass Flow{kg/s},Measured Demand {W},Demand Calculated Mass Flow{kg/s},Sizes Changed {Yes/No},Previous Volume Flow Rate {m3/s},New Volume Flow Rate {m3/s},Demand Check Applied {Yes/No},Sizing Factor {},Normalized Change {},Specific Heat{J/kg-K},Density {kg/m3}";
 			eioHeaderDoneOnce = true;
 		}
 		chIteration = TrimSigDigits(HVACSizingIterCount);
-		if ( SetNewSizes ) {
+		if ( setNewSizes ) {
 			chSetSizes = "Yes";
 		} else {
 			chSetSizes = "No";
@@ -573,7 +581,7 @@ namespace EnergyPlus {
 			chDemandTrapUsed = "No";
 		}
 
-		gio::write( OutputFileInits, fmtA ) << " Plant Sizing Coincident Flow Algorithm," 
+		gio::write( OutputFileInits, fmtA ) << "Plant Coincident Sizing Algorithm," 
 				+ name + ","
 				+ chIteration + "," 
 				+ RoundSigDigits( newFoundMassFlowRateTimeStamp.runningAvgDataValue, 7 ) + ","
@@ -583,11 +591,10 @@ namespace EnergyPlus {
 				+ RoundSigDigits( previousVolDesignFlowRate , 6 ) + ","
 				+ RoundSigDigits( newVolDesignFlowRate, 6 ) + ","
 				+ chDemandTrapUsed + ","
-				+ RoundSigDigits( SizingFac, 4) + ","
-				+ RoundSigDigits( NormalizedChange, 6 ) + ","
-				+ RoundSigDigits( specificHeatForSizing, 4 ) ;
-
-
+				+ RoundSigDigits( sizingFac, 4) + ","
+				+ RoundSigDigits( normalizedChange, 6 ) + ","
+				+ RoundSigDigits( specificHeatForSizing, 4 ) +","
+				+ RoundSigDigits( densityForSizing, 4) ;
 
 		//report to sizing summary table called Plant Loop Coincident Design Fluid Flow Rates
 
@@ -595,16 +602,49 @@ namespace EnergyPlus {
 		PreDefTableEntry( pdchPlantSizMeasVdot, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , newFoundVolFlowRate , 6 );
 		PreDefTableEntry( pdchPlantSizCalcVdot, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , newVolDesignFlowRate , 6 );
 
-		if (SetNewSizes) {
+		if (setNewSizes) {
 			PreDefTableEntry( pdchPlantSizCoincYesNo, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , "Yes" );
 		} else {
 			PreDefTableEntry( pdchPlantSizCoincYesNo, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , "No" );
 		}
 
-		PreDefTableEntry( pdchPlantSizDesDay, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , Environment(newFoundMassFlowRateTimeStamp.envrnNum).Title );
-		PreDefTableEntry( pdchPlantSizPkTimeDayOfSim, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , newFoundMassFlowRateTimeStamp.dayOfSim );
-		PreDefTableEntry( pdchPlantSizPkTimeHour, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , newFoundMassFlowRateTimeStamp.hourOfDay - 1 );
-		PreDefTableEntry( pdchPlantSizPkTimeMin, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , newFoundMassFlowRateTimeStamp.stepStartMinute, 0 );
+		if ( newFoundMassFlowRateTimeStamp.envrnNum > 0 ) { // protect against invalid index
+			PreDefTableEntry( pdchPlantSizDesDay, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , Environment(newFoundMassFlowRateTimeStamp.envrnNum).Title );
+		}
+		if ( ! nullStampProblem ) {
+			if ( ! changedByDemand ) {
+				PreDefTableEntry( pdchPlantSizPkTimeDayOfSim, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration ,
+					newFoundMassFlowRateTimeStamp.dayOfSim );
+				PreDefTableEntry( pdchPlantSizPkTimeHour, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration ,
+					newFoundMassFlowRateTimeStamp.hourOfDay - 1 );
+				PreDefTableEntry( pdchPlantSizPkTimeMin, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration ,
+					newFoundMassFlowRateTimeStamp.stepStartMinute, 0 );
+			} else {
+				PreDefTableEntry( pdchPlantSizPkTimeDayOfSim, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration ,
+					NewFoundMaxDemandTimeStamp.dayOfSim );
+				PreDefTableEntry( pdchPlantSizPkTimeHour, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration ,
+					NewFoundMaxDemandTimeStamp.hourOfDay - 1 );
+				PreDefTableEntry( pdchPlantSizPkTimeMin, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration ,
+					NewFoundMaxDemandTimeStamp.stepStartMinute, 0 );
+			}
+		}
+	}
+
+	bool PlantCoinicidentAnalysis::CheckTimeStampForNull(
+		ZoneTimestepObject testStamp
+	){
 	
+		bool isNull;
+
+		isNull = true;
+
+		if ( testStamp.envrnNum != 0 ) {
+			isNull = false;
+		}
+		if ( testStamp.kindOfSim != 0 ) {
+			isNull = false;
+		}
+	
+		return isNull;
 	}
 }

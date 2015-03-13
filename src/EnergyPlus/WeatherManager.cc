@@ -621,11 +621,11 @@ namespace WeatherManager {
 					ShowSevereError( "Weather Simulation requested, but no weather file attached." );
 					ErrorsFound = true;
 				}
-				Envrn = 0;
+				if ( ! DoingHVACSizingSimulations) Envrn = 0;
 				Available = false;
 			} else if ( ( KindOfSim == ksRunPeriodWeather ) && ( ! WeatherFileExists && ! DoWeathSim ) ) {
 				Available = false;
-				Envrn = 0;
+				if ( ! DoingHVACSizingSimulations) Envrn = 0;
 			} else if ( ( KindOfSim == ksRunPeriodWeather ) && DoingSizing ) {
 				Available = false;
 				Envrn = 0;

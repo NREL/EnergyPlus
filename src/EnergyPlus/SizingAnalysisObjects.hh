@@ -186,6 +186,9 @@ private:
 	Real64 previousVolDesignFlowRate = 0.0;
 	Real64 newVolDesignFlowRate = 0.0;
 
+	bool CheckTimeStampForNull (
+		ZoneTimestepObject testStamp
+	);
 };
 
 }
