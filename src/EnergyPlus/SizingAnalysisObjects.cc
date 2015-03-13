@@ -491,7 +491,7 @@ namespace EnergyPlus {
 			nullStampProblem =  false;
 		}
 
-		previousVolDesignFlowRate	= PlantSizData( plantLoopIndex ).DesVolFlowRate;
+		previousVolDesignFlowRate	= PlantSizData( plantSizingIndex ).DesVolFlowRate;
 
 		if (newFoundMassFlowRateTimeStamp.runningAvgDataValue > 0.0 ) {
 			newFoundMassFlowRate		= newFoundMassFlowRateTimeStamp.runningAvgDataValue;
@@ -608,11 +608,11 @@ namespace EnergyPlus {
 			PreDefTableEntry( pdchPlantSizCoincYesNo, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , "No" );
 		}
 
-		if ( newFoundMassFlowRateTimeStamp.envrnNum > 0 ) { // protect against invalid index
-			PreDefTableEntry( pdchPlantSizDesDay, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , Environment(newFoundMassFlowRateTimeStamp.envrnNum).Title );
-		}
 		if ( ! nullStampProblem ) {
 			if ( ! changedByDemand ) {
+				if ( newFoundMassFlowRateTimeStamp.envrnNum > 0 ) { // protect against invalid index
+					PreDefTableEntry( pdchPlantSizDesDay, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , Environment(newFoundMassFlowRateTimeStamp.envrnNum).Title );
+				}
 				PreDefTableEntry( pdchPlantSizPkTimeDayOfSim, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration ,
 					newFoundMassFlowRateTimeStamp.dayOfSim );
 				PreDefTableEntry( pdchPlantSizPkTimeHour, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration ,
@@ -620,6 +620,9 @@ namespace EnergyPlus {
 				PreDefTableEntry( pdchPlantSizPkTimeMin, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration ,
 					newFoundMassFlowRateTimeStamp.stepStartMinute, 0 );
 			} else {
+				if ( NewFoundMaxDemandTimeStamp.envrnNum > 0 ) { // protect against invalid index
+					PreDefTableEntry( pdchPlantSizDesDay, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration , Environment(NewFoundMaxDemandTimeStamp.envrnNum).Title );
+				}
 				PreDefTableEntry( pdchPlantSizPkTimeDayOfSim, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration ,
 					NewFoundMaxDemandTimeStamp.dayOfSim );
 				PreDefTableEntry( pdchPlantSizPkTimeHour, PlantLoop( plantLoopIndex ).Name + " Sizing Pass " + chIteration ,

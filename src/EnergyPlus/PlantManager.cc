@@ -3308,11 +3308,7 @@ namespace PlantManager {
 		bool ReSize;
 
 		Real64 FluidDensity( 0.0 ); // local value from glycol routine
-//		bool Finalize;
 
-		bool RunHasNoHVACSizingSimulation;
-
-//		Finalize = OkayToFinish;
 		PlantSizNum = 0;
 		ErrorsFound = false;
 
@@ -3325,7 +3321,7 @@ namespace PlantManager {
 		ReSize = false;
 
 		PlantSizNum = PlantLoop( LoopNum ).PlantSizNum;
-//		PlantSizeFac = PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( 1 ).PumpSizFac;
+
 		// fill PlantSizFac from data structure
 		for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( SupplySide ).TotalBranches; ++BranchNum ) {
 			if ( PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNumIn == PlantLoop( LoopNum ).LoopSide( SupplySide ).Branch( BranchNum ).NodeNumIn ) {
