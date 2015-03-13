@@ -3,6 +3,7 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src/EnergyPlus )
 
 set( test_src
   AdvancedAFN.unit.cc
+  AirflowNetworkSolver.unit.cc
   DataPlant.unit.cc
   DataZoneEquipment.unit.cc
   DXCoils.unit.cc
@@ -11,8 +12,9 @@ set( test_src
   FluidCoolers.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
-  HVACStandaloneERV.unit.cc
   Humidifiers.unit.cc
+  HVACStandaloneERV.unit.cc
+  ManageElectricPower.unit.cc
   MixedAir.unit.cc
   PurchasedAirManager.unit.cc
   OutputProcessor.unit.cc
