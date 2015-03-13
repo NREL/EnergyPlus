@@ -60,6 +60,7 @@ IF(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU")
   ELSE()
     SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
     SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffree-line-length-none")
+    SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fbounds-check")
   ENDIF()
 ENDIF()
 

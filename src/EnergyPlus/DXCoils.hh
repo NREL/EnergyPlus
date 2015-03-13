@@ -417,6 +417,7 @@ namespace DXCoils {
 		// (function of actual supply air flow vs rated air flow)
 		int SHRFTempCurveType2; // type of curve for SHRFTemp (cubic,quadratic,bi-quadratic)
 		bool UserSHRCurveExists; // TRUE if user specified SHR modifier curve exists
+		bool ASHRAE127StdRprt; // TRUE if user wishes to report ASHRAE 127 standard ratings
 
 		// Default Constructor
 		DXCoilData() :
@@ -614,7 +615,8 @@ namespace DXCoils {
 			SHRFTemp2( 0 ),
 			SHRFFlow2( 0 ),
 			SHRFTempCurveType2( 0 ),
-			UserSHRCurveExists( false )
+			UserSHRCurveExists( false ),
+			ASHRAE127StdRprt( false )
 		{}
 
 		// Member Constructor
@@ -852,7 +854,8 @@ namespace DXCoils {
 			int const SHRFTemp2, // index of sensible heat ratio modifier curve
 			int const SHRFFlow2, // index of sensible heat ratio modifier curve
 			int const SHRFTempCurveType2, // type of curve for SHRFTemp (cubic,quadratic,bi-quadratic)
-			bool const UserSHRCurveExists // TRUE if user specified SHR modifier curve exists
+			bool const UserSHRCurveExists, // TRUE if user specified SHR modifier curve exists
+			bool const ASHRAE127StdRprt // TRUE if user wishes to report ASHRAE 127 standard ratings
 		) :
 			Name( Name ),
 			DXCoilType( DXCoilType ),
@@ -1087,7 +1090,8 @@ namespace DXCoils {
 			SHRFTemp2( SHRFTemp2 ),
 			SHRFFlow2( SHRFFlow2 ),
 			SHRFTempCurveType2( SHRFTempCurveType2 ),
-			UserSHRCurveExists( UserSHRCurveExists )
+			UserSHRCurveExists( UserSHRCurveExists ),
+			ASHRAE127StdRprt( ASHRAE127StdRprt )
 		{}
 
 	};

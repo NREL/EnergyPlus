@@ -2211,7 +2211,7 @@ namespace InternalHeatGains {
 				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
-				GetObjectItem( CurrentModuleObject, Item, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				GetObjectItem( CurrentModuleObject, Loop, AlphaName, NumAlpha, IHGNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 				ZoneITEq( Loop ).Name = AlphaName( 1 );
 				ZoneITEq( Loop ).ZonePtr = FindItemInList( AlphaName( 2 ), Zone.Name( ), NumOfZones );
@@ -2222,6 +2222,9 @@ namespace InternalHeatGains {
 					ZoneITEq( Loop ).DesignTotalPower = IHGNumbers( 1 ) * IHGNumbers( 2 );
 					if ( lNumericFieldBlanks( 1 ) ) {
 						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 IT Equipment will result." );
+					}
+					if ( lNumericFieldBlanks( 2 ) ) {
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 IT Equipment will result." );
 					}
 
 				} else if ( equipmentLevel == "WATTS/AREA" ) {
@@ -2241,11 +2244,9 @@ namespace InternalHeatGains {
 					}
 
 				} else {
-					if ( Item1 == 1 ) {
-						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 4 ) + ", value  =" + AlphaName( 4 ) );
-						ShowContinueError( "...Valid values are \"Watts/Unit\" or \"Watts/Area\"." );
-						ErrorsFound = true;
-					}
+					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + ", value  =" + AlphaName( 3 ) );
+					ShowContinueError( "...Valid values are \"Watts/Unit\" or \"Watts/Area\"." );
+					ErrorsFound = true;
 				}}
 
 				if ( lAlphaFieldBlanks( 4 ) ) {
@@ -2496,7 +2497,7 @@ namespace InternalHeatGains {
 				// SetupEMSInternalVariable( "Plug and Process Power Design Level", ZoneITEq( Loop ).Name, "[W]", ZoneITEq( Loop ).DesignTotalPower );
 				// } // EMS
 
-				if ( !ErrorsFound ) SetupZoneInternalGain( ZoneITEq( Loop ).ZonePtr, "ElectricEquipment:ITE:AirCooled", ZoneITEq( Loop ).Name, IntGainTypeOf_ElectricEquipment, ZoneITEq( Loop ).ConGainRateToZone );
+				if ( !ErrorsFound ) SetupZoneInternalGain( ZoneITEq( Loop ).ZonePtr, "ElectricEquipment:ITE:AirCooled", ZoneITEq( Loop ).Name, IntGainTypeOf_ElectricEquipmentITEAirCooled, ZoneITEq( Loop ).ConGainRateToZone );
 
 			} // Item - Number of ZoneITEq objects
 		} // Check on number of ZoneITEq

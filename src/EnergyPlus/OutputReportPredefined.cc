@@ -89,6 +89,17 @@ namespace OutputReportPredefined {
 	int pdchDXCoolCoilEERIP; // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
 	int pdchDXCoolCoilIEERIP; // IEER value in IP unit at AHRI std. 340/360 conditions
 
+	// DX Cooling Coil subtable per ANSI/ASHRAE Std 127 for Tests A, B, C and D
+	int pdstDXCoolCoil2;
+	int pdchDXCoolCoilNetCapSIA; // Standard Rated (Net) Cooling Capacity [W], Test A
+	int pdchDXCoolCoilElecPowerA; // Standard Rated Electric Power [W], Test A
+	int pdchDXCoolCoilNetCapSIB; // Standard Rated (Net) Cooling Capacity [W], Test B
+	int pdchDXCoolCoilElecPowerB; // Standard Rated Electric Power [W], Test B
+	int pdchDXCoolCoilNetCapSIC; // Standard Rated (Net) Cooling Capacity [W], Test C
+	int pdchDXCoolCoilElecPowerC; // Standard Rated Electric Power [W], Test C
+	int pdchDXCoolCoilNetCapSID; // Standard Rated (Net) Cooling Capacity [W], Test D
+	int pdchDXCoolCoilElecPowerD; // Standard Rated Electric Power [W], Test D
+
 	// VAV DX Cooling Ratings Details
 	int pdstVAVDXCoolCoil; // details for Packaged VAV rating under AHRI 340/360
 	int pdchVAVDXCoolCoilType;
@@ -876,6 +887,18 @@ namespace OutputReportPredefined {
 		pdchDXCoolCoilEERIP = newPreDefColumn( pdstDXCoolCoil, "EER [Btu/W-h]" );
 		pdchDXCoolCoilSEERIP = newPreDefColumn( pdstDXCoolCoil, "SEER [Btu/W-h]" );
 		pdchDXCoolCoilIEERIP = newPreDefColumn( pdstDXCoolCoil, "IEER [Btu/W-h]" );
+
+		// for DX Cooling Coil ASHRAE 127-12 Report
+		pdstDXCoolCoil2 = newPreDefSubTable( pdrEquip, "DX Cooling Coil ASHRAE 127 Standard Ratings Report" );
+		pdchDXCoolCoilType = newPreDefColumn( pdstDXCoolCoil2, "DX Cooling Coil Type" );
+		pdchDXCoolCoilNetCapSIA = newPreDefColumn( pdstDXCoolCoil2, "Rated Net Cooling Capacity Test A [W]" );
+		pdchDXCoolCoilElecPowerA = newPreDefColumn( pdstDXCoolCoil2, "Rated Electric Power Test A [W]" );
+		pdchDXCoolCoilNetCapSIB = newPreDefColumn( pdstDXCoolCoil2, "Rated Net Cooling Capacity Test B [W]" );
+		pdchDXCoolCoilElecPowerB = newPreDefColumn( pdstDXCoolCoil2, "Rated Electric Power Test B [W]" );
+		pdchDXCoolCoilNetCapSIC = newPreDefColumn( pdstDXCoolCoil2, "Rated Net Cooling Capacity Test C [W]" );
+		pdchDXCoolCoilElecPowerC = newPreDefColumn( pdstDXCoolCoil2, "Rated Electric Power Test C [W]" );
+		pdchDXCoolCoilNetCapSID = newPreDefColumn( pdstDXCoolCoil2, "Rated Net Cooling Capacity Test D [W]" );
+		pdchDXCoolCoilElecPowerD = newPreDefColumn( pdstDXCoolCoil2, "Rated Electric Power Test D [W]" );
 
 		pdstDXHeatCoil = newPreDefSubTable( pdrEquip, "DX Heating Coils" );
 		pdchDXHeatCoilType = newPreDefColumn( pdstDXHeatCoil, "DX Heating Coil Type" );
