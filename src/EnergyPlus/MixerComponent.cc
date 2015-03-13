@@ -61,6 +61,7 @@ namespace MixerComponent {
 	int NumMixers( 0 ); // The Number of Mixers found in the Input
 	int LoopInletNode( 0 );
 	int LoopOutletNode( 0 );
+	static bool GetInputFlag( true ); // Flag set to make sure you get input once
 	FArray1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Mixers
@@ -621,6 +622,73 @@ namespace MixerComponent {
 	}
 
 	//        End of Reporting subroutines for the Mixer Module
+
+	// Beginning of Utility subroutines for the Mixer Component
+	// *****************************************************************************
+
+	void
+		GetZoneMixerIndex(
+		std::string const & MixerName,
+		int & MixerIndex,
+		bool & ErrorsFound,
+		Optional_string_const ThisObjectType
+		)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Fred Buhl
+		//       DATE WRITTEN   March 2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine sets an index for a given zone mixer -- issues error message if that mixer
+		// is not legal mixer.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		// na
+		if ( GetInputFlag ) { //First time subroutine has been entered
+			GetMixerInput();
+			GetInputFlag = false;
+		}
+
+		MixerIndex = FindItemInList( MixerName, MixerCond.MixerName(), NumMixers );
+		if ( MixerIndex == 0 ) {
+			if ( present( ThisObjectType ) ) {
+				ShowSevereError( ThisObjectType() + ", GetZoneMixerIndex: Zone Mixer not found=" + MixerName );
+			}
+			else {
+				ShowSevereError( "GetZoneMixerIndex: Zone Mixer not found=" + MixerName );
+			}
+			ErrorsFound = true;
+		}
+
+	}
+
+	// End of Utility subroutines for the Mixer Component
+	// *****************************************************************************
+
 	// *****************************************************************************
 
 	//     NOTICE
