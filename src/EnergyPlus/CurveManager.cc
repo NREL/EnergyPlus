@@ -2632,7 +2632,6 @@ namespace CurveManager {
 		std::string NextLine; // Line of data
 		int DataSetCount( 0 ); // counter for number of lines read (used in some error messages)
 		int ReadStat; // File read status
-		bool EOFonFile; // True if EOF during file read
 		int I; // Do loop indexes and data set counter
 		int J;
 		int NumDataSets;
@@ -3337,7 +3336,6 @@ namespace CurveManager {
 		}
 
 Label1000: ;
-		EOFonFile = true;
 		if ( ReadFromFile ) gio::close( FileNum );
 
 		if ( TotalDataSets < DataSetCount ) {
@@ -3713,10 +3711,6 @@ Label999: ;
 		Real64 TempX1High;
 		Real64 TempX2Low;
 		Real64 TempX2High;
-		//INTEGER   :: ATempX1LowPtr(1)
-		//INTEGER   :: ATempX1HighPtr(1)
-		//INTEGER   :: ATempX2LowPtr(1)
-		//INTEGER   :: ATempX2HighPtr(1)
 		int TempX1LowPtr( 0 );
 		int TempX1HighPtr( 0 );
 		int TempX2LowPtr( 0 );
@@ -3725,7 +3719,6 @@ Label999: ;
 		Real64 X2Frac;
 		Real64 X1ValLow;
 		Real64 X1ValHigh;
-		//INTEGER   :: MaxSizeArray
 		int X1Val;
 		int X2Val;
 		int TableIndex;
@@ -5421,7 +5414,6 @@ Label999: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int TempCurveIndex;
-		bool FoundCurve;
 		std::string GenericCurveType;
 
 		//If input is not gotten, go ahead and get it now
@@ -5432,7 +5424,6 @@ Label999: ;
 		}
 
 		//Initialize
-		FoundCurve = false;
 		PressureCurveType = PressureCurve_None;
 		PressureCurveIndex = 0;
 

@@ -260,6 +260,8 @@ namespace Psychrometrics {
 		// This formulation currently does not use W since it returns results that are in J/kg and the
 		//  amount of energy is on a per unit of moisture basis.
 
+		UNUSED( w );
+
 		Real64 const Temperature( max( T, 0.0 ) ); // input temperature {Celsius} - corrected for >= 0C
 		return ( 2500940.0 + 1858.95 * Temperature ) - ( 4180.0 * Temperature ); // enthalpy of the gas - enthalpy of the fluid
 	}
@@ -288,6 +290,8 @@ namespace Psychrometrics {
 
 		// This formulation currently does not use W since it returns results that are in J/kg and the
 		//  amount of energy is on a per unit of moisture basis.
+
+		UNUSED( w );
 
 		return 2500940.0 + 1858.95 * T; // enthalpy of the gas {units?}
 	}
@@ -1242,6 +1246,8 @@ namespace Psychrometrics {
 		// PURPOSE OF THIS FUNCTION:
 		// This function provides the specific heat of chilled water. CPCW (J/Kg/k)
 
+		UNUSED( Temperature );
+
 		return 4180.0;
 	}
 
@@ -1257,6 +1263,8 @@ namespace Psychrometrics {
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function provides the specific heat of hot water. CPHW (J/Kg/k)
+
+		UNUSED( Temperature );
 
 		return 4180.0;
 	}

@@ -138,7 +138,6 @@ namespace ChillerReformulatedEIR {
 
 	void
 	SimReformulatedEIRChiller(
-		std::string const & EIRChillerType, // Type of chiller !unused1208
 		std::string const & EIRChillerName, // User specified name of chiller
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // Chiller number pointer
@@ -939,7 +938,6 @@ namespace ChillerReformulatedEIR {
 		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
 		int PltSizCondNum; // Plant Sizing index for condenser loop
 		bool ErrorsFound; // If errors detected in input
-		bool LoopErrorsFound; // Plant loop errors found
 		Real64 SizingEvapOutletTemp; // Plant Sizing outlet temperature for CurLoopNum [C]
 		Real64 SizingCondOutletTemp; // Plant Sizing outlet temperature for condenser loop [C]
 		Real64 RefCapFT; // Capacity as a function of temperature curve output used for sizing
@@ -1418,7 +1416,7 @@ namespace ChillerReformulatedEIR {
 		Real64 CondTempMax; // Condenser outlet temperature when using Tmax as input to CalcReformEIRChillerModel [C]
 
 		if ( MyLoad >= 0.0 || ! RunFlag ) {
-			CalcReformEIRChillerModel( EIRChillNum, MyLoad, RunFlag, FirstIteration, EquipFlowCtrl, Node( ElecReformEIRChiller( EIRChillNum ).CondInletNodeNum ).Temp );
+			CalcReformEIRChillerModel( EIRChillNum, MyLoad, RunFlag, EquipFlowCtrl, Node( ElecReformEIRChiller( EIRChillNum ).CondInletNodeNum ).Temp );
 		} else {
 
 			//  Find min/max condenser outlet temperature used by curve objects
@@ -1442,9 +1440,9 @@ namespace ChillerReformulatedEIR {
 			}
 
 			//  Check that condenser outlet temperature is within curve object limits prior to calling RegulaFalsi
-			CalcReformEIRChillerModel( EIRChillNum, MyLoad, RunFlag, FirstIteration, EquipFlowCtrl, Tmin );
+			CalcReformEIRChillerModel( EIRChillNum, MyLoad, RunFlag, EquipFlowCtrl, Tmin );
 			CondTempMin = CondOutletTemp;
-			CalcReformEIRChillerModel( EIRChillNum, MyLoad, RunFlag, FirstIteration, EquipFlowCtrl, Tmax );
+			CalcReformEIRChillerModel( EIRChillNum, MyLoad, RunFlag, EquipFlowCtrl, Tmax );
 			CondTempMax = CondOutletTemp;
 
 			if ( CondTempMin > Tmin && CondTempMax < Tmax ) {
@@ -1486,12 +1484,12 @@ namespace ChillerReformulatedEIR {
 							ShowRecurringWarningErrorAtEnd( ElecReformEIRChiller( EIRChillNum ).Name + ": Solution is not found in calculating condenser outlet temperature.", ElecReformEIRChiller( EIRChillNum ).IterFailedIndex, CondOutletTemp, CondOutletTemp );
 						}
 					}
-					CalcReformEIRChillerModel( EIRChillNum, MyLoad, RunFlag, FirstIteration, EquipFlowCtrl, Node( ElecReformEIRChiller( EIRChillNum ).CondInletNodeNum ).Temp );
+					CalcReformEIRChillerModel( EIRChillNum, MyLoad, RunFlag, EquipFlowCtrl, Node( ElecReformEIRChiller( EIRChillNum ).CondInletNodeNum ).Temp );
 				}
 			} else {
 				//    If iteration is not possible, average the min/max condenser outlet temperature and manually determine solution
-				CalcReformEIRChillerModel( EIRChillNum, MyLoad, RunFlag, FirstIteration, EquipFlowCtrl, ( CondTempMin + CondTempMax ) / 2.0 );
-				CalcReformEIRChillerModel( EIRChillNum, MyLoad, RunFlag, FirstIteration, EquipFlowCtrl, CondOutletTemp );
+				CalcReformEIRChillerModel( EIRChillNum, MyLoad, RunFlag, EquipFlowCtrl, ( CondTempMin + CondTempMax ) / 2.0 );
+				CalcReformEIRChillerModel( EIRChillNum, MyLoad, RunFlag, EquipFlowCtrl, CondOutletTemp );
 			}
 
 			//  Call subroutine to evaluate all performance curve min/max values against evaporator/condenser outlet temps and PLR
@@ -1540,15 +1538,11 @@ namespace ChillerReformulatedEIR {
 		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int CondInletNode; // Condenser inlet node number
-		int CondOutletNode; // Condenser outlet node number
 		int HeatRecInNode; // Node number for heat recovery water inlet node
-		int HeatRecOutNode; // Node number for heat recovery water outlet node
 		Real64 QTotal; // Total condenser heat [W]
 		//  REAL(r64)    :: QCondTmp            ! Total condenser heat based on average temperatures [W]
 		Real64 HeatRecInletTemp; // Heat reclaim inlet temp [C]
 		Real64 HeatRecMassFlowRate; // Heat reclaim mass flow rate [m3/s]
-		Real64 FracHeatRec; // Fraction of condenser heat reclaimed
 		Real64 TAvgIn; // Average inlet temperature of heat reclaim inlet and condenser inlet [C]
 		Real64 TAvgOut; // Average outlet temperature [C]
 		Real64 CpHeatRec; // Heat reclaim water inlet specific heat [J/kg-K]
@@ -1559,9 +1553,6 @@ namespace ChillerReformulatedEIR {
 
 		// Begin routine
 		HeatRecInNode = ElecReformEIRChiller( EIRChillNum ).HeatRecInletNodeNum;
-		HeatRecOutNode = ElecReformEIRChiller( EIRChillNum ).HeatRecOutletNodeNum;
-		CondInletNode = ElecReformEIRChiller( EIRChillNum ).CondInletNodeNum;
-		CondOutletNode = ElecReformEIRChiller( EIRChillNum ).CondOutletNodeNum;
 
 		// inlet node to the heat recovery heat exchanger
 		HeatRecInletTemp = Node( HeatRecInNode ).Temp;
@@ -1815,7 +1806,7 @@ namespace ChillerReformulatedEIR {
 		//FlowLock = INT(Par(5))   !DSU
 		EquipFlowCtrl = int( Par( 6 ) );
 
-		CalcReformEIRChillerModel( EIRChillNum, MyLoad, RunFlag, FirstIteration, EquipFlowCtrl, FalsiCondOutTemp );
+		CalcReformEIRChillerModel( EIRChillNum, MyLoad, RunFlag, EquipFlowCtrl, FalsiCondOutTemp );
 		CondOutTempResidual = FalsiCondOutTemp - CondOutletTemp; // CondOutletTemp is module level variable, final value used for reporting
 
 		return CondOutTempResidual;
@@ -1827,7 +1818,6 @@ namespace ChillerReformulatedEIR {
 		int const EIRChillNum, // Chiller number
 		Real64 & MyLoad, // Operating load [W]
 		bool const RunFlag, // TRUE when chiller operating
-		bool const FirstIteration, // TRUE when first iteration of timestep !unused1208
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		Real64 const FalsiCondOutTemp // RegulaFalsi condenser outlet temperature result [C]
 	)
@@ -1895,7 +1885,6 @@ namespace ChillerReformulatedEIR {
 		Real64 MinPartLoadRat; // Minimum allowed operating fraction of full load
 		Real64 MinUnloadRat; // Minimum allowed unloading fraction of full load
 		Real64 MaxPartLoadRat; // Maximum allowed operating fraction of full load
-		Real64 EvapInletTemp; // Evaporator inlet temperature [C]
 		Real64 CondInletTemp; // Condenser inlet temperature [C]
 		Real64 EvapOutletTempSetPoint( 0.0 ); // Evaporator outlet temperature setpoint [C]
 		Real64 AvailChillerCap; // Chiller available capacity [W]
@@ -1928,11 +1917,6 @@ namespace ChillerReformulatedEIR {
 		int CompNum;
 		Real64 Cp; // Local fluid specific heat
 
-		//  REAL(r64),SAVE         :: TimeStepSysLast=0.0     ! last system time step (used to check for downshifting)
-		//  REAL(r64)              :: CurrentEndTime          ! end time of time step for current simulation time step
-		//  REAL(r64),SAVE         :: CurrentEndTimeLast=0.0  ! end time of time step for last simulation time step
-		//  CHARACTER(len=6)       :: OutputChar = ' '        ! character string for warning messages
-
 		// Set module level inlet and outlet nodes and initialize other local variables
 		ChillerPartLoadRatio = 0.0;
 		ChillerCyclingRatio = 0.0;
@@ -1959,7 +1943,6 @@ namespace ChillerReformulatedEIR {
 		ChillerEIRFPLR = 0.0;
 
 		// Set module-level chiller evap and condenser inlet temperature variables
-		EvapInletTemp = Node( EvapInletNode ).Temp;
 		CondInletTemp = Node( CondInletNode ).Temp;
 
 		// This chiller is currenlty has only a water-cooled condenser

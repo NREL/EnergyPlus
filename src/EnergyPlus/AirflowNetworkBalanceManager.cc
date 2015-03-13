@@ -438,7 +438,6 @@ namespace AirflowNetworkBalanceManager {
 		int FanType_Num;
 
 		// Declare variables used in this subroutine for debug purpose
-		bool AirflowNetworkInitFlag;
 		FArray1D_int ZoneCheck;
 		FArray1D_int ZoneBCCheck;
 		bool SurfaceFound;
@@ -537,7 +536,6 @@ namespace AirflowNetworkBalanceManager {
 		lNumericBlanks.dimension( MaxNums, true );
 
 		ErrorsFound = false;
-		AirflowNetworkInitFlag = false;
 
 		// Read AirflowNetwork OccupantVentilationControl before reading other AirflowNetwork objects, so that this object can be called by other simple ventilation objects
 		CurrentModuleObject = "AirflowNetwork:OccupantVentilationControl";
@@ -4658,12 +4656,8 @@ namespace AirflowNetworkBalanceManager {
 		int LF;
 		int LT;
 		int CompNum;
-		int NF;
-		int NT;
 		int CompTypeNum;
-		int TypeNum;
 		std::string CompName;
-		Real64 DirSign;
 		Real64 COZN;
 		int ZoneNum;
 		bool found;
@@ -4677,43 +4671,34 @@ namespace AirflowNetworkBalanceManager {
 			CompName = AirflowNetworkCompData( CompNum ).EPlusName;
 			// Calculate duct moisture diffusion loss
 			if ( CompTypeNum == CompTypeNum_DWC && CompName == BlankString ) { // Duct component only
-				TypeNum = AirflowNetworkCompData( CompNum ).TypeNum;
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
-					DirSign = 1.0;
 				} else { // flow direction is tha opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
-					DirSign = -1.0;
 				}
 				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW );
 				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LF ) = -std::abs( AirflowNetworkLinkSimu( i ).FLOW );
 			}
 			if ( CompTypeNum == CompTypeNum_TMU ) { // Reheat unit: SINGLE DUCT:CONST VOLUME:REHEAT
-				TypeNum = AirflowNetworkCompData( CompNum ).TypeNum;
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
-					DirSign = 1.0;
 				} else { // flow direction is tha opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
-					DirSign = -1.0;
 				}
 				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW );
 				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LF ) = -std::abs( AirflowNetworkLinkSimu( i ).FLOW );
 			}
 			if ( CompTypeNum == CompTypeNum_COI ) { // heating or cooling coil
-				TypeNum = AirflowNetworkCompData( CompNum ).TypeNum;
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
-					DirSign = 1.0;
 				} else { // flow direction is tha opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
-					DirSign = -1.0;
 				}
 			}
 			// Calculate temp in a constant pressure drop component
@@ -4873,12 +4858,8 @@ namespace AirflowNetworkBalanceManager {
 		int LF;
 		int LT;
 		int CompNum;
-		int NF;
-		int NT;
 		int CompTypeNum;
-		int TypeNum;
 		std::string CompName;
-		Real64 DirSign;
 		Real64 COZN;
 		int ZoneNum;
 		bool found;
@@ -4892,43 +4873,34 @@ namespace AirflowNetworkBalanceManager {
 			CompName = AirflowNetworkCompData( CompNum ).EPlusName;
 			// Calculate duct moisture diffusion loss
 			if ( CompTypeNum == CompTypeNum_DWC && CompName == BlankString ) { // Duct component only
-				TypeNum = AirflowNetworkCompData( CompNum ).TypeNum;
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
-					DirSign = 1.0;
 				} else { // flow direction is tha opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
-					DirSign = -1.0;
 				}
 				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW );
 				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LF ) = -std::abs( AirflowNetworkLinkSimu( i ).FLOW );
 			}
 			if ( CompTypeNum == CompTypeNum_TMU ) { // Reheat unit: SINGLE DUCT:CONST VOLUME:REHEAT
-				TypeNum = AirflowNetworkCompData( CompNum ).TypeNum;
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
-					DirSign = 1.0;
 				} else { // flow direction is tha opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
-					DirSign = -1.0;
 				}
 				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LT ) += std::abs( AirflowNetworkLinkSimu( i ).FLOW );
 				MA( ( LT - 1 ) * AirflowNetworkNumOfNodes + LF ) = -std::abs( AirflowNetworkLinkSimu( i ).FLOW );
 			}
 			if ( CompTypeNum == CompTypeNum_COI ) { // heating or cooling coil
-				TypeNum = AirflowNetworkCompData( CompNum ).TypeNum;
 				if ( AirflowNetworkLinkSimu( i ).FLOW > 0.0 ) { // flow direction is the same as input from node 1 to node 2
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 2 );
-					DirSign = 1.0;
 				} else { // flow direction is tha opposite as input from node 2 to node 1
 					LF = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 					LT = AirflowNetworkLinkageData( i ).NodeNums( 1 );
-					DirSign = -1.0;
 				}
 			}
 			// Calculate temp in a constant pressure drop component
@@ -5126,18 +5098,15 @@ namespace AirflowNetworkBalanceManager {
 				for ( K = 1; K <= NORDER; ++K ) {
 					MA( ( j - 1 ) * NORDER + K ) -= R1 * MA( ( i - 1 ) * NORDER + K );
 				}
-Label60: ;
 			}
 		}
 		for ( i = 1; i <= NORDER; ++i ) {
 			if ( IVEC( i + 20 ) == i ) continue;
 			M = i;
 			while ( NORDER > M ) {
-Label70: ;
 				++M;
 				if ( IVEC( M + 20 ) == i ) break;
 			}
-Label80: ;
 			IVEC( M + 20 ) = IVEC( i + 20 );
 			for ( j = 1; j <= NORDER; ++j ) {
 				R1 = MA( ( i - 1 ) * NORDER + j );
@@ -5145,7 +5114,6 @@ Label80: ;
 				MA( ( M - 1 ) * NORDER + j ) = R1;
 			}
 			IVEC( i + 20 ) = i;
-Label90: ;
 		}
 		return;
 		//   ########################################################### END
@@ -7086,8 +7054,6 @@ Label90: ;
 		Real64 ZoneAng1;
 		Real64 ZoneAng2;
 		Real64 ZoneAngDiff;
-		Real64 SSZoneNum;
-		Real64 SmallArea;
 		FArray1D< Real64 > ZoneAng; // Azimuth angle of the exterior wall of the zone
 		FArray1D< Real64 > PiFormula; // Formula for the mean pressure difference
 		FArray1D< Real64 > SigmaFormula; // Formula for the flucuating pressure difference

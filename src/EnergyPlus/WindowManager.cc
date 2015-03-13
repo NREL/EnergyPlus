@@ -6050,7 +6050,6 @@ namespace WindowManager {
 		Real64 DividerConduction; // Conduction through divider from outside to inside face (W)
 		Real64 DividerConvHeatGain; // Convective heat gain from divider to zone (W)
 		Real64 DividerRadHeatGain; // Convective IR radiative gain from divider to zone (W)
-		Real64 DividerHeatGain; // Heat gain from divider to zone (W)
 
 		TInRad = root_4( SurfaceWindow( SurfNum ).IRfromParentZone / sigma );
 		TOutRad = root_4( Outir / sigma );
@@ -6173,7 +6172,6 @@ namespace WindowManager {
 			// The following three statements are for debugging purposes only
 			DividerConvHeatGain = SurfaceWindow( SurfNum ).DividerArea * HInConvDiv * ( SurfaceWindow( SurfNum ).DividerTempSurfIn + TKelvin - tin );
 			DividerRadHeatGain = SurfaceWindow( SurfNum ).DividerArea * HInRad * ( SurfaceWindow( SurfNum ).DividerTempSurfIn + TKelvin - TInRadDiv ) - SurfaceWindow( SurfNum ).DividerArea * SurfaceWindow( SurfNum ).DividerQRadInAbs;
-			DividerHeatGain = DividerConvHeatGain + DividerRadHeatGain;
 			// If interior shade is present it is assumed that both the convective and IR radiative gain
 			// from the inside surface of the divider goes directly into the zone air -- i.e., the IR radiative
 			// interaction between divider and shade is ignored due to the difficulty of calculating this interaction
@@ -6305,7 +6303,6 @@ namespace WindowManager {
 		FArray1D< Real64 > hGapTot( 5 ); // Combined radiative and conductive gap conductance [W/m2-K]
 		Real64 Rbare; // Nominal center-of-glass resistance without air films [m2-K/W]
 		int ShadeFlag; // Shading flag
-		Real64 ShadeRes; // Thermal resistance of shade
 		int MatOutside; // Material number of outside layer of construction
 		int MatInside; // Material number of inside layer of construction
 		int MatShade; // Material number of shade layer
@@ -6323,8 +6320,6 @@ namespace WindowManager {
 		Real64 TBlBmBm; // Normal incidence blind beam-beam transmittance
 		Real64 TScBmBm; // Screen incident beam-beam transmittance
 		Real64 TScBmBmVis;
-		Real64 TBmBmBl; // TBmBm * TBlBmBm, TBmBmVis * TBlBmBm
-		Real64 TBmBmBlVis;
 		Real64 RGlDiffBack; // Bare glass back sol/vis reflectance
 		Real64 RGlDiffBackVis;
 		Real64 RGlDiffFront; // Bare glass front sol/vis reflectance
@@ -6406,7 +6401,6 @@ namespace WindowManager {
 
 		// Determine whether construction has an exterior or interior shade or blind
 		ShadeFlag = NoShade;
-		ShadeRes = 0.0;
 		MatOutside = Construct( ConstrNum ).LayerPoint( 1 );
 		MatInside = Construct( ConstrNum ).LayerPoint( TotLay );
 		if ( Material( MatOutside ).Group == 2 ) { // Exterior shade present
@@ -6503,8 +6497,6 @@ namespace WindowManager {
 				if ( Blind( BlNum ).SlatAngleType == VariableSlats ) VarSlats = true;
 				SlatAng = Blind( BlNum ).SlatAngle * DegToRadians;
 				TBlBmBm = BlindBeamBeamTrans( 0.0, SlatAng, Blind( BlNum ).SlatWidth, Blind( BlNum ).SlatSeparation, Blind( BlNum ).SlatThickness );
-				TBmBmBl = TBmBm * TBlBmBm;
-				TBmBmBlVis = TBmBmVis * TBlBmBm;
 				TBlBmDif = InterpProfSlatAng( 0.0, SlatAng, VarSlats, Blind( BlNum ).SolFrontBeamDiffTrans );
 				TBlBmDifVis = InterpProfSlatAng( 0.0, SlatAng, VarSlats, Blind( BlNum ).VisFrontBeamDiffTrans );
 				TDif = Construct( ConstrNumBare ).TransDiff;

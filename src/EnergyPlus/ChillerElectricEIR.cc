@@ -138,7 +138,6 @@ namespace ChillerElectricEIR {
 
 	void
 	SimElectricEIRChiller(
-		std::string const & EIRChillerType, // Type of chiller
 		std::string const & EIRChillerName, // User specified name of chiller
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // Chiller number pointer
@@ -243,7 +242,7 @@ namespace ChillerElectricEIR {
 
 		if ( LoopNum == ElectricEIRChiller( EIRChillNum ).CWLoopNum ) {
 			InitElectricEIRChiller( EIRChillNum, RunFlag, MyLoad );
-			CalcElectricEIRChillerModel( EIRChillNum, MyLoad, RunFlag, FirstIteration, EquipFlowCtrl );
+			CalcElectricEIRChillerModel( EIRChillNum, MyLoad, RunFlag, EquipFlowCtrl );
 			UpdateElectricEIRChillerRecords( MyLoad, RunFlag, EIRChillNum );
 
 		} else if ( LoopNum == ElectricEIRChiller( EIRChillNum ).CDLoopNum ) {
@@ -1087,7 +1086,6 @@ namespace ChillerElectricEIR {
 		int PltSizNum; // Plant Sizing index corresponding to CurLoopNum
 		int PltSizCondNum; // Plant Sizing index for condenser loop
 		bool ErrorsFound; // If errors detected in input
-		bool LoopErrorsFound;
 		std::string equipName;
 		Real64 rho;
 		Real64 Cp;
@@ -1317,7 +1315,6 @@ namespace ChillerElectricEIR {
 		int & EIRChillNum, // Chiller number
 		Real64 & MyLoad, // Operating load
 		bool const RunFlag, // TRUE when chiller operating
-		bool const FirstIteration, // TRUE when first iteration of timestep
 		int const EquipFlowCtrl // Flow control mode for the equipment
 	)
 	{
@@ -1381,7 +1378,6 @@ namespace ChillerElectricEIR {
 		Real64 MinPartLoadRat; // Min allowed operating fraction of full load
 		Real64 MinUnloadRat; // Min allowed unloading fraction of full load
 		Real64 MaxPartLoadRat; // Max allowed operating fraction of full load
-		Real64 EvapInletTemp; // Evaporator inlet temperature [C]
 		Real64 CondInletTemp; // Condenser inlet temperature [C]
 		Real64 EvapOutletTempSetPoint( 0.0 ); // Evaporator outlet temperature setpoint [C]
 		Real64 AvailChillerCap; // Chiller available capacity at current operating conditions [W]
@@ -1429,7 +1425,6 @@ namespace ChillerElectricEIR {
 		LoopSideNum = ElectricEIRChiller( EIRChillNum ).CWLoopSideNum;
 		BranchNum = ElectricEIRChiller( EIRChillNum ).CWBranchNum;
 		CompNum = ElectricEIRChiller( EIRChillNum ).CWCompNum;
-		EvapInletTemp = Node( EvapInletNode ).Temp;
 		FRAC = 1.0;
 
 		// Set performance curve outputs to 0.0 when chiller is off
@@ -1909,15 +1904,10 @@ namespace ChillerElectricEIR {
 		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int CondInletNode; // Condenser inlet node number
-		int CondOutletNode; // Condenser outlet node number
 		int HeatRecInNode; // Node number of heat recovery water inlet node
-		int HeatRecOutNode; // Node number of heat recovery water outlet node
 		Real64 QTotal; // Total condenser heat [W]
-		Real64 QCondTmp; // Total condenser heat based on average temperatures [W]
 		Real64 HeatRecInletTemp; // Heat reclaim inlet temp [C]
 		Real64 HeatRecMassFlowRate; // Heat reclaim mass flow rate [m3/s]
-		Real64 FracHeatRec; // Fraction of condenser heat reclaimed
 		Real64 TAvgIn; // Average inlet temperature of heat reclaim inlet and condenser inlet [C]
 		Real64 TAvgOut; // Average outlet temperature [C]
 		Real64 CpHeatRec; // Heat reclaim water inlet specific heat [J/kg-K]
@@ -1928,9 +1918,6 @@ namespace ChillerElectricEIR {
 
 		// Begin routine
 		HeatRecInNode = ElectricEIRChiller( EIRChillNum ).HeatRecInletNodeNum;
-		HeatRecOutNode = ElectricEIRChiller( EIRChillNum ).HeatRecOutletNodeNum;
-		CondInletNode = ElectricEIRChiller( EIRChillNum ).CondInletNodeNum;
-		CondOutletNode = ElectricEIRChiller( EIRChillNum ).CondOutletNodeNum;
 
 		// Inlet node to the heat recovery heat exchanger
 		HeatRecInletTemp = Node( HeatRecInNode ).Temp;

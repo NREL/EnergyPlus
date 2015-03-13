@@ -3373,8 +3373,6 @@ namespace ZoneEquipmentManager {
 
 		Real64 ZoneMixingAirMassFlowRate;
 		Real64 ZoneMixingNetAirMassFlowRate;
-		Real64 ZoneMixMassFlowRate;
-		Real64 ZoneMixingAirMassFlowRatePrevious;
 		Real64 ZoneInfiltrationMassFlowRate;
 		Real64 BuildingZoneMixingFlowOld;
 		Real64 BuildingZoneMixingFlow;
@@ -3423,9 +3421,7 @@ namespace ZoneEquipmentManager {
 
 				ZoneMixingAirMassFlowRate = 0.0;
 				ZoneMixingNetAirMassFlowRate = 0.0;
-				ZoneMixMassFlowRate = 0.0;
 				ZoneInfiltrationMassFlowRate = 0.0;
-				ZoneMixingAirMassFlowRatePrevious = 0.0;
 
 				for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneNum ).NumInletNodes; ++NodeNum ) {
 					TotInletAirMassFlowRate += Node( ZoneEquipConfig( ZoneNum ).InletNode( NodeNum) ).MassFlowRate;
@@ -3669,7 +3665,6 @@ namespace ZoneEquipmentManager {
 		Real64 WinGapFlowTtoRA; // Sum of mass flow times outlet temp for all airflow windows in zone [(kg/s)-C]
 		Real64 WinGapTtoRA; // Temp of outlet flow mixture to return air from all airflow windows in zone [C]
 		Real64 H2OHtOfVap; // Heat of vaporization of water (W/kg)
-		Real64 RhoAir; // Density of air (Kg/m3)
 		Real64 ZoneMult; // zone multiplier
 		Real64 SumRetAirLatentGainRate;
 
@@ -3770,7 +3765,6 @@ namespace ZoneEquipmentManager {
 				Node( ReturnNode ).Press = Node( ZoneNode ).Press;
 
 				H2OHtOfVap = PsyHgAirFnWTdb( Node( ZoneNode ).HumRat, Node( ReturnNode ).Temp );
-				RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ReturnNode ).Temp, Node( ZoneNode ).HumRat );
 
 				// Include impact of under case returns for refrigerated display case when updating the return air node humidity
 				if ( ! Zone( ActualZoneNum ).NoHeatToReturnAir ) {
@@ -4058,7 +4052,6 @@ namespace ZoneEquipmentManager {
 		Real64 MassFlowXCpXTempToB;
 		Real64 MassFlowXHumRatToA;
 		Real64 MassFlowXHumRatToB;
-		Real64 MassFlowRate;
 
 		// Allocate the ZMAT and ZHumRat arrays
 
@@ -4100,7 +4093,6 @@ namespace ZoneEquipmentManager {
 		MCPThermChim = 0.0;
 		ThermChimAMFL = 0.0;
 		MCPTThermChim = 0.0;
-		MassFlowRate = 0.0;
 
 		if ( AirFlowFlag != UseSimpleAirFlow ) return;
 		// AirflowNetwork Multizone field /= SIMPLE

@@ -117,7 +117,6 @@ namespace ChillerAbsorption {
 
 	void
 	SimBLASTAbsorber(
-		std::string const & AbsorberType, // type of Absorber
 		std::string const & AbsorberName, // user specified name of Absorber
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int const LoopNum, // Plant loop index for where called from
@@ -226,7 +225,7 @@ namespace ChillerAbsorption {
 
 			//Calculate Load
 			InitBLASTAbsorberModel( ChillNum, RunFlag, MyLoad );
-			CalcBLASTAbsorberModel( ChillNum, MyLoad, RunFlag, FirstIteration, EquipFlowCtrl );
+			CalcBLASTAbsorberModel( ChillNum, MyLoad, RunFlag, EquipFlowCtrl );
 			UpdateBLASTAbsorberRecords( MyLoad, RunFlag, ChillNum );
 
 		} else if ( LoopNum == BLASTAbsorber( ChillNum ).CDLoopNum ) {
@@ -557,15 +556,10 @@ namespace ChillerAbsorption {
 		static FArray1D_bool MyEnvrnFlag;
 		int CondInletNode; // node number of water inlet node to the condenser
 		int CondOutletNode; // node number of water outlet node from the condenser
-		int LoopCtr; // Plant loop counter
-		int LoopSideCtr; // Loop side counter
-		int BranchCtr; // Plant branch counter
-		int CompCtr; // Component counter
 		bool errFlag;
 		bool FatalError;
 		Real64 rho; // local fluid density
 		Real64 CpWater; // local specific heat
-		Real64 SteamDensity; // density of generator steam (when connected to a steam loop)
 		Real64 EnthSteamOutDry; // dry enthalpy of steam (quality = 1)
 		Real64 EnthSteamOutWet; // wet enthalpy of steam (quality = 0)
 		Real64 HfgSteam; // latent heat of steam at constant pressure
@@ -687,7 +681,6 @@ namespace ChillerAbsorption {
 					SteamDeltaT = BLASTAbsorber( ChillNum ).GeneratorSubcool;
 					SteamOutletTemp = Node( GeneratorInletNode ).Temp - SteamDeltaT;
 					HfgSteam = EnthSteamOutDry - EnthSteamOutWet;
-					SteamDensity = GetSatDensityRefrig( fluidNameSteam, Node( GeneratorInletNode ).Temp, 1.0, BLASTAbsorber( ChillNum ).SteamFluidIndex, calcChillerAbsorption + BLASTAbsorber( ChillNum ).Name );
 					CpWater = GetDensityGlycol( fluidNameWater, SteamOutletTemp, DummyWaterIndex, calcChillerAbsorption + BLASTAbsorber( ChillNum ).Name );
 					BLASTAbsorber( ChillNum ).GenMassFlowRateMax = QGenerator / ( HfgSteam + CpWater * SteamDeltaT );
 				}
@@ -1212,7 +1205,6 @@ namespace ChillerAbsorption {
 		int & ChillNum, // Absorber number
 		Real64 & MyLoad, // operating load
 		bool const RunFlag, // TRUE when Absorber operating
-		bool const FirstIteration, // TRUE when first iteration of timestep !unused1208
 		int const EquipFlowCtrl // Flow control mode for the equipment
 	)
 	{
@@ -1267,11 +1259,8 @@ namespace ChillerAbsorption {
 		FArray1D< Real64 > ElectricLoadFactor( 3 ); // coefficients to poly curve fit
 		Real64 MinPartLoadRat; // min allowed operating frac full load
 		Real64 MaxPartLoadRat; // max allowed operating frac full load
-		Real64 TempCondIn; // C - (BLAST ADJTC(1)The design secondary loop fluid
-		Real64 TempCondInDesign; // C - (BLAST ADJTC(1)The design secondary loop fluid
 		Real64 EvapInletTemp; // C - evaporator inlet temperature, water side
 		Real64 CondInletTemp; // C - condenser inlet temperature, water side
-		Real64 TempEvapOut; // C - evaporator outlet temperature, water side
 		Real64 TempEvapOutSetPoint( 0.0 ); // C - evaporator outlet temperature setpoint
 		Real64 AbsorberNomCap; // Absorber nominal capacity
 		Real64 NomPumpPower; // Absorber nominal pumping power
@@ -1284,7 +1273,6 @@ namespace ChillerAbsorption {
 		int EvapInletNode; // evaporator inlet node number, water side
 		int EvapOutletNode; // evaporator outlet node number, water side
 		int CondInletNode; // condenser inlet node number, water side
-		int CondOutletNode; // condenser outlet node number, water side
 		int GeneratorInletNode; // generator inlet node number, steam/water side
 		int GeneratorOutletNode; // generator outlet node number, steam/water side
 		Real64 EnthSteamOutDry; // enthalpy of dry steam at generator inlet
@@ -1292,12 +1280,10 @@ namespace ChillerAbsorption {
 		Real64 HfgSteam; // heat of vaporization of steam
 		static FArray1D_bool MyEnvironFlag;
 		static FArray1D_bool MyEnvironSteamFlag;
-		static bool OneTimeFlag( true );
 		Real64 FRAC;
 		//  LOGICAL,SAVE           :: PossibleSubcooling
 		Real64 CpFluid; // local specific heat of fluid
 		Real64 SteamDeltaT;
-		Real64 SteamDensity;
 		Real64 SteamOutletTemp;
 		int LoopNum;
 		int LoopSideNum;
@@ -1319,7 +1305,6 @@ namespace ChillerAbsorption {
 		EvapInletNode = BLASTAbsorber( ChillNum ).EvapInletNodeNum;
 		EvapOutletNode = BLASTAbsorber( ChillNum ).EvapOutletNodeNum;
 		CondInletNode = BLASTAbsorber( ChillNum ).CondInletNodeNum;
-		CondOutletNode = BLASTAbsorber( ChillNum ).CondOutletNodeNum;
 		GeneratorInletNode = BLASTAbsorber( ChillNum ).GeneratorInletNodeNum;
 		GeneratorOutletNode = BLASTAbsorber( ChillNum ).GeneratorOutletNodeNum;
 
@@ -1341,11 +1326,8 @@ namespace ChillerAbsorption {
 		ElectricLoadFactor = BLASTAbsorber( ChillNum ).PumpPowerCoef;
 		MinPartLoadRat = BLASTAbsorber( ChillNum ).MinPartLoadRat;
 		MaxPartLoadRat = BLASTAbsorber( ChillNum ).MaxPartLoadRat;
-		TempCondInDesign = BLASTAbsorber( ChillNum ).TempDesCondIn;
 		AbsorberNomCap = BLASTAbsorber( ChillNum ).NomCap;
 		NomPumpPower = BLASTAbsorber( ChillNum ).NomPumpPower;
-		TempCondIn = Node( BLASTAbsorber( ChillNum ).CondInletNodeNum ).Temp;
-		TempEvapOut = Node( BLASTAbsorber( ChillNum ).EvapOutletNodeNum ).Temp;
 		TempLowLimitEout = BLASTAbsorber( ChillNum ).TempLowLimitEvapOut;
 		LoopNum = BLASTAbsorber( ChillNum ).CWLoopNum;
 		LoopSideNum = BLASTAbsorber( ChillNum ).CWLoopSideNum;

@@ -135,7 +135,7 @@ namespace BranchNodeConnections {
 	);
 
 	void
-	TestInletOutletNodes( bool & ErrorsFound );
+	TestInletOutletNodes();
 
 	void
 	TestCompSet(

@@ -431,7 +431,6 @@ namespace CrossVentMgr {
 		int Ctd; // counter
 		int Ctd2; // counter
 		int OPtr; // counter
-		static Real64 Win; // Inflow aperture width
 		static Real64 Aroom; // Room area cross section
 		static Real64 Wroom; // Room width
 		Real64 Uin; // Inflow air velocity [m/s]
@@ -449,7 +448,6 @@ namespace CrossVentMgr {
 		Real64 ActiveSurfNum;
 		int NSides; // Number of sides in surface
 		static int CompNum( 0 ); // AirflowNetwork Component number
-		static int TypeNum( 0 ); // Airflownetwork Type Number within a component
 		static int NodeNum1( 0 ); // The first node number in an AirflowNetwork linkage data
 		static int NodeNum2( 0 ); // The Second node number in an AirflowNetwork linkage data
 
@@ -515,7 +513,6 @@ namespace CrossVentMgr {
 		// Calculate the opening area for all apertures
 		for ( Ctd = 1; Ctd <= AirflowNetworkSurfaceUCSDCV( ZoneNum, 0 ); ++Ctd ) {
 			CompNum = AirflowNetworkLinkageData( Ctd ).CompNum;
-			TypeNum = AirflowNetworkCompData( CompNum ).TypeNum;
 			if ( AirflowNetworkCompData( CompNum ).CompTypeNum == CompTypeNum_DOP ) {
 				CVJetRecFlows( ZoneNum, Ctd ).Area = SurfParametersCVDV( Ctd ).Width * SurfParametersCVDV( Ctd ).Height * MultizoneSurfaceData( Ctd ).OpenFactor;
 			} else if ( AirflowNetworkCompData( CompNum ).CompTypeNum == CompTypeNum_SCR ) {
@@ -798,7 +795,6 @@ namespace CrossVentMgr {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const Sigma( 10.0 );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -815,9 +811,6 @@ namespace CrossVentMgr {
 		Real64 ZTAveraged;
 
 		int Ctd;
-		Real64 VolOverAin;
-		Real64 MCpT_Total;
-		Real64 L;
 		Real64 ZoneMult; // total zone multiplier
 		Real64 RetAirConvGain;
 
@@ -842,15 +835,12 @@ namespace CrossVentMgr {
 		ConvGainsJet = ConvGains * GainsFrac;
 		ConvGainsRec = ConvGains * ( 1.0 - GainsFrac );
 		MCp_Total = MCPI( ZoneNum ) + MCPV( ZoneNum ) + MCPM( ZoneNum ) + MCPE( ZoneNum ) + MCPC( ZoneNum ) + MDotCPOA( ZoneNum );
-		MCpT_Total = MCPTI( ZoneNum ) + MCPTV( ZoneNum ) + MCPTM( ZoneNum ) + MCPTE( ZoneNum ) + MCPTC( ZoneNum ) + MDotCPOA( ZoneNum ) * Zone( ZoneNum ).OutDryBulbTemp;
 
 		if ( SimulateAirflowNetwork == AirflowNetworkControlMultizone ) {
 			MCp_Total = AirflowNetworkExchangeData( ZoneNum ).SumMCp + AirflowNetworkExchangeData( ZoneNum ).SumMMCp;
-			MCpT_Total = AirflowNetworkExchangeData( ZoneNum ).SumMCpT + AirflowNetworkExchangeData( ZoneNum ).SumMMCpT;
 		}
 
 		EvolveParaUCSDCV( ZoneNum );
-		L = Droom( ZoneNum );
 
 		if ( AirModel( ZoneNum ).SimAirModel ) {
 			//=============================== CROSS VENTILATION  Calculation ==============================================

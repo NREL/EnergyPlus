@@ -608,7 +608,6 @@ namespace WindTurbine {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool MyOneTimeFlag( true );
-		int OpenStatus; // Open status of stat file
 		int ReadStatus; // Reading status of stat file
 		int statFile; // Weather Stat File
 		std::string::size_type lnPtr; // scan pointer for Line input
@@ -755,9 +754,7 @@ namespace WindTurbine {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const MaxTheta( 90.0 ); // Maximum of theta
 		Real64 const MaxDegree( 360.0 ); // Maximum limit of outdoor air wind speed in m/s
-		Real64 const PitchAngle( 0.0 ); // No pitch control, i.e. maximum rotor speed
 		Real64 const SecInMin( 60.0 );
-		Real64 const MaxTSR( 12.0 ); // Maximum of tip speed ratio
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -793,7 +790,6 @@ namespace WindTurbine {
 		Real64 TanForceCoeff; // Tnagential force coefficient
 		Real64 NorForceCoeff; // Normal force coefficient
 		Real64 Period; // Period of sine and cosine functions
-		Real64 Integrand; // Integrand of tangential force
 		Real64 C1; // Empirical power coefficient C1
 		Real64 C2; // Empirical power coefficient C2
 		Real64 C3; // Empirical power coefficient C3

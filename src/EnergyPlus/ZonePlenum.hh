@@ -353,18 +353,6 @@ namespace ZonePlenum {
 	//        End of Update subroutines for the ZonePlenum Module
 	// *****************************************************************************
 
-	// Beginning of Reporting subroutines for the ZonePlenum Module
-	// *****************************************************************************
-
-	void
-	ReportZoneReturnPlenum( int const ZonePlenumNum ); // unused1208
-
-	void
-	ReportZoneSupplyPlenum( int const ZonePlenumNum ); // unused1208
-
-	//        End of Reporting subroutines for the ZonePlenum Module
-	// *****************************************************************************
-
 	//     NOTICE
 
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

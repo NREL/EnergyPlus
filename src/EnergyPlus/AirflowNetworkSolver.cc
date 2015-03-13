@@ -845,11 +845,9 @@ namespace AirflowNetworkSolver {
 		int JHK1;
 		int newsum;
 		int newh;
-		int Nzeros;
 		int ispan;
 		int thisIK;
 		bool allZero; // noel
-		static bool firstTime( true ); // noel
 #endif
 		FArray1D< Real64 > X( 4 );
 		Real64 DP;
@@ -2366,7 +2364,6 @@ Label999: ;
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Co;
 		int CompNum;
 		int k;
 
@@ -2389,7 +2386,6 @@ Label999: ;
 			}
 			PDROP = DisSysCompCPDData( CompNum ).DP;
 			PZ( M ) = PZ( n ) - PDROP;
-			Co = F( 1 ) / DisSysCompCPDData( CompNum ).DP;
 			DF( 1 ) = 10.e10;
 		}
 
@@ -3884,7 +3880,6 @@ Label999: ;
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const RealMax( 0.1e+37 );
 		Real64 const RealMin( 1e-37 );
 		static Real64 const sqrt_1_2( std::sqrt( 1.2 ) );
 
@@ -3899,8 +3894,6 @@ Label999: ;
 		static Real64 const sqrt_2( std::sqrt( 2.0 ) );
 
 		int CompNum;
-		Real64 Width;
-		Real64 Height;
 
 		Real64 fma12; // massflow in direction "from-to" [kg/s]
 		Real64 fma21; // massflow in direction "to-from" [kg/s]
@@ -3911,7 +3904,6 @@ Label999: ;
 		Real64 Fact; // Actual opening factor
 		Real64 DifLim; // Limit for the pressure difference where laminarization takes place [Pa]
 		Real64 Cfact;
-		Real64 FvVeloc;
 
 		Real64 ActLh;
 		Real64 ActLw;
@@ -3944,8 +3936,6 @@ Label999: ;
 		// Get component properties
 		DifLim = 1.0e-4;
 		CompNum = AirflowNetworkCompData( j ).TypeNum;
-		Width = MultizoneSurfaceData( IL ).Width;
-		Height = MultizoneSurfaceData( IL ).Height;
 		Fact = MultizoneSurfaceData( IL ).OpenFactor;
 		Loc = ( AirflowNetworkLinkageData( IL ).DetOpenNum - 1 ) * ( NrInt + 2 );
 		iNum = MultizoneCompDetOpeningData( CompNum ).NumFac;
@@ -4241,13 +4231,7 @@ Label999: ;
 
 		// Calculate some velocity in the large opening
 		area = ActLh * ActLw * ActCD;
-		if ( area > ( Cs + RealMin ) ) {
-			if ( area > RealMin ) {
-				FvVeloc = ( fma21 + fma12 ) / area;
-			} else {
-				FvVeloc = 0.0;
-			}
-		} else {
+		if ( area < ( Cs + RealMin ) ) {
 			// here the average velocity over the full area, may blow half in half out.
 			// velocity= Fva/Nett area=Fma/Rho/(Cm/( (2**N)* SQRT(1.2) ) )
 			if ( Cs > 0.0 ) {
@@ -4262,9 +4246,6 @@ Label999: ;
 					rholink /= NrInt;
 					rholink = 1.2;
 				}
-				FvVeloc = ( fma21 + fma12 ) * std::pow( 2.0, expn ) * sqrt_1_2 / ( rholink * Cs );
-			} else {
-				FvVeloc = 0.0;
 			}
 		}
 
@@ -4574,11 +4555,9 @@ Label999: ;
 		int ilayptr;
 		int OpenNum;
 
-		Real64 RhoREF;
 		Real64 CONV;
 
 		// FLOW:
-		RhoREF = PsyRhoAirFnPbTdbW( PSea, OutDryBulbTemp, OutHumRat );
 
 		CONV = Latitude * 2.0 * Pi / 360.0;
 		G = 9.780373 * ( 1.0 + 0.0052891 * pow_2( std::sin( CONV ) ) - 0.0000059 * pow_2( std::sin( 2.0 * CONV ) ) );
@@ -4903,7 +4882,6 @@ Label999: ;
 		Real64 H; // Start Height of the layer
 		Real64 BetaT; // Temperature gradient of this layer
 		Real64 BetaXfct; // Humidity gradient factor of this layer
-		Real64 BetaCfct; // Concentration 1 gradient factor of this layer
 		Real64 X0;
 		Real64 P;
 		Real64 Htop;
@@ -4923,7 +4901,6 @@ Label999: ;
 			H = 0.0;
 			BetaT = 0.0;
 			BetaXfct = 0.0;
-			BetaCfct = 0.0;
 			BetaRho = 0.0;
 			Hbot = 0.0;
 
@@ -4931,7 +4908,6 @@ Label999: ;
 				// loop until H>0 ; The start of the layer is above 0
 				BetaT = 0.0;
 				BetaXfct = 0.0;
-				BetaCfct = 0.0;
 				L += 9;
 				ilayptr = 0;
 				if ( zone == 0 ) ilayptr = 9;
@@ -4982,7 +4958,6 @@ Label999: ;
 					Hbot = H;
 					BetaT = 0.0;
 					BetaXfct = 0.0;
-					BetaCfct = 0.0;
 					L += 9;
 					ilayptr = 0;
 					if ( zone == 0 ) ilayptr = 9;
@@ -4999,7 +4974,6 @@ Label999: ;
 			H = 0.0;
 			BetaT = 0.0;
 			BetaXfct = 0.0;
-			BetaCfct = 0.0;
 			BetaRho = 0.0;
 			Htop = 0.0;
 			while ( H > 0.0 ) {
@@ -5012,13 +4986,11 @@ Label999: ;
 					H = Z;
 					BetaT = 0.0;
 					BetaXfct = 0.0;
-					BetaCfct = 0.0;
 					BetaRho = 0.0;
 				} else {
 					H = 0.0;
 					BetaT = 0.0;
 					BetaXfct = 0.0;
-					BetaCfct = 0.0;
 				}
 			}
 
@@ -5063,12 +5035,10 @@ Label999: ;
 						H = Z - 1.0;
 						BetaT = 0.0;
 						BetaXfct = 0.0;
-						BetaCfct = 0.0;
 					} else {
 						H = 0.0;
 						BetaT = 0.0;
 						BetaXfct = 0.0;
-						BetaCfct = 0.0;
 					}
 				}
 				// ENDIF H<Z

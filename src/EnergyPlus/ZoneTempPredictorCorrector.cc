@@ -2748,7 +2748,6 @@ namespace ZoneTempPredictorCorrector {
 		int SchedNameIndex;
 		int SchedTypeIndex;
 		FArray2D< Real64 > DaySPValues; // Day room temp setpoint values - for optimum start
-		Real64 OccRoomSP; // Occupied room temp set point - for optimum start
 		int OccStartTime; // Occupancy start time - for optimum start
 
 		// FLOW:
@@ -3287,7 +3286,6 @@ namespace ZoneTempPredictorCorrector {
 		Real64 C;
 		Real64 SysTimeStepInSeconds;
 		Real64 H2OHtOfVap;
-		Real64 RHSetPoint; // Relative Humidity in percent
 		Real64 WZoneSetPoint;
 		int HumidControlledZoneNum;
 		bool ControlledHumidZoneFlag; // This determines whether this is a humidity controlled zone or not
@@ -3295,7 +3293,6 @@ namespace ZoneTempPredictorCorrector {
 		Real64 ZoneRHDehumidifyingSetPoint; // Zone dehumidifying set point (%)
 		Real64 LoadToHumidifySetPoint; // Moisture load at humidifying set point
 		Real64 LoadToDehumidifySetPoint; // Moisture load at dehumidifying set point
-		Real64 ZoneAirRH; // Zone air relative humidity
 		bool SingleSetPoint; // This determines whether both setpoint are equal or not
 
 		// FLOW:
@@ -3311,7 +3308,6 @@ namespace ZoneTempPredictorCorrector {
 		// Check all the controlled zones to see if it matches the zone simulated
 		for ( HumidControlledZoneNum = 1; HumidControlledZoneNum <= NumHumidityControlZones; ++HumidControlledZoneNum ) {
 			if ( HumidityControlZone( HumidControlledZoneNum ).ActualZoneNum != ZoneNum ) continue;
-			ZoneAirRH = PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress ) * 100.0;
 			ZoneRHHumidifyingSetPoint = GetCurrentScheduleValue( HumidityControlZone( HumidControlledZoneNum ).HumidifyingSchedIndex );
 			ZoneRHDehumidifyingSetPoint = GetCurrentScheduleValue( HumidityControlZone( HumidControlledZoneNum ).DehumidifyingSchedIndex );
 			
@@ -3452,10 +3448,8 @@ namespace ZoneTempPredictorCorrector {
 			} else {
 				if ( LoadToHumidifySetPoint > 0.0 && LoadToDehumidifySetPoint > 0.0 ) {
 					ZoneSysMoistureDemand( ZoneNum ).TotalOutputRequired = LoadToHumidifySetPoint;
-					RHSetPoint = ZoneRHHumidifyingSetPoint;
 				} else if ( LoadToHumidifySetPoint < 0.0 && LoadToDehumidifySetPoint < 0.0 ) {
 					ZoneSysMoistureDemand( ZoneNum ).TotalOutputRequired = LoadToDehumidifySetPoint;
-					RHSetPoint = ZoneRHDehumidifyingSetPoint;
 				} else if ( LoadToHumidifySetPoint <= 0.0 && LoadToDehumidifySetPoint >= 0.0 ) { // deadband includes zero loads
 					ZoneSysMoistureDemand( ZoneNum ).TotalOutputRequired = 0.0;
 				} else { // this should never occur!

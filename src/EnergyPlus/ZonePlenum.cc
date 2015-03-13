@@ -172,8 +172,6 @@ namespace ZonePlenum {
 
 			UpdateAirZoneReturnPlenum( ZonePlenumNum ); // Update the current ZonePlenum to the outlet nodes
 
-			ReportZoneReturnPlenum( ZonePlenumNum );
-
 		} else if ( SELECT_CASE_var == ZoneSupplyPlenum_Type ) { // 'AirLoopHVAC:SupplyPlenum'
 			// Find the correct ZonePlenumNumber
 			if ( CompIndex == 0 ) {
@@ -200,8 +198,6 @@ namespace ZonePlenum {
 			CalcAirZoneSupplyPlenum( ZonePlenumNum, FirstCall );
 			// Update the current ZonePlenum to the outlet nodes
 			UpdateAirZoneSupplyPlenum( ZonePlenumNum, PlenumInletChanged, FirstCall );
-
-			ReportZoneSupplyPlenum( ZonePlenumNum );
 
 		} else {
 			ShowSevereError( "SimAirZonePlenum: Errors in Plenum=" + CompName );
@@ -1253,98 +1249,6 @@ namespace ZonePlenum {
 	}
 
 	//        End of Update subroutines for the ZonePlenum Module
-	// *****************************************************************************
-
-	// Beginning of Reporting subroutines for the ZonePlenum Module
-	// *****************************************************************************
-
-	void
-	ReportZoneReturnPlenum( int const ZonePlenumNum ) // unused1208
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Peter Graham Ellis
-		//       DATE WRITTEN   November 2000
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine needs a description.
-
-		// METHODOLOGY EMPLOYED:
-		// Needs description, as appropriate.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		// Write(*,*)=ZoneRetPlenCond(ZonePlenumNum)%ZonePlenumPower    Still needs to report the ZonePlenum power from this component
-
-		//ZoneRetPlenCond(ZonePlenumNum)% =
-
-	}
-
-	void
-	ReportZoneSupplyPlenum( int const ZonePlenumNum ) // unused1208
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Peter Graham Ellis
-		//       DATE WRITTEN   November 2000
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine needs a description.
-
-		// METHODOLOGY EMPLOYED:
-		// Needs description, as appropriate.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		// Write(*,*)=ZoneSupPlenCond(ZonePlenumNum)%ZonePlenumPower    Still needs to report the ZonePlenum power from this component
-
-		//ZoneSupPlenCond(ZonePlenumNum)% =
-
-	}
-
-	//        End of Reporting subroutines for the ZonePlenum Module
 	// *****************************************************************************
 
 	//     NOTICE

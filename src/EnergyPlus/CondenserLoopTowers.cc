@@ -260,12 +260,12 @@ namespace CondenserLoopTowers {
 		InitSimVars();
 
 		//CALCULATE
-		TypeOfEquip: { auto const SELECT_CASE_var( SimpleTower( TowerNum ).TowerType_Num );
+		{ auto const SELECT_CASE_var( SimpleTower( TowerNum ).TowerType_Num );
 
 		if ( SELECT_CASE_var == CoolingTower_SingleSpeed ) {
 
 			if ( InitLoopEquip ) {
-				InitTower( TowerNum, RunFlag );
+				InitTower( TowerNum );
 				SizeTower( TowerNum );
 				MinCap = 0.0;
 				MaxCap = SimpleTower( TowerNum ).TowerNominalCapacity * SimpleTower( TowerNum ).HeatRejectCapNomCapSizingRatio;
@@ -275,7 +275,7 @@ namespace CondenserLoopTowers {
 				}
 				return;
 			}
-			InitTower( TowerNum, RunFlag );
+			InitTower( TowerNum );
 			CalcSingleSpeedTower( TowerNum );
 			CalculateWaterUseage( TowerNum );
 			UpdateTowers( TowerNum );
@@ -284,7 +284,7 @@ namespace CondenserLoopTowers {
 		} else if ( SELECT_CASE_var == CoolingTower_TwoSpeed ) {
 
 			if ( InitLoopEquip ) {
-				InitTower( TowerNum, RunFlag );
+				InitTower( TowerNum );
 				SizeTower( TowerNum );
 				MinCap = 0.0;
 				MaxCap = SimpleTower( TowerNum ).TowerNominalCapacity * SimpleTower( TowerNum ).HeatRejectCapNomCapSizingRatio;
@@ -294,7 +294,7 @@ namespace CondenserLoopTowers {
 				}
 				return;
 			}
-			InitTower( TowerNum, RunFlag );
+			InitTower( TowerNum );
 			CalcTwoSpeedTower( TowerNum );
 			CalculateWaterUseage( TowerNum );
 			UpdateTowers( TowerNum );
@@ -303,7 +303,7 @@ namespace CondenserLoopTowers {
 		} else if ( SELECT_CASE_var == CoolingTower_VariableSpeedMerkel ) {
 
 			if ( InitLoopEquip ) {
-				InitTower( TowerNum, RunFlag );
+				InitTower( TowerNum );
 				SizeVSMerkelTower( TowerNum );
 				MinCap = 0.0;
 				MaxCap = SimpleTower( TowerNum ).TowerNominalCapacity * SimpleTower( TowerNum ).HeatRejectCapNomCapSizingRatio;
@@ -313,7 +313,7 @@ namespace CondenserLoopTowers {
 				}
 				return;
 			}
-			InitTower( TowerNum, RunFlag );
+			InitTower( TowerNum );
 			CalcMerkelVariableSpeedTower( TowerNum, MyLoad );
 			CalculateWaterUseage( TowerNum );
 			UpdateTowers( TowerNum );
@@ -322,7 +322,7 @@ namespace CondenserLoopTowers {
 		} else if ( SELECT_CASE_var == CoolingTower_VariableSpeed ) {
 
 			if ( InitLoopEquip ) {
-				InitTower( TowerNum, RunFlag );
+				InitTower( TowerNum );
 				SizeTower( TowerNum );
 				MinCap = 0.0;
 				MaxCap = SimpleTower( TowerNum ).TowerNominalCapacity * SimpleTower( TowerNum ).HeatRejectCapNomCapSizingRatio;
@@ -332,7 +332,7 @@ namespace CondenserLoopTowers {
 				}
 				return;
 			}
-			InitTower( TowerNum, RunFlag );
+			InitTower( TowerNum );
 			CalcVariableSpeedTower( TowerNum );
 			CalculateWaterUseage( TowerNum );
 			UpdateTowers( TowerNum );
@@ -1981,8 +1981,7 @@ namespace CondenserLoopTowers {
 
 	void
 	InitTower(
-		int const TowerNum, // Number of the current cooling tower being simulated
-		bool const RunFlag // Indication of
+		int const TowerNum // Number of the current cooling tower being simulated
 	)
 	{
 
@@ -2040,10 +2039,6 @@ namespace CondenserLoopTowers {
 		static FArray1D_bool OneTimeFlagForEachTower;
 		//  LOGICAL                                 :: FatalError
 		int TypeOf_Num( 0 );
-		int LoopNum;
-		int LoopSideNum;
-		int BranchIndex;
-		int CompIndex;
 		Real64 rho; // local density of fluid
 
 		// Do the one time initializations
@@ -2129,11 +2124,6 @@ namespace CondenserLoopTowers {
 			SimpleTowerInlet( TowerNum ).AirPress = OutBaroPress;
 			SimpleTowerInlet( TowerNum ).AirWetBulb = OutWetBulbTemp;
 		}
-
-		LoopNum = SimpleTower( TowerNum ).LoopNum;
-		LoopSideNum = SimpleTower( TowerNum ).LoopSideNum;
-		BranchIndex = SimpleTower( TowerNum ).BranchNum;
-		CompIndex = SimpleTower( TowerNum ).CompNum;
 
 		WaterMassFlowRate = RegulateCondenserCompFlowReqOp( SimpleTower( TowerNum ).LoopNum, SimpleTower( TowerNum ).LoopSideNum, SimpleTower( TowerNum ).BranchNum, SimpleTower( TowerNum ).CompNum, SimpleTower( TowerNum ).DesWaterMassFlowRate * SimpleTower( TowerNum ).TowerMassFlowRateMultiplier );
 
@@ -2221,7 +2211,6 @@ namespace CondenserLoopTowers {
 		Real64 tmpDesignWaterFlowRate; // local temporary for water volume flow rate
 		Real64 tmpHighSpeedFanPower; // local temporary for high speed fan power
 		Real64 tmpHighSpeedAirFlowRate; // local temporary for high speed air flow rate
-		Real64 tmpHighSpeedTowerUA; // local temporary for high speed tower UA
 		Real64 tmpLowSpeedAirFlowRate; // local temporary for low speed air flow rate
 		Real64 AssumedDeltaT; // default delta T for nominal capacity of hard sized with UA method
 		Real64 AssumedExitTemp; // default for cp fo nominal capacity of hard sized with UA method
@@ -2232,7 +2221,6 @@ namespace CondenserLoopTowers {
 		tmpDesignWaterFlowRate = SimpleTower( TowerNum ).DesignWaterFlowRate;
 		tmpHighSpeedFanPower = SimpleTower( TowerNum ).HighSpeedFanPower;
 		tmpHighSpeedAirFlowRate = SimpleTower( TowerNum ).HighSpeedAirFlowRate;
-		tmpHighSpeedTowerUA = SimpleTower( TowerNum ).HighSpeedTowerUA;
 		tmpLowSpeedAirFlowRate = SimpleTower( TowerNum ).LowSpeedAirFlowRate;
 
 		// Find the appropriate Plant Sizing object
@@ -2365,15 +2353,11 @@ namespace CondenserLoopTowers {
 
 					if ( PlantSizesOkayToFinalize ) {
 						SimpleTower( TowerNum ).HighSpeedTowerUA = UA;
-					} else {
-						tmpHighSpeedTowerUA = UA;
 					}
 					SimpleTower( TowerNum ).TowerNominalCapacity = DesTowerLoad / SimpleTower( TowerNum ).HeatRejectCapNomCapSizingRatio;
 				} else {
 					if ( PlantSizesOkayToFinalize ) {
 						SimpleTower( TowerNum ).HighSpeedTowerUA = 0.0;
-					} else {
-						tmpHighSpeedTowerUA = 0.0;
 					}
 				}
 				if ( SimpleTower( TowerNum ).TowerType_Num == CoolingTower_SingleSpeed ) {
@@ -3196,7 +3180,6 @@ namespace CondenserLoopTowers {
 		Real64 UAdesign; // UA value at design conditions (entered by user or calculated)
 		Real64 OutletWaterTempOFF;
 		Real64 FanModeFrac;
-		Real64 DesignWaterFlowRate;
 		Real64 FanPowerOn;
 		Real64 CpWater;
 		Real64 TempSetPoint;
@@ -3292,7 +3275,6 @@ namespace CondenserLoopTowers {
 			//   Initialize local variables to the free convection design values
 			UAdesign = SimpleTower( TowerNum ).FreeConvTowerUA / SimpleTower( TowerNum ).NumCell;
 			AirFlowRate = SimpleTower( TowerNum ).FreeConvAirFlowRate / SimpleTower( TowerNum ).NumCell;
-			DesignWaterFlowRate = SimpleTower( TowerNum ).DesignWaterFlowRate;
 			OutletWaterTempOFF = Node( WaterInletNode ).Temp;
 			OutletWaterTemp = OutletWaterTempOFF;
 			FanModeFrac = 0.0;
@@ -3514,7 +3496,6 @@ namespace CondenserLoopTowers {
 		Real64 OutletWaterTemp1stStage;
 		Real64 OutletWaterTemp2ndStage;
 		Real64 FanModeFrac;
-		Real64 DesignWaterFlowRate;
 		Real64 FanPowerLow;
 		Real64 FanPowerHigh;
 		Real64 CpWater;
@@ -3597,7 +3578,6 @@ namespace CondenserLoopTowers {
 			//set local variable for tower
 			UAdesign = SimpleTower( TowerNum ).FreeConvTowerUA / SimpleTower( TowerNum ).NumCell; // where is NumCellOn?
 			AirFlowRate = SimpleTower( TowerNum ).FreeConvAirFlowRate / SimpleTower( TowerNum ).NumCell;
-			DesignWaterFlowRate = SimpleTower( TowerNum ).DesignWaterFlowRate; // ??useless subroutine variable??
 			OutletWaterTempOFF = Node( WaterInletNode ).Temp;
 			WaterMassFlowRate = Node( WaterInletNode ).MassFlowRate;
 			OutletWaterTemp1stStage = OutletWaterTemp;
@@ -3721,7 +3701,6 @@ namespace CondenserLoopTowers {
 		Real64 CpWater;
 		int LoopNum;
 		int LoopSideNum;
-		Real64 TempSetPoint;
 		Real64 WaterMassFlowRatePerCellMin;
 		Real64 WaterMassFlowRatePerCellMax;
 		int NumCellMin = 0;
@@ -3750,20 +3729,6 @@ namespace CondenserLoopTowers {
 		OutletWaterTemp = Node( WaterInletNode ).Temp;
 		LoopNum = SimpleTower( TowerNum ).LoopNum;
 		LoopSideNum = SimpleTower( TowerNum ).LoopSideNum;
-		{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
-		if ( SELECT_CASE_var == SingleSetPoint ) {
-			if ( SimpleTower( TowerNum ).SetpointIsOnOutlet ) {
-				TempSetPoint = Node( WaterOutletNode ).TempSetPoint;
-			} else {
-				TempSetPoint = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TempSetPoint;
-			}
-		} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
-			if ( SimpleTower( TowerNum ).SetpointIsOnOutlet ) {
-				TempSetPoint = Node( WaterOutletNode ).TempSetPointHi;
-			} else {
-				TempSetPoint = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TempSetPointHi;
-			}
-		}}
 
 		// Added for multi-cell. Determine the number of cells operating
 		if ( SimpleTower( TowerNum ).DesWaterMassFlowRate > 0.0 ) {
@@ -4097,8 +4062,6 @@ namespace CondenserLoopTowers {
 		Real64 TempSetPoint( 0.0 ); // Outlet water temperature setpoint (C)
 		Real64 FanCurveValue; // Output of fan power as a func of air flow rate ratio curve
 		Real64 AirDensity; // Density of air [kg/m3]
-		Real64 AirMassFlowRate; // Mass flow rate of air [kg/s]
-		Real64 InletAirEnthalpy; // Enthalpy of entering moist air [J/kg]
 		int SolFla; // Flag of solver
 		FArray1D< Real64 > Par( 6 ); // Parameter array for regula falsi solver
 		Real64 Twb; // inlet air wet-bulb temperature
@@ -4320,8 +4283,6 @@ namespace CondenserLoopTowers {
 		SimpleTower( TowerNum ).NumCellOn = NumCellOn;
 		// Set water and air properties
 		AirDensity = PsyRhoAirFnPbTdbW( SimpleTowerInlet( TowerNum ).AirPress, SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirHumRat );
-		AirMassFlowRate = AirFlowRateRatio * SimpleTower( TowerNum ).HighSpeedAirFlowRate * AirDensity * SimpleTower( TowerNum ).NumCellOn / SimpleTower( TowerNum ).NumCell;
-		InletAirEnthalpy = PsyHFnTdbRhPb( SimpleTowerInlet( TowerNum ).AirWetBulb, 1.0, SimpleTowerInlet( TowerNum ).AirPress );
 
 		//   calculate end time of current time step
 		CurrentEndTime = CurrentTime + SysTimeElapsed;

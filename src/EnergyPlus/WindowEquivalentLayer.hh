@@ -539,10 +539,8 @@ namespace WindowEquivalentLayer {
 		Real64 const CK,
 		Real64 const ACP, // gas specific heat coeffs, CP = ACP + BCP*TM + CCP*TM*TM
 		Real64 const BCP,
-		Real64 const CCP,
 		Real64 const AVISC, // gas viscosity coeffs, VISC = AVISC + BVISC*TM + CVISC*TM*TM
 		Real64 const BVISC,
-		Real64 const CVISC,
 		Real64 const RHOGAS // gas density, kg/m3
 	);
 

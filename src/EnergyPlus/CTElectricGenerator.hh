@@ -328,7 +328,6 @@ namespace CTElectricGenerator {
 
 	void
 	SimCTGenerator(
-		int const GeneratorType, // type of Generator
 		std::string const & GeneratorName, // user specified name of Generator
 		int & GeneratorIndex,
 		bool const RunFlag, // simulate Generator when TRUE
@@ -338,17 +337,12 @@ namespace CTElectricGenerator {
 
 	void
 	SimCTPlantHeatRecovery(
-		std::string const & CompType, // unused1208
 		std::string const & CompName,
-		int const CompTypeNum, // unused1208
 		int & CompNum,
-		bool const RunFlag,
 		bool & InitLoopEquip,
-		Real64 & MyLoad,
 		Real64 & MaxCap,
 		Real64 & MinCap,
-		Real64 & OptCap,
-		bool const FirstHVACIteration // TRUE if First iteration of simulation
+		Real64 & OptCap
 	);
 
 	// End CT Generator Module Driver Subroutines
@@ -384,7 +378,6 @@ namespace CTElectricGenerator {
 	InitCTGenerators(
 		int const GeneratorNum, // Generator number
 		bool const RunFlag, // TRUE when Generator operating
-		Real64 const MyLoad, // Generator demand
 		bool const FirstHVACIteration
 	);
 
@@ -396,13 +389,11 @@ namespace CTElectricGenerator {
 
 	void
 	UpdateCTGeneratorRecords(
-		bool const RunFlag, // TRUE if Generator operating
 		int const Num // Generator number
 	);
 
 	void
 	GetCTGeneratorResults(
-		int const GeneratorType, // type of Generator
 		int const GeneratorIndex,
 		Real64 & GeneratorPower, // electrical power
 		Real64 & GeneratorEnergy, // electrical energy

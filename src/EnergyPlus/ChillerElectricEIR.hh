@@ -515,7 +515,6 @@ namespace ChillerElectricEIR {
 
 	void
 	SimElectricEIRChiller(
-		std::string const & EIRChillerType, // Type of chiller
 		std::string const & EIRChillerName, // User specified name of chiller
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int & CompIndex, // Chiller number pointer
@@ -554,7 +553,6 @@ namespace ChillerElectricEIR {
 		int & EIRChillNum, // Chiller number
 		Real64 & MyLoad, // Operating load
 		bool const RunFlag, // TRUE when chiller operating
-		bool const FirstIteration, // TRUE when first iteration of timestep
 		int const EquipFlowCtrl // Flow control mode for the equipment
 	);
 

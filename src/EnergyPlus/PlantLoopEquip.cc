@@ -326,7 +326,7 @@ namespace PlantLoopEquip {
 				}
 
 			} else if ( EquipTypeNum == TypeOf_Chiller_Absorption ) {
-				SimBLASTAbsorber( sim_component.TypeOf, sim_component.Name, EquipFlowCtrl, LoopNum, LoopSideNum, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign );
+				SimBLASTAbsorber( sim_component.Name, EquipFlowCtrl, LoopNum, LoopSideNum, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign );
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
 					sim_component.MinLoad = MinLoad;
@@ -339,7 +339,7 @@ namespace PlantLoopEquip {
 				}
 
 			} else if ( EquipTypeNum == TypeOf_Chiller_Indirect_Absorption ) {
-				SimIndirectAbsorber( sim_component.TypeOf, sim_component.Name, EquipFlowCtrl, LoopNum, LoopSideNum, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign );
+				SimIndirectAbsorber( sim_component.Name, EquipFlowCtrl, LoopNum, LoopSideNum, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign );
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
 					sim_component.MinLoad = MinLoad;
@@ -352,7 +352,7 @@ namespace PlantLoopEquip {
 				}
 
 			} else if ( EquipTypeNum == TypeOf_Chiller_ElectricEIR ) {
-				SimElectricEIRChiller( sim_component.TypeOf, sim_component.Name, EquipFlowCtrl, EquipNum, LoopNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign, TempEvapOutDesign );
+				SimElectricEIRChiller( sim_component.Name, EquipFlowCtrl, EquipNum, LoopNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign, TempEvapOutDesign );
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
 					sim_component.MinLoad = MinLoad;
@@ -366,7 +366,7 @@ namespace PlantLoopEquip {
 				}
 
 			} else if ( EquipTypeNum == TypeOf_Chiller_ElectricReformEIR ) {
-				SimReformulatedEIRChiller( sim_component.TypeOf, sim_component.Name, EquipFlowCtrl, EquipNum, LoopNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign, TempEvapOutDesign );
+				SimReformulatedEIRChiller( sim_component.Name, EquipFlowCtrl, EquipNum, LoopNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign, TempEvapOutDesign );
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
 					sim_component.MinLoad = MinLoad;
@@ -382,7 +382,7 @@ namespace PlantLoopEquip {
 				// Chiller-Heater needs to know whether it is being called for heating or cooling
 				// Since loops are generic, pass the branch inlet nodenum
 			} else if ( EquipTypeNum == TypeOf_Chiller_DFAbsorption ) {
-				SimGasAbsorber( sim_component.TypeOf, sim_component.Name, EquipFlowCtrl, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).NodeNumIn, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign, TempEvapOutDesign ); //DSU
+				SimGasAbsorber( sim_component.Name, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).NodeNumIn, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac, TempCondInDesign, TempEvapOutDesign ); //DSU
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
 					sim_component.MinLoad = MinLoad;
@@ -398,7 +398,7 @@ namespace PlantLoopEquip {
 				// Exhaust Fired Absorption Chiller
 
 			} else if ( EquipTypeNum == TypeOf_Chiller_ExhFiredAbsorption ) {
-				SimExhaustAbsorber( sim_component.TypeOf, sim_component.Name, EquipFlowCtrl, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).NodeNumIn, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac ); //DSU
+				SimExhaustAbsorber( sim_component.Name, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).NodeNumIn, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac ); //DSU
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
 					sim_component.MinLoad = MinLoad;
@@ -620,7 +620,7 @@ namespace PlantLoopEquip {
 			//BOILERS
 		} else if ( GeneralEquipType == GenEquipTypes_Boiler ) {
 			if ( EquipTypeNum == TypeOf_Boiler_Simple ) {
-				SimBoiler( sim_component.TypeOf, sim_component.Name, EquipFlowCtrl, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac ); //DSU
+				SimBoiler( sim_component.Name, EquipFlowCtrl, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac ); //DSU
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
 					sim_component.MinLoad = MinLoad;
@@ -632,7 +632,7 @@ namespace PlantLoopEquip {
 				}
 
 			} else if ( EquipTypeNum == TypeOf_Boiler_Steam ) {
-				SimSteamBoiler( sim_component.TypeOf, sim_component.Name, EquipFlowCtrl, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac ); //DSU
+				SimSteamBoiler( sim_component.Name, EquipFlowCtrl, EquipNum, RunFlag, FirstHVACIteration, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, GetCompSizFac, SizingFac ); //DSU
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
 					sim_component.MinLoad = MinLoad;
@@ -907,7 +907,7 @@ namespace PlantLoopEquip {
 				}
 
 			} else if ( EquipTypeNum == TypeOf_Generator_CTurbine ) {
-				SimCTPlantHeatRecovery( sim_component.TypeOf, sim_component.Name, TypeOf_Generator_CTurbine, EquipNum, RunFlag, InitLoopEquip, CurLoad, MaxLoad, MinLoad, OptLoad, FirstHVACIteration ); //DSU
+				SimCTPlantHeatRecovery( sim_component.Name, EquipNum, InitLoopEquip, MaxLoad, MinLoad, OptLoad ); //DSU
 				if ( InitLoopEquip ) {
 					sim_component.MaxLoad = MaxLoad;
 					sim_component.MinLoad = MinLoad;
