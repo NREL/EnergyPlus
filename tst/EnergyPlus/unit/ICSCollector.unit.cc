@@ -98,7 +98,7 @@ TEST( ISCSolarCollectorTest, BugTest ) {
 	EXPECT_NEAR( 3.694, HrGapRpt, 0.001 );
 	EXPECT_NEAR( 0.036, MdotVentRpt, 0.001 );
 
-	// dellet allocated variables
+	// delete allocated variables
 	Surface.deallocate();
 	Construct( ConstrNum ).LayerPoint.deallocate();
 	Construct.deallocate();
