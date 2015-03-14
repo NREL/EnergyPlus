@@ -925,7 +925,7 @@ namespace ChillerElectricEIR {
 		}
 
 		if ( MyEnvrnFlag( EIRChillNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
-			if ( ! PlantFirstSizeCompleted ) SizeElectricEIRChiller( EIRChillNum );
+
 			rho = GetDensityGlycol( PlantLoop( ElectricEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ElectricEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 			ElectricEIRChiller( EIRChillNum ).EvapMassFlowRateMax = ElectricEIRChiller( EIRChillNum ).EvapVolFlowRate * rho;
@@ -1129,9 +1129,7 @@ namespace ChillerElectricEIR {
 		CondVolFlowRateUser = 0.0;
 
 		if ( ElectricEIRChiller( EIRChillNum ).CondenserType == WaterCooled ) {
-			//IF (ElectricEIRChiller(EIRChillNum)%CondVolFlowRate == AutoSize) THEN
 			PltSizCondNum = PlantLoop( ElectricEIRChiller( EIRChillNum ).CDLoopNum ).PlantSizNum;
-			//END IF
 		}
 
 		// find the appropriate Plant Sizing object
