@@ -122,7 +122,7 @@ namespace EnergyPlus {
 			NumSevere = numSevere;
 		}
 
-		cJSON* SimInfo::GetJSON()
+		cJSON* SimInfo::getJSON()
 		{
 			cJSON *_root, *_errsummary, *_errwarmup, *_errsizing;
 
@@ -149,7 +149,7 @@ namespace EnergyPlus {
 			return _root;
 		}
 
-
+		
 
 		// Class Variable
 		Variable::Variable(const std::string VarName, const int ReportFrequency, const int IndexType, const int ReportID, const std::string units) {
@@ -236,7 +236,7 @@ namespace EnergyPlus {
 			return Values;
 		}
 
-		cJSON* Variable::GetJSON() {
+		cJSON* Variable::getJSON() {
 			cJSON *_root, *_errsummary, *_errwarmup, *_errsizing;
 
 			_root = cJSON_CreateObject();
@@ -249,11 +249,41 @@ namespace EnergyPlus {
 		}
 
 
+		// Class OutputVariable
+		OutputVariable::OutputVariable(const std::string VarName, const int ReportFrequency, const int IndexType, const int ReportID, const std::string units)
+			:Variable(VarName, ReportFrequency, IndexType, ReportID, units)
+		{}
+
+		// Class MeterVariable
+		MeterVariable::MeterVariable(const std::string VarName, const int ReportFrequency, const int ReportID, const std::string units, const bool Accumulative)
+			: Variable(VarName, ReportFrequency, ZoneVar, ReportID, units)
+		{
+			acc = Accumulative;
+		}
+
+		bool MeterVariable::accumulative()
+		{
+			return acc;
+		}
+
+		void MeterVariable::setAccumulative(bool state) {
+			acc = state;
+		}
+
+		cJSON* MeterVariable::getJSON() {
+			cJSON *_root = Variable::getJSON();
+			if (acc)
+				cJSON_AddItemToObject(_root, "Cumulative", cJSON_CreateString("True"));
+			return _root;
+		}
+
 		// class DataFrame
 		DataFrame::DataFrame(std::string ReportFreq) {
 			ReportFrequency = ReportFreq;
 			RDataFrameEnabled = false;
 			IDataFrameEnabled = false;
+			RVariablesScanned = false;
+			IVariablesScanned = false;
 		}
 
 		DataFrame::~DataFrame() {
@@ -272,13 +302,9 @@ namespace EnergyPlus {
 			std::string ts = std::to_string(month) + "/" + std::to_string(dayOfMonth) + " " + std::to_string(hourOfDay) + ":" + std::to_string(curMin) + ":00";
 			TS.push_back(ts);
 		}
-
-		bool DataFrame::rDataFrameEnabled() {
-			return RDataFrameEnabled;
-		}
-
-		bool DataFrame::iDataFrameEnabled() {
-			return IDataFrameEnabled;
+		
+		void DataFrame::newRow(const std::string ts) {
+			TS.push_back(ts);
 		}
 
 		void DataFrame::setRDataFrameEnabled(bool state) {
@@ -289,6 +315,29 @@ namespace EnergyPlus {
 			IDataFrameEnabled = state;
 		}
 
+		bool DataFrame::rDataFrameEnabled() {
+			return RDataFrameEnabled;
+		}
+
+		bool DataFrame::iDataFrameEnabled() {
+			return IDataFrameEnabled;
+		}
+		void DataFrame::setRVariablesScanned(bool state) {
+			RVariablesScanned = state;
+		}
+
+		void DataFrame::setIVariablesScanned(bool state) {
+			IVariablesScanned = state;
+		}
+
+		bool DataFrame::rVariablesScanned() {
+			return RVariablesScanned;
+		}
+
+		bool DataFrame::iVariablesScanned() {
+			return IVariablesScanned;
+		}
+		
 		void DataFrame::pushVariableValue(const int reportID, double value) {
 			// this is O(1) complexity. I like this.
 			variableMap[reportID]->pushValue(value); 
@@ -298,10 +347,17 @@ namespace EnergyPlus {
 			return outputVariables;
 		}
 
-		void DataFrame::writeFile() {
-			std::string jsonfilename = "eplusout_" + ReportFrequency + ".json";
-			std::ofstream jsonfile(jsonfilename);
+		cJSON* DataFrame::getVariablesJSON() {
+			cJSON *arr;
+			arr = cJSON_CreateArray();
+			for (int i = 0; i < variables().size(); i++)
+				cJSON_AddItemToArray(arr, variables()[i]->getJSON());
+			for (int i = 0; i < variables().size(); i++)
+				cJSON_AddItemToArray(arr, variables()[i]->getJSON());
+			return arr;
+		}
 
+		cJSON* DataFrame::getJSON() {
 			cJSON *_root, *_col, *_colfld, *_val, *_row, *_rowvec;
 
 			_root = cJSON_CreateObject();
@@ -310,28 +366,38 @@ namespace EnergyPlus {
 			cJSON_AddItemToObject(_root, "Cols", _col = cJSON_CreateArray());
 			cJSON_AddItemToObject(_root, "Rows", _row = cJSON_CreateArray());
 
+			for (int i = 0; i < outputVariables.size(); ++i) {
+				cJSON_AddItemToArray(_col, _colfld = cJSON_CreateObject());
+				cJSON_AddStringToObject(_colfld, "Variable", outputVariables[i]->variableName().c_str());
+				cJSON_AddStringToObject(_colfld, "UUID", outputVariables[i]->UUID().c_str());
+			}
+
+			std::vector <double> vals;
+			vals.reserve(10000);
+
+			// if DataFrame is enabled and control reaches here, there must be at least one o/p variable
+			assert(TS.size() == outputVariables[0]->values().size());
+
+			for (int row = 0; row < TS.size(); ++row) {
+				vals.clear();
+				for (int vars = 0; vars < outputVariables.size(); ++vars) {
+					vals.push_back(outputVariables[vars]->values()[row]);
+				}
+				cJSON_AddItemToArray(_row, _rowvec = cJSON_CreateObject());
+				cJSON_AddItemToObject(_rowvec, TS.at(row).c_str(), cJSON_CreateDoubleArray(&vals[0], vals.size()));
+			}
+			return _root;
+		}
+
+		void DataFrame::writeFile() {
+			std::string jsonfilename = "eplusout_" + ReportFrequency + ".json";
+			std::ofstream jsonfile(jsonfilename);
+			
+			cJSON *_root;
+			
 			if (jsonfile.is_open())
 			{
-				for (int i = 0; i < outputVariables.size(); ++i) {
-					cJSON_AddItemToArray(_col, _colfld = cJSON_CreateObject());
-					cJSON_AddStringToObject(_colfld, "Variable", outputVariables[i]->variableName().c_str()  );
-					cJSON_AddStringToObject(_colfld, "UUID", outputVariables[i]->UUID().c_str() );
-				}
-
-				std::vector <double> vals;
-				vals.reserve(10000);
-
-				assert(TS.size() == outputVariables[0]->values().size());
-
-				for (int row = 0; row < TS.size(); ++row) {
-					vals.clear();
-					for (int vars = 0; vars < outputVariables.size(); ++vars) {
-						vals.push_back(outputVariables[vars]->values()[row]);
-					}
-					cJSON_AddItemToArray(_row, _rowvec = cJSON_CreateObject());
-					cJSON_AddItemToObject(_rowvec, TS.at(row).c_str(), cJSON_CreateDoubleArray(&vals[0], vals.size()));
-				}
-			
+				_root = getJSON();
 				jsonfile << cJSON_Print(_root);
 				jsonfile.close();
 			}
@@ -352,7 +418,12 @@ namespace EnergyPlus {
 			ResultsSchema::RIDailyTSData("Daily"),
 			ResultsSchema::RIMonthlyTSData("Monthly"),
 			ResultsSchema::RIRunPeriodTSData("RunPeriod");
-
+		
+		DataFrame ResultsSchema::TSMeters("Timestep"),
+			ResultsSchema::HRMeters("Hourly"),
+			ResultsSchema::DYMeters("Daily"),
+			ResultsSchema::MNMeters("Monthly"),
+			ResultsSchema::SMMeters("RunPeriod");
 
 		ResultsSchema::ResultsSchema() {
 			tsEnabled = false;
@@ -406,14 +477,12 @@ namespace EnergyPlus {
 					RVar >>= RVariableTypes(Loop).VarPtr;
 					auto & rVar(RVar());
 					
-					if (rVar.Report && rVar.ReportFreq == ReportFrequency && rVar.Stored)
-					{
+					if (rVar.Report && rVar.ReportFreq == ReportFrequency && rVar.Stored) {
 						Variable *var = new Variable(RVariableTypes(Loop).VarName, 
 								ReportFrequency, RVariableTypes(Loop).IndexType, 
 								RVariableTypes(Loop).ReportID,
 								RVariableTypes(Loop).UnitsString);
-						switch (ReportFrequency)
-						{
+						switch (ReportFrequency) {
 						case -1:  // each time UpdatedataandReport is called
 							if (IndexType == ZoneVar && RVariableTypes(Loop).IndexType == ZoneVar)
 							{
@@ -446,25 +515,48 @@ namespace EnergyPlus {
 							RIRunPeriodTSData.setRDataFrameEnabled(true);
 							RIRunPeriodTSData.addVariable(var);
 							break;
-					}
+						}
 				}
+			}
+			// set the scanned variables to true or false
+			switch (ReportFrequency) {
+				case -1:
+					if (IndexType == ZoneVar)
+						RIDetailedZoneTSData.setRVariablesScanned(true);
+					if (IndexType == HVACVar)
+						RIDetailedZoneTSData.setRVariablesScanned(true);
+					break;
+				case 0:  // at 'EndTimeStepFlag'
+					RITimestepTSData.setRVariablesScanned(true);
+					break;
+				case 1:  // at 'EndHourFlag'
+					RIHourlyTSData.setRVariablesScanned(true);
+					break;
+				case 2: // at 'EndDayFlag'
+					RIDailyTSData.setRVariablesScanned(true);
+					break;
+				case 3:  // at end of month
+					RIMonthlyTSData.setRVariablesScanned(true);
+					break;
+				case 4:  // once per environment 'EndEnvrnFlag'
+					RIRunPeriodTSData.setRVariablesScanned(true);
+					break;
 			}
 		}
 
 		void ResultsSchema::initializeITSDataFrame(const int ReportFrequency, const FArray1D< IntegerVariableType > &IVariableTypes, const int NumOfIVariable, const int IndexType) {
 			Reference< IntegerVariables > IVar;
 
+			// loop over values to suck in var info
 			for (int Loop = 1; Loop <= NumOfIVariable; ++Loop) {
 				IVar >>= IVariableTypes(Loop).VarPtr;
 				auto & iVar(IVar());
-				if (iVar.Report && iVar.ReportFreq == ReportFrequency && iVar.Stored)
-				{
-					Variable *var = new Variable(IVariableTypes(Loop).VarName, ReportFrequency, 
+				if (iVar.Report && iVar.ReportFreq == ReportFrequency && iVar.Stored) {
+					OutputVariable *var = new OutputVariable(IVariableTypes(Loop).VarName, ReportFrequency, 
 								IVariableTypes(Loop).IndexType, 
 								IVariableTypes(Loop).ReportID,
 								IVariableTypes(Loop).UnitsString);
-					switch (ReportFrequency)
-					{
+					switch (ReportFrequency) {
 					case -1:  // each time UpdatedataandReport is called
 						if (IndexType == ZoneVar && IVariableTypes(Loop).IndexType == ZoneVar)
 						{
@@ -501,6 +593,131 @@ namespace EnergyPlus {
 				}
 			}
 
+			// set the scanned variables to true or false
+			switch (ReportFrequency) {
+				case -1:
+					if (IndexType == ZoneVar)
+						RIDetailedZoneTSData.setIVariablesScanned(true);
+					if (IndexType == HVACVar)
+						RIDetailedZoneTSData.setIVariablesScanned(true);
+					break;
+				case 0:  // at 'EndTimeStepFlag'
+					RITimestepTSData.setIVariablesScanned(true);
+					break;
+				case 1:  // at 'EndHourFlag'
+					RIHourlyTSData.setIVariablesScanned(true);
+					break;
+				case 2: // at 'EndDayFlag'
+					RIDailyTSData.setIVariablesScanned(true);
+					break;
+				case 3:  // at end of month
+					RIMonthlyTSData.setIVariablesScanned(true);
+					break;
+				case 4:  // once per environment 'EndEnvrnFlag'
+					RIRunPeriodTSData.setIVariablesScanned(true);
+					break;
+			}
+		}
+
+		void ResultsSchema::initializeMeters(const FArray1D< OutputProcessor::MeterType > &EnergyMeters, const int ReportFrequency) {
+			switch (ReportFrequency) {
+				case -1:
+					//nothing to do; meters are not reported at this frequency
+					break;
+				case 0:  // at 'Timestep'
+					for (int Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
+						if (EnergyMeters(Loop).RptTS || EnergyMeters(Loop).RptTSFO) {
+							MeterVariable *var = new MeterVariable(EnergyMeters(Loop).Name, ReportFrequency, EnergyMeters(Loop).TSRptNum, EnergyMeters(Loop).Units);
+							TSMeters.addVariable(var);
+							TSMeters.setRDataFrameEnabled(true);
+						}
+						if (EnergyMeters(Loop).RptAccTS || EnergyMeters(Loop).RptAccTSFO) {
+							MeterVariable *var = new MeterVariable(EnergyMeters(Loop).Name, ReportFrequency, EnergyMeters(Loop).TSAccRptNum, EnergyMeters(Loop).Units);
+							TSMeters.addVariable(var);
+							TSMeters.setRDataFrameEnabled(true);
+						}
+					}
+					break;
+				case 1:  // at 'Hourly'
+					for (int Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
+						if (EnergyMeters(Loop).RptHR || EnergyMeters(Loop).RptHRFO) {
+							MeterVariable *var = new MeterVariable(EnergyMeters(Loop).Name, ReportFrequency, EnergyMeters(Loop).HRRptNum, EnergyMeters(Loop).Units);
+							TSMeters.addVariable(var);
+							TSMeters.setRDataFrameEnabled(true);
+						}
+						if (EnergyMeters(Loop).RptAccHR || EnergyMeters(Loop).RptAccHRFO) {
+							MeterVariable *var = new MeterVariable(EnergyMeters(Loop).Name, ReportFrequency, EnergyMeters(Loop).HRAccRptNum, EnergyMeters(Loop).Units);
+							HRMeters.addVariable(var);
+							HRMeters.setRDataFrameEnabled(true);
+						}
+					}
+					break;
+				case 2:  // at 'Daily'
+					for (int Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
+						if (EnergyMeters(Loop).RptDY || EnergyMeters(Loop).RptDYFO) {
+							MeterVariable *var = new MeterVariable(EnergyMeters(Loop).Name, ReportFrequency, EnergyMeters(Loop).DYRptNum, EnergyMeters(Loop).Units);
+							DYMeters.addVariable(var);
+							DYMeters.setRDataFrameEnabled(true);
+						}
+						if (EnergyMeters(Loop).RptAccDY || EnergyMeters(Loop).RptAccDYFO) {
+							MeterVariable *var = new MeterVariable(EnergyMeters(Loop).Name, ReportFrequency, EnergyMeters(Loop).DYAccRptNum, EnergyMeters(Loop).Units);
+							DYMeters.addVariable(var);
+							DYMeters.setRDataFrameEnabled(true);
+						}
+					}
+					break;
+				case 3:  // at 'Monthly'
+					for (int Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
+						if (EnergyMeters(Loop).RptMN || EnergyMeters(Loop).RptMNFO) {
+							MeterVariable *var = new MeterVariable(EnergyMeters(Loop).Name, ReportFrequency, EnergyMeters(Loop).MNRptNum, EnergyMeters(Loop).Units);
+							MNMeters.addVariable(var);
+							MNMeters.setRDataFrameEnabled(true);
+						}
+						if (EnergyMeters(Loop).RptAccMN || EnergyMeters(Loop).RptAccMNFO) {
+							MeterVariable *var = new MeterVariable(EnergyMeters(Loop).Name, ReportFrequency, EnergyMeters(Loop).MNAccRptNum, EnergyMeters(Loop).Units);
+							MNMeters.addVariable(var);
+							MNMeters.setRDataFrameEnabled(true);
+						}
+					}
+					break;
+				case 4:  // at 'RunPeriod'/'SM'
+					for (int Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
+						if (EnergyMeters(Loop).RptSM || EnergyMeters(Loop).RptSMFO) {
+							MeterVariable *var = new MeterVariable(EnergyMeters(Loop).Name, ReportFrequency, EnergyMeters(Loop).SMRptNum, EnergyMeters(Loop).Units);
+							SMMeters.addVariable(var);
+							SMMeters.setRDataFrameEnabled(true);
+						}
+						if (EnergyMeters(Loop).RptAccSM || EnergyMeters(Loop).RptAccSMFO) {
+							MeterVariable *var = new MeterVariable(EnergyMeters(Loop).Name, ReportFrequency, EnergyMeters(Loop).SMAccRptNum, EnergyMeters(Loop).Units);
+							SMMeters.addVariable(var);
+							SMMeters.setRDataFrameEnabled(true);
+						}
+					}
+					break;
+			}
+
+			// set the scanned variables to true or false
+			switch (ReportFrequency)
+			{
+			case -1:
+				// case should not happen in Meters
+				break;
+			case 0:  // at TimeStepFlag
+				TSMeters.setRVariablesScanned(true);
+				break;
+			case 1:  // at Hourly
+				HRMeters.setRVariablesScanned(true);
+				break;
+			case 2: // at Daily
+				DYMeters.setRVariablesScanned(true);
+				break;
+			case 3:  // at Monthly
+				MNMeters.setRVariablesScanned(true);
+				break;
+			case 4:  // at RunPeriod/SM
+				SMMeters.setRVariablesScanned(true);
+				break;
+			}
 		}
 
 		void ResultsSchema::writeTimeSeriesFiles()
@@ -534,76 +751,88 @@ namespace EnergyPlus {
 				OutputSchema->RIRunPeriodTSData.writeFile();
 		}
 
+		char* ResultsSchema::convert(const std::string & s) {
+			char *pc = new char[s.size() + 1];
+			std::strcpy(pc, s.c_str());
+			return pc;
+		}
+
 		void ResultsSchema::writeFile()
 		{
 			std::string jsonfilename = "eplusout.json";
 			std::ofstream jsonfile(jsonfilename);
 
-			cJSON *_root, *_simRes, *outputVars;
+			cJSON *_root, *_simRes, *outputVars, *meterVars, *meterData, *mdd;
 
 			_root = cJSON_CreateObject();
 
 			cJSON_AddItemToObject(_root, "SimulationResults", _simRes = cJSON_CreateObject());
-			cJSON_AddItemToObject(_simRes, "Simulation", SimulationInformation.GetJSON());
+			cJSON_AddItemToObject(_simRes, "Simulation", SimulationInformation.getJSON());
 			
 			cJSON_AddItemToObject(_root, "OutputVariables", outputVars = cJSON_CreateObject());
+
 			if (RIDetailedZoneTSData.iDataFrameEnabled() || RIDetailedZoneTSData.rDataFrameEnabled())
-			{
-				cJSON *arr;
-				cJSON_AddItemToObject(outputVars, "Detailed-Zone", arr = cJSON_CreateArray());
-				for (int i = 0; i < RIDetailedZoneTSData.variables().size(); i++)
-					cJSON_AddItemToArray(arr, RIDetailedZoneTSData.variables()[i]->GetJSON());
-			}
-			if (RIDetailedZoneTSData.iDataFrameEnabled() || RIDetailedZoneTSData.rDataFrameEnabled())
-			{
-				cJSON *arr;
-				cJSON_AddItemToObject(outputVars, "Detailed-Zone", arr = cJSON_CreateArray());
-				for (int i = 0; i < RIDetailedZoneTSData.variables().size(); i++)
-					cJSON_AddItemToArray(arr, RIDetailedZoneTSData.variables()[i]->GetJSON());
-			}
-			if (RIDetailedHVACTSData.iDataFrameEnabled() || RIDetailedHVACTSData.rDataFrameEnabled())
-			{
-				cJSON *arr;
-				cJSON_AddItemToObject(outputVars, "Detailed-HVAC", arr = cJSON_CreateArray());
-				for (int i = 0; i < RIDetailedHVACTSData.variables().size(); i++)
-					cJSON_AddItemToArray(arr, RIDetailedHVACTSData.variables()[i]->GetJSON());
-			}
-			if (RITimestepTSData.iDataFrameEnabled() || RITimestepTSData.rDataFrameEnabled())
-			{
-				cJSON *arr;
-				cJSON_AddItemToObject(outputVars, "TimeStep", arr = cJSON_CreateArray());
-				for (int i = 0; i < RITimestepTSData.variables().size(); i++)
-					cJSON_AddItemToArray(arr, RITimestepTSData.variables()[i]->GetJSON());
-			}
-			if (RIHourlyTSData.iDataFrameEnabled() || RIHourlyTSData.rDataFrameEnabled())
-			{
-				cJSON *arr;
-				cJSON_AddItemToObject(outputVars, "Hourly", arr = cJSON_CreateArray());
-				for (int i = 0; i < RIHourlyTSData.variables().size(); i++)
-					cJSON_AddItemToArray(arr, RIHourlyTSData.variables()[i]->GetJSON());
-			}
-			if (RIDailyTSData.iDataFrameEnabled() || RIDailyTSData.rDataFrameEnabled())
-			{
-				cJSON *arr;
-				cJSON_AddItemToObject(outputVars, "Daily", arr = cJSON_CreateArray());
-				for (int i = 0; i < RIDailyTSData.variables().size(); i++)
-					cJSON_AddItemToArray(arr, RIDailyTSData.variables()[i]->GetJSON());
-			}
-			if (RIMonthlyTSData.iDataFrameEnabled() || RIMonthlyTSData.rDataFrameEnabled())
-			{
-				cJSON *arr;
-				cJSON_AddItemToObject(outputVars, "Monthly", arr = cJSON_CreateArray());
-				for (int i = 0; i < RIMonthlyTSData.variables().size(); i++)
-					cJSON_AddItemToArray(arr, RIMonthlyTSData.variables()[i]->GetJSON());
-			}
-			if (RIRunPeriodTSData.iDataFrameEnabled() || RIRunPeriodTSData.rDataFrameEnabled())
-			{
-				cJSON *arr;
-				cJSON_AddItemToObject(outputVars, "RunPeriod", arr = cJSON_CreateArray());
-				for (int i = 0; i < RIRunPeriodTSData.variables().size(); i++)
-					cJSON_AddItemToArray(arr, RIRunPeriodTSData.variables()[i]->GetJSON());
-			}
+				cJSON_AddItemToObject(outputVars, "Detailed-Zone", RIDetailedZoneTSData.getVariablesJSON());
 			
+			if (RIDetailedHVACTSData.iDataFrameEnabled() || RIDetailedHVACTSData.rDataFrameEnabled())
+				cJSON_AddItemToObject(outputVars, "Detailed-HVAC", RIDetailedHVACTSData.getVariablesJSON());
+
+			if (RITimestepTSData.iDataFrameEnabled() || RITimestepTSData.rDataFrameEnabled())
+				cJSON_AddItemToObject(outputVars, "Timestep", RITimestepTSData.getVariablesJSON());
+
+			if (RIHourlyTSData.iDataFrameEnabled() || RIHourlyTSData.rDataFrameEnabled())
+				cJSON_AddItemToObject(outputVars, "Hourly", RIHourlyTSData.getVariablesJSON());
+
+			if (RIDailyTSData.iDataFrameEnabled() || RIDailyTSData.rDataFrameEnabled())
+				cJSON_AddItemToObject(outputVars, "Daily", RIDailyTSData.getVariablesJSON());
+
+			if (RIMonthlyTSData.iDataFrameEnabled() || RIMonthlyTSData.rDataFrameEnabled())
+				cJSON_AddItemToObject(outputVars, "Monthly", RIMonthlyTSData.getVariablesJSON());
+
+			if (RIRunPeriodTSData.iDataFrameEnabled() || RIRunPeriodTSData.rDataFrameEnabled())
+				cJSON_AddItemToObject(outputVars, "RunPeriod", RIRunPeriodTSData.getVariablesJSON());
+
+			cJSON_AddItemToObject(_root, "MeterVariables", meterVars = cJSON_CreateObject());
+			
+			cJSON_AddItemToObject(meterVars, "MeterDictonary", mdd = cJSON_CreateArray());
+
+			for (int i = 0; i < MDD.size(); i++) {
+				cJSON* str = cJSON_CreateString(MDD[i].c_str());
+				cJSON_AddItemToArray(mdd, str);
+			}		
+
+			if (TSMeters.rDataFrameEnabled())
+				cJSON_AddItemToObject(meterVars, "Timestep", TSMeters.getVariablesJSON());
+
+			if (HRMeters.rDataFrameEnabled())
+				cJSON_AddItemToObject(meterVars, "Hourly", HRMeters.getVariablesJSON());
+			
+			if (DYMeters.rDataFrameEnabled())
+				cJSON_AddItemToObject(meterVars, "Daily", DYMeters.getVariablesJSON());
+			
+			if (MNMeters.rDataFrameEnabled())
+				cJSON_AddItemToObject(meterVars, "Monthly", MNMeters.getVariablesJSON());
+
+			if (SMMeters.rDataFrameEnabled())
+				cJSON_AddItemToObject(meterVars, "RunPeriod", SMMeters.getVariablesJSON());
+
+			cJSON_AddItemToObject(_root, "MeterData", meterData = cJSON_CreateObject());
+
+			if (TSMeters.rDataFrameEnabled())
+				cJSON_AddItemToObject(meterData, "Timestep", TSMeters.getJSON());
+
+			if (HRMeters.rDataFrameEnabled())
+				cJSON_AddItemToObject(meterData, "Hourly", HRMeters.getJSON());
+
+			if (DYMeters.rDataFrameEnabled())
+				cJSON_AddItemToObject(meterData, "Daily", DYMeters.getJSON());
+
+			if (MNMeters.rDataFrameEnabled())
+				cJSON_AddItemToObject(meterData, "Monthly", MNMeters.getJSON());
+
+			if (SMMeters.rDataFrameEnabled())
+				cJSON_AddItemToObject(meterData, "RunPeriod", SMMeters.getJSON());
+
 			if (jsonfile.is_open())	{
 				jsonfile << cJSON_Print(_root);
 				jsonfile.close();

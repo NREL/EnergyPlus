@@ -45,7 +45,8 @@ namespace EnergyPlus {
 			void setNumErrorsWarmup(const std::string  numWarningsDuringWarmup, const std::string  numSevereDuringWarmup);
 			void setNumErrorsSizing(const std::string  numWarningsDuringSizing, const std::string  numSevereDuringSizing);
 			void setNumErrorsSummary(const std::string  numWarnings, const std::string  numSevere);
-			cJSON* GetJSON();
+			cJSON* getJSON();
+
 		protected:
 			std::string ProgramVersion;
 			std::string SimulationEnvironment;
@@ -78,7 +79,8 @@ namespace EnergyPlus {
 			void pushValue(const double val);
 			std::vector<double>& values();
 			
-			cJSON* GetJSON();
+			cJSON* getJSON();
+
 		protected:
 			std::string varName;
 			std::string sReportFreq;
@@ -87,6 +89,24 @@ namespace EnergyPlus {
 			int idxType;
 			int rptID;
 			std::vector<double> Values;
+		};
+
+		class OutputVariable : public Variable {
+		public:
+			OutputVariable(const std::string VarName, const int ReportFrequency, const int IndexType, const int ReportID, const std::string units);
+		};
+
+		class MeterVariable : public Variable {
+		public:
+			MeterVariable(const std::string VarName, const int ReportFrequency, const int ReportID, const std::string units, const bool Acculumative=false);
+
+			bool accumulative();
+			void setAccumulative(bool state);
+
+			cJSON* getJSON();
+
+		protected:
+			bool acc;
 		};
 
 		class DataFrame : public BaseResultObject {
@@ -100,19 +120,33 @@ namespace EnergyPlus {
 
 			void setRDataFrameEnabled(bool state);
 			void setIDataFrameEnabled(bool state);
+			
 			bool rDataFrameEnabled();
 			bool iDataFrameEnabled();
 
+			void setRVariablesScanned(bool state);
+			void setIVariablesScanned(bool state);
+
+			bool rVariablesScanned();
+			bool iVariablesScanned();
+
 			void newRow(const int month, const int dayOfMonth, const int hourOfDay, const int curMin);
+			void newRow(const std::string ts);
 			void pushVariableValue(const int reportID, double value);
 			
 			Variable* lastVariable();
 			std::vector < Variable *> variables();
+			
+			cJSON *getVariablesJSON();
+			cJSON* getJSON();
 
 			void writeFile();
+
 		protected:
 			bool IDataFrameEnabled;
 			bool RDataFrameEnabled;
+			bool RVariablesScanned;
+			bool IVariablesScanned;
 			std::string ReportFrequency;
 			std::vector < std::string > TS;
 			std::vector < Variable *> outputVariables;
@@ -132,17 +166,23 @@ namespace EnergyPlus {
 
 			void initializeRTSDataFrame(const int ReportFrequency, const FArray1D< OutputProcessor::RealVariableType > &RVariableTypes, const int NumOfRVariable, const int IndexType = OutputProcessor::ZoneVar);
 			void initializeITSDataFrame(const int ReportFrequency, const FArray1D< OutputProcessor::IntegerVariableType > &IVariableTypes, const int NumOfIVariable, const int IndexType = OutputProcessor::ZoneVar);
+			void initializeMeters(const FArray1D< OutputProcessor::MeterType > &EnergyMeters, const int ReportFrequency);
 
 			static DataFrame RIDetailedZoneTSData, RIDetailedHVACTSData, RITimestepTSData, RIHourlyTSData, RIDailyTSData, RIMonthlyTSData, RIRunPeriodTSData;
+			static DataFrame TSMeters, HRMeters, DYMeters, MNMeters, SMMeters;
 
 			void writeTimeSeriesFiles();
 			void writeFile();
 
 			SimInfo SimulationInformation;
+
+			std::vector<std::string> MDD;
+			std::vector<std::string> RDD;
 		protected:
+			char *convert(const std::string & s);
+
 			bool tsEnabled;
 			bool tsAndTabularEnabled;
-			
 		};
 
 		extern std::unique_ptr<ResultsSchema> OutputSchema;
