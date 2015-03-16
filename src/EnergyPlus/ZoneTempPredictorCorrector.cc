@@ -24,6 +24,7 @@
 #include <DataZoneControls.hh>
 #include <DataZoneEnergyDemands.hh>
 #include <DataZoneEquipment.hh>
+#include <FaultsManager.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
@@ -86,6 +87,7 @@ namespace ZoneTempPredictorCorrector {
 	using DataAirflowNetwork::AirflowNetworkControlMultiADS;
 	using namespace DataRoomAirModel;
 	using namespace DataZoneControls;
+	using namespace FaultsManager;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -1936,7 +1938,6 @@ namespace ZoneTempPredictorCorrector {
 		// na
 
 		// Using/Aliasing
-		using DataZoneEquipment::ZoneEquipConfig;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataSurfaces::Surface;
 
@@ -2566,6 +2567,14 @@ namespace ZoneTempPredictorCorrector {
 			}
 		}
 
+		//Tuned Precompute controlled equip zone numbers for performance
+		std::vector< int > controlledZoneEquipConfigNums;
+		for ( int ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum ) {
+			if ( Zone( ZoneEquipConfigNum ).IsControlled ) {
+				controlledZoneEquipConfigNums.push_back( ZoneEquipConfigNum );
+			}
+		}
+
 		// Update zone temperatures
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
@@ -2633,7 +2642,7 @@ namespace ZoneTempPredictorCorrector {
 			// Calculate the various heat balance sums
 
 			// NOTE: SumSysMCp and SumSysMCpT are not used in the predict step
-			CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT );
+			CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
 
 			TempDepCoef = SumHA + SumMCp;
 			TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT + SysDepZoneLoadsLagged( ZoneNum );
@@ -2714,6 +2723,7 @@ namespace ZoneTempPredictorCorrector {
 		using General::TrimSigDigits;
 		using DataZoneControls::OccRoomTSetPointHeat;
 		using DataZoneControls::OccRoomTSetPointCool;
+		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2867,10 +2877,42 @@ namespace ZoneTempPredictorCorrector {
 				ShowSevereError( "CalcZoneAirTempSetpoints: Illegal control type for Zone=" + Zone( ActualZoneNum ).Name + ", Found value=" + TrimSigDigits( TempControlType( ActualZoneNum ) ) + ", in Schedule=" + TempControlledZone( RelativeZoneNum ).ControlTypeSchedName );
 
 			}}
-
+			
+			//Apply offset for faulty therostats_Feb. 2015, zrp
+			if ( ( NumFaultyThermostat > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ) {
+			
+				//  loop through the FaultsThermostatOffset objects to find the one for the zone
+				for ( int iFault = 1; iFault <= NumFaultyThermostat; ++iFault ) {
+				
+					if ( SameString( TempControlledZone( RelativeZoneNum ).Name, FaultsThermostatOffset( iFault ).FaultyThermostatName ) ) {
+					
+						// Check fault availability schedules
+						if ( GetCurrentScheduleValue( FaultsThermostatOffset( iFault ).AvaiSchedPtr ) > 0.0 ) {
+							
+							// Check fault severity schedules to update the reference thermostat offset
+							double rSchVal = 1.0;
+							double offsetUpdated;							
+							if ( FaultsThermostatOffset( iFault ).SeveritySchedPtr >= 0 ) {
+								rSchVal = GetCurrentScheduleValue( FaultsThermostatOffset( iFault ).SeveritySchedPtr );
+							}						
+							offsetUpdated = rSchVal * FaultsThermostatOffset( iFault ).Offset;
+							
+							// Positive offset means the sensor reading is higher than the actual value
+							TempZoneThermostatSetPoint( ActualZoneNum ) -= offsetUpdated; 
+							ZoneThermostatSetPointLo( ActualZoneNum ) -= offsetUpdated;
+							ZoneThermostatSetPointHi( ActualZoneNum ) -= offsetUpdated;
+						}
+						
+						// Stop searching the FaultsThermostatOffset object for the zone
+						break;
+					}
+				}
+			}
+		
 		}
 
 		if ( NumComfortControlledZones > 0 ) CalcZoneAirComfortSetPoints();
+		
 
 	}
 
@@ -3223,6 +3265,7 @@ namespace ZoneTempPredictorCorrector {
 		using DataSurfaces::Surface;
 		using DataSurfaces::HeatTransferModel_EMPD;
 		using DataSurfaces::HeatTransferModel_HAMT;
+		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3271,6 +3314,8 @@ namespace ZoneTempPredictorCorrector {
 			ZoneAirRH = PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress ) * 100.0;
 			ZoneRHHumidifyingSetPoint = GetCurrentScheduleValue( HumidityControlZone( HumidControlledZoneNum ).HumidifyingSchedIndex );
 			ZoneRHDehumidifyingSetPoint = GetCurrentScheduleValue( HumidityControlZone( HumidControlledZoneNum ).DehumidifyingSchedIndex );
+			
+			// Apply EMS values to overwrite the humidistat values
 			if ( HumidityControlZone( HumidControlledZoneNum ).EMSOverrideHumidifySetPointOn ) {
 				ZoneRHHumidifyingSetPoint = HumidityControlZone( HumidControlledZoneNum ).EMSOverrideHumidifySetPointValue;
 			}
@@ -3278,6 +3323,40 @@ namespace ZoneTempPredictorCorrector {
 				ZoneRHDehumidifyingSetPoint = HumidityControlZone( HumidControlledZoneNum ).EMSOverrideDehumidifySetPointValue;
 			}
 
+			// Apply offsets for faulty humidistats_Feb. 2015, zrp
+			if ( ( NumFaultyHumidistat > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ) {
+			
+				//  loop through the FaultsHumidistatOffset objects to find the one for the zone
+				for ( int iFault = 1; iFault <= NumFaultyHumidistat; ++iFault ) {
+				
+					if ( SameString( HumidityControlZone( HumidControlledZoneNum ).ControlName, FaultsHumidistatOffset( iFault ).FaultyHumidistatName ) ) {
+					
+						// Check fault availability schedules
+						if ( GetCurrentScheduleValue( FaultsHumidistatOffset( iFault ).AvaiSchedPtr ) > 0.0 ) {
+							
+							// Check fault severity schedules to update the reference humidistat offset
+							double rSchVal = 1.0;
+							double offsetUpdated;							
+							if ( FaultsHumidistatOffset( iFault ).SeveritySchedPtr >= 0 ) {
+								rSchVal = GetCurrentScheduleValue( FaultsHumidistatOffset( iFault ).SeveritySchedPtr );
+							}						
+							offsetUpdated = rSchVal * FaultsHumidistatOffset( iFault ).Offset;
+							
+							// Positive offset means the sensor reading is higher than the actual value
+							ZoneRHHumidifyingSetPoint -= offsetUpdated; 
+							ZoneRHDehumidifyingSetPoint -= offsetUpdated;
+
+							// constrain value to something reasonable
+							ZoneRHHumidifyingSetPoint = min( 100.0, max( 0.0, ZoneRHHumidifyingSetPoint ) );
+							ZoneRHDehumidifyingSetPoint = min( 100.0, max( 0.0, ZoneRHDehumidifyingSetPoint ) );
+						}
+						
+						// Stop searching the FaultsHumidistatOffset object for the zone
+						break;
+					}
+				}
+			}
+			
 			// Run-time error check
 			if ( ZoneRHHumidifyingSetPoint > ZoneRHDehumidifyingSetPoint ) {
 				//      HumidityControlZone(HumidControlledZoneNum)%ErrorCount = HumidityControlZone(HumidControlledZoneNum)%ErrorCount + 1
@@ -3505,13 +3584,21 @@ namespace ZoneTempPredictorCorrector {
 		// Initializations
 		ZoneTempChange = constant_zero;
 
+		//Tuned Precompute controlled equip zone numbers for performance
+		std::vector< int > controlledZoneEquipConfigNums;
+		for ( int ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum ) {
+			if ( Zone( ZoneEquipConfigNum ).IsControlled ) {
+				controlledZoneEquipConfigNums.push_back( ZoneEquipConfigNum );
+			}
+		}
+
 		// Update zone temperatures
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
 			ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
 
 			if ( ShortenTimeStepSys ) {
-				//time step has gotten smaller, use zone timestep history to interpolate new set of "DS" history terms.
+				// time step has gotten smaller, use zone timestep history to interpolate new set of "DS" history terms.
 				if ( NumOfSysTimeSteps != NumOfSysTimeStepsLastZoneTimeStep ) { // cannot reuse existing DS data, interpolate from zone time
 					DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, MAT( ZoneNum ), XMAT( ZoneNum ), XM2T( ZoneNum ), XM3T( ZoneNum ), XM4T( ZoneNum ), MAT( ZoneNum ), DSXMAT( ZoneNum ), DSXM2T( ZoneNum ), DSXM3T( ZoneNum ), DSXM4T( ZoneNum ) );
 					DownInterpolate4HistoryValues( PriorTimeStep, TimeStepSys, ZoneAirHumRat( ZoneNum ), WZoneTimeMinus1( ZoneNum ), WZoneTimeMinus2( ZoneNum ), WZoneTimeMinus3( ZoneNum ), WZoneTimeMinus4( ZoneNum ), ZoneAirHumRat( ZoneNum ), DSWZoneTimeMinus1( ZoneNum ), DSWZoneTimeMinus2( ZoneNum ), DSWZoneTimeMinus3( ZoneNum ), DSWZoneTimeMinus4( ZoneNum ) );
@@ -3544,7 +3631,6 @@ namespace ZoneTempPredictorCorrector {
 				WZoneTimeMinus1Temp( ZoneNum ) = WZoneTimeMinus1( ZoneNum );
 				WZoneTimeMinus2Temp( ZoneNum ) = WZoneTimeMinus2( ZoneNum );
 				WZoneTimeMinus3Temp( ZoneNum ) = WZoneTimeMinus3( ZoneNum );
-
 			}
 
 			AIRRAT( ZoneNum ) = Zone( ZoneNum ).Volume * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MAT( ZoneNum ) ) / ( TimeStepSys * SecInHour );
@@ -3554,7 +3640,7 @@ namespace ZoneTempPredictorCorrector {
 			ManageAirModel( ZoneNum );
 
 			// Calculate the various heat balance sums
-			CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT );
+			CalcZoneSums( ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, controlledZoneEquipConfigNums );
 			//    ZoneTempHistoryTerm = (3.0D0 * ZTM1(ZoneNum) - (3.0D0/2.0D0) * ZTM2(ZoneNum) + (1.0D0/3.0D0) * ZTM3(ZoneNum))
 			ZoneNodeNum = Zone( ZoneNum ).SystemZoneNodeNumber;
 
@@ -3681,7 +3767,7 @@ namespace ZoneTempPredictorCorrector {
 			SNLoadCoolEnergy( ZoneNum ) = std::abs( min( SNLoad, 0.0 ) * TimeStepSys * SecInHour );
 
 			// Final humidity calcs
-			CorrectZoneHumRat( ZoneNum );
+			CorrectZoneHumRat( ZoneNum, controlledZoneEquipConfigNums );
 
 			ZoneAirHumRat( ZoneNum ) = ZoneAirHumRatTemp( ZoneNum );
 			ZoneAirRelHum( ZoneNum ) = 100.0 * PsyRhFnTdbWPb( ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress, RoutineName );
@@ -3722,7 +3808,7 @@ namespace ZoneTempPredictorCorrector {
 				}
 			}}
 
-			CalcZoneComponentLoadSums( ZoneNum, TempDepCoef, TempIndCoef, ZnAirRpt( ZoneNum ).SumIntGains, ZnAirRpt( ZoneNum ).SumHADTsurfs, ZnAirRpt( ZoneNum ).SumMCpDTzones, ZnAirRpt( ZoneNum ).SumMCpDtInfil, ZnAirRpt( ZoneNum ).SumMCpDTsystem, ZnAirRpt( ZoneNum ).SumNonAirSystem, ZnAirRpt( ZoneNum ).CzdTdt, ZnAirRpt( ZoneNum ).imBalance ); // convection part of internal gains | surface convection heat transfer | interzone mixing | OA of various kinds except via system | air system | non air system | air mass energy storage term | measure of imbalance in zone air heat balance
+			CalcZoneComponentLoadSums( ZoneNum, TempDepCoef, TempIndCoef, ZnAirRpt( ZoneNum ).SumIntGains, ZnAirRpt( ZoneNum ).SumHADTsurfs, ZnAirRpt( ZoneNum ).SumMCpDTzones, ZnAirRpt( ZoneNum ).SumMCpDtInfil, ZnAirRpt( ZoneNum ).SumMCpDTsystem, ZnAirRpt( ZoneNum ).SumNonAirSystem, ZnAirRpt( ZoneNum ).CzdTdt, ZnAirRpt( ZoneNum ).imBalance, controlledZoneEquipConfigNums ); // convection part of internal gains | surface convection heat transfer | interzone mixing | OA of various kinds except via system | air system | non air system | air mass energy storage term | measure of imbalance in zone air heat balance
 
 		} // ZoneNum
 
@@ -3985,7 +4071,10 @@ namespace ZoneTempPredictorCorrector {
 	}
 
 	void
-	CorrectZoneHumRat( int const ZoneNum )
+	CorrectZoneHumRat(
+		int const ZoneNum,
+		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4064,13 +4153,15 @@ namespace ZoneTempPredictorCorrector {
 		ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
 
 		// Check to see if this is a controlled zone
+		ZoneEquipConfigNum = 0;
 		ControlledZoneAirFlag = false;
-		for ( ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum ) {
-			if ( ! Zone( ZoneEquipConfigNum ).IsControlled ) continue;
-			if ( ZoneEquipConfig( ZoneEquipConfigNum ).ActualZoneNum != ZoneNum ) continue;
-			ControlledZoneAirFlag = true;
-			break;
-		} // ZoneEquipConfigNum
+		for ( std::vector< int >::size_type i = 0, e = controlledZoneEquipConfigNums.size(); i < e; ++i ) {
+			if ( ZoneEquipConfig( controlledZoneEquipConfigNums[ i ] ).ActualZoneNum == ZoneNum ) {
+				ZoneEquipConfigNum = controlledZoneEquipConfigNums[ i ];
+				ControlledZoneAirFlag = true;
+				break;
+			}
+		}
 
 		// Check to see if this is a plenum zone
 		ZoneRetPlenumAirFlag = false;
@@ -4331,7 +4422,8 @@ namespace ZoneTempPredictorCorrector {
 		Real64 & SumMCp, // Zone sum of MassFlowRate*Cp
 		Real64 & SumMCpT, // Zone sum of MassFlowRate*Cp*T
 		Real64 & SumSysMCp, // Zone sum of air system MassFlowRate*Cp
-		Real64 & SumSysMCpT // Zone sum of air system MassFlowRate*Cp*T
+		Real64 & SumSysMCpT, // Zone sum of air system MassFlowRate*Cp*T
+		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
 	)
 	{
 
@@ -4436,18 +4528,15 @@ namespace ZoneTempPredictorCorrector {
 		// Sum all system air flow: SumSysMCp, SumSysMCpT
 		// Check to see if this is a controlled zone
 
+		ZoneEquipConfigNum = 0;
 		ControlledZoneAirFlag = false;
-		//  If (Zone(ZoneNum)%IsControlled) Then   ! more CR 7384
-		//    ControlledZoneAirFlag = .TRUE.       ! more CR 7384
-		//    ZoneEquipConfigNum = ZoneNum         ! more CR 7384
-		//  endif
-		// BG feb 2008 repeating this do loop every time seems crazy, store ControlledZoneAirFlag in Zone structure?
-		for ( ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum ) {
-			if ( ! Zone( ZoneEquipConfigNum ).IsControlled ) continue;
-			if ( ZoneEquipConfig( ZoneEquipConfigNum ).ActualZoneNum != ZoneNum ) continue;
-			ControlledZoneAirFlag = true;
-			break; //sloppy way of finding ZoneEquipConfigNum for later use.
-		} // ZoneEquipConfigNum
+		for ( std::vector< int >::size_type i = 0, e = controlledZoneEquipConfigNums.size(); i < e; ++i ) {
+			if ( ZoneEquipConfig( controlledZoneEquipConfigNums[ i ] ).ActualZoneNum == ZoneNum ) {
+				ZoneEquipConfigNum = controlledZoneEquipConfigNums[ i ];
+				ControlledZoneAirFlag = true;
+				break;
+			}
+		}
 
 		// Check to see if this is a plenum zone
 		// BG feb 2008 repeating this do loop every time seems crazy, store ControlledZoneAirFlag in Zone structure?
@@ -4570,10 +4659,10 @@ namespace ZoneTempPredictorCorrector {
 						WinHeatGain( SurfNum ) += SurfaceWindow( SurfNum ).RetHeatGainToZoneAir;
 						if ( WinHeatGain( SurfNum ) >= 0.0 ) {
 							WinHeatGainRep( SurfNum ) = WinHeatGain( SurfNum );
-							WinHeatGainRepEnergy( SurfNum ) = WinHeatGainRep( SurfNum ) * TimeStepZone * SecInHour;
+							WinHeatGainRepEnergy( SurfNum ) = WinHeatGainRep( SurfNum ) * TimeStepZoneSec;
 						} else {
 							WinHeatLossRep( SurfNum ) = -WinHeatGain( SurfNum );
-							WinHeatLossRepEnergy( SurfNum ) = WinHeatLossRep( SurfNum ) * TimeStepZone * SecInHour;
+							WinHeatLossRepEnergy( SurfNum ) = WinHeatLossRep( SurfNum ) * TimeStepZoneSec;
 						}
 					}
 				}
@@ -4643,7 +4732,8 @@ namespace ZoneTempPredictorCorrector {
 		Real64 & SumMCpDTsystem, // Zone sum of air system MassFlowRate*Cp*(Tsup - Tz)
 		Real64 & SumNonAirSystem, // Zone sum of non air system convective heat gains
 		Real64 & CzdTdt, // Zone air energy storage term.
-		Real64 & imBalance // put all terms in eq. 5 on RHS , should be zero
+		Real64 & imBalance, // put all terms in eq. 5 on RHS , should be zero
+		std::vector< int > const & controlledZoneEquipConfigNums // Precomputed controlled equip nums
 	)
 	{
 
@@ -4758,13 +4848,15 @@ namespace ZoneTempPredictorCorrector {
 		// Check to see if this is a controlled zone
 
 		// CR 7384 continuation needed below.  eliminate do loop for speed and clarity
+		ZoneEquipConfigNum = 0;
 		ControlledZoneAirFlag = false;
-		for ( ZoneEquipConfigNum = 1; ZoneEquipConfigNum <= NumOfZones; ++ZoneEquipConfigNum ) {
-			if ( ! ZoneEquipConfig( ZoneEquipConfigNum ).IsControlled ) continue;
-			if ( ZoneEquipConfig( ZoneEquipConfigNum ).ActualZoneNum != ZoneNum ) continue;
-			ControlledZoneAirFlag = true;
-			break;
-		} // ZoneEquipConfigNum
+		for ( std::vector< int >::size_type i = 0, e = controlledZoneEquipConfigNums.size(); i < e; ++i ) {
+			if ( ZoneEquipConfig( controlledZoneEquipConfigNums[ i ] ).ActualZoneNum == ZoneNum ) {
+				ZoneEquipConfigNum = controlledZoneEquipConfigNums[ i ];
+				ControlledZoneAirFlag = true;
+				break;
+			}
+		}
 
 		// Check to see if this is a plenum zone
 		ZoneRetPlenumAirFlag = false;
@@ -5044,7 +5136,6 @@ namespace ZoneTempPredictorCorrector {
 		using DataZoneEquipment::ZoneEquipConfig;
 
 		// Return value
-		bool IsControlled; // True if does, false if not.
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -5061,13 +5152,7 @@ namespace ZoneTempPredictorCorrector {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		if ( FindItemInList( ZoneName, ZoneEquipConfig.ZoneName(), NumOfZones ) > 0 ) {
-			IsControlled = true;
-		} else {
-			IsControlled = false;
-		}
-		return IsControlled;
-
+		return ( FindItemInList( ZoneName, ZoneEquipConfig.ZoneName(), NumOfZones ) > 0 );
 	}
 
 	void
@@ -5655,7 +5740,7 @@ namespace ZoneTempPredictorCorrector {
 	Real64
 	PMVResidual(
 		Real64 const Tset,
-		Optional< FArray1S< Real64 > const > Par // par(1) = PMV set point
+		FArray1< Real64 > const & Par // par(1) = PMV set point
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -5697,9 +5782,9 @@ namespace ZoneTempPredictorCorrector {
 		int PeopleNum; // index of people object
 		Real64 PMVresult; // resulting PMV values
 
-		PeopleNum = int( Par()( 2 ) );
+		PeopleNum = int( Par( 2 ) );
 		CalcThermalComfortFanger( PeopleNum, Tset, PMVresult );
-		PMVResidual = Par()( 1 ) - PMVresult;
+		PMVResidual = Par( 1 ) - PMVresult;
 		return PMVResidual;
 
 	}
@@ -5775,7 +5860,7 @@ namespace ZoneTempPredictorCorrector {
 
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -323,7 +323,7 @@ namespace ConductionTransferFunctionCalc {
 					if ( ( rho( Layer ) * cp( Layer ) ) > 0.0 ) {
 						Alpha = rk( Layer ) / ( rho( Layer ) * cp( Layer ) );
 						if ( Alpha > HighDiffusivityThreshold ) {
-							DeltaTimestep = TimeStepZone * SecInHour;
+							DeltaTimestep = TimeStepZoneSec;
 							ThicknessThreshold = std::sqrt( Alpha * DeltaTimestep * 3.0 );
 							if ( Material( CurrentLayer ).Thickness < ThicknessThreshold ) {
 								ShowSevereError( "InitConductionTransferFunctions: Found Material that is too thin and/or too highly conductive, material name = " + Material( CurrentLayer ).Name );

@@ -3,8 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -326,6 +324,15 @@ namespace FluidCoolers {
 
 	// Functions
 
+	bool
+	TestFluidCoolerTwoSpeedInputForDesign(
+		std::string const cCurrentModuleObject,
+		FArray1D<std::string> const &  AlphArray,
+		FArray1D<std::string> const & cNumericFieldNames,
+		FArray1D<std::string> const & cAlphaFieldNames,
+		int const &	FluidCoolerNum
+		);
+
 	void
 	SimFluidCoolers(
 		std::string & FluidCoolerType,
@@ -389,7 +396,7 @@ namespace FluidCoolers {
 	Real64
 	SimpleFluidCoolerUAResidual(
 		Real64 const UA, // UA of fluid cooler
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = design fluid cooler load [W]
+		FArray1< Real64 > const & Par // par(1) = design fluid cooler load [W]
 	);
 
 	// End of the CondenserLoopFluidCoolers Module Simulation Subroutines

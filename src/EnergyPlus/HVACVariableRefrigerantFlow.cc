@@ -5326,7 +5326,7 @@ namespace HVACVariableRefrigerantFlow {
 	Real64
 	PLRResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = VRFTUNum
+		FArray1< Real64 > const & Par // par(1) = VRFTUNum
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -5380,18 +5380,14 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 OnOffAirFlowRatio; // ratio of compressor ON airflow to average airflow over timestep
 		Real64 ActualOutput; // delivered capacity of VRF terminal unit
 
-		VRFTUNum = int( Par()( 1 ) );
+		VRFTUNum = int( Par( 1 ) );
 		// FirstHVACIteration is a logical, Par is real, so make 1.0=TRUE and 0.0=FALSE
-		if ( Par()( 3 ) == 1.0 ) {
-			FirstHVACIteration = true;
-		} else {
-			FirstHVACIteration = false;
-		}
-		OpMode = int( Par()( 4 ) );
-		QZnReq = Par()( 5 );
+		FirstHVACIteration = ( Par( 3 ) == 1.0 );
+		OpMode = int( Par( 4 ) );
+		QZnReq = Par( 5 );
 		QZnReqTemp = QZnReq;
 		if ( std::abs( QZnReq ) < 100.0 ) QZnReqTemp = sign( 100.0, QZnReq );
-		OnOffAirFlowRatio = Par()( 6 );
+		OnOffAirFlowRatio = Par( 6 );
 
 		CalcVRF( VRFTUNum, FirstHVACIteration, PartLoadRatio, ActualOutput, OnOffAirFlowRatio );
 		PLRResidual = ( ActualOutput - QZnReq ) / QZnReqTemp;
@@ -5994,6 +5990,106 @@ namespace HVACVariableRefrigerantFlow {
 				MaxLimit = RemainingCapacity / ( NumTUInList - TempTUIndex + 1 );
 				break;
 			}
+		}
+
+	}
+
+	int
+	GetVRFTUOutAirNode( int const VRFTUNum ) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         R. Raustad (copy of B Griffith routine)
+		//       DATE WRITTEN   Jan  2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// lookup function for VRF terminal unit OA inlet node
+
+		if( GetVRFInputFlag ) {
+			GetVRFInput();
+			GetVRFInputFlag = false;
+		}
+
+		if( VRFTUNum > 0 && VRFTUNum <= NumVRFTU ) {
+			return VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum;
+		} else {
+			return 0;
+		}
+		
+	}
+
+	int
+	GetVRFTUZoneInletAirNode( int const VRFTUNum ) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         R. Raustad (copy of B Griffith routine)
+		//       DATE WRITTEN   Jan  2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// lookup function for VRF terminal unit zone inlet node
+
+		if( GetVRFInputFlag ) {
+			GetVRFInput();
+			GetVRFInputFlag = false;
+		}
+
+		if( VRFTUNum > 0 && VRFTUNum <= NumVRFTU ) {
+			return VRFTU( VRFTUNum ).VRFTUOutletNodeNum;
+		} else {
+			return 0;
+		}
+
+	}
+
+	int
+	GetVRFTUMixedAirNode( int const VRFTUNum ) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         R. Raustad (copy of B Griffith routine)
+		//       DATE WRITTEN   Jan  2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// lookup function for VRF terminal unit mixed air node
+
+		if( GetVRFInputFlag ) {
+			GetVRFInput();
+			GetVRFInputFlag = false;
+		}
+
+		if( VRFTUNum > 0 && VRFTUNum <= NumVRFTU ) {
+			return VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum;
+		} else {
+			return 0;
+		}
+
+	}
+
+	int
+	GetVRFTUReturnAirNode( int const VRFTUNum ) {
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         R. Raustad (copy of B Griffith routine)
+		//       DATE WRITTEN   Jan  2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// lookup function for VRF terminal unit return air node
+
+		if( GetVRFInputFlag ) {
+			GetVRFInput();
+			GetVRFInputFlag = false;
+		}
+
+		if( VRFTUNum > 0 && VRFTUNum <= NumVRFTU ) {
+			return VRFTU( VRFTUNum ).VRFTUOAMixerRetNodeNum;
+		} else {
+			return 0;
 		}
 
 	}

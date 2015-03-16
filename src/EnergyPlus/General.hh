@@ -45,10 +45,21 @@ namespace General {
 		int const MaxIte, // maximum number of allowed iterations
 		int & Flag, // integer storing exit status
 		Real64 & XRes, // value of x that solves f(x [,Par]) = 0
-		std::function< Real64( Real64 const, Optional< FArray1S< Real64 > const > ) > f,
+		std::function< Real64( Real64 const, FArray1< Real64 > const & ) > f,
 		Real64 const X_0, // 1st bound of interval that contains the solution
 		Real64 const X_1, // 2nd bound of interval that contains the solution
-		Optional< FArray1S< Real64 > const > Par = _ // array with additional parameters used for function evaluation
+		FArray1< Real64 > const & Par // array with additional parameters used for function evaluation
+	);
+
+	void
+	SolveRegulaFalsi(
+		Real64 const Eps, // required absolute accuracy
+		int const MaxIte, // maximum number of allowed iterations
+		int & Flag, // integer storing exit status
+		Real64 & XRes, // value of x that solves f(x) = 0
+		std::function< Real64( Real64 const ) > f,
+		Real64 const X_0, // 1st bound of interval that contains the solution
+		Real64 const X_1 // 2nd bound of interval that contains the solution
 	);
 
 	Real64

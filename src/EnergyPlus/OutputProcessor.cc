@@ -196,7 +196,7 @@ namespace OutputProcessor {
 	int RunPeriodStampReportNbr; // RunPeriod Report number
 	std::string RunPeriodStampReportChr; // RunPeriod Report number (character -- for printing)
 	bool TrackingRunPeriodVariables( false ); // Requested RunPeriod Report Variables
-	Real64 SecondsPerTimeStep; // Seconds from NumTimeStepInHour
+	Real64 TimeStepZoneSec; // Seconds from NumTimeStepInHour
 	bool ErrorsLogged( false );
 	bool ProduceVariableDictionary( false );
 
@@ -344,7 +344,7 @@ namespace OutputProcessor {
 
 		OutputInitialized = true;
 
-		SecondsPerTimeStep = double( MinutesPerTimeStep ) * 60.0;
+		TimeStepZoneSec = double( MinutesPerTimeStep ) * 60.0;
 
 		InitializeMeters();
 
@@ -3361,51 +3361,51 @@ namespace OutputProcessor {
 			int const RT_forIPUnits( EnergyMeters( Loop ).RT_forIPUnits );
 			if ( RT_forIPUnits == RT_IPUnits_Electricity ) {
 				PreDefTableEntry( pdchEMelecannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue * convertJtoGJ );
-				PreDefTableEntry( pdchEMelecminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep );
+				PreDefTableEntry( pdchEMelecminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec );
 				PreDefTableEntry( pdchEMelecminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMelecmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep );
+				PreDefTableEntry( pdchEMelecmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec );
 				PreDefTableEntry( pdchEMelecmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_Gas ) {
 				PreDefTableEntry( pdchEMgasannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue * convertJtoGJ );
-				PreDefTableEntry( pdchEMgasminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep );
+				PreDefTableEntry( pdchEMgasminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec );
 				PreDefTableEntry( pdchEMgasminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMgasmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep );
+				PreDefTableEntry( pdchEMgasmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec );
 				PreDefTableEntry( pdchEMgasmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_Cooling ) {
 				PreDefTableEntry( pdchEMcoolannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue * convertJtoGJ );
-				PreDefTableEntry( pdchEMcoolminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep );
+				PreDefTableEntry( pdchEMcoolminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec );
 				PreDefTableEntry( pdchEMcoolminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMcoolmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep );
+				PreDefTableEntry( pdchEMcoolmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec );
 				PreDefTableEntry( pdchEMcoolmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_Water ) {
 				PreDefTableEntry( pdchEMwaterannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue );
-				PreDefTableEntry( pdchEMwaterminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep );
+				PreDefTableEntry( pdchEMwaterminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec );
 				PreDefTableEntry( pdchEMwaterminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMwatermaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep );
+				PreDefTableEntry( pdchEMwatermaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec );
 				PreDefTableEntry( pdchEMwatermaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_OtherKG ) {
 				PreDefTableEntry( pdchEMotherKGannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue );
-				PreDefTableEntry( pdchEMotherKGminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep, 3 );
+				PreDefTableEntry( pdchEMotherKGminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec, 3 );
 				PreDefTableEntry( pdchEMotherKGminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMotherKGmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep, 3 );
+				PreDefTableEntry( pdchEMotherKGmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec, 3 );
 				PreDefTableEntry( pdchEMotherKGmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_OtherM3 ) {
 				PreDefTableEntry( pdchEMotherM3annual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue, 3 );
-				PreDefTableEntry( pdchEMotherM3minvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep, 3 );
+				PreDefTableEntry( pdchEMotherM3minvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec, 3 );
 				PreDefTableEntry( pdchEMotherM3minvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMotherM3maxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep, 3 );
+				PreDefTableEntry( pdchEMotherM3maxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec, 3 );
 				PreDefTableEntry( pdchEMotherM3maxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
 			} else if ( RT_forIPUnits == RT_IPUnits_OtherL ) {
 				PreDefTableEntry( pdchEMotherLannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue, 3 );
-				PreDefTableEntry( pdchEMotherLminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep, 3 );
+				PreDefTableEntry( pdchEMotherLminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec, 3 );
 				PreDefTableEntry( pdchEMotherLminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMotherLmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep, 3 );
+				PreDefTableEntry( pdchEMotherLmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec, 3 );
 				PreDefTableEntry( pdchEMotherLmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
 			} else {
 				PreDefTableEntry( pdchEMotherJannual, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMValue * convertJtoGJ );
-				PreDefTableEntry( pdchEMotherJminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / SecondsPerTimeStep );
+				PreDefTableEntry( pdchEMotherJminvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMinVal / TimeStepZoneSec );
 				PreDefTableEntry( pdchEMotherJminvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMinValDate ) );
-				PreDefTableEntry( pdchEMotherJmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / SecondsPerTimeStep );
+				PreDefTableEntry( pdchEMotherJmaxvalue, EnergyMeters( Loop ).Name, EnergyMeters( Loop ).LastSMMaxVal / TimeStepZoneSec );
 				PreDefTableEntry( pdchEMotherJmaxvaluetime, EnergyMeters( Loop ).Name, DateToStringWithMonth( EnergyMeters( Loop ).LastSMMaxValDate ) );
 			}
 		}
@@ -3775,27 +3775,29 @@ namespace OutputProcessor {
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) ) {
 			std::sprintf( stamp, "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), Hour(), StartMinute(), EndMinute(), DayType().c_str() );
 			out_stream << stamp << NL;
-			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, EndMinute, StartMinute, DST, DayType );
+			if ( writeToSQL && sqlite ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, DataEnvironment::CurEnvirNum, Month, DayOfMonth, Hour, EndMinute, StartMinute, DST, DayType, DataGlobals::WarmupFlag );
 		} else if ( reportingInterval == ReportHourly ) {
 			std::sprintf( stamp, "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), Hour(), 0.0, 60.0, DayType().c_str() );
 			out_stream << stamp << NL;
-			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, _, _, DST, DayType );
+			if ( writeToSQL && sqlite ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, DataEnvironment::CurEnvirNum, Month, DayOfMonth, Hour, _, _, DST, DayType, DataGlobals::WarmupFlag );
 		} else if ( reportingInterval == ReportDaily ) {
 			std::sprintf( stamp, "%s,%s,%2d,%2d,%2d,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), DayType().c_str() );
 			out_stream << stamp << NL;
-			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, _, _, _, DST, DayType );
+			if ( writeToSQL && sqlite ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, DataEnvironment::CurEnvirNum, Month, DayOfMonth, _, _, _, DST, DayType, DataGlobals::WarmupFlag );
 		} else if ( reportingInterval == ReportMonthly ) {
 			std::sprintf( stamp, "%s,%s,%2d", reportIDString.c_str(), DayOfSimChr.c_str(), Month() );
 			out_stream << stamp << NL;
-			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( ReportMonthly, reportID, DayOfSim, Month );
+			if ( writeToSQL && sqlite ) sqlite->createSQLiteTimeIndexRecord( ReportMonthly, reportID, DayOfSim, DataEnvironment::CurEnvirNum, Month );
 		} else if ( reportingInterval == ReportSim ) {
 			std::sprintf( stamp, "%s,%s", reportIDString.c_str(), DayOfSimChr.c_str() );
 			out_stream << stamp << NL;
-			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim );
+			if ( writeToSQL && sqlite ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, DataEnvironment::CurEnvirNum );
 		} else {
 			std::ostringstream ss;
 			ss << "Illegal reportingInterval passed to WriteTimeStampFormatData: " << reportingInterval;
-			sqlite->sqliteWriteMessage( ss.str() );
+			if ( sqlite ) {
+				sqlite->sqliteWriteMessage( ss.str() );
+			}
 		}
 	}
 
@@ -3871,7 +3873,9 @@ namespace OutputProcessor {
 			if ( eso_stream ) *eso_stream << reportIDChr << ",11," << keyedValue << ',' << variableName << " [" << UnitsString << ']' << FreqString << NL;
 		}
 
-		sqlite->createSQLiteReportDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval, false, ScheduleName );
+		if ( sqlite ) {
+			sqlite->createSQLiteReportDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval, false, ScheduleName );
+		}
 
 	}
 
@@ -3999,7 +4003,9 @@ namespace OutputProcessor {
 		static std::string const keyedValueStringNon( "" );
 		std::string const & keyedValueString( cumulativeMeterFlag ? keyedValueStringCum : keyedValueStringNon );
 
-		sqlite->createSQLiteReportDictionaryRecord( reportID, storeType, indexGroup, keyedValueString, meterName, 1, UnitsString, reportingInterval, true );
+		if ( sqlite ) {
+			sqlite->createSQLiteReportDictionaryRecord( reportID, storeType, indexGroup, keyedValueString, meterName, 1, UnitsString, reportingInterval, true );
+		}
 
 	}
 
@@ -4145,7 +4151,9 @@ namespace OutputProcessor {
 		ProduceMinMaxString( MinOut, minValueDate, reportingInterval );
 		ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
 
-		sqlite->createSQLiteReportDataRecord( reportID, repVal, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate );
+		if ( sqlite ) {
+			sqlite->createSQLiteReportDataRecord( reportID, repVal, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate );
+		}
 
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) || ( reportingInterval == ReportHourly ) ) { // -1, 0, 1
 			if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << NL;
@@ -4212,7 +4220,9 @@ namespace OutputProcessor {
 			strip_trailing_zeros( strip( NumberOut ) );
 		}
 
-		sqlite->createSQLiteReportDataRecord( reportID, repValue );
+		if ( sqlite ) {
+			sqlite->createSQLiteReportDataRecord( reportID, repValue );
+		}
 
 		if ( mtr_stream ) *mtr_stream << creportID << ',' << NumberOut << NL;
 		++StdMeterRecordCount;
@@ -4301,7 +4311,9 @@ namespace OutputProcessor {
 			strip_trailing_zeros( strip( MinOut ) );
 		}
 
-		sqlite->createSQLiteReportDataRecord( reportID, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
+		if ( sqlite ) {
+			sqlite->createSQLiteReportDataRecord( reportID, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
+		}
 
 		// Append the min and max strings with date information
 		//    CALL ProduceMinMaxStringWStartMinute(MinOut, minValueDate, reportingInterval)
@@ -4486,7 +4498,9 @@ namespace OutputProcessor {
 			strip_number( s );
 		}
 
-		sqlite->createSQLiteReportDataRecord( reportID, repValue );
+		if ( sqlite ) {
+			sqlite->createSQLiteReportDataRecord( reportID, repValue );
+		}
 
 		if ( eso_stream ) *eso_stream << creportID << ',' << s << NL;
 
@@ -4630,7 +4644,9 @@ namespace OutputProcessor {
 
 		rminValue = minValue;
 		rmaxValue = MaxValue;
-		sqlite->createSQLiteReportDataRecord( reportID, repVal, reportingInterval, rminValue, minValueDate, rmaxValue, maxValueDate );
+		if ( sqlite ) {
+			sqlite->createSQLiteReportDataRecord( reportID, repVal, reportingInterval, rminValue, minValueDate, rmaxValue, maxValueDate );
+		}
 
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) || ( reportingInterval == ReportHourly ) ) { // -1, 0, 1
 			if ( eso_stream ) *eso_stream << reportIDString << ',' << NumberOut << NL;
@@ -4695,7 +4711,9 @@ namespace OutputProcessor {
 			}
 		}
 
-		sqlite->createSQLiteReportDataRecord( reportID, repValue );
+		if ( sqlite ) {
+			sqlite->createSQLiteReportDataRecord( reportID, repValue );
+		}
 
 		if ( eso_stream ) *eso_stream << reportIDString << ',' << NumberOut << NL;
 
@@ -8056,7 +8074,7 @@ AddToOutputVariableList(
 }
 
 //     NOTICE
-//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted

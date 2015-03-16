@@ -62,6 +62,7 @@ logical withUnits  ! True if units should be displayed on output lines (by field
 logical LeaveBlank  ! True if blank fields on input should be left blank (no default fill)
 integer auditf  ! auditfile
 real  :: VersionNum=0.0
+CHARACTER(len=3) :: sVersionNum=''
 
 ! Added for compare routines
 
