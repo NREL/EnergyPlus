@@ -620,6 +620,14 @@ if(BUILD_PACKAGE)
   install(FILES "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.csv" DESTINATION "./")
   install(FILES "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.md" DESTINATION "./")
   
+  # the example file summary
+  add_custom_command(
+    TARGET energyplus
+    PRE_BUILD
+    COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/doc/tools/example_file_summary.py" "${CMAKE_SOURCE_DIR}/testfiles" "${DOCS_OUT}/ExampleFiles.html"
+  )
+  install(FILES "${CMAKE_BINARY_DIR}/autodocs/ExampleFiles.html" DESTINATION "./ExampleFiles/")
+  
   # the change log, only if we do have a github token in the environment
   if(NOT "$ENV{GITHUB_TOKEN}" STREQUAL "")
     add_custom_command( 
