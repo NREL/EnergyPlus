@@ -1752,6 +1752,11 @@ namespace GroundHeatExchangers {
 		Real64 B1;
 		Real64 maxDistance;
 		Real64 distanceRatio;
+		Real64 smoothingFunction;
+		Real64 A( 3150 );
+		Real64 B( 350 );
+		Real64 laminarNusseltNo( 4.364 );
+		Real64 turbulentNusseltNo;
 
 		cpFluid = GetSpecificHeatGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
 		kFluid = GetConductivityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
@@ -1773,8 +1778,12 @@ namespace GroundHeatExchangers {
 			prandtlNum = ( cpFluid * fluidViscosity ) / ( kFluid );
 			//   Convection Resistance
 			if ( reynoldsNum <= 2300 ) {
-				nusseltNum = 4.364;
-			} else { 
+				nusseltNum = laminarNusseltNo;
+			} else if ( reynoldsNum > 2300 && reynoldsNum <= 4000 ) { 
+				smoothingFunction = 0.5 + 0.5 * std::tanh( ( reynoldsNum - A ) / B );
+				turbulentNusseltNo = 0.023 * std::pow( reynoldsNum, 0.8 ) * std::pow( prandtlNum, 0.35 );
+				nusseltNum = laminarNusseltNo * ( 1 - smoothingFunction ) + turbulentNusseltNo * smoothingFunction;
+			} else {
 				nusseltNum = 0.023 * std::pow( reynoldsNum, 0.8 ) * std::pow( prandtlNum, 0.35 );
 			}
 			hci = nusseltNum * kFluid / pipeInnerDia;
@@ -1852,6 +1861,11 @@ namespace GroundHeatExchangers {
 		Real64 B1;
 		Real64 maxDistance;
 		Real64 distanceRatio;
+		Real64 smoothingFunction;
+		Real64 A( 3150 );
+		Real64 B( 350 );
+		Real64 laminarNusseltNo( 4.364 );
+		Real64 turbulentNusseltNo;
 
 		cpFluid = GetSpecificHeatGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
 		kFluid = GetConductivityGlycol( PlantLoop( loopNum ).FluidName, inletTemp, PlantLoop( loopNum ).FluidIndex, RoutineName );
@@ -1873,7 +1887,11 @@ namespace GroundHeatExchangers {
 			prandtlNum = ( cpFluid * fluidViscosity ) / ( kFluid );
 			//   Convection Resistance
 			if ( reynoldsNum <= 2300 ) {
-				nusseltNum = 4.364;
+				nusseltNum = laminarNusseltNo;
+			} else if ( reynoldsNum > 2300 && reynoldsNum <= 4000 ) { 
+				smoothingFunction = 0.5 + 0.5 * std::tanh( ( reynoldsNum - A ) / B );
+				turbulentNusseltNo = 0.023 * std::pow( reynoldsNum, 0.8 ) * std::pow( prandtlNum, 0.35 );
+				nusseltNum = laminarNusseltNo * ( 1 - smoothingFunction ) + turbulentNusseltNo * smoothingFunction;
 			} else { 
 				nusseltNum = 0.023 * std::pow( reynoldsNum, 0.8 ) * std::pow( prandtlNum, 0.35 );
 			}

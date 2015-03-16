@@ -154,10 +154,15 @@ TEST( SlinkyGroundHeatExchangerTest, CalcHXResistance )
 	thisGLHE.calcHXResistance();
 	EXPECT_NEAR( 0.13487, thisGLHE.HXResistance, 0.0001 );
 
-	// Re > 2300 mass flow rate
+	// 4000 > Re > 2300 mass flow rate
 	thisGLHE.massFlowRate = 0.07;
 	thisGLHE.calcHXResistance();
-	EXPECT_NEAR( 0.079245, thisGLHE.HXResistance, 0.0001 );
+	EXPECT_NEAR( 0.08582, thisGLHE.HXResistance, 0.0001 );
+
+	// Re > 4000 mass flow rate
+	thisGLHE.massFlowRate = 0.1;
+	thisGLHE.calcHXResistance();
+	EXPECT_NEAR( 0.077185, thisGLHE.HXResistance, 0.0001 );
 
 	// Zero mass flow rate
 	thisGLHE.massFlowRate = 0.0;
@@ -201,14 +206,18 @@ TEST( VerticalGroundHeatExchangerTest, CalcHXResistance )
 	thisGLHE.calcHXResistance();
 	EXPECT_NEAR( 0.32891, thisGLHE.HXResistance, 0.0001 );
 
-	// Re > 2300 mass flow rate; all other distance ratios correction factor
+	// 4000 > Re > 2300 mass flow rate; all other distance ratios correction factor
 	thisGLHE.UtubeDist = 0.12;
 	thisGLHE.massFlowRate = 0.07;
 	thisGLHE.calcHXResistance();
-	EXPECT_NEAR( 0.17732, thisGLHE.HXResistance, 0.0001 );
+	EXPECT_NEAR( 0.18391, thisGLHE.HXResistance, 0.0001 );
+
+	// Re > 4000 mass flow rate; all other distance ratios correction factor
+	thisGLHE.massFlowRate = 0.1;
+	thisGLHE.calcHXResistance();
+	EXPECT_NEAR( 0.17526, thisGLHE.HXResistance, 0.0001 );
 
 	// Zero mass flow rate; distance ratio > 0.75 correction factor
-	thisGLHE.UtubeDist = 0.12;
 	thisGLHE.massFlowRate = 0.0;
 	thisGLHE.calcHXResistance();
 	EXPECT_NEAR( 0.16903, thisGLHE.HXResistance, 0.0001 );
