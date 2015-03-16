@@ -628,6 +628,8 @@ if(BUILD_PACKAGE)
       COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/doc/tools/create_changelog.py" "${CMAKE_SOURCE_DIR}" "${DOCS_OUT}/changelog.md" "${DOCS_OUT}/changelog.html" "$ENV{GITHUB_TOKEN}"
     )
     install(FILES "${CMAKE_BINARY_DIR}/autodocs/changelog.md" DESTINATION "./")
+  else()
+    message(WARNING "No GITHUB_TOKEN found in environment; package won't be complete")
   endif()
     
 endif()

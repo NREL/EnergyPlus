@@ -49,9 +49,7 @@ option( BUILD_FORTRAN "Build Fortran stuff" OFF )
 # 2. Doing package building, since Python is going to be our tool for some things; thus: BUILD_PACKAGE
 
 if( ( BUILD_TESTING AND ENABLE_REGRESSION_TESTING ) OR ( BUILD_PACKAGE ) )
-  set( PythonLibs_FIND_VERSION 2.7 )
-  set( PythonInterp_FIND_VERSION 2.7 )
-  find_package(PythonInterp REQUIRED)
+  find_package(PythonInterp 2.7 REQUIRED)
 endif()
 
 if( BUILD_TESTING )
