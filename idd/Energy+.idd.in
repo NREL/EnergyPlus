@@ -74804,7 +74804,7 @@ FaultModel:ThermostatOffset,
        \minimum> -10
        \maximum< 10
        \default 2
-       \units C
+       \units deltaC
 
 FaultModel:HumidistatOffset, 
    \memo This object describes fault of humidistat offset
