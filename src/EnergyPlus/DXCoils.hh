@@ -329,8 +329,6 @@ namespace DXCoils {
 		bool FanPowerIncludedInCOP; // Indicates that fan heat is included in heating capacity and COP
 		bool CondPumpHeatInCapacity; // Indicates that condenser pump heat is included in heating capacity
 		bool CondPumpPowerInCOP; // Indicates that condenser pump power is included in heating COP
-		bool AirVolFlowAutoSized; // Used to report autosizing info for the HPWH DX coil
-		bool WaterVolFlowAutoSized; // Used to report autosizing info for the HPWH DX coil
 		// end of variables for heat pump water heater DX coil
 		// Error tracking
 		Real64 LowTempLast; // low ambient temp entering condenser when warning message occurred
@@ -576,8 +574,6 @@ namespace DXCoils {
 			FanPowerIncludedInCOP( true ),
 			CondPumpHeatInCapacity( false ),
 			CondPumpPowerInCOP( false ),
-			AirVolFlowAutoSized( false ),
-			WaterVolFlowAutoSized( false ),
 			LowTempLast( 0.0 ),
 			HighTempLast( 0.0 ),
 			ErrIndex1( 0 ),
@@ -783,8 +779,6 @@ namespace DXCoils {
 			bool const FanPowerIncludedInCOP, // Indicates that fan heat is included in heating capacity and COP
 			bool const CondPumpHeatInCapacity, // Indicates that condenser pump heat is included in heating capacity
 			bool const CondPumpPowerInCOP, // Indicates that condenser pump power is included in heating COP
-			bool const AirVolFlowAutoSized, // Used to report autosizing info for the HPWH DX coil
-			bool const WaterVolFlowAutoSized, // Used to report autosizing info for the HPWH DX coil
 			Real64 const LowTempLast, // low ambient temp entering condenser when warning message occurred
 			Real64 const HighTempLast, // high ambient temp entering condenser when warning message occurred
 			int const ErrIndex1, // index/pointer to recurring error structure for Air volume flow rate per watt of
@@ -1019,8 +1013,6 @@ namespace DXCoils {
 			FanPowerIncludedInCOP( FanPowerIncludedInCOP ),
 			CondPumpHeatInCapacity( CondPumpHeatInCapacity ),
 			CondPumpPowerInCOP( CondPumpPowerInCOP ),
-			AirVolFlowAutoSized( AirVolFlowAutoSized ),
-			WaterVolFlowAutoSized( WaterVolFlowAutoSized ),
 			LowTempLast( LowTempLast ),
 			HighTempLast( HighTempLast ),
 			ErrIndex1( ErrIndex1 ),

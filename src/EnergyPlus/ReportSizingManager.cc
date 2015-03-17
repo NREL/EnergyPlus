@@ -223,6 +223,7 @@ namespace ReportSizingManager {
 		// Real64 DataBypassFrac( 0.0 ); // value of bypass fraction for Coil:Cooling:DX:TwoStageWithHumidityControlMode coils
 		// Real64 DataConstantUsedForSizing( 0.0 ); // base value used for sizing inputs that are ratios of other inputs
 		// Real64 DataFractionUsedForSizing( 0.0 ); // fractional value of base value used for sizing inputs that are ratios of other inputs
+		// Real64 DataNonZoneNonAirloopValue( 0.0 ); // used when equipment is not located in a zone or airloop (rarely used, ex. HPWH fan)
 		//
 		// EXAMPLE setup in DXCoils:
 		//			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
@@ -365,11 +366,11 @@ namespace ReportSizingManager {
 		Real64 UA1; // upper bound of UA for autosizing
 		Real64 MinFlowFrac; // minimum flow fraction from terminal unit []
 		Real64 TDpIn; // coil inlet air dew point temperature [C]
-		int SupFanNum;
-		int RetFanNum;
-		Real64 SupFanDT;
-		Real64 RetFanDT;
-		Real64 FanCoolLoad;
+		int SupFanNum; // index to supply fan
+		int RetFanNum; // index to return fan
+		Real64 SupFanDT; // supply air fan delta temperature [C]
+		Real64 RetFanDT; // return air fan delta temperature [C]
+		Real64 FanCoolLoad; // load due to fan operation added to cooling load [W]
 		FArray1D< Real64 > Par( 4 ); // array passed to RegulaFalsi
 		Real64 DesOAFlowFrac;   // design outdoor air flow volume fraction
 		std::string ScalableSM; // scalable sizing methods label for reporting
@@ -426,7 +427,8 @@ namespace ReportSizingManager {
 				ShowContinueError( "... DataConstantUsedForSizing and DataFractionUsedForSizing used for autocalculating " + SizingString + " must both be greater than 0." );
 				ShowFatalError( "Preceding conditions cause termination." );
 			}
-		} else if ( CurZoneEqNum > 0 ) {
+			bCheckForZero = false;
+		} else if( CurZoneEqNum > 0 ) {
 			if ( !IsAutoSize && !SizingDesRunThisZone && !SizingDesValueFromParent ) {
 				HardSizeNoDesRun = true;
 				AutosizeUser = SizingResult;
@@ -1690,9 +1692,34 @@ namespace ReportSizingManager {
 		} else {
 			// some components don't set CurZoneEqNum or CurSysNum (e.g., Plant HPWH fans)
 			HardSizeNoDesRun = true;
-			AutosizeDes = 0.0;
-			if ( PrintWarningFlag && SizingResult > 0.0 ) {
-				ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString, SizingResult );
+			AutosizeDes = DataNonZoneNonAirloopValue;
+			if( DataNonZoneNonAirloopValue > 0.0 && IsAutoSize ) {
+				SizingResult = DataNonZoneNonAirloopValue;
+			}
+			if ( PrintWarningFlag ) {
+				if( IsAutoSize && SizingResult > 0.0 ) {
+					ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, SizingResult );
+				} else if( SizingResult > 0.0 ) {
+					AutosizeUser = SizingResult;
+					if ( ( std::abs( AutosizeDes - AutosizeUser ) / AutosizeUser ) > AutoVsHardSizingThreshold ) {
+						ReportSizingOutput( CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString, AutosizeUser );
+					} else {
+						ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString, AutosizeUser );
+					}
+					if ( DisplayExtraWarnings ) {
+						if ( ( std::abs( AutosizeDes - AutosizeUser ) / AutosizeUser ) > AutoVsHardSizingThreshold ) {
+							ShowMessage( CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName );
+							ShowContinueError( "User-Specified " + SizingString + " = " + RoundSigDigits( AutosizeUser, 5 ) );
+							ShowContinueError( "differs from Design Size " + SizingString + " = " + RoundSigDigits( AutosizeDes, 5 ) );
+							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+						}
+					}
+				} else {
+					ShowSevereError( CallingRoutine + ' ' + CompType + ' ' + CompName + ", Developer Error: Component sizing incomplete." );
+					ShowContinueError( "SizingString = " + SizingString + ", SizingResult = " + TrimSigDigits( SizingResult, 1 ) );
+					// ShowFatalError( " Previous errors cause program termination" );
+				}
 			}
 		}
 

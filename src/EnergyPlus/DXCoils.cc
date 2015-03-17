@@ -5217,17 +5217,6 @@ namespace DXCoils {
 				}
 			}
 
-			//   Autosizing is completed in Size routine, however, the HPWH disrupts the flow of the eio and reporting
-			//   is done here while all other coils are sized and reported.
-			if ( ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped || DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped ) && DXCoil( DXCoilNum ).AirVolFlowAutoSized ) {
-				ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Rated Air Volume Flow Rate [m3/s]", DXCoil( DXCoilNum ).RatedAirVolFlowRate( Mode ) );
-				DXCoil( DXCoilNum ).AirVolFlowAutoSized = false;
-			}
-			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped && DXCoil( DXCoilNum ).WaterVolFlowAutoSized ) {
-				ReportSizingOutput( DXCoil( DXCoilNum ).DXCoilType, DXCoil( DXCoilNum ).Name, "Rated Condenser Water Volume Flow Rate [m3/s]", DXCoil( DXCoilNum ).RatedHPWHCondWaterFlow );
-				DXCoil( DXCoilNum ).WaterVolFlowAutoSized = false;
-			}
-
 			// Multispeed Cooling
 			if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_MultiSpeedCooling ) {
 				for ( Mode = 1; Mode <= DXCoil( DXCoilNum ).NumOfSpeeds; ++Mode ) {
@@ -5494,23 +5483,48 @@ namespace DXCoils {
 		//  EXTERNAL ReportSizingOutput
 
 		// NOTE: we are sizing COIL:DX:HeatingEmpirical on the COOLING load. Thus the cooling and
-		// and heating capacities of a DX heat pump system will be identical. In real life the ARI
+		// and heating capacities of a DX heat pump system will be identical. In real life the AHRI
 		// heating and cooling capacities are close but not identical.
 		for ( DehumidModeNum = 0; DehumidModeNum <= DXCoil( DXCoilNum ).NumDehumidModes; ++DehumidModeNum ) {
 			for ( CapacityStageNum = 1; CapacityStageNum <= DXCoil( DXCoilNum ).NumCapacityStages; ++CapacityStageNum ) {
 				Mode = DehumidModeNum * 2 + CapacityStageNum;
 				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped ) {
 					if ( DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) == AutoCalculate ) {
-						DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) = DXCoil( DXCoilNum ).RatedTotCap2 * 0.00005035;
-						DXCoil( DXCoilNum ).AirVolFlowAutoSized = true;
+						// report autocalculated sizing
+						PrintFlag = true;
+						CompName = DXCoil( DXCoilNum ).Name;
+						CompType = DXCoil( DXCoilNum ).DXCoilType;
+						FieldNum = 7;
+						SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [m3/s]";
+						SizingMethod = AutoCalculateSizing;
+						// DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) = DXCoil( DXCoilNum ).RatedTotCap2 * 0.00005035
+						DataConstantUsedForSizing = DXCoil( DXCoilNum ).RatedTotCap2;
+						DataFractionUsedForSizing = 0.00005035;
+						TempSize = AutoSize;
+						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) = TempSize;
+						PrintFlag = false;
+						DataConstantUsedForSizing = 0.0;
+						DataFractionUsedForSizing = 0.0;
 					}
 
 					if ( DXCoil( DXCoilNum ).RatedHPWHCondWaterFlow == AutoCalculate ) {
-						DXCoil( DXCoilNum ).RatedHPWHCondWaterFlow = DXCoil( DXCoilNum ).RatedTotCap2 * 0.00000004487;
-						DXCoil( DXCoilNum ).WaterVolFlowAutoSized = true;
-						//            Reporting autosize info for DX coils used with HPWHs will list the info out of order in the eio, report it later
-						//            CALL ReportSizingOutput(DXCoil(DXCoilNum)%DXCoilType, DXCoil(DXCoilNum)%Name, &
-						//                                  'Rated Condenser Water Volume Flow Rate [m3/s]', DXCoil(DXCoilNum)%RatedHPWHCondWaterFlow)
+						// report autocalculated sizing
+						PrintFlag = true;
+						CompName = DXCoil( DXCoilNum ).Name;
+						CompType = DXCoil( DXCoilNum ).DXCoilType;
+						FieldNum = 8;
+						SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [m3/s]";
+						SizingMethod = AutoCalculateSizing;
+						// DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) = DXCoil( DXCoilNum ).RatedTotCap2 * 0.00000004487
+						DataConstantUsedForSizing = DXCoil( DXCoilNum ).RatedTotCap2;
+						DataFractionUsedForSizing = 0.00000004487;
+						TempSize = AutoSize;
+						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						DXCoil( DXCoilNum ).RatedHPWHCondWaterFlow = TempSize;
+						PrintFlag = false;
+						DataConstantUsedForSizing = 0.0;
+						DataFractionUsedForSizing = 0.0;
 					}
 				} else {
 					if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl ) {
@@ -5600,7 +5614,7 @@ namespace DXCoils {
 					SizingString = DXCoilNumericFields( DXCoilNum ).PerfMode( Mode ).FieldNames( FieldNum ) + " [W]";
 					DataCoolCoilCap = DXCoolCap;
 				} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterPumped || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped ) {
-					SizingMethod = HeatingCapacitySizing;
+					SizingMethod = CoolingCapacitySizing;
 					CompName = DXCoil( DXCoilNum ).Name;
 					FieldNum = 1;
 					TempSize = DXCoil( DXCoilNum ).RatedTotCap( Mode );
@@ -5626,6 +5640,8 @@ namespace DXCoils {
 				DataTotCapCurveIndex = 0;
 				DataEMSOverrideON = false;
 				DataEMSOverride = 0.0;
+				DataConstantUsedForSizing = 0.0;
+				DataFractionUsedForSizing = 0.0;
 
 				// Heating coil capacity
 				if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoSpeed || DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl || DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling ) {
