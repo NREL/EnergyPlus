@@ -199,6 +199,7 @@ namespace DataSizing {
 	extern Real64 DataAutosizedHeatingCapacity; // Autosized heating capacit used for multiplying flow per capacity to get flow rate
 	extern Real64 DataConstantUsedForSizing; // base value used for sizing inputs that are ratios of other inputs
 	extern Real64 DataFractionUsedForSizing; // fractional value of base value used for sizing inputs that are ratios of other inputs
+	extern Real64 DataNonZoneNonAirloopValue; // used when equipment is not located in a zone or airloop
 	extern int DataZoneNumber; // a pointer to a served by zoneHVAC equipment
 	extern int NumZoneHVACSizing; // Number of zone HVAC sizing objects
 	extern bool TermUnitSingDuct; // TRUE if a non-induction single duct terminal unit

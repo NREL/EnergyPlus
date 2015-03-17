@@ -9,6 +9,7 @@ set( test_src
   DXCoils.unit.cc
   EvaporativeCoolers.unit.cc
   ExteriorEnergyUse.unit.cc
+  Fans.unit.cc
   FluidCoolers.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
