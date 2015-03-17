@@ -125,6 +125,10 @@ class IDFSummary:
 		return outString
 
 	def summarize(self):
+		if self.floorArea = -1:
+			self.floorArea = ""
+		if self.numberFloors = -1:
+			self.numberFloors = ""
 		return ",".join([str(x) for x in 
 		               [self.filename,
 		                self.location,
