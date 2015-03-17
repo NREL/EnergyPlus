@@ -10,6 +10,7 @@ set( test_src
   EvaporativeCoolers.unit.cc
   ExteriorEnergyUse.unit.cc
   FluidCoolers.unit.cc
+  Furnaces.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
   Humidifiers.unit.cc
