@@ -12,6 +12,7 @@ set( test_src
   ExteriorEnergyUse.unit.cc
   Fans.unit.cc
   FluidCoolers.unit.cc
+  Furnaces.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
   Humidifiers.unit.cc
