@@ -2923,7 +2923,7 @@ namespace ZoneEquipmentManager {
 
 				}}
 
-				ZoneEquipConfig( ControlledZoneNum ).ZoneExh += UnbalExhMassFlow;
+				ZoneEquipConfig( ControlledZoneNum ).ZoneExh += ( UnbalExhMassFlow + BalancedExhMassFlow);
 				ZoneEquipConfig( ControlledZoneNum ).ZoneExhBalanced += BalancedExhMassFlow;
 				ZoneEquipConfig( ControlledZoneNum ).PlenumMassFlow += PlenumInducedMassFlow;
 
