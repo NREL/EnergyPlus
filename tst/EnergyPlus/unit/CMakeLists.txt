@@ -16,6 +16,7 @@ set( test_src
   HeatBalanceManager.unit.cc
   Humidifiers.unit.cc
   HVACStandaloneERV.unit.cc
+  ICSCollector.unit.cc
   ManageElectricPower.unit.cc
   MixedAir.unit.cc
   PurchasedAirManager.unit.cc
