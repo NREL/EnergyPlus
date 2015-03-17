@@ -248,6 +248,7 @@ namespace WaterThermalTanks {
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::KickOffSimulation;
 		using InputProcessor::FindItem;
+		using DataSizing::DataNonZoneNonAirloopValue;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -445,6 +446,7 @@ namespace WaterThermalTanks {
 
 				if ( PlantFirstSizesOkayToFinalize ) {
 					CalcStandardRatings( TankNum );
+					DataNonZoneNonAirloopValue = 0.0;
 				}
 				MinCap = 0.0;
 				MaxCap = HPWaterHeater( CompNum ).Capacity;
@@ -4280,6 +4282,9 @@ namespace WaterThermalTanks {
 		using DataHVACGlobals::HPWHCrankcaseDBTemp;
 		using DataHVACGlobals::NumPlantLoops;
 		using DataSizing::AutoSize;
+		using DataSizing::CurZoneEqNum;
+		using DataSizing::ZoneEqSizing;
+		using DataSizing::DataNonZoneNonAirloopValue;
 		using InputProcessor::SameString;
 		using General::TrimSigDigits;
 		using General::RoundSigDigits;
@@ -4761,6 +4766,11 @@ namespace WaterThermalTanks {
 				}
 				if ( HPWaterHeater( HPNum ).AirFlowRateAutoSized ) {
 					ReportSizingOutput( HPWaterHeater( HPNum ).Type, HPWaterHeater( HPNum ).Name, "Evaporator air flow rate [m3/s]", HPWaterHeater( HPNum ).OperatingAirFlowRate );
+				}
+				DataNonZoneNonAirloopValue = HPWaterHeater( HPNum ).OperatingAirFlowRate;
+				if ( CurZoneEqNum > 0 ) {
+					ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow = true;
+					ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = DataNonZoneNonAirloopValue;
 				}
 				MyHPSizeFlag( HPNum ) = false;
 			}
