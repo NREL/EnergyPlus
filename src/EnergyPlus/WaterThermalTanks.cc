@@ -340,16 +340,12 @@ namespace WaterThermalTanks {
 				if ( present( LoopNum ) ) {
 					if ( ( ( WaterThermalTank( CompNum ).SourceSidePlantLoopNum == LoopNum ) && ( WaterThermalTank( CompNum ).SourceSidePlantLoopSide == LoopSideNum ) ) 
 						|| ( ( WaterThermalTank( CompNum ).UseSidePlantLoopNum == LoopNum ) && ( WaterThermalTank( CompNum ).UseSidePlantLoopSide == LoopSideNum ) ) ) {
-						// we know this is plant loop connected on at least one side, but only one should really call sizing,
 
-						if ( ( WaterThermalTank( CompNum ).UseSidePlantLoopNum == LoopNum ) ||
-							(WaterThermalTank( CompNum ).UseInletNode == 0 && ( WaterThermalTank( CompNum ).SourceSidePlantLoopNum == LoopNum ) )) {
-							// only call sizing routines from use side connection, unless there is none and are calling from source side  loop
-							SizeTankForDemandSide( CompNum );
-							SizeDemandSidePlantConnections( CompNum );
-							SizeSupplySidePlantConnections( CompNum, LoopNum, LoopSideNum );
-							SizeTankForSupplySide( CompNum );
-						}
+						SizeTankForDemandSide( CompNum );
+						SizeDemandSidePlantConnections( CompNum );
+						SizeSupplySidePlantConnections( CompNum, LoopNum, LoopSideNum );
+						SizeTankForSupplySide( CompNum );
+
 
 					} else {
 						return;
