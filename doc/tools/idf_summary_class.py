@@ -6,10 +6,10 @@ class IDFSummary:
 		self.filename = idfFileName
 		self.location = ""
 		self.weatherFileName = "" #no
-		self.numSizingPeriods = -1
-		self.floorArea = -1
-		self.numberFloors = -1
-		self.numberZones = -1
+		self.numSizingPeriods = 0 # it's incremented, so start at 0, not -1
+		self.floorArea = -1 # it is inferred from comments, so leave -1 as a flag
+		self.numberFloors = -1 # it is inferred from comments, so leave -1 as a flag
+		self.numberZones = 0 # it's incremented, so start at 0, not -1
 		self.internalMass = False
 		self.people = False
 		self.lights = False
