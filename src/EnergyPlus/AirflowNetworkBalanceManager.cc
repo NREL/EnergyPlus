@@ -96,6 +96,7 @@ namespace AirflowNetworkBalanceManager {
 	using DataEnvironment::WindSpeedAt;
 	using DataSurfaces::cExtBoundCondition;
 	using DataSurfaces::ExternalEnvironment;
+	using DataSurfaces::OtherSideCoefNoCalcExt;
 	using DataSurfaces::Surface;
 	using DataSurfaces::TotSurfaces;
 	using DataSurfaces::WorldCoordSystem;
@@ -1236,14 +1237,14 @@ namespace AirflowNetworkBalanceManager {
 			}
 
 			// Get the number of external surfaces
-			if ( Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCond == ExternalEnvironment ) {
+			if ( Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCond == ExternalEnvironment || ( Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt && Surface( MultizoneSurfaceData( i ).SurfNum ).ExtWind ) ) {
 				++AirflowNetworkNumOfExtSurfaces;
 			}
 
 			// Outside face environment
 			if ( AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input ) {
 				n = Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCond;
-				if ( n == ExternalEnvironment ) {
+				if ( n == ExternalEnvironment || ( n == OtherSideCoefNoCalcExt && Surface( MultizoneSurfaceData( i ).SurfNum ).ExtWind ) ) {
 					++NumOfExtNodes;
 					if ( AirflowNetworkNumOfExtNode > 0 ) {
 						found = false;
@@ -1264,7 +1265,7 @@ namespace AirflowNetworkBalanceManager {
 					}
 					continue;
 				} else {
-					if ( n < ExternalEnvironment ) {
+					if ( n < ExternalEnvironment && !( Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt && Surface( MultizoneSurfaceData( i ).SurfNum ).ExtWind ) ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields( 1 ) + " = " + MultizoneSurfaceData( i ).SurfName );
 						ShowContinueError( "This type of surface (has ground, etc exposure) cannot be used in the AiflowNetwork model." );
 						ErrorsFound = true;
@@ -1306,13 +1307,15 @@ namespace AirflowNetworkBalanceManager {
 					}
 				}
 			}
-			if ( MultizoneSurfaceData( i ).NodeNums( 2 ) == 0 && Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCond < 0 ) {
-				ShowSevereError( RoutineName + CurrentModuleObject + " = " + MultizoneSurfaceData( i ).SurfName );
-				ShowContinueError( "Outside boundary condition and object are " + cExtBoundCondition( Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCond ) + " and " + Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCondName + "." );
-				ShowContinueError( "The outside boundary condition must be exposed to either the outside or an adjacent zone." );
-				ErrorsFound = true;
-				continue;
-			}
+			if ( !( Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCond == -2 && Surface( MultizoneSurfaceData( i ).SurfNum ).ExtWind ) ) {
+				if ( MultizoneSurfaceData( i ).NodeNums( 2 ) == 0 && Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCond < 0 ) {
+					ShowSevereError( RoutineName + CurrentModuleObject + " = " + MultizoneSurfaceData( i ).SurfName );
+					ShowContinueError( "Outside boundary condition and object are " + cExtBoundCondition( Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCond ) + " and " + Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCondName + "." );
+					ShowContinueError( "The outside boundary condition must be exposed to either the outside or an adjacent zone." );
+					ErrorsFound = true;
+					continue;
+				}
+			}	
 		}
 
 		// Validate adjacent temperature and Enthalpy control for an interior surface only
@@ -2058,7 +2061,7 @@ namespace AirflowNetworkBalanceManager {
 		if ( SameString( AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation" ) || SameString( AirflowNetworkSimu.HeightOption, "OpeningHeight" ) ) {
 			for ( i = 1; i <= AirflowNetworkNumOfExtNode; ++i ) {
 				for ( j = 1; j <= AirflowNetworkNumOfSurfaces; ++j ) {
-					if ( Surface( MultizoneSurfaceData( j ).SurfNum ).ExtBoundCond == ExternalEnvironment ) {
+					if ( Surface( MultizoneSurfaceData( j ).SurfNum ).ExtBoundCond == ExternalEnvironment || ( Surface( MultizoneSurfaceData( j ).SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt && Surface( MultizoneSurfaceData( j ).SurfNum ).ExtWind ) ) {
 						if ( SameString( MultizoneSurfaceData( j ).ExternalNodeName, MultizoneExternalNodeData( i ).Name ) ) {
 							MultizoneExternalNodeData( i ).Height = Surface( MultizoneSurfaceData( j ).SurfNum ).Centroid.z;
 							break;
@@ -3714,7 +3717,8 @@ namespace AirflowNetworkBalanceManager {
 				}
 				MultizoneSurfaceData( i ).OpenFactor *= MultizoneSurfaceData( i ).WindModifier;
 				if ( MultizoneSurfaceData( i ).HybridVentClose ) MultizoneSurfaceData( i ).OpenFactor = 0.0;
-				if ( AirflowNetworkFanActivated && ( SimulateAirflowNetwork > AirflowNetworkControlMultizone ) && MultizoneSurfaceData( i ).OpenFactor > 0.0 && Surface( j ).ExtBoundCond == ExternalEnvironment && ! WarmupFlag ) {
+				if ( AirflowNetworkFanActivated && ( SimulateAirflowNetwork > AirflowNetworkControlMultizone ) && MultizoneSurfaceData( i ).OpenFactor > 0.0 && 
+					( Surface( j ).ExtBoundCond == ExternalEnvironment || ( Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt && Surface( MultizoneSurfaceData( i ).SurfNum ).ExtWind ) ) && ! WarmupFlag ) {
 					// Exterior Large opening only
 					++MultizoneSurfaceData( i ).ExtLargeOpeningErrCount;
 					if ( MultizoneSurfaceData( i ).ExtLargeOpeningErrCount < 2 ) {
@@ -3853,7 +3857,7 @@ namespace AirflowNetworkBalanceManager {
 		for ( SurfDatNum = 1; SurfDatNum <= AirflowNetworkNumOfSurfaces; ++SurfDatNum ) {
 			SurfNum = MultizoneSurfaceData( SurfDatNum ).SurfNum;
 			if ( SurfNum == 0 ) continue; // Error caught earlier
-			if ( Surface( SurfNum ).ExtBoundCond == ExternalEnvironment ) {
+			if ( Surface( SurfNum ).ExtBoundCond == ExternalEnvironment || ( Surface( SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt && Surface( SurfNum ).ExtWind ) ) {
 				++ExtNum;
 				if ( Surface( SurfNum ).Tilt >= 45.0 ) { // "Vertical" surface
 					SurfAng = Surface( SurfNum ).Azimuth;
@@ -6853,7 +6857,7 @@ Label90: ;
 				for ( j = 1; j <= AirflowNetworkNumOfSurfaces; ++j ) {
 					if ( SameString( MultizoneSurfaceData( j ).OpeningName, MultizoneCompExhaustFanData( i ).Name ) ) {
 						found = true;
-						if ( Surface( MultizoneSurfaceData( j ).SurfNum ).ExtBoundCond != ExternalEnvironment ) {
+						if ( Surface( MultizoneSurfaceData( j ).SurfNum ).ExtBoundCond != ExternalEnvironment && ! ( Surface( MultizoneSurfaceData( i ).SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt && Surface( MultizoneSurfaceData( i ).SurfNum ).ExtWind ) ) {
 							ShowSevereError( RoutineName + "The surface using " + CurrentModuleObject + " is not an exterior surface: " + MultizoneSurfaceData( j ).SurfName );
 							ErrorsFound = true;
 						}
