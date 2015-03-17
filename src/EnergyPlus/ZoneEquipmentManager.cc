@@ -2923,7 +2923,7 @@ namespace ZoneEquipmentManager {
 
 				}}
 
-				ZoneEquipConfig( ControlledZoneNum ).ZoneExh += ( UnbalExhMassFlow + BalancedExhMassFlow);
+				ZoneEquipConfig( ControlledZoneNum ).ZoneExh += ( UnbalExhMassFlow + BalancedExhMassFlow); // This is the total "exhaust" flow from equipment such as a zone exhaust fan
 				ZoneEquipConfig( ControlledZoneNum ).ZoneExhBalanced += BalancedExhMassFlow;
 				ZoneEquipConfig( ControlledZoneNum ).PlenumMassFlow += PlenumInducedMassFlow;
 
