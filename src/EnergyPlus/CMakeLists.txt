@@ -631,7 +631,15 @@ if(BUILD_PACKAGE)
     PRE_BUILD
     COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/doc/tools/example_file_summary.py" "${CMAKE_SOURCE_DIR}/testfiles" "${DOCS_OUT}/ExampleFiles.html"
   )
-  install(FILES "${CMAKE_BINARY_DIR}/autodocs/ExampleFiles.html" DESTINATION "./ExampleFiles/")
+  install(FILES "${DOCS_OUT}/ExampleFiles.html" DESTINATION "./ExampleFiles/")
+  
+  # the example file objects link
+  add_custom_command(
+    TARGET energyplus
+    PRE_BUILD
+    COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/doc/tools/example_file_objects.py" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" "${CMAKE_SOURCE_DIR}/testfiles" "${DOCS_OUT}/ExampleFiles-ObjectsLink.html"
+  )
+  install(FILES "${DOCS_OUT}/ExampleFiles-ObjectsLink.html" DESTINATION "./ExampleFiles/")
   
   # the change log, only if we do have a github token in the environment
   if(NOT "$ENV{GITHUB_TOKEN}" STREQUAL "")
