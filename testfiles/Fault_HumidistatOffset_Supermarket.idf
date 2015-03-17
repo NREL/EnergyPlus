@@ -2433,8 +2433,8 @@
     Humi_Offset_SalesFloor, !- Name
     SalesFloor Humidistat,  !- Humidistat Name
     ThermostatOffsetIndependent, !- Humidistat Offset Type
-    ,  				  		!- Availability Schedule Name
-    , 				  		!- Severity Schedule Name
-    5,        	 	  		!- Reference Humidistat Offset
-    ;						!- Related Thermostat Offset Fault Name
+    ,                       !- Availability Schedule Name
+    ,                       !- Severity Schedule Name
+    5,                      !- Reference Humidistat Offset{percent}
+    ;                       !- Related Thermostat Offset Fault Name
 

@@ -2444,3 +2444,4 @@
     ,                       !- Severity Schedule Name
     ,                       !- Reference Humidistat Offset {percent}
     Ther_Offset_SalesFloor; !- Related Thermostat Offset Fault Name
+

@@ -8015,4 +8015,4 @@
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
     1.0;                     !- Reference Thermostat Offset {deltaC}
-	
+
