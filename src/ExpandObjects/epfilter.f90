@@ -3481,13 +3481,16 @@ CHARACTER(len=*), INTENT(IN) :: stringIn
 
 IF (LEN_TRIM(stringIn) .GE. 1) THEN
   IF (VERIFY(TRIM(stringIn),'-0123456789.E+') .EQ. 0) THEN
-    READ(stringIn,*) StringToReal
+    READ(stringIn,*,ERR=2222) StringToReal
   ELSE
     StringToReal = 0
   END IF
 ELSE
   StringToReal = 0
 END IF
+RETURN
+
+2222 StringToReal = 0
 END FUNCTION
 
 !----------------------------------------------------------------------------------
@@ -10355,7 +10358,7 @@ DO iSys = 1, numCompactSysVAV
   CALL AddToObjStr('Heating Design Capacity {W}','autosize')
   CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
   CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
-  CALL AddToObjStr('Central Cooling Capacity Control Method','VAV',.true.)
+  CALL AddToObjStr('Central Cooling Capacity Control Method','OnOff',.true.)
   !AIR PRIMARY LOOP ~ line 184
   CALL CreateNewObj('AirLoopHVAC')
   CALL AddToObjFld('Name', base + vsAirHandlerNameOff,' ')
@@ -11786,7 +11789,7 @@ DO iSys = 1, numCompactSysPVAV
   CALL AddToObjStr('Heating Design Capacity {W}','autosize')
   CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
   CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
-  CALL AddToObjStr('Central Cooling Capacity Control Method','VAV',.true.)
+  CALL AddToObjStr('Central Cooling Capacity Control Method','OnOff',.true.)
   !Object ==> AirLoopHVAC
   CALL CreateNewObj('AirLoopHVAC')
   CALL AddToObjFld('Name', base + pvavsAirHandlerNameOff,' ')
@@ -13788,7 +13791,7 @@ DO iSys = 1, numCompactSysUnit
     CALL AddToObjStr('Heating Design Capacity {W}','autosize')
     CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
     CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
-    CALL AddToObjStr('Central Cooling Capacity Control Method','VAV',.true.)
+    CALL AddToObjStr('Central Cooling Capacity Control Method','OnOff',.true.)
   ELSE
     CALL AddToObjStr('Cooling Supply Air Flow Rate Method','Flow/System')
     CALL AddToObjFld('Cooling Supply Air Flow Rate {m3/s}', base + usSupplyMaxRateOff,' ')
@@ -13813,7 +13816,7 @@ DO iSys = 1, numCompactSysUnit
     CALL AddToObjStr('Heating Design Capacity {W}','autosize')
     CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
     CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
-    CALL AddToObjStr('Central Cooling Capacity Control Method','VAV',.true.)
+    CALL AddToObjStr('Central Cooling Capacity Control Method','OnOff',.true.)
   END IF
   !AIR PRIMARY LOOP
   CALL CreateNewObj('AirLoopHVAC')
@@ -14897,7 +14900,7 @@ DO iSys = 1, numCompactSysUnitHP
   CALL AddToObjStr('Heating Design Capacity {W}','autosize')
   CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
   CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
-  CALL AddToObjStr('Central Cooling Capacity Control Method','VAV',.true.)
+  CALL AddToObjStr('Central Cooling Capacity Control Method','OnOff',.true.)
   !Object ==> AirLoopHVAC
   CALL CreateNewObj('AirLoopHVAC')
   CALL AddToObjFld('Name', base + uhpsAirHandlerNameOff,' ')
@@ -16044,7 +16047,7 @@ DO iSys = 1, numCompactSysUnitarySystem
   CALL AddToObjStr('Heating Design Capacity {W}','autosize')
   CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
   CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
-  CALL AddToObjStr('Central Cooling Capacity Control Method','VAV',.true.)
+  CALL AddToObjStr('Central Cooling Capacity Control Method','OnOff',.true.)
   !Object ==> AirLoopHVAC
   CALL CreateNewObj('AirLoopHVAC')
   CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' ')
@@ -19371,7 +19374,7 @@ DO iSys = 1, numCompactSysConstVol
   CALL AddToObjStr('Heating Design Capacity {W}','autosize')
   CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
   CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
-  CALL AddToObjStr('Central Cooling Capacity Control Method','VAV',.true.)
+  CALL AddToObjStr('Central Cooling Capacity Control Method','OnOff',.true.)
 
   !***AirLoopHVAC
   CALL CreateNewObj('AirLoopHVAC')
@@ -21256,7 +21259,7 @@ DO iSys = 1, numCompactSysDualDuct
   CALL AddToObjStr('Heating Design Capacity {W}','autosize')
   CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
   CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
-  CALL AddToObjStr('Central Cooling Capacity Control Method','VAV',.true.)
+  CALL AddToObjStr('Central Cooling Capacity Control Method','OnOff',.true.)
   !AIR PRIMARY LOOP ~ line 184
   CALL CreateNewObj('AirLoopHVAC')
   CALL AddToObjFld('Name', base + ddsAirHandlerNameOff,' ')
@@ -31587,7 +31590,7 @@ DO iSys = 1, numCompactDedOutAir
   CALL AddToObjStr('Heating Design Capacity {W}','autosize')
   CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
   CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
-  CALL AddToObjStr('Central Cooling Capacity Control Method','VAV',.true.)
+  CALL AddToObjStr('Central Cooling Capacity Control Method','OnOff',.true.)
   !***AirLoopHVAC
   CALL CreateNewObj('AirLoopHVAC')
   CALL AddToObjFld('Name', base + doasNameOff,' ')

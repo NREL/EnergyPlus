@@ -273,6 +273,8 @@ namespace DataAirflowNetwork {
 		Real64 BuildWidth; // The width of the building along the facade that contains this zone.
 		int ASH55PeopleInd; // Index of people object with ASH55 comfort calcs for ventilation control
 		int CEN15251PeopleInd; // Index of people object with CEN15251 comfort calcs for ventilation control
+		std::string OccupantVentilationControlName; // Occupant ventilation control name
+		int OccupantVentilationControlNum; // Occupant ventilation control number
 
 		// Default Constructor
 		MultizoneZoneProp() :
@@ -290,7 +292,9 @@ namespace DataAirflowNetwork {
 			SingleSidedCpType( "STANDARD" ),
 			BuildWidth( 10.0 ),
 			ASH55PeopleInd( 0 ),
-			CEN15251PeopleInd( 0 )
+			CEN15251PeopleInd( 0 ),
+			OccupantVentilationControlName( "" ),
+			OccupantVentilationControlNum( 0 )
 		{}
 
 		// Member Constructor
@@ -312,7 +316,9 @@ namespace DataAirflowNetwork {
 			std::string const & SingleSidedCpType, // Type of calculation method for single sided wind pressure coefficients
 			Real64 const BuildWidth, // The width of the building along the facade that contains this zone.
 			int const ASH55PeopleInd, // Index of people object with ASH55 comfort calcs for ventilation control
-			int const CEN15251PeopleInd // Index of people object with CEN15251 comfort calcs for ventilation control
+			int const CEN15251PeopleInd, // Index of people object with CEN15251 comfort calcs for ventilation control
+			std::string const OccupantVentilationControlName, // Occupant ventilation control name
+			int const OccupantVentilationControlNum // Occupant ventilation control number
 		) :
 			ZoneName( ZoneName ),
 			VentControl( VentControl ),
@@ -331,8 +337,10 @@ namespace DataAirflowNetwork {
 			SingleSidedCpType( SingleSidedCpType ),
 			BuildWidth( BuildWidth ),
 			ASH55PeopleInd( ASH55PeopleInd ),
-			CEN15251PeopleInd( CEN15251PeopleInd )
-		{}
+			CEN15251PeopleInd( CEN15251PeopleInd ),
+			OccupantVentilationControlName( OccupantVentilationControlName ),
+			OccupantVentilationControlNum( OccupantVentilationControlNum )
+			{}
 
 	};
 
@@ -346,6 +354,7 @@ namespace DataAirflowNetwork {
 		int SurfNum; // Surface number
 		FArray1D_int NodeNums; // Positive: Zone numbers; 0: External
 		Real64 OpenFactor; // Surface factor
+		Real64 OpenFactorLast; // Surface factor at previous time step
 		bool EMSOpenFactorActuated; // True if EMS actuation is on
 		Real64 EMSOpenFactor; // Surface factor value from EMS for override
 		Real64 Height; // Surface Height
@@ -377,6 +386,14 @@ namespace DataAirflowNetwork {
 		bool HybridCtrlGlobal; // Hybrid ventilation global control logical
 		bool HybridCtrlMaster; // Hybrid ventilation global control master
 		Real64 WindModifier; // Wind modifier from hybrid ventilation control
+		std::string OccupantVentilationControlName; // Occupant ventilation control name
+		int OccupantVentilationControlNum; // Occupant ventilation control number
+		int OpeningStatus; // Open status at current time step
+		int PrevOpeningstatus; // Open status at previous time step
+		Real64 CloseElapsedTime; // Elapsed time during closing (min)
+		Real64 OpenElapsedTime; // Elapsed time during closing (min)
+		int ClosingProbStatus; // Closing probability status
+		int OpeningProbStatus; // Opening probability status
 
 		// Default Constructor
 		MultizoneSurfaceProp() :
@@ -384,6 +401,7 @@ namespace DataAirflowNetwork {
 			SurfNum( 0 ),
 			NodeNums( 2, 0 ),
 			OpenFactor( 0.0 ),
+			OpenFactorLast( 0.0 ),
 			EMSOpenFactorActuated( false ),
 			EMSOpenFactor( 0.0 ),
 			Height( 0.0 ),
@@ -408,7 +426,15 @@ namespace DataAirflowNetwork {
 			HybridVentClose( false ),
 			HybridCtrlGlobal( false ),
 			HybridCtrlMaster( false ),
-			WindModifier( 1.0 )
+			WindModifier( 1.0 ),
+			OccupantVentilationControlName( "" ),
+			OccupantVentilationControlNum( 0 ),
+			OpeningStatus( 0 ),
+			PrevOpeningstatus( 0 ),
+			CloseElapsedTime( 0.0 ),
+			OpenElapsedTime( 0.0 ),
+			ClosingProbStatus( 0 ),
+			OpeningProbStatus( 0 )
 		{}
 
 		// Member Constructor
@@ -420,6 +446,7 @@ namespace DataAirflowNetwork {
 			int const SurfNum, // Surface number
 			FArray1_int const & NodeNums, // Positive: Zone numbers; 0: External
 			Real64 const OpenFactor, // Surface factor
+			Real64 const OpenFactorLast, // Surface factor at previous time step
 			bool const EMSOpenFactorActuated, // True if EMS actuation is on
 			Real64 const EMSOpenFactor, // Surface factor value from EMS for override
 			Real64 const Height, // Surface Height
@@ -446,7 +473,15 @@ namespace DataAirflowNetwork {
 			bool const HybridVentClose, // Hybrid ventilation window close control logical
 			bool const HybridCtrlGlobal, // Hybrid ventilation global control logical
 			bool const HybridCtrlMaster, // Hybrid ventilation global control master
-			Real64 const WindModifier // Wind modifier from hybrid ventilation control
+			Real64 const WindModifier, // Wind modifier from hybrid ventilation control
+			std::string const OccupantVentilationControlName, // Occupant ventilation control name
+			int const OccupantVentilationControlNum, // Occupant ventilation control number
+			int const OpeningStatus, // Open status at current time step
+			int const PrevOpeningstatus, // Open status at previous time step
+			Real64 const CloseElapsedTime, // Elapsed time during closing (min)
+			Real64 const OpenElapsedTime, // Elapsed time during closing (min)
+			int const ClosingProbStatus, // Closing probability status
+			int const OpeningProbStatus // Opening probability status
 		) :
 			SurfName( SurfName ),
 			OpeningName( OpeningName ),
@@ -455,6 +490,7 @@ namespace DataAirflowNetwork {
 			SurfNum( SurfNum ),
 			NodeNums( 2, NodeNums ),
 			OpenFactor( OpenFactor ),
+			OpenFactorLast( OpenFactorLast ),
 			EMSOpenFactorActuated( EMSOpenFactorActuated ),
 			EMSOpenFactor( EMSOpenFactor ),
 			Height( Height ),
@@ -481,8 +517,16 @@ namespace DataAirflowNetwork {
 			HybridVentClose( HybridVentClose ),
 			HybridCtrlGlobal( HybridCtrlGlobal ),
 			HybridCtrlMaster( HybridCtrlMaster ),
-			WindModifier( WindModifier )
-		{}
+			WindModifier( WindModifier ),
+			OccupantVentilationControlName( OccupantVentilationControlName ),
+			OccupantVentilationControlNum( OccupantVentilationControlNum ),
+			OpeningStatus( OpeningStatus ),
+			PrevOpeningstatus( PrevOpeningstatus ),
+			CloseElapsedTime( CloseElapsedTime ),
+			OpenElapsedTime( OpenElapsedTime ),
+			ClosingProbStatus( ClosingProbStatus ),
+			OpeningProbStatus( OpeningProbStatus )
+			{}
 
 	};
 

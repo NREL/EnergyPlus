@@ -82,6 +82,14 @@ namespace StandardRatings {
 	// Test H2 (low and High Speed) Std. AHRI 210/240
 	extern Real64 const HeatingOutdoorCoilInletAirDBTempH3Test; // Outdoor air dry-bulb temp in degrees C (17F)
 	// Test H3 (low and High Speed) Std. AHRI 210/240
+	
+	// ANSI/ASHRAE Standard 127-2012 -Method of Testing for Rating Computer and Data Processing Room Unitary Air Conditioners
+	// indoor dry bulb temperatures for tests A, B, C and D and Classes I, II, III, and IV
+	extern FArray1D < Real64 > const IndoorDBTempClassI2IV;
+	// indoor dew point temperature
+	extern Real64 const IndoorTDPA2D;
+	// outdoor dry bulb temperatures for tests A, B, C and D
+	extern FArray1D < Real64 > const OutdoorDBTempAllClassA2D;
 
 	// Functions
 
@@ -143,7 +151,8 @@ namespace StandardRatings {
 		Optional< Real64 const > MinOATCompressor = _, // Minimum OAT for heat pump compressor operation [C] //Autodesk:OPTIONAL Used without PRESENT check
 		Optional< Real64 const > OATempCompressorOn = _, // The outdoor temperature when the compressor is automatically turned //Autodesk:OPTIONAL Used without PRESENT check
 		Optional_bool_const OATempCompressorOnOffBlank = _, // Flag used to determine low temperature cut out factor //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_int_const DefrostControl = _ // defrost control; 1=timed, 2=on-demand //Autodesk:OPTIONAL Used without PRESENT check
+		Optional_int_const DefrostControl = _, // defrost control; 1=timed, 2=on-demand //Autodesk:OPTIONAL Used without PRESENT check
+		Optional_bool_const ASHRAE127StdRprt = _ // true if user wishes to report ASHRAE 127 standard ratings
 	);
 
 	void
@@ -184,6 +193,23 @@ namespace StandardRatings {
 		Real64 & EER, // energy efficiency ratio of single speed DX cooling coil
 		Real64 & IEER // Integareted energy efficiency ratio of single speed DX cooling coil
 	);
+
+	void
+	DXCoolingCoilDataCenterStandardRatings(
+		std::string const & DXCoilName, // Name of DX coil for which HSPF is calculated
+		std::string const & DXCoilType, // Type of DX coil - heating or cooling
+		int const CapFTempCurveIndex, // Index for the capacity as a function of temperature modifier curve
+		int const CapFFlowCurveIndex, // Index for the capacity as a function of flow fraction modifier curve
+		int const EIRFTempCurveIndex, // Index for the EIR as a function of temperature modifier curve
+		int const EIRFFlowCurveIndex, // Index for the EIR as a function of flow fraction modifier curve
+		int const PLFFPLRCurveIndex, // Index for the EIR vs part-load ratio curve
+		Real64 const RatedTotalCapacity, // Rated gross total cooling capacity
+		Real64 const RatedCOP, // Rated gross COP
+		Real64 const RatedAirVolFlowRate, // air flow rate through the coil at rated condition
+		Real64 const FanPowerPerEvapAirFlowRateFromInput, // Fan power per air volume flow rate through the evaporator coil
+		FArray1D< Real64 > & NetCoolingCapRated, // net cooling capacity of single speed DX cooling coil
+		FArray1D< Real64 > & TotElectricPowerRated // total electric power including supply fan
+		);
 
 	void
 	MultiSpeedDXCoolingCoilStandardRatings(
@@ -242,6 +268,15 @@ namespace StandardRatings {
 		Real64 const HSPFValueIP, // IEER value in IP units {Btu/W-h}
 		int const RegionNum // Region Number for which HSPF is calculated
 	);
+
+	void
+	ReportDXCoolCoilDataCenterApplication(
+		std::string const & CompType, // Type of component
+		std::string const & CompName, // Name of component
+		int const CompTypeNum, // TypeNum of component
+		FArray1D< Real64 > & NetCoolingCapRated, // net cooling capacity of single speed DX cooling coil
+		FArray1D< Real64 > & TotElectricPowerRated // total electric power including supply fan
+		);
 
 	void
 	CheckCurveLimitsForStandardRatings(

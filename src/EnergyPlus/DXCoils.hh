@@ -328,8 +328,6 @@ namespace DXCoils {
 		bool FanPowerIncludedInCOP; // Indicates that fan heat is included in heating capacity and COP
 		bool CondPumpHeatInCapacity; // Indicates that condenser pump heat is included in heating capacity
 		bool CondPumpPowerInCOP; // Indicates that condenser pump power is included in heating COP
-		bool AirVolFlowAutoSized; // Used to report autosizing info for the HPWH DX coil
-		bool WaterVolFlowAutoSized; // Used to report autosizing info for the HPWH DX coil
 		// end of variables for heat pump water heater DX coil
 		// Error tracking
 		Real64 LowTempLast; // low ambient temp entering condenser when warning message occurred
@@ -416,6 +414,7 @@ namespace DXCoils {
 		// (function of actual supply air flow vs rated air flow)
 		int SHRFTempCurveType2; // type of curve for SHRFTemp (cubic,quadratic,bi-quadratic)
 		bool UserSHRCurveExists; // TRUE if user specified SHR modifier curve exists
+		bool ASHRAE127StdRprt; // TRUE if user wishes to report ASHRAE 127 standard ratings
 
 		// Default Constructor
 		DXCoilData() :
@@ -574,8 +573,6 @@ namespace DXCoils {
 			FanPowerIncludedInCOP( true ),
 			CondPumpHeatInCapacity( false ),
 			CondPumpPowerInCOP( false ),
-			AirVolFlowAutoSized( false ),
-			WaterVolFlowAutoSized( false ),
 			LowTempLast( 0.0 ),
 			HighTempLast( 0.0 ),
 			ErrIndex1( 0 ),
@@ -613,7 +610,8 @@ namespace DXCoils {
 			SHRFTemp2( 0 ),
 			SHRFFlow2( 0 ),
 			SHRFTempCurveType2( 0 ),
-			UserSHRCurveExists( false )
+			UserSHRCurveExists( false ),
+			ASHRAE127StdRprt( false )
 		{}
 
 		// Member Constructor
@@ -780,8 +778,6 @@ namespace DXCoils {
 			bool const FanPowerIncludedInCOP, // Indicates that fan heat is included in heating capacity and COP
 			bool const CondPumpHeatInCapacity, // Indicates that condenser pump heat is included in heating capacity
 			bool const CondPumpPowerInCOP, // Indicates that condenser pump power is included in heating COP
-			bool const AirVolFlowAutoSized, // Used to report autosizing info for the HPWH DX coil
-			bool const WaterVolFlowAutoSized, // Used to report autosizing info for the HPWH DX coil
 			Real64 const LowTempLast, // low ambient temp entering condenser when warning message occurred
 			Real64 const HighTempLast, // high ambient temp entering condenser when warning message occurred
 			int const ErrIndex1, // index/pointer to recurring error structure for Air volume flow rate per watt of
@@ -851,7 +847,8 @@ namespace DXCoils {
 			int const SHRFTemp2, // index of sensible heat ratio modifier curve
 			int const SHRFFlow2, // index of sensible heat ratio modifier curve
 			int const SHRFTempCurveType2, // type of curve for SHRFTemp (cubic,quadratic,bi-quadratic)
-			bool const UserSHRCurveExists // TRUE if user specified SHR modifier curve exists
+			bool const UserSHRCurveExists, // TRUE if user specified SHR modifier curve exists
+			bool const ASHRAE127StdRprt // TRUE if user wishes to report ASHRAE 127 standard ratings
 		) :
 			Name( Name ),
 			DXCoilType( DXCoilType ),
@@ -1015,8 +1012,6 @@ namespace DXCoils {
 			FanPowerIncludedInCOP( FanPowerIncludedInCOP ),
 			CondPumpHeatInCapacity( CondPumpHeatInCapacity ),
 			CondPumpPowerInCOP( CondPumpPowerInCOP ),
-			AirVolFlowAutoSized( AirVolFlowAutoSized ),
-			WaterVolFlowAutoSized( WaterVolFlowAutoSized ),
 			LowTempLast( LowTempLast ),
 			HighTempLast( HighTempLast ),
 			ErrIndex1( ErrIndex1 ),
@@ -1086,7 +1081,8 @@ namespace DXCoils {
 			SHRFTemp2( SHRFTemp2 ),
 			SHRFFlow2( SHRFFlow2 ),
 			SHRFTempCurveType2( SHRFTempCurveType2 ),
-			UserSHRCurveExists( UserSHRCurveExists )
+			UserSHRCurveExists( UserSHRCurveExists ),
+			ASHRAE127StdRprt( ASHRAE127StdRprt )
 		{}
 
 	};

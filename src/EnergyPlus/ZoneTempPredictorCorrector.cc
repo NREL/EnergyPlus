@@ -24,6 +24,7 @@
 #include <DataZoneControls.hh>
 #include <DataZoneEnergyDemands.hh>
 #include <DataZoneEquipment.hh>
+#include <FaultsManager.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
 #include <InternalHeatGains.hh>
@@ -86,6 +87,7 @@ namespace ZoneTempPredictorCorrector {
 	using DataAirflowNetwork::AirflowNetworkControlMultiADS;
 	using namespace DataRoomAirModel;
 	using namespace DataZoneControls;
+	using namespace FaultsManager;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -2721,6 +2723,7 @@ namespace ZoneTempPredictorCorrector {
 		using General::TrimSigDigits;
 		using DataZoneControls::OccRoomTSetPointHeat;
 		using DataZoneControls::OccRoomTSetPointCool;
+		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2874,10 +2877,42 @@ namespace ZoneTempPredictorCorrector {
 				ShowSevereError( "CalcZoneAirTempSetpoints: Illegal control type for Zone=" + Zone( ActualZoneNum ).Name + ", Found value=" + TrimSigDigits( TempControlType( ActualZoneNum ) ) + ", in Schedule=" + TempControlledZone( RelativeZoneNum ).ControlTypeSchedName );
 
 			}}
-
+			
+			//Apply offset for faulty therostats_Feb. 2015, zrp
+			if ( ( NumFaultyThermostat > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ) {
+			
+				//  loop through the FaultsThermostatOffset objects to find the one for the zone
+				for ( int iFault = 1; iFault <= NumFaultyThermostat; ++iFault ) {
+				
+					if ( SameString( TempControlledZone( RelativeZoneNum ).Name, FaultsThermostatOffset( iFault ).FaultyThermostatName ) ) {
+					
+						// Check fault availability schedules
+						if ( GetCurrentScheduleValue( FaultsThermostatOffset( iFault ).AvaiSchedPtr ) > 0.0 ) {
+							
+							// Check fault severity schedules to update the reference thermostat offset
+							double rSchVal = 1.0;
+							double offsetUpdated;							
+							if ( FaultsThermostatOffset( iFault ).SeveritySchedPtr >= 0 ) {
+								rSchVal = GetCurrentScheduleValue( FaultsThermostatOffset( iFault ).SeveritySchedPtr );
+							}						
+							offsetUpdated = rSchVal * FaultsThermostatOffset( iFault ).Offset;
+							
+							// Positive offset means the sensor reading is higher than the actual value
+							TempZoneThermostatSetPoint( ActualZoneNum ) -= offsetUpdated; 
+							ZoneThermostatSetPointLo( ActualZoneNum ) -= offsetUpdated;
+							ZoneThermostatSetPointHi( ActualZoneNum ) -= offsetUpdated;
+						}
+						
+						// Stop searching the FaultsThermostatOffset object for the zone
+						break;
+					}
+				}
+			}
+		
 		}
 
 		if ( NumComfortControlledZones > 0 ) CalcZoneAirComfortSetPoints();
+		
 
 	}
 
@@ -3230,6 +3265,7 @@ namespace ZoneTempPredictorCorrector {
 		using DataSurfaces::Surface;
 		using DataSurfaces::HeatTransferModel_EMPD;
 		using DataSurfaces::HeatTransferModel_HAMT;
+		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3278,6 +3314,8 @@ namespace ZoneTempPredictorCorrector {
 			ZoneAirRH = PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress ) * 100.0;
 			ZoneRHHumidifyingSetPoint = GetCurrentScheduleValue( HumidityControlZone( HumidControlledZoneNum ).HumidifyingSchedIndex );
 			ZoneRHDehumidifyingSetPoint = GetCurrentScheduleValue( HumidityControlZone( HumidControlledZoneNum ).DehumidifyingSchedIndex );
+			
+			// Apply EMS values to overwrite the humidistat values
 			if ( HumidityControlZone( HumidControlledZoneNum ).EMSOverrideHumidifySetPointOn ) {
 				ZoneRHHumidifyingSetPoint = HumidityControlZone( HumidControlledZoneNum ).EMSOverrideHumidifySetPointValue;
 			}
@@ -3285,6 +3323,40 @@ namespace ZoneTempPredictorCorrector {
 				ZoneRHDehumidifyingSetPoint = HumidityControlZone( HumidControlledZoneNum ).EMSOverrideDehumidifySetPointValue;
 			}
 
+			// Apply offsets for faulty humidistats_Feb. 2015, zrp
+			if ( ( NumFaultyHumidistat > 0 ) && ( ! WarmupFlag ) && ( ! DoingSizing ) && DoWeathSim ) {
+			
+				//  loop through the FaultsHumidistatOffset objects to find the one for the zone
+				for ( int iFault = 1; iFault <= NumFaultyHumidistat; ++iFault ) {
+				
+					if ( SameString( HumidityControlZone( HumidControlledZoneNum ).ControlName, FaultsHumidistatOffset( iFault ).FaultyHumidistatName ) ) {
+					
+						// Check fault availability schedules
+						if ( GetCurrentScheduleValue( FaultsHumidistatOffset( iFault ).AvaiSchedPtr ) > 0.0 ) {
+							
+							// Check fault severity schedules to update the reference humidistat offset
+							double rSchVal = 1.0;
+							double offsetUpdated;							
+							if ( FaultsHumidistatOffset( iFault ).SeveritySchedPtr >= 0 ) {
+								rSchVal = GetCurrentScheduleValue( FaultsHumidistatOffset( iFault ).SeveritySchedPtr );
+							}						
+							offsetUpdated = rSchVal * FaultsHumidistatOffset( iFault ).Offset;
+							
+							// Positive offset means the sensor reading is higher than the actual value
+							ZoneRHHumidifyingSetPoint -= offsetUpdated; 
+							ZoneRHDehumidifyingSetPoint -= offsetUpdated;
+
+							// constrain value to something reasonable
+							ZoneRHHumidifyingSetPoint = min( 100.0, max( 0.0, ZoneRHHumidifyingSetPoint ) );
+							ZoneRHDehumidifyingSetPoint = min( 100.0, max( 0.0, ZoneRHDehumidifyingSetPoint ) );
+						}
+						
+						// Stop searching the FaultsHumidistatOffset object for the zone
+						break;
+					}
+				}
+			}
+			
 			// Run-time error check
 			if ( ZoneRHHumidifyingSetPoint > ZoneRHDehumidifyingSetPoint ) {
 				//      HumidityControlZone(HumidControlledZoneNum)%ErrorCount = HumidityControlZone(HumidControlledZoneNum)%ErrorCount + 1
