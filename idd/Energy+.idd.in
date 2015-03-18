@@ -33193,6 +33193,7 @@ ZoneHVAC:OutdoorAirUnit,
        \type choice
        \key NeutralControl
        \key TemperatureControl
+       \key HumidityControl
        \default NeutralControl
    A10, \field High Air Control Temperature Schedule Name
        \note Air and control temperatures for cooling. If outdoor air temperature
@@ -35981,6 +35982,7 @@ ZoneHVAC:LowTemperatureRadiant:VariableFlow,
         \key OperativeTemperature
         \key OutdoorDryBulbTemperature
         \key OutdoorWetBulbTemperature
+        \key SurfaceTemperature
         \default MeanAirTemperature
    A6 , \field Heating Design Capacity Method
         \required-field
@@ -36138,6 +36140,7 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
         \key OperativeTemperature
         \key OutdoorDryBulbTemperature
         \key OutdoorWetBulbTemperature
+        \key SurfaceTemperature
         \default MeanAirTemperature
    N3 , \field Rated Flow Rate
         \units m3/s
@@ -36290,6 +36293,7 @@ ZoneHVAC:LowTemperatureRadiant:Electric,
         \key OperativeTemperature
         \key OutdoorDryBulbTemperature
         \key OutdoorWetBulbTemperature
+        \key SurfaceTemperature
         \default MeanAirTemperature
    N4 , \field Heating Throttling Range
         \units deltaC

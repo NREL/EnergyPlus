@@ -118,6 +118,7 @@ namespace OutdoorAirUnit {
 	int const Neutral( 1 ); // Controls system using zone mean air temperature
 	int const Unconditioned( 2 ); // Controls system when outdoor air temperature is identified with control temperature
 	int const Temperature( 3 ); // Controls system using temperature band
+	int const Humidity( 4 ); // Controls system using humidity for latent loads
 
 	// Operating Options
 	int const HeatingMode( 1 ); // normal heating coil operation
@@ -510,6 +511,8 @@ namespace OutdoorAirUnit {
 					OutAirUnit( OAUnitNum ).ControlType = Neutral;
 				} else if ( SELECT_CASE_var == "TEMPERATURECONTROL" ) {
 					OutAirUnit( OAUnitNum ).ControlType = Temperature;
+				} else if ( SELECT_CASE_var == "HUMIDITYCONTROL" ) {
+					OutAirUnit( OAUnitNum ).ControlType = Humidity;
 				}}
 			} else {
 				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 9 ) + "=\"" + cAlphaArgs( 9 ) + "\"." );
@@ -1655,7 +1658,11 @@ namespace OutdoorAirUnit {
 		using Fans::SimulateFanComponents;
 		using DataHVACGlobals::ZoneCompTurnFansOn;
 		using DataHVACGlobals::ZoneCompTurnFansOff;
-
+		using Psychrometrics::PsyWFnTdpPb;
+		using DataHeatBalFanSys::ZoneVolCapMultpSens;
+		using DataHeatBalance::Zone;
+		using DataHVACGlobals::TimeStepSys;
+		
 		// Locals
 		Real64 OAMassFlowRate;
 
@@ -1708,6 +1715,13 @@ namespace OutdoorAirUnit {
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		bool FatalErrorFlag;
 		Real64 ZoneAirEnt; // zone air enthalphy J/kg
+		Real64 TargetDewPtTemp; // target dewpoint temperature for humidity control
+		Real64 TargetHumRat; // target humidity ratio for zone
+		Real64 ZoneHumRat; // zone humidity ratio
+		int ZonePtr; // local zone pointer
+		Real64 ZoneMass; // mass of air in the zone
+		Real64 OutletHumRat; // outlet humidity ratio
+		Real64 OutletDewPtTemp; // outlet dewpoint temperature
 
 		// FLOW:
 
@@ -1846,6 +1860,49 @@ namespace OutdoorAirUnit {
 						OutAirUnit( OAUnitNum ).CompOutSetTemp = AirOutletTemp;
 						SimZoneOutAirUnitComps( OAUnitNum, FirstHVACIteration );
 					}
+				}
+			} else if ( SELECT_CASE_var == Humidity ) {
+				// Humidity control for handling latent load.  The purpose of this is for approximate
+				// control of the humidity level in the zone so that this system handles the latent load
+				// while another system (like say a radiant system) handles the sensible load.
+				TargetDewPtTemp = GetCurrentScheduleValue( OutAirUnit( OAUnitNum ).HiCtrlTempSchedPtr );
+				TargetHumRat = PsyWFnTdpPb( TargetDewPtTemp, OutBaroPress );
+				ZoneHumRat = Node( OutAirUnit( OAUnitNum ).ZoneNodeNum ).HumRat;
+				if ( TargetHumRat >= ZoneHumRat ) {
+					// Target humidity ratio is greater than the current zone humidity ratio, so revert back to neutral control
+					// The next section of code is cut and paste from the neutral control scheme above.
+					SetPointTemp = MAT( ZoneNum );
+					//Neutral Control Condition
+					if ( DesOATemp == SetPointTemp ) {
+						OutAirUnit( OAUnitNum ).OperatingMode = NeutralMode;
+						AirOutletTemp = DesOATemp;
+						OutAirUnit( OAUnitNum ).CompOutSetTemp = DesOATemp;
+						SimZoneOutAirUnitComps( OAUnitNum, FirstHVACIteration );
+					} else {
+						if ( DesOATemp < SetPointTemp ) { // Heating MODE
+							OutAirUnit( OAUnitNum ).OperatingMode = HeatingMode;
+							AirOutletTemp = SetPointTemp;
+							OutAirUnit( OAUnitNum ).CompOutSetTemp = AirOutletTemp;
+							SimZoneOutAirUnitComps( OAUnitNum, FirstHVACIteration );
+						} else if ( DesOATemp > SetPointTemp ) { //Cooling Mode
+							OutAirUnit( OAUnitNum ).OperatingMode = CoolingMode;
+							AirOutletTemp = SetPointTemp;
+							OutAirUnit( OAUnitNum ).CompOutSetTemp = AirOutletTemp;
+							SimZoneOutAirUnitComps( OAUnitNum, FirstHVACIteration );
+						}
+					}
+				} else {
+					// Target humidity ratio is less than the current zone humidity ratio, so we need to cool/remove moisture
+					OutAirUnit( OAUnitNum ).OperatingMode = CoolingMode;
+					ZonePtr = OutAirUnit( OAUnitNum ).ZonePtr;
+					ZoneMass = Zone( ZonePtr ).Volume * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MAT( ZonePtr ), ZoneAirHumRat( ZonePtr ) );
+					AirMassFlow = OutAirUnit( OAUnitNum ).OutAirMassFlow;
+					OutletHumRat = ZoneHumRat + ( ( TargetHumRat - ZoneHumRat ) * ZoneMass / ( AirMassFlow * TimeStepSys * SecInHour ) );
+					OutletDewPtTemp = PsyTdpFnWPb( OutletHumRat, OutBaroPress );
+					OutAirUnit( OAUnitNum ).OperatingMode = CoolingMode;
+					AirOutletTemp = OutletDewPtTemp;
+					OutAirUnit( OAUnitNum ).CompOutSetTemp = AirOutletTemp;
+					SimZoneOutAirUnitComps( OAUnitNum, FirstHVACIteration );
 				}
 			}}
 
@@ -2666,7 +2723,7 @@ namespace OutdoorAirUnit {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

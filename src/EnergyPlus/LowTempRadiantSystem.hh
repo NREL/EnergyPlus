@@ -33,6 +33,7 @@ namespace LowTempRadiantSystem {
 	extern int const OperativeControl; // Controls system using operative temperature
 	extern int const ODBControl; // Controls system using outside air dry-bulb temperature
 	extern int const OWBControl; // Controls system using outside air wet-bulb temperature
+	extern int const SurfTempControl; // Controls system using surface temperature
 	// Condensation control types:
 	extern int const CondCtrlNone; // Condensation control--none, so system never shuts down
 	extern int const CondCtrlSimpleOff; // Condensation control--simple off, system shuts off when condensation predicted
@@ -937,7 +938,7 @@ namespace LowTempRadiantSystem {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

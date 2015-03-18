@@ -38,6 +38,7 @@ namespace OutdoorAirUnit {
 	extern int const Neutral; // Controls system using zone mean air temperature
 	extern int const Unconditioned; // Controls system when outdoor air temperature is identified with control temperature
 	extern int const Temperature; // Controls system using temperature band
+	extern int const Humidity; // Controls humidity for latent load handling
 
 	// Operating Options
 	extern int const HeatingMode; // normal heating coil operation
@@ -499,7 +500,7 @@ namespace OutdoorAirUnit {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

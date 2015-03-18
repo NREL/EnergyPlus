@@ -2013,8 +2013,8 @@
     Zn003:Flr001,            !- Surface Name or Radiant Surface Group Name
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
-    MeanAirTemperature,      !- Temperature Control Type
-    0.0005,                  !- Rated Flow Rate {m3/s}
+    SurfaceTemperature,      !- Temperature Control Type
+    0.00005,                 !- Rated Flow Rate {m3/s}
     ,                        !- Pump Flow Rate Schedule Name
     75000,                   !- Rated Pump Head {Pa}
     50,                      !- Rated Power Consumption {W}
@@ -2052,6 +2052,8 @@
   Output:Variable,*,Zone Air Temperature,timestep;
 
   Output:Variable,*,Zone Air Humidity Ratio,timestep;
+
+  Output:Variable,Zn003:Flr001,Surface Inside Face Temperature,timestep;
 
   Output:Variable,*,Plant Supply Side Cooling Demand Rate,timestep;
 
