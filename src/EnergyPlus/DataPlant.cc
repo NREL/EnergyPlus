@@ -324,8 +324,11 @@ namespace DataPlant {
 	Real64 EconLoadMet( 0.0 ); // Load met by Economizer
 	int TotNumLoops( 0 ); // number of plant and condenser loops
 	int TotNumHalfLoops( 0 ); // number of half loops (2 * TotNumLoops)
-	bool PlantSizeNotComplete( true );
-	bool PlantSizesOkayToFinalize( false ); // true if plant sizing is finishing and can save results
+	bool PlantFirstSizeCompleted( false );
+	bool PlantFirstSizesOkayToFinalize( false ); // true if plant sizing is finishing and can save results
+	bool PlantReSizingCompleted( false );
+	bool PlantFirstSizesOkayToReport( false );
+	bool PlantFinalSizesOkayToReport( false );
 	bool AnyEMSPlantOpSchemesInModel( false );
 
 	FArray1D_int EconBranchNum; // Branch num on which economizer is placed

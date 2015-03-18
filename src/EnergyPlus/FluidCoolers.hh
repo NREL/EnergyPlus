@@ -71,15 +71,22 @@ namespace FluidCoolers {
 		bool Available; // need an array of logicals--load identifiers of available equipment
 		bool ON; // Simulate the machine at it's operating part load ratio
 		Real64 DesignWaterFlowRate; // Design water flow rate through the fluid cooler [m3/s]
+		bool DesignWaterFlowRateWasAutoSized; // true if design water rate was autosize on input
 		Real64 DesWaterMassFlowRate; // Design water flow rate through the fluid cooler [kg/s]
 		Real64 HighSpeedAirFlowRate; // Air flow rate through the fluid cooler at high speed [m3/s]
+		bool HighSpeedAirFlowRateWasAutoSized; //true if high speed air rate was autosize on input
 		Real64 HighSpeedFanPower; // Fan power at high fan speed [W]
+		bool HighSpeedFanPowerWasAutoSized; // true if high fan power was autosize on input
 		Real64 HighSpeedFluidCoolerUA; // UA of fluid cooler at high fan speed [W/C]
+		bool HighSpeedFluidCoolerUAWasAutoSized; // true if high speed UA was autosized on input
 		Real64 LowSpeedAirFlowRate; // Air flow rate through fluid cooler at low speed [m3/s]
+		bool LowSpeedAirFlowRateWasAutoSized; // true if low speed air rate was autosize on input
 		Real64 LowSpeedAirFlowRateSizingFactor; // sizing factor for low speed air flow rate []
 		Real64 LowSpeedFanPower; // Fan power at low fan speed [W]
+		bool LowSpeedFanPowerWasAutoSized; // true if low speed fan power set to autosize on input
 		Real64 LowSpeedFanPowerSizingFactor; // sizing factor for low speed fan power []
 		Real64 LowSpeedFluidCoolerUA; // UA of fluid cooler at low fan speed [W/C]
+		bool LowSpeedFluidCoolerUAWasAutoSized; //true if low speed UA set to autosize on input
 		Real64 LowSpeedFluidCoolerUASizingFactor; // sizing factor for low speed UA []
 		Real64 DesignEnteringWaterTemp; // Entering water temperature at design conditions
 		Real64 DesignLeavingWaterTemp; // Entering water temperature at design conditions
@@ -88,6 +95,7 @@ namespace FluidCoolers {
 		Real64 FluidCoolerMassFlowRateMultiplier; // Maximum fluid cooler flow rate is this multiplier * design flow rate
 		Real64 FluidCoolerNominalCapacity; // Nominal capacity of the fluid cooler [W] at high speed
 		Real64 FluidCoolerLowSpeedNomCap; // Nominal capacity of the fluid cooler [W] at low speed
+		bool FluidCoolerLowSpeedNomCapWasAutoSized; // true if previous was set to autosize on input
 		Real64 FluidCoolerLowSpeedNomCapSizingFactor; // sizing factor for low speed capacity []
 		int WaterInletNodeNum; // Node number on the water inlet side of the fluid cooler
 		int WaterOutletNodeNum; // Node number on the water outlet side of the fluid cooler
@@ -115,15 +123,22 @@ namespace FluidCoolers {
 			Available( true ),
 			ON( true ),
 			DesignWaterFlowRate( 0.0 ),
+			DesignWaterFlowRateWasAutoSized( false ),
 			DesWaterMassFlowRate( 0.0 ),
 			HighSpeedAirFlowRate( 0.0 ),
+			HighSpeedAirFlowRateWasAutoSized( false ),
 			HighSpeedFanPower( 0.0 ),
+			HighSpeedFanPowerWasAutoSized( false ),
 			HighSpeedFluidCoolerUA( 0.0 ),
+			HighSpeedFluidCoolerUAWasAutoSized( false ),
 			LowSpeedAirFlowRate( 0.0 ),
+			LowSpeedAirFlowRateWasAutoSized( false ),
 			LowSpeedAirFlowRateSizingFactor( 0.0 ),
 			LowSpeedFanPower( 0.0 ),
+			LowSpeedFanPowerWasAutoSized( false ),
 			LowSpeedFanPowerSizingFactor( 0.0 ),
 			LowSpeedFluidCoolerUA( 0.0 ),
+			LowSpeedFluidCoolerUAWasAutoSized( false ),
 			LowSpeedFluidCoolerUASizingFactor( 0.0 ),
 			DesignEnteringWaterTemp( 0.0 ),
 			DesignLeavingWaterTemp( 0.0 ),
@@ -132,6 +147,7 @@ namespace FluidCoolers {
 			FluidCoolerMassFlowRateMultiplier( 0.0 ),
 			FluidCoolerNominalCapacity( 0.0 ),
 			FluidCoolerLowSpeedNomCap( 0.0 ),
+			FluidCoolerLowSpeedNomCapWasAutoSized( false ),
 			FluidCoolerLowSpeedNomCapSizingFactor( 0.0 ),
 			WaterInletNodeNum( 0 ),
 			WaterOutletNodeNum( 0 ),
@@ -150,95 +166,6 @@ namespace FluidCoolers {
 			LoopSideNum( 0 ),
 			BranchNum( 0 ),
 			CompNum( 0 )
-		{}
-
-		// Member Constructor
-		FluidCoolerspecs(
-			std::string const & Name, // User identifier
-			std::string const & FluidCoolerType, // Type of fluid cooler
-			int const FluidCoolerType_Num,
-			int const PerformanceInputMethod_Num,
-			bool const Available, // need an array of logicals--load identifiers of available equipment
-			bool const ON, // Simulate the machine at it's operating part load ratio
-			Real64 const DesignWaterFlowRate, // Design water flow rate through the fluid cooler [m3/s]
-			Real64 const DesWaterMassFlowRate, // Design water flow rate through the fluid cooler [kg/s]
-			Real64 const HighSpeedAirFlowRate, // Air flow rate through the fluid cooler at high speed [m3/s]
-			Real64 const HighSpeedFanPower, // Fan power at high fan speed [W]
-			Real64 const HighSpeedFluidCoolerUA, // UA of fluid cooler at high fan speed [W/C]
-			Real64 const LowSpeedAirFlowRate, // Air flow rate through fluid cooler at low speed [m3/s]
-			Real64 const LowSpeedAirFlowRateSizingFactor, // sizing factor for low speed air flow rate []
-			Real64 const LowSpeedFanPower, // Fan power at low fan speed [W]
-			Real64 const LowSpeedFanPowerSizingFactor, // sizing factor for low speed fan power []
-			Real64 const LowSpeedFluidCoolerUA, // UA of fluid cooler at low fan speed [W/C]
-			Real64 const LowSpeedFluidCoolerUASizingFactor, // sizing factor for low speed UA []
-			Real64 const DesignEnteringWaterTemp, // Entering water temperature at design conditions
-			Real64 const DesignLeavingWaterTemp, // Entering water temperature at design conditions
-			Real64 const DesignEnteringAirTemp, // Entering water temperature at design conditions
-			Real64 const DesignEnteringAirWetBulbTemp, // Entering water temperature at design condition
-			Real64 const FluidCoolerMassFlowRateMultiplier, // Maximum fluid cooler flow rate is this multiplier * design flow rate
-			Real64 const FluidCoolerNominalCapacity, // Nominal capacity of the fluid cooler [W] at high speed
-			Real64 const FluidCoolerLowSpeedNomCap, // Nominal capacity of the fluid cooler [W] at low speed
-			Real64 const FluidCoolerLowSpeedNomCapSizingFactor, // sizing factor for low speed capacity []
-			int const WaterInletNodeNum, // Node number on the water inlet side of the fluid cooler
-			int const WaterOutletNodeNum, // Node number on the water outlet side of the fluid cooler
-			int const OutdoorAirInletNodeNum, // Node number of outdoor air inlet for the fluid cooler
-			int const HighMassFlowErrorCount, // Counter when mass flow rate is > Design*FluidCoolerMassFlowRateMultiplier
-			int const HighMassFlowErrorIndex, // Index for high mass flow recurring error message
-			int const OutletWaterTempErrorCount, // Counter when outlet water temperature is < minimum allowed temperature
-			int const OutletWaterTempErrorIndex, // Index for outlet water temperature recurring error message
-			int const SmallWaterMassFlowErrorCount, // Counter when water mass flow rate is very small
-			int const SmallWaterMassFlowErrorIndex, // Index for very small water mass flow rate recurring error message
-			int const WMFRLessThanMinAvailErrCount, // Counter when water mass flow rate is less than minimum available
-			int const WMFRLessThanMinAvailErrIndex, // Index for water mass flow rate less than minavail recurring message
-			int const WMFRGreaterThanMaxAvailErrCount, // Counter when water mass flow rate is greater than minimum available
-			int const WMFRGreaterThanMaxAvailErrIndex, // Index for water mass flow rate > minavail recurring message
-			int const LoopNum,
-			int const LoopSideNum,
-			int const BranchNum,
-			int const CompNum
-		) :
-			Name( Name ),
-			FluidCoolerType( FluidCoolerType ),
-			FluidCoolerType_Num( FluidCoolerType_Num ),
-			PerformanceInputMethod_Num( PerformanceInputMethod_Num ),
-			Available( Available ),
-			ON( ON ),
-			DesignWaterFlowRate( DesignWaterFlowRate ),
-			DesWaterMassFlowRate( DesWaterMassFlowRate ),
-			HighSpeedAirFlowRate( HighSpeedAirFlowRate ),
-			HighSpeedFanPower( HighSpeedFanPower ),
-			HighSpeedFluidCoolerUA( HighSpeedFluidCoolerUA ),
-			LowSpeedAirFlowRate( LowSpeedAirFlowRate ),
-			LowSpeedAirFlowRateSizingFactor( LowSpeedAirFlowRateSizingFactor ),
-			LowSpeedFanPower( LowSpeedFanPower ),
-			LowSpeedFanPowerSizingFactor( LowSpeedFanPowerSizingFactor ),
-			LowSpeedFluidCoolerUA( LowSpeedFluidCoolerUA ),
-			LowSpeedFluidCoolerUASizingFactor( LowSpeedFluidCoolerUASizingFactor ),
-			DesignEnteringWaterTemp( DesignEnteringWaterTemp ),
-			DesignLeavingWaterTemp( DesignLeavingWaterTemp ),
-			DesignEnteringAirTemp( DesignEnteringAirTemp ),
-			DesignEnteringAirWetBulbTemp( DesignEnteringAirWetBulbTemp ),
-			FluidCoolerMassFlowRateMultiplier( FluidCoolerMassFlowRateMultiplier ),
-			FluidCoolerNominalCapacity( FluidCoolerNominalCapacity ),
-			FluidCoolerLowSpeedNomCap( FluidCoolerLowSpeedNomCap ),
-			FluidCoolerLowSpeedNomCapSizingFactor( FluidCoolerLowSpeedNomCapSizingFactor ),
-			WaterInletNodeNum( WaterInletNodeNum ),
-			WaterOutletNodeNum( WaterOutletNodeNum ),
-			OutdoorAirInletNodeNum( OutdoorAirInletNodeNum ),
-			HighMassFlowErrorCount( HighMassFlowErrorCount ),
-			HighMassFlowErrorIndex( HighMassFlowErrorIndex ),
-			OutletWaterTempErrorCount( OutletWaterTempErrorCount ),
-			OutletWaterTempErrorIndex( OutletWaterTempErrorIndex ),
-			SmallWaterMassFlowErrorCount( SmallWaterMassFlowErrorCount ),
-			SmallWaterMassFlowErrorIndex( SmallWaterMassFlowErrorIndex ),
-			WMFRLessThanMinAvailErrCount( WMFRLessThanMinAvailErrCount ),
-			WMFRLessThanMinAvailErrIndex( WMFRLessThanMinAvailErrIndex ),
-			WMFRGreaterThanMaxAvailErrCount( WMFRGreaterThanMaxAvailErrCount ),
-			WMFRGreaterThanMaxAvailErrIndex( WMFRGreaterThanMaxAvailErrIndex ),
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum )
 		{}
 
 	};
@@ -260,22 +187,6 @@ namespace FluidCoolers {
 			AirPress( 0.0 ),
 			AirHumRat( 0.0 )
 		{}
-
-		// Member Constructor
-		FluidCoolerInletConds(
-			Real64 const WaterTemp, // Fluid cooler water inlet temperature (C)
-			Real64 const AirTemp, // Fluid cooler air inlet dry-bulb temperature (C)
-			Real64 const AirWetBulb, // Fluid cooler air inlet wet-bulb temperature (C)
-			Real64 const AirPress, // Fluid cooler air barometric pressure
-			Real64 const AirHumRat // Fluid cooler air inlet humidity ratio (kg/kg)
-		) :
-			WaterTemp( WaterTemp ),
-			AirTemp( AirTemp ),
-			AirWetBulb( AirWetBulb ),
-			AirPress( AirPress ),
-			AirHumRat( AirHumRat )
-		{}
-
 	};
 
 	struct ReportVars
@@ -297,24 +208,6 @@ namespace FluidCoolers {
 			FanPower( 0.0 ),
 			FanEnergy( 0.0 )
 		{}
-
-		// Member Constructor
-		ReportVars(
-			Real64 const InletWaterTemp, // Fluid cooler inlet water temperature (C)
-			Real64 const OutletWaterTemp, // Fluid cooler outlet water temperature (C)
-			Real64 const WaterMassFlowRate, // Fluid cooler water mass flow rate (m3/s)
-			Real64 const Qactual, // Fluid cooler heat rejection rate (W)
-			Real64 const FanPower, // Fluid cooler fan power (W)
-			Real64 const FanEnergy // Fluid cooler fan energy consumption (J)
-		) :
-			InletWaterTemp( InletWaterTemp ),
-			OutletWaterTemp( OutletWaterTemp ),
-			WaterMassFlowRate( WaterMassFlowRate ),
-			Qactual( Qactual ),
-			FanPower( FanPower ),
-			FanEnergy( FanEnergy )
-		{}
-
 	};
 
 	// Object Data

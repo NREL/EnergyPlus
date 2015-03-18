@@ -82,16 +82,23 @@ namespace EvaporativeFluidCoolers {
 		bool Available; // need an array of logicals--load identifiers of available equipment
 		bool ON; // Simulate the machine at it's operating part load ratio
 		Real64 DesignWaterFlowRate; // Design water flow rate through the evaporative fluid cooler [m3/s]
+		bool DesignWaterFlowRateWasAutoSized; // true if design water rate was autosize on input
 		Real64 DesignSprayWaterFlowRate; // Design spray water flow rate through the evaporative fluid cooler [m3/s]
 		Real64 DesWaterMassFlowRate; // Design water flow rate through the evaporative fluid cooler [kg/s]
 		Real64 HighSpeedAirFlowRate; // Air flow rate through evaporative fluid cooler at high speed [m3/s]
+		bool HighSpeedAirFlowRateWasAutoSized; //true if high speed air rate was autosized
 		Real64 HighSpeedFanPower; // Fan power at high fan speed [W]
+		bool HighSpeedFanPowerWasAutoSized; // true if high fan power was autosize on input
 		Real64 HighSpeedEvapFluidCoolerUA; // UA of evaporative fluid cooler at high fan speed [W/C]
+		bool HighSpeedEvapFluidCoolerUAWasAutoSized; // true if high speed UA was autosized on input
 		Real64 LowSpeedAirFlowRate; // Air flow rate through evaporative fluid cooler at low speed [m3/s]
+		bool LowSpeedAirFlowRateWasAutoSized; // true if low speed air rate was autosize on input
 		Real64 LowSpeedAirFlowRateSizingFactor; // sizing factor for low speed air flow rate []
 		Real64 LowSpeedFanPower; // Fan power at low fan speed [W]
+		bool LowSpeedFanPowerWasAutoSized; // true if low speed fan power set to autosize on input
 		Real64 LowSpeedFanPowerSizingFactor; // Sizing factor for low speed fan power []
 		Real64 LowSpeedEvapFluidCoolerUA; // UA of evaporative fluid cooler at low fan speed [W/C]
+		bool LowSpeedEvapFluidCoolerUAWasAutoSized; //true if low speed UA set to autosize on input
 		Real64 LowSpeedEvapFluidCoolerUASizingFactor; // sizing factor for low speed UA []
 		Real64 DesignEnteringWaterTemp; // Entering water temperature at design conditions
 		Real64 DesignEnteringAirTemp; // Design inlet air dry-bulb temperature (C)
@@ -163,16 +170,23 @@ namespace EvaporativeFluidCoolers {
 			Available( true ),
 			ON( true ),
 			DesignWaterFlowRate( 0.0 ),
+			DesignWaterFlowRateWasAutoSized( false ),
 			DesignSprayWaterFlowRate( 0.0 ),
 			DesWaterMassFlowRate( 0.0 ),
 			HighSpeedAirFlowRate( 0.0 ),
+			HighSpeedAirFlowRateWasAutoSized( false ),
 			HighSpeedFanPower( 0.0 ),
+			HighSpeedFanPowerWasAutoSized( false ),
 			HighSpeedEvapFluidCoolerUA( 0.0 ),
+			HighSpeedEvapFluidCoolerUAWasAutoSized( false ),
 			LowSpeedAirFlowRate( 0.0 ),
+			LowSpeedAirFlowRateWasAutoSized( false ),
 			LowSpeedAirFlowRateSizingFactor( 0.0 ),
 			LowSpeedFanPower( 0.0 ),
+			LowSpeedFanPowerWasAutoSized( false ),
 			LowSpeedFanPowerSizingFactor( 0.0 ),
 			LowSpeedEvapFluidCoolerUA( 0.0 ),
+			LowSpeedEvapFluidCoolerUAWasAutoSized( false ),
 			LowSpeedEvapFluidCoolerUASizingFactor( 0.0 ),
 			DesignEnteringWaterTemp( 0.0 ),
 			DesignEnteringAirTemp( 0.0 ),
@@ -221,137 +235,6 @@ namespace EvaporativeFluidCoolers {
 			CompNum( 0 )
 		{}
 
-		// Member Constructor
-		EvapFluidCoolerspecs(
-			std::string const & Name, // User identifier
-			std::string const & EvapFluidCoolerType, // Type of evaporative fluid cooler
-			int const EvapFluidCoolerType_Num,
-			int const PerformanceInputMethod_Num,
-			bool const Available, // need an array of logicals--load identifiers of available equipment
-			bool const ON, // Simulate the machine at it's operating part load ratio
-			Real64 const DesignWaterFlowRate, // Design water flow rate through the evaporative fluid cooler [m3/s]
-			Real64 const DesignSprayWaterFlowRate, // Design spray water flow rate through the evaporative fluid cooler [m3/s]
-			Real64 const DesWaterMassFlowRate, // Design water flow rate through the evaporative fluid cooler [kg/s]
-			Real64 const HighSpeedAirFlowRate, // Air flow rate through evaporative fluid cooler at high speed [m3/s]
-			Real64 const HighSpeedFanPower, // Fan power at high fan speed [W]
-			Real64 const HighSpeedEvapFluidCoolerUA, // UA of evaporative fluid cooler at high fan speed [W/C]
-			Real64 const LowSpeedAirFlowRate, // Air flow rate through evaporative fluid cooler at low speed [m3/s]
-			Real64 const LowSpeedAirFlowRateSizingFactor, // sizing factor for low speed air flow rate []
-			Real64 const LowSpeedFanPower, // Fan power at low fan speed [W]
-			Real64 const LowSpeedFanPowerSizingFactor, // Sizing factor for low speed fan power []
-			Real64 const LowSpeedEvapFluidCoolerUA, // UA of evaporative fluid cooler at low fan speed [W/C]
-			Real64 const LowSpeedEvapFluidCoolerUASizingFactor, // sizing factor for low speed UA []
-			Real64 const DesignEnteringWaterTemp, // Entering water temperature at design conditions
-			Real64 const DesignEnteringAirTemp, // Design inlet air dry-bulb temperature (C)
-			Real64 const DesignEnteringAirWetBulbTemp, // Design inlet air wet-bulb temperature (C)
-			Real64 const EvapFluidCoolerMassFlowRateMultiplier, // Maximum evaporative fluid cooler flow rate is
-			Real64 const HeatRejectCapNomCapSizingRatio, // ratio of actual cap to nominal capacity []
-			Real64 const HighSpeedStandardDesignCapacity, // Standard Design Capacity of the evaporative fluid cooler [W]
-			Real64 const LowSpeedStandardDesignCapacity, // Standard Design Capacity of the evaporative fluid cooler [W]
-			Real64 const LowSpeedStandardDesignCapacitySizingFactor, // sizing factor for low speed capacity []
-			Real64 const HighSpeedUserSpecifiedDesignCapacity, // User specified design capacity [W]
-			Real64 const LowSpeedUserSpecifiedDesignCapacity, // User specified design capacity for at low speed for
-			Real64 const LowSpeedUserSpecifiedDesignCapacitySizingFactor, // sizing factor for low speed user capacity []
-			Real64 const Concentration, // fluid/glycol concentration - percent
-			int const FluidIndex, // Index to Property arrays
-			Real64 const SizFac, // sizing factor
-			int const WaterInletNodeNum, // Node number on the water inlet side of the evaporative fluid cooler
-			int const WaterOutletNodeNum, // Node number on the water outlet side of the evaporative fluid cooler
-			int const OutdoorAirInletNodeNum, // Node number of outdoor air inlet for the evaporative fluid cooler
-			int const BlowDownSchedulePtr, // Pointer to blow down schedule
-			int const HighMassFlowErrorCount, // Counter when mass flow rate is >
-			int const HighMassFlowErrorIndex, // Index for high mass flow recurring error message
-			int const OutletWaterTempErrorCount, // Counter when outlet water temperature is < minimum allowed temperature
-			int const OutletWaterTempErrorIndex, // Index for outlet water temperature recurring error message
-			int const SmallWaterMassFlowErrorCount, // Counter when water mass flow rate is very small
-			int const SmallWaterMassFlowErrorIndex, // Index for very small water mass flow rate recurring error message
-			int const WMFRLessThanMinAvailErrCount, // Counter when water mass flow rate is less than minimum available
-			int const WMFRLessThanMinAvailErrIndex, // Index for water mass flow rate less than minavail recurring message
-			int const WMFRGreaterThanMaxAvailErrCount, // Counter when water mass flow rate is greater than minimum available
-			int const WMFRGreaterThanMaxAvailErrIndex, // Index for water mass flow rate > minavail recurring message
-			int const EvapFluidCoolerAFRRFailedCount, // Counter for air flow rate ratio out of bounds error
-			int const EvapFluidCoolerAFRRFailedIndex, // Index for air flow rate ratio out of bounds error
-			int const CapacityControl, // Type of capacity control for single speed cooling tower:
-			Real64 const BypassFraction, // Fraction of fluid bypass as a ratio of total fluid flow
-			int const EvapLossMode, // sets how evaporative fluid cooler water evaporation is modeled
-			int const BlowdownMode, // sets how evaporative fluid cooler water blowdown is modeled
-			int const SchedIDBlowdown, // index "pointer" to schedule of blowdown in [m3/s]
-			int const WaterTankID, // index "pointer" to WaterStorage structure
-			int const WaterTankDemandARRID, // index "pointer" to demand array inside WaterStorage structure
-			Real64 const UserEvapLossFactor, // simple model [%/Delt C]
-			Real64 const DriftLossFraction,
-			Real64 const ConcentrationRatio, // ratio of solids in blowdown vs make up water
-			bool const SuppliedByWaterSystem,
-			int const LoopNum,
-			int const LoopSideNum,
-			int const BranchNum,
-			int const CompNum
-		) :
-			Name( Name ),
-			EvapFluidCoolerType( EvapFluidCoolerType ),
-			EvapFluidCoolerType_Num( EvapFluidCoolerType_Num ),
-			PerformanceInputMethod_Num( PerformanceInputMethod_Num ),
-			Available( Available ),
-			ON( ON ),
-			DesignWaterFlowRate( DesignWaterFlowRate ),
-			DesignSprayWaterFlowRate( DesignSprayWaterFlowRate ),
-			DesWaterMassFlowRate( DesWaterMassFlowRate ),
-			HighSpeedAirFlowRate( HighSpeedAirFlowRate ),
-			HighSpeedFanPower( HighSpeedFanPower ),
-			HighSpeedEvapFluidCoolerUA( HighSpeedEvapFluidCoolerUA ),
-			LowSpeedAirFlowRate( LowSpeedAirFlowRate ),
-			LowSpeedAirFlowRateSizingFactor( LowSpeedAirFlowRateSizingFactor ),
-			LowSpeedFanPower( LowSpeedFanPower ),
-			LowSpeedFanPowerSizingFactor( LowSpeedFanPowerSizingFactor ),
-			LowSpeedEvapFluidCoolerUA( LowSpeedEvapFluidCoolerUA ),
-			LowSpeedEvapFluidCoolerUASizingFactor( LowSpeedEvapFluidCoolerUASizingFactor ),
-			DesignEnteringWaterTemp( DesignEnteringWaterTemp ),
-			DesignEnteringAirTemp( DesignEnteringAirTemp ),
-			DesignEnteringAirWetBulbTemp( DesignEnteringAirWetBulbTemp ),
-			EvapFluidCoolerMassFlowRateMultiplier( EvapFluidCoolerMassFlowRateMultiplier ),
-			HeatRejectCapNomCapSizingRatio( HeatRejectCapNomCapSizingRatio ),
-			HighSpeedStandardDesignCapacity( HighSpeedStandardDesignCapacity ),
-			LowSpeedStandardDesignCapacity( LowSpeedStandardDesignCapacity ),
-			LowSpeedStandardDesignCapacitySizingFactor( LowSpeedStandardDesignCapacitySizingFactor ),
-			HighSpeedUserSpecifiedDesignCapacity( HighSpeedUserSpecifiedDesignCapacity ),
-			LowSpeedUserSpecifiedDesignCapacity( LowSpeedUserSpecifiedDesignCapacity ),
-			LowSpeedUserSpecifiedDesignCapacitySizingFactor( LowSpeedUserSpecifiedDesignCapacitySizingFactor ),
-			Concentration( Concentration ),
-			FluidIndex( FluidIndex ),
-			SizFac( SizFac ),
-			WaterInletNodeNum( WaterInletNodeNum ),
-			WaterOutletNodeNum( WaterOutletNodeNum ),
-			OutdoorAirInletNodeNum( OutdoorAirInletNodeNum ),
-			BlowDownSchedulePtr( BlowDownSchedulePtr ),
-			HighMassFlowErrorCount( HighMassFlowErrorCount ),
-			HighMassFlowErrorIndex( HighMassFlowErrorIndex ),
-			OutletWaterTempErrorCount( OutletWaterTempErrorCount ),
-			OutletWaterTempErrorIndex( OutletWaterTempErrorIndex ),
-			SmallWaterMassFlowErrorCount( SmallWaterMassFlowErrorCount ),
-			SmallWaterMassFlowErrorIndex( SmallWaterMassFlowErrorIndex ),
-			WMFRLessThanMinAvailErrCount( WMFRLessThanMinAvailErrCount ),
-			WMFRLessThanMinAvailErrIndex( WMFRLessThanMinAvailErrIndex ),
-			WMFRGreaterThanMaxAvailErrCount( WMFRGreaterThanMaxAvailErrCount ),
-			WMFRGreaterThanMaxAvailErrIndex( WMFRGreaterThanMaxAvailErrIndex ),
-			EvapFluidCoolerAFRRFailedCount( EvapFluidCoolerAFRRFailedCount ),
-			EvapFluidCoolerAFRRFailedIndex( EvapFluidCoolerAFRRFailedIndex ),
-			CapacityControl( CapacityControl ),
-			BypassFraction( BypassFraction ),
-			EvapLossMode( EvapLossMode ),
-			BlowdownMode( BlowdownMode ),
-			SchedIDBlowdown( SchedIDBlowdown ),
-			WaterTankID( WaterTankID ),
-			WaterTankDemandARRID( WaterTankDemandARRID ),
-			UserEvapLossFactor( UserEvapLossFactor ),
-			DriftLossFraction( DriftLossFraction ),
-			ConcentrationRatio( ConcentrationRatio ),
-			SuppliedByWaterSystem( SuppliedByWaterSystem ),
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum )
-		{}
-
 	};
 
 	struct EvapFluidCoolerInletConds
@@ -371,22 +254,6 @@ namespace EvaporativeFluidCoolers {
 			AirPress( 0.0 ),
 			AirHumRat( 0.0 )
 		{}
-
-		// Member Constructor
-		EvapFluidCoolerInletConds(
-			Real64 const WaterTemp, // Evaporative fluid cooler water inlet temperature (C)
-			Real64 const AirTemp, // Evaporative fluid cooler air inlet dry-bulb temperature (C)
-			Real64 const AirWetBulb, // Evaporative fluid cooler air inlet wet-bulb temperature (C)
-			Real64 const AirPress, // Evaporative fluid cooler air barometric pressure
-			Real64 const AirHumRat // Evaporative fluid cooler air inlet humidity ratio (kg/kg)
-		) :
-			WaterTemp( WaterTemp ),
-			AirTemp( AirTemp ),
-			AirWetBulb( AirWetBulb ),
-			AirPress( AirPress ),
-			AirHumRat( AirHumRat )
-		{}
-
 	};
 
 	struct ReportVars
@@ -438,54 +305,6 @@ namespace EvaporativeFluidCoolers {
 			StarvedMakeUpVol( 0.0 ),
 			BypassFraction( 0.0 )
 		{}
-
-		// Member Constructor
-		ReportVars(
-			Real64 const InletWaterTemp, // Evaporative fluid cooler inlet water temperature (C)
-			Real64 const OutletWaterTemp, // Evaporative fluid cooler outlet water temperature (C)
-			Real64 const WaterMassFlowRate, // Evaporative fluid cooler water mass flow rate (m3/s)
-			Real64 const Qactual, // Evaporative fluid cooler heat rejection rate (W)
-			Real64 const FanPower, // Evaporative fluid cooler fan power (W)
-			Real64 const FanEnergy, // Evaporative fluid cooler fan energy consumption (J)
-			Real64 const AirFlowRatio, // Air flow ratio through variable speed evaporative fluid cooler
-			Real64 const WaterAmountUsed, // Evaporative fluid cooler make up water usage (m3)
-			Real64 const EvaporationVdot,
-			Real64 const EvaporationVol,
-			Real64 const DriftVdot,
-			Real64 const DriftVol,
-			Real64 const BlowdownVdot,
-			Real64 const BlowdownVol,
-			Real64 const MakeUpVdot,
-			Real64 const MakeUpVol,
-			Real64 const TankSupplyVdot,
-			Real64 const TankSupplyVol,
-			Real64 const StarvedMakeUpVdot,
-			Real64 const StarvedMakeUpVol,
-			Real64 const BypassFraction // Added for fluid bypass
-		) :
-			InletWaterTemp( InletWaterTemp ),
-			OutletWaterTemp( OutletWaterTemp ),
-			WaterMassFlowRate( WaterMassFlowRate ),
-			Qactual( Qactual ),
-			FanPower( FanPower ),
-			FanEnergy( FanEnergy ),
-			AirFlowRatio( AirFlowRatio ),
-			WaterAmountUsed( WaterAmountUsed ),
-			EvaporationVdot( EvaporationVdot ),
-			EvaporationVol( EvaporationVol ),
-			DriftVdot( DriftVdot ),
-			DriftVol( DriftVol ),
-			BlowdownVdot( BlowdownVdot ),
-			BlowdownVol( BlowdownVol ),
-			MakeUpVdot( MakeUpVdot ),
-			MakeUpVol( MakeUpVol ),
-			TankSupplyVdot( TankSupplyVdot ),
-			TankSupplyVol( TankSupplyVol ),
-			StarvedMakeUpVdot( StarvedMakeUpVdot ),
-			StarvedMakeUpVol( StarvedMakeUpVol ),
-			BypassFraction( BypassFraction )
-		{}
-
 	};
 
 	// Object Data
