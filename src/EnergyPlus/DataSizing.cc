@@ -127,6 +127,12 @@ namespace DataSizing {
 	int const FractionOfAutosizedCoolingCapacity( 11 );
 	int const FractionOfAutosizedHeatingCapacity( 12 );
 
+	int const NoSizingFactorMode( 101 );
+	int const GlobalHeatingSizingFactorMode( 102 );
+	int const GlobalCoolingSizingFactorMode( 103 );
+	int const LoopComponentSizingFactorMode( 104 );
+
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// INTERFACE BLOCK SPECIFICATIONS
