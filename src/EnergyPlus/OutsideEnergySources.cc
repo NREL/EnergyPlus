@@ -57,7 +57,7 @@ namespace OutsideEnergySources {
 	using DataPlant::TypeOf_PurchHotWater;
 	using DataPlant::TypeOf_PurchChilledWater;
 	using DataPlant::ScanPlantLoopsForObject;
-	using DataPlant::PlantSizesOkayToFinalize;
+
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
@@ -160,10 +160,8 @@ namespace OutsideEnergySources {
 		//CALCULATE
 		if ( InitLoopEquip ) {
 			InitSimVars( EqNum, MassFlowRate, InletTemp, OutletTemp, MyLoad );
-			if ( ! EnergySource( EqNum ).isThisSized ) {
-				SizeDistrictEnergy( EqNum );
-				EnergySource( EqNum ).isThisSized = true;
-			}
+			SizeDistrictEnergy( EqNum );
+
 			MinCap = 0.0;
 			MaxCap = EnergySource( EqNum ).NomCap;
 			OptCap = EnergySource( EqNum ).NomCap;
@@ -208,6 +206,7 @@ namespace OutsideEnergySources {
 		using ScheduleManager::GetScheduleIndex;
 		using ScheduleManager::CheckScheduleValueMinMax;
 		using DataGlobals::ScheduleAlwaysOn;
+		using DataSizing::AutoSize;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -270,6 +269,9 @@ namespace OutsideEnergySources {
 			EnergySource( EnergySourceNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Hot Water Nodes" );
 			EnergySource( EnergySourceNum ).NomCap = rNumericArgs( 1 );
+			if ( EnergySource( EnergySourceNum ).NomCap == AutoSize ) {
+				EnergySource( EnergySourceNum ).NomCapWasAutoSized = true;
+			}
 			EnergySource( EnergySourceNum ).EnergyTransfer = 0.0;
 			EnergySource( EnergySourceNum ).EnergyRate = 0.0;
 			EnergySource( EnergySourceNum ).EnergyType = EnergyType_DistrictHeating;
@@ -330,6 +332,9 @@ namespace OutsideEnergySources {
 			EnergySource( EnergySourceNum ).OutletNodeNum = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 2 ), cAlphaArgs( 3 ), "Chilled Water Nodes" );
 			EnergySource( EnergySourceNum ).NomCap = rNumericArgs( 1 );
+			if ( EnergySource( EnergySourceNum ).NomCap == AutoSize ) {
+				EnergySource( EnergySourceNum ).NomCapWasAutoSized = true;
+			}
 			EnergySource( EnergySourceNum ).EnergyTransfer = 0.0;
 			EnergySource( EnergySourceNum ).EnergyRate = 0.0;
 			EnergySource( EnergySourceNum ).EnergyType = EnergyType_DistrictCooling;
@@ -407,8 +412,8 @@ namespace OutsideEnergySources {
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using DataGlobals::BeginEnvrnFlag;
-		using DataPlant::PlantSizesOkayToFinalize;
-		using DataPlant::PlantSizeNotComplete;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizeCompleted;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -456,7 +461,6 @@ namespace OutsideEnergySources {
 			// component model has not design flow rates, using data for overall plant loop
 			InitComponentNodes( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).MinMassFlowRate, PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).MaxMassFlowRate, EnergySource( EnergySourceNum ).InletNodeNum, EnergySource( EnergySourceNum ).OutletNodeNum, EnergySource( EnergySourceNum ).LoopNum, EnergySource( EnergySourceNum ).LoopSideNum, EnergySource( EnergySourceNum ).BranchNum, EnergySource( EnergySourceNum ).CompNum );
 			EnergySource( EnergySourceNum ).BeginEnvrnInitFlag = false;
-			if ( PlantSizesOkayToFinalize && PlantSizeNotComplete ) SizeDistrictEnergy( EnergySourceNum );
 		}
 		if ( ! BeginEnvrnFlag ) EnergySource( EnergySourceNum ).BeginEnvrnInitFlag = true;
 
@@ -509,6 +513,9 @@ namespace OutsideEnergySources {
 		using ReportSizingManager::ReportSizingOutput;
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToReport;
+		using DataPlant::PlantFinalSizesOkayToReport;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PltSizNum( 0 );	// Plant sizing index for hot water loop
@@ -528,44 +535,51 @@ namespace OutsideEnergySources {
 		}
 
 		// Do the sizing here
-		if ( EnergySource( EnergySourceNum ).NomCap == AutoSize ) {
-			IsAutoSize = true;
-		}
+
 		PltSizNum = PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).PlantSizNum;
 		if ( PltSizNum > 0 ) {
 			rho = GetDensityGlycol( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidIndex, "SizeDistrict" + typeName );
 			Cp = GetSpecificHeatGlycol( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop(EnergySource( EnergySourceNum).LoopNum ).FluidIndex, "SizeDistrict" + typeName );
 			NomCapDes = Cp * rho * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate;
-			if ( PlantSizesOkayToFinalize ) {
-				if ( IsAutoSize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
+				if ( EnergySource( EnergySourceNum ).NomCapWasAutoSized ) {
 					EnergySource( EnergySourceNum ).NomCap = NomCapDes;
-					ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name, "Design Size Nominal Capacity [W]", NomCapDes );
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name, 
+							"Design Size Nominal Capacity [W]", NomCapDes );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name, 
+							"Initial Design Size Nominal Capacity [W]", NomCapDes );
+					}
 				} else {  // Hard-size with sizing data
 					if ( EnergySource( EnergySourceNum ).NomCap > 0.0 && NomCapDes > 0.0 ) {
 						NomCapUser = EnergySource( EnergySourceNum ).NomCap;
-						ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name, "Design Size Nominal Capacity [W]", NomCapDes, "User-Specified Nominal Capacity [W]", NomCapUser );
-						if ( DisplayExtraWarnings ) {
-							if ( ( std::abs( NomCapDes - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeDistrict" + typeName + ": Potential issue with equipment sizing for " + EnergySource( EnergySourceNum ).Name );
-								ShowContinueError ( "User-Specified Nominal Capacity of " + RoundSigDigits( NomCapUser, 2 ) + " [W]" );
-								ShowContinueError( "differs from Design Size Nominal Capacity of " + RoundSigDigits( NomCapDes, 2 ) + " [W]" );
-								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+						if ( PlantFinalSizesOkayToReport ) {
+							ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name, 
+								"Design Size Nominal Capacity [W]", NomCapDes, "User-Specified Nominal Capacity [W]", NomCapUser );
+							if ( DisplayExtraWarnings ) {
+								if ( ( std::abs( NomCapDes - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
+									ShowMessage( "SizeDistrict" + typeName + ": Potential issue with equipment sizing for " + EnergySource( EnergySourceNum ).Name );
+									ShowContinueError ( "User-Specified Nominal Capacity of " + RoundSigDigits( NomCapUser, 2 ) + " [W]" );
+									ShowContinueError( "differs from Design Size Nominal Capacity of " + RoundSigDigits( NomCapDes, 2 ) + " [W]" );
+									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+								}
 							}
 						}
 					}
 				}
 			}
 		} else {
-			if ( IsAutoSize ) {
+			if ( EnergySource( EnergySourceNum ).NomCapWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				ShowSevereError( "Autosizing of District " + typeName + " nominal capacity requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in District" + typeName + " object=" + EnergySource( EnergySourceNum ).Name );
 				ErrorsFound = true;
-			} else {
-				if ( EnergySource( EnergySourceNum ).NomCap > 0.0 ) {
+			} 
+			if ( ! EnergySource( EnergySourceNum ).NomCapWasAutoSized && EnergySource( EnergySourceNum ).NomCap > 0.0 && PlantFinalSizesOkayToReport ) {
 					ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name, 
 						"User-Specified Nominal Capacity [W]", EnergySource( EnergySourceNum ).NomCap );
-				}
 			}
 		}
 		if ( ErrorsFound ) {

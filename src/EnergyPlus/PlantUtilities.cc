@@ -192,7 +192,7 @@ namespace PlantUtilities {
 		using DataPlant::DemandOpSchemeType;
 		using DataPlant::FlowUnlocked;
 		using DataPlant::FlowLocked;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataBranchAirLoopPlant::ControlType_SeriesActive;
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using General::RoundSigDigits;
@@ -270,7 +270,7 @@ namespace PlantUtilities {
 			Node( OutletNode ).MassFlowRateMaxAvail = min( Node( InletNode ).MassFlowRateMaxAvail, Node( InletNode ).MassFlowRateMax );
 		} else {
 
-			if ( ! SysSizingCalc && PlantSizesOkayToFinalize ) {
+			if ( ! SysSizingCalc && PlantFirstSizesOkayToFinalize ) {
 				// throw error for developers, need to change a componennt model to set hardware limits on inlet
 				if ( ! NodeErrorMsgIssued( InletNode ) ) {
 
