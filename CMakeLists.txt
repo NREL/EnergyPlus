@@ -41,6 +41,7 @@ set(CPACK_PACKAGE_CONTACT "Kyle Benne <Kyle.Benne@nrel.gov>")
 option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
+option( BUILD_VALIDATION_REPORTS "Build validation reports" OFF )
 
 if( BUILD_TESTING )
   option( ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF )
@@ -131,6 +132,8 @@ if( BUILD_FORTRAN )
 endif()
 
 configure_file( idd/Energy+.idd.in "${CMAKE_BINARY_DIR}/Energy+.idd" )
+configure_file( idd/BasementGHT.idd "${CMAKE_BINARY_DIR}/BasementGHT.idd" )
+configure_file( idd/SlabGHT.idd "${CMAKE_BINARY_DIR}/SlabGHT.idd" )
 
 if( BUILD_PACKAGE )
   set(CPACK_INSTALL_CMAKE_PROJECTS
@@ -153,5 +156,20 @@ if( BUILD_PACKAGE )
   endif()
 
   include(CPack.cmake)
+endif()
+
+
+
+if (BUILD_VALIDATION_REPORTS)
+include(ExternalProject)
+  ExternalProject_Add(ValidationReports
+    DEPENDS EnergyPlus ReadVarsESO Basement Slab
+    GIT_REPOSITORY git://github.com/lefticus/EnergyPlusValidationReports
+    GIT_TAG master
+    CMAKE_CACHE_ARGS
+      -DENERGYPLUS_PATH:PATH=${CMAKE_BINARY_DIR}
+      -DENERGYPLUS_VERSION:STRING=${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}
+    INSTALL_COMMAND ""
+    )
 endif()
 
