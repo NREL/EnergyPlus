@@ -5404,11 +5404,11 @@ namespace ConvectionCoefficients {
 		MapIntConvClassificationToHcModels( SurfNum );
 
 		EvaluateIntHcModels( SurfNum, Surface( SurfNum ).IntConvHcModelEq, HConvIn( SurfNum ) );
-		if ( std::isnan( HConvIn( SurfNum ) ) ) { // Use IEEE_IS_NAN when GFortran supports it
-			// throw Error
-			ShowSevereError( "Inside convection coefficient is out of bound = " + Surface( SurfNum ).Name );
-			ShowFatalError( "Inside convection coefficient model number = " + TrimSigDigits( Surface( SurfNum ).IntConvHcModelEq ) );
-		}
+		//if ( std::isnan( HConvIn( SurfNum ) ) ) { // Use IEEE_IS_NAN when GFortran supports it
+			//// throw Error
+			//ShowSevereError( "Inside convection coefficient is out of bound = " + Surface( SurfNum ).Name );
+			//ShowFatalError( "Inside convection coefficient model number = " + TrimSigDigits( Surface( SurfNum ).IntConvHcModelEq ) );
+		//}
 	}
 
 	void
