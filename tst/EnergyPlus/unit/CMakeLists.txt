@@ -16,13 +16,16 @@ set( test_src
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
   Humidifiers.unit.cc
+  HVACSizingSimulationManager.unit.cc 
   HVACStandaloneERV.unit.cc
+  ICSCollector.unit.cc
   ManageElectricPower.unit.cc
   MixedAir.unit.cc
   PurchasedAirManager.unit.cc
   OutputProcessor.unit.cc
   OutputReportTabular.unit.cc
   ReportSizingManager.unit.cc
+  SizingAnalysisObjects.unit.cc
   SizingManager.unit.cc
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
