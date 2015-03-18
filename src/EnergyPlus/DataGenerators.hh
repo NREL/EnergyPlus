@@ -2338,6 +2338,7 @@ namespace DataGenerators {
 		int PlantOutletNodeID;
 		Real64 PlantMassFlowRate; // only if internal control
 		Real64 PlantMassFlowRateMax; // hardware limit for node%massflowrateMax
+		bool PlantMassFlowRateMaxWasAutoSized; // true if mass flow rate was autosized on input
 		std::string AirInletNodeName;
 		int AirInletNodeID;
 		std::string AirOutletNodeName;
@@ -2360,6 +2361,7 @@ namespace DataGenerators {
 			PlantOutletNodeID( 0 ),
 			PlantMassFlowRate( 0.0 ),
 			PlantMassFlowRateMax( 0.0 ),
+			PlantMassFlowRateMaxWasAutoSized( false ),
 			AirInletNodeID( 0 ),
 			AirOutletNodeID( 0 ),
 			FuelSupplyID( 0 ),
@@ -2370,62 +2372,6 @@ namespace DataGenerators {
 			CWBranchNum( 0 ),
 			CWCompNum( 0 )
 		{}
-
-		// Member Constructor
-		MicroCHPDataStruct(
-			std::string const & Name, // name of this Micro CHP Generator
-			std::string const & ParamObjName, // name of parameter object
-			MicroCHPParamsNonNormalized const & A42Model, // Nested parameter data structure
-			bool const ModelTypeAnnex42, // normalized =  non-normalized?
-			Real64 const NomEff, // nominal efficiency
-			std::string const & ZoneName,
-			int const ZoneID,
-			std::string const & PlantInletNodeName,
-			int const PlantInletNodeID,
-			std::string const & PlantOutletNodeName,
-			int const PlantOutletNodeID,
-			Real64 const PlantMassFlowRate, // only if internal control
-			Real64 const PlantMassFlowRateMax, // hardware limit for node%massflowrateMax
-			std::string const & AirInletNodeName,
-			int const AirInletNodeID,
-			std::string const & AirOutletNodeName,
-			int const AirOutletNodeID,
-			MicroCHPReportDataStruct const & Report, // structure of report variables
-			int const FuelSupplyID, // index for fuel supply data structure
-			int const DynamicsControlID, // index in GeneratorDynamics data where control issues are handled
-			int const AvailabilitySchedID, // index for availability schedule
-			int const CWLoopNum, // cooling water plant loop index number
-			int const CWLoopSideNum, // cooling water plant loop side index
-			int const CWBranchNum, // cooling water plant loop branch index
-			int const CWCompNum // cooling water plant loop component index
-		) :
-			Name( Name ),
-			ParamObjName( ParamObjName ),
-			A42Model( A42Model ),
-			ModelTypeAnnex42( ModelTypeAnnex42 ),
-			NomEff( NomEff ),
-			ZoneName( ZoneName ),
-			ZoneID( ZoneID ),
-			PlantInletNodeName( PlantInletNodeName ),
-			PlantInletNodeID( PlantInletNodeID ),
-			PlantOutletNodeName( PlantOutletNodeName ),
-			PlantOutletNodeID( PlantOutletNodeID ),
-			PlantMassFlowRate( PlantMassFlowRate ),
-			PlantMassFlowRateMax( PlantMassFlowRateMax ),
-			AirInletNodeName( AirInletNodeName ),
-			AirInletNodeID( AirInletNodeID ),
-			AirOutletNodeName( AirOutletNodeName ),
-			AirOutletNodeID( AirOutletNodeID ),
-			Report( Report ),
-			FuelSupplyID( FuelSupplyID ),
-			DynamicsControlID( DynamicsControlID ),
-			AvailabilitySchedID( AvailabilitySchedID ),
-			CWLoopNum( CWLoopNum ),
-			CWLoopSideNum( CWLoopSideNum ),
-			CWBranchNum( CWBranchNum ),
-			CWCompNum( CWCompNum )
-		{}
-
 	};
 
 	// Object Data
