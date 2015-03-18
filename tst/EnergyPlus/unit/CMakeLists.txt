@@ -27,6 +27,7 @@ set( test_src
   Vectors.unit.cc
   Vector.unit.cc
   WaterThermalTanks.unit.cc
+  ZoneTempPredictorCorrector.unit.cc
   main.cc
 )
 set( test_dependencies
