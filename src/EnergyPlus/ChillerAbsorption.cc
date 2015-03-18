@@ -200,11 +200,10 @@ namespace ChillerAbsorption {
 		// Initialize Loop Equipment
 		if ( InitLoopEquip ) {
 			TempCondInDesign = BLASTAbsorber( ChillNum ).TempDesCondIn;
-			BLASTAbsorber( ChillNum ).IsThisSized = false;
 			InitBLASTAbsorberModel( ChillNum, RunFlag, MyLoad );
-			BLASTAbsorber( ChillNum ).IsThisSized = true;
-			SizeAbsorpChiller( ChillNum );
+
 			if ( LoopNum == BLASTAbsorber( ChillNum ).CWLoopNum ) {
+				SizeAbsorpChiller( ChillNum );
 				MinCap = BLASTAbsorber( ChillNum ).NomCap * BLASTAbsorber( ChillNum ).MinPartLoadRat;
 				MaxCap = BLASTAbsorber( ChillNum ).NomCap * BLASTAbsorber( ChillNum ).MaxPartLoadRat;
 				OptCap = BLASTAbsorber( ChillNum ).NomCap * BLASTAbsorber( ChillNum ).OptPartLoadRat;
@@ -280,6 +279,7 @@ namespace ChillerAbsorption {
 		using FluidProperties::FindRefrigerant;
 		using General::RoundSigDigits;
 		using DataGlobals::AnyEnergyManagementSystemInModel;
+		using DataSizing::AutoSize;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -333,7 +333,13 @@ namespace ChillerAbsorption {
 			}
 			BLASTAbsorber( AbsorberNum ).Name = cAlphaArgs( 1 );
 			BLASTAbsorber( AbsorberNum ).NomCap = rNumericArgs( 1 );
+			if ( BLASTAbsorber( AbsorberNum ).NomCap == AutoSize ) {
+				BLASTAbsorber( AbsorberNum ).NomCapWasAutoSized = true;
+			}
 			BLASTAbsorber( AbsorberNum ).NomPumpPower = rNumericArgs( 2 );
+			if ( BLASTAbsorber( AbsorberNum ).NomPumpPower == AutoSize ) {
+				BLASTAbsorber( AbsorberNum ).NomPumpPowerWasAutoSized = true;
+			}
 			if ( rNumericArgs( 1 ) == 0.0 ) {
 				ShowSevereError( "Invalid " + cNumericFieldNames( 1 ) + '=' + RoundSigDigits( rNumericArgs( 1 ), 2 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
@@ -396,7 +402,13 @@ namespace ChillerAbsorption {
 			BLASTAbsorber( AbsorberNum ).OptPartLoadRat = rNumericArgs( 5 );
 			BLASTAbsorber( AbsorberNum ).TempDesCondIn = rNumericArgs( 6 );
 			BLASTAbsorber( AbsorberNum ).EvapVolFlowRate = rNumericArgs( 7 );
+			if ( BLASTAbsorber( AbsorberNum ).EvapVolFlowRate == AutoSize ) {
+				BLASTAbsorber( AbsorberNum ).EvapVolFlowRateWasAutoSized = true;
+			}
 			BLASTAbsorber( AbsorberNum ).CondVolFlowRate = rNumericArgs( 8 );
+			if ( BLASTAbsorber( AbsorberNum ).CondVolFlowRate == AutoSize ) {
+				BLASTAbsorber( AbsorberNum ).CondVolFlowRateWasAutoSized = true;
+			}
 			BLASTAbsorber( AbsorberNum ).SteamLoadCoef( 1 ) = rNumericArgs( 9 );
 			BLASTAbsorber( AbsorberNum ).SteamLoadCoef( 2 ) = rNumericArgs( 10 );
 			BLASTAbsorber( AbsorberNum ).SteamLoadCoef( 3 ) = rNumericArgs( 11 );
@@ -427,6 +439,9 @@ namespace ChillerAbsorption {
 
 			if ( NumNums > 15 ) {
 				BLASTAbsorber( AbsorberNum ).GeneratorVolFlowRate = rNumericArgs( 16 );
+				if ( BLASTAbsorber( AbsorberNum ).GeneratorVolFlowRate == AutoSize ) {
+					BLASTAbsorber( AbsorberNum ).GeneratorVolFlowRateWasAutoSized = true;
+				}
 			}
 
 			if ( BLASTAbsorber( AbsorberNum ).GeneratorVolFlowRate == 0.0 && BLASTAbsorber( AbsorberNum ).GenHeatSourceType == NodeType_Water ) {
@@ -526,8 +541,8 @@ namespace ChillerAbsorption {
 		using DataPlant::PlantLoop;
 		using DataPlant::TypeOf_Chiller_Absorption;
 		using DataPlant::ScanPlantLoopsForObject;
-		using DataPlant::PlantSizeNotComplete;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizeCompleted;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataPlant::LoopFlowStatus_NeedyIfLoopOn;
 		using InputProcessor::SameString;
 		using PlantUtilities::InterConnectTwoPlantLoopSides;
@@ -657,8 +672,8 @@ namespace ChillerAbsorption {
 		//  IF((MyEnvrnFlag(ChillNum) .and. BeginEnvrnFlag) &
 		//     .OR. (Node(CondInletNode)%MassFlowrate <= 0.0 .AND. RunFlag)) THEN
 
-		if ( MyEnvrnFlag( ChillNum ) && BeginEnvrnFlag && ( PlantSizesOkayToFinalize ) ) {
-			if ( PlantSizeNotComplete ) SizeAbsorpChiller( ChillNum );
+		if ( MyEnvrnFlag( ChillNum ) && BeginEnvrnFlag && ( PlantFirstSizesOkayToFinalize ) ) {
+
 			rho = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 			BLASTAbsorber( ChillNum ).EvapMassFlowRateMax = BLASTAbsorber( ChillNum ).EvapVolFlowRate * rho;
@@ -758,7 +773,9 @@ namespace ChillerAbsorption {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToReport;
+		using DataPlant::PlantFinalSizesOkayToReport;
 		using DataPlant::MyPlantSizingIndex;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
@@ -807,7 +824,7 @@ namespace ChillerAbsorption {
 		Real64 tmpCondVolFlowRate; // local condenser design volume flow rate
 		Real64 tmpGeneratorVolFlowRate; // local generator design volume flow rate
 		static int DummWaterIndex( 1 );
-		bool IsAutoSize; // Indicator to autosize for reporting
+
 		Real64 NomCapUser; // Hardsized nominal capacity for reporting
 		Real64 NomPumpPowerUser; // Hardsized nominal pump power for reporting
 		Real64 EvapVolFlowRateUser; // Hardsized evaporator volume flow rate for reporting
@@ -826,7 +843,7 @@ namespace ChillerAbsorption {
 		tmpEvapVolFlowRate = BLASTAbsorber( ChillNum ).EvapVolFlowRate;
 		tmpCondVolFlowRate = BLASTAbsorber( ChillNum ).CondVolFlowRate;
 		tmpGeneratorVolFlowRate = BLASTAbsorber( ChillNum ).GeneratorVolFlowRate;
-		IsAutoSize = false;
+
 		NomCapUser = 0.0;
 		NomPumpPowerUser = 0.0;
 		EvapVolFlowRateUser = 0.0;
@@ -835,13 +852,7 @@ namespace ChillerAbsorption {
 
 		// find the appropriate Plant Sizing object
 		PltSizNum = PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).PlantSizNum;
-
-		//IF (BLASTAbsorber(ChillNum)%CondVolFlowRate == AutoSize) THEN
 		PltSizCondNum = PlantLoop( BLASTAbsorber( ChillNum ).CDLoopNum ).PlantSizNum;
-		//    PltSizCondNum = MyCondPlantSizingIndex('Chiller:Absorption', BLASTAbsorber(ChillNum)%Name, &
-		//                                         BLASTAbsorber(ChillNum)%CondInletNodeNum, &
-		//                                         BLASTAbsorber(ChillNum)%CondOutletNodeNum, LoopErrorsFound)
-		//ENDIF
 
 		if ( BLASTAbsorber( ChillNum ).GenHeatSourceType == NodeType_Steam ) {
 			if ( BLASTAbsorber( ChillNum ).GeneratorInletNodeNum > 0 && BLASTAbsorber( ChillNum ).GeneratorOutletNodeNum > 0 ) {
@@ -865,9 +876,6 @@ namespace ChillerAbsorption {
 			}
 		}
 
-		if ( BLASTAbsorber( ChillNum ).NomCap == AutoSize ) {
-			IsAutoSize = true;
-		}
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 
@@ -875,23 +883,28 @@ namespace ChillerAbsorption {
 
 				rho = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate * BLASTAbsorber( ChillNum ).SizFac;
-				if ( ! IsAutoSize ) tmpNomCap = BLASTAbsorber( ChillNum ).NomCap;
-				//IF (PlantSizesOkayToFinalize)  BLASTAbsorber(ChillNum)%NomCap = tmpNomCap
+				if ( ! BLASTAbsorber( ChillNum ).NomCapWasAutoSized ) tmpNomCap = BLASTAbsorber( ChillNum ).NomCap;
 			} else {
-				if ( IsAutoSize ) tmpNomCap = 0.0;
-				//IF (PlantSizesOkayToFinalize)  BLASTAbsorber(ChillNum)%NomCap = tmpNomCap
+				if ( BLASTAbsorber( ChillNum ).NomCapWasAutoSized ) tmpNomCap = 0.0;
 			}
-			if ( PlantSizesOkayToFinalize ) {
-				if ( IsAutoSize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
+				if ( BLASTAbsorber( ChillNum ).NomCapWasAutoSized ) {
 					BLASTAbsorber( ChillNum ).NomCap = tmpNomCap;
-					if ( ! BLASTAbsorber( ChillNum ).IsThisSized ) {
-						ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, "Design Size Nominal Capacity [W]", tmpNomCap );
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, 
+							"Design Size Nominal Capacity [W]", tmpNomCap );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, 
+							"Initial Design Size Nominal Capacity [W]", tmpNomCap );
 					}
 				} else {
 					if ( BLASTAbsorber( ChillNum ).NomCap > 0.0 && tmpNomCap > 0.0 ) {
 						NomCapUser = BLASTAbsorber( ChillNum ).NomCap;
-						if ( ! BLASTAbsorber( ChillNum ).IsThisSized ) {
-							ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, "Design Size Nominal Capacity [W]", tmpNomCap, "User-Specified Nominal Capacity [W]", NomCapUser );
+						if ( PlantFinalSizesOkayToReport ) {
+							ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, 
+								"Design Size Nominal Capacity [W]", tmpNomCap, 
+								"User-Specified Nominal Capacity [W]", NomCapUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpNomCap - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
 									ShowMessage( "SizeChillerAbsorption: Potential issue with equipment sizing for " + BLASTAbsorber( ChillNum ).Name );
@@ -907,38 +920,40 @@ namespace ChillerAbsorption {
 				}
 			}
 		} else {
-			if ( IsAutoSize ) {
+			if ( BLASTAbsorber( ChillNum ).NomCapWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				ShowSevereError( "Autosizing of Absorption Chiller nominal capacity requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Chiller:Absorption object=" + BLASTAbsorber( ChillNum ).Name );
 				ErrorsFound = true;
-			} else {
-				if ( ! BLASTAbsorber( ChillNum ).IsThisSized ) {
-					if ( BLASTAbsorber( ChillNum ).NomCap > 0.0 ) {
-						ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, "User-Specified Nominal Capacity [W]", BLASTAbsorber( ChillNum ).NomCap );
-					}
-				}
+			} 
+			if ( ! BLASTAbsorber( ChillNum ).NomCapWasAutoSized && PlantFinalSizesOkayToReport 
+					&& BLASTAbsorber( ChillNum ).NomCap > 0.0 ) {
+				ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, 
+					"User-Specified Nominal Capacity [W]", BLASTAbsorber( ChillNum ).NomCap );
 			}
+
 		}
 
-		IsAutoSize = false;
-		if ( BLASTAbsorber( ChillNum ).NomPumpPower == AutoSize ) {
-			IsAutoSize = true;
-		}
 		tmpNomPumpPower = 0.0045 * BLASTAbsorber( ChillNum ).NomCap;
 
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFirstSizesOkayToFinalize ) {
 			// the DOE-2 EIR for single stage absorption chiller
-			if ( IsAutoSize ) {
+			if ( BLASTAbsorber( ChillNum ).NomPumpPowerWasAutoSized ) {
 				BLASTAbsorber( ChillNum ).NomPumpPower = tmpNomPumpPower;
-				if ( ! BLASTAbsorber( ChillNum ).IsThisSized ) {
-					ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, "Design Size Nominal Pumping Power [W]", tmpNomPumpPower );
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, 
+						"Design Size Nominal Pumping Power [W]", tmpNomPumpPower );
+				}
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, 
+						"Initial Design Size Nominal Pumping Power [W]", tmpNomPumpPower );
 				}
 			} else {
-				//tmpNomPumpPower = 0.0045 * tmpNomCap;
 				if ( BLASTAbsorber( ChillNum ).NomPumpPower > 0.0 && tmpNomPumpPower > 0.0 ) {
 					NomPumpPowerUser = BLASTAbsorber( ChillNum ).NomPumpPower;
-					if ( ! BLASTAbsorber( ChillNum ).IsThisSized ) {
-						ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, "Design Size Nominal Pumping Power [W]", tmpNomPumpPower, "User-Specified Nominal Pumping Power [W]", NomPumpPowerUser );
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, 
+							"Design Size Nominal Pumping Power [W]", tmpNomPumpPower, 
+							"User-Specified Nominal Pumping Power [W]", NomPumpPowerUser );
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( tmpNomPumpPower - NomPumpPowerUser ) / NomPumpPowerUser ) > AutoVsHardSizingThreshold ) {
 								ShowMessage( "SizeChillerAbsorption: Potential issue with equipment sizing for " + BLASTAbsorber( ChillNum ).Name );
@@ -954,30 +969,31 @@ namespace ChillerAbsorption {
 			}
 		}
 
-		IsAutoSize = false;
-		if ( BLASTAbsorber( ChillNum ).EvapVolFlowRate == AutoSize ) {
-			IsAutoSize = true;
-		}
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				tmpEvapVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate * BLASTAbsorber( ChillNum ).SizFac;
-				if ( ! IsAutoSize ) tmpEvapVolFlowRate = BLASTAbsorber( ChillNum ).EvapVolFlowRate;
-				//IF (PlantSizesOkayToFinalize) BLASTAbsorber(ChillNum)%EvapVolFlowRate = tmpEvapVolFlowRate
+				if ( ! BLASTAbsorber( ChillNum ).EvapVolFlowRateWasAutoSized ) tmpEvapVolFlowRate = BLASTAbsorber( ChillNum ).EvapVolFlowRate;
 			} else {
-				if ( IsAutoSize ) tmpEvapVolFlowRate = 0.0;
-				//IF (PlantSizesOkayToFinalize)   BLASTAbsorber(ChillNum)%EvapVolFlowRate = tmpEvapVolFlowRate
+				if ( BLASTAbsorber( ChillNum ).EvapVolFlowRateWasAutoSized ) tmpEvapVolFlowRate = 0.0;
 			}
-			if ( PlantSizesOkayToFinalize ) {
-				if ( IsAutoSize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
+				if ( BLASTAbsorber( ChillNum ).EvapVolFlowRateWasAutoSized ) {
 					BLASTAbsorber( ChillNum ).EvapVolFlowRate = tmpEvapVolFlowRate;
-					if ( ! BLASTAbsorber( ChillNum ).IsThisSized ) {
-						ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, "Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate );
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, 
+							"Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, 
+							"Initial Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate );
 					}
 				} else {
 					if ( BLASTAbsorber( ChillNum ).EvapVolFlowRate > 0.0 && tmpEvapVolFlowRate > 0.0 ) {
 						EvapVolFlowRateUser = BLASTAbsorber( ChillNum ).EvapVolFlowRate;
-						if ( ! BLASTAbsorber( ChillNum ).IsThisSized ) {
-							ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, "Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate, "User-Specified Design Chilled Water Flow Rate [m3/s]", EvapVolFlowRateUser );
+						if ( PlantFinalSizesOkayToReport ) {
+							ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, 
+								"Design Size Design Chilled Water Flow Rate [m3/s]", tmpEvapVolFlowRate, 
+								"User-Specified Design Chilled Water Flow Rate [m3/s]", EvapVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpEvapVolFlowRate - EvapVolFlowRateUser ) / EvapVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
 									ShowMessage( "SizeChillerAbsorption: Potential issue with equipment sizing for " + BLASTAbsorber( ChillNum ).Name );
@@ -993,25 +1009,20 @@ namespace ChillerAbsorption {
 				}
 			}
 		} else {
-			if ( IsAutoSize ) {
+			if ( BLASTAbsorber( ChillNum ).EvapVolFlowRateWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				ShowSevereError( "Autosizing of Absorption Chiller evap flow rate requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in CHILLER:ABSORPTION object=" + BLASTAbsorber( ChillNum ).Name );
 				ErrorsFound = true;
-			} else {
-				if ( ! BLASTAbsorber( ChillNum ).IsThisSized ) {
-					if ( BLASTAbsorber( ChillNum ).EvapVolFlowRate > 0.0 ) {
-						ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, "User-Specified Design Chilled Water Flow Rate [m3/s]", BLASTAbsorber( ChillNum ).EvapVolFlowRate );
-					}
-				}
+			} 
+			if ( ! BLASTAbsorber( ChillNum ).EvapVolFlowRateWasAutoSized && PlantFinalSizesOkayToReport 
+					&& BLASTAbsorber( ChillNum ).EvapVolFlowRate > 0.0 ) {
+					ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, 
+						"User-Specified Design Chilled Water Flow Rate [m3/s]", BLASTAbsorber( ChillNum ).EvapVolFlowRate );
 			}
 		}
 
 		RegisterPlantCompDesignFlow( BLASTAbsorber( ChillNum ).EvapInletNodeNum, tmpEvapVolFlowRate );
 
-		IsAutoSize = false;
-		if ( BLASTAbsorber( ChillNum ).CondVolFlowRate == AutoSize ) {
-			IsAutoSize = true;
-		}
 		if ( PltSizCondNum > 0 && PltSizNum > 0 ) {
 			if ( BLASTAbsorber( ChillNum ).EvapVolFlowRate >= SmallWaterVolFlow && tmpNomCap > 0.0 ) {
 				//       QCondenser = QEvaporator + QGenerator + PumpingPower
@@ -1020,22 +1031,26 @@ namespace ChillerAbsorption {
 
 				rho = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).CDLoopNum ).FluidName, InitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 				tmpCondVolFlowRate = tmpNomCap * ( 1.0 + SteamInputRatNom + tmpNomPumpPower / tmpNomCap ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
-				if ( ! IsAutoSize ) tmpCondVolFlowRate = BLASTAbsorber( ChillNum ).CondVolFlowRate;
-				//IF (PlantSizesOkayToFinalize)  BLASTAbsorber(ChillNum)%CondVolFlowRate = tmpCondVolFlowRate
+				if ( ! BLASTAbsorber( ChillNum ).CondVolFlowRateWasAutoSized ) tmpCondVolFlowRate = BLASTAbsorber( ChillNum ).CondVolFlowRate;
+
 			} else {
-				if ( IsAutoSize ) tmpCondVolFlowRate = 0.0;
-				//IF (PlantSizesOkayToFinalize)  BLASTAbsorber(ChillNum)%CondVolFlowRate = 0.0d0
+				if ( BLASTAbsorber( ChillNum ).CondVolFlowRateWasAutoSized ) tmpCondVolFlowRate = 0.0;
 			}
-			if ( PlantSizesOkayToFinalize ) {
-				if ( IsAutoSize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
+				if ( BLASTAbsorber( ChillNum ).CondVolFlowRateWasAutoSized ) {
 					BLASTAbsorber( ChillNum ).CondVolFlowRate = tmpCondVolFlowRate;
-					if ( ! BLASTAbsorber( ChillNum ).IsThisSized ) {
-						ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, "Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate );
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, 
+							"Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, 
+							"Initial Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate );
 					}
 				} else {
 					if ( BLASTAbsorber( ChillNum ).CondVolFlowRate > 0.0 && tmpCondVolFlowRate > 0.0 ) {
 						CondVolFlowRateUser = BLASTAbsorber( ChillNum ).CondVolFlowRate;
-						if ( ! BLASTAbsorber( ChillNum ).IsThisSized ) {
+						if ( PlantFinalSizesOkayToReport ) {
 							ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, "Design Size Design Condenser Water Flow Rate [m3/s]", tmpCondVolFlowRate, "User-Specified Design Condenser Water Flow Rate [m3/s]", CondVolFlowRateUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpCondVolFlowRate - CondVolFlowRateUser ) / CondVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
@@ -1052,45 +1067,46 @@ namespace ChillerAbsorption {
 				}
 			}
 		} else {
-			if ( IsAutoSize ) {
+			if ( BLASTAbsorber( ChillNum ).CondVolFlowRateWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				ShowSevereError( "Autosizing of Absorption Chiller condenser flow rate requires a condenser" );
 				ShowContinueError( "loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in CHILLER:ABSORPTION object=" + BLASTAbsorber( ChillNum ).Name );
 				ErrorsFound = true;
-			} else {
-				if ( ! BLASTAbsorber( ChillNum ).IsThisSized ) {
-					if ( BLASTAbsorber( ChillNum ).CondVolFlowRate > 0.0 ) {
-						ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, "User-Specified Design Condenser Water Flow Rate [m3/s]", BLASTAbsorber( ChillNum ).CondVolFlowRate );
-					}
-				}
+			} 
+			if ( ! BLASTAbsorber( ChillNum ).CondVolFlowRateWasAutoSized && PlantFirstSizesOkayToFinalize 
+					&&  ( BLASTAbsorber( ChillNum ).CondVolFlowRate > 0.0 ) ) {
+					ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, 
+						"User-Specified Design Condenser Water Flow Rate [m3/s]", BLASTAbsorber( ChillNum ).CondVolFlowRate );
 			}
 		}
 
 		// save the design condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
 		RegisterPlantCompDesignFlow( BLASTAbsorber( ChillNum ).CondInletNodeNum, tmpCondVolFlowRate );
 
-		IsAutoSize = false;
-		if ( BLASTAbsorber( ChillNum ).GeneratorVolFlowRate == AutoSize ) {
-			IsAutoSize = true;
-		}
-		if ( (PltSizSteamNum > 0 && BLASTAbsorber( ChillNum ).GenHeatSourceType == NodeType_Steam) || (PltSizHeatingNum > 0 && BLASTAbsorber( ChillNum ).GenHeatSourceType == NodeType_Water) ) {
+		if ( (PltSizSteamNum > 0 && BLASTAbsorber( ChillNum ).GenHeatSourceType == NodeType_Steam) 
+				|| (PltSizHeatingNum > 0 && BLASTAbsorber( ChillNum ).GenHeatSourceType == NodeType_Water) ) {
 			if ( BLASTAbsorber( ChillNum ).EvapVolFlowRate >= SmallWaterVolFlow && tmpNomCap > 0.0 ) {
 				if ( BLASTAbsorber( ChillNum ).GenHeatSourceType == NodeType_Water ) {
 					CpWater = GetSpecificHeatGlycol( PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidName, PlantSizData( PltSizHeatingNum ).ExitTemp, PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
 					SteamDeltaT = max( 0.5, PlantSizData( PltSizHeatingNum ).DeltaT );
 					RhoWater = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidName, ( PlantSizData( PltSizHeatingNum ).ExitTemp - SteamDeltaT ), PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
 					tmpGeneratorVolFlowRate = ( BLASTAbsorber( ChillNum ).NomCap * SteamInputRatNom ) / ( CpWater * SteamDeltaT * RhoWater );
-					if ( ! IsAutoSize ) tmpGeneratorVolFlowRate = BLASTAbsorber( ChillNum ).GeneratorVolFlowRate;
-					if ( PlantSizesOkayToFinalize ) {
-						if ( IsAutoSize ) {
+					if ( ! BLASTAbsorber( ChillNum ).GeneratorVolFlowRateWasAutoSized ) tmpGeneratorVolFlowRate = BLASTAbsorber( ChillNum ).GeneratorVolFlowRate;
+					if ( PlantFirstSizesOkayToFinalize ) {
+						if ( BLASTAbsorber( ChillNum ).GeneratorVolFlowRateWasAutoSized ) {
 							BLASTAbsorber( ChillNum ).GeneratorVolFlowRate = tmpGeneratorVolFlowRate;
-							if ( ! BLASTAbsorber( ChillNum ).IsThisSized ) {
-								ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, "Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate );
+							if ( PlantFinalSizesOkayToReport ) {
+								ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, 
+									"Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate );
+							}
+							if ( PlantFirstSizesOkayToReport ) {
+								ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, 
+									"Iniital Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate );
 							}
 						} else {
 							if ( BLASTAbsorber( ChillNum ).GeneratorVolFlowRate > 0.0 && tmpGeneratorVolFlowRate > 0.0 ) {
 								GeneratorVolFlowRateUser = BLASTAbsorber( ChillNum ).GeneratorVolFlowRate;
-								if ( ! BLASTAbsorber( ChillNum ).IsThisSized ) {
+								if ( PlantFinalSizesOkayToReport ) {
 									ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, "Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate, "User-Specified Design Generator Fluid Flow Rate [m3/s]", GeneratorVolFlowRateUser );
 									if ( DisplayExtraWarnings ) {
 										if ( ( std::abs( tmpGeneratorVolFlowRate - GeneratorVolFlowRateUser ) / GeneratorVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
@@ -1118,18 +1134,26 @@ namespace ChillerAbsorption {
 					SteamMassFlowRate = ( BLASTAbsorber( ChillNum ).NomCap * SteamInputRatNom ) / ( ( HfgSteam ) + ( SteamDeltaT * CpWater ) );
 					tmpGeneratorVolFlowRate = SteamMassFlowRate / SteamDensity;
 
-					if ( ! IsAutoSize ) tmpGeneratorVolFlowRate = BLASTAbsorber( ChillNum ).GeneratorVolFlowRate;
-					if ( PlantSizesOkayToFinalize ) {
-						BLASTAbsorber( ChillNum ).GeneratorVolFlowRate = tmpGeneratorVolFlowRate;
-						if ( IsAutoSize ) {
-							if ( ! BLASTAbsorber( ChillNum ).IsThisSized ) {
-								ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, "Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate );
+					if ( ! BLASTAbsorber( ChillNum ).GeneratorVolFlowRateWasAutoSized ) tmpGeneratorVolFlowRate = BLASTAbsorber( ChillNum ).GeneratorVolFlowRate;
+					if ( PlantFirstSizesOkayToFinalize ) {
+
+						if ( BLASTAbsorber( ChillNum ).GeneratorVolFlowRateWasAutoSized ) {
+							BLASTAbsorber( ChillNum ).GeneratorVolFlowRate = tmpGeneratorVolFlowRate;
+							if ( PlantFinalSizesOkayToReport ) {
+								ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, 
+									"Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate );
+							}
+							if ( PlantFirstSizesOkayToReport ) {
+								ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, 
+									"Initial Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate );
 							}
 						} else {
 							if ( BLASTAbsorber( ChillNum ).GeneratorVolFlowRate > 0.0 && tmpGeneratorVolFlowRate > 0.0 ) {
 								GeneratorVolFlowRateUser = BLASTAbsorber( ChillNum ).GeneratorVolFlowRate;
-								if ( ! BLASTAbsorber( ChillNum ).IsThisSized ) {
-									ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, "Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate, "User-Specified Design Generator Fluid Flow Rate [m3/s]", GeneratorVolFlowRateUser );
+								if ( PlantFinalSizesOkayToReport ) {
+									ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, 
+										"Design Size Design Generator Fluid Flow Rate [m3/s]", tmpGeneratorVolFlowRate, 
+										"User-Specified Design Generator Fluid Flow Rate [m3/s]", GeneratorVolFlowRateUser );
 									if ( DisplayExtraWarnings ) {
 										if ( ( std::abs( tmpGeneratorVolFlowRate - GeneratorVolFlowRateUser ) / GeneratorVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
 											ShowMessage( "SizeChillerAbsorption: Potential issue with equipment sizing for " + BLASTAbsorber( ChillNum ).Name );
@@ -1146,8 +1170,8 @@ namespace ChillerAbsorption {
 					}
 				}
 			} else {
-				if ( IsAutoSize ) {
-					if ( PlantSizesOkayToFinalize ) {
+				if ( BLASTAbsorber( ChillNum ).GeneratorVolFlowRateWasAutoSized ) {
+					if ( PlantFirstSizesOkayToFinalize ) {
 						BLASTAbsorber( ChillNum ).GeneratorVolFlowRate = 0.0;
 					} else {
 						tmpGeneratorVolFlowRate = 0.0;
@@ -1155,36 +1179,35 @@ namespace ChillerAbsorption {
 				}
 			}
 		} else {
-			if ( IsAutoSize ) {
+			if ( BLASTAbsorber( ChillNum ).GeneratorVolFlowRateWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				ShowSevereError( "Autosizing of Absorption Chiller generator flow rate requires a loop Sizing:Plant object." );
 				ShowContinueError( " For steam loops, use a steam Sizing:Plant object." );
 				ShowContinueError( " For hot water loops, use a heating Sizing:Plant object." );
 				ShowContinueError( "Occurs in Chiller:Absorption object=" + BLASTAbsorber( ChillNum ).Name );
 				ErrorsFound = true;
-			} else {
-				if ( ! BLASTAbsorber( ChillNum ).IsThisSized ) {
-					if ( BLASTAbsorber( ChillNum ).GeneratorVolFlowRate > 0.0 ) {
-						ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, "User-Specified Design Generator Fluid Flow Rate [m3/s]", BLASTAbsorber( ChillNum ).GeneratorVolFlowRate );
-					}
-				}
+			} 
+			if ( ! BLASTAbsorber( ChillNum ).GeneratorVolFlowRateWasAutoSized && PlantFinalSizesOkayToReport 
+					&& ( BLASTAbsorber( ChillNum ).GeneratorVolFlowRate > 0.0 ) ) {
+					ReportSizingOutput( moduleObjectType, BLASTAbsorber( ChillNum ).Name, 
+						"User-Specified Design Generator Fluid Flow Rate [m3/s]", BLASTAbsorber( ChillNum ).GeneratorVolFlowRate );
 			}
 		}
 
 		// save the design steam or hot water volumetric flow rate for use by the steam or hot water loop sizing algorithms
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFirstSizesOkayToFinalize ) {
 			RegisterPlantCompDesignFlow( BLASTAbsorber( ChillNum ).GeneratorInletNodeNum, BLASTAbsorber( ChillNum ).GeneratorVolFlowRate );
 		} else {
 			RegisterPlantCompDesignFlow( BLASTAbsorber( ChillNum ).GeneratorInletNodeNum, tmpGeneratorVolFlowRate );
 		}
 
-		if ( BLASTAbsorber( ChillNum ).GeneratorDeltaTemp == AutoSize ) {
+		if ( BLASTAbsorber( ChillNum ).GeneratorDeltaTempWasAutoSized ) {
 			if ( PltSizHeatingNum > 0 && BLASTAbsorber( ChillNum ).GenHeatSourceType == NodeType_Water ) {
 				BLASTAbsorber( ChillNum ).GeneratorDeltaTemp = max( 0.5, PlantSizData( PltSizHeatingNum ).DeltaT );
 			} else if ( BLASTAbsorber( ChillNum ).GenHeatSourceType == NodeType_Water ) {
-				Cp = GetSpecificHeatGlycol( PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidName, InitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
-				rho = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidName, InitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
+				if ( PlantFirstSizesOkayToFinalize ) {
+					Cp = GetSpecificHeatGlycol( PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidName, InitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidName, InitConvTemp, PlantLoop( BLASTAbsorber( ChillNum ).GenLoopNum ).FluidIndex, RoutineName );
 
-				if ( PlantSizesOkayToFinalize ) {
 					BLASTAbsorber( ChillNum ).GeneratorDeltaTemp = ( SteamInputRatNom * BLASTAbsorber( ChillNum ).NomCap ) / ( Cp * rho * BLASTAbsorber( ChillNum ).GeneratorVolFlowRate );
 				}
 			}
@@ -1194,7 +1217,7 @@ namespace ChillerAbsorption {
 			ShowFatalError( "Preceding sizing errors cause program termination" );
 		}
 
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFinalSizesOkayToReport ) {
 			//create predefined report
 			equipName = BLASTAbsorber( ChillNum ).Name;
 			PreDefTableEntry( pdchMechType, equipName, moduleObjectType );
