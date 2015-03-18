@@ -9,7 +9,6 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-//#include <ObjexxFCL/gio.hh>
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -34,14 +33,8 @@ using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataAirflowNetwork;
 
 
-TEST( ZoneTempPredictorCorrecto, CorrectZoneHumRatTest )
+TEST( ZoneTempPredictorCorrector, CorrectZoneHumRatTest )
 {
-
-//	int write_stat;
-	// Open the Initialization Output File (lifted from SimulationManager.cc)
-//	OutputFileInits = GetNewUnitNumber( );
-//	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios( ); }
-//	eso_stream = gio::out_stream( OutputFileStandard );
 
 	TimeStepSys = 15.0 / 60.0; // System timestep in hours
 
@@ -106,12 +99,12 @@ TEST( ZoneTempPredictorCorrecto, CorrectZoneHumRatTest )
 
 
 // Case 1 - All flows at the same humrat
-	ZoneEquipConfig( 1 ).ZoneExhBalanced = 0.0;
 	ZoneW1( 1 ) = 0.008;
 	Node( 1 ).MassFlowRate = 0.01; // Zone inlet node 1
 	Node( 1 ).HumRat = 0.008;
 	Node( 2 ).MassFlowRate = 0.02; // Zone inlet node 2
 	Node( 2 ).HumRat = 0.008;
+	ZoneEquipConfig( 1 ).ZoneExhBalanced = 0.0;
 	Node( 3 ).MassFlowRate = 0.00; // Zone exhaust node 1
 	Node( 3 ).HumRat = ZoneW1( 1 );
 	Node( 4 ).MassFlowRate = 0.03; // Zone return node
@@ -131,12 +124,12 @@ TEST( ZoneTempPredictorCorrecto, CorrectZoneHumRatTest )
 	EXPECT_EQ( 0.008, Node( 5 ).HumRat );
 
 	// Case 2 - Unbalanced exhaust flow
-	ZoneEquipConfig( 1 ).ZoneExhBalanced = 0.0;
 	ZoneW1( 1 ) = 0.008;
 	Node( 1 ).MassFlowRate = 0.01; // Zone inlet node 1
 	Node( 1 ).HumRat = 0.008;
 	Node( 2 ).MassFlowRate = 0.02; // Zone inlet node 2
 	Node( 2 ).HumRat = 0.008;
+	ZoneEquipConfig( 1 ).ZoneExhBalanced = 0.0;
 	Node( 3 ).MassFlowRate = 0.02; // Zone exhaust node 1
 	Node( 3 ).HumRat = ZoneW1( 1 );
 	Node( 4 ).MassFlowRate = 0.01; // Zone return node
@@ -154,6 +147,56 @@ TEST( ZoneTempPredictorCorrecto, CorrectZoneHumRatTest )
 
 	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
 	EXPECT_EQ( 0.008, Node( 5 ).HumRat );
+
+	// Case 3 - Balanced exhaust flow with proper source flow from mixing
+	ZoneW1( 1 ) = 0.008;
+	Node( 1 ).MassFlowRate = 0.01; // Zone inlet node 1
+	Node( 1 ).HumRat = 0.008;
+	Node( 2 ).MassFlowRate = 0.02; // Zone inlet node 2
+	Node( 2 ).HumRat = 0.008;
+	ZoneEquipConfig( 1 ).ZoneExhBalanced = 0.02;
+	Node( 3 ).MassFlowRate = 0.02; // Zone exhaust node 1
+	Node( 3 ).HumRat = ZoneW1( 1 );
+	Node( 4 ).MassFlowRate = 0.03; // Zone return node
+	Node( 4 ).HumRat = ZoneW1( 1 );
+	Node( 5 ).HumRat = 0.000;
+	ZoneAirHumRat( 1 ) = 0.008;
+	OAMFL( 1 ) = 0.0;
+	VAMFL( 1 ) = 0.0;
+	EAMFL( 1 ) = 0.0;
+	CTMFL( 1 ) = 0.0;
+	OutHumRat = 0.004;
+	MixingMassFlowXHumRat( 1 ) = 0.02 * 0.008;
+	MixingMassFlowZone( 1 ) = 0.02;
+	MDotOA( 1 ) = 0.0;
+
+	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
+	EXPECT_EQ( 0.008, Node( 5 ).HumRat );
+
+	// Case 4 - Balanced exhaust flow without source flow from mixing
+	ZoneW1( 1 ) = 0.008;
+	Node( 1 ).MassFlowRate = 0.01; // Zone inlet node 1
+	Node( 1 ).HumRat = 0.008;
+	Node( 2 ).MassFlowRate = 0.02; // Zone inlet node 2
+	Node( 2 ).HumRat = 0.008;
+	ZoneEquipConfig( 1 ).ZoneExhBalanced = 0.02;
+	Node( 3 ).MassFlowRate = 0.02; // Zone exhaust node 1
+	Node( 3 ).HumRat = ZoneW1( 1 );
+	Node( 4 ).MassFlowRate = 0.01; // Zone return node
+	Node( 4 ).HumRat = ZoneW1( 1 );
+	Node( 5 ).HumRat = 0.000;
+	ZoneAirHumRat( 1 ) = 0.008;
+	OAMFL( 1 ) = 0.0;
+	VAMFL( 1 ) = 0.0;
+	EAMFL( 1 ) = 0.0;
+	CTMFL( 1 ) = 0.0;
+	OutHumRat = 0.004;
+	MixingMassFlowXHumRat( 1 ) = 0.0;
+	MixingMassFlowZone( 1 ) = 0.0;
+	MDotOA( 1 ) = 0.0;
+
+	CorrectZoneHumRat( 1, controlledZoneEquipConfigNums );
+	EXPECT_FALSE( (0.008 == Node( 5 ).HumRat) );
 
 	// Deallocate everything
 	ZoneEquipConfig( 1 ).InletNode.deallocate( );
@@ -179,9 +222,5 @@ TEST( ZoneTempPredictorCorrecto, CorrectZoneHumRatTest )
 	MDotOA.deallocate( );
 	ZoneAirHumRatTemp.deallocate( );
 	ZoneW1.deallocate( );
-
-
-	// Close and delete eio output file
-//	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 
 }
