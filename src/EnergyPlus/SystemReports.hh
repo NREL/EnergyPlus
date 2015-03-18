@@ -65,6 +65,7 @@ namespace SystemReports {
 
 	extern FArray1D< Real64 > SysHumidHTNG;
 	extern FArray1D< Real64 > SysHumidElec;
+	extern FArray1D< Real64 > SysHumidGas;
 	extern FArray1D< Real64 > SysEvapCLNG;
 	extern FArray1D< Real64 > SysEvapElec;
 	extern FArray1D< Real64 > SysHeatExHTNG;
