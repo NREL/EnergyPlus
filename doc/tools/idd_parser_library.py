@@ -12,7 +12,9 @@ class iddFile(object):
         # phases 1 and 2: remove comments and blank lines
         lines_a = []
         self.comments = []
+        line_num = 0
         for line in lines:
+            line_num += 1
             line_text = line.strip()
             this_line = ""
             if len(line_text) > 0:
@@ -26,9 +28,7 @@ class iddFile(object):
                 elif exclamation == -1 and slash > -1:
                     comment_point = slash
                 elif exclamation > -1 and slash > -1:
-                    comment_point = min(comment_point, exclamation)
-                if slash > -1:
-                    comment_point = min(comment_point, slash)
+                    comment_point = min(slash, exclamation)
                 if comment_point == -1:
                     this_line = line_text
                 elif comment_point == 0:

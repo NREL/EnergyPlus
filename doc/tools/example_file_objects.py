@@ -53,7 +53,7 @@ for idf in idf_set:
 			pass #print(upperObjName)
 		if not upperObjName in mainObjectDictionary:
 			# theres a few things we can ignore:
-			if upperObjName in ["LEAD INPUT","END LEAD INPUT", "END SIMULATION DATA"]:
+			if upperObjName in ["LEAD INPUT","END LEAD INPUT", "END SIMULATION DATA", "REPORT VARIABLE DICTIONARY"]:
 				continue
 			print("***Found object not in IDD:")
 			print("  IDF = " + idf_name)
@@ -66,8 +66,6 @@ for idf in idf_set:
 				mainObjectDictionary[upperObjName].append(idf_name)
 			# no matter what increment the total count
 			totalReferences[upperObjName] += 1
-
-mainObjectDictionarySorted = collections.OrderedDict(sorted(mainObjectDictionary.items()))
 
 with open(html_file, 'w') as f:
 	def out(s):
@@ -97,11 +95,11 @@ with open(html_file, 'w') as f:
 	out('</style>')
 	out('<h1>EnergyPlus Example File Objects Link</h1>')
 	out('This file is auto-generated from the objects and comments in the example files and idd in GitHub.')
-	#out('<h2>' + descriptor + '</h2>')
 	out('<table border="1" >')
 	header()
 	entry = 0
-	for k,v in mainObjectDictionarySorted.iteritems():
+	for k in sorted(mainObjectDictionary.keys()):
+		v = mainObjectDictionary[k]
 		entry += 1
 		if entry % 20 == 0:
 			header()

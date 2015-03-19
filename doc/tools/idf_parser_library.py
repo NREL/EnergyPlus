@@ -1,3 +1,4 @@
+from __future__ import print_function
 import sys
 
 class idfFile(object):
@@ -64,7 +65,7 @@ class idfObject(object):
         return s
         
     def printObject(self):
-        print self.objectString()
+        print(self.objectString())
         
     def writeObject(self, fileObject):
         fileObject.write(self.objectString())
