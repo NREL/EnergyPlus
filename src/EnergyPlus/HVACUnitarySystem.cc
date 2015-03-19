@@ -5887,10 +5887,10 @@ namespace HVACUnitarySystem {
 		if ( FirstHVACIteration && UnitarySystem( UnitarySysNum ).AirLoopEquipment ) {
 			if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingHXAssisted || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == CoilDX_HeatingEmpirical || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed || UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == Coil_CoolingWaterToAirHPSimple || UnitarySystem( UnitarySysNum ).HeatingCoilType_Num == Coil_HeatingWaterToAirHPSimple ) {
 				PartLoadRatio = 1.0;
-				if( HeatingLoad && UnitarySystem( UnitarySysNum ).NumOfSpeedHeating > 0 ) {
+				if ( HeatingLoad && UnitarySystem( UnitarySysNum ).NumOfSpeedHeating > 0 ) {
 					UnitarySystem( UnitarySysNum ).HeatingSpeedNum = UnitarySystem( UnitarySysNum ).NumOfSpeedHeating;
 					UnitarySystem( UnitarySysNum ).HeatingSpeedRatio = 1.0;
-				} else if( ( CoolingLoad || MoistureLoad < 0.0 ) && UnitarySystem( UnitarySysNum ).NumOfSpeedCooling > 0 ) {
+				} else if ( ( CoolingLoad || MoistureLoad < 0.0 ) && UnitarySystem( UnitarySysNum ).NumOfSpeedCooling > 0 ) {
 					//        CoolingLoad = .TRUE.
 					UnitarySystem( UnitarySysNum ).CoolingSpeedNum = UnitarySystem( UnitarySysNum ).NumOfSpeedCooling;
 					UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = 1.0;
@@ -5898,7 +5898,7 @@ namespace HVACUnitarySystem {
 			} else {
 				if ( HeatingLoad ) {
 					PartLoadRatio = 0.0;
-					if( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating > 0 ) {
+					if ( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating > 0 ) {
 						UnitarySystem( UnitarySysNum ).HeatingSpeedNum = UnitarySystem( UnitarySysNum ).NumOfSpeedHeating;
 						UnitarySystem( UnitarySysNum ).HeatingSpeedRatio = 1.0;
 						if ( UnitarySystem( UnitarySysNum ).Staged && std::abs( UnitarySystem( UnitarySysNum ).StageNum ) < UnitarySystem( UnitarySysNum ).NumOfSpeedHeating ) {
@@ -5906,10 +5906,10 @@ namespace HVACUnitarySystem {
 							if ( UnitarySystem( UnitarySysNum ).HeatingSpeedNum == 1 ) UnitarySystem( UnitarySysNum ).HeatingSpeedRatio = 0.0;
 						}
 					}
-				} else if( CoolingLoad || MoistureLoad < 0.0 ) {
+				} else if ( CoolingLoad || MoistureLoad < 0.0 ) {
 					//        CoolingLoad = .TRUE.
 					PartLoadRatio = 1.0;
-					if( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling > 0 ) {
+					if ( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling > 0 ) {
 						UnitarySystem( UnitarySysNum ).CoolingSpeedNum = UnitarySystem( UnitarySysNum ).NumOfSpeedCooling;
 						UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = 1.0;
 						if ( UnitarySystem( UnitarySysNum ).Staged && std::abs( UnitarySystem( UnitarySysNum ).StageNum ) < UnitarySystem( UnitarySysNum ).NumOfSpeedCooling ) {
@@ -6038,26 +6038,26 @@ namespace HVACUnitarySystem {
 			CoolPLR = 0.0;
 			HeatPLR = 1.0;
 			UnitarySystem( UnitarySysNum ).WSHPRuntimeFrac = HeatPLR;
-			if( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating > 0 ) {
+			if ( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating > 0 ) {
 				UnitarySystem( UnitarySysNum ).HeatingSpeedRatio = 1.0;
 				UnitarySystem( UnitarySysNum ).HeatingCycRatio = 1.0;
 				UnitarySystem( UnitarySysNum ).HeatingSpeedNum = UnitarySystem( UnitarySysNum ).NumOfSpeedHeating;
 			}
 			if ( UnitarySystem( UnitarySysNum ).Staged && UnitarySystem( UnitarySysNum ).StageNum > 0 ) {
-				if( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating > 0 ) {
+				if ( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating > 0 ) {
 					UnitarySystem( UnitarySysNum ).HeatingSpeedNum = min( UnitarySystem( UnitarySysNum ).StageNum, UnitarySystem( UnitarySysNum ).NumOfSpeedHeating );
 					UnitarySystem( UnitarySysNum ).HeatingSpeedRatio = 0.0;
 				}
 				SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
 				CalcUnitarySystemToLoad( UnitarySysNum, FirstHVACIteration, CoolPLR, HeatPLR, OnOffAirFlowRatio, SensOutputOff, LatOutputOff, HXUnitOn, _, _, CompressorONFlag );
 				if ( SensOutputOff > ZoneLoad ) return;
-				if( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating > 0 ) UnitarySystem( UnitarySysNum ).HeatingSpeedRatio = 1.0;
+				if ( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating > 0 ) UnitarySystem( UnitarySysNum ).HeatingSpeedRatio = 1.0;
 			}
 		} else if ( CoolingLoad || MoistureLoad < LatOutputOff ) {
 			CoolPLR = 1.0;
 			HeatPLR = 0.0;
 			UnitarySystem( UnitarySysNum ).WSHPRuntimeFrac = CoolPLR;
-			if( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling > 0 ) {
+			if ( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling > 0 ) {
 				UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = 1.0;
 				UnitarySystem( UnitarySysNum ).CoolingCycRatio = 1.0;
 				UnitarySystem( UnitarySysNum ).CoolingSpeedNum = UnitarySystem( UnitarySysNum ).NumOfSpeedCooling;
@@ -6068,7 +6068,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = 0.0;
 				CalcUnitarySystemToLoad( UnitarySysNum, FirstHVACIteration, CoolPLR, HeatPLR, OnOffAirFlowRatio, SensOutputOff, LatOutputOff, HXUnitOn, _, _, CompressorONFlag );
 				if ( SensOutputOff < ZoneLoad ) return;
-				if( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling > 0 ) UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = 1.0;
+				if ( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling > 0 ) UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = 1.0;
 			}
 		} else {
 			// will return here when no cooling or heating load and MoistureLoad > LatOutputOff (i.e., PLR=0)
@@ -6648,7 +6648,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).CompPartLoadRatio = PartLoadRatio;
 				UnitarySystem( UnitarySysNum ).WSHPRuntimeFrac = RuntimeFrac;
 				UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 0;
-			} else if( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed ) {
+			} else if ( UnitarySystem( UnitarySysNum ).CoolingCoilType_Num == CoilDX_CoolingTwoSpeed ) {
 				if ( UnitarySystem( UnitarySysNum ).CoolingSpeedNum == 1 ) {
 					UnitarySystem( UnitarySysNum ).CoolingSpeedRatio = 0.0;
 					UnitarySystem( UnitarySysNum ).CoolingCycRatio = PartLoadRatio;
@@ -6660,7 +6660,7 @@ namespace HVACUnitarySystem {
 				UnitarySystem( UnitarySysNum ).CoolingSpeedNum = 0;
 			}
 		}
-		if( UnitarySystem( UnitarySysNum ).CoolingSpeedNum > 1 || UnitarySystem( UnitarySysNum ).HeatingSpeedNum > 1 ) {
+		if ( UnitarySystem( UnitarySysNum ).CoolingSpeedNum > 1 || UnitarySystem( UnitarySysNum ).HeatingSpeedNum > 1 ) {
 			OnOffAirFlowRatio = 1.0;
 			SetAverageAirFlow( UnitarySysNum, PartLoadRatio, OnOffAirFlowRatio );
 		}
