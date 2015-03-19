@@ -19,7 +19,7 @@ using namespace EnergyPlus::DataIPShortCuts;
 using namespace EnergyPlus::DataGlobals;
 using namespace ObjexxFCL;
 
-TEST( ProcessZoneDataTest, Test1 )
+TEST( HeatBalanceManagerTest, ProcessZoneData )
 {
 // Test input processing of Zone object
 //	Zone,
@@ -95,7 +95,7 @@ TEST( ProcessZoneDataTest, Test1 )
 	EXPECT_EQ( ASHRAETARP, Zone( 2 ).InsideConvectionAlgo );
 
 }
-TEST( GetWindowConstructDataTest, Test2 ) {
+TEST( HeatBalanceManagerTest, GetWindowConstructData ) {
 	// Test get input for window construction object
 	// Construction,
 	//	 WINDOWWBLIND, !- Name
