@@ -88,6 +88,7 @@ extern "C" {
 #include <ZoneTempPredictorCorrector.hh>
 #include <ZoneEquipmentManager.hh>
 #include <Timer.h>
+#include <HVACSizingSimulationManager.hh>
 
 namespace EnergyPlus {
 
@@ -311,7 +312,7 @@ namespace SimulationManager {
 
 		BeginFullSimFlag = true;
 		SimsDone = false;
-		if ( DoDesDaySim || DoWeathSim ) {
+		if ( DoDesDaySim || DoWeathSim || DoHVACSizingSimulation ) {
 			DoOutputReporting = true;
 		}
 		DoingSizing = false;
@@ -394,7 +395,14 @@ namespace SimulationManager {
 
 		GetInputForLifeCycleCost(); //must be prior to WriteTabularReports -- do here before big simulation stuff.
 
+		// if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
+		if ( DoHVACSizingSimulation ) {
+			ManageHVACSizingSimulation( ErrorsFound );
+		}
+
 		ShowMessage( "Beginning Simulation" );
+		DisplayString( "Beginning Primary Simulation" );
+
 		ResetEnvironmentCounter();
 
 		EnvCount = 0;
@@ -408,6 +416,9 @@ namespace SimulationManager {
 			if ( ErrorsFound ) break;
 			if ( ( ! DoDesDaySim ) && ( KindOfSim != ksRunPeriodWeather ) ) continue;
 			if ( ( ! DoWeathSim ) && ( KindOfSim == ksRunPeriodWeather ) ) continue;
+			if (KindOfSim == ksHVACSizeDesignDay) continue; // don't run these here, only for sizing simulations
+
+			if (KindOfSim == ksHVACSizeRunPeriodDesign) continue; // don't run these here, only for sizing simulations
 
 			++EnvCount;
 
@@ -627,7 +638,7 @@ namespace SimulationManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_string Alphas( 5 );
+		FArray1D_string Alphas( 6 );
 		FArray1D< Real64 > Number( 4 );
 		int NumAlpha;
 		int NumNumber;
@@ -881,6 +892,8 @@ namespace SimulationManager {
 					TimingFlag = true;
 				} else if ( SameString( Alphas( NumA ), "ReportDetailedWarmupConvergence" ) ) {
 					ReportDetailedWarmupConvergence = true;
+				} else if ( SameString( Alphas( NumA ), "ReportDuringHVACSizingSimulation" ) ) {
+					ReportDuringHVACSizingSimulation = true;
 				} else if ( SameString( Alphas( NumA ), "CreateMinimalSurfaceVariables" ) ) {
 					continue;
 					//        CreateMinimalSurfaceVariables=.TRUE.
@@ -918,6 +931,8 @@ namespace SimulationManager {
 		DoPlantSizing = false;
 		DoDesDaySim = true;
 		DoWeathSim = true;
+		DoHVACSizingSimulation = false;
+		HVACSizingSimMaxIterations = 0;
 		CurrentModuleObject = "SimulationControl";
 		NumRunControl = GetNumObjectsFound( CurrentModuleObject );
 		if ( NumRunControl > 0 ) {
@@ -928,6 +943,9 @@ namespace SimulationManager {
 			if ( Alphas( 3 ) == "YES" ) DoPlantSizing = true;
 			if ( Alphas( 4 ) == "NO" ) DoDesDaySim = false;
 			if ( Alphas( 5 ) == "NO" ) DoWeathSim = false;
+			if (NumAlpha > 5){
+				if ( Alphas( 6 ) == "YES") DoHVACSizingSimulation = true;
+			}
 		}
 		if ( DDOnly ) {
 			DoDesDaySim = true;
@@ -977,10 +995,18 @@ namespace SimulationManager {
 		} else {
 			Alphas( 5 ) = "No";
 		}
+		if ( DoHVACSizingSimulation ) {
+			Alphas( 6 ) = "Yes";
+			if ( NumNumber >= 1 ){
+				HVACSizingSimMaxIterations = Number( 1 );
+			}
+		} else {
+			Alphas( 6 ) = "No";
+		}
 
-		gio::write( OutputFileInits, fmtA ) << "! <Simulation Control>, Do Zone Sizing, Do System Sizing, Do Plant Sizing, Do Design Days, Do Weather Simulation";
+		gio::write( OutputFileInits, fmtA ) << "! <Simulation Control>, Do Zone Sizing, Do System Sizing, Do Plant Sizing, Do Design Days, Do Weather Simulation, Do HVAC Sizing Simulation";
 		gio::write( OutputFileInits, Format_741 );
-		for ( Num = 1; Num <= 5; ++Num ) {
+		for ( Num = 1; Num <= 6; ++Num ) {
 			gio::write( OutputFileInits, Format_741_1 ) << Alphas( Num );
 		}
 		gio::write( OutputFileInits );

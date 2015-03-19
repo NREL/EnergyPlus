@@ -382,6 +382,7 @@ SimulationControl,
       \memo fields set to No, the corresponding Sizing object is ignored.
       \memo Note also, if you want to do system sizing, you must also do zone sizing in the same
       \memo run or an error will result.
+      \min-fields 5
   A1, \field Do Zone Sizing Calculation
       \note If Yes, Zone sizing is accomplished from corresponding Sizing:Zone objects
       \note and autosize fields.
@@ -410,12 +411,26 @@ SimulationControl,
       \key Yes
       \key No
       \default Yes
-  A5; \field Run Simulation for Weather File Run Periods
+  A5, \field Run Simulation for Weather File Run Periods
       \note If Yes, RunPeriod:* objects are executed and results from those may be displayed..
       \type choice
       \key Yes
       \key No
       \default Yes
+  A6, \field Do HVAC Sizing Simulation for Sizing Periods
+      \note If Yes, SizingPeriod:* objects are exectuted additional times for advanced sizing.
+      \note Currently limited to use with coincident plant sizing, see Sizing:Plant object
+      \type choice
+      \key Yes
+      \key No
+      \default No
+  N1; \field Maximum Number of HVAC Sizing Simulation Passes
+      \note the entire set of SizingPeriod:* objects may be repeated to fine tune size results
+      \note this input sets a limit on the number of passes that the sizing algorithms can repeate the set
+      \type integer
+      \minimum 1
+      \default 1
+      
 
 Building,
        \memo Describes parameters that are used during the simulation
@@ -31102,11 +31117,31 @@ Sizing:Plant,
       \required-field
       \type real
       \units C
-  N2; \field Loop Design Temperature Difference
+  N2, \field Loop Design Temperature Difference
       \required-field
       \type real
       \units deltaC
       \minimum> 0.0
+  A3, \field Sizing Option
+      \note if Coincident is chosen, then sizing is based on HVAC Sizing Simulations and 
+      \note the input field called Do HVAC Sizing Simulation for Sizing Periods in SimulationControl must be set to Yes
+      \type choice
+      \key Coincident
+      \key NonCoincident
+      \default NonCoincident
+  N3, \field Zone Timesteps in Averaging Window
+      \note this is used in the coincident sizing algorithm to apply a running average to peak flow rates 
+      \note that occur during HVAC Sizing Simulations
+      \type integer
+      \minimum 1
+      \default 1
+  A4; \field Coincident Sizing Factor Mode
+      \note this is used to adjust the result for coincident sizing by applying a sizing factor
+      \type choice
+      \key None
+      \key GlobalHeatingSizingFactor
+      \key GlobalCoolingSizingFactor
+      \key LoopComponentSizingFactor
 
 OutputControl:Sizing:Style,
        \memo Default style for the Sizing output files is comma -- this works well for
@@ -92479,6 +92514,7 @@ Output:Diagnostics,
        \key DisplayWeatherMissingDataWarnings
        \key ReportDuringWarmup
        \key ReportDetailedWarmupConvergence
+       \key ReportDuringHVACSizingSimulation
   A2 ; \field Key 2
        \type choice
        \key DisplayAllWarnings
@@ -92491,6 +92527,7 @@ Output:Diagnostics,
        \key DisplayWeatherMissingDataWarnings
        \key ReportDuringWarmup
        \key ReportDetailedWarmupConvergence
+       \key ReportDuringHVACSizingSimulation
 
 Output:DebuggingData,
        \memo switch eplusout.dbg file on or off
