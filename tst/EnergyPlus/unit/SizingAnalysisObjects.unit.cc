@@ -96,10 +96,11 @@ public:
 	~SizingAnalysisObjectsTest( )
 	{
 		TotNumLoops = 0;
-		PlantLoop.clear();
-		Environment.clear();
-		PlantSizData.clear();
-		TimeValue.clear();
+		PlantLoop( 1 ).LoopSide.deallocate();
+		PlantLoop.deallocate();
+		Environment.deallocate();
+		PlantSizData.deallocate();
+		TimeValue.deallocate();
 	}
 
 

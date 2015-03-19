@@ -852,7 +852,7 @@ namespace HVACManager {
 
 					for ( AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum ) {
 
-						if ( AirLoopConvergence( AirSysNum ).HVACMassFlowNotConverged ) {
+						if ( any( AirLoopConvergence( AirSysNum ).HVACMassFlowNotConverged ) ) {
 
 							ShowContinueError( "Air System Named = " + AirToZoneNodeInfo( AirSysNum ).AirLoopName + " did not converge for mass flow rate" );
 							ShowContinueError( "Check values should be zero. Most Recent values listed first." );
@@ -877,7 +877,7 @@ namespace HVACManager {
 							}
 						} // mass flow rate not converged
 
-						if ( AirLoopConvergence( AirSysNum ).HVACHumRatNotConverged ) {
+						if( any( AirLoopConvergence( AirSysNum ).HVACHumRatNotConverged ) ) {
 
 							ShowContinueError( "Air System Named = " + AirToZoneNodeInfo( AirSysNum ).AirLoopName + " did not converge for humidity ratio" );
 							ShowContinueError( "Check values should be zero. Most Recent values listed first." );
@@ -901,7 +901,7 @@ namespace HVACManager {
 							}
 						} // humidity ratio not converged
 
-						if ( AirLoopConvergence( AirSysNum ).HVACTempNotConverged ) {
+						if( any( AirLoopConvergence( AirSysNum ).HVACTempNotConverged ) ) {
 
 							ShowContinueError( "Air System Named = " + AirToZoneNodeInfo( AirSysNum ).AirLoopName + " did not converge for temperature" );
 							ShowContinueError( "Check values should be zero. Most Recent values listed first." );
@@ -924,7 +924,7 @@ namespace HVACManager {
 								ShowContinueError( "Supply-to-demand interface deck 2 temperature check value iteration history trace: " + HistoryTrace );
 							}
 						} // Temps not converged
-						if ( AirLoopConvergence( AirSysNum ).HVACEnergyNotConverged ) {
+						if( any( AirLoopConvergence( AirSysNum ).HVACEnergyNotConverged ) ) {
 
 							ShowContinueError( "Air System Named = " + AirToZoneNodeInfo( AirSysNum ).AirLoopName + " did not converge for energy" );
 							ShowContinueError( "Check values should be zero. Most Recent values listed first." );

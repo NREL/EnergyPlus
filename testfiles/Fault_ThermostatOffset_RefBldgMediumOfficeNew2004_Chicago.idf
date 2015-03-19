@@ -7912,107 +7912,107 @@
 
 
   FaultModel:ThermostatOffset,
-    Ther_Offset_Zn10,		 !- Name
+    Ther_Offset_Zn10,        !- Name
+    Core_bottom Thermostat,  !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
-    1.0,       				 !- Reference Thermostat Offset
-    Core_bottom Thermostat; 		 !- Thermostat Name
+    1.0;                     !- Reference Thermostat Offset {deltaC}
 	
   FaultModel:ThermostatOffset,
-    Ther_Offset_Zn11,		 !- Name
+    Ther_Offset_Zn11,        !- Name
+    Perimeter_bot_ZN_1 Thermostat, 		 !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
-    1.0,       				 !- Reference Thermostat Offset
-    Perimeter_bot_ZN_1 Thermostat; 		 !- Thermostat Name
+    1.0;                     !- Reference Thermostat Offset {deltaC}
 	
   FaultModel:ThermostatOffset,
-    Ther_Offset_Zn12,		 !- Name
+    Ther_Offset_Zn12,        !- Name
+    Perimeter_bot_ZN_2 Thermostat, 		 !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
-    1.0,       				 !- Reference Thermostat Offset
-    Perimeter_bot_ZN_2 Thermostat; 		 !- Thermostat Name
+    1.0;                     !- Reference Thermostat Offset {deltaC}
 	
   FaultModel:ThermostatOffset,
-    Ther_Offset_Zn13,		 !- Name
+    Ther_Offset_Zn13,        !- Name
+    Perimeter_bot_ZN_3 Thermostat, 		 !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
-    1.0,       				 !- Reference Thermostat Offset
-    Perimeter_bot_ZN_3 Thermostat; 		 !- Thermostat Name
+    1.0;                     !- Reference Thermostat Offset {deltaC}
 	
   FaultModel:ThermostatOffset,
-    Ther_Offset_Zn14,		 !- Name
+    Ther_Offset_Zn14,        !- Name
+    Perimeter_bot_ZN_4 Thermostat, 		 !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
-    1.0,       				 !- Reference Thermostat Offset
-    Perimeter_bot_ZN_4 Thermostat; 		 !- Thermostat Name
+    1.0;                     !- Reference Thermostat Offset {deltaC}
 	
   FaultModel:ThermostatOffset,
-    Ther_Offset_Zn20,		 !- Name
+    Ther_Offset_Zn20,        !- Name
+    Core_mid Thermostat,     !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
-    1.0,       				 !- Reference Thermostat Offset
-    Core_mid Thermostat; 		 !- Thermostat Name
+    1.0;                     !- Reference Thermostat Offset {deltaC}
 	
   FaultModel:ThermostatOffset,
-    Ther_Offset_Zn21,		 !- Name
+    Ther_Offset_Zn21,        !- Name
+    Perimeter_mid_ZN_1 Thermostat, !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
-    1.0,       				 !- Reference Thermostat Offset
-    Perimeter_mid_ZN_1 Thermostat; 		 !- Thermostat Name
+    1.0;                     !- Reference Thermostat Offset {deltaC}
 	
   FaultModel:ThermostatOffset,
-    Ther_Offset_Zn22,		 !- Name
+    Ther_Offset_Zn22,        !- Name
+    Perimeter_mid_ZN_2 Thermostat,  !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
-    1.0,       				 !- Reference Thermostat Offset
-    Perimeter_mid_ZN_2 Thermostat; 		 !- Thermostat Name
+    1.0;                     !- Reference Thermostat Offset {deltaC}
 	
   FaultModel:ThermostatOffset,
-    Ther_Offset_Zn23,		 !- Name
+    Ther_Offset_Zn23,        !- Name
+    Perimeter_mid_ZN_3 Thermostat,  !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
-    1.0,       				 !- Reference Thermostat Offset
-    Perimeter_mid_ZN_3 Thermostat; 		 !- Thermostat Name
+    1.0;                     !- Reference Thermostat Offset {deltaC}
 	
   FaultModel:ThermostatOffset,
-    Ther_Offset_Zn24,		 !- Name
+    Ther_Offset_Zn24,        !- Name
+    Perimeter_mid_ZN_4 Thermostat, 		 !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
-    1.0,       				 !- Reference Thermostat Offset
-    Perimeter_mid_ZN_4 Thermostat; 		 !- Thermostat Name
+    1.0;                     !- Reference Thermostat Offset {deltaC}
 	
   FaultModel:ThermostatOffset,
-    Ther_Offset_Zn30,		 !- Name
+    Ther_Offset_Zn30,        !- Name
+    Core_top Thermostat, 	 !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
-    1.0,       				 !- Reference Thermostat Offset
-    Core_top Thermostat; 		 !- Thermostat Name
+    1.0;                     !- Reference Thermostat Offset {deltaC}
 	
   FaultModel:ThermostatOffset,
-    Ther_Offset_Zn31,		 !- Name
+    Ther_Offset_Zn31,        !- Name
+    Perimeter_top_ZN_1 Thermostat, !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
-    1.0,       				 !- Reference Thermostat Offset
-    Perimeter_top_ZN_1 Thermostat; 		 !- Thermostat Name
+    1.0;                     !- Reference Thermostat Offset {deltaC}
 	
   FaultModel:ThermostatOffset,
-    Ther_Offset_Zn32,		 !- Name
+    Ther_Offset_Zn32,        !- Name
+    Perimeter_top_ZN_2 Thermostat, !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
-    1.0,       				 !- Reference Thermostat Offset
-    Perimeter_top_ZN_2 Thermostat; 		 !- Thermostat Name
+    1.0;                     !- Reference Thermostat Offset {deltaC}
 	
   FaultModel:ThermostatOffset,
-    Ther_Offset_Zn33,		 !- Name
+    Ther_Offset_Zn33,        !- Name
+    Perimeter_top_ZN_3 Thermostat, !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
-    1.0,       				 !- Reference Thermostat Offset
-    Perimeter_top_ZN_3 Thermostat; 		 !- Thermostat Name
+    1.0;                     !- Reference Thermostat Offset {deltaC}
 	
   FaultModel:ThermostatOffset,
-    Ther_Offset_Zn34,		 !- Name
+    Ther_Offset_Zn34,        !- Name
+    Perimeter_top_ZN_4 Thermostat, !- Thermostat Name
     ,                        !- Availability Schedule Name
     ,                        !- Severity Schedule Name
-    1.0,       				 !- Reference Thermostat Offset
-    Perimeter_top_ZN_4 Thermostat; 		 !- Thermostat Name
-	
+    1.0;                     !- Reference Thermostat Offset {deltaC}
+
