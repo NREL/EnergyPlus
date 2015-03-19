@@ -16,6 +16,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataAirflowNetwork.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -31,10 +32,13 @@ using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataAirflowNetwork;
+using namespace EnergyPlus::Psychrometrics;
 
 
 TEST( ZoneTempPredictorCorrector, CorrectZoneHumRatTest )
 {
+
+	InitializePsychRoutines( );
 
 	TimeStepSys = 15.0 / 60.0; // System timestep in hours
 

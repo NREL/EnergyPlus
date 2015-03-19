@@ -12,6 +12,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 
 using namespace ObjexxFCL;
 using namespace EnergyPlus;
@@ -19,8 +20,9 @@ using namespace EnergyPlus::ConvectionCoefficients;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalSurface;
+using namespace EnergyPlus::Psychrometrics;
 
-TEST( ISCSolarCollectorTest, BugTest ) {
+TEST( ISCSolarCollectorTest, CalcPassiveExteriorBaffleGapTest ) {
 
 	// ICS collector un-allocated collector data bug fix test.  This unit test 
 	// does not test ICS collector performance but it does test a bug fix for 
@@ -32,6 +34,8 @@ TEST( ISCSolarCollectorTest, BugTest ) {
 	int ZoneNum;
 	int ConstrNum;
 	int MatNum;
+
+	InitializePsychRoutines( );
 
 	MatNum = 1;
 	ZoneNum = 1;
