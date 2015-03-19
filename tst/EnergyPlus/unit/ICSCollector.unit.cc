@@ -22,7 +22,7 @@ using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalSurface;
 using namespace EnergyPlus::Psychrometrics;
 
-TEST( ISCSolarCollectorTest, CalcPassiveExteriorBaffleGapTest ) {
+TEST( ICSSolarCollectorTest, CalcPassiveExteriorBaffleGapTest ) {
 
 	// ICS collector un-allocated collector data bug fix test.  This unit test 
 	// does not test ICS collector performance but it does test a bug fix for 
@@ -66,7 +66,7 @@ TEST( ISCSolarCollectorTest, CalcPassiveExteriorBaffleGapTest ) {
 	Zone( ZoneNum ).OutsideConvectionAlgo = ASHRAESimple;
 	// allocate surface temperature variable data
 	TH.allocate( NumOfSurf, 1, 2 );
-	TH( SurfNum, 1, 1 ) = 22;
+	TH( SurfNum, 1, 1 ) = 22.0;
 	// allocate solar incident radiation variable data
 	QRadSWOutIncident.allocate( 1 );
 	QRadSWOutIncident( 1 ) = 0.0;
@@ -84,7 +84,7 @@ TEST( ISCSolarCollectorTest, CalcPassiveExteriorBaffleGapTest ) {
 	Real64 const AspRat( 0.9 ); // aspect ratio of gap  Height/gap [--]
 	Real64 const GapThick( 0.05 ); // Thickness of air space between baffle and underlying heat transfer surface
 	int Roughness( 1 ); // Roughness index (1-6), see DataHeatBalance parameters
-	Real64 QdotSource( 0 ); // Source/sink term, e.g. electricity exported from solar cell [W]
+	Real64 QdotSource( 0.0 ); // Source/sink term, e.g. electricity exported from solar cell [W]
 	Real64 TsBaffle( 20.0 ); // Temperature of baffle (both sides) use lagged value on input [C]
 	Real64 TaGap( 22.0 ); // Temperature of air gap (assumed mixed) use lagged value on input [C]
 	Real64 HcGapRpt; // gap convection coefficient [W/m2C]
@@ -102,7 +102,7 @@ TEST( ISCSolarCollectorTest, CalcPassiveExteriorBaffleGapTest ) {
 	EXPECT_NEAR( 3.694, HrGapRpt, 0.001 );
 	EXPECT_NEAR( 0.036, MdotVentRpt, 0.001 );
 
-	// delete allocated variables
+	// deallocated variables
 	Surface.deallocate();
 	Construct( ConstrNum ).LayerPoint.deallocate();
 	Construct.deallocate();
