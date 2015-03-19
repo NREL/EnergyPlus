@@ -97,7 +97,8 @@ TEST( SizePurchasedAirTest, Test1 )
 
 	ZoneEqSizing(CurZoneEqNum).SizingMethod.deallocate();
 	ZoneEqSizing.deallocate();
-	FinalZoneSizing.deallocate();
+	ZoneHVACSizing.deallocate( );
+	FinalZoneSizing.deallocate( );
 	PurchAir.deallocate();
 	PurchAirNumericFields.deallocate();
 	UnitarySysEqSizing.deallocate();
