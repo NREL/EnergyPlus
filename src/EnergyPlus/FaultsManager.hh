@@ -109,6 +109,7 @@ namespace FaultsManager {
 
 		std::string FaultyThermostatName; // The faulty thermostat name
 		std::string FaultyHumidistatName; // The faulty humidistat name
+		std::string FaultyHumidistatType; // The faulty humidistat type
 		
 		// Default Constructor
 		FaultProperties() :
@@ -146,6 +147,7 @@ namespace FaultsManager {
 			std::string const & FouledCoilName, // The fouled coil name
 			std::string const & FaultyThermostatName, // The faulty thermostat name
 			std::string const & FaultyHumidistatName, // The faulty humidistat name
+			std::string const & FaultyHumidistatType, // The faulty humidistat type
 			int const FouledCoilID, // Point to a fouling coil
 			int const FoulingInputMethod, // Coil fouling input method
 			Real64 const UAFouled, // Fouling coil UA under rating conditions
@@ -176,7 +178,8 @@ namespace FaultsManager {
 			Aout( Aout ),
 			Aratio( Aratio ),
 			FaultyThermostatName( FaultyThermostatName ),
-			FaultyHumidistatName( FaultyHumidistatName )
+			FaultyHumidistatName( FaultyHumidistatName ),
+			FaultyHumidistatType( FaultyHumidistatType )
 		{}
 
 	};
