@@ -50,6 +50,7 @@ namespace EnergyPlus {
 			double scaled = (double)rand() / RAND_MAX;
 			return (int)(max - min + 1)*scaled + min;
 		}
+
 		//return a version 4 (random) uuid
 		std::string getNewUuid()
 		{
@@ -69,7 +70,15 @@ namespace EnergyPlus {
 			return uuid_str.str();
 		}
 
-
+		// trim string
+		std::string trim(std::string str)
+		{
+			str.erase(str.begin(), find_if(str.begin(), str.end(),
+				[](char& ch)->bool { return !isspace(ch); }));
+			str.erase(find_if(str.rbegin(), str.rend(),
+				[](char& ch)->bool { return !isspace(ch); }).base(), str.end());
+			return str;
+		}
 
 		// Class BaseResultObject
 		BaseResultObject::BaseResultObject() {
@@ -406,6 +415,128 @@ namespace EnergyPlus {
 				ShowWarningError("Unable to open file for time-series output.");
 			
 			cJSON_Delete(_root);
+		}
+
+
+		// class Table
+
+		Table::Table(FArray2D_string const & body,
+			FArray1D_string const & rowLabels,
+			FArray1D_string const & columnLabels,
+			std::string const & tableName,
+			std::string footnoteText) 
+		{
+
+			size_t sizeColumnLabels = columnLabels.size();
+			size_t sizeRowLabels = rowLabels.size();
+			TableName = tableName;
+			FootnoteText = footnoteText;
+
+			for (size_t iCol = 0, k = body.index(1, 1); iCol < sizeColumnLabels; ++iCol) {
+				ColHeaders.push_back(columnLabels[iCol]);
+				std::vector< std::string > col;
+				for (size_t iRow = 0; iRow < sizeRowLabels; ++iRow) {
+					if (iCol == 0) {
+						// do this once only
+						RowHeaders.push_back(rowLabels[iRow]);
+					}
+					col.push_back(trim(body[k]));
+					++k;
+				}
+				Data.push_back(col);
+				col.clear();
+			}
+		}
+
+		cJSON* Table::getJSON() {
+			cJSON *_root;
+
+			_root = cJSON_CreateObject();
+			cJSON_AddStringToObject(_root, "TableName", TableName.c_str());
+			cJSON_AddStringToObject(_root, "UUID", UUID().c_str());
+
+			cJSON *_cols;
+			cJSON_AddItemToObject(_root, "Cols", _cols = cJSON_CreateArray());
+			for (int i = 0; i < ColHeaders.size(); i++) {
+				cJSON* str = cJSON_CreateString(ColHeaders[i].c_str());
+				cJSON_AddItemToArray(_cols, str);
+			}
+
+			cJSON *_rows;
+			cJSON_AddItemToObject(_root, "Rows", _rows = cJSON_CreateObject());
+
+			for (int row = 0; row < RowHeaders.size(); ++row) {
+				cJSON *_rowvec;
+				cJSON_AddItemToObject(_rows, RowHeaders[row].c_str(), _rowvec = cJSON_CreateArray());
+				for (int col = 0; col < ColHeaders.size(); ++col) {
+					cJSON *_val = cJSON_CreateString(Data[col][row].c_str());
+					cJSON_AddItemToArray(_rowvec, _val);
+				}
+			}
+			if (!FootnoteText.empty())
+				cJSON_AddStringToObject(_root, "Footnote", FootnoteText.c_str());
+
+			return _root;
+		}
+
+		// class Report
+
+		cJSON* Report::getJSON() {
+			cJSON *_root;
+			_root = cJSON_CreateObject();
+			cJSON_AddStringToObject(_root, "ReportName", ReportName.c_str());
+			cJSON_AddStringToObject(_root, "For", ReportForString.c_str());
+			cJSON_AddStringToObject(_root, "UUID", UUID().c_str());
+
+			cJSON *_cols;
+			cJSON_AddItemToObject(_root, "Tables", _cols = cJSON_CreateArray());
+			for (int i = 0; i < Tables.size(); i++) {
+				cJSON* tbl = Tables[i]->getJSON();
+				cJSON_AddItemToArray(_cols, tbl);
+			}
+
+			return _root;
+		}
+
+
+		// class ReportsCollection
+		ReportsCollection::ReportsCollection() {
+		}
+		
+		void ReportsCollection::addReportTable(FArray2D_string const & body,
+				FArray1D_string const & rowLabels,
+				FArray1D_string const & columnLabels,
+				std::string const & reportName, std::string const & reportForString,
+				std::string const & tableName,
+				std::string footnoteText)	
+		{
+			std::string key = reportName + reportForString;
+			Report *r;
+
+			auto search = reportsMap.find(key);
+			if (search != reportsMap.end()) {
+				r = search->second;
+			}
+			else {
+				r = new Report();
+				r->ReportName = reportName;
+				r->ReportForString = reportForString;
+				reportsMap.insert(RptPtrPair(key, r));
+			}
+			
+			Table *tbl = new Table(body, rowLabels, columnLabels, tableName, footnoteText);
+			r->Tables.push_back(tbl);
+		}
+
+		cJSON* ReportsCollection::getJSON() {
+			cJSON *_root;
+			_root = cJSON_CreateArray();
+
+			for (RptPtrPair iter : reportsMap) {
+				cJSON *_rpts;
+				cJSON_AddItemToArray(_root, iter.second->getJSON());
+			}
+			return _root;
 		}
 
 
@@ -766,11 +897,13 @@ namespace EnergyPlus {
 
 			_root = cJSON_CreateObject();
 
+			// simulation results
 			cJSON_AddItemToObject(_root, "SimulationResults", _simRes = cJSON_CreateObject());
 			cJSON_AddItemToObject(_simRes, "Simulation", SimulationInformation.getJSON());
 			
+			// output variables
 			cJSON_AddItemToObject(_root, "OutputVariables", outputVars = cJSON_CreateObject());
-
+			
 			if (RIDetailedZoneTSData.iDataFrameEnabled() || RIDetailedZoneTSData.rDataFrameEnabled())
 				cJSON_AddItemToObject(outputVars, "Detailed-Zone", RIDetailedZoneTSData.getVariablesJSON());
 			
@@ -792,15 +925,21 @@ namespace EnergyPlus {
 			if (RIRunPeriodTSData.iDataFrameEnabled() || RIRunPeriodTSData.rDataFrameEnabled())
 				cJSON_AddItemToObject(outputVars, "RunPeriod", RIRunPeriodTSData.getVariablesJSON());
 
+			// output dictionary
+			cJSON *rdd, *rddvals;
+			cJSON_AddItemToObject(outputVars, "OutputDictonary", rdd = cJSON_CreateObject());
+			cJSON_AddStringToObject(rdd, "Description", "Dictionary containing output variables that may be requested");
+			cJSON_AddItemToObject(rdd, "Variables", rddvals = cJSON_CreateArray());
+			for (int i = 0; i < RDD.size(); i++) {
+				cJSON* str = cJSON_CreateString(RDD[i].c_str());
+				cJSON_AddItemToArray(rddvals, str);
+			}
+
+
+			// meter variables
 			cJSON_AddItemToObject(_root, "MeterVariables", meterVars = cJSON_CreateObject());
 			
-			cJSON_AddItemToObject(meterVars, "MeterDictonary", mdd = cJSON_CreateArray());
-
-			for (int i = 0; i < MDD.size(); i++) {
-				cJSON* str = cJSON_CreateString(MDD[i].c_str());
-				cJSON_AddItemToArray(mdd, str);
-			}		
-
+			// -- meter values
 			if (TSMeters.rDataFrameEnabled())
 				cJSON_AddItemToObject(meterVars, "Timestep", TSMeters.getVariablesJSON());
 
@@ -833,6 +972,24 @@ namespace EnergyPlus {
 			if (SMMeters.rDataFrameEnabled())
 				cJSON_AddItemToObject(meterData, "RunPeriod", SMMeters.getJSON());
 
+			// -- meter dictionary
+			cJSON_AddItemToObject(meterVars, "MeterDictonary", mdd = cJSON_CreateObject());
+			cJSON_AddStringToObject(mdd, "Description", "Dictionary containing meter variables that may be requested");
+			cJSON *mddvals;
+			cJSON_AddItemToObject(mdd, "Meters", mddvals = cJSON_CreateArray());
+			for (int i = 0; i < MDD.size(); i++) {
+				cJSON* str = cJSON_CreateString(MDD[i].c_str());
+				cJSON_AddItemToArray(mddvals, str);
+			}
+
+			// reports
+
+			cJSON *reports;
+			cJSON_AddItemToObject(_root, "TabularReports", reports = TabularReportsCollection.getJSON());
+
+			
+
+			// write json
 			if (jsonfile.is_open())	{
 				jsonfile << cJSON_Print(_root);
 				jsonfile.close();

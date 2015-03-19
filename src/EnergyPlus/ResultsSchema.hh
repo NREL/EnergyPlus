@@ -5,6 +5,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/FArray2D.hh>
 #include <ObjexxFCL/Reference.hh>
 
 // cJSON header
@@ -25,6 +26,9 @@ namespace EnergyPlus {
 		std::string getUUID();
 		int randomInRange(int min, int max);
 
+		// trim string
+		std::string trim(std::string str);
+		
 		// base result object
 		class BaseResultObject {
 		public:
@@ -154,6 +158,53 @@ namespace EnergyPlus {
 		};
 
 
+
+		class Table :public BaseResultObject {
+		public:
+			std::string TableName;
+			std::string FootnoteText;
+			std::vector< std::string > ColHeaders;
+			std::vector< std::string > RowHeaders;
+			std::vector< std::vector< std::string > > Data;
+
+			Table(FArray2D_string const & body,
+				FArray1D_string const & rowLabels,
+				FArray1D_string const & columnLabels,
+				std::string const & tableName,
+				std::string footnoteText = "");
+
+			cJSON* getJSON();
+		};
+
+		class Report:public BaseResultObject {
+		public:
+			std::string ReportName;
+			std::string ReportForString;
+			std::vector< Table* > Tables;
+
+			cJSON* getJSON();
+		};
+
+		class ReportsCollection : public BaseResultObject {
+		public:			
+			typedef std::pair< std::string, Report* > RptPtrPair;
+
+			ReportsCollection();
+
+			void addReportTable(FArray2D_string const & body,
+				FArray1D_string const & rowLabels,
+				FArray1D_string const & columnLabels,
+				std::string const & reportName, std::string const & reportForString, 
+				std::string const & tableName,
+				std::string footnoteText = "");
+
+			cJSON* getJSON();
+
+		protected:
+			std::unordered_map< std::string, Report * > reportsMap;
+			Report *rpt;
+		};
+
 		class ResultsSchema : public BaseResultObject {
 		public:
 			ResultsSchema();
@@ -178,6 +229,7 @@ namespace EnergyPlus {
 
 			std::vector<std::string> MDD;
 			std::vector<std::string> RDD;
+			ReportsCollection TabularReportsCollection;
 		protected:
 			char *convert(const std::string & s);
 

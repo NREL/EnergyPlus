@@ -80,6 +80,7 @@ namespace OutputProcessor {
 	using DataEnvironment::DayOfWeek;
 	using DataEnvironment::HolidayIndex;
 	using namespace DataGlobalConstants;
+	using namespace ResultsFramework;
 
 	// Data
 	// in this file should obey a USE OutputProcessor, ONLY: rule.

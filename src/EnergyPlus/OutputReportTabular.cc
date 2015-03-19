@@ -43,6 +43,7 @@
 #include <OutputReportPredefined.hh>
 #include <PollutionModule.hh>
 #include <Psychrometrics.hh>
+#include <ResultsSchema.hh>
 #include <ScheduleManager.hh>
 #include <SQLiteProcedures.hh>
 #include <UtilityRoutines.hh>
@@ -90,6 +91,7 @@ namespace OutputReportTabular {
 	// Using/Aliasing
 	using namespace DataPrecisionGlobals;
 	using namespace InputProcessor;
+	using namespace ResultsFramework;
 	using DataGlobals::BigNumber;
 	using DataGlobals::ZoneTSReporting;
 	using DataGlobals::HVACTSReporting;
@@ -6236,6 +6238,10 @@ namespace OutputReportTabular {
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, MonthlyInput( iInput ).name, MonthlyTables( curTable ).keyValue, "Custom Monthly Report" );
 				}
+				
+				if (OutputSchema->timeSeriesAndTabularEnabled())
+					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, MonthlyInput(iInput).name, MonthlyTables(curTable).keyValue, "Custom Monthly Report");
+
 				columnHead.deallocate();
 				columnWidth.deallocate();
 				tableBody.deallocate();
@@ -6451,6 +6457,8 @@ namespace OutputReportTabular {
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID( repIndex ).namesOfObj, "Time Bin Results" );
 				}
+				if (OutputSchema->timeSeriesAndTabularEnabled())
+					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Time Bin Results");
 				//create statistics table
 				rowHeadStat( 1 ) = "Minimum";
 				rowHeadStat( 2 ) = "Mean minus two standard deviations";
@@ -6493,6 +6501,8 @@ namespace OutputReportTabular {
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID( repIndex ).namesOfObj, "Statistics" );
 				}
+				if (OutputSchema->timeSeriesAndTabularEnabled())
+					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Statistics");
 			}
 			columnHead.deallocate();
 			columnWidth.deallocate();
@@ -6945,6 +6955,9 @@ namespace OutputReportTabular {
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site and Source Energy" );
 				}
+
+				if (OutputSchema->timeSeriesAndTabularEnabled())
+					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Site and Source Energy");
 			}
 
 			columnHead.deallocate();
@@ -7084,6 +7097,9 @@ namespace OutputReportTabular {
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site to Source Energy Conversion Factors" );
 				}
+				
+				if (OutputSchema->timeSeriesAndTabularEnabled())
+					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Site to Source Energy Conversion Factors");
 			}
 
 			columnHead.deallocate();
@@ -7128,6 +7144,9 @@ namespace OutputReportTabular {
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Building Area" );
 				}
+				
+				if (OutputSchema->timeSeriesAndTabularEnabled())
+					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Building Area");
 			}
 
 			columnHead.deallocate();
@@ -7412,6 +7431,8 @@ namespace OutputReportTabular {
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses" );
 				}
+				if (OutputSchema->timeSeriesAndTabularEnabled())
+					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "End Uses");
 			}
 			columnHead.deallocate();
 			rowHead.deallocate();
@@ -7542,6 +7563,8 @@ namespace OutputReportTabular {
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory" );
 				}
+				if (OutputSchema->timeSeriesAndTabularEnabled())
+					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "End Uses By Subcategory");
 			}
 			columnHead.deallocate();
 			rowHead.deallocate();
@@ -7617,6 +7640,8 @@ namespace OutputReportTabular {
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Utility Use Per Conditioned Floor Area" );
 				}
+				if (OutputSchema->timeSeriesAndTabularEnabled())
+					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Utility Use Per Conditioned Floor Area");
 			}
 			//---- Normalized by Total Area Sub-Table
 			tableBody = "";
@@ -7634,6 +7659,8 @@ namespace OutputReportTabular {
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Utility Use Per Total Floor Area" );
 				}
+				if (OutputSchema->timeSeriesAndTabularEnabled())
+					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Utility Use Per Total Floor Area");
 			}
 
 			columnHead.deallocate();
@@ -7712,6 +7739,8 @@ namespace OutputReportTabular {
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Electric Loads Satisfied" );
 				}
+				if (OutputSchema->timeSeriesAndTabularEnabled())
+					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Electric Loads Satisfied");
 			}
 
 			columnHead.deallocate();
@@ -7785,6 +7814,8 @@ namespace OutputReportTabular {
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "On-Site Thermal Sources" );
 				}
+				if (OutputSchema->timeSeriesAndTabularEnabled())
+					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "On-Site Thermal Sources");
 			}
 
 			columnHead.deallocate();
@@ -7878,6 +7909,8 @@ namespace OutputReportTabular {
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Water Source Summary" );
 				}
+				if (OutputSchema->timeSeriesAndTabularEnabled())
+					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Water Source Summary");
 			}
 
 			columnHead.deallocate();
@@ -7917,6 +7950,8 @@ namespace OutputReportTabular {
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Setpoint Not Met Criteria" );
 				}
+				if (OutputSchema->timeSeriesAndTabularEnabled())
+					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Setpoint Not Met Criteria");
 
 				columnHead.deallocate();
 				rowHead.deallocate();
@@ -7952,6 +7987,8 @@ namespace OutputReportTabular {
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Comfort and Setpoint Not Met Summary" );
 				}
+				if (OutputSchema->timeSeriesAndTabularEnabled())
+					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Comfort and Setpoint Not Met Summary");
 			}
 
 			columnHead.deallocate();
@@ -8167,6 +8204,8 @@ namespace OutputReportTabular {
 			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Components Summary" );
 			}
+			if (OutputSchema->timeSeriesAndTabularEnabled())
+				OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Source Energy End Use Components Summary", "Entire Facility", "Source Energy End Use Components Summary");
 
 			//---- Normalized by Conditioned Area Sub-Table
 
@@ -8209,6 +8248,8 @@ namespace OutputReportTabular {
 			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Component Per Conditioned Floor Area" );
 			}
+			if (OutputSchema->timeSeriesAndTabularEnabled())
+				OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Source Energy End Use Components Summary", "Entire Facility", "Source Energy End Use Component Per Conditioned Floor Area");
 
 			//---- Normalized by Total Area Sub-Table
 			tableBody = "";
@@ -8227,6 +8268,8 @@ namespace OutputReportTabular {
 			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Components Per Total Floor Area" );
 			}
+			if (OutputSchema->timeSeriesAndTabularEnabled())
+				OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Source Energy End Use Components Summary", "Entire Facility", "Source Energy End Use Components Per Total Floor Area");
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -8644,6 +8687,8 @@ namespace OutputReportTabular {
 			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses" );
 			}
+			if (OutputSchema->timeSeriesAndTabularEnabled())
+				OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Demand End Use Components Summary", "Entire Facility", "End Uses");
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -8768,6 +8813,8 @@ namespace OutputReportTabular {
 			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory" );
 			}
+			if (OutputSchema->timeSeriesAndTabularEnabled())
+				OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Demand End Use Components Summary", "Entire Facility", "End Uses By Subcategory");
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -8954,7 +9001,8 @@ namespace OutputReportTabular {
 		if ( sqlite ) {
 			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary" );
 		}
-
+		if (OutputSchema->timeSeriesAndTabularEnabled())
+			OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary");
 		columnHead.deallocate();
 		rowHead.deallocate();
 		columnWidth.deallocate();
@@ -9011,6 +9059,8 @@ namespace OutputReportTabular {
 		if ( sqlite ) {
 			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details" );
 		}
+		if (OutputSchema->timeSeriesAndTabularEnabled())
+			OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
 		columnHead.deallocate();
 		rowHead.deallocate();
 		columnWidth.deallocate();
@@ -9269,7 +9319,8 @@ namespace OutputReportTabular {
 			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General" );
 			}
-
+			if (OutputSchema->timeSeriesAndTabularEnabled())
+				OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "General");
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -9477,7 +9528,8 @@ namespace OutputReportTabular {
 			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio" );
 			}
-
+			if (OutputSchema->timeSeriesAndTabularEnabled())
+				OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Window-Wall Ratio");
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -9545,7 +9597,8 @@ namespace OutputReportTabular {
 			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio" );
 			}
-
+			if (OutputSchema->timeSeriesAndTabularEnabled())
+				OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Conditioned Window-Wall Ratio");
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -9579,6 +9632,8 @@ namespace OutputReportTabular {
 			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio" );
 			}
+			if (OutputSchema->timeSeriesAndTabularEnabled())
+				OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Skylight-Roof Ratio");
 
 			columnHead.deallocate();
 			rowHead.deallocate();
@@ -9771,7 +9826,8 @@ namespace OutputReportTabular {
 			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary" );
 			}
-
+			if (OutputSchema->timeSeriesAndTabularEnabled())
+				OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Zone Summary");
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -9869,6 +9925,8 @@ namespace OutputReportTabular {
 			if ( sqlite ) {
 				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AdaptiveComfortReport", "Entire Facility", "People Summary" );
 			}
+			if (OutputSchema->timeSeriesAndTabularEnabled())
+				OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Adaptive Comfort Report", "Entire Facility", "People Summary");
 		}
 
 	}
@@ -10097,6 +10155,8 @@ namespace OutputReportTabular {
 						if ( sqlite ) {
 							sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, reportName( iReportName ).name, "Entire Facility", subTable( jSubTable ).name );
 						}
+						if (OutputSchema->timeSeriesAndTabularEnabled())
+							OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, reportName(iReportName).name, "Entire Facility", subTable(jSubTable).name);
 						//clean up the temporary arrays used
 						columnHead.deallocate();
 						rowHead.deallocate();
@@ -10327,6 +10387,8 @@ namespace OutputReportTabular {
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ComponentSizingSummary", "Entire Facility", CompSizeTableEntry( foundEntry ).typeField );
 				}
+				if (OutputSchema->timeSeriesAndTabularEnabled())
+					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Component Sizing Summary", "Entire Facility", CompSizeTableEntry(foundEntry).typeField, "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
 				//deallocate these arrays since they are used to create the next
 				//table
 				rowHead.deallocate();
@@ -10471,11 +10533,15 @@ namespace OutputReportTabular {
 					if ( sqlite ) {
 						sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces" );
 					}
+					if (OutputSchema->timeSeriesAndTabularEnabled())
+						OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Surface Shadowing Summary", "Entire Facility", "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces");
 				} else if ( iKindRec == recKindSubsurface ) {
 					WriteSubtitle( "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces" );
 					if ( sqlite ) {
 						sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces" );
 					}
+					if (OutputSchema->timeSeriesAndTabularEnabled())
+						OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Surface Shadowing Summary", "Entire Facility", "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces");
 				}
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			}
@@ -11655,6 +11721,8 @@ namespace OutputReportTabular {
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Cooling Peak Load Components" );
 				}
+				if (OutputSchema->timeSeriesAndTabularEnabled())
+					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Zone Component Load Summary", Zone(iZone).Name, "Estimated Cooling Peak Load Components");
 
 				columnHead.deallocate();
 				rowHead.deallocate();
@@ -11739,7 +11807,8 @@ namespace OutputReportTabular {
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Cooling Peak Conditions" );
 				}
-
+				if (OutputSchema->timeSeriesAndTabularEnabled())
+					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Zone Component Load Summary", Zone(iZone).Name, "Cooling Peak Conditions");
 				columnHead.deallocate();
 				rowHead.deallocate();
 				columnWidth.deallocate();
@@ -12137,7 +12206,8 @@ namespace OutputReportTabular {
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Heating Peak Load Components" );
 				}
-
+				if (OutputSchema->timeSeriesAndTabularEnabled())
+					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Zone Component Load Summary", Zone(iZone).Name, "Estimated Heating Peak Load Components");
 				columnHead.deallocate();
 				rowHead.deallocate();
 				columnWidth.deallocate();
@@ -12220,7 +12290,8 @@ namespace OutputReportTabular {
 				if ( sqlite ) {
 					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Heating Peak Conditions" );
 				}
-
+				if (OutputSchema->timeSeriesAndTabularEnabled())
+					OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Zone Component Load Summary", Zone(iZone).Name, "Heating Peak Conditions");
 				columnHead.deallocate();
 				rowHead.deallocate();
 				columnWidth.deallocate();
@@ -12590,6 +12661,7 @@ namespace OutputReportTabular {
 		colLabelMulti = blank; //set array to blank
 		numColLabelRows = 0; //default value
 		maxNumColLabelRows = 0;
+
 		for ( iStyle = 1; iStyle <= numStyles; ++iStyle ) {
 			std::ostream & tbl_stream( *TabularOutputFile( iStyle ) );
 			curDel = del( iStyle );
@@ -12633,6 +12705,7 @@ namespace OutputReportTabular {
 					}
 				}
 			}
+
 			// output depending on style of format
 			auto const style( TableStyle( iStyle ) );
 			if ( ( style == tableStyleComma ) || ( style == tableStyleTab ) ) {
