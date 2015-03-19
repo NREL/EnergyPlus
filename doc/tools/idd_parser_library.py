@@ -1,14 +1,17 @@
-import sys
+# python 2/3 compatibility imports
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+import io
+
 
 class iddFile(object):
-    
-    def __init__(self, fileName):
-        
+    def __init__(self, file_name):
+
         # phase 0: read in lines of file
-        lines = []
-        with open(fileName, "r") as fo:
+        with io.open(file_name, 'r', encoding='latin-1') as fo:
             lines = fo.readlines()
-        
+
         # phases 1 and 2: remove comments and blank lines
         lines_a = []
         self.comments = []
@@ -16,9 +19,9 @@ class iddFile(object):
         for line in lines:
             line_num += 1
             line_text = line.strip()
-            this_line = ""
+            this_line = ''
             if len(line_text) > 0:
-                exclamation = line_text.find("!")
+                exclamation = line_text.find('!')
                 slash = line_text.find("\\")
                 comment_point = -1
                 if exclamation == -1 and slash == -1:
@@ -32,25 +35,25 @@ class iddFile(object):
                 if comment_point == -1:
                     this_line = line_text
                 elif comment_point == 0:
-                    this_line = ""
+                    this_line = ''
                     self.comments.append(line_text)
                 elif comment_point > 0:
                     this_line = line_text[:comment_point]
-                    self.comments.append(line_text[comment_point+1:])
-                if not this_line == "":
+                    self.comments.append(line_text[comment_point + 1:])
+                if not this_line == '':
                     lines_a.append(this_line)
-        
+
         # intermediates: join entire array and re-split by semicolon
-        iddDataJoined = ''.join(lines_a)
-        iddObjectStrings = iddDataJoined.split(";")
-        
+        idd_data_joined = ''.join(lines_a)
+        idd_object_strings = idd_data_joined.split(';')
+
         # phase 3: inspect each object and its fields
         self.iddObjects = []
-        for object in iddObjectStrings:
-            tokens = object.split(",")
-            niceObject = [ t.strip() for t in tokens ]
-            if len(niceObject) == 1:
-                if niceObject[0] == "":
+        for idf_object in idd_object_strings:
+            tokens = idf_object.split(',')
+            nice_object = [t.strip() for t in tokens]
+            if len(nice_object) == 1:
+                if nice_object[0] == '':
                     continue
-            self.iddObjects.append(niceObject[0].upper())
+            self.iddObjects.append(nice_object[0].upper())
 
