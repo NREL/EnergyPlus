@@ -338,11 +338,15 @@ namespace WaterThermalTanks {
 				}
 				MinePlantStructForInfo( CompNum );
 				if ( present( LoopNum ) ) {
-					if ( ( ( WaterThermalTank( CompNum ).SourceSidePlantLoopNum == LoopNum ) && ( WaterThermalTank( CompNum ).SourceSidePlantLoopSide == LoopSideNum ) ) || ( ( WaterThermalTank( CompNum ).UseSidePlantLoopNum == LoopNum ) && ( WaterThermalTank( CompNum ).UseSidePlantLoopSide == LoopSideNum ) ) ) {
+					if ( ( ( WaterThermalTank( CompNum ).SourceSidePlantLoopNum == LoopNum ) && ( WaterThermalTank( CompNum ).SourceSidePlantLoopSide == LoopSideNum ) ) 
+						|| ( ( WaterThermalTank( CompNum ).UseSidePlantLoopNum == LoopNum ) && ( WaterThermalTank( CompNum ).UseSidePlantLoopSide == LoopSideNum ) ) ) {
+
 						SizeTankForDemandSide( CompNum );
 						SizeDemandSidePlantConnections( CompNum );
 						SizeSupplySidePlantConnections( CompNum, LoopNum, LoopSideNum );
 						SizeTankForSupplySide( CompNum );
+
+
 					} else {
 						return;
 					}
@@ -354,7 +358,7 @@ namespace WaterThermalTanks {
 				}
 
 				// Calculate and report water heater standard ratings to EIO file (now that sizing is done)
-				if ( PlantSizesOkayToFinalize ) {
+				if ( PlantFirstSizesOkayToFinalize ) {
 					if ( ! WaterThermalTank( CompNum ).IsChilledWaterTank ) {
 						CalcStandardRatings( CompNum );
 					} else {
@@ -436,7 +440,7 @@ namespace WaterThermalTanks {
 					SizeTankForSupplySide( TankNum );
 				}
 
-				if ( PlantSizesOkayToFinalize ) {
+				if ( PlantFirstSizesOkayToFinalize ) {
 					CalcStandardRatings( TankNum );
 					DataNonZoneNonAirloopValue = 0.0;
 				}
@@ -1841,6 +1845,9 @@ namespace WaterThermalTanks {
 					WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName = "Water Heater";
 
 					WaterThermalTank( WaterThermalTankNum ).Volume = rNumericArgs( 1 );
+					if ( WaterThermalTank( WaterThermalTankNum ).Volume == AutoSize ) {
+						WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized = true;
+					}
 					if ( rNumericArgs( 1 ) == 0.0 ) {
 						// Set volume to a really small number to simulate a tankless/instantaneous water heater
 						WaterThermalTank( WaterThermalTankNum ).Volume = 0.000001; // = 1 cm3
@@ -1872,8 +1879,11 @@ namespace WaterThermalTanks {
 					}
 
 					WaterThermalTank( WaterThermalTankNum ).MaxCapacity = rNumericArgs( 4 );
+					if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity == AutoSize ) {
+						WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized = true;
+					}
 
-					if ( ( rNumericArgs( 5 ) > WaterThermalTank( WaterThermalTankNum ).MaxCapacity ) && ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity != AutoSize ) ) {
+					if ( ( rNumericArgs( 5 ) > WaterThermalTank( WaterThermalTankNum ).MaxCapacity ) && ( ! WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Heater Minimum Capacity cannot be greater than Heater Maximum Capacity" );
 						ErrorsFound = true;
 					} else {
@@ -2161,6 +2171,9 @@ namespace WaterThermalTanks {
 
 					if ( ! lNumericFieldBlanks( 20 ) ) {
 						WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate = rNumericArgs( 20 );
+						if ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate == AutoSize ) {
+							WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRateWasAutoSized = true;
+						}
 					} else {
 						WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate = 0.0;
 					}
@@ -2168,6 +2181,9 @@ namespace WaterThermalTanks {
 
 					if ( ! lNumericFieldBlanks( 21 ) ) {
 						WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate = rNumericArgs( 21 );
+						if ( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate == AutoSize ) {
+							WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRateWasAutoSized = true;
+						}
 					} else {
 						WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate = 0.0;
 					}
@@ -2264,9 +2280,15 @@ namespace WaterThermalTanks {
 					WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName = cAlphaArgs( 2 );
 
 					WaterThermalTank( WaterThermalTankNum ).Volume = rNumericArgs( 1 );
+					if ( WaterThermalTank( WaterThermalTankNum ).Volume == AutoSize ) {
+						WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized = true;
+					}
 					rho = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineNameNoColon );
 					WaterThermalTank( WaterThermalTankNum ).Mass = WaterThermalTank( WaterThermalTankNum ).Volume * rho;
 					WaterThermalTank( WaterThermalTankNum ).Height = rNumericArgs( 2 );
+					if ( WaterThermalTank( WaterThermalTankNum ).Height == AutoSize ) {
+						WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized = true;
+					}
 
 					{ auto const SELECT_CASE_var( cAlphaArgs( 3 ) );
 					if ( SELECT_CASE_var == "VERTICALCYLINDER" ) {
@@ -2328,10 +2350,14 @@ namespace WaterThermalTanks {
 					}
 
 					WaterThermalTank( WaterThermalTankNum ).MaxCapacity = rNumericArgs( 6 );
+					if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity == AutoSize ) {
+						WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized = true;
+					}
+
 					WaterThermalTank( WaterThermalTankNum ).HeaterHeight1 = rNumericArgs( 7 );
 
 					//Test if Heater height is within range
-					if ( ( WaterThermalTank( WaterThermalTankNum ).Height != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).HeaterHeight1 > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
+					if ( ( ! WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).HeaterHeight1 > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Heater 1 is located higher than overall tank height." );
 						ShowContinueError( cNumericFieldNames( 2 ) + " = " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
 						ShowContinueError( cNumericFieldNames( 7 ) + " = " + RoundSigDigits( rNumericArgs( 7 ), 4 ) );
@@ -2359,7 +2385,7 @@ namespace WaterThermalTanks {
 					WaterThermalTank( WaterThermalTankNum ).HeaterHeight2 = rNumericArgs( 10 );
 
 					//Test if Heater height is within range
-					if ( ( WaterThermalTank( WaterThermalTankNum ).Height != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).HeaterHeight2 > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
+					if ( ( ! WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).HeaterHeight2 > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Heater 2 is located higher than overall tank height." );
 						ShowContinueError( cNumericFieldNames( 2 ) + " = " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
 						ShowContinueError( cNumericFieldNames( 10 ) + " = " + RoundSigDigits( rNumericArgs( 10 ), 4 ) );
@@ -2601,7 +2627,7 @@ namespace WaterThermalTanks {
 						// Defaults to bottom of tank
 						WaterThermalTank( WaterThermalTankNum ).UseInletHeight = 0.0;
 					}
-					if ( ( WaterThermalTank( WaterThermalTankNum ).Height != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).UseInletHeight > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
+					if ( ( ! WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).UseInletHeight > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Use inlet is located higher than overall tank height." );
 						ShowContinueError( cNumericFieldNames( 2 ) + " = " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
 						ShowContinueError( cNumericFieldNames( 24 ) + " = " + RoundSigDigits( rNumericArgs( 24 ), 4 ) );
@@ -2614,7 +2640,10 @@ namespace WaterThermalTanks {
 						// Defaults to top of tank
 						WaterThermalTank( WaterThermalTankNum ).UseOutletHeight = WaterThermalTank( WaterThermalTankNum ).Height;
 					}
-					if ( ( WaterThermalTank( WaterThermalTankNum ).Height != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).UseOutletHeight > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
+					if ( WaterThermalTank( WaterThermalTankNum ).UseOutletHeight == AutoSize ) {
+						WaterThermalTank( WaterThermalTankNum ).UseOutletHeightWasAutoSized = true;
+					}
+					if ( ( ! WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).UseOutletHeight > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Use outlet is located higher than overall tank height." );
 						ShowContinueError( cNumericFieldNames( 2 ) + " = " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
 						ShowContinueError( cNumericFieldNames( 25 ) + " = " + RoundSigDigits( rNumericArgs( 25 ), 4 ) );
@@ -2633,7 +2662,10 @@ namespace WaterThermalTanks {
 						// Defaults to top of tank
 						WaterThermalTank( WaterThermalTankNum ).SourceInletHeight = WaterThermalTank( WaterThermalTankNum ).Height;
 					}
-					if ( ( WaterThermalTank( WaterThermalTankNum ).Height != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).SourceInletHeight > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
+					if ( WaterThermalTank( WaterThermalTankNum ).SourceInletHeight == AutoSize ) {
+						WaterThermalTank( WaterThermalTankNum ).SourceInletHeightWasAutoSized = true;
+					}
+					if ( ( ! WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).SourceInletHeight > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Source inlet is located higher than overall tank height." );
 						ShowContinueError( cNumericFieldNames( 2 ) + " = " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
 						ShowContinueError( cNumericFieldNames( 27 ) + " = " + RoundSigDigits( rNumericArgs( 27 ), 4 ) );
@@ -2646,7 +2678,7 @@ namespace WaterThermalTanks {
 						// Defaults to bottom of tank
 						WaterThermalTank( WaterThermalTankNum ).SourceOutletHeight = 0.0;
 					}
-					if ( ( WaterThermalTank( WaterThermalTankNum ).Height != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).SourceOutletHeight > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
+					if ( ( ! WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).SourceOutletHeight > WaterThermalTank( WaterThermalTankNum ).Height ) ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ": Source outlet is located higher than overall tank height." );
 						ShowContinueError( cNumericFieldNames( 2 ) + " = " + RoundSigDigits( rNumericArgs( 2 ), 4 ) );
 						ShowContinueError( cNumericFieldNames( 28 ) + " = " + RoundSigDigits( rNumericArgs( 28 ), 4 ) );
@@ -2658,6 +2690,9 @@ namespace WaterThermalTanks {
 
 					if ( ! lNumericFieldBlanks( 29 ) ) {
 						WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate = rNumericArgs( 29 );
+						if ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate == AutoSize ) {
+							WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRateWasAutoSized = true;
+						}
 					} else {
 						WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate = 0.0;
 					}
@@ -2666,6 +2701,9 @@ namespace WaterThermalTanks {
 
 					if ( ! lNumericFieldBlanks( 30 ) ) {
 						WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate = rNumericArgs( 30 );
+						if ( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate == AutoSize ) {
+							WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRateWasAutoSized = true;
+						}
 					} else {
 						WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate = 0.0;
 					}
@@ -2786,6 +2824,9 @@ namespace WaterThermalTanks {
 					WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName = "Chilled Water Storage";
 
 					WaterThermalTank( WaterThermalTankNum ).Volume = rNumericArgs( 1 );
+					if ( WaterThermalTank( WaterThermalTankNum ).Volume == AutoSize ) {
+						WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized = true;
+					}
 					if ( rNumericArgs( 1 ) == 0.0 ) {
 						// Set volume to a really small number to continue simulation
 						WaterThermalTank( WaterThermalTankNum ).Volume = 0.000001; // = 1 cm3
@@ -2814,6 +2855,10 @@ namespace WaterThermalTanks {
 					}
 
 					WaterThermalTank( WaterThermalTankNum ).MaxCapacity = rNumericArgs( 4 );
+					if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity == AutoSize ) {
+						WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized = true;
+					}
+
 					WaterThermalTank( WaterThermalTankNum ).MinCapacity = 0.0;
 					WaterThermalTank( WaterThermalTankNum ).ControlType = ControlTypeCycle;
 
@@ -2900,8 +2945,12 @@ namespace WaterThermalTanks {
 
 					if ( lNumericFieldBlanks( 7 ) ) {
 						WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate = 0.0;
+
 					} else {
 						WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate = rNumericArgs( 7 );
+						if ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate  ) {
+							WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRateWasAutoSized = true;
+						}
 					}
 
 					WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopSide = DemandSupply_No;
@@ -2924,6 +2973,9 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate = 0.0;
 					} else {
 						WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate = rNumericArgs( 9 );
+						if ( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate == AutoSize ) {
+							WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRateWasAutoSized = true;
+						}
 					}
 
 					if ( lAlphaFieldBlanks( 12 ) ) {
@@ -2995,9 +3047,15 @@ namespace WaterThermalTanks {
 					WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName = "Chilled Water Storage";
 
 					WaterThermalTank( WaterThermalTankNum ).Volume = rNumericArgs( 1 );
+					if ( WaterThermalTank( WaterThermalTankNum ).Volume == AutoSize ) {
+						WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized = true;
+					}
 					rho = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineNameNoColon );
 					WaterThermalTank( WaterThermalTankNum ).Mass = WaterThermalTank( WaterThermalTankNum ).Volume * rho;
 					WaterThermalTank( WaterThermalTankNum ).Height = rNumericArgs( 2 );
+					if ( WaterThermalTank( WaterThermalTankNum ).Height == AutoSize ) {
+						WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized = true;
+					}
 
 					{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
 					if ( SELECT_CASE_var == "VERTICALCYLINDER" ) {
@@ -3045,6 +3103,10 @@ namespace WaterThermalTanks {
 
 					WaterThermalTank( WaterThermalTankNum ).HeaterHeight1 = rNumericArgs( 5 );
 					WaterThermalTank( WaterThermalTankNum ).MaxCapacity = rNumericArgs( 7 );
+					if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity == AutoSize ) {
+						WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized = true;
+					}
+
 					WaterThermalTank( WaterThermalTankNum ).Efficiency = 1.0;
 					WaterThermalTank( WaterThermalTankNum ).SetPointTempSchedule2 = 0;
 					WaterThermalTank( WaterThermalTankNum ).MaxCapacity2 = 0.0;
@@ -3162,8 +3224,12 @@ namespace WaterThermalTanks {
 
 					if ( lNumericFieldBlanks( 12 ) ) {
 						WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate = 0.0;
+
 					} else {
 						WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate = rNumericArgs( 12 );
+						if ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate == AutoSize ) {
+							WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRateWasAutoSized = true;
+						}
 					}
 
 					WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopSide = DemandSupply_No;
@@ -3172,6 +3238,9 @@ namespace WaterThermalTanks {
 						WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate = 0.0;
 					} else {
 						WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate = rNumericArgs( 16 );
+						if ( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate == AutoSize ) {
+							WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRateWasAutoSized = true;
+						}
 					}
 
 					WaterThermalTank( WaterThermalTankNum ).SizingRecoveryTime = rNumericArgs( 17 );
@@ -3528,13 +3597,14 @@ namespace WaterThermalTanks {
 								ErrorsFound = true;
 							}
 							// if both volume and demand side flow connections are autosized, must be a good NominalVolForSizingDemandSideFlow
-							if ( ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopSide == DemandSide ) && ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate == AutoSize ) ) {
+							if ( ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopSide == DemandSide ) 
+								&& ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRateWasAutoSized ) ) {
 								if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NominalVolForSizingDemandSideFlow <= 0.0 ) {
 									ShowWarningError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + " needs a value for Nominal Tank Volume for Autosizing Plant Connections" );
 									ErrorsFound = true;
 								}
 							}
-							if ( ( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopSide == DemandSide ) && ( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate == AutoSize ) ) {
+							if ( ( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopSide == DemandSide ) && ( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRateWasAutoSized ) ) {
 								if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NominalVolForSizingDemandSideFlow <= 0.0 ) {
 									ShowWarningError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + " needs a value for Nominal Tank Volume for Autosizing Plant Connections" );
 									ErrorsFound = true;
@@ -3553,45 +3623,45 @@ namespace WaterThermalTanks {
 
 						} else if ( SELECT_CASE_var == SizePerPerson ) {
 
-							if ( ( WaterThermalTank( WaterThermalTankNum ).Volume == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerPerson <= 0.0 ) ) {
+							if ( ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerPerson <= 0.0 ) ) {
 								ShowSevereError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ", PerPerson mode needs positive value input for storage capacity per person" );
 								ErrorsFound = true;
 							}
 
-							if ( ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryCapacityPerPerson <= 0.0 ) ) {
+							if ( ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryCapacityPerPerson <= 0.0 ) ) {
 								ShowSevereError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ", PerPerson mode needs positive value input for recovery capacity per person" );
 								ErrorsFound = true;
 							}
 
 						} else if ( SELECT_CASE_var == SizePerFloorArea ) {
-							if ( ( WaterThermalTank( WaterThermalTankNum ).Volume == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerArea <= 0.0 ) ) {
+							if ( ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerArea <= 0.0 ) ) {
 								ShowSevereError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ", PerArea mode needs positive value input for storage capacity per floor area" );
 								ErrorsFound = true;
 							}
-							if ( ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryCapacityPerArea <= 0.0 ) ) {
+							if ( ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryCapacityPerArea <= 0.0 ) ) {
 								ShowSevereError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ", PerArea mode needs positive value input for recovery capacity per floor area" );
 								ErrorsFound = true;
 							}
 
 						} else if ( SELECT_CASE_var == SizePerUnit ) {
-							if ( ( WaterThermalTank( WaterThermalTankNum ).Volume == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerUnit <= 0.0 ) ) {
+							if ( ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerUnit <= 0.0 ) ) {
 								ShowSevereError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ", PerUnit mode needs positive value input for storage capacity per unit" );
 								ErrorsFound = true;
 							}
-							if ( ( WaterThermalTank( WaterThermalTankNum ).Volume == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfUnits <= 0.0 ) ) {
+							if ( ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfUnits <= 0.0 ) ) {
 								ShowSevereError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ", PerUnit mode needs positive value input for number of units" );
 								ErrorsFound = true;
 							}
-							if ( ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryCapacityPerUnit <= 0.0 ) ) {
+							if ( ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryCapacityPerUnit <= 0.0 ) ) {
 								ShowSevereError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ", PerUnit mode needs positive value input for recovery capacity per unit" );
 								ErrorsFound = true;
 							}
-							if ( ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfUnits <= 0.0 ) ) {
+							if ( ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfUnits <= 0.0 ) ) {
 								ShowSevereError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ", PerUnit mode needs positive value input for number of units" );
 								ErrorsFound = true;
 							}
 						} else if ( SELECT_CASE_var == SizePerSolarColArea ) {
-							if ( ( WaterThermalTank( WaterThermalTankNum ).Volume == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerCollectorArea <= 0.0 ) ) {
+							if ( ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerCollectorArea <= 0.0 ) ) {
 								ShowSevereError( cCurrentModuleObject + ", named " + cAlphaArgs( 1 ) + ", PerSolarCollectorArea mode needs positive value input for storage capacity per collector area" );
 								ErrorsFound = true;
 							}
@@ -3610,15 +3680,15 @@ namespace WaterThermalTanks {
 			if ( NumWaterThermalTank > 0 ) {
 				for ( WaterThermalTankNum = 1; WaterThermalTankNum <= NumWaterThermalTank; ++WaterThermalTankNum ) {
 
-					if ( ( WaterThermalTank( WaterThermalTankNum ).Volume == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.DesignMode == SizeNotSet ) ) {
+					if ( ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.DesignMode == SizeNotSet ) ) {
 						ShowWarningError( "Water heater named " + WaterThermalTank( WaterThermalTankNum ).Name + "has tank volume set to AUTOSIZE but it is missing associated WaterHeater:Sizing object" );
 						ErrorsFound = true;
 					}
-					if ( ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.DesignMode == SizeNotSet ) ) {
+					if ( ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.DesignMode == SizeNotSet ) ) {
 						ShowWarningError( "Water heater named " + WaterThermalTank( WaterThermalTankNum ).Name + "has heater capacity set to AUTOSIZE but it is missing associated WaterHeater:Sizing object" );
 						ErrorsFound = true;
 					}
-					if ( ( WaterThermalTank( WaterThermalTankNum ).Height == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.DesignMode == SizeNotSet ) ) {
+					if ( ( WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.DesignMode == SizeNotSet ) ) {
 						ShowWarningError( "Water heater named " + WaterThermalTank( WaterThermalTankNum ).Name + "has tank height set to AUTOSIZE but it is missing associated WaterHeater:Sizing object" );
 						ErrorsFound = true;
 					}
@@ -4250,7 +4320,7 @@ namespace WaterThermalTanks {
 		static FArray1D_bool MyEnvrnFlag; // flag for init once at start of environment
 		static FArray1D_bool MyWarmupFlag; // flag for init after warmup complete
 		static FArray1D_bool SetLoopIndexFlag; // get loop number flag
-		static FArray1D_bool MySizingDoneFlag; // true if sizing is finished
+//		static FArray1D_bool MySizingDoneFlag; // true if sizing is finished
 
 		static std::string const RoutineName( "InitWaterThermalTank" );
 		static std::string const GetWaterThermalTankInput( "GetWaterThermalTankInput" );
@@ -4273,13 +4343,13 @@ namespace WaterThermalTanks {
 			MyEnvrnFlag.allocate( NumWaterThermalTank );
 			MyWarmupFlag.allocate( NumWaterThermalTank );
 			SetLoopIndexFlag.allocate( NumWaterThermalTank );
-			MySizingDoneFlag.allocate( NumWaterThermalTank );
+//			MySizingDoneFlag.allocate( NumWaterThermalTank );
 			AlreadyRated.dimension( NumWaterThermalTank, false );
 			MyEnvrnFlag = true;
 			MyWarmupFlag = false;
 			InitWaterThermalTanksOnce = false;
 			SetLoopIndexFlag = true;
-			MySizingDoneFlag = false;
+
 		}
 
 		UseInletNode = WaterThermalTank( WaterThermalTankNum ).UseInletNode;
@@ -4299,7 +4369,7 @@ namespace WaterThermalTanks {
 				WaterThermalTank( WaterThermalTankNum ).PlantUseMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate * rho;
 				WaterThermalTank( WaterThermalTankNum ).Mass = WaterThermalTank( WaterThermalTankNum ).Volume * rho;
 				WaterThermalTank( WaterThermalTankNum ).UseSidePlantSizNum = PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).PlantSizNum;
-				if ( ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantSizNum == 0 ) ) {
+				if ( ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRateWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantSizNum == 0 ) ) {
 					ShowSevereError( "InitWaterThermalTank: Did not find Sizing:Plant object for use side of plant thermal tank = " + WaterThermalTank( WaterThermalTankNum ).Name );
 					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );
 				}
@@ -4316,7 +4386,7 @@ namespace WaterThermalTanks {
 				WaterThermalTank( WaterThermalTankNum ).PlantUseMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate * rho;
 				WaterThermalTank( WaterThermalTankNum ).Mass = WaterThermalTank( WaterThermalTankNum ).Volume * rho;
 				WaterThermalTank( WaterThermalTankNum ).UseSidePlantSizNum = PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).PlantSizNum;
-				if ( ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantSizNum == 0 ) ) {
+				if ( ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRateWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantSizNum == 0 ) ) {
 					ShowSevereError( "InitWaterThermalTank: Did not find Sizing:Plant object for use side of plant thermal tank = " + WaterThermalTank( WaterThermalTankNum ).Name );
 					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );
 				}
@@ -4334,7 +4404,7 @@ namespace WaterThermalTanks {
 				rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidIndex, GetWaterThermalTankInput );
 				WaterThermalTank( WaterThermalTankNum ).PlantSourceMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate * rho;
 				WaterThermalTank( WaterThermalTankNum ).SourceSidePlantSizNum = PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).PlantSizNum;
-				if ( ( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantSizNum == 0 ) ) {
+				if ( ( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRateWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantSizNum == 0 ) ) {
 					ShowSevereError( "InitWaterThermalTank: Did not find Sizing:Plant object for source side of plant thermal tank = " + WaterThermalTank( WaterThermalTankNum ).Name );
 					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );
 				}
@@ -4343,7 +4413,7 @@ namespace WaterThermalTanks {
 				SetLoopIndexFlag( WaterThermalTankNum ) = false;
 			}
 
-			if ( PlantSizesOkayToFinalize ) SetLoopIndexFlag( WaterThermalTankNum ) = false;
+			if ( PlantFirstSizesOkayToFinalize ) SetLoopIndexFlag( WaterThermalTankNum ) = false;
 			if ( WaterThermalTank( WaterThermalTankNum ).StandAlone ) {
 				SizeStandAloneWaterHeater( WaterThermalTankNum );
 				SetLoopIndexFlag( WaterThermalTankNum ) = false;
@@ -4364,66 +4434,9 @@ namespace WaterThermalTanks {
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag( WaterThermalTankNum ) && ! SetLoopIndexFlag( WaterThermalTankNum ) ) {
 
-			if ( ! MySizingDoneFlag( WaterThermalTankNum ) ) {
-				//      IF (WaterThermalTank(WaterThermalTankNum)%UseSidePlantLoopNum > 0 ) THEN
-				//        WaterThermalTank(WaterThermalTankNum)%UseSidePlantSizNum  = &
-				//                      PlantLoop(WaterThermalTank(WaterThermalTankNum)%UseSidePlantLoopNum)%PlantSizNum
-				//      ENDIF
-				//      IF (WaterThermalTank(WaterThermalTankNum)%SourceSidePlantLoopNum > 0) THEN
-				//      WaterThermalTank(WaterThermalTankNum)%SourceSidePlantSizNum  = &
-				//                      PlantLoop(WaterThermalTank(WaterThermalTankNum)%SourceSidePlantLoopNum)%PlantSizNum
-				//      ENDIF
-				//   !   CALL MinePlantStructForInfo(WaterThermalTankNum)
-				SizeTankForDemandSide( WaterThermalTankNum );
-				SizeDemandSidePlantConnections( WaterThermalTankNum );
-				if ( present( LoopNum ) ) {
-					SizeSupplySidePlantConnections( WaterThermalTankNum, LoopNum, LoopSideNum );
-				} else {
-					SizeSupplySidePlantConnections( WaterThermalTankNum );
-				}
+			if ( PlantFirstSizesOkayToFinalize ) {
 
-				SizeTankForSupplySide( WaterThermalTankNum );
-				if ( PlantSizesOkayToFinalize ) {
-					// check to see if any autosize values left, depending on the nature of this tank
-					if ( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum > 0 ) { // this is heat pump water heater, source side not sized
-						if ( WaterThermalTank( WaterThermalTankNum ).UseInletNode > 0 ) {
-							if ( ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Volume != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity != AutoSize ) ) {
-								MySizingDoneFlag( WaterThermalTankNum ) = true;
-							}
-						} else {
-							if ( ( WaterThermalTank( WaterThermalTankNum ).Volume != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity != AutoSize ) ) {
-								MySizingDoneFlag( WaterThermalTankNum ) = true;
-							}
-						}
-					} else { // not a heat pump water heater
-						if ( ( WaterThermalTank( WaterThermalTankNum ).UseInletNode > 0 ) && ( WaterThermalTank( WaterThermalTankNum ).SourceInletNode > 0 ) ) {
-							if ( ( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Volume != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Height != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity != AutoSize ) ) {
-								MySizingDoneFlag( WaterThermalTankNum ) = true;
-							}
-						} else if ( ( WaterThermalTank( WaterThermalTankNum ).UseInletNode > 0 ) && ( WaterThermalTank( WaterThermalTankNum ).SourceInletNode == 0 ) ) {
-							if ( ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Volume != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Height != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity != AutoSize ) ) {
-								MySizingDoneFlag( WaterThermalTankNum ) = true;
-							}
-						} else if ( ( WaterThermalTank( WaterThermalTankNum ).UseInletNode == 0 ) && ( WaterThermalTank( WaterThermalTankNum ).SourceInletNode == 0 ) ) {
-							if ( ( WaterThermalTank( WaterThermalTankNum ).Volume != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Height != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity != AutoSize ) ) {
-								MySizingDoneFlag( WaterThermalTankNum ) = true;
-							}
-						}
-					}
-				}
-				if ( ! MySizingDoneFlag( WaterThermalTankNum ) ) {
-					if ( ( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum > 0 ) || ( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum > 0 ) ) {
-						if ( ( WaterThermalTank( WaterThermalTankNum ).UseInletNode == 0 ) && ( WaterThermalTank( WaterThermalTankNum ).Volume != AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).MaxCapacity != AutoSize ) ) {
-							MySizingDoneFlag( WaterThermalTankNum ) = true;
-						} else {
-							return;
-						}
-					} else {
-						return;
-					}
-				}
-
-				if ( ( WaterThermalTank( WaterThermalTankNum ).ControlType == ControlTypeCycle ) && MySizingDoneFlag( WaterThermalTankNum ) ) {
+				if ( WaterThermalTank( WaterThermalTankNum ).ControlType == ControlTypeCycle ) {
 					WaterThermalTank( WaterThermalTankNum ).MinCapacity = WaterThermalTank( WaterThermalTankNum ).MaxCapacity;
 				}
 
@@ -4551,13 +4564,6 @@ namespace WaterThermalTanks {
 			WaterThermalTank( WaterThermalTankNum ).OnCycParaEnergyToTank = 0.0;
 			WaterThermalTank( WaterThermalTankNum ).NetHeatTransferEnergy = 0.0;
 
-			if ( ( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate == AutoSize ) || ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate == AutoSize ) ) {
-				MyEnvrnFlag( WaterThermalTankNum ) = true;
-				MyWarmupFlag( WaterThermalTankNum ) = false;
-			} else {
-				MyEnvrnFlag( WaterThermalTankNum ) = false;
-				MyWarmupFlag( WaterThermalTankNum ) = true;
-			}
 		}
 
 		if ( ! BeginEnvrnFlag ) MyEnvrnFlag( WaterThermalTankNum ) = true;
@@ -7723,7 +7729,7 @@ namespace WaterThermalTanks {
 			PlantLoopNum = WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum;
 			LoopSideNum = WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopSide;
 
-			if ( ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantSizNum == 0 ) ) {
+			if ( ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRateWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantSizNum == 0 ) ) {
 				ShowSevereError( "Water heater = " + WaterThermalTank( WaterThermalTankNum ).Name + " for autosizing Use side flow rate, did not find Sizing:Plant object " + PlantLoop( PlantLoopNum ).Name );
 				ErrorsFound = true;
 			}
@@ -7744,7 +7750,7 @@ namespace WaterThermalTanks {
 			PlantLoopNum = WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum;
 			LoopSideNum = WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopSide;
 			// was user's input correct for plant loop name?
-			if ( ( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantSizNum == 0 ) && ( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum == 0 ) && ( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum == 0 ) ) {
+			if ( ( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRateWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantSizNum == 0 ) && ( WaterThermalTank( WaterThermalTankNum ).DesuperheaterNum == 0 ) && ( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum == 0 ) ) {
 				ShowSevereError( "Water heater = " + WaterThermalTank( WaterThermalTankNum ).Name + "for autosizing Source side flow rate, did not find Sizing:Plant object " + PlantLoop( PlantLoopNum ).Name );
 				ErrorsFound = true;
 			}
@@ -7802,6 +7808,9 @@ namespace WaterThermalTanks {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
+		using DataPlant::PlantFinalSizesOkayToReport;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToReport;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -7842,32 +7851,39 @@ namespace WaterThermalTanks {
 		}
 
 		if ( ( WaterThermalTank( WaterThermalTankNum ).UseInletNode > 0 ) && ( tmpLoopNum == WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ) ) {
-			if ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate == AutoSize ) {
+			if ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRateWasAutoSized ) {
 				PltSizNum = WaterThermalTank( WaterThermalTankNum ).UseSidePlantSizNum;
 				if ( PltSizNum > 0 ) { // we have a Plant Sizing Object
 					if ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopSide == SupplySide ) {
 						if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-							if ( PlantSizesOkayToFinalize ) {
+							if ( PlantFirstSizesOkayToFinalize ) {
 								WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate;
 							} else {
 								tmpUseDesignVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate;
 							}
 						} else {
-							if ( PlantSizesOkayToFinalize ) {
+							if ( PlantFirstSizesOkayToFinalize ) {
 								WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate = 0.0;
 							} else {
 								tmpUseDesignVolFlowRate = 0.0;
 							}
 						}
-						if ( PlantSizesOkayToFinalize ) ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Use Side Design Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate );
-						if ( PlantSizesOkayToFinalize ) {
+						if ( PlantFinalSizesOkayToReport ) {
+							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+								"Use Side Design Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate );
+						}
+						if ( PlantFirstSizesOkayToReport ) {
+							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+								"Initial Use Side Design Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate );
+						}
+						if ( PlantFirstSizesOkayToFinalize ) {
 							RegisterPlantCompDesignFlow( WaterThermalTank( WaterThermalTankNum ).UseInletNode, WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate );
 						} else {
 							RegisterPlantCompDesignFlow( WaterThermalTank( WaterThermalTankNum ).UseInletNode, tmpUseDesignVolFlowRate );
 						}
 
 						rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, RoutineName );
-						if ( PlantSizesOkayToFinalize ) {
+						if ( PlantFirstSizesOkayToFinalize ) {
 							WaterThermalTank( WaterThermalTankNum ).PlantUseMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate * rho;
 						} else {
 							WaterThermalTank( WaterThermalTankNum ).PlantUseMassFlowRateMax = tmpUseDesignVolFlowRate * rho;
@@ -7890,31 +7906,38 @@ namespace WaterThermalTanks {
 		} // connected to plant
 
 		if ( ( WaterThermalTank( WaterThermalTankNum ).SourceInletNode > 0 ) && ( tmpLoopNum == WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ) ) {
-			if ( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate == AutoSize ) {
+			if ( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRateWasAutoSized ) {
 				PltSizNum = WaterThermalTank( WaterThermalTankNum ).SourceSidePlantSizNum;
 				if ( PltSizNum > 0 ) {
 					if ( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopSide == SupplySide ) {
 						if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-							if ( PlantSizesOkayToFinalize ) {
+							if ( PlantFirstSizesOkayToFinalize ) {
 								WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate;
 							} else {
 								tmpSourceDesignVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate;
 							}
 						} else {
-							if ( PlantSizesOkayToFinalize ) {
+							if ( PlantFirstSizesOkayToFinalize ) {
 								WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate = 0.0;
 							} else {
 								tmpSourceDesignVolFlowRate = 0.0;
 							}
 						}
-						if ( PlantSizesOkayToFinalize ) ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Source Side Design Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate );
-						if ( PlantSizesOkayToFinalize ) {
+						if ( PlantFinalSizesOkayToReport ) {
+							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+								"Source Side Design Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate );
+						}
+						if ( PlantFirstSizesOkayToReport ) {
+							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+								"Initial Source Side Design Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate );
+						}
+						if ( PlantFirstSizesOkayToFinalize ) {
 							RegisterPlantCompDesignFlow( WaterThermalTank( WaterThermalTankNum ).SourceInletNode, WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate );
 						} else {
 							RegisterPlantCompDesignFlow( WaterThermalTank( WaterThermalTankNum ).SourceInletNode, tmpSourceDesignVolFlowRate );
 						}
 						rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidIndex, RoutineName );
-						if ( PlantSizesOkayToFinalize ) {
+						if ( PlantFirstSizesOkayToFinalize ) {
 							WaterThermalTank( WaterThermalTankNum ).PlantSourceMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate * rho;
 						} else {
 							WaterThermalTank( WaterThermalTankNum ).PlantSourceMassFlowRateMax = tmpSourceDesignVolFlowRate * rho;
@@ -7977,6 +8000,9 @@ namespace WaterThermalTanks {
 		using SolarCollectors::Collector;
 		using SolarCollectors::NumOfCollectors;
 		using DataSurfaces::Surface;
+		using DataPlant::PlantFinalSizesOkayToReport;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToReport;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -7997,8 +8023,8 @@ namespace WaterThermalTanks {
 		Real64 SumPeopleAllZones;
 		Real64 SumFloorAreaAllZones;
 		//unused  INTEGER   :: CollectorNum  ! do loop index
-		static bool SizeVolume( false );
-		static bool SizeMaxCapacity( false );
+//		static bool SizeVolume( false );
+//		static bool SizeMaxCapacity( false );
 		Real64 rho;
 		Real64 Cp;
 		static int DummyWaterIndex( 1 );
@@ -8009,13 +8035,10 @@ namespace WaterThermalTanks {
 		// local inits
 		Tstart = 14.44;
 		Tfinish = 57.22;
-		SizeVolume = false;
-		SizeMaxCapacity = false;
+
 
 		tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Volume;
 		tmpMaxCapacity = WaterThermalTank( WaterThermalTankNum ).MaxCapacity;
-		if ( tmpTankVolume == AutoSize ) SizeVolume = true;
-		if ( tmpMaxCapacity == AutoSize ) SizeMaxCapacity = true;
 
 		{ auto const SELECT_CASE_var( WaterThermalTank( WaterThermalTankNum ).Sizing.DesignMode );
 
@@ -8053,122 +8076,136 @@ namespace WaterThermalTanks {
 
 			if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBedrooms == 1 ) {
 				if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-					if ( SizeVolume ) tmpTankVolume = 20.0 * GalTocubicMeters;
-					if ( SizeMaxCapacity ) tmpMaxCapacity = 2.5 * 1000.0; //2.5 kW
+					if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 20.0 * GalTocubicMeters;
+					if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 2.5 * 1000.0; //2.5 kW
 				} else if ( FuelTypeIsLikeGas ) {
-					if ( SizeVolume ) tmpTankVolume = 20.0 * GalTocubicMeters;
-					if ( SizeMaxCapacity ) tmpMaxCapacity = 27.0 * kBtuPerHrToWatts; //27kBtu/hr
+					if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 20.0 * GalTocubicMeters;
+					if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 27.0 * kBtuPerHrToWatts; //27kBtu/hr
 				}
 
 			} else if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBedrooms == 2 ) {
 				if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms <= 1.5 ) {
 					if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-						if ( SizeVolume ) tmpTankVolume = 30.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 3.5 * 1000.0; //3.5 kW
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 30.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 3.5 * 1000.0; //3.5 kW
 					} else if ( FuelTypeIsLikeGas ) {
-						if ( SizeVolume ) tmpTankVolume = 30.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 30.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
 					}
 				} else if ( ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms > 1.5 ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms < 3.0 ) ) {
 					if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-						if ( SizeVolume ) tmpTankVolume = 40.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 4.5 * 1000.0; //4.5 kW
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 40.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 4.5 * 1000.0; //4.5 kW
 					} else if ( FuelTypeIsLikeGas ) {
-						if ( SizeVolume ) tmpTankVolume = 30.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 30.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
 					}
 				} else if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms >= 3.0 ) {
 					if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-						if ( SizeVolume ) tmpTankVolume = 50.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 50.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
 					} else if ( FuelTypeIsLikeGas ) {
-						if ( SizeVolume ) tmpTankVolume = 40.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 40.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
 					}
 				}
 			} else if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBedrooms == 3 ) {
 				if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms <= 1.5 ) {
 					if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-						if ( SizeVolume ) tmpTankVolume = 40.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 4.5 * 1000.0; //4.5 kW
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 40.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 4.5 * 1000.0; //4.5 kW
 					} else if ( FuelTypeIsLikeGas ) {
-						if ( SizeVolume ) tmpTankVolume = 30.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 30.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
 					}
 				} else if ( ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms > 1.5 ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms < 3.0 ) ) {
 					if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-						if ( SizeVolume ) tmpTankVolume = 50.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 50.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
 					} else if ( FuelTypeIsLikeGas ) {
-						if ( SizeVolume ) tmpTankVolume = 40.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 40.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
 					}
 				} else if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms >= 3.0 ) {
 					if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-						if ( SizeVolume ) tmpTankVolume = 50.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 50.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
 					} else if ( FuelTypeIsLikeGas ) {
-						if ( SizeVolume ) tmpTankVolume = 40.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 38.0 * kBtuPerHrToWatts; //38 kBtu/hr
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 40.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 38.0 * kBtuPerHrToWatts; //38 kBtu/hr
 					}
 				}
 			} else if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBedrooms == 4 ) {
 				if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms <= 1.5 ) {
 					if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-						if ( SizeVolume ) tmpTankVolume = 50.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 50.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
 					} else if ( FuelTypeIsLikeGas ) {
-						if ( SizeVolume ) tmpTankVolume = 40.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 40.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
 					}
 				} else if ( ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms > 1.5 ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms < 3.0 ) ) {
 					if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-						if ( SizeVolume ) tmpTankVolume = 50.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 50.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
 					} else if ( FuelTypeIsLikeGas ) {
-						if ( SizeVolume ) tmpTankVolume = 40.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 38.0 * kBtuPerHrToWatts; //38 kBtu/hr
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 40.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 38.0 * kBtuPerHrToWatts; //38 kBtu/hr
 					}
 				} else if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms >= 3.0 ) {
 					if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-						if ( SizeVolume ) tmpTankVolume = 66.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 66.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
 					} else if ( FuelTypeIsLikeGas ) {
-						if ( SizeVolume ) tmpTankVolume = 50.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 38.0 * kBtuPerHrToWatts; //38 kBtu/hr
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 50.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 38.0 * kBtuPerHrToWatts; //38 kBtu/hr
 					}
 				}
 			} else if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBedrooms == 5 ) {
 				if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-					if ( SizeVolume ) tmpTankVolume = 66.0 * GalTocubicMeters;
-					if ( SizeMaxCapacity ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
+					if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 66.0 * GalTocubicMeters;
+					if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
 				} else if ( FuelTypeIsLikeGas ) {
-					if ( SizeVolume ) tmpTankVolume = 50.0 * GalTocubicMeters;
-					if ( SizeMaxCapacity ) tmpMaxCapacity = 47.0 * kBtuPerHrToWatts; //47 kBtu/hr
+					if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 50.0 * GalTocubicMeters;
+					if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 47.0 * kBtuPerHrToWatts; //47 kBtu/hr
 				}
 			} else if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBedrooms >= 6 ) {
 				if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-					if ( SizeVolume ) tmpTankVolume = 66.0 * GalTocubicMeters;
-					if ( SizeMaxCapacity ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
+					if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 66.0 * GalTocubicMeters;
+					if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
 				} else if ( FuelTypeIsLikeGas ) {
-					if ( SizeVolume ) tmpTankVolume = 50.0 * GalTocubicMeters;
-					if ( SizeMaxCapacity ) tmpMaxCapacity = 50.0 * kBtuPerHrToWatts; //50 kBtu/hr
+					if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 50.0 * GalTocubicMeters;
+					if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 50.0 * kBtuPerHrToWatts; //50 kBtu/hr
 				}
 			}
 
-			if ( SizeVolume && PlantSizesOkayToFinalize ) {
+			if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).Volume = tmpTankVolume;
-				ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
+				}
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Initial Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
+				}
 			}
-			if ( SizeMaxCapacity && PlantSizesOkayToFinalize ) {
+			if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).MaxCapacity = tmpMaxCapacity;
-				ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
+				}
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Initial Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
+				}
 			}
 		} else if ( SELECT_CASE_var == SizePerPerson ) {
 			// how to get number of people?
 
 			SumPeopleAllZones = sum( Zone.TotOccupants() );
-			if ( SizeVolume ) tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerPerson * SumPeopleAllZones;
+			if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerPerson * SumPeopleAllZones;
 			if ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum > 0 ) {
 				rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, ( ( Tfinish + Tstart ) / 2.0 ), PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, RoutineName );
 				Cp = GetSpecificHeatGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, ( ( Tfinish + Tstart ) / 2.0 ), PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, RoutineName );
@@ -8177,19 +8214,33 @@ namespace WaterThermalTanks {
 				Cp = GetSpecificHeatGlycol( fluidNameWater, ( ( Tfinish + Tstart ) / 2.0 ), DummyWaterIndex, RoutineName );
 			}
 
-			if ( SizeMaxCapacity ) tmpMaxCapacity = SumPeopleAllZones * WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryCapacityPerPerson * ( Tfinish - Tstart ) * ( 1.0 / SecInHour ) * rho * Cp; //m3/hr/person | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
-			if ( SizeVolume && PlantSizesOkayToFinalize ) {
+			if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = SumPeopleAllZones * WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryCapacityPerPerson * ( Tfinish - Tstart ) * ( 1.0 / SecInHour ) * rho * Cp; //m3/hr/person | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
+			if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).Volume = tmpTankVolume;
-				ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
+				}
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Initial Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
+				}
 			}
-			if ( SizeMaxCapacity && PlantSizesOkayToFinalize ) {
+			if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).MaxCapacity = tmpMaxCapacity;
-				ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
+				}
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Initial Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
+				}
 			}
 		} else if ( SELECT_CASE_var == SizePerFloorArea ) {
 
 			SumFloorAreaAllZones = sum( Zone.FloorArea() );
-			if ( SizeVolume ) tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerArea * SumFloorAreaAllZones;
+			if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerArea * SumFloorAreaAllZones;
 			if ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum > 0 ) {
 				rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, ( ( Tfinish + Tstart ) / 2.0 ), PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, RoutineName );
 				Cp = GetSpecificHeatGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, ( ( Tfinish + Tstart ) / 2.0 ), PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, RoutineName );
@@ -8198,18 +8249,32 @@ namespace WaterThermalTanks {
 				Cp = GetSpecificHeatGlycol( fluidNameWater, ( ( Tfinish + Tstart ) / 2.0 ), DummyWaterIndex, RoutineName );
 			}
 
-			if ( SizeMaxCapacity ) tmpMaxCapacity = SumFloorAreaAllZones * WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryCapacityPerArea * ( Tfinish - Tstart ) * ( 1.0 / SecInHour ) * rho * Cp; // m2 | m3/hr/m2 | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
-			if ( SizeVolume && PlantSizesOkayToFinalize ) {
+			if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = SumFloorAreaAllZones * WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryCapacityPerArea * ( Tfinish - Tstart ) * ( 1.0 / SecInHour ) * rho * Cp; // m2 | m3/hr/m2 | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
+			if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).Volume = tmpTankVolume;
-				ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
+				}
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Initial Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
+				}
 			}
-			if ( SizeMaxCapacity && PlantSizesOkayToFinalize ) {
+			if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).MaxCapacity = tmpMaxCapacity;
-				ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
+				}
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Initial Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
+				}
 			}
 		} else if ( SELECT_CASE_var == SizePerUnit ) {
 
-			if ( SizeVolume ) tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerUnit * WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfUnits;
+			if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerUnit * WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfUnits;
 			if ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum > 0 ) {
 				rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, ( ( Tfinish + Tstart ) / 2.0 ), PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, RoutineName );
 				Cp = GetSpecificHeatGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, ( ( Tfinish + Tstart ) / 2.0 ), PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, RoutineName );
@@ -8217,29 +8282,50 @@ namespace WaterThermalTanks {
 				rho = GetDensityGlycol( fluidNameWater, ( ( Tfinish + Tstart ) / 2.0 ), DummyWaterIndex, RoutineName );
 				Cp = GetSpecificHeatGlycol( fluidNameWater, ( ( Tfinish + Tstart ) / 2.0 ), DummyWaterIndex, RoutineName );
 			}
-			if ( SizeMaxCapacity ) tmpMaxCapacity = WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfUnits * WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryCapacityPerUnit * ( Tfinish - Tstart ) * ( 1.0 / SecInHour ) * rho * Cp; //m3/hr/ea | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
-			if ( SizeVolume && PlantSizesOkayToFinalize ) {
+			if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfUnits * WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryCapacityPerUnit * ( Tfinish - Tstart ) * ( 1.0 / SecInHour ) * rho * Cp; //m3/hr/ea | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
+			if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).Volume = tmpTankVolume;
-				ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
+				}
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Initial Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
+				}
 			}
-			if ( SizeMaxCapacity && PlantSizesOkayToFinalize ) {
+			if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).MaxCapacity = tmpMaxCapacity;
-				ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
+				}
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Initial Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
+				}
 			}
 		} else if ( SELECT_CASE_var == SizePerSolarColArea ) {
 
 		}}
 
 		// if stratified, might set height.
-		if ( ( SizeVolume ) && ( WaterThermalTank( WaterThermalTankNum ).TypeNum == StratifiedWaterHeater ) && PlantSizesOkayToFinalize ) { // might set height
-			if ( ( WaterThermalTank( WaterThermalTankNum ).Height == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Volume != AutoSize ) ) {
+		if ( ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).TypeNum == StratifiedWaterHeater ) && PlantFirstSizesOkayToFinalize ) { // might set height
+			if ( ( WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized ) && ( ! WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) ) {
 				WaterThermalTank( WaterThermalTankNum ).Height = std::pow( ( 4.0 * WaterThermalTank( WaterThermalTankNum ).Volume * pow_2( WaterThermalTank( WaterThermalTankNum ).Sizing.HeightAspectRatio ) ) / Pi, 0.3333333333333333 );
-				ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Tank Height [m]", WaterThermalTank( WaterThermalTankNum ).Height );
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Tank Height [m]", WaterThermalTank( WaterThermalTankNum ).Height );
+				}
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Initial Tank Height [m]", WaterThermalTank( WaterThermalTankNum ).Height );
+				}
 				// check if autocalculate Use outlet and source inlet are still set to autosize by earlier
-				if ( WaterThermalTank( WaterThermalTankNum ).UseOutletHeight == AutoSize ) {
+				if ( WaterThermalTank( WaterThermalTankNum ).UseOutletHeightWasAutoSized ) {
 					WaterThermalTank( WaterThermalTankNum ).UseOutletHeight = WaterThermalTank( WaterThermalTankNum ).Height;
 				}
-				if ( WaterThermalTank( WaterThermalTankNum ).SourceInletHeight == AutoSize ) {
+				if ( WaterThermalTank( WaterThermalTankNum ).SourceInletHeightWasAutoSized ) {
 					WaterThermalTank( WaterThermalTankNum ).SourceInletHeight = WaterThermalTank( WaterThermalTankNum ).Height;
 				}
 			}
@@ -8276,6 +8362,9 @@ namespace WaterThermalTanks {
 		using SolarCollectors::NumOfCollectors;
 		using DataSurfaces::Surface;
 		using DataGlobals::Pi;
+		using DataPlant::PlantFinalSizesOkayToReport;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToReport;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -8294,8 +8383,6 @@ namespace WaterThermalTanks {
 		Real64 Tstart; // initial tank temp for sizing.
 		Real64 Tfinish; // final target temp for sizing
 		int CollectorNum;
-		static bool SizeVolume( false );
-		static bool SizeMaxCapacity( false );
 		Real64 rho;
 		Real64 Cp;
 		static int DummyWaterIndex( 1 );
@@ -8305,23 +8392,26 @@ namespace WaterThermalTanks {
 		// local inits
 		Tstart = 14.44;
 		Tfinish = 57.22;
-		SizeVolume = false;
-		SizeMaxCapacity = false;
 
 		tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Volume;
 		tmpMaxCapacity = WaterThermalTank( WaterThermalTankNum ).MaxCapacity;
-		if ( tmpTankVolume == AutoSize ) SizeVolume = true;
-		if ( tmpMaxCapacity == AutoSize ) SizeMaxCapacity = true;
 
 		{ auto const SELECT_CASE_var( WaterThermalTank( WaterThermalTankNum ).Sizing.DesignMode );
 
 		if ( SELECT_CASE_var == SizePeakDraw ) {
-			if ( SizeVolume ) tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TankDrawTime * WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate * SecInHour; // hours | m3/s | (3600 s/1 hour)
-			if ( SizeVolume && PlantSizesOkayToFinalize ) {
+			if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TankDrawTime * WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate * SecInHour; // hours | m3/s | (3600 s/1 hour)
+			if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).Volume = tmpTankVolume;
-				ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
+				if ( PlantFinalSizesOkayToReport ){
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
+				}
+				if ( PlantFirstSizesOkayToReport ){
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Initial Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
+				}
 			}
-			if ( SizeMaxCapacity ) {
+			if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) {
 				if ( WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryTime > 0.0 ) {
 					if ( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum > 0 ) {
 						rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidName, ( ( Tfinish + Tstart ) / 2.0 ), PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidIndex, RoutineName );
@@ -8336,9 +8426,16 @@ namespace WaterThermalTanks {
 				}
 			}
 
-			if ( SizeMaxCapacity && PlantSizesOkayToFinalize ) {
+			if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).MaxCapacity = tmpMaxCapacity;
-				ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
+				}
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Initial Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
+				}
 			}
 		} else if ( SELECT_CASE_var == SizePerSolarColArea ) {
 
@@ -8347,22 +8444,44 @@ namespace WaterThermalTanks {
 				WaterThermalTank( WaterThermalTankNum ).Sizing.TotalSolarCollectorArea += Surface( Collector( CollectorNum ).Surface ).Area;
 			}
 
-			if ( SizeVolume ) tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TotalSolarCollectorArea * WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerCollectorArea;
-			if ( SizeMaxCapacity ) tmpMaxCapacity = 0.0;
-			if ( SizeVolume && PlantSizesOkayToFinalize ) {
+			if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TotalSolarCollectorArea * WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerCollectorArea;
+			if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 0.0;
+			if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).Volume = tmpTankVolume;
-				ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
+				}
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Initial Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
+				}
 			}
-			if ( SizeMaxCapacity && PlantSizesOkayToFinalize ) {
+			if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				WaterThermalTank( WaterThermalTankNum ).MaxCapacity = tmpMaxCapacity;
-				ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
+				}
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Initial Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
+				}
 			}
 		}}
 
-		if ( ( SizeVolume ) && ( WaterThermalTank( WaterThermalTankNum ).TypeNum == StratifiedWaterHeater ) && PlantSizesOkayToFinalize ) { // might set height
-			if ( ( WaterThermalTank( WaterThermalTankNum ).Height == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Volume != AutoSize ) ) {
+		if ( ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) && ( WaterThermalTank( WaterThermalTankNum ).TypeNum == StratifiedWaterHeater ) && PlantFirstSizesOkayToFinalize ) { // might set height
+			if ( ( WaterThermalTank( WaterThermalTankNum ).HeightWasAutoSized ) 
+					&& ( ! WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) ) {
 				WaterThermalTank( WaterThermalTankNum ).Height = std::pow( ( 4.0 * WaterThermalTank( WaterThermalTankNum ).Volume * pow_2( WaterThermalTank( WaterThermalTankNum ).Sizing.HeightAspectRatio ) ) / Pi, 0.3333333333333333 );
-				ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Tank Height [m]", WaterThermalTank( WaterThermalTankNum ).Height );
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Tank Height [m]", WaterThermalTank( WaterThermalTankNum ).Height );
+				}
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+						"Initial Tank Height [m]", WaterThermalTank( WaterThermalTankNum ).Height );
+				}
 			}
 		}
 
@@ -8402,6 +8521,9 @@ namespace WaterThermalTanks {
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
 		using namespace OutputReportPredefined;
+		using DataPlant::PlantFinalSizesOkayToReport;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToReport;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -8448,12 +8570,12 @@ namespace WaterThermalTanks {
 
 		// determine tank volume to use for sizing.
 		TankVolume = WaterThermalTank( WaterThermalTankNum ).Volume;
-		if ( TankVolume == AutoSize ) {
+		if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) {
 			TankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.NominalVolForSizingDemandSideFlow;
 		}
 
 		if ( WaterThermalTank( WaterThermalTankNum ).UseInletNode > 0 ) {
-			if ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate == AutoSize ) {
+			if ( WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRateWasAutoSized ) {
 				PltSizNum = WaterThermalTank( WaterThermalTankNum ).UseSidePlantSizNum;
 				if ( PltSizNum > 0 ) { // we have a Plant Sizing Object
 					if ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopSide == DemandSide ) {
@@ -8465,13 +8587,13 @@ namespace WaterThermalTanks {
 						Tpdesign = PlantSizData( PltSizNum ).ExitTemp;
 						eff = WaterThermalTank( WaterThermalTankNum ).UseEffectiveness;
 						if ( ( Tpdesign >= 58.0 ) && ( ! WaterThermalTank( WaterThermalTankNum ).IsChilledWaterTank ) ) {
-							if ( PlantSizesOkayToFinalize ) {
+							if ( PlantFirstSizesOkayToFinalize ) {
 								WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate = -1.0 * ( TankVolume / ( tankRecoverhours * SecInHour * eff ) ) * std::log( ( Tpdesign - Tfinish ) / ( Tpdesign - Tstart ) );
 							} else {
 								tmpUseDesignVolFlowRate = -1.0 * ( TankVolume / ( tankRecoverhours * SecInHour * eff ) ) * std::log( ( Tpdesign - Tfinish ) / ( Tpdesign - Tstart ) );
 							}
 						} else if ( ( Tpdesign <= 8.0 ) && ( WaterThermalTank( WaterThermalTankNum ).IsChilledWaterTank ) ) {
-							if ( PlantSizesOkayToFinalize ) {
+							if ( PlantFirstSizesOkayToFinalize ) {
 								WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate = -1.0 * ( TankVolume / ( tankRecoverhours * SecInHour * eff ) ) * std::log( ( Tpdesign - Tfinish ) / ( Tpdesign - Tstart ) );
 							} else {
 								tmpUseDesignVolFlowRate = -1.0 * ( TankVolume / ( tankRecoverhours * SecInHour * eff ) ) * std::log( ( Tpdesign - Tfinish ) / ( Tpdesign - Tstart ) );
@@ -8489,14 +8611,21 @@ namespace WaterThermalTanks {
 							}
 							ErrorsFound = true;
 						}
-						if ( PlantSizesOkayToFinalize ) ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Use Side Design Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate );
-						if ( PlantSizesOkayToFinalize ) {
+						if ( PlantFinalSizesOkayToReport ) {
+							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+								"Use Side Design Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate );
+						}
+						if ( PlantFirstSizesOkayToReport ) {
+							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+								"Initial Use Side Design Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate );
+						}
+						if ( PlantFirstSizesOkayToFinalize ) {
 							RegisterPlantCompDesignFlow( WaterThermalTank( WaterThermalTankNum ).UseInletNode, WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate );
 						} else {
 							RegisterPlantCompDesignFlow( WaterThermalTank( WaterThermalTankNum ).UseInletNode, tmpUseDesignVolFlowRate );
 						}
 						rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, RoutineName );
-						if ( PlantSizesOkayToFinalize ) {
+						if ( PlantFirstSizesOkayToFinalize ) {
 							WaterThermalTank( WaterThermalTankNum ).PlantUseMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).UseDesignVolFlowRate * rho;
 						} else {
 							WaterThermalTank( WaterThermalTankNum ).PlantUseMassFlowRateMax = tmpUseDesignVolFlowRate * rho;
@@ -8519,7 +8648,7 @@ namespace WaterThermalTanks {
 		} // connected to plant
 
 		if ( WaterThermalTank( WaterThermalTankNum ).SourceInletNode > 0 ) {
-			if ( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate == AutoSize ) {
+			if ( WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRateWasAutoSized ) {
 				PltSizNum = WaterThermalTank( WaterThermalTankNum ).SourceSidePlantSizNum;
 				if ( PltSizNum > 0 ) {
 					if ( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopSide == DemandSide ) {
@@ -8530,13 +8659,13 @@ namespace WaterThermalTanks {
 						eff = WaterThermalTank( WaterThermalTankNum ).SourceEffectiveness;
 						if ( ( Tpdesign >= 58.0 ) && ( ! WaterThermalTank( WaterThermalTankNum ).IsChilledWaterTank ) ) {
 
-							if ( PlantSizesOkayToFinalize ) {
+							if ( PlantFirstSizesOkayToFinalize ) {
 								WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate = -1.0 * ( TankVolume / ( tankRecoverhours * SecInHour * eff ) ) * std::log( ( Tpdesign - Tfinish ) / ( Tpdesign - Tstart ) );
 							} else {
 								tmpSourceDesignVolFlowRate = -1.0 * ( TankVolume / ( tankRecoverhours * SecInHour * eff ) ) * std::log( ( Tpdesign - Tfinish ) / ( Tpdesign - Tstart ) );
 							}
 						} else if ( ( Tpdesign <= 8.0 ) && ( WaterThermalTank( WaterThermalTankNum ).IsChilledWaterTank ) ) {
-							if ( PlantSizesOkayToFinalize ) {
+							if ( PlantFirstSizesOkayToFinalize ) {
 								WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate = -1.0 * ( TankVolume / ( tankRecoverhours * SecInHour * eff ) ) * std::log( ( Tpdesign - Tfinish ) / ( Tpdesign - Tstart ) );
 							} else {
 								tmpSourceDesignVolFlowRate = -1.0 * ( TankVolume / ( tankRecoverhours * SecInHour * eff ) ) * std::log( ( Tpdesign - Tfinish ) / ( Tpdesign - Tstart ) );
@@ -8553,14 +8682,21 @@ namespace WaterThermalTanks {
 							}
 							ErrorsFound = true;
 						}
-						if ( PlantSizesOkayToFinalize ) ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Source Side Design Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate );
-						if ( PlantSizesOkayToFinalize ) {
+						if ( PlantFinalSizesOkayToReport ) {
+							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+								"Source Side Design Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate );
+						}
+						if ( PlantFirstSizesOkayToReport ) {
+							ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, 
+								"Initial Source Side Design Flow Rate [m3/s]", WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate );
+						}
+						if ( PlantFirstSizesOkayToFinalize ) {
 							RegisterPlantCompDesignFlow( WaterThermalTank( WaterThermalTankNum ).SourceInletNode, WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate );
 						} else {
 							RegisterPlantCompDesignFlow( WaterThermalTank( WaterThermalTankNum ).SourceInletNode, tmpSourceDesignVolFlowRate );
 						}
 						rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).SourceSidePlantLoopNum ).FluidIndex, RoutineName );
-						if ( PlantSizesOkayToFinalize ) {
+						if ( PlantFirstSizesOkayToFinalize ) {
 							WaterThermalTank( WaterThermalTankNum ).PlantSourceMassFlowRateMax = WaterThermalTank( WaterThermalTankNum ).SourceDesignVolFlowRate * rho;
 						} else {
 							WaterThermalTank( WaterThermalTankNum ).PlantSourceMassFlowRateMax = tmpSourceDesignVolFlowRate * rho;
@@ -8637,8 +8773,6 @@ namespace WaterThermalTanks {
 		Real64 tmpMaxCapacity; // local temporary for heating capacity W
 		Real64 Tstart; // initial tank temp for sizing.
 		Real64 Tfinish; // final target temp for sizing
-		static bool SizeVolume( false );
-		static bool SizeMaxCapacity( false );
 		static bool FuelTypeIsLikeGas( false );
 		static int DummyWaterIndex( 1 );
 		Real64 rho;
@@ -8651,15 +8785,11 @@ namespace WaterThermalTanks {
 		// local inits
 		Tstart = 14.44;
 		Tfinish = 57.22;
-		SizeVolume = false;
-		SizeMaxCapacity = false;
 
 		tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Volume;
 		tmpMaxCapacity = WaterThermalTank( WaterThermalTankNum ).MaxCapacity;
-		if ( tmpTankVolume == AutoSize ) SizeVolume = true;
-		if ( tmpMaxCapacity == AutoSize ) SizeMaxCapacity = true;
 
-		if ( SizeVolume || SizeMaxCapacity ) {
+		if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized || WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) {
 
 			{ auto const SELECT_CASE_var( WaterThermalTank( WaterThermalTankNum ).Sizing.DesignMode );
 
@@ -8668,12 +8798,12 @@ namespace WaterThermalTanks {
 				rho = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineName );
 				DrawDesignVolFlowRate = GetScheduleMaxValue( WaterThermalTank( WaterThermalTankNum ).FlowRateSchedule ) * WaterThermalTank( WaterThermalTankNum ).MassFlowRateMax / rho;
 
-				if ( SizeVolume ) {
+				if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) {
 					tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TankDrawTime * DrawDesignVolFlowRate * SecInHour; // hours | m3/s | (3600 s/1 hour)
 					WaterThermalTank( WaterThermalTankNum ).Volume = tmpTankVolume;
 					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
 				}
-				if ( SizeMaxCapacity ) {
+				if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) {
 					if ( WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryTime > 0.0 ) {
 						rho = GetDensityGlycol( fluidNameWater, ( ( Tfinish + Tstart ) / 2.0 ), DummyWaterIndex, RoutineName );
 						Cp = GetSpecificHeatGlycol( fluidNameWater, ( ( Tfinish + Tstart ) / 2.0 ), DummyWaterIndex, RoutineName );
@@ -8715,113 +8845,113 @@ namespace WaterThermalTanks {
 
 				if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBedrooms == 1 ) {
 					if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-						if ( SizeVolume ) tmpTankVolume = 20.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 2.5 * 1000.0; //2.5 kW
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 20.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 2.5 * 1000.0; //2.5 kW
 					} else if ( FuelTypeIsLikeGas ) {
-						if ( SizeVolume ) tmpTankVolume = 20.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 27.0 * kBtuPerHrToWatts; //27kBtu/hr
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 20.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 27.0 * kBtuPerHrToWatts; //27kBtu/hr
 					}
 
 				} else if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBedrooms == 2 ) {
 					if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms <= 1.5 ) {
 						if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-							if ( SizeVolume ) tmpTankVolume = 30.0 * GalTocubicMeters;
-							if ( SizeMaxCapacity ) tmpMaxCapacity = 3.5 * 1000.0; //3.5 kW
+							if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 30.0 * GalTocubicMeters;
+							if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 3.5 * 1000.0; //3.5 kW
 						} else if ( FuelTypeIsLikeGas ) {
-							if ( SizeVolume ) tmpTankVolume = 30.0 * GalTocubicMeters;
-							if ( SizeMaxCapacity ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
+							if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 30.0 * GalTocubicMeters;
+							if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
 						}
 					} else if ( ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms > 1.5 ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms < 3.0 ) ) {
 						if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-							if ( SizeVolume ) tmpTankVolume = 40.0 * GalTocubicMeters;
-							if ( SizeMaxCapacity ) tmpMaxCapacity = 4.5 * 1000.0; //4.5 kW
+							if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 40.0 * GalTocubicMeters;
+							if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 4.5 * 1000.0; //4.5 kW
 						} else if ( FuelTypeIsLikeGas ) {
-							if ( SizeVolume ) tmpTankVolume = 30.0 * GalTocubicMeters;
-							if ( SizeMaxCapacity ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
+							if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 30.0 * GalTocubicMeters;
+							if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
 						}
 					} else if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms >= 3.0 ) {
 						if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-							if ( SizeVolume ) tmpTankVolume = 50.0 * GalTocubicMeters;
-							if ( SizeMaxCapacity ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
+							if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 50.0 * GalTocubicMeters;
+							if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
 						} else if ( FuelTypeIsLikeGas ) {
-							if ( SizeVolume ) tmpTankVolume = 40.0 * GalTocubicMeters;
-							if ( SizeMaxCapacity ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
+							if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 40.0 * GalTocubicMeters;
+							if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
 						}
 					}
 				} else if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBedrooms == 3 ) {
 					if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms <= 1.5 ) {
 						if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-							if ( SizeVolume ) tmpTankVolume = 40.0 * GalTocubicMeters;
-							if ( SizeMaxCapacity ) tmpMaxCapacity = 4.5 * 1000.0; //4.5 kW
+							if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 40.0 * GalTocubicMeters;
+							if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 4.5 * 1000.0; //4.5 kW
 						} else if ( FuelTypeIsLikeGas ) {
-							if ( SizeVolume ) tmpTankVolume = 30.0 * GalTocubicMeters;
-							if ( SizeMaxCapacity ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
+							if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 30.0 * GalTocubicMeters;
+							if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
 						}
 					} else if ( ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms > 1.5 ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms < 3.0 ) ) {
 						if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-							if ( SizeVolume ) tmpTankVolume = 50.0 * GalTocubicMeters;
-							if ( SizeMaxCapacity ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
+							if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 50.0 * GalTocubicMeters;
+							if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
 						} else if ( FuelTypeIsLikeGas ) {
-							if ( SizeVolume ) tmpTankVolume = 40.0 * GalTocubicMeters;
-							if ( SizeMaxCapacity ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
+							if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 40.0 * GalTocubicMeters;
+							if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
 						}
 					} else if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms >= 3.0 ) {
 						if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-							if ( SizeVolume ) tmpTankVolume = 50.0 * GalTocubicMeters;
-							if ( SizeMaxCapacity ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
+							if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 50.0 * GalTocubicMeters;
+							if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
 						} else if ( FuelTypeIsLikeGas ) {
-							if ( SizeVolume ) tmpTankVolume = 40.0 * GalTocubicMeters;
-							if ( SizeMaxCapacity ) tmpMaxCapacity = 38.0 * kBtuPerHrToWatts; //38 kBtu/hr
+							if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 40.0 * GalTocubicMeters;
+							if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 38.0 * kBtuPerHrToWatts; //38 kBtu/hr
 						}
 					}
 				} else if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBedrooms == 4 ) {
 					if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms <= 1.5 ) {
 						if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-							if ( SizeVolume ) tmpTankVolume = 50.0 * GalTocubicMeters;
-							if ( SizeMaxCapacity ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
+							if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 50.0 * GalTocubicMeters;
+							if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
 						} else if ( FuelTypeIsLikeGas ) {
-							if ( SizeVolume ) tmpTankVolume = 40.0 * GalTocubicMeters;
-							if ( SizeMaxCapacity ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
+							if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 40.0 * GalTocubicMeters;
+							if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; //36 kBtu/hr
 						}
 					} else if ( ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms > 1.5 ) && ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms < 3.0 ) ) {
 						if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-							if ( SizeVolume ) tmpTankVolume = 50.0 * GalTocubicMeters;
-							if ( SizeMaxCapacity ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
+							if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 50.0 * GalTocubicMeters;
+							if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
 						} else if ( FuelTypeIsLikeGas ) {
-							if ( SizeVolume ) tmpTankVolume = 40.0 * GalTocubicMeters;
-							if ( SizeMaxCapacity ) tmpMaxCapacity = 38.0 * kBtuPerHrToWatts; //38 kBtu/hr
+							if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 40.0 * GalTocubicMeters;
+							if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 38.0 * kBtuPerHrToWatts; //38 kBtu/hr
 						}
 					} else if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBathrooms >= 3.0 ) {
 						if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-							if ( SizeVolume ) tmpTankVolume = 66.0 * GalTocubicMeters;
-							if ( SizeMaxCapacity ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
+							if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 66.0 * GalTocubicMeters;
+							if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
 						} else if ( FuelTypeIsLikeGas ) {
-							if ( SizeVolume ) tmpTankVolume = 50.0 * GalTocubicMeters;
-							if ( SizeMaxCapacity ) tmpMaxCapacity = 38.0 * kBtuPerHrToWatts; //38 kBtu/hr
+							if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 50.0 * GalTocubicMeters;
+							if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 38.0 * kBtuPerHrToWatts; //38 kBtu/hr
 						}
 					}
 				} else if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBedrooms == 5 ) {
 					if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-						if ( SizeVolume ) tmpTankVolume = 66.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 66.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
 					} else if ( FuelTypeIsLikeGas ) {
-						if ( SizeVolume ) tmpTankVolume = 50.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 47.0 * kBtuPerHrToWatts; //47 kBtu/hr
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 50.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 47.0 * kBtuPerHrToWatts; //47 kBtu/hr
 					}
 				} else if ( WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfBedrooms >= 6 ) {
 					if ( SameString( WaterThermalTank( WaterThermalTankNum ).FuelType, "Electric" ) ) {
-						if ( SizeVolume ) tmpTankVolume = 66.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 66.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 5.5 * 1000.0; //5.5 kW
 					} else if ( FuelTypeIsLikeGas ) {
-						if ( SizeVolume ) tmpTankVolume = 50.0 * GalTocubicMeters;
-						if ( SizeMaxCapacity ) tmpMaxCapacity = 50.0 * kBtuPerHrToWatts; //50 kBtu/hr
+						if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = 50.0 * GalTocubicMeters;
+						if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 50.0 * kBtuPerHrToWatts; //50 kBtu/hr
 					}
 				}
-				if ( SizeVolume ) {
+				if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) {
 					WaterThermalTank( WaterThermalTankNum ).Volume = tmpTankVolume;
 					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
 				}
-				if ( SizeMaxCapacity ) {
+				if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) {
 					WaterThermalTank( WaterThermalTankNum ).MaxCapacity = tmpMaxCapacity;
 					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
 				}
@@ -8830,20 +8960,20 @@ namespace WaterThermalTanks {
 				// how to get number of people?
 
 				SumPeopleAllZones = sum( Zone.TotOccupants() );
-				if ( SizeVolume ) {
+				if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) {
 					tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerPerson * SumPeopleAllZones;
 				}
-				if ( SizeMaxCapacity ) {
+				if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) {
 					rho = GetDensityGlycol( fluidNameWater, ( ( Tfinish + Tstart ) / 2.0 ), DummyWaterIndex, RoutineName );
 					Cp = GetSpecificHeatGlycol( fluidNameWater, ( ( Tfinish + Tstart ) / 2.0 ), DummyWaterIndex, RoutineName );
 					tmpMaxCapacity = SumPeopleAllZones * WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryCapacityPerPerson * ( Tfinish - Tstart ) * ( 1.0 / SecInHour ) * rho * Cp; //m3/hr/person | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
 				}
 
-				if ( SizeVolume ) {
+				if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) {
 					WaterThermalTank( WaterThermalTankNum ).Volume = tmpTankVolume;
 					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
 				}
-				if ( SizeMaxCapacity ) {
+				if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) {
 					WaterThermalTank( WaterThermalTankNum ).MaxCapacity = tmpMaxCapacity;
 					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
 				}
@@ -8851,38 +8981,38 @@ namespace WaterThermalTanks {
 			} else if ( SELECT_CASE_var == SizePerFloorArea ) {
 
 				SumFloorAreaAllZones = sum( Zone.FloorArea() );
-				if ( SizeVolume ) {
+				if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) {
 					tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerArea * SumFloorAreaAllZones;
 				}
 
-				if ( SizeMaxCapacity ) {
+				if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) {
 					rho = GetDensityGlycol( fluidNameWater, ( ( Tfinish + Tstart ) / 2.0 ), DummyWaterIndex, RoutineName );
 					Cp = GetSpecificHeatGlycol( fluidNameWater, ( ( Tfinish + Tstart ) / 2.0 ), DummyWaterIndex, RoutineName );
 					tmpMaxCapacity = SumFloorAreaAllZones * WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryCapacityPerArea * ( Tfinish - Tstart ) * ( 1.0 / SecInHour ) * rho * Cp; // m2 | m3/hr/m2 | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
 				}
-				if ( SizeVolume ) {
+				if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) {
 					WaterThermalTank( WaterThermalTankNum ).Volume = tmpTankVolume;
 					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
 				}
-				if ( SizeMaxCapacity ) {
+				if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) {
 					WaterThermalTank( WaterThermalTankNum ).MaxCapacity = tmpMaxCapacity;
 					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
 				}
 			} else if ( SELECT_CASE_var == SizePerUnit ) {
 
-				if ( SizeVolume ) tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerUnit * WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfUnits;
+				if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerUnit * WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfUnits;
 
-				if ( SizeMaxCapacity ) {
+				if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) {
 					rho = GetDensityGlycol( fluidNameWater, ( ( Tfinish + Tstart ) / 2.0 ), DummyWaterIndex, RoutineName );
 					Cp = GetSpecificHeatGlycol( fluidNameWater, ( ( Tfinish + Tstart ) / 2.0 ), DummyWaterIndex, RoutineName );
 					tmpMaxCapacity = WaterThermalTank( WaterThermalTankNum ).Sizing.NumberOfUnits * WaterThermalTank( WaterThermalTankNum ).Sizing.RecoveryCapacityPerUnit * ( Tfinish - Tstart ) * ( 1.0 / SecInHour ) * rho * Cp; //m3/hr/ea | delta T  in K | 1 hr/ 3600 s | kg/m3 | J/Kg/k
 				}
 
-				if ( SizeVolume ) {
+				if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) {
 					WaterThermalTank( WaterThermalTankNum ).Volume = tmpTankVolume;
 					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
 				}
-				if ( SizeMaxCapacity ) {
+				if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) {
 					WaterThermalTank( WaterThermalTankNum ).MaxCapacity = tmpMaxCapacity;
 					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
 				}
@@ -8892,13 +9022,13 @@ namespace WaterThermalTanks {
 					WaterThermalTank( WaterThermalTankNum ).Sizing.TotalSolarCollectorArea += Surface( Collector( CollectorNum ).Surface ).Area;
 				}
 
-				if ( SizeVolume ) tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TotalSolarCollectorArea * WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerCollectorArea;
-				if ( SizeMaxCapacity ) tmpMaxCapacity = 0.0;
-				if ( SizeVolume ) {
+				if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) tmpTankVolume = WaterThermalTank( WaterThermalTankNum ).Sizing.TotalSolarCollectorArea * WaterThermalTank( WaterThermalTankNum ).Sizing.TankCapacityPerCollectorArea;
+				if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) tmpMaxCapacity = 0.0;
+				if ( WaterThermalTank( WaterThermalTankNum ).VolumeWasAutoSized ) {
 					WaterThermalTank( WaterThermalTankNum ).Volume = tmpTankVolume;
 					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Tank Volume [m3]", WaterThermalTank( WaterThermalTankNum ).Volume );
 				}
-				if ( SizeMaxCapacity ) {
+				if ( WaterThermalTank( WaterThermalTankNum ).MaxCapacityWasAutoSized ) {
 					WaterThermalTank( WaterThermalTankNum ).MaxCapacity = tmpMaxCapacity;
 					ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Maximum Heater Capacity [W]", WaterThermalTank( WaterThermalTankNum ).MaxCapacity );
 				}

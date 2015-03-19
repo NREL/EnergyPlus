@@ -5,6 +5,7 @@ set( test_src
   AdvancedAFN.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
+  ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
   DataZoneEquipment.unit.cc
   DXCoils.unit.cc
@@ -15,6 +16,7 @@ set( test_src
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
   Humidifiers.unit.cc
+  HVACSizingSimulationManager.unit.cc 
   HVACStandaloneERV.unit.cc
   ICSCollector.unit.cc
   ManageElectricPower.unit.cc
@@ -24,6 +26,7 @@ set( test_src
   OutputProcessor.unit.cc
   OutputReportTabular.unit.cc
   ReportSizingManager.unit.cc
+  SizingAnalysisObjects.unit.cc
   SizingManager.unit.cc
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
@@ -31,6 +34,7 @@ set( test_src
   Vectors.unit.cc
   Vector.unit.cc
   WaterThermalTanks.unit.cc
+  ZoneTempPredictorCorrector.unit.cc
   main.cc
 )
 set( test_dependencies
