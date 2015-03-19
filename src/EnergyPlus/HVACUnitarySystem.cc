@@ -10695,7 +10695,6 @@ namespace HVACUnitarySystem {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int HeatSpeedNum;
 		int CoolSpeedNum;
-//		Real64 SpeedRatio;
 
 		CompOffMassFlow = 0.0;
 		CompOffFlowRatio = 0.0;
@@ -10716,9 +10715,6 @@ namespace HVACUnitarySystem {
 					CompOnMassFlow = UnitarySystem( UnitarySysNum ).HeatMassFlowRate( 1 );
 					CompOnFlowRatio = UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( 1 );
 				} else if ( HeatSpeedNum > 1 ) {
-//					SpeedRatio = UnitarySystem( UnitarySysNum ).HeatingSpeedRatio;
-//					CompOnMassFlow = SpeedRatio * UnitarySystem( UnitarySysNum ).HeatMassFlowRate( HeatSpeedNum ) + ( 1.0 - SpeedRatio ) * UnitarySystem( UnitarySysNum ).HeatMassFlowRate( HeatSpeedNum - 1 );
-//					CompOnFlowRatio = SpeedRatio * UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( HeatSpeedNum ) + ( 1.0 - SpeedRatio ) * UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( HeatSpeedNum - 1 );
 					CompOnMassFlow = UnitarySystem( UnitarySysNum ).HeatMassFlowRate( HeatSpeedNum );
 					CompOnFlowRatio = UnitarySystem( UnitarySysNum ).MSHeatingSpeedRatio( HeatSpeedNum );
 				}
@@ -10778,9 +10774,6 @@ namespace HVACUnitarySystem {
 							CompOnMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 1 );
 							CompOnFlowRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 1 );
 						} else {
-//							SpeedRatio = UnitarySystem( UnitarySysNum ).CoolingSpeedRatio;
-//							CompOnMassFlow = SpeedRatio * UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum ) + ( 1.0 - SpeedRatio ) * UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum - 1 );
-//							CompOnFlowRatio = SpeedRatio * UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( CoolSpeedNum ) + ( 1.0 - SpeedRatio ) * UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( CoolSpeedNum - 1 );
 							CompOnMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum );
 							CompOnFlowRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( CoolSpeedNum );
 						}
@@ -10823,9 +10816,6 @@ namespace HVACUnitarySystem {
 					CompOnMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 1 );
 					CompOnFlowRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 1 );
 				} else if ( CoolSpeedNum > 1 ) {
-//					SpeedRatio = UnitarySystem( UnitarySysNum ).CoolingSpeedRatio;
-//					CompOnMassFlow = SpeedRatio * UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum ) + ( 1.0 - SpeedRatio ) * UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum - 1 );
-//					CompOnFlowRatio = SpeedRatio * UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( CoolSpeedNum ) + ( 1.0 - SpeedRatio ) * UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( CoolSpeedNum - 1 );
 					CompOnMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum );
 					CompOnFlowRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( CoolSpeedNum );
 				}
@@ -10882,10 +10872,6 @@ namespace HVACUnitarySystem {
 						CompOnMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( 1 );
 						CompOnFlowRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( 1 );
 					} else {
-						//        SpeedRatio           = UnitarySystem(UnitarySysNum)%MSCoolingSpeedRatio(CoolSpeedNum)
-//						SpeedRatio = UnitarySystem( UnitarySysNum ).CoolingSpeedRatio;
-//						CompOnMassFlow = SpeedRatio * UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum ) + ( 1.0 - SpeedRatio ) * UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum - 1 );
-//						CompOnFlowRatio = SpeedRatio * UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( CoolSpeedNum ) + ( 1.0 - SpeedRatio ) * UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( CoolSpeedNum - 1 );
 						CompOnMassFlow = UnitarySystem( UnitarySysNum ).CoolMassFlowRate( CoolSpeedNum );
 						CompOnFlowRatio = UnitarySystem( UnitarySysNum ).MSCoolingSpeedRatio( CoolSpeedNum );
 					}
@@ -11094,7 +11080,7 @@ namespace HVACUnitarySystem {
 		InletNode = UnitarySystem( UnitarySysNum ).UnitarySystemInletNodeNum;
 
 		if ( SpeedNum > 1 ) {
-			if( CoolingLoad && MultiOrVarSpeedCoolCoil( UnitarySysNum ) || HeatingLoad && MultiOrVarSpeedHeatCoil( UnitarySysNum ) ) {
+			if( ( CoolingLoad && MultiOrVarSpeedCoolCoil( UnitarySysNum ) ) || ( HeatingLoad && MultiOrVarSpeedHeatCoil( UnitarySysNum ) ) ) {
 				AverageUnitMassFlow = PartLoadRatio * CompOnMassFlow + ( 1.0 - PartLoadRatio ) * CompOffMassFlow;
 			} else {
 				AverageUnitMassFlow = CompOnMassFlow;
@@ -11104,7 +11090,7 @@ namespace HVACUnitarySystem {
 		}
 		if ( CompOffFlowRatio > 0.0 ) {
 			if ( SpeedNum > 1 ) {
-				if( CoolingLoad && MultiOrVarSpeedCoolCoil( UnitarySysNum ) || HeatingLoad && MultiOrVarSpeedHeatCoil( UnitarySysNum ) ) {
+				if( ( CoolingLoad && MultiOrVarSpeedCoolCoil( UnitarySysNum ) ) || ( HeatingLoad && MultiOrVarSpeedHeatCoil( UnitarySysNum ) ) ) {
 					FanSpeedRatio = PartLoadRatio * CompOnFlowRatio + ( 1.0 - PartLoadRatio ) * CompOffFlowRatio;
 				} else {
 					FanSpeedRatio = CompOnFlowRatio;
