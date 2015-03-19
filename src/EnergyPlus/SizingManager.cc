@@ -2411,6 +2411,10 @@ namespace SizingManager {
 			PlantSizData.DeltaT() = 0.0;
 			PlantSizData.LoopType() = 0;
 			PlantSizData.DesVolFlowRate() = 0.0;
+			for (int i=1; i<=NumPltSizInput; i++ ){
+				PlantSizData(i).ConcurrenceOption = NonCoincident;
+				PlantSizData(i).NumTimeStepsInAvg = 1;
+			}
 		}
 
 		for ( PltSizIndex = 1; PltSizIndex <= NumPltSizInput; ++PltSizIndex ) {
@@ -2425,6 +2429,13 @@ namespace SizingManager {
 			PlantSizData( PltSizIndex ).PlantLoopName = cAlphaArgs( 1 );
 			PlantSizData( PltSizIndex ).ExitTemp = rNumericArgs( 1 );
 			PlantSizData( PltSizIndex ).DeltaT = rNumericArgs( 2 );
+			if (NumNumbers > 2) {
+			  PlantSizData( PltSizIndex ).NumTimeStepsInAvg = rNumericArgs( 3 );
+			} else {
+			  PlantSizData( PltSizIndex ).NumTimeStepsInAvg = 1.0;
+			}
+			
+
 			{ auto const loopType( cAlphaArgs( 2 ) );
 			if ( loopType == "HEATING" ) {
 				PlantSizData( PltSizIndex ).LoopType = HeatingLoop;
@@ -2441,6 +2452,35 @@ namespace SizingManager {
 				ErrorsFound = true;
 			}}
 
+			if ( NumAlphas > 2 ) {
+				{auto const concurrenceOption (cAlphaArgs(3) );
+				if ( concurrenceOption == "NONCOINCIDENT" ){
+					PlantSizData( PltSizIndex ).ConcurrenceOption = NonCoincident;
+				} else if ( concurrenceOption == "COINCIDENT" ){
+					PlantSizData( PltSizIndex ).ConcurrenceOption = Coincident;
+				} else {
+					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid data." );
+					ShowContinueError( "...incorrect " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
+					ShowContinueError( "...Valid values are \"NonCoincident\" or \"Coincident\"." );
+					ErrorsFound = true;
+						
+				}}
+			}
+			if (NumAlphas > 3){
+				{auto const sizingFactorOption ( cAlphaArgs(4) );
+					if ( sizingFactorOption == "NONE" ) {
+						PlantSizData( PltSizIndex ).SizingFactorOption = NoSizingFactorMode;
+					} else if ( sizingFactorOption == "GLOBALHEATINGSIZINGFACTOR" ) { 
+						PlantSizData( PltSizIndex ).SizingFactorOption = GlobalHeatingSizingFactorMode;
+					} else if ( sizingFactorOption == "GLOBALCOOLINGSIZINGFACTOR" ) {
+						PlantSizData( PltSizIndex ).SizingFactorOption = GlobalCoolingSizingFactorMode;
+					} else if ( sizingFactorOption == "LOOPCOMPONENTSIZINGFACTOR" ) {
+						PlantSizData( PltSizIndex ).SizingFactorOption = LoopComponentSizingFactorMode;
+					}
+				
+				}
+			
+			}
 			SetupEMSInternalVariable( "Plant Design Volume Flow Rate", PlantSizData( PltSizIndex ).PlantLoopName, "[m3/s]", PlantSizData( PltSizIndex ).DesVolFlowRate );
 		}
 

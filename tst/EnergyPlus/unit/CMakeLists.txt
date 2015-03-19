@@ -3,23 +3,30 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src/EnergyPlus )
 
 set( test_src
   AdvancedAFN.unit.cc
+  AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
+  ConvectionCoefficients.unit.cc
   DataPlant.unit.cc
   DataZoneEquipment.unit.cc
   DXCoils.unit.cc
   EvaporativeCoolers.unit.cc
   ExteriorEnergyUse.unit.cc
+  Fans.unit.cc
   FluidCoolers.unit.cc
+  Furnaces.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceManager.unit.cc
   Humidifiers.unit.cc
+  HVACSizingSimulationManager.unit.cc 
   HVACStandaloneERV.unit.cc
+  ICSCollector.unit.cc
   ManageElectricPower.unit.cc
   MixedAir.unit.cc
   PurchasedAirManager.unit.cc
   OutputProcessor.unit.cc
   OutputReportTabular.unit.cc
   ReportSizingManager.unit.cc
+  SizingAnalysisObjects.unit.cc
   SizingManager.unit.cc
   SolarShading.unit.cc
   SortAndStringUtilities.unit.cc
@@ -27,6 +34,7 @@ set( test_src
   Vectors.unit.cc
   Vector.unit.cc
   WaterThermalTanks.unit.cc
+  ZoneTempPredictorCorrector.unit.cc
   main.cc
 )
 set( test_dependencies
