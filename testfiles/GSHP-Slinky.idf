@@ -3537,7 +3537,7 @@
     Slinky GHX,       !- Name
     GHE Inlet Node,   !- Inlet Node
     GHE Outlet Node,  !- Outlet Node
-    0.0025,           !- Design Flow Rate [m3/s]
+    0.0033,           !- Design Flow Rate [m3/s]
     1.2,              !- Soil Thermal Conductivity [W/m-K]
     3200,             !- Soil Density [kg/m3]
     850,              !- Soil Specific Heat [J/kg-K]
@@ -3550,8 +3550,8 @@
     1,                !- Coil Diameter [m]
     0.2,              !- Coil Pitch [m]
     2.5,              !- Trench Depth [m]
-    15,               !- Trench Length [m]
-    2,                !- Number of Parallel Trenches
+    40,               !- Trench Length [m]
+    15,               !- Number of Parallel Trenches
     2,                !- Trench Spacing [m]
     15.5,             !- Kusuda-Achenbach Average Surface Temp [C]
     3.2,              !- Kusuda-Achenbach Average Surface Temp Amplitude [C]

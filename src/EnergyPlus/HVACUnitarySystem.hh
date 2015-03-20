@@ -1185,9 +1185,27 @@ namespace HVACUnitarySystem {
 
 	};
 
+	struct UnitarySystemNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		UnitarySystemNumericFieldData()
+		{}
+
+		// Member Constructor
+		UnitarySystemNumericFieldData(
+			FArray1_string const & FieldNames // Name of the UnitarySystem numeric field descriptions
+		) :
+		FieldNames( FieldNames )
+		{}
+	};
+
 	// Object Data
 	extern FArray1D< DesignSpecMSHPData > DesignSpecMSHP;
 	extern FArray1D< UnitarySystemData > UnitarySystem;
+	extern FArray1D< UnitarySystemNumericFieldData > UnitarySystemNumericFields;
 
 	// Functions
 

@@ -11629,6 +11629,11 @@ Label50: ;
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = DXCoil( WhichCoil ).RatedTotCap( 1 );
 			}
+		} else if ( SameString( CoilType, "Coil:Cooling:DX:MultiSpeed" ) ) {
+			WhichCoil = FindItem( CoilName, DXCoil.Name(), NumDXCoils );
+			if ( WhichCoil != 0 ) {
+				CoilCapacity = DXCoil( WhichCoil ).MSRatedTotCap( DXCoil( WhichCoil ).NumOfSpeeds );
+			}
 		} else {
 			WhichCoil = 0;
 		}

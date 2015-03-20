@@ -2428,13 +2428,20 @@
 
   Output:SQLite,
     Simple;
+
+  FaultModel:ThermostatOffset,
+    Ther_Offset_SalesFloor, !- Name
+    SalesFloor Thermostat,  !- Thermostat Name
+    ,                       !- Availability Schedule Name
+    ,                       !- Severity Schedule Name
+    1.0;                    !- Reference Thermostat Offset {deltaC}
 	
   FaultModel:HumidistatOffset, 
     Humi_Offset_SalesFloor, !- Name
     SalesFloor Humidistat,  !- Humidistat Name
-    ThermostatOffsetIndependent, !- Humidistat Offset Type
+    ThermostatOffsetDependent, !- Humidistat Offset Type
     ,                       !- Availability Schedule Name
     ,                       !- Severity Schedule Name
-    5,                      !- Reference Humidistat Offset{percent}
-    ;                       !- Related Thermostat Offset Fault Name
+    ,                       !- Reference Humidistat Offset {percent}
+    Ther_Offset_SalesFloor; !- Related Thermostat Offset Fault Name
 
