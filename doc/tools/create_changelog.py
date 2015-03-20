@@ -6,6 +6,7 @@ import sys
 import io
 import git
 import github
+import os
 
 # this date needs to be updated with the date of the previous release
 LastReleaseDate = '2014-9-30'
@@ -47,7 +48,7 @@ else:
 
 # get the pull request numbers
 g = git.Git(repo)
-log_full = g.log('--oneline', '--after="' + LastReleaseDate + '"')
+log_full = io.open(os.path.join(repo, "doc", "tools", "TESTGITLOG")).read() #g.log('--oneline', '--after="' + LastReleaseDate + '"')
 log_full_split = log_full.split('\n')
 log_merge_prs = [x for x in log_full_split if 'Merge pull request' in x]
 pr_tokens = [x.split(' ')[4] for x in log_merge_prs]
@@ -130,4 +131,4 @@ with io.open(html_file, 'w') as f2:
     out('</body>')
     out('</html>')
 
-print(" +++ AutoDocs: Completed processing changelog: processed %i merged pull requests" % len(PRS))
+print(" +++ AutoDocs: Completed processing changelog: processed %i merged pull requests" % len(pr_numbers))
