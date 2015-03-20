@@ -4,10 +4,9 @@ from __future__ import unicode_literals
 from __future__ import print_function
 import sys
 import io
+import github
 import os
 import subprocess
-import requests
-import json
 
 # this date needs to be updated with the date of the previous release
 LastReleaseDate = '2014-9-30'
@@ -72,24 +71,17 @@ for valid_pr_type in ValidPRTypes:
     PRS[valid_pr_type] = []
 
 # use the GitHub API to get pull request info
+g = github.Github(github_token)
+repo = g.get_repo(RepoName)
 for pr_num in pr_numbers:
-    # set the url for this pull request
-    github_url = "https://api.github.com/repos/NREL/EnergyPlus/issues/" + pr_num
-    # make the request
-    r = requests.get(github_url, params={'access_token':github_token})
-    # read the json response
-    j = json.loads(r.text)
-    # mine the data
-    title = j['title']
-    labels = j['labels']
-    if len(labels) != 1:
-        print(" +++ AutoDocs: %s,%s,Pull request has wrong number of labels (%i)...expected 1" % (pr_num, this_pr.title, len(labels)))
+    this_pr = repo.get_issue(int(pr_num))
+    if len(this_pr.labels) != 1:
+        print(" +++ AutoDocs: %s,%s,Pull request has wrong number of labels...expected 1" % (pr_num, this_pr.title))
     else:
         key = 'Unknown'
-        first_label_name = labels[0]['name']
-        if first_label_name in ValidPRTypes:
-            key = first_label_name
-        PRS[key].append([pr_num, title])
+        if this_pr.labels[0].name in ValidPRTypes:
+            key = this_pr.labels[0].name
+        PRS[key].append([pr_num, this_pr.title])
         # print("%s,%s,%s" % (pr_num, this_pr.title, this_pr.labels[0].name))
 
 # Now write the nice markdown output file
