@@ -4,9 +4,16 @@ from __future__ import unicode_literals
 from __future__ import print_function
 import sys
 import io
-import github
-import os
-import subprocess
+from subprocess import check_output, CalledProcessError
+import json
+try:
+    from urllib import urlencode
+except ImportError:
+    from urllib.parse import urlencode
+try:
+    from urllib2 import Request, urlopen
+except ImportError:
+    from urllib.request import Request, urlopen
 
 # this date needs to be updated with the date of the previous release
 LastReleaseDate = '2014-9-30'
@@ -14,6 +21,7 @@ LastReleaseDate = '2014-9-30'
 # this probably won't change
 RepoName = "NREL/EnergyPlus"
 EPlusRepoPath = 'https://github.com/' + RepoName
+
 
 def usage():
     print("""Script should be called with 4 positional arguments:
@@ -24,7 +32,7 @@ def usage():
  - a github token for performing authentication API requests
  - and optionally a "Y" for enabling debug mode""")
 
-# command line arguments: the path to the repo base, output markdown and html file paths, a git exe path, and a github token
+# command line arguments: repo base path, output markdown and html file paths, a git exe path, and a github token
 if len(sys.argv) == 6:
     repo = sys.argv[1]
     md_file = sys.argv[2]
@@ -49,16 +57,11 @@ else:
     sys.exit(1)
 
 # get the pull request numbers
-# PIPE wasn't working on Windows, so use a temporary file to store stdout
-with io.open('stdoutdummy.txt', 'w') as f:
-    process = subprocess.Popen([git_exe, 'log', 	'--oneline', '--after='+LastReleaseDate], stdout=f)
-    (output, err) = process.communicate()
-    exit_code = process.wait()
-# f is getting closed by here, so re-open it to read it
-with io.open('stdoutdummy.txt', 'r') as f:
-    log_full = f.read()
-if exit_code != 0:
-    pass # add error handling
+try:
+    log_full = check_output([git_exe, 'log', '--oneline', '--after=' + LastReleaseDate]).decode('utf-8')
+except CalledProcessError as ex:
+    log_full = ''
+    pass  # add error handling
 log_full_split = log_full.split('\n')
 log_merge_prs = [x for x in log_full_split if 'Merge pull request' in x]
 pr_tokens = [x.split(' ')[4] for x in log_merge_prs]
@@ -70,18 +73,32 @@ PRS = {'Unknown': []}
 for valid_pr_type in ValidPRTypes:
     PRS[valid_pr_type] = []
 
+query_args = urlencode({'access_token': github_token})
 # use the GitHub API to get pull request info
-g = github.Github(github_token)
-repo = g.get_repo(RepoName)
 for pr_num in pr_numbers:
-    this_pr = repo.get_issue(int(pr_num))
-    if len(this_pr.labels) != 1:
-        print(" +++ AutoDocs: %s,%s,Pull request has wrong number of labels...expected 1" % (pr_num, this_pr.title))
+    # set the url for this pull request
+    github_url = "https://api.github.com/repos/NREL/EnergyPlus/issues/" + pr_num + '?' + query_args
+
+    # make the request
+    req = Request(github_url)
+    response = urlopen(req)
+    the_page = response.read().decode('utf-8')
+
+    # read the json response
+    j = json.loads(the_page)
+
+    # mine the data
+    title = j['title']
+    labels = j['labels']
+    if len(labels) != 1:
+        print(" +++ AutoDocs: %s,%s,Pull request has wrong number of labels (%i)...expected 1" % (
+            pr_num, title, len(labels)))
     else:
         key = 'Unknown'
-        if this_pr.labels[0].name in ValidPRTypes:
-            key = this_pr.labels[0].name
-        PRS[key].append([pr_num, this_pr.title])
+        first_label_name = labels[0]['name']
+        if first_label_name in ValidPRTypes:
+            key = first_label_name
+        PRS[key].append([pr_num, title])
         # print("%s,%s,%s" % (pr_num, this_pr.title, this_pr.labels[0].name))
 
 # Now write the nice markdown output file
