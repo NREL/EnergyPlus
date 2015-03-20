@@ -74851,7 +74851,7 @@ FaultModel:HumidistatOffset,
        \note Enter the name of a ZoneControl:Humidistat object.
        \required-field
        \type object-list
-       \object-list ZoneControlHumidistaticNames
+       \object-list ZoneControlHumidistatNames
    A3, \field Humidistat Offset Type 
        \note Two types are available: 
        \note Type ThermostatOffsetIndependent
