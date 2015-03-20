@@ -650,7 +650,7 @@ if(BUILD_PACKAGE)
     add_custom_command( 
       TARGET energyplus
       PRE_BUILD
-      COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/doc/tools/create_changelog.py" "${CMAKE_SOURCE_DIR}" "${DOCS_OUT}/changelog.md" "${DOCS_OUT}/changelog.html" "$ENV{GITHUB_TOKEN}"
+      COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/doc/tools/create_changelog.py" "${CMAKE_SOURCE_DIR}" "${DOCS_OUT}/changelog.md" "${DOCS_OUT}/changelog.html" "${GIT_EXECUTABLE}" "$ENV{GITHUB_TOKEN}"
     )
     install(FILES "${CMAKE_BINARY_DIR}/autodocs/changelog.md" DESTINATION "./")
   else()

@@ -4,9 +4,9 @@ from __future__ import unicode_literals
 from __future__ import print_function
 import sys
 import io
-import git
 import github
 import os
+import subprocess
 
 # this date needs to be updated with the date of the previous release
 LastReleaseDate = '2014-9-30'
@@ -15,28 +15,30 @@ LastReleaseDate = '2014-9-30'
 RepoName = "NREL/EnergyPlus"
 EPlusRepoPath = 'https://github.com/' + RepoName
 
-
 def usage():
     print("""Script should be called with 4 positional arguments:
  - the path to a repository 
  - the path to a markdown output file
  - the path to a html output file
+ - the path to a local git executable
  - a github token for performing authentication API requests
  - and optionally a "Y" for enabling debug mode""")
 
-# command line arguments: the path to the repo base, output markdown and html file paths, and a github token
-if len(sys.argv) == 5:
+# command line arguments: the path to the repo base, output markdown and html file paths, a git exe path, and a github token
+if len(sys.argv) == 6:
     repo = sys.argv[1]
     md_file = sys.argv[2]
     html_file = sys.argv[3]
-    github_token = sys.argv[4]
+    git_exe = sys.argv[4]
+    github_token = sys.argv[5]
     debug = False
-elif len(sys.argv) == 6:
+elif len(sys.argv) == 7:
     repo = sys.argv[1]
     md_file = sys.argv[2]
     html_file = sys.argv[3]
-    github_token = sys.argv[4]
-    if sys.argv[5] == "Y":
+    git_exe = sys.argv[4]
+    github_token = sys.argv[5]
+    if sys.argv[6] == "Y":
         debug = True
     else:
         print("Bad debug flag, should be \"Y\" or not passed at all")
@@ -47,8 +49,16 @@ else:
     sys.exit(1)
 
 # get the pull request numbers
-g = git.Git(repo)
-log_full = io.open(os.path.join(repo, "doc", "tools", "TESTGITLOG")).read() #g.log('--oneline', '--after="' + LastReleaseDate + '"')
+# PIPE wasn't working on Windows, so use a temporary file to store stdout
+with io.open('stdoutdummy.txt', 'w') as f:
+    process = subprocess.Popen([git_exe, 'log', 	'--oneline', '--after='+LastReleaseDate], stdout=f)
+    (output, err) = process.communicate()
+    exit_code = process.wait()
+# f is getting closed by here, so re-open it to read it
+with io.open('stdoutdummy.txt', 'r') as f:
+    log_full = f.read()
+if exit_code != 0:
+    pass # add error handling
 log_full_split = log_full.split('\n')
 log_merge_prs = [x for x in log_full_split if 'Merge pull request' in x]
 pr_tokens = [x.split(' ')[4] for x in log_merge_prs]
