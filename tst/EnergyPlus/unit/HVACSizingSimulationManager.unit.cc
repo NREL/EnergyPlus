@@ -77,14 +77,14 @@ public:
 
 		// need a node to log mass flow rate from
 		Node.allocate( 1 );
-
+		TimeValue.allocate( 2 );
 		// set up time related 
 		SetupTimePointers( "Zone", TimeStepZone ); // Set up Time pointer for HB/Zone Simulation
 		SetupTimePointers( "HVAC", TimeStepSys );
 
 		NumOfTimeStepInHour = 4;
 		TimeStepFraction = 1.0 / double( NumOfTimeStepInHour );
-		TimeValue.allocate( 2 );
+
 		TimeValue( 1 ).TimeStep >>= TimeStepZone;
 		TimeValue( 1 ).CurMinute = 0; // init
 		TimeValue( 2 ).TimeStep >>= TimeStepSys;
@@ -100,11 +100,15 @@ public:
 	//destructor
 	~HVACSizingSimulationManagerTest ()
 	{
-		PlantSizData.clear();
-		PlantLoop.clear();
-		PlantReport.clear();
-
-		Environment.clear();
+		TotNumLoops = 0;
+		PlantLoop( 1 ).LoopSide.deallocate();
+		PlantLoop.deallocate();
+		PlantReport.deallocate();
+		TimeValue.deallocate();
+		Environment.deallocate();
+		Node.deallocate();
+			// Close and delete eio output file
+		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 	}
 };
 
@@ -118,7 +122,7 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3 )
 
 
 
-	Environment.clear();
+	Environment.deallocate();
 			// setup weather manager state needed
 	NumOfEnvrn = 4;
 	Environment.allocate( NumOfEnvrn );

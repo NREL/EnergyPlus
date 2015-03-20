@@ -74818,52 +74818,68 @@ FaultModel:EnthalpySensorOffset:ReturnAir,
        \units J/kg
 
 FaultModel:ThermostatOffset,
+   \memo This object describes fault of thermostat offset
    A1, \field Name
        \required-field
        \type alpha
-   A2, \field Availability Schedule Name
+       \reference ThermostatOffsetFaults
+   A2, \field Thermostat Name
+       \note Enter the name of a ZoneControl:Thermostat object.
+       \required-field
+       \type object-list
+       \object-list ZoneControlThermostaticNames
+   A3, \field Availability Schedule Name
        \type object-list
        \object-list ScheduleNames
-   A3, \field Severity Schedule Name
+   A4, \field Severity Schedule Name
        \type object-list
        \object-list ScheduleNames
-   N1, \field Reference Thermostat Offset
+   N1; \field Reference Thermostat Offset
        \required-field
        \type real
        \minimum> -10
        \maximum< 10
        \default 2
-       \units C
-   A4; \field Thermostat Name
-       \begin-extensible
-       \note Enter the name of a ZoneControl:Thermostat object.
-       \required-field
-       \type object-list
-       \object-list ZoneControlThermostaticNames
+       \units deltaC
 
-FaultModel:HumidistatOffset,
+FaultModel:HumidistatOffset, 
+   \memo This object describes fault of humidistat offset
    A1, \field Name
        \required-field
        \type alpha
-   A2, \field Availability Schedule Name
-       \type object-list
-       \object-list ScheduleNames
-   A3, \field Severity Schedule Name
-       \type object-list
-       \object-list ScheduleNames
-   N1, \field Reference Humidistat Offset
+   A2, \field Humidistat Name
+       \note Enter the name of a ZoneControl:Humidistat object.
        \required-field
+       \type object-list
+       \object-list ZoneControlHumidistaticNames
+   A3, \field Humidistat Offset Type 
+       \note Two types are available: 
+       \note Type ThermostatOffsetIndependent
+       \note Type ThermostatOffsetDependent
+       \type choice
+       \key ThermostatOffsetIndependent
+       \key ThermostatOffsetDependent
+       \default ThermostatOffsetIndependent
+   A4, \field Availability Schedule Name
+       \note This field is applicable for Type ThermostatOffsetIndependent
+       \type object-list
+       \object-list ScheduleNames
+   A5, \field Severity Schedule Name
+       \note This field is applicable for Type ThermostatOffsetIndependent
+       \type object-list
+       \object-list ScheduleNames 
+   N1, \field Reference Humidistat Offset       
+       \note Required field for Type ThermostatOffsetIndependent
        \type real
        \minimum> -20
        \maximum< 20
        \default 5
        \units percent
-   A4; \field Humidistat Name
-       \begin-extensible
-       \note Enter the name of a ZoneControl:Humidistat object.
-       \required-field
+   A6; \field Related Thermostat Offset Fault Name
+       \note Enter the name of a FaultModel:ThermostatOffset object
+       \note Required field for Type ThermostatOffsetDependent
        \type object-list
-       \object-list ZoneControlHumidistatNames
+       \object-list ThermostatOffsetFaults   
 
 FaultModel:Fouling:Coil,
    \memo This object describes fouling water heating or cooling coils
