@@ -33,6 +33,7 @@ set( test_src
   SQLite.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
+  WaterCoils.unit.cc
   WaterThermalTanks.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc
