@@ -82,4 +82,12 @@ TEST( SizeStandAloneERVTest, Test1 )
 	// Close and delete eio output file
 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 
+	// Clean up
+	ZoneEquipConfig.deallocate();
+	Zone.deallocate();
+	ZoneEqSizing.deallocate();
+	People.deallocate();
+	StandAloneERV.deallocate();
+
+
 }

@@ -94,6 +94,15 @@ TEST( HeatBalanceManagerTest, ProcessZoneData )
 	EXPECT_EQ( "Zone Two", Zone( 2 ).Name );
 	EXPECT_EQ( ASHRAETARP, Zone( 2 ).InsideConvectionAlgo );
 
+	// Clean up
+	Zone.deallocate();
+	lNumericFieldBlanks.deallocate();
+	lAlphaFieldBlanks.deallocate();
+	cAlphaFieldNames.deallocate();
+	cNumericFieldNames.deallocate();
+	cAlphaArgs.deallocate();
+	rNumericArgs.deallocate();
+
 }
 TEST( HeatBalanceManagerTest, GetWindowConstructData ) {
 	// Test get input for window construction object
