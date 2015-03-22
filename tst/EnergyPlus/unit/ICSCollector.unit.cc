@@ -51,6 +51,8 @@ TEST( ICSSolarCollectorTest, CalcPassiveExteriorBaffleGapTest ) {
 	Surface( SurfNum ).BaseSurf = SurfNum;
 	Surface( SurfNum ).Zone = ZoneNum;
 	Surface( SurfNum ).IsICS = true;
+	Surface( SurfNum ).ExtConvCoeff = 0;
+	Surface( SurfNum ).ExtWind = false;
 	// allocate construction variable data
 	Construct.allocate( ConstrNum );
 	Construct( ConstrNum ).LayerPoint.allocate( MatNum );
