@@ -15,13 +15,10 @@ try:
 except ImportError:
     from urllib.request import Request, urlopen
 
-# this date needs to be updated with the date of the previous release
-LastReleaseDate = '2014-9-30'
-
 # this probably won't change
 RepoName = "NREL/EnergyPlus"
 EPlusRepoPath = 'https://github.com/' + RepoName
-
+debug = False
 
 def usage():
     print("""Script should be called with 4 positional arguments:
@@ -30,41 +27,36 @@ def usage():
  - the path to a html output file
  - the path to a local git executable
  - a github token for performing authentication API requests
- - and optionally a "Y" for enabling debug mode""")
+ - the commit SHA for the last major release""")
 
 # command line arguments: repo base path, output markdown and html file paths, a git exe path, and a github token
-if len(sys.argv) == 6:
+if len(sys.argv) == 7:
     repo = sys.argv[1]
     md_file = sys.argv[2]
     html_file = sys.argv[3]
     git_exe = sys.argv[4]
     github_token = sys.argv[5]
-    debug = False
-elif len(sys.argv) == 7:
+    last_commit = sys.argv[6]
+elif len(sys.argv) == 8:
     repo = sys.argv[1]
     md_file = sys.argv[2]
     html_file = sys.argv[3]
     git_exe = sys.argv[4]
     github_token = sys.argv[5]
-    if sys.argv[6] == "Y":
-        debug = True
-    else:
-        print("Bad debug flag, should be \"Y\" or not passed at all")
-        usage()
-        sys.exit(1)
+    last_commit = sys.argv[6]
 else:
     usage()
     sys.exit(1)
 
 # get the pull request numbers
 try:
-    log_full = check_output([git_exe, 'log', '--oneline', '--after=' + LastReleaseDate]).decode('utf-8')
+    log_full = check_output([git_exe, 'log', last_commit+'..']).decode('utf-8')
 except CalledProcessError as ex:
     log_full = ''
     pass  # add error handling
 log_full_split = log_full.split('\n')
 log_merge_prs = [x for x in log_full_split if 'Merge pull request' in x]
-pr_tokens = [x.split(' ')[4] for x in log_merge_prs]
+pr_tokens = [x.split(' ')[7] for x in log_merge_prs]
 pr_numbers = sorted([x[1:] for x in pr_tokens])
 
 # create and initialize the master array, with known keys plus an "Unknown" key
