@@ -116,6 +116,12 @@ namespace DataSizing {
 	extern int const FractionOfAutosizedCoolingCapacity;
 	extern int const FractionOfAutosizedHeatingCapacity;
 
+	// Plant Coincident sizing factor options
+	extern int const NoSizingFactorMode;
+	extern int const GlobalHeatingSizingFactorMode;
+	extern int const GlobalCoolingSizingFactorMode;
+	extern int const LoopComponentSizingFactorMode;
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// INTERFACE BLOCK SPECIFICATIONS
@@ -199,6 +205,7 @@ namespace DataSizing {
 	extern Real64 DataAutosizedHeatingCapacity; // Autosized heating capacit used for multiplying flow per capacity to get flow rate
 	extern Real64 DataConstantUsedForSizing; // base value used for sizing inputs that are ratios of other inputs
 	extern Real64 DataFractionUsedForSizing; // fractional value of base value used for sizing inputs that are ratios of other inputs
+	extern Real64 DataNonZoneNonAirloopValue; // used when equipment is not located in a zone or airloop
 	extern int DataZoneNumber; // a pointer to a served by zoneHVAC equipment
 	extern int NumZoneHVACSizing; // Number of zone HVAC sizing objects
 	extern bool TermUnitSingDuct; // TRUE if a non-induction single duct terminal unit
@@ -1773,34 +1780,25 @@ namespace DataSizing {
 		int LoopType; // type of loop: 1=heating, 2=cooling, 3=condenser
 		Real64 ExitTemp; // loop design exit (supply) temperature [C]
 		Real64 DeltaT; // loop design temperature drop (or rise) [DelK]
+		int ConcurrenceOption; // sizing option for coincident or noncoincident
+		int NumTimeStepsInAvg; // number of zone timesteps in the averaging window for coincident plant flow 
+		int SizingFactorOption; // option for what sizing factor to apply
 		// Calculated
 		Real64 DesVolFlowRate; // loop design flow rate in m3/s
 		bool VolFlowSizingDone; // flag to indicate when this loop has finished sizing flow rate
+		Real64 PlantSizFac; // hold the loop and pump sizing factor
 
 		// Default Constructor
 		PlantSizingData() :
 			LoopType( 0 ),
 			ExitTemp( 0.0 ),
 			DeltaT( 0.0 ),
+			ConcurrenceOption( 1 ),
+			NumTimeStepsInAvg( 0 ),
+			SizingFactorOption( 101 ),
 			DesVolFlowRate( 0.0 ),
-			VolFlowSizingDone( false )
-		{}
-
-		// Member Constructor
-		PlantSizingData(
-			std::string const & PlantLoopName, // name of PLANT LOOP or CONDENSER LOOP object
-			int const LoopType, // type of loop: 1=heating, 2=cooling, 3=condenser
-			Real64 const ExitTemp, // loop design exit (supply) temperature [C]
-			Real64 const DeltaT, // loop design temperature drop (or rise) [DelK]
-			Real64 const DesVolFlowRate, // loop design flow rate in m3/s
-			bool const VolFlowSizingDone // flag to indicate when this loop has finished sizing flow rate
-		) :
-			PlantLoopName( PlantLoopName ),
-			LoopType( LoopType ),
-			ExitTemp( ExitTemp ),
-			DeltaT( DeltaT ),
-			DesVolFlowRate( DesVolFlowRate ),
-			VolFlowSizingDone( VolFlowSizingDone )
+			VolFlowSizingDone( false ),
+			PlantSizFac( 1.0 )
 		{}
 
 	};

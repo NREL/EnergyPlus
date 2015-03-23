@@ -3330,25 +3330,89 @@ namespace ZoneTempPredictorCorrector {
 				for ( int iFault = 1; iFault <= NumFaultyHumidistat; ++iFault ) {
 				
 					if ( SameString( HumidityControlZone( HumidControlledZoneNum ).ControlName, FaultsHumidistatOffset( iFault ).FaultyHumidistatName ) ) {
-					
-						// Check fault availability schedules
-						if ( GetCurrentScheduleValue( FaultsHumidistatOffset( iFault ).AvaiSchedPtr ) > 0.0 ) {
+						
+						if ( SameString( FaultsHumidistatOffset( iFault ).FaultyHumidistatType, "ThermostatOffsetDependent" ) ) {
+						// For Humidistat Offset Type I: ThermostatOffsetDependent				
+						
+							bool IsThermostatFound = false;
+							double offsetThermostat = 0.0;
+							double offsetZoneRHHumidifyingSetPoint = 0.0;
+							double offsetZoneRHDehumidifyingSetPoint = 0.0;
+							double faultZoneWHumidifyingSetPoint;
+							double faultZoneWDehumidifyingSetPoint;
 							
-							// Check fault severity schedules to update the reference humidistat offset
-							double rSchVal = 1.0;
-							double offsetUpdated;							
-							if ( FaultsHumidistatOffset( iFault ).SeveritySchedPtr >= 0 ) {
-								rSchVal = GetCurrentScheduleValue( FaultsHumidistatOffset( iFault ).SeveritySchedPtr );
-							}						
-							offsetUpdated = rSchVal * FaultsHumidistatOffset( iFault ).Offset;
+							// Get the offset value of the corresponding thermostat fault object
+							if ( NumFaultyThermostat > 0 ) {
 							
-							// Positive offset means the sensor reading is higher than the actual value
-							ZoneRHHumidifyingSetPoint -= offsetUpdated; 
-							ZoneRHDehumidifyingSetPoint -= offsetUpdated;
+								//  loop through the FaultsThermostatOffset objects to find the one causes the Humidistat Offset
+								for ( int iFaultThermo = 1; iFaultThermo <= NumFaultyThermostat; ++iFaultThermo ) {
+								
+									if ( SameString( FaultsHumidistatOffset( iFault ).FaultyThermostatName, FaultsThermostatOffset( iFaultThermo ).Name ) ) {
+										IsThermostatFound = true;
+										
+										// Check fault availability schedules
+										if ( GetCurrentScheduleValue( FaultsThermostatOffset( iFaultThermo ).AvaiSchedPtr ) > 0.0 ) {
+											
+											// Check fault severity schedules to update the reference thermostat offset
+											double rSchVal = 1.0;							
+											if ( FaultsThermostatOffset( iFaultThermo ).SeveritySchedPtr >= 0 ) {
+												rSchVal = GetCurrentScheduleValue( FaultsThermostatOffset( iFaultThermo ).SeveritySchedPtr );
+											}						
+											offsetThermostat = rSchVal * FaultsThermostatOffset( iFaultThermo ).Offset;
+										}
+										
+										// Stop searching the FaultsThermostatOffset object for the Humidistat Offset
+										break;
+									}
+								}
+							}
+							
+							// The FaultsThermostatOffset specified in the FaultHumidistatOffset is not found
+							if ( ! IsThermostatFound ) {
+								ShowSevereError( "FaultModel:HumidistatOffset = \"" + FaultsHumidistatOffset( iFault ).Name + "\" invalid Reference Humidistat Offset Name = \"" + FaultsHumidistatOffset( iFault ).FaultyThermostatName + "\" not found." );
+								ShowFatalError( "Errors getting FaultModel input data.  Preceding condition(s) cause termination." );
+							}
+							
+							if ( offsetThermostat != 0.0 ) {
+								// Calculate the humidistat offset value from the thermostat offset value
+								faultZoneWHumidifyingSetPoint = PsyWFnTdbRhPb( ( MAT( ZoneNum ) + offsetThermostat ), ( ZoneRHHumidifyingSetPoint / 100.0 ), OutBaroPress );
+								faultZoneWDehumidifyingSetPoint = PsyWFnTdbRhPb( ( MAT( ZoneNum ) + offsetThermostat ), ( ZoneRHDehumidifyingSetPoint / 100.0 ), OutBaroPress );
+								offsetZoneRHHumidifyingSetPoint = ZoneRHHumidifyingSetPoint - PsyRhFnTdbWPb( MAT( ZoneNum ), faultZoneWHumidifyingSetPoint, OutBaroPress ) * 100.0;
+								offsetZoneRHDehumidifyingSetPoint = ZoneRHDehumidifyingSetPoint - PsyRhFnTdbWPb( MAT( ZoneNum ), faultZoneWDehumidifyingSetPoint, OutBaroPress ) * 100.0;
+								
+								// Apply the calculated humidistat offset value
+								// Positive offset means the sensor reading is higher than the actual value
+								ZoneRHHumidifyingSetPoint -= offsetZoneRHHumidifyingSetPoint; 
+								ZoneRHDehumidifyingSetPoint -= offsetZoneRHDehumidifyingSetPoint;
 
-							// constrain value to something reasonable
-							ZoneRHHumidifyingSetPoint = min( 100.0, max( 0.0, ZoneRHHumidifyingSetPoint ) );
-							ZoneRHDehumidifyingSetPoint = min( 100.0, max( 0.0, ZoneRHDehumidifyingSetPoint ) );
+								// constrain value to something reasonable
+								ZoneRHHumidifyingSetPoint = min( 100.0, max( 0.0, ZoneRHHumidifyingSetPoint ) );
+								ZoneRHDehumidifyingSetPoint = min( 100.0, max( 0.0, ZoneRHDehumidifyingSetPoint ) );
+							}
+								
+						} else {
+						// For Humidistat Offset Type II: ThermostatOffsetIndependent
+						
+							// Check fault availability schedules
+							if ( GetCurrentScheduleValue( FaultsHumidistatOffset( iFault ).AvaiSchedPtr ) > 0.0 ) {
+								
+								// Check fault severity schedules to update the reference humidistat offset
+								double rSchVal = 1.0;
+								double offsetUpdated;							
+								if ( FaultsHumidistatOffset( iFault ).SeveritySchedPtr >= 0 ) {
+									rSchVal = GetCurrentScheduleValue( FaultsHumidistatOffset( iFault ).SeveritySchedPtr );
+								}						
+								offsetUpdated = rSchVal * FaultsHumidistatOffset( iFault ).Offset;
+								
+								// Positive offset means the sensor reading is higher than the actual value
+								ZoneRHHumidifyingSetPoint -= offsetUpdated; 
+								ZoneRHDehumidifyingSetPoint -= offsetUpdated;
+
+								// constrain value to something reasonable
+								ZoneRHHumidifyingSetPoint = min( 100.0, max( 0.0, ZoneRHHumidifyingSetPoint ) );
+								ZoneRHDehumidifyingSetPoint = min( 100.0, max( 0.0, ZoneRHDehumidifyingSetPoint ) );
+							}
+						
 						}
 						
 						// Stop searching the FaultsHumidistatOffset object for the zone
@@ -4189,6 +4253,7 @@ namespace ZoneTempPredictorCorrector {
 			for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumExhaustNodes; ++NodeNum ) {
 				ExhMassFlowRate += Node( ZoneEquipConfig( ZoneEquipConfigNum ).ExhaustNode( NodeNum ) ).MassFlowRate / ZoneMult;
 			} // NodeNum
+			ExhMassFlowRate -= ZoneEquipConfig( ZoneEquipConfigNum ).ZoneExhBalanced; // Balanced exhaust flow assumes there are other flows providing makeup air such as mixing or infiltration, so subtract it here
 
 			if ( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode > 0 ) {
 				TotExitMassFlowRate = ExhMassFlowRate + Node( ZoneEquipConfig( ZoneEquipConfigNum ).ReturnAirNode ).MassFlowRate / ZoneMult;

@@ -217,6 +217,10 @@ namespace WeatherManager {
 		std::string Title; // Environment name
 		std::string cKindOfEnvrn; // kind of environment
 		int KindOfEnvrn; // Type of environment (see Parameters for KindOfSim in DataGlobals)
+		int DesignDayNum; // index in DesignDay structure and DesignDayInput
+		int RunPeriodDesignNum; // for WeatherFileDays, index in  RunPeriodDesign and RunPeriodDesignInput
+		int SeedEnvrnNum; // for HVAC sizing sim, new environments are copies of original environments, this is the index for original
+		int HVACSizingIterationNum; // environments for HVAC sizing simulations are associated with iteration
 		int TotalDays; // Number of days in environment
 		int StartJDay; // Day of year of first day of environment
 		int StartMonth;
@@ -252,6 +256,10 @@ namespace WeatherManager {
 			Title( "" ),
 			cKindOfEnvrn( "" ),
 			KindOfEnvrn( 0 ),
+			DesignDayNum( 0 ),
+			RunPeriodDesignNum( 0 ),
+			SeedEnvrnNum( 0 ),
+			HVACSizingIterationNum( 0 ),
 			TotalDays( 0 ),
 			StartJDay( 0 ),
 			StartMonth( 0 ),
@@ -1175,6 +1183,11 @@ namespace WeatherManager {
 	GetNextEnvironment(
 		bool & Available, // true if there is another environment, false if the end
 		bool & ErrorsFound // will be set to true if severe errors are found in inputs
+	);
+
+	void
+	AddDesignSetToEnvironmentStruct(
+		int const HVACSizingIterCount // Counter for number of times HVAC Sizing Simulation of Design Period set is being rerun
 	);
 
 	void

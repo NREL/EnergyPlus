@@ -56,6 +56,8 @@ namespace DataGlobals {
 	int const ksDesignDay( 1 );
 	int const ksRunPeriodDesign( 2 );
 	int const ksRunPeriodWeather( 3 );
+	int const ksHVACSizeDesignDay ( 4 );  // a regular design day run during HVAC Sizing Simulation
+	int const ksHVACSizeRunPeriodDesign( 5 ); // a weather period design day run during HVAC Sizing Simulation
 
 	int const ZoneTSReporting( 1 ); // value for Zone Time Step Reporting (UpdateDataAndReport)
 	int const HVACTSReporting( 2 ); // value for HVAC Time Step Reporting (UpdateDataAndReport)
@@ -153,10 +155,13 @@ namespace DataGlobals {
 	bool DoPlantSizing( false ); // User input in SimulationControl object
 	bool DoDesDaySim( false ); // User input in SimulationControl object
 	bool DoWeathSim( false ); // User input in SimulationControl object
+	bool DoHVACSizingSimulation( false ); // User input in SimulationControl object
+	int HVACSizingSimMaxIterations( 0 ); // User input in SimulationControl object
 	bool WeathSimReq( false ); // Input has a RunPeriod request
 	int KindOfSim( 0 ); // See parameters. (ksDesignDay, ksRunPeriodDesign, ksRunPeriodWeather)
 	bool DoOutputReporting( false ); // TRUE if variables to be written out
 	bool DoingSizing( false ); // TRUE when "sizing" is being performed (some error messages won't be displayed)
+	bool DoingHVACSizingSimulations( false ); // true when HVAC Sizing Simulations are being performed. 
 	bool DoingInputProcessing( false ); // TRUE when "IP" is being performed (some error messages are cached)
 	bool DisplayAllWarnings( false ); // True when selection for  "DisplayAllWarnings" is entered (turns on other warning flags)
 	bool DisplayExtraWarnings( false ); // True when selection for  "DisplayExtraWarnings" is entered
@@ -173,6 +178,8 @@ namespace DataGlobals {
 	bool MetersHaveBeenInitialized( false );
 	bool KickOffSimulation( false ); // Kick off simulation -- meaning run each environment for 1 or 2 time steps.
 	bool KickOffSizing( false ); // Kick off sizing -- meaning run each environment for 1 or 2 time steps.
+	bool RedoSizesHVACSimulation( false ); // doing kick off simulation for redoing sizes as part of sizing
+	bool FinalSizingHVACSizingSimIteration( false ); //when doing HVAC sizing Simulation
 	bool AnyEnergyManagementSystemInModel( false ); // true if there is any EMS or Erl in model.  otherwise false
 	bool AnyPlantInModel( false ); // true if there are any plant or condenser loops in model, otherwise false
 	int CacheIPErrorFile( 0 ); // Cache IP errors until IDF processing done.

@@ -64,7 +64,16 @@ TEST( OutputProcessor, TestGetMeteredVariables )
 	EXPECT_EQ( 1 , NumFound );
 
 	// Clean up
+	VarIndexes.deallocate();
+	VarTypes.deallocate();
+	IndexTypes.deallocate();
+	UnitsStrings.deallocate();
+	ResourceTypes.deallocate();
+	EndUses.deallocate();
+	Groups.deallocate();
+	Names.deallocate();
 	RVariableTypes.deallocate();
+	// Won't compile RVar.deallocate();
 	VarMeterArrays.deallocate();
 	EnergyMeters.deallocate();
 }
