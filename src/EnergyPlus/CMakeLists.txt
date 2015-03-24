@@ -258,6 +258,8 @@ SET( SRC
   HVACMultiSpeedHeatPump.hh
   HVACSingleDuctInduc.cc
   HVACSingleDuctInduc.hh
+  HVACSizingSimulationManager.cc
+  HVACSizingSimulationManager.hh
   HVACStandAloneERV.cc
   HVACStandAloneERV.hh
   HVACUnitaryBypassVAV.cc
@@ -424,6 +426,8 @@ SET( SRC_2
   SimulationManager.hh
   SingleDuct.cc
   SingleDuct.hh
+  SizingAnalysisObjects.cc
+  SizingAnalysisObjects.hh
   SizingManager.cc
   SizingManager.hh
   SolarCollectors.cc

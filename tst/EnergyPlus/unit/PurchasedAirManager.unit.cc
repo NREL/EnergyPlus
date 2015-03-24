@@ -24,7 +24,7 @@ using namespace EnergyPlus::DataSizing;
 TEST( SizePurchasedAirTest, Test1 )
 {
 
-	int PurchAirNum;
+	int PurchAirNum = 1;
 	int write_stat;
 	// Open the Initialization Output File (lifted from SimulationManager.cc)
 	OutputFileInits = GetNewUnitNumber( );
@@ -56,9 +56,8 @@ TEST( SizePurchasedAirTest, Test1 )
 	FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat = 0.010;
 	FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow = 0.0103747425;
 
-	PurchAir.allocate( 1 );
-	PurchAirNumericFields.allocate( 1 );
-	PurchAirNum = 1;
+	PurchAir.allocate( 10 );
+	PurchAirNumericFields.allocate( 10 );
 	PurchAirNumericFields( PurchAirNum ).FieldNames.allocate( 8 );
 	PurchAirNumericFields( PurchAirNum ).FieldNames( 5 ) = "Maximum Heating Air Flow Rate";
 	PurchAirNumericFields( PurchAirNum ).FieldNames( 6 ) = "Maximum Sensible Heating Capacity";
@@ -78,7 +77,7 @@ TEST( SizePurchasedAirTest, Test1 )
 	PurchAir( PurchAirNum ).Name = "Ideal Loads 1";
 
 	// Need this to prevent crash in RequestSizing
-	UnitarySysEqSizing.allocate(1);
+	UnitarySysEqSizing.allocate(10);
 
 	SizePurchasedAir( PurchAirNum );
 	EXPECT_DOUBLE_EQ( 1.0 , PurchAir( PurchAirNum ).MaxHeatVolFlowRate );

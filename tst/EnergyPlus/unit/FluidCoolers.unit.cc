@@ -44,10 +44,15 @@ TEST( TwoSpeedFluidCoolerInput, Test1 )
 	SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirTemp = 35;
 	SimpleFluidCooler( FluidCoolerNum ).DesignEnteringAirWetBulbTemp = 25;
 	SimpleFluidCooler( FluidCoolerNum ).DesignWaterFlowRate = AutoSize;
+	SimpleFluidCooler( FluidCoolerNum ).DesignWaterFlowRateWasAutoSized = true;
 	SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRate = AutoSize;
+	SimpleFluidCooler( FluidCoolerNum ).HighSpeedAirFlowRateWasAutoSized = true;
 	SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPower = AutoSize;
+	SimpleFluidCooler( FluidCoolerNum ).HighSpeedFanPowerWasAutoSized = true;
 	SimpleFluidCooler( FluidCoolerNum ).LowSpeedAirFlowRate = AutoSize;
+	SimpleFluidCooler( FluidCoolerNum ).LowSpeedAirFlowRateWasAutoSized = true;
 	SimpleFluidCooler( FluidCoolerNum ).LowSpeedFanPower = AutoSize;
+	SimpleFluidCooler( FluidCoolerNum ).LowSpeedFanPowerWasAutoSized = true;
 	SimpleFluidCooler( FluidCoolerNum ).FluidCoolerLowSpeedNomCap = 30000;
 
 
@@ -64,10 +69,12 @@ TEST( TwoSpeedFluidCoolerInput, Test1 )
 
 	SimpleFluidCooler( 1 ).DesignEnteringWaterTemp = 50;
 	SimpleFluidCooler( 1 ).FluidCoolerLowSpeedNomCap = AutoSize;
+	SimpleFluidCooler( 1 ).FluidCoolerLowSpeedNomCapWasAutoSized = true;
 	testResult = TestFluidCoolerTwoSpeedInputForDesign( cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames, FluidCoolerNum );
 	EXPECT_FALSE( testResult ); // no error message triggered
 
 	SimpleFluidCooler( 1 ).FluidCoolerLowSpeedNomCap = 0; // this should trigger the original error condition 
+	SimpleFluidCooler( 1 ).FluidCoolerLowSpeedNomCapWasAutoSized = false;
 	testResult = TestFluidCoolerTwoSpeedInputForDesign( cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames, FluidCoolerNum );
 	EXPECT_TRUE( testResult ); // error message triggered
 
