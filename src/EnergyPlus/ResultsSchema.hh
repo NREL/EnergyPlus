@@ -139,7 +139,6 @@ namespace EnergyPlus {
 			void pushVariableValue(const int reportID, double value);
 			
 			Variable* lastVariable();
-			std::vector < Variable *> variables();
 			
 			cJSON *getVariablesJSON();
 			cJSON* getJSON();
@@ -153,8 +152,8 @@ namespace EnergyPlus {
 			bool IVariablesScanned;
 			std::string ReportFrequency;
 			std::vector < std::string > TS;
-			std::vector < Variable *> outputVariables;
 			std::unordered_map< int, Variable * > variableMap; // for O(1) lookup when adding to data structure
+			int lastVarID;
 		};
 
 

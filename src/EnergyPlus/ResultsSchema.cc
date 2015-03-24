@@ -299,12 +299,12 @@ namespace EnergyPlus {
 		}
 
 		void DataFrame::addVariable(Variable *var) {
-			outputVariables.push_back(var);
-			variableMap.insert(VarPtrPair(lastVariable()->reportID(), lastVariable()));
+			lastVarID = var->reportID();
+			variableMap.insert(VarPtrPair(lastVarID, var));
 		}
 
 		Variable* DataFrame::lastVariable() {
-			return outputVariables.back();
+			return variableMap.at(lastVarID);
 		}
 
 		void DataFrame::newRow(const int month, const int dayOfMonth, const int hourOfDay, const int curMin) {
@@ -352,17 +352,12 @@ namespace EnergyPlus {
 			variableMap[reportID]->pushValue(value); 
 		}
 
-		std::vector< Variable*> DataFrame::variables() {
-			return outputVariables;
-		}
-
 		cJSON* DataFrame::getVariablesJSON() {
 			cJSON *arr;
 			arr = cJSON_CreateArray();
-			for (int i = 0; i < variables().size(); i++)
-				cJSON_AddItemToArray(arr, variables()[i]->getJSON());
-			for (int i = 0; i < variables().size(); i++)
-				cJSON_AddItemToArray(arr, variables()[i]->getJSON());
+			//for (int i = 0; i < variables().size(); i++);
+			for (auto it = variableMap.begin(); it != variableMap.end(); ++it)
+				cJSON_AddItemToArray(arr, it->second->getJSON());
 			return arr;
 		}
 
@@ -375,22 +370,23 @@ namespace EnergyPlus {
 			cJSON_AddItemToObject(_root, "Cols", _col = cJSON_CreateArray());
 			cJSON_AddItemToObject(_root, "Rows", _row = cJSON_CreateArray());
 
-			for (int i = 0; i < outputVariables.size(); ++i) {
+			for (auto it = variableMap.begin(); it != variableMap.end(); ++it) {
 				cJSON_AddItemToArray(_col, _colfld = cJSON_CreateObject());
-				cJSON_AddStringToObject(_colfld, "Variable", outputVariables[i]->variableName().c_str());
-				cJSON_AddStringToObject(_colfld, "UUID", outputVariables[i]->UUID().c_str());
+				cJSON_AddStringToObject(_colfld, "Variable", it->second->variableName().c_str());
+				cJSON_AddStringToObject(_colfld, "Units", it->second->units().c_str());
+				cJSON_AddStringToObject(_colfld, "UUID", it->second->UUID().c_str());
 			}
 
 			std::vector <double> vals;
 			vals.reserve(10000);
 
 			// if DataFrame is enabled and control reaches here, there must be at least one o/p variable
-			assert(TS.size() == outputVariables[0]->values().size());
+			assert(TS.size() == variableMap.begin()->second->values().size());
 
 			for (int row = 0; row < TS.size(); ++row) {
 				vals.clear();
-				for (int vars = 0; vars < outputVariables.size(); ++vars) {
-					vals.push_back(outputVariables[vars]->values()[row]);
+				for (auto it = variableMap.begin(); it != variableMap.end(); ++it) {
+					vals.push_back(it->second->values()[row]);
 				}
 				cJSON_AddItemToArray(_row, _rowvec = cJSON_CreateObject());
 				cJSON_AddItemToObject(_rowvec, TS.at(row).c_str(), cJSON_CreateDoubleArray(&vals[0], vals.size()));
@@ -655,7 +651,7 @@ namespace EnergyPlus {
 					if (IndexType == ZoneVar)
 						RIDetailedZoneTSData.setRVariablesScanned(true);
 					if (IndexType == HVACVar)
-						RIDetailedZoneTSData.setRVariablesScanned(true);
+						RIDetailedHVACTSData.setRVariablesScanned(true);
 					break;
 				case 0:  // at 'EndTimeStepFlag'
 					RITimestepTSData.setRVariablesScanned(true);
@@ -696,8 +692,8 @@ namespace EnergyPlus {
 						}
 						else if (IndexType == HVACVar && IVariableTypes(Loop).IndexType == HVACVar)
 						{
-							RIDetailedZoneTSData.setIDataFrameEnabled(true);
-							RIDetailedZoneTSData.addVariable(var);
+							RIDetailedHVACTSData.setIDataFrameEnabled(true);
+							RIDetailedHVACTSData.addVariable(var);
 						}
 						break;
 					case 0:  // at 'EndTimeStepFlag'
@@ -730,7 +726,7 @@ namespace EnergyPlus {
 					if (IndexType == ZoneVar)
 						RIDetailedZoneTSData.setIVariablesScanned(true);
 					if (IndexType == HVACVar)
-						RIDetailedZoneTSData.setIVariablesScanned(true);
+						RIDetailedHVACTSData.setIVariablesScanned(true);
 					break;
 				case 0:  // at 'EndTimeStepFlag'
 					RITimestepTSData.setIVariablesScanned(true);
@@ -773,8 +769,8 @@ namespace EnergyPlus {
 					for (int Loop = 1; Loop <= EnergyMeters.size(); ++Loop) {
 						if (EnergyMeters(Loop).RptHR || EnergyMeters(Loop).RptHRFO) {
 							MeterVariable *var = new MeterVariable(EnergyMeters(Loop).Name, ReportFrequency, EnergyMeters(Loop).HRRptNum, EnergyMeters(Loop).Units);
-							TSMeters.addVariable(var);
-							TSMeters.setRDataFrameEnabled(true);
+							HRMeters.addVariable(var);
+							HRMeters.setRDataFrameEnabled(true);
 						}
 						if (EnergyMeters(Loop).RptAccHR || EnergyMeters(Loop).RptAccHRFO) {
 							MeterVariable *var = new MeterVariable(EnergyMeters(Loop).Name, ReportFrequency, EnergyMeters(Loop).HRAccRptNum, EnergyMeters(Loop).Units);
@@ -853,7 +849,7 @@ namespace EnergyPlus {
 
 		void ResultsSchema::writeTimeSeriesFiles()
 		{
-
+			// Output detailed Zone time series data
 			if (OutputSchema->RIDetailedZoneTSData.rDataFrameEnabled() || OutputSchema->RIDetailedZoneTSData.iDataFrameEnabled())
 				OutputSchema->RIDetailedZoneTSData.writeFile();
 
