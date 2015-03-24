@@ -50,6 +50,7 @@ using namespace DXCoils;
 using namespace DataHVACGlobals;
 using namespace CurveManager;
 using namespace OutputReportPredefined;
+using namespace EnergyPlus::Psychrometrics;
 
 TEST( DXCoilsTest, Test1 )
 {
@@ -62,6 +63,7 @@ TEST( DXCoilsTest, Test1 )
 	int DXCoilNum;
 	int CurveNum;
 
+	InitializePsychRoutines();
 	NumDXCoils = 2;
 	DXCoilNum = 2;
 	DXCoil.allocate( NumDXCoils );
@@ -178,6 +180,8 @@ TEST( DXCoilsTest, Test1 )
 	DXCoil.deallocate();
 	DXCoilNumericFields.deallocate();
 	PerfCurve.deallocate();
+	cached_Twb.deallocate();
+	cached_Psat.deallocate();
 
 }
 
