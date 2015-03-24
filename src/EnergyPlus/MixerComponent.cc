@@ -61,7 +61,7 @@ namespace MixerComponent {
 	int NumMixers( 0 ); // The Number of Mixers found in the Input
 	int LoopInletNode( 0 );
 	int LoopOutletNode( 0 );
-	static bool GetInputFlag( true ); // Flag set to make sure you get input once
+	bool GetInputFlag( true ); // Flag set to make sure you get input once
 	FArray1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Mixers
