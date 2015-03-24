@@ -34,6 +34,33 @@ set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/license.txt")
 
 install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION ./ )
 
+# Some docs are generated on the fly here, create a dir for the 'built' files
+set( DOCS_OUT "${CMAKE_BINARY_DIR}/autodocs" )
+install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E make_directory \"${DOCS_OUT}\")")
+
+# the output variables listing
+install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/parse_output_variables.py\" \"${CMAKE_SOURCE_DIR}/src/EnergyPlus\" \"${DOCS_OUT}/SetupOutputVariables.csv\" \"${DOCS_OUT}/SetupOutputVariables.md\")")
+install(FILES "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.csv" DESTINATION "./")
+install(FILES "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.md" DESTINATION "./")
+
+# the example file summary
+install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/example_file_summary.py\" \"${CMAKE_SOURCE_DIR}/testfiles\" \"${DOCS_OUT}/ExampleFiles.html\")")
+install(FILES "${DOCS_OUT}/ExampleFiles.html" DESTINATION "./ExampleFiles/")
+
+# the example file objects link
+install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/example_file_objects.py\" \"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd\" \"${CMAKE_SOURCE_DIR}/testfiles\" \"${DOCS_OUT}/ExampleFiles-ObjectsLink.html\")")
+install(FILES "${DOCS_OUT}/ExampleFiles-ObjectsLink.html" DESTINATION "./ExampleFiles/")
+
+# the change log, only if we do have a github token in the environment
+# Watch out! GITHUB_TOKEN could go out of scope by the time install target is run.
+# Better to move this condition into the install CODE.
+if(NOT "$ENV{GITHUB_TOKEN}" STREQUAL "")
+  install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/create_changelog.py\" \"${CMAKE_SOURCE_DIR}\" \"${DOCS_OUT}/changelog.md\" \"${DOCS_OUT}/changelog.html\" \"${GIT_EXECUTABLE}\" \"$ENV{GITHUB_TOKEN}\" \"${PREV_RELEASE_SHA}\")")
+  install(FILES "${CMAKE_BINARY_DIR}/autodocs/changelog.md" DESTINATION "./")
+else()
+  message(WARNING "No GITHUB_TOKEN found in environment; package won't be complete")
+endif()
+
 # Install files that are in the current repo
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/datasets/AirCooledChiller.idf" DESTINATION "./DataSets")
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/datasets/ASHRAE_2005_HOF_Materials.idf" DESTINATION "./DataSets")
