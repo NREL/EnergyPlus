@@ -72,9 +72,12 @@ for pr_num in pr_numbers:
     github_url = "https://api.github.com/repos/NREL/EnergyPlus/issues/" + pr_num + '?' + query_args
 
     # make the request
-    req = Request(github_url)
-    response = urlopen(req)
-    the_page = response.read().decode('utf-8')
+    try:
+        req = Request(github_url)
+        response = urlopen(req)
+        the_page = response.read().decode('utf-8')
+    except Exception as e:
+        print(str(e))
 
     # read the json response
     j = json.loads(the_page)
@@ -91,7 +94,6 @@ for pr_num in pr_numbers:
         if first_label_name in ValidPRTypes:
             key = first_label_name
         PRS[key].append([pr_num, title])
-        # print("%s,%s,%s" % (pr_num, this_pr.title, this_pr.labels[0].name))
 
 # Now write the nice markdown output file
 with io.open(md_file, 'w') as f:

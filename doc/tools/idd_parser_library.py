@@ -47,7 +47,7 @@ class iddFile(object):
         idd_data_joined = ''.join(lines_a)
         idd_object_strings = idd_data_joined.split(';')
 
-        # phase 3: inspect each object and its fields
+        # phase 3: inspect each object and get it's name
         self.iddObjects = []
         for idf_object in idd_object_strings:
             tokens = idf_object.split(',')

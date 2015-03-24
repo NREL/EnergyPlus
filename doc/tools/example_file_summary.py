@@ -130,7 +130,6 @@ for idf in idf_set:
             if 'Floor Area' in comment:
                 idf_summary.floorArea = float(comment[comment.find(':') + 1:comment.find('m2')].strip())
             elif 'Number of Stories' in comment:
-                # if idf_name == "5ZoneAirCooled.idf": print(comment)
                 idf_summary.numberFloors = int(comment[comment.find(':') + 1:])
         except Exception as e:
             pass
@@ -156,7 +155,6 @@ with io.open(html_file, 'w') as f:
     out('</style>')
     out('<h1>EnergyPlus Example File Summary</h1>')
     out('This file is auto-generated from the objects and comments in the example files in GitHub.')
-    # out('<h2>' + descriptor + '</h2>')
     out('<table border="1" >')
     out(idf_summary_class.IDFSummary.summarize_header_html())
     entry = 0
