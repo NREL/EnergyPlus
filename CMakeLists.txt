@@ -48,6 +48,8 @@ option( BUILD_FORTRAN "Build Fortran stuff" OFF )
 # Turning ENABLE_GTEST_DEBUG_MODE ON will cause assertions and exceptions to halt the test case and unwind.
 # Turn this option OFF for automated testing.
 option( ENABLE_GTEST_DEBUG_MODE "Enable options to help debug test failures" ON )
+option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist commands to install files from remote resources on the internet" ON )
+mark_as_advanced( ENABLE_INSTALL_REMOTE )
 
 # we don't need all devs to have Python installed.  There are 2 cases where we do want it
 # 1. Doing regression testing; which would be: BUILD_TESTING AND ENABLE_REGRESSION_TESTING
