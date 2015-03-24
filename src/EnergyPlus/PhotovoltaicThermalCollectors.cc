@@ -188,6 +188,7 @@ namespace PhotovoltaicThermalCollectors {
 		if ( present( InitLoopEquip ) ) {
 			if ( InitLoopEquip ) {
 				InitPVTcollectors( PVTnum, FirstHVACIteration );
+				SizePVT( PVTnum );
 				return;
 			}
 		}
@@ -440,6 +441,9 @@ namespace PhotovoltaicThermalCollectors {
 
 			PVT( Item ).DesignVolFlowRate = rNumericArgs( 1 );
 			PVT( Item ).SizingInit = true;
+			if ( PVT( Item ).DesignVolFlowRate == AutoSize ) {
+				PVT( Item ).DesignVolFlowRateWasAutoSized = true;
+			}
 			if ( PVT( Item ).DesignVolFlowRate != AutoSize ) {
 
 				if ( PVT( Item ).WorkingFluidType == LiquidWorkingFluid ) {
@@ -604,8 +608,8 @@ namespace PhotovoltaicThermalCollectors {
 			MySetPointCheckFlag = false;
 		}
 
-		//Size design flow rate
-		if ( ! SysSizingCalc && PVT( PVTnum ).SizingInit ) {
+		if ( ! SysSizingCalc && PVT( PVTnum ).SizingInit 
+				&& ( PVT( PVTnum ).WorkingFluidType == AirWorkingFluid ) ) {
 			SizePVT( PVTnum );
 		}
 
@@ -719,6 +723,9 @@ namespace PhotovoltaicThermalCollectors {
 		using DataEnvironment::StdRhoAir;
 		using DataLoopNode::Node;
 		using General::RoundSigDigits;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToReport;
+		using DataPlant::PlantFinalSizesOkayToReport;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -738,13 +745,11 @@ namespace PhotovoltaicThermalCollectors {
 		//unused1208  CHARACTER(len=MaxNameLength) :: equipName     ! Name of boiler object
 		Real64 DesVolFlow;
 		Real64 DesMassFlow;
-		bool IsAutoSize; // Indicator to autosize
 		bool HardSizeNoDesRun; // Indicator to hardsize and no sizing run
 		bool SizingDesRunThisAirSys; // true if a particular air system had a Sizing:System object and system sizing done
 		Real64 DesignVolFlowRateDes; // Autosize design volume flow for reporting
 		Real64 DesignVolFlowRateUser; // Hardsize design volume flow for reporting
 
-		IsAutoSize = false;
 		if ( SysSizingRunDone || ZoneSizingRunDone ) {
 			HardSizeNoDesRun = false;
 		} else {
@@ -769,10 +774,6 @@ namespace PhotovoltaicThermalCollectors {
 			if ( PVT( PVTnum ).WLoopNum > 0 ) {
 				PltSizNum = PlantLoop( PVT( PVTnum ).WLoopNum ).PlantSizNum;
 			}
-
-			if ( PVT( PVTnum ).DesignVolFlowRate == AutoSize ) {
-				IsAutoSize = true;
-			}
 			if ( PVT( PVTnum ).WLoopSideNum == SupplySide ) {
 				if ( PltSizNum > 0 ) {
 					if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
@@ -782,12 +783,14 @@ namespace PhotovoltaicThermalCollectors {
 					}
 					DesignVolFlowRateDes = DesVolFlow;
 				} else {
-					if ( IsAutoSize ) {
-						ShowSevereError( "Autosizing of PVT solar collector design flow rate requires a Sizing:Plant object" );
-						ShowContinueError( "Occurs in PVT object=" + PVT( PVTnum ).Name );
-						ErrorsFound = true;
+					if ( PVT( PVTnum ).DesignVolFlowRateWasAutoSized ) {
+						if ( PlantFirstSizesOkayToFinalize ) {
+							ShowSevereError( "Autosizing of PVT solar collector design flow rate requires a Sizing:Plant object" );
+							ShowContinueError( "Occurs in PVT object=" + PVT( PVTnum ).Name );
+							ErrorsFound = true;
+						}
 					} else { // Hardsized
-						if ( PVT( PVTnum ).DesignVolFlowRate > 0.0 ) {
+						if ( PlantFinalSizesOkayToReport && PVT( PVTnum ).DesignVolFlowRate > 0.0 ) {
 							ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name, "User-Specified Design Flow Rate [m3/s]", PVT( PVTnum ).DesignVolFlowRate );
 						}
 					}
@@ -795,15 +798,24 @@ namespace PhotovoltaicThermalCollectors {
 			} else if ( PVT( PVTnum ).WLoopSideNum == DemandSide ) {
 				DesignVolFlowRateDes = PVT( PVTnum ).AreaCol * SimplePVTWaterSizeFactor;
 			}
-			if ( IsAutoSize ) {
+			if ( PVT( PVTnum ).DesignVolFlowRateWasAutoSized ) {
 				PVT( PVTnum ).DesignVolFlowRate = DesignVolFlowRateDes;
-				ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name, "Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes );
+				if ( PlantFinalSizesOkayToReport ) {
+					ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name, 
+						"Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes );
+				}
+				if ( PlantFirstSizesOkayToReport ) {
+					ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name, 
+						"Initial Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes );
+				}
 				RegisterPlantCompDesignFlow( PVT( PVTnum ).PlantInletNodeNum, PVT( PVTnum ).DesignVolFlowRate );
-				PVT( PVTnum ).SizingInit = false;
+
 			} else { //Hardsized with sizing data
-				if ( PVT( PVTnum ).DesignVolFlowRate > 0.0 && DesignVolFlowRateDes > 0.0 ) {
+				if ( PVT( PVTnum ).DesignVolFlowRate > 0.0 && DesignVolFlowRateDes > 0.0 && PlantFinalSizesOkayToReport ) {
 					DesignVolFlowRateUser = PVT( PVTnum ).DesignVolFlowRate;
-					ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name, "Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes, "User-Specified Design Flow Rate [m3/s]", DesignVolFlowRateUser );
+					ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name, 
+						"Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes, 
+						"User-Specified Design Flow Rate [m3/s]", DesignVolFlowRateUser );
 					if ( DisplayExtraWarnings ) {
 						if ( ( std::abs( DesignVolFlowRateDes - DesignVolFlowRateUser ) / DesignVolFlowRateUser ) > AutoVsHardSizingThreshold ) {
 							ShowMessage( "SizeSolarCollector: Potential issue with equipment sizing for " + PVT( PVTnum ).Name );
@@ -819,15 +831,12 @@ namespace PhotovoltaicThermalCollectors {
 
 		if ( PVT( PVTnum ).WorkingFluidType == AirWorkingFluid ) {
 
-			if ( PVT( PVTnum ).DesignVolFlowRate == AutoSize ) {
-				IsAutoSize = true;
-			}
-
 			if ( CurSysNum > 0 ) {
-				if ( ! IsAutoSize && ! SizingDesRunThisAirSys ) { // Simulation continue
+				if ( ! PVT( PVTnum ).DesignVolFlowRateWasAutoSized && ! SizingDesRunThisAirSys ) { // Simulation continue
 					HardSizeNoDesRun = true;
 					if ( PVT( PVTnum ).DesignVolFlowRate > 0.0 ) {
-						ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name, "User-Specified Design Flow Rate [m3/s]", PVT( PVTnum ).DesignVolFlowRate );
+						ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name, 
+							"User-Specified Design Flow Rate [m3/s]", PVT( PVTnum ).DesignVolFlowRate );
 					}
 				} else {
 					CheckSysSizing( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name );
@@ -853,10 +862,12 @@ namespace PhotovoltaicThermalCollectors {
 					PVT( PVTnum ).MaxMassFlowRate = DesMassFlow;
 				}
 				if ( ! HardSizeNoDesRun ) {
-					if ( IsAutoSize ) {
+					if ( PVT( PVTnum ).DesignVolFlowRateWasAutoSized ) {
 						PVT( PVTnum ).DesignVolFlowRate = DesignVolFlowRateDes;
-						ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name, "Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes );
+						ReportSizingOutput( "SolarCollector:FlatPlate:PhotovoltaicThermal", PVT( PVTnum ).Name, 
+								"Design Size Design Flow Rate [m3/s]", DesignVolFlowRateDes );
 						PVT( PVTnum ).SizingInit = false;
+
 					} else {
 						if ( PVT( PVTnum ).DesignVolFlowRate > 0.0 && DesignVolFlowRateDes > 0.0 ) {
 							DesignVolFlowRateUser = PVT( PVTnum ).DesignVolFlowRate;

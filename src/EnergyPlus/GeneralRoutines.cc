@@ -1043,9 +1043,14 @@ CalcPassiveExteriorBaffleGap(
 			ICSULossbottom = 0.40;
 			ICSWaterTemp = 20.0;
 		} else {
-			ICSULossbottom = Collector( CollectorNum ).UbLoss;
-			ICSWaterTemp = Collector( CollectorNum ).TempOfWater;
-			MyICSEnvrnFlag = false;
+			if ( ! Collector.allocated() ) {
+				ICSULossbottom = 0.40;
+				ICSWaterTemp = 20.0;
+			} else {
+				ICSULossbottom = Collector( CollectorNum ).UbLoss;
+				ICSWaterTemp = Collector( CollectorNum ).TempOfWater;
+				MyICSEnvrnFlag = false;
+			}
 		}
 	}
 	if ( ! BeginEnvrnFlag ) {

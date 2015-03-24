@@ -4747,16 +4747,18 @@ namespace Furnaces {
 							}
 						}
 					}
-					if ( Furnace( FurnaceNum ).FanVolFlow + 1e-10 < Furnace( FurnaceNum ).HeatVolumeFlowRate( NumOfSpeedHeating ) ) {
-						ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( Furnace( FurnaceNum ).FanVolFlow, 7 ) + " in fan object is less than the MSHP system air flow rate when heating is required (" + TrimSigDigits( Furnace( FurnaceNum ).HeatVolumeFlowRate( NumOfSpeedHeating ), 7 ) + ")." );
-						ShowContinueError( " The MSHP system flow rate when heating is required is reset to the fan flow rate and the simulation continues." );
-						ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + Furnace( FurnaceNum ).Name );
-						Furnace( FurnaceNum ).HeatVolumeFlowRate( NumOfSpeedHeating ) = Furnace( FurnaceNum ).FanVolFlow;
-						for ( i = NumOfSpeedHeating - 1; i >= 1; --i ) {
-							if ( Furnace( FurnaceNum ).HeatVolumeFlowRate( i ) > Furnace( FurnaceNum ).HeatVolumeFlowRate( i + 1 ) ) {
-								ShowContinueError( " The MSHP system flow rate when heating is required is reset to the flow rate at higher speed and the simulation continues at Speed" + TrimSigDigits( i ) + '.' );
-								ShowContinueError( " Occurs in " + CurrentModuleObject + " system = " + Furnace( FurnaceNum ).Name );
-								Furnace( FurnaceNum ).HeatVolumeFlowRate( i ) = Furnace( FurnaceNum ).HeatVolumeFlowRate( i + 1 );
+					if( NumOfSpeedHeating > 0 ) {
+						if ( Furnace( FurnaceNum ).FanVolFlow + 1e-10 < Furnace( FurnaceNum ).HeatVolumeFlowRate( NumOfSpeedHeating ) ) {
+							ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( Furnace( FurnaceNum ).FanVolFlow, 7 ) + " in fan object is less than the MSHP system air flow rate when heating is required (" + TrimSigDigits( Furnace( FurnaceNum ).HeatVolumeFlowRate( NumOfSpeedHeating ), 7 ) + ")." );
+							ShowContinueError( " The MSHP system flow rate when heating is required is reset to the fan flow rate and the simulation continues." );
+							ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + Furnace( FurnaceNum ).Name );
+							Furnace( FurnaceNum ).HeatVolumeFlowRate( NumOfSpeedHeating ) = Furnace( FurnaceNum ).FanVolFlow;
+							for ( i = NumOfSpeedHeating - 1; i >= 1; --i ) {
+								if ( Furnace( FurnaceNum ).HeatVolumeFlowRate( i ) > Furnace( FurnaceNum ).HeatVolumeFlowRate( i + 1 ) ) {
+									ShowContinueError( " The MSHP system flow rate when heating is required is reset to the flow rate at higher speed and the simulation continues at Speed" + TrimSigDigits( i ) + '.' );
+									ShowContinueError( " Occurs in " + CurrentModuleObject + " system = " + Furnace( FurnaceNum ).Name );
+									Furnace( FurnaceNum ).HeatVolumeFlowRate( i ) = Furnace( FurnaceNum ).HeatVolumeFlowRate( i + 1 );
+								}
 							}
 						}
 					}
@@ -4785,8 +4787,16 @@ namespace Furnaces {
 						Furnace( FurnaceNum ).IdleSpeedRatio = Furnace( FurnaceNum ).IdleVolumeAirRate / Furnace( FurnaceNum ).FanVolFlow;
 					}
 					// set the node max and min mass flow rates based on reset volume flow rates
-					Node( InNode ).MassFlowRateMax = max( Furnace( FurnaceNum ).CoolMassFlowRate( NumOfSpeedCooling ), Furnace( FurnaceNum ).HeatMassFlowRate( NumOfSpeedHeating ) );
-					Node( InNode ).MassFlowRateMaxAvail = max( Furnace( FurnaceNum ).CoolMassFlowRate( NumOfSpeedCooling ), Furnace( FurnaceNum ).HeatMassFlowRate( NumOfSpeedHeating ) );
+					if( NumOfSpeedCooling > 0 && NumOfSpeedHeating == 0 ) {
+						Node( InNode ).MassFlowRateMax = max( Furnace( FurnaceNum ).CoolMassFlowRate( NumOfSpeedCooling ), Furnace( FurnaceNum ).MaxHeatAirMassFlow );
+						Node( InNode ).MassFlowRateMaxAvail = max( Furnace( FurnaceNum ).CoolMassFlowRate( NumOfSpeedCooling ), Furnace( FurnaceNum ).MaxHeatAirMassFlow );
+					} else if( NumOfSpeedCooling == 0 && NumOfSpeedHeating > 0 ) {
+						Node( InNode ).MassFlowRateMax = max( Furnace( FurnaceNum ).MaxCoolAirMassFlow, Furnace( FurnaceNum ).HeatMassFlowRate( NumOfSpeedHeating ) );
+						Node( InNode ).MassFlowRateMaxAvail = max( Furnace( FurnaceNum ).MaxCoolAirMassFlow, Furnace( FurnaceNum ).HeatMassFlowRate( NumOfSpeedHeating ) );
+					} else {
+						Node( InNode ).MassFlowRateMax = max( Furnace( FurnaceNum ).CoolMassFlowRate( NumOfSpeedCooling ), Furnace( FurnaceNum ).HeatMassFlowRate( NumOfSpeedHeating ) );
+						Node( InNode ).MassFlowRateMaxAvail = max( Furnace( FurnaceNum ).CoolMassFlowRate( NumOfSpeedCooling ), Furnace( FurnaceNum ).HeatMassFlowRate( NumOfSpeedHeating ) );
+					}
 					Node( InNode ).MassFlowRateMin = 0.0;
 					Node( InNode ).MassFlowRateMinAvail = 0.0;
 					Node( OutNode ) = Node( InNode );
@@ -9251,13 +9261,34 @@ namespace Furnaces {
 			CompOffFlowRatio = 0.0;
 		}
 
-		if ( HeatingLoad && ( Furnace( FurnaceNum ).FurnaceType_Num == UnitarySys_HeatCool ) ) {
-			CompOnMassFlow = Furnace( FurnaceNum ).CoolMassFlowRate( Furnace( FurnaceNum ).NumOfSpeedCooling );
-			CompOnFlowRatio = Furnace( FurnaceNum ).MSCoolingSpeedRatio( Furnace( FurnaceNum ).NumOfSpeedCooling );
-			MSHPMassFlowRateLow = Furnace( FurnaceNum ).CoolMassFlowRate( Furnace( FurnaceNum ).NumOfSpeedCooling );
-			MSHPMassFlowRateHigh = Furnace( FurnaceNum ).CoolMassFlowRate( Furnace( FurnaceNum ).NumOfSpeedCooling );
+		if ( CoolingLoad && ( Furnace( FurnaceNum ).FurnaceType_Num == UnitarySys_HeatCool ) ) {
+			if( Furnace( FurnaceNum ).NumOfSpeedCooling > 0 ) {
+				CompOnMassFlow = Furnace( FurnaceNum ).CoolMassFlowRate( Furnace( FurnaceNum ).NumOfSpeedCooling );
+				CompOnFlowRatio = Furnace( FurnaceNum ).MSCoolingSpeedRatio( Furnace( FurnaceNum ).NumOfSpeedCooling );
+				MSHPMassFlowRateLow = Furnace( FurnaceNum ).CoolMassFlowRate( Furnace( FurnaceNum ).NumOfSpeedCooling );
+				MSHPMassFlowRateHigh = Furnace( FurnaceNum ).CoolMassFlowRate( Furnace( FurnaceNum ).NumOfSpeedCooling );
+			} else {
+				CompOnMassFlow = Furnace( FurnaceNum ).MaxCoolAirMassFlow;
+				CompOnFlowRatio = Furnace( FurnaceNum ).CoolingSpeedRatio;
+			}
 			AverageUnitMassFlow = ( PartLoadRatio * CompOnMassFlow ) + ( ( 1 - PartLoadRatio ) * CompOffMassFlow );
 			if ( CompOffFlowRatio > 0.0 ) {
+				FanSpeedRatio = ( PartLoadRatio * CompOnFlowRatio ) + ( ( 1 - PartLoadRatio ) * CompOffFlowRatio );
+			} else {
+				FanSpeedRatio = CompOnFlowRatio;
+			}
+		} else if( HeatingLoad && ( Furnace( FurnaceNum ).FurnaceType_Num == UnitarySys_HeatCool ) ) {
+			if( Furnace( FurnaceNum ).NumOfSpeedHeating > 0 ) {
+				CompOnMassFlow = Furnace( FurnaceNum ).HeatMassFlowRate( Furnace( FurnaceNum ).NumOfSpeedHeating );
+				CompOnFlowRatio = Furnace( FurnaceNum ).MSHeatingSpeedRatio( Furnace( FurnaceNum ).NumOfSpeedHeating );
+				MSHPMassFlowRateLow = Furnace( FurnaceNum ).HeatMassFlowRate( Furnace( FurnaceNum ).NumOfSpeedHeating );
+				MSHPMassFlowRateHigh = Furnace( FurnaceNum ).HeatMassFlowRate( Furnace( FurnaceNum ).NumOfSpeedHeating );
+			} else {
+				CompOnMassFlow = Furnace( FurnaceNum ).MaxHeatAirMassFlow;
+				CompOnFlowRatio = Furnace( FurnaceNum ).HeatingSpeedRatio;
+			}
+			AverageUnitMassFlow = ( PartLoadRatio * CompOnMassFlow ) + ( ( 1 - PartLoadRatio ) * CompOffMassFlow );
+			if( CompOffFlowRatio > 0.0 ) {
 				FanSpeedRatio = ( PartLoadRatio * CompOnFlowRatio ) + ( ( 1 - PartLoadRatio ) * CompOffFlowRatio );
 			} else {
 				FanSpeedRatio = CompOnFlowRatio;

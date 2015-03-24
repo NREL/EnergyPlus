@@ -173,6 +173,12 @@ TEST( DXCoilsTest, Test1 )
 	SetPredefinedTables();
 	SizeDXCoil( 2 );
 	EXPECT_DOUBLE_EQ( 5000.0, DXCoil( 2 ).DefrostCapacity );
+
+	// Clean up
+	DXCoil.deallocate();
+	DXCoilNumericFields.deallocate();
+	PerfCurve.deallocate();
+
 }
 
 

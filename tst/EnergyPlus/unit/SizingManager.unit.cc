@@ -157,4 +157,10 @@ TEST( GetOARequirementsTest, DSOA1 )
 	EXPECT_EQ( 0.3, OARequirements( OAIndex ).OAFlowPerZone );
 	EXPECT_EQ( 0.4, OARequirements( OAIndex ).OAFlowACH );
 
+	// Clean up
+	OARequirements.deallocate( );
+	Alphas.deallocate();
+	cAlphaFields.deallocate();
+	cNumericFields.deallocate();
+
 }
