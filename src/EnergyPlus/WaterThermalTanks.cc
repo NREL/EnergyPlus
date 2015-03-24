@@ -1325,12 +1325,6 @@ namespace WaterThermalTanks {
 						
 					} else if ( HPWH.CondenserConfig == HPWH_CONDENSER_WRAPPED ) {
 						
-						// Dummy condenser Inlet/Outlet Nodes
-						HPWHSaveNode.InletNodeName1 = "DUMMY CONDENSER INLET uMKYjHgn"; // some random characters to make it really unlikely that this will be duplicated on accident in an input file
-						HPWH.CondWaterInletNode = GetOnlySingleNode( HPWHSaveNode.InletNodeName1, ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsParent );
-						HPWHSaveNode.OutletNodeName1 = "DUMMY CONDENSER OUTLET Gwp72rxh"; // more random characters
-						HPWH.CondWaterOutletNode = GetOnlySingleNode(HPWHSaveNode.OutletNodeName1, ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsParent );
-						
 						// Wrapped Condenser Location
 						HPWH.WrappedCondenserBottomLocation = rNumericArgs( 2 + nNumericOffset );
 						HPWH.WrappedCondenserTopLocation = rNumericArgs( 3 + nNumericOffset );
@@ -1466,9 +1460,10 @@ namespace WaterThermalTanks {
 
 					// check that the DX Coil exists
 					DXCoilErrFlag = false;
+					
 					GetDXCoilIndex( HPWH.DXCoilName, HPWH.DXCoilNum, DXCoilErrFlag, cCurrentModuleObject );
 					if ( DXCoilErrFlag ) {
-						ShowContinueError( "...occurs in WaterHeater:HeatPumpPumpedCondenser =" + HPWH.Name );
+						ShowContinueError( "...occurs in " + cCurrentModuleObject + " =" + HPWH.Name );
 						ShowContinueError( "...entered DX CoilType=" + HPWH.DXCoilType );
 						ErrorsFound = true;
 					}
@@ -1488,14 +1483,14 @@ namespace WaterThermalTanks {
 						ErrorsFound = true;
 					}
 					
-					// Hook up our dummy nodes to the coil.
+					// Dummy condenser Inlet/Outlet Nodes for wrapped tanks
 					if ( HPWH.DXCoilTypeNum == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterWrapped ) {
 						DXCoils::DXCoilData &Coil =DXCoil( HPWH.DXCoilNum );
-						Coil.WaterInNode = GetOnlySingleNode( HPWHSaveNode.OutletNodeName1, ErrorsFound, cCurrentModuleObject, Coil.Name, NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
 						
-						Coil.WaterOutNode = GetOnlySingleNode( HPWHSaveNode.InletNodeName1, ErrorsFound, cCurrentModuleObject, Coil.Name, NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
-						
-						TestCompSet( cCurrentModuleObject, Coil.Name, HPWHSaveNode.OutletNodeName1, HPWHSaveNode.InletNodeName1, "Water Nodes" );
+						HPWHSaveNode.InletNodeName1 = "DUMMY CONDENSER INLET " + Coil.Name;
+						HPWH.CondWaterInletNode = GetOnlySingleNode( HPWHSaveNode.InletNodeName1, ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsParent );
+						HPWHSaveNode.OutletNodeName1 = "DUMMY CONDENSER OUTLET " + Coil.Name;
+						HPWH.CondWaterOutletNode = GetOnlySingleNode(HPWHSaveNode.OutletNodeName1, ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsParent );
 						
 					}
 

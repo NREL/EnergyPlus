@@ -3195,13 +3195,6 @@ namespace DXCoils {
 
 			GetObjectItem( CurrentModuleObject, DXHPWaterHeaterCoilNum, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			for (int i = 1; i <= NumAlphas; ++i) {
-				std::cout << i << " " << cAlphaFields(i) << " " <<  Alphas(i) << " " << lAlphaBlanks(i) << std::endl;
-			}
-			for (int i = 1; i <= NumNumbers; ++i) {
-				std::cout << i << " " << cNumericFields(i) << " " << Numbers(i) << " " << lNumericBlanks(i) << std::endl;
-			}
-
 			++DXCoilNum;
 
 			// allocate single performance mode for numeric field strings used for sizing routine
@@ -3294,6 +3287,14 @@ namespace DXCoils {
 			DXCoil( DXCoilNum ).AirOutNode = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
 			TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 3 ), Alphas( 4 ), "Air Nodes" );
+			
+			std::string const DummyCondenserInletName( "DUMMY CONDENSER INLET " + DXCoil( DXCoilNum ).Name );
+			std::string const DummyCondenserOutletName( "DUMMY CONDENSER OUTLET " + DXCoil( DXCoilNum ).Name );
+			DXCoil( DXCoilNum ).WaterInNode = GetOnlySingleNode( DummyCondenserInletName, ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+			
+			DXCoil( DXCoilNum ).WaterOutNode = GetOnlySingleNode( DummyCondenserOutletName, ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+			
+			TestCompSet( CurrentModuleObject, Alphas( 1 ), DummyCondenserInletName, DummyCondenserOutletName, "Water Nodes" );
 
 			DXCoil( DXCoilNum ).CrankcaseHeaterCapacity = Numbers( 8 );
 			if ( DXCoil( DXCoilNum ).CrankcaseHeaterCapacity < 0.0 ) {
@@ -4826,7 +4827,7 @@ namespace DXCoils {
 
 		for ( DXCoilNum = NumDoe2DXCoils + NumDXMulModeCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + 1; DXCoilNum <= NumDoe2DXCoils + NumDXMulModeCoils + NumDXHeatingCoils + NumDXMulSpeedCoils + NumDXHeatPumpWaterHeaterPumpedCoils; ++DXCoilNum ) {
 			// Setup Report Variables for Cooling Equipment
-			// CurrentModuleObject='Coil:WaterHeating:AirToWaterHeatPump:Pumped'
+			// CurrentModuleObject='Coil:WaterHeating:AirToWaterHeatPump:Pumped or Wrapped'
 			SetupOutputVariable( "Cooling Coil Total Cooling Rate [W]", DXCoil( DXCoilNum ).TotalCoolingEnergyRate, "System", "Average", DXCoil( DXCoilNum ).Name );
 			SetupOutputVariable( "Cooling Coil Total Cooling Energy [J]", DXCoil( DXCoilNum ).TotalCoolingEnergy, "System", "Sum", DXCoil( DXCoilNum ).Name ); //, &
 			//                           ResourceTypeKey='ENERGYTRANSFER',EndUseKey='COOLING',GroupKey='Plant')
