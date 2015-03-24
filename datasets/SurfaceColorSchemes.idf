@@ -4,7 +4,7 @@
 ! EnergyPlus Example Surface Color Schemes
 
 !  Version,
-!    8.0;                    !- Version Identifier
+!    8.3;                    !- Version Identifier
 
   OutputControl:SurfaceColorScheme,
     Default;                 !- Name

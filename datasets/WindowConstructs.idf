@@ -52,7 +52,7 @@
 ! U=5.894  SHGC=0.861  TSOL=0.837  TVIS=0.898
 
 !  Version,
-!    8.0;                    !- Version Identifier
+!    8.3;                    !- Version Identifier
 
   Construction,
     Sgl Clr 3mm,             !- Name
