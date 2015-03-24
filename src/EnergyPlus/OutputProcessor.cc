@@ -5633,9 +5633,9 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 
 		rxTime = ( MinuteNow - StartMinute ) / double( MinutesPerTimeStep );
 
-		// R and I data frames for ZoneVar
 		if (OutputSchema->timeSeriesEnabled())
 		{
+			// R and I data frames for ZoneVar
 			if (IndexType == ZoneVar && OutputSchema->RIDetailedZoneTSData.rVariablesScanned() == false)
 				OutputSchema->initializeRTSDataFrame(ReportEach, RVariableTypes, NumOfRVariable, ZoneVar);
 			if (IndexType == ZoneVar && OutputSchema->RIDetailedZoneTSData.iVariablesScanned() == false)

@@ -603,8 +603,7 @@ namespace EnergyPlus {
 			for (int Loop = 1; Loop <= NumOfRVariable; ++Loop) {
 					RVar >>= RVariableTypes(Loop).VarPtr;
 					auto & rVar(RVar());
-					
-					if (rVar.Report && rVar.ReportFreq == ReportFrequency && rVar.Stored) {
+					if (rVar.Report && rVar.ReportFreq == ReportFrequency) {
 						Variable *var = new Variable(RVariableTypes(Loop).VarName, 
 								ReportFrequency, RVariableTypes(Loop).IndexType, 
 								RVariableTypes(Loop).ReportID,
@@ -678,7 +677,7 @@ namespace EnergyPlus {
 			for (int Loop = 1; Loop <= NumOfIVariable; ++Loop) {
 				IVar >>= IVariableTypes(Loop).VarPtr;
 				auto & iVar(IVar());
-				if (iVar.Report && iVar.ReportFreq == ReportFrequency && iVar.Stored) {
+				if (iVar.Report && iVar.ReportFreq == ReportFrequency) {
 					OutputVariable *var = new OutputVariable(IVariableTypes(Loop).VarName, ReportFrequency, 
 								IVariableTypes(Loop).IndexType, 
 								IVariableTypes(Loop).ReportID,
