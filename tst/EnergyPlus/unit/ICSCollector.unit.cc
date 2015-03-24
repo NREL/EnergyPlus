@@ -13,6 +13,8 @@
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 
 using namespace ObjexxFCL;
 using namespace EnergyPlus;
@@ -21,6 +23,8 @@ using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalSurface;
 using namespace EnergyPlus::Psychrometrics;
+using namespace EnergyPlus::DataEnvironment;
+using DataGlobals::BeginEnvrnFlag;
 
 TEST( ICSSolarCollectorTest, CalcPassiveExteriorBaffleGapTest ) {
 
@@ -37,6 +41,10 @@ TEST( ICSSolarCollectorTest, CalcPassiveExteriorBaffleGapTest ) {
 
 	InitializePsychRoutines( );
 
+	BeginEnvrnFlag = true;
+	OutBaroPress = 101325.0;
+	SkyTemp = 24.0;
+	IsRain = false;
 	MatNum = 1;
 	ZoneNum = 1;
 	SurfNum = 1;
