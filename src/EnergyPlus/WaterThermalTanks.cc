@@ -5125,7 +5125,7 @@ namespace WaterThermalTanks {
 		Real64 Efuel; // Energy change for fuel consumed over the timestep (J)
 		bool SetPointRecovered; // Flag to indicate when setpoint is recovered for the first time
 		Real64 rho;
-		Real64 HPWHCondenserDeltaT; // Temperature difference across the condenser for a heat pump water heater
+		Real64 HPWHCondenserDeltaT( 0.0 ); // Temperature difference across the condenser for a heat pump water heater
 		static int DummyWaterIndex( 1 );
 
 		// Reference to objects
@@ -5218,9 +5218,9 @@ namespace WaterThermalTanks {
 			HeatPumpWaterHeaterData const &HeatPump = HPWaterHeater(Tank.HeatPumpNum);
 			DataLoopNode::NodeData const &HPWHCondWaterInletNode = DataLoopNode::Node(HeatPump.CondWaterInletNode);
 			DataLoopNode::NodeData const &HPWHCondWaterOutletNode = DataLoopNode::Node(HeatPump.CondWaterOutletNode);
-			HPWHCondenserDeltaT = HPWHCondWaterOutletNode.Temp - HPWHCondWaterInletNode.Temp;
-		} else {
-			HPWHCondenserDeltaT = 0.0;
+			if ( HeatPump.Mode == HeatMode ) {
+				HPWHCondenserDeltaT = HPWHCondWaterOutletNode.Temp - HPWHCondWaterInletNode.Temp;
+			}
 		}
 		assert( HPWHCondenserDeltaT >= 0 );
 		
@@ -6027,8 +6027,10 @@ namespace WaterThermalTanks {
 		if ( Tank.HeatPumpNum > 0 ) {
 			HeatPumpWaterHeaterData const &HeatPump = HPWaterHeater(Tank.HeatPumpNum);
 			DXCoils::DXCoilData const &Coil = DXCoils::DXCoil( HeatPump.DXCoilNum );
-			Qheatpump = Coil.TotalHeatingEnergyRate;
 			HPWHCondenserConfig = HeatPump.CondenserConfig;
+			if ( HeatPump.Mode == HeatMode ) {
+				Qheatpump = Coil.TotalHeatingEnergyRate;
+			}
 		}
 
 		SetPointTemp1 = Tank.SetPointTemp;
