@@ -109,6 +109,7 @@ TEST( ReportSizingManager, GetCoilDesFlowT )
 	
 	
 	// tear down
+	DataSizing::DataAirFlowUsedForSizing = 0.0;
 	DataSizing::CalcSysSizing(1).SumZoneCoolLoadSeq.deallocate();
 	DataSizing::CalcSysSizing(1).CoolZoneAvgTempSeq.deallocate();
 	DataSizing::SysSizPeakDDNum(1).TimeStepAtSensCoolPk.deallocate();
