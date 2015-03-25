@@ -266,7 +266,7 @@ namespace VariableSpeedCoils {
 		else if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed) {
 			// Heating mode
 			InitVarSpeedCoil(DXCoilNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
-			CalcVarSpeedHPWH(DXCoilNum, RuntimeFrac,PartLoadFrac, SpeedRatio, SpeedNum);
+			CalcVarSpeedHPWH(DXCoilNum, RuntimeFrac, PartLoadFrac, SpeedRatio, SpeedNum, CyclingScheme);
 			UpdateVarSpeedCoil(DXCoilNum);
 		}		
 		else {
@@ -2785,6 +2785,12 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).InletWaterEnthalpy = 0.0;
 		}
 
+		if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed)
+		{
+			VarSpeedCoil(DXCoilNum).InletWaterTemp = Node(WaterInletNode).Temp;
+			VarSpeedCoil(DXCoilNum).InletWaterEnthalpy = Node(WaterInletNode).Enthalpy;
+		};
+
 		VarSpeedCoil( DXCoilNum ).InletAirDBTemp = Node( AirInletNode ).Temp;
 		VarSpeedCoil( DXCoilNum ).InletAirHumRat = Node( AirInletNode ).HumRat;
 		VarSpeedCoil( DXCoilNum ).InletAirEnthalpy = Node( AirInletNode ).Enthalpy;
@@ -2834,7 +2840,7 @@ namespace VariableSpeedCoils {
 
 		VSHPWHHeatingCapacity = 0.0; // Used by Heat Pump:Water Heater object as total water heating capacity [W]
 		VSHPWHHeatingCOP = 0.0; // Used by Heat Pump:Water Heater object as water heating COP [W/W]
-		
+		VarSpeedCoil(DXCoilNum).OutletWaterTemp = VarSpeedCoil(DXCoilNum).InletWaterTemp;
 	}
 
 	void
@@ -4405,7 +4411,8 @@ namespace VariableSpeedCoils {
 		Real64 & RuntimeFrac, // Runtime Fraction of compressor or percent on time (on-time/cycle time)
 		Real64 const PartLoadRatio, // sensible water heating load / full load sensible water heating capacity
 		Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
-		int const SpeedNum // Speed number, high bound
+		int const SpeedNum, // Speed number, high bound
+		int const CyclingScheme // Continuous fan OR cycling compressor
 		)
 	{
 
@@ -4521,6 +4528,16 @@ namespace VariableSpeedCoils {
 			OperatingHeatingPower = 0.0;
 			TankHeatingCOP = 0.0;
 		}
+
+
+		//  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
+		if (!(CyclingScheme == ContFanCycCoil) && PartLoadRatio > 0.0) {
+			CondInletMassFlowRate = CondInletMassFlowRate / PartLoadRatio;
+			EvapInletMassFlowRate = EvapInletMassFlowRate / PartLoadRatio;
+		}
+
+		VarSpeedCoil(DXCoilNum).AirMassFlowRate = EvapInletMassFlowRate;
+		VarSpeedCoil(DXCoilNum).WaterMassFlowRate = CondInletMassFlowRate;
 		
 		// determine inlet air temperature type for curve objects
 		if (VarSpeedCoil(DXCoilNum).InletAirTemperatureType == WetBulbIndicator) {
@@ -4536,6 +4553,9 @@ namespace VariableSpeedCoils {
 			LoadSideInletDBTemp = Node(EvapInletNode).Temp;
 			LoadSideInletHumRat = Node(EvapInletNode).HumRat;
 			LoadPressure = Node(EvapInletNode).Press;
+			//prevent the air pressure not given
+			if (LoadPressure < 10.0) LoadPressure = OutBaroPress;
+
 			LoadSideInletWBTemp = Node(EvapInletNode).OutAirWetBulb;
 			LoadSideInletEnth = Node(EvapInletNode).Enthalpy;
 		}
@@ -4879,21 +4899,20 @@ namespace VariableSpeedCoils {
 			LoadSideOutletHumRat = MaxHumRat;
 		}
 
-		////Actual outlet conditions are "average" for time step
-		//if (CyclingScheme == ContFanCycCoil) {
-		//	// continuous fan, cycling compressor
-		//	VarSpeedCoil(DXCoilNum).OutletAirEnthalpy = PartLoadRatio * LoadSideOutletEnth + (1.0 - PartLoadRatio) * LoadSideInletEnth;
-		//	VarSpeedCoil(DXCoilNum).OutletAirHumRat = PartLoadRatio * LoadSideOutletHumRat + (1.0 - PartLoadRatio) * LoadSideInletHumRat;
-		//	VarSpeedCoil(DXCoilNum).OutletAirDBTemp = PsyTdbFnHW(VarSpeedCoil(DXCoilNum).OutletAirEnthalpy, VarSpeedCoil(DXCoilNum).OutletAirHumRat);
-		//	PLRCorrLoadSideMdot = LoadSideMassFlowRate;
-		//}
-		//else {
-		// default to cycling fan, cycling compressor
-		VarSpeedCoil(DXCoilNum).OutletAirEnthalpy = LoadSideOutletEnth;
-		VarSpeedCoil(DXCoilNum).OutletAirHumRat = LoadSideOutletHumRat;
-		VarSpeedCoil(DXCoilNum).OutletAirDBTemp = LoadSideOutletDBTemp;
-		PLRCorrLoadSideMdot = LoadSideMassFlowRate * PartLoadRatio;
-		//}
+		//Actual outlet conditions are "average" for time step
+		if (CyclingScheme == ContFanCycCoil) {
+			// continuous fan, cycling compressor
+			VarSpeedCoil(DXCoilNum).OutletAirEnthalpy = PartLoadRatio * LoadSideOutletEnth + (1.0 - PartLoadRatio) * LoadSideInletEnth;
+			VarSpeedCoil(DXCoilNum).OutletAirHumRat = PartLoadRatio * LoadSideOutletHumRat + (1.0 - PartLoadRatio) * LoadSideInletHumRat;
+			VarSpeedCoil(DXCoilNum).OutletAirDBTemp = PsyTdbFnHW(VarSpeedCoil(DXCoilNum).OutletAirEnthalpy, VarSpeedCoil(DXCoilNum).OutletAirHumRat);
+			PLRCorrLoadSideMdot = LoadSideMassFlowRate;
+		}
+		else {
+			VarSpeedCoil(DXCoilNum).OutletAirEnthalpy = LoadSideOutletEnth;
+			VarSpeedCoil(DXCoilNum).OutletAirHumRat = LoadSideOutletHumRat;
+			VarSpeedCoil(DXCoilNum).OutletAirDBTemp = LoadSideOutletDBTemp;
+			PLRCorrLoadSideMdot = LoadSideMassFlowRate * PartLoadRatio;
+		}
 
 		// scale heat transfer rates to PLR and power to RTF
 		QLoadTotal *= PartLoadRatio;
