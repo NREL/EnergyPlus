@@ -3550,44 +3550,60 @@ namespace WaterThermalTanks {
 							} // ALLOCATED
 						} //InletAirConfiguration
 						
+						// Nodal heat distribution fraction for stratified tank wrapped condensers
 						if ( Tank.TypeNum == StratifiedWaterHeater ) {
 							if ( HPWH.CondenserConfig == HPWH_CONDENSER_WRAPPED ) {
-								Real64 CurHeight(0.0);
-								Real64 SumFrac(0.0);
-								// Get the fraction of each stratified node that is wrapped by the condenser
-								for ( NodeNum = 1; NodeNum <= Tank.Nodes; ++NodeNum ) {
-									StratifiedNodeData &CurNode = Tank.Node( NodeNum );
-									if ( CurHeight < HPWH.WrappedCondenserBottomLocation && ( CurHeight + CurNode.Height ) > HPWH.WrappedCondenserBottomLocation ) {
-										// The bottom of the condenser starts partway through this node.
-										CurNode.HPWHWrappedCondenserHeatingFrac = 1.0 - ( HPWH.WrappedCondenserBottomLocation - CurHeight ) / CurNode.Height;
-									} else if ( CurHeight >= HPWH.WrappedCondenserBottomLocation && CurHeight <= HPWH.WrappedCondenserTopLocation ) {
-										if ( (CurHeight + CurNode.Height) > HPWH.WrappedCondenserTopLocation ) {
-											// the top of the condenser ends partway through this node.
-											CurNode.HPWHWrappedCondenserHeatingFrac = ( HPWH.WrappedCondenserTopLocation - CurHeight ) / CurNode.Height;
-										} else {
-											// the entire node is wrapped by the condenser
-											CurNode.HPWHWrappedCondenserHeatingFrac = 1.0;
-										}
-									} else {
-										CurNode.HPWHWrappedCondenserHeatingFrac = 0.0;
+								if ( Tank.Shape == TankShapeHorizCylinder ) {
+									ShowWarningError( cCurrentModuleObject + " = " + HPWH.Name + ":" );
+									ShowContinueError("A wrapped condenser HPWH model should not be used with a horizontal stratified tank.");
+									ShowContinueError("Ignoring condenser location and distributing heat evenly throughout the tank. Simulation continues.");
+									Real64 const SameFrac = 1.0 / Tank.Nodes;
+									for ( NodeNum = 1; NodeNum <= Tank.Nodes; ++NodeNum ) {
+										Tank.Node( NodeNum ).HPWHWrappedCondenserHeatingFrac = SameFrac;
 									}
-									SumFrac += CurNode.HPWHWrappedCondenserHeatingFrac;
-									CurHeight += CurNode.Height;
+								} else {
+									Real64 CurHeight(0.0);
+									Real64 SumFrac(0.0);
+									// Get the fraction of each stratified node that is wrapped by the condenser
+									for ( NodeNum = 1; NodeNum <= Tank.Nodes; ++NodeNum ) {
+										StratifiedNodeData &CurNode = Tank.Node( NodeNum );
+										if ( CurHeight < HPWH.WrappedCondenserBottomLocation && ( CurHeight + CurNode.Height ) > HPWH.WrappedCondenserBottomLocation ) {
+											// The bottom of the condenser starts partway through this node.
+											CurNode.HPWHWrappedCondenserHeatingFrac = 1.0 - ( HPWH.WrappedCondenserBottomLocation - CurHeight ) / CurNode.Height;
+										} else if ( CurHeight >= HPWH.WrappedCondenserBottomLocation && CurHeight <= HPWH.WrappedCondenserTopLocation ) {
+											if ( (CurHeight + CurNode.Height) > HPWH.WrappedCondenserTopLocation ) {
+												// the top of the condenser ends partway through this node.
+												CurNode.HPWHWrappedCondenserHeatingFrac = ( HPWH.WrappedCondenserTopLocation - CurHeight ) / CurNode.Height;
+											} else {
+												// the entire node is wrapped by the condenser
+												CurNode.HPWHWrappedCondenserHeatingFrac = 1.0;
+											}
+										} else {
+											CurNode.HPWHWrappedCondenserHeatingFrac = 0.0;
+										}
+										SumFrac += CurNode.HPWHWrappedCondenserHeatingFrac;
+										CurHeight += CurNode.Height;
+									}
+									// Normalize the fractions so they sum to 1.
+									for ( NodeNum = 1; NodeNum <= Tank.Nodes; ++NodeNum ) {
+										Tank.Node( NodeNum ).HPWHWrappedCondenserHeatingFrac /= SumFrac;
+									}
 								}
-								// Normalize the fractions so they sum to 1.
-								for ( NodeNum = 1; NodeNum <= Tank.Nodes; ++NodeNum ) {
-									Tank.Node( NodeNum ).HPWHWrappedCondenserHeatingFrac /= SumFrac;
-								}
-							} else if ( HPWH.CondenserConfig == HPWH_CONDENSER_PUMPED ) {
-								ShowWarningError( cCurrentModuleObject + " = " + HPWH.Name + ":" );
-								ShowContinueError("A wrapped condenser HPWH model should not be used with a horizontal stratified tank.");
-								ShowContinueError("Ignoring condenser location and distributing heat evenly throughout the tank. Simulation continues.");
-								Real64 const SameFrac = 1.0 / Tank.Nodes;
-								for ( NodeNum = 1; NodeNum <= Tank.Nodes; ++NodeNum ) {
-									Tank.Node( NodeNum ).HPWHWrappedCondenserHeatingFrac = SameFrac;
-								}
+							}
+						}
+						
+						// Set up the source side nodes for wrapped condensers
+						if ( HPWH.CondenserConfig == HPWH_CONDENSER_WRAPPED ) {
+							if ( Tank.SourceInletNode > 0 || Tank.SourceOutletNode > 0 ) {
+								ShowSevereError( Tank.Type + " = " + Tank.Name + " has a source inlet or outlet node specified," );
+								ShowContinueError( "but it is attached to " + HPWH.Type + " = " + HPWH.Name + ", which doesn't permit source side connections." );
+								ShowContinueError( "Please leave the source side inlet and outlet fields blank." );
+								ErrorsFound = true;
 							} else {
-								assert(0);
+								Tank.SourceInletNode = GetOnlySingleNode(HPWHSaveNodeNames( NumHeatPumpWaterHeater ).OutletNodeName1, ErrorsFound, Tank.Type, Tank.Name, NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+								WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 = HPWHSaveNodeNames( NumHeatPumpWaterHeater ).OutletNodeName1;
+								Tank.SourceOutletNode = GetOnlySingleNode(HPWHSaveNodeNames( NumHeatPumpWaterHeater ).InletNodeName1, ErrorsFound, Tank.Type, Tank.Name, NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+								WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 = HPWHSaveNodeNames( NumHeatPumpWaterHeater ).InletNodeName1;
 							}
 						}
 						
