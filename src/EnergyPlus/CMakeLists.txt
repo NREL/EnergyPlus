@@ -612,3 +612,4 @@ if(UNIX AND NOT APPLE)
   COMMAND ${CMAKE_COMMAND} -E create_symlink energyplus EnergyPlus
   COMMAND ${CMAKE_COMMAND} -E rename EnergyPlus "${CMAKE_BINARY_DIR}/Products/EnergyPlus") 
 endif()
+
