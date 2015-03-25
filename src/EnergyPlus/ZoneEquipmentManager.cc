@@ -629,7 +629,7 @@ namespace ZoneEquipmentManager {
 				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolMassFlow = 0.0;
 				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolZoneTemp = 0.0;
 				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolZoneHumRat = 0.0;
-			} else {
+			} else if ( SysOutputProvided < 0.0 ) {
 				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolLoad = -SysOutputProvided;
 				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolMassFlow = MassFlowRate;
 				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolZoneTemp = Node( ZoneNode ).Temp;
@@ -640,7 +640,16 @@ namespace ZoneEquipmentManager {
 				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatMassFlow = 0.0;
 				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatZoneTemp = 0.0;
 				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatZoneHumRat = 0.0;
-			}
+			} else {
+				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolLoad = 0.0;
+				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolMassFlow = 0.0;
+				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolZoneTemp = 0.0;
+				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolZoneHumRat = 0.0;
+				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatLoad = 0.0;
+				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatMassFlow = 0.0;
+				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatZoneTemp = 0.0;
+				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatZoneHumRat = 0.0;
+			}		
 
 			if ( SupplyAirNode > 0 ) {
 				Node( SupplyAirNode ).Temp = Temp;
