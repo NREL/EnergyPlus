@@ -117,9 +117,13 @@ TEST( HeatBalanceManagerTest, GetWindowConstructData ) {
 	int NumAlphas( 4 );
 	int NumNumbers( 0 );
 
-	TotConstructs = 1;
-	Construct.allocate( TotConstructs );
-	Construct( 1 ).Name = "WINDOWWBLIND";
+	ZoneNum = 0;
+	NumAlphas = 4;
+	NumNumbers = 0;
+
+	//TotConstructs = 1;
+	//Construct.allocate( TotConstructs );
+	//Construct( 1 ).Name = "WINDOWWBLIND";
 
 	TotMaterials = 3;
 	Material.allocate( TotMaterials );
@@ -159,7 +163,7 @@ TEST( HeatBalanceManagerTest, GetWindowConstructData ) {
 	IDFRecords( 1 ).NumAlphas = NumAlphas;
 	IDFRecords( 1 ).ObjectDefPtr = ObjectDef( 1 ).NumFound;
 	IDFRecords( 1 ).Alphas.allocate( NumAlphas );
-	IDFRecords( 1 ).Alphas( 1 ) = Construct( 1 ).Name;
+	IDFRecords( 1 ).Alphas( 1 ) = "WINDOWWBLIND";
 	IDFRecords( 1 ).Alphas( 2 ) = Material( 1 ).Name;
 	IDFRecords( 1 ).Alphas( 3 ) = Material( 2 ).Name;
 	IDFRecords( 1 ).Alphas( 4 ) = Material( 3 ).Name;
@@ -196,11 +200,16 @@ TEST( HeatBalanceManagerTest, GetWindowConstructData ) {
 	NominalR( TotMaterials ) = 0.4;
 
 	// call to get valid window material types
+	ErrorsFound = false;
 	GetConstructData( ErrorsFound ); // returns ErrorsFound as false since all layers are valid
 	EXPECT_FALSE( ErrorsFound );
 
+	// Clear the Construct array
+	Construct.deallocate( );
+
 	// call to get invalid window material type
 	Material( 2 ).Group = 16; // BlindEquivalentLayer, this layer is invalid in plain windows
+	ErrorsFound = false;
 	GetConstructData( ErrorsFound ); // returns ErrorsFound as true since layer 2 is invalid
 	EXPECT_TRUE( ErrorsFound );
 
