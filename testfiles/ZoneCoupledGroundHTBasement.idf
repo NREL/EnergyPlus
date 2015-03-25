@@ -62,7 +62,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 Version,
-    8.2; !- Version Identifier
+    8.3; !- Version Identifier
 
 
 !- =========== ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
