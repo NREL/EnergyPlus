@@ -90,4 +90,16 @@ TEST( CalcPerSolarBeamTest, Test1 )
 		}
 	}
 
+	// Clean up
+	SurfaceWindow.deallocate();
+	SunlitFracHR.deallocate();
+	SunlitFrac.deallocate();
+	SunlitFracWithoutReveal.deallocate();
+	CTHETA.deallocate();
+	CosIncAngHR.deallocate();
+	CosIncAng.deallocate();
+	AOSurf.deallocate();
+	BackSurfaces.deallocate();
+	OverlapAreas.deallocate();
+
 }

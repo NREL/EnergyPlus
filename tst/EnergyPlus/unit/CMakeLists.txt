@@ -21,6 +21,7 @@ set( test_src
   HVACStandaloneERV.unit.cc
   ICSCollector.unit.cc
   ManageElectricPower.unit.cc
+  HVACUnitarySystem.unit.cc
   MixedAir.unit.cc
   PurchasedAirManager.unit.cc
   OutputProcessor.unit.cc
