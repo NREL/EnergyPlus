@@ -41,7 +41,6 @@ install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E make_directory \"$
 # the output variables listing
 install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/parse_output_variables.py\" \"${CMAKE_SOURCE_DIR}/src/EnergyPlus\" \"${DOCS_OUT}/SetupOutputVariables.csv\" \"${DOCS_OUT}/SetupOutputVariables.md\")")
 install(FILES "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.csv" DESTINATION "./")
-install(FILES "${CMAKE_BINARY_DIR}/autodocs/SetupOutputVariables.md" DESTINATION "./")
 
 # the example file summary
 install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/example_file_summary.py\" \"${CMAKE_SOURCE_DIR}/testfiles\" \"${DOCS_OUT}/ExampleFiles.html\")")
@@ -56,7 +55,7 @@ install(FILES "${DOCS_OUT}/ExampleFiles-ObjectsLink.html" DESTINATION "./Example
 # Better to move this condition into the install CODE.
 if(NOT "$ENV{GITHUB_TOKEN}" STREQUAL "")
   install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" \"${CMAKE_SOURCE_DIR}/doc/tools/create_changelog.py\" \"${CMAKE_SOURCE_DIR}\" \"${DOCS_OUT}/changelog.md\" \"${DOCS_OUT}/changelog.html\" \"${GIT_EXECUTABLE}\" \"$ENV{GITHUB_TOKEN}\" \"${PREV_RELEASE_SHA}\")")
-  install(FILES "${CMAKE_BINARY_DIR}/autodocs/changelog.md" DESTINATION "./")
+  install(FILES "${DOCS_OUT}/changelog.html" DESTINATION "./")
 else()
   message(WARNING "No GITHUB_TOKEN found in environment; package won't be complete")
 endif()
