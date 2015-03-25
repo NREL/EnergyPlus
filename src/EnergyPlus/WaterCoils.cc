@@ -1894,7 +1894,9 @@ namespace WaterCoils {
 				DataWaterLoopNum = 0;
 				DataConstantUsedForSizing = 0.0;
 				DataFractionUsedForSizing = 0.0;
+				DataAirFlowUsedForSizing = 0.0;
 				DataFlowUsedForSizing = 0.0;
+				DataWaterFlowUsedForSizing = 0.0;
 				DataCapacityUsedForSizing = 0.0;
 				DataDesInletAirTemp = 0.0;
 				DataDesOutletAirTemp = 0.0;
