@@ -6,21 +6,30 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products"
 
 SET(SRC epfilter.f90) 
 
-# the Fortran apps require a DEF for proper path handling on Windows
-if( WIN32 ) 
-  add_definitions(-D_WIN32) 
-  if( CMAKE_Fortran_COMPILER MATCHES "ifort" )
-    add_definitions( "/fpp" )
-    set(CMAKE_Fortran_FLAGS /lib:static)
-  else() # assume mingw gfortran if not intel fortran
-    add_definitions( "-x f95-cpp-input" )
-    set(CMAKE_Fortran_FLAGS "-static")
-  endif()  
-else()
-  if( CMAKE_Fortran_COMPILER MATCHES "ifort" )
-    add_definitions( "-fpp" )
-  elseif( CMAKE_Fortran_COMPILER_ID MATCHES "GNU" ) # could use this above in WIN32 block to be more specific
-    add_definitions( "-cpp" )
+if(APPLE)
+  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel")
+  else()
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
+  endif()
+elseif(UNIX)
+  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel")
+  else()
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static")
+  endif()
+else()  # Windows
+  if( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU" )
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
+  else()
+    # Set release flags to be empty
+    set(CMAKE_Fortran_FLAGS_RELEASE "")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /libs:static")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /fpp")
   endif()
 endif()
 
