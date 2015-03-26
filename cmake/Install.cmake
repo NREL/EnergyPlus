@@ -338,7 +338,7 @@ if( UNIX AND NOT APPLE )
 
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater%20Libs/libRBAppearancePak.so" "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater%20Libs/libRBShell.so" "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
-  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater" "PreProcess/IDFVersionUpdater/")
+  install_remote(PROGRAMS "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater" "PreProcess/IDFVersionUpdater/")
     
   install_remote(PROGRAMS "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/bin/EPMacro/Linux/EPMacro" "./")
 
