@@ -162,13 +162,13 @@ install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/
 
 # TODO Remove version from file name or generate
 # These files names are stored in variables because they also appear as start menu shortcuts later.
-set( RULES_XLS Rules8-1-0-to-8-2-0.xls )
+set( RULES_XLS Rules8-2-0-to-8-3-0.xls )
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/release/Bugreprt.txt" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/release/ep.gif" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/release/ObjectStatus.xls" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/release/readme.html" "./" "readme.html" TRUE)
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/release/${RULES_XLS}" "./")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/release/Report%20Variables%208-1-0-009%20to%208-2-0.csv" "PreProcess/IDFVersionUpdater/" "Report Variables 8-1-0-009 to 8-2-0.csv")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/release/Report%20Variables%208-2-0%20to%208-3-0.csv" "PreProcess/IDFVersionUpdater/" "Report Variables 8-2-0 to 8-3-0.csv")
 install(FILES "${CMAKE_SOURCE_DIR}/idd/V8-2-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
 install( FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}-Energy+.idd" )
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" "PreProcess/HVACCurveFitTool/")
