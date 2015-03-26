@@ -6953,6 +6953,7 @@ namespace WaterThermalTanks {
 		Real64 RhoWater; //water density
 		Real64 SpeedRatio(0.0); //speed ratio for interpolating between two speed levels
 		bool bIterSpeed(false);// interpolation between speed level or not
+		Real64 zeroResidual(1.0); //residual when running VSHPWH at 0.0 part-load ratio, 1.0 needed setting >0
 		int i;// index for iteration
 		Real64 EMP1(0.0), EMP2(0.0), EMP3(0.0); //place holder to calling vs HPWH function
 		Real64 LowSpeedTankTemp(0.0); //tank temperature resulted by a lower compressor speed
@@ -7179,13 +7180,15 @@ namespace WaterThermalTanks {
 			// This for loop is intended to iterate and converge on a condenser operating temperature so that the evaporator model correctly calculates performance.
 			// CHECK- embedded both the nonVS and the VS sim calls inside the for-loop, previously the VS wasn't in a for loop
 			for ( loopIter = 1; loopIter <= 4; ++loopIter ) {
-				if (MaxSpeedNum > 0) { //max speed of VS HPWH coil
-					bIterSpeed = false; 
-					HPPartLoadRatio = 1;
-					SpeedRatio = 1.0; 
-					SpeedNum = MaxSpeedNum; 
-					SetVSHPWHFlowRates(WaterThermalTankNum, Tank.HeatPumpNum, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
-					SimVariableSpeedCoils(HeatPump.DXCoilName, HeatPump.DXCoilNum, CycFanCycCoil, EMP1, EMP2, EMP3, 1, HPPartLoadRatio, SpeedNum, SpeedRatio, 0.0, 0.0, 1.0);
+				if (MaxSpeedNum > 0) { //lowest speed of VS HPWH coil
+					SpeedRatio = 1.0;
+					HPPartLoadRatio = 1.0;
+					bIterSpeed = true; //prepare for iterating between speed levels
+					SpeedNum = 1;
+					SetVSHPWHFlowRates(WaterThermalTankNum, Tank.HeatPumpNum, SpeedNum, SpeedRatio,
+						RhoWater, MdotWater, FirstHVACIteration);
+					SimVariableSpeedCoils(HeatPump.DXCoilName, HeatPump.DXCoilNum,
+						CycFanCycCoil, EMP1, EMP2, EMP3, 1, HPPartLoadRatio, SpeedNum, SpeedRatio, 0.0, 0.0, 1.0);
 				} else {
 					CalcHPWHDXCoil( HeatPump.DXCoilNum, HPPartLoadRatio );
 				}
@@ -7194,7 +7197,7 @@ namespace WaterThermalTanks {
 				// CALL CalcDOE2DXCoil(DXCoilNum, HPPartLoadRatio, FirstHVACIteration,PartLoadRatio, FanOpMode)
 				// (possibly with an iteration loop to converge on a solution)
 				CondenserDeltaT = Node( HPWaterOutletNode ).Temp - Node( HPWaterInletNode ).Temp;
-				Tank.SourceInletTemp = HPWaterInletNodeTempSaved + CondenserDeltaT;
+				Tank.SourceInletTemp = Node(HPWaterInletNode).Temp + CondenserDeltaT;
 				
 				// this CALL does not update node temps, must use WaterThermalTank variables
 				// select tank type
@@ -7207,94 +7210,85 @@ namespace WaterThermalTanks {
 					NewTankTemp = FindStratifiedTankSensedTemp( WaterThermalTankNum, HeatPump.ControlSensorLocation );
 				}}
 
+				LowSpeedTankTemp = NewTankTemp;
+
 				Node( HPWaterInletNode ).Temp = Tank.SourceOutletTemp;
 				if ( std::abs( Node( HPWaterInletNode ).Temp - HPWHCondInletNodeLast ) < SmallTempDiff ) break;
 				HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
-
-				if (NewTankTemp > SetPointTemp && MaxSpeedNum > 0)	{ //calculate lowest speed of VS coil
-					SpeedRatio = 1.0;
-					HPPartLoadRatio = 1.0;
-					bIterSpeed = true; //prepare for iterating between speed levels
-					SpeedNum = 1;
-
-					SetVSHPWHFlowRates(WaterThermalTankNum, Tank.HeatPumpNum, SpeedNum, SpeedRatio,
-						RhoWater, MdotWater, FirstHVACIteration);
-					SimVariableSpeedCoils(HeatPump.DXCoilName, HeatPump.DXCoilNum,
-						CycFanCycCoil, EMP1, EMP2, EMP3, 1, HPPartLoadRatio, SpeedNum, SpeedRatio, 0.0, 0.0, 1.0);
-
-					CondenserDeltaT = Node(HPWaterOutletNode).Temp - Node(HPWaterInletNode).Temp;
-
-					//           move the full load outlet temperature rate to the water heater structure variables
-					//           (water heaters source inlet node temperature/mdot are set in Init, set it here after CalcHPWHDXCoil has been called)
-					WaterThermalTank(WaterThermalTankNum).SourceInletTemp = Node(HPWaterInletNode).Temp + CondenserDeltaT;
-					//				WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = MdotWater;
-
-					//           this CALL does not update node temps, must use WaterThermalTank variables
-					// select tank type
-					{ auto const SELECT_CASE_var1(HeatPump.TankTypeNum);
-					if (SELECT_CASE_var1 == MixedWaterHeater) {
-						CalcWaterThermalTankMixed(WaterThermalTankNum);
-						NewTankTemp = Tank.TankTemp;
-					}
-					else if (SELECT_CASE_var1 == StratifiedWaterHeater) {
-						CalcWaterThermalTankStratified(WaterThermalTankNum);
-						NewTankTemp = FindStratifiedTankSensedTemp(WaterThermalTankNum, HeatPump.ControlSensorLocation);
-					}}
-					LowSpeedTankTemp = NewTankTemp;
-
-				}
 			}
 				
 			
 			if ( NewTankTemp > SetPointTemp ) {
-				if ( MaxSpeedNum > 0 ) {
-					//variable-speed coil, update
-					Node(HPWaterInletNode).Temp = Tank.SourceOutletTemp;
-				}
 				HeatPump.Mode = FloatMode;
-				Par( 1 ) = SetPointTemp;
-				Par( 2 ) = HeatPump.SaveWHMode;
-				Par( 3 ) = WaterThermalTankNum;
-				if ( FirstHVACIteration ) {
-					Par( 4 ) = 1.0;
-				} else {
-					Par( 4 ) = 0.0;
+				Par(1) = SetPointTemp;
+				Par(2) = HeatPump.SaveWHMode;
+				Par(3) = WaterThermalTankNum;
+				if (FirstHVACIteration) {
+					Par(4) = 1.0;
 				}
-				Par( 5 ) = MdotWater;
-				{ auto const SELECT_CASE_var1( HeatPump.TankTypeNum );
-					if ( SELECT_CASE_var1 == MixedWaterHeater ) {
-						SolveRegulaFalsi( Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualMixedTank, 0.0, 1.0, Par );
-					} else if ( SELECT_CASE_var1 == StratifiedWaterHeater ) {
-						SolveRegulaFalsi( Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualStratifiedTank, 0.0, 1.0, Par );
+				else {
+					Par(4) = 0.0;
+				}
+				Par(5) = MdotWater;
+
+				if (MaxSpeedNum > 0)
+				//square the solving, and avoid warning
+				//due to very small capacity at lowest speed of VSHPWH coil
+				{
+					{ auto const SELECT_CASE_var1(HeatPump.TankTypeNum);
+					if (SELECT_CASE_var1 == MixedWaterHeater) {
+						zeroResidual = PLRResidualMixedTank(0.0, Par);
+					}
+					else if (SELECT_CASE_var1 == StratifiedWaterHeater) {
+						zeroResidual = PLRResidualStratifiedTank(0.0, Par);
 					}}
-				if ( SolFla == -1 ) {
-					gio::write( IterNum, fmtLD ) << MaxIte;
-					strip( IterNum );
-					if ( ! WarmupFlag ) {
-						++HeatPump.IterLimitExceededNum2;
-						if ( HeatPump.IterLimitExceededNum2 == 1 ) {
-							ShowWarningError( HeatPump.Type + " \"" + HeatPump.Name + "\"" );
-							ShowContinueError( "Iteration limit exceeded calculating heat pump water heater compressor part-load ratio, maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
-							ShowContinueErrorTimeStamp( "This error occurred in float mode." );
-						} else {
-							ShowRecurringWarningErrorAtEnd( HeatPump.Type + " \"" + HeatPump.Name + "\":  Iteration limit exceeded in float mode warning continues. Part-load ratio statistics follow.", HeatPump.IterLimitErrIndex2, HPPartLoadRatio, HPPartLoadRatio );
+				}
+
+				if (zeroResidual > 0.0)//then iteration
+				{
+					{ auto const SELECT_CASE_var1(HeatPump.TankTypeNum);
+					if (SELECT_CASE_var1 == MixedWaterHeater) {
+						SolveRegulaFalsi(Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualMixedTank, 0.0, 1.0, Par);
+					}
+					else if (SELECT_CASE_var1 == StratifiedWaterHeater) {
+						SolveRegulaFalsi(Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualStratifiedTank, 0.0, 1.0, Par);
+					}}
+					if (SolFla == -1) {
+						gio::write(IterNum, fmtLD) << MaxIte;
+						strip(IterNum);
+						if (!WarmupFlag) {
+							++HeatPump.IterLimitExceededNum2;
+							if (HeatPump.IterLimitExceededNum2 == 1) {
+								ShowWarningError(HeatPump.Type + " \"" + HeatPump.Name + "\"");
+								ShowContinueError("Iteration limit exceeded calculating heat pump water heater compressor part-load ratio, maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits(HPPartLoadRatio, 3));
+								ShowContinueErrorTimeStamp("This error occurred in float mode.");
+							}
+							else {
+								ShowRecurringWarningErrorAtEnd(HeatPump.Type + " \"" + HeatPump.Name + "\":  Iteration limit exceeded in float mode warning continues. Part-load ratio statistics follow.", HeatPump.IterLimitErrIndex2, HPPartLoadRatio, HPPartLoadRatio);
+							}
 						}
 					}
-				} else if ( SolFla == -2 ) {
-					HPPartLoadRatio = max( 0.0, min( 1.0, ( SetPointTemp - TankTemp ) / ( NewTankTemp - TankTemp ) ) );
-					if ( ! WarmupFlag ) {
-						++HeatPump.RegulaFalsiFailedNum2;
-						if ( HeatPump.RegulaFalsiFailedNum2 == 1 ) {
-							ShowWarningError( HeatPump.Type + " \"" + HeatPump.Name + "\"" );
-							ShowContinueError( "Heat pump water heater compressor part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
-							ShowContinueError( "Please send this information to the EnergyPlus support group." );
-							ShowContinueErrorTimeStamp( "This error occured in float mode." );
-						} else {
-							ShowRecurringWarningErrorAtEnd( HeatPump.Type + " \"" + HeatPump.Name + "\": Part-load ratio calculation failed in float mode warning continues. Part-load ratio statistics follow.", HeatPump.RegulaFalsiFailedIndex2, HPPartLoadRatio, HPPartLoadRatio );
+					else if (SolFla == -2) {
+						HPPartLoadRatio = max(0.0, min(1.0, (SetPointTemp - TankTemp) / (NewTankTemp - TankTemp)));
+						if (!WarmupFlag) {
+							++HeatPump.RegulaFalsiFailedNum2;
+							if (HeatPump.RegulaFalsiFailedNum2 == 1) {
+								ShowWarningError(HeatPump.Type + " \"" + HeatPump.Name + "\"");
+								ShowContinueError("Heat pump water heater compressor part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits(HPPartLoadRatio, 3));
+								ShowContinueError("Please send this information to the EnergyPlus support group.");
+								ShowContinueErrorTimeStamp("This error occured in float mode.");
+							}
+							else {
+								ShowRecurringWarningErrorAtEnd(HeatPump.Type + " \"" + HeatPump.Name + "\": Part-load ratio calculation failed in float mode warning continues. Part-load ratio statistics follow.", HeatPump.RegulaFalsiFailedIndex2, HPPartLoadRatio, HPPartLoadRatio);
+							}
 						}
 					}
 				}
-				
+				else
+				{
+					HPPartLoadRatio = 0.0; 
+				};
+					
 				// Re-calculate the HPWH Coil to get the correct heat transfer rate.
 				Node( HPWaterInletNode ).Temp = Tank.SourceOutletTemp;
 				if (MaxSpeedNum > 0) {
@@ -7313,7 +7307,7 @@ namespace WaterThermalTanks {
 			} else if (bIterSpeed) {
 				for (loopIter = 1; loopIter <= 4; ++loopIter)
 				{
-					HeatPump.Mode = FloatMode;
+					HeatPump.Mode = HeatMode;//HeatMode is important for system convergence
 					HPPartLoadRatio = 1.0;
 					SpeedRatio = 1.0;
 					for (i = 2; i <= MaxSpeedNum; ++i)
@@ -7351,55 +7345,63 @@ namespace WaterThermalTanks {
 						}
 					}
 
-					ParVS(1) = WaterThermalTankNum;
-					ParVS(2) = Tank.HeatPumpNum;
-					ParVS(3) = SpeedNum;
-					ParVS(4) = HPWaterInletNode;
-					ParVS(5) = HPWaterOutletNode;
-					ParVS(6) = RhoWater;
-					ParVS(7) = SetPointTemp;
-					ParVS(8) = HeatPump.SaveWHMode;
-					if (FirstHVACIteration) {
-						ParVS(9) = 1.0;
-					}
-					else {
-						ParVS(9) = 0.0;
-					}
-
-					SolveRegulaFalsi(Acc, MaxIte, SolFla, SpeedRatio, PLRResidualIterSpeed, 1.0e-10, 1.0, ParVS);
-
-					if (SolFla == -1) {
-						gio::write(IterNum, fmtLD) << MaxIte;
-						strip(IterNum);
-						if (!WarmupFlag) {
-							++HeatPump.IterLimitExceededNum1;
-							if (HeatPump.IterLimitExceededNum1 == 1) {
-								ShowWarningError(HeatPump.Type + " \"" + HeatPump.Name + "\"");
-								ShowContinueError("Iteration limit exceeded calculating heat pump water heater speed" " speed ratio ratio, maximum iterations = " + IterNum + ". speed ratio returned = " + RoundSigDigits(SpeedRatio, 3));
-								ShowContinueErrorTimeStamp("This error occurred in heating mode.");
-							}
-							else {
-								ShowRecurringWarningErrorAtEnd(HeatPump.Type + " \"" + HeatPump.Name + "\":  Iteration limit exceeded in heating mode warning continues. speed ratio statistics follow.", HeatPump.IterLimitErrIndex1, SpeedRatio, SpeedRatio);
-							}
-						}
-					}
-					else if (SolFla == -2)
+					if (NewTankTemp > SetPointTemp)
 					{
-						SpeedRatio = max(0.0, min(1.0, (SetPointTemp - LowSpeedTankTemp) / (NewTankTemp - LowSpeedTankTemp)));
-						if (!WarmupFlag) {
-							++HeatPump.RegulaFalsiFailedNum1;
-							if (HeatPump.RegulaFalsiFailedNum1 == 1) {
-								ShowWarningError(HeatPump.Type + " \"" + HeatPump.Name + "\"");
-								ShowContinueError("Heat pump water heater speed ratio calculation failed: speed ratio limits " "of 0 to 1 exceeded. speed ratio used = " + RoundSigDigits(SpeedRatio, 3));
-								ShowContinueError("Please send this information to the EnergyPlus support group.");
-								ShowContinueErrorTimeStamp("This error occured in heating mode.");
+						ParVS(1) = WaterThermalTankNum;
+						ParVS(2) = Tank.HeatPumpNum;
+						ParVS(3) = SpeedNum;
+						ParVS(4) = HPWaterInletNode;
+						ParVS(5) = HPWaterOutletNode;
+						ParVS(6) = RhoWater;
+						ParVS(7) = SetPointTemp;
+						ParVS(8) = HeatPump.SaveWHMode;
+						if (FirstHVACIteration) {
+							ParVS(9) = 1.0;
+						}
+						else {
+							ParVS(9) = 0.0;
+						}
+
+						SolveRegulaFalsi(Acc, MaxIte, SolFla, SpeedRatio, PLRResidualIterSpeed, 1.0e-10, 1.0, ParVS);
+
+						if (SolFla == -1) {
+							gio::write(IterNum, fmtLD) << MaxIte;
+							strip(IterNum);
+							if (!WarmupFlag) {
+								++HeatPump.IterLimitExceededNum1;
+								if (HeatPump.IterLimitExceededNum1 == 1) {
+									ShowWarningError(HeatPump.Type + " \"" + HeatPump.Name + "\"");
+									ShowContinueError("Iteration limit exceeded calculating heat pump water heater speed" " speed ratio ratio, maximum iterations = " + IterNum + ". speed ratio returned = " + RoundSigDigits(SpeedRatio, 3));
+									ShowContinueErrorTimeStamp("This error occurred in heating mode.");
+								}
+								else {
+									ShowRecurringWarningErrorAtEnd(HeatPump.Type + " \"" + HeatPump.Name + "\":  Iteration limit exceeded in heating mode warning continues. speed ratio statistics follow.", HeatPump.IterLimitErrIndex1, SpeedRatio, SpeedRatio);
+								}
 							}
-							else {
-								ShowRecurringWarningErrorAtEnd(HeatPump.Type + " \"" + HeatPump.Name + "\":  Speed ratio calculation failed in heating mode warning continues. Speed ratio statistics follow.", HeatPump.RegulaFalsiFailedIndex1, SpeedRatio, SpeedRatio);
+						}
+						else if (SolFla == -2)
+						{
+							SpeedRatio = max(0.0, min(1.0, (SetPointTemp - LowSpeedTankTemp) / (NewTankTemp - LowSpeedTankTemp)));
+							if (!WarmupFlag) {
+								++HeatPump.RegulaFalsiFailedNum1;
+								if (HeatPump.RegulaFalsiFailedNum1 == 1) {
+									ShowWarningError(HeatPump.Type + " \"" + HeatPump.Name + "\"");
+									ShowContinueError("Heat pump water heater speed ratio calculation failed: speed ratio limits " "of 0 to 1 exceeded. speed ratio used = " + RoundSigDigits(SpeedRatio, 3));
+									ShowContinueError("Please send this information to the EnergyPlus support group.");
+									ShowContinueErrorTimeStamp("This error occured in heating mode.");
+								}
+								else {
+									ShowRecurringWarningErrorAtEnd(HeatPump.Type + " \"" + HeatPump.Name + "\":  Speed ratio calculation failed in heating mode warning continues. Speed ratio statistics follow.", HeatPump.RegulaFalsiFailedIndex1, SpeedRatio, SpeedRatio);
+								}
 							}
 						}
 					}
-
+					else
+					{
+						SpeedNum = MaxSpeedNum; 
+						SpeedRatio = 1.0;
+					}
+					
 					HPPartLoadRatio = 1.0;
 					SetVSHPWHFlowRates(WaterThermalTankNum, Tank.HeatPumpNum, SpeedNum, SpeedRatio,
 						RhoWater, MdotWater, FirstHVACIteration);
@@ -7427,6 +7429,8 @@ namespace WaterThermalTanks {
 					}}
 					//update inlet temp
 					Node(HPWaterInletNode).Temp = WaterThermalTank(WaterThermalTankNum).SourceOutletTemp;
+					if (std::abs(Node(HPWaterInletNode).Temp - HPWHCondInletNodeLast) < SmallTempDiff) break;
+					HPWHCondInletNodeLast = Node(HPWaterInletNode).Temp;
 				}
 				
 			} else {
