@@ -14,7 +14,7 @@
 ! Cooling Capacity function of temperature curve  - CoolCapfT
 
 !  Version,
-!    8.0;                    !- Version Identifier
+!    8.3;                    !- Version Identifier
 
   Curve:Biquadratic,
     ExhAbsorb_CapFt,         !- Name

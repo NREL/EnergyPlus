@@ -337,8 +337,12 @@ namespace DataPlant {
 	extern Real64 EconLoadMet; // Load met by Economizer
 	extern int TotNumLoops; // number of plant and condenser loops
 	extern int TotNumHalfLoops; // number of half loops (2 * TotNumLoops)
-	extern bool PlantSizeNotComplete;
-	extern bool PlantSizesOkayToFinalize; // true if plant sizing is finishing and can save results
+	extern bool PlantFirstSizeCompleted; //true if first-pass sizing is still going on and not finished
+	extern bool PlantFirstSizesOkayToFinalize; // true if first-pass plant sizing is finish and can save results for simulation
+	extern bool PlantFirstSizesOkayToReport; // true if initial first pass size can be reported
+	extern bool PlantFinalSizesOkayToReport; // true if plant sizing is really all done and final results reported
+	extern bool PlantReSizingCompleted;
+
 	extern bool AnyEMSPlantOpSchemesInModel;
 
 	extern FArray1D_int EconBranchNum; // Branch num on which economizer is placed
@@ -1365,9 +1369,11 @@ namespace DataPlant {
 		int MaxTempErrIndex; // for recurring too hot errors
 		Real64 MinVolFlowRate; // Minimum flow rate allowed in the loop
 		Real64 MaxVolFlowRate; // Maximum flow rate allowed in the loop
+		bool MaxVolFlowRateWasAutoSized; // true if previous was set to autosized in the input 
 		Real64 MinMassFlowRate; // Minimum flow rate allowed in the loop
 		Real64 MaxMassFlowRate; // Maximum flow rate allowed in the loop
 		Real64 Volume; // Volume of the fluid in the loop
+		bool VolumeWasAutoSized; //true if Volume was set to autocalculate
 		Real64 Mass; // Mass of the fluid in the loop
 		bool EMSCtrl;
 		Real64 EMSValue;
@@ -1415,9 +1421,11 @@ namespace DataPlant {
 			MaxTempErrIndex( 0 ),
 			MinVolFlowRate( 0.0 ),
 			MaxVolFlowRate( 0.0 ),
+			MaxVolFlowRateWasAutoSized( false ),
 			MinMassFlowRate( 0.0 ),
 			MaxMassFlowRate( 0.0 ),
 			Volume( 0.0 ),
+			VolumeWasAutoSized ( false ), //true if Volume was set to autocalculate
 			Mass( 0.0 ),
 			EMSCtrl( false ),
 			EMSValue( 0.0 ),
@@ -1458,9 +1466,11 @@ namespace DataPlant {
 			int const MaxTempErrIndex, // for recurring too hot errors
 			Real64 const MinVolFlowRate, // Minimum flow rate allowed in the loop
 			Real64 const MaxVolFlowRate, // Maximum flow rate allowed in the loop
+			bool const MaxVolFlowRateWasAutoSized, // true if previous was set to autosized in the input 
 			Real64 const MinMassFlowRate, // Minimum flow rate allowed in the loop
 			Real64 const MaxMassFlowRate, // Maximum flow rate allowed in the loop
 			Real64 const Volume, // Volume of the fluid in the loop
+			bool const VolumeWasAutoSized, // true if previous was set to autocal
 			Real64 const Mass, // Mass of the fluid in the loop
 			bool const EMSCtrl,
 			Real64 const EMSValue,
@@ -1504,9 +1514,11 @@ namespace DataPlant {
 			MaxTempErrIndex( MaxTempErrIndex ),
 			MinVolFlowRate( MinVolFlowRate ),
 			MaxVolFlowRate( MaxVolFlowRate ),
+			MaxVolFlowRateWasAutoSized( MaxVolFlowRateWasAutoSized ),
 			MinMassFlowRate( MinMassFlowRate ),
 			MaxMassFlowRate( MaxMassFlowRate ),
 			Volume( Volume ),
+			VolumeWasAutoSized( VolumeWasAutoSized ),
 			Mass( Mass ),
 			EMSCtrl( EMSCtrl ),
 			EMSValue( EMSValue ),

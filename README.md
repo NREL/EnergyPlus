@@ -63,4 +63,4 @@ These instructions were written for Mac OS X Version 10.9.  Newer versions of OS
 # Building Installer Packages
 
 Building an installer package is simply a matter of compiling the "Package" target.  On Windows you must have the NSIS tool installed first.  On Mac you must install PackageMaker.  Once the appropriate packaging tool is installed, use the CMake interface to turn on the "BUILD\_PACKAGE" option and regenerate the project.  A separate repository contains many binary pieces that are downloaded during the process of compiling the installer.  These are being transitioned to build from source where possible, in which case they will end up in this repository along with the other source.  Because this content is automatically downloaded from a separate GitHub repository during the packaging process, you will need to have an internet connection while generating an installer.  The completed installer package will be copied into the root of the build directory.
-
+ 
