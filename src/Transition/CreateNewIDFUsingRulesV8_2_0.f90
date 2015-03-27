@@ -328,7 +328,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   EXIT
                 ENDIF
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1)='${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}'
+                OutArgs(1)='8.2'
                 nodiff=.false.
 
 !    !!!    Changes for this version
