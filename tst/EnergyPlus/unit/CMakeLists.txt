@@ -36,6 +36,7 @@ set( test_src
   Vector.unit.cc
   WaterCoils.unit.cc
   WaterThermalTanks.unit.cc
+  ZoneEquipmentManager.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc
 )

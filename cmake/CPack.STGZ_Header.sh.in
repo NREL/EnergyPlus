@@ -73,7 +73,7 @@ link_err ()
 
 chmod o+w "${install_directory}/${package_name}/PreProcess/IDFVersionUpdater/"
 
-if [ "$(id -u)" == "0" ]; then
+if [ "$(id -u)" = "0" ]; then
   mv "${install_directory}/${package_name}/energyplus.1" /usr/local/share/man/man1/
 else
   echo "Man page installation skipped since script is executing without root privileges" 1>&2
@@ -86,8 +86,7 @@ if [ ! "$link_directory" = "n" ]; then
   ln -sf "${install_directory}/${package_name}/PreProcess/GrndTempCalc/Basement" "${link_directory}" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/PreProcess/GrndTempCalc/BasementGHT.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/PostProcess/convertESOMTRpgm/convertESOMTR" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/PreProcess/dos2unix" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/EnergyPlus" "${link_directory}" 2> /dev/null > /dev/null || link_err
+  ln -sf "${install_directory}/${package_name}/energyplus" "${link_directory}/EnergyPlus" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/Energy+.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/PostProcess/EP-Compare/EP-Compare" "${link_directory}" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/EPMacro" "${link_directory}" 2> /dev/null > /dev/null || link_err
@@ -110,7 +109,6 @@ if [ ! "$link_directory" = "n" ]; then
       rm -f "${link_directory}/Basement"
       rm -f "${link_directory}/BasementGHT.idd"
       rm -f "${link_directory}/convertESOMTR"
-      rm -f "${link_directory}/dos2unix"
       rm -f "${link_directory}/EnergyPlus"
       rm -f "${link_directory}/Energy+.idd"
       rm -f "${link_directory}/EP-Compare"
