@@ -352,7 +352,7 @@ namespace VariableSpeedCoils {
 		DXCoilNum = 0;
 
 		if ( NumWatertoAirHPs <= 0 ) {
-			ShowSevereError( "No Equipment found in SimWatertoAirHPSimple" );
+			ShowSevereError( "No Equipment found in GetVarSpeedCoilInput" );
 			ErrorsFound = true;
 		}
 
