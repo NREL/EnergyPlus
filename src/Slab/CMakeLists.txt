@@ -24,6 +24,7 @@ if(APPLE)
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel" )
   endif()
 elseif(UNIX)
+  set(CMAKE_SKIP_RPATH TRUE)
   if(CMAKE_Fortran_COMPILER MATCHES "ifort")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel" )
   else()
@@ -39,6 +40,7 @@ else()
   endif()
 endif()
 
+set(SKIP_BUILD_RPATH true)
 ADD_EXECUTABLE( Slab ${SRC} )
 
 SET_TARGET_PROPERTIES(Slab PROPERTIES

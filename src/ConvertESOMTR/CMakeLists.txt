@@ -8,6 +8,7 @@ set(SRC
   mainModule.f90  
 ) 
 
+set(SKIP_BUILD_RPATH true)
 add_executable( convertESOMTR ${SRC} )
 
 if(APPLE)
@@ -15,6 +16,7 @@ if(APPLE)
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel" )
   endif()
 elseif(UNIX)
+  set(CMAKE_SKIP_RPATH TRUE)
   if(CMAKE_Fortran_COMPILER MATCHES "ifort")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel" )
   else()
