@@ -29,6 +29,8 @@ else()
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} /libs:static")
   else()
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -std=legacy"  )
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffree-line-length-200" )
   endif()
 endif()
 
