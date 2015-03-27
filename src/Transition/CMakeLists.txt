@@ -118,8 +118,9 @@ TARGET_LINK_LIBRARIES( "${LAST_NAME}" TransitionLib )
 ENDFOREACH()
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
-install_and_fixup_exe_target( "${LAST_NAME}" PreProcess/IDFVersionUpdater )
 if( APPLE )
   install_and_fixup_exe_target( "${LAST_NAME}" PreProcess/IDFVersionUpdater/IDFVersionUpdater.app/Contents/MacOS/ )
+else()
+  install_and_fixup_exe_target( "${LAST_NAME}" PreProcess/IDFVersionUpdater )
 endif()
 
