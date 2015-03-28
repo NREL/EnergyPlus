@@ -5,7 +5,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/IOFlags.hh>
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
@@ -33,6 +32,11 @@ using namespace EnergyPlus::DataHVACGlobals;
 
 
 TEST( GasFiredHumidifierTest, Sizing ) {
+
+	int write_stat;
+	// Open the Initialization Output File (lifted from SimulationManager.cc)
+	OutputFileInits = GetNewUnitNumber( );
+	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios( ); }
 
 	SysSizingRunDone = true;
 	CurSysNum = 1;
@@ -65,6 +69,11 @@ TEST( GasFiredHumidifierTest, Sizing ) {
 	EXPECT_DOUBLE_EQ( 4.00E-5, thisHum.NomCapVol );
 	EXPECT_DOUBLE_EQ( 0.040000010708118504, thisHum.NomCap );
 	EXPECT_DOUBLE_EQ( 103710.42776358133, thisHum.NomPower );
+
+	// clean up
+	FinalSysSizing.deallocate( );
+
+
 }
 TEST( GasFiredHumidifierTest, AutoSizing ) {
 
@@ -104,6 +113,9 @@ TEST( GasFiredHumidifierTest, AutoSizing ) {
 	EXPECT_NEAR( 0.0818, thisHum.NomCap, 1.0E-04 ); // kg/s
 	// test autosized nominal gas use rate
 	EXPECT_NEAR( 265257.67, thisHum.NomPower, 1.0E-02 ); // Watts
+
+	// clean up
+	FinalSysSizing.deallocate( );
 }
 
 TEST( GasFiredHumidifierTest, EnergyUse ) {
@@ -158,4 +170,11 @@ TEST( GasFiredHumidifierTest, EnergyUse ) {
 
 	thisHum.ReportHumidifier();
 	EXPECT_DOUBLE_EQ( 93339384.987223208, thisHum.GasUseEnergy );
+
+	// clean up
+	FinalSysSizing.deallocate( );
+	Humidifier.deallocate( );
+
+	// Close and delete eio output file
+	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 }
