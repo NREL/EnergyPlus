@@ -91,6 +91,10 @@ public:
 
 		SetPredefinedTables();
 
+		int write_stat;
+		// Open the Initialization Output File (lifted from SimulationManager.cc)
+		OutputFileInits = GetNewUnitNumber( );
+		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios( ); }
 	}
 
 	//destructor
@@ -102,6 +106,10 @@ public:
 		Environment.deallocate();
 		PlantSizData.deallocate();
 		TimeValue.deallocate();
+
+		// Close and delete eio output file
+		{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
+
 	}
 
 
