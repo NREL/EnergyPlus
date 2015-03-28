@@ -10,6 +10,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataAirflowNetwork;
@@ -27,6 +28,8 @@ using DataHeatBalFanSys::ZoneThermostatSetPointHi;
 
 TEST( AdvancedAFNTest, Test1 )
 {
+
+	ShowMessage( "Begin Test: AdvancedAFNTest, Test1" );
 
 	int AirflowNetworkNumOfOccuVentCtrls;
 	Real64 TimeOpenElapsed; 

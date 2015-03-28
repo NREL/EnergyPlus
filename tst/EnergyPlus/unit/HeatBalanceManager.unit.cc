@@ -21,6 +21,8 @@ using namespace ObjexxFCL;
 
 TEST( HeatBalanceManagerTest, ProcessZoneData )
 {
+	ShowMessage( "Begin Test: HeatBalanceManagerTest, ProcessZoneData" );
+	
 // Test input processing of Zone object
 //	Zone,
 //		ZONE ONE, !- Name
@@ -104,7 +106,10 @@ TEST( HeatBalanceManagerTest, ProcessZoneData )
 	rNumericArgs.deallocate();
 
 }
-TEST( HeatBalanceManagerTest, GetWindowConstructData ) {
+TEST( HeatBalanceManagerTest, GetWindowConstructData ) 
+{
+	ShowMessage( "Begin Test: HeatBalanceManagerTest, GetWindowConstructData" );
+
 	// Test get input for window construction object
 	// Construction,
 	//	 WINDOWWBLIND, !- Name

@@ -23,6 +23,7 @@ using namespace EnergyPlus::DataSizing;
 
 TEST( SizeStandAloneERVTest, Test1 )
 {
+	ShowMessage( "Begin Test: SizeStandAloneERVTest, Test1" );
 
 	int write_stat;
 	// Open the Initialization Output File (lifted from SimulationManager.cc)

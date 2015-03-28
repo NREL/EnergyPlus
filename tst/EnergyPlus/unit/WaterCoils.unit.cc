@@ -95,6 +95,7 @@ public:
 
 TEST_F( WaterCoilsTest, WaterCoolingCoilSizing )
 {
+	ShowMessage( "Begin Test: WaterCoilsTest, WaterCoolingCoilSizing" );
 	int write_stat;
 	// Open the Initialization Output File (lifted from SimulationManager.cc)
 	OutputFileInits = GetNewUnitNumber();

@@ -114,6 +114,8 @@ public:
 
 TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3 )
 {
+	ShowMessage( "Begin Test: HVACSizingSimulationManagerTest, WeatherFileDaysTest3" );
+	
 // this test emulates two design days and two sizing weather file days periods
 // calls code related to coincident plant sizing with HVAC sizing simulation
 // this test runs 3 system timesteps for each zone timestep
@@ -331,6 +333,8 @@ TEST_F(HVACSizingSimulationManagerTest, WeatherFileDaysTest3 )
 
 TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3 )
 {
+	ShowMessage( "Begin Test: HVACSizingSimulationManagerTest, TopDownTestSysTimestep3" );
+	
 // this test emulates two design days and calls nearly all the OO code related
 // to coincident plant sizing with HVAC sizing simulation
 // this test runs 3 system timesteps for each zone timestep
@@ -461,6 +465,8 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep3 )
 
 TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1 )
 {
+	ShowMessage( "Begin Test: HVACSizingSimulationManagerTest, TopDownTestSysTimestep1" );
+	
 // this test emulates two design days and calls nearly all the OO code related
 // to coincident plant sizing with HVAC sizing simulation
 // this test runs 1 system timestep for each zone timestep
@@ -549,6 +555,8 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1 )
 
 TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps )
 {
+	ShowMessage( "Begin Test: HVACSizingSimulationManagerTest, VarySysTimesteps" );
+	
 // this test emulates two design days and calls nearly all the OO code related
 // to coincident plant sizing with HVAC sizing simulation
 // this test run varies the system timestep some to test irregular 

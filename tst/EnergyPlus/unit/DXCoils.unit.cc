@@ -55,6 +55,8 @@ using namespace EnergyPlus::Psychrometrics;
 TEST( DXCoilsTest, Test1 )
 {
 
+	ShowMessage( "Begin Test: DXCoilsTest, Test1" );
+
 	using CurveManager::Quadratic;
 	using CurveManager::BiQuadratic;
 	using CurveManager::NumCurves;

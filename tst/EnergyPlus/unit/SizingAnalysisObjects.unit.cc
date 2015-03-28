@@ -9,6 +9,7 @@
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace WeatherManager;
@@ -111,6 +112,7 @@ public:
 
 TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
 {
+	ShowMessage( "Begin Test: SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework" );
 
 	int const ZoneIndex ( 1 );
 
@@ -151,6 +153,8 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework )
 
 TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 {
+	ShowMessage( "Begin Test: SizingAnalysisObjectsTest, BasicLogging4stepsPerHour" );
+	
 // basic test of method FillZoneStep and zone time stamp constructor
 // setup a log for 4 timesteps per hour and fill the first 4 steps, then check that values are there
 	SizingLog TestLogObj( LogVal );
@@ -250,6 +254,8 @@ TEST_F( SizingAnalysisObjectsTest, BasicLogging4stepsPerHour)
 
 TEST_F( SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour )
 {
+	ShowMessage( "Begin Test: SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour" );
+
 // this test uses one timestep per hour and checks as for two design days
 
 	SizingLog TestLogObj( LogVal );
@@ -312,6 +318,7 @@ TEST_F( SizingAnalysisObjectsTest, LoggingDDWrap1stepPerHour )
 
 TEST_F( SizingAnalysisObjectsTest , PlantCoincidentAnalyObjTest)
 {
+	ShowMessage( "Begin Test: SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest" );
 
 	std::string loopName;
 	int loopNum;

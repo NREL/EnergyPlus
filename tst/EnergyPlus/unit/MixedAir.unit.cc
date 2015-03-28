@@ -24,6 +24,8 @@ using namespace ObjexxFCL;
 
 TEST( ProcessOAControllerTest, Test1 )
 {
+	ShowMessage( "Begin Test: ProcessOAControllerTest, Test1" );
+	
 // Test input processing of portion of Controller:OutdoorAir object
 	//  Controller:OutdoorAir,
 	//    OA Controller 1,         !- Name

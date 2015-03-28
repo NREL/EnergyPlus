@@ -10,6 +10,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 #include <ObjexxFCL/gio.hh>
 
 
@@ -25,6 +26,8 @@ using namespace ScheduleManager;
 
 TEST( SetVSHPAirFlowTest, VSFurnaceFlowTest )
 {
+	ShowMessage( "Begin Test: SetVSHPAirFlowTest, VSFurnaceFlowTest" );
+
 	int FurnaceNum( 1 );
 	Real64 OnOffAirFlowRatio; // This is a return value
 	Real64 PartLoadRatio( 1.0 );

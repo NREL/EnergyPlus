@@ -37,6 +37,7 @@ using namespace EnergyPlus::Psychrometrics;
 
 TEST( ZoneTempPredictorCorrector, CorrectZoneHumRatTest )
 {
+	ShowMessage( "Begin Test: ZoneTempPredictorCorrector, CorrectZoneHumRatTest" );
 
 	InitializePsychRoutines( );
 

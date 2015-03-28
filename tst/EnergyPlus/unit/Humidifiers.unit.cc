@@ -32,6 +32,7 @@ using namespace EnergyPlus::DataHVACGlobals;
 
 
 TEST( GasFiredHumidifierTest, Sizing ) {
+	ShowMessage( "Begin Test: GasFiredHumidifierTest, Sizing" );
 
 	int write_stat;
 	// Open the Initialization Output File (lifted from SimulationManager.cc)
@@ -76,6 +77,7 @@ TEST( GasFiredHumidifierTest, Sizing ) {
 
 }
 TEST( GasFiredHumidifierTest, AutoSizing ) {
+	ShowMessage( "Begin Test: GasFiredHumidifierTest, AutoSizing" );
 
 	SysSizingRunDone = true;
 	CurSysNum = 1;
@@ -119,6 +121,7 @@ TEST( GasFiredHumidifierTest, AutoSizing ) {
 }
 
 TEST( GasFiredHumidifierTest, EnergyUse ) {
+	ShowMessage( "Begin Test: GasFiredHumidifierTest, EnergyUse" );
 
 	HumidifierData thisHum;
 
