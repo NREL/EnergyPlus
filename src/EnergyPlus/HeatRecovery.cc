@@ -1891,15 +1891,14 @@ namespace HeatRecovery {
 			//   Control the supply air outlet temperature to a setpoint for Heating Mode only
 			//   (ControlFraction = 0 HX fully bypassed, ControlFraction = 1 air passed entirely through HX)
 			//   (supply air stream bypass mass flow rate proportional to ControlFraction except when frost control is active)
-//			if ( ExchCond( ExNum ).ControlToTemperatureSetPoint && ExchCond( ExNum ).SupInTemp < HXTempSetPoint ) {
-			if( ExchCond( ExNum ).ControlToTemperatureSetPoint ) {
-					//     IF secondary inlet temperature is above the supply inlet temperature, control to SP
-//				if ( ExchCond( ExNum ).SecInTemp > ExchCond( ExNum ).SupInTemp && ( ExchCond( ExNum ).SupInTemp - ExchCond( ExNum ).SupOutTemp ) != 0.0 ) {
-				if( ( ExchCond( ExNum ).SupInTemp - ExchCond( ExNum ).SupOutTemp ) != 0.0 ) {
-					if( ExchCond( ExNum ).SupInTemp < ExchCond( ExNum ).SecInTemp && ExchCond( ExNum ).SupInTemp < HXTempSetPoint ) { // heating mode
+			if ( ExchCond( ExNum ).ControlToTemperatureSetPoint ) {
+				if ( ( ExchCond( ExNum ).SupInTemp - ExchCond( ExNum ).SupOutTemp ) != 0.0 ) {
+					if ( ( ExchCond( ExNum ).SupInTemp < HXTempSetPoint && ExchCond( ExNum ).SupOutTemp > HXTempSetPoint ) || 
+						( ExchCond( ExNum ).SupInTemp > HXTempSetPoint && ExchCond( ExNum ).SupOutTemp < HXTempSetPoint ) ) {
 						ControlFraction = max( 0.0, min( 1.0, std::abs( ( ExchCond( ExNum ).SupInTemp - HXTempSetPoint ) / ( ExchCond( ExNum ).SupInTemp - ExchCond( ExNum ).SupOutTemp ) ) ) );
-					} else if( ExchCond( ExNum ).SupInTemp > ExchCond( ExNum ).SecInTemp && ExchCond( ExNum ).SupInTemp > HXTempSetPoint ) { // cooling mode
-						ControlFraction = max( 0.0, min( 1.0, std::abs( ( ExchCond( ExNum ).SupInTemp - HXTempSetPoint ) / ( ExchCond( ExNum ).SupInTemp - ExchCond( ExNum ).SupOutTemp ) ) ) );
+					} else if ( ( ExchCond( ExNum ).SupInTemp < ExchCond( ExNum ).SupOutTemp && ExchCond( ExNum ).SupOutTemp < HXTempSetPoint ) ||
+								( ExchCond( ExNum ).SupInTemp > ExchCond( ExNum ).SupOutTemp && ExchCond( ExNum ).SupOutTemp > HXTempSetPoint ) ) {
+						ControlFraction = 1.0;
 					} else {
 						ControlFraction = 0.0;
 					}
@@ -1957,10 +1956,8 @@ namespace HeatRecovery {
 						} else {
 							//           or HX is fully bypassed (ControlFraction = 0) which actually should be caught in IF(CSup .EQ. 0.0)THEN above.
 							ControlFraction = 0.0;
-//							MassFlowSupOut = MassFlowSupIn * ControlFraction;
-//							MassFlowSupBypass = MassFlowSupIn * ( 1.0 - ControlFraction );
-							MassFlowSupOut = 0.0;
-							MassFlowSupBypass = MassFlowSupIn;
+							MassFlowSupOut = MassFlowSupIn * ControlFraction;
+							MassFlowSupBypass = MassFlowSupIn * ( 1.0 - ControlFraction );
 							CSup = 1.0;
 							CMin = 0.0;
 							break;
