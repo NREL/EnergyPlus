@@ -98,6 +98,8 @@ public:
 TEST_F( WaterCoilsTest, WaterCoolingCoilSizing )
 {
 	InitializePsychRoutines( );
+	OutBaroPress = 101325.0;
+	StdRhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, 20.0, 0.0 );
 	ShowMessage( "Begin Test: WaterCoilsTest, WaterCoolingCoilSizing" );
 	int write_stat;
 	// Open the Initialization Output File (lifted from SimulationManager.cc)
