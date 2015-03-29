@@ -106,6 +106,9 @@ TEST_F( WaterCoilsTest, WaterCoolingCoilSizing )
 	OutputFileInits = GetNewUnitNumber();
 	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
+	// set up sizing flags
+	SysSizingRunDone = true;
+
 	// set up plant sizing
 	NumPltSizInput = 1;
 	PlantSizData( 1 ).PlantLoopName = "WaterLoop";
