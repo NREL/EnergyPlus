@@ -2925,8 +2925,9 @@ namespace SimAirServingZones {
 		// Any coil operation from multiple coils causes flag to be TRUE
 		// Flag is reset at beginning of each iteration (Subroutine SimHVAC)
 		AirLoopControlInfo( AirLoopNum ).CoolingActiveFlag = AirLoopControlInfo( AirLoopNum ).CoolingActiveFlag || CoolingActive;
-		AirLoopControlInfo( AirLoopNum ).HeatingActiveFlag = AirLoopControlInfo( AirLoopNum ).HeatingActiveFlag || HeatingActive;
-
+		if( HeatingActive ) {
+			AirLoopControlInfo( AirLoopNum ).HeatingActiveFlag = AirLoopControlInfo( AirLoopNum ).HeatingActiveFlag || HeatingActive;
+		}
 	}
 
 	void
