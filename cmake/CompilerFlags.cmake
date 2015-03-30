@@ -39,10 +39,6 @@ IF ( MSVC ) # Visual C++ (VS 2013)
 
 ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # g++/Clang
 
-	if(UNIX)
-	  ADD_CXX_DEFINITIONS("-fPIC") # Enable fPIC for CMake on UNIX only
-	endif()
-
     option(ENABLE_THREAD_SANITIZER "Enable thread sanitizer testing in gcc/clang" FALSE)
     set(LINKER_FLAGS "")
     if(ENABLE_THREAD_SANITIZER)
@@ -162,7 +158,6 @@ ELSEIF ( UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     ADD_CXX_DEFINITIONS("-Wall") # Enable "all" warnings
     ADD_CXX_DEFINITIONS("-Wp64") # 64-bit warnings
     ADD_CXX_DEFINITIONS("-diag-disable:177,869,1786,2259,3280,11074,11075") # Disable warnings listed above
-    ADD_CXX_DEFINITIONS("-fPIC") # Enable fPIC for CMake
 	
     # Optimization options that had no significant benefit for EnergyPlus
     #  -inline-factor=200
