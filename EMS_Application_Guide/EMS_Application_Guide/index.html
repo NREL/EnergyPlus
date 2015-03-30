@@ -550,7 +550,7 @@
 <p>Built-in variables, internal variables, and sensor variables are primarily used to <em>get</em> information about the state of the simulation. However, because all variables are treated alike, built-in variables and sensor variables can also be overwritten by the SET instruction. (This applies within the EMS only; the variables in the rest of EnergyPlus program will not be overwritten.)  This allows you to reassign constants such as “on” and “off” as well as the values of the other built-in variables and sensor variables. There is really no problem with this, as long as you know what you are doing. One possible application is to reset a sensor variable that references the outdoor drybulb temperature so it contains the temperature in degrees Fahrenheit instead of Celsius. Regardless of reassignment, sensor variables and the dynamic built-in variables (e.g., date and time) will be cleared and updated with the latest values from EnergyPlus at the next timestep. Resetting a sensor variable does not have a retroactive effect on the report variable to which it is mapped.</p>
 <p>The actuator variable is the counterpart of the sensor variable. Sensor variables are used to <em>get</em> the state of building systems; actuator variables are used to <em>set</em> the state of building systems. When used with actuator variables, the SET instruction performs control actions on the object to which it maps.</p>
 <h3 id="built-in-variables">Built-In Variables</h3>
-<p>A set of built-in variables provides date, time, and weather information that is not available via standard report variables, as well as several handy constant variables such as “true,” “false,” “on,” and “off.” Several variables provide access to the time and date information during the course of a simulation.  The CurrentTime, Hour and Minute variables represent the point in time at end of the timestep currently being simulated. EnergyPlus primarily operates in standard time and these clock values are not adjusted for daylight savings time.  The built-in variable DaylightSavings time is available for use with the daylight savings time adjustment feature (see RunPeriodControl:DaylightSavingTime). The duration of simulation timesteps are available in the variables ZoneTimeStep and SystemTimeStep.</p>
+<p>A set of built-in variables provides date, time, and weather information that is not available via standard report variables, as well as several handy constant variables such as “true,” “false,” “on,” and “off.” Several variables provide access to the time and date information during the course of a simulation.  The CurrentTime, Hour and Minute variables represent the point in time at end of the timestep currently being simulated. EnergyPlus primarily operates in standard time and these clock values are not adjusted for daylight savings time.  The built-in variable DaylightSavings time is available for use with the daylight savings time adjustment feature (see RunPeriodControl:DaylightSavingTime). The duration of simulation timesteps are available in the variables ZoneTimeStep and SystemTimeStep.  The status of whether or not the simulation is currently during the initial warmup days is available in the variable WarmupFlag.</p>
 <p>Table 2 lists the built-in variables that are always available for use in Erl programs.</p>
 <p>Table 2. Built-In Unique Variables for Erl</p>
 <table class="table table-striped">
@@ -650,6 +650,9 @@
 <td>ActualTime</td>
 <td>A simple sum of the values of the time part of the date/time function. Could be used in random seeding.</td>
 </tr>
+<tr>
+<td>WarmupFlag</td>
+<td>0 (= not during warmup) or 1 (= during warmup)</tr>
 </table>
 
 <h3 id="trend-variables">Trend Variables</h3>
