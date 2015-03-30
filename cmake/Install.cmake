@@ -61,6 +61,7 @@ else()
 endif()
 
 # Install files that are in the current repo
+INSTALL(FILES "${CMAKE_SOURCE_DIR}/doc/index.html" DESTINATION "./Documentation")
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/datasets/AirCooledChiller.idf" DESTINATION "./DataSets")
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/datasets/ASHRAE_2005_HOF_Materials.idf" DESTINATION "./DataSets")
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/datasets/Boilers.idf" DESTINATION "./DataSets")
@@ -137,28 +138,6 @@ INSTALL( DIRECTORY testfiles/ DESTINATION ExampleFiles/
   PATTERN *.ddy EXCLUDE
   PATTERN CMakeLists.txt EXCLUDE
 )
-
-# remote files.  All of these should eventually be generated from content in the EnergyPlusTeam project.
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/docs/pdf/Acknowledgments.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/docs/pdf/appguidemenu.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/docs/pdf/AuxiliaryPrograms.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/docs/pdf/devguidemenu.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/docs/pdf/EMS_Application_Guide.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/docs/pdf/EngineeringReference.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/docs/pdf/EPlusMainMenu.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/docs/pdf/ExternalInterfaces_Application_Guide.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/docs/pdf/GettingStarted.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/docs/pdf/index.pdx" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/docs/pdf/InputOutputReference.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/docs/pdf/InterfaceDeveloper.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/docs/pdf/ModuleDeveloper.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/docs/pdf/OutputDetailsAndExamples.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/docs/pdf/PlantApplicationGuide.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/docs/pdf/ProgrammingStandard.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/docs/pdf/Tips_and_Tricks_Using_EnergyPlus.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/docs/pdf/Using_EnergyPlus_for_Compliance.pdf" "./Documentation")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/docs/pdf/index/index.idx" "./Documentation/index/")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/docs/pdf/index/index1.idx" "./Documentation/index/")
 
 # TODO Remove version from file name or generate
 # These files names are stored in variables because they also appear as start menu shortcuts later.
@@ -380,7 +359,6 @@ if( APPLE )
   install_remote_plist("https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/bin/EP-Compare/Run-Mac/EP-Compare.app/Contents/Info.plist" "PostProcess/EP-Compare/EP-Compare.app/Contents/" "epcompare")
 
   install_remote(PROGRAMS "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/bin/EPMacro/Mac/EPMacro" "./")
-  install_remote(PROGRAMS "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.3.0/release/Mac/EnergyPlus%20Quick%20Start%20Guide.pdf" "./" "EnergyPlus Quick Start Guide.pdf")
 
   configure_file(scripts/runenergyplus.in "${CMAKE_BINARY_DIR}/scripts/runenergyplus" @ONLY)
   install(PROGRAMS "${CMAKE_BINARY_DIR}/scripts/runenergyplus" DESTINATION "./")
