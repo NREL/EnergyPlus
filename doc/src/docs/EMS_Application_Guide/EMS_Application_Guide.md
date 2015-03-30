@@ -187,7 +187,7 @@ The actuator variable is the counterpart of the sensor variable. Sensor variable
 
 ### Built-In Variables
 
-A set of built-in variables provides date, time, and weather information that is not available via standard report variables, as well as several handy constant variables such as “true,” “false,” “on,” and “off.” Several variables provide access to the time and date information during the course of a simulation.  The CurrentTime, Hour and Minute variables represent the point in time at end of the timestep currently being simulated. EnergyPlus primarily operates in standard time and these clock values are not adjusted for daylight savings time.  The built-in variable DaylightSavings time is available for use with the daylight savings time adjustment feature (see RunPeriodControl:DaylightSavingTime). The duration of simulation timesteps are available in the variables ZoneTimeStep and SystemTimeStep.
+A set of built-in variables provides date, time, and weather information that is not available via standard report variables, as well as several handy constant variables such as “true,” “false,” “on,” and “off.” Several variables provide access to the time and date information during the course of a simulation.  The CurrentTime, Hour and Minute variables represent the point in time at end of the timestep currently being simulated. EnergyPlus primarily operates in standard time and these clock values are not adjusted for daylight savings time.  The built-in variable DaylightSavings time is available for use with the daylight savings time adjustment feature (see RunPeriodControl:DaylightSavingTime). The duration of simulation timesteps are available in the variables ZoneTimeStep and SystemTimeStep.  The status of whether or not the simulation is currently during the initial warmup days is available in the variable WarmupFlag.
 
 Table 2 lists the built-in variables that are always available for use in Erl programs.
 
@@ -290,6 +290,9 @@ Table 2. Built-In Unique Variables for Erl
 <td>ActualTime</td>
 <td>A simple sum of the values of the time part of the date/time function. Could be used in random seeding.</td>
 </tr>
+<tr>
+<td>WarmupFlag</td>
+<td>0 (= not during warmup) or 1 (= during warmup)</tr>
 </table>
 
 ### Trend Variables

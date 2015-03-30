@@ -12,52 +12,86 @@ The importance of correct equipment sizing is often ignored in discussions of bu
 
 4.    Modular, component-specific sizing algorithms for each HVAC component.
 
+5.    Options for monitoring how the initial sizes operate over multiple design days and then making adjustments and repeating plant level calculations
+
 Sizing Manager
 --------------
 
 The sizing calculations in EnergyPlus are managed by a sizing manager contained in the software module *SizingManager*. The main sizing manager routine *ManageSizing* is called from *ManageSimulation* before the annual simulation sequence is invoked. *ManageSizing* performs the following tasks.
 
-(1)  By calling *GetSizingParams*, *GetZoneSizingInput*, *GetSystemSizingInput* and *GetPlantSizingInput* reads in all the user sizing input contained in objects *Sizing:Parameters*, *Sizing:Zone*, *Sizing:System* and *Sizing:Plant*. These objects and their data are described in the EnergyPlus Input Output Reference, Group – Design Objects.
+*  By calling *GetSizingParams*, *GetZoneSizingInput*, *GetSystemSizingInput* and *GetPlantSizingInput* reads in all the user sizing input contained in objects *Sizing:Parameters*, *Sizing:Zone*, *Sizing:System* and *Sizing:Plant*. These objects and their data are described in the EnergyPlus Input Output Reference, Group – Design Objects.
 
-(2)  Set the *ZoneSizingCalc* flag equal to *true*.
+*  Set the *ZoneSizingCalc* flag equal to *true*.
 
-(3)  Loop over all the sizing periods by each day. **This starts the zone design calculations.**
+*  Loop over all the sizing periods by each day. **This starts the zone design calculations.**
 
-(a)  Call *UpdateZoneSizing(BeginDay)* to initialize zone design load and flow rate  sequences.
+    * Call *UpdateZoneSizing(BeginDay)* to initialize zone design load and flow rate  sequences.
 
-(b)  Loop over hours in the day
+    * Loop over hours in the day
 
-(i)    Loop over zone time steps in each hour
+        * Loop over zone time steps in each hour
 
-1.    Call *ManageWeather* to obtain outside conditions for this time-step.
+            * Call *ManageWeather* to obtain outside conditions for this time-step.
 
-2.    Call *ManageHeatBalance* to do a full heat balance calculation for each zone. The call to *ManageHeatBalance* also brings about an HVAC simulation. *ZoneSizingCalc = true* signals the *HVACManager* to ignore the real HVAC system and instead run the ideal zonal system (described below) used to calculate design loads and flow rates. HVACManager also calls *UpdateZoneSizing(DuringDay)* to save the results of the ideal zonal system calculation in the design load and flow rate sequences.
+            * Call *ManageHeatBalance* to do a full heat balance calculation for each zone. The call to *ManageHeatBalance* also brings about an HVAC simulation. *ZoneSizingCalc = true* signals the *HVACManager* to ignore the real HVAC system and instead run the ideal zonal system (described below) used to calculate design loads and flow rates. HVACManager also calls *UpdateZoneSizing(DuringDay)* to save the results of the ideal zonal system calculation in the design load and flow rate sequences.
 
-(c)  Call *UpdateZoneSizing(EndDay)* to calculate peaks and moving averages from the zone design sequences for each design day.
+        * Call *UpdateZoneSizing(EndDay)* to calculate peaks and moving averages from the zone design sequences for each design day.
 
-(4)  Call *UpdateZoneSizing(EndZoneSizingCalc)* to calculate for each zone the peak heating & cooling loads and flow rates over all the sizing periods (design days and sizing periods from the weather file, if specified). The corresponding design load and flow rate sequences are saved for use in the system design calculations. **This ends the zone design calculations.**
+* Call *UpdateZoneSizing(EndZoneSizingCalc)* to calculate for each zone the peak heating & cooling loads and flow rates over all the sizing periods (design days and sizing periods from the weather file, if specified). The corresponding design load and flow rate sequences are saved for use in the system design calculations. **This ends the zone design calculations.**
 
-(5)  Set the *SysSizingCalc* flag equal to *true*.
+*  Set the *SysSizingCalc* flag equal to *true*.
 
-(6)  Call *ManageZoneEquipment* and *ManageAirLoops* to read in the zone and central system inputs needed for the system design calculations. The program needs enough information to be able to figure out the overall air loop connectivity.
+* Call *ManageZoneEquipment* and *ManageAirLoops* to read in the zone and central system inputs needed for the system design calculations. The program needs enough information to be able to figure out the overall air loop connectivity.
 
-(7)  Loop over all the sizing periods by each day. **This starts the system design calculations.**
+*  Loop over all the sizing periods by each day. **This starts the system design calculations.**
 
-(a)  Call *UpdateSysSizing(BeginDay)* to initialize system design load and flow rate  sequences.
+    * Call *UpdateSysSizing(BeginDay)* to initialize system design load and flow rate  sequences.
 
-(b)  Loop over hours in the day
+    * Loop over hours in the day
 
-(i)    Loop over zone time steps in each hour
+        * Loop over zone time steps in each hour
 
-1.    Call *ManageWeather* to obtain outside conditions for this time-step.
+            * Call *ManageWeather* to obtain outside conditions for this time-step.
 
-2.    Call *UpdateSysSizing(DuringDay)* to save the results of the system design calculations in the system design load and flow rate sequences.
+            * Call *UpdateSysSizing(DuringDay)* to save the results of the system design calculations in the system design load and flow rate sequences.
 
-(c)  Call *UpdateSysSizing(EndDay)* to calculate peaks and moving averages from the system design sequences for each sizing period.
+    * Call *UpdateSysSizing(EndDay)* to calculate peaks and moving averages from the system design sequences for each sizing period.
 
-(8)  Call *UpdateSysSizing(EndSysSizingCalc))* to calculate for each system the peak heating & cooling loads and flow rates over all the sizing periods (design days and sizing periods from the weather file, if specified). The corresponding design load and flow rate sequences are saved for use in the component sizing calculations. **This ends the system design calculations.**
+* Call *UpdateSysSizing(EndSysSizingCalc))* to calculate for each system the peak heating & cooling loads and flow rates over all the sizing periods (design days and sizing periods from the weather file, if specified). The corresponding design load and flow rate sequences are saved for use in the component sizing calculations. **This ends the system design calculations.**
 
-**(9)  And this ends the tasks of the Sizing Manager.**
+* And this ends the tasks of the Sizing Manager.
+
+HVAC Sizing Simulation Manager
+------------------------------
+
+After the Sizing Manager has completed its initial pass, all the data needed to complete a running model should be available and the program is ready to run the main simulation(s).  However, as of Version 8.3 there is now an option of applying some advanced sizing calculations using what are called HVAC Sizing Simulations.  
+
+With this new sizing method we distinguish between different kinds of simulations and introduce some new terminology.  The Primary Simulations are the main simulations that are the final version of the model to be run.  Prior to Version 8.3, these are just the usual simulations with the final results.  When the program is running the zone heat balance model over the sizing periods for zone sizing (for step 3 in the Sizing Manager description above), we call those Ideal Loads Sizing Simulations.  When the program is running the zone heat balance model over the sizing periods for component loads calculations we call those Ideal Component Loads Simulations. HVAC Sizing Simulations are a kind of simulation, where the program creates copies of sizing periods and runs them as complete EnergyPlus simulations with the most current equipment sizes and full HVAC systems.  The advanced sizing algorithms monitor what occurred during those sizing periods and determines if new size results are needed and signals systems and components to repeat their sizing calculations.  The process can repeat in an iterative manner and a Sizing Pass refers to a set of the HVAC Sizing Simulations for each of the sizing periods (e.g. two design days).  
+
+If the user has selected a sizing option that requires HVAC Sizing Simulations the main ManageSimulation will call ManageHVACSizingSimulation before going on to the main simulations.  
+
+* Instantiate a new HVACSizingSimulationManager object.  
+
+* Call DetermineSizingAnalysesNeeded(). This checks what user input and decides what, if anything, needs to be done for advanced sizing algorithms.   This involves, for example, checking the input in Sizing:Plant object to see if coincident sizing option has been selected.
+
+* Call SetupSizingAnalyses().  This method creates the data logging apparatus needed to monitor operation during HVAC Sizing Simulations.  Individual sizing algorithms include selecting specific variables, such as system node states or load output variables, that will be recorded. 
+
+* Loop over some number of Sizing Passes.  The set of sizing periods, run as HVAC Sizing Simulations, can iterate up to a maximum limit on the number of passes
+
+    * Loop over all the sizing periods by each day.  This runs the HVAC Sizing Simulations which have basically the same set of calls as are used for marching through time and calling of EnergyPlus modeling for the Primary Simulations (in ManageSimulation).
+
+        * Call PostProcessLogs().  This method applies running averages (if desired) and averages system timestep data to fill zone timestep data in the records.
+
+        * Call ProcessCoincidentPlantSizeAdjustments(). This method retrieves data from the logs and calls for the coincident plant sizing algorithm to execute. Set flag if the sizing analyses request another Sizing Pass.  (See the section below on Coincident Plant Sizing.)
+
+        * Call RedoKickOffAndResize(). The methods calls SetupSimulation() and sets flag to signal that system and component level sizing methods need to be called again.  These are fake timesteps used to initialize and are not part of a Simulation.
+
+    * Break out of Sizing Pass loop if size results did not change or the limit on Sizing Passes has been reached.
+
+* Empty HVACSizingSimulationManager object to free memory
+
+Currently the only application for HVAC Sizing Simulations is to improve the sizing of plant loops using the “Coincident” sizing option.  However this approach may be expanded in the future to extend advanced sizing methods to air-side equipment. 
+
 
 Zone Design Loads and Air Flow Rates
 ------------------------------------
@@ -971,6 +1005,37 @@ The loop maximum volumetric flow rate (m<sup>3</sup>) is just set equal to the v
 Since the loop capacitance has a stability requirement of <div img="image2044.txt">\((\dot V\cdot \Delta tstep/V) \le 1\)</div> the volume is set so that the stability requirement will be 0.8 at the zone time step, which is the largest time step encountered at the max flow rate the loop can reach.
 
 <div>\[Vloop = (\dot Vloop,max\cdot \Delta tstep,zone\cdot 3600)/0.8\]</div>
+
+Coincident Plant Sizing using HVAC Sizing Simulation
+----------------------------------------------------
+
+Coincident plant sizing is an advanced sizing method that uses HVAC Sizing Simulations to determine coincident flows.  This section describes the algorithm used for sizing plant loop flow rate based on the coincidence of flow requests that actually occur when operating the system.  The purpose is to provide a more accurate value for the plant loop design flow rate.  This value is held in PlantSizData( PltSizIndex ).DesVolFlowRate.  For plant, this flow rate is the main independent variable used by component models in their sizing routines (along with the design temperature difference in Sizing:Plant). The code is contained in a PlantCoinicidentAnalysis object, one for each plant loop that is to be sized using the coincident method using HVAC Sizing Simulation.
+
+The analysis will proceed as follows:
+
+1. Find the maximum mass flow rate over all Sizing Periods, along with the coinciding return temperature and load.  Record which sizing period and timestep. This system node used for logging here is the plant loop supply side inlet node. 
+
+2. Find the maximum load, and the coinciding mass flow and return temperature. Record which sizing period and timestep. For a heating or steam plant loop, the load that is logged is associated with the output variable called Plant Supply Side Heating Demand Rate.  For a cooling or condenser plant loop, the load log is as for the output variable called Plant Supply Side Cooling Demand Rate.
+
+3. Calculate a maximum design flow rate from the maximum load, from step 2, and the temperature difference entered in the Plant:Sizing object and the specific heat (at 5°C) of the plant fluid.  
+
+4. Compare the flow rate from step 1 to the flow rate from step 3 and take the higher.
+
+5. Apply a sizing factor to the flow rate from Step 4, if desired.  The user can select among different options for which sizing factor use.  
+
+6. Compare the flow rate from step 5 to the current value for plant loop flow rate and calculate a normalized change using 
+
+<div>\[\rm{Normalized_Change} = \abs{\frac{\rm{NewFlowRate}-\rm{PreviousFlowRate}}{\rm{PreviousFlowRate}}\]</div>
+
+7. Normalized_Change =ABS(((New flow rate-previous flow rate))/(previous flow rate))
+    * Compare magnitude of Normalized_Change to a threshold, currently set at 0.005, to determine if it was significant or not.
+    * If change is significant, then alter the size result for that plant loop. Set flags that sizes have changed and sizing calculations need to be called again.  Trigger special setup timesteps with flags set so that all plant system and component level sizes will be recomputed.  Not this will call and resize all of plant so that if one loop has coincident sizing and it places a load on a loop that has noncoincident sizing, the noncoincident loop might still change size because the loop it depends on changed.  Call for another Sizing Pass. 
+    * If change is not significant, then leave the sizes alone and do not trigger resizing. Do not call for another Sizing Pass. 
+
+See OutputDetailsAndExamples documentation for a description of a fairly comprehensive report sent the EIO file called “Plant Coincident Sizing Algorithm” which provides the user details for each execution of  the algorithm. There is also a predefined summary table 
+
+The algorithm described above can have powerful impacts on the sizes of plant loops.  It is not uncommon for a hot water plant to size out at around half of what would be determined from the noncoincident sum of the sizes of all the components connected to the loop.  The maximum load aspect of the algorithm is able to increase plant flow rates above the size of the pumps, whereas the flow rate aspect of the algorithm is only able to reduce the flow rates.  It can happen that load spikes cause sizes to increase after the first Sizing Pass, and then the coincident flow rate bring the sizes back down some during subsequent Sizing Passes.  It is worthwhile to explore multiple Sizing Passes, or iterations, because sometimes the algorithm will switch between coincident flow and coincident demand from one Sizing Pass and gradually find a size that just meets conditions.  Be aware that all the controls and and EMS are also      
+
 
 Component Sizing
 ----------------
@@ -2570,6 +2635,46 @@ Packaged terminal heat pumps are compound components: each unit contains a suppl
 #### Maximum supply air temperature from supplemental heater
 
 <div>\[{T_{SA,\max }} = HeatDesTem{p_{zone}}\]</div>
+
+#### Unitary System Sizing
+
+The AirloopHVAC:UnitarySystem object incorporates all coils types and fans as a complete packaged system. The fans and coils are optional allowing virtually any system type to be modeled. Sizing of this object depends on the coils selected. For single coil systems, the associated air flow rate is used as the operating flow rate (i.e., cooling or heating). For systems with both a cooling and heating coil, this methodology still applies except for DX systems (Heat Pumps) where the greater of the cooling or heating air flow rate is used. Heat pumps are defined as systems having both a DX cooling and DX heating coil. Other AirloopHVAC equipment models use the greater of the cooling and heating flow rates. The inputs that may need to be autosized are the supply air air volumetric air flow rates during cooling operation, heating operation, and when no cooling or heating is needed. The data needed for sizing the units are obtained from the zone design arrays.
+
+Supply Air Flow Rate:
+
+Supply air volumetric flow rate during cooling operation
+
+<div>\[\dot{V}_{SA,cooling} = \rm{DesCoolVolFlow}_{zone}/\rm{ZoneFraction} \]</div>
+ 
+Supply air volumetric flow rate during heating operation
+
+ 
+Supply air volumetric flow rate when DX coils are used as a system
+
+ 
+where ZoneFraction = Fraction of the total volume flow that goes through the controlling zone
+
+The unitary system object also allows scalable sizing as follows:
+
+Flow Per Floor Area:
+
+ 
+Fraction of Autosized Cooling Value:
+
+ 
+Fraction of Autosized Heating Value:
+
+ 
+Flow Per Cooling Capacity
+
+
+Flow Per Heating Capacity
+
+ 
+The maximum supply air temperature can also be automatically selected. The value is determined from the Sizing:Zone or Sizing:System object depending on where the object is used in the simulation (i.e., as zone or air loop equipment).
+
+Maximum supply air temperature
+ 
 
 ### MultiSpeed Heat Pump Sizing
 
