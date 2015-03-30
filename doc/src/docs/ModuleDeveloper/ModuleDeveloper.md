@@ -10347,7 +10347,11 @@ Setting to “yes” (internal default) causes the program to use the Sutherland
 
 Setting to “yes” causes the program to use Minimal Shadowing (a speed up mechanism) in calculations. This could be useful when large files are being run to search for non-shadowing related problems. There is no Output:Diagnostics equivalent.
 
-    et MinimalShadowing=yes
+    Set MinimalShadowing=yes
+
+#### DisplayInputInAudit: turn on (or off) to show the input file in the audit file
+
+Setting to “yes” causes the audit file to include a line-by-line echoing of the input file which may be useful for debugging purposes. For versions 8.2 and earlier, the default behavior was to include the line-by-line echoing of the input file into the audit file but it was changed to not do this by default as a way to speed up the input processing portion of executing EnergyPlus. When not set to “yes”, the audit file contains a reference on using the DisplayInputInAudit environment variable to see the line-by-line echoing of the input file.
 
 #### Caution: Environment Variables
 
