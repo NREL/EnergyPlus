@@ -23,6 +23,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <Psychrometrics.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -37,6 +38,7 @@ using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::FluidProperties;
+using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::SizingManager;
 using namespace EnergyPlus::WaterCoils;
 
@@ -71,6 +73,7 @@ public:
 		FinalSysSizing.allocate( 1 );
 		PrimaryAirSystem.allocate( 1 );
 		AirLoopControlInfo.allocate( 1 );
+		InitializePsychRoutines();
 	}
 
 	~WaterCoilsTest() // Reset global state
@@ -89,6 +92,8 @@ public:
 		SysSizPeakDDNum.clear();
 		PrimaryAirSystem.clear();
 		AirLoopControlInfo.clear();
+		cached_Twb.clear();
+		cached_Psat.clear();
 	}
 
 };
