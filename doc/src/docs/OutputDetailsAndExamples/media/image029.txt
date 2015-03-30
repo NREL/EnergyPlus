@@ -1,0 +1,1 @@
+\[Temperature\,\,\,{\rm{ = }}\,\,{\rm{ }}\frac{{\left( {{\rm{12 -  45}}.{\rm{672192}} + 0.{\rm{144599 }}*{\rm{ }}RelativeHumidity} \right)}}{{ - {\rm{ 1}}.{\rm{1559942}}}}\]

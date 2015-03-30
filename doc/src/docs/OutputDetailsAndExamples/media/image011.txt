@@ -1,0 +1,1 @@
+\[T = C2*Tzone + C3*Toadb + C4*C5 + C6*Tgrnd + C7*Wspd*Toadb\]
