@@ -1,0 +1,1 @@
+\(Sk{y_{emissivity}} = \left( {.787 + .764\cdot \ln \left( {\frac{{Temperatur{e_{dewpoint}}}}{{273.}}} \right)} \right)\cdot \left( {1. + .0224N - .0035{N^2} + .00028{N^3}} \right)\)

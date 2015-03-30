@@ -1,0 +1,1 @@
+\[TMC = \left( {\frac{{Atmospheric\;Temperature\;Gradient*EarthRadius*Temperature\;Sensor\;Heigh{t_{met}}}}{{EarthRadius + Temperature\;Sensor\;Heigh{t_{met}}}}} \right)\]

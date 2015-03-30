@@ -1,0 +1,1 @@
+\[\begin{array}{l}Local\;Wind\;Speed = Windspee{d_{met}}*Wind\;Speed\;Modifier\\\quad \quad \quad \quad \quad \quad \quad \quad *{\left( {\frac{{Height\;above\;groun{d_{site/component}}}}{{Wind\;Boundary\;Layer\;Thicknes{s_{site}}}}} \right)^{site\;wind\;exponent}}\end{array}\]

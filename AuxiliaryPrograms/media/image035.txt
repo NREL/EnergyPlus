@@ -1,0 +1,1 @@
+\[ = \left\{ {\begin{array}{*{20}{c}}{User\,Specified}\\{Curve\;Object\;Name}\end{array}} \right\} + ``DXCoilType`` + \left\{ \begin{array}{l}CAPFTemp\\CAPFFF\\EIRFTemp\\EIRFFF\end{array} \right\}\]
