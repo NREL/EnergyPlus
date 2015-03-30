@@ -42,11 +42,11 @@ TEST( ProcessOAControllerTest, Test1 )
 	int NumOfOAControllers( 2 );
 
 	// Open the Error Output File (lifted from UtilityRoutines.cc)
-	int StandardErrorOutput = GetNewUnitNumber( );
-	IOFlags flags;
-	flags.ACTION( "write" );
-	gio::open( StandardErrorOutput, DataStringGlobals::outputErrFileName, flags );
-	int write_stat = flags.ios( );
+	// int StandardErrorOutput = GetNewUnitNumber( );
+	// IOFlags flags;
+	// flags.ACTION( "write" );
+	// gio::open( StandardErrorOutput, DataStringGlobals::outputErrFileName, flags );
+	// int write_stat = flags.ios( );
 
 	cCurrentModuleObject = "Controller:OutdoorAir";
 	OAController.allocate( NumOfOAControllers );
