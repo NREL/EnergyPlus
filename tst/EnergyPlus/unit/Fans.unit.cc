@@ -4,15 +4,17 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <ObjexxFCL/gio.hh>
 
 using namespace EnergyPlus;
+using namespace DataGlobals;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHVACGlobals;
-using namespace DataGlobals;
 using namespace EnergyPlus::Fans;
 
 class FansTest : public testing::Test
@@ -48,12 +50,12 @@ TEST_F( FansTest, FanSizing )
 	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
 
 	int FanNum = 1;
-	Fan( FanNum ).FanName = "My Test Fan";
+	Fan( FanNum ).FanName = "Test Fan";
 	Fan( FanNum ).FanType = "Fan:OnOff";
 	Fan( FanNum ).FanType_Num = FanType_SimpleOnOff;
 	Fan( FanNum ).MaxAirFlowRate = AutoSize;
 
-	FanNumericFields( NumFans ).FieldNames( 3 ) = "Maximum Flow Rate";
+	FanNumericFields( FanNum ).FieldNames( 3 ) = "Maximum Flow Rate";
 
 	CurZoneEqNum = 0;
 	CurSysNum = 0;
@@ -63,6 +65,7 @@ TEST_F( FansTest, FanSizing )
 	DataNonZoneNonAirloopValue = 1.00635;
 	SizeFan( FanNum );
 	EXPECT_DOUBLE_EQ( 1.00635, Fan( FanNum ).MaxAirFlowRate );
+	DataNonZoneNonAirloopValue = 0.0;
 
 	// Close and delete eio output file
 	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }

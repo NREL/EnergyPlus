@@ -4,7 +4,7 @@
 ! EnergyPlus Reference Data Set for Window Blinds
 
 !  Version,
-!    8.0;                    !- Version Identifier
+!    8.3;                    !- Version Identifier
 
   WindowMaterial:Blind,
     BLIND WITH HIGH REFLECTIVITY SLATS,  !- Name

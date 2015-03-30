@@ -1307,7 +1307,6 @@ namespace ReportSizingManager {
 					}
 					bCheckForZero = false;
 				} else if ( SizingType == CoolingWaterDesWaterInletTempSizing ) {
-					AutosizeDes = FinalSysSizing( CurSysNum ).OutTempAtCoolPeak;
 					AutosizeDes = PlantSizData( DataPltSizCoolNum ).ExitTemp;
 					bCheckForZero = false;
 				} else if ( SizingType == CoolingWaterNumofTubesPerRowSizing ) {

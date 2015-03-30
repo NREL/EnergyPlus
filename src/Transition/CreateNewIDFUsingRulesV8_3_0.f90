@@ -9,8 +9,8 @@ CONTAINS
 
 SUBROUTINE SetThisVersionVariables()
       VerString='Conversion 8.2 => 8.3'
-      VersionNum=8.2
-      sVersionNum='8.2'
+      VersionNum=8.3
+      sVersionNum='8.3'
       IDDFileNameWithPath=TRIM(ProgramPath)//'V8-2-0-Energy+.idd'
       NewIDDFileNameWithPath=TRIM(ProgramPath)//'V8-3-0-Energy+.idd'
       RepVarFileNameWithPath=TRIM(ProgramPath)//'Report Variables 8-2-0 to 8-3-0.csv'
