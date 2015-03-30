@@ -2094,6 +2094,31 @@ where
 
 *h<sub>fg</sub> is the latent heat of vaporization of water at 100.0°C, (J/kg);*
 
+#### Gas Fired Humidifier Sizing
+
+The rated power, or nominal gas use rate of a gas steam humidifier (Humidifier:Steam:Gas) is calculated from user specified rated volumetric capacity (m3/s) and the enthalpy change of the water from a reference temperature of 20.0°C to a saturated steam at 100.0°C. Autosizing procedure assumes that gas heater in the humidifier convert the water from the reference temperature and generate saturated steam at 100°C, using gas to thermal energy conversion rated thermal efficiency. 
+
+Rated Gas Use Rate
+
+The rated or nominal gas use rate is given by:
+
+<div>\[Q_{NG,nom} = \frac{\dot{V}_{cap,nom}\rho_w\left(h_{fg}+c_{p,w}\Delta T_w\right)}{\eta_{rated}}\]</div>
+
+Where, 
+
+- Cp,w: specific heat of water at average temperature ((100+20)/2 = 60.0 °C), (J/kgK);
+
+- rho_w: density of water at standard condition (5.05 °C);
+
+- DeltaTw: sensible temperature rise of water (100.0 – 20.0=80.0 °C);
+
+- V_cap_nom: rated or nominal capacity of the humidifier, (m3/s)
+
+- h_fg: latent heat of vaporization of water at 100.0°C, (J/kg);
+
+- eta_rated: thermal efficiency at rated condition;
+
+
 #### Rated Capacity
 
 <div>\[{\dot m_w} = {\dot m_a}\left( {{\omega_o} - {\omega_i}} \right)\]</div>
@@ -2648,9 +2673,11 @@ Supply air volumetric flow rate during cooling operation
  
 Supply air volumetric flow rate during heating operation
 
+<div>\[\dot{V}_{SA,heating} = \rm{DesHeatVolFlow}_{zone}/\rm{ZoneFraction} \]</div>
  
 Supply air volumetric flow rate when DX coils are used as a system
 
+<div>\[\dot{V}_{SA} = \max{\eft(\rm{DesCoolVolFlow},\rm{DesHeatVolFlow}\right)}/\rm{ZoneFraction} \]</div>
  
 where ZoneFraction = Fraction of the total volume flow that goes through the controlling zone
 
@@ -2658,23 +2685,29 @@ The unitary system object also allows scalable sizing as follows:
 
 Flow Per Floor Area:
 
- 
+<div>\[\dot{V}_{SA} = \rm{FlowPerFloorArea}\left(\rm{TotalFloorArea}\right)\]</div>
+
 Fraction of Autosized Cooling Value:
 
+<div>\[\dot{V}_{SA,cooling} = \dot{V}_{SA,des,cooling}\left(\rm{FractionOfCoolingValue}\right)\]</div>
  
 Fraction of Autosized Heating Value:
 
+<div>\[\dot{V}_{SA,heating} = \dot{V}_{SA,des,heating}\left(\rm{FractionOfHeatingValue}\right)\]</div>
  
 Flow Per Cooling Capacity
 
+<div>\[\dot{V}_{SA,cooling} = \dot{Q}_{coil,des,cooling}\left(\rm{FractionOfCoolingValue}\right)\]</div>
 
 Flow Per Heating Capacity
 
- 
+<div>\[\dot{V}_{SA,heating} = \dot{Q}_{coil,des,heating}\left(\rm{FractionOfHeatingValue}\right)\]</div>
+
 The maximum supply air temperature can also be automatically selected. The value is determined from the Sizing:Zone or Sizing:System object depending on where the object is used in the simulation (i.e., as zone or air loop equipment).
 
 Maximum supply air temperature
  
+<div>\[T_{SA,max}=\rm{HeatDesTemp}_{ZoneOrSystem}]</div>
 
 ### MultiSpeed Heat Pump Sizing
 

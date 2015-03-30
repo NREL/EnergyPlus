@@ -4577,8 +4577,6 @@ where,
 
 <div img="image3559.txt">\(EE{R_D}\)</div>=      *EER* at 25% net capacity and reduced outdoor air temperature
 
-<div>\[EE{R_{B - D}} = \frac{{LF \cdot {{\dot Q}_{Total,Net,PartLoad}}}}{{LF\left( {{C_D} \cdot Powe{r_{Total,PartLoad}}} \right) + \,\left( {FanPowerPerVolFlowRate \cdot {{\dot V}_{Rated}}} \right)}}\]</div>
-
 <div>\[EE{R_{B - D}} = \frac{{LF \cdot {{\dot Q}_{Total,Net,PartLoad}}}}{{Powe{r_{Total,{\kern 1pt} PartLoad}}}}\]</div>
 
 <div>\[Powe{r_{Total,{\kern 1pt} PartLoad}} = LF\left( {{C_D} \cdot Powe{r_{CompCondFan,{\kern 1pt} PartLoad}}} \right) + \,\left( {FanPowerPerVolFlowRate \cdot {{\dot V}_{Rated}}} \right)\]</div>
@@ -4608,8 +4606,6 @@ where,
 *<div img="image3572.txt">\(\% Load\)</div>* = Part-load operating points, i.e., 75% (B), 50% (C), 25% (D)
 
 The calculations for *Q<sub>Total,Net,PartLoad</sub>* and *Power<sub>Total,PartLoad</sub>* are calculated in nearly the same way as *Q<sub>Total,Net,TestB</sub>* and *Power<sub>Total,TestB</sub>* are calculated for SEER (defined above). The only difference is that these cooling capacity and power values, used for calculating EER<sub>B</sub>/EER<sub>C</sub>/EER<sub>D</sub> for IEER, are calculated for a series of dry-bulb temperatures of air entering the air-cooled condenser (B = 27.5°C, C = 20.0°C, D = 18.3°C) and part-load performance degradiation correction is also applied to the condensing unit electric power calculation.
-
-<div img="image3573.txt">\(\begin{array}{l}{{\dot Q}_{StandardRating}} = \,\,{{\dot Q}_{Total,Rated}}\left( {TotCapTempModFa{c_{Rated}}} \right)\left( {TotCapFlowModFa{c_{Rated}}} \right)\,\\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, - \,\left( {FanPowerPerVolFlowRate \cdot {{\dot V}_{Rated}}} \right)\end{array}\)</div><div img="image3574.txt">\({\dot Q_{StandardRating}}\)</div><div img="image3575.txt">\({\dot Q_{Total,Rated}}\)</div><div img="image3576.txt">\(TotCapTempModFa{c_{Rated}}\)</div><div img="image3577.txt">\(TotCapFlowModFa{c_{Rated}}\)</div><div img="image3578.txt">\(FanPowerPerVolFlowRate\)</div><div img="image3579.txt">\({\dot V_{Rated}}\)</div><div img="image3580.txt">\(SEER = PL{F_{0.5}} \cdot EE{R_{TestB}}\)</div><div img="image3581.txt">\(EE{R_{TestB}} = \frac{{{{\dot Q}_{Total,Net,TestB}}}}{{Powe{r_{Total,TestB}}}}\)</div><div img="image3582.txt">\(\begin{array}{l}{{\dot Q}_{Total,Net,TestB}} = {{\dot Q}_{Total,Rated}}(TotCapTempModFa{c_{TestB}})(TotCapFlowModFa{c_{Rated}})\\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, - \,\,\left( {FanPowerPerVolFlowRate \cdot {{\dot V}_{Rated}}} \right)\end{array}\)</div><div img="image3583.txt">\(\begin{array}{l}Powe{r_{Total,TestB}} = \left( {{{\dot Q}_{Total,Rated}}(TotCapTempModFa{c_{TestB}})(TotCapFlowModFa{c_{Rated}})} \right)\, \cdot EI{R_{TestB}}\\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, + \,\,\left( {FanPowerPerVolFlowRate \cdot {{\dot V}_{Rated}}} \right)\end{array}\)</div><div img="image3584.txt">\(EI{R_{TestB}} = \left( {\frac{1}{{CO{P_{rated}}}}} \right)(EIRTempModFa{c_{TestB}})(EIRFlowModFa{c_{Rated}})\)</div><div img="image3585.txt">\({\dot Q_{Total,Net,TestB}}\)</div><div img="image3586.txt">\(TotCapTempModFa{c_{TestB}}\)</div><div img="image3587.txt">\(Powe{r_{Total,TestB}}\)</div><div img="image3588.txt">\(CO{P_{rated}}\)</div><div img="image3589.txt">\(EIRTempModFa{c_{TestB}}\)</div><div img="image3590.txt">\(EIRFlowModFa{c_{Rated}}\)</div><div>\[EE{R_{}} = \frac{{{{\dot Q}_{Standard\,Rating}}}}{{Powe{r_{Total,Rated}}}}\]</div><div img="image3592.txt">\(\begin{array}{l}Powe{r_{Total,Rated}} = \left( {{{\dot Q}_{Total,Rated}}(TotCapTempModFa{c_{Rated}})(TotCapFlowModFa{c_{Rated}})} \right)\, \cdot EI{R_{Rated}}\\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, + \,\,\left( {FanPowerPerVolFlowRate \cdot {{\dot V}_{Rated}}} \right)\end{array}\)</div><div img="image3593.txt">\(EI{R_{Rated}} = \left( {\frac{1}{{CO{P_{Rated}}}}} \right)(EIRTempModFa{c_{Rated}})(EIRFlowModFa{c_{Rated}})\)</div><div img="image3594.txt">\(Powe{r_{Total,Rated}}\)</div><div img="image3595.txt">\(TotCapTempModFa{c_{Rated}}\)</div><div img="image3596.txt">\(EIRTempModFa{c_{Rated}}\)</div><div>\[IEER = \,(0.02 \cdot EE{R_A}) + (0.617 \cdot EE{R_B}) + (0.238 \cdot EE{R_C}) + (0.125 \cdot EE{R_D})\]</div><div img="image3598.txt">\(EE{R_A}\)</div><div img="image3599.txt">\(EE{R_B}\)</div><div img="image3600.txt">\(EE{R_C}\)</div><div img="image3601.txt">\(EE{R_D}\)</div><div img="image3602.txt">\(EE{R_{B - D}} = \frac{{LF \cdot {{\dot Q}_{Total,Net,PartLoad}}}}{{LF\left( {{C_D} \cdot Powe{r_{Total,PartLoad}}} \right) + \,\left( {FanPowerPerVolFlowRate \cdot {{\dot V}_{Rated}}} \right)}}\)</div><div img="image3603.txt">\(EE{R_{B - D}} = \frac{{LF \cdot {{\dot Q}_{Total,Net,PartLoad}}}}{{Powe{r_{Total,{\kern 1pt} PartLoad}}}}\)</div><div img="image3604.txt">\(Powe{r_{Total,{\kern 1pt} PartLoad}} = LF\left( {{C_D} \cdot Powe{r_{CompCondFan,{\kern 1pt} PartLoad}}} \right) + \,\left( {FanPowerPerVolFlowRate \cdot {{\dot V}_{Rated}}} \right)\)</div><div img="image3605.txt">\(\begin{array}{l}Powe{r_{CompCondFan,{\kern 1pt} PartLoad}} = \left( {{{\dot Q}_{Total,Rated}}(TotCapTempModFa{c_{PartLoad}})(TotCapFlowModFa{c_{Rated}})} \right)\\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\, \cdot EI{R_{PartLoad}}\\\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\,\end{array}\)</div><div img="image3606.txt">\(EI{R_{PartLoad}} = \left( {\frac{1}{{CO{P_{Rated}}}}} \right)(EIRTempModFa{c_{PartLoad}})(EIRFlowModFa{c_{Rated}})\)</div><div img="image3607.txt">\({\dot Q_{Total,Net,PartLoad}}\)</div><div img="image3608.txt">\(Powe{r_{Total,PartLoad}}\)</div><div img="image3609.txt">\(Powe{r_{CompCondFan,{\kern 1pt} PartLoad}}\)</div><div img="image3610.txt">\(EIRTempModFa{c_{PartLoad}}\)</div><div img="image3611.txt">\({C_D}\)</div><div img="image3612.txt">\(LF\)</div><div img="image3613.txt">\(LF = \frac{{\left( {{\raise0.7ex\hbox{${\% Load}$} \!\mathord{\left/ {\vphantom {{\% Load} {100}}}\right.}\!\lower0.7ex\hbox{${100}$}}} \right) \cdot {{\dot Q}_{StandardRating}}}}{{{{\dot Q}_{Total,Net,PartLoad}}}}\)</div>*<div img="image3614.txt">\(\% Load\)</div>*
 
 #### Basin Heater For Two-Stage DX Coil
 
@@ -16609,25 +16605,25 @@ Air System Humidifiers
 
 ### Overview
 
-Air system humidifiers are components that add moisture to the supply air stream. They fall into 2 broad categories: spray type humidifiers which act like direct evaporative coolers, cooling the supply air as well as humidifying it; and dry steam humidifiers, which humidify the supply air stream while causing almost no change to the supply air stream temperature. The EnergyPlus electric steam humidifier uses electrical energy to convert ordinary tap water to steam which it then injects into the supply air stream by means of a blower fan. The actual unit might be an electrode-type humidifier or a resistance-type humidifier.
+Air system humidifiers are components that add moisture to the supply air stream. They fall into 2 broad categories: spray type humidifiers which act like direct evaporative coolers, cooling the supply air as well as humidifying it; and dry steam humidifiers, which humidify the supply air stream while causing almost no change to the supply air stream temperature. The EnergyPlus electric and gas fired steam humidifier uses electrical energy and thermal energy, respectively, to convert ordinary tap water to steam which it then injects into the supply air stream by means of a blower fan. The actual electric dry steam unit might be an electrode-type humidifier or a resistance-type humidifier.
 
-### Electric Steam Humidifier
+### Electric and Gas Steam Humidifier
 
-The electric steam humidifier model (object name: Humidifier:Steam:Electric) is based on moisture and enthalpy balance equations plus standard psychrometric relationships. The approach is similar to that taken in the ASHRAE HVAC 2 Toolkit, page 4-112 (ASHRAE 1993). EnergyPlus contains its own module of psychrometric routines; the psychrometric theory and relations are given in the 2001 edition of ASHRAE Fundamentals, Chapter 6 (ASHRAE 2001). The model contains both an ideal controller and the component. The control model assumes that there is a minimum humidity setpoint on the component air outlet node. This setpoint is established by a setpoint manager described elsewhere.
+The electric and gas steam humidifier models (object names: Humidifier:Steam:Electric and Humidifier:Steam:Gas) are based on moisture and enthalpy balance equations plus standard psychrometric relationships. The approach is similar to that taken in the ASHRAE HVAC 2 Toolkit, page 4-112 (ASHRAE 1993). EnergyPlus contains its own module of psychrometric routines; the psychrometric theory and relations are given in the 2001 edition of ASHRAE Fundamentals, Chapter 6 (ASHRAE 2001). The model contains both an ideal controller and the component. The control model assumes that there is a minimum humidity setpoint on the component air outlet node. This setpoint is established by a setpoint manager described elsewhere.
 
 #### Model
 
-The component model is a forward model: its inputs are its inlet conditions; its outputs are its outlet conditions and its energy consumption. The inputs are the temperature, humidity ratio, and mass flow rate of the inlet air stream, which are known; and the water addition rate (kg/s) which is determined by the controller.
+The component model is a forward model: its inputs are its inlet conditions; its outputs are its outlet conditions and its energy consumption. The inputs are the temperature, humidity ratio, and mass flow rate of the inlet air stream, which are known; and the water addition rate (kg/s) which is determined by the controller.  The moisture mass balance and psychometric calculations are identical for both gas and electric dry steam humidifiers.  The only difference is how a heat source (electric or gas) is used to generate the steam.
 
 #### Controller
 
 The controller first decides whether the humidifier is on or off. For the humidifier to be on:
 
-n the humidifier schedule value must be nonzero;
+* the humidifier schedule value must be nonzero;
 
-n the inlet air mass flow must be greater than zero;
+* the inlet air mass flow must be greater than zero;
 
-n the inlet air humidity ratio must be less than the minimum humidity ratio setpoint.
+* the inlet air humidity ratio must be less than the minimum humidity ratio setpoint.
 
 If the humidifier is off, the water addition rate is set to zero. If the humidifier is on, the water addition rate needed to meet the humidity setpoint is calculated.
 
@@ -16733,9 +16729,9 @@ where <div img="image5810.txt">\(PsyHFnTdbW\)</div> is an EnergyPlus psychromet
 
 <div>\[{\dot m_{w,add}} = {\dot m_a} \cdot ({w_{out}} - {w_{in}})\]</div>
 
-We now have the outlet conditions and the adjusted steam addition rate for the case where the desired outlet humidity results in an outlet state above the saturation curve.
+We now have the outlet conditions and the adjusted steam addition rate for the case where the desired outlet humidity results in an outlet state above the saturation curve.  The energy consumption of the electric and gas steam humidifiers is calculated separately.
 
-Finally, the electricity consumption is given by
+The electric steam humidifier electric consumption is given by
 
 <div>\[{W_{hum}} = ({\dot m_{w,add}}/Ca{p_{nom}}) \cdot {W_{nom}} + {W_{fan}} + {W_{stby}}\]</div>
 
@@ -16745,7 +16741,58 @@ where
 
 <div img="image5814.txt">\({W_{stby}}\)</div> = standby power [W], a user input.
 
-and the water consumption rate is
+The gas steam humidifier performance calculation is done for fixed and variable entering water temperature. The calculation procedure for fixed and variable entering water temperature are as follows.
+
+#### Fixed Inlet WaterTemperature:
+
+The gas steam humidifier gas consumption rate for fixed entering water temperature is given by:
+
+<div>\[\dot{Q}_{NG} = \frac{\dot{m}_{w,add}}{\dot{m}_{cap,nom}}Q_{NG,nom}\]</div>
+
+The actual gas use rate accounting for gas fired humidifier thermal efficiency variation with part load ratio is given by: 
+
+<div>\[ Q_{NG}=\dot{Q}_{NG}\frac{\eta_{rated}}{\eta_{actual}} \]</div>
+
+<div>\[ \eta_{actual} = \eta_{rated} \times \rm{EffModCurveValue}\left(PLR\right) \]</div>
+
+<div>\[ \rm{PLR} = \frac{\dot{Q}_{NG}}{Q_{NG,nom}} \]</div>
+
+where,
+EffModCurveValue = thermal efficiency modifier curve value as function of part load ratio. This curve is generated from manufacturer’s part load performance data. 
+PLR = part load ratio, (-).
+Q_NG_nom = nominal or rated gas use rate, (Watts).
+Q_NG = actual gas use rate, (Watts).
+eta_rated = nominal or rated thermal efficiency of gas fired steam humidifier, (-)
+eta_actual = actual thermal efficiency of gas fired steam humidifier accounting for part load performance, (-). 
+
+#### Variable Inlet WaterTemperature: 
+
+The gas use rate is determined from the theoretical gas input rate and actual thermal efficiency. The actual thermal efficiency is the rated thermal efficiency corrected for part load ratio operation. At steady state the gas use rate is given by:
+
+<div>\[ Q_{NG}=\frac{\dot{m}_w \left(h_{fg}+c_{p,w}\left(100-T_{w,inlet}\right)\right)}{\eta_{rated}} \]</div>
+
+<div>\[ \rm{PLR} = \frac{\dot{Q}_{NG}}{Q_{NG,nom}} \]</div>
+ 
+<div>\[ \eta_{actual} = \eta_{rated} \times \rm{EffModCurveValue}\left(PLR\right) \]</div>
+ 
+<div>\[ Q_{NG}=\dot{Q}_{NG}\frac{\eta_{rated}}{\eta_{actual}} \]</div> 
+
+where,
+T_w_inlet = temperature of water entering the gas steam humidifier, °C. This value depends on the water source.  
+
+If the rated gas use rated input field is not autosized, then user specified thermal efficiency will be overriden with a value calculated from user specified rated gas use rate, nominal  capacity (m3/s) and design conditions as follows:
+
+<div>\[ \eta_{rated}=\frac{\dot{V}_{cap,nom} \rho_w \left(h_{fg}+c_{p,w}\Delta T_w}{Q_{NG,nom}} \]</div>
+
+The gas steam humidifier requires electric power input to the blower fan and associated control units.  The auxiliary electric power input rate of the gas steam humidifier is given by:
+
+<div>\[W_{aux} = W_{fan} + W_{controls}\]</div>
+ 
+where
+W_fan = nominal fan power [W], a user input,
+W_controls = control electric power [W], a user input.
+
+The water consumption rate is, in m3/s, for electric and steam humidifier at a reference temperature of 5.05 C is given by.
 
 <div>\[{\dot V_{cons}} = {\dot m_{w,add}}/{\rho_w}\]</div>
 
