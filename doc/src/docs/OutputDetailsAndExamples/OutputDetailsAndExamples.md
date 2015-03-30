@@ -3795,7 +3795,7 @@ Component sizing is applicable to all manners of autosized components and equipm
 
 **! &lt;Component Sizing Information&gt;, Component Type, Component Name, Input Field Description, Value**
 
-Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE1-1 VAV REHEAT, Maximum Air Flow Rate [m3/s], 0.22672
+ Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE1-1 VAV REHEAT, Maximum Air Flow Rate [m3/s], 0.22672
 
  Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE1-1 VAV REHEAT, Maximum Reheat Water Flow Rate [m3/s], 5.87104E-005
 
@@ -3828,8 +3828,6 @@ Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE1-1 VAV RE
  Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE4-1 VAV REHEAT, Maximum Air Flow Rate [m3/s], 0.22257
 
  Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE4-1 VAV REHEAT, Maximum Reheat Water Flow Rate [m3/s], 5.76351E-005
-
-
 
  Component Sizing Information, Coil:Heating:Water, SPACE4-1 ZONE COIL, Maximum Water Flow Rate [m3/s], 5.76351E-005
 
@@ -3867,9 +3865,9 @@ Component Sizing Information, AirTerminal:SingleDuct:VAV:Reheat, SPACE1-1 VAV RE
 
  Component Sizing Information, Coil:Cooling:Water, OA COOLING COIL 1, Design Inlet Air Temperature [C], 30.01375
 
-Component Sizing Information, Coil:Cooling:Water, OA COOLING COIL 1, Design Outlet Air Humidity Ratio, 8.00000E-003
+ Component Sizing Information, Coil:Cooling:Water, OA COOLING COIL 1, Design Outlet Air Humidity Ratio, 8.00000E-003
 
-Component Sizing Information, Coil:Cooling:Water, MAIN COOLING COIL 1, Design Inlet Air Humidity Ratio, 9.33031E-003
+ Component Sizing Information, Coil:Cooling:Water, MAIN COOLING COIL 1, Design Inlet Air Humidity Ratio, 9.33031E-003
 
  Component Sizing Information, Coil:Cooling:Water, MAIN COOLING COIL 1, Design Outlet Air Humidity Ratio, 8.00000E-003
 
@@ -3917,7 +3915,9 @@ Component Sizing Information, Coil:Cooling:Water, MAIN COOLING COIL 1, Design In
 
  Component Sizing Information, Humidifier:Steam:Electric, HUMIDIFIER 1, Rated Power [W], 9826.56303
 
-
+ Component Sizing Information, Humidifier:Steam:Gas, MAIN GAS HUMIDIFIER, Design Size Nominal Capacity Volume [m3/s], 1.05405E-002
+ 
+ Component Sizing Information, Humidifier:Steam:Gas, MAIN GAS HUMIDIFIER, Design Size Rated Power [W], 103710.42776
 
 #### Field: &lt;Component Sizing Information&gt;
 

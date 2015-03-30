@@ -16609,25 +16609,25 @@ Air System Humidifiers
 
 ### Overview
 
-Air system humidifiers are components that add moisture to the supply air stream. They fall into 2 broad categories: spray type humidifiers which act like direct evaporative coolers, cooling the supply air as well as humidifying it; and dry steam humidifiers, which humidify the supply air stream while causing almost no change to the supply air stream temperature. The EnergyPlus electric steam humidifier uses electrical energy to convert ordinary tap water to steam which it then injects into the supply air stream by means of a blower fan. The actual unit might be an electrode-type humidifier or a resistance-type humidifier.
+Air system humidifiers are components that add moisture to the supply air stream. They fall into 2 broad categories: spray type humidifiers which act like direct evaporative coolers, cooling the supply air as well as humidifying it; and dry steam humidifiers, which humidify the supply air stream while causing almost no change to the supply air stream temperature. The EnergyPlus electric and gas fired steam humidifier uses electrical energy and thermal energy, respectively, to convert ordinary tap water to steam which it then injects into the supply air stream by means of a blower fan. The actual electric dry steam unit might be an electrode-type humidifier or a resistance-type humidifier.
 
-### Electric Steam Humidifier
+### Electric and Gas Steam Humidifier
 
-The electric steam humidifier model (object name: Humidifier:Steam:Electric) is based on moisture and enthalpy balance equations plus standard psychrometric relationships. The approach is similar to that taken in the ASHRAE HVAC 2 Toolkit, page 4-112 (ASHRAE 1993). EnergyPlus contains its own module of psychrometric routines; the psychrometric theory and relations are given in the 2001 edition of ASHRAE Fundamentals, Chapter 6 (ASHRAE 2001). The model contains both an ideal controller and the component. The control model assumes that there is a minimum humidity setpoint on the component air outlet node. This setpoint is established by a setpoint manager described elsewhere.
+The electric and gas steam humidifier models (object names: Humidifier:Steam:Electric and Humidifier:Steam:Gas) are based on moisture and enthalpy balance equations plus standard psychrometric relationships. The approach is similar to that taken in the ASHRAE HVAC 2 Toolkit, page 4-112 (ASHRAE 1993). EnergyPlus contains its own module of psychrometric routines; the psychrometric theory and relations are given in the 2001 edition of ASHRAE Fundamentals, Chapter 6 (ASHRAE 2001). The model contains both an ideal controller and the component. The control model assumes that there is a minimum humidity setpoint on the component air outlet node. This setpoint is established by a setpoint manager described elsewhere.
 
 #### Model
 
-The component model is a forward model: its inputs are its inlet conditions; its outputs are its outlet conditions and its energy consumption. The inputs are the temperature, humidity ratio, and mass flow rate of the inlet air stream, which are known; and the water addition rate (kg/s) which is determined by the controller.
+The component model is a forward model: its inputs are its inlet conditions; its outputs are its outlet conditions and its energy consumption. The inputs are the temperature, humidity ratio, and mass flow rate of the inlet air stream, which are known; and the water addition rate (kg/s) which is determined by the controller.  The moisture mass balance and psychometric calculations are identical for both gas and electric dry steam humidifiers.  The only difference is how a heat source (electric or gas) is used to generate the steam.
 
 #### Controller
 
 The controller first decides whether the humidifier is on or off. For the humidifier to be on:
 
-n the humidifier schedule value must be nonzero;
+* the humidifier schedule value must be nonzero;
 
-n the inlet air mass flow must be greater than zero;
+* the inlet air mass flow must be greater than zero;
 
-n the inlet air humidity ratio must be less than the minimum humidity ratio setpoint.
+* the inlet air humidity ratio must be less than the minimum humidity ratio setpoint.
 
 If the humidifier is off, the water addition rate is set to zero. If the humidifier is on, the water addition rate needed to meet the humidity setpoint is calculated.
 
@@ -16733,9 +16733,9 @@ where <div img="image5810.txt">\(PsyHFnTdbW\)</div> is an EnergyPlus psychromet
 
 <div>\[{\dot m_{w,add}} = {\dot m_a} \cdot ({w_{out}} - {w_{in}})\]</div>
 
-We now have the outlet conditions and the adjusted steam addition rate for the case where the desired outlet humidity results in an outlet state above the saturation curve.
+We now have the outlet conditions and the adjusted steam addition rate for the case where the desired outlet humidity results in an outlet state above the saturation curve.  The energy consumption of the electric and gas steam humidifiers is calculated separately.
 
-Finally, the electricity consumption is given by
+The electric steam humidifier electric consumption is given by
 
 <div>\[{W_{hum}} = ({\dot m_{w,add}}/Ca{p_{nom}}) \cdot {W_{nom}} + {W_{fan}} + {W_{stby}}\]</div>
 
@@ -16745,7 +16745,58 @@ where
 
 <div img="image5814.txt">\({W_{stby}}\)</div> = standby power [W], a user input.
 
-and the water consumption rate is
+The gas steam humidifier performance calculation is done for fixed and variable entering water temperature. The calculation procedure for fixed and variable entering water temperature are as follows.
+
+#### Fixed Inlet WaterTemperature:
+
+The gas steam humidifier gas consumption rate for fixed entering water temperature is given by:
+
+<div>\[\dot{Q}_{NG} = \frac{\dot{m}_{w,add}}{\dot{m}_{cap,nom}}Q_{NG,nom}\]</div>
+
+The actual gas use rate accounting for gas fired humidifier thermal efficiency variation with part load ratio is given by: 
+
+<div>\[ Q_{NG}=\dot{Q}_{NG}\frac{\eta_{rated}}{\eta_{actual}} \]</div>
+
+<div>\[ \eta_{actual} = \eta_{rated} \times \rm{EffModCurveValue}\left(PLR\right) \]</div>
+
+<div>\[ \rm{PLR} = \frac{\dot{Q}_{NG}}{Q_{NG,nom}} \]</div>
+
+where,
+EffModCurveValue = thermal efficiency modifier curve value as function of part load ratio. This curve is generated from manufacturer’s part load performance data. 
+PLR = part load ratio, (-).
+Q_NG_nom = nominal or rated gas use rate, (Watts).
+Q_NG = actual gas use rate, (Watts).
+eta_rated = nominal or rated thermal efficiency of gas fired steam humidifier, (-)
+eta_actual = actual thermal efficiency of gas fired steam humidifier accounting for part load performance, (-). 
+
+#### Variable Inlet WaterTemperature: 
+
+The gas use rate is determined from the theoretical gas input rate and actual thermal efficiency. The actual thermal efficiency is the rated thermal efficiency corrected for part load ratio operation. At steady state the gas use rate is given by:
+
+<div>\[ Q_{NG}=\frac{\dot{m}_w \left(h_{fg}+c_{p,w}\left(100-T_{w,inlet}\right)\right)}{\eta_{rated}} \]</div>
+
+<div>\[ \rm{PLR} = \frac{\dot{Q}_{NG}}{Q_{NG,nom}} \]</div>
+ 
+<div>\[ \eta_{actual} = \eta_{rated} \times \rm{EffModCurveValue}\left(PLR\right) \]</div>
+ 
+<div>\[ Q_{NG}=\dot{Q}_{NG}\frac{\eta_{rated}}{\eta_{actual}} \]</div> 
+
+where,
+T_w_inlet = temperature of water entering the gas steam humidifier, °C. This value depends on the water source.  
+
+If the rated gas use rated input field is not autosized, then user specified thermal efficiency will be overriden with a value calculated from user specified rated gas use rate, nominal  capacity (m3/s) and design conditions as follows:
+
+<div>\[ \eta_{rated}=\frac{\dot{V}_{cap,nom} \rho_w \left(h_{fg}+c_{p,w}\Delta T_w}{Q_{NG,nom}} \]</div>
+
+The gas steam humidifier requires electric power input to the blower fan and associated control units.  The auxiliary electric power input rate of the gas steam humidifier is given by:
+
+<div>\[W_{aux} = W_{fan} + W_{controls}\]</div>
+ 
+where
+W_fan = nominal fan power [W], a user input,
+W_controls = control electric power [W], a user input.
+
+The water consumption rate is, in m3/s, for electric and steam humidifier at a reference temperature of 5.05 C is given by.
 
 <div>\[{\dot V_{cons}} = {\dot m_{w,add}}/{\rho_w}\]</div>
 
