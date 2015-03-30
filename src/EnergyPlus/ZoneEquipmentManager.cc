@@ -643,12 +643,12 @@ namespace ZoneEquipmentManager {
 			} else {
 				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolLoad = 0.0;
 				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolMassFlow = 0.0;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolZoneTemp = 0.0;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolZoneHumRat = 0.0;
+				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolZoneTemp = Node( ZoneNode ).Temp;
+				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).CoolZoneHumRat = ZoneSizingInput( ControlledZoneNum ).CoolDesHumRat;
 				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatLoad = 0.0;
 				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatMassFlow = 0.0;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatZoneTemp = 0.0;
-				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatZoneHumRat = 0.0;
+				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatZoneTemp = Node( ZoneNode ).Temp;
+				CalcZoneSizing( ControlledZoneNum, CurOverallSimDay ).HeatZoneHumRat = ZoneSizingInput( ControlledZoneNum ).HeatDesHumRat;
 			}		
 
 			if ( SupplyAirNode > 0 ) {

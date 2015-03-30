@@ -19,8 +19,11 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <ObjexxFCL/gio.hh>
 
 using namespace EnergyPlus;
+using namespace ObjexxFCL;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalance;
@@ -28,11 +31,13 @@ using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataZoneEnergyDemands;
 using namespace EnergyPlus::DataHeatBalFanSys;
+using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataContaminantBalance;
 using namespace EnergyPlus::Psychrometrics;
-using DataHVACGlobals::SmallLoad;
+using namespace EnergyPlus::ScheduleManager;
+using namespace EnergyPlus::ZoneEquipmentManager;
 using DataZoneControls::TempControlledZone;
 using DataZoneControls::NumTempControlledZones;
 
@@ -53,6 +58,13 @@ TEST( ZoneEquipmentManager, SizeZoneEquipmentTest )
 	int const ZoneSizNum = 1;
 	int const SurfNum = 1;
 
+	int write_stat;
+	// Open the Initialization Output File (lifted from SimulationManager.cc)
+	OutputFileInits = GetNewUnitNumber();
+	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
+
+	InitializePsychRoutines();
+
 	// setup global initialization
 	DataSizing::CurZoneEqNum = 1;
 	DataSizing::CurOverallSimDay = 2;  // cooling design day only
@@ -63,6 +75,8 @@ TEST( ZoneEquipmentManager, SizeZoneEquipmentTest )
 	DataGlobals::NumOfTimeStepInHour = 1;
 	DataSurfaces::TotSurfaces = 1;
 	DataZoneControls::NumTempControlledZones = 1;
+	DataGlobals::AnyEnergyManagementSystemInModel = false;
+	DataHVACGlobals::NumPrimaryAirSys = 0;
 
 	ZoneAirNode = 1;
 	ZoneSupplyNode = 2;
@@ -86,19 +100,23 @@ TEST( ZoneEquipmentManager, SizeZoneEquipmentTest )
 	DataHeatBalFanSys::SysDepZoneLoads.allocate( NumOfZones );
 	DataHeatBalFanSys::TempZoneThermostatSetPoint.allocate( NumOfZones );
 	DataHeatBalFanSys::ZoneMassBalanceFlag.allocate( NumOfZones );
+	DataHeatBalFanSys::ZoneInfiltrationFlag.allocate( NumOfZones );
 	DataHeatBalFanSys::ZoneLatentGain.allocate( NumOfZones );
 	DataHeatBalance::Zone.allocate( NumOfZones );
 	DataHeatBalance::MassConservation.allocate( NumOfZones );
 	DataHeatBalance::ZoneIntGain.allocate( NumOfZones );
 	DataHeatBalance::RefrigCaseCredit.allocate( NumOfZones );
 	DataSurfaces::SurfaceWindow.allocate( TotSurfaces );
+	DataLoopNode::Node.allocate( 4 );
 
 	Zone( CtrlZoneNum ).Name = "VirtualZone";
 	Zone( CtrlZoneNum ).FloorArea = 35.0;
 	Zone( CtrlZoneNum ).Multiplier = 1;
 	Zone( CtrlZoneNum ).ListMultiplier = 1;
+	Zone( CtrlZoneNum ).NumSurfaces = 1;
 	Zone( CtrlZoneNum ).SurfaceFirst = 1;
 	Zone( CtrlZoneNum ).SurfaceLast = 1;
+
 	Zone( CtrlZoneNum ).NoHeatToReturnAir = true;
 	SurfaceWindow( SurfNum ).AirflowThisTS = 0.0;
 	SurfaceWindow( SurfNum ).AirflowDestination = AirFlowWindow_Destination_OutdoorAir;
@@ -178,19 +196,20 @@ TEST( ZoneEquipmentManager, SizeZoneEquipmentTest )
 	Node( ZoneAirNode ).Enthalpy = 32000.0;
 	Node( ZoneReturnNode ).Temp = 25.0;
 
-	InitializePsychRoutines();
-
 	ZoneEquipmentManager::SizeZoneEquipment();
 	
-	EXPECT_DOUBLE_EQ( 0.0, CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolZoneHumRat );
+	EXPECT_NEAR( 0.0075, CalcZoneSizing( CtrlZoneNum, CurOverallSimDay ).CoolZoneHumRat, 0.0001 );
+	//EXPECT_NEAR( 0.0075, FinalZoneSizing( CtrlZoneNum ).ZoneHumRatAtCoolPeak, 0.00001 );
 	
-	// delet variables
+	
+	// delete variables
 	CalcZoneSizing.deallocate();
 	CalcFinalZoneSizing.deallocate();
 	CurDeadBandOrSetback.deallocate();
 	DeadBandOrSetback.deallocate();
 	FinalZoneSizing.deallocate();
 	MassConservation.deallocate();
+	Node.deallocate();
 	NonAirSystemResponse.deallocate();
 	People.deallocate();
 	RefrigCaseCredit.deallocate();
@@ -205,8 +224,12 @@ TEST( ZoneEquipmentManager, SizeZoneEquipmentTest )
 	ZoneSizingInput.deallocate();
 	ZoneSizing.deallocate();
 	ZoneMassBalanceFlag.deallocate();
+	ZoneInfiltrationFlag.deallocate();
 	ZoneLatentGain.deallocate();
 	ZoneIntGain.deallocate();
 	ZoneSysEnergyDemand.deallocate();
 	ZoneSysMoistureDemand.deallocate();	
+
+	// Close and delete eio output file
+	{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileInits, flags ); }
 }
