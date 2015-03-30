@@ -125,6 +125,10 @@
               </li>
             
               <li>
+                <a href="../11-OperationalFaults">Operational Faults</a>
+              </li>
+            
+              <li>
                 <a href="../11-DemandLimiting">Demand Limiting</a>
               </li>
             
@@ -317,14 +321,12 @@
 <p>2.    Significant user control with modest input requirements;</p>
 <p>3.    Zone, system and plant level calculations of design heating and cooling capacities and fluid flow rates;</p>
 <p>4.    Modular, component-specific sizing algorithms for each HVAC component.</p>
-<ol>
-<li>Options for monitoring how the initial sizes operate over multiple design days and then making adjustments and repeating plant level calculations</li>
-</ol>
+<p>5.    Options for monitoring how the initial sizes operate over multiple design days and then making adjustments and repeating plant level calculations</p>
 <h2 id="sizing-manager">Sizing Manager</h2>
 <p>The sizing calculations in EnergyPlus are managed by a sizing manager contained in the software module <em>SizingManager</em>. The main sizing manager routine <em>ManageSizing</em> is called from <em>ManageSimulation</em> before the annual simulation sequence is invoked. <em>ManageSizing</em> performs the following tasks.</p>
-<p>1.  By calling <em>GetSizingParams</em>, <em>GetZoneSizingInput</em>, <em>GetSystemSizingInput</em> and <em>GetPlantSizingInput</em> reads in all the user sizing input contained in objects <em>Sizing:Parameters</em>, <em>Sizing:Zone</em>, <em>Sizing:System</em> and <em>Sizing:Plant</em>. These objects and their data are described in the EnergyPlus Input Output Reference, Group – Design Objects.</p>
-<p>2.  Set the <em>ZoneSizingCalc</em> flag equal to <em>true</em>.</p>
-<p>3.  Loop over all the sizing periods by each day. <strong>This starts the zone design calculations.</strong></p>
+<p><em>  By calling </em>GetSizingParams<em>, </em>GetZoneSizingInput<em>, </em>GetSystemSizingInput<em> and </em>GetPlantSizingInput<em> reads in all the user sizing input contained in objects </em>Sizing:Parameters<em>, </em>Sizing:Zone<em>, </em>Sizing:System<em> and </em>Sizing:Plant*. These objects and their data are described in the EnergyPlus Input Output Reference, Group – Design Objects.</p>
+<p><em>  Set the </em>ZoneSizingCalc<em> flag equal to </em>true*.</p>
+<p>*  Loop over all the sizing periods by each day. <strong>This starts the zone design calculations.</strong></p>
 <pre><code>* Call *UpdateZoneSizing(BeginDay)* to initialize zone design load and flow rate  sequences.
 
 * Loop over hours in the day
@@ -337,10 +339,10 @@
 
     * Call *UpdateZoneSizing(EndDay)* to calculate peaks and moving averages from the zone design sequences for each design day.
 </code></pre>
-<p>4. Call <em>UpdateZoneSizing(EndZoneSizingCalc)</em> to calculate for each zone the peak heating &amp; cooling loads and flow rates over all the sizing periods (design days and sizing periods from the weather file, if specified). The corresponding design load and flow rate sequences are saved for use in the system design calculations. <strong>This ends the zone design calculations.</strong></p>
-<p>5.  Set the <em>SysSizingCalc</em> flag equal to <em>true</em>.</p>
-<p>6. Call <em>ManageZoneEquipment</em> and <em>ManageAirLoops</em> to read in the zone and central system inputs needed for the system design calculations. The program needs enough information to be able to figure out the overall air loop connectivity.</p>
-<p>7.  Loop over all the sizing periods by each day. <strong>This starts the system design calculations.</strong></p>
+<p><em> Call </em>UpdateZoneSizing(EndZoneSizingCalc)* to calculate for each zone the peak heating &amp; cooling loads and flow rates over all the sizing periods (design days and sizing periods from the weather file, if specified). The corresponding design load and flow rate sequences are saved for use in the system design calculations. <strong>This ends the zone design calculations.</strong></p>
+<p><em>  Set the </em>SysSizingCalc<em> flag equal to </em>true*.</p>
+<p><em> Call </em>ManageZoneEquipment<em> and </em>ManageAirLoops* to read in the zone and central system inputs needed for the system design calculations. The program needs enough information to be able to figure out the overall air loop connectivity.</p>
+<p>*  Loop over all the sizing periods by each day. <strong>This starts the system design calculations.</strong></p>
 <pre><code>* Call *UpdateSysSizing(BeginDay)* to initialize system design load and flow rate  sequences.
 
 * Loop over hours in the day
@@ -353,13 +355,13 @@
 
 * Call *UpdateSysSizing(EndDay)* to calculate peaks and moving averages from the system design sequences for each sizing period.
 </code></pre>
-<p>8. Call <em>UpdateSysSizing(EndSysSizingCalc))</em> to calculate for each system the peak heating &amp; cooling loads and flow rates over all the sizing periods (design days and sizing periods from the weather file, if specified). The corresponding design load and flow rate sequences are saved for use in the component sizing calculations. <strong>This ends the system design calculations.</strong></p>
-<p>9. And this ends the tasks of the Sizing Manager.</p>
+<p><em> Call </em>UpdateSysSizing(EndSysSizingCalc))* to calculate for each system the peak heating &amp; cooling loads and flow rates over all the sizing periods (design days and sizing periods from the weather file, if specified). The corresponding design load and flow rate sequences are saved for use in the component sizing calculations. <strong>This ends the system design calculations.</strong></p>
+<p>* And this ends the tasks of the Sizing Manager.</p>
 <h2 id="hvac-sizing-simulation-manager">HVAC Sizing Simulation Manager</h2>
 <p>After the Sizing Manager has completed its initial pass, all the data needed to complete a running model should be available and the program is ready to run the main simulation(s).  However, as of Version 8.3 there is now an option of applying some advanced sizing calculations using what are called HVAC Sizing Simulations.  </p>
 <p>With this new sizing method we distinguish between different kinds of simulations and introduce some new terminology.  The Primary Simulations are the main simulations that are the final version of the model to be run.  Prior to Version 8.3, these are just the usual simulations with the final results.  When the program is running the zone heat balance model over the sizing periods for zone sizing (for step 3 in the Sizing Manager description above), we call those Ideal Loads Sizing Simulations.  When the program is running the zone heat balance model over the sizing periods for component loads calculations we call those Ideal Component Loads Simulations. HVAC Sizing Simulations are a kind of simulation, where the program creates copies of sizing periods and runs them as complete EnergyPlus simulations with the most current equipment sizes and full HVAC systems.  The advanced sizing algorithms monitor what occurred during those sizing periods and determines if new size results are needed and signals systems and components to repeat their sizing calculations.  The process can repeat in an iterative manner and a Sizing Pass refers to a set of the HVAC Sizing Simulations for each of the sizing periods (e.g. two design days).  </p>
 <p>If the user has selected a sizing option that requires HVAC Sizing Simulations the main ManageSimulation will call ManageHVACSizingSimulation before going on to the main simulations.  </p>
-<ol>
+<ul>
 <li>
 <p>Instantiate a new HVACSizingSimulationManager object.  </p>
 </li>
@@ -394,7 +396,7 @@
 <li>
 <p>Empty HVACSizingSimulationManager object to free memory</p>
 </li>
-</ol>
+</ul>
 <p>Currently the only application for HVAC Sizing Simulations is to improve the sizing of plant loops using the “Coincident” sizing option.  However this approach may be expanded in the future to extend advanced sizing methods to air-side equipment. </p>
 <h2 id="zone-design-loads-and-air-flow-rates">Zone Design Loads and Air Flow Rates</h2>
 <h3 id="overview">Overview</h3>
@@ -1657,6 +1659,33 @@
 <p><em>DT<sub>w</sub>  is the sensible temperature rise of water (100.0 – 20.0=80.0</em> <em>°C);</em></p>
 <p><em><div img="image2143.txt">({\dot V_{rated}})</div> is the rated capacity of the humidifier in volumetric flow rate.</em></p>
 <p><em>h<sub>fg</sub> is the latent heat of vaporization of water at 100.0°C, (J/kg);</em></p>
+<h4 id="gas-fired-humidifier-sizing">Gas Fired Humidifier Sizing</h4>
+<p>The rated power, or nominal gas use rate of a gas steam humidifier (Humidifier:Steam:Gas) is calculated from user specified rated volumetric capacity (m3/s) and the enthalpy change of the water from a reference temperature of 20.0°C to a saturated steam at 100.0°C. Autosizing procedure assumes that gas heater in the humidifier convert the water from the reference temperature and generate saturated steam at 100°C, using gas to thermal energy conversion rated thermal efficiency. </p>
+<p>Rated Gas Use Rate</p>
+<p>The rated or nominal gas use rate is given by:</p>
+<div>\[Q_{NG,nom} = \frac{\dot{V}_{cap,nom}\rho_w\left(h_{fg}+c_{p,w}\Delta T_w\right)}{\eta_{rated}}\]</div>
+
+<p>Where, </p>
+<ul>
+<li>
+<p>Cp,w: specific heat of water at average temperature ((100+20)/2 = 60.0 °C), (J/kgK);</p>
+</li>
+<li>
+<p>rho_w: density of water at standard condition (5.05 °C);</p>
+</li>
+<li>
+<p>DeltaTw: sensible temperature rise of water (100.0 – 20.0=80.0 °C);</p>
+</li>
+<li>
+<p>V_cap_nom: rated or nominal capacity of the humidifier, (m3/s)</p>
+</li>
+<li>
+<p>h_fg: latent heat of vaporization of water at 100.0°C, (J/kg);</p>
+</li>
+<li>
+<p>eta_rated: thermal efficiency at rated condition;</p>
+</li>
+</ul>
 <h4 id="rated-capacity">Rated Capacity</h4>
 <div>\[{\dot m_w} = {\dot m_a}\left( {{\omega_o} - {\omega_i}} \right)\]</div>
 
@@ -1992,16 +2021,32 @@
 <div>\[\dot{V}_{SA,cooling} = \rm{DesCoolVolFlow}_{zone}/\rm{ZoneFraction} \]</div>
 
 <p>Supply air volumetric flow rate during heating operation</p>
+<div>\[\dot{V}_{SA,heating} = \rm{DesHeatVolFlow}_{zone}/\rm{ZoneFraction} \]</div>
+
 <p>Supply air volumetric flow rate when DX coils are used as a system</p>
+<div>\[\dot{V}_{SA} = \max{\eft(\rm{DesCoolVolFlow},\rm{DesHeatVolFlow}\right)}/\rm{ZoneFraction} \]</div>
+
 <p>where ZoneFraction = Fraction of the total volume flow that goes through the controlling zone</p>
 <p>The unitary system object also allows scalable sizing as follows:</p>
 <p>Flow Per Floor Area:</p>
+<div>\[\dot{V}_{SA} = \rm{FlowPerFloorArea}\left(\rm{TotalFloorArea}\right)\]</div>
+
 <p>Fraction of Autosized Cooling Value:</p>
+<div>\[\dot{V}_{SA,cooling} = \dot{V}_{SA,des,cooling}\left(\rm{FractionOfCoolingValue}\right)\]</div>
+
 <p>Fraction of Autosized Heating Value:</p>
+<div>\[\dot{V}_{SA,heating} = \dot{V}_{SA,des,heating}\left(\rm{FractionOfHeatingValue}\right)\]</div>
+
 <p>Flow Per Cooling Capacity</p>
+<div>\[\dot{V}_{SA,cooling} = \dot{Q}_{coil,des,cooling}\left(\rm{FractionOfCoolingValue}\right)\]</div>
+
 <p>Flow Per Heating Capacity</p>
+<div>\[\dot{V}_{SA,heating} = \dot{Q}_{coil,des,heating}\left(\rm{FractionOfHeatingValue}\right)\]</div>
+
 <p>The maximum supply air temperature can also be automatically selected. The value is determined from the Sizing:Zone or Sizing:System object depending on where the object is used in the simulation (i.e., as zone or air loop equipment).</p>
 <p>Maximum supply air temperature</p>
+<div>\[T_{SA,max}=\rm{HeatDesTemp}_{ZoneOrSystem}]</div>
+
 <h3 id="multispeed-heat-pump-sizing">MultiSpeed Heat Pump Sizing</h3>
 <p>MultiSpeed heat pumps are compound components: each unit contains a supply air fan, a multispeed DX cooling coil, a multispeed DX heating coil, and a GAS or ELECTRIC supplemental heating coil. The inputs that may need to be autosized are the supply air volumetric air flow rates during cooling operation, heating operation, and when no cooling or heating is needed. The data needed for sizing the units are obtained from the controlled zone design arrays.</p>
 <h4 id="supply-air-volumetric-flow-rate-during-cooling-operation-at-the-highest-speed">Supply air volumetric flow rate during cooling operation at the highest speed</h4>
@@ -2284,7 +2329,8 @@
         "HTML-CSS": {
           imageFont: null,
           preferredFont: null
-        }
+        },
+        tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
       });
     </script>
     <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js'></script>

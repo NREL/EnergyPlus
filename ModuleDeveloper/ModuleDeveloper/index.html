@@ -125,6 +125,10 @@
               </li>
             
               <li>
+                <a href="../../EngineeringReference/11-OperationalFaults">Operational Faults</a>
+              </li>
+            
+              <li>
                 <a href="../../EngineeringReference/11-DemandLimiting">Demand Limiting</a>
               </li>
             
@@ -3105,26 +3109,29 @@
 <p>Component models generally need to do a thorough re-initialization at the start of each new environment.  Component models can call InitComponentNodesto coordinate initializing inlet and outlet nodes. This routine has arguments for the minimum and maximum flow and these should be mass flow rates, in kg/s, that correspond to the “hardware” limits of the device.</p>
 <p>Some components are connected to more than one plant loop creating dependencies between loops. For example a water-cooled chiller is connected to both a chilled water loop and a condenser water loop.  The chilled water loop places demands on the condenser water loop so it is beneficial to model the chilled water loop’s supply side before the condenser water loop’s demand side is modeled.  An initialization routine called InterConnectTwoPlantLoopSides is used by the component models to inform the central plant routines of these situations.  One call to this routine describes a connection between two half-loops. The component model developer needs to decide which of the half loops places demands on the other and set the logical argument Loop1DemandsOnLoop2appropriately.  The central plant routines use this information to determine an appropriate calling order for simulating individual half-loops.</p>
 <h3 id="sizing">Sizing</h3>
-<p>Component models need to interact with centralized routines that relate to sizes.  This section provides an overview of how EnergyPlus performs automatic sizing of plant systems and components so that the broader context can be understood when implementing plant components. As of EnergyPlus version 7, the plant sizing methods were changed significantly.  We first describe some of the variables involved, then describe the overall process steps, and finally discuss implications for component models.</p>
+<p>Component models need to interact with centralized routines that relate to sizes.  This section provides an overview of how EnergyPlus performs automatic sizing of plant systems and components so that the broader context can be understood when implementing plant components. As of EnergyPlus version 8.3, the plant sizing methods were changed significantly.  We first describe some of the variables involved, then describe the overall process steps, and finally discuss implications for component models.</p>
 <p>The following variables are used to help control plant sizing:</p>
 <ul>
 <li>
-<p>PlantSizeNotComplete This public logical flag is declared in DataPlant.  It starts out FALSE TRUE and is set to TRUE FALSE only after all plant sizing actions have been completed and finalized.</p>
+<p>PlantFirstSizesOkayToFinalizePlantSizeNotComplete  This public logical boolean flag is declared in DataPlant.  It starts out FALSE TRUEfalse and is set to TRUE FALSEtrue only after all some intial plant sizing actions iterations have been completed and the first set of sizes can be finalized.   Component models should delay first filling autosized values until this flag is true. The -9999 values that indicate an autosized variable are not filled until this is TRUE.  </p>
 </li>
 <li>
-<p>PlantSizesOkayToFinalizeThis public logical flag is declared in DataPlant.  It starts out false FALSE and is set to TRUE after the main iterative phase of sizing is completed but before the final finishing passes are made.  Component models should delay final reporting and filling of autosized values until this is set to TRUE.  The -9999 values that indicate an autosized variable are not filled until this is TRUE.  Calls to report the outcome of sizing are not made until this is TRUE.</p>
+<p>PlantFirstSizesOkayToReportPlantSizesOkayToFinalize  This public logical boolean flag is declared in DataPlant.  It starts out false FALSE and is set to TRUE true after the main iterative phase of sizing is completed but before the final finishing passes are made.  This flag is only used for advanced sizing methods based on HVAC Sizing Simulations, where the program should report both the “Initial” sizes and the final sizes.  Component models should delay final reporting first sizes and filling of autosized values until this is set to TRUEtrue.  The -9999 values that indicate an autosized variable are not filled until this is TRUE.  The first, or intial, cCalls to report the outcome of sizing are not made until this is TRUEtrue.  </p>
 </li>
 <li>
-<p>InitLoopEquip This logical flag is passed as an argument with SimPlantEquipand carries through to the main simulation calls for component models.  This argument is set to TRUE when the plant sizing is being conducted.  The component model needs to handle this argument such that when TRUE the get input, initialization and sizing routines are run, but the calculation routine does not.  When TRUE  most supply side component models need to return values for the minimum, maximum, and optimal capacities (in terms of loop loads that the device can meet).</p>
+<p>PlantFinalSizesOkayToReport  This public boolean flag is declared in DataPlant.  It starts out false and is set to true when all the sizing is done and it is okay to report the final size values. Component models should delay reporting final sizes until this is set to true.  </p>
 </li>
 <li>
-<p>GetSizingFactor This logical flag is passed as an argument with SimPlantEquipand carries through to the main simulation calls for component models.  This is arguementargument set TRUE during some portions of the plant sizing calls and signals the intent to obtain the value of a component-level sizing factor.  When this argument is TRUE, InitLoopEquipwill also be TRUE.  It can be ignored if the component model has no component-level sizing factor as part of its input.  If the component does offer a sizing factor, then the implementation needs to handle this argument such that when TRUE the model returns the value of the SizingFactor as an argument to the simulation routine that is called from SimPlantEquip.</p>
+<p>InitLoopEquip  This logical flag is passed as an argument with SimPlantEquip and carries through to the main simulation calls for component models.  This argument is set to TRUE when the plant sizing is being conducted.  The component model needs to handle this argument such that when TRUE the get input, initialization and sizing routines are run, but the calculation routine does not.  When TRUE  most supply side component models need to return values for the minimum, maximum, and optimal capacities (in terms of loop loads that the device can meet).  For plant components with more than one connection to a plant loop, a leading loop connection must be determined and the component sizing routine called with InitLoopEquip is called for only that plant loop. For a example, a chiller only calls its sizing routine when called from a the chilled water loop and does not call it sizing routine when called from the condenser loop. </p>
 </li>
 <li>
-<p>CurLoopNum This public integer variable is declared in DataSizing. It is used to communicate to the component models which of the plant loops is actively being sized at the moment.</p>
+<p>GetSizingFactor  This logical flag is passed as an argument with SimPlantEquip and carries through to the main simulation calls for component models.  This is arguementargument set TRUE during some portions of the plant sizing calls and signals the intent to obtain the value of a component-level sizing factor.  When this argument is TRUE, InitLoopEquip will also be TRUE.  It can be ignored if the component model has no component-level sizing factor as part of its input.  If the component does offer a sizing factor, then the implementation needs to handle this argument such that when TRUE the model returns the value of the SizingFactor as an argument to the simulation routine that is called from SimPlantEquip.</p>
 </li>
 <li>
-<p>LoopNumand LoopSideThese arguments are optional to the main simulation routine</p>
+<p>CurLoopNum  This public integer variable is declared in DataSizing. It is used to communicate to the component models which of the plant loops is actively being sized at the moment. </p>
+</li>
+<li>
+<p>LoopNum and LoopSide These arguments are optional to the main simulation routine     </p>
 </li>
 </ul>
 <p>Plant sizing routines use the approach outlined in the following steps.  These steps occur at a point during the program’s procedural flow when:  zone and system sizing is completed, much of the plant loop input has been read in and processed but the main plant manager is being called for the first time, none of the pure plant component’s simulation routines have yet been called (but components on the air side may have been), and an initial attempt at determining loop calling order has been made in SetupInitialPlantCallingOrder.</p>
@@ -3133,9 +3140,9 @@
 <p>2.    Call each component model in calling order.   InitLoopEquipis TRUE.  The components on each half loop are called in flow order.  Each half loop in the model is called in the order set up for simulation.  These calls are typically the first time certain component models have been called and should trigger input processing and plant loop topology processing including loop interconnections.</p>
 <p>3.    Revise the calling order for the sequence with which the various plant loop sides are called for sizing and normal simulation.  Components that connect two loops will have been processed in Step 2 and that information is now available to refine loop side calling order</p>
 <p>4.    Call loop sizing routines in calling order.  Component will have registered their design flow rates in step 2 and now the overall loop sizes are determined from the sum of the components on the loop.</p>
-<p>5.    A final pass thru each loop side is made in calling order with the flag  PlantSizesOkayToFinalize set to true.  At this point the findings are not expected to change.  Component models now finalize their findings and store the results for use during the simulation.  Overall plant loops are finalized.  Sizing reporting occurs.</p>
+<p>5.    A final pass thru each loop side is made in calling order with the flag  PlantFirstSizesOkayToFinalize set to true.  At this point the findings are not expected to change (unless doing HVAC Sizing Simulations).  Component models now finalize their findings and store the results for use during the simulation.  Overall plant loops are finished.  If doing coincident plant sizing using HVAC Sizing Simulations, set the flag PlantFirstSizesOkayToReport and report the “Initial” sizes.  If not doing coincident plant sizing using HVAC Sizing Simulations, the sizes won’t change again and set the flag  PlantFinalSizesOkayToReport and report the final sizes.</p>
 <p>6.    Sizing finished and PlantSizeNotCompleteset FALSE</p>
-<p>Previous to version 7, component sizing routines were only called once and one had to take care not call them repeatedly (or else their flow request would get doubled each time). However, now plant component models should be designed for multiple executions of their component-level sizing routine.  This allows for an iterative approach to plant sizing that is used to solve complex problems raised by inter-connected loops and the interdependence of sizing information.</p>
+<p>In earlier versions, component sizing routines were only called once and one had to take care not call them repeatedly (or else their flow request would get doubled each time). However, now plant component models should be designed for multiple executions of their component-level sizing routine.  This allows for an iterative approach to plant sizing that is used to solve complex problems raised by inter-connected loops and the interdependence of sizing information.  As of version 8.3, the addition of HVAC Sizing Simulation method makes it very explicit that not only do sizing routines need to be able to rerun, the autosized values need to be set to useable values and then changed.  It is therefore now necessary to store whether or not the original input was set to autosize and so autosizable input now needs to add a boolean “*WasAutoSized” version of the variable to keep track of the user input. </p>
 <p>After the component model has determined a design value for the flow rate, this flow rate needs to be registered with the larger plant routines by calling RegisterPlantCompDesignFlow. This is a volume flow rate in m<sup>3</sup>/s.  The flow rate is associated with the inlet node.  This call can be repeated and the design flow will be updated with the latest request.</p>
 <p>Calls to InitComponentNodesshould be done after sizing is complete so that valid sizes are passed for initialing nodes.</p>
 <h3 id="component-flow-rates">Component Flow Rates</h3>
@@ -5597,67 +5604,92 @@
 <p>Some environment variables can be used with single or several idf file(s) to keep IDF files pristine while allowing developers or others trying to determine a problem or run a group of files. Many of these have counterparts in Output:Diagnostics objects (some may not be documented). Likewise there may be some “sections” that will produce certain outputs not generally documented.</p>
 <h4 id="ddonly-design-days-only">DDOnly: Design Days Only</h4>
 <p>Setting to “yes” will cause EnergyPlus to set Run Control option (regardless of whether there is a Run Control object in the input file) for Do the Design Day Simulation to “yes” and Do the Weather File Simulation to “no”.  (Uses logical variable <strong>DDOnly</strong> in module DataSystemVariables). There is no Output:Diagnostics equivalent.</p>
-<p>Set DDOnly=yes</p>
+<pre><code>Set DDOnly=yes
+</code></pre>
 <h4 id="fullannualrun-full-annual-simulation">FullAnnualRun: Full Annual simulation</h4>
 <p>Setting to “yes” will cause EnergyPlus to set Run Control option (regardless of whether there is a Run Control object in the input file) for Do the Weather File Simulation to “yes”. Scripts should use a weather file when this environment variable is set.  (Uses logical variable <strong>FullAnnualRun</strong> in module DataSystemVariables). There is no Output:Diagnostics equivalent.</p>
-<p>Set FullAnnualRun=yes</p>
+<pre><code>Set FullAnnualRun=yes
+</code></pre>
 <p>And appropriate changes to script files</p>
 <h4 id="noweatherfile-do-not-use-weatherfile-even-if-indicated">NoWeatherFile: Do not use weatherfile even if indicated</h4>
 <p>Setting to “yes” doesn’t cause EnergyPlus to do anything but can be used in the scripts to not copy a weather file even when indicated. There is no Output:Diagnostics equivalent.</p>
-<p>Set NoWeatherFile=yes</p>
+<pre><code>Set NoWeatherFile=yes
+</code></pre>
 <p>And appropriate changes to script files</p>
 <h4 id="reversedd-reverse-design-days-during-run">ReverseDD: Reverse Design Days during run</h4>
 <p>Setting to “yes” causes the first two design days requested in the input file to be reversed during EnergyPlus execution.  (Uses logical variable <strong>ReverseDD</strong> in module DataSystemVariables).  For proper comparisons to original order, a program such as <strong>ReverseDDInCSV</strong> or <strong>ReverseDDInESO</strong> must be run or hand edited. There is no Output:Diagnostics equivalent.</p>
-<p>Set ReverseDD=yes</p>
+<pre><code>Set ReverseDD=yes
+</code></pre>
 <p>And appropriate changes to script files</p>
 <h4 id="minreportfrequency-set-minimum-reporting-frequency-for-outputs">MinReportFrequency: Set minimum reporting frequency for outputs</h4>
 <p>Some developers persist in reporting at the timestep or detailed level even if their runs are full annual runs. This is really burdensome on developers that try to run the full test suite for checking changes. The MinReportFrequency environment variable allows EnergyPlus to report at a higher/less frequent level that still allows for changes to be checked (though differences may require more frequent reporting to track down). EnergyPlus reads this environment variable and sets reporting frequency appropriately. There is no Output:Diagnostics equivalent.</p>
-<p>Set MinReportFrequency=daily</p>
+<pre><code>Set MinReportFrequency=daily
+</code></pre>
 <p>The standard frequencies accepted by EnergyPlus must be used: detail, timestep, hourly, daily, monthly, runperiod, environment, annual. In addition, if this environment variable is used, the following will show in the .eio file:</p>
 <p>! &lt;Minimum Reporting Frequency (overriding input value)&gt;, Value, Input Value</p>
 <p>Minimum Reporting Frequency,  !Daily [Value,Min,Hour,Minute,Max,Hour,Minute],DAILY</p>
 <h4 id="reportduringwarmup-cause-reporting-during-warmup">ReportDuringWarmup: Cause reporting during warmup</h4>
 <p>Setting to “yes” causes reporting (Output:Variable, Output:Meter) to be reporting during the warmup days at the start of each environment. (Uses logical variable <strong>ReportDuringWarmup</strong> in module DataSystemVariables).  The Output:Diagnostics, ReportDuringWarmup; is equivalent.</p>
-<p>Set ReportDuringWarmup=yes</p>
+<pre><code>Set ReportDuringWarmup=yes
+</code></pre>
+<h4 id="reportduringhvacsizingsimulation-cause-sqlite-reporting-during-hvac-sizing-simulations">REPORTDURINGHVACSIZINGSIMULATION: Cause SQLite reporting during HVAC Sizing Simulations</h4>
+<p>Setting to “yes” causes output to be sent to SQLite database file during HVAC Sizing Simulations.  (Uses Boolean variable ReportDuringHVACSizingSimulation in DataSystemVariables).  The Output:Diagnostics, ReportDuringHVAVSizingSimulation; is equivalent.</p>
+<pre><code>Set REPORTDURINGHVACSIZINGSIMULATIN=YES
+</code></pre>
 <h4 id="displayallwarnings-turn-on-all-extra-warnings">DisplayAllWarnings: turn on all extra warnings</h4>
 <p>Setting to “yes” causes turning on the warnings: DisplayAllWarnings, DisplayExtraWarnings, DisplayUnusedSchedules, DisplayUnusedObjects. DisplayUnusedObjects also displays unused fluids (that is, fluids that are not directly retrieved by the simulation). The Output:Diagnostics, DisplayAllWarnings; is equivalent.</p>
-<p>Set DisplayAllWarnings=yes</p>
+<pre><code>Set DisplayAllWarnings=yes
+</code></pre>
 <h4 id="displayextrawarnings-turn-on-extra-warnings">DisplayExtraWarnings: turn on  extra warnings</h4>
 <p>Setting to “yes” causes turning on DispalyExtraWarnings. The Output:Diagnostics, DisplayExtraWarnings; is equivalent.</p>
-<p>Set DisplayExtraWarnings=yes</p>
+<pre><code>Set DisplayExtraWarnings=yes
+</code></pre>
 <h4 id="displayunusedobjects-turn-on-display-of-unused-objects-and-fluids">DisplayUnusedObjects: turn on display of unused objects and fluids</h4>
 <p>Setting to “yes” causes the orphan objects and fluids that are in the input file but not used to be displayed at the end of the simulation. The Output:Diagnostics, DisplayUnusedObjects; is equivalent.</p>
-<p>Set DisplayUnusedObjects=yes</p>
+<pre><code>Set DisplayUnusedObjects=yes
+</code></pre>
 <h4 id="displayunusedschedules-turn-on-display-of-unused-schedules">DisplayUnusedSchedules: turn on display of unused schedules</h4>
 <p>Setting to “yes” causes the schedules that are in the input file but not used to be displayed at the end of the simulation. The Output:Diagnostics, DisplayUnusedSchedules; is equivalent.</p>
-<p>Set DisplayUnusedSchedules=yes</p>
+<pre><code>Set DisplayUnusedSchedules=yes
+</code></pre>
 <h4 id="displayzoneairheatbalanceoffbalance-turn-on-this-development-output">DisplayZoneAirHeatBalanceOffBalance: turn on this development output</h4>
 <p>Setting to “yes” causes the program to calculate and display the Zone Air Heat Balance “out of balance” warnings. The Output:Diagnostics, DisplayZoneAirHeatBalanceOffBalance; is equivalent.</p>
-<p>Set DisplayZoneAirHeatBalanceOffBalance=yes</p>
+<pre><code>Set DisplayZoneAirHeatBalanceOffBalance=yes
+</code></pre>
 <h4 id="ignoresolarradiation-turn-off-using-solar-in-simulation">IgnoreSolarRadiation: turn off using Solar in simulation</h4>
 <p>Setting to “yes” causes the program to ignore all solar values during simulation.  One might use this when a new set of weather files are produced but you are unsure of their impacts. It also speeds the program as no shading calculations are done. The Output:Diagnostics, IgnoreSolarRadiation; is equivalent.</p>
-<p>Set IgnoreSolarRadiation=yes</p>
+<pre><code>Set IgnoreSolarRadiation=yes
+</code></pre>
 <h4 id="displayadvancedreportvariables-turn-on-access-to-advance-report-variables">DisplayAdvancedReportVariables: turn on access to advance report variables</h4>
 <p>Setting to “yes” causes the program to be able to access the “advanced report variable” set in the program.The Output:Diagnostics, DisplayAdvancedReportVariables; is equivalent.</p>
-<p>Set DisplayAdvancedReportVariables=yes</p>
+<pre><code>Set DisplayAdvancedReportVariables=yes
+</code></pre>
 <h4 id="sortidd-turn-on-or-off-the-sorting-of-idd-objects">SortIDD: turn on (or off) the sorting of IDD objects</h4>
 <p>Setting to “yes” (internal default) causes the program to use sorted lists (a speed up mechanism) in searching for existant objects during IDF processing. There is really no reason to turn it off. There is no Output:Diagnostics equivalent.</p>
-<p>Set SortIDD=yes</p>
+<pre><code>Set SortIDD=yes
+</code></pre>
 <h4 id="developerflag-turn-on-or-off-some-different-outputs-for-the-developer">DeveloperFlag: turn on (or off) some different outputs for the developer</h4>
 <p>Setting to “yes” (internal default is “no”) causes the program to display some different information that could be useful to developers. In particular, this will cause the Warmup Convergence output to show the last day for each zone, each timestep. There is no Output:Diagnostics equivalent.</p>
-<p>Set DeveloperFlag=yes</p>
+<pre><code>Set DeveloperFlag=yes
+</code></pre>
 <h4 id="ignorebeamradiation-turn-on-or-off-the-beam-radiation">IgnoreBeamRadiation: turn on (or off) the beam radiation</h4>
 <p>Setting to “yes” causes the program to ignore beam radiation in solar calculations. Of limited use, but may be useful for some simulation developments or isolating problems. There is no Output:Diagnostics equivalent.</p>
-<p>Set IgnoreBeamRadiation=yes</p>
+<pre><code>Set IgnoreBeamRadiation=yes
+</code></pre>
 <h4 id="ignorediffuseradiation-turn-on-or-off-the-diffuse-radiation">IgnoreDiffuseRadiation: turn on (or off) the diffuse radiation</h4>
 <p>Setting to “yes” causes the program to ignore diffuse radiation in solar calculations. Of limited use, but may be useful for some simulation developments or isolating problems. There is no Output:Diagnostics equivalent.</p>
-<p>Set IgnoreDiffuseRadiation=yes</p>
+<pre><code>Set IgnoreDiffuseRadiation=yes
+</code></pre>
 <h4 id="sutherlandhodgman-turn-on-or-off-the-polygon-clipping-algorithm">SutherlandHodgman: turn on (or off) the polygon clipping algorithm</h4>
 <p>Setting to “yes” (internal default) causes the program to use the SutherlandHodgman polygon clipping algorithm. You might use this if you wanted to run a bunch of files with the legacy clipping algorithm (convex Weiler Atherton). There is no Output:Diagnostics equivalent.</p>
-<p>Set SutherlandHodgman=yes</p>
+<pre><code>Set SutherlandHodgman=yes
+</code></pre>
 <h4 id="minimalshadowing-turn-on-or-off-the-use-of-minimal-shadowing">MinimalShadowing: turn on (or off) the use of Minimal Shadowing</h4>
 <p>Setting to “yes” causes the program to use Minimal Shadowing (a speed up mechanism) in calculations. This could be useful when large files are being run to search for non-shadowing related problems. There is no Output:Diagnostics equivalent.</p>
-<p>Set MinimalShadowing=yes</p>
+<pre><code>Set MinimalShadowing=yes
+</code></pre>
+<h4 id="displayinputinaudit-turn-on-or-off-to-show-the-input-file-in-the-audit-file">DisplayInputInAudit: turn on (or off) to show the input file in the audit file</h4>
+<p>Setting to “yes” causes the audit file to include a line-by-line echoing of the input file which may be useful for debugging purposes. For versions 8.2 and earlier, the default behavior was to include the line-by-line echoing of the input file into the audit file but it was changed to not do this by default as a way to speed up the input processing portion of executing EnergyPlus. When not set to “yes”, the audit file contains a reference on using the DisplayInputInAudit environment variable to see the line-by-line echoing of the input file.</p>
 <h4 id="caution-environment-variables">Caution: Environment Variables</h4>
 <p>Some combinations will cause fatal errors from EnergyPlus – <strong>DDOnly</strong> and <strong>FullAnnualRun</strong>, for example.  <strong>FullAnnualRun</strong> and <strong>NoWeatherFile</strong> won’t cause fatal errors from EnergyPlus but probably should from the script files.  We welcome any suggestions for future environment variables.</p>
 <h2 id="air-loop-simulation-environment-variables">Air Loop Simulation Environment Variables</h2>
@@ -6271,7 +6303,8 @@
         "HTML-CSS": {
           imageFont: null,
           preferredFont: null
-        }
+        },
+        tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
       });
     </script>
     <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js'></script>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Demand Limiting - EnergyPlus Documentation</title>
+    <title>Operational Faults - EnergyPlus Documentation</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -124,12 +124,12 @@
                 <a href="../10-Sizing">Sizing and Design Data</a>
               </li>
             
-              <li>
-                <a href="../11-OperationalFaults">Operational Faults</a>
+              <li class="active">
+                <a href=".">Operational Faults</a>
               </li>
             
-              <li class="active">
-                <a href=".">Demand Limiting</a>
+              <li>
+                <a href="../11-DemandLimiting">Demand Limiting</a>
               </li>
             
               <li>
@@ -218,10 +218,16 @@
           <div class="bs-docs-sidebar hidden-print affix well" role="complementary">
   <ul class="nav">
   
-    <li class="main active"><a href="#demand-limiting">Demand Limiting</a>
+    <li class="main active"><a href="#operational-faults">Operational Faults</a>
       <ul class="nav">
         
-        <li><a href="#algorithm">Algorithm</a></li>
+        <li><a href="#introduction-to-operational-faults-modeling">Introduction to Operational Faults Modeling</a></li>
+        
+        <li><a href="#sensor-faults-with-air-economizers">Sensor Faults with Air Economizers</a></li>
+        
+        <li><a href="#thermostathumidistat-offset">Thermostat/Humidistat Offset</a></li>
+        
+        <li><a href="#heating-and-cooling-coil-fouling">Heating and Cooling Coil Fouling</a></li>
         
       </ul>
     </li>
@@ -233,73 +239,72 @@
 </div>
         </div>
         <div class="col-md-9" role="main">
-          <h1 id="demand-limiting">Demand Limiting</h1>
-<p>Demand limiting, or demand management, is a strategy for reducing a building's demand for utilities, e.g., electricity.  Utility companies typically charge a monthly fee for "demand charges" that is based on the peak demand during a certain time period.  Often the peak demand charge is set by one exceptional day that is much higher than the peak demand for an average day during the month.  Therefore, to save utility costs, it is in the interest of building owners to find ways to manage the demand on peak days.  While demand management is generally concerned with the demand for electricity, the future will likely see demand management of other utilities, such as natural gas or water.</p>
-<p>Demand limiting controls shut off or reduce the power to non-essential loads in order to reduce the overall building demand.  Some typical controls:</p>
-<p>§ shut off or dim electric lights, equipment, or HVAC systems</p>
-<p>§ reset the thermostatic setpoints on HVAC systems</p>
-<p>§ reduce the load of a set of similar components by rotating one or more components "off" for a short time interval</p>
-<p>§ turn on generators to meet some or all of the building's demand.</p>
-<p>The demand limiting controls implemented in EnergyPlus are intended to allow some of the more common demand limiting strategies.  The DemandManagerAssignmentList object is a high level control that makes demand limiting decisions based on a list of possible demand limiting strategies.  Each demand limiting strategy is described in a separate DemandManager object.  Each DemandManager object controls a group of similar load objects of the same type, such as DemandManager:Lights, DemandManager:ElectricEquipment, or DemandManager:Thermostats objects.</p>
-<h3 id="algorithm">Algorithm</h3>
-<p>In EnergyPlus the DemandManagerAssignmentList and DemandManager objects are simulated by the Demand Manager module.  The Demand Manager is built into the overall solution method for the program.  For each zone time step, the program executes three major segments of code:</p>
-<p>§ exterior energy use</p>
-<p>§ zone heat balance (surface heat balances, internal gains, and air flows)</p>
-<p>§ HVAC system simulation (air and plant loops)</p>
-<p>The exterior energy use segment is completely independent of the zone heat balance and HVAC system simulation.  Exterior energy use handles energy use accounting for exterior lights and exterior equipment that are outside of the building and are not part of the zone heat balance.  The zone heat balance segment includes all of the surface heat balances, internal heat gains, and air flows.  The HVAC system simulation includes air and plant loops with their associated HVAC components.  The behaviour of the HVAC system depends on the results of the zone heat balance.  The HVAC system simulation operates on a variable "system" time step which is automatically shortened if necessary for stability.</p>
-<p>The Demand Manager is called after the first pass through the HVAC system simulation, before the system time step is shortened.  After evaluating the DemandManagerAssignmentList object, the Demand Manager decides if demand limiting is required.  If demand limiting is required, the individual DemandManager objects are surveyed to determine which loads can be limited.  Based on the <em>Demand Manager Priority</em> selected, the Demand Manager then decides which DemandManager objects should be activated.  In turn, the activated DemandManager objects set the demand limiting hooks on their respective load objects.  Finally, depending on the type of DemandManager objects that were activated, one or more of the major segments of code must be called to be resimulated because the load conditions have changed.  The code segments depend on the type of DemandManager and the relationship of its load objects to the overall solution method.  The table below shows the different DemandManager types and the related code segments that must be resimulated.</p>
-<p>Table 42. Demand Manager Types and Resimulation.</p>
-<table class="table table-striped">
+          <h1 id="operational-faults">Operational Faults</h1>
+<h3 id="introduction-to-operational-faults-modeling">Introduction to Operational Faults Modeling</h3>
+<p>Most of the buildings, either new or old, have operational faults in the sensors, controllers, meters, equipment and systems. Being able to model and simulate these faults and their impact on energy performance of buildings is crucial to improve accuracy of building simulations and to support the retrofit of buildings. 
+To date, the main practitioner use of EnergyPlus has been for new construction design. With the new high priority attached by USDOE to retrofit and improved operation of existing buildings, there is a need to extend the capabilities of EnergyPlus to model existing buildings, including faulty operation:</p>
+<ul>
+<li>Retrofit analysis: starts with calibrated simulation; the ability to estimate the severity of common faults is expected to improve the accuracy and transparency of the calibrated model and hence the increase accuracy of the analysis of different retrofit measures.  </li>
+<li>Commissioning providers can use the fault models to demonstrate the saving to be expected from fixing faults found in retro-commissioning</li>
+<li>Support for building operation by using the calibrated model, including unfixed faults, as a real-time reference model to detect, and verify the diagnosis of, newly occurring faults.</li>
+</ul>
+<p>The users in these cases are practitioners, not power users, so it is needed to implement the fault models using conventional EnergyPlus objects rather than the EMS, which, in any case, could only be used to model limited types of faults.   </p>
+<p>EnergyPlus contains a number of objects to model operational faults of sensors, meters, equipment and systems. The current implementation allows the modeling of the following fault types: (1) sensor faults with air economizers, (2) thermostat/humidistat offset faults, and (3) heating and cooling coil fouling faults. </p>
+<h3 id="sensor-faults-with-air-economizers">Sensor Faults with Air Economizers</h3>
+<h4 id="symptom">Symptom</h4>
+<p>The sensor readings deviate from the actual air conditions due to sensor offset, which leads to inappropriate operations of the air economizer and thus undesired resulting indoor conditions.</p>
+<h4 id="modeling-approach">Modeling Approach</h4>
+<p>There are a number of sensors installed to support the air economizer operations. The sensors may be of different types. The objects used by EnergyPlus to model the sensor faults are as follows:</p>
+<ul>
+<li>FaultModel:TemperatureSensorOffset:OutdoorAir</li>
+<li>FaultModel:HumiditySensorOffset:OutdoorAir</li>
+<li>FaultModel:EnthalpySensorOffset:OutdoorAir</li>
+<li>FaultModel:TemperatureSensorOffset:ReturnAir</li>
+<li>FaultModel:EnthalpySensorOffset:ReturnAir</li>
+</ul>
+<h3 id="thermostathumidistat-offset">Thermostat/Humidistat Offset</h3>
+<h4 id="symptom_1">Symptom</h4>
+<p>The zone air temperature/relative humidity readings deviate from the actual zone air conditions due to thermostat/humidistat offset, and thus leads to inappropriate operations of the HVAC system and undesired resulting indoor conditions.</p>
+<h4 id="modeling-approach_1">Modeling Approach</h4>
+<p>The thermostat offset fault is described in the object FaultModel:ThermostatOffset, which refers to the object ZoneControl:Thermostat. The humidistat offset fault is described in the object FaultModel:HumidistatOffset, which refers to the object ZoneControl:Humidistat.
+The effect of an offset in a thermostat/humidistat whose sole use is for the calculation of difference between the set-points and the design values can be modeled as an equal and opposite offset in the thermostat/humidistat: </p>
+<div>\[T_{s,f} = T_{s,ff}  - \Delta T\]</div>
 
+<div>\[RH_{s,f} = RH_{s,ff}  - \Delta RH\]</div>
 
-
-
-
-
-
-<tr>
-<td>Demand Manager Type</td>
-<td>Resimulate Exterior Energy</td>
-<td>Resimulate Zone Heat Balance</td>
-<td>Resimulate HVAC System</td>
-</tr>
-<tr>
-<td>DemandManager:ExteriorLights</td>
-<td>ü</td>
-<td> </td>
-<td> </td>
-</tr>
-<tr>
-<td>DemandManager:Lights</td>
-<td> </td>
-<td>ü</td>
-<td>ü</td>
-</tr>
-<tr>
-<td>DemandManager:ElectricEquipment</td>
-<td> </td>
-<td>ü</td>
-<td>ü</td>
-</tr>
-<tr>
-<td>DemandManager:Thermostats</td>
-<td> </td>
-<td> </td>
-<td>ü</td>
-</tr>
-
-</table>
-
-<p>All demand limiting controls are disabled during warmup days and sizing runs.</p>
-<h4 id="sequential-priority">Sequential Priority</h4>
-<p>If the <em>Demand Manager Priority</em> field of the DemandManagerAssignmentList object is set to SEQUENTIAL, each DemandManager in the list is activated in sequence from first to last until demand is reduced below the limit or until all managers are activated.  A DemandManager is skipped if it cannot reduce the demand.  Possible reasons that a manager cannot reduce demand include:</p>
-<p>§ not enough load to limit</p>
-<p>§ not available because of its <em>Availability Schedule</em></p>
-<p>§ already activated; load limited during a previous time step.</p>
-<p>For each DemandManager in the list that is successfully activated, one or more of the major code segments must be called to be resimulated (see above).  The DemandManagerAssignmentList object is then reevaluated to determine if further demand limiting is required before the next DemandManager is activated.</p>
-<p>The implication of sequential priority is that a DemandManagerAssignmentList with many DemandManagers may make many passes through the Demand Manager before all demand limiting decisions are finalized.  Each pass requires an additional resimulation of the current time step.  In some cases this could significantly slow down the overall simulation runtime.  The use of the <em>Minimum Limit Duration</em> field can help to ensure that not every DemandManager is being activated at every time step.</p>
-<h4 id="all-priority">All Priority</h4>
-<p>If the <em>Demand Manager Priority</em> field of the DemandManagerAssignmentList object is set to ALL, all DemandManagers in the list are activated simultaneously to achieve the maximum demand reduction.  This priority option requires only one final resimulation after all DemandManagers are activated.</p>
+<p>Where, </p>
+<p>$T_{s,f}$ thermostat value in the faulty case, C</p>
+<p>$T_{s,ff}$ thermostat value in the fault-free case (design value), C</p>
+<p>$RH_{s,f}$ humidistat value in the faulty case,</p>
+<p>$RH_{s,ff}$ humidistat value in the fault-free case (design value),</p>
+<p>$\Delta T / \Delta RH$ difference between the thermostat/humidistat readings and the actual zone air conditions. Positive values mean that the readings is higher than the actual air conditions.</p>
+<p>For the humidistat that is independent of the thermostat, $\Delta RH$ can be described by a pre-defined schedule. For the humidistat offset that is caused by the thermostat offset, $\Delta RH$ is related with both the thermostat offset level as well as the indoor air conditions which are dynamic, and therefore cannot be described with a pre-defined schedule. In this case, the humidistat offset level is calculated each time step. </p>
+<p>$$\Delta RH = RH_{s,ff} - f(T_{real}, W_{s,f})$$</p>
+<p>Where,
+Treal   real-time temperature of the indoor air (real value), C
+Ws,f    humidistat ratio corresponding to Treal-ΔT and RHs,ff, kgWater/kgDryAir
+Note that the thermostat/humidistat settings are related with two major processes within EnergyPlus: one is the design load calculations and HVAC system sizing, and the other is the HVAC system operations. Only the latter is affected by the thermostat/humidistat offset fault, while the former is not. Therefore, the size of the corresponding HVAC equipment in the faulty cases is the same as that in the fault-free cases.
+When EMS is used to overwrite the ZoneControl:Thermostat/ZoneControl:Humidistat values, the offsets are applied to the EMS values rather than the original Thermostat/Humidistat values.</p>
+<h3 id="heating-and-cooling-coil-fouling">Heating and Cooling Coil Fouling</h3>
+<h4 id="symptom_2">Symptom</h4>
+<p>Reduced overall heat transfer coefficient (UA) causes reduced coil capacity, resulting in unmet loads and/or increased water flow rate and decreased water side temperature difference (“low ΔT” syndrome). </p>
+<h4 id="modeling-approach_2">Modeling Approach</h4>
+<p>The coil fouling fault is described in the object FaultModel:Fouling:Coil. The fault model currently applies only to the ‘simple’ water coils: Coil:Heating:Water and Coil:Cooling:Water.
+The FaultModel:Fouling:Coil object allows the user to describe the fouling information in either of the two methods: FouledUARated or FoulingFactor. Using FouledUARated method, user specifies the value of UAfouled directly. Using FoulingFactor method user specifies air/water side fouling factor, and the UAfouled value is further calculated via the equations shown below.
+UAfouled = [UAair-1  +  Rfoul  + UAwater-1]-1                                       <br />
+Where, 
+UAair       heat transfer coefficient of the coil on the air side, W/K
+UAfouled   overall heat transfer coefficient of the fouled coil, W/K
+UAwater    heat transfer coefficient of the coil on the water side, W/K
+Rfoul   fouling factor, K/W</p>
+<p>Rfoul is determined by:
+Rfoul  = rair/Aair + rwater /Awater
+Where, 
+rair      Air side fouling factor, m2-K/W
+rwater   Water side fouling factor, m2-K/W 
+Aair,      Air side coil surface area, m2
+Awater  Water side coil surface area, m2</p>
+<p>The pressure drop associated with the fouling is ignored in the current implementation.</p>
 
           <div class="footer">
   <p class="text-center"><a href="https://unmethours.com/questions/scope:all/sort:activity-desc/tags:energyplus/">Get Help</a> | <a href="https://www.energyplus.gov/">More Information</a></p>
