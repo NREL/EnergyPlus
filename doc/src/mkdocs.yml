@@ -21,6 +21,7 @@ pages:
 - [EngineeringReference/08-AirHeatBalance.md, "Engineering Reference", "Air Heat Balance Manager"]
 - [EngineeringReference/09-BuildingSystemSimulation.md, "Engineering Reference", "Building System Simulation Manager"]
 - [EngineeringReference/10-Sizing.md, "Engineering Reference", "Sizing and Design Data"]
+- [EngineeringReference/11-OperationalFaults.md, "Engineering Reference", "Operational Faults"]
 - [EngineeringReference/11-DemandLimiting.md, "Engineering Reference", "Demand Limiting"]
 - [EngineeringReference/12-AlternativeModeling.md, "Engineering Reference", "Alternative Modeling Processes"]
 - [EngineeringReference/13-EncylopaedicRefs.md, "Engineering Reference", "Models - Encyclopedic Reference"]
