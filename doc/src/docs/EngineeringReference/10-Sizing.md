@@ -2648,9 +2648,11 @@ Supply air volumetric flow rate during cooling operation
  
 Supply air volumetric flow rate during heating operation
 
+<div>\[\dot{V}_{SA,heating} = \rm{DesHeatVolFlow}_{zone}/\rm{ZoneFraction} \]</div>
  
 Supply air volumetric flow rate when DX coils are used as a system
 
+<div>\[\dot{V}_{SA} = \max{\eft(\rm{DesCoolVolFlow},\rm{DesHeatVolFlow}\right)}/\rm{ZoneFraction} \]</div>
  
 where ZoneFraction = Fraction of the total volume flow that goes through the controlling zone
 
@@ -2658,23 +2660,29 @@ The unitary system object also allows scalable sizing as follows:
 
 Flow Per Floor Area:
 
- 
+<div>\[\dot{V}_{SA} = \rm{FlowPerFloorArea}\left(\rm{TotalFloorArea}\right)\]</div>
+
 Fraction of Autosized Cooling Value:
 
+<div>\[\dot{V}_{SA,cooling} = \dot{V}_{SA,des,cooling}\left(\rm{FractionOfCoolingValue}\right)\]</div>
  
 Fraction of Autosized Heating Value:
 
+<div>\[\dot{V}_{SA,heating} = \dot{V}_{SA,des,heating}\left(\rm{FractionOfHeatingValue}\right)\]</div>
  
 Flow Per Cooling Capacity
 
+<div>\[\dot{V}_{SA,cooling} = \dot{Q}_{coil,des,cooling}\left(\rm{FractionOfCoolingValue}\right)\]</div>
 
 Flow Per Heating Capacity
 
- 
+<div>\[\dot{V}_{SA,heating} = \dot{Q}_{coil,des,heating}\left(\rm{FractionOfHeatingValue}\right)\]</div>
+
 The maximum supply air temperature can also be automatically selected. The value is determined from the Sizing:Zone or Sizing:System object depending on where the object is used in the simulation (i.e., as zone or air loop equipment).
 
 Maximum supply air temperature
  
+<div>\[T_{SA,max}=\rm{HeatDesTemp}_{ZoneOrSystem}]</div>
 
 ### MultiSpeed Heat Pump Sizing
 

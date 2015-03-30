@@ -899,11 +899,11 @@ This is the number of timesteps in hour as entered in the IDF file as well as sh
 
 ### SimulationControl
 
-! &lt;Run Control&gt;, Do Zone Sizing, Do System Sizing, Do Plant Sizing, Do Design Days, Do Weather Simulation
+! &lt;Run Control&gt;, Do Zone Sizing, Do System Sizing, Do Plant Sizing, Do Design Days, Do Weather Simulation, Do HVAC Sizing Simulation
 
- Run Control, Yes, Yes, Yes, No, Yes
+ Run Control, Yes, Yes, Yes, No, Yes, No
 
-This shows how the sizing and running (design days vs. weather file) will be accomplished. Design days are required for sizing but do not necessarily need to be “run” after sizing has completed. Thus, the user can choose to do sizing, not do a “normal” calculation with the design day definitions but then go ahead and run the full simulation year.
+This shows how the sizing and running (design days vs. weather file) will be accomplished. Design days are required for sizing but do not necessarily need to be “run” after sizing has completed. Thus, the user can choose to do sizing, not do a “normal” calculation with the design day definitions but then go ahead and run the full simulation year.  Some advanced sizing methods require also running HVAC Sizing Simulations.
 
 ### Building
 
@@ -3724,6 +3724,71 @@ This contains the value of the field.
 
 ***Note:*** "Calculated" values are the unaltered result of the system sizing calculations, using the design day weather and schedules given in the input. "User" values are the calculated values altered by various user inputs in Sizing:Zone and Sizing:System. For instance, sizing factors will alter the calculated values. Another example would be using the *flow/system* method to specify a system design flow rate.
 
+### Plant Coincident Sizing Algorithm
+
+A special report is issued to the eio file that provides details for the Coincident sizing option.  Coincident plant sizing adjustments using HVAC Sizing Simulations run a sizing algorithm at the end of each Sizing Pass.  The following report provides details on the calculations and observations from monitoring the previous Sizing Pass. 
+
+    ! <Plant Coincident Sizing Algorithm>,Plant Loop Name,Sizing Pass {#},Measured Mass Flow{kg/s},Measured Demand {W},Demand Calculated Mass Flow{kg/s},Sizes Changed {Yes/No},Previous Volume Flow Rate {m3/s},New Volume Flow Rate {m3/s},Demand Check Applied {Yes/No},Sizing Factor {},Normalized Change {},Specific Heat{J/kg-K},Density {kg/m3}
+    Plant Coincident Sizing Algorithm,HOT WATER LOOP,1,0.1062471,11942.67,0.2586269,Yes,7.324432E-004,2.586533E-004,Yes,1.0000,0.646862,4197.9300,999.8980
+    Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290764,Yes,1.197307E-003,1.122396E-003,No,1.0000,6.256652E-002,4197.9300,999.8980
+
+#### Field: <Plant Coincident Sizing Algorithm>
+
+This field simply contains the words “Plant Sizing Coincident Flow Algorithm.” 
+
+#### Field: Plant Loop Name
+
+This field shows the name of the plant loop being analyzed.
+
+#### Field: Sizing Pass #
+
+This field shows which sizing pass has just completed prior to running the sizing algorithm.  Each Sizing Pass is an iteration of a set of HVAC Sizing Simulations. 
+
+#### Field: Measured Mass Flow {kg/s}
+
+This is the maximum coincident mass flow rate, in kg/s, found at the supply side inlet system node. This was recorded by a data logging system tracking node mass flow rate over all the sizing periods.  It will include any zone timestep averaging. 
+
+#### Field: Measured Demand {W}
+
+This is the maximum loop coincident demand, in W, on the supply side.  This was recorded by a data logging system tracking the report value for loop demand over all the sizing periods.  It will include and zone timestep averaging. 
+
+#### Field: Demand Calculated Mass Flow {kg/s}
+
+This is the flow rate, in kg/s, that was calculated from measured demand, the temperature difference in the plant sizing object, and the fluid specific heat.   
+
+#### Field: Sizes Changed {Yes/No}
+
+This field indicates if the sizing algorithm resulted in a change of size.  If the flows did not change significantly, the sizes might not change. 
+
+#### Field: Previous Volume Flow Rate {m3/s}
+
+This field is the prior size of the plant loop, in m3/s.  This is the size before the adjustment if the size changes. 
+
+#### Field: New Volume Flow Rate {m3/s}
+
+This field is the result of the sizing algorithm, in m3/s.  If the size changes, this is the new value used for the plant loop maximum volume flow rate. 
+
+#### Field: Demand Check Applied {Yes/No}
+
+This field indicates if the algorithm produced a new mass flow rate from the measured demand or not.  If this field is “No,” then the algorithm used coincident mass flow.  If this field is “Yes,” then the mass flow derived from demand was larger than the measured mass flow and the demand drove the result. 
+
+#### Field: Sizing Factor { }
+
+This field is the value of the sizing factor applied to the measured or calculated coincident flows.  
+
+#### Field: Normalized Change { }
+
+This field is the normalized change used to determine if the new flow size is significantly different from the previous. 
+
+#### Field: Specific Heat {J/kg-K }
+
+This is the fluid specific heat, in J/kg-K, used in the calculation of mass flow from the maximum coincident demand.
+
+#### Field: Density {kg/m3}
+
+This is the fluid density , in kg/m3, used in the calculation of volume flow rate from the mass flow rate.
+
+
 ### Component Sizing Information
 
 Component sizing is applicable to all manners of autosized components and equipments (coils, boilers, chillers, towers, humidifiers, namely – whatever can be autosized)
@@ -3868,7 +3933,7 @@ This field shows the name of the component.
 
 #### Field:  Input Field Description
 
-This field shows the field description/variable with units.
+This field shows the field description/variable with units.  When using HVAC Sizing Simulation for advanced sizing methods, there are two versions of the report for each component that might be affected.  With HVAC Sizing Simulation, there is a first size value reported, which is the result of the Ideal Loads Sizing Simulation, and there is the final value after all the Sizing Passes have completed.  This input field description will have “Initial” prepended to the description to indicate that this is the first size, the same report without “Initial” is the final size. Note that with HVAC Sizing Simulation, these reports will occur much later in the simulation and hence appear further down in the .eio file.
 
 #### Field:  Value
 
@@ -12225,6 +12290,44 @@ Report: **HVAC Sizing Summary**
 <td>1.05</td>
 <td>0.43</td>
 <td>0.43</td>
+</tr>
+</table>
+
+**Plant Loop Coincident Design Fluid Flow Rate Adjustments**
+
+<table class="table table-striped">
+<tr>
+<td></td>
+<td>Previous Design Volume Flow Rate [m3/s]</td>
+<td>Algorithm Volume Flow Rate [m3/s]</td>
+<td>Coincident Design Volume Flow Rate [m3/s]</td>
+<td>Coincident Size Adjusted</td>
+<td>Peak Sizing Period Name</td>
+<td>Peak Day into Period</td>
+<td>Peak Hour Of Day</td>
+<td>Peak Step Start Minute</td>
+</tr>
+<tr>
+<td>COOLSYS1 Sizing Pass 1</td>
+<td>0.120672</td>
+<td>0.141525</td>
+<td>0.141525</td>
+<td>Yes</td>
+<td>CHICAGO ANN CLG .4% CONDNS WB=>MDB HVAC Sizing Pass 1</td>
+<td>1</td>
+<td>2</td>
+<td>30></td>
+</tr>
+<tr>
+<td>HEATSYS1 Sizing Pass 1</td>
+<td>0.060598</td>
+<td>0.049054</td>
+<td>0.049054</td>
+<td>Yes</td>
+<td>CHICAGO ANN HTG 99.6% CONDNS DB HVAC Sizing Pass 1</td>
+<td>1</td>
+<td>7</td>
+<td>20></td>
 </tr>
 </table>
 
