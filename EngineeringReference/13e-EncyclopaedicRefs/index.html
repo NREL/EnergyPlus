@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>13e EncyclopaedicRefs - EnergyPlus Documentation</title>
+    <title> - - - - Encyclopedia Volume 5 - EnergyPlus Documentation</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -80,7 +80,7 @@
           
         
           
-          <li class="dropdown">
+          <li class="dropdown active">
             <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">Engineering Reference <span class="caret"></span></a>
             <ul class="dropdown-menu" role="menu">
             
@@ -137,50 +137,32 @@
               </li>
             
               <li>
-                <a href="../13-EncyclopaedicRefs">Models - Encyclopedic Reference</a>
-              </li>
-            
-            </ul>
-          </li>
-          
-        
-          
-          <li class="dropdown active">
-            <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">EngineeringReference <span class="caret"></span></a>
-            <ul class="dropdown-menu" role="menu">
-            
-              <li>
-                <a href="../13a-EncyclopaedicRefs">13a EncyclopaedicRefs</a>
+                <a href="../13-EncyclopaedicRefs">Encyclopedic Reference of Simulation Models</a>
               </li>
             
               <li>
-                <a href="../13b-EncyclopaedicRefs">13b EncyclopaedicRefs</a>
+                <a href="../13a-EncyclopaedicRefs"> - - - - Encyclopedia Volume 1</a>
               </li>
             
               <li>
-                <a href="../13c-EncyclopaedicRefs">13c EncyclopaedicRefs</a>
+                <a href="../13b-EncyclopaedicRefs"> - - - - Encyclopedia Volume 2</a>
               </li>
             
               <li>
-                <a href="../13d-EncyclopaedicRefs">13d EncyclopaedicRefs</a>
+                <a href="../13c-EncyclopaedicRefs"> - - - - Encyclopedia Volume 3</a>
+              </li>
+            
+              <li>
+                <a href="../13d-EncyclopaedicRefs"> - - - - Encyclopedia Volume 4</a>
               </li>
             
               <li class="active">
-                <a href=".">13e EncyclopaedicRefs</a>
+                <a href="."> - - - - Encyclopedia Volume 5</a>
               </li>
             
               <li>
-                <a href="../13f-EncyclopaedicRefs">13f EncyclopaedicRefs</a>
+                <a href="../13f-EncyclopaedicRefs"> - - - - Encyclopedia Volume 6</a>
               </li>
-            
-            </ul>
-          </li>
-          
-        
-          
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">Engineering Reference <span class="caret"></span></a>
-            <ul class="dropdown-menu" role="menu">
             
               <li>
                 <a href="../14-OnSiteGeneration">On-SIte Generation</a>
@@ -263,117 +245,479 @@
     <li class="main active"><a href="#simulation-models-encyclopedic-reference">Simulation Models – Encyclopedic Reference</a>
       <ul class="nav">
         
-        <li><a href="#radiant-system-models-refrigeration-setpoint-managers-solar-collectors-system-availability-managers">Radiant System Models, Refrigeration, Setpoint Managers, Solar Collectors, System Availability Managers</a></li>
+        <li><a href="#low-temperature-radiant-system-model">Low Temperature Radiant System Model</a></li>
         
-        <li><a href="#radiant-system-models">Radiant System Models</a></li>
-        
-        <li><a href="#refrigeration-equipment">Refrigeration Equipment</a></li>
-        
-        <li><a href="#references_1">References</a></li>
+        <li><a href="#high-temperature-radiant-heater-model">High Temperature Radiant Heater Model</a></li>
         
       </ul>
     </li>
   
-    <li class="main"><a href="#setpoint-managers">Setpoint Managers</a>
+    <li class="main"><a href="#overview">Overview</a>
       <ul class="nav">
-        
-        <li><a href="#overview_1">Overview</a></li>
-        
-        <li><a href="#scheduled">Scheduled</a></li>
-        
-        <li><a href="#outdoor-air-reset">Outdoor Air Reset</a></li>
-        
-        <li><a href="#single-zone-reheat-heating-and-cooling">Single Zone Reheat Heating and Cooling</a></li>
-        
-        <li><a href="#single-zone-heating-only">Single Zone Heating Only</a></li>
-        
-        <li><a href="#single-zone-cooling-only">Single Zone Cooling Only</a></li>
-        
-        <li><a href="#single-zone-minimum-humidity">Single Zone Minimum Humidity</a></li>
-        
-        <li><a href="#single-zone-maximum-humidity">Single Zone Maximum Humidity</a></li>
-        
-        <li><a href="#mixed-air">Mixed Air</a></li>
-        
-        <li><a href="#outdoor-air-pretreat">Outdoor Air Pretreat</a></li>
-        
-        <li><a href="#warmest-zone-supply-air-reset">Warmest Zone Supply Air Reset</a></li>
-        
-        <li><a href="#coldest-zone-supply-air-reset">Coldest Zone Supply Air Reset</a></li>
-        
-        <li><a href="#return-air-bypass-flow">Return Air Bypass Flow</a></li>
-        
-        <li><a href="#warmest-temp-flow">Warmest Temp Flow</a></li>
-        
-        <li><a href="#multizone-heating-average">Multizone Heating Average</a></li>
-        
-        <li><a href="#multizone-cooling-average">Multizone Cooling Average</a></li>
-        
-        <li><a href="#multizone-minimum-humidity-average">Multizone Minimum Humidity Average</a></li>
-        
-        <li><a href="#multizone-maximum-humidity-average">Multizone Maximum Humidity Average</a></li>
-        
-        <li><a href="#multizone-minimum-humidity-supply-air-reset">MultiZone Minimum Humidity Supply Air Reset</a></li>
-        
-        <li><a href="#multizone-maximum-humidity-supply-air-reset">MultiZone Maximum Humidity Supply Air Reset</a></li>
-        
-        <li><a href="#follow-outdoor-air-temperature">Follow Outdoor Air Temperature</a></li>
-        
-        <li><a href="#follow-system-node-temperature">Follow System Node Temperature</a></li>
-        
-        <li><a href="#follow-ground-temperature">Follow Ground Temperature</a></li>
-        
-        <li><a href="#condenser-entering-water-temperature-reset">Condenser Entering Water Temperature Reset</a></li>
-        
-        <li><a href="#ideal-condenser-entering-water-temperature-reset">Ideal Condenser Entering Water Temperature Reset</a></li>
         
       </ul>
     </li>
   
-    <li class="main"><a href="#solar-collectors">Solar Collectors</a>
+    <li class="main"><a href="#refrigeration-compressor-racks">Refrigeration Compressor Racks</a>
       <ul class="nav">
         
-        <li><a href="#flat-plate-solar-collectors">Flat-Plate Solar Collectors</a></li>
+        <li><a href="#compressor-energy-use">Compressor Energy Use</a></li>
         
-        <li><a href="#integral-collector-storage-ics-solar-collector">Integral-collector-storage (ICS) Solar Collector</a></li>
-        
-        <li><a href="#references_3">References:</a></li>
-        
-        <li><a href="#photovoltaic-thermal-flat-plate-solar-collectors">Photovoltaic Thermal Flat-Plate Solar Collectors</a></li>
-        
-        <li><a href="#unglazed-transpired-solar-collectors">Unglazed Transpired Solar Collectors</a></li>
+        <li><a href="#condenser-heat-rejection-energy-use-and-water-use">Condenser Heat Rejection, Energy Use, and Water Use</a></li>
         
       </ul>
     </li>
   
-    <li class="main"><a href="#system-availability-managers">System Availability Managers</a>
+    <li class="main"><a href="#refrigerated-cases">Refrigerated Cases</a>
       <ul class="nav">
         
-        <li><a href="#overview_2">Overview</a></li>
+        <li><a href="#case-evaporator-fan">Case Evaporator Fan</a></li>
         
-        <li><a href="#scheduled_1">Scheduled</a></li>
+        <li><a href="#case-lighting">Case Lighting</a></li>
         
-        <li><a href="#scheduled-on">Scheduled On</a></li>
+        <li><a href="#anti-sweat-heater-performance">Anti-Sweat Heater Performance</a></li>
         
-        <li><a href="#scheduled-off">Scheduled Off</a></li>
+        <li><a href="#case-restocking">Case Restocking</a></li>
         
-        <li><a href="#night-cycle">Night Cycle</a></li>
+        <li><a href="#case-defrost">Case Defrost</a></li>
         
-        <li><a href="#night-ventilation">Night Ventilation</a></li>
+        <li><a href="#sensible-case-credits">Sensible Case Credits</a></li>
         
-        <li><a href="#differential-thermostat">Differential Thermostat</a></li>
+        <li><a href="#latent-case-credits">Latent Case Credits</a></li>
         
-        <li><a href="#high-temperature-turn-off">High Temperature Turn Off</a></li>
+        <li><a href="#refrigerated-case-credits-with-under-case-return-air">Refrigerated Case Credits With Under Case Return Air</a></li>
         
-        <li><a href="#high-temperature-turn-on">High Temperature Turn On</a></li>
+        <li><a href="#variable-evaporator-temperature">Variable Evaporator Temperature</a></li>
         
-        <li><a href="#low-temperature-turn-off">Low Temperature Turn Off</a></li>
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#walk-in-coolers-and-freezers">Walk-In Coolers and Freezers</a>
+      <ul class="nav">
         
-        <li><a href="#low-temperature-turn-on">Low Temperature Turn On</a></li>
+        <li><a href="#walk-in-sensible-and-latent-heat-exchange">Walk-In Sensible and Latent Heat Exchange</a></li>
         
-        <li><a href="#hybrid-ventilation-control">Hybrid Ventilation Control</a></li>
+        <li><a href="#walk-in-fans-heaters-lighting-and-restocking">Walk-In Fans, Heaters, Lighting, and Restocking</a></li>
         
-        <li><a href="#optimum-start-controls">Optimum Start Controls</a></li>
+        <li><a href="#defrost">Defrost</a></li>
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#air-chillers-and-air-chiller-sets">Air Chillers and Air Chiller Sets</a>
+      <ul class="nav">
+        
+        <li><a href="#unit-load-factor-capacity">Unit Load Factor Capacity</a></li>
+        
+        <li><a href="#european-standard-ratings">European Standard Ratings</a></li>
+        
+        <li><a href="#total-capacity-map">Total Capacity Map</a></li>
+        
+        <li><a href="#sensible-and-latent-capacity">Sensible and Latent Capacity</a></li>
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#detailed-refrigeration-systems">Detailed Refrigeration Systems</a>
+      <ul class="nav">
+        
+        <li><a href="#refrigeration-system-loads-and-convergence">Refrigeration System Loads and Convergence</a></li>
+        
+        <li><a href="#compressor-energy-use_1">Compressor Energy Use</a></li>
+        
+        <li><a href="#two-stage-compression-systems">Two-Stage Compression Systems</a></li>
+        
+        <li><a href="#condenser-performance">Condenser Performance</a></li>
+        
+        <li><a href="#subcoolers">Subcoolers</a></li>
+        
+        <li><a href="#suction-piping-heat-gains">Suction Piping Heat Gains</a></li>
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#secondary-refrigeration-systems">Secondary Refrigeration Systems</a>
+      <ul class="nav">
+        
+        <li><a href="#secondary-evaporator-in-a-single-phase-secondary-loop-brine-or-glycol-loop">Secondary Evaporator in a Single-Phase Secondary Loop (Brine or Glycol Loop)</a></li>
+        
+        <li><a href="#secondary-loop-distribution-piping-and-receiver-shell-heat-gains">Secondary Loop Distribution Piping and Receiver Shell Heat Gains</a></li>
+        
+        <li><a href="#secondary-loop-pumping-power-and-secondary-loop-load">Secondary Loop Pumping Power and Secondary Loop Load</a></li>
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#gas-cooler-performance">Gas Cooler Performance</a>
+      <ul class="nav">
+        
+        <li><a href="#condensing-temperature-and-pressure-for-subcritical-operation">Condensing Temperature and Pressure for Subcritical Operation</a></li>
+        
+        <li><a href="#gas-cooler-fan-energy-use">Gas Cooler Fan Energy Use</a></li>
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#suction-line-heat-exchanger">Suction Line Heat Exchanger</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#references_1">References</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#overview_1">Overview</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#scheduled">Scheduled</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#outdoor-air-reset">Outdoor Air Reset</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#single-zone-reheat-heating-and-cooling">Single Zone Reheat Heating and Cooling</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#single-zone-heating-only">Single Zone Heating Only</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#single-zone-cooling-only">Single Zone Cooling Only</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#single-zone-minimum-humidity">Single Zone Minimum Humidity</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#single-zone-maximum-humidity">Single Zone Maximum Humidity</a>
+      <ul class="nav">
+        
+        <li><a href="#model-description">Model Description</a></li>
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#mixed-air">Mixed Air</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#outdoor-air-pretreat">Outdoor Air Pretreat</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#warmest-zone-supply-air-reset">Warmest Zone Supply Air Reset</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#coldest-zone-supply-air-reset">Coldest Zone Supply Air Reset</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#return-air-bypass-flow">Return Air Bypass Flow</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#warmest-temp-flow">Warmest Temp Flow</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#multizone-heating-average">Multizone Heating Average</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#multizone-cooling-average">Multizone Cooling Average</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#multizone-minimum-humidity-average">Multizone Minimum Humidity Average</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#multizone-maximum-humidity-average">Multizone Maximum Humidity Average</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#multizone-minimum-humidity-supply-air-reset">MultiZone Minimum Humidity Supply Air Reset</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#multizone-maximum-humidity-supply-air-reset">MultiZone Maximum Humidity Supply Air Reset</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#follow-outdoor-air-temperature">Follow Outdoor Air Temperature</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#follow-system-node-temperature">Follow System Node Temperature</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#follow-ground-temperature">Follow Ground Temperature</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#condenser-entering-water-temperature-reset">Condenser Entering Water Temperature Reset</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#ideal-condenser-entering-water-temperature-reset">Ideal Condenser Entering Water Temperature Reset</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#flat-plate-solar-collectors">Flat-Plate Solar Collectors</a>
+      <ul class="nav">
+        
+        <li><a href="#solar-and-shading-calculations">Solar and Shading Calculations</a></li>
+        
+        <li><a href="#thermal-performance">Thermal Performance</a></li>
+        
+        <li><a href="#incident-angle-modifiers">Incident Angle Modifiers</a></li>
+        
+        <li><a href="#outlet-temperature">Outlet Temperature</a></li>
+        
+        <li><a href="#references_2">References</a></li>
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#integral-collector-storage-ics-solar-collector">Integral-collector-storage (ICS) Solar Collector</a>
+      <ul class="nav">
+        
+        <li><a href="#solar-and-shading-calculations_1">Solar and Shading Calculations</a></li>
+        
+        <li><a href="#mathematical-model">Mathematical Model</a></li>
+        
+        <li><a href="#thermal-network-model">Thermal Network Model:</a></li>
+        
+        <li><a href="#other-side-condition-model">Other Side Condition Model</a></li>
+        
+        <li><a href="#heat-transfer-coefficients">Heat Transfer Coefficients</a></li>
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#references_3">References:</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#photovoltaic-thermal-flat-plate-solar-collectors">Photovoltaic Thermal Flat-Plate Solar Collectors</a>
+      <ul class="nav">
+        
+        <li><a href="#simple-pvt-thermal-model">Simple PVT Thermal Model</a></li>
+        
+        <li><a href="#references_4">References</a></li>
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#unglazed-transpired-solar-collectors">Unglazed Transpired Solar Collectors</a>
+      <ul class="nav">
+        
+        <li><a href="#heat-exchanger-effectiveness">Heat Exchanger Effectiveness</a></li>
+        
+        <li><a href="#kutscher-correlation">Kutscher Correlation</a></li>
+        
+        <li><a href="#van-decker-hollands-and-brunger-correlation">Van Decker, Hollands, and Brunger Correlation</a></li>
+        
+        <li><a href="#heat-exchanger-leaving-temperature">Heat Exchanger Leaving Temperature</a></li>
+        
+        <li><a href="#collector-heat-balance">Collector Heat Balance</a></li>
+        
+        <li><a href="#external-sw-radiation">External SW Radiation</a></li>
+        
+        <li><a href="#external-lw-radiation">External LW Radiation</a></li>
+        
+        <li><a href="#external-convection">External Convection</a></li>
+        
+        <li><a href="#heat-exchanger">Heat Exchanger</a></li>
+        
+        <li><a href="#plenum-lw-radation">Plenum LW Radation</a></li>
+        
+        <li><a href="#plenum-convection">Plenum Convection</a></li>
+        
+        <li><a href="#plenum-heat-balance">Plenum Heat Balance</a></li>
+        
+        <li><a href="#underlying-heat-transfer-surface">Underlying Heat Transfer Surface</a></li>
+        
+        <li><a href="#solar-and-shading-calculations_2">Solar and Shading Calculations</a></li>
+        
+        <li><a href="#local-wind-speed-calculations">Local Wind Speed Calculations</a></li>
+        
+        <li><a href="#convection-coefficients">Convection Coefficients</a></li>
+        
+        <li><a href="#radiation-coefficients">Radiation Coefficients</a></li>
+        
+        <li><a href="#bypass-control">Bypass Control</a></li>
+        
+        <li><a href="#sizing-warnings">Sizing Warnings</a></li>
+        
+        <li><a href="#overall-efficiency">Overall Efficiency</a></li>
+        
+        <li><a href="#collector-efficiency">Collector Efficiency</a></li>
+        
+        <li><a href="#references_5">References</a></li>
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#overview_2">Overview</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#scheduled_1">Scheduled</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#scheduled-on">Scheduled On</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#scheduled-off">Scheduled Off</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#night-cycle">Night Cycle</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#night-ventilation">Night Ventilation</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#differential-thermostat">Differential Thermostat</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#high-temperature-turn-off">High Temperature Turn Off</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#high-temperature-turn-on">High Temperature Turn On</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#low-temperature-turn-off">Low Temperature Turn Off</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#low-temperature-turn-on">Low Temperature Turn On</a>
+      <ul class="nav">
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#hybrid-ventilation-control">Hybrid Ventilation Control</a>
+      <ul class="nav">
+        
+        <li><a href="#control-logic">Control logic</a></li>
+        
+        <li><a href="#temperature-control">Temperature control</a></li>
+        
+        <li><a href="#enthalpy-control">Enthalpy control</a></li>
+        
+        <li><a href="#dew-point-control">Dew-Point control</a></li>
+        
+        <li><a href="#outdoor-ventilation-air-control">Outdoor ventilation air control</a></li>
+        
+        <li><a href="#availability-status">Availability Status</a></li>
+        
+      </ul>
+    </li>
+  
+    <li class="main"><a href="#optimum-start-controls">Optimum Start Controls</a>
+      <ul class="nav">
+        
+        <li><a href="#overview_3">Overview</a></li>
+        
+        <li><a href="#algorithms">Algorithms</a></li>
+        
+        <li><a href="#constant-start-time">Constant Start Time</a></li>
+        
+        <li><a href="#constant-temperature-gradient">Constant Temperature Gradient</a></li>
+        
+        <li><a href="#adaptive-temperature-gradient">Adaptive Temperature Gradient</a></li>
+        
+        <li><a href="#adaptive-ashrae-algorithm">Adaptive ASHRAE Algorithm</a></li>
         
       </ul>
     </li>
@@ -387,8 +731,15 @@
         <div class="col-md-9" role="main">
           <h1 id="simulation-models-encyclopedic-reference">Simulation Models – Encyclopedic Reference</h1>
 <p>The following descriptions are grouped alphabetically (as much as possible) with some also having additional tags of “Heat Balance”, “HVAC”, and “Plant”.  With the integrated solution, these designations signify where the effects of these models have their first impacts.</p>
-<h2 id="radiant-system-models-refrigeration-setpoint-managers-solar-collectors-system-availability-managers">Radiant System Models, Refrigeration, Setpoint Managers, Solar Collectors, System Availability Managers</h2>
-<h2 id="radiant-system-models">Radiant System Models</h2>
+<p>Main Sections:</p>
+<ul>
+<li><a href="#RadiantSystems">Radiant System Models</a></li>
+<li><a href="#Refrigeration">Refrigeration Equipment</a></li>
+<li><a href="#SetpointManagers">Setpoint Managers</a></li>
+<li><a href="#SolarCollectors">Solar Collectors</a></li>
+<li><a href="#AvailManagers">System Availability Managers</a></li>
+</ul>
+<h2 id="radiant-system-models">Radiant System Models <a name="RadiantSystems"></a></h2>
 <h3 id="low-temperature-radiant-system-model">Low Temperature Radiant System Model</h3>
 <p>The input objects ZoneHVAC:LowTemperatureRadiant:ConstantFlow, ZoneHVAC:LowTemperatureRadiant:VariableFlow, and ZoneHVAC:LowTemperatureRadiant:Electric provide models for low temperature radiant heating and cooling systems that appear, on the surface, to be relatively simple systems.  The system circulates hot or cold fluid through tubes embedded in a wall, ceiling, or floor or runs current through electric resistance wires embedded in a surface or a panel.  Energy is thus either added to or removed from the space, and zone occupants are conditioned by both radiation exchange with the system and convection from the surrounding air that is also affected by the system.  Unless specifically required for indoor air quality considerations, fans, ductwork, dampers, etc. are not needed.</p>
 <p>Despite the relative simplicity of the low temperature radiant systems, the integration of such a system within an energy analysis program requires one to overcome several challenges.  First, for systems with significant thermal mass, the conduction transfer function method for modeling transient conduction must be extended to include embedded heat sources or sinks.  Second, one must integrate this formulation within an energy analysis program like EnergyPlus.  Finally, one must overcome the fact that the radiant system is both a zone heat balance element and a conditioning system.  Each of these issues will be addressed in the next several subsections.</p>
@@ -823,7 +1174,7 @@
 <p>Strand, R.K. and C.O. Pedersen. 1997. “Implementation of a Radiant Heating and Cooling Model into an Integrated Building Energy Analysis Program”, ASHRAE Transactions, Volume 103, Part 1.</p>
 <p>Strand, R.K. and C.O. Pedersen. 2001. “Modularization and Simulation Techniques for Heat Balance Based Energy and Load Calculation Programs: the Experience of the ASHRAE LOADS Toolkit and EnergyPlus”, International Building Performance Simulation Association, Conference Proceedings of Building Simulation 2001, Rio de Janeiro, Brazil.</p>
 <p>Taylor, R.D., C.O. Pedersen, D. Fisher, R. Liesen, and L. Lawrie. 1991. “Impact of simultaneous simulation of building and mechanical systems in heat balance based energy analysis programs on system response and control”, International Building Performance Simulation Association, Conference Proceedings of Building Simulation 1991, Nice, France.</p>
-<h2 id="refrigeration-equipment">Refrigeration Equipment</h2>
+<h2 id="refrigeration-equipment">Refrigeration Equipment <a name="Refrigeration"></a></h2>
 <h3 id="overview">Overview</h3>
 <p>EnergyPlus can model refrigerated case equipment consisting of a compressor rack, multiple refrigerated cases and walk-in coolers, secondary loop equipment, and  optional heat reclaim air and water heating coils. The refrigerated case equipment models perform four major functions:</p>
 <p>n calculate the electric consumption of refrigerated cases and walk-in coolers connected to a compressor rack</p>
@@ -2148,7 +2499,7 @@ display case</td>
 <p>Nelson, B. I., 2010, Refrigeration Air Cooler Rating Methods, ASHRAE Journal, American Society of Heating, Refrigeration and Air-Conditioning Engineers, Inc., August</p>
 <p>Sawalha, S. 2008. Theoretical Evaluation of Trans-Critical CO<sub>2</sub> Systems in Supermarket Refrigeration. Part I: Modeling, Simulation and Optimization of Two System Solutions. <em>International Journal of Refrigeration</em> 31, 516-524.</p>
 <p>Terrell, W.J.Jr., Mao, Y., Hrnjak, P.S. 1999. Evaluation of Secondary Fluids for Use in Low-Temperature Supermarket Applications, ACRC CR-15, Air Conditioning and Refrigeration Center, University of Illinois, Urbana, IL, April 1999.</p>
-<h2 id="setpoint-managers">Setpoint Managers</h2>
+<h2 id="setpoint-managers">Setpoint Managers <a name="SetpointManagers"></a></h2>
 <h3 id="overview_1">Overview</h3>
 <p>Setpoint Managers are one of the high-level control constructs in EnergyPlus. A Setpoint Manager is able to access data from any of the HVAC system nodes and use this data to calculate a setpoint (usually a temperature setpoint) for one or more other HVAC system nodes. Setpoints are then used by Controllers as a goal for their control actions.</p>
 <p>Setpoint managers are executed at the start of each HVAC time step, and they reside outside the HVAC system iteration loops. Thus, the Setpoint Managers are executed once per HVAC time step, and they use previous time step information (except for zone load) to calculate their setpoints.</p>
@@ -2534,7 +2885,7 @@ display case</td>
 <p>5)   If dTEC<sub>1</sub> is positive, Decrease the setpoint value by 1˚C and calculate TEC. Compare the TECs and repeat this step (i.e., dTEC<sub>N</sub>=TEC<sub>N</sub>–TEC<sub>N+1</sub>) until either Toptset<sub>N+1</sub> reaches to the minimum boundary value or dTEC<sub>N</sub> becomes negative.</p>
 <p>6)   If Toptset<sub>N</sub> reaches to the minimum boundary value and still dTEC<sub>N</sub> is positive, set the “optimal” setpoint to Toptset<sub>N+1</sub>.</p>
 <p>7)   If TEC<sub>N</sub> becomes negative, decrease Toptset<sub>N-1</sub> by 0.2˚C and calculate TEC. Compare the TECs and repeat this step (i.e., dTEC<sub>M</sub>=TEC<sub>M</sub>–TEC<sub>M+1</sub>) until dTEC<sub>M</sub> becomes negative. Then set the “optimal” setpoint to Toptset<sub>M+1</sub>.</p>
-<h2 id="solar-collectors">Solar Collectors</h2>
+<h2 id="solar-collectors">Solar Collectors <a name="SolarCollectors"></a></h2>
 <p>Solar collectors are devices that convert solar energy into thermal energy by raising the temperature of a circulating heat transfer fluid.  The fluid can then be used to heat water for domestic hot water usage or space heating.  Flat-plate solar collectors using water as the heat transfer fluid, Integral-Collector Storage solar collectors using water and unglazed transpired solar collectors using air are currently the only types of collector available in EnergyPlus.</p>
 <h3 id="flat-plate-solar-collectors">Flat-Plate Solar Collectors</h3>
 <p>The input object SolarCollector:FlatPlate:Water provides a model for flat-plate solar collectors that are the most common type of collector.  Standards have been established by ASHRAE for the performance testing of these collectors (ASHRAE 1989; 1991) and the Solar Rating and Certification Corporation (SRCC) publishes a directory of commercially available collectors in North America (SRCC 2003).</p>
@@ -3241,7 +3592,7 @@ display case</td>
 <p>Kutscher, C.F. 1994. Heat exchange effectiveness and pressure drop for air flow through perforated plates with and without crosswind. <em>Journal of Heat Transfer</em>. May 1994, Vol. 116, p. 391. American Society of Mechanical Engineers.</p>
 <p>Van Decker, G.W.E., K.G.T. Hollands, and A.P. Brunger. 2001. Heat-exchange relations for unglazed transpired solar collectors with circular holes on a square of triangular pitch. <em>Solar Energy</em>. Vol. 71, No. 1. pp 33-45, 2001.</p>
 <p>ISO. 2003. ISO 15099:2003. Thermal performance of windows, doors, and shading devices – Detailed calculations. International Organization for Standardization.</p>
-<h2 id="system-availability-managers">System Availability Managers</h2>
+<h2 id="system-availability-managers">System Availability Managers <a name="AvailManagers"></a></h2>
 <h3 id="overview_2">Overview</h3>
 <p>System availability managers, or AvailabilityManagers, are one of the high-level control constructs in EnergyPlus. An AvailabilityManager is able to access data from any of the HVAC system nodes and use this data to set flags telling a central air system or plant loop to turn on or off. Also, some of the HVACZone:* components can use these same availability managers to turn their supply air fan on or off. Each type of availability manager encapsulates a specific high-level on-off control strategy. For instance, the input object AvailabilityManager:NightVentilation allows the user to specify a control strategy for pre-cooling the building with night-time ventilation.</p>
 <p>Availability managers are contained in the program module <em>SystemAvailabilityManager</em>. The Availability managers are executed at the start of each HVAC time step by a call to <em>ManageSystemAvailability</em>, and they reside outside the HVAC system iteration loops. Thus, the availability managers are executed once per HVAC time step, and they use previous time step information to calculate their control actions.</p>
