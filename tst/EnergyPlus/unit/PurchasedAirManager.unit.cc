@@ -24,7 +24,7 @@ using namespace EnergyPlus::DataSizing;
 TEST( SizePurchasedAirTest, Test1 )
 {
 
-	int PurchAirNum;
+	int PurchAirNum = 1;
 	int write_stat;
 	// Open the Initialization Output File (lifted from SimulationManager.cc)
 	OutputFileInits = GetNewUnitNumber( );
@@ -41,24 +41,29 @@ TEST( SizePurchasedAirTest, Test1 )
 	CurZoneEqNum = 1;
 	ZoneEqSizing( CurZoneEqNum ).SizingMethod.allocate( 24 );
 	CurSysNum = 0;
+	ZoneHVACSizing.allocate( 1 );
+	ZoneHVACSizing( 1 ).CoolingSAFMethod = SupplyAirFlowRate;
+	ZoneHVACSizing( 1 ).HeatingSAFMethod = SupplyAirFlowRate;
 
-	FinalZoneSizing.allocate(1);
+	ZoneEqSizing( CurZoneEqNum ).AirVolFlow = 0.0;
+	FinalZoneSizing.allocate( 1 );
 	FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow = 1.0;
+	ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow = 1.0;
 	FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp = 30.0;
 	FinalZoneSizing( CurZoneEqNum ).HeatDesTemp = 80.0;
 	FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat = 0.008;
 	FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow = 0.01;
 
 	FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow = 2.0;
+	ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow = 2.0;
 	FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp = 60.0;
 	FinalZoneSizing( CurZoneEqNum ).CoolDesTemp = 50.0;
 	FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat = 0.008;
 	FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat = 0.010;
 	FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow = 0.0103747425;
 
-	PurchAir.allocate( 1 );
-	PurchAirNumericFields.allocate( 1 );
-	PurchAirNum = 1;
+	PurchAir.allocate( 10 );
+	PurchAirNumericFields.allocate( 10 );
 	PurchAirNumericFields( PurchAirNum ).FieldNames.allocate( 8 );
 	PurchAirNumericFields( PurchAirNum ).FieldNames( 5 ) = "Maximum Heating Air Flow Rate";
 	PurchAirNumericFields( PurchAirNum ).FieldNames( 6 ) = "Maximum Sensible Heating Capacity";
@@ -78,7 +83,7 @@ TEST( SizePurchasedAirTest, Test1 )
 	PurchAir( PurchAirNum ).Name = "Ideal Loads 1";
 
 	// Need this to prevent crash in RequestSizing
-	UnitarySysEqSizing.allocate(1);
+	UnitarySysEqSizing.allocate(10);
 
 	SizePurchasedAir( PurchAirNum );
 	EXPECT_DOUBLE_EQ( 1.0 , PurchAir( PurchAirNum ).MaxHeatVolFlowRate );
@@ -91,7 +96,8 @@ TEST( SizePurchasedAirTest, Test1 )
 
 	ZoneEqSizing(CurZoneEqNum).SizingMethod.deallocate();
 	ZoneEqSizing.deallocate();
-	FinalZoneSizing.deallocate();
+	ZoneHVACSizing.deallocate( );
+	FinalZoneSizing.deallocate( );
 	PurchAir.deallocate();
 	PurchAirNumericFields.deallocate();
 	UnitarySysEqSizing.deallocate();

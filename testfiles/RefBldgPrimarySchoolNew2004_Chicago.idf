@@ -205,14 +205,16 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 25
 
-  Version,8.2;
+  Version,8.3;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
     YES,                     !- Do System Sizing Calculation
     YES,                     !- Do Plant Sizing Calculation
     YES,                     !- Run Simulation for Sizing Periods
-    NO;                      !- Run Simulation for Weather File Run Periods
+    NO,                      !- Run Simulation for Weather File Run Periods
+    YES,                     !- Do HVAC Sizing Simulation for Sizing Periods
+    1;                       !- Maximum Number of HVAC Sizing Simulation Passes    
 
   Building,
     Ref Bldg Primary School New2004_v1.3_5.0,  !- Name
@@ -11303,7 +11305,10 @@
     HeatSys1,                !- Plant or Condenser Loop Name
     Heating,                 !- Loop Type
     82.2,                    !- Design Loop Exit Temperature {C}
-    11.1;                    !- Loop Design Temperature Difference {deltaC}
+    11.1,                    !- Loop Design Temperature Difference {deltaC}
+    Coincident,              !- Sizing Option
+    4,                       !- Zone Timesteps in Averaging Window
+    None;                    !- Coincident Sizing Factor Mode
 
   SetpointManager:Scheduled,
     HeatSys1 Loop Setpoint Manager,  !- Name

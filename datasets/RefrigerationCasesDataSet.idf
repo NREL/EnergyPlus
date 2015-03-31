@@ -391,7 +391,7 @@
 !Example CaseAndWalkInList object
 
 !  Version,
-!    8.0;                    !- Version Identifier
+!    8.3;                    !- Version Identifier
 
   Refrigeration:CaseAndWalkInList,
     NameofCaseList,          !- Name

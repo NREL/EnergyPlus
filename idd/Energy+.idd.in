@@ -382,6 +382,7 @@ SimulationControl,
       \memo fields set to No, the corresponding Sizing object is ignored.
       \memo Note also, if you want to do system sizing, you must also do zone sizing in the same
       \memo run or an error will result.
+      \min-fields 5
   A1, \field Do Zone Sizing Calculation
       \note If Yes, Zone sizing is accomplished from corresponding Sizing:Zone objects
       \note and autosize fields.
@@ -410,12 +411,26 @@ SimulationControl,
       \key Yes
       \key No
       \default Yes
-  A5; \field Run Simulation for Weather File Run Periods
+  A5, \field Run Simulation for Weather File Run Periods
       \note If Yes, RunPeriod:* objects are executed and results from those may be displayed..
       \type choice
       \key Yes
       \key No
       \default Yes
+  A6, \field Do HVAC Sizing Simulation for Sizing Periods
+      \note If Yes, SizingPeriod:* objects are exectuted additional times for advanced sizing.
+      \note Currently limited to use with coincident plant sizing, see Sizing:Plant object
+      \type choice
+      \key Yes
+      \key No
+      \default No
+  N1; \field Maximum Number of HVAC Sizing Simulation Passes
+      \note the entire set of SizingPeriod:* objects may be repeated to fine tune size results
+      \note this input sets a limit on the number of passes that the sizing algorithms can repeate the set
+      \type integer
+      \minimum 1
+      \default 1
+      
 
 Building,
        \memo Describes parameters that are used during the simulation
@@ -21649,7 +21664,7 @@ ZoneEarthtube,
       \default 0
  N13, \field Amplitude of Soil Surface Temperature
       \required-field
-      \units C
+      \units deltaC
       \type real
       \minimum 0
       \default 0
@@ -31102,11 +31117,31 @@ Sizing:Plant,
       \required-field
       \type real
       \units C
-  N2; \field Loop Design Temperature Difference
+  N2, \field Loop Design Temperature Difference
       \required-field
       \type real
       \units deltaC
       \minimum> 0.0
+  A3, \field Sizing Option
+      \note if Coincident is chosen, then sizing is based on HVAC Sizing Simulations and 
+      \note the input field called Do HVAC Sizing Simulation for Sizing Periods in SimulationControl must be set to Yes
+      \type choice
+      \key Coincident
+      \key NonCoincident
+      \default NonCoincident
+  N3, \field Zone Timesteps in Averaging Window
+      \note this is used in the coincident sizing algorithm to apply a running average to peak flow rates 
+      \note that occur during HVAC Sizing Simulations
+      \type integer
+      \minimum 1
+      \default 1
+  A4; \field Coincident Sizing Factor Mode
+      \note this is used to adjust the result for coincident sizing by applying a sizing factor
+      \type choice
+      \key None
+      \key GlobalHeatingSizingFactor
+      \key GlobalCoolingSizingFactor
+      \key LoopComponentSizingFactor
 
 OutputControl:Sizing:Style,
        \memo Default style for the Sizing output files is comma -- this works well for
@@ -31128,6 +31163,7 @@ ZoneControl:Humidistat,
   \min-fields 3
   A1 , \field Name
        \required-field
+       \reference ZoneControlHumidistatNames
   A2 , \field Zone Name
        \required-field
        \type object-list
@@ -55749,7 +55785,7 @@ Pipe:Underground,
         \default 0
    N4,  \field Amplitude of Soil Surface Temperature
         \note optional
-        \units C
+        \units deltaC
         \type real
         \minimum 0
         \default 0
@@ -55872,7 +55908,7 @@ PipingSystem:Underground:Domain,
    N16, \field Kusuda-Achenbach Average Amplitude of Surface Temperature
         \required-field
         \type real
-        \units C
+        \units deltaC
    N17, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
         \required-field
         \type real
@@ -62483,7 +62519,7 @@ GroundHeatExchanger:HorizontalTrench,
         \note Site:GroundTemperature:Shallow object must be found in the input
         \note The undisturbed ground temperature will be approximated from this object
         \type real
-        \units C
+        \units deltaC
    N18, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
         \note This is the parameter for phase shift from minimum surface temperature
         \note This is an optional input in that if it is missing, a
@@ -69101,7 +69137,7 @@ Refrigeration:Condenser:AirCooled,
         \note Will be adjusted for elevation automatically
   N1 ,  \field Rated Subcooling Temperature Difference
         \type real
-        \units DeltaC
+        \units deltaC
         \default 0.0
         \minimum 0.0
         \note must correspond to rating given for total heat rejection effect
@@ -69169,7 +69205,7 @@ Refrigeration:Condenser:EvaporativeCooled,
         \units W
   N2 ,  \field Rated Subcooling Temperature Difference
         \type real
-        \units DeltaC
+        \units deltaC
         \default 0.0
         \minimum 0.0
         \note must correspond to rating given for total heat rejection effect
@@ -69319,7 +69355,7 @@ Refrigeration:Condenser:WaterCooled,
         \default 0.0
         \minimum 0.0
         \type real
-        \units DeltaC
+        \units deltaC
         \note must correspond to rating given for total heat rejection effect
   N4,   \field Rated Water Inlet Temperature
         \required-field
@@ -69402,7 +69438,7 @@ Refrigeration:Condenser:Cascade,
         \default 3.0
         \type real
         \minimum> 0.0
-        \units DeltaC
+        \units deltaC
   N3 ,  \field Rated Effective Total Heat Rejection Rate
         \required-field
         \note used for identification and rough system size error checking
@@ -69474,13 +69510,13 @@ Refrigeration:GasCooler:AirCooled,
         \note Temperature difference between the CO2 exiting the gas cooler and the air entering the
         \note gas cooler during transcritical operation.
         \type real
-        \units DeltaC
+        \units deltaC
         \default 3.0
   N5 ,  \field Subcritical Temperature Difference
         \note Temperature difference between the saturated condensing temperature and the air
         \note temperature during subcritical operation.
         \type real
-        \units DeltaC
+        \units deltaC
         \default 10.0
   N6 ,  \field Minimum Condensing Temperature
         \note Minimum saturated condensing temperature during subcritical operation.
@@ -69591,7 +69627,7 @@ Refrigeration:Subcooler,
         \note plan to add ambient subcoolers at future time
    N1 , \field Liquid Suction Design Subcooling Temperature Difference
         \type real
-        \units DeltaC
+        \units deltaC
         \note Applicable only and required for liquid suction heat exchangers
         \note design liquid suction subcooling
    N2 , \field Design Liquid Inlet Temperature
@@ -70120,7 +70156,7 @@ Refrigeration:SecondarySystem,
   N4 ,  \field Evaporator Approach Temperature Difference
         \type real
         \required-field
-        \units DeltaC
+        \units deltaC
         \note  For "FluidAlwaysLiquid", this is the rated difference between the temperature of the
         \note      circulating fluid leaving the heat exchanger
         \note      and the heat exchanger's rated evaporating temperature.
@@ -70128,7 +70164,7 @@ Refrigeration:SecondarySystem,
         \note      evaporating and condensing temperatures in the heat exchanger.
   N5 ,  \field Evaporator Range Temperature Difference
         \type real
-        \units DeltaC
+        \units deltaC
         \note  For "FluidAlwaysLiquid", this is the rated difference between the temperature of the
         \note      circulating fluid entering the heat exchanger and the temperature of the
         \note      circulating fluid leaving the heat exchanger, and is Required.
@@ -74782,52 +74818,68 @@ FaultModel:EnthalpySensorOffset:ReturnAir,
        \units J/kg
 
 FaultModel:ThermostatOffset,
+   \memo This object describes fault of thermostat offset
    A1, \field Name
        \required-field
        \type alpha
-   A2, \field Availability Schedule Name
+       \reference ThermostatOffsetFaults
+   A2, \field Thermostat Name
+       \note Enter the name of a ZoneControl:Thermostat object.
+       \required-field
+       \type object-list
+       \object-list ZoneControlThermostaticNames
+   A3, \field Availability Schedule Name
        \type object-list
        \object-list ScheduleNames
-   A3, \field Severity Schedule Name
+   A4, \field Severity Schedule Name
        \type object-list
        \object-list ScheduleNames
-   N1, \field Reference Thermostat Offset
+   N1; \field Reference Thermostat Offset
        \required-field
        \type real
        \minimum> -10
        \maximum< 10
        \default 2
-       \units C
-   A4; \field Thermostat Name
-       \begin-extensible
-       \note Enter the name of a ZoneControl:Thermostat object.
-       \required-field
-       \type object-list
-       \object-list ZoneControlThermostaticNames
+       \units deltaC
 
-FaultModel:HumidistatOffset,
+FaultModel:HumidistatOffset, 
+   \memo This object describes fault of humidistat offset
    A1, \field Name
        \required-field
        \type alpha
-   A2, \field Availability Schedule Name
-       \type object-list
-       \object-list ScheduleNames
-   A3, \field Severity Schedule Name
-       \type object-list
-       \object-list ScheduleNames
-   N1, \field Reference Humidistat Offset
+   A2, \field Humidistat Name
+       \note Enter the name of a ZoneControl:Humidistat object.
        \required-field
+       \type object-list
+       \object-list ZoneControlHumidistatNames
+   A3, \field Humidistat Offset Type 
+       \note Two types are available: 
+       \note Type ThermostatOffsetIndependent
+       \note Type ThermostatOffsetDependent
+       \type choice
+       \key ThermostatOffsetIndependent
+       \key ThermostatOffsetDependent
+       \default ThermostatOffsetIndependent
+   A4, \field Availability Schedule Name
+       \note This field is applicable for Type ThermostatOffsetIndependent
+       \type object-list
+       \object-list ScheduleNames
+   A5, \field Severity Schedule Name
+       \note This field is applicable for Type ThermostatOffsetIndependent
+       \type object-list
+       \object-list ScheduleNames 
+   N1, \field Reference Humidistat Offset       
+       \note Required field for Type ThermostatOffsetIndependent
        \type real
        \minimum> -20
        \maximum< 20
        \default 5
        \units percent
-   A4; \field Humidistat Name
-       \begin-extensible
-       \note Enter the name of a ZoneControl:Humidistat object.
-       \required-field
+   A6; \field Related Thermostat Offset Fault Name
+       \note Enter the name of a FaultModel:ThermostatOffset object
+       \note Required field for Type ThermostatOffsetDependent
        \type object-list
-       \object-list ZoneControlHumidistaticNames
+       \object-list ThermostatOffsetFaults   
 
 FaultModel:Fouling:Coil,
    \memo This object describes fouling water heating or cooling coils
@@ -92463,6 +92515,7 @@ Output:Diagnostics,
        \key DisplayWeatherMissingDataWarnings
        \key ReportDuringWarmup
        \key ReportDetailedWarmupConvergence
+       \key ReportDuringHVACSizingSimulation
   A2 ; \field Key 2
        \type choice
        \key DisplayAllWarnings
@@ -92475,6 +92528,7 @@ Output:Diagnostics,
        \key DisplayWeatherMissingDataWarnings
        \key ReportDuringWarmup
        \key ReportDetailedWarmupConvergence
+       \key ReportDuringHVACSizingSimulation
 
 Output:DebuggingData,
        \memo switch eplusout.dbg file on or off
