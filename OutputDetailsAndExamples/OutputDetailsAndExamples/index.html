@@ -2859,16 +2859,17 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <h3 id="dx-coil-outputs">DX Coil Outputs</h3>
 <h3 id="dx-cooling-coil-outputs">DX Cooling Coil Outputs</h3>
 <p>Outputs are provided for air-cooled, single-speed direct expansion (DX) cooling coils as follows:</p>
-<p>! &lt;DX Cooling Coil Standard Rating Information&gt;, Component Type, Component Name, Standard Rating (Net) Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}</p>
+<pre><code>! &amp;lt;DX Cooling Coil Standard Rating Information&amp;gt;, Component Type, Component Name, Standard Rating (Net) Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}
+</code></pre>
 <p>DX Cooling Coil Standard Rating Information, Coil:Cooling:DX:SingleSpeed, PSZ-AC_1:1_COOLC DXCOIL, 29299.3, 3.04, 10.38, 10.47, 10.67</p>
-<p>DX Cooling Coil Standard Rating Information, Coil:Cooling:DX:SingleSpeed, PSZ-AC_2:2_COOLC DXCOIL, 17427.1, 3.21, 10.95, 11.04, 11.20</p>
+<pre><code>DX Cooling Coil Standard Rating Information, Coil:Cooling:DX:SingleSpeed, PSZ-AC\_2:2\_COOLC DXCOIL, 17427.1, 3.21, 10.95, 11.04, 11.20
+</code></pre>
 <h4 id="field-component-type_3">Field: Component Type</h4>
 <p>This is the component type, currently Coil:Cooling:DX:SingleSpeed is the only valid type.</p>
 <h4 id="field-component-name_3">Field: Component Name</h4>
 <p>The name of the DX cooling coil from the input data file (IDF).</p>
 <h4 id="field-standard-rating-net-cooling-capacity-w">Field: Standard Rating (Net) Cooling Capacity {W}</h4>
 <p>The standard rating (net) cooling capacity for this DX cooling coil. Units are Watts. See the EnergyPlus Engineering Reference (Single Speed DX Cooling Coil, Standard Ratings) for details on how this value is calculated.</p>
-<p>.</p>
 <h4 id="field-standard-rated-net-cop-ww">Field: Standard Rated Net COP {W/W}</h4>
 <p>The standard rated net COP or energy efficiency ratio (<em>EER</em>) at standard rating conditions for the DX cooling coil in SI units of W/W. See the EnergyPlus Engineering Reference (Single Speed DX Cooling Coil, Standard Ratings) for details on how this value is calculated.</p>
 <h4 id="field-eer-btuw-h">Field: EER {Btu/W-h}</h4>
@@ -2877,13 +2878,45 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>The seasonal energy efficiency ratio (SEER) for the DX cooling coil in IP units of Btu/W-hr. See the EnergyPlus Engineering Reference (Single Speed DX Cooling Coil, Standard Ratings) for details on how this value is calculated.</p>
 <h4 id="field-ieer-btuw-h">Field: IEER {Btu/W-h}</h4>
 <p>The integrated energy efficiency ratio (<em>IEER</em>) for the DX cooling coil in IP units of Btu/W-hr. See the EnergyPlus Engineering Reference (Single Speed DX Cooling Coil, Standard Ratings) for details on how this value is calculated.</p>
+<h3 id="dx-cooling-coil-outputs-for-ashrae-127-standard-ratings">DX Cooling Coil Outputs for ASHRAE 127 Standard Ratings</h3>
+<h4 id="field-component-type_4">Field: Component Type</h4>
+<p>This is the component type, currently Coil:Cooling:DX:SingleSpeed is the only valid type.</p>
+<h4 id="field-component-name_4">Field: Component Name</h4>
+<p>The name of the DX cooling coil from the input data file (IDF).</p>
+<h4 id="field-class">Field: Class</h4>
+<p>The application classification classes of the DX cooling coil. There are four application classification classes per ASHRAE standard 127: Class I, Class II, Class III, and Class IV.  The standard ratings are reported for each the four classification classes and test conditions.</p>
+<h4 id="field-rated-net-cooling-capacity-at-test-a-w">Field: Rated Net Cooling Capacity at Test A {W}</h4>
+<p>Rated net cooling capacity for this DX cooling coil at Test condition A per Standard ASHRAE 127. Units are Watts. See the EnergyPlus Engineering Reference (ANSI/ASHRAE 127 - Standard Ratings of Single-Speed DX Cooling Coils) for details on how this value is calculated. The net cooling capacity is reported for class I, II, II and IV test conditions.</p>
+<h4 id="field-rated-total-electric-power-test-a-w">Field: Rated Total Electric Power Test A {W}</h4>
+<p>Rated total electric power input of the unit at Test condition A per Standard ASHRAE 127. Units are Watts. See the EnergyPlus Engineering Reference (ANSI/ASHRAE 127 - Standard Ratings of Single-Speed DX Cooling Coils) for details on how this value is calculated. The total electric power includes the supply fan power as well. The total electric power input is reported for class I, II, III and IV test conditions.</p>
+<h4 id="field-rated-net-cooling-capacity-at-test-b-w">Field: Rated Net Cooling Capacity at Test B {W}</h4>
+<p>Rated net cooling capacity of this unit at Test condition B per Standard ASHRAE 127. Units are Watts. See the EnergyPlus Engineering Reference (ANSI/ASHRAE 127 - Standard Ratings of Single-Speed DX Cooling Coils) for details on how this value is calculated. The net cooling capacity is reported for class I, II, II and IV test conditions.</p>
+<h4 id="field-rated-total-electric-power-test-b-w">Field: Rated Total Electric Power Test B {W}</h4>
+<p>Rated total electric power input of the unit at Test condition B per Standard ASHRAE 127. Units are Watts. See the EnergyPlus Engineering Reference (ANSI/ASHRAE 127 - Standard Ratings of Single-Speed DX Cooling Coils) for details on how this value is calculated. The total electric power includes the supply fan power as well. The total electric power input is reported for class I, II, III and IV test conditions.</p>
+<h4 id="field-rated-net-cooling-capacity-at-test-c-w">Field: Rated Net Cooling Capacity at Test C {W}</h4>
+<p>Rated net cooling capacity of this unit at Test condition C per Standard ASHRAE 127. Units are Watts. See the EnergyPlus Engineering Reference (ANSI/ASHRAE 127 - Standard Ratings of Single-Speed DX Cooling Coils) for details on how this value is calculated. The net cooling capacity is reported for class I, II, II and IV test conditions.</p>
+<h4 id="field-rated-total-electric-power-test-c-w">Field: Rated Total Electric Power Test C {W}</h4>
+<p>Rated total electric power input of the unit at Test condition C per Standard ASHRAE 127. Units are Watts. See the EnergyPlus Engineering Reference (ANSI/ASHRAE 127 - Standard Ratings of Single-Speed DX Cooling Coils) for details on how this value is calculated. The total electric power includes the supply fan power as well. The total electric power input is reported for class I, II, III and IV test conditions.</p>
+<h4 id="field-rated-net-cooling-capacity-at-test-d-w">Field: Rated Net Cooling Capacity at Test D {W}</h4>
+<p>Rated net cooling capacity of unit at Test condition D per Standard ASHRAE 127. Units are Watts. See the EnergyPlus Engineering Reference (ANSI/ASHRAE 127 - Standard Ratings of Single-Speed DX Cooling Coils) for details on how this value is calculated. The net cooling capacity is reported for class I, II, II and IV test conditions.</p>
+<h4 id="field-rated-total-electric-power-test-d-w">Field: Rated Total Electric Power Test D {W}</h4>
+<p>Rated total electric power input of the unit at Test condition D per Standard ASHRAE 127. Units are Watts. See the EnergyPlus Engineering Reference (ANSI/ASHRAE 127 - Standard Ratings of Single-Speed DX Cooling Coils) for details on how this value is calculated. The total electric power includes the supply fan power as well. The total electric power input is reported for class I, II, III and IV test conditions.</p>
+<pre><code>! &lt;DX Cooling Coil ASHRAE 127 Standard Ratings Information&gt;, Component Type, Component Name, Standard 127 Classification, Rated Net Cooling Capacity Test A {W}, Rated Total Electric Power Test A {W}, Rated Net Cooling Capacity Test B {W}, Rated Total Electric Power Test B {W}, Rated Net Cooling Capacity Test C {W}, Rated Total Electric Power Test C {W}, Rated Net Cooling Capacity Test D {W}, Rated Total Electric Power Test D {W} 
+ DX Cooling Coil ASHRAE 127 Standard Ratings Information, Coil:Cooling:DX:SingleSpeed, MAIN COOLING COIL 1, Class 1, 126953.8, 35918.5, 135678.7, 30852.7, 141523.1, 24400.1, 141727.0, 13951.0
+ DX Cooling Coil ASHRAE 127 Standard Ratings Information, Coil:Cooling:DX:SingleSpeed, MAIN COOLING COIL 1, Class 2, 133377.6, 37330.3, 140336.0, 31647.7, 141727.0, 24424.7, 141727.0, 13951.0
+ DX Cooling Coil ASHRAE 127 Standard Ratings Information, Coil:Cooling:DX:SingleSpeed, MAIN COOLING COIL 1, Class 3, 139488.4, 38673.3, 141354.0, 31821.4, 141727.0, 24424.7, 141727.0, 13951.0
+ DX Cooling Coil ASHRAE 127 Standard Ratings Information, Coil:Cooling:DX:SingleSpeed, MAIN COOLING COIL 1, Class 4, 145024.0, 39889.8, 141727.0, 31885.1, 141727.0, 24424.7, 141727.0, 13951.0
+</code></pre>
+
 <h3 id="dx-heating-coil-outputs">DX Heating Coil Outputs</h3>
 <p>Outputs are provided for single-speed direct expansion (DX) heating coils as follows:</p>
-<p>! &lt;DX Heating Coil Standard Rating Information&gt;, Component Type, Component Name, High Temperature Heating Standard (Net) Rating Capacity {W}, Low Temperature Heating Standard (Net) Rating Capacity {W}, HSPF {Btu/W-h, Region Number</p>
-<p>DX Heating Coil Standard Rating Information, Coil:Heating:DX:SingleSpeed, PSZ-AC_1:1_HEATC DXCOIL, 10476.1, 5833.2, 6.10, 4</p>
-<h4 id="field-component-type_4">Field: Component Type</h4>
+<pre><code>! &amp;lt;DX Heating Coil Standard Rating Information&amp;gt;, Component Type, Component Name, High Temperature Heating Standard (Net) Rating Capacity {W}, Low Temperature Heating Standard (Net) Rating Capacity {W}, HSPF {Btu/W-h, Region Number
+DX Heating Coil Standard Rating Information, Coil:Heating:DX:SingleSpeed, PSZ-AC\_1:1\_HEATC DXCOIL, 10476.1, 5833.2, 6.10, 4
+</code></pre>
+
+<h4 id="field-component-type_5">Field: Component Type</h4>
 <p>This is the component type, currently Coil:Heating:DX:SingleSpeed is the only valid type.</p>
-<h4 id="field-component-name_4">Field: Component Name</h4>
+<h4 id="field-component-name_5">Field: Component Name</h4>
 <p>The name of the DX heating coil from the input data file (IDF).</p>
 <h4 id="field-high-temperature-heating-standard-net-rating-capacity-w">Field: High Temperature Heating Standard (Net) Rating Capacity {W}</h4>
 <p>The standard rating (net) heating capacity for this DX heating coil at high temperature. Units are Watts. See the EnergyPlus Engineering Reference (Single Speed DX Heating Coil, Standard Ratings) for details on how this value is calculated.</p>
@@ -2895,12 +2928,14 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>The standard region number for which above ratings are calculated (from the input data file).</p>
 <h3 id="chiller-outputs">Chiller Outputs</h3>
 <p>Outputs are provided for Chiller:Electric:EIR and Chiller:Electric:ReformulatedEIR objects as follows:</p>
-<p>! &lt;Chiller Standard Rating Information&gt;, Component Type, Component Name, IPLV in SI Units {W/W}, IPLV in IP Units {Btu/W-h}</p>
-<p>Chiller Standard Rating Information, Chiller:Electric:EIR, Big Chiller 1, 4.5, 15.4</p>
-<p>Chiller Standard Rating Information, Chiller:Electric:ReformulatedEIR, Big Chiller 2, 4.8, 16.4</p>
-<h4 id="field-component-type_5">Field: Component Type</h4>
+<pre><code>! &amp;lt;Chiller Standard Rating Information&amp;gt;, Component Type, Component Name, IPLV in SI Units {W/W}, IPLV in IP Units {Btu/W-h}
+Chiller Standard Rating Information, Chiller:Electric:EIR, Big Chiller 1, 4.5, 15.4
+Chiller Standard Rating Information, Chiller:Electric:ReformulatedEIR, Big Chiller 2, 4.8, 16.4
+</code></pre>
+
+<h4 id="field-component-type_6">Field: Component Type</h4>
 <p>This is the component type, Chiller:Electric:EIR and/or Chiller:Electric:ReformulatedEIR.</p>
-<h4 id="field-component-name_5">Field: Component Name</h4>
+<h4 id="field-component-name_6">Field: Component Name</h4>
 <p>The name of the Chiller:Electric:EIR and Chiller:Electric:ReformulatedEIR objects from the input data file (IDF).</p>
 <h4 id="field-iplv-in-si-units-ww">Field: IPLV in SI Units {W/W}</h4>
 <p>The integrated part load value (<em>IPLV</em>) for the Chiller:Electric:EIR and Chiller:Electric:ReformulatedEIR in SI units of W/W. See the EnergyPlus Engineering Reference (Electric Chiller Model Based on Condenser Entering Temperature, Standard Ratings) for details on how this value is calculated.</p>
