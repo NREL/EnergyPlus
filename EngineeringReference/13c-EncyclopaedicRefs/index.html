@@ -653,7 +653,7 @@
         
         <li><a href="#horizontal-slinky-temperature-response-functions">Horizontal Slinky Temperature Response Functions</a></li>
         
-        <li><a href="#vertical-slinky-terperature-response-functions">Vertical Slinky Terperature Response Functions</a></li>
+        <li><a href="#vertical-slinky-temperature-response-functions">Vertical Slinky Temperature Response Functions</a></li>
         
         <li><a href="#model-simplifications-for-computational-efficiency">Model Simplifications for Computational Efficiency</a></li>
         
@@ -5399,13 +5399,13 @@
   d\left(P_{io},P_j\right) = \sqrt{\left[x_{0i} + \left(R-r\right)\cos \varphi - x_{0j}-R\cos \omega\right]^2 + \left[y_{0i} + \left(R+r\right)\sin \varphi - y_{0j}-R\sin \omega\right]^2}
 \]</div>
 
-<h4 id="vertical-slinky-terperature-response-functions">Vertical Slinky Terperature Response Functions</h4>
+<h4 id="vertical-slinky-temperature-response-functions">Vertical Slinky Temperature Response Functions</h4>
 <p>Equations used for calculating the g-function temperature response factors for the vertical Slinky HX are seen below.</p>
 <div>\[   
  g_s\left(t\right) = \sum_{i=1}^{N_{ring}} \sum_{j=1}^{N_{ring}} \frac{R}{4\pi N_{ring}} \int_0^{2\pi} \int_0^{2\pi} 
             \left[ 
                 \frac{erfc\left(d\left(P_j,P_i\right)/2\sqrt{\alpha t}\right)}{d\left(P_j,P_i\right)} - 
-                \frac{erfc\left(d\left(P_j,P_i\right)/2\sqrt{\alpha t}\right)}{d\left(P_j,P_i\right)}
+                \frac{erfc\left(d\left(P_{j'},P_i\right)/2\sqrt{\alpha t}\right)}{d\left(P_{j'},P_i\right)}
             \right]d\omega d\varphi
 \]</div>
 

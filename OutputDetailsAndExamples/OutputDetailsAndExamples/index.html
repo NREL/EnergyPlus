@@ -3688,22 +3688,13 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>NominalVentilation Table</p>
 </li>
 <li>
-<p>ReportMeterData Table</p>
+<p>ReportData Table</p>
 </li>
 <li>
-<p>ReportMeterDataDictionary Table</p>
+<p>ReportDataDictionary Table</p>
 </li>
 <li>
-<p>ReportMeterExtendedData Table</p>
-</li>
-<li>
-<p>ReportVariableData Table</p>
-</li>
-<li>
-<p>ReportVariableDataDictionary Table</p>
-</li>
-<li>
-<p>ReportVariableExtendedData Table</p>
+<p>ReportExtendedData Table</p>
 </li>
 <li>
 <p>RoomAirModels Table</p>
@@ -3733,6 +3724,9 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>ZoneSizes Table</p>
 </li>
 <li>
+<p>ZoneInfoLists Table</p>
+</li>
+<li>
 <p><a href="#_Simulations_Table_1">Simulations</a>Table</p>
 </li>
 <li>
@@ -3755,28 +3749,34 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 </li>
 </ul>
 <p>A short discussion of contents of each of the above SQL tables is given in the sections that follow.</p>
-<h3 id="report-variable-data">Report Variable Data</h3>
-<p>Data in the following four tables is also found in EnergyPlus’ standard output file (i.e., eplusout.eso – see that section for more information). As with the standard output file, the “Report Variable” and “Report Meter” commands control the data in these tables.</p>
-<h4 id="reportvariabledatadictionary-table">ReportVariableDataDictionary Table</h4>
-<p>The ReportVariableDataDictionary table provides the equivalent of the dictionary portion of the ESO file (i.e., the first section of the .eso file). Please see the Report Variable section of the Input-Output Reference for more information.</p>
-<p>Table 7. SQL ReportVariableDataDictionary Contents</p>
+<h3 id="report-data">Report Data</h3>
+<p>Data in the following four tables are also found in EnergyPlus’ standard output file (i.e., eplusout.eso – see that section for more information) or in EnergyPlus' eplusout.mtr (i.e. meter) output file. As with the standard output file, the “Report Variable” and “Report Meter” commands control the data in these tables.</p>
+<h4 id="reportdatadictionary-table">ReportDataDictionary Table</h4>
+<p>The ReportDataDictionary table provides the equivalent of the dictionary portion of the ESO file (i.e., the first section of the .eso file) or eplusout.mtr. Please see the Report Variable section of the Input-Output Reference for more information.  Like in the eplusout.mtr file (see the eplusout.mtr section), only data requested by "Report Meter" commands will set isMeter to 1 or True.</p>
 <table class="table table-striped">
+<caption>Table 7. SQL ReportDataDictionary Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
-<td>Enumeration</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
+<th>Enumeration</th>
 </tr>
 <tr>
-<td>ReportVariableDataDictionaryIndex</td>
+<td>ReportDataDictionaryIndex</td>
 <td>INTEGER PRIMARY KEY</td>
-<td>The ReportVariableDataDictionaryIndex links the dictionary data to the variable data (see ReportVariableData table)</td>
+<td>The ReportDataDictionaryIndex links the dictionary data to the variable data (see ReportData table)</td>
 <td> </td>
 </tr>
 <tr>
-<td>VariableType</td>
+<td>IsMeter</td>
+<td>INTEGER</td>
+<td>Boolean flag whether dictionary data is report of meter data</td>
+<td>0, 1</td>
+</tr>
+<tr>
+<td>Type</td>
 <td>TEXT</td>
-<td>Nature of data type with respect to state, (e.g. average or sum type of variable).</td>
+<td>Nature of data type with respect to state, (e.g. average or sum type of data).</td>
 <td>“Sum” “Avg”</td>
 </tr>
 <tr>
@@ -3799,9 +3799,9 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <td> </td>
 </tr>
 <tr>
-<td>VariableName</td>
+<td>Name</td>
 <td>TEXT</td>
-<td>The actual report variable name</td>
+<td>The actual report data name</td>
 <td> </td>
 </tr>
 <tr>
@@ -3817,21 +3817,26 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <td> </td>
 </tr>
 <tr>
-<td>VariableUnits</td>
+<td>Units</td>
 <td>TEXT</td>
-<td>The variable’s units</td>
+<td>The data units</td>
 <td> </td>
 </tr>
 </table>
 
-<h4 id="reportvariabledata-table">ReportVariableData Table</h4>
-<p>The ReportVariableData table contains the report variable data (e.g., the hourly, daily, and monthly report variable data). Please see the Report Variable section of the Input-Output Reference for more information.</p>
-<p>Table 8. SQL ReportVariableData Table Contents</p>
+<h4 id="reportdata-table">ReportData Table</h4>
+<p>The ReportData table contains the report or meter variable data (e.g., the hourly, daily, and monthly report variable data). Please see the Report Variable section of the Input-Output Reference for more information.</p>
 <table class="table table-striped">
+<caption>Table 8. SQL ReportData Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>ReportDataIndex</td>
+<td>INTEGER PRIMARY KEY</td>
+<td></td>
 </tr>
 <tr>
 <td>TimeIndex</td>
@@ -3839,35 +3844,35 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <td>This index links the record to its time record (see the Time table below)</td>
 </tr>
 <tr>
-<td>ReportVariableDataDictionaryIndex</td>
+<td>ReportDataDictionaryIndex</td>
 <td>INTEGER</td>
-<td>The ReportVariableDataDictionaryIndex links the data to the respective data dictionary record (see ReportVariableDataDictionary table above)</td>
+<td>The ReportDataDictionaryIndex links the data to the respective data dictionary record (see ReportDataDictionary table above)</td>
 </tr>
 <tr>
-<td>VariableValue</td>
+<td>Value</td>
 <td>REAL</td>
-<td>The variable’s value</td>
-</tr>
-<tr>
-<td>ReportVariableExtendedDataIndex</td>
-<td>INTEGER</td>
-<td>Links the record to its extended data, if any, such as minimums and maximums (see the ReportVariableExtendedData table below)</td>
+<td>The data value</td>
 </tr>
 </table>
 
-<h4 id="reportvariableextendeddata-table">ReportVariableExtendedData Table</h4>
-<p>The ReportVariableExtendedData table contains additional data (e.g., monthly maximums and minimums) that is available for certain report variables.</p>
-<p>Table 9. SQL ReportVariableExtendedData Table Contents</p>
+<h4 id="reportextendeddata-table">ReportExtendedData Table</h4>
+<p>The ReportExtendedData table contains additional data (e.g., monthly maximums and minimums) that is available for certain report or meter variables.</p>
 <table class="table table-striped">
+<caption>Table 9. SQL ReportExtendedData Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
-<td>ReportVariableExtendedDataIndex</td>
+<td>ReportExtendedDataIndex</td>
 <td>INTEGER PRIMARY KEY</td>
-<td>Connects the ReportVariableExtendedData table with the ReportVariableData table</td>
+<td></td>
+</tr>
+<tr>
+<td>ReportDataIndex</td>
+<td>INTEGER</td>
+<td>Associates ReportData record with ReportExtendedData record</td>
 </tr>
 <tr>
 <td>MaxValue</td>
@@ -3932,18 +3937,18 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 </table>
 
 <h4 id="time-table">Time Table</h4>
-<p>The Time table provides the time information for both the “report variable” and “report meter” variables (the ReportVariableData and ReportMeterData tables).</p>
-<p>Table 10. Time Table Contents</p>
+<p>The Time table provides the time information for both the “report variable” and “report meter” variables (the ReportData table).</p>
 <table class="table table-striped">
+<caption>Table 10. Time Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>TimeIndex</td>
 <td>INTEGER PRIMARY KEY</td>
-<td>Connects the time information with the report variables and meter variables (see the ReportVariableData and ReportMeterData tables)</td>
+<td>Connects the time information with the report variables and meter variables (see the ReportData table)</td>
 </tr>
 <tr>
 <td>Month</td>
@@ -4002,181 +4007,16 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 </tr>
 </table>
 
-<h3 id="report-meter-data">Report Meter Data</h3>
-<p>Data in the following three tables is also found in EnergyPlus’ eplusout.mtr (i.e., meter) output file. Like in the eplusout.mtr file (see the eplusout.mtr section), only data requested by “Report Meter” commands is contained in the data tables below. Note that the Report Meter tables are very similar to the Report Variable tables described above.</p>
-<h4 id="reportmeterdatadictionary-table">ReportMeterDataDictionary Table</h4>
-<p>The ReportMeterDataDictionary table provides the equivalent of the dictionary portion (i.e., the first section) of the eplusout.mtr file.</p>
-<p>Table 11. SQL ReportMeterDataDictionary Table Contents</p>
-<table class="table table-striped">
-<tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
-</tr>
-<tr>
-<td>ReportMeterDataDictionaryIndex</td>
-<td>INTEGER PRIMARY KEY</td>
-<td>The ReportMeterDataDictionaryIndex links the dictionary data to the sampled data (see ReportMeterData table below)</td>
-</tr>
-<tr>
-<td>VariableType</td>
-<td>TEXT</td>
-<td>Nature of data type with respect to state, (e.g. average or sum type of variable).</td>
-</tr>
-<tr>
-<td>IndexGroup</td>
-<td>TEXT</td>
-<td>Groupings from meter classifications</td>
-</tr>
-<tr>
-<td>TimestepType</td>
-<td>TEXT</td>
-<td>Type of timestep for data, (enum: “Zone” or “HVAC System”)</td>
-</tr>
-<tr>
-<td>KeyValue</td>
-<td>TEXT</td>
-<td>The identifying “key name” for the data record</td>
-</tr>
-<tr>
-<td>VariableName</td>
-<td>TEXT</td>
-<td>The actual meter variable name</td>
-</tr>
-<tr>
-<td>ReportingFrequency</td>
-<td>TEXT</td>
-<td>The reporting frequency of the variable. (enum: “HVAC System Timestep”,  “Zone Timestep”,  “Hourly”, “Daily”, “Monthly”, “Run Period”)</td>
-</tr>
-<tr>
-<td>ScheduleName</td>
-<td>TEXT</td>
-<td>The name of the schedule that controls reporting frequency</td>
-</tr>
-<tr>
-<td>VariableUnits</td>
-<td>TEXT</td>
-<td>The variable’s units</td>
-</tr>
-</table>
-
-<h4 id="reportmeterdata-table">ReportMeterData Table</h4>
-<p>The ReportMeterData table contains the meter variable data (e.g., the hourly, daily, and monthly meter data).</p>
-<p>Table 12. SQL ReportMeterData Table Contents</p>
-<table class="table table-striped">
-<tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
-</tr>
-<tr>
-<td>TimeIndex</td>
-<td>INTEGER</td>
-<td>This index links the record to its time record (see the Time table below)</td>
-</tr>
-<tr>
-<td>ReportMeterDataDictionaryIndex</td>
-<td>INTEGER</td>
-<td>The ReportMeterDataDictionaryIndex links the data to the respective data dictionary record (see the ReportMeterDataDictionary table)</td>
-</tr>
-<tr>
-<td>VariableValue</td>
-<td>REAL</td>
-<td>The variable’s value</td>
-</tr>
-<tr>
-<td>ReportVariableExtendedDataIndex</td>
-<td>INTEGER</td>
-<td>Links the record to its extended data, if any  (see the ReportVariableExtendedData table below)</td>
-</tr>
-</table>
-
-<h4 id="reportmeterextendeddata-table">ReportMeterExtendedData Table</h4>
-<p>The ReportMeterExtendedData table contains additional data (e.g., reporting interval maximums and minimums) that is available for certain meter variables.</p>
-<p>Table 13. SQL ReportMeterExtendedData Table Contents</p>
-<table class="table table-striped">
-<tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
-</tr>
-<tr>
-<td>ReportMeterExtendedDataIndex</td>
-<td>INTEGER PRIMARY KEY</td>
-<td>The index that connects the extended data with the variable’s primary data (see the ReportMeterData table)</td>
-</tr>
-<tr>
-<td>MaxValue</td>
-<td>REAL</td>
-<td>The maximum value during the reporting period</td>
-</tr>
-<tr>
-<td>MaxMonth</td>
-<td>INTEGER</td>
-<td>The month in which the maximum value occurred</td>
-</tr>
-<tr>
-<td>MaxDay</td>
-<td>INTEGER</td>
-<td>The day on which the maximum value occurred</td>
-</tr>
-<tr>
-<td>MaxHour</td>
-<td>INTEGER</td>
-<td>The hour in which the maximum value occurred</td>
-</tr>
-<tr>
-<td>MaxStartMinute</td>
-<td>INTEGER</td>
-<td>The starting minute of the interval in which the maximum value occurred</td>
-</tr>
-<tr>
-<td>MaxMinute</td>
-<td>INTEGER</td>
-<td>The minute in which the maximum value occurred</td>
-</tr>
-<tr>
-<td>MinValue</td>
-<td>REAL</td>
-<td>The minimum value during the reporting period</td>
-</tr>
-<tr>
-<td>MinMonth</td>
-<td>INTEGER</td>
-<td>The month in which the minimum value occurred</td>
-</tr>
-<tr>
-<td>MinDay</td>
-<td>INTEGER</td>
-<td>The day on which the minimum value occurred</td>
-</tr>
-<tr>
-<td>MinHour</td>
-<td>INTEGER</td>
-<td>The hour in which the minimum value occurred</td>
-</tr>
-<tr>
-<td>MinStartMinute</td>
-<td>INTEGER</td>
-<td>The starting minute of the interval in which the minimum value occurred</td>
-</tr>
-<tr>
-<td>MinMinute</td>
-<td>INTEGER</td>
-<td>The minute in which the minimum value occurred</td>
-</tr>
-</table>
-
 <h3 id="one-time-eio-file-data">One time (EIO) File Data</h3>
 <p>Data in the tables below can also be found in EnergyPlus input output file (i.e., in the eplusout.eio output file).</p>
 <h4 id="zones-table">Zones Table</h4>
 <p>The Zones table provides a variety of information about the zones specified within EnergyPlus. One of its most common uses is to provide zone name and area information for the other tables within the SQL database (e.g., use the ZoneIndex to look up the ZoneName).</p>
-<p>Table 14. SQL Zones Table Contents</p>
 <table class="table table-striped">
+<caption>Table 14. SQL Zones Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>ZoneIndex</td>
@@ -4318,12 +4158,12 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>Please see the Zone object in the Group-Thermal Zone Description/Geometry section of the Input-Output Reference for more information.</p>
 <h4 id="nominalpeople-table">NominalPeople Table</h4>
 <p>An overview of the NominalPeople SQL table is shown below.</p>
-<p>Table 15. SQL NominalPeople Table Contents</p>
 <table class="table table-striped">
+<caption>Table 15. SQL NominalPeople Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>NominalPeopleIndex</td>
@@ -4420,12 +4260,12 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>Please see the People object in the Group-Internal Gains section of the Input-Output Reference for more information.</p>
 <h4 id="nominallighting-table">NominalLighting Table</h4>
 <p>An overview of the NominalLighting SQL table is shown below.</p>
-<p>Table 16. SQL NominalLighting Table Contents</p>
 <table class="table table-striped">
+<caption>Table 16. SQL NominalLighting Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>NominalLightingIndex</td>
@@ -4477,12 +4317,12 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>Please see the LIGHTS object in the Group-Internal Gains section of the Input-Output Reference for more information.</p>
 <h4 id="nominalelectricequipment-table">NominalElectricEquipment Table</h4>
 <p>An overview of the NominalElectricEquipment SQL table is shown below.</p>
-<p>Table 17. SQL NominalElectricEquipment Table Contents</p>
 <table class="table table-striped">
+<caption>Table 17. SQL NominalElectricEquipment Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>NominalElectricEquipmentIndex</td>
@@ -4539,12 +4379,12 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>Please see the Electric Equipment object in the Group-Internal Gains section of the Input-Output Reference for more information.</p>
 <h4 id="nominalgasequipment-table">NominalGasEquipment Table</h4>
 <p>An overview of the NominalGasEquipment SQL table is shown below.</p>
-<p>Table 18. SQL NominalGasEquipment Table Contents</p>
 <table class="table table-striped">
+<caption>Table 18. SQL NominalGasEquipment Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>NominalGasEquipmentIndex</td>
@@ -4601,12 +4441,12 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>Please see the Gas Equipment object in the Group-Internal Gains section of the Input-Output Reference for more information.</p>
 <h4 id="nominalsteamequipment-table">NominalSteamEquipment Table</h4>
 <p>An overview of the NominalSteamEquipment SQL table is shown below.</p>
-<p>Table 19. SQL NominalSteamEquipment Table Contents</p>
 <table class="table table-striped">
+<caption>Table 19. SQL NominalSteamEquipment Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>NominalSteamEquipmentIndex</td>
@@ -4663,12 +4503,12 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>Please see the Steam Equipment object in the Group-Internal Gains section of the Input-Output Reference for more information.</p>
 <h4 id="nominalhotwaterequipment-table">NominalHotWaterEquipment Table</h4>
 <p>An overview of the NominalHotWaterEquipment SQL table is shown below.</p>
-<p>Table 20. SQL NominalHotWaterEquipment Table Contents</p>
 <table class="table table-striped">
+<caption>Table 20. SQL NominalHotWaterEquipment Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>NominalHotWaterEquipmentIndex</td>
@@ -4725,12 +4565,12 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>Please see the Hot Water Equipment object in the Group-Internal Gains section of the Input-Output Reference for more information.</p>
 <h4 id="nominalotherequipment-table">NominalOtherEquipment Table</h4>
 <p>An overview of the NominalOtherEquipment SQL table is shown below.</p>
-<p>Table 21. SQL NominalOtherEquipment Table Contents</p>
 <table class="table table-striped">
+<caption>Table 21. SQL NominalOtherEquipment Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>NominalOtherEquipmentIndex</td>
@@ -4787,12 +4627,12 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>Please see the Other Equipment object in the Group-Internal Gains section of the Input-Output Reference for more information.</p>
 <h4 id="nominalbaseboardheaters-table">NominalBaseboardHeaters Table</h4>
 <p>An overview of the NominalBaseboardHeaters SQL table is shown below.</p>
-<p>Table 22. SQL NominalBaseboardHeaters Table Contents</p>
 <table class="table table-striped">
+<caption>Table 22. SQL NominalBaseboardHeaters Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>NominalBaseboardHeaterIndex</td>
@@ -4854,12 +4694,12 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>Please see the Baseboard Heat object in the Group-Internal Gains section of the Input-Output Reference for more information.</p>
 <h4 id="nominalinfiltration-table">NominalInfiltration Table</h4>
 <p>An overview of the NominalInfiltration SQL table is shown below.</p>
-<p>Table 23. SQL NominalInfiltration Table Contents</p>
 <table class="table table-striped">
+<caption>Table 23. SQL NominalInfiltration Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>NominalInfiltrationIndex</td>
@@ -4891,12 +4731,12 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>Please see the Infiltration object in the Group-Airflow section of the Input-Output Reference for more information.</p>
 <h4 id="nominalventilation-table">NominalVentilation Table</h4>
 <p>An overview of the NominalVentilation SQL table is shown below.</p>
-<p>Table 24. SQL NominalVentilation Table Contents</p>
 <table class="table table-striped">
+<caption>Table 24. SQL NominalVentilation Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>NominalVentilationIndex</td>
@@ -4928,12 +4768,12 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>Please see the Ventilation object in the Group-Airflow section of the Input-Output Reference for more information.</p>
 <h4 id="surfaces-table">Surfaces Table</h4>
 <p>An overview of the Surfaces SQL table is shown below.</p>
-<p>Table 25. SQL Surfaces Table Contents</p>
 <table class="table table-striped">
+<caption>Table 25. SQL Surfaces Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>SurfaceIndex</td>
@@ -5040,12 +4880,12 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>Please see the Surface(s) object in the Group-Thermal Zone Description/Geometry section of the Input-Output Reference for more information.</p>
 <h4 id="constructions-table">Constructions Table</h4>
 <p>An overview of the Constructions SQL table is shown below.</p>
-<p>Table 26. SQL Constructions Table Contents</p>
 <table class="table table-striped">
+<caption>Table 26. SQL Constructions Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>ConstructionIndex</td>
@@ -5122,12 +4962,17 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>Please see the Construction object in the Group-Surface Construction Elements section of the Input-Output Reference for more information.</p>
 <h4 id="constructionlayers-table">ConstructionLayers Table</h4>
 <p>An overview of the ConstructionLayers SQL table is shown below.</p>
-<p>Table 27. SQL ConstructionLayers Table Contents</p>
 <table class="table table-striped">
+<caption>Table 27. SQL ConstructionLayers Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>ConstructionLayersIndex</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Construction Layers Index</td>
 </tr>
 <tr>
 <td>ConstructionIndex</td>
@@ -5149,12 +4994,12 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>Please see the Construction object in the Group-Surface Construction Elements section of the Input-Output Reference for more information.</p>
 <h4 id="materials-table">Materials Table</h4>
 <p>An overview of the Materials SQL table is shown below.</p>
-<p>Table 28. SQL Materials Table Contents</p>
 <table class="table table-striped">
+<caption>Table 28. SQL Materials Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>MaterialIndex</td>
@@ -5226,12 +5071,12 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>Please see the Materials object in the Group-Surface Construction Elements section of the Input-Output Reference for more information.</p>
 <h4 id="roomairmodels-table">RoomAirModels Table</h4>
 <p>An overview of the RoomAirModels SQL table is shown below. Please see the Group-RoomAir Models section of the Input-Output Reference for more information.</p>
-<p>Table 29. SQL RoomAirModels Table Contents</p>
 <table class="table table-striped">
+<caption>Table 29. SQL RoomAirModels Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>ZoneIndex</td>
@@ -5262,12 +5107,17 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 
 <h4 id="componentsizes-table">ComponentSizes Table</h4>
 <p>An overview of the ComponentSizes SQL table is shown below.</p>
-<p>Table 30. SQL ComponentSizes Table Contents</p>
 <table class="table table-striped">
+<caption>Table 30. SQL ComponentSizes Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>ComponentSizesIndex</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Component Sizes Index</td>
 </tr>
 <tr>
 <td>CompType</td>
@@ -5299,12 +5149,17 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>Please see the Sizing object in the Group-Design Objects section of the Input-Output Reference for more information.</p>
 <h4 id="systemsizes-table">SystemSizes Table</h4>
 <p>An overview of the SystemSizes SQL table is shown below. Please see the System Sizing object in the Group-Design Objects section of the Input-Output Reference for more information.</p>
-<p>Table 31. SQL SystemSizes Table Contents</p>
 <table class="table table-striped">
+<caption>Table 31. SQL SystemSizes Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>SystemSizesIndex</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>System Sizes Index</td>
 </tr>
 <tr>
 <td>SystemName</td>
@@ -5330,12 +5185,17 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 
 <h4 id="zonesizes-table">ZoneSizes Table</h4>
 <p>An overview of the ZoneSizes SQL table is shown below.</p>
-<p>Table 32. SQL ZoneSizes Table Contents</p>
 <table class="table table-striped">
+<caption>Table 32. SQL ZoneSizes Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>ZoneSizesIndex</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Zone Sizes Index</td>
 </tr>
 <tr>
 <td>ZoneName</td>
@@ -5392,12 +5252,12 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>Please see the Zone Sizing object in the Group-Design Objects section of the Input-Output Reference for more information.</p>
 <h4 id="zonegroups-table">ZoneGroups Table</h4>
 <p>An overview of the ZoneGroups SQL table is shown below.</p>
-<p>Table 33. SQL ZoneGroups Table Contents</p>
 <table class="table table-striped">
+<caption>Table 33. SQL ZoneGroups Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>ZoneGroupIndex</td>
@@ -5405,9 +5265,14 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <td>Zone group index</td>
 </tr>
 <tr>
-<td>Name</td>
+<td>ZoneGroupName</td>
 <td>TEXT</td>
 <td>Zone list name</td>
+</tr>
+<tr>
+<td>ZoneListIndex</td>
+<td>INTEGER</td>
+<td>The ZoneListIndex links this record to the respective zone list record (see ZoneLists table below)</td>
 </tr>
 <tr>
 <td>ZoneListMultiplier</td>
@@ -5419,12 +5284,12 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>Please see the Zone Group object in the Group-Thermal Zone Description/Geometry section of the Input-Output Reference for more information.</p>
 <h4 id="zonelists-table">ZoneLists Table</h4>
 <p>An overview of the ZoneLists SQL table is shown below.</p>
-<p>Table 34. SQL ZoneLists Table Contents</p>
 <table class="table table-striped">
+<caption>Table 34. SQL ZoneLists Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>ZoneListIndex</td>
@@ -5436,6 +5301,23 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <td>TEXT</td>
 <td>Zone list name</td>
 </tr>
+</table>
+
+<p>Please see the Zone List object in the Group-Thermal Zone Description/Geometry section of the Input-Output Reference for more information.</p>
+<h4 id="zoneinfozonelists-table">ZoneInfoZoneLists Table</h4>
+<p>An overview of the ZoneInfoZoneLists SQL table is shown below.</p>
+<table class="table table-striped">
+<caption>SQL ZoneLists Table Contents</caption>
+<tr>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>ZoneListIndex</td>
+<td>INTEGER</td>
+<td>Zone list index</td>
+</tr>
 <tr>
 <td>ZoneIndex</td>
 <td>INTEGER</td>
@@ -5443,16 +5325,16 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 </tr>
 </table>
 
-<p>Please see the Zone List object in the Group-Thermal Zone Description/Geometry section of the Input-Output Reference for more information.</p>
+<p>This is a join table to represent the many-to-many relationship of zones and zone lists.  ZoneListIndex and ZoneIndex together are the Primary Key for this table.</p>
 <h3 id="miscellaneous-tables">Miscellaneous Tables</h3>
 <h4 id="schedules-table">Schedules Table</h4>
 <p>An overview of the Schedules SQL table is shown below.</p>
-<p>Table 35. SQL Schedules Table Contents</p>
 <table class="table table-striped">
+<caption>Table 35. SQL Schedules Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>ScheduleIndex</td>
@@ -5484,12 +5366,12 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>Please see the Group-Schedules section of the Input-Output Reference for more information.</p>
 <h4 id="simulations-table">Simulations Table</h4>
 <p>An overview of the Simulations SQL table is shown below.  Currently there will only be one record in the table, because the SQLite database is relevant to only one simulation.  In the future this might change if multiple simulations are aggregated into a larger database.</p>
-<p>Table 36. SQL Simulations Table Contents</p>
 <table class="table table-striped">
+<caption>Table 36. SQL Simulations Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>SimulationIndex</td>
@@ -5525,12 +5407,12 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 
 <h4 id="environmentperiods-table">EnvironmentPeriods Table</h4>
 <p>An overview of the EnvironmentPeriods SQL table is shown below.</p>
-<p>Table 37. SQL EnvironmentPeriods Table Contents</p>
 <table class="table table-striped">
+<caption>Table 37. SQL EnvironmentPeriods Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>EnvironmentPeriodIndex</td>
@@ -5556,12 +5438,17 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 
 <h4 id="tabulardata-table">TabularData Table</h4>
 <p>An overview of the TabularData SQL table is shown below.   The TabularData table is only output when the “SimpleAndTabular” choice is made in the Output:SQLite object.  The TabularData table contains all of the tabular report information that is typically output to one of the formats controlled by the OutputControl:Table:Style object.  This is a generic way of dumping all of the existing tabular reports to the SQLite database.  This table has many references to the companion Strings table.  The Strings table simply associates strings to an integer value for space efficiency of the database.  Tabular data is easier to query from the TabularDataWithStrings table, which is implemented as a database view that joins this table with the Strings table.</p>
-<p>Table 38. SQL TabularData Table Contents</p>
 <table class="table table-striped">
+<caption>Table 38. SQL TabularData Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>TabularDataIndex</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Tabular Data Index</td>
 </tr>
 <tr>
 <td>ReportNameIndex</td>
@@ -5594,6 +5481,16 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <td>A foreign key to an entry in the Strings table, which indicates the name of the column the record belongs to.</td>
 </tr>
 <tr>
+<td>UnitsIndex</td>
+<td>INTEGER</td>
+<td>A foreign key to an entry in the Strings table, which indicates the units associated with the record.</td>
+</tr>
+<tr>
+<td>SimulationIndex</td>
+<td>INTEGER</td>
+<td>A foreign key to the Simulations table.</td>
+</tr>
+<tr>
 <td>RowId</td>
 <td>INTEGER</td>
 <td>The index of the row associated with the record.  Data in the first row of a tabular report would have the Id 1.</td>
@@ -5608,21 +5505,16 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <td>REAL</td>
 <td>The value of the record.  Most data is numeric, thus the type for this column is REAL.  The SQLite engine will first try to store the value as a REAL, however if this fails the value will be stored as text.</td>
 </tr>
-<tr>
-<td>UnitsIndex</td>
-<td>INTEGER</td>
-<td>A foreign key to an entry in the Strings table, which indicates the units associated with the record.</td>
-</tr>
 </table>
 
 <h4 id="strings-table">Strings Table</h4>
 <p>An overview of the Strings SQL table is shown below. The Strings table is only output when the “SimpleAndTabular” choice is made in the Output:SQLite object.  The Strings table simply associates strings with integers to save space in the database.</p>
-<p>Table 39. SQL Strings Table Contents</p>
 <table class="table table-striped">
+<caption>Table 39. SQL Strings Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>StringIndex</td>
@@ -5643,12 +5535,12 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 
 <h4 id="stringtypes-table">StringTypes Table</h4>
 <p>An overview of the StringTypes SQL table is shown below. The StringTypes table is only output when the “SimpleAndTabular” choice is made in the Output:SQLite object.</p>
-<p>Table 40. SQL StringTypes Table Contents</p>
 <table class="table table-striped">
+<caption>Table 40. SQL StringTypes Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>StringTypeIndex</td>
@@ -5665,14 +5557,22 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <h4 id="tabulardatawithstrings-table">TabularDataWithStrings Table</h4>
 <p>An overview of the TabularDataWithStrings SQL table is shown below.  This table is implemented as a view of other tables and is not actually a table in the database.  This view is similar to the TabularData table except text strings are directly available in place of foreign keys to the Strings table.   The TabularDataWithStrings view is only created when the “SimpleAndTabular” choice is made in the Output:SQLite object.</p>
 <p>An example of a SQL query to get a table out of the AnnualBuildingUtilityPerformanceSummary report is the following.</p>
-<p>select * FROM TabularDataWithStrings WHERE ReportName='AnnualBuildingUtilityPerformanceSummary'</p>
-<p>and TableName='Site and Source Energy';</p>
-<p>Table 41. SQL TabularDataWithStrings Table Contents</p>
+<pre><code>select \* FROM TabularDataWithStrings WHERE 
+ReportName='AnnualBuildingUtilityPerformanceSummary' 
+and TableName='Site and Source Energy';
+</code></pre>
+
 <table class="table table-striped">
+<caption>Table 41. SQL TabularDataWithStrings Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>TabularDataIndex</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>The index of the record</td>
 </tr>
 <tr>
 <td>Value</td>
@@ -5713,12 +5613,12 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 
 <h4 id="errors-table">Errors Table</h4>
 <p>The Errors SQL table reports errors and warnings for the simulation.  The content of this table includes most of the content of the error file.  However, it does not contain purely informational messages (e.g. not warnings or errors) and some of the error summary statistics which may be readily computed. Users should be aware that errors experienced while processing input cause EnergyPlus to exit before the SQLite output database has been initialized.  This is because the Output:SQLite object must be parsed from the input to request the database.  Therefore, failures in input processing are indicated by the absence of a SQLite output file.  The regular error or audit files must be used to identify the erroneous input objects in this case.  Because each error or warning message is expected to be unique these messages are stored directly in the Errors table and not in the Strings table.</p>
-<p>Table 42. SQL Errors Table Contents</p>
 <table class="table table-striped">
+<caption>Table 42. SQL Errors Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>ErrorIndex</td>
@@ -5760,9 +5660,11 @@ Plant Coincident Sizing Algorithm,CHILLED WATER LOOP,1,1.1222815,17614.26,0.6290
 <p>The sqlite3 program comes standard on MacOS X 10.5. From the command line, type “sqlite3 --version” to see which version of sqlite3 is installed.  In order to access the database created by EnergyPlus, version 3 or later is required.</p>
 <h4 id="accessing-the-data-from-the-command-line">Accessing the Data from the Command Line</h4>
 <p>Once it has been confirmed that SQLite3 is installed on your machine, the SQL database can be accessed by typing:</p>
-<p>sqlite3 &lt;database name&gt;</p>
+<pre><code>sqlite3 &amp;lt;database name&amp;gt;
+</code></pre>
+
 <p>at the command line, where &lt;database name &gt; is the name of the SQL database (e.g., sqlite3 eplusout.sql).</p>
-<p>The sqlite.org website, http://www.sqlite.org/sqlite.html, gives examples of how sqlite3 can be used to access and output data in various formats.</p>
+<p>The sqlite.org <a href="http://www.sqlite.org/sqlite.html">website</a> gives examples of how sqlite3 can be used to access and output data in various formats.</p>
 <h4 id="odbc">ODBC</h4>
 <p>ODBC allows access to the SQL database from a variety of programs, including Microsoft Excel, Microsoft Access, and FileMaker. How to install and use ODBC drivers is outside the scope of this document, and more information can be found at the following websites:</p>
 <p>Macintosh ODBC drivers:</p>
