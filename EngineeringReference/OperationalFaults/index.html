@@ -268,10 +268,8 @@ To date, the main practitioner use of EnergyPlus has been for new construction d
 <h4 id="modeling-approach_1">Modeling Approach</h4>
 <p>The thermostat offset fault is described in the object FaultModel:ThermostatOffset, which refers to the object ZoneControl:Thermostat. The humidistat offset fault is described in the object FaultModel:HumidistatOffset, which refers to the object ZoneControl:Humidistat.
 The effect of an offset in a thermostat/humidistat whose sole use is for the calculation of difference between the set-points and the design values can be modeled as an equal and opposite offset in the thermostat/humidistat: </p>
-<div>\[T_{s,f} = T_{s,ff}  - \Delta T\]</div>
-
-<div>\[RH_{s,f} = RH_{s,ff}  - \Delta RH\]</div>
-
+<p>$$T_{s,f} = T_{s,ff}  - \Delta T$$</p>
+<p>$$RH_{s,f} = RH_{s,ff}  - \Delta RH$$</p>
 <p>Where, </p>
 <p>$T_{s,f}$ thermostat value in the faulty case, C</p>
 <p>$T_{s,ff}$ thermostat value in the fault-free case (design value), C</p>
@@ -280,30 +278,30 @@ The effect of an offset in a thermostat/humidistat whose sole use is for the cal
 <p>$\Delta T / \Delta RH$ difference between the thermostat/humidistat readings and the actual zone air conditions. Positive values mean that the readings is higher than the actual air conditions.</p>
 <p>For the humidistat that is independent of the thermostat, $\Delta RH$ can be described by a pre-defined schedule. For the humidistat offset that is caused by the thermostat offset, $\Delta RH$ is related with both the thermostat offset level as well as the indoor air conditions which are dynamic, and therefore cannot be described with a pre-defined schedule. In this case, the humidistat offset level is calculated each time step. </p>
 <p>$$\Delta RH = RH_{s,ff} - f(T_{real}, W_{s,f})$$</p>
-<p>Where,
-Treal   real-time temperature of the indoor air (real value), C
-Ws,f    humidistat ratio corresponding to Treal-ΔT and RHs,ff, kgWater/kgDryAir
-Note that the thermostat/humidistat settings are related with two major processes within EnergyPlus: one is the design load calculations and HVAC system sizing, and the other is the HVAC system operations. Only the latter is affected by the thermostat/humidistat offset fault, while the former is not. Therefore, the size of the corresponding HVAC equipment in the faulty cases is the same as that in the fault-free cases.
-When EMS is used to overwrite the ZoneControl:Thermostat/ZoneControl:Humidistat values, the offsets are applied to the EMS values rather than the original Thermostat/Humidistat values.</p>
+<p>Where,</p>
+<p>$T_{real}$ real-time temperature of the indoor air (real value), C</p>
+<p>$W_{s,f}$ humidistat ratio corresponding to $T_{real} - \Delta T and RH_{s,ff, kgWater/kgDryAir}$</p>
+<p>Note that the thermostat/humidistat settings are related with two major processes within EnergyPlus: one is the design load calculations and HVAC system sizing, and the other is the HVAC system operations. Only the latter is affected by the thermostat/humidistat offset fault, while the former is not. Therefore, the size of the corresponding HVAC equipment in the faulty cases is the same as that in the fault-free cases.</p>
+<p>When EMS is used to overwrite the ZoneControl:Thermostat/ZoneControl:Humidistat values, the offsets are applied to the EMS values rather than the original Thermostat/Humidistat values.</p>
 <h3 id="heating-and-cooling-coil-fouling">Heating and Cooling Coil Fouling</h3>
 <h4 id="symptom_2">Symptom</h4>
 <p>Reduced overall heat transfer coefficient (UA) causes reduced coil capacity, resulting in unmet loads and/or increased water flow rate and decreased water side temperature difference (“low ΔT” syndrome). </p>
 <h4 id="modeling-approach_2">Modeling Approach</h4>
 <p>The coil fouling fault is described in the object FaultModel:Fouling:Coil. The fault model currently applies only to the ‘simple’ water coils: Coil:Heating:Water and Coil:Cooling:Water.
-The FaultModel:Fouling:Coil object allows the user to describe the fouling information in either of the two methods: FouledUARated or FoulingFactor. Using FouledUARated method, user specifies the value of UAfouled directly. Using FoulingFactor method user specifies air/water side fouling factor, and the UAfouled value is further calculated via the equations shown below.
-UAfouled = [UAair-1  +  Rfoul  + UAwater-1]-1                                       <br />
-Where, 
-UAair       heat transfer coefficient of the coil on the air side, W/K
-UAfouled   overall heat transfer coefficient of the fouled coil, W/K
-UAwater    heat transfer coefficient of the coil on the water side, W/K
-Rfoul   fouling factor, K/W</p>
-<p>Rfoul is determined by:
-Rfoul  = rair/Aair + rwater /Awater
-Where, 
-rair      Air side fouling factor, m2-K/W
-rwater   Water side fouling factor, m2-K/W 
-Aair,      Air side coil surface area, m2
-Awater  Water side coil surface area, m2</p>
+The FaultModel:Fouling:Coil object allows the user to describe the fouling information in either of the two methods: FouledUARated or FoulingFactor. Using FouledUARated method, user specifies the value of UAfouled directly. Using FoulingFactor method user specifies air/water side fouling factor, and the UAfouled value is further calculated via the equations shown below.</p>
+<p>$$UA_{fouled} = [UA_{air} - 1  +  R_{foul}  + UA_{water} - 1]-1$$</p>
+<p>Where, </p>
+<p>$U_{Aair}$ heat transfer coefficient of the coil on the air side, W/K</p>
+<p>$UA_{fouled}$ overall heat transfer coefficient of the fouled coil, W/K</p>
+<p>$UA_{water}$ heat transfer coefficient of the coil on the water side, W/K</p>
+<p>$R_{foul}$ fouling factor, K/W</p>
+<p>$R_{foul}$ is determined by:</p>
+<p>$$R_{foul} = r_{air}/A_{air} + r_{water} / A_{water}$$</p>
+<p>Where, </p>
+<p>$r_{air}$ Air side fouling factor, m2-K/W</p>
+<p>$r_{water}$ Water side fouling factor, m2-K/W </p>
+<p>$A_{air}$ Air side coil surface area, m2</p>
+<p>$A_{water}$  Water side coil surface area, m2</p>
 <p>The pressure drop associated with the fouling is ignored in the current implementation.</p>
 
           <div class="footer">

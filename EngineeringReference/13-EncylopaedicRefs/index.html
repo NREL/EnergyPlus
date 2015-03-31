@@ -125,7 +125,7 @@
               </li>
             
               <li>
-                <a href="../11-OperationalFaults">Operational Faults</a>
+                <a href="../OperationalFaults">Operational Faults</a>
               </li>
             
               <li>
@@ -2499,7 +2499,8 @@
 <p><em>ChillerEIRFTemp</em> = Energy input to cooling output factor, equal to 1 at reference conditions</p>
 <p><em>T<sub>cw,l</sub></em>      = leaving chilled water temperature, ˚C</p>
 <p><em>T<sub>cond,l</sub></em><sub>     </sub>= leaving condenser water temperature, ˚C. This will be the water temperature entering the condenser loop (e.g., entering the cooling tower). If the chiller is a heat recovery chiller,then the condenser leaving temperature is adjusted to account for both fluid streams as described in the section above on heat recovery chillers.</p>
-<p>·        The energy input to cooling output ratio function of part-load ratio curve is a bicubic performance curve that parameterizes the variation of the chiller input power ratio as a function of the leaving condenser water temperature and the part-load ratio. The part-load ratio is the actual cooling load divided by the chiller’s available cooling capacity. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) and the Energy Input to Cooling Output Ratio Function of Temperature Curve to give the EIR at the specific temperatures and part-load ratio at which the chiller is operating. This curve should have a value of 1.0 at the reference leaving condenser water temperature with part-load ratio equal to 1.0. It is recommended that this performance curve be developed using both full- and part-load performance data. The bicubic curve should be valid for the range of condenser water temperatures and part-load ratios anticipated for the simulation (otherwise the program issues warning messages).</p>
+<p>·        The energy input to cooling output ratio function of part-load ratio curve parameterizes the variation of the energy input ratio (EIR). The output of this curve is multiplied by the reference EIR (inverse of the reference COP) and the Energy Input to Cooling Output Ratio Function of Temperature Curve to give the EIR at the specific temperatures and part-load ratio at which the chiller is operating. This curve should have a value of 1.0 at the reference leaving condenser water temperature with part-load ratio equal to 1.0. It is recommended that this performance curve be developed using both full- and part-load performance data. The bicubic curve should be valid for the range of condenser water temperatures and part-load ratios anticipated for the simulation (otherwise the program issues warning messages). Either of the following two types of curves can be used.</p>
+<p>The first type is a bicubic performance curve that parameterizes the variation of the chiller input power ratio as a function of the leaving condenser water temperature and the part-load ratio. The part-load ratio is the actual cooling load divided by the chiller’s available cooling capacity.</p>
 <div>\[ChillerEIRFPLR = a + b({T_{cond,l}}) + c{({T_{cond,l}})^2} + d(PLR) + e{(PLR)^2} + f({T_{cond,l}})(PLR) + g{(PLR)^3}\]</div>
 
 <div>\[ChillerEIRFPLR = \,{\raise0.7ex\hbox{${{P_{chiller}}}$} \!\mathord{\left/ {\vphantom {{{P_{chiller}}} {{P_{ref}}\left( {ChillerCapFTemp} \right)\left( {ChillerEIRFTemp} \right)}}}\right.}\!\lower0.7ex\hbox{${{P_{ref}}\left( {ChillerCapFTemp} \right)\left( {ChillerEIRFTemp} \right)}$}}\]</div>
@@ -2511,7 +2512,21 @@
 <p><em>P<sub>chiller</sub> = chiller power at specific PLR</em></p>
 <p><em>P<sub>ref</sub> = <div img="image3260.txt">({\mathop Q\limits^ \bullet_{ref}})</div>/COP<sub>ref</sub></em></p>
 <p>Note: Although a bicubic curve requires 10 coefficients (ref. Curve:Bicubic), coefficients 7, 9 and 10 are typically not used in the performance curve described here and should be entered as 0 unless sufficient performance data and regression accuracy exist to justify the use of these terms of the bicubic curve.</p>
-<p>All three of the performance curves are accessed through EnergyPlus’ built-in performance curve equation manager (curve:biquadratic and curve:bicubic). Note that the above three performance curves use the leaving condenser water temperature as an independent variable, instead of the entering condenser water temperature used in the performance curves for the Chiller:Electric:EIR model. Since the leaving condenser water temperature is calculated based on the condenser heat transfer rate, which is a function of the load to be met by the chiller, chiller compressor power, and the false loading (detailed calculations are given below), iterative calculations are required to determine the actual (converged) leaving condenser water temperature. The program uses the leaving condenser water temperature from the previous iteration to calculate values for each of the three performance curves described above. After obtaining the condenser heat transfer rate, the leaving condenser water temperature is recalculated. When the difference between the leaving condenser water temperature calculated on successive iterations is less than 0.0001<sup>°</sup>C, the solution is assumed to have converged. Warning messages are issued if the calculated solution for leaving condenser water temperature and/or part-load ratio falls outside the valid range specified for the chiller’s performance curves. If these warnings are issued, the user may chose to extend the range for the performance curves (only if a small extension is required since model extrapolation may produce significant errors) or a different chiller and associated performance curves with extended performance range can be located and used for the simulation.</p>
+<p>The second type is a Chiller Part Load Custom Curve that parameterizes the variation of EIR as a function of the normalized dT, normalized Tdev and the PLR.</p>
+<div>$$ChillerEIRFPLR = a + b(dT^*) + c(dT^*)^2 + d \cdot PLR + e \cdot PLR^2 + f \cdot (dT^*) \cdot PLR + g \cdot (dT^*)^3  + h \cdot PLR^3 + i \cdot (dT^*)^2 \cdot PLR + j \cdot (dT^*) \cdot PLR^2 + k \cdot (dT^*)^2 \cdot PLR^2 + l \cdot (T_{dev}^*) \cdot PLR^3$$</div>
+
+<div>$$dT^* = dT / dT_{ref}$$</div>
+
+<div>$$T_{dev}^* = T_{dev} / dT_{ref}$$</div>
+
+<p>where</p>
+<p>$dT$ = the delta of temperature across the leaving condenser water temperature and leaving evaporator water temperature of a chiller (lift)</p>
+<p>$dT^*$ = the normalized fractional lift</p>
+<p>$dT_{ref}$ = the lift under the reference condition</p>
+<p>PLR = the part load ratio</p>
+<p>$T_{dev}$ = the deviation of leaving chilled water temperature from the reference condition</p>
+<p>$T_{dev}^*$ = the normalized Tdev term</p>
+<p>All three of the performance curves are accessed through EnergyPlus’ built-in performance curve equation manager (curve:biquadratic, curve:bicubic, and Curve:ChillerPartLoadWithLift). Note that the above three performance curves use the leaving condenser water temperature as an independent variable, instead of the entering condenser water temperature used in the performance curves for the Chiller:Electric:EIR model. Since the leaving condenser water temperature is calculated based on the condenser heat transfer rate, which is a function of the load to be met by the chiller, chiller compressor power, and the false loading (detailed calculations are given below), iterative calculations are required to determine the actual (converged) leaving condenser water temperature. The program uses the leaving condenser water temperature from the previous iteration to calculate values for each of the three performance curves described above. After obtaining the condenser heat transfer rate, the leaving condenser water temperature is recalculated. When the difference between the leaving condenser water temperature calculated on successive iterations is less than 0.0001<sup>°</sup>C, the solution is assumed to have converged. Warning messages are issued if the calculated solution for leaving condenser water temperature and/or part-load ratio falls outside the valid range specified for the chiller’s performance curves. If these warnings are issued, the user may choose to extend the range for the performance curves (only if a small extension is required since model extrapolation may produce significant errors) or a different chiller and associated performance curves with extended performance range can be located and used for the simulation.</p>
 <p>Note: Chiller:Electric:ReformulatedEIR objects and their associated performance curve objects are developed using performance information for a specific chiller and should almost always be used together for an EnergyPlus simulation. Changing the object input values, or swapping performance curves between chillers, should be done with extreme caution. For example, if the user wishes to model a chiller size that is different from the reference capacity, it is highly recommended that the reference flow rates be scaled proportionately to the change in reference capacity. Although this model can provide more accurate prediction than the Chiller:Electric:EIR model, it requires more performance data to develop the associated performance curves (at least 12 points from full-load performance and 7 points from part-load performance).</p>
 <p>Although performance curve data sets for 160 chillers are provided in the EnergyPlus Reference DataSets (Chillers.idf and AllDataSets.idf), they may not meet the requirements for specific applications. One can develop performance curves from performance data using two available techniques (Hydeman and Gillespie 2002). The first technique is called the Least-squares Linear Regression method and is used when sufficient performance data exist to employ standard least-square linear regression techniques. The second technique is called Reference Curve Method and is used when insufficient performance data exist to apply linear regression techniques. A detailed description of both techniques can be found in the reference mentioned above.</p>
 <p>For any simulation time step, the chiller’s available cooling capacity is calculated as follows:</p>
@@ -8343,8 +8358,8 @@
 <div>\[{P_{fan,avg}}\, = \,\omega \,({P_{fan,high}})\, + \,\left( {1 - \omega } \right)\left( {{P_{fan,low}}} \right)\]</div>
 
 <h2 id="demand-controlled-ventilation">Demand Controlled Ventilation</h2>
-<p>ASHRAE Standard 62.1, Ventilation for Acceptable Indoor Air Quality, contains provisions that allow building ventilation systems to vary the amount of outdoor ventilation air delivered to occupied zones based on feedback from sensors that monitor various indoor air contaminants (ASHRAE 2007). Although not a contaminant of concern in most buildings, carbon dioxide (CO<sub>2</sub>) levels can be monitored as an indicator of building occupancy and the associated human bioeffluent concentration. CO<sub>2</sub>-based demand controlled ventilation (DCV) is being increasingly used to modulate outdoor ventilation air based on real-time occupancy (Emmerich and Persily 1997, Schell et al. 1998, Schell and Int-Hout 2001). Modulating the outdoor ventilation air while maintaining proper indoor air quality has the potential for large energy savings compared to constant rate ventilation systems that are typically designed to provide outdoor ventilation air based on maximum anticipated occupancy.</p>
-<p>EnergyPlus can model CO<sub>2</sub>-based DCV by the ventilation rate procedure (VRP) defined in ASHRAE Standard 62.1-2007/2010 for single and multiple path systems, and the indoor air quality procedure (IAQP) defined in Standard 62. The VRP first calculates the breathing-zone outdoor air flow rate based on two components – the zone occupant component and the zone floor area component, then it calculates the zone supply outdoor air flow rate considering the zone air distribution effectiveness and secondary recirculation (for mult-path systems only), and finally calculates the system outdoor air flow rate considering the zone diversity and system ventilation efficiency. The user must include the following five objects in their input data file in order to model CO<sub>2</sub>-based DCV (using VRP or IAQP):</p>
+<p>ASHRAE Standard 62.1, Ventilation for Acceptable Indoor Air Quality, contains provisions that allow building ventilation systems to vary the amount of outdoor ventilation air delivered to occupied zones based on feedback from sensors that monitor various indoor air contaminants (ASHRAE 2007). Although not a contaminant of concern in most buildings, carbon dioxide (CO<sub>2</sub>) levels can be monitored as an indicator of building occupancy and the associated human bioeffluent concentration. Demand controlled ventilation (DCV) is being increasingly used to modulate outdoor ventilation air based on real-time occupancy (Emmerich and Persily 1997, Schell et al. 1998, Schell and Int-Hout 2001). Modulating the outdoor ventilation air while maintaining proper indoor air quality has the potential for large energy savings compared to constant rate ventilation systems that are typically designed to provide outdoor ventilation air based on maximum anticipated occupancy.</p>
+<p>EnergyPlus can model DCV by the ventilation rate procedure (VRP) defined in ASHRAE Standard 62.1-2007/2010 for single and multiple path systems, and the indoor air quality procedure (IAQP) defined in Standard 62. The VRP first calculates the breathing-zone outdoor air flow rate based on two components – the zone occupant component and the zone floor area component, then it calculates the zone supply outdoor air flow rate considering the zone air distribution effectiveness and secondary recirculation (for mult-path systems only), and finally calculates the system outdoor air flow rate considering the zone diversity and system ventilation efficiency. The user must include the following five objects in their input data file in order to model DCV (using VRP or IAQP):</p>
 <p>n <strong>AirLoopHVAC:OutdoorAirSystem</strong> to simulate the mixed air box of the air loop</p>
 <p>n <strong>Controller:MechanicalVentilation</strong> with the DCV flag set to 'Yes' to determine the minimum outdoor air flow rate to be provided by the mixed air box</p>
 <p>n <strong>Controller:OutdoorAir</strong> to control the outside air flow rate introduced via the mixed air box</p>
@@ -8442,7 +8457,7 @@
 <p>The program then calculates the minimum outdoor air flow fraction based on the information provided in the object Controller:MechanicalVentilation and the maximum branch air flow rate as follows:</p>
 <p>MechVentOutsideAirMinFrac = <div img="image4729.txt">({V_{ot}})</div> RhoStd / <div img="image4730.txt">(\dot m{_{maxbranch}})</div>here:</p>
 <p>MechVentOutsideAirMinFrac = outdoor air minimum fraction based on all zones specified in the Controller:MechanicalVentilation object</p>
-<p>Controller:OutdoorAir controls the amount of outdoor ventilation air introduced via the mixed air box based on several user inputs. The user can define the minimum outdoor air flow rate as a percentage of the system’s supply air flow rate (e.g., for a variable-air volume system) or a fixed minimum outdoor air flow rate (not as a percentage but a fixed value) (field MinimumLimit). CO<sub>2</sub>-based DCV, using the Controller:MechanicalVentilation object in conjunction with the Controller:OutdoorAir object, allows a third option for setting the minimum outdoor air flow. Economizer operation can also be specified to increase the outdoor air flow above the minimum flow rate to provide free cooling when conditions permit (Controller:OutdoorAir, field Economizer Control Type).</p>
+<p>Controller:OutdoorAir controls the amount of outdoor ventilation air introduced via the mixed air box based on several user inputs. The user can define the minimum outdoor air flow rate as a percentage of the system’s supply air flow rate (e.g., for a variable-air volume system) or a fixed minimum outdoor air flow rate (not as a percentage but a fixed value) (field MinimumLimit). DCV, using the Controller:MechanicalVentilation object in conjunction with the Controller:OutdoorAir object, allows a third option for setting the minimum outdoor air flow. Economizer operation can also be specified to increase the outdoor air flow above the minimum flow rate to provide free cooling when conditions permit (Controller:OutdoorAir, field Economizer Control Type).</p>
 <p>EnergyPlus uses the largest outdoor air flow rate calculated by the various methods described above when modeling system performance (as long this rate doesn’t exceed the maximum flow rate specified for the main air loop branch or for the outdoor air controller itself).</p>
 <p>The method used to calculate the outdoor ventilation air flow rate for each system simulation time step is described in more detail below. The figure below schematically illustrates air flow paths used in the calculation of outdoor air flow rate.</p>
 <p><img alt="" src="../../EngineeringReference/media/image4731.png" /></p>
@@ -12688,6 +12703,112 @@ W_controls = control electric power [W], a user input.</p>
 <p><img alt="" src="../../EngineeringReference/media/image5820.png" /></p>
 <p>Figure 259.  Sensible Heat Gain from People Correlation</p>
 <p>The function for sensible gain calculation is compared to the original data points in the following figure.  The radiant fraction of the sensible gain is a user input on the People object.</p>
+<h3 id="heat-gain-from-it-equipment">Heat Gain from IT Equipment</h3>
+<p>The input object ElectricEquipment:ITE:AirCooled describes air-cooled electric information technology equipment (ITE) which has variable power consumption as a function of loading and temperature. The calculations are described below.</p>
+<h4 id="variable-definitions-user-inputs">Variable Definitions – User Inputs:</h4>
+<ul>
+<li>PDesign = Design power input when fully loaded and entering air temperature is at the user-specified design inlet temperature [W]</li>
+<li>PFanFracDesign = Design fan power input fraction of total power input when fully loaded and entering air temperature is at the user-specified design inlet temperature</li>
+<li>SchDesignLevel = Scheduled fraction of this equipment which is powered up</li>
+<li>SchCPULoading = Scheduled fraction of CPU loading</li>
+<li>TAirInDesign = Air inlet temperature at design condition [C]</li>
+<li>VAirDesign = Air volume flow rate at design condition [m3/s]</li>
+<li>VAirfLoadTAir = Air volume flow rate modifier function of TAirIn and SchCPULoading</li>
+<li>PCPUfLoadTAir = CPU power input modifier function of TAirIn and SchCPULoading</li>
+<li>PFanfFlowFrac = Fan power input modifier function of air flow fraction</li>
+<li>RecircFracDesign = Recirculation Fraction at design condition [C]</li>
+<li>RecircfLoadTAir = Recirculation Fraction modifier function of TAirSupply and SchCPULoading</li>
+<li>UPSEfficDesign = Design electric power supply efficiency</li>
+<li>UPSEfficfPLR = Electric power supply efficiency function of part load ratio</li>
+<li>UPSLossFracToZone = Fraction of electric power supply losses to zone</li>
+</ul>
+<h4 id="variable-definitions-simulation-inputs">Variable Definitions – Simulation Inputs:</h4>
+<ul>
+<li>TAirIn = Air inlet temperature at current conditions [C]</li>
+<li>TAirSupply = Supply air node temperature at current conditions [C]</li>
+<li>TZone = Zone air temperature at current conditions [C]</li>
+<li>TRoomAirNodeIn = Room air model inlet node air temperature at current conditions [C]</li>
+<li>RhoAir = Air density [kg/m3]</li>
+<li>CpAir = Air specific heat [J/kg-K]</li>
+</ul>
+<h4 id="variable-definitions-intermediate-calculations">Variable Definitions – Intermediate Calculations:</h4>
+<ul>
+<li>PCPUDesign = Design CPU power input when fully loaded and entering air temperature is at the user-specified design inlet temperature [W]</li>
+<li>PFanDesign = Design fan power input when fully loaded and entering air temperature is at the user-specified design inlet temperature [W]</li>
+<li>UPSPLR = Electric power supply part load ratio (can be greater than 1.0)</li>
+</ul>
+<h4 id="variable-definitions-outputs">Variable Definitions – Outputs:</h4>
+<ul>
+<li>PCPU = CPU power input [W]</li>
+<li>PFan = Fan power input [W]</li>
+<li>PUPS = Electric power supply net power input [W]</li>
+<li>TAirOut = Air outlet temperature [C]</li>
+<li>VAir = Air volume flow rate [m3/s]</li>
+<li>FlowFrac = Air volume flow rate fraction of design flow rate</li>
+<li>RecircFrac = Recirculation fraction</li>
+<li>QAir = Air cooling rate [W]</li>
+<li>QUPS = Electric power supply heat loss rate to zone [W]</li>
+<li>QConv = Convective heat gain rate to zone heat balance [W]</li>
+<li>SHI = Supply heat index</li>
+<li>SHIZone = Zone average supply heat index</li>
+</ul>
+<h4 id="calculations">Calculations</h4>
+<p>The design power input is first split into portions for the CPU (everything in the equipment except the cooling fans) and the fan(s).</p>
+<p>PCPUDesign = PDesign * (1 - PFanFracDesign)</p>
+<p>PFanDesign = PDesign * PFanFracDesign</p>
+<p>For each time step, the air inlet temperature is calculated depending on the type of air node connection.</p>
+<p>TAirIn:</p>
+<ul>
+<li>
+<p>If Air Node Connection Type = AdjustedSupply</p>
+<ul>
+<li>RecircFrac = RecircFracDesign * RecircfLoadTAir(SchCPULoading TAirSupply)</li>
+<li>TAirIn = TAirSupply * (1 – RecircFrac) +TAirZone * RecircFrac</li>
+</ul>
+</li>
+<li>
+<p>If Air Node Connection Type = ZoneAirNode</p>
+<ul>
+<li>TAirIn = TAirZone</li>
+</ul>
+</li>
+<li>
+<p>If Air Node Connection Type = RoomAirModel</p>
+<ul>
+<li>TAirIn = TRoomAirNodeIn</li>
+</ul>
+</li>
+</ul>
+<p>Using the air inlet temperature, the CPU power consumption, air flow rate, fan power consumption, and power supply power consumption are calculated.</p>
+<p>PCPU = PCPUDesign * SchDesignLevel * PfLoadTAir(SchCPULoading, TAirIn)</p>
+<p>FlowFrac = VAirfLoadTAir(SchCPULoading, TAirIn)</p>
+<p>VAir = VAirDesign * FlowFrac</p>
+<p>PFan = PFanDesign * SchDesignLevel * PFanfFlowFrac(FlowFrac)</p>
+<p>UPSPLR = (PCPU + PFan) / (PCPUDesign + PFanDesign)</p>
+<p>PUPS = (PCPU + PFan) * (1 - UPSEfficDesign * UPSEfficfPLR (UPSPLR))</p>
+<p>The convective heat gain to the zone and the air outlet temperature are then calculated. The user specified fration of power supply losses are always added to the general zone heat balace convective heat gain. For air node connection types AdjustedSupply and ZoneAirNode, the CPU and fan power consumption are also added to the zone convective heat gain. For air connection type RoomAirModel, the gains from the CPU and fan power consumption are added to the outlet room air model node.</p>
+<p>QAir = PCPU + PFan</p>
+<p>QUPS = PUPS * UPSLossFracToZone</p>
+<p>QConv:</p>
+<ul>
+<li>
+<p>If Air Node Connection Type = AdjustedSupply OR ZoneAirNode</p>
+<ul>
+<li>QConv = QAir + QUPS</li>
+</ul>
+</li>
+<li>
+<p>If Air Node Connection Type = RoomAirModel</p>
+<ul>
+<li>QConv = QUPS</li>
+</ul>
+</li>
+</ul>
+<p>TAirOut = TAirIn + QAir / (VAir * RhoAir * CpAir)</p>
+<p>The individual ITE supply heat index is calculated as shown below.</p>
+<p>SHI = (TAirIn – TAirSupply) / (TAirOut - TAirSupply)</p>
+<p>The zone average ITE supply heat index is weighted by the air flow rate of each ITE object.</p>
+<p>SHIZone = ∑ [VAir * (TAirIn – TAirSupply)] / ∑ [VAir * (TAirOut - TAirSupply)]</p>
 <h3 id="heat-gain-from-baseboard-heat">Heat Gain from Baseboard Heat</h3>
 <p>The input object ZoneBaseboard:OutdoorTemperatureControlled provides a model for an outdoor temperature controlled baseboard heater that adds energy to the zone according a control profile as shown in the following figure.  At TA = T2, the baseboard heat gain is Q2.  For TA &gt; T2, there is no heat gain.  For TA &lt; T1, a maximum amount of energy, Q1, is added to the zone.  There is proportional control between those two temperatures:</p>
 <p><img alt="" src="../../EngineeringReference/media/image5821.png" /></p>
