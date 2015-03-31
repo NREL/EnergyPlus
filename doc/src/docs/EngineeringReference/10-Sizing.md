@@ -2825,6 +2825,18 @@ If the cooler is part of the outdoor air path of a central air system, then the 
 
 <div>\[{\dot V_{fan,\max }} = MAX({\rm{DesOutAirVolFlow, 0}}{\rm{.5*DesMainVolFlow)}}\]</div>
 
+### Secondary DX Coils Sizing
+
+The secondary DX coils model does not have a standalone object and it is models as add-on feature to the DX Coils. When the secondary DX coil is added to a primary DX cooling coil, the heat rejected to secondary zone is sensible only and is treated as tnternal gain, hence secondary air flow rate is not required in the model.  Where as when the secondary DX coil is added to a primary DX heating coil, then the heat removed from  secondary zone may have sensible and latent components and is treated as tnternal gain. The sensible/latent component split among other parameters requires secondary coil air flow rate. Hence secondary coil air flow rate sizing is added based on the primary DX cooling coil only.
+
+<div>\[\[\dot{V}_\rm{SecCoil} = \dot{V}_\rm{PriHeatCoil}\cdot \rm{ScalingFactor}\]</div>
+
+where
+
+* \(\dot{V}_\rm{SecCoil}\) is the secondary coil design air flow rate (m3/s)
+* \(\dot{V}_\rm{SecCoil}\) is the primary heating DX coil design air flow rate (kg/s)
+* \(\rm{ScalingFactor}\) is the secondary DX coil air flow rarte scaling factor (-)
+
 ### Desiccant Dehumidifier Sizing
 
 The sizing of dehumidifier with no fans is done in subroutine SizeDesiccantDehumidifier.
@@ -2875,23 +2887,22 @@ As from the continuity equation, the area of direct pad is directly determined b
 
 where
 
-*A<sub>pad</sub>* is area of direct pad, m<sup>2</sup>
+* \(A_\rm{pad} is area of direct pad, m<sup>2</sup>
 
-*V* is face air velocity, m/s
+* \(V\) is face air velocity, m/s
 
 #### Direct Pad Depth
 
 The solution of the following regression equation is used, assuming saturation effectiveness of 70% and face air velocity of 3m/s:
 
-ɛ = 0.792714 + 0.958569D - 0.25193V - 1.03215D2 + 0.0262659V2 + 0.914869DV
+<div>\[\eps = 0.792714 + 0.958569D - 0.25193V - 1.03215D^2 + 0.0262659V^2 + 0.914869DV
 
-- 1.48241VD<sup>2</sup> - 0.018992 D V<sup>3</sup> + 1.13137D<sup>3</sup>V + 0.0327622 D<sup>2</sup>V<sup>3</sup> - 0.145384D<sup>3</sup>V<sup>2</sup>
+- 1.48241VD^2 - 0.018992 D V^3 + 1.13137D^3V + 0.0327622 D^2V^3 - 0.145384D^3 V^2\]</div>
 
 where
 
-D is depth of pad, m
-
-ɛ is saturation effectiveness
+* \(D\) is depth of pad, m
+* \(\eps\)is saturation effectiveness
 
 ### Heat Recovery Sizing
 
@@ -2986,19 +2997,16 @@ Outdoor air design data may be required for many aspects of a building computer 
 
 The design data is provided as a group of inputs that are recognized by designers as standard practice. This information may be used individually or used as a group to calculate summations or maximums of the entered data. These design data include values for:
 
-·        Outdoor air per person
-
-·        Outdoor air per zone floor area
-
-·        Outdoor air per zone
-
-·        Outdoor air changes per hour
+* Outdoor air per person
+* Outdoor air per zone floor area
+*�Outdoor air per zone
+*�Outdoor air changes per hour
 
 This design data is entered in an outdoor air design data object and may be referenced by other objects during the simulation. A single specification for outdoor air design data may be used by all other appropriate objects within EnergyPlus, or multiple outdoor air design data objects may be specified and these design data objects may be used as necessary by other objects when outdoor air design quantaties vary for any reason.
 
 ### Design Outdoor Air Calculation
 
-The outdoor air design data is entered as a group and referenced through name association to this group of design data (Ref. DesignSpecification:OutdoorAir). The reference name in the following example is “ZoneOAData”.
+The outdoor air design data is entered as a group and referenced through name association to this group of design data (Ref. DesignSpecification:OutdoorAir). The reference name in the following example is "ZoneOAData".
 
 A DesignSpecification:OutdoorAirexample:
 
