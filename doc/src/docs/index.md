@@ -12,6 +12,7 @@ For convenience, here are links to the core documentation:
     * [Plant Application Guide](PlantApplicationGuide/PlantApplicationGuide.md)
 * [Input Output Reference](InputOutputReference/01-Page1.md)
 * [Engineering Reference](EngineeringReference/01-Overview.md)
+* [Engineering Reference: Encyclopedic Guide to Simulation Models](EngineeringReference/13-EncyclopaedicRefs.md)
 * Developer Guides
     * [Interface Developer](InterfaceDeveloper/InterfaceDeveloper.md)
     * [Module Developer](ModuleDeveloper/ModuleDeveloper.md)

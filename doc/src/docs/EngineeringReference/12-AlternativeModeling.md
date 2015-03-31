@@ -14,16 +14,10 @@ EnergyPlus offers the different types of air models listed in the table below al
 Table 43.  Summary of room air models available in EnergyPlus
 
 <table class="table table-striped">
-
-
-
-
-
-
 <tr>
-<td>Air model name</td>
-<td>Applicability</td>
-<td>Input Objects Required</td>
+<th>Air model name</th>
+<th>Applicability</th>
+<th>Input Objects Required</th>
 </tr>
 <tr>
 <td>Well-Mixed</td>
@@ -2939,6 +2933,155 @@ Where MW<sub>airflow</sub> is the sum of mass flow rate multiplied by humidity r
 
 The available outputs from the AirflowNetwork model are described in the EnergyPlus Input Output Reference manual.
 
+### Occupant Ventilation Control
+
+The AirflowNetwork:OccupantVentilationControl object enhances the AirflowNetwork model and provides more practical and advanced controls for window opening and closing operations, based on Marais & Teichmann (2014). This control includes minimum open and closed time control, indoor thermal comfort control, and opening and closing probability controls.
+
+#### Procedures of occupant ventilation control
+
+It should be pointed that the open elapsed time and closed elapsed time are not independent. In other words, when one of the elapsed times value is greater than 0, then other elapsed time value must be equal to 0. The model is either tracking a window as open, in which case the open elapsed time grows, or as closed, in which case the closed elapsed time grows. 
+
+The calculation procedures are presented in the following steps:
+
+Step 1: Open elapsed time check 
+
+The model checks the open elapsed time first. When the open elapsed time is greater than 0 and less than the minimum opening time, a window will remain open. Otherwise, the model goes to Step 2.  
+
+    Open elapsed time > minimum open time
+
+Step 2: Closed elapsed time check 
+
+This step checks the closed elapsed time. When the closed elapsed time is greater than 0 and less than the minimum closed time, a window will remain closed. Otherwise, the model goes to Step 3. 
+
+    Closed elapsed time > minimum closed time
+
+Step 3: Elapsed time only? 
+
+When either the open elapsed time or the closed elapsed time is long enough (greater than the minimum time) and no other checks are needed, the model returns to the other ventilation control defined in the Ventilation Control Mode field in AirflowNetwork:MultiZone:Zone or AirflowNetwork:MultiZone:Surface. If other checks are needed, the following steps will be performed. 
+
+Step 4: Thermal comfort temperature calculation 
+
+The thermal comfort check requires the thermal comfort temperature and the comfort band. The comfort temperature of Tcomf is calculated as a function of the outdoor dry-bulb temperature Tout. The comfort temperature calculation may be based on two curves and a boundary temperature point. 
+
+<div>\[
+  T_{comf} = \left\{ \begin{array}{ll} \rm{Low Temp Curve,} & \min T_{out} < x \leq \rm{Boundary Point} \\ \rm{High Temp Curve,} & \rm{Boundary Point} \leq x < \max T_{out}  \end{array}\right.
+\]</div>
+
+Step 5: Thermal band calculation 
+
+The comfort band is calculated as a function of the design personal dissatisfaction PPD. 
+
+<div>\[\theta = -0.0028 \left(100-\rm{PPD}\right)^2 + 0.3419 \left(100-\rm{PPD}\right) – 6.6275 \]</div>
+
+This equation is valid for PPD 0% to 35%
+
+Step 6: Upper boundary check of thermal comfort 
+
+After calculation of the comfort temperature and band, the thermal comfort check will be performed using the zone air operative temperature Tg. The check consists of upper and lower boundary checks.
+
+The upper boundary check checks window opening status and uses the following logic:
+
+<div>\[T_g > \left(T_{comf} + \theta\right)\]</div>
+
+If the above logic check is true, the opening probability check will be performed. The detailed description is given in the opening probability section. 
+
+If the above logic check is false, no action is needed.
+
+If the opening probability check is true and upper boundary check is satisfied, a window will be opened, regardless of open/closed status at the previous time step. If the opening probability check is false and upper boundary check is satisfied, a window will remain at the status from the previous time step.
+
+<div>\[T_g > \left(T_{comf} + \theta\right) \&\& \rm{OpeningProbability}\]</div>
+
+Step 7: Lower boundary check of thermal comfort 
+
+The lower boundary check will follow the upper boundary check to check the window closing status, using the following logic.
+
+<div>\[T_g < \left(T_{comf} - \theta\right)\]</div>
+
+If the above logic check is true, the closing probability check will be performed. The detailed description is given in the closing probability section. 
+
+If the above logic check is false, no action is needed.
+
+If the closing probability check is true and lower boundary check is satisfied, a window will be closed, regardless of open/closed status at the previous time step. If the closing probability check is false and lower boundary check is satisfied, a window will remain at the status from the previous time step.
+
+<div>\[T_g < \left(T_{comf} - \theta\right) \&\& \rm{ClosingProbability}\]</div>
+
+The output variables from the model are open status, opening probability status, and closing probability status. The detailed description of opening status is given in the Airflow Network Outputs section in the Input Output Reference.
+
+Note: The upper and lower boundary checks are not independent. In other words, when one of boundary check is satisfied, the other check will be dissatisfied.  
+ 
+#### Procedures of opening probability control
+
+Opening probability control provides an optional random number check. The control logic of opening probability is described in the following steps.
+
+Step 1: Closed elapsed time check 
+
+This check requires that closed elapsed time is longer than the minimum closing time. 
+
+Closed time > minimum closed time
+
+If the time duration is not long enough, the output is false so that a window remains closed. 
+
+If the time duration is long enough, an occupancy check is performed.
+
+Step 2: Occupancy check 
+
+If a zone is not occupied and the occupancy check is requested, the output is false. If the zone is occupied, the next step is to check the setpoints using zone air temperature at the previous time step as a reference. 
+
+Step 3: Setpoint check 
+
+There are 5 temperature control types. The following types are available:
+
+* No control: Bypass
+
+* Single heating setpoint: If Tzon > setpoint, go to next step. Otherwise, return false.
+
+* Single cooling setpoint: If Tzon < setpoint, go to next step. Otherwise, return false.
+
+* Single heating and cooling setpoint: no action by returning false
+
+* Dual heating and setpoints: If heating setpoint < Tzon < Cooling setpoint, go to next step. Otherwise, return false.
+
+Step 4: Select bypass or opening probability check 
+
+A choice is provided at this stage so that the opening probability check may be performed or bypassed. If bypassed, the output will be true to open a window. If performed, probability will be determined from a schedule. 
+
+Step 5: Perform opening probability check 
+
+The opening probability (OP) value is determined from a schedule.
+
+OP = Schedule value or specific function
+
+If the probability value is greater than a random number, the output is true. 
+
+OP > random number (random number is between 0 and 1)
+
+Otherwise, the result will be false.    
+
+#### Procedures of closing probability control
+
+The control logic of closing probability is described as follows. 
+
+Step 1: Open elapsed time check 
+
+This check requires that open elapsed time is longer than the minimum opening time.
+ 
+Open time > minimum open time
+
+If the time duration is not long enough, the output is false and the window remains open. Otherwise, Step 2 will be performed.
+
+Step 2: Select by-pass or closing probability check 
+
+A choice is provided at this step so that the closing probability check may be performed or bypassed. If bypassed, the output will be true to close a window. If performed, the closing probability will be calculated. The closing probability (CP) value is given from a schedule.
+
+CP = Schedule value or specific function
+
+If the closing probability check is performed and the closing probability is greater than a random number, the output is true. 
+
+CP > random number (random number is between 0 and 1)
+
+Otherwise, the result will be false.    
+
+
 ### References
 
 Atkins, R. E., J. A. Peterka, and J. E. Cermak. 1979. “Averaged pressure coefficients for rectangular buildings,” Wind Engineering, Proceedings of the Fifth International Conference 7:369-80, Fort Collins, CO. Pergamon Press, NY.
@@ -2954,6 +3097,8 @@ Cooper, L., 1989, “Calculation of the Flow Through a Horizontal Ceiling/Floor 
 Dols, W. S. & G. N. Walton. 2002. “CONTAMW 2.0 User Manual,” NISTIR 6921, National Institute of Standards and Technology, Gaithersburg , Maryland
 
 Holmes, J. D. 1986. Wind Loads on low-rise buildings: The structural and environmental effects of wind on buildings and structures, Chapter 12, Faculty of Engineering, Monash University, Melbourne, Australia
+
+Marais, J. M. & C. Teichmann, “Window Simulation Methods Required for Manual Window Ventilated Buildings,” Fifth German-Austrian IBPSA Conference, September 22-24, 2014, RWTH Aachen University, Germany 
 
 Swami, M. V. and S. Chandra. 1988. Correlations for pressure distribution on buildings and calculation of natural-ventilation airflow, ASHRAE Transactions 94(1988) (Pt 1), pp. 243-266.
 

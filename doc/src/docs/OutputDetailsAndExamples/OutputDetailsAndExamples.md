@@ -6597,17 +6597,11 @@ This initial release of the SQL database output option includes a variety of dat
 
 - NominalVentilation Table
 
-- ReportMeterData Table
+- ReportData Table
 
-- ReportMeterDataDictionary Table
+- ReportDataDictionary Table
 
-- ReportMeterExtendedData Table
-
-- ReportVariableData Table
-
-- ReportVariableDataDictionary Table
-
-- ReportVariableExtendedData Table
+- ReportExtendedData Table
 
 - RoomAirModels Table
 
@@ -6627,6 +6621,8 @@ This initial release of the SQL database output option includes a variety of dat
 
 - ZoneSizes Table
 
+- ZoneInfoLists Table
+
 - [Simulations](#_Simulations_Table_1)Table
 
 - [EnvironmentPeriods](#_EnvironmentPeriods_Table)Table
@@ -6643,33 +6639,40 @@ This initial release of the SQL database output option includes a variety of dat
 
 A short discussion of contents of each of the above SQL tables is given in the sections that follow.
 
-### Report Variable Data
+### Report Data
 
-Data in the following four tables is also found in EnergyPlus’ standard output file (i.e., eplusout.eso – see that section for more information). As with the standard output file, the “Report Variable” and “Report Meter” commands control the data in these tables.
+Data in the following four tables are also found in EnergyPlus’ standard output file (i.e., eplusout.eso – see that section for more information) or in EnergyPlus' eplusout.mtr (i.e. meter) output file. As with the standard output file, the “Report Variable” and “Report Meter” commands control the data in these tables.
 
-#### ReportVariableDataDictionary Table
+#### ReportDataDictionary Table
 
-The ReportVariableDataDictionary table provides the equivalent of the dictionary portion of the ESO file (i.e., the first section of the .eso file). Please see the Report Variable section of the Input-Output Reference for more information.
+The ReportDataDictionary table provides the equivalent of the dictionary portion of the ESO file (i.e., the first section of the .eso file) or eplusout.mtr. Please see the Report Variable section of the Input-Output Reference for more information.  Like in the eplusout.mtr file (see the eplusout.mtr section), only data requested by "Report Meter" commands will set isMeter to 1 or True.
 
-Table 7. SQL ReportVariableDataDictionary Contents
+
 
 <table class="table table-striped">
+<caption>Table 7. SQL ReportDataDictionary Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
-<td>Enumeration</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
+<th>Enumeration</th>
 </tr>
 <tr>
-<td>ReportVariableDataDictionaryIndex</td>
+<td>ReportDataDictionaryIndex</td>
 <td>INTEGER PRIMARY KEY</td>
-<td>The ReportVariableDataDictionaryIndex links the dictionary data to the variable data (see ReportVariableData table)</td>
+<td>The ReportDataDictionaryIndex links the dictionary data to the variable data (see ReportData table)</td>
 <td> </td>
 </tr>
 <tr>
-<td>VariableType</td>
+<td>IsMeter</td>
+<td>INTEGER</td>
+<td>Boolean flag whether dictionary data is report of meter data</td>
+<td>0, 1</td>
+</tr>
+<tr>
+<td>Type</td>
 <td>TEXT</td>
-<td>Nature of data type with respect to state, (e.g. average or sum type of variable).</td>
+<td>Nature of data type with respect to state, (e.g. average or sum type of data).</td>
 <td>“Sum” “Avg”</td>
 </tr>
 <tr>
@@ -6692,9 +6695,9 @@ Table 7. SQL ReportVariableDataDictionary Contents
 <td> </td>
 </tr>
 <tr>
-<td>VariableName</td>
+<td>Name</td>
 <td>TEXT</td>
-<td>The actual report variable name</td>
+<td>The actual report data name</td>
 <td> </td>
 </tr>
 <tr>
@@ -6710,24 +6713,30 @@ Table 7. SQL ReportVariableDataDictionary Contents
 <td> </td>
 </tr>
 <tr>
-<td>VariableUnits</td>
+<td>Units</td>
 <td>TEXT</td>
-<td>The variable’s units</td>
+<td>The data units</td>
 <td> </td>
 </tr>
 </table>
 
-#### ReportVariableData Table
+#### ReportData Table
 
-The ReportVariableData table contains the report variable data (e.g., the hourly, daily, and monthly report variable data). Please see the Report Variable section of the Input-Output Reference for more information.
+The ReportData table contains the report or meter variable data (e.g., the hourly, daily, and monthly report variable data). Please see the Report Variable section of the Input-Output Reference for more information.
 
-Table 8. SQL ReportVariableData Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 8. SQL ReportData Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>ReportDataIndex</td>
+<td>INTEGER PRIMARY KEY</td>
+<td></td>
 </tr>
 <tr>
 <td>TimeIndex</td>
@@ -6735,38 +6744,39 @@ Table 8. SQL ReportVariableData Table Contents
 <td>This index links the record to its time record (see the Time table below)</td>
 </tr>
 <tr>
-<td>ReportVariableDataDictionaryIndex</td>
+<td>ReportDataDictionaryIndex</td>
 <td>INTEGER</td>
-<td>The ReportVariableDataDictionaryIndex links the data to the respective data dictionary record (see ReportVariableDataDictionary table above)</td>
+<td>The ReportDataDictionaryIndex links the data to the respective data dictionary record (see ReportDataDictionary table above)</td>
 </tr>
 <tr>
-<td>VariableValue</td>
+<td>Value</td>
 <td>REAL</td>
-<td>The variable’s value</td>
-</tr>
-<tr>
-<td>ReportVariableExtendedDataIndex</td>
-<td>INTEGER</td>
-<td>Links the record to its extended data, if any, such as minimums and maximums (see the ReportVariableExtendedData table below)</td>
+<td>The data value</td>
 </tr>
 </table>
 
-#### ReportVariableExtendedData Table
+#### ReportExtendedData Table
 
-The ReportVariableExtendedData table contains additional data (e.g., monthly maximums and minimums) that is available for certain report variables.
+The ReportExtendedData table contains additional data (e.g., monthly maximums and minimums) that is available for certain report or meter variables.
 
-Table 9. SQL ReportVariableExtendedData Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 9. SQL ReportExtendedData Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
-<td>ReportVariableExtendedDataIndex</td>
+<td>ReportExtendedDataIndex</td>
 <td>INTEGER PRIMARY KEY</td>
-<td>Connects the ReportVariableExtendedData table with the ReportVariableData table</td>
+<td></td>
+</tr>
+<tr>
+<td>ReportDataIndex</td>
+<td>INTEGER</td>
+<td>Associates ReportData record with ReportExtendedData record</td>
 </tr>
 <tr>
 <td>MaxValue</td>
@@ -6832,20 +6842,21 @@ Table 9. SQL ReportVariableExtendedData Table Contents
 
 #### Time Table
 
-The Time table provides the time information for both the “report variable” and “report meter” variables (the ReportVariableData and ReportMeterData tables).
+The Time table provides the time information for both the “report variable” and “report meter” variables (the ReportData table).
 
-Table 10. Time Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 10. Time Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>TimeIndex</td>
 <td>INTEGER PRIMARY KEY</td>
-<td>Connects the time information with the report variables and meter variables (see the ReportVariableData and ReportMeterData tables)</td>
+<td>Connects the time information with the report variables and meter variables (see the ReportData table)</td>
 </tr>
 <tr>
 <td>Month</td>
@@ -6904,182 +6915,6 @@ Table 10. Time Table Contents
 </tr>
 </table>
 
-### Report Meter Data
-
-Data in the following three tables is also found in EnergyPlus’ eplusout.mtr (i.e., meter) output file. Like in the eplusout.mtr file (see the eplusout.mtr section), only data requested by “Report Meter” commands is contained in the data tables below. Note that the Report Meter tables are very similar to the Report Variable tables described above.
-
-#### ReportMeterDataDictionary Table
-
-The ReportMeterDataDictionary table provides the equivalent of the dictionary portion (i.e., the first section) of the eplusout.mtr file.
-
-Table 11. SQL ReportMeterDataDictionary Table Contents
-
-<table class="table table-striped">
-<tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
-</tr>
-<tr>
-<td>ReportMeterDataDictionaryIndex</td>
-<td>INTEGER PRIMARY KEY</td>
-<td>The ReportMeterDataDictionaryIndex links the dictionary data to the sampled data (see ReportMeterData table below)</td>
-</tr>
-<tr>
-<td>VariableType</td>
-<td>TEXT</td>
-<td>Nature of data type with respect to state, (e.g. average or sum type of variable).</td>
-</tr>
-<tr>
-<td>IndexGroup</td>
-<td>TEXT</td>
-<td>Groupings from meter classifications</td>
-</tr>
-<tr>
-<td>TimestepType</td>
-<td>TEXT</td>
-<td>Type of timestep for data, (enum: “Zone” or “HVAC System”)</td>
-</tr>
-<tr>
-<td>KeyValue</td>
-<td>TEXT</td>
-<td>The identifying “key name” for the data record</td>
-</tr>
-<tr>
-<td>VariableName</td>
-<td>TEXT</td>
-<td>The actual meter variable name</td>
-</tr>
-<tr>
-<td>ReportingFrequency</td>
-<td>TEXT</td>
-<td>The reporting frequency of the variable. (enum: “HVAC System Timestep”,  “Zone Timestep”,  “Hourly”, “Daily”, “Monthly”, “Run Period”)</td>
-</tr>
-<tr>
-<td>ScheduleName</td>
-<td>TEXT</td>
-<td>The name of the schedule that controls reporting frequency</td>
-</tr>
-<tr>
-<td>VariableUnits</td>
-<td>TEXT</td>
-<td>The variable’s units</td>
-</tr>
-</table>
-
-#### ReportMeterData Table
-
-The ReportMeterData table contains the meter variable data (e.g., the hourly, daily, and monthly meter data).
-
-Table 12. SQL ReportMeterData Table Contents
-
-<table class="table table-striped">
-<tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
-</tr>
-<tr>
-<td>TimeIndex</td>
-<td>INTEGER</td>
-<td>This index links the record to its time record (see the Time table below)</td>
-</tr>
-<tr>
-<td>ReportMeterDataDictionaryIndex</td>
-<td>INTEGER</td>
-<td>The ReportMeterDataDictionaryIndex links the data to the respective data dictionary record (see the ReportMeterDataDictionary table)</td>
-</tr>
-<tr>
-<td>VariableValue</td>
-<td>REAL</td>
-<td>The variable’s value</td>
-</tr>
-<tr>
-<td>ReportVariableExtendedDataIndex</td>
-<td>INTEGER</td>
-<td>Links the record to its extended data, if any  (see the ReportVariableExtendedData table below)</td>
-</tr>
-</table>
-
-#### ReportMeterExtendedData Table
-
-The ReportMeterExtendedData table contains additional data (e.g., reporting interval maximums and minimums) that is available for certain meter variables.
-
-Table 13. SQL ReportMeterExtendedData Table Contents
-
-<table class="table table-striped">
-<tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
-</tr>
-<tr>
-<td>ReportMeterExtendedDataIndex</td>
-<td>INTEGER PRIMARY KEY</td>
-<td>The index that connects the extended data with the variable’s primary data (see the ReportMeterData table)</td>
-</tr>
-<tr>
-<td>MaxValue</td>
-<td>REAL</td>
-<td>The maximum value during the reporting period</td>
-</tr>
-<tr>
-<td>MaxMonth</td>
-<td>INTEGER</td>
-<td>The month in which the maximum value occurred</td>
-</tr>
-<tr>
-<td>MaxDay</td>
-<td>INTEGER</td>
-<td>The day on which the maximum value occurred</td>
-</tr>
-<tr>
-<td>MaxHour</td>
-<td>INTEGER</td>
-<td>The hour in which the maximum value occurred</td>
-</tr>
-<tr>
-<td>MaxStartMinute</td>
-<td>INTEGER</td>
-<td>The starting minute of the interval in which the maximum value occurred</td>
-</tr>
-<tr>
-<td>MaxMinute</td>
-<td>INTEGER</td>
-<td>The minute in which the maximum value occurred</td>
-</tr>
-<tr>
-<td>MinValue</td>
-<td>REAL</td>
-<td>The minimum value during the reporting period</td>
-</tr>
-<tr>
-<td>MinMonth</td>
-<td>INTEGER</td>
-<td>The month in which the minimum value occurred</td>
-</tr>
-<tr>
-<td>MinDay</td>
-<td>INTEGER</td>
-<td>The day on which the minimum value occurred</td>
-</tr>
-<tr>
-<td>MinHour</td>
-<td>INTEGER</td>
-<td>The hour in which the minimum value occurred</td>
-</tr>
-<tr>
-<td>MinStartMinute</td>
-<td>INTEGER</td>
-<td>The starting minute of the interval in which the minimum value occurred</td>
-</tr>
-<tr>
-<td>MinMinute</td>
-<td>INTEGER</td>
-<td>The minute in which the minimum value occurred</td>
-</tr>
-</table>
-
 ### One time (EIO) File Data
 
 Data in the tables below can also be found in EnergyPlus input output file (i.e., in the eplusout.eio output file).
@@ -7088,13 +6923,14 @@ Data in the tables below can also be found in EnergyPlus input output file (i.e.
 
 The Zones table provides a variety of information about the zones specified within EnergyPlus. One of its most common uses is to provide zone name and area information for the other tables within the SQL database (e.g., use the ZoneIndex to look up the ZoneName).
 
-Table 14. SQL Zones Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 14. SQL Zones Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>ZoneIndex</td>
@@ -7239,13 +7075,14 @@ Please see the Zone object in the Group-Thermal Zone Description/Geometry sectio
 
 An overview of the NominalPeople SQL table is shown below.
 
-Table 15. SQL NominalPeople Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 15. SQL NominalPeople Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>NominalPeopleIndex</td>
@@ -7345,13 +7182,14 @@ Please see the People object in the Group-Internal Gains section of the Input-Ou
 
 An overview of the NominalLighting SQL table is shown below.
 
-Table 16. SQL NominalLighting Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 16. SQL NominalLighting Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>NominalLightingIndex</td>
@@ -7406,13 +7244,14 @@ Please see the LIGHTS object in the Group-Internal Gains section of the Input-Ou
 
 An overview of the NominalElectricEquipment SQL table is shown below.
 
-Table 17. SQL NominalElectricEquipment Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 17. SQL NominalElectricEquipment Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>NominalElectricEquipmentIndex</td>
@@ -7472,13 +7311,14 @@ Please see the Electric Equipment object in the Group-Internal Gains section of 
 
 An overview of the NominalGasEquipment SQL table is shown below.
 
-Table 18. SQL NominalGasEquipment Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 18. SQL NominalGasEquipment Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>NominalGasEquipmentIndex</td>
@@ -7538,13 +7378,14 @@ Please see the Gas Equipment object in the Group-Internal Gains section of the I
 
 An overview of the NominalSteamEquipment SQL table is shown below.
 
-Table 19. SQL NominalSteamEquipment Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 19. SQL NominalSteamEquipment Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>NominalSteamEquipmentIndex</td>
@@ -7604,13 +7445,14 @@ Please see the Steam Equipment object in the Group-Internal Gains section of the
 
 An overview of the NominalHotWaterEquipment SQL table is shown below.
 
-Table 20. SQL NominalHotWaterEquipment Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 20. SQL NominalHotWaterEquipment Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>NominalHotWaterEquipmentIndex</td>
@@ -7670,13 +7512,14 @@ Please see the Hot Water Equipment object in the Group-Internal Gains section of
 
 An overview of the NominalOtherEquipment SQL table is shown below.
 
-Table 21. SQL NominalOtherEquipment Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 21. SQL NominalOtherEquipment Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>NominalOtherEquipmentIndex</td>
@@ -7736,13 +7579,14 @@ Please see the Other Equipment object in the Group-Internal Gains section of the
 
 An overview of the NominalBaseboardHeaters SQL table is shown below.
 
-Table 22. SQL NominalBaseboardHeaters Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 22. SQL NominalBaseboardHeaters Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>NominalBaseboardHeaterIndex</td>
@@ -7807,13 +7651,14 @@ Please see the Baseboard Heat object in the Group-Internal Gains section of the 
 
 An overview of the NominalInfiltration SQL table is shown below.
 
-Table 23. SQL NominalInfiltration Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 23. SQL NominalInfiltration Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>NominalInfiltrationIndex</td>
@@ -7848,13 +7693,14 @@ Please see the Infiltration object in the Group-Airflow section of the Input-Out
 
 An overview of the NominalVentilation SQL table is shown below.
 
-Table 24. SQL NominalVentilation Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 24. SQL NominalVentilation Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>NominalVentilationIndex</td>
@@ -7889,13 +7735,14 @@ Please see the Ventilation object in the Group-Airflow section of the Input-Outp
 
 An overview of the Surfaces SQL table is shown below.
 
-Table 25. SQL Surfaces Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 25. SQL Surfaces Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>SurfaceIndex</td>
@@ -8005,13 +7852,14 @@ Please see the Surface(s) object in the Group-Thermal Zone Description/Geometry 
 
 An overview of the Constructions SQL table is shown below.
 
-Table 26. SQL Constructions Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 26. SQL Constructions Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>ConstructionIndex</td>
@@ -8091,13 +7939,19 @@ Please see the Construction object in the Group-Surface Construction Elements se
 
 An overview of the ConstructionLayers SQL table is shown below.
 
-Table 27. SQL ConstructionLayers Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 27. SQL ConstructionLayers Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>ConstructionLayersIndex</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Construction Layers Index</td>
 </tr>
 <tr>
 <td>ConstructionIndex</td>
@@ -8122,13 +7976,14 @@ Please see the Construction object in the Group-Surface Construction Elements se
 
 An overview of the Materials SQL table is shown below.
 
-Table 28. SQL Materials Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 28. SQL Materials Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>MaterialIndex</td>
@@ -8203,13 +8058,14 @@ Please see the Materials object in the Group-Surface Construction Elements secti
 
 An overview of the RoomAirModels SQL table is shown below. Please see the Group-RoomAir Models section of the Input-Output Reference for more information.
 
-Table 29. SQL RoomAirModels Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 29. SQL RoomAirModels Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>ZoneIndex</td>
@@ -8242,13 +8098,19 @@ Table 29. SQL RoomAirModels Table Contents
 
 An overview of the ComponentSizes SQL table is shown below.
 
-Table 30. SQL ComponentSizes Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 30. SQL ComponentSizes Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>ComponentSizesIndex</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Component Sizes Index</td>
 </tr>
 <tr>
 <td>CompType</td>
@@ -8283,13 +8145,19 @@ Please see the Sizing object in the Group-Design Objects section of the Input-Ou
 
 An overview of the SystemSizes SQL table is shown below. Please see the System Sizing object in the Group-Design Objects section of the Input-Output Reference for more information.
 
-Table 31. SQL SystemSizes Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 31. SQL SystemSizes Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>SystemSizesIndex</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>System Sizes Index</td>
 </tr>
 <tr>
 <td>SystemName</td>
@@ -8317,13 +8185,19 @@ Table 31. SQL SystemSizes Table Contents
 
 An overview of the ZoneSizes SQL table is shown below.
 
-Table 32. SQL ZoneSizes Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 32. SQL ZoneSizes Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>ZoneSizesIndex</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Zone Sizes Index</td>
 </tr>
 <tr>
 <td>ZoneName</td>
@@ -8383,13 +8257,14 @@ Please see the Zone Sizing object in the Group-Design Objects section of the Inp
 
 An overview of the ZoneGroups SQL table is shown below.
 
-Table 33. SQL ZoneGroups Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 33. SQL ZoneGroups Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>ZoneGroupIndex</td>
@@ -8397,9 +8272,14 @@ Table 33. SQL ZoneGroups Table Contents
 <td>Zone group index</td>
 </tr>
 <tr>
-<td>Name</td>
+<td>ZoneGroupName</td>
 <td>TEXT</td>
 <td>Zone list name</td>
+</tr>
+<tr>
+<td>ZoneListIndex</td>
+<td>INTEGER</td>
+<td>The ZoneListIndex links this record to the respective zone list record (see ZoneLists table below)</td>
 </tr>
 <tr>
 <td>ZoneListMultiplier</td>
@@ -8414,13 +8294,14 @@ Please see the Zone Group object in the Group-Thermal Zone Description/Geometry 
 
 An overview of the ZoneLists SQL table is shown below.
 
-Table 34. SQL ZoneLists Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 34. SQL ZoneLists Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>ZoneListIndex</td>
@@ -8432,6 +8313,26 @@ Table 34. SQL ZoneLists Table Contents
 <td>TEXT</td>
 <td>Zone list name</td>
 </tr>
+</table>
+
+Please see the Zone List object in the Group-Thermal Zone Description/Geometry section of the Input-Output Reference for more information.
+
+#### ZoneInfoZoneLists Table
+
+An overview of the ZoneInfoZoneLists SQL table is shown below.
+
+<table class="table table-striped">
+<caption>SQL ZoneLists Table Contents</caption>
+<tr>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>ZoneListIndex</td>
+<td>INTEGER</td>
+<td>Zone list index</td>
+</tr>
 <tr>
 <td>ZoneIndex</td>
 <td>INTEGER</td>
@@ -8439,7 +8340,7 @@ Table 34. SQL ZoneLists Table Contents
 </tr>
 </table>
 
-Please see the Zone List object in the Group-Thermal Zone Description/Geometry section of the Input-Output Reference for more information.
+This is a join table to represent the many-to-many relationship of zones and zone lists.  ZoneListIndex and ZoneIndex together are the Primary Key for this table.
 
 ### Miscellaneous Tables
 
@@ -8447,13 +8348,14 @@ Please see the Zone List object in the Group-Thermal Zone Description/Geometry s
 
 An overview of the Schedules SQL table is shown below.
 
-Table 35. SQL Schedules Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 35. SQL Schedules Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>ScheduleIndex</td>
@@ -8488,13 +8390,14 @@ Please see the Group-Schedules section of the Input-Output Reference for more in
 
 An overview of the Simulations SQL table is shown below.  Currently there will only be one record in the table, because the SQLite database is relevant to only one simulation.  In the future this might change if multiple simulations are aggregated into a larger database.
 
-Table 36. SQL Simulations Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 36. SQL Simulations Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>SimulationIndex</td>
@@ -8532,13 +8435,14 @@ Table 36. SQL Simulations Table Contents
 
 An overview of the EnvironmentPeriods SQL table is shown below.
 
-Table 37. SQL EnvironmentPeriods Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 37. SQL EnvironmentPeriods Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>EnvironmentPeriodIndex</td>
@@ -8566,13 +8470,19 @@ Table 37. SQL EnvironmentPeriods Table Contents
 
 An overview of the TabularData SQL table is shown below.   The TabularData table is only output when the “SimpleAndTabular” choice is made in the Output:SQLite object.  The TabularData table contains all of the tabular report information that is typically output to one of the formats controlled by the OutputControl:Table:Style object.  This is a generic way of dumping all of the existing tabular reports to the SQLite database.  This table has many references to the companion Strings table.  The Strings table simply associates strings to an integer value for space efficiency of the database.  Tabular data is easier to query from the TabularDataWithStrings table, which is implemented as a database view that joins this table with the Strings table.
 
-Table 38. SQL TabularData Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 38. SQL TabularData Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>TabularDataIndex</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Tabular Data Index</td>
 </tr>
 <tr>
 <td>ReportNameIndex</td>
@@ -8605,6 +8515,16 @@ Table 38. SQL TabularData Table Contents
 <td>A foreign key to an entry in the Strings table, which indicates the name of the column the record belongs to.</td>
 </tr>
 <tr>
+<td>UnitsIndex</td>
+<td>INTEGER</td>
+<td>A foreign key to an entry in the Strings table, which indicates the units associated with the record.</td>
+</tr>
+<tr>
+<td>SimulationIndex</td>
+<td>INTEGER</td>
+<td>A foreign key to the Simulations table.</td>
+</tr>
+<tr>
 <td>RowId</td>
 <td>INTEGER</td>
 <td>The index of the row associated with the record.  Data in the first row of a tabular report would have the Id 1.</td>
@@ -8619,24 +8539,20 @@ Table 38. SQL TabularData Table Contents
 <td>REAL</td>
 <td>The value of the record.  Most data is numeric, thus the type for this column is REAL.  The SQLite engine will first try to store the value as a REAL, however if this fails the value will be stored as text.</td>
 </tr>
-<tr>
-<td>UnitsIndex</td>
-<td>INTEGER</td>
-<td>A foreign key to an entry in the Strings table, which indicates the units associated with the record.</td>
-</tr>
 </table>
 
 #### Strings Table
 
 An overview of the Strings SQL table is shown below. The Strings table is only output when the “SimpleAndTabular” choice is made in the Output:SQLite object.  The Strings table simply associates strings with integers to save space in the database.
 
-Table 39. SQL Strings Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 39. SQL Strings Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>StringIndex</td>
@@ -8659,13 +8575,14 @@ Table 39. SQL Strings Table Contents
 
 An overview of the StringTypes SQL table is shown below. The StringTypes table is only output when the “SimpleAndTabular” choice is made in the Output:SQLite object.
 
-Table 40. SQL StringTypes Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 40. SQL StringTypes Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>StringTypeIndex</td>
@@ -8685,19 +8602,25 @@ An overview of the TabularDataWithStrings SQL table is shown below.  This table
 
 An example of a SQL query to get a table out of the AnnualBuildingUtilityPerformanceSummary report is the following.
 
-select \* FROM TabularDataWithStrings WHERE ReportName='AnnualBuildingUtilityPerformanceSummary'
-
+````
+select \* FROM TabularDataWithStrings WHERE 
+ReportName='AnnualBuildingUtilityPerformanceSummary' 
 and TableName='Site and Source Energy';
+````
 
 
-
-Table 41. SQL TabularDataWithStrings Table Contents
 
 <table class="table table-striped">
+<caption>Table 41. SQL TabularDataWithStrings Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>TabularDataIndex</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>The index of the record</td>
 </tr>
 <tr>
 <td>Value</td>
@@ -8740,13 +8663,14 @@ Table 41. SQL TabularDataWithStrings Table Contents
 
 The Errors SQL table reports errors and warnings for the simulation.  The content of this table includes most of the content of the error file.  However, it does not contain purely informational messages (e.g. not warnings or errors) and some of the error summary statistics which may be readily computed. Users should be aware that errors experienced while processing input cause EnergyPlus to exit before the SQLite output database has been initialized.  This is because the Output:SQLite object must be parsed from the input to request the database.  Therefore, failures in input processing are indicated by the absence of a SQLite output file.  The regular error or audit files must be used to identify the erroneous input objects in this case.  Because each error or warning message is expected to be unique these messages are stored directly in the Errors table and not in the Strings table.
 
-Table 42. SQL Errors Table Contents
+
 
 <table class="table table-striped">
+<caption>Table 42. SQL Errors Table Contents</caption>
 <tr>
-<td>Field Name</td>
-<td>Field Type</td>
-<td>Description</td>
+<th>Field Name</th>
+<th>Field Type</th>
+<th>Description</th>
 </tr>
 <tr>
 <td>ErrorIndex</td>
@@ -8803,11 +8727,13 @@ The sqlite3 program comes standard on MacOS X 10.5. From the command line, type 
 
 Once it has been confirmed that SQLite3 is installed on your machine, the SQL database can be accessed by typing:
 
+```
 sqlite3 &lt;database name&gt;
+```
 
 at the command line, where &lt;database name &gt; is the name of the SQL database (e.g., sqlite3 eplusout.sql).
 
-The sqlite.org website, http://www.sqlite.org/sqlite.html, gives examples of how sqlite3 can be used to access and output data in various formats.
+The sqlite.org [website](http://www.sqlite.org/sqlite.html) gives examples of how sqlite3 can be used to access and output data in various formats.
 
 #### ODBC
 
