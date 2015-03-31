@@ -648,6 +648,20 @@
       </ul>
     </li>
   
+    <li class="main"><a href="#groundheatexchangerslinky">GroundHeatExchanger:Slinky</a>
+      <ul class="nav">
+        
+        <li><a href="#horizontal-slinky-temperature-response-functions">Horizontal Slinky Temperature Response Functions</a></li>
+        
+        <li><a href="#vertical-slinky-terperature-response-functions">Vertical Slinky Terperature Response Functions</a></li>
+        
+        <li><a href="#model-simplifications-for-computational-efficiency">Model Simplifications for Computational Efficiency</a></li>
+        
+        <li><a href="#references_10">References</a></li>
+        
+      </ul>
+    </li>
+  
     <li class="main"><a href="#plant-loop-pond-to-water-heat-exchanger">Plant Loop Pond-To-Water Heat Exchanger</a>
       <ul class="nav">
         
@@ -663,7 +677,7 @@
         
         <li><a href="#total-heat-transfer-tofrom-the-heat-exchanging-fluid-flowing-in-all-spools-or-coils-in-the-pond">Total heat transfer to/from the heat exchanging fluid flowing in all spools or coils in the pond</a></li>
         
-        <li><a href="#references_10">References</a></li>
+        <li><a href="#references_11">References</a></li>
         
       </ul>
     </li>
@@ -680,7 +694,7 @@
       </ul>
     </li>
   
-    <li class="main"><a href="#references_11">References</a>
+    <li class="main"><a href="#references_12">References</a>
       <ul class="nav">
         
       </ul>
@@ -705,7 +719,7 @@
         
         <li><a href="#variable-inlet-watertemperature">Variable Inlet WaterTemperature:</a></li>
         
-        <li><a href="#references_12">References</a></li>
+        <li><a href="#references_13">References</a></li>
         
       </ul>
     </li>
@@ -5360,6 +5374,75 @@
 <p>Eskilson, P. 1987. Thermal Analysis of Heat Extraction Boreholes. Ph.D. Thesis, Department of Mathematical Physics, University of Lund, Lund, Sweden.</p>
 <p>Yavuzturk, C. 1999. Modeling of Vertical Ground Loop Heat Exchangers for Ground Source Heat Pump Systems. Ph.D. Thesis, Department of Mechanical and Aerospace Engineering, Oklahoma State University, Stillwater, Oklahoma.</p>
 <p>Yavuzturk, C., J.D. Spitler. 1999.<a href="http://www.hvac.okstate.edu/research/Documents/ASHRAE/Yavuzturk_Spitler_99.pdf"> A Short Time Step Response Factor Model for Vertical Ground Loop Heat Exchangers.</a> <em>ASHRAE Transactions</em>. 105(2):475-485.</p>
+<h3 id="groundheatexchangerslinky">GroundHeatExchanger:Slinky</h3>
+<p>This model reuses much of the same code including the load aggregation and temperature response caluclations which are described above in the GroundHeatExchanger:Vertical model. As a result, that section can also be used as reference material. This model is unique in that it generates it’s own temperature response factor g-functions, rather than relying on the other software or data to generate the g-functions. These are generated based on the work by Xiong et al. 2015.</p>
+<h4 id="horizontal-slinky-temperature-response-functions">Horizontal Slinky Temperature Response Functions</h4>
+<p>Equation used for calculating the g-function temperature response factors for the horizontal Slinky HX are seen below.</p>
+<div>\[   
+ g_s\left(t\right) = \sum_{i=1}^{N_{ring}} \sum_{j=1}^{N_{ring}} \frac{R}{4\pi N_{ring}} \int_0^{2\pi} \int_0^{2\pi} 
+            \left[ 
+                \frac{erfc\left(d\left(P_j,P_i\right)/2\sqrt{\alpha t}\right)}{d\left(P_j,P_i\right)} - 
+                \frac{erfc\left(\sqrt{d\left(P_j,P_i\right)^2+4h^2/\left(2\sqrt{\alpha t}\right)}\right)}{\sqrt{d\left(P_j,P_i\right)^2+4h^2} }
+            \right]d\omega d\varphi
+\]</div>
+
+<p>Where:</p>
+<div>\[
+  d\left(P_j,P_i\right) = \frac{d\left(P_{ii},P_j\right) + d\left(P_{io},P_j\right)}{2}
+\]</div>
+
+<div>\[
+  d\left(P_{ii},P_j\right) = \sqrt{\left[x_{0i} + \left(R-r\right)\cos \varphi - x_{0j}-R\cos \omega\right]^2 + \left[y_{0i} + \left(R-r\right)\sin \varphi - y_{0j}-R\sin \omega\right]^2}
+\]</div>
+
+<div>\[
+  d\left(P_{io},P_j\right) = \sqrt{\left[x_{0i} + \left(R-r\right)\cos \varphi - x_{0j}-R\cos \omega\right]^2 + \left[y_{0i} + \left(R+r\right)\sin \varphi - y_{0j}-R\sin \omega\right]^2}
+\]</div>
+
+<h4 id="vertical-slinky-terperature-response-functions">Vertical Slinky Terperature Response Functions</h4>
+<p>Equations used for calculating the g-function temperature response factors for the vertical Slinky HX are seen below.</p>
+<div>\[   
+ g_s\left(t\right) = \sum_{i=1}^{N_{ring}} \sum_{j=1}^{N_{ring}} \frac{R}{4\pi N_{ring}} \int_0^{2\pi} \int_0^{2\pi} 
+            \left[ 
+                \frac{erfc\left(d\left(P_j,P_i\right)/2\sqrt{\alpha t}\right)}{d\left(P_j,P_i\right)} - 
+                \frac{erfc\left(d\left(P_j,P_i\right)/2\sqrt{\alpha t}\right)}{d\left(P_j,P_i\right)}
+            \right]d\omega d\varphi
+\]</div>
+
+<p>Where: </p>
+<div>\[
+  d\left(P_j,P_i\right) = \frac{d\left(P_{ii},P_j\right) + d\left(P_{io},P_j\right)}{2}
+\]</div>
+
+<div>\[
+  d\left(P_{j'},P_i\right) = \frac{d\left(P_{ii},P_{j'}\right) + d\left(P_{io},P_{j'}\right)}{2}
+\]</div>
+
+<div>\[
+  d\left(P_{ii},P_j\right) = \sqrt{\left[x_{0i} + \left(R-r\right)\cos \varphi - x_{0j}-R\cos \omega\right]^2 + \left[y_{0i}-y_{0j}\right]^2 + \left[z_{0i} + \left(R-r\right)\sin \varphi - z_{0j}-R\sin \omega\right]^2}
+\]</div>
+
+<div>\[
+  d\left(P_{io},P_j\right) = \sqrt{\left[x_{0i} + \left(R+r\right)\cos \varphi - x_{0j}-R\cos \omega\right]^2 + \left[y_{0i}-y_{0j}\right]^2 + \left[z_{0i} + \left(R+r\right)\sin \varphi - z_{0j}-R\sin \omega\right]^2}
+\]</div>
+
+<div>\[
+  d\left(P_{ii},P_{j'}\right) = \sqrt{\left[x_{0i} + \left(R-r\right)\cos \varphi - x_{0j}-R\cos \omega\right]^2 + \left[y_{0i}-y_{0j}\right]^2 + \left[z_{0i} + \left(R-r\right)\sin \varphi - z_{0j} - 2h - R\sin \omega\right]^2}
+\]</div>
+
+<div>\[
+  d\left(P_{io},P_{j'}\right) = \sqrt{\left[x_{0i} + \left(R+r\right)\cos \varphi - x_{0j}-R\cos \omega\right]^2 + \left[y_{0i}-y_{0j}\right]^2 + \left[z_{0i} + \left(R+r\right)\sin \varphi - z_{0j} - 2h - R\sin \omega\right]^2}
+\]</div>
+
+<h4 id="model-simplifications-for-computational-efficiency">Model Simplifications for Computational Efficiency</h4>
+<p>Several simplifications were used to ensure the g-function temperature response factors are computationally efficient. The first simplification is achieved by taking advantage of symmetry. In the <a href="#SlinkyGHX1">Figure</a> below we can see that by taking advantage of symmettry the temperature response for only one quarter of the rings needs be calculated.</p>
+<p>The second simplification occurs by realizing that the effect between two rings decreases exponentially as the distance between the rings increases. Near-field rings are defined as rings whose centers are within 2.5m + D distance from the center of ring i as is seen in <a href="#SlinkyGHX1">Figure</a>. Far-field rings are defined as rings whose centers are beyond 10m + D, with middle-field rings occupying the space in between the near-field and far-field rings. Near-field ring temperature response factors are determined as indicated above for horzontal or vertical slinkys. Middle-field rings are considerably simplified – the interaction between ring is approximated as that of two point sources at their centers. Thermal effect of far-field rings are ignored.</p>
+<p>The third and final simplification takes advantatge of geometric similarity that ring share. Ring pairs that are geometrically similar do not require recalculation of distances or reponse factors. Thus the calculations for geometrically similar ring pairs can be reused.</p>
+<p>For more information, see <a href="#SlinkyReferenceXiong">Xiong et al. 2015</a>.</p>
+<p><img alt="" src="../../EngineeringReference/media/image8001.png" /></p>
+<p>Figure: Schematic of first and second improvements to the algorithm for computational efficiency. <a name="SlinkyGHX1"></a></p>
+<h4 id="references_10">References</h4>
+<p>Xiong, Z., D.E. Fisher, and J.D. Spitler. 2015. Development and Validation of a Slinky(TM) Ground Heat Exchanger Model. Applied Energy 141: 57-69. <a name="SlinkyReferenceXiong"></a></p>
 <h3 id="plant-loop-pond-to-water-heat-exchanger">Plant Loop Pond-To-Water Heat Exchanger</h3>
 <p>The pond model (Object: GroundHeatExchanger:Pond) is a ‘lumped parameter’ model where the pond is represented by a single node with thermal mass. The pond surface temperature is the same as the temperature at this node, i.e. the surface temperature is the same as the bulk temperature. A first order differential equation is solved in the model to calculate the pond temperature at each time step. This type of heat rejecter is modeled as several circuits connected in parallel.</p>
 <p><img alt="" src="../../EngineeringReference/media/image5676.png" /></p>
@@ -5516,7 +5599,7 @@
 <div img="image5724.txt">\(\sum {{r_t}} \)</div>
 
 <p>=Resistance due to fluid flow in the pipe +external pipe thermal resistance +fouling factor</p>
-<h4 id="references_10">References</h4>
+<h4 id="references_11">References</h4>
 <p>Chiasson, A.D. 1999. <em>Advances in modeling of groundsourceheat pump systems</em>. Master’s thesis,Oklahoma State University, Stillwater, OK</p>
 <p>Duffie, J.A., and W.A. Beckman. 1991. <em>Solar engineering of thermal processes,</em> 2d ed. New York: John Wiley &amp; Sons.</p>
 <p>Hull, J.R., K.V. Liu, W.T. Sha, J. Kamal, and C.E. Nielsen. 1984. Dependence of ground heat losses upon solar pond size and perimeter insulation—Calculated and experimental results. <em>Solar Energy</em> 33(1): 25-33</p>
@@ -5652,7 +5735,7 @@
 <p>2)  the lower temperature setpoint on the reference node is compared to the inlet temperature for the Loop Supply Side to see if their difference exceeds the minimum temperature difference and has the correct sign for heating to be possible, and</p>
 <p>3) the lower temperature setpoint on the reference node is compared to the inlet temperature for the Loop Demand Side to see if their difference exceeds the minimum temperature difference and has the correct sign for heating to be possible.</p>
 <p>When the heat exchanger is turned “on,” the model requests the full design flow rate on the Loop Supply Side connection.  If the Loop Supply Side flow rate exceeds a small tolerance, then the full design flow rate is requested for the Loop Demand Side connection.</p>
-<h3 id="references_11">References</h3>
+<h3 id="references_12">References</h3>
 <p>Strand, R.K. and C.O. Pedersen, 1997.  Implementation of a Radiant Heating and Cooling Model Into an Integrated Building Energy Analysis Program, ASHRAE Transactions v. 103, n. 1, pp 949-958, 1997.</p>
 <p>Incropera, F.P. and D.P. DeWitt. 1981. Fundamentals of Heat Transfer. New York: John Wiley &amp; Sons.</p>
 <p>Mills, A.F.1999. Heat Transfer, Second Edition. Prentice Hall. New Jersey.</p>
@@ -5835,7 +5918,7 @@ W_controls = control electric power [W], a user input.</p>
 <div img="image5817.txt">\({\rho_w}\)</div>
 
 <p>= water density (998.2 kg/m<sup>3</sup>).</p>
-<h4 id="references_12">References</h4>
+<h4 id="references_13">References</h4>
 <p>ASHRAE. 1993. HVAC 2 Toolkit: A Toolkit for Secondary HVAC System Energy Calculations. Atlanta: American Society of Heating, Refrigerating and Air-Conditioning Engineers, Inc.</p>
 <p>ASHRAE. 2001. 2001 ASHRAE Handbook Fundamentals. Atlanta: American Society of Heating, Refrigerating and Air-Conditioning Engineers, Inc.</p>
 
