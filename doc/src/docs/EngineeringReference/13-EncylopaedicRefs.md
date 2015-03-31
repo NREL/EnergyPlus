@@ -16851,6 +16851,117 @@ Figure 259.  Sensible Heat Gain from People Correlation
 
 The function for sensible gain calculation is compared to the original data points in the following figure.  The radiant fraction of the sensible gain is a user input on the People object.
 
+### Heat Gain from IT Equipment
+
+The input object ElectricEquipment:ITE:AirCooled describes air-cooled electric information technology equipment (ITE) which has variable power consumption as a function of loading and temperature. The calculations are described below.
+
+#### Variable Definitions – User Inputs:
+
+* PDesign = Design power input when fully loaded and entering air temperature is at the user-specified design inlet temperature [W]
+* PFanFracDesign = Design fan power input fraction of total power input when fully loaded and entering air temperature is at the user-specified design inlet temperature
+* SchDesignLevel = Scheduled fraction of this equipment which is powered up
+* SchCPULoading = Scheduled fraction of CPU loading
+* TAirInDesign = Air inlet temperature at design condition [C]
+* VAirDesign = Air volume flow rate at design condition [m3/s]
+* VAirfLoadTAir = Air volume flow rate modifier function of TAirIn and SchCPULoading
+* PCPUfLoadTAir = CPU power input modifier function of TAirIn and SchCPULoading
+* PFanfFlowFrac = Fan power input modifier function of air flow fraction
+* RecircFracDesign = Recirculation Fraction at design condition [C]
+* RecircfLoadTAir = Recirculation Fraction modifier function of TAirSupply and SchCPULoading
+* UPSEfficDesign = Design electric power supply efficiency
+* UPSEfficfPLR = Electric power supply efficiency function of part load ratio
+* UPSLossFracToZone = Fraction of electric power supply losses to zone
+ 
+#### Variable Definitions – Simulation Inputs:
+
+* TAirIn = Air inlet temperature at current conditions [C]
+* TAirSupply = Supply air node temperature at current conditions [C]
+* TZone = Zone air temperature at current conditions [C]
+* TRoomAirNodeIn = Room air model inlet node air temperature at current conditions [C]
+* RhoAir = Air density [kg/m3]
+* CpAir = Air specific heat [J/kg-K]
+ 
+#### Variable Definitions – Intermediate Calculations:
+
+* PCPUDesign = Design CPU power input when fully loaded and entering air temperature is at the user-specified design inlet temperature [W]
+* PFanDesign = Design fan power input when fully loaded and entering air temperature is at the user-specified design inlet temperature [W]
+* UPSPLR = Electric power supply part load ratio (can be greater than 1.0)
+ 
+#### Variable Definitions – Outputs:
+
+* PCPU = CPU power input [W]
+* PFan = Fan power input [W]
+* PUPS = Electric power supply net power input [W]
+* TAirOut = Air outlet temperature [C]
+* VAir = Air volume flow rate [m3/s]
+* FlowFrac = Air volume flow rate fraction of design flow rate
+* RecircFrac = Recirculation fraction
+* QAir = Air cooling rate [W]
+* QUPS = Electric power supply heat loss rate to zone [W]
+* QConv = Convective heat gain rate to zone heat balance [W]
+* SHI = Supply heat index
+* SHIZone = Zone average supply heat index
+ 
+#### Calculations
+
+The design power input is first split into portions for the CPU (everything in the equipment except the cooling fans) and the fan(s).
+
+PCPUDesign = PDesign * (1 - PFanFracDesign)
+ 
+PFanDesign = PDesign * PFanFracDesign
+ 
+For each time step, the air inlet temperature is calculated depending on the type of air node connection.
+ 
+TAirIn:
+
+* If Air Node Connection Type = AdjustedSupply
+    * RecircFrac = RecircFracDesign * RecircfLoadTAir(SchCPULoading TAirSupply)
+    * TAirIn = TAirSupply * (1 – RecircFrac) +TAirZone * RecircFrac
+ 
+* If Air Node Connection Type = ZoneAirNode
+    * TAirIn = TAirZone
+ 
+* If Air Node Connection Type = RoomAirModel
+    * TAirIn = TRoomAirNodeIn
+ 
+Using the air inlet temperature, the CPU power consumption, air flow rate, fan power consumption, and power supply power consumption are calculated.
+ 
+PCPU = PCPUDesign * SchDesignLevel * PfLoadTAir(SchCPULoading, TAirIn)
+ 
+FlowFrac = VAirfLoadTAir(SchCPULoading, TAirIn)
+ 
+VAir = VAirDesign * FlowFrac
+ 
+PFan = PFanDesign * SchDesignLevel * PFanfFlowFrac(FlowFrac)
+ 
+UPSPLR = (PCPU + PFan) / (PCPUDesign + PFanDesign)
+ 
+PUPS = (PCPU + PFan) * (1 - UPSEfficDesign * UPSEfficfPLR (UPSPLR))
+ 
+The convective heat gain to the zone and the air outlet temperature are then calculated. The user specified fration of power supply losses are always added to the general zone heat balace convective heat gain. For air node connection types AdjustedSupply and ZoneAirNode, the CPU and fan power consumption are also added to the zone convective heat gain. For air connection type RoomAirModel, the gains from the CPU and fan power consumption are added to the outlet room air model node.
+ 
+QAir = PCPU + PFan
+ 
+QUPS = PUPS * UPSLossFracToZone
+ 
+QConv:
+
+* If Air Node Connection Type = AdjustedSupply OR ZoneAirNode
+    * QConv = QAir + QUPS
+ 
+* If Air Node Connection Type = RoomAirModel
+    * QConv = QUPS
+ 
+TAirOut = TAirIn + QAir / (VAir * RhoAir * CpAir)
+ 
+The individual ITE supply heat index is calculated as shown below.
+ 
+SHI = (TAirIn – TAirSupply) / (TAirOut - TAirSupply)
+ 
+The zone average ITE supply heat index is weighted by the air flow rate of each ITE object.
+ 
+SHIZone = ∑ [VAir * (TAirIn – TAirSupply)] / ∑ [VAir * (TAirOut - TAirSupply)]
+
 ### Heat Gain from Baseboard Heat
 
 The input object ZoneBaseboard:OutdoorTemperatureControlled provides a model for an outdoor temperature controlled baseboard heater that adds energy to the zone according a control profile as shown in the following figure.  At TA = T2, the baseboard heat gain is Q2.  For TA &gt; T2, there is no heat gain.  For TA &lt; T1, a maximum amount of energy, Q1, is added to the zone.  There is proportional control between those two temperatures:
