@@ -65,6 +65,12 @@ A performance curve having an order or degree of 2 in two independent variables.
 
 <div>\[z = a + bx + c{x^2} + dy + exy + f{x^2}y\]</div>
 
+#### CubicLinear Curves
+
+A performance curve having an order or degree of 3 in two independent variables.
+
+<div>\[z = a + bx + c{x^2} + d{x^3} + ey + fxy\]</div>
+
 #### BiQuadratic Curves
 
 A performance curve having an order or degree of 2 in two independent variables.
