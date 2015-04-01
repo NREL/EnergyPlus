@@ -1,18 +1,13 @@
-Getting Started with EnergyPlus
-
-Basic Concepts Manual - Essential Information You Need about Running EnergyPlus
- (and a start at building simulation)
-
 
 EnergyPlus Overview
 ===================
 
-Welcome to EnergyPlus!  This section offers a big picture view of what EnergyPlus is, what it does, why it exists, and what its goals are AND provides an overview to the **EnergyPlus documentation library**. While this document does not provide every detail on the program, it does give the reader a macroscopic view of EnergyPlus and how it is intended to fit into the energy analysis and thermal load simulation software continuum.
+Welcome to EnergyPlus! This section offers a big picture view of what EnergyPlus is, what it does, why it exists, and what its goals are AND provides an overview to the **EnergyPlus documentation library**. While this document does not provide every detail on the program, it does give the reader a macroscopic view of EnergyPlus and how it is intended to fit into the energy analysis and thermal load simulation software continuum.
 
 What is EnergyPlus?
 -------------------
 
-** **EnergyPlus has its roots in both the BLAST and DOE–2 programs. BLAST (Building Loads Analysis and System Thermodynamics) and DOE–2 were both developed and released in the late 1970s and early 1980s as energy and load simulation tools. Their intended audience is a design engineer or architect that wishes to size appropriate HVAC equipment, develop retrofit studies for life cycling cost analyses, optimize energy performance, etc. Born out of concerns driven by the energy crisis of the early 1970s and recognition that building energy consumption is a major component of the American energy usage statistics, the two programs attempted to solve the same problem from two slightly different perspectives. Both programs had their merits and shortcomings, their supporters and detractors, and solid user bases both nationally and internationally.
+EnergyPlus has its roots in both the BLAST and DOE–2 programs. BLAST (Building Loads Analysis and System Thermodynamics) and DOE–2 were both developed and released in the late 1970s and early 1980s as energy and load simulation tools. Their intended audience is a design engineer or architect that wishes to size appropriate HVAC equipment, develop retrofit studies for life cycling cost analyses, optimize energy performance, etc. Born out of concerns driven by the energy crisis of the early 1970s and recognition that building energy consumption is a major component of the American energy usage statistics, the two programs attempted to solve the same problem from two slightly different perspectives. Both programs had their merits and shortcomings, their supporters and detractors, and solid user bases both nationally and internationally.
 
 Like its parent programs, EnergyPlus is an energy analysis and thermal load simulation program. Based on a user’s description of a building from the perspective of the building’s physical make-up, associated mechanical systems, etc., EnergyPlus will calculate the heating and cooling loads necessary to maintain thermal control setpoints, conditions throughout an secondary HVAC system and coil loads, and the energy consumption of primary plant equipment as well as many other simulation details that are necessary to verify that the simulation is performing as the actual building would. Many of the simulation characteristics have been inherited from the legacy programs of BLAST and DOE–2. Below is list of some of the features of the first release of EnergyPlus. While this list is not exhaustive, it is intended to give the reader and idea of the rigor and applicability of EnergyPlus to various simulation situations.
 
@@ -46,7 +41,7 @@ Like its parent programs, EnergyPlus is an energy analysis and thermal load simu
 
 More details on each of these features can be found in the various parts of the EnergyPlus documentation library.
 
-No program is able to handle every simulation situation. However, it is the intent of EnergyPlus to handle as many building and HVAC design options either directly or indirectly through links to other programs in order to calculate thermal loads and/or energy consumption on for a design day or an extended period of time (up to, including, and beyond a year). While the first version of the program contains mainly features that are directly linked to the thermal aspects of buildings, future versions of the program will attempt to address other issues that are important to the built environment: water, electrical systems, etc.
+No program is able to handle every simulation situation. However, it is the intent of EnergyPlus to handle as many building and HVAC design options either directly or indirectly through links to other programs in order to calculate thermal loads and/or energy consumption on for a design day or an extended period of time (up to, including, and beyond a year). While the first version of the program contained mainly features directly linked to the thermal aspects of buildings, later versions of the program also included other issues that are important to the built environment: water, electrical systems, etc.
 
 *Although it is important to note what EnergyPlus is, it is also important to remember what it is not.*
 
@@ -79,7 +74,7 @@ Finally, the speed with which new technology in the HVAC field is developed has 
 
 The key benefit of modularity is that researchers can develop modules concurrently without interfering with other modules under development and with only a limited knowledge of the entire program structure. This feature is critical to promoting both widespread use and broad development of program models. EnergyPlus can only be successful if the pool of potential model developers increases significantly so that interest and economics drives what models are added to the program rather than have its extensions limited by a lack of intellectual resources. Thus, modularity and structure improvements in EnergyPlus solve the problems of not having enough experts to keep up with technology and the large start-up time and expense previously needed to bring someone up to speed on program additions.
 
-Since the original version (2001), EnergyPlus code and structure continues to evolve and adopts the ever changing Fortran Standard.
+Since the original version (2001), EnergyPlus code and structure continued to evolve and adopt the ever changing Fortran Standard.  However, in 2014, a full conversion of the simulation code to C++ was completed.  The development team also adapted workflows and open sourced the code and posted it on [Github](https://github.com/NREL/EnergyPlus).  Just like how the Fortran simulation code utilized modern Fortran standard capabilities, the C++ code utilizes modern (C++11...) C++ standard capabilities.
 
 ***Established Links:*** The modularity of EnergyPlus makes it easier for other developers to quickly add other component simulation modules. This means that it will be significantly easier to establish links to other programming elements. Since initially the EnergyPlus code will contain a significant number of existing modules, there will be many places within the HVAC code where natural links to new programming elements can be established. These are fully documented to assist other developers in a swift integration of their research into EnergyPlus. In addition to these more natural links in the HVAC section of the code, EnergyPlus will also have other more fluid links in areas such as the heat balance that will allow for interaction where the modules might be more complex or less component based. Again, the goal of this feature of EnergyPlus is maximize the number of developers who can quickly integrate their work into EnergyPlus for the minimum investment of resources. The following diagram depicts how other programs have already been linked to EnergyPlus and a big picture view of how future work can impact the program.
 
@@ -102,17 +97,20 @@ It is also important to note that testing and verification are key issues in the
 EnergyPlus Documentation Library
 --------------------------------
 
-The documentation library has four components: Menus to other documents, User Information, Engineering Reference and Developer Information.  All library documents are in portable document format (PDF) form.  There are several PDF readers available including the original Adobe reader (Adobe’s reader is available as a download from their web site at no charge). Below are brief descriptions of the various components of the EnergyPlus Documentation Library.
+The documentation library for EnergyPlus has historically been provided in the form of pdf's packaged with the release.  As of the 8.3.0 release, a major conversion was completed where the source of the docs was changed to Markdown.  This allows for numerous improvements:
 
-### Main Documentation Menu
+* Easy to automatically translate in between other markup languages, including html, thus making it easy to host as a web page.
+* Merging can be done automatically so the documentation source can stay alongside the source code, idd, and idfs, and all be merged at once.  With the ever-increasing visibility of EnergyPlus development, it is becoming key that documentation is directly in sync with the rest of the program files.
+* Since Markdown is clear text, it is platform-independent and maximizes the possibility for outside contributions to EnergyPlus.
 
-The main menu is not so much a document as a navigation system to the rest of the documents in the library.  In Windows installations, you can actually perform complex searching on the other documents through this menu.  If you press the button that says “press to search documents”, the Adobe search menu will be displayed.  You then enter the word or phrase you want to search for (such as a Output:Variable name) and it will display on screen the documents that contain that word or phrase.  You can then scroll through each found place and display the descriptions.
+The Markdown source for the latest major release is converted to html which is then available at http://energyplus.net/documentation.  The current, or "daily" documentation is available at http://nrel.github.io/EnergyPlus, but since this is a moving target within a release cycle, it is recommended that users view the .net documentation page.
 
-![EnergyPlus\_Menu\_r3\_flat](GettingStarted/media/image003.jpg)
+Two key aspects of the documentation that are currently in development and should be completed soon are:
 
-Figure 3.  Example View of EnergyPlus Document Main Menu
+* Search: the ability to search the online html docs easily
+* Download as pdf: the ability to download pdfs for local/offline access
 
-
+The Markdown based documentation is structured similarly to the pdfs, though the larger files are broken into smaller pieces for faster load times due to the dynamic nature of the math, especially in the engineering reference.  Each of the main documentation pieces are described here.
 
 ### User Information Documents
 
