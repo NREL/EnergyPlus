@@ -123,14 +123,9 @@ The data stored in *CalcZoneSizing*, *CalcFinalZoneSizing*, *ZoneSizing* and *Fi
 Table 40.  Zone Sizing Data
 
 <table class="table table-striped">
-
-
-
-
-
 <tr>
-<td>Name</td>
-<td>Description</td>
+<th>Name</td>
+<th>Description</td>
 </tr>
 <tr>
 <td>All the data from ZoneSizingInput</td>
@@ -451,14 +446,9 @@ The data stored in *SysSizing*, *CalcSysSizing* and *FinalSysSizing* includes th
 Table 41.  System Sizing Data
 
 <table class="table table-striped">
-
-
-
-
-
 <tr>
-<td>Name</td>
-<td>Description</td>
+<th>Name</td>
+<th>Description</td>
 </tr>
 <tr>
 <td>All the data from SysSizInput</td>
@@ -497,6 +487,10 @@ Table 41.  System Sizing Data
 <td>design sensible cooling capacity [W]</td>
 </tr>
 <tr>
+<td>TotCoolCap</td>
+<td>design total cooling capacity [W]</td>
+</tr>
+<tr>
 <td>HeatCap</td>
 <td>design heating capacity [W]</td>
 </tr>
@@ -505,28 +499,28 @@ Table 41.  System Sizing Data
 <td>design preheat capacity [W]</td>
 </tr>
 <tr>
-<td>CoolMixTemp</td>
-<td>design mixed air temperature for cooling [C]</td>
+<td>MixTempAtCoolPeak</td>
+<td>mixed air temperature at the time of the cooling peak [C]</td>
 </tr>
 <tr>
-<td>CoolMixHumRat</td>
-<td>design mixed air humidity ratio for cooling [kg water/kg dry air]</td>
+<td>MixHumRatAtCoolPeak</td>
+<td>mixed air humidity ratio at the time of the cooling peak [kg water/kg dry air]</td>
 </tr>
 <tr>
-<td>CoolRetTemp</td>
-<td>design return air temperature for cooling [C]</td>
+<td>RetTempAtCoolPeak</td>
+<td>return air temperature at the time of the cooling peak [C]</td>
 </tr>
 <tr>
-<td>CoolRetHumRat</td>
-<td>design return air humidity ratio for cooling [kg water/kg dry air]</td>
+<td>RetHumRatAtCoolPeak</td>
+<td>return air humidity ratio at the time of the cooling peak [kg water/kg dry air]</td>
 </tr>
 <tr>
-<td>CoolOutTemp</td>
-<td>design outside air temperature for cooling [C]</td>
+<td>OutTempAtCoolPeak</td>
+<td>outside air temperature at the time of the cooling peak [C]</td>
 </tr>
 <tr>
-<td>CoolOutHumRat</td>
-<td>design outside air humidity ratio for cooling [kg water/kg dry air]</td>
+<td>OutHumRatAtCoolPeak</td>
+<td>outside air humidity ratio at the time of the cooling peak [kg water/kg dry air]</td>
 </tr>
 <tr>
 <td>HeatMixTemp</td>
@@ -561,8 +555,20 @@ Table 41.  System Sizing Data
 <td>daily sequence of system cooling air mass flow rate (zone time step) [kg/s]</td>
 </tr>
 <tr>
+<td>SumZoneCoolLoadSeq(I)</td>
+<td>daily sequence of zones' summed cooling load (zone time step) [W]</td>
+</tr>
+<tr>
+<td>CoolZoneAvgTempSeq(I)</td>
+<td>daily sequence of zones flow weighted average temperature (zone time step) [W]</td>
+</tr>
+<tr>
 <td>SensCoolCapSeq(I)</td>
 <td>daily sequence of system sensible cooling capacity (zone time step) [W]</td>
+</tr>
+<tr>
+<td>TotCoolCapSeq(I)</td>
+<td>daily sequence of system total cooling capacity (zone time step) [W]</td>
 </tr>
 <tr>
 <td>HeatCapSeq(i)</td>
@@ -604,7 +610,6 @@ Table 41.  System Sizing Data
 <td>SysHeatOutHumRatSeq</td>
 <td>daily sequence of system heating outside humidity ratios (zone time step) [kg water/kg dry air]</td>
 </tr>
-
 </table>
 
 ### System Design Flow Rate and Load Summation and Adjustment
@@ -619,21 +624,21 @@ There is a logical flag *SysSizingCalc* corresponding to *ZoneSizingCalc*.  It 
 
 (2)  Loop over the zones cooled by this air loop:
 
-(a)  *NonCoinCoolMassFlow<sub>sys</sub>*=**å***DesCoolMassFlow<sub>zone</sub>*
+(a)  *NonCoinCoolMassFlow<sub>sys</sub>*=*DesCoolMassFlow<sub>zone</sub>*
 
 (3)  Loop over the zones heated by this air loop:
 
-(a)  *NonCoinHeatMassFlow<sub>sys</sub>*=**å***DesHeatMassFlow<sub>zone</sub>*
+(a)  *NonCoinHeatMassFlow<sub>sys</sub>*=*DesHeatMassFlow<sub>zone</sub>*
 
 #### DuringDay
 
 (1)  Loop over the zones cooled by this air loop:
 
-*CoolFlowSeq<sub>sys</sub>(i)* =**å***CoolFlowSeq <sub>zone</sub>*(i)
+*CoolFlowSeq<sub>sys</sub>(i)* =*CoolFlowSeq <sub>zone</sub>*(i)
 
-*SysCoolRetTemp(i)*=**å**(*CoolZoneRetTempSeq(i)· CoolFlowSeq<sub>zone</sub>(i)*)*/ CoolFlowSeq<sub>sys</sub>(i)*
+*SysCoolRetTemp(i)*=(*CoolZoneRetTempSeq(i)· CoolFlowSeq<sub>zone</sub>(i)*)*/ CoolFlowSeq<sub>sys</sub>(i)*
 
-*SysCoolRetHumRat(i)*=**å**(*CoolZoneHumRatSeq(i)· CoolFlowSeq<sub>zone</sub>(i)*)*/ CoolFlowSeq<sub>sys</sub>(i)*
+*SysCoolRetHumRat(i)*=(*CoolZoneHumRatSeq(i)· CoolFlowSeq<sub>zone</sub>(i)*)*/ CoolFlowSeq<sub>sys</sub>(i)*
 
 *FracOA=r<sub>air</sub>*· *DesOutAirVolFlow<sub>sys</sub>*/ *CoolFlowSeq<sub>sys</sub>(i)*
 
@@ -687,13 +692,13 @@ Here     *r<sub>air</sub>*is the density of dry air at 20C and standard elev
 
 (2)  Loop over the zones heated by this air loop.
 
-*HeatFlowSeq<sub>sys</sub>(i)* =**å***HeatFlowSeq <sub>zone</sub>*(i)
+*HeatFlowSeq<sub>sys</sub>(i)* =*HeatFlowSeq <sub>zone</sub>*(i)
 
-*SysHeatRetTemp(i)*=**å**(*HeatZoneRetTempSeq(i)· HeatFlowSeq<sub>zone</sub>(i)*)*/*
+*SysHeatRetTemp(i)*=(*HeatZoneRetTempSeq(i)· HeatFlowSeq<sub>zone</sub>(i)*)*/*
 
 *HeatFlowSeq<sub>sys</sub>(i)*
 
-*SysHeatRetHumRat(i)*=**å**(*HeatZoneHumRatSeq(i)· HeatFlowSeq<sub>zone</sub>(i)*)*/*
+*SysHeatRetHumRat(i)*=(*HeatZoneHumRatSeq(i)· HeatFlowSeq<sub>zone</sub>(i)*)*/*
 
 * HeatFlowSeq<sub>sys</sub>(i)*
 
@@ -775,21 +780,21 @@ For noncoincident sizing the task is harder since we don’t have a single time-
 
 (i)    In *FinalZoneSizing* replace the value in *DesCoolCoilInTemp* with the user specified *CoolSupTemp<sub>sys</sub>*. Do the same for *DesCoolCoilInHumRat* and *CoolSupHumRat*. This ensures that zone equipment connected to an air loop will use the system design supply air conditions as coil entering conditions.
 
-(ii)   *NonCoinCoolMassFlow<sub>sys</sub>*=**å***DesCoolMassFlow<sub>zone</sub>*
+(ii)   *NonCoinCoolMassFlow<sub>sys</sub>*=*DesCoolMassFlow<sub>zone</sub>*
 
-*SysCoolRetTemp*=**å**(*ZoneRetTempAtCoolPeak·DesCoolMassFlow<sub>zone</sub>*)
+*SysCoolRetTemp*=(*ZoneRetTempAtCoolPeak·DesCoolMassFlow<sub>zone</sub>*)
 
 /*NonCoinCoolMassFlow<sub>sys</sub>*
 
-*SysCoolRetHumRat*=**å**(*ZoneHumRatAtCoolPeak·*
+*SysCoolRetHumRat*=(*ZoneHumRatAtCoolPeak·*
 
 *DesCoolMassFlow<sub>zone</sub>*)/*NonCoinCoolMassFlow<sub>sys</sub>*
 
-*SysCoolOutTemp*=**å**(*T<sub>OA,zone\\ peak</sub>·DesCoolMassFlow<sub>zone</sub>*)/
+*SysCoolOutTemp*=(*T<sub>OA,zone\\ peak</sub>·DesCoolMassFlow<sub>zone</sub>*)/
 
 * NonCoinCoolMassFlow<sub>sys</sub>*
 
-*SysCoolOutHumRat*=**å**(*W<sub>OA,zone\\ peak</sub>·DesCoolMassFlow<sub>zone</sub>*)/
+*SysCoolOutHumRat*=(*W<sub>OA,zone\\ peak</sub>·DesCoolMassFlow<sub>zone</sub>*)/
 
 * NonCoinCoolMassFlow<sub>sys</sub>*
 
@@ -811,21 +816,21 @@ Then (for noncoincident sizing) the variables calculated in section (ii) are mov
 
 (i)    In *FinalZoneSizing* replace the value in *DesHeatCoilInTemp* with the user specified *HeatSupTemp<sub>sys</sub>*. Do the same for *DesHeatCoilInHumRat* and *HeatSupHumRat*. This ensures that zone equipment connected to an air loop will use the system design supply air conditions as coil entering conditions.
 
-(ii)   *NonCoinHeatMassFlow<sub>sys</sub>*=**å***DesHeatMassFlow<sub>zone</sub>*
+(ii)   *NonCoinHeatMassFlow<sub>sys</sub>*=*DesHeatMassFlow<sub>zone</sub>*
 
-*SysHeatRetTemp*=**å**(*ZoneRetTempAtHeatPeak·DesHeatMassFlow<sub>zone</sub>*)
+*SysHeatRetTemp*=(*ZoneRetTempAtHeatPeak·DesHeatMassFlow<sub>zone</sub>*)
 
 /*NonCoinHeatMassFlow<sub>sys</sub>*
 
-*SysHeatRetHumRat*=**å**(*ZoneHumRatAtHeatPeak·*
+*SysHeatRetHumRat*=(*ZoneHumRatAtHeatPeak·*
 
 *DesHeatMassFlow<sub>zone</sub>*)/*NonCoinHeatMassFlow<sub>sys</sub>*
 
-*SysHeatOutTemp*=**å**(*T<sub>OA,zone\\ peak</sub>·DesHeatMassFlow<sub>zone</sub>*)/
+*SysHeatOutTemp*=(*T<sub>OA,zone\\ peak</sub>·DesHeatMassFlow<sub>zone</sub>*)/
 
 * NonCoinHeatMassFlow<sub>sys</sub>*
 
-*SysHeatOutHumRat*=**å**(*W<sub>OA,zone\\ peak</sub>·DesHeatMassFlow<sub>zone</sub>*)/
+*SysHeatOutHumRat*=(*W<sub>OA,zone\\ peak</sub>·DesHeatMassFlow<sub>zone</sub>*)/
 
 * NonCoinHeatMassFlow<sub>sys</sub>*
 
@@ -990,7 +995,7 @@ The loop maximum volumetric flow rate (m<sup>3</sup>) is just set equal to the v
 
 #### Volume of the plant loop
 
-Since the loop capacitance has a stability requirement of <div img="image2042.txt">\((\dot V\cdot \Delta tstep/V) \le 1\)</div> the volume is set so that the stability requirement will be 0.8 at the zone time step, which is the largest time step encountered at the max flow rate the loop can reach.
+Since the loop capacitance has a stability requirement of <span>$(\dot V\cdot \Delta tstep/V) \le 1$</span> the volume is set so that the stability requirement will be 0.8 at the zone time step, which is the largest time step encountered at the max flow rate the loop can reach.
 
 <div>\[Vloop = (\dot Vloop,max\cdot \Delta tstep,zone\cdot 3600)/0.8\]</div>
 
@@ -1002,7 +1007,7 @@ The loop maximum volumetric flow rate (m<sup>3</sup>) is just set equal to the v
 
 #### Volume of the plant loop
 
-Since the loop capacitance has a stability requirement of <div img="image2044.txt">\((\dot V\cdot \Delta tstep/V) \le 1\)</div> the volume is set so that the stability requirement will be 0.8 at the zone time step, which is the largest time step encountered at the max flow rate the loop can reach.
+Since the loop capacitance has a stability requirement of <span>$(\dot V\cdot \Delta tstep/V) \le 1$</span> the volume is set so that the stability requirement will be 0.8 at the zone time step, which is the largest time step encountered at the max flow rate the loop can reach.
 
 <div>\[Vloop = (\dot Vloop,max\cdot \Delta tstep,zone\cdot 3600)/0.8\]</div>
 
@@ -1025,9 +1030,9 @@ The analysis will proceed as follows:
 
 6. Compare the flow rate from step 5 to the current value for plant loop flow rate and calculate a normalized change using 
 
-<div>\[\rm{Normalized_Change} = \abs{\frac{\rm{NewFlowRate}-\rm{PreviousFlowRate}}{\rm{PreviousFlowRate}}\]</div>
+    * <span>$\rm{Normalized_Change} = \left|\frac{\rm{NewFlowRate}-\rm{PreviousFlowRate}}\right|{\rm{PreviousFlowRate}}$</span>
 
-7. Normalized_Change =ABS(((New flow rate-previous flow rate))/(previous flow rate))
+7. Normalized_Change = <span>$\frac{\left|\text{NewFlowRate}-\text{PreviousFlowRate}\right|}{\text{PreviousFlowRate}}$</span>
     * Compare magnitude of Normalized_Change to a threshold, currently set at 0.005, to determine if it was significant or not.
     * If change is significant, then alter the size result for that plant loop. Set flags that sizes have changed and sizing calculations need to be called again.  Trigger special setup timesteps with flags set so that all plant system and component level sizes will be recomputed.  Not this will call and resize all of plant so that if one loop has coincident sizing and it places a load on a loop that has noncoincident sizing, the noncoincident loop might still change size because the loop it depends on changed.  Call for another Sizing Pass. 
     * If change is not significant, then leave the sizes alone and do not trigger resizing. Do not call for another Sizing Pass. 
@@ -1060,201 +1065,296 @@ Fan sizing is done in subroutine *SizeFan*.
 
 If the fan is part of the central air system then check the duct type.
 
-For duct type = *main, other* or default
+For duct type = *main, other* or default, <span>$\dot{V}_{fan,max} = \text{DesMainVolFlowsys}$</span>
 
-*<div>\[\dot Vfan,max = DesMainVolFlowsys\]</div>*
+For duct type=*cooling*, <span>$\dot{V}_{fan,max} = \text{DesCoolVolFlowsys}$</span>
 
-For duct type=*cooling*
-
-*<div img="image2047.txt">\(\dot Vfan,max = DesCoolVolFlowsys\)</div>*
-
-For duct type=*heating*
-
-<div>\[\dot Vfan,max = DesHeatVolFlowsys\]</div>
+For duct type=*heating*, <span>$\dot{V}_{fan,max} = \text{DesHeatVolFlowsys}$</span>
 
 If the fan is zone equipment then check whether it is part of a component that only does heating.
 
-For heating only <div img="image2049.txt">\(\dot Vfan,max = DesHeatVolFlowzone\)</div>;
+For heating only <span>$\dot{V}_{fan,max} = \text{DesHeatVolFlowzone}$</span>;
 
-Otherwise <div img="image2050.txt">\(\dot Vfan,max = Max(DesHeatVolFlowzone,DesCoolVolFlowzone)\)</div>
+Otherwise <span>$\dot{V}_{fan,max} = \max\left(\text{DesHeatVolFlowzone},\text{DesCoolVolFlowzone}\right)$</span>
 
 If the max fan flow rate is less than *SmallAirVolFlow* the max flow rate is set to zero.
 
 ### Coil:Cooling:Water
 
-The sizing is done in subroutine *SizeWaterCoil* of module *WaterCoils*
+The sizing is done in function *SizeWaterCoil* of module *WaterCoils*
 
-#### Design Water Flow Rate (m<sup>3</sup>/s)
+#### Initial Calculations
 
-##### System Coils
+For central cooling coils, the first step is to determine the design air flow rate, load, and design air entering and exit conditions. The coil design air flow rate is not generally the same as the maximum system air flow rate (used to size the central fans). The cooling coil peak load (either sensible or total) can occur at a different time than the system peak flow rate. Hence the coil air entering conditions can be different than those at the peak system flow rate. Also, the method of controlling the coil's cooling output may also affect coil design flow rate as well as the coil design exit temperature and humidity.
 
-The design water volumetric flow rate is calculated using:
+By choosing Type of Load to Size On = _Sensible_ or _Total_ in Sizing:System the user indicates to the program to save the cooling coil air flow rate and system air conditions (mixed, return, outside) at the time of either the system cooling sensible or total load peak. Note that the choice _VentilationRequirement_ uses the time of the sensible peak.
 
-<div>\[WaterVolFlowRat{e_{coil,des}} = \frac{{Loa{d_{coil,des}}}}{{{\rho_w} \cdot {c_{p,w}} \cdot \Delta {T_{w,des}}}}\]</div>
+Choosing Central Cooling Capacity Control Method = _VAV_, _Bypass_, _VT_, or _OnOff_ indicates which type of cooling output control the program should assume when calculating the design air flow rate.  The function _GetCoilDesFlowT_ in module _ReportSizingManager_ calculates the air flow rate and exit air temperature for each capacity control method. 
 
-*DT<sub>w,des</sub>* is just the *Loop Design Temperature Difference* user input from *Sizing:Plant* (if the coil is in the outside air stream, ½ the *Loop Design Temperature Difference* is used). The design coil load *Load<sub>coil,des</sub>* is calculated from:
+<table class="table table-striped">
+<caption>Cooling coil calculations for different capacity control methods</caption>
+<tr>
+ <th>Control Method</th>
+ <th>Calculations</th>
+</tr>
+<tr>
+ <td>VAV</td>
+ <td><span>$ \begin{array}{rl} T_{cc,exit} &= T_{cool,supply} \\ 
+                          \dot{V}_{cc,air} &= \frac{\dot{m}_{cc,air,peak}}{\rho_{air}} \end{array} $</span></td>
+</tr>
+<tr>
+ <td>Bypass</td>
+ <td><span>$ \begin{array}{rl} T_{cc,exit} &= T_{cool,supply} \\ 
+                          \dot{V}_{cc,air} &= \dot{V}_{cc,air,max}\cdot\max \left(0, \min \left(1, \frac{T_{mix,at-peak}-T_{sup,avg}}{T_{mix,at-peak}-T_{cc,exit}}\right) \right) \end{array} $</span></td>
+</tr>
+<tr>
+ <td>VT</td>
+ <td><span>$ \begin{array}{rl} T_{cc,exit} &= \max\left(T_{cool,supply}, T_{sup,avg}\right) \\ 
+                          \dot{V}_{cc,air} &= \dot{V}_{cc,air,max} \end{array} $</span></td>
+</tr>
+<tr>
+ <td>OnOff</td>
+ <td><span>$ \begin{array}{rl} T_{cc,exit} &= T_{cool,supply} \\ 
+                          \dot{V}_{cc,air} &=\dot{V}_{sys,air,max} \end{array} $</span></td>
+</tr>
+</table>
 
-<div>\[Loa{d_{coil,des}} = AirMassFlowRat{e_{coil,des}} \cdot ({h_{air,coil,des,in}} - {h_{air,coil,des,out}})\]</div>
+Where: 
 
-The design air mass flow rate depends on the location of the coil. If the coil is in the outside air stream the flow rate is set to *r<sub>air</sub>*·*DesOutAirVolFlow<sub>sys</sub>* (the design outside air volumetric flow for the system). If the coil is in a cooling duct the flow rate is set to *r<sub>air</sub>*·*DesCoolVolFlow<sub>sys</sub>*. If the coil is in a heating duct the flow rate is set to *r<sub>air</sub>*·*DesHeatVolFlow<sub>sys</sub>*. If the coil is in the main duct (or any other kind of duct) the flow rate is set to *r<sub>air</sub>*·*DesMainVolFlow<sub>sys</sub>*.
+<div>\[ T_{sup,avg} = T_{zones,avg}-\sum_{zones}\frac{\dot{Q}_{sens,at-peak}}{\rho_{air}c_{p,air}\dot{V}_{cool,air,max}}\]</div>
 
-To obtain the inlet and outlet enthalpies, we need the inlet and outlet temperatures and humidity ratios. The inlet and outlet conditions depend on whether the coil is in the outside air stream and if it is not, whether or not there is outside air preconditioning.
+and:
 
-1)    Coil in outside air stream
+* <span>$C_{p,air}$</span>: the specific heat of air (J/kgC)
 
-a.    *T<sub>air,in,des</sub>* = *CoolOutTemp<sub>sys</sub>* (the outside air temperature at the design cooling peak)
+* <span>$\dot{m}_{cc,air,peak}$</span>: the air mass flow rate through the cooling coil at the sensible or total system peak cooling load (m3/s)
 
-b.   *T<sub>air,out,des</sub>* = *PrecoolTemp<sub>sys</sub>*  (the specified Precool Design Temperature from the *Sizing:System* object).
+* <span>$\sum_{zones}\dot{Q}_{sens,at-peak}$</span>: sum of the zone sensible cooling loads at the time of the peak system cooling load
 
-c.    *W<sub>air,in,des</sub>* = *CoolOutHumRat<sub>sys</sub>* (the outside humidity ratio at the design cooling peak)
+* <span>$\rho_{air}$</span>: the density of air (kg/m3)
 
-d.   *W<sub>air,out,des</sub>* = *PrecoolHumRat<sub>sys</sub>* (the specified Precool Design Humidity Ratio from the *Sizing:System* object)
+* <span>$T_{cc,exit}$</span>: the design cooling coil exit temperature (c)
 
-2)    Coil in main air stream, no preconditioning of outside air
+* <span>$ T_{cool,supply} $</span>: the supply air temperature for cooling specified in Sizing:System (C)
 
-a.    *T<sub>air,in,des</sub>* = *CoolMixTemp<sub>sys</sub>* (the mixed air temperature at the design cooling peak)
+* <span>$ T_{mix,at-peak} $</span>: the mixed air temperature at the time of the system peak cooling load (C)
 
-b.   *W<sub>air,in,des</sub>* = *CoolMixHumRat<sub>sys</sub>* (the mixed air humidity ratio at the design cooling peak)
+* <span>$ T_{zones,avg} $</span>: the average zone temperature at the time of the system peak cooling load (C)
 
-c.    *T<sub>air,out,des</sub>* = *CoolSupTemp<sub>sys</sub>*  (the specified Central Cooling Design Supply Air Temperature from the *Sizing:System* object)
+* <span>$ \dot{V}_{cc,air} $</span>: the design volumetric air flow rate through the cooling coil (m3/s). This is the flow rate at either the sensible or total cooling load peak from the design period calculations. 
 
-d.   *W<sub>air,out,des</sub>* = *CoolSupHumRat<sub>sys</sub>* (the specified Central Cooling Design Supply Air Humidity Ratio from the *Sizing:System* object)
+* <span>$ \dot{V}_{cool,air,max} $</span>: the maximum cooling volumetric air flow rate from the design calculations (m3/s). This flow rate occurs at the maximum zone cooling demand.
 
-3)    Coil in main air stream, outside air preconditioned. The outside air fraction is calculated as *Frac*<sub>oa</sub> = *DesOutAirVolFlow<sub>sys</sub>* / *DesVolFlow*. *DesVolFlow* is just *AirMassFlowRate<sub>coil,des</sub>* / *r<sub>air</sub>*.
+* <span>$ \dot{V}_{sys,air,max} $</span>: the maximum volumetric air flow rate from the design calculations (m3/s). This flow rate occurs at either the maximum zone cooling or heating demand.
 
-a.    *T<sub>air,in,des</sub>*=*Frac*<sub>oa</sub>*·PrecoolTemp<sub>sys</sub>* + (1.- *Frac<sub>oa</sub>*)·*CoolRetTemp<sub>sys</sub>* (see Table 41.  System Sizing Data)
+#### Design Coil Load - System Coils
 
-b.   *W<sub>air,in,des</sub>*=*Frac<sub>oa</sub>·PrecoolHumRat<sub>sys</sub>* + (1.- *Frac<sub>oa</sub>*)·*CoolRetHumRat<sub>sys</sub>*
+Design coil load (cooling capacity) is not an input for Coil:Cooling:Water. It is used for calculating the design water flow rate.
 
-c.    *T<sub>air,out,des</sub>* = *CoolSupTemp<sub>sys</sub>* (the specified Central Cooling Design Supply Air Temperature from the *Sizing:System* object)
+The design load is calculated as:
 
-d.   *W<sub>air,out,des</sub>* = *CoolSupHumRat<sub>sys</sub>* (the specified Central Cooling Design Supply Air Humidity Ratio from the *Sizing:System* object)
-
-With the inlet and outlet conditions established, we can obtain the inlet and outlet enthalpies:
-
-*h<sub>air,coil,des,in</sub>* = *PsyHFnTdbW*(*T<sub>air,in,des</sub>*, *W<sub>air,in,des</sub>*)
-
-*h<sub>air,coil,des,out</sub>* = *PsyHFnTdbW*(*T<sub>air,out,des</sub>*, *W<sub>air,out,des</sub>*)
-
-where *PsyHFnTdbW* is the EnergyPlus function for calculating air specific enthalpy given the air temperature and humidity ratio. We now have all we need to calculate *Load<sub>coil,des</sub>* and *WaterVolFlowRate<sub>coil,des</sub>*.
-
-##### Zone Coils
-
-If the coil is part of an *AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction* unit, the water flow rate is set equal to the terminal unit’s chilled water flow rate. Otherwise (e.g., the zone-level coil is part of *ZoneHVAC:FourPipeFanCoil, ZoneHVAC:UnitVentilator or ZoneHVAC:VentilatedSlab*) the calculation is similar to that at the system level. A design load is calculated:
-
-<div>\[Loa{d_{coil,des}} = AirMassFlowRat{e_{coil,des}} \cdot ({h_{air,coil,des,in}} - {h_{air,coil,des,out}})\]</div>
+<div>\[ \dot{Q}_{coil,des} = \dot{m}_{a,coil,des}\left(h_{a,coil,des,in}-h_{a,coil,des,out}\right) \]</div>
 
 Where:
 
-AirMassFlowRate<sub>coil,des</sub> = DesCoolMassFlow<sub>zone</sub> (see Table 40.  Zone Sizing Data)
+* <span>$ h_{a,coil,des,in} $</span>: is the coil design inlet air enthalpy (J/kg)
 
-h<sub>air,coil,des,in</sub> = PsyHFnTdbW(T<sub>air,in,des</sub>, W<sub>air,in,des</sub>)
+* <span>$ h_{a,coil,des,out} $</span>: is the coil design outlet air enthalpy (J/kg), and 
 
-h<sub>air,coil,des,out</sub> = PsyHFnTdbW(T<sub>air,out,des</sub>, W<sub>air,out,des</sub>)
+* <span>$ \dot{m}_{a,coil,des} $</span>: is the coil design air mass flow rate (kg/s)
 
-T<sub>air,in,des</sub> = DesCoolCoilInTemp<sub>zone</sub> (see Table 40)
+The design air mass flow rate depends on the location of the coil.  If the coil is in the outside air stream, the flow rate is set to 
 
-W<sub>air,in,des</sub> = DesCoolCoilInHumRat<sub>zone</sub> (see Table 40)
+<div>\[\rho_{air}\dot{V}_{a,coil,oa,des}\]</div> where <span>$\dot{V}_{a,coil.oa,des}$</span> is the design outside air volumetric flow rate for the system.  Otherwise, it is set to:
 
-T<sub>air,out,des</sub> =CoolDesTemp<sub>zone</sub> (user input from Zone:Sizing object)
+<div>\[\rho_{air}\dot{V}_{cc,air}\]</div>
 
-W<sub>air,out,des</sub> = CoolDesHumRat<sub>zone</sub> (user input from Zone:Sizing object)
+where <span>$\dot{V}_{cc,air}$</span> is calculated above in the Initial Calculations section.
 
-<div>\[WaterVolFlowRat{e_{coil,des}} = \frac{{Loa{d_{coil,des}}}}{{{\rho_w} \cdot {c_{p,w}} \cdot \Delta {T_{w,des}}}}\]</div>
+To obtain the inlet and outlet enthalpies, we need the inlet and outlet temperatures and humidity ratios. The inlet and outlet conditions depend on whether the coil is in the outside air stream and if it is not, whether or not there is outside air preconditioning.
 
-where *DT<sub>w,des</sub>* is the *Loop Design Temperature Difference* user input from the *Sizing:Plant* object*.*
+##### **Coil in outside air stream**:<a name="CoilVsSpacePeakCondition1"></a>
 
-#### Design Air Flow Rate
+* <span>$T_{air,in,des}=T_{out,cool,at-peak}$</span> (the outside air temperature at the design cooling peak)
+  
+* <span>$T_{air,out,des}=T_{sys,precool}$</span> (the specified Precool Design Temperature from the System:Sizing object)
 
-##### System Coils
+* <span>$W_{air,in,des} = W_{out,cool,at-peak}$</span> (the outside humidity ratio at the design cooling peak)
 
-The design air volumetric flow rate depends on the location of the coil. If the coil is in the outside air stream the flow rate is set to *DesOutAirVolFlow<sub>sys</sub>*. If the coil is in a cooling duct the flow rate is set to *DesCoolVolFlow<sub>sys</sub>*. If the coil is in a heating duct the flow rate is set to *DesHeatVolFlow<sub>sys</sub>*. If the coil is in the main duct (or any other kind of duct) the flow rate is set to *DesMainVolFlow<sub>sys</sub>*.
+* <span>$W_{air,out,des}=W_{sys,precool}$</span> (the specified Precool Design Humidity Ratio from the System:Sizing object)
+  
+##### **Coil in main air stream, no preconditioning of outside air** <a name="CoilVsSpacePeakCondition2"></a>
 
-##### Zone Coils
+* <span>$T_{air,in,des}=T_{mix,cool,at-peak}$</span> (the mixed air temperature at the design cooling peak)
+  
+* <span>$W_{air,in,des} = W_{mix,cool,at-peak}$</span> (the mixed humidity ratio at the design cooling peak)
 
-If the coil is part of an *AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction* unit, the design air volumetric flow rate is set equal to the flow rate of the terminal unit. For all other zone coils it is set equal to:
+* <span>$T_{air,out,des}=T_{cc,exit}$</span> (calculated above in the Initial Calculation section)
 
-Max(DesCoolMassFlow<sub>zone</sub>,DesHeatMassFlow<sub>zone</sub>) / r<sub>air</sub>
+* <span>$W_{air,out,des}=W_{sup,cool}$</span> (the specified Central Cooling Design Supply Air Humidity Ratio from the Sizing:System object)
 
-#### Design Inlet Air Temperature
+##### **Coil in main air stream, outside air preconditioned** <a name="CoilVsSpacePeakCondition3"></a>
 
-##### System Coils
+The oustide air fraction is calculated as  (where V<sub>cc,air</sub> is calculated as above)
+
+* <span>$f_{oa}=\frac{\dot V_{air,out,des}}{\dot{V}_{cc,air}}$</span>
+
+* <span>$T_{air,in,des}=f_{oa}T_{precool} + \left(1-f_{oa}\right)T_{ret,cool,at-peak}$</span>(Precool temperature is the specified Precool Design Temperature from System:Sizing Manager; T_ret_cool_at-peak is the return temperature at the system cooling peak load)
+
+* <span>$W_{air,in,des}=f_{oa}W_{precool} + \left(1-f_{oa}\right)W_{ret,cool,at-peak}$</span>(Precool humidity ratio is the specified Precool Design Humidity Ratio from System:Sizing Manager; W_ret_cool_at-peak is the return humidity ratio at the system cooling peak load)
+  
+* <span>$T_{air,out,des}=T_{cc,exit}$</span> (calculated above in the Initial Calculation section)
+
+* <span>$W_{air,out,des}=W_{sup,cool}$</span> (the specified Central Cooling Design Supply Air Humidity Ratio from the Sizing:System object)
+
+With the inlet and outlet conditions established, we can obtain the inlet and outlet enthalpies:
+
+<div>\[ \begin{array}{rl}
+  h_{air,coil,des,in} &= \text{PsyHFnTdbW}\left(T_{air,in,des},W_{air,in,des}\right) \\
+  h_{air,coil,des,out} &= \text{PsyHFnTdbW}\left(T_{air,out,des},W_{air,out,des}\right) \\
+\end{array}\]</div>
+
+Where PsyHFnTdbW is the EnergyPlus function for calculation air specific enthalpy given the air temperature and humidity ratio.  We now have all we need to calculate the design coil capacity, <span>$\dot{Q}_{coil,des}$</span>.
+
+#### Design Coil Load - Zone Coils
+
+If the coil is part of an AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction unit or an ZoneHVAC:FourPipeFanCoil, the cooling load (cooling capacity) is passed down from the terminal unit or fan coil sizing calculations. Otherwise the load is defined as:
+
+<div>\[\dot{Q}_{coil,des} = \dot{m}_{a,coil,des}\left(h_{a,coil,des,in}-h_{a,coil,des,out}\right)\]</div>
+
+Where:
+
+* <span>$ h_{a,coil,des,in} $</span>: is the coil design inlet air enthalpy (J/kg)
+
+* <span>$ h_{a,coil,des,out} $</span>: is the coil design outlet air enthalpy (J/kg), and 
+
+* <span>$ \dot{m}_{a,coil,des} $</span>: is the coil design air mass flow rate (kg/s)
+
+The enthalpies are given by:
+
+<div>\[ \begin{array}{lr}
+  h_{air,coil,des,in} &= \text{PsyHFnTdbW}\left(T_{air,in,des},W_{air,in,des}\right) \\
+  h_{air,coil,des,out} &= \text{PsyHFnTdbW}\left(T_{air,out,des},W_{air,out,des}\right) \\
+\end{array}\]</div>
+
+Where the inputs to those functions are the coil inlet design conditions.  For coils in terminal units these are set at the system level to the system design supply air temperature. For zonal units they are set to design return air, mixed air, or outside air as appropriate to the unit. T<sub>air,out,des</sub> is set to the zone cooling design supply air temperature as specified in the _Zone:Sizing_ inputs. W<sub>air,out,des</sub> is set to the zone cooling design supply air humidity ratio as specified in the _Zone:Sizing_ inputs.
+
+#### Design Water Flow Rate (m<sup>3</sup>/s) - System Coils
+
+The design water volumetric flow rate is calculated using:
+
+<div>\[ \dot{V}_{w,coil,des} = \frac{\dot{Q}_{coil,des}}{\rho_w c_{p,w} \Delta T_{w,des}} \]</div>
+
+Where <span>$\Delta T_{w,des}$</span> is just the *Loop Design Temperature Difference* user input from *Sizing:Plant* (if the coil is in the outside air stream, 1/2 the *Loop Design Temperature Difference* is used). The design coil load *Load<sub>coil,des</sub>* is calculated from:
+
+#### Design Water Flow Rate (m<sup>3</sup>/s) - Zone Coils
+
+If the coil is part of an AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction unit or an ZoneHVAC:FourPipeFanCoil, the chilled water flow rate is passed down from the terminal unit or fan coil sizing calculations. Otherwise the flow is set to:
+
+<div>\[ \dot{V}_{w,coil,des} = \frac{\dot{Q}_{coil,des}}{\rho_w c_{p,w} \Delta T_{w,des}} \]</div>
+
+Where <span>$\Delta T_{w,des}$</span> is just the *Loop Design Temperature Difference* user input from *Sizing:Plant*.
+
+#### Design Air Flow Rate - System Coils
+
+The design air volumetric flow rate for the system cooling coil is set to:
+
+1. the design outside air flow rate if the coil is in the outside air stream;
+
+2. the coil design flow rate from function GetCoilDesFlowT described in section "Initial Calculations";
+
+3. the design flow rate set by the parent component (such as a unitary system) containing the cooling coil.
+
+#### Design Air Flow Rate - Zone Coils
+
+Zone chilled water coils are always part of a zone HVAC component. In almost all cases the design flow rate is passed down from the design flow rate of the parent component. Otherwise if the parent component does cooling only the flow rate for the coil is set to the zone design cooling flow rate. And if the parent component does both cooling and heating, the coil flow rate is set to the maximum of the zone design cooling and heating flow rates.
+
+#### Design Air Inlet Temperature - System Coils
 
 The inlet air temperature depends on whether the coil is in the outside air stream and if it is not, whether or not there is outside air preconditioning.
 
-1.    Coil in outside air stream: *T<sub>air,in</sub>* = *CoolOutTemp<sub>sys</sub>* (the outside air temperature at the design cooling peak).
+* Coil in outside air stream: <span>$T_{air,in,des}=T_{out,cool,at-peak}$</span> (the outside air temperature set at the design cooling peak).
 
-2.    Coil in main air stream, no preconditioning of outside air: *T<sub>air,in</sub>* = *CoolMixTemp<sub>sys</sub>* (the mixed air temperature at the design cooling peak).
+* Coil in main air stream, no preconditioning of outside air: <span>$T_{air,in,des}=T_{mix,cool,at-peak}$</span> (the mixed air temperature at the cooling design peak).
 
-3.    Coil in main air stream, outside air preconditioned. The outside air fraction is calculated as *Frac*<sub>oa</sub> = *DesOutAirVolFlow<sub>sys</sub>* / *DesVolFlow*. *DesVolFlow* is just *AirMassFlowRate<sub>coil,des</sub>* / *r<sub>air</sub>*. Then
+* Coil in main air stream, outside air preconditioned.  The outside air fraction is calculated as <span>$f_{oa}= \dot V_{air,out,des}/\dot V_{cc,air}$</span>, where <span>$\dot V_{cc,air}$</span> is calculated above.  Then <span>$T_{air,in,des}=f_{oa}T_{precool}+\left(1-f_{oa}\right)T_{ret,cool,at-peak}$</span>, where <span>$T_{precool}$</span> is the specified *Precool Design Temperature* from *System:Sizing*, and <span>$T_{ret,cool,at-peak}$</span> is the return temperature at the system cooling peak load.
 
-*T<sub>air,in</sub>*=*Frac*<sub>oa</sub>*·PrecoolTemp<sub>sys</sub>* + (1.- *Frac<sub>oa</sub>*)·*CoolRetTemp<sub>sys</sub>*
+#### Design Air Inlet Temperature - Zone Coils
 
-##### Zone Coils
+The design inlet temperature depends on whether the coil is in a terminal unit or a zonal unit, and where the coil is positioned within the unit.
 
-If the coil is part of an *AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction* unit, the Design Inlet Air Temperature is set equal to *ZoneTempAtCoolPeak<sub>zone</sub>* (see Table 40.  Zone Sizing Data). For all other zone coils, it is set equal to *DesCoolCoilInTemp<sub>zone</sub>* (see Table 40).
+1. For the AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction terminal unit the design inlet temperature is set to the zone temperature at the time of the zone cooling peak, since the coil is located in the induced air stream.
 
-#### Design Outlet Air Temperature
+2. For fan coil units the design inlet temperature is set to the mixed air temperature: <span>$T_{air,in,des}=f_{oa}T_{oa,coolpeak} + \left(1-f_{oa}\right)T_{z,coolpeak}$</span>, where <span>$f_{oa} = \rho_a \dot V_{z,oa,des} / \dot m_{z,cool,des}$</span>
 
-##### System Coils
+3. In all other cases the design inlet temperature is set to the zone design cooling coil inlet temperature which is calculated in the zone sizing simulation and is basically the same calculation as the fan coil unit.
+
+#### Design Air Outlet Temperature - System Coils
 
 The outlet air temperature depends on whether the coil is in the outside air stream.
 
-1.    Coil in outside air stream: *T<sub>air,out,des</sub>* = *PrecoolTemp<sub>sys</sub>*  (the specified Precool Design Temperature from the *Sizing:System* object).
+1. Coil in outside air stream: T<sub>air,out,des</sub> = T<sub>sys,des,precool</sub> (the specified Precool Design Temperature from the Sizing:System object).
 
-2.    Coil in main air stream: *T<sub>air,out,des</sub>* = *CoolSupTemp<sub>sys</sub>*  (the specified Central Cooling Design Supply Air Temperature from the *Sizing:System* object)
+2. Coil in main air stream: the design outlet air temperature is set to the temperature calculated in the Initial Calculation section above.
 
-##### Zone Coils
+#### Design Air Outlet Temperature - Zone Coils
 
-If the coil is part of an *AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction* unit, then:
+If the coil is part of an AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction unit, then:
 
-<div>\[Loa{d_{coil,des}} = AirMassFlowRat{e_{coil,des}} \cdot \Delta {T_{w,des}} \cdot {c_{p,w}} \cdot {\rho_w}\]</div>
+<div>$$
+ \begin{array}{rl}
+  \dot{Q}_{coil,des} &= c_{p,air}\rho_{air}\dot{V}_{w,coil,des}\Delta T_{w,des} \\
+  T_1 &= T_{air,in,des} - \dot{Q}_{coil,des} / \left(\rho_{air}c_{p,air}\dot V_{air,coil,des}\right) \\
+  T_2 &= T_{w,out,des} + 2 \\
+  T_{air,out,des} &= \max \left(T_1,T_2\right)
+ \end{array}
+$$</div>
 
-<div>\[{T_{air,out,des}} = {T_{air,in,des}} - Loa{d_{coil,des}}/({\rho_{air}} \cdot {c_{p,air}} \cdot CoolVolFlo{w_{coil,air,des}})\]</div>
+For all other cases T<sub>air,out,des</sub> is set to T<sub>z,sup,des</sub> (the zone design supply air temperature as specified in Sizing:Zone).
 
-where *CoolVolFlow<sub>coil,air,des</sub>* is the user input or previously autosized coil Design Air Flow Rate. For all other zone coils the Design Outlet Air Temperature is set to *CoolDesTemp<sub>zone</sub>* (see Table 40.  Zone Sizing Data).
+#### Design Inlet Air Humidity Ratio - System Coils
 
-#### Design Inlet Air Humidity Ratio
+The design inlet humidity ratio depends on whether the coil is in the outside air stream and if it is not, whether or not there is outside air preconditioning.
 
-##### System Coils
+* Coil in outside air stream: <span>$W_{air,in,des}=W_{out,cool,at-peak}$</span> (the outside air humidity ratio at the design cooling peak).
 
-The inlet air humidity ratio depends on whether the coil is in the outside air stream and if it is not, whether or not there is outside air preconditioning.
+* Coil in main air stream, no preconditioning of outside air: <span>$W_{air,in,des}=W_{mix,cool,at-peak}$</span> (the mixed air humidity ratio at the cooling design peak).
 
-1.    Coil in outside air stream: *W<sub>air,in,des</sub>* = *CoolOutHumRat<sub>sys</sub>* (the outside humidity ratio at the design cooling peak).
+* Coil in main air stream, outside air preconditioned.  The outside air fraction is calculated as <span>$f_{oa}= \dot V_{air,out,des}/\dot V_{cc,air}$</span>, where <span>$\dot V_{cc,air}$</span> is calculated above.  Then <span>$W_{air,in,des}=f_{oa}W_{precool}+\left(1-f_{oa}\right)W_{ret,cool,at-peak}$</span>, where <span>$W_{precool}$</span> is the specified *Precool Design Humidity Ratio* from *System:Sizing*, and <span>$W_{ret,cool,at-peak}$</span> is the return humidity ratio at the system cooling peak load.
 
-2.    Coil in main air stream, no preconditioning of outside air: *W<sub>air,in,des</sub>* = *CoolMixHumRat<sub>sys</sub>* (the mixed air humidity ratio at the design cooling peak).
+#### Design Air Inlet Humidity Ratio - Zone Coils
 
-3.    Coil in main air stream, outside air preconditioned. The outside air fraction is calculated as *Frac*<sub>oa</sub> = *DesOutAirVolFlow<sub>sys</sub>* / *DesVolFlow*. *DesVolFlow* is just *AirMassFlowRate<sub>coil,des</sub>* / *r<sub>air</sub>*. Then
+The design inlet humidity ratio depends on whether the coil is in a terminal unit or a zonal unit, and where the coil is positioned within the unit.
 
-*W<sub>air,in,des</sub>*=*Frac<sub>oa</sub>·PrecoolHumRat<sub>sys</sub>* + (1.- *Frac<sub>oa</sub>*)·*CoolRetHumRat<sub>sys</sub>*
+1. For the AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction terminal unit the design inlet humidity ratio is set to the zone humidity ratio at the time of the zone cooling peak, since the coil is located in the induced air stream.
 
-##### Zone Coils
+2. For fan coil units the design inlet humidity ratio is set to the mixed air humidity ratio: <span>$W_{air,in,des}=f_{oa}W_{oa,coolpeak} + \left(1-f_{oa}\right)W_{z,coolpeak}$</span>, where <span>$f_{oa} = \rho_a \dot V_{z,oa,des} / \dot m_{z,cool,des}$</span>
 
-If the coil is part of an *AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction* unit, the Design Inlet Air Humidity Ratio is set equal to *ZoneHumRatAtCoolPeak<sub>zone</sub>* (see Table 40.  Zone Sizing Data). For all other zone coils, it is set equal to *DesCoolCoilInHumRat<sub>zone</sub>* (see Table 40).
+3. In all other cases the design inlet humidity ratio is set to the zone design cooling coil inlet hunidity ratio which is calculated in the zone sizing simulation and is basically the same calculation as the fan coil unit.
 
-#### Design Outlet Air Humidity Ratio
-
-##### System Coils
+#### Design Outlet Air Humidity Ratio - System Coils
 
 The outlet air humidity ratio depends on whether the coil is in the outside air stream.
 
-1.    Coil in outside air stream: *W<sub>air,out,des</sub>* = *PrecoolHumRat<sub>sys</sub>* (the specified Precool Design Humidity Ratio from the *Sizing:System* object)
+* Coil in outside air stream: W<sub>air,out,des</sub> = W<sub>sys,des,precool</sub> (the specified Precool Design Humidity Ratio from the Sizing:System object)
 
-2.    Coil in main air stream: *W<sub>air,out,des</sub>* = *CoolSupHumRat<sub>sys</sub>* (the specified Central Cooling Design Supply Air Humidity Ratio from the *Sizing:System* object)
+* Coil in main air stream: W<sub>air,out,des</sub> = PsyWFnTdbRhPb(T<sub>air,out,des</sub>,0.9,P<sub>air,std</sub>), where PsyWFnTdbRhPb is the EnergyPlus psychrometric function to calculate humidity ratio from drybulb temperature, relative humidity, and atmospheric pressure. The design outlet humidity ratio is being set to the humidity ratio at 90% relative humidity and design outlet temperature.
 
-##### Zone Coils
+#### Design Outlet Air Humidity Ratio - Zone Coils
 
-The Design Outlet Air Humidity Ratio is set equal to *CoolDesHumRat<sub>zone</sub>* (user input from *Zone:Sizing*).
+* If the coil is part of an AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction unit, then:
+    
+    * Get the dewpoint temperature at W<sub>air,in,des</sub>: <span>$T_{dp,in}=\text{PsyTdpFnWPb}\left(W_{air,in,des},P_{air,std}\right)$</span>
+    
+    * If T<sub>dp,in</sub> <= T<sub>w,in,des</sub> set W<sub>air,out,des</sub> = W<sub>air,in,des</sub>.  Otherwise set W<sub>air,out,des</sub> = min(PsyWFnTdbRhPb(T<sub>air,out,des</sub>,0.9,P<sub>air,std</sub>),W<sub>air,in,des</sub>)
+    
+#### Design Inlet Water Temperature - System Coils
 
-#### Design Inlet Water Temperature
+The Design Inlet Water Temperature is set to the Design Loop Exit Temperature specified in the Sizing:Plant object for the water loop serving this coil.
 
-##### System Coils
+#### Design Inlet Water Temperature - Zone Coils
 
-The Design Inlet Water Temperature is set to the *Design Loop Exit Temperature* specified in the *Sizing*:*Plant* object for the water loop serving this coil.
-
-##### Zone Coils
-
-The Design Inlet Water Temperature is set to the *Design Loop Exit Temperature* specified in the *Sizing*:*Plant* object for the water loop serving this coil.
+The Design Inlet Water Temperature is set to the Design Loop Exit Temperature specified in the Sizing:Plant object for the water loop serving this coil.
 
 ### Coil:Cooling:Water:DetailedGeometry Sizing
 
@@ -1362,9 +1462,9 @@ The calculation for coil operating temperatures (inlet and outlet) are identical
 
 where:
 
-<div img="image2072.txt">\({T_{WB,ratio}} = \)</div>ratio of load-side inlet air wet-bulb temperature in Kelvin to a reference temperature
+<span>${T_{WB,ratio}} = $</span>ratio of load-side inlet air wet-bulb temperature in Kelvin to a reference temperature
 
-<div img="image2073.txt">\({T_{S,ratio}} = \)</div> ratio of source-side inlet water temperature in Kelvin to a reference temperature
+<span>${T_{S,ratio}} = $</span> ratio of source-side inlet water temperature in Kelvin to a reference temperature
 
 TCC1 = user input for Total Cooling Capacity Coefficient 1
 
@@ -1394,7 +1494,7 @@ The calculation for coil operating temperatures (inlet and outlet) are identical
 
 where:
 
-<div img="image2078.txt">\({T_{DB,ratio}} = \)</div>ratio of load-side inlet air dry-bulb temperature in Kelvin to a reference temperature
+<span>${T_{DB,ratio}} = $</span>ratio of load-side inlet air dry-bulb temperature in Kelvin to a reference temperature
 
 SCC1 = user input for Sensible Cooling Capacity Coefficient 1
 
@@ -1558,11 +1658,11 @@ Depending on the duct type, get the coil design air flow rate.
 
 For duct type = *main, other* or default
 
-*<div img="image2090.txt">\(\dot min,air = \rho air\cdot DesMainVolFlowsys\)</div>*
+*<span>$\dot min,air = \rho air\cdot DesMainVolFlowsys$</span>*
 
 for duct type=*cooling*
 
-*<div img="image2091.txt">\(\dot min,air = \rho air\cdot DesCoolVolFlowsys\)</div>*
+*<span>$\dot min,air = \rho air\cdot DesCoolVolFlowsys$</span>*
 
 for duct type=*heating*
 
@@ -1620,7 +1720,7 @@ The maximum steam volumetric flow rate is calculated using:
 
 <div>\[{\dot V_{coil,steam,max}}\,\,\, = \,\,\,\,\,\frac{{Loa{d_{coil,des}}}}{{{\rho_{steam}}\left( {{h_{fg}} + {c_{p,w}}\cdot \Delta {T_{sc}}} \right)}}\]</div>
 
-The steam density (<div img="image2098.txt">\({\rho_{steam}}\)</div>) is for saturated steam at 100°C (101325.0 Pa) and *h<sub>fg</sub>* is the latent heat of vaporization of water at 100°C (101325.0 Pa). *C<sub>p,w</sub>* is the heat capacity of saturated water (condensate) at 100°C (101325.0 Pa)  and <div img="image2099.txt">\(\Delta {T_{sc}}\)</div> is the Degree of  Subcooling defined in the Coil:Heating:Steam object input. The design coil load *Load<sub>coil,des</sub>* is calculated from:
+The steam density (<span>${\rho_{steam}}$</span>) is for saturated steam at 100°C (101325.0 Pa) and *h<sub>fg</sub>* is the latent heat of vaporization of water at 100°C (101325.0 Pa). *C<sub>p,w</sub>* is the heat capacity of saturated water (condensate) at 100°C (101325.0 Pa)  and <span>$\Delta {T_{sc}}$</span> is the Degree of  Subcooling defined in the Coil:Heating:Steam object input. The design coil load *Load<sub>coil,des</sub>* is calculated from:
 
 <div>\[Loa{d_{coil,des}} = {\dot m_{air,des}}({c_{p,air}})({T_{air,coil,des,out}} - {T_{air,coil,des,in}})\]</div>
 
@@ -1634,7 +1734,7 @@ The design inlet air temperature depends on whether the coil is being sized for 
 
 *T<sub>air,coil,des,in</sub>* = *HeatOutTemp<sub>sys</sub>* (the outdoor air temperature at the design heating peak)
 
-2)    Sizing based on minimum outdoor air flow. The outdoor air fraction is calculated as *Frac*<sub>oa</sub> = *DesOutAirVolFlow<sub>sys</sub>* / *DesVolFlow*. *DesVolFlow* is <div img="image2101.txt">\({{{{\mathop m\limits^ \bullet  }_{air,des}}} \mathord{\left/ {\vphantom {{{{\mathop m\limits^ \bullet  }_{air,des}}} {{\rho_{air}}}}} \right. } {{\rho_{air}}}}\)</div>*.*
+2)    Sizing based on minimum outdoor air flow. The outdoor air fraction is calculated as *Frac*<sub>oa</sub> = *DesOutAirVolFlow<sub>sys</sub>* / *DesVolFlow*. *DesVolFlow* is <span>${{{{\mathop m\limits^ \bullet  }_{air,des}}} \mathord{\left/ {\vphantom {{{{\mathop m\limits^ \bullet  }_{air,des}}} {{\rho_{air}}}}} \right. } {{\rho_{air}}}}$</span>*.*
 
 *T<sub>air,coil,des,in</sub>* =*Frac*<sub>oa</sub>*· HeatOutTemp<sub>sys</sub>* + (1.- *Frac<sub>oa</sub>*)·*HeatRetTemp<sub>sys</sub>* (see Table 41.  System Sizing Data)
 
@@ -1646,13 +1746,13 @@ If the coil is part of an *AirTerminal:SingleDuct:\** unit (e.g., *AirTerminal:S
 
 where:
 
-<div img="image2103.txt">\({\dot m_{air,des}}\)</div>= *DesHeatMassFlow<sub>zone</sub>* (see Table 40.  Zone Sizing Data)
+<span>${\dot m_{air,des}}$</span>= *DesHeatMassFlow<sub>zone</sub>* (see Table 40.  Zone Sizing Data)
 
 *T<sub>air,coil,des,in</sub>* = *DesHeatCoilInTemp<sub>zone</sub>* (see Table 40)
 
 *T<sub>air,coil,des,out</sub>* =*HeatDesTemp<sub>zone</sub>* (user input from Sizing:Zone object)
 
-<div img="image2104.txt">\({c_{p,air}}\)</div> = Specific heat of air (evaluated at the average of inlet and outlet air temperatures, and at the zone heating design supply air humidity ratio *HeatDesHumRat<sub>zone</sub>* [user input from Sizing:Zone object])
+<span>${c_{p,air}}$</span> = Specific heat of air (evaluated at the average of inlet and outlet air temperatures, and at the zone heating design supply air humidity ratio *HeatDesHumRat<sub>zone</sub>* [user input from Sizing:Zone object])
 
 <div>\[{\dot V_{coil,steam,max}}\,\,\, = \,\,\,\,\,\frac{{Loa{d_{coil,des}}}}{{{\rho_{steam}}\left( {{h_{fg}} + {c_{p,w}}\cdot \Delta {T_{sc}}} \right)}}\]</div>
 
@@ -2000,7 +2100,7 @@ where
 
 *DT<sub>loop,des</sub>* is the chilled water loop design temperature rise;
 
-<div img="image2122.txt">\(\dot Vloop,des\)</div>is the loop design volumetric flow rate.
+<span>$\dot Vloop,des$</span>is the loop design volumetric flow rate.
 
 #### Design Evaporator Volumetric Water Flow Rate
 
@@ -2038,7 +2138,7 @@ where
 
 *DT<sub>loop,des</sub>* is the hot water loop design temperature decrease;
 
-<div img="image2126.txt">\(\dot Vloop,des\)</div>is the loop design volumetric flow rate.
+<span>$\dot Vloop,des$</span>is the loop design volumetric flow rate.
 
 #### Design Evaporator Volumetric Water Flow Rate
 
@@ -2048,23 +2148,23 @@ where
 
 The sizing of plant heat exchanger component (object: HeatExchanger:FluidToFluid) involves determining design flow rates for both sides, a UA value, and a nominal capacity for reporting.  The component has a sizing factor for fine control and uses the design temperatures defined in the Sizing:Plant object.
 
-The Loop Supply Side design flow rate, <div img="image2128.txt">\({\dot V_{Sup,des}}\)</div>, is set equal to the design flow rate for that loop, multiplied by the component sizing factor, <div img="image2129.txt">\({f_{comp}}\)</div>.
+The Loop Supply Side design flow rate, <span>${\dot V_{Sup,des}}$</span>, is set equal to the design flow rate for that loop, multiplied by the component sizing factor, <span>${f_{comp}}$</span>.
 
 <div>\[{\dot V_{Sup,des}} = {\dot V_{loop,des}}*{f_{comp}}\]</div>
 
-The Loop Demand Side design flow rate,<div img="image2131.txt">\({\dot V_{Dmd,des}}\)</div> , is set equal to the Loop Supply Side design flow rate.
+The Loop Demand Side design flow rate,<span>${\dot V_{Dmd,des}}$</span> , is set equal to the Loop Supply Side design flow rate.
 
 <div>\[{\dot V_{Dmd,des}} = {\dot V_{Sup,des}}\]</div>
 
-The design heat transfer capacity and UA for the heat exchanger are calculated using the design temperatures for the two plant loops.  The loop design temperature difference for the Loop Supply Side, <div img="image2133.txt">\(\Delta {T_{SupLoop,Des}}\)</div>, is used to determine a nominal capacity.
+The design heat transfer capacity and UA for the heat exchanger are calculated using the design temperatures for the two plant loops.  The loop design temperature difference for the Loop Supply Side, <span>$\Delta {T_{SupLoop,Des}}$</span>, is used to determine a nominal capacity.
 
 <div>\[\dot Q = {\mathop V\limits^._{Sup,des}}\rho {c_p}\Delta {T_{SupLoop,Des}}\]</div>
 
-A loop-to-loop design temperature difference, <div img="image2135.txt">\(\Delta {T_{LoopToLoop,Des}}\)</div>, is determined depending on the nature of the plant loop connected to the Loop Supply Side.  The Sizing:Plant object includes  classifications for the type of loop that include Heating, Steam, Cooling, or Condenser. For Cooling and Condenser loop types, the loop design temperature difference is added to the design exit temperature for the Loop Supply Side, <div img="image2136.txt">\({T_{SupLoop,Exit}}\)</div>.  For Heating and Stem loop types, the loop design temperature difference is subtracted from the design exit temperature.  This adjusted supply side temperature is then compared to the design exit temperature for the Loop Demand Side,<div img="image2137.txt">\({T_{DmdLoop,Exit}}\)</div> .
+A loop-to-loop design temperature difference, <span>$\Delta {T_{LoopToLoop,Des}}$</span>, is determined depending on the nature of the plant loop connected to the Loop Supply Side.  The Sizing:Plant object includes  classifications for the type of loop that include Heating, Steam, Cooling, or Condenser. For Cooling and Condenser loop types, the loop design temperature difference is added to the design exit temperature for the Loop Supply Side, <span>${T_{SupLoop,Exit}}$</span>.  For Heating and Stem loop types, the loop design temperature difference is subtracted from the design exit temperature.  This adjusted supply side temperature is then compared to the design exit temperature for the Loop Demand Side,<span>${T_{DmdLoop,Exit}}$</span> .
 
-<div img="image2138.txt">\(\Delta {T_{LoopToLoop,Des}} = \left( {{T_{SupLoop,Exit}} + \Delta {T_{SupLoop,Des}}} \right) - {T_{DmdLoop,Exit}}\)</div>    (Cooling, Condenser)
+<span>$\Delta {T_{LoopToLoop,Des}} = \left( {{T_{SupLoop,Exit}} + \Delta {T_{SupLoop,Des}}} \right) - {T_{DmdLoop,Exit}}$</span>    (Cooling, Condenser)
 
-<div img="image2139.txt">\(\Delta {T_{LoopToLoop,Des}} = \left( {{T_{SupLoop,Exit}} - \Delta {T_{SupLoop,Des}}} \right) - {T_{DmdLoop,Exit}}\)</div>    (Heating, Steam)
+<span>$\Delta {T_{LoopToLoop,Des}} = \left( {{T_{SupLoop,Exit}} - \Delta {T_{SupLoop,Des}}} \right) - {T_{DmdLoop,Exit}}$</span>    (Heating, Steam)
 
 <div>\[\Delta {T_{LoopToLoop,Des}} = MAX\left( {ABS\left( {\Delta {T_{LoopToLoop,Des}}} \right),2.0} \right)\]</div>
 
@@ -2090,7 +2190,7 @@ where
 
 *DT<sub>w</sub>  is the sensible temperature rise of water (100.0 – 20.0=80.0* *°C);*
 
-*<div img="image2143.txt">\({\dot V_{rated}}\)</div> is the rated capacity of the humidifier in volumetric flow rate.*
+*<span>${\dot V_{rated}}$</span> is the rated capacity of the humidifier in volumetric flow rate.*
 
 *h<sub>fg</sub> is the latent heat of vaporization of water at 100.0°C, (J/kg);*
 
@@ -2125,9 +2225,9 @@ Where,
 
 where
 
-<div img="image2145.txt">\({\dot m_w}\)</div>* iswater mass flow rate, kg/s;*
+<span>${\dot m_w}$</span>* iswater mass flow rate, kg/s;*
 
-<div img="image2146.txt">\({\dot m_a}\)</div>* is design air mass flow rate, kg/s;*
+<span>${\dot m_a}$</span>* is design air mass flow rate, kg/s;*
 
 *ω<sub>o</sub> is design outlet humidity ratio, kg-water/kg-air; *
 
@@ -2143,7 +2243,7 @@ The air mass flow rate and humidity ratios are determined based upon zone design
 
 <div>\[{\omega_i} = Min\left( {OutHumRatAtCoolPea{k_{zone}},OutHumRatAtHeatPea{k_{zone}}} \right)\]</div>
 
-      <div img="image2149.txt">\({\omega_o} = Max\left( {ZoneHumRatAtCoolPea{k_{zone}},ZoneHumRatAtHeatPea{k_{zone}}} \right)\)</div>
+      <span>${\omega_o} = Max\left( {ZoneHumRatAtCoolPea{k_{zone}},ZoneHumRatAtHeatPea{k_{zone}}} \right)$</span>
 
 
 
@@ -2159,7 +2259,7 @@ If the unit is part of the central air system, then check if outdoor air system 
 
 <div>\[{\omega_i} = Min\left( {CoolOutHumRa{t_{sys}},HeatOutHumRa{t_{sys}}} \right)\]</div>
 
-      <div img="image2152.txt">\({\omega_o} = Max\left( {CoolSupHumRa{t_{sys}},HeatSupHumRa{t_{sys}}} \right)\)</div>
+      <span>${\omega_o} = Max\left( {CoolSupHumRa{t_{sys}},HeatSupHumRa{t_{sys}}} \right)$</span>
 
 Otherwise, air mass flow rate is determined as follows:
 
@@ -2177,13 +2277,13 @@ for duct type = *heating*
 
 for duct type = *other*
 
-<div img="image2156.txt">\({\dot m_a} = DesMainVolFlo{w_{sys}} \cdot {\rho_a}\)</div>,
+<span>${\dot m_a} = DesMainVolFlo{w_{sys}} \cdot {\rho_a}$</span>,
 
 and the humidity ratios are:
 
 <div>\[{\omega_i} = Min\left( {CoolMixHumRa{t_{sys}},HeatMixHumRa{t_{sys}}} \right)\]</div>
 
-      <div img="image2158.txt">\({\omega_o} = Max\left( {CoolSupHumRa{t_{sys}},HeatSupHumRa{t_{sys}}} \right)\)</div>
+      <span>${\omega_o} = Max\left( {CoolSupHumRa{t_{sys}},HeatSupHumRa{t_{sys}}} \right)$</span>
 
 ### Cooling Tower Sizing
 
@@ -2235,11 +2335,11 @@ where
 
 r<sub>air</sub> is the density of air at standard conditions.
 
-For the CoolingTower:VariableSpeed:Merkel model, the design air flow rate is determined from the nominal capacity using a scaling factor, <div img="image2164.txt">\({f_{airflow/W}}\)</div>,in units of m<sup>3</sup>/s/W.  The default value is 2.76316\*10<sup>-5</sup>.  When the input field is left blank, the default is used as follows
+For the CoolingTower:VariableSpeed:Merkel model, the design air flow rate is determined from the nominal capacity using a scaling factor, <span>${f_{airflow/W}}$</span>,in units of m<sup>3</sup>/s/W.  The default value is 2.76316\*10<sup>-5</sup>.  When the input field is left blank, the default is used as follows
 
 <div>\[{\dot V_{tower,air,des}} = {\dot Q_{tower,nom}} \bullet {f_{airflow/W}} \bullet \frac{{101325}}{{{P_{std,altitude}}}}\]</div>
 
-where, <div img="image2166.txt">\({P_{std,altitude}}\)</div> is the standard barometric pressure for the location’s elevation.
+where, <span>${P_{std,altitude}}$</span> is the standard barometric pressure for the location’s elevation.
 
 When the input field is filled with a hard value, the pressure scaling is not used
 
@@ -2257,9 +2357,9 @@ for *Tower Performance Input Method* = *UFactorTimesAreaAndDesignWaterFlowRate*
 
 for *Tower Performance Input Method* = *NominalCapacity*
 
-<div img="image2169.txt">\(\dot Qtower,des = 1.25\cdot \dot Qtower,nom\)</div>(to allow for compressor heat)
+<span>$\dot Qtower,des = 1.25\cdot \dot Qtower,nom$</span>(to allow for compressor heat)
 
-Where, <div img="image2170.txt">\({f_{des,heat,ratio}}\)</div> is the ratio of actual heat rejection capacity to nominal capacity.  This ratio is available as a user input with a default value of 1.25 (to allow for compressor heat).
+Where, <span>${f_{des,heat,ratio}}$</span> is the ratio of actual heat rejection capacity to nominal capacity.  This ratio is available as a user input with a default value of 1.25 (to allow for compressor heat).
 
 Then we assign the inputs needed for the model.
 
@@ -2293,7 +2393,7 @@ The fan power at low fan speed is set to a fraction of the fan power at full spe
 
 #### Tower UA Value at Low Fan Speed
 
-For *Tower Performance Input Method* = *UFactorTimesAreaAndDesignWaterFlowRate* the low speed UA is set to a fraction of the full speed UA.  The fraction is available for user input in the field called Low Fan Speed U-Factor Times Area Sizing Factor. The default is 0.6. For *Tower Performance Input Method* = *NominalCapacity* the low speed UA is calculated in the same manner as the full speed UA using <div img="image2171.txt">\(\dot Qtower,nom,lowspeed\)</div> instead of <div img="image2172.txt">\(\dot Qtower,nom\)</div>.
+For *Tower Performance Input Method* = *UFactorTimesAreaAndDesignWaterFlowRate* the low speed UA is set to a fraction of the full speed UA.  The fraction is available for user input in the field called Low Fan Speed U-Factor Times Area Sizing Factor. The default is 0.6. For *Tower Performance Input Method* = *NominalCapacity* the low speed UA is calculated in the same manner as the full speed UA using <span>$\dot Qtower,nom,lowspeed$</span> instead of <span>$\dot Qtower,nom$</span>.
 
 #### Air Flow Rate in Free Convection Regime
 
@@ -2301,7 +2401,7 @@ The free convection air flow rate is set to a fraction of the full air flow rate
 
 #### Tower UA Value in Free Convection Regime
 
-For *Tower Performance Input Method* = *UA and Design Water Flow Rate* the low speed UA is set to a fraction of the full speed UA. The fraction is available for user input in the field called Free Convection U-Factor Times Area Value Sizing Factor. The default is 0.1. For *Tower Performance Input Method* = *NominalCapacity* the low speed UA is calculated in the same manner as the full speed UA using <div img="image2173.txt">\(\dot Qtower,nom,freeconv\)</div> instead of <div img="image2174.txt">\(\dot Qtower,nom\)</div>.
+For *Tower Performance Input Method* = *UA and Design Water Flow Rate* the low speed UA is set to a fraction of the full speed UA. The fraction is available for user input in the field called Free Convection U-Factor Times Area Value Sizing Factor. The default is 0.1. For *Tower Performance Input Method* = *NominalCapacity* the low speed UA is calculated in the same manner as the full speed UA using <span>$\dot Qtower,nom,freeconv$</span> instead of <span>$\dot Qtower,nom$</span>.
 
 ### Fluid Cooler Sizing
 
@@ -2337,23 +2437,23 @@ If *Performance Input Method* = *UFactorTimesAreaAndDesignWaterFlowRate* then
 
 #### ElseifPerformance Input Method= NominalCapacitythen
 
-      <div img="image2178.txt">\({\dot Q_{fan,nom}} = 0.0105 \bullet {\dot Q_{fluidcooler,nom}}\)</div>
+      <span>${\dot Q_{fan,nom}} = 0.0105 \bullet {\dot Q_{fluidcooler,nom}}$</span>
 
   Where
 
-      <div img="image2179.txt">\({\dot Q_{fluidcooler,nom}}\)</div> is provided by the user.
+      <span>${\dot Q_{fluidcooler,nom}}$</span> is provided by the user.
 
 #### Design Air Flow Rate
 
 n For Performance Input Method = UFactorTimesAreaAndDesignWaterFlowRate
 
-  <div img="image2180.txt">\({\dot Q_{fluidcooler,nom}} = {C_{p,w}} \bullet {\rho_w} \bullet {\dot V_{fluidcooler,w,des}} \bullet \Delta {T_{loop,des}}\)</div>
+  <span>${\dot Q_{fluidcooler,nom}} = {C_{p,w}} \bullet {\rho_w} \bullet {\dot V_{fluidcooler,w,des}} \bullet \Delta {T_{loop,des}}$</span>
 
 n For Performance Input Method = NominalCapacity
 
-  <div img="image2181.txt">\({\dot Q_{fluidcooler,nom}}\)</div> is provided by the user.
+  <span>${\dot Q_{fluidcooler,nom}}$</span> is provided by the user.
 
-  <div img="image2182.txt">\({\dot V_{fluidcooler,air,des}} = {\dot Q_{fluidcooler,nom}}/({T_{in,water}} - {T_{in,air}})*4\)</div>
+  <span>${\dot V_{fluidcooler,air,des}} = {\dot Q_{fluidcooler,nom}}/({T_{in,water}} - {T_{in,air}})*4$</span>
 
 Where,
 
@@ -2369,11 +2469,11 @@ The design fluid cooler load is:
 
 n For Performance Input Method = UFactorTimesAreaAndDesignWaterFlowRate
 
-  <div img="image2183.txt">\({\dot Q_{fluidcooler,nom}} = {C_{p,w}} \bullet {\rho_w} \bullet {\dot V_{fluidcooler,w,des}} \bullet \Delta {T_{loop,des}}\)</div>
+  <span>${\dot Q_{fluidcooler,nom}} = {C_{p,w}} \bullet {\rho_w} \bullet {\dot V_{fluidcooler,w,des}} \bullet \Delta {T_{loop,des}}$</span>
 
 n For Performance Input Method = NominalCapacity
 
-  <div img="image2184.txt">\({\dot Q_{fluidcooler,nom}}\)</div> is provided by the user.
+  <span>${\dot Q_{fluidcooler,nom}}$</span> is provided by the user.
 
 Then we assign the inputs needed for the model.
 
@@ -2407,7 +2507,7 @@ The fan power at low fan speed is set to a fraction of the fan power at full spe
 
 #### Fluid cooler UA Value at Low Fan Speed
 
-For *Performance Input Method* = *UFactorTimesAreaAndDesignWaterFlowRate* the low speed UA is set to a fraction of the full speed UA. .  The fraction is available for user input in the field called Low Fan Speed U-Factor Times Area Sizing Factor. The default is 0.6. For *Performance Input Method* = *NominalCapacity* the low speed UA is calculated in the same manner as the full speed UA using <div img="image2187.txt">\({\dot Q_{fluidcooler,nom,lowspeed}}\)</div> instead of <div img="image2188.txt">\({\dot Q_{fluidcooler,nom}}\)</div>.
+For *Performance Input Method* = *UFactorTimesAreaAndDesignWaterFlowRate* the low speed UA is set to a fraction of the full speed UA. .  The fraction is available for user input in the field called Low Fan Speed U-Factor Times Area Sizing Factor. The default is 0.6. For *Performance Input Method* = *NominalCapacity* the low speed UA is calculated in the same manner as the full speed UA using <span>${\dot Q_{fluidcooler,nom,lowspeed}}$</span> instead of <span>${\dot Q_{fluidcooler,nom}}$</span>.
 
 ### Evaporative Fluid cooler Sizing
 
@@ -2453,7 +2553,7 @@ Finally
 
 Where
 
-<div img="image2194.txt">\({\dot Q_{fluidcooler,design}}\)</div>is the design capacity provided by the user for the other two performance input methods
+<span>${\dot Q_{fluidcooler,design}}$</span>is the design capacity provided by the user for the other two performance input methods
 
 #### Design Air Flow Rate
 
@@ -2479,7 +2579,7 @@ n For Performance Input Method = UFactorTimesAreaAndDesignWaterFlowRate
 
 n For Performance Input Method = StandardDesignCapacity
 
-<div img="image2197.txt">\({\dot Q_{fluidcooler,design}} = 1.25 \bullet {\dot Q_{fluidcooler,standarddesign}}\)</div> (to allow for compressor heat)
+<span>${\dot Q_{fluidcooler,design}} = 1.25 \bullet {\dot Q_{fluidcooler,standarddesign}}$</span> (to allow for compressor heat)
 
 Then we assign the inputs needed for the model.
 
@@ -2495,7 +2595,7 @@ n For Performance Input Method = UserSpecifiedDesignCapacity
 
 <div>\[{\dot Q_{fluidcooler,design}} = {\dot Q_{fluidcooler,userspecifieddesign}}\]</div>
 
-Where, <div img="image2199.txt">\({f_{des,heat,ratio}}\)</div> is the ratio of actual heat rejection capacity to nominal capacity.  This ratio is available as a user input with a default value of 1.25 (to allow for compressor heat)
+Where, <span>${f_{des,heat,ratio}}$</span> is the ratio of actual heat rejection capacity to nominal capacity.  This ratio is available as a user input with a default value of 1.25 (to allow for compressor heat)
 
 Then we assign the inputs needed for the model.
 
@@ -2537,7 +2637,7 @@ The fan power at low fan speed is set to a fraction of the fan power at full spe
 
 #### Fluid cooler UA Value at Low Fan Speed
 
-For *Performance Input Method* = *UFactorTimesAreaAndDesignWaterFlowRate* the low speed UA is set to a fraction of the full speed UA. The fraction is available for user input in the field called Low Fan Speed U-Factor Times Area Sizing Factor. The default is 0.6. For *Performance Input Method* = *StandardDesignCapacity* (and similarly for *UserSpecifiedDesignCapacity method*) the low speed UA is calculated in the same manner as the full speed UA using <div img="image2203.txt">\({\dot Q_{fluidcooler,standarddesign,lowspeed}}\)</div> instead of <div img="image2204.txt">\({\dot Q_{fluidcooler,standarddesign}}\)</div>.
+For *Performance Input Method* = *UFactorTimesAreaAndDesignWaterFlowRate* the low speed UA is set to a fraction of the full speed UA. The fraction is available for user input in the field called Low Fan Speed U-Factor Times Area Sizing Factor. The default is 0.6. For *Performance Input Method* = *StandardDesignCapacity* (and similarly for *UserSpecifiedDesignCapacity method*) the low speed UA is calculated in the same manner as the full speed UA using <span>${\dot Q_{fluidcooler,standarddesign,lowspeed}}$</span> instead of <span>${\dot Q_{fluidcooler,standarddesign}}$</span>.
 
 ### Fan Coil Unit Sizing
 
@@ -2557,7 +2657,7 @@ Fan Coil units are compound components: each unit contains a fan, hot water coil
 
 *T<sub>coil,out</sub>*=*HeatDesTemp<sub>zone</sub>*
 
-<sub><div img="image2207.txt">\(\dot Qcoil,des = cp,air\cdot DesHeatMassFlowzone\cdot (Tout,coil - Tin,coil)\)</div></sub>
+<sub><span>$\dot Qcoil,des = cp,air\cdot DesHeatMassFlowzone\cdot (Tout,coil - Tin,coil)$</span></sub>
 
 <div>\[\dot Vmax,hw = \dot Qcoil,des/(cp,w\cdot \rho w\cdot \Delta Tloop,des)\]</div>
 
@@ -2579,7 +2679,7 @@ where
 
 *H<sub>coil,out</sub>*= *PsyHFnTdbW*(*T<sub>coil,out</sub>*, *W<sub>coil,out</sub>*)
 
-<sub><div img="image2209.txt">\(\dot Qcoil,des = DesCoolMassFlowzone\cdot (hin,coil - hout,coil)\)</div></sub>
+<sub><span>$\dot Qcoil,des = DesCoolMassFlowzone\cdot (hin,coil - hout,coil)$</span></sub>
 
 <div>\[\dot Vmax,hw = \dot Qcoil,des/(cp,w\cdot \rho w\cdot \Delta Tloop,des)\]</div>
 
@@ -2767,7 +2867,7 @@ Basically minimum air flow rates are sized to the ventilation air requirement. T
 
 For the PIU's, the minimum primary air flow fraction is set to
 
-<div img="image2233.txt">\(\mathop {MinOA}\nolimits_{zone} /{\dot V_{air,max,primary,terminal}}\)</div>.
+<span>$\mathop {MinOA}\nolimits_{zone} /{\dot V_{air,max,primary,terminal}}$</span>.
 
 For other VAV terminal units
 
@@ -2787,7 +2887,7 @@ For the parallel PIU, this is set to the minimum primary air flow fraction.
 
 The coil load and max hot water flow rate are then:
 
-<sub><div img="image2237.txt">\(\dot Qcoil,des = cp,air\cdot \rho air\cdot \dot Vair,coil,heating\cdot (Tout,coil - Tin,coil)\)</div></sub>
+<sub><span>$\dot Qcoil,des = cp,air\cdot \rho air\cdot \dot Vair,coil,heating\cdot (Tout,coil - Tin,coil)$</span></sub>
 
 <div>\[\dot Vmax,hw = \dot Qcoil,des/(cp,w\cdot \rho w\cdot \Delta Tloop,des)\]</div>
 
@@ -2829,13 +2929,13 @@ If the cooler is part of the outdoor air path of a central air system, then the 
 
 The secondary DX coils model does not have a standalone object and it is models as add-on feature to the DX Coils. When the secondary DX coil is added to a primary DX cooling coil, the heat rejected to secondary zone is sensible only and is treated as tnternal gain, hence secondary air flow rate is not required in the model.  Where as when the secondary DX coil is added to a primary DX heating coil, then the heat removed from  secondary zone may have sensible and latent components and is treated as tnternal gain. The sensible/latent component split among other parameters requires secondary coil air flow rate. Hence secondary coil air flow rate sizing is added based on the primary DX cooling coil only.
 
-<div>\[\[\dot{V}_\rm{SecCoil} = \dot{V}_\rm{PriHeatCoil}\cdot \rm{ScalingFactor}\]</div>
+<div>\[\dot{V}_\rm{SecCoil} = \dot{V}_\rm{PriHeatCoil}\cdot \text{ScalingFactor}\]</div>
 
 where
 
-* \(\dot{V}_\rm{SecCoil}\) is the secondary coil design air flow rate (m3/s)
-* \(\dot{V}_\rm{SecCoil}\) is the primary heating DX coil design air flow rate (kg/s)
-* \(\rm{ScalingFactor}\) is the secondary DX coil air flow rarte scaling factor (-)
+* <span>$\dot{V}_\text{SecCoil}$</span> is the secondary coil design air flow rate (m3/s)
+* <span>$\dot{V}_\text{SecCoil}$</span> is the primary heating DX coil design air flow rate (kg/s)
+* <span>$\text{ScalingFactor}$</span> is the secondary DX coil air flow rarte scaling factor (-)
 
 ### Desiccant Dehumidifier Sizing
 
@@ -2895,14 +2995,12 @@ where
 
 The solution of the following regression equation is used, assuming saturation effectiveness of 70% and face air velocity of 3m/s:
 
-<div>\[\eps = 0.792714 + 0.958569D - 0.25193V - 1.03215D^2 + 0.0262659V^2 + 0.914869DV
-
-- 1.48241VD^2 - 0.018992 D V^3 + 1.13137D^3V + 0.0327622 D^2V^3 - 0.145384D^3 V^2\]</div>
+<div>\[\epsilon = 0.792714 + 0.958569D - 0.25193V - 1.03215D^2 + 0.0262659V^2 + 0.914869DV - 1.48241VD^2 - 0.018992 D V^3 + 1.13137D^3V + 0.0327622 D^2V^3 - 0.145384D^3 V^2\]</div>
 
 where
 
 * \(D\) is depth of pad, m
-* \(\eps\)is saturation effectiveness
+* \(\epsilon\)is saturation effectiveness
 
 ### Heat Recovery Sizing
 
@@ -2958,7 +3056,7 @@ The sizing is done in subroutine *SizeLowTempRadiantSystem*.
 
 where
 
-<div img="image2261.txt">\({\dot V_h}\)</div>* is maximum hot water flow rate, m<sup>3</sup>/s*
+<span>${\dot V_h}$</span>* is maximum hot water flow rate, m<sup>3</sup>/s*
 
 *c<sub>p,h</sub> is specific heat of hot water at reference condition (60°C), J/kgK*
 
@@ -2968,7 +3066,7 @@ where
 
 <div>\[{\dot V_c} = \frac{{DesCoolLoa{d_{zone}} \cdot CoolSizingFactor}}{{\Delta {T_c} \cdot {c_{p,c}} \cdot {\rho_c}}}\]</div>
 
-<div img="image2263.txt">\({\dot V_c}\)</div>* is maximum chilled water flow rate, m<sup>3</sup>/s*
+<span>${\dot V_c}$</span>* is maximum chilled water flow rate, m<sup>3</sup>/s*
 
 *c<sub>p,c</sub> is specific heat of hot water at reference condition (5°C), J/kgK*
 
@@ -2999,8 +3097,8 @@ The design data is provided as a group of inputs that are recognized by designer
 
 * Outdoor air per person
 * Outdoor air per zone floor area
-*�Outdoor air per zone
-*�Outdoor air changes per hour
+* Outdoor air per zone
+* Outdoor air changes per hour
 
 This design data is entered in an outdoor air design data object and may be referenced by other objects during the simulation. A single specification for outdoor air design data may be used by all other appropriate objects within EnergyPlus, or multiple outdoor air design data objects may be specified and these design data objects may be used as necessary by other objects when outdoor air design quantaties vary for any reason.
 
@@ -3040,41 +3138,41 @@ As previously mentioned, this group of outdoor air design data is reference by o
 
 where:
 
-<div img="image2269.txt">\(O{A_{people}}\)</div>= outdoor air volume flow rate based on occupancy, [m<sup>3</sup>/s]
+<span>$O{A_{people}}$</span>= outdoor air volume flow rate based on occupancy, [m<sup>3</sup>/s]
 
-<div img="image2270.txt">\(Oc{c_{zone}}\)</div>= number of occupants in zone, [people]
+<span>$Oc{c_{zone}}$</span>= number of occupants in zone, [people]
 
-<div img="image2271.txt">\(OAFlowperPerson\)</div>= outdoor air volume flow rate per person, [m<sup>3</sup>/s-person]
+<span>$OAFlowperPerson$</span>= outdoor air volume flow rate per person, [m<sup>3</sup>/s-person]
 
-<div img="image2272.txt">\(O{A_{floor\;area}}\)</div>= outdoor air volume flow rate based on zone floor area, [m<sup>3</sup>/s]
+<span>$O{A_{floor\;area}}$</span>= outdoor air volume flow rate based on zone floor area, [m<sup>3</sup>/s]
 
-<div img="image2273.txt">\({A_{zone}}\)</div>= zone floor area, [m<sup>2</sup>]
+<span>${A_{zone}}$</span>= zone floor area, [m<sup>2</sup>]
 
-<div img="image2274.txt">\(OAFlowperFloorArea\)</div>= outdoor air volume flow rate per zone floor area, [m<sup>3</sup>/s-m<sup>2</sup>]
+<span>$OAFlowperFloorArea$</span>= outdoor air volume flow rate per zone floor area, [m<sup>3</sup>/s-m<sup>2</sup>]
 
-<div img="image2275.txt">\(O{A_{zone}}\)</div>= zone outdoor air volume flow rate, [m<sup>3</sup>/s]
+<span>$O{A_{zone}}$</span>= zone outdoor air volume flow rate, [m<sup>3</sup>/s]
 
-<div img="image2276.txt">\(OAFlowperZone\)</div>= outdoor air volume flow rate per zone, [m<sup>3</sup>/s]
+<span>$OAFlowperZone$</span>= outdoor air volume flow rate per zone, [m<sup>3</sup>/s]
 
-<div img="image2277.txt">\(O{A_{ACH}}\)</div>= outdoor air volume flow rate based on air changes per hour, [m<sup>3</sup>/s]
+<span>$O{A_{ACH}}$</span>= outdoor air volume flow rate based on air changes per hour, [m<sup>3</sup>/s]
 
-<div img="image2278.txt">\({V_{zone}}\)</div>= zone volume, [m<sup>3</sup>]
+<span>${V_{zone}}$</span>= zone volume, [m<sup>3</sup>]
 
-<div img="image2279.txt">\(OAFlowAirChangesperHour\)</div>= outdoor air volume flow in air changes per hour, [m<sup>3</sup>/s-m<sup>3</sup>]
+<span>$OAFlowAirChangesperHour$</span>= outdoor air volume flow in air changes per hour, [m<sup>3</sup>/s-m<sup>3</sup>]
 
 Given the calculations for each specific type of design data, the method used to calculate the outdoor air design data is then based on a user selected method for this specific outdoor air design data object. The outdoor air methods used to calculate the outdoor air quantity and the associated value for outdoor air volume flow rate are shown here.
 
-Flow/Person =&gt; <div img="image2280.txt">\(O{A_{people}}\)</div>
+Flow/Person =&gt; <span>$O{A_{people}}$</span>
 
-Flow/Area =&gt; <div img="image2281.txt">\(O{A_{floor\,area}}\)</div>
+Flow/Area =&gt; <span>$O{A_{floor\,area}}$</span>
 
-Flow/Zone =&gt; <div img="image2282.txt">\(O{A_{zone}}\)</div>
+Flow/Zone =&gt; <span>$O{A_{zone}}$</span>
 
-AirChanges/Hour =&gt; <div img="image2283.txt">\(O{A_{ACH}}\)</div>
+AirChanges/Hour =&gt; <span>$O{A_{ACH}}$</span>
 
-Sum =&gt; <div img="image2284.txt">\(O{A_{people}}\, + \,O{A_{floor\,area}}\, + \,O{A_{zone}}\, + \,O{A_{ACH}}\)</div>
+Sum =&gt; <span>$O{A_{people}}\, + \,O{A_{floor\,area}}\, + \,O{A_{zone}}\, + \,O{A_{ACH}}$</span>
 
-Maximum =&gt; <div img="image2285.txt">\(MAX\left( {O{A_{people}}\,,\,O{A_{floor\,area}}\,,\,O{A_{zone}}\,,\,O{A_{ACH}}} \right)\)</div>
+Maximum =&gt; <span>$MAX\left( {O{A_{people}}\,,\,O{A_{floor\,area}}\,,\,O{A_{zone}}\,,\,O{A_{ACH}}} \right)$</span>
 
 If an Outdoor Air Flow Rate Fraction Schedule Name is specified, the flow rate determined above will be multiplied by the current schedule value.
 

@@ -1,4 +1,4 @@
-Simulation Models ‚Äì Encyclopedic Reference
+Simulation Models - Encyclopedic Reference
 ==========================================
 
 The following descriptions are grouped alphabetically (as much as possible) with some also having additional tags of ‚ÄúHeat Balance‚Äù, ‚ÄúHVAC‚Äù, and ‚ÄúPlant‚Äù.¬† With the integrated solution, these designations signify where the effects of these models have their first impacts.
@@ -6210,15 +6210,15 @@ where
 *\(\dot{m}_\text{sec}\) is the secondary DX coil mass flow rate, (kg/s)
 *\(PLR\) is the primary DX cooling coil compressor part-load ratio, (-)
 *\(P_\text{Tot}\) is the total pressure at the inlet of secondary DX coil, (Pa)
-*\(T_\text{OutletNode}\) is the secondary coil outlet air temperature, (∞C)
-*\(T_\text{OutletNode,Sat}\) is the secondary coil saturated air temperature at the outlet enthalpy, (∞C)
+*\(T_\text{OutletNode}\) is the secondary coil outlet air temperature, (degC)
+*\(T_\text{OutletNode,Sat}\) is the secondary coil saturated air temperature at the outlet enthalpy, (degC)
 *\(\omega_\text{InletNode}\) is the secondary coil inlet node air humidity ratio, (kgH2O/kgDryair)
 *\(\omega_\text{OutletNode}\) is the secondary coil outlet node air humidity ratio, (kgH2O/kgDryair)
 
 
 ### Packaged Thermal Storage Cooling Coil
 
-The DX cooling coil model for Coil:Cooling:DX:SingleSpeed:ThermalStorage is described in this section. The following diagram shows the main aspects of the model for packaged thermal energy storage cooling coil.† This model allows charging and discharging to shift cooling energy use. The dashed line shows the boundary of the empirical "black box" model.† The main parts are the Condenser, Evaporator, Compressor, and Thermal Energy Storage (TES) tank.† The model interacts with the surroundings via a condenser inlet and outlet nodes, evaporator inlet and outlet nodes, heat transfer between TES tank and surrounding ambient environment, and optional added plant connection to the TES tank.
+The DX cooling coil model for Coil:Cooling:DX:SingleSpeed:ThermalStorage is described in this section. The following diagram shows the main aspects of the model for packaged thermal energy storage cooling coil.  This model allows charging and discharging to shift cooling energy use. The dashed line shows the boundary of the empirical "black box" model.  The main parts are the Condenser, Evaporator, Compressor, and Thermal Energy Storage (TES) tank.  The model interacts with the surroundings via a condenser inlet and outlet nodes, evaporator inlet and outlet nodes, heat transfer between TES tank and surrounding ambient environment, and optional added plant connection to the TES tank.
 
 ![](EngineeringReference/media/image4287.png)
 
