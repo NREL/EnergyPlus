@@ -2926,7 +2926,6 @@ namespace SimAirServingZones {
 		// Flag is reset at beginning of each iteration (Subroutine SimHVAC)
 		AirLoopControlInfo( AirLoopNum ).CoolingActiveFlag = AirLoopControlInfo( AirLoopNum ).CoolingActiveFlag || CoolingActive;
 		AirLoopControlInfo( AirLoopNum ).HeatingActiveFlag = AirLoopControlInfo( AirLoopNum ).HeatingActiveFlag || HeatingActive;
-
 	}
 
 	void
