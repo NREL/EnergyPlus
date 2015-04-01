@@ -136,13 +136,17 @@ The Engineering Reference provides more in-depth knowledge into the theoretical 
 
 ***Encyclopedic Reference:***If the information did not fit in the above categories, then the last part of the Engineering Reference is a detailed description of the various models.
 
-### Application Menu and Application Guides
+### Application Guides
 
 The application guides are intended to address specific applications using EnergyPlus where the other documents may not provide cohesive examples of intended usage; that is, the techniques for doing certain things may be spread throughout other documents but warrant a more “how to” approach that will be present in these documents. The application guides are intended to become more prolific over time, specifically targeted to questions users have sent to the helpdesk support site.
 
 ***Current Application Guides:***
 
 ***EMS Application Guide:*** This guide contains information useful to use the advanced feature of EnergyPlus: Energy Management System tweaks. The Erl language is described and examples for use are given.
+
+***External Interface Application Guide:*** This guide contains information specific to using the external interface feature of EnergyPlus to connect other simulation systems.
+
+***Plant Application Guide:*** This guide details the methods for simulating real chilled and hot water plant systems within EnergyPlus.
 
 ***Using EnergyPlus for Compliance Guide:*** This guide contains information specific to using EnergyPlus in Compliance and Standard Rating systems.
 
@@ -154,8 +158,6 @@ The application guides are intended to address specific applications using Energ
 
 The following documents will be most useful to potential developers of EnergyPlus, both Interface Developers and Module Developers. Interface Developers will be creating input and output wraps on EnergyPlus so that is it is usable to the architect, design engineers, and others. Module developers will be creating new modules within the EnergyPlus structure and framework.
 
-***Programming Standards:*** This document is the source of all major policies relating to the actual EnergyPlus source code. It describes rules to which all program code should adhere, notes how to structure and modularize code, and provides a listing of “approved” input and output units. As a result, it is an important document for both interface and module developers.
-
 ***Interface Developer’s Guide:*** This document is critically important to persons interested in developing an interface that provides input to and read output from EnergyPlus. It is a comprehensive guide to the input data dictionary and the input data files that contain a user’s building data. Each piece of input syntax is described in detail. In addition, the mechanism for obtaining output and the format in which output will be produced are discussed. This document also contains sections on weather files and units. Numerous samples and examples are given throughout the document with a full file length example provided in the appendix.
 
 ***Module Developer’s Guide:*** This document contains a wealth of information that is intended to provide as much assistance as possible to persons interested in adding modules to the EnergyPlus program. It reviews the module concept as outlined in the programming standard and how they have been implemented in EnergyPlus. It provides a description of how the various modules work together and how the program is structured from a module tree (inverted tree) perspective. One of the most important features of this document is a list of standard EnergyPlus service subroutines and modules that greatly simplify the developers’ task of integrating their work into the program. Input and output issues are also addressed from the perspective of how modules actually obtain data from the input file and how each section of the code sends data to the output files.
@@ -165,64 +167,46 @@ Getting Started with EnergyPlus
 
 The remainder of this document is intended to give you a start on using the program with a few simple tools (EP-Launch to help run the simulation; IDFEditor to help create or look at input files) as well as some of the features (such as energy meters, simulation results) of using the program.
 
-A developer has also created a tutorial set of pages for EnergyPlus, you may wish to visit:
+For learning about a specific input file, or a specific input object, the install includes two documents in the ExampleFiles folder:
 
- Link to the tutorials section. It may be better to have two screens available so that you can go through the steps as you are reading the tutorial.
-
-In addition, the install includes two spreadsheets:
-
-- Example Files Summary Spreadsheet (highlights of each example file)
+- Example Files Summary (highlights of each example file)
 
 - Example Files Links to Objects (for any object, up to 3 files using that object are shown)
 
-And for those who want to get results quickly, use the EnergyPlus Example File Generator:
-
-
-
-The Example File Generator will take your descriptive details about a building (or you could use an EnergyPlus input file), run the simulation at the location you pick and send the results along with an input file to your email address.
-
 The standard Windows install procedure has put the following information on your computer, in the directories/folders shown.
 
-(You were allowed to select components, so not all of these may be there).
-
-The main EnergyPlus folder contains **Energy+.idd**, **EnergyPlus.exe**, **RunEPlus.bat**, shortcut to **IDFEditor**, **readme file(s)**, **EP-Macro.exe**, **bugreprt.txt** file. This will also contain the translation.exe for converting last “release” input files to the current release (see: [Auxiliary Programs](file:///E:\Docs4PDFs\AuxiliaryPrograms.pdf) document for details) and the WinEPDraw program (again in the Auxiliary Programs document). If chosen, the EP-Launch program will be in this directory as well.
+The main EnergyPlus folder contains:
+* Energy+.idd
+* EnergyPlus.exe and dependent shared libraries (dll files)
+* RunEPlus.bat and other batch files for running EnergyPlus
+* readme file(s), license, etc.
+* EP-Macro.exe and other support binaries
+* bugreprt.txt 
 
 The general layout of folders from the install looks like:
 
-\\EnergyPlus main folder
-
-       \\Documentation
-
-              the PDF files of the documentation
-
-       \\DataSets
-
-              Reference Data Sets (libraries)
-
-       \\MacroDataSets
-
-              Macroized Reference Data Sets (libraries)
-
-       \\PreProcess
-
-              \\IDFEditor           Program files for the IDFEditor
-
-              \\GrndTempCalc        Special program to calculate ground temperatures.
-
-              \\BLASTTranslator
-
-              \\DOE2Translator
-
-              \\WeatherConverter
-
-       \\PostProcess
-
-              ReadVarsEso          The simple post processor exe.
-
-       \\ExampleFiles        Sample input, output, results files shipped with the program.
-
-       \\WeatherData         Sample weather files shipped with the program.
-
+```
+. EnergyPlus main folder
++-- Documentation
+|   +-- A link to find the documentation online, and any additional docs packaged with the installation
++-- DataSets
+|   +-- Reference Data Sets (libraries)
++-- MacroDataSets
+|   +-- Macroized Reference Data Sets (libraries)
++-- PreProcess
+|   +-- FMUParser              Tool for external interface specific applications
+|   +-- IDFEditor              Program files for the IDFEditor
+|   +-- GrndTempCalc           Special program to calculate ground temperatures.
+|   +-- DOE2Translator         Simple translator for DOE-2 files
+|   +-- WeatherConverter       Tool for performing weather file creation and conversion
+|   +-- ParametricPreprocessor Parametric simulation tool
+|   +-- IDFVersionUpdater      Graphical tool for updating old EnergyPlus files to the latest version
++-- PostProcess
+|   +-- ReadVarsEso            The simple post processor exe.
+|   +-- EPCompare              A graphical tool for comparing two EnergyPlus output sets
++-- ExampleFiles               Sample input, output, results files shipped with the program.
++-- WeatherData                Sample weather files shipped with the program.
+```
 
 
 Running EnergyPlus
@@ -292,23 +276,23 @@ You can also view the results using one of the three buttons ("Text Output Files
 
 By pressing the "Text Output Files” button, a text editor will open each of the text output files. Up to 29 files will open, if they exist. Selecting “Single File” from the ‘View “ menu displays a menu of all available output files from which any file can be opened individually. Each file may also be opened with an associated function key. The output files and function key shortcuts are listed below:
 
-1.    Variable – tabulated results in comma, tab or space delimited format (generated by the ReadVarsESO postprocessor) (F4)
+1. Variable – tabulated results in comma, tab or space delimited format (generated by the ReadVarsESO postprocessor) (F4)
 
-2.    ESO – raw report variable output (F5),
+2. ESO – raw report variable output (F5),
 
-3.    RDD – list of output variables available from the run (F6).
+3. RDD – list of output variables available from the run (F6).
 
-4.    MDD – list of output meters available from the run (Shift-Ctrl-F3)
+4. MDD – list of output meters available from the run (Shift-Ctrl-F3)
 
-5.    EIO – additional EnergyPlus results (F7),
+5. EIO – additional EnergyPlus results (F7),
 
-6.    ERR – list of errors and warnings (F8),
+6. ERR – list of errors and warnings (F8),
 
-7.    BND – HVAC system node and component connection details (F9),
+7. BND – HVAC system node and component connection details (F9),
 
-8.    MTR – raw report meter output (F11),
+8. MTR – raw report meter output (F11),
 
-9.    MTD – list of meter component variables (F12)
+9. MTD – list of meter component variables (F12)
 
 10. METER File – tabulated meter report in comma, tab or space delimited format (generated by the ReadVarsESO postprocessor) (Ctrl-F4)
 
@@ -563,8 +547,8 @@ Table 1. Error Message Levels – Required Actions
 
 <table class="table table-striped">
 <tr>
-<td>Error Level</td>
-<td>Action</td>
+<th>Error Level</th>
+<th>Action</th>
 </tr>
 <tr>
 <td>Information, shown as *********</td>
@@ -680,13 +664,13 @@ The details of the building construction and operation are shown in the followin
 
 <table class="table table-striped">
 <tr>
-<td>Material  (listed from outside to inside)</td>
-<td>Conductivity (W/m-K)</td>
-<td>Thickness (m)</td>
-<td>U (W/m<sup>2</sup>-K)</td>
-<td>R (m<sup>2</sup>-K/W)</td>
-<td>Density (kg/m<sup>3</sup>)</td>
-<td>C<sub>p</sub> (J/kg-K)</td>
+<th>Material  (listed from outside to inside)</th>
+<th>Conductivity (W/m-K)</th>
+<th>Thickness (m)</th>
+<th>U (W/m<sup>2</sup>-K)</th>
+<th>R (m<sup>2</sup>-K/W)</th>
+<th>Density (kg/m<sup>3</sup>)</th>
+<th>C<sub>p</sub> (J/kg-K)</th>
 </tr>
 <tr>
 <td>Walls</td>
@@ -784,8 +768,8 @@ The details of the building construction and operation are shown in the followin
 
 <table class="table table-striped">
 <tr>
-<td>Type *</td>
-<td>Clear</td>
+<th>Type *</th>
+<th>Clear</th>
 </tr>
 <tr>
 <td>Number of panes</td>
@@ -811,25 +795,33 @@ Refers to specific glass type included in the EnergyPlus datasets directory
 
  (**WindowGlassMaterials.idf**)
 
-#### Internal Loads
-
-Lights:  1000W, Office Lighting schedule, surface mount fluorescent
-
-#### Space Conditioning
-
-Heating setpoint 20C, cooling setpoint 24C, no setback
-
-#### Environment
-
-Location:                   Chicago, Illinois, USA
-
-Design Days:             Summer
-
-                                 Winter
-
-Annual Simulation Period:    Jan 1 – Dec 31
-
-Ground Temperatures:         18.2 C to 22.5 C (from Slab preprocessor, vary monthly)
+<table class="table table-striped">
+<caption>Additional Model Details</caption>
+<tr>
+ <th>Type</th>
+ <th>Details</th>
+</tr>
+<tr>
+ <td>Internal Loads</td>
+ <td>Lights (1000 W), Office Lighting schedule, surface mount fluorescent</td>
+</tr>
+<tr>
+ <td>Space Conditioning</td>
+ <td>Heating setpoint 20C, cooling setpoint 24C, no setback</td>
+</tr>
+<tr>
+ <td>Location</td>
+ <td>Chicago, Illinois, USA; Summer and Winter design days</td>
+</tr>
+<tr>
+ <td>Simulation Period</td>
+ <td>Annual, Jan 1 - Dec 31</td>
+</tr>
+<tr>
+ <td>Ground Temperatures</td>
+ <td>18.2 C to 22.5 C (from Slab preprocessor, vary monthly)</td>
+</tr>
+</table>
 
 Instructions
 ------------
@@ -838,166 +830,167 @@ Instructions
 
 Objective:  Learn to use EP-Launch to run an EnergyPlus input file and view output files.
 
-1)   Open EP-Launch.
+1. Open EP-Launch.
 
-2)   Under “Input File”, browse for input file Exercise1A.idf.  This input file contains the 1-zone model described above without the windows and lights. This is located under the install folder &lt;root&gt;\\ExampleFiles\\BasicsFiles,
+2. Under “Input File”, browse for input file Exercise1A.idf.  This input file contains the 1-zone model described above without the windows and lights. This is located under the install folder &lt;root&gt;\\ExampleFiles\\BasicsFiles,
 
-3)   Under “Weather File”, select “No Weather File” (at the top of the pull-down list).
+3. Under “Weather File”, select “No Weather File” (at the top of the pull-down list).
 
-4)   Press “Simulate”.
+4. Press “Simulate”.
 
-5)   When the simulation is complete, review output files:
+5. When the simulation is complete, review output files:
 
-- Press “Text Output Files” to see all text output.  Look especially at the eio and err output files.
+  - Press “Text Output Files” to see all text output.  Look especially at the eio and err output files.
 
-- Press “Drawing Files” to see a dxf drawing of the building envelope.  (If using Voloview Express, right-click to switch between wireframe and shaded orbit view.  In DWG True View, use “View” -&gt; “Visual Styles” to switch between wireframe and solid views. In both programs, use “View” à“Named Views” to select isometric views.)
+  - Press “Drawing Files” to see a dxf drawing of the building envelope.  (If using Voloview Express, right-click to switch between wireframe and shaded orbit view.  In DWG True View, use “View” -&gt; “Visual Styles” to switch between wireframe and solid views. In both programs, use “View” à“Named Views” to select isometric views.)
 
-- An empty svg drawing file will also open (this will show HVAC system components in later exercises).  Note that the Adobe SVG viewer is a “plug-in” for Internet Explorer (IE), so IE will open when viewing an SVG file.  Depending on the security settings in IE, you may be prompted with a warning about “active” content.
+  - An empty svg drawing file will also open (this will show HVAC system components in later exercises).  Note that the Adobe SVG viewer is a “plug-in” for Internet Explorer (IE), so IE will open when viewing an SVG file.  Depending on the security settings in IE, you may be prompted with a warning about “active” content.
 
-- Press “Spreadsheets” to open the numeric csv output files.  In Exercise1a.csv, review the pattern of outdoor conditions and loads.  (To make it easier to read the column headings, select Row 1, format cells, and turn on wrap text; then select cell B2 and select “freeze panes”.)  In Exercise1aMeter.csv, review the facility district heating and cooling meters.
+  - Press “Spreadsheets” to open the numeric csv output files.  In Exercise1a.csv, review the pattern of outdoor conditions and loads.  (To make it easier to read the column headings, select Row 1, format cells, and turn on wrap text; then select cell B2 and select “freeze panes”.)  In Exercise1aMeter.csv, review the facility district heating and cooling meters.
 
-- Zone/Sys Air Temperature – the zone air temperatures are already being reported.
+  - Zone/Sys Air Temperature – the zone air temperatures are already being reported.
 
-- Outdoor Dry Bulb – is being reported (so you can compare to outside temperature)
+  - Outdoor Dry Bulb – is being reported (so you can compare to outside temperature)
 
-- The meter for the heating in the facility - DistrictHeating:Facility – is being reported. Facility is the entire building.
+  - The meter for the heating in the facility - DistrictHeating:Facility – is being reported. Facility is the entire building.
 
-- The meter for the cooling in the facility - DistrictCooling:Facility – is being reported.
+  - The meter for the cooling in the facility - DistrictCooling:Facility – is being reported.
 
 ### Exercise 1B. Add Windows
 
 Objective:  Learn how to add materials, constructions, and a surface using 3-D coordinates.
 
-1)   In EP-Launch, with input file Exercise1A.idf still selected, press “Edit – IDF Editor”.  This will open Exercise1A.idf in the IDF Editor, a tool that assists in editing EnergyPlus input files (idf).
+1. In EP-Launch, with input file Exercise1A.idf still selected, press “Edit – IDF Editor”.  This will open Exercise1A.idf in the IDF Editor, a tool that assists in editing EnergyPlus input files (idf).
 
-2)   In IDF Editor, select File -&gt; Save Options . . . and set “Saved Order” to “Original with New at Top”, and “Special Format for Some Objects” to “Yes.”  Check the “Set as Default” box.
+2. In IDF Editor, select File -&gt; Save Options . . . and set “Saved Order” to “Original with New at Top”, and “Special Format for Some Objects” to “Yes.”  Check the “Set as Default” box.
 
-3)   In IDF Editor, Select File -&gt; Save As . . . and save this file as Exercise1B.idf.
+3. In IDF Editor, Select File -&gt; Save As . . . and save this file as Exercise1B.idf.
 
-4)   Create the construction definition for the windows which are double-pane clear gas with an air space:
+4. Create the construction definition for the windows which are double-pane clear gas with an air space:
 
-- Using File -&gt; Open Dataset, open the window glass materials dataset file, WindowGlassMaterials.idf
+  - Using File -&gt; Open Dataset, open the window glass materials dataset file, WindowGlassMaterials.idf
 
-- Scroll down the Class list and select “**WindowMaterial:Glazing**”.
- Hint:  In IDF Editor, View -&gt; Show Classes with Objects Only (or ctl-L) will hide all empty object types from the class list.
+  - Scroll down the Class list and select “**WindowMaterial:Glazing**”.
+    
+    -Hint:  In IDF Editor, View -&gt; Show Classes with Objects Only (or ctl-L) will hide all empty object types from the class list.
 
-- Locate the object which defines the material properties for “CLEAR 6MM”.  Select this object (by clicking on the column heading).
+  - Locate the object which defines the material properties for “CLEAR 6MM”.  Select this object (by clicking on the column heading).
 
-- Using Edit -&gt; Copy Object (or the toolbar button, or ctl-C), copy this object.
+  - Using Edit -&gt; Copy Object (or the toolbar button, or ctl-C), copy this object.
 
-- Switch windows to file Exercise1B.idf and paste the window material into this file.  (Verify that is had been added by going to **WindowMaterial:Glazing** to view the object.)
+  - Switch windows to file Exercise1B.idf and paste the window material into this file.  (Verify that is had been added by going to **WindowMaterial:Glazing** to view the object.)
 
-- Open dataset file WindowGasMaterials.idf.
+  - Open dataset file WindowGasMaterials.idf.
 
-- Locate “AIR 3MM”, copy it and paste it into Exercise1B.idf.
+  - Locate “AIR 3MM”, copy it and paste it into Exercise1B.idf.
 
-- In Exercise1B.idf, select the “**Construction**” class.  There are three constructions pre-defined for the walls, roof, and floor.
+  - In Exercise1B.idf, select the “**Construction**” class.  There are three constructions pre-defined for the walls, roof, and floor.
 
-- Press “New Obj” to create a new blank **Construction** object.
+  - Press “New Obj” to create a new blank **Construction** object.
 
-- Name this new construction “DOUBLE PANE WINDOW”.
+  - Name this new construction “DOUBLE PANE WINDOW”.
 
-- Use the pulldown list to select “CLEAR 6MM” for the outside layer, then press “Enter” or “Return” to save this entry and move to the next field.
+  - Use the pulldown list to select “CLEAR 6MM” for the outside layer, then press “Enter” or “Return” to save this entry and move to the next field.
 
-- Select “AIR 3MM” for Layer 2, and “CLEAR 6MM” for Layer 3.
+  - Select “AIR 3MM” for Layer 2, and “CLEAR 6MM” for Layer 3.
 
-5)   Add the east window (3m wide by 2m high, centered on wall, *see the drawing in* *Figure 11* *to determine coordinates):*
+5. Add the east window (3m wide by 2m high, centered on wall, *see the drawing in* *Figure 11* *to determine coordinates):*
 
-- Select “**FenestrationSurface:Detailed**” class.
+  - Select “**FenestrationSurface:Detailed**” class.
 
-- Add a new object named “EAST WINDOW”.
+  - Add a new object named “EAST WINDOW”.
 
-- Set the remaining fields as listed:
+  - Set the remaining fields as listed:
 
-- Surface Type ................................................ = Window
+  - Surface Type ................................................ = Window
 
-- Construction Name ............ = DOUBLE PANE WINDOW
+  - Construction Name ............ = DOUBLE PANE WINDOW
 
-- Base Surface Name ............... = ZONE SURFACE EAST
+  - Base Surface Name ............... = ZONE SURFACE EAST
 
-- OutsideFaceEnvironment Object ................... = &lt;blank&gt;
+  - OutsideFaceEnvironment Object ................... = &lt;blank&gt;
 
-- View Factor to Ground .......................... = autocalculate
+  - View Factor to Ground .......................... = autocalculate
 
-- Name of shading control .............................. = &lt;blank&gt;
+  - Name of shading control .............................. = &lt;blank&gt;
 
-- WindowFrameAndDivider Name .................... = &lt;blank&gt;
+  - WindowFrameAndDivider Name .................... = &lt;blank&gt;
 
-- Multiplier ................................................................ = 1
+  - Multiplier ................................................................ = 1
 
-- Number of Surface Vertex Groups ........................... = 4
+  - Number of Surface Vertex Groups ........................... = 4
 
-- Vertex coordinates = *as determined from the drawing* *Figure 11*.  Coordinates in this input are in World Coordinates (all relative to the global origin of 0,0,0).  Coordinates are specified as viewed from the outside of the surface, using the rules specified in the SurfaceGeometry object.
+  - Vertex coordinates = *as determined from the drawing* *Figure 11*.  Coordinates in this input are in World Coordinates (all relative to the global origin of 0,0,0).  Coordinates are specified as viewed from the outside of the surface, using the rules specified in the SurfaceGeometry object.
 
-6)   Add the west window, similar to the east window.
+6. Add the west window, similar to the east window.
 
-7)   Add a new **Output:Surfaces:List** object, type= Details.  This report produces a list of all surfaces in the eio output summarizing area, azimuth, tilt, etc.
+7. Add a new **Output:Surfaces:List** object, type= Details.  This report produces a list of all surfaces in the eio output summarizing area, azimuth, tilt, etc.
 
-8)   Save and close the IDF file, select Exercise1B.idf in EP-Launch, run the simulation and view outputs.
+8. Save and close the IDF file, select Exercise1B.idf in EP-Launch, run the simulation and view outputs.
 
-- Always review the err file for errors and warnings.  Fix problems if needed and re-run.
+  - Always review the err file for errors and warnings.  Fix problems if needed and re-run.
 
-- Are the windows in the right place in the dxf drawing file. (Use the Drawing File button or select the DXF file from View -&gt; Single File or from the Quick-Open panel).
+  - Are the windows in the right place in the dxf drawing file. (Use the Drawing File button or select the DXF file from View -&gt; Single File or from the Quick-Open panel).
 
-- Review the surface details report in the eio file, search for “Zone/Shading Surfaces” to find this report. (Use the Text Output button, Quick Open “eio” button, or select from the single file menu, or use F7).  This report is easier to read by pasting this section into a spreadsheet and using the text to columns function with comma as a delimiter).
+  - Review the surface details report in the eio file, search for “Zone/Shading Surfaces” to find this report. (Use the Text Output button, Quick Open “eio” button, or select from the single file menu, or use F7).  This report is easier to read by pasting this section into a spreadsheet and using the text to columns function with comma as a delimiter).
 
-- Open the csv output file and compare the heating and cooling loads with the results from Exercise1A.csv.
+  - Open the csv output file and compare the heating and cooling loads with the results from Exercise1A.csv.
 
 ### Exercise 1C. Add Internal Loads
 
 Objective:  Learn how to add schedules, internal loads, and report variables.
 
-1)   Save Exercise1B.idf as Exercise1C.idf.
+1. Save Exercise1B.idf as Exercise1C.idf.
 
-2)   Open the dataset file Schedules.idf:
+2. Open the dataset file Schedules.idf:
 
-- Copy the **Schedule:Compact** object named “Office Lighting”, and paste it into Exercise1C.idf.
+  - Copy the **Schedule:Compact** object named “Office Lighting”, and paste it into Exercise1C.idf.
 
-- Copy the **ScheduleTypeLimits** object named “Fraction”, and paste it into Exercise1C.idf.
+  - Copy the **ScheduleTypeLimits** object named “Fraction”, and paste it into Exercise1C.idf.
 
-3)   In Exercise1C.idf, add a LIGHTS object named ZONE ONE Lights, using the Office Lighting schedule, peak input is 1000W.  Consult the EnergyPlus Input Output Reference section on **Lights** for values for the return, radiant, and visible fractions.  Assume the lights are surface mounted fluorescents.
+3. In Exercise1C.idf, add a LIGHTS object named ZONE ONE Lights, using the Office Lighting schedule, peak input is 1000W.  Consult the EnergyPlus Input Output Reference section on **Lights** for values for the return, radiant, and visible fractions.  Assume the lights are surface mounted fluorescents.
 
-4)   Save and close the IDF file, select Exercise1C.idf in EP-Launch, run the simulation and review outputs.
+4. Save and close the IDF file, select Exercise1C.idf in EP-Launch, run the simulation and review outputs.
 
-5)   Open the rdd file (the report variable data dictionary) and find report variable names related to **Lights**.  Add a new **Output:Variable** object to report the lighting electric consumption.
+5. Open the rdd file (the report variable data dictionary) and find report variable names related to **Lights**.  Add a new **Output:Variable** object to report the lighting electric consumption.
 
-6)   Run the simulation and review outputs.
+6. Run the simulation and review outputs.
 
-- Check the err file.
+  - Check the err file.
 
-- Find the lighting electric consumption in the csv output file.
+  - Find the lighting electric consumption in the csv output file.
 
-7)   Compare heating and cooling loads with Exercise1A and Exercise1B.
+7. Compare heating and cooling loads with Exercise1A and Exercise1B.
 
-8)   Add more **Output:Variable** objects as desired.
+8. Add more **Output:Variable** objects as desired.
 
 ### Exercise 1D. Annual Simulation and Predefined Reports
 
 Objective:  Learn how to run an annual simulation using a weather data file and add table reports.
 
-1)   Save Exercise1C.idf as Exercise1D.idf.
+1. Save Exercise1C.idf as Exercise1D.idf.
 
-2)   Edit the **SimulationControl** object to turn off the design day simulations by setting “Run Simulation for Sizing Periods” to **No** and turn on the weather file (annual) simulation by setting “Run Simulation for Weather File Run Periods” to **Yes**..
+2. Edit the **SimulationControl** object to turn off the design day simulations by setting “Run Simulation for Sizing Periods” to **No** and turn on the weather file (annual) simulation by setting “Run Simulation for Weather File Run Periods” to **Yes**..
 
-3)   Add a RunPeriod object to run a full annual simulation, let other fields default or remain blank.
+3. Add a RunPeriod object to run a full annual simulation, let other fields default or remain blank.
 
-4)   Add a **Output:Table:SummaryReports** object, and select the following reports:  “Annual Building Performance Summary” (ABUPS), “Input Verification and Results Summary” (IVRS), “Climate Summary”, and “Envelope Summary”.
+4. Add a **Output:Table:SummaryReports** object, and select the following reports:  “Annual Building Performance Summary” (ABUPS), “Input Verification and Results Summary” (IVRS), “Climate Summary”, and “Envelope Summary”.
 
-5)   Add a **OutputControl:Table:Style** object, and select HTML format (ColumnSeparator).
+5. Add a **OutputControl:Table:Style** object, and select HTML format (ColumnSeparator).
 
-6)   Edit existing **Output:Variable** and **Output:Meter** objects and change the reporting frequency from Hourly to Monthly.
+6. Edit existing **Output:Variable** and **Output:Meter** objects and change the reporting frequency from Hourly to Monthly.
 
-7)   Save and close the IDF file, select Exercise1D.idf in EP-Launch.
+7. Save and close the IDF file, select Exercise1D.idf in EP-Launch.
 
-8)   Select Chicago TMY2 weather file (or the weather file of your choice) and run the simulation.
+8. Select Chicago TMY2 weather file (or the weather file of your choice) and run the simulation.
 
-9)   Review outputs.
+9. Review outputs.
 
-- Check the err file.
+  - Check the err file.
 
-- Look at the monthly results in the csv output.
+  - Look at the monthly results in the csv output.
 
-- Press the Table output button to view the predefined reports.
+  - Press the Table output button to view the predefined reports.
 
 ### Solution: Exercise 1
 
@@ -1007,277 +1000,143 @@ Objective:  Learn how to run an annual simulation using a weather data file and
 
 This is a listing of new and modified objects created in this Exercise.
 
-**WindowMaterial:Glazing**,
-
+```
+WindowMaterial:Glazing,
     CLEAR 6MM,               !- Name
-
     SpectralAverage,         !- Optical Data Type
-
     ,                        !- Name of Window Glass Spectral Data Set
-
     0.006,                   !- Thickness {m}
-
     0.775,                   !- Solar Transmittance at Normal Incidence
-
     0.071,                   !- Solar Reflectance at Normal Incidence: Front Side
-
     0.071,                   !- Solar Reflectance at Normal Incidence: Back Side
-
     0.881,                   !- Visible Transmittance at Normal Incidence
-
     0.080,                   !- Visible Reflectance at Normal Incidence: Front Side
-
     0.080,                   !- Visible Reflectance at Normal Incidence: Back Side
-
     0.0,                     !- IR Transmittance at Normal Incidence
-
     0.84,                    !- IR Hemispherical Emissivity: Front Side
-
     0.84,                    !- IR Hemispherical Emissivity: Back Side
-
     0.9;                     !- Conductivity {W/m-K}
 
-
-
-**WindowMaterial:Gas**,
-
+WindowMaterial:Gas,
     AIR 3MM,                 !- Name
-
     Air    ,                 !- Gas Type
-
     0.0032;                  !- Thickness {m}
 
-
-
-**Construction**,
-
+Construction,
     DOUBLE PANE WINDOW,      !- Name
-
     CLEAR 6MM,               !- Outside Layer
+    AIR 3MM,                 !- Layer #2
+    CLEAR 6MM;               !- Layer #3
 
-    AIR 3MM,                 !- Layer \#2
-
-    CLEAR 6MM;               !- Layer \#3
-
-
-
-**FenestrationSurface:Detailed**,
-
+FenestrationSurface:Detailed,
     EAST WINDOW,             !- User Supplied Surface Name
-
     WINDOW,                  !- Surface Type
-
     DOUBLE PANE WINDOW,      !- Construction Name of the Surface
-
     ZONE SURFACE EAST,       !- Base Surface Name
-
     ,                        !- OutsideFaceEnvironment Object
-
     autocalculate,           !- View Factor to Ground
-
     ,                        !- Name of shading control
-
     ,                        !- WindowFrameAndDivider Name
-
     1,                       !- Multiplier
-
     4,                       !- Number of vertices
+    8, 1.5, 2.35,            !- X,Y,Z  1 {m}
+    8, 1.5, 0.35,            !- X,Y,Z  2 {m}
+    8, 4.5, 0.35,            !- X,Y,Z  3 {m}
+    8, 4.5, 2.35;            !- X,Y,Z  4 {m}
 
-    8, 1.5, 2.35,                       !- X,Y,Z  1 {m}
-
-    8, 1.5, 0.35,                       !- X,Y,Z  2 {m}
-
-    8, 4.5, 0.35,                       !- X,Y,Z  3 {m}
-
-    8, 4.5, 2.35;                       !- X,Y,Z  4 {m}
-
-
-
-**FenestrationSurface:Detailed**,
-
+FenestrationSurface:Detailed,
     WEST WINDOW,             !- User Supplied Surface Name
-
     WINDOW,                  !- Surface Type
-
     DOUBLE PANE WINDOW,      !- Construction Name of the Surface
-
     ZONE SURFACE WEST,       !- Base Surface Name
-
     ,                        !- OutsideFaceEnvironment Object
-
     autocalculate,           !- View Factor to Ground
-
     ,                        !- Name of shading control
-
     ,                        !- WindowFrameAndDivider Name
-
     1,                       !- Multiplier
-
     4,                       !- Number of Vertices
+    0, 4.5, 2.35,            !- X,Y,Z  1 {m}
+    0, 4.5, 0.35,            !- X,Y,Z  2 {m}
+    0, 1.5, 0.35,            !- X,Y,Z  3 {m}
+    0, 1.5, 2.35;            !- X,Y,Z  4 {m}
 
-    0, 4.5, 2.35,                       !- X,Y,Z  1 {m}
+Output:Surfaces:List,Details;
 
-    0, 4.5, 0.35,                       !- X,Y,Z  2 {m}
-
-    0, 1.5, 0.35,                       !- X,Y,Z  3 {m}
-
-    0, 1.5, 2.35;                       !- X,Y,Z  4 {m}
-
-
-
-**Output:Surfaces:List**,Details;
-
-
-
-**Schedule:Compact**,
-
+Schedule:Compact,
     Office Lighting,         !- Name
-
     Fraction,                !- ScheduleType
+    Through: 12/31,          !- Complex Field #1
+    For: Weekdays SummerDesignDay,  !- Complex Field #2
+    Until: 05:00, 0.05,      !- Complex Field #4
+    Until: 07:00, 0.1,       !- Complex Field #6
+    Until: 08:00, 0.3,       !- Complex Field #8
+    Until: 17:00, 0.9,       !- Complex Field #10
+    Until: 18:00, 0.5,       !- Complex Field #12
+    Until: 20:00, 0.3,       !- Complex Field #14
+    Until: 22:00, 0.2,       !- Complex Field #16
+    Until: 23:00, 0.1,       !- Complex Field #18
+    Until: 24:00, 0.05,      !- Complex Field #20
+    For: Saturday WinterDesignDay,  !- Complex Field #21
+    Until: 06:00, 0.05,      !- Complex Field #23
+    Until: 08:00, 0.1,       !- Complex Field #25
+    Until: 12:00, 0.3,       !- Complex Field #27
+    Until: 17:00, 0.15,      !- Complex Field #29
+    Until: 24:00, 0.05,      !- Complex Field #31
+    For: Sunday Holidays AllOtherDays,  !- Complex Field #32
+    Until: 24:00, 0.05;      !- Complex Field #34
 
-    Through: 12/31,          !- Complex Field \#1
-
-    For: Weekdays SummerDesignDay,  !- Complex Field \#2
-
-    Until: 05:00, 0.05,      !- Complex Field \#4
-
-    Until: 07:00, 0.1,       !- Complex Field \#6
-
-    Until: 08:00, 0.3,       !- Complex Field \#8
-
-    Until: 17:00, 0.9,       !- Complex Field \#10
-
-    Until: 18:00, 0.5,       !- Complex Field \#12
-
-    Until: 20:00, 0.3,       !- Complex Field \#14
-
-    Until: 22:00, 0.2,       !- Complex Field \#16
-
-    Until: 23:00, 0.1,       !- Complex Field \#18
-
-    Until: 24:00, 0.05,      !- Complex Field \#20
-
-    For: Saturday WinterDesignDay,  !- Complex Field \#21
-
-    Until: 06:00, 0.05,      !- Complex Field \#23
-
-    Until: 08:00, 0.1,       !- Complex Field \#25
-
-    Until: 12:00, 0.3,       !- Complex Field \#27
-
-    Until: 17:00, 0.15,      !- Complex Field \#29
-
-    Until: 24:00, 0.05,      !- Complex Field \#31
-
-    For: Sunday Holidays AllOtherDays,  !- Complex Field \#32
-
-    Until: 24:00, 0.05;      !- Complex Field \#34
-
-
-
-**ScheduleTypeLimits**,
-
+ScheduleTypeLimits,
     Fraction,                !- ScheduleType Name
-
     0.0,                     !- Lower Limit Value
-
     1.0,                     !- Upper Limit Value
-
     CONTINUOUS;              !- Numeric Type
 
+Lights,
+    ZONE ONE Lights,         !- Name
+    ZONE ONE,                !- Zone Name
+    Office Lighting,         !- Schedule Name
+    LightingLevel,           !- Design Level Calculation Method
+    1000,                    !- Lighting Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.72,                    !- Fraction Radiant
+    0.18,                    !- Fraction Visible
+    1,                       !- Fraction Replaceable
+    General,                 !- End-Use Subcategory
+    No;                      !- Return Air Fraction Calculated from Plenum Temperature
 
+Output:Variable,*,Lights Electric Consumption ,hourly;
 
-**Lights**,
-
-  ZONE ONE Lights,         !- Name
-
-  ZONE ONE,                !- Zone Name
-
-  Office Lighting,         !- Schedule Name
-
-  LightingLevel,           !- Design Level Calculation Method
-
-  1000,                    !- Lighting Level {W}
-
-  ,                        !- Watts per Zone Floor Area {W/m2}
-
-  ,                        !- Watts per Person {W/person}
-
-  0,                       !- Return Air Fraction
-
-  0.72,                    !- Fraction Radiant
-
-  0.18,                    !- Fraction Visible
-
-  1,                       !- Fraction Replaceable
-
-  General,                 !- End-Use Subcategory
-
-  No;                      !- Return Air Fraction Calculated from Plenum Temperature
-
-
-
-**Output:Variable**,\*,Lights Electric Consumption ,hourly;
-
-
-
-**RunPeriod**,
-
+RunPeriod,
     1,                       !- Begin Month
-
     1,                       !- Begin Day Of Month
-
     12,                      !- End Month
-
     31,                      !- End Day Of Month
-
     UseWeatherFile,          !- Day Of Week For Start Day
-
     Yes,                     !- Use WeatherFile Holidays/Special Days
-
     Yes,                     !- Use WeatherFile DaylightSavingPeriod
-
     No,                      !- Apply Weekend Holiday Rule
-
     Yes,                     !- Use WeatherFile Rain Indicators
-
     Yes,                     !- Use WeatherFile Snow Indicators
-
     1;                       !- Number of years of simulation
 
-
-
-**Output:Table:SummaryReports**,
-
+Output:Table:SummaryReports,
     Annual Building Utility Performance Summary,  !- ReportName1
-
     Input Verification and Results Summary,  !- ReportName2
-
     Climate Summary,         !- ReportName3
-
     Envelope Summary;        !- ReportName4
 
-
-
-**OutputControl:Table**,
-
+OutputControl:Table,
     HTML;                    !- ColumnSeparator
 
-
-
-**SimulationControl**,
-
+SimulationControl,
     No,                      !- Do the zone sizing calculation
-
     No,                      !- Do the system sizing calculation
-
     No,                      !- Do the plant sizing calculation
-
     No,                      !- Do the design day simulations
-
     Yes;                     !- Do the weather file simulation
-
-
+```
 
 Overall scheme/methodology for running EnergyPlus
 =================================================
@@ -1296,17 +1155,17 @@ This section provides a step by step outline that will help you streamline creat
 
 Some preliminary steps will facilitate the construction of your input file. EnergyPlus requires some information in specified, externally available formats; other information may require some lead time to obtain. The following checklist should be completed before you start to construct your input file.
 
--        Obtain location and design climate information for the city in which your building is located. If possible, use one of the weather files available for your weather period run.
+- Obtain location and design climate information for the city in which your building is located. If possible, use one of the weather files available for your weather period run.
 
--        Obtain sufficient *building* *construction* information to allow specification of overall building geometry and surface constructions (including exterior walls, interior walls, partitions, floors, ceilings, roofs, windows and doors).
+- Obtain sufficient *building* *construction* information to allow specification of overall building geometry and surface constructions (including exterior walls, interior walls, partitions, floors, ceilings, roofs, windows and doors).
 
--    Obtain sufficient *building* *use* information to allow specification of the lighting and other equipment (e.g. electric, gas, etc.) and the number of people in each area of the building.
+- Obtain sufficient *building* *use* information to allow specification of the lighting and other equipment (e.g. electric, gas, etc.) and the number of people in each area of the building.
 
--    Obtain sufficient *building* *thermostatic* *control* information to allow specification of the temperature control strategy for each area of the building.
+- Obtain sufficient *building* *thermostatic* *control* information to allow specification of the temperature control strategy for each area of the building.
 
--    Obtain sufficient *HVAC* *operation* information to allow specification and scheduling of the fan systems.
+- Obtain sufficient *HVAC* *operation* information to allow specification and scheduling of the fan systems.
 
--    Obtain sufficient *central plant* information to allow specification and scheduling of the boilers, chillers and other plant equipment.
+- Obtain sufficient *central plant* information to allow specification and scheduling of the boilers, chillers and other plant equipment.
 
 ### *Step 2: "*Zone" the Building
 
@@ -1344,11 +1203,11 @@ Table 2. Zoning the Building by System Type.
 
 <table class="table table-striped">
 <tr>
-<td>System Number</td>
-<td>System Name</td>
-<td>CFM</td>
-<td>m/s</td>
-<td>Zone Served</td>
+<th>System Number</th>
+<th>System Name</th>
+<th>CFM</th>
+<th>m/s</th>
+<th>Zone Served</th>
 </tr>
 <tr>
 <td>1</td>
@@ -1427,7 +1286,7 @@ Working from blueprints or sketches and following the guidelines in Step 2, the 
 
 By the way, the file for this example, the 1 zone model are contained in your EnergyPlus installation ExampleFiles\\BasicFiles folder.
 
-#### Step3.1.      Determine heat transfer and heat storage surfaces.
+#### Step 3.1.      Determine heat transfer and heat storage surfaces.
 
 The surfaces of the building can be described in any order; grouping surfaces by zone may help you read the input file. Specifics of the describing surfaces help categorize the surface’s heat transfer/storage as well as identify the surface construction information.
 
@@ -1437,8 +1296,8 @@ Table 3. Surface types and categorization
 
 <table class="table table-striped">
 <tr>
-<td>Surface Type</td>
-<td>Applicability</td>
+<th>Surface Type</th>
+<th>Applicability</th>
 </tr>
 <tr>
 <td>BuildingSurface:Detailed</td>
@@ -1670,9 +1529,9 @@ BLAST, DOE-2 and other programs often have “libraries” of constructions, sch
 
 <table class="table table-striped">
 <tr>
-<td>Type (1)</td>
-<td>Name (2)</td>
-<td>Material (3)</td>
+<th>Type (1)</th>
+<th>Name (2)</th>
+<th>Material (3)</th>
 </tr>
 <tr>
 <td>Wall</td>
@@ -1854,11 +1713,11 @@ Figure 17. Schematic of One Zone Model with Exterior Wall length and Window Area
 
 <table class="table table-striped">
 <tr>
-<td>Surface</td>
-<td>type</td>
-<td>construction</td>
-<td>Length {m}</td>
-<td>Area {m<sup>2</sup>}</td>
+<th>Surface</th>
+<th>type</th>
+<th>construction</th>
+<th>Length {m}</th>
+<th>Area {m<sup>2</sup>}</th>
 </tr>
 <tr>
 <td>1</td>
@@ -2099,10 +1958,10 @@ Table 6. Internal Gain Data
 
 <table class="table table-striped">
 <tr>
-<td>Zone</td>
-<td>Gain Type</td>
-<td>Size</td>
-<td>Schedule</td>
+<th>Zone</th>
+<th>Gain Type</th>
+<th>Size</th>
+<th>Schedule</th>
 </tr>
 <tr>
 <td>1</td>
