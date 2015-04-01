@@ -21,6 +21,7 @@ The encyclopedic reference of simulation models is a very large document, and so
     * Humidifiers
 * [Volume 4](13d-EncyclopaedicRefs.md)
     * Zone Internal Gains
+    * Indoor Swimming Pool
     * Pipes
     * Pumps
     * Ideal Load Air Systems
