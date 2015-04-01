@@ -6113,9 +6113,112 @@ Keith C. Rice, 2011, DOE/ORNL Heat Pump Design Model:
 
 S.A. Klein 2011, User Manual of Engineering Equation Solver V8
 
+#### Secondary Coils of DX Systems and Heat Pumps
+
+#### Overview
+
+Secondary coils reject to or remove heat from a secondary zone. Secondary coil refers to a condenser of a DX system or a heat pump in cooling operating mode or an evaporator of a heat pump in heating mode. The secondary coil (e.g. condenser) of DX system or heat pumps is commonly installed outdoor but when installed indoor either heat is dumped to or extracted from the secondary zone. A secondary zone is a conditioned or unconditioned zone where the secondary coil is installed. Secondary coils are not standalone DX coil objects but they are add-on features on existing DX coil objects. A secondary DX coil is modelled by specifying additional inputs in single speed and multi speed DX coil objects: The additional inputs allow us to model the heat rejected or extracted by the secondary coil while the primary coil serves another controlled zone as shown in [Figure](#SchematicDXCoil).  A secondary coil is not controlled directly but responds to the requirements of the primary DX coil. The operating mode of a secondary DX coil is determined by the primary DX coil serving the conditioned zone. If the primary DX coil is in cooling mode, then the secondary coil is rejecting heat (heating mode) to the secondary zone, or else if the  primary DX coil is in heating mode, then the secondary coil is extracting heat (cooling mode) from the secondary zone. Heat rejected to a secondary zone by a condenser of a DX system or a heat pump is considered as sensible only. Whereas energy extracted from a secondary zone may contain sensible and latent components. The condenser type of the primary DX coils should be AirCooled. There is no need to specify the condenser air inlet node. The model uses zone air node as the secondary coil air inlet node. Air drawn by the secondary coil fan passes through the secondary coil and dumped back into the secondary zone. The previous time step zone condition is used as an inlet condition to the current time for the secondary DX coil model.
+
+![SchematicDXCoil](EngineeringReference/media/image8002.png)<a name="SchematicDXCoil"></a>
+
+Figure: Schematic of DX System in cooling operating mode
+
+The heat rejected or extracted by the secondary DX coil is estimated from the delivered capacity and electric power input of the primary DX coils. And the rejected or extracted heat is treated as internal gain of the secondary zone. Currently secondary DX coil are allowed in single speed, two speed and multi speed DX coil objects: _Coil:Cooling:DX:SingleSpeed_, _Coil:Heating:DX:SingleSpeed_, _Coil:Cooling:DX:TwoSpeed_, _Coil:Cooling:DX:MultiSpeed_, and _Coil:Heating:DX:MultiSpeed_.
+
+#### Model Description:
+The secondary coil performance calculation is invoked using inputs in the DX coil objects.  The input required for cooling and heating operation of the primary DX coils are different. In the DX cooling coils the only required input is the zone name where the secondary coil is installed. In heating DX coils six inputs are required for single speed coils and a minimum of 11 input fields are required for multispeed DX heating coils.  And five more inputs are required for every additional compressor speed. The extensible five input fields are used for splitting the total heat extraction rate into sensible and latent components. These five input fields are: rated sensible heat ratio, secondary air flow rates, scaling factor for auto-sizing secondary air flow rates, sensible heat ratio modifier curves as a function of temperature and sensible heat ratio modifier curves as a function of secondary air flow fraction. The secondary coil model assumes that liquid water from defrosting operation is drained to the outdoor and has no impact on the zone air heat balance. 
+
+**Cooling Operating Mode:** the primary DX cooling coil of a DX system serving a primary zone is on and heat is rejected by the secondary coil (condenser) into a secondary zone. The secondary zone name is specified in DX cooling coil objects.  This operating mode applies to a DX cooling system and cooling operating mode of air-to-air single and multi-speed heat pumps. The heat rejected by the secondary coil (condenser) of a DX system or heat pump operating in cooling mode is given by:
+
+<div>\[Q_\rm{cond}=Q_\rm{Evap}+P_\rm{CompCondFan}\]</div>
+
+where
+
+* \(Q_\rm{Evap}\) is the cooling load delivered by the primary DX cooling coil system, W 
+* \(P_\rm{CompCondFan}\) is the compressor and evaporator fan electric power input of a heat pump in heating mode, W
+* \(Q_\rm{cond}\) is the heat rejected by the secondary coil (condenser) of a DX system or heat pump, W
+
+Heat rejected by a secondary coil (condenser) calculated at each time step becomes internal gain of the secondary zone as shown in [Figure](#SchematicDXAndSecondary). Whenever a secondary zone name is specified in DX cooling coil objects, the secondary DX coil model calculation is invoked.  New input field required as add-on to the DX cooling coil objects is "_Zone Name for Secondary Coil (condenser) Placement_".
+
+![SchematicDXAndSecondary](EngineeringReference/media/image8003.png)<a name="SchematicDXCoil"></a>
+
+Figure: Schematic of DX system and secondary coil (condenser)
+
+**Heating Operating Mode:** When a heat pump operates in heating mode then energy is extracted from the secondary zone.  The total energy extracted is estimated by rearranging the equation above as follows:
+
+<div>\[Q_\text{Evap} = Q_\text{cond} - P_\text{CompCondFan}\]</div>
+
+where
+
+* \(Q_\text{cond}\) is the heat delivered by the primary heating DX coil to the primary zone, W
+* \(P_\text{CompCondFan}\) is the compressor and condenser fan electric power input of a DX system or heat pump in cooling mode, W
+* \(Q_\text{Evap}\) is the energy extracted by secondary coil (evaporator) from the secondary zone, W
+
+The total energy extracted from a secondary zone may contain sensible and latent components.  The secondary coil model checks for the coil inlet and full load outlet air condition to determine whether dehumidification will occur. The sensible and latent split of the energy extracted is done using a user specified rated sensible heat ratio (SHR) and SHR modifier curves for temperature and the secondary air flow fraction.  If the secondary coil operation is dry, then the SHR is set to 1.0.  In addition, the model assumes that defrosting operation is on, then the defrosting melts the frost and the liquid water from the collecting pan is drained to outside. Thus defrosting energy is not included in the zone energy balance. The heat extracted from the secondary zone may contain sensible and latent components and the secondary coil model does the sensible/latent heat split calculation.
+
+#### Sensible Heat Ratio Calculation
+
+The SHR calculation method uses user specified SHR modifying curves for temperature and flow fraction.  The modifying curves correct the rated SHR value for a given secondary DX coil (evaporator) entering air temperatures and air mass flow fraction for a given speed. If these SHR modifying curves are not specified a constant SHR will be assumed.  These two curves are a biquadratic SHR modifier curve for temperature (SHRFT), and a quadratic SHR correction curve for flow fraction (SHRFFF). The SHR is given by:
+
+<div>\[SHR = SHR_\text{rated}\cdot SHRFT\left(T_\text{wb,secondaryZone},T_\text{db,primaryCoil}\right)\cdot SHRFFF(FF)\]</div>
+ 
+where
+
+* \(SHRFT\) is the sensible heat ratio modifier normalized biquadratic curve as a function of secondary DX coil entering air wet-bulb and primary DX coil entering air dry-bulb temperatures, (-). The secondary DX coil (evaporator) entering air wet-bulb temperature is the secondary zone air wet-bulb temperature.
+* \(SHRFFF\) is the sensible heat ratio modifier normalized quadratic curve as a function of air mass flow fraction.  Flow fraction is the ratio of actual to rated mass flow rate of air through the secondary DX coil, (-).
+* \(SHR_\text{rated}\) is the sensible heat ratio at rated condition, (-).
+
+For multispeed secondary DX coils when the system is cycling between two speeds of _n_ and _n_-1 the operating SHR is weighted using _SpeedRatio_ as follows:
+
+<div>\[SHR = SHR_n \cdot SpeedRatio +  SHR_{n-1} (1 - SpeedRatio)\]</div>
+ 
+where
+
+* \(SHR_n\) is the sensible heat ratio at speed n determined from user specified rated SHR, and SHR modifier curves at speed _n_, (-)
+* \(SHR_{n-1}\) is the sensible heat ratio at speed _n_-1 determined from user specified rated SHR, and _SHR_ modifier curves at speed _n_-1, (-).
+* _SpeedRatio_ is a parameter that relates performance between successive compressor speeds, (-).
+
+#### Sensible and Latent Split
+The air enthalpy difference across the secondary DX coil (evaporator) at full load is given by:
+
+<div>\[h_\text{Delta} = \frac{\left(Q_\text{Evap}/PLR\right)}{\dot{m}_\text{cond}}\]</div>
+
+The coil outlet enthalpy is calculated as follows:
+
+<div>\[h_\text{Outlet}=h_\text{Inlet}-h_\text{Delta}\]</div>
+
+Using the SHR calculated above and secondary DX coil outlet temperature is given by:
+
+<div>\[T_\text{OutletNode} = T_\text{ZoneAirNode} -  \frac{\left(Q_\text{Evap}/PLR\right)\cdot SHR}{\dot{m}_\text{cond}c_p}\]</div>
+
+Calculate the saturated outlet temperature at the outlet enthalpy and check the secondary outlet air condition if super-saturation has occurred:
+
+<div>\[T_\text{OutletNode, Sat} = T_\text{SAT}\left(h_\text{Outlet}, P_\text{Tot}\right)\]</div>
+
+    IF(\(T_\text{OutletNode} > T_\text{OutletNode, Sat}\)) Then
+        \(\omega_\text{OutletNode} > \omega_\text{InletNode}\)
+    ELSE
+        (\(T_\text{OutletNode} = T_\text{OutletNode, Sat}\)
+        The coil outlet humidity ratio is determined using psychrometric functions as follows.
+        \(\omega_\text{OutletNode} = \omega\left(T_\text{OutletNode,Sat},h_\text{Outlet}\right)\)
+    ENDIF
+
+where
+
+*\(h_\text{Inlet}\) is the enthalpy of air entering the passive coil, (J/kg)
+*\(h_\text{Outlet}\) is the enthalpy of air leaving the passive coil, (J/kg)
+*\(\dot{m}_\text{sec}\) is the secondary DX coil mass flow rate, (kg/s)
+*\(PLR\) is the primary DX cooling coil compressor part-load ratio, (-)
+*\(P_\text{Tot}\) is the total pressure at the inlet of secondary DX coil, (Pa)
+*\(T_\text{OutletNode}\) is the secondary coil outlet air temperature, (∞C)
+*\(T_\text{OutletNode,Sat}\) is the secondary coil saturated air temperature at the outlet enthalpy, (∞C)
+*\(\omega_\text{InletNode}\) is the secondary coil inlet node air humidity ratio, (kgH2O/kgDryair)
+*\(\omega_\text{OutletNode}\) is the secondary coil outlet node air humidity ratio, (kgH2O/kgDryair)
+
+
 ### Packaged Thermal Storage Cooling Coil
 
-The DX cooling coil model for Coil:Cooling:DX:SingleSpeed:ThermalStorage is described in this section. The following diagram shows the main aspects of the model for packaged thermal energy storage cooling coil.¬† This model allows charging and discharging to shift cooling energy use. The dashed line shows the boundary of the empirical ‚Äúblack box‚Äù model.¬† The main parts are the Condenser, Evaporator, Compressor, and Thermal Energy Storage (TES) tank.¬† The model interacts with the surroundings via a condenser inlet and outlet nodes, evaporator inlet and outlet nodes, heat transfer between TES tank and surrounding ambient environment, and optional added plant connection to the TES tank.
+The DX cooling coil model for Coil:Cooling:DX:SingleSpeed:ThermalStorage is described in this section. The following diagram shows the main aspects of the model for packaged thermal energy storage cooling coil.† This model allows charging and discharging to shift cooling energy use. The dashed line shows the boundary of the empirical "black box" model.† The main parts are the Condenser, Evaporator, Compressor, and Thermal Energy Storage (TES) tank.† The model interacts with the surroundings via a condenser inlet and outlet nodes, evaporator inlet and outlet nodes, heat transfer between TES tank and surrounding ambient environment, and optional added plant connection to the TES tank.
 
 ![](EngineeringReference/media/image4287.png)
 
