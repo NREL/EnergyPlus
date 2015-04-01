@@ -463,29 +463,21 @@
 <p>The model requires air mass, m, calculated as follows --</p>
 <div>\[m = {1 \mathord{\left/ {\vphantom {1 {\left[ {\sin \beta  + 0.50572 \cdot {{\left( {6.07995 + \beta } \right)}^{ - 1.6364}}} \right]}}} \right. } {\left[ {\sin \beta  + 0.50572 \cdot {{\left( {6.07995 + \beta } \right)}^{ - 1.6364}}} \right]}}\]</div>
 
-<p>where <div img="image570.txt">(\beta )</div> = solar altitude, degrees.</p>
+<p>where <span>$\beta $</span> = solar altitude, degrees.</p>
 <p>Direct and diffuse irradiance are determined with the following relationships,</p>
 <div>\[{E_b} = {E_o} \cdot \exp \left[ { - {\tau_b} \cdot {m^{ab}}} \right]\]</div>
 
 <div>\[{E_d} = {E_o} \cdot \exp \left[ { - {\tau_d} \cdot {m^{ad}}} \right]\]</div>
 
 <p>where:</p>
-<div img="image573.txt">\({E_b}\)</div>
-
-<p>= beam normal irradiance, W/m<sup>2</sup></p>
-<div img="image574.txt">\({E_d}\)</div>
-
-<p>= diffuse horizontal irradiance,</p>
-<div img="image575.txt">\({E_o}\)</div>
-
-<p>= extraterrestrial normal irradiance,</p>
-<p><em><div img="image576.txt">(m)</div></em> = air mass</p>
+<p><span>${E_b}$</span> = beam normal irradiance, W/m<sup>2</sup></p>
+<p><span>${E_d}$</span> = diffuse horizontal irradiance,</p>
+<p><span>${E_o}$</span> = extraterrestrial normal irradiance,</p>
+<p><em><span>$m$</span></em> = air mass</p>
 <p>t<sub>b</sub> and t<sub>d</sub> = beam and diffuse optical depths (from ASHRAE climatic design data)</p>
-<div img="image577.txt">\(ab\)</div>
-
-<p>and <div img="image578.txt">(ad)</div> = beam and diffuse air mass exponents (see below)</p>
+<p><span>$ab$</span> and <span>$ad$</span> = beam and diffuse air mass exponents (see below)</p>
 <p>Values of t<sub>b</sub> and t<sub>d</sub> are location-specific and vary during the year. They embody the dependence of clear sky solar radiation upon local conditions, such as elevation, precipitable water content, and aerosols.</p>
-<p>The air mass exponents <div img="image579.txt">(ab)</div> and <div img="image580.txt">(ad)</div> were correlated to t<sub>b</sub> and t<sub>d</sub> through the following empirical relationships:</p>
+<p>The air mass exponents <span>$ab$</span> and <span>$ad$</span> were correlated to t<sub>b</sub> and t<sub>d</sub> through the following empirical relationships:</p>
 <div>\[ab = 1.219 - 0.043 \cdot {\tau_b} - 0.151 \cdot {\tau_d} - 0.204 \cdot {\tau_b} \cdot {\tau_d}\]</div>
 
 <div>\[ad = 0.202 + 0.852 \cdot {\tau_b} - 0.007 \cdot {\tau_d} - 0.357 \cdot {\tau_b} \cdot {\tau_d}\]</div>
@@ -500,18 +492,10 @@
 <p>I<sub>0</sub>= global solar constant, 1355 W/m<sup>2</sup></p>
 <p>h=solar altitude angle, i.e, the angle between the horizontal and the line to the sun</p>
 <p>CC = cloud cover</p>
-<div img="image584.txt">\(\varphi \)</div>
-
-<p>= relative humidity, %</p>
-<div img="image585.txt">\({T_n},{T_{n - 3}}\)</div>
-
-<p>= dry-bulb temperature at hours n (current) and n-3, respectively</p>
-<div img="image586.txt">\({V_w}\)</div>
-
-<p>= Wind speed, m/s</p>
-<div img="image587.txt">\({c_0},{c_1},{c_2},{c_3},{c_4},{c_5},d,k\)</div>
-
-<p>= regression coefficients</p>
+<p><span>$\varphi $</span> = relative humidity, %</p>
+<p><span>${T_n},{T_{n - 3}}$</span> = dry-bulb temperature at hours n (current) and n-3, respectively</p>
+<p><span>${V_w}$</span> = Wind speed, m/s</p>
+<p><span>${c_0},{c_1},{c_2},{c_3},{c_4},{c_5},d,k$</span> = regression coefficients</p>
 <p>The constants were determined by analysis from measured data and are as follows:</p>
 <p>c<sub>0</sub> = .5598, c<sub>1</sub> = .4982, c<sub>2</sub> = -.6762, c<sub>3</sub> = .02842, c<sub>4</sub> = -.00317, c<sub>5</sub> = .014,
  d = -17.853, k = .843.</p>
@@ -944,7 +928,7 @@
 <p>The cosine of the angle of incidence of the sun's rays on the surface are given by the dot product of surface and sun direction cosines.</p>
 <div>\[\cos \theta  = C{S_1}\cdot C{W_1} + C{S_2}\cdot C{W_2} + C{S_3}\cdot C{W_3}\]</div>
 
-<p>If <div img="image627.txt">(\cos \theta )</div> is less than zero, the sun is behind the surface.</p>
+<p>If <span>$\cos \theta $</span> is less than zero, the sun is behind the surface.</p>
 <p>A shadow is projected from the vertices of the shadowing polygon (SP) along the direction of the sun's rays to the plane of the shadow receiving polygon (RP).  If any vertices of the SP are below the plane of the RP (z &lt; 0), a false shadow is cast as in Figure 42.  The "submerged" portion of the SP must be clipped off before projection.</p>
 <p><img alt="" src="../../EngineeringReference/media/image628.png" /></p>
 <p>Figure 42.  Illustration of Shadow Clipping</p>
@@ -1106,9 +1090,7 @@
 <p><em>i</em> = zone surface number counter</p>
 <p><em>N<sub>surf</sub></em>= number of heat transfer surfaces in zone</p>
 <p><em>A<sub>i</sub></em> = surface area [m<sup>2</sup>]</p>
-<div img="image649.txt">\({\alpha_i}\)</div>
-
-<p>= inside solar absorptance for an opaque surface, or, for a window, = back diffuse transmittance plus back diffuse system absorptance of glass layers and shading device layers (if present)</p>
+<p><span>${\alpha_i}$</span>= inside solar absorptance for an opaque surface, or, for a window, = back diffuse transmittance plus back diffuse system absorptance of glass layers and shading device layers (if present)</p>
 <p>Solving this equation for <em>QS</em> gives:</p>
 <div>\[QS(ZoneNum) = \frac{{{Q_{SW}}(ZoneNum)}}{{\sum\limits_{i = 1}^{{N_{surf}}} {AbsInsSur{f_i}{A_i}} }} = {Q_{SW}}(ZoneNum)*VMULT(ZoneNum)\]</div>
 
@@ -1116,7 +1098,7 @@
 <div>\[VMULT(ZoneNum) = \frac{1}{{\sum\limits_{i = 1}^{{N_{surf}}} {AbsIntSur{f_i}*{A_i}} }}{\rm{    [}}{{\rm{m}}^{{\rm{ - 2}}}}]\]</div>
 
 <p><em>Q<sub>sw</sub></em> is given by</p>
-<p><div img="image652.txt">(\begin{array}{l}Q{S_{SW}} = QD(ZoneNum) + \{\rm{             }}ZoneIntGain(ZoneNum)\% QLTSW + \{\rm{             }}ZoneIntGain(ZoneNum)\% T_QLTSW{\rm{    [W]}}\end{array})</div></p>
+<p><span>$\begin{array}{l}Q{S_{SW}} = QD(ZoneNum) + \{\rm{             }}ZoneIntGain(ZoneNum)\% QLTSW + \{\rm{             }}ZoneIntGain(ZoneNum)\% T_QLTSW{\rm{    [W]}}\end{array}$</span></p>
 <p>where</p>
 <p><em>ZoneIntGain(ZoneNum)%QLTSW</em> = short-wave radiation into zone from general (overhead) electric lighting [W]</p>
 <p><em>ZoneIntGain(</em>ZoneNum<em>)%T_QLTSW</em> = short-wave radiation into zone from task electric lighting [W]</p>
@@ -1161,9 +1143,7 @@
 <p><em>FractDifShortZtoZ(OtherZoneNum,ZoneNum)</em> = “diffuse solar exchange factor” = fraction of short-wave radiation in <em>OtherZoneNum</em> that is transmitted to <em>ZoneNum</em>. This factor is calculated in subroutine ComputeDifSolExcZonesWIZWindows taking into account multiple reflection between zones. For example, for two zones means that some of the radiation transmitted from Zone1 to Zone2 is reflected back to Zone1, and some of this is in turn reflected back to Zone2, etc.</p>
 <h5 id="interior-beam-radiation">Interior Beam Radiation</h5>
 <p>The inside beam solar irradiance factor<a href="#_ftn4">[4]</a> in is given by:</p>
-<div img="image658.txt">\(AISurf(SurfNum) = \frac{{AbsIntSurf(SurfNum)}}{{A(SurfNum)}}\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}*Aoverla{p_i}(SurfNum)*CosIn{c_i}} \)</div>
-
-<p>where</p>
+<p><span>$AISurf(SurfNum) = \frac{{AbsIntSurf(SurfNum)}}{{A(SurfNum)}}\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}<em>Aoverla{p_i}(SurfNum)</em>CosIn{c_i}} $</span>where</p>
 <p><em>i</em> = exterior window number</p>
 <p><em>N<sub>extwin</sub>=</em> number of exterior windows in zone</p>
 <p><em>CosInc<sub>i</sub></em> = cosine of angle of incidence of beam on exterior window <em>i</em></p>
@@ -1173,15 +1153,9 @@
 <p><em>A(SurfNum)</em> = area of surface <em>SurfNum</em> [m<sup>2</sup>]</p>
 <h4 id="interior-solar-radiation-absorbed-by-windows">Interior Solar Radiation Absorbed by Windows</h4>
 <p>The interior short-wave radiation absorbed by layer <em>l</em> (glass, shade or blind) of a window is equal to:</p>
-<div img="image659.txt">\(\begin{array}{l}QS(ZoneNum)*\alpha_{l,back}^{dif}(SurfNum) + \\BeamSolarRad*\frac{{\alpha_{l,back}^{beam}(SurfNum)}}{{A(SurfNum)}}\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}*Aoverla{p_i}(SurfNum)} *CosIn{c_i}{\rm{  [W/}}{{\rm{m}}^{\rm{2}}}]\end{array}\)</div>
-
-<p>where</p>
-<div img="image660.txt">\(\alpha_{l,back}^{dif}\)</div>
-
-<p>= the system diffuse solar absorptance of layer<em> l</em> for irradiance from the back side</p>
-<div img="image661.txt">\(\alpha_{l,back}^{beam}\)</div>
-
-<p>= the system beam solar absorptance of layer<em> l</em> for irradiance from the back side</p>
+<p><span>$\begin{array}{l}QS(ZoneNum)<em>\alpha_{l,back}^{dif}(SurfNum) + \BeamSolarRad</em>\frac{{\alpha_{l,back}^{beam}(SurfNum)}}{{A(SurfNum)}}\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}<em>Aoverla{p_i}(SurfNum)} </em>CosIn{c_i}{\rm{  [W/}}{{\rm{m}}^{\rm{2}}}]\end{array}$</span>where</p>
+<p><span>$\alpha_{l,back}^{dif}$</span>= the system diffuse solar absorptance of layer<em> l</em> for irradiance from the back side</p>
+<p><span>$\alpha_{l,back}^{beam}$</span>= the system beam solar absorptance of layer<em> l</em> for irradiance from the back side</p>
 <p><em>A(SurfNum)</em>= glazing area [m<sup>2</sup>]</p>
 <p>Note that as of Version 2.1, the initially distributed diffuse solar absorbed by each surface (as described above under “Initial Distribution of Diffuse Solar Transmitted through Exterior and Interior Windows”) is added to this uniformly distributed short-wave radiation.</p>
 <h4 id="interior-solar-radiation-transmitted-by-interior-windows">Interior Solar Radiation Transmitted by Interior Windows</h4>
@@ -1190,14 +1164,12 @@
 <div>\[QS(ZoneNum)*{\tau ^{dif}}(SurfNum)*A(SurfNum){\rm{    [W]}}\]</div>
 
 <p>where</p>
-<div img="image663.txt">\({\tau ^{dif}}(SurfNum)\)</div>
-
-<p>= diffuse transmittance of the interior window</p>
+<p><span>${\tau ^{dif}}(SurfNum)$</span>= diffuse transmittance of the interior window</p>
 <h5 id="interior-beam-radiation-transmitted-by-interior-windows">Interior Beam Radiation Transmitted by Interior Windows</h5>
 <p>The interior beam solar radiation transmitted by an interior window to the adjacent zone is</p>
 <div>\[BeamSolarRad*{\tau ^{beam}}(SurfNum)\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}*Aoverla{p_i}(SurfNum)*CosIn{c_i}{\rm{    [W}}]} \]</div>
 
-<p>where <div img="image665.txt">({\tau ^{beam}}(SurfNum))</div>is the beam-to-beam transmittance of the interior window at the angle of incidence of beam solar from the exterior window on the interior window. The program does not track where this radiation falls in the adjacent zone: it is counted as diffuse radiation in that zone. Therefore,</p>
+<p>where <span>${\tau ^{beam}}(SurfNum)$</span>is the beam-to-beam transmittance of the interior window at the angle of incidence of beam solar from the exterior window on the interior window. The program does not track where this radiation falls in the adjacent zone: it is counted as diffuse radiation in that zone. Therefore,</p>
 <div>\[QS(ZoneNum) \to QS(ZoneNum) + [{\rm{beam solar from adjacent zones]}}*VMULT(ZoneNum)\]</div>
 
 <h3 id="ground-reflectances">Ground Reflectances</h3>

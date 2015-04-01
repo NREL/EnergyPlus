@@ -352,7 +352,7 @@
 
 </table>
 
-<p><em>ResolveAirLoopFlowLimits</em> is invoked to deal with zone equipment – primary air system flow mismatches. For instance the zone air terminal units (ATUs) may be asking for more air than the central fan can supply. In this case <em>ResolveAirLoopFlowLimits</em> takes the air flow that the fan can supply and apportions it among the ATUs in proportion to their design maximum air flow rates (<em>ResolveAirLoopFlowLimits</em> sets the <div img="image1911.txt">({\dot m_{\max avail,node}})</div> at the entering node of each ATU in the system).</p>
+<p><em>ResolveAirLoopFlowLimits</em> is invoked to deal with zone equipment – primary air system flow mismatches. For instance the zone air terminal units (ATUs) may be asking for more air than the central fan can supply. In this case <em>ResolveAirLoopFlowLimits</em> takes the air flow that the fan can supply and apportions it among the ATUs in proportion to their design maximum air flow rates (<em>ResolveAirLoopFlowLimits</em> sets the <span>${\dot m_{\max avail,node}}$</span> at the entering node of each ATU in the system).</p>
 <p>At the end of the air loop simulation <em>ResolveLockoutFlags</em> is called. This subroutine checks if any air system component has requested that the economizer be locked out. If such a request has been made and if the economizer is active, <em>ResolveLockoutFlags</em> sets <em>SimAirLoops</em> to <em>true</em> and the <em>EconoLockout</em> flag to <em>true</em> to ensure that the air loop will be resimulated with the economizer forced off.</p>
 <h2 id="primary-air-system-simulation">Primary Air System Simulation</h2>
 <p>When the EnergyPlus HVAC simulation manager needs to simulate the primary air system side of the air loop it calls <em>ManageAirLoops</em>, the primary air system simulation manager subroutine.</p>
@@ -411,7 +411,7 @@
 
 <div>\[{\dot m_{br,\min }} = {\rho_{std}} \cdot {\dot V_{br,\min }}\]</div>
 
-<p>where <div img="image1914.txt">({\rho_{std}})</div> is the density of air at 20 degrees C, humidity ratio = 0, standard pressure.</p>
+<p>where <span>${\rho_{std}}$</span> is the density of air at 20 degrees C, humidity ratio = 0, standard pressure.</p>
 <p>For each branch, loop over all the nodes on the branch and set the node data to the following values:</p>
 <div>\[{T_{node}} = {20^{\rm{o}}}C\]</div>
 
@@ -435,10 +435,10 @@
 
 <div>\[Q{u_{node}} = 0.0\]</div>
 
-<p>where <div img="image1926.txt">({W_{oa}})</div> is the humidity ratio of the outside air; <div img="image1927.txt">({\rm{PsyHFnTdbW}})</div>is the EnergyPlus psychrometric function for enthalpy <em>h</em>, given temperature and humidity ratio; and <em>Qu</em> is quality.</p>
+<p>where <span>${W_{oa}}$</span> is the humidity ratio of the outside air; <span>${\rm{PsyHFnTdbW}}$</span>is the EnergyPlus psychrometric function for enthalpy <em>h</em>, given temperature and humidity ratio; and <em>Qu</em> is quality.</p>
 <h4 id="system-time-step-initializations">System Time Step Initializations</h4>
-<p>For each branch in each air loop, loop over all the nodes on the branch and set <div img="image1928.txt">({\dot m_{setpt,node}} = 0.0)</div>; if it is the start of an HVAC solution sequence set <div img="image1929.txt">({\dot m_{\max avail,node}} = {\dot m_{\max ,node}})</div>. Then set the mass flow rate setpoints for the air loop nodes.</p>
-<p>1)    On each air loop, loop over the outlet branches and find the loop outlet nodes. If it is the start of an HVAC solution sequence, set <div img="image1930.txt">({\dot m_{setpt,outletnode}} = {\dot m_{outletbr,\max }})</div>. This will insure that during the first pass through the full loop that the mass flow rate will be at the maximum. Otherwise, set <div img="image1931.txt">({\dot m_{setpt,outletnode}} = {\dot m_{zone{\rm{ }}eq{\rm{ }}inletnode}})</div>. This sets the air loop flow rate to the total zone requirement.</p>
+<p>For each branch in each air loop, loop over all the nodes on the branch and set <span>${\dot m_{setpt,node}} = 0.0$</span>; if it is the start of an HVAC solution sequence set <span>${\dot m_{\max avail,node}} = {\dot m_{\max ,node}}$</span>. Then set the mass flow rate setpoints for the air loop nodes.</p>
+<p>1)    On each air loop, loop over the outlet branches and find the loop outlet nodes. If it is the start of an HVAC solution sequence, set <span>${\dot m_{setpt,outletnode}} = {\dot m_{outletbr,\max }}$</span>. This will insure that during the first pass through the full loop that the mass flow rate will be at the maximum. Otherwise, set <span>${\dot m_{setpt,outletnode}} = {\dot m_{zone{\rm{ }}eq{\rm{ }}inletnode}}$</span>. This sets the air loop flow rate to the total zone requirement.</p>
 <p>2)    Pass the mass flow rate setpoint upstream to the start of the outlet branches; through the splitter, if one exists; and upstream to the beginning node of the splitter inlet branch.</p>
 <p>3)    Sum the total return air mass flow rate and save it in the AirLoopFlow data structure.</p>
 <p>4)    For each air loop, loop over the inlet nodes and, at the start of each HVAC solution sequence, set the entering node mass flow rate equal to the primary air system design mass flow rate (subject to it not being larger than the entering node mass flow rate setpoint).</p>
@@ -514,7 +514,7 @@
 
 <div>\[{p_{node}} = {p_{oa}}\]</div>
 
-<p>where <em>W<sub>oa</sub></em> is the humidity of the outside air; <div img="image1938.txt">({\rm{PsyHFnTdbW}})</div>is the EnergyPlus psychrometric function for enthalpy <em>h</em>, given temperature and humidity ratio; <em>p<sub>oa</sub></em> is the pressure of the outside air; and <em>Qu</em> is quality.</p>
+<p>where <em>W<sub>oa</sub></em> is the humidity of the outside air; <span>${\rm{PsyHFnTdbW}}$</span>is the EnergyPlus psychrometric function for enthalpy <em>h</em>, given temperature and humidity ratio; <em>p<sub>oa</sub></em> is the pressure of the outside air; and <em>Qu</em> is quality.</p>
 <h4 id="system-time-step-initializations_1">System Time Step Initializations</h4>
 <p>For each controlled zone, set the exhaust nodes conditions equal to the zone node conditions; except set the exhaust nodes mass flow rate and min and max available mass flow rates to zero.</p>
 <h3 id="simulation_2">Simulation</h3>
@@ -561,7 +561,7 @@
 
 <div>\[{T_{air,out}} = PsyTdbFnHW({h_{air,out}},{W_{air,out}})\]</div>
 
-<p>Where <div img="image1944.txt">(\dot m)</div>is air mass flow rate, <em>W</em> is humidity ratio, <em>h</em> is specific enthalpy, <em>P</em> is pressure, and <em>T</em> is temperature. <em>PsyTdbFnHW</em> is the EnergyPlus psychrometric function for drybulb temperature as a function of enthalpy and humidity ratio. The air mass flow rate calculation is also done for the maximum and minimum available mass flow rates.</p>
+<p>Where <span>$\dot m$</span>is air mass flow rate, <em>W</em> is humidity ratio, <em>h</em> is specific enthalpy, <em>P</em> is pressure, and <em>T</em> is temperature. <em>PsyTdbFnHW</em> is the EnergyPlus psychrometric function for drybulb temperature as a function of enthalpy and humidity ratio. The air mass flow rate calculation is also done for the maximum and minimum available mass flow rates.</p>
 <h3 id="zone-return-plenum">Zone Return Plenum</h3>
 <p>The AirLoopHVAC:ReturnPlenum acts analogously to the AirLoopHVAC:ZoneMixer. The only difference is that the AirLoopHVAC:ReturnPlenum is associated with a Zone for which it sets the supply air flow rate and from which it gets its outlet air conditions. The AirLoopHVAC:ReturnPlenum combines multiple inlet air streams into a single outlet air stream. Its data and simulation model are encapsulated in the module <em>ZonePlenum</em>. The outlet air mass flow rate is obtained from</p>
 <div>\[{\dot m_{air,out}} = \sum\limits_{i = 1,n} {{{\dot m}_{air,in,i}}} \]</div>
@@ -580,36 +580,20 @@
 <div>\[{T_{out}} = {T_{in}} - \frac{{{Q_{load}}}}{{\dot m{c_p}}}\]</div>
 
 <p>where</p>
-<div img="image1948.txt">\({T_{out}}\)</div>
-
-<p>= the outlet water temperature</p>
-<div img="image1949.txt">\({T_{in}}\)</div>
-
-<p>= the inlet water temperature</p>
-<div img="image1950.txt">\({Q_{load}}\)</div>
-
-<p>= the scheduled plant load</p>
-<div img="image1951.txt">\(\dot m\)</div>
-
-<p>= the water mass flow rate</p>
-<div img="image1952.txt">\({c_p}\)</div>
-
-<p>= the specific heat of water</p>
+<p><span>${T_{out}}$</span> = the outlet water temperature</p>
+<p><span>${T_{in}}$</span> = the inlet water temperature</p>
+<p><span>${Q_{load}}$</span> = the scheduled plant load</p>
+<p><span>$\dot m$</span> = the water mass flow rate</p>
+<p><span>${c_p}$</span> = the specific heat of water</p>
 <p>The user requested flow rate is not always available from the plant loop.  The actual flow rate used in the calculation is the lesser of the user requested value and the plant available value.</p>
 <p>Note that the LoadProfile:Plant object can still request and receive flow even if the scheduled plant load is zero.  In this case the outlet temperature will be the same as the inlet temperature.  This allows users to drive the plant loop flow without necessarily affecting the loop temperature.</p>
 <p>For reporting purposes the energy consumption of the object is calculated using the equation:</p>
 <div>\[E = {Q_{load}}\Delta t\]</div>
 
 <p>where</p>
-<div img="image1954.txt">\(E\)</div>
-
-<p>= the energy consumption</p>
-<div img="image1955.txt">\({Q_{load}}\)</div>
-
-<p>= the scheduled plant load</p>
-<div img="image1956.txt">\(\Delta t\)</div>
-
-<p>= the time step interval</p>
+<p><span>$E$</span> = the energy consumption</p>
+<p><span>${Q_{load}}$</span> = the scheduled plant load</p>
+<p><span>$\Delta t$</span> = the time step interval</p>
 <h2 id="plantcondenser-loops">Plant/Condenser Loops</h2>
 <h3 id="integration-of-system-and-plant">Integration of System and Plant</h3>
 <p>In order to integrate the air handling system simulation with the zones simulation, methods were developed to model the system air loop and its interactions with the zones due to temperature controls and the relative difference between the zone and supply air temperatures. A similar situation is encountered when integrating the central plant simulation. Typically, the central plant interacts with the systems via a fluid loop between the plant components and heat exchangers, called either heating or cooling coils. In EnergyPlus the performance of the air systems and plant are interdependent because the simulations are combined. The plant outputs must match the system inputs and vice versa. That is, the temperature of the chilled water leaving the plant must equal the temperature of the water entering the coils, and the chilled water flow rate must satisfy mass continuity. In addition, coil controls are usually necessary to ensure that the values of chilled water flow variables entering and leaving the coil remain in a reasonable range. Plants can also interact with each other so that the operation of a chilled water loop and chiller will affect the operation of a condenser water loop.</p>
@@ -691,27 +675,13 @@
 <div>\[T_{tank}^t = \left( {T_{tank}^{t - \delta t} - \frac{{\dot m{c_p}{T_{inlet}} + {{\dot Q}_{pumpheat}}}}{{\dot m{c_p}}}} \right)\exp \left( { - \frac{{\dot m{c_p}}}{{{M_{tank}}{c_p}}}t} \right) + \frac{{\dot m{c_p}{T_{inlet}} + {{\dot Q}_{pumpheat}}}}{{\dot m{c_p}}}\]</div>
 
 <p>where:</p>
-<div img="image1966.txt">\(T_{tank}^{t - \delta t}\)</div>
-
-<p>= Previous system time-step tank temperature [°C]</p>
-<div img="image1967.txt">\(T_{tank}^t\)</div>
-
-<p>= Current tank and tank outlet temperature [°C]</p>
-<div img="image1968.txt">\(\dot m\)</div>
-
-<p>= Current fluid mass flow rate through the tank [kg/s]</p>
-<div img="image1969.txt">\(\delta t\)</div>
-
-<p>= Duration of system time step [second]</p>
-<div img="image1970.txt">\({c_P}\)</div>
-
-<p>= Heat capacity of fluid [J/kg]</p>
-<div img="image1971.txt">\({M_{tank}}\)</div>
-
-<p>= Mass of the water in the tank [kg]</p>
-<div img="image1972.txt">\({\dot Q_{pumpheat}}\)</div>
-
-<p>= Heat generated by a pump in the tank [W]</p>
+<p><span>$T_{tank}^{t - \delta t}$</span>          = Previous system time-step tank temperature [°C]</p>
+<p><span>$T_{tank}^t$</span>           = Current tank and tank outlet temperature [°C]</p>
+<p><span>$\dot m$</span>              = Current fluid mass flow rate through the tank [kg/s]</p>
+<p><span>$\delta t$</span>             = Duration of system time step [second]</p>
+<p><span>${c_P}$</span>             = Heat capacity of fluid [J/kg]</p>
+<p><span>${M_{tank}}$</span>         = Mass of the water in the tank [kg]</p>
+<p><span>${\dot Q_{pumpheat}}$</span>    = Heat generated by a pump in the tank [W]</p>
 <p>When modeling plants using one of the common pipe modes for plant loops, the same tank model is used but the tanks are situated differently and account for extra connections.  For common pipe situation, the tanks are located on the outlet of a half loop with common pipe interactions downstream of the tank.</p>
 <p>The average temperature is reported as the tank temperature. The average temperature is defined as the value of an integral function of tank temperature on an interval [<em>0</em>,<em>δt</em>]</p>
 <div>\[\mathop T\limits^ -   = \frac{1}{{\delta t}}\int_0^{\delta t} {T_{tank}^tdt} \;\; = \frac{{{M_{tank}}{c_p}}}{{\dot m{c_p}\delta t}}\left( {T_{tank}^{t - \delta t} - \frac{{\dot m{c_p}{T_{inlet}} + {{\dot Q}_{pumpheat}}}}{{\dot m{c_p}}}} \right)\left( {1 - \exp \left( { - \frac{{\dot m{c_p}}}{{{M_{tank}}{c_p}}}\delta t} \right)} \right) + \frac{{\dot m{c_p}{T_{inlet}} + {{\dot Q}_{pumpheat}}}}{{\dot m{c_p}}}\]</div>
@@ -876,8 +846,8 @@
 
 <p>C<sub>1-4</sub> are curve coefficients with last mandatory non-zero constant term C<sub>0</sub> (as pump curve will not pass through origin).</p>
 <p>The nondimensional variables in the previous equation are defined in terms of the following expressions:</p>
-<p>Ψ – Non-dimensional pressure rise:  <div img="image1984.txt">(\psi  = \frac{{\Delta P}}{{\rho {N^2}{D^2}}})</div></p>
-<p>φ - Non-dimensional flow:  <div img="image1985.txt">(\varphi  = \frac{{\dot m}}{{\rho N{D^3}}})</div></p>
+<p>Ψ – Non-dimensional pressure rise:  <span>$\psi  = \frac{{\Delta P}}{{\rho {N^2}{D^2}}}$</span></p>
+<p>φ - Non-dimensional flow:  <span>$\varphi  = \frac{{\dot m}}{{\rho N{D^3}}}$</span></p>
 <p>The user preprocesses mass flow and pressure values into these nondimensional forms in order to generate the curve fit.  The program then resolves the nondimensional forms into actual values based on the pump speed, diameter, and fluid density.  This gives the proper pressure-flow relationship for the simulation.</p>
 <h4 id="pump-system-operating-point-flow-resolver">Pump-System Operating Point Flow Resolver:</h4>
 <p>The pressure drop components and the pump curve are described in the prior sections.  The routine which actually uses these curves to resolve to an operating point is described here.  This routine is called by the pump model as it is determining what flow it should be using.  The flow resolver reads the non-dimensional pump curve, loop pressure constant (K value) and rated mass flow rate (or mass flow rate from last iteration). The resolver finds the intersection of the two curves by successive substitution with 0.9 as a damping factor. If the flow rate is outside (or if in any iteration move out of) the range for which pump curve-fit is suggested, the resolver will bring the value within range, thus it is important to specify the curve-fit range (in terms of non-dimensional flow rate) for pump curve by the user.  It was observed that simple successive substitution (sometimes) diverges depending on shape of curves and/or location of operating point. Damping factor provides stability to successive substitution and it was observed that it converges for less number of iteration, speeding up the function. The damping factor was set as 0.9 as it showed full stability during testing, although a more optimum value may be available for a particular set of curves.  A future version may have an improved selection algorithm for the damping factor itself.</p>
@@ -1001,9 +971,7 @@
 
 <div>\[END\,\,IF\]</div>
 
-<div img="image2008.txt">\(END\,\,IF\)</div>
-
-<p>End IF for the zone load controlled coil.</p>
+<p><span>$END\,\,IF$</span> End IF for the zone load controlled coil.</p>
 <h4 id="steam-coil-is-temperature-controlled">Steam coil is temperature controlled.</h4>
 <div>\[IF\,\,\,\,\,(Coil\, = TemperatureControlled)\,\,\,\,\,\,THEN\,\]</div>
 
@@ -1050,15 +1018,9 @@
 
 <div>\[{Q_{al}}\,\, = \,\,\,{\dot m_a}\, \times \,\,\,{c_{p,a}}\,\, \times \,\,\,\,[\,\,{T_{sp}}\,\, - \,\,\,{T_a}]\]</div>
 
-<div img="image2026.txt">\(END\,\,IF\)</div>
-
-<p>End IF statement, for the air coil heating loop.</p>
-<div img="image2027.txt">\(END\,\,IF\)</div>
-
-<p>End IF statement for the operating condition loop</p>
-<div img="image2028.txt">\(END\,\,IF\)</div>
-
-<p>End IF statement for the Temperature Setpoint Controlled Coil</p>
+<p><span>$END\,\,IF$</span>   End IF statement, for the air coil heating loop.</p>
+<p><span>$END\,\,IF$</span>         End IF statement for the operating condition loop</p>
+<p><span>$END\,\,IF$</span>   End IF statement for the Temperature Setpoint Controlled Coil</p>
 <p>The steam coil model encapsulates the above described control logic along with the other necessary simulation code for reading the user inputs and the code for reporting the simulation results.</p>
 <p>*********************PSEUDO CODE SECTION ENDS**************************</p>
 <p>The two main types of coil control discussed above are followed by common simulation code in the coil model.  This code calculates the loop losses occurring due to flashing of steam across the steam trap, isenthalpic expansion occurring across the steam trap due to pressure difference, and loss occurring due to condensate sub cooling returning back to the boiler.  The above-mentioned two processes are explained in Figure 129 as process 3-4’ and 4-5.</p>
