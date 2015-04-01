@@ -20,7 +20,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 template< typename, typename = void > class Optional;
 class byte;
 class ubyte;

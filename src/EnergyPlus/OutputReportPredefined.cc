@@ -89,6 +89,17 @@ namespace OutputReportPredefined {
 	int pdchDXCoolCoilEERIP; // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
 	int pdchDXCoolCoilIEERIP; // IEER value in IP unit at AHRI std. 340/360 conditions
 
+	// DX Cooling Coil subtable per ANSI/ASHRAE Std 127 for Tests A, B, C and D
+	int pdstDXCoolCoil2;
+	int pdchDXCoolCoilNetCapSIA; // Standard Rated (Net) Cooling Capacity [W], Test A
+	int pdchDXCoolCoilElecPowerA; // Standard Rated Electric Power [W], Test A
+	int pdchDXCoolCoilNetCapSIB; // Standard Rated (Net) Cooling Capacity [W], Test B
+	int pdchDXCoolCoilElecPowerB; // Standard Rated Electric Power [W], Test B
+	int pdchDXCoolCoilNetCapSIC; // Standard Rated (Net) Cooling Capacity [W], Test C
+	int pdchDXCoolCoilElecPowerC; // Standard Rated Electric Power [W], Test C
+	int pdchDXCoolCoilNetCapSID; // Standard Rated (Net) Cooling Capacity [W], Test D
+	int pdchDXCoolCoilElecPowerD; // Standard Rated Electric Power [W], Test D
+
 	// VAV DX Cooling Ratings Details
 	int pdstVAVDXCoolCoil; // details for Packaged VAV rating under AHRI 340/360
 	int pdchVAVDXCoolCoilType;
@@ -264,6 +275,16 @@ namespace OutputReportPredefined {
 	int pdchSysSizUserClAir;
 	int pdchSysSizCalcHtAir;
 	int pdchSysSizUserHtAir;
+	int pdstPlantSize;
+	int pdchPlantSizCalcVdot;
+	int pdchPlantSizMeasVdot;
+	int pdchPlantSizPrevVdot;
+//	int pdchPlantSizPass;
+	int pdchPlantSizCoincYesNo;
+	int pdchPlantSizDesDay;
+	int pdchPlantSizPkTimeHour;
+	int pdchPlantSizPkTimeDayOfSim;
+	int pdchPlantSizPkTimeMin;
 
 	//System summary
 	int pdrSystem;
@@ -631,17 +652,11 @@ namespace OutputReportPredefined {
 
 	// Object Data
 	FArray1D< reportNameType > reportName;
-	FArray1D< reportNameType > reportNameCopy;
 	FArray1D< SubTableType > subTable;
-	FArray1D< SubTableType > subTableCopy;
 	FArray1D< ColumnTagType > columnTag;
-	FArray1D< ColumnTagType > columnTagCopy;
 	FArray1D< TableEntryType > tableEntry;
-	FArray1D< TableEntryType > tableEntryCopy;
 	FArray1D< CompSizeTableEntryType > CompSizeTableEntry;
-	FArray1D< CompSizeTableEntryType > CompSizeTableEntryCopy;
 	FArray1D< ShadowRelateType > ShadowRelate;
-	FArray1D< ShadowRelateType > ShadowRelateCopy;
 
 	// Functions
 
@@ -883,6 +898,18 @@ namespace OutputReportPredefined {
 		pdchDXCoolCoilSEERIP = newPreDefColumn( pdstDXCoolCoil, "SEER [Btu/W-h]" );
 		pdchDXCoolCoilIEERIP = newPreDefColumn( pdstDXCoolCoil, "IEER [Btu/W-h]" );
 
+		// for DX Cooling Coil ASHRAE 127-12 Report
+		pdstDXCoolCoil2 = newPreDefSubTable( pdrEquip, "DX Cooling Coil ASHRAE 127 Standard Ratings Report" );
+		pdchDXCoolCoilType = newPreDefColumn( pdstDXCoolCoil2, "DX Cooling Coil Type" );
+		pdchDXCoolCoilNetCapSIA = newPreDefColumn( pdstDXCoolCoil2, "Rated Net Cooling Capacity Test A [W]" );
+		pdchDXCoolCoilElecPowerA = newPreDefColumn( pdstDXCoolCoil2, "Rated Electric Power Test A [W]" );
+		pdchDXCoolCoilNetCapSIB = newPreDefColumn( pdstDXCoolCoil2, "Rated Net Cooling Capacity Test B [W]" );
+		pdchDXCoolCoilElecPowerB = newPreDefColumn( pdstDXCoolCoil2, "Rated Electric Power Test B [W]" );
+		pdchDXCoolCoilNetCapSIC = newPreDefColumn( pdstDXCoolCoil2, "Rated Net Cooling Capacity Test C [W]" );
+		pdchDXCoolCoilElecPowerC = newPreDefColumn( pdstDXCoolCoil2, "Rated Electric Power Test C [W]" );
+		pdchDXCoolCoilNetCapSID = newPreDefColumn( pdstDXCoolCoil2, "Rated Net Cooling Capacity Test D [W]" );
+		pdchDXCoolCoilElecPowerD = newPreDefColumn( pdstDXCoolCoil2, "Rated Electric Power Test D [W]" );
+
 		pdstDXHeatCoil = newPreDefSubTable( pdrEquip, "DX Heating Coils" );
 		pdchDXHeatCoilType = newPreDefColumn( pdstDXHeatCoil, "DX Heating Coil Type" );
 		pdchDXHeatCoilHighCap = newPreDefColumn( pdstDXHeatCoil, "High Temperature Heating (net) Rating Capacity [W]" );
@@ -965,6 +992,17 @@ namespace OutputReportPredefined {
 		pdchSysSizUserClAir = newPreDefColumn( pdstSystemSize, "User cooling [m3/s]" );
 		pdchSysSizCalcHtAir = newPreDefColumn( pdstSystemSize, "Calculated heating [m3/s]" );
 		pdchSysSizUserHtAir = newPreDefColumn( pdstSystemSize, "User heating [m3/s]" );
+
+		pdstPlantSize = newPreDefSubTable( pdrSizing, "Plant Loop Coincident Design Fluid Flow Rate Adjustments");
+//		pdchPlantSizPass = newPreDefColumn( pdstPlantSize, "Sizing Pass" );
+		pdchPlantSizPrevVdot = newPreDefColumn( pdstPlantSize, "Previous Design Volume Flow Rate [m3/s]" );
+		pdchPlantSizMeasVdot = newPreDefColumn( pdstPlantSize, "Algorithm Volume Flow Rate [m3/s]" );
+		pdchPlantSizCalcVdot = newPreDefColumn( pdstPlantSize, "Coincident Design Volume Flow Rate [m3/s]" );
+		pdchPlantSizCoincYesNo = newPreDefColumn( pdstPlantSize, "Coincident Size Adjusted" );
+		pdchPlantSizDesDay = newPreDefColumn( pdstPlantSize, "Peak Sizing Period Name" );
+		pdchPlantSizPkTimeDayOfSim = newPreDefColumn( pdstPlantSize, "Peak Day into Period" );
+		pdchPlantSizPkTimeHour = newPreDefColumn( pdstPlantSize, "Peak Hour Of Day" );
+		pdchPlantSizPkTimeMin = newPreDefColumn( pdstPlantSize, "Peak Step Start Minute" );
 
 		// System Summary Report
 
@@ -1444,7 +1482,7 @@ namespace OutputReportPredefined {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtI1( "(I1)" );
+		static gio::Fmt fmtI1( "(I1)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1562,7 +1600,7 @@ namespace OutputReportPredefined {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1620,16 +1658,9 @@ namespace OutputReportPredefined {
 			numTableEntry = 1;
 		} else {
 			++numTableEntry;
-			// if larger then current size then make a temporary array of the same
-			// type and put stuff into it while reallocating the main array
+			// if larger than current size grow the array
 			if ( numTableEntry > sizeTableEntry ) {
-				tableEntryCopy.allocate( sizeTableEntry );
-				tableEntryCopy = tableEntry;
-				tableEntry.deallocate();
-				tableEntry.allocate( sizeTableEntry + sizeIncrement );
-				tableEntry( {1,sizeTableEntry} ) = tableEntryCopy;
-				tableEntryCopy.deallocate();
-				sizeTableEntry += sizeIncrement;
+				tableEntry.redimension( sizeTableEntry *= 2 ); //Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
 			}
 		}
 	}
@@ -1679,16 +1710,9 @@ namespace OutputReportPredefined {
 			numCompSizeTableEntry = 1;
 		} else {
 			++numCompSizeTableEntry;
-			// if larger then current size then make a temporary array of the same
-			// type and put stuff into it while reallocating the main array
+			// if larger than current size grow the array
 			if ( numCompSizeTableEntry > sizeCompSizeTableEntry ) {
-				CompSizeTableEntryCopy.allocate( sizeCompSizeTableEntry );
-				CompSizeTableEntryCopy = CompSizeTableEntry;
-				CompSizeTableEntry.deallocate();
-				CompSizeTableEntry.allocate( sizeCompSizeTableEntry + sizeIncrement );
-				CompSizeTableEntry( {1,sizeCompSizeTableEntry} ) = CompSizeTableEntryCopy;
-				CompSizeTableEntryCopy.deallocate();
-				sizeCompSizeTableEntry += sizeIncrement;
+				CompSizeTableEntry.redimension( sizeCompSizeTableEntry *= 2 ); //Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
 			}
 		}
 		CompSizeTableEntry( numCompSizeTableEntry ).typeField = FieldType;
@@ -1744,16 +1768,9 @@ namespace OutputReportPredefined {
 			numShadowRelate = 1;
 		} else {
 			++numShadowRelate;
-			// if larger then current size then make a temporary array of the same
-			// type and put stuff into it while reallocating the main array
+			// if larger than current size grow the array
 			if ( numShadowRelate > sizeShadowRelate ) {
-				ShadowRelateCopy.allocate( sizeShadowRelate );
-				ShadowRelateCopy = ShadowRelate;
-				ShadowRelate.deallocate();
-				ShadowRelate.allocate( sizeShadowRelate + sizeIncrement );
-				ShadowRelate( {1,sizeShadowRelate} ) = ShadowRelateCopy;
-				ShadowRelateCopy.deallocate();
-				sizeShadowRelate += sizeIncrement;
+				ShadowRelate.redimension( sizeShadowRelate *= 2 ); //Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
 			}
 		}
 		ShadowRelate( numShadowRelate ).castSurf = castingField;
@@ -1807,16 +1824,9 @@ namespace OutputReportPredefined {
 			numReportName = 1;
 		} else {
 			++numReportName;
-			// if larger then current size then make a temporary array of the same
-			// type and put stuff into it while reallocating the main array
+			// if larger than current size grow the array
 			if ( numReportName > sizeReportName ) {
-				reportNameCopy.allocate( sizeReportName );
-				reportNameCopy = reportName;
-				reportName.deallocate();
-				reportName.allocate( sizeReportName + sizeIncrement );
-				reportName( {1,sizeReportName} ) = reportNameCopy;
-				reportNameCopy.deallocate();
-				sizeReportName += sizeIncrement;
+				reportName.redimension( sizeReportName *= 2 ); //Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
 			}
 		}
 		// initialize new record
@@ -1852,7 +1862,6 @@ namespace OutputReportPredefined {
 		// USE STATEMENTS:
 
 		// Return value
-		int newPreDefSubTable;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1873,23 +1882,15 @@ namespace OutputReportPredefined {
 			numSubTable = 1;
 		} else {
 			++numSubTable;
-			// if larger then current size then make a temporary array of the same
-			// type and put stuff into it while reallocating the main array
+			// if larger than current size then grow the array
 			if ( numSubTable > sizeSubTable ) {
-				subTableCopy.allocate( sizeSubTable );
-				subTableCopy = subTable;
-				subTable.deallocate();
-				subTable.allocate( sizeSubTable + sizeIncrement );
-				subTable( {1,sizeSubTable} ) = subTableCopy;
-				subTableCopy.deallocate();
-				sizeSubTable += sizeIncrement;
+				subTable.redimension( sizeSubTable *= 2 ); //Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
 			}
 		}
 		// initialize new record)
 		subTable( numSubTable ).name = subTableName;
 		subTable( numSubTable ).indexReportName = reportIndex;
-		newPreDefSubTable = numSubTable;
-		return newPreDefSubTable;
+		return numSubTable;
 	}
 
 	void
@@ -1978,16 +1979,9 @@ namespace OutputReportPredefined {
 			numColumnTag = 1;
 		} else {
 			++numColumnTag;
-			// if larger then current size then make a temporary array of the same
-			// type and put stuff into it while reallocating the main array
+			// if larger than current size grow the array
 			if ( numColumnTag > sizeColumnTag ) {
-				columnTagCopy.allocate( sizeColumnTag );
-				columnTagCopy = columnTag;
-				columnTag.deallocate();
-				columnTag.allocate( sizeColumnTag + sizeIncrement );
-				columnTag( {1,sizeColumnTag} ) = columnTagCopy;
-				columnTagCopy.deallocate();
-				sizeColumnTag += sizeIncrement;
+				columnTag.redimension( sizeColumnTag *= 2 ); //Tuned Changed += sizeIncrement to *= 2 for reduced heap allocations (at some space cost)
 			}
 		}
 		// initialize new record)
@@ -2006,7 +2000,7 @@ namespace OutputReportPredefined {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

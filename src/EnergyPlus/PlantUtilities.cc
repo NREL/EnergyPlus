@@ -192,7 +192,7 @@ namespace PlantUtilities {
 		using DataPlant::DemandOpSchemeType;
 		using DataPlant::FlowUnlocked;
 		using DataPlant::FlowLocked;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
 		using DataBranchAirLoopPlant::ControlType_SeriesActive;
 		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using General::RoundSigDigits;
@@ -226,8 +226,7 @@ namespace PlantUtilities {
 		Real64 SeriesBranchMinAvail;
 
 		if ( OneTimeDiagSetup ) {
-			NodeErrorMsgIssued.allocate( NumOfNodes );
-			NodeErrorMsgIssued = false;
+			NodeErrorMsgIssued.dimension( NumOfNodes, false );
 			NullPlantErrorMsgIssued = false;
 			OneTimeDiagSetup = false;
 		}
@@ -271,7 +270,7 @@ namespace PlantUtilities {
 			Node( OutletNode ).MassFlowRateMaxAvail = min( Node( InletNode ).MassFlowRateMaxAvail, Node( InletNode ).MassFlowRateMax );
 		} else {
 
-			if ( ! SysSizingCalc && PlantSizesOkayToFinalize ) {
+			if ( ! SysSizingCalc && PlantFirstSizesOkayToFinalize ) {
 				// throw error for developers, need to change a componennt model to set hardware limits on inlet
 				if ( ! NodeErrorMsgIssued( InletNode ) ) {
 
@@ -1370,8 +1369,6 @@ namespace PlantUtilities {
 		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PreviousNumChecksStored;
-		static int CurrentNumChecksStored;
 
 		struct CriteriaData
 		{
@@ -1410,24 +1407,13 @@ namespace PlantUtilities {
 
 		// Object Data
 		static FArray1D< CriteriaData > CriteriaChecks; // stores criteria information
-		FArray1D< CriteriaData > TempCriteriaChecks; // used for reallocation during initial calls
 		CriteriaData CurCriteria; // for convenience
 
 		if ( UniqueCriteriaCheckIndex <= 0 ) { // If we don't yet have an index, we need to initialize
 
 			// We need to start by allocating, or REallocating the array
-			if ( ! allocated( CriteriaChecks ) ) {
-				CurrentNumChecksStored = 1;
-				CriteriaChecks.allocate( CurrentNumChecksStored );
-			} else {
-				if ( allocated( TempCriteriaChecks ) ) TempCriteriaChecks.deallocate();
-				PreviousNumChecksStored = size( CriteriaChecks );
-				CurrentNumChecksStored = PreviousNumChecksStored + 1;
-				TempCriteriaChecks.allocate( CurrentNumChecksStored );
-				TempCriteriaChecks( {1,PreviousNumChecksStored} ) = CriteriaChecks;
-				CriteriaChecks.deallocate();
-				CriteriaChecks.allocate( CurrentNumChecksStored );
-			}
+			int const CurrentNumChecksStored( CriteriaChecks.size() + 1 );
+			CriteriaChecks.redimension( CurrentNumChecksStored );
 
 			// Store the unique name and location
 			CriteriaChecks( CurrentNumChecksStored ).CallingCompLoopNum = LoopNum;
@@ -1840,66 +1826,44 @@ namespace PlantUtilities {
 		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int CurrentNumConnectedLoops;
-		bool Loop2DemandsOnLoop1;
 
 		// Object Data
-		FArray1D< ConnectedLoopData > TemporaryConnectedLoops;
 
 		if ( Loop1Num == 0 || Loop1LoopSideNum == 0 || Loop2Num == 0 || Loop2LoopSideNum == 0 ) {
 			return; // Associated ScanPlantLoopsForObject couldn't find the component in the the plant loop structure...
 		} // This is a Fatal error condition
 
-		Loop2DemandsOnLoop1 = false;
-		if ( ! Loop1DemandsOnLoop2 ) Loop2DemandsOnLoop1 = true;
+		bool const Loop2DemandsOnLoop1( ! Loop1DemandsOnLoop2 );
 
-		if ( allocated( PlantLoop( Loop1Num ).LoopSide( Loop1LoopSideNum ).Connected ) ) {
-			CurrentNumConnectedLoops = PlantLoop( Loop1Num ).LoopSide( Loop1LoopSideNum ).TotalConnected;
-			TemporaryConnectedLoops.allocate( CurrentNumConnectedLoops );
-			TemporaryConnectedLoops = PlantLoop( Loop1Num ).LoopSide( Loop1LoopSideNum ).Connected;
+		int TotalConnected;
 
-			PlantLoop( Loop1Num ).LoopSide( Loop1LoopSideNum ).Connected.deallocate();
-			PlantLoop( Loop1Num ).LoopSide( Loop1LoopSideNum ).Connected.allocate( CurrentNumConnectedLoops + 1 );
-			PlantLoop( Loop1Num ).LoopSide( Loop1LoopSideNum ).TotalConnected = CurrentNumConnectedLoops + 1;
-			PlantLoop( Loop1Num ).LoopSide( Loop1LoopSideNum ).Connected( {1,CurrentNumConnectedLoops} ) = TemporaryConnectedLoops;
-			PlantLoop( Loop1Num ).LoopSide( Loop1LoopSideNum ).Connected( CurrentNumConnectedLoops + 1 ).LoopNum = Loop2Num;
-			PlantLoop( Loop1Num ).LoopSide( Loop1LoopSideNum ).Connected( CurrentNumConnectedLoops + 1 ).LoopSideNum = Loop2LoopSideNum;
-			PlantLoop( Loop1Num ).LoopSide( Loop1LoopSideNum ).Connected( CurrentNumConnectedLoops + 1 ).ConnectorTypeOf_Num = PlantComponentTypeOfNum;
-			PlantLoop( Loop1Num ).LoopSide( Loop1LoopSideNum ).Connected( CurrentNumConnectedLoops + 1 ).LoopDemandsOnRemote = Loop1DemandsOnLoop2;
-
-			TemporaryConnectedLoops.deallocate();
+		auto & loop_side_1( PlantLoop( Loop1Num ).LoopSide( Loop1LoopSideNum ) );
+		auto & connected_1( loop_side_1.Connected );
+		if ( allocated( connected_1 ) ) {
+			TotalConnected = ++loop_side_1.TotalConnected;
+			connected_1.redimension( TotalConnected );
 		} else {
-			PlantLoop( Loop1Num ).LoopSide( Loop1LoopSideNum ).Connected.allocate( 1 );
-			PlantLoop( Loop1Num ).LoopSide( Loop1LoopSideNum ).TotalConnected = 1;
-			PlantLoop( Loop1Num ).LoopSide( Loop1LoopSideNum ).Connected( 1 ).LoopNum = Loop2Num;
-			PlantLoop( Loop1Num ).LoopSide( Loop1LoopSideNum ).Connected( 1 ).LoopSideNum = Loop2LoopSideNum;
-			PlantLoop( Loop1Num ).LoopSide( Loop1LoopSideNum ).Connected( 1 ).ConnectorTypeOf_Num = PlantComponentTypeOfNum;
-			PlantLoop( Loop1Num ).LoopSide( Loop1LoopSideNum ).Connected( 1 ).LoopDemandsOnRemote = Loop1DemandsOnLoop2;
+			TotalConnected = loop_side_1.TotalConnected = 1;
+			connected_1.allocate( 1 );
 		}
+		connected_1( TotalConnected ).LoopNum = Loop2Num;
+		connected_1( TotalConnected ).LoopSideNum = Loop2LoopSideNum;
+		connected_1( TotalConnected ).ConnectorTypeOf_Num = PlantComponentTypeOfNum;
+		connected_1( TotalConnected ).LoopDemandsOnRemote = Loop1DemandsOnLoop2;
 
-		if ( allocated( PlantLoop( Loop2Num ).LoopSide( Loop2LoopSideNum ).Connected ) ) {
-
-			CurrentNumConnectedLoops = PlantLoop( Loop2Num ).LoopSide( Loop2LoopSideNum ).TotalConnected;
-			TemporaryConnectedLoops.allocate( CurrentNumConnectedLoops );
-			TemporaryConnectedLoops = PlantLoop( Loop2Num ).LoopSide( Loop2LoopSideNum ).Connected;
-
-			PlantLoop( Loop2Num ).LoopSide( Loop2LoopSideNum ).Connected.deallocate();
-			PlantLoop( Loop2Num ).LoopSide( Loop2LoopSideNum ).Connected.allocate( CurrentNumConnectedLoops + 1 );
-			PlantLoop( Loop2Num ).LoopSide( Loop2LoopSideNum ).TotalConnected = CurrentNumConnectedLoops + 1;
-			PlantLoop( Loop2Num ).LoopSide( Loop2LoopSideNum ).Connected( {1,CurrentNumConnectedLoops} ) = TemporaryConnectedLoops;
-			PlantLoop( Loop2Num ).LoopSide( Loop2LoopSideNum ).Connected( CurrentNumConnectedLoops + 1 ).LoopNum = Loop1Num;
-			PlantLoop( Loop2Num ).LoopSide( Loop2LoopSideNum ).Connected( CurrentNumConnectedLoops + 1 ).LoopSideNum = Loop1LoopSideNum;
-			PlantLoop( Loop2Num ).LoopSide( Loop2LoopSideNum ).Connected( CurrentNumConnectedLoops + 1 ).ConnectorTypeOf_Num = PlantComponentTypeOfNum;
-			PlantLoop( Loop2Num ).LoopSide( Loop2LoopSideNum ).Connected( CurrentNumConnectedLoops + 1 ).LoopDemandsOnRemote = Loop2DemandsOnLoop1;
-			TemporaryConnectedLoops.deallocate();
+		auto & loop_side_2( PlantLoop( Loop2Num ).LoopSide( Loop2LoopSideNum ) );
+		auto & connected_2( loop_side_2.Connected );
+		if ( allocated( connected_2 ) ) {
+			TotalConnected = ++loop_side_2.TotalConnected;
+			connected_2.redimension( TotalConnected );
 		} else {
-			PlantLoop( Loop2Num ).LoopSide( Loop2LoopSideNum ).Connected.allocate( 1 );
-			PlantLoop( Loop2Num ).LoopSide( Loop2LoopSideNum ).TotalConnected = 1;
-			PlantLoop( Loop2Num ).LoopSide( Loop2LoopSideNum ).Connected( 1 ).LoopNum = Loop1Num;
-			PlantLoop( Loop2Num ).LoopSide( Loop2LoopSideNum ).Connected( 1 ).LoopSideNum = Loop1LoopSideNum;
-			PlantLoop( Loop2Num ).LoopSide( Loop2LoopSideNum ).Connected( 1 ).ConnectorTypeOf_Num = PlantComponentTypeOfNum;
-			PlantLoop( Loop2Num ).LoopSide( Loop2LoopSideNum ).Connected( 1 ).LoopDemandsOnRemote = Loop2DemandsOnLoop1;
+			TotalConnected = loop_side_2.TotalConnected = 1;
+			connected_2.allocate( 1 );
 		}
+		connected_2( TotalConnected ).LoopNum = Loop1Num;
+		connected_2( TotalConnected ).LoopSideNum = Loop1LoopSideNum;
+		connected_2( TotalConnected ).ConnectorTypeOf_Num = PlantComponentTypeOfNum;
+		connected_2( TotalConnected ).LoopDemandsOnRemote = Loop2DemandsOnLoop1;
 
 	}
 
@@ -1944,7 +1908,6 @@ namespace PlantUtilities {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// Object Data
-		FArray1D< PlantCallingOrderInfoStruct > TempPlantCallingOrderInfo;
 		PlantCallingOrderInfoStruct RecordToMoveInPlantCallingOrderInfo;
 
 		if ( OldIndex == 0 ) {
@@ -1957,10 +1920,8 @@ namespace PlantUtilities {
 			return;
 		}
 
-		if ( ! allocated( TempPlantCallingOrderInfo ) ) TempPlantCallingOrderInfo.allocate( TotNumHalfLoops );
-
 		// store copy of prior structure
-		TempPlantCallingOrderInfo = PlantCallingOrderInfo;
+		FArray1D< PlantCallingOrderInfoStruct > TempPlantCallingOrderInfo( PlantCallingOrderInfo );
 
 		RecordToMoveInPlantCallingOrderInfo = PlantCallingOrderInfo( OldIndex );
 
@@ -2009,7 +1970,7 @@ namespace PlantUtilities {
 			PlantCallingOrderInfo( {OldIndex + 1,TotNumHalfLoops} ) = TempPlantCallingOrderInfo( {OldIndex + 1,TotNumHalfLoops} );
 
 		} else {
-			ShowSevereError( "ShiftPlantLoopSideCallingOrder: developer error notice, " "caught unexpected logical case in ShiftPlantLoopSideCallingOrder PlantUtilities" );
+			ShowSevereError( "ShiftPlantLoopSideCallingOrder: developer error notice, caught unexpected logical case in ShiftPlantLoopSideCallingOrder PlantUtilities" );
 
 		}
 
@@ -2023,7 +1984,7 @@ namespace PlantUtilities {
 	{
 
 		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Fred Buhl(previosly SaveCompDesWaterFlow in General.f90)
+		//       AUTHOR         Fred Buhl(previosly SaveCompDesWaterFlow in General.cc)
 		//       DATE WRITTEN   January 2004
 		//       MODIFIED
 		//       RE-ENGINEERED  B. Griffith April 2011, allow to enter repeatedly
@@ -2357,6 +2318,19 @@ namespace PlantUtilities {
 
 	}
 
+	// In-Place Right Shift by 1 of Array Elements
+	void
+	rshift1( FArray1< Real64 > & a, Real64 const a_l )
+	{
+		assert( a.size_bounded() );
+		if ( a.dimensions_initialized() ) {
+			for ( int i = a.u(), e = a.l(); i > e; --i ) {
+				a( i ) = a( i - 1 );
+			}
+			a( a.l() ) = a_l;
+		}
+	}
+
 	void
 	LogPlantConvergencePoints( bool const FirstHVACIteration )
 	{
@@ -2398,30 +2372,32 @@ namespace PlantUtilities {
 		Real64 OutletNodeMdot;
 
 		for ( int ThisLoopNum = 1; ThisLoopNum <= isize( PlantLoop ); ++ThisLoopNum ) {
-			for ( int ThisLoopSide = 1; ThisLoopSide <= isize( PlantLoop( ThisLoopNum ).LoopSide ); ++ThisLoopSide ) {
+			auto & loop( PlantLoop( ThisLoopNum ) );
+			for ( int ThisLoopSide = 1; ThisLoopSide <= isize( loop.LoopSide ); ++ThisLoopSide ) {
+				auto & loop_side( loop.LoopSide( ThisLoopSide ) );
 
 				if ( FirstHVACIteration ) {
-					PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).InletNode.TemperatureHistory = 0.0;
-					PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).InletNode.MassFlowRateHistory = 0.0;
-					PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).OutletNode.TemperatureHistory = 0.0;
-					PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).OutletNode.MassFlowRateHistory = 0.0;
+					loop_side.InletNode.TemperatureHistory = 0.0;
+					loop_side.InletNode.MassFlowRateHistory = 0.0;
+					loop_side.OutletNode.TemperatureHistory = 0.0;
+					loop_side.OutletNode.MassFlowRateHistory = 0.0;
 				}
 
-				InletNodeNum = PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).NodeNumIn;
+				InletNodeNum = loop_side.NodeNumIn;
 				InletNodeTemp = Node( InletNodeNum ).Temp;
 				InletNodeMdot = Node( InletNodeNum ).MassFlowRate;
 
-				OutletNodeNum = PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).NodeNumOut;
+				OutletNodeNum = loop_side.NodeNumOut;
 				OutletNodeTemp = Node( OutletNodeNum ).Temp;
 				OutletNodeMdot = Node( OutletNodeNum ).MassFlowRate;
 
-				PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).InletNode.TemperatureHistory = eoshift( PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).InletNode.TemperatureHistory, -1, InletNodeTemp );
+				rshift1( loop_side.InletNode.TemperatureHistory, InletNodeTemp );
 
-				PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).InletNode.MassFlowRateHistory = eoshift( PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).InletNode.MassFlowRateHistory, -1, InletNodeMdot );
+				rshift1( loop_side.InletNode.MassFlowRateHistory, InletNodeMdot );
 
-				PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).OutletNode.TemperatureHistory = eoshift( PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).OutletNode.TemperatureHistory, -1, OutletNodeTemp );
+				rshift1( loop_side.OutletNode.TemperatureHistory, OutletNodeTemp );
 
-				PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).OutletNode.MassFlowRateHistory = eoshift( PlantLoop( ThisLoopNum ).LoopSide( ThisLoopSide ).OutletNode.MassFlowRateHistory, -1, OutletNodeMdot );
+				rshift1( loop_side.OutletNode.MassFlowRateHistory, OutletNodeMdot );
 
 			}
 		}
@@ -2524,7 +2500,7 @@ namespace PlantUtilities {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

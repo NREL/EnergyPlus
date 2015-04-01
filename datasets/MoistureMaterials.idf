@@ -4,7 +4,7 @@
 ! Moisture Material Reference Data Set for Effective Moisture Penetration Depth (EMPD) materials
 
 !  Version,
-!    8.0;                    !- Version Identifier
+!    8.3;                    !- Version Identifier
 
   MaterialProperty:MoisturePenetrationDepth:Settings,
     Gypsum,                  !- Name

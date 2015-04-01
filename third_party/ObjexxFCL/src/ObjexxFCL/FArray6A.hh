@@ -27,9 +27,6 @@ class FArray6A : public FArray6< T >
 private: // Types
 
 	typedef  FArray6< T >  Super;
-	typedef  typename Super::real_FArray  real_FArray;
-	typedef  typename Super::proxy_FArray  proxy_FArray;
-	typedef  typename Super::arg_FArray  arg_FArray;
 	typedef  internal::ProxySentinel  ProxySentinel;
 
 public: // Types
@@ -57,6 +54,7 @@ public: // Types
 	typedef  typename Base::Size  Size;
 	typedef  typename Base::Difference  Difference;
 
+	using Super::conformable;
 	using Super::npos;
 	using Super::operator ();
 	using Super::shift_set;
@@ -80,19 +78,19 @@ public: // Creation
 	// Default Constructor
 	inline
 	FArray6A() :
-		Super( ProxySentinel() )
+	 Super( ProxySentinel() )
 	{}
 
 	// Copy Constructor
 	inline
 	FArray6A( FArray6A const & a ) :
-		Super( a, ProxySentinel() ),
-		I1_( a.I1_ ),
-		I2_( a.I2_ ),
-		I3_( a.I3_ ),
-		I4_( a.I4_ ),
-		I5_( a.I5_ ),
-		I6_( a.I6_ )
+	 Super( a, ProxySentinel() ),
+	 I1_( a.I1_ ),
+	 I2_( a.I2_ ),
+	 I3_( a.I3_ ),
+	 I4_( a.I4_ ),
+	 I5_( a.I5_ ),
+	 I6_( a.I6_ )
 	{
 		shift_set( a.shift_ );
 		z1_ = a.z1_;
@@ -104,14 +102,14 @@ public: // Creation
 
 	// Real Constructor
 	inline
-	FArray6A( real_FArray const & a ) :
-		Super( a, ProxySentinel() ),
-		I1_( a.I1_ ),
-		I2_( a.I2_ ),
-		I3_( a.I3_ ),
-		I4_( a.I4_ ),
-		I5_( a.I5_ ),
-		I6_( a.I6_ )
+	FArray6A( FArray6D< T > const & a ) :
+	 Super( a, ProxySentinel() ),
+	 I1_( a.I1_ ),
+	 I2_( a.I2_ ),
+	 I3_( a.I3_ ),
+	 I4_( a.I4_ ),
+	 I5_( a.I5_ ),
+	 I6_( a.I6_ )
 	{
 		shift_set( a.shift_ );
 		z1_ = a.z1_;
@@ -123,14 +121,14 @@ public: // Creation
 
 	// Proxy Constructor
 	inline
-	FArray6A( proxy_FArray const & a ) :
-		Super( a, ProxySentinel() ),
-		I1_( a.I1_ ),
-		I2_( a.I2_ ),
-		I3_( a.I3_ ),
-		I4_( a.I4_ ),
-		I5_( a.I5_ ),
-		I6_( a.I6_ )
+	FArray6A( FArray6P< T > const & a ) :
+	 Super( a, ProxySentinel() ),
+	 I1_( a.I1_ ),
+	 I2_( a.I2_ ),
+	 I3_( a.I3_ ),
+	 I4_( a.I4_ ),
+	 I5_( a.I5_ ),
+	 I6_( a.I6_ )
 	{
 		shift_set( a.shift_ );
 		z1_ = a.z1_;
@@ -143,13 +141,13 @@ public: // Creation
 	// Super Constructor
 	inline
 	FArray6A( Super const & a ) :
-		Super( a, ProxySentinel() ),
-		I1_( a.I1() ),
-		I2_( a.I2() ),
-		I3_( a.I3() ),
-		I4_( a.I4() ),
-		I5_( a.I5() ),
-		I6_( a.I6() )
+	 Super( a, ProxySentinel() ),
+	 I1_( a.I1() ),
+	 I2_( a.I2() ),
+	 I3_( a.I3() ),
+	 I4_( a.I4() ),
+	 I5_( a.I5() ),
+	 I6_( a.I6() )
 	{
 		shift_set( a.shift_ );
 		z1_ = a.z1_;
@@ -162,13 +160,13 @@ public: // Creation
 	// Base Constructor
 	inline
 	FArray6A( Base const & a ) :
-		Super( a, ProxySentinel() ),
-		I1_( 1 ),
-		I2_( 1 ),
-		I3_( 1 ),
-		I4_( 1 ),
-		I5_( 1 ),
-		I6_( a.isize() )
+	 Super( a, ProxySentinel() ),
+	 I1_( 1 ),
+	 I2_( 1 ),
+	 I3_( 1 ),
+	 I4_( 1 ),
+	 I5_( 1 ),
+	 I6_( a.isize() )
 	{
 		shift_set( 6 );
 		z1_ = z2_ = z3_ = z4_ = z5_ = 1;
@@ -177,13 +175,13 @@ public: // Creation
 	// Tail Constructor
 	inline
 	FArray6A( Tail const & s ) :
-		Super( s, ProxySentinel() ),
-		I1_( 1 ),
-		I2_( 1 ),
-		I3_( 1 ),
-		I4_( 1 ),
-		I5_( 1 ),
-		I6_( s.isize() )
+	 Super( s, ProxySentinel() ),
+	 I1_( 1 ),
+	 I2_( 1 ),
+	 I3_( 1 ),
+	 I4_( 1 ),
+	 I5_( 1 ),
+	 I6_( s.isize() )
 	{
 		shift_set( 6 );
 		z1_ = z2_ = z3_ = z4_ = z5_ = 1;
@@ -192,13 +190,13 @@ public: // Creation
 	// Value Constructor
 	inline
 	FArray6A( T const & t ) :
-		Super( t, ProxySentinel() ),
-		I1_( 1 ),
-		I2_( 1 ),
-		I3_( 1 ),
-		I4_( 1 ),
-		I5_( 1 ),
-		I6_( star ) // Unbounded
+	 Super( t, ProxySentinel() ),
+	 I1_( 1 ),
+	 I2_( 1 ),
+	 I3_( 1 ),
+	 I4_( 1 ),
+	 I5_( 1 ),
+	 I6_( star ) // Unbounded
 	{
 		shift_set( 6 );
 		z1_ = z2_ = z3_ = z4_ = z5_ = 1;
@@ -207,41 +205,41 @@ public: // Creation
 	// Copy + IndexRange Constructor
 	inline
 	FArray6A( FArray6A const & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6 ) :
-		Super( a, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		I6_( I6 )
+	 Super( a, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 I6_( I6 )
 	{
 		dimension_argument();
 	}
 
 	// Real + IndexRange Constructor
 	inline
-	FArray6A( real_FArray const & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6 ) :
-		Super( a, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		I6_( I6 )
+	FArray6A( FArray6D< T > const & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6 ) :
+	 Super( a, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 I6_( I6 )
 	{
 		dimension_argument();
 	}
 
 	// Proxy + IndexRange Constructor
 	inline
-	FArray6A( proxy_FArray const & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6 ) :
-		Super( a, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		I6_( I6 )
+	FArray6A( FArray6P< T > const & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6 ) :
+	 Super( a, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 I6_( I6 )
 	{
 		dimension_argument();
 	}
@@ -249,13 +247,13 @@ public: // Creation
 	// Super + IndexRange Constructor
 	inline
 	FArray6A( Super const & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6 ) :
-		Super( a, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		I6_( I6 )
+	 Super( a, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 I6_( I6 )
 	{
 		dimension_argument();
 	}
@@ -263,13 +261,13 @@ public: // Creation
 	// Base + IndexRange Constructor
 	inline
 	FArray6A( Base const & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6 ) :
-		Super( a, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		I6_( I6 )
+	 Super( a, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 I6_( I6 )
 	{
 		dimension_argument();
 	}
@@ -277,13 +275,13 @@ public: // Creation
 	// Tail + IndexRange Constructor
 	inline
 	FArray6A( Tail const & s, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6 ) :
-		Super( s, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		I6_( I6 )
+	 Super( s, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 I6_( I6 )
 	{
 		dimension_argument();
 	}
@@ -291,13 +289,13 @@ public: // Creation
 	// Value + IndexRange Constructor
 	inline
 	FArray6A( T const & t, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6 ) :
-		Super( t, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		I6_( I6 )
+	 Super( t, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 I6_( I6 )
 	{
 		dimension_argument();
 	}
@@ -307,13 +305,13 @@ public: // Creation
 	// Non-Const Copy Constructor
 	inline
 	FArray6A( FArray6A & a ) :
-		Super( a, ProxySentinel() ),
-		I1_( a.I1_ ),
-		I2_( a.I2_ ),
-		I3_( a.I3_ ),
-		I4_( a.I4_ ),
-		I5_( a.I5_ ),
-		I6_( a.I6_ )
+	 Super( a, ProxySentinel() ),
+	 I1_( a.I1_ ),
+	 I2_( a.I2_ ),
+	 I3_( a.I3_ ),
+	 I4_( a.I4_ ),
+	 I5_( a.I5_ ),
+	 I6_( a.I6_ )
 	{
 		shift_set( a.shift_ );
 		z1_ = a.z1_;
@@ -325,14 +323,14 @@ public: // Creation
 
 	// Non-Const Real Constructor
 	inline
-	FArray6A( real_FArray & a ) :
-		Super( a, ProxySentinel() ),
-		I1_( a.I1_ ),
-		I2_( a.I2_ ),
-		I3_( a.I3_ ),
-		I4_( a.I4_ ),
-		I5_( a.I5_ ),
-		I6_( a.I6_ )
+	FArray6A( FArray6D< T > & a ) :
+	 Super( a, ProxySentinel() ),
+	 I1_( a.I1_ ),
+	 I2_( a.I2_ ),
+	 I3_( a.I3_ ),
+	 I4_( a.I4_ ),
+	 I5_( a.I5_ ),
+	 I6_( a.I6_ )
 	{
 		shift_set( a.shift_ );
 		z1_ = a.z1_;
@@ -344,14 +342,14 @@ public: // Creation
 
 	// Non-Const Proxy Constructor
 	inline
-	FArray6A( proxy_FArray & a ) :
-		Super( a, ProxySentinel() ),
-		I1_( a.I1_ ),
-		I2_( a.I2_ ),
-		I3_( a.I3_ ),
-		I4_( a.I4_ ),
-		I5_( a.I5_ ),
-		I6_( a.I6_ )
+	FArray6A( FArray6P< T > & a ) :
+	 Super( a, ProxySentinel() ),
+	 I1_( a.I1_ ),
+	 I2_( a.I2_ ),
+	 I3_( a.I3_ ),
+	 I4_( a.I4_ ),
+	 I5_( a.I5_ ),
+	 I6_( a.I6_ )
 	{
 		shift_set( a.shift_ );
 		z1_ = a.z1_;
@@ -364,13 +362,13 @@ public: // Creation
 	// Non-Const Super Constructor
 	inline
 	FArray6A( Super & a ) :
-		Super( a, ProxySentinel() ),
-		I1_( a.I1() ),
-		I2_( a.I2() ),
-		I3_( a.I3() ),
-		I4_( a.I4() ),
-		I5_( a.I5() ),
-		I6_( a.I6() )
+	 Super( a, ProxySentinel() ),
+	 I1_( a.I1() ),
+	 I2_( a.I2() ),
+	 I3_( a.I3() ),
+	 I4_( a.I4() ),
+	 I5_( a.I5() ),
+	 I6_( a.I6() )
 	{
 		shift_set( a.shift_ );
 		z1_ = a.z1_;
@@ -383,13 +381,13 @@ public: // Creation
 	// Non-Const Base Constructor
 	inline
 	FArray6A( Base & a ) :
-		Super( a, ProxySentinel() ),
-		I1_( 1 ),
-		I2_( 1 ),
-		I3_( 1 ),
-		I4_( 1 ),
-		I5_( 1 ),
-		I6_( a.isize() )
+	 Super( a, ProxySentinel() ),
+	 I1_( 1 ),
+	 I2_( 1 ),
+	 I3_( 1 ),
+	 I4_( 1 ),
+	 I5_( 1 ),
+	 I6_( a.isize() )
 	{
 		shift_set( 6 );
 		z1_ = z2_ = z3_ = z4_ = z5_ = 1;
@@ -398,13 +396,13 @@ public: // Creation
 	// Non-Const Tail Constructor
 	inline
 	FArray6A( Tail & s ) :
-		Super( s, ProxySentinel() ),
-		I1_( 1 ),
-		I2_( 1 ),
-		I3_( 1 ),
-		I4_( 1 ),
-		I5_( 1 ),
-		I6_( s.isize() )
+	 Super( s, ProxySentinel() ),
+	 I1_( 1 ),
+	 I2_( 1 ),
+	 I3_( 1 ),
+	 I4_( 1 ),
+	 I5_( 1 ),
+	 I6_( s.isize() )
 	{
 		shift_set( 6 );
 		z1_ = z2_ = z3_ = z4_ = z5_ = 1;
@@ -413,13 +411,13 @@ public: // Creation
 	// Non-Const Value Constructor
 	inline
 	FArray6A( T & t ) :
-		Super( t, ProxySentinel() ),
-		I1_( 1 ),
-		I2_( 1 ),
-		I3_( 1 ),
-		I4_( 1 ),
-		I5_( 1 ),
-		I6_( star ) // Unbounded
+	 Super( t, ProxySentinel() ),
+	 I1_( 1 ),
+	 I2_( 1 ),
+	 I3_( 1 ),
+	 I4_( 1 ),
+	 I5_( 1 ),
+	 I6_( star ) // Unbounded
 	{
 		shift_set( 6 );
 		z1_ = z2_ = z3_ = z4_ = z5_ = 1;
@@ -428,41 +426,41 @@ public: // Creation
 	// Non-Const Copy + IndexRange Constructor
 	inline
 	FArray6A( FArray6A & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6 ) :
-		Super( a, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		I6_( I6 )
+	 Super( a, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 I6_( I6 )
 	{
 		dimension_argument();
 	}
 
 	// Non-Const Real + IndexRange Constructor
 	inline
-	FArray6A( real_FArray & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6 ) :
-		Super( a, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		I6_( I6 )
+	FArray6A( FArray6D< T > & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6 ) :
+	 Super( a, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 I6_( I6 )
 	{
 		dimension_argument();
 	}
 
 	// Non-Const Proxy + IndexRange Constructor
 	inline
-	FArray6A( proxy_FArray & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6 ) :
-		Super( a, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		I6_( I6 )
+	FArray6A( FArray6P< T > & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6 ) :
+	 Super( a, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 I6_( I6 )
 	{
 		dimension_argument();
 	}
@@ -470,13 +468,13 @@ public: // Creation
 	// Non-Const Super + IndexRange Constructor
 	inline
 	FArray6A( Super & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6 ) :
-		Super( a, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		I6_( I6 )
+	 Super( a, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 I6_( I6 )
 	{
 		dimension_argument();
 	}
@@ -484,13 +482,13 @@ public: // Creation
 	// Non-Const Base + IndexRange Constructor
 	inline
 	FArray6A( Base & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6 ) :
-		Super( a, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		I6_( I6 )
+	 Super( a, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 I6_( I6 )
 	{
 		dimension_argument();
 	}
@@ -498,13 +496,13 @@ public: // Creation
 	// Non-Const Tail + IndexRange Constructor
 	inline
 	FArray6A( Tail & s, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6 ) :
-		Super( s, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		I6_( I6 )
+	 Super( s, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 I6_( I6 )
 	{
 		dimension_argument();
 	}
@@ -512,13 +510,13 @@ public: // Creation
 	// Non-Const Value + IndexRange Constructor
 	inline
 	FArray6A( T & t, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, IR const & I6 ) :
-		Super( t, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		I6_( I6 )
+	 Super( t, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 I6_( I6 )
 	{
 		dimension_argument();
 	}
@@ -531,7 +529,7 @@ public: // Creation
 	~FArray6A()
 	{}
 
-public: // Assignment
+public: // Assignment: Array
 
 	// Copy Assignment
 	inline
@@ -539,7 +537,7 @@ public: // Assignment
 	operator =( FArray6A const & a )
 	{
 		if ( this != &a ) {
-			if ( ! Super::conformable( a ) ) dimension( a );
+			if ( ! conformable( a ) ) dimension( a );
 			Base::operator =( a );
 		}
 		return *this;
@@ -551,25 +549,25 @@ public: // Assignment
 	operator =( Super const & a )
 	{
 		if ( this != &a ) {
-			if ( ! Super::conformable( a ) ) dimension( a );
+			if ( ! conformable( a ) ) dimension( a );
 			Base::operator =( a );
 		}
 		return *this;
 	}
 
 	// Super Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray6A &
 	operator =( FArray6< U > const & a )
 	{
-		if ( ! Super::conformable( a ) ) dimension( a );
+		if ( ! conformable( a ) ) dimension( a );
 		Base::operator =( a );
 		return *this;
 	}
 
 	// Slice Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray6A &
 	operator =( FArray6S< U > const & a )
@@ -589,7 +587,7 @@ public: // Assignment
 	}
 
 	// Initializer List Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray6A &
 	operator =( std::initializer_list< U > const l )
@@ -599,7 +597,7 @@ public: // Assignment
 	}
 
 	// += Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray6A &
 	operator +=( FArray6< U > const & a )
@@ -609,7 +607,7 @@ public: // Assignment
 	}
 
 	// -= Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray6A &
 	operator -=( FArray6< U > const & a )
@@ -619,7 +617,7 @@ public: // Assignment
 	}
 
 	// *= Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray6A &
 	operator *=( FArray6< U > const & a )
@@ -629,7 +627,7 @@ public: // Assignment
 	}
 
 	// /= Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray6A &
 	operator /=( FArray6< U > const & a )
@@ -639,7 +637,7 @@ public: // Assignment
 	}
 
 	// += Slice Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray6A &
 	operator +=( FArray6S< U > const & a )
@@ -649,7 +647,7 @@ public: // Assignment
 	}
 
 	// -= Slice Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray6A &
 	operator -=( FArray6S< U > const & a )
@@ -659,7 +657,7 @@ public: // Assignment
 	}
 
 	// *= Slice Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray6A &
 	operator *=( FArray6S< U > const & a )
@@ -669,7 +667,7 @@ public: // Assignment
 	}
 
 	// /= Slice Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray6A &
 	operator /=( FArray6S< U > const & a )
@@ -718,12 +716,76 @@ public: // Assignment
 		return *this;
 	}
 
+public: // Assignment: Array: Logical
+
+	// &&= Array Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray6A &
+	and_equals( FArray6< U > const & a )
+	{
+		Super::and_equals( a );
+		return *this;
+	}
+
+	// ||= Array Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray6A &
+	or_equals( FArray6< U > const & a )
+	{
+		Super::or_equals( a );
+		return *this;
+	}
+
+	// &&= Slice Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray6A &
+	and_equals( FArray6S< U > const & a )
+	{
+		Super::and_equals( a );
+		return *this;
+	}
+
+	// ||= Slice Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray6A &
+	or_equals( FArray6S< U > const & a )
+	{
+		Super::or_equals( a );
+		return *this;
+	}
+
+	// &&= MArray Template
+	template< class A, typename M >
+	inline
+	FArray6A &
+	and_equals( MArray6< A, M > const & a )
+	{
+		Super::and_equals( a );
+		return *this;
+	}
+
+	// ||= MArray Template
+	template< class A, typename M >
+	inline
+	FArray6A &
+	or_equals( MArray6< A, M > const & a )
+	{
+		Super::or_equals( a );
+		return *this;
+	}
+
+public: // Assignment: Value
+
 	// = Value
 	inline
 	FArray6A &
 	operator =( T const & t )
 	{
-		Super::operator =( t );
+		Base::operator =( t );
 		return *this;
 	}
 
@@ -732,7 +794,7 @@ public: // Assignment
 	FArray6A &
 	operator +=( T const & t )
 	{
-		Super::operator +=( t );
+		Base::operator +=( t );
 		return *this;
 	}
 
@@ -741,7 +803,7 @@ public: // Assignment
 	FArray6A &
 	operator -=( T const & t )
 	{
-		Super::operator -=( t );
+		Base::operator -=( t );
 		return *this;
 	}
 
@@ -750,7 +812,7 @@ public: // Assignment
 	FArray6A &
 	operator *=( T const & t )
 	{
-		Super::operator *=( t );
+		Base::operator *=( t );
 		return *this;
 	}
 
@@ -759,11 +821,19 @@ public: // Assignment
 	FArray6A &
 	operator /=( T const & t )
 	{
-		Super::operator /=( t );
+		Base::operator /=( t );
 		return *this;
 	}
 
 public: // Subscript
+
+	// Linear Index
+	inline
+	size_type
+	index( int const i1, int const i2, int const i3, int const i4, int const i5, int const i6 ) const
+	{
+		return ( ( ( ( ( ( ( ( ( ( ( i6 * z5_ ) + i5 ) * z4_ ) + i4 ) * z3_ ) + i3 ) * z2_ ) + i2 ) * z1_ ) + i1 ) - shift_ );
+	}
 
 	// Const Tail Starting at array( i1, i2, i3, i4, i5, i6 )
 	inline
@@ -784,14 +854,6 @@ public: // Subscript
 		assert( ( I1_.contains( i1 ) ) && ( I2_.contains( i2 ) ) && ( I3_.contains( i3 ) ) && ( I4_.contains( i4 ) ) && ( I5_.contains( i5 ) ) && ( I6_.contains( i6 ) ) );
 		size_type const offset( ( ( ( ( ( ( ( ( ( ( i6 * z5_ ) + i5 ) * z4_ ) + i4 ) * z3_ ) + i3 ) * z2_ ) + i2 ) * z1_ ) + i1 ) - shift_ );
 		return Tail( data_ + offset, ( data_size_ != npos ? data_size_ - offset : npos ) );
-	}
-
-	// Linear Index
-	inline
-	size_type
-	index( int const i1, int const i2, int const i3, int const i4, int const i5, int const i6 ) const
-	{
-		return ( ( ( ( ( ( ( ( ( ( ( i6 * z5_ ) + i5 ) * z4_ ) + i4 ) * z3_ ) + i3 ) * z2_ ) + i2 ) * z1_ ) + i1 ) - shift_ );
 	}
 
 public: // Predicate
@@ -1092,7 +1154,7 @@ public: // Modifier
 	// Attach to Real Array
 	inline
 	FArray6A &
-	attach( real_FArray const & a )
+	attach( FArray6D< T > const & a )
 	{
 		Base::attach( a );
 		z1_ = a.z1_;
@@ -1112,7 +1174,7 @@ public: // Modifier
 	// Attach to Non-Const Real Array
 	inline
 	FArray6A &
-	attach( real_FArray & a )
+	attach( FArray6D< T > & a )
 	{
 		Base::attach( a );
 		z1_ = a.z1_;
@@ -1132,7 +1194,7 @@ public: // Modifier
 	// Attach to Proxy Array
 	inline
 	FArray6A &
-	attach( proxy_FArray const & a )
+	attach( FArray6P< T > const & a )
 	{
 		Base::attach( a );
 		z1_ = a.z1_;
@@ -1152,7 +1214,7 @@ public: // Modifier
 	// Attach to Non-Const Proxy Array
 	inline
 	FArray6A &
-	attach( proxy_FArray & a )
+	attach( FArray6P< T > & a )
 	{
 		Base::attach( a );
 		z1_ = a.z1_;
@@ -1214,7 +1276,7 @@ public: // Modifier
 	FArray6A &
 	attach( Base const & a )
 	{
-		Base::attach( a, 6 );
+		Base::attach< 6 >( a );
 		z1_ = z2_ = z3_ = z4_ = z5_ = 1;
 		I1_ = 1;
 		I2_ = 1;
@@ -1230,7 +1292,7 @@ public: // Modifier
 	FArray6A &
 	attach( Base & a )
 	{
-		Base::attach( a, 6 );
+		Base::attach< 6 >( a );
 		z1_ = z2_ = z3_ = z4_ = z5_ = 1;
 		I1_ = 1;
 		I2_ = 1;
@@ -1246,7 +1308,7 @@ public: // Modifier
 	FArray6A &
 	attach( Tail const & s )
 	{
-		Base::attach( s, 6 );
+		Base::attach< 6 >( s );
 		z1_ = z2_ = z3_ = z4_ = z5_ = 1;
 		I1_ = 1;
 		I2_ = 1;
@@ -1262,7 +1324,7 @@ public: // Modifier
 	FArray6A &
 	attach( Tail & s )
 	{
-		Base::attach( s, 6 );
+		Base::attach< 6 >( s );
 		z1_ = z2_ = z3_ = z4_ = z5_ = 1;
 		I1_ = 1;
 		I2_ = 1;
@@ -1278,7 +1340,7 @@ public: // Modifier
 	FArray6A &
 	attach( T const & t )
 	{
-		Base::attach( t, 6 );
+		Base::attach< 6 >( t );
 		z1_ = z2_ = z3_ = z4_ = z5_ = 1;
 		I1_ = 1;
 		I2_ = 1;
@@ -1294,7 +1356,7 @@ public: // Modifier
 	FArray6A &
 	attach( T & t )
 	{
-		Base::attach( t, 6 );
+		Base::attach< 6 >( t );
 		z1_ = z2_ = z3_ = z4_ = z5_ = 1;
 		I1_ = 1;
 		I2_ = 1;

@@ -217,6 +217,10 @@ namespace WeatherManager {
 		std::string Title; // Environment name
 		std::string cKindOfEnvrn; // kind of environment
 		int KindOfEnvrn; // Type of environment (see Parameters for KindOfSim in DataGlobals)
+		int DesignDayNum; // index in DesignDay structure and DesignDayInput
+		int RunPeriodDesignNum; // for WeatherFileDays, index in  RunPeriodDesign and RunPeriodDesignInput
+		int SeedEnvrnNum; // for HVAC sizing sim, new environments are copies of original environments, this is the index for original
+		int HVACSizingIterationNum; // environments for HVAC sizing simulations are associated with iteration
 		int TotalDays; // Number of days in environment
 		int StartJDay; // Day of year of first day of environment
 		int StartMonth;
@@ -252,6 +256,10 @@ namespace WeatherManager {
 			Title( "" ),
 			cKindOfEnvrn( "" ),
 			KindOfEnvrn( 0 ),
+			DesignDayNum( 0 ),
+			RunPeriodDesignNum( 0 ),
+			SeedEnvrnNum( 0 ),
+			HVACSizingIterationNum( 0 ),
 			TotalDays( 0 ),
 			StartJDay( 0 ),
 			StartMonth( 0 ),
@@ -1178,6 +1186,11 @@ namespace WeatherManager {
 	);
 
 	void
+	AddDesignSetToEnvironmentStruct(
+		int const HVACSizingIterCount // Counter for number of times HVAC Sizing Simulation of Design Period set is being rerun
+	);
+
+	void
 	SetupWeekDaysByMonth(
 		int const StMon,
 		int const StDay,
@@ -1460,7 +1473,7 @@ namespace WeatherManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -73,11 +73,11 @@ namespace General {
 		Real64 const Eps, // required absolute accuracy
 		int const MaxIte, // maximum number of allowed iterations
 		int & Flag, // integer storing exit status
-		Real64 & XRes, // value of x that solves f(x [,Par]) = 0
-		std::function< Real64( Real64 const, Optional< FArray1S< Real64 > const > ) > f,
+		Real64 & XRes, // value of x that solves f(x,Par) = 0
+		std::function< Real64( Real64 const, FArray1< Real64 > const & ) > f,
 		Real64 const X_0, // 1st bound of interval that contains the solution
 		Real64 const X_1, // 2nd bound of interval that contains the solution
-		Optional< FArray1S< Real64 > const > Par // array with additional parameters used for function evaluation
+		FArray1< Real64 > const & Par // array with additional parameters used for function evaluation
 	)
 	{
 
@@ -88,7 +88,7 @@ namespace General {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// Find the value of x between x0 and x1 such that f(x,[,Par])
+		// Find the value of x between x0 and x1 such that f(x,Par)
 		// is equal to zero.
 
 		// METHODOLOGY EMPLOYED:
@@ -137,13 +137,8 @@ namespace General {
 		Cont = true;
 		NIte = 0;
 
-		if ( present( Par ) ) {
-			Y0 = f( X0, Par );
-			Y1 = f( X1, Par );
-		} else {
-			Y0 = f( X0, _ );
-			Y1 = f( X1, _ );
-		}
+		Y0 = f( X0, Par );
+		Y1 = f( X1, Par );
 		// check initial values
 		if ( Y0 * Y1 > 0 ) {
 			Flag = -2;
@@ -157,11 +152,139 @@ namespace General {
 			if ( std::abs( DY ) < SMALL ) DY = SMALL;
 			// new estimation
 			XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
-			if ( present( Par ) ) {
-				YTemp = f( XTemp, Par );
+			YTemp = f( XTemp, Par );
+
+			++NIte;
+
+			// check convergence
+			if ( std::abs( YTemp ) < Eps ) Conv = true;
+
+			if ( NIte > MaxIte ) StopMaxIte = true;
+
+			if ( ( ! Conv ) && ( ! StopMaxIte ) ) {
+				Cont = true;
 			} else {
-				YTemp = f( XTemp, _ );
+				Cont = false;
 			}
+
+			if ( Cont ) {
+
+				// reassign values (only if further iteration required)
+				if ( Y0 < 0.0 ) {
+					if ( YTemp < 0.0 ) {
+						X0 = XTemp;
+						Y0 = YTemp;
+					} else {
+						X1 = XTemp;
+						Y1 = YTemp;
+					}
+				} else {
+					if ( YTemp < 0.0 ) {
+						X1 = XTemp;
+						Y1 = YTemp;
+					} else {
+						X0 = XTemp;
+						Y0 = YTemp;
+					}
+				} // ( Y0 < 0 )
+
+			} // (Cont)
+
+		} // Cont
+
+		if ( Conv ) {
+			Flag = NIte;
+		} else {
+			Flag = -1;
+		}
+		XRes = XTemp;
+
+	}
+
+	void
+	SolveRegulaFalsi(
+		Real64 const Eps, // required absolute accuracy
+		int const MaxIte, // maximum number of allowed iterations
+		int & Flag, // integer storing exit status
+		Real64 & XRes, // value of x that solves f(x) = 0
+		std::function< Real64( Real64 const ) > f,
+		Real64 const X_0, // 1st bound of interval that contains the solution
+		Real64 const X_1 // 2nd bound of interval that contains the solution
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Michael Wetter
+		//       DATE WRITTEN   March 1999
+		//       MODIFIED       Fred Buhl November 2000, R. Raustad October 2006 - made subroutine RECURSIVE
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Find the value of x between x0 and x1 such that f(x)
+		// is equal to zero.
+
+		// METHODOLOGY EMPLOYED:
+		// Uses the Regula Falsi (false position) method (similar to secant method)
+
+		// REFERENCES:
+		// See Press et al., Numerical Recipes in Fortran, Cambridge University Press,
+		// 2nd edition, 1992. Page 347 ff.
+
+		// USE STATEMENTS:
+		// na
+
+		// Argument array dimensioning
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// = -2: f(x0) and f(x1) have the same sign
+		// = -1: no convergence
+		// >  0: number of iterations performed
+		// optional
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		Real64 const SMALL( 1.e-10 );
+
+		// INTERFACE BLOCK SPECIFICATIONS
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 X0; // present 1st bound
+		Real64 X1; // present 2nd bound
+		Real64 XTemp; // new estimate
+		Real64 Y0; // f at X0
+		Real64 Y1; // f at X1
+		Real64 YTemp; // f at XTemp
+		Real64 DY; // DY = Y0 - Y1
+		bool Conv; // flag, true if convergence is achieved
+		bool StopMaxIte; // stop due to exceeding of maximum # of iterations
+		bool Cont; // flag, if true, continue searching
+		int NIte; // number of interations
+
+		X0 = X_0;
+		X1 = X_1;
+		Conv = false;
+		StopMaxIte = false;
+		Cont = true;
+		NIte = 0;
+
+		Y0 = f( X0 );
+		Y1 = f( X1 );
+		// check initial values
+		if ( Y0 * Y1 > 0 ) {
+			Flag = -2;
+			XRes = X0;
+			return;
+		}
+
+		while ( Cont ) {
+
+			DY = Y0 - Y1;
+			if ( std::abs( DY ) < SMALL ) DY = SMALL;
+			// new estimation
+			XTemp = ( Y0 * X1 - Y1 * X0 ) / DY;
+			YTemp = f( XTemp );
 
 			++NIte;
 
@@ -898,7 +1021,7 @@ namespace General {
 		// FUNCTION PARAMETER DEFINITIONS:
 		static std::string const NAN_string( "NAN" );
 		static std::string const ZEROOOO( "0.000000000000000000000000000" );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -971,7 +1094,7 @@ namespace General {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1022,7 +1145,7 @@ namespace General {
 		static std::string const DigitChar( "01234567890" );
 		static std::string const NAN_string( "NAN" );
 		static std::string const ZEROOOO( "0.000000000000000000000000000" );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1160,7 +1283,7 @@ namespace General {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1326,28 +1449,19 @@ namespace General {
 		// DERIVED TYPE DEFINITIONS
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int i; // loop index
-		int j; // inner loop index
-		FArray1D< Real64 > TempData; // a scratch array
+		FArray1D< Real64 > TempData( 3 * NumDataItems ); // a scratch array
 
-		TempData.allocate( 3 * NumDataItems );
-
-		for ( i = 1; i <= NumDataItems; ++i ) {
-			TempData( i ) = DataIn( i );
-			TempData( NumDataItems + i ) = DataIn( i );
-			TempData( 2 * NumDataItems + i ) = DataIn( i );
+		for ( int i = 1; i <= NumDataItems; ++i ) {
+			TempData( i ) = TempData( NumDataItems + i ) = TempData( 2 * NumDataItems + i ) = DataIn( i );
 			SmoothedData( i ) = 0.0;
 		}
 
-		for ( i = 1; i <= NumDataItems; ++i ) {
-			for ( j = 1; j <= NumItemsInAvg; ++j ) {
+		for ( int i = 1; i <= NumDataItems; ++i ) {
+			for ( int j = 1; j <= NumItemsInAvg; ++j ) {
 				SmoothedData( i ) += TempData( NumDataItems + i - NumItemsInAvg + j );
 			}
 			SmoothedData( i ) /= double( NumItemsInAvg );
 		}
-
-		TempData.deallocate();
-
 	}
 
 	void
@@ -1943,8 +2057,8 @@ namespace General {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static gio::Fmt const TStmpFmt( "(I2.2,':',F3.0)" );
-		static gio::Fmt const TStmpFmti( "(I2.2,':',I2.2)" );
+		static gio::Fmt TStmpFmt( "(I2.2,':',F3.0)" );
+		static gio::Fmt TStmpFmti( "(I2.2,':',I2.2)" );
 		Real64 const FracToMin( 60.0 );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -2693,7 +2807,7 @@ namespace General {
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function creates the time stamp string from the time value specified in seconds.
-		// Inspired by similar function CreateSysTimeIntervalString() in General.f90
+		// Inspired by similar function CreateSysTimeIntervalString() in General.cc
 		// However, this function provides better accuracy for sub-minute time steps
 		// by also showing information down to the 10th of a second.
 		// Note that Time is expected to be specified in REAL(r64).
@@ -2714,7 +2828,7 @@ namespace General {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static gio::Fmt const TStampFmt( "(I2.2,':',I2.2,':',F4.1)" );
+		static gio::Fmt TStampFmt( "(I2.2,':',I2.2,':',F4.1)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2771,7 +2885,7 @@ namespace General {
 		// PURPOSE OF THIS FUNCTION:
 		// This function creates the time stamp with the current time interval from start and end
 		// time values specified in seconds.
-		// Inspired by similar function CreateSysTimeIntervalString() in General.f90
+		// Inspired by similar function CreateSysTimeIntervalString() in General.cc
 
 		// METHODOLOGY EMPLOYED:
 		// na
@@ -3013,11 +3127,11 @@ namespace General {
 
 				} else if ( SELECT_CASE_var == "" ) {
 					ShowWarningError( cCurrentModuleObject + ": No " + cAlphaFieldNames( 1 ) + " supplied." );
-					ShowContinueError( " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", " "\"CostInfo\", \"ViewFactorIinfo\"." );
+					ShowContinueError( " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", \"CostInfo\", \"ViewFactorIinfo\"." );
 
 				} else {
 					ShowWarningError( cCurrentModuleObject + ": Invalid " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) + "\" supplied." );
-					ShowContinueError( " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", " "\"CostInfo\", \"ViewFactorIinfo\"." );
+					ShowContinueError( " Legal values are: \"Lines\", \"Vertices\", \"Details\", \"DetailsWithVertices\", \"CostInfo\", \"ViewFactorIinfo\"." );
 
 				}}
 			}
@@ -3239,63 +3353,6 @@ namespace General {
 	}
 
 	void
-	ReallocateRealArray(
-		FArray1D< Real64 > & Array,
-		int & ArrayMax, // Current and resultant dimension for Array
-		int const ArrayInc // increment for redimension
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   October 2012
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine reallocates (preserving data) a REAL(r64) array.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > NewArray;
-
-		NewArray.allocate( ArrayMax + ArrayInc );
-		NewArray = 0.0;
-
-		if ( ArrayMax > 0 ) {
-			NewArray( {1,ArrayMax} ) = Array( {1,ArrayMax} );
-		}
-		Array.deallocate();
-		ArrayMax += ArrayInc;
-		Array.allocate( ArrayMax );
-		Array = NewArray;
-		NewArray.deallocate();
-
-	}
-
-	void
 	CheckCreatedZoneItemName(
 		std::string const & calledFrom, // routine called from
 		std::string const & CurrentObject, // object being parsed
@@ -3383,7 +3440,7 @@ namespace General {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

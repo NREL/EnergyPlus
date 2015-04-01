@@ -22,7 +22,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 template< typename > class FArray;
 
 // Random int on [0,1]

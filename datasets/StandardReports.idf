@@ -63,7 +63,7 @@
 !   Mechanical Ventilation Loads,
 
 !  Version,
-!    8.0;                    !- Version Identifier
+!    8.3;                    !- Version Identifier
 
   Output:Table:Monthly,
     Zone Cooling Summary,    !- Name

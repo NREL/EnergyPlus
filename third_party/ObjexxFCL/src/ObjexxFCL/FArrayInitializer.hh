@@ -24,10 +24,7 @@
 namespace ObjexxFCL {
 
 // FArrayInitializer: FArray Initializer Class Template
-template<
-	typename T,
-	template< typename > class Array
->
+template< typename T, template< typename > class Array >
 class FArrayInitializer
 {
 
@@ -52,37 +49,37 @@ public: // Creation
 	// Default Constructor
 	inline
 	FArrayInitializer() :
-		state_( INACTIVE ),
-		sticky_( false ),
-		value_( Traits::initial_value() )
+	 state_( INACTIVE ),
+	 sticky_( false ),
+	 value_( Traits::initial_value() )
 	{}
 
 	// Value Constructor
 	inline
 	explicit
 	FArrayInitializer( T const & value ) :
-		state_( VALUE ),
-		sticky_( false ),
-		value_( value )
+	 state_( VALUE ),
+	 sticky_( false ),
+	 value_( value )
 	{}
 
 	// Sticky Value Constructor
 	inline
 	explicit
 	FArrayInitializer( Sticky< T > const & value ) :
-		state_( VALUE ),
-		sticky_( true ),
-		value_( value() )
+	 state_( VALUE ),
+	 sticky_( true ),
+	 value_( value() )
 	{}
 
 	// Function Constructor
 	inline
 	explicit
 	FArrayInitializer( Function const & fxn ) :
-		state_( fxn ? FUNCTION : INACTIVE ),
-		sticky_( false ),
-		value_( Traits::initial_value() ),
-		function_( fxn ? fxn : Function() )
+	 state_( fxn ? FUNCTION : INACTIVE ),
+	 sticky_( false ),
+	 value_( Traits::initial_value() ),
+	 function_( fxn ? fxn : Function() )
 	{}
 
 public: // Assignment
@@ -199,6 +196,18 @@ public: // Modifier
 		}
 	}
 
+	// Swap
+	inline
+	void
+	swap( FArrayInitializer & o )
+	{
+		using std::swap;
+		swap( state_, o.state_ );
+		swap( sticky_, o.sticky_ );
+		swap( value_, o.value_ );
+		swap( function_, o.function_ );
+	}
+
 private: // Data
 
 	State state_; // State
@@ -207,6 +216,15 @@ private: // Data
 	Function function_; // Function
 
 }; // FArrayInitializer
+
+// Swap
+template< typename T, template< typename > class Array >
+inline
+void
+swap( FArrayInitializer< T, Array > & a, FArrayInitializer< T, Array > & b )
+{
+	a.swap( b );
+}
 
 } // ObjexxFCL
 

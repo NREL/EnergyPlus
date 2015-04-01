@@ -920,7 +920,7 @@ std::string
 string_of( T const & t )
 {
 	std::ostringstream t_stream;
-	t_stream << std::uppercase << std::setprecision( TypeTraits< T >::precision() ) << t;
+	t_stream << std::uppercase << std::setprecision( TypeTraits< T >::precision ) << t;
 	return t_stream.str();
 }
 
@@ -929,8 +929,8 @@ template< typename T >
 inline
 std::string
 string_of(
-	T const & t,
-	int const p // Precision
+ T const & t,
+ int const p // Precision
 )
 {
 	std::ostringstream t_stream;
@@ -943,14 +943,14 @@ template< typename T >
 inline
 std::string
 left_string_of(
-	T const & t,
-	int const w, // Minimum width
-	char const f = ' ' // Fill character
+ T const & t,
+ int const w, // Minimum width
+ char const f = ' ' // Fill character
 )
 {
 	std::ostringstream t_stream;
 	t_stream << std::left << std::uppercase
-	 << std::setw( w ) << std::setfill( f ) << std::setprecision( TypeTraits< T >::precision() ) << t;
+	 << std::setw( w ) << std::setfill( f ) << std::setprecision( TypeTraits< T >::precision ) << t;
 	return t_stream.str();
 }
 
@@ -959,14 +959,14 @@ template< typename T >
 inline
 std::string
 right_string_of(
-	T const & t,
-	int const w, // Minimum width
-	char const f = ' ' // Fill character
+ T const & t,
+ int const w, // Minimum width
+ char const f = ' ' // Fill character
 )
 {
 	std::ostringstream t_stream;
 	t_stream << std::right << std::uppercase
-	 << std::setw( w ) << std::setfill( f ) << std::setprecision( TypeTraits< T >::precision() ) << t;
+	 << std::setw( w ) << std::setfill( f ) << std::setprecision( TypeTraits< T >::precision ) << t;
 	return t_stream.str();
 }
 
@@ -976,13 +976,13 @@ template< typename T >
 inline
 std::string
 lead_zero_string_of(
-	T const & t,
-	int const w // Minimum width
+ T const & t,
+ int const w // Minimum width
 )
 {
 	std::ostringstream t_stream;
 	t_stream << std::internal << std::uppercase
-	 << std::setw( w ) << std::setfill( '0' ) << std::setprecision( TypeTraits< T >::precision() ) << t;
+	 << std::setw( w ) << std::setfill( '0' ) << std::setprecision( TypeTraits< T >::precision ) << t;
 	return t_stream.str();
 }
 
@@ -991,9 +991,9 @@ template< typename T >
 inline
 std::string
 general_string_of(
-	T const & t,
-	int const w = TypeTraits< T >::iwidth(), // Minimum width
-	std::streamsize const p = TypeTraits< T >::precision() // Precision
+ T const & t,
+ int const w = TypeTraits< T >::iwidth, // Minimum width
+ std::streamsize const p = TypeTraits< T >::precision // Precision
 )
 {
 	std::ostringstream t_stream;
@@ -1007,9 +1007,9 @@ template< typename T >
 inline
 std::string
 fixed_string_of(
-	T const & t,
-	int const w = TypeTraits< T >::iwidth(), // Minimum width
-	std::streamsize const p = TypeTraits< T >::precision() // Precision
+ T const & t,
+ int const w = TypeTraits< T >::iwidth, // Minimum width
+ std::streamsize const p = TypeTraits< T >::precision // Precision
 )
 {
 	std::ostringstream t_stream;
@@ -1023,9 +1023,9 @@ template< typename T >
 inline
 std::string
 scientific_string_of(
-	T const & t,
-	int const w = TypeTraits< T >::iwidth(), // Minimum width
-	std::streamsize const p = TypeTraits< T >::precision() // Precision
+ T const & t,
+ int const w = TypeTraits< T >::iwidth, // Minimum width
+ std::streamsize const p = TypeTraits< T >::precision // Precision
 )
 {
 	std::ostringstream t_stream;

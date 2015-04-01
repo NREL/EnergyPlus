@@ -50,6 +50,7 @@
 #include <WindowComplexManager.hh>
 #include <WindowEquivalentLayer.hh>
 #include <WindowManager.hh>
+#include <HVACSizingSimulationManager.hh>
 
 namespace EnergyPlus {
 
@@ -128,7 +129,7 @@ namespace HeatBalanceManager {
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 	static std::string const BlankString;
-	static gio::Fmt const fmtA( "(A)" );
+	static gio::Fmt fmtA( "(A)" );
 
 	FArray1D_string const PassFail( 2, { "Fail", "Pass" } );
 
@@ -517,6 +518,47 @@ namespace HeatBalanceManager {
 	}
 
 	void
+	SetPreConstructionInputParameters()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   October 2014
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine sets parameters that need to be established before any heat balance inputs are read
+
+		int NumAlpha;
+		int NumNumber;
+		int IOStat;
+
+		// Get all the construction objects to determine the max layers and use this as the value for DataHeatBalance::MaxSolidWinLayers
+		// The variable MaxSolidWinLayers is initialized to zero to immediately catch any issues with timing of this routine
+
+		// start by setting this to 5; it will satisfy the regular window constructions (Construction) and the Window5 files (Construction:WindowDataFile)
+		MaxSolidWinLayers = 7;
+
+		// Construction:ComplexFenestrationState have a limit of 10 layers, so set it up to 10 if they are present
+		if ( GetNumObjectsFound( "Construction:ComplexFenestrationState" ) > 0 ) {
+			MaxSolidWinLayers = max( MaxSolidWinLayers, 10 );
+		}
+
+		// then process the rest of the relevant constructions
+		std::string constructName( "Construction:WindowEquivalentLayer" );
+		int numConstructions( GetNumObjectsFound( constructName ) );
+		for ( int constructionNum = 1; constructionNum <= numConstructions; ++constructionNum ) {
+			GetObjectItem( constructName, constructionNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			int numLayersInThisConstruct( NumAlpha - 1 );
+			MaxSolidWinLayers = max( MaxSolidWinLayers, numLayersInThisConstruct );
+		}
+
+		// construction types being ignored as they are opaque: Construction:CfactorUndergroundWall, Construction:FfactorGroundFloor, Construction:InternalSource
+
+
+	}
+
+	void
 	GetProjectControlData( bool & ErrorsFound ) // Set to true if errors detected during getting data
 	{
 
@@ -570,19 +612,19 @@ namespace HeatBalanceManager {
 		std::string::size_type TMP;
 
 		// Formats
-		static gio::Fmt const Format_721( "('! <Building Information>, Building Name,North Axis {deg},Terrain, ',' Loads Convergence Tolerance Value,Temperature Convergence Tolerance Value, ',' Solar Distribution,Maximum Number of Warmup Days,Minimum Number of Warmup Days')" );
-		static gio::Fmt const Format_720( "(' Building Information',8(',',A))" );
-		static gio::Fmt const Format_722( "('! <Inside Convection Algorithm>, Algorithm {Simple | TARP | CeilingDiffuser | AdaptiveConvectionAlgorithm}',/,'Inside Convection Algorithm,',A)" );
-		static gio::Fmt const Format_723( "('! <Outside Convection Algorithm>, ','Algorithm {SimpleCombined | TARP | MoWitt | DOE-2 | AdaptiveConvectionAlgorithm}',/,'Outside Convection Algorithm,',A)" );
-		static gio::Fmt const Format_724( "('! <Sky Radiance Distribution>, Value {Anisotropic}',/,'Sky Radiance Distribution,Anisotropic')" );
-		static gio::Fmt const Format_726( "('! <Zone Air Solution Algorithm>, Value {ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}')" );
-		static gio::Fmt const Format_727( "(' Zone Air Solution Algorithm, ',A)" );
-		static gio::Fmt const Format_728( "('! <Zone Air Contaminant Balance Simulation>, Simulation {Yes/No}, Carbon Dioxide Concentration')" );
-		static gio::Fmt const Format_730( "(' Zone Air Carbon Dioxide Balance Simulation, ',A,',',A)" );
-		static gio::Fmt const Format_729( "('! <Zone Air Contaminant Balance Simulation>, Simulation {Yes/No}, Generic Contaminant Concentration')" );
-		static gio::Fmt const Format_731( "(' Zone Air Generic Contaminant Balance Simulation, ',A,',',A)" );
-		static gio::Fmt const Format_732( "('! <Zone Air Mass Flow Balance Simulation>, Simulation {Yes/No}')");
-		static gio::Fmt const Format_733( "(' Zone Air Mass Flow Balance Simulation, ',A)");
+		static gio::Fmt Format_721( "('! <Building Information>, Building Name,North Axis {deg},Terrain, ',' Loads Convergence Tolerance Value,Temperature Convergence Tolerance Value, ',' Solar Distribution,Maximum Number of Warmup Days,Minimum Number of Warmup Days')" );
+		static gio::Fmt Format_720( "(' Building Information',8(',',A))" );
+		static gio::Fmt Format_722( "('! <Inside Convection Algorithm>, Algorithm {Simple | TARP | CeilingDiffuser | AdaptiveConvectionAlgorithm}',/,'Inside Convection Algorithm,',A)" );
+		static gio::Fmt Format_723( "('! <Outside Convection Algorithm>, ','Algorithm {SimpleCombined | TARP | MoWitt | DOE-2 | AdaptiveConvectionAlgorithm}',/,'Outside Convection Algorithm,',A)" );
+		static gio::Fmt Format_724( "('! <Sky Radiance Distribution>, Value {Anisotropic}',/,'Sky Radiance Distribution,Anisotropic')" );
+		static gio::Fmt Format_726( "('! <Zone Air Solution Algorithm>, Value {ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}')" );
+		static gio::Fmt Format_727( "(' Zone Air Solution Algorithm, ',A)" );
+		static gio::Fmt Format_728( "('! <Zone Air Contaminant Balance Simulation>, Simulation {Yes/No}, Carbon Dioxide Concentration')" );
+		static gio::Fmt Format_730( "(' Zone Air Carbon Dioxide Balance Simulation, ',A,',',A)" );
+		static gio::Fmt Format_729( "('! <Zone Air Contaminant Balance Simulation>, Simulation {Yes/No}, Generic Contaminant Concentration')" );
+		static gio::Fmt Format_731( "(' Zone Air Generic Contaminant Balance Simulation, ',A,',',A)" );
+		static gio::Fmt Format_732( "('! <Zone Air Mass Flow Balance Simulation>, Simulation {Yes/No}')");
+		static gio::Fmt Format_733( "(' Zone Air Mass Flow Balance Simulation, ',A)");
 
 		//Assign the values to the building data
 
@@ -885,7 +927,7 @@ namespace HeatBalanceManager {
 		HeatTransferAlgosUsed( 1 ) = OverallHeatTransferSolutionAlgo;
 
 		// algorithm input checks now deferred until surface properties are read in,
-		//  moved to SurfaceGeometry.f90 routine GetSurfaceHeatTransferAlgorithmOverrides
+		//  moved to SurfaceGeometry.cc routine GetSurfaceHeatTransferAlgorithmOverrides
 
 		gio::write( OutputFileInits, Format_724 );
 
@@ -1011,59 +1053,50 @@ namespace HeatBalanceManager {
 		CurrentModuleObject = "ZoneAirMassFlowConservation";
 		NumObjects = GetNumObjectsFound(CurrentModuleObject);
 
-		if (NumObjects > 0) {
-			GetObjectItem(CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
-			if (NumAlpha > 0) {
-				{ auto const SELECT_CASE_var(AlphaName(1));
-				if (SELECT_CASE_var == "YES") {
+		if ( NumObjects > 0 ) {
+			GetObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			if ( NumAlpha > 0 ) {
+				{ auto const SELECT_CASE_var( AlphaName( 1 ) );
+				if ( SELECT_CASE_var == "YES" ) {
 					ZoneAirMassFlow.EnforceZoneMassBalance = true;
-				}
-				else if (SELECT_CASE_var == "NO") {
+				} else if ( SELECT_CASE_var == "NO" ) {
 					ZoneAirMassFlow.EnforceZoneMassBalance = false;
-				}
-				else {
+				} else {
 					ZoneAirMassFlow.EnforceZoneMassBalance = false;
 					AlphaName(1) = "NO";
-					ShowWarningError(trim(CurrentModuleObject) + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = NO");
-				} }
+					ShowWarningError( CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = NO" );
+				}}
 			}
-			if (NumAlpha > 1) {
-				{ auto const SELECT_CASE_var(AlphaName(2));
-				if (SELECT_CASE_var == "ADDINFILTRATIONFLOW") {
+			if ( NumAlpha > 1 ) {
+				{ auto const SELECT_CASE_var( AlphaName( 2 ) );
+				if ( SELECT_CASE_var == "ADDINFILTRATIONFLOW" ) {
 					ZoneAirMassFlow.InfiltrationTreatment = true;
-					if (!Contaminant.CO2Simulation) Contaminant.SimulateContaminants = true;
-				}
-				else if (SELECT_CASE_var == "ADJUSTINFILTRATIONFLOW") {
+					if ( !Contaminant.CO2Simulation ) Contaminant.SimulateContaminants = true;
+				} else if ( SELECT_CASE_var == "ADJUSTINFILTRATIONFLOW" ) {
 					ZoneAirMassFlow.InfiltrationTreatment = 2;
-				}
-				else {
+				} else {
 					ZoneAirMassFlow.InfiltrationTreatment = 1;
 					AlphaName(2) = "ADDINFILTRATIONFLOW";
-					ShowWarningError(trim(CurrentModuleObject) + ": Invalid input of " + cAlphaFieldNames(2) + ". The default choice is assigned = NO");
-				} }
-			}
-			else {
+					ShowWarningError( CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(2) + ". The default choice is assigned = NO" );
+				}}
+			} else {
 				ZoneAirMassFlow.InfiltrationTreatment = 1;
 				AlphaName(2) = "ADDINFILTRATIONFLOW";
 			}
-
-
-		}
-		else{
+		} else {
 			ZoneAirMassFlow.EnforceZoneMassBalance = false;
 			AlphaName(1) = "NO";
 		}
-		//// allocate if the global variable ZoneAirMassFlow is ON 
+		//// allocate if the global variable ZoneAirMassFlow is ON
 		//if ( ZoneAirMassFlow.EnforceZoneMassBalance ) {
 		//	MassConservation.allocate( NumOfZones );
 		//}
 
-		gio::write(OutputFileInits, Format_732);
-		if (ZoneAirMassFlow.EnforceZoneMassBalance) {
-			gio::write(OutputFileInits, Format_733) << "Yes";
-		}
-		else {
-			gio::write(OutputFileInits, Format_733) << "No";
+		gio::write( OutputFileInits, Format_732 );
+		if ( ZoneAirMassFlow.EnforceZoneMassBalance ) {
+			gio::write( OutputFileInits, Format_733 ) << "Yes";
+		} else {
+			gio::write( OutputFileInits, Format_733 ) << "No";
 		}
 
 	}
@@ -1101,7 +1134,7 @@ namespace HeatBalanceManager {
 		FArray1D< Real64 > NumArray( 3 ); // Numeric data
 
 		// Formats
-		static gio::Fmt const Format_720( "('Environment:Site Atmospheric Variation',3(',',A))" );
+		static gio::Fmt Format_720( "('Environment:Site Atmospheric Variation',3(',',A))" );
 
 		// FLOW:
 		CurrentModuleObject = "Site:HeightVariation";
@@ -1226,8 +1259,8 @@ namespace HeatBalanceManager {
 		int TotCfactorConstructs; // Number of underground wall constructions defined with C factors
 
 		// Formats
-		static gio::Fmt const Format_701( "(' Material Details',10(',',A))" );
-		static gio::Fmt const Format_702( "(' Material:Air',2(',',A))" );
+		static gio::Fmt Format_701( "(' Material Details',10(',',A))" );
+		static gio::Fmt Format_702( "(' Material:Air',2(',',A))" );
 
 		// FLOW:
 
@@ -1265,8 +1298,7 @@ namespace HeatBalanceManager {
 
 		Material.allocate( TotMaterials ); // Allocate the array Size to the number of materials
 
-		NominalR.allocate( TotMaterials );
-		NominalR = 0.0;
+		NominalR.dimension( TotMaterials, 0.0 );
 
 		MaterNum = 0;
 
@@ -3516,6 +3548,7 @@ namespace HeatBalanceManager {
 		//  Window5 data file
 		bool EOFonW5File; // True if EOF encountered reading Window5 data file
 		static bool NoRegularMaterialsUsed( true );
+		int MaterialLayerGroup; // window contruction layer material group index
 
 		int iMatGlass; // number of glass layers
 		FArray1D_string WConstructNames;
@@ -3533,14 +3566,11 @@ namespace HeatBalanceManager {
 		TotWinEquivLayerConstructs = GetNumObjectsFound( "Construction:WindowEquivalentLayer" );
 
 		WConstructNames.allocate( TotWindow5Constructs );
-		WConstructNames = "";
 
 		TotConstructs = TotRegConstructs + TotFfactorConstructs + TotCfactorConstructs + TotSourceConstructs + TotComplexFenStates + TotWinEquivLayerConstructs;
 
-		NominalRforNominalUCalculation.allocate( TotConstructs );
-		NominalRforNominalUCalculation = 0.0;
-		NominalU.allocate( TotConstructs );
-		NominalU = 0.0;
+		NominalRforNominalUCalculation.dimension( TotConstructs, 0.0 );
+		NominalU.dimension( TotConstructs, 0.0 );
 
 		//Allocate the array to the number of constructions/initialize selected variables
 		Construct.allocate( TotConstructs );
@@ -3597,6 +3627,12 @@ namespace HeatBalanceManager {
 				// count number of glass layers
 				if ( Construct( ConstrNum ).LayerPoint( Layer ) > 0 ) {
 					if ( Material( Construct( ConstrNum ).LayerPoint( Layer ) ).Group == WindowGlass ) ++iMatGlass;
+					MaterialLayerGroup = Material( Construct( ConstrNum ).LayerPoint( Layer ) ).Group;
+					if ( ( MaterialLayerGroup == GlassEquivalentLayer ) || ( MaterialLayerGroup == ShadeEquivalentLayer ) || ( MaterialLayerGroup == DrapeEquivalentLayer ) || ( MaterialLayerGroup == BlindEquivalentLayer ) || ( MaterialLayerGroup == ScreenEquivalentLayer ) || ( MaterialLayerGroup == GapEquivalentLayer ) ) {
+						ShowSevereError( "Invalid material layer type in window " + CurrentModuleObject + " = " + Construct( ConstrNum ).Name );
+						ShowSevereError( "Equivalent Layer material type = " + ConstructAlphas( Layer ) + " is allowed only in Construction:WindowEquivalentLayer window object." );
+						ErrorsFound = true;
+					}
 				}
 
 				if ( Construct( ConstrNum ).LayerPoint( Layer ) == 0 ) {
@@ -3827,20 +3863,21 @@ namespace HeatBalanceManager {
 			// A FrameAndDivider object will also be created if window on data file has a
 			// frame or divider.)
 
+			std::string window5DataFileName;
 			if ( ConstructAlphas( 1 ) == "" ) {
-				FullName = CurrentWorkingFolder + "Window5DataFile.dat";
+				window5DataFileName = CurrentWorkingFolder + "Window5DataFile.dat";
 			} else {
-				FullName = ConstructAlphas( 1 );
+				window5DataFileName = ConstructAlphas( 1 );
 			}
 			DisplayString( "Searching Window5 data file for Construction=" + ConstructAlphas( 0 ) );
 
-			SearchWindow5DataFile( FullName, ConstructAlphas( 0 ), ConstructionFound, EOFonW5File, ErrorsFound );
+			SearchWindow5DataFile( window5DataFileName, ConstructAlphas( 0 ), ConstructionFound, EOFonW5File, ErrorsFound );
 
 			if ( EOFonW5File || ! ConstructionFound ) {
 				DisplayString( "--Construction not found" );
 				ErrorsFound = true;
 				ShowSevereError( "No match on WINDOW5 data file for Construction=" + ConstructAlphas( 0 ) + ", or error in data file." );
-				ShowContinueError( "...Looking on file=" + FullName );
+				ShowContinueError( "...Looking on file=" + window5DataFileName );
 				continue;
 			}
 
@@ -4135,18 +4172,19 @@ namespace HeatBalanceManager {
 	}
 
 	void
-		ProcessZoneData( 
+	ProcessZoneData(
 		std::string const & cCurrentModuleObject,
 		int const ZoneLoop,
-		FArray1S_string cAlphaArgs,
+		FArray1_string const & cAlphaArgs,
 		int & NumAlphas,
-		FArray1S< Real64 > rNumericArgs,
+		FArray1< Real64 > const & rNumericArgs,
 		int & NumNumbers,
-		FArray1S_bool lNumericFieldBlanks,
-		FArray1S_bool lAlphaFieldBlanks,
-		FArray1S_string cAlphaFieldNames,
-		FArray1S_string cNumericFieldNames,
-		bool & ErrorsFound ) // If errors found in input
+		FArray1_bool const & lNumericFieldBlanks, //Unused
+		FArray1_bool const & lAlphaFieldBlanks,
+		FArray1_string const & cAlphaFieldNames,
+		FArray1_string const & cNumericFieldNames, //Unused
+		bool & ErrorsFound // If errors found in input
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4474,167 +4512,93 @@ namespace HeatBalanceManager {
 		// Allocate real Variables
 		// Following used for Calculations
 		//  Allocate variables in DataHeatBalSys
-		SumConvHTRadSys.allocate( NumOfZones );
-		SumConvHTRadSys = 0.0;
-		SumLatentHTRadSys.allocate( NumOfZones );
-		SumLatentHTRadSys = 0.0;
-		QHTRadSysToPerson.allocate( NumOfZones );
-		QHTRadSysToPerson = 0.0;
-		QHWBaseboardToPerson.allocate( NumOfZones );
-		QHWBaseboardToPerson = 0.0;
-		QSteamBaseboardToPerson.allocate( NumOfZones );
-		QSteamBaseboardToPerson = 0.0;
-		QElecBaseboardToPerson.allocate( NumOfZones );
-		QElecBaseboardToPerson = 0.0;
-		XMAT.allocate( NumOfZones );
-		XMAT = 23.0;
-		XM2T.allocate( NumOfZones );
-		XM2T = 23.0;
-		XM3T.allocate( NumOfZones );
-		XM3T = 23.0;
-		XM4T.allocate( NumOfZones );
-		XM4T = 23.0;
-		DSXMAT.allocate( NumOfZones );
-		DSXMAT = 23.0;
-		DSXM2T.allocate( NumOfZones );
-		DSXM2T = 23.0;
-		DSXM3T.allocate( NumOfZones );
-		DSXM3T = 23.0;
-		DSXM4T.allocate( NumOfZones );
-		DSXM4T = 23.0;
-		XMPT.allocate( NumOfZones );
-		XMPT = 23.0;
-		MCPI.allocate( NumOfZones );
-		MCPI = 0.0;
-		MCPTI.allocate( NumOfZones );
-		MCPTI = 0.0;
-		MCPV.allocate( NumOfZones );
-		MCPV = 0.0;
-		MCPTV.allocate( NumOfZones );
-		MCPTV = 0.0;
-		MCPM.allocate( NumOfZones );
-		MCPM = 0.0;
-		MCPTM.allocate( NumOfZones );
-		MCPTM = 0.0;
-		MixingMassFlowZone.allocate( NumOfZones );
-		MixingMassFlowZone = 0.0;
-		MixingMassFlowXHumRat.allocate( NumOfZones );
-		MixingMassFlowXHumRat = 0.0;
-		ZoneMassBalanceRepVarFlag.allocate( NumOfZones );
-		ZoneMassBalanceRepVarFlag = true;
+		SumConvHTRadSys.dimension( NumOfZones, 0.0 );
+		SumLatentHTRadSys.dimension( NumOfZones, 0.0 );
+		SumConvPool.dimension( NumOfZones, 0.0 );
+		SumLatentPool.dimension( NumOfZones, 0.0 );
+		QHTRadSysToPerson.dimension( NumOfZones, 0.0 );
+		QHWBaseboardToPerson.dimension( NumOfZones, 0.0 );
+		QSteamBaseboardToPerson.dimension( NumOfZones, 0.0 );
+		QElecBaseboardToPerson.dimension( NumOfZones, 0.0 );
+		XMAT.dimension( NumOfZones, 23.0 );
+		XM2T.dimension( NumOfZones, 23.0 );
+		XM3T.dimension( NumOfZones, 23.0 );
+		XM4T.dimension( NumOfZones, 23.0 );
+		DSXMAT.dimension( NumOfZones, 23.0 );
+		DSXM2T.dimension( NumOfZones, 23.0 );
+		DSXM3T.dimension( NumOfZones, 23.0 );
+		DSXM4T.dimension( NumOfZones, 23.0 );
+		XMPT.dimension( NumOfZones, 23.0 );
+		MCPI.dimension( NumOfZones, 0.0 );
+		MCPTI.dimension( NumOfZones, 0.0 );
+		MCPV.dimension( NumOfZones, 0.0 );
+		MCPTV.dimension( NumOfZones, 0.0 );
+		MCPM.dimension( NumOfZones, 0.0 );
+		MCPTM.dimension( NumOfZones, 0.0 );
+		MixingMassFlowZone.dimension( NumOfZones, 0.0 );
+		MixingMassFlowXHumRat.dimension( NumOfZones, 0.0 );
+		ZoneMassBalanceRepVarFlag.dimension( NumOfZones, true );
 		ZoneReOrder.allocate( NumOfZones );
-		ZoneMassBalanceFlag.allocate( NumOfZones );
-		ZoneMassBalanceFlag = false;
-		ZoneInfiltrationFlag.allocate( NumOfZones );
-		ZoneInfiltrationFlag = false;
+		ZoneMassBalanceFlag.dimension( NumOfZones, false );
+		ZoneInfiltrationFlag.dimension( NumOfZones, false );
 		ZoneReOrder = 0;
-		ZoneLatentGain.allocate( NumOfZones );
-		ZoneLatentGain = 0.0;
-		OAMFL.allocate( NumOfZones );
-		OAMFL = 0.0;
-		VAMFL.allocate( NumOfZones );
-		VAMFL = 0.0;
-		ZTAV.allocate( NumOfZones );
-		ZTAV = 23.0;
-		ZTAVComf.allocate( NumOfZones );
-		ZTAVComf = 23.0;
-		ZT.allocate( NumOfZones );
-		ZT = 23.0;
-		TempTstatAir.allocate( NumOfZones );
-		TempTstatAir = 23.0;
-		MAT.allocate( NumOfZones );
-		MAT = 23.0;
-		ZoneTMX.allocate( NumOfZones );
-		ZoneTMX = 23.0;
-		ZoneTM2.allocate( NumOfZones );
-		ZoneTM2 = 23.0;
+		ZoneLatentGain.dimension( NumOfZones, 0.0 );
+		OAMFL.dimension( NumOfZones, 0.0 );
+		VAMFL.dimension( NumOfZones, 0.0 );
+		ZTAV.dimension( NumOfZones, 23.0 );
+		ZTAVComf.dimension( NumOfZones, 23.0 );
+		ZT.dimension( NumOfZones, 23.0 );
+		TempTstatAir.dimension( NumOfZones, 23.0 );
+		MAT.dimension( NumOfZones, 23.0 );
+		ZoneTMX.dimension( NumOfZones, 23.0 );
+		ZoneTM2.dimension( NumOfZones, 23.0 );
 		// Allocate this zone air humidity ratio
-		ZoneAirHumRatAvg.allocate( NumOfZones );
-		ZoneAirHumRatAvg = 0.01;
-		ZoneAirHumRatAvgComf.allocate( NumOfZones );
-		ZoneAirHumRatAvgComf = 0.01;
-		ZoneAirHumRat.allocate( NumOfZones );
-		ZoneAirHumRat = 0.01;
-		ZoneAirHumRatOld.allocate( NumOfZones );
-		ZoneAirHumRatOld = 0.01;
-		SumHmAW.allocate( NumOfZones );
-		SumHmAW = 0.0;
-		SumHmARa.allocate( NumOfZones );
-		SumHmARa = 0.0;
-		SumHmARaW.allocate( NumOfZones );
-		SumHmARaW = 0.0;
-		MCPTE.allocate( NumOfZones );
-		MCPTE = 0.0;
-		MCPE.allocate( NumOfZones );
-		MCPE = 0.0;
-		EAMFL.allocate( NumOfZones );
-		EAMFL = 0.0;
-		MCPTC.allocate( NumOfZones );
-		MCPTC = 0.0;
-		MCPC.allocate( NumOfZones );
-		MCPC = 0.0;
-		CTMFL.allocate( NumOfZones );
-		CTMFL = 0.0;
-		MDotCPOA.allocate( NumOfZones );
-		MDotCPOA = 0.0;
-		MDotOA.allocate( NumOfZones );
-		MDotOA = 0.0;
+		ZoneAirHumRatAvg.dimension( NumOfZones, 0.01 );
+		ZoneAirHumRatAvgComf.dimension( NumOfZones, 0.01 );
+		ZoneAirHumRat.dimension( NumOfZones, 0.01 );
+		ZoneAirHumRatOld.dimension( NumOfZones, 0.01 );
+		SumHmAW.dimension( NumOfZones, 0.0 );
+		SumHmARa.dimension( NumOfZones, 0.0 );
+		SumHmARaW.dimension( NumOfZones, 0.0 );
+		MCPTE.dimension( NumOfZones, 0.0 );
+		MCPE.dimension( NumOfZones, 0.0 );
+		EAMFL.dimension( NumOfZones, 0.0 );
+		MCPTC.dimension( NumOfZones, 0.0 );
+		MCPC.dimension( NumOfZones, 0.0 );
+		CTMFL.dimension( NumOfZones, 0.0 );
+		MDotCPOA.dimension( NumOfZones, 0.0 );
+		MDotOA.dimension( NumOfZones, 0.0 );
 		if ( Contaminant.CO2Simulation ) {
 			OutdoorCO2 = GetCurrentScheduleValue( Contaminant.CO2OutdoorSchedPtr );
-			ZoneAirCO2.allocate( NumOfZones );
-			ZoneAirCO2 = OutdoorCO2;
-			ZoneAirCO2Temp.allocate( NumOfZones );
-			ZoneAirCO2Temp = OutdoorCO2;
-			ZoneAirCO2Avg.allocate( NumOfZones );
-			ZoneAirCO2Avg = OutdoorCO2;
+			ZoneAirCO2.dimension( NumOfZones, OutdoorCO2 );
+			ZoneAirCO2Temp.dimension( NumOfZones, OutdoorCO2 );
+			ZoneAirCO2Avg.dimension( NumOfZones, OutdoorCO2 );
 		}
 		if ( Contaminant.GenericContamSimulation ) {
 			OutdoorGC = GetCurrentScheduleValue( Contaminant.GenericContamOutdoorSchedPtr );
-			ZoneAirGC.allocate( NumOfZones );
-			ZoneAirGC = OutdoorGC;
-			ZoneAirGCTemp.allocate( NumOfZones );
-			ZoneAirGCTemp = OutdoorGC;
-			ZoneAirGCAvg.allocate( NumOfZones );
-			ZoneAirGCAvg = OutdoorGC;
+			ZoneAirGC.dimension( NumOfZones, OutdoorGC );
+			ZoneAirGCTemp.dimension( NumOfZones, OutdoorGC );
+			ZoneAirGCAvg.dimension( NumOfZones, OutdoorGC );
 		}
-		MaxTempPrevDay.allocate( NumOfZones );
-		MaxTempPrevDay = 0.0;
-		MinTempPrevDay.allocate( NumOfZones );
-		MinTempPrevDay = 0.0;
-		MaxHeatLoadPrevDay.allocate( NumOfZones );
-		MaxHeatLoadPrevDay = 0.0;
-		MaxCoolLoadPrevDay.allocate( NumOfZones );
-		MaxCoolLoadPrevDay = 0.0;
-		MaxHeatLoadZone.allocate( NumOfZones );
-		MaxHeatLoadZone = -9999.0;
-		MaxCoolLoadZone.allocate( NumOfZones );
-		MaxCoolLoadZone = -9999.0;
-		MaxTempZone.allocate( NumOfZones );
-		MaxTempZone = -9999.0;
-		MinTempZone.allocate( NumOfZones );
-		MinTempZone = 1000.0;
-		TempZonePrevDay.allocate( NumOfZones );
-		TempZonePrevDay = 0.0;
-		LoadZonePrevDay.allocate( NumOfZones );
-		LoadZonePrevDay = 0.0;
-		TempZoneSecPrevDay.allocate( NumOfZones );
-		TempZoneSecPrevDay = 0.0;
-		LoadZoneSecPrevDay.allocate( NumOfZones );
-		LoadZoneSecPrevDay = 0.0;
-		WarmupTempDiff.allocate( NumOfZones );
-		WarmupTempDiff = 0.0;
-		WarmupLoadDiff.allocate( NumOfZones );
-		WarmupLoadDiff = 0.0;
-		TempZone.allocate( NumOfZones );
-		TempZone = 0.0;
-		LoadZone.allocate( NumOfZones );
-		LoadZone = 0.0;
-		TempZoneRpt.allocate( NumOfTimeStepInHour * 24, NumOfZones );
-		TempZoneRpt = 0.0;
-		LoadZoneRpt.allocate( NumOfTimeStepInHour * 24, NumOfZones );
-		LoadZoneRpt = 0.0;
-		MaxLoadZoneRpt.allocate( NumOfTimeStepInHour * 24, NumOfZones );
-		MaxLoadZoneRpt = 0.0;
+		MaxTempPrevDay.dimension( NumOfZones, 0.0 );
+		MinTempPrevDay.dimension( NumOfZones, 0.0 );
+		MaxHeatLoadPrevDay.dimension( NumOfZones, 0.0 );
+		MaxCoolLoadPrevDay.dimension( NumOfZones, 0.0 );
+		MaxHeatLoadZone.dimension( NumOfZones, -9999.0 );
+		MaxCoolLoadZone.dimension( NumOfZones, -9999.0 );
+		MaxTempZone.dimension( NumOfZones, -9999.0 );
+		MinTempZone.dimension( NumOfZones, 1000.0 );
+		TempZonePrevDay.dimension( NumOfZones, 0.0 );
+		LoadZonePrevDay.dimension( NumOfZones, 0.0 );
+		TempZoneSecPrevDay.dimension( NumOfZones, 0.0 );
+		LoadZoneSecPrevDay.dimension( NumOfZones, 0.0 );
+		WarmupTempDiff.dimension( NumOfZones, 0.0 );
+		WarmupLoadDiff.dimension( NumOfZones, 0.0 );
+		TempZone.dimension( NumOfZones, 0.0 );
+		LoadZone.dimension( NumOfZones, 0.0 );
+		TempZoneRpt.dimension( NumOfTimeStepInHour * 24, NumOfZones, 0.0 );
+		LoadZoneRpt.dimension( NumOfTimeStepInHour * 24, NumOfZones, 0.0 );
+		MaxLoadZoneRpt.dimension( NumOfTimeStepInHour * 24, NumOfZones, 0.0 );
 		WarmupConvergenceValues.allocate( NumOfZones );
 		TempZoneRptStdDev.allocate( NumOfTimeStepInHour * 24 );
 		LoadZoneRptStdDev.allocate( NumOfTimeStepInHour * 24 );
@@ -4693,8 +4657,8 @@ namespace HeatBalanceManager {
 		static bool FirstWarmupWrite( true );
 
 		// Formats
-		static gio::Fmt const Format_731( "(' Warmup Convergence Information, ',A,',',A,',',A,',',A,',',A)" );
-		static gio::Fmt const Format_732( "('! <Warmup Convergence Information>,Zone Name,Time Step,Hour of Day,Warmup Temperature Difference {deltaC},','Warmup Load Difference {W}')" );
+		static gio::Fmt Format_731( "(' Warmup Convergence Information, ',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_732( "('! <Warmup Convergence Information>,Zone Name,Time Step,Hour of Day,Warmup Temperature Difference {deltaC},','Warmup Load Difference {W}')" );
 
 		// FLOW:
 
@@ -4965,8 +4929,8 @@ namespace HeatBalanceManager {
 		int Num; // loop control
 
 		// Formats
-		static gio::Fmt const Format_730( "('! <Warmup Convergence Information>,Zone Name,Environment Type/Name,','Average Warmup Temperature Difference {deltaC},','Std Dev Warmup Temperature Difference {deltaC},Max Temperature Pass/Fail Convergence,','Min Temperature Pass/Fail Convergence,Average Warmup Load Difference {W},Std Dev Warmup Load Difference {W},','Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence')" );
-		static gio::Fmt const Format_731( "(' Warmup Convergence Information',10(',',A))" );
+		static gio::Fmt Format_730( "('! <Warmup Convergence Information>,Zone Name,Environment Type/Name,','Average Warmup Temperature Difference {deltaC},','Std Dev Warmup Temperature Difference {deltaC},Max Temperature Pass/Fail Convergence,','Min Temperature Pass/Fail Convergence,Average Warmup Load Difference {W},Std Dev Warmup Load Difference {W},','Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence')" );
+		static gio::Fmt Format_731( "(' Warmup Convergence Information',10(',',A))" );
 
 		if ( ! WarmupFlag ) { // Report out average/std dev
 			// Write Warmup Convervence Information to the initialization output file
@@ -5044,14 +5008,15 @@ namespace HeatBalanceManager {
 		using DataSystemVariables::ReportDuringWarmup; // added for FMI
 		using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
 		using namespace DataReportingFlags;
-
+		using DataGlobals::KindOfSim;
+		using DataGlobals::ksHVACSizeDesignDay;
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const EndOfHeaderFormat( "('End of Data Dictionary')" ); // End of data dictionary marker
-		static gio::Fmt const EnvironmentStampFormat( "(a,',',a,3(',',f7.2),',',f7.2)" ); // Format descriptor for environ stamp
+		static gio::Fmt EndOfHeaderFormat( "('End of Data Dictionary')" ); // End of data dictionary marker
+		static gio::Fmt EnvironmentStampFormat( "(a,',',a,3(',',f7.2),',',f7.2)" ); // Format descriptor for environ stamp
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -5070,6 +5035,10 @@ namespace HeatBalanceManager {
 		if ( ! WarmupFlag && DoOutputReporting ) {
 			CalcMoreNodeInfo();
 			UpdateDataandReport( ZoneTSReporting );
+			if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ){
+				if ( hvacSizingSimulationManager ) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
+			}
+			
 			UpdateTabularReports( ZoneTSReporting );
 			UpdateUtilityBills();
 		} else if ( ! KickOffSimulation && DoOutputReporting && ReportDuringWarmup ) {
@@ -5092,8 +5061,15 @@ namespace HeatBalanceManager {
 			}
 			CalcMoreNodeInfo();
 			UpdateDataandReport( ZoneTSReporting );
+			if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ){
+				if ( hvacSizingSimulationManager ) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
+			}
+			
 		} else if ( UpdateDataDuringWarmupExternalInterface ) { // added for FMI
 			UpdateDataandReport( ZoneTSReporting );
+			if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ){
+				if ( hvacSizingSimulationManager ) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
+			}
 		}
 		// There is no hourly reporting in the heat balance.
 
@@ -5392,7 +5368,6 @@ namespace HeatBalanceManager {
 		std::string::size_type endcol;
 
 		// Object Data
-		FArray1D< FrameDividerProperties > FrameDividerSave;
 
 		// In the following four gas-related data sets, the first
 		//  index is gas type (1=air, 2=Argon, 3=Krypton, 4=Xenon)
@@ -5640,25 +5615,8 @@ Label20: ;
 
 			// reallocate Material type
 
-			MaterialSave.allocate( TotMaterialsPrev );
-			NominalRSave.allocate( TotMaterialsPrev );
-			NominalRSave = NominalR;
-			for ( loop = 1; loop <= TotMaterialsPrev; ++loop ) {
-				MaterialSave( loop ) = Material( loop );
-				//      NominalRSave(loop) = NominalR(loop)
-			}
-			Material.deallocate();
-			NominalR.deallocate();
-			Material.allocate( TotMaterials );
-			NominalR.allocate( TotMaterials );
-			NominalR = 0.0;
-			NominalR( {1,TotMaterialsPrev} ) = NominalRSave;
-			for ( loop = 1; loop <= TotMaterialsPrev; ++loop ) {
-				Material( loop ) = MaterialSave( loop );
-				//      NominalR(loop) = NominalRSave(loop)
-			}
-			MaterialSave.deallocate();
-			NominalRSave.deallocate();
+			Material.redimension( TotMaterials );
+			NominalR.redimension( TotMaterials, 0.0 );
 
 			// Initialize new materials
 			for ( loop = TotMaterialsPrev + 1; loop <= TotMaterials; ++loop ) {
@@ -5794,29 +5752,10 @@ Label20: ;
 			// Construction objects
 
 			// reallocate Construct types
-			ConstructSave.allocate( TotConstructs );
-			NominalRSave.allocate( TotConstructs );
-			NominalUSave.allocate( TotConstructs );
-			for ( loop = 1; loop <= TotConstructs; ++loop ) {
-				ConstructSave( loop ) = Construct( loop );
-				NominalRSave( loop ) = NominalRforNominalUCalculation( loop );
-				NominalUSave( loop ) = NominalU( loop );
-			}
-			Construct.deallocate();
-			NominalRforNominalUCalculation.deallocate();
-			NominalU.deallocate();
 			TotConstructs += NGlSys;
-			Construct.allocate( TotConstructs );
-			NominalRforNominalUCalculation.allocate( TotConstructs );
-			NominalU.allocate( TotConstructs );
-			for ( loop = 1; loop <= TotConstructs - NGlSys; ++loop ) {
-				Construct( loop ) = ConstructSave( loop );
-				NominalRforNominalUCalculation( loop ) = NominalRSave( loop );
-				NominalU( loop ) = NominalUSave( loop );
-			}
-			ConstructSave.deallocate();
-			NominalRSave.deallocate();
-			NominalUSave.deallocate();
+			Construct.redimension( TotConstructs );
+			NominalRforNominalUCalculation.redimension( TotConstructs );
+			NominalU.redimension( TotConstructs );
 
 			{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
@@ -6054,16 +5993,7 @@ Label20: ;
 			}
 
 			if ( TotFrameDivider > TotFrameDividerPrev ) {
-				FrameDividerSave.allocate( TotFrameDividerPrev );
-				for ( loop = 1; loop <= TotFrameDividerPrev; ++loop ) {
-					FrameDividerSave( loop ) = FrameDivider( loop );
-				}
-				FrameDivider.deallocate();
-				FrameDivider.allocate( TotFrameDivider );
-				for ( loop = 1; loop <= TotFrameDividerPrev; ++loop ) {
-					FrameDivider( loop ) = FrameDividerSave( loop );
-				}
-				FrameDividerSave.deallocate();
+				FrameDivider.redimension( TotFrameDivider );
 			}
 
 			for ( IGlSys = 1; IGlSys <= NGlSys; ++IGlSys ) {
@@ -6807,28 +6737,9 @@ Label1000: ;
 		if ( NumNewConst == 0 ) return; // no need to go further
 
 		// Increase Construct() and copy the extra constructions
-		ConstructSave.allocate( TotConstructs );
-		NominalRSave.allocate( TotConstructs );
-		NominalUSave.allocate( TotConstructs );
-		for ( Loop = 1; Loop <= TotConstructs; ++Loop ) {
-			ConstructSave( Loop ) = Construct( Loop );
-			NominalRSave( Loop ) = NominalRforNominalUCalculation( Loop );
-			NominalUSave( Loop ) = NominalU( Loop );
-		}
-		Construct.deallocate();
-		NominalRforNominalUCalculation.deallocate();
-		NominalU.deallocate();
-		Construct.allocate( TotConstructs + NumNewConst );
-		NominalRforNominalUCalculation.allocate( TotConstructs + NumNewConst );
-		NominalU.allocate( TotConstructs + NumNewConst );
-		for ( Loop = 1; Loop <= TotConstructs; ++Loop ) {
-			Construct( Loop ) = ConstructSave( Loop );
-			NominalRforNominalUCalculation( Loop ) = NominalRSave( Loop );
-			NominalU( Loop ) = NominalUSave( Loop );
-		}
-		ConstructSave.deallocate();
-		NominalRSave.deallocate();
-		NominalUSave.deallocate();
+		Construct.redimension( TotConstructs + NumNewConst );
+		NominalRforNominalUCalculation.redimension( TotConstructs + NumNewConst );
+		NominalU.redimension( TotConstructs + NumNewConst );
 
 		NumNewConst = TotConstructs;
 		for ( Loop = 1; Loop <= TotConstructs; ++Loop ) {
@@ -8113,14 +8024,14 @@ Label1000: ;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

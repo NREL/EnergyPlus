@@ -93,8 +93,8 @@ namespace DaylightingDevices {
 	// upper window onto the ceiling of the zone as diffuse light.  The outside shelf, if specified, changes
 	// the total amount of light incident on the window.  All light reflected from the outside shelf also goes
 	// onto the zone ceiling.
-	// Most of the work for daylighting shelves is actually done in DaylightingManager.f90, SolarShading.f90,
-	// and HeatBalanceSurfaceManager.f90.  The main task of the module is to get the input and initialize the
+	// Most of the work for daylighting shelves is actually done in DaylightingManager.cc, SolarShading.cc,
+	// and HeatBalanceSurfaceManager.cc.  The main task of the module is to get the input and initialize the
 	// shelf.  The biggest part of initialization is calculating the window view factor to the outside shelf.
 	// It is up to the user to reduce the window view factor to ground accordingly.
 	// The inside shelf is modeled in both daylighting and heat balance simulations by converting all light
@@ -186,7 +186,7 @@ namespace DaylightingDevices {
 
 		// DERIVED TYPE DEFINITIONS:
 
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PipeNum; // TDD pipe object number
@@ -489,7 +489,7 @@ namespace DaylightingDevices {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Dome " + cAlphaArgs( 2 ) + " Equivalent Layer Window is not supported." );
 						ErrorsFound = true;
 					}
-					// Window multiplier is already handled in SurfaceGeometry.f90
+					// Window multiplier is already handled in SurfaceGeometry.cc
 
 					if ( ! Surface( SurfNum ).ExtSolar ) {
 						ShowWarningError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Dome " + cAlphaArgs( 2 ) + " is not exposed to exterior radiation." );
@@ -552,7 +552,7 @@ namespace DaylightingDevices {
 						ErrorsFound = true;
 					}
 
-					// Window multiplier is already handled in SurfaceGeometry.f90
+					// Window multiplier is already handled in SurfaceGeometry.cc
 
 					TDDPipe( PipeNum ).Diffuser = SurfNum;
 				}
@@ -945,7 +945,7 @@ namespace DaylightingDevices {
 		// Not sure if shading and tilt is adequately accounted for by DifShdgRatioIsoSky later on or not...
 
 		// REFERENCES:
-		// See AnisoSkyViewFactors in SolarShading.f90.
+		// See AnisoSkyViewFactors in SolarShading.cc.
 
 		// USE STATEMENTS: na
 
@@ -1018,7 +1018,7 @@ namespace DaylightingDevices {
 		// Not sure if shading is adequately accounted for by DifShdgRatioHoriz later on or not...
 
 		// REFERENCES:
-		// See AnisoSkyViewFactors in SolarShading.f90.
+		// See AnisoSkyViewFactors in SolarShading.cc.
 
 		// Using/Aliasing
 		using namespace DataSurfaces;
@@ -1103,14 +1103,14 @@ namespace DaylightingDevices {
 		//   FluxInc = IsoSkyRad + CircumSolarRad + HorizonRad
 		//   FluxTrans = T1*IsoSkyRad + T2*CircumSolarRad + T3*HorizonRad
 		// It turns out that FluxTrans/FluxInc is equivalent to AnisoSkyTDDMult/AnisoSkyMult.
-		// AnisoSkyMult has been conveniently calculated already in AnisoSkyViewFactors in SolarShading.f90.
+		// AnisoSkyMult has been conveniently calculated already in AnisoSkyViewFactors in SolarShading.cc.
 		// AnisoSkyMult = MultIsoSky*DifShdgRatioIsoSky + MultCircumSolar*SunlitFrac + MultHorizonZenith*DifShdgRatioHoriz
 		// In this routine a similar AnisoSkyTDDMult is calculated that applies the appropriate transmittance to each
 		// of the components above.  The result is Trans = AnisoSkyTDDMult/AnisoSkyMult.
 		// Shading and orientation are already taken care of by DifShdgRatioIsoSky and DifShdgRatioHoriz.
 
 		// REFERENCES:
-		// See AnisoSkyViewFactors in SolarShading.f90.
+		// See AnisoSkyViewFactors in SolarShading.cc.
 
 		// USE STATEMENTS: na
 		// Using/Aliasing
@@ -1339,7 +1339,7 @@ namespace DaylightingDevices {
 		FindTDDPipe = 0;
 
 		if ( NumOfTDDPipes <= 0 ) {
-			ShowFatalError( "FindTDDPipe: Surface=" + Surface( WinNum ).Name + ", TDD:Dome object does not reference a valid Diffuser object." "...needs DaylightingDevice:Tubular of same name as Surface." );
+			ShowFatalError( "FindTDDPipe: Surface=" + Surface( WinNum ).Name + ", TDD:Dome object does not reference a valid Diffuser object....needs DaylightingDevice:Tubular of same name as Surface." );
 		}
 
 		for ( PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum ) {
@@ -1373,7 +1373,7 @@ namespace DaylightingDevices {
 		//     a. Reflection off of diffuser surface (inside of TDD)
 		//     b. Zone diffuse interior shortwave incident on the diffuser from windows, lights, etc.
 		//   3. Inward absorbed solar in dome and diffuser glass
-		// This subroutine is called by InitIntSolarDistribution in HeatBalanceSurfaceManager.f90.
+		// This subroutine is called by InitIntSolarDistribution in HeatBalanceSurfaceManager.cc.
 
 		// REFERENCES: na
 
@@ -1562,7 +1562,7 @@ namespace DaylightingDevices {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

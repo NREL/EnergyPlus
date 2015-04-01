@@ -24,7 +24,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 template< typename > class FArray1;
 
 // Current Time: HH, MM, SS

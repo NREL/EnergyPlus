@@ -26,7 +26,7 @@
 !           tries to meet the load.
 ! SolDis=FullInteriorAndExterior, Aniso, Detailed Interior and Exterior Convection
 
-  Version,8.2;
+  Version,8.3;
 
   Timestep,6;
 
@@ -1877,14 +1877,13 @@
     Vertical Ground Heat Exchanger,  !- Name
     GHE Inlet Node,          !- Inlet Node Name
     GHE Outlet Node,         !- Outlet Node Name
-    0.00330000,              !- Maximum Flow Rate {m3/s}
+    0.00330000,              !- Design Flow Rate {m3/s}
     120,                     !- Number of Bore Holes
     76.2,                    !- Bore Hole Length {m}
     0.635080E-01,            !- Bore Hole Radius {m}
     0.692626E+00,            !- Ground Thermal Conductivity {W/m-K}
     0.234700E+07,            !- Ground Thermal Heat Capacity {J/m3-K}
     13.375,                  !- Ground Temperature {C}
-    0.0033,                  !- Design Flow Rate {m3/s}
     0.692626E+00,            !- Grout Thermal Conductivity {W/m-K}
     0.391312E+00,            !- Pipe Thermal Conductivity {W/m-K}
     2.66667E-02,             !- Pipe Out Diameter {m}

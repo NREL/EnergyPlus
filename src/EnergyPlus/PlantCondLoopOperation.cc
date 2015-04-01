@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 #include <vector>
 
@@ -153,7 +154,7 @@ namespace PlantCondLoopOperation {
 		//used to locate data in PL()%OpScheme(CurSchemePtr)%EquipList(ListPtr)
 		//Local values from the PlantLoop()%OpScheme() data structure
 		int CurSchemeType; // identifier set in PlantData
-		Real64 RangeVariable; // holds the 'loop demand', wetbulb temp, etc.
+		Real64 RangeVariable( 0.0 ); // holds the 'loop demand', wetbulb temp, etc.
 		Real64 TestRangeVariable; // abs of RangeVariable for logic tests etc.
 		Real64 RangeHiLimit; // upper limit of the range variable
 		Real64 RangeLoLimit; // lower limit of the range variable
@@ -378,7 +379,6 @@ namespace PlantCondLoopOperation {
 		if ( NumPlantOpSchemes > 0 ) {
 			// OpSchemeListNames is used to determine if there are any duplicate operation scheme names
 			OpSchemeNames.allocate( NumPlantOpSchemes );
-			OpSchemeNames = "";
 			Num = 0;
 			for ( OpNum = 1; OpNum <= NumPlantOpSchemes; ++OpNum ) {
 				GetObjectItem( CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
@@ -403,7 +403,6 @@ namespace PlantCondLoopOperation {
 		if ( NumCondOpSchemes > 0 ) {
 			// OpSchemeListNames is used to determine if there are any duplicate operation scheme names
 			OpSchemeNames.allocate( NumCondOpSchemes );
-			OpSchemeNames = "";
 			Num = 0;
 			for ( OpNum = 1; OpNum <= NumCondOpSchemes; ++OpNum ) {
 				GetObjectItem( CurrentModuleObject, OpNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat );
@@ -446,7 +445,7 @@ namespace PlantCondLoopOperation {
 						if ( plantLoopOperation == "LOAD RANGE BASED OPERATION" ) { // Deprecated
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = LoadRBOpSchemeType; // Deprecated
 							ShowSevereError( CurrentModuleObject + " = \"" + cAlphaArgs( 1 ) + "\" deprecated field value =\"" + PlantLoop( LoopNum ).OpScheme( Num ).TypeOf + "\"." );
-							ShowContinueError( "... should be replaced with PlantEquipmentOperation:CoolingLoad or " "PlantEquipmentOperation:HeatingLoad" );
+							ShowContinueError( "... should be replaced with PlantEquipmentOperation:CoolingLoad or PlantEquipmentOperation:HeatingLoad" );
 						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:COOLINGLOAD" ) {
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = CoolingRBOpSchemeType;
 						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:HEATINGLOAD" ) {
@@ -497,7 +496,7 @@ namespace PlantCondLoopOperation {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting input for PlantEquipmentOperationSchemes or " "CondenserEquipmentOperationSchemes" );
+			ShowFatalError( RoutineName + "Errors found in getting input for PlantEquipmentOperationSchemes or CondenserEquipmentOperationSchemes" );
 		}
 
 	}
@@ -598,7 +597,6 @@ namespace PlantCondLoopOperation {
 
 		// test for blank or duplicates -- this section just determines if there are any duplicate operation scheme names
 		TempVerifyNames.allocate( NumSchemes );
-		TempVerifyNames = "";
 
 		//Check for existence of duplicates in keyword names
 		Count = 0;
@@ -654,14 +652,12 @@ namespace PlantCondLoopOperation {
 			TempVerifyNames( Num ) = cAlphaArgs( 1 );
 
 		}
-		TempVerifyNames.deallocate();
 
 		//**********VERIFY THE 'PlantEquipmentList' AND 'CondenserEquipmentList' KEYWORDS*********
 		PELists = GetNumObjectsFound( "PlantEquipmentList" );
 		CELists = GetNumObjectsFound( "CondenserEquipmentList" );
 		NumSchemeLists = PELists + CELists;
 		TempVerifyNames.allocate( NumSchemeLists );
-		TempVerifyNames = "";
 		Count = 0;
 		for ( Num = 1; Num <= NumSchemeLists; ++Num ) {
 			if ( Num <= PELists ) {
@@ -681,7 +677,6 @@ namespace PlantCondLoopOperation {
 			}
 			TempVerifyNames( Num ) = cAlphaArgs( 1 );
 		}
-		TempVerifyNames.deallocate();
 
 		//**********GET INPUT AND LOAD PLANT DATA STRUCTURE*********
 
@@ -833,17 +828,11 @@ namespace PlantCondLoopOperation {
 		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 
 		AlphArray.allocate( NumAlphas );
-		AlphArray = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNums );
-		cNumericFields = "";
-		NumArray.allocate( NumNums );
-		NumArray = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNums );
-		lNumericBlanks = true;
+		NumArray.dimension( NumNums, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNums, true );
 
 		if ( PlantLoop( LoopNum ).TypeOfLoop == Plant ) {
 			LoopOpSchemeObj = "PlantEquipmentOperationSchemes";
@@ -918,14 +907,14 @@ namespace PlantCondLoopOperation {
 								if ( InnerListNumLowerLimit > OuterListNumLowerLimit && InnerListNumLowerLimit < OuterListNumUpperLimit ) {
 									ShowWarningError( LoopOpSchemeObj + " = \"" + PlantLoop( LoopNum ).OperationScheme + "\", detected overlapping ranges in " + CurrentModuleObject + " = \"" + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\"." );
 									ShowContinueError( "Range # " + RoundSigDigits( InnerListNum ) + " Lower limit = " + RoundSigDigits( InnerListNumLowerLimit, 1 ) + " lies within the Range # " + RoundSigDigits( ListNum ) + " (" + RoundSigDigits( OuterListNumLowerLimit, 1 ) + " to " + RoundSigDigits( OuterListNumUpperLimit, 1 ) + ")." );
-									ShowContinueError( "Check that input for load range limit values do not overlap, " "and the simulation continues..." );
+									ShowContinueError( "Check that input for load range limit values do not overlap, and the simulation continues..." );
 
 								}
 								// Check if inner list has an upper limit that is between an outer's lower and upper limit
 								if ( InnerListNumUpperLimit > OuterListNumLowerLimit && InnerListNumUpperLimit < OuterListNumUpperLimit ) {
 									ShowWarningError( LoopOpSchemeObj + " = \"" + PlantLoop( LoopNum ).OperationScheme + "\", detected overlapping ranges in " + CurrentModuleObject + " = \"" + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\"." );
 									ShowContinueError( "Range # " + RoundSigDigits( InnerListNum ) + " Upper limit = " + RoundSigDigits( InnerListNumUpperLimit, 1 ) + " lies within Range # " + RoundSigDigits( ListNum ) + " (" + RoundSigDigits( OuterListNumLowerLimit, 1 ) + " to " + RoundSigDigits( OuterListNumUpperLimit, 1 ) + ")." );
-									ShowContinueError( "Check that input for load range limit values do not overlap, " "and the simulation continues..." );
+									ShowContinueError( "Check that input for load range limit values do not overlap, and the simulation continues..." );
 
 								}
 							}
@@ -1019,17 +1008,11 @@ namespace PlantCondLoopOperation {
 		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 
 		AlphArray.allocate( NumAlphas );
-		AlphArray = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNums );
-		cNumericFields = "";
-		NumArray.allocate( NumNums );
-		NumArray = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNums );
-		lNumericBlanks = true;
+		NumArray.dimension( NumNums, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNums, true );
 
 		if ( PlantLoop( LoopNum ).TypeOfLoop == Plant ) {
 			LoopOpSchemeObj = "PlantEquipmentOperationSchemes";
@@ -1310,7 +1293,7 @@ namespace PlantCondLoopOperation {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const Plant( 1 ); // Used to identify whether the current loop is Plant
 		int const Condenser( 2 ); // Used to identify whether the current loop is Condenser
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1322,7 +1305,7 @@ namespace PlantCondLoopOperation {
 		int CompNum;
 		int CompInNode;
 		int IOStat;
-		Real64 CompFlowRate;
+		Real64 CompFlowRate( 0.0 );
 		int Num;
 		std::string LoopOpSchemeObj; // Used to identify the object name for loop equipment operation scheme
 		bool SchemeNameFound; // Set to FALSE if a match of OpScheme object and OpScheme name is not found
@@ -1440,7 +1423,7 @@ namespace PlantCondLoopOperation {
 												ShowContinueError( "PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband" );
 											} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) { // not applicable to Condenser loops
 											}
-											ShowContinueError( " Use a setpoint manager or EMS actuator to place a dual or high temperature" " setpoint on node" );
+											ShowContinueError( " Use a setpoint manager or EMS actuator to place a dual or high temperature setpoint on node" );
 											ErrorsFound = true;
 										}
 									}
@@ -1468,7 +1451,7 @@ namespace PlantCondLoopOperation {
 												ShowContinueError( "PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband" );
 											} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) { // not applicable to Condenser loops
 											}
-											ShowContinueError( " Use a setpoint manager or EMS actuator to place a dual or low temperature" " setpoint on node" );
+											ShowContinueError( " Use a setpoint manager or EMS actuator to place a dual or low temperature setpoint on node" );
 											ErrorsFound = true;
 										}
 									}
@@ -1495,7 +1478,7 @@ namespace PlantCondLoopOperation {
 												ShowContinueError( "PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband" );
 											} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) { // not applicable to Condenser loops
 											}
-											ShowContinueError( " Use a setpoint manager or EMS actuator to place a dual temperature" " setpoint on node" );
+											ShowContinueError( " Use a setpoint manager or EMS actuator to place a dual temperature setpoint on node" );
 											ErrorsFound = true;
 										}
 									}
@@ -1687,19 +1670,15 @@ namespace PlantCondLoopOperation {
 		int LoopSidePtr;
 		int BranchPtr;
 		int CompPtr;
-		int LoopNum;
 		int DummyLoopNum;
 		int LoopSideNum;
 		int BranchNum;
 		int CompNum;
 		int Index;
-		int EquipNum;
-		int OpNum;
 		int OpSchemePtr;
 		int SchemeNum;
 		int thisSchemeNum;
 		int SchemeType;
-		int ListNum;
 		static bool MyOneTimeFlag( true );
 		bool FoundScheme;
 		bool FoundSchemeMatch;
@@ -1719,7 +1698,6 @@ namespace PlantCondLoopOperation {
 		Real64 HighestRange;
 
 		// Object Data
-		FArray1D< OpSchemePtrData > TempCompOpScheme;
 
 		errFlag2 = false;
 		//Get Input
@@ -1733,22 +1711,22 @@ namespace PlantCondLoopOperation {
 			}
 		}
 
-		//ONE TIME INITS
+		// ONE TIME INITS
 		if ( MyOneTimeFlag ) {
-			//Set up 'component' to 'op scheme' pointers in Plant data structure
-			//We're looking for matches between a component on a PlantLoop.OpScheme.List()
-			//and the same component in the PlantLoop.LoopSide.Branch.Comp() data structure
+			// Set up 'component' to 'op scheme' pointers in Plant data structure
+			// We're looking for matches between a component on a PlantLoop.OpScheme.List()
+			// and the same component in the PlantLoop.LoopSide.Branch.Comp() data structure
 
 			// first loop over main operation scheme data and finish filling out indexes to plant topology for the components in the lists
-			for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
+			for ( int LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
 				auto & this_plant_loop( PlantLoop( LoopNum ) );
-				for ( OpNum = 1; OpNum <= this_plant_loop.NumOpSchemes; ++OpNum ) {
+				for ( int OpNum = 1, OpNum_end = this_plant_loop.NumOpSchemes; OpNum <= OpNum_end; ++OpNum ) {
 					auto & this_op_scheme( this_plant_loop.OpScheme( OpNum ) );
-					for ( ListNum = 1; ListNum <= this_op_scheme.NumEquipLists; ++ListNum ) {
+					for ( int ListNum = 1, ListNum_end = this_op_scheme.NumEquipLists; ListNum <= ListNum_end; ++ListNum ) {
 						auto & this_equip_list( this_op_scheme.EquipList( ListNum ) );
-						for ( EquipNum = 1; EquipNum <= this_equip_list.NumComps; ++EquipNum ) {
+						for ( int EquipNum = 1, EquipNum_end = this_equip_list.NumComps; EquipNum <= EquipNum_end; ++EquipNum ) {
 							auto & this_equip( this_equip_list.Comp( EquipNum ) );
-							ThisTypeOfNum = FindItem( trim( this_equip.TypeOf ), SimPlantEquipTypes, NumSimPlantEquipTypes );
+							ThisTypeOfNum = FindItem( this_equip.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes );
 							errFlag1 = false;
 							ScanPlantLoopsForObject( this_equip.Name, ThisTypeOfNum, DummyLoopNum, LoopSideNum, BranchNum, CompNum, _, _, NumSearchResults, _, LoopNum, errFlag1 );
 
@@ -1780,19 +1758,19 @@ namespace PlantCondLoopOperation {
 								errFlag2 = true;
 							}
 
-						} //Equipment on List
-					} //List
-				} //operation scheme
-			} //loop
+						} // Equipment on List
+					} // List
+				} // operation scheme
+			} // loop
 
-			//second loop, fill op schemes info at each component.
-			for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
+			// second loop, fill op schemes info at each component.
+			for ( int LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
 				auto & this_plant_loop( PlantLoop( LoopNum ) );
-				for ( OpNum = 1; OpNum <= PlantLoop( LoopNum ).NumOpSchemes; ++OpNum ) {
+				for ( int OpNum = 1, OpNum_end = this_plant_loop.NumOpSchemes; OpNum <= OpNum_end; ++OpNum ) {
 					auto & this_op_scheme( this_plant_loop.OpScheme( OpNum ) );
-					for ( ListNum = 1; ListNum <= PlantLoop( LoopNum ).OpScheme( OpNum ).NumEquipLists; ++ListNum ) {
+					for ( int ListNum = 1, ListNum_end = this_op_scheme.NumEquipLists; ListNum <= ListNum_end; ++ListNum ) {
 						auto & this_equip_list( this_op_scheme.EquipList( ListNum ) );
-						for ( EquipNum = 1; EquipNum <= PlantLoop( LoopNum ).OpScheme( OpNum ).EquipList( ListNum ).NumComps; ++EquipNum ) {
+						for ( int EquipNum = 1, EquipNum_end = this_equip_list.NumComps; EquipNum <= EquipNum_end; ++EquipNum ) {
 							auto & this_equip( this_equip_list.Comp( EquipNum ) );
 							// dereference indices (stored in previous loop)
 							DummyLoopNum = this_equip.LoopNumPtr;
@@ -1804,94 +1782,74 @@ namespace PlantCondLoopOperation {
 							if ( dummy_loop_equip.NumOpSchemes == 0 ) {
 								// first op scheme for this component, allocate OpScheme and its EquipList to size 1
 								dummy_loop_equip.OpScheme.allocate( 1 );
-								dummy_loop_equip.OpScheme( 1 ).EquipList.allocate( 1 );
+								auto & dummy_op_scheme_1( dummy_loop_equip.OpScheme( 1 ) );
+								dummy_op_scheme_1.EquipList.allocate( 1 );
 								dummy_loop_equip.NumOpSchemes = 1;
-								dummy_loop_equip.OpScheme( 1 ).NumEquipLists = 1;
+								dummy_op_scheme_1.NumEquipLists = 1;
 								// store pointers
-								dummy_loop_equip.OpScheme( 1 ).OpSchemePtr = OpNum;
-								dummy_loop_equip.OpScheme( 1 ).EquipList( 1 ).ListPtr = ListNum;
-								dummy_loop_equip.OpScheme( 1 ).EquipList( 1 ).CompPtr = EquipNum;
-
-							} else if ( dummy_loop_equip.NumOpSchemes > 0 ) {
-								// already an op scheme
+								dummy_op_scheme_1.OpSchemePtr = OpNum;
+								dummy_op_scheme_1.EquipList( 1 ).ListPtr = ListNum;
+								dummy_op_scheme_1.EquipList( 1 ).CompPtr = EquipNum;
+							} else if ( dummy_loop_equip.NumOpSchemes > 0 ) { // already an op scheme
 								OldNumOpSchemes = dummy_loop_equip.NumOpSchemes;
-								// create and store complete copy of old opScheme structure
-								TempCompOpScheme.allocate( OldNumOpSchemes );
-								for ( thisSchemeNum = 1; thisSchemeNum <= OldNumOpSchemes; ++thisSchemeNum ) {
-									OldNumEquipLists = dummy_loop_equip.OpScheme( thisSchemeNum ).NumEquipLists;
-									TempCompOpScheme( thisSchemeNum ).EquipList.allocate( OldNumEquipLists );
-								}
-								TempCompOpScheme = dummy_loop_equip.OpScheme;
 
-								//could be new list on existing scheme or new scheme with new list.  Check and see
+								// could be new list on existing scheme or new scheme with new list.  Check and see
 								FoundSchemeMatch = false;
-								for ( thisSchemeNum = 1; thisSchemeNum <= OldNumOpSchemes; ++thisSchemeNum ) {
-									//compare the OpScheme index, 'opnum', in the PlantLoop()%OpScheme()data structure
-									//with the OpSchemePtr in the PlantLoop()%LoopSide()%Branch()%Comp() data structure.
+								for ( thisSchemeNum = 1; thisSchemeNum <= OldNumOpSchemes; ++thisSchemeNum ) { // Loop index used below
+									// compare the OpScheme index, 'opnum', in the PlantLoop()%OpScheme()data structure
+									// with the OpSchemePtr in the PlantLoop()%LoopSide()%Branch()%Comp() data structure.
 									if ( OpNum != dummy_loop_equip.OpScheme( thisSchemeNum ).OpSchemePtr ) continue;
 									FoundSchemeMatch = true;
 									break;
 								}
-								if ( FoundSchemeMatch ) {
-									//op scheme already exists, but need to add a list to the existing OpScheme
-									NewNumEquipLists = dummy_loop_equip.OpScheme( thisSchemeNum ).NumEquipLists + 1;
-
-									dummy_loop_equip.OpScheme( thisSchemeNum ).EquipList.deallocate();
-									dummy_loop_equip.OpScheme( thisSchemeNum ).EquipList.allocate( NewNumEquipLists );
-									dummy_loop_equip.OpScheme( thisSchemeNum ).EquipList( {1,NewNumEquipLists - 1} ) = TempCompOpScheme( thisSchemeNum ).EquipList; //structure array assignment
-									dummy_loop_equip.OpScheme( thisSchemeNum ).NumEquipLists = NewNumEquipLists;
-									dummy_loop_equip.OpScheme( thisSchemeNum ).EquipList( NewNumEquipLists ).ListPtr = ListNum;
-									dummy_loop_equip.OpScheme( thisSchemeNum ).EquipList( NewNumEquipLists ).CompPtr = EquipNum;
-
-								} else { //(.NOT.FoundSchemeMatch)THEN
-									// add new op scheme and a new list
+								if ( FoundSchemeMatch ) { // op scheme already exists, but need to add a list to the existing OpScheme
+									auto & this_op_scheme( dummy_loop_equip.OpScheme( thisSchemeNum ) );
+									NewNumEquipLists = this_op_scheme.NumEquipLists + 1;
+									this_op_scheme.EquipList.redimension( NewNumEquipLists );
+									this_op_scheme.NumEquipLists = NewNumEquipLists;
+									this_op_scheme.EquipList( NewNumEquipLists ).ListPtr = ListNum;
+									this_op_scheme.EquipList( NewNumEquipLists ).CompPtr = EquipNum;
+								} else { // !FoundSchemeMatch: Add new op scheme and a new list
 									NewNumOpSchemes = OldNumOpSchemes + 1;
-									dummy_loop_equip.OpScheme.deallocate();
-									dummy_loop_equip.OpScheme.allocate( NewNumOpSchemes );
-									for ( SchemeNum = 1; SchemeNum <= OldNumOpSchemes; ++SchemeNum ) {
-										NewNumEquipLists = TempCompOpScheme( SchemeNum ).NumEquipLists;
-										dummy_loop_equip.OpScheme( SchemeNum ).EquipList.allocate( NewNumEquipLists );
-									}
-									dummy_loop_equip.OpScheme( {1,OldNumOpSchemes} ) = TempCompOpScheme; // structure array assignment
-
-									dummy_loop_equip.OpScheme( NewNumOpSchemes ).EquipList.allocate( 1 );
+									dummy_loop_equip.OpScheme.redimension( NewNumOpSchemes );
+									auto & new_op_scheme( dummy_loop_equip.OpScheme( NewNumOpSchemes ) );
+									new_op_scheme.EquipList.allocate( 1 );
 									dummy_loop_equip.NumOpSchemes = NewNumOpSchemes;
-									dummy_loop_equip.OpScheme( NewNumOpSchemes ).NumEquipLists = 1;
-									dummy_loop_equip.OpScheme( NewNumOpSchemes ).OpSchemePtr = OpNum;
-									dummy_loop_equip.OpScheme( NewNumOpSchemes ).EquipList( 1 ).ListPtr = ListNum;
-									dummy_loop_equip.OpScheme( NewNumOpSchemes ).EquipList( 1 ).CompPtr = EquipNum;
-
+									new_op_scheme.NumEquipLists = 1;
+									new_op_scheme.OpSchemePtr = OpNum;
+									new_op_scheme.EquipList( 1 ).ListPtr = ListNum;
+									new_op_scheme.EquipList( 1 ).CompPtr = EquipNum;
 								}
-
-								if ( allocated( TempCompOpScheme ) ) TempCompOpScheme.deallocate();
-
 							}
 
-						} //Equipment on List
-					} //List
-				} //operation scheme
-			} //loop
+						} // Equipment on List
+					} // List
+				} // operation scheme
+			} // loop
 
-			//check the pointers to see if a single component is attached to more than one type of control scheme
-			for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
-				for ( LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum ) {
-					for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches; ++BranchNum ) {
-						for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-							auto & this_component( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ) );
+			// check the pointers to see if a single component is attached to more than one type of control scheme
+			for ( int LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
+				auto const & this_plant_loop( PlantLoop( LoopNum ) );
+				for ( int LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum ) {
+					auto const & this_loop_side( this_plant_loop.LoopSide( LoopSideNum ) );
+					for ( int BranchNum = 1, BranchNum_end = this_loop_side.TotalBranches; BranchNum <= BranchNum_end; ++BranchNum ) {
+						auto const & this_branch( this_loop_side.Branch( BranchNum ) );
+						for ( int CompNum = 1, CompNum_end = this_branch.TotalComponents; CompNum <= CompNum_end; ++CompNum ) {
+							auto const & this_component( this_branch.Comp( CompNum ) );
 							if ( allocated( this_component.OpScheme ) ) {
 								for ( Index = 1; Index <= this_component.NumOpSchemes; ++Index ) {
 									OpSchemePtr = this_component.OpScheme( Index ).OpSchemePtr;
 									if ( OpSchemePtr == 0 ) {
-										ShowSevereError( "InitLoadDistribution: no operation scheme index found for component on PlantLoop=" + PlantLoop( LoopNum ).Name );
+										ShowSevereError( "InitLoadDistribution: no operation scheme index found for component on PlantLoop=" + this_plant_loop.Name );
 										ShowContinueError( "Component name = " + this_component.Name );
 										errFlag2 = true;
 									}
 									if ( Index == 1 ) {
-										SchemeType = PlantLoop( LoopNum ).OpScheme( OpSchemePtr ).OpSchemeType;
+										SchemeType = this_plant_loop.OpScheme( OpSchemePtr ).OpSchemeType;
 									} else {
-										if ( SchemeType != PlantLoop( LoopNum ).OpScheme( OpSchemePtr ).OpSchemeType ) {
-											//CALL FATAL ERROR 'component may not be specified on two types of operation schemes
-											//DSU?  BG do not understand.  Cannot different op schemes be in effect at different times?
+										if ( SchemeType != this_plant_loop.OpScheme( OpSchemePtr ).OpSchemeType ) {
+											// CALL FATAL ERROR 'component may not be specified on two types of operation schemes
+											// DSU?  BG do not understand.  Cannot different op schemes be in effect at different times?
 											//  I thought this would be allowed??
 										}
 									}
@@ -1903,55 +1861,61 @@ namespace PlantCondLoopOperation {
 			}
 
 			// fill out information on which equipment list is the "last" meaning it has the highest upper limit for load range
-			for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
-				for ( OpNum = 1; OpNum <= PlantLoop( LoopNum ).NumOpSchemes; ++OpNum ) {
+			for ( int LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
+				auto & this_plant_loop( PlantLoop( LoopNum ) );
+				for ( int OpNum = 1, OpNum_end = this_plant_loop.NumOpSchemes; OpNum <= OpNum_end; ++OpNum ) {
+					auto & this_op_scheme( this_plant_loop.OpScheme( OpNum ) );
 					// skip non-load based op schemes
-					if ( ( PlantLoop( LoopNum ).OpScheme( OpNum ).OpSchemeType != HeatingRBOpSchemeType ) && ( PlantLoop( LoopNum ).OpScheme( OpNum ).OpSchemeType != CoolingRBOpSchemeType ) ) continue;
+					if ( ( this_op_scheme.OpSchemeType != HeatingRBOpSchemeType ) && ( this_op_scheme.OpSchemeType != CoolingRBOpSchemeType ) ) continue;
 					HighestRange = 0.0;
-					for ( ListNum = 1; ListNum <= PlantLoop( LoopNum ).OpScheme( OpNum ).NumEquipLists; ++ListNum ) {
-						HighestRange = max( HighestRange, PlantLoop( LoopNum ).OpScheme( OpNum ).EquipList( ListNum ).RangeUpperLimit );
-					} //List
-					for ( ListNum = 1; ListNum <= PlantLoop( LoopNum ).OpScheme( OpNum ).NumEquipLists; ++ListNum ) {
-						if ( HighestRange == PlantLoop( LoopNum ).OpScheme( OpNum ).EquipList( ListNum ).RangeUpperLimit ) {
-							PlantLoop( LoopNum ).OpScheme( OpNum ).EquipListNumForLastStage = ListNum;
+					for ( int ListNum = 1, ListNum_end = this_op_scheme.NumEquipLists; ListNum <= ListNum_end; ++ListNum ) {
+						HighestRange = max( HighestRange, this_op_scheme.EquipList( ListNum ).RangeUpperLimit );
+					} // List
+					for ( int ListNum = 1, ListNum_end = this_op_scheme.NumEquipLists; ListNum <= ListNum_end; ++ListNum ) {
+						if ( HighestRange == this_op_scheme.EquipList( ListNum ).RangeUpperLimit ) {
+							this_op_scheme.EquipListNumForLastStage = ListNum;
 						}
 					}
-				} //operation scheme
-			} //loop
+				} // operation scheme
+			} // loop
 
 			MyOneTimeFlag = false;
 		}
 
-		if ( AnyEMSPlantOpSchemesInModel ) {
-			// Execute any Initialization EMS program calling managers for User-Defined operation.
-			for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
-				for ( OpNum = 1; OpNum <= PlantLoop( LoopNum ).NumOpSchemes; ++OpNum ) {
-					if ( PlantLoop( LoopNum ).OpScheme( OpNum ).OpSchemeType == EMSOpSchemeType ) {
-						if ( BeginEnvrnFlag && PlantLoop( LoopNum ).OpScheme( OpNum ).MyEnvrnFlag ) {
-							if ( PlantLoop( LoopNum ).OpScheme( OpNum ).ErlInitProgramMngr > 0 ) {
-								ManageEMS( emsCallFromUserDefinedComponentModel, PlantLoop( LoopNum ).OpScheme( OpNum ).ErlInitProgramMngr );
+		if ( AnyEMSPlantOpSchemesInModel ) { // Execute any Initialization EMS program calling managers for User-Defined operation.
+			for ( int LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
+				auto & this_plant_loop( PlantLoop( LoopNum ) );
+				for ( int OpNum = 1, OpNum_end = this_plant_loop.NumOpSchemes; OpNum <= OpNum_end; ++OpNum ) {
+					auto & this_op_scheme( this_plant_loop.OpScheme( OpNum ) );
+					if ( this_op_scheme.OpSchemeType == EMSOpSchemeType ) {
+						if ( BeginEnvrnFlag && this_op_scheme.MyEnvrnFlag ) {
+							if ( this_op_scheme.ErlInitProgramMngr > 0 ) {
+								ManageEMS( emsCallFromUserDefinedComponentModel, this_op_scheme.ErlInitProgramMngr );
 							}
-							PlantLoop( LoopNum ).OpScheme( OpNum ).MyEnvrnFlag = false;
+							this_op_scheme.MyEnvrnFlag = false;
 						}
-						if ( ! BeginEnvrnFlag ) PlantLoop( LoopNum ).OpScheme( OpNum ).MyEnvrnFlag = true;
+						if ( ! BeginEnvrnFlag ) this_op_scheme.MyEnvrnFlag = true;
 					}
-				} //operation scheme
-			} //loop
+				} // operation scheme
+			} // loop
 		}
 
-		//FIRST HVAC INITS
+		// FIRST HVAC INITS
 		if ( FirstHVACIteration ) {
-			for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
-				for ( LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum ) {
-					for ( BranchNum = 1; BranchNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalBranches; ++BranchNum ) {
-						for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-							auto & this_component( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ) );
+			for ( int LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
+				auto & this_plant_loop( PlantLoop( LoopNum ) );
+				for ( int LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum ) {
+					auto & this_loop_side( this_plant_loop.LoopSide( LoopSideNum ) );
+					for ( int BranchNum = 1, BranchNum_end = this_loop_side.TotalBranches; BranchNum <= BranchNum_end; ++BranchNum ) {
+						auto & this_branch( this_loop_side.Branch( BranchNum ) );
+						for ( int CompNum = 1, CompNum_end = this_branch.TotalComponents; CompNum <= CompNum_end; ++CompNum ) {
+							auto & this_component( this_branch.Comp( CompNum ) );
 							// initalize components 'ON-AVAILABLE-NO LOAD-NO EMS CTRL'
 							this_component.ON = true;
 							this_component.Available = true;
 							this_component.MyLoad = 0.0;
 							this_component.EMSLoadOverrideOn = false;
-							//  Zero out the old curOpSchemePtr so that we don't get 'carry-over' when we update schedules
+							// Zero out the old curOpSchemePtr so that we don't get 'carry-over' when we update schedules
 							if ( this_component.CurOpSchemeType != DemandOpSchemeType && this_component.CurOpSchemeType != PumpOpSchemeType && this_component.CurOpSchemeType != WSEconOpSchemeType && this_component.CurOpSchemeType != NoControlOpSchemeType ) {
 								this_component.CurOpSchemeType = NoControlOpSchemeType;
 							}
@@ -1960,24 +1924,24 @@ namespace PlantCondLoopOperation {
 					}
 				}
 			}
-			//Update the OpScheme schedules
-			for ( LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
+			// Update the OpScheme schedules
+			for ( int LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum ) {
 				FoundScheme = false;
 				auto & this_loop( PlantLoop( LoopNum ) );
-				for ( OpNum = 1; OpNum <= this_loop.NumOpSchemes; ++OpNum ) {
+				for ( int OpNum = 1; OpNum <= this_loop.NumOpSchemes; ++OpNum ) {
 					auto & this_op_scheme( this_loop.OpScheme( OpNum ) );
 					if ( GetCurrentScheduleValue( this_op_scheme.SchedPtr ) > 0.0 ) {
 						this_op_scheme.Available = true;
 						FoundScheme = true;
-						for ( ListNum = 1; ListNum <= PlantLoop( LoopNum ).OpScheme( OpNum ).NumEquipLists; ++ListNum ) {
+						for ( int ListNum = 1, ListNum_end = this_op_scheme.NumEquipLists; ListNum <= ListNum_end; ++ListNum ) {
 							auto & this_equip_list( this_op_scheme.EquipList( ListNum ) );
-							//The component loop loads the pointers from the OpScheme data structure
-							//If the component happens to be active in more than schedule, the *LAST*
-							//schedule found will be activated
-							for ( CompNum = 1; CompNum <= this_equip_list.NumComps; ++CompNum ) {
+							// The component loop loads the pointers from the OpScheme data structure
+							// If the component happens to be active in more than schedule, the *LAST*
+							// schedule found will be activated
+							for ( int CompNum = 1; CompNum <= this_equip_list.NumComps; ++CompNum ) {
 
 								// set up a reference to the component instance on the list data structure
-								auto & this_list_component( this_equip_list.Comp( CompNum ) );
+								auto const & this_list_component( this_equip_list.Comp( CompNum ) );
 
 								// then look up the component topological position from this structure
 								LoopPtr = this_list_component.LoopNumPtr;
@@ -1989,10 +1953,10 @@ namespace PlantCondLoopOperation {
 								auto & this_loop_component( PlantLoop( LoopPtr ).LoopSide( LoopSidePtr ).Branch( BranchPtr ).Comp( CompPtr ) );
 
 								if ( this_loop_component.CurOpSchemeType != PumpOpSchemeType ) {
-									this_loop_component.CurOpSchemeType = PlantLoop( LoopNum ).OpScheme( OpNum ).OpSchemeType;
+									this_loop_component.CurOpSchemeType = this_op_scheme.OpSchemeType;
 								} else {
 									ShowSevereError( "Invalid [pump] component found on equipment list.  Pumps are not allowed on equipment lists." );
-									ShowContinueError( "Problem component name = " + PlantLoop( LoopNum ).OpScheme( OpNum ).EquipList( ListNum ).Comp( CompNum ).Name );
+									ShowContinueError( "Problem component name = " + this_op_scheme.EquipList( ListNum ).Comp( CompNum ).Name );
 									ShowContinueError( "Remove pump component and place other plant equipment on the list to correct." );
 									errFlag2 = true;
 								}
@@ -2005,7 +1969,7 @@ namespace PlantCondLoopOperation {
 							}
 						}
 					} else {
-						PlantLoop( LoopNum ).OpScheme( OpNum ).Available = false;
+						this_op_scheme.Available = false;
 					}
 
 				}
@@ -2091,7 +2055,7 @@ namespace PlantCondLoopOperation {
 		auto & this_loop( PlantLoop( LoopNum ) );
 		auto & this_loopside( this_loop.LoopSide( LoopSideNum ) );
 		auto & this_equiplist( this_loop.OpScheme( CurSchemePtr ).EquipList( ListPtr ) );
-		
+
 		struct LoadPLRPoint {
 			Real64 plant_capacity_to_this_point;
 			Real64 largest_min_plr_to_this_point;
@@ -2101,7 +2065,7 @@ namespace PlantCondLoopOperation {
 			}
 		};
 		std::vector< LoadPLRPoint > accrued_load_plr_values;
-						
+
 		// load local variables
 		NumCompsOnList = this_equiplist.NumComps;
 
@@ -2118,7 +2082,7 @@ namespace PlantCondLoopOperation {
 
 			//OPTIMAL DISTRIBUTION SCHEME
 			switch ( LoadFlag ) {
-			case OptimalLoading: 
+			case OptimalLoading:
 				//step 1: load all machines to optimal PLR
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
 
@@ -2159,8 +2123,8 @@ namespace PlantCondLoopOperation {
 						BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
 						CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
-                        // create a reference to the component itself
-                        auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
+						// create a reference to the component itself
+						auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 						if ( ! this_component.Available ) continue;
 
@@ -2191,12 +2155,12 @@ namespace PlantCondLoopOperation {
 						if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0; //CR8631 don't just exit or %MyLoad on second device isn't reset
 					}
 				}
-				
+
 				break;
-			
+
 			//SEQUENTIALLOAD DISTRIBUTION SCHEME
-			case SequentialLoading: 
-				
+			case SequentialLoading:
+
 				// step 1: Load machines in list order
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
 
@@ -2230,7 +2194,7 @@ namespace PlantCondLoopOperation {
 				break;
 
 			//UNIFORMLOAD DISTRIBUTION SCHEME
-			case UniformLoading: 
+			case UniformLoading:
 
 				// step 1: distribute load equally to all machines
 				UniformLoad = std::abs( RemLoopDemand ) / NumCompsOnList;
@@ -2290,7 +2254,7 @@ namespace PlantCondLoopOperation {
 				PlantPLR = 0.0;
 				MinCompPLR = 0.0;
 				LargestMinCompPLR = 0.0;
-				
+
 				// Determine PlantCapacity and LargestMinCompPLR
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
 
@@ -2304,13 +2268,13 @@ namespace PlantCondLoopOperation {
 
 					PlantCapacity += this_component.MaxLoad;
 
-					if ( this_component.MaxLoad < SmallLoad ){
+					if ( this_component.MaxLoad < SmallLoad ) {
 						ShowWarningMessage( "Plant component " + this_component.Name + " has zero available capacity. Check component controls." );
 						MinCompPLR = 0.0;
 					} else {
 						MinCompPLR = this_component.MinLoad/this_component.MaxLoad;
 					}
-						
+
 					//Set LargestMinCompPLR to largest MinCompPLR
 					LargestMinCompPLR = max( LargestMinCompPLR, MinCompPLR );
 
@@ -2320,23 +2284,23 @@ namespace PlantCondLoopOperation {
 
 				// work backwards from full capacity down to 1 unit on
 				for ( int i = accrued_load_plr_values.size() - 1; i >= 0; --i ) {
-					
+
 					// if i == 0 then we need to take that as the resulting value
 					if ( i == 0 ) {
 						PlantCapacity = accrued_load_plr_values[i].plant_capacity_to_this_point;
 						LargestMinCompPLR = accrued_load_plr_values[i].largest_min_plr_to_this_point;
 						break;
-					
+
 					// if the capacity is greater than the demand, just store the latest values and continue
 					} else if ( std::abs( RemLoopDemand ) < ( accrued_load_plr_values[i].largest_min_plr_to_this_point * accrued_load_plr_values[i].plant_capacity_to_this_point ) ) {
 						PlantCapacity = accrued_load_plr_values[i].plant_capacity_to_this_point;
 						LargestMinCompPLR = accrued_load_plr_values[i].largest_min_plr_to_this_point;
 						continue;
-					
+
 					// if the capacity is less than the demand, accept the last values from the previous iteration and exit
 					} else {
 						break;
-						
+
 					}
 				}
 
@@ -2345,11 +2309,11 @@ namespace PlantCondLoopOperation {
 					PlantPLR = min( 1.0, std::abs( RemLoopDemand ) / PlantCapacity );
 				} else {
 					ShowWarningError( "Zero available plant capacity for Plant Loop = " + PlantLoop( LoopNum ).Name );
-				} 
+				}
 
 				// Distribute load to each machine
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
-					
+
 					CompLoad = 0.0;
 
 					BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
@@ -2361,14 +2325,14 @@ namespace PlantCondLoopOperation {
 					if ( ! this_component.Available ) continue;
 
 					CompLoad = PlantPLR * this_component.MaxLoad;
-					
+
 					if ( this_component.MaxLoad > 0.0 ) {
 						ChangeInLoad = min( std::abs( RemLoopDemand ), CompLoad );
 					} else {
 						// this is for some components like cooling towers don't have well defined MaxLoad
 						ChangeInLoad = std::abs( RemLoopDemand );
 					}
-				
+
 					AdjustChangeInLoadForLastStageUpperRangeLimit( LoopNum, CurSchemePtr, ListPtr, ChangeInLoad );
 
 					AdjustChangeInLoadByEMSControls( LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad );
@@ -2378,36 +2342,36 @@ namespace PlantCondLoopOperation {
 					ChangeInLoad = max( 0.0, ChangeInLoad );
 
 					this_component.MyLoad = sign( ChangeInLoad, RemLoopDemand );
-			
+
 					RemLoopDemand -= sign( ChangeInLoad, RemLoopDemand );
-					
-					if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0;				
+
+					if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0;
 				}
 
 				break;
 
 			// SEQUENTIALUNIFORMPLR LOAD DISTRIBUTION SCHEME
 			case SequentialUniformPLRLoading:
-				
+
 				PlantCapacity = 0.0;
 				PlantPLR = 0.0;
 				MinCompPLR = 0.0;
 				LargestMinCompPLR = 0.0;
-		
+
 				// Determine PlantCapacity and LargestMinCompPLR
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
-					
+
 					BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
 					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
-                    // create a reference to the component itself
-                    auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
+					// create a reference to the component itself
+					auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 					if ( ! this_component.Available ) continue;
 
 					PlantCapacity += this_component.MaxLoad;
 
-					if ( this_component.MaxLoad < SmallLoad ){
+					if ( this_component.MaxLoad < SmallLoad ) {
 						ShowWarningMessage( "Plant component " + this_component.Name + " has zero available capacity. Check component controls." );
 						MinCompPLR = 0.0;
 					} else {
@@ -2427,30 +2391,30 @@ namespace PlantCondLoopOperation {
 					PlantPLR = min( 1.0, std::abs( RemLoopDemand ) / PlantCapacity );
 				} else {
 					ShowWarningError( "Zero available plant capacity for Plant Loop = " + PlantLoop( LoopNum ).Name );
-				} 
+				}
 
 				// Distribute load to each machine
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
-					
+
 					CompLoad = 0.0;
 
 					BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
 					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
-                    // create a reference to the component itself
-                    auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
+					// create a reference to the component itself
+					auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 					if ( ! this_component.Available ) continue;
 
 					CompLoad = PlantPLR * this_component.MaxLoad;
-					
+
 					if ( this_component.MaxLoad > 0.0 ) {
 						ChangeInLoad = min( std::abs( RemLoopDemand ), CompLoad );
 					} else {
 						// this is for some components like cooling towers don't have well defined MaxLoad
 						ChangeInLoad = std::abs( RemLoopDemand );
 					}
-				
+
 					AdjustChangeInLoadForLastStageUpperRangeLimit( LoopNum, CurSchemePtr, ListPtr, ChangeInLoad );
 
 					AdjustChangeInLoadByEMSControls( LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad );
@@ -2460,10 +2424,10 @@ namespace PlantCondLoopOperation {
 					ChangeInLoad = max( 0.0, ChangeInLoad );
 
 					this_component.MyLoad = sign( ChangeInLoad, RemLoopDemand );
-					
+
 					RemLoopDemand -= sign( ChangeInLoad, RemLoopDemand );
-					
-					if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0;				
+
+					if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0;
 				}
 
 			}
@@ -2738,7 +2702,7 @@ namespace PlantCondLoopOperation {
 		Real64 ActualMdot;
 		Real64 TempIn;
 		Real64 CurSpecHeat;
-		Real64 TempSetPt;
+		Real64 TempSetPt( 0.0 );
 		Real64 CompMinLoad;
 		Real64 CompMaxLoad;
 		Real64 CompOptLoad;
@@ -2800,9 +2764,11 @@ namespace PlantCondLoopOperation {
 				} else { // deadband
 					TempSetPt = TempIn;
 				}
-
+			} else {
+				assert( false );
 			}
-
+		} else {
+			assert( false );
 		}}
 
 		if ( TempSetPt == SensedNodeFlagValue ) {
@@ -2959,7 +2925,7 @@ namespace PlantCondLoopOperation {
 		using DataEnvironment::OutDewPointTemp;
 
 		// Return value
-		Real64 FindRangeVariable;
+		Real64 FindRangeVariable( 0.0 );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2991,8 +2957,9 @@ namespace PlantCondLoopOperation {
 			ReferenceNodeNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).ReferenceNodeNumber;
 			NodeTemperature = Node( ReferenceNodeNum ).Temp;
 			FindRangeVariable = NodeTemperature - OutDewPointTemp;
+		} else {
+			assert( false );
 		}} // OperationScheme
-		//Autodesk:Return Check/enforce that one of these CASEs holds or add a default case to assure return value is set
 
 		return FindRangeVariable;
 
@@ -3432,7 +3399,7 @@ namespace PlantCondLoopOperation {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

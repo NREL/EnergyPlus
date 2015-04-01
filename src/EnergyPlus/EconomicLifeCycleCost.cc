@@ -519,7 +519,7 @@ namespace EconomicLifeCycleCost {
 			if ( lastDateMonth == 0 ) lastDateMonth = 12;
 			lastDateYear = baseDateYear + lengthStudyYears - 1;
 		} else {
-			ShowWarningError( CurrentModuleObject + ": Only one instance of this object is allowed. " "No life-cycle cost reports will be generated. " );
+			ShowWarningError( CurrentModuleObject + ": Only one instance of this object is allowed. No life-cycle cost reports will be generated." );
 			LCCparamPresent = false;
 		}
 	}
@@ -635,10 +635,10 @@ namespace EconomicLifeCycleCost {
 			//        \maximum 100
 			RecurringCosts( iInObj ).yearsFromStart = int( NumArray( 2 ) );
 			if ( RecurringCosts( iInObj ).yearsFromStart > 100 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 2 ) + ".  This value is the number of years from the start so a value greater than 100 " "is not reasonable for an economic evaluation. " );
+				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 2 ) + ".  This value is the number of years from the start so a value greater than 100 is not reasonable for an economic evaluation. " );
 			}
 			if ( RecurringCosts( iInObj ).yearsFromStart < 0 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 2 ) + ".  This value is the number of years from the start so a value less than 0 " "is not reasonable for an economic evaluation. " );
+				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 2 ) + ".  This value is the number of years from the start so a value less than 0 is not reasonable for an economic evaluation. " );
 			}
 			//   N3,  \field Months from Start
 			//        \type integer
@@ -646,10 +646,10 @@ namespace EconomicLifeCycleCost {
 			//        \maximum 1200
 			RecurringCosts( iInObj ).monthsFromStart = int( NumArray( 3 ) );
 			if ( RecurringCosts( iInObj ).monthsFromStart > 1200 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 3 ) + ".  This value is the number of months from the start so a value greater than 1200 " "is not reasonable for an economic evaluation. " );
+				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 3 ) + ".  This value is the number of months from the start so a value greater than 1200 is not reasonable for an economic evaluation. " );
 			}
 			if ( RecurringCosts( iInObj ).monthsFromStart < 0 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 3 ) + ".  This value is the number of months from the start so a value less than 0 " "is not reasonable for an economic evaluation. " );
+				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 3 ) + ".  This value is the number of months from the start so a value less than 0 is not reasonable for an economic evaluation. " );
 			}
 			//   N4,  \field Repeat Period Years
 			//        \type integer
@@ -657,10 +657,10 @@ namespace EconomicLifeCycleCost {
 			//        \maximum 100
 			RecurringCosts( iInObj ).repeatPeriodYears = int( NumArray( 4 ) );
 			if ( RecurringCosts( iInObj ).repeatPeriodYears > 100 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 4 ) + ".  This value is the number of years between occurances of the cost so a value greater than 100 " "is not reasonable for an economic evaluation. " );
+				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 4 ) + ".  This value is the number of years between occurances of the cost so a value greater than 100 is not reasonable for an economic evaluation. " );
 			}
 			if ( RecurringCosts( iInObj ).repeatPeriodYears < 1 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 4 ) + ".  This value is the number of years between occurances of the cost so a value less than 1 " "is not reasonable for an economic evaluation. " );
+				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 4 ) + ".  This value is the number of years between occurances of the cost so a value less than 1 is not reasonable for an economic evaluation. " );
 			}
 			//   N5,  \field Repeat Period Months
 			//        \type integer
@@ -668,10 +668,10 @@ namespace EconomicLifeCycleCost {
 			//        \maximum 1200
 			RecurringCosts( iInObj ).repeatPeriodMonths = int( NumArray( 5 ) );
 			if ( RecurringCosts( iInObj ).repeatPeriodMonths > 1200 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 5 ) + ".  This value is the number of months between occurances of the cost so a value greater than 1200 " "is not reasonable for an economic evaluation. " );
+				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 5 ) + ".  This value is the number of months between occurances of the cost so a value greater than 1200 is not reasonable for an economic evaluation. " );
 			}
 			if ( RecurringCosts( iInObj ).repeatPeriodMonths < 0 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 5 ) + ".  This value is the number of months between occurances of the cost so a value less than 0 " "is not reasonable for an economic evaluation. " );
+				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 5 ) + ".  This value is the number of months between occurances of the cost so a value less than 0 is not reasonable for an economic evaluation. " );
 			}
 			if ( ( RecurringCosts( iInObj ).repeatPeriodMonths == 0 ) && ( RecurringCosts( iInObj ).repeatPeriodYears == 0 ) ) {
 				ShowWarningError( CurrentModuleObject + ": Invalid value in fields " + cNumericFieldNames( 5 ) + " and " + cNumericFieldNames( 4 ) + ".  The repeat period must not be zero months and zero years. " );
@@ -796,7 +796,7 @@ namespace EconomicLifeCycleCost {
 			//      \maximum 100
 			NonrecurringCost( iInObj ).yearsFromStart = int( NumArray( 2 ) );
 			if ( NonrecurringCost( iInObj ).yearsFromStart > 100 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 2 ) + ".  This value is the number of years from the start so a value greater than 100 " "is not reasonable for an economic evaluation. " );
+				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 2 ) + ".  This value is the number of years from the start so a value greater than 100 is not reasonable for an economic evaluation. " );
 			}
 			if ( NonrecurringCost( iInObj ).yearsFromStart < 0 ) {
 				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 2 ) + ".  This value is the number of years from the start so a value less than 0 is not reasonable for an economic evaluation. " );
@@ -807,10 +807,10 @@ namespace EconomicLifeCycleCost {
 			//       \maximum 11
 			NonrecurringCost( iInObj ).monthsFromStart = int( NumArray( 3 ) );
 			if ( NonrecurringCost( iInObj ).monthsFromStart > 1200 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 3 ) + ".  This value is the number of months from the start so a value greater than 1200 " "is not reasonable for an economic evaluation. " );
+				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 3 ) + ".  This value is the number of months from the start so a value greater than 1200 is not reasonable for an economic evaluation. " );
 			}
 			if ( NonrecurringCost( iInObj ).monthsFromStart < 0 ) {
-				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 3 ) + ".  This value is the number of months from the start so a value less than 0 " "is not reasonable for an economic evaluation. " );
+				ShowWarningError( CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames( 3 ) + ".  This value is the number of months from the start so a value less than 0 is not reasonable for an economic evaluation. " );
 			}
 			// express the years and months fields in total months
 			NonrecurringCost( iInObj ).totalMonthsFromStart = NonrecurringCost( iInObj ).yearsFromStart * 12 + NonrecurringCost( iInObj ).monthsFromStart;
@@ -1449,7 +1449,7 @@ namespace EconomicLifeCycleCost {
 			{ auto const SELECT_CASE_var( CashFlow( iCashFlow ).SourceKind );
 			if ( SELECT_CASE_var == skResource ) {
 				//only for real fuels purchased such as electricity, natural gas, etc..
-				if ((CashFlow(iCashFlow).Resource) >= iRT_Electricity && (CashFlow(iCashFlow).Resource <= iRT_ElectricitySurplusSold)) {
+				if ( ( CashFlow(iCashFlow).Resource >= iRT_Electricity ) && ( CashFlow(iCashFlow).Resource <= iRT_ElectricitySurplusSold ) ) {
 					CashFlow( iCashFlow ).pvKind = pvkEnergy;
 				} else {
 					CashFlow( iCashFlow ).pvKind = pvkNonEnergy;
@@ -2013,7 +2013,9 @@ namespace EconomicLifeCycleCost {
 			columnWidth = 14; //array assignment - same for all columns
 			WriteSubtitle( "Life-Cycle Cost Parameters" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Life-Cycle Cost Parameters" );
+			if( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Life-Cycle Cost Parameters" );
+			}
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -2022,8 +2024,7 @@ namespace EconomicLifeCycleCost {
 			numColumns = max( 1, numUsePriceEscalation );
 			rowHead.allocate( lengthStudyYears + 2 );
 			columnHead.allocate( numColumns );
-			columnWidth.allocate( numColumns );
-			columnWidth = 14; //array assignment - same for all columns
+			columnWidth.dimension( numColumns, 14 ); //array assignment - same for all columns
 			tableBody.allocate( lengthStudyYears + 2, numColumns );
 			tableBody = "";
 			columnHead = "none";
@@ -2044,7 +2045,9 @@ namespace EconomicLifeCycleCost {
 			}
 			WriteSubtitle( "Use Price Escalation" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Price Escalation" );
+			if( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Price Escalation" );
+			}
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -2055,8 +2058,7 @@ namespace EconomicLifeCycleCost {
 				numYears = lengthStudyYears - ( serviceDateYear - baseDateYear );
 				rowHead.allocate( numYears + 1 );
 				columnHead.allocate( numColumns );
-				columnWidth.allocate( numColumns );
-				columnWidth = 14; //array assignment - same for all columns
+				columnWidth.dimension( numColumns, 14 ); //array assignment - same for all columns
 				tableBody.allocate( numYears + 1, numColumns );
 				tableBody = "";
 				columnHead = "none";
@@ -2075,7 +2077,9 @@ namespace EconomicLifeCycleCost {
 				}
 				WriteSubtitle( "Use Adjustment" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Adjustment" );
+				if( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Adjustment" );
+				}
 				columnHead.deallocate();
 				rowHead.deallocate();
 				columnWidth.deallocate();
@@ -2085,8 +2089,7 @@ namespace EconomicLifeCycleCost {
 			numColumns = max( 1, numRecurringCosts + numNonrecurringCost );
 			rowHead.allocate( lengthStudyYears + 1 );
 			columnHead.allocate( numColumns );
-			columnWidth.allocate( numColumns );
-			columnWidth = 14; //array assignment - same for all columns
+			columnWidth.dimension( numColumns, 14 ); //array assignment - same for all columns
 			tableBody.allocate( lengthStudyYears + 1, numColumns );
 			tableBody = "";
 			rowHead( 1 ) = "";
@@ -2108,7 +2111,9 @@ namespace EconomicLifeCycleCost {
 			}
 			WriteSubtitle( "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)" );
+			if( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)" );
+			}	
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -2117,8 +2122,7 @@ namespace EconomicLifeCycleCost {
 			numColumns = max( 1, numResourcesUsed );
 			rowHead.allocate( lengthStudyYears );
 			columnHead.allocate( numColumns );
-			columnWidth.allocate( numColumns );
-			columnWidth = 14; //array assignment - same for all columns
+			columnWidth.dimension( numColumns, 14 ); //array assignment - same for all columns
 			tableBody.allocate( lengthStudyYears, numColumns );
 			tableBody = "";
 			for ( iYear = 1; iYear <= lengthStudyYears; ++iYear ) {
@@ -2133,7 +2137,9 @@ namespace EconomicLifeCycleCost {
 			}
 			WriteSubtitle( "Energy Cost Cash Flows (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Energy Cost Cash Flows (Without Escalation)" );
+			if( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Energy Cost Cash Flows (Without Escalation)" );
+			}
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -2158,7 +2164,9 @@ namespace EconomicLifeCycleCost {
 			}
 			WriteSubtitle( "Capital Cash Flow by Category (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Capital Cash Flow by Category (Without Escalation)" );
+			if( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Capital Cash Flow by Category (Without Escalation)" );
+			}
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -2196,7 +2204,9 @@ namespace EconomicLifeCycleCost {
 			}
 			WriteSubtitle( "Operating Cash Flow by Category (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Operating Cash Flow by Category (Without Escalation)" );
+			if( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Operating Cash Flow by Category (Without Escalation)" );
+			}
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -2268,7 +2278,9 @@ namespace EconomicLifeCycleCost {
 			}
 			WriteSubtitle( "Monthly Total Cash Flow (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Monthly Total Cash Flow (Without Escalation)" );
+			if( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Monthly Total Cash Flow (Without Escalation)" );
+			}
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -2341,7 +2353,9 @@ namespace EconomicLifeCycleCost {
 			tableBody( numRows + 1, 4 ) = RealToStr( totalPV, 2 );
 			WriteSubtitle( "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)" );
+			if( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)" );
+			}
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -2390,7 +2404,9 @@ namespace EconomicLifeCycleCost {
 
 			WriteSubtitle( "Present Value by Category" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Category" );
+			if( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Category" );
+			}
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -2418,7 +2434,9 @@ namespace EconomicLifeCycleCost {
 
 			WriteSubtitle( "Present Value by Year" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Year" );
+			if( sqlite ) {
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Year" );
+			}
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -2453,7 +2471,9 @@ namespace EconomicLifeCycleCost {
 
 				WriteSubtitle( "After Tax Estimate" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "After Tax Estimate" );
+				if( sqlite ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "After Tax Estimate" );
+				}
 				columnHead.deallocate();
 				rowHead.deallocate();
 				columnWidth.deallocate();
@@ -2472,7 +2492,7 @@ namespace EconomicLifeCycleCost {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -35,6 +35,14 @@ namespace ReportSizingManager {
 		std::string const & CallingRoutine // name of calling rotuine for warning messages
 	);
 
+	void
+	GetCoilDesFlowT(
+		int SysNum, // central air system index
+		Real64 CpAir, // specific heat to be used in calculations [J/kgC]
+		Real64 & DesFlow, // returned design mass flow [kg/s]
+		Real64 & DesExitTemp // returned design coil exit temperature [kg/s]
+	);
+
 	//     NOTICE
 
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
@@ -44,7 +52,7 @@ namespace ReportSizingManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

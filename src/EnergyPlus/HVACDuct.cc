@@ -203,8 +203,7 @@ namespace HVACDuct {
 		cCurrentModuleObject = "Duct";
 		NumDucts = GetNumObjectsFound( cCurrentModuleObject );
 		Duct.allocate( NumDucts );
-		CheckEquipName.allocate( NumDucts );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumDucts, true );
 
 		for ( DuctNum = 1; DuctNum <= NumDucts; ++DuctNum ) {
 			GetObjectItem( cCurrentModuleObject, DuctNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -270,8 +269,7 @@ namespace HVACDuct {
 		// do one time initializations
 		if ( MyOneTimeFlag ) {
 			// initialize the environment and sizing flags
-			MyEnvrnFlag.allocate( NumDucts );
-			MyEnvrnFlag = true;
+			MyEnvrnFlag.dimension( NumDucts, true );
 
 			MyOneTimeFlag = false;
 
@@ -439,7 +437,7 @@ namespace HVACDuct {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

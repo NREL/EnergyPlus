@@ -3,7 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -688,7 +687,7 @@ namespace HVACMultiSpeedHeatPump {
 	Real64
 	MSHPCyclingResidual(
 		Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = MSHPNum
+		FArray1< Real64 > const & Par // par(1) = MSHPNum
 	);
 
 	//******************************************************************************
@@ -696,7 +695,7 @@ namespace HVACMultiSpeedHeatPump {
 	Real64
 	MSHPVarSpeedResidual(
 		Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par = _ // par(1) = MSHPNum
+		FArray1< Real64 > const & Par // par(1) = MSHPNum
 	);
 
 	//******************************************************************************
@@ -734,7 +733,7 @@ namespace HVACMultiSpeedHeatPump {
 	Real64
 	HotWaterCoilResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		Optional< FArray1S< Real64 > const > Par = _ // Par(5) is the requested coil load
+		FArray1< Real64 > const & Par // Par(5) is the requested coil load
 	);
 
 	//     NOTICE
@@ -746,7 +745,7 @@ namespace HVACMultiSpeedHeatPump {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -114,9 +114,10 @@ namespace RuntimeLanguageProcessor {
 	int CurrentEnvironmentPeriodNum( 0 );
 	int ActualDateAndTimeNum( 0 );
 	int ActualTimeNum( 0 );
+	int WarmUpFlagNum( 0 );
 
-	static gio::Fmt const fmtLD( "*" );
-	static gio::Fmt const fmtA( "(A)" );
+	static gio::Fmt fmtLD( "*" );
+	static gio::Fmt fmtA( "(A)" );
 
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -148,6 +149,7 @@ namespace RuntimeLanguageProcessor {
 		using DataGlobals::OutputFileDebug;
 		using DataGlobals::CurrentTime;
 		using DataGlobals::TimeStepZone;
+		using DataGlobals::WarmupFlag;
 		using DataEnvironment::Year;
 		using DataEnvironment::Month;
 		using DataEnvironment::DayOfMonth;
@@ -214,6 +216,7 @@ namespace RuntimeLanguageProcessor {
 			CurrentEnvironmentPeriodNum = NewEMSVariable( "CURRENTENVIRONMENT", 0 );
 			ActualDateAndTimeNum = NewEMSVariable( "ACTUALDATEANDTIME", 0 );
 			ActualTimeNum = NewEMSVariable( "ACTUALTIME", 0 );
+			WarmUpFlagNum = NewEMSVariable( "WARMUPFLAG", 0);
 
 			GetRuntimeLanguageUserInput(); // Load and parse all runtime language objects
 
@@ -268,6 +271,11 @@ namespace RuntimeLanguageProcessor {
 
 		tmpCurEnvirNum = double( CurEnvirNum );
 		ErlVariable( CurrentEnvironmentPeriodNum ).Value = SetErlValueNumber( tmpCurEnvirNum );
+		if ( WarmupFlag ) {
+			ErlVariable( WarmUpFlagNum ).Value = SetErlValueNumber( 1.0 );
+		} else {
+			ErlVariable( WarmUpFlagNum ).Value = SetErlValueNumber( 0.0 );
+		}
 
 	}
 
@@ -1068,7 +1076,6 @@ namespace RuntimeLanguageProcessor {
 		//  CHARACTER(len=120), DIMENSION(MaxErrors) :: Error  ! Errors should be stored with the stack
 		int NumErrors;
 		std::string::size_type Pos;
-		int NumTokens;
 		std::string StringToken;
 		char NextChar;
 		bool PeriodFound;
@@ -1077,13 +1084,11 @@ namespace RuntimeLanguageProcessor {
 		bool ErrorFlag;
 		bool OperatorProcessing;
 		int CountDoLooping;
-		static bool firstTime( true );
 		int i;
 		bool LastED; // last character in a numeric was an E or D
 
 		// Object Data
 		static FArray1D< TokenType > Token;
-		FArray1D< TokenType > TempToken;
 
 		// FLOW:
 		CountDoLooping = 0;
@@ -1091,11 +1096,7 @@ namespace RuntimeLanguageProcessor {
 		//  Error = 'No errors.'
 
 		// Break the string into tokens
-		if ( firstTime ) {
-			Token.allocate( 1 );
-			firstTime = false;
-		}
-		NumTokens = 0;
+		int NumTokens( 0 );
 		std::string String( InString );
 
 		// Following is a workaround to parse unitary operators as first value in the expression.
@@ -1126,36 +1127,9 @@ namespace RuntimeLanguageProcessor {
 			}
 
 			// Extend the token array
-			// code replaced with a bit safer code below.
-			//    ALLOCATE(TempToken(NumTokens))
-			//    TempToken = Token
-			//    DEALLOCATE(Token)
-			//    ALLOCATE(Token(NumTokens + 1))
-			//    Token(1:NumTokens) = TempToken(1:NumTokens)
-			//    DEALLOCATE(TempToken)
-
-			// Extend the token array
-			if ( NumTokens > 0 ) { //noel -- add to prevent deallocate of 0 -- but not sure if needed
-				TempToken.allocate( NumTokens );
-
-				//noel
-				//TempToken = Token
-				for ( i = 1; i <= NumTokens; ++i ) {
-					TempToken( i ) = Token( i );
-				}
-				Token.deallocate();
-				Token.allocate( NumTokens + 1 );
-
-				//noel
-				//Token(1:NumTokens) = TempToken(1:NumTokens)
-				for ( i = 1; i <= NumTokens; ++i ) {
-					Token( i ) = TempToken( i );
-				}
-				TempToken.deallocate();
-			}
+			Token.redimension( ++NumTokens );
 
 			// Get the next token
-			++NumTokens;
 			StringToken = "";
 			PeriodFound = false;
 			MinusFound = false;
@@ -1700,20 +1674,12 @@ namespace RuntimeLanguageProcessor {
 		int i;
 
 		// Object Data
-		FArray1D< TokenType > Token;
-		FArray1D< TokenType > TempToken;
+		FArray1D< TokenType > Token( TokenIN );
 		FArray1D< TokenType > SubTokenList;
 
 		// FLOW:
 		ExpressionNum = 0;
 		NumTokens = NumTokensIN;
-		Token.allocate( NumTokens );
-		// safer code below
-		//  Token = TokenIN
-
-		for ( i = 1; i <= NumTokens; ++i ) {
-			Token( i ) = TokenIN( i );
-		}
 
 		// Process parentheses
 		Pos = 0;
@@ -1748,20 +1714,13 @@ namespace RuntimeLanguageProcessor {
 							// Replace the parenthetical tokens with one expression token
 							NewNumTokens = NumTokens - NumSubTokens - 1;
 							if ( NewNumTokens > 0 ) {
-								TempToken.allocate( NewNumTokens );
-								if ( Pos - 1 > 0 ) {
-									TempToken( {1,Pos - 1} ) = Token( {1,Pos - 1} );
-								}
 								if ( LastPos + 1 <= NumTokens ) {
-									TempToken( {Pos+1,_} ) = Token( {LastPos+1,_} );
+									Token( {Pos+1,NewNumTokens} ) = Token( {LastPos+1,_} );
 								}
-								TempToken( Pos ).Type = TokenExpression;
-								TempToken( Pos ).Expression = ExpressionNum;
-								TempToken( Pos ).String = "Expr";
-								Token.deallocate();
-								Token.allocate( NewNumTokens );
-								Token = TempToken;
-								TempToken.deallocate();
+								Token.redimension( NewNumTokens );
+								Token( Pos ).Type = TokenExpression;
+								Token( Pos ).Expression = ExpressionNum;
+								Token( Pos ).String = "Expr";
 								NumTokens = NewNumTokens;
 							}
 
@@ -1894,21 +1853,14 @@ namespace RuntimeLanguageProcessor {
 
 					// Replace the three tokens with one expression token
 					if ( ( NumOperands == 2 ) && ( NumTokens - 2 > 0 ) ) {
-						TempToken.allocate( NumTokens - 2 );
-						if ( Pos - 2 > 0 ) {
-							TempToken( {1,Pos - 2} ) = Token( {1,Pos - 2} );
-						}
 						if ( Pos + 2 <= NumTokens ) {
-							TempToken( {Pos,NumTokens-2} ) = Token( {Pos+2,_} );
+							Token( {Pos,NumTokens-2} ) = Token( {Pos+2,_} );
 						}
-						TempToken( Pos - 1 ).Type = TokenExpression;
-						TempToken( Pos - 1 ).Expression = ExpressionNum;
-						TempToken( Pos - 1 ).String = "Expr";
-						Token.deallocate();
-						Token.allocate( NumTokens - 2 );
-						Token = TempToken;
-						TempToken.deallocate();
+						Token( Pos - 1 ).Type = TokenExpression;
+						Token( Pos - 1 ).Expression = ExpressionNum;
+						Token( Pos - 1 ).String = "Expr";
 						NumTokens -= 2;
+						Token.redimension( NumTokens );
 					}
 				}
 
@@ -1964,7 +1916,6 @@ namespace RuntimeLanguageProcessor {
 		// METHODOLOGY EMPLOYED:
 
 		// Return value
-		int ExpressionNum;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -1972,25 +1923,16 @@ namespace RuntimeLanguageProcessor {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
 		// Object Data
-		FArray1D< ErlExpressionType > TempExpression;
 
 		// FLOW:
 		if ( NumExpressions == 0 ) {
 			ErlExpression.allocate( 1 );
 			NumExpressions = 1;
 		} else {
-			TempExpression.allocate( NumExpressions );
-			TempExpression = ErlExpression;
-			ErlExpression.deallocate();
-			ErlExpression.allocate( NumExpressions + 1 );
-			ErlExpression( {1,NumExpressions} ) = TempExpression( {1,NumExpressions} );
-			++NumExpressions;
-			TempExpression.deallocate();
+			ErlExpression.redimension( ++NumExpressions );
 		}
 
-		ExpressionNum = NumExpressions;
-
-		return ExpressionNum;
+		return NumExpressions;
 
 	}
 
@@ -2544,7 +2486,7 @@ namespace RuntimeLanguageProcessor {
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
 		static bool ErrorsFound( false );
-		int VariableNum; // temporary
+		int VariableNum( 0 ); // temporary
 		int RuntimeReportVarNum;
 		//unused0909  INTEGER    :: Pos
 		//unused0909  CHARACTER(len=MaxNameLength) :: VariableName
@@ -2632,17 +2574,11 @@ namespace RuntimeLanguageProcessor {
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 			cAlphaFieldNames.allocate( MaxNumAlphas );
-			cAlphaFieldNames = "";
 			cAlphaArgs.allocate( MaxNumAlphas );
-			cAlphaArgs = "";
-			lAlphaFieldBlanks.allocate( MaxNumAlphas );
-			lAlphaFieldBlanks = false;
+			lAlphaFieldBlanks.dimension( MaxNumAlphas, false );
 			cNumericFieldNames.allocate( MaxNumNumbers );
-			cNumericFieldNames = "";
-			rNumericArgs.allocate( MaxNumNumbers );
-			rNumericArgs = 0.0;
-			lNumericFieldBlanks.allocate( MaxNumNumbers );
-			lNumericFieldBlanks = false;
+			rNumericArgs.dimension( MaxNumNumbers, 0.0 );
+			lNumericFieldBlanks.dimension( MaxNumNumbers, false );
 
 			cCurrentModuleObject = "EnergyManagementSystem:GlobalVariable";
 
@@ -2691,8 +2627,7 @@ namespace RuntimeLanguageProcessor {
 			cCurrentModuleObject = "EnergyManagementSystem:CurveOrTableIndexVariable";
 			NumEMSCurveIndices = GetNumObjectsFound( cCurrentModuleObject );
 			if ( NumEMSCurveIndices > 0 ) {
-				CurveIndexVariableNums.allocate( NumEMSCurveIndices );
-				CurveIndexVariableNums = 0;
+				CurveIndexVariableNums.dimension( NumEMSCurveIndices, 0 );
 				for ( loop = 1; loop <= NumEMSCurveIndices; ++loop ) {
 					GetObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
@@ -2741,8 +2676,7 @@ namespace RuntimeLanguageProcessor {
 			cCurrentModuleObject = "EnergyManagementSystem:ConstructionIndexVariable";
 			NumEMSConstructionIndices = GetNumObjectsFound( cCurrentModuleObject );
 			if ( NumEMSConstructionIndices > 0 ) {
-				ConstructionIndexVariableNums.allocate( NumEMSConstructionIndices );
-				ConstructionIndexVariableNums = 0;
+				ConstructionIndexVariableNums.dimension( NumEMSConstructionIndices, 0 );
 				for ( loop = 1; loop <= NumEMSConstructionIndices; ++loop ) {
 					GetObjectItem( cCurrentModuleObject, loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
@@ -3643,7 +3577,6 @@ namespace RuntimeLanguageProcessor {
 		using InputProcessor::MakeUPPERCase;
 
 		// Return value
-		int VariableNum;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -3651,24 +3584,16 @@ namespace RuntimeLanguageProcessor {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
 		// Object Data
-		FArray1D< ErlVariableType > TempErlVariable;
 
 		// FLOW:
-		VariableNum = FindEMSVariable( VariableName, StackNum );
+		int VariableNum = FindEMSVariable( VariableName, StackNum );
 
 		if ( VariableNum == 0 ) { // Variable does not exist anywhere yet
 			if ( NumErlVariables == 0 ) {
 				ErlVariable.allocate( 1 );
 				NumErlVariables = 1;
-			} else {
-				// Extend the variable array
-				TempErlVariable.allocate( NumErlVariables );
-				TempErlVariable = ErlVariable;
-				ErlVariable.deallocate();
-				ErlVariable.allocate( NumErlVariables + 1 );
-				ErlVariable( {1,NumErlVariables} ) = TempErlVariable( {1,NumErlVariables} );
-				TempErlVariable.deallocate();
-				++NumErlVariables;
+			} else { // Extend the variable array
+				ErlVariable.redimension( ++NumErlVariables );
 			}
 
 			// Add the new variable
@@ -4110,7 +4035,7 @@ namespace RuntimeLanguageProcessor {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

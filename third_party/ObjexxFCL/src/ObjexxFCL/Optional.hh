@@ -41,52 +41,52 @@ public: // Creation
 	// Default Constructor
 	inline
 	Optional() :
-		ptr_( nullptr ),
-		own_( false )
+	 ptr_( nullptr ),
+	 own_( false )
 	{}
 
 	// Copy Constructor
 	inline
 	Optional( Optional const & o ) :
-		ptr_( o.own_ ? new Value( o() ) : o.ptr_ ),
-		own_( o.own_ )
+	 ptr_( o.own_ ? new T( o() ) : o.ptr_ ),
+	 own_( o.own_ )
 	{}
 
 	// Optional Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_const< T >::value && std::is_same< U, typename std::remove_const< T >::type >::value >::type >
 	inline
-	Optional( Optional< U, Enable > const & o, typename std::enable_if< std::is_const< T >::value && std::is_same< U, typename std::remove_const< T >::type >::value >::type * = 0 ) :
-		ptr_( o.own_ ? new Value( o() ) : o.ptr_ ),
-		own_( o.own_ )
+	Optional( Optional< U, Enable > const & o ) :
+	 ptr_( o.own_ ? new T( o() ) : o.ptr_ ),
+	 own_( o.own_ )
 	{}
 
 	// Value Constructor
 	inline
-	Optional( Value const & val ) :
-		ptr_( const_cast< Value * >( &val ) ),
-		own_( false )
+	Optional( T const & val ) :
+	 ptr_( const_cast< T * >( &val ) ),
+	 own_( false )
 	{}
 
 	// Value Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	Optional( U const & val ) :
-		ptr_( new Value( val ) ), // Requires Value( U ) constructor
-		own_( true )
+	 ptr_( new T( val ) ), // Requires Value( U ) constructor
+	 own_( true )
 	{}
 
 	// rvalue Constructor
 	inline
-	Optional( Value && val ) :
-		ptr_( new Value( val ) ), // Requires Value copy constructor
-		own_( true )
+	Optional( T && val ) :
+	 ptr_( new T( val ) ), // Requires Value copy constructor
+	 own_( true )
 	{}
 
 	// Omit Constructor
 	inline
 	Optional( Omit ) :
-		ptr_( nullptr ),
-		own_( false )
+	 ptr_( nullptr ),
+	 own_( false )
 	{}
 
 	// Destructor
@@ -103,16 +103,18 @@ public: // Assignment
 	Optional &
 	operator =( Optional const & o )
 	{
-		if ( own_ ) delete ptr_;
-		ptr_ = o.own_ ? new Value( o() ) : o.ptr_;
-		own_ = o.own_;
+		if ( this != &o ) {
+			if ( own_ ) delete ptr_;
+			ptr_ = o.own_ ? new T( o() ) : o.ptr_;
+			own_ = o.own_;
+		}
 		return *this;
 	}
 
 	// Value Assignment
 	inline
 	Optional &
-	operator =( Value const & val )
+	operator =( T const & val )
 	{
 		assert( ptr_ != nullptr );
 		*ptr_ = val;
@@ -120,7 +122,7 @@ public: // Assignment
 	}
 
 	// Value Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	Optional &
 	operator =( U const & val )
@@ -133,7 +135,7 @@ public: // Assignment
 	// rvalue Assignment
 	inline
 	Optional &
-	operator =( Value && val )
+	operator =( T && val )
 	{
 		assert( ptr_ != nullptr );
 		*ptr_ = val;
@@ -155,7 +157,7 @@ public: // Conversion
 
 	// Value Conversion
 	inline
-	operator Value const &() const
+	operator T const &() const
 	{
 		assert( ptr_ != nullptr );
 		return *ptr_;
@@ -163,7 +165,7 @@ public: // Conversion
 
 	// Value Conversion
 	inline
-	operator Value &()
+	operator T &()
 	{
 		assert( ptr_ != nullptr );
 		return *ptr_;
@@ -173,7 +175,7 @@ public: // Operators
 
 	// Value
 	inline
-	Value const &
+	T const &
 	operator ()() const
 	{
 		assert( ptr_ != nullptr );
@@ -182,7 +184,7 @@ public: // Operators
 
 	// Value
 	inline
-	Value &
+	T &
 	operator ()()
 	{
 		assert( ptr_ != nullptr );
@@ -243,7 +245,7 @@ public: // Comparison
 	inline
 	friend
 	bool
-	operator ==( Optional const & a, Value const & b )
+	operator ==( Optional const & a, T const & b )
 	{
 		return ( ( a.ptr_ != nullptr ) && ( *a.ptr_ == b ) );
 	}
@@ -252,7 +254,7 @@ public: // Comparison
 	inline
 	friend
 	bool
-	operator !=( Optional const & a, Value const & b )
+	operator !=( Optional const & a, T const & b )
 	{
 		return !( a == b );
 	}
@@ -261,7 +263,7 @@ public: // Comparison
 	inline
 	friend
 	bool
-	operator ==( Value const & a, Optional const & b )
+	operator ==( T const & a, Optional const & b )
 	{
 		return ( ( b.ptr_ != nullptr ) && ( a == *b.ptr_ ) );
 	}
@@ -270,14 +272,14 @@ public: // Comparison
 	inline
 	friend
 	bool
-	operator !=( Value const & a, Optional const & b )
+	operator !=( T const & a, Optional const & b )
 	{
 		return !( a == b );
 	}
 
 private: // Data
 
-	Value * ptr_; // Pointer to object
+	T * ptr_; // Pointer to object
 	bool own_; // Own the object?
 
 }; // Optional
@@ -301,32 +303,32 @@ public: // Creation
 	// Default Constructor
 	inline
 	Optional() :
-		ptr_( nullptr )
+	 ptr_( nullptr )
 	{}
 
 	// Copy Constructor
 	inline
 	Optional( Optional const & o ) :
-		ptr_( o.ptr_ )
+	 ptr_( o.ptr_ )
 	{}
 
 	// Optional Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_const< T >::value && std::is_same< U, typename std::remove_const< T >::type >::value >::type >
 	inline
-	Optional( Optional< U, EnableType > const & o, typename std::enable_if< std::is_const< T >::value && std::is_same< U, typename std::remove_const< T >::type >::value >::type * = 0 ) :
-		ptr_( o.ptr_ )
+	Optional( Optional< U, EnableType > const & o ) :
+	 ptr_( o.ptr_ )
 	{}
 
 	// Value Constructor
 	inline
-	Optional( Value const & val ) :
-		ptr_( const_cast< Value * >( &val ) )
+	Optional( T const & val ) :
+	 ptr_( const_cast< T * >( &val ) )
 	{}
 
 	// Omit Constructor
 	inline
 	Optional( Omit ) :
-		ptr_( nullptr )
+	 ptr_( nullptr )
 	{}
 
 	// Destructor
@@ -348,7 +350,7 @@ public: // Assignment
 	// Value Assignment
 	inline
 	Optional &
-	operator =( Value const & val )
+	operator =( T const & val )
 	{
 		assert( ptr_ != nullptr );
 		*ptr_ = val;
@@ -356,7 +358,7 @@ public: // Assignment
 	}
 
 	// Value Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	Optional &
 	operator =( U const & val )
@@ -369,7 +371,7 @@ public: // Assignment
 	// rvalue Assignment
 	inline
 	Optional &
-	operator =( Value && val )
+	operator =( T && val )
 	{
 		assert( ptr_ != nullptr );
 		*ptr_ = val;
@@ -389,7 +391,7 @@ public: // Conversion
 
 	// Value Conversion
 	inline
-	operator Value const &() const
+	operator T const &() const
 	{
 		assert( ptr_ != nullptr );
 		return *ptr_;
@@ -397,7 +399,7 @@ public: // Conversion
 
 	// Value Conversion
 	inline
-	operator Value &()
+	operator T &()
 	{
 		assert( ptr_ != nullptr );
 		return *ptr_;
@@ -407,7 +409,7 @@ public: // Operators
 
 	// Value
 	inline
-	Value const &
+	T const &
 	operator ()() const
 	{
 		assert( ptr_ != nullptr );
@@ -416,7 +418,7 @@ public: // Operators
 
 	// Value
 	inline
-	Value &
+	T &
 	operator ()()
 	{
 		assert( ptr_ != nullptr );
@@ -467,7 +469,7 @@ public: // Comparison
 	inline
 	friend
 	bool
-	operator ==( Optional const & a, Value const & b )
+	operator ==( Optional const & a, T const & b )
 	{
 		return ( ( a.ptr_ != nullptr ) && ( *a.ptr_ == b ) );
 	}
@@ -476,7 +478,7 @@ public: // Comparison
 	inline
 	friend
 	bool
-	operator !=( Optional const & a, Value const & b )
+	operator !=( Optional const & a, T const & b )
 	{
 		return !( a == b );
 	}
@@ -485,7 +487,7 @@ public: // Comparison
 	inline
 	friend
 	bool
-	operator ==( Value const & a, Optional const & b )
+	operator ==( T const & a, Optional const & b )
 	{
 		return ( ( b.ptr_ != nullptr ) && ( a == *b.ptr_ ) );
 	}
@@ -494,14 +496,14 @@ public: // Comparison
 	inline
 	friend
 	bool
-	operator !=( Value const & a, Optional const & b )
+	operator !=( T const & a, Optional const & b )
 	{
 		return !( a == b );
 	}
 
 private: // Data
 
-	Value * ptr_; // Pointer
+	T * ptr_; // Pointer
 
 }; // Optional
 

@@ -5,6 +5,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <ScheduleManager.hh>
 #include <DataEnvironment.hh>
 #include <DataIPShortCuts.hh>
@@ -102,8 +103,8 @@ namespace ScheduleManager {
 	FArray1D< WeekScheduleData > WeekSchedule; // Week Schedule Storage
 	FArray1D< ScheduleData > Schedule; // Schedule Storage
 
-	static gio::Fmt const fmtLD( "*" );
-	static gio::Fmt const fmtA( "(A)" );
+	static gio::Fmt fmtLD( "*" );
+	static gio::Fmt fmtA( "(A)" );
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -382,17 +383,11 @@ namespace ScheduleManager {
 		MaxAlps = max( MaxAlps, NumAlphas );
 
 		Alphas.allocate( MaxAlps ); // Maximum Alphas possible
-		Alphas = "";
 		cAlphaFields.allocate( MaxAlps );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		Numbers.allocate( MaxNums ); // Maximum Numbers possible
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( MaxAlps );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		Numbers.dimension( MaxNums, 0.0 ); // Maximum Numbers possible
+		lAlphaBlanks.dimension( MaxAlps, true );
+		lNumericBlanks.dimension( MaxNums, true );
 
 		// Prescan to determine extra day and week schedules due to compact schedule input
 		AddWeekSch = 0;
@@ -415,11 +410,8 @@ namespace ScheduleManager {
 			Numbers.deallocate();
 			lNumericBlanks.deallocate();
 			cNumericFields.allocate( MaxNums );
-			cNumericFields = "";
-			Numbers.allocate( MaxNums ); // Maximum Numbers possible
-			Numbers = 0.0;
-			lNumericBlanks.allocate( MaxNums );
-			lNumericBlanks = true;
+			Numbers.dimension( MaxNums, 0.0 ); // Maximum Numbers possible
+			lNumericBlanks.dimension( MaxNums, true );
 		}
 		// add week and day schedules for each FILE:COMMA schedule
 		AddWeekSch += NumCommaFileSchedules * 366; //number of days/year because need a week for each day
@@ -472,7 +464,7 @@ namespace ScheduleManager {
 		Schedule( 0 ).ScheduleTypePtr = 0;
 		Schedule( 0 ).WeekSchedulePointer = 0;
 
-		UnitNumber = FindUnitNumber( "eplusout.audit" );
+		UnitNumber = FindUnitNumber( DataStringGlobals::outputAuditFileName );
 		gio::write( UnitNumber, fmtLD ) << " Processing Schedule Input -- Start";
 
 		//!! Get Schedule Types
@@ -721,7 +713,7 @@ namespace ScheduleManager {
 			}
 			if ( NumNumbers < 25 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Insufficient data entered for a full schedule day." );
-				ShowContinueError( "...Minutes per Item field = [" + RoundSigDigits( int( Numbers( 1 ) ) ) + "] and " " only [" + RoundSigDigits( NumNumbers - 1 ) + "] to apply to list fields." );
+				ShowContinueError( "...Minutes per Item field = [" + RoundSigDigits( int( Numbers( 1 ) ) ) + "] and only [" + RoundSigDigits( NumNumbers - 1 ) + "] to apply to list fields." );
 				ErrorsFound = true;
 				continue;
 			}
@@ -1695,7 +1687,7 @@ namespace ScheduleManager {
 			IsBlank = false;
 
 			if ( NumExternalInterfaceSchedules >= 1 ) {
-				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, "The schedule object with the name \"" + Alphas( 1 ) + "\" is defined as an ExternalInterface:Schedule and " "ExternalInterface:FunctionalMockupUnitImport:To:Schedule. This will cause the schedule to be overwritten" " by PtolemyServer and FunctionalMockUpUnitImport." );
+				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, "The schedule object with the name \"" + Alphas( 1 ) + "\" is defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitImport:To:Schedule. This will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitImport." );
 			} else {
 				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			}
@@ -1751,7 +1743,7 @@ namespace ScheduleManager {
 			IsBlank = false;
 
 			if ( NumExternalInterfaceSchedules >= 1 ) {
-				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, "The schedule object with the name \"" + Alphas( 1 ) + "\" is defined as an ExternalInterface:Schedule and " "ExternalInterface:FunctionalMockupUnitExport:To:Schedule. This will cause the schedule to be overwritten" " by PtolemyServer and FunctionalMockUpUnitExport." );
+				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, "The schedule object with the name \"" + Alphas( 1 ) + "\" is defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitExport:To:Schedule. This will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitExport." );
 			} else {
 				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			}
@@ -1887,15 +1879,15 @@ namespace ScheduleManager {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static FArray1D_string const Months( 12, { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" } );
 		static FArray1D_string const HrField( {0,24}, { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24" } );
-		static gio::Fmt const SchTFmt0( "('! Schedule Details Report=',A,' =====================')" );
-		static gio::Fmt const SchTFmt( "('! <ScheduleType>,Name,Limited? {Yes/No},Minimum,Maximum,',   'Continuous? {Yes/No - Discrete}')" );
-		static gio::Fmt const SchSFmt( "('! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31')" );
-		static gio::Fmt const SchTFmtdata( "('ScheduleTypeLimits',5(',',A))" );
-		static gio::Fmt const SchWFmtdata( "('Schedule:Week:Daily',',',A,$)" );
-		static gio::Fmt const CMinFmt( "(I2.2)" );
-		static gio::Fmt const ThruFmt( "(',Through ',A,1X,I2.2,',',A)" );
-		static gio::Fmt const SchDFmt0( "('! <DaySchedule>,Name,ScheduleType,Interpolated {Yes/No},Time (HH:MM) =>',$)" );
-		static gio::Fmt const SchDFmtdata0( "('DaySchedule,',A,',',A,',',A,',',A,$)" );
+		static gio::Fmt SchTFmt0( "('! Schedule Details Report=',A,' =====================')" );
+		static gio::Fmt SchTFmt( "('! <ScheduleType>,Name,Limited? {Yes/No},Minimum,Maximum,',   'Continuous? {Yes/No - Discrete}')" );
+		static gio::Fmt SchSFmt( "('! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31')" );
+		static gio::Fmt SchTFmtdata( "('ScheduleTypeLimits',5(',',A))" );
+		static gio::Fmt SchWFmtdata( "('Schedule:Week:Daily',',',A,$)" );
+		static gio::Fmt CMinFmt( "(I2.2)" );
+		static gio::Fmt ThruFmt( "(',Through ',A,1X,I2.2,',',A)" );
+		static gio::Fmt SchDFmt0( "('! <DaySchedule>,Name,ScheduleType,Interpolated {Yes/No},Time (HH:MM) =>',$)" );
+		static gio::Fmt SchDFmtdata0( "('DaySchedule,',A,',',A,',',A,',',A,$)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2242,7 +2234,7 @@ namespace ScheduleManager {
 					ShowContinueError( "...1) Remove RunperiodControl:DaylightSavingTime object or remove DST period from Weather File." );
 					ShowContinueError( "...2) Configure other schedules and Schedule:File to account for occupant behavior during DST." );
 					ShowContinueError( "...   If you have already done this, you can ignore this message." );
-					ShowContinueError( "...When active, DaylightSavingTime will shift all scheduled items by one hour, " "retaining the same day type as the original." );
+					ShowContinueError( "...When active, DaylightSavingTime will shift all scheduled items by one hour, retaining the same day type as the original." );
 					ScheduleDSTSFileWarningIssued = true;
 				}
 			}
@@ -2338,10 +2330,9 @@ namespace ScheduleManager {
 
 	Real64
 	LookUpScheduleValue(
-		int & ScheduleIndex,
-		Optional_int ThisHour,
-		Optional_int ThisTimeStep,
-		Optional_int ThisDayOfYear
+		int const ScheduleIndex,
+		int const ThisHour, // Negative => unspecified
+		int const ThisTimeStep  // Negative => unspecified
 	)
 	{
 
@@ -2399,13 +2390,13 @@ namespace ScheduleManager {
 			return LookUpScheduleValue;
 		}
 
-		if ( ! present( ThisHour ) ) {
+		if ( ThisHour < 0 ) { // ThisHour unspecified
 			LookUpScheduleValue = GetCurrentScheduleValue( ScheduleIndex );
 
 			//  ELSEIF (ThisHour == 0) THEN  ! odd answers when thishour=0 (initialization of shadowing)
 			//    LookUpScheduleValue=GetCurrentScheduleValue(ScheduleIndex)
 
-		} else if ( ! present( ThisDayOfYear ) ) { // ThisHour present, check other optional parameters
+		} else { // ThisHour specified
 			//  so, current date, but maybe TimeStep added
 
 			// Determine which Week Schedule is used
@@ -2453,7 +2444,7 @@ namespace ScheduleManager {
 				}
 			}
 			WhichHour += DSTIndicator;
-			if ( present( ThisTimeStep ) ) {
+			if ( ThisTimeStep >= 0 ) { // ThisTimeStep specified
 				if ( ThisTimeStep == 0 ) {
 					WhichTimeStep = NumOfTimeStepInHour;
 				} else {
@@ -2474,8 +2465,6 @@ namespace ScheduleManager {
 				}
 			}
 
-		} else { // date present, not ready for that yet.
-			ShowFatalError( "DayofYear Requested in LookUpScheduleValue, not implemented yet" );
 		}
 
 		return LookUpScheduleValue;
@@ -2925,7 +2914,7 @@ namespace ScheduleManager {
 		sFld = 0;
 
 		if ( NumUntils != NumNumbers ) {
-			ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "  number of Time fields does not match number of value fields, " + ErrContext + '=' + DayScheduleName );
+			ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, number of Time fields does not match number of value fields, " + ErrContext + '=' + DayScheduleName );
 			ErrorsFound = true;
 			return;
 		}
@@ -2942,20 +2931,20 @@ namespace ScheduleManager {
 			} else if ( Pos == std::string::npos ) {
 				DecodeHHMMField( Untils( Count ), HHField, MMField, ErrorsFound, DayScheduleName, Untils( Count ) );
 			} else { // Until found but wasn't first field
-				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "Invalid \"Until\" field encountered=" + Untils( Count ) );
+				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, Invalid \"Until\" field encountered=" + Untils( Count ) );
 				ShowContinueError( "Occurred in Day Schedule=" + DayScheduleName );
 				ErrorsFound = true;
 				continue;
 			}
 			// Field decoded
 			if ( HHField < 0 || HHField > 24 || MMField < 0 || MMField > 60 ) {
-				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "Invalid \"Until\" field encountered=" + Untils( Count ) );
+				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, Invalid \"Until\" field encountered=" + Untils( Count ) );
 				ShowContinueError( "Occurred in Day Schedule=" + DayScheduleName );
 				ErrorsFound = true;
 				continue;
 			}
 			if ( HHField == 24 && MMField > 0 && MMField < 60 ) {
-				ShowWarningError( "ProcessScheduleInput: ProcessIntervalFields, " "Invalid \"Until\" field encountered=" + Untils( Count ) );
+				ShowWarningError( "ProcessScheduleInput: ProcessIntervalFields, Invalid \"Until\" field encountered=" + Untils( Count ) );
 				ShowContinueError( "Occurred in Day Schedule=" + DayScheduleName );
 				ShowContinueError( "Terminating the field at 24:00" );
 				MMField = 0;
@@ -2974,7 +2963,7 @@ namespace ScheduleManager {
 			if ( SHr == EHr ) {
 				for ( Min = SMin; Min <= EMin; ++Min ) {
 					if ( SetMinuteValue( SHr, Min ) ) {
-						ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "Processing time fields, overlapping times detected, " + ErrContext + '=' + DayScheduleName );
+						ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, Processing time fields, overlapping times detected, " + ErrContext + '=' + DayScheduleName );
 						ErrorsFound = true;
 						goto UntilLoop_exit;
 					}
@@ -2987,7 +2976,7 @@ namespace ScheduleManager {
 					SMin = 1;
 				}
 			} else if ( EHr < SHr ) {
-				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "Processing time fields, overlapping times detected, " + ErrContext + '=' + DayScheduleName );
+				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, Processing time fields, overlapping times detected, " + ErrContext + '=' + DayScheduleName );
 				ErrorsFound = true;
 			} else {
 				for ( Min = SMin; Min <= 60; ++Min ) {
@@ -3015,7 +3004,7 @@ namespace ScheduleManager {
 		UntilLoop_exit: ;
 
 		if ( ! all( SetMinuteValue ) ) {
-			ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "Processing time fields, incomplete day detected, " + ErrContext + '=' + DayScheduleName );
+			ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, Processing time fields, incomplete day detected, " + ErrContext + '=' + DayScheduleName );
 			ErrorsFound = true;
 		}
 
@@ -3055,7 +3044,7 @@ namespace ScheduleManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const hhmmFormat( "(I2.2)" );
+		static gio::Fmt hhmmFormat( "(I2.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3075,7 +3064,7 @@ namespace ScheduleManager {
 		std::string::size_type const Pos = index( String, ':' );
 		nonIntegral = false;
 		if ( Pos == std::string::npos ) {
-			ShowSevereError( "ProcessScheduleInput: DecodeHHMMField, " "Invalid \"until\" field submitted (no : separator in hh:mm)=" + stripped( FullFieldValue ) );
+			ShowSevereError( "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (no : separator in hh:mm)=" + stripped( FullFieldValue ) );
 			ShowContinueError( "Occurred in Day Schedule=" + DayScheduleName );
 			ErrorsFound = true;
 			return;
@@ -3086,11 +3075,11 @@ namespace ScheduleManager {
 			RetHH = int( rRetHH );
 			if ( double( RetHH ) != rRetHH || IOS != 0 || rRetHH < 0.0 ) {
 				if ( double( RetHH ) != rRetHH && rRetHH >= 0.0 ) {
-					ShowWarningError( "ProcessScheduleInput: DecodeHHMMField, " "Invalid \"until\" field submitted (non-integer numeric in HH)=" + stripped( FullFieldValue ) );
+					ShowWarningError( "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (non-integer numeric in HH)=" + stripped( FullFieldValue ) );
 					ShowContinueError( "Other errors may result. Occurred in Day Schedule=" + DayScheduleName );
 					nonIntegral = true;
 				} else {
-					ShowSevereError( "ProcessScheduleInput: DecodeHHMMField, " "Invalid \"until\" field submitted (invalid numeric in HH)=" + stripped( FullFieldValue ) );
+					ShowSevereError( "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (invalid numeric in HH)=" + stripped( FullFieldValue ) );
 					ShowContinueError( "Field values must be integer and represent hours:minutes. Occurred in Day Schedule=" + DayScheduleName );
 					ErrorsFound = true;
 					return;
@@ -3103,11 +3092,11 @@ namespace ScheduleManager {
 		RetMM = int( rRetMM );
 		if ( double( RetMM ) != rRetMM || IOS != 0 || rRetMM < 0.0 ) {
 			if ( double( RetMM ) != rRetMM && rRetMM >= 0.0 ) {
-				ShowWarningError( "ProcessScheduleInput: DecodeHHMMField, " "Invalid \"until\" field submitted (non-integer numeric in MM)=" + stripped( FullFieldValue ) );
+				ShowWarningError( "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (non-integer numeric in MM)=" + stripped( FullFieldValue ) );
 				ShowContinueError( "Other errors may result. Occurred in Day Schedule=" + DayScheduleName );
 				nonIntegral = true;
 			} else {
-				ShowSevereError( "ProcessScheduleInput: DecodeHHMMField, " "Invalid \"until\" field submitted (invalid numeric in MM)=" + stripped( FullFieldValue ) );
+				ShowSevereError( "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (invalid numeric in MM)=" + stripped( FullFieldValue ) );
 				ShowContinueError( "Field values must be integer and represent hours:minutes. Occurred in Day Schedule=" + DayScheduleName );
 				ErrorsFound = true;
 				return;
@@ -3325,11 +3314,11 @@ namespace ScheduleManager {
 		}
 
 		if ( DupAssignment ) {
-			ShowSevereError( "ProcessScheduleInput: ProcessForDayTypes, " "Duplicate assignment attempted in \"for\" days field=" + ForDayField );
+			ShowSevereError( "ProcessScheduleInput: ProcessForDayTypes, Duplicate assignment attempted in \"for\" days field=" + ForDayField );
 			ErrorsFound = true;
 		}
 		if ( ! OneValid ) {
-			ShowSevereError( "ProcessScheduleInput: ProcessForDayTypes, " "No valid day assignments found in \"for\" days field=" + ForDayField );
+			ShowSevereError( "ProcessScheduleInput: ProcessForDayTypes, No valid day assignments found in \"for\" days field=" + ForDayField );
 			ErrorsFound = true;
 		}
 
@@ -4765,7 +4754,7 @@ namespace ScheduleManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

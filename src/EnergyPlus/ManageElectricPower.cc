@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -68,7 +69,7 @@ namespace ManageElectricPower {
 	using namespace DataPrecisionGlobals;
 	using namespace DataLoopNode;
 	using DataGlobals::NumOfTimeStepInHour;
-	using DataGlobals::TimeStepZone;
+	using DataGlobals::TimeStepZoneSec;
 	using DataGlobals::SecInHour;
 	using DataGlobals::ScheduleAlwaysOn;
 	using DataHVACGlobals::TimeStepSys;
@@ -341,7 +342,7 @@ namespace ManageElectricPower {
 		ElecProducedPV = GetInstantMeterValue( ElecProducedPVIndex, 2 );
 		ElecProducedWT = GetInstantMeterValue( ElecProducedWTIndex, 2 );
 
-		WholeBldgElectSummary.TotalBldgElecDemand = ElecFacilityBldg / ( TimeStepZone * SecInHour );
+		WholeBldgElectSummary.TotalBldgElecDemand = ElecFacilityBldg / TimeStepZoneSec;
 		WholeBldgElectSummary.TotalHVACElecDemand = ElecFacilityHVAC / ( TimeStepSys * SecInHour );
 		WholeBldgElectSummary.TotalElectricDemand = WholeBldgElectSummary.TotalBldgElecDemand + WholeBldgElectSummary.TotalHVACElecDemand;
 		WholeBldgElectSummary.ElecProducedPVRate = ElecProducedPV / ( TimeStepSys * SecInHour );
@@ -580,7 +581,7 @@ namespace ManageElectricPower {
 				// The TRACK CUSTOM METER scheme tries to have the generators meet all of the
 				//   electrical demand from a meter, it can also be a user-defined Custom Meter
 				//   and PV is ignored.
-				CustomMeterDemand = GetInstantMeterValue( ElecLoadCenter( LoadCenterNum ).DemandMeterPtr, 1 ) / ( TimeStepZone * SecInHour ) + GetInstantMeterValue( ElecLoadCenter( LoadCenterNum ).DemandMeterPtr, 2 ) / ( TimeStepSys * SecInHour );
+				CustomMeterDemand = GetInstantMeterValue( ElecLoadCenter( LoadCenterNum ).DemandMeterPtr, 1 ) / TimeStepZoneSec + GetInstantMeterValue( ElecLoadCenter( LoadCenterNum ).DemandMeterPtr, 2 ) / ( TimeStepSys * SecInHour );
 
 				RemainingLoad = CustomMeterDemand;
 				LoadCenterElectricLoad = RemainingLoad;
@@ -1527,7 +1528,7 @@ namespace ManageElectricPower {
 				SetupOutputVariable( "Transformer Load Loss Energy [J]", Transformer( TransfNum ).LoadLossEnergy, "System", "Sum", Transformer( TransfNum ).Name );
 				SetupOutputVariable( "Transformer Thermal Loss Rate [W]", Transformer( TransfNum ).ThermalLossRate, "System", "Average", Transformer( TransfNum ).Name );
 				SetupOutputVariable( "Transformer Thermal Loss Energy [J]", Transformer( TransfNum ).ThermalLossEnergy, "System", "Sum", Transformer( TransfNum ).Name );
-				SetupOutputVariable( "Transformer Distribution Electric Loss Energy [J]", Transformer( TransfNum ).ElecUseUtility, "System", "Sum", Transformer( TransfNum ).Name, _, "Electricity", _, _, "System" );
+				SetupOutputVariable( "Transformer Distribution Electric Loss Energy [J]", Transformer( TransfNum ).ElecUseUtility, "System", "Sum", Transformer( TransfNum ).Name, _, "Electricity", "ExteriorEquipment", "Transformer", "System" );
 				SetupOutputVariable( "Transformer Cogeneration Electric Loss Energy [J]", Transformer( TransfNum ).ElecProducedCoGen, "System", "Sum", Transformer( TransfNum ).Name, _, "ElectricityProduced", "COGENERATION", _, "System" );
 
 				if ( Transformer( TransfNum ).ZoneNum > 0 ) {
@@ -2092,8 +2093,7 @@ namespace ManageElectricPower {
 
 		// need to do initial setups
 		if ( MyOneTimeSetupFlag ) {
-			MyCoGenSetupFlag.allocate( NumLoadCenters );
-			MyCoGenSetupFlag = true;
+			MyCoGenSetupFlag.dimension( NumLoadCenters, true );
 			ThermalLoad = 0.0;
 			MyOneTimeSetupFlag = false;
 			return;
@@ -2238,8 +2238,8 @@ namespace ManageElectricPower {
 		Real64 NormalizedPower;
 		int InvertNum;
 		int StorNum;
-		Real64 tmpEffic;
-		Real64 tempACpower;
+		Real64 tmpEffic( 0.0 );
+		Real64 tempACpower( 0.0 );
 
 		//model inverters
 		InvertNum = ElecLoadCenter( LoadCenterNum ).InverterModelNum;
@@ -2301,6 +2301,8 @@ namespace ManageElectricPower {
 					tmpEffic = Inverter( InvertNum ).LUTable.NomVoltEfficiencyARR( 5 ) + ( ( NormalizedPower - 0.75 ) / ( 1.0 - 0.75 ) ) * ( Inverter( InvertNum ).LUTable.NomVoltEfficiencyARR( 6 ) - Inverter( InvertNum ).LUTable.NomVoltEfficiencyARR( 5 ) );
 				} else if ( NormalizedPower >= 1.0 ) {
 					tmpEffic = Inverter( InvertNum ).LUTable.NomVoltEfficiencyARR( 6 );
+				} else {
+					assert( false );
 				}
 
 				Inverter( InvertNum ).Efficiency = max( tmpEffic, 0.0 );
@@ -2333,6 +2335,8 @@ namespace ManageElectricPower {
 
 				tempACpower = Inverter( InvertNum ).Efficiency * Inverter( InvertNum ).DCPowerIn;
 
+			} else {
+				assert( false );
 			}}
 
 			Inverter( InvertNum ).ACPowerOut = tempACpower;
@@ -2769,12 +2773,9 @@ namespace ManageElectricPower {
 					//        The arrary size needs to be increased when count = MaxRainflowArrayBounds. Please note that (MaxRainflowArrayBounds +1)
 					//        is the index used in the subroutine RainFlow. So we cannot reallocate array size until count = MaxRainflowArrayBounds +1.
 					if ( ElecStorage( ElecStorNum ).count0 == MaxRainflowArrayBounds ) {
-						SaveArrayBounds = MaxRainflowArrayBounds + 1;
-						ReallocateRealArray( ElecStorage( ElecStorNum ).B10, SaveArrayBounds, MaxRainflowArrayInc );
-						SaveArrayBounds = MaxRainflowArrayBounds + 1;
-						ReallocateRealArray( ElecStorage( ElecStorNum ).X0, SaveArrayBounds, MaxRainflowArrayInc );
-						//           Decrement by 1 is needed because the last input parameter of RainFlow is MaxRainflowArrayBounds+1
-						MaxRainflowArrayBounds = SaveArrayBounds - 1;
+						ElecStorage( ElecStorNum ).B10.redimension( MaxRainflowArrayBounds + 1 + MaxRainflowArrayInc, 0.0 );
+						ElecStorage( ElecStorNum ).X0.redimension( MaxRainflowArrayBounds + 1 + MaxRainflowArrayInc, 0.0 );
+						MaxRainflowArrayBounds += MaxRainflowArrayInc;
 					}
 
 					Rainflow( ElecStorage( ElecStorNum ).CycleBinNum, Input0, ElecStorage( ElecStorNum ).B10, ElecStorage( ElecStorNum ).X0, ElecStorage( ElecStorNum ).count0, ElecStorage( ElecStorNum ).Nmb0, ElecStorage( ElecStorNum ).OneNmb0, MaxRainflowArrayBounds + 1 );
@@ -3028,26 +3029,9 @@ namespace ManageElectricPower {
 
 				Pw = tmpPdraw / Numbattery;
 				q0 = ElecStorage( ElecStorNum ).LastTimeStepAvailable + ElecStorage( ElecStorNum ).LastTimeStepBound;
-				I0 = 10.0; // Initial assumption
-				T0 = qmax / I0; // Initial Assumption
-				qmaxf = qmax * k * c * T0 / ( 1.0 - std::exp( -k * T0 ) + c * ( k * T0 - 1.0 + std::exp( -k * T0 ) ) ); //Initial calculation of a function qmax(I)
-				Xf = ( qmax - q0 ) / qmaxf;
-				Ef = E0c + CurveValue( ElecStorage( ElecStorNum ).DischargeCurveNum, Xf ); //E0d+Ac*Xf+Cc*X/(Dc-Xf)
-				Volt = Ef - I0 * InternalR;
-				Inew = Pw / Volt;
-				Tnew = qmaxf / Inew;
-				error = 1.0;
-
-				while ( error > 0.0001 ) { //Iteration process to get converged current(I)
-					I0 = Inew;
-					T0 = Tnew;
-					qmaxf = qmax * k * c * T0 / ( 1.0 - std::exp( -k * T0 ) + c * ( k * T0 - 1.0 + std::exp( -k * T0 ) ) );
-					Xf = ( qmax - q0 ) / qmaxf;
-					Ef = E0c + CurveValue( ElecStorage( ElecStorNum ).DischargeCurveNum, Xf ); //E0c+Ad*Xf+Cd*X/(Dd-Xf)
-					Volt = Ef - I0 * InternalR;
-					Inew = Pw / Volt;
-					Tnew = qmaxf / Inew;
-					error = std::abs( Inew - I0 );
+				bool ok = determineCurrentForBatteryDischarge( I0, T0, Volt, Pw, q0, ElecStorage( ElecStorNum ).DischargeCurveNum, k, c, qmax, E0c, InternalR );
+				if ( !ok ){
+					ShowFatalError( "ElectricLoadCenter:Storage:Battery named=\"" + ElecStorage( ElecStorNum ).Name + "\". Battery discharge current could not be estimated due to iteration limit reached. " );
 				}
 
 				dividend = k * ElecStorage( ElecStorNum ).LastTimeStepAvailable * std::exp( -k * TimeStepSys ) + q0 * k * c * ( 1.0 - std::exp( -k * TimeStepSys ) );
@@ -3191,6 +3175,82 @@ namespace ManageElectricPower {
 
 	//*****************************************************************************************************************
 
+	bool 
+	determineCurrentForBatteryDischarge( 
+		Real64& curI0, 
+		Real64& curT0, 
+		Real64& curVolt,
+		Real64 const Pw, 
+		Real64 const q0,
+		int const CurveNum,
+		Real64 const k,
+		Real64 const c,
+		Real64 const qmax,
+		Real64 const E0c,
+		Real64 const InternalR )
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         B. Griffith
+		//       DATE WRITTEN   June-August 2008
+		//       MODIFIED       BG May 2009, added EMS
+		//                      BN (FSEC) Feb 2010 (pass out two storage values)
+		//                      Y. KyungTae & W. Wang July-August, 2011 Added a battery model
+		//       RE-ENGINEERED  Jason Glazer, GARD Analytics, February 2015, refactor charge calculation into a function
+
+		// PURPOSE OF THIS FUNCTION:
+		// Calculate the current for battery discharge in a separate function so that it could be called from the unit tests
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using CurveManager::CurveValue;
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		curI0 = 10.0; // Initial assumption
+		curT0 = qmax / curI0; // Initial Assumption
+		Real64 qmaxf = qmax * k * c * curT0 / ( 1.0 - std::exp( -k * curT0 ) + c * ( k * curT0 - 1.0 + std::exp( -k * curT0 ) ) ); //Initial calculation of a function qmax(I)
+		Real64 Xf = ( qmax - q0 ) / qmaxf;
+		Real64 Ef = E0c + CurveValue( CurveNum, Xf ); //E0d+Ac*Xf+Cc*X/(Dc-Xf)
+		curVolt = Ef - curI0 * InternalR;
+		Real64 Inew = Pw / curVolt;
+		Real64 Tnew = qmaxf / Inew;
+		Real64 error = 1.0;
+		int countForIteration = 0;
+		bool exceedIterationLimit = false;
+
+		while ( error > 0.0001 ) { //Iteration process to get converged current(I)
+			curI0 = Inew;
+			curT0 = Tnew;
+			qmaxf = qmax * k * c * curT0 / ( 1.0 - std::exp( -k * curT0 ) + c * ( k * curT0 - 1.0 + std::exp( -k * curT0 ) ) );
+			Xf = ( qmax - q0 ) / qmaxf;
+			Ef = E0c + CurveValue( CurveNum, Xf ); //E0c+Ad*Xf+Cd*X/(Dd-Xf)
+			curVolt = Ef - curI0 * InternalR;
+			Inew = Pw / curVolt;
+			Tnew = qmaxf / Inew;
+			error = std::abs( Inew - curI0 );
+			countForIteration++;
+			if ( countForIteration > 1000 ){
+				exceedIterationLimit = true;
+				break;
+			}
+		}
+		return (!exceedIterationLimit);
+	}
+
+
 	void
 	FigureElectricalStorageZoneGains()
 	{
@@ -3267,8 +3327,6 @@ namespace ManageElectricPower {
 
 		// Using/Aliasing
 		using DataHVACGlobals::TimeStepSys;
-		using DataGlobals::TimeStepZone;
-		using DataGlobals::SecInHour;
 		using DataGlobals::MetersHaveBeenInitialized;
 		using ScheduleManager::GetCurrentScheduleValue;
 		using DataHeatBalance::ZnAirRpt;
@@ -3350,10 +3408,10 @@ namespace ManageElectricPower {
 
 					if ( MetersHaveBeenInitialized ) {
 						MeterPtr = Transformer( TransfNum ).WiredMeterPtrs( MeterNum );
-						ElecLoad += GetInstantMeterValue( MeterPtr, 1 ) / ( TimeStepZone * SecInHour ) + GetInstantMeterValue( MeterPtr, 2 ) / ( TimeStepSys * SecInHour );
+						ElecLoad += GetInstantMeterValue( MeterPtr, 1 ) / TimeStepZoneSec + GetInstantMeterValue( MeterPtr, 2 ) / ( TimeStepSys * SecInHour );
 						// PastElecLoad store the metered value in the previous time step. This value will be used to check whether
 						// a transformer is overloaded or not.
-						PastElecLoad += GetCurrentMeterValue( MeterPtr ) / ( TimeStepZone * SecInHour );
+						PastElecLoad += GetCurrentMeterValue( MeterPtr ) / TimeStepZoneSec;
 					} else {
 						ElecLoad = 0.0;
 						PastElecLoad = 0.0;
@@ -3401,7 +3459,7 @@ namespace ManageElectricPower {
 						ShowSevereError( "Transformer Overloaded" );
 						ShowContinueError( "Entered in ElectricLoadCenter:Transformer =" + Transformer( TransfNum ).Name );
 					}
-					ShowRecurringSevereErrorAtEnd( "Transformer Overloaded: " "Entered in ElectricLoadCenter:Transformer =" + Transformer( TransfNum ).Name, Transformer( TransfNum ).OverloadErrorIndex );
+					ShowRecurringSevereErrorAtEnd( "Transformer Overloaded: Entered in ElectricLoadCenter:Transformer =" + Transformer( TransfNum ).Name, Transformer( TransfNum ).OverloadErrorIndex );
 				}
 
 				TempChange = std::pow( PUL, 1.6 ) * Transformer( TransfNum ).TempRise;
@@ -3683,8 +3741,8 @@ namespace ManageElectricPower {
 		// na
 
 		// Argument array dimensioning
-		A.dim( {0,dim} );
-		B.dim( {0,dim} );
+		A.dim( {1,dim} );
+		B.dim( {1,dim} );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3722,7 +3780,7 @@ namespace ManageElectricPower {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

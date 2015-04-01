@@ -3,25 +3,25 @@
 ///
 ///
 /// \author Thierry Stephane Nouidui,
-///         Simulation Research Group, 
+///         Simulation Research Group,
 ///         LBNL,
 ///         TSNouidui@lbl.gov
 ///
 /// \date   2011-11-11
 ///
-/// This files contains the implementation of all 
-/// energyplus functions that are needed to mapped 
+/// This files contains the implementation of all
+/// energyplus functions that are needed to mapped
 /// to fmiFunctions
 
 /// This file is based on main.c that is copyrighted by
-/// QTronic GmbH and that is distributed under the BSD license. 
-/// The original file, its copyright notice and its license can 
+/// QTronic GmbH and that is distributed under the BSD license.
+/// The original file, its copyright notice and its license can
 /// be found in /Copyright
 ///
-/// The file has been modified for use with the FMU standard for 
+/// The file has been modified for use with the FMU standard for
 /// co-simulation. The original file was developed for model exchange.
-/// The original file used 0 as indicator for failure and 
-/// 1 as indicator for success.  
+/// The original file used 0 as indicator for failure and
+/// 1 as indicator for success.
 /// The new file uses 0 as indicator for success according to STL.
 ///
 ////////////////////////////////////////////////////////////////////
@@ -46,7 +46,7 @@
 #define BIN_WIN "\\binaries\\winxx\\"
 #define BIN_WIN32 "\\binaries\\win32\\"
 #define BIN_WIN64 "\\binaries\\win64\\"
-#if defined(_WIN32) 
+#if defined(_WIN32)
 #define OperSys 1
 #endif
 #if defined(_WIN64)
@@ -64,9 +64,9 @@
 #define BIN_LIN32 "/binaries/linux32/"
 #define BIN_LIN64 "/binaries/linux64/"
 //#define OperSys 3
-//#if defined(__LP32__) 
+//#if defined(__LP32__)
 //#define OperSys 3
-# if defined(__LP64__) || defined(__x86_64__) || defined(__ia64__) || defined(__amd64__) || defined(__ppc64__) 
+# if defined(__LP64__) || defined(__x86_64__) || defined(__ia64__) || defined(__amd64__) || defined(__ppc64__)
 #define OperSys 4
 #else
 #define OperSys 3
@@ -80,9 +80,9 @@
 #define BIN_MAC "/binaries/darwinxx/"
 #define BIN_MAC32 "/binaries/darwin32/"
 #define BIN_MAC64 "/binaries/darwin64/"
-//#if defined(__LP32__) 
+//#if defined(__LP32__)
 //#define OperSys 5
-#if defined(__LP64__) || defined(__x86_64__) || defined(__ia64__) || defined(__amd64__) || defined(__ppc64__) 
+#if defined(__LP64__) || defined(__x86_64__) || defined(__ia64__) || defined(__amd64__) || defined(__ppc64__)
 #define OperSys 6
 #else
 #define OperSys 5
@@ -99,7 +99,7 @@ fmiComponent c;
 FMU* _c;
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This function checks the operating system and returns an error message 
+/// This function checks the operating system and returns an error message
 /// if the operating system is not supported
 ///
 ///\param name Error message
@@ -110,20 +110,20 @@ fmiInteger checkOperatingSystem(char* errorMessage){
 	strncpy(errorMessage, msg, strlen(msg));
 	return -1;
 #endif
-	return 0;	
+	return 0;
 }
 
-#if defined _MSC_VER || defined __linux__ 
+#if defined _MSC_VER || defined __linux__
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Check if string \c name is in the string array \c array[]. This function is 
+/// Check if string \c name is in the string array \c array[]. This function is
 ///
 ///\param name The string to be checked.
 ///\param kind The type of string to be checked.
 ///\param array The list of strings for comparison.
 ///\param n The length of array.
-///\return The index of matched string in the \c array[]. 
-///        Otherwise, return -1 to indicate error. 
+///\return The index of matched string in the \c array[].
+///        Otherwise, return -1 to indicate error.
 ///////////////////////////////////////////////////////////////////////////////
 static int checkName2(const char* name, const char* kind, const char* array[], int n){
 	int i;
@@ -138,7 +138,7 @@ static int checkName2(const char* name, const char* kind, const char* array[], i
 /// Check enum value of input string \c enu.
 ///
 ///\param enu String to be checked.
-///\return The enum value of string if it is found in the enum. 
+///\return The enum value of string if it is found in the enum.
 ///        Otherwise, return -1 to indicate an error.
 ///////////////////////////////////////////////////////////////////////////////
 static int checkEnumValue2(const char* enu){
@@ -154,7 +154,7 @@ static int checkEnumValue2(const char* enu){
 static void* getAdr(FMU *fmu, const char* modelID, const char* functionName){
 	char name[BUFSIZE];
 	void* fp;
-	sprintf(name, "%s_%s", modelID, functionName); 
+	sprintf(name, "%s_%s", modelID, functionName);
 
 #ifdef _MSC_VER
 	fp = GetProcAddress(fmu->dllHandle, name);
@@ -162,7 +162,7 @@ static void* getAdr(FMU *fmu, const char* modelID, const char* functionName){
 	fp = dlsym(fmu->dllHandle, name);
 #endif
 	if (!fp) {
-		printf ("Error: Function %s not found in FMI functions library\n", name); 
+		printf ("Error: Function %s not found in FMI functions library\n", name);
 	}
 	return fp;
 }
@@ -189,7 +189,7 @@ static void addfmuInstances(FMU* s){
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Load the given dll and set function pointers in fmu.
-/// It changes the names of the standard FMI functions by adding 
+/// It changes the names of the standard FMI functions by adding
 /// the model identifier and links the new functions with QTronic's FMU structure.
 ///
 ///\param dllPat Path of the dll file.
@@ -204,7 +204,7 @@ static int loadLib(const char* libPath, const char* modelID, FMU *fmu) {
 #endif
 
 #ifdef _MSC_VER
-	h = LoadLibrary(libPath); 
+	h = LoadLibrary(libPath);
 	if (h == NULL) {
 		printf("Error: unable to load FMI functions library\n");
 		return -1;
@@ -214,7 +214,7 @@ static int loadLib(const char* libPath, const char* modelID, FMU *fmu) {
 		return -1;
 	}
 #else
-	h = dlopen(libPath, RTLD_LAZY); 
+	h = dlopen(libPath, RTLD_LAZY);
 	if (h == NULL) {
 		printf("Error: unable to load  FMI functions library\n");
 		return -1;
@@ -238,7 +238,7 @@ static int loadLib(const char* libPath, const char* modelID, FMU *fmu) {
 	if (!(fmu->freeSlaveInstance)) {
 		return -1;
 	}
-	fmu->resetSlaveInstance = (fResetSlaveInstance)getAdr(fmu, modelID, "fmiResetSlave");	
+	fmu->resetSlaveInstance = (fResetSlaveInstance)getAdr(fmu, modelID, "fmiResetSlave");
 	if (!(fmu->resetSlaveInstance)) {
 		return -1;
 	}
@@ -282,7 +282,7 @@ static int loadLib(const char* libPath, const char* modelID, FMU *fmu) {
 	if (!(fmu->getString)) {
 		return -1;
 	}
-	fmu->doStep = (fDoStep)getAdr(fmu, modelID, "fmiDoStep");	
+	fmu->doStep = (fDoStep)getAdr(fmu, modelID, "fmiDoStep");
 	if (!(fmu->doStep)) {
 		return -1;
 	}
@@ -295,8 +295,8 @@ static const char* fmiStatusToString(fmiStatus status){
 	case fmiOK:      return "ok";
 	case fmiWarning: return "warning";
 	case fmiDiscard: return "discard";
-	case fmiError:   return "error";		
-	case fmiPending: return "pending";	
+	case fmiError:   return "error";
+	case fmiPending: return "pending";
 	default:         return "?";
 	}
 }
@@ -319,11 +319,11 @@ static ScalarVariable* getSV(FMU* fmu, char type, fmiValueReference vr) {
 	case 'r': tp = elm_Real;    break;
 	case 'i': tp = elm_Integer; break;
 	case 'b': tp = elm_Boolean; break;
-	case 's': tp = elm_String;  break;                
+	case 's': tp = elm_String;  break;
 	}
 	for (i=0; vars[i]; i++) {
 		ScalarVariable* sv = vars[i];
-		if (vr==getValueReference(sv) && tp==sv->typeSpec->type) 
+		if (vr==getValueReference(sv) && tp==sv->typeSpec->type)
 			return sv;
 	}
 	return NULL;
@@ -334,7 +334,7 @@ static ScalarVariable* getSV(FMU* fmu, char type, fmiValueReference vr) {
 /// E.g. #r1365# by variable name and ## by # in message
 /// copies the result to buffer
 ///
-///\param msg 
+///\param msg
 ///\param buffer
 ///\param nBuffer
 ///\param fmu FMU
@@ -375,7 +375,7 @@ static void replaceRefsInMessage(const char* msg, char* buffer, int nBuffer, FMU
 					sprintf(buffer+k, "%s", name);
 					k += strlen(name);
 					i += (n+1);
-					c = msg[i]; 
+					c = msg[i];
 				}
 				else {
 					// could not parse the number
@@ -395,7 +395,7 @@ static void replaceRefsInMessage(const char* msg, char* buffer, int nBuffer, FMU
 ///\param c FMI component.
 ///\param instanceName FMI string.
 ///\param status FMI status.
-///\param category FMI string. 
+///\param category FMI string.
 ///\param message Message to be recorded.
 ///////////////////////////////////////////////////////////////////////////////
 static void fmuLogger(fmiComponent c, fmiString instanceName, fmiStatus status,
@@ -409,7 +409,7 @@ static void fmuLogger(fmiComponent c, fmiString instanceName, fmiStatus status,
 		va_start(argp, message);
 		vsprintf(msg, message, argp);
 
-		// Replace e.g. ## and #r12#  
+		// Replace e.g. ## and #r12#
 		copy = strdup(msg);
 		replaceRefsInMessage(copy, msg, MAX_MSG_SIZE, &fmu);
 		free(copy);
@@ -435,7 +435,7 @@ static int error(const char* message){
 ///\param sizemodelID Size of FMU modelID
 ///\param fmiVersionNumber FMI version number
 ////////////////////////////////////////////////////////////////
-fmiInteger getfmiEPlusVersion(char* fmuWorkingFolder, 
+fmiInteger getfmiEPlusVersion(char* fmuWorkingFolder,
 	fmiInteger *sizefmuWorkingFolder, char *fmiVersionNumber, fmiInteger *index){
 
 		char *trimfmuWorkingFolder;
@@ -466,25 +466,25 @@ fmiInteger getfmiEPlusVersion(char* fmuWorkingFolder,
 		verID = fmuInstances[_c->index]->getVersion();
 		strncpy(fmiVersionNumber, verID, strlen (verID)+ 1);
 
-		return 0;	
+		return 0;
 }
 
 ////////////////////////////////////////////////////////////////
-///  This method is an interface to the function in Fortran 
-///  needed to instantiate an FMU. It returns a pointer to the 
+///  This method is an interface to the function in Fortran
+///  needed to instantiate an FMU. It returns a pointer to the
 ///  instantiate FMU
 ///
 ///\param fmuResFolder Path to the FMU resources folder
 ///\param sizefmuResFolder Size of FMU resources folder
-///\param timeOut communication timeout value in milli-seconds 
-///\param visible Flag to executes the FMU in windowless mode 
+///\param timeOut communication timeout value in milli-seconds
+///\param visible Flag to executes the FMU in windowless mode
 ///\param interactive Flag to execute the FMU in interactive mode
-///\param loggingOn Flag to enable or disable debug 
+///\param loggingOn Flag to enable or disable debug
 ///\param index Index of FMU
 ////////////////////////////////////////////////////////////////
 fmiComponent fmiEPlusInstantiateSlave(char* fmuResFolder,
-	fmiInteger *sizefmuResFolder, 
-	fmiReal *timeOut, fmiInteger *visible, 
+	fmiInteger *sizefmuResFolder,
+	fmiReal *timeOut, fmiInteger *visible,
 	fmiInteger *interactive, fmiInteger *loggingOn, fmiInteger *index) {
 
 		char* trimfmuResFolder;
@@ -492,10 +492,10 @@ fmiComponent fmiEPlusInstantiateSlave(char* fmuResFolder,
 		fmiBoolean visiBoolean;
 		fmiBoolean interactBoolean;
 		fmiBoolean loggOnBoolean;
-		fmiComponent fmuInstance; 
+		fmiComponent fmuInstance;
 
 		// define callbacks functions
-		fmiCallbackFunctions callbacks; 
+		fmiCallbackFunctions callbacks;
 		callbacks.allocateMemory = calloc;
 		callbacks.freeMemory = free;
 		callbacks.logger = fmuLogger;
@@ -525,9 +525,9 @@ fmiComponent fmiEPlusInstantiateSlave(char* fmuResFolder,
 			loggOnBoolean = fmiTrue;
 
 		// instantiate FMU
-		fmuInstance = fmuInstances[_c->index]->instantiateSlave(fmuInstances[_c->index]->modelID, 
-			fmuInstances[_c->index]->modelGUID, trimfmuResFolder, "", *timeOut, visiBoolean, 
-			interactBoolean, callbacks, loggOnBoolean); 
+		fmuInstance = fmuInstances[_c->index]->instantiateSlave(fmuInstances[_c->index]->modelID,
+			fmuInstances[_c->index]->modelGUID, trimfmuResFolder, "", *timeOut, visiBoolean,
+			interactBoolean, callbacks, loggOnBoolean);
 		if (!fmuInstance) {
 			printf("Error: failed to instantiate slave in fmiEPlusInstantiateSlave!\n");
 			return NULL;
@@ -539,21 +539,21 @@ fmiComponent fmiEPlusInstantiateSlave(char* fmuResFolder,
 }
 
 ////////////////////////////////////////////////////////////////
-///  This method is an interface to the function in Fortran 
-///  needed to initialize an FMU. It returns an integer-value 
-///  which indicates whether the initialization was successful 
+///  This method is an interface to the function in Fortran
+///  needed to initialize an FMU. It returns an integer-value
+///  which indicates whether the initialization was successful
 ///  or not.
 ///
-///\param fmuInstance FMU instance 
+///\param fmuInstance FMU instance
 ///\param tStart Simulation starttime
 ///\param newStep Flag to accept or reject timestep
 ///\param tStop Simulation endtime
 ///\param index Index of FMU
 ////////////////////////////////////////////////////////////////
-fmiStatus fmiEPlusInitializeSlave(fmiComponent *fmuInstance, 
+fmiStatus fmiEPlusInitializeSlave(fmiComponent *fmuInstance,
 	fmiReal *tStart, fmiInteger *newStep, fmiReal *tStop, fmiInteger *index) {
 
-		fmiStatus fmiFlag;              
+		fmiStatus fmiFlag;
 		fmiBoolean newStepBoolean;
 
 		//map the newStep to fmiBoolean value
@@ -565,7 +565,7 @@ fmiStatus fmiEPlusInitializeSlave(fmiComponent *fmuInstance,
 		// get index value
 		_c->index = *index;
 
-		//initialize fmu; 
+		//initialize fmu;
 		fmiFlag = fmuInstances[_c->index]->initializeSlave(*fmuInstance, *tStart, newStepBoolean, *tStop);
 		if (fmiFlag > fmiWarning) {
 			printf("Error: failed to initialize slave in fmiEPlusInitializeSlave!\n");
@@ -575,20 +575,20 @@ fmiStatus fmiEPlusInitializeSlave(fmiComponent *fmuInstance,
 }
 
 ////////////////////////////////////////////////////////////////
-///  This method is an interface to the function in Fortran 
-///  needed to get real variables from the FMU. 
-/// 
-///\param fmuInstance FMU instance 
+///  This method is an interface to the function in Fortran
+///  needed to get real variables from the FMU.
+///
+///\param fmuInstance FMU instance
 ///\param valRef FMU value references
-///\param outValue FMU output values 
+///\param outValue FMU output values
 ///\param numOutputs Number of FMU outputs
 ///\param index Index of FMU
 ////////////////////////////////////////////////////////////////
 
-fmiStatus fmiEPlusGetReal(fmiComponent *fmuInstance, const fmiValueReference valRef [], 
+fmiStatus fmiEPlusGetReal(fmiComponent *fmuInstance, const fmiValueReference valRef [],
 	fmiReal outValue[], fmiInteger *numOutputs, fmiInteger *index) {
 
-		fmiStatus fmiFlag;	 
+		fmiStatus fmiFlag;
 
 		// get index value
 		_c->index = *index;
@@ -603,18 +603,18 @@ fmiStatus fmiEPlusGetReal(fmiComponent *fmuInstance, const fmiValueReference val
 }
 
 ////////////////////////////////////////////////////////////////
-///  This method is an interface to the function in Fortran 
-///  needed to set real variables to the FMU. It returns an  
-///  integer which indicates whether input has been set or not. 
-/// 
+///  This method is an interface to the function in Fortran
+///  needed to set real variables to the FMU. It returns an
+///  integer which indicates whether input has been set or not.
+///
 
-///\param fmuInstance FMU-instance 
+///\param fmuInstance FMU-instance
 ///\param valRef FMU value references
 ///\param inpVal FMU input values
 ///\param numOutputs Number of FMU inputs
 ///\param index Index of FMU
 ////////////////////////////////////////////////////////////////
-fmiStatus fmiEPlusSetReal(fmiComponent *fmuInstance, const fmiValueReference valRef[], 
+fmiStatus fmiEPlusSetReal(fmiComponent *fmuInstance, const fmiValueReference valRef[],
 	fmiReal inpVal[], fmiInteger *numInputs, fmiInteger *index) {
 
 		fmiStatus fmiFlag;
@@ -622,7 +622,7 @@ fmiStatus fmiEPlusSetReal(fmiComponent *fmuInstance, const fmiValueReference val
 		// get index value
 		_c->index = *index;
 
-		fmiFlag = fmuInstances[_c->index]->setReal(*fmuInstance, valRef, *numInputs, inpVal); 
+		fmiFlag = fmuInstances[_c->index]->setReal(*fmuInstance, valRef, *numInputs, inpVal);
 		if (fmiFlag > fmiWarning) {
 			printf("Error: failed to set all inputs in fmiEPlusSetReal!\n");
 			return fmiError;
@@ -631,21 +631,21 @@ fmiStatus fmiEPlusSetReal(fmiComponent *fmuInstance, const fmiValueReference val
 }
 
 ////////////////////////////////////////////////////////////////
-///  This method is an interface to the function in Fortran 
-///  needed to do the step in FMU. It returns an integer  
-///  which indicates whether the step was successfully done. 
-///  
+///  This method is an interface to the function in Fortran
+///  needed to do the step in FMU. It returns an integer
+///  which indicates whether the step was successfully done.
+///
 ///\param fmuInstance FMU instance
-///\param curCommPoint fmiEPlusDoStep Current communication intervall 
+///\param curCommPoint fmiEPlusDoStep Current communication intervall
 ///\param newStep Flag to accept or reject step
 ///\param commStepSize Size of communication timestep
 ///\param index Index of FMU
 ////////////////////////////////////////////////////////////////
-fmiStatus fmiEPlusDoStep(fmiComponent *fmuInstance, fmiReal *curCommPoint, 
+fmiStatus fmiEPlusDoStep(fmiComponent *fmuInstance, fmiReal *curCommPoint,
 	fmiReal *commStepSize, fmiInteger *newStep, fmiInteger *index) {
 
 		fmiBoolean newStepBoolean;
-		fmiStatus fmiFlag;  
+		fmiStatus fmiFlag;
 
 		// map the newStep to the fmiBoolean value
 		if (*newStep == 0)
@@ -666,9 +666,9 @@ fmiStatus fmiEPlusDoStep(fmiComponent *fmuInstance, fmiReal *curCommPoint,
 
 
 ////////////////////////////////////////////////////////////////
-///  This method is an interface to the function in Fortran 
-///  needed to free FMU. It returns an integer  
-///  which indicates whether the FMU was successfully freed. 
+///  This method is an interface to the function in Fortran
+///  needed to free FMU. It returns an integer
+///  which indicates whether the FMU was successfully freed.
 ///
 ///\param fmuInstance FMU instance
 ///\param modelID FMU modelID
@@ -676,7 +676,7 @@ fmiStatus fmiEPlusDoStep(fmiComponent *fmuInstance, fmiReal *curCommPoint,
 ////////////////////////////////////////////////////////////////
 
 fmiStatus fmiEPlusFreeSlave(fmiComponent *fmuInstance, fmiInteger *index) {
-	
+
 	// get index value
 	_c->index = *index;
 
@@ -687,10 +687,10 @@ fmiStatus fmiEPlusFreeSlave(fmiComponent *fmuInstance, fmiInteger *index) {
 
 
 ////////////////////////////////////////////////////////////////
-///  This method is an interface to the function in Fortran 
-///  needed to reset FMU. It returns an integer  
-///  which indicates whether the FMU was successfully reseted. 
-///  
+///  This method is an interface to the function in Fortran
+///  needed to reset FMU. It returns an integer
+///  which indicates whether the FMU was successfully reseted.
+///
 ///\param fmuInstance FMU instance
 ///\param index Index of FMU
 ////////////////////////////////////////////////////////////////
@@ -711,20 +711,20 @@ fmiStatus fmiEPlusResetSlave(fmiComponent *fmuInstance, fmiInteger *index) {
 }
 
 ////////////////////////////////////////////////////////////////
-///  This method is an interface to the function in Fortran 
-///  needed to get value reference of FMU- input variable by Name.  
-///  It returns the value reference of the given variable. 
-///  
-///\param variableName FMU variable name 
+///  This method is an interface to the function in Fortran
+///  needed to get value reference of FMU- input variable by Name.
+///  It returns the value reference of the given variable.
+///
+///\param variableName FMU variable name
 ///\param sizeVariableName Size of FMU-variable name
 ///\param index Index of FMU
 ////////////////////////////////////////////////////////////////
-fmiInteger getValueReferenceByNameFMUInputVariables(char* variableName, 
+fmiInteger getValueReferenceByNameFMUInputVariables(char* variableName,
 	fmiInteger *sizeVariableName, fmiInteger *index) {
 
 		char *trimVariableName;
-		fmiInteger valueRef; 
-		
+		fmiInteger valueRef;
+
 		// allocate memory for the FMU-variable trimmed
 		trimVariableName = (char*)calloc(sizeof(char),*sizeVariableName +1 );
 
@@ -742,14 +742,14 @@ fmiInteger getValueReferenceByNameFMUInputVariables(char* variableName,
 		}
 		else
 		{
-			valueRef = getValueReference(getVariableByName(fmuInstances[_c->index]->modelDescription, 
+			valueRef = getValueReference(getVariableByName(fmuInstances[_c->index]->modelDescription,
 				trimVariableName));
 			if (!valueRef) {
 				printf("Error: could not get value by reference in fmigetValueReferenceByName. "
 					"Please check input variables and modelDescription file again");
 				return -999;
 			}
-			if (getCausality(getVariableByName(fmuInstances[_c->index]->modelDescription, 
+			if (getCausality(getVariableByName(fmuInstances[_c->index]->modelDescription,
 				trimVariableName)) != enu_input) {
 					printf("Error: This is not an FMU input variable. "
 						"Please check input variables and modelDescription file again");
@@ -763,19 +763,19 @@ fmiInteger getValueReferenceByNameFMUInputVariables(char* variableName,
 }
 
 ////////////////////////////////////////////////////////////////
-///  This method is an interface to the function in Fortran 
-///  needed to get value reference of FMU output variable by Name.  
-///  It returns the value reference of the given variable. 
-///  
-///\param variableName FMU variable name 
+///  This method is an interface to the function in Fortran
+///  needed to get value reference of FMU output variable by Name.
+///  It returns the value reference of the given variable.
+///
+///\param variableName FMU variable name
 ///\param sizeVariableName Size of FMU-variable name
 ///\param index Index of FMU
 ////////////////////////////////////////////////////////////////
-fmiInteger getValueReferenceByNameFMUOutputVariables(char* variableName, 
+fmiInteger getValueReferenceByNameFMUOutputVariables(char* variableName,
 	fmiInteger *sizeVariableName, fmiInteger *index) {
 
 		char *trimVariableName;
-		fmiInteger valueRef; 
+		fmiInteger valueRef;
 
 		// allocate memory for the FMU-variable trimmed
 		trimVariableName = (char*)calloc(sizeof(char),*sizeVariableName +1 );
@@ -793,14 +793,14 @@ fmiInteger getValueReferenceByNameFMUOutputVariables(char* variableName,
 		}
 		else
 		{
-			valueRef = getValueReference(getVariableByName(fmuInstances[_c->index]->modelDescription, 
+			valueRef = getValueReference(getVariableByName(fmuInstances[_c->index]->modelDescription,
 				trimVariableName));
 			if (!valueRef) {
 				printf("Error: could not get value by reference in fmigetValueReferenceByName. "
 					"Please check output variables and modelDescription file again");
 				return -999;
 			}
-			if (getCausality(getVariableByName(fmuInstances[_c->index]->modelDescription, 
+			if (getCausality(getVariableByName(fmuInstances[_c->index]->modelDescription,
 				trimVariableName)) != enu_output) {
 					printf("Error: This is not an FMU output variable. "
 						"Please check output variables and modelDescription file again");
@@ -814,17 +814,17 @@ fmiInteger getValueReferenceByNameFMUOutputVariables(char* variableName,
 }
 
 ////////////////////////////////////////////////////////////////
-///  This method is an interface to the function in Fortran 
-///  needed to add //fmus/ to the current working folder 
-///  of EnergyPlus . It returns an integer  
-///  which indicates whether the addition was successfully done. 
-///  
+///  This method is an interface to the function in Fortran
+///  needed to add //fmus/ to the current working folder
+///  of EnergyPlus . It returns an integer
+///  which indicates whether the addition was successfully done.
+///
 ///\param fmuWorkingFolder FMU output working folder
 ///\param fmuWorkingFolder FMU working folder
 ///\param sizefmuWorkingFolder Size of FMU working folder
 ////////////////////////////////////////////////////////////////
 
-fmiInteger addFMURootFolderName(char* fmuOutputWorkingFolder, 
+fmiInteger addFMURootFolderName(char* fmuOutputWorkingFolder,
 	char* fmuWorkingFolder, fmiInteger *sizefmuWorkingFolder) {
 		char *trimfmuWorkingFolder;
 		char * trimfmuWorkingFolderWithRoot;
@@ -838,23 +838,23 @@ fmiInteger addFMURootFolderName(char* fmuOutputWorkingFolder,
 		trimfmuWorkingFolderWithRoot = (char*)calloc(sizeof(char),*sizefmuWorkingFolder + strlen (FMU_ROOT_DIR) + 1);
 		sprintf(trimfmuWorkingFolderWithRoot, "%s%s", trimfmuWorkingFolder, FMU_ROOT_DIR);
 
-		//write fmuOutputWorkingFolder 
+		//write fmuOutputWorkingFolder
 		strncpy(fmuOutputWorkingFolder, trimfmuWorkingFolderWithRoot, *sizefmuWorkingFolder + strlen (FMU_ROOT_DIR) + 1);
 
 		// deallocate memory FMU-working folder trimmed
 		free(trimfmuWorkingFolder);
 		// deallocate memory FMU-working folder with root
 		free(trimfmuWorkingFolderWithRoot);
-		return 0;	
+		return 0;
 }
 
 ////////////////////////////////////////////////////////////////
-///  This method is an interface to the function in Fortran 
-///  needed to get the path to the binaries of FMu instance 
-///  It returns an integer  
+///  This method is an interface to the function in Fortran
+///  needed to get the path to the binaries of FMu instance
+///  It returns an integer
 ///  which indicates whether the routine completes successfully.
-///  
-///\param trimfmuOutputWorkingFolder_wLiB FMU Output working folder 
+///
+///\param trimfmuOutputWorkingFolder_wLiB FMU Output working folder
 /// with path to binaries
 ///\param fmuWorkingFolder FMU working folder
 ///\param sizefmuWorkingFolder Size of FMU working folder
@@ -862,8 +862,8 @@ fmiInteger addFMURootFolderName(char* fmuOutputWorkingFolder,
 ////////////////////////////////////////////////////////////////
 
 fmiInteger addLibPathCurrentWorkingFolder(
-	char* trimfmuOutputWorkingFolder_wLiB, 
-	char* fmuWorkingFolder, fmiInteger *sizefmuWorkingFolder, 
+	char* trimfmuOutputWorkingFolder_wLiB,
+	char* fmuWorkingFolder, fmiInteger *sizefmuWorkingFolder,
 	fmiInteger *index) {
 		char *trimfmuWorkingFolder;
 		char * librPath_w32;
@@ -872,7 +872,7 @@ fmiInteger addLibPathCurrentWorkingFolder(
 		fmiInteger len_LibPath;
 		fmiBoolean bRes_w32;
 		fmiBoolean bRes_w64;
-#if __linux__ 
+#if __linux__
 		char * librPath_l32;
 		char * librPath_l64;
 		fmiBoolean bRes_l32;
@@ -889,24 +889,24 @@ fmiInteger addLibPathCurrentWorkingFolder(
 		_c->index = *index;
 
 #ifdef _MSC_VER
-		len_LibPath = strlen(trimfmuWorkingFolder) + strlen(BIN_WIN) + strlen (fmuInstances[_c->index]->modelID) 
+		len_LibPath = strlen(trimfmuWorkingFolder) + strlen(BIN_WIN) + strlen (fmuInstances[_c->index]->modelID)
 			+ strlen (LIB_EXT);
 		librPath_w32 = (char*)calloc(sizeof(char), len_LibPath + 1);
 
 		// write the path to the binaries for Windows 32 bit
-		sprintf(librPath_w32, "%s%s%s%s", trimfmuWorkingFolder, BIN_WIN32, fmuInstances[_c->index]->modelID, LIB_EXT); 
-		// check whether the dlls for Windows 32 bit exist in the binaries folder 
+		sprintf(librPath_w32, "%s%s%s%s", trimfmuWorkingFolder, BIN_WIN32, fmuInstances[_c->index]->modelID, LIB_EXT);
+		// check whether the dlls for Windows 32 bit exist in the binaries folder
 		bRes_w32 = (stat(librPath_w32, &st) == 0);
 
 		// write the path to the binaries for Windows 64 bit
 		librPath_w64 = (char*)calloc(sizeof(char), len_LibPath + 1);
-		sprintf(librPath_w64, "%s%s%s%s", trimfmuWorkingFolder, BIN_WIN64, fmuInstances[_c->index]->modelID, LIB_EXT); 
-		// check whether the dlls for Windows 32 bit exist in the binaries folder 
+		sprintf(librPath_w64, "%s%s%s%s", trimfmuWorkingFolder, BIN_WIN64, fmuInstances[_c->index]->modelID, LIB_EXT);
+		// check whether the dlls for Windows 32 bit exist in the binaries folder
 		bRes_w64 = (stat(librPath_w64, &st) == 0);
 
 		// check whether we have folders for Windows 32 and Windows 64 bit
-		if (bRes_w32 && bRes_w64) { 
-			if (OperSys == 1){ 
+		if (bRes_w32 && bRes_w64) {
+			if (OperSys == 1){
 				strncpy(trimfmuOutputWorkingFolder_wLiB, librPath_w32, strlen(librPath_w32));
 			}
 			else
@@ -931,25 +931,25 @@ fmiInteger addLibPathCurrentWorkingFolder(
 		}
 #endif
 
-#if __linux__ 
+#if __linux__
 
 		len_LibPath = strlen(trimfmuWorkingFolder) + strlen(BIN_LIN) + strlen (fmuInstances[_c->index]->modelID) + strlen (LIB_EXT);
 		librPath_l32 = (char*)calloc(sizeof(char), len_LibPath + 10);
 
 		// write the path to the binaries for Windows 32 bit
-		sprintf(librPath_l32, "%s%s%s%s", trimfmuWorkingFolder, BIN_LIN32,fmuInstances[_c->index]->modelID, LIB_EXT); 
-		// check whether the so for Linux 32 bit exist in the binaries folder 
+		sprintf(librPath_l32, "%s%s%s%s", trimfmuWorkingFolder, BIN_LIN32,fmuInstances[_c->index]->modelID, LIB_EXT);
+		// check whether the so for Linux 32 bit exist in the binaries folder
 		bRes_l32 = (stat(librPath_l32, &st) == 0);
 
 		// write the path to the binaries for Windows 64 bit
 		librPath_l64 = (char*)calloc(sizeof(char), len_LibPath + 10);
-		sprintf(librPath_l64, "%s%s%s%s", trimfmuWorkingFolder, BIN_LIN64,fmuInstances[_c->index]->modelID, LIB_EXT); 
-		// check whether the so for Linux 64 bit exist in the binaries folder 
+		sprintf(librPath_l64, "%s%s%s%s", trimfmuWorkingFolder, BIN_LIN64,fmuInstances[_c->index]->modelID, LIB_EXT);
+		// check whether the so for Linux 64 bit exist in the binaries folder
 		bRes_l64 = (stat(librPath_l64, &st) == 0);
 
 		// check whether we have folders for Linux 32 and Linux 64 bit
-		if (bRes_l32 && bRes_l64) { 
-			if (OperSys == 3){ 
+		if (bRes_l32 && bRes_l64) {
+			if (OperSys == 3){
 				strncpy(trimfmuOutputWorkingFolder_wLiB, librPath_l32, strlen(librPath_l32));
 			}
 			else
@@ -984,21 +984,21 @@ fmiInteger addLibPathCurrentWorkingFolder(
 			free(librPath_w64);
 		}
 
-#if __linux__ 
+#if __linux__
 		// deallocate memory for path for binaries for windows 32 bit
 		free(librPath_l32);
 		// deallocate memory for path for binaries for windows 64 bit
 		free(librPath_l64);
 #endif
-		return 0;	
+		return 0;
 }
 
 ////////////////////////////////////////////////////////////////
-///  This method is an interface to the function in Fortran 
+///  This method is an interface to the function in Fortran
 ///  needed to get the modelID and the modelGUID of the FMU.
-///  It returns an integer  
+///  It returns an integer
 ///  which indicates whether the routine was successfully.
-///  
+///
 ///\param fmuWorkingFolder FMU output working folder
 ///\param sizefmuWorkingFolder Size of FMU working folder
 ///\param modelID FMU modelID
@@ -1007,8 +1007,8 @@ fmiInteger addLibPathCurrentWorkingFolder(
 ///\param numOutputs Number of FMU outputs
 ////////////////////////////////////////////////////////////////
 
-fmiInteger model_ID_GUID(char* fmuWorkingFolder, 
-	fmiInteger *sizefmuWorkingFolder, fmiInteger *numInputs, 
+fmiInteger model_ID_GUID(char* fmuWorkingFolder,
+	fmiInteger *sizefmuWorkingFolder, fmiInteger *numInputs,
 	fmiInteger *numOutputs) {
 
 		char* xmlPath;
@@ -1079,7 +1079,7 @@ fmiInteger model_ID_GUID(char* fmuWorkingFolder,
 						val = checkEnumValue2(e->attributes[i+1]);
 				}
 
-				// get number of input variables   
+				// get number of input variables
 				if(val == enu_input)
 				{
 					num_input = num_input + 1;
@@ -1098,23 +1098,23 @@ fmiInteger model_ID_GUID(char* fmuWorkingFolder,
 			free (xmlPath);
 			// free trimmed working folder
 			free (trimfmuWorkingFolder);
-			return insNum-1;	
+			return insNum-1;
 }
 
 
 // This function is an interface to the function in Fortran that is used to parse the FMU
 ////////////////////////////////////////////////////////////////
-///  This method is an interface to the function in Fortran 
-///  needed to unpack FMUs. It returns an integer  
-///  which indicates whether the FMU was successfully unzipped. 
-///  
+///  This method is an interface to the function in Fortran
+///  needed to unpack FMUs. It returns an integer
+///  which indicates whether the FMU was successfully unzipped.
+///
 ///\param fmuName FMU fileName
 ///\param fmuOutputWorkingFolder FMU working folder
 ///\param sizefmuName Size of FMU name trimmed
 ///\param sizefmuOutputWorkingFolder Size of FMU working folder trimmed
 ////////////////////////////////////////////////////////////////
-fmiInteger fmiEPlusUnpack(char* fmuName, 
-	char* fmuOutputWorkingFolder, 
+fmiInteger fmiEPlusUnpack(char* fmuName,
+	char* fmuOutputWorkingFolder,
 	fmiInteger *sizefmuName, fmiInteger *sizefmuOutputWorkingFolder) {
 
 		char * trimfmuOutputWorkingFolder;
@@ -1145,38 +1145,38 @@ fmiInteger fmiEPlusUnpack(char* fmuName,
 		free(trimfmuName);
 		// deallocate memory FMU-working folder
 		free(trimfmuOutputWorkingFolder);
-		return 0;	
+		return 0;
 }
 
 #else
 fmiComponent fmiEPlusInstantiateSlave(char* fmuResFolder,
-	fmiInteger *sizefmuResFolder, 
-	fmiReal *timeOut, fmiInteger *visible, 
+	fmiInteger *sizefmuResFolder,
+	fmiReal *timeOut, fmiInteger *visible,
 	fmiInteger *interactive, fmiInteger *loggingOn, fmiInteger *index) {
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux");
 		exit(EXIT_FAILURE);
 }
 
-fmiStatus fmiEPlusInitializeSlave(fmiComponent *fmuInstance, 
+fmiStatus fmiEPlusInitializeSlave(fmiComponent *fmuInstance,
 	fmiReal *tStart, fmiInteger *newStep, fmiReal *tStop, fmiInteger *index){
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux");
 		exit(EXIT_FAILURE);
 }
 
-fmiStatus fmiEPlusGetReal(fmiComponent *fmuInstance, const fmiValueReference valRef [], 
+fmiStatus fmiEPlusGetReal(fmiComponent *fmuInstance, const fmiValueReference valRef [],
 	fmiReal outValue[], fmiInteger *numOutputs, fmiInteger *index){
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux");
 		exit(EXIT_FAILURE);
 }
 
 
-fmiStatus fmiEPlusSetReal(fmiComponent *fmuInstance, const fmiValueReference valRef[], 
+fmiStatus fmiEPlusSetReal(fmiComponent *fmuInstance, const fmiValueReference valRef[],
 	fmiReal inpVal[], fmiInteger *numInputs, fmiInteger *index){
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux");
 		exit(EXIT_FAILURE);
 }
 
-fmiStatus fmiEPlusDoStep(fmiComponent *fmuInstance, fmiReal *curCommPoint, 
+fmiStatus fmiEPlusDoStep(fmiComponent *fmuInstance, fmiReal *curCommPoint,
 	fmiReal *commStepSize, fmiInteger *newStep, fmiInteger *index){
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux");
 		exit(EXIT_FAILURE);
@@ -1190,47 +1190,47 @@ fmiStatus fmiEPlusFreeSlave(fmiComponent *fmuInstance, fmiInteger *index){
 fmiStatus fmiEPlusResetSlave(fmiComponent *fmuInstance, fmiInteger *index){
 	printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux");
 	exit(EXIT_FAILURE);
-} 
+}
 
-fmiInteger fmiEPlusUnpack(char* fmuName, char* fmuOutputWorkingFolder, 
+fmiInteger fmiEPlusUnpack(char* fmuName, char* fmuOutputWorkingFolder,
 	fmiInteger *sizefmuName, fmiInteger *sizefmuOutputWorkingFolder){
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux");
 		exit(EXIT_FAILURE);
-} 
+}
 
-fmiInteger getValueReferenceByNameFMUInputVariables(char* variableName, 
+fmiInteger getValueReferenceByNameFMUInputVariables(char* variableName,
 	fmiInteger *sizeVariableName, fmiInteger *index){
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux");
 		exit(EXIT_FAILURE);
 }
 
-fmiInteger getValueReferenceByNameFMUOutputVariables(char* variableName, 
+fmiInteger getValueReferenceByNameFMUOutputVariables(char* variableName,
 	fmiInteger *sizeVariableName, fmiInteger *index){
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux");
 		exit(EXIT_FAILURE);
 }
 
-fmiInteger model_ID_GUID(char* fmuWorkingFolder, 
-	fmiInteger *sizefmuWorkingFolder, fmiInteger *numInputs, 
+fmiInteger model_ID_GUID(char* fmuWorkingFolder,
+	fmiInteger *sizefmuWorkingFolder, fmiInteger *numInputs,
 	fmiInteger *numOutputs){
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux");
 		exit(EXIT_FAILURE);
 }
 
-fmiInteger addFMURootFolderName(char* fmuOutputWorkingFolder, 
+fmiInteger addFMURootFolderName(char* fmuOutputWorkingFolder,
 	char* fmuWorkingFolder, fmiInteger *sizefmuWorkingFolder){
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux");
 		exit(EXIT_FAILURE);
 }
 
-fmiInteger getfmiEPlusVersion(char* fmuWorkingFolder, 
+fmiInteger getfmiEPlusVersion(char* fmuWorkingFolder,
 	fmiInteger *sizefmuWorkingFolder, char *fmiVersionNumber, fmiInteger *index){
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux");
 		exit(EXIT_FAILURE);
 }
 
-fmiInteger addLibPathCurrentWorkingFolder(char* trimfmuOutputWorkingFolder_wLiB, 
-	char* fmuWorkingFolder, fmiInteger *sizefmuWorkingFolder, 
+fmiInteger addLibPathCurrentWorkingFolder(char* trimfmuOutputWorkingFolder_wLiB,
+	char* fmuWorkingFolder, fmiInteger *sizefmuWorkingFolder,
 	fmiInteger *index){
 		printf("Error: FunctionalMock-up Unit for co-simulation is currently only supported on Windows and Linux");
 		exit(EXIT_FAILURE);

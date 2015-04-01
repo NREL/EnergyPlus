@@ -476,27 +476,27 @@ count( MArray2< A, bool > const & a, int const dim )
 	switch ( dim ) {
 	case 1:
 		{
-			FArray1D< typename MArray2< A, bool >::size_type > v( a.isize2() );
-			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-				typename MArray2< A, bool >::size_type c( 0u );
-				for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-					if ( a( i1, i2 ) ) ++c;
-				}
-				v( i2 ) = c;
+		FArray1D< typename MArray2< A, bool >::size_type > v( a.isize2() );
+		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
+			typename MArray2< A, bool >::size_type c( 0u );
+			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
+				if ( a( i1, i2 ) ) ++c;
 			}
-			return v;
+			v( i2 ) = c;
+		}
+		return v;
 		}
 	case 2:
 		{
-			FArray1D< typename MArray2< A, bool >::size_type > v( a.isize1() );
-			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-				typename MArray2< A, bool >::size_type c( 0u );
-				for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-					if ( a( i1, i2 ) ) ++c;
-				}
-				v( i1 ) = c;
+		FArray1D< typename MArray2< A, bool >::size_type > v( a.isize1() );
+		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
+			typename MArray2< A, bool >::size_type c( 0u );
+			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
+				if ( a( i1, i2 ) ) ++c;
 			}
-			return v;
+			v( i1 ) = c;
+		}
+		return v;
 		}
 	default:
 		assert( false );
@@ -504,12 +504,12 @@ count( MArray2< A, bool > const & a, int const dim )
 	}
 }
 
-// is_contiguous /////
+// contiguous /////
 
 template< class A, typename T >
 inline
 bool
-is_contiguous( MArray< A, T > const & )
+contiguous( MArray< A, T > const & )
 {
 	return false; // Member arrays are by definition non-contiguous
 }
@@ -1049,9 +1049,9 @@ isize( MArray< A, T > const & a )
 	return static_cast< int >( size( a ) );
 }
 
-template< template< class, typename > class ArrayType, class A, typename T >
+template< template< class, typename > class ArrayType, class A, typename T, class = typename std::enable_if< std::is_base_of< MArray< A, T >, ArrayType< A, T > >::value >::type >
 inline
-typename std::enable_if< std::is_base_of< MArray< A, T >, ArrayType< A, T > >::value, int >::type // Restrict to MArray
+int
 isize( ArrayType< A, T > const & a, int const dim )
 {
 	return static_cast< int >( size( a, dim ) );
@@ -1668,27 +1668,27 @@ sum( MArray2< A, T > const & a, int const dim )
 	switch ( dim ) {
 	case 1:
 		{
-			FArray1D< T > sums( a.size2(), 0 );
-			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-				T s( 0 );
-				for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-					s += a( i1, i2 );
-				}
-				sums( i2 ) = s;
+		FArray1D< T > r( a.isize2() );
+		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
+			T s( 0 );
+			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
+				s += a( i1, i2 );
 			}
-			return sums;
+			r( i2 ) = s;
+		}
+		return r;
 		}
 	case 2:
 		{
-			FArray1D< T > sums( a.size1(), 0 );
-			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-				T s( 0 );
-				for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-					s += a( i1, i2 );
-				}
-				sums( i1 ) = s;
+		FArray1D< T > r( a.isize1() );
+		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
+			T s( 0 );
+			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
+				s += a( i1, i2 );
 			}
-			return sums;
+			r( i1 ) = s;
+		}
+		return r;
 		}
 	default:
 		assert( false );
@@ -2134,27 +2134,27 @@ product( MArray2< A, T > const & a, int const dim )
 	switch ( dim ) {
 	case 1:
 		{
-			FArray1D< T > prds( a.size2(), 0 );
-			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-				T p( 1 );
-				for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-					p *= a( i1, i2 );
-				}
-				prds( i2 ) = p;
+		FArray1D< T > r( a.isize2() );
+		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
+			T p( 1 );
+			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
+				p *= a( i1, i2 );
 			}
-			return prds;
+			r( i2 ) = p;
+		}
+		return r;
 		}
 	case 2:
 		{
-			FArray1D< T > prds( a.size1(), 0 );
-			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-				T p( 1 );
-				for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-					p *= a( i1, i2 );
-				}
-				prds( i1 ) = p;
+		FArray1D< T > r( a.isize1() );
+		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
+			T p( 1 );
+			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
+				p *= a( i1, i2 );
 			}
-			return prds;
+			r( i1 ) = p;
+		}
+		return r;
 		}
 	default:
 		assert( false );
@@ -2972,31 +2972,31 @@ minloc( MArray2< A, T > const & a, int const dim )
 	switch ( dim ) {
 	case 1:
 		{
-			FArray1D< int > loc( a.size2(), a.size2() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-				T r( std::numeric_limits< T >::max() );
-				for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-					if ( a( i1, i2 ) < r ) {
-						r = a( i1, i2 );
-						loc( i2 ) = i1;
-					}
+		FArray1D< int > loc( a.isize2(), a.size2() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
+		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
+			T r( std::numeric_limits< T >::max() );
+			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
+				if ( a( i1, i2 ) < r ) {
+					r = a( i1, i2 );
+					loc( i2 ) = i1;
 				}
 			}
-			return loc;
+		}
+		return loc;
 		}
 	case 2:
 		{
-			FArray1D< int > loc( a.size1(), a.size1() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-				T r( std::numeric_limits< T >::max() );
-				for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-					if ( a( i1, i2 ) < r ) {
-						r = a( i1, i2 );
-						loc( i1 ) = i2;
-					}
+		FArray1D< int > loc( a.isize1(), a.size1() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
+		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
+			T r( std::numeric_limits< T >::max() );
+			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
+				if ( a( i1, i2 ) < r ) {
+					r = a( i1, i2 );
+					loc( i1 ) = i2;
 				}
 			}
-			return loc;
+		}
+		return loc;
 		}
 	default:
 		assert( false );
@@ -3300,31 +3300,31 @@ maxloc( MArray2< A, T > const & a, int const dim )
 	switch ( dim ) {
 	case 1:
 		{
-			FArray1D< int > loc( a.size2(), a.size2() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-				T r( std::numeric_limits< T >::lowest() );
-				for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-					if ( a( i1, i2 ) > r ) {
-						r = a( i1, i2 );
-						loc( i2 ) = i1;
-					}
+		FArray1D< int > loc( a.isize2(), a.size2() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
+		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
+			T r( std::numeric_limits< T >::lowest() );
+			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
+				if ( a( i1, i2 ) > r ) {
+					r = a( i1, i2 );
+					loc( i2 ) = i1;
 				}
 			}
-			return loc;
+		}
+		return loc;
 		}
 	case 2:
 		{
-			FArray1D< int > loc( a.size1(), a.size1() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
-			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-				T r( std::numeric_limits< T >::lowest() );
-				for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-					if ( a( i1, i2 ) > r ) {
-						r = a( i1, i2 );
-						loc( i1 ) = i2;
-					}
+		FArray1D< int > loc( a.isize1(), a.size1() > 0u ? 1 : 0 ); // F2008 standard => 0 for empty arrays
+		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
+			T r( std::numeric_limits< T >::lowest() );
+			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
+				if ( a( i1, i2 ) > r ) {
+					r = a( i1, i2 );
+					loc( i1 ) = i2;
 				}
 			}
-			return loc;
+		}
+		return loc;
 		}
 	default:
 		assert( false );
@@ -3643,7 +3643,7 @@ matmul( MArray2< A, bool > const & a, MArray2< A, bool > const & b )
 	return m;
 }
 
-// Array Generators
+// Subscript Array Generators
 
 // Subscripted Array
 template< class A, typename T >
@@ -3651,7 +3651,7 @@ inline
 FArray1D< T >
 array_sub( MArray1< A, T > const & a, FArray1< int > const & sub )
 {
-	FArray1D< T > r( sub.size() );
+	FArray1D< T > r( sub.isize() );
 	for ( int i = sub.l(), e = sub.u(), k = 1; i <= e; ++i, ++k ) {
 		r( k ) = a( sub( i ) );
 	}
@@ -3664,9 +3664,9 @@ inline
 FArray1D< T >
 array_sub( MArray1< A, T > const & a, FArray1S< int > const & sub )
 {
-	FArray1D< T > r( sub.size() );
-	for ( int i = sub.l(), e = sub.u(), k = 1; i <= e; ++i, ++k ) {
-		r( k ) = a( sub( i ) );
+	FArray1D< T > r( sub.isize() );
+	for ( int i = 1, e = sub.u(); i <= e; ++i ) {
+		r( i ) = a( sub( i ) );
 	}
 	return r;
 }

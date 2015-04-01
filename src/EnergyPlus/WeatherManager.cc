@@ -1,5 +1,6 @@
 // C++ Headers
 #include <cmath>
+#include <cstdio>
 #include <string>
 
 // ObjexxFCL Headers
@@ -10,9 +11,11 @@
 #include <ObjexxFCL/Time_Date.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <WeatherManager.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
+#include <DataStringGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataReportingFlags.hh>
@@ -278,8 +281,8 @@ namespace WeatherManager {
 	FArray1D< SpecialDayData > SpecialDays;
 	FArray1D< DataPeriodData > DataPeriods;
 
-	static gio::Fmt const fmtA( "(A)" );
-	static gio::Fmt const fmtAN( "(A,$)" );
+	static gio::Fmt fmtA( "(A)" );
+	static gio::Fmt fmtAN( "(A,$)" );
 
 	// MODULE SUBROUTINES:
 
@@ -419,13 +422,13 @@ namespace WeatherManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetNextEnvironment: " );
-		static gio::Fmt const EnvironFormat( "('! <Environment>,Environment Name,Environment Type, Start Date, End Date,',    ' Start DayOfWeek, Duration {#days}, Source:Start DayOfWeek, ',        ' Use Daylight Saving, Use Holidays, Apply Weekend Holiday Rule, ',    ' Use Rain Values, Use Snow Values',/,                                 '! <Environment:Special Days>, Special Day Name, Special Day Type, Source, ',  'Start Date, Duration {#days}',/,                                      '! <Environment:Daylight Saving>, Daylight Saving Indicator, Source,',           ' Start Date, End Date',/,                                           '! <Environment:WarmupDays>, NumberofWarmupDays')" );
-		static gio::Fmt const EnvNameFormat( "('Environment',12(',',A))" );
-		static gio::Fmt const EnvDSTNFormat( "('Environment:Daylight Saving,No,',A)" );
-		static gio::Fmt const EnvDSTYFormat( "('Environment:Daylight Saving,Yes',3(',',A))" );
-		static gio::Fmt const EnvSpDyFormat( "('Environment:Special Days',4(',',A),',',I3)" );
-		static gio::Fmt const DateFormat( "(I2.2,'/',I2.2)" );
-		static gio::Fmt const DateFormatwithYear( "(I2.2,'/',I2.2,'/',I4.4)" );
+		static gio::Fmt EnvironFormat( "('! <Environment>,Environment Name,Environment Type, Start Date, End Date,',    ' Start DayOfWeek, Duration {#days}, Source:Start DayOfWeek, ',        ' Use Daylight Saving, Use Holidays, Apply Weekend Holiday Rule, ',    ' Use Rain Values, Use Snow Values',/,                                 '! <Environment:Special Days>, Special Day Name, Special Day Type, Source, ',  'Start Date, Duration {#days}',/,                                      '! <Environment:Daylight Saving>, Daylight Saving Indicator, Source,',           ' Start Date, End Date',/,                                           '! <Environment:WarmupDays>, NumberofWarmupDays')" );
+		static gio::Fmt EnvNameFormat( "('Environment',12(',',A))" );
+		static gio::Fmt EnvDSTNFormat( "('Environment:Daylight Saving,No,',A)" );
+		static gio::Fmt EnvDSTYFormat( "('Environment:Daylight Saving,Yes',3(',',A))" );
+		static gio::Fmt EnvSpDyFormat( "('Environment:Special Days',4(',',A),',',I3)" );
+		static gio::Fmt DateFormat( "(I2.2,'/',I2.2)" );
+		static gio::Fmt DateFormatwithYear( "(I2.2,'/',I2.2,'/',I4.4)" );
 		static FArray1D_string const SpecialDayNames( 5, { "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
 		static FArray1D_string const ValidDayNames( 12, { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
 
@@ -549,7 +552,7 @@ namespace WeatherManager {
 			if ( NumOfEnvrn > 0 ) {
 				ResolveLocationInformation( ErrorsFound ); // Obtain weather related info from input file
 				CheckLocationValidity();
-				if ( Environment( NumOfEnvrn ).KindOfEnvrn != ksDesignDay ) {
+				if ((Environment(NumOfEnvrn).KindOfEnvrn != ksDesignDay) && (Environment(NumOfEnvrn).KindOfEnvrn != ksHVACSizeDesignDay)) {
 					CheckWeatherFileValidity();
 				}
 				if ( ErrorsFound ) {
@@ -576,7 +579,7 @@ namespace WeatherManager {
 					MaxNumberSimYears = max( MaxNumberSimYears, Environment( Loop ).NumSimYears );
 				}
 			}
-//			DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays ); // Doesn't do anything!
+			DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays );
 		}
 
 		CloseWeatherFile(); // will only close if opened.
@@ -618,11 +621,11 @@ namespace WeatherManager {
 					ShowSevereError( "Weather Simulation requested, but no weather file attached." );
 					ErrorsFound = true;
 				}
-				Envrn = 0;
+				if ( ! DoingHVACSizingSimulations) Envrn = 0;
 				Available = false;
 			} else if ( ( KindOfSim == ksRunPeriodWeather ) && ( ! WeatherFileExists && ! DoWeathSim ) ) {
 				Available = false;
-				Envrn = 0;
+				if ( ! DoingHVACSizingSimulations) Envrn = 0;
 			} else if ( ( KindOfSim == ksRunPeriodWeather ) && DoingSizing ) {
 				Available = false;
 				Envrn = 0;
@@ -682,7 +685,7 @@ namespace WeatherManager {
 								RunStJDay = DataPeriods( Loop ).DataStJDay;
 								RunEnJDay = DataPeriods( Loop ).DataEnJDay;
 								if ( ! DataPeriods( Loop ).HasYearData ) {
-									ShowSevereError( "GetNextEnvironment: Runperiod:CustomRange has been entered but weatherfile " " DATA PERIOD does not have year included in start/end date." );
+									ShowSevereError( "GetNextEnvironment: Runperiod:CustomRange has been entered but weatherfile DATA PERIOD does not have year included in start/end date." );
 									ShowContinueError( "...to match the RunPeriod, the DATA PERIOD should be mm/dd/yyyy for both." );
 								}
 								if ( ! BetweenDates( Environment( Envrn ).StartDate, RunStJDay, RunEnJDay ) ) continue;
@@ -815,7 +818,7 @@ namespace WeatherManager {
 										ErrorsFound = true;
 									}
 									if ( NumIntervalsPerHour != 1 ) {
-										ShowSevereError( RoutineName + "AdaptiveComfort Reporting does not work correctly with weather files " "that have multiple interval records per hour." );
+										ShowSevereError( RoutineName + "AdaptiveComfort Reporting does not work correctly with weather files that have multiple interval records per hour." );
 										ErrorsFound = true;
 									}
 								}
@@ -908,16 +911,16 @@ namespace WeatherManager {
 							}
 						}
 
-					} else if ( SELECT_CASE_var == ksDesignDay ) { // Design Day
+					} else if (SELECT_CASE_var == ksDesignDay || SELECT_CASE_var == ksHVACSizeDesignDay ) { // Design Day
 						RunPeriodEnvironment = false;
-						gio::write( StDate, DateFormat ) << DesDayInput( Envrn ).Month << DesDayInput( Envrn ).DayOfMonth;
+						gio::write(StDate, DateFormat) << DesDayInput(Environment(Envrn).DesignDayNum).Month << DesDayInput(Environment(Envrn).DesignDayNum).DayOfMonth;
 						EnDate = StDate;
-						if ( DesDayInput( Envrn ).DayType <= 7 && DoWeatherInitReporting ) {
-							gio::write( OutputFileInits, EnvNameFormat ) << Environment( Envrn ).Title << "SizingPeriod:DesignDay" << StDate << EnDate << DaysOfWeek( DesDayInput( Envrn ).DayType ) << "1" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A";
+						if (DesDayInput(Environment(Envrn).DesignDayNum).DayType <= 7 && DoWeatherInitReporting) {
+							gio::write(OutputFileInits, EnvNameFormat) << Environment(Envrn).Title << "SizingPeriod:DesignDay" << StDate << EnDate << DaysOfWeek(DesDayInput(Environment(Envrn).DesignDayNum).DayType) << "1" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A";
 						} else if ( DoWeatherInitReporting ) {
-							gio::write( OutputFileInits, EnvNameFormat ) << Environment( Envrn ).Title << "SizingPeriod:DesignDay" << StDate << EnDate << SpecialDayNames( DesDayInput( Envrn ).DayType - 7 ) << "1" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A";
+							gio::write(OutputFileInits, EnvNameFormat) << Environment(Envrn).Title << "SizingPeriod:DesignDay" << StDate << EnDate << SpecialDayNames(DesDayInput(Environment(Envrn).DesignDayNum).DayType - 7) << "1" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A";
 						}
-						if ( DesDayInput( Envrn ).DSTIndicator == 0 && DoWeatherInitReporting ) {
+						if (DesDayInput(Environment(Envrn).DesignDayNum).DSTIndicator == 0 && DoWeatherInitReporting) {
 							gio::write( OutputFileInits, EnvDSTNFormat ) << "SizingPeriod:DesignDay";
 						} else if ( DoWeatherInitReporting ) {
 							gio::write( OutputFileInits, EnvDSTYFormat ) << "SizingPeriod:DesignDay" << StDate << EnDate;
@@ -935,6 +938,42 @@ namespace WeatherManager {
 		} else if ( ErrorsFound ) {
 			Available = false;
 		}
+
+	}
+
+	void
+	AddDesignSetToEnvironmentStruct(
+		int const HVACSizingIterCount
+	)
+	{
+		// SUBROUTINE INFORMATION:
+
+		using DataGlobals::ksDesignDay;
+		using DataGlobals::ksRunPeriodDesign;
+		using DataGlobals::ksHVACSizeDesignDay;
+		using DataGlobals::ksHVACSizeRunPeriodDesign;
+
+		int OrigNumOfEnvrn;
+
+		OrigNumOfEnvrn = NumOfEnvrn;
+		for ( int i = 1; i <= OrigNumOfEnvrn; i++ ) {
+			if ( Environment(i).KindOfEnvrn == ksDesignDay) {
+				Environment.redimension(++NumOfEnvrn);
+				Environment(NumOfEnvrn) = Environment(i); // copy over seed data from current array element
+				Environment(NumOfEnvrn).SeedEnvrnNum = i;
+				Environment(NumOfEnvrn).KindOfEnvrn = ksHVACSizeDesignDay;
+				Environment(NumOfEnvrn).Title = Environment(i).Title + " HVAC Sizing Pass " + RoundSigDigits( HVACSizingIterCount );
+				Environment(NumOfEnvrn).HVACSizingIterationNum = HVACSizingIterCount;
+			}
+			else if (Environment(i).KindOfEnvrn == ksRunPeriodDesign) {
+				Environment.redimension(++NumOfEnvrn);
+				Environment(NumOfEnvrn) = Environment(i); // copy over seed data
+				Environment(NumOfEnvrn).SeedEnvrnNum = i;
+				Environment(NumOfEnvrn).KindOfEnvrn = ksHVACSizeRunPeriodDesign;
+				Environment(NumOfEnvrn).Title = Environment(i).Title + " HVAC Sizing Pass " + RoundSigDigits( HVACSizingIterCount );
+				Environment(NumOfEnvrn).HVACSizingIterationNum = HVACSizingIterCount;
+			}
+		}  // for each loop over Environment data strucure
 
 	}
 
@@ -1400,6 +1439,8 @@ namespace WeatherManager {
 			}
 			ThisDay += 7 * ( DST.EnDay - 1 );
 			if ( ThisDay > ActEndDayOfMonth( DST.EnMon ) ) {
+				ActEndMonth = 0; // Suppress uninitialized warning
+				ActEndDay = 0; // Suppress uninitialized warning
 				ShowSevereError( RoutineName + "Determining DST: DST End Date, Nth Day of Month, not enough Nths" );
 				ErrorsFound = true;
 			} else {
@@ -1615,8 +1656,10 @@ namespace WeatherManager {
 
 			//Call and setup the Design Day environment
 			if ( Environment( Envrn ).KindOfEnvrn != ksRunPeriodWeather ) {
-				if ( Envrn <= TotDesDays ) {
-					SetUpDesignDay( Envrn );
+				if (Environment(Envrn).DesignDayNum > 0) 
+				{
+					SetUpDesignDay(Environment(Envrn).DesignDayNum);
+					EnvironmentName = Environment(Envrn).Title;
 				}
 			}
 
@@ -1675,10 +1718,10 @@ namespace WeatherManager {
 				SpecialDays( Loop ).Used = false;
 			}
 
-			if ( KindOfSim != ksDesignDay ) {
+			if ((KindOfSim != ksDesignDay) && (KindOfSim != ksHVACSizeDesignDay)) {
 				ReadWeatherForDay( 1, Envrn, false ); // Read first day's weather
 			} else {
-				TomorrowVariables = DesignDay( Envrn );
+				TomorrowVariables = DesignDay(Environment(Envrn).DesignDayNum);
 			}
 
 		} // ... end of BeginEnvrnFlag IF-THEN block.
@@ -1698,7 +1741,7 @@ namespace WeatherManager {
 			// In a multi year simulation with run period less than 365, we need to position the weather line
 			// appropriately.
 
-			if ( ( ! WarmupFlag ) && ( Environment( Envrn ).KindOfEnvrn != ksDesignDay ) ) {
+			if ((!WarmupFlag) && ((Environment(Envrn).KindOfEnvrn != ksDesignDay) && (Environment(Envrn).KindOfEnvrn != ksHVACSizeDesignDay))) {
 				if ( DayOfSim < NumOfDayInEnvrn ) {
 					if ( DayOfSim == curSimDayForEndOfRunPeriod ) {
 						curSimDayForEndOfRunPeriod += Environment( Envrn ).RawSimDays;
@@ -1810,7 +1853,7 @@ namespace WeatherManager {
 			DatesShouldBeReset = true;
 		}
 
-		if ( EndEnvrnFlag && ( Environment( Envrn ).KindOfEnvrn != ksDesignDay ) ) {
+		if (EndEnvrnFlag && (Environment(Envrn).KindOfEnvrn != ksDesignDay) && (Environment(Envrn).KindOfEnvrn != ksHVACSizeDesignDay)) {
 			gio::rewind( WeatherFileUnitNumber );
 			SkipEPlusWFHeader();
 			ReportMissing_RangeData();
@@ -1964,8 +2007,8 @@ namespace WeatherManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const TimeStmpFmt( "(I2.2,'/',I2.2,' ',I2.2,':')" );
-		static gio::Fmt const MnDyFmt( "(I2.2,'/',I2.2)" );
+		static char time_stamp[ 10 ];
+		static char day_stamp[ 6 ];
 		static std::string const RoutineName( "SetCurrentWeather" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -1993,8 +2036,10 @@ namespace WeatherManager {
 
 		UpdateScheduleValues();
 
-		gio::write( CurMnDyHr, TimeStmpFmt ) << Month << DayOfMonth << HourOfDay - 1;
-		gio::write( CurMnDy, MnDyFmt ) << Month << DayOfMonth;
+		std::sprintf( time_stamp, "%02d/%02d %02d:", Month, DayOfMonth, HourOfDay - 1 );
+		CurMnDyHr = time_stamp;
+		std::sprintf( day_stamp, "%02d/%02d", Month, DayOfMonth );
+		CurMnDy = day_stamp;
 
 		WeightNow = Interpolation( TimeStep );
 		WeightPreviousHour = 1.0 - WeightNow;
@@ -2044,27 +2089,28 @@ namespace WeatherManager {
 			OutDewPointTemp = OutWetBulbTemp;
 		}
 
-		if ( KindOfSim == ksDesignDay ) {
+		if ((KindOfSim == ksDesignDay) || (KindOfSim == ksHVACSizeDesignDay)) {
 			SPSiteDryBulbRangeModScheduleValue = -999.0; // N/A Drybulb Temperature Range Modifier Schedule Value
 			SPSiteHumidityConditionScheduleValue = -999.0; // N/A Humidity Condition Schedule Value
 			SPSiteBeamSolarScheduleValue = -999.0; // N/A Beam Solar Schedule Value
 			SPSiteDiffuseSolarScheduleValue = -999.0; // N/A Diffuse Solar Schedule Value
 			SPSiteSkyTemperatureScheduleValue = -999.0; // N/A SkyTemperature Modifier Schedule Value
 
-			if ( DesDayInput( Envrn ).DBTempRangeType != DDDBRangeType_Default ) {
-				SPSiteDryBulbRangeModScheduleValue( Envrn ) = DDDBRngModifier( Envrn, HourOfDay, TimeStep );
+			if ( DesDayInput( Environment( Envrn ).DesignDayNum ).DBTempRangeType != DDDBRangeType_Default ) {
+				SPSiteDryBulbRangeModScheduleValue(Environment(Envrn).DesignDayNum) = DDDBRngModifier(Environment(Envrn).DesignDayNum, HourOfDay, TimeStep);
 			}
-			if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_WBProfDef || DesDayInput( Envrn ).HumIndType == DDHumIndType_WBProfDif || DesDayInput( Envrn ).HumIndType == DDHumIndType_WBProfMul ) {
-				SPSiteHumidityConditionScheduleValue( Envrn ) = DDHumIndModifier( Envrn, HourOfDay, TimeStep );
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_RelHumSch ) {
-				SPSiteHumidityConditionScheduleValue( Envrn ) = DDHumIndModifier( Envrn, HourOfDay, TimeStep );
+			if (DesDayInput(Environment(Envrn).DesignDayNum).HumIndType == DDHumIndType_WBProfDef || DesDayInput(Environment(Envrn).DesignDayNum).HumIndType == DDHumIndType_WBProfDif || DesDayInput(Environment(Envrn).DesignDayNum).HumIndType == DDHumIndType_WBProfMul) {
+				SPSiteHumidityConditionScheduleValue(Environment(Envrn).DesignDayNum) = DDHumIndModifier(Environment(Envrn).DesignDayNum, HourOfDay, TimeStep);
 			}
-			if ( DesDayInput( Envrn ).SolarModel == SolarModel_Schedule ) {
-				SPSiteBeamSolarScheduleValue( Envrn ) = DDBeamSolarValues( Envrn, HourOfDay, TimeStep );
-				SPSiteDiffuseSolarScheduleValue( Envrn ) = DDDiffuseSolarValues( Envrn, HourOfDay, TimeStep );
+			else if (DesDayInput(Environment(Envrn).DesignDayNum).HumIndType == DDHumIndType_RelHumSch) {
+				SPSiteHumidityConditionScheduleValue(Environment(Envrn).DesignDayNum) = DDHumIndModifier(Environment(Envrn).DesignDayNum, HourOfDay, TimeStep);
+			}
+			if (DesDayInput(Environment(Envrn).DesignDayNum).SolarModel == SolarModel_Schedule) {
+				SPSiteBeamSolarScheduleValue(Environment(Envrn).DesignDayNum) = DDBeamSolarValues(Environment(Envrn).DesignDayNum, HourOfDay, TimeStep);
+				SPSiteDiffuseSolarScheduleValue(Environment(Envrn).DesignDayNum) = DDDiffuseSolarValues(Environment(Envrn).DesignDayNum, HourOfDay, TimeStep);
 			}
 			if ( Environment( Envrn ).WP_Type1 != 0 ) {
-				SPSiteSkyTemperatureScheduleValue( Envrn ) = DDSkyTempScheduleValues( Envrn, HourOfDay, TimeStep );
+				SPSiteSkyTemperatureScheduleValue(Environment(Envrn).DesignDayNum) = DDSkyTempScheduleValues(Environment(Envrn).DesignDayNum, HourOfDay, TimeStep);
 			}
 		} else if ( TotDesDays > 0 ) {
 			SPSiteDryBulbRangeModScheduleValue = -999.0; // N/A Drybulb Temperature Range Modifier Schedule Value
@@ -2220,9 +2266,9 @@ namespace WeatherManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtLD( "*" );
-		static gio::Fmt const YMDHFmt( "(I4.4,2('/',I2.2),1X,I2.2,':',I2.2)" );
-		static gio::Fmt const YMDHFmt1( "(I4.4,2('/',I2.2),1X,'hour=',I2.2,' - expected hour=',I2.2)" );
+		static gio::Fmt fmtLD( "*" );
+		static gio::Fmt YMDHFmt( "(I4.4,2('/',I2.2),1X,I2.2,':',I2.2)" );
+		static gio::Fmt YMDHFmt1( "(I4.4,2('/',I2.2),1X,'hour=',I2.2,' - expected hour=',I2.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2552,7 +2598,7 @@ namespace WeatherManager {
 								InterpretWeatherDataLine( WeatherDataLine, ErrorFound, WYear, WMonth, WDay, WHour, WMinute, DryBulb, DewPoint, RelHum, AtmPress, ETHoriz, ETDirect, IRHoriz, GLBHoriz, DirectRad, DiffuseRad, GLBHorizIllum, DirectNrmIllum, DiffuseHorizIllum, ZenLum, WindDir, WindSpeed, TotalSkyCover, OpaqueSkyCover, Visibility, CeilHeight, PresWeathObs, PresWeathConds, PrecipWater, AerosolOptDepth, SnowDepth, DaysSinceLastSnow, Albedo, LiquidPrecip );
 							} else {
 								BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
-								ShowFatalError( "End-of-File encountered after " + BadRecord + ", starting from first day of " "Weather File would not be \"next day\"" );
+								ShowFatalError( "End-of-File encountered after " + BadRecord + ", starting from first day of Weather File would not be \"next day\"" );
 							}
 						} else {
 							BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
@@ -2613,7 +2659,7 @@ namespace WeatherManager {
 							TryAgain = true;
 							ShowWarningError( "ReadEPlusWeatherForDay: Feb29 data encountered but will not be processed." );
 							if ( ! WFAllowsLeapYears ) {
-								ShowContinueError( "...WeatherFile does not allow Leap Years. " "HOLIDAYS/DAYLIGHT SAVINGS header must indicate \"Yes\"." );
+								ShowContinueError( "...WeatherFile does not allow Leap Years. HOLIDAYS/DAYLIGHT SAVINGS header must indicate \"Yes\"." );
 							}
 							continue;
 						} else if ( WMonth == 2 && WDay == 29 && CurrentYearIsLeapYear && WFAllowsLeapYears ) {
@@ -3102,8 +3148,8 @@ namespace WeatherManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const ValidDigits( "0123456789" );
-		static gio::Fmt const fmtLD( "*" );
-		static gio::Fmt const fmt9I1( "(9I1)" );
+		static gio::Fmt fmtLD( "*" );
+		static gio::Fmt fmt9I1( "(9I1)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3361,11 +3407,11 @@ Label903: ;
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const GlobalSolarConstant( 1367.0 );
 		Real64 const ZHGlobalSolarConstant( 1355.0 );
-		static gio::Fmt const EnvDDHdFormat( "('! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, ',   'Temp Range {dC}, Temp Range Ind Type, ',   'Hum Ind Value at Max Temp, Hum Ind Type,Pressure {Pa}, ',   'Wind Direction {deg CW from N}, ',    'Wind Speed {m/s}, Clearness, Rain, Snow')" );
-		static gio::Fmt const EnvDDayFormat( "('Environment:Design Day Data,')" );
-		static gio::Fmt const DDayMiscHdFormat( "('! <Environment:Design_Day_Misc>,DayOfYear,ASHRAE A Coeff,',   'ASHRAE B Coeff,ASHRAE C Coeff,Solar Constant-Annual Variation,',   'Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model')" );
-		static gio::Fmt const DDayMiscFormat( "('Environment:Design_Day_Misc,',I3,',')" );
-		static gio::Fmt const MnDyFmt( "(I2.2,'/',I2.2)" );
+		static gio::Fmt EnvDDHdFormat( "('! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, ',   'Temp Range {dC}, Temp Range Ind Type, ',   'Hum Ind Value at Max Temp, Hum Ind Type,Pressure {Pa}, ',   'Wind Direction {deg CW from N}, ',    'Wind Speed {m/s}, Clearness, Rain, Snow')" );
+		static gio::Fmt EnvDDayFormat( "('Environment:Design Day Data,')" );
+		static gio::Fmt DDayMiscHdFormat( "('! <Environment:Design_Day_Misc>,DayOfYear,ASHRAE A Coeff,',   'ASHRAE B Coeff,ASHRAE C Coeff,Solar Constant-Annual Variation,',   'Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model')" );
+		static gio::Fmt DDayMiscFormat( "('Environment:Design_Day_Misc,',I3,',')" );
+		static gio::Fmt MnDyFmt( "(I2.2,'/',I2.2)" );
 		Real64 const ZhangHuangModCoeff_C0( 0.5598 ); // 37.6865d0
 		Real64 const ZhangHuangModCoeff_C1( 0.4982 ); // 13.9263d0
 		Real64 const ZhangHuangModCoeff_C2( -0.6762 ); // -20.2354d0
@@ -3378,7 +3424,7 @@ Label903: ;
 		static std::string const RoutineNamePsyWFnTdpPb( "SetUpDesignDay:PsyWFnTdpPb" );
 		static std::string const RoutineNamePsyWFnTdbH( "SetUpDesignDay:PsyWFnTdbH" );
 		static std::string const WeatherManager( "WeatherManager" );
-		static std::string const RoutineNameLong( "WeatherManager.f90 subroutine SetUpDesignDay" );
+		static std::string const RoutineNameLong( "WeatherManager.cc subroutine SetUpDesignDay" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3478,7 +3524,7 @@ Label903: ;
 		DesignDay( EnvrnNum ).DayOfMonth = DesDayInput( EnvrnNum ).DayOfMonth;
 		DesignDay( EnvrnNum ).DayOfYear = JulianDay( DesignDay( EnvrnNum ).Month, DesignDay( EnvrnNum ).DayOfMonth, 0 );
 		gio::write( CurMnDy, MnDyFmt ) << DesDayInput( EnvrnNum ).Month << DesDayInput( EnvrnNum ).DayOfMonth;
-		EnvironmentName = DesDayInput( EnvrnNum ).Title;
+		//EnvironmentName = DesDayInput( EnvrnNum ).Title;
 		RunPeriodEnvironment = false;
 		// Following builds Environment start/end for ASHRAE 55 warnings
 		EnvironmentStartEnd = CurMnDy + " - " + CurMnDy;
@@ -3520,56 +3566,66 @@ Label903: ;
 			PrintDDHeader = false;
 		}
 		if ( DoWeatherInitReporting ) {
-			if ( DesDayInput( Envrn ).RainInd == 1 ) {
+			if (DesDayInput(EnvrnNum).RainInd == 1) {
 				AlpUseRain = "Yes";
 			} else {
 				AlpUseRain = "No";
 			}
-			if ( DesDayInput( Envrn ).SnowInd == 1 ) {
+			if (DesDayInput(EnvrnNum).SnowInd == 1) {
 				AlpUseSnow = "Yes";
 			} else {
 				AlpUseSnow = "No";
 			}
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, EnvDDayFormat, flags ); }
-			StringOut = RoundSigDigits( DesDayInput( Envrn ).MaxDryBulb, 2 );
+			StringOut = RoundSigDigits(DesDayInput(EnvrnNum).MaxDryBulb, 2);
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
-			StringOut = RoundSigDigits( DesDayInput( Envrn ).DailyDBRange, 2 );
+			StringOut = RoundSigDigits(DesDayInput(EnvrnNum).DailyDBRange, 2);
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = ",";
-			if ( DesDayInput( Envrn ).DBTempRangeType == DDDBRangeType_Default ) {
+			if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType_Default) {
 				StringOut = "DefaultMultipliers,";
-			} else if ( DesDayInput( Envrn ).DBTempRangeType == DDDBRangeType_Multiplier ) {
+			}
+			else if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType_Multiplier) {
 				StringOut = "MultiplierSchedule,";
-			} else if ( DesDayInput( Envrn ).DBTempRangeType == DDDBRangeType_Profile ) {
+			}
+			else if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType_Profile) {
 				StringOut = "TemperatureProfile,";
-			} else if ( DesDayInput( Envrn ).DBTempRangeType == DDDBRangeType_Difference ) {
+			}
+			else if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType_Difference) {
 				StringOut = "DifferenceSchedule,";
 			}
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut; }
-			if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_WetBulb ) {
-				StringOut = "Wetbulb," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {C},";
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_DewPoint ) {
-				StringOut = "Dewpoint," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {C},";
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_Enthalpy ) {
-				StringOut = "Enthalpy," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {kJ/kg},";
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_HumRatio ) {
-				StringOut = "HumidityRatio," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 4 ) + " {},";
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_RelHumSch ) {
-				StringOut = "Schedule,<schedule values from 0.0 to 100.0 {percent},";
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_WBProfDef ) {
-				StringOut = "WetBulbProfileDefaultMultipliers," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {C},";
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_WBProfDif ) {
-				StringOut = "WetBulbProfileDifferenceSchedule," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {C},";
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_WBProfMul ) {
-				StringOut = "WetBulbProfileMultiplierSchedule," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {C},";
+			if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WetBulb) {
+				StringOut = "Wetbulb," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {C},";
 			}
-			StringOut = RoundSigDigits( DesDayInput( Envrn ).PressBarom, 0 );
+			else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_DewPoint) {
+				StringOut = "Dewpoint," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {C},";
+			}
+			else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_Enthalpy) {
+				StringOut = "Enthalpy," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {kJ/kg},";
+			}
+			else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_HumRatio) {
+				StringOut = "HumidityRatio," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 4) + " {},";
+			}
+			else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_RelHumSch) {
+				StringOut = "Schedule,<schedule values from 0.0 to 100.0 {percent},";
+			}
+			else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfDef) {
+				StringOut = "WetBulbProfileDefaultMultipliers," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {C},";
+			}
+			else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfDif) {
+				StringOut = "WetBulbProfileDifferenceSchedule," + RoundSigDigits( DesDayInput( EnvrnNum ).HumIndValue, 2 ) + " {C},";
+			}
+			else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfMul) {
+				StringOut = "WetBulbProfileMultiplierSchedule," + RoundSigDigits( DesDayInput( EnvrnNum ).HumIndValue, 2 ) + " {C},";
+			}
+			StringOut = RoundSigDigits(DesDayInput(EnvrnNum).PressBarom, 0);
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
-			StringOut = RoundSigDigits( DesDayInput( Envrn ).WindDir, 0 );
+			StringOut = RoundSigDigits(DesDayInput(EnvrnNum).WindDir, 0);
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
-			StringOut = RoundSigDigits( DesDayInput( Envrn ).WindSpeed, 1 );
+			StringOut = RoundSigDigits(DesDayInput(EnvrnNum).WindSpeed, 1);
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
-			StringOut = RoundSigDigits( DesDayInput( Envrn ).SkyClear, 2 );
+			StringOut = RoundSigDigits(DesDayInput(EnvrnNum).SkyClear, 2);
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			gio::write( OutputFileInits, fmtA ) << AlpUseRain + ',' + AlpUseSnow;
 
@@ -3607,7 +3663,7 @@ Label903: ;
 
 		CurrentTime = 25.0;
 
-		{ auto const SELECT_CASE_var( DesDayInput( Envrn ).HumIndType );
+		{ auto const SELECT_CASE_var( DesDayInput( EnvrnNum ).HumIndType );
 
 		if ( SELECT_CASE_var == DDHumIndType_WetBulb ) {
 			HumidityRatio = PsyWFnTdbTwbPb( DesDayInput( EnvrnNum ).MaxDryBulb, DesDayInput( EnvrnNum ).HumIndValue, DesDayInput( EnvrnNum ).PressBarom, RoutineNamePsyWFnTdbTwbPb );
@@ -3635,7 +3691,7 @@ Label903: ;
 
 		} else {
 			ShowSevereError( "SetUpDesignDay: Invalid Humidity Indicator type" );
-			ShowContinueError( "Occurred in Design Day=" + DesDayInput( Envrn ).Title );
+			ShowContinueError( "Occurred in Design Day=" + DesDayInput( EnvrnNum ).Title );
 
 		}}
 
@@ -4389,7 +4445,7 @@ Label903: ;
 
 		// FLOW:
 
-		{ IOFlags flags; gio::inquire( "in.epw", flags ); WeatherFileExists = flags.exists(); }
+		{ IOFlags flags; gio::inquire( DataStringGlobals::inputWeatherFileName, flags ); WeatherFileExists = flags.exists(); }
 
 		if ( WeatherFileExists ) {
 			OpenEPlusWeatherFile( ErrorsFound, true );
@@ -4442,11 +4498,11 @@ Label903: ;
 		bool EPWOpen;
 		int unitnumber;
 
-		{ IOFlags flags; gio::inquire( "in.epw", flags ); unitnumber = flags.unit(); EPWOpen = flags.open(); }
+		{ IOFlags flags; gio::inquire( DataStringGlobals::inputWeatherFileName, flags ); unitnumber = flags.unit(); EPWOpen = flags.open(); }
 		if ( EPWOpen ) gio::close( unitnumber );
 
 		WeatherFileUnitNumber = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "read" ); gio::open( WeatherFileUnitNumber, "in.epw", flags ); if ( flags.err() ) goto Label9999; }
+		{ IOFlags flags; flags.ACTION( "read" ); gio::open( WeatherFileUnitNumber, DataStringGlobals::inputWeatherFileName, flags ); if ( flags.err() ) goto Label9999; }
 
 		if ( ProcessHeader ) {
 			// Read in Header Information
@@ -4482,7 +4538,7 @@ Label9997: ;
 		ShowFatalError( "Program terminates due to previous condition." );
 
 Label9998: ;
-		ShowFatalError( "OpenWeatherFile: Unexpected End-of-File on EPW Weather file, " "while reading header information, looking for header=" + Header( HdLine ), OutputFileStandard );
+		ShowFatalError( "OpenWeatherFile: Unexpected End-of-File on EPW Weather file, while reading header information, looking for header=" + Header( HdLine ), OutputFileStandard );
 
 Label9999: ;
 		ShowFatalError( "OpenWeatherFile: Could not OPEN EPW Weather File", OutputFileStandard );
@@ -4530,7 +4586,7 @@ Label9999: ;
 
 		//  Make sure it's open
 
-		{ IOFlags flags; gio::inquire( "in.epw", flags ); unitnumber = flags.unit(); EPWOpen = flags.open(); }
+		{ IOFlags flags; gio::inquire( DataStringGlobals::inputWeatherFileName, flags ); unitnumber = flags.unit(); EPWOpen = flags.open(); }
 		if ( EPWOpen ) gio::close( unitnumber );
 
 	}
@@ -4564,8 +4620,8 @@ Label9999: ;
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const LocHdFormat( "('! <Site:Location>, Location Name, Latitude {N+/S- Deg}, Longitude {E+/W- Deg}, ',   ' Time Zone Number {GMT+/-}, Elevation {m}, ',   ' Standard Pressure at Elevation {Pa}, Standard RhoAir at Elevation')" );
-		static gio::Fmt const LocFormat( "('Site:Location',7(',',A))" );
+		static gio::Fmt LocHdFormat( "('! <Site:Location>, Location Name, Latitude {N+/S- Deg}, Longitude {E+/W- Deg}, ',   ' Time Zone Number {GMT+/-}, Elevation {m}, ',   ' Standard Pressure at Elevation {Pa}, Standard RhoAir at Elevation')" );
+		static gio::Fmt LocFormat( "('Site:Location',7(',',A))" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -4586,7 +4642,7 @@ Label9999: ;
 					ShowContinueError( "..Location object=" + LocationTitle );
 					ShowContinueError( "..Weather File Location=" + WeatherFileLocationTitle );
 					ShowContinueError( "..due to location differences, Latitude difference=[" + RoundSigDigits( std::abs( Latitude - WeatherFileLatitude ), 2 ) + "] degrees, Longitude difference=[" + RoundSigDigits( std::abs( Longitude - WeatherFileLongitude ), 2 ) + "] degrees." );
-					ShowContinueError( "..Time Zone difference=[" + RoundSigDigits( std::abs( TimeZoneNumber - WeatherFileTimeZone ), 1 ) + "] hour(s), Elevation difference=[" + RoundSigDigits( std::abs( ( Elevation - WeatherFileElevation ) / max( Elevation, 1.0 ) ) * 100.0, 2 ) + "] percent," " [" + RoundSigDigits( std::abs( Elevation - WeatherFileElevation ), 2 ) + "] meters." );
+					ShowContinueError( "..Time Zone difference=[" + RoundSigDigits( std::abs( TimeZoneNumber - WeatherFileTimeZone ), 1 ) + "] hour(s), Elevation difference=[" + RoundSigDigits( std::abs( ( Elevation - WeatherFileElevation ) / max( Elevation, 1.0 ) ) * 100.0, 2 ) + "] percent, [" + RoundSigDigits( std::abs( Elevation - WeatherFileElevation ), 2 ) + "] meters." );
 				}
 			}
 
@@ -4698,10 +4754,10 @@ Label9999: ;
 				DiffCalc = std::abs( TimeZoneNumber - StdTimeMerid );
 				if ( DiffCalc > 1.0 && DiffCalc < 24.0 ) {
 					if ( DiffCalc < 3.0 ) {
-						ShowWarningError( "Standard Time Meridian and Time Zone differ by more than 1, " "Difference=\"" + RoundSigDigits( DiffCalc, 1 ) + "\"" );
+						ShowWarningError( "Standard Time Meridian and Time Zone differ by more than 1, Difference=\"" + RoundSigDigits( DiffCalc, 1 ) + "\"" );
 						ShowContinueError( "Solar Positions may be incorrect" );
 					} else {
-						ShowSevereError( "Standard Time Meridian and Time Zone differ by more than 2, " "Difference=\"" + RoundSigDigits( DiffCalc, 1 ) + "\"" );
+						ShowSevereError( "Standard Time Meridian and Time Zone differ by more than 2, Difference=\"" + RoundSigDigits( DiffCalc, 1 ) + "\"" );
 						ShowContinueError( "Solar Positions will be incorrect" );
 						//          LocationError=.TRUE.
 					}
@@ -4728,7 +4784,7 @@ Label9999: ;
 		CosLatitude = std::cos( DegToRadians * Latitude );
 
 		if ( Latitude == 0.0 && Longitude == 0.0 && TimeZoneNumber == 0.0 ) {
-			ShowWarningError( "Did you realize that you have Latitude=0.0, Longitude=0.0 and TimeZone=0.0?" "  Your building site is in the middle of the Atlantic Ocean." );
+			ShowWarningError( "Did you realize that you have Latitude=0.0, Longitude=0.0 and TimeZone=0.0?  Your building site is in the middle of the Atlantic Ocean." );
 		}
 
 	}
@@ -4829,7 +4885,7 @@ Label9999: ;
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const IntFmt( "(I3)" );
+		static gio::Fmt IntFmt( "(I3)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -4840,11 +4896,11 @@ Label9999: ;
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// Format descriptor for the environment title
-		static gio::Fmt const EnvironmentFormat( "(a,',5,Environment Title[],Latitude[deg]," "Longitude[deg],Time Zone[],Elevation[m]')" );
-		static gio::Fmt const TimeStepFormat( "(a,',6,Day of Simulation[],Month[],Day of Month[]," "DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType')" );
-		static gio::Fmt const DailyFormat( "(a,',3,Cumulative Day of Simulation[],Month[],Day of Month[]," "DST Indicator[1=yes 0=no],DayType  ! When Daily ',A,' Requested')" );
-		static gio::Fmt const MonthlyFormat( "(a,',2,Cumulative Days of Simulation[],Month[]" "  ! When Monthly ',A,' Requested')" );
-		static gio::Fmt const RunPeriodFormat( "(a,',1,Cumulative Days of Simulation[]" " ! When Run Period ',A,' Requested')" );
+		static gio::Fmt EnvironmentFormat( "(a,',5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]')" );
+		static gio::Fmt TimeStepFormat( "(a,',6,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType')" );
+		static gio::Fmt DailyFormat( "(a,',3,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily ',A,' Requested')" );
+		static gio::Fmt MonthlyFormat( "(a,',2,Cumulative Days of Simulation[],Month[]  ! When Monthly ',A,' Requested')" );
+		static gio::Fmt RunPeriodFormat( "(a,',1,Cumulative Days of Simulation[] ! When Run Period ',A,' Requested')" );
 
 		// FLOW:
 
@@ -4915,8 +4971,8 @@ Label9999: ;
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const EndOfHeaderFormat( "('End of Data Dictionary')" ); // End of data dictionary marker
-		static gio::Fmt const EnvironmentStampFormat( "(a,',',a,3(',',f7.2),',',f7.2)" ); // Format descriptor for environ stamp
+		static gio::Fmt EndOfHeaderFormat( "('End of Data Dictionary')" ); // End of data dictionary marker
+		static gio::Fmt EnvironmentStampFormat( "(a,',',a,3(',',f7.2),',',f7.2)" ); // Format descriptor for environ stamp
 		//  CHARACTER(len=*), PARAMETER :: TimeStampFormat = "(i3,',',i4,',',i2,',',i2,',',i2)" ! Format descriptor for the date/time stamp
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -4926,13 +4982,11 @@ Label9999: ;
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string Title;
 
 		// FLOW:
 
 		// Report the time stamp and the current weather to the output file
 
-		Title = Environment( Envrn ).Title;
 		if ( ! WarmupFlag ) { // Write the required output information
 
 			// The first time through in a non-warmup day, the environment header
@@ -4953,6 +5007,7 @@ Label9999: ;
 					PrintEndDataDictionary = false;
 				}
 				if ( DoOutputReporting ) {
+					std::string const & Title( Environment( Envrn ).Title );
 					gio::write( OutputFileStandard, EnvironmentStampFormat ) << EnvironmentReportChr << Title << Latitude << Longitude << TimeZoneNumber << Elevation;
 					gio::write( OutputFileMeters, EnvironmentStampFormat ) << EnvironmentReportChr << Title << Latitude << Longitude << TimeZoneNumber << Elevation;
 					PrintEnvrnStamp = false;
@@ -5161,7 +5216,6 @@ Label9999: ;
 		int LocalLeapYearAdd;
 
 		// Object Data
-		FArray1D< EnvironmentData > TempEnvironment; // Environment data
 
 		// FLOW:
 		RP = GetNumObjectsFound( "RunPeriod" );
@@ -5517,17 +5571,8 @@ Label9999: ;
 		}
 
 		if ( TotRunPers == 0 && FullAnnualRun ) {
-			RunPeriodInput.deallocate();
 			ShowWarningError( "No Run Periods input but Full Annual Simulation selected.  Adding Run Period to 1/1 through 12/31." );
-			++NumOfEnvrn;
-			TempEnvironment.allocate( NumOfEnvrn );
-			if ( NumOfEnvrn > 1 ) {
-				TempEnvironment( {1,NumOfEnvrn - 1} ) = Environment( {1,NumOfEnvrn - 1} );
-			}
-			Environment.deallocate();
-			Environment.allocate( NumOfEnvrn );
-			Environment = TempEnvironment;
-			TempEnvironment.deallocate();
+			Environment.redimension( ++NumOfEnvrn );
 			Environment( NumOfEnvrn ).KindOfEnvrn = ksRunPeriodWeather;
 			TotRunPers = 1;
 			WeathSimReq = true;
@@ -6211,16 +6256,11 @@ Label9999: ;
 		DDSkyTempScheduleValues.allocate( TotDesDays, 24, NumOfTimeStepInHour );
 		DDSkyTempScheduleValues = 0.0;
 
-		SPSiteDryBulbRangeModScheduleValue.allocate( TotDesDays );
-		SPSiteDryBulbRangeModScheduleValue = 0.0;
-		SPSiteHumidityConditionScheduleValue.allocate( TotDesDays );
-		SPSiteHumidityConditionScheduleValue = 0.0;
-		SPSiteBeamSolarScheduleValue.allocate( TotDesDays );
-		SPSiteBeamSolarScheduleValue = 0.0;
-		SPSiteDiffuseSolarScheduleValue.allocate( TotDesDays );
-		SPSiteDiffuseSolarScheduleValue = 0.0;
-		SPSiteSkyTemperatureScheduleValue.allocate( TotDesDays );
-		SPSiteSkyTemperatureScheduleValue = 0.0;
+		SPSiteDryBulbRangeModScheduleValue.dimension( TotDesDays, 0.0 );
+		SPSiteHumidityConditionScheduleValue.dimension( TotDesDays, 0.0 );
+		SPSiteBeamSolarScheduleValue.dimension( TotDesDays, 0.0 );
+		SPSiteDiffuseSolarScheduleValue.dimension( TotDesDays, 0.0 );
+		SPSiteSkyTemperatureScheduleValue.dimension( TotDesDays, 0.0 );
 
 		if ( ReverseDD && TotDesDays <= 1 ) {
 			ShowSevereError( "GetDesignDayData: Reverse Design Day requested but # Design Days <=1" );
@@ -6779,12 +6819,14 @@ Label9999: ;
 			if ( DesDayInput( EnvrnNum ).DayType == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + DesDayInput( EnvrnNum ).Title + "\", invalid data." );
 				ShowContinueError( "..invalid field: " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
-				ShowContinueError( "Valid values are Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday," "Holiday,SummerDesignDay,WinterDesignDay,CustomDay1,CustomDay2." );
+				ShowContinueError( "Valid values are Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Holiday,SummerDesignDay,WinterDesignDay,CustomDay1,CustomDay2." );
 				ErrorsFound = true;
 			}
 
 			Environment( EnvrnNum ).Title = DesDayInput( EnvrnNum ).Title;
 			Environment( EnvrnNum ).KindOfEnvrn = ksDesignDay;
+			Environment( EnvrnNum ).DesignDayNum = EnvrnNum;
+			Environment( EnvrnNum ).RunPeriodDesignNum = 0;
 			Environment( EnvrnNum ).TotalDays = 1;
 			Environment( EnvrnNum ).StartMonth = DesDayInput( EnvrnNum ).Month;
 			Environment( EnvrnNum ).StartDay = DesDayInput( EnvrnNum ).DayOfMonth;
@@ -7032,7 +7074,7 @@ Label9999: ;
 				units = "[deltaC]";
 			} else {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + '.' );
-				ShowContinueError( "...entered value=\"" + cAlphaArgs( 2 ) + "\", should be one of: " "ScheduleValue, DifferenceScheduleDryBulbValue, DifferenceScheduleDewPointValue." );
+				ShowContinueError( "...entered value=\"" + cAlphaArgs( 2 ) + "\", should be one of: ScheduleValue, DifferenceScheduleDryBulbValue, DifferenceScheduleDewPointValue." );
 				ErrorsFound = true;
 			}
 
@@ -7044,7 +7086,7 @@ Label9999: ;
 				if ( Found == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + '.' );
 					ShowContinueError( "...Entered name=\"" + cAlphaArgs( 3 ) + "\"." );
-					ShowContinueError( "...Should be a full year schedule (\"Schedule:Year\", \"Schedule:Compact\"," " \"Schedule:File\", or \"Schedule:Constant\" objects." );
+					ShowContinueError( "...Should be a full year schedule (\"Schedule:Year\", \"Schedule:Compact\", \"Schedule:File\", or \"Schedule:Constant\" objects." );
 					ErrorsFound = true;
 				} else {
 					WPSkyTemperature( Item ).IsSchedule = true;
@@ -7055,7 +7097,7 @@ Label9999: ;
 				if ( Found == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + '.' );
 					ShowContinueError( "...Entered name=\"" + cAlphaArgs( 3 ) + "\"." );
-					ShowContinueError( "...Should be a single day schedule (\"Schedule:Day:Hourly\"," " \"Schedule:Day:Interval\", or \"Schedule:Day:List\" objects." );
+					ShowContinueError( "...Should be a single day schedule (\"Schedule:Day:Hourly\", \"Schedule:Day:Interval\", or \"Schedule:Day:List\" objects." );
 					ErrorsFound = true;
 				} else {
 					if ( envFound != 0 ) {
@@ -7128,7 +7170,7 @@ Label9999: ;
 		static bool GenErrorMessage( false );
 
 		// Formats
-		static gio::Fmt const Format_720( "(' ',A,12(', ',F6.2))" );
+		static gio::Fmt Format_720( "(' ',A,12(', ',F6.2))" );
 
 		// FLOW:
 		cCurrentModuleObject = "Site:GroundTemperature:BuildingSurface";
@@ -7318,7 +7360,7 @@ Label9999: ;
 		FArray1D< Real64 > GndProps; // Temporary array to transfer ground reflectances
 
 		// Formats
-		static gio::Fmt const Format_720( "(' Site:GroundReflectance',12(', ',F5.2))" );
+		static gio::Fmt Format_720( "(' Site:GroundReflectance',12(', ',F5.2))" );
 
 		// FLOW:
 		cCurrentModuleObject = "Site:GroundReflectance";
@@ -7400,8 +7442,8 @@ Label9999: ;
 		FArray1D< Real64 > GndProps; // Temporary array to transfer ground reflectances
 
 		// Formats
-		static gio::Fmt const Format_720( "(' Site:GroundReflectance:SnowModifier',2(', ',F7.3))" );
-		static gio::Fmt const Format_721( "(A,12(', ',F5.2))" );
+		static gio::Fmt Format_720( "(' Site:GroundReflectance:SnowModifier',2(', ',F7.3))" );
+		static gio::Fmt Format_721( "(A,12(', ',F5.2))" );
 
 		// FLOW:
 		cCurrentModuleObject = "Site:GroundReflectance:SnowModifier";
@@ -7616,7 +7658,7 @@ Label9999: ;
 		Real64 WeatherFileTempSensorHeight; // Height of the air temperature sensor at the weather station (m)
 
 		// Formats
-		static gio::Fmt const Format_720( "('Environment:Weather Station',6(',',A))" );
+		static gio::Fmt Format_720( "('Environment:Weather Station',6(',',A))" );
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// na
@@ -7648,7 +7690,7 @@ Label9999: ;
 		WeatherFileTempModCoeff = AtmosphericTempGradient * EarthRadius * WeatherFileTempSensorHeight / ( EarthRadius + WeatherFileTempSensorHeight );
 
 		// Write to the initialization output file
-		gio::write( OutputFileInits, fmtA ) << "! <Environment:Weather Station>,Wind Sensor Height Above Ground {m}," "Wind Speed Profile Exponent {},Wind Speed Profile Boundary Layer Thickness {m}," "Air Temperature Sensor Height Above Ground {m},Wind Speed Modifier Coefficient [Internal]," "Temperature Modifier Coefficient [Internal]";
+		gio::write( OutputFileInits, fmtA ) << "! <Environment:Weather Station>,Wind Sensor Height Above Ground {m},Wind Speed Profile Exponent {},Wind Speed Profile Boundary Layer Thickness {m},Air Temperature Sensor Height Above Ground {m},Wind Speed Modifier Coefficient [Internal],Temperature Modifier Coefficient [Internal]";
 
 		gio::write( OutputFileInits, Format_720 ) << RoundSigDigits( WeatherFileWindSensorHeight, 3 ) << RoundSigDigits( WeatherFileWindExp, 3 ) << RoundSigDigits( WeatherFileWindBLHeight, 3 ) << RoundSigDigits( WeatherFileTempSensorHeight, 3 ) << RoundSigDigits( WeatherFileWindModCoeff, 3 ) << RoundSigDigits( WeatherFileTempModCoeff, 3 );
 
@@ -7944,7 +7986,7 @@ Label9999: ;
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -8755,11 +8797,11 @@ Label9998: ;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const MissString( "Missing Data Found on Weather Data File" );
-		static gio::Fmt const msFmt( "('Missing ',A,', Number of items=',I5)" );
+		static gio::Fmt msFmt( "('Missing ',A,', Number of items=',I5)" );
 		static std::string const InvString( "Invalid Data Found on Weather Data File" );
-		static gio::Fmt const ivFmt( "('Invalid ',A,', Number of items=',I5)" );
+		static gio::Fmt ivFmt( "('Invalid ',A,', Number of items=',I5)" );
 		static std::string const RangeString( "Out of Range Data Found on Weather Data File" );
-		static gio::Fmt const rgFmt( "('Out of Range ',A,' [',A,',',A,'], Number of items=',I5)" );
+		static gio::Fmt rgFmt( "('Out of Range ',A,' [',A,',',A,'], Number of items=',I5)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -9167,6 +9209,8 @@ Label9998: ;
 			Environment( Envrn ).Title = RunPeriodDesignInput( Loop ).Title;
 			Environment( Envrn ).cKindOfEnvrn = RunPeriodDesignInput( Loop ).PeriodType;
 			Environment( Envrn ).KindOfEnvrn = ksRunPeriodDesign;
+			Environment( Envrn ).DesignDayNum = 0;
+			Environment( Envrn ).RunPeriodDesignNum = Loop;
 			Environment( Envrn ).DayOfWeek = RunPeriodDesignInput( Loop ).DayOfWeek;
 			Environment( Envrn ).MonWeekDay = RunPeriodDesignInput( Loop ).MonWeekDay;
 			Environment( Envrn ).SetWeekDays = false;
@@ -9473,7 +9517,7 @@ Label9998: ;
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -3,8 +3,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -70,6 +68,7 @@ namespace PlantHeatExchangerFluidToFluid {
 		Real64 MassFlowRateMin; // minimum (hardware) flow rate for component [kg/s]
 		Real64 MassFlowRateMax; // maximum (hardware) flow rate for component [kg/s]
 		Real64 DesignVolumeFlowRate; // design flow rate [m3/s]
+		bool DesignVolumeFlowRateWasAutoSized; // true if design flow rate was autosize on input
 		Real64 MyLoad; // current load request of supply equip for op scheme control[W]
 		Real64 MinLoad; // reports back size for load dispatch routines [W]
 		Real64 MaxLoad; // reports back size for load dispatch [W]
@@ -89,6 +88,7 @@ namespace PlantHeatExchangerFluidToFluid {
 			MassFlowRateMin( 0.0 ),
 			MassFlowRateMax( 0.0 ),
 			DesignVolumeFlowRate( 0.0 ),
+			DesignVolumeFlowRateWasAutoSized( false ),
 			MyLoad( 0.0 ),
 			MinLoad( 0.0 ),
 			MaxLoad( 0.0 ),
@@ -96,43 +96,6 @@ namespace PlantHeatExchangerFluidToFluid {
 			InletTemp( 0.0 ),
 			InletMassFlowRate( 0.0 ),
 			OutletTemp( 0.0 )
-		{}
-
-		// Member Constructor
-		PlantConnectionStruct(
-			int const LoopNum, // plant loop connection index
-			int const LoopSideNum, // plant loop side connection index
-			int const BranchNum, // plant loop branch connection index
-			int const CompNum, // plant loop component connection index
-			int const InletNodeNum, // plant loop inlet node index
-			int const OutletNodeNum, // plant loop outlet node index
-			Real64 const MassFlowRateMin, // minimum (hardware) flow rate for component [kg/s]
-			Real64 const MassFlowRateMax, // maximum (hardware) flow rate for component [kg/s]
-			Real64 const DesignVolumeFlowRate, // design flow rate [m3/s]
-			Real64 const MyLoad, // current load request of supply equip for op scheme control[W]
-			Real64 const MinLoad, // reports back size for load dispatch routines [W]
-			Real64 const MaxLoad, // reports back size for load dispatch [W]
-			Real64 const OptLoad, // reports back size for load dispatch [W]
-			Real64 const InletTemp, // current inlet fluid temperature [C]
-			Real64 const InletMassFlowRate, // current inlet mass flow rate [kg/s]
-			Real64 const OutletTemp // componenent outlet temperature [C]
-		) :
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			InletNodeNum( InletNodeNum ),
-			OutletNodeNum( OutletNodeNum ),
-			MassFlowRateMin( MassFlowRateMin ),
-			MassFlowRateMax( MassFlowRateMax ),
-			DesignVolumeFlowRate( DesignVolumeFlowRate ),
-			MyLoad( MyLoad ),
-			MinLoad( MinLoad ),
-			MaxLoad( MaxLoad ),
-			OptLoad( OptLoad ),
-			InletTemp( InletTemp ),
-			InletMassFlowRate( InletMassFlowRate ),
-			OutletTemp( OutletTemp )
 		{}
 
 	};
@@ -155,21 +118,6 @@ namespace PlantHeatExchangerFluidToFluid {
 			InletNodeNum( 0 )
 		{}
 
-		// Member Constructor
-		PlantLocatorStruct(
-			int const LoopNum, // plant loop connection index
-			int const LoopSideNum, // plant loop side connection index
-			int const BranchNum, // plant loop branch connection index
-			int const CompNum, // plant loop component connection index
-			int const InletNodeNum // plant loop inlet node index
-		) :
-			LoopNum( LoopNum ),
-			LoopSideNum( LoopSideNum ),
-			BranchNum( BranchNum ),
-			CompNum( CompNum ),
-			InletNodeNum( InletNodeNum )
-		{}
-
 	};
 
 	struct HeatExchangerStruct
@@ -179,6 +127,7 @@ namespace PlantHeatExchangerFluidToFluid {
 		int AvailSchedNum;
 		int HeatExchangeModelType;
 		Real64 UA;
+		bool UAWasAutoSized; // true is UA was autosized on input
 		int ControlMode;
 		int SetPointNodeNum;
 		Real64 TempControlTol;
@@ -208,6 +157,7 @@ namespace PlantHeatExchangerFluidToFluid {
 			AvailSchedNum( 0 ),
 			HeatExchangeModelType( 0 ),
 			UA( 0.0 ),
+			UAWasAutoSized( false ),
 			ControlMode( 0 ),
 			SetPointNodeNum( 0 ),
 			TempControlTol( 0.0 ),
@@ -224,65 +174,6 @@ namespace PlantHeatExchangerFluidToFluid {
 			DmdSideModulatSolvNoConvergeErrorIndex( 0 ),
 			DmdSideModulatSolvFailErrorCount( 0 ),
 			DmdSideModulatSolvFailErrorIndex( 0 )
-		{}
-
-		// Member Constructor
-		HeatExchangerStruct(
-			std::string const & Name,
-			int const AvailSchedNum,
-			int const HeatExchangeModelType,
-			Real64 const UA,
-			int const ControlMode,
-			int const SetPointNodeNum,
-			Real64 const TempControlTol,
-			int const ControlSignalTemp,
-			Real64 const MinOperationTemp,
-			Real64 const MaxOperationTemp,
-			PlantConnectionStruct const & DemandSideLoop, // plant connections and data for the side of HX connected to demand side
-			PlantConnectionStruct const & SupplySideLoop,
-			std::string const & HeatTransferMeteringEndUse,
-			std::string const & ComponentUserName, // user name for control-associated  component
-			std::string const & ComponentClassName, // object class name for control-associated component
-			int const ComponentTypeOfNum,
-			PlantLocatorStruct const & OtherCompSupplySideLoop,
-			PlantLocatorStruct const & OtherCompDemandSideLoop,
-			Real64 const SizingFactor,
-			Real64 const HeatTransferRate,
-			Real64 const HeatTransferEnergy,
-			Real64 const Effectiveness,
-			Real64 const OperationStatus,
-			int const DmdSideModulatSolvNoConvergeErrorCount,
-			int const DmdSideModulatSolvNoConvergeErrorIndex,
-			int const DmdSideModulatSolvFailErrorCount,
-			int const DmdSideModulatSolvFailErrorIndex
-		) :
-			Name( Name ),
-			AvailSchedNum( AvailSchedNum ),
-			HeatExchangeModelType( HeatExchangeModelType ),
-			UA( UA ),
-			ControlMode( ControlMode ),
-			SetPointNodeNum( SetPointNodeNum ),
-			TempControlTol( TempControlTol ),
-			ControlSignalTemp( ControlSignalTemp ),
-			MinOperationTemp( MinOperationTemp ),
-			MaxOperationTemp( MaxOperationTemp ),
-			DemandSideLoop( DemandSideLoop ),
-			SupplySideLoop( SupplySideLoop ),
-			HeatTransferMeteringEndUse( HeatTransferMeteringEndUse ),
-			ComponentUserName( ComponentUserName ),
-			ComponentClassName( ComponentClassName ),
-			ComponentTypeOfNum( ComponentTypeOfNum ),
-			OtherCompSupplySideLoop( OtherCompSupplySideLoop ),
-			OtherCompDemandSideLoop( OtherCompDemandSideLoop ),
-			SizingFactor( SizingFactor ),
-			HeatTransferRate( HeatTransferRate ),
-			HeatTransferEnergy( HeatTransferEnergy ),
-			Effectiveness( Effectiveness ),
-			OperationStatus( OperationStatus ),
-			DmdSideModulatSolvNoConvergeErrorCount( DmdSideModulatSolvNoConvergeErrorCount ),
-			DmdSideModulatSolvNoConvergeErrorIndex( DmdSideModulatSolvNoConvergeErrorIndex ),
-			DmdSideModulatSolvFailErrorCount( DmdSideModulatSolvFailErrorCount ),
-			DmdSideModulatSolvFailErrorIndex( DmdSideModulatSolvFailErrorIndex )
 		{}
 
 	};
@@ -342,7 +233,7 @@ namespace PlantHeatExchangerFluidToFluid {
 	Real64
 	HXDemandSideLoopFlowResidual(
 		Real64 const DmdSideMassFlowRate,
-		Optional< FArray1S< Real64 > const > Par = _ // Par(1) = HX index number
+		FArray1< Real64 > const & Par // Par(1) = HX index number
 	);
 
 	void
@@ -360,7 +251,7 @@ namespace PlantHeatExchangerFluidToFluid {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

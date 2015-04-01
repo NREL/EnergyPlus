@@ -34,6 +34,7 @@ namespace DataSystemVariables {
 	extern std::string const cDisplayZoneAirHeatBalanceOffBalance;
 	extern std::string const cSortIDD;
 	extern std::string const cReportDuringWarmup;
+	extern std::string const cReportDuringHVACSizingSimulation;
 	extern std::string const cIgnoreSolarRadiation;
 	extern std::string const cIgnoreBeamRadiation;
 	extern std::string const cIgnoreDiffuseRadiation;
@@ -55,6 +56,7 @@ namespace DataSystemVariables {
 	//  each individual HVAC controller with all controller iterations
 
 	extern std::string const MinReportFrequencyEnvVar; // environment var for reporting frequency.
+	extern std::string const cDisplayInputInAuditEnvVar; // environmental variable that enables the echoing of the input file into the audit file
 
 	// DERIVED TYPE DEFINITIONS
 	// na
@@ -78,6 +80,7 @@ namespace DataSystemVariables {
 	extern bool TraceHVACControllerEnvFlag; // If TRUE generates a trace file for each individual HVAC
 	// controller with all controller iterations
 	extern bool ReportDuringWarmup; // True when the report outputs even during warmup
+	extern bool ReportDuringHVACSizingSimulation; // true when reporting outputs during HVAC sizing Simulation
 	extern bool ReportDetailedWarmupConvergence; // True when the detailed warmup convergence is requested
 	extern bool UpdateDataDuringWarmupExternalInterface; // variable sets in the external interface.
 	// This update the value during the warmup added for FMI
@@ -124,7 +127,7 @@ namespace DataSystemVariables {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

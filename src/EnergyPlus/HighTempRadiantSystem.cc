@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -537,7 +538,7 @@ namespace HighTempRadiantSystem {
 					ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ErrorsFound = true;
 				} else if ( Surface( HighTempRadSys( Item ).SurfacePtr( SurfNum ) ).Zone != HighTempRadSys( Item ).ZonePtr ) {
-					ShowWarningError( "Surface referenced in ZoneHVAC:HighTemperatureRadiant not in same zone as Radiant System," "surface=" + HighTempRadSys( Item ).SurfaceName( SurfNum ) );
+					ShowWarningError( "Surface referenced in ZoneHVAC:HighTemperatureRadiant not in same zone as Radiant System, surface=" + HighTempRadSys( Item ).SurfaceName( SurfNum ) );
 					ShowContinueError( "Surface is in Zone=" + Zone( Surface( HighTempRadSys( Item ).SurfacePtr( SurfNum ) ).Zone ).Name + " ZoneHVAC:HighTemperatureRadiant in Zone=" + cAlphaArgs( 3 ) );
 					ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				}
@@ -646,20 +647,13 @@ namespace HighTempRadiantSystem {
 
 		// FLOW:
 		if ( firstTime ) {
-			ZeroSourceSumHATsurf.allocate( NumOfZones );
-			ZeroSourceSumHATsurf = 0.0;
-			QHTRadSource.allocate( NumOfHighTempRadSys );
-			QHTRadSource = 0.0;
-			QHTRadSrcAvg.allocate( NumOfHighTempRadSys );
-			QHTRadSrcAvg = 0.0;
-			LastQHTRadSrc.allocate( NumOfHighTempRadSys );
-			LastQHTRadSrc = 0.0;
-			LastSysTimeElapsed.allocate( NumOfHighTempRadSys );
-			LastSysTimeElapsed = 0.0;
-			LastTimeStepSys.allocate( NumOfHighTempRadSys );
-			LastTimeStepSys = 0.0;
-			MySizeFlag.allocate( NumOfHighTempRadSys );
-			MySizeFlag = true;
+			ZeroSourceSumHATsurf.dimension( NumOfZones, 0.0 );
+			QHTRadSource.dimension( NumOfHighTempRadSys, 0.0 );
+			QHTRadSrcAvg.dimension( NumOfHighTempRadSys, 0.0 );
+			LastQHTRadSrc.dimension( NumOfHighTempRadSys, 0.0 );
+			LastSysTimeElapsed.dimension( NumOfHighTempRadSys, 0.0 );
+			LastTimeStepSys.dimension( NumOfHighTempRadSys, 0.0 );
+			MySizeFlag.dimension( NumOfHighTempRadSys, true );
 			firstTime = false;
 		}
 
@@ -778,7 +772,7 @@ namespace HighTempRadiantSystem {
 
 				if ( CapSizingMethod == HeatingDesignCapacity ) {
 					if ( HighTempRadSys( RadSysNum ).ScaledHeatingCapacity == AutoSize ) {
-						CheckZoneSizing( CompType, CompName );						
+						CheckZoneSizing( CompType, CompName );
 						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor / (HighTempRadSys( RadSysNum ).FracRadiant + HighTempRadSys( RadSysNum ).FracConvect );
 					} else {
 						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = HighTempRadSys( RadSysNum ).ScaledHeatingCapacity;
@@ -803,7 +797,7 @@ namespace HighTempRadiantSystem {
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 				HighTempRadSys( RadSysNum ).MaxPowerCapac = TempSize;
 			}
-		
+
 		}
 
 	}
@@ -969,7 +963,7 @@ namespace HighTempRadiantSystem {
 		int IterNum; // iteration number
 		Real64 SetPtTemp; // Setpoint temperature [C]
 		int ZoneNum; // number of zone being served
-		Real64 ZoneTemp; // zone temperature (MAT, MRT, or Operative Temperature, depending on control type) [C]
+		Real64 ZoneTemp( 0.0 ); // zone temperature (MAT, MRT, or Operative Temperature, depending on control type) [C]
 
 		// FLOW:
 		// initialize local variables
@@ -1001,6 +995,8 @@ namespace HighTempRadiantSystem {
 				ZoneTemp = MRT( ZoneNum );
 			} else if ( SELECT_CASE_var == OperativeSPControl ) {
 				ZoneTemp = 0.5 * ( MAT( ZoneNum ) + MRT( ZoneNum ) );
+			} else {
+				assert( false );
 			}}
 
 			if ( ZoneTemp < ( SetPtTemp - TempConvToler ) ) {
@@ -1489,7 +1485,7 @@ namespace HighTempRadiantSystem {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

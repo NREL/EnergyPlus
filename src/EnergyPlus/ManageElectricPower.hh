@@ -1029,6 +1029,21 @@ namespace ManageElectricPower {
 
 	//*****************************************************************************************************************
 
+	bool
+		determineCurrentForBatteryDischarge(
+		Real64& curI0,
+		Real64& curT0,
+		Real64& curVolt,
+		Real64 const Pw,
+		Real64 const q0,
+		int const CurveNum,
+		Real64 const k,
+		Real64 const c,
+		Real64 const qmax,
+		Real64 const E0c,
+		Real64 const InternalR
+	);
+
 	void
 	FigureElectricalStorageZoneGains();
 
@@ -1071,7 +1086,7 @@ namespace ManageElectricPower {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

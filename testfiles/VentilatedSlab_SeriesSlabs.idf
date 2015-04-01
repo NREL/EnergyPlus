@@ -92,7 +92,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.2;
+  Version,8.3;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -2843,4 +2843,7 @@
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
+
+  Output:SQLite,
+    Simple;
 

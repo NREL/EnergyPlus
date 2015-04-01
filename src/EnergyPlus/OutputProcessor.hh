@@ -1,6 +1,9 @@
 #ifndef OutputProcessor_hh_INCLUDED
 #define OutputProcessor_hh_INCLUDED
 
+// C++ Headers
+#include <iosfwd>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
@@ -78,7 +81,6 @@ namespace OutputProcessor {
 	extern int InstMeterCacheSize; // the maximum size of the instant meter cache used in GetInstantMeterValue
 	extern int InstMeterCacheSizeInc; // the increment for the instant meter cache used in GetInstantMeterValue
 	extern FArray1D_int InstMeterCache; // contains a list of RVariableTypes that make up a specific meter
-	extern FArray1D_int InstMeterCacheCopy; // for dynamic array resizing
 	extern int InstMeterCacheLastUsed; // the last item in the instant meter cache used
 
 	// INTERFACE BLOCK SPECIFICATIONS:
@@ -102,8 +104,6 @@ namespace OutputProcessor {
 	extern int MaxIVariable;
 	extern bool OutputInitialized;
 	extern int ProduceReportVDD;
-	extern int OutputFileRVDD; // Unit number for Report Variables Data Dictionary (output)
-	extern int OutputFileMVDD; // Unit number for Meter Variables Data Dictionary (output)
 	extern int OutputFileMeterDetails; // Unit number for Meter Details file (output)
 	extern int NumHoursInDay;
 	extern int NumHoursInMonth;
@@ -132,7 +132,7 @@ namespace OutputProcessor {
 	extern int RunPeriodStampReportNbr; // RunPeriod Report number
 	extern std::string RunPeriodStampReportChr; // RunPeriod Report number (character -- for printing)
 	extern bool TrackingRunPeriodVariables; // Requested RunPeriod Report Variables
-	extern Real64 SecondsPerTimeStep; // Seconds from NumTimeStepInHour
+	extern Real64 TimeStepZoneSec; // Seconds from NumTimeStepInHour
 	extern bool ErrorsLogged;
 	extern bool ProduceVariableDictionary;
 
@@ -956,18 +956,30 @@ namespace OutputProcessor {
 		int const ReportFreq // Reporting Frequency
 	);
 
+	inline
 	void
 	ReallocateIntegerArray(
 		FArray1D_int & Array,
 		int & ArrayMax, // Current and resultant dimension for Array
 		int const ArrayInc // increment for redimension
-	);
+	)
+	{
+		Array.redimension( ArrayMax += ArrayInc, 0 );
+	}
 
+	inline
 	void
-	ReallocateRVar();
+	ReallocateRVar()
+	{
+		RVariableTypes.redimension( MaxRVariable += RVarAllocInc );
+	}
 
+	inline
 	void
-	ReallocateIVar();
+	ReallocateIVar()
+	{
+		IVariableTypes.redimension( MaxIVariable += IVarAllocInc );
+	}
 
 	int
 	ValidateIndexType(
@@ -1118,12 +1130,13 @@ namespace OutputProcessor {
 
 	void
 	WriteTimeStampFormatData(
-		int const unitNumber, // the Fortran output unit number
+		std::ostream * out_stream_p, // Output stream pointer
 		int const reportingInterval, // See Module Parameter Definitons for ReportEach, ReportTimeStep, ReportHourly, etc.
 		int const reportID, // The ID of the time stamp
 		std::string const & reportIDString, // The ID of the time stamp
 		int const DayOfSim, // the number of days simulated so far
 		std::string const & DayOfSimChr, // the number of days simulated so far
+		bool writeToSQL, // write to SQLite
 		Optional_int_const Month = _, // the month of the reporting interval
 		Optional_int_const DayOfMonth = _, // The day of the reporting interval
 		Optional_int_const Hour = _, // The hour of the reporting interval
@@ -1220,12 +1233,12 @@ namespace OutputProcessor {
 		std::string const & reportIDString, // The variable's reporting ID (character)
 		Real64 const repValue, // The variable's value
 		int const storeType, // Type of item (averaged or summed)
-		Optional< Real64 const > numOfItemsStored = _, // The number of items (hours or timesteps) of data stored //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_int_const reportingInterval = _, // The reporting interval (e.g., monthly) //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_int_const minValue = _, // The variable's minimum value during the reporting interval //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_int_const minValueDate = _, // The date the minimum value occurred //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_int_const MaxValue = _, // The variable's maximum value during the reporting interval //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_int_const maxValueDate = _ // The date the maximum value occurred //Autodesk:OPTIONAL Used without PRESENT check
+		Real64 const numOfItemsStored, // The number of items (hours or timesteps) of data stored
+		int const reportingInterval, // The reporting interval (e.g., monthly)
+		int const minValue, // The variable's minimum value during the reporting interval
+		int const minValueDate, // The date the minimum value occurred
+		int const MaxValue, // The variable's maximum value during the reporting interval
+		int const maxValueDate // The date the maximum value occurred
 	);
 
 	void
@@ -1416,13 +1429,13 @@ AddToOutputVariableList(
 );
 
 //     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted
 //     by other individuals, companies and institutions.  These portions have been
 //     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in EnergyPlus.f90.
+//     list of contributors, see "Notice" located in main.cc.
 //     NOTICE: The U.S. Government is granted for itself and others acting on its
 //     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 //     reproduce, prepare derivative works, and perform publicly and display publicly.

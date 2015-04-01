@@ -97,7 +97,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.2;
+  Version,8.3;
 
   Timestep,6;
 
@@ -1329,21 +1329,21 @@
     FunctionalMockupUnitImport;  !- Name of External Interface
 
   ExternalInterface:FunctionalMockupUnitImport,
-    DataSets\FMUs\ShadingController.fmu,  !- FMU File Name
+    ..\datasets\FMUs\ShadingController.fmu,  !- FMU File Name
     15,                      !- FMU Timeout {ms}
     0;                       !- FMU LoggingOn
 
   ExternalInterface:FunctionalMockupUnitImport:From:Variable,
     Zn001:Wall001:Win001,    !- Output:Variable Index Key Name
     Surface Outside Face Incident Solar Radiation Rate per Area,  !- Output:Variable Name
-    DataSets\FMUs\ShadingController.fmu,  !- FMU File Name
+    ..\datasets\FMUs\ShadingController.fmu,  !- FMU File Name
     Model1,                  !- FMU Instance Name
     ISolExt;                 !- FMU Variable Name
 
   ExternalInterface:FunctionalMockupUnitImport:From:Variable,
     WEST ZONE,               !- Output:Variable Index Key Name
     Zone Mean Air Temperature,  !- Output:Variable Name
-    DataSets\FMUs\ShadingController.fmu,  !- FMU File Name
+    ..\datasets\FMUs\ShadingController.fmu,  !- FMU File Name
     Model1,                  !- FMU Instance Name
     TRoo;                    !- FMU Variable Name
 
@@ -1352,7 +1352,7 @@
     Zn001:Wall001:Win001,    !- Actuated Component Unique Name
     Window Shading Control,  !- Actuated Component Type
     Control Status,          !- Actuated Component Control Type
-    DataSets\FMUs\ShadingController.fmu,  !- FMU File Name
+    ..\datasets\FMUs\ShadingController.fmu,  !- FMU File Name
     Model1,                  !- FMU Instance Name
     yShade,                  !- FMU Variable Name
     6;                       !- Initial Value

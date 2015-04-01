@@ -447,7 +447,7 @@ namespace DataZoneEquipment {
 		// =2 if central sysis in constant fan mode.
 		bool ZonalSystemOnly; // TRUE if served by a zonal system (only)
 		bool IsControlled; // True when this is a controlled zone.
-		Real64 ZoneExh; // zone exhaust (unbalanced) mass flow rate [kg/s]
+		Real64 ZoneExh; // zone exhaust (unbalanced+balanced) mass flow rate [kg/s]
 		Real64 ZoneExhBalanced; // balanced zone exhaust mass flow rate [kg/s]
 		Real64 PlenumMassFlow; // zone air mass flow rate induced from plenum [kg/s]
 		// AirDistUnitCool and AirDistUnitHeat
@@ -509,7 +509,7 @@ namespace DataZoneEquipment {
 			int const FanOpMode, // =0 if no central sys;
 			bool const ZonalSystemOnly, // TRUE if served by a zonal system (only)
 			bool const IsControlled, // True when this is a controlled zone.
-			Real64 const ZoneExh, // zone exhaust (unbalanced) mass flow rate [kg/s]
+			Real64 const ZoneExh, // zone exhaust (unbalanced+balanced) mass flow rate [kg/s]
 			Real64 const ZoneExhBalanced, // balanced zone exhaust mass flow rate [kg/s]
 			Real64 const PlenumMassFlow, // zone air mass flow rate induced from plenum [kg/s]
 			FArray1< AirIn > const & AirDistUnitHeat, // dimensioned to number of zone inlet nodes
@@ -897,7 +897,7 @@ namespace DataZoneEquipment {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

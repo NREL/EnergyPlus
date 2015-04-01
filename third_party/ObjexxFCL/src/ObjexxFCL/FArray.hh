@@ -28,6 +28,8 @@
 #include <ObjexxFCL/proxy_const_assert.hh>
 #include <ObjexxFCL/Sticky.hh>
 #include <ObjexxFCL/TypeTraits.hh>
+#include <ObjexxFCL/Vector2.hh>
+#include <ObjexxFCL/Vector3.hh>
 
 // C++ Headers
 #include <algorithm>
@@ -45,6 +47,10 @@
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 #include <iostream>
 #endif // OBJEXXFCL_FARRAY_SIZE_REPORT
+
+#ifndef OBJEXXFCL_ARRAY_ALIGN
+#define OBJEXXFCL_ARRAY_ALIGN 128u
+#endif
 
 namespace ObjexxFCL {
 
@@ -103,15 +109,15 @@ protected: // Creation
 	// Default Constructor
 	inline
 	FArray() :
-		data_size_( 0 ),
-		data_( nullptr ),
-		size_( 0 ),
-		owner_( true ),
+	 data_size_( 0 ),
+	 data_( nullptr ),
+	 size_( 0 ),
+	 owner_( true ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		const_proxy_( false ),
+	 const_proxy_( false ),
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
-		shift_( 0 ),
-		sdata_( nullptr )
+	 shift_( 0 ),
+	 sdata_( nullptr )
 	{
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 		size_report();
@@ -121,19 +127,23 @@ protected: // Creation
 	// Copy Constructor
 	inline
 	FArray( FArray const & a ) :
-		BArray( a ),
-		data_size_( size_of( a.size_ ) ),
-		data_( a.data_ ? new T[ data_size_ ] : nullptr ),
-		size_( data_size_ ),
-		owner_( true ),
+	 BArray( a ),
+	 data_size_( size_of( a.size_ ) ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+	 data_( a.data_ ? new T[ data_size_ ] : nullptr ),
+#else
+	 data_( a.data_ ? new_array< T >() : nullptr ),
+#endif
+	 size_( data_size_ ),
+	 owner_( true ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		const_proxy_( false ),
+	 const_proxy_( false ),
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
-		shift_( a.shift_ ),
-		sdata_( data_ - shift_ )
+	 shift_( a.shift_ ),
+	 sdata_( data_ - shift_ )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
-			reassign( i, a[ i ] );
+			initialize( i, a[ i ] );
 		}
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 		size_report();
@@ -141,22 +151,26 @@ protected: // Creation
 	}
 
 	// Copy Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	explicit
 	FArray( FArray< U > const & a ) :
-		data_size_( size_of( a.size() ) ),
-		data_( a.data_ ? new T[ data_size_ ] : nullptr ),
-		size_( data_size_ ),
-		owner_( true ),
+	 data_size_( size_of( a.size() ) ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+	 data_( a.data_ ? new T[ data_size_ ] : nullptr ),
+#else
+	 data_( a.data_ ? new_array< T >() : nullptr ),
+#endif
+	 size_( data_size_ ),
+	 owner_( true ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		const_proxy_( false ),
+	 const_proxy_( false ),
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
-		shift_( a.shift_ ),
-		sdata_( data_ - shift_ )
+	 shift_( a.shift_ ),
+	 sdata_( data_ - shift_ )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
-			reassign( i, a[ i ] );
+			initialize( i, a[ i ] );
 		}
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 		size_report();
@@ -164,19 +178,23 @@ protected: // Creation
 	}
 
 	// Slice Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	explicit
 	FArray( FArrayS< U > const & a ) :
-		data_size_( size_of( a.size() ) ),
-		data_( new T[ data_size_ ] ),
-		size_( data_size_ ),
-		owner_( true ),
+	 data_size_( size_of( a.size() ) ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+	 data_( new T[ data_size_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
+	 size_( data_size_ ),
+	 owner_( true ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		const_proxy_( false ),
+	 const_proxy_( false ),
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
-		shift_( 0 ),
-		sdata_( nullptr )
+	 shift_( 0 ),
+	 sdata_( nullptr )
 	{
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 		size_report();
@@ -188,15 +206,19 @@ protected: // Creation
 	inline
 	explicit
 	FArray( MArray< A, M > const & a ) :
-		data_size_( size_of( a.size() ) ),
-		data_( new T[ data_size_ ] ),
-		size_( data_size_ ),
-		owner_( true ),
+	 data_size_( size_of( a.size() ) ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+	 data_( new T[ data_size_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
+	 size_( data_size_ ),
+	 owner_( true ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		const_proxy_( false ),
+	 const_proxy_( false ),
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
-		shift_( 0 ),
-		sdata_( nullptr )
+	 shift_( 0 ),
+	 sdata_( nullptr )
 	{
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 		size_report();
@@ -207,15 +229,19 @@ protected: // Creation
 	inline
 	explicit
 	FArray( size_type const size ) :
-		data_size_( size_of( size ) ),
-		data_( new T[ data_size_ ] ),
-		size_( data_size_ ),
-		owner_( true ),
+	 data_size_( size_of( size ) ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+	 data_( new T[ data_size_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
+	 size_( data_size_ ),
+	 owner_( true ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		const_proxy_( false ),
+	 const_proxy_( false ),
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
-		shift_( 0 ),
-		sdata_( nullptr )
+	 shift_( 0 ),
+	 sdata_( nullptr )
 	{
 #if defined(OBJEXXFCL_FARRAY_INIT) || defined(OBJEXXFCL_FARRAY_INIT_DEBUG)
 		std::fill_n( data_, size_, Traits::initial_array_value() );
@@ -228,15 +254,19 @@ protected: // Creation
 	// Size + InitializerSentinel Constructor
 	inline
 	FArray( size_type const size, InitializerSentinel const & ) :
-		data_size_( size_of( size ) ),
-		data_( new T[ data_size_ ] ),
-		size_( data_size_ ),
-		owner_( true ),
+	 data_size_( size_of( size ) ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+	 data_( new T[ data_size_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
+	 size_( data_size_ ),
+	 owner_( true ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		const_proxy_( false ),
+	 const_proxy_( false ),
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
-		shift_( 0 ),
-		sdata_( nullptr )
+	 shift_( 0 ),
+	 sdata_( nullptr )
 	{
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 		size_report();
@@ -244,22 +274,26 @@ protected: // Creation
 	}
 
 	// Initializer List Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	FArray( std::initializer_list< U > const l ) :
-		data_size_( l.size() ),
-		data_( new T[ data_size_ ] ),
-		size_( data_size_ ),
-		owner_( true ),
+	 data_size_( l.size() ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+	 data_( new T[ data_size_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
+	 size_( data_size_ ),
+	 owner_( true ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		const_proxy_( false ),
+	 const_proxy_( false ),
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
-		shift_( 0 ),
-		sdata_( nullptr )
+	 shift_( 0 ),
+	 sdata_( nullptr )
 	{
-		auto il( l.begin() );
-		for ( size_type i = 0; i < size_; ++i, ++il ) {
-			reassign( i, *il );
+		auto r( l.begin() );
+		for ( size_type i = 0; i < size_; ++i, ++r ) {
+			initialize( i, *r );
 		}
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 		size_report();
@@ -267,22 +301,26 @@ protected: // Creation
 	}
 
 	// std::array Constructor Template
-	template< typename U, Size s >
+	template< typename U, Size s, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	FArray( std::array< U, s > const & a ) :
-		data_size_( s ),
-		data_( new T[ data_size_ ] ),
-		size_( data_size_ ),
-		owner_( true ),
+	 data_size_( s ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+	 data_( new T[ data_size_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
+	 size_( data_size_ ),
+	 owner_( true ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		const_proxy_( false ),
+	 const_proxy_( false ),
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
-		shift_( 0 ),
-		sdata_( nullptr )
+	 shift_( 0 ),
+	 sdata_( nullptr )
 	{
 		auto ia( a.begin() );
 		for ( size_type i = 0; i < size_; ++i, ++ia ) {
-			reassign( i, *ia );
+			initialize( i, *ia );
 		}
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 		size_report();
@@ -290,23 +328,78 @@ protected: // Creation
 	}
 
 	// std::vector Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	FArray( std::vector< U > const & v ) :
-		data_size_( v.size() ),
-		data_( new T[ data_size_ ] ),
-		size_( data_size_ ),
-		owner_( true ),
+	 data_size_( v.size() ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+	 data_( new T[ data_size_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
+	 size_( data_size_ ),
+	 owner_( true ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		const_proxy_( false ),
+	 const_proxy_( false ),
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
-		shift_( 0 ),
-		sdata_( nullptr )
+	 shift_( 0 ),
+	 sdata_( nullptr )
 	{
 		auto iv( v.begin() );
 		for ( size_type i = 0; i < size_; ++i, ++iv ) {
-			reassign( i, *iv );
+			initialize( i, *iv );
 		}
+#ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
+		size_report();
+#endif // OBJEXXFCL_FARRAY_SIZE_REPORT
+	}
+
+	// Vector2 Constructor Template
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
+	inline
+	FArray( Vector2< U > const & v ) :
+	 data_size_( 2 ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+	 data_( new T[ data_size_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
+	 size_( data_size_ ),
+	 owner_( true ),
+#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
+	 const_proxy_( false ),
+#endif // OBJEXXFCL_PROXY_CONST_CHECKS
+	 shift_( 0 ),
+	 sdata_( nullptr )
+	{
+		operator []( 0 ) = v[ 0 ];
+		operator []( 1 ) = v[ 1 ];
+#ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
+		size_report();
+#endif // OBJEXXFCL_FARRAY_SIZE_REPORT
+	}
+
+	// Vector3 Constructor Template
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
+	inline
+	FArray( Vector3< U > const & v ) :
+	 data_size_( 3 ),
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+	 data_( new T[ data_size_ ] ),
+#else
+	 data_( new_array< T >() ),
+#endif
+	 size_( data_size_ ),
+	 owner_( true ),
+#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
+	 const_proxy_( false ),
+#endif // OBJEXXFCL_PROXY_CONST_CHECKS
+	 shift_( 0 ),
+	 sdata_( nullptr )
+	{
+		operator []( 0 ) = v[ 0 ];
+		operator []( 1 ) = v[ 1 ];
+		operator []( 2 ) = v[ 2 ];
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 		size_report();
 #endif // OBJEXXFCL_FARRAY_SIZE_REPORT
@@ -315,57 +408,57 @@ protected: // Creation
 	// Default Proxy Constructor
 	inline
 	FArray( ProxySentinel const & ) :
-		data_size_( 0 ),
-		data_( nullptr ),
-		size_( 0 ),
-		owner_( false ),
+	 data_size_( 0 ),
+	 data_( nullptr ),
+	 size_( 0 ),
+	 owner_( false ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		const_proxy_( false ),
+	 const_proxy_( false ),
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
-		shift_( 0 ),
-		sdata_( nullptr )
+	 shift_( 0 ),
+	 sdata_( nullptr )
 	{}
 
 	// Array Proxy Constructor
 	inline
 	FArray( FArray const & a, ProxySentinel const & ) :
-		data_size_( a.data_size_ ),
-		data_( a.data_ ),
-		size_( a.size_ ),
-		owner_( false ),
+	 data_size_( a.data_size_ ),
+	 data_( a.data_ ),
+	 size_( a.size_ ),
+	 owner_( false ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		const_proxy_( true ),
+	 const_proxy_( true ),
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
-		shift_( 0 ),
-		sdata_( nullptr )
+	 shift_( 0 ),
+	 sdata_( nullptr )
 	{}
 
 	// Tail Proxy Constructor
 	inline
 	FArray( Tail const & s, ProxySentinel const & ) :
-		data_size_( s.size() ),
-		data_( s.data_ ),
-		size_( data_size_ ),
-		owner_( false ),
+	 data_size_( s.size() ),
+	 data_( s.data_ ),
+	 size_( data_size_ ),
+	 owner_( false ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		const_proxy_( true ),
+	 const_proxy_( true ),
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
-		shift_( 0 ),
-		sdata_( nullptr )
+	 shift_( 0 ),
+	 sdata_( nullptr )
 	{}
 
 	// Value Proxy Constructor
 	inline
 	FArray( T const & t, ProxySentinel const & ) :
-		data_size_( npos ), // Unknown
-		data_( const_cast< T * >( &t ) ),
-		size_( npos ), // Unbounded
-		owner_( false ),
+	 data_size_( npos ), // Unknown
+	 data_( const_cast< T * >( &t ) ),
+	 size_( npos ), // Unbounded
+	 owner_( false ),
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		const_proxy_( true ),
+	 const_proxy_( true ),
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
-		shift_( 0 ),
-		sdata_( nullptr )
+	 shift_( 0 ),
+	 sdata_( nullptr )
 	{}
 
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
@@ -373,37 +466,37 @@ protected: // Creation
 	// Non-Const Array Proxy Constructor
 	inline
 	FArray( FArray & a, ProxySentinel const & ) :
-		data_size_( a.data_size_ ),
-		data_( a.data_ ),
-		size_( a.size_ ),
-		owner_( false ),
-		const_proxy_( a.const_proxy_ ),
-		shift_( 0 ),
-		sdata_( nullptr )
+	 data_size_( a.data_size_ ),
+	 data_( a.data_ ),
+	 size_( a.size_ ),
+	 owner_( false ),
+	 const_proxy_( a.const_proxy_ ),
+	 shift_( 0 ),
+	 sdata_( nullptr )
 	{}
 
 	// Non-Const Tail Proxy Constructor
 	inline
 	FArray( Tail & s, ProxySentinel const & ) :
-		data_size_( s.size() ),
-		data_( s.data_ ),
-		size_( data_size_ ),
-		owner_( false ),
-		const_proxy_( s.const_proxy_ ),
-		shift_( 0 ),
-		sdata_( nullptr )
+	 data_size_( s.size() ),
+	 data_( s.data_ ),
+	 size_( data_size_ ),
+	 owner_( false ),
+	 const_proxy_( s.const_proxy_ ),
+	 shift_( 0 ),
+	 sdata_( nullptr )
 	{}
 
 	// Non-Const Value Proxy Constructor
 	inline
 	FArray( T & t, ProxySentinel const & ) :
-		data_size_( npos ), // Unknown
-		data_( &t ),
-		size_( npos ), // Unbounded
-		owner_( false ),
-		const_proxy_( false ),
-		shift_( 0 ),
-		sdata_( nullptr )
+	 data_size_( npos ), // Unknown
+	 data_( &t ),
+	 size_( npos ), // Unbounded
+	 owner_( false ),
+	 const_proxy_( false ),
+	 shift_( 0 ),
+	 sdata_( nullptr )
 	{}
 
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
@@ -415,10 +508,14 @@ public: // Creation
 	virtual
 	~FArray()
 	{
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
 		if ( owner_ ) delete[] data_;
+#else
+		if ( owner_ ) del_array();
+#endif
 	}
 
-protected: // Assignment
+protected: // Assignment: Array
 
 	// Copy Assignment
 	inline
@@ -444,7 +541,7 @@ protected: // Assignment
 	}
 
 	// Copy Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	void
 	operator =( FArray< U > const & a )
@@ -458,7 +555,7 @@ protected: // Assignment
 	}
 
 	// Initializer List Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	void
 	operator =( std::initializer_list< U > const l )
@@ -467,6 +564,57 @@ protected: // Assignment
 		assert( size_bounded() );
 		assert( size_ == l.size() );
 		std::copy( l.begin(), l.end(), data_ );
+	}
+
+	// std::array Assignment Template
+	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator =( std::array< U, s > const & a )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == s );
+		std::copy( a.begin(), a.end(), data_ );
+	}
+
+	// std::vector Assignment Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator =( std::vector< U > const & v )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == v.size() );
+		std::copy( v.begin(), v.end(), data_ );
+	}
+
+	// Vector2 Assignment Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator =( Vector2< U > const & v )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == 2u );
+		operator []( 0 ) = v[ 0 ];
+		operator []( 1 ) = v[ 1 ];
+	}
+
+	// Vector3 Assignment Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator =( Vector3< U > const & v )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == 3u );
+		operator []( 0 ) = v[ 0 ];
+		operator []( 1 ) = v[ 1 ];
+		operator []( 2 ) = v[ 2 ];
 	}
 
 	// += Array
@@ -563,54 +711,8 @@ protected: // Assignment
 		}
 	}
 
-	// &&= Array
-	inline
-	void
-	and_equals( FArray< T > const & a )
-	{
-		proxy_const_assert( not_const_proxy() );
-		assert( size_bounded() );
-		assert( size_ == a.size() );
-		if ( overlap( a ) ) { // Overlap-safe
-			CArray< T > c( size_ );
-			for ( size_type i = 0; i < size_; ++i ) {
-				c[ i ] = a[ i ];
-			}
-			for ( size_type i = 0; i < size_; ++i ) {
-				data_[ i ] = data_[ i ] && c[ i ];
-			}
-		} else { // Not overlap-safe
-			for ( size_type i = 0; i < size_; ++i ) {
-				data_[ i ] = data_[ i ] && a[ i ];
-			}
-		}
-	}
-
-	// ||= Array
-	inline
-	void
-	or_equals( FArray< T > const & a )
-	{
-		proxy_const_assert( not_const_proxy() );
-		assert( size_bounded() );
-		assert( size_ == a.size() );
-		if ( overlap( a ) ) { // Overlap-safe
-			CArray< T > c( size_ );
-			for ( size_type i = 0; i < size_; ++i ) {
-				c[ i ] = a[ i ];
-			}
-			for ( size_type i = 0; i < size_; ++i ) {
-				data_[ i ] = data_[ i ] || c[ i ];
-			}
-		} else { // Not overlap-safe
-			for ( size_type i = 0; i < size_; ++i ) {
-				data_[ i ] = data_[ i ] || a[ i ];
-			}
-		}
-	}
-
 	// += Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	void
 	operator +=( FArray< U > const & a )
@@ -624,7 +726,7 @@ protected: // Assignment
 	}
 
 	// -= Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	void
 	operator -=( FArray< U > const & a )
@@ -638,7 +740,7 @@ protected: // Assignment
 	}
 
 	// *= Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	void
 	operator *=( FArray< U > const & a )
@@ -652,7 +754,7 @@ protected: // Assignment
 	}
 
 	// /= Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	void
 	operator /=( FArray< U > const & a )
@@ -666,35 +768,295 @@ protected: // Assignment
 		}
 	}
 
-	// &&= Array Template
-	template< typename U >
+	// += Initializer List Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	void
-	and_equals( FArray< U > const & a )
+	operator +=( std::initializer_list< U > const l )
 	{
 		proxy_const_assert( not_const_proxy() );
 		assert( size_bounded() );
-		assert( size_ == a.size() );
-		for ( size_type i = 0; i < size_; ++i ) {
-			data_[ i ] = data_[ i ] && a[ i ];
+		assert( size_ == l.size() );
+		auto r( l.begin() );
+		for ( size_type i = 0; i < size_; ++i, ++r ) {
+			data_[ i ] += *r;
 		}
 	}
 
-	// ||= Array Template
-	template< typename U >
+	// -= Initializer List Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	void
-	or_equals( FArray< U > const & a )
+	operator -=( std::initializer_list< U > const l )
 	{
 		proxy_const_assert( not_const_proxy() );
 		assert( size_bounded() );
-		assert( size_ == a.size() );
-		for ( size_type i = 0; i < size_; ++i ) {
-			data_[ i ] = data_[ i ] || a[ i ];
+		assert( size_ == l.size() );
+		auto r( l.begin() );
+		for ( size_type i = 0; i < size_; ++i, ++r ) {
+			data_[ i ] -= *r;
 		}
 	}
 
-public: // Assignment
+	// *= Initializer List Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator *=( std::initializer_list< U > const l )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == l.size() );
+		auto r( l.begin() );
+		for ( size_type i = 0; i < size_; ++i, ++r ) {
+			data_[ i ] *= *r;
+		}
+	}
+
+	// /= Initializer List Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator /=( std::initializer_list< U > const l )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == l.size() );
+		auto r( l.begin() );
+		for ( size_type i = 0; i < size_; ++i, ++r ) {
+			assert( *r != T( 0 ) );
+			data_[ i ] /= *r;
+		}
+	}
+
+	// += std::array Template
+	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator +=( std::array< U, s > const & a )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == s );
+		for ( size_type i = 0; i < size_; ++i ) {
+			data_[ i ] += a[ i ];
+		}
+	}
+
+	// -= std::array Template
+	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator -=( std::array< U, s > const & a )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == s );
+		for ( size_type i = 0; i < size_; ++i ) {
+			data_[ i ] -= a[ i ];
+		}
+	}
+
+	// *= std::array Template
+	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator *=( std::array< U, s > const & a )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == s );
+		for ( size_type i = 0; i < size_; ++i ) {
+			data_[ i ] *= a[ i ];
+		}
+	}
+
+	// /= std::array Template
+	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator /=( std::array< U, s > const & a )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == s );
+		for ( size_type i = 0; i < size_; ++i ) {
+			assert( a[ i ] != T( 0 ) );
+			data_[ i ] /= a[ i ];
+		}
+	}
+
+	// += std::vector Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator +=( std::vector< U > const & v )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == v.size() );
+		for ( size_type i = 0; i < size_; ++i ) {
+			data_[ i ] += v[ i ];
+		}
+	}
+
+	// -= std::vector Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator -=( std::vector< U > const & v )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == v.size() );
+		for ( size_type i = 0; i < size_; ++i ) {
+			data_[ i ] -= v[ i ];
+		}
+	}
+
+	// *= std::vector Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator *=( std::vector< U > const & v )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == v.size() );
+		for ( size_type i = 0; i < size_; ++i ) {
+			data_[ i ] *= v[ i ];
+		}
+	}
+
+	// /= std::vector Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator /=( std::vector< U > const & v )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == v.size() );
+		for ( size_type i = 0; i < size_; ++i ) {
+			assert( v[ i ] != T( 0 ) );
+			data_[ i ] /= v[ i ];
+		}
+	}
+
+	// += Vector2 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator +=( Vector2< U > const & v )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == 2u );
+		data_[ 0 ] += v[ 0 ];
+		data_[ 1 ] += v[ 1 ];
+	}
+
+	// -= Vector2 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator -=( Vector2< U > const & v )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == 2u );
+		data_[ 0 ] -= v[ 0 ];
+		data_[ 1 ] -= v[ 1 ];
+	}
+
+	// *= Vector2 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator *=( Vector2< U > const & v )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == 2u );
+		data_[ 0 ] *= v[ 0 ];
+		data_[ 1 ] *= v[ 1 ];
+	}
+
+	// /= Vector2 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator /=( Vector2< U > const & v )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == 2u );
+		assert( v[ 0 ] != T( 0 ) );
+		assert( v[ 1 ] != T( 0 ) );
+		data_[ 0 ] /= v[ 0 ];
+		data_[ 1 ] /= v[ 1 ];
+	}
+
+	// += Vector3 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator +=( Vector3< U > const & v )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == 3u );
+		data_[ 0 ] += v[ 0 ];
+		data_[ 1 ] += v[ 1 ];
+		data_[ 2 ] += v[ 2 ];
+	}
+
+	// -= Vector3 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator -=( Vector3< U > const & v )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == 3u );
+		data_[ 0 ] -= v[ 0 ];
+		data_[ 1 ] -= v[ 1 ];
+		data_[ 2 ] -= v[ 2 ];
+	}
+
+	// *= Vector3 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator *=( Vector3< U > const & v )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == 3u );
+		data_[ 0 ] *= v[ 0 ];
+		data_[ 1 ] *= v[ 1 ];
+		data_[ 2 ] *= v[ 2 ];
+	}
+
+	// /= Vector3 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	operator /=( Vector3< U > const & v )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == 3u );
+		assert( v[ 0 ] != T( 0 ) );
+		assert( v[ 1 ] != T( 0 ) );
+		assert( v[ 2 ] != T( 0 ) );
+		data_[ 0 ] /= v[ 0 ];
+		data_[ 1 ] /= v[ 1 ];
+		data_[ 2 ] /= v[ 2 ];
+	}
+
+public: // Assignment: Value
 
 	// = Value
 	inline
@@ -747,17 +1109,250 @@ public: // Assignment
 	}
 
 	// /= Value
+	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray &
-	operator /=( T const & t )
+	operator /=( U const & u )
 	{
 		proxy_const_assert( not_const_proxy() );
 		assert( size_bounded() );
-		assert( t != T( 0 ) );
+		assert( u != U( 0 ) );
+		U const inv_u( U( 1 ) / u );
 		for ( size_type i = 0; i < size_; ++i ) {
-			data_[ i ] /= t;
+			data_[ i ] *= inv_u;
 		}
 		return *this;
+	}
+
+	// /= Value
+	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
+	inline
+	FArray &
+	operator /=( U const & u )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( u != U( 0 ) );
+		for ( size_type i = 0; i < size_; ++i ) {
+			data_[ i ] /= u;
+		}
+		return *this;
+	}
+
+protected: // Assignment: Logical
+
+	// &&= Array
+	inline
+	void
+	and_equals( FArray< T > const & a )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == a.size() );
+		if ( overlap( a ) ) { // Overlap-safe
+			CArray< T > c( size_ );
+			for ( size_type i = 0; i < size_; ++i ) {
+				c[ i ] = a[ i ];
+			}
+			for ( size_type i = 0; i < size_; ++i ) {
+				data_[ i ] = data_[ i ] && c[ i ];
+			}
+		} else { // Not overlap-safe
+			for ( size_type i = 0; i < size_; ++i ) {
+				data_[ i ] = data_[ i ] && a[ i ];
+			}
+		}
+	}
+
+	// ||= Array
+	inline
+	void
+	or_equals( FArray< T > const & a )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == a.size() );
+		if ( overlap( a ) ) { // Overlap-safe
+			CArray< T > c( size_ );
+			for ( size_type i = 0; i < size_; ++i ) {
+				c[ i ] = a[ i ];
+			}
+			for ( size_type i = 0; i < size_; ++i ) {
+				data_[ i ] = data_[ i ] || c[ i ];
+			}
+		} else { // Not overlap-safe
+			for ( size_type i = 0; i < size_; ++i ) {
+				data_[ i ] = data_[ i ] || a[ i ];
+			}
+		}
+	}
+
+	// &&= Array Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	and_equals( FArray< U > const & a )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == a.size() );
+		for ( size_type i = 0; i < size_; ++i ) {
+			data_[ i ] = data_[ i ] && a[ i ];
+		}
+	}
+
+	// ||= Array Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	or_equals( FArray< U > const & a )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == a.size() );
+		for ( size_type i = 0; i < size_; ++i ) {
+			data_[ i ] = data_[ i ] || a[ i ];
+		}
+	}
+
+	// &&= Initializer List Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	and_equals( std::initializer_list< U > const l )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == l.size() );
+		auto r( l.begin() );
+		for ( size_type i = 0; i < size_; ++i, ++r ) {
+			data_[ i ] = data_[ i ] && *r;
+		}
+	}
+
+	// ||= Initializer List Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	or_equals( std::initializer_list< U > const l )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == l.size() );
+		auto r( l.begin() );
+		for ( size_type i = 0; i < size_; ++i, ++r ) {
+			data_[ i ] = data_[ i ] || *r;
+		}
+	}
+
+	// &&= std::array Template
+	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	and_equals( std::array< U, s > const & a )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == s );
+		for ( size_type i = 0; i < size_; ++i ) {
+			data_[ i ] = data_[ i ] && a[ i ];
+		}
+	}
+
+	// ||= std::array Template
+	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	or_equals( std::array< U, s > const & a )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == s );
+		for ( size_type i = 0; i < size_; ++i ) {
+			data_[ i ] = data_[ i ] || a[ i ];
+		}
+	}
+
+	// &&= std::vector Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	and_equals( std::vector< U > const & v )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == v.size() );
+		for ( size_type i = 0; i < size_; ++i ) {
+			data_[ i ] = data_[ i ] && v[ i ];
+		}
+	}
+
+	// ||= std::vector Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	or_equals( std::vector< U > const & v )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == v.size() );
+		for ( size_type i = 0; i < size_; ++i ) {
+			data_[ i ] = data_[ i ] || v[ i ];
+		}
+	}
+
+	// &&= Vector2 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	and_equals( Vector2< U > const & v )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == 2u );
+		data_[ 0 ] = data_[ 0 ] && v[ 0 ];
+		data_[ 1 ] = data_[ 1 ] && v[ 1 ];
+	}
+
+	// ||= Vector2 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	or_equals( Vector2< U > const & v )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == 2u );
+		data_[ 0 ] = data_[ 0 ] || v[ 0 ];
+		data_[ 1 ] = data_[ 1 ] || v[ 1 ];
+	}
+
+	// &&= Vector3 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	and_equals( Vector3< U > const & v )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == 3u );
+		data_[ 0 ] = data_[ 0 ] && v[ 0 ];
+		data_[ 1 ] = data_[ 1 ] && v[ 1 ];
+		data_[ 2 ] = data_[ 2 ] && v[ 2 ];
+	}
+
+	// ||= Vector3 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	void
+	or_equals( Vector3< U > const & v )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( size_ == 3u );
+		data_[ 0 ] = data_[ 0 ] || v[ 0 ];
+		data_[ 1 ] = data_[ 1 ] || v[ 1 ];
+		data_[ 2 ] = data_[ 2 ] || v[ 2 ];
 	}
 
 public: // Subscript
@@ -812,7 +1407,7 @@ public: // Predicate
 	// Contiguous?
 	inline
 	bool
-	is_contiguous() const
+	contiguous() const
 	{
 		return true;
 	}
@@ -990,7 +1585,7 @@ public: // Inspector
 	int
 	l( int const d ) const = 0;
 
-	// Upper Index of Dimension
+	// Upper Index of a Dimension
 	virtual
 	int
 	u( int const d ) const = 0;
@@ -1061,8 +1656,13 @@ public: // Modifier
 	FArray &
 	clear()
 	{
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+		if ( owner_ ) delete[] data_;
+#else
+		if ( owner_ ) del_array();
+#endif
+		data_ = nullptr;
 		data_size_ = 0;
-		if ( owner_ ) delete[] data_; data_ = nullptr;
 		size_ = 0u;
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
 		const_proxy_ = false;
@@ -1122,6 +1722,21 @@ public: // Modifier
 	data_copy_from( U const * source, size_type const size )
 	{
 		if ( data_ ) std::memcpy( data_, source, std::min( size, size_ ) );
+	}
+
+	// Swap Data of Same Size Arrays
+	inline
+	void
+	data_swap( FArray & v )
+	{
+		using std::swap;
+		assert( owner_ );
+		assert( v.owner_ );
+		assert( size_ == v.size_ );
+		swap( data_size_, v.data_size_ );
+		swap( data_, v.data_ );
+		swap( shift_, v.shift_ );
+		swap( sdata_, v.sdata_ );
 	}
 
 public: // Comparison: Predicate
@@ -2197,9 +2812,15 @@ protected: // Methods
 		assert( owner_ );
 		assert( size != npos );
 		if ( ( data_size_ != size ) || ( ! data_ ) ) {
-			data_size_ = size;
-			delete[] data_; data_ = new T[ data_size_ ]; // Allocate even if size==0 for consistency with Fortran
-			size_ = size;
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+			delete[] data_;
+			size_ = data_size_ = size;
+			data_ = new T[ data_size_ ]; // Allocate even if size==0 for consistency with Fortran
+#else
+			del_array();
+			size_ = data_size_ = size;
+			data_ = new_array< T >(); // Allocate even if size==0 for consistency with Fortran
+#endif
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 			size_report();
 #endif // OBJEXXFCL_FARRAY_SIZE_REPORT
@@ -2243,9 +2864,10 @@ protected: // Methods
 	}
 
 	// Attach Proxy/Argument Array to Const Array
+	template< int shift >
 	inline
 	void
-	attach( FArray const & a, int const shift )
+	attach( FArray const & a )
 	{
 		assert( ! owner_ );
 		data_size_ = a.data_size_;
@@ -2259,9 +2881,10 @@ protected: // Methods
 	}
 
 	// Attach Proxy/Argument Array to Array
+	template< int shift >
 	inline
 	void
-	attach( FArray & a, int const shift )
+	attach( FArray & a )
 	{
 		assert( ! owner_ );
 		data_size_ = a.data_size_;
@@ -2275,9 +2898,10 @@ protected: // Methods
 	}
 
 	// Attach Proxy/Argument Array to Const Tail
+	template< int shift >
 	inline
 	void
-	attach( Tail const & s, int const shift )
+	attach( Tail const & s )
 	{
 		assert( ! owner_ );
 		data_size_ = s.size();
@@ -2291,9 +2915,10 @@ protected: // Methods
 	}
 
 	// Attach Proxy/Argument Array to Tail
+	template< int shift >
 	inline
 	void
-	attach( Tail & s, int const shift )
+	attach( Tail & s )
 	{
 		assert( ! owner_ );
 		data_size_ = s.size();
@@ -2307,9 +2932,10 @@ protected: // Methods
 	}
 
 	// Attach Proxy/Argument Array to Const Value
+	template< int shift >
 	inline
 	void
-	attach( T const & t, int const shift )
+	attach( T const & t )
 	{
 		assert( ! owner_ );
 		data_size_ = npos; // Unknown
@@ -2323,9 +2949,10 @@ protected: // Methods
 	}
 
 	// Attach Proxy/Argument Array to Value
+	template< int shift >
 	inline
 	void
-	attach( T & t, int const shift )
+	attach( T & t )
 	{
 		assert( ! owner_ );
 		data_size_ = npos; // Unknown
@@ -2403,13 +3030,13 @@ protected: // Methods
 		template< typename V > static int test( ... );
 	public:
 		enum { value = sizeof( test< T >( 0 ) ) == sizeof( char ) };
-	}; // Has_reassign
+	};
 
-	// Uniform Reassignment
-	template< typename U >
+	// Initialize
+	template< typename U, class = typename std::enable_if< Has_reassign< U >::value >::type >
 	inline
 	void
-	reassign( U const & u, typename std::enable_if< Has_reassign< U >::value >::type * = 0 )
+	initialize( U const & u )
 	{
 		proxy_const_assert( not_const_proxy() );
 		assert( size_bounded() );
@@ -2418,29 +3045,29 @@ protected: // Methods
 		}
 	}
 
-	// Uniform Reassignment
-	template< typename U >
+	// Initialize
+	template< typename U, class = typename std::enable_if< ! Has_reassign< U >::value >::type, typename = void >
 	inline
 	void
-	reassign( U const & u, typename std::enable_if< ! Has_reassign< U >::value >::type * = 0 )
+	initialize( U const & u )
 	{
 		operator =( u );
 	}
 
-	// Element Reassignment
-	template< typename U >
+	// Initialize an Element
+	template< typename U, class = typename std::enable_if< Has_reassign< U >::value >::type >
 	inline
 	void
-	reassign( size_type const i, U const & u, typename std::enable_if< Has_reassign< U >::value >::type * = 0 )
+	initialize( size_type const i, U const & u )
 	{
 		operator []( i ).reassign( u );
 	}
 
-	// Element Reassignment
-	template< typename U >
+	// Initialize an Element
+	template< typename U, class = typename std::enable_if< ! Has_reassign< U >::value >::type, typename = void >
 	inline
 	void
-	reassign( size_type const i, U const & u, typename std::enable_if< ! Has_reassign< U >::value >::type * = 0 )
+	initialize( size_type const i, U const & u )
 	{
 		operator []( i ) = u;
 	}
@@ -2449,12 +3076,18 @@ protected: // Methods
 	void
 	reconstruct_by_size( size_type const size )
 	{
+		assert( owner_ );
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
 		delete[] data_;
-		data_size_ = size;
-		size_ = data_size_;
+		size_ = data_size_ = size;
 		data_ = new T[ data_size_ ];
+#else
+		del_array();
+		size_ = data_size_ = size;
+		data_ = new_array< T >();
+#endif
 #if defined(OBJEXXFCL_FARRAY_INIT) || defined(OBJEXXFCL_FARRAY_INIT_DEBUG)
-		reassign( Traits::initial_array_value() );
+		initialize( Traits::initial_array_value() );
 #endif // OBJEXXFCL_FARRAY_INIT || OBJEXXFCL_FARRAY_INIT_DEBUG
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 		size_report();
@@ -2643,7 +3276,7 @@ protected: // Static Methods
 		return i * multiplier;
 	}
 
-private: // Properties
+private: // Methods
 
 #ifdef OBJEXXFCL_FARRAY_SIZE_REPORT
 
@@ -2660,6 +3293,82 @@ private: // Properties
 	}
 
 #endif // OBJEXXFCL_FARRAY_SIZE_REPORT
+
+	// Array Heap Allocator for POD Types
+	template< typename U, class = typename std::enable_if< std::is_fundamental< U >::value >::type >
+	inline
+	T *
+	new_array()
+	{
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+		return new T[ data_size_ ];
+#else
+#if defined(_WIN32)
+		return static_cast< T * >( _aligned_malloc( data_size_ * sizeof( T ), OBJEXXFCL_ARRAY_ALIGN ) );
+#elif defined(__linux__)
+		void * p;
+		return ( posix_memalign( &p, OBJEXXFCL_ARRAY_ALIGN, data_size_ * sizeof( T ) ) == 0 ? static_cast< T * >( p ) : nullptr );
+#else
+		return new T[ data_size_ ];
+#endif
+#endif
+	}
+
+	// Array Heap Allocator for Class Types
+	template< typename U, class = typename std::enable_if< ! std::is_fundamental< U >::value >::type, typename = void >
+	inline
+	T *
+	new_array()
+	{
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+		return new T[ data_size_ ];
+#else
+#if defined(_WIN32)
+		T * pT( static_cast< T * >( _aligned_malloc( data_size_ * sizeof( T ), OBJEXXFCL_ARRAY_ALIGN ) ) );
+		for ( size_t i = 0; i < data_size_; ++i ) {
+			pT[ i ] = *( new( pT + i ) T() );
+		}
+		return pT;
+#elif defined(__linux__)
+		void * p;
+		int const status( posix_memalign( &p, OBJEXXFCL_ARRAY_ALIGN, data_size_ * sizeof( T ) ) );
+		if ( status == 0 ) { // Success
+			T * pT( static_cast< T * >( p ) );
+			for ( size_t i = 0; i < data_size_; ++i ) {
+				pT[ i ] = *( new( pT + i ) T() );
+			}
+			return pT;
+		} else {
+			return nullptr;
+		}
+#else
+		return new T[ data_size_ ];
+#endif
+#endif
+	}
+
+	// Array Heap Destructor
+	inline
+	void
+	del_array()
+	{
+		assert( owner_ );
+#ifdef OBJEXXFCL_ARRAY_NOALIGN
+		delete[] data_;
+#else
+#if defined(_WIN32)
+		size_type i( data_size_ );
+		while ( i ) data_[ --i ].~T();
+		_aligned_free( data_ );
+#elif defined(__linux__)
+		size_type i( data_size_ );
+		while ( i ) data_[ --i ].~T();
+		free( data_ );
+#else
+		delete[] data_;
+#endif
+#endif
+	}
 
 public: // Data
 

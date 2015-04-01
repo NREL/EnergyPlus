@@ -31,6 +31,8 @@ namespace DataHVACGlobals {
 	extern Real64 const RetTempMax; // maximum return air temperature [deg C]
 	extern Real64 const RetTempMin; // minimum return air temperature [deg C]
 
+	extern int const NumOfSizingTypes; // request sizing for cooling air flow rate
+
 	extern int const CoolingAirflowSizing; // request sizing for cooling air flow rate
 	extern int const CoolingWaterflowSizing; // request sizing for cooling coil water flow rate
 	extern int const HeatingWaterflowSizing; // request sizing for heating coil water flow rate
@@ -54,6 +56,7 @@ namespace DataHVACGlobals {
 	extern int const SystemCapacitySizing; // request sizing for system capacity
 	extern int const CoolingSHRSizing; // request sizing for cooling SHR
 	extern int const HeatingDefrostSizing; // request sizing for heating defrost capacity
+	extern int const MaxHeaterOutletTempSizing; // request sizing for heating coil maximum outlet temperature
 	extern int const AutoCalculateSizing; // identifies an autocalulate input
 
 	// Condenser Type (using same numbering scheme as for chillers)
@@ -260,7 +263,7 @@ namespace DataHVACGlobals {
 	extern Real64 DXElecHeatingPower; // Electric power consumed by DX heating coil last DX simulation
 	extern Real64 ElecHeatingCoilPower; // Electric power consumed by electric heating coil
 	extern Real64 AirToAirHXElecPower; // Electric power consumed by Heat Exchanger:Air To Air (Generic or Flat Plate)
-	// from last simulation in HeatRecovery.f90
+	// from last simulation in HeatRecovery.cc
 	extern Real64 UnbalExhMassFlow; // unbalanced zone exhaust from a zone equip component [kg/s]
 	extern Real64 BalancedExhMassFlow; // balanced zone exhaust (declared as so by user)  [kg/s]
 	extern Real64 PlenumInducedMassFlow; // secondary air mass flow rate induced from a return plenum [kg/s]

@@ -20,14 +20,14 @@
 #include <ObjexxFCL/ChunkVector.fwd.hh>
 #include <ObjexxFCL/Cstring.fwd.hh>
 #include <ObjexxFCL/Dimension.fwd.hh>
-#include <ObjexxFCL/DimensionSlice.fwd.hh>
 #include <ObjexxFCL/DynamicIndexRange.fwd.hh>
 #include <ObjexxFCL/FArray.all.fwd.hh>
+#include <ObjexxFCL/FArrayS.all.fwd.hh>
 #include <ObjexxFCL/Fstring.fwd.hh>
-#include <ObjexxFCL/gio.fwd.hh>
 #include <ObjexxFCL/Index.fwd.hh>
 #include <ObjexxFCL/IndexRange.fwd.hh>
 #include <ObjexxFCL/IndexSlice.fwd.hh>
+#include <ObjexxFCL/IOFlags.fwd.hh>
 #include <ObjexxFCL/MArray.all.fwd.hh>
 #include <ObjexxFCL/Optional.fwd.hh>
 #include <ObjexxFCL/Print.fwd.hh>

@@ -17,6 +17,7 @@
 #include <ObjexxFCL/DynamicIndexRange.hh>
 #include <ObjexxFCL/DimensionExpressions.hh>
 #include <ObjexxFCL/ObserverMediator.hh>
+#include "ObjexxFCL.unit.hh"
 
 using namespace ObjexxFCL;
 

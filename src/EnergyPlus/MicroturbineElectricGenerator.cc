@@ -325,8 +325,7 @@ namespace MicroturbineElectricGenerator {
 		// ALLOCATE ARRAYS
 		MTGenerator.allocate( NumMTGenerators );
 		MTGeneratorReport.allocate( NumMTGenerators );
-		CheckEquipName.allocate( NumMTGenerators );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumMTGenerators, true );
 
 		// LOAD ARRAYS WITH MICROTURBINE GENERATOR DATA
 		for ( GeneratorNum = 1; GeneratorNum <= NumMTGenerators; ++GeneratorNum ) {
@@ -434,7 +433,7 @@ namespace MicroturbineElectricGenerator {
 
 				} else {
 					ShowSevereError( cCurrentModuleObject + " \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-					ShowContinueError( "... illegal " + cAlphaFieldNames( 2 ) + " type" " for this object = " + GetCurveType( MTGenerator( GeneratorNum ).ElecPowFTempElevCurveNum ) );
+					ShowContinueError( "... illegal " + cAlphaFieldNames( 2 ) + " type for this object = " + GetCurveType( MTGenerator( GeneratorNum ).ElecPowFTempElevCurveNum ) );
 					ShowContinueError( "... Curve type must be BIQUADRATIC." ); //TODO rename point (curves)
 					ErrorsFound = true;
 
@@ -464,7 +463,7 @@ namespace MicroturbineElectricGenerator {
 
 				} else {
 					ShowSevereError( cCurrentModuleObject + " \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-					ShowContinueError( "...illegal " + cAlphaFieldNames( 3 ) + " type" " for this object = " + GetCurveType( MTGenerator( GeneratorNum ).ElecEffFTempCurveNum ) );
+					ShowContinueError( "...illegal " + cAlphaFieldNames( 3 ) + " type for this object = " + GetCurveType( MTGenerator( GeneratorNum ).ElecEffFTempCurveNum ) );
 					ShowContinueError( "Curve type must be QUADRATIC or CUBIC." ); //TODO rename point (curves)
 					ErrorsFound = true;
 
@@ -497,7 +496,7 @@ namespace MicroturbineElectricGenerator {
 
 				} else {
 					ShowSevereError( cCurrentModuleObject + " \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-					ShowContinueError( "...illegal " + cAlphaFieldNames( 4 ) + " type" " for this object = " + GetCurveType( MTGenerator( GeneratorNum ).ElecEffFPLRCurveNum ) );
+					ShowContinueError( "...illegal " + cAlphaFieldNames( 4 ) + " type for this object = " + GetCurveType( MTGenerator( GeneratorNum ).ElecEffFPLRCurveNum ) );
 					ShowContinueError( "Curve type must be QUADRATIC or CUBIC." ); //TODO rename point (curves)
 					ErrorsFound = true;
 
@@ -613,7 +612,7 @@ namespace MicroturbineElectricGenerator {
 
 				} else {
 					ShowSevereError( cCurrentModuleObject + " \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-					ShowContinueError( "... illegal " + cAlphaFieldNames( 6 ) + " type" " for this object = " + GetCurveType( MTGenerator( GeneratorNum ).AncillaryPowerFuelCurveNum ) );
+					ShowContinueError( "... illegal " + cAlphaFieldNames( 6 ) + " type for this object = " + GetCurveType( MTGenerator( GeneratorNum ).AncillaryPowerFuelCurveNum ) );
 					ShowContinueError( "... Curve type must be QUADRATIC." );
 					ErrorsFound = true;
 
@@ -699,7 +698,7 @@ namespace MicroturbineElectricGenerator {
 
 						} else {
 							ShowSevereError( cCurrentModuleObject + " \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-							ShowContinueError( "... illegal " + cAlphaFieldNames( 10 ) + " type" " for this object = " + GetCurveType( MTGenerator( GeneratorNum ).HeatRecFlowFTempPowCurveNum ) );
+							ShowContinueError( "... illegal " + cAlphaFieldNames( 10 ) + " type for this object = " + GetCurveType( MTGenerator( GeneratorNum ).HeatRecFlowFTempPowCurveNum ) );
 							ShowContinueError( "Curve type must be BIQUADRATIC." );
 							ErrorsFound = true;
 
@@ -729,7 +728,7 @@ namespace MicroturbineElectricGenerator {
 
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-						ShowContinueError( "... illegal " + cAlphaFieldNames( 11 ) + " type" " for this object = " + GetCurveType( MTGenerator( GeneratorNum ).ThermEffFTempElevCurveNum ) );
+						ShowContinueError( "... illegal " + cAlphaFieldNames( 11 ) + " type for this object = " + GetCurveType( MTGenerator( GeneratorNum ).ThermEffFTempElevCurveNum ) );
 						ShowContinueError( "Curve type must be BIQUADRATIC or BICUBIC." );
 						ErrorsFound = true;
 
@@ -755,7 +754,7 @@ namespace MicroturbineElectricGenerator {
 
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-						ShowContinueError( "... illegal " + cAlphaFieldNames( 12 ) + " type" " for this object = " + GetCurveType( MTGenerator( GeneratorNum ).HeatRecRateFPLRCurveNum ) );
+						ShowContinueError( "... illegal " + cAlphaFieldNames( 12 ) + " type for this object = " + GetCurveType( MTGenerator( GeneratorNum ).HeatRecRateFPLRCurveNum ) );
 						ShowContinueError( "... Curve type must be QUADRATIC or CUBIC." );
 						ErrorsFound = true;
 
@@ -782,7 +781,7 @@ namespace MicroturbineElectricGenerator {
 
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-						ShowContinueError( "... illegal " + cAlphaFieldNames( 13 ) + " type" " for this object = " + GetCurveType( MTGenerator( GeneratorNum ).HeatRecRateFTempCurveNum ) );
+						ShowContinueError( "... illegal " + cAlphaFieldNames( 13 ) + " type for this object = " + GetCurveType( MTGenerator( GeneratorNum ).HeatRecRateFTempCurveNum ) );
 						ShowContinueError( "... Curve type must be QUADRATIC." );
 						ErrorsFound = true;
 
@@ -809,7 +808,7 @@ namespace MicroturbineElectricGenerator {
 
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-						ShowContinueError( "... illegal " + cAlphaFieldNames( 14 ) + " type" " for this object = " + GetCurveType( MTGenerator( GeneratorNum ).HeatRecRateFWaterFlowCurveNum ) );
+						ShowContinueError( "... illegal " + cAlphaFieldNames( 14 ) + " type for this object = " + GetCurveType( MTGenerator( GeneratorNum ).HeatRecRateFWaterFlowCurveNum ) );
 						ShowContinueError( "... Curve type must be QUADRATIC." );
 						ErrorsFound = true;
 
@@ -916,7 +915,7 @@ namespace MicroturbineElectricGenerator {
 
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-						ShowContinueError( "... illegal " + cAlphaFieldNames( 17 ) + " type" " for this object = " + GetCurveType( MTGenerator( GeneratorNum ).ExhFlowFTempCurveNum ) );
+						ShowContinueError( "... illegal " + cAlphaFieldNames( 17 ) + " type for this object = " + GetCurveType( MTGenerator( GeneratorNum ).ExhFlowFTempCurveNum ) );
 						ShowContinueError( "... Curve type must be QUADRATIC or CUBIC." );
 						ErrorsFound = true;
 
@@ -942,7 +941,7 @@ namespace MicroturbineElectricGenerator {
 
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-						ShowContinueError( "... illegal " + cAlphaFieldNames( 18 ) + " type" " for this object = " + GetCurveType( MTGenerator( GeneratorNum ).ExhFlowFPLRCurveNum ) );
+						ShowContinueError( "... illegal " + cAlphaFieldNames( 18 ) + " type for this object = " + GetCurveType( MTGenerator( GeneratorNum ).ExhFlowFPLRCurveNum ) );
 						ShowContinueError( "... Curve type must be QUADRATIC or CUBIC." );
 						ErrorsFound = true;
 
@@ -971,7 +970,7 @@ namespace MicroturbineElectricGenerator {
 
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-						ShowContinueError( "... illegal " + cAlphaFieldNames( 19 ) + " type" " for this object = " + GetCurveType( MTGenerator( GeneratorNum ).ExhAirTempFTempCurveNum ) );
+						ShowContinueError( "... illegal " + cAlphaFieldNames( 19 ) + " type for this object = " + GetCurveType( MTGenerator( GeneratorNum ).ExhAirTempFTempCurveNum ) );
 						ShowContinueError( "... Curve type must be QUADRATIC or CUBIC." );
 						ErrorsFound = true;
 
@@ -997,7 +996,7 @@ namespace MicroturbineElectricGenerator {
 
 					} else {
 						ShowSevereError( cCurrentModuleObject + " \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-						ShowContinueError( "... illegal " + cAlphaFieldNames( 20 ) + " type" " for this object = " + GetCurveType( MTGenerator( GeneratorNum ).ExhAirTempFPLRCurveNum ) );
+						ShowContinueError( "... illegal " + cAlphaFieldNames( 20 ) + " type for this object = " + GetCurveType( MTGenerator( GeneratorNum ).ExhAirTempFPLRCurveNum ) );
 						ShowContinueError( "... Curve type must be QUADRATIC or CUBIC." );
 						ErrorsFound = true;
 
@@ -1420,7 +1419,7 @@ namespace MicroturbineElectricGenerator {
 			if ( MTGenerator( GeneratorNum ).PowerFTempElevErrorIndex == 0 ) {
 				//        MTGenerator(GeneratorNum)%PowerFTempElevErrorCount = MTGenerator(GeneratorNum)%PowerFTempElevErrorCount + 1
 				ShowWarningMessage( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-				ShowContinueError( "... Electrical Power Modifier curve (function of temperature and elevation) output is " "less than zero (" + TrimSigDigits( PowerFTempElev, 4 ) + ")." );
+				ShowContinueError( "... Electrical Power Modifier curve (function of temperature and elevation) output is less than zero (" + TrimSigDigits( PowerFTempElev, 4 ) + ")." );
 				ShowContinueError( "... Value occurs using a combustion inlet air temperature of " + TrimSigDigits( CombustionAirInletTemp, 2 ) + " C." );
 				ShowContinueError( "... and an elevation of " + TrimSigDigits( Elevation, 2 ) + " m." );
 				ShowContinueErrorTimeStamp( "... Resetting curve output to zero and continuing simulation." );
@@ -1465,7 +1464,7 @@ namespace MicroturbineElectricGenerator {
 				if ( MTGenerator( GeneratorNum ).EffFTempErrorIndex == 0 ) {
 					//          MTGenerator(GeneratorNum)%EffFTempErrorCount = MTGenerator(GeneratorNum)%EffFTempErrorCount + 1
 					ShowWarningMessage( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-					ShowContinueError( "... Electrical Efficiency Modifier (function of temperature) output is less than " "zero (" + TrimSigDigits( ElecEfficiencyFTemp, 4 ) + ")." );
+					ShowContinueError( "... Electrical Efficiency Modifier (function of temperature) output is less than zero (" + TrimSigDigits( ElecEfficiencyFTemp, 4 ) + ")." );
 					ShowContinueError( "... Value occurs using a combustion inlet air temperature of " + TrimSigDigits( CombustionAirInletTemp, 2 ) + " C." );
 					ShowContinueErrorTimeStamp( "... Resetting curve output to zero and continuing simulation." );
 				}
@@ -1480,11 +1479,11 @@ namespace MicroturbineElectricGenerator {
 			if ( ElecEfficiencyFPLR < 0.0 ) {
 				if ( MTGenerator( GeneratorNum ).EffFPLRErrorIndex == 0 ) {
 					ShowWarningMessage( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-					ShowContinueError( "... Electrical Efficiency Modifier (function of part-load ratio) output is less than" " zero (" + TrimSigDigits( ElecEfficiencyFPLR, 4 ) + ")." );
+					ShowContinueError( "... Electrical Efficiency Modifier (function of part-load ratio) output is less than zero (" + TrimSigDigits( ElecEfficiencyFPLR, 4 ) + ")." );
 					ShowContinueError( "... Value occurs using a part-load ratio of " + TrimSigDigits( PLR, 3 ) + '.' );
 					ShowContinueErrorTimeStamp( "... Resetting curve output to zero and continuing simulation." );
 				}
-				ShowRecurringWarningErrorAtEnd( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\": Electrical Efficiency Modifier (function of part-load ratio) output is less than zero warning" " continues...", MTGenerator( GeneratorNum ).EffFPLRErrorIndex, ElecEfficiencyFPLR, ElecEfficiencyFPLR );
+				ShowRecurringWarningErrorAtEnd( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\": Electrical Efficiency Modifier (function of part-load ratio) output is less than zero warning continues...", MTGenerator( GeneratorNum ).EffFPLRErrorIndex, ElecEfficiencyFPLR, ElecEfficiencyFPLR );
 				ElecEfficiencyFPLR = 0.0;
 			}
 
@@ -1513,11 +1512,11 @@ namespace MicroturbineElectricGenerator {
 				if ( AnciPowerFMdotFuel < 0.0 ) {
 					if ( MTGenerator( GeneratorNum ).AnciPowerFMdotFuelErrorIndex == 0 ) {
 						ShowWarningMessage( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-						ShowContinueError( "... Ancillary Power Modifier (function of fuel input) output is less than" " zero (" + TrimSigDigits( AnciPowerFMdotFuel, 4 ) + ")." );
+						ShowContinueError( "... Ancillary Power Modifier (function of fuel input) output is less than zero (" + TrimSigDigits( AnciPowerFMdotFuel, 4 ) + ")." );
 						ShowContinueError( "... Value occurs using a fuel input mass flow rate of " + TrimSigDigits( MTGenerator( GeneratorNum ).FuelMdot, 4 ) + " kg/s." );
 						ShowContinueErrorTimeStamp( "... Resetting curve output to zero and continuing simulation." );
 					}
-					ShowRecurringWarningErrorAtEnd( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\": Ancillary Power Modifier (function of fuel input) output is less than zero warning" " continues...", MTGenerator( GeneratorNum ).AnciPowerFMdotFuelErrorIndex, AnciPowerFMdotFuel, AnciPowerFMdotFuel );
+					ShowRecurringWarningErrorAtEnd( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\": Ancillary Power Modifier (function of fuel input) output is less than zero warning continues...", MTGenerator( GeneratorNum ).AnciPowerFMdotFuelErrorIndex, AnciPowerFMdotFuel, AnciPowerFMdotFuel );
 					AnciPowerFMdotFuel = 0.0;
 				}
 			} else {
@@ -1568,7 +1567,7 @@ namespace MicroturbineElectricGenerator {
 				if ( ThermalEffFTempElev < 0.0 ) {
 					if ( MTGenerator( GeneratorNum ).ThermEffFTempElevErrorIndex == 0 ) {
 						ShowWarningMessage( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-						ShowContinueError( "... Electrical Power Modifier curve (function of temperature and elevation) output is " "less than zero (" + TrimSigDigits( PowerFTempElev, 4 ) + ")." );
+						ShowContinueError( "... Electrical Power Modifier curve (function of temperature and elevation) output is less than zero (" + TrimSigDigits( PowerFTempElev, 4 ) + ")." );
 						ShowContinueError( "... Value occurs using a combustion inlet air temperature of " + TrimSigDigits( CombustionAirInletTemp, 2 ) + " C." );
 						ShowContinueError( "... and an elevation of " + TrimSigDigits( Elevation, 2 ) + " m." );
 						ShowContinueErrorTimeStamp( "... Resetting curve output to zero and continuing simulation." );
@@ -1589,11 +1588,11 @@ namespace MicroturbineElectricGenerator {
 				if ( HeatRecRateFPLR < 0.0 ) {
 					if ( MTGenerator( GeneratorNum ).HeatRecRateFPLRErrorIndex == 0 ) {
 						ShowWarningMessage( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-						ShowContinueError( "... Heat Recovery Rate Modifier (function of part-load ratio) output is less than" " zero (" + TrimSigDigits( HeatRecRateFPLR, 4 ) + ")." );
+						ShowContinueError( "... Heat Recovery Rate Modifier (function of part-load ratio) output is less than zero (" + TrimSigDigits( HeatRecRateFPLR, 4 ) + ")." );
 						ShowContinueError( "... Value occurs using a part-load ratio of " + TrimSigDigits( PLR, 3 ) + '.' );
 						ShowContinueErrorTimeStamp( "... Resetting curve output to zero and continuing simulation." );
 					}
-					ShowRecurringWarningErrorAtEnd( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\": Heat Recovery Rate Modifier (function of part-load ratio) output is less than zero warning" " continues...", MTGenerator( GeneratorNum ).HeatRecRateFPLRErrorIndex, HeatRecRateFPLR, HeatRecRateFPLR );
+					ShowRecurringWarningErrorAtEnd( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\": Heat Recovery Rate Modifier (function of part-load ratio) output is less than zero warning continues...", MTGenerator( GeneratorNum ).HeatRecRateFPLRErrorIndex, HeatRecRateFPLR, HeatRecRateFPLR );
 					HeatRecRateFPLR = 0.0;
 				}
 			} else {
@@ -1606,7 +1605,7 @@ namespace MicroturbineElectricGenerator {
 				if ( HeatRecRateFTemp < 0.0 ) {
 					if ( MTGenerator( GeneratorNum ).HeatRecRateFTempErrorIndex == 0 ) {
 						ShowWarningMessage( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-						ShowContinueError( "... Heat Recovery Rate Modifier (function of inlet water temp) output is less than " "zero (" + TrimSigDigits( HeatRecRateFTemp, 4 ) + ")." );
+						ShowContinueError( "... Heat Recovery Rate Modifier (function of inlet water temp) output is less than zero (" + TrimSigDigits( HeatRecRateFTemp, 4 ) + ")." );
 						ShowContinueError( "... Value occurs using an inlet water temperature temperature of " + TrimSigDigits( HeatRecInTemp, 2 ) + " C." );
 						ShowContinueErrorTimeStamp( "... Resetting curve output to zero and continuing simulation." );
 					}
@@ -1626,7 +1625,7 @@ namespace MicroturbineElectricGenerator {
 				if ( HeatRecRateFFlow < 0.0 ) {
 					if ( MTGenerator( GeneratorNum ).HeatRecRateFFlowErrorIndex == 0 ) {
 						ShowWarningMessage( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-						ShowContinueError( "... Heat Recovery Rate Modifier (function of water flow rate) output is less than " "zero (" + TrimSigDigits( HeatRecRateFFlow, 4 ) + ")." );
+						ShowContinueError( "... Heat Recovery Rate Modifier (function of water flow rate) output is less than zero (" + TrimSigDigits( HeatRecRateFFlow, 4 ) + ")." );
 						ShowContinueError( "... Value occurs using a water flow rate of " + TrimSigDigits( HeatRecVolFlowRate, 4 ) + " m3/s." );
 						ShowContinueErrorTimeStamp( "... Resetting curve output to zero and continuing simulation." );
 					}
@@ -1710,7 +1709,7 @@ namespace MicroturbineElectricGenerator {
 				if ( ExhFlowFTemp <= 0.0 ) {
 					if ( MTGenerator( GeneratorNum ).ExhFlowFTempErrorIndex == 0 ) {
 						ShowWarningMessage( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-						ShowContinueError( "...Exhaust Air Flow Rate Modifier (function of temperature) output is less than or equal " "to zero (" + TrimSigDigits( ExhFlowFTemp, 4 ) + ")." );
+						ShowContinueError( "...Exhaust Air Flow Rate Modifier (function of temperature) output is less than or equal to zero (" + TrimSigDigits( ExhFlowFTemp, 4 ) + ")." );
 						ShowContinueError( "...Value occurs using a combustion inlet air temperature of " + TrimSigDigits( CombustionAirInletTemp, 2 ) + '.' );
 						ShowContinueErrorTimeStamp( "...Resetting curve output to zero and continuing simulation." );
 					}
@@ -1727,11 +1726,11 @@ namespace MicroturbineElectricGenerator {
 				if ( ExhFlowFPLR <= 0.0 ) {
 					if ( MTGenerator( GeneratorNum ).ExhFlowFPLRErrorIndex == 0 ) {
 						ShowWarningMessage( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-						ShowContinueError( "...Exhaust Air Flow Rate Modifier (function of part-load ratio) output is less than or " "equal to zero (" + TrimSigDigits( ExhFlowFPLR, 4 ) + ")." );
+						ShowContinueError( "...Exhaust Air Flow Rate Modifier (function of part-load ratio) output is less than or equal to zero (" + TrimSigDigits( ExhFlowFPLR, 4 ) + ")." );
 						ShowContinueError( "...Value occurs using a part-load ratio of " + TrimSigDigits( PLR, 2 ) + '.' );
 						ShowContinueErrorTimeStamp( "...Resetting curve output to zero and continuing simulation." );
 					}
-					ShowRecurringWarningErrorAtEnd( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\": Exhaust Air Flow Rate Modifier (function of part-load ratio) output is less than or equal to zero warning" " continues...", MTGenerator( GeneratorNum ).ExhFlowFPLRErrorIndex, ExhFlowFPLR, ExhFlowFPLR );
+					ShowRecurringWarningErrorAtEnd( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\": Exhaust Air Flow Rate Modifier (function of part-load ratio) output is less than or equal to zero warning continues...", MTGenerator( GeneratorNum ).ExhFlowFPLRErrorIndex, ExhFlowFPLR, ExhFlowFPLR );
 					ExhFlowFPLR = 0.0;
 				}
 			} else {
@@ -1755,11 +1754,11 @@ namespace MicroturbineElectricGenerator {
 				if ( ExhAirTempFTemp <= 0.0 ) {
 					if ( MTGenerator( GeneratorNum ).ExhTempFTempErrorIndex == 0 ) {
 						ShowWarningMessage( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-						ShowContinueError( "...Exhaust Air Temperature Modifier (function of temperature) output is less than or equal " "to zero (" + TrimSigDigits( ExhAirTempFTemp, 4 ) + ")." );
+						ShowContinueError( "...Exhaust Air Temperature Modifier (function of temperature) output is less than or equal to zero (" + TrimSigDigits( ExhAirTempFTemp, 4 ) + ")." );
 						ShowContinueError( "...Value occurs using a combustion inlet air temperature of " + TrimSigDigits( CombustionAirInletTemp, 2 ) + '.' );
 						ShowContinueErrorTimeStamp( "...Resetting curve output to zero and continuing simulation." );
 					}
-					ShowRecurringWarningErrorAtEnd( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\": Exhaust Air Temperature Modifier (function of temperature) output is less than or equal to zero" " warning continues...", MTGenerator( GeneratorNum ).ExhTempFTempErrorIndex, ExhAirTempFTemp, ExhAirTempFTemp );
+					ShowRecurringWarningErrorAtEnd( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\": Exhaust Air Temperature Modifier (function of temperature) output is less than or equal to zero warning continues...", MTGenerator( GeneratorNum ).ExhTempFTempErrorIndex, ExhAirTempFTemp, ExhAirTempFTemp );
 					ExhAirTempFTemp = 0.0;
 				}
 			} else {
@@ -1772,11 +1771,11 @@ namespace MicroturbineElectricGenerator {
 				if ( ExhAirTempFPLR <= 0.0 ) {
 					if ( MTGenerator( GeneratorNum ).ExhTempFPLRErrorIndex == 0 ) {
 						ShowWarningMessage( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-						ShowContinueError( "...Exhaust Air Temperature Modifier (function of part-load ratio) output is less than or " "equal to zero (" + TrimSigDigits( ExhAirTempFPLR, 4 ) + ")." );
+						ShowContinueError( "...Exhaust Air Temperature Modifier (function of part-load ratio) output is less than or equal to zero (" + TrimSigDigits( ExhAirTempFPLR, 4 ) + ")." );
 						ShowContinueError( "...Value occurs using a part-load ratio of " + TrimSigDigits( PLR, 2 ) + '.' );
 						ShowContinueErrorTimeStamp( "...Resetting curve output to zero and continuing simulation." );
 					}
-					ShowRecurringWarningErrorAtEnd( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\": Exhaust Air Temperature Modifier (function of part-load ratio) output is less than or equal to zero warning" " continues...", MTGenerator( GeneratorNum ).ExhTempFPLRErrorIndex, ExhAirTempFPLR, ExhAirTempFPLR );
+					ShowRecurringWarningErrorAtEnd( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\": Exhaust Air Temperature Modifier (function of part-load ratio) output is less than or equal to zero warning continues...", MTGenerator( GeneratorNum ).ExhTempFPLRErrorIndex, ExhAirTempFPLR, ExhAirTempFPLR );
 					ExhAirTempFPLR = 0.0;
 				}
 			} else {
@@ -1810,7 +1809,7 @@ namespace MicroturbineElectricGenerator {
 			if ( MTGenerator( GeneratorNum ).ExhaustAirTemperature < CombustionAirInletTemp ) {
 				if ( MTGenerator( GeneratorNum ).ExhTempLTInletTempIndex == 0 ) {
 					ShowWarningMessage( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-					ShowContinueError( "...The model has calculated the exhaust air temperature to be less than " "the combustion air inlet temperature." );
+					ShowContinueError( "...The model has calculated the exhaust air temperature to be less than the combustion air inlet temperature." );
 					ShowContinueError( "...Value of exhaust air temperature   =" + TrimSigDigits( MTGenerator( GeneratorNum ).ExhaustAirTemperature, 4 ) + " C." );
 					ShowContinueError( "...Value of combustion air inlet temp =" + TrimSigDigits( CombustionAirInletTemp, 4 ) + " C." );
 					ShowContinueErrorTimeStamp( "... Simulation will continue." );
@@ -1821,7 +1820,7 @@ namespace MicroturbineElectricGenerator {
 			if ( MTGenerator( GeneratorNum ).ExhaustAirHumRat < CombustionAirInletW ) {
 				if ( MTGenerator( GeneratorNum ).ExhHRLTInletHRIndex == 0 ) {
 					ShowWarningMessage( "GENERATOR:MICROTURBINE \"" + MTGenerator( GeneratorNum ).Name + "\"" );
-					ShowContinueError( "...The model has calculated the exhaust air humidity ratio to be less than " "the combustion air inlet humidity ratio." );
+					ShowContinueError( "...The model has calculated the exhaust air humidity ratio to be less than the combustion air inlet humidity ratio." );
 					ShowContinueError( "...Value of exhaust air humidity ratio          =" + TrimSigDigits( MTGenerator( GeneratorNum ).ExhaustAirHumRat, 6 ) + " kgWater/kgDryAir." );
 					ShowContinueError( "...Value of combustion air inlet humidity ratio =" + TrimSigDigits( CombustionAirInletW, 6 ) + " kgWater/kgDryAir." );
 					ShowContinueErrorTimeStamp( "... Simulation will continue." );

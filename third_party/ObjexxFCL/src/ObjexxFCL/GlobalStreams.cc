@@ -25,7 +25,7 @@ namespace gio {
 
 	// Default Constructor
 	GlobalStreams::GlobalStreams() :
-		next_unit_( 1 )
+	 next_unit_( 1 )
 	{
 		IStream * const cin_p( new IStream( std::cin, "stdin" ) );
 		OStream * const cout_p( new OStream( std::cout, "stdout" ) );

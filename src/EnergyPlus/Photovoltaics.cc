@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -80,7 +81,7 @@ namespace Photovoltaics {
 	// na
 
 	// DERIVED TYPE DEFINITIONS:
-	//   see DataPhotovoltaics.f90
+	//   see DataPhotovoltaics.cc
 
 	FArray1D_bool CheckEquipName;
 
@@ -272,10 +273,10 @@ namespace Photovoltaics {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the input for the Photovoltaic units saving it in
-		// the data structures defined in DataPhotovoltaics.f90.
+		// the data structures defined in DataPhotovoltaics.cc.
 
 		// METHODOLOGY EMPLOYED:
-		// subroutine structure taken from Beta2 BaseboardRadiator.f90
+		// subroutine structure taken from Beta2 BaseboardRadiator.cc
 
 		// REFERENCES:
 		// na
@@ -344,8 +345,7 @@ namespace Photovoltaics {
 		}
 
 		if ( ! allocated( PVarray ) ) PVarray.allocate( NumPVs );
-		CheckEquipName.allocate( NumPVs );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumPVs, true );
 
 		cCurrentModuleObject = cPVGeneratorObjectName;
 		for ( PVnum = 1; PVnum <= NumPVs; ++PVnum ) {
@@ -463,12 +463,12 @@ namespace Photovoltaics {
 					} else if ( PVarray( dupPtr ).CellIntegrationMode == iTranspiredCollectorCellIntegration ) {
 						ShowSevereError( cCurrentModuleObject + ": problem detected with multiple PV arrays." );
 						ShowContinueError( "When using IntegratedTranspiredCollector heat transfer mode, only one PV array can be coupled" );
-						ShowContinueError( "Both " + PVarray( PVnum ).Name + " and " + PVarray( dupPtr ).Name + " are using UTSC " "surface = " + PVarray( PVnum ).SurfaceName );
+						ShowContinueError( "Both " + PVarray( PVnum ).Name + " and " + PVarray( dupPtr ).Name + " are using UTSC surface = " + PVarray( PVnum ).SurfaceName );
 						ErrorsFound = true;
 					} else if ( PVarray( dupPtr ).CellIntegrationMode == iExteriorVentedCavityCellIntegration ) {
 						ShowSevereError( cCurrentModuleObject + ": problem detected with multiple PV arrays." );
 						ShowContinueError( "When using IntegratedExteriorVentedCavity heat transfer mode, only one PV array can be coupled" );
-						ShowContinueError( "Both " + PVarray( PVnum ).Name + " and " + PVarray( dupPtr ).Name + " are using exterior " "vented surface = " + PVarray( PVnum ).SurfaceName );
+						ShowContinueError( "Both " + PVarray( PVnum ).Name + " and " + PVarray( dupPtr ).Name + " are using exterior vented surface = " + PVarray( PVnum ).SurfaceName );
 						ErrorsFound = true;
 					}
 				}
@@ -786,6 +786,7 @@ namespace Photovoltaics {
 				PVarray( thisPV ).SimplePVModule.PVEfficiency = Eff;
 
 			} else {
+				Eff = 0.0; // Suppress uninitialized warning
 				ShowSevereError( "caught bad Mode in Generator:Photovoltaic:Simple use FIXED or SCHEDULED efficiency mode" );
 			}}
 
@@ -1125,8 +1126,7 @@ namespace Photovoltaics {
 		// perform the one time initializations
 		if ( MyOneTimeFlag ) {
 			// initialize the environment and sizing flags
-			MyEnvrnFlag.allocate( NumPVs );
-			MyEnvrnFlag = true;
+			MyEnvrnFlag.dimension( NumPVs, true );
 			MyOneTimeFlag = false;
 		}
 
@@ -1242,7 +1242,7 @@ namespace Photovoltaics {
 		Real64 PA;
 		int CC;
 		int K;
-		Real64 CellTemp; // cell temperature in Kelvin
+		Real64 CellTemp( 0.0 ); // cell temperature in Kelvin
 		Real64 CellTempC; // cell temperature in degrees C
 		static bool firstTime( true );
 		//unused1208  INTEGER :: thisZone
@@ -1348,7 +1348,9 @@ namespace Photovoltaics {
 				GetExtVentedCavityTsColl( PVarray( PVnum ).ExtVentCavPtr, CellTemp );
 				CellTemp += KelvinConv;
 			} else if ( SELECT_CASE_var == iPVTSolarCollectorCellIntegration ) {
-				// get PVT model result for cell temp..
+				// get PVT model result for cell temp.. //Bug CellTemp not set but used below
+			} else {
+				assert( false );
 			}}
 
 			PVarray( PVnum ).TRNSYSPVcalc.Insolation = 0.0;
@@ -1652,7 +1654,7 @@ namespace Photovoltaics {
 		using General::RoundSigDigits;
 
 		// Return value
-		Real64 FUN;
+		Real64 FUN( 0.0 );
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -1713,7 +1715,7 @@ namespace Photovoltaics {
 		using General::RoundSigDigits;
 
 		// Return value
-		Real64 FI;
+		Real64 FI( 0.0 );
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -1773,7 +1775,7 @@ namespace Photovoltaics {
 		using General::RoundSigDigits;
 
 		// Return value
-		Real64 FV;
+		Real64 FV( 0.0 );
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -2687,7 +2689,7 @@ namespace Photovoltaics {
 		}
 
 		if ( ! Found ) {
-			ShowFatalError( "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, " "Surface name = " + Surface( SurfacePtr ).Name );
+			ShowFatalError( "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, Surface name = " + Surface( SurfacePtr ).Name );
 		} else {
 
 			VentCavIndex = CavNum;
@@ -2761,7 +2763,7 @@ namespace Photovoltaics {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -116,7 +116,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.2;
+  Version,8.3;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -2777,7 +2777,7 @@
     0.88,                    !- Emissivity of Outer Cover {dimensionless}
     1.37,                    !- Refractive Index of Inner Cover {dimensionless}
     0.0,                     !- Extinction Coefficient Times Thickness of the inner Cover {dimensionless}
-    0.88,                    !- Emmissivity of Inner Cover {dimensionless}
+    0.88,                    !- Emissivity of Inner Cover {dimensionless}
     0.96,                    !- Absorptance of Absorber Plate {dimensionless}
     0.30;                    !- Emissivity of Absorber Plate {dimensionless}
 

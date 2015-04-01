@@ -15,11 +15,8 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class IndexRange;
-
-// Types
-typedef  IndexRange  IRange;
 
 } // ObjexxFCL
 

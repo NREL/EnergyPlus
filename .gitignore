@@ -2,6 +2,8 @@
 *.d
 *.dll
 *.exe
+*.gcda
+*.ilk
 *.lib
 *.log
 *.map
@@ -16,6 +18,9 @@
 *.so.*
 *~
 .directory
+
+# now that we have python, ignore some things
+*.pyc
 
 # build folder, if the dev chooses to put it there
 #  could also do a wildcard for build-* if we suggest that naming approach

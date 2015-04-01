@@ -73,6 +73,12 @@ link_err ()
 
 chmod o+w "${install_directory}/${package_name}/PreProcess/IDFVersionUpdater/"
 
+if [ "$(id -u)" = "0" ]; then
+  mv "${install_directory}/${package_name}/energyplus.1" /usr/local/share/man/man1/
+else
+  echo "Man page installation skipped since script is executing without root privileges" 1>&2
+fi
+
 if [ ! "$link_directory" = "n" ]; then
 	uninstall="$install_directory/$package_name/uninstall.sh"
 	echo "#!/usr/bin/env sh" > $uninstall
@@ -80,8 +86,7 @@ if [ ! "$link_directory" = "n" ]; then
   ln -sf "${install_directory}/${package_name}/PreProcess/GrndTempCalc/Basement" "${link_directory}" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/PreProcess/GrndTempCalc/BasementGHT.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/PostProcess/convertESOMTRpgm/convertESOMTR" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/PreProcess/dos2unix" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/EnergyPlus" "${link_directory}" 2> /dev/null > /dev/null || link_err
+  ln -sf "${install_directory}/${package_name}/energyplus" "${link_directory}/EnergyPlus" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/Energy+.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/PostProcess/EP-Compare/EP-Compare" "${link_directory}" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/EPMacro" "${link_directory}" 2> /dev/null > /dev/null || link_err
@@ -96,15 +101,14 @@ if [ ! "$link_directory" = "n" ]; then
   ln -sf "${install_directory}/${package_name}/runreadvars" "${link_directory}" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/PreProcess/GrndTempCalc/Slab" "${link_directory}" 2> /dev/null > /dev/null || link_err
   ln -sf "${install_directory}/${package_name}/PreProcess/GrndTempCalc/SlabGHT.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/PreProcess/IDFVersionUpdater/Transition-V8-0-0-to-V8-1-0" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/PreProcess/IDFVersionUpdater/V8-0-0-Energy+.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
-  ln -sf "${install_directory}/${package_name}/PreProcess/IDFVersionUpdater/V8-1-0-Energy+.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
+  ln -sf "${install_directory}/${package_name}/PreProcess/IDFVersionUpdater/Transition-V8-2-0-to-V8-3-0" "${link_directory}" 2> /dev/null > /dev/null || link_err
+  ln -sf "${install_directory}/${package_name}/PreProcess/IDFVersionUpdater/V8-2-0-Energy+.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
+  ln -sf "${install_directory}/${package_name}/PreProcess/IDFVersionUpdater/V8-3-0-Energy+.idd" "${link_directory}" 2> /dev/null > /dev/null || link_err
 	(   
 		cat <<-HERE
       rm -f "${link_directory}/Basement"
       rm -f "${link_directory}/BasementGHT.idd"
       rm -f "${link_directory}/convertESOMTR"
-      rm -f "${link_directory}/dos2unix"
       rm -f "${link_directory}/EnergyPlus"
       rm -f "${link_directory}/Energy+.idd"
       rm -f "${link_directory}/EP-Compare"
@@ -120,9 +124,10 @@ if [ ! "$link_directory" = "n" ]; then
       rm -f "${link_directory}/runreadvars"
       rm -f "${link_directory}/Slab"
       rm -f "${link_directory}/SlabGHT.idd"
-      rm -f "${link_directory}/Transition-V8-0-0-to-V8-1-0"
-      rm -f "${link_directory}/V8-0-0-Energy+.idd"
-      rm -f "${link_directory}/V8-1-0-Energy+.idd"
+      rm -f "${link_directory}/Transition-V8-2-0-to-V8-3-0"
+      rm -f "${link_directory}/V8-2-0-Energy+.idd"
+      rm -f "${link_directory}/V8-3-0-Energy+.idd"
+      rm -f /usr/local/share/man/man1/energyplus.1
 			echo "Symbolic links to this installation of EnergyPlus have been removed."
 			echo "You may remove the EnergyPlus directory to completely uninstall the software."
 		HERE

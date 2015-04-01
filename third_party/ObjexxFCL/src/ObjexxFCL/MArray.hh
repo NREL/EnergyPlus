@@ -22,6 +22,7 @@
 #include <cassert>
 #include <cstddef>
 #include <initializer_list>
+#include <type_traits>
 
 namespace ObjexxFCL {
 
@@ -61,16 +62,16 @@ protected: // Creation
 	// Copy Constructor
 	inline
 	MArray( MArray const & a ) :
-		BArray( a ),
-		array_( a.array_ ),
-		pmem_( a.pmem_ )
+	 BArray( a ),
+	 array_( a.array_ ),
+	 pmem_( a.pmem_ )
 	{}
 
 	// Constructor
 	inline
-	MArray( A & array, T Class::* pmem ) :
-		array_( array ),
-		pmem_( pmem )
+	MArray( A & a, T Class::* pmem ) :
+	 array_( a ),
+	 pmem_( pmem )
 	{}
 
 public: // Creation
@@ -174,7 +175,7 @@ public: // Inspector
 		return 1;
 	}
 
-	// Upper Index of Dimension
+	// Upper Index of a Dimension
 	inline
 	int
 	u( int const d ) const

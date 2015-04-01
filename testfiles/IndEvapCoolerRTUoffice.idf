@@ -29,7 +29,7 @@
 !         Systems are set to Night Cycle during setup/setback.
 !
 
-  Version,8.2;
+  Version,8.3;
 
   Timestep,6;
 
@@ -3780,30 +3780,40 @@
     Direct DX air Loop ZN1,  !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     .008,                    !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     .008,                    !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN1 Inlets,         !- Name
@@ -3981,17 +3991,24 @@
   EvaporativeCooler:Indirect:ResearchSpecial,
     Indirect Evap ZN1,       !- Name
     On_Except_Winter_Night,  !- Availability Schedule Name
-    0.7,                     !- Cooler Maximum Effectiveness
-    ,                        !- Cooler Flow Ratio
-    30,                      !- Recirculating Water Pump Power Consumption {W}
-    0.8,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Total Efficiency
-    250,                     !- Secondary Fan Delta Pressure {Pa}
+    0.7,                     !- Cooler Wetbulb Design Effectiveness
+    ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
+    ,                        !- Cooler Drybulb Design Effectiveness
+    ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
+    30,                      !- Recirculating Water Pump Design Power {W}
+    ,                        !- Water Pump Power Sizing Factor 
+    ,                        !- Water Pump Power Modifier Curve Name
+    0.8,                     !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Sizing Factor
+    autosize,                !- Secondary Air Fan Design Power
+    357.142857142857,        !- Secondary Air Fan Sizing Specific Power
+    ,                        !- Secondary Fan Power Modifier Curve Name
     Mixed Air Node ZN1,      !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN1,  !- Primary Air Outlet Node Name
-    ,                        !- Control Type
+    autosize,                !- Primary Design Air Flow Rate
     0.9,                     !- Dewpoint Effectiveness Factor
     Purge Air Inlet ZN1,     !- Secondary Air Inlet Node Name
+    Purge Air Outlet Node ZN1,   !- Secondary Air Outlet Node Name
     Air Loop Outlet Node ZN1,!- Sensor Node Name
     ;                        !- Relief Air Inlet Node Name
 
@@ -4094,30 +4111,40 @@
     Direct DX air Loop ZN3,  !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     .008,                    !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     .008,                    !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN3 Inlets,         !- Name
@@ -4295,17 +4322,24 @@
   EvaporativeCooler:Indirect:ResearchSpecial,
     Indirect Evap ZN3,       !- Name
     On_Except_Winter_Night,  !- Availability Schedule Name
-    0.7,                     !- Cooler Maximum Effectiveness
-    ,                        !- Cooler Flow Ratio
-    30,                      !- Recirculating Water Pump Power Consumption {W}
-    1.0,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Total Efficiency
-    250,                     !- Secondary Fan Delta Pressure {Pa}
+    0.7,                     !- Cooler Wetbulb Design Effectiveness
+    ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
+    ,                        !- Cooler Drybulb Design Effectiveness
+    ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
+    30,                      !- Recirculating Water Pump Design Power{W}
+    ,                        !- Water Pump Power Sizing Factor 
+    ,                        !- Water Pump Power Modifier Curve Name
+    1.0,                     !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Sizing Factor
+    autosize,                !- Secondary Air Fan Design Power
+    357.142857142857,        !- Secondary Air Fan Sizing Specific Power
+    ,                        !- Secondary Fan Power Modifier Curve Name
     Mixed Air Node ZN3,      !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN3,  !- Primary Air Outlet Node Name
-    ,                        !- Control Type
+    autosize,                !- Primary Design Air Flow Rate
     0.9,                     !- Dewpoint Effectiveness Factor
     Purge Air Inlet ZN3,     !- Secondary Air Inlet Node Name
+    Purge Air Outlet Node ZN3,   !- Secondary Air Outlet Node Name
     Air Loop Outlet Node ZN3,!- Sensor Node Name
     ;                        !- Relief Air Inlet Node Name
 
@@ -4408,30 +4442,40 @@
     Direct DX air Loop ZN5,  !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     .008,                    !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     .008,                    !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN5 Inlets,         !- Name
@@ -4609,17 +4653,24 @@
   EvaporativeCooler:Indirect:ResearchSpecial,
     Indirect Evap ZN5,       !- Name
     On_Except_Winter_Night,  !- Availability Schedule Name
-    0.7,                     !- Cooler Maximum Effectiveness
-    ,                        !- Cooler Flow Ratio
-    30,                      !- Recirculating Water Pump Power Consumption {W}
-    1.4,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Total Efficiency
-    250,                     !- Secondary Fan Delta Pressure {Pa}
+    0.7,                     !- Cooler Wetbulb Design Effectiveness
+    ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
+    ,                        !- Cooler Drybulb Design Effectiveness
+    ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
+    30,                      !- Recirculating Water Pump Design Power{W}
+    ,                        !- Water Pump Power Sizing Factor 
+    ,                        !- Water Pump Power Modifier Curve Name
+    1.4,                     !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Sizing Factor
+    autosize,                !- Secondary Air Fan Design Power
+    357.142857142857,        !- Secondary Air Fan Sizing Specific Power
+    ,                        !- Secondary Fan Power Modifier Curve Name
     Mixed Air Node ZN5,      !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN5,  !- Primary Air Outlet Node Name
-    ,                        !- Control Type
+    autosize,                !- Primary Design Air Flow Rate
     0.9,                     !- Dewpoint Effectiveness Factor
     Purge Air Inlet ZN5,     !- Secondary Air Inlet Node Name
+    Purge Air Outlet Node ZN5,   !- Secondary Air Outlet Node Name
     Air Loop Outlet Node ZN5,!- Sensor Node Name
     ;                        !- Relief Air Inlet Node Name
 
@@ -4722,30 +4773,40 @@
     Direct DX air Loop ZN7,  !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     .008,                    !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     .008,                    !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN7 Inlets,         !- Name
@@ -4923,17 +4984,24 @@
   EvaporativeCooler:Indirect:ResearchSpecial,
     Indirect Evap ZN7,       !- Name
     On_Except_Winter_Night,  !- Availability Schedule Name
-    0.7,                     !- Cooler Maximum Effectiveness
-    ,                        !- Cooler Flow Ratio
-    30,                      !- Recirculating Water Pump Power Consumption {W}
-    0.8,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Total Efficiency
-    250,                     !- Secondary Fan Delta Pressure {Pa}
+    0.7,                     !- Cooler Wetbulb Design Effectiveness
+    ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
+    ,                        !- Cooler Drybulb Design Effectiveness
+    ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
+    30,                      !- Recirculating Water Pump Design Power{W}
+    ,                        !- Water Pump Power Sizing Factor 
+    ,                        !- Water Pump Power Modifier Curve Name
+    0.8,                     !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Sizing Factor
+    autosize,                !- Secondary Air Fan Design Power
+    357.142857142857,        !- Secondary Air Fan Sizing Specific Power
+    ,                        !- Secondary Fan Power Modifier Curve Name
     Mixed Air Node ZN7,      !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN7,  !- Primary Air Outlet Node Name
-    ,                        !- Control Type
+    autosize,                !- Primary Design Air Flow Rate
     0.9,                     !- Dewpoint Effectiveness Factor
     Purge Air Inlet ZN7,     !- Secondary Air Inlet Node Name
+    Purge Air Outlet Node ZN7,   !- Secondary Air Outlet Node Name
     Air Loop Outlet Node ZN7,!- Sensor Node Name
     ;                        !- Relief Air Inlet Node Name
 
@@ -5036,30 +5104,40 @@
     Direct DX air Loop ZN9,  !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     .008,                    !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     .008,                    !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN9 Inlets,         !- Name
@@ -5237,17 +5315,24 @@
   EvaporativeCooler:Indirect:ResearchSpecial,
     Indirect Evap ZN9,       !- Name
     On_Except_Winter_Night,  !- Availability Schedule Name
-    0.7,                     !- Cooler Maximum Effectiveness
-    ,                        !- Cooler Flow Ratio
-    30,                      !- Recirculating Water Pump Power Consumption {W}
-    1.1,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Total Efficiency
-    250,                     !- Secondary Fan Delta Pressure {Pa}
+    0.7,                     !- Cooler Wetbulb Design Effectiveness
+    ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
+    ,                        !- Cooler Drybulb Design Effectiveness
+    ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
+    30,                      !- Recirculating Water Pump Design Power{W}
+    ,                        !- Water Pump Power Sizing Factor 
+    ,                        !- Water Pump Power Modifier Curve Name
+    1.1,                     !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Sizing Factor
+    autosize,                !- Secondary Air Fan Design Power
+    357.142857142857,        !- Secondary Air Fan Sizing Specific Power
+    ,                        !- Secondary Fan Power Modifier Curve Name
     Mixed Air Node ZN9,      !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN9,  !- Primary Air Outlet Node Name
-    ,                        !- Control Type
+    autosize,                !- Primary Design Air Flow Rate
     0.9,                     !- Dewpoint Effectiveness Factor
     Purge Air Inlet ZN9,     !- Secondary Air Inlet Node Name
+    Purge Air Outlet Node ZN9,   !- Secondary Air Outlet Node Name
     Air Loop Outlet Node ZN9,!- Sensor Node Name
     ;                        !- Relief Air Inlet Node Name
 
@@ -5350,30 +5435,40 @@
     Direct DX air Loop ZN11, !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     .008,                    !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     .008,                    !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN11 Inlets,        !- Name
@@ -5551,17 +5646,24 @@
   EvaporativeCooler:Indirect:ResearchSpecial,
     Indirect Evap ZN11,      !- Name
     On_Except_Winter_Night,  !- Availability Schedule Name
-    0.7,                     !- Cooler Maximum Effectiveness
-    ,                        !- Cooler Flow Ratio
-    30,                      !- Recirculating Water Pump Power Consumption {W}
-    0.9,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Total Efficiency
-    250,                     !- Secondary Fan Delta Pressure {Pa}
+    0.7,                     !- Cooler Wetbulb Design Effectiveness
+    ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
+    ,                        !- Cooler Drybulb Design Effectiveness
+    ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
+    30,                      !- Recirculating Water Pump Design Power{W}
+    ,                        !- Water Pump Power Sizing Factor 
+    ,                        !- Water Pump Power Modifier Curve Name
+    0.9,                     !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Sizing Factor
+    autosize,                !- Secondary Air Fan Design Power
+    357.142857142857,        !- Secondary Air Fan Sizing Specific Power
+    ,                        !- Secondary Fan Power Modifier Curve Name
     Mixed Air Node ZN11,     !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN11,  !- Primary Air Outlet Node Name
-    ,                        !- Control Type
+    autosize,                !- Primary Design Air Flow Rate
     0.9,                     !- Dewpoint Effectiveness Factor
     Purge Air Inlet ZN11,    !- Secondary Air Inlet Node Name
+    Purge Air Outlet Node ZN11,   !- Secondary Air Outlet Node Name
     Air Loop Outlet Node ZN11,  !- Sensor Node Name
     ;                        !- Relief Air Inlet Node Name
 
@@ -5664,30 +5766,40 @@
     Direct DX air Loop ZN13, !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     .008,                    !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     .008,                    !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN13 Inlets,        !- Name
@@ -5865,17 +5977,24 @@
   EvaporativeCooler:Indirect:ResearchSpecial,
     Indirect Evap ZN13,      !- Name
     On_Except_Winter_Night,  !- Availability Schedule Name
-    0.7,                     !- Cooler Maximum Effectiveness
-    ,                        !- Cooler Flow Ratio
-    30,                      !- Recirculating Water Pump Power Consumption {W}
-    1.2,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Total Efficiency
-    250,                     !- Secondary Fan Delta Pressure {Pa}
+    0.7,                     !- Cooler Wetbulb Design Effectiveness
+    ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
+    ,                        !- Cooler Drybulb Design Effectiveness
+    ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
+    30,                      !- Recirculating Water Pump Design Power{W}
+    ,                        !- Water Pump Power Sizing Factor 
+    ,                        !- Water Pump Power Modifier Curve Name
+    1.2,                     !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Sizing Factor
+    autosize,                !- Secondary Air Fan Design Power
+    357.142857142857,        !- Secondary Air Fan Sizing Specific Power
+    ,                        !- Secondary Fan Power Modifier Curve Name
     Mixed Air Node ZN13,     !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN13,  !- Primary Air Outlet Node Name
-    ,                        !- Control Type
+    autosize,                !- Primary Design Air Flow Rate
     0.9,                     !- Dewpoint Effectiveness Factor
     Purge Air Inlet ZN13,    !- Secondary Air Inlet Node Name
+    Purge Air Outlet Node ZN13,   !- Secondary Air Outlet Node Name
     Air Loop Outlet Node ZN13,  !- Sensor Node Name
     ;                        !- Relief Air Inlet Node Name
 
@@ -5978,30 +6097,40 @@
     Direct DX air Loop ZN15, !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     .008,                    !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     .008,                    !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN15 Inlets,        !- Name
@@ -6179,17 +6308,24 @@
   EvaporativeCooler:Indirect:ResearchSpecial,
     Indirect Evap ZN15,      !- Name
     On_Except_Winter_Night,  !- Availability Schedule Name
-    0.7,                     !- Cooler Maximum Effectiveness
-    ,                        !- Cooler Flow Ratio
-    30,                      !- Recirculating Water Pump Power Consumption {W}
-    1.5,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Total Efficiency
-    250,                     !- Secondary Fan Delta Pressure {Pa}
+    0.7,                     !- Cooler Wetbulb Design Effectiveness
+    ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
+    ,                        !- Cooler Drybulb Design Effectiveness
+    ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
+    30,                      !- Recirculating Water Pump Design Power{W}
+    ,                        !- Water Pump Power Sizing Factor 
+    ,                        !- Water Pump Power Modifier Curve Name
+    1.5,                     !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Sizing Factor
+    autosize,                !- Secondary Air Fan Design Power
+    357.142857142857,        !- Secondary Air Fan Sizing Specific Power
+    ,                        !- Secondary Fan Power Modifier Curve Name
     Mixed Air Node ZN15,     !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN15,  !- Primary Air Outlet Node Name
-    ,                        !- Control Type
+    autosize,                !- Primary Design Air Flow Rate
     0.9,                     !- Dewpoint Effectiveness Factor
     Purge Air Inlet ZN15,    !- Secondary Air Inlet Node Name
+    Purge Air Outlet Node ZN15,   !- Secondary Air Outlet Node Name
     Air Loop Outlet Node ZN15,  !- Sensor Node Name
     ;                        !- Relief Air Inlet Node Name
 
@@ -6292,30 +6428,40 @@
     Direct DX air Loop ZN17, !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     .008,                    !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     .008,                    !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN17 Inlets,        !- Name
@@ -6493,17 +6639,24 @@
   EvaporativeCooler:Indirect:ResearchSpecial,
     Indirect Evap ZN17,      !- Name
     On_Except_Winter_Night,  !- Availability Schedule Name
-    0.7,                     !- Cooler Maximum Effectiveness
-    ,                        !- Cooler Flow Ratio
-    30,                      !- Recirculating Water Pump Power Consumption {W}
-    0.9,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Total Efficiency
-    250,                     !- Secondary Fan Delta Pressure {Pa}
+    0.7,                     !- Cooler Wetbulb Design Effectiveness
+    ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
+    ,                        !- Cooler Drybulb Design Effectiveness
+    ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
+    30,                      !- Recirculating Water Pump Design Power{W}
+    ,                        !- Water Pump Power Sizing Factor 
+    ,                        !- Water Pump Power Modifier Curve Name
+    0.9,                     !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Sizing Factor
+    autosize,                !- Secondary Air Fan Design Power
+    357.142857142857,        !- Secondary Air Fan Sizing Specific Power
+    ,                        !- Secondary Fan Power Modifier Curve Name
     Mixed Air Node ZN17,     !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN17,  !- Primary Air Outlet Node Name
-    ,                        !- Control Type
+    autosize,                !- Primary Design Air Flow Rate
     0.9,                     !- Dewpoint Effectiveness Factor
     Purge Air Inlet ZN17,    !- Secondary Air Inlet Node Name
+    Purge Air Outlet Node ZN17,   !- Secondary Air Outlet Node Name
     Air Loop Outlet Node ZN17,  !- Sensor Node Name
     ;                        !- Relief Air Inlet Node Name
 
@@ -6606,30 +6759,40 @@
     Direct DX air Loop ZN19, !- AirLoop Name
     sensible,                !- Type of Load to Size On
     autosize,                !- Design Outdoor Air Flow Rate {m3/s}
-    1.0,                     !- Minimum System Air Flow Ratio
+    1.0,                     !- Central Heating Maximum System Air Flow Ratio
     4.0,                     !- Preheat Design Temperature {C}
     .008,                    !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     11.0,                    !- Precool Design Temperature {C}
     .008,                    !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.0,                    !- Central Cooling Design Supply Air Temperature {C}
     50.0,                    !- Central Heating Design Supply Air Temperature {C}
-    noncoincident,           !- Sizing Option
+    noncoincident,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-    DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    DesignDay,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    DesignDay,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    1.0,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   NodeList,
     Zone ZN19 Inlets,        !- Name
@@ -6807,17 +6970,24 @@
   EvaporativeCooler:Indirect:ResearchSpecial,
     Indirect Evap ZN19,      !- Name
     On_Except_Winter_Night,  !- Availability Schedule Name
-    0.7,                     !- Cooler Maximum Effectiveness
-    ,                        !- Cooler Flow Ratio
-    30,                      !- Recirculating Water Pump Power Consumption {W}
-    1.8,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Total Efficiency
-    250,                     !- Secondary Fan Delta Pressure {Pa}
+    0.7,                     !- Cooler Wetbulb Design Effectiveness
+    ,                        !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
+    ,                        !- Cooler Drybulb Design Effectiveness
+    ,                        !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
+    30,                      !- Recirculating Water Pump Design Power{W}
+    ,                        !- Water Pump Power Sizing Factor 
+    ,                        !- Water Pump Power Modifier Curve Name
+    1.8,                     !- Secondary Air Design Flow Rate {m3/s}
+    1.0,                     !- Secondary Air Flow Sizing Factor
+    autosize,                !- Secondary Air Fan Design Power
+    357.142857142857,        !- Secondary Air Fan Sizing Specific Power
+    ,                        !- Secondary Fan Power Modifier Curve Name
     Mixed Air Node ZN19,     !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN19,  !- Primary Air Outlet Node Name
-    ,                        !- Control Type
+    autosize,                !- Primary Design Air Flow Rate
     0.9,                     !- Dewpoint Effectiveness Factor
     Purge Air Inlet ZN19,    !- Secondary Air Inlet Node Name
+    Purge Air Outlet Node ZN19,   !- Secondary Air Outlet Node Name
     Air Loop Outlet Node ZN19,  !- Sensor Node Name
     ;                        !- Relief Air Inlet Node Name
 

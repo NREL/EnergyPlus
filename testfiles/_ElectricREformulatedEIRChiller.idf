@@ -106,7 +106,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.2;
+  Version,8.3;
 
   Timestep,6;
 
@@ -1451,6 +1451,7 @@
     0.001345,                !- Reference Condenser Water Flow Rate {m3/s}
     ReformEIRChiller Trane CGWD 207kW/None CAPFT,  !- Cooling Capacity Function of Temperature Curve Name
     ReformEIRChiller Trane CGWD 207kW/None EIRFT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    ,                        !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Trane CGWD 207kW/None EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.25,                    !- Minimum Part Load Ratio
     1.01,                    !- Maximum Part Load Ratio

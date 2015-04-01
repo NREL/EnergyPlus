@@ -19,6 +19,7 @@
 #include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/DimensionExpressions.hh>
 #include <ObjexxFCL/FArray.functions.hh>
+#include "ObjexxFCL.unit.hh"
 
 // C++ Headers
 #include <array>
@@ -279,8 +280,10 @@ TEST( FArray2Test, ConstructIndexes )
 
 TEST( FArray2Test, ConstructIndexRange )
 {
+	typedef  StaticIndexRange  SR;
+
 	// Explicit index range, positive bounds
-	FArray2D_int A11( SRange( 2, 5 ), SRange( 3, 7 ) );
+	FArray2D_int A11( SR( 2, 5 ), SR( 3, 7 ) );
 	EXPECT_EQ( 20u, A11.size() );
 	EXPECT_EQ( 4u, A11.size1() );
 	EXPECT_EQ( 5u, A11.size2() );
@@ -294,7 +297,7 @@ TEST( FArray2Test, ConstructIndexRange )
 	EXPECT_FALSE( A11.initializer_active() );
 
 	// Explicit index range, negative bounds
- 	FArray2D_int A12( SRange( -5, -2 ), SRange( -7, -3 ) );
+ 	FArray2D_int A12( SR( -5, -2 ), SR( -7, -3 ) );
 	EXPECT_EQ( 20u, A12.size() );
 	EXPECT_EQ( 4u, A12.size1() );
 	EXPECT_EQ( 5u, A12.size2() );
@@ -308,7 +311,7 @@ TEST( FArray2Test, ConstructIndexRange )
 	EXPECT_FALSE( A12.initializer_active() );
 
 	// Explicit index range, bounds that cross zero
-	FArray2D_int A13( SRange( -3, 3 ), SRange( -2, 2 ) );
+	FArray2D_int A13( SR( -3, 3 ), SR( -2, 2 ) );
 	EXPECT_EQ( 35u, A13.size() );
 	EXPECT_EQ( 7u, A13.size1() );
 	EXPECT_EQ( 5u, A13.size2() );
@@ -405,8 +408,10 @@ TEST( FArray2Test, ConstructIndexesInitializerValue )
 
 TEST( FArray2Test, ConstructIndexRangeInitializerValue )
 {
+	typedef  StaticIndexRange  SR;
+
 	// Explicit index range
-	FArray2D_int A11( SRange( 2, 5 ), SRange( 3, 7 ), 31459 );
+	FArray2D_int A11( SR( 2, 5 ), SR( 3, 7 ), 31459 );
 	EXPECT_EQ( 20u, A11.size() );
 	EXPECT_EQ( 4u, A11.size1() );
 	EXPECT_EQ( 5u, A11.size2() );
@@ -425,7 +430,7 @@ TEST( FArray2Test, ConstructIndexRangeInitializerValue )
 	}
 
 	// Explicit index range, bounds that cross zero
-	FArray2D_int A12( SRange( -3, 3 ), SRange( -2, 2 ), -31459 );
+	FArray2D_int A12( SR( -3, 3 ), SR( -2, 2 ), -31459 );
 	EXPECT_EQ( 35u, A12.size() );
 	EXPECT_EQ( 7u, A12.size1() );
 	EXPECT_EQ( 5u, A12.size2() );
@@ -679,14 +684,14 @@ static void initializer_function_Fstring( FArray2D_Fstring & A )
 
 TEST( FArray2Test, ConstructIndexesInitializerFunction )
 {
-	FArray2D_int A1( 2, 3, initializer_function_int);
+	FArray2D_int A1( 2, 3, initializer_function_int );
 	EXPECT_TRUE( eq( FArray2D_int( 2, 3, { 11, 21, 12, 22, 13, 23 } ), A1 ) );
 	FArray2D_double A2( 2, 3, initializer_function_double );
 	EXPECT_TRUE( eq( FArray2D_double( 2, 3, { 1.1, 2.1, 1.2, 2.2, 1.3, 2.3 } ), A2 ) );
 	FArray2D_Fstring A3( 2, 3, initializer_function_Fstring );
 	EXPECT_TRUE( eq( FArray2D_Fstring( 2, 3, { "1,1", "2,1", "1,2", "2,2", "1,3", "2,3" } ), A3 ) );
 
-	FArray2D_int const C1( 2, 3, initializer_function_int);
+	FArray2D_int const C1( 2, 3, initializer_function_int );
 	EXPECT_TRUE( eq( FArray2D_int( 2, 3, { 11, 21, 12, 22, 13, 23 } ), C1 ) );
 	FArray2D_double const C2( 2, 3, initializer_function_double );
 	EXPECT_TRUE( eq( FArray2D_double( 2, 3, { 1.1, 2.1, 1.2, 2.2, 1.3, 2.3 } ), C2 ) );
@@ -703,7 +708,7 @@ TEST( FArray2Test, ConstructIndexRangeInitializerFunction )
 	FArray2D_Fstring A3( { 0, 1 }, { -1, 1 }, initializer_function_Fstring );
 	EXPECT_TRUE( eq( FArray2D_Fstring( { 0, 1 }, { -1, 1 }, { "0,-1", "1,-1", "0,0", "1,0", "0,1", "1,1" } ), A3 ) );
 
-	FArray2D_int const C1( { 0, 1 }, { -1, 1 }, initializer_function_int);
+	FArray2D_int const C1( { 0, 1 }, { -1, 1 }, initializer_function_int );
 	EXPECT_TRUE( eq( FArray2D_int( { 0, 1 }, { -1, 1 }, { -1, 9, 0, 10, 1, 11 } ), C1 ) );
 	FArray2D_double const C2( { 0, 1 }, { -1, 1 }, initializer_function_double );
 	EXPECT_TRUE( eq( FArray2D_double( { 0, 1 }, { -1, 1 }, { -0.1, 0.9, 0.0, 1.0, 0.1, 1.1 } ), C2 ) );
@@ -1351,7 +1356,7 @@ TEST( FArray2Test, SubscriptOperator )
 	EXPECT_EQ( 23, A1[ 5 ] );
 
 	for ( std::size_t i = 0; i < A1.size(); ++i ) A1[ i ] = static_cast< int >( i * 10 );
-	EXPECT_EQ( 0, A1[ 0 ] );
+	EXPECT_EQ(  0, A1[ 0 ] );
 	EXPECT_EQ( 10, A1[ 1 ] );
 	EXPECT_EQ( 20, A1[ 2 ] );
 	EXPECT_EQ( 30, A1[ 3 ] );
@@ -1372,57 +1377,57 @@ TEST( FArray2Test, Predicates )
 	FArray2D_int A1;
 	EXPECT_FALSE( A1.active() );
 	EXPECT_FALSE( A1.allocated() );
-	EXPECT_TRUE ( A1.is_contiguous() );
-	EXPECT_TRUE ( A1.data_size_bounded() );
+	EXPECT_TRUE( A1.contiguous() );
+	EXPECT_TRUE( A1.data_size_bounded() );
 	EXPECT_FALSE( A1.data_size_unbounded() );
-	EXPECT_TRUE ( A1.empty() );
-	EXPECT_TRUE ( A1.size_bounded() );
+	EXPECT_TRUE( A1.empty() );
+	EXPECT_TRUE( A1.size_bounded() );
 	EXPECT_FALSE( A1.size_unbounded() );
-	EXPECT_TRUE ( A1.owner() );
+	EXPECT_TRUE( A1.owner() );
 	EXPECT_FALSE( A1.proxy() );
-	EXPECT_TRUE ( A1.is_default() );
-	EXPECT_TRUE ( A1.is_zero() );
-	EXPECT_TRUE ( A1.is_uniform() );
-	EXPECT_TRUE ( A1.is_uniform( 0 ) );
+	EXPECT_TRUE( A1.is_default() );
+	EXPECT_TRUE( A1.is_zero() );
+	EXPECT_TRUE( A1.is_uniform() );
+	EXPECT_TRUE( A1.is_uniform( 0 ) );
 
-   FArray2D_int A2( 2, 3 ); // Uninitialized
-	EXPECT_TRUE ( A2.active() );
-	EXPECT_TRUE ( A2.allocated() );
-	EXPECT_TRUE ( A2.is_contiguous() );
-	EXPECT_TRUE ( A2.data_size_bounded() );
+	FArray2D_int A2( 2, 3 ); // Uninitialized
+	EXPECT_TRUE( A2.active() );
+	EXPECT_TRUE( A2.allocated() );
+	EXPECT_TRUE( A2.contiguous() );
+	EXPECT_TRUE( A2.data_size_bounded() );
 	EXPECT_FALSE( A2.data_size_unbounded() );
 	EXPECT_FALSE( A2.empty() );
-	EXPECT_TRUE ( A2.data_size_bounded() );
+	EXPECT_TRUE( A2.data_size_bounded() );
 	EXPECT_FALSE( A2.data_size_unbounded() );
-	EXPECT_TRUE ( A2.owner() );
+	EXPECT_TRUE( A2.owner() );
 	EXPECT_FALSE( A2.proxy() );
 
 	FArray2D_int A3( 2, 3, 31459 );
-	EXPECT_TRUE ( A3.active() );
-	EXPECT_TRUE ( A3.allocated() );
-	EXPECT_TRUE ( A3.is_contiguous() );
-	EXPECT_TRUE ( A3.data_size_bounded() );
+	EXPECT_TRUE( A3.active() );
+	EXPECT_TRUE( A3.allocated() );
+	EXPECT_TRUE( A3.contiguous() );
+	EXPECT_TRUE( A3.data_size_bounded() );
 	EXPECT_FALSE( A3.data_size_unbounded() );
 	EXPECT_FALSE( A3.empty() );
-	EXPECT_TRUE ( A3.data_size_bounded() );
+	EXPECT_TRUE( A3.data_size_bounded() );
 	EXPECT_FALSE( A3.data_size_unbounded() );
-	EXPECT_TRUE ( A3.owner() );
+	EXPECT_TRUE( A3.owner() );
 	EXPECT_FALSE( A3.proxy() );
 	EXPECT_FALSE( A3.is_default() );
 	EXPECT_FALSE( A3.is_zero() );
-	EXPECT_TRUE ( A3.is_uniform() );
-	EXPECT_TRUE ( A3.is_uniform( 31459 ) );
+	EXPECT_TRUE( A3.is_uniform() );
+	EXPECT_TRUE( A3.is_uniform( 31459 ) );
 
 	FArray2D_int A4( 2, 3, { 11, 21, 12, 22, 13, 23 } );
-	EXPECT_TRUE ( A4.active() );
-	EXPECT_TRUE ( A4.allocated() );
-	EXPECT_TRUE ( A4.is_contiguous() );
-	EXPECT_TRUE ( A4.data_size_bounded() );
+	EXPECT_TRUE( A4.active() );
+	EXPECT_TRUE( A4.allocated() );
+	EXPECT_TRUE( A4.contiguous() );
+	EXPECT_TRUE( A4.data_size_bounded() );
 	EXPECT_FALSE( A4.data_size_unbounded() );
 	EXPECT_FALSE( A4.empty() );
-	EXPECT_TRUE ( A4.data_size_bounded() );
+	EXPECT_TRUE( A4.data_size_bounded() );
 	EXPECT_FALSE( A4.data_size_unbounded() );
-	EXPECT_TRUE ( A4.owner() );
+	EXPECT_TRUE( A4.owner() );
 	EXPECT_FALSE( A4.proxy() );
 	EXPECT_FALSE( A4.is_default() );
 	EXPECT_FALSE( A4.is_zero() );
@@ -1434,33 +1439,32 @@ TEST( FArray2Test, Predicates )
 TEST( FArray2Test, PredicateComparisonsValues )
 {
 	FArray2D_int A1;
-	EXPECT_TRUE ( eq( A1, 0 ) && eq( 0, A1 ) ); // Empty array is considered to equal any scalar (no values don't equal the scalar)
+	EXPECT_TRUE( eq( A1, 0 ) && eq( 0, A1 ) ); // Empty array is considered to equal any scalar (no values don't equal the scalar)
 	EXPECT_FALSE( ne( A1, 0 ) || ne( 0, A1 ) );
 	EXPECT_FALSE( lt( A1, 0 ) || lt( 0, A1 ) );
-	EXPECT_TRUE ( le( A1, 0 ) && le( 0, A1 ) );
+	EXPECT_TRUE( le( A1, 0 ) && le( 0, A1 ) );
 	EXPECT_FALSE( gt( A1, 0 ) || gt( 0, A1 ) );
-	EXPECT_TRUE ( ge( A1, 0 ) && ge( 0, A1 ) );
+	EXPECT_TRUE( ge( A1, 0 ) && ge( 0, A1 ) );
 
 	FArray2D_int A2( 2, 3, 31459 );
-	EXPECT_TRUE ( eq( A2, 31459 ) && eq( 31459, A1 ) );
+	EXPECT_TRUE( eq( A2, 31459 ) && eq( 31459, A1 ) );
 	EXPECT_FALSE( ne( A2, 31459 ) || ne( 31459, A2 ) );
-	EXPECT_TRUE ( lt( A2, 31460 ) && lt( 31458, A2 ) );
-	EXPECT_TRUE ( le( A2, 31459 ) && le( 31459, A2 ) );
-	EXPECT_TRUE ( le( A2, 31460 ) && le( 31458, A2 ) );
-	EXPECT_TRUE ( gt( A2, 31458 ) && gt( 31460, A2 ) );
-	EXPECT_TRUE ( ge( A2, 31459 ) && ge( 31459, A2 ) );
-	EXPECT_TRUE ( ge( A2, 31458 ) && ge( 31460, A2 ) );
+	EXPECT_TRUE( lt( A2, 31460 ) && lt( 31458, A2 ) );
+	EXPECT_TRUE( le( A2, 31459 ) && le( 31459, A2 ) );
+	EXPECT_TRUE( le( A2, 31460 ) && le( 31458, A2 ) );
+	EXPECT_TRUE( gt( A2, 31458 ) && gt( 31460, A2 ) );
+	EXPECT_TRUE( ge( A2, 31459 ) && ge( 31459, A2 ) );
+	EXPECT_TRUE( ge( A2, 31458 ) && ge( 31460, A2 ) );
 
-	// Elements compared in order
 	FArray2D_int A3( 2, 3, { 11, 21, 12, 22, 13, 23 } );
 	EXPECT_FALSE( eq( A3, 11 ) || eq( 23, A3 ) );
-	EXPECT_TRUE ( ne( A3, 11 ) && ne( 23, A3 ) );
-	EXPECT_TRUE ( lt( A3, 24 ) && lt( 10, A3 ) );
+	EXPECT_TRUE( ne( A3, 11 ) && ne( 23, A3 ) );
+	EXPECT_TRUE( lt( A3, 24 ) && lt( 10, A3 ) );
 	EXPECT_FALSE( lt( A3, 23 ) || lt( 11, A3 ) );
-	EXPECT_TRUE ( le( A3, 23 ) && le( 11, A3 ) );
-	EXPECT_TRUE ( gt( A3, 10 ) && gt( 24, A3 ) );
+	EXPECT_TRUE( le( A3, 23 ) && le( 11, A3 ) );
+	EXPECT_TRUE( gt( A3, 10 ) && gt( 24, A3 ) );
 	EXPECT_FALSE( gt( A3, 11 ) || gt( 23, A3 ) );
-	EXPECT_TRUE ( ge( A3, 11 ) && ge( 23, A3 ) );
+	EXPECT_TRUE( ge( A3, 11 ) && ge( 23, A3 ) );
 }
 
 TEST( FArray2Test, PredicateComparisonArrays )
@@ -1468,31 +1472,31 @@ TEST( FArray2Test, PredicateComparisonArrays )
 	//Note Illegal to compare non-conformable arrays
 
 	FArray2D_int A1;
-	EXPECT_TRUE ( eq( A1, A1 ) );
+	EXPECT_TRUE( eq( A1, A1 ) );
 	EXPECT_FALSE( ne( A1, A1 ) );
 	EXPECT_FALSE( lt( A1, A1 ) );
-	EXPECT_TRUE ( le( A1, A1 ) );
+	EXPECT_TRUE( le( A1, A1 ) );
 	EXPECT_FALSE( gt( A1, A1 ) );
-	EXPECT_TRUE ( ge( A1, A1 ) );
+	EXPECT_TRUE( ge( A1, A1 ) );
 
 	FArray2D_int A2( 2, 3, 20 );
-	EXPECT_TRUE ( eq( A2, A2 ) );
+	EXPECT_TRUE( eq( A2, A2 ) );
 	EXPECT_FALSE( ne( A2, A2 ) );
 	EXPECT_FALSE( lt( A2, A2 ) );
-	EXPECT_TRUE ( le( A2, A2 ) );
+	EXPECT_TRUE( le( A2, A2 ) );
 	EXPECT_FALSE( gt( A2, A2 ) );
-	EXPECT_TRUE ( ge( A2, A2 ) );
+	EXPECT_TRUE( ge( A2, A2 ) );
 
 	FArray2D_int A3( 2, 3, { 11, 21, 12, 22, 13, 23 } );
-	EXPECT_TRUE ( eq( A3, A3 ) );
+	EXPECT_TRUE( eq( A3, A3 ) );
 	EXPECT_FALSE( ne( A3, A3 ) );
 	EXPECT_FALSE( lt( A3, A3 ) );
-	EXPECT_TRUE ( le( A3, A3 ) );
+	EXPECT_TRUE( le( A3, A3 ) );
 	EXPECT_FALSE( gt( A3, A3 ) );
-	EXPECT_TRUE ( ge( A3, A3 ) );
+	EXPECT_TRUE( ge( A3, A3 ) );
 
 	EXPECT_FALSE( eq( A2, A3 ) || eq( A3, A2 ) );
-	EXPECT_TRUE ( ne( A2, A3 ) && ne( A3, A2 ) );
+	EXPECT_TRUE( ne( A2, A3 ) && ne( A3, A2 ) );
 	EXPECT_FALSE( lt( A2, A3 ) || lt( A3, A2 ) );
 	EXPECT_FALSE( le( A2, A3 ) || le( A3, A2 ) );
 	EXPECT_FALSE( gt( A2, A3 ) || gt( A3, A2 ) );
@@ -1500,19 +1504,19 @@ TEST( FArray2Test, PredicateComparisonArrays )
 
 	FArray2D_int A4( 2, 3, { 11, 21, 12, 21, 12, 22 } );
 	EXPECT_FALSE( eq( A3, A4 ) || eq( A4, A3 ) );
-	EXPECT_TRUE ( ne( A3, A4 ) && ne( A4, A3 ) );
+	EXPECT_TRUE( ne( A3, A4 ) && ne( A4, A3 ) );
 	EXPECT_FALSE( lt( A3, A4 ) );
 	EXPECT_FALSE( lt( A4, A3 ) );
 	EXPECT_FALSE( le( A3, A4 ) );
-	EXPECT_TRUE ( le( A4, A3 ) );
+	EXPECT_TRUE( le( A4, A3 ) );
 	EXPECT_FALSE( gt( A3, A4 ) );
 	EXPECT_FALSE( gt( A4, A3 ) );
-	EXPECT_TRUE ( ge( A3, A4 ) );
+	EXPECT_TRUE( ge( A3, A4 ) );
 	EXPECT_FALSE( ge( A4, A3 ) );
 
 	FArray2D_int A5( 2, 3, { 11, 21, 12, 23, 14, 24 } );
 	EXPECT_FALSE( eq( A3, A4 ) || eq( A4, A3 ) );
-	EXPECT_TRUE ( ne( A3, A4 ) && ne( A4, A3 ) );
+	EXPECT_TRUE( ne( A3, A4 ) && ne( A4, A3 ) );
 }
 
 TEST( FArray2Test, PredicateContains )
@@ -1549,7 +1553,7 @@ TEST( FArray2Test, PredicateConformable )
 	EXPECT_FALSE( A1.conformable( A3 ) || A3.conformable( A1 ) );
 	EXPECT_FALSE( A1.conformable( A4 ) || A4.conformable( A1 ) );
 	EXPECT_FALSE( A2.conformable( A3 ) || A3.conformable( A2 ) );
-	EXPECT_TRUE ( A2.conformable( A4 ) && A4.conformable( A2 ) );
+	EXPECT_TRUE( A2.conformable( A4 ) && A4.conformable( A2 ) );
 	EXPECT_FALSE( A3.conformable( A4 ) || A4.conformable( A3 ) );
 
 	FArray2D_int const C1;
@@ -1561,7 +1565,7 @@ TEST( FArray2Test, PredicateConformable )
 	EXPECT_FALSE( C1.conformable( C3 ) || C3.conformable( C1 ) );
 	EXPECT_FALSE( C1.conformable( C4 ) || C4.conformable( C1 ) );
 	EXPECT_FALSE( C2.conformable( C3 ) || C3.conformable( C2 ) );
-	EXPECT_TRUE ( C2.conformable( C4 ) && C4.conformable( C2 ) );
+	EXPECT_TRUE( C2.conformable( C4 ) && C4.conformable( C2 ) );
 	EXPECT_FALSE( C3.conformable( C4 ) || C4.conformable( C3 ) );
 }
 
@@ -1620,7 +1624,7 @@ TEST( FArray2Test, PredicateEqualDimensions )
 	EXPECT_FALSE( A3.equal_dimensions( A4 ) || A4.equal_dimensions( A3 ) );
 
 	FArray2D_int A5( 2, 3, 31459 );
-	EXPECT_TRUE ( A2.equal_dimensions( A5 ) && A5.equal_dimensions( A2 ) );
+	EXPECT_TRUE( A2.equal_dimensions( A5 ) && A5.equal_dimensions( A2 ) );
 
 	FArray2D_int const C1;
 	FArray2D_int const C2( 2, 3 );
@@ -1635,7 +1639,7 @@ TEST( FArray2Test, PredicateEqualDimensions )
 	EXPECT_FALSE( C3.equal_dimensions( C4 ) || C4.equal_dimensions( C3 ) );
 
 	FArray2D_int C5( 2, 3, 31459 );
-	EXPECT_TRUE ( C2.equal_dimensions( C5 ) && C5.equal_dimensions( C2 ) );
+	EXPECT_TRUE( C2.equal_dimensions( C5 ) && C5.equal_dimensions( C2 ) );
 }
 
 TEST( FArray2Test, PredicateIdentity )
@@ -1727,6 +1731,8 @@ TEST( FArray2Test, PredicateInitializerActive )
 
 TEST( FArray2Test, Inspectors )
 {
+	typedef  StaticIndexRange  SR;
+
 	FArray2D_int const C1;
 	// Rank
 	EXPECT_EQ( 2, C1.rank() );
@@ -1738,9 +1744,9 @@ TEST( FArray2Test, Inspectors )
 	EXPECT_EQ( 0u, C1.size( 2 ) );
 	EXPECT_EQ( C1.size2(), C1.size( 2 ) );
 	// Indexes
-	EXPECT_EQ( SRange(), C1.I( 1 ) );
+	EXPECT_EQ( SR(), C1.I( 1 ) );
 	EXPECT_EQ( C1.I1(), C1.I( 1 ) );
-	EXPECT_EQ( SRange(), C1.I( 2 ) );
+	EXPECT_EQ( SR(), C1.I( 2 ) );
 	EXPECT_EQ( C1.I2(), C1.I( 2 ) );
 	EXPECT_EQ( 1, C1.l( 1 ) );
 	EXPECT_EQ( C1.l1(), C1.l( 1 ) );
@@ -1766,9 +1772,9 @@ TEST( FArray2Test, Inspectors )
 	EXPECT_EQ( 3u, C2.size( 2 ) );
 	EXPECT_EQ( C2.size2(), C2.size( 2 ) );
 	// Indexes
-	EXPECT_EQ( SRange( 1, 2 ), C2.I( 1 ) );
+	EXPECT_EQ( SR( 1, 2 ), C2.I( 1 ) );
 	EXPECT_EQ( C2.I1(), C2.I( 1 ) );
-	EXPECT_EQ( SRange( 1, 3 ), C2.I( 2 ) );
+	EXPECT_EQ( SR( 1, 3 ), C2.I( 2 ) );
 	EXPECT_EQ( C2.I2(), C2.I( 2 ) );
 	EXPECT_EQ( 1, C2.l( 1 ) );
 	EXPECT_EQ( C2.l1(), C2.l( 1 ) );
@@ -1947,14 +1953,14 @@ TEST( FArray2Test, ModifierInvert )
 	// Illegal to call on an uninitialized array
 
 	// Inverts values of an initialized array
-	FArray2D_double A2( 2, 3, { 1.0, 10.0, 100.0, 0.1, 0.01 } );
+	FArray2D_double A2( 2, 3, { 1.0, 10.0, 100.0, 0.1, 0.01, 0.001 } );
 	A2.invert();
-	EXPECT_TRUE( eq( FArray2D_double( 2, 3, { 1.0, 0.1, 0.01, 10.0, 100.0 } ), A2 ) );
+	EXPECT_TRUE( eq( FArray2D_double( 2, 3, { 1.0, 0.1, 0.01, 10.0, 100.0, 1000.0 } ), A2 ) );
 
 	// Inverts values of an initialized array
-	FArray2D_double A3( 2, 3, { -1.0, -10.0, -100.0, -0.1, -0.01 } );
+	FArray2D_double A3( 2, 3, { -1.0, -10.0, -100.0, -0.1, -0.01, -0.001 } );
 	A3.invert();
-	EXPECT_TRUE( eq( FArray2D_double( 2, 3, { -1.0, -0.1, -0.01, -10.0, -100.0 } ), A3 ) );
+	EXPECT_TRUE( eq( FArray2D_double( 2, 3, { -1.0, -0.1, -0.01, -10.0, -100.0, -1000.0 } ), A3 ) );
 }
 
 TEST( FArray2Test, ModifierAllocateDeallocate )
@@ -2390,4 +2396,155 @@ TEST( FArray2Test, Swap )
 	A1.swap( A2 );
 	EXPECT_TRUE( eq( A2, A3 ) );
 	EXPECT_TRUE( eq( FArray2D_int(), A1 ) );
+}
+
+TEST( FArray2Test, Diagonals )
+{
+	{
+		FArray2D_int A( 3, 3, { 11, 21, 31, 12, 22, 32, 13, 23, 33 } );
+		A.to_identity();
+		EXPECT_EQ( 1, A( 1, 1 ) );
+		EXPECT_EQ( 1, A( 2, 2 ) );
+		EXPECT_EQ( 1, A( 3, 3 ) );
+		EXPECT_EQ( 0, A( 2, 1 ) );
+		EXPECT_EQ( 0, A( 3, 1 ) );
+		EXPECT_EQ( 0, A( 1, 2 ) );
+		EXPECT_EQ( 0, A( 3, 2 ) );
+		EXPECT_EQ( 0, A( 1, 3 ) );
+		EXPECT_EQ( 0, A( 2, 3 ) );
+	}
+	{
+		FArray2D_int A( {-1,1}, 3, { 11, 21, 31, 12, 22, 32, 13, 23, 33 } );
+		A.to_diag( 9 );
+		EXPECT_EQ( 9, A( -1, 1 ) );
+		EXPECT_EQ( 9, A(  0, 2 ) );
+		EXPECT_EQ( 9, A(  1, 3 ) );
+		EXPECT_EQ( 0, A(  0, 1 ) );
+		EXPECT_EQ( 0, A(  1, 1 ) );
+		EXPECT_EQ( 0, A( -1, 2 ) );
+		EXPECT_EQ( 0, A(  1, 2 ) );
+		EXPECT_EQ( 0, A( -1, 3 ) );
+		EXPECT_EQ( 0, A(  0, 3 ) );
+	}
+	{
+		FArray2D_int A( 3, 3, { 11, 21, 31, 12, 22, 32, 13, 23, 33 } );
+		A.set_diagonal( 9 );
+		EXPECT_EQ( 9, A( 1, 1 ) );
+		EXPECT_EQ( 9, A( 2, 2 ) );
+		EXPECT_EQ( 9, A( 3, 3 ) );
+		EXPECT_EQ( 21, A( 2, 1 ) );
+		EXPECT_EQ( 31, A( 3, 1 ) );
+		EXPECT_EQ( 12, A( 1, 2 ) );
+		EXPECT_EQ( 32, A( 3, 2 ) );
+		EXPECT_EQ( 13, A( 1, 3 ) );
+		EXPECT_EQ( 23, A( 2, 3 ) );
+	}
+}
+
+TEST( FArray2Test, Transpose )
+{
+	{
+		FArray2D_int A( 2, {-1,0}, { 11, 21, 12, 22 } ), C( A );
+		A.transpose();
+		EXPECT_EQ( C( 1, -1 ), A( 1, -1 ) );
+		EXPECT_EQ( C( 1,  0 ), A( 2, -1 ) );
+		EXPECT_EQ( C( 2, -1 ), A( 1,  0 ) );
+		EXPECT_EQ( C( 2,  0 ), A( 2,  0 ) );
+	}
+	{
+		FArray2D_int A( 2, 3 );
+		A( 1, 1 ) = 4;
+		A( 1, 2 ) = 3;
+		A( 1, 3 ) = 5;
+		A( 2, 1 ) = 9;
+		A( 2, 2 ) = 2;
+		A( 2, 3 ) = 8;
+		FArray2D_int B( transpose( A ) );
+		EXPECT_EQ( 1, B.l1() );
+		EXPECT_EQ( 3, B.u1() );
+		EXPECT_EQ( 1, B.l2() );
+		EXPECT_EQ( 2, B.u2() );
+		EXPECT_EQ( 3u, B.size1() );
+		EXPECT_EQ( 2u, B.size2() );
+		EXPECT_EQ( A( 1, 1 ), B( 1, 1 ) );
+		EXPECT_EQ( A( 1, 2 ), B( 2, 1 ) );
+		EXPECT_EQ( A( 1, 3 ), B( 3, 1 ) );
+		EXPECT_EQ( A( 2, 1 ), B( 1, 2 ) );
+		EXPECT_EQ( A( 2, 2 ), B( 2, 2 ) );
+		EXPECT_EQ( A( 2, 3 ), B( 3, 2 ) );
+	}
+	{
+		FArray2D_int A( 2, {-1,1} );
+		A( 1, -1 ) = 4;
+		A( 1,  0 ) = 3;
+		A( 1,  1 ) = 5;
+		A( 2, -1 ) = 9;
+		A( 2,  0 ) = 2;
+		A( 2,  1 ) = 8;
+		FArray2D_int B( transpose( A ) );
+		EXPECT_EQ( 1, B.l1() );
+		EXPECT_EQ( 3, B.u1() );
+		EXPECT_EQ( 1, B.l2() );
+		EXPECT_EQ( 2, B.u2() );
+		EXPECT_EQ( 3u, B.size1() );
+		EXPECT_EQ( 2u, B.size2() );
+		EXPECT_EQ( A( 1, -1 ), B( 1, 1 ) );
+		EXPECT_EQ( A( 1,  0 ), B( 2, 1 ) );
+		EXPECT_EQ( A( 1,  1 ), B( 3, 1 ) );
+		EXPECT_EQ( A( 2, -1 ), B( 1, 2 ) );
+		EXPECT_EQ( A( 2,  0 ), B( 2, 2 ) );
+		EXPECT_EQ( A( 2,  1 ), B( 3, 2 ) );
+	}
+	{
+		FArray2D_int A( 2, {-1,1} );
+		A( 1, -1 ) = 4;
+		A( 1,  0 ) = 3;
+		A( 1,  1 ) = 5;
+		A( 2, -1 ) = 9;
+		A( 2,  0 ) = 2;
+		A( 2,  1 ) = 8;
+		FArray2D_int B( transposed( A ) );
+		EXPECT_EQ( -1, B.l1() );
+		EXPECT_EQ( 1, B.u1() );
+		EXPECT_EQ( 1, B.l2() );
+		EXPECT_EQ( 2, B.u2() );
+		EXPECT_EQ( 3u, B.size1() );
+		EXPECT_EQ( 2u, B.size2() );
+		EXPECT_EQ( A( 1, -1 ), B( -1, 1 ) );
+		EXPECT_EQ( A( 1,  0 ), B(  0, 1 ) );
+		EXPECT_EQ( A( 1,  1 ), B(  1, 1 ) );
+		EXPECT_EQ( A( 2, -1 ), B( -1, 2 ) );
+		EXPECT_EQ( A( 2,  0 ), B(  0, 2 ) );
+		EXPECT_EQ( A( 2,  1 ), B(  1, 2 ) );
+	}
+}
+
+TEST( FArray2FunctionsTest, Count )
+{
+	FArray2D_bool A( 2, 3, { true, false, false, false, true, true } );
+	FArray1D_size C1( 3, { 1, 0, 2 } );
+	FArray1D_size C2( 2, { 2, 1 } );
+	EXPECT_EQ( 3u, count( A ) );
+	EXPECT_TRUE( eq( C1, count( A, 1 ) ) );
+	EXPECT_TRUE( eq( C2, count( A, 2 ) ) );
+}
+
+TEST( FArray2FunctionsTest, Sum )
+{
+	FArray2D_int A( 2, 2, { 11, 21, 12, 22 } );
+	FArray1D_int S1( 2, { 32, 34 } );
+	FArray1D_int S2( 2, { 23, 43 } );
+	EXPECT_EQ( 66, sum( A ) );
+	EXPECT_TRUE( eq( S1, sum( A, 1 ) ) );
+	EXPECT_TRUE( eq( S2, sum( A, 2 ) ) );
+}
+
+TEST( FArray2FunctionsTest, Product )
+{
+	FArray2D_int A( 2, 2, { 11, 21, 12, 22 } );
+	FArray1D_int P1( 2, { 231, 264 } );
+	FArray1D_int P2( 2, { 132, 462 } );
+	EXPECT_EQ( 60984, product( A ) );
+	EXPECT_TRUE( eq( P1, product( A, 1 ) ) );
+	EXPECT_TRUE( eq( P2, product( A, 2 ) ) );
 }

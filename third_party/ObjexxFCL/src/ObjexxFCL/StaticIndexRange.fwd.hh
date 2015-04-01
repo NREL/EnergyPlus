@@ -15,11 +15,8 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class StaticIndexRange;
-
-// Types
-typedef  StaticIndexRange  SRange;
 
 } // ObjexxFCL
 

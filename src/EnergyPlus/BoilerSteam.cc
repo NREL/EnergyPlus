@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -165,9 +166,7 @@ namespace BoilerSteam {
 
 		// Initialize Loop Equipment
 		if ( InitLoopEquip ) {
-			Boiler( BoilerNum ).IsThisSized = false;
 			InitBoiler( BoilerNum );
-			Boiler( BoilerNum ).IsThisSized = true;
 			SizeBoiler( BoilerNum );
 			MinCap = Boiler( BoilerNum ).NomCap * Boiler( BoilerNum ).MinPartLoadRat;
 			MaxCap = Boiler( BoilerNum ).NomCap * Boiler( BoilerNum ).MaxPartLoadRat;
@@ -215,6 +214,7 @@ namespace BoilerSteam {
 		using FluidProperties::FindRefrigerant;
 		using GlobalNames::VerifyUniqueBoilerName;
 		using General::RoundSigDigits;
+		using DataSizing::AutoSize;
 
 		// Locals
 		// PARAMETERS
@@ -246,10 +246,8 @@ namespace BoilerSteam {
 
 		// Boiler will have fuel input to it , that is it !
 		Boiler.allocate( NumBoilers );
-		CheckEquipName.allocate( NumBoilers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumBoilers, true );
 		BoilerFuelTypeForOutputVariable.allocate( NumBoilers );
-		BoilerFuelTypeForOutputVariable = "";
 
 		BoilerReport.allocate( NumBoilers );
 
@@ -326,6 +324,9 @@ namespace BoilerSteam {
 			Boiler( BoilerNum ).Effic = rNumericArgs( 2 );
 			Boiler( BoilerNum ).TempUpLimitBoilerOut = rNumericArgs( 3 );
 			Boiler( BoilerNum ).NomCap = rNumericArgs( 4 );
+			if ( Boiler( BoilerNum ).NomCap == AutoSize ) {
+				Boiler( BoilerNum ).NomCapWasAutoSized = true;
+			}
 			Boiler( BoilerNum ).MinPartLoadRat = rNumericArgs( 5 );
 			Boiler( BoilerNum ).MaxPartLoadRat = rNumericArgs( 6 );
 			Boiler( BoilerNum ).OptPartLoadRat = rNumericArgs( 7 );
@@ -360,7 +361,7 @@ namespace BoilerSteam {
 				SteamFluidIndex = FindRefrigerant( "Steam" );
 				if ( SteamFluidIndex == 0 ) {
 					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
-					ShowContinueError( "Steam Properties not found; " "Steam Fluid Properties must be included in the input file." );
+					ShowContinueError( "Steam Properties not found; Steam Fluid Properties must be included in the input file." );
 					ErrorsFound = true;
 				}
 			}
@@ -419,8 +420,8 @@ namespace BoilerSteam {
 		using DataPlant::TypeOf_Boiler_Steam;
 		using DataPlant::ScanPlantLoopsForObject;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantSizesOkayToFinalize;
-		using DataPlant::PlantSizeNotComplete;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizeCompleted;
 		using DataPlant::SingleSetPoint;
 		using DataPlant::DualSetPointDeadBand;
 		using PlantUtilities::InitComponentNodes;
@@ -478,8 +479,7 @@ namespace BoilerSteam {
 		BoilerInletNode = Boiler( BoilerNum ).BoilerInletNodeNum;
 		BoilerOutletNode = Boiler( BoilerNum ).BoilerOutletNodeNum;
 
-		if ( BeginEnvrnFlag && MyEnvrnFlag( BoilerNum ) && ( PlantSizesOkayToFinalize ) ) {
-			if ( PlantSizeNotComplete ) SizeBoiler( BoilerNum );
+		if ( BeginEnvrnFlag && MyEnvrnFlag( BoilerNum ) && ( PlantFirstSizesOkayToFinalize ) ) {
 
 			//BoilerOutletTemp     = Node(BoilerOutletNode)%TempSetPoint
 			//TempUpLimitBoilerOut =Boiler(BoilerNum)%TempUpLimitBoilerOut
@@ -508,7 +508,7 @@ namespace BoilerSteam {
 				if ( ! AnyEnergyManagementSystemInModel ) {
 					if ( ! Boiler( BoilerNum ).MissingSetPointErrDone ) {
 						ShowWarningError( "Missing temperature setpoint for Boiler:Steam = " + Boiler( BoilerNum ).Name );
-						ShowContinueError( " A temperature setpoint is needed at the outlet node of the boiler," " use a SetpointManager" );
+						ShowContinueError( " A temperature setpoint is needed at the outlet node of the boiler, use a SetpointManager" );
 						ShowContinueError( " The overall loop setpoint will be assumed for this boiler. The simulation continues ..." );
 						Boiler( BoilerNum ).MissingSetPointErrDone = true;
 					}
@@ -577,7 +577,9 @@ namespace BoilerSteam {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using DataPlant::PlantLoop;
-		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToFinalize;
+		using DataPlant::PlantFirstSizesOkayToReport;
+		using DataPlant::PlantFinalSizesOkayToReport;
 		using FluidProperties::GetSatDensityRefrig;
 		using FluidProperties::GetSatEnthalpyRefrig;
 		using FluidProperties::GetSatSpecificHeatRefrig;
@@ -607,21 +609,16 @@ namespace BoilerSteam {
 		Real64 CpWater; // Heat capacity of condensed steam
 		std::string equipName;
 		Real64 tmpNomCap; // local nominal capacity cooling power
-		bool IsAutoSize; // Indicator to autosize for reporting
 		Real64 NomCapUser; // Hardsized nominal capacity for reporting
 
 		PltSizNum = 0;
 		ErrorsFound = false;
-		IsAutoSize = false;
 		tmpNomCap = Boiler( BoilerNum ).NomCap;
 		NomCapUser = 0.0;
 
 		// Find the appropriate Plant Sizing object
 		PltSizNum = PlantLoop( Boiler( BoilerNum ).LoopNum ).PlantSizNum;
 
-		if ( Boiler( BoilerNum ).NomCap == AutoSize ) {
-			IsAutoSize = true;
-		}
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				SizingTemp = Boiler( BoilerNum ).TempUpLimitBoilerOut;
@@ -631,23 +628,28 @@ namespace BoilerSteam {
 				LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
 				CpWater = GetSatSpecificHeatRefrig( FluidNameSteam, SizingTemp, 0.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
 				tmpNomCap = ( CpWater * SteamDensity * Boiler( BoilerNum ).SizFac * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate + PlantSizData( PltSizNum ).DesVolFlowRate * SteamDensity * LatentEnthSteam );
-				if ( ! IsAutoSize ) tmpNomCap = Boiler( BoilerNum ).NomCap;
-				//IF (PlantSizesOkayToFinalize) Boiler(BoilerNum)%NomCap =tmpNomCap
+				if ( ! Boiler( BoilerNum ).NomCapWasAutoSized ) tmpNomCap = Boiler( BoilerNum ).NomCap;
 			} else {
-				if ( IsAutoSize ) tmpNomCap = 0.0;
-				//IF (PlantSizesOkayToFinalize) Boiler(BoilerNum)%NomCap = tmpNomCap
+				if ( Boiler( BoilerNum ).NomCapWasAutoSized ) tmpNomCap = 0.0;
 			}
-			if ( PlantSizesOkayToFinalize ) {
-				if ( IsAutoSize ) {
+			if ( PlantFirstSizesOkayToFinalize ) {
+				if ( Boiler( BoilerNum ).NomCapWasAutoSized ) {
 					Boiler( BoilerNum ).NomCap = tmpNomCap;
-					if ( ! Boiler( BoilerNum ).IsThisSized ) {
-						ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name, "Design Size Nominal Capacity [W]", tmpNomCap );
+					if ( PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name, 
+							"Design Size Nominal Capacity [W]", tmpNomCap );
+					}
+					if ( PlantFirstSizesOkayToReport ) {
+						ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name, 
+							"Initial Design Size Nominal Capacity [W]", tmpNomCap );
 					}
 				} else { // Hard-sized with sizing data
 					if ( Boiler( BoilerNum ).NomCap > 0.0 && tmpNomCap > 0.0 ) {
 						NomCapUser = Boiler( BoilerNum ).NomCap;
-						if ( ! Boiler( BoilerNum ).IsThisSized ) {
-							ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name, "Design Size Nominal Capacity [W]", tmpNomCap, "User-Specified Nominal Capacity [W]", NomCapUser );
+						if ( PlantFinalSizesOkayToReport ) {
+							ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name, 
+								"Design Size Nominal Capacity [W]", tmpNomCap, 
+								"User-Specified Nominal Capacity [W]", NomCapUser );
 							if ( DisplayExtraWarnings ) {
 								if ( ( std::abs( tmpNomCap - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
 									ShowMessage( "SizePump: Potential issue with equipment sizing for " + Boiler( BoilerNum ).Name );
@@ -663,23 +665,22 @@ namespace BoilerSteam {
 				}
 			}
 		} else {
-			if ( IsAutoSize ) {
+			if ( Boiler( BoilerNum ).NomCapWasAutoSized && PlantFirstSizesOkayToFinalize ) {
 				ShowSevereError( "Autosizing of Boiler nominal capacity requires a loop Sizing:Plant object" );
 				ShowContinueError( "Occurs in Boiler:Steam object=" + Boiler( BoilerNum ).Name );
 				ErrorsFound = true;
-			} else {
-				if ( ! Boiler( BoilerNum ).IsThisSized ) {
-					if ( Boiler( BoilerNum ).NomCap > 0.0 ) {
-						ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name, "User-Specified Nominal Capacity [W]", Boiler( BoilerNum ).NomCap );
-					}
-				}
+			} 
+			if ( ! Boiler( BoilerNum ).NomCapWasAutoSized && Boiler( BoilerNum ).NomCap > 0.0 
+					&& PlantFinalSizesOkayToReport ) {
+						ReportSizingOutput( "Boiler:Steam", Boiler( BoilerNum ).Name, 
+						"User-Specified Nominal Capacity [W]", Boiler( BoilerNum ).NomCap );
 			}
 		}
 
 		//  model has no volume flow rate, may need something else for steam loop sizing DSU??
 		//DSU?      CALL RegisterPlantCompDesignFlow(Boiler(BoilerNum)%BoilerInletNodeNum,Boiler(BoilerNum)%VolFlowRate)
 
-		if ( PlantSizesOkayToFinalize ) {
+		if ( PlantFinalSizesOkayToReport ) {
 			//create predefined report
 			equipName = Boiler( BoilerNum ).Name;
 			PreDefTableEntry( pdchMechType, equipName, "Boiler:Steam" );
@@ -746,7 +747,7 @@ namespace BoilerSteam {
 		Real64 BoilerMinPLR; // boiler minimum part load ratio
 		Real64 TheorFuelUse; // Theoretical (stoichiometric) fuel use
 		Real64 OperPLR; // operating part load ratio
-		Real64 BoilerDeltaTemp; // C - boiler inlet to outlet temperature difference
+		Real64 BoilerDeltaTemp( 0.0 ); // C - boiler inlet to outlet temperature difference
 		Real64 TempUpLimitBout; // C - boiler high temperature limit
 		Real64 BoilerMassFlowRateMax; // Max Design Boiler Mass Flow Rate converted from Volume Flow Rate
 		Real64 EnthSteamOutDry;
@@ -818,6 +819,8 @@ namespace BoilerSteam {
 				BoilerDeltaTemp = Node( BoilerOutletNode ).TempSetPoint - Node( BoilerInletNode ).Temp;
 			} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 				BoilerDeltaTemp = Node( BoilerOutletNode ).TempSetPointLo - Node( BoilerInletNode ).Temp;
+			} else {
+				assert( false );
 			}}
 			BoilerOutletTemp = BoilerDeltaTemp + Node( BoilerInletNode ).Temp;
 
@@ -1045,7 +1048,7 @@ namespace BoilerSteam {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

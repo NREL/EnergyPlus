@@ -585,17 +585,11 @@ namespace HVACMultiSpeedHeatPump {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
-		Numbers.allocate( MaxNums );
-		Numbers = 0.0;
+		Numbers.dimension( MaxNums, 0.0 );
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNums, true );
 
 		NumMSHeatPumps = GetNumObjectsFound( CurrentModuleObject );
 
@@ -607,8 +601,7 @@ namespace HVACMultiSpeedHeatPump {
 		// ALLOCATE ARRAYS
 		MSHeatPump.allocate( NumMSHeatPumps );
 		MSHeatPumpReport.allocate( NumMSHeatPumps );
-		CheckEquipName.allocate( NumMSHeatPumps );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumMSHeatPumps, true );
 		AllocatedFlag = true;
 
 		// Load arrays with reformulated electric EIR chiller data
@@ -688,14 +681,14 @@ namespace HVACMultiSpeedHeatPump {
 							AirNodeFound = true;
 						}
 					} else {
-						ShowSevereError( "Did not find a AirLoopHVAC for " + CurrentModuleObject + " = \"" "\"" + MSHeatPump( MSHPNum ).Name );
+						ShowSevereError( "Did not find a AirLoopHVAC for " + CurrentModuleObject + " = \"\"" + MSHeatPump( MSHPNum ).Name );
 						ShowContinueError( "Specified " + cAlphaFields( 5 ) + " = " + Alphas( 5 ) );
 						ErrorsFound = true;
 					}
 					break;
 				}
 				if ( ! AirNodeFound ) {
-					ShowSevereError( "Did not find Air Node (" + cAlphaFields( 5 ) + "), " + CurrentModuleObject + " = \"" "\"" + MSHeatPump( MSHPNum ).Name );
+					ShowSevereError( "Did not find Air Node (" + cAlphaFields( 5 ) + "), " + CurrentModuleObject + " = \"\"" + MSHeatPump( MSHPNum ).Name );
 					ShowContinueError( "Specified " + cAlphaFields( 5 ) + " = " + Alphas( 5 ) );
 					ErrorsFound = true;
 				}
@@ -768,7 +761,7 @@ namespace HVACMultiSpeedHeatPump {
 			if ( MSHeatPump( MSHPNum ).FanSchedPtr > 0 && MSHeatPump( MSHPNum ).FanType == FanType_SimpleConstVolume ) {
 				if ( ! CheckScheduleValueMinMax( MSHeatPump( MSHPNum ).FanSchedPtr, ">", 0.0, "<=", 1.0 ) ) {
 					ShowSevereError( CurrentModuleObject + " \"" + MSHeatPump( MSHPNum ).Name + "\"" );
-					ShowContinueError( cAlphaFields( 9 ) + " must be continuous (fan operating mode schedule values > 0)" " for " + cAlphaFields( 6 ) + " = Fan:ConstantVolume." );
+					ShowContinueError( cAlphaFields( 9 ) + " must be continuous (fan operating mode schedule values > 0) for " + cAlphaFields( 6 ) + " = Fan:ConstantVolume." );
 					ShowContinueError( "Error found in " + cAlphaFields( 9 ) + " = " + Alphas( 9 ) );
 					ShowContinueError( "schedule values must be (>0., <=1.)" );
 					ErrorsFound = true;
@@ -783,7 +776,7 @@ namespace HVACMultiSpeedHeatPump {
 					ShowSevereError( "Configuration error in " + CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 					ShowContinueError( cAlphaFields( 11 ) + " \"" + Alphas( 11 ) + "\" not found." );
 					ShowContinueError( cAlphaFields( 10 ) + " must be Coil:Heating:DX:MultiSpeed " );
-					ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. " "Preceding condition(s) causes termination." );
+					ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
 					ErrorsFound = true;
 				}
 				LocalError = false;
@@ -818,7 +811,7 @@ namespace HVACMultiSpeedHeatPump {
 						ShowSevereError( "Configuration error in " + CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 						ShowContinueError( cAlphaFields( 11 ) + " \"" + Alphas( 11 ) + "\" not found." );
 						ShowContinueError( cAlphaFields( 10 ) + " must be Coil:Heating:Electric:MultiStage " );
-						ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. " "Preceding condition(s) causes termination." );
+						ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
 						ErrorsFound = true;
 					}
 				} else {
@@ -828,7 +821,7 @@ namespace HVACMultiSpeedHeatPump {
 						ShowSevereError( "Configuration error in " + CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 						ShowContinueError( cAlphaFields( 11 ) + " \"" + Alphas( 11 ) + "\" not found." );
 						ShowContinueError( cAlphaFields( 10 ) + " must be Coil:Heating:Gas:MultiStage " );
-						ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. " "Preceding condition(s) causes termination." );
+						ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
 						ErrorsFound = true;
 					}
 				}
@@ -961,7 +954,7 @@ namespace HVACMultiSpeedHeatPump {
 
 				}
 			} else {
-				ShowSevereError( "The allowed " + cAlphaFields( 10 ) + " are Coil:Heating:DX:MultiSpeed, " "Coil:Heating:Electric:MultiStage, and Coil:Heating:Gas:MultiStage  " "in " + CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
+				ShowSevereError( "The allowed " + cAlphaFields( 10 ) + " are Coil:Heating:DX:MultiSpeed, Coil:Heating:Electric:MultiStage, and Coil:Heating:Gas:MultiStage  in " + CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 				ShowContinueError( "The entered " + cAlphaFields( 10 ) + " = \"" + Alphas( 10 ) + "\"." );
 				ErrorsFound = true;
 			}
@@ -976,7 +969,7 @@ namespace HVACMultiSpeedHeatPump {
 					ShowSevereError( "Configuration error in " + CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 					ShowContinueError( cAlphaFields( 13 ) + " \"" + Alphas( 13 ) + "\" not found." );
 					ShowContinueError( cAlphaFields( 12 ) + " must be Coil:Cooling:DX:MultiSpeed " );
-					ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. " "Preceding condition(s) causes termination." );
+					ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
 					ErrorsFound = true;
 				}
 				LocalError = false;
@@ -1002,7 +995,7 @@ namespace HVACMultiSpeedHeatPump {
 					LocalError = false;
 				}
 			} else {
-				ShowSevereError( "The allowed " + cAlphaFields( 12 ) + " is Coil:Cooling:DX:MultiSpeed " "in " + CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
+				ShowSevereError( "The allowed " + cAlphaFields( 12 ) + " is Coil:Cooling:DX:MultiSpeed in " + CurrentModuleObject + " \"" + Alphas( 1 ) + "\"" );
 				ShowContinueError( "The entered " + cAlphaFields( 12 ) + " = \"" + Alphas( 12 ) + "\"." );
 				ErrorsFound = true;
 			}
@@ -1265,14 +1258,14 @@ namespace HVACMultiSpeedHeatPump {
 			MSHeatPump( MSHPNum ).NumOfSpeedHeating = Numbers( 9 );
 			if ( MSHeatPump( MSHPNum ).NumOfSpeedHeating < 2 || MSHeatPump( MSHPNum ).NumOfSpeedHeating > 4 ) {
 				if ( MSHeatPump( MSHPNum ).HeatCoilType == MultiSpeedHeatingCoil ) {
-					ShowSevereError( CurrentModuleObject + ", The maximum " + cNumericFields( 9 ) + " is 4, and " "the minimum number is 2" );
+					ShowSevereError( CurrentModuleObject + ", The maximum " + cNumericFields( 9 ) + " is 4, and the minimum number is 2" );
 					ShowContinueError( "The input value is " + RoundSigDigits( Numbers( 9 ), 0 ) );
 					ErrorsFound = true;
 				}
 			}
 			MSHeatPump( MSHPNum ).NumOfSpeedCooling = Numbers( 10 );
 			if ( MSHeatPump( MSHPNum ).NumOfSpeedCooling < 2 || MSHeatPump( MSHPNum ).NumOfSpeedCooling > 4 ) {
-				ShowSevereError( CurrentModuleObject + ", The maximum " + cNumericFields( 10 ) + " is 4, and " "the minimum number is 2" );
+				ShowSevereError( CurrentModuleObject + ", The maximum " + cNumericFields( 10 ) + " is 4, and the minimum number is 2" );
 				ShowContinueError( "The input value is " + RoundSigDigits( Numbers( 10 ), 0 ) );
 				ErrorsFound = true;
 			}
@@ -1349,35 +1342,35 @@ namespace HVACMultiSpeedHeatPump {
 			if ( MSHeatPump( MSHPNum ).FanPlaceType == BlowThru ) {
 				if ( MSHeatPump( MSHPNum ).FanInletNode != MSHeatPump( MSHPNum ).AirInletNodeNum ) {
 					ShowSevereError( "For " + CurrentModuleObject + " \"" + MSHeatPump( MSHPNum ).Name + "\"" );
-					ShowContinueError( "When a blow through fan is specified, the fan inlet node name must be " "the same as the " + cAlphaFields( 3 ) );
+					ShowContinueError( "When a blow through fan is specified, the fan inlet node name must be the same as the " + cAlphaFields( 3 ) );
 					ShowContinueError( "...Fan inlet node name           = " + NodeID( MSHeatPump( MSHPNum ).FanInletNode ) );
 					ShowContinueError( "..." + cAlphaFields( 3 ) + " = " + NodeID( MSHeatPump( MSHPNum ).AirInletNodeNum ) );
 					ErrorsFound = true;
 				}
 				if ( MSHeatPump( MSHPNum ).FanOutletNode != CoolingCoilInletNode ) {
 					ShowSevereError( "For " + CurrentModuleObject + " \"" + MSHeatPump( MSHPNum ).Name + "\"" );
-					ShowContinueError( "When a blow through fan is specified, the fan outlet node name must be " "the same as the cooling coil inlet node name." );
+					ShowContinueError( "When a blow through fan is specified, the fan outlet node name must be the same as the cooling coil inlet node name." );
 					ShowContinueError( "...Fan outlet node name         = " + NodeID( MSHeatPump( MSHPNum ).FanOutletNode ) );
 					ShowContinueError( "...Cooling coil inlet node name = " + NodeID( CoolingCoilInletNode ) );
 					ErrorsFound = true;
 				}
 				if ( CoolingCoilOutletNode != HeatingCoilInletNode ) {
 					ShowSevereError( "For " + CurrentModuleObject + " \"" + MSHeatPump( MSHPNum ).Name + "\"" );
-					ShowContinueError( "The cooling coil outlet node name must be " "the same as the heating coil inlet node name." );
+					ShowContinueError( "The cooling coil outlet node name must be the same as the heating coil inlet node name." );
 					ShowContinueError( "...Cooling coil outlet node name = " + NodeID( CoolingCoilOutletNode ) );
 					ShowContinueError( "...Heating coil inlet node name  = " + NodeID( HeatingCoilInletNode ) );
 					ErrorsFound = true;
 				}
 				if ( HeatingCoilOutletNode != SuppHeatCoilInletNode ) {
 					ShowSevereError( "For " + CurrentModuleObject + " \"" + MSHeatPump( MSHPNum ).Name + "\"" );
-					ShowContinueError( "When a blow through fan is specified, the heating coil outlet node name must be " "the same as the reheat coil inlet node name." );
+					ShowContinueError( "When a blow through fan is specified, the heating coil outlet node name must be the same as the reheat coil inlet node name." );
 					ShowContinueError( "...Heating coil outlet node name = " + NodeID( HeatingCoilOutletNode ) );
 					ShowContinueError( "...Reheat coil inlet node name   = " + NodeID( SuppHeatCoilInletNode ) );
 					ErrorsFound = true;
 				}
 				if ( SuppHeatCoilOutletNode != MSHeatPump( MSHPNum ).AirOutletNodeNum ) {
 					ShowSevereError( "For " + CurrentModuleObject + " \"" + MSHeatPump( MSHPNum ).Name + "\"" );
-					ShowContinueError( "The supplemental heating coil outlet node name must be " "the same as the " + cAlphaFields( 4 ) );
+					ShowContinueError( "The supplemental heating coil outlet node name must be the same as the " + cAlphaFields( 4 ) );
 					ShowContinueError( "...Supplemental heating coil outlet node name   = " + NodeID( SuppHeatCoilOutletNode ) );
 					ShowContinueError( "..." + cAlphaFields( 4 ) + " = " + NodeID( MSHeatPump( MSHPNum ).AirOutletNodeNum ) );
 					ErrorsFound = true;
@@ -1385,35 +1378,35 @@ namespace HVACMultiSpeedHeatPump {
 			} else {
 				if ( CoolingCoilInletNode != MSHeatPump( MSHPNum ).AirInletNodeNum ) {
 					ShowSevereError( "For " + CurrentModuleObject + " \"" + MSHeatPump( MSHPNum ).Name + "\"" );
-					ShowContinueError( "When a draw through fan is specified, the cooling coil inlet node name must be " "the same as the " + cAlphaFields( 3 ) );
+					ShowContinueError( "When a draw through fan is specified, the cooling coil inlet node name must be the same as the " + cAlphaFields( 3 ) );
 					ShowContinueError( "...Cooling coil inlet node name  = " + NodeID( CoolingCoilInletNode ) );
 					ShowContinueError( "..." + cAlphaFields( 3 ) + " = " + NodeID( MSHeatPump( MSHPNum ).AirInletNodeNum ) );
 					ErrorsFound = true;
 				}
 				if ( CoolingCoilOutletNode != HeatingCoilInletNode ) {
 					ShowSevereError( "For " + CurrentModuleObject + " \"" + MSHeatPump( MSHPNum ).Name + "\"" );
-					ShowContinueError( "The cooling coil outlet node name must be " "the same as the heating coil inlet node name." );
+					ShowContinueError( "The cooling coil outlet node name must be the same as the heating coil inlet node name." );
 					ShowContinueError( "...Cooling coil outlet node name = " + NodeID( CoolingCoilOutletNode ) );
 					ShowContinueError( "...Heating coil inlet node name  = " + NodeID( HeatingCoilInletNode ) );
 					ErrorsFound = true;
 				}
 				if ( HeatingCoilOutletNode != MSHeatPump( MSHPNum ).FanInletNode ) {
 					ShowSevereError( "For " + CurrentModuleObject + " \"" + MSHeatPump( MSHPNum ).Name + "\"" );
-					ShowContinueError( "When a draw through fan is specified, the heating coil outlet node name must be " "the same as the fan inlet node name." );
+					ShowContinueError( "When a draw through fan is specified, the heating coil outlet node name must be the same as the fan inlet node name." );
 					ShowContinueError( "...Heating coil outlet node name = " + NodeID( HeatingCoilOutletNode ) );
 					ShowContinueError( "...Fan inlet node name           = " + NodeID( MSHeatPump( MSHPNum ).FanInletNode ) );
 					ErrorsFound = true;
 				}
 				if ( MSHeatPump( MSHPNum ).FanOutletNode != SuppHeatCoilInletNode ) {
 					ShowSevereError( "For " + CurrentModuleObject + " \"" + MSHeatPump( MSHPNum ).Name + "\"" );
-					ShowContinueError( "When a draw through fan is specified, the fan outlet node name must be " "the same as the reheat coil inlet node name." );
+					ShowContinueError( "When a draw through fan is specified, the fan outlet node name must be the same as the reheat coil inlet node name." );
 					ShowContinueError( "...Fan outlet node name        = " + NodeID( MSHeatPump( MSHPNum ).FanOutletNode ) );
 					ShowContinueError( "...Reheat coil inlet node name = " + NodeID( SuppHeatCoilInletNode ) );
 					ErrorsFound = true;
 				}
 				if ( SuppHeatCoilOutletNode != MSHeatPump( MSHPNum ).AirOutletNodeNum ) {
 					ShowSevereError( "For " + CurrentModuleObject + " \"" + MSHeatPump( MSHPNum ).Name + "\"" );
-					ShowContinueError( "The reheat coil outlet node name must be " "the same as the " + cAlphaFields( 4 ) );
+					ShowContinueError( "The reheat coil outlet node name must be the same as the " + cAlphaFields( 4 ) );
 					ShowContinueError( "...Reheat coil outlet node name   = " + NodeID( SuppHeatCoilOutletNode ) );
 					ShowContinueError( "..." + cAlphaFields( 4 ) + " = " + NodeID( MSHeatPump( MSHPNum ).AirOutletNodeNum ) );
 					ErrorsFound = true;
@@ -1445,7 +1438,7 @@ namespace HVACMultiSpeedHeatPump {
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input.  " "Preceding condition(s) causes termination." );
+			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input.  Preceding condition(s) causes termination." );
 		}
 		// End of multispeed heat pump
 
@@ -1758,7 +1751,7 @@ namespace HVACMultiSpeedHeatPump {
 			}
 			MyCheckFlag( MSHeatPumpNum ) = false;
 			if ( MSHeatPump( MSHeatPumpNum ).ZoneInletNode == 0 ) {
-				ShowSevereError( "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed" ", \"" + MSHeatPump( MSHeatPumpNum ).Name + "\", The zone inlet node in the controlled zone (" + MSHeatPump( MSHeatPumpNum ).ControlZoneName + ") is not found." );
+				ShowSevereError( "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, \"" + MSHeatPump( MSHeatPumpNum ).Name + "\", The zone inlet node in the controlled zone (" + MSHeatPump( MSHeatPumpNum ).ControlZoneName + ") is not found." );
 				ShowFatalError( "Subroutine InitMSHeatPump: Errors found in getting AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed input.  Preceding condition(s) causes termination." );
 			}
 		}
@@ -1900,7 +1893,7 @@ namespace HVACMultiSpeedHeatPump {
 			if ( MSHeatPump( MSHeatPumpNum ).FanVolFlow != AutoSize ) {
 				//     Check fan versus system supply air flow rates
 				if ( MSHeatPump( MSHeatPumpNum ).FanVolFlow < MSHeatPump( MSHeatPumpNum ).CoolVolumeFlowRate( NumOfSpeedCooling ) ) {
-					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( MSHeatPump( MSHeatPumpNum ).FanVolFlow, 7 ) + " in fan object " + MSHeatPump( MSHeatPumpNum ).FanName + " is less than the MSHP system air flow rate" " when cooling is required (" + TrimSigDigits( MSHeatPump( MSHeatPumpNum ).CoolVolumeFlowRate( NumOfSpeedCooling ), 7 ) + ")." );
+					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( MSHeatPump( MSHeatPumpNum ).FanVolFlow, 7 ) + " in fan object " + MSHeatPump( MSHeatPumpNum ).FanName + " is less than the MSHP system air flow rate when cooling is required (" + TrimSigDigits( MSHeatPump( MSHeatPumpNum ).CoolVolumeFlowRate( NumOfSpeedCooling ), 7 ) + ")." );
 					ShowContinueError( " The MSHP system flow rate when cooling is required is reset to the fan flow rate and the simulation continues." );
 					ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + MSHeatPump( MSHeatPumpNum ).Name );
 					MSHeatPump( MSHeatPumpNum ).CoolVolumeFlowRate( NumOfSpeedCooling ) = MSHeatPump( MSHeatPumpNum ).FanVolFlow;
@@ -1914,7 +1907,7 @@ namespace HVACMultiSpeedHeatPump {
 					}
 				}
 				if ( MSHeatPump( MSHeatPumpNum ).FanVolFlow < MSHeatPump( MSHeatPumpNum ).HeatVolumeFlowRate( NumOfSpeedHeating ) ) {
-					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( MSHeatPump( MSHeatPumpNum ).FanVolFlow, 7 ) + " in fan object " + MSHeatPump( MSHeatPumpNum ).FanName + " is less than the MSHP system air flow rate" " when heating is required (" + TrimSigDigits( MSHeatPump( MSHeatPumpNum ).HeatVolumeFlowRate( NumOfSpeedHeating ), 7 ) + ")." );
+					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( MSHeatPump( MSHeatPumpNum ).FanVolFlow, 7 ) + " in fan object " + MSHeatPump( MSHeatPumpNum ).FanName + " is less than the MSHP system air flow rate when heating is required (" + TrimSigDigits( MSHeatPump( MSHeatPumpNum ).HeatVolumeFlowRate( NumOfSpeedHeating ), 7 ) + ")." );
 					ShowContinueError( " The MSHP system flow rate when heating is required is reset to the fan flow rate and the simulation continues." );
 					ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + MSHeatPump( MSHeatPumpNum ).Name );
 					MSHeatPump( MSHeatPumpNum ).HeatVolumeFlowRate( NumOfSpeedHeating ) = MSHeatPump( MSHeatPumpNum ).FanVolFlow;
@@ -1927,7 +1920,7 @@ namespace HVACMultiSpeedHeatPump {
 					}
 				}
 				if ( MSHeatPump( MSHeatPumpNum ).FanVolFlow < MSHeatPump( MSHeatPumpNum ).IdleVolumeAirRate && MSHeatPump( MSHeatPumpNum ).IdleVolumeAirRate != 0.0 ) {
-					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( MSHeatPump( MSHeatPumpNum ).FanVolFlow, 7 ) + " in fan object " + MSHeatPump( MSHeatPumpNum ).FanName + " is less than the MSHP system air flow rate when no " "heating or cooling is needed (" + TrimSigDigits( MSHeatPump( MSHeatPumpNum ).IdleVolumeAirRate, 7 ) + ")." );
+					ShowWarningError( CurrentModuleObject + " - air flow rate = " + TrimSigDigits( MSHeatPump( MSHeatPumpNum ).FanVolFlow, 7 ) + " in fan object " + MSHeatPump( MSHeatPumpNum ).FanName + " is less than the MSHP system air flow rate when no heating or cooling is needed (" + TrimSigDigits( MSHeatPump( MSHeatPumpNum ).IdleVolumeAirRate, 7 ) + ")." );
 					ShowContinueError( " The MSHP system flow rate when no heating or cooling is needed is reset to the fan flow rate and the simulation continues." );
 					ShowContinueError( " Occurs in " + CurrentModuleObject + " = " + MSHeatPump( MSHeatPumpNum ).Name );
 					MSHeatPump( MSHeatPumpNum ).IdleVolumeAirRate = MSHeatPump( MSHeatPumpNum ).FanVolFlow;
@@ -2258,8 +2251,8 @@ namespace HVACMultiSpeedHeatPump {
 						if ( MSHeatPump( MSHeatPumpNum ).FanVolFlow < MSHeatPump( MSHeatPumpNum ).CoolVolumeFlowRate( i ) && MSHeatPump( MSHeatPumpNum ).FanVolFlow != AutoSize ) {
 							MSHeatPump( MSHeatPumpNum ).CoolVolumeFlowRate( i ) = MSHeatPump( MSHeatPumpNum ).FanVolFlow;
 							ShowWarningError( CurrentModuleObject + " \"" + MSHeatPump( MSHeatPumpNum ).Name + "\"" );
-							ShowContinueError( "The supply air flow rate at high speed is less than the " "autosized value for the supply air flow rate in cooling mode. Consider autosizing the fan for" " this simulation." );
-							ShowContinueError( "The air flow rate at high speed in cooling mode " "is reset to the supply air flow rate and the simulation continues." );
+							ShowContinueError( "The supply air flow rate at high speed is less than the autosized value for the supply air flow rate in cooling mode. Consider autosizing the fan for this simulation." );
+							ShowContinueError( "The air flow rate at high speed in cooling mode is reset to the supply air flow rate and the simulation continues." );
 						}
 					} else {
 						MSHeatPump( MSHeatPumpNum ).CoolVolumeFlowRate( i ) = MSHeatPump( MSHeatPumpNum ).CoolVolumeFlowRate( NumOfSpeedCooling ) * i / NumOfSpeedCooling;
@@ -2288,8 +2281,8 @@ namespace HVACMultiSpeedHeatPump {
 						if ( MSHeatPump( MSHeatPumpNum ).FanVolFlow < MSHeatPump( MSHeatPumpNum ).HeatVolumeFlowRate( i ) && MSHeatPump( MSHeatPumpNum ).FanVolFlow != AutoSize ) {
 							MSHeatPump( MSHeatPumpNum ).HeatVolumeFlowRate( i ) = MSHeatPump( MSHeatPumpNum ).FanVolFlow;
 							ShowWarningError( CurrentModuleObject + " \"" + MSHeatPump( MSHeatPumpNum ).Name + "\"" );
-							ShowContinueError( "The supply air flow rate at high speed is less than the " "autosized value for the maximum air flow rate in heating mode. Consider autosizing the fan for" " this simulation." );
-							ShowContinueError( "The maximum air flow rate at high speed in heating mode " "is reset to the supply air flow rate and the simulation continues." );
+							ShowContinueError( "The supply air flow rate at high speed is less than the autosized value for the maximum air flow rate in heating mode. Consider autosizing the fan for this simulation." );
+							ShowContinueError( "The maximum air flow rate at high speed in heating mode is reset to the supply air flow rate and the simulation continues." );
 						}
 					} else {
 						MSHeatPump( MSHeatPumpNum ).HeatVolumeFlowRate( i ) = MSHeatPump( MSHeatPumpNum ).HeatVolumeFlowRate( NumOfSpeedHeating ) * i / NumOfSpeedHeating;
@@ -2315,8 +2308,8 @@ namespace HVACMultiSpeedHeatPump {
 				if ( MSHeatPump( MSHeatPumpNum ).FanVolFlow < MSHeatPump( MSHeatPumpNum ).IdleVolumeAirRate && MSHeatPump( MSHeatPumpNum ).FanVolFlow != AutoSize ) {
 					MSHeatPump( MSHeatPumpNum ).IdleVolumeAirRate = MSHeatPump( MSHeatPumpNum ).FanVolFlow;
 					ShowWarningError( CurrentModuleObject + " \"" + MSHeatPump( MSHeatPumpNum ).Name + "\"" );
-					ShowContinueError( "The supply air flow rate is less than the autosized value" " for the maximum air flow rate when no heating or cooling is needed. Consider" " autosizing the fan for this simulation." );
-					ShowContinueError( "The maximum air flow rate when no heating or cooling is needed " "is reset to the supply air flow rate and the simulation continues." );
+					ShowContinueError( "The supply air flow rate is less than the autosized value for the maximum air flow rate when no heating or cooling is needed. Consider autosizing the fan for this simulation." );
+					ShowContinueError( "The maximum air flow rate when no heating or cooling is needed is reset to the supply air flow rate and the simulation continues." );
 				}
 				if ( MSHeatPump( MSHeatPumpNum ).IdleVolumeAirRate < SmallAirVolFlow ) {
 					MSHeatPump( MSHeatPumpNum ).IdleVolumeAirRate = 0.0;
@@ -2908,7 +2901,7 @@ namespace HVACMultiSpeedHeatPump {
 	Real64
 	MSHPCyclingResidual(
 		Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = MSHPNum
+		FArray1< Real64 > const & Par // par(1) = MSHPNum
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -2966,19 +2959,15 @@ namespace HVACMultiSpeedHeatPump {
 		Real64 ActualOutput; // delivered capacity of MSHP
 		int CompOp; // compressor operation; 1=on, 0=off
 
-		MSHeatPumpNum = int( Par()( 1 ) );
-		ZoneNum = int( Par()( 2 ) );
+		MSHeatPumpNum = int( Par( 1 ) );
+		ZoneNum = int( Par( 2 ) );
 		// FirstHVACIteration is a logical, Par is REAL(r64), so make 1.0=TRUE and 0.0=FALSE
-		if ( Par()( 3 ) == 1.0 ) {
-			FirstHVACIteration = true;
-		} else {
-			FirstHVACIteration = false;
-		}
-		OpMode = int( Par()( 4 ) );
-		QZnReq = Par()( 5 );
-		OnOffAirFlowRatio = Par()( 6 );
-		SupHeaterLoad = Par()( 7 );
-		CompOp = int( Par()( 9 ) );
+		FirstHVACIteration = ( Par( 3 ) == 1.0 );
+		OpMode = int( Par( 4 ) );
+		QZnReq = Par( 5 );
+		OnOffAirFlowRatio = Par( 6 );
+		SupHeaterLoad = Par( 7 );
+		CompOp = int( Par( 9 ) );
 
 		CalcMSHeatPump( MSHeatPumpNum, FirstHVACIteration, CompOp, 1, 0.0, PartLoadFrac, ActualOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad );
 
@@ -2992,7 +2981,7 @@ namespace HVACMultiSpeedHeatPump {
 	Real64
 	MSHPVarSpeedResidual(
 		Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		Optional< FArray1S< Real64 > const > Par // par(1) = MSHPNum
+		FArray1< Real64 > const & Par // par(1) = MSHPNum
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -3052,20 +3041,16 @@ namespace HVACMultiSpeedHeatPump {
 		int SpeedNum; // Speed number
 		int CompOp; // compressor operation; 1=on, 0=off
 
-		MSHeatPumpNum = int( Par()( 1 ) );
-		ZoneNum = int( Par()( 2 ) );
+		MSHeatPumpNum = int( Par( 1 ) );
+		ZoneNum = int( Par( 2 ) );
 		// FirstHVACIteration is a logical, Par is REAL(r64), so make 1.0=TRUE and 0.0=FALSE
-		if ( Par()( 3 ) == 1.0 ) {
-			FirstHVACIteration = true;
-		} else {
-			FirstHVACIteration = false;
-		}
-		OpMode = int( Par()( 4 ) );
-		QZnReq = Par()( 5 );
-		OnOffAirFlowRatio = Par()( 6 );
-		SupHeaterLoad = Par()( 7 );
-		SpeedNum = int( Par()( 8 ) );
-		CompOp = int( Par()( 9 ) );
+		FirstHVACIteration = ( Par( 3 ) == 1.0 );
+		OpMode = int( Par( 4 ) );
+		QZnReq = Par( 5 );
+		OnOffAirFlowRatio = Par( 6 );
+		SupHeaterLoad = Par( 7 );
+		SpeedNum = int( Par( 8 ) );
+		CompOp = int( Par( 9 ) );
 
 		CalcMSHeatPump( MSHeatPumpNum, FirstHVACIteration, CompOp, SpeedNum, SpeedRatio, 1.0, ActualOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad );
 
@@ -3573,7 +3558,7 @@ namespace HVACMultiSpeedHeatPump {
 	Real64
 	HotWaterCoilResidual(
 		Real64 const HWFlow, // hot water flow rate in kg/s
-		Optional< FArray1S< Real64 > const > Par // Par(5) is the requested coil load
+		FArray1< Real64 > const & Par // Par(5) is the requested coil load
 	)
 	{
 
@@ -3621,13 +3606,9 @@ namespace HVACMultiSpeedHeatPump {
 		Real64 HeatCoilLoad; // requested coild load, W
 		Real64 mdot;
 
-		MSHeatPumpNum = int( Par()( 1 ) );
-		if ( Par()( 2 ) > 0.0 ) {
-			FirstHVACSoln = true;
-		} else {
-			FirstHVACSoln = false;
-		}
-		HeatCoilLoad = Par()( 3 );
+		MSHeatPumpNum = int( Par( 1 ) );
+		FirstHVACSoln = ( Par( 2 ) > 0.0 );
+		HeatCoilLoad = Par( 3 );
 		QCoilActual = HeatCoilLoad;
 		mdot = HWFlow;
 		SetComponentFlowRate( mdot, MSHeatPump( MSHeatPumpNum ).HotWaterCoilControlNode, MSHeatPump( MSHeatPumpNum ).HotWaterCoilOutletNode, MSHeatPump( MSHeatPumpNum ).HotWaterLoopNum, MSHeatPump( MSHeatPumpNum ).HotWaterLoopSide, MSHeatPump( MSHeatPumpNum ).HotWaterBranchNum, MSHeatPump( MSHeatPumpNum ).HotWaterCompNum );
@@ -3650,7 +3631,7 @@ namespace HVACMultiSpeedHeatPump {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

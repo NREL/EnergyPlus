@@ -85,7 +85,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.2;
+  Version,8.3;
 
   ZoneHVAC:WaterToAirHeatPump,
     Zone1WTAHP,              !- Name
@@ -602,6 +602,7 @@
     Yes,                     !- Run Simulation for Sizing Periods
     No;                      !- Run Simulation for Weather File Run Periods
 
+    
   RunPeriod,
     ,                        !- Name
     1,                       !- Begin Month
@@ -1232,6 +1233,7 @@
     29.4,                    !- Design Loop Exit Temperature {C}
     5.6;                     !- Loop Design Temperature Difference {deltaC}
 
+    
   BranchList,
     Condenser Supply Side Branches,  !- Name
     Condenser Supply Inlet Branch,  !- Branch 1 Name
@@ -1421,14 +1423,13 @@
     Vertical Ground Heat Exchanger,  !- Name
     GHE Inlet Node,          !- Inlet Node Name
     GHE Outlet Node,         !- Outlet Node Name
-    0.00033000,              !- Maximum Flow Rate {m3/s}
+    0.00033000,              !- Design Flow Rate {m3/s}
     24,                      !- Number of Bore Holes
     76.2,                    !- Bore Hole Length {m}
     .635080E-01,             !- Bore Hole Radius {m}
     .692626E+00,             !- Ground Thermal Conductivity {W/m-K}
     .234700E+07,             !- Ground Thermal Heat Capacity {J/m3-K}
     13.375,                  !- Ground Temperature {C}
-    0.002,                   !- Design Flow Rate {m3/s}
     .692626E+00,             !- Grout Thermal Conductivity {W/m-K}
     .391312E+00,             !- Pipe Thermal Conductivity {W/m-K}
     2.66667E-02,             !- Pipe Out Diameter {m}

@@ -62,7 +62,7 @@
 ! Expansion Valve Type = Balance port TXV, removable head
 
 !  Version,
-!    8.0;                    !- Version Identifier
+!    8.3;                    !- Version Identifier
 
   Coil:Cooling:DX:SingleSpeed,
     Lennox KCA060S4,         !- Name

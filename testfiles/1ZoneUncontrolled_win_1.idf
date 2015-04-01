@@ -88,7 +88,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.2;
+  Version,8.3;
 
   Timestep,4;
 
@@ -240,7 +240,7 @@
 
   Construction:WindowDataFile,
     DoubleClear,             !- Name
-    DataSets\Window5DataFile.dat;  !- File Name
+    ..\datasets\Window5DataFile.dat;  !- File Name
 
   Site:GroundTemperature:BuildingSurface,18.89,18.92,19.02,19.12,19.21,19.23,19.07,19.32,19.09,19.21,19.13,18.96;
 

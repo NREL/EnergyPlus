@@ -1,3 +1,7 @@
+// C++ Headers
+#include <ostream>
+#include <string>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/numeric.hh>
 
@@ -37,6 +41,9 @@ namespace DataGlobals {
 	// Data
 	// -only module should be available to other modules and routines.
 	// Thus, all variables in this module must be PUBLIC.
+	bool runReadVars(false);
+	bool DDOnlySimulation(false);
+	bool AnnualSimulation(false);
 
 	// MODULE PARAMETER DEFINITIONS:
 	int const BeginDay( 1 );
@@ -49,15 +56,19 @@ namespace DataGlobals {
 	int const ksDesignDay( 1 );
 	int const ksRunPeriodDesign( 2 );
 	int const ksRunPeriodWeather( 3 );
+	int const ksHVACSizeDesignDay ( 4 );  // a regular design day run during HVAC Sizing Simulation
+	int const ksHVACSizeRunPeriodDesign( 5 ); // a weather period design day run during HVAC Sizing Simulation
 
 	int const ZoneTSReporting( 1 ); // value for Zone Time Step Reporting (UpdateDataAndReport)
 	int const HVACTSReporting( 2 ); // value for HVAC Time Step Reporting (UpdateDataAndReport)
 
 	Real64 const MaxEXPArg( 709.78 ); // maximum exponent in EXP() function
-	Real64 const Pi( 3.141592653589793 ); // Pi 3.1415926535897932384626435
+	Real64 const Pi( 3.14159265358979324 ); // Pi 3.1415926535897932384626435
 	Real64 const PiOvr2( Pi / 2.0 ); // Pi/2
+	Real64 const TwoPi( 2.0 * Pi ); // 2*Pi 6.2831853071795864769252868
 	Real64 const GravityConstant( 9.807 );
 	Real64 const DegToRadians( Pi / 180.0 ); // Conversion for Degrees to Radians
+	Real64 const RadToDeg( 180.0 / Pi ); // Conversion for Radians to Degrees
 	Real64 const SecInHour( 3600.0 ); // Conversion for hours to seconds
 	Real64 const HoursInDay( 24.0 ); // Number of Hourse in Day
 	Real64 const SecsInDay( SecInHour * HoursInDay ); // Number of seconds in Day
@@ -127,12 +138,14 @@ namespace DataGlobals {
 	Real64 TimeStepZone( 0.0 ); // Zone time step in fractional hours
 	bool WarmupFlag( false ); // True during the warmup portion of a simulation
 	int OutputFileStandard( 0 ); // Unit number for the standard output file (hourly data only)
+	std::ostream * eso_stream( nullptr ); // Internal stream used for eso output (used for performance)
 	int StdOutputRecordCount( 0 ); // Count of Standard output records
 	int OutputFileInits( 0 ); // Unit number for the standard Initialization output file
 	int OutputFileDebug( 0 ); // Unit number for debug outputs
 	int OutputFileZoneSizing( 0 ); // Unit number of zone sizing calc output file
 	int OutputFileSysSizing( 0 ); // Unit number of system sizing calc output file
 	int OutputFileMeters( 0 ); // Unit number for meters output
+	std::ostream * mtr_stream( nullptr ); // Internal stream used for mtr output (used for performance)
 	int StdMeterRecordCount( 0 ); // Count of Meter output records
 	int OutputFileBNDetails( 0 ); // Unit number for Branch-Node Details
 	bool ZoneSizingCalc( false ); // TRUE if zone sizing calculation
@@ -142,10 +155,13 @@ namespace DataGlobals {
 	bool DoPlantSizing( false ); // User input in SimulationControl object
 	bool DoDesDaySim( false ); // User input in SimulationControl object
 	bool DoWeathSim( false ); // User input in SimulationControl object
+	bool DoHVACSizingSimulation( false ); // User input in SimulationControl object
+	int HVACSizingSimMaxIterations( 0 ); // User input in SimulationControl object
 	bool WeathSimReq( false ); // Input has a RunPeriod request
 	int KindOfSim( 0 ); // See parameters. (ksDesignDay, ksRunPeriodDesign, ksRunPeriodWeather)
 	bool DoOutputReporting( false ); // TRUE if variables to be written out
 	bool DoingSizing( false ); // TRUE when "sizing" is being performed (some error messages won't be displayed)
+	bool DoingHVACSizingSimulations( false ); // true when HVAC Sizing Simulations are being performed. 
 	bool DoingInputProcessing( false ); // TRUE when "IP" is being performed (some error messages are cached)
 	bool DisplayAllWarnings( false ); // True when selection for  "DisplayAllWarnings" is entered (turns on other warning flags)
 	bool DisplayExtraWarnings( false ); // True when selection for  "DisplayExtraWarnings" is entered
@@ -153,13 +169,17 @@ namespace DataGlobals {
 	bool DisplayUnusedSchedules( false ); // True when selection for  "DisplayUnusedSchedules" is entered
 	bool DisplayAdvancedReportVariables( false ); // True when selection for  "DisplayAdvancedReportVariables" is entered
 	bool DisplayZoneAirHeatBalanceOffBalance( false ); // True when selection for  "DisplayZoneAirHeatBalanceOffBalance" is entered
+	bool DisplayInputInAudit( false ); // True when environmental variable "DisplayInputInAudit" is used
 	bool CreateMinimalSurfaceVariables( false ); // True when selection for  "CreateMinimalSurfaceVariables" is entered
 	Real64 CurrentTime( 0.0 ); // CurrentTime, in fractional hours, from start of day. Uses Loads time step.
 	int SimTimeSteps( 0 ); // Number of (Loads) timesteps since beginning of run period (environment).
-	int MinutesPerTimeStep; // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
+	int MinutesPerTimeStep( 0 ); // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
+	Real64 TimeStepZoneSec( 0.0 ); // Seconds per time step
 	bool MetersHaveBeenInitialized( false );
 	bool KickOffSimulation( false ); // Kick off simulation -- meaning run each environment for 1 or 2 time steps.
 	bool KickOffSizing( false ); // Kick off sizing -- meaning run each environment for 1 or 2 time steps.
+	bool RedoSizesHVACSimulation( false ); // doing kick off simulation for redoing sizes as part of sizing
+	bool FinalSizingHVACSizingSimIteration( false ); //when doing HVAC sizing Simulation
 	bool AnyEnergyManagementSystemInModel( false ); // true if there is any EMS or Erl in model.  otherwise false
 	bool AnyPlantInModel( false ); // true if there are any plant or condenser loops in model, otherwise false
 	int CacheIPErrorFile( 0 ); // Cache IP errors until IDF processing done.
@@ -170,16 +190,21 @@ namespace DataGlobals {
 	int OutputFileZonePulse( 0 ); // file handle for special zone sizing report that contains the result of the "pulse" for the load component report
 	bool doLoadComponentPulseNow( false ); // true for the time step that is the "pulse" for the load component report
 	bool ShowDecayCurvesInEIO( false ); // true if the Radiant to Convective Decay Curves should appear in the EIO file
-	bool AnySlabsInModel ( false ); // true if there are any zone-coupled ground domains in the input file
+	bool AnySlabsInModel( false ); // true if there are any zone-coupled ground domains in the input file
+	bool AnyBasementsInModel( false ); // true if there are any basements in the input file
+
+	int Progress( 0 ); // current progress (0-100)
+	void ( *fProgressPtr )( int const );
+	void ( *fMessagePtr )( std::string const & );
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 	//     reproduce, prepare derivative works, and perform publicly and display publicly.

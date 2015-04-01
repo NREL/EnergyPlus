@@ -65,6 +65,7 @@ namespace SystemReports {
 
 	extern FArray1D< Real64 > SysHumidHTNG;
 	extern FArray1D< Real64 > SysHumidElec;
+	extern FArray1D< Real64 > SysHumidGas;
 	extern FArray1D< Real64 > SysEvapCLNG;
 	extern FArray1D< Real64 > SysEvapElec;
 	extern FArray1D< Real64 > SysHeatExHTNG;
@@ -374,7 +375,7 @@ namespace SystemReports {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

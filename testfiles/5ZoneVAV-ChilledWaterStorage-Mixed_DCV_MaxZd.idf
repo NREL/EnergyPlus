@@ -74,7 +74,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                Yes, PSI Indiana year 2004.
 
-  Version,8.2;
+  Version,8.3;
 
   Timestep,4;
 
@@ -1571,8 +1571,8 @@
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZN_1_FLR_1_SEC_1,!- Name
-    FLOW/ZONE,               !- Outdoor Air Method
-    ,                        !- Outdoor Air Flow per Person {m3/s-person}
+    Flow/Person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
@@ -2063,8 +2063,8 @@
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZN_1_FLR_1_SEC_2,!- Name
-    FLOW/ZONE,               !- Outdoor Air Method
-    ,                        !- Outdoor Air Flow per Person {m3/s-person}
+    Flow/Person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
@@ -2514,8 +2514,8 @@
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZN_1_FLR_1_SEC_3,!- Name
-    FLOW/ZONE,               !- Outdoor Air Method
-    ,                        !- Outdoor Air Flow per Person {m3/s-person}
+    Flow/Person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
@@ -2984,8 +2984,8 @@
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZN_1_FLR_1_SEC_4,!- Name
-    FLOW/ZONE,               !- Outdoor Air Method
-    ,                        !- Outdoor Air Flow per Person {m3/s-person}
+    Flow/Person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
@@ -3547,8 +3547,8 @@
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZN_1_FLR_1_SEC_5,!- Name
-    FLOW/ZONE,               !- Outdoor Air Method
-    ,                        !- Outdoor Air Flow per Person {m3/s-person}
+    Flow/Person,             !- Outdoor Air Method
+    0.00944,                 !- Outdoor Air Flow per Person {m3/s-person}
     0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
@@ -3753,14 +3753,14 @@
     VAV WITH REHEAT,         !- AirLoop Name
     SENSIBLE,                !- Type of Load to Size On
     AUTOSIZE,                !- Design Outdoor Air Flow Rate {m3/s}
-    0.3000,                  !- Minimum System Air Flow Ratio
+    0.3000,                  !- Central Heating Maximum System Air Flow Ratio
     -10.0,                   !- Preheat Design Temperature {C}
     0.008,                   !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
     12.8000,                 !- Precool Design Temperature {C}
     0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     13.8000,                 !- Central Cooling Design Supply Air Temperature {C}
     16.7000,                 !- Central Heating Design Supply Air Temperature {C}
-    NONCOINCIDENT,           !- Sizing Option
+    NONCOINCIDENT,           !- Type of Zone Sum to Use
     NO,                      !- 100% Outdoor Air in Cooling
     NO,                      !- 100% Outdoor Air in Heating
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
@@ -3777,7 +3777,16 @@
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     VentilationRateProcedure,!- System Outdoor Air Method
-    0.3;                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    0.3,                     !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
+    VAV;                     !- Central Cooling Capacity Control Method
 
   AvailabilityManagerAssignmentList,
     VAV WITH REHEAT Availability Manager List,  !- Name

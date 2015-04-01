@@ -371,25 +371,18 @@ namespace Fans {
 		}
 
 		cAlphaArgs.allocate( MaxAlphas );
-		cAlphaArgs = "";
 		cAlphaFieldNames.allocate( MaxAlphas );
-		cAlphaFieldNames = "";
-		lAlphaFieldBlanks.allocate( MaxAlphas );
-		lAlphaFieldBlanks = false;
+		lAlphaFieldBlanks.dimension( MaxAlphas, false );
 		cNumericFieldNames.allocate( MaxNumbers );
-		cNumericFieldNames = "";
-		lNumericFieldBlanks.allocate( MaxNumbers );
-		lNumericFieldBlanks = false;
-		rNumericArgs.allocate( MaxNumbers );
-		rNumericArgs = 0.0;
+		lNumericFieldBlanks.dimension( MaxNumbers, false );
+		rNumericArgs.dimension( MaxNumbers, 0.0 );
 
 		NumFans = NumSimpFan + NumVarVolFan + NumZoneExhFan + NumOnOff + NumCompModelFan; // cpw1Mar2010 Add NumCompModelFan
 		if ( NumFans > 0 ) {
 			Fan.allocate( NumFans );
 			FanNumericFields.allocate( NumFans );
 		}
-		CheckEquipName.allocate( NumFans );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumFans, true );
 
 		for ( SimpFanNum = 1; SimpFanNum <= NumSimpFan; ++SimpFanNum ) {
 			FanNum = SimpFanNum;
@@ -894,8 +887,7 @@ namespace Fans {
 		}
 
 		ManageEMS( emsCallFromComponentGetInput );
-		MySizeFlag.allocate( NumFans );
-		MySizeFlag = true;
+		MySizeFlag.dimension( NumFans, true );
 
 	}
 
@@ -960,8 +952,7 @@ namespace Fans {
 
 		if ( MyOneTimeFlag ) {
 
-			MyEnvrnFlag.allocate( NumFans );
-			MyEnvrnFlag = true;
+			MyEnvrnFlag.dimension( NumFans, true );
 
 			MyOneTimeFlag = false;
 
@@ -2350,6 +2341,7 @@ namespace Fans {
 				UnbalExhMassFlow = Fan( FanNum ).InletAirMassFlowRate;
 				if ( Fan( FanNum ).BalancedFractSchedNum > 0 ) {
 					BalancedExhMassFlow = UnbalExhMassFlow * GetCurrentScheduleValue( Fan( FanNum ).BalancedFractSchedNum );
+					UnbalExhMassFlow = UnbalExhMassFlow - BalancedExhMassFlow;
 				} else {
 					BalancedExhMassFlow = 0.0;
 				}
@@ -2357,7 +2349,7 @@ namespace Fans {
 				UnbalExhMassFlow = 0.0;
 				BalancedExhMassFlow = 0.0;
 			}
-			Fan( FanNum ).UnbalancedOutletMassFlowRate = UnbalExhMassFlow - BalancedExhMassFlow;
+			Fan( FanNum ).UnbalancedOutletMassFlowRate = UnbalExhMassFlow;
 			Fan( FanNum ).BalancedOutletMassFlowRate = BalancedExhMassFlow;
 		}
 
@@ -2641,7 +2633,7 @@ namespace Fans {
 		FanIndex = FindItemInList( FanName, Fan.FanName(), NumFans );
 		if ( FanIndex == 0 ) {
 			if ( present( ThisObjectType ) && present( ThisObjectName ) ) {
-				ShowSevereError( "GetFanType: " + ThisObjectType() + "=\"" + ThisObjectName() + "\"," " invalid Fan specified=\"" + FanName + "\"." );
+				ShowSevereError( "GetFanType: " + ThisObjectType() + "=\"" + ThisObjectName() + "\", invalid Fan specified=\"" + FanName + "\"." );
 			} else if ( present( ThisObjectType ) ) {
 				ShowSevereError( ThisObjectType() + ", GetFanType: Fan not found=" + FanName );
 			} else {
@@ -3070,7 +3062,7 @@ namespace Fans {
 		}
 
 	}
-	
+
 	Real64
 	FanDesDT(
 		int const FanNum, // index of fan in Fan array
@@ -3080,7 +3072,7 @@ namespace Fans {
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Fred Buhl
 		//       DATE WRITTEN   August 2014
-		//       MODIFIED       
+		//       MODIFIED
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
@@ -3092,7 +3084,7 @@ namespace Fans {
 		//              Qdot,air = cp,air*rho,air*Vdot*deltaT
 
 		// REFERENCES: EnergyPlus Engineering Reference
-		
+
 		// Using/Aliasing
 		using InputProcessor::FindItemInList;
 
@@ -3110,8 +3102,7 @@ namespace Fans {
 		//
 		if ( FanNum == 0 ) {
 			DesignDeltaT = 0.0;
-		}
-		else if ( Fan( FanNum ).FanType_Num != FanType_ComponentModel ) {
+		} else if ( Fan( FanNum ).FanType_Num != FanType_ComponentModel ) {
 			DeltaP = Fan( FanNum ).DeltaPress;
 			TotEff = Fan( FanNum ).FanEff;
 			MotEff = Fan( FanNum ).MotEff;
@@ -3119,13 +3110,12 @@ namespace Fans {
 			RhoAir = StdRhoAir;
 			CpAir = PsyCpAirFnWTdb( constant_zero, constant_twenty );
 			DesignDeltaT = ( DeltaP / ( RhoAir * CpAir * TotEff ) ) * ( MotEff + MotInAirFrac * ( 1.0 - MotEff ) );
-		}
-		else {
+		} else {
 			DesignDeltaT = 0.0;
 		}
-	
+
 		return DesignDeltaT;
-	
+
 	} // FanDesDT
 
 	Real64
@@ -3137,7 +3127,7 @@ namespace Fans {
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Fred Buhl
 		//       DATE WRITTEN   August 2014
-		//       MODIFIED       
+		//       MODIFIED
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS FUNCTION:
@@ -3168,16 +3158,14 @@ namespace Fans {
 		//
 		if ( FanNum == 0 ) {
 			DesignHeatGain = 0.0;
-		}
-		else if ( Fan( FanNum ).FanType_Num != FanType_ComponentModel ) {
+		} else if ( Fan( FanNum ).FanType_Num != FanType_ComponentModel ) {
 			DeltaP = Fan( FanNum ).DeltaPress;
 			TotEff = Fan( FanNum ).FanEff;
 			MotEff = Fan( FanNum ).MotEff;
 			MotInAirFrac = Fan( FanNum ).MotInAirFrac;
 			FanPowerTot = ( FanVolFlow * DeltaP ) / TotEff;
 			DesignHeatGain = MotEff*FanPowerTot + ( FanPowerTot - MotEff * FanPowerTot ) * MotInAirFrac;
-		}
-		else {
+		} else {
 			if ( !SysSizingCalc && MySizeFlag( FanNum ) ) {
 				SizeFan( FanNum );
 				MySizeFlag( FanNum ) = false;
@@ -3201,7 +3189,7 @@ namespace Fans {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

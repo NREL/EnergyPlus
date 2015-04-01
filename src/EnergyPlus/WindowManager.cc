@@ -9,11 +9,13 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <WindowManager.hh>
 #include <ConvectionCoefficients.hh>
 #include <DataBSDFWindow.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
+#include <DataStringGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHeatBalSurface.hh>
@@ -1272,16 +1274,20 @@ namespace WindowManager {
 					Construct( ConstrNum ).AbsBeamBackCoef( IGlass, {1,6} ) = CoeffsCurveFit;
 				}
 
-				// To check goodness of fit
+				// To check goodness of fit //Tuned
+				auto const & solBeamCoef( Construct( ConstrNum ).TransSolBeamCoef );
+				auto const & visBeamCoef( Construct( ConstrNum ).TransVisBeamCoef );
 				for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
 					tsolPhiFit( IPhi ) = 0.0;
 					tvisPhiFit( IPhi ) = 0.0;
 					Phi = double( IPhi - 1 ) * 10.0;
 					CosPhi = std::cos( Phi * DegToRadians );
 					if ( std::abs( CosPhi ) < 0.0001 ) CosPhi = 0.0;
+					Real64 cos_pow( 1.0 );
 					for ( CoefNum = 1; CoefNum <= 6; ++CoefNum ) {
-						tsolPhiFit( IPhi ) += Construct( ConstrNum ).TransSolBeamCoef( CoefNum ) * std::pow( CosPhi, CoefNum );
-						tvisPhiFit( IPhi ) += Construct( ConstrNum ).TransVisBeamCoef( CoefNum ) * std::pow( CosPhi, CoefNum );
+						cos_pow *= CosPhi;
+						tsolPhiFit( IPhi ) += solBeamCoef( CoefNum ) * cos_pow;
+						tvisPhiFit( IPhi ) += visBeamCoef( CoefNum ) * cos_pow;
 					}
 				}
 			}
@@ -2241,7 +2247,7 @@ namespace WindowManager {
 			// Reset hcin if necessary since too small a value sometimes causes non-convergence
 			// of window layer heat balance solution.
 			if ( surface.IntConvCoeff == 0 ) {
-				if ( hcin <= LowHConvLimit ) { // may be redundent now, check is also in HeatBalanceConvectionCoeffs.f90
+				if ( hcin <= LowHConvLimit ) { // may be redundent now, check is also in HeatBalanceConvectionCoeffs.cc
 					//  hcin = 3.076d0  !BG this is rather high value and abrupt change. changed to set to lower limit
 					hcin = LowHConvLimit;
 					HConvIn( SurfNum ) = hcin; // store for accurate reporting.
@@ -2575,14 +2581,14 @@ namespace WindowManager {
 		Tsout = SurfOutsideTemp + TKelvin;
 		QdotConvOutRep( SurfNum ) = -surface.Area * hcout * ( Tsout - tout );
 		QdotConvOutRepPerArea( SurfNum ) = -hcout * ( Tsout - tout );
-		QConvOutReport( SurfNum ) = QdotConvOutRep( SurfNum ) * SecInHour * TimeStepZone;
+		QConvOutReport( SurfNum ) = QdotConvOutRep( SurfNum ) * TimeStepZoneSec;
 
 		Real64 const Tsout_4( pow_4( Tsout ) ); //Tuned To reduce pow calls and redundancies
 		Real64 const rad_out_per_area( -SurfOutsideEmiss * sigma * ( ( ( ( 1.0 - AirSkyRadSplit( SurfNum ) ) * surface.ViewFactorSkyIR + surface.ViewFactorGroundIR ) * ( Tsout_4 - pow_4( tout ) ) ) + ( AirSkyRadSplit( SurfNum ) * surface.ViewFactorSkyIR * ( Tsout_4 - pow_4( SkyTempKelvin ) ) ) ) );
 		QdotRadOutRep( SurfNum ) = surface.Area * rad_out_per_area;
 		QdotRadOutRepPerArea( SurfNum ) = rad_out_per_area;
 
-		QRadOutReport( SurfNum ) = QdotRadOutRep( SurfNum ) * SecInHour * TimeStepZone;
+		QRadOutReport( SurfNum ) = QdotRadOutRep( SurfNum ) * TimeStepZoneSec;
 
 	}
 
@@ -2921,7 +2927,7 @@ namespace WindowManager {
 				hr( i ) = emis( i ) * sigma * pow_3( thetas( i ) );
 				// Following line is redundant since thetas is being relaxed;
 				// removed by FCW, 3/4/03
-				//!fw if(iter >= 1) hr(i) = 0.5*(hrprev(i)+hr(i))
+				//!fw if ( iter >= 1 ) hr(i) = 0.5*(hrprev(i)+hr(i))
 				hrprev( i ) = hr( i );
 			}
 
@@ -3407,7 +3413,7 @@ namespace WindowManager {
 			SurfaceWindow( SurfNum ).TAirflowGapOutlet = TAirflowGapOutletC;
 			if ( SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 ) {
 				WinGapConvHtFlowRep( SurfNum ) = ConvHeatFlowForced;
-				WinGapConvHtFlowRepEnergy( SurfNum ) = WinGapConvHtFlowRep( SurfNum ) * TimeStepZone * SecInHour;
+				WinGapConvHtFlowRepEnergy( SurfNum ) = WinGapConvHtFlowRep( SurfNum ) * TimeStepZoneSec;
 				// Add heat from gap airflow to zone air if destination is inside air; save the heat gain to return
 				// air in case it needs to be sent to the zone (due to no return air determined in HVAC simulation)
 				if ( SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_IndoorAir || SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_ReturnAir ) {
@@ -3456,7 +3462,7 @@ namespace WindowManager {
 
 			if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn ) {
 				WinShadingAbsorbedSolar( SurfNum ) = ( SurfaceWindow( SurfNum ).ExtBeamAbsByShade + SurfaceWindow( SurfNum ).ExtDiffAbsByShade ) * ( Surface( SurfNum ).Area + SurfaceWindow( SurfNum ).DividerArea );
-				WinShadingAbsorbedSolarEnergy( SurfNum ) = WinShadingAbsorbedSolar( SurfNum ) * TimeStepZone * SecInHour;
+				WinShadingAbsorbedSolarEnergy( SurfNum ) = WinShadingAbsorbedSolar( SurfNum ) * TimeStepZoneSec;
 			}
 			if ( SunIsUp ) {
 				WinSysSolTransmittance( SurfNum ) = WinTransSolar( SurfNum ) / ( QRadSWOutIncident( SurfNum ) * ( Surface( SurfNum ).Area + SurfaceWindow( SurfNum ).DividerArea ) + 0.0001 );
@@ -4437,9 +4443,9 @@ namespace WindowManager {
 		static FArray1D< Real64 > kdpdown( 10 );
 		Real64 kmix; // For accumulating conductance of gas mixture
 		Real64 mumix; // For accumulating viscosity of gas mixture
-		Real64 visc; // Dynamic viscosity of mixture at tmean (g/m-s)
-		Real64 cp; // Specific heat of mixture at tmean (J/m3-K)
-		Real64 dens; // Density of mixture at tmean (kg/m3)
+		Real64 visc( 0.0 ); // Dynamic viscosity of mixture at tmean (g/m-s)
+		Real64 cp( 0.0 ); // Specific heat of mixture at tmean (J/m3-K)
+		Real64 dens( 0.0 ); // Density of mixture at tmean (kg/m3)
 		Real64 cpmixm; // Gives cp when divided by molmix
 		Real64 phimup; // Numerator factor
 		Real64 downer; // Denominator factor
@@ -4535,6 +4541,8 @@ namespace WindowManager {
 			dens = rhomix;
 			cp = cpmixm / molmix;
 
+		} else {
+			assert( false );
 		} // End of check if single or multiple gases in gap
 
 		pr = cp * visc / con;
@@ -5022,8 +5030,8 @@ namespace WindowManager {
 		Real64 ReflectCurveFH; // average of curves F and H
 		Real64 TransCurveBDCD; // average of curves B, D, C, and D (again)
 		Real64 ReflectCurveBDCD; // average of curves B, D, C, and D (again)
-		Real64 TransTmp; // temporary value for normalized transmission (carry out of if blocks)
-		Real64 ReflectTmp; // temporary value for normalized reflectance (carry out of if blocks)
+		Real64 TransTmp( 0.0 ); // temporary value for normalized transmission (carry out of if blocks)
+		Real64 ReflectTmp( 0.0 ); // temporary value for normalized reflectance (carry out of if blocks)
 		Real64 testval; // temporary value for calculations
 		Real64 tmp1; // temporary value for calculations
 		Real64 tmp2; // temporary value for calculations
@@ -5248,7 +5256,11 @@ namespace WindowManager {
 					TransTmp = TransCurveD;
 					ReflectTmp = ReflectCurveD;
 
+				} else {
+					assert( false );
 				}
+			} else {
+				assert( false );
 			}
 
 			if ( cs == 1.0 ) { // at 0 deg incident, TransTmp should be 1.0
@@ -5379,7 +5391,7 @@ namespace WindowManager {
 				rfp = 0.5 * ( rfp1 + rfp2 );
 				tmp9 = -abb;
 				if ( tmp9 != 0.0 ) {
-					expmabbdivcgb = std::exp( ( tmp9 / cgb ) );
+					expmabbdivcgb = std::exp( tmp9 / cgb );
 				} else {
 					expmabbdivcgb = 0.0;
 				}
@@ -6781,7 +6793,7 @@ namespace WindowManager {
 		while ( iter < MaxIterations && errtemp > errtemptol ) {
 			for ( i = 1; i <= nglface; ++i ) {
 				hr( i ) = emis( i ) * sigma * pow_3( thetas( i ) );
-				//!fw 3/4/03 if(iter >= 1) hr(i) = 0.5*(hrprev(i)+hr(i))
+				//!fw 3/4/03 if ( iter >= 1 ) hr(i) = 0.5*(hrprev(i)+hr(i))
 				hrprev( i ) = hr( i );
 			}
 
@@ -7082,7 +7094,7 @@ namespace WindowManager {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static FArray1D_string const Roughness( 6, { "VeryRough", "Rough", "MediumRough", "MediumSmooth", "Smooth", "VerySmooth" } );
 		static FArray1D_string const GasTypeName( {0,4}, { "Custom", "Air", "Argon", "Krypton", "Xenon" } );
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -7127,20 +7139,20 @@ namespace WindowManager {
 		std::string GapVentType;
 
 		// Formats
-		static gio::Fmt const Format_700( "(' WindowConstruction',8(',',A))" );
-		static gio::Fmt const Format_702( "(' WindowMaterial:Gas',3(',',A))" );
-		static gio::Fmt const Format_703( "(' WindowMaterial:Shade,',7(',',A))" );
-		static gio::Fmt const Format_704( "(' WindowMaterial:Blind',8(',',A))" );
-		static gio::Fmt const Format_706( "(' WindowMaterial:Screen',11(',',A))" );
-		static gio::Fmt const Format_707( "(' WindowMaterial:Glazing',16(',',A))" );
-		static gio::Fmt const Format_708( "(' WindowMaterial:Glazing:EquivalentLayer',17(',',A))" );
-		static gio::Fmt const Format_709( "(' WindowMaterial:Shade:EquivalentLayer',10(',',A))" );
-		static gio::Fmt const Format_710( "(' WindowMaterial:Drape:EquivalentLayer',11(',',A))" );
-		static gio::Fmt const Format_711( "(' WindowMaterial:Screen:EquivalentLayer',11(',',A))" );
-		static gio::Fmt const Format_712( "(' WindowMaterial:Blind:EquivalentLayer',16(',',A))" );
-		static gio::Fmt const Format_713( "(' WindowMaterial:Gap:EquivalentLayer',4(',',A))" );
-		static gio::Fmt const Format_799( "(' Construction:WindowEquivalentLayer',6(',',A))" );
-		static gio::Fmt const Format_800( "(' WindowConstruction:Complex',5(',',A))" );
+		static gio::Fmt Format_700( "(' WindowConstruction',8(',',A))" );
+		static gio::Fmt Format_702( "(' WindowMaterial:Gas',3(',',A))" );
+		static gio::Fmt Format_703( "(' WindowMaterial:Shade,',7(',',A))" );
+		static gio::Fmt Format_704( "(' WindowMaterial:Blind',8(',',A))" );
+		static gio::Fmt Format_706( "(' WindowMaterial:Screen',11(',',A))" );
+		static gio::Fmt Format_707( "(' WindowMaterial:Glazing',16(',',A))" );
+		static gio::Fmt Format_708( "(' WindowMaterial:Glazing:EquivalentLayer',17(',',A))" );
+		static gio::Fmt Format_709( "(' WindowMaterial:Shade:EquivalentLayer',10(',',A))" );
+		static gio::Fmt Format_710( "(' WindowMaterial:Drape:EquivalentLayer',11(',',A))" );
+		static gio::Fmt Format_711( "(' WindowMaterial:Screen:EquivalentLayer',11(',',A))" );
+		static gio::Fmt Format_712( "(' WindowMaterial:Blind:EquivalentLayer',16(',',A))" );
+		static gio::Fmt Format_713( "(' WindowMaterial:Gap:EquivalentLayer',4(',',A))" );
+		static gio::Fmt Format_799( "(' Construction:WindowEquivalentLayer',6(',',A))" );
+		static gio::Fmt Format_800( "(' WindowConstruction:Complex',5(',',A))" );
 
 		ScanForReports( "Constructions", DoReport, "Constructions" );
 
@@ -7572,7 +7584,7 @@ namespace WindowManager {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const M( 18 );
 		int const N( 18 );
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -7692,7 +7704,7 @@ namespace WindowManager {
 
 		if ( PrintTransMap ) {
 			ScreenTransUnitNo = GetNewUnitNumber();
-			{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "unknown" ); gio::open( ScreenTransUnitNo, "eplusscreen.csv", flags ); if ( flags.err() ) goto Label99999; }
+			{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "unknown" ); gio::open( ScreenTransUnitNo, DataStringGlobals::outputScreenCsvFileName, flags ); if ( flags.err() ) goto Label99999; }
 			//  WRITE(ScreenTransUnitNo,*)' '
 			for ( ScreenNum = 1; ScreenNum <= NumSurfaceScreens; ++ScreenNum ) {
 				MatNum = SurfaceScreens( ScreenNum ).MaterialNumber;
@@ -8770,9 +8782,7 @@ Label99999: ;
 
 		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
-		cAlphaArgs = "";
-		rNumericArgs.allocate( NumNumbers );
-		rNumericArgs = 0.0;
+		rNumericArgs.dimension( NumNumbers, 0.0 );
 
 		if ( NumSiteSpectrum == 1 ) {
 			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
@@ -8799,9 +8809,7 @@ Label99999: ;
 
 			GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 			cAlphaArgs.allocate( NumAlphas );
-			cAlphaArgs = "";
-			rNumericArgs.allocate( NumNumbers );
-			rNumericArgs = 0.0;
+			rNumericArgs.dimension( NumNumbers, 0.0 );
 
 			iSolarSpectrum = 0;
 			iVisibleSpectrum = 0;
@@ -8872,7 +8880,7 @@ Label99999: ;
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

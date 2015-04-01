@@ -4,6 +4,7 @@
 #include <ObjexxFCL/Time_Date.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <DataTimings.hh>
 #include <DataErrorTracking.hh>
 #include <DataPrecisionGlobals.hh>
@@ -305,7 +306,7 @@ namespace DataTimings {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -321,7 +322,7 @@ namespace DataTimings {
 		return;
 #endif
 #ifdef EP_Timings
-		EchoInputFile = FindUnitNumber( "eplusout.audit" );
+		EchoInputFile = FindUnitNumber( outputAuditFile );
 		gio::write( EchoInputFile, fmtA ) << "Timing Element" + tabchar + "# calls" + tabchar + "Time {s}" + tabchar + "Time {s} (per call)";
 
 		for ( loop = 1; loop <= NumTimingElements; ++loop ) {
@@ -575,7 +576,7 @@ namespace DataTimings {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

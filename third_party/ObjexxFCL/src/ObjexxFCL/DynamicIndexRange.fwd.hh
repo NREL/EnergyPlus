@@ -15,11 +15,8 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class DynamicIndexRange;
-
-// Types
-typedef  DynamicIndexRange  DRange;
 
 } // ObjexxFCL
 

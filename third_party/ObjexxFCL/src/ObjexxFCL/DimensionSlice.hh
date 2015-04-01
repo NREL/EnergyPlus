@@ -44,17 +44,17 @@ public: // Creation
 	// Default Constructor
 	inline
 	DimensionSlice() :
-		m_( 1 ),
-		k_( 0 ),
-		u_( 0 )
+	 m_( 1 ),
+	 k_( 0 ),
+	 u_( 0 )
 	{}
 
 	// Index Slice + Multiplier Constructor
 	inline
 	DimensionSlice( IndexSlice const & slice, std::int64_t const multiplier = 1 ) :
-		m_( slice.s() * multiplier ),
-		k_( slice.l() * multiplier - m_ ),
-		u_( slice.isize() )
+	 m_( slice.s() * multiplier ),
+	 k_( slice.l() * multiplier - m_ ),
+	 u_( slice.isize() )
 	{
 		assert( slice.initialized() );
 		assert( multiplier <= std::numeric_limits< std::int64_t >::max() / std::abs( slice.s() ) );
@@ -63,9 +63,9 @@ public: // Creation
 	// Index Slice + Multiplier Constructor
 	inline
 	DimensionSlice( IndexSlice const & slice, size_type const multiplier ) :
-		m_( slice.s() * multiplier ),
-		k_( slice.l() * multiplier - m_ ),
-		u_( slice.isize() )
+	 m_( slice.s() * multiplier ),
+	 k_( slice.l() * multiplier - m_ ),
+	 u_( slice.isize() )
 	{
 		assert( slice.initialized() );
 		assert( multiplier <= size_type( std::numeric_limits< std::int64_t >::max() / std::abs( slice.s() ) ) );
@@ -75,9 +75,9 @@ public: // Creation
 	template< typename M >
 	inline
 	DimensionSlice( IndexSlice const & slice, M const multiplier ) :
-		m_( slice.s() * multiplier ),
-		k_( slice.l() * multiplier - m_ ),
-		u_( slice.isize() )
+	 m_( slice.s() * multiplier ),
+	 k_( slice.l() * multiplier - m_ ),
+	 u_( slice.isize() )
 	{
 		assert( slice.initialized() );
 		assert( multiplier <= std::numeric_limits< std::int64_t >::max() / std::abs( slice.s() ) );
@@ -257,9 +257,6 @@ private: // Data
 	int u_; // Upper index
 
 }; // DimensionSlice
-
-// Types
-typedef  DimensionSlice  DSlice;
 
 } // ObjexxFCL
 

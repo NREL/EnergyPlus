@@ -80,6 +80,17 @@ namespace OutputReportPredefined {
 	extern int pdchDXCoolCoilEERIP; // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
 	extern int pdchDXCoolCoilIEERIP; // IEER value in IP unit at AHRI std. 340/360 conditions
 
+	// DX Cooling Coil subtable per ANSI/ASHRAE Std 127 for Tests A, B, C and D
+	extern int pdstDXCoolCoil2;
+	extern int pdchDXCoolCoilNetCapSIA; // Standard Rated (Net) Cooling Capacity [W], Test A
+	extern int pdchDXCoolCoilElecPowerA; // Standard Rated Electric Power [W], Test A
+	extern int pdchDXCoolCoilNetCapSIB; // Standard Rated (Net) Cooling Capacity [W], Test B
+	extern int pdchDXCoolCoilElecPowerB; // Standard Rated Electric Power [W], Test B
+	extern int pdchDXCoolCoilNetCapSIC; // Standard Rated (Net) Cooling Capacity [W], Test C
+	extern int pdchDXCoolCoilElecPowerC; // Standard Rated Electric Power [W], Test C
+	extern int pdchDXCoolCoilNetCapSID; // Standard Rated (Net) Cooling Capacity [W], Test D
+	extern int pdchDXCoolCoilElecPowerD; // Standard Rated Electric Power [W], Test D
+
 	// VAV DX Cooling Ratings Details
 	extern int pdstVAVDXCoolCoil; // details for Packaged VAV rating under AHRI 340/360
 	extern int pdchVAVDXCoolCoilType;
@@ -255,6 +266,16 @@ namespace OutputReportPredefined {
 	extern int pdchSysSizUserClAir;
 	extern int pdchSysSizCalcHtAir;
 	extern int pdchSysSizUserHtAir;
+	extern int pdstPlantSize;
+	extern int pdchPlantSizCalcVdot;
+	extern int pdchPlantSizMeasVdot;
+	extern int pdchPlantSizPrevVdot;
+//	extern int pdchPlantSizPass;
+	extern int pdchPlantSizCoincYesNo;
+	extern int pdchPlantSizDesDay;
+	extern int pdchPlantSizPkTimeDayOfSim;
+	extern int pdchPlantSizPkTimeHour;
+	extern int pdchPlantSizPkTimeMin;
 
 	//System summary
 	extern int pdrSystem;
@@ -809,17 +830,11 @@ namespace OutputReportPredefined {
 
 	// Object Data
 	extern FArray1D< reportNameType > reportName;
-	extern FArray1D< reportNameType > reportNameCopy;
 	extern FArray1D< SubTableType > subTable;
-	extern FArray1D< SubTableType > subTableCopy;
 	extern FArray1D< ColumnTagType > columnTag;
-	extern FArray1D< ColumnTagType > columnTagCopy;
 	extern FArray1D< TableEntryType > tableEntry;
-	extern FArray1D< TableEntryType > tableEntryCopy;
 	extern FArray1D< CompSizeTableEntryType > CompSizeTableEntry;
-	extern FArray1D< CompSizeTableEntryType > CompSizeTableEntryCopy;
 	extern FArray1D< ShadowRelateType > ShadowRelate;
-	extern FArray1D< ShadowRelateType > ShadowRelateCopy;
 
 	// Functions
 
@@ -900,7 +915,7 @@ namespace OutputReportPredefined {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
