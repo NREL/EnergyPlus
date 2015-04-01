@@ -26,17 +26,17 @@ The basis for the zone and air system integration is to formulate energy and moi
 
 where:
 
-<div img="image10.txt">\(\sum\limits_{i = 1}^{{N_{sl}}} {{{\dot Q}_i}} \)</div> = sum of the convective internal loads
+<span>$\sum\limits_{i = 1}^{{N_{sl}}} {{{\dot Q}_i}} $</span> = sum of the convective internal loads
 
-<div img="image11.txt">\(\sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i}\left( {{T_{si}} - {T_z}} \right)\)</div> = convective heat transfer from the zone surfaces
+<span>$\sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i}\left( {{T_{si}} - {T_z}} \right)$</span> = convective heat transfer from the zone surfaces
 
-<div img="image12.txt">\({\dot m_{\inf }}{C_p}\left( {{T_\infty } - {T_z}} \right)\)</div> = heat transfer due to infiltration of outside air
+<span>${\dot m_{\inf }}{C_p}\left( {{T_\infty } - {T_z}} \right)$</span> = heat transfer due to infiltration of outside air
 
-<div img="image13.txt">\(\sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_p}\left( {{T_{zi}} - {T_z}} \right)\)</div> = heat transfer due to interzone air mixing
+<span>$\sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_p}\left( {{T_{zi}} - {T_z}} \right)$</span> = heat transfer due to interzone air mixing
 
-<div img="image14.txt">\({\dot Q_{sys}}\)</div> = air systems output
+<span>${\dot Q_{sys}}$</span> = air systems output
 
-<div img="image15.txt">\({C_z}\frac{{d{T_z}}}{{dt}} = \)</div>energy stored in zone air
+<span>${C_z}\frac{{d{T_z}}}{{dt}} = $</span>energy stored in zone air
 
 C<sub>z</sub> = ρ<sub>air</sub>C<sub>p</sub>C<sub>T</sub>
 
@@ -229,7 +229,7 @@ In the same manner as described above for zone air temperature (ref. Basis for t
 
 In order to calculate the derivative term with respect to time, the first order backward finite difference method, defined as the EulerMethod in the ZoneAirHeatBalanceAlgorithm object, may be used:
 
- <div img="image51.txt">\(\frac{{dW}}{{dt}} = {\left( {\delta t} \right)^{ - 1}}(W_z^t - W_z^{t - \delta t}) + O(\delta t)\)</div>
+ <span>$\frac{{dW}}{{dt}} = {\left( {\delta t} \right)^{ - 1}}(W_z^t - W_z^{t - \delta t}) + O(\delta t)$</span>
 
 The zone air humidity ratio update at the current time step using the EulerMethod may be expressed as follows:
 
@@ -239,7 +239,7 @@ To preserve the stability of the calculation of the zone humidity ratio, the thi
 
 The third order derivative derived from a Taylor Series expansion is defined as:
 
-<div img="image53.txt">\({\left. {\frac{{d{W_z}}}{{dt}}} \right|_t} \approx \frac{{\left( {{\textstyle{{11} \over 6}}W_z^t - 3W_z^{t - \delta t} + {\textstyle{3 \over 2}}W_z^{t - 2\delta t} - {\textstyle{1 \over 3}}W_z^{t - 3\delta t}} \right)}}{{\delta t}} + O\left( {\delta {t^3}} \right)\)</div>.
+<span>${\left. {\frac{{d{W_z}}}{{dt}}} \right|_t} \approx \frac{{\left( {{\textstyle{{11} \over 6}}W_z^t - 3W_z^{t - \delta t} + {\textstyle{3 \over 2}}W_z^{t - 2\delta t} - {\textstyle{1 \over 3}}W_z^{t - 3\delta t}} \right)}}{{\delta t}} + O\left( {\delta {t^3}} \right)$</span>.
 
 The coefficients of the approximated derivative are very close to the coefficients of the analogous Adams-Bashforth algorithm. Then the approximated derivative is substituted into the mass balance and the terms with the humidity ratio at past time steps are all put on the right hand side of the equation. This third order derivative zone humidity ratio update increases the number of previous time steps that are used in calculating the new zone humidity ratio, and decreases the dependence on the most recent. The higher order derivative approximations have the potential to allow the use of larger time steps by smoothing transitions through sudden changes in zone operating conditions.
 
@@ -351,29 +351,29 @@ The transient air mass balance equation for the change in zone air carbon dioxid
 
 where:
 
-<div img="image74.txt">\(\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}} \)</div> = sum of scheduled internal carbon dioxide loads. The zone air density is used to convert the volumetric rate of carbon dioxide generation from user input into mass generation rate [kg/s].The coefficient of 10<sup>6</sup> is used to make the units of carbon dioxide as ppm.
+<span>$\sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}} $</span> = sum of scheduled internal carbon dioxide loads. The zone air density is used to convert the volumetric rate of carbon dioxide generation from user input into mass generation rate [kg/s].The coefficient of 10<sup>6</sup> is used to make the units of carbon dioxide as ppm.
 
-<div img="image75.txt">\(\sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \left( {{C_{zi}} - C_z^t} \right)\)</div> = carbon dioxide transfer due to interzone air mixing [ppm-kg/s]
+<span>$\sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \left( {{C_{zi}} - C_z^t} \right)$</span> = carbon dioxide transfer due to interzone air mixing [ppm-kg/s]
 
-<div img="image76.txt">\({C_{zi}}\)</div> = carbon dioxide concentration in the zone air being transferred into this zone [ppm]
+<span>${C_{zi}}$</span> = carbon dioxide concentration in the zone air being transferred into this zone [ppm]
 
-<div img="image77.txt">\({\dot m_{\inf }}\left( {{C_\infty } - C_z^t} \right)\)</div> = carbon dioxide transfer due to infiltration and ventilation of outdoor air [ppm-kg/s]
+<span>${\dot m_{\inf }}\left( {{C_\infty } - C_z^t} \right)$</span> = carbon dioxide transfer due to infiltration and ventilation of outdoor air [ppm-kg/s]
 
-<div img="image78.txt">\({C_\infty }\)</div> = carbon dioxide concentration in outdoor air [ppm]
+<span>${C_\infty }$</span> = carbon dioxide concentration in outdoor air [ppm]
 
-<div img="image79.txt">\({\dot m_{sys}}\left( {{C_{\sup }} - C_z^t} \right)\)</div> = carbon dioxide transfer due to system supply [ppm-kg/s]
+<span>${\dot m_{sys}}\left( {{C_{\sup }} - C_z^t} \right)$</span> = carbon dioxide transfer due to system supply [ppm-kg/s]
 
-<div img="image80.txt">\({C_{\sup }}\)</div> = carbon dioxide concentration in the system supply airstream [ppm]
+<span>${C_{\sup }}$</span> = carbon dioxide concentration in the system supply airstream [ppm]
 
-<div img="image81.txt">\({\dot m_{sys}}\)</div> = air system supply mass flow rate [kg/s]
+<span>${\dot m_{sys}}$</span> = air system supply mass flow rate [kg/s]
 
-<div img="image82.txt">\({\rho_{air}}{V_z}\frac{{dC_z^t}}{{dt}}\)</div>= carbon dioxide storage term in zone air [kg/s]
+<span>${\rho_{air}}{V_z}\frac{{dC_z^t}}{{dt}}$</span>= carbon dioxide storage term in zone air [kg/s]
 
-<div img="image83.txt">\(C_z^t\)</div> = zone air carbon dioxide concentration at the current time step [ppm]
+<span>$C_z^t$</span> = zone air carbon dioxide concentration at the current time step [ppm]
 
-<div img="image84.txt">\({\rho_{air}}\)</div>= zone air density [kg/m<sup>3</sup>]
+<span>${\rho_{air}}$</span>= zone air density [kg/m<sup>3</sup>]
 
-<div img="image85.txt">\({V_z}\)</div>= zone volume [m<sup>3</sup>]
+<span>${V_z}$</span>= zone volume [m<sup>3</sup>]
 
 C<sub>CO2</sub> = carbon dioxide capacity multiplier [dimensionless] (See the InputOutput Reference for additional information on the object ZoneCapacitanceMultiplier:ResearchSpecial)
 
@@ -433,7 +433,7 @@ At the prediction point in the simulation, the system air mass flows are not kno
 
 where:
 
-<div img="image95.txt">\({\dot m_{OA,z}}\)</div>= supply outdoor airflow rate into the controlled zone [kg/s]
+<span>${\dot m_{OA,z}}$</span>= supply outdoor airflow rate into the controlled zone [kg/s]
 
 The above approximation is based on the assumption that the carbon dioxide concentration at the outdoor air (OA) mixer inlet is equal to the zone air outlet concentration level, and the carbon dioxide level at the zone supply air inlet is equal to the level at the outlet node of the OA mixer.
 
@@ -468,37 +468,37 @@ The transient air mass balance equation for the change in zone air generic conta
 
 where:
 
-<div img="image100.txt">\(\sum\limits_{i = 1}^{{N_{source}}} {{\rho_{air}}{G_{f,i}}} \)</div>=  Sum of internal generic contaminant loads from sources in a zone or interior surfaces.
+<span>$\sum\limits_{i = 1}^{{N_{source}}} {{\rho_{air}}{G_{f,i}}} $</span>=  Sum of internal generic contaminant loads from sources in a zone or interior surfaces.
 
 The zone air density is used to convert the volumetric rate of generic contaminant generation from user input into mass generation rate [kg/s].The coefficient of 10<sup>6</sup> is used to make the units of generic contaminant as ppm.
 
-<div img="image101.txt">\({\rho_{air}}\sum\limits_i^{N{\rm{sink}}} {{R_{f,i}}{C_{f,z}}} \)</div>= Sum of removal rate from sinks in a zone or interior surfaces [ppm-kg/s]
+<span>${\rho_{air}}\sum\limits_i^{N{\rm{sink}}} {{R_{f,i}}{C_{f,z}}} $</span>= Sum of removal rate from sinks in a zone or interior surfaces [ppm-kg/s]
 
-<div img="image102.txt">\(\sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \left( {{C_{f,z,i}} - C_{f,z}^t} \right)\)</div> = Generic contaminant transfer due to interzone air mixing [ppm-kg/s]
+<span>$\sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \left( {{C_{f,z,i}} - C_{f,z}^t} \right)$</span> = Generic contaminant transfer due to interzone air mixing [ppm-kg/s]
 
-<div img="image103.txt">\({C_{f,z,i}}\)</div> = Generic contaminant concentration in the zone air being transferred into this zone [ppm]
+<span>${C_{f,z,i}}$</span> = Generic contaminant concentration in the zone air being transferred into this zone [ppm]
 
-<div img="image104.txt">\({\dot m_{\inf }}\left( {{C_{f,\infty }} - C_{f,z}^t} \right)\)</div>   = Generic contaminant transfer due to infiltration and ventilation of outdoor air [ppm-kg/s]
+<span>${\dot m_{\inf }}\left( {{C_{f,\infty }} - C_{f,z}^t} \right)$</span>   = Generic contaminant transfer due to infiltration and ventilation of outdoor air [ppm-kg/s]
 
-<div img="image105.txt">\({C_{f,\infty }}\)</div> = Generic contaminant concentration in outdoor air [ppm]
+<span>${C_{f,\infty }}$</span> = Generic contaminant concentration in outdoor air [ppm]
 
-<div img="image106.txt">\({\dot m_{sys}}\left( {{C_{f,\sup }} - C_{f,z}^t} \right)\)</div> = Generic contaminant transfer due to system supply [ppm-kg/s]
+<span>${\dot m_{sys}}\left( {{C_{f,\sup }} - C_{f,z}^t} \right)$</span> = Generic contaminant transfer due to system supply [ppm-kg/s]
 
-<div img="image107.txt">\({C_{f,\sup }}\)</div> = Generic contaminant concentration in the system supply airstream [ppm]
+<span>${C_{f,\sup }}$</span> = Generic contaminant concentration in the system supply airstream [ppm]
 
-<div img="image108.txt">\({\dot m_{sys}}\)</div> = Air system supply mass flow rate [kg/s]
+<span>${\dot m_{sys}}$</span> = Air system supply mass flow rate [kg/s]
 
-<div img="image109.txt">\({\rho_{air}}{V_z}\frac{{dC_{f,z}^t}}{{dt}}\)</div>= Generic contaminant storage term in zone air [ppm-kg/s]
+<span>${\rho_{air}}{V_z}\frac{{dC_{f,z}^t}}{{dt}}$</span>= Generic contaminant storage term in zone air [ppm-kg/s]
 
-<div img="image110.txt">\(C_{f,z}^t\)</div> = Zone air generic contaminant concentration at the current time step [ppm]
+<span>$C_{f,z}^t$</span> = Zone air generic contaminant concentration at the current time step [ppm]
 
-<div img="image111.txt">\({\rho_{air}}\)</div>= Zone air density [kg/m<sup>3</sup>]
+<span>${\rho_{air}}$</span>= Zone air density [kg/m<sup>3</sup>]
 
-<div img="image112.txt">\({V_z}\)</div>= Zone volume [m<sup>3</sup>]
+<span>${V_z}$</span>= Zone volume [m<sup>3</sup>]
 
-<div img="image113.txt">\(\sum\limits_j {{h_j}\rho {A_j}(\frac{{{C_{s,j}}}}{{{k_j}}} - {C_{f,z}})} \)</div>       = Generic contaminant transport through diffusion between interior surfaces and zone air
+<span>$\sum\limits_j {{h_j}\rho {A_j}(\frac{{{C_{s,j}}}}{{{k_j}}} - {C_{f,z}})} $</span>       = Generic contaminant transport through diffusion between interior surfaces and zone air
 
-<div img="image114.txt">\({S_f}(C_{f,z}^{t - \delta t})\)</div>= Generic contaminant generation or removal rate as a function of zone air generic contaminant level at the previous time step
+<span>${S_f}(C_{f,z}^{t - \delta t})$</span>= Generic contaminant generation or removal rate as a function of zone air generic contaminant level at the previous time step
 
 Mfor = Generic contaminant capacity multiplier [dimensionless] (See the InputOutput Reference for additional information on the object ZoneCapacitanceMultiplier:ResearchSpecial)
 
@@ -558,7 +558,7 @@ At the prediction point in the simulation, the system air mass flows are not kno
 
 where:
 
-<div img="image124.txt">\({\dot m_{OA,z}}\)</div>= Supply outdoor airflow rate into the controlled zone [kg/s]
+<span>${\dot m_{OA,z}}$</span>= Supply outdoor airflow rate into the controlled zone [kg/s]
 
 The above approximation is based on the assumption that the generic contaminant concentration at the outdoor air (OA) mixer inlet is equal to the zone air outlet concentration level, and the generic contaminant level at the zone supply air inlet is equal to the level at the outlet node of the OA mixer.
 
@@ -599,15 +599,15 @@ The zone air mass flow conservation object is intended to trigger zone air mass 
 
 where,
 
-<div img="image129.txt">\({\dot m_R}\)</div>   =    zone return air mass flow rate, (kg/s)
+<span>${\dot m_R}$</span>   =    zone return air mass flow rate, (kg/s)
 
-<div img="image130.txt">\({\dot m_{EX}}\)</div>  =    zone exhaust air mass flow rate from exhaust fans, (kg/s)
+<span>${\dot m_{EX}}$</span>  =    zone exhaust air mass flow rate from exhaust fans, (kg/s)
 
-<div img="image131.txt">\({\dot m_{XR}}\)</div>  =    zone mixing mass flow rate as a receiving zone, (kg/s)
+<span>${\dot m_{XR}}$</span>  =    zone mixing mass flow rate as a receiving zone, (kg/s)
 
-<div img="image132.txt">\({\dot m_{XS}}\)</div>  =    zone mixing mass flow rate as a source zone, (kg/s)
+<span>${\dot m_{XS}}$</span>  =    zone mixing mass flow rate as a source zone, (kg/s)
 
-<div img="image133.txt">\({\dot m_S}\)</div>   =    zone supply air mass flow rate, (kg/s)
+<span>${\dot m_S}$</span>   =    zone supply air mass flow rate, (kg/s)
 
 
 

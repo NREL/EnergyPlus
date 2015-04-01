@@ -138,11 +138,11 @@ The subtotal for miscellaneous construction costs (typically those costs not exp
 
 The subtotal for the amount that the construction costs should be altered because of regional differences in material and labor costs (e.g. when using national average data), *S<sub>r</sub>*, is determined by multiplying the Regional Adjustment Factor, *R<sub>f\\ ,</sub>* by the sum of *S<sub>L </sub>* and *S<sub>m:</sub>*
 
-<sub><div img="image7900.txt">\({S_r} = ({S_L} + {S_m}){R_f}\)</div></sub>
+<sub><span>${S_r} = ({S_L} + {S_m}){R_f}$</span></sub>
 
 Remaining adjustments are applied to the subtotal for construction costs, *S<sub>c</sub>*, which is the sum of *S<sub>L</sub>*, *S<sub>m,</sub>*, and *S<sub>r:</sub>*
 
-<sub><div img="image7901.txt">\({S_C} = {S_L} + {S_m} + {S_r}\)</div></sub>
+<sub><span>${S_C} = {S_L} + {S_m} + {S_r}$</span></sub>
 
 The **Design and Engineering Fee Fraction**,*F<sub>d</sub>*,is the fraction of construction costs, *S<sub>c</sub>*, attributable to costs associated with architectural and engineering services needed for the project.  The subtotal for costs associated with these fees, *S<sub>D</sub>*, are determined by multiplying *S<sub>C</sub>* by *F<sub>d</sub>*:
 

@@ -57,17 +57,17 @@ The Effective Leakage Area, or Sherman-Grimsrud, model is:
 
 where,
 
-<div img="image1877.txt">\({F_{schedule}}\)</div> is a value from a user-defined schedule,
+<span>${F_{schedule}}$</span> is a value from a user-defined schedule,
 
-<div img="image1878.txt">\({A_L}\)</div> is the effective air leakage area in cm<sup>2</sup> that corresponds to a 4 Pa pressure differential,
+<span>${A_L}$</span> is the effective air leakage area in cm<sup>2</sup> that corresponds to a 4 Pa pressure differential,
 
-<div img="image1879.txt">\({C_s}\)</div> is the coefficient for stack-induced infiltration in (L/s)<sup>2</sup>/(cm<sup>4</sup>·K),
+<span>${C_s}$</span> is the coefficient for stack-induced infiltration in (L/s)<sup>2</sup>/(cm<sup>4</sup>·K),
 
-<div img="image1880.txt">\(\Delta T\)</div> is the absolute temperature difference between zone air and outdoor air,
+<span>$\Delta T$</span> is the absolute temperature difference between zone air and outdoor air,
 
-<div img="image1881.txt">\({C_w}\)</div> is the coefficient for wind-induced infiltration in (L/s)<sup>2</sup>/(cm<sup>4</sup>·(m/s)<sup>2</sup>), and
+<span>${C_w}$</span> is the coefficient for wind-induced infiltration in (L/s)<sup>2</sup>/(cm<sup>4</sup>·(m/s)<sup>2</sup>), and
 
-<div img="image1882.txt">\(WindSpeed\)</div> is the local wind speed.
+<span>$WindSpeed$</span> is the local wind speed.
 
 ### Infiltration by Flow Coefficient
 
@@ -79,17 +79,17 @@ The Enhanced, or AIM-2, model is:
 
 where,
 
-<div img="image1884.txt">\({F_{schedule}}\)</div> is a value from a user-defined schedule,
+<span>${F_{schedule}}$</span> is a value from a user-defined schedule,
 
-<div img="image1885.txt">\(c\)</div> is the flow coefficient in m<sup>3</sup>/(s·Pa<sup>n</sup>),
+<span>$c$</span> is the flow coefficient in m<sup>3</sup>/(s·Pa<sup>n</sup>),
 
-<div img="image1886.txt">\({C_s}\)</div> is the coefficient for stack-induced infiltration in (Pa/K)<sup>n</sup>,
+<span>${C_s}$</span> is the coefficient for stack-induced infiltration in (Pa/K)<sup>n</sup>,
 
-<div img="image1887.txt">\(n\)</div> is the pressure exponent,
+<span>$n$</span> is the pressure exponent,
 
-<div img="image1888.txt">\({C_w}\)</div> is the coefficient for wind-induced infiltration in (Pa·s<sup>2</sup>/m<sup>2</sup>)<sup>n</sup>, and
+<span>${C_w}$</span> is the coefficient for wind-induced infiltration in (Pa·s<sup>2</sup>/m<sup>2</sup>)<sup>n</sup>, and
 
-<div img="image1889.txt">\(s\)</div> is the shelter factor.
+<span>$s$</span> is the shelter factor.
 
 #### References:
 
@@ -264,7 +264,7 @@ where:
 
 c<sub>P,Avg</sub>                                   = Average specific heat of air within the two zones (J/kg.K)
 
-<div img="image1901.txt">\({\dot m_{{\rm{MixingFlowToReceivingZone}}}}\)</div>          = Mass of moist air flowing into the receiving zone (kg<sub>air</sub>/s)
+<span>${\dot m_{{\rm{MixingFlowToReceivingZone}}}}$</span>          = Mass of moist air flowing into the receiving zone (kg<sub>air</sub>/s)
 
 Moisture<sub>MixingFlowToReceivingZone</sub>    = Moisture mass flow rate into the receiving zone (kg<sub>H2O</sub>/s)
 
@@ -272,13 +272,13 @@ P<sub>Barometric</sub>                             
 
 ρ<sub>Avg\\                                                                         </sub> = Average density of air within the two zones (kg/s)
 
-<div img="image1902.txt">\({\dot Q_{{\rm{MixingFlowToReceivingZone}}}}\)</div>          = Energy added to receiving zone air by mixing mass flow (W)
+<span>${\dot Q_{{\rm{MixingFlowToReceivingZone}}}}$</span>          = Energy added to receiving zone air by mixing mass flow (W)
 
 T<sub>ReceivingZone                                                      </sub> = Temperature in the Receiving Zone (<sup>o</sup>C)
 
 T<sub>SourceZone</sub>                              = Temperature in the Source Zone (<sup>o</sup>C)
 
-<div img="image1903.txt">\({\dot V_{Air}}\)</div>                                   = Volume rate of air flow defined by the user (m<sup>3</sup>/s)
+<span>${\dot V_{Air}}$</span>                                   = Volume rate of air flow defined by the user (m<sup>3</sup>/s)
 
 W<sub>ReceivingZone</sub>              = Humidity Ratio in the Receiving Zone (kg<sub>H2O</sub>/kg<sub>dry\\ air</sub>)
 
@@ -290,17 +290,17 @@ For cross-mixing, the mass of moist air exchanged between the two zones is assum
 
 where:
 
-<div img="image1905.txt">\({\dot m_{{\rm{MixingFlowToSourceZone}}}}\)</div>             = Mass of moist air flowing into the source zone (kg<sub>air</sub>/s)
+<span>${\dot m_{{\rm{MixingFlowToSourceZone}}}}$</span>             = Mass of moist air flowing into the source zone (kg<sub>air</sub>/s)
 
 Moisture<sub>MixingFlowToSourceZone</sub>       = Moisture mass flow rate into the source zone (kg<sub>H2O</sub>/s)
 
-<div img="image1906.txt">\({\dot Q_{{\rm{MixingFlowToSourceZone}}}}\)</div>             = Sensible energy added to source zone air by mixing mass flow (W)
+<span>${\dot Q_{{\rm{MixingFlowToSourceZone}}}}$</span>             = Sensible energy added to source zone air by mixing mass flow (W)
 
-<div img="image1907.txt">\({\dot Q_{{\rm{MixingFlowToReceivingZone}}}}\)</div>          = Sensible energy added to receiving zone air by mixing mass flow, W
+<span>${\dot Q_{{\rm{MixingFlowToReceivingZone}}}}$</span>          = Sensible energy added to receiving zone air by mixing mass flow, W
 
-<div img="image1908.txt">\(Moistur{e_{{\rm{MixingFlowToSourceZone}}}}\)</div>= Latent load added to source zone air by mixing mass flow (kg<sub>H2O</sub>/s)
+<span>$Moistur{e_{{\rm{MixingFlowToSourceZone}}}}$</span>= Latent load added to source zone air by mixing mass flow (kg<sub>H2O</sub>/s)
 
-<div img="image1909.txt">\(Moistur{e_{{\rm{MixingFlowToReceivingZone}}}}\)</div>= Latent load added to receiving zone air by mixing mass flow (kg<sub>H2O</sub>/s)
+<span>$Moistur{e_{{\rm{MixingFlowToReceivingZone}}}}$</span>= Latent load added to receiving zone air by mixing mass flow (kg<sub>H2O</sub>/s)
 
 ### Density Difference Controlled Air Exchange
 

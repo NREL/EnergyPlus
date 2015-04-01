@@ -32,7 +32,7 @@ x is the position,
 
 t is the time,
 
-<div img="image5971.txt">\(\alpha  = \frac{k}{{\rho {c_p}}}\)</div> is the thermal diffusivity of the layer material,
+<span>$\alpha  = \frac{k}{{\rho {c_p}}}$</span> is the thermal diffusivity of the layer material,
 
 k is its thermal conductivity,
 
@@ -88,19 +88,19 @@ The transformed equations are solved and then put in matrix form as shown below:
 
 where: T1(s), T2(s), q1(s), and q2(s) are the temperature and flux terms in the Laplace domain,
 
-<div img="image5980.txt">\({A_1}\left( s \right) = \cosh \left( {{\ell_1}\sqrt {{s \mathord{\left/ {\vphantom {s {{\alpha_1}}}} \right. } {{\alpha_1}}}} } \right)\)</div>,
+<span>${A_1}\left( s \right) = \cosh \left( {{\ell_1}\sqrt {{s \mathord{\left/ {\vphantom {s {{\alpha_1}}}} \right. } {{\alpha_1}}}} } \right)$</span>,
 
-<div img="image5981.txt">\({B_1}\left( s \right) = \left( {{1 \mathord{\left/ {\vphantom {1 {{k_1}\sqrt {{s \mathord{\left/ {\vphantom {s {{\alpha_1}}}} \right. } {{\alpha_1}}}} }}} \right. } {{k_1}\sqrt {{s \mathord{\left/ {\vphantom {s {{\alpha_1}}}} \right. } {{\alpha_1}}}} }}} \right)\sinh \left( {{\ell_1}\sqrt {{s \mathord{\left/ {\vphantom {s {{\alpha_1}}}} \right. } {{\alpha_1}}}} } \right)\)</div>,
+<span>${B_1}\left( s \right) = \left( {{1 \mathord{\left/ {\vphantom {1 {{k_1}\sqrt {{s \mathord{\left/ {\vphantom {s {{\alpha_1}}}} \right. } {{\alpha_1}}}} }}} \right. } {{k_1}\sqrt {{s \mathord{\left/ {\vphantom {s {{\alpha_1}}}} \right. } {{\alpha_1}}}} }}} \right)\sinh \left( {{\ell_1}\sqrt {{s \mathord{\left/ {\vphantom {s {{\alpha_1}}}} \right. } {{\alpha_1}}}} } \right)$</span>,
 
-<div img="image5982.txt">\({C_1}\left( s \right) = {k_1}\sqrt {{s \mathord{\left/ {\vphantom {s {{\alpha_1}}}} \right. } {{\alpha_1}}}} \sinh \left( {{\ell_1}\sqrt {{s \mathord{\left/ {\vphantom {s {{\alpha_1}}}} \right. } {{\alpha_1}}}} } \right)\)</div>,
+<span>${C_1}\left( s \right) = {k_1}\sqrt {{s \mathord{\left/ {\vphantom {s {{\alpha_1}}}} \right. } {{\alpha_1}}}} \sinh \left( {{\ell_1}\sqrt {{s \mathord{\left/ {\vphantom {s {{\alpha_1}}}} \right. } {{\alpha_1}}}} } \right)$</span>,
 
-<div img="image5983.txt">\({D_1}\left( s \right) = \cosh \left( {{\ell_1}\sqrt {{s \mathord{\left/ {\vphantom {s {{\alpha_1}}}} \right. } {{\alpha_1}}}} } \right)\)</div>,
+<span>${D_1}\left( s \right) = \cosh \left( {{\ell_1}\sqrt {{s \mathord{\left/ {\vphantom {s {{\alpha_1}}}} \right. } {{\alpha_1}}}} } \right)$</span>,
 
 k1 is the thermal conductivity of the layer,
 
 a1 is the thermal diffusivity of the layer, and
 
-<div img="image5984.txt">\({\ell_1}\)</div> is the thickness of the layer.
+<span>${\ell_1}$</span> is the thickness of the layer.
 
 The 2 x 2 matrix consisting of A1(s), B1(s), C1(s), and D1(s) is called the transmission matrix and contains all of the thermophysical properties of the layer necessary to calculate transient conduction heat transfer through it.  It can easily be shown that a second layer could be characterized in a similar way as:
 
@@ -140,7 +140,7 @@ This formulation can be used to solve the transient heat conduction equation by 
 
 <div>\[\left[ {\begin{array}{*{20}{c}}{{{q''}_i}}\\\{{{q''}_o}}\end{array}} \right] = \left[ C \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\ \vdots \\\{{T_n}}\end{array}} \right] + \left[ D \right]\left[ {\begin{array}{*{20}{c}}{{T_i}}\\\{{T_o}}\end{array}} \right]\]</div>
 
-where T1, T2, ..., Tn-1, Tn are the finite difference nodal temperatures, n is the number of nodes, Ti and To are the interior and exterior environmental temperatures, and <div img="image5994.txt">\({q''_i}\)</div> and <div img="image5995.txt">\({q''_o}\)</div> are the heat fluxes (desired output).
+where T1, T2, ..., Tn-1, Tn are the finite difference nodal temperatures, n is the number of nodes, Ti and To are the interior and exterior environmental temperatures, and <span>${q''_i}$</span> and <span>${q''_o}$</span> are the heat fluxes (desired output).
 
 Seem (1987) shows that for a simple one layer slab with two interior nodes as in Figure 268 and convection at both sides the resulting finite difference equations are given by:
 
@@ -152,17 +152,17 @@ Seem (1987) shows that for a simple one layer slab with two interior nodes as in
 
 <div>\[{q''_o} = h\left( {{T_1} - {T_o}} \right)\]</div>
 
-where:         <div img="image6000.txt">\(R = \frac{\ell }{{kA}}\)</div>  , thermal resistance
+where:         <span>$R = \frac{\ell }{{kA}}$</span>  , thermal resistance
 
-<div img="image6001.txt">\(C = \frac{{\rho {c_p}\ell A}}{2}\)</div> , thermal capacitance
+<span>$C = \frac{{\rho {c_p}\ell A}}{2}$</span> , thermal capacitance
 
-<div img="image6002.txt">\({T_o}\)</div>= outside temperature
+<span>${T_o}$</span>= outside temperature
 
-<div img="image6003.txt">\({T_i}\)</div>= inside temperature
+<span>${T_i}$</span>= inside temperature
 
-<div img="image6004.txt">\({T_1}\)</div>=temperature of node 1
+<span>${T_1}$</span>=temperature of node 1
 
-<div img="image6005.txt">\({T_2}\)</div>=temperature of node 2
+<span>${T_2}$</span>=temperature of node 2
 
 and
 
@@ -222,7 +222,7 @@ or in more compact form:
 
 <div>\[\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\\{{q_1}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{A\left( s \right)}&{B\left( s \right)}\\\{C\left( s \right)}&{D\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_{n + 1}}\left( s \right)}\\\{{q_{n + 1}}\left( s \right)}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}{a\left( s \right)}&{b\left( s \right)}\\\{c\left( s \right)}&{d\left( s \right)}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}0\\\{{q_{source}}\left( s \right)}\end{array}} \right]\]</div>
 
-where:  <div img="image6018.txt">\(\left[ {\begin{array}{*{20}{c}}{A\left( s \right)}&{B\left( s \right)}\\\{C\left( s \right)}&{D\left( s \right)}\end{array}} \right] = \prod\limits_{i = 1}^n {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\\{{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} \)</div>  and  <div img="image6019.txt">\(\left[ {\begin{array}{*{20}{c}}{a\left( s \right)}&{b\left( s \right)}\\\{c\left( s \right)}&{d\left( s \right)}\end{array}} \right] = \prod\limits_{i = 1}^m {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\\{{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} \)</div> .
+where:  <span>$\left[ {\begin{array}{*{20}{c}}{A\left( s \right)}&{B\left( s \right)}\\\{C\left( s \right)}&{D\left( s \right)}\end{array}} \right] = \prod\limits_{i = 1}^n {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\\{{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} $</span>  and  <span>$\left[ {\begin{array}{*{20}{c}}{a\left( s \right)}&{b\left( s \right)}\\\{c\left( s \right)}&{d\left( s \right)}\end{array}} \right] = \prod\limits_{i = 1}^m {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\\{{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} $</span> .
 
 Next, Equation must be rearranged to match the form of Equation , which relates the heat flux at both sides of the element to the temperature at each side.  The matrix equation that is obtained shows that:
 
@@ -238,13 +238,13 @@ If this is extended to a slab with n layers and a source between the m and m+1 l
 
 <div>\[\left[ {\begin{array}{*{20}{c}}{{q_1}\left( s \right)}\\\{{q_{n + 1}}\left( s \right)}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}{\frac{{D\left( s \right)}}{{B\left( s \right)}}}&{\frac{{ - 1}}{{B\left( s \right)}}}\\\{\frac{1}{{B\left( s \right)}}}&{\frac{{ - A\left( s \right)}}{{B\left( s \right)}}}\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}\left( s \right)}\\\{{T_{n + 1}}\left( s \right)}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}{\frac{{\bar b\left( s \right)}}{{B\left( s \right)}}}\\\{\frac{{b\left( s \right)}}{{B\left( s \right)}}}\end{array}} \right]\left[ {{q_{source}}\left( s \right)} \right]\]</div>
 
-where: <div img="image6023.txt">\(\left[ {\begin{array}{*{20}{c}}{A\left( s \right)}&{B\left( s \right)}\\\{C\left( s \right)}&{D\left( s \right)}\end{array}} \right] = \prod\limits_{i = 1}^n {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\\{{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} \)</div> ,
+where: <span>$\left[ {\begin{array}{*{20}{c}}{A\left( s \right)}&{B\left( s \right)}\\\{C\left( s \right)}&{D\left( s \right)}\end{array}} \right] = \prod\limits_{i = 1}^n {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\\{{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} $</span> ,
 
-<div img="image6024.txt">\(\left[ {\begin{array}{*{20}{c}}{a\left( s \right)}&{b\left( s \right)}\\\{c\left( s \right)}&{d\left( s \right)}\end{array}} \right] = \prod\limits_{i = 1}^m {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\\{{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} \)</div> , and
+<span>$\left[ {\begin{array}{*{20}{c}}{a\left( s \right)}&{b\left( s \right)}\\\{c\left( s \right)}&{d\left( s \right)}\end{array}} \right] = \prod\limits_{i = 1}^m {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\\{{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} $</span> , and
 
-<div img="image6025.txt">\(\left[ {\begin{array}{*{20}{c}}{\bar a\left( s \right)}&{\bar b\left( s \right)}\\\{\bar c\left( s \right)}&{\bar d\left( s \right)}\end{array}} \right] = \prod\limits_{i = m + 1}^n {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\\{{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} \)</div> .
+<span>$\left[ {\begin{array}{*{20}{c}}{\bar a\left( s \right)}&{\bar b\left( s \right)}\\\{\bar c\left( s \right)}&{\bar d\left( s \right)}\end{array}} \right] = \prod\limits_{i = m + 1}^n {\left[ {\begin{array}{*{20}{c}}{{A_i}\left( s \right)}&{{B_i}\left( s \right)}\\\{{C_i}\left( s \right)}&{{D_i}\left( s \right)}\end{array}} \right]} $</span> .
 
-At first glance, the terms in the heat source transmission matrix may appear to be reversed.  It is expected that only the layers to the left of the source will affect q1(s), but the presence of <div img="image6026.txt">\(\bar b\left( s \right)\)</div> in the element multiplied by qsource(s) to obtain q1(s) seems to be contradictory.  In fact, the entire term, <div img="image6027.txt">\({{\bar b\left( s \right)} \mathord{\left/ {\vphantom {{\bar b\left( s \right)} {B\left( s \right)}}} \right. } {B\left( s \right)}}\)</div>, must be analyzed to determine the effect of qsource(s) on q1(s).  In essence, the appearance of <div img="image6028.txt">\(\bar b\left( s \right)\)</div> removes the effects of the layers to the right of the source from B(s) leaving only the influence of the layers to the left of the source.  The form displayed by Equation is, however, extremely convenient because the terms in the heat source transmission matrix have the same denominators, and thus roots, as the terms in the temperature transmission matrix.  Thus, the same roots that are calculated for the CTFs can be used for the QTFs, saving a considerable amount of computer time during the calculation of the transfer functions.
+At first glance, the terms in the heat source transmission matrix may appear to be reversed.  It is expected that only the layers to the left of the source will affect q1(s), but the presence of <span>$\bar b\left( s \right)$</span> in the element multiplied by qsource(s) to obtain q1(s) seems to be contradictory.  In fact, the entire term, <span>${{\bar b\left( s \right)} \mathord{\left/ {\vphantom {{\bar b\left( s \right)} {B\left( s \right)}}} \right. } {B\left( s \right)}}$</span>, must be analyzed to determine the effect of qsource(s) on q1(s).  In essence, the appearance of <span>$\bar b\left( s \right)$</span> removes the effects of the layers to the right of the source from B(s) leaving only the influence of the layers to the left of the source.  The form displayed by Equation is, however, extremely convenient because the terms in the heat source transmission matrix have the same denominators, and thus roots, as the terms in the temperature transmission matrix.  Thus, the same roots that are calculated for the CTFs can be used for the QTFs, saving a considerable amount of computer time during the calculation of the transfer functions.
 
 Once Equation is inverted from the Laplace domain back into the time domain, the combined CTF–QTF solution takes the following form:
 
@@ -276,7 +276,7 @@ In obtaining the matrix equivalent for this set of equations, it should be noted
 
 <div>\[\left[ {\begin{array}{*{20}{c}}{{{q''}_1}}\\\{{{q''}_2}}\end{array}} \right] = \left[ {\begin{array}{*{20}{c}}0&{ - h}\\h&0\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_1}}\\\{{T_2}}\end{array}} \right] + \left[ {\begin{array}{*{20}{c}}0&h&0\\\{ - h}&0&0\end{array}} \right]\left[ {\begin{array}{*{20}{c}}{{T_o}}\\\{{T_i}}\\\{{q_{source}}}\end{array}} \right]\]</div>
 
-Equation appears to suggest that the source term has no direct effect on the heat flux at either side of the element because its coefficients are zero.  This is not the case.  Equation only relates variables that have a direct influence on heat flux.  So, while Ti has no direct influence on<div img="image6037.txt">\({q''_o}\)</div>, it does have an indirect influence through the nodal network.  The same would hold for the influence of qsource.
+Equation appears to suggest that the source term has no direct effect on the heat flux at either side of the element because its coefficients are zero.  This is not the case.  Equation only relates variables that have a direct influence on heat flux.  So, while Ti has no direct influence on<span>${q''_o}$</span>, it does have an indirect influence through the nodal network.  The same would hold for the influence of qsource.
 
 If this analysis is extended to a finite difference network with n nodes, the corresponding matrix equations can be shown to be:
 
@@ -324,7 +324,7 @@ where the new coefficients are obtained from the standard conduction transfer fu
 
 This system for backing out an internal temperature through the use of a second, rearranged CTF equation is valid regardless of whether the Laplace transform or state space method is utilized to calculate the CTFs and QTFs.  The state space method, however, offers a more direct method of obtaining an internal temperature through its definition as an additional output variable.
 
-Consider again the state space example shown in Figure 270.  Two output variables were defined for this example: <div img="image6047.txt">\({q''_i}\)</div> and <div img="image6048.txt">\({q''_o}\)</div>.  The temperature of the node where the source is present can also be defined as an output variable through the identity equation:
+Consider again the state space example shown in Figure 270.  Two output variables were defined for this example: <span>${q''_i}$</span> and <span>${q''_o}$</span>.  The temperature of the node where the source is present can also be defined as an output variable through the identity equation:
 
 <div>\[{T_1} = {T_1}\]</div>
 
@@ -396,7 +396,7 @@ Using these assumptions and the effectiveness-NTU heat exchanger algorithm, seve
 
 <div>\[q = {\left( {\dot m{c_p}} \right)_{water}}\left( {{T_{wi}} - {T_{wo}}} \right)\]</div>
 
-where q is the energy transferred between the water loop and the building element, <div img="image6058.txt">\(\dot m\)</div> is the mass flow rate of the water, cp is the specific heat of the water, Twi is the inlet water temperature, and Two is the outlet water temperature.
+where q is the energy transferred between the water loop and the building element, <span>$\dot m$</span> is the mass flow rate of the water, cp is the specific heat of the water, Twi is the inlet water temperature, and Two is the outlet water temperature.
 
 The maximum amount of heat transfer that is possible according to the Second Law of Thermodynamics is:
 
@@ -514,7 +514,7 @@ Equations and above can be solved to remove the other surface temperature.  Sub
 
 <div>\[{T_{source}} = {C_k} + {C_l}q''\]</div>
 
-where:         <div img="image6077.txt">\({C_k} = {C_g} + \frac{{{C_i}\left( {{C_a} + {C_b}{C_d}} \right) + {C_j}\left( {{C_d} + {C_e}{C_a}} \right)}}{{1 - {C_e}{C_b}}}\)</div>
+where:         <span>${C_k} = {C_g} + \frac{{{C_i}\left( {{C_a} + {C_b}{C_d}} \right) + {C_j}\left( {{C_d} + {C_e}{C_a}} \right)}}{{1 - {C_e}{C_b}}}$</span>
 
 <div>\[{C_l} = {C_h} + \frac{{{C_i}\left( {{C_c} + {C_b}{C_f}} \right) + {C_j}\left( {{C_f} + {C_e}{C_c}} \right)}}{{1 - {C_e}{C_b}}}\]</div>
 
@@ -731,11 +731,11 @@ Calculation of compressor rack electric power uses a simple model based on the t
 
 where:
 
-<div img="image6095.txt">\(CO{P_{operating}}\)</div>              = compressor coefficient of performance at actual operating conditions (W/W)
+<span>$CO{P_{operating}}$</span>              = compressor coefficient of performance at actual operating conditions (W/W)
 
-<div img="image6096.txt">\(CO{P_{design}}\)</div>     = compressor coefficient of performance at design conditions (W/W)
+<span>$CO{P_{design}}$</span>     = compressor coefficient of performance at design conditions (W/W)
 
-<div img="image6097.txt">\(COPfTemp\)</div> = output of the normalized “Compressor Rack COP as a Function of Temperature Curve” (dimensionless)
+<span>$COPfTemp$</span> = output of the normalized “Compressor Rack COP as a Function of Temperature Curve” (dimensionless)
 
 Because the COP curve is defined only as a function of the condensing temperature, it is important that this curve definition corresponds to the lowest evaporating temperature served by the compressor rack. The air temperature used to evaluate the “Compressor Rack COP as a Function of Temperature Curve” depends on where the compressor rack’s condenser is located (Heat Rejection Location). When modeling condenser heat rejected directly to a zone (typical of a stand-alone packaged refrigerated case with integral condenser located in a building zone), the zone air dry-bulb temperature is used to calculate the change in compressor COP from the design value. If more than one refrigerated case and no walk-ins are attached to a compressor rack that rejects its condenser heat to a zone, then all cases served by this rack must reside in the same zone. When modeling a compressor rack serving at least one walk-in, OR with condenser heat rejected to outdoors, the refrigerated cases and walk-ins connected to this rack may be located in different zones. If the condenser type is specified as “Air Cooled”, the outdoor air dry-bulb temperature is used to evaluate the “Compressor Rack COP as a Function of Temperature Curve.”  If the condenser type is specified as “Evap Cooled”, the air temperature leaving the condenser is related to the effectiveness of the evaporative cooling system. If the evaporative process were 100% effective, the effective temperature of air leaving the evaporative media would equal the air wet-bulb temperature. However, the efficiency of the direct evaporative process is typically less than 100%, and the effective temperature leaving the condenser is determined by:
 
@@ -743,13 +743,13 @@ Because the COP curve is defined only as a function of the condensing temperatur
 
 where:
 
-<div img="image6099.txt">\({T_{effective}}\)</div>       = effective dry-bulb temperature of air leaving the condenser cooling coil (°C)
+<span>${T_{effective}}$</span>       = effective dry-bulb temperature of air leaving the condenser cooling coil (°C)
 
-<div img="image6100.txt">\({T_{owb}}\)</div>           = outdoor air wet-bulb temperature (°C)
+<span>${T_{owb}}$</span>           = outdoor air wet-bulb temperature (°C)
 
-<div img="image6101.txt">\({T_{odb}}\)</div>           = outdoor air dry-bulb temperature (°C)
+<span>${T_{odb}}$</span>           = outdoor air dry-bulb temperature (°C)
 
-<div img="image6102.txt">\(\varepsilon \)</div>               = evaporative condenser effectiveness.
+<span>$\varepsilon $</span>               = evaporative condenser effectiveness.
 
 If the user is modeling an evaporative cooled condenser and is using COPfTemp curve data (e.g., manufacturer’s data) based on wet-bulb temperature rather than dry-bulb temperature, the evaporative condenser effectiveness should be set to 1.0 for consistency.
 
@@ -761,11 +761,11 @@ The electric power input to the rack compressor(s) is calculated for each simula
 
 where:
 
-<div img="image6104.txt">\({P_{rack}}\)</div>  = output variable “Refrigeration Compressor Rack Electric Power [W]”, electric power input to the rack compressor(s)
+<span>${P_{rack}}$</span>  = output variable “Refrigeration Compressor Rack Electric Power [W]”, electric power input to the rack compressor(s)
 
-<div img="image6105.txt">\({\dot Q_{case}}\)</div>  = evaporator load for each refrigerated case connected to the rack (W)
+<span>${\dot Q_{case}}$</span>  = evaporator load for each refrigerated case connected to the rack (W)
 
-<div img="image6106.txt">\({\dot Q_{walkin}}\)</div>= refrigeration load for each walk-in connected to the rack (W)
+<span>${\dot Q_{walkin}}$</span>= refrigeration load for each walk-in connected to the rack (W)
 
 #### Condenser Heat Rejection, Energy Use, and Water Use
 
@@ -779,11 +779,11 @@ Condenser fan power for any simulation time step is calculated by multiplying th
 
 where:
 
-<div img="image6108.txt">\({P_{CondFan}}\)</div>                  = output variable “Refrigeration Compressor Rack Condenser Fan Electric Energy [W]”
+<span>${P_{CondFan}}$</span>                  = output variable “Refrigeration Compressor Rack Condenser Fan Electric Energy [W]”
 
-<div img="image6109.txt">\({P_{CondFan,design}}\)</div>           = design condenser fan power (W)
+<span>${P_{CondFan,design}}$</span>           = design condenser fan power (W)
 
-<div img="image6110.txt">\(CondFanfTemp\)</div>    = output of the optional “Condenser Fan Power as a Function of Temperature Curve”
+<span>$CondFanfTemp$</span>    = output of the optional “Condenser Fan Power as a Function of Temperature Curve”
 
 Similar to the compressor rack energy use described above, the air temperature used to evaluate the “Condenser Fan Power as a Function of Temperature Curve” depends on where the condenser rack’s condenser is located (i.e., zone air dry-bulb temperature if the condenser is located in a zone, outdoor air dry-bulb temperature if the condenser is located outdoors and is specified as air cooled, or effective temperature if the condenser is outdoors and is specified as evaporative cooled). If the sum of the evaporator loads for the refrigerated cases connected to the rack is equal to zero, the condenser fan power is set equal to zero. If the user does not provide a “Condenser Fan Power as a Function of Temperature Curve”, then the model assumes the condenser fan power is at the design power level when any of the refrigerated cases connected to this rack are operating.
 
@@ -815,11 +815,11 @@ If only cases are served, the amount of condenser waste heat rejected to the zon
 
 where:
 
-<div img="image6114.txt">\({\dot Q_{Zone,heating}}\)</div> = output variable “Refrigeration Compressor Rack Zone Sensible Heating Rate [W] “
+<span>${\dot Q_{Zone,heating}}$</span> = output variable “Refrigeration Compressor Rack Zone Sensible Heating Rate [W] “
 
 *RAF*           = return air factor for each case connected to the rack (Ref. Figure 279)
 
-<div img="image6115.txt">\({\dot Q_{HVAC,heating}}\)</div>= output variable “Refrigeration Compressor Rack Return Air Sensible Heating Rate [W] “
+<span>${\dot Q_{HVAC,heating}}$</span>= output variable “Refrigeration Compressor Rack Return Air Sensible Heating Rate [W] “
 
 If the HVAC system is off for a simulation time step (no return air mass flow), the rack condenser heat normally attributed to the HVAC return is set equal to zero and all condenser heat energy is applied to the zone air heat balance.
 
@@ -865,15 +865,15 @@ With evaporative cooling of the condenser’s entering air, makeup water is need
 
 where:
 
-<div img="image6120.txt">\(\mathop {{{\dot V}_{evaporation,makeup}}}\limits^{} \)</div>= Refrigeration Compressor Rack Evaporative Condenser Water Volume Flow Rate (m<sup>3</sup>/s)
+<span>$\mathop {{{\dot V}_{evaporation,makeup}}}\limits^{} $</span>= Refrigeration Compressor Rack Evaporative Condenser Water Volume Flow Rate (m<sup>3</sup>/s)
 
-<div img="image6121.txt">\({\dot m_{air}} = \)</div> mass flow rate of air through the evaporative condenser (kg/s)
+<span>${\dot m_{air}} = $</span> mass flow rate of air through the evaporative condenser (kg/s)
 
-<div img="image6122.txt">\({\omega_{air,outlet}}\)</div> = humidity ratio of air leaving the evaporative media (kg<sub>water</sub>/kg<sub>dry\\ air</sub>) based on the effective dry-bulb temperature *T<sub>effective</sub>*, as described above, outdoor air wet-bulb temperature, and outdoor barometric pressure
+<span>${\omega_{air,outlet}}$</span> = humidity ratio of air leaving the evaporative media (kg<sub>water</sub>/kg<sub>dry\\ air</sub>) based on the effective dry-bulb temperature *T<sub>effective</sub>*, as described above, outdoor air wet-bulb temperature, and outdoor barometric pressure
 
-<div img="image6123.txt">\({\omega_{air,inlet}}\)</div> = humidity ratio of inlet air (kg<sub>water</sub>/kg<sub>dry\\ air</sub>) based on conditions at the condenser air inlet node if provided, or outdoor air conditions (e.g., no adjustment for height above ground) if the condenser air inlet node field is left blank
+<span>${\omega_{air,inlet}}$</span> = humidity ratio of inlet air (kg<sub>water</sub>/kg<sub>dry\\ air</sub>) based on conditions at the condenser air inlet node if provided, or outdoor air conditions (e.g., no adjustment for height above ground) if the condenser air inlet node field is left blank
 
-<div img="image6124.txt">\({\rho_{water}}\)</div> = density of water evaluated at the effective air temperature (kg/m<sup>3</sup>)
+<span>${\rho_{water}}$</span> = density of water evaluated at the effective air temperature (kg/m<sup>3</sup>)
 
 The source of the makeup water may be specified as a water storage tank. If not specified, the makeup water is assumed to come from the building mains (Ref. Water Mains Temperatures).
 
@@ -885,13 +885,13 @@ In cold climates, a basin heater may be needed to prevent freezing of the evapor
 
 where:
 
-<div img="image6126.txt">\({P_{ba\sinh eater}}\)</div>= electric power demand for basin heater in current time step (W)
+<span>${P_{ba\sinh eater}}$</span>= electric power demand for basin heater in current time step (W)
 
-<div img="image6127.txt">\({P_{heatercapacity}}\)</div>= electric heater capacity as a function of differential temperature (W/deg K)
+<span>${P_{heatercapacity}}$</span>= electric heater capacity as a function of differential temperature (W/deg K)
 
-<div img="image6128.txt">\({T_{setpo{\mathop{\rm int}} }}\)</div>= setpoint temperature below which the heater turns on (°C)
+<span>${T_{setpo{\mathop{\rm int}} }}$</span>= setpoint temperature below which the heater turns on (°C)
 
-<div img="image6129.txt">\({T_{OutDb}}\)</div> = outdoor air dry-bulb temperature (°C)
+<span>${T_{OutDb}}$</span> = outdoor air dry-bulb temperature (°C)
 
 A default value for the basin heater capacity of 200 W/deg K has been established based on manufacturer data.
 
@@ -909,31 +909,31 @@ The total load on the refrigerated case evaporator is made up of various compone
 
 where:
 
-<div img="image6131.txt">\({\dot Q_{case}}\)</div>    = total load on the refrigerated case evaporator (W)
+<span>${\dot Q_{case}}$</span>    = total load on the refrigerated case evaporator (W)
 
-<div img="image6132.txt">\({\dot Q_{walls}}\)</div>   = heat transfer through case walls due to the difference between the refrigerated case operating dry-bulb temperature and the zone air dry-bulb temperature (W)
+<span>${\dot Q_{walls}}$</span>   = heat transfer through case walls due to the difference between the refrigerated case operating dry-bulb temperature and the zone air dry-bulb temperature (W)
 
-<div img="image6133.txt">\({\dot Q_{rad}}\)</div>     = radiant heat transfer to the refrigerated case (W)
+<span>${\dot Q_{rad}}$</span>     = radiant heat transfer to the refrigerated case (W)
 
-<div img="image6134.txt">\({\dot Q_{{\rm{inf,}}sens}}\)</div> = sensible heat transfer by air infiltration to the refrigerated case through the air curtain or via door openings (W)
+<span>${\dot Q_{{\rm{inf,}}sens}}$</span> = sensible heat transfer by air infiltration to the refrigerated case through the air curtain or via door openings (W)
 
-<div img="image6135.txt">\({\dot Q_{{\rm{inf,lat}}}}\)</div>   = latent heat transfer by air infiltration to the refrigerated case through the air curtain or via door openings (W)
+<span>${\dot Q_{{\rm{inf,lat}}}}$</span>   = latent heat transfer by air infiltration to the refrigerated case through the air curtain or via door openings (W)
 
-<div img="image6136.txt">\({\dot Q_{lights}}\)</div>   = lighting heat load (W)
+<span>${\dot Q_{lights}}$</span>   = lighting heat load (W)
 
-<div img="image6137.txt">\({\dot Q_{as}}\)</div>      = anti-sweat heater load (W)
+<span>${\dot Q_{as}}$</span>      = anti-sweat heater load (W)
 
-<div img="image6138.txt">\({\dot Q_{def}}\)</div>     = defrost heat load (W)
+<span>${\dot Q_{def}}$</span>     = defrost heat load (W)
 
-<div img="image6139.txt">\({\dot Q_{fan}}\)</div>     = fan heat load (W)
+<span>${\dot Q_{fan}}$</span>     = fan heat load (W)
 
-<div img="image6140.txt">\({\dot Q_{restock}}\)</div> = sensible load on the refrigerated case due to restocking of products that are at a higher temperature than the case (W)
+<span>${\dot Q_{restock}}$</span> = sensible load on the refrigerated case due to restocking of products that are at a higher temperature than the case (W)
 
 The model assumes that these load components are known for a refrigerated case at rated ambient air conditions (typically 23.9˚C [75˚F] and 55% relative humidity) and the specified case operating temperature. A combination of user input curves and fixed correlations (defined within EnergyPlus) adjust for case performance at off-rated conditions. Several of the load components are typically provided by the case manufacturer (e.g., total rated load, fan, lighting, anti-sweat heater, and defrost loads). The remaining load components are not usually provided by the manufacturer and must be estimated (heat conduction through case walls, radiation heat transfer, sensible/latent air infiltration, and restocking).
 
 For estimating the latent air infiltration load, the model requires that the user provide the latent heat ratio (LHR) for the refrigerated case at rated conditions. Research results are available to provide guidance in selecting this value (ASHRAE 2002, Howell 1993a, Howell 1993b). The rated LHR for refrigerated cases typically ranges from 0.1 to 0.3 depending on case configuration (e.g., glass door reach-in versus multi-deck open case) and case operating temperature.
 
-The case loads due to wall heat conduction, radiation, and sensible air infiltration are estimated by the model as a single lumped value (sensible case credits). The sensible case credits are calculated by subtracting the known loads at rated conditions (fan, lighting, anti-sweat heater, defrost and latent case credits) from the rated total cooling capacity of the case which is provided by the case manufacturer (<div img="image6141.txt">\({\dot Q_{case,rated}}\)</div>).
+The case loads due to wall heat conduction, radiation, and sensible air infiltration are estimated by the model as a single lumped value (sensible case credits). The sensible case credits are calculated by subtracting the known loads at rated conditions (fan, lighting, anti-sweat heater, defrost and latent case credits) from the rated total cooling capacity of the case which is provided by the case manufacturer (<span>${\dot Q_{case,rated}}$</span>).
 
 Using these assumptions and the schedule inputs provided by the user, the refrigerated case evaporator load components in Equation are determined for each simulation time step. The variation in certain loads with respect to changes in ambient air temperature and/or humidity (e.g., latent and sensible case credits, defrost load, and anti-sweat heater load) are factored into the calculation based on user-provided inputs or by the model itself.
 
@@ -949,13 +949,13 @@ The refrigerated case evaporator fan electric power is calculated for each simul
 
 where:
 
-<div img="image6143.txt">\({P_{fan}}\)</div>           = output variable “Refrigerated Case Evaporator Fan Electric Power [W]”
+<span>${P_{fan}}$</span>           = output variable “Refrigerated Case Evaporator Fan Electric Power [W]”
 
-<div img="image6144.txt">\({P'}_{fan,oper}\)</div>     = operating case fan power per unit length (W/m)
+<span>${P'}_{fan,oper}$</span>     = operating case fan power per unit length (W/m)
 
-<div img="image6145.txt">\({L_{case}}\)</div>          = case length (m)
+<span>${L_{case}}$</span>          = case length (m)
 
-<div img="image6146.txt">\(SC{H_{defrost,dripdown}}\)</div> = fraction of time case is being defrosted (0 to 1), including drip-down period (based on the defrost drip-down schedule) for hot-gas or electric defrost. For off-cycle defrost or no defrost, this value is set to zero for this calculation.
+<span>$SC{H_{defrost,dripdown}}$</span> = fraction of time case is being defrosted (0 to 1), including drip-down period (based on the defrost drip-down schedule) for hot-gas or electric defrost. For off-cycle defrost or no defrost, this value is set to zero for this calculation.
 
 The model assumes that the evaporator fan is entirely contained within the thermal envelope of the case, and that all fan power results in a direct heat load on the case evaporator:
 
@@ -969,11 +969,11 @@ The refrigerated case lighting electric power is calculated for each simulation 
 
 where:
 
-<div img="image6149.txt">\({P_{lights}}\)</div>          = output variable “Refrigerated Case Lighting Electric Power [W]”
+<span>${P_{lights}}$</span>          = output variable “Refrigerated Case Lighting Electric Power [W]”
 
-<div img="image6150.txt">\(P{'_{{\rm{lights,  installed}}}}\)</div>          = installed case lighting power per unit length (W/m)
+<span>$P{'_{{\rm{lights,  installed}}}}$</span>          = installed case lighting power per unit length (W/m)
 
-<div img="image6151.txt">\(SC{H_{lights}}\)</div>    = case lighting schedule value (0 to 1)
+<span>$SC{H_{lights}}$</span>    = case lighting schedule value (0 to 1)
 
 A maximum schedule value of 1.0 means the lights are fully on at the installed case lighting power level. Schedule values of 0.0 indicate the lights are off and 0.5 at half-power.
 
@@ -983,7 +983,7 @@ The user can specify the fraction of lighting energy that directly contributes t
 
 where:
 
-<div img="image6153.txt">\({F_l}\)</div>  = fraction of lighting energy to case
+<span>${F_l}$</span>  = fraction of lighting energy to case
 
 The remainder of the lighting energy (1 - *F<sub>l</sub>*) is a heating load to the zone where the case is located, which is discussed further in section Sensible Case Credits below. This fraction (1 - *F<sub>l</sub>*) can be used to represent lighting ballasts and/or bulbs located outside the air curtain of the refrigerated case.
 
@@ -999,7 +999,7 @@ Used for refrigerated cases that do not require an anti-sweat heater.
 
 where:
 
-<div img="image6155.txt">\({\dot Q_{as}}\)</div>            = anti-sweat heater load on the case evaporator (W)
+<span>${\dot Q_{as}}$</span>            = anti-sweat heater load on the case evaporator (W)
 
 ##### Constant Method
 
@@ -1009,9 +1009,9 @@ For refrigerated cases requiring constant anti-sweat heater output, the power us
 
 where:
 
-<div img="image6157.txt">\({P_{as}}\)</div>             = output variable “Refrigerated Case Anti-Sweat Heater Electric Power [W]”
+<span>${P_{as}}$</span>             = output variable “Refrigerated Case Anti-Sweat Heater Electric Power [W]”
 
-<div img="image6158.txt">\({P'}_{as}\)</div>           = case anti-sweat heater power per unit length (W)
+<span>${P'}_{as}$</span>           = case anti-sweat heater power per unit length (W)
 
 ##### Relative Humidity Method
 
@@ -1021,11 +1021,11 @@ Anti-sweat heater power can be reduced at lower ambient relative humidity levels
 
 where:
 
-<div img="image6160.txt">\(R{H_{air}}\)</div>        = relative humidity of the ambient (zone) air (%)
+<span>$R{H_{air}}$</span>        = relative humidity of the ambient (zone) air (%)
 
-<div img="image6161.txt">\(R{H_{rated}}\)</div>      = rated ambient relative humidity (%)
+<span>$R{H_{rated}}$</span>      = rated ambient relative humidity (%)
 
-<div img="image6162.txt">\(R{H_{\min }}\)</div>       = relative humidity at zero anti-sweat heater energy (%)
+<span>$R{H_{\min }}$</span>       = relative humidity at zero anti-sweat heater energy (%)
 
 ##### Dewpoint Method
 
@@ -1035,11 +1035,11 @@ Anti-sweat heater power can also be reduced as a function of ambient air dewpoin
 
 where:
 
-<div img="image6164.txt">\({T_{dp,air}}\)</div>         = dewpoint temperature of the ambient (zone) air (˚C)
+<span>${T_{dp,air}}$</span>         = dewpoint temperature of the ambient (zone) air (˚C)
 
-<div img="image6165.txt">\({T_{dp,rated}}\)</div>       = rated ambient dewpoint temperature (˚C)
+<span>${T_{dp,rated}}$</span>       = rated ambient dewpoint temperature (˚C)
 
-<div img="image6166.txt">\({T_{case}}\)</div>           = case operating temperature (˚C)
+<span>${T_{case}}$</span>           = case operating temperature (˚C)
 
 
 
@@ -1051,27 +1051,27 @@ A theoretical model may also be used to simulate the performance of anti-sweat h
 
 where:
 
-<div img="image6168.txt">\({T_{dp,air}}\)</div>         = dewpoint temperature of the ambient (zone) air (˚C)
+<span>${T_{dp,air}}$</span>         = dewpoint temperature of the ambient (zone) air (˚C)
 
-<div img="image6169.txt">\({T_{db,air}}\)</div>         = dry-bulb temperature of the ambient (zone) air (˚C)
+<span>${T_{db,air}}$</span>         = dry-bulb temperature of the ambient (zone) air (˚C)
 
-<div img="image6170.txt">\({H_{case}}\)</div>         = height of the case (m)
+<span>${H_{case}}$</span>         = height of the case (m)
 
-<div img="image6171.txt">\({R_{air}}\)</div>           = air film resistance (assumed constant at 0.3169 m<sup>2</sup>-˚C/W)
+<span>${R_{air}}$</span>           = air film resistance (assumed constant at 0.3169 m<sup>2</sup>-˚C/W)
 
-<div img="image6172.txt">\({R_{case}}\)</div>          = heat transfer resistance of case (m<sup>2</sup>-˚C/W)
+<span>${R_{case}}$</span>          = heat transfer resistance of case (m<sup>2</sup>-˚C/W)
 
-<div img="image6173.txt">\({T_{case}}\)</div>           = case operating temperature (˚C)
+<span>${T_{case}}$</span>           = case operating temperature (˚C)
 
-<div img="image6174.txt">\({L_{case}}\)</div>          = case length (m)
+<span>${L_{case}}$</span>          = case length (m)
 
-The model above provides a linear relationship of anti-sweat heater power with varying ambient air dewpoint temperature at constant ambient air dry-bulb and case temperatures. By assuming that the ‘nominal’ anti-sweat heater power entered by the user is required to avoid moisture condensation at rated ambient air conditions, the value of <div img="image6175.txt">\({R_{case}}\)</div> can be determined by rearranging the equation and solving as follows:
+The model above provides a linear relationship of anti-sweat heater power with varying ambient air dewpoint temperature at constant ambient air dry-bulb and case temperatures. By assuming that the ‘nominal’ anti-sweat heater power entered by the user is required to avoid moisture condensation at rated ambient air conditions, the value of <span>${R_{case}}$</span> can be determined by rearranging the equation and solving as follows:
 
 <div>\[{R_{case}} = \frac{{\left( {{T_{dp,rated}} - {T_{case}}} \right)}}{{\left( {\frac{{{P'}_{as}}}{{{H_{case}}}}} \right) - \left( {\frac{{{T_{dp,rated}} - {T_{db,rated}}}}{{{R_{air}}}}} \right)}}\]</div>
 
 where:
 
-<div img="image6177.txt">\({T_{db,rated}}\)</div>       = rated ambient temperature (˚C)
+<span>${T_{db,rated}}$</span>       = rated ambient temperature (˚C)
 
 With *R<sub>case</sub>*known, *P<sub>as</sub>* can be calculated for each simulation time step using the actual ambient (zone) air dry-bulb and dewpoint temperatures.
 
@@ -1083,7 +1083,7 @@ For all control methods, the user can specify the fraction of anti-sweat heater 
 
 where:
 
-<div img="image6179.txt">\({F_{as}}\)</div>            = fraction of anti-sweat heater energy to case
+<span>${F_{as}}$</span>            = fraction of anti-sweat heater energy to case
 
 The remainder of the anti-sweat heater energy (1 - *F<sub>as</sub>*) is a heating load to the zone where the case is located, which is discussed further in section Sensible Case Credits below.
 
@@ -1095,7 +1095,7 @@ The impact of restocking the refrigerated case with product that is not at the c
 
 where:
 
-<div img="image6181.txt">\(SC{H_{restock}}\)</div>  = refrigerated case restocking schedule value (W/m)
+<span>$SC{H_{restock}}$</span>  = refrigerated case restocking schedule value (W/m)
 
 The restocking heat load is removed by the refrigerated case evaporator any time the case is not being defrosted and excess sensible cooling capacity is available. If the evaporator cooling capacity is insufficient to remove the entire restocking load, the unmet portion is carried over to the next simulation time step.
 
@@ -1111,15 +1111,15 @@ For electric, hot gas, and hot brine defrost types, energy use by the defrost he
 
 where:
 
-<div img="image6183.txt">\({P_{def}}\)</div>           = output variable “Refrigerated Case Defrost Electric Power [W]”
+<span>${P_{def}}$</span>           = output variable “Refrigerated Case Defrost Electric Power [W]”
 
-<div img="image6184.txt">\({P'}_{def}\)</div>          = case defrost power per unit length (W)
+<span>${P'}_{def}$</span>          = case defrost power per unit length (W)
 
-<div img="image6185.txt">\({L_{case}}\)</div>          = case length (m)
+<span>${L_{case}}$</span>          = case length (m)
 
-<div img="image6186.txt">\(SC{H_{defrost}}\)</div>  = case defrost schedule value (0 to 1)
+<span>$SC{H_{defrost}}$</span>  = case defrost schedule value (0 to 1)
 
-<div img="image6187.txt">\(DefrostRatio\)</div> = fraction of maximum defrost time, used with temperature termination
+<span>$DefrostRatio$</span> = fraction of maximum defrost time, used with temperature termination
 
 Frost accumulation on the case evaporator will vary with the humidity level in the ambient air surrounding the case. Therefore, defrost heater operation can be reduced when ambient air humidity levels are low. Several methods are used to reduce unnecessary defrost heater operation, including terminating heater operation when the measured evaporator temperature indicates that the accumulated frost has been completely melted. For modeling refrigerated cases with temperature-terminated defrost, EnergyPlus allows the user to specify a defrost energy correction curve to account for variations in defrost energy as ambient air humidity levels change. The user can select from four correction curve types: None, Case Temperature Method, Relative Humidity Method, or Dewpoint Method.
 
@@ -1127,13 +1127,13 @@ Frost accumulation on the case evaporator will vary with the humidity level in t
 
 where:
 
-<div img="image6189.txt">\(R{H_{rated}}\)</div>      = rated ambient relative humidity (%)
+<span>$R{H_{rated}}$</span>      = rated ambient relative humidity (%)
 
-<div img="image6190.txt">\(R{H_{air}}\)</div>        = relative humidity of the ambient (zone) air (%)
+<span>$R{H_{air}}$</span>        = relative humidity of the ambient (zone) air (%)
 
-<div img="image6191.txt">\({T_{case}}\)</div>           = case operating temperature (˚C)
+<span>${T_{case}}$</span>           = case operating temperature (˚C)
 
-<div img="image6192.txt">\({T_{dp,air}}\)</div>         = dewpoint temperature of the ambient (zone) air (˚C)
+<span>${T_{dp,air}}$</span>         = dewpoint temperature of the ambient (zone) air (˚C)
 
 a…l                        = user-defined coefficients using a cubic curve object (Curve:Cubic)
 
@@ -1186,61 +1186,61 @@ As mentioned above, the refrigerated case evaporator is turned off while it is b
 
 where:
 
-<div img="image6194.txt">\(Frost\)</div>        = amount of accumulated frost on the case evaporator (kg)
+<span>$Frost$</span>        = amount of accumulated frost on the case evaporator (kg)
 
-<div img="image6195.txt">\({\dot Q_{case,rated}}\)</div>    = case rated total cooling capacity per unit length (W/m)
+<span>${\dot Q_{case,rated}}$</span>    = case rated total cooling capacity per unit length (W/m)
 
-<div img="image6196.txt">\({L_{case}}\)</div>          = case length (m)
+<span>${L_{case}}$</span>          = case length (m)
 
-<div img="image6197.txt">\(RT{F_{rated}}\)</div>     = runtime fraction of the refrigerated case at rated conditions
+<span>$RT{F_{rated}}$</span>     = runtime fraction of the refrigerated case at rated conditions
 
-<div img="image6198.txt">\(LH{R_{rated}}\)</div>    = latent heat ratio of the refrigerated case at rated conditions
+<span>$LH{R_{rated}}$</span>    = latent heat ratio of the refrigerated case at rated conditions
 
-<div img="image6199.txt">\(LatentRatio\)</div> = ratio of actual latent load to rated latent load on the case, based on latent case credit curve (see section Latent Case Credits below)
+<span>$LatentRatio$</span> = ratio of actual latent load to rated latent load on the case, based on latent case credit curve (see section Latent Case Credits below)
 
-<div img="image6200.txt">\({t_{zn}}\)</div>             = duration of zone simulation time step (s)
+<span>${t_{zn}}$</span>             = duration of zone simulation time step (s)
 
-<div img="image6201.txt">\({h_{fg}}\)</div>                        = heat of vaporization of water (assumed constant at 2,498,000 J/kg)
+<span>${h_{fg}}$</span>                        = heat of vaporization of water (assumed constant at 2,498,000 J/kg)
 
-<div img="image6202.txt">\({h_f}\)</div>             = heat of fusion of water (335,000 J/kg)
+<span>${h_f}$</span>             = heat of fusion of water (335,000 J/kg)
 
-<div img="image6203.txt">\(SC{H_{defrost,dripdown}}\)</div>    = defrost drip-down schedule value (0 to 1)
+<span>$SC{H_{defrost,dripdown}}$</span>    = defrost drip-down schedule value (0 to 1)
 
-During defrost (SCHdefrost), the model assumes that the hot gas, hot brine, or electric heater energy directly contributes to melting the frost (heat of fusion of water). Defrost energy not attributed to melting frost from the evaporator coil results in a heat load on the refrigerated case evaporator (<sub><div img="image6204.txt">\({\dot Q_{def}}\)</div></sub>). When the defrost drip-down time period ends, this defrost energy heat load is added to the actual case load (up to the maximum evaporator capacity) until the total defrost energy heat load is removed (which may take several simulation time steps)
+During defrost (SCHdefrost), the model assumes that the hot gas, hot brine, or electric heater energy directly contributes to melting the frost (heat of fusion of water). Defrost energy not attributed to melting frost from the evaporator coil results in a heat load on the refrigerated case evaporator (<sub><span>${\dot Q_{def}}$</span></sub>). When the defrost drip-down time period ends, this defrost energy heat load is added to the actual case load (up to the maximum evaporator capacity) until the total defrost energy heat load is removed (which may take several simulation time steps)
 
 <div>\[\begin{array}{l}If\left( {DefrostType = Electric\;or\;HotGas\;or\;HotBrine} \right)\;Then\\\quad \quad {{\dot Q}_{def}} = MAX\left( {0.0,\left[ {P_{def}'({L_{case}})(SC{H_{def}}) - \frac{{Frost({h_f})}}{{{t_{zn}}}}} \right]} \right)\\Else\\\quad \quad {{\dot Q}_{def}} = 0.0\\Endif\end{array}\]</div>
 
 where:
 
-<div img="image6206.txt">\({\dot Q_{def}}\)</div>     = defrost heat load (W)
+<span>${\dot Q_{def}}$</span>     = defrost heat load (W)
 
 #### Sensible Case Credits
 
-Refrigerated cases remove sensible energy from the surrounding environment (termed “sensible case credits”). In this model, the sensible case credits are composed of wall heat conduction, radiation heat transfer, and sensible heat transfer by air infiltration (<div img="image6207.txt">\({\dot Q_{walls}}\)</div>+ <div img="image6208.txt">\({\dot Q_{rad}}\)</div>+ <div img="image6209.txt">\({\dot Q_{{\rm{inf,sens}}}}\)</div> in equation ). To quantify this energy transfer, the model first calculates the rated sensible case credits by subtracting the known loads at rated conditions (fan, lighting, and anti-sweat heater) from the rated sensible cooling capacity of the case. It should be noted that the lighting and fan heat discussed here are for standard-efficiency equipment. Manufacturers typically provide ratings for both standard and high-efficiency fan and lighting equipment; however, the standard equipment is used to determine rated sensible case credits. (Some manufacturers no longer include any lighting in their rated capacity values. For these cases, P’<sub>lights,std</sub> will equal zero.)
+Refrigerated cases remove sensible energy from the surrounding environment (termed “sensible case credits”). In this model, the sensible case credits are composed of wall heat conduction, radiation heat transfer, and sensible heat transfer by air infiltration (<span>${\dot Q_{walls}}$</span>+ <span>${\dot Q_{rad}}$</span>+ <span>${\dot Q_{{\rm{inf,sens}}}}$</span> in equation ). To quantify this energy transfer, the model first calculates the rated sensible case credits by subtracting the known loads at rated conditions (fan, lighting, and anti-sweat heater) from the rated sensible cooling capacity of the case. It should be noted that the lighting and fan heat discussed here are for standard-efficiency equipment. Manufacturers typically provide ratings for both standard and high-efficiency fan and lighting equipment; however, the standard equipment is used to determine rated sensible case credits. (Some manufacturers no longer include any lighting in their rated capacity values. For these cases, P’<sub>lights,std</sub> will equal zero.)
 
 <div>\[\dot Qc{c_{sens,rated}} = \left[ {{{\dot Q}_{case,rated}}\left( {RT{F_{rated}}} \right)\left( {1 - LH{R_{rated}}} \right) - {P'}_{lights,std}\left( {{F_l}} \right) - {P'}_{as}\left( {{F_{as}}} \right) - {P'}_{fan,std}} \right]{L_{case}}\]</div>
 
 where:
 
-<div img="image6211.txt">\(\dot Qc{c_{sens,rated}}\)</div>  = sensible case credits at rated conditions (W)
+<span>$\dot Qc{c_{sens,rated}}$</span>  = sensible case credits at rated conditions (W)
 
-<div img="image6212.txt">\({\dot Q_{case,rated}}\)</div>    = case rated total cooling capacity per unit length (W/m)
+<span>${\dot Q_{case,rated}}$</span>    = case rated total cooling capacity per unit length (W/m)
 
-<div img="image6213.txt">\(RT{F_{rated}}\)</div>     = runtime fraction of the refrigerated case at rated conditions
+<span>$RT{F_{rated}}$</span>     = runtime fraction of the refrigerated case at rated conditions
 
-<div img="image6214.txt">\(LH{R_{rated}}\)</div>    = latent heat ratio of the refrigerated case at rated conditions
+<span>$LH{R_{rated}}$</span>    = latent heat ratio of the refrigerated case at rated conditions
 
-<div img="image6215.txt">\({P'}_{lights,std}\)</div>    = standard case lighting power per unit length (W/m)
+<span>${P'}_{lights,std}$</span>    = standard case lighting power per unit length (W/m)
 
-<div img="image6216.txt">\({F_l}\)</div>              = fraction of lighting energy to case
+<span>${F_l}$</span>              = fraction of lighting energy to case
 
-<div img="image6217.txt">\({P'}_{as}\)</div>           = case anti-sweat heater power per unit length (W)
+<span>${P'}_{as}$</span>           = case anti-sweat heater power per unit length (W)
 
-<div img="image6218.txt">\({F_{as}}\)</div>                        = fraction of anti-sweat heater energy to case
+<span>${F_{as}}$</span>                        = fraction of anti-sweat heater energy to case
 
-<div img="image6219.txt">\({P'}_{fan,std}\)</div>      = standard case fan power per unit length (W/m)
+<span>${P'}_{fan,std}$</span>      = standard case fan power per unit length (W/m)
 
-<div img="image6220.txt">\({L_{case}}\)</div>          = case length (m)
+<span>${L_{case}}$</span>          = case length (m)
 
 For every simulation time step, the rated sensible case credits are then adjusted to account for variations at off-rated ambient air temperatures. The model also allows the user to define a case credit fraction using a schedule object. This case credit fraction can be useful for modeling cases that operate differently during specific time periods. For example, metal or plastic coverings may be installed on refrigerated display cases during unoccupied hours which would significantly reduce case credits (e.g., air infiltration) compared to occupied hours when the coverings are removed. If the user does not define a case credit fraction schedule, then the fraction is assumed to be 1 for the entire simulation.
 
@@ -1248,15 +1248,15 @@ For every simulation time step, the rated sensible case credits are then adjuste
 
 where:
 
-<div img="image6222.txt">\(\dot Qc{c_{sens}}\)</div>      = sensible case credits adjusted for ambient temperature and case credit fraction (W)
+<span>$\dot Qc{c_{sens}}$</span>      = sensible case credits adjusted for ambient temperature and case credit fraction (W)
 
-<div img="image6223.txt">\({T_{db,air}}\)</div>         = dry-bulb temperature of the ambient (zone) air (˚C)
+<span>${T_{db,air}}$</span>         = dry-bulb temperature of the ambient (zone) air (˚C)
 
-<div img="image6224.txt">\({T_{case}}\)</div>           = case operating temperature (˚C)
+<span>${T_{case}}$</span>           = case operating temperature (˚C)
 
-<div img="image6225.txt">\({T_{db,rated}}\)</div>       = rated ambient (zone) dry-bulb temperature (˚C)
+<span>${T_{db,rated}}$</span>       = rated ambient (zone) dry-bulb temperature (˚C)
 
-<div img="image6226.txt">\(SC{H_{cc}}\)</div>       = case credit fraction (schedule value, 0 to 1)
+<span>$SC{H_{cc}}$</span>       = case credit fraction (schedule value, 0 to 1)
 
 The sensible case credits calculated above are considered heat loads on the refrigerated case evaporator. The ***net*** impact of the case credits on the surrounding zone includes adjustment for the portion of the lighting and anti-sweat heater power that does not directly contribute to the case evaporator load. Sensible case credits are negative values when heat is removed from the zone load.
 
@@ -1264,41 +1264,41 @@ The sensible case credits calculated above are considered heat loads on the refr
 
 where:
 
-<div img="image6228.txt">\(\dot Qc{c_{sens,NET}}\)</div> = net impact of the sensible case credits on the surrounding zone, negative for cooling (W)
+<span>$\dot Qc{c_{sens,NET}}$</span> = net impact of the sensible case credits on the surrounding zone, negative for cooling (W)
 
-<div img="image6229.txt">\({P_{lights}}\)</div>          = case lighting electric power (W)
+<span>${P_{lights}}$</span>          = case lighting electric power (W)
 
-<div img="image6230.txt">\({F_l}\)</div>              = fraction of lighting energy to case
+<span>${F_l}$</span>              = fraction of lighting energy to case
 
-<div img="image6231.txt">\({P_{as}}\)</div>             = anti-sweat heater electric power (W)
+<span>${P_{as}}$</span>             = anti-sweat heater electric power (W)
 
-<div img="image6232.txt">\({F_{as}}\)</div>                        = fraction of anti-sweat heater energy to case
+<span>${F_{as}}$</span>                        = fraction of anti-sweat heater energy to case
 
 When refrigerated cases are served by a compressor rack that rejects condenser waste heat directly to the zone (e.g., a stand-alone refrigerated case with integral compressor and condenser), this condenser waste heat offsets some or all of the sensible case credits. The amount of condenser waste heat rejected to the zone is calculated and reported by the refrigerated case compressor rack object (Ref. Heat Rejection to Zone).
 
 #### Latent Case Credits
 
-Refrigerated cases also remove latent energy (moisture) from the surrounding environment (termed “latent case credits”). In this model, the latent case credit is composed solely of the latent heat transfer by air infiltration <div img="image6233.txt">\({\dot Q_{inf,lat}}\)</div>in equation . The latent case credits are calculated as the product of the case length and the total cooling capacity per unit length, latent heat ratio, and runtime fraction at rated conditions. As described previously (Ref. Sensible Case Credits), a case credit fraction schedule is used to model cases that operate differently during specific time periods. The same case credit fraction is used to modify both the sensible and latent case credits. If the user does not define a case credit fraction schedule, then the fraction is assumed to be 1 for the entire simulation. The calculation of latent case credits also includes a factor (*LatentRatio*) that accounts for lower ambient humidity levels. Latent case credits are set to zero during the defrost-dripdown periods.
+Refrigerated cases also remove latent energy (moisture) from the surrounding environment (termed “latent case credits”). In this model, the latent case credit is composed solely of the latent heat transfer by air infiltration <span>${\dot Q_{inf,lat}}$</span>in equation . The latent case credits are calculated as the product of the case length and the total cooling capacity per unit length, latent heat ratio, and runtime fraction at rated conditions. As described previously (Ref. Sensible Case Credits), a case credit fraction schedule is used to model cases that operate differently during specific time periods. The same case credit fraction is used to modify both the sensible and latent case credits. If the user does not define a case credit fraction schedule, then the fraction is assumed to be 1 for the entire simulation. The calculation of latent case credits also includes a factor (*LatentRatio*) that accounts for lower ambient humidity levels. Latent case credits are set to zero during the defrost-dripdown periods.
 
 <div>\[{\dot Q_{{\rm{inf}},lat}} = \,\,\,\, - \dot Qc{c_{lat}}\,\, = \,\,{\dot Q_{case,rated}}\left( {LH{R_{rated}}} \right)\left( {RT{F_{rated}}} \right)\left( {SC{H_{cc}}} \right)\left( {LatentRatio} \right){L_{case}}\]</div>
 
 where:
 
-<div img="image6235.txt">\({\dot Q_{{\rm{inf,lat}}}}\)</div>         = latent load on the refrigerated case evaporator at current ambient conditions (W)
+<span>${\dot Q_{{\rm{inf,lat}}}}$</span>         = latent load on the refrigerated case evaporator at current ambient conditions (W)
 
-<div img="image6236.txt">\(\dot Qc{c_{lat}}\)</div>        = latent case credit impact on zone load, negative for dehumidification (W)
+<span>$\dot Qc{c_{lat}}$</span>        = latent case credit impact on zone load, negative for dehumidification (W)
 
-<div img="image6237.txt">\({\dot Q_{case,rated}}\)</div>  = case rated total cooling capacity per unit length (W/m)
+<span>${\dot Q_{case,rated}}$</span>  = case rated total cooling capacity per unit length (W/m)
 
-<div img="image6238.txt">\(LH{R_{rated}}\)</div>  = latent heat ratio of the refrigerated case at rated conditions
+<span>$LH{R_{rated}}$</span>  = latent heat ratio of the refrigerated case at rated conditions
 
-<div img="image6239.txt">\(RT{F_{rated}}\)</div>   = runtime fraction of the refrigerated case at rated conditions
+<span>$RT{F_{rated}}$</span>   = runtime fraction of the refrigerated case at rated conditions
 
 SCH<sub>CC</sub>     = case credit fraction (schedule value, 0 to 1)
 
-<div img="image6240.txt">\(LatentRatio\)</div> = ratio of actual latent load to rated latent load on the case, based on latent case credit curve
+<span>$LatentRatio$</span> = ratio of actual latent load to rated latent load on the case, based on latent case credit curve
 
-<div img="image6241.txt">\({L_{case}}\)</div>         = case length (m)
+<span>${L_{case}}$</span>         = case length (m)
 
 Latent load on the refrigerated case evaporator will vary with ambient humidity levels. Therefore, the refrigerated case model allows the user to specify a latent case credit curve to adjust case credits based on ambient humidity, and the user can select from three curve types: Case Temperature Method, Relative Humidity Method, or Dewpoint Method.
 
@@ -1306,13 +1306,13 @@ Latent load on the refrigerated case evaporator will vary with ambient humidity 
 
 where:
 
-<div img="image6243.txt">\(R{H_{rated}}\)</div>      = rated ambient relative humidity (%)
+<span>$R{H_{rated}}$</span>      = rated ambient relative humidity (%)
 
-<div img="image6244.txt">\(R{H_{air}}\)</div>        = relative humidity of the ambient (zone) air (%)
+<span>$R{H_{air}}$</span>        = relative humidity of the ambient (zone) air (%)
 
-<div img="image6245.txt">\({T_{case}}\)</div>           = case operating temperature (˚C)
+<span>${T_{case}}$</span>           = case operating temperature (˚C)
 
-<div img="image6246.txt">\({T_{dp,air}}\)</div>         = dewpoint temperature of the ambient (zone) air (˚C)
+<span>${T_{dp,air}}$</span>         = dewpoint temperature of the ambient (zone) air (˚C)
 
 m…x          = user-defined coefficients using a cubic curve object (Curve:Cubic)
 
@@ -1378,13 +1378,13 @@ Since under case return ducts reduce the temperature and humidity of the air bei
 
 where:
 
-<div img="image6252.txt">\(\dot Qc{c_{sens,zone}}\)</div> = sensible case credit applied to the zone air heat balance (W)
+<span>$\dot Qc{c_{sens,zone}}$</span> = sensible case credit applied to the zone air heat balance (W)
 
-<div img="image6253.txt">\(\dot Qc{c_{lat,zone}}\)</div>   = latent case credit applied to the zone air heat balance (W)
+<span>$\dot Qc{c_{lat,zone}}$</span>   = latent case credit applied to the zone air heat balance (W)
 
-<div img="image6254.txt">\(\dot Qc{c_{sens,HVAC}}\)</div>= sensible case credit applied to the HVAC return air (zone return air path outlet node) (W)
+<span>$\dot Qc{c_{sens,HVAC}}$</span>= sensible case credit applied to the HVAC return air (zone return air path outlet node) (W)
 
-<div img="image6255.txt">\(\dot Qc{c_{lat,HVAC}}\)</div> = latent case credit applied to the HVAC return air (zone return air path outlet node) (W)
+<span>$\dot Qc{c_{lat,HVAC}}$</span> = latent case credit applied to the HVAC return air (zone return air path outlet node) (W)
 
 RAF            = return air factor (see Figure 279 above)
 
@@ -1624,11 +1624,11 @@ Where:
 
 q<sub>sens</sub>            = Cooling capacity (sensible only), W
 
-<div img="image6258.txt">\(\dot m\)</div>              = mass flow rate of air, kg/s
+<span>$\dot m$</span>              = mass flow rate of air, kg/s
 
-<div img="image6259.txt">\({c_p}\)</div>             = specific heat capacity of moist air, J/kg-C
+<span>${c_p}$</span>             = specific heat capacity of moist air, J/kg-C
 
-<div img="image6260.txt">\(\varepsilon \)</div>               = effectiveness (=(T<sub>coil\\ inlet</sub> – T<sub>coil</sub> exit)/(T<sub>coil\\ inlet</sub> - T<sub>evap</sub>)
+<span>$\varepsilon $</span>               = effectiveness (=(T<sub>coil\\ inlet</sub> – T<sub>coil</sub> exit)/(T<sub>coil\\ inlet</sub> - T<sub>evap</sub>)
 
 T<sub>coil\\ inlet</sub>         = dry-bulb air temperature entering the coil, C
 
@@ -1652,9 +1652,9 @@ Using this approach, the manufacturer specifies the Unit Load Factor in terms of
 
 Where:
 
-<div img="image6263.txt">\({Q_{{\rm{ideal}}}}\)</div>          = Cooling capacity (total) if fin efficiency and total effectiveness were constant, W
+<span>${Q_{{\rm{ideal}}}}$</span>          = Cooling capacity (total) if fin efficiency and total effectiveness were constant, W
 
-<div img="image6264.txt">\({Q_{{\rm{Total}}}}\)</div>         = Cooling capacity (total), actual
+<span>${Q_{{\rm{Total}}}}$</span>         = Cooling capacity (total), actual
 
 
 
@@ -1664,9 +1664,9 @@ The total capacity is therefore a function of the sensible heat ratio, which is 
 
 Where:
 
-<div img="image6266.txt">\(\Delta T\)</div>            = Temperature difference between the inlet air and the average evaporating temperature, C
+<span>$\Delta T$</span>            = Temperature difference between the inlet air and the average evaporating temperature, C
 
-<div img="image6267.txt">\(\Delta T{}_{Max}\)</div>       = Maximum temperature difference specified by the user, C
+<span>$\Delta T{}_{Max}$</span>       = Maximum temperature difference specified by the user, C
 
 SCH<sub>Coil</sub>        = Coil availability schedule
 
@@ -1698,7 +1698,7 @@ The sensible and latent loads served are then calculated as:
 
 Where:
 
-<div img="image6270.txt">\({\dot V_{Air,Max}}\)</div>       = Maximum air flow, m<sup>3</sup>/s
+<span>${\dot V_{Air,Max}}$</span>       = Maximum air flow, m<sup>3</sup>/s
 
 HR              = Humidity Ratio, kg water/kg dry air
 
@@ -1784,7 +1784,7 @@ Once the corrected capacity is calculated for each compressor, the compressors a
 
 where:
 
-<div img="image6277.txt">\(\dot m\)</div>= mass flow rate of refrigerant, kg/s
+<span>$\dot m$</span>= mass flow rate of refrigerant, kg/s
 
 ρ    = density, kg/m<sup>3</sup>
 
@@ -1838,7 +1838,7 @@ The condenser can be modeled as dry air cooling, wet evaporative cooling, water 
 
 EnergyPlus can simulate waste heat being reclaimed from a detailed refrigeration system for use by refrigerant-to-air and refrigerant-to-water heating coils. (Refer to objects Coil:Heating:Desuperheater and Coil:WaterHeating:Desuperheater for a complete description of how these coils are modeled.) Heat reclaimed from the detailed refrigeration system is limited to the portion of the rejected heat in the superheat region. Using the state point nomenclature from Figure 280, this value is calculated by the detailed compressor and condenser models each time step as follows:
 
-<div img="image6282.txt">\(\)</div><div img="image6283.txt">\({\dot Q_{AvailableSuperheat}} = \dot m\left( {{h_{{\rm{2}}a}} - {h_{2b}}} \right)\)</div>
+<span>$$</span><span>${\dot Q_{AvailableSuperheat}} = \dot m\left( {{h_{{\rm{2}}a}} - {h_{2b}}} \right)$</span>
 
 Heat reclaimed for hot gas or hot brine defrost is not limited to the superheat range. However, if an excessive amount of the system rejected heat is diverted for that purpose, a warning is issued advising the user to increase the diversity of the defrost schedules.
 
@@ -1848,9 +1848,9 @@ The total heat rejection load on the condenser is the sum of the case and walk-i
 
 where:
 
-<sub><div img="image6285.txt">\({\dot Q_{Rejected}}\)</div></sub>     = Heat rejected by the condenser (W)
+<sub><span>${\dot Q_{Rejected}}$</span></sub>     = Heat rejected by the condenser (W)
 
-<div img="image6286.txt">\(\sum {{{\dot Q}_{Reclaimed}}} \)</div>= Sum of all the heat reclaimed by desuperheater coils and hot gas and hot brine defrost (W)
+<span>$\sum {{{\dot Q}_{Reclaimed}}} $</span>= Sum of all the heat reclaimed by desuperheater coils and hot gas and hot brine defrost (W)
 
 Depending upon the condenser type, the heat rejection environment is set to the ambient conditions, conditions corresponding to a defined ouside air node (sometimes used to represent condensers located above ground level) or zone node, to a temperature specified for a water-cooled condenser, or according to the evaporating temperature for a higher-temperature loop (used for cascade condensers).
 
@@ -1924,9 +1924,9 @@ For a cycling fan, the power variation with air flow volume is approximately lin
 
 where:
 
-<div img="image6293.txt">\({P_{CondFan}}\)</div>                  = output variable “Refrigerated Case Condenser Fan Electric Power [W]”, not allowed to exceed the design condenser fan power
+<span>${P_{CondFan}}$</span>                  = output variable “Refrigerated Case Condenser Fan Electric Power [W]”, not allowed to exceed the design condenser fan power
 
-<div img="image6294.txt">\({P_{CondFan,design}}\)</div>           = design condenser fan power (W)
+<span>${P_{CondFan,design}}$</span>           = design condenser fan power (W)
 
 For a fixed speed fan with damper (corresponding to the option “Fixed”), the shape of the power fraction curve is as shown above, and calculated using:
 
@@ -1992,13 +1992,13 @@ The water consumption for an evaporative condenser is calculated based upon the 
 
 where:
 
-<div img="image6304.txt">\({\left. h \right|_{Tcondense,sat}}\)</div>=enthalpy of saturated air at the calculated condensing temperature
+<span>${\left. h \right|_{Tcondense,sat}}$</span>=enthalpy of saturated air at the calculated condensing temperature
 
 h<sub>air,out</sub> = enthalpy of the air leaving the condenser,
 
 h<sub>air,in</sub> = enthalpy of the inlet air, psychometric function of inlet air drybulb temperature and humidity ratio
 
-<div img="image6305.txt">\({\dot V_{air,rated}}\)</div>= rated volumetric air flow for the evaporative condenser (input value) m<sup>3</sup>/s
+<span>${\dot V_{air,rated}}$</span>= rated volumetric air flow for the evaporative condenser (input value) m<sup>3</sup>/s
 
 ρ<sub>air</sub> = density of air evaluated at environmental conditions
 
@@ -2006,7 +2006,7 @@ h<sub>air,in</sub> = enthalpy of the inlet air, psychometric function of inlet a
 
 T<sub>air,out</sub> = air temperature leaving the condenser, psychometric function of saturated air at the enthalpy leaving the condenser and the barometric pressure
 
-<div img="image6306.txt">\({\dot V_{evaporation}}\)</div>= Volumetric rate of water evaporation in the condenser, m<sup>3</sup>/s
+<span>${\dot V_{evaporation}}$</span>= Volumetric rate of water evaporation in the condenser, m<sup>3</sup>/s
 
 ω<sub>air,out</sub>= humidity ratio (kg<sub>water</sub>/kg<sub>dry\\ air</sub>) of the air leaving the condenser, psychometric function of T<sub>air,out</sub> and the barometric pressure
 
@@ -2014,9 +2014,9 @@ T<sub>air,out</sub> = air temperature leaving the condenser, psychometric functi
 
 ρ<sub>water</sub> = density of water evaluated at the environmental wetbulb temperature (kg/m<sup>3</sup>)
 
-<div img="image6307.txt">\({\dot V_{purge}}\)</div>= Volumetric rate of water purged in the condenser, m<sup>3</sup>/s
+<span>${\dot V_{purge}}$</span>= Volumetric rate of water purged in the condenser, m<sup>3</sup>/s
 
-<div img="image6308.txt">\({\dot V_{makeup}}\)</div>= Volumetric rate of water makeup in the condenser, m<sup>3</sup>/s
+<span>${\dot V_{makeup}}$</span>= Volumetric rate of water makeup in the condenser, m<sup>3</sup>/s
 
 The source of the makeup water may be specified as a water storage tank. If not specified, the makeup water is assumed to come from the building mains (Ref. Water Mains Temperatures).
 
@@ -2058,15 +2058,15 @@ For cases and walk-ins served by cascade condensers, energy needed for hot brine
 
 where
 
-<div img="image6312.txt">\({\dot Q_{Cascade}}\)</div>      = Total refrigeration load the cascade condenser places upon the primary system, W
+<span>${\dot Q_{Cascade}}$</span>      = Total refrigeration load the cascade condenser places upon the primary system, W
 
-<div img="image6313.txt">\({\dot Q_{Case}}\)</div>         = Case load on the secondary loop , W
+<span>${\dot Q_{Case}}$</span>         = Case load on the secondary loop , W
 
-<div img="image6314.txt">\({\dot Q_{Walkin}}\)</div>        = Walk-in load on the secondary loop, W
+<span>${\dot Q_{Walkin}}$</span>        = Walk-in load on the secondary loop, W
 
-<div img="image6315.txt">\({\dot Q_{Compressor}}\)</div>   = Power input to a compressor on the secondary loop, W
+<span>${\dot Q_{Compressor}}$</span>   = Power input to a compressor on the secondary loop, W
 
-<div img="image6316.txt">\({\dot Q_{PipeHeatGain}}\)</div>= Heat gain in secondary loop suction pipe, W
+<span>${\dot Q_{PipeHeatGain}}$</span>= Heat gain in secondary loop suction pipe, W
 
 **Even though a cascade condenser is considered to be a part of a secondary loop, that loop is described with the Refrigeration:System object, not with the object, Refrigeration:SecondarySystem, described below.**
 
@@ -2078,9 +2078,9 @@ Subcooler objects (Refrigeration:Subcooler) reduce the temperature of the liquid
 
 where:
 
-<div img="image6318.txt">\(\dot Q\)</div>= subcooler load, W
+<span>$\dot Q$</span>= subcooler load, W
 
-<div img="image6319.txt">\(\dot m\)</div>= mass flow rate of refrigerant, kg/s
+<span>$\dot m$</span>= mass flow rate of refrigerant, kg/s
 
 c<sub>p,liquid</sub>          = specific heat of saturated liquid at the condensing temperature, J/kg-C
 
@@ -2112,11 +2112,11 @@ Any one system can be cooled (i.e., have energy removed between points ‘3a’ 
 
 Suction piping heat gain is an optional element in the load calculation.  Typically, the suction pipe heat gain is small compared to the other loads.  However, when comparing DX systems to secondary systems, this portion of the total load can be very different. (Hinde, D., et al. 2009)  To include the suction pipe heat gain load, the user must first calculate the U-value and outer surface area for the suction piping. The U-value is the total conductance from the inside skin coefficient, through the pipe insulation, to the outside skin coefficient. This value must be multiplied by the external surface area of the pipe insulation to provide the sum of the UA required in the input.  These piping heat gains are also reflected in the zone heat balance.
 
-<div img="image6321.txt">\({\dot Q_{PipeHeatGain}}\)</div> = ∑U\*A (T<sub>zone</sub> – T<sub>SaturatedSuction</sub>)
+<span>${\dot Q_{PipeHeatGain}}$</span> = ∑U\*A (T<sub>zone</sub> – T<sub>SaturatedSuction</sub>)
 
 Where:
 
-    <div img="image6322.txt">\({\dot Q_{PipeHeatGain}}\)</div>  =  Heat load on the detailed refrigeration system due to suction pipe heat gains (W)
+    <span>${\dot Q_{PipeHeatGain}}$</span>  =  Heat load on the detailed refrigeration system due to suction pipe heat gains (W)
 
     ∑U\*A =   Sum of the product of the conductance times the surface area for the suction piping (W/C)
 
@@ -2244,11 +2244,11 @@ Where:
 
 Distribution piping and receiver shell heat gains are optional elements in the load calculation.  Typically, the distribution pipe and receiver shell heat gains are small compared to the other loads.  However, when comparing direct expansion systems to secondary systems, this portion of the total load can be very different. (Hinde, D., et al. 2009) To calculate the pipe heat gain load, the user must first calculate the U-value and area for the distribution piping. The U-value is the total conductance from the inside skin coefficient to the outside skin coefficient. This value must be multiplied by the piping external surface area to provide the sum of the UA required in the input.  Note that these piping and receiver shell heat gains are also reflected in the zone heat balance, similar to the zone cooling credits provided by refrigerated cases.
 
-<div img="image6328.txt">\({\dot Q_{PipeHeatGain}}\)</div> = ∑U\*A (T<sub>zone</sub> – T<sub>BrineAverage</sub>)
+<span>${\dot Q_{PipeHeatGain}}$</span> = ∑U\*A (T<sub>zone</sub> – T<sub>BrineAverage</sub>)
 
 Where:
 
-<div img="image6329.txt">\({\dot Q_{PipeHeatGain}}\)</div>  =  Heat load on the secondary loop due to pipe heat gains, output variable “Refrigeration Secondary Loop Pipe Heat Gain Rate [W]”
+<span>${\dot Q_{PipeHeatGain}}$</span>  =  Heat load on the secondary loop due to pipe heat gains, output variable “Refrigeration Secondary Loop Pipe Heat Gain Rate [W]”
 
 ∑U\*A =   Sum of the product of the conductance times the surface area for the piping (W/C)
 
@@ -2272,11 +2272,11 @@ Efficiency<sub>PumpMotor</sub>     = Pump motor efficiency, dimensionless
 
 The pump impeller efficiency is assumed to be 78%. (ASHRAE 2006c) The pump motor efficiency is assumed to be 85%.(ITT 2009)  If a semi-hermetic motor is specified, all the pump power is translated to heat within the fluid. The total heat load placed upon the loop by the pumps is therefore:
 
-<div img="image6330.txt">\({\dot Q_{Pump}}\)</div> = Power<sub>PumpRated</sub> \* Ratio<sub>PowertoHeat</sub>
+<span>${\dot Q_{Pump}}$</span> = Power<sub>PumpRated</sub> \* Ratio<sub>PowertoHeat</sub>
 
 Where:
 
-<div img="image6331.txt">\({\dot Q_{Pump}}\)</div>                     = total heat load placed upon the secondary loop by the pumps (W)
+<span>${\dot Q_{Pump}}$</span>                     = total heat load placed upon the secondary loop by the pumps (W)
 
 Ratio<sub>PowertoHeat</sub>           = Ratio of total motor energy rejected to the circulating fluid to the total pump power used (input by the user, suggest 1.0 for semi-hermetic motors and 0.85 for others)
 
@@ -2294,11 +2294,11 @@ The user may also specify multiple constant-speed pumps.  Multiple pumps, or pu
 
 Where:
 
-<div img="image6334.txt">\({\dot Q_{{\rm{Refrigeration}}}}\)</div> = output variable “Refrigeration Secondary Loop Load Heat Transfer Rate”
+<span>${\dot Q_{{\rm{Refrigeration}}}}$</span> = output variable “Refrigeration Secondary Loop Load Heat Transfer Rate”
 
-<div img="image6335.txt">\({\dot Q_{{\rm{TotalSecondary}}}}\)</div> = Total load the secondary loop transfers to the primary system, output variable “Refrigeration Secondary Loop Total Heat Transfer Rate [W]”
+<span>${\dot Q_{{\rm{TotalSecondary}}}}$</span> = Total load the secondary loop transfers to the primary system, output variable “Refrigeration Secondary Loop Total Heat Transfer Rate [W]”
 
-<div img="image6336.txt">\({\dot Q_{{\rm{Pump}}}}\)</div> = Pump power, function of Flow<sub>Needed</sub>, output variable “Refrigeration Secondary Loop Pump Electric Power [W]”
+<span>${\dot Q_{{\rm{Pump}}}}$</span> = Pump power, function of Flow<sub>Needed</sub>, output variable “Refrigeration Secondary Loop Pump Electric Power [W]”
 
 Flow<sub>Needed</sub> = Flow rate needed to meet the loop refrigeration load, , output variable “Refrigeration Secondary Loop Volume Flow Rate [m3/]s”
 
@@ -2422,7 +2422,7 @@ The performance of the transcritical CO<sub>2</sub> booster system can be enhanc
 
 <div>\[\varepsilon  = \frac{{{h_{14}} - {h_{13}}}}{{{h_{{T_1},{P_{13}}}} - {h_{13}}}} = \frac{{{h_1} - {h_2}}}{{{h_{{T_1},{P_{13}}}} - {h_{13}}}}\]</div>
 
-where *h*<sub>1</sub>, *h*<sub>2</sub>, *h*<sub>13</sub>, and *h*<sub>14</sub> are the enthalpies of carbon dioxide at the respective locations in the refrigeration cycle, as shown in Figure 289 and Figure 290, and <div img="image6347.txt">\({h_{{T_1},{P_{13}}}}\)</div> is the enthalpy of carbon dioxide evaluated at temperature *T*<sub>1</sub> and pressure *P*<sub>13</sub>.
+where *h*<sub>1</sub>, *h*<sub>2</sub>, *h*<sub>13</sub>, and *h*<sub>14</sub> are the enthalpies of carbon dioxide at the respective locations in the refrigeration cycle, as shown in Figure 289 and Figure 290, and <span>${h_{{T_1},{P_{13}}}}$</span> is the enthalpy of carbon dioxide evaluated at temperature *T*<sub>1</sub> and pressure *P*<sub>13</sub>.
 
 In EnergyPlus, the value of the suction line heat exchanger effectiveness, ε, is specified by the user as an input, and the enthalpies at the exit of the heat exchanger, *h*<sub>2</sub> and *h*<sub>14</sub>, are determined from the definition of heat exchanger effectiveness given above.  In EnergyPlus, the default value of heat exchanger effectiveness is 0.4.
 
@@ -2529,7 +2529,7 @@ The input object SetpointManager:Scheduled provides the simplest setpoint manage
 
 <div>\[{T_{set}} = {T_{sched}}\]</div>
 
-where <div img="image6349.txt">\({T_{set}}\)</div>is the supply air temperature setpoint and <div img="image6350.txt">\({T_{sched}}\)</div>is the current value (°C) from the user input temperature schedule. In this case, <div img="image6351.txt">\({T_{set}}\)</div>will be applied to the node or nodes specified in the input object SetpointManager:Scheduled.  There are a number of other types of setpoints that can be set, by choosing different control variables in the object, including:
+where <span>${T_{set}}$</span>is the supply air temperature setpoint and <span>${T_{sched}}$</span>is the current value (°C) from the user input temperature schedule. In this case, <span>${T_{set}}$</span>will be applied to the node or nodes specified in the input object SetpointManager:Scheduled.  There are a number of other types of setpoints that can be set, by choosing different control variables in the object, including:
 
 1)   Maximum temperature of fluid at node (°C)
 
@@ -2569,27 +2569,27 @@ otherwise
 
 <div>\[{T_{set,atOAlow}} = {T_{1,set,atOAlow}}\]</div>
 
-<div img="image6359.txt">\({T_{set,atOAhigh}} = {T_{1,set,atOAhigh}}\)</div>.
+<span>${T_{set,atOAhigh}} = {T_{1,set,atOAhigh}}$</span>.
 
-If <div img="image6360.txt">\({T_{out,low}} < {T_{out,high}}\)</div>and <div img="image6361.txt">\({T_{set,atOAlow}} > {T_{set,atOAhigh}}\)</div> then
+If <span>${T_{out,low}} < {T_{out,high}}$</span>and <span>${T_{set,atOAlow}} > {T_{set,atOAhigh}}$</span> then
 
-      If <div img="image6362.txt">\({T_{out}} \le {T_{out,low}}\)</div> then
+      If <span>${T_{out}} \le {T_{out,low}}$</span> then
 
-      <div img="image6363.txt">\({T_{set}} = {T_{out,low}}\)</div>
+      <span>${T_{set}} = {T_{out,low}}$</span>
 
-      if <div img="image6364.txt">\({T_{out}} \ge {T_{out,high}}\)</div> then
+      if <span>${T_{out}} \ge {T_{out,high}}$</span> then
 
-      <div img="image6365.txt">\({T_{set}} = {T_{out,high}}\)</div>
+      <span>${T_{set}} = {T_{out,high}}$</span>
 
       otherwise
 
-      <div img="image6366.txt">\({T_{set}} = {T_{set,atOAlow}} - (({T_{out}} - {T_{out,low}})/({T_{out,high}} - {T_{out,low}}))\cdot ({T_{set,atOAlow}} - {T_{set,atOAhigh}})\)</div>
+      <span>${T_{set}} = {T_{set,atOAlow}} - (({T_{out}} - {T_{out,low}})/({T_{out,high}} - {T_{out,low}}))\cdot ({T_{set,atOAlow}} - {T_{set,atOAhigh}})$</span>
 
 otherwise
 
-      <div img="image6367.txt">\({T_{set}} = 0.5({T_{set,atOAlow}} + {T_{set,atOAhigh)}}\)</div>.
+      <span>${T_{set}} = 0.5({T_{set,atOAlow}} + {T_{set,atOAhigh)}}$</span>.
 
-*<div img="image6368.txt">\({T_{set}}\)</div>*will be applied to the node or nodes specified in the *SetpointManager:OutdoorAirReset* object input.
+*<span>${T_{set}}$</span>*will be applied to the node or nodes specified in the *SetpointManager:OutdoorAirReset* object input.
 
 ### Single Zone Reheat Heating and Cooling
 
@@ -2597,7 +2597,7 @@ The input object SetpointManager:SingleZone:Reheat provides a setpoint manager t
 
 <div>\[{T_{set}} = {T_z} + {\dot Q_z}/({C_{p,air}}\cdot {\dot m_z})\]</div>
 
-where <div img="image6370.txt">\({T_z}\)</div>is the control zone temperature, <div img="image6371.txt">\({\dot Q_z}\)</div>is the zone load (greater than zero for heating, less than zero for cooling), <div img="image6372.txt">\({\dot m_z}\)</div>is the zone supply air mass flow rate, and <div img="image6373.txt">\({C_{p,air}}\)</div>is the specific heat of air. If <div img="image6374.txt">\({\dot m_z}\)</div>is very small (<div img="image6375.txt">\( \le .001\)</div> kg/s) <div img="image6376.txt">\({T_{set}}\)</div> is set equal to <div img="image6377.txt">\({T_{set,min}}\)</div> if the control zone has a cooling load and to <div img="image6378.txt">\({T_{set,max}}\)</div>if the control zone has a heating load. <div img="image6379.txt">\({T_{set,min}}\)</div> is the user specified minimum setpoint and <div img="image6380.txt">\({T_{set,max}}\)</div> is the user specified maximum setpoint. <div img="image6381.txt">\({T_{set}}\)</div>will be applied to the node or nodes specified in the SetpointManager:SingleZone:Reheat object input.
+where <span>${T_z}$</span>is the control zone temperature, <span>${\dot Q_z}$</span>is the zone load (greater than zero for heating, less than zero for cooling), <span>${\dot m_z}$</span>is the zone supply air mass flow rate, and <span>${C_{p,air}}$</span>is the specific heat of air. If <span>${\dot m_z}$</span>is very small (<span>$ \le .001$</span> kg/s) <span>${T_{set}}$</span> is set equal to <span>${T_{set,min}}$</span> if the control zone has a cooling load and to <span>${T_{set,max}}$</span>if the control zone has a heating load. <span>${T_{set,min}}$</span> is the user specified minimum setpoint and <span>${T_{set,max}}$</span> is the user specified maximum setpoint. <span>${T_{set}}$</span>will be applied to the node or nodes specified in the SetpointManager:SingleZone:Reheat object input.
 
 ### Single Zone Heating Only
 
@@ -2665,27 +2665,27 @@ This setpoint manager first converts the desired relative humidity setpoint for 
 
 where:
 
-<div img="image6383.txt">\({\omega_{sp}}\)</div> = humidity ratio setpoint, kg H<sub>2</sub>O/kg air
+<span>${\omega_{sp}}$</span> = humidity ratio setpoint, kg H<sub>2</sub>O/kg air
 
 PsyWFnTdbRHPb = EnergyPlus psychrometric function, returns humidity ratio as a function of dry-bulb temperature, relative humidity, and barometric pressure
 
-<div img="image6384.txt">\({T_{db}}\)</div>= dry-bulb temperature in the control zone, °C
+<span>${T_{db}}$</span>= dry-bulb temperature in the control zone, °C
 
-<div img="image6385.txt">\(R{H_{sp}}\)</div>= maximum relative humidity setpoint, fraction
+<span>$R{H_{sp}}$</span>= maximum relative humidity setpoint, fraction
 
-<div img="image6386.txt">\(P\)</div> = outdoor barometric pressure, Pa
+<span>$P$</span> = outdoor barometric pressure, Pa
 
-The model then calculates the supply air humidity ratio required to reduce the control zone relative humidity to the desired level. Using the humidity ratio setpoint (<div img="image6387.txt">\({\omega_{sp}}\)</div>) calculated above,
+The model then calculates the supply air humidity ratio required to reduce the control zone relative humidity to the desired level. Using the humidity ratio setpoint (<span>${\omega_{sp}}$</span>) calculated above,
 
 <div>\[{\omega_{sa}} = \,{\omega_{sp}} + \frac{{{{\mathop Q\limits^ \bullet  }_l}}}{{\mathop m\limits^ \bullet  }}\]</div>
 
 where:
 
-<div img="image6389.txt">\({\omega_{sa}}\)</div> = maximum supply air humidity ratio setpoint, kg H<sub>2</sub>O/kg air
+<span>${\omega_{sa}}$</span> = maximum supply air humidity ratio setpoint, kg H<sub>2</sub>O/kg air
 
-<div img="image6390.txt">\(\mathop {{Q_l}}\limits^ \bullet  \)</div> = control zone latent load, kg H<sub>2</sub>O/s (calculated by Zone Control:Humidistat)
+<span>$\mathop {{Q_l}}\limits^ \bullet  $</span> = control zone latent load, kg H<sub>2</sub>O/s (calculated by Zone Control:Humidistat)
 
-<div img="image6391.txt">\(\mathop m\limits^ \bullet  \)</div> = control zone mass flow rate, kg/s
+<span>$\mathop m\limits^ \bullet  $</span> = control zone mass flow rate, kg/s
 
 All setpoint managers are executed at the beginning of the simulation time step. Therefore, the calculated setpoint is based on the resulting control zone air temperature and air mass flow rate for the previous simulation time step.
 
@@ -2723,7 +2723,7 @@ The input object SetpointManager:Warmest provides a setpoint manager that attemp
 
 <div>\[{T_{set,z}} = {T_z} + {\dot Q_z}/({C_{p,air}}\cdot {\dot m_{z,max}})\]</div>
 
-Note that for cooling <div img="image6394.txt">\({\dot Q_z} < 0.\)</div>The lowest <div img="image6395.txt">\({T_{set,z}}\)</div>is chosen as <div img="image6396.txt">\({T_{set}}\)</div>. <div img="image6397.txt">\({T_{set}}\)</div>is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone cooling loads is very small, the setpoint temperature is set to the maximum. <div img="image6398.txt">\({T_{set}}\)</div>will be applied to the node or nodes specified in the SetpointManager:Warmest object input.
+Note that for cooling <span>${\dot Q_z} < 0.$</span>The lowest <span>${T_{set,z}}$</span>is chosen as <span>${T_{set}}$</span>. <span>${T_{set}}$</span>is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone cooling loads is very small, the setpoint temperature is set to the maximum. <span>${T_{set}}$</span>will be applied to the node or nodes specified in the SetpointManager:Warmest object input.
 
 ### Coldest Zone Supply Air Reset
 
@@ -2731,7 +2731,7 @@ The input object SetpointManager:Coldest provides a setpoint manager that attemp
 
 <div>\[{T_{set,z}} = {T_z} + {\dot Q_z}/({C_{p,air}}\cdot {\dot m_{z,max}})\]</div>
 
-Note that for heating <div img="image6400.txt">\({\dot Q_z} > 0.\)</div>The highest <div img="image6401.txt">\({T_{set,z}}\)</div>is chosen as <div img="image6402.txt">\({T_{set}}\)</div>. <div img="image6403.txt">\({T_{set}}\)</div>is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone heating loads is very small, the setpoint temperature is set to the minimum. <div img="image6404.txt">\({T_{set}}\)</div>will be applied to the node or nodes specified in the SetpointManager:Coldest object input.
+Note that for heating <span>${\dot Q_z} > 0.$</span>The highest <span>${T_{set,z}}$</span>is chosen as <span>${T_{set}}$</span>. <span>${T_{set}}$</span>is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone heating loads is very small, the setpoint temperature is set to the minimum. <span>${T_{set}}$</span>will be applied to the node or nodes specified in the SetpointManager:Coldest object input.
 
 ### Return Air Bypass Flow
 
@@ -2743,11 +2743,11 @@ This temperature is modified to account for any potential fan heat gain:
 
 <div>\[{T_{set,mod}} = {T_{set}} - ({T_{loop,out}} - {T_{mixer,out}})\]</div>
 
-Here <div img="image6406.txt">\({T_{loop,out}}\)</div>is the temperature at the air loop outlet node and <div img="image6407.txt">\({T_{mixer,out}}\)</div> is the temperature at the outlet node of the bypass – nonbypass air mixer. Depending on the system configuration these may be the same node. Then
+Here <span>${T_{loop,out}}$</span>is the temperature at the air loop outlet node and <span>${T_{mixer,out}}$</span> is the temperature at the outlet node of the bypass – nonbypass air mixer. Depending on the system configuration these may be the same node. Then
 
 <div>\[{\dot m_{bypass}} = ({\dot m_{tot}}\cdot {T_{set,mod}} - {\dot m_{nonbypass}}\cdot {T_{nonbypass}})/{T_{bypass}}\]</div>
 
-where <div img="image6409.txt">\({\dot m_{tot}}\)</div>is the total supply air flowrate in kg/s sent to the zones, <div img="image6410.txt">\({\dot m_{nonbypass}}\)</div>is the nonbypassed air flowrate (the conditioned air), <div img="image6411.txt">\({T_{nonbypass}}\)</div>is the corresponding temperature just before mixing with the bypassed air, and <div img="image6412.txt">\({T_{bypass}}\)</div>is the temperature of the bypassed (unconditioned) air. The resulting <div img="image6413.txt">\({\dot m_{bypass}}\)</div> is the mass flow rate setpoint for the bypass air branch.
+where <span>${\dot m_{tot}}$</span>is the total supply air flowrate in kg/s sent to the zones, <span>${\dot m_{nonbypass}}$</span>is the nonbypassed air flowrate (the conditioned air), <span>${T_{nonbypass}}$</span>is the corresponding temperature just before mixing with the bypassed air, and <span>${T_{bypass}}$</span>is the temperature of the bypassed (unconditioned) air. The resulting <span>${\dot m_{bypass}}$</span> is the mass flow rate setpoint for the bypass air branch.
 
 ### Warmest Temp Flow
 
@@ -2763,15 +2763,15 @@ The algorithm loops over all the zones that the system can cool and calculates a
 
 <div>\[{T_{set,z}} = {T_z} + {\raise0.7ex\hbox{${{{\dot Q}_z}}$} \!\mathord{\left/ {\vphantom {{{{\dot Q}_z}} {({C_{p,air}}\cdot {{\dot m}_{z,\max }})}}}\right.}\!\lower0.7ex\hbox{${({C_{p,air}}\cdot {{\dot m}_{z,\max }})}$}}\]</div>
 
-where <div img="image6416.txt">\({\dot m_{z,\min }}\)</div>is the minimum air flow rate to the zone produced by reducing the capacity of the supply fan or by reducing the opening of the damper in the terminal box, if present, and  <div img="image6417.txt">\({\dot m_{z,\max }}\)</div> is the design air flow rate to the zone.
+where <span>${\dot m_{z,\min }}$</span>is the minimum air flow rate to the zone produced by reducing the capacity of the supply fan or by reducing the opening of the damper in the terminal box, if present, and  <span>${\dot m_{z,\max }}$</span> is the design air flow rate to the zone.
 
-Note that for cooling <div img="image6418.txt">\({\dot Q_z} < 0.\)</div> The lowest <div img="image6419.txt">\({T_{set,z}}\)</div>is chosen as <div img="image6420.txt">\({T_{set}}\)</div>. <div img="image6421.txt">\({T_{set}}\)</div>is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the unconstrained value of <div img="image6422.txt">\({T_{set}}\)</div>is less than the minimum setpoint temperature and there are no VAV terminal boxes, the fan capacity is increased so as to meet the zone cooling loads with the constrained value of <div img="image6423.txt">\({T_{set}}\)</div>:
+Note that for cooling <span>${\dot Q_z} < 0.$</span> The lowest <span>${T_{set,z}}$</span>is chosen as <span>${T_{set}}$</span>. <span>${T_{set}}$</span>is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the unconstrained value of <span>${T_{set}}$</span>is less than the minimum setpoint temperature and there are no VAV terminal boxes, the fan capacity is increased so as to meet the zone cooling loads with the constrained value of <span>${T_{set}}$</span>:
 
 
 
 <div>\[{\dot m_{fan}} = \sum\limits_z {{{\dot m}_{z,\min }}}  = \sum\limits_z {{{\dot Q}_z}/[{C_{p,air}} \cdot ({T_{set}} - {T_z})]} \]</div>
 
- This is more likely to occur in the ‘Temp First’ case. If the sum of the zone cooling loads is very small, the setpoint temperature is set to the maximum. <div img="image6425.txt">\({T_{set}}\)</div>will be applied to the node or nodes specified in the SetpointManager:WarmestTemperatureFlow object input.
+ This is more likely to occur in the ‘Temp First’ case. If the sum of the zone cooling loads is very small, the setpoint temperature is set to the maximum. <span>${T_{set}}$</span>will be applied to the node or nodes specified in the SetpointManager:WarmestTemperatureFlow object input.
 
 ### Multizone Heating Average
 
@@ -2779,7 +2779,7 @@ The input object SetpointManager:MultiZone:Heating:Average provides a setpoint m
 
 
 
-IF ( <div img="image6426.txt">\({\dot Q_{zj}}\)</div>&gt; 0 ) THEN
+IF ( <span>${\dot Q_{zj}}$</span>&gt; 0 ) THEN
 
 <div>\[\overline {{T_{SP}}}  = \overline {{T_Z}}  + \left( {\frac{{\sum\limits_{j = 1}^{NumControlZones} {{{\dot Q}_{Zi}}} }}{{\sum\limits_{j = 1}^{NumControlZones} {{{\dot m}_{Zi}}\cdot C{p_j}} }}} \right)\]</div>
 
@@ -2791,23 +2791,23 @@ END IF
 
 where,
 
-<div img="image6429.txt">\({\bar T_{SP}}\)</div>                  = average supply air setpoint temperature (°C)
+<span>${\bar T_{SP}}$</span>                  = average supply air setpoint temperature (°C)
 
-<div img="image6430.txt">\(NumControlZones\)</div>= number of controlled zones (i.e., zones that contain thermostat objects) served by the air loop (-)
+<span>$NumControlZones$</span>= number of controlled zones (i.e., zones that contain thermostat objects) served by the air loop (-)
 
-<div img="image6431.txt">\({\dot Q_{Zj}}\)</div>= sensible heating load required to reach the zone air temperature setpoint for the *j*<sup>th</sup> controlled zone at current time step (W)
+<span>${\dot Q_{Zj}}$</span>= sensible heating load required to reach the zone air temperature setpoint for the *j*<sup>th</sup> controlled zone at current time step (W)
 
-<div img="image6432.txt">\({\dot m_{Zj}}\)</div>= air mass flow rate being supplied by the air loop to the *j*<sup>th</sup> controlled zone, lagged by one HVAC simulation time step (kg/s)
+<span>${\dot m_{Zj}}$</span>= air mass flow rate being supplied by the air loop to the *j*<sup>th</sup> controlled zone, lagged by one HVAC simulation time step (kg/s)
 
-<div img="image6433.txt">\(C{p_j}\)</div>= specific heat of supply air for the j<sup>th</sup> controlled zone (J/kg-K)
+<span>$C{p_j}$</span>= specific heat of supply air for the j<sup>th</sup> controlled zone (J/kg-K)
 
-<div img="image6434.txt">\({T_{Zj}}\)</div>= air node temperature for the *j*<sup>th</sup> controlled zone (°C)
+<span>${T_{Zj}}$</span>= air node temperature for the *j*<sup>th</sup> controlled zone (°C)
 
-<div img="image6435.txt">\({\overline T_Z}\)</div>= average zone air node temperature weighted by the heat capacity rate of the supply air streams for the controlled zones served by the air loop (°C)
+<span>${\overline T_Z}$</span>= average zone air node temperature weighted by the heat capacity rate of the supply air streams for the controlled zones served by the air loop (°C)
 
-<div img="image6436.txt">\(TotZones\)</div>= total number of zones served by the air loop (-)
+<span>$TotZones$</span>= total number of zones served by the air loop (-)
 
-Note that for heating <div img="image6437.txt">\({\dot Q_{Zj}} > 0.\)</div> The average supply air setpoint temperature <div img="image6438.txt">\({\bar T_{SP}}\)</div> is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone sensible heating loads is extremely small (i.e., no heating load), the setpoint temperature is set to the minimum. <div img="image6439.txt">\({\bar T_{SP}}\)</div>will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:Heating:Average object.
+Note that for heating <span>${\dot Q_{Zj}} > 0.$</span> The average supply air setpoint temperature <span>${\bar T_{SP}}$</span> is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone sensible heating loads is extremely small (i.e., no heating load), the setpoint temperature is set to the minimum. <span>${\bar T_{SP}}$</span>will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:Heating:Average object.
 
 ### Multizone Cooling Average
 
@@ -2815,7 +2815,7 @@ The input object SetpointManager:MultiZone:Cooling:Average provides a setpoint m
 
 
 
-IF ( <div img="image6440.txt">\({\dot Q_{zj}}\)</div>&lt; 0 ) THEN
+IF ( <span>${\dot Q_{zj}}$</span>&lt; 0 ) THEN
 
 <div>\[\overline {{T_{SP}}}  = \overline {{T_Z}}  + \left( {\frac{{\sum\limits_{j = 1}^{NumControlZones} {{{\dot Q}_{Zi}}} }}{{\sum\limits_{j = 1}^{NumControlZones} {{{\dot m}_{Zi}}\cdot C{p_j}} }}} \right)\]</div>
 
@@ -2823,13 +2823,13 @@ END IF
 
 <div>\[{\bar T_z} = {{\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j} \bullet {T_{zj}}} \right)} \mathord{\left/ {\vphantom {{\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j} \bullet {T_{zj}}} \right)} {\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j}} \right)}}} \right. } {\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{Zj}} \bullet } C{p_j}} \right)}}\]</div>
 
-Note that for cooling <div img="image6443.txt">\({\dot Q_{Zj}} < 0.\)</div> The average supply air setpoint temperature <div img="image6444.txt">\({\bar T_{SP}}\)</div>is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone sensible cooling loads is extremely small (i.e., no cooling load), the setpoint temperature is set to the maximum. <div img="image6445.txt">\({\bar T_{SP}}\)</div>will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:Cooling:Average object.
+Note that for cooling <span>${\dot Q_{Zj}} < 0.$</span> The average supply air setpoint temperature <span>${\bar T_{SP}}$</span>is constrained to be less than or equal to the maximum setpoint temperature (user input) and greater than or equal to the minimum setpoint temperature (user input). If the sum of the zone sensible cooling loads is extremely small (i.e., no cooling load), the setpoint temperature is set to the maximum. <span>${\bar T_{SP}}$</span>will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:Cooling:Average object.
 
 ### Multizone Minimum Humidity Average
 
 The input object SetpointManager:MultiZone:MinimumHumidity:Average provides a setpoint manager that attempts to establish a supply air minimum humidity ratio setpoint that will meet the humidification load of multiple zones served by an HVAC air loop.  This setpoint manager, used in conjunction with object ZoneControl:Humidistat, detects the air humidity level for all controlled zones served by an air loop (i.e., zones that have a humidistat object with a humidifying setpoint schedule), and uses moisture mass balances to calculate the average supply air minimum humidity ratio setpoint as follows:
 
-IF ( <div img="image6446.txt">\({\dot Q_{lzj}}\)</div>&gt; 0 ) THEN
+IF ( <span>${\dot Q_{lzj}}$</span>&gt; 0 ) THEN
 
 <div>\[{\bar \omega_{SP}} = {\bar \omega_Z} + {{\left( {\sum\limits_{j = 1}^{NumControlZones} {{{\dot Q}_{l,Zj}}} } \right)} \mathord{\left/ {\vphantom {{\left( {\sum\limits_{j = 1}^{NumControlZones} {{{\dot Q}_{l,Zj}}} } \right)} {\left( {\sum\limits_{j = 1}^{NumControlZones} {{{\dot m}_{ZJ}}} } \right)}}} \right. } {\left( {\sum\limits_{j = 1}^{NumControlZones} {{{\dot m}_{ZJ}}} } \right)}}\]</div>
 
@@ -2839,21 +2839,21 @@ END IF
 
 where,
 
-<div img="image6449.txt">\({\bar \omega_{SP}}\)</div>= average supply air minimum humidity ratio setpoint (kg H<sub>2</sub>O/kg air)
+<span>${\bar \omega_{SP}}$</span>= average supply air minimum humidity ratio setpoint (kg H<sub>2</sub>O/kg air)
 
-<div img="image6450.txt">\(NumControlZones\)</div>= number of controlled zones (i.e., zones that contain humidistat objects with humidifying setpoint schedule) served by the air loop (-)
+<span>$NumControlZones$</span>= number of controlled zones (i.e., zones that contain humidistat objects with humidifying setpoint schedule) served by the air loop (-)
 
-<div img="image6451.txt">\({\dot Q_{lZj}}\)</div>= latent (humidification) load required to reach the zone air humidifying setpoint for the *j*<sup>th</sup> controlled zone at current time step (kg H<sub>2</sub>O/s)
+<span>${\dot Q_{lZj}}$</span>= latent (humidification) load required to reach the zone air humidifying setpoint for the *j*<sup>th</sup> controlled zone at current time step (kg H<sub>2</sub>O/s)
 
-<div img="image6452.txt">\({\dot m_{Zj}}\)</div>= air mass flow rate being supplied by the air loop to the *j*<sup>th</sup> controlled zone, lagged by one HVAC simulation time step (kg/s)
+<span>${\dot m_{Zj}}$</span>= air mass flow rate being supplied by the air loop to the *j*<sup>th</sup> controlled zone, lagged by one HVAC simulation time step (kg/s)
 
-<div img="image6453.txt">\({\omega_{Zj}}\)</div>= air node humidity ratio for the jth controlled zone (kg H<sub>2</sub>O/kg air)
+<span>${\omega_{Zj}}$</span>= air node humidity ratio for the jth controlled zone (kg H<sub>2</sub>O/kg air)
 
-<div img="image6454.txt">\({\bar \omega_Z}\)</div>= average zone air node humidity ratio weighted by supply air mass flow rate for the controlled zones served by the air loop (kg H<sub>2</sub>O/kg air)
+<span>${\bar \omega_Z}$</span>= average zone air node humidity ratio weighted by supply air mass flow rate for the controlled zones served by the air loop (kg H<sub>2</sub>O/kg air)
 
-<div img="image6455.txt">\(TotZones\)</div>= total number of zones served by the air loop (-)
+<span>$TotZones$</span>= total number of zones served by the air loop (-)
 
-Note that a positive latent load means humidification is required. The average supply air minimum humidity ratio setpoint <div img="image6456.txt">\({\bar \omega_{SP}}\)</div>is constrained to be less than or equal to the maximum setpoint humidity ratio (user input) and greater than or equal to the minimum setpoint humidity ratio (user input). If the sum of the zone latent humidification loads is extremely small (i.e., no humidification load), the humidity ratio setpoint is set to the minimum. <div img="image6457.txt">\({\bar \omega_{SP}}\)</div>will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:MinimumHumidity:Average object. A humidification component (e.g., an electric humidifier) placed upstream of this node can then use the humidity ratio setpoint to control its moisture addition rate.
+Note that a positive latent load means humidification is required. The average supply air minimum humidity ratio setpoint <span>${\bar \omega_{SP}}$</span>is constrained to be less than or equal to the maximum setpoint humidity ratio (user input) and greater than or equal to the minimum setpoint humidity ratio (user input). If the sum of the zone latent humidification loads is extremely small (i.e., no humidification load), the humidity ratio setpoint is set to the minimum. <span>${\bar \omega_{SP}}$</span>will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:MinimumHumidity:Average object. A humidification component (e.g., an electric humidifier) placed upstream of this node can then use the humidity ratio setpoint to control its moisture addition rate.
 
 All setpoint managers are executed at the beginning of the simulation time step. Therefore, the calculated setpoint is based on the resulting zone air node humidity ratios and supply air mass flow rates for the previous simulation time step.
 
@@ -2861,7 +2861,7 @@ All setpoint managers are executed at the beginning of the simulation time step.
 
 The input object SetpointManager:MultiZone:MaximumHumidity:Average provides a setpoint manager that attempts to establish a supply air maximum humidity ratio setpoint that will meet the dehumidification load of multiple zones served by an HVAC air loop. This setpoint manager, used in conjunction with object ZoneControl:Humidistat, detects the air humidity level for all controlled zones served by an air loop (i.e., zones that have a humidistat object with a dehumidifying setpoint schedule), and uses moisture mass balances to calculate the average supply air maximum humidity ratio as follows:
 
-IF ( <div img="image6458.txt">\({\dot Q_{lzj}}\)</div>&lt; 0 ) THEN
+IF ( <span>${\dot Q_{lzj}}$</span>&lt; 0 ) THEN
 
 <div>\[{\bar \omega_{SP}} = {\bar \omega_Z} + {{\left( {\sum\limits_{j = 1}^{NumControlZones} {{{\dot Q}_{l,Zj}}} } \right)} \mathord{\left/ {\vphantom {{\left( {\sum\limits_{j = 1}^{NumControlZones} {{{\dot Q}_{l,Zj}}} } \right)} {\left( {\sum\limits_{j = 1}^{NumControlZones} {{{\dot m}_{ZJ}}} } \right)}}} \right. } {\left( {\sum\limits_{j = 1}^{NumControlZones} {{{\dot m}_{ZJ}}} } \right)}}\]</div>
 
@@ -2869,13 +2869,13 @@ END IF
 
 <div>\[{\bar \omega_Z}{ =_\,}{{\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{\,Zj}}\cdot {\omega_{Zj}}} } \right)} \mathord{\left/ {\vphantom {{\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{\,Zj}}\cdot {\omega_{Zj}}} } \right)} {\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{\,Zj}}} } \right)}}} \right. } {\left( {\sum\limits_{j = 1}^{TotZones} {{{\dot m}_{\,Zj}}} } \right)}}\]</div>
 
-Note that a negative latent load means dehumidification is required. The average supply air maximum humidity ratio setpoint <div img="image6461.txt">\({\bar \omega_{SP}}\)</div>is constrained to be less than or equal to the maximum setpoint humidity ratio (user input) and greater than or equal to the minimum setpoint humidity ratio (user input). If the sum of the zone latent dehumidification loads is extremely small (i.e., no dehumidification load), the humidity ratio setpoint is set to the maximum. <div img="image6462.txt">\({\bar \omega_{SP}}\)</div>will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:MaximumHumidity:Average object. A dehumidification component (e.g., an desiccant dehumidifier) placed upstream of this node can then use the humidity ratio setpoint to control its moisture removal rate. In the case of a chilled water coil which is used for both temperature and high humidity control, this setpoint manager works in conjunction with a Controller:WaterCoil object to determines the minimum supply air temperature required to meet both the temperature (sensible) and humidity (latent) load in the control zone (ref: Controller:WaterCoil).
+Note that a negative latent load means dehumidification is required. The average supply air maximum humidity ratio setpoint <span>${\bar \omega_{SP}}$</span>is constrained to be less than or equal to the maximum setpoint humidity ratio (user input) and greater than or equal to the minimum setpoint humidity ratio (user input). If the sum of the zone latent dehumidification loads is extremely small (i.e., no dehumidification load), the humidity ratio setpoint is set to the maximum. <span>${\bar \omega_{SP}}$</span>will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:MaximumHumidity:Average object. A dehumidification component (e.g., an desiccant dehumidifier) placed upstream of this node can then use the humidity ratio setpoint to control its moisture removal rate. In the case of a chilled water coil which is used for both temperature and high humidity control, this setpoint manager works in conjunction with a Controller:WaterCoil object to determines the minimum supply air temperature required to meet both the temperature (sensible) and humidity (latent) load in the control zone (ref: Controller:WaterCoil).
 
 ### MultiZone Minimum Humidity Supply Air Reset
 
 The input object SetpointManager:MultiZone:Humidity:Minimum provides a setpoint manager that attempts to establish a supply air minimum humidity ratio setpoint that will meet the humidification load of zone with the critical humidification requirement at each time step served by an HVAC air loop at the zone actual supply air mass flow rate.  This setpoint manager, used in conjunction with object ZoneControl:Humidistat, detects the air humidity level for all controlled zones served by an air loop (i.e., zones that have a humidistat object with a humidifying setpoint schedule), and uses moisture mass balances to calculate the supply air minimum humidity ratio setpoint.  The algorithm loops over all the zones that the system can humidify and calculates the setpoint based on a zone with the highest humidity ratio setpoint requirement as follows:
 
-IF (<div img="image6463.txt">\({\dot Q_{lzj}}\)</div>&gt; 0) THEN
+IF (<span>${\dot Q_{lzj}}$</span>&gt; 0) THEN
 
 <div>\[{\omega_{SP\;Zj}} = {\omega_{Zj}} + {{{{\dot Q}_{lZj}}} \mathord{\left/ {\vphantom {{{{\dot Q}_{lZj}}} {{{\dot m}_{Zj}}}}} \right. } {{{\dot m}_{Zj}}}}\]</div>
 
@@ -2887,27 +2887,27 @@ END IF
 
 where,
 
-<div img="image6467.txt">\({\omega_{SP}}\)</div>= supply air humidity ratio setpoint (kg/kg)
+<span>${\omega_{SP}}$</span>= supply air humidity ratio setpoint (kg/kg)
 
-<div img="image6468.txt">\({\dot Q_{lzj}}\)</div>= latent load required to reach the zone air setpoint for the *j*<sup>th</sup> controlled zone at current time step (kg H<sub>2</sub>O/s)
+<span>${\dot Q_{lzj}}$</span>= latent load required to reach the zone air setpoint for the *j*<sup>th</sup> controlled zone at current time step (kg H<sub>2</sub>O/s)
 
-<div img="image6469.txt">\({\dot m_{Zj}}\)</div>= actual mass flow rate supplied by the air loop to the *j*<sup>th</sup> controlled zone, (kg/s)
+<span>${\dot m_{Zj}}$</span>= actual mass flow rate supplied by the air loop to the *j*<sup>th</sup> controlled zone, (kg/s)
 
-<div img="image6470.txt">\({\omega_{Zj}}\)</div>= air node humidity ratio for the j<sup>th</sup> controlled zone (kg/kg)
+<span>${\omega_{Zj}}$</span>= air node humidity ratio for the j<sup>th</sup> controlled zone (kg/kg)
 
-<div img="image6471.txt">\({\omega_{SP\;Zj}}\)</div>= supply air humidity ratio setpoint for the j<sup>th</sup> controlled zones (kg/kg)
+<span>${\omega_{SP\;Zj}}$</span>= supply air humidity ratio setpoint for the j<sup>th</sup> controlled zones (kg/kg)
 
-<div img="image6472.txt">\({\omega_{SP\;Min}}\)</div>= user-specified supply air minimum humidity ratio setpoint (kg/kg)
+<span>${\omega_{SP\;Min}}$</span>= user-specified supply air minimum humidity ratio setpoint (kg/kg)
 
-<div img="image6473.txt">\({\omega_{SP\;Max}}\)</div>= user-specified supply air maximum humidity ratio setpoint (kg/kg)
+<span>${\omega_{SP\;Max}}$</span>= user-specified supply air maximum humidity ratio setpoint (kg/kg)
 
-Note that a positive latent load means humidification is required. The supply air minimum humidity ratio setpoint <div img="image6474.txt">\({\omega_{SP}}\)</div>is constrained to be less than or equal to the maximum setpoint humidity ratio (user input) and greater than or equal to the minimum setpoint humidity ratio (user input). If the humidification load for all zones in the air loop is extremely small (i.e., no humidification load), the humidity ratio setpoint is set to the user input minimum value. <div img="image6475.txt">\({\omega_{SP}}\)</div>will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:Humidity:Minimum object. A humidification component (e.g., an electric humidifier) placed upstream of this node can then use the humidity ratio setpoint to control its moisture addition rate.
+Note that a positive latent load means humidification is required. The supply air minimum humidity ratio setpoint <span>${\omega_{SP}}$</span>is constrained to be less than or equal to the maximum setpoint humidity ratio (user input) and greater than or equal to the minimum setpoint humidity ratio (user input). If the humidification load for all zones in the air loop is extremely small (i.e., no humidification load), the humidity ratio setpoint is set to the user input minimum value. <span>${\omega_{SP}}$</span>will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:Humidity:Minimum object. A humidification component (e.g., an electric humidifier) placed upstream of this node can then use the humidity ratio setpoint to control its moisture addition rate.
 
 ### MultiZone Maximum Humidity Supply Air Reset
 
 The input object SetpointManager:MultiZone:Humidity:Maximum provides a setpoint manager that attempts to establish a supply air maximum humidity ratio setpoint that will meet the dehumidification load of the zone with the critical dehumidification requirement at each time step served by an HVAC air loop at the zone actual supply air mass flow rate. This setpoint manager, used in conjunction with object ZoneControl:Humidistat, detects the air humidity level for all controlled zones served by an air loop (i.e., zones that have a humidistat object with a dehumidifying setpoint schedule), and uses moisture mass balances to calculate the supply air maximum humidity ratio setpoint.  The algorithm loops over all the zones that the system can dehumidify and calculates the setpoint based on a zone with the lowest humidity ratio setpoint requirement as follows:
 
-IF (<div img="image6476.txt">\({\dot Q_{lzj}}\)</div>&lt; 0) THEN
+IF (<span>${\dot Q_{lzj}}$</span>&lt; 0) THEN
 
 <div>\[{\omega_{SP\;Zj}} = {\omega_{Zj}} + {{{{\dot Q}_{lZj}}} \mathord{\left/ {\vphantom {{{{\dot Q}_{lZj}}} {{{\dot m}_{Zj}}}}} \right. } {{{\dot m}_{Zj}}}}\]</div>
 
@@ -2917,7 +2917,7 @@ END IF
 
 <div>\[{\omega_{SP}} = MIN\left( {{\omega_{SP\;Zj}},\;{\omega_{SP\;Max}}} \right)\]</div>
 
-Note that a negative latent load means dehumidification is required. The supply air maximum humidity ratio setpoint <div img="image6480.txt">\({\omega_{SP}}\)</div>is constrained to be less than or equal to the maximum setpoint humidity ratio (user input) and greater than or equal to the minimum setpoint humidity ratio (user input). If the dehumidification load for all zones in the air loop is extremely small (i.e., no dehumidification load), the humidity ratio setpoint is set to the user input maximum value. <div img="image6481.txt">\({\omega_{SP}}\)</div>will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:Humidity:Maximum object. A dehumidification component (e.g., an desiccant dehumidifier) placed upstream of this node can then use the humidity ratio setpoint to control its moisture removal rate. In the case of a chilled water coil which is used for both temperature and high humidity control, this setpoint manager works in conjunction with a Controller:WaterCoil object to determines the minimum supply air temperature required to meet both the temperature (sensible) and dehumidification (latent) load in the control zone (ref: Controller:WaterCoil).
+Note that a negative latent load means dehumidification is required. The supply air maximum humidity ratio setpoint <span>${\omega_{SP}}$</span>is constrained to be less than or equal to the maximum setpoint humidity ratio (user input) and greater than or equal to the minimum setpoint humidity ratio (user input). If the dehumidification load for all zones in the air loop is extremely small (i.e., no dehumidification load), the humidity ratio setpoint is set to the user input maximum value. <span>${\omega_{SP}}$</span>will be applied to the setpoint node or nodes specified in the SetpointManager:MultiZone:Humidity:Maximum object. A dehumidification component (e.g., an desiccant dehumidifier) placed upstream of this node can then use the humidity ratio setpoint to control its moisture removal rate. In the case of a chilled water coil which is used for both temperature and high humidity control, this setpoint manager works in conjunction with a Controller:WaterCoil object to determines the minimum supply air temperature required to meet both the temperature (sensible) and dehumidification (latent) load in the control zone (ref: Controller:WaterCoil).
 
 ### Follow Outdoor Air Temperature
 
@@ -3244,7 +3244,7 @@ Outlet temperature is calculated using the useful heat gain q as determined by E
 
 where
 
-<div img="image6500.txt">\(\dot m\)</div> = fluid mass flow rate through the collector
+<span>$\dot m$</span> = fluid mass flow rate through the collector
 
 c<sub>p</sub> = specific heat of the working fluid
 
@@ -3314,7 +3314,7 @@ A        = collector gross area, m<sup>2</sup>
 
 *T<sub>wi</sub>*       = Entering makeup or mains water temperature, (°C)
 
-<div img="image6505.txt">\({\dot m_w}{C_w}\)</div>= water capacity flow through the collector, (W/°C)
+<span>${\dot m_w}{C_w}$</span>= water capacity flow through the collector, (W/°C)
 
 The other side condition model boundary condition represented by the *T<sub>osc</sub>*, allows us to apply a realistic outside boundary condition for a collector mounted on a building roof.  This also accounts for the shading impact of the collector on the under-laying surface (roof).  On the other hand if ambient air boundary condition is specified, then the collector does not shade the underlying surface it is mounted on.
 
@@ -3448,7 +3448,7 @@ Where
 
 *T<sub>so</sub>*   = the outside face temperature of the underlying heat transfer surface, (ºC)
 
-<div img="image6532.txt">\({\dot m_{vent}}\)</div>          = air mass flow rate due to natural ventilation, (kg/s)
+<span>${\dot m_{vent}}$</span>          = air mass flow rate due to natural ventilation, (kg/s)
 
 *q<sub>cond</sub>*            = conduction heat flux though the insulation bottom and, (W/m<sup>2</sup>)
 
@@ -3480,7 +3480,7 @@ The Nusselt number for hot surface upward and cold surface facing down is given 
 
 Where,
 
-<div img="image6540.txt">\(\theta \)</div>= angle of inclination of the collector to the vertical, radians
+<span>$\theta $</span>= angle of inclination of the collector to the vertical, radians
 
 *g*    = gravitation force constant, 9.806 (m/s<sup>2</sup>)
 
@@ -3598,7 +3598,7 @@ The transmittance of the cover system with absorption only considered *t*<sub>a<
 
 The reflectance of un-polarized radiation on passing from medium 1 with reflective index *n*<sub>1</sub> to medium 2 with reflective index *n*<sub>2</sub> is given by:
 
- <div img="image6560.txt">\({r_ \bot } = \frac{{{{\sin }^2}\left( {{\theta_2} - {\theta_1}} \right)}}{{{{\sin }^2}\left( {{\theta_2} + {\theta_1}} \right)}}\)</div>
+ <span>${r_ \bot } = \frac{{{{\sin }^2}\left( {{\theta_2} - {\theta_1}} \right)}}{{{{\sin }^2}\left( {{\theta_2} + {\theta_1}} \right)}}$</span>
 
 <div>\[{r_\parallel } = \frac{{{{\tan }^2}\left( {{\theta_2} - {\theta_1}} \right)}}{{{{\tan }^2}\left( {{\theta_2} + {\theta_1}} \right)}}\]</div>
 
@@ -3628,9 +3628,9 @@ where,
 
 *q*<sub>2</sub>    = angle of refraction, degree
 
-<div img="image6564.txt">\({r_ \bot }\)</div>  = parallel component of reflected un-polarized radiation, (-)
+<span>${r_ \bot }$</span>  = parallel component of reflected un-polarized radiation, (-)
 
-<div img="image6565.txt">\({r_\parallel }\)</div>   = perpendicular component of reflected un-polarized radiation, (-)
+<span>${r_\parallel }$</span>   = perpendicular component of reflected un-polarized radiation, (-)
 
 *b*    = slope of the collector, degree
 
@@ -3678,27 +3678,27 @@ When the PVT themal collector is controlled to be “on,” in heating mode, and
 
 where,
 
-<div img="image6571.txt">\({Q_{therm}}\)</div> is the thermal energy collected [W]
+<span>${Q_{therm}}$</span> is the thermal energy collected [W]
 
-<div img="image6572.txt">\({A_{surf}}\)</div> is the net area of the surface [m<sup>2</sup>]
+<span>${A_{surf}}$</span> is the net area of the surface [m<sup>2</sup>]
 
-<div img="image6573.txt">\({f_{activ}}\)</div>is the fraction of surface aire with active PV/T collector, and
+<span>${f_{activ}}$</span>is the fraction of surface aire with active PV/T collector, and
 
-<div img="image6574.txt">\({\eta_{thermal}}\)</div>is the thermal conversion efficiency.
+<span>${\eta_{thermal}}$</span>is the thermal conversion efficiency.
 
 <div>\[{T_{out}} = {T_{in}} + \frac{{{Q_{therm}}}}{{\dot m{c_p}}}\]</div>
 
 where,
 
-<div img="image6576.txt">\({T_{out}}\)</div> is the temperature of the working fluid leaving the PV/T
+<span>${T_{out}}$</span> is the temperature of the working fluid leaving the PV/T
 
-<div img="image6577.txt">\({T_{in}}\)</div> is the temperature of the working fluid entering the PV/T
+<span>${T_{in}}$</span> is the temperature of the working fluid entering the PV/T
 
-<div img="image6578.txt">\(\dot m\)</div> is the entire mass flow of the working fluid through the PV/T
+<span>$\dot m$</span> is the entire mass flow of the working fluid through the PV/T
 
-<div img="image6579.txt">\({c_p}\)</div> is the specific heat of the working fluid.
+<span>${c_p}$</span> is the specific heat of the working fluid.
 
-For air-based systems, the value of <div img="image6580.txt">\({T_{out}}\)</div>is then compared to the temperature setpoint on the outlet node.  If <div img="image6581.txt">\({T_{out}}\)</div> exceeds the desired outlet temperature, <div img="image6582.txt">\({T_{set,out}}\)</div>,then a bypass fraction is calculated to model a modulating bypass damper using:
+For air-based systems, the value of <span>${T_{out}}$</span>is then compared to the temperature setpoint on the outlet node.  If <span>${T_{out}}$</span> exceeds the desired outlet temperature, <span>${T_{set,out}}$</span>,then a bypass fraction is calculated to model a modulating bypass damper using:
 
 <div>\[{f_{bypass}} = \frac{{\left( {{T_{set,out}} - {T_{out}}} \right)}}{{\left( {{T_{in}} - {T_{out}}} \right)}}\]</div>
 
@@ -3708,15 +3708,15 @@ When the PVT themal collector is controlled to be “on,” in cooling mode, and
 
 Where,
 
-<div img="image6585.txt">\({\dot Q_{LWR}}\)</div> is the net rate of long wavelength (thermal) radiation exchange with the air, night sky, and ground.  See the section “External Longwave Radiation” in the Outside Surface Heat Balance, for full discussion of how this modeled in EnergyPlus using linearized radiation coefficients.
+<span>${\dot Q_{LWR}}$</span> is the net rate of long wavelength (thermal) radiation exchange with the air, night sky, and ground.  See the section “External Longwave Radiation” in the Outside Surface Heat Balance, for full discussion of how this modeled in EnergyPlus using linearized radiation coefficients.
 
-<div img="image6586.txt">\({\dot Q_{conv}}\)</div> is the net rate of convective flux exchange with outdoor air. See the section “Exterior/External Convection” in the Outside Surface Heat Balance, for full discussion of how this modeled in EnergyPlus.  The surface roughness is assumed to be “very smooth.”
+<span>${\dot Q_{conv}}$</span> is the net rate of convective flux exchange with outdoor air. See the section “Exterior/External Convection” in the Outside Surface Heat Balance, for full discussion of how this modeled in EnergyPlus.  The surface roughness is assumed to be “very smooth.”
 
-The simple model assumes that the effective collector temperature, <div img="image6587.txt">\({T_{col}}\)</div>, is the average of the working fluid inlet and outlet temperatures so that we can make the following substitution:
+The simple model assumes that the effective collector temperature, <span>${T_{col}}$</span>, is the average of the working fluid inlet and outlet temperatures so that we can make the following substitution:
 
 <div>\[{T_{out}} = 2{T_{col}} - {T_{in}}\]</div>
 
-Substituting and solving for <div img="image6589.txt">\({T_{col}}\)</div> we obtain the following model for collector temperatures during a (possible) cooling process :
+Substituting and solving for <span>${T_{col}}$</span> we obtain the following model for collector temperatures during a (possible) cooling process :
 
 <div>\[{T_{col}} = \frac{{2\dot m{c_p}{T_{in}} + {A_{surf}}{f_{activ}}\left( {{h_{r,gnd}}{T_{gnd}} + {h_{r,sky}}{T_{sky}} + {h_{r,air}}{T_{air}} + {h_{c,ext}}{T_{air}}} \right)}}{{2\dot m{c_p} + {A_{surf}}{f_{activ}}\left( {{h_{r,gnd}} + {h_{r,sky}} + {h_{r,air}} + {h_{c,ext}}} \right)}}\]</div>
 
@@ -3738,7 +3738,7 @@ In EnergyPlus, an unglazed transpired solar collector (UTSC) is modeled as a spe
 
 #### Heat Exchanger Effectiveness
 
-The perforated absorber plate is treated as a heat exchanger and modeled using a traditional effectiveness formulation.  The heat exchanger effectiveness, <div img="image6591.txt">\({\varepsilon_{HX}}\)</div>, is determined from correlations derived from small-scale experiments.  Two correlations available in the literature are implemented in EnergyPlus.  The first is based on research by Kutscher at the National Renewable Energy Laboratory. The second is based on the research by Van Decker, Hollands, and Brunger at the University of Waterloo.  Because both correlations are considered valid, the choice of which correlation to use is left to the user.
+The perforated absorber plate is treated as a heat exchanger and modeled using a traditional effectiveness formulation.  The heat exchanger effectiveness, <span>${\varepsilon_{HX}}$</span>, is determined from correlations derived from small-scale experiments.  Two correlations available in the literature are implemented in EnergyPlus.  The first is based on research by Kutscher at the National Renewable Energy Laboratory. The second is based on the research by Van Decker, Hollands, and Brunger at the University of Waterloo.  Because both correlations are considered valid, the choice of which correlation to use is left to the user.
 
 
 
@@ -3750,11 +3750,11 @@ Kutscher’s (1994) correlation encompasses surface convection between the colle
 
 where,
 
-      <div img="image6593.txt">\({V_h}\)</div> is the velocity through the holes [m/s]
+      <span>${V_h}$</span> is the velocity through the holes [m/s]
 
-      <div img="image6594.txt">\(D\)</div> is the hole diameter [m]
+      <span>$D$</span> is the hole diameter [m]
 
-      <div img="image6595.txt">\(\nu \)</div> is the kinematic viscosity of air  [m<sup>2</sup>/s]
+      <span>$\nu $</span> is the kinematic viscosity of air  [m<sup>2</sup>/s]
 
 The correlation is a function of Reynolds number, hole geometry, the free stream air velocity, and velocity through the holes:
 
@@ -3762,15 +3762,15 @@ The correlation is a function of Reynolds number, hole geometry, the free stream
 
 where,
 
-      <div img="image6597.txt">\(P\)</div> is the pitch, or distance between holes, [m],
+      <span>$P$</span> is the pitch, or distance between holes, [m],
 
-      <div img="image6598.txt">\(D\)</div> is the diameter of the holes, [m],
+      <span>$D$</span> is the diameter of the holes, [m],
 
-      <div img="image6599.txt">\(\sigma \)</div> is the porosity, or area fraction of the holes, [dimensionless],
+      <span>$\sigma $</span> is the porosity, or area fraction of the holes, [dimensionless],
 
-      <div img="image6600.txt">\({V_h}\)</div> is the mean velocity of air passing through the holes, [m/s],
+      <span>${V_h}$</span> is the mean velocity of air passing through the holes, [m/s],
 
-      <div img="image6601.txt">\({U_\infty }\)</div> is the free stream velocity (local wind speed) [m/s].
+      <span>${U_\infty }$</span> is the free stream velocity (local wind speed) [m/s].
 
 The Nusselt number is formulated as:
 
@@ -3778,15 +3778,15 @@ The Nusselt number is formulated as:
 
 where,
 
-      <div img="image6603.txt">\(U\)</div>is the overall heat transfer coefficient based on log mean temperature difference, [W/m<sup>2</sup>·K], and
+      <span>$U$</span>is the overall heat transfer coefficient based on log mean temperature difference, [W/m<sup>2</sup>·K], and
 
-      <div img="image6604.txt">\(k\)</div> is the thermal conductivity of air [W/m·K].
+      <span>$k$</span> is the thermal conductivity of air [W/m·K].
 
 The heat exchanger effectiveness is:
 
 <div>\[{\varepsilon_{HX}} = 1 - {e^{\left[ { - \frac{{U\,A}}{{\dot m\,{c_p}}}} \right]}}\]</div>
 
-Kutscher’s relation was formulated for triangular hole layout, but based on Van Decker et al. (2001) we allow using the correlation for square hole layout and scale <div img="image6606.txt">\(P\)</div> by a factor of 1.6.
+Kutscher’s relation was formulated for triangular hole layout, but based on Van Decker et al. (2001) we allow using the correlation for square hole layout and scale <span>$P$</span> by a factor of 1.6.
 
 #### Van Decker, Hollands, and Brunger Correlation
 
@@ -3796,15 +3796,15 @@ Van Decker et. al. extended Kutscher’s measurements to include a wider range o
 
 where,
 
-      <div img="image6608.txt">\({{\mathop{\rm Re}\nolimits}_s} = \frac{{{V_s}P}}{v}\)</div>
+      <span>${{\mathop{\rm Re}\nolimits}_s} = \frac{{{V_s}P}}{v}$</span>
 
-      <div img="image6609.txt">\({{\mathop{\rm Re}\nolimits}_w} = \frac{{{U_\infty }P}}{v}\)</div>
+      <span>${{\mathop{\rm Re}\nolimits}_w} = \frac{{{U_\infty }P}}{v}$</span>
 
-      <div img="image6610.txt">\({{\mathop{\rm Re}\nolimits}_b} = \frac{{{V_h}P}}{v}\)</div>
+      <span>${{\mathop{\rm Re}\nolimits}_b} = \frac{{{V_h}P}}{v}$</span>
 
-      <div img="image6611.txt">\({V_s}\)</div> is the average suction velocity across the front face of the collector [m/s]
+      <span>${V_s}$</span> is the average suction velocity across the front face of the collector [m/s]
 
-      <div img="image6612.txt">\(t\)</div> is the collector plate thickness
+      <span>$t$</span> is the collector plate thickness
 
 
 
@@ -3816,19 +3816,19 @@ Using either of the correlations above allows determining the heat exchanger eff
 
 where,
 
-      <div img="image6614.txt">\({T_{{\rm{a,HX}}}}\)</div> is the temperature of the air leaving the collector and entering the plenum [ºC]
+      <span>${T_{{\rm{a,HX}}}}$</span> is the temperature of the air leaving the collector and entering the plenum [ºC]
 
-      <div img="image6615.txt">\({T_{s,coll}}\)</div> is the temperature of the collector’s absorber plate, [ºC], and
+      <span>${T_{s,coll}}$</span> is the temperature of the collector’s absorber plate, [ºC], and
 
-      <div img="image6616.txt">\({T_{amb}}\)</div> is the temperature of the ambient outdoor air [ºC].
+      <span>${T_{amb}}$</span> is the temperature of the ambient outdoor air [ºC].
 
-By rewriting equation to solve for <div img="image6617.txt">\({T_{{\rm{a,HX}}}}\)</div> we see that the temperature of the heated outdoor air entering the plenum can be determined once the collector surface temperature is known,
+By rewriting equation to solve for <span>${T_{{\rm{a,HX}}}}$</span> we see that the temperature of the heated outdoor air entering the plenum can be determined once the collector surface temperature is known,
 
 <div>\[{T_{a,HX}} = {\varepsilon_{HX}}{T_{s,coll}} + \left( {1 - {\varepsilon_{HX}}} \right){T_{amb}}\]</div>
 
 #### Collector Heat Balance
 
-The collector is assumed to be sufficiently thin and high-conductivity so that it can be modeled using a single temperature (for both sides and along its area).  This temperature <div img="image6619.txt">\({T_{s,coll}}\)</div>is determined by formulating a heat balance on a control volume that just encapsulates the collector surface.  The heat balances are formulated separately for active and passive modes and are diagrammed in the following figure.
+The collector is assumed to be sufficiently thin and high-conductivity so that it can be modeled using a single temperature (for both sides and along its area).  This temperature <span>${T_{s,coll}}$</span>is determined by formulating a heat balance on a control volume that just encapsulates the collector surface.  The heat balances are formulated separately for active and passive modes and are diagrammed in the following figure.
 
 Observe that for the passive case, we do not use the heat exchanger relations to directly model the interaction of ventilating air with the collector.  This is because these relations are considered to not apply when the UTSC is in passive mode.  They were developed for uni-directional flow (rather than the balanced-in-and-out flow expected from natural forces) and for specific ranges of suction face velocity.  Therefore, this heat transfer mechanism is handled using classical surface convection models (as if the collector was not perforated).  (Air exchanges are modeled as ventilation in the plenum air heat balance but do not interact with the hole edges in the collector surface.)
 
@@ -3842,17 +3842,17 @@ When the UTSC is active, the heat balance on the collector surface control volum
 
 where:
 
-<sub><div img="image6622.txt">\({q''_{\alpha sol}}\)</div> </sub>is absorbed direct and diffuse solar (short wavelength) radiation heat flux.
+<sub><span>${q''_{\alpha sol}}$</span> </sub>is absorbed direct and diffuse solar (short wavelength) radiation heat flux.
 
-<div img="image6623.txt">\({q''_{LWR,Env}}\)</div> is net long wavelength (thermal) radiation flux exchange with the air and surroundings.
+<span>${q''_{LWR,Env}}$</span> is net long wavelength (thermal) radiation flux exchange with the air and surroundings.
 
-<div img="image6624.txt">\({q''_{conv,wind}}\)</div> is surface convection flux exchange with outdoor air under high wind and rain conditions.  Note that this term is usually assumed to be zero in UTSC model development but we add the term to allow for deteriorated performance of the UTSC under poor conditions.
+<span>${q''_{conv,wind}}$</span> is surface convection flux exchange with outdoor air under high wind and rain conditions.  Note that this term is usually assumed to be zero in UTSC model development but we add the term to allow for deteriorated performance of the UTSC under poor conditions.
 
-<sub><div img="image6625.txt">\({q''_{HX}}\)</div> </sub> is heat exchanger flux from collector to incoming outdoor air.
+<sub><span>${q''_{HX}}$</span> </sub> is heat exchanger flux from collector to incoming outdoor air.
 
-<sub><div img="image6626.txt">\({q''_{LWR,plen}}\)</div> </sub>is net long wavelength (thermal) radiation flux exchange with the outside face of the underlying surface(s).
+<sub><span>${q''_{LWR,plen}}$</span> </sub>is net long wavelength (thermal) radiation flux exchange with the outside face of the underlying surface(s).
 
-<div img="image6627.txt">\({q''_{source}}\)</div> is a source/sink term that accounts for energy exported out of the control volume when the collecter’s absorber plate is a hybrid device such as a photovoltaic panel.
+<span>${q''_{source}}$</span> is a source/sink term that accounts for energy exported out of the control volume when the collecter’s absorber plate is a hybrid device such as a photovoltaic panel.
 
 While the heat balance on the passive collector surface control volume is:
 
@@ -3860,37 +3860,37 @@ While the heat balance on the passive collector surface control volume is:
 
 where:
 
-<sub><div img="image6629.txt">\({q''_{conv,Env}}\)</div> </sub>= surface convection flux exchange with outdoor air.
+<sub><span>${q''_{conv,Env}}$</span> </sub>= surface convection flux exchange with outdoor air.
 
-<sub><div img="image6630.txt">\({q''_{conv,plen}}\)</div> </sub>= surface convection flux exchange with plenum air.
+<sub><span>${q''_{conv,plen}}$</span> </sub>= surface convection flux exchange with plenum air.
 
 All terms are positive for net flux to the collector except the heat exchanger term, which is taken to be positive in the direction from collector to incoming air stream.  Each of these heat balance components is introduced briefly below.
 
 #### External SW Radiation
 
-<sub><div img="image6631.txt">\({q''_{\alpha sol}}\)</div> </sub> is calculated using procedures presented elsewhere in this manual and includes both direct and diffuse incident solar radiation absorbed by the surface face.  This is influenced by location, surface facing angle and tilt, shading surfaces, surface face material properties, weather conditions, etc.
+<sub><span>${q''_{\alpha sol}}$</span> </sub> is calculated using procedures presented elsewhere in this manual and includes both direct and diffuse incident solar radiation absorbed by the surface face.  This is influenced by location, surface facing angle and tilt, shading surfaces, surface face material properties, weather conditions, etc.
 
 #### External LW Radiation
 
-<div img="image6632.txt">\({q''_{LWR,Env}}\)</div> is a standard radiation exchange formulation between the surface, the sky, the ground, and the atmosphere.  The radiation heat flux is calculated from the surface absorptivity, surface temperature, sky, air, and ground temperatures, and sky and ground view factors.  Radiation is modeled using linearized coefficients.
+<span>${q''_{LWR,Env}}$</span> is a standard radiation exchange formulation between the surface, the sky, the ground, and the atmosphere.  The radiation heat flux is calculated from the surface absorptivity, surface temperature, sky, air, and ground temperatures, and sky and ground view factors.  Radiation is modeled using linearized coefficients.
 
 #### External Convection
 
-<sub><div img="image6633.txt">\({q''_{conv,Env}}\)</div> </sub>is modeled using the classical formulation: <div img="image6634.txt">\({q''_{conv}}\)</div> <sub> </sub>= h<sub>co</sub>(T<sub>air</sub> - T<sub>o</sub>) where h<sub>co</sub>, is the convection coefficient.  This coefficient will differ depending on whether or not the UTSC is active or passive.  When the UTSC is passive, h<sub>co</sub> is treated in the same way as an outside face with ExteriorEnvironment conditions.  When the UTSC is active, the special suction airflow situation of a transpired collector during operation means that h<sub>co</sub> is often zero because the suction situation can eliminate mass transport away from the collector.  However when the winds are high, the strong turbulence and highly varying pressures can cause the suction flow situation to breakdown.  Therefore, we include the <div img="image6635.txt">\({q''_{conv,wind}}\)</div> term in the heat balance and use a special coefficient <div img="image6636.txt">\({h_{c,wind}}\)</div> to model this lost heat transfer.  In addition, when it is raining outside, we assume the collector gets wet and model the enhanced surface heat transfer using a large value for <div img="image6637.txt">\({h_{c,wind}}\)</div>.
+<sub><span>${q''_{conv,Env}}$</span> </sub>is modeled using the classical formulation: <span>${q''_{conv}}$</span> <sub> </sub>= h<sub>co</sub>(T<sub>air</sub> - T<sub>o</sub>) where h<sub>co</sub>, is the convection coefficient.  This coefficient will differ depending on whether or not the UTSC is active or passive.  When the UTSC is passive, h<sub>co</sub> is treated in the same way as an outside face with ExteriorEnvironment conditions.  When the UTSC is active, the special suction airflow situation of a transpired collector during operation means that h<sub>co</sub> is often zero because the suction situation can eliminate mass transport away from the collector.  However when the winds are high, the strong turbulence and highly varying pressures can cause the suction flow situation to breakdown.  Therefore, we include the <span>${q''_{conv,wind}}$</span> term in the heat balance and use a special coefficient <span>${h_{c,wind}}$</span> to model this lost heat transfer.  In addition, when it is raining outside, we assume the collector gets wet and model the enhanced surface heat transfer using a large value for <span>${h_{c,wind}}$</span>.
 
 #### Heat Exchanger
 
-<sub><div img="image6638.txt">\({q''_{HX}}\)</div> </sub>is modeled using the classical formulation <div img="image6639.txt">\({q''_{HX}} = \frac{{\dot m{c_p}({T_{a,HX}} - {T_{amb}})}}{A}\)</div><sub> </sub>where <div img="image6640.txt">\({T_{{\rm{a,HX}}}}\)</div> is determined using correlations described above.  When the UTSC is active, the air mass flow is determined from the operation of the outdoor air mixer component.  When the UTSC is off, this term is zero.
+<sub><span>${q''_{HX}}$</span> </sub>is modeled using the classical formulation <span>${q''_{HX}} = \frac{{\dot m{c_p}({T_{a,HX}} - {T_{amb}})}}{A}$</span><sub> </sub>where <span>${T_{{\rm{a,HX}}}}$</span> is determined using correlations described above.  When the UTSC is active, the air mass flow is determined from the operation of the outdoor air mixer component.  When the UTSC is off, this term is zero.
 
 #### Plenum LW Radation
 
-<div img="image6641.txt">\({q''_{LWR,plen}}\)</div>is a standard radiation exchange formulation between the collector surface and the underlying heat transfer surface located across the plenum.  Radiation is modeled using linearized coefficients.
+<span>${q''_{LWR,plen}}$</span>is a standard radiation exchange formulation between the collector surface and the underlying heat transfer surface located across the plenum.  Radiation is modeled using linearized coefficients.
 
 #### Plenum Convection
 
-<sub><div img="image6642.txt">\({q''_{conv,plen}}\)</div> </sub>is modeled using the classical formulation: <div img="image6643.txt">\({q''_{conv}}\)</div> <sub> </sub>= h<sub>cp</sub>(T<sub>air</sub> - T<sub>o</sub>) where h<sub>cp</sub>, is the convection coefficient.  This coefficient is taken as zero when the UTSC is operating because of the suction airflow situation.  When the UTSC is off, the value for h<sub>cp</sub> is obtained from correlations used for window gaps from ISO (2003) standard 15099.
+<sub><span>${q''_{conv,plen}}$</span> </sub>is modeled using the classical formulation: <span>${q''_{conv}}$</span> <sub> </sub>= h<sub>cp</sub>(T<sub>air</sub> - T<sub>o</sub>) where h<sub>cp</sub>, is the convection coefficient.  This coefficient is taken as zero when the UTSC is operating because of the suction airflow situation.  When the UTSC is off, the value for h<sub>cp</sub> is obtained from correlations used for window gaps from ISO (2003) standard 15099.
 
-Substituting models into and solving for <div img="image6644.txt">\({T_{s,coll}}\)</div> yields the following equation when the UTSC is active (“on”):
+Substituting models into and solving for <span>${T_{s,coll}}$</span> yields the following equation when the UTSC is active (“on”):
 
 
 
@@ -3902,43 +3902,43 @@ and substituting into yields the following equation when the UTSC is passive (�
 
 where,
 
-      <div img="image6647.txt">\({I_s}\)</div> is the incident solar radiation of all types [W/m<sup>2</sup>],
+      <span>${I_s}$</span> is the incident solar radiation of all types [W/m<sup>2</sup>],
 
-      <div img="image6648.txt">\(\alpha \)</div> is the solar absorptivity of the collector [dimensionless],
+      <span>$\alpha $</span> is the solar absorptivity of the collector [dimensionless],
 
-      <div img="image6649.txt">\({h_{r,atm}}\)</div>is the linearized radiation coefficient for the surrounding atmosphere [W/m<sup>2</sup>·K],
+      <span>${h_{r,atm}}$</span>is the linearized radiation coefficient for the surrounding atmosphere [W/m<sup>2</sup>·K],
 
-      <div img="image6650.txt">\({T_{amb}}\)</div> is the outdoor drybulb from the weather data, also assumed for ground surface [ºC],
+      <span>${T_{amb}}$</span> is the outdoor drybulb from the weather data, also assumed for ground surface [ºC],
 
-      <div img="image6651.txt">\({h_{r,sky}}\)</div> is the linearized radiation coefficient for the sky [W/m<sup>2</sup>·K],
+      <span>${h_{r,sky}}$</span> is the linearized radiation coefficient for the sky [W/m<sup>2</sup>·K],
 
-      <div img="image6652.txt">\({T_{sky}}\)</div> is the effective sky temperature [ºC],
+      <span>${T_{sky}}$</span> is the effective sky temperature [ºC],
 
-      <div img="image6653.txt">\({h_{r,gnd}}\)</div> is the linearized radiation coefficient for the ground [W/m<sup>2</sup>·K],
+      <span>${h_{r,gnd}}$</span> is the linearized radiation coefficient for the ground [W/m<sup>2</sup>·K],
 
-      <div img="image6654.txt">\({h_{r,plen}}\)</div> is the linearized radiation coefficient for the underlying surface [W/m<sup>2</sup>·K],
+      <span>${h_{r,plen}}$</span> is the linearized radiation coefficient for the underlying surface [W/m<sup>2</sup>·K],
 
-      <div img="image6655.txt">\({h_{c,wind}}\)</div> is the convection coefficient for the outdoor environment when the UTSC is active and winds are high or it is raining [W/m<sup>2</sup>·K],
+      <span>${h_{c,wind}}$</span> is the convection coefficient for the outdoor environment when the UTSC is active and winds are high or it is raining [W/m<sup>2</sup>·K],
 
-      <div img="image6656.txt">\({T_{so}}\)</div> is the temperature of the outside face of the underlying heat transfer surface [ºC],
+      <span>${T_{so}}$</span> is the temperature of the outside face of the underlying heat transfer surface [ºC],
 
-      <div img="image6657.txt">\(\dot m\)</div> is the air mass flow rate when in active mode [kg/s],
+      <span>$\dot m$</span> is the air mass flow rate when in active mode [kg/s],
 
-      <div img="image6658.txt">\({c_p}\)</div> is the specific heat of air at constant pressure [J/kg·K],
+      <span>${c_p}$</span> is the specific heat of air at constant pressure [J/kg·K],
 
-      <div img="image6659.txt">\(A\)</div> is the area of the collector [m<sup>2</sup>],
+      <span>$A$</span> is the area of the collector [m<sup>2</sup>],
 
-      <div img="image6660.txt">\({h_{co}}\)</div> is the convection coefficient for the outdoor environment [W/m<sup>2</sup>·K],
+      <span>${h_{co}}$</span> is the convection coefficient for the outdoor environment [W/m<sup>2</sup>·K],
 
-      <div img="image6661.txt">\({h_{c,plen}}\)</div> is the convection coefficient for the surfaces facing the plenum [W/m<sup>2</sup>·K], and
+      <span>${h_{c,plen}}$</span> is the convection coefficient for the surfaces facing the plenum [W/m<sup>2</sup>·K], and
 
-      <div img="image6662.txt">\({T_{a,plen}}\)</div> is the air drybulb for air in the plenum and entering the outdoor air system [ºC].
+      <span>${T_{a,plen}}$</span> is the air drybulb for air in the plenum and entering the outdoor air system [ºC].
 
 
 
 #### Plenum Heat Balance
 
-The *plenum* is the volume of air located between the collector and the underlying heat transfer surface.  The plenum air is modeled as well-mixed.  The uniform temperature of the plenum air, <div img="image6663.txt">\({T_{a,plen}}\)</div>, is determined by formulating a heat balance on a control volume of air as diagrammed below.
+The *plenum* is the volume of air located between the collector and the underlying heat transfer surface.  The plenum air is modeled as well-mixed.  The uniform temperature of the plenum air, <span>${T_{a,plen}}$</span>, is determined by formulating a heat balance on a control volume of air as diagrammed below.
 
 Note that we have formulated the control volumes with slight differences for the active and passive cases.  For the active case, the suction air situation and heat exchanger effectiveness formulations dictate that the collector surface control volume encompass part of the air adjacent to both the front and back surfaces of the collector.  However for the passive case, the collector surface control volume has no air in it and the plenum air control volume extends all the way to the surface of the collector. 
 
@@ -3956,9 +3956,9 @@ When the UTSC is active, the heat balance on the plenum air control volume is:
 
 where,
 
-<div img="image6666.txt">\({\dot Q_{air}}\)</div>is the net rate of energy added by suction air convecting through the control volume.
+<span>${\dot Q_{air}}$</span>is the net rate of energy added by suction air convecting through the control volume.
 
-<sub><div img="image6667.txt">\({\dot Q_{co}}\)</div> </sub> is the net rate of energy added by surface convection heat transfer with the underlying surface.
+<sub><span>${\dot Q_{co}}$</span> </sub> is the net rate of energy added by surface convection heat transfer with the underlying surface.
 
 
 
@@ -3968,13 +3968,13 @@ When the UTSC is passive, the heat balance on the plenum air control volume is:
 
 where,
 
-      <div img="image6669.txt">\({\dot Q_{vent}}\)</div> is the net rate of energy added from infiltration – where outdoor ambient air exchanges with the plenum air.
+      <span>${\dot Q_{vent}}$</span> is the net rate of energy added from infiltration – where outdoor ambient air exchanges with the plenum air.
 
-      <div img="image6670.txt">\({\dot Q_{c,coll}}\)</div>is the net rate of energy added by surface convection heat transfer with the collector.
+      <span>${\dot Q_{c,coll}}$</span>is the net rate of energy added by surface convection heat transfer with the collector.
 
 
 
-Substituting into and solving for <div img="image6671.txt">\({T_{a,plen}}\)</div> yields the following equation for when the UTSC is active:
+Substituting into and solving for <span>${T_{a,plen}}$</span> yields the following equation for when the UTSC is active:
 
 <div>\[{T_{a,plen}} = \frac{{\left( {\dot m{c_p}{T_{a,HX}} + {h_{c,plen}}A\,{T_{so}}} \right)}}{{\left( {\dot m{c_p} + {h_{c,plen}}A} \right)}}\]</div>
 
@@ -3984,9 +3984,9 @@ And substituting into yields the following equation when the UTSC is passive:
 
 where,
 
-      <div img="image6674.txt">\({\dot m_{vent}}\)</div> is the air mass flow from natural forces [kg/s]
+      <span>${\dot m_{vent}}$</span> is the air mass flow from natural forces [kg/s]
 
-The literature on UTSC does not appear to address the passive mode of operation and no models for <div img="image6675.txt">\({\dot m_{vent}}\)</div> have been identified.  Nevertheless, natural buoyancy and wind forces are expected to drive air exchange between the plenum and ambient and some method of modeling <div img="image6676.txt">\({\dot m_{vent}}\)</div> is needed.  Reasoning that the configuration is similar to single-side natural ventilation, we elect to use correlations for natural ventilation presented in Chapter 26. of ASHRAE HOF (2001).
+The literature on UTSC does not appear to address the passive mode of operation and no models for <span>${\dot m_{vent}}$</span> have been identified.  Nevertheless, natural buoyancy and wind forces are expected to drive air exchange between the plenum and ambient and some method of modeling <span>${\dot m_{vent}}$</span> is needed.  Reasoning that the configuration is similar to single-side natural ventilation, we elect to use correlations for natural ventilation presented in Chapter 26. of ASHRAE HOF (2001).
 
 
 
@@ -3994,35 +3994,35 @@ The literature on UTSC does not appear to address the passive mode of operation 
 
 where,
 
-      <div img="image6678.txt">\(\rho \)</div> is the density of air [kg/m<sup>3</sup>], and
+      <span>$\rho $</span> is the density of air [kg/m<sup>3</sup>], and
 
-      <div img="image6679.txt">\({{\rm{\rlap{--} \dot V}}_{{\rm{tot}}}} = {{\rm{\rlap{--} \dot V}}_{{\rm{wind}}}} + \,{{\rm{\rlap{--} \dot V}}_{{\rm{thermal}}}}\)</div> is the total volumetric flow rate of air ventilating in and out of the plenum.
+      <span>${{\rm{\rlap{--} \dot V}}_{{\rm{tot}}}} = {{\rm{\rlap{--} \dot V}}_{{\rm{wind}}}} + \,{{\rm{\rlap{--} \dot V}}_{{\rm{thermal}}}}$</span> is the total volumetric flow rate of air ventilating in and out of the plenum.
 
 
 
 <div>\[{{\rm{\rlap{--} \dot V}}_{{\rm{wind}}}} = {C_v}{A_{in}}{U_\infty }\]</div>
 
-<div img="image6681.txt">\({{\rm{\rlap{--} \dot V}}_{{\rm{thermal}}}} = {C_D}{A_{in}}\sqrt {2g\Delta {H_{NPL}}\left( {{T_{a,plen}} - {T_{amb}}} \right)/{T_{a,plen}}} \)</div>  (if <div img="image6682.txt">\({T_{a,plen}} > {T_{amb}}\)</div>)
+<span>${{\rm{\rlap{--} \dot V}}_{{\rm{thermal}}}} = {C_D}{A_{in}}\sqrt {2g\Delta {H_{NPL}}\left( {{T_{a,plen}} - {T_{amb}}} \right)/{T_{a,plen}}} $</span>  (if <span>${T_{a,plen}} > {T_{amb}}$</span>)
 
-<div img="image6683.txt">\({{\rm{\rlap{--} \dot V}}_{{\rm{thermal}}}} = {C_D}{A_{in}}\sqrt {2g\Delta {H_{NPL}}\left( {{T_{amb}} - {T_{a,plen}}} \right)/{T_{amb}}} \)</div>  (if <div img="image6684.txt">\({T_{amb}} > {T_{a,plen}}\)</div> and UTSC vertical)
+<span>${{\rm{\rlap{--} \dot V}}_{{\rm{thermal}}}} = {C_D}{A_{in}}\sqrt {2g\Delta {H_{NPL}}\left( {{T_{amb}} - {T_{a,plen}}} \right)/{T_{amb}}} $</span>  (if <span>${T_{amb}} > {T_{a,plen}}$</span> and UTSC vertical)
 
-<div img="image6685.txt">\({C_v}\)</div> is the effectiveness of the openings that depends on opening geometry and the orientation with respect to the wind.  ASHRAE HoF (2001) indicates values ranging from 0.25 to 0.6.  In the UTSC model, this value is available for user input and defaulted to 0.25.
+<span>${C_v}$</span> is the effectiveness of the openings that depends on opening geometry and the orientation with respect to the wind.  ASHRAE HoF (2001) indicates values ranging from 0.25 to 0.6.  In the UTSC model, this value is available for user input and defaulted to 0.25.
 
-<div img="image6686.txt">\({C_D}\)</div> is the discharge coefficient for the opening and depends on opening geometry.  In the UTSC model, this value is available for user input and defaulted to 0.65.
+<span>${C_D}$</span> is the discharge coefficient for the opening and depends on opening geometry.  In the UTSC model, this value is available for user input and defaulted to 0.65.
 
 Mass continuity arguments lead to modeling the area of the openings as one half of the total area of the holes, so we have:
 
 <div>\[{A_{in}} = \frac{{A\,\sigma }}{2}\]</div>
 
-<div img="image6688.txt">\(g\)</div> is the gravitational constant taken as 9.81 [m/s<sup>2</sup>].
+<span>$g$</span> is the gravitational constant taken as 9.81 [m/s<sup>2</sup>].
 
-<div img="image6689.txt">\(\Delta {H_{NPL}}\)</div> is the height from midpoint of lower opening to the Neutral Pressure Level.  This is taken as one-fourth the overall height of the UTSC if it is mounted vertically.  For tilted collectors, the nominal height is modified by the sine of the tilt.  If the UTSC is mounted horizontally (e.g. on the roof) then the <div img="image6690.txt">\(\Delta {H_{NPL}}\)</div> is taken as the gap thickness of the plenum.
+<span>$\Delta {H_{NPL}}$</span> is the height from midpoint of lower opening to the Neutral Pressure Level.  This is taken as one-fourth the overall height of the UTSC if it is mounted vertically.  For tilted collectors, the nominal height is modified by the sine of the tilt.  If the UTSC is mounted horizontally (e.g. on the roof) then the <span>$\Delta {H_{NPL}}$</span> is taken as the gap thickness of the plenum.
 
-If the UTSC is horizontal and <div img="image6691.txt">\({T_{amb}} > {T_{a,plen}}\)</div> then <div img="image6692.txt">\({{\rm{\rlap{--} \dot V}}_{{\rm{thermal}}}}{\rm{  =  0}}\)</div> because this is a stable situation.
+If the UTSC is horizontal and <span>${T_{amb}} > {T_{a,plen}}$</span> then <span>${{\rm{\rlap{--} \dot V}}_{{\rm{thermal}}}}{\rm{  =  0}}$</span> because this is a stable situation.
 
 #### Underlying Heat Transfer Surface
 
-The UTSC is applied to the outside of a heat transfer surface.  This surface is modeled using the usual EnergyPlus methods for handling heat capacity and transients – typically the CTF method.  These native EnergyPlus Heat Balance routines are used to calculate <div img="image6693.txt">\({T_{so}}\)</div>.  The UTSC model is coupled to the underlying surface using the OtherSideConditionsModel mechanism.  The UTSC model provides values for <div img="image6694.txt">\({h_{r,plen}}\)</div>,<div img="image6695.txt">\({T_{s,coll}}\)</div>, <div img="image6696.txt">\({h_{c,plen}}\)</div>, and <div img="image6697.txt">\({T_{a,plen}}\)</div> for use with the Heat Balance Model calculations for the outside face of the underlying surface (described elsewhere in this manual).
+The UTSC is applied to the outside of a heat transfer surface.  This surface is modeled using the usual EnergyPlus methods for handling heat capacity and transients – typically the CTF method.  These native EnergyPlus Heat Balance routines are used to calculate <span>${T_{so}}$</span>.  The UTSC model is coupled to the underlying surface using the OtherSideConditionsModel mechanism.  The UTSC model provides values for <span>${h_{r,plen}}$</span>,<span>${T_{s,coll}}$</span>, <span>${h_{c,plen}}$</span>, and <span>${T_{a,plen}}$</span> for use with the Heat Balance Model calculations for the outside face of the underlying surface (described elsewhere in this manual).
 
 
 
@@ -4097,27 +4097,27 @@ UTSC modeling requires calculating up to three different coefficients for surfac
 
 <div>\[{h_c} = \frac{{{T_{air}} - {T_{surf}}}}{{{{q''}_{conv}}}}\]</div>
 
-First, <div img="image6700.txt">\({h_{co}}\)</div> is the convection coefficient for the collector surface facing the outdoors when the UTSC is passive.  It is modeled in exactly the same way as elsewhere in EnergyPlus and will depend on the user setting for Outside Convection Algorithm – Outside Surface Heat Balance entry elsewhere in this document.
+First, <span>${h_{co}}$</span> is the convection coefficient for the collector surface facing the outdoors when the UTSC is passive.  It is modeled in exactly the same way as elsewhere in EnergyPlus and will depend on the user setting for Outside Convection Algorithm – Outside Surface Heat Balance entry elsewhere in this document.
 
 
 
-Second, <div img="image6701.txt">\({h_{c,plen}}\)</div> is the convection coefficient for surfaces facing the plenum.  This coefficient is applied to just the underlying surface’s convection when the UTSC is active and to both the collector and the underlying surface when the UTSC is passive.  When the UTSC is active, we use the convection correlation for forced air developed by McAdams (1954) as published by ASHRAE HoF (2001):
+Second, <span>${h_{c,plen}}$</span> is the convection coefficient for surfaces facing the plenum.  This coefficient is applied to just the underlying surface’s convection when the UTSC is active and to both the collector and the underlying surface when the UTSC is passive.  When the UTSC is active, we use the convection correlation for forced air developed by McAdams (1954) as published by ASHRAE HoF (2001):
 
 <div>\[{h_{c,plen}} = 5.62 + 3.9{V_p}\]</div>
 
 where,
 
-      <div img="image6703.txt">\({V_p}\)</div> is the mean velocity in the plenum determined from <div img="image6704.txt">\({V_p} = \frac{{\dot m}}{{2\rho \,{A_p}}}\)</div> where <div img="image6705.txt">\({A_p}\)</div> is the effective cross section area of the plenum perpendicular to the primary flow direction.  When the UTSC is passive, we model the convection in the same way used in EnergyPlus to model air gaps in windows.  These correlations vary by Rayleigh number and surface tilt and are based on the work of various research including Hollands et. al., Elsherbiny et. al., Wright, and Arnold.  The formulations are documented in ISO (2003) standard 15099.  For the UTSC implementation, the routines were adapted from Subroutine NusseltNumber in WindowManager.f90 (by F. Winkelmann), which itself was derived from Window5 subroutine “nusselt”.
+      <span>${V_p}$</span> is the mean velocity in the plenum determined from <span>${V_p} = \frac{{\dot m}}{{2\rho \,{A_p}}}$</span> where <span>${A_p}$</span> is the effective cross section area of the plenum perpendicular to the primary flow direction.  When the UTSC is passive, we model the convection in the same way used in EnergyPlus to model air gaps in windows.  These correlations vary by Rayleigh number and surface tilt and are based on the work of various research including Hollands et. al., Elsherbiny et. al., Wright, and Arnold.  The formulations are documented in ISO (2003) standard 15099.  For the UTSC implementation, the routines were adapted from Subroutine NusseltNumber in WindowManager.f90 (by F. Winkelmann), which itself was derived from Window5 subroutine “nusselt”.
 
-Third, <div img="image6706.txt">\({h_{c,wind}}\)</div> is the convection coefficient used to degrade the UTSC performance under environmental conditions with high wind or rain.  If the weather file indicates it is raining, then we set <div img="image6707.txt">\({h_{c,wind}}\)</div> = 1000.0 which has the effect of making the collector the same temperature as ambient air.  The heat exchanger effectiveness correlations described above account for a moderate amount of wind, but the correlations appear confined to the range 0 to 5.0 m/s.  Therefore we set <div img="image6708.txt">\({h_{c,wind}}\)</div> equal to zero if <div img="image6709.txt">\({U_\infty }\)</div> is &lt;= 5.0 m/s.  If <div img="image6710.txt">\({U_\infty }\)</div> is &gt; 5.0 m/s then we use the McAdams correlation but with a reduced velocity magnitude:
+Third, <span>${h_{c,wind}}$</span> is the convection coefficient used to degrade the UTSC performance under environmental conditions with high wind or rain.  If the weather file indicates it is raining, then we set <span>${h_{c,wind}}$</span> = 1000.0 which has the effect of making the collector the same temperature as ambient air.  The heat exchanger effectiveness correlations described above account for a moderate amount of wind, but the correlations appear confined to the range 0 to 5.0 m/s.  Therefore we set <span>${h_{c,wind}}$</span> equal to zero if <span>${U_\infty }$</span> is &lt;= 5.0 m/s.  If <span>${U_\infty }$</span> is &gt; 5.0 m/s then we use the McAdams correlation but with a reduced velocity magnitude:
 
-<div img="image6711.txt">\(\)</div><div img="image6712.txt">\({h_{c,wind}} = 5.62 + 3.9({U_\infty } - 5.0)\)</div>
+<span>$$</span><span>${h_{c,wind}} = 5.62 + 3.9({U_\infty } - 5.0)$</span>
 
 #### Radiation Coefficients
 
 UTSC modeling requires calculating up to four different linearized coefficients for radiation heat transfer.  Whereas radiation calculations usually use temperature raised to the fourth power, this greatly complicates solving heat balance equations for a single temperature.  Linearized radiation coefficients have the same units and are used in the same manner as surface convection coefficients and introduce very little error for the temperature levels involved.
 
-The radiation coefficient, <div img="image6713.txt">\({h_{r,plen}}\)</div>, is used to model thermal radiation between the collector surface and the outside face of the underlying heat transfer surface.  We assume a view factor of unity.  It is calculated using:
+The radiation coefficient, <span>${h_{r,plen}}$</span>, is used to model thermal radiation between the collector surface and the outside face of the underlying heat transfer surface.  We assume a view factor of unity.  It is calculated using:
 
 <div>\[{h_{r,plen}} = {\sigma_{SB}}{e_{coll}}{e_{so}}\frac{{\left( {T_{s,coll}^4 - T_{so}^4} \right)}}{{\left( {{T_{s,coll}} - {T_{so}}} \right)}}\]</div>
 
@@ -4125,13 +4125,13 @@ where,
 
       all temperatures are converted to Kelvin,
 
-      <div img="image6715.txt">\({\sigma_{SB}}\)</div> is the Stefan-Boltzmann constant,
+      <span>${\sigma_{SB}}$</span> is the Stefan-Boltzmann constant,
 
-      <div img="image6716.txt">\({e_{coll}}\)</div> is the longwave thermal emmittance of the collector, and
+      <span>${e_{coll}}$</span> is the longwave thermal emmittance of the collector, and
 
-      <div img="image6717.txt">\({e_{so}}\)</div> is the longwave thermal emmittance of the underlying heat transfer surface.
+      <span>${e_{so}}$</span> is the longwave thermal emmittance of the underlying heat transfer surface.
 
-The three other coefficients, <div img="image6718.txt">\({h_{r,atm}}\)</div>, <div img="image6719.txt">\({h_{r,sky}}\)</div>, and <div img="image6720.txt">\({h_{r,gnd}}\)</div> are used elsewhere in EnergyPlus for the outside face surface heat balance and are calculated in the same manner as equation for UTSC collectors.  [This is accomplished by calling subroutine InitExteriorConvectionCoeffs in the file HeatBalanceConvectionCoeffs.f90. ]
+The three other coefficients, <span>${h_{r,atm}}$</span>, <span>${h_{r,sky}}$</span>, and <span>${h_{r,gnd}}$</span> are used elsewhere in EnergyPlus for the outside face surface heat balance and are calculated in the same manner as equation for UTSC collectors.  [This is accomplished by calling subroutine InitExteriorConvectionCoeffs in the file HeatBalanceConvectionCoeffs.f90. ]
 
 #### Bypass Control
 
@@ -4149,11 +4149,11 @@ The overall thermal efficiency of the UTSC is a useful output report and is defi
 
 where
 
-<div img="image6722.txt">\(\dot Q\)</div> is useful heat gain
+<span>$\dot Q$</span> is useful heat gain
 
-<div img="image6723.txt">\({I_{sc}}\)</div> is total incident solar radiation
+<span>${I_{sc}}$</span> is total incident solar radiation
 
-Note that the efficiency <div img="image6724.txt">\(\eta \)</div> is only defined for <div img="image6725.txt">\({I_{solar}} > 0\)</div>.  This efficiency includes heat recovered from the underlying wall and can exceed 1.0.
+Note that the efficiency <span>$\eta $</span> is only defined for <span>${I_{solar}} > 0$</span>.  This efficiency includes heat recovered from the underlying wall and can exceed 1.0.
 
 #### Collector Efficiency
 
@@ -4161,7 +4161,7 @@ The thermal efficiency of the collector is a useful output report and is defined
 
 <div>\[\eta  = \frac{{\dot m\,{c_p}\left( {{T_{a,HX}} - {T_{amb}}} \right)}}{{{I_{sc}}A}}\]</div>
 
-Note that the efficiency <div img="image6727.txt">\(\eta \)</div> is only defined for <div img="image6728.txt">\({I_{solar}} > 0\)</div>
+Note that the efficiency <span>$\eta $</span> is only defined for <span>${I_{solar}} > 0$</span>
 
 #### References
 
@@ -4214,7 +4214,7 @@ The input object AvailabilityManager:NightCycle is to specify when a system that
 
 ·        Cycling run time in seconds; used to calculate a stop time (in time steps since the start of the current run period) once the status has become *Cycle On*.
 
-If the fan schedule current value is &gt; 0 or the applicability schedule value is <div img="image6729.txt">\( \le \)</div> 0 or if the program is in warmup, *AvailStatus = NoAction*.
+If the fan schedule current value is &gt; 0 or the applicability schedule value is <span>$ \le $</span> 0 or if the program is in warmup, *AvailStatus = NoAction*.
 
 Otherwise,
 
@@ -4248,7 +4248,7 @@ The input object AvailabilityManager:NightVentilation is a manager that looks at
 
 ·        The name of the control zone.
 
-If the fan schedule current value is &gt; 0 or the applicability schedule value is <div img="image6730.txt">\( \le \)</div> 0 or if the program is in warmup, *AvailStatus = NoAction*.
+If the fan schedule current value is &gt; 0 or the applicability schedule value is <span>$ \le $</span> 0 or if the program is in warmup, *AvailStatus = NoAction*.
 
 Otherwise, the manager performs 3 limit checks.
 

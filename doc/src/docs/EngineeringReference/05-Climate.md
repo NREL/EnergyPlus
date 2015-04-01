@@ -259,7 +259,7 @@ The model requires air mass, m, calculated as follows --
 
 <div>\[m = {1 \mathord{\left/ {\vphantom {1 {\left[ {\sin \beta  + 0.50572 \cdot {{\left( {6.07995 + \beta } \right)}^{ - 1.6364}}} \right]}}} \right. } {\left[ {\sin \beta  + 0.50572 \cdot {{\left( {6.07995 + \beta } \right)}^{ - 1.6364}}} \right]}}\]</div>
 
-where <div img="image570.txt">\(\beta \)</div> = solar altitude, degrees.
+where <span>$\beta $</span> = solar altitude, degrees.
 
 Direct and diffuse irradiance are determined with the following relationships,
 
@@ -269,21 +269,21 @@ Direct and diffuse irradiance are determined with the following relationships,
 
 where:
 
-<div img="image573.txt">\({E_b}\)</div> = beam normal irradiance, W/m<sup>2</sup>
+<span>${E_b}$</span> = beam normal irradiance, W/m<sup>2</sup>
 
-<div img="image574.txt">\({E_d}\)</div> = diffuse horizontal irradiance,
+<span>${E_d}$</span> = diffuse horizontal irradiance,
 
-<div img="image575.txt">\({E_o}\)</div> = extraterrestrial normal irradiance,
+<span>${E_o}$</span> = extraterrestrial normal irradiance,
 
-*<div img="image576.txt">\(m\)</div>* = air mass
+*<span>$m$</span>* = air mass
 
 t<sub>b</sub> and t<sub>d</sub> = beam and diffuse optical depths (from ASHRAE climatic design data)
 
-<div img="image577.txt">\(ab\)</div> and <div img="image578.txt">\(ad\)</div> = beam and diffuse air mass exponents (see below)
+<span>$ab$</span> and <span>$ad$</span> = beam and diffuse air mass exponents (see below)
 
 Values of t<sub>b</sub> and t<sub>d</sub> are location-specific and vary during the year. They embody the dependence of clear sky solar radiation upon local conditions, such as elevation, precipitable water content, and aerosols.
 
-The air mass exponents <div img="image579.txt">\(ab\)</div> and <div img="image580.txt">\(ad\)</div> were correlated to t<sub>b</sub> and t<sub>d</sub> through the following empirical relationships:
+The air mass exponents <span>$ab$</span> and <span>$ad$</span> were correlated to t<sub>b</sub> and t<sub>d</sub> through the following empirical relationships:
 
 <div>\[ab = 1.219 - 0.043 \cdot {\tau_b} - 0.151 \cdot {\tau_d} - 0.204 \cdot {\tau_b} \cdot {\tau_d}\]</div>
 
@@ -307,13 +307,13 @@ h=solar altitude angle, i.e, the angle between the horizontal and the line to th
 
 CC = cloud cover
 
-<div img="image584.txt">\(\varphi \)</div> = relative humidity, %
+<span>$\varphi $</span> = relative humidity, %
 
-<div img="image585.txt">\({T_n},{T_{n - 3}}\)</div> = dry-bulb temperature at hours n (current) and n-3, respectively
+<span>${T_n},{T_{n - 3}}$</span> = dry-bulb temperature at hours n (current) and n-3, respectively
 
-<div img="image586.txt">\({V_w}\)</div> = Wind speed, m/s
+<span>${V_w}$</span> = Wind speed, m/s
 
-<div img="image587.txt">\({c_0},{c_1},{c_2},{c_3},{c_4},{c_5},d,k\)</div> = regression coefficients
+<span>${c_0},{c_1},{c_2},{c_3},{c_4},{c_5},d,k$</span> = regression coefficients
 
 The constants were determined by analysis from measured data and are as follows:
 
@@ -995,7 +995,7 @@ The cosine of the angle of incidence of the sun's rays on the surface are given 
 
 <div>\[\cos \theta  = C{S_1}\cdot C{W_1} + C{S_2}\cdot C{W_2} + C{S_3}\cdot C{W_3}\]</div>
 
-If <div img="image627.txt">\(\cos \theta \)</div> is less than zero, the sun is behind the surface.
+If <span>$\cos \theta $</span> is less than zero, the sun is behind the surface.
 
 A shadow is projected from the vertices of the shadowing polygon (SP) along the direction of the sun's rays to the plane of the shadow receiving polygon (RP).  If any vertices of the SP are below the plane of the RP (z &lt; 0), a false shadow is cast as in Figure 42.  The "submerged" portion of the SP must be clipped off before projection.
 
@@ -1270,7 +1270,7 @@ where
 
 *A<sub>i</sub>* = surface area [m<sup>2</sup>]
 
-<div img="image649.txt">\({\alpha_i}\)</div>= inside solar absorptance for an opaque surface, or, for a window, = back diffuse transmittance plus back diffuse system absorptance of glass layers and shading device layers (if present)
+<span>${\alpha_i}$</span>= inside solar absorptance for an opaque surface, or, for a window, = back diffuse transmittance plus back diffuse system absorptance of glass layers and shading device layers (if present)
 
 Solving this equation for *QS* gives:
 
@@ -1282,7 +1282,7 @@ where
 
 *Q<sub>sw</sub>* is given by
 
- <div img="image652.txt">\(\begin{array}{l}Q{S_{SW}} = QD(ZoneNum) + \\\{\rm{             }}ZoneIntGain(ZoneNum)\% QLTSW + \\\{\rm{             }}ZoneIntGain(ZoneNum)\% T\_QLTSW{\rm{    [W]}}\end{array}\)</div>
+ <span>$\begin{array}{l}Q{S_{SW}} = QD(ZoneNum) + \\\{\rm{             }}ZoneIntGain(ZoneNum)\% QLTSW + \\\{\rm{             }}ZoneIntGain(ZoneNum)\% T\_QLTSW{\rm{    [W]}}\end{array}$</span>
 
 where
 
@@ -1366,7 +1366,7 @@ The inside beam solar irradiance factor[[4]](#_ftn4) in is given by:
 
 
 
-<div img="image658.txt">\(AISurf(SurfNum) = \frac{{AbsIntSurf(SurfNum)}}{{A(SurfNum)}}\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}*Aoverla{p_i}(SurfNum)*CosIn{c_i}} \)</div>where
+<span>$AISurf(SurfNum) = \frac{{AbsIntSurf(SurfNum)}}{{A(SurfNum)}}\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}*Aoverla{p_i}(SurfNum)*CosIn{c_i}} $</span>where
 
 *i* = exterior window number
 
@@ -1388,11 +1388,11 @@ The interior short-wave radiation absorbed by layer *l* (glass, shade or blind) 
 
 
 
-<div img="image659.txt">\(\begin{array}{l}QS(ZoneNum)*\alpha_{l,back}^{dif}(SurfNum) + \\BeamSolarRad*\frac{{\alpha_{l,back}^{beam}(SurfNum)}}{{A(SurfNum)}}\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}*Aoverla{p_i}(SurfNum)} *CosIn{c_i}{\rm{  [W/}}{{\rm{m}}^{\rm{2}}}]\end{array}\)</div>where
+<span>$\begin{array}{l}QS(ZoneNum)*\alpha_{l,back}^{dif}(SurfNum) + \\BeamSolarRad*\frac{{\alpha_{l,back}^{beam}(SurfNum)}}{{A(SurfNum)}}\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}*Aoverla{p_i}(SurfNum)} *CosIn{c_i}{\rm{  [W/}}{{\rm{m}}^{\rm{2}}}]\end{array}$</span>where
 
-<div img="image660.txt">\(\alpha_{l,back}^{dif}\)</div>= the system diffuse solar absorptance of layer* l* for irradiance from the back side
+<span>$\alpha_{l,back}^{dif}$</span>= the system diffuse solar absorptance of layer* l* for irradiance from the back side
 
-<div img="image661.txt">\(\alpha_{l,back}^{beam}\)</div>= the system beam solar absorptance of layer* l* for irradiance from the back side
+<span>$\alpha_{l,back}^{beam}$</span>= the system beam solar absorptance of layer* l* for irradiance from the back side
 
 *A(SurfNum)*= glazing area [m<sup>2</sup>]
 
@@ -1408,7 +1408,7 @@ The interior diffuse short-wave radiation transmitted by an interior window to t
 
 where
 
-<div img="image663.txt">\({\tau ^{dif}}(SurfNum)\)</div>= diffuse transmittance of the interior window
+<span>${\tau ^{dif}}(SurfNum)$</span>= diffuse transmittance of the interior window
 
 ##### Interior Beam Radiation Transmitted by Interior Windows
 
@@ -1416,7 +1416,7 @@ The interior beam solar radiation transmitted by an interior window to the adjac
 
 <div>\[BeamSolarRad*{\tau ^{beam}}(SurfNum)\sum\limits_{i = 1}^{{N_{extwin}}} {TB{m_i}*Aoverla{p_i}(SurfNum)*CosIn{c_i}{\rm{    [W}}]} \]</div>
 
-where <div img="image665.txt">\({\tau ^{beam}}(SurfNum)\)</div>is the beam-to-beam transmittance of the interior window at the angle of incidence of beam solar from the exterior window on the interior window. The program does not track where this radiation falls in the adjacent zone: it is counted as diffuse radiation in that zone. Therefore,
+where <span>${\tau ^{beam}}(SurfNum)$</span>is the beam-to-beam transmittance of the interior window at the angle of incidence of beam solar from the exterior window on the interior window. The program does not track where this radiation falls in the adjacent zone: it is counted as diffuse radiation in that zone. Therefore,
 
 <div>\[QS(ZoneNum) \to QS(ZoneNum) + [{\rm{beam solar from adjacent zones]}}*VMULT(ZoneNum)\]</div>
 
