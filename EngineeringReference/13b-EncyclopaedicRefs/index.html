@@ -242,7 +242,7 @@
           <div class="bs-docs-sidebar hidden-print affix well" role="complementary">
   <ul class="nav">
   
-    <li class="main active"><a href="#simulation-models-encyclopedic-reference">Simulation Models – Encyclopedic Reference</a>
+    <li class="main active"><a href="#simulation-models-encyclopedic-reference">Simulation Models - Encyclopedic Reference</a>
       <ul class="nav">
         
         <li><a href="#simple-ice-storage-model">Simple Ice Storage Model</a></li>
@@ -627,6 +627,16 @@
         
         <li><a href="#references_11">References</a></li>
         
+        <li><a href="#secondary-coils-of-dx-systems-and-heat-pumps">Secondary Coils of DX Systems and Heat Pumps</a></li>
+        
+        <li><a href="#overview_16">Overview</a></li>
+        
+        <li><a href="#model-description_13">Model Description:</a></li>
+        
+        <li><a href="#sensible-heat-ratio-calculation">Sensible Heat Ratio Calculation</a></li>
+        
+        <li><a href="#sensible-and-latent-split">Sensible and Latent Split</a></li>
+        
       </ul>
     </li>
   
@@ -639,7 +649,7 @@
     <li class="main"><a href="#control-valve-for-water-based-air-system-coils">Control Valve for Water-Based Air System Coils</a>
       <ul class="nav">
         
-        <li><a href="#model-description_13">Model Description</a></li>
+        <li><a href="#model-description_14">Model Description</a></li>
         
       </ul>
     </li>
@@ -679,9 +689,9 @@
     <li class="main"><a href="#hot-water-baseboard-heater-with-only-convection">Hot Water Baseboard Heater with Only Convection</a>
       <ul class="nav">
         
-        <li><a href="#overview_16">Overview</a></li>
+        <li><a href="#overview_17">Overview</a></li>
         
-        <li><a href="#model-description_14">Model Description</a></li>
+        <li><a href="#model-description_15">Model Description</a></li>
         
         <li><a href="#convective-water-baseboard-heater-inputs">Convective Water Baseboard Heater Inputs</a></li>
         
@@ -695,9 +705,9 @@
     <li class="main"><a href="#electric-baseboard-heater-with-only-convection">Electric Baseboard Heater with Only Convection</a>
       <ul class="nav">
         
-        <li><a href="#overview_17">Overview</a></li>
+        <li><a href="#overview_18">Overview</a></li>
         
-        <li><a href="#model-description_15">Model Description</a></li>
+        <li><a href="#model-description_16">Model Description</a></li>
         
         <li><a href="#convective-electric-baseboard-heater-inputs">Convective Electric Baseboard Heater Inputs</a></li>
         
@@ -711,9 +721,9 @@
     <li class="main"><a href="#hot-water-baseboard-heater-with-radiation-and-convection">Hot Water Baseboard Heater with Radiation and Convection</a>
       <ul class="nav">
         
-        <li><a href="#overview_18">Overview</a></li>
+        <li><a href="#overview_19">Overview</a></li>
         
-        <li><a href="#model-description_16">Model Description</a></li>
+        <li><a href="#model-description_17">Model Description</a></li>
         
         <li><a href="#water-baseboard-heater-inputs">Water Baseboard Heater Inputs</a></li>
         
@@ -727,9 +737,9 @@
     <li class="main"><a href="#electric-baseboard-heater-with-radiation-and-convection">Electric Baseboard Heater with Radiation and Convection</a>
       <ul class="nav">
         
-        <li><a href="#overview_19">Overview</a></li>
+        <li><a href="#overview_20">Overview</a></li>
         
-        <li><a href="#model-description_17">Model Description</a></li>
+        <li><a href="#model-description_18">Model Description</a></li>
         
         <li><a href="#steam-baseboard-heater-with-radiation-and-convection">Steam Baseboard Heater with Radiation and Convection</a></li>
         
@@ -743,7 +753,7 @@
 </div>
         </div>
         <div class="col-md-9" role="main">
-          <h1 id="simulation-models-encyclopedic-reference">Simulation Models – Encyclopedic Reference</h1>
+          <h1 id="simulation-models-encyclopedic-reference">Simulation Models - Encyclopedic Reference</h1>
 <p>The following descriptions are grouped alphabetically (as much as possible) with some also having additional tags of “Heat Balance”, “HVAC”, and “Plant”.  With the integrated solution, these designations signify where the effects of these models have their first impacts.</p>
 <p>Main Sections:</p>
 <ul>
@@ -5034,8 +5044,88 @@
 <h4 id="references_11">References</h4>
 <p>Keith C. Rice, 2011, DOE/ORNL Heat Pump Design Model:</p>
 <p>S.A. Klein 2011, User Manual of Engineering Equation Solver V8</p>
+<h4 id="secondary-coils-of-dx-systems-and-heat-pumps">Secondary Coils of DX Systems and Heat Pumps</h4>
+<h4 id="overview_16">Overview</h4>
+<p>Secondary coils reject to or remove heat from a secondary zone. Secondary coil refers to a condenser of a DX system or a heat pump in cooling operating mode or an evaporator of a heat pump in heating mode. The secondary coil (e.g. condenser) of DX system or heat pumps is commonly installed outdoor but when installed indoor either heat is dumped to or extracted from the secondary zone. A secondary zone is a conditioned or unconditioned zone where the secondary coil is installed. Secondary coils are not standalone DX coil objects but they are add-on features on existing DX coil objects. A secondary DX coil is modelled by specifying additional inputs in single speed and multi speed DX coil objects: The additional inputs allow us to model the heat rejected or extracted by the secondary coil while the primary coil serves another controlled zone as shown in <a href="#SchematicDXCoil">Figure</a>.  A secondary coil is not controlled directly but responds to the requirements of the primary DX coil. The operating mode of a secondary DX coil is determined by the primary DX coil serving the conditioned zone. If the primary DX coil is in cooling mode, then the secondary coil is rejecting heat (heating mode) to the secondary zone, or else if the  primary DX coil is in heating mode, then the secondary coil is extracting heat (cooling mode) from the secondary zone. Heat rejected to a secondary zone by a condenser of a DX system or a heat pump is considered as sensible only. Whereas energy extracted from a secondary zone may contain sensible and latent components. The condenser type of the primary DX coils should be AirCooled. There is no need to specify the condenser air inlet node. The model uses zone air node as the secondary coil air inlet node. Air drawn by the secondary coil fan passes through the secondary coil and dumped back into the secondary zone. The previous time step zone condition is used as an inlet condition to the current time for the secondary DX coil model.</p>
+<p><img alt="SchematicDXCoil" src="../../EngineeringReference/media/image8002.png" /><a name="SchematicDXCoil"></a></p>
+<p>Figure: Schematic of DX System in cooling operating mode</p>
+<p>The heat rejected or extracted by the secondary DX coil is estimated from the delivered capacity and electric power input of the primary DX coils. And the rejected or extracted heat is treated as internal gain of the secondary zone. Currently secondary DX coil are allowed in single speed, two speed and multi speed DX coil objects: <em>Coil:Cooling:DX:SingleSpeed</em>, <em>Coil:Heating:DX:SingleSpeed</em>, <em>Coil:Cooling:DX:TwoSpeed</em>, <em>Coil:Cooling:DX:MultiSpeed</em>, and <em>Coil:Heating:DX:MultiSpeed</em>.</p>
+<h4 id="model-description_13">Model Description:</h4>
+<p>The secondary coil performance calculation is invoked using inputs in the DX coil objects.  The input required for cooling and heating operation of the primary DX coils are different. In the DX cooling coils the only required input is the zone name where the secondary coil is installed. In heating DX coils six inputs are required for single speed coils and a minimum of 11 input fields are required for multispeed DX heating coils.  And five more inputs are required for every additional compressor speed. The extensible five input fields are used for splitting the total heat extraction rate into sensible and latent components. These five input fields are: rated sensible heat ratio, secondary air flow rates, scaling factor for auto-sizing secondary air flow rates, sensible heat ratio modifier curves as a function of temperature and sensible heat ratio modifier curves as a function of secondary air flow fraction. The secondary coil model assumes that liquid water from defrosting operation is drained to the outdoor and has no impact on the zone air heat balance. </p>
+<p><strong>Cooling Operating Mode:</strong> the primary DX cooling coil of a DX system serving a primary zone is on and heat is rejected by the secondary coil (condenser) into a secondary zone. The secondary zone name is specified in DX cooling coil objects.  This operating mode applies to a DX cooling system and cooling operating mode of air-to-air single and multi-speed heat pumps. The heat rejected by the secondary coil (condenser) of a DX system or heat pump operating in cooling mode is given by:</p>
+<div>\[Q_\rm{cond}=Q_\rm{Evap}+P_\rm{CompCondFan}\]</div>
+
+<p>where</p>
+<ul>
+<li>(Q_\rm{Evap}) is the cooling load delivered by the primary DX cooling coil system, W </li>
+<li>(P_\rm{CompCondFan}) is the compressor and evaporator fan electric power input of a heat pump in heating mode, W</li>
+<li>(Q_\rm{cond}) is the heat rejected by the secondary coil (condenser) of a DX system or heat pump, W</li>
+</ul>
+<p>Heat rejected by a secondary coil (condenser) calculated at each time step becomes internal gain of the secondary zone as shown in <a href="#SchematicDXAndSecondary">Figure</a>. Whenever a secondary zone name is specified in DX cooling coil objects, the secondary DX coil model calculation is invoked.  New input field required as add-on to the DX cooling coil objects is "<em>Zone Name for Secondary Coil (condenser) Placement</em>".</p>
+<p><img alt="SchematicDXAndSecondary" src="../../EngineeringReference/media/image8003.png" /><a name="SchematicDXCoil"></a></p>
+<p>Figure: Schematic of DX system and secondary coil (condenser)</p>
+<p><strong>Heating Operating Mode:</strong> When a heat pump operates in heating mode then energy is extracted from the secondary zone.  The total energy extracted is estimated by rearranging the equation above as follows:</p>
+<div>\[Q_\text{Evap} = Q_\text{cond} - P_\text{CompCondFan}\]</div>
+
+<p>where</p>
+<ul>
+<li>(Q_\text{cond}) is the heat delivered by the primary heating DX coil to the primary zone, W</li>
+<li>(P_\text{CompCondFan}) is the compressor and condenser fan electric power input of a DX system or heat pump in cooling mode, W</li>
+<li>(Q_\text{Evap}) is the energy extracted by secondary coil (evaporator) from the secondary zone, W</li>
+</ul>
+<p>The total energy extracted from a secondary zone may contain sensible and latent components.  The secondary coil model checks for the coil inlet and full load outlet air condition to determine whether dehumidification will occur. The sensible and latent split of the energy extracted is done using a user specified rated sensible heat ratio (SHR) and SHR modifier curves for temperature and the secondary air flow fraction.  If the secondary coil operation is dry, then the SHR is set to 1.0.  In addition, the model assumes that defrosting operation is on, then the defrosting melts the frost and the liquid water from the collecting pan is drained to outside. Thus defrosting energy is not included in the zone energy balance. The heat extracted from the secondary zone may contain sensible and latent components and the secondary coil model does the sensible/latent heat split calculation.</p>
+<h4 id="sensible-heat-ratio-calculation">Sensible Heat Ratio Calculation</h4>
+<p>The SHR calculation method uses user specified SHR modifying curves for temperature and flow fraction.  The modifying curves correct the rated SHR value for a given secondary DX coil (evaporator) entering air temperatures and air mass flow fraction for a given speed. If these SHR modifying curves are not specified a constant SHR will be assumed.  These two curves are a biquadratic SHR modifier curve for temperature (SHRFT), and a quadratic SHR correction curve for flow fraction (SHRFFF). The SHR is given by:</p>
+<div>\[SHR = SHR_\text{rated}\cdot SHRFT\left(T_\text{wb,secondaryZone},T_\text{db,primaryCoil}\right)\cdot SHRFFF(FF)\]</div>
+
+<p>where</p>
+<ul>
+<li>(SHRFT) is the sensible heat ratio modifier normalized biquadratic curve as a function of secondary DX coil entering air wet-bulb and primary DX coil entering air dry-bulb temperatures, (-). The secondary DX coil (evaporator) entering air wet-bulb temperature is the secondary zone air wet-bulb temperature.</li>
+<li>(SHRFFF) is the sensible heat ratio modifier normalized quadratic curve as a function of air mass flow fraction.  Flow fraction is the ratio of actual to rated mass flow rate of air through the secondary DX coil, (-).</li>
+<li>(SHR_\text{rated}) is the sensible heat ratio at rated condition, (-).</li>
+</ul>
+<p>For multispeed secondary DX coils when the system is cycling between two speeds of <em>n</em> and <em>n</em>-1 the operating SHR is weighted using <em>SpeedRatio</em> as follows:</p>
+<div>\[SHR = SHR_n \cdot SpeedRatio +  SHR_{n-1} (1 - SpeedRatio)\]</div>
+
+<p>where</p>
+<ul>
+<li>(SHR_n) is the sensible heat ratio at speed n determined from user specified rated SHR, and SHR modifier curves at speed <em>n</em>, (-)</li>
+<li>(SHR_{n-1}) is the sensible heat ratio at speed <em>n</em>-1 determined from user specified rated SHR, and <em>SHR</em> modifier curves at speed <em>n</em>-1, (-).</li>
+<li><em>SpeedRatio</em> is a parameter that relates performance between successive compressor speeds, (-).</li>
+</ul>
+<h4 id="sensible-and-latent-split">Sensible and Latent Split</h4>
+<p>The air enthalpy difference across the secondary DX coil (evaporator) at full load is given by:</p>
+<div>\[h_\text{Delta} = \frac{\left(Q_\text{Evap}/PLR\right)}{\dot{m}_\text{cond}}\]</div>
+
+<p>The coil outlet enthalpy is calculated as follows:</p>
+<div>\[h_\text{Outlet}=h_\text{Inlet}-h_\text{Delta}\]</div>
+
+<p>Using the SHR calculated above and secondary DX coil outlet temperature is given by:</p>
+<div>\[T_\text{OutletNode} = T_\text{ZoneAirNode} -  \frac{\left(Q_\text{Evap}/PLR\right)\cdot SHR}{\dot{m}_\text{cond}c_p}\]</div>
+
+<p>Calculate the saturated outlet temperature at the outlet enthalpy and check the secondary outlet air condition if super-saturation has occurred:</p>
+<div>\[T_\text{OutletNode, Sat} = T_\text{SAT}\left(h_\text{Outlet}, P_\text{Tot}\right)\]</div>
+
+<pre><code>IF(\(T_\text{OutletNode} &gt; T_\text{OutletNode, Sat}\)) Then
+    \(\omega_\text{OutletNode} &gt; \omega_\text{InletNode}\)
+ELSE
+    (\(T_\text{OutletNode} = T_\text{OutletNode, Sat}\)
+    The coil outlet humidity ratio is determined using psychrometric functions as follows.
+    \(\omega_\text{OutletNode} = \omega\left(T_\text{OutletNode,Sat},h_\text{Outlet}\right)\)
+ENDIF
+</code></pre>
+<p>where</p>
+<p><em>(h_\text{Inlet}) is the enthalpy of air entering the passive coil, (J/kg)
+</em>(h_\text{Outlet}) is the enthalpy of air leaving the passive coil, (J/kg)
+<em>(\dot{m}_\text{sec}) is the secondary DX coil mass flow rate, (kg/s)
+</em>(PLR) is the primary DX cooling coil compressor part-load ratio, (-)
+<em>(P_\text{Tot}) is the total pressure at the inlet of secondary DX coil, (Pa)
+</em>(T_\text{OutletNode}) is the secondary coil outlet air temperature, (degC)
+<em>(T_\text{OutletNode,Sat}) is the secondary coil saturated air temperature at the outlet enthalpy, (degC)
+</em>(\omega_\text{InletNode}) is the secondary coil inlet node air humidity ratio, (kgH2O/kgDryair)
+*(\omega_\text{OutletNode}) is the secondary coil outlet node air humidity ratio, (kgH2O/kgDryair)</p>
 <h3 id="packaged-thermal-storage-cooling-coil">Packaged Thermal Storage Cooling Coil</h3>
-<p>The DX cooling coil model for Coil:Cooling:DX:SingleSpeed:ThermalStorage is described in this section. The following diagram shows the main aspects of the model for packaged thermal energy storage cooling coil.  This model allows charging and discharging to shift cooling energy use. The dashed line shows the boundary of the empirical “black box” model.  The main parts are the Condenser, Evaporator, Compressor, and Thermal Energy Storage (TES) tank.  The model interacts with the surroundings via a condenser inlet and outlet nodes, evaporator inlet and outlet nodes, heat transfer between TES tank and surrounding ambient environment, and optional added plant connection to the TES tank.</p>
+<p>The DX cooling coil model for Coil:Cooling:DX:SingleSpeed:ThermalStorage is described in this section. The following diagram shows the main aspects of the model for packaged thermal energy storage cooling coil.  This model allows charging and discharging to shift cooling energy use. The dashed line shows the boundary of the empirical "black box" model.  The main parts are the Condenser, Evaporator, Compressor, and Thermal Energy Storage (TES) tank.  The model interacts with the surroundings via a condenser inlet and outlet nodes, evaporator inlet and outlet nodes, heat transfer between TES tank and surrounding ambient environment, and optional added plant connection to the TES tank.</p>
 <p><img alt="" src="../../EngineeringReference/media/image4287.png" /></p>
 <p>Figure 183. Highlights of Packaged Thermal Storage Cooling Coil</p>
 <p>Depending on the operating mode, different parts are active.  There are six modes to consider.</p>
@@ -5305,7 +5395,7 @@
 <h2 id="hvac-controllers">HVAC Controllers <a name="Controllers"></a></h2>
 <h3 id="control-valve-for-water-based-air-system-coils">Control Valve for Water-Based Air System Coils</h3>
 <p>The input object Controller:WaterCoil provides a simple controller model for adjusting water flow rates to meet the desired air side conditions. It is really a solution inverter. For a water coil the simulation cannot be inverted where the mass flow rate of the water through the coil can be solved directly given an air temperature. Thus, this “controller” will numerically step through all of the water flow possibilities by a root finding technique until the mass flow rate is determined to meet the specified outlet air temperature within a specified user tolerance.</p>
-<h4 id="model-description_13">Model Description</h4>
+<h4 id="model-description_14">Model Description</h4>
 <p>The figure below illustrates the use of a simple controller used with a central chilled water coil (control variable Temperature). The controller reads the desired temperature setpoint from the control node (established by a SetpointManager) and modulates the chilled water flow rate at the actuator node in order to meet the desired supply (coil outlet) air temperature.</p>
 <p><img alt="TemperatureControlledWaterCoil" src="../../EngineeringReference/media/image4384.png" /></p>
 <p>Figure 190. Controller:WaterCoil used with Central Chilled Water Coil</p>
@@ -5503,10 +5593,10 @@
 <p>The model is flexible, and checks all limits established by the user in the object’s input data. The model initially assumes that heat exchange should be suspended, and then checks each one of the limits that the user has set (single-point temperature, differential temperature, single-point enthalpy and differential point enthalpy, single-point dewpoint or electronic (variable) enthalpy). If any of the limits entered by the user is exceeded, then economizer operation is terminated and heat exchange between the supply and exhaust air streams is modeled.</p>
 <h2 id="baseboard-heaters">Baseboard Heaters <a name="Baseboards"></a></h2>
 <h3 id="hot-water-baseboard-heater-with-only-convection">Hot Water Baseboard Heater with Only Convection</h3>
-<h4 id="overview_16">Overview</h4>
+<h4 id="overview_17">Overview</h4>
 <p>The convective water baseboard heater (Ref. ZoneHVAC:Baseboard:Convective:Water) is a simple model for establishing a convective-only heat addition to a space through a baseboard heater.  In most situations, the baseboard heater does give a significant amount of heat off via natural convection, but some heat is given off via radiation.  In this model, the radiant component is ignored and all heat is assumed to be delivered to the space via convection.  The baseboard heater is supplied with hot water from the primary system which is circulated through the inside of a finned tube within the space.  Heat is transferred from the water inside the pipe, through the tube and fins, and eventually convected to the surrounding air within the space.  EnergyPlus then assumes that this heat is evenly spread throughout the space thus having an immediate impact on the zone air heat balance which is used to calculate the mean air temperature (MAT) within the space.</p>
 <p>The model requests an effective UA value to handle the heat exchange between the water loop and the zone air.  From there, it employs an effectiveness-NTU heat exchanger model to determine the heat transfer between the water and the zone air.  This is necessary because during the simulation only the inlet water and “inlet air” (assumed to be zone air) is known.  As a result, the effectiveness-NTU heat exchanger methodology is better suited to determine the performance of the system.</p>
-<h4 id="model-description_14">Model Description</h4>
+<h4 id="model-description_15">Model Description</h4>
 <h4 id="convective-water-baseboard-heater-inputs">Convective Water Baseboard Heater Inputs</h4>
 <p>Like many other HVAC components, the convective-only water baseboard model requires a unique identifying name, an availability schedule, and water side inlet and outlet nodes.  These define the availability of the unit for providing condition to the space and the node connections that relate to the primary system.  In addition, a convergence tolerance is requested of the user to help define the ability of the local controls to tightly control the system output.  In almost all cases, the user should simply accept the default value for the convergence tolerance unless engaged in an expert study of controls logic in EnergyPlus.</p>
 <p>The input also requires a UA value and a maximum design flow rate for the unit.  Both of these parameters can be chosen to be auto-sized by EnergyPlus.  The UA value corresponds to the convective heat transfer from the water to the tube, the conduction through the tube and fin material, and the natural convection from the tube/fins to the zone air.  The maximum flow rate and UA value define the performance and maximum output of the baseboard unit.</p>
@@ -5536,9 +5626,9 @@
 <h4 id="references_12">References</h4>
 <p>The effectiveness-NTU method is taken from Incropera and DeWitt, Fundamentals of Heat and Mass Transfer, Chapter 11.4, p. 523, eq. 11.33.  The user can always refer to the ASHRAE Handbook series for general information on different system types as needed.</p>
 <h3 id="electric-baseboard-heater-with-only-convection">Electric Baseboard Heater with Only Convection</h3>
-<h4 id="overview_17">Overview</h4>
+<h4 id="overview_18">Overview</h4>
 <p>The input object ZoneHVAC:Baseboard:Convective:Electric provides a model for electric baseboard heaters that assumes only convective heat addition to a space from a baseboard heater.  In most situations, the baseboard heater does give a significant amount of heat off via natural convection, but some heat is given off via radiation.  In this model, the radiant component is ignored and all heat is assumed to be delivered to the space via convection.  The baseboard heater is transferred to the unit via electric resistance heating.  EnergyPlus then assumes that this heat is evenly spread throughout the space thus having an immediate impact on the zone air heat balance which is used to calculate the mean air temperature (MAT) within the space.</p>
-<h4 id="model-description_15">Model Description</h4>
+<h4 id="model-description_16">Model Description</h4>
 <h4 id="convective-electric-baseboard-heater-inputs">Convective Electric Baseboard Heater Inputs</h4>
 <p>Like many other HVAC components, the convective-only electric baseboard model requires a unique identifying name and an availability schedule.  The availability schedule defines the availability of the unit for providing condition to the space.</p>
 <p>The input also requires a capacity and efficiency for the unit.  While the efficiency is a required input that defaults to unity, the capacity can be chosen to be auto-sized by EnergyPlus.</p>
@@ -5550,11 +5640,11 @@
 <h4 id="references_13">References</h4>
 <p>No specific reference.  Refer to the ASHRAE Handbook series for general information on different system types as needed.</p>
 <h3 id="hot-water-baseboard-heater-with-radiation-and-convection">Hot Water Baseboard Heater with Radiation and Convection</h3>
-<h4 id="overview_18">Overview</h4>
+<h4 id="overview_19">Overview</h4>
 <p>The water baseboard heater model is intended to calculate the mass flow rate of the water by determining the actual system impact not only to the surrounding air via convection but also to the surfaces and people via radiation. The actual system impact by the heater in the zone is the sum of the additional convective heat transfer from the surfaces to the zone air after they have been heated as well as radiant heat transferred to people and the convective heat transfer to the zone. This actual convective power tries to meet any remaining heating requirement in the zone. The model thus improves the accuracy of thermal comfort predictions and system responses.</p>
 <p>The radiant components are calculated to interact with the surfaces in the zone through the radiant distribution fractions. Heat is also delivered to the space via convection. The baseboard heater is supplied with hot water from the primary system which is circulated through the inside of a finned tube within the space. This could also be used to model a hot water radiator (convector in the UK). Heat is transferred from the water inside the pipe, through the tube and fins. It is also not only convected to the surrounding air but also radiated to the surfaces within the space. The user is allowed to specify the percentage of radiant heat from the heater to the surfaces. In addition, the user is allowed the ability to define what fraction of radiation leaving the heater is incident directly on a person within the zone for thermal comfort purposes. This amount of heat is then used in the thermal comfort models as the high temperature radiant heater model.</p>
 <p>This model calculates the UA values using the log mean temperature difference (LMTD) method. The calculation is based on standard conditions of both fluids obtained in a rating document or manufacturer’s literature. Overall energy balances to the hot water and air handle the heat exchange between the water loop and the zone air. Once the UA for the baseboard heater has been determined, the model employs an effectiveness-NTU heat exchanger method to determine the heat transfer between the water and zone air. This is necessary because during the simulation only the inlet water and “inlet air” (assumed to be zone air) temperatures are known. As a result, the effectiveness-NTU heat exchanger methodology is suited to determine the performance of the system during the simulation.</p>
-<h4 id="model-description_16">Model Description</h4>
+<h4 id="model-description_17">Model Description</h4>
 <h4 id="water-baseboard-heater-inputs">Water Baseboard Heater Inputs</h4>
 <p>Like many other HVAC components, the water baseboard model requires a unique identifying name, an available schedule, and water inlet and outlet nodes. These define the availability of the unit for providing conditions to the space and the node connections that relate to the primary system. For the calculation of the UA value of the unit, standard conditions of both fluids are necessary. The user can specifies such standard conditions from manufacturers’ information such as I=B=R rating document. The user provides the rated capacity, average water temperature, water mass flow rate, and standard inlet air temperature. However, the model also has the ability to autosize the rated capacity, which allows the user simulate and design any baseboard units when manufacturer’s data is unavailable.</p>
 <p>The UA value corresponds to the convective heat transfer from the water to the tube, the conduction through the tube and fin material, the natural convection from the tube/fins to the zone air, and radiation to the surfaces. In addition, a convergence tolerance is requested of the user to help define the ability of the local controls to tightly control the system output. In almost all cases, the user should simply accept the default value for the convergence tolerance unless engaged in an expert study of controls logic in EnergyPlus.</p>
@@ -5608,9 +5698,9 @@
 <p>Incropera and DeWitt. Fundamentals of Heat and Mass Transfer, Chapter 11.3 and 11.4, eq. 11.15, 11.17, and 11.33.</p>
 <p>Li Lianzhong and M. Zaheeruddin. 2006. Dynamic modeling and simulation of a room with hot water baseboard heater, International Journal of Energy Research; 30, pp. 427–445</p>
 <h2 id="electric-baseboard-heater-with-radiation-and-convection">Electric Baseboard Heater with Radiation and Convection</h2>
-<h3 id="overview_19">Overview</h3>
+<h3 id="overview_20">Overview</h3>
 <p>The input object ZoneHVAC:Baseboard:RadiantConvective:Electric provides a model for electric baseboard heaters that include both convective and radiant heat addition to a space from a baseboard heater. The radiant heat transfer to people as well as surfaces within a space is determined in the same fashion as both hot water and steam baseboard heater with radiation and convection models. The electric baseboard heater transfers energy via electric resistance heating. Radiant heat calculated by the user-defined fraction from the heating capacity of a baseboard unit impacts the surface heat balances and thermal comfort of occupants in a space. EnergyPlus then assumes that the remaining convective gains from the unit are evenly spread throughout the space thus having an immediate impact on the zone air heat balance which is used to calculate the mean air temperature (MAT) within the space.</p>
-<h3 id="model-description_17">Model Description</h3>
+<h3 id="model-description_18">Model Description</h3>
 <h4 id="convective-electric-baseboard-heater-inputs_1">Convective Electric Baseboard Heater Inputs</h4>
 <p>Like many other HVAC components, the electric baseboard model requires a unique identifying name and an availability schedule. The availability schedule defines the availability of the unit for providing condition to the space. The input also requires a capacity and efficiency for the unit. While the efficiency is a required input that defaults to unity, the capacity can be chosen to be autosized by EnergyPlus.</p>
 <p>All inputs for the radiant heat calculation are the same as the water and steam baseboard heater with radiation and convection models in EnergyPlus. Users are required to input fractions that specify total radiant heat directly delivered to surfaces as well as people in a space. The sum of radiant energy of these distribution fractions must sum to unity, and each baseboard heater is allowed to distribute energy to up to 20 surfaces.</p>
@@ -5636,10 +5726,10 @@
 <h4 id="references_15">References</h4>
 <p>No specific reference. Refer to the ASHRAE Handbook series for general information on different system types as needed.</p>
 <h3 id="steam-baseboard-heater-with-radiation-and-convection">Steam Baseboard Heater with Radiation and Convection</h3>
-<h4 id="overview_20">Overview</h4>
+<h4 id="overview_21">Overview</h4>
 <p>The steam baseboard heater model is intended to calculate the mass flow rate of the steam to meet remaining heating demand by determining the actual system impact not only to the surrounding air via convection but also to the surfaces and people via radiation. The actual system impact by the heater is the sum of the additional convective heat transfer from the surfaces to the zone air after they have been heated as well as radiant heat transferred to people and the convective heat transfer to the zone. This actual convective power tries to meet any remaining heating requirement in the zone. The model thus improves the accuracy of thermal comfort predictions and system responses. The calculation of radiant heat addition is the same as that of water baseboard heater model in EnergyPlus.</p>
 <p>This model determines the heating capacity from the sum of the latent heat transfer and sensible cooling of water as current steam coil model in EnergyPlus does. Overall energy balances to the steam and air handle the heat exchange between the steam loop and the zone air. The mass flow rate of steam is determined based on the heating demand in the zone. The model requests the user input the desired degree of subcooling so that it determines the heating rate from the heater due to the cooling of the condensate. The user input is also used to determine the condensate outlet conditions.</p>
-<h4 id="model-description_18">Model Description</h4>
+<h4 id="model-description_19">Model Description</h4>
 <h4 id="steam-baseboard-heater-inputs">Steam Baseboard Heater Inputs</h4>
 <p>The steam baseboard model requires a unique identifying name, an available schedule, and steam inlet and outlet nodes. These define the availability of the unit for providing conditions to the space and the node connections that relate to the primary system. It also requires the desired degree of subcooling to calculate the heating capacity and temperature of the condensate. A maximum design flow rate is required, and the user can request this parameter to be auto-sized by EnergyPlus. In addition, a convergence tolerance is requested of the user to help define the ability of the local controls to tightly control the system output. In almost all cases, the user should simply accept the default value for the convergence tolerance unless engaged in an expert study of controls logic in EnergyPlus.</p>
 <p>All of the inputs for the radiant heat calculation are the same as the water baseboard heater model in EnergyPlus. User inputs of the radiant fraction and of the fraction of radiant energy incident both on people and on surfaces are required to calculate radiant energy distribution from the heater to the people and surfaces. The sum of radiant energy of these distribution fractions must sum to unity, and each steam baseboard heater is allowed to distribute energy to up to 20 surfaces.</p>
