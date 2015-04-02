@@ -922,18 +922,19 @@ namespace ReportSizingManager {
 								}
 							} else {
 								AutosizeDes = 0.0;
+								CoilOutTemp = -999.0;
 							}
 						}
 					}
 					AutosizeDes = AutosizeDes * DataFracOfAutosizedCoolingCapacity;
-					if( DisplayExtraWarnings && AutosizeDes <= 0.0 ) {
+					if ( DisplayExtraWarnings && AutosizeDes <= 0.0 ) {
 						ShowWarningMessage( CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName );
-						ShowContinueError( "...Rated Total Cooling Capacity = 0." );
-						if( ZoneEqSizing( CurZoneEqNum ).CoolingCapacity ) {
+						ShowContinueError( "...Rated Total Cooling Capacity = " + TrimSigDigits( AutosizeDes, 2 ) + " [W]" );
+						if ( ZoneEqSizing( CurZoneEqNum ).CoolingCapacity ) {
 							ShowContinueError( "...Capacity passed by parent object to size child component = " + TrimSigDigits( AutosizeDes, 2 ) + " [W]" );
 						} else {
-							if( SameString( CompType, "COIL:COOLING:WATER" ) || SameString( CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) || SameString( CompType, "ZONEHVAC:IDEALLOADSAIRSYSTEM" ) ) {
-								if( TermUnitIU || ZoneEqFanCoil ) {
+							if ( SameString( CompType, "COIL:COOLING:WATER" ) || SameString( CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) || SameString( CompType, "ZONEHVAC:IDEALLOADSAIRSYSTEM" ) ) {
+								if ( TermUnitIU || ZoneEqFanCoil ) {
 									ShowContinueError( "...Capacity passed by parent object to size child component = " + TrimSigDigits( AutosizeDes, 2 ) + " [W]" );
 								} else {
 									ShowContinueError( "...Air flow rate used for sizing = " + TrimSigDigits( DesVolFlow, 5 ) + " [m3/s]" );
@@ -941,13 +942,17 @@ namespace ReportSizingManager {
 									ShowContinueError( "...Coil outlet air temperature used for sizing = " + TrimSigDigits( CoilOutTemp, 2 ) + " [C]" );
 								}
 							} else {
-								ShowContinueError( "...Air flow rate used for sizing = " + TrimSigDigits( DesVolFlow, 5 ) + " [m3/s]" );
-								ShowContinueError( "...Coil inlet air temperature used for sizing = " + TrimSigDigits( CoilInTemp, 2 ) + " [C]" );
-								ShowContinueError( "...Coil outlet air temperature used for sizing = " + TrimSigDigits( CoilOutTemp, 2 ) + " [C]" );
+								if ( CoilOutTemp > -999.0 ) {
+									ShowContinueError( "...Air flow rate used for sizing = " + TrimSigDigits( DesVolFlow, 5 ) + " [m3/s]" );
+									ShowContinueError( "...Coil inlet air temperature used for sizing = " + TrimSigDigits( CoilInTemp, 2 ) + " [C]" );
+									ShowContinueError( "...Coil outlet air temperature used for sizing = " + TrimSigDigits( CoilOutTemp, 2 ) + " [C]" );
+								} else {
+									ShowContinueError( "...Capacity used to size child component set to 0 [W]" );
+								}
 							}
 						}
 					}
-				} else if( SizingType == HeatingCapacitySizing ) {
+				} else if ( SizingType == HeatingCapacitySizing ) {
 					if ( ZoneEqSizing(CurZoneEqNum).HeatingCapacity ) {
 						NominalCapacityDes = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
 						if ( DataFlowUsedForSizing > 0.0 ) {
@@ -1012,15 +1017,15 @@ namespace ReportSizingManager {
 					}
 					if ( DisplayExtraWarnings && AutosizeDes <= 0.0 ) {
 						ShowWarningMessage( CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName );
-						ShowContinueError( "...Rated Total Heating Capacity = 0." );
+						ShowContinueError( "...Rated Total Heating Capacity = " + TrimSigDigits( AutosizeDes, 2 ) + " [W]" );
 						if ( ZoneEqSizing( CurZoneEqNum ).HeatingCapacity || ( DataCoolCoilCap > 0.0 && DataFlowUsedForSizing > 0.0 ) ) {
 							ShowContinueError( "...Capacity passed by parent object to size child component = " + TrimSigDigits( NominalCapacityDes, 2 ) + " [W]" );
 						} else {
-							if( CoilOutTemp > -999.0 ) {
+							if ( CoilOutTemp > -999.0 ) {
 								ShowContinueError( "...Air flow rate used for sizing = " + TrimSigDigits( DesVolFlow, 5 ) + " [m3/s]" );
 								ShowContinueError( "...Coil inlet air temperature used for sizing = " + TrimSigDigits( CoilInTemp, 2 ) + " [C]" );
 								ShowContinueError( "...Coil outlet air temperature used for sizing = " + TrimSigDigits( CoilOutTemp, 2 ) + " [C]" );
-							} else{
+							} else {
 								ShowContinueError( "...Capacity used to size child component set to 0 [W]" );
 							}
 						}
@@ -1047,9 +1052,9 @@ namespace ReportSizingManager {
 					AutosizeDes = NominalCapacityDes * DataHeatSizeRatio;
 					if( DisplayExtraWarnings && AutosizeDes <= 0.0 ) {
 						ShowWarningMessage( CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName );
-						ShowContinueError( "...Rated Total Heating Capacity = 0." );
+						ShowContinueError( "...Rated Total Heating Capacity = " + TrimSigDigits( AutosizeDes, 2 ) + " [W]" );
 						ShowContinueError( "...Air flow rate used for sizing = " + TrimSigDigits( DesMassFlow / StdRhoAir, 5 ) + " [m3/s]" );
-						if( TermUnitSingDuct || TermUnitPIU || TermUnitIU || ZoneEqFanCoil ) {
+						if ( TermUnitSingDuct || TermUnitPIU || TermUnitIU || ZoneEqFanCoil ) {
 							ShowContinueError( "...Plant loop temperature difference = " + TrimSigDigits( PlantSizData( DataPltSizHeatNum ).DeltaT, 2 ) + " [C]" );
 						} else {
 							ShowContinueError( "...Coil inlet air temperature used for sizing = " + TrimSigDigits( CoilInTemp, 2 ) + " [C]" );
@@ -1553,8 +1558,8 @@ namespace ReportSizingManager {
 					} // IF(OASysFlag) THEN or ELSE IF(AirLoopSysFlag) THEN
 					if( DisplayExtraWarnings && AutosizeDes <= 0.0 ) {
 						ShowWarningMessage( CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName );
-						ShowContinueError( "...Rated Total Cooling Capacity = 0." );
-						if( OASysFlag || AirLoopSysFlag || FinalSysSizing( CurSysNum ).CoolingCapMethod == CapacityPerFloorArea || ( FinalSysSizing( CurSysNum ).CoolingCapMethod == CoolingDesignCapacity && FinalSysSizing( CurSysNum ).CoolingTotalCapacity ) ) {
+						ShowContinueError( "...Rated Total Cooling Capacity = " + TrimSigDigits( AutosizeDes, 2 ) + " [W]" );
+						if ( OASysFlag || AirLoopSysFlag || FinalSysSizing( CurSysNum ).CoolingCapMethod == CapacityPerFloorArea || ( FinalSysSizing( CurSysNum ).CoolingCapMethod == CoolingDesignCapacity && FinalSysSizing( CurSysNum ).CoolingTotalCapacity ) ) {
 							ShowContinueError( "...Capacity passed by parent object to size child component = " + TrimSigDigits( AutosizeDes, 2 ) + " [W]" );
 						} else {
 							ShowContinueError( "...Air flow rate used for sizing = " + TrimSigDigits( DesVolFlow, 5 ) + " [m3/s]" );
@@ -1662,10 +1667,10 @@ namespace ReportSizingManager {
 						}
 						DesCoilLoad = NominalCapacityDes;
 						CoilOutTemp = -999.0;
-					} else if( FinalSysSizing( CurSysNum ).HeatingCapMethod == CapacityPerFloorArea ) {
+					} else if ( FinalSysSizing( CurSysNum ).HeatingCapMethod == CapacityPerFloorArea ) {
 						NominalCapacityDes = FinalSysSizing( CurSysNum ).HeatingTotalCapacity;
 						CoilOutTemp = -999.0;
-					} else if( FinalSysSizing( CurSysNum ).HeatingCapMethod == HeatingDesignCapacity && FinalSysSizing( CurSysNum ).HeatingTotalCapacity > 0.0 ) {
+					} else if ( FinalSysSizing( CurSysNum ).HeatingCapMethod == HeatingDesignCapacity && FinalSysSizing( CurSysNum ).HeatingTotalCapacity > 0.0 ) {
 						NominalCapacityDes = FinalSysSizing( CurSysNum ).HeatingTotalCapacity;
 						CoilOutTemp = -999.0;
 					} else {
@@ -1679,9 +1684,9 @@ namespace ReportSizingManager {
 						CoilOutTemp = -999.0;
 					}
 					AutosizeDes = NominalCapacityDes * DataHeatSizeRatio * DataFracOfAutosizedHeatingCapacity;
-					if( DisplayExtraWarnings && AutosizeDes <= 0.0 ) {
+					if ( DisplayExtraWarnings && AutosizeDes <= 0.0 ) {
 						ShowWarningMessage( CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName );
-						ShowContinueError( "...Rated Total Heating Capacity = 0." );
+						ShowContinueError( "...Rated Total Heating Capacity = " + TrimSigDigits( AutosizeDes, 2 ) + " [W]" );
 						if ( CoilOutTemp > -999.0 ) {
 							ShowContinueError( "...Air flow rate used for sizing = " + TrimSigDigits( DesVolFlow, 5 ) + " [m3/s]" );
 							ShowContinueError( "...Outdoor air fraction used for sizing = " + TrimSigDigits( OutAirFrac, 2 ) );
