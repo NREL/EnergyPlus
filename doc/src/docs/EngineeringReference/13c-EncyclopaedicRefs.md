@@ -1572,7 +1572,7 @@ Where:
 
 * <span>$\epsilon_{wb,design}$</span> = user input for effectiveness at design air flow rates and full spray power
 
-* <span>$f_{wb,mod}}$</span> = normalized wet mode operation effectiveness modifier performance curve as a function of flow fraction. The curve value describes how effectiveness varies at different flow rates.  When conditions are appropriate, this curve is numerically inverted to find a FlowRatio that just meets a setpoint. 
+* <span>$f_{wb,mod}$</span> = normalized wet mode operation effectiveness modifier performance curve as a function of flow fraction. The curve value describes how effectiveness varies at different flow rates.  When conditions are appropriate, this curve is numerically inverted to find a FlowRatio that just meets a setpoint. 
 
 * <span>$\dot{m}_{sys}$</span> = primary air current time step mass flow rate in kg/s
 
@@ -1609,7 +1609,7 @@ One approximation that can be made is the outlet condition of the temperature an
   \begin{array}{rl}
     T_{db,out,sec} &= T_{db,in,sec} \\
     \text{HumRat}_{out,sec} &= \text{PsyWFnTbH}\left(T_{db,out,sec},\text{enthalpy}_{out,sec}\right) \\
-    \dot{V}_{water} &= \frac{QHX / \left[ \left(\text{HumRat}_{out,sec}-\text{HumRat}_{in,sec}\right) \cdot h_{fg,in,sec}\right]}{\rho_{water,Tdb,in,sec}}
+    \dot{V}_{water} &= \frac{QHX / \left[ \left(\text{HumRat}_{out,sec}-\text{HumRat}_{in,sec}\right) \cdot h_{fg,in,sec}\right]}{\rho_{water,Tdb,in,sec}} \\
     or &= \\
     \dot{V}_{water} &= \frac{QHX / \left[ \left(\text{enthalpy}_{out,sec}-\text{enthalpy}_{in,sec}\right) \right]}{\rho_{water,Tdb,in,sec}}
   \end{array}
@@ -1631,7 +1631,7 @@ Where:
 
 The leaving primary air dry bulb temperature in dry operating mode is calculated as follows:
 
-<div>\[T_{db,out,sys} = T_{db,in,sys} - \epsilon{db,op}\left(T_{db,in,sys]-T_{db,in,sec}\right)\]</div>
+<div>\[T_{db,out,sys} = T_{db,in,sys} - \epsilon{db,op}\left(T_{db,in,sys}-T_{db,in,sec}\right)\]</div>
 
 Then check that there is sufficient heat capacitance flux (mcT) in the secondary air stream to provide the conditioning.  For dry operation, it should be sufficient to simply use inlet moist air properties for density and specific heat.  The following steps are for checking and adjusting for non-physical outcomes that could happen with low secondary flow rates.
 
@@ -1793,11 +1793,11 @@ The secondary air design flow rate fan is not part of an airstream that is direc
 
 User inputs for autosizing scaling factors are included so that when modeling an autosized IEC, all the design values can be scaled off of Primary Design Air Flow Rate.  User input for Secondary Air Flow Sizing Factor is multiplied by DesMainVolFlow<sub>sys</sub> as follows:
 
-<div>\[ \dot{V}_{sec,design} = \text{DesMainVolFlow_{sys}\cdot\text{SecAirFlowScalingFactor} \]</div>
+<div>\[ \dot{V}_{sec,design} = \text{DesMainVolFlow}_{sys}\cdot\text{SecAirFlowScalingFactor} \]</div>
 
 If the cooler is part of the outdoor air path of a central air system, then the secondary air design flow rate is sized to be the maximum of either the design minimum outdoor air flow rate or one-half of the main design flow rate. 
 
-<div>\[ \dot{V}_{sec,design} = \max\left(\text{DesOutAirVolFlow,0.5\cdot\text{DesMainVolFlow}_{sys}\right)\cdot\text{SecAirFlowScalingFactor} \]</div>
+<div>\[ \dot{V}_{sec,design} = \max\left(\text{DesOutAirVolFlow},0.5\cdot\text{DesMainVolFlow}_{sys}\right)\cdot\text{SecAirFlowScalingFactor} \]</div>
  
 ##### Secondary Fan Design Power
 
