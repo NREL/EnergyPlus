@@ -1,2 +1,0 @@
-\(\begin{array}{l}WaterFlowScaleFactor = \\\quad \quad \quad \frac{{RatedVolumetricWaterFlowRate}}{{ReferenceUnitVolWaterFlowRate@NominalSpeedLevel \times CapacityScaleFactor}}\end{array}\)image5
-\(\begin{array}{l}WaterFlowScaleFactor = \\\quad \quad \quad \frac{{RatedVolumetricWaterFlowRate}}{{ReferenceUnitVolWaterFlowRate@NominalSpeedLevel \times CapacityScaleFactor}}\end{array}\)

@@ -1,1 +1,0 @@
-\[\begin{array}{l}r = {\left( {\frac{{n - 1}}{{n + 1}}} \right)^2}\\\tau  = \frac{{{{\left[ {{{(1 - r)}^4} + 4{r^2}{T^2}} \right]}^{1/2}} - {{(1 - r)}^2}}}{{2{r^2}T}}\\R = r + \frac{{{{(1 - r)}^2}r{\tau ^2}}}{{1 - {r^2}{\tau ^2}}}\end{array}\]

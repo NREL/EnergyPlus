@@ -1,1 +1,0 @@
-\(\begin{array}{l}ActualWasteHeat@SpeedLevel\left( x \right) = ActualPower@SpeedLevel\left( x \right)\\\quad \quad \quad \quad \quad \quad  \times WasteHeatFrac@SpeedLevel(x)\\\quad \quad \quad \quad \quad \quad  \times WasteHeatTempModFac@SpeedLevel(x)\end{array}\)

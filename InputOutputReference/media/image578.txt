@@ -1,1 +1,0 @@
-\[\frac{1}{{{\lambda _i}}} = \frac{1}{{\lambda  + 0.08\theta }} - \frac{{0.035}}{{{\theta ^3} + 1}}\]

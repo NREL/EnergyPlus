@@ -1,1 +1,0 @@
-\(Valu{e_{TimeStep}} = LastHourValue\cdot Weigh{t_{LastHour}} + ThisHourValue\cdot Weigh{t_{ThisHour}}\)

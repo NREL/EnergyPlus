@@ -1,1 +1,0 @@
-\[\begin{array}{l}CoolElectricPower = \\NomCoolCap \cdot RunFrac \cdot CEIR \cdot CEIRfT({T_{cw,l}},{T_{cond}}) \cdot CEIRfPLR(CPLR)\end{array}\]

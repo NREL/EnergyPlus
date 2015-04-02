@@ -1,1 +1,0 @@
-\[\Delta P = \left( {K + f\frac{L}{D}} \right)\frac{{\rho {V^2}}}{2}\]

@@ -1,1 +1,0 @@
-\(Linear\,\,Curve:\,\,\,Output = {C_1} + {C_2}x\)

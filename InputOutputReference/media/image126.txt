@@ -1,1 +1,0 @@
-\[{Q_w} = {C_w}{A_{opening}}{F_{schedule}}V\]

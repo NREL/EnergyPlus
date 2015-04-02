@@ -1,1 +1,0 @@
-\[SteamInputRatio = \frac{{C1}}{{PLR}} + C2 + C3 * PLR\]

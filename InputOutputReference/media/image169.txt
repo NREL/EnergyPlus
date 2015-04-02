@@ -1,1 +1,0 @@
-\[HeatFuelInput = AvailHeatCap \cdot HFIR \cdot HFIRfHPLR(HPLR)\]

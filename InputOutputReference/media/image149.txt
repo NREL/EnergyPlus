@@ -1,1 +1,0 @@
-\({\rm{CoolingLoadtoFuelCurve}} = {C_1} + {C_2} * PLR + {C_3} * PL{R^2}\)

@@ -1,1 +1,0 @@
-\({\rm{DaylightingGroundReflectanc}}{{\rm{e}}_{{\rm{used}}}} = {\rm{GroundReflectance}} \bullet Modifie{r_{Snow}}\)

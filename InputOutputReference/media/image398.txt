@@ -1,1 +1,0 @@
-\[{T_{Cond\,\;inlet}} = \left( {{T_{wb,o}}} \right) + \left( {1 - EvapCondEffectiveness} \right)\left( {{T_{db,o}} - {T_{wb,o}}} \right)\]

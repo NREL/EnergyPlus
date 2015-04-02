@@ -1,1 +1,0 @@
-\[Q = {\rm{(Crack Factor)*}}{C_T}{\rm{*}}{C_Q}{\left( {\Delta P} \right)^n}\]

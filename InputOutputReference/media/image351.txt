@@ -1,1 +1,0 @@
-\[ratio = \frac{{{\eta _f}{{\left( {hA} \right)}_{air}}}}{{{{\left( {hA} \right)}_{water}}}}\]

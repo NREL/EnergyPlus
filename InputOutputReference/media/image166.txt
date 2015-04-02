@@ -1,1 +1,0 @@
-\[\begin{array}{l}CoolFuelInput = \\AvailCoolCap \cdot RunFrac \cdot CFIR \cdot CFIRfT({T_{cw,l}},{T_{cond}}) \cdot CFIRfPLR(CPLR)\end{array}\]

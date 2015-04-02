@@ -1,1 +1,0 @@
-\[{C_p} = {C_1}(\frac{{{C_2}}}{{{\lambda _i}}} - {C_3}\theta  - {C_4}{\theta ^x} - {C_5}){e^{ - \frac{{{C_6}(\lambda ,\theta )}}{{{\lambda _i}}}}}\]

@@ -1,1 +1,0 @@
-\[{C_{equ}}\,\,\,\,\,\, = r*{Q_r}*\rho *{\left( {\Delta {P_r}} \right)^{ - n}}\]

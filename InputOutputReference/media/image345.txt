@@ -1,1 +1,0 @@
-\[\psi  = \frac{{\Delta P}}{{\rho {N^2}{D^2}}}\]

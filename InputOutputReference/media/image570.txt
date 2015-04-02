@@ -1,1 +1,0 @@
-\(Q_{battery}^{t + \Delta t} = Q_{battery}^t + {P_{battery - charge}} \cdot {\varepsilon _{charge}} \cdot \Delta t\)

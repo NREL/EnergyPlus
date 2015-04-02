@@ -1,1 +1,0 @@
-\(Design\;Air\;Flow\;Rate = \frac{{0.5(Fan\;power\;at\;Design\;Air\;Flow\;Rate)}}{{190.}}\left( {\frac{{101325.}}{{{P_{atm}}}}} \right)\)

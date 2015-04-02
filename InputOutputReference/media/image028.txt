@@ -1,1 +1,0 @@
-\(Property = Coefficien{t_A} + Coefficien{t_B}*Temperatur{e_K}\)

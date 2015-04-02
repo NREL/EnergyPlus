@@ -1,1 +1,0 @@
-\(\frac{{\left| {{Q_{PIU,out}} - {Q_{zone\;load}}} \right|}}{{{Q_{zone\;load}}}} \le ConvergenceTolerance\)

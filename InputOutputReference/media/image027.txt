@@ -1,1 +1,0 @@
-\[\begin{array}{l}r = {\left( {\frac{{1.526 - 1}}{{1.526 + 1}}} \right)^2}\\\tau  = 0.93974\\R = 0.07846\end{array}\]
