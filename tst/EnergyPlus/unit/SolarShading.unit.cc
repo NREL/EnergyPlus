@@ -21,9 +21,9 @@ using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataBSDFWindow;
 using namespace ObjexxFCL;
 
-TEST( CalcPerSolarBeamTest, Test1 )
+TEST(SolarShadingTest, CalcPerSolarBeamTest)
 {
-	ShowMessage( "Begin Test: CalcPerSolarBeamTest, Test1" );
+	ShowMessage( "Begin Test: SolarShadingTest, CalcPerSolarBeamTest" );
 	
 // Test inits for integrated and non-integrated shading calcs
 
@@ -104,5 +104,46 @@ TEST( CalcPerSolarBeamTest, Test1 )
 	AOSurf.deallocate();
 	BackSurfaces.deallocate();
 	OverlapAreas.deallocate();
+
+}
+
+TEST( SolarShadingTest, SurfaceScheduledSolarInc )
+{
+	ShowMessage("Begin Test: SolarShadingTest, SurfaceScheduledSolarInc");
+	int SurfSolIncPtr;
+	TotSurfIncSolSSG = 4;
+	SurfIncSolSSG.allocate( TotSurfIncSolSSG );
+	SurfIncSolSSG( 1 ).SurfPtr = 1;
+	SurfIncSolSSG( 1 ).ConstrPtr = 1; 
+	SurfIncSolSSG( 2 ).SurfPtr = 1;
+	SurfIncSolSSG( 2 ).ConstrPtr = 2;
+	SurfIncSolSSG( 3 ).SurfPtr = 4;
+	SurfIncSolSSG( 3 ).ConstrPtr = 10;
+	SurfIncSolSSG( 4 ).SurfPtr = 5;
+	SurfIncSolSSG( 4 ).ConstrPtr = 1;
+
+	// Test retrieving pointer for surface incident solar schedule
+
+	SurfSolIncPtr = -99;
+	SurfSolIncPtr = SurfaceScheduledSolarInc( 1, 1 );
+	EXPECT_EQ( 1, SurfSolIncPtr );
+
+	SurfSolIncPtr = -99;
+	SurfSolIncPtr = SurfaceScheduledSolarInc( 1, 2 );
+	EXPECT_EQ( 2, SurfSolIncPtr );
+
+	SurfSolIncPtr = -99;
+	SurfSolIncPtr = SurfaceScheduledSolarInc( 1, 3 );
+	EXPECT_EQ( 0, SurfSolIncPtr );
+
+	SurfSolIncPtr = -99;
+	SurfSolIncPtr = SurfaceScheduledSolarInc( 5, 1 );
+	EXPECT_EQ( 4, SurfSolIncPtr );
+
+	SurfSolIncPtr = -99;
+	SurfSolIncPtr = SurfaceScheduledSolarInc( 5, 10 );
+	EXPECT_EQ( 0, SurfSolIncPtr );
+
+	SurfIncSolSSG.deallocate( );
 
 }
