@@ -38632,6 +38632,7 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction,
        \minimum> 0.0
        \default 0.001
   A12; \field Zone Mixer Name
+       \required-field
        \type object-list
        \object-list ZoneMixers
 

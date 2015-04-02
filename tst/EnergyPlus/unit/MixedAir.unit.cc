@@ -41,7 +41,6 @@ TEST( ProcessOAControllerTest, Test1 )
 	int NumAlphas ( 17 );
 	int NumNumbers ( 7 );
 	int NumOfOAControllers( 2 );
-
 	cCurrentModuleObject = "Controller:OutdoorAir";
 	OAController.allocate( NumOfOAControllers );
 
