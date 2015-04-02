@@ -6,6 +6,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/FluidCoolers.hh>
 #include <DataSizing.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 
 using namespace EnergyPlus;
@@ -16,6 +17,8 @@ using namespace ObjexxFCL;
 
 TEST( TwoSpeedFluidCoolerInput, Test1 )
 {
+	ShowMessage( "Begin Test: TwoSpeedFluidCoolerInput, Test1" );
+
 	using DataSizing::AutoSize;
 	int StringArraySize = 20;
 	FArray1D_string cNumericFieldNames;

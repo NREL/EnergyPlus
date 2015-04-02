@@ -5,6 +5,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataVectorTypes;
@@ -12,6 +13,7 @@ using namespace ObjexxFCL;
 
 TEST( VectorTest, Basic )
 {
+	ShowMessage( "Begin Test: VectorTest, Basic" );
 	{
 		Vector v( 0.0, 0.0, 0.0 );
 		EXPECT_EQ( 0.0, v.x );

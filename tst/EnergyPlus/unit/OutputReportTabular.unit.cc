@@ -6,6 +6,7 @@
 #include <ObjexxFCL/FArray1D.hh>
 // EnergyPlus Headers
 #include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::OutputReportTabular;
@@ -13,6 +14,8 @@ using namespace ObjexxFCL;
 
 TEST( OutputReportTabularTest, ConfirmSetUnitsStyleFromString )
 {
+	ShowMessage( "Begin Test: OutputReportTabularTest, ConfirmSetUnitsStyleFromString" );
+
 	EXPECT_EQ( unitsStyleNone, SetUnitsStyleFromString( "None" ) );
 	EXPECT_EQ( unitsStyleJtoKWH, SetUnitsStyleFromString( "JTOKWH" ) );
 	EXPECT_EQ( unitsStyleJtoMJ, SetUnitsStyleFromString( "JTOMJ" ) );
@@ -23,6 +26,8 @@ TEST( OutputReportTabularTest, ConfirmSetUnitsStyleFromString )
 
 TEST( OutputReportTabularTest, Basic )
 {
+	ShowMessage( "Begin Test: OutputReportTabularTest, Basic" );
+
 	OutputTableBinned.allocate( 10 );
 	EXPECT_TRUE( warningAboutKeyNotFound( 0, 1, "moduleName" ) );
 	EXPECT_FALSE( warningAboutKeyNotFound( 100, 1, "moduleName") );
