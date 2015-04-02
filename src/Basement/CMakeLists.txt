@@ -16,20 +16,32 @@ SET(SRC
   BasementSimData.f90
 )
 
-IF(UNIX) # Mac and Linux
-  IF( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU" )
-    ADD_DEFINITIONS( " -ffloat-store " )
-  ENDIF()
-ELSE()  # Windows
-  IF(CMAKE_Fortran_COMPILER MATCHES "ifort")
+if(APPLE)
+  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel")
+  else()
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffloat-store" )
+  endif()
+elseif(UNIX)
+  set(CMAKE_SKIP_RPATH TRUE)
+  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel")
+  else()
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffloat-store" )
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static" )
+  endif()
+else()  # Windows
+  if(CMAKE_Fortran_COMPILER MATCHES "ifort")
     # Set release flags to be empty
-    SET(CMAKE_Fortran_FLAGS_RELEASE "")
-    SET(CMAKE_Fortran_FLAGS "/nologo /debug:minimal /O2 /Oy- /assume:buffered_io /noaltparam /fpscomp:nolibs /fpe:0 /fp:fast=2  /traceback /check:uninit /libs:static /threads /c /assume:protect-parens /Qprec-div /Qprec-sqrt /Qimf-precision:high /Qimf-arch-consistency:true /Qvec-")
-  ELSE()
-    SET(CMAKE_Fortran_FLAGS "-static -ffloat-store")
-  ENDIF()
-ENDIF()
+    set(CMAKE_Fortran_FLAGS_RELEASE "")
+    set(CMAKE_Fortran_FLAGS "/nologo /debug:minimal /O2 /Oy- /assume:buffered_io /noaltparam /fpscomp:nolibs /fpe:0 /fp:fast=2  /traceback /check:uninit /libs:static /threads /c /assume:protect-parens /Qprec-div /Qprec-sqrt /Qimf-precision:high /Qimf-arch-consistency:true /Qvec-")
+  else()
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffloat-store")
+  endif()
+endif()
 
+set(SKIP_BUILD_RPATH true)
 ADD_EXECUTABLE( Basement ${SRC} )
 
 SET_TARGET_PROPERTIES(Basement PROPERTIES

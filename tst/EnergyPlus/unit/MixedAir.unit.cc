@@ -148,9 +148,10 @@ TEST( ProcessOAControllerTest, Test1 )
 	EXPECT_EQ( 4, OAController( 2 ).OANode );
 	EXPECT_FALSE( CheckOutAirNodeNumber( OAController( 2 ).OANode ) );
 
+	// Clean up
 	OAController.deallocate();
 	OutsideAirNodeList.deallocate();
-
+	ObjectDef.deallocate();
 	lNumericFieldBlanks.deallocate();
 	lAlphaFieldBlanks.deallocate();
 	cAlphaFieldNames.deallocate();

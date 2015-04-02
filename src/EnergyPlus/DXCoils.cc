@@ -4683,7 +4683,7 @@ namespace DXCoils {
 
 			RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).RatedAirVolFlowRate( 1 ) / DXCoil( DXCoilNum ).RatedTotCap2;
 			if ( ( ( MinRatedVolFlowPerRatedTotCap( DXCT ) - RatedVolFlowPerRatedTotCap ) > SmallDifferenceTest ) || ( ( RatedVolFlowPerRatedTotCap - MaxHeatVolFlowPerRatedTotCap( DXCT ) ) > SmallDifferenceTest ) ) {
-				ShowSevereError( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": Rated air volume flow rate per watt of rated total water heating capacity is out of range." );
+				ShowSevereError( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\": Rated air volume flow rate per watt of rated total water heating capacity is out of range" );
 				ShowContinueError( "Min Rated Vol Flow Per Watt=[" + TrimSigDigits( MinRatedVolFlowPerRatedTotCap( DXCT ), 3 ) + "], Rated Vol Flow Per Watt=[" + TrimSigDigits( RatedVolFlowPerRatedTotCap, 3 ) + "], Max Rated Vol Flow Per Watt=[" + TrimSigDigits( MaxHeatVolFlowPerRatedTotCap( DXCT ), 3 ) + "]. See Input-Output Reference Manual for valid range." );
 			}
 			HPInletAirHumRat = PsyWFnTdbTwbPb( DXCoil( DXCoilNum ).RatedInletDBTemp, DXCoil( DXCoilNum ).RatedInletWBTemp, StdBaroPress, RoutineName );
@@ -9544,6 +9544,19 @@ Label50: ;
 		AirMassFlow = DXCoil( DXCoilNum ).InletAirMassFlowRate;
 		AirMassFlowRatioLS = MSHPMassFlowRateLow / DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedNumLS );
 		AirMassFlowRatioHS = MSHPMassFlowRateHigh / DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedNumHS );
+		if ( ( AirMassFlow > 0.0 ) && ( CycRatio > 0.0 ) && ( ( MSHPMassFlowRateLow == 0.0 ) || ( MSHPMassFlowRateHigh == 0.0 ) ) ) {
+			ShowSevereError( "CalcMultiSpeedDXCoilCooling: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + " Developer error - inconsistent airflow rates." );
+			ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0, then MSHPMassFlowRateLow and MSHPMassFlowRateHigh must also be > 0.0" );
+			ShowContinueErrorTimeStamp( "" );
+			ShowContinueError( "AirMassFlow = " + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio = " + RoundSigDigits( CycRatio, 3 ) + ", MSHPMassFlowRateLow = " + RoundSigDigits( MSHPMassFlowRateLow, 3 ) + ", MSHPMassFlowRateHigh = " + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
+			ShowFatalError( "Preceding condition(s) causes termination." );
+		} else if ( CycRatio > 1.0 || SpeedRatio > 1.0 ) {
+			ShowSevereError( "CalcMultiSpeedDXCoilCooling: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + " Developer error - inconsistent speed ratios." );
+			ShowContinueError( "CycRatio and SpeedRatio must be between 0.0 and 1.0" );
+			ShowContinueErrorTimeStamp( "" );
+			ShowContinueError( "CycRatio=" + RoundSigDigits( CycRatio, 1 ) + ", SpeedRatio = " + RoundSigDigits( SpeedRatio, 1 ) );
+			ShowFatalError( "Preceding condition(s) causes termination." );
+		}
 
 		DXCoil( DXCoilNum ).PartLoadRatio = 0.0;
 		HeatReclaimDXCoil( DXCoilNum ).AvailCapacity = 0.0;
@@ -9582,11 +9595,11 @@ Label50: ;
 					if ( DXCoil( DXCoilNum ).MSErrIndex( SpeedNumLS ) == 0 ) {
 						ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumLS ) + '.' );
 						ShowContinueErrorTimeStamp( "" );
-						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxCoolVolFlowPerRatedTotCap( DXCT ), 3 ) + ']' );
+						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxCoolVolFlowPerRatedTotCap( DXCT ), 3 ) + "] Current value is " + RoundSigDigits( VolFlowperRatedTotCap, 3 ) + " m3/s/W" );
 						ShowContinueError( "Possible causes include inconsistent air flow rates in system components or" );
 						ShowContinueError( "inconsistent supply air fan operation modes in coil and unitary system objects." );
 					}
-					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumLS ) + "error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumLS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
+					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumLS ) + " error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumLS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
 				}
 
 				// Check for valid air volume flow per rated total cooling capacity (200 - 500 cfm/ton) at high speed
@@ -9598,11 +9611,11 @@ Label50: ;
 					if ( DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ) == 0 ) {
 						ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + '.' );
 						ShowContinueErrorTimeStamp( "" );
-						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxCoolVolFlowPerRatedTotCap( DXCT ), 3 ) + ']' );
+						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxCoolVolFlowPerRatedTotCap( DXCT ), 3 ) + "] Current value is " + RoundSigDigits( VolFlowperRatedTotCap, 3 ) + " m3/s/W" );
 						ShowContinueError( "Possible causes include inconsistent air flow rates in system components or" );
 						ShowContinueError( "inconsistent supply air fan operation modes in coil and unitary system objects." );
 					}
-					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + "error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
+					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + " error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
 				}
 
 				// Adjust high speed coil bypass factor for actual maximum air flow rate.
@@ -9808,11 +9821,11 @@ Label50: ;
 					if ( DXCoil( DXCoilNum ).MSErrIndex( SpeedNumLS ) == 0 ) {
 						ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumLS ) + '.' );
 						ShowContinueErrorTimeStamp( "" );
-						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxCoolVolFlowPerRatedTotCap( DXCT ), 3 ) + ']' );
+						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxCoolVolFlowPerRatedTotCap( DXCT ), 3 ) + "] Current value is " + RoundSigDigits( VolFlowperRatedTotCap, 3 ) + " m3/s/W" );
 						ShowContinueError( "Possible causes include inconsistent air flow rates in system components or" );
 						ShowContinueError( "inconsistent supply air fan operation modes in coil and unitary system objects." );
 					}
-					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + "error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
+					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total cooling capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + " error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
 				}
 
 				if ( DXCoil( DXCoilNum ).CondenserType( SpeedNumLS ) == EvapCooled ) {
@@ -10153,6 +10166,19 @@ Label50: ;
 		AirMassFlow = DXCoil( DXCoilNum ).InletAirMassFlowRate;
 		AirMassFlowRatioLS = MSHPMassFlowRateLow / DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedNumLS );
 		AirMassFlowRatioHS = MSHPMassFlowRateHigh / DXCoil( DXCoilNum ).MSRatedAirMassFlowRate( SpeedNumHS );
+		if ( ( AirMassFlow > 0.0 ) && ( CycRatio > 0.0 ) && ( ( MSHPMassFlowRateLow == 0.0 ) || ( MSHPMassFlowRateHigh == 0.0 ) ) ) {
+			ShowSevereError( "CalcMultiSpeedDXCoilHeating: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + " Developer error - inconsistent airflow rates." );
+			ShowContinueError( "When AirMassFlow > 0.0 and CycRatio > 0.0, then MSHPMassFlowRateLow and MSHPMassFlowRateHigh must also be > 0.0" );
+			ShowContinueErrorTimeStamp( "" );
+			ShowContinueError( "AirMassFlow=" + RoundSigDigits( AirMassFlow, 3 ) + ",CycRatio=" + RoundSigDigits( CycRatio, 3 ) + ", MSHPMassFlowRateLow=" + RoundSigDigits( MSHPMassFlowRateLow, 3 ) + ", MSHPMassFlowRateHigh=" + RoundSigDigits( MSHPMassFlowRateHigh, 3 ) );
+			ShowFatalError( "Preceding condition(s) causes termination." );
+		} else if ( CycRatio > 1.0 || SpeedRatio > 1.0 ) {
+			ShowSevereError( "CalcMultiSpeedDXCoilHeating: " + DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + " Developer error - inconsistent speed ratios." );
+			ShowContinueError( "CycRatio and SpeedRatio must be between 0.0 and 1.0" );
+			ShowContinueErrorTimeStamp( "" );
+			ShowContinueError( "CycRatio=" + RoundSigDigits( CycRatio, 1 ) + ", SpeedRatio = " + RoundSigDigits( SpeedRatio, 1 ) );
+			ShowFatalError( "Preceding condition(s) causes termination." );
+		}
 
 		AirFlowRatio = 1.0;
 		if ( DXCoil( DXCoilNum ).CompanionUpstreamDXCoil == 0 ) MSHPWasteHeat = 0.0;
@@ -10206,11 +10232,11 @@ Label50: ;
 					if ( DXCoil( DXCoilNum ).MSErrIndex( SpeedNumLS ) == 0 ) {
 						ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed " + TrimSigDigits( SpeedNumLS ) + '.' );
 						ShowContinueErrorTimeStamp( "" );
-						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxHeatVolFlowPerRatedTotCap( DXCT ), 3 ) + ']' );
+						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxHeatVolFlowPerRatedTotCap( DXCT ), 3 ) + "] Current value is " + RoundSigDigits( VolFlowperRatedTotCap, 3 ) + " m3/s/W" );
 						ShowContinueError( "Possible causes include inconsistent air flow rates in system components or" );
 						ShowContinueError( "inconsistent supply air fan operation modes in coil and unitary system objects." );
 					}
-					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed " + TrimSigDigits( SpeedNumLS ) + "error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumLS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
+					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed " + TrimSigDigits( SpeedNumLS ) + " error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumLS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
 				}
 
 				// Check for valid air volume flow per rated total cooling capacity (200 - 600 cfm/ton) at high speed
@@ -10222,11 +10248,11 @@ Label50: ;
 					if ( DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ) == 0 ) {
 						ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + '.' );
 						ShowContinueErrorTimeStamp( "" );
-						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxHeatVolFlowPerRatedTotCap( DXCT ), 3 ) + ']' );
+						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxHeatVolFlowPerRatedTotCap( DXCT ), 3 ) + "] Current value is " + RoundSigDigits( VolFlowperRatedTotCap, 3 ) + " m3/s/W" );
 						ShowContinueError( "Possible causes include inconsistent air flow rates in system components or" );
 						ShowContinueError( "inconsistent supply air fan operation modes in coil and unitary system objects." );
 					}
-					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + "error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
+					ShowRecurringWarningErrorAtEnd( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed " + TrimSigDigits( SpeedNumHS ) + " error continues...", DXCoil( DXCoilNum ).MSErrIndex( SpeedNumHS ), VolFlowperRatedTotCap, VolFlowperRatedTotCap );
 				}
 
 				// Get total capacity modifying factor (function of temperature) for off-rated conditions
@@ -10422,7 +10448,7 @@ Label50: ;
 					if ( DXCoil( DXCoilNum ).ErrIndex1 == 0 ) {
 						ShowWarningMessage( DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Air volume flow rate per watt of rated total heating capacity is out of range at speed 1." );
 						ShowContinueErrorTimeStamp( "" );
-						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxHeatVolFlowPerRatedTotCap( DXCT ), 3 ) + ']' );
+						ShowContinueError( "Expected range for VolumeFlowPerRatedTotalCapacity=[" + RoundSigDigits( MinOperVolFlowPerRatedTotCap( DXCT ), 3 ) + "--" + RoundSigDigits( MaxHeatVolFlowPerRatedTotCap( DXCT ), 3 ) + "] Current value is " + RoundSigDigits( VolFlowperRatedTotCap, 3 ) + " m3/s/W" );
 						ShowContinueError( "Possible causes include inconsistent air flow rates in system components or" );
 						ShowContinueError( "inconsistent supply air fan operation modes in coil and unitary system objects." );
 					}
@@ -10510,7 +10536,7 @@ Label50: ;
 				// Calculate electricity consumed. First, get EIR modifying factors for off-rated conditions
 				// Model was extended to accept bi-quadratic curves. This allows sensitivity of the EIR
 				// to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
-				// advised to use the bi-quaratic curve if sufficient manufacturer data is available.
+				// advised to use the bi-quadratic curve if sufficient manufacturer data is available.
 				if ( ( DXCoil( DXCoilNum ).MSEIRTempModFacCurveType( 1 ) == Quadratic ) || ( DXCoil( DXCoilNum ).MSEIRTempModFacCurveType( 1 ) == Cubic ) ) {
 					EIRTempModFac = CurveValue( DXCoil( DXCoilNum ).MSEIRFTemp( 1 ), OutdoorDryBulb );
 				} else if ( DXCoil( DXCoilNum ).MSEIRTempModFacCurveType( 1 ) == BiQuadratic ) {
@@ -11628,6 +11654,11 @@ Label50: ;
 			WhichCoil = FindItem( CoilName, DXCoil.Name(), NumDXCoils );
 			if ( WhichCoil != 0 ) {
 				CoilCapacity = DXCoil( WhichCoil ).RatedTotCap( 1 );
+			}
+		} else if ( SameString( CoilType, "Coil:Cooling:DX:MultiSpeed" ) ) {
+			WhichCoil = FindItem( CoilName, DXCoil.Name(), NumDXCoils );
+			if ( WhichCoil != 0 ) {
+				CoilCapacity = DXCoil( WhichCoil ).MSRatedTotCap( DXCoil( WhichCoil ).NumOfSpeeds );
 			}
 		} else {
 			WhichCoil = 0;

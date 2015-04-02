@@ -19,6 +19,9 @@
 *~
 .directory
 
+# now that we have python, ignore some things
+*.pyc
+
 # build folder, if the dev chooses to put it there
 #  could also do a wildcard for build-* if we suggest that naming approach
 #  which could be useful for: build-eclipse, build-vs2013, build, etc.

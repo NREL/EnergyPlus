@@ -73,7 +73,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.2;
+  Version,8.3;
 
   Building,
     barracks2,               !- Name
