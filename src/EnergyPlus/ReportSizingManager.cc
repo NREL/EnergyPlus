@@ -1042,10 +1042,12 @@ namespace ReportSizingManager {
 						ShowWarningMessage( CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName );
 						ShowContinueError( "...Rated Total Heating Capacity = 0." );
 						ShowContinueError( "...Air flow rate used for sizing = " + TrimSigDigits( DesMassFlow / StdRhoAir, 5 ) + " [m3/s]" );
-						ShowContinueError( "...Coil inlet air temperature used for sizing = " + TrimSigDigits( CoilInTemp, 2 ) + " [C]" );
-						ShowContinueError( "...Coil outlet air temperature used for sizing = " + TrimSigDigits( CoilOutTemp, 2 ) + " [C]" );
 						if( TermUnitSingDuct || TermUnitPIU || TermUnitIU || ZoneEqFanCoil ) {
 							ShowContinueError( "...Plant loop temperature difference = " + TrimSigDigits( PlantSizData( DataPltSizHeatNum ).DeltaT, 2 ) + " [C]" );
+						} else {
+							ShowContinueError( "...Coil inlet air temperature used for sizing = " + TrimSigDigits( CoilInTemp, 2 ) + " [C]" );
+							ShowContinueError( "...Coil outlet air temperature used for sizing = " + TrimSigDigits( CoilOutTemp, 2 ) + " [C]" );
+							ShowContinueError( "...Coil outlet air humidity ratio used for sizing = " + TrimSigDigits( CoilOutHumRat, 2 ) + " [kgWater/kgDryAir]" );
 						}
 					}
 				} else if( SizingType == HeatingWaterDesCoilLoadUsedForUASizing ) {
@@ -1471,9 +1473,11 @@ namespace ReportSizingManager {
 						}
 						if (FinalSysSizing( CurSysNum ).CoolingCapMethod == CapacityPerFloorArea) {
 							NominalCapacityDes = FinalSysSizing( CurSysNum ).CoolingTotalCapacity;
+							AutosizeDes = NominalCapacityDes;
 						} else if (FinalSysSizing( CurSysNum ).CoolingCapMethod == CoolingDesignCapacity && FinalSysSizing( CurSysNum ).CoolingTotalCapacity > 0.0 ) {
 							NominalCapacityDes = FinalSysSizing( CurSysNum ).CoolingTotalCapacity;
-						} else if ( DesVolFlow >= SmallAirVolFlow ) {
+							AutosizeDes = NominalCapacityDes;
+						} else if( DesVolFlow >= SmallAirVolFlow ) {
 							OutAirFrac = 0.0;
 							if ( DesVolFlow > 0.0 ) {
 								OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / DesVolFlow;
@@ -1543,7 +1547,7 @@ namespace ReportSizingManager {
 					if( DisplayExtraWarnings && AutosizeDes <= 0.0 ) {
 						ShowWarningMessage( CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName );
 						ShowContinueError( "...Rated Total Cooling Capacity = 0." );
-						if( OASysFlag || AirLoopSysFlag ) {
+						if( OASysFlag || AirLoopSysFlag || FinalSysSizing( CurSysNum ).CoolingCapMethod == CapacityPerFloorArea || ( FinalSysSizing( CurSysNum ).CoolingCapMethod == CoolingDesignCapacity && FinalSysSizing( CurSysNum ).CoolingTotalCapacity ) ) {
 							ShowContinueError( "...Capacity passed by parent object to size child component = " + TrimSigDigits( AutosizeDes, 2 ) + " [W]" );
 						} else {
 							ShowContinueError( "...Air flow rate used for sizing = " + TrimSigDigits( DesVolFlow, 5 ) + " [m3/s]" );
@@ -1649,10 +1653,14 @@ namespace ReportSizingManager {
 								}
 							}
 						}
-					} else if (FinalSysSizing( CurSysNum ).HeatingCapMethod == CapacityPerFloorArea) {
+						DesCoilLoad = NominalCapacityDes;
+						CoilOutTemp = -999.0;
+					} else if( FinalSysSizing( CurSysNum ).HeatingCapMethod == CapacityPerFloorArea ) {
 						NominalCapacityDes = FinalSysSizing( CurSysNum ).HeatingTotalCapacity;
-					} else if (FinalSysSizing( CurSysNum ).HeatingCapMethod == HeatingDesignCapacity && FinalSysSizing( CurSysNum ).HeatingTotalCapacity > 0.0) {
+						CoilOutTemp = -999.0;
+					} else if( FinalSysSizing( CurSysNum ).HeatingCapMethod == HeatingDesignCapacity && FinalSysSizing( CurSysNum ).HeatingTotalCapacity > 0.0 ) {
 						NominalCapacityDes = FinalSysSizing( CurSysNum ).HeatingTotalCapacity;
+						CoilOutTemp = -999.0;
 					} else {
 						if ( DataCoolCoilCap > 0.0 ) {
 							NominalCapacityDes = DataCoolCoilCap;
@@ -1661,6 +1669,7 @@ namespace ReportSizingManager {
 						} else {
 							NominalCapacityDes = 0.0;
 						}
+						CoilOutTemp = -999.0;
 					}
 					AutosizeDes = NominalCapacityDes * DataHeatSizeRatio * DataFracOfAutosizedHeatingCapacity;
 					if( DisplayExtraWarnings && AutosizeDes <= 0.0 ) {
