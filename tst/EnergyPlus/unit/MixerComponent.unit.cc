@@ -16,6 +16,7 @@ using namespace ObjexxFCL;
 
 TEST(MixerComponent, GetZoneMixerIndex)
 {
+	ShowMessage( "Begin Test: MixerComponent, GetZoneMixerIndex" );
 	// locals
 	std::string CurrentModuleObject;
 	std::string LINE;
@@ -29,13 +30,13 @@ TEST(MixerComponent, GetZoneMixerIndex)
 	errFlag = false;
 	// allocate needed arrays
 	MixerCond.allocate( NumMixers );
-	MixerCond( 1 ).MixerName = "SPACE1-1 FPIU";
-	MixerCond( 2 ).MixerName = "SPACE2-1 FPIU";
-	MixerCond( 3 ).MixerName = "SPACE3-1 FPIU";
+	MixerCond( 1 ).MixerName = "SPACE1-1 ATU Mixer";
+	MixerCond( 2 ).MixerName = "SPACE2-1 ATU Mixer";
+	MixerCond( 3 ).MixerName = "SPACE3-1 ATU Mixer";
 	GetZoneMixerIndex( MixerCond( 2 ).MixerName, MixerIndex, errFlag, CurrentModuleObject );
 	EXPECT_EQ( 2, MixerIndex );
-	EXPECT_EQ( false, errFlag );
-	GetZoneMixerIndex( "Bad Mixer Name", MixerIndex, errFlag, CurrentModuleObject );
+	EXPECT_FALSE( errFlag );
+	GetZoneMixerIndex( "SPACE3-3 ATU Mixer", MixerIndex, errFlag, CurrentModuleObject );
 	EXPECT_EQ( 0, MixerIndex );
-	EXPECT_EQ( true, errFlag );
+	EXPECT_TRUE( errFlag );
 }
