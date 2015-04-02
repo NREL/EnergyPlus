@@ -21,6 +21,8 @@ using namespace ObjexxFCL;
 
 TEST( HeatBalanceManagerTest, ProcessZoneData )
 {
+	ShowMessage( "Begin Test: HeatBalanceManagerTest, ProcessZoneData" );
+	
 // Test input processing of Zone object
 //	Zone,
 //		ZONE ONE, !- Name
@@ -104,7 +106,10 @@ TEST( HeatBalanceManagerTest, ProcessZoneData )
 	rNumericArgs.deallocate();
 
 }
-TEST( HeatBalanceManagerTest, GetWindowConstructData ) {
+TEST( HeatBalanceManagerTest, GetWindowConstructData ) 
+{
+	ShowMessage( "Begin Test: HeatBalanceManagerTest, GetWindowConstructData" );
+
 	// Test get input for window construction object
 	// Construction,
 	//	 WINDOWWBLIND, !- Name
@@ -197,14 +202,16 @@ TEST( HeatBalanceManagerTest, GetWindowConstructData ) {
 	NominalRforNominalUCalculation.allocate( 1 );
 	NominalRforNominalUCalculation( 1 ) = 0.0;
 	NominalR.allocate( TotMaterials );
-	NominalR( TotMaterials ) = 0.4;
+	NominalR( 1 ) = 0.4; // Set these explicity for each material layer to avoid random failures of check for NominalRforNominalUCalculation == 0.0 at end of GetConstructData
+	NominalR( 2 ) = 0.4;
+	NominalR( 3 ) = 0.4;
 
 	// call to get valid window material types
 	ErrorsFound = false;
 	GetConstructData( ErrorsFound ); // returns ErrorsFound as false since all layers are valid
 	EXPECT_FALSE( ErrorsFound );
 
-	// Clear the Construct array
+	// Clear shared arrays that were allocated in GetConstructData
 	Construct.deallocate( );
 
 	// call to get invalid window material type
@@ -214,9 +221,8 @@ TEST( HeatBalanceManagerTest, GetWindowConstructData ) {
 	EXPECT_TRUE( ErrorsFound );
 
 	// dealocate variables
-	Construct.deallocate();
-	Material.deallocate();
-	//ListOfObjects.deallocate();
+	Construct.deallocate( );
+	Material.deallocate( );
 	iListOfObjects.deallocate();
 	ObjectStartRecord.deallocate();
 	ObjectGotCount.deallocate();

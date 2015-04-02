@@ -17,6 +17,7 @@
 #include <DataAirflowNetwork.hh>
 #include <AirflowNetworkBalanceManager.hh>
 #include <AirflowNetworkSolver.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace AirflowNetworkBalanceManager;
@@ -25,6 +26,8 @@ using namespace AirflowNetworkSolver;
 
 TEST( AirflowNetworkSolverTest, HorizontalOpening )
 {
+
+	ShowMessage( "Begin Test: AirflowNetworkSolverTest, HorizontalOpening" );
 
 	int i = 1;
 	int j = 1;

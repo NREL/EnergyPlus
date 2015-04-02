@@ -10,6 +10,7 @@
 #include <DataSystemVariables.hh>
 #include <DataHeatBalance.hh>
 #include <DataBSDFWindow.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::SolarShading;
@@ -22,6 +23,8 @@ using namespace ObjexxFCL;
 
 TEST( CalcPerSolarBeamTest, Test1 )
 {
+	ShowMessage( "Begin Test: CalcPerSolarBeamTest, Test1" );
+	
 // Test inits for integrated and non-integrated shading calcs
 
 //	static bool ErrorsFound( false ); // If errors detected in input

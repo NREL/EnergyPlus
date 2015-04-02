@@ -26,6 +26,7 @@
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <ObjexxFCL/gio.hh>
 
 using namespace EnergyPlus;
@@ -39,6 +40,7 @@ using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::FluidProperties;
 using namespace EnergyPlus::SizingManager;
 using namespace EnergyPlus::WaterCoils;
+using namespace EnergyPlus::Psychrometrics;
 
 class WaterCoilsTest : public testing::Test
 {
@@ -95,10 +97,17 @@ public:
 
 TEST_F( WaterCoilsTest, WaterCoolingCoilSizing )
 {
+	InitializePsychRoutines( );
+	OutBaroPress = 101325.0;
+	StdRhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, 20.0, 0.0 );
+	ShowMessage( "Begin Test: WaterCoilsTest, WaterCoolingCoilSizing" );
 	int write_stat;
 	// Open the Initialization Output File (lifted from SimulationManager.cc)
 	OutputFileInits = GetNewUnitNumber();
 	{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
+
+	// set up sizing flags
+	SysSizingRunDone = true;
 
 	// set up plant sizing
 	NumPltSizInput = 1;
