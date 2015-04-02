@@ -21,9 +21,9 @@ using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataBSDFWindow;
 using namespace ObjexxFCL;
 
-TEST( CalcPerSolarBeamTest, Test1 )
+TEST(SolarShadingTest, CalcPerSolarBeamTest)
 {
-	ShowMessage( "Begin Test: CalcPerSolarBeamTest, Test1" );
+	ShowMessage( "Begin Test: SolarShadingTest, CalcPerSolarBeamTest" );
 	
 // Test inits for integrated and non-integrated shading calcs
 
@@ -109,6 +109,7 @@ TEST( CalcPerSolarBeamTest, Test1 )
 
 TEST( SolarShadingTest, SurfaceScheduledSolarInc )
 {
+	ShowMessage("Begin Test: SolarShadingTest, SurfaceScheduledSolarInc");
 	int SurfSolIncPtr;
 	TotSurfIncSolSSG = 4;
 	SurfIncSolSSG.allocate( TotSurfIncSolSSG );
