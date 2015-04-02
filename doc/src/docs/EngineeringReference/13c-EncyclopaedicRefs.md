@@ -1543,45 +1543,181 @@ This section summarizes the model implemented in the component EvaporativeCooler
 
 The indirect research special evaporative cooler (IEC) machine provides improved modeling features needed for data center and other hybrid cooling applications.  The new model includes performance curves for variable effectiveness, fan power, and pump power.  It is intended to be able to model IEC machines that have 1) variable speed secondary fans, 2) variable speed pumps for water recirculation and spraying, and 3) ability to operate in a dry mode.  Such IEC machines can modulate the cooling power during operation by varying either the secondary side fan speed or the intensity of water spray or both.  To simplify the model it is assumed that the device’s internal controls are such that, when it is operating as a “Wet” evaporative cooler, secondary fan and spray pump operation are linked together so that there is a one-to-one mapping between them at any given part load situation.  This allows formulating the fan and pump power performance curves to be based on the same independent variable, secondary air flow fraction.
 
-
-
-
-HERE
-
-
-
-
 ![figure 166 renamed](EngineeringReference/media/image4808.png)
 
 Figure 206. Research Special Indirect Evaporative Cooler
 
-The algorithm used to determine the cooling provided to the system air proceeds in these three steps:
+#### Model Formulation
 
-1)    calculate full load performance using PLF=1 and Equation and Equation
+Each time the model is called it takes the inputs on the left and produces the outputs on the right as shown in [Figure](#IndEvapCoolerFig2). “sys” is primary air stream and typically sits on an AirLoop HVAC branch. “sec” is secondary purge air stream and is typically outdoor air.  The model will set node flow rates and “out_sec” state variables on the secondary outlet. 
 
-2)    calculate PLF using Equation , Equation , and Equation , and
+![](EngineeringReference/media/image8005.png)
 
-3)    recalculate performance using PLF from step 2.
+Figure: Illustration of Inputs-Outputs of Indirect Evaporative Cooler Research Special <a name="IndEvapCoolerFig2"></a>
 
-* If PLF = 1 then use Equation and Equation
+The model runs either in dry mode or wet mode depending entering air conditions of the primary and secondary air sides. Different effectiveness values are used depending on the operating modes.
 
-* If PLF &lt;1 then outlet temp = desired outlet temp (as by magic)
+#### Wet Mode Operation
 
-* Auxiliary fan energy adjusted by PLF
+If running “wet,” use wet bulb effectiveness and wet bulb temperature depression for delta T:
 
-* Water consumption based on change in enthalpy in air system
+<div>\[  \begin{array}{rl}
+  \epsilon_{wb,op} &= \epsilon_{wb,design}\cdot f_{wb,mod}\left(\text{flowRatio}\right) \\
+  \text{flowRatio} &= \frac{\dot{m}_{sec}}{\dot{m}_{sys}}
+\end{array}\]</div>
 
-<div>\[{T_{db,out,sys}} = {T_{db,in,sys}} - \varepsilon \left( {{T_{db,in,sys}} - {T_{wb,in,purge}}} \right)\]</div>
+Where:
 
-where,
+* <span>$\epsilon_{wb,op}$</span> = current operation effectiveness with respect to wet bulb temperature depression.
 
-<span>${T_{db,out,sys}}$</span>     is the dry-bulb of the system air leaving the cooler [ºC]
+* <span>$\epsilon_{wb,design}$</span> = user input for effectiveness at design air flow rates and full spray power
 
-<span>${T_{db,in,sys}}$</span>                  is the dry-bulb of the system air entering the cooler [ºC]
+* <span>$f_{wb,mod}}$</span> = normalized wet mode operation effectiveness modifier performance curve as a function of flow fraction. The curve value describes how effectiveness varies at different flow rates.  When conditions are appropriate, this curve is numerically inverted to find a FlowRatio that just meets a setpoint. 
 
-<span>$\varepsilon $</span>               is a cooler effectiveness (eg. 0.7 to 1.2)
+* <span>$\dot{m}_{sys}$</span> = primary air current time step mass flow rate in kg/s
 
-<span>${T_{wb,in,purge}}$</span>   is the wet-bulb of the purge air entering the wet side of cooler [ºC]
+* <span>$\dot{m}_{sec}$</span> = secondary air current time step mass flow rate in kg/s
+
+The leaving primary air dry bulb temperature in wet operating mode is calculated as follows:
+
+<div>\[ T_{db,out,sys} = T_{db,in,sys} - \epsilon_{wb,op} \left( T_{db,in,sys} - T_{wb,in,sec} \right) \] </div>
+
+Then check that there is sufficient heat capacitance flux (mcT) in the secondary air stream to provide the conditioning.  The following steps are for checking and adjusting for non-physical outcomes that could happen with low secondary flow rates.
+
+1. Calculate heat transfer rate
+
+The secondary air entering wet-bulb temperature would be the loswest limit allowed, although this temperature cannot be attained in most practical situations.  This is checked as a limiting case.
+
+<div>\[
+  \begin{array}{rl}
+    T_{db,out,sys} &= \max\left(T_{db,out,sys},T_{db,out,setpoint}\right) \\
+    \dot{Q}_{HX} &= \left(\dot{m}c_p\right)_{sys,in} \cdot \left(T_{db,in,sys}-T_{db,out,sys}\right)
+  \end{array}
+\]</div>
+
+2. Calculate outlet enthalpy of the secondary air
+
+<div>\[
+  \text{enahalpy}_{out,sec} = \text{enthalpy}_{in,sec} + \frac{\dot{Q}_{HX}}{\dot{m}_{sec}}
+\]</div>
+
+One approximation that can be made is the outlet condition of the temperature and humidity ratio combination that produces the outlet enthalpy of the secondary air calculated above.  A conservative approach is that the secondary air leaves with water added at such a rate that it results in the secondary air to leave at the same dry bulb temperature and all the total heat transfer results in humidity ratio increases, i.e., latent heat transfer. Following this assumption the secondary air outlet humidity ratio can be calculated in step 3. 
+
+3. Calculate outlet humidity ratio of the secondary air
+
+<div>\[
+  \begin{array}{rl}
+    T_{db,out,sec} &= T_{db,in,sec} \\
+    \text{HumRat}_{out,sec} &= \text{PsyWFnTbH}\left(T_{db,out,sec},\text{enthalpy}_{out,sec}\right) \\
+    \dot{V}_{water} &= \frac{QHX / \left[ \left(\text{HumRat}_{out,sec}-\text{HumRat}_{in,sec}\right) \cdot h_{fg,in,sec}\right]}{\rho_{water,Tdb,in,sec}}
+    or &= \\
+    \dot{V}_{water} &= \frac{QHX / \left[ \left(\text{enthalpy}_{out,sec}-\text{enthalpy}_{in,sec}\right) \right]}{\rho_{water,Tdb,in,sec}}
+  \end{array}
+\]</div>
+
+Dry Operation Mode
+
+Similarly, if running “dry” use dry bulb effectiveness and dry bulb based delta T
+
+<div>\[ \epsilon_{db,op} = \epsilon_{db,design} \cdot f_{db,mod}\left(\text{flowRatio}\right) \]</div>
+
+Where:
+
+* <span>$ \epsilon_{db,op} $</span> = current operation effectiveness with respect to dry bulb temperature depression.
+
+* <span>$ \epsilon_{db,design} $</span> = user input for effectiveness at design air flow rates and dry operation mode (no water spray on the secondary air side)
+
+* <span>$ f_{db,mod} $</span> = normalized dry mode operation effectiveness modifier performance curve as a function of flow fraction.  The curve value describes how the dry mode effectiveness varies with different flow rates.  When conditions are appropriate, this curve is numerically inverted to find a FlowRatio that just meets a setpoint 
+
+The leaving primary air dry bulb temperature in dry operating mode is calculated as follows:
+
+<div>\[T_{db,out,sys} = T_{db,in,sys} - \epsilon{db,op}\left(T_{db,in,sys]-T_{db,in,sec}\right)\]</div>
+
+Then check that there is sufficient heat capacitance flux (mcT) in the secondary air stream to provide the conditioning.  For dry operation, it should be sufficient to simply use inlet moist air properties for density and specific heat.  The following steps are for checking and adjusting for non-physical outcomes that could happen with low secondary flow rates.
+
+1. Calculate heat transfer
+
+<div>\[ \dot{Q}_{HX} = \left(\dot{m}c_{p}\right)_{sys,in} \left(T_{db,in,sys}-T_{db,out,sys}c\right) \]</div>
+
+2. Calculate secondary/scavenger leaving dry-bulb
+
+<div>\[ T_{db,out,sec} = T_{db,in,sec} + \frac{\dot{Q}_{HX}}{ \left(\dot{m}c_{p}\right)_{sys,in}} \]</div>
+
+3. Check for energy imbalance and adjust if need
+
+<div>\[ \text{IF} \left(T_{db,out,sec}>T_{db,in,sys}\right) \text{THEN} T_{db,out,sec} = T_{db,in,sys}-0.2 C \]</div>
+
+4. Recalculate heat transfer limit if imbalance found in step 3 using new secondary outlet drybulb
+
+<div>\[ \dot{Q}_{HX,lim} = \left(\dot{m}c_{p}\right)_{sec,in}\cdot \left( T_{db,out,sec}-T_{db,in,sec} \right) \]</div>
+
+5. Recalculate leaving supply air dryblub using new heat transfer rate from step 4
+
+<div>\[ T_{db,out,sys} = T_{db,in,sec} + \frac{\dot{Q}_{HX}}{ \left(\dot{m}c_{p}\right)_{sys,in}} \]</div>
+
+The IEC in dry and wet operating mode transfers no moisture to the primary system air, so the humidity ratio remains the same:
+
+<div>\[\text{HumRat}_{out,sys} = \text{HumRat}_{in,sys}\]</div>
+
+#### Secondary Air Flow Fraction
+
+The secondary air mass flow rate will either be set to <span>$\dot{m}_{sec}$</span> or solved for numerically as described below. The secondary side flow fraction, <span>$ff_{sec}$</span>, is defined as.  (Note this is another flow ratio that differs from the one used above which combined both streams into one ratio in effectiveness modifier curves.)  
+
+<div>\[ff_{sec} = \frac{\dot{m}_{sec}}{\dot{m}_{sec,design}}\]</div>
+
+The secondary air mass flow rate will either be set to  or solved for numerically as described below. The secondary side flow fraction, , is defined as.  (Note this is another flow ratio that differs from the one used above which combined both streams into one ratio in effectiveness modifier curves.)  
+
+<div>\[P_{sec,fan} = P_{sec,fan,design}\cdot f_{sec,fan,mod}\left(ff_{sec}\right) \]</div>
+
+Where:
+
+<span>$ P_{sec,fan} $</span> = secondary air fan electric power value at current secondary air flow rate in W.
+
+<span>$ P_{sec,fan,design} $</span> = secondary air fan electric power value at design air flow rate in W.
+
+<span>$ f_{sec,fan,mod} $</span> = secondary air fan power modifier normalized performance curve as a function of secondary air flow fraction.
+
+<span>$ \dot{m}_{sec,design} $</span> = secondary air design mass flow rate in kg/s
+
+Recirculation and spray pump electric power is calculated using design pump electric power and a normalized pump power modifier performance curve that describes how power varies as a function of the secondary air flow fraction is given by:
+
+<div>\[P_{pump} = P_{pump,design}\cdot f_{pump,mod}\left(ff_{sec}\right) \]</div>
+
+Where:
+
+<span>$ P_{pump} $</span> = recirculation and spray pump power value at current operation in W.
+
+<span>$ P_{pump,design} $</span> = recirculation and spray pump power value at design air flow rate in W.
+
+<span>$ f_{pump,mod} $</span> = recirculation and spray pump power modifier normalized performance curve as a function of secondary air flow fraction.
+
+User specified three operating temperature limits are included in the model.  These allow controlling when operation should shift from wet to dry and when the cooler should just be shut down because the outdoor conditions are too warm or too wet to do anything beneficial. 
+
+<span>$ T_{db,evapMinLimit} $</span> = Evaporative Operation Minimum Limit Outdoor Drybulb Temperature, user input.  Shut down wet mode with outdoor temperature is lower than this limit, typically shifting to dry mode.  
+
+<span>$ T_{wb,evapMaxLimit} $</span> = Evaporative Operation Maximum Limit Outdoor Wetbulb Temperature, user input.  Shut down fan and pump and don’t operate when outdoor Wetbulb is higher than this limit.  The wet bulb is maybe warmer than the return air and attempting evaporative cooling is wasteful. 
+
+<span>$ T_{db,evapMaxLimit} $</span> = Dry Operation Maximum Limit Outdoor Drybulb Temperature, user input.  Shut down dry operation attempts and don’t operate secondary fan when outdoor dry bulb is higher than this limit.  The dry bulb is maybe warmer than the return air and attempting to do heat exchange is wasteful. 
+
+Algorithm to determine cooler operation proceeds as follows
+
+1. Retrieve leaving setpoint, <span>$T_{db,out,setpoint}$</span>
+
+2. Calculate leaving dry bulb for max cooling power available at full secondary air flow rate for dry operation, <span>$T_{db,out,sys,dry,min}$</span>
+
+3. Check if dry operation limit (input field called Evaporative Operation Minimum Limit Outdoor Dry-Bulb Temperature) reached, <span>$T_{db,in,sec}<T_{db,evapMinLimit}$</span>
+
+4. If dry limit not exceeded, then leaving dry bulb for max cooling power available at full secondary air flow rate for wet operation, <span>$T_{db,out,sys,wet,min}$</span>
+
+5. Compare setpoint temperature needed to temperatures available, evaluate limits and choose which case for operation is called for. The following table outlines the five cases in order of increasing cooling power.
+
+INSERT TABLE
+
+“Modulated” cases solve for a secondary flow rate using numerical method, such as regula falsi.  Residual is formulated by a difference between the dry bulb temperature leaving the cooler and the setpoint.  As the solver progress it varies flow rate on the secondary side until the setpoint is met.  For each iteration, a new effectiveness is calculated as a function of Flow Ratio.  The new flow is used for the <span>$\left(\dot{m}c_{p}\right)_{min}$</span> term and the new effectiveness is used to calculate a result for leaving drybulb.  The numerical method is the same for dry and wet operation, only the functions will use different curves and state variables to describe performance. The regula falsi solver can vary secondary flow rate, <span>$\dot{V}_{sec}$</span>, to drive the following residual to zero:
+
+<div>\[\text{residual} = T_{db,out,sys} - T_{db,out,setpoint}\]</div> 
+
+“Dry or Wet Op Modulated” is the most complex situation.  There is an overlap and the cooler could deliver the setpoint air using either dry operation or wet operation.  The model proceeds separately to calculate both wet and dry operation, with separate numerical solvers for modulation in each mode.  Then the fan and pump power is calculated for each mode.  Select the lowest power mode as the preferred choice.  (This doesn’t really count the value of water, could bring in a source factor but …). Discard results for the unused mode. 
 
 The purge air, or secondary airside, is the stream that evaporates water and indirectly cools the primary, or system air.  The result from Equation is then compared to a lower bound, <span>${T_{db,out,bound}}$</span>, determined from the dewpoint of the incoming purge air using Equation .
 
@@ -1595,7 +1731,7 @@ where,
 
 The final result (for PLF = 1) is the larger of the results from Equations and .
 
-The indirect cooler has the ability to overcool the air and therefore needs some form of modulation.  A Part Load Fraction, PLF, is used to model the implications of controlling the amount of cooling.  It is assumed that through on/off cycling that the cooling power can be varied to exactly meet the desired temperature when PLF is less than unity.  The auxiliary fan power is then varied linearly using a Part Load Fraction.
+The indirect cooler has the ability to overcool the air and therefore needs some form of modulation.  A Part Load Fraction, PLF, is used to model the implications of controlling the amount of cooling.  It is assumed that through on/off cycling that the cooling power can be varied to exactly meet the desired temperature when PLF is less than unity.
 
 <div>\[{\dot Q_{Full}} = \dot m\left( {{h_{out,sys}} - {h_{in,sys}}} \right)\]</div>
 
@@ -1607,7 +1743,7 @@ where,
 
 <span>$PLF$</span>                     is the Part Load Fraction
 
-When PLF is less than 1.0 it is assumed that the cooler will deliver the desired temperature air (as long as it is less than the inlet; it doesn’t need heating).  The PLF is used to modify the auxiliary fan power and find when the unit will overcool.
+When PLF is less than 1.0 it is assumed that the cooler will deliver the desired temperature air (as long as it is less than the inlet; it doesn’t need heating).  The PLF is used to modify the auxiliary fan power when the fan power modifier curve is not specified and find when the unit will overcool.
 
 <div>\[{P_{fan}} = \Delta P\cdot \dot V\cdot e\cdot PLF\]</div>
 
@@ -1647,31 +1783,81 @@ Blowdown is water drained from the sump to counter the build up of solids in the
 
 Figure 207. Research Special Indirect Evaporative Cooler Using Relief Air
 
+#### Indirect Evaporative Cooler Sizing
+
+The model for the object called EvaporativeCooler:Indirect:ResearchSpecial has a field for the secondary fan flow rate that can be autosized.  
+
+##### Secondary Air DesignFan Flow Rate
+
+The secondary air design flow rate fan is not part of an airstream that is directly modeled in EnergyPlus.  Because the primary side air flows can be autosized as part of the air system, it is convenentconvenient to also scale the size of the secondary flow.   If the cooler is part of the main loop of a central air system, then the secondary fan flow rate is sized to equal to the main design flow rate. 
+
+User inputs for autosizing scaling factors are included so that when modeling an autosized IEC, all the design values can be scaled off of Primary Design Air Flow Rate.  User input for Secondary Air Flow Sizing Factor is multiplied by DesMainVolFlow<sub>sys</sub> as follows:
+
+<div>\[ \dot{V}_{sec,design} = \text{DesMainVolFlow_{sys}\cdot\text{SecAirFlowScalingFactor} \]</div>
+
+If the cooler is part of the outdoor air path of a central air system, then the secondary air design flow rate is sized to be the maximum of either the design minimum outdoor air flow rate or one-half of the main design flow rate. 
+
+<div>\[ \dot{V}_{sec,design} = \max\left(\text{DesOutAirVolFlow,0.5\cdot\text{DesMainVolFlow}_{sys}\right)\cdot\text{SecAirFlowScalingFactor} \]</div>
+ 
+##### Secondary Fan Design Power
+
+The Secondary Fan Design Power is outosized from secondary air design flow rate and user input for Secondary Fan Sizing Specific Power in units of W/(m3/s) as follows:
+
+<div>\[ P_{sec,fan,design} = \dot{V}_{sec,design}\cdot\text{FanPowerScalingFactor} \]</div>
+
+##### Recirculating Water Design Pump Power
+
+The Recirculating Water Design Pump Power is sized from secondary air design flow rate and user input for recirculating and spraying Water Pump Power Sizing Factor in units of W/(m3/s) or W-s/m3 and is given by:
+
+<div>\[P_{pump,design} = \dot{V}_{sec,design}\cdot\text{PumpPowerScalingFactor}\]</div>
+
+Where,
+
+<span>$ \dot{V}_{sys,design} $</span> = primary air design volume flow rate in m3/s
+
+<span>$ \dot{V}_{sec,design} $</span> = secondary air design volume flow rate in m3/s
+
+<span>$ \text{SecAirFlowScalingFactor} $</span> = user specified Secondary air flow sizing factor in units of W/(m3/s) for secondary design air flow rate calculation.
+
+<span>$ \text{FanPowerScalingFactor} $</span> = user specified secondary air fan sizing specific power in units of W/(m3/s) for design fan power calculation.
+
+<span>$ \text{PumpPowerScalingFactor} $</span> = user specified recirculating and spraying water pump power sizing factor in units of W/(m3/s) for design pump power calculation.
+
 ### Direct Evaporative Cooler Special Research Model
 
-This section summarizes the model implemented in the component EvaporativeCooler:Direct:ResearchSpecial.  This is a simple constant effectiveness model that, under part load conditions, can modulate so that the air leaving the cooler just meets a drybulb temperature setpoint.  The algorithm used to determine the changes to the system air proceeds in three steps:
+This section summarizes the model implemented in the component EvaporativeCooler:Direct:ResearchSpecial.  This model can use a simple constant effectiveness or a variable effectiveness model that, under part load conditions, can modulate so that the air leaving the cooler just meets a drybulb temperature setpoint.  The algorithm used to determine the changes to the system air proceeds in four steps:
 
-1)    calculate full load performance using a part load fraction (PLF)=1 and Equation .
+1) Calculate the current operation effectiveness using effectiveness modifying curve
 
-2)    calculate PLF using Equations , , and .
+2) Calculate full load performance using a part load fraction (PLF)=1 and Equation .
 
-3)    recalculate cooler performance using the PLF.
+3) Calculate PLF using Equations , , and .
 
-<div>\[\begin{array}{l}{T_{db,out}} = {T_{db,in}} - \varepsilon \left( {{T_{db,in}} - {T_{wb,in}}} \right)\\\end{array}\]</div>
+4) Recalculate cooler performance using the PLF.
+
+<div>\[\begin{array}{rl}
+  \epsilon_{op} &= \epsilon_{design}\cdot f_{mod}\left(flowRatio\right) \\
+  T_{db,out,sys} &= T_{db,in,sys} - \epsilon_{op}\cdot\left(T_{db,in,sys}-T_{wb,in,sys}\right) \\
+  T_{db,out} &= T_{db,in}-\epsilon\left(T_{db,in}-T_{wb,in}\right)
+\end{array}\]</div>
 
 where,
 
-<span>${T_{db,out}}$</span> is the drybub temperature of the air leaving the cooler [ºC],
+* <span>${T_{db,out,sys}}$</span> is the drybub temperature of the air leaving the cooler [ºC],
 
-<span>${T_{db,in}}$</span> is the drybulb temperature of the air entering the cooler [ºC],
+* <span>${T_{db,in,sys}}$</span> is the drybulb temperature of the air entering the cooler [ºC],
 
-<span>${T_{wb,in}}$</span> is the wetbulb temperature of the air entering the cooler [ºC], and
+* <span>${T_{wb,in,sys}}$</span> is the wetbulb temperature of the air entering the cooler [ºC], and
 
-<span>$\varepsilon $</span> is the cooler effectiveness.
+* <span>$\epsilon_{design} $</span> is the cooler design effectiveness.
 
-The wetbulb temperature of air leaving a direct cooler is the same as the wetbulb temperature entering the cooler.  The leaving humidity ratio of the air is calculated using psychrometric functions with with leaving drybulb and wetbulb temperatures and outdoor air pressure as inputs.  The leaving enthalpy of air is calculated using pyschrometric functions with leaving drybulb temperature, leaving humidity ratio, and outdoor air pressure as inputs.
+* <span>$\epsilon_{op} $</span> is the cooler current operation effectiveness.
 
-The direct cooler sometimes has the ability to overcool the air and therefore some form of modulation is useful for analysis.  The special research model includes a Part Load Fraction, PLF, used to model the implications of controlling the amount of cooling.  It is assumed that through some sort of on/off cycling or wetness control that the cooling power can be varied to exactly meet the desired temperature when PLF is less than unity.  The auxiliary water pump power is then varied linearly using a Part Load Fraction.
+* <span>$f_{mod} $</span> is the effectiveness modifier curve as a function of system air flow fraction
+
+The wetbulb temperature of air leaving a direct cooler is the same as the wetbulb temperature entering the cooler.  The leaving humidity ratio of the air is calculated using psychrometric functions with leaving drybulb and wetbulb temperatures and outdoor air pressure as inputs.  The leaving enthalpy of air is calculated using psychrometric functions with leaving drybulb temperature, leaving humidity ratio, and outdoor air pressure as inputs.
+
+The direct cooler sometimes has the ability to overcool the air and therefore some form of modulation is useful for analysis.  The special research model includes a Part Load Fraction, PLF, used to model the implications of controlling the amount of cooling.  It is assumed that through some sort of on/off cycling or wetness control that the cooling electric power can be varied to exactly meet the desired temperature when PLF is less than unity.  The auxiliary water pump power is then varied using pump power modifier curve or linearly using a Part Load Fraction when the pump power modifier curve is not specified.
 
 <div>\[{\rm{FullOutput}} = {T_{db,out}} - {T_{db,in}}\]</div>
 
@@ -1679,7 +1865,7 @@ The direct cooler sometimes has the ability to overcool the air and therefore so
 
 <div>\[PLF = \frac{{{\rm{RequiredOutput}}}}{{{\rm{FullOutput}}}}\]</div>
 
-When PLF is less than 1.0 it is assumed that the cooler will deliver the desired temperature air (as long as it is less than the inlet; it doesn’t need heating).  Water pump power is also derated using the PLF.
+When PLF is less than 1.0 it is assumed that the cooler will deliver the desired temperature air (as long as it is less than the inlet; it doesn’t need heating).  Water pump power is also derated using the user specified pump modifier curve or using PLF when the pump modifier curve is not specified.
 
 #### Water Consumption
 
