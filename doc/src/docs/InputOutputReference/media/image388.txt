@@ -1,1 +1,0 @@
-\(\begin{array}{l}LoopVolumetricAirFlowRate@SpeedLevel\left( x \right) = \\\quad \quad \quad \quad AirFlowScaleFactor\\\quad \quad \quad \quad  \times ReferenceUnitVolAirFlowRate@SpeedLevel(x)\\\quad \quad \quad \quad  \times CapacityScaleFactor\end{array}\)

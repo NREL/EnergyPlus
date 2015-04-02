@@ -1,1 +1,0 @@
-\[\eta  = \frac{{{{\dot W}_{Theoritical}}}}{{{{\dot W}_{CompInput}} - {{\dot W}_{Loss}}}}\]

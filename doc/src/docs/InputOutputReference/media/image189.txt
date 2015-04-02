@@ -1,1 +1,0 @@
-\[Ratio = \frac{{EvapCapHt{g_{@Tchw,l = 6.67C,Tcond,l = 51.67C}}}}{{EvapCapC{{\lg }_{@Tchw,l = 6.67C,Tcond,l = 35.0C}}}}\]

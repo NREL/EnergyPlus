@@ -1,1 +1,0 @@
-\(\begin{array}{l}GrossRatedCapacity@SpeedLevel\left( x \right) = CapacityScaleFactor\\\quad \quad \quad \quad  \times ReferenceUnitCapacity@SpeedLevel(x)\end{array}\)

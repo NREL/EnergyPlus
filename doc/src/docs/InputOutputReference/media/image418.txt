@@ -1,1 +1,0 @@
-\({T_{db\,supout}} = {T_{db\,sup\,in}} - {\varepsilon _{se}}\cdot \left( {{T_{db\,sup\,in}} - {T_{wb\,sup\,in}}} \right)\)

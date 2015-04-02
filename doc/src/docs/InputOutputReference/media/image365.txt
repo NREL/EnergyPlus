@@ -1,1 +1,0 @@
-\(\begin{array}{l}{\rm{Gross RatedCapacity}}@{\rm{SpeedLevel}}\left( {\rm{x}} \right) = \\\quad \quad \quad {\rm{CapacityScaleFactor}} \times \\\quad \quad \quad {\rm{ReferenceUnitCapacity}}@{\rm{SpeedLevel}}({\rm{x}})\end{array}\)

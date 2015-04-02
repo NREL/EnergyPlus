@@ -1,1 +1,0 @@
-\[{\varepsilon _{el}} = \left[ {{\varepsilon _0} + {\varepsilon _1} \cdot \frac{{{P_{el}}}}{{{P_{nom}}}} + {\varepsilon _2} \cdot {{\left( {\frac{{{P_{el}}}}{{{P_{nom}}}}} \right)}^2}} \right] \cdot {\varepsilon _{nom}} \cdot \left[ {1 - {N_{stops}} \cdot D} \right] \cdot \left[ {1 - (MAX(\int\limits_0 {dt - {t_{threshold}},0.0))}  \cdot L} \right]\]

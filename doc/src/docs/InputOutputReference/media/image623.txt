@@ -1,1 +1,0 @@
-\(Stdpressure = 101325\cdot {\left( {1.0 - Z\cdot {{2.25577}^{ - 5}}} \right)^{5.2559}}\)

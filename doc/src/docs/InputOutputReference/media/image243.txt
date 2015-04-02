@@ -1,1 +1,0 @@
-\[\dot m = {C_T}C{\left( {\Delta P} \right)^n}\]

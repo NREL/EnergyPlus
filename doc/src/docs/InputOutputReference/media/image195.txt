@@ -1,1 +1,0 @@
-\[Fan\;power = 0.0105\cdot Tower\;Nominal\;Capacity\]

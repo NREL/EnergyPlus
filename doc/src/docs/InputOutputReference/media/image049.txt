@@ -1,1 +1,0 @@
-\[Property = Coef{f_A} + Coef{f_B} \times Temperatur{e_K} + Coef{f_C} \times Temperature_K^2\]

@@ -1,1 +1,0 @@
-\(Building = \sum\limits_1^{NumberOfZones} {Zone} \)

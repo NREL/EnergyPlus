@@ -1,1 +1,0 @@
-\({\rm{CapacityScaleFactor}} = \frac{{{\rm{Gross RatedTotalHeatingCapacity}}}}{{{\rm{ReferenceUnitCapacity}}@{\rm{NominalSpeedLevel}}}}\)

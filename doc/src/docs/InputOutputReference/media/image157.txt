@@ -1,1 +1,0 @@
-\(AvailToNominalCapacityRatio = {C_1} + {C_2}{\Delta _{temp}} + {C_3}\Delta _{temp}^2\)

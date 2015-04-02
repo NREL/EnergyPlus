@@ -1,1 +1,0 @@
-\[{\rm{Power  =  FracFullLoadPower }}\cdot {\rm{ FullLoadPowerRat }}\cdot {\rm{ AvailToNominalCapacityRatio }}\cdot \frac{{{\rm{NominalCapacity}}}}{{{\rm{COP}}}}\]

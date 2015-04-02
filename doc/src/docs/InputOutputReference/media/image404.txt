@@ -1,1 +1,0 @@
-\[{\varphi _{\max }} = \frac{{30}}{{\pi D_{fan}^3}}*\max \left( {\frac{{{Q_{fan}}}}{{{\omega _{fan}}}}} \right)\]

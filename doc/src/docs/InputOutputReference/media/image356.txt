@@ -1,1 +1,0 @@
-\[Tcond\,inlet = \,\left( {Twb,o} \right)\,\, + \,\,\left( {1 - EvapCondEffectivenes{s_{HighSpeed}}} \right)\left( {Tdb,o\,\, - Twb,o} \right)\]

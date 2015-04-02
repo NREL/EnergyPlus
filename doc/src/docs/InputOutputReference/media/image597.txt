@@ -1,1 +1,0 @@
-\(Quadratic\,\,Curve:\,\,\,Output = {C_1} + {C_2}x + {C_3}{x^2}\)

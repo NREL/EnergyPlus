@@ -1,1 +1,0 @@
-\(Facility = \sum {\left( {Building + System + Plant + Exterior} \right)} \)

@@ -1,1 +1,0 @@
-\[FuelUsed = \frac{{TheoreticalFuelUse}}{{NormalizedBoilerEfficiencyCurveOutput}}\]

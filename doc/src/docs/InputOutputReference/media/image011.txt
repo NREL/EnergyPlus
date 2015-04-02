@@ -1,1 +1,0 @@
-\({T_{current}} = {T_{Max}} - {T_{range}}\cdot {T_{Multiplier}}\)

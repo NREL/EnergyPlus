@@ -1,1 +1,0 @@
-\(Weigh{t_{LastHour}} = 1.0 - Weigh{t_{ThisHour}}\)

@@ -1,1 +1,0 @@
-\(Weigh{t_{ThisHour}} = \frac{{CurrentTimeStep}}{{Number\,of\,TimeSteps\,in\,Hour}}\)
