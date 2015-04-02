@@ -982,7 +982,8 @@ namespace ReportSizingManager {
 							CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
 							CpAir = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) );
 							DesCoilLoad = CpAir * StdRhoAir * TermUnitSizing( CurZoneEqNum ).AirVolFlow * ( CoilOutTemp - CoilInTemp );
-						} else if ( TermUnitIU ) {
+							DesVolFlow = TermUnitSizing( CurZoneEqNum ).AirVolFlow;
+						} else if( TermUnitIU ) {
 							if ( TermUnitSizing( CurZoneEqNum ).InducRat > 0.01 ) {
 								DesVolFlow = TermUnitSizing( CurZoneEqNum ).AirVolFlow / TermUnitSizing( CurZoneEqNum ).InducRat;
 								CpAir = PsyCpAirFnWTdb( FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat, FinalZoneSizing( CurZoneEqNum ).HeatDesTemp );
@@ -997,10 +998,12 @@ namespace ReportSizingManager {
 							CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
 							CpAir = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) );
 							DesCoilLoad = CpAir * FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow * ( CoilOutTemp - CoilInTemp );
+							DesVolFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow / StdRhoAir;
 						}
-							NominalCapacityDes = max( 0.0, DesCoilLoad );
+						NominalCapacityDes = max( 0.0, DesCoilLoad );
 					} else {
 						NominalCapacityDes = 0.0;
+						CoilOutTemp = -999.0;
 					}
 					if ( DataCoolCoilCap > 0.0 ) {
 						AutosizeDes = NominalCapacityDes * DataHeatSizeRatio;
@@ -1013,9 +1016,13 @@ namespace ReportSizingManager {
 						if ( ZoneEqSizing( CurZoneEqNum ).HeatingCapacity || ( DataCoolCoilCap > 0.0 && DataFlowUsedForSizing > 0.0 ) ) {
 							ShowContinueError( "...Capacity passed by parent object to size child component = " + TrimSigDigits( NominalCapacityDes, 2 ) + " [W]" );
 						} else {
-							ShowContinueError( "...Air flow rate used for sizing = " + TrimSigDigits( DesVolFlow, 5 ) + " [m3/s]" );
-							ShowContinueError( "...Coil inlet air temperature used for sizing = " + TrimSigDigits( CoilInTemp, 2 ) + " [C]" );
-							ShowContinueError( "...Coil outlet air temperature used for sizing = " + TrimSigDigits( CoilOutTemp, 2 ) + " [C]" );
+							if( CoilOutTemp > -999.0 ) {
+								ShowContinueError( "...Air flow rate used for sizing = " + TrimSigDigits( DesVolFlow, 5 ) + " [m3/s]" );
+								ShowContinueError( "...Coil inlet air temperature used for sizing = " + TrimSigDigits( CoilInTemp, 2 ) + " [C]" );
+								ShowContinueError( "...Coil outlet air temperature used for sizing = " + TrimSigDigits( CoilOutTemp, 2 ) + " [C]" );
+							} else{
+								ShowContinueError( "...Capacity used to size child component set to 0 [W]" );
+							}
 						}
 					}
 				} else if( SizingType == WaterHeatingCapacitySizing ) {
