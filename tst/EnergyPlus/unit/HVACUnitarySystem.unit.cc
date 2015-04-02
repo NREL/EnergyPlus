@@ -29,7 +29,9 @@ using General::TrimSigDigits;
 
 TEST( SetOnOffMassFlowRateTest, Test1 )
 {
-	int UnitarySysNum ( 1 );
+	ShowMessage( "Begin Test: SetOnOffMassFlowRateTest, Test1" );
+
+	int UnitarySysNum( 1 );
 	Real64 OnOffAirFlowRatio; // This is a return value
 	Real64 PartLoadRatio( 1.0 );
 	MultiOrVarSpeedHeatCoil.allocate( 1 );
@@ -176,6 +178,8 @@ TEST( SetOnOffMassFlowRateTest, Test1 )
 
 TEST( UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest )
 {
+	ShowMessage( "Begin Test: UnitarySystemSizingTest, ConfirmUnitarySystemSizingTest" );
+
 	int UnitarySysNum( 1 );
 	int AirLoopNum( 1 );
 	int iCoolingSizingType( 1 );

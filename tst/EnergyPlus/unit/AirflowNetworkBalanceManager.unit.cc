@@ -7,6 +7,7 @@
 #include <DataAirflowNetwork.hh>
 #include <AirflowNetworkBalanceManager.hh>
 #include <DataSurfaces.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace AirflowNetworkBalanceManager;
@@ -15,6 +16,8 @@ using namespace DataSurfaces;
 
 TEST( AirflowNetworkBalanceManagerTest, TestOtherSideCoefficients )
 {
+
+	ShowMessage( "Begin Test: AirflowNetworkBalanceManagerTest, TestOtherSideCoefficients" );
 
 	int i = 2;
 
