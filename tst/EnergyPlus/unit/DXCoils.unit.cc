@@ -47,7 +47,10 @@
 
 using namespace EnergyPlus;
 using namespace DXCoils;
+using namespace DataAirLoop;
+using namespace DataAirSystems;
 using namespace DataHVACGlobals;
+using namespace DataSizing;
 using namespace CurveManager;
 using namespace OutputReportPredefined;
 using namespace EnergyPlus::Psychrometrics;
@@ -186,5 +189,110 @@ TEST( DXCoilsTest, Test1 )
 	cached_Psat.deallocate();
 
 }
+TEST( DXCoilsTest, Test2 )
+{
 
+	using CurveManager::Quadratic;
+	using CurveManager::BiQuadratic;
+	using CurveManager::NumCurves;
+	int DXCoilNum;
+	int CurveNum;
+
+	InitializePsychRoutines();
+	DisplayExtraWarnings = true;
+	SysSizingRunDone = true;
+	FinalSysSizing.allocate( 1 );
+	PrimaryAirSystem.allocate( 1 );
+	AirLoopControlInfo.allocate( 1 );
+	CurSysNum = 1;
+	NumDXCoils = 2;
+	DXCoilNum = 2;
+	UnitarySysEqSizing.allocate( 1 );
+	DXCoil.allocate( NumDXCoils );
+	DXCoil( 1 ).DXCoilType_Num = CoilDX_CoolingSingleSpeed;
+	DXCoil( 2 ).DXCoilType_Num = CoilDX_HeatingEmpirical;
+	DXCoil( DXCoilNum ).DXCoilType = "Coil:Heating:DX:SingleSpeed";
+	DXCoil( 2 ).CompanionUpstreamDXCoil = 1;
+
+	DXCoilNumericFields.allocate( NumDXCoils );
+	DXCoilNumericFields( 2 ).PerfMode.allocate( 1 );
+	DXCoilNumericFields( 2 ).PerfMode( 1 ).FieldNames.allocate( 20 );
+	DXCoil( 2 ).DefrostStrategy = Resistive;
+	DXCoil( 2 ).DefrostCapacity = 5000.0;
+	DXCoil( 2 ).Name = "DX Heating coil";
+
+	DXCoil( 1 ).RatedTotCap( 1 ) = AutoSize;
+	DXCoil( 1 ).RatedTotCap( 2 ) = AutoSize;
+	DXCoil( 2 ).RatedTotCap( 1 ) = AutoSize;
+	DXCoil( DXCoilNum ).RegionNum = 4;
+	DXCoil( DXCoilNum ).MinOATCompressor = -17.78;
+	DXCoil( DXCoilNum ).CCapFFlow( 1 ) = 1;
+	DXCoil( DXCoilNum ).CCapFTemp( 1 ) = 1;
+	DXCoil( DXCoilNum ).EIRFFlow( 1 ) = 1;
+	DXCoil( DXCoilNum ).EIRFTemp( 1 ) = 1;
+	DXCoil( DXCoilNum ).PLFFPLR( 1 ) = 1;
+	NumCurves = 3;
+	PerfCurve.allocate( NumCurves );
+
+	CurveNum = 1;
+	PerfCurve( CurveNum ).CurveType = Quadratic;
+	PerfCurve( CurveNum ).ObjectType = CurveType_Quadratic;
+	PerfCurve( CurveNum ).InterpolationType = EvaluateCurveToLimits;
+	PerfCurve( CurveNum ).Coeff1 = 1;
+	PerfCurve( CurveNum ).Coeff2 = 0.0;
+	PerfCurve( CurveNum ).Coeff3 = 0.0;
+	PerfCurve( CurveNum ).Coeff4 = 0.0;
+	PerfCurve( CurveNum ).Coeff5 = 0.0;
+	PerfCurve( CurveNum ).Coeff6 = 0.0;
+	PerfCurve( CurveNum ).Var1Min = 0.0;
+	PerfCurve( CurveNum ).Var1Max = 2.0;
+	PerfCurve( CurveNum ).Var2Min = 0.0;
+	PerfCurve( CurveNum ).Var2Max = 2.0;
+
+	CurveNum = 2;
+	PerfCurve( CurveNum ).CurveType = Quadratic;
+	PerfCurve( CurveNum ).ObjectType = CurveType_Quadratic;
+	PerfCurve( CurveNum ).InterpolationType = EvaluateCurveToLimits;
+	PerfCurve( CurveNum ).Coeff1 = 1;
+	PerfCurve( CurveNum ).Coeff2 = 0.0;
+	PerfCurve( CurveNum ).Coeff3 = 0.0;
+	PerfCurve( CurveNum ).Coeff4 = 0.0;
+	PerfCurve( CurveNum ).Coeff5 = 0.0;
+	PerfCurve( CurveNum ).Coeff6 = 0.0;
+	PerfCurve( CurveNum ).Var1Min = 0.0;
+	PerfCurve( CurveNum ).Var1Max = 1.0;
+	PerfCurve( CurveNum ).Var2Min = 0.7;
+	PerfCurve( CurveNum ).Var2Max = 1.0;
+
+	CurveNum = 3;
+	PerfCurve( CurveNum ).CurveType = BiQuadratic;
+	PerfCurve( CurveNum ).ObjectType = CurveType_BiQuadratic;
+	PerfCurve( CurveNum ).InterpolationType = EvaluateCurveToLimits;
+	PerfCurve( CurveNum ).Coeff1 = 1;
+	PerfCurve( CurveNum ).Coeff2 = 0.0;
+	PerfCurve( CurveNum ).Coeff3 = 0.0;
+	PerfCurve( CurveNum ).Coeff4 = 0.0;
+	PerfCurve( CurveNum ).Coeff5 = 0.0;
+	PerfCurve( CurveNum ).Coeff6 = 0.0;
+	PerfCurve( CurveNum ).Var1Min = -100.0;
+	PerfCurve( CurveNum ).Var1Max = 100.0;
+	PerfCurve( CurveNum ).Var2Min = -100.0;
+	PerfCurve( CurveNum ).Var2Max = 100.0;
+
+	SetPredefinedTables();
+	SizeDXCoil( 2 );
+	EXPECT_DOUBLE_EQ( 0.0, DXCoil( 2 ).RatedTotCap( 1 ) );
+
+	// Clean up
+	DXCoil.deallocate();
+	DXCoilNumericFields.deallocate();
+	UnitarySysEqSizing.deallocate();
+	PerfCurve.deallocate();
+	FinalSysSizing.deallocate();
+	PrimaryAirSystem.deallocate();
+	AirLoopControlInfo.deallocate();
+	cached_Twb.deallocate();
+	cached_Psat.deallocate();
+
+}
 
