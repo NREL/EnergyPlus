@@ -1,0 +1,1 @@
+\[AvailableCoolingCapacity = NominalCoolingCapacity*CoolCapfT\left( {{T_{cw,l}},{T_{cond}}} \right)\]

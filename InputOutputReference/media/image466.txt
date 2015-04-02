@@ -1,0 +1,1 @@
+\[{P_{net,warm - up}} = {P_{\max }}{k_p}\left( {\frac{{{T_{eng}} - {T_{room}}}}{{{T_{eng,nom}} - {T_{room}}}}} \right)\]

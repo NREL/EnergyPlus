@@ -1,0 +1,1 @@
+\(Fan\;powe{r_{High\;Fan\;Speed}} = 0.0105\cdot {\rho _{water}}\cdot {C_{p,water}}\cdot Design\;Water\;Flow\;Rate\cdot Design\;Loop\Delta T\)

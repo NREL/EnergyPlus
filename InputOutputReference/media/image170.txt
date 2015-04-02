@@ -1,0 +1,1 @@
+\[AvailCoolCap = NomCoolCap \cdot CoolCapfT({T_{cw,l}},{T_{cond}})\]

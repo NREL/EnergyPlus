@@ -72,7 +72,51 @@
             <ul class="dropdown-menu" role="menu">
             
               <li>
-                <a href="../../InputOutputReference/01-Page1">Status</a>
+                <a href="../../InputOutputReference/01a-InputOutputReference">Input Output Reference - Vol 1</a>
+              </li>
+            
+              <li>
+                <a href="../../InputOutputReference/01b-InputOutputReference">Input Output Reference - Vol 2</a>
+              </li>
+            
+              <li>
+                <a href="../../InputOutputReference/01c-InputOutputReference">Input Output Reference - Vol 3</a>
+              </li>
+            
+              <li>
+                <a href="../../InputOutputReference/01d-InputOutputReference">Input Output Reference - Vol 4</a>
+              </li>
+            
+              <li>
+                <a href="../../InputOutputReference/02-HVACTemplates">HVACTemplates</a>
+              </li>
+            
+              <li>
+                <a href="../../InputOutputReference/03-Economics">Economics</a>
+              </li>
+            
+              <li>
+                <a href="../../InputOutputReference/04-Parametrics">Parametrics</a>
+              </li>
+            
+              <li>
+                <a href="../../InputOutputReference/05-InputForOutput">Input for Output</a>
+              </li>
+            
+              <li>
+                <a href="../../InputOutputReference/06-StandardOutputReports">Standard Output Reports</a>
+              </li>
+            
+              <li>
+                <a href="../../InputOutputReference/07-WeatherData">Weather Data</a>
+              </li>
+            
+              <li>
+                <a href="../../InputOutputReference/08-RunningEnergyPlus">Running EnergyPlus</a>
+              </li>
+            
+              <li>
+                <a href="../../InputOutputReference/09-Appendix">Appendices</a>
               </li>
             
             </ul>
@@ -1619,17 +1663,29 @@
 <p>Figure 205.  Thermodynamic Process for Supply Air Through Two Stage Evaporative Cooler</p>
 <p>Two stage evaporative coolers can be accomplished by putting the EvaporativeCooler:Direct:CelDekPad, EvaporativeCooler:Indirect:CelDekPad, EvaporativeCooler:Indirect:WetCoil in series in any combination the user desires in the supply air loop.</p>
 <h3 id="indirect-evaporative-cooler-special-research-model">Indirect Evaporative Cooler Special Research Model</h3>
-<p>This section summarizes the model implemented in the component EvaporativeCooler:Indirect:ResearchSpecial.  Examples of this evaporative cooler are shown in the following figures, without and with a relief valve. This model differs from the other indirect evaporative coolers in that, under part load conditions, it can modulate so that the air leaving the cooler just meets a drybulb temperature setpoint.  It is also a simple model with a constant effectiveness.</p>
+<p>This section summarizes the model implemented in the component EvaporativeCooler:Indirect:ResearchSpecial.  Examples of this evaporative cooler are shown in the following figures, without and with a relief valve. This model differs from the other indirect evaporative coolers in that, under part load conditions, it can modulate so that the air leaving the cooler just meets a drybulb temperature setpoint.</p>
+<p>The indirect research special evaporative cooler (IEC) machine provides improved modeling features needed for data center and other hybrid cooling applications.  The new model includes performance curves for variable effectiveness, fan power, and pump power.  It is intended to be able to model IEC machines that have 1) variable speed secondary fans, 2) variable speed pumps for water recirculation and spraying, and 3) ability to operate in a dry mode.  Such IEC machines can modulate the cooling power during operation by varying either the secondary side fan speed or the intensity of water spray or both.  To simplify the model it is assumed that the device’s internal controls are such that, when it is operating as a “Wet” evaporative cooler, secondary fan and spray pump operation are linked together so that there is a one-to-one mapping between them at any given part load situation.  This allows formulating the fan and pump power performance curves to be based on the same independent variable, secondary air flow fraction.</p>
+<p>HERE</p>
 <p><img alt="figure 166 renamed" src="../../EngineeringReference/media/image4808.png" /></p>
 <p>Figure 206. Research Special Indirect Evaporative Cooler</p>
 <p>The algorithm used to determine the cooling provided to the system air proceeds in these three steps:</p>
 <p>1)    calculate full load performance using PLF=1 and Equation and Equation</p>
 <p>2)    calculate PLF using Equation , Equation , and Equation , and</p>
 <p>3)    recalculate performance using PLF from step 2.</p>
-<p>·        If PLF = 1 then use Equation and Equation</p>
-<p>·        If PLF &lt;1 then outlet temp = desired outlet temp (as by magic)</p>
-<p>·        Auxiliary fan energy adjusted by PLF</p>
-<p>·        Water consumption based on change in enthalpy in air system</p>
+<ul>
+<li>
+<p>If PLF = 1 then use Equation and Equation</p>
+</li>
+<li>
+<p>If PLF &lt;1 then outlet temp = desired outlet temp (as by magic)</p>
+</li>
+<li>
+<p>Auxiliary fan energy adjusted by PLF</p>
+</li>
+<li>
+<p>Water consumption based on change in enthalpy in air system</p>
+</li>
+</ul>
 <div>\[{T_{db,out,sys}} = {T_{db,in,sys}} - \varepsilon \left( {{T_{db,in,sys}} - {T_{wb,in,purge}}} \right)\]</div>
 
 <p>where,</p>

@@ -1,0 +1,3 @@
+\[{\raise0.7ex\hbox{${\rho VD}$} \!\mathord{\left/
+ {\vphantom {{\rho VD} \mu }}\right.\kern-\nulldelimiterspace}
+\!\lower0.7ex\hbox{$\mu $}}\]

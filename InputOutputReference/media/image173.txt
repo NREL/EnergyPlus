@@ -1,0 +1,1 @@
+\(AvailHeatCap = NomCoolCap \cdot HeatCoolCapRatio \cdot HeatCapfCPLR(CPLRh)\)

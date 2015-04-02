@@ -1,0 +1,1 @@
+\(Exponent\,\,Curve:\,\,\,Output = {C_1} + {C_2}{x^{{C_3}}}\)

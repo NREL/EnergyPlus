@@ -1,0 +1,1 @@
+\(\Delta x = \sqrt {C\alpha \Delta t} \)

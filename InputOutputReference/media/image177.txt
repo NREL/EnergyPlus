@@ -1,0 +1,1 @@
+\(Linear \to Eff = {A_0} + {A_1}\cdot PLR\)

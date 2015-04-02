@@ -1,0 +1,1 @@
+\(ShaftPowerToFuelRatio = {C_1} + {C_2}RL + {C_3}R{L^2}\)

@@ -1,0 +1,1 @@
+\(\begin{array}{l}ActualEIR@SpeedLevel\left( x \right) = \frac{{1.0}}{{ReferenceUnitCOP@SpeedLevel(x)}}\\\quad \quad \quad  \times EIRTempModFac@SpeedLevel(x)\\\quad \quad \quad  \times EIRAirFlowModFac@SpeedLevel(x)\\\quad \quad \quad  \times EIRWaterFlowModFac@SpeedLevel(x)\end{array}\)

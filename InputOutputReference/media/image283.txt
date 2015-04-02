@@ -1,0 +1,1 @@
+\(\frac{{\left| {{Q_{ZoneLoad}} - {Q_{WindowAirConditioner,out}})} \right|}}{{{Q_{ZoneLoad}}}} \le Cooling{\kern 1pt} Convergence{\kern 1pt} Tolerance\)

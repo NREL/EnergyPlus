@@ -1,0 +1,1 @@
+\(T = {C_1} + {C_2}\cdot MinWb + {C_3}\cdot WPLR + {C_4}\cdot TwrWb + {C_5}NF\)

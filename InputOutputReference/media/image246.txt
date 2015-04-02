@@ -1,0 +1,1 @@
+\[{C_T} = {\left[ {\frac{{{\rho _o}}}{\rho }} \right]^{n - 1}}{\left[ {\frac{{{\nu _o}}}{\nu }} \right]^{2n - 1}}\]

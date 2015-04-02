@@ -1,0 +1,1 @@
+\(\begin{array}{l}AirFlowScaleFactor = \\\quad \quad \quad \quad \quad \frac{{RatedVolumetricAirFlowRate}}{{ReferenceUnitVolAirFlowRate@NominalSpeedLevel \times CapacityScaleFactor}}\end{array}\)

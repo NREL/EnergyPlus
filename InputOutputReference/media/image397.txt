@@ -1,0 +1,1 @@
+\[\dot Q = {\left( {UA} \right)_{Tank}}\left( {{T_{TES}} - {T_{Amb}}} \right)\]

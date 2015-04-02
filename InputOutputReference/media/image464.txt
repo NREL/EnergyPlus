@@ -1,0 +1,1 @@
+\[{\dot m_{fuel,warm - up}} = {\dot m_{fuel,ss - \max }} + {k_f}{\dot m_{fuel,ss - \max }}\left( {\frac{{{T_{eng,nom}} - {T_{room}}}}{{{T_{eng}} - {T_{room}}}}} \right)\]

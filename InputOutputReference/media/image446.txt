@@ -1,0 +1,1 @@
+\(UAToCapacityRatio = {C_1}GeneratorRatedPowerOutpu{t^{{C_2}}}\)

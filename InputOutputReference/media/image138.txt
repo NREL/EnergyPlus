@@ -1,0 +1,1 @@
+\[ElectricInputRatio = C1 + C2 * PLR + C3 * PL{R^2}\]

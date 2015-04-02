@@ -1,0 +1,1 @@
+\[\varphi  = \frac{{\dot m}}{{\rho N{D^3}}}\]

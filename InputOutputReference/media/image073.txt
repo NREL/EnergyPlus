@@ -1,0 +1,1 @@
+\({{\rm{\dot \rlap{--} V}}_{{\rm{thermal}}}} = {C_D}{A_{in}}\sqrt {2g\Delta {H_{NPL}}\left( {{T_{a,cav}} - {T_{amb}}} \right)/{T_{a,cav}}} \)

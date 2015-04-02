@@ -1,0 +1,1 @@
+\[{\dot q_{OA,Zone\;1}} = \sum\limits_{n = 1}^{AirPathNum} {{{\dot q}_{OA}}\frac{{{{\dot m}_n}}}{{{{\dot m}_{sys}}}}} \]

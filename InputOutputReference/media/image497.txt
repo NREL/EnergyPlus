@@ -1,0 +1,1 @@
+\({P_{el,ancillaries - AC}} = an{c_0} + an{c_1} \cdot {\dot N_{fuel}}\)

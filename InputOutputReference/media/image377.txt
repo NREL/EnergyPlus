@@ -1,0 +1,1 @@
+\(\begin{array}{l}LoopVolumetricWaterFlowRate@SpeedLevel\left( x \right) = WaterFlowScaleFactor\\\quad \quad \quad  \times ReferenceUnitVolWaterFlowRate@SpeedLevel(x)\\\quad \quad \quad  \times CapacityScaleFactor\end{array}\)

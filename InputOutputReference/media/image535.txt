@@ -1,0 +1,1 @@
+\({q_{HX}} = {\varepsilon _{HX}} \cdot {\left( {\dot N{{\hat c}_p}} \right)_{\min }} \cdot \left( {{T_{aux - mix}} - {T_{water,in}}} \right)\)

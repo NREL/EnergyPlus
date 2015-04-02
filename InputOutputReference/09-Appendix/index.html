@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Appendices - EnergyPlus Documentation</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
+    <link rel="shortcut icon" href="../../favicon.ico">
+    
+    <link href="../../css/bootstrap-3.3.4.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.3.0.min.css" rel="stylesheet">
+    <link href="../../css/prettify-1.0.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="container">
+  <nav class="navbar navbar-default" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../.."><img alt="" src="../../img/EP_32x32.png"> EnergyPlus Documentation</a>
+      </div>
+      <div class="navbar-collapse collapse">
+        <!-- Main navigation -->
+        <ul class="nav navbar-nav">
+        
+          
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">Intro & Application <span class="caret"></span></a>
+            <ul class="dropdown-menu" role="menu">
+            
+              <li>
+                <a href="../../GettingStarted/GettingStarted">Getting Started</a>
+              </li>
+            
+              <li>
+                <a href="../../Tips_and_Tricks_Using_EnergyPlus/Tips_and_Tricks_Using_EnergyPlus">Tips and Tricks for EnergyPlus</a>
+              </li>
+            
+              <li>
+                <a href="../../EMS_Application_Guide/EMS_Application_Guide">EMS Applications</a>
+              </li>
+            
+              <li>
+                <a href="../../ExternalInterfaces_Application_Guide/ExternalInterfaces_Application_Guide">External Interface Applications</a>
+              </li>
+            
+              <li>
+                <a href="../../PlantApplicationGuide/PlantApplicationGuide">Plant Applications</a>
+              </li>
+            
+            </ul>
+          </li>
+          
+        
+          
+          <li class="dropdown active">
+            <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">Input/Output Reference <span class="caret"></span></a>
+            <ul class="dropdown-menu" role="menu">
+            
+              <li>
+                <a href="../01a-InputOutputReference">Input Output Reference - Vol 1</a>
+              </li>
+            
+              <li>
+                <a href="../01b-InputOutputReference">Input Output Reference - Vol 2</a>
+              </li>
+            
+              <li>
+                <a href="../01c-InputOutputReference">Input Output Reference - Vol 3</a>
+              </li>
+            
+              <li>
+                <a href="../01d-InputOutputReference">Input Output Reference - Vol 4</a>
+              </li>
+            
+              <li>
+                <a href="../02-HVACTemplates">HVACTemplates</a>
+              </li>
+            
+              <li>
+                <a href="../03-Economics">Economics</a>
+              </li>
+            
+              <li>
+                <a href="../04-Parametrics">Parametrics</a>
+              </li>
+            
+              <li>
+                <a href="../05-InputForOutput">Input for Output</a>
+              </li>
+            
+              <li>
+                <a href="../06-StandardOutputReports">Standard Output Reports</a>
+              </li>
+            
+              <li>
+                <a href="../07-WeatherData">Weather Data</a>
+              </li>
+            
+              <li>
+                <a href="../08-RunningEnergyPlus">Running EnergyPlus</a>
+              </li>
+            
+              <li class="active">
+                <a href=".">Appendices</a>
+              </li>
+            
+            </ul>
+          </li>
+          
+        
+          
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">Engineering Reference <span class="caret"></span></a>
+            <ul class="dropdown-menu" role="menu">
+            
+              <li>
+                <a href="../../EngineeringReference/01-Overview">Overview</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/02-IntegratedSolution">Integrated Solution Manager</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/03-SurfaceHeatBalance">Surface Heat Balance Manager</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/04-AdvancedSurface">Advanced Surface Concepts</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/05-Climate">Climate, Sky and Solar Calculation</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/06-SolarRadiation">Solar Reflection</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/07-Daylighting">Daylighting and Window Calcs</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/08-AirHeatBalance">Air Heat Balance Manager</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/09-BuildingSystemSimulation">Building System Simulation Manager</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/10-Sizing">Sizing and Design Data</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/OperationalFaults">Operational Faults</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/11-DemandLimiting">Demand Limiting</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/12-AlternativeModeling">Alternative Modeling Processes</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/13-EncyclopaedicRefs">Encyclopedic Reference of Simulation Models</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/13a-EncyclopaedicRefs"> - - - - Encyclopedia Volume 1</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/13b-EncyclopaedicRefs"> - - - - Encyclopedia Volume 2</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/13c-EncyclopaedicRefs"> - - - - Encyclopedia Volume 3</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/13d-EncyclopaedicRefs"> - - - - Encyclopedia Volume 4</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/13e-EncyclopaedicRefs"> - - - - Encyclopedia Volume 5</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/13f-EncyclopaedicRefs"> - - - - Encyclopedia Volume 6</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/14-OnSiteGeneration">On-SIte Generation</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/15-PerformanceCurves">Performance Curves and Lookup Tables</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/16-Economics">Economic Calculations</a>
+              </li>
+            
+              <li>
+                <a href="../../EngineeringReference/17-SpecialModulesReporting">Special Modules and Reporting</a>
+              </li>
+            
+            </ul>
+          </li>
+          
+        
+          
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">Developer Guides <span class="caret"></span></a>
+            <ul class="dropdown-menu" role="menu">
+            
+              <li>
+                <a href="../../InterfaceDeveloper/InterfaceDeveloper">Interface Developer</a>
+              </li>
+            
+              <li>
+                <a href="../../ModuleDeveloper/ModuleDeveloper">Module Developer</a>
+              </li>
+            
+            </ul>
+          </li>
+          
+        
+          
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">Other <span class="caret"></span></a>
+            <ul class="dropdown-menu" role="menu">
+            
+              <li>
+                <a href="../../Acknowledgements/Acknowledgments">Acknowledgements</a>
+              </li>
+            
+              <li>
+                <a href="../../AuxiliaryPrograms/AuxiliaryPrograms">Auxiliary Programs</a>
+              </li>
+            
+              <li>
+                <a href="../../OutputDetailsAndExamples/OutputDetailsAndExamples">Output Details and Examples</a>
+              </li>
+            
+              <li>
+                <a href="../../Using_EnergyPlus_for_Compliance/Using_EnergyPlus_for_Compliance">Using E+ for Compliance</a>
+              </li>
+            
+            </ul>
+          </li>
+          
+        
+        </ul>
+
+        <!-- Search, Navigation and Repo links -->
+        <ul class="nav navbar-nav navbar-right">
+        
+        </ul>
+      </div>
+    </div>
+  </nav>
+</div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3">
+          <div class="bs-docs-sidebar hidden-print affix well" role="complementary">
+  <ul class="nav">
+  
+    <li class="main active"><a href="#appendix-a-units-and-abbreviations">Appendix A. Units and Abbreviations</a>
+      <ul class="nav">
+        
+        <li><a href="#standard-energyplus-conditions">Standard EnergyPlus Conditions</a></li>
+        
+        <li><a href="#standard-energyplus-units">Standard EnergyPlus Units</a></li>
+        
+      </ul>
+    </li>
+  
+  </ul>
+  <div class="home-btn">
+    <a class="btn btn-default" role="button" href="https://github.com/NREL/EnergyPlus">Back to EnergyPlus</a>
+  </div>
+</div>
+        </div>
+        <div class="col-md-9" role="main">
+          <h1 id="appendix-a-units-and-abbreviations">Appendix A. Units and Abbreviations</h1>
+<h2 id="standard-energyplus-conditions">Standard EnergyPlus Conditions</h2>
+<h3 id="standard-temperature-and-pressure">Standard Temperature and Pressure</h3>
+<p>Several objects specify inputs at “standard temperature and pressure”. Standard Temperature  is dry air at 20<sup>o</sup> C drybulb. The program uses local barometric pressure to account for altitude using the equation for "standard atmospheric" pressure on p 6.1 of the ASHRAE 1997 HOF (SI edition) to initialize the air systems being simulated.</p>
+<div>\[Stdpressure = 101325\cdot {\left( {1.0 - Z\cdot {{2.25577}^{ - 5}}} \right)^{5.2559}}\]</div>
+
+<p>where</p>
+<p>StdPressure = pressure {Pa}</p>
+<p>Z = altitude/elevation {m}</p>
+<h2 id="standard-energyplus-units">Standard EnergyPlus Units</h2>
+<p>EnergyPlus expects information in a single unit system (SI). This requires interface developers to convert user inputs from those preferred by architects and engineers into the standard metric units of EnergyPlus. EnergyPlus will not perform any units conversions and will not have any unit conversion routines.</p>
+<p>ASCII with no spaces is used for abbreviations. Note that exponents appear without any indication of exponentiation: i.e., kg/m3 not kg/m^3 or kg/m**3. Also note the use of dashes. We have W/m2-K not W/m2*K or W/(m2*K).</p>
+<p>At the end we note the “problem” variables – the inputs that have non-standard units. Inputs using these units will have to be changed and the code checked to see how the quantities are used internally.</p>
+<p>Table 49. Standard EnergyPlus Units</p>
+<p>Quantity</p>
+<p>unit</p>
+<p>abbreviation</p>
+<p>angular degrees</p>
+<p>degree</p>
+<p>deg</p>
+<p>Length</p>
+<p>meter</p>
+<p>m</p>
+<p>Area</p>
+<p>square meter</p>
+<p>m2</p>
+<p>Volume</p>
+<p>cubic meter</p>
+<p>m3</p>
+<p>Time</p>
+<p>seconds</p>
+<p>s</p>
+<p>Frequency</p>
+<p>Hertz</p>
+<p>Hz</p>
+<p>Temperature</p>
+<p>Celsius</p>
+<p>C</p>
+<p>absolute temperature</p>
+<p>Kelvin</p>
+<p>K</p>
+<p>temperature difference</p>
+<p>Kelvin</p>
+<p>deltaC</p>
+<p>speed</p>
+<p>meters per second</p>
+<p>m/s</p>
+<p>energy (or work)</p>
+<p>Joules</p>
+<p>J</p>
+<p>power</p>
+<p>Watts</p>
+<p>W</p>
+<p>mass</p>
+<p>kilograms</p>
+<p>kg</p>
+<p>force</p>
+<p>Newton</p>
+<p>N</p>
+<p>mass flow</p>
+<p>kilograms per second</p>
+<p>kg/s</p>
+<p>volume flow</p>
+<p>cubic meters per second</p>
+<p>m3/s</p>
+<p>pressure</p>
+<p>Pascals</p>
+<p>Pa</p>
+<p>pressure difference</p>
+<p>Pascals</p>
+<p>Pa</p>
+<p>specific enthalpy</p>
+<p>Joules per kilogram</p>
+<p>J/kg</p>
+<p>density</p>
+<p>kilograms per cubic meter</p>
+<p>kg/m3</p>
+<p>heat flux</p>
+<p>watts per square meter</p>
+<p>W/m2</p>
+<p>specific heat</p>
+<hr />
+<p>J/kg-K</p>
+<p>conductivity</p>
+<hr />
+<p>W/m-K</p>
+<p>diffusivity</p>
+<hr />
+<p>m2/s</p>
+<p>heat transfer coefficient</p>
+<hr />
+<p>W/m2-K</p>
+<p>R-value</p>
+<hr />
+<p>m2-K/W</p>
+<p>heating or cooling capacity</p>
+<p>Watts</p>
+<p>W</p>
+<p>electric potential</p>
+<p>volts</p>
+<p>V</p>
+<p>electric current</p>
+<p>Amperes</p>
+<p>A</p>
+<p>illuminace</p>
+<p>lux</p>
+<p>lx</p>
+<p>luminous flux</p>
+<p>lumen</p>
+<p>lm</p>
+<p>luminous intensity</p>
+<p>candelas</p>
+<p>cd</p>
+<p>luminance</p>
+<p>candelas per square meter</p>
+<p>cd/m2</p>
+<p>vapor diffusivity</p>
+<p>meters squared per second</p>
+<p>m2/s</p>
+<p>viscosity</p>
+<hr />
+<p>kg/m-s</p>
+<p>dynamic Viscosity</p>
+<hr />
+<p>N-s/m2</p>
+<p>thermal gradient coeff for moisture capacity</p>
+<hr />
+<p>kg/kg-K</p>
+<p>isothermal moisture capacity</p>
+<hr />
+<p>m3/kg</p>
+
+          <div class="footer">
+  <p class="text-center"><a href="https://unmethours.com/questions/scope:all/sort:activity-desc/tags:energyplus/">Get Help</a> | <a href="https://www.energyplus.gov/">More Information</a></p>
+  <p class="text-center"><a href="https://github.com/NREL/EnergyPlus">EnergyPlus</a> is developed in collaboration by NREL, LBNL, ORNL, and PNNL.</p>
+  <p class="text-center"><a href="http://www.nrel.gov">NREL</a> is a National Laboratory of the U.S. Department of Energy, Office of Energy Efficiency and Renewable Energy, operated by the Alliance for Sustainable Energy, LLC.</p>
+  <p class="text-center"><a href="#">Back to Top</a></p>
+</div>
+        </div>
+      </div>
+    </div>
+    
+
+    <script src="../../js/jquery-2.1.3.min.js"></script>
+    <script src="../../js/bootstrap-3.3.4.min.js"></script>
+    <script src="../../js/bootstrap-hover-dropdown-2.1.3.min.js"></script>
+    <script src="../../js/prettify-1.0.min.js"></script>
+    <script src="../../js/base.js"></script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        showMathMenu: true,
+        showMathMenuMSIE: false,
+        "HTML-CSS": {
+          imageFont: null,
+          preferredFont: null
+        },
+        tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+      });
+    </script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js'></script>
+  </body>
+</html>

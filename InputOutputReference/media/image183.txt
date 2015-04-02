@@ -1,0 +1,1 @@
+\(\begin{array}{l}Bicubic \to Eff = {A_0} + {A_1}\cdot PLR + {A_2}\cdot PL{R^2} + {A_3}\cdot {T_w} + {A_4}{T_w}^2 + {A_5}PLR\cdot {T_w} + {A_6}PL{R^3}\\\quad \quad \quad \quad \quad \quad \quad  + {A_7}\cdot {T_w}^3 + {A_8}\cdot PL{R^2}\cdot {T_w} + {A_9}\cdot PLR\cdot {T_w}^2\end{array}\)

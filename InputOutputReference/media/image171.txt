@@ -1,0 +1,1 @@
+\(\begin{array}{l}CoolThermalEnergyInput = AvailCoolCap \cdot RunFrac \cdot TeFIR \cdot \\\quad \quad \quad \quad \quad \quad TeFIRfT\left( {{T_{cw,l}},{T_{cond}}} \right) \cdot TeFIRfPLR(CPLR)\end{array}\)

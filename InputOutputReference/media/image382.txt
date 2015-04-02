@@ -1,0 +1,1 @@
+\(\begin{array}{l}ActualPower@SpeedLevel\left( x \right) = ActualCapacity@SpeedLevel\left( x \right)\\\quad \quad \quad \quad  \times ActualEIR@SpeedLevel\left( x \right)\end{array}\)
