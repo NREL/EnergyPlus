@@ -1,0 +1,1 @@
+\(ExhaustFlowRate = GTCapacity * ({C_1} + {C_2}A{T_{air}} + {C_3}AT_{air}^2)\)

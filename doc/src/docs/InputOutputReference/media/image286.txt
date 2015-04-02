@@ -1,0 +1,1 @@
+\[\frac{{\left| {({Q_{ZoneLoad}} - {Q_{HeatPump,out}})} \right|}}{{{Q_{ZoneLoad}}}}\,\, \le \,\,Heating{\kern 1pt} Convergence{\kern 1pt} Tolerance\]

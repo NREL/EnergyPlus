@@ -1,0 +1,1 @@
+\({q_{aux - skin - losses}} = {(UA)_{aux}} \cdot ({T_{aux - mix}} - {T_{room}})\)

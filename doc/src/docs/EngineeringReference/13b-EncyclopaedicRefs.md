@@ -357,11 +357,11 @@ The UA values are calculated assuming a wet coil at the design conditions. Follo
 
 The Design Block is a one time calculation. The aim of the Design Block is to calculate the Coil UA for use in the operating Block.
 
-#### Design Block Calculations:<span>$$</span>
+#### Design Block Calculations:
 
 The design block has the code for calculating the six Coil UA values required by the operating block. Reasonable assumptions have been made in the calculations to maintain the simplicity of the model.
 
-Heat transfer ina wet coil model is based on enthalpy rather than temperature to take into account latent effects. While heat transfer rates are commonly expressed as the product of an overall heat transfer coefficient, UA, and a temperature difference, the use of enthalpy-based heat transfer calculations requires an enthalpy-based heat transfer coefficient which we denote as DesUACoilTotalEnth and hence the equation.
+Heat transfer in a wet coil model is based on enthalpy rather than temperature to take into account latent effects. While heat transfer rates are commonly expressed as the product of an overall heat transfer coefficient, UA, and a temperature difference, the use of enthalpy-based heat transfer calculations requires an enthalpy-based heat transfer coefficient which we denote as DesUACoilTotalEnth and hence the equation.
 
 Q = DesUACoilTotalEnth \* (H<sub>air,mean</sub> - H<sub>water,mean</sub>). The value of Q is calculated using product of air mass flow rate and difference in inlet and outlet air enthalpies at design conditions.
 
@@ -425,17 +425,17 @@ The next step is to estimate the coil external heat transfer surface area. This 
 
 using the following assumptions:
 
-·        Tube inside diameter = 0.0122 (m)
+* Tube inside diameter = 0.0122 (m)
 
-·        Tube side water velocity = 2.0 (m/s)
+* Tube side water velocity = 2.0 (m/s)
 
-·        Inside to outside coil surface area ratio (Ai/Ao) = 0.07 (-)
+* Inside to outside coil surface area ratio (Ai/Ao) = 0.07 (-)
 
-·        Fins overall efficiency = 0.92 (-)
+* Fins overall efficiency = 0.92 (-)
 
-·        Aluminum fins, 12 fins per inch with fins to total outside surface area ratio of 90%.
+* Aluminum fins, 12 fins per inch with fins to total outside surface area ratio of 90%.
 
-·        Airside combined heat and mass transfer coefficient = 140 (W/m2∙°C)
+* Airside combined heat and mass transfer coefficient = 140 (W/m2∙°C)
 
 Interior and exterior U values (really UA's per unit exterior surface area) are calculated by dividing the above UA's by the area. The resulting U<sub>coil,ext</sub> is assumed to be U<sub>coil,ext,wet</sub>; U<sub>coil,ext,dry</sub> is set equal to U<sub>coil,ext,wet</sub>. We now have all the starting values needed for inverting the simple coil model using the chosen Regula Falsi iterative method. Once the iteration is completed, we have coil UA's and U's that yield the design outlet air and water enthalpies given the inlet design conditions and flow rates. Note that the simple coil model can not exactly match the specified design outlet air temperature and humidity ratio. It can only match the design air outlet enthalpy. Generally the simple coil model will yield outlet conditions near the saturation curve if any dehumidification is occuring. Typical outlet relative humidities are around 95%.
 
@@ -1076,87 +1076,71 @@ This model simulates the thermal performance of the DX cooling coil and the powe
 
 The user must input the total cooling capacity, sensible heat ratio (SHR), coefficient of performance (COP) and the volumetric air flow rate across the cooling coil at rated conditions. The capacity, SHR and COP inputs should be “gross” values, excluding any thermal or energy impacts due to the indoor supply air fan. The rated conditions are considered to be air entering the cooling coil at 26.7°C drybulb/19.4°C wetbulb and air entering the outdoor condenser coil at 35°C drybulb/23.9°C wetbulb. The rated volumetric air flow should be between 0.00004027 m<sup>3</sup>/s and 0.00006041 m<sup>3</sup>/s per watt of rated total cooling capacity (300 – 450 cfm/ton). The rated volumetric air flow to total cooling capacity ratio for 100% dedicated outdoor air (DOAS) application DX cooling coils should be between 0.00001677 (m3/s)/W (125 cfm/ton) and 0.00003355 (m3/s)/W (250 cfm/ton).
 
-The user must also input five performance curves that describe the change in total cooling capacity and efficiency at part-load conditions:
+The user must also input five performance curves or performance tables that describe the change in total cooling capacity and efficiency at part-load conditions:
 
-1)    Total cooling capacity modifier curve (function of temperature)
+1)    Total cooling capacity modifier curve or table (function of temperature)
 
-2)    Total cooling capacity modifier curve (function of flow fraction)
+2)    Total cooling capacity modifier curve or table (function of flow fraction)
 
-3)    Energy input ratio (EIR) modifier curve (function of temperature)
+3)    Energy input ratio (EIR) modifier curve or table (function of temperature)
 
-4)    Energy input ratio (EIR) modifier curve (function of flow fraction)
+4)    Energy input ratio (EIR) modifier curve or table (function of flow fraction)
 
-5)    Part load fraction correlation (function of part load ratio)
+5)    Part load fraction correlation curve or table (function of part load ratio)
 
-·        The total cooling capacity modifier curve (function of temperature) is a biquadratic curve with two independent variables: wet-bulb temperature of the air entering the cooling coil, and dry-bulb temperature of the air entering the air-cooled condenser coil (wet-bulb temperature if modeling an evaporative-cooled condenser). The output of this curve is multiplied by the rated total cooling capacity to give the total cooling capacity at the specific entering air temperatures at which the DX coil unit is operating (i.e., at temperatures different from the rating point temperatures).
+* The total cooling capacity modifier curve (function of temperature) is a curve with two independent variables: wet-bulb temperature of the air entering the cooling coil, and dry-bulb temperature of the air entering the air-cooled condenser coil (wet-bulb temperature if modeling an evaporative-cooled condenser). The output of this curve is multiplied by the rated total cooling capacity to give the total cooling capacity at the specific entering air temperatures at which the DX coil unit is operating (i.e., at temperatures different from the rating point temperatures).  This curve is typically a biquadratic but any curve or table with two independent variables can be used.
 
 Note: The data used to develop the total cooling capacity modifier curve (function of temperature) should represent performance when the cooling coil is ‘wet’ (i.e., coil providing sensible cooling and at least some dehumidification). Performance data when the cooling coil is ‘dry’ (i.e., not providing any dehumidification) should **not** be included when developing this modifier curve. This model automatically detects and adjusts for ‘dry coil’ conditions (see section “Dry Coil Conditions” below).
 
-<div>\[TotCapTempModFac = \,a + \,b\left( {{T_{wb,i}}} \right)\,\, + \,\,c{\left( {{T_{wb,i}}} \right)^2} + \,\,d\left( {{T_{c,i}}} \right)\,\, + \,\,e{\left( {{T_{c,i}}} \right)^2} + f\left( {{T_{wb,i}}} \right)\left( {{T_{c,i}}} \right)\]</div>
+<div>\[\text{TotCapTempModFac} = \text{Func}\left(T_{wb,i},T_c,i}\right)\]</div>
 
 where
 
-<span>${T_{wb,i}}$</span> = wet-bulb temperature of the air entering the cooling coil, °C
+<span>${T_{wb,i}}$</span> = x values = wet-bulb temperature of the air entering the cooling coil, °C
 
-<span>${T_{c,i}}$</span> = dry-bulb temperature of the air entering an air-cooled condenser or wet-bulb
+<span>${T_{c,i}}$</span> = y values = dry-bulb temperature of the air entering an air-cooled condenser or wet-bulb temperature of the air entering an evaporative-cooled condenser, °C
 
-          temperature of the air entering an evaporative-cooled condenser, °C
+* The total cooling capacity modifier curve (function of flow fraction) is a curve with one independent variable being the ratio of the actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The output of this curve is multiplied by the rated total cooling capacity and the total cooling capacity modifier curve (function of temperature) to give the total cooling capacity at the specific temperature and air flow conditions at which the DX unit is operating.  This curve is typically a quadratic but any curve or table with one independent variable can be used.
 
-·        The total cooling capacity modifier curve (function of flow fraction) is a quadratic (or cubic) curve with the independent variable being the ratio of the actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The output of this curve is multiplied by the rated total cooling capacity and the total cooling capacity modifier curve (function of temperature) to give the total cooling capacity at the specific temperature and air flow conditions at which the DX unit is operating.
-
-<div>\[TotCapFlowModFac = \,a + \,b\left( {ff} \right)\,\, + \,\,c{\left( {ff} \right)^2}\]</div>
-
-or
-
-<div>\[TotCapFlowModFac = \,a + \,b\left( {ff} \right)\,\, + \,\,c{\left( {ff} \right)^2}\,\, + \,\,d{\left( {ff} \right)^3}\]</div>
+<div>\[\text{TotCapFlowModFac} = \text{Func}\left(ff\right)\]</div>
 
 where
 
-<div>\[ff = flow\;fraction = \left( {\frac{{Actual\,air\,mass\,flow\,rate}}{{Rated\,air\,mass\,flow\,rate}}} \right)\]</div>
+<div>\[ff = \text{flow fraction} = \left( \frac{\text{Actual air mass flow rate}}{\text{Rated air mass flow rate}} \right) = \text{x value}\]</div>
 
 **Note:**  The actual volumetric air flow rate through the cooling coil for any simulation time step where the DX unit is operating must be between 0.00002684 m<sup>3</sup>/s and .00006713 m<sup>3</sup>/s per watt of rated total cooling capacity (200 - 500 cfm/ton). The simulation will issue a warning message if this air flow range is exceeded.
 
-·        The energy input ratio (EIR) modifier curve (function of temperature) is a biquadratic curve with two independent variables: wet-bulb temperature of the air entering the cooling coil, and dry-bulb temperature of the air entering the air-cooled condenser coil (wet-bulb temperature if modeling an evaporative-cooled condenser). The output of this curve is multiplied by the rated EIR (inverse of the rated COP) to give the EIR at the specific entering air temperatures at which the DX coil unit is operating (i.e., at temperatures different from the rating point temperatures).
+* The energy input ratio (EIR) modifier curve (function of temperature) is a curve with two independent variables: wet-bulb temperature of the air entering the cooling coil, and dry-bulb temperature of the air entering the air-cooled condenser coil (wet-bulb temperature if modeling an evaporative-cooled condenser). The output of this curve is multiplied by the rated EIR (inverse of the rated COP) to give the EIR at the specific entering air temperatures at which the DX coil unit is operating (i.e., at temperatures different from the rating point temperatures).  This curve is typically a biquadratic but any curve or table with two independent variables can be used.
 
 Note: The data used to develop the energy input ratio (EIR) modifier curve (function of temperature) should represent performance when the cooling coil is ‘wet’ (i.e., coil providing sensible cooling and at least some dehumidification). Performance data when the cooling coil is ‘dry’ (i.e., not providing any dehumidification) should **not** be included when developing this modifier curve. This model automatically detects and adjusts for ‘dry coil’ conditions (see section “Dry Coil Conditions” below).
 
-<div>\[EIRTempModFac = \,a + \,b\left( {{T_{wb,i}}} \right)\,\, + \,\,c{\left( {{T_{wb,i}}} \right)^2}\, + \,\,d\left( {{T_{c,i}}} \right)\,\, + \,\,e{\left( {{T_{c,i}}} \right)^2} + f\left( {{T_{wb,i}}} \right)\left( {{T_{c,i}}} \right)\]</div>
+<div>\[\text{EIRTempModFac} = \text{Func}\left(T_{wb,i},T_c,i}\right)\]</div>
 
 where
 
-<span>${T_{wb,i}}$</span> = wet-bulb temperature of the air entering the cooling coil, °C
+<span>${T_{wb,i}}$</span> = x values = wet-bulb temperature of the air entering the cooling coil, °C
 
-<span>${T_{c,i}}$</span> = dry-bulb temperature of the air entering an air-cooled condenser or wet-bulb
+<span>${T_{c,i}}$</span> = y values = dry-bulb temperature of the air entering an air-cooled condenser or wet-bulb temperature of the air entering an evaporative-cooled condenser, °C
 
-          temperature of the air entering an evaporative-cooled condenser, °C
+* The energy input ratio (EIR) modifier curve (function of flow fraction) is a curve with one independent variable being the ratio of the actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The output of this curve is multiplied by the rated EIR (inverse of the rated COP) and the EIR modifier curve (function of temperature) to give the EIR at the specific temperature and air flow conditions at which the DX unit is operating.  This curve is typically a quadratic but any curve or table with one independent variable can be used.
 
-·        The energy input ratio (EIR) modifier curve (function of flow fraction) is a quadratic (or cubic) curve with the independent variable being the ratio of the actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The output of this curve is multiplied by the rated EIR (inverse of the rated COP) and the EIR modifier curve (function of temperature) to give the EIR at the specific temperature and air flow conditions at which the DX unit is operating.
-
-<span>$$</span><span>$EIRFlowModFac = \,a + \,b\left( {ff} \right)\,\, + \,\,c{\left( {ff} \right)^2}$</span>
-
-or
-
-<div>\[EIRFlowModFac = \,a + \,b\left( {ff} \right)\,\, + \,\,c{\left( {ff} \right)^2}\,\, + \,\,d{\left( {ff} \right)^3}\]</div>
+<div>\[\text{EIRFlowModFrac} = \text{Func}\left(ff\right)\]</div>
 
 where
 
-<div>\[ff = flow\;fraction = \left( {\frac{{Actual\,air\,mass\,flow\,rate}}{{Rated\,air\,mass\,flow\,rate}}} \right)\]</div>
+<div>\[ff = \text{flow fraction} = \left( \frac{\text{Actual air mass flow rate}}{\text{Rated air mass flow rate}} \right) = \text{x value}\]</div>
 
-·        The part load fraction correlation (function of part load ratio) is a quadratic or a cubic curve with the independent variable being part load ratio (sensible cooling load / steady-state sensible cooling capacity). The output of this curve is used in combination with the rated EIR and EIR modifier curves to give the “effective” EIR for a given simulation time step. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling.
+* The part load fraction correlation (function of part load ratio) is a curve with one independent variable being part load ratio (sensible cooling load / steady-state sensible cooling capacity). The output of this curve is used in combination with the rated EIR and EIR modifier curves to give the “effective” EIR for a given simulation time step. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling.  This curve is typically a linear, quadratic, or cubic but any curve or table with one independent variable can be used.
 
-<div>\[PartLoadFrac = \,PLF\, = \,\,a + \,b\left( {PLR} \right)\,\, + \,\,c{\left( {PLR} \right)^2}\]</div>
-
-or
-
-<div>\[PartLoadFrac = \,a + \,b\left( {PLR} \right)\,\, + \,\,c{\left( {PLR} \right)^2}\,\, + \,\,d{\left( {PLR} \right)^3}\]</div>
+<div>\[\text{PartLoadFrac} = \text{PLF} = \text{Func}\left(\text{PLR}\right)\]</div>
 
 where
 
-<div>\[PLR = part - load\,ratio = \left( {\frac{{sensible\,cooling\,load}}{{steady - state\,sensible\,cooling\,capacity}}} \right)\]</div>
+<div>\[\text{PLR} = \text{part load ratio} = \left(\frac{\text{actual sensible cooling load}}{\text{steady-state sensible cooling load}}\right) = \text{x values}\]</div>
 
 The part-load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation time step). For PLR values between 0 and 1 (0 &lt;= PLR &lt; 1), the following rules apply:
 
-PLF &gt;= 0.7   and   PLF &gt;= PLR
+<div>\[ \begin{array}{rl} \text{PLF} &\geq 0.7 \\ \text{PLF} &\geq \text{PLR} \end{array}\]</div>
 
 If PLF &lt; 0.7 a warning message is issued, the program resets the PLF value to 0.7, and the simulation proceeds. The runtime fraction of the coil is defined as PLR/PLF. If PLF &lt; PLR, then a warning message is issued and the runtime fraction of the coil is limited to 1.0.
 
@@ -1685,6 +1669,111 @@ where,
 *<span>$\% Load$</span>* = Part-load operating points, i.e., 75% (B), 50% (C), 25% (D)
 
 The calculations for *Q<sub>Total,Net,PartLoad</sub>* and *Power<sub>Total,PartLoad</sub>* are calculated in nearly the same way as *Q<sub>Total,Net,TestB</sub>* and *Power<sub>Total,TestB</sub>* are calculated for SEER (defined above). The only difference is that these cooling capacity and power values, used for calculating EER<sub>B</sub>/EER<sub>C</sub>/EER<sub>D</sub> for IEER, are calculated for a series of dry-bulb temperatures of air entering the air-cooled condenser (B = 27.5°C, C = 20.0°C, D = 18.3°C) and part-load performance degradiation correction is also applied to the condensing unit electric power calculation.
+
+#### ANSI/ASHRAE 127 - Standard Ratings of Single-Speed DX Cooling Coils
+
+For computer and data processing room unitary air conditioners single-speed direct expansion (DX) cooling coils, the standard ratings net total cooling capacity and total cooling electric power inputs are calculated according to ANSI/AHRI Standard 127 (ASHRAE 2012). These ratings apply to unitary air conditioners with air-cooled. If the single-speed DX cooling coil is specified with an evaporatively-cooled condenser, then no standard ratings are output from EnergyPlus at this time. These standard ratings are not direct inputs to the model. However, these standard ratings can be calculated using user-entered information for the Coil:Cooling:DX:SingleSpeed object.  These standard rating values are provided in the eplusout.eio output file and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). 
+
+**Note**: The standard ratings described in this section require that the DX cooling coil model be evaluated at sixteen different test conditions (i.e., specific wet-bulb temperatures for air entering the cooling coil and dry-bulb temperatures for air entering the air-cooled [outdoor] condenser) for each of the four standard tests and four application classes (ASHRAE – 2012).  The four test conditions: A, B, C and D are provided in the ANSI/ASHRAE Standard 127. And the test conditions are different for each application classes described in the standard.  In total sixteen performance data of net cooling capacity and total electric power inputs are reported.  The total cooling electric power includes the supply fan power.
+
+<table class="table table-striped">
+  <tr>
+    <th colspan="6">Rated Cooling Tests</th>
+  </tr>
+  <tr>
+    <th></th>
+    <th>Application Class</th>
+    <th>A</th>
+    <th>B</th>
+    <th>C</th>
+    <th>D</th>
+  </tr>
+  <tr>
+    <td rowspan="4">Tdb, Indoor</td>
+    <td>Class 1</td>
+    <td>23.9&deg;C(75.0&deg;F)</td>
+    <td>23.9&deg;C(75.0&deg;F)</td>
+    <td>23.9&deg;C(75.0&deg;F)</td>
+    <td>23.9&deg;C(75.0&deg;F)</td>
+  </tr>
+  <tr>
+    <td>Class 2</td>
+    <td>29.4&deg;C(85.0&deg;F)</td>
+    <td>29.4&deg;C(85.0&deg;F)</td>
+    <td>29.4&deg;C(85.0&deg;F)</td>
+    <td>29.4&deg;C(85.0&deg;F)</td>
+  </tr>
+  <tr>
+    <td>Class 3</td>
+    <td>35.0&deg;C(95.0&deg;F)</td>
+    <td>35.0&deg;C(95.0&deg;F)</td>
+    <td>35.0&deg;C(95.0&deg;F)</td>
+    <td>35.0&deg;C(95.0&deg;F)</td>
+  </tr>
+  <tr>
+    <td>Class 4</td>
+    <td>40.5&deg;C(105&deg;F)</td>
+    <td>40.5&deg;C(105&deg;F)</td>
+    <td>40.5&deg;C(105&deg;F)</td>
+    <td>40.5&deg;C(105&deg;F)</td>
+  </tr>
+  <tr>
+    <td colspan="2">Tdp, Indoor</td>
+    <td>35.0&deg;C(95.0&deg;F)</td>
+    <td>26.7&deg;C(80.0&deg;F)</td>
+    <td>18.3&deg;C(65.0&deg;F)</td>
+    <td>4.4&deg;C(40.0&deg;F)</td>
+  </tr>
+  <tr>
+    <td colspan="2">Tdb, Outdoor</td>
+    <td>35.0&deg;C(95.0&deg;F)</td>
+    <td>26.7&deg;C(80.0&deg;F)</td>
+    <td>18.3&deg;C(65.0&deg;F)</td>
+    <td>4.4&deg;C(40.0&deg;F)</td>
+  </tr>
+</table>
+
+The standard rating net total cooling capacity is calculated as follows:
+
+<div>\[ \dot{Q}_{StandardRating} = \dot{Q}_{TotalRated}\left(\text{TotCapTempModFac}_{Rated}\right)\left(\text{TotCapFlowModFac}_{Rated}\right)-\left(\text{FanPowerPerVolFlowRate} \cdot \dot{V}_{Rated}\right) \]</div>
+
+where:
+
+* <span>$ \dot{Q}_{StandardRating} $</span> = Standard Rating (Net) Cooling Capacity (W)
+
+* <span>$ \dot{Q}_{Total,Rated} $</span> = Rated Total (Gross) Cooling Capacity, user input (W)
+
+* <span>$ \text{TotCapTempModFac}_{Rated} $</span> = Total Cooling Capacity Function of Temperature Curve evaluated at wet-bulb temperature of air entering the cooling coil and dry-bulb temperature of air entering the air-cooled (outdoor) condenser (dimensionless)
+
+* <span>$ \text{TotCapFlowModFac}_{Rated} $</span> = Total Cooling Capacity Function of Flow Fraction Curve evaluated at a flow fraction of 1.0 (dimensionless)
+
+* <span>$ \text{FanPowerPerVolFlowRate} $</span> = Rated Evaporator Fan Power Per Volume Flow Rate, user input ( W/(m3/s) )
+
+* <span>$ \dot{V}_{Rated} $</span> = Rated Air Volume Flow Rate, user input (m3/s)
+
+The standard rating net total cooling electric power input is calculated as follows:
+
+<div>\[ \text{Power}_{Total} = \left[\dot{Q}_{Total,Rated}\left(\text{TotCapTempModFac}\right)\left(\text{TotCapFlowModFac}_{Rated}\right)\right]\cdot\text{EIR}+\left(\text{FanPowerPerVolFlowRate}\cdot\dot{V}_{Rated}\right) \]</div>
+
+<div>\[ \frac{\text{EIRTempModFac}\text{EIRFlowModFac_{Rated}}}{COP_{Rated}} \]</div>
+
+where:
+
+* <span>$ EER $</span> = Energy efficiency ratio at wet-bulb temperature of air entering the cooling coil, dry-bulb temperature of air entering the air-cooled (outdoor) condenser, and rated air volume flow through the cooling coil (W/W)
+
+* <span>$ \text{TotCapTempModFac} $</span> = Total Cooling Capacity Function of Temperature Curve evaluated at the test condition of wet-bulb temperature of air entering the cooling coil and dry-bulb temperature of air entering the air-cooled (outdoor) condenser (dimensionless)
+
+* <span>$ \text{Power}_{Total} $</span> = Total electric power (compressors, condenser fans and evaporator fan) at the test conditions of wet-bulb temperature of air entering the cooling coil, and dry-bulb temperature of air entering the air-cooled (outdoor) condenser, and rated air volume flow through the cooling coil (W)
+
+* <span>$ COP_{Rated} $</span> = Coefficient of Performance at Rated Conditions, user input (W/W)
+
+* <span>$ \text{EIRTempModFac} $</span> = Energy Input Ratio Function of Temperature Curve evaluated at the test condition of wet-bulb temperature of air entering the cooling coil and dry-bulb temperature of air entering the air-cooled (outdoor) condenser (dimensionless)
+
+* <span>$ \text{EIRFlowModFac}_{Rated} $</span> = Energy Input Ratio Function of Flow Fraction Curve evaluated at a flow fraction of 1.0 (dimensionless).
+
+Reference:
+
+ASHRAE 2012. ANSI/ASHRAE Standard 127-2012 Method of Testing for Rating Computer and Data Processing Room Unitary Air Conditioners.
 
 #### Basin Heater For Two-Stage DX Coil
 

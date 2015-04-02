@@ -1,0 +1,1 @@
+\(Sky\;Temperature = {\left( {\frac{{Horizontal\;IR}}{{Sigma}}} \right)^{\frac{1}{4}}} - {273.15_{Conversion\;from\;Kelvin\;to\;Centigrade}}\)

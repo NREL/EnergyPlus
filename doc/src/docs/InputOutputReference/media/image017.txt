@@ -1,0 +1,1 @@
+\[Amount\,(m/hour) = \,\left\{ {\begin{array}{*{20}{c}}{Light = 0.0125}\\{Moderate = 0.052}\\{Heavy = 0.1}\end{array}} \right.\]

@@ -1,0 +1,1 @@
+\(UAToCapacityRatio = {C_1}GasTurbineEngineCapacit{y^{{C_2}}}\)

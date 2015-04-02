@@ -1,0 +1,1 @@
+\(\dot m = ELA*{C_d}\sqrt {2\rho } *{\left( {\Delta {P_r}} \right)^{0.5 - n}}{\left( {\Delta P} \right)^n}\)

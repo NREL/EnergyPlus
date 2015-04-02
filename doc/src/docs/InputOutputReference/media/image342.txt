@@ -1,0 +1,1 @@
+\[{\varepsilon _{HX}} = \frac{{{T_{a,HX}} - {T_{amb}}}}{{{T_{s,coll}} - {T_{amb}}}}\]

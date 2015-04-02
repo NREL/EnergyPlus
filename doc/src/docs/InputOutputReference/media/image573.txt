@@ -1,0 +1,1 @@
+\(Q_{battery}^{t + \Delta t} = Q_{battery}^t + \frac{{{P_{battery - discharge}} \cdot \Delta t}}{{{\varepsilon _{discharge}}}}\)

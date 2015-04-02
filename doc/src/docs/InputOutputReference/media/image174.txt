@@ -1,0 +1,1 @@
+\(HeatThermalEnergyInput = AvailHeatCap \cdot HFIR \cdot HFIRfHPLR(HPLR)\)

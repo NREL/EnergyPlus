@@ -1,0 +1,1 @@
+\({h_{gas}} = h_{gas}^0 \cdot {\left( {\frac{{{{\dot N}_{gas}}}}{{\dot N_{gas}^0}}} \right)^n}\)

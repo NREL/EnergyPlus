@@ -10,7 +10,7 @@ For convenience, here are links to the core documentation:
     * [EMS Application Guide](EMS_Application_Guide/EMS_Application_Guide.md)
     * [External Interface Application Guide](ExternalInterfaces_Application_Guide/ExternalInterfaces_Application_Guide.md)
     * [Plant Application Guide](PlantApplicationGuide/PlantApplicationGuide.md)
-* [Input Output Reference](InputOutputReference/01-Page1.md)
+* [Input Output Reference](InputOutputReference/01a-InputOutputReference.md)
 * [Engineering Reference](EngineeringReference/01-Overview.md)
 * [Engineering Reference: Encyclopedic Guide to Simulation Models](EngineeringReference/13-EncyclopaedicRefs.md)
 * Developer Guides

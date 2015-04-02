@@ -1,0 +1,1 @@
+\[\Delta {P_{fan,tot}} = {C_1}*Q_{fan}^2 + {C_2}*Q_{fan}^{} + {C_3}*Q_{fan}^{}*\sqrt {{P_{sm}} - {P_o}}  + {C_4}*\left( {{P_{sm}} - {P_o}} \right)\]

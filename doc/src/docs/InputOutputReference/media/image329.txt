@@ -1,0 +1,1 @@
+\[{T_{OP}} = \gamma {T_{MRT}} + (1 - \gamma ){T_{drybulb}}\]

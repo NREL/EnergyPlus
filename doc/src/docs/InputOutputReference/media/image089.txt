@@ -1,0 +1,1 @@
+\[{S_f}(t) = {H_f}(t)*{F_G}*{\left( {{P_j} - {P_i}} \right)^n}\]

@@ -1,0 +1,1 @@
+\[q = UA \times ({T_{water,avg}} - {T_{air,avg}})\]

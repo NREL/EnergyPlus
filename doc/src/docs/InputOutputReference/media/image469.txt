@@ -1,0 +1,1 @@
+\({\sum\limits_i {\left( {{{\dot N}_i} \cdot \left[ {{{\hat h}_i} - {\Delta _f}\hat h_i^0} \right]} \right)} _{air}}\)

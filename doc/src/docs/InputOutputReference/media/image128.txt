@@ -1,0 +1,1 @@
+\[Ventilatio{n_{WindAndStack}} = \sqrt {{Q_s}^2 + {Q_w}^2} \]

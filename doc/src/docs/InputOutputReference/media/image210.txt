@@ -1,0 +1,1 @@
+\[{\dot q_{OA}} = {\dot m_{OA}}\left( {{h_{OA}} - {h_{RA'}}} \right) = {\dot m_{sys}}\left( {{h_{MA}} - {h_{RA'}}} \right)\]

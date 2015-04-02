@@ -1,0 +1,1 @@
+\(Facility = \sum {\left( {Building + HVAC + Plant + Exterior} \right)} \)

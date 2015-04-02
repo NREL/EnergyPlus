@@ -1,0 +1,1 @@
+\[\dot m = \sqrt {\frac{{2\rho {A^2}\Delta P}}{{fL/D + \sum {C_d}}}} \]

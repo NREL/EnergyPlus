@@ -1539,7 +1539,17 @@ Two stage evaporative coolers can be accomplished by putting the EvaporativeCool
 
 ### Indirect Evaporative Cooler Special Research Model
 
-This section summarizes the model implemented in the component EvaporativeCooler:Indirect:ResearchSpecial.  Examples of this evaporative cooler are shown in the following figures, without and with a relief valve. This model differs from the other indirect evaporative coolers in that, under part load conditions, it can modulate so that the air leaving the cooler just meets a drybulb temperature setpoint.  It is also a simple model with a constant effectiveness.
+This section summarizes the model implemented in the component EvaporativeCooler:Indirect:ResearchSpecial.  Examples of this evaporative cooler are shown in the following figures, without and with a relief valve. This model differs from the other indirect evaporative coolers in that, under part load conditions, it can modulate so that the air leaving the cooler just meets a drybulb temperature setpoint.
+
+The indirect research special evaporative cooler (IEC) machine provides improved modeling features needed for data center and other hybrid cooling applications.  The new model includes performance curves for variable effectiveness, fan power, and pump power.  It is intended to be able to model IEC machines that have 1) variable speed secondary fans, 2) variable speed pumps for water recirculation and spraying, and 3) ability to operate in a dry mode.  Such IEC machines can modulate the cooling power during operation by varying either the secondary side fan speed or the intensity of water spray or both.  To simplify the model it is assumed that the device’s internal controls are such that, when it is operating as a “Wet” evaporative cooler, secondary fan and spray pump operation are linked together so that there is a one-to-one mapping between them at any given part load situation.  This allows formulating the fan and pump power performance curves to be based on the same independent variable, secondary air flow fraction.
+
+
+
+
+HERE
+
+
+
 
 ![figure 166 renamed](EngineeringReference/media/image4808.png)
 
@@ -1553,13 +1563,13 @@ The algorithm used to determine the cooling provided to the system air proceeds 
 
 3)    recalculate performance using PLF from step 2.
 
-·        If PLF = 1 then use Equation and Equation
+* If PLF = 1 then use Equation and Equation
 
-·        If PLF &lt;1 then outlet temp = desired outlet temp (as by magic)
+* If PLF &lt;1 then outlet temp = desired outlet temp (as by magic)
 
-·        Auxiliary fan energy adjusted by PLF
+* Auxiliary fan energy adjusted by PLF
 
-·        Water consumption based on change in enthalpy in air system
+* Water consumption based on change in enthalpy in air system
 
 <div>\[{T_{db,out,sys}} = {T_{db,in,sys}} - \varepsilon \left( {{T_{db,in,sys}} - {T_{wb,in,purge}}} \right)\]</div>
 

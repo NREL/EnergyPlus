@@ -1,0 +1,1 @@
+\({\rm{CapacityScaleFactor}} = \frac{{{\rm{Gross RatedTotalCoolingCapacity}}}}{{{\rm{ReferenceUnitCapacity}}@{\rm{NominalSpeedLevel}}}}\)

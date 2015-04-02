@@ -1,0 +1,1 @@
+\[{\eta _{fan,\max }} = \max \left[ {\frac{{\left( {\Delta {P_{fan}} * {Q_{fan}}} \right)}}{{{H_{fan}}}}} \right]\]

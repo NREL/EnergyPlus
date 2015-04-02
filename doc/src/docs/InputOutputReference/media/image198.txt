@@ -1,0 +1,1 @@
+\[Fan\;powe{r_{High\;Fan\;Speed}} = 0.0105\cdot Tower\;High - Speed\;Nominal\;Capacity\]

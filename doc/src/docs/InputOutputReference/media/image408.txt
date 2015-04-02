@@ -1,0 +1,1 @@
+\({\eta _{belt,\max ,\ln }} = {C_1} + {C_2} \cdot {x_{belt,\max }} + {C_3} \cdot x_{_{belt,\max }}^2 + {C_4} \cdot x_{_{belt,\max }}^3 + {C_5} \cdot x_{_{belt,\max }}^4\)

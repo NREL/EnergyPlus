@@ -1,0 +1,1 @@
+\(Design\;Air\;Flow\;Rate = \frac{{0.5{\rho _{air}}(Fan\;power\;at\;Design\;Air\;Flow\;Rate)}}{{190.}}\)

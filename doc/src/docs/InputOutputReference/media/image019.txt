@@ -1,0 +1,1 @@
+\[Groundreflectedsolar = \left( {Beamsolar\cdot COS(SolarAltitudeAngle) + Diffusesolar} \right)\cdot {\rm{Groundreflectanc}}{{\rm{e}}_{{\rm{month}}}}\]
