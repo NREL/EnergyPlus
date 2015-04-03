@@ -384,402 +384,408 @@
 <p>✓ Html – reports with a .html extension are “web-browser” ready.</p>
 <h2 id="idd-conventions">IDD Conventions</h2>
 <p>The following is a basic description of the structure of the IDD (it’s actually taken directly from the IDD file). As noted within, <strong>!</strong> signifies a comment character as does the <strong>\</strong>. <strong>\</strong> has also been adopted as a convention for including more specific comments about each field in an object. These have been used with success in the IDFEditor and it is hoped the flexibility will provide other interface developers with useful information.</p>
-<p>!IDD_Version <strong>VERSION NUMBER</strong></p>
-<p>! **************************************************************************</p>
-<p>! This file is the Input Data Dictionary (IDD) for EnergyPlus.</p>
-<p>! The IDD defines the syntax and data model for each type of input "Object."</p>
-<p>! Lines in EnergyPlus input files (and IDD) are limited to 500 characters.</p>
-<p>!</p>
-<p>! Object Description</p>
-<p>! ------------------</p>
-<p>! To define an object (a record with data), develop a key word that is unique</p>
-<p>! Each data item to the object can be A (Alphanumeric string) or N (numeric)</p>
-<p>! Number each A and N.  This will show how the data items will be put into the</p>
-<p>! arrays that are passed to the Input Processor "Get" (GetObjectItem) routines.</p>
-<p>! All alpha fields are limited to 100 characters.  Numeric fields should be</p>
-<p>! valid numerics (can include such as 1.0E+05) and are placed into double</p>
-<p>! precision variables.</p>
-<p>!</p>
-<p>! NOTE: Even though a field may be optional, a comma representing that field</p>
-<p>!   must be included (unless it is the last field in the object).  Since the</p>
-<p>!   entire input is "field-oriented" and not "keyword-oriented", the EnergyPlus</p>
-<p>!   Input Processor must have some representation (even if blank) for each</p>
-<p>!   field.</p>
-<p>!</p>
-<p>! Object Documentation</p>
-<p>! --------------------</p>
-<p>! In addition, the following special comments appear one per line and</p>
-<p>! most are followed by a value.  Comments may apply to a field or the object</p>
-<p>! or a group of objects.</p>
-<p>!</p>
-<p>! Field-level comments:</p>
-<p>!</p>
-<p>!  \field           Name of field</p>
-<p>!                     (should be succinct and readable, blanks are encouraged)</p>
-<p>!</p>
-<p>!  \note            Note describing the field and its valid values. If multiple lines,</p>
-<p>!                   start each line with \note. Limit line length to 100 characters.</p>
-<p>!</p>
-<p>!  \required-field  To flag fields which may not be left blank</p>
-<p>!                     (this comment has no "value")</p>
-<p>!</p>
-<p>!  \begin-extensible  Marks the first field at which the object accepts an extensible</p>
-<p>!                   field set.  A fixed number of fields from this marker define the</p>
-<p>!                   extensible field set, see the object code \extensible for</p>
-<p>!                   more information.</p>
-<p>!</p>
-<p>!  \units           Units (must be from EnergyPlus standard units list)</p>
-<p>!                   EnergyPlus units are standard SI units</p>
-<p>!</p>
-<p>!  \ip-units        IP-Units (for use by input processors with IP units)</p>
-<p>!                   This is only used if the default conversion is not</p>
-<p>!                   appropriate.</p>
-<p>!</p>
-<p>!  \unitsBasedOnField  For fields that may have multiple possible units, indicates</p>
-<p>!                   the field in the object that can be used to determine</p>
-<p>!                   the units. The field reference is in the A2 form.</p>
-<p>!</p>
-<p>!  \minimum         Minimum that includes the following value</p>
-<p>!</p>
-<p>!  \minimum&gt;        Minimum that must be &gt; than the following value</p>
-<p>!</p>
-<p>!  \maximum         Maximum that includes the following value</p>
-<p>!</p>
-<p>!  \maximum&lt;        Maximum that must be &lt; than the following value</p>
-<p>!</p>
-<p>!  \default         Default for the field (if N/A then omit entire line)</p>
-<p>!</p>
-<p>!  \deprecated      This field is not really used and will be deleted from the object.</p>
-<p>!                   The required information is gotten internally or</p>
-<p>!                   not needed by the program.</p>
-<p>!</p>
-<p>!  \autosizable     Flag to indicate that this field can be used with the Auto</p>
-<p>!                   Sizing routines to produce calculated results for the</p>
-<p>!                   field.  If a value follows this, then that will be used</p>
-<p>!                   when the "Autosize" feature is flagged.  To trigger</p>
-<p>!                   autosizing for a field, enter Autosize as the field's</p>
-<p>!                   value.  Only applicable to numeric fields.</p>
-<p>!</p>
-<p>! \autocalculatable Flag to indicate that this field can be automatically</p>
-<p>!                   calculated. To trigger auto calculation for a field, enter</p>
-<p>!                   Autocalculate as the field's value.  Only applicable to</p>
-<p>!                   numeric fields.</p>
-<p>!</p>
-<p>!  \type            Type of data for the field -</p>
-<p>!                     integer</p>
-<p>!                     real</p>
-<p>!                     alpha       (arbitrary string),</p>
-<p>!                     choice      (alpha with specific list of choices, see</p>
-<p>!                                 \key)</p>
-<p>!                     object-list (link to a list of objects defined elsewhere,</p>
-<p>!                                  see \object-list and \reference)</p>
-<p>!                     external-list (uses a special list from an external source,</p>
-<p>!                                    see \external-list)</p>
-<p>!                     node        (name used in connecting HVAC components)</p>
-<p>!</p>
-<p>!  \retaincase      Retains the alphabetic case for alpha type fields</p>
-<p>!</p>
-<p>!  \key             Possible value for "\type choice" (blanks are significant)</p>
-<p>!                     use multiple \key lines to indicate all valid choices</p>
-<p>!</p>
-<p>!  \object-list     Name of a list of user-provided object names that are valid</p>
-<p>!                     entries for this field (used with "\reference")</p>
-<p>!                     see Zone and BuildingSurface:Detailed objects below for</p>
-<p>!                     examples.</p>
-<p>!                  ** Note that a field may have multiple \object-list commands.</p>
-<p>!</p>
-<p>!  \external-list   The values for this field should be selected from a special</p>
-<p>!                   list generated outside of the IDD file. The choices for the</p>
-<p>!                   special lists are:</p>
-<p>!                        autoRDDvariable</p>
-<p>!                        autoRDDmeter</p>
-<p>!                        autoRDDvariableMeter</p>
-<p>!                   When one of these are selected the options for the field</p>
-<p>!                   are taken from the RDD or MDD file or both.</p>
-<p>!</p>
-<p>!  \reference       Name of a list of names to which this object belongs</p>
-<p>!                     used with "\type object-list" and with "\object-list"</p>
-<p>!                     see Zone and BuildingSurface:Detailed objects below for</p>
-<p>!                     examples:</p>
-<p>!</p>
-<p>!                        Zone,</p>
-<p>!                          A1 , \field Name</p>
-<p>!                               \type alpha</p>
-<p>!                               \reference ZoneNames</p>
-<p>!</p>
-<p>!                        BuildingSurface:Detailed,</p>
-<p>!                          A4 , \field Zone Name</p>
-<p>!                               \note Zone the surface is a part of</p>
-<p>!                               \type object-list</p>
-<p>!                               \object-list ZoneNames</p>
-<p>!</p>
-<p>!             For each zone, the field "Name" may be referenced</p>
-<p>!             by other objects, such as BuildingSurface:Detailed, so it is</p>
-<p>!             commented with "\reference ZoneNames"</p>
-<p>!             Fields that reference a zone name, such as BuildingSurface:Detailed's</p>
-<p>!             "Zone Name", are commented as</p>
-<p>!             "\type object-list" and "\object-list ZoneNames"</p>
-<p>!             ** Note that a field may have multiple \reference commands.</p>
-<p>!             ** This is useful if the object belongs to a small specific</p>
-<p>!             object-list as well as a larger more general object-list.</p>
-<p>!</p>
-<p>! Object-level comments:</p>
-<p>!</p>
-<p>!  \memo            Memo describing the object. If multiple lines, start each line</p>
-<p>!                   with \memo.</p>
-<p>!                   Limit line length to 100 characters.</p>
-<p>!</p>
-<p>!  \unique-object   To flag objects which should appear only once in an idf</p>
-<p>!                     (this comment has no "value")</p>
-<p>!</p>
-<p>!  \required-object To flag objects which are required in every idf</p>
-<p>!                     (this comment has no "value")</p>
-<p>!</p>
-<p>!  \min-fields      Minimum number of fields that should be included in the</p>
-<p>!                   object.  If appropriate, the Input Processor will fill</p>
-<p>!                   any missing fields with defaults (for numeric fields).</p>
-<p>!                   It will also supply that number of fields to the "get"</p>
-<p>!                   routines using blanks for alpha fields (note -- blanks</p>
-<p>!                   may not be allowable for some alpha fields).</p>
-<p>!</p>
-<p>!  \obsolete        This object has been replaced though is kept (and is read)</p>
-<p>!                   in the current version.  Please refer to documentation as</p>
-<p>!                   to the dispersal of the object.  If this object is</p>
-<p>!                   encountered in an IDF, the InputProcessor will post an</p>
-<p>!                   appropriate message to the error file.</p>
-<p>!                   usage:  \obsolete New=&gt;[New object name]</p>
-<p>!</p>
-<p>!  \extensible:&lt;#&gt;  This object is dynamically extensible -- meaning, if you</p>
-<p>!           change the IDD appropriately (if the object has a simple list</p>
-<p>!           structure -- just add items to the list arguments (i.e. BRANCH</p>
-<p>!           LIST). These will be automatically redimensioned and used during</p>
-<p>!           the simulation. &lt;#&gt; should be entered by the developer to signify</p>
-<p>!           how many of the last fields are needed to be extended (and EnergyPlus</p>
-<p>!           will attempt to auto-extend the object).  The first field of the first</p>
-<p>!           instance of the extensible field set is marked with \begin-extensible.</p>
-<p>!</p>
-<p>!  \begin-extensible See previous item, marks beginning of extensible fields in</p>
-<p>!                   an object.</p>
-<p>!</p>
-<p>!  \format          The object should have a special format when saved in</p>
-<p>!                   the IDF Editor with the special format option enabled.</p>
-<p>!                   The options include SingleLine, Vertices, CompactSchedule,</p>
-<p>!                   FluidProperties, ViewFactors, and Spectral.</p>
-<p>!                   The SingleLine option puts all the fields for the object</p>
-<p>!                   on a single line. The Vertices option is used in objects</p>
-<p>!                   that use X, Y and Z fields to format those three fields</p>
-<p>!                   on a single line.</p>
-<p>!                   The CompactSchedule formats that specific object.</p>
-<p>!                   The FluidProperty option formats long lists of fluid</p>
-<p>!                   properties to ten values per line.</p>
-<p>!                   The ViewFactor option formats three fields related to</p>
-<p>!                   view factors per line.</p>
-<p>!                   The Spectral option formats the four fields related to</p>
-<p>!                   window glass spectral data per line.</p>
-<p>!</p>
-<p>!   \reference-class-name Adds the name of the class to the reference list</p>
-<p>!                   similar to \reference.</p>
-<p>!</p>
-<p>! Group-level comments:</p>
-<p>!</p>
-<p>!  \group          Name for a group of related objects</p>
-<p>!</p>
-<p>!</p>
-<p>! Notes on comments</p>
-<p>! -----------------</p>
-<p>!</p>
-<p>! 1.  If a particular comment is not applicable (such as units, or default)</p>
-<p>! then simply omit the comment rather than indicating N/A.</p>
-<p>!</p>
-<p>! 2.  Memos and notes should be brief (recommend 5 lines or less per block).</p>
-<p>! More extensive explanations are expected to be in the user documentation</p>
+<pre><code class="idd">!IDD\_Version **VERSION NUMBER**
+! \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*
+! This file is the Input Data Dictionary (IDD) for EnergyPlus.
+! The IDD defines the syntax and data model for each type of input &quot;Object.&quot;
+! Lines in EnergyPlus input files (and IDD) are limited to 500 characters.
+!
+! Object Description
+! ------------------
+! To define an object (a record with data), develop a key word that is unique
+! Each data item to the object can be A (Alphanumeric string) or N (numeric)
+! Number each A and N.  This will show how the data items will be put into the
+! arrays that are passed to the Input Processor &quot;Get&quot; (GetObjectItem) routines.
+! All alpha fields are limited to 100 characters.  Numeric fields should be
+! valid numerics (can include such as 1.0E+05) and are placed into double
+! precision variables.
+!
+! NOTE: Even though a field may be optional, a comma representing that field
+!   must be included (unless it is the last field in the object).  Since the
+!   entire input is &quot;field-oriented&quot; and not &quot;keyword-oriented&quot;, the EnergyPlus
+!   Input Processor must have some representation (even if blank) for each
+!   field.
+!
+! Object Documentation
+! --------------------
+! In addition, the following special comments appear one per line and
+! most are followed by a value.  Comments may apply to a field or the object
+! or a group of objects.
+!
+! Field-level comments:
+!
+!  \\field           Name of field
+!                     (should be succinct and readable, blanks are encouraged)
+!
+!  \\note            Note describing the field and its valid values. If multiple lines,
+!                   start each line with \\note. Limit line length to 100 characters.
+!
+!  \\required-field  To flag fields which may not be left blank
+!                     (this comment has no &quot;value&quot;)
+!
+!  \\begin-extensible  Marks the first field at which the object accepts an extensible
+!                   field set.  A fixed number of fields from this marker define the
+!                   extensible field set, see the object code \\extensible for
+!                   more information.
+!
+!  \\units           Units (must be from EnergyPlus standard units list)
+!                   EnergyPlus units are standard SI units
+!
+!  \\ip-units        IP-Units (for use by input processors with IP units)
+!                   This is only used if the default conversion is not
+!                   appropriate.
+!
+!  \\unitsBasedOnField  For fields that may have multiple possible units, indicates
+!                   the field in the object that can be used to determine
+!                   the units. The field reference is in the A2 form.
+!
+!  \\minimum         Minimum that includes the following value
+!
+!  \\minimum&amp;gt;        Minimum that must be &amp;gt; than the following value
+!
+!  \\maximum         Maximum that includes the following value
+!
+!  \\maximum&amp;lt;        Maximum that must be &amp;lt; than the following value
+!
+!  \\default         Default for the field (if N/A then omit entire line)
+!
+!  \\deprecated      This field is not really used and will be deleted from the object.
+!                   The required information is gotten internally or
+!                   not needed by the program.
+!
+!  \\autosizable     Flag to indicate that this field can be used with the Auto
+!                   Sizing routines to produce calculated results for the
+!                   field.  If a value follows this, then that will be used
+!                   when the &quot;Autosize&quot; feature is flagged.  To trigger
+!                   autosizing for a field, enter Autosize as the field's
+!                   value.  Only applicable to numeric fields.
+!
+! \\autocalculatable Flag to indicate that this field can be automatically
+!                   calculated. To trigger auto calculation for a field, enter
+!                   Autocalculate as the field's value.  Only applicable to
+!                   numeric fields.
+!
+!  \\type            Type of data for the field -
+!                     integer
+!                     real
+!                     alpha       (arbitrary string),
+!                     choice      (alpha with specific list of choices, see
+!                                 \\key)
+!                     object-list (link to a list of objects defined elsewhere,
+!                                  see \\object-list and \\reference)
+!                     external-list (uses a special list from an external source,
+!                                    see \\external-list)
+!                     node        (name used in connecting HVAC components)
+!
+!  \\retaincase      Retains the alphabetic case for alpha type fields
+!
+!  \\key             Possible value for &quot;\\type choice&quot; (blanks are significant)
+!                     use multiple \\key lines to indicate all valid choices
+!
+!  \\object-list     Name of a list of user-provided object names that are valid
+!                     entries for this field (used with &quot;\\reference&quot;)
+!                     see Zone and BuildingSurface:Detailed objects below for
+!                     examples.
+!                  \*\* Note that a field may have multiple \\object-list commands.
+!
+!  \\external-list   The values for this field should be selected from a special
+!                   list generated outside of the IDD file. The choices for the
+!                   special lists are:
+!                        autoRDDvariable
+!                        autoRDDmeter
+!                        autoRDDvariableMeter
+!                   When one of these are selected the options for the field
+!                   are taken from the RDD or MDD file or both.
+!
+!  \\reference       Name of a list of names to which this object belongs
+!                     used with &quot;\\type object-list&quot; and with &quot;\\object-list&quot;
+!                     see Zone and BuildingSurface:Detailed objects below for
+!                     examples:
+!
+!                        Zone,
+!                          A1 , \\field Name
+!                               \\type alpha
+!                               \\reference ZoneNames
+!
+!                        BuildingSurface:Detailed,
+!                          A4 , \\field Zone Name
+!                               \\note Zone the surface is a part of
+!                               \\type object-list
+!                               \\object-list ZoneNames
+!
+!             For each zone, the field &quot;Name&quot; may be referenced
+!             by other objects, such as BuildingSurface:Detailed, so it is
+!             commented with &quot;\\reference ZoneNames&quot;
+!             Fields that reference a zone name, such as BuildingSurface:Detailed's
+!             &quot;Zone Name&quot;, are commented as
+!             &quot;\\type object-list&quot; and &quot;\\object-list ZoneNames&quot;
+!             \*\* Note that a field may have multiple \\reference commands.
+!             \*\* This is useful if the object belongs to a small specific
+!             object-list as well as a larger more general object-list.
+!
+! Object-level comments:
+!
+!  \\memo            Memo describing the object. If multiple lines, start each line
+!                   with \\memo.
+!                   Limit line length to 100 characters.
+!
+!  \\unique-object   To flag objects which should appear only once in an idf
+!                     (this comment has no &quot;value&quot;)
+!
+!  \\required-object To flag objects which are required in every idf
+!                     (this comment has no &quot;value&quot;)
+!
+!  \\min-fields      Minimum number of fields that should be included in the
+!                   object.  If appropriate, the Input Processor will fill
+!                   any missing fields with defaults (for numeric fields).
+!                   It will also supply that number of fields to the &quot;get&quot;
+!                   routines using blanks for alpha fields (note -- blanks
+!                   may not be allowable for some alpha fields).
+!
+!  \\obsolete        This object has been replaced though is kept (and is read)
+!                   in the current version.  Please refer to documentation as
+!                   to the dispersal of the object.  If this object is
+!                   encountered in an IDF, the InputProcessor will post an
+!                   appropriate message to the error file.
+!                   usage:  \\obsolete New=&amp;gt;[New object name]
+!
+!  \\extensible:&amp;lt;\#&amp;gt;  This object is dynamically extensible -- meaning, if you
+!           change the IDD appropriately (if the object has a simple list
+!           structure -- just add items to the list arguments (i.e. BRANCH
+!           LIST). These will be automatically redimensioned and used during
+!           the simulation. &amp;lt;\#&amp;gt; should be entered by the developer to signify
+!           how many of the last fields are needed to be extended (and EnergyPlus
+!           will attempt to auto-extend the object).  The first field of the first
+!           instance of the extensible field set is marked with \\begin-extensible.
+!
+!  \\begin-extensible See previous item, marks beginning of extensible fields in
+!                   an object.
+!
+!  \\format          The object should have a special format when saved in
+!                   the IDF Editor with the special format option enabled.
+!                   The options include SingleLine, Vertices, CompactSchedule,
+!                   FluidProperties, ViewFactors, and Spectral.
+!                   The SingleLine option puts all the fields for the object
+!                   on a single line. The Vertices option is used in objects
+!                   that use X, Y and Z fields to format those three fields
+!                   on a single line.
+!                   The CompactSchedule formats that specific object.
+!                   The FluidProperty option formats long lists of fluid
+!                   properties to ten values per line.
+!                   The ViewFactor option formats three fields related to
+!                   view factors per line.
+!                   The Spectral option formats the four fields related to
+!                   window glass spectral data per line.
+!
+!   \\reference-class-name Adds the name of the class to the reference list
+!                   similar to \\reference.
+!
+! Group-level comments:
+!
+!  \\group          Name for a group of related objects
+!
+!
+! Notes on comments
+! -----------------
+!
+! 1.  If a particular comment is not applicable (such as units, or default)
+! then simply omit the comment rather than indicating N/A.
+!
+! 2.  Memos and notes should be brief (recommend 5 lines or less per block).
+! More extensive explanations are expected to be in the user documentation
+</code></pre>
+
 <h3 id="idd-ip-units">IDD – IP Units</h3>
 <p>In addition, the IDD contains indications of IP (inch-pound) units for the EnergyPlus standard SI (Systems International) units. These may be used by input and output interfaces to display values in the IP system. As noted, if the IP units are “standard” (first block below), then no \ip-units is expected in the field. Note that for some fields – due to their multiple use (for example, schedule values) – there cannot be a ip-unit designation.</p>
-<p>! Default IP conversions (no \ip-units necessary)</p>
-<p>!      $/(m3/s)               =&gt;   $/(ft3/min)         0.000472000059660808</p>
-<p>!      $/(W/K)                =&gt;   $/(Btu/h-F)         0.52667614683731</p>
-<p>!      $/kW                   =&gt;   $/(kBtuh/h)         0.293083235638921</p>
-<p>!      $/m2                   =&gt;   $/ft2               0.0928939733269818</p>
-<p>!      $/m3                   =&gt;   $/ft3               0.0283127014102352</p>
-<p>!      (kg/s)/W               =&gt;   (lbm/sec)/(Btu/hr)  0.646078115385742</p>
-<p>!      1/K                    =&gt;   1/F                 0.555555555555556</p>
-<p>!      1/m                    =&gt;   1/ft                0.3048</p>
-<p>!      A/K                    =&gt;   A/F                 0.555555555555556</p>
-<p>!      C                      =&gt;   F                   1.8 (plus 32)</p>
-<p>!      cm                     =&gt;   in                  0.3937</p>
-<p>!      cm2                    =&gt;   inch2               0.15500031000062</p>
-<p>!      deltaC                 =&gt;   deltaF              1.8</p>
-<p>!      deltaJ/kg              =&gt;   deltaBtu/lb         0.0004299</p>
-<p>!      g/GJ                   =&gt;   lb/MWh              0.00793664091373665</p>
-<p>!      g/kg                   =&gt;   grains/lb           7</p>
-<p>!      g/MJ                   =&gt;   lb/MWh              7.93664091373665</p>
-<p>!      g/mol                  =&gt;   lb/mol              0.0022046</p>
-<p>!      g/m-s                  =&gt;   lb/ft-s             0.000671968949659</p>
-<p>!      g/m-s-K                =&gt;   lb/ft-s-F           0.000373574867724868</p>
-<p>!      GJ                     =&gt;   ton-hrs             78.9889415481832</p>
-<p>!      J                      =&gt;   Wh                  0.000277777777777778</p>
-<p>!      J/K                    =&gt;   Btu/F               526.565</p>
-<p>!      J/kg                   =&gt;   Btu/lb              0.00042986</p>
-<p>!      J/kg-K                 =&gt;   Btu/lb-F            0.000239005736137667</p>
-<p>!      J/kg-K2                =&gt;   Btu/lb-F2           0.000132889924714692</p>
-<p>!      J/kg-K3                =&gt;   Btu/lb-F3           7.38277359526066E-05</p>
-<p>!      J/m2-K                 =&gt;   Btu/ft2-F           4.89224766847393E-05</p>
-<p>!      J/m3                   =&gt;   Btu/ft3             2.68096514745308E-05</p>
-<p>!      J/m3-K                 =&gt;   Btu/ft3-F           1.49237004739337E-05</p>
-<p>!      K                      =&gt;   R                   1.8</p>
-<p>!      K/m                    =&gt;   F/ft                0.54861322767449</p>
-<p>!      kg                     =&gt;   lb                  2.2046</p>
-<p>!      kg/J                   =&gt;   lb/Btu              2325.83774250441</p>
-<p>!      kg/kg-K                =&gt;   lb/lb-F             0.555555555555556</p>
-<p>!      kg/m                   =&gt;   lb/ft               0.67196893069637</p>
-<p>!      kg/m2                  =&gt;   lb/ft2              0.204794053596664</p>
-<p>!      kg/m3                  =&gt;   lb/ft3              0.062428</p>
-<p>!      kg/m-s                 =&gt;   lb/ft-s             0.67196893069637</p>
-<p>!      kg/m-s-K               =&gt;   lb/ft-s-F           0.373316072609094</p>
-<p>!      kg/m-s-K2              =&gt;   lb/ft-s-F2          0.207397818116164</p>
-<p>!      kg/Pa-s-m2             =&gt;   lb/psi-s-ft2        1412.00523459398</p>
-<p>!      kg/s                   =&gt;   lb/s                2.20462247603796</p>
-<p>!      kg/s2                  =&gt;   lb/s2               2.2046</p>
-<p>!      kg/s-m                 =&gt;   lb/s-ft             0.67196893069637</p>
-<p>!      kJ/kg                  =&gt;   Btu/lb              0.429925</p>
-<p>!      kPa                    =&gt;   psi                 0.145038</p>
-<p>!      L/day                  =&gt;   pint/day            2.11337629827348</p>
-<p>!      L/GJ                   =&gt;   gal/kWh             0.000951022349025202</p>
-<p>!      L/kWh                  =&gt;   pint/kWh            2.11337629827348</p>
-<p>!      L/MJ                   =&gt;   gal/kWh             0.951022349025202</p>
-<p>!      lux                    =&gt;   foot-candles        0.092902267</p>
-<p>!      m                      =&gt;   ft                  3.28083989501312</p>
-<p>!      m/hr                   =&gt;   ft/hr               3.28083989501312</p>
-<p>!      m/s                    =&gt;   ft/min              196.850393700787</p>
-<p>!      m/s                    =&gt;   miles/hr            2.2369362920544</p>
-<p>!      m/yr                   =&gt;   inch/yr             39.3700787401575</p>
-<p>!      m2                     =&gt;   ft2                 10.7639104167097</p>
-<p>!      m2/m                   =&gt;   ft2/ft              3.28083989501312</p>
-<p>!      m2/person              =&gt;   ft2/person          10.764961</p>
-<p>!      m2/s                   =&gt;   ft2/s               10.7639104167097</p>
-<p>!      m2-K/W                 =&gt;   ft2-F-hr/Btu        5.678263</p>
-<p>!      m3                     =&gt;   ft3                 35.3146667214886</p>
-<p>!      m3                     =&gt;   gal                 264.172037284185</p>
-<p>!      m3/GJ                  =&gt;   ft3/MWh             127.13292</p>
-<p>!      m3/hr                  =&gt;   ft3/hr              35.3146667214886</p>
-<p>!      m3/hr-m2               =&gt;   ft3/hr-ft2          3.28083989501312</p>
-<p>!      m3/hr-person           =&gt;   ft3/hr-person       35.3146667214886</p>
-<p>!      m3/kg                  =&gt;   ft3/lb              16.018</p>
-<p>!      m3/m2                  =&gt;   ft3/ft2             3.28083989501312</p>
-<p>!      m3/MJ                  =&gt;   ft3/kWh             127.13292</p>
-<p>!      m3/person              =&gt;   ft3/person          35.3146667214886</p>
-<p>!      m3/s                   =&gt;   ft3/min             2118.88000328931</p>
-<p>!      m3/s-m                 =&gt;   ft3/min-ft          645.89</p>
-<p>!      m3/s-m2                =&gt;   ft3/min-ft2         196.85</p>
-<p>!      m3/s-person            =&gt;   ft3/min-person      2118.6438</p>
-<p>!      m3/s-W                 =&gt;   (ft3/min)/(Btu/h)   621.099127332943</p>
-<p>!      N-m                    =&gt;   lbf-in              8.85074900525547</p>
-<p>!      N-s/m2                 =&gt;   lbf-s/ft2           0.0208857913669065</p>
-<p>!      Pa                     =&gt;   psi                 0.000145037743897283</p>
-<p>!      percent/K              =&gt;   percent/F           0.555555555555556</p>
-<p>!      person/m2              =&gt;   person/ft2          0.0928939733269818</p>
-<p>!      s/m                    =&gt;   s/ft                0.3048</p>
-<p>!      V/K                    =&gt;   V/F                 0.555555555555556</p>
-<p>!      W                      =&gt;   Btu/h               3.4121412858518</p>
-<p>!      W/(m3/s)               =&gt;   W/(ft3/min)         0.0004719475</p>
-<p>!      W/K                    =&gt;   Btu/h-F             1.89563404769544</p>
-<p>!      W/m                    =&gt;   Btu/h-ft            1.04072</p>
-<p>!      W/m2                   =&gt;   Btu/h-ft2           0.316957210776545</p>
-<p>!      W/m2                   =&gt;   W/ft2               0.09290304</p>
-<p>!      W/m2-K                 =&gt;   Btu/h-ft2-F         0.176110194261872</p>
-<p>!      W/m2-K2                =&gt;   Btu/h-ft2-F2        0.097826</p>
-<p>!      W/m-K                  =&gt;   Btu-in/h-ft2-F      6.93481276005548</p>
-<p>!      W/m-K2                 =&gt;   Btu/h-F2-ft         0.321418310071648</p>
-<p>!      W/m-K3                 =&gt;   Btu/h-F3-ft         0.178565727817582</p>
-<p>!      W/person               =&gt;   Btu/h-person        3.4121412858518</p>
-<p>!</p>
-<p>! Other conversions supported (needs the \ip-units code)</p>
-<p>!</p>
-<p>!      kPa                    =&gt;   inHg                0.29523</p>
-<p>!      m                      =&gt;   in                  39.3700787401575</p>
-<p>!      m3/s                   =&gt;   gal/min             15850.3222370511</p>
-<p>!      Pa                     =&gt;   ftH2O               0.00033455</p>
-<p>!      Pa                     =&gt;   inH2O               0.00401463</p>
-<p>!      Pa                     =&gt;   inHg                0.00029613</p>
-<p>!      Pa                     =&gt;   Pa                  1</p>
-<p>!      W                      =&gt;   W                   1</p>
-<p>!      W/m2                   =&gt;   W/m2                1</p>
-<p>!      W/m-K                  =&gt;   Btu/h-ft-F          0.577796066000163</p>
-<p>!      W/person               =&gt;   W/person            1</p>
-<p>!</p>
-<p>! Units fields that are not translated</p>
-<p>!      $</p>
-<p>!      1/hr</p>
-<p>!      A</p>
-<p>!      Ah</p>
-<p>!      A/V</p>
-<p>!      Availability</p>
-<p>!      Control</p>
-<p>!      cycles/hr</p>
-<p>!      days</p>
-<p>!      deg</p>
-<p>!      dimensionless</p>
-<p>!      eV</p>
-<p>!      hr</p>
-<p>!      J/J</p>
-<p>!      kg/kg</p>
-<p>!      kg-H2O/kg-air</p>
-<p>!      kmol</p>
-<p>!      kmol/s</p>
-<p>!      m3/m3</p>
-<p>!      minutes</p>
-<p>!      Mode</p>
-<p>!      ms</p>
-<p>!      ohms</p>
-<p>!      percent</p>
-<p>!      ppm</p>
-<p>!      rev/min</p>
-<p>!      s</p>
-<p>!      V</p>
-<p>!      VA</p>
-<p>!      W/m2 or deg C</p>
-<p>!      W/m2, W or deg C</p>
-<p>!      W/s</p>
-<p>!      W/W</p>
-<p>!      years</p>
-<p>! **************************************************************************</p>
+<pre><code class="idd">! Default IP conversions (no \\ip-units necessary)
+!      $/(m3/s)               =&amp;gt;   $/(ft3/min)         0.000472000059660808
+!      $/(W/K)                =&amp;gt;   $/(Btu/h-F)         0.52667614683731
+!      $/kW                   =&amp;gt;   $/(kBtuh/h)         0.293083235638921
+!      $/m2                   =&amp;gt;   $/ft2               0.0928939733269818
+!      $/m3                   =&amp;gt;   $/ft3               0.0283127014102352
+!      (kg/s)/W               =&amp;gt;   (lbm/sec)/(Btu/hr)  0.646078115385742
+!      1/K                    =&amp;gt;   1/F                 0.555555555555556
+!      1/m                    =&amp;gt;   1/ft                0.3048
+!      A/K                    =&amp;gt;   A/F                 0.555555555555556
+!      C                      =&amp;gt;   F                   1.8 (plus 32)
+!      cm                     =&amp;gt;   in                  0.3937
+!      cm2                    =&amp;gt;   inch2               0.15500031000062
+!      deltaC                 =&amp;gt;   deltaF              1.8
+!      deltaJ/kg              =&amp;gt;   deltaBtu/lb         0.0004299
+!      g/GJ                   =&amp;gt;   lb/MWh              0.00793664091373665
+!      g/kg                   =&amp;gt;   grains/lb           7
+!      g/MJ                   =&amp;gt;   lb/MWh              7.93664091373665
+!      g/mol                  =&amp;gt;   lb/mol              0.0022046
+!      g/m-s                  =&amp;gt;   lb/ft-s             0.000671968949659
+!      g/m-s-K                =&amp;gt;   lb/ft-s-F           0.000373574867724868
+!      GJ                     =&amp;gt;   ton-hrs             78.9889415481832
+!      J                      =&amp;gt;   Wh                  0.000277777777777778
+!      J/K                    =&amp;gt;   Btu/F               526.565
+!      J/kg                   =&amp;gt;   Btu/lb              0.00042986
+!      J/kg-K                 =&amp;gt;   Btu/lb-F            0.000239005736137667
+!      J/kg-K2                =&amp;gt;   Btu/lb-F2           0.000132889924714692
+!      J/kg-K3                =&amp;gt;   Btu/lb-F3           7.38277359526066E-05
+!      J/m2-K                 =&amp;gt;   Btu/ft2-F           4.89224766847393E-05
+!      J/m3                   =&amp;gt;   Btu/ft3             2.68096514745308E-05
+!      J/m3-K                 =&amp;gt;   Btu/ft3-F           1.49237004739337E-05
+!      K                      =&amp;gt;   R                   1.8
+!      K/m                    =&amp;gt;   F/ft                0.54861322767449
+!      kg                     =&amp;gt;   lb                  2.2046
+!      kg/J                   =&amp;gt;   lb/Btu              2325.83774250441
+!      kg/kg-K                =&amp;gt;   lb/lb-F             0.555555555555556
+!      kg/m                   =&amp;gt;   lb/ft               0.67196893069637
+!      kg/m2                  =&amp;gt;   lb/ft2              0.204794053596664
+!      kg/m3                  =&amp;gt;   lb/ft3              0.062428
+!      kg/m-s                 =&amp;gt;   lb/ft-s             0.67196893069637
+!      kg/m-s-K               =&amp;gt;   lb/ft-s-F           0.373316072609094
+!      kg/m-s-K2              =&amp;gt;   lb/ft-s-F2          0.207397818116164
+!      kg/Pa-s-m2             =&amp;gt;   lb/psi-s-ft2        1412.00523459398
+!      kg/s                   =&amp;gt;   lb/s                2.20462247603796
+!      kg/s2                  =&amp;gt;   lb/s2               2.2046
+!      kg/s-m                 =&amp;gt;   lb/s-ft             0.67196893069637
+!      kJ/kg                  =&amp;gt;   Btu/lb              0.429925
+!      kPa                    =&amp;gt;   psi                 0.145038
+!      L/day                  =&amp;gt;   pint/day            2.11337629827348
+!      L/GJ                   =&amp;gt;   gal/kWh             0.000951022349025202
+!      L/kWh                  =&amp;gt;   pint/kWh            2.11337629827348
+!      L/MJ                   =&amp;gt;   gal/kWh             0.951022349025202
+!      lux                    =&amp;gt;   foot-candles        0.092902267
+!      m                      =&amp;gt;   ft                  3.28083989501312
+!      m/hr                   =&amp;gt;   ft/hr               3.28083989501312
+!      m/s                    =&amp;gt;   ft/min              196.850393700787
+!      m/s                    =&amp;gt;   miles/hr            2.2369362920544
+!      m/yr                   =&amp;gt;   inch/yr             39.3700787401575
+!      m2                     =&amp;gt;   ft2                 10.7639104167097
+!      m2/m                   =&amp;gt;   ft2/ft              3.28083989501312
+!      m2/person              =&amp;gt;   ft2/person          10.764961
+!      m2/s                   =&amp;gt;   ft2/s               10.7639104167097
+!      m2-K/W                 =&amp;gt;   ft2-F-hr/Btu        5.678263
+!      m3                     =&amp;gt;   ft3                 35.3146667214886
+!      m3                     =&amp;gt;   gal                 264.172037284185
+!      m3/GJ                  =&amp;gt;   ft3/MWh             127.13292
+!      m3/hr                  =&amp;gt;   ft3/hr              35.3146667214886
+!      m3/hr-m2               =&amp;gt;   ft3/hr-ft2          3.28083989501312
+!      m3/hr-person           =&amp;gt;   ft3/hr-person       35.3146667214886
+!      m3/kg                  =&amp;gt;   ft3/lb              16.018
+!      m3/m2                  =&amp;gt;   ft3/ft2             3.28083989501312
+!      m3/MJ                  =&amp;gt;   ft3/kWh             127.13292
+!      m3/person              =&amp;gt;   ft3/person          35.3146667214886
+!      m3/s                   =&amp;gt;   ft3/min             2118.88000328931
+!      m3/s-m                 =&amp;gt;   ft3/min-ft          645.89
+!      m3/s-m2                =&amp;gt;   ft3/min-ft2         196.85
+!      m3/s-person            =&amp;gt;   ft3/min-person      2118.6438
+!      m3/s-W                 =&amp;gt;   (ft3/min)/(Btu/h)   621.099127332943
+!      N-m                    =&amp;gt;   lbf-in              8.85074900525547
+!      N-s/m2                 =&amp;gt;   lbf-s/ft2           0.0208857913669065
+!      Pa                     =&amp;gt;   psi                 0.000145037743897283
+!      percent/K              =&amp;gt;   percent/F           0.555555555555556
+!      person/m2              =&amp;gt;   person/ft2          0.0928939733269818
+!      s/m                    =&amp;gt;   s/ft                0.3048
+!      V/K                    =&amp;gt;   V/F                 0.555555555555556
+!      W                      =&amp;gt;   Btu/h               3.4121412858518
+!      W/(m3/s)               =&amp;gt;   W/(ft3/min)         0.0004719475
+!      W/K                    =&amp;gt;   Btu/h-F             1.89563404769544
+!      W/m                    =&amp;gt;   Btu/h-ft            1.04072
+!      W/m2                   =&amp;gt;   Btu/h-ft2           0.316957210776545
+!      W/m2                   =&amp;gt;   W/ft2               0.09290304
+!      W/m2-K                 =&amp;gt;   Btu/h-ft2-F         0.176110194261872
+!      W/m2-K2                =&amp;gt;   Btu/h-ft2-F2        0.097826
+!      W/m-K                  =&amp;gt;   Btu-in/h-ft2-F      6.93481276005548
+!      W/m-K2                 =&amp;gt;   Btu/h-F2-ft         0.321418310071648
+!      W/m-K3                 =&amp;gt;   Btu/h-F3-ft         0.178565727817582
+!      W/person               =&amp;gt;   Btu/h-person        3.4121412858518
+!
+! Other conversions supported (needs the \\ip-units code)
+!
+!      kPa                    =&amp;gt;   inHg                0.29523
+!      m                      =&amp;gt;   in                  39.3700787401575
+!      m3/s                   =&amp;gt;   gal/min             15850.3222370511
+!      Pa                     =&amp;gt;   ftH2O               0.00033455
+!      Pa                     =&amp;gt;   inH2O               0.00401463
+!      Pa                     =&amp;gt;   inHg                0.00029613
+!      Pa                     =&amp;gt;   Pa                  1
+!      W                      =&amp;gt;   W                   1
+!      W/m2                   =&amp;gt;   W/m2                1
+!      W/m-K                  =&amp;gt;   Btu/h-ft-F          0.577796066000163
+!      W/person               =&amp;gt;   W/person            1
+!
+! Units fields that are not translated
+!      $
+!      1/hr
+!      A
+!      Ah
+!      A/V
+!      Availability
+!      Control
+!      cycles/hr
+!      days
+!      deg
+!      dimensionless
+!      eV
+!      hr
+!      J/J
+!      kg/kg
+!      kg-H2O/kg-air
+!      kmol
+!      kmol/s
+!      m3/m3
+!      minutes
+!      Mode
+!      ms
+!      ohms
+!      percent
+!      ppm
+!      rev/min
+!      s
+!      V
+!      VA
+!      W/m2 or deg C
+!      W/m2, W or deg C
+!      W/s
+!      W/W
+!      years
+! \*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*
+</code></pre>
+
 <h2 id="input-output-descriptions-document">Input – Output Descriptions (Document)</h2>
 <h3 id="input-descriptions">Input Descriptions</h3>
 <p>In the descriptions below, the fields for each input object will be described but the Energy+.idd descriptions will not be shown. Refer to the actual Energy+.idd file for complete specifications. Energy+.idd is a text file that can be viewed with many text editors or word processors. The Site:Location object will serve as an example.</p>
-<p><strong>Site:Location,</strong></p>
-<p><strong>       \unique-object</strong></p>
-<p><strong>       \min-fields 5</strong></p>
-<p><strong>  A1 , \field Name</strong></p>
-<p><strong>       \required-field</strong></p>
-<p><strong>       \type  alpha</strong></p>
-<p><strong>  N1 , \field Latitude</strong></p>
-<p><strong>       \units deg</strong></p>
-<p><strong>       \minimum -90.0</strong></p>
-<p><strong>       \maximum +90.0</strong></p>
-<p><strong>       \default 0.0</strong></p>
-<p><strong>       \note + is North, - is South, degree minutes represented in decimal (i.e. 30 minutes is .5)</strong></p>
-<p><strong>       \type real</strong></p>
-<p><strong>  N2 , \field Longitude</strong></p>
-<p><strong>       \units deg</strong></p>
-<p><strong>       \minimum -180.0</strong></p>
-<p><strong>       \maximum +180.0</strong></p>
-<p><strong>       \default 0.0</strong></p>
-<p><strong>       \note - is West, + is East, degree minutes represented in decimal (i.e. 30 minutes is .5)</strong></p>
-<p><strong>       \type real</strong></p>
-<p><strong>  N3 , \field Time Zone</strong></p>
-<p><strong>       \note basic these limits on the WorldTimeZone Map (2003)</strong></p>
-<p><strong>       \units hr</strong></p>
-<p><strong>       \minimum -12.0</strong></p>
-<p><strong>       \maximum +14.0</strong></p>
-<p><strong>       \default 0.0</strong></p>
-<p><strong>       \note  Time relative to GMT. Decimal hours.</strong></p>
-<p><strong>       \type real</strong></p>
-<p><strong>  N4 ; \field Elevation</strong></p>
-<p><strong>       \units m</strong></p>
-<p><strong>       \minimum -300.0</strong></p>
-<p><strong>       \maximum&lt; 8900.0</strong></p>
-<p><strong>       \default 0.0</strong></p>
-<p><strong>       \type real</strong></p>
+<pre><code class="idd">Site:Location,
+       \unique-object
+       \min-fields 5
+  A1 , \field Name
+       \required-field
+       \type  alpha
+  N1 , \field Latitude
+       \units deg
+       \minimum -90.0
+       \maximum +90.0
+       \default 0.0
+       \note + is North, - is South, degree minutes represented in decimal (i.e. 30 minutes is .5)
+       \type real
+  N2 , \field Longitude
+       \units deg
+       \minimum -180.0
+       \maximum +180.0
+       \default 0.0
+       \note - is West, + is East, degree minutes represented in decimal (i.e. 30 minutes is .5)
+       \type real
+  N3 , \field Time Zone
+       \note basic these limits on the WorldTimeZone Map (2003)
+       \units hr
+       \minimum -12.0
+       \maximum +14.0
+       \default 0.0
+       \note  Time relative to GMT. Decimal hours.
+       \type real
+  N4 ; \field Elevation
+       \units m
+       \minimum -300.0
+       \maximum&amp;lt; 8900.0
+       \default 0.0
+       \type real
+</code></pre>
+
 <p>The IDD excerpt above is the complete definition as seen in the IDD file.</p>
 <p>First, the object name is given. (Site:Location)  This is followed by a comma in both the definition (IDD) and in an input file (IDF). In fact, all fields except the terminating field of an IDD class object and IDF object are followed by commas. The final field in an IDD class object or in an IDF object is terminated by a semi-colon.</p>
 <p>Next is an alpha field, the location name. As noted above, for input, spaces are significant in this field. The main inputs for Site:Location are numeric fields. These are numbered (as is the alpha field) for convenience. The \ designations will show various information about the objects as described above in the IDD conventions discussion. Of importance for reading this document are the units and possible minimum and maximum values for a  field.</p>
@@ -902,11 +908,13 @@
 <h4 id="field-maximum-plant-iterations">Field: Maximum Plant Iterations</h4>
 <p>The plant system solver iterates within a single HVAC manager iteration.  This input field and the previous one provide some control over how the plant model iterates.  This field sets a maximum limit for plant interations.  The default for this field is the value “8” which indicates that the plant solver will exit after having completed eight full iterations.  This value can be raised for better accuracy with complex plants or lowered for faster speed with simple plants. The output variable called “Plant Solver Sub Iteration Count” (typically reported at the “detailed” frequency) is useful for understanding how many plant solver iterations are actually being used during a particular simulation.  The lower limit of the value for this field is “2.”</p>
 <p>Use in an IDF:</p>
-<p>ConvergenceLimits,</p>
-<p>0,        !- Minimum System Timestep (0=same as zone timestep)</p>
-<p>25,       !- Maximum HVAC Iterations</p>
-<p>3,        !- Minimum Plant Iterations</p>
-<p>9;        !- Maximum Plant Iterations</p>
+<pre><code class="idf">ConvergenceLimits,
+  0,        !- Minimum System Timestep (0=same as zone timestep)
+  25,       !- Maximum HVAC Iterations
+  3,        !- Minimum Plant Iterations
+  9;        !- Maximum Plant Iterations
+</code></pre>
+
 <h3 id="building">Building</h3>
 <p>The Building object describes parameters that are used during the simulation of the building. There are necessary correlations between the entries for this object and some entries in the Site:WeatherStation and Site:HeightVariation objects, specifically the Terrain field.</p>
 <h4 id="field-building-name">Field: Building Name</h4>

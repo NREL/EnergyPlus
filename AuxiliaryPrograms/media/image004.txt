@@ -1,1 +1,0 @@
-\(Globa{l_{horizontalradiation}} = Direc{t_{horizontalradiation}} + Diffus{e_{horizontalradiation}}\)
