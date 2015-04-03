@@ -1,1 +1,0 @@
-\({F_{open}} = \left\{ \begin{array}{l}0.0\quad \quad \quad RH < 25\% \\\frac{{RH - 25}}{{60 - 25}}\quad 25\%  \le RH\\1.0\quad \quad \quad RH > 60\% \end{array} \right. \le 60\% \)

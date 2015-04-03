@@ -1,1 +1,0 @@
-\(Actual\;Temperature = Temperatur{e_{met}} + TMC - \left( {\frac{{Temperature\;Gradien{t_{site}}*EarthRadius*Heigh{t_{site/component}}}}{{EarthRadius + Heigh{t_{site/component}}}}} \right)\)

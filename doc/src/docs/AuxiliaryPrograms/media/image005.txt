@@ -1,1 +1,0 @@
-\(Direc{t_{normalradiation}} = \frac{{Direc{t_{horizontalradiation}}}}{{SIN(Sola{r_{height}})}}\)

@@ -1,1 +1,0 @@
-\({T_{average}} = \frac{{\sum {\left( {{T_{zone}} * Vo{l_{zone}}} \right)} }}{{\sum {\left( {Vo{l_{zone}}} \right)} }}\)
