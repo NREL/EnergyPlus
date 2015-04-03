@@ -4734,7 +4734,7 @@ namespace DXCoils {
 			ShowFatalError( RoutineName + "Errors found in getting " + CurrentModuleObject + " input. Preceding condition(s) causes termination." );
 		}
 		
-		for ( DXCoilNum = 1; DXCoilNum <= NumDoe2DXCoils; ++DXCoilNum ) {
+		for ( DXCoilNum = 1; DXCoilNum <= NumDXCoils; ++DXCoilNum ) {
 			
 			DXCoilData & Coil = DXCoil( DXCoilNum );
 			
