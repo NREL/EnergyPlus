@@ -23,6 +23,7 @@ using namespace EnergyPlus::DataSizing;
 
 TEST( SizePurchasedAirTest, Test1 )
 {
+	ShowMessage( "Begin Test: SizePurchasedAirTest, Test1" );
 
 	int PurchAirNum = 1;
 	int write_stat;

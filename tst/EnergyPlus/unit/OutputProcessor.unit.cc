@@ -5,6 +5,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::OutputProcessor;
@@ -13,6 +14,8 @@ using namespace DataGlobals;
 
 TEST( OutputProcessor, TestGetMeteredVariables )
 {
+	ShowMessage( "Begin Test: OutputProcessor, TestGetMeteredVariables" );
+
 	FArray1D_int VarIndexes; // Variable Numbers
 	FArray1D_int VarTypes; // Variable Types (1=integer, 2=real, 3=meter)
 	FArray1D_int IndexTypes; // Variable Index Types (1=Zone,2=HVAC)

@@ -27,6 +27,7 @@ using namespace EnergyPlus::DataEnvironment;
 using DataGlobals::BeginEnvrnFlag;
 
 TEST( ICSSolarCollectorTest, CalcPassiveExteriorBaffleGapTest ) {
+	ShowMessage( "Begin Test: ICSSolarCollectorTest, CalcPassiveExteriorBaffleGapTest" );
 
 	// ICS collector un-allocated collector data bug fix test.  This unit test 
 	// does not test ICS collector performance but it does test a bug fix for 

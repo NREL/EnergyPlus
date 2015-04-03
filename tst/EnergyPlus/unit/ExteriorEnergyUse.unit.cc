@@ -6,6 +6,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ExteriorEnergyUse;
@@ -15,6 +16,8 @@ using namespace EnergyPlus::ScheduleManager;
 
 TEST( ExteriorEquipmentTest, Test1 )
 {
+
+	ShowMessage( "Begin Test: ExteriorEquipmentTest, Test1" );
 
 	NumExteriorLights = 0;
 	NumExteriorEqs = 2;

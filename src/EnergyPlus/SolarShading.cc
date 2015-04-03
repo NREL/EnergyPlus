@@ -5970,7 +5970,7 @@ namespace SolarShading {
 					// The inside reveals receive solar (reflected part + absorbed part) from the window, this amount should be
 					// deducted from the BTOTZone, then adds the InsRevealDiffIntoZone
 					if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) { //Complex Fenestration
-						SurfSolIncPtr = SurfaceScheduledSolarInc( BackSurfaceNumber, ConstrNumBack );
+						SurfSolIncPtr = SurfaceScheduledSolarInc( SurfNum, ConstrNum );
 
 						// Do not add total into zone from scheduled surface gains.  That will be added later
 						if ( SurfSolIncPtr == 0 ) {
