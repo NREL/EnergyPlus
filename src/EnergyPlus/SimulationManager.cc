@@ -77,6 +77,7 @@ extern "C" {
 #include <PlantPipingSystemsManager.hh>
 #include <Psychrometrics.hh>
 #include <RefrigeratedCase.hh>
+#include <ResultsSchema.hh>
 #include <SetPointManager.hh>
 #include <SizingManager.hh>
 #include <SolarShading.hh>
@@ -135,6 +136,7 @@ namespace SimulationManager {
 	using namespace HeatBalanceManager;
 	using namespace WeatherManager;
 	using namespace ExternalInterface;
+	using namespace ResultsFramework;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -263,6 +265,9 @@ namespace SimulationManager {
 
 		// Formats
 		static gio::Fmt Format_700( "('Environment:WarmupDays,',I3)" );
+
+		// Is JSON Enabled?
+		// EnergyPlus::ResultsSchema::OutputSchema.InitializeSchema();
 
 		//CreateSQLiteDatabase();
 		sqlite = EnergyPlus::CreateSQLiteDatabase();
@@ -548,6 +553,10 @@ namespace SimulationManager {
 		}
 
 		if ( sqlite ) sqlite->sqliteBegin(); // for final data to write
+
+		// Output detailed ZONE time series data
+		if (OutputSchema->timeSeriesEnabled())
+			OutputSchema->writeTimeSeriesFiles();
 
 #ifdef EP_Detailed_Timings
 		epStartTime( "Closeout Reporting=" );
@@ -1283,6 +1292,16 @@ namespace SimulationManager {
 		}
 		gio::write( OutputFileBNDetails, fmtA ) << "Program Version," + VerString;
 
+		//// Open the Schema Output File
+		//// timeSeriesEnabled() will return true if any of the options JSON options is set
+		//if (OutputSchema->timeSeriesEnabled() )
+		//{
+		//	OutputFileSchema = GetNewUnitNumber();
+		//	{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); gio::open(OutputFileSchema, "eplusout.json", flags); write_stat = flags.ios(); }
+		//	if (write_stat != 0) {
+		//		ShowFatalError("OpenOutputFiles: Could not open file \"eplusout.json\" for output (write).");
+		//	}
+		//}
 	}
 
 	void
@@ -1478,6 +1497,9 @@ namespace SimulationManager {
 		}
 		mtr_stream = nullptr;
 
+		//// Close the Schema Output File if JSON output is enabled
+		//if(OutputSchema->timeSeriesEnabled())
+		//	gio::close(OutputFileSchema);
 	}
 
 	void

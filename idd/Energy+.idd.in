@@ -93314,6 +93314,15 @@ Meter:CustomDecrement,
    A46, \field Key Name 22
    A47; \field Output Variable or Meter Name 22
 
+Output:JSON,
+       \memo Output from EnergyPlus can be written to JSON format files.
+       \unique-object
+  A1 ; \field Option Type
+       \type choice
+       \key TimeSeries
+       \key TimeSeriesAndTabular
+
+   
 Output:SQLite,
        \memo Output from EnergyPlus can be written to an SQLite format file.
        \unique-object

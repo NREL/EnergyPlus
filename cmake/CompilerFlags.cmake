@@ -158,7 +158,7 @@ ELSEIF ( UNIX AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
     ADD_CXX_DEFINITIONS("-Wall") # Enable "all" warnings
     ADD_CXX_DEFINITIONS("-Wp64") # 64-bit warnings
     ADD_CXX_DEFINITIONS("-diag-disable:177,869,1786,2259,3280,11074,11075") # Disable warnings listed above
-
+	
     # Optimization options that had no significant benefit for EnergyPlus
     #  -inline-factor=200
     #  -ipo instead of -ip

@@ -1010,7 +1010,7 @@ void SQLite::initializeDaylightMapTables()
 	sqlitePrepareStatement(m_daylightMapHourlyDataInsertStmt,daylightMapHourlyDataInsertSQL);
 }
 
-void SQLite::initializeViews()
+void SQLite::initializeViews() 
 {
 	const std::string reportVariableWithTimeViewSQL =
 		"CREATE VIEW ReportVariableWithTime AS "
