@@ -38944,6 +38944,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
        \required-field
   A3 , \field Zone Equipment 1 Name
        \required-field
@@ -38988,6 +38989,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A5 , \field Zone Equipment 2 Name
   N3 , \field Zone Equipment 2 Cooling Sequence
        \type integer
@@ -39028,6 +39030,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A7 , \field Zone Equipment 3 Name
   N5 , \field Zone Equipment 3 Cooling Sequence
        \type integer
@@ -39068,6 +39071,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A9 , \field Zone Equipment 4 Name
   N7 , \field Zone Equipment 4 Cooling Sequence
        \type integer
@@ -39108,6 +39112,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A11, \field Zone Equipment 5 Name
   N9 , \field Zone Equipment 5 Cooling Sequence
        \type integer
@@ -39148,6 +39153,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A13, \field Zone Equipment 6 Name
   N11, \field Zone Equipment 6 Cooling Sequence
        \type integer
@@ -39188,6 +39194,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A15, \field Zone Equipment 7 Name
   N13, \field Zone Equipment 7 Cooling Sequence
        \type integer
@@ -39228,6 +39235,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A17, \field Zone Equipment 8 Name
   N15, \field Zone Equipment 8 Cooling Sequence
        \type integer
@@ -39268,6 +39276,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A19, \field Zone Equipment 9 Name
   N17, \field Zone Equipment 9 Cooling Sequence
        \type integer
@@ -39308,6 +39317,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A21, \field Zone Equipment 10 Name
   N19, \field Zone Equipment 10 Cooling Sequence
        \type integer
@@ -39348,6 +39358,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A23, \field Zone Equipment 11 Name
   N21, \field Zone Equipment 11 Cooling Sequence
        \type integer
@@ -39388,6 +39399,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A25, \field Zone Equipment 12 Name
   N23, \field Zone Equipment 12 Cooling Sequence
        \type integer
@@ -39428,6 +39440,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A27, \field Zone Equipment 13 Name
   N25, \field Zone Equipment 13 Cooling Sequence
        \type integer
@@ -39468,6 +39481,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A29, \field Zone Equipment 14 Name
   N27, \field Zone Equipment 14 Cooling Sequence
        \type integer
@@ -39508,6 +39522,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A31, \field Zone Equipment 15 Name
   N29, \field Zone Equipment 15 Cooling Sequence
        \type integer
@@ -39548,6 +39563,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A33, \field Zone Equipment 16 Name
   N31, \field Zone Equipment 16 Cooling Sequence
        \type integer
@@ -39588,6 +39604,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A35, \field Zone Equipment 17 Name
   N33, \field Zone Equipment 17 Cooling Sequence
        \type integer
@@ -39628,6 +39645,7 @@ ZoneHVAC:EquipmentList,
        \key ZoneHVAC:RefrigerationChillerSet
        \key Fan:ZoneExhaust
        \key WaterHeater:HeatPump:PumpedCondenser
+       \key WaterHeater:HeatPump:WrappedCondenser
   A37, \field Zone Equipment 18 Name
   N35, \field Zone Equipment 18 Cooling Sequence
        \type integer
