@@ -1494,10 +1494,6 @@ namespace WaterThermalTanks {
 						
 					}
 
-					// Set up comp set for condenser water side nodes (reverse inlet/outlet for water heater)
-					SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.DXCoilType, HPWH.DXCoilName, HPWHSaveNode.InletNodeName1, HPWHSaveNode.OutletNodeName1 );
-					SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.TankType, HPWH.TankName, HPWHSaveNode.OutletNodeName1, HPWHSaveNode.InletNodeName1 );
-					
 					// Minimum Inlet Air Temperature for Compressor Operation
 					HPWH.MinAirTempForHPOperation = rNumericArgs( 4 + nNumericOffset );
 					if ( HPWH.MinAirTempForHPOperation < -5 ) {
@@ -3388,8 +3384,6 @@ namespace WaterThermalTanks {
 			// Loop through HPWH's and then search all water heaters for the tank connected to the HPWH
 			if ( NumHeatPumpWaterHeater > 0 ) {
 
-				cCurrentModuleObject = "WaterHeater:HeatPumpPumpedCondenser";
-
 				int const NumPumpedCondenser = GetNumObjectsFound( cHPWHPumpedCondenser ); // number of WaterHeater:HeatPumpPumpedCondenser objects
 				for ( HPWaterHeaterNum = 1; HPWaterHeaterNum <= NumHeatPumpWaterHeater; ++HPWaterHeaterNum ) {
 
@@ -3431,7 +3425,12 @@ namespace WaterThermalTanks {
 							ShowContinueError( "Invalid water heater tank type = " + Tank.Type );
 							ErrorsFound = true;
 						}
-
+						
+						// Set up comp set for condenser water side nodes (reverse inlet/outlet for water heater)
+						WaterHeaterSaveNodes const &HPWHSaveNode = HPWHSaveNodeNames( HPWaterHeaterNum );
+						SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.DXCoilType, HPWH.DXCoilName, HPWHSaveNode.InletNodeName1, HPWHSaveNode.OutletNodeName1, "HPWH To Coil" );
+						SetUpCompSets( HPWH.Type, HPWH.Name, HPWH.TankType, HPWH.TankName, HPWHSaveNode.OutletNodeName1, HPWHSaveNode.InletNodeName1, "HPWH To Tank" );
+						
 						// do not allow modulating control for HPWH's (i.e. modulating control usually used for tankless WH's)
 						if ( Tank.ControlType == ControlTypeModulate ) {
 							ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
@@ -3441,6 +3440,7 @@ namespace WaterThermalTanks {
 
 						Tank.HeatPumpNum = HPWaterHeaterNum;
 						HPWH.WaterHeaterTankNum = CheckWaterHeaterNum;
+						HPWH.FoundTank = true;
 
 						if ( Tank.DesuperheaterNum > 0 ) {
 							ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + "and Coil:WaterHeating:Desuperheater = " + WaterHeaterDesuperheater( CheckWaterHeaterNum ).Name + ":  cannot be connected to the same water heater tank = " + Tank.Name );
@@ -3453,6 +3453,23 @@ namespace WaterThermalTanks {
 							Tank.SourceEffectiveness = 1.0;
 						}
 
+						// Set up the source side nodes for wrapped condensers
+						if ( HPWH.CondenserConfig == HPWH_CONDENSER_WRAPPED ) {
+							if ( Tank.SourceInletNode > 0 || Tank.SourceOutletNode > 0 ) {
+								ShowSevereError( Tank.Type + " = " + Tank.Name + " has a source inlet or outlet node specified," );
+								ShowContinueError( "but it is attached to " + HPWH.Type + " = " + HPWH.Name + ", which doesn't permit source side connections." );
+								ShowContinueError( "Please leave the source side inlet and outlet fields blank." );
+								ErrorsFound = true;
+							} else {
+								WaterHeaterSaveNodes &HPWHNodeNames = HPWHSaveNodeNames( NumHeatPumpWaterHeater );
+								WaterHeaterSaveNodes &TankNodenames = WHSaveNodeNames( CheckWaterHeaterNum );
+								Tank.SourceInletNode = GetOnlySingleNode(HPWHNodeNames.OutletNodeName1, ErrorsFound, Tank.Type, Tank.Name, NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+								TankNodenames.InletNodeName2 = HPWHNodeNames.OutletNodeName1;
+								Tank.SourceOutletNode = GetOnlySingleNode(HPWHNodeNames.InletNodeName1, ErrorsFound, Tank.Type, Tank.Name, NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
+								TankNodenames.OutletNodeName2 = HPWHNodeNames.InletNodeName1;
+							}
+						}
+						
 						// Set HPWH structure variable StandAlone to TRUE if use nodes are not connected
 						if ( Tank.UseInletNode == 0 && Tank.UseOutletNode == 0 ) HPWH.StandAlone = true;
 
@@ -3472,35 +3489,33 @@ namespace WaterThermalTanks {
 								TestCompSet( HPWH.Type, HPWH.Name, WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName1, WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName1, "Water Nodes" );
 							}
 						}
-						if ( HPWH.CondenserConfig == HPWH_CONDENSER_PUMPED ) {
-							// verify HP/tank source node connections
-							if ( HPWH.CondWaterInletNode != Tank.SourceOutletNode ) {
-								ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
-								ShowContinueError( "Heat Pump condenser water inlet node name does not match water heater tank source outlet node name." );
-								ShowContinueError( "Heat pump condenser water inlet and outlet node names = " + HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName1 + " and " + HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName1 );
-								ShowContinueError( "Water heater tank source side inlet and outlet node names      = " + WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 + " and " + WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 );
-								ErrorsFound = true;
-							}
+						
+						// verify HP/tank source node connections
+						if ( HPWH.CondWaterInletNode != Tank.SourceOutletNode ) {
+							ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
+							ShowContinueError( "Heat Pump condenser water inlet node name does not match water heater tank source outlet node name." );
+							ShowContinueError( "Heat pump condenser water inlet and outlet node names = " + HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName1 + " and " + HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName1 );
+							ShowContinueError( "Water heater tank source side inlet and outlet node names      = " + WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 + " and " + WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 );
+							ErrorsFound = true;
+						}
 
-							if ( HPWH.CondWaterOutletNode != Tank.SourceInletNode ) {
-								ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
-								ShowContinueError( "Heat Pump condenser water outlet node name does not match water heater tank source inlet node name." );
-								ShowContinueError( "Heat pump condenser water inlet and outlet node names = " + HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName1 + " and " + HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName1 );
-								ShowContinueError( "Water heater tank source side inlet and outlet node names      = " + WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 + " and " + WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 );
-								ErrorsFound = true;
-							}
-						} else if ( HPWH.CondenserConfig == HPWH_CONDENSER_WRAPPED ) {
+						if ( HPWH.CondWaterOutletNode != Tank.SourceInletNode ) {
+							ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
+							ShowContinueError( "Heat Pump condenser water outlet node name does not match water heater tank source inlet node name." );
+							ShowContinueError( "Heat pump condenser water inlet and outlet node names = " + HPWHSaveNodeNames( HPWaterHeaterNum ).InletNodeName1 + " and " + HPWHSaveNodeNames( HPWaterHeaterNum ).OutletNodeName1 );
+							ShowContinueError( "Water heater tank source side inlet and outlet node names      = " + WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 + " and " + WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 );
+							ErrorsFound = true;
+						}
+						
+						// verify wrapped condenser location
+						if ( HPWH.CondenserConfig == HPWH_CONDENSER_WRAPPED ) {
 							// make sure the top of the condenser is not above the tank height.
 							if ( HPWH.WrappedCondenserTopLocation > Tank.Height ) {
 								ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
 								ShowContinueError( "The height of the top of the wrapped condenser is greater than the height of the tank." );
 								ErrorsFound = true;
 							}
-						} else {
-							assert(0);
 						}
-
-						HPWH.FoundTank = true;
 
 						// Verify tank name is in a zone equipment list if HPWH Inlet Air Configuration is Zone Air Only or Zone and Outdoor Air
 						if ( HPWH.InletAirConfiguration == AmbientTempZone || HPWH.InletAirConfiguration == AmbientTempZoneAndOA ) {
@@ -3592,20 +3607,6 @@ namespace WaterThermalTanks {
 							}
 						}
 						
-						// Set up the source side nodes for wrapped condensers
-						if ( HPWH.CondenserConfig == HPWH_CONDENSER_WRAPPED ) {
-							if ( Tank.SourceInletNode > 0 || Tank.SourceOutletNode > 0 ) {
-								ShowSevereError( Tank.Type + " = " + Tank.Name + " has a source inlet or outlet node specified," );
-								ShowContinueError( "but it is attached to " + HPWH.Type + " = " + HPWH.Name + ", which doesn't permit source side connections." );
-								ShowContinueError( "Please leave the source side inlet and outlet fields blank." );
-								ErrorsFound = true;
-							} else {
-								Tank.SourceInletNode = GetOnlySingleNode(HPWHSaveNodeNames( NumHeatPumpWaterHeater ).OutletNodeName1, ErrorsFound, Tank.Type, Tank.Name, NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
-								WHSaveNodeNames( CheckWaterHeaterNum ).InletNodeName2 = HPWHSaveNodeNames( NumHeatPumpWaterHeater ).OutletNodeName1;
-								Tank.SourceOutletNode = GetOnlySingleNode(HPWHSaveNodeNames( NumHeatPumpWaterHeater ).InletNodeName1, ErrorsFound, Tank.Type, Tank.Name, NodeType_Water, NodeConnectionType_Outlet, 2, ObjectIsNotParent);
-								WHSaveNodeNames( CheckWaterHeaterNum ).OutletNodeName2 = HPWHSaveNodeNames( NumHeatPumpWaterHeater ).InletNodeName1;
-							}
-						}
 						
 					} // DO CheckWaterHeaterNum = 1, NumWaterHeater
 
