@@ -5,6 +5,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataZoneEquipment;
@@ -12,6 +13,8 @@ using namespace ObjexxFCL;
 
 TEST( DataZoneEquipment, TestGetSystemNodeNumberForZone )
 {
+
+	ShowMessage( "Begin Test: DataZoneEquipment, TestGetSystemNodeNumberForZone" );
 
 	NumOfZones = 2;
 	ZoneEquipConfig.allocate( NumOfZones ); 

@@ -44,6 +44,9 @@ public:
 
 TEST_F( FansTest, FanSizing )
 {
+
+	ShowMessage( "Begin Test: FansTest, FanSizing" );
+
 	int write_stat;
 	// Open the Initialization Output File (lifted from SimulationManager.cc)
 	OutputFileInits = GetNewUnitNumber();

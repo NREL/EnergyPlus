@@ -20,6 +20,8 @@ using namespace EnergyPlus::Psychrometrics;
 TEST( EvaporativeCoolers, CalcSecondaryAirOutletCondition )
 {
 
+	ShowMessage( "Begin Test: EvaporativeCoolers, CalcSecondaryAirOutletCondition" );
+
 	EvaporativeCoolers::EvapCond.allocate( 1 );
 	int const EvapCoolNum( 1 );
 	EvaporativeCoolers::EvapCond( EvapCoolNum ).SecInletEnthalpy = 42000.0;
@@ -103,6 +105,8 @@ TEST( EvaporativeCoolers, CalcSecondaryAirOutletCondition )
 TEST( EvaporativeCoolers, CalcIndirectRDDEvapCoolerOutletTemp )
 {
 	
+	ShowMessage( "Begin Test: EvaporativeCoolers, CalcIndirectRDDEvapCoolerOutletTemp" );
+
 	OutBaroPress = 101325.0;
 	EvaporativeCoolers::EvapCond.allocate( 1 );
 	int const EvapCoolNum( 1 );
@@ -149,6 +153,8 @@ TEST( EvaporativeCoolers, CalcIndirectRDDEvapCoolerOutletTemp )
 
 TEST( EvaporativeCoolers, IndEvapCoolerPower )
 {
+
+	ShowMessage( "Begin Test: EvaporativeCoolers, IndEvapCoolerPower" );
 
 	using CurveManager::Quadratic;
 

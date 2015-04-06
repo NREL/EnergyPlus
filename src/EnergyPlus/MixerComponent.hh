@@ -3,6 +3,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -24,6 +25,7 @@ namespace MixerComponent {
 	extern int NumMixers; // The Number of Mixers found in the Input
 	extern int LoopInletNode;
 	extern int LoopOutletNode;
+	extern bool GetInputFlag;
 	extern FArray1D_bool CheckEquipName;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Mixers
@@ -167,6 +169,19 @@ namespace MixerComponent {
 
 	//        End of Reporting subroutines for the Mixer Module
 	// *****************************************************************************
+
+	// Beginning of Utility subroutines for the Mixer Component
+	// *****************************************************************************
+	void
+		GetZoneMixerIndex(
+		std::string const & MixerName,
+		int & MixerIndex,
+		bool & ErrorsFound,
+		Optional_string_const ThisObjectType
+		);
+
+		// End of Utility subroutines for the Mixer Component
+		// *****************************************************************************
 
 	//     NOTICE
 

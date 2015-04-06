@@ -8,11 +8,14 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <ReportSizingManager.hh>
 #include <DataPrecisionGlobals.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 
 TEST( ReportSizingManager, GetCoilDesFlowT )
 {
+	ShowMessage( "Begin Test: ReportSizingManager, GetCoilDesFlowT" );
+
 	// setup global allocation
 	DataSizing::SysSizInput.allocate(1);
 	DataSizing::SysSizPeakDDNum.allocate(1);

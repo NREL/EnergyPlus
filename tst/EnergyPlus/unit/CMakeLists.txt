@@ -24,6 +24,7 @@ set( test_src
   ManageElectricPower.unit.cc
   HVACUnitarySystem.unit.cc
   MixedAir.unit.cc
+  MixerComponent.unit.cc
   PurchasedAirManager.unit.cc
   OutputProcessor.unit.cc
   OutputReportTabular.unit.cc

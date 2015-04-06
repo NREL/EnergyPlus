@@ -7,6 +7,7 @@
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::GroundHeatExchangers;
@@ -17,6 +18,8 @@ using namespace EnergyPlus::DataLoopNode;
 
 TEST( GroundHeatExchangerTest, KAGroundTemps)
 {
+	ShowMessage( "Begin Test: GroundHeatExchangerTest, KAGroundTemps" );
+
 	// Initialization
 	GLHESlinky thisGLHE;
 
@@ -37,6 +40,8 @@ TEST( GroundHeatExchangerTest, KAGroundTemps)
 
 TEST( GroundHeatExchangerTest, Interpolate )
 {
+	ShowMessage( "Begin Test: GroundHeatExchangerTest, Interpolate" );
+
 	// Initialization
 	GLHESlinky thisGLHE;
 	Real64 thisLNTTS;
@@ -70,6 +75,8 @@ TEST( GroundHeatExchangerTest, Interpolate )
 
 TEST( SlinkyGroundHeatExchangerTest, GetGFunc )
 {
+
+	ShowMessage( "Begin Test: SlinkyGroundHeatExchangerTest, GetGFunc" );
 
 	// Initialization
 	GLHESlinky thisGLHE;
@@ -132,6 +139,8 @@ TEST( VerticalGroundHeatExchangerTest, GetGFunc )
 
 TEST( SlinkyGroundHeatExchangerTest, CalcHXResistance )
 {
+	ShowMessage( "Begin Test: SlinkyGroundHeatExchangerTest, CalcHXResistance" );
+
 	// Initializations
 	GLHESlinky thisGLHE;
 
@@ -172,6 +181,8 @@ TEST( SlinkyGroundHeatExchangerTest, CalcHXResistance )
 
 TEST( VerticalGroundHeatExchangerTest, CalcHXResistance )
 {
+	ShowMessage( "Begin Test: VerticalGroundHeatExchangerTest, CalcHXResistance" );
+
 	// Initializations
 	GLHEVert thisGLHE;
 
@@ -225,6 +236,8 @@ TEST( VerticalGroundHeatExchangerTest, CalcHXResistance )
 
 TEST( SlinkyGroundHeatExchangerTest, CalcGroundHeatExchanger )
 {
+	ShowMessage( "Begin Test: SlinkyGroundHeatExchangerTest, CalcGroundHeatExchanger" );
+
 	// Initializations
 	GLHESlinky thisGLHE;
 

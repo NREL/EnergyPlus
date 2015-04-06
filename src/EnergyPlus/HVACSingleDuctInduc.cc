@@ -242,6 +242,7 @@ namespace HVACSingleDuctInduc {
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilWaterCooling;
 		using DataPlant::TypeOf_CoilWaterDetailedFlatCooling;
+		using MixerComponent::GetZoneMixerIndex;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -280,6 +281,7 @@ namespace HVACSingleDuctInduc {
 		int SupAirIn; // controlled zone supply air inlet index
 		bool AirNodeFound;
 		int ADUNum;
+		bool errFlag;
 
 		// find the number of each type of induction unit
 		CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction";
@@ -372,7 +374,16 @@ namespace HVACSingleDuctInduc {
 			IndUnit( IUNum ).MaxVolColdWaterFlow = Numbers( 6 );
 			IndUnit( IUNum ).MinVolColdWaterFlow = Numbers( 7 );
 			IndUnit( IUNum ).ColdControlOffset = Numbers( 8 );
+
+			// Get the Zone Mixer name and check that it is OK
+			errFlag = false;
 			IndUnit( IUNum ).MixerName = Alphas( 12 );
+			GetZoneMixerIndex( IndUnit( IUNum ).MixerName, IndUnit( IUNum ).Mixer_Num, errFlag, CurrentModuleObject );
+			if ( errFlag ) {
+				ShowContinueError( "...specified in " + CurrentModuleObject + " = " + IndUnit( IUNum ).Name );
+				ErrorsFound = true;
+			}
+
 			// Add heating coil to component sets array
 			SetUpCompSets( IndUnit( IUNum ).UnitType, IndUnit( IUNum ).Name, IndUnit( IUNum ).HCoilType, IndUnit( IUNum ).HCoil, Alphas( 4 ), "UNDEFINED" );
 			// Add cooling coil to component sets array
@@ -435,7 +446,6 @@ namespace HVACSingleDuctInduc {
 		Numbers.deallocate();
 		lAlphaBlanks.deallocate();
 		lNumericBlanks.deallocate();
-
 		if ( ErrorsFound ) {
 			ShowFatalError( RoutineName + "Errors found in getting input. Preceding conditions cause termination." );
 		}
