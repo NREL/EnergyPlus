@@ -195,7 +195,7 @@
 
   PlantEquipmentList,
     DHW Plant Equipment,     !- Name
-    WaterHeater:HeatPumpPumpedCondenser,    !- Equipment 1 Object Type
+    WaterHeater:HeatPump:PumpedCondenser,    !- Equipment 1 Object Type
     PlantHeatPumpWaterHeater;!- Equipment 1 Name
 
   SetpointManager:Scheduled,
@@ -261,13 +261,13 @@
     Water Heater Use Branch, !- Name
     ,                        !- Maximum Flow Rate {m3/s}
     ,                        !- Pressure Drop Curve Name
-    WaterHeater:HeatPumpPumpedCondenser,    !- Component 1 Object Type
+    WaterHeater:HeatPump:PumpedCondenser,    !- Component 1 Object Type
     PlantHeatPumpWaterHeater,!- Component 1 Name
     Water Heater Use Inlet Node,  !- Component 1 Inlet Node Name
     Water Heater Use Outlet Node,  !- Component 1 Outlet Node Name
     PASSIVE;                 !- Component 1 Branch Control Type
 
-  WaterHeater:HeatPumpPumpedCondenser,
+  WaterHeater:HeatPump:PumpedCondenser,
     PlantHeatPumpWaterHeater,!- Name
     PlantHPWHSch,            !- Availability Schedule Name
     PlantHPWHTempSch,        !- Compressor Setpoint Temperature Schedule Name

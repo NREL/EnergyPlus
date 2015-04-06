@@ -102,8 +102,8 @@ namespace WaterThermalTanks {
 	std::string const cStratifiedWHModuleObj( "WaterHeater:Stratified" );
 	std::string const cMixedCWTankModuleObj( "ThermalStorage:ChilledWater:Mixed" );
 	std::string const cStratifiedCWTankModuleObj( "ThermalStorage:ChilledWater:Stratified" );
-	std::string const cHPWHPumpedCondenser("WaterHeater:HeatPumpPumpedCondenser");
-	std::string const cHPWHWrappedCondenser("WaterHeater:HeatPumpWrappedCondenser");
+	std::string const cHPWHPumpedCondenser("WaterHeater:HeatPump:PumpedCondenser");
+	std::string const cHPWHWrappedCondenser("WaterHeater:HeatPump:WrappedCondenser");
 	static std::string const BlankString;
 
 	int const HeatMode( 1 ); // heating source is on, source will not turn off until setpoint temp is reached
@@ -136,7 +136,7 @@ namespace WaterThermalTanks {
 	// integer parameter for water heater
 	int const MixedWaterHeater( TypeOf_WtrHeaterMixed ); // WaterHeater:Mixed
 	int const StratifiedWaterHeater( TypeOf_WtrHeaterStratified ); // WaterHeater:Stratified
-	int const HeatPumpWaterHeater( TypeOf_HeatPumpWtrHeater ); // WaterHeater:HeatPumpPumpedCondenser
+	int const HeatPumpWaterHeater( TypeOf_HeatPumpWtrHeater ); // WaterHeater:HeatPump:PumpedCondenser
 	//stovall, next line never used because all desuperheater coils used in mixed water heater types
 	int const CoilWaterDesuperHeater( 4 ); // Coil:WaterHeating:Desuperheater
 	int const MixedChilledWaterStorage( TypeOf_ChilledWaterTankMixed ); // 'ThermalStorage:ChilledWater:Mixed'
@@ -1232,7 +1232,7 @@ namespace WaterThermalTanks {
 
 			//   get input for heat pump water heater object
 			if ( NumHeatPumpWaterHeater > 0 ) {
-				int const NumPumpedCondenser = GetNumObjectsFound( cHPWHPumpedCondenser ); // number of WaterHeater:HeatPumpPumpedCondenser objects
+				int const NumPumpedCondenser = GetNumObjectsFound( cHPWHPumpedCondenser ); // number of WaterHeater:HeatPump:PumpedCondenser objects
 				int nAlphaOffset; // the difference of array location between alpha items between pumped and wrapped condensers
 				int nNumericOffset; // the difference of array location between numeric items between pumped and wrapped condensers
 
@@ -1646,7 +1646,7 @@ namespace WaterThermalTanks {
 					if ( ! lAlphaFieldBlanks( 23 + nAlphaOffset ) ) {
 						// For the inlet air mixer node, NodeConnectionType is outlet from the HPWH inlet air node
 						if ( HPWH.InletAirConfiguration == AmbientTempZoneAndOA ) {
-							HPWH.InletAirMixerNode = GetOnlySingleNode( cAlphaArgs( 23 + nAlphaOffset ), ErrorsFound, "WaterHeater:HeatPumpPumpedCondenser inlet air mixer", HPWH.Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+							HPWH.InletAirMixerNode = GetOnlySingleNode( cAlphaArgs( 23 + nAlphaOffset ), ErrorsFound, "WaterHeater:HeatPump:PumpedCondenser inlet air mixer", HPWH.Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 						} else {
 							ShowWarningError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
 							ShowContinueError( "Inlet air mixer node name specified but only required when Inlet Air Configuration is selected as Zone and OutdoorAir. Node name disregarded and simulation continues." );
@@ -3384,7 +3384,7 @@ namespace WaterThermalTanks {
 			// Loop through HPWH's and then search all water heaters for the tank connected to the HPWH
 			if ( NumHeatPumpWaterHeater > 0 ) {
 
-				int const NumPumpedCondenser = GetNumObjectsFound( cHPWHPumpedCondenser ); // number of WaterHeater:HeatPumpPumpedCondenser objects
+				int const NumPumpedCondenser = GetNumObjectsFound( cHPWHPumpedCondenser ); // number of WaterHeater:HeatPump:PumpedCondenser objects
 				for ( HPWaterHeaterNum = 1; HPWaterHeaterNum <= NumHeatPumpWaterHeater; ++HPWaterHeaterNum ) {
 
 					// Create reference to current HPWH object in array.
@@ -3889,7 +3889,7 @@ namespace WaterThermalTanks {
 						SetupOutputVariable( "Water Heater Mains Water Volume [m3]", WaterThermalTank( WaterThermalTankNum ).VolumeConsumed, "System", "Sum", WaterThermalTank( WaterThermalTankNum ).Name, _, "MainsWater", "DHW", WaterThermalTank( WaterThermalTankNum ).EndUseSubcategoryName, "Plant" );
 
 						if ( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum > 0 ) {
-							//CurrentModuleObject='WaterHeater:HeatPumpPumpedCondenser'
+							//CurrentModuleObject='WaterHeater:HeatPump:PumpedCondenser'
 							SetupOutputVariable( "Water Heater Compressor Part Load Ratio []", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).HeatingPLR, "System", "Average", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Name );
 							SetupOutputVariable( "Water Heater Off Cycle Ancillary Electric Power [W]", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).OffCycParaFuelRate, "System", "Average", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Name );
 							SetupOutputVariable( "Water Heater Off Cycle Ancillary Electric Energy [J]", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).OffCycParaFuelEnergy, "System", "Sum", HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Name, _, "Electric", "DHW", "Water Heater Parasitic", "Plant" );

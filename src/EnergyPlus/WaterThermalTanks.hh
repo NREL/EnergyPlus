@@ -52,7 +52,7 @@ namespace WaterThermalTanks {
 	// integer parameter for water heater
 	extern int const MixedWaterHeater; // WaterHeater:Mixed
 	extern int const StratifiedWaterHeater; // WaterHeater:Stratified
-	extern int const HeatPumpWaterHeater; // WaterHeater:HeatPumpPumpedCondenser
+	extern int const HeatPumpWaterHeater; // WaterHeater:HeatPump:PumpedCondenser
 	//stovall, next line never used because all desuperheater coils used in mixed water heater types
 	extern int const CoilWaterDesuperHeater; // Coil:WaterHeating:Desuperheater
 	extern int const MixedChilledWaterStorage; // 'ThermalStorage:ChilledWater:Mixed'

@@ -1043,7 +1043,7 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_Generator_FCExhaust;
 							this_comp.GeneralEquipType = GenEquipTypes_Generator;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
-						} else if ( SameString( this_comp_type, "WaterHeater:HeatPumpPumpedCondenser" ) || SameString( this_comp_type, "WaterHeater:HeatPumpWrappedCondenser") ) {
+						} else if ( SameString( this_comp_type, "WaterHeater:HeatPump:PumpedCondenser" ) || SameString( this_comp_type, "WaterHeater:HeatPump:WrappedCondenser") ) {
 							this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeater;
 							this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
