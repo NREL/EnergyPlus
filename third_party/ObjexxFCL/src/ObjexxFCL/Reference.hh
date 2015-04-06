@@ -307,7 +307,7 @@ public: // Modifiers
 	void
 	deallocate()
 	{
-		if ( ptr_ and own_ ) delete ptr_;
+		if ( ptr_ && own_ ) delete ptr_;
 		ptr_ = nullptr;
 		own_ = false;
 	}

@@ -74,7 +74,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                Yes
 
-  Version,8.2;
+  Version,8.3;
 
   Timestep,6;
 
@@ -5047,8 +5047,8 @@
     0.0,                     !- Shut Down Time {s}
     0.2,                     !- Shut Down Fuel {kmol}
     ,                        !- Shut Down Electricity Consumption {J}
-    0.0,                     !- Ancilliary Electricity Constant Term
-    0.0,                     !- Ancilliary Electricity Linear Term
+    0.0,                     !- Ancillary Electricity Constant Term
+    0.0,                     !- Ancillary Electricity Linear Term
     ConstantRate,            !- Skin Loss Calculation Mode
     ZN_1_FLR_1_SEC_5,        !- Zone Name
     0.6392,                  !- Skin Loss Radiative Fraction
@@ -5180,8 +5180,8 @@
   Generator:FuelCell:AuxiliaryHeater,
     FCT SOFC Auxiliary Heater,  !- Name
     0.0,                     !- Excess Air Ratio
-    0.0,                     !- Ancilliary Power Constant Term
-    0.0,                     !- Ancilliary Power Linear Term
+    0.0,                     !- Ancillary Power Constant Term
+    0.0,                     !- Ancillary Power Linear Term
     0.5,                     !- Skin Loss U-Factor Times Area Value {W/K}
     SurroundingZone,         !- Skin Loss Destination
     ZN_1_FLR_1_SEC_5,        !- Zone Name to Receive Skin Losses

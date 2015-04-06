@@ -2709,7 +2709,7 @@ namespace UnitVentilator {
 
 					if ( QCoilReq < 0.0 ) QCoilReq = 0.0; // a heating coil can only heat, not cool
 
-					SimulateSteamCoilComponents(  UnitVent( UnitVentNum ).HCoilName, FirstHVACIteration, UnitVent( UnitVentNum ).HCoil_Index, QCoilReq );
+					SimulateSteamCoilComponents( UnitVent( UnitVentNum ).HCoilName, FirstHVACIteration, UnitVent( UnitVentNum ).HCoil_Index, QCoilReq );
 
 				} else if ( ( SELECT_CASE_var == Heating_ElectricCoilType ) || ( SELECT_CASE_var == Heating_GasCoilType ) ) {
 

@@ -1418,7 +1418,7 @@ namespace SolarShading {
 		// see if no point of shadow casting surface is above low point of receiving surface
 
 		auto const & vertex_C( surface_C.Vertex );
-		ZMAX = maxval( vertex_C( {1,surface_C.Sides} ).z()  );
+		ZMAX = maxval( vertex_C( {1,surface_C.Sides} ).z() );
 		if ( ZMAX <= ZMIN ) return;
 
 		// SEE IF Shadow Casting Surface IS HORIZONTAL AND FACING UPWARD.
@@ -5963,7 +5963,7 @@ namespace SolarShading {
 					// The inside reveals receive solar (reflected part + absorbed part) from the window, this amount should be
 					// deducted from the BTOTZone, then adds the InsRevealDiffIntoZone
 					if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) { //Complex Fenestration
-						SurfSolIncPtr = SurfaceScheduledSolarInc( BackSurfaceNumber, ConstrNumBack );
+						SurfSolIncPtr = SurfaceScheduledSolarInc( SurfNum, ConstrNum );
 
 						// Do not add total into zone from scheduled surface gains.  That will be added later
 						if ( SurfSolIncPtr == 0 ) {

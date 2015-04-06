@@ -2341,6 +2341,7 @@ namespace Fans {
 				UnbalExhMassFlow = Fan( FanNum ).InletAirMassFlowRate;
 				if ( Fan( FanNum ).BalancedFractSchedNum > 0 ) {
 					BalancedExhMassFlow = UnbalExhMassFlow * GetCurrentScheduleValue( Fan( FanNum ).BalancedFractSchedNum );
+					UnbalExhMassFlow = UnbalExhMassFlow - BalancedExhMassFlow;
 				} else {
 					BalancedExhMassFlow = 0.0;
 				}
@@ -2348,7 +2349,7 @@ namespace Fans {
 				UnbalExhMassFlow = 0.0;
 				BalancedExhMassFlow = 0.0;
 			}
-			Fan( FanNum ).UnbalancedOutletMassFlowRate = UnbalExhMassFlow - BalancedExhMassFlow;
+			Fan( FanNum ).UnbalancedOutletMassFlowRate = UnbalExhMassFlow;
 			Fan( FanNum ).BalancedOutletMassFlowRate = BalancedExhMassFlow;
 		}
 

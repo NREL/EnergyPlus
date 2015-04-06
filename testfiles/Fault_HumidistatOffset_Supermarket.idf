@@ -1,0 +1,2440 @@
+!-Generator IDFEditor 1.34
+!-Option SortedOrder UseSpecialFormat
+!-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
+!-      Use '!' comments if they need to be retained when using the IDFEditor.
+!-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
+! Supermarket.idf
+! Basic file description: 1 story building divided into 2 interior conditioned zones. Roof with no plenum.
+!                         Floor in contact with the ground.
+!
+! Highlights:             Example of refrigerated display cases and compressor racks.
+!
+! Refrigeration:          (compressor location) Rack name:            Display case names on rack:
+!                         Rack 1 (indoors) :    SelfContainedDisplay  SelfContainedDisplayCase (located in zone SalesFloor)
+!                         Rack 2 (outdoors):    MediumTempRack        FishDisplayCase
+!                                                                     MeatDisplayCase
+!                                                                     MultiDeckDairyAndDeliCase
+!                         Rack 3 (outdoors):    LowTempRack           OpenWellIceCreamDisplayCase
+!                                                                     GlassDoorFrozenFood
+!                                                                     WalkInFreezer
+!
+! Display Case
+! Configuration:   Refrigerated cases configured to represent actual performance of medium and low temp cases.
+!                  Self contained display case representative of "plug-in" type case with attached
+!                  compressor and condenser section.  Condenser heat for this case is rejected to the zone.
+!                  Walk-in cooler is modeled using a low runtime fraction with a 2 day/week stocking schedule.
+!
+! Simulation Location/Run: USA_FL_Miami.Intl.AP_722020_TMY3, 2 design days, 2 run periods,
+!                          Run Control executes the run periods, design days are not simulated.
+!
+! Location:                Miami, FL USA
+!
+! Design Days:             MIAMI_FL_USA Annual Heating 99.6%, MaxDB=8.7°C
+!                          MIAMI_FL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2°C MWB=25.3°C
+!
+! Run Period (Weather File): Winter 1/14, Summer 7/7, USA_FL_Miami.Intl.AP_722020_TMY3
+!
+! Run Control:             No Zone or System sizing required. Simulation uses weather file for run periods.
+!
+! Building: Single floor rectangular building 150 ft x 150 ft, zone height 14 feet. FaceBrkIns4LWConcBlkGyp_R-11
+!           There is 1 door and 2 windows at the front of the building. The exterior walls are Face brick with
+!           R-11 insulation and concrete block with gypsum board on the interior surface. Partions wall is 8" concrete
+!           block covered with gypsum board on each surface. The roof is a built up roof with 1/2 in slag over 3/8 in
+!           felt and membrane with R-11 insulation over 6 in lightweight concrete, an air gap separates the interior
+!           acoustical tiles. The windows are single pane 6mm clear and double pane 6mm clear with 6mm air gap.
+!           The window to wall ratio is approxomately 0.0016.
+!
+!           The building is oriented due north with front of building facing east.
+!
+! Floor Area:        2090.1  m2 (22,500 ft2)
+! Number of Stories: 1
+!
+! Zone Description Details:
+!
+!       (0,0,0)                           (0,45.718,0)
+!           ____________________________________
+!          |                                   |
+!          |             Backroom              |
+!          |___________________________________|
+!          |(4.572,0,0)        (4.572,45.718,0)|
+!          |                                   |
+!          |                                   |
+!          |                                   |
+!          |                                   |
+!          |                                   |
+!          |            Salesfloor             |      ---> N
+!          |                                   |
+!          |                                   |
+!          |                                   |
+!          |                                   |      door = --
+!          |                                   |    window = *
+!          |                                   |
+!          |                                   |
+!          |                                   |
+!          |__________--______*____*****_______|
+!
+!     (45.718,0,0)                    (45.718,45.718,0)
+!
+! Internal gains description:     ZONE Backroom    - lighting is 1500 watts, equip is 150 watts, 10 occupants
+!                                 ZONE SalesFloor  - lighting is 45000 watts, equip is 17100 watts, 100 occupants
+!                                 Above includes Front Sales Register equipment included at 1.5 Kw. Sales floor misc.
+!                                 equipment at 600 W. Bakery equipment at 15 Kw. Backroom misc. equipment at 150 W.
+!
+! Interzone Surfaces:             1 interzone surfaces (see diagram)
+! Internal Mass:                  Yes, 1880 m2 simulating product
+! People:                         150
+! Lights:                         46500 W
+! Equipment:                      17250 W
+! Windows:                        2 - single pane clear 6mm glass and double pane 6mm with 6mm air gap
+! Detached Shading:               None
+! Daylight:                       None
+! Natural Ventilation:            None
+! Compact Schedules:              Yes
+! Solair Distribution:            MinimalShadowing
+!
+! HVAC:                           Heat/cool furnace with DX coil for cooling, using an air-reheat strategy to keep
+!                                 SALESFLOOR zone humidity below a 50% RH setpoint. Outdoor ventilation air is
+!                                 introduced through the air loop. Heating up to 22 C during all hours.
+!                                 Cooling to 24 C during all hours. Fans and coils scheduled to be available all
+!                                 Reheat coil on all year. System configuration is very basic--air loop has a fan,
+!                                 cooling coil, and heating coil.
+!
+!
+! Zonal Equipment:                AirTerminal:SingleDuct:Uncontrolled
+! Central Air Handling Equipment: Yes
+! System Equipment Autosize:      No
+! Purchased Cooling:              No
+! Purchased Heating:              No
+! Purchased Chilled Water:        No
+! Purchased Hot Water:            No
+! HVAC System:                    AirLoopHVAC:Unitary:Furnace:HeatCool
+! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Gas
+! Pumps:                          None
+! Boilers:                        None
+! Chillers:                       None
+! Towers:                         None
+!
+! Results:
+! Standard Reports:               Report:Table:Monthly
+! Timestep or Hourly Variables:   Timestep
+! Time bins Report:               None
+! HTML Report:                    None
+! Environmental Emissions:        None
+! Utility Tariffs:                None
+!
+
+  Version,8.3;
+
+!-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
+
+  SimulationControl,
+    Yes,                      !- Do Zone Sizing Calculation
+    Yes,                      !- Do System Sizing Calculation
+    Yes,                      !- Do Plant Sizing Calculation
+    Yes,                      !- Run Simulation for Sizing Periods
+    Yes;                     !- Run Simulation for Weather File Run Periods
+
+!-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
+
+  Building,
+    None,                    !- Name
+    0,                       !- North Axis {deg}
+    Suburbs,                 !- Terrain
+    0.04,                    !- Loads Convergence Tolerance Value
+    0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
+    MinimalShadowing,        !- Solar Distribution
+    50,                      !- Maximum Number of Warmup Days
+    6;                       !- Minimum Number of Warmup Days
+
+!-   ===========  ALL OBJECTS IN CLASS: SURFACECONVECTIONALGORITHM:INSIDE ===========
+
+  SurfaceConvectionAlgorithm:Inside,TARP;
+
+!-   ===========  ALL OBJECTS IN CLASS: SURFACECONVECTIONALGORITHM:OUTSIDE ===========
+
+  SurfaceConvectionAlgorithm:Outside,DOE-2;
+
+!-   ===========  ALL OBJECTS IN CLASS: HEATBALANCEALGORITHM ===========
+
+  HeatBalanceAlgorithm,ConductionTransferFunction;
+
+!-   ===========  ALL OBJECTS IN CLASS: TIMESTEP ===========
+
+  Timestep,6;
+
+!-   ===========  ALL OBJECTS IN CLASS: SITE:LOCATION ===========
+
+  Site:Location,
+    Miami Intl Ap_FL_USA Design_Conditions,  !- Name
+    25.82,                   !- Latitude {deg}
+    -80.30,                  !- Longitude {deg}
+    -5.00,                   !- Time Zone {hr}
+    11.00;                   !- Elevation {m}
+
+!-   ===========  ALL OBJECTS IN CLASS: SIZINGPERIOD:DESIGNDAY ===========
+ ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
+ ! Miami Intl Ap_FL_USA Extreme Annual Wind Speeds, 1%=9.2m/s, 2.5%=8.4m/s, 5%=7.7m/s
+ ! Miami Intl Ap_FL_USA Extreme Annual Temperatures, Max Drybulb=5.1°C Min Drybulb=35°C
+ ! Miami Intl Ap_FL_USA Annual Heating Design Conditions Wind Speed=3.8m/s Wind Dir=340
+ ! Coldest Month=JAN
+ ! Miami Intl Ap_FL_USA Annual Heating 99.6%, MaxDB=8.7°C
+
+  SizingPeriod:DesignDay,
+    Miami Intl Ap Ann Htg 99.6% Condns DB,  !- Name
+    1,                       !- Month
+    21,                      !- Day of Month
+    WinterDesignDay,         !- Day Type
+    8.7,                     !- Maximum Dry-Bulb Temperature {C}
+    0.0,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    8.7,                     !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    101193.,                 !- Barometric Pressure {Pa}
+    3.8,                     !- Wind Speed {m/s}
+    340,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    0.00;                    !- Sky Clearness
+
+ ! Miami Intl Ap Annual Cooling Design Conditions Wind Speed=4.5m/s Wind Dir=140
+ ! Hottest Month=JUL
+ ! Miami Intl Ap_FL_USA Annual Cooling (DB=>MWB) .4%, MaxDB=33.2°C MWB=25.3°C
+
+  SizingPeriod:DesignDay,
+    Miami Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name
+    7,                       !- Month
+    21,                      !- Day of Month
+    SummerDesignDay,         !- Day Type
+    33.2,                    !- Maximum Dry-Bulb Temperature {C}
+    6.7,                     !- Daily Dry-Bulb Temperature Range {deltaC}
+    ,                        !- Dry-Bulb Temperature Range Modifier Type
+    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+    Wetbulb,                 !- Humidity Condition Type
+    25.3,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+    ,                        !- Humidity Condition Day Schedule Name
+    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+    ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+    101193.,                 !- Barometric Pressure {Pa}
+    4.5,                     !- Wind Speed {m/s}
+    140,                     !- Wind Direction {deg}
+    No,                      !- Rain Indicator
+    No,                      !- Snow Indicator
+    No,                      !- Daylight Saving Time Indicator
+    ASHRAEClearSky,          !- Solar Model Indicator
+    ,                        !- Beam Solar Day Schedule Name
+    ,                        !- Diffuse Solar Day Schedule Name
+    ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+    ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+    1.00;                    !- Sky Clearness
+
+!-   ===========  ALL OBJECTS IN CLASS: RUNPERIOD ===========
+
+  RunPeriod,
+    ,                        !- Name
+    1,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    12,                      !- End Month
+    31,                      !- End Day of Month
+    ,                        !- Day of Week for Start Day
+    No,                      !- Use Weather File Holidays and Special Days
+    No,                      !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    No,                      !- Use Weather File Rain Indicators
+    No;                      !- Use Weather File Snow Indicators
+
+!-   ===========  ALL OBJECTS IN CLASS: RUNPERIODCONTROL:DAYLIGHTSAVINGTIME ===========
+!  WMO=722020 Time Zone=NAE        (GMT-05:00) Eastern Time (US & Canada)
+!  Data Source=ASHRAE 2005 Annual Design Conditions
+
+  RunPeriodControl:DaylightSavingTime,
+    1st Sunday in April,     !- Start Date
+    Last Sunday in October;  !- End Date
+
+!-   ===========  ALL OBJECTS IN CLASS: SITE:GROUNDTEMPERATURE:BUILDINGSURFACE ===========
+
+  Site:GroundTemperature:BuildingSurface,21.0,21.5,22.0,22.2,22.2,22.2,22.2,22.2,22.2,22.0,21.5,21.0;
+
+!-   ===========  ALL OBJECTS IN CLASS: SCHEDULETYPELIMITS ===========
+
+  ScheduleTypeLimits,
+    AnyNumber;               !- Name
+
+  ScheduleTypeLimits,
+    Fraction,                !- Name
+    0.0,                     !- Lower Limit Value
+    1.0,                     !- Upper Limit Value
+    CONTINUOUS;              !- Numeric Type
+
+  ScheduleTypeLimits,
+    Temperature,             !- Name
+    -60,                     !- Lower Limit Value
+    200,                     !- Upper Limit Value
+    CONTINUOUS,              !- Numeric Type
+    Temperature;             !- Unit Type
+
+  ScheduleTypeLimits,
+    Control Type,            !- Name
+    0,                       !- Lower Limit Value
+    4,                       !- Upper Limit Value
+    DISCRETE;                !- Numeric Type
+
+  ScheduleTypeLimits,
+    On/Off,                  !- Name
+    0,                       !- Lower Limit Value
+    1,                       !- Upper Limit Value
+    DISCRETE;                !- Numeric Type
+
+  ScheduleTypeLimits,
+    Humidity,                !- Name
+    0,                       !- Lower Limit Value
+    100,                     !- Upper Limit Value
+    CONTINUOUS;              !- Numeric Type
+
+  ScheduleTypeLimits,
+    Any Number;              !- Name
+
+!-   ===========  ALL OBJECTS IN CLASS: SCHEDULE:COMPACT ===========
+
+  Schedule:Compact,
+    People_Shopping_Sch,     !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay WinterDesignDay, !- Field 2
+    Until: 8:00,0.02,        !- Field 3
+    Until: 20:00,1,          !- Field 5
+    Until: 24:00,0.04,       !- Field 7
+    For: Saturday,           !- Field 9
+    Until: 8:00,0.01,        !- Field 10
+    Until: 18:00,1,          !- Field 12
+    Until: 24:00,0.05,       !- Field 14
+    For: AllOtherDays,       !- Field 16
+    Until: 8:00,0.01,        !- Field 17
+    Until: 18:00,0.75,       !- Field 19
+    Until: 24:00,0.01;       !- Field 21
+
+  Schedule:Compact,
+    Lighting_Sch,            !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay WinterDesignDay, !- Field 2
+    Until: 4:00,0.2,         !- Field 3
+    Until: 7:00,0.3,         !- Field 5
+    Until: 21:00,1,          !- Field 7
+    Until: 22:00,0.3,        !- Field 9
+    Until: 24:00,0.2,        !- Field 11
+    For: Saturday,           !- Field 13
+    Until: 4:00,0.2,         !- Field 14
+    Until: 7:00,0.3,         !- Field 16
+    Until: 21:00,1,          !- Field 18
+    Until: 22:00,0.3,        !- Field 20
+    Until: 24:00,0.2,        !- Field 22
+    For: AllOtherDays,       !- Field 24
+    Until: 4:00,0.2,         !- Field 25
+    Until: 7:00,0.3,         !- Field 27
+    Until: 21:00,1,          !- Field 29
+    Until: 22:00,0.3,        !- Field 31
+    Until: 24:00,0.2;        !- Field 33
+
+  Schedule:Compact,
+    Register_Equip_Sch,      !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay WinterDesignDay, !- Field 2
+    Until: 8:00,0.0,         !- Field 3
+    Until: 19:00,1,          !- Field 5
+    Until: 24:00,0.0,        !- Field 7
+    For: Saturday,           !- Field 9
+    Until: 8:00,0.0,         !- Field 10
+    Until: 19:00,1,          !- Field 12
+    Until: 24:00,0.0,        !- Field 14
+    For: AllOtherDays,       !- Field 16
+    Until: 8:00,0.0,         !- Field 17
+    Until: 19:00,1,          !- Field 19
+    Until: 24:00,0.0;        !- Field 21
+
+  Schedule:Compact,
+    Bakery_Equip_Sch,        !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay WinterDesignDay, !- Field 2
+    Until: 4:00,0.0,         !- Field 3
+    Until: 18:00,1,          !- Field 5
+    Until: 24:00,0.0,        !- Field 7
+    For: Saturday,           !- Field 9
+    Until: 4:00,0.0,         !- Field 10
+    Until: 18:00,1,          !- Field 12
+    Until: 24:00,0.0,        !- Field 14
+    For: AllOtherDays,       !- Field 16
+    Until: 4:00,0.0,         !- Field 17
+    Until: 18:00,1,          !- Field 19
+    Until: 24:00,0.0;        !- Field 21
+
+  Schedule:Compact,
+    Elec_Equip_Sch,          !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Weekdays SummerDesignDay WinterDesignDay, !- Field 2
+    Until: 8:00,0.5,         !- Field 3
+    Until: 18:00,1,          !- Field 5
+    Until: 24:00,0.5,        !- Field 7
+    For: Saturday,           !- Field 9
+    Until: 8:00,0.5,         !- Field 10
+    Until: 18:00,1,          !- Field 12
+    Until: 24:00,0.5,        !- Field 14
+    For: AllOtherDays,       !- Field 16
+    Until: 8:00,0.5,         !- Field 17
+    Until: 18:00,1,          !- Field 19
+    Until: 24:00,0.5;        !- Field 21
+
+  Schedule:Compact,
+    Activity_Shopping_Sch,   !- Name
+    AnyNumber,               !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,105;        !- Field 3
+
+  Schedule:Compact,
+    CaseLightingSched,       !- Name
+    ON/OFF,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 6:00,0.0,         !- Field 3
+    Until: 21:00,1.0,        !- Field 5
+    Until: 24:00,0.0;        !- Field 7
+
+  Schedule:Compact,
+    CaseLightingSched2,      !- Name
+    AnyNumber,               !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 6:00,0.0,         !- Field 3
+    Until: 7:00,1.0,         !- Field 5
+    Until: 11:00,0.0,        !- Field 7
+    Until: 13:00,0.5,        !- Field 9
+    Until: 19:00,0.0,        !- Field 11
+    Until: 20:00,1.0,        !- Field 13
+    Until: 24:00,0.0;        !- Field 15
+
+  Schedule:Compact,
+    LightingOnSched,         !- Name
+    ON/OFF,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0;        !- Field 3
+
+  Schedule:Compact,
+    CaseStockingSched,       !- Name
+    AnyNumber,               !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 13:00,0.0,        !- Field 3
+    Until: 14:00,50.0,       !- Field 5
+    Until: 15:00,35.0,       !- Field 7
+    Until: 24:00,0.0;        !- Field 9
+
+  Schedule:Compact,
+    SelfContainedCaseStockingSched,  !- Name
+    AnyNumber,               !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 6:00,0.0,         !- Field 3
+    Until: 7:00,50.0,        !- Field 5
+    Until: 9:00,70.0,        !- Field 7
+    Until: 10:00,80.0,       !- Field 9
+    Until: 11:00,70.0,       !- Field 11
+    Until: 13:00,50.0,       !- Field 13
+    Until: 14:00,80.0,       !- Field 15
+    Until: 15:00,90.0,       !- Field 17
+    Until: 16:00,80.0,       !- Field 19
+    Until: 24:00,0.0;        !- Field 21
+
+  Schedule:Compact,
+    WalkInStockingSched,     !- Name
+    AnyNumber,               !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Tuesday Friday,     !- Field 2
+    Until: 4:00,0.0,         !- Field 3
+    Until: 5:00,725.0,       !- Field 5
+    Until: 6:00,417.0,       !- Field 7
+    Until: 7:00,290.0,       !- Field 9
+    Until: 24:00,0.0,        !- Field 11
+    For: AllOtherDays,       !- Field 13
+    Until: 4:00,0.0,         !- Field 14
+    Until: 5:00,125.0,       !- Field 16
+    Until: 6:00,117.0,       !- Field 18
+    Until: 7:00,90.0,        !- Field 20
+    Until: 19:00,0.0,        !- Field 22
+    Until: 20:00,125.0,      !- Field 24
+    Until: 21:00,117.0,      !- Field 26
+    Until: 22:00,90.0,       !- Field 28
+    Until: 24:00,0.0;        !- Field 30
+
+  Schedule:Compact,
+    OAFractionSched,         !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 6:00,0.0,         !- Field 3
+    Until: 20:00,1.0,        !- Field 5
+    Until: 24:00,0.0;        !- Field 7
+
+  Schedule:Compact,
+    CaseOperatingSched,      !- Name
+    ON/OFF,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0;        !- Field 3
+
+  Schedule:Compact,
+    CaseCleanedOnMonday,     !- Name
+    AnyNumber,               !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Monday,             !- Field 2
+    Until: 5:00,1.0,         !- Field 3
+    Until: 7:00,0.0,         !- Field 5
+    Until: 24:00,1.0,        !- Field 7
+    For: AllOtherDays,       !- Field 9
+    Until: 24:00,1.0;        !- Field 10
+
+  Schedule:Compact,
+    CaseCleanedOnTuesday,    !- Name
+    AnyNumber,               !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: Tuesday,            !- Field 2
+    Until: 5:00,1.0,         !- Field 3
+    Until: 7:00,0.0,         !- Field 5
+    Until: 24:00,1.0,        !- Field 7
+    For: AllOtherDays,       !- Field 9
+    Until: 24:00,1.0;        !- Field 10
+
+  Schedule:Compact,
+    FanAndCoilAvailSched,    !- Name
+    ON/OFF,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0;        !- Field 3
+
+  Schedule:Compact,
+    OutdoorAirAvailSched,    !- Name
+    ON/OFF,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0;        !- Field 3
+
+  Schedule:Compact,
+    Heating Setpoints,       !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,22.0;       !- Field 3
+
+  Schedule:Compact,
+    Cooling Setpoints,       !- Name
+    Temperature,             !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,24.0;       !- Field 3
+
+  Schedule:Compact,
+    Zone Control Type Sched, !- Name
+    Control Type,            !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,4;          !- Field 3
+
+  Schedule:Compact,
+    Seasonal Relative Humidity Sch,  !- Name
+    Humidity,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,50.0;       !- Field 3
+
+  Schedule:Compact,
+    CaseCreditReductionSched,!- Name
+    fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For:AllDays,             !- Field 2
+    Interpolate:No,          !- Field 3
+    Until: 7:00,0.2,         !- Field 4
+    Until: 21:00,1.0,        !- Field 6
+    Until: 24:00,0.2;        !- Field 8
+
+  Schedule:Compact,
+    CaseCreditReductionSched2,  !- Name
+    fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For:AllDays,             !- Field 2
+    Interpolate:No,          !- Field 3
+    Until: 7:00,0.2,         !- Field 4
+    Until: 21:00,0.4,        !- Field 6
+    Until: 24:00,0.2;        !- Field 8
+
+  Schedule:Compact,
+    DairyCaseCreditReductionSched,  !- Name
+    fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For:AllDays,             !- Field 2
+    Interpolate:No,          !- Field 3
+    Until: 7:00,0.2,         !- Field 4
+    Until: 21:00,0.6,        !- Field 6
+    Until: 24:00,0.2;        !- Field 8
+
+  Schedule:Compact,
+    CaseDefrostSched,        !- Name
+    ON/OFF,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For:AllDays,             !- Field 2
+    Interpolate:Yes,         !- Field 3
+    Until: 4:00,0,           !- Field 4
+    Until: 4:17,1,           !- Field 6
+    Until: 14:00,0,          !- Field 8
+    Until: 14:17,1,          !- Field 10
+    Until: 24:00,0;          !- Field 12
+
+  Schedule:Compact,
+    CaseDripDownSched,       !- Name
+    ON/OFF,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For:AllDays,             !- Field 2
+    Interpolate:Yes,         !- Field 3
+    Until: 4:00,0,           !- Field 4
+    Until: 4:22,1,           !- Field 6
+    Until: 14:00,0,          !- Field 8
+    Until: 14:22,1,          !- Field 10
+    Until: 24:00,0;          !- Field 12
+
+  Schedule:Compact,
+    CaseDefrostSched2,       !- Name
+    ON/OFF,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For:AllDays,             !- Field 2
+    Interpolate:Yes,         !- Field 3
+    Until: 08:00,0,          !- Field 4
+    Until: 08:17,1,          !- Field 6
+    Until: 18:00,0,          !- Field 8
+    Until: 18:17,1,          !- Field 10
+    Until: 24:00,0;          !- Field 12
+
+  Schedule:Compact,
+    CaseDripDownSched2,      !- Name
+    ON/OFF,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For:AllDays,             !- Field 2
+    Interpolate:Yes,         !- Field 3
+    Until: 08:00,0,          !- Field 4
+    Until: 08:22,1,          !- Field 6
+    Until: 18:00,0,          !- Field 8
+    Until: 18:22,1,          !- Field 10
+    Until: 24:00,0;          !- Field 12
+
+  Schedule:Compact,
+    CaseDefrostSched3,       !- Name
+    ON/OFF,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For:AllDays,             !- Field 2
+    Interpolate:Yes,         !- Field 3
+    Until: 11:00,0,          !- Field 4
+    Until: 11:20,1,          !- Field 6
+    Until: 23:00,0,          !- Field 8
+    Until: 23:20,1,          !- Field 10
+    Until: 24:00,0;          !- Field 12
+
+  Schedule:Compact,
+    CaseDripDownSched3,      !- Name
+    ON/OFF,                  !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For:AllDays,             !- Field 2
+    Interpolate:Yes,         !- Field 3
+    Until: 11:00,0,          !- Field 4
+    Until: 11:30,1,          !- Field 6
+    Until: 23:00,0,          !- Field 8
+    Until: 23:30,1,          !- Field 10
+    Until: 24:00,0;          !- Field 12
+
+  Schedule:Compact,
+    ContinuousFanSchedule,   !- Name
+    Any Number,              !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0;        !- Field 3
+
+!-   ===========  ALL OBJECTS IN CLASS: MATERIAL ===========
+
+  Material,
+    ConcForIntFloor,         !- Name
+    Smooth,                  !- Roughness
+    0.1524,                  !- Thickness {m}
+    1.73,                    !- Conductivity {W/m-K}
+    2243,                    !- Density {kg/m3}
+    837,                     !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.65,                    !- Solar Absorptance
+    0.65;                    !- Visible Absorptance
+
+  Material,
+    FurnitureMaterial,       !- Name
+    MediumSmooth,            !- Roughness
+    0.1,                     !- Thickness {m}
+    11,                      !- Conductivity {W/m-K}
+    544.62,                  !- Density {kg/m3}
+    1210,                    !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.78,                    !- Solar Absorptance
+    0.78;                    !- Visible Absorptance
+
+  Material,
+    StoreSlab,               !- Name
+    Smooth,                  !- Roughness
+    0.1524,                  !- Thickness {m}
+    1.73,                    !- Conductivity {W/m-K}
+    2243,                    !- Density {kg/m3}
+    837,                     !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.65,                    !- Solar Absorptance
+    0.65;                    !- Visible Absorptance
+
+  Material,
+    WoodForDoor,             !- Name
+    Smooth,                  !- Roughness
+    0.0635,                  !- Thickness {m}
+    0.1211,                  !- Conductivity {W/m-K}
+    593,                     !- Density {kg/m3}
+    2510,                    !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.78,                    !- Solar Absorptance
+    0.78;                    !- Visible Absorptance
+
+  Material,
+    GypForInterior,          !- Name
+    Smooth,                  !- Roughness
+    0.0191,                  !- Thickness {m}
+    0.7264,                  !- Conductivity {W/m-K}
+    1602,                    !- Density {kg/m3}
+    837,                     !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.92,                    !- Solar Absorptance
+    0.92;                    !- Visible Absorptance
+
+  Material,
+    ConcForInterior,         !- Name
+    Smooth,                  !- Roughness
+    0.2033,                  !- Thickness {m}
+    0.5708,                  !- Conductivity {W/m-K}
+    609,                     !- Density {kg/m3}
+    837,                     !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.65,                    !- Solar Absorptance
+    0.65;                    !- Visible Absorptance
+
+  Material,
+    HF-A2,                   !- Name
+    Smooth,                  !- Roughness
+    0.1016,                  !- Thickness {m}
+    1.332,                   !- Conductivity {W/m-K}
+    2082,                    !- Density {kg/m3}
+    920,                     !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.93,                    !- Solar Absorptance
+    0.93;                    !- Visible Absorptance
+
+  Material,
+    HF-C2,                   !- Name
+    Smooth,                  !- Roughness
+    0.1015,                  !- Thickness {m}
+    0.3805,                  !- Conductivity {W/m-K}
+    609,                     !- Density {kg/m3}
+    837,                     !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.65,                    !- Solar Absorptance
+    0.65;                    !- Visible Absorptance
+
+  Material,
+    HF-E1,                   !- Name
+    Smooth,                  !- Roughness
+    0.0191,                  !- Thickness {m}
+    0.7264,                  !- Conductivity {W/m-K}
+    1602,                    !- Density {kg/m3}
+    837,                     !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.92,                    !- Solar Absorptance
+    0.92;                    !- Visible Absorptance
+
+  Material,
+    HF-E2,                   !- Name
+    Smooth,                  !- Roughness
+    0.0127,                  !- Thickness {m}
+    1.436,                   !- Conductivity {W/m-K}
+    881,                     !- Density {kg/m3}
+    1674,                    !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.55,                    !- Solar Absorptance
+    0.55;                    !- Visible Absorptance
+
+  Material,
+    HF-E3,                   !- Name
+    Smooth,                  !- Roughness
+    0.0095,                  !- Thickness {m}
+    0.1903,                  !- Conductivity {W/m-K}
+    1121,                    !- Density {kg/m3}
+    1674,                    !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.75,                    !- Solar Absorptance
+    0.75;                    !- Visible Absorptance
+
+  Material,
+    HF-C15,                  !- Name
+    Smooth,                  !- Roughness
+    0.1524,                  !- Thickness {m}
+    0.173,                   !- Conductivity {W/m-K}
+    641,                     !- Density {kg/m3}
+    837,                     !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.65,                    !- Solar Absorptance
+    0.65;                    !- Visible Absorptance
+
+  Material,
+    HF-E5,                   !- Name
+    Smooth,                  !- Roughness
+    0.0191,                  !- Thickness {m}
+    0.0605,                  !- Conductivity {W/m-K}
+    481,                     !- Density {kg/m3}
+    837,                     !- Specific Heat {J/kg-K}
+    0.9,                     !- Thermal Absorptance
+    0.32,                    !- Solar Absorptance
+    0.32;                    !- Visible Absorptance
+
+!-   ===========  ALL OBJECTS IN CLASS: MATERIAL:NOMASS ===========
+
+  Material:NoMass,
+    R-11,                    !- Name
+    Rough,                   !- Roughness
+    1.935938,                !- Thermal Resistance {m2-K/W}
+    0.9,                     !- Thermal Absorptance
+    0.75,                    !- Solar Absorptance
+    0.75;                    !- Visible Absorptance
+
+!-   ===========  ALL OBJECTS IN CLASS: MATERIAL:AIRGAP ===========
+
+  Material:AirGap,
+    AirGap,                  !- Name
+    0.1762;                  !- Thermal Resistance {m2-K/W}
+
+!-   ===========  ALL OBJECTS IN CLASS: WINDOWMATERIAL:GLAZING ===========
+! ID 3
+
+  WindowMaterial:Glazing,
+    CLEAR 6MM,               !- Name
+    SpectralAverage,         !- Optical Data Type
+    ,                        !- Window Glass Spectral Data Set Name
+    0.006,                   !- Thickness {m}
+    0.775,                   !- Solar Transmittance at Normal Incidence
+    0.071,                   !- Front Side Solar Reflectance at Normal Incidence
+    0.071,                   !- Back Side Solar Reflectance at Normal Incidence
+    0.881,                   !- Visible Transmittance at Normal Incidence
+    0.080,                   !- Front Side Visible Reflectance at Normal Incidence
+    0.080,                   !- Back Side Visible Reflectance at Normal Incidence
+    0.0,                     !- Infrared Transmittance at Normal Incidence
+    0.84,                    !- Front Side Infrared Hemispherical Emissivity
+    0.84,                    !- Back Side Infrared Hemispherical Emissivity
+    0.9;                     !- Conductivity {W/m-K}
+
+!-   ===========  ALL OBJECTS IN CLASS: WINDOWMATERIAL:GAS ===========
+
+  WindowMaterial:Gas,
+    AIR 6MM,                 !- Name
+    Air,                     !- Gas Type
+    0.0063;                  !- Thickness {m}
+
+!-   ===========  ALL OBJECTS IN CLASS: CONSTRUCTION ===========
+
+  Construction,
+    FurnitureConstruction,   !- Name
+    FurnitureMaterial;       !- Outside Layer
+
+  Construction,
+    BotFloorConstruction,    !- Name
+    StoreSlab;               !- Outside Layer
+
+  Construction,
+    DoorConstruction,        !- Name
+    WoodForDoor;             !- Outside Layer
+
+  Construction,
+    IntWallConstruction,     !- Name
+    GypForInterior,          !- Outside Layer
+    AirGap,                  !- Layer 2
+    ConcForInterior,         !- Layer 3
+    AirGap,                  !- Layer 4
+    GypForInterior;          !- Layer 5
+
+  Construction,
+    FaceBrkIns4LWConcBlkGyp_R-11,  !- Name
+    HF-A2,                   !- Outside Layer
+    R-11,                    !- Layer 2
+    HF-C2,                   !- Layer 3
+    HF-E1;                   !- Layer 4
+
+  Construction,
+    SlagFeltIns6LWConcGapAcoTile_R-11,  !- Name
+    HF-E2,                   !- Outside Layer
+    HF-E3,                   !- Layer 2
+    R-11,                    !- Layer 3
+    HF-C15,                  !- Layer 4
+    AirGap,                  !- Layer 5
+    HF-E5;                   !- Layer 6
+
+  Construction,
+    WinLib_1001,             !- Name
+    CLEAR 6MM;               !- Outside Layer
+
+  Construction,
+    WinLib_2003,             !- Name
+    CLEAR 6MM,               !- Outside Layer
+    AIR 6MM,                 !- Layer 2
+    CLEAR 6MM;               !- Layer 3
+
+!-   ===========  ALL OBJECTS IN CLASS: GLOBALGEOMETRYRULES ===========
+
+  GlobalGeometryRules,
+    UpperLeftCorner,         !- Starting Vertex Position
+    CounterClockWise,        !- Vertex Entry Direction
+    World;                   !- Coordinate System
+
+!-   ===========  ALL OBJECTS IN CLASS: ZONE ===========
+
+  Zone,
+    BackRoom,                !- Name
+    0,                       !- Direction of Relative North {deg}
+    0,                       !- X Origin {m}
+    0,                       !- Y Origin {m}
+    0,                       !- Z Origin {m}
+    1,                       !- Type
+    1,                       !- Multiplier
+    4.266992,                !- Ceiling Height {m}
+    autocalculate,           !- Volume {m3}
+    autocalculate,           !- Floor Area {m2}
+    TARP;                    !- Zone Inside Convection Algorithm
+
+  Zone,
+    SalesFloor,              !- Name
+    0,                       !- Direction of Relative North {deg}
+    0,                       !- X Origin {m}
+    0,                       !- Y Origin {m}
+    0,                       !- Z Origin {m}
+    1,                       !- Type
+    1,                       !- Multiplier
+    4.266992,                !- Ceiling Height {m}
+    autocalculate,           !- Volume {m3}
+    autocalculate,           !- Floor Area {m2}
+    TARP;                    !- Zone Inside Convection Algorithm
+
+!-   ===========  ALL OBJECTS IN CLASS: BUILDINGSURFACE:DETAILED ===========
+
+  BuildingSurface:Detailed,
+    Main_ExtWall_a_b,        !- Name
+    Wall,                    !- Surface Type
+    FaceBrkIns4LWConcBlkGyp_R-11,  !- Construction Name
+    BackRoom,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,45.71777,4.266992,  !- X,Y,Z ==> Vertex 1 {m}
+    0,45.71777,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,4.266992;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Main_ExtWall_b_c,        !- Name
+    Wall,                    !- Surface Type
+    FaceBrkIns4LWConcBlkGyp_R-11,  !- Construction Name
+    BackRoom,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    4.571777,45.71777,4.266992,  !- X,Y,Z ==> Vertex 1 {m}
+    4.571777,45.71777,0,  !- X,Y,Z ==> Vertex 2 {m}
+    0,45.71777,0,  !- X,Y,Z ==> Vertex 3 {m}
+    0,45.71777,4.266992;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Main_ExtWall_c_d,        !- Name
+    Wall,                    !- Surface Type
+    FaceBrkIns4LWConcBlkGyp_R-11,  !- Construction Name
+    SalesFloor,              !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    45.71777,45.71777,4.266992,  !- X,Y,Z ==> Vertex 1 {m}
+    45.71777,45.71777,0,  !- X,Y,Z ==> Vertex 2 {m}
+    4.571777,45.71777,0,  !- X,Y,Z ==> Vertex 3 {m}
+    4.571777,45.71777,4.266992;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Main_ExtWall_d_e,        !- Name
+    Wall,                    !- Surface Type
+    FaceBrkIns4LWConcBlkGyp_R-11,  !- Construction Name
+    SalesFloor,              !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    45.71777,0,4.266992,  !- X,Y,Z ==> Vertex 1 {m}
+    45.71777,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    45.71777,45.71777,0,  !- X,Y,Z ==> Vertex 3 {m}
+    45.71777,45.71777,4.266992;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Main_ExtWall_e_f,        !- Name
+    Wall,                    !- Surface Type
+    FaceBrkIns4LWConcBlkGyp_R-11,  !- Construction Name
+    SalesFloor,              !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    4.571777,0,4.266992,  !- X,Y,Z ==> Vertex 1 {m}
+    4.571777,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    45.71777,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    45.71777,0,4.266992;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Main_ExtWall_f_a,        !- Name
+    Wall,                    !- Surface Type
+    FaceBrkIns4LWConcBlkGyp_R-11,  !- Construction Name
+    BackRoom,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,4.266992,  !- X,Y,Z ==> Vertex 1 {m}
+    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    4.571777,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    4.571777,0,4.266992;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Main_IntWall,            !- Name
+    Wall,                    !- Surface Type
+    IntWallConstruction,     !- Construction Name
+    BackRoom,                !- Zone Name
+    Surface,                 !- Outside Boundary Condition
+    Main_IntWall_mirror,     !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    4.571777,0,4.266992,  !- X,Y,Z ==> Vertex 1 {m}
+    4.571777,0,0,  !- X,Y,Z ==> Vertex 2 {m}
+    4.571777,45.71777,0,  !- X,Y,Z ==> Vertex 3 {m}
+    4.571777,45.71777,4.266992;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Main_IntWall_mirror,     !- Name
+    Wall,                    !- Surface Type
+    IntWallConstruction,     !- Construction Name
+    SalesFloor,              !- Zone Name
+    Surface,                 !- Outside Boundary Condition
+    Main_IntWall,            !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0.5,                     !- View Factor to Ground
+    4,                       !- Number of Vertices
+    4.571777,45.71777,4.266992,  !- X,Y,Z ==> Vertex 1 {m}
+    4.571777,45.71777,0,  !- X,Y,Z ==> Vertex 2 {m}
+    4.571777,0,0,  !- X,Y,Z ==> Vertex 3 {m}
+    4.571777,0,4.266992;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    RoofAbove_BackRoom,      !- Name
+    Roof,                    !- Surface Type
+    SlagFeltIns6LWConcGapAcoTile_R-11,  !- Construction Name
+    BackRoom,                !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0,                       !- View Factor to Ground
+    4,                       !- Number of Vertices
+    4.571777,0,4.266992,  !- X,Y,Z ==> Vertex 1 {m}
+    4.571777,45.71777,4.266992,  !- X,Y,Z ==> Vertex 2 {m}
+    0,45.71777,4.266992,  !- X,Y,Z ==> Vertex 3 {m}
+    0,0,4.266992;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    RoofAbove_SalesFloor,    !- Name
+    Roof,                    !- Surface Type
+    SlagFeltIns6LWConcGapAcoTile_R-11,  !- Construction Name
+    SalesFloor,              !- Zone Name
+    Outdoors,                !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    SunExposed,              !- Sun Exposure
+    WindExposed,             !- Wind Exposure
+    0,                       !- View Factor to Ground
+    4,                       !- Number of Vertices
+    45.71777,0,4.266992,  !- X,Y,Z ==> Vertex 1 {m}
+    45.71777,45.71777,4.266992,  !- X,Y,Z ==> Vertex 2 {m}
+    4.571777,45.71777,4.266992,  !- X,Y,Z ==> Vertex 3 {m}
+    4.571777,0,4.266992;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Foundation_BackRoom,     !- Name
+    Floor,                   !- Surface Type
+    BotFloorConstruction,    !- Construction Name
+    BackRoom,                !- Zone Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0,                       !- View Factor to Ground
+    4,                       !- Number of Vertices
+    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
+    0,45.71777,0,  !- X,Y,Z ==> Vertex 2 {m}
+    4.571777,45.71777,0,  !- X,Y,Z ==> Vertex 3 {m}
+    4.571777,0,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+  BuildingSurface:Detailed,
+    Foundation_SalesFloor,   !- Name
+    Floor,                   !- Surface Type
+    BotFloorConstruction,    !- Construction Name
+    SalesFloor,              !- Zone Name
+    Ground,                  !- Outside Boundary Condition
+    ,                        !- Outside Boundary Condition Object
+    NoSun,                   !- Sun Exposure
+    NoWind,                  !- Wind Exposure
+    0,                       !- View Factor to Ground
+    4,                       !- Number of Vertices
+    4.571777,0,0,  !- X,Y,Z ==> Vertex 1 {m}
+    4.571777,45.71777,0,  !- X,Y,Z ==> Vertex 2 {m}
+    45.71777,45.71777,0,  !- X,Y,Z ==> Vertex 3 {m}
+    45.71777,0,0;  !- X,Y,Z ==> Vertex 4 {m}
+
+!-   ===========  ALL OBJECTS IN CLASS: FENESTRATIONSURFACE:DETAILED ===========
+
+  FenestrationSurface:Detailed,
+    Main_Window_d_e_1,       !- Name
+    Window,                  !- Surface Type
+    WinLib_1001,             !- Construction Name
+    Main_ExtWall_d_e,        !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5,                     !- View Factor to Ground
+    ,                        !- Shading Control Name
+    ,                        !- Frame and Divider Name
+    1,                       !- Multiplier
+    4,                       !- Number of Vertices
+    45.71777,31.85005,2.285888,  !- X,Y,Z ==> Vertex 1 {m}
+    45.71777,31.85005,1.981103,  !- X,Y,Z ==> Vertex 2 {m}
+    45.71777,35.50747,1.981103,  !- X,Y,Z ==> Vertex 3 {m}
+    45.71777,35.50747,2.285888;  !- X,Y,Z ==> Vertex 4 {m}
+
+  FenestrationSurface:Detailed,
+    Main_Window_d_e_2,       !- Name
+    Window,                  !- Surface Type
+    WinLib_2003,             !- Construction Name
+    Main_ExtWall_d_e,        !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5,                     !- View Factor to Ground
+    ,                        !- Shading Control Name
+    ,                        !- Frame and Divider Name
+    1,                       !- Multiplier
+    4,                       !- Number of Vertices
+    45.71777,21.33496,2.285888,  !- X,Y,Z ==> Vertex 1 {m}
+    45.71777,21.33496,1.981103,  !- X,Y,Z ==> Vertex 2 {m}
+    45.71777,21.63974,1.981103,  !- X,Y,Z ==> Vertex 3 {m}
+    45.71777,21.63974,2.285888;  !- X,Y,Z ==> Vertex 4 {m}
+
+  FenestrationSurface:Detailed,
+    Main_Door_d_e_1_1,       !- Name
+    Door,                    !- Surface Type
+    DoorConstruction,        !- Construction Name
+    Main_ExtWall_d_e,        !- Building Surface Name
+    ,                        !- Outside Boundary Condition Object
+    0.5,                     !- View Factor to Ground
+    ,                        !- Shading Control Name
+    ,                        !- Frame and Divider Name
+    ,                        !- Multiplier
+    4,                       !- Number of Vertices
+    45.71777,10.2103,2.133496,  !- X,Y,Z ==> Vertex 1 {m}
+    45.71777,10.2103,0,  !- X,Y,Z ==> Vertex 2 {m}
+    45.71777,11.12466,0,  !- X,Y,Z ==> Vertex 3 {m}
+    45.71777,11.12466,2.133496;  !- X,Y,Z ==> Vertex 4 {m}
+
+!-   ===========  ALL OBJECTS IN CLASS: INTERNALMASS ===========
+
+  InternalMass,
+    BackRoom_Furniture1,     !- Name
+    FurnitureConstruction,   !- Construction Name
+    BackRoom,                !- Zone Name
+    95.0;                    !- Surface Area {m2}
+
+  InternalMass,
+    BackRoom_Furniture2,     !- Name
+    FurnitureConstruction,   !- Construction Name
+    BackRoom,                !- Zone Name
+    95.0;                    !- Surface Area {m2}
+
+  InternalMass,
+    SalesFloor_Furniture1,   !- Name
+    FurnitureConstruction,   !- Construction Name
+    SalesFloor,              !- Zone Name
+    845.0;                   !- Surface Area {m2}
+
+  InternalMass,
+    SalesFloor_Furniture2,   !- Name
+    FurnitureConstruction,   !- Construction Name
+    SalesFloor,              !- Zone Name
+    845.0;                   !- Surface Area {m2}
+
+!-   ===========  ALL OBJECTS IN CLASS: PEOPLE ===========
+
+  People,
+    BackRoom People 1,       !- Name
+    BackRoom,                !- Zone or ZoneList Name
+    People_Shopping_Sch,     !- Number of People Schedule Name
+    people,                  !- Number of People Calculation Method
+    10,                      !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    ,                        !- Zone Floor Area per Person {m2/person}
+    0.2,                     !- Fraction Radiant
+    ,                        !- Sensible Heat Fraction
+    Activity_Shopping_Sch;   !- Activity Level Schedule Name
+
+  People,
+    SalesFloor People 1,     !- Name
+    SalesFloor,              !- Zone or ZoneList Name
+    People_Shopping_Sch,     !- Number of People Schedule Name
+    people,                  !- Number of People Calculation Method
+    150,                     !- Number of People
+    ,                        !- People per Zone Floor Area {person/m2}
+    ,                        !- Zone Floor Area per Person {m2/person}
+    0.2,                     !- Fraction Radiant
+    ,                        !- Sensible Heat Fraction
+    Activity_Shopping_Sch;   !- Activity Level Schedule Name
+
+!-   ===========  ALL OBJECTS IN CLASS: LIGHTS ===========
+
+  Lights,
+    BackRoom Lights 1,       !- Name
+    BackRoom,                !- Zone or ZoneList Name
+    Lighting_Sch,            !- Schedule Name
+    LightingLevel,           !- Design Level Calculation Method
+    1500.0,                  !- Lighting Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.37,                    !- Fraction Radiant
+    0.18,                    !- Fraction Visible
+    0,                       !- Fraction Replaceable
+    GeneralLights;           !- End-Use Subcategory
+
+  Lights,
+    SalesFloor Lights 1,     !- Name
+    SalesFloor,              !- Zone or ZoneList Name
+    Lighting_Sch,            !- Schedule Name
+    LightingLevel,           !- Design Level Calculation Method
+    45000.0,                 !- Lighting Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Return Air Fraction
+    0.37,                    !- Fraction Radiant
+    0.18,                    !- Fraction Visible
+    0,                       !- Fraction Replaceable
+    GeneralLights;           !- End-Use Subcategory
+
+!-   ===========  ALL OBJECTS IN CLASS: ELECTRICEQUIPMENT ===========
+
+  ElectricEquipment,
+    BackRoom ElecEq 1,       !- Name
+    BackRoom,                !- Zone or ZoneList Name
+    Elec_Equip_Sch,          !- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    150.0,                   !- Design Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.25,                    !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+  ElectricEquipment,
+    SalesFloor ElecEq 1,     !- Name
+    SalesFloor,              !- Zone or ZoneList Name
+    Register_Equip_Sch,      !- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    1500.0,                  !- Design Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0.0,                     !- Fraction Latent
+    0.1,                     !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+  ElectricEquipment,
+    SalesFloor ElecEq 2,     !- Name
+    SalesFloor,              !- Zone or ZoneList Name
+    Bakery_Equip_Sch,        !- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    15000.0,                 !- Design Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0.05,                    !- Fraction Latent
+    0.4,                     !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+  ElectricEquipment,
+    SalesFloor ElecEq 3,     !- Name
+    SalesFloor,              !- Zone or ZoneList Name
+    Elec_Equip_Sch,          !- Schedule Name
+    EquipmentLevel,          !- Design Level Calculation Method
+    600.0,                   !- Design Level {W}
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    ,                        !- Watts per Person {W/person}
+    0,                       !- Fraction Latent
+    0.25,                    !- Fraction Radiant
+    0;                       !- Fraction Lost
+
+!-   ===========  ALL OBJECTS IN CLASS: ZONECONTROL:HUMIDISTAT ===========
+
+  ZoneControl:Humidistat,
+    SalesFloor Humidistat,   !- Name
+    SalesFloor,              !- Zone Name
+    Seasonal Relative Humidity Sch;  !- Humidifying Relative Humidity Setpoint Schedule Name
+
+!-   ===========  ALL OBJECTS IN CLASS: ZONECONTROL:THERMOSTAT ===========
+
+  ZoneControl:Thermostat,
+    SalesFloor Thermostat,   !- Name
+    SalesFloor,              !- Zone or ZoneList Name
+    Zone Control Type Sched, !- Control Type Schedule Name
+    ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
+    DualSetPoint;            !- Control 1 Name
+
+!-   ===========  ALL OBJECTS IN CLASS: THERMOSTATSETPOINT:DUALSETPOINT ===========
+
+  ThermostatSetpoint:DualSetpoint,
+    DualSetPoint,            !- Name
+    Heating Setpoints,       !- Heating Setpoint Temperature Schedule Name
+    Cooling Setpoints;       !- Cooling Setpoint Temperature Schedule Name
+
+!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:UNCONTROLLED ===========
+
+  AirTerminal:SingleDuct:Uncontrolled,
+    Zone1DirectAir,          !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    SalesFloor Inlet Node,   !- Zone Supply Air Node Name
+    5.225;                   !- Maximum Air Flow Rate {m3/s}
+
+  AirTerminal:SingleDuct:Uncontrolled,
+    Zone2DirectAir,          !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    BackRoom Inlet Node,     !- Zone Supply Air Node Name
+    0.275;                   !- Maximum Air Flow Rate {m3/s}
+
+!-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTLIST ===========
+
+  ZoneHVAC:EquipmentList,
+    Zone1Equipment,          !- Name
+    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
+    Zone1DirectAir,          !- Zone Equipment 1 Name
+    1,                       !- Zone Equipment 1 Cooling Sequence
+    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+
+  ZoneHVAC:EquipmentList,
+    Zone2Equipment,          !- Name
+    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
+    Zone2DirectAir,          !- Zone Equipment 1 Name
+    1,                       !- Zone Equipment 1 Cooling Sequence
+    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+
+!-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTCONNECTIONS ===========
+
+  ZoneHVAC:EquipmentConnections,
+    SalesFloor,              !- Zone Name
+    Zone1Equipment,          !- Zone Conditioning Equipment List Name
+    Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name
+    ,                        !- Zone Air Exhaust Node or NodeList Name
+    SalesFloor Node,         !- Zone Air Node Name
+    SalesFloor Outlet Node;  !- Zone Return Air Node Name
+
+  ZoneHVAC:EquipmentConnections,
+    BackRoom,                !- Zone Name
+    Zone2Equipment,          !- Zone Conditioning Equipment List Name
+    Zone2Inlets,             !- Zone Air Inlet Node or NodeList Name
+    ,                        !- Zone Air Exhaust Node or NodeList Name
+    BackRoom Node,           !- Zone Air Node Name
+    BackRoom Outlet Node;    !- Zone Return Air Node Name
+
+!-   ===========  ALL OBJECTS IN CLASS: FAN:ONOFF ===========
+
+  Fan:OnOff,
+    Supply Fan 1,            !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    0.7,                     !- Fan Total Efficiency
+    600.0,                   !- Pressure Rise {Pa}
+    5.5,                     !- Maximum Flow Rate {m3/s}
+    0.9,                     !- Motor Efficiency
+    1.0,                     !- Motor In Airstream Fraction
+    Mixed Air Node,          !- Air Inlet Node Name
+    DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
+
+!-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
+
+  Coil:Cooling:DX:SingleSpeed,
+    Furnace ACDXCoil 1,      !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    100000,                  !- Gross Rated Total Cooling Capacity {W}
+    0.8,                     !- Gross Rated Sensible Heat Ratio
+    3.0,                     !- Gross Rated Cooling COP {W/W}
+    5.5,                     !- Rated Air Flow Rate {m3/s}
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DX Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
+    Heating Coil Air Inlet Node,  !- Air Outlet Node Name
+    WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name
+    WindACCoolCapFFF,        !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name
+    WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name
+    WindACPLFFPLR,           !- Part Load Fraction Correlation Curve Name
+    1000,                    !- Nominal Time for Condensate Removal to Begin {s}
+    1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    3.0,                     !- Maximum Cycling Rate {cycles/hr}
+    45.0;                    !- Latent Capacity Time Constant {s}
+
+!-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:GAS ===========
+
+  Coil:Heating:Gas,
+    Furnace Heating Coil 1,  !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    0.8,                     !- Gas Burner Efficiency
+    100000,                  !- Nominal Capacity {W}
+    Heating Coil Air Inlet Node,  !- Air Inlet Node Name
+    Reheat Coil Air Inlet Node;  !- Air Outlet Node Name
+
+  Coil:Heating:Gas,
+    Humidistat Reheat Coil 1,!- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    0.8,                     !- Gas Burner Efficiency
+    100000,                  !- Nominal Capacity {W}
+    Reheat Coil Air Inlet Node,  !- Air Inlet Node Name
+    Air Loop Outlet Node;    !- Air Outlet Node Name
+
+!-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL ===========
+
+  AirLoopHVAC:Unitary:Furnace:HeatCool,
+    Supermarket Rooftop DX w/ Gas Heat,  !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    Mixed Air Node,          !- Furnace Air Inlet Node Name
+    Air Loop Outlet Node,    !- Furnace Air Outlet Node Name
+    ContinuousFanSchedule,   !- Supply Air Fan Operating Mode Schedule Name
+    80,                      !- Maximum Supply Air Temperature {C}
+    5.5,                     !- Supply Air Flow Rate During Cooling Operation {m3/s}
+    5.5,                     !- Supply Air Flow Rate During Heating Operation {m3/s}
+    5.5,                     !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+    SalesFloor,              !- Controlling Zone or Thermostat Location
+    Fan:OnOff,               !- Supply Fan Object Type
+    Supply Fan 1,            !- Supply Fan Name
+    BlowThrough,             !- Fan Placement
+    Coil:Heating:Gas,        !- Heating Coil Object Type
+    Furnace Heating Coil 1,  !- Heating Coil Name
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
+    Furnace ACDXCoil 1,      !- Cooling Coil Name
+    CoolReheat,              !- Dehumidification Control Type
+    Coil:Heating:Gas,        !- Reheat Coil Object Type
+    Humidistat Reheat Coil 1;!- Reheat Coil Name
+
+!-   ===========  ALL OBJECTS IN CLASS: CONTROLLER:OUTDOORAIR ===========
+
+  Controller:OutdoorAir,
+    OA Controller 1,         !- Name
+    Relief Air Outlet Node,  !- Relief Air Outlet Node Name
+    Outdoor Air Mixer Inlet Node,  !- Return Air Node Name
+    Mixed Air Node,          !- Mixed Air Node Name
+    Outside Air Inlet Node,  !- Actuator Node Name
+    0.25,                    !- Minimum Outdoor Air Flow Rate {m3/s}
+    1.4,                     !- Maximum Outdoor Air Flow Rate {m3/s}
+    NoEconomizer,            !- Economizer Control Type
+    ModulateFlow,            !- Economizer Control Action Type
+    ,                        !- Economizer Maximum Limit Dry-Bulb Temperature {C}
+    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}
+    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}
+    ,                        !- Electronic Enthalpy Limit Curve Name
+    ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}
+    NoLockout,               !- Lockout Type
+    FixedMinimum,            !- Minimum Limit Type
+    OAFractionSched;         !- Minimum Outdoor Air Schedule Name
+
+!-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:CONTROLLERLIST ===========
+
+  AirLoopHVAC:ControllerList,
+    OA Sys 1 Controllers,    !- Name
+    Controller:OutdoorAir,   !- Controller 1 Object Type
+    OA Controller 1;         !- Controller 1 Name
+
+!-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC ===========
+
+  AirLoopHVAC,
+    Supermarket HVAC System, !- Name
+    ,                        !- Controller List Name
+    Furnace 1 Avail List,    !- Availability Manager List Name
+    5.5,                     !- Design Supply Air Flow Rate {m3/s}
+    Air Loop Branches,       !- Branch List Name
+    ,                        !- Connector List Name
+    Outdoor Air Mixer Inlet Node,  !- Supply Side Inlet Node Name
+    Return Air Mixer Outlet, !- Demand Side Outlet Node Name
+    Zone Equipment Inlet Node,  !- Demand Side Inlet Node Names
+    Air Loop Outlet Node;    !- Supply Side Outlet Node Names
+
+!-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:OUTDOORAIRSYSTEM:EQUIPMENTLIST ===========
+
+  AirLoopHVAC:OutdoorAirSystem:EquipmentList,
+    OA Sys 1 Equipment,      !- Name
+    OutdoorAir:Mixer,        !- Component 1 Object Type
+    OA Mixing Box 1;         !- Component 1 Name
+
+!-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:OUTDOORAIRSYSTEM ===========
+
+  AirLoopHVAC:OutdoorAirSystem,
+    OA Sys 1,                !- Name
+    OA Sys 1 Controllers,    !- Controller List Name
+    OA Sys 1 Equipment,      !- Outdoor Air Equipment List Name
+    Outdoor Air 1 Avail List;!- Availability Manager List Name
+
+!-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:MIXER ===========
+
+  OutdoorAir:Mixer,
+    OA Mixing Box 1,         !- Name
+    Mixed Air Node,          !- Mixed Air Node Name
+    Outside Air Inlet Node,  !- Outdoor Air Stream Node Name
+    Relief Air Outlet Node,  !- Relief Air Stream Node Name
+    Outdoor Air Mixer Inlet Node;  !- Return Air Stream Node Name
+
+!-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:ZONESPLITTER ===========
+
+  AirLoopHVAC:ZoneSplitter,
+    Zone Supply Air Splitter,!- Name
+    Zone Equipment Inlet Node,  !- Inlet Node Name
+    SalesFloor Inlet Node,   !- Outlet 1 Node Name
+    BackRoom Inlet Node;     !- Outlet 2 Node Name
+
+!-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:SUPPLYPATH ===========
+
+  AirLoopHVAC:SupplyPath,
+    FurnaceSupplyPath,       !- Name
+    Zone Equipment Inlet Node,  !- Supply Air Path Inlet Node Name
+    AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type
+    Zone Supply Air Splitter;!- Component 1 Name
+
+!-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:ZONEMIXER ===========
+
+  AirLoopHVAC:ZoneMixer,
+    Zone Return Air Mixer,   !- Name
+    Return Air Mixer Outlet, !- Outlet Node Name
+    SalesFloor Outlet Node,  !- Inlet 1 Node Name
+    BackRoom Outlet Node;    !- Inlet 2 Node Name
+
+!-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:RETURNPATH ===========
+
+  AirLoopHVAC:ReturnPath,
+    FurnaceReturnPath,       !- Name
+    Return Air Mixer Outlet, !- Return Air Path Outlet Node Name
+    AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type
+    Zone Return Air Mixer;   !- Component 1 Name
+
+!-   ===========  ALL OBJECTS IN CLASS: BRANCH ===========
+
+  Branch,
+    Air Loop Main Branch,    !- Name
+    5.5,                     !- Maximum Flow Rate {m3/s}
+    ,                        !- Pressure Drop Curve Name
+    AirLoopHVAC:OutdoorAirSystem,  !- Component 1 Object Type
+    OA Sys 1,                !- Component 1 Name
+    Outdoor Air Mixer Inlet Node,  !- Component 1 Inlet Node Name
+    Mixed Air Node,          !- Component 1 Outlet Node Name
+    PASSIVE,                 !- Component 1 Branch Control Type
+    AirLoopHVAC:Unitary:Furnace:HeatCool,  !- Component 2 Object Type
+    Supermarket Rooftop DX w/ Gas Heat,  !- Component 2 Name
+    Mixed Air Node,          !- Component 2 Inlet Node Name
+    Air Loop Outlet Node,    !- Component 2 Outlet Node Name
+    ACTIVE;                  !- Component 2 Branch Control Type
+
+!-   ===========  ALL OBJECTS IN CLASS: BRANCHLIST ===========
+
+  BranchList,
+    Air Loop Branches,       !- Name
+    Air Loop Main Branch;    !- Branch 1 Name
+
+!-   ===========  ALL OBJECTS IN CLASS: NODELIST ===========
+
+  NodeList,
+    OutsideAirInletNodes,    !- Name
+    Outside Air Inlet Node;  !- Node 1 Name
+
+  NodeList,
+    Zone1Inlets,             !- Name
+    SalesFloor Inlet Node;   !- Node 1 Name
+
+  NodeList,
+    Zone2Inlets,             !- Name
+    BackRoom Inlet Node;     !- Node 1 Name
+
+!-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:NODE ===========
+
+  OutdoorAir:Node,
+    COMPRESSOR RACK:REFRIGERATED CASE MediumTempRack CondenserNode;  !- Name
+
+  OutdoorAir:Node,
+    COMPRESSOR RACK:REFRIGERATED CASE LowTempRack CondenserNode;  !- Name
+
+!-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:NODELIST ===========
+
+  OutdoorAir:NodeList,
+    OutsideAirInletNodes;    !- Node or NodeList Name 1
+
+!-   ===========  ALL OBJECTS IN CLASS: AVAILABILITYMANAGER:SCHEDULED ===========
+
+  AvailabilityManager:Scheduled,
+    Furnace 1 Avail,         !- Name
+    FanAndCoilAvailSched;    !- Schedule Name
+
+  AvailabilityManager:Scheduled,
+    Outdoor Air 1 Avail,     !- Name
+    OutdoorAirAvailSched;    !- Schedule Name
+
+!-   ===========  ALL OBJECTS IN CLASS: AVAILABILITYMANAGERASSIGNMENTLIST ===========
+
+  AvailabilityManagerAssignmentList,
+    Furnace 1 Avail List,    !- Name
+    AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type
+    Furnace 1 Avail;         !- Availability Manager 1 Name
+
+  AvailabilityManagerAssignmentList,
+    Outdoor Air 1 Avail List,!- Name
+    AvailabilityManager:Scheduled,  !- Availability Manager 1 Object Type
+    Outdoor Air 1 Avail;     !- Availability Manager 1 Name
+
+!-   ===========  ALL OBJECTS IN CLASS: REFRIGERATION:CASE ===========
+! Example of stand-alone refrigerated case
+
+  Refrigeration:Case,
+    SelfContainedDisplayCase,!- Name
+    CaseOperatingSched,      !- Availability Schedule Name
+    SalesFloor,              !- Zone Name
+    23.88,                   !- Rated Ambient Temperature {C}
+    55.0,                    !- Rated Ambient Relative Humidity {percent}
+    1000.0,                  !- Rated Total Cooling Capacity per Unit Length {W/m}
+    0.08,                    !- Rated Latent Heat Ratio
+    0.85,                    !- Rated Runtime Fraction
+    10.0,                    !- Case Length {m}
+    13.0,                    !- Case Operating Temperature {C}
+    CaseTemperatureMethod,   !- Latent Case Credit Curve Type
+    MultiShelfVertical_LatentEnergyMult,  !- Latent Case Credit Curve Name
+    40.0,                    !- Standard Case Fan Power per Unit Length {W/m}
+    40.0,                    !- Operating Case Fan Power per Unit Length {W/m}
+    75.0,                    !- Standard Case Lighting Power per Unit Length {W/m}
+    ,                        !- Installed Case Lighting Power per Unit Length {W/m}
+    LightingOnSched,         !- Case Lighting Schedule Name
+    0.9,                     !- Fraction of Lighting Energy to Case
+    0.0,                     !- Case Anti-Sweat Heater Power per Unit Length {W/m}
+    ,                        !- Minimum Anti-Sweat Heater Power per Unit Length {W/m}
+    None,                    !- Anti-Sweat Heater Control Type
+    0.0,                     !- Humidity at Zero Anti-Sweat Heater Energy {percent}
+    0.0,                     !- Case Height {m}
+    0.0,                     !- Fraction of Anti-Sweat Heater Energy to Case
+    0.0,                     !- Case Defrost Power per Unit Length {W/m}
+    None,                    !- Case Defrost Type
+    ,                        !- Case Defrost Schedule Name
+    ,                        !- Case Defrost Drip-Down Schedule Name
+    ,                        !- Defrost Energy Correction Curve Type
+    ,                        !- Defrost Energy Correction Curve Name
+    0.0,                     !- Under Case HVAC Return Air Fraction
+    SelfContainedCaseStockingSched;  !- Refrigerated Case Restocking Schedule Name
+
+! Tyler Refrigeration, Model FCF Fixed Curved Glass Gravity Service Case,
+! Date Source: Tyler Spec Sheet, SG01155, Rev. 8/93
+! Capacity - 300 Btuh/Ft x 3.281 ft/m x 0.293 Btuh/W = 288.8 W/m
+! Fan - N/A
+! Lights - 12.6 W/ft x 3.281 ft/m = 41.56 W/m
+! Defrost - Time Clock, off-cycle
+! Anti-Sweat - N/A
+! Suction -  +20 F (-6.67 C)
+! Entering Air -  assumed at +34 F (1.1 C)
+
+  Refrigeration:Case,
+    FishDisplayCase,         !- Name
+    CaseCleanedOnMonday,     !- Availability Schedule Name
+    SalesFloor,              !- Zone Name
+    23.88,                   !- Rated Ambient Temperature {C}
+    55.0,                    !- Rated Ambient Relative Humidity {percent}
+    288.4,                   !- Rated Total Cooling Capacity per Unit Length {W/m}
+    0.1,                     !- Rated Latent Heat Ratio
+    0.85,                    !- Rated Runtime Fraction
+    15.0,                    !- Case Length {m}
+    1.1,                     !- Case Operating Temperature {C}
+    RelativeHumidityMethod,  !- Latent Case Credit Curve Type
+    RHCubic_LatentEnergyMult,!- Latent Case Credit Curve Name
+    0.0,                     !- Standard Case Fan Power per Unit Length {W/m}
+    0.0,                     !- Operating Case Fan Power per Unit Length {W/m}
+    41.56,                   !- Standard Case Lighting Power per Unit Length {W/m}
+    ,                        !- Installed Case Lighting Power per Unit Length {W/m}
+    CaseLightingSched,       !- Case Lighting Schedule Name
+    0.9,                     !- Fraction of Lighting Energy to Case
+    0.0,                     !- Case Anti-Sweat Heater Power per Unit Length {W/m}
+    ,                        !- Minimum Anti-Sweat Heater Power per Unit Length {W/m}
+    None,                    !- Anti-Sweat Heater Control Type
+    0.0,                     !- Humidity at Zero Anti-Sweat Heater Energy {percent}
+    0.0,                     !- Case Height {m}
+    0.2,                     !- Fraction of Anti-Sweat Heater Energy to Case
+    0.0,                     !- Case Defrost Power per Unit Length {W/m}
+    OffCycle,                !- Case Defrost Type
+    CaseDefrostSched,        !- Case Defrost Schedule Name
+    CaseDripDownSched,       !- Case Defrost Drip-Down Schedule Name
+    ,                        !- Defrost Energy Correction Curve Type
+    ,                        !- Defrost Energy Correction Curve Name
+    0.05,                    !- Under Case HVAC Return Air Fraction
+    CaseStockingSched;       !- Refrigerated Case Restocking Schedule Name
+
+! Tyler Refrigeration, Model DM Open Top Display Meat Case,
+! Date Source: Tyler Spec Sheet, SG00524, Rev. 11/93
+! Capacity - 475 Btuh/Ft x 3.281 ft/m x 0.293 Btuh/W = 456.6 W/m
+! Fan - 0.125/ft amps at 115 VAC = 14.375 W/ft x 3.281 ft/m = 47.16 W/m
+! Lights - 0.23/ft amps at 115 VAC max x 3.281 ft/m = 86.8 W/m
+! Defrost - Electric 178.8 W/ft x 3.281 ft/m = 586.8 W/m
+! Anti-Sweat - 0.035 amps/ft at 115 VAC x 3.281 ft/m = 13.2 W/m
+! Suction -  +15 F
+! Entering Air -  +24 F
+
+  Refrigeration:Case,
+    MeatDisplayCase,         !- Name
+    CaseCleanedOnTuesday,    !- Availability Schedule Name
+    SalesFloor,              !- Zone Name
+    23.88,                   !- Rated Ambient Temperature {C}
+    55.0,                    !- Rated Ambient Relative Humidity {percent}
+    456.6,                   !- Rated Total Cooling Capacity per Unit Length {W/m}
+    0.1,                     !- Rated Latent Heat Ratio
+    0.85,                    !- Rated Runtime Fraction
+    26.0,                    !- Case Length {m}
+    -4.4,                    !- Case Operating Temperature {C}
+    CaseTemperatureMethod,   !- Latent Case Credit Curve Type
+    SingleShelfHorizontal_LatentEnergyMult,  !- Latent Case Credit Curve Name
+    47.2,                    !- Standard Case Fan Power per Unit Length {W/m}
+    47.2,                    !- Operating Case Fan Power per Unit Length {W/m}
+    86.8,                    !- Standard Case Lighting Power per Unit Length {W/m}
+    ,                        !- Installed Case Lighting Power per Unit Length {W/m}
+    CaseLightingSched,       !- Case Lighting Schedule Name
+    0.9,                     !- Fraction of Lighting Energy to Case
+    13.2,                    !- Case Anti-Sweat Heater Power per Unit Length {W/m}
+    0.0,                     !- Minimum Anti-Sweat Heater Power per Unit Length {W/m}
+    Linear,                  !- Anti-Sweat Heater Control Type
+    35.0,                    !- Humidity at Zero Anti-Sweat Heater Energy {percent}
+    1.5,                     !- Case Height {m}
+    0.2,                     !- Fraction of Anti-Sweat Heater Energy to Case
+    585.8,                   !- Case Defrost Power per Unit Length {W/m}
+    ElectricWithTemperatureTermination,  !- Case Defrost Type
+    CaseDefrostSched2,       !- Case Defrost Schedule Name
+    CaseDripDownSched2,      !- Case Defrost Drip-Down Schedule Name
+    CaseTemperatureMethod,   !- Defrost Energy Correction Curve Type
+    SingleShelfHorizontal_DefrostEnergyMult,  !- Defrost Energy Correction Curve Name
+    0.05,                    !- Under Case HVAC Return Air Fraction
+    CaseStockingSched;       !- Refrigerated Case Restocking Schedule Name
+
+! Tyler Refrigeration, Model DHS/R Multi-Deck Dairy/Deli Merchandiser,
+! Date Source: Tyler Spec Sheet, SG02053, Rev. 2/93
+! Capacity - 1975 Btuh/Ft x 0.96 = 1890 W/m
+! Fan - 0.2 amps/ft at 120 VAC = 24 W/ft x 3.281 = 78.7 W/m
+! Standard Case has no lights, Canopy lights are field installed, wiring harness for case lights is factory installed
+! Canopy Lights - 0.23 amps/ft at 120 VAC max x 3.283 = 90.6 W/m
+! Case Lights - 0.78 amps at 120 VAC max x 3.283 = 307.3 W/m
+! Defrost - Time Clock, off-cycle
+! Anti-Sweat - NA
+! Suction -  +15 F
+! Entering Air -  +30 F
+
+  Refrigeration:Case,
+    MultiDeckDairyAndDeliCase,  !- Name
+    CaseOperatingSched,      !- Availability Schedule Name
+    SalesFloor,              !- Zone Name
+    23.88,                   !- Rated Ambient Temperature {C}
+    55.0,                    !- Rated Ambient Relative Humidity {percent}
+    1890.0,                  !- Rated Total Cooling Capacity per Unit Length {W/m}
+    0.3,                     !- Rated Latent Heat Ratio
+    0.85,                    !- Rated Runtime Fraction
+    12.0,                    !- Case Length {m}
+    -1.1,                    !- Case Operating Temperature {C}
+    CaseTemperatureMethod,   !- Latent Case Credit Curve Type
+    MultiShelfVertical_LatentEnergyMult,  !- Latent Case Credit Curve Name
+    78.7,                    !- Standard Case Fan Power per Unit Length {W/m}
+    78.7,                    !- Operating Case Fan Power per Unit Length {W/m}
+    307.3,                   !- Standard Case Lighting Power per Unit Length {W/m}
+    ,                        !- Installed Case Lighting Power per Unit Length {W/m}
+    CaseLightingSched,       !- Case Lighting Schedule Name
+    0.77,                    !- Fraction of Lighting Energy to Case
+    0.0,                     !- Case Anti-Sweat Heater Power per Unit Length {W/m}
+    0.0,                     !- Minimum Anti-Sweat Heater Power per Unit Length {W/m}
+    None,                    !- Anti-Sweat Heater Control Type
+    0.0,                     !- Humidity at Zero Anti-Sweat Heater Energy {percent}
+    0.0,                     !- Case Height {m}
+    0.2,                     !- Fraction of Anti-Sweat Heater Energy to Case
+    0.0,                     !- Case Defrost Power per Unit Length {W/m}
+    OffCycle,                !- Case Defrost Type
+    CaseDefrostSched3,       !- Case Defrost Schedule Name
+    CaseDripDownSched3,      !- Case Defrost Drip-Down Schedule Name
+    ,                        !- Defrost Energy Correction Curve Type
+    ,                        !- Defrost Energy Correction Curve Name
+    0.05,                    !- Under Case HVAC Return Air Fraction
+    CaseStockingSched,       !- Refrigerated Case Restocking Schedule Name
+    DairyCaseCreditReductionSched;  !- Case Credit Fraction Schedule Name
+
+! Tyler Refrigeration, Model XDFIS Open Well Ice Cream,
+! Date Source: Tyler Spec Sheet, SG0127, Rev. 10/92
+! Capacity - 460 Btuh/Ft x 0.96 = 441.6 W/m
+! Fan - 8.75 W/ft x 3.281 = 28.7 W/m
+! Standard Case has no lights, Canopy lights are field installed, wiring harness for case lights is factory installed
+! Canopy Lights - 0.108 amps/ft at 120 VAC max x 3.283 = 42.7 W/m
+! Defrost - Time Clock
+! Anti-Sweat - 23.3 W/ft x 3.281 = 76.5 W/m
+! Suction -  -35 F
+! Entering Air -  -25 F
+
+  Refrigeration:Case,
+    OpenWellIceCreamDisplayCase,  !- Name
+    CaseCleanedOnMonday,     !- Availability Schedule Name
+    SalesFloor,              !- Zone Name
+    23.88,                   !- Rated Ambient Temperature {C}
+    55.0,                    !- Rated Ambient Relative Humidity {percent}
+    441.6,                   !- Rated Total Cooling Capacity per Unit Length {W/m}
+    0.08,                    !- Rated Latent Heat Ratio
+    0.85,                    !- Rated Runtime Fraction
+    14.6,                    !- Case Length {m}
+    -34.4,                   !- Case Operating Temperature {C}
+    CaseTemperatureMethod,   !- Latent Case Credit Curve Type
+    SingleShelfHorizontal_LatentEnergyMult,  !- Latent Case Credit Curve Name
+    28.7,                    !- Standard Case Fan Power per Unit Length {W/m}
+    28.7,                    !- Operating Case Fan Power per Unit Length {W/m}
+    42.7,                    !- Standard Case Lighting Power per Unit Length {W/m}
+    ,                        !- Installed Case Lighting Power per Unit Length {W/m}
+    CaseLightingSched,       !- Case Lighting Schedule Name
+    0.9,                     !- Fraction of Lighting Energy to Case
+    70.0,                    !- Case Anti-Sweat Heater Power per Unit Length {W/m}
+    0.0,                     !- Minimum Anti-Sweat Heater Power per Unit Length {W/m}
+    Linear,                  !- Anti-Sweat Heater Control Type
+    35.0,                    !- Humidity at Zero Anti-Sweat Heater Energy {percent}
+    1.5,                     !- Case Height {m}
+    0.2,                     !- Fraction of Anti-Sweat Heater Energy to Case
+    76.5,                    !- Case Defrost Power per Unit Length {W/m}
+    HotGas,                  !- Case Defrost Type
+    CaseDefrostSched,        !- Case Defrost Schedule Name
+    CaseDripDownSched,       !- Case Defrost Drip-Down Schedule Name
+    ,                        !- Defrost Energy Correction Curve Type
+    ,                        !- Defrost Energy Correction Curve Name
+    0.05,                    !- Under Case HVAC Return Air Fraction
+    CaseStockingSched,       !- Refrigerated Case Restocking Schedule Name
+    CaseCreditReductionSched;!- Case Credit Fraction Schedule Name
+
+! Tyler Refrigeration, Model XDFIS Frozen Food Glass Door Merchandiser,
+! Date Source: Tyler Spec Sheet, SG02056, Rev. 12/93
+! Capacity - 1638 Btuh/Door w/15 doors @ 38.3 ft
+! Capacity - 641.5 Bthh/Ft x 0.96 = 615.8 W/m
+! Fan - 225 W/5 door (12.75 ft) = 17.65 W/ft = 57.9 W/m
+! Lights - 388 W/5 door (12.75 ft) = 30.4 W/ft = 99.8 W/m
+! Defrost - Electric
+! Defrost Power - 4300 W/5 door (12.75 ft) = 337.3 W/ft = 1106.5 W/m
+! Anti-sweat heater control uses the theoretical heat balance method for illustrative purposes
+! Anti-Sweat - 850 W/5 door (12.75 ft) = 66.67 W/ft = 218.7 W/m
+! Suction -  -16 F
+! Entering Air -  -5 F
+
+  Refrigeration:Case,
+    GlassDoorFrozenFood,     !- Name
+    CaseOperatingSched,      !- Availability Schedule Name
+    SalesFloor,              !- Zone Name
+    23.88,                   !- Rated Ambient Temperature {C}
+    55.0,                    !- Rated Ambient Relative Humidity {percent}
+    615.8,                   !- Rated Total Cooling Capacity per Unit Length {W/m}
+    0.13,                    !- Rated Latent Heat Ratio
+    0.85,                    !- Rated Runtime Fraction
+    11.7,                    !- Case Length {m}
+    -23.3,                   !- Case Operating Temperature {C}
+    CaseTemperatureMethod,   !- Latent Case Credit Curve Type
+    SingleShelfHorizontal_LatentEnergyMult,  !- Latent Case Credit Curve Name
+    57.9,                    !- Standard Case Fan Power per Unit Length {W/m}
+    57.9,                    !- Operating Case Fan Power per Unit Length {W/m}
+    99.8,                    !- Standard Case Lighting Power per Unit Length {W/m}
+    ,                        !- Installed Case Lighting Power per Unit Length {W/m}
+    CaseLightingSched,       !- Case Lighting Schedule Name
+    1.0,                     !- Fraction of Lighting Energy to Case
+    218.7,                   !- Case Anti-Sweat Heater Power per Unit Length {W/m}
+    0.0,                     !- Minimum Anti-Sweat Heater Power per Unit Length {W/m}
+    HeatBalanceMethod,       !- Anti-Sweat Heater Control Type
+    1.5,                     !- Humidity at Zero Anti-Sweat Heater Energy {percent}
+    1.5,                     !- Case Height {m}
+    0.2,                     !- Fraction of Anti-Sweat Heater Energy to Case
+    1106.5,                  !- Case Defrost Power per Unit Length {W/m}
+    HotGasWithTemperatureTermination,  !- Case Defrost Type
+    CaseDefrostSched2,       !- Case Defrost Schedule Name
+    CaseDripDownSched2,      !- Case Defrost Drip-Down Schedule Name
+    CaseTemperatureMethod,   !- Defrost Energy Correction Curve Type
+    SingleShelfHorizontal_DefrostEnergyMult,  !- Defrost Energy Correction Curve Name
+    0.1,                     !- Under Case HVAC Return Air Fraction
+    CaseStockingSched,       !- Refrigerated Case Restocking Schedule Name
+    CaseCreditReductionSched;!- Case Credit Fraction Schedule Name
+
+! Tyler Refrigeration, Model LA-E Walk-in Meat Cooler,
+! Data Source: Tyler Spec Sheet, SG01092, Rev. 8/93
+! walk-in meat cooler dimensions at 10' x 14' x 9' high (4.27 m length)
+! 12100 Btu/h requirements with 3.5-in. foam insulation (R24.1)
+! 12100 Btuh/14 ft = 831 W/m
+! Tyler Refrigeration, Model PFE-160M High Performance Unit Cooler
+! Unit Cooler Performance: 16,000 Btuh @ 25 F suction temperature
+!  16,000 Btu/h/ 14 ft = 1098. W/m
+!  (manufacturer recommends size to run 18 h out of 24 h, giving RTF of 0.75)
+! Fan - 7.1 amps @ 115 VAC x 0.9 power factor = 734.9 W / 14 ft = 52.5 W/ft = 172.2 W/m
+! Lights - 2 ea. 60 W bulbs = 120 W/14 ft = 8.57 W/ft = 28.1 W/m
+! Defrost - electric type assumed to be 5512 W = 393.7 W/ft = 1291.7 W/m
+! Anti-sweat heater control type none
+! Suction: 20 F (-6.67 C)
+! Cooler Temp: 28 F (-2.22 C)
+
+  Refrigeration:Case,
+    WalkInFreezer,           !- Name
+    CaseOperatingSched,      !- Availability Schedule Name
+    BackRoom,                !- Zone Name
+    23.88,                   !- Rated Ambient Temperature {C}
+    55.0,                    !- Rated Ambient Relative Humidity {percent}
+    1098.,                   !- Rated Total Cooling Capacity per Unit Length {W/m}
+    0.1,                     !- Rated Latent Heat Ratio
+    0.75,                    !- Rated Runtime Fraction
+    4.27,                    !- Case Length {m}
+    -2.22,                   !- Case Operating Temperature {C}
+    CaseTemperatureMethod,   !- Latent Case Credit Curve Type
+    SingleShelfHorizontal_LatentEnergyMult,  !- Latent Case Credit Curve Name
+    172.2,                   !- Standard Case Fan Power per Unit Length {W/m}
+    172.2,                   !- Operating Case Fan Power per Unit Length {W/m}
+    28.1,                    !- Standard Case Lighting Power per Unit Length {W/m}
+    ,                        !- Installed Case Lighting Power per Unit Length {W/m}
+    CaseLightingSched2,      !- Case Lighting Schedule Name
+    1.0,                     !- Fraction of Lighting Energy to Case
+    0.0,                     !- Case Anti-Sweat Heater Power per Unit Length {W/m}
+    0.0,                     !- Minimum Anti-Sweat Heater Power per Unit Length {W/m}
+    None,                    !- Anti-Sweat Heater Control Type
+    0.0,                     !- Humidity at Zero Anti-Sweat Heater Energy {percent}
+    0.0,                     !- Case Height {m}
+    0.0,                     !- Fraction of Anti-Sweat Heater Energy to Case
+    1291.7,                  !- Case Defrost Power per Unit Length {W/m}
+    Electric,                !- Case Defrost Type
+    CaseDefrostSched3,       !- Case Defrost Schedule Name
+    CaseDripDownSched3,      !- Case Defrost Drip-Down Schedule Name
+    ,                        !- Defrost Energy Correction Curve Type
+    ,                        !- Defrost Energy Correction Curve Name
+    0.0,                     !- Under Case HVAC Return Air Fraction
+    WalkInStockingSched,     !- Refrigerated Case Restocking Schedule Name
+    CaseCreditReductionSched2;  !- Case Credit Fraction Schedule Name
+
+!-   ===========  ALL OBJECTS IN CLASS: REFRIGERATION:COMPRESSORRACK ===========
+! Refrigerated Case and Compressor Rack Inputs:
+! Order of Compressor Rack and Refrigerated Case objects does not matter
+! A minimum of 8 fields are required for Compressor Racks
+! A minimum of 27 fields are required for Refrigerated Cases
+
+  Refrigeration:CompressorRack,
+    SelfContainedDisplay,    !- Name
+    Zone,                    !- Heat Rejection Location
+    4.0,                     !- Design Compressor Rack COP {W/W}
+    RackCOPfTCurve2,         !- Compressor Rack COP Function of Temperature Curve Name
+    175.0,                   !- Design Condenser Fan Power {W}
+    ,                        !- Condenser Fan Power Function of Temperature Curve Name
+    AirCooled,               !- Condenser Type
+    ,                        !- Water-Cooled Condenser Inlet Node Name
+    ,                        !- Water-Cooled Condenser Outlet Node Name
+    ,                        !- Water-Cooled Loop Flow Type
+    ,                        !- Water-Cooled Condenser Outlet Temperature Schedule Name
+    ,                        !- Water-Cooled Condenser Design Flow Rate {m3/s}
+    ,                        !- Water-Cooled Condenser Maximum Flow Rate {m3/s}
+    ,                        !- Water-Cooled Condenser Maximum Water Outlet Temperature {C}
+    ,                        !- Water-Cooled Condenser Minimum Water Inlet Temperature {C}
+    ,                        !- Evaporative Condenser Availability Schedule Name
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Design Evaporative Condenser Water Pump Power {W}
+    ,                        !- Evaporative Water Supply Tank Name
+    ,                        !- Condenser Air Inlet Node Name
+    ,                        !- End-Use Subcategory
+    SelfContainedDisplayCase;!- Refrigeration Case Name or WalkIn Name or CaseAndWalkInList Name
+
+  Refrigeration:CompressorRack,
+    MediumTempRack,          !- Name
+    Outdoors,                !- Heat Rejection Location
+    1.7,                     !- Design Compressor Rack COP {W/W}
+    RackCOPfTCurve,          !- Compressor Rack COP Function of Temperature Curve Name
+    1025.0,                  !- Design Condenser Fan Power {W}
+    RackCondFanCurve,        !- Condenser Fan Power Function of Temperature Curve Name
+    AirCooled,               !- Condenser Type
+    ,                        !- Water-Cooled Condenser Inlet Node Name
+    ,                        !- Water-Cooled Condenser Outlet Node Name
+    ,                        !- Water-Cooled Loop Flow Type
+    ,                        !- Water-Cooled Condenser Outlet Temperature Schedule Name
+    ,                        !- Water-Cooled Condenser Design Flow Rate {m3/s}
+    ,                        !- Water-Cooled Condenser Maximum Flow Rate {m3/s}
+    ,                        !- Water-Cooled Condenser Maximum Water Outlet Temperature {C}
+    ,                        !- Water-Cooled Condenser Minimum Water Inlet Temperature {C}
+    ,                        !- Evaporative Condenser Availability Schedule Name
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Design Evaporative Condenser Water Pump Power {W}
+    ,                        !- Evaporative Water Supply Tank Name
+    COMPRESSOR RACK:REFRIGERATED CASE MediumTempRack CondenserNode,  !- Condenser Air Inlet Node Name
+    ,                        !- End-Use Subcategory
+    MedTempCaseList;         !- Refrigeration Case Name or WalkIn Name or CaseAndWalkInList Name
+
+  Refrigeration:CompressorRack,
+    LowTempRack,             !- Name
+    Outdoors,                !- Heat Rejection Location
+    1.5,                     !- Design Compressor Rack COP {W/W}
+    RackCOPfTCurve,          !- Compressor Rack COP Function of Temperature Curve Name
+    1025.0,                  !- Design Condenser Fan Power {W}
+    RackCondFanCurve2,       !- Condenser Fan Power Function of Temperature Curve Name
+    AirCooled,               !- Condenser Type
+    ,                        !- Water-Cooled Condenser Inlet Node Name
+    ,                        !- Water-Cooled Condenser Outlet Node Name
+    ,                        !- Water-Cooled Loop Flow Type
+    ,                        !- Water-Cooled Condenser Outlet Temperature Schedule Name
+    ,                        !- Water-Cooled Condenser Design Flow Rate {m3/s}
+    ,                        !- Water-Cooled Condenser Maximum Flow Rate {m3/s}
+    ,                        !- Water-Cooled Condenser Maximum Water Outlet Temperature {C}
+    ,                        !- Water-Cooled Condenser Minimum Water Inlet Temperature {C}
+    ,                        !- Evaporative Condenser Availability Schedule Name
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Design Evaporative Condenser Water Pump Power {W}
+    ,                        !- Evaporative Water Supply Tank Name
+    COMPRESSOR RACK:REFRIGERATED CASE LowTempRack CondenserNode,  !- Condenser Air Inlet Node Name
+    ,                        !- End-Use Subcategory
+    LowTempCaseList;         !- Refrigeration Case Name or WalkIn Name or CaseAndWalkInList Name
+
+!-   ===========  ALL OBJECTS IN CLASS: REFRIGERATION:CASELIST ===========
+
+  Refrigeration:CaseAndWalkInList,
+    MedTempCaseList,         !- Name
+    FishDisplayCase,         !- Case or WalkIn 1 Name
+    MeatDisplayCase,         !- Case or WalkIn 2 Name
+    MultiDeckDairyAndDeliCase;  !- Case or WalkIn 3 Name
+
+  Refrigeration:CaseAndWalkInList,
+    LowTempCaseList,         !- Name
+    OpenWellIceCreamDisplayCase,  !- Case or WalkIn 1 Name
+    GlassDoorFrozenFood,     !- Case or WalkIn 2 Name
+    WalkInFreezer;           !- Case or WalkIn 3 Name
+
+!-   ===========  ALL OBJECTS IN CLASS: CURVE:QUADRATIC ===========
+
+  Curve:Quadratic,
+    WindACCoolCapFFF,        !- Name
+    0.8,                     !- Coefficient1 Constant
+    0.2,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.5,                     !- Minimum Value of x
+    1.5;                     !- Maximum Value of x
+
+  Curve:Quadratic,
+    WindACEIRFFF,            !- Name
+    1.1552,                  !- Coefficient1 Constant
+    -0.1808,                 !- Coefficient2 x
+    0.0256,                  !- Coefficient3 x**2
+    0.5,                     !- Minimum Value of x
+    1.5;                     !- Maximum Value of x
+
+  Curve:Quadratic,
+    WindACPLFFPLR,           !- Name
+    0.85,                    !- Coefficient1 Constant
+    0.15,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    1.0;                     !- Maximum Value of x
+
+! two speed condenser fan power curve object
+! 1st stage condenser fan always ON
+! 2nd stage condenser fan cycles bewteen 10 C and 35 C
+! 2nd stage condenser fan on above 35 C
+
+  Curve:Quadratic,
+    RackCondFanCurve,        !- Name
+    0.3,                     !- Coefficient1 Constant
+    0.02,                    !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    10.0,                    !- Minimum Value of x
+    35.0;                    !- Maximum Value of x
+
+! variable condenser fan power curve object
+! condenser fan off at 0 C, condenser fan at full power at 35 C
+
+  Curve:Quadratic,
+    RackCondFanCurve2,       !- Name
+    0.0,                     !- Coefficient1 Constant
+    0.02857,                 !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    35.0;                    !- Maximum Value of x
+
+! compressor COP as a function of Outdoor Temperature curve object
+! used for outdoor condenser section
+
+  Curve:Quadratic,
+    RackCOPfTCurve,          !- Name
+    1.7603,                  !- Coefficient1 Constant
+    -0.0377,                 !- Coefficient2 x
+    0.0004,                  !- Coefficient3 x**2
+    10.0,                    !- Minimum Value of x
+    35.0,                    !- Maximum Value of x
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+! compressor COP as a function of Indoor Temperature curve object
+! used for stand alone display cases
+
+  Curve:Quadratic,
+    RackCOPfTCurve2,         !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Minimum Value of x
+    50.0,                    !- Maximum Value of x
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Dimensionless;           !- Output Unit Type
+
+!-   ===========  ALL OBJECTS IN CLASS: CURVE:CUBIC ===========
+
+  Curve:Cubic,
+    RHCubic_LatentEnergyMult,!- Name
+    -0.4641,                 !- Coefficient1 Constant
+    0.0268,                  !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Coefficient4 x**3
+    17.32,                   !- Minimum Value of x
+    80.0;                    !- Maximum Value of x
+
+  Curve:Cubic,
+    RHCubic_DefrostEnergyMult,  !- Name
+    -0.5796,                 !- Coefficient1 Constant
+    0.0288,                  !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Coefficient4 x**3
+    20.13,                   !- Minimum Value of x
+    80.0;                    !- Maximum Value of x
+
+  Curve:Cubic,
+    ConstantMult,            !- Name
+    0.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Coefficient4 x**3
+    -35.0,                   !- Minimum Value of x
+    20.0;                    !- Maximum Value of x
+
+  Curve:Cubic,
+    MultiShelfVertical_LatentEnergyMult,  !- Name
+    0.026526281,             !- Coefficient1 Constant
+    0.001078032,             !- Coefficient2 x
+    -0.0000602558,           !- Coefficient3 x**2
+    0.00000123732,           !- Coefficient4 x**3
+    -35.0,                   !- Minimum Value of x
+    20.0;                    !- Maximum Value of x
+
+  Curve:Cubic,
+    MultiShelfVertical_DefrostEnergyMult,  !- Name
+    0.024597538,             !- Coefficient1 Constant
+    0.000764389,             !- Coefficient2 x
+    -0.0000386374,           !- Coefficient3 x**2
+    0.00000074568,           !- Coefficient4 x**3
+    -35.0,                   !- Minimum Value of x
+    20.0;                    !- Maximum Value of x
+
+  Curve:Cubic,
+    SingleShelfHorizontal_LatentEnergyMult,  !- Name
+    0.020375634,             !- Coefficient1 Constant
+    0.000243779,             !- Coefficient2 x
+    0.0000114001,            !- Coefficient3 x**2
+    0.000000181142,          !- Coefficient4 x**3
+    -35.0,                   !- Minimum Value of x
+    20.0;                    !- Maximum Value of x
+
+  Curve:Cubic,
+    SingleShelfHorizontal_DefrostEnergyMult,  !- Name
+    0.023632177,             !- Coefficient1 Constant
+    0.0006232,               !- Coefficient2 x
+    0.0000283282,            !- Coefficient3 x**2
+    0.000000440351,          !- Coefficient4 x**3
+    -35.0,                   !- Minimum Value of x
+    20.0;                    !- Maximum Value of x
+
+!-   ===========  ALL OBJECTS IN CLASS: CURVE:BIQUADRATIC ===========
+
+  Curve:Biquadratic,
+    WindACCoolCapFT,         !- Name
+    0.942587793,             !- Coefficient1 Constant
+    0.009543347,             !- Coefficient2 x
+    0.000683770,             !- Coefficient3 x**2
+    -0.011042676,            !- Coefficient4 y
+    0.000005249,             !- Coefficient5 y**2
+    -0.000009720,            !- Coefficient6 x*y
+    12.77778,                !- Minimum Value of x
+    23.88889,                !- Maximum Value of x
+    18.0,                    !- Minimum Value of y
+    46.11111,                !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    WindACEIRFT,             !- Name
+    0.342414409,             !- Coefficient1 Constant
+    0.034885008,             !- Coefficient2 x
+    -0.000623700,            !- Coefficient3 x**2
+    0.004977216,             !- Coefficient4 y
+    0.000437951,             !- Coefficient5 y**2
+    -0.000728028,            !- Coefficient6 x*y
+    12.77778,                !- Minimum Value of x
+    23.88889,                !- Maximum Value of x
+    18.0,                    !- Minimum Value of y
+    46.11111,                !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+!-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLEDICTIONARY ===========
+
+  Output:VariableDictionary,Regular;
+
+!-   ===========  ALL OBJECTS IN CLASS: OUTPUT:SURFACES:LIST ===========
+
+  Output:Surfaces:List,detailswithvertices;
+
+!-   ===========  ALL OBJECTS IN CLASS: OUTPUT:SURFACES:DRAWING ===========
+
+  Output:Surfaces:Drawing,DXF;
+
+!-   ===========  ALL OBJECTS IN CLASS: OUTPUT:SCHEDULES ===========
+
+  Output:Schedules,timestep;
+
+!-   ===========  ALL OBJECTS IN CLASS: OUTPUT:CONSTRUCTIONS ===========
+
+  Output:Constructions,Constructions;
+
+!-   ===========  ALL OBJECTS IN CLASS: OUTPUT:TABLE:SUMMARYREPORTS ===========
+
+  Output:Table:SummaryReports,
+    AllSummary;              !- Report 1 Name
+
+!-   ===========  ALL OBJECTS IN CLASS: OUTPUT:TABLE:MONTHLY ===========
+
+  Output:Table:Monthly,
+    Building Loads - Cooling,!- Name
+    2,                       !- Digits After Decimal
+    Zone Air System Sensible Cooling Energy,  !- Variable or Meter 1 Name
+    SumOrAverage,            !- Aggregation Type for Variable or Meter 1
+    Zone Air System Sensible Cooling Rate,  !- Variable or Meter 2 Name
+    Maximum,                 !- Aggregation Type for Variable or Meter 2
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 3 Name
+    ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 3
+    Site Outdoor Air Wetbulb Temperature,  !- Variable or Meter 4 Name
+    ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 4
+    Zone Total Internal Latent Gain Energy,  !- Variable or Meter 5 Name
+    SumOrAverage,            !- Aggregation Type for Variable or Meter 5
+    Zone Total Internal Latent Gain Energy,  !- Variable or Meter 6 Name
+    Maximum,                 !- Aggregation Type for Variable or Meter 6
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 7 Name
+    ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 7
+    Site Outdoor Air Wetbulb Temperature,  !- Variable or Meter 8 Name
+    ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 8
+
+  Output:Table:Monthly,
+    Building Loads - Heating,!- Name
+    2,                       !- Digits After Decimal
+    Zone Air System Sensible Heating Energy,  !- Variable or Meter 1 Name
+    SumOrAverage,            !- Aggregation Type for Variable or Meter 1
+    Zone Air System Sensible Heating Rate,  !- Variable or Meter 2 Name
+    Maximum,                 !- Aggregation Type for Variable or Meter 2
+    Site Outdoor Air Drybulb Temperature,  !- Variable or Meter 3 Name
+    ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 3
+
+!-   ===========  ALL OBJECTS IN CLASS: OUTPUTCONTROL:TABLE:STYLE ===========
+
+  OutputControl:Table:Style,
+    HTML;                    !- Column Separator
+
+!-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLE ===========
+
+  Output:Variable,Outside Air Inlet Node,System Node Mass Flow Rate,timestep;
+
+  Output:Variable,Outside Air Inlet Node,System Node Temperature,timestep;
+
+  Output:Variable,Relief Air Outlet Node,System Node Mass Flow Rate,timestep;
+
+  Output:Variable,Relief Air Outlet Node,System Node Temperature,timestep;
+
+  Output:Variable,Outdoor Air Mixer Inlet Node,System Node Mass Flow Rate,timestep;
+
+  Output:Variable,Outdoor Air Mixer Inlet Node,System Node Temperature,timestep;
+
+  Output:Variable,Mixed Air Node,System Node Mass Flow Rate,timestep;
+
+  Output:Variable,Mixed Air Node,System Node Temperature,timestep;
+
+  Output:Variable,Heating Coil Air Inlet Node,System Node Temperature,timestep;
+
+  Output:Variable,DX Cooling Coil Air Inlet Node,System Node Temperature,timestep;
+
+  Output:Variable,Air Loop Outlet Node,System Node Temperature,timestep;
+
+  Output:Variable,*,Unitary System Compressor Part Load Ratio,timestep;
+
+  Output:Variable,*,Zone Air System Sensible Heating Energy,timestep;
+
+  Output:Variable,*,Zone Air System Sensible Cooling Energy,timestep;
+
+  Output:Variable,*,Zone Air Temperature,timestep;
+
+  Output:Variable,*,Zone Air Relative Humidity,timestep;
+
+  Output:Variable,*,Zone Air Humidity Ratio,timestep;
+
+  Output:Variable,*,Zone Predicted Moisture Load Moisture Transfer Rate,timestep;
+
+  Output:Variable,*,Cooling Coil Electric Energy,timestep;
+
+  Output:Variable,*,Heating Coil Air Heating Rate,timestep;
+
+  Output:Variable,*,Heating Coil Runtime Fraction,timestep;
+
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
+
+  Output:Variable,*,Site Outdoor Air Humidity Ratio,timestep;
+
+  Output:Variable,*,Refrigeration Case Evaporator Total Cooling Rate,timestep;
+
+  Output:Variable,*,Refrigeration Case Evaporator Sensible Cooling Rate,timestep;
+
+  Output:Variable,*,Refrigeration Case Evaporator Latent Cooling Rate,timestep;
+
+  Output:Variable,*,Refrigeration Case Zone Sensible Cooling Rate,timestep;
+
+  Output:Variable,*,Refrigeration Case Zone Sensible Heating Rate,timestep;
+
+  Output:Variable,*,Refrigeration Case Zone Latent Rate,timestep;
+
+  Output:Variable,*,Refrigeration Case Return Air Sensible Cooling Rate,timestep;
+
+  Output:Variable,*,Refrigeration Case Return Air Sensible Heating Rate,timestep;
+
+  Output:Variable,*,Refrigeration Case Return Air Latent Rate,timestep;
+
+  Output:Variable,*,Refrigeration Case Evaporator Fan Electric Power,timestep;
+
+  Output:Variable,*,Refrigeration Case Anti Sweat Electric Power,timestep;
+
+  Output:Variable,*,Refrigeration Case Lighting Electric Power,timestep;
+
+  Output:Variable,*,Refrigeration Case Defrost Electric Power,timestep;
+
+  Output:Variable,*,Refrigeration Case Defrost Energy Correction Curve Value,timestep;
+
+  Output:Variable,*,Refrigeration Case Latent Credit Curve Value,timestep;
+
+  Output:Variable,*,Refrigeration Compressor Rack Electric Power,timestep;
+
+  Output:Variable,*,Refrigeration Compressor Rack Total Heat Transfer Rate,timestep;
+
+  Output:Variable,*,Refrigeration Compressor Rack COP,timestep;
+
+  Output:Variable,*,Zone Lights Electric Energy,timestep;
+
+  Output:Variable,*,Zone Electric Equipment Electric Energy,timestep;
+
+  Output:Variable,*,Fan Electric Energy,timestep;
+
+  Output:Variable,SALESFLOOR OUTLET NODE,System Node Temperature,timestep;
+
+  Output:Variable,SALESFLOOR OUTLET NODE,System Node Humidity Ratio,timestep;
+
+  Output:Variable,BackRoom OUTLET NODE,System Node Temperature,timestep;
+
+  Output:Variable,BackRoom OUTLET NODE,System Node Humidity Ratio,timestep;
+
+  Output:Variable,SalesFloor Inlet Node,System Node Temperature,timestep;
+
+  Output:Variable,SalesFloor Inlet Node,System Node Mass Flow Rate,timestep;
+
+  Output:Variable,BackRoom Inlet Node,System Node Temperature,timestep;
+
+  Output:Variable,BackRoom Inlet Node,System Node Mass Flow Rate,timestep;
+
+!-   ===========  ALL OBJECTS IN CLASS: OUTPUT:METER:METERFILEONLY ===========
+
+  Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
+
+  Output:Meter:MeterFileOnly,Electricity:Building,monthly;
+
+  Output:Meter:MeterFileOnly,InteriorLights:Electricity,monthly;
+
+  Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
+
+  Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
+
+  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+
+  Output:Meter:MeterFileOnly,Refrigeration:Electricity,monthly;
+
+  Output:Meter:MeterFileOnly,InteriorLights:Electricity,runperiod;
+
+  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+
+  output:diagnostics,
+    displayallwarnings;      !- Key 1
+
+  Output:SQLite,
+    Simple;
+	
+  FaultModel:HumidistatOffset, 
+    Humi_Offset_SalesFloor, !- Name
+    SalesFloor Humidistat,  !- Humidistat Name
+    ThermostatOffsetIndependent, !- Humidistat Offset Type
+    ,                       !- Availability Schedule Name
+    ,                       !- Severity Schedule Name
+    5,                      !- Reference Humidistat Offset{percent}
+    ;                       !- Related Thermostat Offset Fault Name
+

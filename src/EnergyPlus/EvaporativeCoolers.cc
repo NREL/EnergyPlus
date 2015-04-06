@@ -9,6 +9,7 @@
 // EnergyPlus Headers
 #include <EvaporativeCoolers.hh>
 #include <BranchNodeConnections.hh>
+#include <CurveManager.hh>
 #include <DataAirSystems.hh>
 #include <DataContaminantBalance.hh>
 #include <DataEnvironment.hh>
@@ -104,6 +105,14 @@ namespace EvaporativeCoolers {
 	int NumZoneEvapUnits( 0 );
 	Array1D_bool CheckZoneEvapUnitName;
 	bool GetInputZoneEvapUnit( true );
+
+	// Indirect Evaporative Coolers Research Special Operating Modes
+	int const None( 0 ); // the indirect evaporative cooler Research Special is scheduled off or turned off
+	int const DryModulated( 1 ); // the indirect evaporative cooler Research Special is modulated in Dry Mode
+	int const DryFull( 2 ); // the indirect evaporative cooler Research Special is run in full capacity in Dry Mode
+	int const DryWetModulated( 3 ); // the indirect evaporative cooler Research Special is modulated in Dry Mode or wet Mode
+	int const WetModulated( 4 ); // the indirect evaporative cooler Research Special is modulated in wet Mode
+	int const WetFull( 5 ); // the indirect evaporative cooler Research Special is run in full capacity in Wet Mode
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE EvapCoolers
 
@@ -249,7 +258,8 @@ namespace EvaporativeCoolers {
 		using BranchNodeConnections::TestCompSet;
 		using WaterManager::SetupTankDemandComponent;
 		using OutAirNodeManager::CheckOutAirNodeNumber;
-
+		using DataSizing::AutoSize;
+		using CurveManager::GetCurveIndex;
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
@@ -524,27 +534,30 @@ namespace EvaporativeCoolers {
 				}
 			}
 
-			EvapCond( EvapCoolNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			EvapCond( EvapCoolNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
-			EvapCond( EvapCoolNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			EvapCond( EvapCoolNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Evap Air Nodes" );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 7 ), cAlphaArgs( 8 ), "Evap Air Nodes" );
 
-			EvapCond( EvapCoolNum ).EvapControlType = cAlphaArgs( 5 );
-
-			// A6 ; \field Secondary Air Inlet Node Name
-			if ( lAlphaFieldBlanks( 6 ) ) {
+			if ( lAlphaFieldBlanks( 9 ) ) {
 				EvapCond( EvapCoolNum ).SecondaryInletNode = 0;
 			} else {
-				EvapCond( EvapCoolNum ).SecondaryInletNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
+				EvapCond( EvapCoolNum ).SecondaryInletNode = GetOnlySingleNode( cAlphaArgs( 9 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent );
 			}
 
-			EvapCond( EvapCoolNum ).EvapControlNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+			if ( lAlphaFieldBlanks( 10 ) ) {
+				EvapCond( EvapCoolNum ).SecondaryOutletNode = 0;
+			} else {
+				EvapCond( EvapCoolNum ).SecondaryOutletNode = GetOnlySingleNode( cAlphaArgs( 10 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
+			}
 
-			EvapCond( EvapCoolNum ).TertiaryInletNode = GetOnlySingleNode( cAlphaArgs( 8 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
+			EvapCond( EvapCoolNum ).EvapControlNodeNum = GetOnlySingleNode( cAlphaArgs( 11 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 
-			EvapCond( EvapCoolNum ).EvapWaterSupplyName = cAlphaArgs( 9 );
-			if ( lAlphaFieldBlanks( 9 ) ) {
+			EvapCond( EvapCoolNum ).TertiaryInletNode = GetOnlySingleNode( cAlphaArgs( 12 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
+
+			EvapCond( EvapCoolNum ).EvapWaterSupplyName = cAlphaArgs( 13 );
+			if ( lAlphaFieldBlanks( 13 ) ) {
 				EvapCond( EvapCoolNum ).EvapWaterSupplyMode = WaterSupplyFromMains;
 			} else {
 				EvapCond( EvapCoolNum ).EvapWaterSupplyMode = WaterSupplyFromTank;
@@ -554,28 +567,52 @@ namespace EvaporativeCoolers {
 
 			//input the numerical data
 			EvapCond( EvapCoolNum ).WetCoilMaxEfficiency = rNumericArgs( 1 );
-			EvapCond( EvapCoolNum ).WetCoilFlowRatio = rNumericArgs( 2 );
+			if ( lNumericFieldBlanks( 2 ) ) {
+				EvapCond( EvapCoolNum ).DryCoilMaxEfficiency = 0.0;
+			} else {
+				EvapCond( EvapCoolNum ).DryCoilMaxEfficiency = rNumericArgs( 2 );
+			}
 			EvapCond( EvapCoolNum ).IndirectRecircPumpPower = rNumericArgs( 3 );
-			EvapCond( EvapCoolNum ).IndirectVolFlowRate = rNumericArgs( 4 );
-			EvapCond( EvapCoolNum ).IndirectFanEff = rNumericArgs( 5 );
-			EvapCond( EvapCoolNum ).IndirectFanDeltaPress = rNumericArgs( 6 );
-			EvapCond( EvapCoolNum ).DPBoundFactor = rNumericArgs( 7 );
-			if ( lNumericFieldBlanks( 8 ) ) {
+			EvapCond( EvapCoolNum ).RecircPumpSizingFactor = rNumericArgs( 4 );
+			EvapCond( EvapCoolNum ).IndirectVolFlowRate = rNumericArgs( 5 );
+			EvapCond( EvapCoolNum ).IndirectVolFlowScalingFactor = rNumericArgs( 6 );
+			EvapCond( EvapCoolNum ).IndirectFanPower = rNumericArgs( 7 );
+			EvapCond( EvapCoolNum ).FanSizingSpecificPower = rNumericArgs( 8 );
+			EvapCond( EvapCoolNum ).VolFlowRate = rNumericArgs( 9 );
+			EvapCond( EvapCoolNum ).DPBoundFactor = rNumericArgs( 10 );
+			if ( lNumericFieldBlanks( 11 ) ) {
 				EvapCond( EvapCoolNum ).DriftFraction = 0.0;
 			} else {
-				EvapCond( EvapCoolNum ).DriftFraction = rNumericArgs( 8 );
+				EvapCond( EvapCoolNum ).DriftFraction = rNumericArgs( 11 );
 			}
-
-			if ( lNumericFieldBlanks( 9 ) ) {
+			if ( lNumericFieldBlanks( 12 ) ) {
 				EvapCond( EvapCoolNum ).BlowDownRatio = 0.0;
 			} else {
-				EvapCond( EvapCoolNum ).BlowDownRatio = rNumericArgs( 9 );
+				EvapCond( EvapCoolNum ).BlowDownRatio = rNumericArgs( 12 );
 			}
+			if ( lNumericFieldBlanks( 2 ) || lNumericFieldBlanks( 13 ) || lNumericFieldBlanks( 14 ) || lNumericFieldBlanks( 15 ) ) {
+				EvapCond( EvapCoolNum ).EvapCoolerOperationControlFlag = false;
+			} else {
+				if ( !lNumericFieldBlanks( 2 ) && !lNumericFieldBlanks( 13 ) && !lNumericFieldBlanks( 14 ) && !lNumericFieldBlanks( 15 ) ) {
+					EvapCond( EvapCoolNum ).EvapCoolerOperationControlFlag = true;
+					EvapCond( EvapCoolNum ).MinOATDBEvapCooler = rNumericArgs( 13 );
+					EvapCond( EvapCoolNum ).MaxOATWBEvapCooler = rNumericArgs( 14 );
+					EvapCond( EvapCoolNum ).MaxOATDBEvapCooler = rNumericArgs( 15 );
+				} else {
+					EvapCond( EvapCoolNum ).EvapCoolerOperationControlFlag = false;
+				}
+			}
+			EvapCond( EvapCoolNum ).WetbulbEffecCurveIndex = GetCurveIndex( cAlphaArgs( 3 ) );
+			EvapCond( EvapCoolNum ).DrybulbEffecCurveIndex = GetCurveIndex( cAlphaArgs( 4 ) );
+			EvapCond( EvapCoolNum ).PumpPowerModifierCurveIndex = GetCurveIndex( cAlphaArgs( 5 ) );
+			EvapCond( EvapCoolNum ).FanPowerModifierCurveIndex = GetCurveIndex( cAlphaArgs( 6 ) );
 
 			SetupOutputVariable( "Evaporative Cooler Total Stage Effectiveness []", EvapCond( EvapCoolNum ).StageEff, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
 			SetupOutputVariable( "Evaporative Cooler Part Load Ratio []", EvapCond( EvapCoolNum ).PartLoadFract, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
 
 			SetupOutputVariable( "Evaporative Cooler Dewpoint Bound Status []", EvapCond( EvapCoolNum ).DewPointBoundFlag, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
+			SetupOutputVariable( "Evaporative Cooler Operating Mode Status []", EvapCond( EvapCoolNum ).IECOperatingStatus, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
+
 
 		} // end of Indirect Research Special cooler input loop
 
@@ -605,17 +642,17 @@ namespace EvaporativeCoolers {
 				}
 			}
 
-			EvapCond( EvapCoolNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 3 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			EvapCond( EvapCoolNum ).InletNode = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
-			EvapCond( EvapCoolNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			EvapCond( EvapCoolNum ).OutletNode = GetOnlySingleNode( cAlphaArgs( 6 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 
-			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Evap Air Nodes" );
+			TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 5 ), cAlphaArgs( 6 ), "Evap Air Nodes" );
 
-			EvapCond( EvapCoolNum ).EvapControlNodeNum = GetOnlySingleNode( cAlphaArgs( 5 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+			EvapCond( EvapCoolNum ).EvapControlNodeNum = GetOnlySingleNode( cAlphaArgs( 7 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 
-			EvapCond( EvapCoolNum ).EvapWaterSupplyName = cAlphaArgs( 6 );
+			EvapCond( EvapCoolNum ).EvapWaterSupplyName = cAlphaArgs( 8 );
 
-			if ( lAlphaFieldBlanks( 6 ) ) {
+			if ( lAlphaFieldBlanks( 8 ) ) {
 				EvapCond( EvapCoolNum ).EvapWaterSupplyMode = WaterSupplyFromMains;
 			} else {
 				EvapCond( EvapCoolNum ).EvapWaterSupplyMode = WaterSupplyFromTank;
@@ -625,17 +662,36 @@ namespace EvaporativeCoolers {
 			EvapCond( EvapCoolNum ).RecircPumpPower = rNumericArgs( 2 );
 
 			if ( lNumericFieldBlanks( 3 ) ) {
+				EvapCond( EvapCoolNum ).RecircPumpSizingFactor = 0.0;
+			} else {
+				EvapCond( EvapCoolNum ).RecircPumpSizingFactor = rNumericArgs( 3 );
+			}
+			if ( lNumericFieldBlanks( 4 ) ) {
 				EvapCond( EvapCoolNum ).DriftFraction = 0.0;
 			} else {
-				EvapCond( EvapCoolNum ).DriftFraction = rNumericArgs( 3 );
+				EvapCond( EvapCoolNum ).DriftFraction = rNumericArgs( 4 );
 			}
-
-			if ( lNumericFieldBlanks( 4 ) ) {
+			if ( lNumericFieldBlanks( 5 ) ) {
 				EvapCond( EvapCoolNum ).BlowDownRatio = 0.0;
 			} else {
-				EvapCond( EvapCoolNum ).BlowDownRatio = rNumericArgs( 4 );
+				EvapCond( EvapCoolNum ).BlowDownRatio = rNumericArgs( 5 );
 			}
+			if ( lNumericFieldBlanks( 6 ) || lNumericFieldBlanks( 7 ) || lNumericFieldBlanks( 8 ) ) {
+				EvapCond( EvapCoolNum ).EvapCoolerOperationControlFlag = false;
+			} else {
+				if ( !lNumericFieldBlanks( 6 ) && !lNumericFieldBlanks( 7 ) && !lNumericFieldBlanks( 8 ) ) {
+					EvapCond( EvapCoolNum ).EvapCoolerOperationControlFlag = true;
+					EvapCond( EvapCoolNum ).MinOATDBEvapCooler = rNumericArgs( 6 );
+					EvapCond( EvapCoolNum ).MaxOATWBEvapCooler = rNumericArgs( 7 );
+					EvapCond( EvapCoolNum ).MaxOATDBEvapCooler = rNumericArgs( 8 );
+				} else {
+					EvapCond( EvapCoolNum ).EvapCoolerOperationControlFlag = false;
+				}
+			}
+			EvapCond( EvapCoolNum ).WetbulbEffecCurveIndex = GetCurveIndex( cAlphaArgs( 3 ) );
+			EvapCond( EvapCoolNum ).PumpPowerModifierCurveIndex = GetCurveIndex( cAlphaArgs( 4 ) );
 
+			SetupOutputVariable( "Evaporative Cooler Stage Effectiveness []", EvapCond( EvapCoolNum ).StageEff, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
 		}
 
 		if ( ErrorsFound ) {
@@ -829,6 +885,7 @@ namespace EvaporativeCoolers {
 		// These initializations are done every iteration
 		OutNode = EvapCond( EvapCoolNum ).OutletNode;
 		ControlNode = EvapCond( EvapCoolNum ).EvapControlNodeNum;
+		EvapCond( EvapCoolNum ).IECOperatingStatus = 0;
 
 		if ( ControlNode == 0 ) {
 			EvapCond( EvapCoolNum ).DesiredOutletTemp = 0.0;
@@ -865,6 +922,8 @@ namespace EvaporativeCoolers {
 		using DataAirSystems::PrimaryAirSystem;
 		using InputProcessor::SameString;
 		using ReportSizingManager::ReportSizingOutput;
+		using Fans::Fan;
+		using Fans::SetFanData;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -890,8 +949,9 @@ namespace EvaporativeCoolers {
 		//inits
 		CoolerOnOApath = false;
 		CoolerOnMainAirLoop = false;
+		bool ErrorsFound;
 
-		if ( EvapCond( EvapCoolNum ).IndirectVolFlowRate == AutoSize ) {
+		if ( EvapCond( EvapCoolNum ).IndirectVolFlowRate == AutoSize || EvapCond( EvapCoolNum ).VolFlowRate == AutoSize ) {
 			if ( CurSysNum > 0 ) { //central system
 				//where is this cooler located, is it on OA system or main loop?
 				// search for this component in Air loop branches.
@@ -911,11 +971,24 @@ namespace EvaporativeCoolers {
 				if ( ! CoolerOnMainAirLoop ) CoolerOnOApath = true;
 
 				if ( CoolerOnMainAirLoop ) {
-					EvapCond( EvapCoolNum ).IndirectVolFlowRate = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+					if ( EvapCond( EvapCoolNum ).VolFlowRate == AutoSize ) {
+						EvapCond( EvapCoolNum ).VolFlowRate = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+					}
+					if ( EvapCond( EvapCoolNum ).IndirectVolFlowRate == AutoSize ) {
+						EvapCond( EvapCoolNum ).IndirectVolFlowRate = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+					}
 				} else if ( CoolerOnOApath ) {
-					EvapCond( EvapCoolNum ).IndirectVolFlowRate = max( FinalSysSizing( CurSysNum ).DesOutAirVolFlow, 0.5 * FinalSysSizing( CurSysNum ).DesMainVolFlow );
+					if ( EvapCond( EvapCoolNum ).VolFlowRate == AutoSize ) {
+						EvapCond( EvapCoolNum ).VolFlowRate = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+					}
+					if ( EvapCond( EvapCoolNum ).IndirectVolFlowRate == AutoSize ) {
+						EvapCond( EvapCoolNum ).IndirectVolFlowRate = max( FinalSysSizing( CurSysNum ).DesOutAirVolFlow, 0.5 * FinalSysSizing( CurSysNum ).DesMainVolFlow );
+					}
 				}
-
+				// apply scaling factor the secondary air fan flow rate
+				if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectRDDSpecial ) {
+					EvapCond( EvapCoolNum ).IndirectVolFlowRate = EvapCond( EvapCoolNum ).IndirectVolFlowRate * EvapCond( EvapCoolNum ).IndirectVolFlowScalingFactor;
+				}
 			} else { //zone equipment
 				// we have no zone equipment evap coolers yet
 
@@ -924,6 +997,25 @@ namespace EvaporativeCoolers {
 			ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Secondary Fan Flow Rate [m3/s]", EvapCond( EvapCoolNum ).IndirectVolFlowRate );
 		}
 
+		if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectRDDSpecial ) {
+			// secondary air fan sizing: Secondary flow Rate (m3/s) * Fan Flow Sizing Factor (W/(m3/s)
+			if ( EvapCond( EvapCoolNum ).IndirectFanPower == AutoSize ) {
+				EvapCond( EvapCoolNum ).IndirectFanPower = EvapCond( EvapCoolNum ).IndirectVolFlowRate * EvapCond( EvapCoolNum ).FanSizingSpecificPower;
+				ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Secondary Fan Power [W]", EvapCond( EvapCoolNum ).IndirectFanPower );
+			}
+			// recirculating water pump sizing: Secondary flow Rate (m3/s) * Pump Sizing Factor (W/(m3/s)
+			if ( EvapCond( EvapCoolNum ).IndirectRecircPumpPower == AutoSize ) {
+				EvapCond( EvapCoolNum ).IndirectRecircPumpPower = EvapCond( EvapCoolNum ).IndirectVolFlowRate * EvapCond( EvapCoolNum ).RecircPumpSizingFactor;
+				ReportSizingOutput( "EvaporativeCooler:Indirect:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Recirculating Pump Power [W]", EvapCond( EvapCoolNum ).IndirectRecircPumpPower );
+			}
+		}
+		if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerDirectResearchSpecial ) {
+			// recirculating water pump sizing: Primary Air Design flow Rate (m3/s) * Pump Sizing Factor (W/(m3/s)
+			if ( EvapCond( EvapCoolNum ).RecircPumpPower == AutoSize ) {
+				EvapCond( EvapCoolNum ).RecircPumpPower = EvapCond( EvapCoolNum ).VolFlowRate * EvapCond( EvapCoolNum ).RecircPumpSizingFactor;
+				ReportSizingOutput( "EvaporativeCooler:Direct:ResearchSpecial", EvapCond( EvapCoolNum ).EvapCoolerName, "Recirculating Pump Power [W]", EvapCond( EvapCoolNum ).RecircPumpPower );
+			}
+		}
 	}
 
 	// End Initialization Section of the Module
@@ -1460,7 +1552,8 @@ namespace EvaporativeCoolers {
 		//       AUTHOR         B. Griffith
 		//       DATE WRITTEN   July 2003
 		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+		//       RE-ENGINEERED  October 2014, B Nigusse, added dry and wet operating modes
+		//                      and secondary air flow control
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Subroutine models a "special" cooler that allows high effectiveness and controls
@@ -1477,12 +1570,19 @@ namespace EvaporativeCoolers {
 		using DataEnvironment::OutHumRat;
 		using DataEnvironment::OutBaroPress;
 		using DataWater::WaterStorage;
+		using CurveManager::CurveValue;
+		//using General::SolveRegulaFalsi;
+		//using General::RoundSigDigits;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		int const MaxIte( 500 ); // Maximum number of iterations for solver
+		Real64 const TempTol( 0.001 ); // convergence tollerance
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1492,8 +1592,10 @@ namespace EvaporativeCoolers {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//REAL(r64) Variables
+		Real64 SecondaryInletDryBulbTemp; // entering drybulb for secondary/purge side
 		Real64 SecondaryInletWetBulbTemp; // entering wet bulb for secondary/purge side
 		Real64 SecondaryInletDewPointTemp; // entering dewpoint for secondary/purge side
+		Real64 SecondaryInletHumRatio; // entering humidity ratio for secondary/purge side
 		Real64 StageEff; // Stage Efficiency of the Heat Exchanger
 		Real64 TEDB; // Entering Dry Bulb Temperature
 		Real64 TEWB; // Entering Wet Bulb Temperature
@@ -1531,12 +1633,9 @@ namespace EvaporativeCoolers {
 			//******************************************************************************
 			//  INDIRECT STAGE EFFICIENCY FOR WET COIL INDIRECT EVAP COOLERS
 			CFMAir = EvapCond( EvapCoolNum ).VolFlowRate; //Volume Flow Rate Primary Side
-			//      CFMSec = EvapCond(EvapCoolNum)%IndirectVolFlowRate    !Volume Flolw Rate Secondary Side
-
 			StageEff = EvapCond( EvapCoolNum ).WetCoilMaxEfficiency;
 
 			// This is model is for special indirect cooler with efficiency greater than 1.0
-
 			if ( StageEff >= 1.5 ) StageEff = 1.5;
 
 			EvapCond( EvapCoolNum ).StageEff = StageEff;
@@ -1549,9 +1648,10 @@ namespace EvaporativeCoolers {
 
 			TertNode = EvapCond( EvapCoolNum ).TertiaryInletNode;
 			if ( TertNode == 0 ) {
-
+				SecondaryInletDryBulbTemp = EvapCond( EvapCoolNum ).SecInletTemp;
 				SecondaryInletWetBulbTemp = PsyTwbFnTdbWPb( EvapCond( EvapCoolNum ).SecInletTemp, EvapCond( EvapCoolNum ).SecInletHumRat, OutBaroPress );
 				SecondaryInletDewPointTemp = PsyTdpFnTdbTwbPb( EvapCond( EvapCoolNum ).SecInletTemp, SecondaryInletWetBulbTemp, OutBaroPress );
+				SecondaryInletHumRatio = EvapCond( EvapCoolNum ).SecInletHumRat;
 
 			} else {
 
@@ -1567,9 +1667,10 @@ namespace EvaporativeCoolers {
 
 				if ( SecVdot < 0.0 ) { // all tertiary/releif air e.g. econonizer wide open
 					SecVdot = 0.0;
+					SecondaryInletDryBulbTemp = TertTemp;
 					SecondaryInletWetBulbTemp = PsyTwbFnTdbWPb( TertTemp, TertHumRate, OutBaroPress );
 					SecondaryInletDewPointTemp = PsyTdpFnTdbTwbPb( TertTemp, SecondaryInletWetBulbTemp, OutBaroPress );
-
+					SecondaryInletHumRatio = TertHumRate;
 				} else {
 
 					// First determine mass flow of OA,  in secondary
@@ -1587,105 +1688,863 @@ namespace EvaporativeCoolers {
 					// Use Enthalpy and humidity ratio to get outlet temperature from psych chart
 
 					PurgeTemp = PsyTdbFnHW( PurgeEnthalpy, PurgeHumRat );
+					SecondaryInletDryBulbTemp = PurgeTemp;
 					SecondaryInletWetBulbTemp = PsyTwbFnTdbWPb( PurgeTemp, PurgeHumRat, OutBaroPress );
 					SecondaryInletDewPointTemp = PsyTdpFnTdbTwbPb( PurgeTemp, SecondaryInletWetBulbTemp, OutBaroPress );
+					SecondaryInletHumRatio = PurgeHumRat;
 				}
 			}
-			//***************************************************************************
-			//   TEMP LEAVING DRY BULB IS CALCULATED FROM A SIMPLE WET BULB APPROACH
-			//   MODEL GIVEN THE INDIRECT STAGE EFFICIENCY.
-			//   DRY BULB TEMP APPROACHES THE WET BULB TEMP ACROSS THE INDIRECT STAGE.
-			//***************************************************************************
-			TEWB = EvapCond( EvapCoolNum ).InletWetBulbTemp;
-			TEDB = EvapCond( EvapCoolNum ).InletTemp;
-			PartLoad = EvapCond( EvapCoolNum ).PartLoadFract;
+			if ( EvapCond( EvapCoolNum ).EvapCoolerOperationControlFlag ) {
+				// addvanced mode: runs either in dry or wet depending on the entering conditions
+				CalcIndirectResearchSpecialEvapCoolerAdvanced( EvapCoolNum, SecondaryInletDryBulbTemp, SecondaryInletWetBulbTemp, SecondaryInletDewPointTemp, SecondaryInletHumRatio );
 
-			if ( PartLoad == 1.0 ) {
-				//                                 Tout = Tin -  (   0.7    (Tin  - Tpurge,wb,in)
-				EvapCond( EvapCoolNum ).OutletTemp = TEDB - StageEff * ( TEDB - SecondaryInletWetBulbTemp );
-				//  now bound with secondary dewpoint.
-				// unless the resulting Tout<=Tpurge,dp,in ; in which case Tout = Tin - 0.9(Tin-Tpurge,dp,in)
-
-				BoundTemp = TEDB - EvapCond( EvapCoolNum ).DPBoundFactor * ( TEDB - SecondaryInletDewPointTemp );
-				if ( EvapCond( EvapCoolNum ).OutletTemp < BoundTemp ) {
-					EvapCond( EvapCoolNum ).OutletTemp = BoundTemp;
-					EvapCond( EvapCoolNum ).DewPointBoundFlag = 1;
-				}
-			} else if ( ( PartLoad < 1.0 ) && ( PartLoad > 0.0 ) ) {
-				// assume perfect control Use PLF for energy consumption
-				if ( EvapCond( EvapCoolNum ).DesiredOutletTemp < TEDB ) {
-					EvapCond( EvapCoolNum ).OutletTemp = EvapCond( EvapCoolNum ).DesiredOutletTemp;
-				}
 			} else {
-				//part load set to zero so no cooling
-				EvapCond( EvapCoolNum ).OutletTemp = EvapCond( EvapCoolNum ).InletTemp;
+
+				TEWB = EvapCond( EvapCoolNum ).InletWetBulbTemp;
+				TEDB = EvapCond( EvapCoolNum ).InletTemp;
+				PartLoad = EvapCond( EvapCoolNum ).PartLoadFract;
+
+				//***************************************************************************
+				//   TEMP LEAVING DRY BULB IS CALCULATED FROM A SIMPLE WET BULB APPROACH
+				//   MODEL GIVEN THE INDIRECT STAGE EFFICIENCY.
+				//   DRY BULB TEMP APPROACHES THE WET BULB TEMP ACROSS THE INDIRECT STAGE.
+				//***************************************************************************
+				if ( PartLoad == 1.0 ) {
+					//                                 Tout = Tin -  (   0.7    (Tin  - Tpurge,wb,in)
+					EvapCond( EvapCoolNum ).OutletTemp = TEDB - StageEff * ( TEDB - SecondaryInletWetBulbTemp );
+					//  now bound with secondary dewpoint.
+					// unless the resulting Tout<=Tpurge,dp,in ; in which case Tout = Tin - 0.9(Tin-Tpurge,dp,in)
+
+					BoundTemp = TEDB - EvapCond( EvapCoolNum ).DPBoundFactor * ( TEDB - SecondaryInletDewPointTemp );
+					if ( EvapCond( EvapCoolNum ).OutletTemp < BoundTemp ) {
+						EvapCond( EvapCoolNum ).OutletTemp = BoundTemp;
+						EvapCond( EvapCoolNum ).DewPointBoundFlag = 1;
+					}
+				} else if ( ( PartLoad < 1.0 ) && ( PartLoad > 0.0 ) ) {
+					// assume perfect control Use PLF for energy consumption
+					if ( EvapCond( EvapCoolNum ).DesiredOutletTemp < TEDB ) {
+						EvapCond( EvapCoolNum ).OutletTemp = EvapCond( EvapCoolNum ).DesiredOutletTemp;
+					}
+				} else {
+					//part load set to zero so no cooling
+					EvapCond( EvapCoolNum ).OutletTemp = EvapCond( EvapCoolNum ).InletTemp;
+				}
+
+				//***************************************************************************
+				//                  POWER OF THE SECONDARY AIR FAN with part load factor applied (assumes const efficiency)
+				EvapCond( EvapCoolNum ).EvapCoolerPower += EvapCond( EvapCoolNum ).IndirectVolFlowRate * EvapCond( EvapCoolNum ).FanSizingSpecificPower * PartLoad;
+
+				//                  ENERGY CONSUMED BY THE RECIRCULATING PUMP
+				//                  ENERGY CONSUMED BY THE RECIRCULATING PUMP
+				//Add the pump energy to the total Evap Cooler energy comsumption
+				EvapCond( EvapCoolNum ).EvapCoolerPower += EvapCond( EvapCoolNum ).IndirectRecircPumpPower * PartLoad;
+
+				//***************************************************************************
+				//                  CALCULATE THE WET BULB TEMP in the primary system air using PSYCH ROUTINES
+				// There is a constant humidity ratio across the primary side but a reduction in the dry bulb temp
+				EvapCond( EvapCoolNum ).OuletWetBulbTemp = PsyTwbFnTdbWPb( EvapCond( EvapCoolNum ).OutletTemp, EvapCond( EvapCoolNum ).InletHumRat, OutBaroPress );
+				//***************************************************************************
+				//                  CALCULATE other outlet propertiesusing PSYCH ROUTINES
+				EvapCond( EvapCoolNum ).OutletHumRat = EvapCond( EvapCoolNum ).InletHumRat;
+
+				EvapCond( EvapCoolNum ).OutletEnthalpy = PsyHFnTdbW( EvapCond( EvapCoolNum ).OutletTemp, EvapCond( EvapCoolNum ).OutletHumRat );
+				//******************
+				//             WATER CONSUMPTION IN LITERS OF WATER FOR Wet InDIRECT
+				//             H2O [m3/sec] = (QHX [J/s])/(2,500,000 [J/kg H2O] * RhoWater [kg H2O/m3 H2O])
+				//******************
+				//***** FIRST calculate the heat exchange on the primary air side**********
+				RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, EvapCond( EvapCoolNum ).InletTemp, EvapCond( EvapCoolNum ).InletHumRat );
+				QHX = CFMAir * RhoAir * ( EvapCond( EvapCoolNum ).InletEnthalpy - EvapCond( EvapCoolNum ).OutletEnthalpy );
+
+				RhoWater = RhoH2O( OutDryBulbTemp );
+				EvapVdot = ( QHX ) / ( 2500000.0 * RhoWater );
+				DriftVdot = EvapVdot * EvapCond( EvapCoolNum ).DriftFraction;
+				if ( EvapCond( EvapCoolNum ).BlowDownRatio > 0.0 ) {
+					BlowDownVdot = EvapVdot / ( EvapCond( EvapCoolNum ).BlowDownRatio - 1 ) - DriftVdot;
+					if ( BlowDownVdot < 0.0 ) BlowDownVdot = 0.0;
+				} else {
+					BlowDownVdot = 0.0;
+				}
+				EvapCond( EvapCoolNum ).EvapWaterConsumpRate = EvapVdot + DriftVdot + BlowDownVdot;
+				// A numerical check to keep from having very tiny negative water consumption values being reported
+				if ( EvapCond( EvapCoolNum ).EvapWaterConsumpRate < 0.0 ) EvapCond( EvapCoolNum ).EvapWaterConsumpRate = 0.0;
+
 			}
-
-			//***************************************************************************
-			//                  CALCULATE THE WET BULB TEMP in the primary system air using PSYCH ROUTINES
-			// There is a constant humidity ratio across the primary side but a reduction in the dry bulb temp
-			EvapCond( EvapCoolNum ).OuletWetBulbTemp = PsyTwbFnTdbWPb( EvapCond( EvapCoolNum ).OutletTemp, EvapCond( EvapCoolNum ).InletHumRat, OutBaroPress );
-			//***************************************************************************
-			//                  CALCULATE other outlet propertiesusing PSYCH ROUTINES
-			EvapCond( EvapCoolNum ).OutletHumRat = EvapCond( EvapCoolNum ).InletHumRat;
-
-			EvapCond( EvapCoolNum ).OutletEnthalpy = PsyHFnTdbW( EvapCond( EvapCoolNum ).OutletTemp, EvapCond( EvapCoolNum ).OutletHumRat );
-
-			//***************************************************************************
-			//                  POWER OF THE SECONDARY AIR FAN with part load factor applied (assumes const efficiency)
-			if ( EvapCond( EvapCoolNum ).IndirectFanEff > 0.0 ) {
-				EvapCond( EvapCoolNum ).EvapCoolerPower += EvapCond( EvapCoolNum ).IndirectFanDeltaPress * EvapCond( EvapCoolNum ).IndirectVolFlowRate / EvapCond( EvapCoolNum ).IndirectFanEff * PartLoad;
-			}
-			//                  ENERGY CONSUMED BY THE RECIRCULATING PUMP
-			//                  ENERGY CONSUMED BY THE RECIRCULATING PUMP
-			//Add the pump energy to the total Evap Cooler energy comsumption
-			EvapCond( EvapCoolNum ).EvapCoolerPower += EvapCond( EvapCoolNum ).IndirectRecircPumpPower * PartLoad;
-
-			//******************
-			//             WATER CONSUMPTION IN LITERS OF WATER FOR Wet InDIRECT
-			//             H2O [m3/sec] = (QHX [J/s])/(2,500,000 [J/kg H2O] * RhoWater [kg H2O/m3 H2O])
-			//******************
-			//***** FIRST calculate the heat exchange on the primary air side**********
-			RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, EvapCond( EvapCoolNum ).InletTemp, EvapCond( EvapCoolNum ).InletHumRat );
-			QHX = CFMAir * RhoAir * ( EvapCond( EvapCoolNum ).InletEnthalpy - EvapCond( EvapCoolNum ).OutletEnthalpy );
-
-			RhoWater = RhoH2O( OutDryBulbTemp );
-			EvapVdot = ( QHX ) / ( 2500000.0 * RhoWater );
-			DriftVdot = EvapVdot * EvapCond( EvapCoolNum ).DriftFraction;
-			if ( EvapCond( EvapCoolNum ).BlowDownRatio > 0.0 ) {
-				BlowDownVdot = EvapVdot / ( EvapCond( EvapCoolNum ).BlowDownRatio - 1 ) - DriftVdot;
-				if ( BlowDownVdot < 0.0 ) BlowDownVdot = 0.0;
-			} else {
-				BlowDownVdot = 0.0;
-			}
-			EvapCond( EvapCoolNum ).EvapWaterConsumpRate = EvapVdot + DriftVdot + BlowDownVdot;
-			// A numerical check to keep from having very tiny negative water consumption values being reported
-			if ( EvapCond( EvapCoolNum ).EvapWaterConsumpRate < 0.0 ) EvapCond( EvapCoolNum ).EvapWaterConsumpRate = 0.0;
 
 		} else {
 			// The evap cooler is not running and does not change conditions from inlet to outlet
 			EvapCond( EvapCoolNum ).OutletTemp = EvapCond( EvapCoolNum ).InletTemp;
-
 			EvapCond( EvapCoolNum ).OuletWetBulbTemp = EvapCond( EvapCoolNum ).InletWetBulbTemp;
-
 			EvapCond( EvapCoolNum ).OutletHumRat = EvapCond( EvapCoolNum ).InletHumRat;
-
 			EvapCond( EvapCoolNum ).OutletEnthalpy = EvapCond( EvapCoolNum ).InletEnthalpy;
-
 			EvapCond( EvapCoolNum ).EvapCoolerEnergy = 0.0;
 			EvapCond( EvapCoolNum ).EvapCoolerPower = 0.0;
 			EvapCond( EvapCoolNum ).EvapWaterConsumpRate = 0.0;
-
+			EvapCond( EvapCoolNum ).SecInletMassFlowRate = 0.0;
 		}
+
 
 		// all of the mass flowrates are not changed across the evap cooler
 		EvapCond( EvapCoolNum ).OutletMassFlowRate = EvapCond( EvapCoolNum ).InletMassFlowRate;
 		EvapCond( EvapCoolNum ).OutletMassFlowRateMaxAvail = EvapCond( EvapCoolNum ).InletMassFlowRateMaxAvail;
 		EvapCond( EvapCoolNum ).OutletMassFlowRateMinAvail = EvapCond( EvapCoolNum ).InletMassFlowRateMinAvail;
+		// set secondary air side inlet mass flow rate to the outlet node
+		EvapCond( EvapCoolNum ).SecOutletMassFlowRate = EvapCond( EvapCoolNum ).SecInletMassFlowRate;
+		Node( EvapCond( EvapCoolNum ).SecondaryInletNode ).MassFlowRate = EvapCond( EvapCoolNum ).SecInletMassFlowRate;
 
 		// the pressure is not changed across the evap cooler
 		EvapCond( EvapCoolNum ).OutletPressure = EvapCond( EvapCoolNum ).InletPressure;
 
+	}
+
+	void
+	CalcIndirectResearchSpecialEvapCoolerAdvanced(
+		int const EvapCoolNum,
+		Real64 const InletDryBulbTempSec,
+		Real64 const InletWetBulbTempSec,
+		Real64 const InletDewPointTempSec,
+		Real64 const InletHumRatioSec
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         B. Bigusse
+		//       DATE WRITTEN   October 2014
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Subroutine models indirect evaporative cooler with variable effectiveness for wet and dry
+		// operating modes depending on entering conditions
+
+		// METHODOLOGY EMPLOYED:
+		// Needs description, as appropriate.
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using DataEnvironment::OutDryBulbTemp;
+		using DataEnvironment::OutWetBulbTemp;
+		using DataEnvironment::OutHumRat;
+		using DataEnvironment::OutBaroPress;
+		using DataWater::WaterStorage;
+		using CurveManager::CurveValue;
+		using General::SolveRegulaFalsi;
+		using General::RoundSigDigits;
+		using Psychrometrics::PsyHfgAirFnWTdb;
+		using DataHVACGlobals::SmallLoad;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		int const MaxIte( 500 ); // Maximum number of iterations for solver
+		Real64 const TempTol( 0.01 ); // convergence tollerance
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 TEDB; // Entering Dry Bulb Temperature
+		Real64 TEWB; // Entering Wet Bulb Temperature
+		Real64 BoundTemp; // temperature limit for outlet
+		Real64 PartLoad;
+		Real64 SecRho;
+		Real64 TdbOutSysWetMin; // system( primary ) air drybulb outlet temperature minimum based on wet coil
+		Real64 TdbOutSysDryMin; // system (primary) air drybulb outlet temperature minimum based on dry coil
+		Real64 SysTempSetPoint; // evaporative cooler outlet setpoint temperature, drybulb
+		Real64 MassFlowRateSecMax; // Design secondary air mass flow rate
+		Real64 AirMassFlowSec; // current secondary air mass flow rate
+		Real64 AirMassFlowSecDry; // current secondary air mass flow rate in dry mode
+		Real64 AirMassFlowSecWet; // current secondary air mass flow rate in wet mode
+		Real64 FlowRatioSec; // secondary air flow ratio in dry and wet mode
+		Real64 FlowRatioSecDry; // current secondary air mass flow ratio in dry mode
+		Real64 FlowRatioSecWet; // current secondary air mass flow ratio in wet mode
+		Real64 EvapCoolerTotalElectricPowerDry; // evaporative cooler current total electric power drawn
+		Real64 EvapCoolerTotalElectricPowerWet; // evaporative cooler current total electric power drawn
+		int SolFla; // Flag of solver
+		Array1D< Real64 > Par( 6 ); // Parameter array passed to solver
+		Real64 QHXLatent; // evaporative cooler latent heat transfer rate
+		Real64 hfg; // latent heat of vaporization of water at the secondary air inlet condition
+
+		Real64 QHX; // Q Across Sec HX in Watts or J/sec
+		Real64 RhoWater;
+		Real64 RhoAir; // Density of the primary side air
+		Real64 CFMAir;
+		Real64 TotalVolFlow;
+		Real64 TertVdot;
+		Real64 SecVdot;
+		Real64 SecMdot;
+		Real64 MassFlowRateSecMin;
+		static Real64 BlowDownVdot( 0.0 );
+		static Real64 DriftVdot( 0.0 );
+		static Real64 EvapVdot( 0.0 );
+
+		FlowRatioSecDry = 0.0;
+		FlowRatioSecWet = 0.0;
+		EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode = None;
+		TEDB = EvapCond( EvapCoolNum ).InletTemp;
+		TEWB = EvapCond( EvapCoolNum ).InletWetBulbTemp;
+		SysTempSetPoint = EvapCond( EvapCoolNum ).DesiredOutletTemp;
+		SecRho = PsyRhoAirFnPbTdbW( OutBaroPress, InletDryBulbTempSec, InletHumRatioSec );
+		MassFlowRateSecMax = SecRho * EvapCond( EvapCoolNum ).IndirectVolFlowRate;
+		CalcIndirectRDDEvapCoolerOutletTemp( EvapCoolNum, WetFull, MassFlowRateSecMax, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec );
+		TdbOutSysWetMin = EvapCond( EvapCoolNum ).OutletTemp;
+		CalcIndirectRDDEvapCoolerOutletTemp( EvapCoolNum, DryFull, MassFlowRateSecMax, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec );
+		TdbOutSysDryMin = EvapCond( EvapCoolNum ).OutletTemp;
+
+		// Now determine the operating modes of indirect evaporative cooler research special. There are five allowed operating modes
+		if ( ( TEDB <=  SysTempSetPoint ) || ( TEDB > EvapCond( EvapCoolNum ).MaxOATDBEvapCooler && InletWetBulbTempSec > EvapCond( EvapCoolNum ).MaxOATWBEvapCooler ) || ( TEDB <= InletDryBulbTempSec ) ) {
+			EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode = None;
+		} else if ( ( InletDryBulbTempSec < EvapCond( EvapCoolNum ).MinOATDBEvapCooler && TdbOutSysDryMin < SysTempSetPoint ) ) {
+			EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode = DryModulated; // dry mode capacity modulated
+		} else if ( ( InletDryBulbTempSec < EvapCond( EvapCoolNum ).MinOATDBEvapCooler && SysTempSetPoint <= TdbOutSysDryMin ) ) {
+			EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode = DryFull; // dry mode in full capacity
+		} else if ( ( InletDryBulbTempSec >= EvapCond( EvapCoolNum ).MinOATDBEvapCooler && InletWetBulbTempSec < EvapCond( EvapCoolNum ).MaxOATWBEvapCooler && SysTempSetPoint <= TdbOutSysWetMin ) ) {
+			EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode = WetFull; // wet mode in full capacity
+		} else if ( ( InletDryBulbTempSec >= EvapCond( EvapCoolNum ).MinOATDBEvapCooler && InletWetBulbTempSec < EvapCond( EvapCoolNum ).MaxOATWBEvapCooler && TdbOutSysWetMin < SysTempSetPoint ) ) { // && SysTempSetPoint < TdbOutSysDryMin
+			EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode = WetModulated; // wet mode capacity modulated
+		} else if ( ( InletDryBulbTempSec >= EvapCond( EvapCoolNum ).MinOATDBEvapCooler && InletDryBulbTempSec < EvapCond( EvapCoolNum ).MaxOATDBEvapCooler && InletWetBulbTempSec < EvapCond( EvapCoolNum ).MaxOATWBEvapCooler && SysTempSetPoint < TdbOutSysDryMin && TdbOutSysWetMin < SysTempSetPoint ) ) {
+			EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode = DryWetModulated; // modulated in dry and wet mode, and the lower total power will be used
+		} else {
+			EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode = None;  // this condition should not happen unless the bounds do not cover all combinations possible
+		}
+		MassFlowRateSecMin = 0.0;
+		AirMassFlowSec = MassFlowRateSecMax;
+		PartLoad = EvapCond( EvapCoolNum ).PartLoadFract;
+		{ auto const SELECT_CASE_var( EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode );
+		if ( SELECT_CASE_var == DryModulated ) {
+			Par( 1 ) = double( EvapCoolNum );
+			Par( 2 ) = double( DryModulated );
+			Par( 3 ) = SysTempSetPoint;
+			Par( 4 ) = InletDryBulbTempSec;
+			Par( 5 ) = InletWetBulbTempSec;
+			Par( 6 ) = InletHumRatioSec;
+			SolveRegulaFalsi( TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par );
+			// if the numerical inversion failed, issue error messages.
+			if ( SolFla == -1 ) {
+				if ( !WarmupFlag ) {
+					if ( EvapCond( EvapCoolNum ).IterationLimit == 0 ) {
+						ShowSevereError( "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect Evaporative Cooler Research Special = " + EvapCond( EvapCoolNum ).EvapCoolerName );
+						ShowContinueErrorTimeStamp( "" );
+						ShowContinueError( "  Iteration limit [" + RoundSigDigits( MaxIte ) + "] exceeded in calculating secondary air mass flow rate" );
+						ShowContinueError( "  Simulation continues" );
+					}
+					ShowRecurringWarningErrorAtEnd( "Secondary air mass flow Iteration limit exceeded in Indirect Evaporative Cooler Research Special = " + EvapCond( EvapCoolNum ).EvapCoolerName, EvapCond( EvapCoolNum ).IterationLimit );
+				}
+			} else if ( SolFla == -2 ) {
+				if ( !WarmupFlag ) {
+					if ( EvapCond( EvapCoolNum ).IterationFailed == 0 ) {
+						ShowSevereError( "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect Evaporative Cooler Research Special = " + EvapCond( EvapCoolNum ).EvapCoolerName );
+						ShowContinueErrorTimeStamp( "" );
+						ShowContinueError( "...Bad secondary air mass flow rate limits" );
+						ShowContinueError( "...Given minimum secondary air mass flow rate=" + RoundSigDigits( MassFlowRateSecMin, 3 ) + " kg/s" );
+						ShowContinueError( "...Given maximum secondary air mass flow rate=" + RoundSigDigits( MassFlowRateSecMax, 3 ) + " kg/s" );
+						ShowContinueError( " Simulation continues" );
+					}
+					ShowRecurringWarningErrorAtEnd( "Secondary air mass flow control failed in Indirect Evaporative Cooler Research Special = " + EvapCond( EvapCoolNum ).EvapCoolerName, EvapCond( EvapCoolNum ).IterationFailed );
+				}
+			}
+			EvapCond( EvapCoolNum ).SecInletMassFlowRate = AirMassFlowSec;
+			if ( AirMassFlowSec > 0.0 ) {
+				if ( MassFlowRateSecMax > 0.0 ) {
+					FlowRatioSec = AirMassFlowSec / MassFlowRateSecMax;
+				} else {
+					FlowRatioSec = 0.0;
+				}
+			} else {
+				FlowRatioSec = 0.0;
+			}
+			EvapCond( EvapCoolNum ).EvapCoolerPower = IndEvapCoolerPower( EvapCoolNum, DryModulated, FlowRatioSec );
+			EvapCond( EvapCoolNum ).IECOperatingStatus = 1;
+		} else if ( SELECT_CASE_var == DryFull ) {
+			CalcIndirectRDDEvapCoolerOutletTemp( EvapCoolNum, DryFull, MassFlowRateSecMax, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec );
+			EvapCond( EvapCoolNum ).SecInletMassFlowRate = MassFlowRateSecMax;
+			FlowRatioSec = 1.0;
+			EvapCond( EvapCoolNum ).EvapCoolerPower = IndEvapCoolerPower( EvapCoolNum, DryFull, FlowRatioSec );
+			EvapCond( EvapCoolNum ).IECOperatingStatus = 1;
+		} else if ( SELECT_CASE_var == DryWetModulated ) {
+			Par( 1 ) = double( EvapCoolNum );
+			Par( 3 ) = SysTempSetPoint;
+			Par( 4 ) = InletDryBulbTempSec;
+			Par( 5 ) = InletWetBulbTempSec;
+			Par( 6 ) = InletHumRatioSec;
+			// get dry operation performance first
+			Par( 2 ) = double( DryModulated );
+			SolveRegulaFalsi( TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par );
+			// if the numerical inversion failed, issue error messages.
+			if ( SolFla == -1 ) {
+				if ( !WarmupFlag ) {
+					if ( EvapCond( EvapCoolNum ).IterationLimit == 0 ) {
+						ShowSevereError( "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect Evaporative Cooler Research Special = " + EvapCond( EvapCoolNum ).EvapCoolerName );
+						ShowContinueErrorTimeStamp( "" );
+						ShowContinueError( "  Iteration limit [" + RoundSigDigits( MaxIte ) + "] exceeded in calculating secondary air mass flow rate" );
+						ShowContinueError( "  Simulation continues" );
+					}
+					ShowRecurringWarningErrorAtEnd( "Secondary air mass flow Iteration limit exceeded in Indirect Evaporative Cooler Research Special = " + EvapCond( EvapCoolNum ).EvapCoolerName, EvapCond( EvapCoolNum ).IterationLimit );
+				}
+			} else if ( SolFla == -2 ) {
+				if ( !WarmupFlag ) {
+					if ( EvapCond( EvapCoolNum ).IterationFailed == 0 ) {
+						ShowSevereError( "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect Evaporative Cooler Research Special = " + EvapCond( EvapCoolNum ).EvapCoolerName );
+						ShowContinueErrorTimeStamp( "" );
+						ShowContinueError( "...Bad secondary air mass flow rate limits" );
+						ShowContinueError( "...Given minimum secondary air mass flow rate=" + RoundSigDigits( MassFlowRateSecMin, 3 ) + " kg/s" );
+						ShowContinueError( "...Given maximum secondary air mass flow rate=" + RoundSigDigits( MassFlowRateSecMax, 3 ) + " kg/s" );
+						ShowContinueError( " Simulation continues" );
+					}
+					ShowRecurringWarningErrorAtEnd( "Secondary air mass flow control failed in Indirect Evaporative Cooler Research Special = " + EvapCond( EvapCoolNum ).EvapCoolerName, EvapCond( EvapCoolNum ).IterationFailed );
+				}
+			}
+			if ( AirMassFlowSec > 0.0 ) {
+				if ( MassFlowRateSecMax > 0.0 ) {
+					FlowRatioSec = AirMassFlowSec / MassFlowRateSecMax;
+				} else {
+					FlowRatioSec = 0.0;
+				}
+			} else {
+				FlowRatioSec = 0.0;
+			}
+			FlowRatioSecDry = FlowRatioSec;
+			AirMassFlowSecDry = AirMassFlowSec;
+			EvapCoolerTotalElectricPowerDry = IndEvapCoolerPower( EvapCoolNum, DryModulated, FlowRatioSecDry );
+			// get wet operation performance
+			Par( 2 ) = double( WetModulated );
+			SolveRegulaFalsi( TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par );
+			// if the numerical inversion failed, issue error messages.
+			if ( SolFla == -1 ) {
+				if ( !WarmupFlag ) {
+					if ( EvapCond( EvapCoolNum ).IterationLimit == 0 ) {
+						ShowSevereError( "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect Evaporative Cooler Research Special = " + EvapCond( EvapCoolNum ).EvapCoolerName );
+						ShowContinueErrorTimeStamp( "" );
+						ShowContinueError( "  Iteration limit [" + RoundSigDigits( MaxIte ) + "] exceeded in calculating secondary air mass flow rate" );
+						ShowContinueError( "  Simulation continues" );
+					}
+					ShowRecurringWarningErrorAtEnd( "Secondary air mass flow Iteration limit exceeded in Indirect Evaporative Cooler Research Special = " + EvapCond( EvapCoolNum ).EvapCoolerName, EvapCond( EvapCoolNum ).IterationLimit );
+				}
+			} else if ( SolFla == -2 ) {
+				if ( !WarmupFlag ) {
+					if ( EvapCond( EvapCoolNum ).IterationFailed == 0 ) {
+						ShowSevereError( "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect Evaporative Cooler Research Special = " + EvapCond( EvapCoolNum ).EvapCoolerName );
+						ShowContinueErrorTimeStamp( "" );
+						ShowContinueError( "...Bad secondary air mass flow rate limits" );
+						ShowContinueError( "...Given minimum secondary air mass flow rate=" + RoundSigDigits( MassFlowRateSecMin, 3 ) + " kg/s" );
+						ShowContinueError( "...Given maximum secondary air mass flow rate=" + RoundSigDigits( MassFlowRateSecMax, 3 ) + " kg/s" );
+						ShowContinueError( " Simulation continues" );
+					}
+					ShowRecurringWarningErrorAtEnd( "Secondary air mass flow control failed in Indirect Evaporative Cooler Research Special = " + EvapCond( EvapCoolNum ).EvapCoolerName, EvapCond( EvapCoolNum ).IterationFailed );
+				}
+			}
+			if ( AirMassFlowSec > 0.0 ) {
+				if ( MassFlowRateSecMax > 0.0 ) {
+					FlowRatioSec = AirMassFlowSec / MassFlowRateSecMax;
+				} else {
+					FlowRatioSec = 0.0;
+				}
+			} else {
+				FlowRatioSec = 0.0;
+			}
+			FlowRatioSecWet = FlowRatioSec;
+			AirMassFlowSecWet = AirMassFlowSec;
+			EvapCoolerTotalElectricPowerWet = IndEvapCoolerPower( EvapCoolNum, WetModulated, FlowRatioSecWet );
+			// compare the dry and wet operation total electric power
+			if ( EvapCoolerTotalElectricPowerDry < EvapCoolerTotalElectricPowerWet ) {
+				EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode = DryModulated;
+				FlowRatioSec = FlowRatioSecDry;
+				EvapCond( EvapCoolNum ).SecInletMassFlowRate = AirMassFlowSecDry;
+				CalcIndirectRDDEvapCoolerOutletTemp( EvapCoolNum, DryModulated, AirMassFlowSecDry, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec );
+				EvapCond( EvapCoolNum ).EvapCoolerPower = IndEvapCoolerPower( EvapCoolNum, DryModulated, FlowRatioSec );
+				EvapCond( EvapCoolNum ).IECOperatingStatus = 1;
+			} else {
+				EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode = WetModulated;
+				FlowRatioSec = FlowRatioSecWet;
+				EvapCond( EvapCoolNum ).SecInletMassFlowRate = AirMassFlowSecWet;
+				CalcIndirectRDDEvapCoolerOutletTemp( EvapCoolNum, WetModulated, AirMassFlowSecWet, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec );
+				EvapCond( EvapCoolNum ).EvapCoolerPower = IndEvapCoolerPower( EvapCoolNum, WetModulated, FlowRatioSec );
+				EvapCond( EvapCoolNum ).IECOperatingStatus = 2;
+			}
+		} else if ( SELECT_CASE_var == WetModulated ) {
+			Par( 1 ) = double( EvapCoolNum );
+			Par( 2 ) = double( WetModulated );
+			Par( 3 ) = SysTempSetPoint;
+			Par( 4 ) = InletDryBulbTempSec;
+			Par( 5 ) = InletWetBulbTempSec;
+			Par( 6 ) = InletHumRatioSec;
+			SolveRegulaFalsi( TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par );
+			// if the numerical inversion failed, issue error messages.
+			if ( SolFla == -1 ) {
+				if ( !WarmupFlag ) {
+					if ( EvapCond( EvapCoolNum ).IterationLimit == 0 ) {
+						ShowSevereError( "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect Evaporative Cooler Research Special = " + EvapCond( EvapCoolNum ).EvapCoolerName );
+						ShowContinueErrorTimeStamp( "" );
+						ShowContinueError( "  Iteration limit [" + RoundSigDigits( MaxIte ) + "] exceeded in calculating secondary air mass flow rate" );
+						ShowContinueError( "  Simulation continues" );
+					}
+					ShowRecurringWarningErrorAtEnd( "Secondary air mass flow Iteration limit exceeded in Indirect Evaporative Cooler Research Special = " + EvapCond( EvapCoolNum ).EvapCoolerName, EvapCond( EvapCoolNum ).IterationLimit );
+				}
+			} else if ( SolFla == -2 ) {
+				if ( !WarmupFlag ) {
+					if ( EvapCond( EvapCoolNum ).IterationFailed == 0 ) {
+						ShowSevereError( "CalcIndirectResearchSpecialEvapCooler: calculate secondary air mass flow failed for Indirect Evaporative Cooler Research Special = " + EvapCond( EvapCoolNum ).EvapCoolerName );
+						ShowContinueErrorTimeStamp( "" );
+						ShowContinueError( "...Bad secondary air mass flow rate limits" );
+						ShowContinueError( "...Given minimum secondary air mass flow rate=" + RoundSigDigits( MassFlowRateSecMin, 3 ) + " kg/s" );
+						ShowContinueError( "...Given maximum secondary air mass flow rate=" + RoundSigDigits( MassFlowRateSecMax, 3 ) + " kg/s" );
+						ShowContinueError( " Simulation continues" );
+					}
+					ShowRecurringWarningErrorAtEnd( "Secondary air mass flow control failed in Indirect Evaporative Cooler Research Special = " + EvapCond( EvapCoolNum ).EvapCoolerName, EvapCond( EvapCoolNum ).IterationFailed );
+				}
+			}
+			EvapCond( EvapCoolNum ).SecInletMassFlowRate = AirMassFlowSec;
+			if ( AirMassFlowSec > 0.0 ) {
+				if ( MassFlowRateSecMax > 0.0 ) {
+					FlowRatioSec = AirMassFlowSec / MassFlowRateSecMax;
+				} else {
+					FlowRatioSec = 0.0;
+				}
+			} else {
+				FlowRatioSec = 0.0;
+			}
+			EvapCond( EvapCoolNum ).EvapCoolerPower = IndEvapCoolerPower( EvapCoolNum, WetModulated, FlowRatioSec );
+			EvapCond( EvapCoolNum ).IECOperatingStatus = 2;
+		} else if ( SELECT_CASE_var == WetFull ) {
+			CalcIndirectRDDEvapCoolerOutletTemp( EvapCoolNum, WetFull, MassFlowRateSecMax, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec );
+			EvapCond( EvapCoolNum ).SecInletMassFlowRate = MassFlowRateSecMax;
+			FlowRatioSec = 1.0;
+			EvapCond( EvapCoolNum ).EvapCoolerPower = IndEvapCoolerPower( EvapCoolNum, WetFull, FlowRatioSec );
+			EvapCond( EvapCoolNum ).IECOperatingStatus = 2;
+		}
+		}
+		if ( PartLoad == 1.0 ) {
+			if ( EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode == WetModulated || EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode == WetFull ) {
+				BoundTemp = TEDB - EvapCond( EvapCoolNum ).DPBoundFactor * ( TEDB - InletDewPointTempSec );
+				if ( EvapCond( EvapCoolNum ).OutletTemp < BoundTemp ) {
+					EvapCond( EvapCoolNum ).OutletTemp = BoundTemp;
+					EvapCond( EvapCoolNum ).DewPointBoundFlag = 1;
+				}
+			}
+		} else if ( ( PartLoad < 1.0 ) && ( PartLoad > 0.0 ) ) {
+			// assume perfect control Use PLF for energy consumption
+			if ( EvapCond( EvapCoolNum ).DesiredOutletTemp < TEDB ) {
+				EvapCond( EvapCoolNum ).OutletTemp = EvapCond( EvapCoolNum ).DesiredOutletTemp;
+			}
+		} else {
+			//part load set to zero so no cooling
+			EvapCond( EvapCoolNum ).OutletTemp = EvapCond( EvapCoolNum ).InletTemp;
+		}
+		if ( EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode != None ) {
+			// There is a constant humidity ratio across the primary side but a reduction in the dry bulb temp
+			EvapCond( EvapCoolNum ).OuletWetBulbTemp = PsyTwbFnTdbWPb( EvapCond( EvapCoolNum ).OutletTemp, EvapCond( EvapCoolNum ).InletHumRat, OutBaroPress );
+			EvapCond( EvapCoolNum ).OutletHumRat = EvapCond( EvapCoolNum ).InletHumRat;
+			EvapCond( EvapCoolNum ).OutletEnthalpy = PsyHFnTdbW( EvapCond( EvapCoolNum ).OutletTemp, EvapCond( EvapCoolNum ).OutletHumRat );
+			RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, EvapCond( EvapCoolNum ).InletTemp, EvapCond( EvapCoolNum ).InletHumRat );
+			QHX = EvapCond( EvapCoolNum ).VolFlowRate * RhoAir * ( EvapCond( EvapCoolNum ).InletEnthalpy - EvapCond( EvapCoolNum ).OutletEnthalpy );
+			if ( QHX > SmallLoad ) {
+				// get secondary air outlet condition
+				CalcSecondaryAirOutletCondition( EvapCoolNum, EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode, EvapCond( EvapCoolNum ).SecInletMassFlowRate, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec, QHX, QHXLatent );
+				RhoWater = RhoH2O( OutDryBulbTemp ); // this if it is at the outside air inlet node condition
+				hfg = PsyHfgAirFnWTdb( InletHumRatioSec, InletDryBulbTempSec );
+				EvapVdot = ( QHXLatent ) / ( hfg * RhoWater );
+				DriftVdot = EvapVdot * EvapCond( EvapCoolNum ).DriftFraction;
+				if ( EvapCond( EvapCoolNum ).BlowDownRatio > 0.0 ) {
+					BlowDownVdot = EvapVdot / ( EvapCond( EvapCoolNum ).BlowDownRatio - 1 ) - DriftVdot;
+					if ( BlowDownVdot < 0.0 ) BlowDownVdot = 0.0;
+				} else {
+					BlowDownVdot = 0.0;
+				}
+				EvapCond( EvapCoolNum ).EvapWaterConsumpRate = EvapVdot + DriftVdot + BlowDownVdot;
+				// A numerical check to keep from having very tiny negative water consumption values being reported
+				if ( EvapCond( EvapCoolNum ).EvapWaterConsumpRate < 0.0 ) EvapCond( EvapCoolNum ).EvapWaterConsumpRate = 0.0;
+			} else {
+				EvapCond( EvapCoolNum ).OutletTemp = EvapCond( EvapCoolNum ).InletTemp;
+				EvapCond( EvapCoolNum ).OuletWetBulbTemp = EvapCond( EvapCoolNum ).InletWetBulbTemp;
+				EvapCond( EvapCoolNum ).OutletEnthalpy = EvapCond( EvapCoolNum ).InletEnthalpy;
+				EvapCond( EvapCoolNum ).EvapCoolerEnergy = 0.0;
+				EvapCond( EvapCoolNum ).EvapCoolerPower = 0.0;
+				EvapCond( EvapCoolNum ).EvapWaterConsumpRate = 0.0;
+				EvapCond( EvapCoolNum ).SecInletMassFlowRate = 0.0;
+				EvapCond( EvapCoolNum ).IECOperatingStatus = 0;
+				EvapCond( EvapCoolNum ).StageEff = 0.0;
+				CalcSecondaryAirOutletCondition( EvapCoolNum, EvapCond( EvapCoolNum ).EvapCoolerRDDOperatingMode, 0.0, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec, QHX, QHXLatent );
+			}
+
+		} else {
+			// The evap cooler is not running and does not change conditions from inlet to outlet
+			EvapCond( EvapCoolNum ).OutletTemp = EvapCond( EvapCoolNum ).InletTemp;
+			EvapCond( EvapCoolNum ).OuletWetBulbTemp = EvapCond( EvapCoolNum ).InletWetBulbTemp;
+			EvapCond( EvapCoolNum ).OutletHumRat = EvapCond( EvapCoolNum ).InletHumRat;
+			EvapCond( EvapCoolNum ).OutletEnthalpy = EvapCond( EvapCoolNum ).InletEnthalpy;
+			EvapCond( EvapCoolNum ).SecOutletTemp = EvapCond( EvapCoolNum ).SecInletTemp;
+			EvapCond( EvapCoolNum ).SecOutletHumRat = EvapCond( EvapCoolNum ).SecInletHumRat;
+			EvapCond( EvapCoolNum ).SecOutletEnthalpy = EvapCond( EvapCoolNum ).SecInletEnthalpy;
+			EvapCond( EvapCoolNum ).SecOutletMassFlowRate = EvapCond( EvapCoolNum ).SecInletMassFlowRate;
+			EvapCond( EvapCoolNum ).EvapCoolerEnergy = 0.0;
+			EvapCond( EvapCoolNum ).EvapCoolerPower = 0.0;
+			EvapCond( EvapCoolNum ).EvapWaterConsumpRate = 0.0;
+			EvapCond( EvapCoolNum ).SecInletMassFlowRate = 0.0;
+			EvapCond( EvapCoolNum ).IECOperatingStatus = 0;
+			EvapCond( EvapCoolNum ).StageEff = 0.0;
+		}
+	}
+
+	Real64
+	CalcEvapCoolRDDSecFlowResidual(
+		Real64 const AirMassFlowSec, // secondary air mass flow rate in kg/s
+		Array1< Real64 > const & Par // Par(2) is desired outlet temperature of Evap Cooler
+	)
+	{
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         B. Nigusse
+			//       DATE WRITTEN   Sep 2014
+			//       MODIFIED       na
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// Indirect research special evaporative cooler part load operation:
+			// determines the secondary air flow rate
+
+			// METHODOLOGY EMPLOYED:
+			// Uses regula falsi to minimize setpoint temperature residual to by varying the
+			// secondary air flow rate.
+
+			// REFERENCES:
+			//
+
+			// Using/Aliasing
+			// na
+
+			// SUBROUTINE PARAMETER DEFINITIONS:
+			//na
+
+			// INTERFACE BLOCK SPECIFICATIONS
+			// na
+
+			// DERIVED TYPE DEFINITIONS
+			// na
+
+			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+			int EvapCoolIndex; // evaporative cooler index
+			int DryOrWetOperatingMode; // provides index for dry mode and wet mode operation
+			Real64 EDBTSecAirSide; // current entering dry bulb temperature of the secondary side
+			Real64 EWBTSecAirSide; // current entering wet bulb temperature of the secondary side
+			Real64 EHumRatSecAirSide; // current entering humidity ratio of the secondary side
+			Real64 OutletAirTemp; // evap Coler outlet air temperature
+			Real64 SysTempSetPoint; // evaporative cooler outlet setpoint temperature, drybulb
+			Real64 Residuum; // Residual to be minimized to zero
+
+			EvapCoolIndex = int( Par( 1 ) );
+			DryOrWetOperatingMode = int( Par( 2 ) );
+			SysTempSetPoint = Par( 3 );
+			EDBTSecAirSide = Par( 4 );
+			EWBTSecAirSide = Par( 5 );
+			EHumRatSecAirSide = Par( 6 );
+			EvapCond( EvapCoolIndex ).SecInletMassFlowRate = AirMassFlowSec;
+			CalcIndirectRDDEvapCoolerOutletTemp( EvapCoolIndex, DryOrWetOperatingMode, AirMassFlowSec, EDBTSecAirSide, EWBTSecAirSide, EHumRatSecAirSide );
+			OutletAirTemp = EvapCond( EvapCoolIndex ).OutletTemp;
+			Residuum = SysTempSetPoint - OutletAirTemp;
+
+			return Residuum;
+	}
+
+	void
+	CalcIndirectRDDEvapCoolerOutletTemp(
+		int const EvapCoolNum,
+		int const DryOrWetOperatingMode,
+		Real64 const AirMassFlowSec,
+		Real64 const EDBTSec,
+		Real64 const EWBTSec,
+		Real64 const EHumRatSec
+	)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         B. Nigusse
+		//       DATE WRITTEN   Sep 2014
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Indirect research special evaporative cooler perfomance:
+		// determines the IEC primary air outlet temperature
+
+		// METHODOLOGY EMPLOYED:
+		// Uses effectiveness and energy balance equations to determine
+		// primary air outlet temperature.  The dry and wet effectiveness
+		// values are used depending on operating modes.
+
+		// REFERENCES:
+		//
+
+		// Using/Aliasing
+		//using DataHVACGlobals::TempControlTol;
+		using CurveManager::CurveValue;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 OutletTemp; // evaporative cooler current outlet air drybulb temperature
+		Real64 RhoAirSec; // density of secondary air at inlet condition
+		Real64 RhoAirSys; // density of primary air at inlet condition
+		Real64 EffectivenessDry; // dry coil effectiveness
+		Real64 EffectivenessWet; // wet coil effectiveness
+		Real64 TdbOutSysWetMin; // system( primary ) air drybulb outlet temperature minimum based on wet coil
+		Real64 TdbOutSysDryMin; // system (primary) air drybulb outlet temperature minimum based on dry coil
+		Real64 FlowRatio; // flow ratio based on current to the design of secondary air flow rate
+		Real64 EffModDryMode; // dry mode effectiveness modifier for flow ratio
+		Real64 EffModWetMode; // wet mode effectiveness modifier for flow ratio
+		Real64 CapFlowMin; // minimum capacity flow (massFlowRate * Specific Heat) of primary and secondary flows
+		Real64 CapFlowSys; // capacity flow (massFlowRate * Specific Heat) of primary air system
+		Real64 CapFlowSec; // capacity flow (massFlowRate * Specific Heat) of secondary system
+		Real64 CpAirSec; // specific heat of secondary air at inlet condition
+		Real64 CpAirSys; // specific heat of primary air at inlet condition
+		Real64 MassFlowRateTot; // current total mass flow rate of primary and secondary air mass flow rates
+		Real64 DesignMassFlowRateTot; // total design mass flow rate of primary and secondary air mass flow rates
+
+		Real64 QHXRate; // total heat transfer rate
+		Real64 OutletTempSec; // secondary air outlet temperature
+		Real64 SecOutletAirHumRatSat; // secondary air humidity ratio corresponding to saturated temperature
+		Real64 SecOutletAirHumRat; // secondary air humidity ratio at constant temperature (Pure mass transfer)
+		Real64 SecOutletEnthalpy; // secondary air outlet enthalpy
+		Real64 SecOutletTSat; // secondary air saturated temperature corresponding to outlet enthalpy
+
+		if ( EvapCond( EvapCoolNum ).InletMassFlowRate > 0.0 ) {
+			FlowRatio = AirMassFlowSec / EvapCond( EvapCoolNum ).InletMassFlowRate; // ratio of current secondary air flow to current primary air flow
+		} else {
+			FlowRatio = 1.0;
+		}
+		if ( AirMassFlowSec > 0.0 ) {
+			RhoAirSec = PsyRhoAirFnPbTdbW( OutBaroPress, EDBTSec, EHumRatSec );
+			RhoAirSys = PsyRhoAirFnPbTdbW( OutBaroPress, EvapCond( EvapCoolNum ).InletTemp, EvapCond( EvapCoolNum ).InletHumRat );
+			if ( DryOrWetOperatingMode == DryModulated || DryOrWetOperatingMode == DryFull ) {
+				if ( EvapCond( EvapCoolNum ).DrybulbEffecCurveIndex > 0 ) {
+					EffModDryMode = CurveValue( EvapCond( EvapCoolNum ).DrybulbEffecCurveIndex, FlowRatio );
+				} else {
+					EffModDryMode = 1.0;
+				}
+				EffectivenessDry = EvapCond( EvapCoolNum ).DryCoilMaxEfficiency * EffModDryMode;
+				EvapCond( EvapCoolNum ).StageEff = EffectivenessDry;
+				OutletTemp = EvapCond( EvapCoolNum ).InletTemp - EffectivenessDry * ( EvapCond( EvapCoolNum ).InletTemp - EDBTSec );
+				if ( OutletTemp > EvapCond( EvapCoolNum ).InletTemp ) {
+					OutletTemp = EvapCond( EvapCoolNum ).InletTemp;
+				}
+				CpAirSys = PsyCpAirFnWTdb( EvapCond( EvapCoolNum ).InletHumRat, EvapCond( EvapCoolNum ).InletTemp );
+				CapFlowSys = EvapCond( EvapCoolNum ).InletMassFlowRate * CpAirSys;
+				QHXRate = CapFlowSys * ( EvapCond( EvapCoolNum ).InletTemp - OutletTemp );
+				CpAirSec = PsyCpAirFnWTdb( EHumRatSec, EDBTSec );
+				CapFlowSec = AirMassFlowSec * CpAirSec;
+				OutletTempSec = EDBTSec + QHXRate / CapFlowSec;
+				if ( OutletTempSec >= EvapCond( EvapCoolNum ).InletTemp ) {
+					OutletTempSec = EvapCond( EvapCoolNum ).InletTemp - 0.2;
+					QHXRate = CapFlowSec * ( OutletTempSec - EDBTSec );
+					OutletTemp = EvapCond( EvapCoolNum ).InletTemp - QHXRate / CapFlowSys;
+				}
+				EvapCond( EvapCoolNum ).SecOutletTemp = OutletTempSec;
+			} else if ( DryOrWetOperatingMode == WetModulated || DryOrWetOperatingMode == WetFull ) {
+				if ( EvapCond( EvapCoolNum ).WetbulbEffecCurveIndex > 0 ) {
+					EffModWetMode = CurveValue( EvapCond( EvapCoolNum ).WetbulbEffecCurveIndex, FlowRatio );
+				} else {
+					EffModWetMode = 1.0;
+				}
+				EffectivenessWet = EvapCond( EvapCoolNum ).WetCoilMaxEfficiency * EffModWetMode;
+				EvapCond( EvapCoolNum ).StageEff = EffectivenessWet;
+				OutletTemp = EvapCond( EvapCoolNum ).InletTemp - EffectivenessWet * ( EvapCond( EvapCoolNum ).InletTemp - EWBTSec );
+				if ( OutletTemp > EvapCond( EvapCoolNum ).InletTemp ) {
+					OutletTemp = EvapCond( EvapCoolNum ).InletTemp;
+				}
+				CpAirSys = PsyCpAirFnWTdb( EvapCond( EvapCoolNum ).InletHumRat, EvapCond( EvapCoolNum ).InletTemp );
+				CapFlowSys = EvapCond( EvapCoolNum ).InletMassFlowRate * CpAirSys;
+				QHXRate = CapFlowSys * ( EvapCond( EvapCoolNum ).InletTemp - OutletTemp );
+				SecOutletEnthalpy = EvapCond( EvapCoolNum ).SecInletEnthalpy + QHXRate / AirMassFlowSec;
+				SecOutletAirHumRat = PsyWFnTdbH( EDBTSec, SecOutletEnthalpy );  // assumes constant temperature moisture addition
+				// we may need check based on maximum allowed humidity ratio
+				EvapCond( EvapCoolNum ).SecOutletTemp = EDBTSec;
+				EvapCond( EvapCoolNum ).SecOutletHumRat = SecOutletAirHumRat;
+				EvapCond( EvapCoolNum ).SecOutletEnthalpy = SecOutletEnthalpy;
+			} else {
+				OutletTemp = EvapCond( EvapCoolNum ).InletTemp;
+				EvapCond( EvapCoolNum ).StageEff = 0.0;
+			}
+		} else {
+			OutletTemp = EvapCond( EvapCoolNum ).InletTemp;
+			EvapCond( EvapCoolNum ).StageEff = 0.0;
+
+		}
+        // set results to into output variables
+		EvapCond( EvapCoolNum ).OutletTemp = OutletTemp;
+
+	}
+
+	void
+	CalcSecondaryAirOutletCondition(
+		int const EvapCoolNum,
+		int const OperatingMode,
+		Real64 const AirMassFlowSec,
+		Real64 const EDBTSec,
+		Real64 const EWBTSec,
+		Real64 const EHumRatSec,
+		Real64 const QHXTotal,
+		Real64 & QHXLatent
+	)
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         B. Nigusse
+		//       DATE WRITTEN   Oct 2014
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Indirect research special evaporative cooler: determines the secondary air outlet conditions
+
+		// METHODOLOGY EMPLOYED:
+		// applies energy balance equations to determine the secondary air outlet condition
+		// For wt operations assumes the secondary air leaves at at inlet temperature, i.e.,
+		// latent heat transfer only.  For dry operation the humdity ratio remains constant.
+
+		// REFERENCES:
+		// CalculateWaterUseage routine of cooling towers for wet operation mode
+
+		// Using/Aliasing
+		using Psychrometrics::PsyHfgAirFnWTdb;
+		using Psychrometrics::PsyCpAirFnWTdb;
+		using Psychrometrics::PsyWFnTdbTwbPb;
+		using Psychrometrics::PsyWFnTdbH;
+		using DataEnvironment::OutBaroPress;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 SecOutletAirHumRatSat; // secondary air humidity ratio corresponding to saturated temperature
+		Real64 SecOutletAirHumRat; // secondary air humidity ratio at the outlet node
+		Real64 SecOutletEnthalpy; // secondary air outlet enthalpy
+		Real64 SecOutletTempSat; // secondary air saturated temperature corresponding to outlet enthalpy
+		Real64 SecOutletTemp; // secondary air outlet temperature
+		Real64 CpAirSec; // specific heat of secondary air at inlet condition
+		Real64 hfg; // secondary air side enthaly of evaporation
+
+		QHXLatent = 0.0;
+		if ( AirMassFlowSec > 0.0 ) {
+			if ( (OperatingMode == DryModulated || OperatingMode == DryFull ) ) {
+				EvapCond( EvapCoolNum ).SecOutletHumRat = EHumRatSec;
+				CpAirSec = PsyCpAirFnWTdb( EHumRatSec, EDBTSec );
+				EvapCond( EvapCoolNum ).SecOutletTemp = EDBTSec + QHXTotal / AirMassFlowSec / CpAirSec;
+				EvapCond( EvapCoolNum ).SecOutletEnthalpy = PsyHFnTdbW( EvapCond( EvapCoolNum ).SecOutletTemp, EHumRatSec );
+				EvapCond( EvapCoolNum ).SecOuletWetBulbTemp = PsyTwbFnTdbWPb( EvapCond( EvapCoolNum ).SecOutletTemp, EHumRatSec, OutBaroPress );
+			} else if ( ( OperatingMode == WetModulated || OperatingMode == WetFull ) ) {
+				SecOutletEnthalpy = EvapCond( EvapCoolNum ).SecInletEnthalpy + QHXTotal / AirMassFlowSec;
+				SecOutletAirHumRat = PsyWFnTdbH( EDBTSec, SecOutletEnthalpy );  // assumes a constant temperature moisture addition
+				EvapCond( EvapCoolNum ).SecOutletTemp = EDBTSec;
+				EvapCond( EvapCoolNum ).SecOutletHumRat = SecOutletAirHumRat;
+				EvapCond( EvapCoolNum ).SecOutletEnthalpy = SecOutletEnthalpy;
+				EvapCond( EvapCoolNum ).SecOuletWetBulbTemp = PsyTwbFnTdbWPb( EvapCond( EvapCoolNum ).SecOutletTemp, SecOutletAirHumRat, OutBaroPress );
+				hfg = PsyHfgAirFnWTdb( EHumRatSec, EDBTSec );
+				QHXLatent = min( QHXTotal, AirMassFlowSec *  ( SecOutletAirHumRat - EHumRatSec ) * hfg );
+			} else {
+				// set results to into output variables
+				EvapCond( EvapCoolNum ).SecOutletTemp = EDBTSec;
+				EvapCond( EvapCoolNum ).SecOuletWetBulbTemp = EWBTSec;
+				EvapCond( EvapCoolNum ).SecOutletHumRat = EHumRatSec;
+				EvapCond( EvapCoolNum ).SecOutletEnthalpy = EvapCond( EvapCoolNum ).SecInletEnthalpy;
+			}
+		} else {
+			EvapCond( EvapCoolNum ).SecOutletTemp = EDBTSec;
+			EvapCond( EvapCoolNum ).SecOuletWetBulbTemp = EWBTSec;
+			EvapCond( EvapCoolNum ).SecOutletHumRat = EHumRatSec;
+			EvapCond( EvapCoolNum ).SecOutletEnthalpy = EvapCond( EvapCoolNum ).SecInletEnthalpy;
+		}
+	}
+
+	Real64
+	IndEvapCoolerPower(
+		int const EvapCoolIndex, // Unit index
+		int const DryWetMode, // dry or wet operating mode of evaporator cooler
+		Real64 const FlowRatio // secondary air flow fraction
+	)
+	{
+
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         B. Nigusse
+			//       DATE WRITTEN   Sep 2014
+			//       MODIFIED       na
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// Calculates the Indirect Evaporative Cooler Total Electric Power
+
+			// METHODOLOGY EMPLOYED:
+			// Scales the design fan and pump power depending on secondary air flow fraction
+			// and sums the two to determine the evaporative cooler total electric power.
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
+			using CurveManager::CurveValue;
+
+			// Locals
+			// SUBROUTINE ARGUMENT DEFINITIONS:
+
+			// SUBROUTINE PARAMETER DEFINITIONS:
+			// na
+
+			// INTERFACE BLOCK SPECIFICATIONS
+			// na
+
+			// DERIVED TYPE DEFINITIONS
+			// na
+
+			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+			Real64 FanPowerModCurveValue; // fan power modifier curve value
+			Real64 PumpPowerModCurveValue; // fan power modifier curve value
+			Real64 EvapCoolertotalPower; // current evapoartive cooler total electric power
+
+			EvapCoolertotalPower = 0.0;
+			if ( FlowRatio > 0.0 ) {
+				if ( EvapCond( EvapCoolIndex ).FanPowerModifierCurveIndex > 0 ) {
+					FanPowerModCurveValue = CurveValue( EvapCond( EvapCoolIndex ).FanPowerModifierCurveIndex, FlowRatio );
+				} else {
+					FanPowerModCurveValue = EvapCond( EvapCoolIndex ).PartLoadFract;
+				}
+				EvapCoolertotalPower += EvapCond( EvapCoolIndex ).IndirectFanPower * FanPowerModCurveValue;
+				if ( DryWetMode == WetModulated || DryWetMode == WetFull ) {
+					//Add the pump power to the total Evap Cooler power for wet operating mode
+					if ( EvapCond( EvapCoolIndex ).PumpPowerModifierCurveIndex > 0 ) {
+						PumpPowerModCurveValue = CurveValue( EvapCond( EvapCoolIndex ).PumpPowerModifierCurveIndex, FlowRatio );
+					} else {
+						// linearly scale pump power using part-load-fraction when pump power modifier curve is not specified
+						PumpPowerModCurveValue = EvapCond( EvapCoolIndex ).PartLoadFract;
+					}
+					EvapCoolertotalPower += EvapCond( EvapCoolIndex ).IndirectRecircPumpPower * PumpPowerModCurveValue;
+				}
+			} else {
+				EvapCoolertotalPower = 0.0;
+			}
+			return EvapCoolertotalPower;
 	}
 
 	void
@@ -1707,8 +2566,8 @@ namespace EvaporativeCoolers {
 		// REFERENCES:
 		// na
 
-		// USE STATEMENTS:
-		// na
+		// Using/Aliasing
+		using CurveManager::CurveValue;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1728,13 +2587,33 @@ namespace EvaporativeCoolers {
 		Real64 TEWB; // Entering Wet Bulb Temperature
 		Real64 RhoWater;
 		Real64 PartLoad;
+		Real64 EffModCurveValue; // effectiveness modifier curve value
+		Real64 PumpPowerModCurveValue; // recirculation pump power modifier curve value
+		Real64 FlowRatio; // primary air flow frcation (current flow divided by the design flow rate)
+		Real64 MassFlowRateSysDesign; // primary air design mass flow rate
+		Real64 MassFlowRateSys; // primary air current mass flow rate
+		int InletNode; // inlet node number
 		static Real64 BlowDownVdot( 0.0 );
 		static Real64 DriftVdot( 0.0 );
 		static Real64 EvapVdot( 0.0 );
+		bool EvapCoolerOperatingLimitFlag( false );
+
+
+		EvapCoolerOperatingLimitFlag = false;
+		TEDB = EvapCond( EvapCoolNum ).InletTemp;
+		TEWB = EvapCond( EvapCoolNum ).InletWetBulbTemp;
+		if ( EvapCond( EvapCoolNum ).EvapCoolerOperationControlFlag ) {
+			if ( TEDB >= EvapCond( EvapCoolNum ).MinOATDBEvapCooler && ( TEWB <= EvapCond( EvapCoolNum ).MaxOATWBEvapCooler || TEDB <= EvapCond( EvapCoolNum ).MaxOATDBEvapCooler ) ) {
+				EvapCoolerOperatingLimitFlag = true;
+			}
+		} else {
+			EvapCoolerOperatingLimitFlag = true;
+		}
 
 		// If the Evaporative Cooler  is operating there should be some mass flow rate
 		//  Also the evap cooler has to be scheduled to be available
-		if ( ( EvapCond( EvapCoolNum ).InletMassFlowRate > 0.0 ) && ( GetCurrentScheduleValue( EvapCond( EvapCoolNum ).SchedPtr ) > 0.0 ) ) {
+		if ( ( EvapCond( EvapCoolNum ).InletMassFlowRate > 0.0 ) && ( GetCurrentScheduleValue( EvapCond( EvapCoolNum ).SchedPtr ) > 0.0) && EvapCoolerOperatingLimitFlag ) {
+
 
 			//***************************************************************************
 			//   TEMP LEAVING DRY BULB IS CALCULATED FROM SATURATION EFFICIENCY AS THE
@@ -1742,7 +2621,24 @@ namespace EvaporativeCoolers {
 			//   ACROSS A DIRECT EVAPORATION COOLER.
 			TEWB = EvapCond( EvapCoolNum ).InletWetBulbTemp;
 			TEDB = EvapCond( EvapCoolNum ).InletTemp;
-			SatEff = EvapCond( EvapCoolNum ).DirectEffectiveness;
+			InletNode = EvapCond( EvapCoolNum ).InletNode;
+			if ( EvapCond( EvapCoolNum ).WetbulbEffecCurveIndex > 0 ) {
+				MassFlowRateSys = EvapCond( EvapCoolNum ).InletMassFlowRate;
+				MassFlowRateSysDesign = Node( InletNode ).MassFlowRateMax;
+				if ( MassFlowRateSysDesign > 0.0 ) {
+					if ( MassFlowRateSys > 0.0 ) {
+						FlowRatio = MassFlowRateSys / MassFlowRateSysDesign;
+					} else {
+						FlowRatio = 1.0;
+					}
+				}
+				EffModCurveValue = CurveValue( EvapCond( EvapCoolNum ).WetbulbEffecCurveIndex, FlowRatio );
+			} else {
+				// if no curve specified assume constant effectiveness
+				EffModCurveValue = 1.0;
+			}
+			SatEff = EvapCond( EvapCoolNum ).DirectEffectiveness * EffModCurveValue;
+			EvapCond( EvapCoolNum ).StageEff = SatEff;
 			PartLoad = EvapCond( EvapCoolNum ).PartLoadFract;
 			if ( PartLoad == 1.0 ) {
 				EvapCond( EvapCoolNum ).OutletTemp = TEDB - ( ( TEDB - TEWB ) * SatEff );
@@ -1774,8 +2670,13 @@ namespace EvaporativeCoolers {
 			//***************************************************************************
 			//                  ENERGY CONSUMED BY THE RECIRCULATING PUMP
 			//Add the pump energy to the total Evap Cooler energy comsumption
-			EvapCond( EvapCoolNum ).EvapCoolerPower = EvapCond( EvapCoolNum ).RecircPumpPower * PartLoad;
-
+			if ( EvapCond( EvapCoolNum ).PumpPowerModifierCurveIndex > 0 ) {
+				PumpPowerModCurveValue = CurveValue( EvapCond( EvapCoolNum ).PumpPowerModifierCurveIndex, FlowRatio );
+			} else {
+				// if no pump power modifier curve specified, then assume linear variation with part-load
+				PumpPowerModCurveValue = PartLoad;
+			}
+			EvapCond( EvapCoolNum ).EvapCoolerPower = EvapCond( EvapCoolNum ).RecircPumpPower * PumpPowerModCurveValue;
 			//******************
 			//             WATER CONSUMPTION IN m3 OF WATER FOR DIRECT
 			//             H2O [m3/sec] = Delta W[KgH2O/Kg air]*Mass Flow Air[Kg air]
@@ -1866,10 +2767,15 @@ namespace EvaporativeCoolers {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int OutletNode;
 		int InletNode;
+		int OutletNodeSec;
+		int InletNodeSec;
 		static Real64 AvailWaterRate( 0.0 );
 
 		OutletNode = EvapCond( EvapCoolNum ).OutletNode;
 		InletNode = EvapCond( EvapCoolNum ).InletNode;
+
+		InletNodeSec = EvapCond( EvapCoolNum ).SecondaryInletNode;
+		OutletNodeSec = EvapCond( EvapCoolNum ).SecondaryOutletNode;
 
 		// Set the outlet air nodes of the EvapCooler
 		Node( OutletNode ).MassFlowRate = EvapCond( EvapCoolNum ).OutletMassFlowRate;
@@ -1879,6 +2785,17 @@ namespace EvaporativeCoolers {
 		Node( OutletNode ).HumRat = EvapCond( EvapCoolNum ).OutletHumRat;
 		Node( OutletNode ).Enthalpy = EvapCond( EvapCoolNum ).OutletEnthalpy;
 		Node( OutletNode ).Press = EvapCond( EvapCoolNum ).OutletPressure;
+
+		if ( EvapCond( EvapCoolNum ).SecondaryOutletNode > 0 ) {
+			// set outlet nodes of the secondary air side of the EvapCooler (mass Flow Rate Only)
+			if ( EvapCond( EvapCoolNum ).EvapCoolerType == iEvapCoolerInDirectRDDSpecial && EvapCond( EvapCoolNum ).EvapCoolerOperationControlFlag ) {
+				Node( OutletNodeSec ).Temp = EvapCond( EvapCoolNum ).SecOutletTemp;
+				Node( OutletNodeSec ).HumRat = EvapCond( EvapCoolNum ).SecOutletHumRat;
+				Node( OutletNodeSec ).Enthalpy = EvapCond( EvapCoolNum ).SecOutletEnthalpy;
+				Node( OutletNodeSec ).MassFlowRate = EvapCond( EvapCoolNum ).SecOutletMassFlowRate;
+			}
+		}
+
 		// Set the outlet nodes for properties that just pass through & not used
 		Node( OutletNode ).Quality = Node( InletNode ).Quality;
 

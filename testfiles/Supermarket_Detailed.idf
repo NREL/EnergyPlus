@@ -130,7 +130,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.2;
+  Version,8.3;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -5213,4 +5213,7 @@
 
   output:diagnostics,
     displayallwarnings;      !- Key 1
+
+  Output:SQLite,
+    Simple;
 

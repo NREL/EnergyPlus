@@ -5081,9 +5081,9 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			if ( surface.Class == SurfaceClass_TDD_Dome ) continue; // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
 			if ( ( ZoneNum = surface.Zone ) == 0 ) continue; // Skip non-heat transfer surfaces
 
-			Real64 & TH11( TH( 1, 1, SurfNum )  );
-			Real64 & TH12( TH( 2, 1, SurfNum )  );
-			Real64 & TH22( TH( 2, 2, SurfNum )  );
+			Real64 & TH11( TH( 1, 1, SurfNum ) );
+			Real64 & TH12( TH( 2, 1, SurfNum ) );
+			Real64 & TH22( TH( 2, 2, SurfNum ) );
 
 			ConstrNum = surface.Construction;
 			auto const & construct( Construct( ConstrNum ) );
@@ -5361,6 +5361,10 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			TH12 = TempSurfInRep( SurfNum ) = TempSurfIn( SurfNum );
 			TempSurfOut( SurfNum ) = TH11; // For reporting
 
+			//if ( std::isnan( TempSurfInRep( SurfNum ) ) ) { // Use IEEE_IS_NAN when GFortran supports it
+				//// throw Error
+				//ShowFatalError( "Inside surface temperature is out of bound = " + Surface( SurfNum ).Name );
+			//}
 			// sign convention is positive means energy going into inside face from the air.
 			auto const HConvInTemp_fac( -HConvIn_surf * ( TempSurfIn( SurfNum ) - RefAirTemp( SurfNum ) ) );
 			QdotConvInRep( SurfNum ) = surface.Area * HConvInTemp_fac;
@@ -5810,7 +5814,7 @@ CalcOutsideSurfTemp(
 	// the next SurfNum.
 
 	// Outside heat balance case: Tubular daylighting device
-	Real64 & TH11( TH( 1, 1, SurfNum )  );
+	Real64 & TH11( TH( 1, 1, SurfNum ) );
 	if ( Surface( SurfNum ).Class == SurfaceClass_TDD_Dome ) {
 
 		// Lookup up the TDD:DIFFUSER object

@@ -2077,7 +2077,7 @@ namespace BranchInputManager {
 					if ( CurSplitter && ! SameString( ConnectorLists( Count ).ConnectorType( Loop1 ), cMIXER ) ) continue;
 					if ( ConnectorLists( Count ).ConnectorMatchNo( Loop1 ) != 0 ) continue;
 					{ auto const SELECT_CASE_var( CurSplitter );
-					if ( SELECT_CASE_var == true ) {
+					if ( SELECT_CASE_var ) {
 						// Current "item" is a splitter, candidate is a mixer.
 						MixerNum = FindItemInList( ConnectorLists( Count ).ConnectorName( Loop1 ), Mixers.Name(), NumMixers );
 						if ( MixerNum == 0 ) continue;
@@ -2094,7 +2094,7 @@ namespace BranchInputManager {
 							ConnectorLists( Count ).ConnectorMatchNo( Loop1 ) = MixerNum;
 							ConnectorLists( Count ).ConnectorMatchNo( Loop ) = SplitNum;
 						}
-					} else if ( SELECT_CASE_var == false ) {
+					} else {
 						// Current "item" is a splitter, candidate is a mixer.
 						SplitNum = FindItemInList( ConnectorLists( Count ).ConnectorName( Loop1 ), Splitters.Name(), NumSplitters );
 						if ( SplitNum == 0 ) continue;
@@ -3136,15 +3136,15 @@ namespace BranchInputManager {
 
 		gio::write( OutputFileBNDetails, Format_701 ) << "! ===============================================================";
 		gio::write( OutputFileBNDetails, Format_700 );
-		gio::write( ChrOut, fmtLD  ) << NumOfBranchLists;
+		gio::write( ChrOut, fmtLD ) << NumOfBranchLists;
 		gio::write( OutputFileBNDetails, Format_701 ) << " #Branch Lists," + stripped( ChrOut );
 		gio::write( OutputFileBNDetails, Format_702 );
 		gio::write( OutputFileBNDetails, Format_704 );
 
 		for ( BCount = 1; BCount <= NumOfBranchLists; ++BCount ) {
 
-			gio::write( ChrOut, fmtLD  ) << BCount;
-			gio::write( ChrOut1, fmtLD  ) << BranchList( BCount ).NumOfBranchNames;
+			gio::write( ChrOut, fmtLD ) << BCount;
+			gio::write( ChrOut1, fmtLD ) << BranchList( BCount ).NumOfBranchNames;
 			gio::write( OutputFileBNDetails, Format_701 ) << " Branch List," + stripped( ChrOut ) + ',' + BranchList( BCount ).Name + ',' + BranchList( BCount ).LoopName + ',' + BranchList( BCount ).LoopType + ',' + stripped( ChrOut1 );
 
 			IsAirBranch = false;

@@ -32,11 +32,11 @@
 	inline MA1c_bool AbsorpSolarEMSOverrideOn() const { return ma( &T::AbsorpSolarEMSOverrideOn ); }
 	inline MA1c_bool AbsorpThermalEMSOverrideOn() const { return ma( &T::AbsorpThermalEMSOverrideOn ); }
 	inline MA1c_bool AbsorpVisibleEMSOverrideOn() const { return ma( &T::AbsorpVisibleEMSOverrideOn ); }
-	inline MA1c_bool AdaptiveASH55() const { return ma( &T::AdaptiveASH55 ); }
-	inline MA1c_bool AdaptiveCEN15251() const { return ma( &T::AdaptiveCEN15251 ); }
 	inline MA1c_bool Active() const { return ma( &T::Active ); }
 	inline MA1c_bool active() const { return ma( &T::active ); }
 	inline MA1c_bool activeNow() const { return ma( &T::activeNow ); }
+	inline MA1c_bool AdaptiveASH55() const { return ma( &T::AdaptiveASH55 ); }
+	inline MA1c_bool AdaptiveCEN15251() const { return ma( &T::AdaptiveCEN15251 ); }
 	inline MA1c_bool Available() const { return ma( &T::Available ); }
 	inline MA1c_bool CheckHeatRecoveryBypassStatus() const { return ma( &T::CheckHeatRecoveryBypassStatus ); }
 	inline MA1c_bool ConvergedFlag() const { return ma( &T::ConvergedFlag ); }
@@ -68,10 +68,10 @@
 	inline MA1c_bool ResimAirLoopFlag() const { return ma( &T::ResimAirLoopFlag ); }
 	inline MA1c_bool SimAirLoopsNeeded() const { return ma( &T::SimAirLoopsNeeded ); }
 	inline MA1c_bool SimElectLoadCentrNeeded() const { return ma( &T::SimElectLoadCentrNeeded ); }
+	inline MA1c_bool SimHybridVentSysAvailMgr() const { return ma( &T::SimHybridVentSysAvailMgr ); }
 	inline MA1c_bool SimNonZoneEquipNeeded() const { return ma( &T::SimNonZoneEquipNeeded ); }
 	inline MA1c_bool SimZoneEquipNeeded() const { return ma( &T::SimZoneEquipNeeded ); }
 	inline MA1c_bool SourceSinkPresent() const { return ma( &T::SourceSinkPresent ); }
-	inline MA1c_bool SimHybridVentSysAvailMgr() const { return ma( &T::SimHybridVentSysAvailMgr ); }
 	inline MA1c_bool TypeIsIRT() const { return ma( &T::TypeIsIRT ); }
 	inline MA1c_bool TypeIsWindow() const { return ma( &T::TypeIsWindow ); }
 	inline MA1c_bool WindowTypeBSDF() const { return ma( &T::WindowTypeBSDF ); }
@@ -82,11 +82,11 @@
 	inline MA1_bool AbsorpSolarEMSOverrideOn() { return ma( &T::AbsorpSolarEMSOverrideOn ); }
 	inline MA1_bool AbsorpThermalEMSOverrideOn() { return ma( &T::AbsorpThermalEMSOverrideOn ); }
 	inline MA1_bool AbsorpVisibleEMSOverrideOn() { return ma( &T::AbsorpVisibleEMSOverrideOn ); }
-	inline MA1_bool AdaptiveASH55() { return ma( &T::AdaptiveASH55 ); }
-	inline MA1_bool AdaptiveCEN15251() { return ma( &T::AdaptiveCEN15251 ); }
 	inline MA1_bool Active() { return ma( &T::Active ); }
 	inline MA1_bool active() { return ma( &T::active ); }
 	inline MA1_bool activeNow() { return ma( &T::activeNow ); }
+	inline MA1_bool AdaptiveASH55() { return ma( &T::AdaptiveASH55 ); }
+	inline MA1_bool AdaptiveCEN15251() { return ma( &T::AdaptiveCEN15251 ); }
 	inline MA1_bool Available() { return ma( &T::Available ); }
 	inline MA1_bool CheckHeatRecoveryBypassStatus() { return ma( &T::CheckHeatRecoveryBypassStatus ); }
 	inline MA1_bool ConvergedFlag() { return ma( &T::ConvergedFlag ); }
@@ -118,10 +118,10 @@
 	inline MA1_bool ResimAirLoopFlag() { return ma( &T::ResimAirLoopFlag ); }
 	inline MA1_bool SimAirLoopsNeeded() { return ma( &T::SimAirLoopsNeeded ); }
 	inline MA1_bool SimElectLoadCentrNeeded() { return ma( &T::SimElectLoadCentrNeeded ); }
+	inline MA1_bool SimHybridVentSysAvailMgr() { return ma( &T::SimHybridVentSysAvailMgr ); }
 	inline MA1_bool SimNonZoneEquipNeeded() { return ma( &T::SimNonZoneEquipNeeded ); }
 	inline MA1_bool SimZoneEquipNeeded() { return ma( &T::SimZoneEquipNeeded ); }
 	inline MA1_bool SourceSinkPresent() { return ma( &T::SourceSinkPresent ); }
-	inline MA1_bool SimHybridVentSysAvailMgr() { return ma( &T::SimHybridVentSysAvailMgr ); }
 	inline MA1_bool TypeIsIRT() { return ma( &T::TypeIsIRT ); }
 	inline MA1_bool TypeIsWindow() { return ma( &T::TypeIsWindow ); }
 	inline MA1_bool WindowTypeBSDF() { return ma( &T::WindowTypeBSDF ); }
@@ -144,13 +144,13 @@
 	inline MA1c_int CoolDDNum() const { return ma( &T::CoolDDNum ); }
 	inline MA1c_int CoolPowerNegativeCounter() const { return ma( &T::CoolPowerNegativeCounter ); }
 	inline MA1c_int CoolPowerNegativeIndex() const { return ma( &T::CoolPowerNegativeIndex ); }
-	inline MA1c_int FirstDemandSidePtr() const { return ma( &T::FirstDemandSidePtr ); }
 	inline MA1c_int ElapsedRotationTime() const { return ma( &T::ElapsedRotationTime ); }
 	inline MA1c_int ElapsedTime() const { return ma( &T::ElapsedTime ); }
 	inline MA1c_int EquipPtr() const { return ma( &T::EquipPtr ); }
 	inline MA1c_int EquipType_Num() const { return ma( &T::EquipType_Num ); }
 	inline MA1c_int ExtIntShadePrevTS() const { return ma( &T::ExtIntShadePrevTS ); }
 	inline MA1c_int firstColumn() const { return ma( &T::firstColumn ); }
+	inline MA1c_int FirstDemandSidePtr() const { return ma( &T::FirstDemandSidePtr ); }
 	inline MA1c_int firstStep() const { return ma( &T::firstStep ); }
 	inline MA1c_int FlowCtrl() const { return ma( &T::FlowCtrl ); }
 	inline MA1c_int FluidStream() const { return ma( &T::FluidStream ); }
@@ -227,13 +227,13 @@
 	inline MA1_int CoolDDNum() { return ma( &T::CoolDDNum ); }
 	inline MA1_int CoolPowerNegativeCounter() { return ma( &T::CoolPowerNegativeCounter ); }
 	inline MA1_int CoolPowerNegativeIndex() { return ma( &T::CoolPowerNegativeIndex ); }
-	inline MA1_int FirstDemandSidePtr() { return ma( &T::FirstDemandSidePtr ); }
 	inline MA1_int ElapsedRotationTime() { return ma( &T::ElapsedRotationTime ); }
 	inline MA1_int ElapsedTime() { return ma( &T::ElapsedTime ); }
 	inline MA1_int EquipPtr() { return ma( &T::EquipPtr ); }
 	inline MA1_int EquipType_Num() { return ma( &T::EquipType_Num ); }
 	inline MA1_int ExtIntShadePrevTS() { return ma( &T::ExtIntShadePrevTS ); }
 	inline MA1_int firstColumn() { return ma( &T::firstColumn ); }
+	inline MA1_int FirstDemandSidePtr() { return ma( &T::FirstDemandSidePtr ); }
 	inline MA1_int firstStep() { return ma( &T::firstStep ); }
 	inline MA1_int FlowCtrl() { return ma( &T::FlowCtrl ); }
 	inline MA1_int FluidStream() { return ma( &T::FluidStream ); }
@@ -369,17 +369,11 @@
 	inline MA1c_double CoolCap5() const { return ma( &T::CoolCap5 ); }
 	inline MA1c_double CoolCycleTime() const { return ma( &T::CoolCycleTime ); }
 	inline MA1c_double CoolingDemand() const { return ma( &T::CoolingDemand ); }
-	inline MA1c_double CoolMixHumRat() const { return ma( &T::CoolMixHumRat ); }
-	inline MA1c_double CoolMixTemp() const { return ma( &T::CoolMixTemp ); }
-	inline MA1c_double CoolOutHumRat() const { return ma( &T::CoolOutHumRat ); }
-	inline MA1c_double CoolOutTemp() const { return ma( &T::CoolOutTemp ); }
 	inline MA1c_double CoolPower1() const { return ma( &T::CoolPower1 ); }
 	inline MA1c_double CoolPower2() const { return ma( &T::CoolPower2 ); }
 	inline MA1c_double CoolPower3() const { return ma( &T::CoolPower3 ); }
 	inline MA1c_double CoolPower4() const { return ma( &T::CoolPower4 ); }
 	inline MA1c_double CoolPower5() const { return ma( &T::CoolPower5 ); }
-	inline MA1c_double CoolRetHumRat() const { return ma( &T::CoolRetHumRat ); }
-	inline MA1c_double CoolRetTemp() const { return ma( &T::CoolRetTemp ); }
 	inline MA1c_double CurrentMaxAvail() const { return ma( &T::CurrentMaxAvail ); }
 	inline MA1c_double CurrentMinAvail() const { return ma( &T::CurrentMinAvail ); }
 	inline MA1c_double DCElectProdRate() const { return ma( &T::DCElectProdRate ); }
@@ -570,6 +564,7 @@
 	inline MA1c_double LoadSideMassFlowRate() const { return ma( &T::LoadSideMassFlowRate ); }
 	inline MA1c_double LoadSideOutletTemp() const { return ma( &T::LoadSideOutletTemp ); }
 	inline MA1c_double LtsPower() const { return ma( &T::LtsPower ); }
+	inline MA1c_double MassFlowAtCoolPeak() const { return ma( &T::MassFlowAtCoolPeak ); }
 	inline MA1c_double MassFlowFromLower() const { return ma( &T::MassFlowFromLower ); }
 	inline MA1c_double MassFlowFromUpper() const { return ma( &T::MassFlowFromUpper ); }
 	inline MA1c_double MassFlowRate() const { return ma( &T::MassFlowRate ); }
@@ -591,7 +586,9 @@
 	inline MA1c_double MinProcAirInHumRat() const { return ma( &T::MinProcAirInHumRat ); }
 	inline MA1c_double MinProcAirInTemp() const { return ma( &T::MinProcAirInTemp ); }
 	inline MA1c_double MixedTemp() const { return ma( &T::MixedTemp ); }
+	inline MA1c_double MixHumRatAtCoolPeak() const { return ma( &T::MixHumRatAtCoolPeak ); }
 	inline MA1c_double MixMass() const { return ma( &T::MixMass ); }
+	inline MA1c_double MixTempAtCoolPeak() const { return ma( &T::MixTempAtCoolPeak ); }
 	inline MA1c_double MixVolume() const { return ma( &T::MixVolume ); }
 	inline MA1c_double MotEff() const { return ma( &T::MotEff ); }
 	inline MA1c_double MotInAirFrac() const { return ma( &T::MotInAirFrac ); }
@@ -725,6 +722,8 @@
 	inline MA1c_double ReportTotCoolingToZoneEnergy() const { return ma( &T::ReportTotCoolingToZoneEnergy ); }
 	inline MA1c_double ReportTotCoolingToZoneRate() const { return ma( &T::ReportTotCoolingToZoneRate ); }
 	inline MA1c_double ReqSupplyFrac() const { return ma( &T::ReqSupplyFrac ); }
+	inline MA1c_double RetHumRatAtCoolPeak() const { return ma( &T::RetHumRatAtCoolPeak ); }
+	inline MA1c_double RetTempAtCoolPeak() const { return ma( &T::RetTempAtCoolPeak ); }
 	inline MA1c_double SavedTemp() const { return ma( &T::SavedTemp ); }
 	inline MA1c_double SenCaseCreditToHVAC() const { return ma( &T::SenCaseCreditToHVAC ); }
 	inline MA1c_double SenCaseCreditToZone() const { return ma( &T::SenCaseCreditToZone ); }
@@ -837,6 +836,7 @@
 	inline MA1c_double TotCompPower() const { return ma( &T::TotCompPower ); }
 	inline MA1c_double TotCompPowerHP() const { return ma( &T::TotCompPowerHP ); }
 	inline MA1c_double TotCompPowerLP() const { return ma( &T::TotCompPowerLP ); }
+	inline MA1c_double TotCoolCap() const { return ma( &T::TotCoolCap ); }
 	inline MA1c_double TotCoolEnergyRate() const { return ma( &T::TotCoolEnergyRate ); }
 	inline MA1c_double TotCoolingToZoneEnergy() const { return ma( &T::TotCoolingToZoneEnergy ); }
 	inline MA1c_double TotCoolingToZoneRate() const { return ma( &T::TotCoolingToZoneRate ); }
@@ -960,17 +960,11 @@
 	inline MA1_double CoolCap5() { return ma( &T::CoolCap5 ); }
 	inline MA1_double CoolCycleTime() { return ma( &T::CoolCycleTime ); }
 	inline MA1_double CoolingDemand() { return ma( &T::CoolingDemand ); }
-	inline MA1_double CoolMixHumRat() { return ma( &T::CoolMixHumRat ); }
-	inline MA1_double CoolMixTemp() { return ma( &T::CoolMixTemp ); }
-	inline MA1_double CoolOutHumRat() { return ma( &T::CoolOutHumRat ); }
-	inline MA1_double CoolOutTemp() { return ma( &T::CoolOutTemp ); }
 	inline MA1_double CoolPower1() { return ma( &T::CoolPower1 ); }
 	inline MA1_double CoolPower2() { return ma( &T::CoolPower2 ); }
 	inline MA1_double CoolPower3() { return ma( &T::CoolPower3 ); }
 	inline MA1_double CoolPower4() { return ma( &T::CoolPower4 ); }
 	inline MA1_double CoolPower5() { return ma( &T::CoolPower5 ); }
-	inline MA1_double CoolRetHumRat() { return ma( &T::CoolRetHumRat ); }
-	inline MA1_double CoolRetTemp() { return ma( &T::CoolRetTemp ); }
 	inline MA1_double CurrentMaxAvail() { return ma( &T::CurrentMaxAvail ); }
 	inline MA1_double CurrentMinAvail() { return ma( &T::CurrentMinAvail ); }
 	inline MA1_double DCElectProdRate() { return ma( &T::DCElectProdRate ); }
@@ -1161,6 +1155,7 @@
 	inline MA1_double LoadSideMassFlowRate() { return ma( &T::LoadSideMassFlowRate ); }
 	inline MA1_double LoadSideOutletTemp() { return ma( &T::LoadSideOutletTemp ); }
 	inline MA1_double LtsPower() { return ma( &T::LtsPower ); }
+	inline MA1_double MassFlowAtCoolPeak() { return ma( &T::MassFlowAtCoolPeak ); }
 	inline MA1_double MassFlowFromLower() { return ma( &T::MassFlowFromLower ); }
 	inline MA1_double MassFlowFromUpper() { return ma( &T::MassFlowFromUpper ); }
 	inline MA1_double MassFlowRate() { return ma( &T::MassFlowRate ); }
@@ -1182,7 +1177,9 @@
 	inline MA1_double MinProcAirInHumRat() { return ma( &T::MinProcAirInHumRat ); }
 	inline MA1_double MinProcAirInTemp() { return ma( &T::MinProcAirInTemp ); }
 	inline MA1_double MixedTemp() { return ma( &T::MixedTemp ); }
+	inline MA1_double MixHumRatAtCoolPeak() { return ma( &T::MixHumRatAtCoolPeak ); }
 	inline MA1_double MixMass() { return ma( &T::MixMass ); }
+	inline MA1_double MixTempAtCoolPeak() { return ma( &T::MixTempAtCoolPeak ); }
 	inline MA1_double MixVolume() { return ma( &T::MixVolume ); }
 	inline MA1_double MotEff() { return ma( &T::MotEff ); }
 	inline MA1_double MotInAirFrac() { return ma( &T::MotInAirFrac ); }
@@ -1316,6 +1313,8 @@
 	inline MA1_double ReportTotCoolingToZoneEnergy() { return ma( &T::ReportTotCoolingToZoneEnergy ); }
 	inline MA1_double ReportTotCoolingToZoneRate() { return ma( &T::ReportTotCoolingToZoneRate ); }
 	inline MA1_double ReqSupplyFrac() { return ma( &T::ReqSupplyFrac ); }
+	inline MA1_double RetHumRatAtCoolPeak() { return ma( &T::RetHumRatAtCoolPeak ); }
+	inline MA1_double RetTempAtCoolPeak() { return ma( &T::RetTempAtCoolPeak ); }
 	inline MA1_double SavedTemp() { return ma( &T::SavedTemp ); }
 	inline MA1_double SenCaseCreditToHVAC() { return ma( &T::SenCaseCreditToHVAC ); }
 	inline MA1_double SenCaseCreditToZone() { return ma( &T::SenCaseCreditToZone ); }
@@ -1428,6 +1427,7 @@
 	inline MA1_double TotCompPower() { return ma( &T::TotCompPower ); }
 	inline MA1_double TotCompPowerHP() { return ma( &T::TotCompPowerHP ); }
 	inline MA1_double TotCompPowerLP() { return ma( &T::TotCompPowerLP ); }
+	inline MA1_double TotCoolCap() { return ma( &T::TotCoolCap ); }
 	inline MA1_double TotCoolEnergyRate() { return ma( &T::TotCoolEnergyRate ); }
 	inline MA1_double TotCoolingToZoneEnergy() { return ma( &T::TotCoolingToZoneEnergy ); }
 	inline MA1_double TotCoolingToZoneRate() { return ma( &T::TotCoolingToZoneRate ); }

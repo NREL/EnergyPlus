@@ -1541,7 +1541,7 @@ namespace WindowEquivalentLayer {
 		Real64 TAU_BT; // beam-total transmittance
 		// Flow
 
-		Real64 const THETA(  min( 89.99 * DegToRadians, xTHETA ) ); // working incident angle, radians
+		Real64 const THETA( min( 89.99 * DegToRadians, xTHETA ) ); // working incident angle, radians
 		Real64 const COSTHETA( std::cos( THETA ) );
 
 		RHO_W = RHO_BT0 / max( 0.00001, 1.0 - TAU_BB0 );

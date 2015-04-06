@@ -1288,9 +1288,9 @@ namespace SurfaceGeometry {
 		}
 
 		if ( MovedSurfs != TotSurfaces ) {
-			gio::write( ClassMsg, fmtLD  ) << MovedSurfs;
+			gio::write( ClassMsg, fmtLD ) << MovedSurfs;
 			strip( ClassMsg );
-			gio::write( Msg2, fmtLD  ) << TotSurfaces;
+			gio::write( Msg2, fmtLD ) << TotSurfaces;
 			strip( Msg2 );
 			ShowSevereError( RoutineName + "Reordered # of Surfaces (" + ClassMsg + ") not = Total # of Surfaces (" + Msg2 + ')' );
 			SurfError = true;
@@ -1486,10 +1486,10 @@ namespace SurfaceGeometry {
 											ShowContinueError( "  Area=" + TrimSigDigits( Surface( SurfNum ).Area, 1 ) + " in Surface=" + Surface( SurfNum ).Name + ", Zone=" + Surface( SurfNum ).ZoneName );
 											ShowContinueError( "  Area=" + TrimSigDigits( Surface( Found ).Area, 1 ) + " in Surface=" + Surface( Found ).Name + ", Zone=" + Surface( Found ).ZoneName );
 										} else { // Show multiplier info
-											gio::write( MultString, fmtLD  ) << MultSurfNum;
+											gio::write( MultString, fmtLD ) << MultSurfNum;
 											strip( MultString );
 											ShowContinueError( "  Area=" + TrimSigDigits( Surface( SurfNum ).Area, 1 ) + ", Multipliers=" + MultString + ", Total Area=" + TrimSigDigits( Surface( SurfNum ).Area * MultSurfNum, 1 ) + " in Surface=" + Surface( SurfNum ).Name + " Zone=" + Surface( SurfNum ).ZoneName );
-											gio::write( MultString, fmtLD  ) << MultFound;
+											gio::write( MultString, fmtLD ) << MultFound;
 											strip( MultString );
 											ShowContinueError( "  Area=" + TrimSigDigits( Surface( Found ).Area, 1 ) + ", Multipliers=" + MultString + ", Total Area=" + TrimSigDigits( Surface( Found ).Area * MultFound, 1 ) + " in Surface=" + Surface( Found ).Name + " Zone=" + Surface( Found ).ZoneName );
 										}
@@ -6660,7 +6660,7 @@ namespace SurfaceGeometry {
 			--RevPtr;
 		}
 
-		gio::write( OutputFileDebug, fmtLD  ) << "Reversing Surface Name=" + SurfaceTmp( SurfNum ).Name;
+		gio::write( OutputFileDebug, fmtLD ) << "Reversing Surface Name=" + SurfaceTmp( SurfNum ).Name;
 		for ( n = 1; n <= NSides; ++n ) {
 			gio::write( OutputFileDebug, fmt3 ) << "side=" << n << " abs coord vertex=" << SurfaceTmp( SurfNum ).Vertex( n ).x << SurfaceTmp( SurfNum ).Vertex( n ).y << SurfaceTmp( SurfNum ).Vertex( n ).z;
 		}
@@ -8214,28 +8214,28 @@ namespace SurfaceGeometry {
 
 			if ( ShowZoneSurfaces ) {
 				if ( ShowZoneSurfaceHeaders ) {
-					gio::write( OutputFileDebug, fmtLD  ) << "===================================";
-					gio::write( OutputFileDebug, fmtLD  ) << "showing zone surfaces used and not used in volume calculation";
-					gio::write( OutputFileDebug, fmtLD  ) << "for volume calculation, only floors, walls and roofs/ceilings are used";
-					gio::write( OutputFileDebug, fmtLD  ) << "surface class, 1=wall, 2=floor, 3=roof/ceiling";
-					gio::write( OutputFileDebug, fmtLD  ) << "unused surface class(es), 5=internal mass, 11=window, 12=glass door";
-					gio::write( OutputFileDebug, fmtLD  ) << "                          13=door, 14=shading, 15=overhang, 16=fin";
-					gio::write( OutputFileDebug, fmtLD  ) << "                          17=TDD Dome, 18=TDD Diffuser";
+					gio::write( OutputFileDebug, fmtLD ) << "===================================";
+					gio::write( OutputFileDebug, fmtLD ) << "showing zone surfaces used and not used in volume calculation";
+					gio::write( OutputFileDebug, fmtLD ) << "for volume calculation, only floors, walls and roofs/ceilings are used";
+					gio::write( OutputFileDebug, fmtLD ) << "surface class, 1=wall, 2=floor, 3=roof/ceiling";
+					gio::write( OutputFileDebug, fmtLD ) << "unused surface class(es), 5=internal mass, 11=window, 12=glass door";
+					gio::write( OutputFileDebug, fmtLD ) << "                          13=door, 14=shading, 15=overhang, 16=fin";
+					gio::write( OutputFileDebug, fmtLD ) << "                          17=TDD Dome, 18=TDD Diffuser";
 					ShowZoneSurfaceHeaders = false;
 				}
-				gio::write( OutputFileDebug, fmtLD  ) << "===================================";
-				gio::write( OutputFileDebug, fmtLD  ) << "zone=" << Zone( ZoneNum ).Name << " calc volume=" << CalcVolume;
-				gio::write( OutputFileDebug, fmtLD  ) << " nsurfaces=" << NFaces << " nactual=" << NActFaces;
+				gio::write( OutputFileDebug, fmtLD ) << "===================================";
+				gio::write( OutputFileDebug, fmtLD ) << "zone=" << Zone( ZoneNum ).Name << " calc volume=" << CalcVolume;
+				gio::write( OutputFileDebug, fmtLD ) << " nsurfaces=" << NFaces << " nactual=" << NActFaces;
 			}
 			for ( SurfNum = 1; SurfNum <= ZoneStruct.NumSurfaceFaces; ++SurfNum ) {
 				if ( ShowZoneSurfaces ) {
 					if ( SurfNum <= NActFaces ) {
-						gio::write( OutputFileDebug, fmtLD  ) << "surface=" << ZoneStruct.SurfaceFace( SurfNum ).SurfNum << " nsides=" << ZoneStruct.SurfaceFace( SurfNum ).NSides;
-						gio::write( OutputFileDebug, fmtLD  ) << "surface name=" << Surface( ZoneStruct.SurfaceFace( SurfNum ).SurfNum ).Name << " class=" << Surface( ZoneStruct.SurfaceFace( SurfNum ).SurfNum ).Class;
-						gio::write( OutputFileDebug, fmtLD  ) << "area=" << Surface( ZoneStruct.SurfaceFace( SurfNum ).SurfNum ).GrossArea;
+						gio::write( OutputFileDebug, fmtLD ) << "surface=" << ZoneStruct.SurfaceFace( SurfNum ).SurfNum << " nsides=" << ZoneStruct.SurfaceFace( SurfNum ).NSides;
+						gio::write( OutputFileDebug, fmtLD ) << "surface name=" << Surface( ZoneStruct.SurfaceFace( SurfNum ).SurfNum ).Name << " class=" << Surface( ZoneStruct.SurfaceFace( SurfNum ).SurfNum ).Class;
+						gio::write( OutputFileDebug, fmtLD ) << "area=" << Surface( ZoneStruct.SurfaceFace( SurfNum ).SurfNum ).GrossArea;
 						for ( iside = 1; iside <= ZoneStruct.SurfaceFace( SurfNum ).NSides; ++iside ) {
 							auto const & FacePoint( ZoneStruct.SurfaceFace( SurfNum ).FacePoints( iside ) );
-							gio::write( OutputFileDebug, fmtLD  ) << FacePoint.x << FacePoint.y << FacePoint.z;
+							gio::write( OutputFileDebug, fmtLD ) << FacePoint.x << FacePoint.y << FacePoint.z;
 						}
 					}
 				}
@@ -8243,7 +8243,7 @@ namespace SurfaceGeometry {
 			}
 			if ( ShowZoneSurfaces ) {
 				for ( SurfNum = 1; SurfNum <= notused; ++SurfNum ) {
-					gio::write( OutputFileDebug, fmtLD  ) << "notused:surface=" << surfacenotused( SurfNum ) << " name=" << Surface( surfacenotused( SurfNum ) ).Name << " class=" << Surface( surfacenotused( SurfNum ) ).Class;
+					gio::write( OutputFileDebug, fmtLD ) << "notused:surface=" << surfacenotused( SurfNum ) << " name=" << Surface( surfacenotused( SurfNum ) ).Name << " class=" << Surface( surfacenotused( SurfNum ) ).Class;
 				}
 			}
 
@@ -9101,7 +9101,7 @@ namespace SurfaceGeometry {
 			ConstrName = Construct( ConstrNum ).Name;
 			StormWinMatNum = StormWindow( StormWinNum ).StormWinMaterialNum;
 			IntDistance = int( 1000 * StormWindow( StormWinNum ).StormWinDistance );
-			gio::write( ChrIntDistance, fmtLD  ) << IntDistance;
+			gio::write( ChrIntDistance, fmtLD ) << IntDistance;
 			strip( ChrIntDistance );
 			// Set ShAndSt, which is true if the window has a shaded construction to which a storm window
 			// can be added. (A storm window can be added if there is an interior shade or blind and up to three
@@ -9131,7 +9131,7 @@ namespace SurfaceGeometry {
 			// with storm window and air gap added on outside
 			for ( loop = 1; loop <= 2; ++loop ) {
 				if ( loop == 1 ) {
-					gio::write( ChrNum, fmtLD  ) << StormWinNum;
+					gio::write( ChrNum, fmtLD ) << StormWinNum;
 					strip( ChrNum );
 					ConstrNameSt = "BARECONSTRUCTIONWITHSTORMWIN:" + ChrNum;
 					// If this construction name already exists, set the surface's storm window construction number to it

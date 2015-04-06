@@ -1640,8 +1640,8 @@ namespace ExternalInterface {
 			}
 		} else {
 			switch ( Month ) {
-				case  1: simtime =   0  ; break;
-				case  2: simtime =  31  ; break;
+				case  1: simtime =   0; break;
+				case  2: simtime =  31; break;
 				case  3: simtime =  59+1; break;
 				case  4: simtime =  90+1; break;
 				case  5: simtime = 120+1; break;

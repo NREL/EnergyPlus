@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 #include <windows.h>
 #define WINDOWS 1
 #else
@@ -77,7 +77,7 @@ typedef fmiStatus (*fGetNominalContinuousStates)(fmiComponent c, fmiReal x_nomin
 typedef fmiStatus (*fGetStateValueReferences)   (fmiComponent c, fmiValueReference vrx[], size_t nx);
 typedef fmiStatus (*fTerminate)                 (fmiComponent c);
 
-typedef enum {opt_printidf, opt_delete, opt_unpack, opt_help} option;  
+typedef enum {opt_printidf, opt_delete, opt_unpack, opt_help} option;
 
 
 typedef struct {

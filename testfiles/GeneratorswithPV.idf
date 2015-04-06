@@ -21,7 +21,7 @@
 ! Note, this file was completely changed from Ver. 1.1.1 to 1.2 to add tests for different PV generators
 ! note  this file was changed for Ver. 1.2.2 to add new strategies for ventilated mounting configurations
 
-  Version,8.2;
+  Version,8.3;
 
   Timestep,4;
 
@@ -1026,8 +1026,8 @@
     0.007,                   !- Sandia Database Parameter c5 {dimensionless}
     4.7,                     !- Sandia Database Parameter Ix0
     3.22,                    !- Sandia Database Parameter Ixx0
-    1.105,                   !- Sandia Database Parameter c6
-    -0.105;                  !- Sandia Database Parameter c7
+    1.105,                   !- Sandia Database Parameter c6 {dimensionless}
+    -0.105;                  !- Sandia Database Parameter c7 {dimensionless}
 
   Output:Surfaces:Drawing,DXF;
 

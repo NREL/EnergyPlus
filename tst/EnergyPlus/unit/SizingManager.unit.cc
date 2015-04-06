@@ -6,6 +6,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::SizingManager;
@@ -14,6 +15,8 @@ using namespace ObjexxFCL;
 
 TEST( GetOARequirementsTest, DSOA1 )
 {
+	ShowMessage( "Begin Test: GetOARequirementsTest, DSOA1" );
+
 	static bool ErrorsFound( false ); // If errors detected in input
 	static int OAIndex( 0 ); // Zone number
 	int NumAlphas( 2 );
@@ -156,5 +159,11 @@ TEST( GetOARequirementsTest, DSOA1 )
 	EXPECT_EQ( 0.2, OARequirements( OAIndex ).OAFlowPerArea );
 	EXPECT_EQ( 0.3, OARequirements( OAIndex ).OAFlowPerZone );
 	EXPECT_EQ( 0.4, OARequirements( OAIndex ).OAFlowACH );
+
+	// Clean up
+	OARequirements.deallocate();
+	Alphas.deallocate();
+	cAlphaFields.deallocate();
+	cNumericFields.deallocate();
 
 }

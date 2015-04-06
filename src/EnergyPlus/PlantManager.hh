@@ -274,6 +274,11 @@ namespace PlantManager {
 	);
 
 	void
+	ResizePlantLoopLevelSizes(
+		int const LoopNum
+	);
+
+	void
 	SetupInitialPlantCallingOrder();
 
 	void

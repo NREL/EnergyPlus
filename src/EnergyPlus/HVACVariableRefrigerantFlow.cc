@@ -5992,6 +5992,110 @@ namespace HVACVariableRefrigerantFlow {
 
 	}
 
+	int
+	GetVRFTUOutAirNode( int const VRFTUNum )
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         R. Raustad (copy of B Griffith routine)
+		//       DATE WRITTEN   Jan  2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// lookup function for VRF terminal unit OA inlet node
+
+		if ( GetVRFInputFlag ) {
+			GetVRFInput();
+			GetVRFInputFlag = false;
+		}
+
+		if ( VRFTUNum > 0 && VRFTUNum <= NumVRFTU ) {
+			return VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum;
+		} else {
+			return 0;
+		}
+
+	}
+
+	int
+	GetVRFTUZoneInletAirNode( int const VRFTUNum )
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         R. Raustad (copy of B Griffith routine)
+		//       DATE WRITTEN   Jan  2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// lookup function for VRF terminal unit zone inlet node
+
+		if ( GetVRFInputFlag ) {
+			GetVRFInput();
+			GetVRFInputFlag = false;
+		}
+
+		if ( VRFTUNum > 0 && VRFTUNum <= NumVRFTU ) {
+			return VRFTU( VRFTUNum ).VRFTUOutletNodeNum;
+		} else {
+			return 0;
+		}
+
+	}
+
+	int
+	GetVRFTUMixedAirNode( int const VRFTUNum )
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         R. Raustad (copy of B Griffith routine)
+		//       DATE WRITTEN   Jan  2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// lookup function for VRF terminal unit mixed air node
+
+		if ( GetVRFInputFlag ) {
+			GetVRFInput();
+			GetVRFInputFlag = false;
+		}
+
+		if ( VRFTUNum > 0 && VRFTUNum <= NumVRFTU ) {
+			return VRFTU( VRFTUNum ).VRFTUOAMixerOANodeNum;
+		} else {
+			return 0;
+		}
+
+	}
+
+	int
+	GetVRFTUReturnAirNode( int const VRFTUNum )
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         R. Raustad (copy of B Griffith routine)
+		//       DATE WRITTEN   Jan  2015
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// lookup function for VRF terminal unit return air node
+
+		if ( GetVRFInputFlag ) {
+			GetVRFInput();
+			GetVRFInputFlag = false;
+		}
+
+		if ( VRFTUNum > 0 && VRFTUNum <= NumVRFTU ) {
+			return VRFTU( VRFTUNum ).VRFTUOAMixerRetNodeNum;
+		} else {
+			return 0;
+		}
+
+	}
+
 	// End of Utility subroutines for the Module
 	// *****************************************************************************
 

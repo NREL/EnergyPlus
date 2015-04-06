@@ -10,7 +10,7 @@
 ! ScheduleType objects for the schedule defined below
 
 !  Version,
-!    8.0;                    !- Version Identifier
+!    8.3;                    !- Version Identifier
 
   ScheduleTypeLimits,
     Fraction,                !- Name

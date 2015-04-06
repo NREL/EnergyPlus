@@ -728,6 +728,21 @@ namespace MixedAir {
 	void
 	GetOAMixerInputs();
 
+	void
+	ProcessOAControllerInputs(
+		std::string const & CurrentModuleObject,
+		int const OutAirNum,
+		Array1_string const & AlphArray,
+		int & NumAlphas,
+		Array1< Real64 > const & NumArray,
+		int & NumNums,
+		Array1_bool const & lNumericBlanks, //Unused
+		Array1_bool const & lAlphaBlanks,
+		Array1_string const & cAlphaFields,
+		Array1_string const & cNumericFields, //Unused
+		bool & ErrorsFound // If errors found in input
+	);
+
 	// End of Get Input subroutines for the Module
 	//******************************************************************************
 

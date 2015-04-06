@@ -60,6 +60,16 @@ namespace DataSizing {
 	int const NonCoincident( 1 );
 	int const Coincident( 2 );
 
+	// parameters for Cooling Peak Load TYpe
+	int const SensibleCoolingLoad( 1 );
+	int const TotalCoolingLoad( 2 );
+
+	// parameters for Central Cooling Capacity Control Method
+	int const VAV( 1 );
+	int const Bypass( 2 );
+	int const VT( 3 );
+	int const OnOff( 4 );
+
 	// paramters for supply air flow rate method
 	int const SupplyAirTemperature( 1 );
 	int const TemperatureDifference( 2 );
@@ -116,6 +126,12 @@ namespace DataSizing {
 	int const CapacityPerFloorArea( 10 );
 	int const FractionOfAutosizedCoolingCapacity( 11 );
 	int const FractionOfAutosizedHeatingCapacity( 12 );
+
+	int const NoSizingFactorMode( 101 );
+	int const GlobalHeatingSizingFactorMode( 102 );
+	int const GlobalCoolingSizingFactorMode( 103 );
+	int const LoopComponentSizingFactorMode( 104 );
+
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -180,6 +196,7 @@ namespace DataSizing {
 	Real64 DataDesInletAirHumRat( 0.0 ); // coil inlet air humidity ratio used for warning messages
 	Real64 DataDesInletAirTemp( 0.0 ); // coil inlet air temperature used for warning messages
 	Real64 DataDesOutletAirTemp( 0.0 ); // coil outlet air temperature used for sizing
+	Real64 DataDesOutletAirHumRat( 0.0 ); // coil air outlet humidity ratio used in sizing calculations [kg water / kg dry air]
 	Real64 DataCoolCoilCap( 0.0 ); // cooling coil capacity used for sizing with scalable inputs [W]
 	Real64 DataFlowUsedForSizing( 0.0 ); // air flow rate used for sizing with scalable inputs [m3/s]
 	Real64 DataAirFlowUsedForSizing( 0.0 ); // air flow rate used for sizing with scalable inputs [m3/s]
@@ -199,6 +216,7 @@ namespace DataSizing {
 	Real64 DataAutosizedHeatingCapacity( 0.0 ); // Autosized heating capacit used for multiplying flow per capacity to get flow rate
 	Real64 DataConstantUsedForSizing( 0.0 ); // base value used for sizing inputs that are ratios of other inputs
 	Real64 DataFractionUsedForSizing( 0.0 ); // fractional value of base value used for sizing inputs that are ratios of other inputs
+	Real64 DataNonZoneNonAirloopValue( 0.0 ); // used when equipment is not located in a zone or airloop
 	int DataZoneNumber( 0 ); // a pointer to a served by zoneHVAC equipment
 	int NumZoneHVACSizing( 0 ); // Number of zone HVAC sizing objects
 	Real64 DXCoolCap( 0.0 ); // The ARI cooling capacity of a DX unit.
@@ -225,6 +243,7 @@ namespace DataSizing {
 	Array2D< SystemSizingData > SysSizing; // Data array for system sizing (all data)
 	Array1D< SystemSizingData > FinalSysSizing; // Data array for system sizing (max heat/cool)
 	Array1D< SystemSizingData > CalcSysSizing; // Data array for system sizing (max heat/cool)
+	Array1D< SysSizPeakDDNumData > SysSizPeakDDNum; // data array for peak des day indices
 	Array1D< TermUnitSizingData > TermUnitSizing; // Data added in sizing routines
 	Array1D< ZoneEqSizingData > ZoneEqSizing; // Data added in zone eq component sizing routines
 	Array1D< ZoneEqSizingData > UnitarySysEqSizing; // Data added in unitary system sizing routines

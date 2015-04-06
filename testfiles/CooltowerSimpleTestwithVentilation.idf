@@ -73,7 +73,7 @@
 !   Environmental Emissions:        None
 !   Utility Tariffs:                None
 
-  Version,8.2;
+  Version,8.3;
 
   Building,
     BUILDING #1,             !- Name
@@ -2293,4 +2293,7 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
+
+  Output:SQLite,
+    Simple;
 
