@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -15,6 +16,7 @@
 #include <ObjexxFCL/gio.hh>
 
 using namespace EnergyPlus;
+using namespace DataEnvironment;
 using namespace DataGlobals;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHVACGlobals;
@@ -37,6 +39,7 @@ public:
 		ExchCond.allocate( NumHeatExchangers );
 		Node.allocate( 4 );
 		InitializePsychRoutines();
+		OutBaroPress = 101325.0;
 	}
 
 	~HeatRecoveryTest() // Reset global state
@@ -49,6 +52,7 @@ public:
 		Node.clear();
 		cached_Twb.clear();
 		cached_Psat.clear();
+		OutBaroPress = 0.0;
 	}
 
 };
