@@ -325,6 +325,19 @@
 </div>
         </div>
         <div class="col-md-9" role="main">
+          <script>
+           (function() {
+            var cx = '007045650438215436378:sghdz0ne6rg';
+            var gcse = document.createElement('script');
+            gcse.type = 'text/javascript';
+            gcse.async = true;
+            gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+                '//www.google.com/cse/cse.js?cx=' + cx;
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(gcse, s);
+           })();
+          </script>
+          <gcse:search></gcse:search>
           <p>Input Output Reference</p>
 <p>The Encyclopedic Reference to EnergyPlus Input and Output</p>
 <h1 id="input-output-reference">Input-Output Reference</h1>
@@ -870,7 +883,7 @@
 <ul>
 <li>If the model will include calculating the cost of electricity, then the user should be aware that many electric utility tariffs base charges on demand windows of a specified length of time.  If the choice of Number of Timesteps per Hour is not consistent with the demand window, then unexpected results may be obtained.  For reasonable prediction of the maximum rates for electricity use for in calculating demand charges, the length of the zone timestep needs to be consistent with the tariff’s demand window.  The following table lists what values are consistent with various demand windows.</li>
 </ul>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Demand Window</td>
 <td>Applicable Number of Timesteps per Hour</td>
@@ -1461,7 +1474,7 @@
 <p>The values/schedules indicated here and in subsequent fields create the humidity values in the 24 hour design day conditions profile. Valid choices here are: <strong>WetBulb</strong>, <strong>Dewpoint</strong>, <strong>WetBulbProfileDefaultMultipliers, WetBulbProfileDifferenceSchedule,</strong> <strong>WetBulbProfileMultiplierSchedule</strong>, <strong>HumidityRatio</strong>, <strong>Enthalpy</strong>, and <strong>Schedule.</strong></p>
 <p>The Humidity Condition Type fields have interacting uses and units, summarized as follows:</p>
 <p>Table 2. Humidity Indicating Field Interactions - Design Day</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Humidity Condition Type</td>
 <td>Primary Humidity Indicating Field</td>
@@ -1840,7 +1853,7 @@
 <h4 id="field-start-date">Field: Start Date</h4>
 <p>This field is the starting date for the special day period. Dates in this field can be entered in several ways as shown in the accompanying table:</p>
 <p>Table 3. Date Field Interpretation</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Field Contents</td>
 <td>Interpretation</td>
@@ -1952,7 +1965,7 @@
 <p>The measurement conditions at the weather station (i.e., the weather file) are used by EnergyPlus in conjunction with the <em>Terrain</em> field of the <strong>Building</strong> object, or optionally with the <strong>Site:HeightVariation</strong> object (see below), to calculate the local variation in atmospheric properties as a function of height above ground. Outdoor air temperature decreases with height, while wind speed increases with height. The algorithms for this calculation are in the Engineering Reference.</p>
 <p>The <strong>Site:WeatherStation</strong> object is useful when working with a custom weather file that includes data that were not measured at the WMO standard conditions. For example, the weather data could be measured on site, or on the roof top of a nearby building. The wind speed profile coefficients can be estimated from the table below or calculated beforehand using more sophisticated techniques such as CFD modeling of the weather station terrain.</p>
 <p>Table 4. Wind Speed Profile Coefficients (ASHRAE Fundamentals 2005).</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Terrain Description</td>
 <td>Exponent</td>
@@ -2005,7 +2018,7 @@
 <h3 id="siteheightvariation">Site:HeightVariation</h3>
 <p>The Site:HeightVariation object is used to specify the local variation in atmospheric properties at the site and should be used only if you require advanced control over the height-dependent variations for wind speed and temperature. The coefficients set by this object are used by EnergyPlus, in conjunction with the Site:WeatherStation object (see above), to calculate the local variation in atmospheric properties as a function of height above ground. Outdoor air temperature decreases with height, while wind speed increases with height. The local outdoor air temperature and wind speed are calculated separately for all zones and surfaces, and optionally for outdoor air nodes for which a height has been specified (see OutdoorAir:Node object). With the default inputs, wind speed falls significantly at heights lower than the weather station measurement height, and temperature increases slightly. The algorithms for this calculation are in the Engineering Reference. There are necessary correlations between the entries for this object and some entries in the Building object, specifically the <strong>Terrain</strong> field.</p>
 <p>Table 5. Atmospheric Variables at Two Different Heights Above Ground Level.</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Variable</td>
 <td>1.5 m</td>
@@ -2127,7 +2140,7 @@
 <h4 id="field-simulation-timestep">Field: Simulation Timestep</h4>
 <p>Alpha field indicating whether the domain will update temperatures at each zone timestep, or at hourly intervals. Options include “timestep” and “hourly”.</p>
 <p>An IDF example of an in-grade slab.</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Site:GroundDomain,
     IngradeCoupledSlab, !- Name
@@ -2158,7 +2171,7 @@
 </table>
 
 <p>And IDF example of an on-grade slab</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Site:GroundDomain,
     OngradeCoupledSlab, !- Name
@@ -2190,7 +2203,7 @@
 
 <h3 id="sitegrounddomain-outputs">Site:GroundDomain Outputs</h3>
 <p>The following output variables are available.</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Zone, Average, Zone Coupled Surface Heat Flux [W/m2]
 Zone, Average, Zone Coupled Surface Temperature [C]</td>
@@ -2452,7 +2465,7 @@ Zone, Average, Zone Coupled Surface Temperature [C]</td>
 <h4 id="site-solar-hour-angle-deg">Site Solar Hour Angle [deg]</h4>
 <p>The Solar Hour Angle (<em>H</em>) gives the apparent solar time for the current time period (degrees). It is common astronomical practice to express the hour angle in hours, minutes and seconds of time rather than in degrees. You can convert the hour angle displayed from EnergyPlus to time by dividing by 15. (Note that 1 hour is equivalent to 15 degrees;  360° of the Earth’s rotation takes place every 24 hours.)  The relationship of angles in degrees to time is shown in the following table:</p>
 <p>Table 6. Relationship of Angles (degrees) to Time</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Unit of Angle</td>
 <td>Equivalent time</td>
@@ -6555,7 +6568,7 @@ Zone, Average, Zone Coupled Surface Temperature [C]</td>
 <h3 id="window-modeling-options">Window Modeling Options</h3>
 <p>The following table shows what input objects/fields to use to model different window options. It also gives the name of an example input, if available, that demonstrates the option.</p>
 <p>Table 8. Window Modeling Options</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Option</td>
 <td>Object/Field or Output Variable</td>
@@ -8807,7 +8820,7 @@ Zone, Average, Zone Coupled Surface Temperature [C]</td>
 <h4 id="field-convection-coefficient-1-type">Field: Convection Coefficient 1 Type</h4>
 <h4 id="field-convection-coefficient-2-type">Field: Convection Coefficient 2 Type</h4>
 <p>The entries can be of several types: Value (simple numeric value), Schedule (name of schedule with the values), the usual key choices for overall models for Outside or Inside (Simple, SimpleCombined, TARP, AdaptiveConvectionAlgorithm etc.), the key choices for individual convection equations used for customizing the adaptive algorithm, or a custom user defined correlation. The field should contain one of the keys listed in the table below along with face they can be applied.  The definitions of the models and key choices are discussed under SurfaceConvectionAlgorithm:Inside , SurfaceConvectionAlgorithm:Outside, SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections, and SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections.</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Key choice</td>
 <td>Applies to Inside or Outside</td>
@@ -9072,7 +9085,7 @@ Zone, Average, Zone Coupled Surface Temperature [C]</td>
 <h4 id="field-convection-coefficient-1-type_1">Field: Convection Coefficient 1 Type</h4>
 <h4 id="field-convection-coefficient-2-type_1">Field: Convection Coefficient 2 Type</h4>
 <p>The entries can be of several types: Value (simple numeric value), Schedule (name of schedule with the values), the usual key choices for overall models for Outside or Inside (Simple, SimpleCombined, TARP, AdaptiveConvectionAlgorithm etc.), the key choices for individual convection equations used for customizing the adaptive algorithm, or a custom user defined correlation. The field should contain one of the keys listed in the table below along with face they can be applied.  The definitions of the models and key choices are discussed under SurfaceConvectionAlgorithm:Inside , SurfaceConvectionAlgorithm:Outside, SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections, and SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections.</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Key choice</td>
 <td>Applies to Inside or Outside</td>
@@ -9293,7 +9306,7 @@ Zone, Average, Zone Coupled Surface Temperature [C]</td>
 </ul>
 <p>General to Specific, they are assigned in this order:</p>
 <p>Table 9. Convection Coefficient Assignment Hierarchy</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Objects/Description</td>
 <td>Action</td>
@@ -9340,7 +9353,7 @@ Zone, Average, Zone Coupled Surface Temperature [C]</td>
 <p>When EnergyPlus is set to Display Advanced Variables (Output:Diagnostics, DisplayAdvancedVariables;), then additional output variables are available that indicate the status of convection modeling by identifying which models are in effect at a given time.  The adaptive convection algorithms may switch between models over time and the following output variables provide a way to monitor this behavior.  These outputs are integer codes and the integer values are explained in tables.</p>
 <h4 id="surface-inside-face-convection-classification-index">Surface Inside Face Convection Classification Index</h4>
 <p>This variable reports how the surface was classified as part of the adaptive convection algorithm for the inside face.  The algorithm examines probable flow regimes, heat flow directions, orientations, HVAC equipment connections, and current operating status to assign each surface a category.  The numbers in this report are integer codes that correspond to surface categories as described in the following table.</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Code</td>
 <td>Zone Airflow Regime</td>
@@ -9621,7 +9634,7 @@ Zone, Average, Zone Coupled Surface Temperature [C]</td>
 
 <h4 id="surface-inside-face-convection-model-equation-index">Surface Inside Face Convection Model Equation Index</h4>
 <p>This variable reports the specific model equation used to calculate the inside face convection coefficient.  This can vary when using the adaptive convection algorithm and so the result of that selection algorithm is reported here.  The following table lists the models associated with specific interger codes reported here.  The models correspond to key words used in input objects.</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Report Code</td>
 <td>Related key and model</td>
@@ -9754,7 +9767,7 @@ Zone, Average, Zone Coupled Surface Temperature [C]</td>
 
 <h4 id="surface-inside-face-convection-reference-air-index">Surface Inside Face Convection Reference Air Index</h4>
 <p>The inside face convection heat transfer calculations can be based on different reference air temperatures.  This reference air temperature can vary during the simulation when the adaptive algorithm selects models that use different references.  The following table lists the meaning of the integer codes.</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Report Code</td>
 <td>Reference Air Temperature Method</td>
@@ -9775,7 +9788,7 @@ Zone, Average, Zone Coupled Surface Temperature [C]</td>
 
 <h4 id="surface-outside-face-convection-classification-index">Surface Outside Face Convection Classification Index</h4>
 <p>This variable reports how the surface was classified as part of the adaptive convection algorithm for the outside face.  The algorithm examines the wind direction, heat flow directions and orientations to assign each surface a category.  The numbers in this report are integer codes that correspond to surface categories as described in the following table.</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Report Code</td>
 <td>Surface Classification</td>
@@ -9801,7 +9814,7 @@ Zone, Average, Zone Coupled Surface Temperature [C]</td>
 <h4 id="surface-outside-face-forced-convection-model-equation-index">Surface Outside Face Forced Convection Model Equation Index</h4>
 <h4 id="surface-outside-face-natural-convection-model-equation-index">Surface Outside Face Natural Convection Model Equation Index</h4>
 <p>These variables report the specific model equation used to calculate the outside face’s convection coefficient.  They can vary when using the adaptive convection algorithm and so the results of that selection algorithm are reported in these variables.  The following table lists the models associated with specific integer codes that might be reported here.  The models correspond to key words used in input objects.</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Report Code</td>
 <td>Related key and model</td>
@@ -10217,7 +10230,7 @@ Zone, Average, Zone Coupled Surface Temperature [C]</td>
 <p>The group of input objects described in this section is used to account for non-uniform room air temperatures that may occur within the interior air volume of a zone. Room air modeling was added to EnergyPlus starting with Version 1.2. Although there are many types of analyses (comfort, indoor air quality, etc) that might benefit from localized modeling of how room air varies across space, only the <em>temperature</em> distribution of room air within the zone is currently addressed in EnergyPlus. This allows surface heat transfer and air system heat balance calculations to be made taking into account natural thermal stratification of air and different types of intentional air distribution designs such as under-floor and side-wall displacement ventilation that purport to extract room air at higher-than-mean temperatures. Note that EnergyPlus does <strong>not</strong> have completely general methods of modeling room air that are applicable to every conceivable type of airflow that might occur in a zone. Such models (e.g. RANS-CFD) are too computationally expensive to use with EnergyPlus for the foreseeable future. The models that are available in EnergyPlus offer only limited modeling capabilities for select room airflow configurations. Also note that because the complete mixing model for room air has long been the standard in building energy simulation, there is not currently a consensus on how to best model non-uniform air temperatures in buildings. Therefore, it is up to the user to have a good understanding of when, where, and how to apply the room air models available in EnergyPlus. The rest of this section provides some guidance in the way of examples and further discussion of the models available in EnergyPlus.</p>
 <p>EnergyPlus offers the different types of air models listed in the table below along with the input objects associated with the use of that model.</p>
 <p>Table 10. Summary of Room Air Models</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Air Model Key</td>
 <td>Air model Algorithm</td>
@@ -11228,7 +11241,7 @@ Zone, Average, Zone Coupled Surface Temperature [C]</td>
 <h3 id="simplified-ashrae-55-2004-graph-related-outputs">Simplified ASHRAE 55-2004 Graph Related Outputs</h3>
 <p>The following output variables are all based on whether the humidity ratio and the operative temperature is within the region shown in ASHRAE Standard 55-2004 in Figure 5.2.1.1. For these outputs the operative temperature is simplified to be the average of the air temperature and the mean radiant temperature. For summer, the 0.5 Clo level is used and, for winter, the 1.0 Clo level is used. The graphs below are based on the following tables which extend the ASHRAE values to zero humidity ratio.</p>
 <p>Table 12. Winter Clothes (1.0 Clo)</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Operative Temperature (C)</td>
 <td>Humidity Ratio (kgWater/kgDryAir)</td>
@@ -11254,7 +11267,7 @@ Zone, Average, Zone Coupled Surface Temperature [C]</td>
 <p><img alt="" src="../../InputOutputReference/media/image084.svg" /></p>
 <p>Figure 49. Winter Comfort Range</p>
 <p>Table 13. Summer Clothes (0.5 Clo)</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Operative Temperature (C)</td>
 <td>Humidity Ratio (kgWater/kgDryAir)</td>
@@ -11550,7 +11563,7 @@ Zone, Average, Zone Coupled Surface Temperature [C]</td>
 <h3 id="meters-for-lights-outputs">Meters for Lights Outputs</h3>
 <p>As described in the Lights Outputs, values for lights will show up on the following meters:</p>
 <p>Table 15. Distribution of Lights to Meters</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Meter Name</td>
 <td>Scope</td>

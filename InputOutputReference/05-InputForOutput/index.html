@@ -309,6 +309,19 @@
 </div>
         </div>
         <div class="col-md-9" role="main">
+          <script>
+           (function() {
+            var cx = '007045650438215436378:sghdz0ne6rg';
+            var gcse = document.createElement('script');
+            gcse.type = 'text/javascript';
+            gcse.async = true;
+            gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+                '//www.google.com/cse/cse.js?cx=' + cx;
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(gcse, s);
+           })();
+          </script>
+          <gcse:search></gcse:search>
           <h1 id="input-for-output">Input for Output</h1>
 <p>Several items are used to specify what will appear in the output file(s). The output is described in the next section of this document.</p>
 <h2 id="group-reports">Group – Reports</h2>
@@ -528,7 +541,7 @@
 <p>From a three zone file that had no HVAC electricity (i.e., had only electric equipment or lighting equipment in an uncontrolled three zone building).</p>
 <p>Current resource types are shown in the table below:</p>
 <p>Table 38. Table of Metered Resource  Types</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Utility/Fuel Types</td>
 </tr>
@@ -585,7 +598,7 @@
 </tr>
 </table>
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Other Resource Types</td>
 </tr>
@@ -596,7 +609,7 @@
 
 <p>The end use types are shown in the following table (note that certain end use types apply only to the EnergyTransfer resource):</p>
 <p>Table 39. End Use Category Types</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Utility/Fuel End Use Types</td>
 </tr>
@@ -647,7 +660,7 @@
 </tr>
 </table>
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Additional End Use Types Only Used for EnergyTransfer</td>
 </tr>
@@ -676,7 +689,7 @@
 
 <p>Specific meter types are then used for grouping the fuel type meters:</p>
 <p>Table 40. Overall Meter Types</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Meters</td>
 </tr>
@@ -723,7 +736,7 @@
 <p><strong>FuelFactors:</strong> (required for every fuel that is simulated and converted in this simulation input file)</p>
 <p>Users will enter environmental impact factors for each Fuel Type or FuelFactor. This is the same for each Fuel Type: Natural Gas, Residual Oil, Distillate Oil, Coal, Off-Site Electricity, Gasoline, and Propane. For District Heating, District Cooling, and Steam there are additional fields in the EnvironmentalImpactFactors object that help in the conversion of their energy to Natural Gas and Electricity.</p>
 <p>The energy is obtained internally from the following facility meters:</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Electricity:Facility</td>
 <td>Diesel:Facility</td>
@@ -1528,7 +1541,7 @@
 <p>The ReadVarsESO program has a very simple set of inputs. By default, you will get all the variables listed in the Output:Variable (<strong>eplusout.eso</strong>) or Output:Meter (<strong>eplusout.mtr</strong>) objects into the appropriate output files. The outputs from ReadVarsESO are limited to 255 variables (Microsoft Excel™ limit). You can tailor how many variables to list by specifying variables for the ReadVarsESO runs.</p>
 <p>You can override the 255 variable limit by specifying an argument on the command line (<strong>EP-Launch</strong> has a special option for this). You use “unlimited” or “nolimit” on the command line to get as many variables into your output file as desired. Again, this will be limited either by the number of variables in the <strong>eplusout.eso</strong> or <strong>eplusout.mtr</strong> files or the contents of the “rvi” file. If you want to use this option, you must include two arguments to the command line of the ReadVars program – 1) the “rvi” file and 2) the “unlimited” argument.</p>
 <p>Table 41. ReadVarsESO Command Line Options</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Option</td>
 <td>Description</td>
@@ -1566,7 +1579,7 @@
 <p>In addition, another argument can be used so that the output file is only one time frequency. (By default, all variables – hourly, monthly, annual, etc. are mixed together in the output file). By using “Timestep” as an argument, you would get only the TimeStep reported variables. Using “Monthly”, only the monthly variables. This is not automated in either <strong>EP-Launch</strong> or the <strong>RunEPlus</strong> batch file but can easily be accomplished.</p>
 <p>The program is run automatically from the <strong>EP-Launch</strong> program or the <strong>RunEPlus</strong> batch file (both these methods for executing EnergyPlus are described in the GettingStarted document). These programs use <strong>&lt;filename&gt;.rvi</strong> for input to the ReadVarsESO program executed first after the EnergyPlus execution and <strong>&lt;filename&gt;.mvi</strong> for the second execution. Ostensibly, the .rvi file would apply to the eplusout.eso file and the .mvi would apply to the eplusout.mtr file, BUT the contents of the files actually specify the “<strong>input</strong>” reporting file and the “<strong>output</strong>” reorganized file. Typical contents of an .rvi file are:</p>
 <p>Table 42. "RVI" file contents</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>.rvi line description</td>
 <td>Actual .rvi File Contents</td>
@@ -1654,7 +1667,7 @@
 <p>************* Key=*, VarName=SYSTEM SENSIBLE COOLING RATE</p>
 <p>The above message was generated from an IDF that requested reporting of the “SYSTEM SENSIBLE COOLING RATE” but that variable was not available from the components in the execution.</p>
 <p>Table 43. Example ReadVarsESO command lines and results</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Command Line</td>
 <td>Description/Result</td>

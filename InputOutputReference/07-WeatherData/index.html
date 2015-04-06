@@ -305,16 +305,29 @@
 </div>
         </div>
         <div class="col-md-9" role="main">
+          <script>
+           (function() {
+            var cx = '007045650438215436378:sghdz0ne6rg';
+            var gcse = document.createElement('script');
+            gcse.type = 'text/javascript';
+            gcse.async = true;
+            gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+                '//www.google.com/cse/cse.js?cx=' + cx;
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(gcse, s);
+           })();
+          </script>
+          <gcse:search></gcse:search>
           <h1 id="weather-data">Weather Data</h1>
 <p>The description of the weather data format (a simple text-based format) is well described in the Auxiliary Programs document and won’t be repeated here. Descriptions here will be pertinent to running the EnergyPlus program but you may wish to peruse the other descriptions as the statistics reports from the weather files may be useful during design and simulation.</p>
 <h2 id="missing-weather-file-data">Missing Weather File Data</h2>
 <p>The weather description of data contains “missing” descriptors, a new concept not introduced previously in our IDD conventions. In this case, it will be processed as though those values are “missing” in the weather conversions and/or EnergyPlus weather processing. This may not always be desirable though EnergyPlus will fill in “missing” value with something “appropriate”. Eventually, these missing values will be available through the IDD and users will be able to supply their own values or EnergyPlus will calculate those values (such as radiation and illuminance) that are not a simple value replacement. Until then, the following are used:</p>
 <p>Table 44. Missing weather replacement values</p>
-<table>
+<table class="table table-striped">
 <tr>
-<td>Data item</td>
-<td>Supplied Value</td>
-<td>Units</td>
+<th>Data item</th>
+<th>Supplied Value</th>
+<th>Units</th>
 </tr>
 <tr>
 <td>Dry-bulb Temperature</td>
@@ -414,12 +427,12 @@
 
 <p>To explain further, the weighting for four (4) timesteps in hour is:</p>
 <p>Table 45. Illustration of Data Interpolation for 15 minute timesteps</p>
-<table>
+<table class="table table-striped">
 <tr>
-<td>TimeStep</td>
-<td>Time (mm:ss)</td>
-<td>Weight<sub>LastHour</sub></td>
-<td>Weight<sub>ThisHour</sub></td>
+<th>TimeStep</th>
+<th>Time (mm:ss)</th>
+<th>Weight<sub>LastHour</sub></th>
+<th>Weight<sub>ThisHour</sub></th>
 </tr>
 <tr>
 <td>1</td>
@@ -449,12 +462,12 @@
 
 <p>And similarly for six (6) timesteps in hour:</p>
 <p>Table 46. Illustration of Data Interpolation for 10 minute timesteps</p>
-<table>
+<table class="table table-striped">
 <tr>
-<td>TimeStep</td>
-<td>Time (mm:ss)</td>
-<td>Weight<sub>LastHour</sub></td>
-<td>Weight<sub>ThisHour</sub></td>
+<th>TimeStep</th>
+<th>Time (mm:ss)</th>
+<th>Weight<sub>LastHour</sub></th>
+<th>Weight<sub>ThisHour</sub></th>
 </tr>
 <tr>
 <td>1</td>
@@ -498,11 +511,13 @@
 <h2 id="weather-file-data-reporting-errors-during-simulation">Weather File Data Reporting (errors) during Simulation</h2>
 <p>Missing data on the weather file used will be summarized on the <strong>eplusout.err</strong> file. In EnergyPlus, “missing data” is shown only for fields that EnergyPlus will use. For the “WeatherCodes”, an invalid field count (where the number of items in the field does not = 9) will be shown. The number of items count refers to the number of records on the weather file that are in error or missing – for an hourly weather file, this is the number of hours. Likewise out of range values (see specific fields in the previous definition) will be counted for each occurance and summarized. Note that the out of range values will not be changed by EnergyPlus and could affect your simulation results.</p>
 <p>For example:</p>
-<p>** Warning ** Missing Data Found on Weather Data File</p>
-<p>************* Missing Atmospheric Pressure, Number of items=   48</p>
-<p>************* Missing Dry Bulb Temperatures, Number of items=   4</p>
-<p>** Warning ** Out of Range Data Found on Weather Data File</p>
-<p>************* Out of Range Dry Bulb Temperature [&gt;-70,&lt;70], Number of items=   1</p>
+<pre><code>   ** Warning ** Missing Data Found on Weather Data File
+   ************* Missing Atmospheric Pressure, Number of items=   48
+   ************* Missing Dry Bulb Temperatures, Number of items=   4
+   ** Warning ** Out of Range Data Found on Weather Data File
+   ************* Out of Range Dry Bulb Temperature [&amp;gt;-70,&amp;lt;70], Number of items=   1
+</code></pre>
+
 
           <div class="footer">
   <p class="text-center"><a href="https://unmethours.com/questions/scope:all/sort:activity-desc/tags:energyplus/">Get Help</a> | <a href="https://www.energyplus.gov/">More Information</a></p>

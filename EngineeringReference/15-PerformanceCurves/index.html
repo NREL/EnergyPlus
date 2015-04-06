@@ -303,6 +303,19 @@
 </div>
         </div>
         <div class="col-md-9" role="main">
+          <script>
+           (function() {
+            var cx = '007045650438215436378:sghdz0ne6rg';
+            var gcse = document.createElement('script');
+            gcse.type = 'text/javascript';
+            gcse.async = true;
+            gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+                '//www.google.com/cse/cse.js?cx=' + cx;
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(gcse, s);
+           })();
+          </script>
+          <gcse:search></gcse:search>
           <h1 id="performance-curves-and-lookup-tables">Performance Curves and Lookup Tables</h1>
 <p>The following section describes the use of performance curves and lookup tables. Each of these objects may be used in any valid input field where a performance curve name is required.</p>
 <p>Performance curves are used directly to simulate the performance of HVAC equipment. The curves are typically created by performing a regression analysis on tabular data for a particular equipment performance metric. The regression analysis determines the equation coefficients which are the primary input to all performance curve objects. Performance tables are similar to performance curves in that they are meant to replicate a particular performance curve. Input to performance tables are made up of data pairs, the same data pairs that would be used to create performance curve coefficients. Performance tables can be interpolated using up to a 4<sup>th</sup> order polynomial equation for one independent variable tables or using a 2<sup>nd</sup> order polynomial for two independent variable tables. A regression analysis can be performed on performance tables when the simulation is instructed to use the regression analysis during the simulation (i.e., ride the curve). In addition, a performance curve object is created that can be used in future simulations and can be written to the eio file. The performance curve is written to the eio file only when the diagnostics flag is set to DisplayAdvancedReportVariables (ref. Output:Diagnostics, DisplayAdvancedReportVariables;). Lookup tables are similar to performance tables in that tabular data is used for input, however, the input 1) is more compact, 2) a regression analysis may only be performed for one and two independent variable cases, and 3) the tabular data can be read from an external file.</p>

@@ -303,6 +303,19 @@
 </div>
         </div>
         <div class="col-md-9" role="main">
+          <script>
+           (function() {
+            var cx = '007045650438215436378:sghdz0ne6rg';
+            var gcse = document.createElement('script');
+            gcse.type = 'text/javascript';
+            gcse.async = true;
+            gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+                '//www.google.com/cse/cse.js?cx=' + cx;
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(gcse, s);
+           })();
+          </script>
+          <gcse:search></gcse:search>
           <h1 id="appendix-a-units-and-abbreviations">Appendix A. Units and Abbreviations</h1>
 <h2 id="standard-energyplus-conditions">Standard EnergyPlus Conditions</h2>
 <h3 id="standard-temperature-and-pressure">Standard Temperature and Pressure</h3>
@@ -316,124 +329,205 @@
 <p>EnergyPlus expects information in a single unit system (SI). This requires interface developers to convert user inputs from those preferred by architects and engineers into the standard metric units of EnergyPlus. EnergyPlus will not perform any units conversions and will not have any unit conversion routines.</p>
 <p>ASCII with no spaces is used for abbreviations. Note that exponents appear without any indication of exponentiation: i.e., kg/m3 not kg/m^3 or kg/m**3. Also note the use of dashes. We have W/m2-K not W/m2*K or W/(m2*K).</p>
 <p>At the end we note the “problem” variables – the inputs that have non-standard units. Inputs using these units will have to be changed and the code checked to see how the quantities are used internally.</p>
-<p>Table 49. Standard EnergyPlus Units</p>
-<p>Quantity</p>
-<p>unit</p>
-<p>abbreviation</p>
-<p>angular degrees</p>
-<p>degree</p>
-<p>deg</p>
-<p>Length</p>
-<p>meter</p>
-<p>m</p>
-<p>Area</p>
-<p>square meter</p>
-<p>m2</p>
-<p>Volume</p>
-<p>cubic meter</p>
-<p>m3</p>
-<p>Time</p>
-<p>seconds</p>
-<p>s</p>
-<p>Frequency</p>
-<p>Hertz</p>
-<p>Hz</p>
-<p>Temperature</p>
-<p>Celsius</p>
-<p>C</p>
-<p>absolute temperature</p>
-<p>Kelvin</p>
-<p>K</p>
-<p>temperature difference</p>
-<p>Kelvin</p>
-<p>deltaC</p>
-<p>speed</p>
-<p>meters per second</p>
-<p>m/s</p>
-<p>energy (or work)</p>
-<p>Joules</p>
-<p>J</p>
-<p>power</p>
-<p>Watts</p>
-<p>W</p>
-<p>mass</p>
-<p>kilograms</p>
-<p>kg</p>
-<p>force</p>
-<p>Newton</p>
-<p>N</p>
-<p>mass flow</p>
-<p>kilograms per second</p>
-<p>kg/s</p>
-<p>volume flow</p>
-<p>cubic meters per second</p>
-<p>m3/s</p>
-<p>pressure</p>
-<p>Pascals</p>
-<p>Pa</p>
-<p>pressure difference</p>
-<p>Pascals</p>
-<p>Pa</p>
-<p>specific enthalpy</p>
-<p>Joules per kilogram</p>
-<p>J/kg</p>
-<p>density</p>
-<p>kilograms per cubic meter</p>
-<p>kg/m3</p>
-<p>heat flux</p>
-<p>watts per square meter</p>
-<p>W/m2</p>
-<p>specific heat</p>
-<hr />
-<p>J/kg-K</p>
-<p>conductivity</p>
-<hr />
-<p>W/m-K</p>
-<p>diffusivity</p>
-<hr />
-<p>m2/s</p>
-<p>heat transfer coefficient</p>
-<hr />
-<p>W/m2-K</p>
-<p>R-value</p>
-<hr />
-<p>m2-K/W</p>
-<p>heating or cooling capacity</p>
-<p>Watts</p>
-<p>W</p>
-<p>electric potential</p>
-<p>volts</p>
-<p>V</p>
-<p>electric current</p>
-<p>Amperes</p>
-<p>A</p>
-<p>illuminace</p>
-<p>lux</p>
-<p>lx</p>
-<p>luminous flux</p>
-<p>lumen</p>
-<p>lm</p>
-<p>luminous intensity</p>
-<p>candelas</p>
-<p>cd</p>
-<p>luminance</p>
-<p>candelas per square meter</p>
-<p>cd/m2</p>
-<p>vapor diffusivity</p>
-<p>meters squared per second</p>
-<p>m2/s</p>
-<p>viscosity</p>
-<hr />
-<p>kg/m-s</p>
-<p>dynamic Viscosity</p>
-<hr />
-<p>N-s/m2</p>
-<p>thermal gradient coeff for moisture capacity</p>
-<hr />
-<p>kg/kg-K</p>
-<p>isothermal moisture capacity</p>
-<hr />
-<p>m3/kg</p>
+<table class="table table-striped">
+  <caption>Standard EnergyPlus Units</caption>
+  <tr>
+    <th>Quantity</th>
+    <th>unit</th>
+    <th>abbreviation</th>
+  </tr>
+  <tr>
+    <td>angular degrees</td>
+    <td>degree</td>
+    <td>deg</td>
+  </tr>
+  <tr>
+    <td>Length</td>
+    <td>meter</td>
+    <td>m</td>
+  </tr>
+  <tr>
+    <td>Area</td>
+    <td>square meter</td>
+    <td>m2</td>
+  </tr>
+  <tr>
+    <td>Volume</td>
+    <td>cubic meter</td>
+    <td>m3</td>
+  </tr>
+  <tr>
+    <td>Time</td>
+    <td>seconds</td>
+    <td>s</td>
+  </tr>
+  <tr>
+    <td>Frequency</td>
+    <td>Hertz</td>
+    <td>Hz</td>
+  </tr>
+  <tr>
+    <td>Temperature</td>
+    <td>Celsius</td>
+    <td>C</td>
+  </tr>
+  <tr>
+    <td>absolute temperature</td>
+    <td>Kelvin</td>
+    <td>K</td>
+  </tr>
+  <tr>
+    <td>temperature difference</td>
+    <td>Kelvin</td>
+    <td>deltaC</td>
+  </tr>
+  <tr>
+    <td>speed</td>
+    <td>meters per second</td>
+    <td>m/s</td>
+  </tr>
+  <tr>
+    <td>energy (or work)</td>
+    <td>Joules</td>
+    <td>J</td>
+  </tr>
+  <tr>
+    <td>power</td>
+    <td>Watts</td>
+    <td>W</td>
+  </tr>
+  <tr>
+    <td>mass</td>
+    <td>kilograms</td>
+    <td>kg</td>
+  </tr>
+  <tr>
+    <td>force</td>
+    <td>Newton</td>
+    <td>N</td>
+  </tr>
+  <tr>
+    <td>mass flow</td>
+    <td>kilograms per second</td>
+    <td>kg/s</td>
+  </tr>
+  <tr>
+    <td>volume flow</td>
+    <td>cubic meters per second</td>
+    <td>m3/s</td>
+  </tr>
+  <tr>
+    <td>pressure</td>
+    <td>Pascals</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td>pressure difference</td>
+    <td>Pascals</td>
+    <td>Pa</td>
+  </tr>
+  <tr>
+    <td>specific enthalpy</td>
+    <td>Joules per kilogram</td>
+    <td>J/kg</td>
+  </tr>
+  <tr>
+    <td>density</td>
+    <td>kilograms per cubic meter</td>
+    <td>kg/m3</td>
+  </tr>
+  <tr>
+    <td>heat flux</td>
+    <td>watts per square meter</td>
+    <td>W/m2</td>
+  </tr>
+  <tr>
+    <td>specific heat</td>
+    <td>-------</td>
+    <td>J/kg-K</td>
+  </tr>
+  <tr>
+    <td>conductivity</td>
+    <td>-------</td>
+    <td>W/m-K</td>
+  </tr>
+  <tr>
+    <td>diffusivity</td>
+    <td>-------</td>
+    <td>m2/s</td>
+  </tr>
+  <tr>
+    <td>heat transfer coefficient</td>
+    <td>-------</td>
+    <td>W/m2-K</td>
+  </tr>
+  <tr>
+    <td>R-value</td>
+    <td>-------</td>
+    <td>m2-K/W</td>
+  </tr>
+  <tr>
+    <td>heating or cooling capacity</td>
+    <td>Watts</td>
+    <td>W</td>
+  </tr>
+  <tr>
+    <td>electric potential</td>
+    <td>volts</td>
+    <td>V</td>
+  </tr>
+  <tr>
+    <td>electric current</td>
+    <td>Amperes</td>
+    <td>A</td>
+  </tr>
+  <tr>
+    <td>illuminace</td>
+    <td>lux</td>
+    <td>lx</td>
+  </tr>
+  <tr>
+    <td>luminous flux</td>
+    <td>lumen</td>
+    <td>lm</td>
+  </tr>
+  <tr>
+    <td>luminous intensity</td>
+    <td>candelas</td>
+    <td>cd</td>
+  </tr>
+  <tr>
+    <td>luminance</td>
+    <td>candelas per square meter</td>
+    <td>cd/m2</td>
+  </tr>
+  <tr>
+    <td>vapor diffusivity</td>
+    <td>meters squared per second</td>
+    <td>m2/s</td>
+  </tr>
+  <tr>
+    <td>viscosity</td>
+    <td>-------</td>
+    <td>kg/m-s</td>
+  </tr>
+  <tr>
+    <td>dynamic Viscosity</td>
+    <td>-------</td>
+    <td>N-s/m2</td>
+  </tr>
+  <tr>
+    <td>thermal gradient coeff for moisture capacity</td>
+    <td>-------</td>
+    <td>kg/kg-K</td>
+  </tr>
+  <tr>
+    <td>isothermal moisture capacity</td>
+    <td>-------</td>
+    <td>m3/kg</td>
+  </tr>
+</table>
+
 
           <div class="footer">
   <p class="text-center"><a href="https://unmethours.com/questions/scope:all/sort:activity-desc/tags:energyplus/">Get Help</a> | <a href="https://www.energyplus.gov/">More Information</a></p>

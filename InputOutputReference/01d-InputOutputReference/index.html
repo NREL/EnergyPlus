@@ -1135,6 +1135,19 @@
 </div>
         </div>
         <div class="col-md-9" role="main">
+          <script>
+           (function() {
+            var cx = '007045650438215436378:sghdz0ne6rg';
+            var gcse = document.createElement('script');
+            gcse.type = 'text/javascript';
+            gcse.async = true;
+            gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+                '//www.google.com/cse/cse.js?cx=' + cx;
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(gcse, s);
+           })();
+          </script>
+          <gcse:search></gcse:search>
           <h2 id="group-zone-controls-thermostats-and-humidistats">Group – Zone Controls – Thermostats and Humidistats</h2>
 <p>Zone Control objects are used to control zone conditions to a specific setpoint. The six types of zone control are described in this section. They are, by name, ZoneControl:<strong>&lt;name&gt;.</strong>. These types are:</p>
 <p><strong>Thermostat</strong> – The object provides the traditional approach to space control using air temperatures. Each controlled zone contains a thermostat object.</p>
@@ -1329,7 +1342,7 @@
 <p><span>${T_{drybulb}}$</span>is the mean zone air temperature.</p>
 <p>The radiative fraction <span>$\gamma $</span> is selected by the user and can be scheduled to vary during the simulation. A typical value is 0.5. The maximum value needs to be less than 0.9 and the minimum is 0.0. A value of 0.0 is the same as controlling on only zone air temperature. If air velocities are higher than 0.2 m/s, then lower values for radiative fraction might apply. Niu and Burnett (1998) cite International Standard ISO 77300 in recommending the values for this fraction listed in the following table.</p>
 <p>Table 28. Radiative Fraction vs Air Velocity (Operative Temperature Control)</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Air Velocity (m/s)</td>
 <td>&lt; 0.2</td>
@@ -7167,7 +7180,7 @@
 <p>HVAC,Average,Cooling Coil Fluid Thermal Storage End Temperature [C]</p>
 <h4 id="cooling-coil-operating-mode-index">Cooling Coil Operating Mode Index [ ]</h4>
 <p>This output variable reports the operating mode for the cooling coil.  The numbers in this output are integer codes that correspond to the operating modes as described in the following table.  These codes match the values used for input in schedules and EMS actuators to control operation.</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Code</td>
 <td>Operating Mode</td>
@@ -7249,7 +7262,7 @@
 <h2 id="group-fans">Group – Fans</h2>
 <p>The following fans may be defined either in the air loop or as a zone equipment component: Fan:ConstantVolume, Fan:OnOff, Fan:VariableVolume, Fan:ZoneExhaust, and FanPerformance:NightVentilation. The data that are common to these fan types include an identifying name, an availability schedule name, a total efficiency rating, a rated pressure rise, and inlet and outlet air node names. In the case of a variable volume fan, additional input includes parameters for modeling fan performance over a range of fan speeds. See the engineering documentation for the variable speed fan for a further description of what these coefficients represent. Commonly-used values for different variable volume systems are shown in the following table.</p>
 <p>Table 29. Fan Coefficient Values</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Type of Fan</td>
 <td>Fan Coeff. 1</td>
@@ -13704,7 +13717,7 @@
 <h4 id="field-air-intake-heat-recovery-mode">Field: Air Intake Heat Recovery Mode</h4>
 <p>This field is used to control how heat losses from three other subsystems within the FC may or may not be recovered by the air inlet. There are six possible choices for what to use in this Field: “NoRecovery” “RecoverBurnerInverterStorage” “RecoverAuxiliaryBurner” “RecoverInverterandStorage” “RecoverInverter” and “RecoverElectricalStorage”.  If heat is recovered then that means that energy “losses” from those subsystems are added to the inlet air and fed back into the FC power module. The following table clarifies the meaning of the six possible choices.</p>
 <p>Table 32. Air Intake Heat Recovery Mode Choices</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Field Choice</td>
 <td>Inverter Heat Losses Recovered?</td>
@@ -14183,7 +14196,7 @@
 <p>This object describes the performance characteristics of Photovoltaic (PV) modules to be modeled using an equivalent one-diode circuit.  This model is also known at the 4- or 5-parameter TRNSYS model for photovoltaics.</p>
 <p>The following table shows several sample PV array types with their input values.</p>
 <p>Table 33. Photovoltaics Array Types with Values</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td> </td>
 <td>Short Circuit Current</td>
@@ -14727,7 +14740,7 @@
 <p><em>λi</em>       = tip speed ratio at ith time step</p>
 <p><em>θ</em>       = azimuth angle of the pitch, 0 [degree]</p>
 <p>If the user does not input any field of these parameters, the simple approximation model for the power coefficient will be used (see previous maximum power coefficient field). That is, the analytical approximation model of the power coefficient will be chosen only if the user inputs all these six parameters. The user also has the ability to modify each parameter when the specific value of the system is available. The default values are given in the table below.</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>C<sub>1</sub></td>
 <td>C<sub>2</sub></td>

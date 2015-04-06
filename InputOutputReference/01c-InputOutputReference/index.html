@@ -991,6 +991,19 @@
 </div>
         </div>
         <div class="col-md-9" role="main">
+          <script>
+           (function() {
+            var cx = '007045650438215436378:sghdz0ne6rg';
+            var gcse = document.createElement('script');
+            gcse.type = 'text/javascript';
+            gcse.async = true;
+            gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+                '//www.google.com/cse/cse.js?cx=' + cx;
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(gcse, s);
+           })();
+          </script>
+          <gcse:search></gcse:search>
           <h3 id="groundheatexchangervertical">GroundHeatExchanger:Vertical</h3>
 <p>The EnergyPlus Ground loop heat exchanger is a condenser component. This serves the condenser supply side in addition to the cooling towers and other condensing components. The following figure shows the Ground Heat Exchanger in the simulation environment.</p>
 <p>The heat exchanger response is defined by a G-function. This is a non-dimensional function that is used to calculate the response to square heat pulses of different duration. (This function is not the same as ‘G-factors’ referred to in the ASHRAE Applications Handbook). This continuous function is specified by a series of data pairs (LNTTS<em>i</em>, GFNC<em>i</em>) where,</p>
@@ -3474,7 +3487,7 @@
 <p>There are five main zone equipment statements that must be used to describe a block of zone equipment as shown in the below figure “Zone Equipment Input Syntax Map”.</p>
 <p>Types of Zone equipment are listed below and shown below in figure “Zone Equipment”.</p>
 <p>Table 26. Available Zone Equipment Types</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Air Distribution Equipment</td>
 <td>AirTerminal:SingleDuct:Uncontrolled
@@ -3591,7 +3604,7 @@ High Temp Radiant System</td>
 <h4 id="field-zone-equipment-x-object-type">Field: Zone Equipment &lt;x&gt; Object Type</h4>
 <p>Type of zone equipment such as air distribution unit, baseboard, window air conditioner, etc. The current legal types are listed in the following table:</p>
 <p>Table 27. Legal Zone Equipment Types (ZoneHVAC:EquipmentList)</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Legal Zone Equipment Types</td>
 </tr>

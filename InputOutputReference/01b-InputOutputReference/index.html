@@ -795,13 +795,26 @@
 </div>
         </div>
         <div class="col-md-9" role="main">
+          <script>
+           (function() {
+            var cx = '007045650438215436378:sghdz0ne6rg';
+            var gcse = document.createElement('script');
+            gcse.type = 'text/javascript';
+            gcse.async = true;
+            gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+                '//www.google.com/cse/cse.js?cx=' + cx;
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(gcse, s);
+           })();
+          </script>
+          <gcse:search></gcse:search>
           <h3 id="zonebaseboardoutdoortemperaturecontrolled">ZoneBaseboard:OutdoorTemperatureControlled</h3>
 <p>This object specifies outside temperature-controlled (OTC) baseboard heating. The capacities (high and low) are specified in W at the temperatures specified. The schedule allows both capacities to change hourly on a proportional basis. This baseboard heater does not operate if the outdoor dry-bulb is above the high temperature limit. Between the high temperature and the low temperature, the capacity is interpolated (linear) between the high and the low capacity values. Below the low temperature, the capacity is set at the low capacity value. This allows the user to add baseboard heat to a perimeter zone starting at a prescribed temperature and then slowly increases this capacity to a max value.</p>
 <p><strong>Example:</strong></p>
 <p>Temperature High = 10 C     Capacity High = 100,000 W</p>
 <p>Temperature Low = 0 C        Capacity Low  = 500,000 W</p>
 <p>Table 16. Outdoor Temperature Controlled Baseboard Heat Temperature vs. Capacity</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Outdoor Dry-bulb(C)</td>
 <td>Baseboard Output</td>
@@ -923,7 +936,7 @@
 <h3 id="meters-for-equipment-outputs">Meters for Equipment Outputs</h3>
 <p>As described in each of the equipment sections, values for specific equipments will show up on the following meters:</p>
 <p>Table 17. Distribution of Equipment to Meters</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Meter Name</td>
 <td>Scope</td>
@@ -1622,7 +1635,7 @@
 <h3 id="daylighting-modeling-options">Daylighting Modeling Options</h3>
 <p>The following table shows what input objects/fields to use to model different daylighting options. It also gives the name of an example input, if available, that demonstrates the option.</p>
 <p>Table 21. Daylighting Modeling Options</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Option</td>
 <td>Object/Field or Output Variable</td>
@@ -1918,7 +1931,7 @@ Daylighting:DELight:Controls/Lighting Control Type = Continuous, Stepped or Cont
 <p>This field is the effective air leakage area, in cm<sup>2</sup>, at 4 Pa.  This is the value <span>${A_L}$</span>in the equation above.  Effective leakage area data can be obtained from a whole-building pressure test (eg. blower door test).  ASHRAE Handbook of Fundamentals also lists typical values component leakage areas for low-rise residential (e.g. Table 1 in Chapter 26 of HoF 2001).  The value should correspond to a pressure difference of 4 Pa.</p>
 <h4 id="field-stack-coefficient">Field: Stack Coefficient</h4>
 <p>This field is the value of the stack coefficient, <span>${C_s}$</span> in the equation above.  The coefficient has units of (L/s)<sup>2</sup>/(cm<sup>4</sup>·K).  Values for the “Basic Model Stack Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>One story house</td>
 <td>Two story house</td>
@@ -1933,7 +1946,7 @@ Daylighting:DELight:Controls/Lighting Control Type = Continuous, Stepped or Cont
 
 <h4 id="field-wind-coefficient">Field: Wind Coefficient</h4>
 <p>This field is the value of the wind coefficient, <span>${C_w}$</span> in the equation above.  The coefficient has units of (L/s)<sup>2</sup>/(cm<sup>4</sup>·(m/s)<sup>2</sup>).  Values for the “Basic Model Wind Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 chapter 27; 2001, Chapter 26) depend on the type of shelter and are listed in the following tables.</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Shelter class</td>
 <td>One story house</td>
@@ -1972,7 +1985,7 @@ Daylighting:DELight:Controls/Lighting Control Type = Continuous, Stepped or Cont
 </tr>
 </table>
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Shelter class</td>
 <td>Description</td>
@@ -2024,7 +2037,7 @@ Daylighting:DELight:Controls/Lighting Control Type = Continuous, Stepped or Cont
 <p>This field is the flow coefficient in m<sup>3</sup>/(s·Pa<sup>n</sup>).  This is the value <span>$c$</span> in the equation above.  The flow coefficient can be determined from the effective leakage area and whole-building pressure tests (eg. blower door test).</p>
 <h4 id="field-stack-coefficient_1">Field: Stack Coefficient</h4>
 <p>This field is the value of the stack coefficient, <span>${C_s}$</span> in the equation above.  The coefficient has units of (Pa/K)<sup>n</sup>. Values for the “Enhanced Model Stack Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td> </td>
 <td>One story house</td>
@@ -2049,7 +2062,7 @@ Daylighting:DELight:Controls/Lighting Control Type = Continuous, Stepped or Cont
 <p>This field is the value of the pressure exponent, <em>n</em> in the equation above.  The pressure exponent generally lies between 0.6 and 0.7 with a typical value of <em>n</em> = 0.67 for the enhanced model.</p>
 <h4 id="field-wind-coefficient_1">Field: Wind Coefficient</h4>
 <p>This field is the value of the wind coefficient, <span>${C_w}$</span> in the equation above.  The coefficient has units of (Pa·s<sup>2</sup>/m<sup>2</sup>)<sup>n</sup> .  Values for the “Enhanced Model Wind Coefficient” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td> </td>
 <td>One story house</td>
@@ -2085,7 +2098,7 @@ No Flue</td>
 
 <h4 id="field-shelter-factor">Field: Shelter Factor</h4>
 <p>This field is the value of the wind coefficient, <span>$s$</span> in the equation above.  The coefficient is dimensionless.  Values for the “Enhanced Model Shelter Factor” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Shelter class</td>
 <td>No Flue</td>
@@ -2130,7 +2143,7 @@ No Flue</td>
 </tr>
 </table>
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Shelter class</td>
 <td>Description</td>
@@ -8677,7 +8690,7 @@ No Flue</td>
 </li>
 </ul>
 <p>These objects are typically placed on the supply side of a primary chilled water loop in series or in parallel with one or more chillers.  Using the the component set point (PlantEquipmentOperation:ComponentSetpoint) plant operation scheme type, the chiller and storage tank setpoints are used to control operation. Using a SetpointManager:Scheduled object (or other appropriate type of set point manager), the setpoints on the chiller outlet node and the ice storage outlet node can be used to control how the cooling load is shared and when charging of storage occurs.  Example setpoints to use for various modes of operation are shown in the table below:</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Mode</td>
 <td>Chiller Setpoint</td>

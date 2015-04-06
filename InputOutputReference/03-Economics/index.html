@@ -341,6 +341,19 @@
 </div>
         </div>
         <div class="col-md-9" role="main">
+          <script>
+           (function() {
+            var cx = '007045650438215436378:sghdz0ne6rg';
+            var gcse = document.createElement('script');
+            gcse.type = 'text/javascript';
+            gcse.async = true;
+            gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+                '//www.google.com/cse/cse.js?cx=' + cx;
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(gcse, s);
+           })();
+          </script>
+          <gcse:search></gcse:search>
           <h1 id="energyplus-economics">EnergyPlus Economics</h1>
 <h2 id="group-economics">Group – Economics</h2>
 <p>EnergyPlus contains a number of objects to model construction cost and utility bill calculations.</p>
@@ -434,7 +447,7 @@
 <h2 id="conceptual-framework-variables-and-hierarchy">Conceptual Framework – Variables and Hierarchy</h2>
 <p>To understand how to use the utility bill calculation portion of EnergyPlus you first need to understand some important concepts of variables and hierarchy. A variable, for the purposes of this section, is simply a named holder of a series of numbers. In most cases, the variable will be a named holder of 12 numbers, one number for each monthly utility bill. Here is a visualization of a variable called Electric Energy Use:</p>
 <p>Table 35. Example Electric Energy Use (for Economics Calculation)</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Month</td>
 <td>Electric Energy Use</td>
@@ -550,7 +563,7 @@
 </ul>
 <p>The following table shows the conversion factors when specifying one of the predefined choices:</p>
 <p>Table 36. Built in UtilityCost:Tariff Conversion Factors</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Choice</td>
 <td>Energy Conversion Factor</td>
@@ -1694,7 +1707,7 @@
 <h4 id="field-line-item-type">Field: Line Item Type</h4>
 <p>The cost estimate line item calculation will be controlled by the name entered in this field. The requirements for the remaining input, and the cost calculations performed, will vary depending on the object referenced here. Only selected objects can be entered here. The objects available for cost estimating are listed in the following table showing the active fields and options available for each.</p>
 <p>Table 37. Cost Line Item Types (ref Objects)</p>
-<table>
+<table class="table table-striped">
 <tr>
 <td>Object Types available (choice keys)</td>
 <td>Cost per each</td>

@@ -303,6 +303,19 @@
 </div>
         </div>
         <div class="col-md-9" role="main">
+          <script>
+           (function() {
+            var cx = '007045650438215436378:sghdz0ne6rg';
+            var gcse = document.createElement('script');
+            gcse.type = 'text/javascript';
+            gcse.async = true;
+            gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+                '//www.google.com/cse/cse.js?cx=' + cx;
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(gcse, s);
+           })();
+          </script>
+          <gcse:search></gcse:search>
           <h1 id="advanced-surface-concepts">Advanced Surface Concepts</h1>
 <h2 id="exterior-naturally-vented-cavity">Exterior Naturally Vented  Cavity</h2>
 <p>The input object “SurfaceProperty:ExteriorNaturalVentedCavity” allows modeling a special case for the outside boundary conditions of heat transfer surfaces with a multi-skin exterior that is opaque.  From the thermal envelope’s point of view, the presence of a vented cavity on the outside of the surface modifies the conditions experienced by the underlying heat transfer surfaces.  This exterior cavity acts as a radiation and convection baffle situated between the exterior environment and the outside face of the underlying heat transfer surface.  The actual outer surface is referred to as the “baffle”.  The modeling here assumes that the heat capacity in the outer baffle can be neglected since it is much lower than the underlying mass surface.  This object is used with the BuildingSurface:Detailed object where the heat transfer surfaces are referred to as the underlying surfaces.  The constructions and materials for the heat transfer surfaces should reflect the construction of just the underlying surface.  The SurfaceProperty:ExteriorNaturalVentedCavity object is used to describe the detached layer, or baffle, and the characteristics of the cavity and openings for natural ventilation.  This model uses the SurfaceProperty:OtherSideConditionsModel object to pass boundary conditions to the heat transfer modeling for the underlying surfaces.</p>
