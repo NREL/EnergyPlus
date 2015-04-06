@@ -396,7 +396,7 @@ Current resource types are shown in the table below:
 
 Table 38. Table of Metered Resource  Types
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Utility/Fuel Types</td>
 </tr>
@@ -455,7 +455,7 @@ Table 38. Table of Metered Resource  Types
 
 
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Other Resource Types</td>
 </tr>
@@ -470,7 +470,7 @@ The end use types are shown in the following table (note that certain end use ty
 
 Table 39. End Use Category Types
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Utility/Fuel End Use Types</td>
 </tr>
@@ -525,7 +525,7 @@ Table 39. End Use Category Types
 
 
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Additional End Use Types Only Used for EnergyTransfer</td>
 </tr>
@@ -556,7 +556,7 @@ Specific meter types are then used for grouping the fuel type meters:
 
 Table 40. Overall Meter Types
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Meters</td>
 </tr>
@@ -623,7 +623,7 @@ Users will enter environmental impact factors for each Fuel Type or FuelFactor. 
 
 The energy is obtained internally from the following facility meters:
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Electricity:Facility</td>
 <td>Diesel:Facility</td>
@@ -2196,7 +2196,7 @@ You can override the 255 variable limit by specifying an argument on the command
 
 Table 41. ReadVarsESO Command Line Options
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Option</td>
 <td>Description</td>
@@ -2237,7 +2237,7 @@ The program is run automatically from the **EP-Launch** program or the **RunEPlu
 
 Table 42. "RVI" file contents
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>.rvi line description</td>
 <td>Actual .rvi File Contents</td>
@@ -2334,7 +2334,7 @@ The above message was generated from an IDF that requested reporting of the “S
 
 Table 43. Example ReadVarsESO command lines and results
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Command Line</td>
 <td>Description/Result</td>

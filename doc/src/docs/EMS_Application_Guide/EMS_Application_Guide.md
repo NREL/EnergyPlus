@@ -504,12 +504,12 @@ Table 4. Built-in Math Functions for Erl
 </tr>
 <tr>
 <td>@Exp</td>
-<td>Exponential, <img src="EMS_Application_Guide/media/image001.png" />, returns result.</td>
+<td>Exponential, e<sup>x</sup>, returns result.</td>
 <td>1</td>
 </tr>
 <tr>
 <td>@Ln</td>
-<td>Natural log, <img src="EMS_Application_Guide/media/image002.png" />, returns result.</td>
+<td>Natural log, log<sub>e</sub>(x), returns result.</td>
 <td>1</td>
 </tr>
 <tr>
@@ -2397,7 +2397,7 @@ The example file has six zones, but one is an attic that we do not care about. T
 
 A model for average temperature can be constructed by using the zone air volumes as weights so larger zones have more influence than smaller zones on the resulting average. The model equation we will implement in EMS for our new report variable is
 
-![](EMS_Application_Guide/media/image006.png)
+<div>\[T_{average} = \frac{\sum\left(T_{zone}\text{Vol}_{zone}\right)}{\sum\left(\text{Vol}_{zone}\right)}\]</div>
 
 The example file specifies the zone volume in its zone objects so we have the data needed for the weighting factors from elsewhere in the IDF. However, a study could vary the geometry such that the volumes differ from one simulation to another. Zone Air Volume is available as internal data, so we will use EnergyManagementSystem:InternalVariable input objects to assign these weighting factors into global Erl variables. If we did not know beforehand that Zone Air Volume was an available internal variable, we would have had to prerun the model with some EMS-related objects and the appropriate level of reporting selected in an Output:EnergyManagementSystem object, and then studied the EDD output file. Note that the EDD file is only produced if you have EMS/Erl programs in your input file.
 
@@ -2905,7 +2905,13 @@ The EMS will actuate the opening in an airflow network that is defined by the in
 
 Because we do not know the exactly what the user had in mind, for this example we assume that the desired behavior for the opening area is that the opening should vary linearly with room air relative humidity. When the humidity increases, we want the opening to be larger. When the humidity decreases, we want the opening to be smaller. For relative humidity below 25% we close the opening. At 60% or higher relative humidity, the opening should be completely open. We formulate a model equation for opening factor as
 
-![](EMS_Application_Guide/media/image007.png)
+<div>\[
+  F_{open} = \begin{array}{ll}
+    0.0 & RH < 25\% \\
+    \frac{RH-25}{60-25} & 25\% \leq RH \leq 60\% \\
+    1.0 & RH > 60\%  
+  \end{array}
+\]</div>
 
 ### EMS Input Objects
 
@@ -3696,9 +3702,42 @@ One tension often arises with modeling when options being evaluated have an indi
 
 ### EMS Design Discussion
 
-Examining the vendor’s literature for one line of commercial packaged single-zone HVAC air systems shows that the nominal product sizes include 1200 cfm, 1600 cfm, 2000 cfm, 2400 cfm, 3000 cfm, 3400, cfm, and 4000 cfm. The literature also classifies units by tonnage of cooling capacity; however, in EnergyPlus modeling it is simpler to classify by air flow rate rather than by cooling capacity (because the direct expansion models have a tight range for allowable cooling capacity per air flow rate and size themselves off the flow rate). We construct the following simple model to select the next higher air flow rate product that uses the volume flow determined during the usual autosizing calculations, ![](EMS_Application_Guide/media/image008.png),and threshold values taken from the nominal product sizes (in m<sup>3</sup>/s):
+Examining the vendor’s literature for one line of commercial packaged single-zone HVAC air systems shows that the nominal product sizes include 1200 cfm, 1600 cfm, 2000 cfm, 2400 cfm, 3000 cfm, 3400, cfm, and 4000 cfm. The literature also classifies units by tonnage of cooling capacity; however, in EnergyPlus modeling it is simpler to classify by air flow rate rather than by cooling capacity (because the direct expansion models have a tight range for allowable cooling capacity per air flow rate and size themselves off the flow rate). We construct the following simple model to select the next higher air flow rate product that uses the volume flow determined during the usual autosizing calculations, <span>$\dot{V}_{size}$</span>, and threshold values taken from the nominal product sizes (in m<sup>3</sup>/s):
 
-![](EMS_Application_Guide/media/image009.png)
+<table class="table table-striped">
+  <tr>
+    <th>Threshold</th>
+    <th>Selection</th>
+  </tr>
+  <tr>
+    <td><span>$0 < \dot{V}_{size} \leq 0.566 $</span></td>
+    <td><span>$ \dot{V}= 0.566$</span></td>
+  </tr>
+  <tr>
+    <td><span>$0.566 < \dot{V}_{size} \leq 0.755 $</span></td>
+    <td><span>$ \dot{V}= 0.755$</span></td>
+  </tr>
+  <tr>
+    <td><span>$0.755 < \dot{V}_{size} \leq 0.944 $</span></td>
+    <td><span>$ \dot{V}= 0.944$</span></td>
+  </tr>
+  <tr>
+    <td><span>$0.944 < \dot{V}_{size} \leq 1.133 $</span></td>
+    <td><span>$ \dot{V}= 1.133$</span></td>
+  </tr>
+  <tr>
+    <td><span>$1.133 < \dot{V}_{size} \leq 1.416 $</span></td>
+    <td><span>$ \dot{V}= 1.416$</span></td>
+  </tr>
+  <tr>
+    <td><span>$1.416 < \dot{V}_{size} \leq 1.604 $</span></td>
+    <td><span>$ \dot{V}= 1.604$</span></td>
+  </tr>
+  <tr>
+    <td><span>$1.604 < \dot{V}_{size} \leq 1.888 $</span></td>
+    <td><span>$ \dot{V}= 1.888$</span></td>
+  </tr>
+</table>
 
 The system sizing calculations determine a value for the volume flow rate. To obtain this result for use in an Erl program, we use an EnergyManagementSystem:InternalVariable input object to set up a variable for the data called “Intermediate Air System Main Supply Volume Flow Rate.”  We can then use this value in our algorithm to find a discrete system size.
 
@@ -4841,7 +4880,9 @@ A particular manufacturer controls the DX cooling coil such that the capacity of
 
 For this example, we will start with the equation for cooling capacity of the DX coil object (ref. Coil:Cooling:DX:SingleSpeed). From the engineering reference, the equation used to calculate the cooling capacity is:
 
-![](EMS_Application_Guide/media/image010.png)
+<div>\[
+\text{TotCapTempModFac} = a + b \left( T_{wb,i} \right) + c \left( T_{wb,i} \right) + d \left( T_{c,i} \right) + e \left( T_{c,i} \right) + f \left( T_{wb,i} \right)\left( T_{c,i} \right)
+\]</div>
 
 The first term (Twb,i) refers to the cooling coil inlet air wet-bulb temperature and the second (Tc,i) refers to the outdoor condenser inlet air dry-bulb temperature. Using the EMS, a new total capacity as a function of temperature value will be calculated and used during the simulation. The Energyplus input objects for the cooling coil capacity curve, the associated outdoor air mixer object, and the original cooling capacity performance curve are shown here.
 

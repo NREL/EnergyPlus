@@ -100,7 +100,7 @@ To understand how to use the utility bill calculation portion of EnergyPlus you 
 
 Table 35. Example Electric Energy Use (for Economics Calculation)
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Month</td>
 <td>Electric Energy Use</td>
@@ -232,7 +232,7 @@ The following table shows the conversion factors when specifying one of the pred
 
 Table 36. Built in UtilityCost:Tariff Conversion Factors
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Choice</td>
 <td>Energy Conversion Factor</td>
@@ -2000,7 +2000,7 @@ The cost estimate line item calculation will be controlled by the name entered i
 
 Table 37. Cost Line Item Types (ref Objects)
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Object Types available (choice keys)</td>
 <td>Cost per each</td>

@@ -624,7 +624,7 @@ o   Many aspects of a model have time scales that differ from the that of the
 
 - If the model will include calculating the cost of electricity, then the user should be aware that many electric utility tariffs base charges on demand windows of a specified length of time.  If the choice of Number of Timesteps per Hour is not consistent with the demand window, then unexpected results may be obtained.  For reasonable prediction of the maximum rates for electricity use for in calculating demand charges, the length of the zone timestep needs to be consistent with the tariff’s demand window.  The following table lists what values are consistent with various demand windows.
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Demand Window</td>
 <td>Applicable Number of Timesteps per Hour</td>
@@ -1649,7 +1649,7 @@ The Humidity Condition Type fields have interacting uses and units, summarized a
 
 Table 2. Humidity Indicating Field Interactions - Design Day
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Humidity Condition Type</td>
 <td>Primary Humidity Indicating Field</td>
@@ -2323,7 +2323,7 @@ This field is the starting date for the special day period. Dates in this field 
 
 Table 3. Date Field Interpretation
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Field Contents</td>
 <td>Interpretation</td>
@@ -2510,7 +2510,7 @@ The **Site:WeatherStation** object is useful when working with a custom weather 
 
 Table 4. Wind Speed Profile Coefficients (ASHRAE Fundamentals 2005).
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Terrain Description</td>
 <td>Exponent</td>
@@ -2583,7 +2583,7 @@ The Site:HeightVariation object is used to specify the local variation in atmosp
 
 Table 5. Atmospheric Variables at Two Different Heights Above Ground Level.
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Variable</td>
 <td>1.5 m</td>
@@ -2802,7 +2802,7 @@ Alpha field indicating whether the domain will update temperatures at each zone 
 
 An IDF example of an in-grade slab.
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Site:GroundDomain,
     IngradeCoupledSlab, !- Name
@@ -2836,7 +2836,7 @@ An IDF example of an in-grade slab.
 
 And IDF example of an on-grade slab
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Site:GroundDomain,
     OngradeCoupledSlab, !- Name
@@ -2870,7 +2870,7 @@ And IDF example of an on-grade slab
 
 The following output variables are available.
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Zone, Average, Zone Coupled Surface Heat Flux [W/m2]
 Zone, Average, Zone Coupled Surface Temperature [C]</td>
@@ -3362,7 +3362,7 @@ The Solar Hour Angle (*H*) gives the apparent solar time for the current time pe
 
 Table 6. Relationship of Angles (degrees) to Time
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Unit of Angle</td>
 <td>Equivalent time</td>
@@ -11361,7 +11361,7 @@ The following table shows what input objects/fields to use to model different wi
 
 Table 8. Window Modeling Options
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Option</td>
 <td>Object/Field or Output Variable</td>
@@ -15351,7 +15351,7 @@ This field contains the word “Outside” or “Inside” depending on which lo
 
 The entries can be of several types: Value (simple numeric value), Schedule (name of schedule with the values), the usual key choices for overall models for Outside or Inside (Simple, SimpleCombined, TARP, AdaptiveConvectionAlgorithm etc.), the key choices for individual convection equations used for customizing the adaptive algorithm, or a custom user defined correlation. The field should contain one of the keys listed in the table below along with face they can be applied.  The definitions of the models and key choices are discussed under SurfaceConvectionAlgorithm:Inside , SurfaceConvectionAlgorithm:Outside, SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections, and SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections.
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Key choice</td>
 <td>Applies to Inside or Outside</td>
@@ -15664,7 +15664,7 @@ This field contains the word “Outside” or “Inside” depending on which lo
 
 The entries can be of several types: Value (simple numeric value), Schedule (name of schedule with the values), the usual key choices for overall models for Outside or Inside (Simple, SimpleCombined, TARP, AdaptiveConvectionAlgorithm etc.), the key choices for individual convection equations used for customizing the adaptive algorithm, or a custom user defined correlation. The field should contain one of the keys listed in the table below along with face they can be applied.  The definitions of the models and key choices are discussed under SurfaceConvectionAlgorithm:Inside , SurfaceConvectionAlgorithm:Outside, SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections, and SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections.
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Key choice</td>
 <td>Applies to Inside or Outside</td>
@@ -15895,7 +15895,7 @@ General to Specific, they are assigned in this order:
 
 Table 9. Convection Coefficient Assignment Hierarchy
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Objects/Description</td>
 <td>Action</td>
@@ -15942,7 +15942,7 @@ When EnergyPlus is set to Display Advanced Variables (Output:Diagnostics, Displa
 
 This variable reports how the surface was classified as part of the adaptive convection algorithm for the inside face.  The algorithm examines probable flow regimes, heat flow directions, orientations, HVAC equipment connections, and current operating status to assign each surface a category.  The numbers in this report are integer codes that correspond to surface categories as described in the following table.
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Code</td>
 <td>Zone Airflow Regime</td>
@@ -16225,7 +16225,7 @@ This variable reports how the surface was classified as part of the adaptive con
 
 This variable reports the specific model equation used to calculate the inside face convection coefficient.  This can vary when using the adaptive convection algorithm and so the result of that selection algorithm is reported here.  The following table lists the models associated with specific interger codes reported here.  The models correspond to key words used in input objects.
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Report Code</td>
 <td>Related key and model</td>
@@ -16360,7 +16360,7 @@ This variable reports the specific model equation used to calculate the inside f
 
 The inside face convection heat transfer calculations can be based on different reference air temperatures.  This reference air temperature can vary during the simulation when the adaptive algorithm selects models that use different references.  The following table lists the meaning of the integer codes.
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Report Code</td>
 <td>Reference Air Temperature Method</td>
@@ -16383,7 +16383,7 @@ The inside face convection heat transfer calculations can be based on different 
 
 This variable reports how the surface was classified as part of the adaptive convection algorithm for the outside face.  The algorithm examines the wind direction, heat flow directions and orientations to assign each surface a category.  The numbers in this report are integer codes that correspond to surface categories as described in the following table.
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Report Code</td>
 <td>Surface Classification</td>
@@ -16412,7 +16412,7 @@ This variable reports how the surface was classified as part of the adaptive con
 
 These variables report the specific model equation used to calculate the outside face’s convection coefficient.  They can vary when using the adaptive convection algorithm and so the results of that selection algorithm are reported in these variables.  The following table lists the models associated with specific integer codes that might be reported here.  The models correspond to key words used in input objects.
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Report Code</td>
 <td>Related key and model</td>
@@ -17033,7 +17033,7 @@ EnergyPlus offers the different types of air models listed in the table below al
 
 Table 10. Summary of Room Air Models
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Air Model Key</td>
 <td>Air model Algorithm</td>
@@ -18900,7 +18900,7 @@ The following output variables are all based on whether the humidity ratio and t
 
 Table 12. Winter Clothes (1.0 Clo)
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Operative Temperature (C)</td>
 <td>Humidity Ratio (kgWater/kgDryAir)</td>
@@ -18933,7 +18933,7 @@ Figure 49. Winter Comfort Range
 
 Table 13. Summer Clothes (0.5 Clo)
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Operative Temperature (C)</td>
 <td>Humidity Ratio (kgWater/kgDryAir)</td>
@@ -19474,7 +19474,7 @@ As described in the Lights Outputs, values for lights will show up on the follow
 
 Table 15. Distribution of Lights to Meters
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Meter Name</td>
 <td>Scope</td>

@@ -10,11 +10,11 @@ The weather description of data contains “missing” descriptors, a new concep
 
 Table 44. Missing weather replacement values
 
-<table>
+<table class="table table-striped">
 <tr>
-<td>Data item</td>
-<td>Supplied Value</td>
-<td>Units</td>
+<th>Data item</th>
+<th>Supplied Value</th>
+<th>Units</th>
 </tr>
 <tr>
 <td>Dry-bulb Temperature</td>
@@ -125,12 +125,12 @@ To explain further, the weighting for four (4) timesteps in hour is:
 
 Table 45. Illustration of Data Interpolation for 15 minute timesteps
 
-<table>
+<table class="table table-striped">
 <tr>
-<td>TimeStep</td>
-<td>Time (mm:ss)</td>
-<td>Weight<sub>LastHour</sub></td>
-<td>Weight<sub>ThisHour</sub></td>
+<th>TimeStep</th>
+<th>Time (mm:ss)</th>
+<th>Weight<sub>LastHour</sub></th>
+<th>Weight<sub>ThisHour</sub></th>
 </tr>
 <tr>
 <td>1</td>
@@ -162,12 +162,12 @@ And similarly for six (6) timesteps in hour:
 
 Table 46. Illustration of Data Interpolation for 10 minute timesteps
 
-<table>
+<table class="table table-striped">
 <tr>
-<td>TimeStep</td>
-<td>Time (mm:ss)</td>
-<td>Weight<sub>LastHour</sub></td>
-<td>Weight<sub>ThisHour</sub></td>
+<th>TimeStep</th>
+<th>Time (mm:ss)</th>
+<th>Weight<sub>LastHour</sub></th>
+<th>Weight<sub>ThisHour</sub></th>
 </tr>
 <tr>
 <td>1</td>
@@ -218,15 +218,10 @@ Missing data on the weather file used will be summarized on the **eplusout.err**
 
 For example:
 
-
-
-   \*\* Warning \*\* Missing Data Found on Weather Data File
-
-   \*\*\*\*\*\*\*\*\*\*\*\*\* Missing Atmospheric Pressure, Number of items=   48
-
-   \*\*\*\*\*\*\*\*\*\*\*\*\* Missing Dry Bulb Temperatures, Number of items=   4
-
-   \*\* Warning \*\* Out of Range Data Found on Weather Data File
-
-   \*\*\*\*\*\*\*\*\*\*\*\*\* Out of Range Dry Bulb Temperature [&gt;-70,&lt;70], Number of items=   1
-
+```
+   ** Warning ** Missing Data Found on Weather Data File
+   ************* Missing Atmospheric Pressure, Number of items=   48
+   ************* Missing Dry Bulb Temperatures, Number of items=   4
+   ** Warning ** Out of Range Data Found on Weather Data File
+   ************* Out of Range Dry Bulb Temperature [&gt;-70,&lt;70], Number of items=   1
+```

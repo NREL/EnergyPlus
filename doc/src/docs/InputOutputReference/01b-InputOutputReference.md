@@ -10,7 +10,7 @@ Temperature Low = 0 C        Capacity Low  = 500,000 W
 
 Table 16. Outdoor Temperature Controlled Baseboard Heat Temperature vs. Capacity
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Outdoor Dry-bulb(C)</td>
 <td>Baseboard Output</td>
@@ -213,7 +213,7 @@ As described in each of the equipment sections, values for specific equipments w
 
 Table 17. Distribution of Equipment to Meters
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Meter Name</td>
 <td>Scope</td>
@@ -1573,7 +1573,7 @@ The following table shows what input objects/fields to use to model different da
 
 Table 21. Daylighting Modeling Options
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Option</td>
 <td>Object/Field or Output Variable</td>
@@ -2070,7 +2070,7 @@ This field is the value of the stack coefficient, <span>${C_s}$</span> in the e
 
 
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>One story house</td>
 <td>Two story house</td>
@@ -2091,7 +2091,7 @@ This field is the value of the wind coefficient, <span>${C_w}$</span> in the eq
 
 
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Shelter class</td>
 <td>One story house</td>
@@ -2132,7 +2132,7 @@ This field is the value of the wind coefficient, <span>${C_w}$</span> in the eq
 
 
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Shelter class</td>
 <td>Description</td>
@@ -2213,7 +2213,7 @@ This field is the value of the stack coefficient, <span>${C_s}$</span> in the e
 
 
 
-<table>
+<table class="table table-striped">
 <tr>
 <td> </td>
 <td>One story house</td>
@@ -2246,7 +2246,7 @@ This field is the value of the wind coefficient, <span>${C_w}$</span> in the eq
 
 
 
-<table>
+<table class="table table-striped">
 <tr>
 <td> </td>
 <td>One story house</td>
@@ -2286,7 +2286,7 @@ No Flue</td>
 
 This field is the value of the wind coefficient, <span>$s$</span> in the equation above.  The coefficient is dimensionless.  Values for the “Enhanced Model Shelter Factor” listed in the ASHRAE Handbook of Fundamentals (2005 and 2001) are:
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Shelter class</td>
 <td>No Flue</td>
@@ -2333,7 +2333,7 @@ This field is the value of the wind coefficient, <span>$s$</span> in the equati
 
 
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Shelter class</td>
 <td>Description</td>
@@ -16625,7 +16625,7 @@ There are four types of cold thermal storage objects:
 
 These objects are typically placed on the supply side of a primary chilled water loop in series or in parallel with one or more chillers.  Using the the component set point (PlantEquipmentOperation:ComponentSetpoint) plant operation scheme type, the chiller and storage tank setpoints are used to control operation. Using a SetpointManager:Scheduled object (or other appropriate type of set point manager), the setpoints on the chiller outlet node and the ice storage outlet node can be used to control how the cooling load is shared and when charging of storage occurs.  Example setpoints to use for various modes of operation are shown in the table below:
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Mode</td>
 <td>Chiller Setpoint</td>

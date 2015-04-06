@@ -4651,7 +4651,7 @@ Types of Zone equipment are listed below and shown below in figure “Zone Equip
 
 Table 26. Available Zone Equipment Types
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Air Distribution Equipment</td>
 <td>AirTerminal:SingleDuct:Uncontrolled
@@ -4853,7 +4853,7 @@ Type of zone equipment such as air distribution unit, baseboard, window air cond
 
 Table 27. Legal Zone Equipment Types (ZoneHVAC:EquipmentList)
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Legal Zone Equipment Types</td>
 </tr>

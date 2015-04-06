@@ -403,7 +403,7 @@ The radiative fraction <span>$\gamma $</span> is selected by the user and can b
 
 Table 28. Radiative Fraction vs Air Velocity (Operative Temperature Control)
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Air Velocity (m/s)</td>
 <td>&lt; 0.2</td>
@@ -12058,7 +12058,7 @@ HVAC,Average,Cooling Coil Fluid Thermal Storage End Temperature [C]
 
 This output variable reports the operating mode for the cooling coil.  The numbers in this output are integer codes that correspond to the operating modes as described in the following table.  These codes match the values used for input in schedules and EMS actuators to control operation.
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Code</td>
 <td>Operating Mode</td>
@@ -12194,7 +12194,7 @@ The following fans may be defined either in the air loop or as a zone equipment 
 
 Table 29. Fan Coefficient Values
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Type of Fan</td>
 <td>Fan Coeff. 1</td>
@@ -24697,7 +24697,7 @@ This field is used to control how heat losses from three other subsystems within
 
 Table 32. Air Intake Heat Recovery Mode Choices
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>Field Choice</td>
 <td>Inverter Heat Losses Recovered?</td>
@@ -25578,7 +25578,7 @@ The following table shows several sample PV array types with their input values.
 
 Table 33. Photovoltaics Array Types with Values
 
-<table>
+<table class="table table-striped">
 <tr>
 <td> </td>
 <td>Short Circuit Current</td>
@@ -26404,7 +26404,7 @@ C*<sub>1-\\ 6</sub>*  = empirical power coefficient parameters
 
 If the user does not input any field of these parameters, the simple approximation model for the power coefficient will be used (see previous maximum power coefficient field). That is, the analytical approximation model of the power coefficient will be chosen only if the user inputs all these six parameters. The user also has the ability to modify each parameter when the specific value of the system is available. The default values are given in the table below.
 
-<table>
+<table class="table table-striped">
 <tr>
 <td>C<sub>1</sub></td>
 <td>C<sub>2</sub></td>
