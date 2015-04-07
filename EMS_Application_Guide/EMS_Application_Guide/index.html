@@ -24,8 +24,8 @@
   </head>
   <body>
     <div class="container">
-  <nav class="navbar navbar-default" role="navigation">
-    <div class="container-fluid">
+  <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
       <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
           <span class="sr-only">Toggle navigation</span>
@@ -3924,17 +3924,17 @@
     </script>
     <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js'></script>
     <script>
-$(function() {
-  return $("h2, h3, h4, h5, h6").each(function(i, el) {
-    var $el, icon, id;
-    $el = $(el);
-    id = $el.attr('id');
-    icon = '<i class="fa fa-link"></i>';
-    if (id) {
-      return $el.prepend($("<a />").addClass("header-link").attr("href", "#" + id).html(icon));
-    }
-  });
-});
-</script>
+      $(function() {
+        return $("h2, h3, h4, h5, h6").each(function(i, el) {
+          var $el, icon, id;
+          $el = $(el);
+          id = $el.attr('id');
+          icon = '<i class="fa fa-link"></i>';
+          if (id) {
+            return $el.prepend($("<a />").addClass("header-link").attr("href", "#" + id).html(icon));
+          }
+        });
+      });
+    </script>
   </body>
 </html>
