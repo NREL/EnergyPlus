@@ -2222,18 +2222,12 @@
 <p>0.39,                    !- Tax rate</p>
 <p>StraightLine-39year;     !- Depreciation Method</p>
 <h2 id="lifecyclecostrecurringcosts">LifeCycleCost:RecurringCosts</h2>
-<p>Recurring costs are costs that repeat over time on a regular schedule during the study period. If costs associated with equipment do repeat but not on a regular schedule, use LifeCycleCost:NonrecurringCost objects instead.</p>
+<p>Recurring costs are costs that repeat over time on a regular schedule during the study period. If costs associated with equipment do repeat but not on a regular schedule, use LifeCycleCost:NonrecurringCost objects instead.  Costs related to energy usage are not included here. The UtilityCost:Tariff and other UtilityCost objects can be used to compute energy costs that are automatically included in the life-cycle cost calculations</p>
 <h4 id="field-name_6">Field: Name</h4>
 <p>The identifier used for the object. The name is used in identifying the cash flow equivalent in the output results in the Life-Cycle Cost Report.</p>
 <h4 id="field-category">Field: Category</h4>
 <p>Enter the category of the recurring costs. Choose the closest category. The options include:</p>
 <ul>
-<li>
-<p>EnergyCosts</p>
-</li>
-<li>
-<p>WaterCosts</p>
-</li>
 <li>
 <p>Maintenance</p>
 </li>
