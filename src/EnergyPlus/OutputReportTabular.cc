@@ -7166,7 +7166,7 @@ namespace OutputReportTabular {
 			for ( iResource = 1; iResource <= 6; ++iResource ) {
 				Real64 curTotal = 0.0;
 				for ( int jUse = 1; jUse <= 14; ++jUse ) {
-					curTotal += useVal( jUse, iResource );
+					curTotal += useVal( iResource, jUse );
 				}
 				if ( abs( curTotal - collapsedTotal( iResource ) ) > ( collapsedTotal( iResource ) * 0.001 )) {
 					ShowWarningError( "In the Annual Building Utility Performance Summary Report the total row does not match the sum of the column for: " + columnHead( 1 ) );

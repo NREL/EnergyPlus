@@ -162,7 +162,7 @@ ProcessArgs(int argc, const char * argv[])
 	}
 
 	if (opt.lastArgs.size() == 1) {
-		for ( size_type i=0; i < opt.lastArgs.size(); ++i ) {
+		for ( size_type i = 0; i < opt.lastArgs.size(); ++i ) {
 			std::string const & arg( *opt.lastArgs[i] );
 			inputIdfFileName = arg;
 		}
@@ -178,7 +178,7 @@ ProcessArgs(int argc, const char * argv[])
 	std::vector<std::string> badOptions;
 	if (opt.lastArgs.size() > 1u) {
 		bool invalidOptionFound = false;
-		for ( size_type i=0; i < opt.lastArgs.size(); ++i ) {
+		for ( size_type i = 0; i < opt.lastArgs.size(); ++i ) {
 			std::string const & arg( *opt.lastArgs[i] );
 			if (arg.substr(0,1) == "-") {
 				invalidOptionFound = true;
@@ -190,7 +190,7 @@ ProcessArgs(int argc, const char * argv[])
 			exit(EXIT_FAILURE);
 		} else {
 			DisplayString("ERROR: Multiple input files specified:");
-			for ( size_type i=0; i < opt.lastArgs.size(); ++i ) {
+			for ( size_type i = 0; i < opt.lastArgs.size(); ++i ) {
 				std::string const & arg( *opt.lastArgs[i] );
 				DisplayString("  Input file #" + std::to_string(i+1) +  ": " + arg);
 			}
@@ -357,7 +357,7 @@ ProcessArgs(int argc, const char * argv[])
 
 	// Handle bad options
 	if (!opt.gotExpected(badOptions)) {
-		for ( size_type i=0; i < badOptions.size(); ++i ) {
+		for ( size_type i = 0; i < badOptions.size(); ++i ) {
 			DisplayString("ERROR: Unexpected number of arguments for option " + badOptions[i]);
 		}
 		DisplayString(errorFollowUp);
@@ -366,7 +366,7 @@ ProcessArgs(int argc, const char * argv[])
 
 	// This is a place holder in case there are required options in the future
 	if ( !opt.gotRequired(badOptions) ) {
-		for ( size_type i=0; i < badOptions.size(); ++i ) {
+		for ( size_type i = 0; i < badOptions.size(); ++i ) {
 			DisplayString("ERROR: Missing required option " + badOptions[i]);
 		}
 		DisplayString(errorFollowUp);
@@ -374,11 +374,11 @@ ProcessArgs(int argc, const char * argv[])
 	}
 
 	if ( opt.firstArgs.size() > 1 || opt.unknownArgs.size() > 0 ) {
-		for ( size_type i=1; i < opt.firstArgs.size(); ++i ) {
+		for ( size_type i = 1; i < opt.firstArgs.size(); ++i ) {
 			std::string const & arg( *opt.firstArgs[i] );
 			DisplayString("ERROR: Invalid option: " + arg);
 		}
-		for ( size_type i=0; i < opt.unknownArgs.size(); ++i ) {
+		for ( size_type i = 0; i < opt.unknownArgs.size(); ++i ) {
 			std::string const & arg( *opt.unknownArgs[i] );
 			DisplayString("ERROR: Invalid option: " + arg);
 		}

@@ -4560,10 +4560,8 @@ namespace SimAirServingZones {
 
 		// allocate scratch arrays
 		if ( !allocated( SensCoolCapTemp ) ) {
-			SensCoolCapTemp.allocate( NumPrimaryAirSys );
-			SensCoolCapTemp = 0.0;
-			TotCoolCapTemp.allocate( NumPrimaryAirSys );
-			TotCoolCapTemp = 0.0;
+			SensCoolCapTemp.dimension( NumPrimaryAirSys, 0.0 );
+			TotCoolCapTemp.dimension( NumPrimaryAirSys, 0.0 );
 		}
 
 		// allocate arrays used to store values for standard 62.1 tabular report
@@ -4733,7 +4731,7 @@ namespace SimAirServingZones {
 				} // end of system mass flow check
 
 				// get the maximum system sensible cooling capacity
-				if ( SysSensCoolCap > SensCoolCapTemp(AirLoopNum) ) {
+				if ( SysSensCoolCap > SensCoolCapTemp( AirLoopNum ) ) {
 					SysSizPeakDDNum( AirLoopNum ).TimeStepAtSensCoolPk( CurOverallSimDay ) = TimeStepInDay;
 					SensCoolCapTemp( AirLoopNum ) = SysSensCoolCap;
 					if ( SysSizing( CurOverallSimDay, AirLoopNum ).CoolingPeakLoadType == SensibleCoolingLoad ) {
@@ -5973,11 +5971,11 @@ namespace SimAirServingZones {
 					for ( I = 1; I <= NumPrimaryAirSys; ++I ) {
 						for ( J = 1; J <= TotDesDays + TotRunDesPersDays; ++J ) {
 								{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileSysSizing, SSizeFmt22, flags ) << SizingFileColSep
-									 << SysSizing( I, J ).HeatFlowSeq( TimeStepIndex ) << SizingFileColSep
-									 << SysSizing( I, J ).HeatCapSeq( TimeStepIndex ) << SizingFileColSep
-									 << SysSizing( I, J ).CoolFlowSeq( TimeStepIndex ) << SizingFileColSep
-									 << SysSizing( I, J ).SensCoolCapSeq( TimeStepIndex ) << SizingFileColSep
-									 << SysSizing( I, J ).TotCoolCapSeq( TimeStepIndex ); }
+									 << SysSizing( J, I ).HeatFlowSeq( TimeStepIndex ) << SizingFileColSep
+									 << SysSizing( J, I ).HeatCapSeq( TimeStepIndex ) << SizingFileColSep
+									 << SysSizing( J, I ).CoolFlowSeq( TimeStepIndex ) << SizingFileColSep
+									 << SysSizing( J, I ).SensCoolCapSeq( TimeStepIndex ) << SizingFileColSep
+									 << SysSizing( J, I ).TotCoolCapSeq( TimeStepIndex ); }
 						}
 					}
 					gio::write( OutputFileSysSizing );

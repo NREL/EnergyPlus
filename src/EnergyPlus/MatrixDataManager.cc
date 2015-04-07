@@ -160,8 +160,11 @@ namespace MatrixDataManager {
 			//Note With change to row-major arrays the "row" and "col" usage here is transposed
 			auto & matrix( MatData( MatNum ).Mat2D );
 			matrix.allocate( NumCols, NumRows ); // This is standard order for a NumRows X NumCols matrix
-			for ( int ElementNum = 1; ElementNum <= NumElements; ++ElementNum ) {
-				matrix[ ElementNum - 1 ] = rNumericArgs( ElementNum + 2 ); // Matrix is read in row-by-row
+			Array2< Real64 >::size_type l( 0 );
+			for ( int ElementNum = 1; ElementNum <= NumElements; ++ElementNum, l += matrix.size() ) {
+				int const RowIndex = ( ElementNum - 1 ) / NumCols + 1;
+				int const ColIndex = mod( ( ElementNum - 1 ), NumCols ) + 1;
+				matrix( ColIndex, RowIndex ) = rNumericArgs( ElementNum + 2 ); // Matrix is read in row-by-row
 			}
 
 		}
