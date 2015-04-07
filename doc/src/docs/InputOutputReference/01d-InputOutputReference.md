@@ -16126,93 +16126,56 @@ This field specifies the user selected name of the equipment to be controlled by
 
 The following example shows control of a chilled water plant with two chillers that have different sizes and load dispatch is scaled so that each chiller runs at the same part load ratio.
 
+```idf
 PlantEquipmentOperation:UserDefined,
-
-Â  CoolSys1 Operation Scheme,Â  !- Name
-
-Â  Cooling\_dispatch , !-Â  Main Model Program Calling Manager Name
-
-Â  Init\_Chiller\_Capacity, !-Â  Initialization Program Calling Manager Name
-
-Â  Chiller:Electric:ReformulatedEIR,Â  !- Equipment 1 Object Type
-
-Â  CoolSys1 Chiller 1,Â Â Â Â Â  !- Equipment 1 Name
-
-Â  Chiller:Electric:ReformulatedEIR,Â  !- Equipment 2 Object Type
-
-Â  CoolSys1 Chiller 2;Â Â Â Â Â  !- Equipment 2 Name
-
-
+  CoolSys1 Operation Scheme,  !- Name
+  Cooling_dispatch , !- Main Model Program Calling Manager Name
+  Init_Chiller_Capacity, !- Initialization Program Calling Manager Name
+  Chiller:Electric:ReformulatedEIR, !- Equipment 1 Object Type
+  CoolSys1 Chiller 1,    !- Equipment 1 Name
+  Chiller:Electric:ReformulatedEIR,* !- Equipment 2 Object Type
+  CoolSys1 Chiller 2;    !- Equipment 2 Name
 
 EnergyManagementSystem:ProgramCallingManager,
-
-Â Â  Init\_Chiller\_Capacity,
-
-Â Â  UserDefinedComponentModel,
-
-Â Â  Init\_Chiller\_Capacity\_Values;
-
-
+  Init_Chiller_Capacity,
+  UserDefinedComponentModel,
+  Init_Chiller_Capacity_Values;
 
 EnergyManagementSystem:Program,
-
-Â Â  Init\_Chiller\_Capacity\_Values,
-
-Â Â  Set totChilCap = Chil1\_Cap + Chil2\_Cap;
-
-
+  Init_Chiller_Capacity_Values,
+  Set totChilCap = Chil1_Cap + Chil2_Cap;
 
 EnergyManagementSystem:GlobalVariable,
-
-Â Â  totChilCap;
-
-
+  totChilCap;
 
 EnergyManagementSystem:ProgramCallingManager,
-
-Â Â  Cooling\_dispatch,
-
-Â Â  UserDefinedComponentModel,
-
-Â Â  Cooling\_dispatch\_Values;
-
-
+  Cooling_dispatch,
+  UserDefinedComponentModel,
+  Cooling_dispatch_Values;
 
 EnergyManagementSystem:Program,
+  Cooling_dispatch_Values,
+  IF CoolSys1_LoopDmnd &lt; 0.0,
+    Set UniformPLR* = CoolSys1_LoopDmnd / totChilCap,
+    Set UniformPLR* =* @min UniformPLR 1.0,
+    SET Chil1_Disptch = UniformPLR\*Chil1_Cap,
+    SET Chil2_Disptch = UniformPLR\*Chil2_Cap,
+  ELSE,
+    SET Chil1_Disptch = 0.0 ,
+    SET Chil2_Disptch = 0.0 ,
+  ENDIF;
 
-Â Â  Cooling\_dispatch\_Values,
+EnergyManagementSystem:InternalVariable, CoolSys1_LoopDmnd,CoolSys1 Operation Scheme,Supply Side Current Demand Rate; !,[W]
 
-Â Â  IF CoolSys1\_LoopDmnd &lt; 0.0,
+EnergyManagementSystem:InternalVariable, Chil1_Cap, CoolSys1 Chiller 1, Chiller Nominal Capacity;
 
-Â Â Â Â  Set UniformPLRÂ  = CoolSys1\_LoopDmnd / totChilCap,
+EnergyManagementSystem:InternalVariable, Chil2_Cap, CoolSys1 Chiller 2, Chiller Nominal Capacity;
 
-Â Â Â Â  Set UniformPLRÂ  =Â  @min UniformPLR 1.0,
+EnergyManagementSystem:Actuator, Chil1_Disptch,CoolSys1 Operation Scheme:CoolSys1 Chiller 1,Plant Equipment Operation,Distributed Load Rate; ! [W]
 
-Â Â Â Â  SET Chil1\_Disptch = UniformPLR\*Chil1\_Cap,
+EnergyManagementSystem:Actuator, Chil2_Disptch,CoolSys1 Operation Scheme:CoolSys1 Chiller 2,Plant Equipment Operation,Distributed Load Rate; ! [W]
+```
 
-Â Â Â Â  SET Chil2\_Disptch = UniformPLR\*Chil2\_Cap,
-
-Â Â  ELSE,
-
-Â Â Â Â  SET Chil1\_Disptch = 0.0 ,
-
-Â Â Â Â  SET Chil2\_Disptch = 0.0 ,
-
-Â Â  ENDIF;
-
-
-
-EnergyManagementSystem:InternalVariable, CoolSys1\_LoopDmnd,CoolSys1 Operation Scheme,Supply Side Current Demand Rate; !,[W]
-
-EnergyManagementSystem:InternalVariable, Chil1\_Cap, CoolSys1 Chiller 1, Chiller Nominal Capacity;
-
-EnergyManagementSystem:InternalVariable, Chil2\_Cap, CoolSys1 Chiller 2, Chiller Nominal Capacity;
-
-
-
-EnergyManagementSystem:Actuator, Chil1\_Disptch,CoolSys1 Operation Scheme:CoolSys1 Chiller 1,Plant Equipment Operation,Distributed Load Rate; ! [W]
-
-EnergyManagementSystem:Actuator, Chil2\_Disptch,CoolSys1 Operation Scheme:CoolSys1 Chiller 2,Plant Equipment Operation,Distributed Load Rate; ! [W]
 
 Group â€“ SystemÂ  Availability Managers
 -------------------------------------
@@ -28172,7 +28135,7 @@ This is the electrical power of the pump used to extract water from the well, in
 
 This is the electricity energy used by the pump to extract water from the well, in units of Joules (J). This output is also added to a meter with Resource Type = Electricity, End Use Key = WaterSystems, and Group Key = System (ref. Output Meter).
 
-Group â€“ Operational Faults
+Group - Operational Faults
 --------------------------
 
 ### Introduction to Operational Faults Modeling
@@ -28191,9 +28154,9 @@ The users in these cases are practitioners, not power users, so it is needed to 
 
 ### Operational Fault Objects
 
-EnergyPlus contains a number of objects to model operational faults of sensors, meters, equipment and systems. The current implementation allows the model of sensors faults with air economizers and heating and cooling coil fouling.
+EnergyPlus contains a number of objects to model operational faults of sensors, meters, equipment and systems. The current implementation allows the modeling of the following fault types: (1) sensor faults with air economizers, (2) thermostat/humidistat offset faults, and (3) heating and cooling coil fouling faults.
 
-The objects used by EnergyPlus to model sensors faults in an air economizer and the coil fouling are as follows:
+The objects used by EnergyPlus to model the faults are as follows:
 
 - FaultModel:TemperatureSensorOffset:OutdoorAir
 
@@ -28206,6 +28169,10 @@ The objects used by EnergyPlus to model sensors faults in an air economizer and 
 - FaultModel:EnthalpySensorOffset:ReturnAir
 
 - FaultModel:Fouling:Coil
+
+- FaultModel:ThermostatOffset
+
+- FaultModel:HumidistatOffset
 
 ### FaultModel:TemperatureSensorOffset:OutdoorAir
 
@@ -28395,107 +28362,143 @@ This field specifies the inside to outside surface area ratio of the cooling or 
 
 IDF examples:
 
-Â  ! example faults for an air economizer
-
-
+```idf
+   ! example faults for an air economizer
 
 Schedule:Compact,
-
-Â Â Â  OATSeveritySch,Â Â Â Â Â Â Â Â Â  !- Name
-
-Â Â Â  On/Off,Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  !- Schedule Type Limits Name
-
-Â Â Â  Through: 6/30,Â Â Â Â Â Â Â Â Â Â  !- Field 1
-
-Â Â Â  For: AllDays,Â Â Â Â Â Â Â Â Â Â Â  !- Field 2
-
-Â Â Â  Until: 24:00,0,Â Â Â Â Â Â Â Â Â  !- Field 3
-
-Â Â Â  Through: 12/31,Â Â Â Â Â Â Â Â Â  !- Field 4
-
-Â Â Â  For: AllDays,Â Â Â Â Â Â Â Â Â Â Â  !- Field 5
-
-Â Â Â  Until: 24:00,1;Â Â Â Â Â Â Â Â Â  !- Field 6
-
-
+       OATSeveritySch,                   !- Name
+       On/Off,                                   !- Schedule Type Limits Name
+       Through: 6/30,                     !- Field 1
+       For: AllDays,                       !- Field 2
+       Until: 24:00,0,                   !- Field 3
+       Through: 12/31,                   !- Field 4
+       For: AllDays,                       !- Field 5
+       Until: 24:00,1;                   !- Field 6
 
 FaultModel:TemperatureSensorOffset:OutdoorAir,
-
-Â Â  OATFault,Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  !- Name
-
-Â Â  ALWAYS\_ON,Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  !- Availability Schedule Name
-
-Â Â  OATSeveritySch,Â Â Â Â Â Â Â Â Â Â  !- Severity Schedule Name
-
-Â Â  Controller:OutdoorAir,Â Â Â  !- Controller Object Type
-
-Â Â  VAV\_1\_OA\_Controller,Â Â Â Â Â  !- Controller Object Name
-
-Â Â  -2.0;Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  !- Temperature Sensor Offset, deg C
-
-
+     OATFault,                                 !- Name
+     ALWAYS_ON,                               !- Availability Schedule Name
+     OATSeveritySch,                     !- Severity Schedule Name
+     Controller:OutdoorAir,       !- Controller Object Type
+     VAV_1_OA_Controller,           !- Controller Object Name
+     -2.0;                                           !- Temperature Sensor Offset, deg C
 
 FaultModel:TemperatureSensorOffset:ReturnAir,
-
-Â Â  RATFault,Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  !- Name
-
-Â Â  ,Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  !- Availability Schedule Name
-
-Â Â  ,Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  !- Severity Schedule Name
-
-Â Â  Controller:OutdoorAir,Â Â Â  !- Controller Object Type
-
-Â Â  VAV\_2\_OA\_Controller,Â Â Â Â Â  !- Controller Object Name
-
-Â Â  -2.0;Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  !- Temperature Sensor Offset, deg C
-
-
+     RATFault,                                 !- Name
+     ,                                                 !- Availability Schedule Name
+     ,                                                 !- Severity Schedule Name
+     Controller:OutdoorAir,       !- Controller Object Type
+     VAV_2_OA_Controller,           !- Controller Object Name
+     -2.0;                                         !- Temperature Sensor Offset, deg C
 
 FaultModel:EnthalpySensorOffset:ReturnAir,
-
-Â Â  RAHFault,Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  !- Name
-
-Â Â  ,Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  !- Availability Schedule Name
-
-Â Â  ,Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  !- Severity Schedule Name
-
-Â Â  Controller:OutdoorAir,Â Â Â  !- Controller Object Type
-
-Â Â  VAV\_2\_OA\_Controller,Â Â Â Â Â  !- Controller Object Name
-
-Â Â  -2000;Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  !- Enthalpy Sensor Offset, J/Kg
-
-
+     RAHFault,                                 !- Name
+     ,                                                 !- Availability Schedule Name
+     ,                                                 !- Severity Schedule Name
+     Controller:OutdoorAir,       !- Controller Object Type
+     VAV_2_OA_Controller,           !- Controller Object Name
+     -2000;                                       !- Enthalpy Sensor Offset, J/Kg
 
 ! example faults for a fouling coil
 
-
-
 FaultModel:Fouling:Coil,
+     CoolingCoilFault,               !- Name
+     VAV_2_CoolC,                         !- Heating or Cooling Coil Name
+     ALWAYS_ON,                             !- Availability Schedule Name
+     ,                                               !- Severity Schedule Name
+     FouledUARated,                     !- Fouling Input Method
+     3000,                                       !- UAFouled, W/K
+     ,                                               !- Water Side Fouling Factor, m2-K/W
+     ,                                               !- Air Side Fouling Factor, m2-K/W
+     ,                                               !- Outside Coil Surface Area, m2
+     ;                                               !- Inside to Outside Coil Surface Area Ratio
+```
 
-Â Â  CoolingCoilFault,Â Â Â Â Â Â Â  !- Name
+### FaultModel:ThermostatOffset
 
-Â Â  VAV\_2\_CoolC,Â Â Â Â Â Â Â Â Â Â Â Â  !- Heating or Cooling Coil Name
+This object defines the offset fault of a thermostat that leads to inappropriate operations of the HVAC system.
 
-Â Â  ALWAYS\_ON,Â Â Â Â Â Â Â Â Â Â Â Â Â Â  !- Availability Schedule Name
+#### Field: Name
 
-Â Â  ,Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  !- Severity Schedule Name
+This is the user-defined name of the fault. 
 
-Â Â  FouledUARated,Â Â Â Â Â Â Â Â Â Â  !- Fouling Input Method
+#### Field: Thermostat Name
 
-Â Â  3000, Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â !- UAFouled, W/K
+This field defines the name of the thermostat object associated with the fault. It should be the name of a ZoneControl:Thermostat object.
 
-Â Â  ,Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  !- Water Side Fouling Factor, m2-K/W
+#### Field: Availability Schedule Name 
 
-Â Â  ,Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  !- Air Side Fouling Factor, m2-K/W
+This field provides the name of a schedule that will determine whether this fault is applicable or not. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined sensor offset and a severity schedule will be applied. This schedule should be set to "1.0" when a fault is applicable and "0.0" when it is not. If this field is blank, the schedule has values of 1.0 for all time periods.
 
-Â Â  ,Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  !- Outside Coil Surface Area, m2
+#### Field: Severity Schedule Name 
 
-Â Â  ;Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  !- Inside to Outside Coil Surface Area Ratio
+This field provides the name of a schedule that represents severity of a fault. This is used as a multiplier to the reference thermostat offset value. This schedule should be set to a non-zero value when a fault is applicable and "0.0" when it is not. If this field is blank, the schedule has values of 1.0 for all time periods.
+
+#### Field: Reference Thermostat Offset
+
+This field defines the reference offset value of the thermostat. A positive value means the zone air temperature reading is higher than the actual value. A negative value means the reading is lower than the actual value. A "0.0" value means no offset. Default is 2.0. The units are in degrees Celsius. 
 
 
+### FaultModel:HumidistatOffset
 
+This object defines the offset fault of a humidistat that leads to inappropriate operations of the HVAC system.
 
+#### Field: Name
+
+This is the user-defined name of the fault. 
+
+#### Field: Humidistat Name
+
+This field defines the name of the humidistat object associated with the fault. It should be the name of a ZoneControl:Humidistat object.
+
+#### Field: Humidistat Offset Type
+
+This choice field determines the humidistat offset fault type. Two fault types are available: (1) Type ThermostatOffsetIndependent: humidistat offset is not related with thermostat offset. For this type, user needs to specify the Reference Humidistat Offset, Availability Schedule, and Severity Schedule (2) Type ThermostatOffsetDependent: humidistat offset is caused by thermostat offset fault. For this type, user only needs to specify the Related Thermostat Offset Fault Name. 
+
+#### Field: Availability Schedule Name
+
+This field provides the name of a schedule that will determine if this fault is applicable. This field is applicable for the Type ThermostatOffsetIndependent. When a fault is not applicable it is not modeled in the simulations. When it is applicable, then a user-defined sensor offset and a severity schedule will be applied. This schedule should be set to "1.0" when a fault is applicable and "0.0" when it is not. If this field is blank, the schedule has values of 1 for all time periods.
+
+#### Field: Severity Schedule Name
+
+This field provides the name of a schedule that represents severity of a fault. This field is applicable for the Type ThermostatOffsetIndependent. This is used as a multiplier to the reference humidistat offset value. This schedule should be set to a non-zero value when a fault is applicable and "0.0" when it is not. If this field is blank, the schedule has values of 1.0 for all time periods. 
+
+#### Field: Reference Humidistat Offset
+
+This field defines the reference offset value of the humidistat. This field is required for the Type ThermostatOffsetIndependent. A positive value means the zone air temperature reading is higher than the actual value. A negative value means the reading is lower than the actual value. A "0.0" value means no offset. Default is 5.0. The units are in percentage. 
+
+#### Field: Related Thermostat Offset Fault Name
+
+This field provides the name of a Thermostat Offset Fault object that causes the humidistat offset fault. It should be the name of a FaultModel:ThermostatOffset object. This field is required for the Type ThermostatOffsetDependent. This is used as a multiplier to the reference humidistat offset value. This schedule should be set to a non-zero value when a fault is applicable and "0.0" when it is not. If this field is blank, the schedule has values of 1.0 for all time periods.
+
+### An example of IDF codes for the thermostat/humidistat offset fault models:
+
+```idf
+FaultModel:ThermostatOffset,
+   Ther_Offset_Zone1,   !- Name
+   Zone 1 Thermostat,   !- Thermostat Name
+   AlwaysOn,        !- Availability Schedule Name
+   AlwaysOne,       !- Severity Schedule Name
+   2.0;             !- Reference Thermostat Offset
+
+FaultModel:HumidistatOffset, 
+   Humi_Offset_Zone1,   !- Name
+   Zone 1 Humidistat,   !- Humidistat Name
+   ThermostatOffsetDependent, !- Humidistat Offset Type
+   ,            !- Availability Schedule Name
+   ,            !- Severity Schedule Name
+   ,                !- Reference Humidistat Offset
+   Ther_Offset_Zone1;   !- Related Thermostat Offset Fault Name
+
+FaultModel:HumidistatOffset, 
+   Humi_Offset_Zone2,   !- Name
+   Zone 2 Humidistat,   !- Humidistat Name
+   ThermostatOffsetIndependent, !- Humidistat Offset Type
+   AlwaysOn,        !- Availability Schedule Name
+   AlwaysOne,       !- Severity Schedule Name
+   10,              !- Reference Humidistat Offset
+   ;            !- Related Thermostat Offset Fault Name
+```
 
 Group - Performance Curves
 --------------------------
@@ -29488,6 +29491,152 @@ InsideMeltIceDischarging, !- Name
 Dimensionless,            !- Input Unit Type for X
 Dimensionless,            !- Input Unit Type for Y
 Dimensionless,            !- Output Unit Type 
+```
+
+### Curve:ChillerPartLoadCustom
+
+A custom chiller part-load performance curve is a function of three independent variables, i.e., x, y, and z. Input consists of the curve name, the twelve coefficients, and min and max values for each of the independent variables. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve. 
+
+The equation represented by the custom curve is:
+
+<div>\[ C_1 + C_2 \cdot x + C_3 \cdot x^2 + C_4 \cdot y + C_5 \cdot y^2 + C_6 \cdot x \cdot y + C_7 \cdot x^3 + C_8 \cdot y^3 + C_9 \cdot x^2 \cdot y + C_{10} \cdot x \cdot y^2 + C_{11} \cdot x^2 \cdot y^2 + C_{12} \cdot z \cdot y^3 \] </div>
+
+where, 
+
+* x represents the normalized fractional lift (the delta of temperature across the leaving condenser water temperature and leaving evaporator water temperature of a chiller).
+* y represents the normalized deviation of leaving chilled water temperature from the reference condition.
+* z represents the part load ratio.
+
+
+#### Field: Name
+
+A user assigned unique name for an instance of a biquadratic curve. When a curve is used, it is referenced by this name.
+
+#### Field: Coefficient1 
+
+The constant coefficient (C1) in the equation.
+
+#### Field: Coefficient2 
+
+The coefficient C2 in the equation.
+
+#### Field: Coefficient3
+
+The coefficient C3 in the equation.
+
+#### Field: Coefficient4
+
+The coefficient C4 in the equation.
+
+#### Field: Coefficient5
+
+The coefficient C5 in the equation.
+
+#### Field: Coefficient6
+
+The coefficient C6 in the equation.
+
+#### Field: Coefficient7 
+
+The constant coefficient (C7) in the equation.
+
+#### Field: Coefficient8
+
+The coefficient C8 in the equation.
+
+#### Field: Coefficient9
+
+The coefficient C9 in the equation.
+
+#### Field: Coefficient10
+
+The coefficient C10 in the equation.
+
+#### Field: Coefficient11
+
+The coefficient C11 in the equation.
+
+#### Field: Coefficient12
+
+The coefficient C12 in the equation.
+
+#### Field: Minimum Value of x
+
+The minimum allowable value of x. Values of x less than the minimum will be replaced by the minimum.
+
+#### Field: Maximum Value of x
+
+The maximum allowable value of x. Values of x greater than the maximum will be replaced by the maximum.
+
+#### Field: Minimum Value of y
+
+The minimum allowable value of y. Values of y less than the minimum will be replaced by the minimum.
+
+#### Field: Maximum Value of y
+
+The maximum allowable value of y. Values of y greater than the maximum will be replaced by the maximum.
+
+#### Field: Minimum Value of z
+
+The minimum allowable value of z. Values of y less than the minimum will be replaced by the minimum.
+
+#### Field: Maximum Value of z
+
+The maximum allowable value of z. Values of y greater than the maximum will be replaced by the maximum.
+
+#### Field: Minimum Curve Output
+
+The minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum.
+
+#### Field: Maximum Curve Output
+
+The maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum.
+
+#### Field: Input Unit Type for x
+
+This field is used to indicate the kind of units that may be associated with the x values. Select Dimensionless.
+
+#### Field: Input Unit Type for y
+
+This field is used to indicate the kind of units that may be associated with the y values. Select Dimensionless.
+
+#### Field: Input Unit Type for z
+
+This field is used to indicate the kind of units that may be associated with the y values. Select Dimensionless.
+
+#### Field: Output Unit Type
+
+This field is used to indicate the kind of units that may be associated with the output values. Select Dimensionless.
+
+Below is an example input: 
+
+```idf
+Curve:ChillerPartLoadCustom,
+    EIRFPLR,        !- Name  
+    0.093291598,        !- Coefficient1 Constant
+    -0.234322952,       !- Coefficient2 x
+    0.426950368,        !- Coefficient3 x**2
+    0.188624721,        !- Coefficient4 y
+    -0.608010978,       !- Coefficient5 y**2
+    0.992031248,        !- Coefficient6 x*y
+    0.000000E+00,       !- Coefficient7 x**3
+    0.502338322,        !- Coefficient8 y**3
+    0.000000E+00,       !- Coefficient9 x**2*y
+    0.000000E+00,       !- Coefficient 10 x*y**2
+    -0.360902326,       !- Coefficient 11 x**2*y**2
+    -0.097978985,       !- Coefficient 12 z*y**3 
+    0.2562,             !- Minimum Value of x
+    1.0365,             !- Maximum Value of x
+    0.1,                !- Minimum Value of y
+    1,                  !- Maximum Value of y
+    -0.035,             !- Minimum Value of z
+    0.3144,             !- Maximum Value of z
+    ,                   !- Minimum Curve Output
+    ,                   !- Maximum Curve Output
+    Dimensionless,      !- Input Unit Type for x
+    Dimensionless,      !- Input Unit Type for y
+    Dimensionless,      !- Input Unit Type for z
+    Dimensionless;      !- Output Unit Type
 ```
 
 ### Curve:QuadraticLinear

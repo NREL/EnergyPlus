@@ -722,19 +722,19 @@ When a boiler efficiency performance curve is used, any valid curve object with 
 
 #### Single independent variable:
 
-<span>$$</span><span>$BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right)$</span>                                                                  Linear
+* <span>$BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right)$</span> (Linear)
 
-<span>$BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right) + C3{\left( {PLR} \right)^2}$</span>                                           Quadratic
+* <span>$BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right) + C3{\left( {PLR} \right)^2}$</span> (Quadratic)
 
-<span>$\begin{array}{l}BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right) + C3{\left( {PLR} \right)^2} + C4{(PLR)^3}\\\end{array}$</span>                             Cubic
+* <span>$BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right) + C3{\left( {PLR} \right)^2} + C4{(PLR)^3}$</span> (Cubic)
 
 #### Dual independent variables:
 
-<span>$\begin{array}{l}BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right) + C3{\left( {PLR} \right)^2} + \\\quad \left( {C4 + C5\left( {PLR} \right) + C6{{\left( {PLR} \right)}^2}} \right)\left( {Twater} \right)\end{array}$</span>                              QuadraticLinear
+* <span>$BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right) + C3{\left( {PLR} \right)^2} + \left( {C4 + C5\left( {PLR} \right) + C6{{\left( {PLR} \right)}^2}} \right)\left( {Twater} \right)$</span> (QuadraticLinear)
 
-<span>$\begin{array}{l}BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right) + C3{\left( {PLR} \right)^2} + \\\quad C4\left( {Twater} \right) + C5{(Twater)^2} + C6(PLR)(Twater)\end{array}$</span>                                     Biquadratic
+* <span>$BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right) + C3{\left( {PLR} \right)^2} + C4\left( {Twater} \right) + C5{(Twater)^2} + C6(PLR)(Twater)$</span> (Biquadratic)
 
-<span>$\begin{array}{l}BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right) + C3{\left( {PLR} \right)^2} + \\\quad C4\left( {Twater} \right) + C5{(Twater)^2} + C6\left( {PLR} \right)\left( {Twater} \right) + \\\quad C7{(PLR)^3} + C8{(Twater)^3} + C9{\left( {PLR} \right)^2}\left( {Twater} \right) + \\\quad C10\left( {PLR} \right){(Twater)^2}\end{array}$</span>                                           Bicubic
+* <span>$BoilerEfficiencyCurve = C1 + C2\left( {PLR} \right) + C3{\left( {PLR} \right)^2} + C4\left( {Twater} \right) + C5{(Twater)^2} + C6\left( {PLR} \right)\left( {Twater} \right) + C7{(PLR)^3} + C8{(Twater)^3} + C9{\left( {PLR} \right)^2}\left( {Twater} \right) + C10\left( {PLR} \right){(Twater)^2}$</span> (Bicubic)
 
 When a boiler efficiency curve is used, a constant efficiency boiler may be specified by setting C1 = 1 and all other coefficients to 0. A boiler with an efficiency proportional to part-load ratio or which has a non-linear relationship of efficiency with part-load ratio will typically set the coefficients of a linear, quadratic, or cubic curve to non-zero values. Using other curve types allows a more accurate simulation when boiler efficiency varies as a function of part-load ratio and as the boiler outlet water temperature changes over time due to loading or as changes occur in the water temperature setpoint.
 

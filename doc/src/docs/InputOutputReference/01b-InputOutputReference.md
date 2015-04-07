@@ -12278,9 +12278,13 @@ This numeric field contains the chiller’s operating condenser water flow rate 
 
 The name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of the cooling capacity as a function of the leaving chilled water temperature and the leaving condenser water temperature. The output of this curve is multiplied by the reference capacity to give the cooling capacity at specific temperature operating conditions (i.e., at temperatures different from the reference temperatures). The curve should have a value of 1.0 at the reference temperatures and flow rates specified above. The biquadratic curve should be valid for the range of water temperatures anticipated for the simulation (otherwise the program issues warning messages).
 
+#### Field: Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
+
+This choice field determines which type of the Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve is used in the chiller modeling. Two curve types are available: (1) Type LeavingCondenserWaterTemperature is based on the leaving condenser water temperature. (2) Type Lift is based on the normalized lift, which is the temperature difference between the leaving condenser water temperature and the leaving evaporator water temperature. 
+
 #### Field: Electric Input to Cooling Output Ratio Function of Temperature Curve Name
 
-The name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy input to cooling output ratio (EIR) as a function of the leaving chilled water temperature and the leaving condenser water temperature. The EIR is the inverse of the COP. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) to give the EIR at specific temperature operating conditions (i.e., at temperatures different from the reference temperatures). The curve should have a value of 1.0 at the reference temperatures and flow rates specified above. The biquadratic curve should be valid for the range of water temperatures anticipated for the simulation (otherwise the program issues warning messages).
+The name of the Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve. The form of this curve is based on the input for Electric Input to Cooling Output RatioFunction of Part Load Ratio Curve Type. For the type of LeavingCondenserWaterTemperature, the curve object type should be Curve:Bicubic or Table:TwoIndependentVariables that parameterizes the variation of the energy input to cooling output ratio (EIR) as a function of the leaving chilled water temperature and the leaving condenser water temperature. For the type of Lift, the curve object type should be Curve:ChillerPartLoadWithLiftCurves or Table:MultiVariableLookup that parameterizes the variation of EIR as a function of the normalized fractional Lift, normalized Tdev and the PLR. Tdev is the difference between Leaving Chilled Water Temperature and Reference Chilled Water Temperature. Lift is the Leaving Condenser Water Temperature and Leaving Chilled Water Temperature.  The EIR is the inverse of the COP. The output of this curve is multiplied by the reference EIR (inverse of the reference COP) to give the EIR at specific temperature operating conditions (i.e., at temperatures different from the reference temperatures). The curve should have a value of 1.0 at the reference temperatures and flow rates specified above. The biquadratic curve should be valid for the range of water temperatures anticipated for the simulation (otherwise the program issues warning messages).
 
 #### Field: Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
 
@@ -12360,165 +12364,85 @@ This field is optional.  It can be used to control heat recovery operation of t
 
 This field is optional.  It can be used to refine the model and controls for heat recovery operation of the chiller.  The node named here should have a setpoint placed on it by a setpoint manager.  If the plant loop’s demand calculation scheme is set to SingleSetpoint, then a single setpoint manager should be used.  If the plant loop’s demand calculation is set to DualSetpointDeadband then a dual setpoint manager should be used and the upper setpoint is used for control.  When this field is used, a different model is used for determining the distribution of rejected heat between the two bundles that is more appropriate for series bundle arrangements and for chiller’s that are able to produce relatively higher temperature heated fluilds.
 
-
-
 An example of this statement in an IDF is:
 
+```idf
 Chiller:Electric:ReformulatedEIR,
-
   Main Chiller,                        !- Chiller Name
-
   50000,                               !- Reference Capacity {W}
-
   3.99,                                !- Reference COP
-
   6.67,                                !- Reference Leaving Chilled Water Temperature {C}
-
   35.0,                                !- Reference Leaving Condenser Water Temperature {C}
-
   0.00898,                             !- Reference Chilled Water Flow Rate {m3/s}
-
   0.01122,                             !- Reference Condenser Water Flow Rate {m3/s}
-
   Main Chiller RecipCapFT,             !- Cooling Capacity Function of Temperature Curve
-
-  Main Chiller RecipEIRFT,             !- Electric Input to Cooling Output Ratio Function of
-
-                                          Temperature Curve
-
-  Main Chiller RecipEIRFPLR,           !- Electric Input to Cooling Output Ratio Function of Part
-
-                                          Load Ratio Curve
-
+  Main Chiller RecipEIRFT,             !- Electric Input to Cooling Output Ratio Function of Temperature Curve
+  LeavingCondenserWaterTemperature     !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
+  Main Chiller RecipEIRFPLR,           !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
   0.01,                                !- Minimum Part Load Ratio
-
   1,                                   !- Maximum Part Load Ratio
-
   1,                                   !- Optimum Part Load Ratio
-
   0.07,                                !- Minimum Unloading Ratio
-
   Main Chiller ChW Inlet,              !- Chilled Water Side Inlet Node
-
   Main Chiller ChW Outlet,             !- Chilled Water Side Outlet Node
-
   Main Chiller Cnd Inlet,              !- Condenser Side Inlet Node
-
   Main Chiller Cnd Outlet,             !- Condenser Side Outlet Node
-
   1,                                   !- Fraction of Compressor Electric Power Rejected by Condenser
-
   2,                                   !- Leaving Chilled Water Lower Temperature Limit {C}
-
   ConstantFlow;                        !- Chiller Flow Mode
 
-
-
-
-
 ! Cooling capacity to rated capacity function of Temperature Curve
-
 ! x = Leaving Chilled Water Temperature and y = Leaving Condenser Water Temperature
 
   Curve:Biquadratic,
-
     Main Chiller RecipCapFT,  !- Name
-
     0.958546443,       !- Coefficient1 Constant
-
     0.035168695,       !- Coefficient2 x
-
     0.000124662,       !- Coefficient3 x\*\*2
-
     -0.00274551,       !-Coefficient4y
-
     -0.00005000,       !-Coefficient5y\*\*2
-
     -0.00017234,       !-Coefficient6x\*y
-
     5.00,              !- Minimum Value of x
-
     10.0,              !- Maximum Value of x
-
     20.00,             !- Minimum Value of y
-
     40.94;             !- Maximum Value of y
-
-
-
-
 
 ! Energy Input to Cooling Output Ratio Function of Temperature Curve
-
 ! x = Leaving Chilled Water Temperature and y = Leaving Condenser Water Temperature
 
   Curve:Biquadratic,
-
     Main Chiller RecipEIRFT,  !- Name
-
     0.732700123,       !- Coefficient1 Constant
-
     -0.00834360,       !- Coefficient2 x
-
     0.000638530,       !- Coefficient3 x\*\*2
-
     -0.00303753,       !-Coefficient4y
-
     0.000484952,       !-Coefficient5y\*\*2
-
     -0.00083584,       !-Coefficient6x\*y
-
     5.00,              !- Minimum Value of x
-
     10.0,              !- Maximum Value of x
-
     20.00,             !- Minimum Value of y
-
     40.94;             !- Maximum Value of y
 
-
-
-
-
 ! Energy Input to Cooling Output Ratio Function of Part Load Ratio Curve
-
 ! x = Leaving Condenser water Temperature and y = Part Load Ratio
 
   Curve:Bicubic,
-
     Main Chiller RecipEIRFPLR, !- Name
-
     0.070862846,        !- Coefficient1 Constant
-
     0.002787560,        !- Coefficient2 x
-
     -0.00000891,        !- Coefficient3 x\*\*2
-
     0.230973399,        !-Coefficient4y
-
     1.250442176,        !-Coefficient5y\*\*2
-
     -0.00216102,        !-Coefficient6x\*y
-
     0.000000,           !-Coefficient7x\*\*3
-
     -0.56300936,        !-Coefficient8y\*\*3
-
     0.000000,           !-Coefficient9x\*\*2\*y
-
     0.000000,           !-Coefficient10x\*y\*\*2
-
     20.00,              !- Minimum Value of x
-
     40.94,              !- Maximum Value of x
-
     0.01,               !- Minimum Value of y
-
     1.0;               !- Maximum Value of y
-
-
-
-
+```
 
 ### Electric Reformulated EIR Chiller Outputs
 
