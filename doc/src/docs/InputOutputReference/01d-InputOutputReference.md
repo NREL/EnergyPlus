@@ -1,19 +1,19 @@
-Group – Zone Controls – Thermostats and Humidistats
+Group - Zone Controls - Thermostats and Humidistats
 ---------------------------------------------------
 
 Zone Control objects are used to control zone conditions to a specific setpoint. The six types of zone control are described in this section. They are, by name, ZoneControl:**&lt;name&gt;.**. These types are:
 
-**Thermostat** – The object provides the traditional approach to space control using air temperatures. Each controlled zone contains a thermostat object.
+**Thermostat** - The object provides the traditional approach to space control using air temperatures. Each controlled zone contains a thermostat object.
 
-**Humidistat** – The object is used to control a zone to a specified relative humidity.
+**Humidistat** - The object is used to control a zone to a specified relative humidity.
 
-**Thermostat:ThermalComfort** – The object provides a method to control a zone to a dry-bulb temperature setpoint based on a thermal comfort model (e.g. Fanger) and a user-specified thermal comfort setpoint schedule.
+**Thermostat:ThermalComfort** - The object provides a method to control a zone to a dry-bulb temperature setpoint based on a thermal comfort model (e.g. Fanger) and a user-specified thermal comfort setpoint schedule.
 
-**Thermostat:OperativeTemperature** – The operative temperature control is formulated to reuse all of the traditional thermostat objects. One input object will be used for each thermal zone to indicate if that zone’s thermostat control mode should be overridden to effect operative temperature control rather than traditional air temperature control. The user will still have to input all the traditional ZoneControl:Thermostat and setpoint objects.
+**Thermostat:OperativeTemperature** - The operative temperature control is formulated to reuse all of the traditional thermostat objects. One input object will be used for each thermal zone to indicate if that zone’s thermostat control mode should be overridden to effect operative temperature control rather than traditional air temperature control. The user will still have to input all the traditional ZoneControl:Thermostat and setpoint objects.
 
-**Thermostat:TemperatureAndHumidity –** This thermostat control works together with the traditional ZoneControl:Thermostat object to modify temperature control based on zone air humidity conditions. Currently, this object resets the thermostat’s cooling setpoint temperature downward based on elevated zone air humidity levels, typically yielding additional cooling coil operation and associated dehumidification. A ZoneControl:Thermostat:TemperatureAndHumidity object should be specified to indicate if a zone’s traditional thermostat control mode should be overridden to provide enhanced dehumidification. The user must still input the traditional ZoneControl:Thermostat and setpoint objects.
+**Thermostat:TemperatureAndHumidity** - This thermostat control works together with the traditional ZoneControl:Thermostat object to modify temperature control based on zone air humidity conditions. Currently, this object resets the thermostat’s cooling setpoint temperature downward based on elevated zone air humidity levels, typically yielding additional cooling coil operation and associated dehumidification. A ZoneControl:Thermostat:TemperatureAndHumidity object should be specified to indicate if a zone’s traditional thermostat control mode should be overridden to provide enhanced dehumidification. The user must still input the traditional ZoneControl:Thermostat and setpoint objects.
 
-**Thermostat**:**StagedDualSetpoint –** This thermostat control works alone with “Duel Setpoint” type only. The object provides heating and cooling setpoints, throttling range and offsets, so that zone temperature setpoint used for system load calculation is adjusted by the setpoint and throttling range based on the zone temperature at the previous time step. The stage number is determined by the temperature difference between the setpoint and zone temperature at the previous time step, and offset values. If this object and other zone control thermostat and humidistat are assigned to the same controlled zone, this object takes precedence when the controlled zone is specified in the Controlling Zone or Thermostat Location field of the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object.
+**Thermostat**:**StagedDualSetpoint** - This thermostat control works alone with "Dual Setpoint" type only. The object provides heating and cooling setpoints, throttling range and offsets, so that zone temperature setpoint used for system load calculation is adjusted by the setpoint and throttling range based on the zone temperature at the previous time step. The stage number is determined by the temperature difference between the setpoint and zone temperature at the previous time step, and offset values. If this object and other zone control thermostat and humidistat are assigned to the same controlled zone, this object takes precedence when the controlled zone is specified in the Controlling Zone or Thermostat Location field of the AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed object.
 
 
 
@@ -33,7 +33,7 @@ The control type schedule and the list of control type/name pairs are directly r
 
 4 - Dual Setpoint (Heating and Cooling) with deadband
 
-Thus, if the schedule referenced in the ZoneControl:Thermostat statement has a control type of 4 for a particular time period, this indicates that during that time period "Dual Setpoint with deadband” control is to be used. The specific "Dual Setpoint (Heating and Cooling) with deadband" control object to be used is specified in the list of control type/name pairs. Then the specific control type objects reference the thermostat setpoint temperature schedule to be used. Because only one control can be specified for each control type in a ZoneControl:Thermostat statement, there are only four pairs possible in a particular ZoneControl:Thermostat type/name list. This is because individual controls can be defined throughout the simulation, thus giving the user a full range of flexibility. Since putting in the name of the control type directly in the schedule would be very cumbersome, the control types are assigned a number which is used in the schedule profile.
+Thus, if the schedule referenced in the ZoneControl:Thermostat statement has a control type of 4 for a particular time period, this indicates that during that time period "Dual Setpoint with deadband" control is to be used. The specific "Dual Setpoint (Heating and Cooling) with deadband" control object to be used is specified in the list of control type/name pairs. Then the specific control type objects reference the thermostat setpoint temperature schedule to be used. Because only one control can be specified for each control type in a ZoneControl:Thermostat statement, there are only four pairs possible in a particular ZoneControl:Thermostat type/name list. This is because individual controls can be defined throughout the simulation, thus giving the user a full range of flexibility. Since putting in the name of the control type directly in the schedule would be very cumbersome, the control types are assigned a number which is used in the schedule profile.
 
 #### Field: Name
 
@@ -81,6 +81,7 @@ The corresponding control type name. The name is used in an object with the name
 
 An example of this statement in an IDF is:
 
+```idf
 ZoneControl:Thermostat, Zone 3 Thermostat, NORTH ZONE,
 
         Zone Control Type Sched,
@@ -206,10 +207,11 @@ A complete zone thermostat example showing this statement and all of the objects
         Until: 20:00,23.,
 
         Until: 24:00,30.;
+```
 
 ### ZoneControl Thermostat Outputs
 
-Outputs available from controlled zones. The “key” in the below is the Zone Name.
+Outputs available from controlled zones. The "key" in the below is the Zone Name.
 
 HVAC,Average,Zone Predicted Sensible Load to Setpoint Heat Transfer Rate [W]
 
@@ -882,7 +884,7 @@ Schedule which defines what type of thermal comfort control is active during eac
 
 Valid Control Types are
 
-0 – No thermal comfort control
+0 - No thermal comfort control
 
 1 - Single Thermal Comfort Heating Setpoint:Fanger
 
@@ -16158,7 +16160,7 @@ Schedule values equal to zero indicate the individual ventilation control based 
 
 The name of a ZoneVentilation:\* object whose zone name is the controlled zone name defined in a previous input field for this availability manager object (Ref. Field “Controlled Zone Name”). The controls defined for this specific ZoneVentilation:\* object to enable ventilation air will be applied to other ZoneVentilation:\* and ZoneMixing objects served by the air loop controlled by this availability manager, regardless of the controls defined for the other ZoneVentilation:\* and ZoneMixing objects. In other words, when ventilation is enabled by this specific ZoneVentilation:\* object, the other ZoneVentilation:\* and ZoneMixing objects in the zones served by the primary air loop are also enabled.
 
-**Note:** A **ZoneInfiltration:\*** object indicates any one of **ZoneInfiltration:DesignFlowRate**, **ZoneInfiltration:EffectiveLeakageArea**,and **ZoneInfiltration:FlowCoefficient** objects.A object of**ZoneVentilation:\*** indicates any one of **ZoneVentilation:DesignFlowRate** and **ZoneVentilation:WindandStackOpenArea** objects**.**
+**Note:** A **ZoneInfiltration:\*** object indicates any one of **ZoneInfiltration:DesignFlowRate**, **ZoneInfiltration:EffectiveLeakageArea**,and **ZoneInfiltration:FlowCoefficient** objects.A object of**ZoneVentilation:\*** indicates any one of **ZoneVentilation:DesignFlowRate** and **ZoneVentilation:WindandStackOpenArea** objects.
 
 ### AvailabilityManager:HybridVentilation Outputs
 
@@ -27847,7 +27849,7 @@ FaultModel:Fouling:Coil,
 
 
 
-Group – Performance Curves
+Group - Performance Curves
 --------------------------
 
 This group of objects primarily consists of polynomial curves that are used to characterize the performance of HVAC equipment. Several other non-polynomial curves are also included to characterize the performance of pumps and fans. All of the curves are input, stored, and evaluated entirely within the CurveManager module. The curves are usually derived from fits or regressions to data covering a limited range. Results for independent variable values outside this range are likely to be invalid, so curve input always contains a range of validity (maximum and minimum permitted values) for each independent variable and can optionally have limits on the curve ouput. No error or warning message is issued if an independent variable is outside the range. Instead, the curve manager uses the minimum value if an independent variable is less than the minimum, and the maximum if a variable exceeds the maximum. Similarly, no error or warning message is issued if the curve output is outside the range of the optional minimum and maximum curve output limits. Instead, the curve manager uses the minimum and maximum curve limits to cap the output of the performance curve.
@@ -27890,7 +27892,7 @@ The maximum allowable value of the evaluated curve. Values greater than the maxi
 
 #### Field: Input Unit Type for X
 
-This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -27906,7 +27908,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Output Unit Type
 
-This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -27916,37 +27918,27 @@ This field is used to indicate the kind of units that may be associated with the
 
 Following is an example input:
 
+```idf
 Curve:Linear,
-
-       Curve-Linear, ! name
-
-       -1,       ! Coefficient1 Constant
-
-       2,       ! Coefficient2 x
-
-       0.0,          ! min curve output
-
-       1.0;          ! max curve output
+Curve-Linear, ! name
+-1, ! Coefficient1 Constant
+2, ! Coefficient2 x
+0.0, ! min curve output
+1.0; ! max curve output
+```
 
 The following is another example, as might be applied in the Fan:ComponentModel to characterize duct static pressure reset (using a constant duct static pressure set point of 248.84 Pa in this case):
 
+```idf
 Curve:Linear,
-
-    DiagnosticSPR,                   ! Curve Name f = C1 + C2\*x
-
-    248.84,                          ! Coefficient1 Constant [Pa]
-
-    0.,                              ! Coefficent 2 Press/Flow [Pa-s/m3]
-
-    0.,                              ! Minimum Value of x (Qfan) [m3/s]
-
-    100.,                            ! Maximum Value of x (Qfan) [m3/s]
-
-    62.5,                            ! Minimum Curve Output [Pa]
-
-    248.84;                          ! Maximum Curve Output [Pa]
-
-
+DiagnosticSPR, ! Curve Name f = C1 + C2\*x
+248.84, ! Coefficient1 Constant [Pa]
+0., ! Coefficent 2 Press/Flow [Pa-s/m3]
+0., ! Minimum Value of x (Qfan) [m3/s]
+100., ! Maximum Value of x (Qfan) [m3/s]
+62.5, ! Minimum Curve Output [Pa]
+248.84; ! Maximum Curve Output [Pa]
+```
 
 ### Curve:QuadLinear
 
@@ -28084,113 +28076,61 @@ This field is used to indicate the kind of units that may be associated with the
 
 Below are an example inputs for QuadLinear Curves.
 
+```idf
 CURVE:QUADLINEAR,
-
-    MinDsnWBCurveName, ! Curve Name
-
-    -3.3333,          ! CoefficientC1
-
-    0.0,              ! CoefficientC2
-
-    38.9,             ! CoefficientC3
-
-    0.,               ! CoefficientC4
-
-    0.,               ! CoefficientC5
-
-    -30.,             ! Minimum Value of w
-
-    40.,              ! Maximum Value of w
-
-    0.,               ! Minimum Value of x
-
-    1.,               ! Maximum Value of x
-
-    10.,              ! Minimum Value of y
-
-    38.,              ! Maximum Value of y
-
-    1. E-8,           ! Minimum Value of z
-
-    8. E-8,           ! Maximum Value of z
-
-    0.,               ! Minimum Curve Output
-
-    38.;              ! Maximum Curve Output
-
-
+MinDsnWBCurveName, ! Curve Name
+-3.3333,           ! CoefficientC1
+0.0,               ! CoefficientC2
+38.9,              ! CoefficientC3
+0.,                ! CoefficientC4
+0.,                ! CoefficientC5
+-30.,              ! Minimum Value of w
+40.,               ! Maximum Value of w
+0.,                ! Minimum Value of x
+1.,                ! Maximum Value of x
+10.,               ! Minimum Value of y
+8.,                ! Maximum Value of y
+1. E-8,            ! Minimum Value of z
+8. E-8,            ! Maximum Value of z
+0.,                ! Minimum Curve Output
+38.;               ! Maximum Curve Output
 
 Curve:QuadLinear,
-
-    MinActWBCurveName, ! Curve Name
-
-    -8.3333,          ! CoefficientC1
-
-    2.0,              ! CoefficientC2
-
-    5.5556.,          ! CoefficientC3
-
-    -1.0,             ! CoefficientC4
-
-    0.,               ! CoefficientC5
-
-    0.,               ! Minimum Value of w
-
-    38.,              ! Maximum Value of w
-
-    0.,               ! Minimum Value of x
-
-    1.,               ! Maximum Value of x
-
-    10.,              ! Minimum Value of y
-
-    38.,              ! Maximum Value of y
-
-    1. E-8,           ! Minimum Value of z
-
-    8. E-8,           ! Maximum Value of z
-
-    0.,               ! Minimum Curve Output
-
-    43.;              ! Maximum Curve Output
-
-
+MinActWBCurveName, ! Curve Name
+-8.3333,           ! CoefficientC1
+2.0,               ! CoefficientC2
+5.5556.,           ! CoefficientC3
+-1.0,              ! CoefficientC4
+0.,                ! CoefficientC5
+0.,                ! Minimum Value of w
+38.,               ! Maximum Value of w
+0.,                ! Minimum Value of x
+1.,                ! Maximum Value of x
+10.,               ! Minimum Value of y
+38.,               ! Maximum Value of y
+1. E-8,            ! Minimum Value of z
+8. E-8,            ! Maximum Value of z
+0.,                ! Minimum Curve Output
+43.;               ! Maximum Curve Output
 
 Curve:QuadLinear,
-
-    OptCondEntCurveName, ! Curve Name
-
-    12.2711,          ! CoefficientC1
-
-    0.80,             ! CoefficientC2
-
-    6.6667,           ! CoefficientC3
-
-    0-0.266,          ! CoefficientC4
-
-    -6193484.,        ! CoefficientC5
-
-    0.,               ! Minimum Value of w
-
-    38.,              ! Maximum Value of w
-
-    0.,               ! Minimum Value of x
-
-    1.,               ! Maximum Value of x
-
-    10.,              ! Minimum Value of y
-
-    38.,              ! Maximum Value of y
-
-    1. E-8,           ! Minimum Value of z
-
-    8. E-8,           ! Maximum Value of z
-
-    0.,               ! Minimum Curve Output
-
-    32.;              ! Maximum Curve Output
-
-
+OptCondEntCurveName, ! Curve Name
+12.2711,             ! CoefficientC1
+0.80,                ! CoefficientC2
+6.6667,              ! CoefficientC3
+-0.266,              ! CoefficientC4
+-6193484.,           ! CoefficientC5
+0.,                  ! Minimum Value of w
+38.,                 ! Maximum Value of w
+0.,                  ! Minimum Value of x
+1.,                  ! Maximum Value of x
+10.,                 ! Minimum Value of y
+38.,                 ! Maximum Value of y
+1. E-8,              ! Minimum Value of z
+8. E-8,              ! Maximum Value of z
+0.,                  ! Minimum Curve Output
+32.;                 ! Maximum Curve Output
+```
 
 ### Curve:Quadratic
 
@@ -28232,7 +28172,7 @@ The maximum allowable value of the evaluated curve. Values greater than the maxi
 
 #### Field: Input Unit Type for X
 
-This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -28248,7 +28188,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Output Unit Type
 
-This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -28258,19 +28198,15 @@ This field is used to indicate the kind of units that may be associated with the
 
 Following is an example input.
 
+```idf
 Curve:Quadratic,
-
-       WindACCBFFFF, ! name
-
-       -2.277,       ! Coefficient1 Constant
-
-       5.2114,       ! Coefficient2 x
-
-       -1.9344,      ! Coefficient3 x\*\*2
-
-       0.0,          ! Minimum Value of x
-
-       1.0;          ! Maximum Value of x
+WindACCBFFFF, ! name
+-2.277,       ! Coefficient1 Constant
+5.2114,       ! Coefficient2 x
+-1.9344,      ! Coefficient3 x\*\*2
+0.0,          ! Minimum Value of x
+1.0;          ! Maximum Value of x
+```
 
 ### Curve:Cubic
 
@@ -28316,13 +28252,13 @@ The maximum allowable value of the evaluated curve. Values greater than the maxi
 
 #### Field: Input Unit Type for X
 
-This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
 - Temperature
 
--  VolumetricFlow
+- VolumetricFlow
 
 - MassFlow
 
@@ -28332,7 +28268,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Output Unit Type
 
-This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -28342,21 +28278,16 @@ This field is used to indicate the kind of units that may be associated with the
 
 Following is an input example.
 
+```idf
 Curve:Cubic,
-
-       WindACEIRFPLF, ! name
-
-       .00000273404,  ! Coefficient1 Constant
-
-       1.05259,       ! Coefficient2 x
-
-       -.0552087,     ! Coefficient3 x\*\*2
-
-       .00262236,     ! coeff4
-
-       0.0, ! min
-
-       1.1; ! max
+WindACEIRFPLF, ! name
+.00000273404,  ! Coefficient1 Constant
+1.05259,       ! Coefficient2 x
+-.0552087,     ! Coefficient3 x**2
+.00262236,     ! Coefficient4
+0.0,           ! min
+1.1;           ! max
+```
 
 ### Curve:Quartic
 
@@ -28406,7 +28337,7 @@ The maximum allowable value of the evaluated curve. Values greater than the maxi
 
 #### Field: Input Unit Type for X
 
-This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -28422,7 +28353,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Output Unit Type
 
-This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -28432,6 +28363,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 Following is an input example.
 
+```idf
   Curve:Quartic,
 
     BGSeries60,                 !- y = -611.41x4 + 192.68x3 - 88.843x2 + 4.7634x + 5.5656
@@ -28449,9 +28381,11 @@ Following is an input example.
     0.0,                        !- Min Phi Value
 
     0.2412;                     !- Max Phi Value
+```
 
 The following is another example, as might be applied in the Fan:ComponentModel to characterize belt maximum efficiency (using a medium efficiency belt in this case):
 
+```idf
   Curve:Quartic,
 
     BeltMaxEffMedium,                ! Curve Name
@@ -28473,7 +28407,7 @@ The following is another example, as might be applied in the Fan:ComponentModel 
     -4.6,                            ! Minimum Curve Output
 
     0.;                              ! Maximum Curve Output
-
+```
 
 
 ### Curve:Exponent
@@ -28516,7 +28450,7 @@ The maximum allowable value of the evaluated curve. Values greater than the maxi
 
 #### Field: Input Unit Type for X
 
-This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -28532,7 +28466,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Output Unit Type
 
-This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -28542,6 +28476,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 Following is an input example.
 
+```idf
   Curve:Exponent,
 
 !   Curve = C1 + C2\*x\*\*C3, x = fan speed ratio
@@ -28561,6 +28496,7 @@ Following is an input example.
     0.1,                   !- Minimum Curve Output
 
     1.5;                   !- Maximum Curve Output
+```
 
 ### Curve:Bicubic
 
@@ -28638,7 +28574,7 @@ The maximum allowable value of the evaluated curve. Values greater than the maxi
 
 #### Field: Input Unit Type for X
 
-This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -28654,7 +28590,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Input Unit Type for Y
 
-This field is used to indicate the kind of units that may be associated with the y values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of Y and Maximum Value of Y. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the y values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of Y and Maximum Value of Y. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -28670,7 +28606,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Output Unit Type
 
-This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -28680,6 +28616,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 Below is an example input.
 
+```idf
   Curve:Bicubic,
 
    Main Chiller EIRFPLR,       !- Name
@@ -28711,7 +28648,7 @@ Below is an example input.
     0.25,                       !- Minimum Value of y
 
     1.01;                       !- Maximum Value of y
-
+```
 
 
 ### Curve:Biquadratic
@@ -28774,7 +28711,7 @@ The maximum allowable value of the evaluated curve. Values greater than the maxi
 
 #### Field: Input Unit Type for X
 
-This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -28790,7 +28727,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Input Unit Type for Y
 
-This field is used to indicate the kind of units that may be associated with the y values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of Y and Maximum Value of Y. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the y values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of Y and Maximum Value of Y. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -28806,7 +28743,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Output Unit Type
 
-This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -28816,27 +28753,94 @@ This field is used to indicate the kind of units that may be associated with the
 
 Below is an example input.
 
+```idf
 Curve:Biquadratic,
+WindACCoolCapFT, ! name
+0.942587793,     ! Coefficient1 Constant
+0.009543347,     ! Coefficient2 x
+0.000683770,     ! Coefficient3 x\*\*2
+-0.011042676,    ! Coefficient4 y
+0.000005249,     ! Coefficient5 y\*\*2
+-0.000009720,    ! Coefficient6 x\*y
+15., 22.,        ! min and max of first independent variable
+29., 47.;        ! min and max of second independent variable
+```
 
-       WindACCoolCapFT, ! name
+### Curve:CubicLinear
 
-       0.942587793,     ! Coefficient1 Constant
+This curve is a function of two independent variables. Input consists of the curve name, the six coefficients, and min and max values for each of the independent variables. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation represented by the cubic linear curve:
 
-       0.009543347,     ! Coefficient2 x
+<div>\[y = \left( {{C_1} + {C_2}*x + {C_3}*{x^2} + {C_4}*{x^3}} \right) + \left( {{C_5} + {C_6}*x} \right)*y\]</div>
 
-       0.000683770,     ! Coefficient3 x\*\*2
+#### Field: Name
+A user assigned unique name for an instance of a quadratic-linear curve. When a curve is used, it is referenced by this name.
 
-       -0.011042676,    ! Coefficient4 y
+#### Field: Coefficient1 Constant
+The constant coefficient (<span>$C_1$</span>) in the equation.
 
-       0.000005249,     ! Coefficient5 y\*\*2
+#### Field: Coefficient2 x
+The coefficient <span>$C_2</span> in the equation.
 
-       -0.000009720,    ! Coefficient6 x\*y
+#### Field: Coefficient3 x**2
+The coefficient <span>$C_3</span> in the equation.
 
-       15., 22., ! min and max of first independent variable
+#### Field: Coefficient4 x**3
+The coefficient <span>$C_4</span> in the equation.
 
-       29., 47.; ! min and max of second independent variable
+#### Field: Coefficient5 y
+The coefficient <span>$C_5</span> in the equation.
 
+#### Field: Coefficient6 x*y
+The coefficient <span>$C_6</span> in the equation.
 
+#### Field: Minimum Value of x
+The minimum allowable value of x. Values of x less than the minimum will be replaced by the minimum.
+
+#### Field: Maximum Value of x
+The maximum allowable value of x. Values of x greater than the maximum will be replaced by the maximum.
+
+#### Field: Minimum Value of y
+The minimum allowable value of y. Values of y less than the minimum will be replaced by the minimum.
+
+#### Field: Maximum Value of y
+The maximum allowable value of y. Values of y greater than the maximum will be replaced by the maximum.
+
+#### Field: Minimum Curve Output
+The minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum. 
+
+#### Field: Maximum Curve Output
+The maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum.
+
+#### Field: Input Unit Type for X
+This field is used to indicate the kind of units that may be associated with the x values. The only option at this time is **Dimensionless**.
+
+#### Field: Input Unit Type for Y
+This field is used to indicate the kind of units that may be associated with the x values. The only option at this time is **Dimensionless**.
+
+#### Field: Output Unit Type
+This field is used to indicate the kind of units that may be associated with the output values. The only option at this time is **Dimensionless**.
+
+An example input for the CubicLinear equation form is shown below. 
+
+```idf
+Curve:CubicLinear, 
+InsideMeltIceDischarging, !- Name
+0.108734675,              !- Coefficient1 Constant
+-0.989874286,             !- Coefficient2 x
+0.696303562,              !- Coefficient3 x**2
+-0.134945307,             !- Coefficient4 x**3
+1.724007415,              !- Coefficient5 y
+-1.094020457,             !- Coefficient6 y*x
+0.25,                     !- Minimum Value of x
+1,                        !- Maximum Value of x
+0.69,                     !- Minimum Value of y
+1.26,                     !- Maximum Value of y
+0.0926,                   !- Minimum Curve Output
+0.4938,                   !- Maximum Curve Output
+Dimensionless,            !- Input Unit Type for X
+Dimensionless,            !- Input Unit Type for Y
+Dimensionless,            !- Output Unit Type 
+```
 
 ### Curve:QuadraticLinear
 
@@ -28898,7 +28902,7 @@ The maximum allowable value of the evaluated curve. Values greater than the maxi
 
 #### Field: Input Unit Type for X
 
-This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -28914,7 +28918,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Input Unit Type for Y
 
-This field is used to indicate the kind of units that may be associated with the y values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of Y and Maximum Value of Y. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the y values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of Y and Maximum Value of Y. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -28930,7 +28934,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Output Unit Type
 
-This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -28940,29 +28944,20 @@ This field is used to indicate the kind of units that may be associated with the
 
 Below is an example input.
 
+```idf
 Curve:QuadraticLinear,
-
-    DischargeCurve,          !- Curve Name
-
-    0.0,                     !- Coefficient1 Constant
-
-    0.09,                    !- Coefficient2 x
-
-    -0.15,                   !- Coefficient3 x\*\*2
-
-    0.612,                   !- Coefficient4 y
-
-   -0.324,                  !- Coefficient5 x\*y
-
-    -0.216,                  !-Coefficient6 x\*\*2\*y
-
-    0.0,                     !- Minimum Value of x
-
-    1.0,                     !- Maximum Value of x
-
-    0.0,                     !- Minimum Value of y
-
-    9.9;                     !- Maximum Value of y
+DischargeCurve, !- Curve Name
+0.0,            !- Coefficient1 Constant
+0.09,           !- Coefficient2 x
+-0.15,        � !- Coefficient3 x\*\*2
+0.612,         �!- Coefficient4 y
+-0.324,         !- Coefficient5 x\*y
+-0.216,         !-Coefficient6 x\*\*2\*y
+0.0,            !- Minimum Value of x
+1.0,          � !- Maximum Value of x
+0.0,          � !- Minimum Value of y
+9.9;          � !- Maximum Value of y
+```
 
 ### Curve:Triquadratic
 
@@ -29112,7 +29107,7 @@ The maximum allowable value of the evaluated curve. Values greater than the maxi
 
 #### Field: Input Unit Type for X
 
-This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of x. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -29128,7 +29123,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Input Unit Type for Y
 
-This field is used to indicate the kind of units that may be associated with the y values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of Y and Maximum Value of Y. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the y values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of Y and Maximum Value of Y. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -29144,7 +29139,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Input Unit Type for Z
 
-This field is used to indicate the kind of units that may be associated with the z values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of Z and Maximum Value of Z. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the z values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of Z and Maximum Value of Z. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -29160,7 +29155,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Output Unit Type
 
-This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -29210,6 +29205,7 @@ In the curve outputs for this object:
 
 Following is an input example.
 
+```idf
 Curve:Functional:PressureDrop,
 
   PressureMinorAndFriction,!- Name
@@ -29223,6 +29219,7 @@ Curve:Functional:PressureDrop,
   ,                        !- Roughness
 
   0.008;                   !- Fixed Friction Factor
+```
 
 ### Curve:FanPressureRise
 
@@ -29230,9 +29227,9 @@ Input for the fan total pressure rise curve consists of the curve name, the four
 
 <div>\[\Delta {P_{fan,tot}} = {C_1}*Q_{fan}^2 + {C_2}*Q_{fan}^{} + {C_3}*Q_{fan}^{}*\sqrt {{P_{sm}} - {P_o}}  + {C_4}*\left( {{P_{sm}} - {P_o}} \right)\]</div>
 
-where Δ*P<sub>fan,tot</sub>* is the fan total pressure rise (Pa) as a function of volumetric flow through the fan (*Q<sub>fan</sub>*, m<sup>3</sup>/s), duct static pressure set point (*P<sub>sm</sub>*, Pa), and static pressure surrounding the ducts (*P<sub>o</sub>*, Pa). *P<sub>o</sub>* is assumed to be zero.
+where <span>$\Delta P_{fan,tot}$</span> is the fan total pressure rise (Pa) as a function of volumetric flow through the fan (<span>$Q_{fan}, m^3/s$</span>), duct static pressure set point (<span>$P_{sm}$</span>, Pa), and static pressure surrounding the ducts (<span>$P_o$</span>, Pa). <span>$P_o$</span> is assumed to be zero.
 
-The first term of the curve looks like the common system curve in which the fan pressure rise is proportional to the square of the fan flow, but here it also depends implicitly on supply and return pressure losses, and in part on the fraction of the fan flow that is outdoor air (essentially “leaks” into and out of the return side of the system). Very often it is the only term considered, but that would only be correct with fixed-position dampers, no distribution system leakage, no linear resistance components, and no duct static pressure control.
+The first term of the curve looks like the common system curve in which the fan pressure rise is proportional to the square of the fan flow, but here it also depends implicitly on supply and return pressure losses, and in part on the fraction of the fan flow that is outdoor air (essentially "leaks" into and out of the return side of the system). Very often it is the only term considered, but that would only be correct with fixed-position dampers, no distribution system leakage, no linear resistance components, and no duct static pressure control.
 
 The second term accounts for significant flow resistances in the system where the pressure difference is linearly proportional to the flow. Some filters and coils in the return may need this term to be adequately described. This term could be ignored if there are no linear components or if their pressure drops are very small compared to the other terms.
 
@@ -29462,6 +29459,7 @@ This optional field is provided for future purposes so that the IDF Editor could
 
 The following are input examples describing the normalized dimensionless flow for normal (non-stall) and stall operating regions of a backward-curved airfoil centrifugal fan:
 
+```idf
   Curve:Sigmoid,
 
     FanDimFlowNormal,                ! Curve Name
@@ -29507,6 +29505,7 @@ The following are input examples describing the normalized dimensionless flow fo
     0.05,                            ! Minimum Curve Output
 
     1.;                              ! Maximum Curve Output
+```
 
 ### Curve:RectangularHyperbola1
 
@@ -29556,6 +29555,7 @@ This optional field is provided for future purposes so that the IDF Editor could
 
 The following is an input example describing the maximum efficiency variation for a “mid- or average-efficiency” type of motor:
 
+```idf
     Curve:RectangularHyperbola1,
 
     MotorMaxEffAvg,                  ! Curve Name
@@ -29573,6 +29573,7 @@ The following is an input example describing the maximum efficiency variation fo
     0.01,                            ! Minimum Curve Output
 
     1.;                              ! Maximum Curve Output
+```
 
 ### Curve:RectangularHyperbola2
 
@@ -29622,6 +29623,7 @@ This optional field is provided for future purposes so that the IDF Editor could
 
 The following are input examples describing part-load efficiency variations for a “medium efficiency” type of V-belt (Regions 1 and 3), for a “mid- or average-efficiency” nominal 25 hp 4-pole motor, and a nominal 30 hp VFD:
 
+```idf
 Curve:RectangularHyperbola2,
 
     BeltPartLoadRegion1,             ! Curve Name
@@ -29699,6 +29701,7 @@ Curve:RectangularHyperbola2,
     0.01,                            ! Minimum Curve Output
 
     1.;                              ! Maximum Curve Output
+```
 
 ### Curve:ExponentialDecay
 
@@ -29748,23 +29751,17 @@ This optional field is provided for future purposes so that the IDF Editor could
 
 The following is an input example describing the part-load efficiency variation for a “medium efficiency” type of V-belt (Region 2):
 
-  Curve:ExponentialDecay,
-
-    BeltPartLoadRegion2,             ! Curve Name
-
-    1.011965,                        ! CoefficientC1
-
-    -0.339038,                       ! CoefficientC2
-
-    -3.43626,                        ! CoefficientC3
-
-    0.,                              ! Minimum Value of x
-
-    1.,                              ! Maximum Value of x
-
-    0.01,                            ! Minimum Curve Output
-
-    1.;                              ! Maximum Curve Output
+```idf
+Curve:ExponentialDecay,
+BeltPartLoadRegion2,             ! Curve Name
+1.011965,                        ! CoefficientC1
+-0.339038,                       ! CoefficientC2
+-3.43626,                        ! CoefficientC3
+0.,                              ! Minimum Value of x
+1.,                              ! Maximum Value of x
+0.01,                            ! Minimum Curve Output
+1.;                              ! Maximum Curve Output
+```
 
 ### Curve:DoubleExponentialDecay
 
@@ -29824,8 +29821,7 @@ The optional field is provided for future purposes so that the IDF Editor could 
 
 An example input of the Curve:DoubleExponentialDecay input is:
 
-
-
+```idf
   Curve:DoubleExponentialDecay,
 
     BatteryCycleCurve,     !- Name
@@ -29843,104 +29839,7 @@ An example input of the Curve:DoubleExponentialDecay input is:
     0,                     !- Minimum Value of x
 
     1.0;                   !- Maximum Value of x
-
-### Curve:CubicLinear
-
-This curve is a function of two independent variables. Input consists of the curve name, the six coefficients, and min and max values for each of the independent variables. Optional inputs for curve minimum and maximum may be used to limit the output of the performance curve (e.g., limit extrapolation). The equation represented by the cubic linear curve:
-
-      <span>$y = \left( {{C_1} + {C_2}*x + {C_3}*{x^2} + {C_4}*{x^3}} \right) + \left( {{C_5} + {C_6}*x} \right)*y$</span>
-
-#### Field: Name
-
-A user assigned unique name for an instance of a quadratic-linear curve. When a curve is used, it is referenced by this name.
-
-#### Field: Coefficient1 Constant
-
-The constant coefficient (C<sub>1</sub>) in the equation.
-
-#### Field: Coefficient2 x
-
-The coefficient C<sub>2</sub> in the equation.
-
-#### Field: Coefficient3 x\*\*2
-
-The coefficient C<sub>3</sub> in the equation.
-
-#### Field: Coefficient4 x\*\*3
-
-The coefficient C<sub>4</sub> in the equation.
-
-#### Field: Coefficient5 y
-
-The coefficient C<sub>5</sub> in the equation.
-
-#### Field: Coefficient6 x\*y
-
-The coefficient C<sub>6</sub> in the equation.
-
-#### Field: Minimum Value of x
-
-The minimum allowable value of x. Values of x less than the minimum will be replaced by the minimum.
-
-#### Field: Maximum Value of x
-
-The maximum allowable value of x. Values of x greater than the maximum will be replaced by the maximum.
-
-#### Field: Minimum Value of y
-
-The minimum allowable value of y. Values of y less than the minimum will be replaced by the minimum.
-
-#### Field: Maximum Value of y
-
-The maximum allowable value of y. Values of y greater than the maximum will be replaced by the maximum.
-
-#### Field: Minimum Curve Output
-
-The minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum.
-
-#### Field: Maximum Curve Output
-
-The maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum.
-
-#### Field: Input Unit Type for X
-
-This field is used to indicate the kind of units that may be associated with the x values. The only option at this time is **Dimensionless.**
-
-#### Field: Input Unit Type for Y
-
-This field is used to indicate the kind of units that may be associated with the x values. The only option at this time is **Dimensionless.**
-
-#### Field: Output Unit Type
-
-This field is used to indicate the kind of units that may be associated with the output values. The only option at this time is **Dimensionless.**
-
-** **
-
-In addition, the detailed ice storage input will be modified to accept either QuadraticLinear or CubicLinear curve input.
-
-
-
-An example input for the new CubicLinear equation form is shown below.
-
-![Curve:CubicLinear, 
- InsideMeltIceDischarging, !- Name
- 0.108734675, !- Coefficient1 Constant
- -0.989874286, !- Coefficient2 x
- 0.696303562, !- Coefficient3 x\*\*2
- -0.134945307, !- Coefficient4 x\*\*3
- 1.724007415, !- Coefficient5 y
- -1.094020457, !- Coefficient6 y\*x
- 0.25, !- Minimum Value of x
- 1, !- Maximum Value of x
- 0.69, !- Minimum Value of y
- 1.26, !- Maximum Value of y
- 0.0926, !- Minimum Curve Output
- 0.4938, !- Maximum Curve Output
- Dimensionless, !- Input Unit Type for X
- Dimensionless, !- Input Unit Type for Y
- Dimensionless, !- Output Unit Type 
- 
-](InputOutputReference/media/image595.png)
+```
 
 ### Performance Curve Outputs
 
@@ -30009,7 +29908,7 @@ The maximum allowable value of the table output. Values greater than the maximum
 
 #### Field: Input Unit Type for X1
 
-This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of X. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of X. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -30025,7 +29924,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Output Unit Type
 
-This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -30137,7 +30036,7 @@ The maximum allowable value of the table output. Values greater than the maximum
 
 #### Field: Input Unit Type for X
 
-This field is used to indicate the kind of units that may be associated with the X values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of X. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the X values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of X. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -30153,7 +30052,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Input Unit Type for Y
 
-This field is used to indicate the kind of units that may be associated with the Y values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of Y and Maximum Value of Y. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the Y values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of Y and Maximum Value of Y. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -30169,7 +30068,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Output Unit Type
 
-This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -30435,7 +30334,7 @@ The maximum allowable value of the evaluated curve. Values greater than the maxi
 
 #### Field: Input Unit Type for X1
 
-This field is used to indicate the kind of units that may be associated with the X1 values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X1 and Maximum Value of X1. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the X1 values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X1 and Maximum Value of X1. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -30451,7 +30350,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Input Unit Type for X2
 
-This field is used to indicate the kind of units that may be associated with the X2 values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X2 and Maximum Value of X2. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the X2 values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X2 and Maximum Value of X2. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -30467,7 +30366,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Input Unit Type for X3
 
-This field is used to indicate the kind of units that may be associated with the X3 values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X3 and Maximum Value of X3. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the X3 values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X3 and Maximum Value of X3. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -30483,7 +30382,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Input Unit Type for X4
 
-This field is used to indicate the kind of units that may be associated with the X4 values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X4 and Maximum Value of X4. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the X4 values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X4 and Maximum Value of X4. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -30499,7 +30398,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Input Unit Type for X5
 
-This field is used to indicate the kind of units that may be associated with the X5 values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X5 and Maximum Value of X5. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the X5 values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X5 and Maximum Value of X5. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
@@ -30515,7 +30414,7 @@ This field is used to indicate the kind of units that may be associated with the
 
 #### Field: Output Unit Type
 
-This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion**.**
+This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select **Dimensionless** which will have no unit conversion.
 
 - Dimensionless
 
