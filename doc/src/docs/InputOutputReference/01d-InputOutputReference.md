@@ -5230,17 +5230,19 @@ This DX cooling coil input requires an availability schedule, the gross rated to
 
 The rated volumetric air flow to total cooling capacity ratio for 100% dedicated outdoor air (DOAS) application DX cooling coils should be between 0.00001677 (m3/s)/W (125 cfm/ton) and 0.00003355 (m3/s)/W (250 cfm/ton).
 
+Pumped refrigerant economizer integrated with the single speed DX cooling coil model will use exactly the same model except that performance curves use lookup table to cover the pumped refrigerant economizer and the compressor operating ranges. One or two independent variables may used to represent the performance data.
+
 This model requires 5 curves as follows:
 
-1.    The total cooling capacity modifier curve (function of temperature) is a biquadratic curve with two independent variables: wet-bulb temperature of the air entering the cooling coil, and dry-bulb temperature of the air entering the air-cooled condenser coil (wet-bulb temperature if modeling an evaporative-cooled condenser). The output of this curve is multiplied by the gross rated total cooling capacity to give the gross total cooling capacity at specific temperature operating conditions (i.e., at temperatures different from the rating point temperatures).
+1.    The total cooling capacity modifier curve (function of temperature) is a curve with two independent variables: wet-bulb temperature of the air entering the cooling coil, and dry-bulb temperature of the air entering the air-cooled condenser coil (wet-bulb temperature if modeling an evaporative-cooled condenser). The output of this curve is multiplied by the gross rated total cooling capacity to give the gross total cooling capacity at specific temperature operating conditions (i.e., at temperatures different from the rating point temperatures).  This curve is typically a biquadratic but any curve or table with two independent variables can be used.
 
-2.    The total cooling capacity modifier curve (function of flow fraction) is a quadratic or cubic curve with the independent variable being the ratio of the actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The output of this curve is multiplied by the gross rated total cooling capacity and the total cooling capacity modifier curve (function of temperature) to give the gross total cooling capacity at the specific temperature and air flow conditions at which the coil is operating.
+2.    The total cooling capacity modifier curve (function of flow fraction) is a curve or lookup table with the independent variable being the ratio of the actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The output of this curve is multiplied by the gross rated total cooling capacity and the total cooling capacity modifier curve (function of temperature) to give the gross total cooling capacity at the specific temperature and air flow conditions at which the coil is operating.  This curve is typically a quadratic or cubic but any curve or table with one independent variables can be used.
 
-3.    The energy input ratio (EIR) modifier curve (function of temperature) is a biquadratic curve with two independent variables: wet-bulb temperature of the air entering the cooling coil, and dry-bulb temperature of the air entering the air-cooled condenser coil (wet-bulb temperature if modeling an evaporative-cooled condenser). The output of this curve is multiplied by the rated EIR (inverse of the rated COP) to give the EIR at specific temperature operating conditions (i.e., at temperatures different from the rating point temperatures).
+3.    The energy input ratio (EIR) modifier curve (function of temperature) is a curve with two independent variables: wet-bulb temperature of the air entering the cooling coil, and dry-bulb temperature of the air entering the air-cooled condenser coil (wet-bulb temperature if modeling an evaporative-cooled condenser). The output of this curve is multiplied by the rated EIR (inverse of the rated COP) to give the EIR at specific temperature operating conditions (i.e., at temperatures different from the rating point temperatures).  This curve is typically a biquadratic but any curve or table with two independent variables can be used.
 
-4.    The energy input ratio (EIR) modifier curve (function of flow fraction) is a quadratic or cubic curve with the independent variable being the ratio of the actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The output of this curve is multiplied by the rated EIR (inverse of the rated COP) and the EIR modifier curve (function of temperature) to give the EIR at the specific temperature and air flow conditions at which the coil is operating.
+4.    The energy input ratio (EIR) modifier curve (function of flow fraction) is a curve or lookup table with the independent variable being the ratio of the actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The output of this curve is multiplied by the rated EIR (inverse of the rated COP) and the EIR modifier curve (function of temperature) to give the EIR at the specific temperature and air flow conditions at which the coil is operating.  This curve is typically a quadratic or cubic but any curve or table with one independent variables can be used.
 
-5.    The part load fraction correlation (function of part load ratio) is a quadratic or cubic curve with the independent variable being part load ratio (sensible cooling load / steady-state sensible cooling capacity). The output of this curve is used in combination with the rated EIR and EIR modifier curves to give the “effective” EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling. The curve should be normalized to a value of 1.0 when the part-load ratio equals 1.0 (i.e., the compressor(s) run continuously for the simulation timestep).
+5.    The part load fraction correlation (function of part load ratio) is a curve or a lookup table with the independent variable being part load ratio (sensible cooling load / steady-state sensible cooling capacity). The output of this curve is used in combination with the rated EIR and EIR modifier curves to give the “effective” EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling. The curve should be normalized to a value of 1.0 when the part-load ratio equals 1.0 (i.e., the compressor(s) run continuously for the simulation timestep).  This curve is typically a quadratic or cubic but any curve or table with one independent variables can be used.
 
 The curves are simply specified by name. Curve inputs are described in the curve manager section of this document (see Performance Curves in this document).
 
@@ -5290,7 +5292,7 @@ The name of the HVAC system node to which the DX cooling coil sends its outlet a
 
 #### Field: Total Cooling Capacity Function of Temperature Curve Name
 
-The name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of the gross total cooling capacity as a function of the wet-bulb temperature of the air entering the cooling coil, and the dry-bulb temperature of the air entering the air-cooled condenser coil (wet-bulb temperature if modeling an evaporative-cooled condenser). The output of this curve is multiplied by the gross rated total cooling capacity to give the gross total cooling capacity at specific temperature operating conditions (i.e., at temperatures different from the rating point temperatures). The curve is normalized to have the value of 1.0 at the rating point.
+The name of a performance curve (ref: Performance Curves) that parameterizes the variation of the gross total cooling capacity as a function of the wet-bulb temperature of the air entering the cooling coil, and the dry-bulb temperature of the air entering the air-cooled condenser coil (wet-bulb temperature if modeling an evaporative-cooled condenser). The output of this curve is multiplied by the gross rated total cooling capacity to give the gross total cooling capacity at specific temperature operating conditions (i.e., at temperatures different from the rating point temperatures). The curve is normalized to have the value of 1.0 at the rating point.  This curve is typically a biquadratic but any curve or table with two independent variables can be used.
 
 #### Field: Total Cooling Capacity Function of Flow Fraction Curve Name
 
@@ -5298,15 +5300,15 @@ The name of a quadratic or cubic performance curve (ref:  Performance Curves) t
 
 #### Field: Energy Input Ratio Function of Temperature Curve Name
 
-The name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) as a function of the wet-bulb temperature of the air entering the cooling coil, and the dry-bulb temperature of the air entering the air-cooled condenser coil (wet-bulb temperature if modeling an evaporative-cooled condenser). The EIR is the inverse of the COP. The output of this curve is multiplied by the rated EIR (inverse of rated COP) to give the EIR at specific temperature operating conditions (i.e., at temperatures different from the rating point temperatures). The curve is normalized to a value of 1.0 at the rating point.
+The name of a performance curve (ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) as a function of the wet-bulb temperature of the air entering the cooling coil, and the dry-bulb temperature of the air entering the air-cooled condenser coil (wet-bulb temperature if modeling an evaporative-cooled condenser). The EIR is the inverse of the COP. The output of this curve is multiplied by the rated EIR (inverse of rated COP) to give the EIR at specific temperature operating conditions (i.e., at temperatures different from the rating point temperatures). The curve is normalized to a value of 1.0 at the rating point.  This curve is typically a biquadratic but any curve or table with two independent variables can be used.
 
 #### Field: Energy Input Ratio Function of Flow Fraction Curve Name
 
-The name of a quadratic or cubic performance curve (Ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) as a function of the ratio of actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The EIR is the inverse of the COP. The output of this curve is multiplied by the rated EIR and the EIR modifier curve (function of temperature) to give the EIR at the specific temperature and air flow conditions at which the cooling coil is operating. This curve is normalized to a value of 1.0 when the actual air flow rate equals the rated air flow rate.
+The name of a performance curve (Ref: Performance Curves) that parameterizes the variation of the energy input ratio (EIR) as a function of the ratio of actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The EIR is the inverse of the COP. The output of this curve is multiplied by the rated EIR and the EIR modifier curve (function of temperature) to give the EIR at the specific temperature and air flow conditions at which the cooling coil is operating. This curve is normalized to a value of 1.0 when the actual air flow rate equals the rated air flow rate.  This curve is typically a quadratic or cubic but any curve or table with one independent variables can be used.
 
 #### Field: Part Load Fraction Correlation Curve Name
 
-This alpha field defines the name of a quadratic or cubic performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the DX unit as a function of the part load ratio (PLR, sensible cooling load/steady-state sensible cooling capacity). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the “effective” EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling.
+This alpha field defines the name of a performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the DX unit as a function of the part load ratio (PLR, sensible cooling load/steady-state sensible cooling capacity). The product of the rated EIR and EIR modifier curves is divided by the output of this curve to give the “effective” EIR for a given simulation timestep. The part load fraction (PLF) correlation accounts for efficiency losses due to compressor cycling.  This curve is typically a quadratic or cubic but any curve or table with one independent variables can be used.
 
 The part load fraction correlation should be normalized to a value of 1.0 when the part load ratio equals 1.0 (i.e., no efficiency losses when the compressor(s) run continuously for the simulation timestep). For PLR values between 0 and 1 (0 &lt;= PLR &lt; 1), the following rules apply:
 
@@ -5411,6 +5413,10 @@ The name of a biquadratic normalized curve (Ref: Performance Curves) that parame
 #### Field: Sensible Heat Ratio Function of Flow Fraction Curve Name
 
 The name of a quadratic or cubic normalized curve (Ref: Performance Curves) that parameterizes the variation of the sensible heat ratio (SHR) as a function of the ratio of actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The output of this curve is multiplied by the rated SHR and the SHR modifier curve (function of temperature) to give the SHR at the specific temperature and air flow conditions at which the cooling coil is operating. This curve is normalized to a value of 1.0 when the actual air flow rate equals the rated air flow rate. This input field is optional.
+
+#### Field: Zone Name for Condenser Placement
+
+This input field is name of a conditioned or unconditioned zone where the secondary coil (condenser) of DX system or a heat pump is to be placed.  This is an optional input field specified only when user desires to reject the condenser heat into a zone.  The heat rejected is modeled as sensible internal gain of a secondary zone. 
 
 Following is an example input for a Coil:Cooling:DX:SingleSpeed coil.
 
@@ -5669,6 +5675,10 @@ The name of a biquadratic normalized curve (Ref: Performance Curves) that parame
 #### Field: Low Sensible Heat Ratio Function of Flow Fraction Curve Name
 
 The name of a quadratic or cubic normalized curve (Ref: Performance Curves) that parameterizes the variation of the sensible heat ratio (SHR) as a function of the ratio of actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The output of this curve is multiplied by the rated SHR and the SHR modifier curve (function of temperature) to give the SHR at the specific temperature and air flow conditions at which the cooling coil is operating. This curve is normalized to a value of 1.0 when the actual air flow rate equals the rated air flow rate. This input field is optional.
+
+#### Field: Zone Name for Condenser Placement
+
+This input field is name of a conditioned or unconditioned zone where the secondary coil (condenser) of DX system or a heat pump is to be placed.  This is an optional input field specified only when user desires to reject the condenser heat into a zone.  The heat rejected is modeled as sensible internal gain of a secondary zone.
 
 Following are example inputs for the object.
 
@@ -6157,6 +6167,10 @@ The air volume flow rate, in m<sup>3</sup> per second, entering the evaporative 
 #### Field: Speed &lt;x&gt; Rated Evaporative Condenser Pump Power Consumption
 
 The rated power of the evaporative condenser water pump in Watts at Speed &lt;x&gt;. This value is used to calculate the power required to pump the water used to evaporatively cool the condenser inlet air. The default value for this input field is zero, but it is autosizable (equivalent to 0.004266 W per watt [15 W/ton] of rated total capacity for Speed &lt;x&gt;). This field is not used when Condenser Type = Air Cooled.
+
+#### Field: Zone Name for Condenser Placement
+
+This input field is name of a conditioned or unconditioned zone where the secondary coil (condenser) of DX system or a heat pump is to be placed.  This is an optional input field specified only when user desires to reject the condenser heat into a zone.  The heat rejected is modeled as sensible internal gain of a secondary zone.
 
 Following is an example input for this multispeed DX cooling coil.
 
@@ -7614,9 +7628,31 @@ This optional numeric field defines the region number which is used to calculate
 
 This optional alpha field specifies the outdoor air node name used to define the conditions of the air entering the outdoor evaporator. If this field is left blank, the outdoor air temperature entering the evaporator is taken directly from the weather data. If this field is not blank, the node name specified must also be specified in an OutdoorAir:Node object where the height of the node is taken into consideration when calculating outdoor air temperature from the weather data. Alternately, the node name may be specified in an OutdoorAir:NodeList object where the outdoor air temperature is taken directly from the weather data.
 
+#### Field: Zone Name for Evaporator Placement
+
+This input field is name of a conditioned or unconditioned zone where the secondary coil (evaporator) of a heat pump is installed.  This is an optional input field specified only when user desires to extract heat from the zone via secondary coil. Heat extracted is modeled as internal gain. If the primary DX system is a heat pump, then the zone name should be the same as the zone name specified for placing the secondary cooling DX coil.
+
+#### Field: Secondary Coil Air Flow Rate
+
+This input value is the secondary coil (evaporator) air flow rate when the heat pump is working in heating mode or the secondary coil (condenser) air flow rate when the heat pump is working in cooling mode. This input field is auto-sizable.  
+
+#### Field: Secondary Coil Fan Flow Scaling Factor
+
+This input field is scaling factor for autosizing the secondary DX coil fan flow rate.  The secondary air flow rate is determined by multiplying the primary DX coil rated air flow rate by the fan flow scaling factor.  Default value is 1.25. If the secondary coil fan flow rate is not autosized, then the secondary coil fan flow scaling factor is set to 1.0.
+
+#### Field: Nominal Sensible Heat Ratio of Secondary Coil
+
+This input value is the nominal sensible heat ratio used to split the heat extracted by a secondary DX coil (evaporator) of a heat pump into sensible and latent components.  This is an optional input field.  If this input field is left blank, then pure sensible internal heat gain is assumed, i.e., sensible heat ratio of 1.0. 
+
+#### Field: Sensible Heat Ratio Modifier Function of Temperature Curve Name
+
+This input field is name of sensible heat ratio modifier biquadratic curve.  The value of this curve modifies the nominal sensible heat ratio for current time step depending on the secondary zone air node wet-bulb temperature and the heating DX coil entering air dry-bulb temperature.  This is an optional input field.  If this input field is left blank, then the nominal sensible heat ratio modifier curve value for temperature is set to 1.0.
+
+#### Field: Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+
+This input field is name of sensible heat ratio modifier curve as function of secondary air flow fraction. The value of this curve modifies the nominal sensible heat ratio for current time step depending on the secondary coil air flow fraction. This is an optional input field.  If this input field is left blank, then the sensible heat ratio modifier curve value for flow fraction is set to 1.0.
+
 Following is an example input for the object.
-
-
 
 Coil:Heating:DX:SingleSpeed,
 
@@ -7877,6 +7913,30 @@ The fraction of heat input to heating that is available as recoverable waste hea
 #### Field: Speed &lt;x&gt; Waste Heat Function of Temperature Curve Name
 
 The name of a bi-quadratic performance curve (ref: Performance Curves) that parameterizes the variation of the waste heat recovery as a function of outdoor dry-bulb temperature and the entering coil dry-bulb temperature for Speed &lt;x&gt;. The output of this curve is multiplied by the rated recoverable waste heat at specific temperature operating conditions (i.e., at temperatures different from the rating point). The curve is normalized to a value of 1.0 at the rating point. When the fuel type is electricity, the field is either left blank or ignored by the program.
+
+#### Field: Zone Name for Evaporator Placement
+
+This input field is name of a conditioned or unconditioned zone where the secondary coil (evaporator) of a heat pump is installed.  This is an optional input field specified only when user desires to extract heat from the zone via secondary coil. Heat extracted is modeled as internal gain. If the primary DX system is a heat pump, then the zone name should be the same as the zone name specified for placing the secondary cooling DX coil.
+
+#### Field: Speed &lt;x&gt; Secondary Coil Air Flow Rate
+
+This input value is the secondary coil (evaporator) air flow rate when the heat pump is working in heating mode or the secondary coil (condenser) air flow rate when the heat pump is working in cooling mode. This input field is auto-sizable.  
+
+#### Field: Speed &lt;x&gt; Secondary Coil Fan Flow Scaling Factor
+
+This input field is scaling factor for autosizing the secondary DX coil fan flow rate.  The secondary air flow rate is determined by multiplying the primary DX coil rated air flow rate by the fan flow scaling factor.  Default value is 1.25. If the secondary coil fan flow rate is not autosized, then the secondary coil fan flow scaling factor is set to 1.0.
+
+#### Field: Speed &lt;x&gt; Nominal Sensible Heat Ratio of Secondary Coil
+
+This input value is the nominal sensible heat ratio used to split the heat extracted by a secondary DX coil (evaporator) of a heat pump into sensible and latent components.  This is an optional input field.  If this input field is left blank, then pure sensible internal heat gain is assumed, i.e., sensible heat ratio of 1.0. 
+
+#### Field: Speed &lt;x&gt; Sensible Heat Ratio Modifier Function of Temperature Curve Name
+
+This input field is name of sensible heat ratio modifier biquadratic curve.  The value of this curve modifies the nominal sensible heat ratio for current time step depending on the secondary zone air node wet-bulb temperature and the heating DX coil entering air dry-bulb temperature.  This is an optional input field.  If this input field is left blank, then the nominal sensible heat ratio modifier curve value for temperature is set to 1.0.
+
+#### Field: Speed &lt;x&gt; Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+
+This input field is name of sensible heat ratio modifier curve as function of secondary air flow fraction. The value of this curve modifies the nominal sensible heat ratio for current time step depending on the secondary coil air flow fraction. This is an optional input field.  If this input field is left blank, then the sensible heat ratio modifier curve value for flow fraction is set to 1.0.
 
 Following is an example input for a multi-speed heating DX coil.
 
@@ -12187,6 +12247,385 @@ This output is the electricity consumption of the basin heater, in Joules. This 
 
 These are the power and energy outputs for the TES tank’s heat exchange with the plant loop, in Watts and Joules respectively.  This output is only available if the plant connection to the tank is used.  The sign convection is that negative values are cooling the TES tank, or charging it, and positive values are heating the TES tank, or discharging.  This heat transfer is driven by the temperature difference between the media in the tank and the plant loop fluid and is governed by the effectiveness and plant fluid mass flow rate.
 
+### Secondary Coils of DX System and Heat Pump
+
+Secondary Coils reject to or remove heat from a secondary zone as part of a DX system or an air-to-air heat pump. Secondary coil refers to a condenser of a DX system or a heat pump in cooling operating mode or an evaporator of a heat pump in heating mode. The secondary coil (e.g. condenser) of DX system or heat pumps is commonly installed outdoor but when installed inside a zone either heat is dumped to or extracted from a secondary zone. A secondary zone is a conditioned or unconditioned zone where the secondary coil is installed. Secondary coils are not standalone DX coils but they are add-on features on existing DX coil objects. A secondary DX coil is modelled by specifying additional inputs in one of the following DX coil objects: Coil:Cooling:DX:SingleSpeed, Coil:Heating:DX:SingleSpeed, Coil:Cooling:DX:TwoSpeed, Coil:Cooling:DX:MultiSpeed, and Coil:Heating:DX:MultiSpeed. These additional inputs allow us to model the heat rejected or extracted by the secondary coil while the primary (active) coil is serving another controlled zone as shown in [Figure](#SecondaryCoilsFigure1).  A secondary coil is not controlled directly but responds to the requirements of the primary DX coil. Heat is rejected or extracted depending on the primary DX coil operating modes.  For instance, heat rejected to a secondary zone by a condenser of a DX system or a heat pump is considered as sensible only whereas the energy extracted from a secondary zone may contain sensible and latent components.
+
+![](InputOutputReference/media/image903.png)
+
+Figure: Schematic of DX System and heat pump in cooling operating mode <a name="SecondaryCoilsFigure1"></a>
+
+Heat rejected or extracted by the secondary DX coil installed in a secondary zone is estimated from the DX coil models and it is considered as internal gains of the secondary zone. The capacity and electric power input of the DX system and heat pumps are determined from the operating modes of the primary cooling or heating DX coils. Calculation of a secondary coil tracks the operating modes of the primary DX coil serving the primary conditioned zone(s). Currently allowed DX coil models are single speed, two speed and multi speed DX Systems and Heat Pumps.  To model secondary DX coils the condenser type should be AirCooled.  There is no need to specify the condenser air inlet node. The model uses zone air node as the secondary coil air inlet node. And the fuel type in multispeed DX coils should Electricity.
+
+**Cooling Operating Mode**: the primary DX cooling coil of a DX system serving a primary zone is active and heat is rejected by the secondary coil (condenser) into a secondary zone. The secondary zone name is specified in DX cooling coil objects.  This operating mode applies to a DX cooling system and cooling operating mode of air-to-air single and multi-speed heat pumps. Heat rejected by a secondary coil (condenser) calculated at each time step becomes internal gain of the secondary zone as shown in [Figure](#SecondaryCoilsFigure2). Whenever a secondary zone name is specified in DX cooling coil objects, the secondary DX coil model calculation is invoked.  New input field required as add-on to the DX cooling coil objects is a zone name for the secondary coil (condenser) placement. 
+
+#### Field: Zone Name for Condenser Placement
+
+This input field is name of a conditioned or unconditioned zone where the secondary coil (condenser) of DX system or a heat pump is to be placed.  This is an optional input field specified only when user desires to reject the condenser heat into a zone.  The heat rejected is modeled as sensible internal gain of a secondary zone. 
+
+![](InputOutputReference/media/image904.png)
+
+Figure: Schematic of DX system and secondary coil in cooling mode <a name="SecondaryCoilsFigure2"></a>
+
+Following is an example input for a single-speed cooling DX coil with secondary DX coil run option.
+
+```idf
+Coil:Cooling:DX:SingleSpeed,
+    Heat Pump ACDXCoil 1,    !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3.0,                     !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    DX Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
+    Heating Coil Air Inlet Node,  !- Air Outlet Node Name
+    HPACCoolCapFT,           !- Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    HPACCOOLEIRFT,           !- Energy Input Ratio Function of Temperature Curve Name
+    HPACCOOLEIRFFF,          !- Energy Input Ratio Function of Flow Fraction Curve Name
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,   !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                 !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Supply Water Storage Tank Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    200,                     !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature
+    ,                        !- Basin Heater Operating Schedule Name
+    ,                        !- Sensible Heat Ratio Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Function of Flow Fraction Curve Name
+    NORTH ZONE;              !- Zone Name for Condenser Placement
+```
+
+Following is an example input for a two-speed cooling DX coil with secondary DX coil run option.
+
+```idf
+Coil:Cooling:DX:TwoSpeed,
+    PSZ-AC_1:1_CoolC DXCoil, !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    AUTOSIZE,                !- High Speed Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- High Speed Rated Sensible Heat Ratio
+    3.5,                     !- High Speed Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- High Speed Rated Air Flow Rate {m3/s}
+    ,                        !- Unit Internal Static Air Pressure {Pa}
+    DX Cooling Coil Air Inlet Node,     !- Air Inlet Node Name
+    Heating Coil Air Inlet Node,        !- Air Outlet Node Name
+    Measured_CoolCStandard10Ton_CapFT,!- Total Cooling Capacity Function of Temperature Curve Name
+    Measured_CoolCStandard10Ton_CapFF,!- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Measured_CoolCStandard10Ton_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Measured_CoolCStandard10Ton_EIRFFF, !- Energy Input Ratio Function of Flow Fraction Curve Name
+    No_PLR_Degredation,      !- Part Load Fraction Correlation Curve Name
+    AUTOSIZE,                !- Low Speed Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Low Speed Gross Rated Sensible Heat Ratio
+    3.3,                     !- Low Speed Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
+    MeasuredLowSpeedCoolCapLSFT,!- Low Speed Total Cooling Capacity Function of Temperature Curve Name
+    MeasuredLowSpeedCoolEIRLSFT,!- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    ,                              !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    ,                        !- High Speed Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- High Speed Evaporative Condenser Air Flow Rate {m3/s}
+    ,                        !- High Speed Evaporative Condenser Pump Rated Power Consumption {W}
+    ,                        !- Low Speed Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Low Speed Evaporative Condenser Air Flow Rate {m3/s}
+    ,                        !- Low Speed Evaporative Condenser Pump Rated Power Consumption {W}
+    ,                        !- Supply Water Storage Tank Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    ,     !- Sensible Heat Ratio Function of Temperature Curve Name
+    ,     !- Sensible Heat Ratio Function of Flow Fraction Curve Name
+    ,     !- Low Speed Sensible Heat Ratio Function of Temperature Curve Name
+    ,     !- Low Speed Sensible Heat Ratio Function of Flow Fraction Curve Name
+    NORTH ZONE;              !- Zone Name for Condenser Placement
+```
+
+Following is an example input for a multi-speed cooling DX coil with secondary DX coil run option.
+
+```idf
+Coil:Cooling:DX:MultiSpeed,
+    Heat Pump ACDXCoil 1,    !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    DX Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
+    Heating Coil Air Inlet Node,  !- Air Outlet Node Name
+    Outdoor Condenser Air Node,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    ,                        !- Supply Water Storage Tank Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    No,                      !- Apply Part Load Fraction to Speeds Greater than 1
+    No,                      !- Apply Latent Degradation to Speeds Greater than 1
+    200.0,                   !- Crankcase Heater Capacity {W}
+    10.0,           !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    Electricity,             !- Fuel Type
+    4,                       !- Number of Speeds
+    autosize,                !- Speed 1 Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Speed 1 Gross Rated Sensible Heat Ratio
+    3.0,                     !- Speed 1 Gross Rated Cooling COP {W/W}
+    autosize,                !- Speed 1 Rated Air Flow Rate {m3/s}
+    453.3,                   !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    HPACCoolCapFT Speed 1,   !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFF Speed 1, !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name
+    HPACCOOLEIRFT Speed 1,   !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
+    HPACCOOLEIRFF Speed 1,   !- Speed 1 Energy Input Ratio Function of Flow Fraction Curve Name
+    HPACCOOLPLFFPLR Speed 1, !- Speed 1 Part Load Fraction Correlation Curve Name
+    1000.0,                  !- Speed 1 Nominal Time for Condensate Removal to Begin {s}
+    1.5,  !- Speed 1 Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    3.0,                     !- Speed 1 Maximum Cycling Rate {cycles/hr}
+    45.0,                    !- Speed 1 Latent Capacity Time Constant {s}
+    0.2,                     !- Speed 1 Rated Waste Heat Fraction of Power Input {dimensionless}
+    HAPCCoolWHFT Speed 1,    !- Speed 1 Waste Heat Function of Temperature Curve Name
+    0.9,                     !- Speed 1 Evaporative Condenser Effectiveness {dimensionless}
+    autosize,                !- Speed 1 Evaporative Condenser Air Flow Rate {m3/s}
+    50,                      !- Speed 1 Rated Evaporative Condenser Pump Power Consumption {W}
+    autosize,                !- Speed 2 Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Speed 2 Gross Rated Sensible Heat Ratio
+    3.0,                     !- Speed 2 Gross Rated Cooling COP {W/W}
+    autosize,                !- Speed 2 Rated Air Flow Rate {m3/s}
+    523.3,                   !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    HPACCoolCapFT Speed 2,   !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFF Speed 2, !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name
+    HPACCOOLEIRFT Speed 2,   !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
+    HPACCOOLEIRFF Speed 2,   !- Speed 2 Energy Input Ratio Function of Flow Fraction Curve Name
+    HPACCOOLPLFFPLR Speed 1, !- Speed 2 Part Load Fraction Correlation Curve Name
+    1000.0,                  !- Speed 2 Nominal Time for Condensate Removal to Begin {s}
+    1.5,  !- Speed 2 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity {dimensionless}
+    3.0,                     !- Speed 2 Maximum Cycling Rate {cycles/hr}
+    45.0,                    !- Speed 2 Latent Capacity Time Constant {s}
+    0.2,                     !- Speed 2 Rated Waste Heat Fraction of Power Input {dimensionless}
+    HAPCCoolWHFT Speed 2,    !- Speed 2 Waste Heat Function of Temperature Curve Name
+    0.9,                     !- Speed 2 Evaporative Condenser Effectiveness {dimensionless}
+    autosize,                !- Speed 2 Evaporative Condenser Air Flow Rate {m3/s}
+    60,                      !- Speed 2 Rated Evaporative Condenser Pump Power Consumption {W}
+    autosize,                !- Speed 3 Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Speed 3 Gross Rated Sensible Heat Ratio
+    3.0,                     !- Speed 3 Gross Rated Cooling COP {W/W}
+    autosize,                !- Speed 3 Rated Air Flow Rate {m3/s}
+    573.3,                   !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    HPACCoolCapFT Speed 3,   !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFF Speed 3, !- Speed 3 Total Cooling Capacity Function of Flow Fraction Curve Name
+    HPACCOOLEIRFT Speed 3,   !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
+    HPACCOOLEIRFF Speed 3,   !- Speed 3 Energy Input Ratio Function of Flow Fraction Curve Name
+    HPACCOOLPLFFPLR Speed 1, !- Speed 3 Part Load Fraction Correlation Curve Name
+    1000.0,                  !- Speed 3 Nominal Time for Condensate Removal to Begin {s}
+    1.5, !- Speed 3 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity {dimensionless}
+    3.0,                     !- Speed 3 Maximum Cycling Rate {cycles/hr}
+    45.0,                    !- Speed 3 Latent Capacity Time Constant {s}
+    0.2,                     !- Speed 3 Rated Waste Heat Fraction of Power Input {dimensionless}
+    HAPCCoolWHFT Speed 3,    !- Speed 3 Waste Heat Function of Temperature Curve Name
+    0.9,                     !- Speed 3 Evaporative Condenser Effectiveness {dimensionless}
+    autosize,                !- Speed 3 Evaporative Condenser Air Flow Rate {m3/s}
+    80,                      !- Speed 3 Rated Evaporative Condenser Pump Power Consumption {W}
+    autosize,                !- Speed 4 Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Speed 4 Gross Rated Sensible Heat Ratio
+    3.0,                     !- Speed 4 Gross Rated Cooling COP {W/W}
+    autosize,                !- Speed 4 Rated Air Flow Rate {m3/s}
+    673.3,                   !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+    HPACCoolCapFT Speed 4,   !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFF Speed 4, !- Speed 4 Total Cooling Capacity Function of Flow Fraction Curve Name
+    HPACCOOLEIRFT Speed 4,   !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
+    HPACCOOLEIRFF Speed 4,   !- Speed 4 Energy Input Ratio Function of Flow Fraction Curve Name
+    HPACCOOLPLFFPLR Speed 1, !- Speed 4 Part Load Fraction Correlation Curve Name
+    1000.0,                  !- Speed 4 Nominal Time for Condensate Removal to Begin {s}
+    1.5, !- Speed 4 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity {dimensionless}
+    3.0,                     !- Speed 4 Maximum Cycling Rate {cycles/hr}
+    45.0,                    !- Speed 4 Latent Capacity Time Constant {s}
+    0.2,                     !- Speed 4 Rated Waste Heat Fraction of Power Input {dimensionless}
+    HAPCCoolWHFT Speed 4,    !- Speed 4 Waste Heat Function of Temperature Curve Name
+    0.9,                     !- Speed 4 Evaporative Condenser Effectiveness {dimensionless}
+    autosize,                !- Speed 4 Evaporative Condenser Air Flow Rate {m3/s}
+    100,                     !- Speed 4 Rated Evaporative Condenser Pump Power Consumption {W}
+    NORTH ZONE;              !- Zone Name for Condenser Placement
+```
+
+**Heating Operating Mode**: When a heat pump operates in heating mode then energy is extracted from the secondary zone.  Total energy extracted from a secondary zone may contain sensible and latent components.  The secondary coil (evaporator) model checks for the coil inlet and outlet air condition to determine if dehumidification has occurred. The sensible and latent split of the energy extracted is done using a user specified rated sensible heat ratio (SHR) and SHR modifier curves for temperature and secondary air flow fraction.  If the coil operation is dry, then the SHR is set to 1.0.  In addition, the model assumes that condensed water is drained to the outside. If defrosting operation is on, then the defrosting melts the frost and the liquid water from the collecting pan is drained to the outside.  Thus, defrosting energy is not included in the zone energy balance. New input fields required in the single speed DX heating coils include:
+
+#### Field: Zone Name for Evaporator Placement
+
+This input field is name of a conditioned or unconditioned zone where the secondary coil (evaporator) of a heat pump is installed.  This is an optional input field specified only when user desires to extract heat from the zone via secondary coil. Heat extracted is modeled as internal gain. If the primary DX system is a heat pump, then the zone name should be the same as the zone name specified for placing the secondary cooling DX coil.
+
+#### Field: Speed <x> Secondary Coil Air Flow Rate
+
+This input value is the secondary coil (evaporator) air flow rate when the heat pump is working in heating mode or the secondary coil (condenser) air flow rate when the heat pump is working in cooling mode. This input field is auto-sizable.  
+
+#### Field: Speed <x> Secondary Coil Fan Flow Scaling Factor
+
+This input field is scaling factor for autosizing the secondary DX coil fan flow rate.  The secondary air flow rate is determined by multiplying the primary DX coil rated air flow rate by the fan flow scaling factor.  Default value is 1.25. If the secondary coil fan flow rate is not autosized, then the secondary coil fan flow scaling factor is set to 1.0.
+
+#### Field: Speed <x> Nominal Sensible Heat Ratio of Secondary Coil
+
+This input value is the nominal sensible heat ratio used to split the heat extracted by a secondary DX coil (evaporator) of a heat pump into sensible and latent components.  This is an optional input field.  If this input field is left blank, then pure sensible internal heat gain is assumed, i.e., sensible heat ratio of 1.0. 
+
+#### Field: Speed <x> Sensible Heat Ratio Modifier Function of Temperature Curve Name
+
+This input field is name of sensible heat ratio modifier biquadratic curve.  The value of this curve modifies the nominal sensible heat ratio for current time step depending on the secondary zone air node wet-bulb temperature and the heating DX coil entering air dry-bulb temperature.  This is an optional input field.  If this input field is left blank, then the nominal sensible heat ratio modifier curve value for temperature is set to 1.0.
+
+#### Field: Speed <x> Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+
+This input field is name of sensible heat ratio modifier curve as function of secondary air flow fraction. The value of this curve modifies the nominal sensible heat ratio for current time step depending on the secondary coil air flow fraction. This is an optional input field.  If this input field is left blank, then the sensible heat ratio modifier curve value for flow fraction is set to 1.0.
+
+Following is an example input for a single-speed heating DX coil with secondary DX coil run option.
+
+```idf
+Coil:Heating:DX:SingleSpeed,
+    Heat Pump DX Heating Coil 1,  !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    autosize,                !- Gross Rated Heating Capacity {W}
+    2.75,                    !- Gross Rated Heating COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
+    ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
+    Heating Coil Air Inlet Node,  !- Air Inlet Node Name
+    SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name
+    HPACHeatCapFT,           !- Heating Capacity Function of Temperature Curve Name
+    HPACHeatCapFFF,          !- Heating Capacity Function of Flow Fraction Curve Name
+    HPACHeatEIRFT,           !- Energy Input Ratio Function of Temperature Curve Name
+    HPACHeatEIRFFF,          !- Energy Input Ratio Function of Flow Fraction Curve Name
+    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
+    ,                        !- Defrost Energy Input Ratio Function of Temperature Curve Name
+   -5.0,                     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
+    5.0,                     !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
+    200.0,                   !- Crankcase Heater Capacity {W}
+    10.0,             !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    Resistive,               !- Defrost Strategy
+    TIMED,                   !- Defrost Control
+    0.166667,                !- Defrost Time Period Fraction
+    autosize,                !- Resistive Defrost Heater Capacity {W}
+    4,                       !- Region number for calculating HSPF
+    ,                        !- Evaporator Air Inlet Node Name
+    NORTH ZONE,              !- Zone Name for Evaporator Placement
+    autosize,                !- Secondary Coil Air Flow Rate
+    1.5,                     !- Secondary Coil Fan Flow Scaling Factor
+    0.9,                     !- Nominal Sensible Heat Ratio of Secondary Coil
+    DXSecondaryCoilSHRFT,    !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    DXSecondaryCoilSHRFFF;   !- Sensible Heat Ratio Function of Flow Fraction Curve Name
+```
+
+Following is an example input for a multi-speed heating DX coil with secondary DX coil run option.
+
+```idf
+Coil:Heating:DX:MultiSpeed,
+    Heat Pump DX Heating Coil 1,  !- Name
+    FanAndCoilAvailSched,    !- Availability Schedule Name
+    Heating Coil Air Inlet Node,  !- Air Inlet Node Name
+    SuppHeating Coil Air Inlet Node,  !- Air Outlet Node Name
+    -8.0,                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    -5.0,                    !- Outdoor Dry-Bulb Temperature to Turn On Compressor {C}
+    200.0,                   !- Crankcase Heater Capacity {W}
+    10.0,              !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    HPACDefrostCAPFT,        !- Defrost Energy Input Ratio Function of Temperature Curve Name
+    7.22,                    !- Maximum Outdoor Dry-Bulb Temperature for Defrost Operation {C}
+    ReverseCycle,            !- Defrost Strategy
+    timed,                   !- Defrost Control
+    0.058333,                !- Defrost Time Period Fraction
+    autosize,                !- Resistive Defrost Heater Capacity {W}
+    No,                      !- Apply Part Load Fraction to Speeds Greater than 1
+    Electricity,             !- Fuel Type
+    4,                       !- Region number for Calculating HSPF
+    4,                       !- Number of Speeds
+    autosize,                !- Speed 1 Gross Rated Heating Capacity {W}
+    2.75,                    !- Speed 1 Gross Rated Heating COP {W/W}
+    autosize,                !- Speed 1 Rated Air Flow Rate {m3/s}
+    345.0,                   !- Speed 1 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+    HPACHeatCapFT Speed 1,   !- Speed 1 Heating Capacity Function of Temperature Curve Name
+    HPACHeatCapFF Speed 1,   !- Speed 1 Heating Capacity Function of Flow Fraction Curve Name
+    HPACHeatEIRFT Speed 1,   !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
+    HPACHeatEIRFF Speed 1,   !- Speed 1 Energy Input Ratio Function of Flow Fraction Curve Name
+    HPACHeatPLFFPLR Speed 1, !- Speed 1 Part Load Fraction Correlation Curve Name
+    0.2,                     !- Speed 1 Rated Waste Heat Fraction of Power Input {dimensionless}
+    HAPCHeatWHFT Speed 1,    !- Speed 1 Waste Heat Function of Temperature Curve Name
+    autosize,                !- Speed 2 Gross Rated Heating Capacity {W}
+    2.75,                    !- Speed 2 Gross Rated Heating COP {W/W}
+    autosize,                !- Speed 2 Rated Air Flow Rate {m3/s}
+    425.0,                   !- Speed 2 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+    HPACHeatCapFT Speed 2,   !- Speed 2 Heating Capacity Function of Temperature Curve Name
+    HPACHeatCapFF Speed 2,   !- Speed 2 Heating Capacity Function of Flow Fraction Curve Name
+    HPACHeatEIRFT Speed 2,   !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
+    HPACHeatEIRFF Speed 2,   !- Speed 2 Energy Input Ratio Function of Flow Fraction Curve Name
+    HPACHeatPLFFPLR Speed 2, !- Speed 2 Part Load Fraction Correlation Curve Name
+    0.2,                     !- Speed 2 Rated Waste Heat Fraction of Power Input {dimensionless}
+    HAPCHeatWHFT Speed 2,    !- Speed 2 Waste Heat Function of Temperature Curve Name
+    autosize,                !- Speed 3 Gross Rated Heating Capacity {W}
+    2.75,                    !- Speed 3 Gross Rated Heating COP {W/W}
+    autosize,                !- Speed 3 Rated Air Flow Rate {m3/s}
+    525.0,                   !- Speed 3 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+    HPACHeatCapFT Speed 3,   !- Speed 3 Heating Capacity Function of Temperature Curve Name
+    HPACHeatCapFF Speed 3,   !- Speed 3 Heating Capacity Function of Flow Fraction Curve Name
+    HPACHeatEIRFT Speed 3,   !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
+    HPACHeatEIRFF Speed 3,   !- Speed 3 Energy Input Ratio Function of Flow Fraction Curve Name
+    HPACHeatPLFFPLR Speed 3, !- Speed 3 Part Load Fraction Correlation Curve Name
+    0.2,                     !- Speed 3 Rated Waste Heat Fraction of Power Input {dimensionless}
+    HAPCHeatWHFT Speed 3,    !- Speed 3 Waste Heat Function of Temperature Curve Name
+    autosize,                !- Speed 4 Gross Rated Heating Capacity {W}
+    2.75,                    !- Speed 4 Gross Rated Heating COP {W/W}
+    autosize,                !- Speed 4 Rated Air Flow Rate {m3/s}
+    673.0,                   !- Speed 4 Rated Supply Air Fan Power Per Volume Flow Rate {W/(m3/s)}
+    HPACHeatCapFT Speed 4,   !- Speed 4 Heating Capacity Function of Temperature Curve Name
+    HPACHeatCapFF Speed 4,   !- Speed 4 Heating Capacity Function of Flow Fraction Curve Name
+    HPACHeatEIRFT Speed 4,   !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
+    HPACHeatEIRFF Speed 4,   !- Speed 4 Energy Input Ratio Function of Flow Fraction Curve Name
+    HPACHeatPLFFPLR Speed 4, !- Speed 4 Part Load Fraction Correlation Curve Name
+    0.2,                     !- Speed 4 Rated Waste Heat Fraction of Power Input {dimensionless}
+    HAPCHeatWHFT Speed 4,    !- Speed 4 Waste Heat Function of Temperature Curve Name
+    NORTH ZONE,              !- Zone Name for Evaporator Placement
+    autosize,                !- Speed 1 Secondary Coil Air Flow Rate
+    1.5,                     !- Speed 1 Secondary Coil Fan Flow Scaling Factor
+    0.9,                     !- Speed 1 Nominal Sensible Heat Ratio of Secondary Coil
+    DXSecondaryCoilSHRFT,!- Speed 1 Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    DXSecondaryCoilSHRFFF,   !- Speed 1 Sensible Heat Ratio Function of Flow Fraction Curve Name
+    autosize,                !- Speed 2 Secondary Coil Air Flow Rate
+    1.5,                     !- Speed 2 Secondary Coil Fan Flow Scaling Factor
+    0.9,                     !- Speed 2 Nominal Sensible Heat Ratio of Secondary Coil
+    DXSecondaryCoilSHRFT,!- Speed 2 Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    DXSecondaryCoilSHRFFF,   !- Speed 2 Sensible Heat Ratio Function of Flow Fraction Curve Name
+    autosize,                !- Speed 3 Secondary Coil Air Flow Rate
+    1.5,                     !- Speed 3 Secondary Coil Fan Flow Scaling Factor
+    0.9,                     !- Speed 3 Nominal Sensible Heat Ratio of Secondary Coil
+    DXSecondaryCoilSHRFT,!- Speed 3 Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    DXSecondaryCoilSHRFFF,   !- Speed 3 Sensible Heat Ratio Function of Flow Fraction Curve Name
+    autosize,                !- Speed 4 Secondary Coil Air Flow Rate
+    1.5,                     !- Speed 4 Secondary Coil Fan Flow Scaling Factor
+    0.9,                     !- Speed 4 Nominal Sensible Heat Ratio of Secondary Coil
+    DXSecondaryCoilSHRFT,!- Speed 4 Sensible Heat Ratio Modifier Function of Temperature Curve Name
+    DXSecondaryCoilSHRFFF;   !- Speed 4 Sensible Heat Ratio Function of Flow Fraction Curve Name
+```
+
+#### Secondary Coil Heat Rejection Rate [W]
+
+This is the sensible heat rejected to a zone by a secondary DX coil (condenser) in Watts. This is sum of the total cooling rate of a DX cooling coil and cooling electric power of the primary DX coil.  This heat is applied as an internal gain to the secondary zone where the condenser is installed.
+
+#### Secondary Coil Total Heat  Removal Rate [W]
+
+This is the total energy removed from a a zone by a secondary DX coil (evaporator) in Watts. This is the total heating rate of the primary DX cooling coil minus the heating electric power of the primary DX coil.  This heat is extracted from the secondary zone when the heat pump is operating in heating mode. The negative sign indicate that heat is removed from the zone.
+
+#### Secondary Coil Sensible Heat Removal Rate [W]
+
+This is the sensible heat removed from a a zone by a secondary DX coil (evaporator) in Watts. This is determined by multiplying the total heat removed with sensible heat ratio of the secondary coil. This heat is extracted from the secondary zone when the heat pump is operating in heating mode. The negative sign indicate that sensible heat is removed from the zone.
+
+#### Secondary Coil Total Heat  Removal Rate [W]
+
+This is the latent heat removed from a a zone by a secondary DX coil (evaporator) in Watts. This is the difference between the total heat removal rate and the sensible heat remobal rate of the secondary coil. This heat is extracted from the secondary zone when the heat pump is operating in heating mode. The negative sign indicate that moisture is removed from the zone.
+
+#### Secondary Coil Sensible Heat Ratio []
+
+This is the operating sensible heat ratio the secondary DX coil (condenser) when the heat pump is operating in heating mode. 
+
+#### Secondary Coil Compressor Part Load Ratio []
+
+This is the compressor part load ratio when the heat pump is operating in heating mode and the secondary coil is extracting heat from a zone where the later is installed.
+
 Group – Fans
 ------------
 
@@ -13277,6 +13716,142 @@ These outputs contain the rate and volume of water that could not be obtained fr
 #### Humidifier Mains Water Volume [m3]
 
 This output contains the volume of water obtained from the mains.
+
+### Humidifier:Steam:Gas
+
+The gas fired steam humidifier is a component that represents a gas fired self-contained steam humidifier. The component uses gas fired energy to convert ordinary tap water to steam which it then blows or injects into the supply air stream. Blower fan may not be required depending on how the dry steam is delivered into the supply air stream. The humidifier model includes local control of the humidifier unit to meet a humidity ratio setpoint on its air outlet node of the unit. A humidity set point manager is needed to put a setpoint on the outlet node but no other local controllers are needed. The humidifier either blows or injects dry steam to meet the humidity ratio setpoint requirement. If the Rated Gas Use Rate input field is not autosized, the thermal efficiency input specified will be ignored and ovverriden by a thermal efficiency  value determined from user specified Rated Gas Use Rate, rated capacity (m3/s) and design conditions for sizing calculation.    
+
+#### Field: Name
+
+A unique user assigned name for a particular humidifier unit. Any reference to this unit by another object will use this name.
+
+#### Field: Availability Schedule Name
+
+The name of the schedule (ref: Schedule) that denotes whether the unit can run during a given time period. A schedule value of 0 indicates that the unit is off for that time period. A schedule value greater than 0 indicates that the unit can operate during the time period. If this field is blank, the schedule has values of 1 for all time periods.
+
+#### Field: Rated Capacity
+
+The nominal full capacity water addition rate in m3/s of water at 5.05 C.
+
+#### Field: Rated Gas Use Rate {W}
+
+The nominal gas use rate in Watts. This input field can be autosized. When this input field is autosized, it is calculated from the rated capacity in kg/s, the enthalpy rise in J/kg of the feed water from a reference temperature of liquid water at 20°C to a saturated steam at 100°C and user specified thermal efficiency. If this input field is hardsized and the Inlet Water Temperature Option input field is selected as FixedInletWaterTemperature, then the thermal efficiency input field will not be used in the calculation or else if the Inlet Water Temperature Option input selected is VariableInletWaterTemperature, then the user specified thermal efficiency value will be overridden using internally calculated efficiency from the capacity, rated gas use rate and design condition.
+
+#### Field: Thermal Efficiency
+
+The thermal efficiency of the gas fired humidifier. The thermal efficiency is based on the higher heating value of the fuel. The default value is 0.8. If “Rated Gas Use Rate” in the field above is not autosized and the Inlet Water Temperature Option input field selected is FixedInletWaterTemperature, then the thermal efficiency specified will be ignored in the calculation, or else if the Inlet Water Temperature Option input field is specified as VariableInletWaterTemperature, then the user specified thermal efficiency value will be overridden using internally calculated matching the capacity, rated gas use rate specified and design condition defined for sizing calculation.
+
+#### Field: Thermal Efficiency Modifier Curve Name
+
+This is thermal efficiency modifier curve name of unit. This curve is normalized, i.e., the curve output value at rated condition is 1.0. If this input field is blank, then constant efficiency value specified in the input field above will be used.  Allowed thermal efficiency modifier curve types are linear, quadratic, or cubic.  These curves are solely a function of part load ratio.
+
+#### Field: Rated Fan Power
+
+The nominal full capacity electric power input to the blower fan in Watts. If no blower fan is required to inject the dry steam to the supply air stream, then this input field is set to zero.
+
+#### Field: Auxiliary Electric Power
+
+The auxiliary electric power input in watts. This amount of power will be consumed whenever the unit is available (as defined by the availability schedule). This electric power is used for control purpose only.
+
+#### Field: Air Inlet Node Name
+
+The name of the HVAC system node from which the unit draws inlet air.
+
+#### Field: Air Outlet Node Name
+
+The name of the HVAC system node to which the unit sends its outlet air.
+
+#### Field: Water Storage Tank Name
+
+This field is optional. If left blank or omitted, then the humidifier obtains its water directly from the mains water. If the name of a Water Storage Tank is specified, then the humidifier will try to obtain its water from that tank. If the tank can’t provide all the water then the rest will be drawn from the mains and the humidifier will still operate.
+
+#### Field: Inlet Water Temperature Option
+
+This field is a key/choice field that tells which humidifier water inlet temperature to use: fixed inlet temperature or variable water inlet temperature that depends on the source. Currently allowed water sources are main water or water storage tank in water use objects. The key/choice are: FixedInletWaterTemperature, with this choice, the gas fired humidifier will use a fixed 20C water inlet temperature. VariableInletWaterTemperature, with this choice, the gas fired humidifier will use water inlet temperature that depends on the source temperature. If a water use storage tank name is specified, then the gas humidifier water inlet temperature will be the storage water temperature, or else it uses water main temperature. The default main water temperature is 10°C. If left blank or omitted, then the humidifier assumes fixed inlet water temperature of 20°C.
+
+An IDF example:
+
+```idf
+  Humidifier:Steam:Gas,
+    Main Gas Humidifier,!- Name
+    ALWAYS_ON,          !- Availability Schedule Name
+    4.00E-5,            !- Rated Capacity {m3/s}
+    104000,             !- Rated Gas Use Rate {W}
+    1.0,                !- Thermal Efficiency {-} 
+    ,                   !- Thermal Efficiency Modifier Curve Name
+    0,                  !- Rated Fan Power {W}
+    0,                  !- Auxiliary Electric Power {W}
+    Mixed Air Node 1,   !- Air Inlet Node Name
+    Main Humidifier Outlet Node,  !- Air Outlet Node Name
+    ;                   !- Water Storage Tank Name
+```
+
+Steam Gas Humidifier Outputs
+
+* HVAC,Average,Humidifier Water Volume Flow Rate [m3/s]
+* HVAC,Sum,Humidifier Water Volume[m3]
+* HVAC,Average,Humidifier Gas Use Rate[W]
+* HVAC,Sum,Humidifier Gas Use Energy [J]
+* HVAC,Average,Humidifier Auxiliary Electric Power[W]
+* HVAC,Sum,Humidifier Auxiliary Electric Energy [J]
+* HVAC,Meter,Humidifier:Water [m3]
+* HVAC,Meter,Humidifier:Gas [J]
+* HVAC,Meter,Humidifier:Electricity [J]
+* HVAC,Average,Humidifier Storage Tank Water Volume Flow Rate [m3/s]
+* HVAC,Sum,Humidifier Storage Tank Water Volume [m3]
+* HVAC,Average,Humidifier Starved Storage Tank Water Volume Flow Rate [m3/s]
+* HVAC,Sum,Humidifier Starved Storage Tank Water Volume [m3]
+* Zone,Meter,Humidifier:MainsWater [m3]
+* HVAC,Sum,Humidifier Mains Water Volume [m3]
+
+#### Humidifier Water Volume Flow Rate [m3/s]
+
+This field reports the water consumption rate of the steam humidifier in cubic meters of water per second.
+
+#### Humidifier Water Volume [m3]
+
+This output is the cubic meters of water consumed by the steam humidifier over the timestep being reported.
+
+#### Humidifier Gas Use Rate [W]
+
+This output is the gas use rate of the gas fired steam humidifier in Watts.  
+
+#### Humidifier Gas Use Energy [J]
+
+This output is the gas consumption of the gas fired steam humidifier in Joules.  
+
+#### Humidifier Auxiliary Electric Power [W]
+
+This output is the auxiliary electricity consumption rate in Watts of the gas fired steam humidifier.  This is the auxiliary electric power input to the blower fan and control unit.
+
+#### Humidifier Auxiliary Electric Energy [J]
+
+This is the auxiliary electricity consumption in Joules of the gas fired steam humidifier over the timestep being reported. This is the auxiliary electric energy consumed by the blower fan and control unit.  This auxiliary electric energy is reported meter output Humidifier:Electricity.
+
+#### Humidifier:Water [m3]
+
+This meter output contains the sum of the water consumed (in cubic meters of water during the report timestep) by all the steam humidifiers at the HVAC level in the simulation.
+
+#### Humidifier:Gas [J]
+
+This meter output contains the sum of the gas consumed (in Joules during the report timestep) by all the steam humidifiers at the HVAC level in the simulation.
+
+#### Humidifier Storage Tank Water Volume Flow Rate [m3/s]
+
+#### Humidifier Storage Tank Water Volume [m3]
+
+These outputs contain the rate and volume of water obtained from water storage tank. These are only present if the humidifier is connected to a Water Storage Tank for its water supply.
+
+#### Humidifier Starved Storage Tank Water Volume Flow Rate [m3/s]
+
+#### Humidifier Starved Storage Tank Water Volume [m3]
+
+These outputs contain the rate and volume of water that could not be obtained from the water storage tank. The component will still operate as if it did get all the water with the balance obtained directly from the mains
+
+#### Humidifier Mains Water Volume [m3]
+
+This output contains the volume of water obtained from the mains.
+
 
 Group – Desiccant Dehumidifiers
 -------------------------------
@@ -18813,7 +19388,11 @@ This is the source (mains) of water consumed by the evaporative cooler that coul
 
 ### EvaporativeCooler:Direct:ResearchSpecial
 
-This cooler is similar in principal to the EvaporativeCooler:Direct:CelDekPad. The model differs in that it gives the user a simple way of specify the cooler effectiveness. Using the ResearchSpecial input object also allows the cooler to control the amount of cooling based on node setpoints (controlled by SetpointManagers). This avoid problems from over cooling when conditions are such that loads are low and cooling power is high. Water pump power is assumed to vary linearly when the cooler is operating at less than full capacity.
+This cooler is similar in principal to the EvaporativeCooler:Direct:CelDekPad. The model differs in that it gives the user a simple way of specify the cooler effectiveness. Using the ResearchSpecial input object also allows the cooler to control the amount of cooling based on node setpoints (controlled by SetpointManagers). This avoid problems from over cooling when conditions are such that loads are low and cooling power is high. 
+
+The model allows to vary the effectiveness depending on the primary air flow rates.  The design effectiveness is modified by multiplying with Effectiveness Flow Fraction Modifier Curve value.  The flow fraction is the ratio of the current primary airflow rate to the design flow rate. The recirculating and spray water pump power is assumed to vary with the primary air flow.  The design pump power is modified using user specified pump modifier curve value.  The normalized pump power modifier curve is a function of primary air flow fraction as a independent variable. 
+
+Also the direct evaporative cooler operating range can be controlled depending on the entering air dry bulb and wet bulb temperatures.  The operating range controlled based on minimum and maximum inlet node air temperature limits.  The evaporative cooler can be turned on or off depending user specified minimum and maximum temperature limits.  If the inlet node entering air temperature is lower or higher than the minimum and maximum limits, respectively, then the direct research special evaporative cooler is turned off.  If these two input fields are left blank then, no user specified operating temperature control is applied. Operating range control feature is primarily intended for application in data centers.
 
 #### Field: Name
 
@@ -18823,13 +19402,25 @@ A unique identifying name for each cooler.
 
 The name of a schedule that defines when the evaporative cooler is available. A schedule value of 0 indicates that the evaporative cooler is off for that time period. A schedule value greater than 0 indicates that the evaporative cooler can operate during the time period. If this field is blank, the schedule has values of 1 for all time periods.
 
-#### Field: Cooler Effectiveness
+#### Field: Cooler Design Effectiveness
 
-This field specifies the effectiveness that is applied to the wetbulb depression to determine the conditions leaving the cooler. This model assumes that the effectiveness is constant.
+This field specifies the effectiveness at design flow rate that is applied to the wetbulb depression to determine the conditions leaving the cooler. This model assumes that the effectiveness can vary with supply air flow rate.  For effectiveness variation with supply air flow fraction enter the “Effectiveness Flow Ratio Modifier Curve Name” input field below. The flow fraction is the ratio of the sum of current primary air and secondary air sides flow rates and the sum of the design flow rates. 
 
-#### Field: Recirculationg Water Pump Power Consumption
+#### Field: Effectiveness Flow Ratio Modifier Curve Name
 
-This field is used to specify the power consumed by the water pump that circulates water in Watts.
+This curve modifies the effectiveness design value specified the previous field by multiplying the value by the result of this curve.  The modifying curve is a function of flow fraction, which is the ratio of the current primary air flow rates divided by the design primary air flow rates. If this input field is left blank, the effectiveness is assumed to be constant. Any curve or table with one independent variable can be used. Any curve or table with one independent variable can be used: Curve:Linear, Curve:Quadratic, Curve:Cubic, Curve:Quartic, Curve:Exponent, Curve:ExponentialSkewNormal, Curve:Sigmoid, Curve:RectuangularHyperbola1, Curve:RectangularHyperbola2, Curve:ExponentialDecay, Curve:DoubleExponentialDecay, and Table:OneIndependentVariable.
+
+#### Field: Recirculationg Water Pump Design Power
+
+This numeric input field is the recirculating and spray pump electric power at Secondary Design Air Flow Rate in W. This is the nominal water recirculating and spray pump power of evaporative cooler at primary air design flow rates and cooler design effectiveness.  This input field is autosizable.
+
+#### Field: Water Pump Power Sizing Factor
+
+This numeric input field value is recirculating water pump sizing factor in W/(m3/s). This field is used when the previous field is set to autosize. The pump design electric power is scaled with Secondary Design Air Flow Rate.
+
+#### Field: Water Pump Power Modifier Curve Name
+
+This alpha input field is the name of a dimensionless normalized pump power modifying curve. This curve modifies the pump electric power in the previous field by multiplying the design power by the result of this curve. The normalized curve is a function of the primary air flow fraction as independent variable.  The curve shall yield a value of 1.0 at a flow fraction of 1.0. The flow fraction is the ratio of the primary air during current operation divided by primary air Design Air Flow Rate. If this input field is left blank, the pump power is assumed to lineary vary with the load. Any curve or table with one independent variable can be used: Curve:Linear, Curve:Quadratic, Curve:Cubic, Curve:Quartic, Curve:Exponent, Curve:ExponentialSkewNormal, Curve:Sigmoid, Curve:RectuangularHyperbola1, Curve:RectangularHyperbola2, Curve:ExponentialDecay, Curve:DoubleExponentialDecay, and Table:OneIndependentVariable.
 
 #### Field: Air Inlet Node Name
 
@@ -18855,37 +19446,44 @@ This field is optional and can be used to model additional water consumed by the
 
 This field is optional and can be used to model additional water consumed by the cooler from blowdown.  Blowdown is water that is intentionally drained from the cooler’s sump to offset the build up of solids in the water that would otherwise occur because of evaporation.  The value entered here is dimensionless.  It can be characterized as the ratio of solids in the blowdown water to solids in the make up water.  Typical values are 3 to 5.  The default is 3.0.
 
+#### Field: Evaporative Cooler Operation Minimum Drybulb Temperature 
+
+This numeric field defines the evaporative cooler inlet node drybulb temperature minimum limit in degrees Celsius. The evaporative cooler will be turned off when evaporator cooler air inlet node dry-bulb temperature falls below this value. The typical minimum value is 16°C. Users are allowed to specify their own limits. If this field is left blank, then there is no drybulb temperature lower limit for evaporative cooler operation.  
+
+#### Field: Evaporative Operation Maximum Limit Wetbulb Temperature
+
+This numeric field defines the evaporative cooler air inlet node air wetbulb temperature maximum limits in degree Celsius. When the evaporative cooler air inlet node air wetbulb temperature exceeds this limit, then the evaporative cooler is turns off. The typical maximum value is 24°C. If this input field is left blank, then there is no wetbulb temperature upper limit for evaporative cooler operation.
+
+#### Field: Evaporative Operation Maximum Limit Drybulb Temperature
+
+This numeric field defines the evaporative cooler air inlet node drybulb temperature maximum limits in degree Celsius. The evaporative cooler will be turned off when the evaporative cooler air inlet node drybulb temperature exceeds this value. The typical maximum value is 28°C. If this input field is left blank, then there is no upper drybulb temperature limit for evaporative cooler operation.
+
 An example IDF entry is
 
+```idf
 EvaporativeCooler:Direct:ResearchSpecial,
-
   Direct Evap Cooler, !- Name
-
-  ALWAYS\_ON, !- Availability Schedule Name
-
-  0.7 , !- Cooler Effectiveness
-
-  30.0 , !- Recirculating Water Pump Power Consumption
-
+  ALWAYS_ON, !- Availability Schedule Name
+  0.7 , !- Cooler Design Effectiveness
+  ,     !- Effectiveness Flow Ratio Modifier Curve Name
+  30.0 , !- Recirculating Water Pump Design Power
+  ,     !- Water Pump Power Sizing Factor
+  ,     !- Water Pump Power Modifier Curve Name
   OAIndRDD Evap Cooler- OADirect Evap CoolerNode , !- Air Inlet Node Name
-
   OADirect Evap Cooler- OAMixing BoxNode, !- Air Outlet Node Name
-
   OADirect Evap Cooler- OAMixing BoxNode, !- Sensor Node Name
-
   , !- Water Supply Storage Tank Name
-
   0.0, !- Drift Loss Fraction
-
   3; !- Blowdown Concentration Ratio
-
-
+```
 
 ### EvaporativeCooler:Direct:ResearchSpecial Outputs
 
 The output variables that are available for this direct evaporative cooler are shown below:
 
 HVAC,Average, Evaporative Cooler Electric Power[W]
+
+HVAC,Average, Evaporative Cooler Stage Effectiveness []
 
 HVAC,Sum, Evaporative Cooler Electric Energy [J]
 
@@ -18904,6 +19502,10 @@ HVAC,Sum,Evaporative Cooler Starved Mains Water Volume [m3]
 #### Evaporative Cooler Electric Energy [J]
 
 These output variables report the electric power and electric energy required to operate the water pump.
+
+#### Evaporative Cooler Stage Effectiveness []
+
+The cooler stage efficiency is defined as the temperature change of the supply air divided by the difference between the outdoor dry-bulb and wet-bulb temperatures, including the effect of the reduction in the primary air flow rate in other words, it is a measure of the approach to the entering air wet-bulb temperature.
 
 #### Evaporative Cooler Water Volume [m3]
 
@@ -19247,6 +19849,8 @@ This is the source (mains) of water consumed by the evaporative cooler that coul
 
 This cooler is similar in principal to the EvaporativeCooler:Indirect:CelDekPad and EvaporativeCooler:Indirect:WetCoil (see Figure 147, Figure 148, and Figure 149). The model differs in that it gives the user more flexibility to specify the source of secondary air. The cooler effectiveness with respect to wetbulb depression is allowed to go beyond 1.0. Using the ResearchSpecial input object also allows the cooler to control the amount of cooling based on node setpoints (controlled by SetpointManagers). This avoid problems from over cooling when conditions are such that loads are low and cooling power is high. Fan power is assumed to vary linearly when the cooler is operating at less than full capacity.
 
+The indirect evaporative cooler research special calculation procedure allows accounting for dry and wet effectiveness value variation with flow fraction.  Two effectiveness modifier curves are included as optional user inputs for this purpose.  Effectiveness modifier curves operate on the design dry and wet effectiveness values. The flow fraction is calculated as a ratio of the sum of current primary and secondary air flow rates to the sum of the design flow rates. Model also accounts for fan and recirculation water pump power variation with secondary air flow rates using pump power modifying curve. The fan power is calculated by multiplying the design fan power using fan power modify curve value evaluated at current secondary air flow fraction. Similarly, recirculating pump power is is calculated by multiplying the design pump power by pump power modifier curve value evaluated at current secondary air flow fraction. If the secondary air fan and recirculating pump power modifier curves are not specified, then fan and pump power are assumed to vary linearly with part load fraction.
+
 #### Field: Name
 
 A unique identifying name for each cooler.
@@ -19255,29 +19859,53 @@ A unique identifying name for each cooler.
 
 The name of a schedule that defines when the evaporative cooler is available. A schedule value of 0 indicates that the evaporative cooler is off for that time period. A schedule value greater than 0 indicates that the evaporative cooler can operate during the time period. If this field is blank, the schedule has values of 1 for all time periods.
 
-#### Field: Cooler Maximum Effectiveness
+#### Field: Cooler Wetbulb Design Effectiveness
 
-This field specifies the maximum effectiveness that is applied to the wetbulb depression to determine the conditions leaving the cooler. This effectiveness is a complicated function of the efficiency with which heat and mass are transferred on the secondary side and the efficiency of heat exchange between the secondary and primary flows. The model assumes that the effectiveness is constant.
+This field specifies the design effectiveness that is applied to the wetbulb depression to determine the conditions leaving the cooler. This effectiveness is a complicated function of the efficiency with which heat and mass are transferred on the secondary side and the efficiency of heat exchange between the secondary and primary flows. The model assumes that the effectiveness a function of flow fraction. The flow fraction is the ratio of the sum of primary air and secondary air current flow rates and the sum of the primary air and secondary air design flow rates.
 
-#### Field: Cooler Flow Ratio
+#### Field: Wet Bulb Effectiveness Flow Ratio Modifier Curve Name
 
-Not used in this model.
+This curve modifies the wet bulb effectiveness design value specified the previous field by multiplying the value by the result of this curve.  The modifying curve is a function of flow fraction, which is the ratio of the sum of the primary and secondary flow rates divided by the sum of the design flow rates. If this input field is left blank, the effectiveness is assumed to be constant. Any curve or table with one independent variable can be used. Any curve or table with one independent variable can be used: Curve:Linear, Curve:Quadratic, Curve:Cubic, Curve:Quartic, Curve:Exponent, Curve:ExponentialSkewNormal, Curve:Sigmoid, Curve:RectuangularHyperbola1, Curve:RectangularHyperbola2, Curve:ExponentialDecay, Curve:DoubleExponentialDecay, and Table:OneIndependentVariable.
 
-#### Field: Recirculating Water Pump Power Consumption
+#### Field: Cooler Drybulb Design Effectiveness
 
-This field is used to specify the power consumed by the water pump that circulates water in Watts. The pump power and energy consumption is reduced by cycling when the amount of cooling needs to be restricted for control purposes.
+This input value is dry bulb design effectiveness of the evaporative cooler. This is the nominal design dry blub effectiveness with respect to dry bulb temperature difference, i.e., dry operation and at design air flow rates, and no water evaporation or spraying on the secondary side.
 
-#### Field: Secondary Fan Flow Rate
+#### Field Drybulb Effectiveness Flow Ratio Modifier Curve Name
 
-This field is used to specify the secondary fan flow rate and is specified in m<sup>3</sup>/s. This flow rate would typically be similar in magnitude to the flow through the primary side. This field can be autosized. When it is autosized, the program detects if the component is in the main air loop or on an outdoor air path.  If it is on the main air loop, then the flow rate is set to the AirLoopHVAC system’s design supply air flow rate (which is the maximum required for heating and cooling).  If it is on the outdoor air path, then the flow rate is set to the larger of either the design minimum outdoor air flow rate or one-half of the main air loop design flow rate. The flow rate is used to determine parasitic fan energy and does not impact the modeling of cooler effectiveness. The flow rate (and fan power) is effectively reduced by cycling when the amount of cooling needs to be restricted for control purposes.
+This this curve modifies the drybulb effectiveness in the previous field (eff_db_design) by multiplying the design effectiveness value by the result of this curve.  The curve is evaluated flow fraction as independent variable.  The flow fraction is the ratio of sum of the primary and secondary flow rates divided by the sum of the design flow rates. If this input field is left blank, the effectiveness is assumed to be constant. Any curve or table with one independent variable can be used: Curve:Linear, Curve:Quadratic, Curve:Cubic, Curve:Quartic, Curve:Exponent, Curve:ExponentialSkewNormal, Curve:Sigmoid, Curve:RectuangularHyperbola1, Curve:RectangularHyperbola2, Curve:ExponentialDecay, Curve:DoubleExponentialDecay, and Table:OneIndependentVariable.
 
-#### Field: Secondary Fan Total Efficiency
+#### Field: Recirculating Water Pump Design Power
 
-This value is the overall efficiency of the fan, i.e., the ratio of the power delivered to the fluid to the electrical input power. It is the product of the motor efficiency and the impeller efficiency. The motor efficiency is the power delivered to the shaft divided by the electrical power input to the motor. The impeller efficiency is power delivered to the fluid (air) divided by the shaft power. The power delivered to the fluid is the mass flow rate of the air multiplied by the pressure rise divided by the air density. This input value must be between 0 and 1.
+This numeric input field is the recirculating pump electric power at Secondary Design Air Flow Rate in W. This is the nominal design pump power water recirculation and spray for evaporation at design secondary air flow rates and cooler design effectiveness.  This input field is autosizable.
 
-#### Field: Secondary Fan Delta Pressure
+#### Field: Water Pump Power Sizing Factor
 
-This field is used to specify the pressure difference in Pascals experienced by the secondary fan as it moves air through the wet side of the cooler.
+This numeric input field value is recirculating water pump sizing factor in W/(m3/s). This field is used when the previous field is set to autosize. The pump design electric power is scaled with Secondary Design Air Flow Rate.
+
+#### Field: Water Pump Power Modifier Curve Name
+
+This alpha input field is the name of a dimensionless normalized pump power modifying curve. This curve modifies the pump electric power in the previous field by multiplying the design power by the result of this curve. The normalized curve is a function of the secondary side flow fraction as independent variable.  The curve shall yield a value of 1.0 at a flow fraction of 1.0. The flow fraction is the secondary air flow rate during operation divided by Secondary Design Air Flow Rate. If this input field is left blank, the pump power is assumed to be constant. Any curve or table with one independent variable can be used: Curve:Linear, Curve:Quadratic, Curve:Cubic, Curve:Quartic, Curve:Exponent, Curve:ExponentialSkewNormal, Curve:Sigmoid, Curve:RectuangularHyperbola1, Curve:RectangularHyperbola2, Curve:ExponentialDecay, Curve:DoubleExponentialDecay, and Table:OneIndependentVariable.
+
+#### Field: Secondary Air Design Flow Rate
+
+This field is used to specify the secondary fan flow rate and is specified in m<sup>3</sup>/s. This flow rate would typically be similar in magnitude to the flow through the primary side. This field can be autosized. When it is autosized, the program detects if the component is in the main air loop or on an outdoor air path.  If it is on the main air loop, then the flow rate is set to the AirLoopHVAC system’s design supply air flow rate (which is the maximum required for heating and cooling).  If it is on the outdoor air path, then the flow rate is set to the larger of either the design minimum outdoor air flow rate or one-half of the main air loop design flow rate. The flow rate is used to determine parasitic fan energy and cooler effectiveness. The flow rate (and fan power) is effectively reduced by cycling when the amount of cooling needs to be restricted for control purpose.  This field can be autosized. When this input is autosized, the program calculates by scaling the Primary Air Design Flow Rate using secondary air scaling factor specified in the input field below.
+
+#### Field: Secondary Air Flow Scaling Factor
+
+This numeric input field is used to scale the secondary air design flow rate and it is dimensionless. This field is used when the previous field is set to autosize. The Primary Design Air Flow Rate is scaled using this factor to calculate the secondary design air flow rate.
+
+#### Field: Secondary Air Fan Design Power
+
+This numeric input field is the fan electric power at Secondary Design Air Flow Rate.  This is the nominal design electric power at full speed of the secondary air fan.   This input field is autosizable.
+
+#### Field: Secondary Air Fan Sizing Specific Power
+
+This input field value is secondary air fan sizing specific power in W/(m3/s).  This field is used when the previous field is set to autosize. The fan power is scaled with Secondary Design Air Flow Rate.
+
+#### Field: Secondary Air Fan Power Modifier Curve Name
+
+This input field is the name of a dimensionless normalized curve.  The normalized curve modifies the design secondary air fan power in the previous field by multiplying the value by the result of this curve.  The normalized curve is a function of the secondary side flow fraction as independent variable.  The curve shall yield a value of 1.0 at a flow fraction of 1.0. The flow fraction is the secondary air flow rate during operation divided by Secondary Design Air Flow Rate. If this input field is left blank, the fan power is assumed to be constant. Any curve or table with one independent variable can be used: Curve:Linear, Curve:Quadratic, Curve:Cubic, Curve:Quartic, Curve:Exponent, Curve:ExponentialSkewNormal, Curve:Sigmoid, Curve:RectuangularHyperbola1, Curve:RectangularHyperbola2, Curve:ExponentialDecay, Curve:DoubleExponentialDecay, and Table:OneIndependentVariable.
 
 #### Field: Primary Air Inlet Node Name
 
@@ -19287,9 +19915,9 @@ The name of the air inlet node for the primary air flow path through the cooler.
 
 The name of the air outlet node for the primary air flow path through the cooler.
 
-#### Field: Control Type
+#### Field:Primary Design Air Flow Rate  
 
-This input field is not used by this model. But using this model does implement controlling of the primary outlet temperature.
+This numeric input field is the primary air design air flow rate in m3/s. This is the design primary air flow rate.  This input field is autosizable. If the evaporative cooler is on main air loop branch, the design flow rate is the same as branch design flow rate, or else if it is on outdoor air system it will be the same as the outdoor air design flow rate. 
 
 #### Field: Dewpoint Effectiveness Factor
 
@@ -19298,6 +19926,10 @@ This field specifies an effectiveness that is applied to the dewpoint depression
 #### Field: Secondary Air Inlet Node Name
 
 This field specifies the name of the node providing air to the secondary/wet side of the cooler. Typically this node could appear in an outdoor air node list or be part of an air system loop.
+
+#### Field: Secondary Air Outlet Node Name
+
+This alpha input field is the name of the secondary air side outlet node.
 
 #### Field: Sensor Node Name
 
@@ -19319,39 +19951,49 @@ This field is optional and can be used to model additional water consumed by the
 
 This field is optional and can be used to model additional water consumed by the cooler from blowdown.  Blowdown is water that is intentionally drained from the cooler’s sump to offset the build up of solids in the water that would otherwise occur because of evaporation.  The value entered here is dimensionless.  It can be characterized as the ratio of solids in the blowdown water to solids in the make up water.  Typical values are 3 to 5.  The default is 3.0.
 
+#### Field: Evaporative Operation Minimum Limit Drybulb Temperature 
+
+This input field value defines the secondary air inlet node drybulb temperature limits in degree Celsius. When the secondary side entering air dry bulb temperature drops below this limit, then the evaporative cooler operation mode changes to dry heat exchanger. Users specify their own limits. If this field is left blank, then there is no drybulb temperature lower limit for evaporative cooler operation.  If operating range control is desired then this input field and the next two input fields should be specified or all the three should be left blank or left out.  If no minimum drybulb temperature limit is required while there are maximum drybulb and wetbulb temperature limits then specify very low temperature limit value (e.g., -99.0 C).
+
+#### Field: Evaporative Operation Maximum Limit Wetbulb Temperature
+
+This input field value defines the secondary air inlet node wetbulb temperature limits in degree Celsius. When the secondary side entering air wet bulb temperature exceeds this limit, then the evaporative cooler is turns off and does not attempt to do any cooling. If this field is left blank, then there is no wetbulb temperature maximum limit for evaporative cooler wet operation mode. If no upper wetbulb temperature limits is desired while there are minimum drybulb and maximum drybulb upper temperature limits then then specify very high maximum wetbulb temperature limit value (e.g. 99.0 C).
+
+#### Field: Evaporative Operation Maximum Limit Drybulb Temperature
+
+This input field value defines the secondary air inlet node drybulb temperature limits in degree Celsius. When the secondary side entering air drybulb temperature exceeds this limit, the evaporative cooler will not run in dry operation mode or may be turned off depending on its wetbulb temperature. If this field is left blank, then there is no drybulb temperature maximum limit for evaporative cooler dry operation mode.
+
+If no drybulb temperature limit is desired while there are minimum drybulb and maximum wetbulb temperature limits then specify very high maximum drybulb temperature limit value (e.g. 99.0 C).
+
 An IDF example is shown below:
 
- EvaporativeCooler:Indirect:ResearchSpecial,
+```idf
+EvaporativeCooler:Indirect:ResearchSpecial,
+    DataC_IndirectEvapCooler,     !- Name
+    ALWAYS_ON,                    !- Availability Schedule Name
+    0.75,                         !- Cooler Wetbulb Design Effectiveness
+    ,              !- Wetbulb Effectiveness Flow Ratio Modifier Curve Name
+    ,                          !- Cooler Drybulb Design Effectiveness
+    ,              !- Drybulb Effectiveness Flow Ratio Modifier Curve Name
+    autosize,                     !- Recirculating Water Pump Power
+    autosize,                     !- Secondary Air Design Flow Rate  
+    1.0,                          !- Secondary Air Flow Scaling Factor
 
-    Indirect Evap ZN1,       !- Name
-
-    On\_Except\_Winter\_Night,  !- Availability Schedule Name
-
-    1.2,                     !- Cooler Maximum Effectiveness
-
-    ,                        !- Cooler Flow Ratio
-
-    30,                      !- Recirculating Water Pump Power Consumption {W}
-
-    autosize,                !- Secondary Fan Flow Rate {m3/s}
-
-    0.7,                     !- Secondary Fan Total Efficiency
-
-    300,                     !- Secondary Fan Delta Pressure {Pa}
-
-    Mixed Air Node ZN1,      !- Primary Air Inlet Node Name
-
-    Evap Cooler Outlet Node ZN1,  !- Primary Air Outlet Node Name
-
-    ,                        !- Control Type
-
-    0.9,                     !- Dewpoint Effectiveness Factor
-
-    Purge Air Inlet ZN1,     !- Secondary Air Inlet Node Name
-
-    Air Loop Outlet Node ZN1,!- Sensor Node Name
-
-    Relief Air Outlet Node ZN1;  !- Relief Air Inlet Node Name
+    autosize,                     !- Secondary Air Fan Design Power
+    800.0,                        !- Secondary Air Fan Sizing Specific Power W
+    ,               !- Secondary Air Fan Power Modifier Curve Name
+    Return Air Node,              !- Primary Air Inlet Node Name
+    IndEC Outlet Node,            !- Primary Air Outlet Node Name
+    autosize,                     !- Primary Design Air Flow Rate  
+    0.9 ,                         !- Dewpoint Effectiveness Factor
+    IndEC OA Air Inlet Node,      !- Secondary Air Inlet Node Name
+    IndEC OA Air Outlet Node,     !- Secondary Air Outlet Node Name
+    IndEC Outlet Node,            !- Sensor Node Name
+    ,                             !- Relief Air Inlet Node Name
+    ,                             !- Water Supply Storage Tank Name
+    0.0,                          !- Drift Loss Fraction
+    ;                             !- Blowdown Concentration Ratio
+```
 
 ### EvaporativeCooler:Indirect:ResearchSpecial Outputs
 
@@ -19362,6 +20004,8 @@ HVAC,Average,Evaporative Cooler Total Stage Effectiveness
 HVAC,Average,Evaporative Cooler Part Load Ratio
 
 HVAC,Average,Evaporative Cooler Dewpoint Bound Status
+
+HVAC,Average,Evaporative Cooler Operating Mode Satus []
 
 HVAC,Sum,Evaporative Cooler Electric Energy [J]
 
@@ -19377,7 +20021,11 @@ HVAC,Sum,Evaporative Cooler Starved Mains Water Volume [m3]
 
 #### Evaporative Cooler Total Stage Effectiveness []
 
-The Total Stage Efficiency is defined as the temperature change of the supply air divided by the difference between the outdoor dry-bulb and wet-bulb temperatures, including the effect of the reduction in flow because of the secondary air stream. In other words, it is a measure of the approach to the outdoor wet-bulb temperature.
+The Total Stage Efficiency is defined as the temperature change of the supply air divided by the difference between the primary air entering dry-bulb temperature and the secondary air enterig wet-bulb temperature for wet operating mode or the the difference between the primary air entering dry-bulb temperature and the secondary air enterig dry-bulb temperature for dry operating mode, including the effect of the reduction in flow because of the secondary air stream. In other words, it is a measure of the approach to the secondary air wet-bulb temperature for wet operating mode, or it is a measure of the approach to the secondary air entering dry-bulb temperature for dry operating mode.
+
+#### Evaporative Cooler Operating Mode Status []
+
+This output variable provides the operating modes or status of the indirect evaporative cooler. This output variable can have status indicator integer value of 0, 1, or 2 representing Off, Dry and Wet operating modes, respectively.
 
 #### Evaporative Cooler Part Load Ratio []
 
