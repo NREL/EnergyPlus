@@ -136,7 +136,6 @@ namespace WaterThermalTanks {
 	// integer parameter for water heater
 	int const MixedWaterHeater( TypeOf_WtrHeaterMixed ); // WaterHeater:Mixed
 	int const StratifiedWaterHeater( TypeOf_WtrHeaterStratified ); // WaterHeater:Stratified
-	int const HeatPumpWaterHeater( TypeOf_HeatPumpWtrHeater ); // WaterHeater:HeatPump:PumpedCondenser
 	//stovall, next line never used because all desuperheater coils used in mixed water heater types
 	int const CoilWaterDesuperHeater( 4 ); // Coil:WaterHeating:Desuperheater
 	int const MixedChilledWaterStorage( TypeOf_ChilledWaterTankMixed ); // 'ThermalStorage:ChilledWater:Mixed'
@@ -285,7 +284,7 @@ namespace WaterThermalTanks {
 		}
 
 		// Find the correct Equipment
-		if ( CompType != TypeOf_HeatPumpWtrHeater ) {
+		if ( CompType != TypeOf_HeatPumpWtrHeaterPumped && CompType != TypeOf_HeatPumpWtrHeaterWrapped ) {
 			if ( CompIndex == 0 ) {
 				CompNum = FindItem( CompName, WaterThermalTank.Name(), NumWaterThermalTank );
 				if ( CompNum == 0 ) {
@@ -412,7 +411,7 @@ namespace WaterThermalTanks {
 			ReportWaterThermalTank( CompNum );
 
 			// =========================  Heat Pump Water Heater
-		} else if ( SELECT_CASE_var == TypeOf_HeatPumpWtrHeater ) {
+		} else if ( SELECT_CASE_var == TypeOf_HeatPumpWtrHeaterPumped || SELECT_CASE_var == TypeOf_HeatPumpWtrHeaterWrapped ) {
 			if ( InitLoopEquip ) {
 				// CompNum is index to heatpump model, not tank so get the tank index
 				TankNum = HPWaterHeater( CompNum ).WaterHeaterTankNum;
@@ -1248,11 +1247,11 @@ namespace WaterThermalTanks {
 					if ( HPWaterHeaterNum <= NumPumpedCondenser ) {
 						// Pumped Condenser
 						cCurrentModuleObject = cHPWHPumpedCondenser;
-						HPWH.CondenserConfig = HPWH_CONDENSER_PUMPED;
+						HPWH.TypeNum = TypeOf_HeatPumpWtrHeaterPumped;
 					} else {
 						// Wrapped Condenser
 						cCurrentModuleObject = cHPWHWrappedCondenser;
-						HPWH.CondenserConfig = HPWH_CONDENSER_WRAPPED;
+						HPWH.TypeNum = TypeOf_HeatPumpWtrHeaterWrapped;
 					}
 					
 					// Get the lists of IDF arguments
@@ -1269,7 +1268,6 @@ namespace WaterThermalTanks {
 					// Name and type
 					HPWH.Name = cAlphaArgs( 1 );
 					HPWH.Type = cCurrentModuleObject;
-					HPWH.TypeNum = HeatPumpWaterHeater;
 					
 					// Availability Schedule
 					// convert schedule name to pointer
@@ -1307,7 +1305,7 @@ namespace WaterThermalTanks {
 						ErrorsFound = true;
 					}
 
-					if ( HPWH.CondenserConfig == HPWH_CONDENSER_PUMPED ) {
+					if ( HPWH.TypeNum == TypeOf_HeatPumpWtrHeaterPumped ) {
 						
 						// Condenser Inlet/Outlet Nodes
 						HPWH.CondWaterInletNode = GetOnlySingleNode( cAlphaArgs( 4 ), ErrorsFound, cCurrentModuleObject, HPWH.Name, NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsParent );
@@ -1323,7 +1321,7 @@ namespace WaterThermalTanks {
 							ErrorsFound = true;
 						}
 						
-					} else if ( HPWH.CondenserConfig == HPWH_CONDENSER_WRAPPED ) {
+					} else if ( HPWH.TypeNum == TypeOf_HeatPumpWtrHeaterWrapped ) {
 						
 						// Wrapped Condenser Location
 						HPWH.WrappedCondenserBottomLocation = rNumericArgs( 2 + nNumericOffset );
@@ -1469,12 +1467,12 @@ namespace WaterThermalTanks {
 					}
 					HPWH.DXCoilType = DXCoil(HPWH.DXCoilNum).DXCoilType;
 					HPWH.DXCoilTypeNum = DXCoil(HPWH.DXCoilNum).DXCoilType_Num;
-					if ( !( (HPWH.DXCoilTypeNum == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterPumped && HPWH.CondenserConfig == HPWH_CONDENSER_PUMPED) || (HPWH.DXCoilTypeNum == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterWrapped && HPWH.CondenserConfig == HPWH_CONDENSER_WRAPPED) ) ) {
+					if ( !( (HPWH.DXCoilTypeNum == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterPumped && HPWH.TypeNum == TypeOf_HeatPumpWtrHeaterPumped ) || (HPWH.DXCoilTypeNum == DataHVACGlobals::CoilDX_HeatPumpWaterHeaterWrapped && HPWH.TypeNum == TypeOf_HeatPumpWtrHeaterWrapped ) ) ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
 						std::string ExpectedCoilType;
-						if ( HPWH.CondenserConfig == HPWH_CONDENSER_PUMPED ) {
+						if ( HPWH.TypeNum == TypeOf_HeatPumpWtrHeaterPumped ) {
 							ExpectedCoilType = DataHVACGlobals::cAllCoilTypes( DataHVACGlobals::CoilDX_HeatPumpWaterHeaterPumped );
-						} else if ( HPWH.CondenserConfig == HPWH_CONDENSER_WRAPPED ) {
+						} else if ( HPWH.TypeNum == TypeOf_HeatPumpWtrHeaterWrapped ) {
 							ExpectedCoilType = DataHVACGlobals::cAllCoilTypes( DataHVACGlobals::CoilDX_HeatPumpWaterHeaterWrapped );
 						} else {
 							assert(0);
@@ -1646,7 +1644,7 @@ namespace WaterThermalTanks {
 					if ( ! lAlphaFieldBlanks( 23 + nAlphaOffset ) ) {
 						// For the inlet air mixer node, NodeConnectionType is outlet from the HPWH inlet air node
 						if ( HPWH.InletAirConfiguration == AmbientTempZoneAndOA ) {
-							HPWH.InletAirMixerNode = GetOnlySingleNode( cAlphaArgs( 23 + nAlphaOffset ), ErrorsFound, "WaterHeater:HeatPump:PumpedCondenser inlet air mixer", HPWH.Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+							HPWH.InletAirMixerNode = GetOnlySingleNode( cAlphaArgs( 23 + nAlphaOffset ), ErrorsFound, cCurrentModuleObject + " inlet air mixer", HPWH.Name, NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
 						} else {
 							ShowWarningError( cCurrentModuleObject + "=\"" + HPWH.Name + "\":" );
 							ShowContinueError( "Inlet air mixer node name specified but only required when Inlet Air Configuration is selected as Zone and OutdoorAir. Node name disregarded and simulation continues." );
@@ -3414,7 +3412,7 @@ namespace WaterThermalTanks {
 						HPWH.WHOffCycParaFracToTank = Tank.OffCycParaFracToTank;
 						HPWH.WHPLFCurve = Tank.PLFCurve;
 
-						if ( ( ( Tank.TypeNum == MixedWaterHeater ) && ( HPWH.CondenserConfig == HPWH_CONDENSER_PUMPED ) ) || ( Tank.TypeNum == StratifiedWaterHeater ) ) {
+						if ( ( ( Tank.TypeNum == MixedWaterHeater ) && ( HPWH.TypeNum == TypeOf_HeatPumpWtrHeaterPumped ) ) || ( Tank.TypeNum == StratifiedWaterHeater ) ) {
 							HPWH.TankType = Tank.Type;
 							HPWH.TankTypeNum = Tank.TypeNum;
 							// use typenum parameter to simulate heatpumpwaterheater in standard ratings procedure
@@ -3454,7 +3452,7 @@ namespace WaterThermalTanks {
 						}
 
 						// Set up the source side nodes for wrapped condensers
-						if ( HPWH.CondenserConfig == HPWH_CONDENSER_WRAPPED ) {
+						if ( HPWH.TypeNum == TypeOf_HeatPumpWtrHeaterWrapped ) {
 							if ( Tank.SourceInletNode > 0 || Tank.SourceOutletNode > 0 ) {
 								ShowSevereError( Tank.Type + " = " + Tank.Name + " has a source inlet or outlet node specified," );
 								ShowContinueError( "but it is attached to " + HPWH.Type + " = " + HPWH.Name + ", which doesn't permit source side connections." );
@@ -3508,7 +3506,7 @@ namespace WaterThermalTanks {
 						}
 						
 						// verify wrapped condenser location
-						if ( HPWH.CondenserConfig == HPWH_CONDENSER_WRAPPED ) {
+						if ( HPWH.TypeNum == TypeOf_HeatPumpWtrHeaterWrapped ) {
 							// make sure the top of the condenser is not above the tank height.
 							if ( HPWH.WrappedCondenserTopLocation > Tank.Height ) {
 								ShowSevereError( cCurrentModuleObject + " = " + HPWH.Name + ':' );
@@ -3567,7 +3565,7 @@ namespace WaterThermalTanks {
 						
 						// Nodal heat distribution fraction for stratified tank wrapped condensers
 						if ( Tank.TypeNum == StratifiedWaterHeater ) {
-							if ( HPWH.CondenserConfig == HPWH_CONDENSER_WRAPPED ) {
+							if ( HPWH.TypeNum == TypeOf_HeatPumpWtrHeaterWrapped ) {
 								if ( Tank.Shape == TankShapeHorizCylinder ) {
 									ShowWarningError( cCurrentModuleObject + " = " + HPWH.Name + ":" );
 									ShowContinueError("A wrapped condenser HPWH model should not be used with a horizontal stratified tank.");
@@ -4474,7 +4472,7 @@ namespace WaterThermalTanks {
 				// this is a heat pump water heater, need a separate block because TypeOf_HeatPumpWtrHeater shows up on Branch
 				//  (input should probably have been the associated tank )
 				errFlag = false;
-				ScanPlantLoopsForObject( HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Name, TypeOf_HeatPumpWtrHeater, WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopSide, WaterThermalTank( WaterThermalTankNum ).UseSidePlantBranchNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantCompNum, _, _, _, UseInletNode, _, errFlag );
+				ScanPlantLoopsForObject( HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).Name, HPWaterHeater( WaterThermalTank( WaterThermalTankNum ).HeatPumpNum ).TypeNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopSide, WaterThermalTank( WaterThermalTankNum ).UseSidePlantBranchNum, WaterThermalTank( WaterThermalTankNum ).UseSidePlantCompNum, _, _, _, UseInletNode, _, errFlag );
 				if ( errFlag ) {
 					ShowFatalError( "InitWaterThermalTank: Program terminated due to previous condition(s)." );
 				}
@@ -5020,7 +5018,7 @@ namespace WaterThermalTanks {
 			if ( OutletAirSplitterNode > 0 ) Node( OutletAirSplitterNode ).MassFlowRate = 0.0;
 			//these are water nodes are not managed by plant. the HP connects
 			// directly to the WH without using plant. will not change this code for DSU because of this
-			if ( HPWaterHeater(HPNum).CondenserConfig == HPWH_CONDENSER_PUMPED ) {
+			if ( HPWaterHeater(HPNum).TypeNum == TypeOf_HeatPumpWtrHeaterPumped ) {
 				Node( HPWaterInletNode ).MassFlowRate = 0.0;
 				Node( HPWaterOutletNode ).MassFlowRate = 0.0;
 			}
@@ -6000,7 +5998,7 @@ namespace WaterThermalTanks {
 		Real64 Eneeded; // Energy change needed over the timestep (J)
 		Real64 Eunmet; // Energy change unmet over the timestep (J)
 		Real64 Efuel; // Energy change for fuel consumed over the timestep (J)
-		HeatPumpWaterHeaterCondenserConfiguration HPWHCondenserConfig( HPWH_CONDENSER_NOT_CONFIGURED ); // Condenser configuration of HPWH
+		int HPWHCondenserConfig; // Condenser configuration of HPWH
 		bool SetPointRecovered; // Flag to indicate when set point is recovered for the first time
 		static int DummyWaterIndex( 1 );
 
@@ -6037,10 +6035,10 @@ namespace WaterThermalTanks {
 
 		// Calculate the heating rate from the heat pump.
 		if ( Tank.HeatPumpNum > 0 ) {
-			HeatPumpWaterHeaterData const &HeatPump = HPWaterHeater(Tank.HeatPumpNum);
-			DXCoils::DXCoilData const &Coil = DXCoils::DXCoil( HeatPump.DXCoilNum );
-			HPWHCondenserConfig = HeatPump.CondenserConfig;
-			if ( HeatPump.Mode == HeatMode ) {
+			HeatPumpWaterHeaterData const &HPWH = HPWaterHeater(Tank.HeatPumpNum);
+			DXCoils::DXCoilData const &Coil = DXCoils::DXCoil( HPWH.DXCoilNum );
+			HPWHCondenserConfig = HPWH.TypeNum;
+			if ( HPWH.Mode == HeatMode ) {
 				Qheatpump = Coil.TotalHeatingEnergyRate;
 			}
 		}
@@ -6294,7 +6292,7 @@ namespace WaterThermalTanks {
 		}
 		NodeNum = Tank.SourceOutletStratNode;
 		if ( NodeNum > 0 ) Tank.SourceOutletTemp = Tank.Node( NodeNum ).TempAvg;
-		if ( Tank.HeatPumpNum > 0 && HPWHCondenserConfig == HPWH_CONDENSER_PUMPED && SourceMassFlowRate > 0.0 ) {
+		if ( Tank.HeatPumpNum > 0 && HPWHCondenserConfig == TypeOf_HeatPumpWtrHeaterPumped && SourceMassFlowRate > 0.0 ) {
 			Tank.SourceInletTemp = Tank.SourceOutletTemp + Qheatpump / ( SourceMassFlowRate * Cp );
 		} else {
 			Tank.SourceInletTemp = Tank.SourceOutletTemp;
@@ -9334,7 +9332,7 @@ namespace WaterThermalTanks {
 					MdotWater = HPWaterHeater( HPNum ).OperatingWaterFlowRate * RhoH2O( WaterThermalTank( WaterThermalTankNum ).TankTemp );
 					MdotAir = HPWaterHeater( HPNum ).OperatingAirFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, WaterThermalTank( WaterThermalTankNum ).AmbientTemp, AmbientHumRat );
 					
-					if ( HPWaterHeater(HPNum).CondenserConfig == HPWH_CONDENSER_PUMPED ){
+					if ( HPWaterHeater(HPNum).TypeNum == TypeOf_HeatPumpWtrHeaterPumped ){
 						// set the condenser inlet node mass flow rate and temperature
 						Node( HPWaterHeater( HPNum ).CondWaterInletNode ).MassFlowRate = MdotWater;
 						Node( HPWaterHeater( HPNum ).CondWaterInletNode ).Temp = WaterThermalTank( WaterThermalTankNum ).TankTemp;

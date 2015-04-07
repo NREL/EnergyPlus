@@ -190,7 +190,8 @@ namespace DataPlant {
 	extern int const TypeOf_CoolingTower_TwoSpd;
 	extern int const TypeOf_CoolingTower_VarSpd;
 	extern int const TypeOf_Generator_FCExhaust;
-	extern int const TypeOf_HeatPumpWtrHeater;
+	extern int const TypeOf_HeatPumpWtrHeaterPumped;
+	extern int const TypeOf_HeatPumpWtrHeaterWrapped;
 	extern int const TypeOf_HPWaterEFCooling;
 	extern int const TypeOf_HPWaterEFHeating;
 	extern int const TypeOf_HPWaterPECooling;

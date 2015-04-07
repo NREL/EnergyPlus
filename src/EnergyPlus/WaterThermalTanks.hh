@@ -52,7 +52,6 @@ namespace WaterThermalTanks {
 	// integer parameter for water heater
 	extern int const MixedWaterHeater; // WaterHeater:Mixed
 	extern int const StratifiedWaterHeater; // WaterHeater:Stratified
-	extern int const HeatPumpWaterHeater; // WaterHeater:HeatPump:PumpedCondenser
 	//stovall, next line never used because all desuperheater coils used in mixed water heater types
 	extern int const CoilWaterDesuperHeater; // Coil:WaterHeating:Desuperheater
 	extern int const MixedChilledWaterStorage; // 'ThermalStorage:ChilledWater:Mixed'
@@ -1031,12 +1030,6 @@ namespace WaterThermalTanks {
 
 	};
 
-	enum HeatPumpWaterHeaterCondenserConfiguration {
-		HPWH_CONDENSER_NOT_CONFIGURED,
-		HPWH_CONDENSER_PUMPED,
-		HPWH_CONDENSER_WRAPPED
-	};
-	
 	struct HeatPumpWaterHeaterData
 	{
 		// Members
@@ -1076,9 +1069,9 @@ namespace WaterThermalTanks {
 		int WHUseOutletNode; // Water heater tank use side outlet node
 		int WHUseSidePlantLoopNum; // if not zero, then this water heater is on plant loop #
 		std::string DXCoilType; // Type of DX coil (Coil:DX:HeatPumpWaterHeater)
-		int DXCoilTypeNum; // Type Number of DX coil
 		std::string DXCoilName; // Name of DX coil
 		int DXCoilNum; // Index of DX coil
+		int DXCoilTypeNum; // Type Number of DX coil
 		int DXCoilAirInletNode; // Inlet air node number of DX coil
 		int DXCoilPLFFPLR; // Index to HPWH's DX Coil PLF as a function of PLR curve
 		std::string FanType; // Type of Fan (Fan:OnOff)
@@ -1132,7 +1125,6 @@ namespace WaterThermalTanks {
 		Real64 HPWaterHeaterSensibleCapacity; // sensible capacity delivered when HPWH is attached to a zone (W)
 		Real64 HPWaterHeaterLatentCapacity; // latent capacity delivered when HPWH is attached to a zone (kg/s)
 		int ControlSensorLocation; // if using stratified tank, indicates control point
-		HeatPumpWaterHeaterCondenserConfiguration CondenserConfig; // whether this is a pumped or wrapped condenser object
 		Real64 WrappedCondenserBottomLocation; // Location of the bottom of the wrapped condenser.
 		Real64 WrappedCondenserTopLocation; // Location of the top of the wrapped condenser.
 		
@@ -1223,7 +1215,6 @@ namespace WaterThermalTanks {
 			HPWaterHeaterSensibleCapacity( 0.0 ),
 			HPWaterHeaterLatentCapacity( 0.0 ),
 			ControlSensorLocation( HPWHControlNotSet ),
-			CondenserConfig( HPWH_CONDENSER_NOT_CONFIGURED ),
 			WrappedCondenserBottomLocation( 0.0 ),
 			WrappedCondenserTopLocation( 0.0 )
 		{}
@@ -1322,7 +1313,6 @@ namespace WaterThermalTanks {
 			Real64 const HPWaterHeaterSensibleCapacity, // sensible capacity delivered when HPWH is attached to a zone (W)
 			Real64 const HPWaterHeaterLatentCapacity, // latent capacity delivered when HPWH is attached to a zone (kg/s)
 			int const ControlSensorLocation, // if using stratified tank, indicates control point
-			HeatPumpWaterHeaterCondenserConfiguration const CondenserConfig, // whether this is a pumped or wrapped condenser object
 			Real64 WrappedCondenserBottomLocation,
 			Real64 WrappedCondenserTopLocation
 		) :
@@ -1418,7 +1408,6 @@ namespace WaterThermalTanks {
 			HPWaterHeaterSensibleCapacity( HPWaterHeaterSensibleCapacity ),
 			HPWaterHeaterLatentCapacity( HPWaterHeaterLatentCapacity ),
 			ControlSensorLocation( ControlSensorLocation ),
-			CondenserConfig( CondenserConfig ),
 			WrappedCondenserBottomLocation( WrappedCondenserBottomLocation ),
 			WrappedCondenserTopLocation( WrappedCondenserTopLocation )
 		{}
