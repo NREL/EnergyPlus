@@ -4433,2351 +4433,2499 @@ For autosizing to occur at the component level the user must enter the special v
 
 Table 22. Details of Autosizable Objects/Fields
 
-Component / Object Name
 
-Autosizable Fields
+<table>
+  <tr>
+    <th>Component / Object Name</th>
+    <th>Autosizable Fields</th>
+  </tr>
+  <tr>
+    <td colspan="2">AirConditioner:VariableRefrigerantFlow</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Gross Rated Total Cooling Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Gross Rated Heating Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Resistive Defrost Heater Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Water Condenser Volume Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Evaporative Condenser Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Evaporative Condenser Pump Rated Power Consumption</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirLoopHVAC</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirLoopHVAC:Unitary:Furnace:HeatCool</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Supply Air Temperature</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Load Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirLoopHVAC:Unitary:Furnace:HeatOnly</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Supply Air Temperature</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirLoopHVAC:UnitaryHeatCool</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Supply Air Temperature</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Load Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling System Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating System Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Load System Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Load Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirLoopHVAC:UnitaryHeatOnly</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Supply Air Temperature</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirLoopHVAC:UnitaryHeatPump:AirToAir</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Load Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Supply Air Temperature from Supplemental Heater</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Supply Air Temperature from Supplemental Heater</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Load Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Speed 1 Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Speed 2 Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Speed 3 Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Speed 4 Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Speed 1 Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Speed 2 Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Speed 3 Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Speed 4 Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirLoopHVAC:UnitaryHeatPump:WaterToAir</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Supply Air Temperature from Supplemental Heater</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirLoopHVAC:UnitarySystem</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Load Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Supply Air Temperature</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirTerminal:DualDuct:ConstantVolume</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirTerminal:DualDuct:VAV</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Damper Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirTerminal:DualDuct:VAV:OutdoorAir</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Terminal Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirTerminal:SingleDuct:ConstantVolume:CooledBeam</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supply Air Volumetric Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Total Chilled Water Volumetric Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Number of Beams</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Beam Length</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Total Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Hot Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Cold Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirTerminal:SingleDuct:ConstantVolume:Reheat</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Hot Water or Steam Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirTerminal:SingleDuct:ParallelPIU:Reheat</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Primary Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Secondary Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Minimum Primary Air Flow Fraction</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Fan On Flow Fraction</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Hot Water or Steam Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirTerminal:SingleDuct:SeriesPIU:Reheat</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Primary Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Minimum Primary Air Flow Fraction</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Hot Water or Steam Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirTerminal:SingleDuct:Uncontrolled</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Hot Water or Steam Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirTerminal:SingleDuct:VAV:NoReheat</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirTerminal:SingleDuct:VAV:Reheat</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Hot Water or Steam Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Cooling Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Heating Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Hot Water or Steam Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">Boiler:HotWater</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">Boiler:Steam</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">Branch</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">Chiller:Absorption</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Nominal Pumping Power</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Chilled Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Condenser Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Generator Fluid Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">Chiller:Absorption:Indirect</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Nominal Pumping Power</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Chilled Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Condenser Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Generator Fluid Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">Chiller:CombustionTurbine</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Chilled Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Condenser Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Gas Turbine Engine Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">Chiller:ConstantCOP</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Chilled Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Condenser Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">Chiller:Electric</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Chilled Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Condenser Fluid Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Heat Recovery Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">Chiller:Electric:EIR</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Reference Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Reference Chilled Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Reference Condenser Fluid Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Heat Recovery Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">Chiller:Electric:ReformulatedEIR</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Reference Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Reference Chilled Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Reference Condenser Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Heat Recovery Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">Chiller:EngineDriven</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Chilled Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Condenser Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">ChillerHeater:Absorption:DirectFired</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Nominal Cooling Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Chilled Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Condenser Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Hot Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">ChillerHeater:Absorption:DoubleEffect</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Nominal Cooling Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Chilled Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Condenser Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Hot Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">ChillerHeaterPerformance:Electric:EIR</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Reference Cooling Mode Evaporator Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Chilled Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Condenser Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">Coil:Cooling:DX:MultiSpeed</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 1 Gross Rated Total Cooling Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 1 Gross Rated Sensible Heat Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 1 Rated Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 1 Evaporative Condenser Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 1 Rated Evaporative Condenser Pump Power Consumption</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 2 Gross Rated Total Cooling Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 2 Gross Rated Sensible Heat Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 2 Rated Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 2 Evaporative Condenser Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 2 Rated Evaporative Condenser Pump Power Consumption</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 3 Gross Rated Total Cooling Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 3 Gross Rated Sensible Heat Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 3 Rated Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 3 Evaporative Condenser Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 3 Rated Evaporative Condenser Pump Power Consumption</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 4 Gross Rated Total Cooling Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 4 Gross Rated Sensible Heat Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 4 Rated Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 4 Evaporative Condenser Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 4 Rated Evaporative Condenser Pump Power Consumption</td>
+  </tr>
+  <tr>
+    <td colspan="2">Coil:Cooling:DX:SingleSpeed</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Gross Rated Total Cooling Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Gross Rated Sensible Heat Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Evaporative Condenser Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Evaporative Condenser Pump Rated Power Consumption</td>
+  </tr>
+  <tr>
+    <td colspan="2">Coil:Cooling:DX:SingleSpeed:ThermalStorage</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Evaporator Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Only Mode Rated Total Evaporator Cooling Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Evaporative Condenser Pump Rated Power Consumption</td>
+  </tr>
+  <tr>
+    <th colspan="2">Coil:Cooling:DX:TwoSpeed</th>
+  </tr>
+  <tr>
+    <td></td>
+    <td>High Speed Gross Rated Total Cooling Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>High Speed Rated Sensible Heat Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>High Speed Rated Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Low Speed Gross Rated Total Cooling Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Low Speed Gross Rated Sensible Heat Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Low Speed Rated Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>High Speed Evaporative Condenser Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>High Speed Evaporative Condenser Pump Rated Power Consumption</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Low Speed Evaporative Condenser Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Low Speed Evaporative Condenser Pump Rated Power Consumption</td>
+  </tr>
+  <tr>
+    <td colspan="2">Coil:Cooling:DX:VariableRefrigerantFlow</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Gross Rated Total Cooling Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Gross Rated Sensible Heat Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">Coil:Cooling:DX:VariableSpeed</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Gross Rated Total Cooling Capacity At Selected Nominal Speed Level</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Air Flow Rate At Selected Nominal Speed Level</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Evaporative Condenser Pump Rated Power Consumption</td>
+  </tr>
+  <tr>
+    <td colspan="2">Coil:Cooling:Water</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Inlet Water Temperature</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Inlet Air Temperature</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Outlet Air Temperature</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Inlet Air Humidity Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Outlet Air Humidity Ratio</td>
+  </tr>
+  <tr>
+    <td colspan="2">Coil:Cooling:Water:DetailedGeometry</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Tube Outside Surface Area</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Total Tube Inside Area</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Fin Surface Area</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Minimum Airflow Area</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Coil Depth</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Fin Diameter</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Number of Tubes per Row</td>
+  </tr>
+  <tr>
+    <td colspan="2">Coil:Cooling:WaterToAirHeatPump:EquationFit</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Gross Rated Total Cooling Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Gross Rated Sensible Cooling Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Gross Rated Total Cooling Capacity At Selected Nominal Speed Level</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Air Flow Rate At Selected Nominal Speed Level</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Water Flow Rate At Selected Nominal Speed Level</td>
+  </tr>
+  <tr>
+    <td colspan="2">Coil:Heating:DX:MultiSpeed</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Resistive Defrost Heater Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 1 Gross Rated Heating Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 1 Rated Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 2 Gross Rated Heating Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 2 Rated Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 3 Gross Rated Heating Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 3 Rated Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 4 Gross Rated Heating Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Speed 4 Rated Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">Coil:Heating:DX:SingleSpeed</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Gross Rated Heating Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Resistive Defrost Heater Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">Coil:Heating:DX:VariableRefrigerantFlow</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Gross Rated Heating Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">Coil:Heating:DX:VariableSpeed</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Heating Capacity At Selected Nominal Speed Level</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Air Flow Rate At Selected Nominal Speed Level</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Resistive Defrost Heater Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">Coil:Heating:Electric</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">Coil:Heating:Electric:MultiStage</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Stage 1 Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Stage 2 Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Stage 3 Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Stage 4 Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">Coil:Heating:Gas</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">Coil:Heating:Gas:MultiStage</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Stage 1 Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Stage 2 Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Stage 3 Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Stage 4 Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">Coil:Heating:Steam</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Steam Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">Coil:Heating:Water</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>U-Factor Times Area Value</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">Coil:Heating:WaterToAirHeatPump:EquationFit</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Gross Rated Heating Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Heating Capacity At Selected Nominal Speed Level</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Air Flow Rate At Selected Nominal Speed Level</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Water Flow Rate At Selected Nominal Speed Level</td>
+  </tr>
+  <tr>
+    <td colspan="2">CoilPerformance:DX:Cooling</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Gross Rated Total Cooling Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Gross Rated Sensible Heat Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Evaporative Condenser Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Evaporative Condenser Pump Rated Power Consumption</td>
+  </tr>
+  <tr>
+    <td colspan="2">CondenserLoop</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Loop Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">Controller:OutdoorAir</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Minimum Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">Controller:WaterCoil</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Controller Convergence Tolerance</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Actuated Flow</td>
+  </tr>
+  <tr>
+    <td colspan="2">CoolingTower:SingleSpeed</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Fan Power</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design U-Factor Times Area Value</td>
+  </tr>
+  <tr>
+    <td colspan="2">CoolingTower:TwoSpeed</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>High Fan Speed Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>High Fan Speed Fan Power</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>High Fan Speed U-Factor Times Area Value</td>
+  </tr>
+  <tr>
+    <td colspan="2">CoolingTower:VariableSpeed</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Fan Power</td>
+  </tr>
+  <tr>
+    <td colspan="2">CoolingTower:VariableSpeed:Merkel</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Air Flow Rate U-Factor Times Area Value</td>
+  </tr>
+  <tr>
+    <td colspan="2">EvaporativeCooler:Indirect:ResearchSpecial</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Secondary Fan Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">EvaporativeFluidCooler:SingleSpeed</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Air Flow Rate Fan Power</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Air Flow Rate U-factor Times Area Value</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">EvaporativeFluidCooler:TwoSpeed</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>High Fan Speed Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>High Fan Speed Fan Power</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>High Fan Speed U-factor Times Area Value</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">Fan:ComponentModel</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Minimum Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Motor Fan Pulley Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Belt Maximum Torque</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Motor Output Power</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum VFD Output Power</td>
+  </tr>
+  <tr>
+    <td colspan="2">Fan:ConstantVolume</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">Fan:OnOff</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">FanPerformance:NightVentilation</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">Fan:VariableVolume</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">FluidCooler:SingleSpeed</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Air Flow Rate U-factor Times Area Value</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Air Flow Rate Fan Power</td>
+  </tr>
+  <tr>
+    <td colspan="2">FluidCooler:TwoSpeed</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>High Fan Speed U-factor Times Area Value</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>High Fan Speed Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>High Fan Speed Fan Power</td>
+  </tr>
+  <tr>
+    <td colspan="2">HeaderedPumps:ConstantSpeed</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Total Rated Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Power Consumption</td>
+  </tr>
+  <tr>
+    <td colspan="2">HeaderedPumps:VariableSpeed</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Total Rated Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Power Consumption</td>
+  </tr>
+  <tr>
+    <td colspan="2">HeatExchanger:AirToAir:SensibleAndLatent</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Nominal Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">HeatExchanger:FluidToFluid</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Loop Demand Side Design Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Loop Supply Side Design Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heat Exchanger U-Factor Times Area Value</td>
+  </tr>
+  <tr>
+    <td colspan="2">Humidifier:Steam:Electric</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Power</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:Plant:Boiler</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:Plant:Chiller</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:Plant:Tower</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>High Speed Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>High Speed Fan Power</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Low Speed Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Low Speed Fan Power</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Free Convection Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:System:ConstantVolume</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supply Fan Maximum Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Coil Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Minimum Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Humidifier Rated Electric Power</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:System:DedicatedOutdoorAir</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supply Fan Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>DX Cooling Coil Gross Rated Total Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>DX Cooling Coil Gross Rated Sensible Heat Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Humidifier Rated Electric Power</td>
+  </tr>
+  <tr>
+    <th colspan="2">HVACTemplate:System:DualDuct</th>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Main Supply Fan Maximum Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cold Duct Supply Fan Maximum Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Hot Duct Supply Fan Maximum Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Coil Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Minimum Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Humidifier Rated Electric Power</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:System:PackagedVAV</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supply Fan Maximum Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supply Fan Minimum Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Coil Gross Rated Total Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Coil Gross Rated Sensible Heat Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Coil Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Minimum Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Humidifier Rated Electric Power</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:System:Unitary</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supply Fan Maximum Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Coil Gross Rated Total Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Coil Gross Rated Sensible Heat Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Coil Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Minimum Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Humidifier Rated Electric Power</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:System:UnitaryHeatPump:AirToAir</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Load Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Coil Gross Rated Total Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Coil Gross Rated Sensible Heat Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heat Pump Heating Coil Gross Rated Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supplemental Heating Coil Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Minimum Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Humidifier Rated Electric Power</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:System:UnitarySystem</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Load Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>DX Cooling Coil Gross Rated Total Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>DX Cooling Coil Gross Rated Sensible Heat Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Coil Gross Rated Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supplemental Heating or Reheat Coil Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Minimum Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Humidifier Rated Electric Power</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:System:VAV</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supply Fan Maximum Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supply Fan Minimum Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Minimum Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Humidifier Rated Electric Power</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:System:VRF</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Gross Rated Total Cooling Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Gross Rated Heating Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Resistive Defrost Heater Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Water Condenser Volume Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Evaporative Condenser Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Evaporative Condenser Pump Rated Power Consumption</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:Zone:BaseboardHeat</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Baseboard Heating Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:Zone:ConstantVolume</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supply Air Maximum Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Baseboard Heating Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:Zone:DualDuct</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supply Air Maximum Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Baseboard Heating Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:Zone:FanCoil</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supply Air Maximum Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Baseboard Heating Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:Zone:IdealLoadsAirSystem</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Heating Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Sensible Heating Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Cooling Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Total Cooling Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:Zone:PTAC</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Load Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Coil Gross Rated Total Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Coil Gross Rated Sensible Heat Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Coil Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Baseboard Heating Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:Zone:PTHP</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Load Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Coil Gross Rated Total Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Coil Gross Rated Sensible Heat Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heat Pump Heating Coil Gross Rated Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supplemental Heating Coil Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Baseboard Heating Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:Zone:Unitary</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supply Air Maximum Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Baseboard Heating Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:Zone:VAV</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supply Air Maximum Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Baseboard Heating Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:Zone:VAV:FanPowered</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Primary Supply Air Maximum Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Primary Supply Air Minimum Flow Fraction</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Secondary Supply Air Maximum Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Parallel Fan On Flow Fraction</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Baseboard Heating Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:Zone:VAV:HeatAndCool</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supply Air Maximum Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Baseboard Heating Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:Zone:VRF</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Cooling Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Heating Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Load Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Coil Gross Rated Total Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Coil Gross Rated Sensible Heat Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heat Pump Heating Coil Gross Rated Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Baseboard Heating Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">HVACTemplate:Zone:WaterToAirHeatPump</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Load Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Coil Gross Rated Total Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Coil Gross Rated Sensible Heat Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heat Pump Heating Coil Gross Rated Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supplemental Heating Coil Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Baseboard Heating Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">PlantComponent:TemperatureSource</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Volume Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">PlantEquipmentOperation:ComponentSetpoint</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Component 1 Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Component 2 Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Component 3 Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Component 4 Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Component 5 Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Component 6 Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Component 7 Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Component 8 Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Component 9 Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Component 10 Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">PlantLoop</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Loop Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">Pump:ConstantSpeed</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Power Consumption</td>
+  </tr>
+  <tr>
+    <td colspan="2">Pump:VariableSpeed</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Power Consumption</td>
+  </tr>
+  <tr>
+    <td colspan="2">Pump:VariableSpeed:Condensate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Power Consumption</td>
+  </tr>
+  <tr>
+    <td colspan="2">Sizing:System</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">SolarCollector:FlatPlate:PhotovoltaicThermal</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">ThermalStorage:ChilledWater:Mixed</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Use Side Design Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Source Side Design Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">ThermalStorage:ChilledWater:Stratified</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Use Side Design Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Source Side Design Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">UnitarySystemPerformance:HeatPump:Multispeed</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Speed 1 Supply Air Flow Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Speed 1 Supply Air Flow Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Speed 2 Supply Air Flow Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Speed 2 Supply Air Flow Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Speed 3 Supply Air Flow Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Speed 3 Supply Air Flow Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Speed 4 Supply Air Flow Ratio</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Speed 4 Supply Air Flow Ratio</td>
+  </tr>
+  <tr>
+    <td colspan="2">WaterHeater:Mixed</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Tank Volume</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heater Maximum Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Use Side Design Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Source Side Design Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">WaterHeater:Stratified</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Tank Volume</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Tank Height</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heater 1 Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Use Side Design Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Source Side Design Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">ZoneHVAC:Baseboard:Convective:Electric</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">ZoneHVAC:Baseboard:Convective:Water</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>U-Factor Times Area Value</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">ZoneHVAC:Baseboard:RadiantConvective:Electric</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Nominal Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">ZoneHVAC:Baseboard:RadiantConvective:Steam</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Steam Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">ZoneHVAC:Baseboard:RadiantConvective:Water</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Rated Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">ZoneHVAC:EnergyRecoveryVentilator</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Exhaust Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">ZoneHVAC:EvaporativeCoolerUnit</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Design Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <th colspan="2">ZoneHVAC:FourPipeFanCoil</th>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Cold Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Hot Water Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">ZoneHVAC:HighTemperatureRadiant</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Power Input</td>
+  </tr>
+  <tr>
+    <td colspan="2">ZoneHVAC:IdealLoadsAirSystem</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Heating Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Sensible Heating Capacity</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Cooling Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Total Cooling Capacity</td>
+  </tr>
+  <tr>
+    <td colspan="2">ZoneHVAC:LowTemperatureRadiant:Electric</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Electrical Power to Panel</td>
+  </tr>
+  <tr>
+    <td colspan="2">ZoneHVAC:LowTemperatureRadiant:VariableFlow</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Hydronic Tubing Length</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Hot Water Flow</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Cold Water Flow</td>
+  </tr>
+  <tr>
+    <td colspan="2">ZoneHVAC:OutdoorAirUnit</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Exhaust Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">ZoneHVAC:PackagedTerminalAirConditioner</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Load Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Load Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">ZoneHVAC:PackagedTerminalHeatPump</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Load Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Load Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Supply Air Temperature from Supplemental Heater</td>
+  </tr>
+  <tr>
+    <td colspan="2">ZoneHVAC:TerminalUnit:VariableRefrigerantFlow</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Cooling Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Heating Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Load Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">ZoneHVAC:UnitHeater</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Hot Water or Steam Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">ZoneHVAC:UnitVentilator</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Minimum Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">ZoneHVAC:VentilatedSlab</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Minimum Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td colspan="2">ZoneHVAC:WaterToAirHeatPump</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Load Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cooling Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Heating Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>No Load Outdoor Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Supply Air Temperature from Supplemental Heater</td>
+  </tr>
+  <tr>
+    <td colspan="2">ZoneHVAC:WindowAirConditioner</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Supply Air Flow Rate</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Maximum Outdoor Air Flow Rate</td>
+  </tr>
+</table>
 
-**AirConditioner:VariableRefrigerantFlow**
-
-
-
-Gross Rated Total Cooling Capacity
-
-
-
-Gross Rated Heating Capacity
-
-
-
-Resistive Defrost Heater Capacity
-
-
-
-Water Condenser Volume Flow Rate
-
-
-
-Evaporative Condenser Air Flow Rate
-
-
-
-Evaporative Condenser Pump Rated Power Consumption
-
-**AirLoopHVAC**
-
-
-
-Design Supply Air Flow Rate
-
-**AirLoopHVAC:Unitary:Furnace:HeatCool**
-
-
-
-Maximum Supply Air Temperature
-
-
-
-Supply Air Flow Rate During Cooling Operation
-
-
-
-Supply Air Flow Rate During Heating Operation
-
-
-
-Supply Air Flow Rate When No Cooling or Heating is Needed
-
-**AirLoopHVAC:Unitary:Furnace:HeatOnly**
-
-
-
-Maximum Supply Air Temperature
-
-
-
-Supply Air Flow Rate
-
-**AirLoopHVAC:UnitaryHeatCool**
-
-
-
-Maximum Supply Air Temperature
-
-
-
-Supply Air Flow Rate During Cooling Operation
-
-
-
-Supply Air Flow Rate During Heating Operation
-
-
-
-Supply Air Flow Rate When No Cooling or Heating is Needed
-
-**AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass**
-
-
-
-System Air Flow Rate During Cooling Operation
-
-
-
-System Air Flow Rate During Heating Operation
-
-
-
-System Air Flow Rate When No Cooling or Heating is Needed
-
-
-
-Outdoor Air Flow Rate During Cooling Operation
-
-
-
-Outdoor Air Flow Rate During Heating Operation
-
-
-
-Outdoor Air Flow Rate When No Cooling or Heating is Needed
-
-**AirLoopHVAC:UnitaryHeatOnly**
-
-
-
-Maximum Supply Air Temperature
-
-
-
-Supply Air Flow Rate
-
-**AirLoopHVAC:UnitaryHeatPump:AirToAir**
-
-
-
-Supply Air Flow Rate During Cooling Operation
-
-
-
-Supply Air Flow Rate During Heating Operation
-
-
-
-Supply Air Flow Rate When No Cooling or Heating is Needed
-
-
-
-Maximum Supply Air Temperature from Supplemental Heater
-
-**AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed**
-
-
-
-Maximum Supply Air Temperature from Supplemental Heater
-
-
-
-Supply Air Flow Rate When No Cooling or Heating is Needed
-
-
-
-Speed 1 Supply Air Flow Rate During Heating Operation
-
-
-
-Speed 2 Supply Air Flow Rate During Heating Operation
-
-
-
-Speed 3 Supply Air Flow Rate During Heating Operation
-
-
-
-Speed 4 Supply Air Flow Rate During Heating Operation
-
-
-
-Speed 1 Supply Air Flow Rate During Cooling Operation
-
-
-
-Speed 2 Supply Air Flow Rate During Cooling Operation
-
-
-
-Speed 3 Supply Air Flow Rate During Cooling Operation
-
-
-
-Speed 4 Supply Air Flow Rate During Cooling Operation
-
-**AirLoopHVAC:UnitaryHeatPump:WaterToAir**
-
-
-
-Supply Air Flow Rate
-
-
-
-Maximum Supply Air Temperature from Supplemental Heater
-
-**AirLoopHVAC:UnitarySystem**
-
-
-
-Supply Air Flow Rate During Cooling Operation
-
-
-
-Supply Air Flow Rate During Heating Operation
-
-
-
-Supply Air Flow Rate When No Cooling or Heating is Required
-
-
-
-Maximum Supply Air Temperature
-
-**AirTerminal:DualDuct:ConstantVolume**
-
-
-
-Maximum Air Flow Rate
-
-**AirTerminal:DualDuct:VAV**
-
-
-
-Maximum Damper Air Flow Rate
-
-**AirTerminal:DualDuct:VAV:OutdoorAir**
-
-
-
-Maximum Terminal Air Flow Rate
-
-**AirTerminal:SingleDuct:ConstantVolume:CooledBeam**
-
-
-
-Supply Air Volumetric Flow Rate
-
-
-
-Maximum Total Chilled Water Volumetric Flow Rate
-
-
-
-Number of Beams
-
-
-
-Beam Length
-
-**AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction**
-
-
-
-Maximum Total Air Flow Rate
-
-
-
-Maximum Hot Water Flow Rate
-
-
-
-Maximum Cold Water Flow Rate
-
-**AirTerminal:SingleDuct:ConstantVolume:Reheat**
-
-
-
-Maximum Air Flow Rate
-
-
-
-Maximum Hot Water or Steam Flow Rate
-
-**AirTerminal:SingleDuct:ParallelPIU:Reheat**
-
-
-
-Maximum Primary Air Flow Rate
-
-
-
-Maximum Secondary Air Flow Rate
-
-
-
-Minimum Primary Air Flow Fraction
-
-
-
-Fan On Flow Fraction
-
-
-
-Maximum Hot Water or Steam Flow Rate
-
-**AirTerminal:SingleDuct:SeriesPIU:Reheat**
-
-
-
-Maximum Air Flow Rate
-
-
-
-Maximum Primary Air Flow Rate
-
-
-
-Minimum Primary Air Flow Fraction
-
-
-
-Maximum Hot Water or Steam Flow Rate
-
-**AirTerminal:SingleDuct:Uncontrolled**
-
-
-
-Maximum Air Flow Rate
-
-**AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat**
-
-
-
-Maximum Air Flow Rate
-
-**AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat**
-
-
-
-Maximum Air Flow Rate
-
-
-
-Maximum Hot Water or Steam Flow Rate
-
-**AirTerminal:SingleDuct:VAV:NoReheat**
-
-
-
-Maximum Air Flow Rate
-
-**AirTerminal:SingleDuct:VAV:Reheat**
-
-
-
-Maximum Air Flow Rate
-
-
-
-Maximum Hot Water or Steam Flow Rate
-
-**AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan**
-
-
-
-Maximum Cooling Air Flow Rate
-
-
-
-Maximum Heating Air Flow Rate
-
-
-
-Maximum Hot Water or Steam Flow Rate
-
-**Boiler:HotWater**
-
-
-
-Nominal Capacity
-
-
-
-Design Water Flow Rate
-
-**Boiler:Steam**
-
-
-
-Nominal Capacity
-
-**Branch**
-
-
-
-Maximum Flow Rate
-
-**Chiller:Absorption**
-
-
-
-Nominal Capacity
-
-
-
-Nominal Pumping Power
-
-
-
-Design Chilled Water Flow Rate
-
-
-
-Design Condenser Water Flow Rate
-
-
-
-Design Generator Fluid Flow Rate
-
-**Chiller:Absorption:Indirect**
-
-
-
-Nominal Capacity
-
-
-
-Nominal Pumping Power
-
-
-
-Design Chilled Water Flow Rate
-
-
-
-Design Condenser Water Flow Rate
-
-
-
-Design Generator Fluid Flow Rate
-
-**Chiller:CombustionTurbine**
-
-
-
-Nominal Capacity
-
-
-
-Design Chilled Water Flow Rate
-
-
-
-Design Condenser Water Flow Rate
-
-
-
-Gas Turbine Engine Capacity
-
-**Chiller:ConstantCOP**
-
-
-
-Nominal Capacity
-
-
-
-Design Chilled Water Flow Rate
-
-
-
-Design Condenser Water Flow Rate
-
-**Chiller:Electric**
-
-
-
-Nominal Capacity
-
-
-
-Design Chilled Water Flow Rate
-
-
-
-Design Condenser Fluid Flow Rate
-
-
-
-Design Heat Recovery Water Flow Rate
-
-**Chiller:Electric:EIR**
-
-
-
-Reference Capacity
-
-
-
-Reference Chilled Water Flow Rate
-
-
-
-Reference Condenser Fluid Flow Rate
-
-
-
-Design Heat Recovery Water Flow Rate
-
-**Chiller:Electric:ReformulatedEIR**
-
-
-
-Reference Capacity
-
-
-
-Reference Chilled Water Flow Rate
-
-
-
-Reference Condenser Water Flow Rate
-
-
-
-Design Heat Recovery Water Flow Rate
-
-**Chiller:EngineDriven**
-
-
-
-Nominal Capacity
-
-
-
-Design Chilled Water Flow Rate
-
-
-
-Design Condenser Water Flow Rate
-
-**ChillerHeater:Absorption:DirectFired**
-
-
-
-Nominal Cooling Capacity
-
-
-
-Design Chilled Water Flow Rate
-
-
-
-Design Condenser Water Flow Rate
-
-
-
-Design Hot Water Flow Rate
-
-**ChillerHeater:Absorption:DoubleEffect**
-
-
-
-Nominal Cooling Capacity
-
-
-
-Design Chilled Water Flow Rate
-
-
-
-Design Condenser Water Flow Rate
-
-
-
-Design Hot Water Flow Rate
-
-**ChillerHeaterPerformance:Electric:EIR**
-
-
-
-Reference Cooling Mode Evaporator Capacity
-
-
-
-Design Chilled Water Flow Rate
-
-
-
-Design Condenser Water Flow Rate
-
-**Coil:Cooling:DX:MultiSpeed**
-
-
-
-Speed 1 Gross Rated Total Cooling Capacity
-
-
-
-Speed 1 Gross Rated Sensible Heat Ratio
-
-
-
-Speed 1 Rated Air Flow Rate
-
-
-
-Speed 1 Evaporative Condenser Air Flow Rate
-
-
-
-Speed 1 Rated Evaporative Condenser Pump Power Consumption
-
-
-
-Speed 2 Gross Rated Total Cooling Capacity
-
-
-
-Speed 2 Gross Rated Sensible Heat Ratio
-
-
-
-Speed 2 Rated Air Flow Rate
-
-
-
-Speed 2 Evaporative Condenser Air Flow Rate
-
-
-
-Speed 2 Rated Evaporative Condenser Pump Power Consumption
-
-
-
-Speed 3 Gross Rated Total Cooling Capacity
-
-
-
-Speed 3 Gross Rated Sensible Heat Ratio
-
-
-
-Speed 3 Rated Air Flow Rate
-
-
-
-Speed 3 Evaporative Condenser Air Flow Rate
-
-
-
-Speed 3 Rated Evaporative Condenser Pump Power Consumption
-
-
-
-Speed 4 Gross Rated Total Cooling Capacity
-
-
-
-Speed 4 Gross Rated Sensible Heat Ratio
-
-
-
-Speed 4 Rated Air Flow Rate
-
-
-
-Speed 4 Evaporative Condenser Air Flow Rate
-
-
-
-Speed 4 Rated Evaporative Condenser Pump Power Consumption
-
-**Coil:Cooling:DX:SingleSpeed**
-
-
-
-Gross Rated Total Cooling Capacity
-
-
-
-Gross Rated Sensible Heat Ratio
-
-
-
-Rated Air Flow Rate
-
-
-
-Evaporative Condenser Air Flow Rate
-
-
-
-Evaporative Condenser Pump Rated Power Consumption
-
-**Coil:Cooling:DX:SingleSpeed:ThermalStorage**
-
-
-
-Rated Evaporator Air Flow Rate
-
-
-
-Cooling Only Mode Rated Total Evaporator Cooling Capacity
-
-
-
-Evaporative Condenser Pump Rated Power Consumption
-
-**Coil:Cooling:DX:TwoSpeed**
-
-
-
-High Speed Gross Rated Total Cooling Capacity
-
-
-
-High Speed Rated Sensible Heat Ratio
-
-
-
-High Speed Rated Air Flow Rate
-
-
-
-Low Speed Gross Rated Total Cooling Capacity
-
-
-
-Low Speed Gross Rated Sensible Heat Ratio
-
-
-
-Low Speed Rated Air Flow Rate
-
-
-
-High Speed Evaporative Condenser Air Flow Rate
-
-
-
-High Speed Evaporative Condenser Pump Rated Power Consumption
-
-
-
-Low Speed Evaporative Condenser Air Flow Rate
-
-
-
-Low Speed Evaporative Condenser Pump Rated Power Consumption
-
-**Coil:Cooling:DX:VariableRefrigerantFlow**
-
-
-
-Gross Rated Total Cooling Capacity
-
-
-
-Gross Rated Sensible Heat Ratio
-
-
-
-Rated Air Flow Rate
-
-**Coil:Cooling:DX:VariableSpeed**
-
-
-
-Gross Rated Total Cooling Capacity At Selected Nominal Speed Level
-
-
-
-Rated Air Flow Rate At Selected Nominal Speed Level
-
-
-
-Evaporative Condenser Pump Rated Power Consumption
-
-**Coil:Cooling:Water**
-
-
-
-Design Water Flow Rate
-
-
-
-Design Air Flow Rate
-
-
-
-Design Inlet Water Temperature
-
-
-
-Design Inlet Air Temperature
-
-
-
-Design Outlet Air Temperature
-
-
-
-Design Inlet Air Humidity Ratio
-
-
-
-Design Outlet Air Humidity Ratio
-
-**Coil:Cooling:Water:DetailedGeometry**
-
-
-
-Maximum Water Flow Rate
-
-
-
-Tube Outside Surface Area
-
-
-
-Total Tube Inside Area
-
-
-
-Fin Surface Area
-
-
-
-Minimum Airflow Area
-
-
-
-Coil Depth
-
-
-
-Fin Diameter
-
-
-
-Number of Tubes per Row
-
-**Coil:Cooling:WaterToAirHeatPump:EquationFit**
-
-
-
-Rated Air Flow Rate
-
-
-
-Rated Water Flow Rate
-
-
-
-Gross Rated Total Cooling Capacity
-
-
-
-Gross Rated Sensible Cooling Capacity
-
-**Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit**
-
-
-
-Gross Rated Total Cooling Capacity At Selected Nominal Speed Level
-
-
-
-Rated Air Flow Rate At Selected Nominal Speed Level
-
-
-
-Rated Water Flow Rate At Selected Nominal Speed Level
-
-**Coil:Heating:DX:MultiSpeed**
-
-
-
-Resistive Defrost Heater Capacity
-
-
-
-Speed 1 Gross Rated Heating Capacity
-
-
-
-Speed 1 Rated Air Flow Rate
-
-
-
-Speed 2 Gross Rated Heating Capacity
-
-
-
-Speed 2 Rated Air Flow Rate
-
-
-
-Speed 3 Gross Rated Heating Capacity
-
-
-
-Speed 3 Rated Air Flow Rate
-
-
-
-Speed 4 Gross Rated Heating Capacity
-
-
-
-Speed 4 Rated Air Flow Rate
-
-**Coil:Heating:DX:SingleSpeed**
-
-
-
-Gross Rated Heating Capacity
-
-
-
-Rated Air Flow Rate
-
-
-
-Resistive Defrost Heater Capacity
-
-**Coil:Heating:DX:VariableRefrigerantFlow**
-
-
-
-Gross Rated Heating Capacity
-
-
-
-Rated Air Flow Rate
-
-**Coil:Heating:DX:VariableSpeed**
-
-
-
-Rated Heating Capacity At Selected Nominal Speed Level
-
-
-
-Rated Air Flow Rate At Selected Nominal Speed Level
-
-
-
-Resistive Defrost Heater Capacity
-
-**Coil:Heating:Electric**
-
-
-
-Nominal Capacity
-
-**Coil:Heating:Electric:MultiStage**
-
-
-
-Stage 1 Nominal Capacity
-
-
-
-Stage 2 Nominal Capacity
-
-
-
-Stage 3 Nominal Capacity
-
-
-
-Stage 4 Nominal Capacity
-
-**Coil:Heating:Gas**
-
-
-
-Nominal Capacity
-
-**Coil:Heating:Gas:MultiStage**
-
-
-
-Stage 1 Nominal Capacity
-
-
-
-Stage 2 Nominal Capacity
-
-
-
-Stage 3 Nominal Capacity
-
-
-
-Stage 4 Nominal Capacity
-
-**Coil:Heating:Steam**
-
-
-
-Maximum Steam Flow Rate
-
-**Coil:Heating:Water**
-
-
-
-U-Factor Times Area Value
-
-
-
-Maximum Water Flow Rate
-
-
-
-Rated Capacity
-
-**Coil:Heating:WaterToAirHeatPump:EquationFit**
-
-
-
-Rated Air Flow Rate
-
-
-
-Rated Water Flow Rate
-
-
-
-Gross Rated Heating Capacity
-
-**Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit**
-
-
-
-Rated Heating Capacity At Selected Nominal Speed Level
-
-
-
-Rated Air Flow Rate At Selected Nominal Speed Level
-
-
-
-Rated Water Flow Rate At Selected Nominal Speed Level
-
-**CoilPerformance:DX:Cooling**
-
-
-
-Gross Rated Total Cooling Capacity
-
-
-
-Gross Rated Sensible Heat Ratio
-
-
-
-Rated Air Flow Rate
-
-
-
-Evaporative Condenser Air Flow Rate
-
-
-
-Evaporative Condenser Pump Rated Power Consumption
-
-**CondenserLoop**
-
-
-
-Maximum Loop Flow Rate
-
-**Controller:OutdoorAir**
-
-
-
-Minimum Outdoor Air Flow Rate
-
-
-
-Maximum Outdoor Air Flow Rate
-
-**Controller:WaterCoil**
-
-
-
-Controller Convergence Tolerance
-
-
-
-Maximum Actuated Flow
-
-**CoolingTower:SingleSpeed**
-
-
-
-Design Water Flow Rate
-
-
-
-Design Air Flow Rate
-
-
-
-Design Fan Power
-
-
-
-Design U-Factor Times Area Value
-
-**CoolingTower:TwoSpeed**
-
-
-
-Design Water Flow Rate
-
-
-
-High Fan Speed Air Flow Rate
-
-
-
-High Fan Speed Fan Power
-
-
-
-High Fan Speed U-Factor Times Area Value
-
-**CoolingTower:VariableSpeed**
-
-
-
-Design Water Flow Rate
-
-
-
-Design Air Flow Rate
-
-
-
-Design Fan Power
-
-**CoolingTower:VariableSpeed:Merkel**
-
-
-
-Nominal Capacity
-
-
-
-Design Water Flow Rate
-
-
-
-Design Air Flow Rate U-Factor Times Area Value
-
-**EvaporativeCooler:Indirect:ResearchSpecial**
-
-
-
-Secondary Fan Flow Rate
-
-**EvaporativeFluidCooler:SingleSpeed**
-
-
-
-Design Air Flow Rate
-
-
-
-Design Air Flow Rate Fan Power
-
-
-
-Design Air Flow Rate U-factor Times Area Value
-
-
-
-Design Water Flow Rate
-
-**EvaporativeFluidCooler:TwoSpeed**
-
-
-
-High Fan Speed Air Flow Rate
-
-
-
-High Fan Speed Fan Power
-
-
-
-High Fan Speed U-factor Times Area Value
-
-
-
-Design Water Flow Rate
-
-**Fan:ComponentModel**
-
-
-
-Maximum Flow Rate
-
-
-
-Minimum Flow Rate
-
-
-
-Motor Fan Pulley Ratio
-
-
-
-Belt Maximum Torque
-
-
-
-Maximum Motor Output Power
-
-
-
-Maximum VFD Output Power
-
-**Fan:ConstantVolume**
-
-
-
-Maximum Flow Rate
-
-**Fan:OnOff**
-
-
-
-Maximum Flow Rate
-
-**FanPerformance:NightVentilation**
-
-
-
-Maximum Flow Rate
-
-**Fan:VariableVolume**
-
-
-
-Maximum Flow Rate
-
-**FluidCooler:SingleSpeed**
-
-
-
-Design Air Flow Rate U-factor Times Area Value
-
-
-
-Design Water Flow Rate
-
-
-
-Design Air Flow Rate
-
-
-
-Design Air Flow Rate Fan Power
-
-**FluidCooler:TwoSpeed**
-
-
-
-High Fan Speed U-factor Times Area Value
-
-
-
-Design Water Flow Rate
-
-
-
-High Fan Speed Air Flow Rate
-
-
-
-High Fan Speed Fan Power
-
-**HeaderedPumps:ConstantSpeed**
-
-
-
-Total Rated Flow Rate
-
-
-
-Rated Power Consumption
-
-**HeaderedPumps:VariableSpeed**
-
-
-
-Total Rated Flow Rate
-
-
-
-Rated Power Consumption
-
-**HeatExchanger:AirToAir:SensibleAndLatent**
-
-
-
-Nominal Supply Air Flow Rate
-
-**HeatExchanger:FluidToFluid**
-
-
-
-Loop Demand Side Design Flow Rate
-
-
-
-Loop Supply Side Design Flow Rate
-
-
-
-Heat Exchanger U-Factor Times Area Value
-
-**Humidifier:Steam:Electric**
-
-
-
-Rated Power
-
-**HVACTemplate:Plant:Boiler**
-
-
-
-Capacity
-
-**HVACTemplate:Plant:Chiller**
-
-
-
-Capacity
-
-**HVACTemplate:Plant:Tower**
-
-
-
-High Speed Nominal Capacity
-
-
-
-High Speed Fan Power
-
-
-
-Low Speed Nominal Capacity
-
-
-
-Low Speed Fan Power
-
-
-
-Free Convection Capacity
-
-**HVACTemplate:System:ConstantVolume**
-
-
-
-Supply Fan Maximum Flow Rate
-
-
-
-Heating Coil Capacity
-
-
-
-Maximum Outdoor Air Flow Rate
-
-
-
-Minimum Outdoor Air Flow Rate
-
-
-
-Humidifier Rated Electric Power
-
-**HVACTemplate:System:DedicatedOutdoorAir**
-
-
-
-Supply Fan Flow Rate
-
-
-
-DX Cooling Coil Gross Rated Total Capacity
-
-
-
-DX Cooling Coil Gross Rated Sensible Heat Ratio
-
-
-
-Humidifier Rated Electric Power
-
-**HVACTemplate:System:DualDuct**
-
-
-
-Main Supply Fan Maximum Flow Rate
-
-
-
-Cold Duct Supply Fan Maximum Flow Rate
-
-
-
-Hot Duct Supply Fan Maximum Flow Rate
-
-
-
-Heating Coil Capacity
-
-
-
-Maximum Outdoor Air Flow Rate
-
-
-
-Minimum Outdoor Air Flow Rate
-
-
-
-Humidifier Rated Electric Power
-
-**HVACTemplate:System:PackagedVAV**
-
-
-
-Supply Fan Maximum Flow Rate
-
-
-
-Supply Fan Minimum Flow Rate
-
-
-
-Cooling Coil Gross Rated Total Capacity
-
-
-
-Cooling Coil Gross Rated Sensible Heat Ratio
-
-
-
-Heating Coil Capacity
-
-
-
-Maximum Outdoor Air Flow Rate
-
-
-
-Minimum Outdoor Air Flow Rate
-
-
-
-Humidifier Rated Electric Power
-
-**HVACTemplate:System:Unitary**
-
-
-
-Supply Fan Maximum Flow Rate
-
-
-
-Cooling Coil Gross Rated Total Capacity
-
-
-
-Cooling Coil Gross Rated Sensible Heat Ratio
-
-
-
-Heating Coil Capacity
-
-
-
-Maximum Outdoor Air Flow Rate
-
-
-
-Minimum Outdoor Air Flow Rate
-
-
-
-Humidifier Rated Electric Power
-
-**HVACTemplate:System:UnitaryHeatPump:AirToAir**
-
-
-
-Cooling Supply Air Flow Rate
-
-
-
-Heating Supply Air Flow Rate
-
-
-
-No Load Supply Air Flow Rate
-
-
-
-Cooling Coil Gross Rated Total Capacity
-
-
-
-Cooling Coil Gross Rated Sensible Heat Ratio
-
-
-
-Heat Pump Heating Coil Gross Rated Capacity
-
-
-
-Supplemental Heating Coil Capacity
-
-
-
-Maximum Outdoor Air Flow Rate
-
-
-
-Minimum Outdoor Air Flow Rate
-
-
-
-Humidifier Rated Electric Power
-
-**HVACTemplate:System:UnitarySystem**
-
-
-
-Cooling Supply Air Flow Rate
-
-
-
-Heating Supply Air Flow Rate
-
-
-
-No Load Supply Air Flow Rate
-
-
-
-DX Cooling Coil Gross Rated Total Capacity
-
-
-
-DX Cooling Coil Gross Rated Sensible Heat Ratio
-
-
-
-Heating Coil Gross Rated Capacity
-
-
-
-Supplemental Heating or Reheat Coil Capacity
-
-
-
-Maximum Outdoor Air Flow Rate
-
-
-
-Minimum Outdoor Air Flow Rate
-
-
-
-Humidifier Rated Electric Power
-
-**HVACTemplate:System:VAV**
-
-
-
-Supply Fan Maximum Flow Rate
-
-
-
-Supply Fan Minimum Flow Rate
-
-
-
-Maximum Outdoor Air Flow Rate
-
-
-
-Minimum Outdoor Air Flow Rate
-
-
-
-Humidifier Rated Electric Power
-
-**HVACTemplate:System:VRF**
-
-
-
-Gross Rated Total Cooling Capacity
-
-
-
-Gross Rated Heating Capacity
-
-
-
-Resistive Defrost Heater Capacity
-
-
-
-Water Condenser Volume Flow Rate
-
-
-
-Evaporative Condenser Air Flow Rate
-
-
-
-Evaporative Condenser Pump Rated Power Consumption
-
-**HVACTemplate:Zone:BaseboardHeat**
-
-
-
-Baseboard Heating Capacity
-
-**HVACTemplate:Zone:ConstantVolume**
-
-
-
-Supply Air Maximum Flow Rate
-
-
-
-Baseboard Heating Capacity
-
-**HVACTemplate:Zone:DualDuct**
-
-
-
-Supply Air Maximum Flow Rate
-
-
-
-Baseboard Heating Capacity
-
-**HVACTemplate:Zone:FanCoil**
-
-
-
-Supply Air Maximum Flow Rate
-
-
-
-Baseboard Heating Capacity
-
-**HVACTemplate:Zone:IdealLoadsAirSystem**
-
-
-
-Maximum Heating Air Flow Rate
-
-
-
-Maximum Sensible Heating Capacity
-
-
-
-Maximum Cooling Air Flow Rate
-
-
-
-Maximum Total Cooling Capacity
-
-**HVACTemplate:Zone:PTAC**
-
-
-
-Cooling Supply Air Flow Rate
-
-
-
-Heating Supply Air Flow Rate
-
-
-
-No Load Supply Air Flow Rate
-
-
-
-Cooling Coil Gross Rated Total Capacity
-
-
-
-Cooling Coil Gross Rated Sensible Heat Ratio
-
-
-
-Heating Coil Capacity
-
-
-
-Baseboard Heating Capacity
-
-**HVACTemplate:Zone:PTHP**
-
-
-
-Cooling Supply Air Flow Rate
-
-
-
-Heating Supply Air Flow Rate
-
-
-
-No Load Supply Air Flow Rate
-
-
-
-Cooling Coil Gross Rated Total Capacity
-
-
-
-Cooling Coil Gross Rated Sensible Heat Ratio
-
-
-
-Heat Pump Heating Coil Gross Rated Capacity
-
-
-
-Supplemental Heating Coil Capacity
-
-
-
-Baseboard Heating Capacity
-
-**HVACTemplate:Zone:Unitary**
-
-
-
-Supply Air Maximum Flow Rate
-
-
-
-Baseboard Heating Capacity
-
-**HVACTemplate:Zone:VAV**
-
-
-
-Supply Air Maximum Flow Rate
-
-
-
-Baseboard Heating Capacity
-
-**HVACTemplate:Zone:VAV:FanPowered**
-
-
-
-Primary Supply Air Maximum Flow Rate
-
-
-
-Primary Supply Air Minimum Flow Fraction
-
-
-
-Secondary Supply Air Maximum Flow Rate
-
-
-
-Parallel Fan On Flow Fraction
-
-
-
-Baseboard Heating Capacity
-
-**HVACTemplate:Zone:VAV:HeatAndCool**
-
-
-
-Supply Air Maximum Flow Rate
-
-
-
-Baseboard Heating Capacity
-
-**HVACTemplate:Zone:VRF**
-
-
-
-Supply Air Flow Rate During Cooling Operation
-
-
-
-Supply Air Flow Rate When No Cooling is Needed
-
-
-
-Supply Air Flow Rate During Heating Operation
-
-
-
-Supply Air Flow Rate When No Heating is Needed
-
-
-
-Outdoor Air Flow Rate During Cooling Operation
-
-
-
-Outdoor Air Flow Rate During Heating Operation
-
-
-
-Outdoor Air Flow Rate When No Cooling or Heating is Needed
-
-
-
-Cooling Coil Gross Rated Total Capacity
-
-
-
-Cooling Coil Gross Rated Sensible Heat Ratio
-
-
-
-Heat Pump Heating Coil Gross Rated Capacity
-
-
-
-Baseboard Heating Capacity
-
-**HVACTemplate:Zone:WaterToAirHeatPump**
-
-
-
-Cooling Supply Air Flow Rate
-
-
-
-Heating Supply Air Flow Rate
-
-
-
-No Load Supply Air Flow Rate
-
-
-
-Cooling Coil Gross Rated Total Capacity
-
-
-
-Cooling Coil Gross Rated Sensible Heat Ratio
-
-
-
-Heat Pump Heating Coil Gross Rated Capacity
-
-
-
-Supplemental Heating Coil Capacity
-
-
-
-Baseboard Heating Capacity
-
-**PlantComponent:TemperatureSource**
-
-
-
-Design Volume Flow Rate
-
-**PlantEquipmentOperation:ComponentSetpoint**
-
-
-
-Component 1 Flow Rate
-
-
-
-Component 2 Flow Rate
-
-
-
-Component 3 Flow Rate
-
-
-
-Component 4 Flow Rate
-
-
-
-Component 5 Flow Rate
-
-
-
-Component 6 Flow Rate
-
-
-
-Component 7 Flow Rate
-
-
-
-Component 8 Flow Rate
-
-
-
-Component 9 Flow Rate
-
-
-
-Component 10 Flow Rate
-
-**PlantLoop**
-
-
-
-Maximum Loop Flow Rate
-
-**Pump:ConstantSpeed**
-
-
-
-Rated Flow Rate
-
-
-
-Rated Power Consumption
-
-**Pump:VariableSpeed**
-
-
-
-Rated Flow Rate
-
-
-
-Rated Power Consumption
-
-**Pump:VariableSpeed:Condensate**
-
-
-
-Rated Flow Rate
-
-
-
-Rated Power Consumption
-
-**Sizing:System**
-
-
-
-Design Outdoor Air Flow Rate
-
-**SolarCollector:FlatPlate:PhotovoltaicThermal**
-
-
-
-Design Flow Rate
-
-**ThermalStorage:ChilledWater:Mixed**
-
-
-
-Use Side Design Flow Rate
-
-
-
-Source Side Design Flow Rate
-
-**ThermalStorage:ChilledWater:Stratified**
-
-
-
-Use Side Design Flow Rate
-
-
-
-Source Side Design Flow Rate
-
-**UnitarySystemPerformance:HeatPump:Multispeed**
-
-
-
-Speed 1 Supply Air Flow Ratio During Heating Operation
-
-
-
-Speed 1 Supply Air Flow Ratio During Cooling Operation
-
-
-
-Speed 2 Supply Air Flow Ratio During Heating Operation
-
-
-
-Speed 2 Supply Air Flow Ratio During Cooling Operation
-
-
-
-Speed 3 Supply Air Flow Ratio During Heating Operation
-
-
-
-Speed 3 Supply Air Flow Ratio During Cooling Operation
-
-
-
-Speed 4 Supply Air Flow Ratio During Heating Operation
-
-
-
-Speed 4 Supply Air Flow Ratio During Cooling Operation
-
-**WaterHeater:Mixed**
-
-
-
-Tank Volume
-
-
-
-Heater Maximum Capacity
-
-
-
-Use Side Design Flow Rate
-
-
-
-Source Side Design Flow Rate
-
-**WaterHeater:Stratified**
-
-
-
-Tank Volume
-
-
-
-Tank Height
-
-
-
-Heater 1 Capacity
-
-
-
-Use Side Design Flow Rate
-
-
-
-Source Side Design Flow Rate
-
-**ZoneHVAC:Baseboard:Convective:Electric**
-
-
-
-Nominal Capacity
-
-**ZoneHVAC:Baseboard:Convective:Water**
-
-
-
-U-Factor Times Area Value
-
-
-
-Maximum Water Flow Rate
-
-**ZoneHVAC:Baseboard:RadiantConvective:Electric**
-
-
-
-Nominal Capacity
-
-**ZoneHVAC:Baseboard:RadiantConvective:Steam**
-
-
-
-Maximum Steam Flow Rate
-
-**ZoneHVAC:Baseboard:RadiantConvective:Water**
-
-
-
-Rated Capacity
-
-
-
-Maximum Water Flow Rate
-
-**ZoneHVAC:EnergyRecoveryVentilator**
-
-
-
-Supply Air Flow Rate
-
-
-
-Exhaust Air Flow Rate
-
-**ZoneHVAC:EvaporativeCoolerUnit**
-
-
-
-Design Supply Air Flow Rate
-
-**ZoneHVAC:FourPipeFanCoil**
-
-
-
-Maximum Supply Air Flow Rate
-
-
-
-Maximum Outdoor Air Flow Rate
-
-
-
-Maximum Cold Water Flow Rate
-
-
-
-Maximum Hot Water Flow Rate
-
-**ZoneHVAC:HighTemperatureRadiant**
-
-
-
-Maximum Power Input
-
-**ZoneHVAC:IdealLoadsAirSystem**
-
-
-
-Maximum Heating Air Flow Rate
-
-
-
-Maximum Sensible Heating Capacity
-
-
-
-Maximum Cooling Air Flow Rate
-
-
-
-Maximum Total Cooling Capacity
-
-**ZoneHVAC:LowTemperatureRadiant:Electric**
-
-
-
-Maximum Electrical Power to Panel
-
-**ZoneHVAC:LowTemperatureRadiant:VariableFlow**
-
-
-
-Hydronic Tubing Length
-
-
-
-Maximum Hot Water Flow
-
-
-
-Maximum Cold Water Flow
-
-**ZoneHVAC:OutdoorAirUnit**
-
-
-
-Outdoor Air Flow Rate
-
-
-
-Exhaust Air Flow Rate
-
-**ZoneHVAC:PackagedTerminalAirConditioner**
-
-
-
-Supply Air Flow Rate During Cooling Operation
-
-
-
-Supply Air Flow Rate During Heating Operation
-
-
-
-Supply Air Flow Rate When No Cooling or Heating is Needed
-
-
-
-Outdoor Air Flow Rate During Cooling Operation
-
-
-
-Outdoor Air Flow Rate During Heating Operation
-
-
-
-Outdoor Air Flow Rate When No Cooling or Heating is Needed
-
-**ZoneHVAC:PackagedTerminalHeatPump**
-
-
-
-Supply Air Flow Rate During Cooling Operation
-
-
-
-Supply Air Flow Rate During Heating Operation
-
-
-
-Supply Air Flow Rate When No Cooling or Heating is Needed
-
-
-
-Outdoor Air Flow Rate During Cooling Operation
-
-
-
-Outdoor Air Flow Rate During Heating Operation
-
-
-
-Outdoor Air Flow Rate When No Cooling or Heating is Needed
-
-
-
-Maximum Supply Air Temperature from Supplemental Heater
-
-**ZoneHVAC:TerminalUnit:VariableRefrigerantFlow**
-
-
-
-Supply Air Flow Rate During Cooling Operation
-
-
-
-Supply Air Flow Rate When No Cooling is Needed
-
-
-
-Supply Air Flow Rate During Heating Operation
-
-
-
-Supply Air Flow Rate When No Heating is Needed
-
-
-
-Outdoor Air Flow Rate During Cooling Operation
-
-
-
-Outdoor Air Flow Rate During Heating Operation
-
-
-
-Outdoor Air Flow Rate When No Cooling or Heating is Needed
-
-**ZoneHVAC:UnitHeater**
-
-
-
-Maximum Supply Air Flow Rate
-
-
-
-Maximum Hot Water or Steam Flow Rate
-
-**ZoneHVAC:UnitVentilator**
-
-
-
-Maximum Supply Air Flow Rate
-
-
-
-Minimum Outdoor Air Flow Rate
-
-
-
-Maximum Outdoor Air Flow Rate
-
-**ZoneHVAC:VentilatedSlab**
-
-
-
-Maximum Air Flow Rate
-
-
-
-Minimum Outdoor Air Flow Rate
-
-
-
-Maximum Outdoor Air Flow Rate
-
-**ZoneHVAC:WaterToAirHeatPump**
-
-
-
-Supply Air Flow Rate During Cooling Operation
-
-
-
-Supply Air Flow Rate During Heating Operation
-
-
-
-Supply Air Flow Rate When No Cooling or Heating is Needed
-
-
-
-Outdoor Air Flow Rate During Cooling Operation
-
-
-
-Outdoor Air Flow Rate During Heating Operation
-
-
-
-Outdoor Air Flow Rate When No Cooling or Heating is Needed
-
-
-
-Maximum Supply Air Temperature from Supplemental Heater
-
-**ZoneHVAC:WindowAirConditioner**
-
-
-
-Maximum Supply Air Flow Rate
-
-
-
-Maximum Outdoor Air Flow Rate
 
 There are 3 places in the input where the user can impose sizing factors.
 
@@ -7571,45 +7719,45 @@ The design humidity ratio in kilograms of water per kilogram of dry air at the e
 
 The design humidity ratio in kilograms of water per kilogram of dry air at the exit of the central heating coil. (kgWater/kgDryAir) The default is .008.
 
-#### Field: Cooling Design Air Flow Method
+#### Field: Cooling Supply Air Flow Rate Method
 
-The input of this field must be the method used to determine the airloop cooling supply air volume flow rate or the cooling supply air flow rate value. The input allowed must be is either, *DesignDay*, *Flow/System,* *FlowPerFloorArea*, *FractionOfAutosizedCoolingAirflow*, or *FlowPerCoolingCapacity*. *DesignDay* means the program will calculate the system design cooling air flow rate using the System Sizing input data and a design day simulation. *Flow/System* means that the the program will use the input of the field *Cooling Design Air Flow Rate* as the system design cooling air flow rate. *FlowPerFloorArea* means the program calculates the cooling supply air volume flow rate from zone floor area served by the airloop and user specified *Flow Per Floor Area* value. *FractionOfAutosizedCoolingAirflow* means the program calculates the cooling supply air volume flow rate from user specified fraction and the autosized design cooling supply air volume flow rate value determined by the simulation. *FlowPerCoolingCapacity* means the supply air volume is calculated from user specified flow per cooling capacity and design cooling capacity determined by the simulation. The default method is *DesignDay*: i.e., the program uses the calculated design values.
+The input of this field must be the method used to determine the airloop cooling supply air volume flow rate. The input must be either, *DesignDay*, *Flow/System,* *FlowPerFloorArea*, *FractionOfAutosizedCoolingAirflow*, or *FlowPerCoolingCapacity*. *DesignDay* means the program will calculate the system design cooling supply air volume flow rate using the System Sizing input data and a design day simulation. *Flow/System* means that the program will use the input of the field *Cooling Design Air Flow Rate* as the system design cooling supply air volume flow rate. *FlowPerFloorArea* means the program calculates the cooling supply air volume flow rate from zone floor area served by the airloop and user specified *Flow Per Floor Area* value. *FractionOfAutosizedCoolingAirflow* means the program calculates the cooling supply air volume flow rate from user specified fraction and the autosized design cooling supply air volume flow rate value determined by the simulation. *FlowPerCoolingCapacity* means the supply air volume is calculated from user specified flow per cooling capacity and design cooling capacity determined by the simulation. The default method is *DesignDay*: i.e., the program uses the calculated design values.
 
-#### Field: Cooling Design Air Flow Rate
+#### Field: Cooling Supply Air Flow Rate
 
-The design system cooling air flow rate in cubic meters per second. This input is an alternative to using the program autocalculated value. This input is used if Cooling Design Air Flow Method is Flow/System. This value will *not* be multiplied by any sizing factor or by zone multipliers. If using zone multipliers, this value must be large enough to serve the multiplied zones.
+The design system cooling air flow rate in cubic meters per second. This input is an alternative to using the program autocalculated value. This input is used if Coolingi Supply Air Flow Rate Method is Flow/System. This value will *not* be multiplied by any sizing factor or by zone multipliers. If using zone multipliers, this value must be large enough to serve the multiplied zones.
 
-#### Field: Cooling Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
+#### Field: Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
 
-Enter the cooling supply air volume flow rate per zone conditioned floor area in m3/s-m2. This field is required field when the Cooling Design air Flow Method is *FlowPerFloorArea*. This field may be left blank if a cooling coil is not included in the airloop or the Cooling Design Air Flow Method is not *FlowPerFloorArea*. The program calculates the cooling supply air volume flow rate from the cooled floor area served by the air loop and the *Flow Per Unit Area* value specified by the user.
+Enter the cooling supply air volume flow rate per zone conditioned floor area in m3/s-m2. This field is required field when the Cooling Supply Air Flow Rate Method is *FlowPerFloorArea*. This field may be left blank if a cooling coil is not included in the airloop or the Cooling Supply Air Flow Rate Method is not *FlowPerFloorArea*. The program calculates the cooling supply air volume flow rate from the cooled floor area served by the air loop and the *Flow Per Unit Area* value specified by the user.
 
-#### Field: Fraction of Autosized Cooling Design Supply Air Flow Rate {-}
+#### Field: Cooling Fraction of Autosized Cooling Design Supply Air Flow Rate {-}
 
-Enter the cooling supply air volume flow rate as a fraction of the airloop autosized cooling supply air flow rate. This input field is required when the Cooling Design air Flow Method is *FractionOfAutosizedCoolingAirflow*. This input field may be left blank if a cooling coil is not included in the airloop or the Cooling Design air Flow Method is not *FractionOfAutosizedCoolingAirflow*. The program calculates the cooling supply air volume flow rate from the design autosized cooling supply air flow rate and user specified fraction.
+Enter the cooling supply air volume flow rate as a fraction of the airloop autosized cooling supply air flow rate. This input field is required when the Cooling Supply Air Flow Rate Method is *FractionOfAutosizedCoolingAirflow*. This input field may be left blank if a cooling coil is not included in the airloop or the Cooling Supply Air Flow Rate Method is not *FractionOfAutosizedCoolingAirflow*. The program calculates the cooling supply air volume flow rate from the design autosized cooling supply air flow rate and user specified fraction.
 
-#### Field: Cooling Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+#### Field: Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
 
-Enter the cooling supply air volume flow rate per unit cooling capacity in m3/s-W. This input field is required when the Cooling Design air Flow Method is *FlowPerCoolingCapacity*. This field may be left blank if a cooling coil is not included in the airloop or the Cooling Design air Flow Method is not *FlowPerCoolingCapacity*. The program calculates the airloop cooling supply air volume flow rate from the design autosized cooling capacity and user specified *Flow Per Cooling Capacity* value.
+Enter the cooling supply air volume flow rate per unit cooling capacity in m3/s-W. This input field is required when the Cooling Supply Air Flow Rate Method is *FlowPerCoolingCapacity*. This field may be left blank if a cooling coil is not included in the airloop or the Cooling Supply Air Flow Rate Method is not *FlowPerCoolingCapacity*. The program calculates the airloop cooling supply air volume flow rate from the design autosized cooling capacity and user specified *Flow Per Cooling Capacity* value.
 
-#### Field: Heating Design Air Flow Method
+#### Field: Heating Supply Air Flow Rate Method
 
-The input of this field must be the method used to determine the airloop heating supply air volume flow rate or the heating supply air flow rate value. The input allowed must be is either, *DesignDay*, *Flow/System,* *FlowPerFloorArea*, *FractionOfAutosizedHeatingAirflow*, *FractionOfAutosizedCoolingAirflow* or *FlowPerHeatingCapacity*. *DesignDay* means the program will calculate the system design heating air flow rate using the System Sizing input data and a design day simulation. *Flow/System* means that the program will use the input of the field *Heating Design Air Flow Rate* as the system design heating air flow rate. *FlowPerFloorArea* means the program calculates the system heating supply air volume flow rate from zone floor area served by the airloop and user specified *Flow Per Floor Area* value. *FractionOfAutosizedHeatingAirflow* means the program calculates the system heating supply air volume flow rate from user specified fraction and the autosized system design heating supply air volume flow rate value determined by the simulation. *FractionOfAutosizedCoolingAirflow* means the program calculates the system heating supply air volume flow rate from user specified fraction and the autosized system design cooling supply air volume flow rate value determined by the simulation. *FlowPerHeatingCapacity* means the system heating supply air volume is calculated from user specified flow per heating capacity and design heating capacity determined by the simulation. The default method is *DesignDay*: i.e., the program uses the calculated design values.
+The input of this field must be the method used to determine the airloop heating supply air volume flow rate. The input must be either, *DesignDay*, *Flow/System,* *FlowPerFloorArea*, *FractionOfAutosizedHeatingAirflow*, *FractionOfAutosizedCoolingAirflow* or *FlowPerHeatingCapacity*. *DesignDay* means the program will calculate the system design heating supply air volume flow rate using the System Sizing input data and a design day simulation. *Flow/System* means that the program will use the input of the field *Heating Design Air Flow Rate* as the system design heating supply air volume flow rate. *FlowPerFloorArea* means the program calculates the system heating supply air volume flow rate from zone floor area served by the airloop and user specified *Flow Per Floor Area* value. *FractionOfAutosizedHeatingAirflow* means the program calculates the system heating supply air volume flow rate from user specified fraction and the autosized system design heating supply air volume flow rate value determined by the simulation. *FractionOfAutosizedCoolingAirflow* means the program calculates the system heating supply air volume flow rate from user specified fraction and the autosized system design cooling supply air volume flow rate value determined by the simulation. *FlowPerHeatingCapacity* means the system heating supply air volume is calculated from user specified flow per heating capacity and design heating capacity determined by the simulation. The default method is *DesignDay*: i.e., the program uses the calculated design values.
 
-#### Field: Heating Design Air Flow Rate
+#### Field: Heating Supply Air Flow Rate
 
-The design system heating air flow rate in cubic meters per second. This input is an alternative to using the program autocalculated value. This input is used if Heating Design Air Flow Method is Flow/System. This value will *not* be multiplied by any sizing factor or by zone multipliers. If using zone multipliers, this value must be large enough to serve the multiplied zones.
+The design system heating air flow rate in cubic meters per second. This input is an alternative to using the program autocalculated value. This input is used if Heating Supply Air Flow Rate Method is Flow/System. This value will *not* be multiplied by any sizing factor or by zone multipliers. If using zone multipliers, this value must be large enough to serve the multiplied zones.
 
-#### Field: Heating Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
+#### Field: Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
 
-Enter the heating supply air volume flow rate per zone conditioned floor area in m3/s-m2. This field is required field when the Heating Design air Flow Method is *FlowPerFloorArea*. This field may be left blank if a heating coil is not included in the airloop or the Heating Design Air Flow Method is not *FlowPerFloorArea*. The program calculates the heating supply air volume flow rate from the heated or cooled floor area served by the air loop and the *Flow Per Unit Area* value specified by the user.
+Enter the heating supply air volume flow rate per zone conditioned floor area in m3/s-m2. This field is required field when the Heating Supply Air Flow Rate Method is *FlowPerFloorArea*. This field may be left blank if a heating coil is not included in the airloop or the Heating Supply Air Flow Rate Method is not *FlowPerFloorArea*. The program calculates the heating supply air volume flow rate from the heated or cooled floor area served by the air loop and the *Flow Per Unit Area* value specified by the user.
 
-#### Field: Fraction of Autosized Heating Design Supply Air Flow Rate {-}
+#### Field: Heating Fraction of Autosized Heating Supply Air Flow Rate {-}
 
-Enter the heating supply air volume flow rate as a fraction of the airloop autosized heating supply air flow rate. This input field is required when the Heating Design air Flow Method is *FractionOfAutosizedHeatingAirflow*. This input field may be left blank if heating coil is not included in the airloop or the Heatng Design air Flow Method is not *FractionOfAutosizedHeatingAirflow*. The program calculates the heating supply air volume flow rate from the design autosized heating supply air flow rate and user specified fraction.
+Enter the heating supply air volume flow rate as a fraction of the airloop autosized heating supply air flow rate. This input field is required when the Heating Supply Air Flow Rate Method is *FractionOfAutosizedHeatingAirflow*. This input field may be left blank if heating coil is not included in the airloop or the Heating Supply Air Flow Rate Method is not *FractionOfAutosizedHeatingAirflow*. The program calculates the heating supply air volume flow rate from the design autosized heating supply air flow rate and user specified fraction.
 
-#### Field: Fraction of Autosized Cooling Design Supply Air Flow Rate {-}
+#### Field: Heating Fraction of Autosized Cooling Supply Air Flow Rate {-}
 
-Enter the heating supply air volume flow rate as a fraction of the airloop autosized cooling supply air flow rate. This input field is required when the Heating Design air Flow Method is *FractionOfAutosizedCoolingAirflow*. This input field may be left blank if heating coil is not included in the airloop or the Heatng Design air Flow Method is not *FractionOfAutosizedCoolingAirflow*. The program calculates the heating supply air volume flow rate from the design autosized cooling supply air flow rate and user specified fraction.
+Enter the heating supply air volume flow rate as a fraction of the airloop autosized cooling supply air flow rate. This input field is required when the Heating Supply Air Flow Rate Method is *FractionOfAutosizedCoolingAirflow*. This input field may be left blank if heating coil is not included in the airloop or the Heating Supply Air Flow Rate Method is not *FractionOfAutosizedCoolingAirflow*. The program calculates the heating supply air volume flow rate from the design autosized cooling supply air flow rate and user specified fraction.
 
 #### Field: Heating Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
 
@@ -7661,80 +7809,46 @@ Specifies how the central cooling coil will be controlled, which affects the coi
 
 An IDF example:
 
+```IDF
 Sizing:System,
+    VAV Sys 1,               !- AirLoop Name
+    sensible,                !- Type of Load to Size On
+    autosize,                !- Design Outdoor Air Flow Rate {m3/s}
+    0.3,                     !- Minimum System Air Flow Ratio
+    4.5,                     !- Preheat Design Temperature {C}
+    .008,                    !- Preheat Design Humidity Ratio {kgWater/kgDryAir}
+    11.0,                    !- Precool Design Temperature {C}
+    .008,                    !- Precool Design Humidity Ratio {kgWater/kgDryAir}
+    12.8,                    !- Central Cooling Design Supply Air Temperature {C}
+    16.7,                    !- Central Heating Design Supply Air Temperature {C}
+    noncoincident,           !- Sizing Option
+    no,                      !- 100% Outdoor Air in Cooling
+    no,                      !- 100% Outdoor Air in Heating
+    0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
+    designday,               !- Cooling Supply Air Flow Rate Method
+    0,                       !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate {-}
+    ,                        !- Cooling Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    designday,               !- Heating Supply Air Flow Rate Method
+    0,                       !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate {-}
+    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate {-}
+    ,                        !- Heating Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+    ZoneSum,                 !- System Outdoor Air Method
+    0.5,                     !- Zone Maximum Outdoor Air Fraction
+    CoolingDesignCapacity,   !- Cooling Design Capacity Method
+    autosize,                !- Cooling Design Capacity {W}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
 
-    VAV Sys 1,               !- name of an AirLoopHVAC object
-
-    sensible,                !- type of load to size on
-
-    autosize,                !- Design (minimum) outside air volumetric flow rate {m3/s}
-
-    0.3,                     !- minimum system air flow ratio
-
-    4.5,                     !- Preheat design temperature {C}
-
-    .008,                    !- Preheat design humidity ratio {kgWater/kgDryAir}
-
-    11.0,                    !- Precool design temperature {C}
-
-    .008,                    !- Precool design humidity ratio {kgWater/kgDryAir}
-
-    12.8,                    !- Central cooling design supply air temperature {C}
-
-    16.7,                    !- Central heating design supply air temperature {C}
-
-    noncoincident,           !- Sizing Option
-
-    no,                      !- Cooling 100% Outside Air
-
-    no,                      !- Heating 100% Outside Air
-
-    0.008,                   !- Central cooling design supply air humidity ratio {kgWater/kgDryAir}
-
-    0.008,                   !- Central heating design supply air humidity ratio {kgWater/kgDryAir}
-
-    designday,               !- Cooling Design Air Flow Method
-
-    0,                       !- cooling design air flow rate {m3/s}
-
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-
-    designday,               !- Heating Design Air Flow Method
-
-    0,                       !- heating design air flow rate {m3/s}
-
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
-
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-
-    ZoneSum,                 !- System Outdoor Air Method
-
-    0.5,                     !- Zone Maximum Outdoor Air Fraction
-
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-
-    autosize,                !- Cooling Design Capacity {W}
-
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-
-    autosize,                !- Heating Design Capacity {W}
-
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-
-    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
-
+```
 
 
 ### System Sizing Outputs
