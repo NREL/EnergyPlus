@@ -113,133 +113,253 @@ This numeric field contains the G-function value of the corresponding LNTTS.
 
 The following is an example input:
 
+```idf
 GroundHeatExchanger:Vertical,
-
     Vertical Ground Heat Exchanger,  !- Name
-
     GHE Inlet Node,          !- Inlet Node Name
-
-   GHE Outlet Node,         !- Outlet Node Name
-
-    0.00330000,              !- Maximum Flow Rate {m3/s}
-
+    GHE Outlet Node,         !- Outlet Node Name
+    0.00330000,              !- Design Flow Rate {m3/s}
     120,                     !- Number of Bore Holes
-
     76.2,                    !- Bore Hole Length {m}
-
     .635080E-01,             !- Bore Hole Radius {m}
-
     .692626E+00,             !- Ground Thermal Conductivity {W/m-K}
-
     .234700E+07,             !- Ground Thermal Heat Capacity {J/m3-K}
-
     13.375,                  !- Ground Temperature {C}
-
-    0.0033,                  !- Design Flow Rate {m3/s}
-
     .692626E+00,             !- Grout Thermal Conductivity {W/m-K}
-
     .391312E+00,             !- Pipe Thermal Conductivity {W/m-K}
-
     2.66667E-02,             !- Pipe Out Diameter {m}
-
     2.53977E-02,             !- U-Tube Distance {m}
-
     2.41285E-03,             !- Pipe Thickness {m}
-
     2,                       !- Maximum Length of Simulation
-
     0.0005,                  !- G-Function Reference Ratio
-
     35,                      !- Number of Data Pairs of the G Function
-
     ! The G-function is defined by the following data pairs
-
     -15.2996, -0.348322,  ! G-Function Ln(T/Ts) Value 1, G-Function G Value 1
-
     -14.201,   0.022208,  ! G-Function Ln(T/Ts) Value 2, G-Function G Value 2
-
     -13.2202,  0.412345,  ! G-Function Ln(T/Ts) Value 3, G-Function G Value 3
-
     -12.2086,  0.867498,  ! G-Function Ln(T/Ts) Value 4, G-Function G Value 4
-
     -11.1888,  1.357839,  ! G-Function Ln(T/Ts) Value 5, G-Function G Value 5
-
     -10.1816,  1.852024,  ! G-Function Ln(T/Ts) Value 6, G-Function G Value 6
-
     -9.1815,   2.345656,  ! G-Function Ln(T/Ts) Value 7, G-Function G Value 7
-
     -8.6809,   2.593958,  ! G-Function Ln(T/Ts) Value 8, G-Function G Value 8
-
     -8.5,      2.679,     ! etc, etc.
-
     -7.8,      3.023,
-
     -7.2,      3.32,
-
     -6.5,      3.681,
-
     -5.9,      4.071,
-
     -5.2,      4.828,
-
     -4.5,      6.253,
-
     -3.963,    7.894,
-
     -3.27,     11.82,
-
     -2.864,    15.117,
-
     -2.577,    18.006,
-
     -2.171,    22.887,
-
     -1.884,    26.924,
-
     -1.191,    38.004,
-
     -0.497,    49.919,
-
     -0.274,    53.407,
-
     -0.051,    56.632,
-
     0.196,     59.825,
-
     0.419,     62.349,
-
     0.642,     64.524,
-
     0.873,     66.412,
-
     1.112,     67.993,
-
     1.335,     69.162,
-
     1.679,     70.476,
-
     2.028,     71.361,
-
     2.275,     71.79,
-
     3.003,     72.511;  !- 35 PAIRS
+```
 
 ### Vertical Ground Heat Exchanger Outputs
 
-HVAC,Average,Ground Heat Exchanger Average Borehole Temperature [C]
+* HVAC,Average,Ground Heat Exchanger Average Borehole Temperature [C]
 
-HVAC,Average,Ground Heat Exchanger Heat Transfer Rate [W]
+* HVAC,Average,Ground Heat Exchanger Heat Transfer Rate [W]
 
-HVAC,Average,Ground Heat Exchanger Inlet Temperature [C]
+* HVAC,Average,Ground Heat Exchanger Inlet Temperature [C]
 
-HVAC,Average,Ground Heat Exchanger Outlet Temperature [C]
+* HVAC,Average,Ground Heat Exchanger Outlet Temperature [C]
 
-HVAC,Average,Ground Heat Exchanger Mass Flow Rate [kg/s]
+* HVAC,Average,Ground Heat Exchanger Mass Flow Rate [kg/s]
 
-HVAC,Average,Ground Heat Exchanger Average Fluid Temperature [C]
+* HVAC,Average,Ground Heat Exchanger Average Fluid Temperature [C]
+
+#### Ground Heat Exchanger Average Borehole Temperature [C]
+
+This is the model result for the average temperature of the borehole heat exchanger.
+
+#### Ground Heat Exchanger Heat Transfer Rate [W]
+
+This is the rate of heat transfer between the working fluid and the ground heat exchanger, in Watts.
+
+#### Ground Heat Exchanger Inlet Temperature [C]
+
+This is the temperature of the working fluid entering the ground heat exchanger.
+
+#### Ground Heat Exchanger Outlet Temperature [C]
+
+This is the temperature of the working fluid leaving the ground heat exchanger.
+
+#### Ground Heat Exchanger Mass Flow Rate [kg/s]
+
+This is the mass flow rate of the working fluid through the heat exchanger.
+
+#### Ground Heat Exchanger Average Fluid Temperature [C]
+
+This is the average temperature of the working fluid inside the heat exchanger.
+
+### GroundHeatExchanger:Slinky
+
+The GroundHeatExchanger:Slinky use the g-functions to calculate the GHX temperature respons, similar to the GroundHeatExchanger:Vertical model, however for this model g-functions are automatically calculated by EnergyPlus without the need of external software or data.
+
+Horizontal slinky-loop ground heat exchangers (GHXs) consist of coiled tubing, with the individual rings spread out along the direction of the trench either horizontally or vertically, as shown in [Figure](#SlinkyIOFig1). A schematic of a slinky GHX can be seen in [Figure](#SlinkyIOFig2). Compared to conventional straight tube horizontal GHXs, slinky loops have a higher tube density; hence, with the same cooling/heating loads, slinky-loop GHXs require less land area and excavation work than straight tube HGHXs. 
+
+![slinky heat exchanger](InputOutputReference/media/image901.png)
+
+Figure: Slinky Ground Heat Exchanger Configurations. <a name="SlinkyIOFig1"></a>
+
+![slinky heat exchanger](InputOutputReference/media/image902.png)
+
+Figure: Schematic of Slinky HX. <a name="SlinkyIOFig2"></a>
+
+An example GroundHeatExchanger:Slinky object is shown below.
+
+```idf
+GroundHeatExchanger:Slinky,
+  Slinky GHX,       !- Name
+  GHE Inlet Node,   !- Inlet Node
+  GHE Outlet Node,  !- Outlet Node
+  0.0033,           !- Design Flow Rate [m3/s]
+  1.2,              !- Soil Thermal Conductivity [W/m-K]
+  3200,             !- Soil Density [kg/m3]
+  850,              !- Soil Specific Heat [J/kg-K]
+  1.8,              !- Pipe Thermal Conductivity [W/m-K]
+  920,              !- Pipe Density [kg/m3]
+  2200,             !- Pipe Specific Heat [J/kg-K]
+  0.02667,          !- Pipe Outside Diameter [m]
+  0.002413,         !- Pipe Wall Thickness [m]
+  Vertical,         !- Heat Exchanger Configuration (Vertical, Horizontal)
+  1,                !- Coil Diameter [m]
+  0.2,              !- Coil Pitch [m]
+  2.5,              !- Trench Depth [m]
+  40,               !- Trench Length [m]
+  15,               !- Number of Parallel Trenches
+  2,                !- Trench Spacing [m]
+  15.5,             !- Kusuda-Achenbach Average Surface Temp [C]
+  3.2,              !- Kusuda-Achenbach Average Surface Temp Amplitude [C]
+  8,                !- Kusuda-Achenbach Phase Shift [C]
+  10;               !- Maximum length of simulation [years]
+```
 
 
+#### Field: Name
+
+Alpha field used as identifying field for heat exchanger
+
+#### Field: Inlet Node
+
+This alpha field is the name of the inlet node of the component on a plant loop.
+
+#### Field: Outlet Node
+
+This alpha field is the name of the outlet node of the component on a plant loop.
+
+#### Field: Design Flow Rate
+
+This numeric field is the design flow rate in m3/s for the heat exchanger. The plant loop will attempt to meet this request based on loop and flow conditions.
+
+#### Field: Soil Thermal Conductivity
+
+This numeric field is the thermal conductivity of the soil, in W/m-K.
+
+#### Field: Soil Density
+
+This numeric field is the density of the soil, in kg/m3. 
+
+#### Field: Soil Specific Heat
+
+This numeric field is the specific heat of the soil, in J/kg-K. 
+
+#### Field: Pipe Thermal Conductivity
+
+This numeric field is the thermal conductivity of the heat exchanger pipe.
+
+#### Field: Pipe Density
+
+This numeric field is the density of the heat exchanger pipe, in kg/m3.
+
+#### Field: Pipe Specific Heat
+
+This numeric field is the specific heat of the heat exchanger pipe, in J/kg-K.
+
+#### Field: Pipe Outside Diameter
+
+This numeric field is the outside pipe diameter, in meters. 
+
+#### Field: Pipe Wall Thickness
+
+This numeric field is the pipe wall thickness, in meters.
+
+#### Field: Heat Exchanger Configuration
+
+This alpha field is heat exchanger configuration, either Vertical or Horizontal.
+
+#### Field: Coil Diameter
+
+This numeric is the diameter of the slinky coil, in meters. 
+
+#### Field: Coil Pitch
+
+This numeric field is the center-to-center distance between heat exchanger coils, in meters.
+
+#### Field: Trench Depth
+
+This numeric field is the distance from the bottom of the trench to the ground surface, in meters.
+
+#### Field: Trench Length
+
+This numeric field is the length of the heat exchanger trench, in meters. This assumes the heat exchanger runs the full length of the trench.
+
+#### Field: Number of Parallel Trenches
+
+This numeric field is the number of parallel trenches. Design flow rate will be equally divided among all parallel trenches.
+
+#### Field: Trench Spacing
+
+This numeric field is the center-to-center distance in between parallel trenches, in meters.
+
+#### Field: Kusuda-Achenbach Average Annual Surface Temperature
+
+The annual average ground surface temperature to be applied to the Kusuda-Achenbach ground temperature boundary temperature correlation, in °C. This parameter and the subsequent two parameters may be determined by using the CalcSoilSurfTemp preprocessor
+
+#### Field: Kusuda-Achenbach Amplitude of Average Surface Temperature
+
+The annual mean ground surface temperature variation from average used in determining the far-field boundary conditions, in °C. This parameter, as well as the previous and following parameters may be determined by using the CalcSoilSurfTemp preprocessor
+
+#### Field: Kusuda-Achenbach Phase Shift
+
+The phase shift of minimum ground surface temperature, or the day of the year when the minimum ground surface temperature occurs. This parameter, as well as the previous two parameters may be determined by using the CalcSoilSurfTemp preprocessor
+
+#### Field: Maximum Length of Simulation
+
+This numeric field contains the maximum number of years of simulation to be carried out.
+
+### GroundHeatExchanger:Slinky Outputs
+
+The following output variables are available.
+
+* HVAC,Average,Ground Heat Exchanger Average Borehole Temperature [C] 
+
+* HVAC,Average,Ground Heat Exchanger Heat Transfer Rate [W] 
+
+* HVAC,Average,Ground Heat Exchanger Inlet Temperature [C] 
+
+* HVAC,Average,Ground Heat Exchanger Outlet Temperature [C] 
+
+* HVAC,Average,Ground Heat Exchanger Mass Flow Rate [kg/s] 
+
+* HVAC,Average,Ground Heat Exchanger Average Fluid Temperature [C]
 
 #### Ground Heat Exchanger Average Borehole Temperature [C]
 
@@ -274,8 +394,6 @@ This type of heat exchanger is intended to be connected to the supply side of a 
 ![pond heat exchanger](InputOutputReference/media/image203.svg)
 
 Figure 84. Example of Pond Ground Heat Exchanger as only heat exchanger on condenser loop
-
-
 
 ![pond surface heat exchangers](InputOutputReference/media/image204.svg)
 
@@ -16747,7 +16865,7 @@ This field is the rated average water temperature for the baseboard heater which
 
 #### Field: Rated Water Mass Flow Rate
 
-#### This field is the rated standard water flow rate in kg/s which is published as part of the manufacturer’s literature. It is used by the manufacturers when determining the rated capacity (see next field). The default value is 0.063kg/s. If it is blank or zero, the default values is assumed.
+This field is the rated standard water flow rate in kg/s which is published as part of the manufacturer’s literature. It is used by the manufacturers when determining the rated capacity (see next field). The default value is 0.063kg/s. If it is blank or zero, the default values is assumed.
 
 #### Field: Heating Design Capacity Method
 
@@ -16779,7 +16897,7 @@ The default is 0.001.
 
 #### Field: Fraction Radiant
 
-#### This field specifies what fraction of the power input to the baseboard heater is actually transferred to the space as radiant heat. The fraction should be between 0 and 1. This is the portion of the total power that is modeled as radiation. The portion that is radiant heat transfer from the baseboard heater is distributed to people and specific surfaces using the remaining fields. Note that the sum of the fractions in the remaining fields (people and surfaces) must equal 1.0 so that all the radiant power is distributed properly. For more information on the specification of this parameter, please see the Engineering Reference for EnergyPlus.
+This field specifies what fraction of the power input to the baseboard heater is actually transferred to the space as radiant heat. The fraction should be between 0 and 1. This is the portion of the total power that is modeled as radiation. The portion that is radiant heat transfer from the baseboard heater is distributed to people and specific surfaces using the remaining fields. Note that the sum of the fractions in the remaining fields (people and surfaces) must equal 1.0 so that all the radiant power is distributed properly. For more information on the specification of this parameter, please see the Engineering Reference for EnergyPlus.
 
 #### Field: Fraction of Radiant Energy Incident on People
 
@@ -16787,7 +16905,7 @@ This field specifies the fraction of radiant portion of heat transfer to the zon
 
 #### Field Set: Surface Name, Fraction of Radiant Energy to Surface
 
-#### The following two items are repeated up to a maximum of 20 surface/fraction pairs. At least one surface/fraction pair must appear in an input file. In other words, at least one surface must be identified as a recipient of radiant energy from the baseboard heater.
+The following two items are repeated up to a maximum of 20 surface/fraction pairs. At least one surface/fraction pair must appear in an input file. In other words, at least one surface must be identified as a recipient of radiant energy from the baseboard heater.
 
 #### Field: Surface &lt;x&gt; Name
 
@@ -16805,59 +16923,35 @@ The radiant energy from the baseboard heater is defined by the total energy inpu
 
 An example IDF for the water baseboard is shown below.
 
+```idf
 ZoneHVAC:Baseboard:RadiantConvective:Water,
-
     SPACE2-1 Baseboard,      !- Baseboard Name
-
     ReheatCoilAvailSched,    !- Availability Schedule Name
-
     SPACE2-1 Zone Coil Water In Node,  !- Inlet\_Node
-
     SPACE2-1 Zone Coil Water Out Node,  !- Outlet\_Node
-
     76.67,                   !- Average Water Temperature {C}
-
     0.063,                   !- Standard Water Mass Flow Rate {Kg/s}
-
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-
     3000.0,                  !- Heating Design Capacity{ W }
-
     ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
-
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
-
     0.0013,                  !- Max Water Volumetric Flow Rate {m3/s}
-
     0.001,                   !- Convergence Tolerance
-
     0.3,                     !- Fraction radiant
-
     0.3,                     !- Fraction of radiant energy incident on people
-
     C2-1,                    !- Surface 1 Name
-
     0.1,                     !- Fraction of radiant energy from heater distributed to surface 1
-
     F2-1,                    !- Surface 2 Name
-
     0.2,                     !- Fraction of radiant energy from heater distributed to surface 2
-
     SB21,                    !- surface 3 Name
-
     0.1,                     !- fraction of radiant energy from heater distributed to surface 3
-
     SB23,                    !- surface 4 Name
-
     0.1,                     !- fraction of radiant energy from heater distributed to surface 4
-
     SB25,                    !- surface 5 Name
-
     0.1,                     !- fraction of radiant energy from heater distributed to surface 5
-
     WR-1,                    !- surface 6 Name
-
     0.1;                     !- fraction of radiant energy from heater distributed to surface 6
+```
 
 ### Baseboard (Water) Radiant Convective (ZoneHVAC) Outputs
 
@@ -17005,49 +17099,30 @@ The radiant energy from the baseboard heater is defined by the total energy inpu
 
 An example IDF for the steam baseboard is shown below.
 
+```idf
 ZoneHVAC:Baseboard:RadiantConvective:Steam,
-
-Zone1Baseboard,       !- Baseboard name
-
-FanAndCoilAvailSched, !- On/off schedule
-
-Steam Inlet Node,     !- Steam inlet node
-
-Steam Outlet Node,    !- Steam outlet node
-
-HeatingDesignCapacity,!- Heating Design Capacity Method
-
-autosize,             !- Heating Design Capacity{ W }
-
-,                     !- Heating Design Capacity Per Floor Area{ W / m2 }
-
-,                     !- Fraction of Autosized Heating Design Capacity{ -}
-
-5.0,                  !- Degree of sub cooling in the coil {C}
-
-autosize,             !- Maximum steam volumetric flow rate {m3/s}
-
-0.001,                !- Tolerance
-
-0.3,                  !- Fraction radiant
-
-0.3,                  !- Fraction of radiant energy that is incident directly on people
-
-OuterWall,            !- Surface 1 Name
-
-0.4,                  !- Fraction of radiant energy from heater distributed to surface 1
-
-Ceiling,              !- Surface 2 Name
-
-0.1,                  !- Fraction of radiant energy from heater distributed to surface 2
-
-InnerWall,            !- Surface 3 Name
-
-0.1,                  !- Fraction of radiant energy from heater distributed to surface 3
-
-Floor,                !- Surface 4 Name
-
-0.1;                  !- Fraction of radiant energy from heater distributed to surface 4
+    Zone1Baseboard,       !- Baseboard name
+    FanAndCoilAvailSched, !- On/off schedule
+    Steam Inlet Node,     !- Steam inlet node
+    Steam Outlet Node,    !- Steam outlet node
+    HeatingDesignCapacity,!- Heating Design Capacity Method
+    autosize,             !- Heating Design Capacity{ W }
+    ,                     !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                     !- Fraction of Autosized Heating Design Capacity{ -}
+    5.0,                  !- Degree of sub cooling in the coil {C}
+    autosize,             !- Maximum steam volumetric flow rate {m3/s}
+    0.001,                !- Tolerance
+    0.3,                  !- Fraction radiant
+    0.3,                  !- Fraction of radiant energy that is incident directly on people
+    OuterWall,            !- Surface 1 Name
+    0.4,                  !- Fraction of radiant energy from heater distributed to surface 1
+    Ceiling,              !- Surface 2 Name
+    0.1,                  !- Fraction of radiant energy from heater distributed to surface 2
+    InnerWall,            !- Surface 3 Name
+    0.1,                  !- Fraction of radiant energy from heater distributed to surface 3
+    Floor,                !- Surface 4 Name
+    0.1;                  !- Fraction of radiant energy from heater distributed to surface 4
+```
 
 ### Baseboard (Steam) Radiant Convective (ZoneHVAC) Outputs
 
@@ -17173,45 +17248,28 @@ The radiant energy from the baseboard heater is defined by the total energy inpu
 
 Below is an example input for an Electric Baseboard Heater.
 
+```idf
 ZoneHVAC:Baseboard:RadiantConvective:Electric,
-
-Baseboard 1,   !- Name
-
-BB Schedule,   !- Availability Schedule Name
-
-HeatingDesignCapacity,   !- Heating Design Capacity Method
-
-5000,          !- Heating Design Capacity{ W }
-
-,              !- Heating Design Capacity Per Floor Area{ W / m2 }
-
-,              !- Fraction of Autosized Heating Design Capacity{ -}
-
-0.97,          !- Efficiency of the baseboard
-
-0.3,           !- Fraction radiant
-
-0.3,           !- Fraction of radiant energy that is incident directly on people
-
-EastWall,      !- Surface 1 name
-
-0.3,           !- Fraction of radiant energy from heater distributed to surface 1
-
-WestWall,      !- Surface 2 name
-
-0.1,           !- Fraction of radiant energy from heater distributed to surface 2
-
-NorthWall,     !- Surface 3 name
-
-0.1,           !- Fraction of radiant energy from heater distributed to surface 3
-
-SouthWall,     !- Surface 4 name
-
-0.1,           !- Fraction of radiant energy from heater distributed to surface 4
-
-Ceiling,       !- Surface 5 name
-
-0.1;           !- Fraction of radiant energy from heater distributed to surface 5
+    Baseboard 1,   !- Name
+    BB Schedule,   !- Availability Schedule Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    5000,          !- Heating Design Capacity{ W }
+    ,              !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,              !- Fraction of Autosized Heating Design Capacity{ -}
+    0.97,          !- Efficiency of the baseboard
+    0.3,           !- Fraction radiant
+    0.3,           !- Fraction of radiant energy that is incident directly on people
+    EastWall,      !- Surface 1 name
+    0.3,           !- Fraction of radiant energy from heater distributed to surface 1
+    WestWall,      !- Surface 2 name
+    0.1,           !- Fraction of radiant energy from heater distributed to surface 2
+    NorthWall,     !- Surface 3 name
+    0.1,           !- Fraction of radiant energy from heater distributed to surface 3
+    SouthWall,     !- Surface 4 name
+    0.1,           !- Fraction of radiant energy from heater distributed to surface 4
+    Ceiling,       !- Surface 5 name
+    0.1;           !- Fraction of radiant energy from heater distributed to surface 5
+```
 
 ### Baseboard (Electric) Radiant Convective (ZoneHVAC) Outputs
 
@@ -17327,34 +17385,26 @@ The default is 0.001.
 
 An example IDF for the hot water convective baseboard is shown below.
 
+```idf
 ZoneHVAC:Baseboard:Convective:Water,
-
         Zone3Baseboard, ! name
-
         FanAndCoilAvailSched, ! on/off schedule
-
         Zone 3 Reheat Water Inlet Node, ! water inlet node
-
         Zone 3 Reheat Water Outlet Node, ! water outlet node
-
         HeatingDesignCapacity, !- Heating Design Capacity Method
-
         autosize,!- Heating Design Capacity{ W }
-
         ,        !- Heating Design Capacity Per Floor Area{ W / m2 }
-
         ,        !- Fraction of Autosized Heating Design Capacity{ -}
-
         500.,    ! UA
-
         0.0013,  ! maximum water flow rate m3/s
-
         0.001;   ! tolerance
+```
 
 ### Baseboard (Water) Convective (ZoneHVAC) Outputs
 
 HVAC,Average,Baseboard Total Heating Rate [W]
- HVAC,Sum,Baseboard Total Heating Energy [J]
+
+HVAC,Sum,Baseboard Total Heating Energy [J]
 
 HVAC,Sum,Baseboard Hot Water Energy [J]
 
@@ -17440,25 +17490,18 @@ Enter the heating capacity as a fraction of the autosized heating capacity for c
 
 This is the overall electrical efficiency of the electric baseboard. The zone load met by this unit is divided by the electrical efficiency to obtain the total electric energy used.
 
-
-
 An example IDF for the electric convective baseboard is shown below.
 
+```idf
 ZoneHVAC:Baseboard:Convective:Electric,
-
     Zone1Baseboard,  !- Baseboard Name
-
     FanAndCoilAvailSched,  !- Availability Schedule Name
-
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-
     5000,                    !- Heating Design Capacity{ W }
-
     ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
-
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
-
     0.97;  !- Efficiency of the BaseBoard
+```
 
 ### Baseboard (Electric) Convective (ZoneHVAC) Outputs
 
@@ -17491,7 +17534,6 @@ This is the total electric consumption of the baseboard for the zone it is servi
 This is the electric power required by the baseboard to the zone it is serving in Watts.
 
 
-
 ### ZoneHVAC:LowTemperatureRadiant:VariableFlow
 
 This low temperature radiant system (hydronic) is a component of zone equipment that is intended to model any “radiant system” where water is used to supply/remove energy to/from a building surface (wall, ceiling, or floor). The component is controlled to meet any remaining zone load not met by other equipment in the zone that have higher priority. The control is accomplished by throttling the hot or chilled water flow to the unit. Note that this system will only control based on the radiant system controls defined by this input syntax and not via a zone thermostat such as is used for forced air systems. Note also that because this unit does not require a thermostat that in cases where no other systems are serving the zone in which this system resides that it will use the heating equipment priority to determine which system will run first.  If the radiant system is serving a zone with forced air equipment, the radiant system will follow the priority order established by the zone thermostat but will still base its response on the controls defined by the user for the radiant system.
@@ -17512,7 +17554,7 @@ This field is the name of the zone (Ref: Zone) in which the hydronic low tempera
 
 #### Field: Surface Name or Radiant Surface Group Name
 
-This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: ZoneHVAC:LowTemperatureRadiant:SurfaceGroup) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Only base surfaces (e.g., BuildingSurface:Detailed) are valid. Window/Door surfaces and Internal Mass are not valid surface types for embedded radiant systems.
+This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: ZoneHVAC:LowTemperatureRadiant:SurfaceGroup) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Base surfaces (e.g., BuildingSurface:Detailed), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
 
 #### Field: Hydronic Tubing Inside Diameter
 
@@ -17604,7 +17646,7 @@ This field contains the name of the cold water oulet node to the radiant system.
 
 #### Field: Cooling Control Throttling Range
 
-This field specifies the range of temperature in degrees Celsuis over which the radiant system throttles from zero flow rate up to the maximum defined by the maximum cold water flow rate field described above. The throttling range parameter is used in conjunction with the control temperature to define the response of the system to various zone conditions. The cooling control temperature schedule specifies the “setpoint” temperature where the flow rate to the system is at half of the maximum flow rate. For example, if the cooling control temperature setpoint is currently 25°C and the cooling throttling range is 2°C, the water flow rate to the radiant system will be zero when the controlling temperature (MAT, MRT, Operative Temperature, ODB, or OWB; see control type field above) is at or below 24°C and the maximum flow rate when the controlling temperature is at or above 26C. This represents a throttling range of 2°C around the setpoint of 25°C. In between 24°C and 26°C, the flow rate to the radiant system is varied linearly.
+This field specifies the range of temperature in degrees Celsuis over which the radiant system throttles from zero flow rate up to the maximum defined by the maximum cold water flow rate field described above. The throttling range parameter is used in conjunction with the control temperature to define the response of the system to various zone conditions. The cooling control temperature schedule specifies the “setpoint” temperature where the flow rate to the system is at half of the maximum flow rate. For example, if the cooling control temperature setpoint is currently 25°C and the cooling throttling range is 2°C, the water flow rate to the radiant system will be zero when the controlling temperature (MAT, MRT, Operative Temperature, ODB, or OWB; see control type field above) is at or below 24°C and the maximum flow rate when the controlling temperature is at or above 26°C. This represents a throttling range of 2°C around the setpoint of 25°C. In between 24°C and 26°C, the flow rate to the radiant system is varied linearly.
 
 #### Field: Cooling Control Temperature Schedule Name
 
@@ -17626,69 +17668,40 @@ This optional input allows the user to choose between modeling each surface in t
 
 The length in meters of each parallel hydronic circuit in a surface. Used when the previous input field is set to *CalculateFromCircuitLength*. The default is 106.7 meters (350 feet), which is the maximum circuit length allowed in Title 24.
 
-
-
 An example IDF with a hydronic low temperature radiant system is shown below.
 
+```idf
   ZoneHVAC:LowTemperatureRadiant:VariableFlow,
-
     SPACE1-1 Zone Radiant Floor,  !- Name
-
     RADIANTSYSAVAILSCHED,    !- Availability Schedule Name
-
     SPACE1-1,                !- Zone Name
-
     C1-1,                    !- Surface Name or Radiant Surface Group Name
-
     0.013,                   !- Hydronic Tubing Inside Diameter {m}
-
     autosize,                !- Hydronic Tubing Length {m}
-
     OperativeTemperature,    !- Temperature Control Type
-
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-
     autosize,                !- Heating Design Capacity{ W }
-
     ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
-
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
-
     0.0004,                  !- Maximum Hot Water Flow {m3/s}
-
     SPACE1-1 Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
-
     SPACE1-1 Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
-
     2.0,                     !- Heating Control Throttling Range {deltaC}
-
     RADIANT HEATING SETPOINTS,  !- Heating Control Temperature Schedule Name
-
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
-
     autosize,                !- Cooling Design Capacity{ W }
-
     ,                        !- Cooling Design Capacity Per Floor Area{ W / m2 }
-
     ,                        !- Fraction of Autosized Cooling Design Capacity{ -}
-
     autosize,                !- Maximum Cold Water Flow {m3/s}
-
     SPACE1-1 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
-
     SPACE1-1 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
-
     2.0,                     !- Cooling Control Throttling Range {deltaC}
-
     RADIANT COOLING SETPOINTS,  !- Cooling Control Temperature Schedule Name
-
     Off,                     !- Condensation Control Type
-
     1.0,                     !- Condensation Control Dewpoint Offset
-
     CalculateFromCircuitLength,   !- Number of Circuits
-
     106.7;                   !- Circuit Length
+```
 
 ### Low Temperature Radiant Variable Flow (ZoneHVAC) Outputs
 
@@ -17774,7 +17787,7 @@ This field is the name of the zone (Ref: Zone) in which the constant flow low te
 
 #### Field: Surface Name or Radiant Surface Group Name
 
-This field is the name of the surface (Ref: BuildingSurface:Detailed) or surface list (Ref: ZoneHVAC:LowTemperatureRadiant:SurfaceGroup) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Only base surfaces (BuildingSurface:Detailed) are valid. Window/Door surfaces and Internal Mass are not valid surface types for embedded radiant systems.
+This field is the name of the surface (Ref: BuildingSurface:Detailed) or surface list (Ref: ZoneHVAC:LowTemperatureRadiant:SurfaceGroup) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Base surfaces (e.g., BuildingSurface:Detailed), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
 
 #### Field: Hydronic Tubing Inside Diameter
 
@@ -17892,66 +17905,38 @@ The length in meters of each parallel hydronic circuit in a surface. Used when t
 
 An example IDF with a constant flow low temperature radiant system is shown below.
 
+```idf
 ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
-
     Resistive Zone Radiant Floor,  !- name of CONSTANT FLOW low temperature radiant system
-
     RadiantSysAvailSched,  !- availability schedule
-
     Resistive Zone,  !- Zone name
-
     Zn001:Flr001,  !- Surface name or group
-
     0.012,  !- Hydronic tubing inside diameter {m}
-
     400.0,  !- Hydronic tubing length {m}
-
     MeanAirTemperature,  !- temperature control type
-
     0.0004,  !- maximum water volumetric flow rate {m3/s}
-
     ,  !-schedule for flow rate (optional, non-existent means constant)
-
     30000, !-Rated Pump Head in Pa
-
     50,  !-Rated Power Consumption in W
-
     0.87,  !-Motor Efficiency
-
     0.1,  !-Fraction of Motor Inefficiencies to Fluid Stream
-
     Resistive Zone Radiant Water Inlet Node,  !- heating water inlet node
-
     Resistive Zone Radiant Water Outlet Node,  !- heating water outlet node
-
     RadHeatHighWaterTemp,  !-high water temperature schedule
-
     RadHeatLowWaterTemp,   !-low water temperature schedule
-
     RadHeatHighControlTemp, !-high control temperature schedule
-
     RadHeatLowControlTemp,  !-low control temperature schedule
-
     Zone 1 Cooling Water Inlet Node,  !- cooling water inlet node
-
     Zone 1 Cooling Water Outlet Node,  !- cooling water outlet node
-
     RadCoolHighWaterTemp, !-cooling high water temperature schedule
-
     RadCoolLowWaterTemp,  !-cooling low water temperature schedule
-
     RadCoolHighControlTemp, !- cooling high control temperature schedule
-
     RadCoolLowControlTemp,  !- cooling low control temperature schedule
-
     SimpleOff,              !- condensation control type
-
     0.5,                    !- condensation control dewpoint offset
-     CalculateFromCircuitLength,   !- Number of Circuits
-
+    CalculateFromCircuitLength,   !- Number of Circuits
     106.7;                   !- Circuit Length
-
-
+```
 
 ### Low Temperature Radiant Constant Flow (ZoneHVAC) Outputs
 
@@ -18085,7 +18070,7 @@ This field is the name of the zone (Ref: Zone) in which the electric low tempera
 
 #### Field: Surface Name or Radiant Surface Group Name
 
-This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: ZoneHVAC:LowTemperatureRadiant:SurfaceGroup) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Only base surfaces (e.g. BuildingSurface:Detailed) are valid. Window/Door surfaces and Internal Mass are not valid surface types for embedded radiant systems.
+This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: ZoneHVAC:LowTemperatureRadiant:SurfaceGroup) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Base surfaces (e.g., BuildingSurface:Detailed), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
 
 #### Field: Heating Design Capacity Method
 
@@ -18129,29 +18114,19 @@ This field specifies the heating setpoint or control temperature for the radiant
 
 An example IDF with an electric low temperature radiant system is shown below.
 
+```idf
 ZoneHVAC:LowTemperatureRadiant:Electric, Zone 2 Radiant Floor,
-
          RadiantPanelAvailSched ,    ! Availability schedule
-
          EAST ZONE ,                 ! Zone name (name of zone system is serving)
-
          Zn002:Flr001 ,              ! Surface name (name of surface system is embedded in)
-
          HeatingDesignCapacity,      !- Heating Design Capacity Method
-
          10000,                      !- Heating Design Capacity{ W }
-
          ,                           !- Heating Design Capacity Per Floor Area{ W / m2 }
-
          ,                           !- Fraction of Autosized Heating Design Capacity{ -}
-
          MeanAirTemperature,         ! control type (control on mean air temperature)
-
          2.0 ,                       ! heating throttling range (in C)
-
          Radiant Heating Setpoints ; ! heating setpoint temperatures
-
-
+```
 
 ### Low Temperature Radiant Electric (ZoneHVAC) Outputs
 
@@ -18191,7 +18166,7 @@ The pairs of Surface Name, Flow Fraction to Surface are used in several objects.
 
 #### Field: Surface &lt;x&gt; Name
 
-This field is the name of a surface in the zone being conditioned by the radiant system. Only base surfaces (walls, roofs, floors) are valid. Window/Door surfaces and Internal Mass are not valid surface types for embedded radiant systems.
+This field is the name of a surface in the zone being conditioned by the radiant system. Base surfaces (e.g., BuildingSurface:Detailed), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
 
 #### Field: Flow Fraction for Surface &lt;x&gt;
 
@@ -18199,17 +18174,14 @@ This field is the fraction of the total radiant system flow rate that is being s
 
 An example IDF with an electric low temperature radiant system is shown below.
 
+```idf
 ZoneHVAC:LowTemperatureRadiant:SurfaceGroup,
-
     Zone 1 Radiant Surfaces, !- name of surface list
-
     Zn001:Flr001,            !- Surface name 1
-
     0.75,                    !- Flow fraction for surface 1
-
     Zn001:Roof001,           !- Surface name 2
-
     0.25;                    !- Flow fraction for surface 2
+```
 
 ### ZoneHVAC:HighTemperatureRadiant
 
@@ -18309,45 +18281,28 @@ This field is paired with the preceding surface name (previous field) to define 
 
 An example IDF with a high temperature radiant system is shown below.
 
+```idf
 ZoneHVAC:HighTemperatureRadiant, Zone 2 Radiant Heater,
-
          RadiantPanelAvailSched ,   ! Availability schedule
-
          EAST ZONE ,                ! Zone name (name of zone system is serving)
-
          10000,                     !- Heating Design Capacity{ W }
-
          ,                          !- Heating Design Capacity Per Floor Area{ W / m2 }
-
          ,                          !- Fraction of Autosized Heating Design Capacity{ -}
-
          Gas,                       ! type of heater (either gas or electric)
-
          0.8,                       ! combustion efficiency (ignored for electric radiant heaters)
-
          0.80,                      ! fraction radiant
-
          0.00,                      ! fraction latent
-
          0.00,                      ! fraction lost
-
          OperativeTemperature,      ! temperature control type (controls on operative temperature)
-
          2.0 ,                      ! heating throttling range (in C)
-
          Radiant Heating Setpoints, ! heating setpoint temperatures
-
          0.04,                      ! fraction of radiant energy that is incident directly on people
-
          Zn002:Flr001, 0.80,        ! fraction of radiant energy that is incident on the surface indicated
-
          Zn002:Wall001, 0.04,       ! fraction of radiant energy that is incident on the surface indicated
-
          Zn002:Wall002, 0.04,       ! fraction of radiant energy that is incident on the surface indicated
-
          Zn002:Wall003, 0.04,       ! fraction of radiant energy that is incident on the surface indicated
-
          Zn002:Wall004, 0.04;       ! fraction of radiant energy that is incident on the surface indicated
+```
 
 ### High Temperature Radiant (ZoneHVAC) Outputs
 

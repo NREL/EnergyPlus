@@ -2672,7 +2672,7 @@ LifeCycleCost:Parameters,
 LifeCycleCost:RecurringCosts
 ----------------------------
 
-Recurring costs are costs that repeat over time on a regular schedule during the study period. If costs associated with equipment do repeat but not on a regular schedule, use LifeCycleCost:NonrecurringCost objects instead.
+Recurring costs are costs that repeat over time on a regular schedule during the study period. If costs associated with equipment do repeat but not on a regular schedule, use LifeCycleCost:NonrecurringCost objects instead.  Costs related to energy usage are not included here. The UtilityCost:Tariff and other UtilityCost objects can be used to compute energy costs that are automatically included in the life-cycle cost calculations
 
 #### Field: Name
 
@@ -2681,10 +2681,6 @@ The identifier used for the object. The name is used in identifying the cash flo
 #### Field: Category
 
 Enter the category of the recurring costs. Choose the closest category. The options include:
-
-- EnergyCosts
-
-- WaterCosts
 
 - Maintenance
 

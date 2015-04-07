@@ -1173,6 +1173,8 @@ Allowable choices are:
 
 **ReportDetailedWarmupConvergence** – use this to produce detailed reporting (essentially each warmup day for each zone) for warmup convergence.
 
+**ReportDuringHVACSizingSimulation** – use this to allow controlling reporting to SQLite database during sizing period simulations done for HVAC Sizing Simulation.  The regular reporting is done in the usual way. This can show details of how advanced sizing adjustments were determined by documenting how the systems operated when doing the intermediate sizing periods.  Depending on the number of iterations performed for HVAC Sizing Simulation, there will be a number of sets of results with each set containing all the Sizing Periods.
+
 In IDF use:
 
 Output:Diagnostics,
@@ -1283,19 +1285,26 @@ Input is Yes or No. The default is Yes. Yes implies that the simulation will be 
 
 Input is Yes or No. The default is Yes. Yes implies the simulation will be run on all the included RunPeriod objects. Note that each RunPeriod object constitutes an “environment” and warmup convergence (see earlier topic under the Building object) will occur for each.
 
+#### Field: Do HVAC Sizing Simulation for Sizing Periods
+
+This field is optional.  It can be used to enable certain advanced sizing calculations that rely on simulating the sizing periods to collect information.  This is currently only applicable when sizing plant loops using the sizing option called Coincident.
+
+#### Field: Maximum Number of HVAC Sizing Simulation Passes
+
+This field is optional and is only used if the previous field is set to Yes.  The HVAC Sizing Simulation approach can use iteration to improve sizing calculations.  Each iteration is a Sizing Pass.  This field is used to manually place an upper limit the number of passes that the sizing algorithms can use.  
+
 An IDF example:
 
+```idf
   SimulationControl,
-
     No,                      !- Do Zone Sizing Calculation
-
     No,                      !- Do System Sizing Calculation
-
     No,                      !- Do Plant Sizing Calculation
-
     Yes,                     !- Run Simulation for Sizing Periods
-
     Yes;                     !- Run Simulation for Weather File Run Periods
+    No,                      !- Do HVAC Sizing Simulation for Sizing Periods
+    2;                       !- Maximum Number of HVAC Sizing Simulation Passes
+```
 
 ### ProgramControl
 
@@ -2682,13 +2691,11 @@ An IDF example:
 
 Site:GroundTemperature:Deep,  16,16,16,16,16,16,16,16,16,16,16,16;
 
-### Site:GroundDomain
+### Site:GroundDomain:Slab
 
 This section documents the input object used to simulate ground coupled heat transfer with horizontal building surfaces within EnergyPlus. Horizontal ground surfaces within EnergyPlus interact with the Site:GroundDomain object by utilizing the SurfaceProperty:OtherSideConditionsModel object. By utilizing this object, multiple horizontal surfaces can be coupled to the same Site:GroundDomain object. Each horizontal surface may also have its unique ground domain, however, runtime will be adversely affected.
 
 Generally, there are two scenarios which Site:GroundDomain is equipped to model: in-grade slabs, and on-grade slabs.
-
-
 
 ![](InputOutputReference/media/image012.png)
 
@@ -2696,7 +2703,7 @@ Figure 7In-grade configuration.
 
 The in-grade slab option can be used to simulate situations when the upper slab surface is near the ground surface level. For this situation, slab’s upper surface must interact with the zone via an OSCM boundary. Due to this, the FloorConstruction object for the zone floor must include a thin layer of the upper floor material. Horizontal and vertical insulation are modeled by the GroundDomain in this scenario. Horizontal insulation can be modeled as covering the full horizontal surface, or it can be limited to the perimeter regions only. In the latter case, the perimeter insulation width must be specified.
 
-**![](InputOutputReference/media/image013.png)**
+![](InputOutputReference/media/image013.png)
 
 Figure 8 On-grade configuration
 
@@ -2798,13 +2805,10 @@ Numeric field indicates the depth measured in meters from the ground surface to 
 
 Alpha field indicating whether the domain will update temperatures at each zone timestep, or at hourly intervals. Options include “timestep” and “hourly”.
 
-
-
 An IDF example of an in-grade slab.
 
-<table class="table table-striped">
-<tr>
-<td>Site:GroundDomain,
+```idf
+Site:GroundDomain:Slab,
     IngradeCoupledSlab, !- Name
     5,                  !- Ground Domain Depth
     1,                  !- Aspect Ratio
@@ -2829,16 +2833,12 @@ An IDF example of an in-grade slab.
     Slab Insulation,    !- Vertical Insulation Name
     2,                  !- Vertical perimeter insulation depth from surface
     Hourly;             !- Simulation timestep</td>
-</tr>
-</table>
-
-
+```
 
 And IDF example of an on-grade slab
 
-<table class="table table-striped">
-<tr>
-<td>Site:GroundDomain,
+```idf
+Site:GroundDomain:Slab,
     OngradeCoupledSlab, !- Name
     5,                  !- Ground Domain Depth {m}
     1,                  !- Aspect Ratio
@@ -2863,19 +2863,14 @@ And IDF example of an on-grade slab
     Slab Insulation,    !- Vertical Insulation Name
     2,                  !- Vertical perimeter insulation depth from surface
     Hourly;             !- Simulation timestep. (Timestep/Hourly)</td>
-</tr>
-</table>
+```
 
 ### Site:GroundDomain Outputs
 
 The following output variables are available.
 
-<table class="table table-striped">
-<tr>
-<td>Zone, Average, Zone Coupled Surface Heat Flux [W/m2]
-Zone, Average, Zone Coupled Surface Temperature [C]</td>
-</tr>
-</table>
+* Zone, Average, Zone Coupled Surface Heat Flux [W/m2]
+* Zone, Average, Zone Coupled Surface Temperature [C]</td>
 
 #### Zone Coupled Surface Heat Flux [W/m2]
 
@@ -2884,6 +2879,173 @@ This is the value of the heat flux provided to the GroundDomain as a boundary co
 #### Zone Coupled Surface Temperature [C]
 
 This is the value of the OthersideConditionModel surface temperature. This is the temperature provided to the ground coupled surfaces as an outside boundary condition.
+
+### Site:GroundDomain:Basement
+
+This section documents the input object used to simulate ground coupled heat transfer with underground zones within EnergyPlus. Zone surfaces within EnergyPlus interact with the Site:GroundDomain:Basement object by utilizing the SurfaceProperty:OtherSideConditionsModel object. Two separate OSCM are required for the basement vertical and horizontal surfaces. Vertical wall surfaces will interact with the first OSCM while the horizontal floor surface will interact with the second OSCM. Basement floor and wall surfaces are constructed normally by using the BuildingSurface:Detailed object, with the outside boundary condition being the OtherSideConditionsModel for the basement floor or wall. The outside surface of the wall being the interface between the ground domain and the EnergyPlus zone. Horizontal and vertical ground insulation are simulated by the ground domain, and therefore should not be included in the wall and floor construction objects.
+
+![](InputOutputReference/media/image012.png)
+
+Figure: Basement Configuration
+
+```idf
+Site:GroundDomain:Basement,
+    CoupledBasement,         !- Name
+    10,                      !- Ground Domain Depth {m}
+    1,                       !- Aspect ratio
+    5,                       !- Perimeter offset {m}
+    1.8,                     !- Soil Thermal Conductivity {W/m-K}
+    3200,                    !- Soil Density {kg/m3}
+    836,                     !- Soil Specific Heat {J/kg-K}
+    30,                      !- Soil Moisture Content Volume Fraction {percent}
+    50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}
+    15.5,                    !- Kusuda-Achenbach Average Surface Temperature {C}
+    12.8,                    !- Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
+    17.3,                    !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
+    1,                       !- Evapotranspiration Ground Cover Parameter
+    BasementFloorOSCM,       !- Name of Basement Floor Boundary Condition Model
+    Yes,                     !- Basement Horizontal Underfloor Insulation Present (Yes/No)
+    Basement Insulation,     !- Basement Horizontal Insulation Underfloor Material Name
+    Full,                    !- Full Horizontal or Perimeter Only (Full/Perimeter)
+    ,                        !- Perimeter width (m)
+    2.5,                     !- Depth of Basement Wall In Ground Domain {m}
+    BasementWallOSCM,        !- Name of Basement Wall Boundary Condition Model
+    Yes,                     !- Basement Wall Vertical Insulation Present(Yes/No)
+    Basement Insulation,     !- Basement Wall Vertical Insulation Material Name
+    2.5,                     !- Vertical insulation depth from surface (m)
+    Hourly;                  !- Domain Update interval. (Timestep, Hourly)
+    4;                       ! Mesh Density Parameter
+```
+
+#### Field: Name
+
+Alpha field used as a unique identifier for each basement domain. Multiple basements domains can be simulated simultaneously, however, each domain must have a unique name. Additionally, despite the ability to simulate multiple domains simultaneously, these domains do not interact with each other and are treated as independent domains with boundary conditions given by the model parameters below.
+
+#### Field: Ground Domain Depth
+
+Numeric field used to determine the depth of the simulation domain, in meters. A value of 10 meters is the default.
+
+#### Field: Aspect Ratio
+
+Numeric field, which is the ratio of basement length to width, used to determine the aspect ratio of the basement. This field along with the total basement floor area, which is taken as the combination of all surfaces connected to the floor OtherSideConditionsModel, are used to determine the size and shape of the basement domain. Aspect ratios and the inverse of aspect ratios should produce identical results. i.e. AR = 2 equals AR = 0.5. This field has units of meters/meters.
+
+#### Field: Domain Perimeter Offset
+
+Numeric field used to determine the distance from the basement perimeter to the domain perimeter, in meters. A value of 5 is default.
+
+#### Field: Soil Thermal Conductivity
+
+The thermal conductivity of the soil, in W/m-K.
+
+#### Field: Soil Density
+
+The bulk density of the soil, in kg/m3.
+
+#### Field: Soil Specific Heat
+
+The specific heat of dry soil, in J/kg-K. If moisture is defined in this object, moisture and freezing effects are accounted for by varying the specific heat value.
+
+#### Field: Soil Moisture Content Volume Fraction
+
+A nominal value of soil moisture content to be used when evaluating soil thermal properties. 
+
+#### Field: Soil Moisture Content Volume Fraction at Saturation
+
+A nominal value of soil moisture content when the soil is saturated, this is used in evaluating thermal properties of freezing soil.
+
+#### Field: Kusuda-Achebach Average Ground Surface Temperature
+
+The annual average ground surface temperature to be applied to the Kusuda-Achenbach far-field boundary temperature correlation, in °C. This parameter and the subsequent two parameters may be determined by using the CalcSoilSurfTemp preprocessor; or, it may be determined by including the Site:GroundTemperature:Shallow object in the input. This object is used to provide monthly ground surface temperatures to the simulation. From these temperatures, the model can determine this, and the following two parameters for the simulation. In which case, this field and the following two can be left blank.
+
+#### Field: Kusuda-Achebach Average Amplitude of Ground Surface Temperature
+
+The annual mean ground surface temperature variation from average used in determining the far-field boundary conditions, in °C. This parameter, as well as the previous and following parameters may be determined by using the CalcSoilSurfTemp preprocessor; or, it may be determined by including the Site:GroundTemperature:Shallow object in the input. This object is used to provide monthly ground surface temperatures to the simulation. From these temperatures, the model can determine this parameter, as well as the previous and following parameters. In which case, this field, the previous field, and the following field can be left blank.
+
+#### Field: Kusuda-Achenbach Phase Shift of Minimum Ground Surface Temperature
+
+The phase shift of minimum ground surface temperature, or the day of the year when the minimum ground surface temperature occurs. This parameter, as well as the previous two parameters may be determined by using the CalcSoilSurfTemp preprocessor; or, it may be determined by including the Site:GroundTemperature:Shallow object in the input. This object is used to provide monthly ground surface temperatures to the simulation. From these temperatures, the model can determine this parameter, as well as the previous two parameters. In which case, this field, the previous two fields can be left blank.
+
+#### Field: Evapotranspiration Ground Cover Parameter
+
+Numeric field specifies the ground cover effects used in the evapotranspiration model at the ground surface heat balance. The values range from 0 (solid, non-permeable ground surface) to 1.5 (wild growth). Model can be sensitive to variations in this parameter, especially in dry climates.
+
+#### Field: Basement Floor Boundary Condition Model Name
+
+This is the name of the other side boundary condition model used for the basement floor surface. 
+
+#### Field: Horizontal Insulation 
+
+Alpha field indicates whether horizontal insulation is present. Options include “YES” and “NO”. 
+
+#### Field: Horizontal Insulation Name
+
+Name of material object representing the horizontal underfloor basement insulation. Optional argument only required if horizontal insulation is present.
+
+#### Field: Horizontal Insulation Extents
+
+Alpha field indicates whether the horizontal underfloor insulation extends to cover the full horizontal area of the basement floor, or only covers the basement floor perimeter. Optional argument only required if horizontal insulation is present. Options include “FULL” and “PERIMETER”.
+
+#### Field: Perimeter Insulation Width
+
+Numeric field indicating the width of the perimeter insulation measured from the basement floor edge. Valid range from > 0 to < half of smallest basement floor width.
+
+#### Field: Basement Depth
+
+Depth of basement floor surface referenced from the ground surface, in meters. This domain should be the distance from the ground surface down to the basement floor surface. In cases where the ground surface is below the main above-ground building level, a separate wall surface should be employed between the basement walls and the main level walls.
+
+#### Field: Basement Wall Boundary Condition Model Name
+
+Name of the other side condition boundary model used for the basement walls.
+
+#### Field: Vertical Insulation 
+
+Alpha field indicates whether vertical insulation is present. Options include “YES” and “NO”.
+
+#### Field: Vertical Insulation Name
+
+Name of material object representing the vertical slab insulation. Optional argument only required if vertical insulation is present.
+
+#### Field: Vertical Insulation Depth
+
+Numeric field indicates the depth measured in meters from the ground surface to which the vertical perimeter insulation extends. Valid range from > 0 to < Basement Depth.
+
+#### Field: Simulation Timestep
+
+Alpha field indicating whether the domain will update temperatures at each zone timestep, or at hourly intervals. Options include “timestep” and “hourly”.
+
+#### Mesh Density Parameter
+
+Integer field indicating the density of the finite difference ground domain cells between the basement and the far field boundaries. Default value is 4. Total number of ground domain cells, insulation cells, and ground surface cells are indicated as outputs to the eio file.
+
+Site:GroundDomain:Basement Output Variables
+
+The following output variables are available.
+
+* Wall Interface Heat Flux
+
+* Wall Interface Temperature
+
+* Floor Interface Heat Flux
+
+* Floor Interface Temperature
+
+#### Wall Interface Heat Flux [W/m2]
+
+This is the value of the heat flux provided to ground domain as a boundary condition for the basement walls. Should be equal to the basement wall outside heat flux.
+
+#### Wall Interface Temperature [C]
+
+This is the value of the OthersideConditionModel surface temperature. This is the temperature provided to the basement wall surfaces as an outside boundary condition.
+
+#### Floor Interface Heat Flux [W/m2]
+
+This is the value of the heat flux provided to ground domain as a boundary condition for the basement floor. Should be equal to the basement floor outside heat flux.
+
+#### Floor Interface Temperature [C]
+
+This is the value of the OthersideConditionModel surface temperature. This is the temperature provided to the ground coupled floor surfaces as an outside boundary condition.
+
+
 
 ### Site:GroundTemperature:FCfactorMethod
 
@@ -2911,31 +3073,21 @@ Each numeric field is the monthly average reflectivity of the ground used for th
 
 And use in an IDF:
 
+```idf
   Site:GroundReflectance,
-
      0.600,     !January Ground Reflectance
-
      0.600,     !February Ground Reflectance
-
      0.400,     !March Ground Reflectance
-
      0.300,     !April Ground Reflectance
-
      0.200,     !May Ground Reflectance
-
      0.200,     !June Ground Reflectance
-
      0.200,     !July Ground Reflectance
-
      0.200,     !August Ground Reflectance
-
      0.200,     !September Ground Reflectance
-
      0.200,     !October Ground Reflectance
-
      0.300,     !November Ground Reflectance
-
      0.400;     !December Ground Reflectance
+```
 
 ### Site:GroundReflectance:SnowModifier
 
@@ -2959,9 +3111,10 @@ The actual Ground Reflectance is limited to [0.0,1.0].
 
 An IDF example:
 
+```idf
   Site:GroundReflectance:SnowModifier,
-
     1.0;                     !- Ground Reflected Solar Modifier
+```
 
 Outputs will show both the inputs from the above object as well as monthly values for both Snow Ground Reflectance and Snow Ground Reflectance for Daylighting.
 
@@ -2997,16 +3150,14 @@ If the calculation method is Correlation, this field is used in the calculation 
 
 If the calculation method is Correlation, this field is used in the calculation as the maximum difference in monthly average outdoor air temperatures [∆C]. If the calculation method is Schedule, this field is ignored.
 
+```idf
   Site:WaterMainsTemperature,
-
     Correlation,  !- Calculation Method {SCHEDULE | CORRELATION}
-
     ,  !- Schedule Name
-
     9.69,  !- Annual Average Outdoor Air Temperature {C}
-
     28.1;  !- Maximum Difference In Monthly Average Outdoor Air Temperatures
-            !- {deltaC}
+           !- {deltaC}
+```
 
 ### Site:Precipitation
 
@@ -19960,29 +20111,203 @@ Allows you to specify a user-defined end-use subcategory, e.g., "Cooking", "Clot
 
 IDF Examples:
 
+```idf
 SteamEquipment,
-
     SPACE4-1 ElecEq 1,       !- Name
-
     SPACE4-1,                !- Zone Name
-
     EQUIP-1,                 !- SCHEDULE Name
-
     EquipmentLevel,          !- Design Level calculation method
-
     1050,                    !- Design Level {W}
-
     ,                        !- Power per Zone Floor Area {watts/m2}
-
     ,                        !- Power per Person {watts/person}
-
     0.5,                     !- Fraction Latent
-
     0.3,                     !- Fraction Radiant
-
     0,                       !- Fraction Lost
-
     Laundry;                 !- End-Use Subcategory
+```
+
+### SwimmingPool:Indoor
+
+The Indoor Swimming Pool object is used to describe the indoor swimming pools that are exposed to the internal environment.  There are several rules that should be noted regarding the specification of an indoor pool in EnergyPlus.  First, the pool is linked to a surface that must be a floor.  The pool is assumed to cover the entire floor to which it is linked.  If the pool only covers part of the floor in the actual building, then the user must break the floor up into multiple sections.
+
+As pools attempt to achieve a particular water temperature and have a variety of heat losses, heating equipment is necessary to maintain the proper setpoint temperature.  In EnergyPlus, the pool itself becomes part of the demand side of a plant loop with heating equipment on the supply side providing whatever heating is needed to maintain the desired temperature.  This heating equipment as well as the loop connections must be entered separately and the input shown in this section only details what is needed to specify the pool itself.
+
+The following information is useful for defining and modeling an indoor pool in EnergyPlus.  For more information on the algorithm used for this model or details on some of the input parameters, please reference the indoor pool section of the EnergyPlus Engineering Reference document.
+
+#### Field: Name
+
+This is a unique name associated with the indoor swimming pool.
+
+#### Field: Surface Name
+
+This is the name of the surface (floor) where the pool is located. Pools are not allowed on any surfaces other than a floor.
+
+#### Field: Average Depth
+
+This field is the average depth of the pool in meters.  If the pool has variable depth, the average depth should be specified to achieve the proper volume of water in the pool.
+
+#### Field: Activity Factor Schedule Name
+
+This field references a schedule that contains values for pool activity.  This parameter can be varied using the schedule named here, and it has an impact on the amount of evaporation that will take place from the pool to the surrounding zone air.  For example values of the activity factor and what impact it will have on the evaporation of water from the pool, please refer to indoor swimming pool section of the EnergyPlus Engineering Reference document.  If left blank, the activity factor will be assumed to be unity.
+
+#### Field: Make-up Water Supply Schedule Name
+
+The scheduled named by this field establishes a cold water temperature [C] for the water that replaces the water which is lost from the pool due to evaporation.  If blank, water temperatures are calculated by the Site:WaterMainsTemperature object.  This field (even if blank) overrides the Cold Water Supply Temperature Schedule in all of the listed WaterUse:Equipment objects.
+
+#### Field: Cover Schedule Name
+
+This schedule defines when the pool water cover is available and affects the evaporation, convection, and radiation rate calculations. A schedule value of 0.0 means that the pool is not covered.  A schedule value of 1.0 means the pool is 100% covered.  The pool may be fully covered, fully open (uncovered), or partially covered (a value between 0.0 and 1.0).  The user also has the option to control the evaporation, convection, short-wavelength radiation, and long-wavelength radiation factors when the pool is covered.  These terms are discussed in the next four fields.
+
+#### Field: Cover Evaporation Factor
+
+This input field can optionally be used to modify the pool evaporation rate and is used in conjunction with the pool cover factor defined by the Pool Cover Schedule field (see above).  The value for this parameter can normally range from 0.0 to 1.0, where 1 means that the pool cover completely eliminates evaporation from the pool surface, 0 means the pool cover has no effect on evaporation, and fractions in between 0 and 1 result in a fractional reduction in evaporation by the pool cover.  So, if this parameter is 0.5 and the pool is 50% covered, the overall reduction in evaporation from a fully uncovered pool is 25% or 0.25.
+
+#### Field: Cover Convection Factor
+
+This input field can optionally be used to modify the pool convection rate and is used in conjunction with the pool cover factor defined by the Pool Cover Schedule field (see above).  The value for this parameter can normally range from 0.0 to 1.0, where 1 means that the pool cover completely eliminates convection from the pool surface, 0 means the pool cover has no effect on convection, and fractions in between 0 and 1 result in a fractional reduction in convection by the pool cover.  So, if this parameter is 0.5 and the pool is 50% covered, the overall reduction in convection from a fully uncovered pool is 25% or 0.25.
+
+#### Field: Cover Short-Wavelength Radiation Factor
+
+This input field can optionally be used to modify the pool short-wavelength radiation rate and is used in conjunction with the pool cover factor defined by the Pool Cover Schedule field (see above).  The value for this parameter can normally range from 0.0 to 1.0, where 1 means that the pool cover completely eliminates short-wavelength radiation from the pool surface, 0 means the pool cover has no effect on short-wavelength radiation, and fractions in between 0 and 1 result in a fractional reduction in short-wavelength radiation by the pool cover.  So, if this parameter is 0.5 and the pool is 50% covered, the overall reduction in short-wavelength radiation from a fully uncovered pool is 25% or 0.25.  Note that with radiation terms that whatever portion of the short-wavelength radiation is blocked by the cover is transferred via convection to the surrounding zone air.
+
+#### Field: Cover Long-Wavelength Radiation Factor
+
+This input field can optionally be used to modify the pool long-wavelength radiation rate and is used in conjunction with the pool cover factor defined by the Pool Cover Schedule field (see above).  The value for this parameter can normally range from 0.0 to 1.0, where 1 means that the pool cover completely eliminates long-wavelength radiation from the pool surface, 0 means the pool cover has no effect on long-wavelength radiation, and fractions in between 0 and 1 result in a fractional reduction in long-wavelength radiation by the pool cover.  So, if this parameter is 0.5 and the pool is 50% covered, the overall reduction in long-wavelength radiation from a fully uncovered pool is 25% or 0.25.  Note that with radiation terms that whatever portion of the long-wavelength radiation is blocked by the cover is transferred via convection to the surrounding zone air.
+
+#### Field: Pool Water Inlet Node
+
+This input is the name of the node on the demand side of a plant loop that leads into the pool.  From the standpoint of an EnergyPlus input file, the pool sits on a plant demand loop, and the pump and heater reside on the plant supply loop.  The pool heater and pump must be defined by other existing EnergyPlus input.
+
+#### Field: Pool Water Outlet Node
+
+This input is the name of the node on the demand side of a plant loop that leads out of the pool.  From the standpoint of an EnergyPlus input file, the pool sits on a plant demand loop, and the pump and heater reside on the plant supply loop.  The pool heater and pump must be defined by other existing EnergyPlus input.
+
+#### Field: Pool Water Maximum Flow Rate
+
+This input is the maximum water volumetric flow rate in m3/s going between the pool and the water heating equipment.  This along with the pool setpoint temperature and the heating plant equipment outlet temperature will establish the maximum heat addition to the pool.  This flow rate to the pool will be varied in an attempt to reach the desired pool water setpoint temperature (see Setpoint Temperature Schedule below).
+
+#### Field: Pool Miscellaneous Equipment Power
+
+This input defines the power consumption rate of miscellaneous equipment such as the filtering and chlorination technology associated with the pool.  The units for this input are in power consumption per flow rate of water through the pool from the heater or W/(kg/s). This field will be multiplied by the flow rate of water through the pool to determine the power consumption of this equipment. Any heat generated by this equipment is assumed to have no effect on the pool water itself.
+
+#### Field: Setpoint Temperature Schedule
+
+Pools attempt to maintain a particular water temperature.  In EnergyPlus, this field defines the setpoint temperature for the desired pool water temperature.  It is input as a schedule to allow the user to vary the pool setpoint temperature as desired.  The equipment defined to provide heating for the pool will deliver the necessary hot water to the pool, up to the capacity of that equipment defined by other input by the user.
+
+#### Field: Maximum Number of People
+
+This field defines the maximum occupancy of people actually in the pool and thus will be used with the next two inputs to determine how much heat people contribute to the pool heat balance.  People who are not in the pool should be modeled separately using the standard People description for zones.
+
+#### Field: People Schedule
+
+This field defines a schedule that establishes how many people are in the pool at any given time.  The current value of this schedule is multiplied by the maximum number of people in the previous field determines how many people are currently in the pool.
+
+#### Field: People Heat Gain Schedule
+
+This field defines the amount of heat given off by an average person in the pool in Watts.  This field is a schedule so that this heat gain can be allowed to vary as the type of activity in a pool can vary greatly and thus the amount of heat gain per person also varies.  This parameter times the number of people in the pool determines how much heat is added to the pool.  All heat given off by people is added to the heat balance of the pool water.
+
+An example of an indoor swimming pool definition is:
+
+```idf
+  SwimmingPool:Indoor,
+    Test Pool,             !- Name
+    F1-1,                  !- Surface Name
+    1.5,                   !- Average Depth {m}
+    PoolActivitySched,     !- Pool Activity Schedule
+    MakeUpWaterSched,      !- MakeUp Water Temperature Schedule
+    PoolCoverSched,        !- Pool Cover Schedule
+    0.0,                   !- Cover Evaporation Factor
+    0.2,                   !- Cover Convection Factor
+    0.9,                   !- Cover Short-Wavelength Radiation Factor
+    0.5,                   !- Cover Long-Wavelength Radiation Factor
+    Pool Water Inlet Node,    !- Water Inlet Node (Plant/Heater)
+    Pool Water Outlet Node,   !- Water Outlet Node (Plant/Heater)
+    0.1,                   !- Maximum flow rate from water heating system {m3/s}
+    0.6,                   !- Miscellaneous Equipment Power Factor
+    PoolSetpointTempSched, !- Pool Water Setpoint Temperature Schedule
+    15,                    !- Maximum Number of People in Pool
+    PoolOccupancySched,    !- Pool People Schedule
+    PoolOccHeatGainSched;  !- Pool People Heat Gain Schedule
+```
+
+### SwimmingPool:Indoor Outputs
+
+* HVAC, Average, Indoor Pool Makeup Water Rate [m3/s]
+* HVAC, Sum, Indoor Pool Makeup Water Volume [m3]
+* HVAC, Average, Indoor Pool Makeup Water Temperature [C]
+* HVAC, Average, Indoor Pool Water Temperature [C]
+* HVAC, Average, Indoor Pool Inlet Water Temperature [C]
+* HVAC, Average, Indoor Pool Inlet Water Mass Flow Rate [kg/s]
+* HVAC, Average, Indoor Pool Miscellaneous Equipment Power [W]
+* HVAC, Sum, Indoor Pool Miscellaneous Equipment Energy [J]
+* HVAC, Average, Indoor Pool Heating Rate [W]
+* HVAC, Sum, Indoor Pool Heating Energy [J]
+* HVAC, Average, Indoor Pool Radiant to Convection by Cover [W]
+* HVAC, Average, Indoor Pool People Heat Gain [W]
+* HVAC, Average, Indoor Pool Current Activity Factor []
+* HVAC, Average, Indoor Pool Current Cover Factor []
+* HVAC, Average, Indoor Pool Evaporative Heat Loss Rate [W]
+* HVAC, Sum, Indoor Pool Evaporative Heat Loss Energy [J]
+
+#### Indoor Pool Makeup Water Rate [m3/s]
+
+The water consumption rate for the makeup water of indoor swimming pool.
+
+#### Indoor Pool Makeup Water Volume [m3]
+
+The water consumption for the makeup water of indoor swimming pool.
+
+#### Indoor Pool Makeup Water Temperature [C]
+
+The temperature of the makeup water of indoor swimming pool.
+
+#### Indoor Pool Water Temperature [C]
+
+The average calculated pool water temperature during the simulation at the time frequency requested.
+
+#### Indoor Pool Inlet Water Temperature [C]
+
+The temperature of the water being sent to the pool from the plant heating equipment.
+
+#### Indoor Pool Inlet Water Mass Flow Rate [kg/s]
+
+The mass flow rate of water being sent to the pool from the plant heating equipment.  Typically this water is being passed through a heater and miscellaneous equipment.
+
+#### Indoor Pool Miscellaneous Equipment Power [W]
+
+The miscellaneous equipment power includes the power consumption of pool filter and chlorinator in Watts.
+
+#### Indoor Pool Miscellaneous Equipment Energy [J]
+
+The miscellaneous equipment power consumption includes the energy consumption of pool filter and chlorinator in Joules.
+
+#### Indoor Pool Heating Rate [W]
+
+This is the rate of heating provided by the plant loop to the pool in Watts.
+
+#### Indoor Pool Heating Energy [J]
+
+This is the amount of heating provided by the plant loop to the pool in Joules over the time step requested.
+
+#### Indoor Pool Radiant to Convection by Cover [W]
+
+The pool cover may block some or all of short- and long-wavelength radiation incident on the pool.  To account for this and to not have the cover result in energy that is not accounted for by the model, the radiation that is blocked by the cover is converted to a convective gain (or loss) to/from the zone air.  This output field reports this value.
+
+#### Indoor Pool Current Activity Factor []
+
+This is the current activity factor as defined by the user input schedule.
+
+#### Indoor Pool Current Cover Factor []
+
+This is the current cover factor as defined by the user input schedule.
+
+#### Indoor Pool Evaporative Heat Loss Rate [W]
+
+This is the rate of evaporative heat loss (latent) to the zone from the pool in Watts.
+
+#### Indoor Pool Evaporative Heat Loss Energy [J]
+
+This is the amount of evaporative heat loss (latent) to the zone from the pool in in Joules over the time step requested.
 
 ### OtherEquipment
 
@@ -20050,27 +20375,19 @@ This field is a decimal number between 0.0 and 1.0 and is used to characterize t
 
 IDF Examples
 
+```idf
 OtherEquipment,
-
     BASE-1 OthEq 1,          !- Name
-
     BASE-1,                  !- Zone Name
-
     ALWAYSON,                !- SCHEDULE Name
-
     EquipmentLevel,          !- Design Level calculation method
-
     6766.,                   !- Design Level {W}
-
     ,                        !- Power per Zone Floor Area {watts/m2}
-
     ,                        !- Power per Person {watts/person}
-
     0,                       !- Fraction Latent
-
     0.3,                     !- Fraction Radiant
-
     0;                       !- Fraction Lost
+```
 
 ### Electric, Gas, Other, HotWater, Steam Equipment Outputs
 
@@ -20351,6 +20668,405 @@ The hot water equipment district heating consumption in Watts (for power) or Jou
 The steam equipment district heating consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. This energy use is added to the district heating meters that are associated with the zone – DistrictHeating:Facility, DistrictHeating:Buidling, DistrictHeating:Zone:&lt;Zone Name&gt;, InteriorEquipment: DistrictHeating: :Zone:&lt;Zone Name&gt;, and &lt;End-Use Subcategory&gt;:InteriorEquipment: DistrictHeating.
 
 Note that zone energy consumption is not reported for OTHER EQUIPMENT and does not go on any meter.
+
+### ElectricEquipment :ITE:AirCooled
+
+This object describes air-cooled electric information technology equipment (ITE) which has variable power consumption as a function of loading and temperature.
+
+#### Field: Name
+
+The name of this object.
+
+#### Field: Zone Name
+
+This field is the name of the thermal zone (ref: Zone) which contains this ElectricEquipment:ITE:AirCooled object.
+
+#### Field: Design Power Input Calculation Method
+
+This field is a key/choice field that tells which of the next two fields are filled and is descriptive of the method for calculating the nominal electric power input to the ITE. The key/choices are:
+
+Watts/Unit
+
+With this choice, the design power input will be the product of Design Level per Unit and Number of Units. (Both of these fields should be filled.) This is the default.
+
+Watts/Area
+
+With this choice, the design power input will be a factor per floor area of the zone. (The Watts per Zone Floor Area field should be filled).
+
+#### Field: Watts per Unit
+
+This field (in Watts) is typically used to represent the design electrical power input to the ITE when fully loaded and the entering air temperatures is at the specified design value. This field is used if the choice from the method field is “EquipmentLevel”.
+
+#### Field: Number of Units
+
+This field is multiplied times the Design Level per Unit to determine the design electrical power input to this ITE object when fully loaded and the entering air temperature is at the specified design value. This field is used if the choice from the method field is “EquipmentLevel”. The default is 1.
+
+#### Field: Watts per Zone Floor Area
+
+This factor (Watts/m2) is used, along with the Zone Area to determine the design electrical power input as described in the Design Level field above. This field is used if the choice from the method field is “Watts/Area”.
+
+#### Field: Design Power Input Schedule Name
+
+This field is the name of the operating schedule that modifies the design level power input for this equipment This schedule specifies the fraction (typically 0.0 to 1.0) of this equipment which is available (powered up), regardless of CPU utilization. If this field is blank, the schedule is assumed to always be 1.0.
+
+#### Field: CPU Loading Schedule Name
+
+This field is the name of the schedule that specifies the CPU loading for this equipment as a fraction from 0.0 (idle) to 1.0 (full load). If this field is blank, the schedule is assumed to always be 1.0.
+
+#### Field: CPU Power Input Function of Loading and Air Temperature Curve Name
+
+The name of a two-variable curve or table lookup object which modifies the CPU power input as a function of CPU loading (x) and air inlet node temperature (y). This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and Design Entering Air Temperature).
+
+#### Field: Design Fan Power Input Fraction
+
+This field is a decimal number between 0.0 and 1.0 and is used to specify the fraction of the total power input at design conditions which is for the cooling fan(s). If fan power data is not available, set this fraction to 0.0. The default is 0.0.
+
+#### Field: Design Fan Air Flow Rate per Power Input
+
+Specifies the cooling fan air flow rate in m3/s per Watt of total electric power input at design conditions (CPU loading = 1.0 and Design Entering Air Temperature).
+
+This is normalized by power input to allow the design power input to be changed without needing to change this value.  
+
+#### Field: Air Flow Function of Loading and Air Temperature Curve Name
+
+The name of a two-variable curve or table lookup object which modifies the cooling air flow rate as a function of CPU loading (x) and air inlet node temperature (y). This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and Design Entering Air Temperature).
+
+#### Field: Fan Power Input Function of Flow Curve Name
+
+The name of a single-variable curve or table lookup object which modifies the fan power input as a function of airflow fraction (x). This curve (table) should equal 1.0 at the design air flow rate (flow fraction = 1.0).
+
+#### Field: Design Entering Air Temperature
+
+Specifies the entering air temperature in deg. C at design conditions. The default is 15C.
+
+#### Field: Environmental Class
+
+Specifies the allowable operating conditions for the air inlet conditions. The available inputs are A1, A2, A3, A4, B, C, or None. This is used to report the “ITE Air Inlet Operating Range Exceeded Time” If None is specified (the default), then no reporting of time outside allowable conditions will be done.
+
+#### Field: Air Inlet Connection Type
+
+Specifies the type of connection between the zone and the ITE air inlet node. The choices are:
+
+AdjustedSupply = This option is used to apply a recirculation adjustment to the ITE inlet conditions. If this option is specified, then the Supply Air Node Name is required and the air inlet temperature to the ITE will be the current supply air node temperature adjusted by the current recirculation fraction. All heat output is added to the zone air heat balance as a convective gain. AdjustedSupply is the default.
+
+ZoneAirNode = This option is used if there is no containment and the ITE air inlet node is at the average zone condition. All heat output is added to the zone air heat balance as a convective gain. 
+
+RoomAirModel = This option connects the ITE air inlet and outlet nodes to a room air model (Ref. RoomAirModelType and RoomAir:Node). 
+
+#### Field: Air Inlet Room Air Model Node Name
+
+Specifies the name of a room air model node (ref. RoomAir:Node) which is the air inlet to this equipment.  This field is required if the Air Node Connection Type = RoomAirModel.
+
+#### Field: Air Outlet Room Air Model Node Name
+
+Specifies the node name of a room air model node (ref. RoomAir:Node) which is the air outlet from this equipment. This field is required if the Air Node Connection Type = RoomAirModel.
+
+#### Field: Supply Air Node Name
+
+Specifies the node name of the supply air inlet node service this ITE. If the Air Node Connection Type = AdjustedSupply ,then this field is required, and the conditions at this node will be used to determine the ITE air inlet conditions. This field is also required if reporting of the Supply Heat Index is desired.
+
+#### Field: Design Recirculation Fraction
+
+Specifies the recirculation fraction for this equipment at design conditions. This field is used only if the Air Node Connection Type = AdjustedSupply. The recirculation fraction is defined as the ratio of recirculated air flow to total air flow entering the ITE. Recirculation is dependent upon many factors including rack and containment configuration. The default is 0.0 (no recirculation).
+
+#### Field: Recirculation Function of Loading and Supply Temperature Curve Name
+
+The name of a two-variable curve or table lookup object which modifies the Design Recirculation Fraction as a function of CPU loading (x) and supply air node temperature (y). This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and Design Entering Air Temperature). This field is used only if the Air Node Connection Type = AdjustedSupply. If this curve is left blank, then the curve is assumed to always equal 1.0.
+
+#### Field: Design Electric Power Supply Efficiency
+
+This field is a decimal number used to specify the efficiency of the power supply system serving this ITE. The default is 1.0.
+
+#### Field: Electric Power Supply Efficiency Function of Part Load Ratio Curve Name
+
+The name of a single-variable curve or table lookup object which modifies the electric power supply efficiency as a function of part load ratio (x). This curve (table) should equal 1.0 at the design power consumption (part load ratio = 1.0). If this curve is left blank, then the curve is assumed to always equal 1.0.
+
+#### Field: Fraction of Electric Power Supply Losses to Zone
+
+This field is a decimal number between 0.0 and 1.0 and is used to specify the fraction of the electric power supply losses which are a heat gain to the zone containing the ITE. If this value is less than 1.0, the remainder of the losses are assumed to be lost to the outdoors. The default is 1.0.
+
+#### Field: CPU End-Use Subcategory
+
+This equipment is metered on the Interior Equipment end-use category for Electricity.  This field allows you to specify a user-defined end-use subcategory for the CPU power consumption. A new meter for reporting is created for each unique subcategory (ref: Output:Meter object). Subcategories are also reported in the ABUPS table. The default is ITE-CPU.
+
+#### Field: Fan End-Use Subcategory
+
+This equipment is metered on the Interior Equipment end-use category for Electricity.  This field allows you to specify a user-defined end-use subcategory for the fan power consumption. A new meter for reporting is created for each unique subcategory (ref: Output:Meter object). Subcategories are also reported in the ABUPS table.  The default is ITE-Fans
+
+#### Field: Electric Power Supply End-Use Subcategory
+
+This equipment is metered on the Interior Equipment end-use category for Electricity.  This field allows you to specify a user-defined end-use subcategory for the electric power supply power consumption. A new meter for reporting is created for each unique subcategory (ref: Output:Meter object). Subcategories are also reported in the ABUPS table. The default is ITE-UPS
+
+An IDF example:
+
+```idf
+ElectricEquipment:ITE:AirCooled,
+    Data Center Servers,     !- Name
+    Main Zone,               !- Zone Name
+    Watts/Unit,              !- Design Power Input Calculation Method
+    500,                     !- Watts per Unit {W}
+    200,                     !- Number of Units
+    ,                        !- Watts per Zone Floor Area {W/m2}
+    Data Center Operation Schedule,  !- Design Power Input Schedule Name
+    Data Center CPU Loading Schedule,  !- CPU Loading  Schedule Name
+    Model 5250 Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name
+    0.4,                     !- Design Fan Power Input Fraction
+    0.0001,                  !- Design Fan Air Flow Rate per Power Input {m3/s-W}
+    Model 5250 AifFlow fLoadTemp,  !- Air Flow Function of Loading and Air Temperature Curve Name
+    ECM FanPower fFlow,      !- Fan Power Input Function of Flow Curve Name
+    15,                      !- Design Entering Air Temperature {C}
+    A3,                      !- Environmental Class
+    AdjustedSupply,          !- Air Inlet Connection Type
+    ,                        !- Air Inlet Room Air Model Node Name
+    ,                        !- Air Outlet Room Air Model Node Name
+    Main Zone Inlet Node,    !- Supply Air Node Name
+    0.1,                     !- Design Recirculation Fraction
+    Data Center Recirculation fLoadTemp,  !- Recirculation Function of Loading and Supply Temperature Curve Name
+    0.9,                     !- Design Electric Power Supply Efficiency
+    UPS Efficiency fPLR,     !- Electric Power Supply Efficiency Function of Part Load Ratio Curve Name
+    1,                       !- Fraction of Electric Power Supply Losses to Zone
+    ITE-CPU,                 !- CPU End-Use Subcategory
+    ITE-Fans,                !- Fan End-Use Subcategory
+    ITE-UPS;                 !- Electric Power Supply End-Use Subcategory
+```
+
+ElectricEquipment:ITE:AirCooled Outputs
+
+* Zone,Average,ITE CPU Electric Power [W]
+* Zone,Average,ITE Fan Electric Power [W]
+* Zone,Average,ITE UPS Electric Power [W]
+* Zone,Average,ITE CPU Electric Power at Design Inlet Conditions [W]
+* Zone,Average,ITE Fan Electric Power at Design Inlet Conditions [W]
+* Zone,Average,ITE UPS Heat Gain to Zone Rate [W]
+* Zone,Average,ITE Total Heat Gain to Zone Rate [W]
+* Zone,Sum,ITE CPU Electric Energy [J]
+* Zone,Sum,ITE Fan Electric Energy [J]
+* Zone,Sum,ITE UPS Electric Energy [J]
+* Zone,Sum,ITE CPU Electric Energy at Design Inlet Conditions [J]
+* Zone,Sum,ITE Fan Electric Energy at Design Inlet Conditions [J]
+* Zone,Sum,ITE UPS Heat Gain to Zone Energy [J]
+* Zone,Sum,ITE Total Heat Gain to Zone Energy [J]
+* Zone,Average,ITE Standard Density Air Volume Flow Rate [m3/s]
+* Zone,Average,ITE Current Density Air Volume Flow Rate [m3/s]
+* Zone,Average,ITE Air Mass Flow Rate [kg/s]
+* Zone,Average,ITE Air Inlet Dry-Bulb Temperature [C]
+* Zone,Average,ITE Air Inlet Dewpoint Temperature [C]
+* Zone,Average,ITE Air Inlet Relative Humidity [%]
+* Zone,Average,ITE Air Outlet Dry-Bulb Temperature [C]
+* Zone,Average,ITE Supply Heat Index []
+* Zone,Sum,ITE Air Inlet Operating Range Exceeded Time [hr]
+* Zone,Sum,ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time [hr]
+* Zone,Sum,ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time [hr]
+* Zone,Sum,ITE Air Inlet Dewpoint Temperature Above Operating Range Time [hr]
+* Zone,Sum,ITE Air Inlet Dewpoint Temperature Below Operating Range Time [hr]
+* Zone,Sum,ITE Air Inlet Relative Humidity Above Operating Range Time [hr]
+* Zone,Sum,ITE Air Inlet Relative Humidity Below Operating Range Time [hr]
+* Zone,Average,ITE Air Inlet Dry-Bulb Temperature Difference Above Operating Range [deltaC]
+* Zone,Average,ITE Air Inlet Dry-Bulb Temperature Difference Below Operating Range [deltaC]
+* Zone,Average,ITE Air Inlet Dewpoint Temperature Difference Above Operating Range [deltaC]
+* Zone,Average,ITE Air Inlet Dewpoint Temperature Difference Below Operating Range [deltaC]
+* Zone,Average,ITE Air Inlet Relative Humidity Difference Above Operating Range [%]
+* Zone,Average,ITE Air Inlet Relative Humidity Difference Below Operating Range [%]
+* Zone,Average,Zone ITE CPU Electric Power [W]
+* Zone,Average,Zone ITE Fan Electric Power [W]
+* Zone,Average,Zone ITE UPS Electric Power [W]
+* Zone,Average,Zone ITE CPU Electric Power at Design Inlet Conditions [W]
+* Zone,Average,Zone ITE Fan Electric Power at Design Inlet Conditions [W]
+* Zone,Average,Zone ITE UPS Heat Gain to Zone Rate [W]
+* Zone,Average,Zone ITE Total Heat Gain to Zone Rate [W]
+* Zone,Sum,Zone ITE CPU Electric Energy [J]
+* Zone,Sum,Zone ITE Fan Electric Energy [J]
+* Zone,Sum,Zone ITE UPS Electric Energy [J]
+* Zone,Sum,Zone ITE CPU Electric Energy at Design Inlet Conditions [J]
+* Zone,Sum,Zone ITE Fan Electric Energy at Design Inlet Conditions [J]
+* Zone,Sum,Zone ITE UPS Heat Gain to Zone Energy [J]
+* Zone,Sum,Zone ITE Total Heat Gain to Zone Energy [J]
+* Zone,Average,Zone ITE Standard Density Air Volume Flow Rate [m3/s]
+* Zone,Average,Zone ITE Air Mass Flow Rate [kg/s]
+* Zone,Average,Zone ITE Average Supply Heat Index []
+* Zone,Sum,Zone ITE Any Air Inlet Operating Range Exceeded Time [hr]
+* Zone,Sum,Zone ITE Any Air Inlet Dry-Bulb Temperature Above Operating Range Time [hr]
+* Zone,Sum,Zone ITE Any Air Inlet Dry-Bulb Temperature Below Operating Range Time [hr]
+* Zone,Sum,Zone ITE Any Air Inlet Dewpoint Temperature Above Operating Range Time [hr]
+* Zone,Sum,Zone ITE Any Air Inlet Dewpoint Temperature Below Operating Range Time [hr]
+* Zone,Sum,Zone ITE Any Air Inlet Relative Humidity Above Operating Range Time [hr]
+* Zone,Sum,Zone ITE Any Air Inlet Relative Humidity Below Operating Range Time [hr]
+
+#### Zone ITE CPU Electric Power [W]
+
+ITE CPU Electric Power [W]
+
+#### Zone ITE CPU Electric Energy [J]
+
+#### ITE CPU Electric Energy [J]
+
+The electric power (or energy) input to the ITE equipment CPU (total power input less cooling fan power). The ITE CPU Electric Energy output is also added to a meter object with Resource Type = Electricity, End Use Key = InteriorEquipment, Group Key = Building (Ref. Output:Meter object).
+
+#### Zone ITE CPU Electric Power at Design Inlet Conditions [W]
+
+#### ITE CPU Electric Power at Design Inlet Conditions [W]
+
+#### Zone ITE CPU Electric Energy at Design Inlet Conditions [J]
+
+#### ITE CPU Electric Energy at Design Inlet Conditions [J]
+
+The electric power (or energy) input to the ITE equipment CPU (total power input less cooling fan power) if the air inlet temperature were held at the design condition. May be used to calculate “IT efficiency”, the ratio of (IT energy consumed in the facility) / (IT energy that would have been consumed in the facility if the ITE were held at the reference temperature).
+
+#### Zone ITE Fan Electric Power [W]
+
+#### ITE Fan Electric Power [W]
+
+#### Zone ITE Fan Electric Energy [J]
+
+#### ITE Fan Electric Energy [J]
+
+The electric power (or energy) input to the ITE cooling fan. The ITE Fan Electric Energy output is also added to a meter object with Resource Type = Electricity, End Use Key = InteriorEquipment, Group Key = Building (Ref. Output:Meter object).
+
+#### Zone ITE Fan Electric Power at Design Inlet Conditions [W]
+
+#### ITE Fan Electric Power at Design Inlet Conditions [W]
+
+#### Zone ITE Fan Electric Energy at Design Inlet Conditions [J]
+
+#### ITE Fan Electric Energy at Design Inlet Conditions [J]
+
+The electric power (or energy) input to the ITE cooling fan if the air inlet temperature were held at the design condition. May be used to calculate “IT efficiency”, the ratio of (IT energy consumed in the facility) / (IT energy that would have been consumed in the facility if the ITE were held at the reference temperature).
+
+#### Zone ITE UPS Electric Power [W]
+
+#### ITE UPS Electric Power [W]
+
+#### Zone ITE UPS Electric Energy [J]
+
+#### ITE UPS Electric Energy [J]
+
+The net electric power (or energy) input to the ITE equipment UPS (total power input less power delivered to ITE). The ITE UPS Electric Energy output is also added to a meter object with Resource Type = Electricity, End Use Key = InteriorEquipment, Group Key = Building (Ref. Output:Meter object).
+
+#### Zone ITE UPS Heat Gain to Zone Rate [W]
+
+#### ITE UPS Heat Gain to Zone Rate [W]
+
+#### Zone ITE UPS Heat Gain to Zone Energy [J]
+
+#### ITE UPS Heat Gain to Zone Energy [J]
+
+The heat gain rate (or energy) to the zone from the UPS.
+
+#### Zone ITE Total Heat Gain to Zone Rate [W]
+
+#### ITE Total Heat Gain to Zone Rate [W]
+
+#### Zone ITE Total Heat Gain to Zone Energy [J]
+
+#### ITE Total Heat Gain to Zone Energy [J]
+
+The heat gain rate (or energy) to the zone from the UPS and from the CPU and fans if the ITE. Air Inlet Connection Type is AdjustedSupply or ZoneAirNode.  If RoomAirModel is selected, then only the heat gain from the UPS is added directly to the zone air heat balance, the heat gain from the CPU and fans will be added to the ITE air Outlet Room Air Model Node
+
+#### Zone ITE Standard Density Air Volume Flow Rate [m3/s]
+
+#### ITE Standard Density Air Volume Flow Rate [m3/s]
+
+Reports the average air volume flow rate through the ITE over the reporting interval.  Standard density in EnergyPlus corresponds to 20ºC dry bulb, dry air, and nominally adjusted for elevation.  
+
+#### Zone ITE Current Density Air Volume Flow Rate [m3/s]
+
+#### ITE Current Density Air Volume Flow Rate [m3/s]
+
+Reports the average air volume flow rate through the ITE over the reporting interval, calculated using the current density at the air inlet node.  
+
+#### Zone ITE Air Mass Flow Rate [kg/s]
+
+#### ITE Air Mass Flow Rate [kg/s]
+
+Reports the average air mass flow rate through the ITE over the reporting interval, calculated using the current density at the air inlet node.  
+
+#### ITE Air Inlet Dry-Bulb Temperature [C]
+
+The dry-bulb temperature of the air entering the ITE.
+
+#### ITE Air Inlet Dewpoint Temperature [C]
+
+The dewpoint temperature of the air entering the ITE.
+
+#### ITE Air Inlet Relative Humidity [%]
+
+The dewpoint temperature of the air entering the ITE.
+
+#### ITE Air Outlet Dry-Bulb Temperature [C]
+
+The dry-bulb temperature of the air leaving the ITE.
+
+#### Zone ITE Average Supply Heat Index []
+
+#### ITE Supply Heat Index []
+
+The supply heat index (SHI) for this equipment. SHI is a dimensionless measure of recirculation of hot air into the cold air intake of the ITE. SHI = (Tin – Tsupply)/(Tout-Tsupply) where Tin is the dry-bulb temperature of the air entering the ITE, Tout is the dry-bulb temperature of the air leaving the ITE, and Tsupply is the dry-bulb temperature at the Supply Air Node. If a Supply Air Node Name is not specified for this object, then this output will not be reported.
+
+#### Zone ITE Any Air Inlet Operating Range Exceeded Time [hr]
+
+#### ITE Air Inlet Operating Range Exceeded Time [hr]
+
+Hours when the dry-bulb and/or dewpoint temperature of the air entering the ITE is outside the range specified by the ITE Environmental Class.
+
+#### Zone ITE Any Air Inlet Dry-Bulb Temperature Above Operating Range Time [hr]
+
+#### ITE Air Inlet Dry-Bulb Temperature Above Operating Range Time [hr]
+
+Hours when the dry-bulb temperature of the air entering the ITE is above the range specified by the ITE Environmental Class.
+
+#### ITE Air Inlet Dry-Bulb Temperature Difference Above Operating Range [deltaC]
+
+The temperature difference (in degrees DeltaC) between the air inlet dry-bulb temperature and the maximum allowable dry-bulb temperature specified by the ITE Environmental Class. Only positive values are reported. When the dry-bulb temperature of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
+
+#### Zone ITE Any Air Inlet Dry-Bulb Temperature Below Operating Range Time [hr]
+
+#### ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time [hr]
+
+Hours when the dry-bulb temperature of the air entering the ITE is above the range specified by the ITE Environmental Class.
+
+#### ITE Air Inlet Dry-Bulb Temperature Difference Below Operating Range [deltaC]
+
+The temperature difference (in degrees DeltaC) between the air inlet dry-bulb temperature and the minimum allowable dry-bulb temperature specified by the ITE Environmental Class. Only negative values are reported. When the dry-bulb temperature of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
+
+#### Zone ITE Any Air Inlet Dewpoint Temperature Above Operating Range Time [hr]
+
+#### ITE Air Inlet Dewpoint Temperature Above Operating Range Time [hr]
+
+Hours when the dewpoint temperature of the air entering the ITE is above the range specified by the ITE Environmental Class.
+
+#### ITE Air Inlet Dewpoint Temperature Difference Above Operating Range [deltaC]
+
+The temperature difference (in degrees DeltaC) between the air inlet dewpoint temperature and the maximum allowable dewpoint temperature specified by the ITE Envionmental Class. Only positive values are reported. When the dewpoint temperature of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
+
+#### Zone ITE Any Air Inlet Dewpoint Temperature Below Operating Range Time [hr]
+
+#### ITE Air Inlet Dewpoint Temperature Below Operating Range Time [hr]
+
+Hours when the dewpoint temperature of the air entering the ITE is above the range specified by the ITE Environmental Class.
+
+#### ITE Air Inlet Dewpoint Temperature Difference Below Operating Range [deltaC]
+
+The temperature difference (in degrees DeltaC) between the air inlet dewpoint temperature and the minimum allowable dewpoint temperature specified by the ITE Envionmental Class. Only negative values are reported. When the dewpoint temperature of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
+
+#### Zone ITE Any Air Inlet Relative Humidity Above Operating Range Time [hr]
+
+#### ITE Air Inlet Relative Humidity Above Operating Range Time [hr]
+
+Hours when the relative humidity of the air entering the ITE is above the range specified by the ITE Environmental Class.
+
+#### ITE Air Inlet Relative Humidity Difference Above Operating Range [%]
+
+The temperature difference (in degrees DeltaC) between the air inlet relative humidity and the maximum allowable relative humidity specified by the ITE Envionmental Class. Only positive values are reported. When the relative humidity of the air entering the ITE is below the maximum specified by the ITE Environmental Class, this output will be zero.
+
+#### Zone ITE Any Air Inlet Relative Humidity Below Operating Range Time [hr]
+
+#### ITE Air Inlet Relative Humidity Below Operating Range Time [hr]
+
+Hours when the relative humidity of the air entering the ITE is above the range specified by the ITE Environmental Class.
+
+#### ITE Air Inlet Relative Humidity Difference Below Operating Range [%]
+
+The temperature difference (in degrees DeltaC) between the air inlet relative humidity and the minimum allowable relative humidity specified by the ITE Envionmental Class. Only negative values are reported. When the relative humidity of the air entering the ITE is above the minimum specified by the ITE Environmental Class, this output will be zero.
 
 ### ZoneContaminantSourceAndSink:CarbonDioxide
 

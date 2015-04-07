@@ -7517,15 +7517,15 @@ The name of the AirLoopHVAC corresponding to this Sizing:System object. This is 
 
 #### Field: Type of Load to Size On
 
-The user specified type of load on which to size the central system. The choices are *Sensible*, *Latent*, *Total* and *VentilationRequirement*. Only *Sensible* and *VentilationRequirement* are operational. *Sensible* means that the central system supply air flow rate will be determined by combining the zone design air flow rates, which have been calculated to meet the zone sensible loads from the design days. *VentilationRequirement* means that the central system supply air flow rate will be determined by the system ventilation requirement.
+The user specified type of load on which to size the central system. The choices are *Sensible*, *Total* and *VentilationRequirement*.  *Sensible* means that the central system supply air flow rate will be determined by combining the zone design air flow rates, which have been calculated to meet the zone sensible loads from the design days. *VentilationRequirement* means that the central system supply air flow rate will be determined by the system ventilation requirement.  In addition Sensible tells the program to size the central cooling coil using entering air flow rate and air conditions at the sensible load peak; Total  indicates that the program should size  the central cooling coil at the air flow rate and conditions at the total load peak. The central heating coil is always sized at the conditions at the peak sensible heating load.
 
 #### Field: Design Outdoor Air Flow Rate
 
 The design outdoor air flow rate in cubic meters per second. Generally this should be the minimum outdoor air flow. It is used for both heating and cooling design calculations. The assumption for cooling is that any outdoor air economizer will be closed. If *Autosize* is input the outdoor air flow rate will be taken from the sum of the zone outdoor air flow rates or calculated based on the System Outdoor Air Method selection (field below).
 
-#### Field: Minimum System Air Flow Ratio
+#### Field: Central Heating Maximum System Air Flow Ratio
 
-The design minimum central air flow ratio. This ratio is the minimum system air flow rate divided by the maximum system air flow rate. The value must be between 0 and 1. For constant volume systems the ratio should be set to 1. Note that this ratio should be set to reflect what the user expects the system flow rate to be when maximum heating demand occurs. This ratio is used in calculating the central system heating capacity. Thus if the system is VAV with the zone VAV dampers held at minimum flow when there is a zone heating demand, this ratio should be set to the minimum flow ratio. If the zone VAV dampers are reverse action and can open to full flow to meet heating demand, this ratio should be set to 1.
+The ratio of the maximum system air flow rate for heating to the maximum system air flow rate.  The value must be between 0 and 1. For constant volume systems the ratio should be set to 1. This ratio should be set to reflect what the user expects the system flow rate to be when maximum heating demand occurs. This ratio is used in calculating the central system heating capacity. Thus if the system is VAV with the zone VAV dampers held at minimum flow when there is a zone heating demand, this ratio should be set to the minimum flow ratio. If the zone VAV dampers are reverse action and can open to full flow to meet heating demand, this ratio should be set to 1.  The default is set to 0.5, reflecting the fact that VAV dampers are typically not allowed to fully open during heating.
 
 #### Field: Preheat Design Temperature
 
@@ -7551,7 +7551,7 @@ The design supply air temperature for cooling in degrees Celsius. This should be
 
 The design supply air temperature for heating in degrees Celsius. This can be either the reset temperature for a single duct system or the actual hot duct supply air temperature for dual duct systems. It should be the temperature at the exit of the main heating coil.
 
-#### Field: Sizing Option
+#### Field: Type of Zone Sum to Use
 
 If the input is *coincident* the central system air flow rate will be sized on the sum of the coincident zone air flow rates. If the input is *noncoincident* the central system air flow rate will be sized on the sum of the noncoincident zone air flow rates. The default is noncoincident.
 
@@ -7655,7 +7655,9 @@ Enter the heating capacity per unit floor area in m3/s-m2. This field is require
 
 Enter the heating capacity as a fraction of the autosized heating capacity. This input field is required when the Heating Design Capacity Method is FractionOfAutosizedHeatingCapacity. This input field may be left blank if heating coil is not included in the airloop or the Heating Design Capacity Method is not FractionOfAutosizedHeatingCapacity. The program calculates the heating capacity from the design autosized cooling capacity and user specified fraction.
 
+#### Field: Central Cooling Capacity Control Method
 
+Specifies how the central cooling coil will be controlled, which affects the coil sizing calculation. There are 4 choices: VAV, Bypass, VT, and OnOff. Choose VAV  if the cooling output is controlled by varying the air flow. Bypass  should be chosen if the capacity is controlled by bypassing a variable fraction of the mixed air around the coil face. VT  indicates that cooling coil output is controlled by varying the coil exit temperature while the flow rate is constant. And OnOff means that the cooling output is controlled by cycling the air flow. 
 
 An IDF example:
 
@@ -7773,23 +7775,36 @@ The water temperature in degrees Celsius at the exit of the supply side of the p
 
 The design temperature rise (for cooling or condenser loops) or fall (for heating loops) in degrees Celsius across the demand side of a plant loop.  This temperature difference is used by component models to determine flow rates required to meet design capacities.  Larger values lead to smaller design flow rates.
 
+#### Field: Sizing Option
 
+This field is optional. This field controls how concurrence issues impact the plant loop design flow rate. If it is not used then the program uses noncoincident method, which is the historical behavior prior to version 8.3. There are two choices, noncoincident and coincident. The use of Coincident sizing option requires that the SimulationControl object be set to YES for the input field called Do HVAC Sizing Simulation for Sizing Periods.
+
+#### Field: Zone Timesteps in Averaging Window
+
+This field is optional and is only used if the preceding field is set to Coincident.  This is the number of zone timesteps used in a moving average to determine the design flow rate from HVAC Sizing Simulation approach.  This allows using a broader average over time when using coincident plant sizing.  This is similar in concept to the similar field in Sizing:Parameters which specifies the averaging window for zone loads.  The default is 1. 
+
+#### Field: Coincident Sizing Factor Mode
+
+This field is only used if the sizing option is set to Coincident.  This field controls the behavior of coincident sizing with respect to what, if any, sizing factor should be applied to further modify the flow rate measured while running HVAC Sizing Simulations.  There are four options.  Enter the keword None to use the raw value for flow rate without modification.  Enter the keyword GlobalHeatingSizingFactor to modify the flow by the sizing factor entered in the object called Sizing:Parameters for heating. Enter the keyword GlobalCoolingSizingFactor to modify the flow by the sizing factor entered in the object called Sizing:Parameters for cooling.  Enter the keyword LoopComponentSizingFactor to modify the flow by a sizing factor determined from the combination of component-level sizing factors in the associated plant loop. 
 
 An IDF example:
 
+```idf
 Sizing:Plant,
-
    Chilled Water Loop, ! name of loop
-
    Cooling,            ! type of loop
-
    7.22,               ! chilled water supply temperature
-
-   6.67;               ! chilled water delta T
-
+   6.67,               ! chilled water delta T
+   NonCoincident,      !- Sizing Option
+   1,                  !- Zone Timesteps in Averaging Window
+   GlobalCoolingSizingFactor; !- Coincident Sizing Factor Mode
+```
+   
 ### Plant Sizing Outputs
 
 The loop flow rates are reported on the *eplusout.eio* file along with the component sizing results.
+
+When coincident plant sizing method is used, the eio file contains special summary report with various details and interim values from the calculations, under the following record header:  ! <Plant Sizing Coincident Flow Algorithm>, Plant Loop Name, Sizing Pass {#}, Measured Mass Flow{kg/s}, Measured Demand {W}, Demand Calculated Mass Flow{kg/s}, Sizes Changed {Yes/No}, Previous Volume Flow Rate {m3/s}, New Volume Flow Rate {m3/s}, Demand Check Applied {Yes/No}, Sizing Factor {}, Normalized Change {}, Specific Heat{}.
 
 HVAC: Primary and Secondary Systems
 -----------------------------------
