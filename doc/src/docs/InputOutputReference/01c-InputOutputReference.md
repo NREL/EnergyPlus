@@ -33,9 +33,9 @@ This alpha field contains the ground heat exchanger inlet node name.
 
 This alpha field contains the ground heat exchanger outlet node name.
 
-#### Field: Maximum Flow Rate
+#### Field: Design Flow Rate
 
-This numeric field contains the GHE maximum design flow rate in cubic meters per second {m<sup>3</sup>/s}.
+This numeric field contains the GHE design flow rate in cubic meters per second {m<sup>3</sup>/s}.
 
 #### Field: Number of Bore Holes
 
@@ -60,10 +60,6 @@ This numeric field contains the thermal heat capacity of the ground in J/m<sup>3
 #### Field: Ground Temperature
 
 This numeric field contains the far field temperature of the ground in °C.
-
-#### Field: Design Flow Rate
-
-This numeric field contains the design volume flow rate of the GHE in m<sup>3</sup>/s.
 
 #### Field: Grout Thermal Conductivity
 
@@ -115,60 +111,60 @@ The following is an example input:
 
 ```idf
 GroundHeatExchanger:Vertical,
-    Vertical Ground Heat Exchanger,  !- Name
-    GHE Inlet Node,          !- Inlet Node Name
-    GHE Outlet Node,         !- Outlet Node Name
-    0.00330000,              !- Design Flow Rate {m3/s}
-    120,                     !- Number of Bore Holes
-    76.2,                    !- Bore Hole Length {m}
-    .635080E-01,             !- Bore Hole Radius {m}
-    .692626E+00,             !- Ground Thermal Conductivity {W/m-K}
-    .234700E+07,             !- Ground Thermal Heat Capacity {J/m3-K}
-    13.375,                  !- Ground Temperature {C}
-    .692626E+00,             !- Grout Thermal Conductivity {W/m-K}
-    .391312E+00,             !- Pipe Thermal Conductivity {W/m-K}
-    2.66667E-02,             !- Pipe Out Diameter {m}
-    2.53977E-02,             !- U-Tube Distance {m}
-    2.41285E-03,             !- Pipe Thickness {m}
-    2,                       !- Maximum Length of Simulation
-    0.0005,                  !- G-Function Reference Ratio
-    35,                      !- Number of Data Pairs of the G Function
-    ! The G-function is defined by the following data pairs
-    -15.2996, -0.348322,  ! G-Function Ln(T/Ts) Value 1, G-Function G Value 1
-    -14.201,   0.022208,  ! G-Function Ln(T/Ts) Value 2, G-Function G Value 2
-    -13.2202,  0.412345,  ! G-Function Ln(T/Ts) Value 3, G-Function G Value 3
-    -12.2086,  0.867498,  ! G-Function Ln(T/Ts) Value 4, G-Function G Value 4
-    -11.1888,  1.357839,  ! G-Function Ln(T/Ts) Value 5, G-Function G Value 5
-    -10.1816,  1.852024,  ! G-Function Ln(T/Ts) Value 6, G-Function G Value 6
-    -9.1815,   2.345656,  ! G-Function Ln(T/Ts) Value 7, G-Function G Value 7
-    -8.6809,   2.593958,  ! G-Function Ln(T/Ts) Value 8, G-Function G Value 8
-    -8.5,      2.679,     ! etc, etc.
-    -7.8,      3.023,
-    -7.2,      3.32,
-    -6.5,      3.681,
-    -5.9,      4.071,
-    -5.2,      4.828,
-    -4.5,      6.253,
-    -3.963,    7.894,
-    -3.27,     11.82,
-    -2.864,    15.117,
-    -2.577,    18.006,
-    -2.171,    22.887,
-    -1.884,    26.924,
-    -1.191,    38.004,
-    -0.497,    49.919,
-    -0.274,    53.407,
-    -0.051,    56.632,
-    0.196,     59.825,
-    0.419,     62.349,
-    0.642,     64.524,
-    0.873,     66.412,
-    1.112,     67.993,
-    1.335,     69.162,
-    1.679,     70.476,
-    2.028,     71.361,
-    2.275,     71.79,
-    3.003,     72.511;  !- 35 PAIRS
+Vertical Ground Heat Exchanger, !- Name
+GHE Inlet Node,                 !- Inlet Node Name
+GHE Outlet Node,                !- Outlet Node Name
+0.00330000,                     !- Design Flow Rate {m3/s}
+120,                            !- Number of Bore Holes
+76.2,                           !- Bore Hole Length {m}
+.635080E-01,                    !- Bore Hole Radius {m}
+.692626E+00,                    !- Ground Thermal Conductivity {W/m-K}
+.234700E+07,                    !- Ground Thermal Heat Capacity {J/m3-K}
+13.375,                         !- Ground Temperature {C}
+.692626E+00,                    !- Grout Thermal Conductivity {W/m-K}
+.391312E+00,                    !- Pipe Thermal Conductivity {W/m-K}
+2.66667E-02,                    !- Pipe Out Diameter {m}
+2.53977E-02,                    !- U-Tube Distance {m}
+2.41285E-03,                    !- Pipe Thickness {m}
+2,                              !- Maximum Length of Simulation
+0.0005,                         !- G-Function Reference Ratio
+35,                             !- Number of Data Pairs of the G Function
+! The G-function is defined by the following data pairs
+-15.2996, -0.348322,            ! G-Function Ln(T/Ts) Value 1, G-Function G Value 1
+-14.201,  0.022208,             ! G-Function Ln(T/Ts) Value 2, G-Function G Value 2
+-13.2202, 0.412345,             ! G-Function Ln(T/Ts) Value 3, G-Function G Value 3
+-12.2086, 0.867498,             ! G-Function Ln(T/Ts) Value 4, G-Function G Value 4
+-11.1888, 1.357839,             ! G-Function Ln(T/Ts) Value 5, G-Function G Value 5
+-10.1816, 1.852024,             ! G-Function Ln(T/Ts) Value 6, G-Function G Value 6
+-9.1815,  2.345656,             ! G-Function Ln(T/Ts) Value 7, G-Function G Value 7
+-8.6809,  2.593958,             ! G-Function Ln(T/Ts) Value 8, G-Function G Value 8
+-8.5,     2.679,                ! etc, etc.
+-7.8,     3.023,
+-7.2,     3.32,
+-6.5,     3.681,
+-5.9,     4.071,
+-5.2,     4.828,
+-4.5,     6.253,
+-3.963,   7.894,
+-3.27,    11.82,
+-2.864,   15.117,
+-2.577,   18.006,
+-2.171,   22.887,
+-1.884,   26.924,
+-1.191,   38.004,
+-0.497,   49.919,
+-0.274,   53.407,
+-0.051,   56.632,
+0.196,    59.825,
+0.419,    62.349,
+0.642,    64.524,
+0.873,    66.412,
+1.112,    67.993,
+1.335,    69.162,
+1.679,    70.476,
+2.028,    71.361,
+2.275,    71.79,
+3.003,    72.511;               !- 35 PAIRS
 ```
 
 ### Vertical Ground Heat Exchanger Outputs
