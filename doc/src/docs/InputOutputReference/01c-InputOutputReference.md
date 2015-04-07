@@ -2585,6 +2585,11 @@ If used with Ventilation Control Mode = Constant, the ventilation rate is consta
 
 If Ventilation Control Mode = NoVent, this schedule has no effect.
 
+#### Field: Occupant Ventilation Control Name
+The name of an AirlowNetwork:OccupantVentilationControl object. The object is used to perform advanced window opening control based on occupant conditions. When an object name is given, advanced window opening control is performed and, the ventilation control defined in the Ventilation Control Mode field will be overridden.
+
+**Note:** The Occupant Ventilation Control object can be assigned to a zone (AirflowNetwork:MultiZone:Zone) or a surface (AirflowNetwork:MultiZone:Surface). When the object is assigned to a zone, the Occupant Ventilation Control is assigned to the surfaces belonging to the zone automatically. The surface objects must have an associated AirflowNetwork:MultiZone:Component:DetailedOpening, AirflowNetwork:MultiZone:Component:HorizontalOpening, or  AirflowNetwork:MultiZone:Component:SimpleOpening component specified in the field of Leakage Component Name. All output variables will be shown under surface names only, and not under zone names.
+
 ![](InputOutputReference/media/image222.svg)
 
 Figure 96. Modulation of venting area according to inside-outside temperature difference.
@@ -2600,7 +2605,7 @@ Figure 97. Modulation of venting area according to inside-outside enthalpy diffe
 An IDF example is shown below:
 
 
-
+```idf
 AirflowNetwork:MultiZone:Zone,
 
     RESISTIVE ZONE,          !- Name of Associated Thermal Zone
@@ -2630,6 +2635,7 @@ AirflowNetwork:MultiZone:Zone,
                              !- the Venting Open Factor {J/kg}
 
     VentingSched;            !- Venting Availability Schedule Name
+```
 
 ### AirflowNetwork:Multizone:Surface
 
@@ -2798,10 +2804,14 @@ If Ventilation Control Mode = NoVent, this schedule has no effect.
 
 **Note:** In order to establish an airflow network, each AirflowNetwork:Multizone:Zone object must have at least two surfaces defined with AirflowNetwork:Multizone:Surface objects, so that air can flow from one zone into other zones (or to outdoors) through the network (air mass flow conserved). In addition, for all AirflowNetwork:Multizone:Surface objects facing the same Zone Name (ref. BuildingSurface:Detailed), at least two different environments must be defined for the other side of these surfaces (e.g., an external node and an adjacent zone, two adjacent zones, or two external nodes).
 
+#### Field: Occupant Ventilation Control Name
+The name of an AirlowNetwork:OccupantVentilationControl object. The object is used to perform advanced window opening control based on occupant conditions. When an object name is given, advanced window opening control is performed and, the Ventilation Control defined in the Ventilation Control Mode field will be overridden. 
+
+
 IDF examples are provided below:
 
 
-
+```idf
 AirflowNetwork:MultiZone:Surface,
 
     Zn001:Wall001,           !- Name of Associated Heat Transfer Surface
@@ -2873,6 +2883,7 @@ AirflowNetwork:MultiZone:Surface,
                              !- the Venting Open Factor {J/kg}
 
     VentingSched;            !- Venting Availability Schedule Name
+```
 
 ### AirflowNetwork:MultiZone:ReferenceCrackConditions
 
@@ -3465,8 +3476,8 @@ AirflowNetwork Model:Wind Pressure Coefficients, WFACADE, -0.56,-0.56,-0.42,-0.3
 An IDF example is provided below:
 
 
-
-**AirflowNetwork:MultiZone:WindPressureCoefficientValues,**
+```idf
+AirflowNetwork:MultiZone:WindPressureCoefficientValues,
 
     NFacade\_WPCValue,        !- Name
 
@@ -3495,8 +3506,64 @@ An IDF example is provided below:
     0.04,                    !- Wind Pressure Coefficient Value 11 {dimensionless}
 
     0.48;                    !- Wind Pressure Coefficient Value 12 {dimensionless}
+```
 
+###AirflowNetwork:OccupantVentilationControl
 
+The AirflowNetwork:OccupantVentilationControl object provides control options with minimum opening and closing time checks and opening and closing probability values. In general, the probability values could be a constant or a specific function. Due to lack of real data, two schedules are selected to represent probability values. If real data are available, this object may be modified to adopt new data. 
+
+#### Field: Name
+This is the name of the object.
+
+#### Field: Minimum Opening Time
+The field represents the minimum time that windows will remain open. If a window has been open for a time less than this value, the window will remain open. 
+
+#### Field: Minimum Closing Time
+The field represents the minimum time that windows will remain closed. If a window has been closed for a time less than this value, the window will remain closed. 
+
+#### Field: Thermal Comfort Low Temperature Curve Name
+This alpha field defines the name of a curve to be used for thermal comfort temperature calculation at low outdoor dry-bulb temperature. This curve is a linear or quadratic equation using outdoor dry-bulb temperatures as an independent variable. This performance curve can be used to describe the thermal comfort temperature at low outdoor dry-bulb temperature. It allows maximum two curves to describe the thermal comfort temperature in two different outdoor dry-bulb temperature regions. If a single curve is used, blanks are entered in the following two fields.
+
+#### Field: Thermal Comfort Temperature Boundary Point
+When there are two piecewise curves to represent thermal comfort temperature calculation, this field represents a boundary point of outdoor dry-bulb temperature. The low temperature curve and the high temperature curve should have the same values at the boundary point. If a single curve is used, this field may be left blank.
+
+#### Field: Thermal Comfort High Temperature Curve Name
+This alpha field defines the name of a curve to be used for thermal comfort temperature calculation at high outdoor dry-bulb temperature. This curve is a linear or quadratic equation using outdoor dry-bulb temperatures as an independent variable. This performance curve can be used to describe the thermal comfort temperature at high outdoor dry-bulb temperature. It allows maximum two curves to describe the thermal comfort temperature in two different outdoor dry-bulb temperature regions. If a single curve is used, blanks are entered in this field.
+
+#### Field: Maximum Threshold for Persons Dissatisfied PPD
+This field is used to calculate the comfort band as a function of predicted percentage of dissatisfied (PPD). The default value is 10%. The equation is based on curve fit and is valid between 0% and 35%.  
+
+<div>\[\Theta = -0.0028 (100-PPD)^2 + 0.3419 (100-PPD) - 6.6275\]</div>
+
+where
+
+* <span>$\Theta$</span> is the comfort band (degC)
+* PPD is predicted percentage person of dissatisfied (%)
+
+#### Field: Occupancy Check
+Input is Yes or No. The default is No. If Yes, an occupancy check is performed used in the opening probability check. If No, the occupancy check is bypassed.
+
+#### Field: Opening Probability Schedule Name
+The name of a schedule of opening probability that controls the opening of windows and doors in the thermal zone to provide natural ventilation. If the probability value is greater a random number, windows are allowed to open. Otherwise, the output will be false. This control will occur when minimum time checks for both opening and closing are satisfied. 
+
+#### Field: Closing Probability Schedule Name
+The name of a schedule of closing probability that controls the closing of windows and doors in the thermal zone to reduce natural ventilation. If the probability value is greater a random number, windows are allowed to be closed. Otherwise, the output will be false. This control will occur when minimum time checks for both opening and closing are satisfied.
+
+An IDF example is provided below:
+
+```idf
+AirlowNetwork:OccupantVentilationControl,
+VentilationControl,      !- Name
+5.0,                     !- Minimum Opening Time
+5.0,                     !- Minimum Opening Time
+ComfortLowTempCurve,     !- Thermal Comfort Low Temperature Curve Name
+10.0,                    !- Thermal Comfort Temperature Boundary Point
+ComfortHighTempCurve,    !- Thermal Comfort High Temperature Curve Name
+10.0,                    !- Maximum Threshold for Persons Dissatisfied PPD
+Yes,                     !- Occupancy Check
+OpeningProbabilitySch,   !- Opening Probability Schedule Name
+ClosingProbabilitySch;   !- Closing Probability Schedule Name
+```
 
 The previous sections of this AirflowNetwork model discussion describe input objects used for multizone airflow calculations. The following sections describe input objects used for air distribution system simulations. These objects work when control option “MultiZone with Distribution” or “MultiZone with Distribution Only During Fan Operation” is defined in the AirflowNetwork Control field in the AirflowNetwork:SimulationControl object.
 
@@ -4260,7 +4327,7 @@ HVAC,Sum,AFN Zone Mixing Mass [kg]
 
 
 
-**The following are reported only when a Fan:OnOff object is used:**
+**The following output variables are reported only when a Fan:OnOff object is used:**
 
 HVAC,Average,AFN Zone Average Pressure [Pa]
 
@@ -4281,6 +4348,22 @@ HVAC,Average,AFN Surface Average Pressure Difference [Pa]
 HVAC,Average,AFN Surface On Cycle Pressure Difference [Pa]
 
 HVAC,Average,AFN Surface Off Cycle Pressure Difference [Pa]
+
+**The following output variables are reported only when an AirflowNetwork:OccupantVentilationControl object is used:**
+
+HVAC,Average,AFN Surface Venting Window or Door Opening Factor at Previous Time Step []
+
+HVAC,Average,AFN Surface Opening Elapsed Time [min]
+
+HVAC,Average,AFN Surface Closing Elapsed Time [min]
+
+HVAC,Average,AFN Surface Opening Status at Previous Time Step []
+
+HVAC,Average,AFN Surface Opening Status []
+
+HVAC,Average,AFN Surface Opening Probability Status []
+
+HVAC,Average,AFN Surface Closing Probability Status []
 
 #### AFN Node Temperature [C]
 
@@ -4756,11 +4839,36 @@ This is a sum of mass flow rates from adjacent zones or outdoors multiplied by t
 
 This is a sum of mass flow rates from adjacent zones or outdoors multiplied by the generic contaminant concentration differences between the corresponding zone and the receiving zone.
 
+The following output variables are reported only when an AirflowNetwork:OccupantVentilationControl object is used:
 
+#### AFN Surface Venting Window or Door Opening Factor at Previous Time Step []
 
+The value of the venting opening factor for a particular window or door at the previous time step. When the window or door is venting, this is the input value of the opening factor (see AirflowNetwork:Multizone:Surface, Window/Door Opening Factor) times the multiplier for venting modulation (see description of next output variable, "Opening Factor Multiplier for AirflowNetwork Venting Modulation"). For example, if  the input Window/Door opening factor is 0.5 and the modulation multiplier is 0.7, then the value of this output variable will be 0.5*0.7 = 0.35.
 
+#### AFN Surface Opening Elapsed Time [min]
 
-Group – Zone Equipment
+This output is the opening elapsed time in the units of minutes since the window opened. 
+
+#### AFN Surface Closing Elapsed Time [min]
+
+This output is the opening elapsed time in the units of minutes since the windows closed. 
+
+#### AFN Surface Opening Status at Previous Time Step []
+
+This is the window or door opening factor control status at the previous time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no occupant ventilation control. The opening factor is determined by the Ventilation Control Mode field. A value of 1 indicates that a window or door is allowed to open. The value of 1 is determined when the opening elapsed time is less than the minimum opening time. A value of 2 denotes that a window or door is forced to close. The value of 2 is determined when the closing elapsed time is less than the minimum closing time.
+
+#### AFN Surface Opening Status []
+
+This is the window or door opening factor control status at the current time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no occupant ventilation control. The opening factor is determined by the Ventilation Control Mode field. A value of 1 indicates that a window or door is allowed to open. The value of 1 is determined when the opening elapsed time is less than the minimum opening time. A value of 2 denotes that a window or door is forced to close. The value of 2 is determined when the closing elapsed time is less than the minimum closing time.
+
+#### AFN Surface Opening Probability Status []
+This is the opening probability status at the current time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no opening probability control action. A value of 1 indicates that a window or door is forced to open when the opening status is 0. A value of 2 denotes that the status at the previous time step will be kept. 
+
+#### AFN Surface Closing Probability Status []
+
+This is the closing probability status at the current time step using an AirflowNetwork:OccupantVentilationControl object, which can have three integer values: 0, 1, and 2. A 0 value indicates no closing probability control action. A value of 1 indicates that a window or door is forced to close when the opening status is 0. A value of 2 denotes that the status at the previous time step will be kept. 
+
+Group - Zone Equipment
 ----------------------
 
 There are five main zone equipment statements that must be used to describe a block of zone equipment as shown in the below figure “Zone Equipment Input Syntax Map”.
