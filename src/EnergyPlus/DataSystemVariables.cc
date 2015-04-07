@@ -202,6 +202,7 @@ namespace DataSystemVariables {
 			firstTime = false;
 		}
 
+		FileFound = false;
 		CheckedFileName = blank;
 		InputFileName = originalInputFileName;
 		makeNativePath(InputFileName);
