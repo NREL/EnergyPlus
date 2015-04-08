@@ -4,12 +4,12 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <SolarShading.hh>
-#include <DataSurfaces.hh>
-#include <DataGlobals.hh>
-#include <DataSystemVariables.hh>
-#include <DataHeatBalance.hh>
-#include <DataBSDFWindow.hh>
+#include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
@@ -21,34 +21,34 @@ using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataBSDFWindow;
 using namespace ObjexxFCL;
 
-TEST(SolarShadingTest, CalcPerSolarBeamTest)
+TEST( SolarShadingTest, CalcPerSolarBeamTest )
 {
 	ShowMessage( "Begin Test: SolarShadingTest, CalcPerSolarBeamTest" );
-	
+
 // Test inits for integrated and non-integrated shading calcs
 
 //	static bool ErrorsFound( false ); // If errors detected in input
 //	static int ZoneNum( 0 ); // Zone number
-//	int NumAlphas ( 2 );
-//	int NumNumbers ( 9 );
-	Real64 AvgEqOfTime ( 0.0 ); // Average value of Equation of Time for period
-	Real64 AvgSinSolarDeclin ( 1.0 ); // Average value of Sine of Solar Declination for period
-	Real64 AvgCosSolarDeclin ( 0.0 ); // Average value of Cosine of Solar Declination for period
+//	int NumAlphas( 2 );
+//	int NumNumbers( 9 );
+	Real64 AvgEqOfTime( 0.0 ); // Average value of Equation of Time for period
+	Real64 AvgSinSolarDeclin( 1.0 ); // Average value of Sine of Solar Declination for period
+	Real64 AvgCosSolarDeclin( 0.0 ); // Average value of Cosine of Solar Declination for period
 	int NumTimeSteps( 6 );
 
 	TimeStep = 1;
 	TotSurfaces = 3;
 	MaxBkSurf = 3;
 	SurfaceWindow.allocate( TotSurfaces );
-	SunlitFracHR.allocate( TotSurfaces, 24 );
-	SunlitFrac.allocate( TotSurfaces, 24, NumTimeSteps );
-	SunlitFracWithoutReveal.allocate( TotSurfaces, 24, NumTimeSteps );
+	SunlitFracHR.allocate( 24, TotSurfaces );
+	SunlitFrac.allocate( NumTimeSteps, 24, TotSurfaces );
+	SunlitFracWithoutReveal.allocate( NumTimeSteps, 24, TotSurfaces );
 	CTHETA.allocate( TotSurfaces );
-	CosIncAngHR.allocate( TotSurfaces, 24 );
-	CosIncAng.allocate( TotSurfaces, 24, NumTimeSteps );
+	CosIncAngHR.allocate( 24, TotSurfaces );
+	CosIncAng.allocate( NumTimeSteps, 24, TotSurfaces );
 	AOSurf.allocate( TotSurfaces );
-	BackSurfaces.allocate( TotSurfaces, MaxBkSurf, 24, NumTimeSteps );
-	OverlapAreas.allocate( TotSurfaces, MaxBkSurf, 24, NumTimeSteps );
+	BackSurfaces.allocate( NumTimeSteps, 24, MaxBkSurf, TotSurfaces );
+	OverlapAreas.allocate( NumTimeSteps, 24, MaxBkSurf, TotSurfaces );
 
 // Test non-integrated option first, CalcPerSolarBeam should set OutProjSLFracMult and InOutProjSLFracMult to 1.0 for all hours
 	for ( int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
@@ -104,7 +104,6 @@ TEST(SolarShadingTest, CalcPerSolarBeamTest)
 	AOSurf.deallocate();
 	BackSurfaces.deallocate();
 	OverlapAreas.deallocate();
-
 }
 
 TEST( SolarShadingTest, SurfaceScheduledSolarInc )
@@ -114,7 +113,7 @@ TEST( SolarShadingTest, SurfaceScheduledSolarInc )
 	TotSurfIncSolSSG = 4;
 	SurfIncSolSSG.allocate( TotSurfIncSolSSG );
 	SurfIncSolSSG( 1 ).SurfPtr = 1;
-	SurfIncSolSSG( 1 ).ConstrPtr = 1; 
+	SurfIncSolSSG( 1 ).ConstrPtr = 1;
 	SurfIncSolSSG( 2 ).SurfPtr = 1;
 	SurfIncSolSSG( 2 ).ConstrPtr = 2;
 	SurfIncSolSSG( 3 ).SurfPtr = 4;
@@ -144,6 +143,5 @@ TEST( SolarShadingTest, SurfaceScheduledSolarInc )
 	SurfSolIncPtr = SurfaceScheduledSolarInc( 5, 10 );
 	EXPECT_EQ( 0, SurfSolIncPtr );
 
-	SurfIncSolSSG.deallocate( );
-
+	SurfIncSolSSG.deallocate();
 }

@@ -2,7 +2,7 @@
 #define DataAirSystems_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -69,8 +69,8 @@ namespace DataAirSystems {
 		Real64 PlantSupplyOtherEff;
 		Real64 PeakPlantSupplyOtherEff;
 		int AirSysToPlantPtr; // =0 No plant loop connection, >0 index to AirSysToPlant array
-		FArray1D< MeterData > MeteredVar; // Index of energy output report data
-		FArray1D< SubcomponentData > SubComp; // Component list
+		Array1D< MeterData > MeteredVar; // Index of energy output report data
+		Array1D< SubcomponentData > SubComp; // Component list
 
 		// Default Constructor
 		AirLoopCompData() :
@@ -134,8 +134,8 @@ namespace DataAirSystems {
 			Real64 const PlantSupplyOtherEff,
 			Real64 const PeakPlantSupplyOtherEff,
 			int const AirSysToPlantPtr, // =0 No plant loop connection, >0 index to AirSysToPlant array
-			FArray1< MeterData > const & MeteredVar, // Index of energy output report data
-			FArray1< SubcomponentData > const & SubComp // Component list
+			Array1< MeterData > const & MeteredVar, // Index of energy output report data
+			Array1< SubcomponentData > const & SubComp // Component list
 		) :
 			TypeOf( TypeOf ),
 			Name( Name ),
@@ -183,17 +183,17 @@ namespace DataAirSystems {
 		Real64 MinMassFlowRate; // minimum mass flow rate for the branch (kg/s)
 		Real64 MaxMassFlowRate; // maximum mass flow rate for the branch (kg/s)
 		int TotalComponents; // Total number of high level components on the branch
-		FArray1D_int FirstCompIndex; // Gives the component index in AllComp that corresponds to Comp
-		FArray1D_int LastCompIndex; // Gives comp index in AllComp that corresponds to last subcomponent
+		Array1D_int FirstCompIndex; // Gives the component index in AllComp that corresponds to Comp
+		Array1D_int LastCompIndex; // Gives comp index in AllComp that corresponds to last subcomponent
 		int NodeNumIn; // Branch inlet node number
 		int NodeNumOut; // Branch outlet node number
 		int DuctType; // 1=main, 2=cooling, 3=heating, 4=other
-		FArray1D< AirLoopCompData > Comp; // Component list--high level components
+		Array1D< AirLoopCompData > Comp; // Component list--high level components
 		//  TYPE(ExpandedCompData), &
 		//           ALLOCATABLE, DIMENSION(:) :: MegaComp              ! Component list
 		//  This list would include children, grandchildren, etc.
 		int TotalNodes; // total number of nodes on branch
-		FArray1D_int NodeNum; // node list (numbers)
+		Array1D_int NodeNum; // node list (numbers)
 
 		// Default Constructor
 		AirLoopBranchData() :
@@ -217,14 +217,14 @@ namespace DataAirSystems {
 			Real64 const MinMassFlowRate, // minimum mass flow rate for the branch (kg/s)
 			Real64 const MaxMassFlowRate, // maximum mass flow rate for the branch (kg/s)
 			int const TotalComponents, // Total number of high level components on the branch
-			FArray1_int const & FirstCompIndex, // Gives the component index in AllComp that corresponds to Comp
-			FArray1_int const & LastCompIndex, // Gives comp index in AllComp that corresponds to last subcomponent
+			Array1_int const & FirstCompIndex, // Gives the component index in AllComp that corresponds to Comp
+			Array1_int const & LastCompIndex, // Gives comp index in AllComp that corresponds to last subcomponent
 			int const NodeNumIn, // Branch inlet node number
 			int const NodeNumOut, // Branch outlet node number
 			int const DuctType, // 1=main, 2=cooling, 3=heating, 4=other
-			FArray1< AirLoopCompData > const & Comp, // Component list--high level components
+			Array1< AirLoopCompData > const & Comp, // Component list--high level components
 			int const TotalNodes, // total number of nodes on branch
-			FArray1_int const & NodeNum // node list (numbers)
+			Array1_int const & NodeNum // node list (numbers)
 		) :
 			Name( Name ),
 			ControlType( ControlType ),
@@ -254,9 +254,9 @@ namespace DataAirSystems {
 		int BranchNumIn; // Reference number for branch connected to splitter inlet
 		std::string NodeNameIn; // Node name for the inlet to the splitter
 		int TotalOutletNodes; // Number of outlet nodes for the splitter
-		FArray1D_int NodeNumOut; // Node numbers for the outlets to the splitter
-		FArray1D_int BranchNumOut; // Reference numbers for branches connected to splitter outlet
-		FArray1D_string NodeNameOut; // Node names for the outlets to the splitter
+		Array1D_int NodeNumOut; // Node numbers for the outlets to the splitter
+		Array1D_int BranchNumOut; // Reference numbers for branches connected to splitter outlet
+		Array1D_string NodeNameOut; // Node names for the outlets to the splitter
 
 		// Default Constructor
 		AirLoopSplitterData() :
@@ -274,9 +274,9 @@ namespace DataAirSystems {
 			int const BranchNumIn, // Reference number for branch connected to splitter inlet
 			std::string const & NodeNameIn, // Node name for the inlet to the splitter
 			int const TotalOutletNodes, // Number of outlet nodes for the splitter
-			FArray1_int const & NodeNumOut, // Node numbers for the outlets to the splitter
-			FArray1_int const & BranchNumOut, // Reference numbers for branches connected to splitter outlet
-			FArray1_string const & NodeNameOut // Node names for the outlets to the splitter
+			Array1_int const & NodeNumOut, // Node numbers for the outlets to the splitter
+			Array1_int const & BranchNumOut, // Reference numbers for branches connected to splitter outlet
+			Array1_string const & NodeNameOut // Node names for the outlets to the splitter
 		) :
 			Exists( Exists ),
 			Name( Name ),
@@ -300,9 +300,9 @@ namespace DataAirSystems {
 		int BranchNumOut; // Reference number for branch connected to mixer outlet
 		std::string NodeNameOut; // Node name for the outlet to the mixer
 		int TotalInletNodes; // Number of inlet nodes for the mixer
-		FArray1D_int NodeNumIn; // Node numbers for the inlets to the mixer
-		FArray1D_int BranchNumIn; // Reference numbers for branches connected to mixer inlet
-		FArray1D_string NodeNameIn; // Node names for the inlets to the mixer
+		Array1D_int NodeNumIn; // Node numbers for the inlets to the mixer
+		Array1D_int BranchNumIn; // Reference numbers for branches connected to mixer inlet
+		Array1D_string NodeNameIn; // Node names for the inlets to the mixer
 
 		// Default Constructor
 		AirLoopMixerData() :
@@ -320,9 +320,9 @@ namespace DataAirSystems {
 			int const BranchNumOut, // Reference number for branch connected to mixer outlet
 			std::string const & NodeNameOut, // Node name for the outlet to the mixer
 			int const TotalInletNodes, // Number of inlet nodes for the mixer
-			FArray1_int const & NodeNumIn, // Node numbers for the inlets to the mixer
-			FArray1_int const & BranchNumIn, // Reference numbers for branches connected to mixer inlet
-			FArray1_string const & NodeNameIn // Node names for the inlets to the mixer
+			Array1_int const & NodeNumIn, // Node numbers for the inlets to the mixer
+			Array1_int const & BranchNumIn, // Reference numbers for branches connected to mixer inlet
+			Array1_string const & NodeNameIn // Node names for the inlets to the mixer
 		) :
 			Exists( Exists ),
 			Name( Name ),
@@ -343,20 +343,20 @@ namespace DataAirSystems {
 		std::string Name; // name of the system
 		Real64 DesignVolFlowRate; // the design total supply air flow rate (m3/s)
 		int NumControllers; // number of controllers on this air path
-		FArray1D_string ControllerName; // name of each controller on this system
-		FArray1D_string ControllerType; // type of each controller on this system
-		FArray1D_int ControllerIndex;
-		FArray1D_bool CanBeLockedOutByEcono; // true if controller inactive
+		Array1D_string ControllerName; // name of each controller on this system
+		Array1D_string ControllerType; // type of each controller on this system
+		Array1D_int ControllerIndex;
+		Array1D_bool CanBeLockedOutByEcono; // true if controller inactive
 		// when the economizer is active
 		int NumBranches; // number of branches making up this system
-		FArray1D< AirLoopBranchData > Branch; // data for each branch
+		Array1D< AirLoopBranchData > Branch; // data for each branch
 		AirLoopSplitterData Splitter; // Data for splitter (if any)
 		AirLoopMixerData Mixer; // Data for mixer (if any)
-		FArray1D_bool ControlConverged; // Convergence Parameter for controllers
+		Array1D_bool ControlConverged; // Convergence Parameter for controllers
 		int NumOutletBranches;
-		FArray1D_int OutletBranchNum; // branch numbers of system outlets
+		Array1D_int OutletBranchNum; // branch numbers of system outlets
 		int NumInletBranches;
-		FArray1D_int InletBranchNum; // branch number of system inlets
+		Array1D_int InletBranchNum; // branch number of system inlets
 		bool OASysExists; // true if there is an Outside Air Sys
 		int OASysInletNodeNum; // node number of return air inlet to OA sys
 		int OASysOutletNodeNum; // node number of mixed air outlet of OA sys
@@ -407,19 +407,19 @@ namespace DataAirSystems {
 			std::string const & Name, // name of the system
 			Real64 const DesignVolFlowRate, // the design total supply air flow rate (m3/s)
 			int const NumControllers, // number of controllers on this air path
-			FArray1_string const & ControllerName, // name of each controller on this system
-			FArray1_string const & ControllerType, // type of each controller on this system
-			FArray1_int const & ControllerIndex,
-			FArray1_bool const & CanBeLockedOutByEcono, // true if controller inactive
+			Array1_string const & ControllerName, // name of each controller on this system
+			Array1_string const & ControllerType, // type of each controller on this system
+			Array1_int const & ControllerIndex,
+			Array1_bool const & CanBeLockedOutByEcono, // true if controller inactive
 			int const NumBranches, // number of branches making up this system
-			FArray1< AirLoopBranchData > const & Branch, // data for each branch
+			Array1< AirLoopBranchData > const & Branch, // data for each branch
 			AirLoopSplitterData const & Splitter, // Data for splitter (if any)
 			AirLoopMixerData const & Mixer, // Data for mixer (if any)
-			FArray1_bool const & ControlConverged, // Convergence Parameter for controllers
+			Array1_bool const & ControlConverged, // Convergence Parameter for controllers
 			int const NumOutletBranches,
-			FArray1_int const & OutletBranchNum, // branch numbers of system outlets
+			Array1_int const & OutletBranchNum, // branch numbers of system outlets
 			int const NumInletBranches,
-			FArray1_int const & InletBranchNum, // branch number of system inlets
+			Array1_int const & InletBranchNum, // branch number of system inlets
 			bool const OASysExists, // true if there is an Outside Air Sys
 			int const OASysInletNodeNum, // node number of return air inlet to OA sys
 			int const OASysOutletNodeNum, // node number of mixed air outlet of OA sys
@@ -823,14 +823,14 @@ namespace DataAirSystems {
 	};
 
 	// Object Data
-	extern FArray1D< DefinePrimaryAirSystem > PrimaryAirSystem;
-	extern FArray1D< ConnectionPoint > DemandSideConnect; // Connections between loops
-	extern FArray1D< ConnectZoneComp > ZoneCompToPlant; // Connections between loops
-	extern FArray1D< ConnectZoneSubComp > ZoneSubCompToPlant; // Connections between loops
-	extern FArray1D< ConnectZoneSubSubComp > ZoneSubSubCompToPlant; // Connections between loops
-	extern FArray1D< ConnectAirSysComp > AirSysCompToPlant; // Connections between loops
-	extern FArray1D< ConnectAirSysSubComp > AirSysSubCompToPlant; // Connections between loops
-	extern FArray1D< ConnectAirSysSubSubComp > AirSysSubSubCompToPlant; // Connections between loops
+	extern Array1D< DefinePrimaryAirSystem > PrimaryAirSystem;
+	extern Array1D< ConnectionPoint > DemandSideConnect; // Connections between loops
+	extern Array1D< ConnectZoneComp > ZoneCompToPlant; // Connections between loops
+	extern Array1D< ConnectZoneSubComp > ZoneSubCompToPlant; // Connections between loops
+	extern Array1D< ConnectZoneSubSubComp > ZoneSubSubCompToPlant; // Connections between loops
+	extern Array1D< ConnectAirSysComp > AirSysCompToPlant; // Connections between loops
+	extern Array1D< ConnectAirSysSubComp > AirSysSubCompToPlant; // Connections between loops
+	extern Array1D< ConnectAirSysSubSubComp > AirSysSubSubCompToPlant; // Connections between loops
 
 } // DataAirSystems
 

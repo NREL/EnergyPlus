@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -79,7 +79,7 @@ namespace WaterToAirHeatPump {
 
 	//MODULE VARIABLE DECLARATIONS:
 	int NumWatertoAirHPs( 0 ); // The Number of Water to Air Heat Pumps found in the Input
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	int RefrigIndex( 0 ); // Refrigerant index
 	int WaterIndex( 0 ); // Water index
@@ -98,7 +98,7 @@ namespace WaterToAirHeatPump {
 	// Utility routines
 
 	// Object Data
-	FArray1D< WatertoAirHPEquipConditions > WatertoAirHP;
+	Array1D< WatertoAirHPEquipConditions > WatertoAirHP;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -271,12 +271,12 @@ namespace WaterToAirHeatPump {
 		bool IsBlank; // Flag for blank name
 		bool errFlag;
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string AlphArray; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > NumArray; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string AlphArray; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > NumArray; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		// FLOW
 
@@ -651,8 +651,8 @@ namespace WaterToAirHeatPump {
 		int WaterInletNode; // water inlet node number
 		int PlantOutletNode;
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyPlantScanFlag;
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyPlantScanFlag;
+		static Array1D_bool MyEnvrnFlag;
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
 		Real64 Temptemp;
@@ -1007,7 +1007,7 @@ namespace WaterToAirHeatPump {
 		Real64 QLatActual; // Qlatent at actual operating conditions
 		Real64 SHRss; // Sensible heat ratio at steady state
 		Real64 SHReff; // Effective sensible heat ratio at part-load condition
-		FArray1D< Real64 > Par( 4 ); // Parameter array passed to RegulaFalsi function
+		Array1D< Real64 > Par( 4 ); // Parameter array passed to RegulaFalsi function
 		int SolFlag; // Solution flag returned from RegulaFalsi function
 		static bool ErrorsFound( false );
 		static bool firstTime( true );
@@ -1112,7 +1112,7 @@ namespace WaterToAirHeatPump {
 		ANTUWET = LoadSideTotalUA * LoadSideMassFlowRate_CpAir_inv;
 		EffectWET = 1.0 - std::exp( -ANTUWET );
 
-		LOOPLatentDegradationModel: while ( true ) {
+		while ( true ) {
 			++NumIteration4;
 			if ( NumIteration4 == 1 ) {
 				//Set indoor air conditions to the rated condition
@@ -1130,7 +1130,7 @@ namespace WaterToAirHeatPump {
 			NumIteration2 = 0;
 			Converged = false;
 			FinalSimFlag = false;
-			LOOPSourceEnth: while ( true ) {
+			while ( true ) {
 				if ( Converged ) FinalSimFlag = true;
 
 				++NumIteration2;
@@ -1142,7 +1142,7 @@ namespace WaterToAirHeatPump {
 
 				//Innerloop: Calculate load side heat transfer
 				NumIteration3 = 0;
-				LOOPLoadEnth: while ( true ) {
+				while ( true ) {
 
 					++NumIteration3;
 
@@ -1337,7 +1337,6 @@ namespace WaterToAirHeatPump {
 						initialQLoadTotal += RelaxParam * ( QLoadTotal - initialQLoadTotal );
 					}
 
-					LOOPLoadEnth_loop: ;
 				}
 				LOOPLoadEnth_exit: ;
 
@@ -1361,8 +1360,6 @@ namespace WaterToAirHeatPump {
 				}
 
 				if ( FinalSimFlag ) goto LOOPSourceEnth_exit;
-
-				LOOPSourceEnth_loop: ;
 			}
 			LOOPSourceEnth_exit: ;
 
@@ -1398,7 +1395,6 @@ namespace WaterToAirHeatPump {
 				SHReff = QSensible / QLoadTotal;
 				goto LOOPLatentDegradationModel_exit;
 			}
-			LOOPLatentDegradationModel_loop: ;
 		}
 		LOOPLatentDegradationModel_exit: ;
 
@@ -1451,7 +1447,7 @@ namespace WaterToAirHeatPump {
 	Real64
 	CalcCompSuctionTempResidual(
 		Real64 const CompSuctionTemp, // HP compressor suction temperature (C)
-		FArray1< Real64 > const & Par // Function parameters
+		Array1< Real64 > const & Par // Function parameters
 	)
 	{
 
@@ -1648,7 +1644,7 @@ namespace WaterToAirHeatPump {
 		Real64 CompSuctionSatTemp; // Temperature of Saturated Refrigerant at Compressor Suction Pressure [C]
 		bool FinalSimFlag; // Final Simulation Flag
 		bool Converged; // Overall convergence Flag
-		FArray1D< Real64 > Par( 4 ); // Parameter array passed to RegulaFalsi function
+		Array1D< Real64 > Par( 4 ); // Parameter array passed to RegulaFalsi function
 		int SolFlag; // Solution flag returned from RegulaFalsi function
 
 		//  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
@@ -1718,7 +1714,7 @@ namespace WaterToAirHeatPump {
 		NumIteration3 = 0;
 		Converged = false;
 		FinalSimFlag = false;
-		LOOPLoadEnth: while ( true ) {
+		while ( true ) {
 			if ( Converged ) FinalSimFlag = true;
 
 			++NumIteration3;
@@ -1730,7 +1726,7 @@ namespace WaterToAirHeatPump {
 
 			//Innerloop: calculate load side heat transfer
 			NumIteration2 = 0;
-			LOOPSourceEnth: while ( true ) {
+			while ( true ) {
 
 				++NumIteration2;
 
@@ -1874,8 +1870,6 @@ namespace WaterToAirHeatPump {
 				} else {
 					initialQSource += RelaxParam * ( QSource - initialQSource );
 				}
-
-				LOOPSourceEnth_loop: ;
 			}
 			LOOPSourceEnth_exit: ;
 
@@ -1899,7 +1893,6 @@ namespace WaterToAirHeatPump {
 			}
 
 			if ( FinalSimFlag ) goto LOOPLoadEnth_exit;
-			LOOPLoadEnth_loop: ;
 		}
 		LOOPLoadEnth_exit: ;
 

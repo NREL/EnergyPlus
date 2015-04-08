@@ -9,18 +9,14 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // C++ Headers
 #include <cstdlib>
-#include <string>
-#ifndef OBJEXXFCL_IO_ERROR_SUPPRESS
-#include <iostream>
-#else
 #include <ios>
-#endif
+#include <string>
 
 namespace ObjexxFCL {
 
@@ -57,7 +53,7 @@ public: // Creation
 	 nad_( false ),
 	 del_( false ),
 	 her_( false ),
-	 size_( 0 ),
+	 size_( 0u ),
 	 pos_( 0 ),
 	 ter_( default_ter() ),
 	 err_( false ),
@@ -1215,7 +1211,7 @@ public: // Methods
 		append_ = false;
 		truncate_ = false;
 		asis_ = true;
-		size_ = 0;
+		size_ = 0u;
 		pos_ = 0;
 		ter_ = default_ter();
 		bz_ = false;
@@ -1262,15 +1258,15 @@ public: // Methods
 	}
 
 	// Error Handler
+#ifdef OBJEXXFCL_IO_ERROR_SUPPRESS
 	inline
 	void
 	error() const
-	{
-#ifndef OBJEXXFCL_IO_ERROR_SUPPRESS
-		std::cerr << '\n' << msg_ << std::endl;
-		std::exit( EXIT_FAILURE );
+	{}
+#else
+	void
+	error() const;
 #endif
-	}
 
 	// AsIs Update
 	inline

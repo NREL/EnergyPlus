@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -78,22 +78,22 @@ namespace SolarCollectors {
 
 	// MODULE VARIABLE TYPE DECLARATIONS:
 
-	FArray1D_bool CheckEquipName;
+	Array1D_bool CheckEquipName;
 
 	// MODULE VARIABLE DECLARATIONS:
 	int NumOfParameters( 0 );
 	int NumOfCollectors( 0 );
 
-	FArray1D< Real64 > TransSysSkyDiff; // transmittance of cover system for sky diffuse solar rad.
-	FArray1D< Real64 > TransSysGrnDiff; // transmittance of cover system for ground diffuse solar rad.
-	FArray1D< Real64 > RefSysSkyDiff; // reflectance of cover system for sky diffuse solar rad.
-	FArray1D< Real64 > RefSysGrnDiff; // reflectance of cover system for ground diffuse solar rad.
+	Array1D< Real64 > TransSysSkyDiff; // transmittance of cover system for sky diffuse solar rad.
+	Array1D< Real64 > TransSysGrnDiff; // transmittance of cover system for ground diffuse solar rad.
+	Array1D< Real64 > RefSysSkyDiff; // reflectance of cover system for sky diffuse solar rad.
+	Array1D< Real64 > RefSysGrnDiff; // reflectance of cover system for ground diffuse solar rad.
 
 	// SUBROUTINE SPECIFICATIONS:
 
 	// Object Data
-	FArray1D< ParametersData > Parameters;
-	FArray1D< CollectorData > Collector;
+	Array1D< ParametersData > Parameters;
+	Array1D< CollectorData > Collector;
 
 	// MODULE SUBROUTINES:
 
@@ -255,12 +255,12 @@ namespace SolarCollectors {
 		int VentCavIndex; // vent cavity index
 		Real64 Perimeter; // perimeter of the absorber or collector
 
-		FArray1D< Real64 > Numbers; // Numeric data
-		FArray1D_string Alphas; // Alpha data
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D< Real64 > Numbers; // Numeric data
+		Array1D_string Alphas; // Alpha data
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		// FLOW:
 		MaxNumbers = 0;
@@ -761,12 +761,12 @@ namespace SolarCollectors {
 		Real64 const BigNumber( 9999.9 ); // Component desired mass flow rate
 
 		static bool MyOneTimeFlag( true ); // one time flag
-		static FArray1D_bool SetLoopIndexFlag; // get loop number flag
+		static Array1D_bool SetLoopIndexFlag; // get loop number flag
 		Real64 rho;
 		//LOGICAL     :: errFlag
 		//  REAL(r64)                                :: Density                ! density of fluid
 		bool errFlag; // local error flag
-		static FArray1D_bool SetDiffRadFlag; // get diffuse radiation flag
+		static Array1D_bool SetDiffRadFlag; // get diffuse radiation flag
 
 		int SurfNum; // Surface object number for collector
 		int ParamNum; // Collector parameters object number
@@ -1528,7 +1528,7 @@ namespace SolarCollectors {
 		Real64 ReflSys; // cover system solar reflectance
 		Real64 AbsCover1; // Inner cover solar absorbtance
 		Real64 AbsCover2; // Outer cover solar absorbtance
-		FArray1D< Real64 > CoversAbsBeam( 2 ); // Inner and Outer Cover absorptance
+		Array1D< Real64 > CoversAbsBeam( 2 ); // Inner and Outer Cover absorptance
 		// FLOW:
 
 		// set
@@ -1622,13 +1622,13 @@ namespace SolarCollectors {
 		Real64 RefrAngle; // angle of refraction
 		Real64 ParaRad; // parallel reflected component of unpolarized solar radiation
 		Real64 PerpRad; // Perpendicular reflected component of unpolarized solar radiation
-		FArray1D< Real64 > TransPara( 2 ); // cover transmittance parallel component
-		FArray1D< Real64 > TransPerp( 2 ); // cover transmittance perpendicular component
-		FArray1D< Real64 > ReflPara( 2 ); // cover reflectance parallel component
-		FArray1D< Real64 > ReflPerp( 2 ); // cover reflectance Perpendicular component
-		FArray1D< Real64 > AbsorPara( 2 ); // cover absorbtance parallel component
-		FArray1D< Real64 > AbsorPerp( 2 ); // cover absorbtance Perpendicular component
-		FArray1D< Real64 > TransAbsOnly( 2 ); // cover transmittance with absorptance only considered
+		Array1D< Real64 > TransPara( 2 ); // cover transmittance parallel component
+		Array1D< Real64 > TransPerp( 2 ); // cover transmittance perpendicular component
+		Array1D< Real64 > ReflPara( 2 ); // cover reflectance parallel component
+		Array1D< Real64 > ReflPerp( 2 ); // cover reflectance Perpendicular component
+		Array1D< Real64 > AbsorPara( 2 ); // cover absorbtance parallel component
+		Array1D< Real64 > AbsorPerp( 2 ); // cover absorbtance Perpendicular component
+		Array1D< Real64 > TransAbsOnly( 2 ); // cover transmittance with absorptance only considered
 		Real64 CoverRefrIndex; // refractive index of collector cover
 		Real64 TransSysDiff; // cover system solar transmittance from inner to outer cover
 		bool DiffRefFlag; // flag for calc. diffuse refl of cover from inside to outside
@@ -1927,11 +1927,11 @@ namespace SolarCollectors {
 		Real64 const gravity( 9.806 ); // gravitational constant [m/s^2]
 
 		int const NumOfPropDivisions( 11 );
-		static FArray1D< Real64 > const Temps( NumOfPropDivisions, { -23.15, 6.85, 16.85, 24.85, 26.85, 36.85, 46.85, 56.85, 66.85, 76.85, 126.85 } ); // Temperature, in C
-		static FArray1D< Real64 > const Mu( NumOfPropDivisions, { 0.0000161, 0.0000175, 0.000018, 0.0000184, 0.0000185, 0.000019, 0.0000194, 0.0000199, 0.0000203, 0.0000208, 0.0000229 } ); // Viscosity, in kg/(m.s)
-		static FArray1D< Real64 > const Conductivity( NumOfPropDivisions, { 0.0223, 0.0246, 0.0253, 0.0259, 0.0261, 0.0268, 0.0275, 0.0283, 0.0290, 0.0297, 0.0331 } ); // Conductivity, in W/mK
-		static FArray1D< Real64 > const Pr( NumOfPropDivisions, { 0.724, 0.717, 0.714, 0.712, 0.712, 0.711, 0.71, 0.708, 0.707, 0.706, 0.703 } ); // Prandtl number (dimensionless)
-		static FArray1D< Real64 > const Density( NumOfPropDivisions, { 1.413, 1.271, 1.224, 1.186, 1.177, 1.143, 1.110, 1.076, 1.043, 1.009, 0.883 } ); // Density, in kg/m3
+		static Array1D< Real64 > const Temps( NumOfPropDivisions, { -23.15, 6.85, 16.85, 24.85, 26.85, 36.85, 46.85, 56.85, 66.85, 76.85, 126.85 } ); // Temperature, in C
+		static Array1D< Real64 > const Mu( NumOfPropDivisions, { 0.0000161, 0.0000175, 0.000018, 0.0000184, 0.0000185, 0.000019, 0.0000194, 0.0000199, 0.0000203, 0.0000208, 0.0000229 } ); // Viscosity, in kg/(m.s)
+		static Array1D< Real64 > const Conductivity( NumOfPropDivisions, { 0.0223, 0.0246, 0.0253, 0.0259, 0.0261, 0.0268, 0.0275, 0.0283, 0.0290, 0.0297, 0.0331 } ); // Conductivity, in W/mK
+		static Array1D< Real64 > const Pr( NumOfPropDivisions, { 0.724, 0.717, 0.714, 0.712, 0.712, 0.711, 0.71, 0.708, 0.707, 0.706, 0.703 } ); // Prandtl number (dimensionless)
+		static Array1D< Real64 > const Density( NumOfPropDivisions, { 1.413, 1.271, 1.224, 1.186, 1.177, 1.143, 1.110, 1.076, 1.043, 1.009, 0.883 } ); // Density, in kg/m3
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

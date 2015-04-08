@@ -97,7 +97,7 @@ public:
 
 TEST_F( WaterCoilsTest, WaterCoolingCoilSizing )
 {
-	InitializePsychRoutines( );
+	InitializePsychRoutines();
 	OutBaroPress = 101325.0;
 	StdRhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, 20.0, 0.0 );
 	ShowMessage( "Begin Test: WaterCoilsTest, WaterCoolingCoilSizing" );
@@ -114,7 +114,7 @@ TEST_F( WaterCoilsTest, WaterCoolingCoilSizing )
 	PlantSizData( 1 ).PlantLoopName = "WaterLoop";
 
 	// set up plant loop
-	for( int l = 1; l <= TotNumLoops; ++l ) {
+	for ( int l = 1; l <= TotNumLoops; ++l ) {
 		auto & loop( PlantLoop( l ) );
 		loop.LoopSide.allocate( 2 );
 		auto & loopside( PlantLoop( 1 ).LoopSide( 1 ) );

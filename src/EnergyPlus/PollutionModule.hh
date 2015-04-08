@@ -2,7 +2,7 @@
 #define PollutionModule_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -434,7 +434,7 @@ namespace PollutionModule {
 	{
 		// Members
 		//FuelType Names
-		FArray1D_string FuelTypeNames;
+		Array1D_string FuelTypeNames;
 		//Fuel Types used with the Pollution Factors
 		Real64 Elec;
 		Real64 NatGas;
@@ -534,7 +534,7 @@ namespace PollutionModule {
 
 		// Member Constructor
 		FuelTypeProps(
-			FArray1_string const & FuelTypeNames,
+			Array1_string const & FuelTypeNames,
 			Real64 const Elec,
 			Real64 const NatGas,
 			Real64 const FuelOil1,

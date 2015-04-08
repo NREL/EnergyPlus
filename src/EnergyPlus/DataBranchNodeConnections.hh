@@ -2,7 +2,7 @@
 #define DataBranchNodeConnections_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -178,10 +178,10 @@ namespace DataBranchNodeConnections {
 	};
 
 	// Object Data
-	extern FArray1D< ComponentListData > CompSets;
-	extern FArray1D< ParentListData > ParentNodeList;
-	extern FArray1D< NodeConnectionDef > NodeConnections;
-	extern FArray1D< EqNodeConnectionDef > AirTerminalNodeConnections;
+	extern Array1D< ComponentListData > CompSets;
+	extern Array1D< ParentListData > ParentNodeList;
+	extern Array1D< NodeConnectionDef > NodeConnections;
+	extern Array1D< EqNodeConnectionDef > AirTerminalNodeConnections;
 
 } // DataBranchNodeConnections
 

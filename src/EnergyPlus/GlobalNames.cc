@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <GlobalNames.hh>
@@ -58,10 +58,10 @@ namespace GlobalNames {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE GlobalNames:
 
 	// Object Data
-	FArray1D< ComponentNameData > ChillerNames;
-	FArray1D< ComponentNameData > BoilerNames;
-	FArray1D< ComponentNameData > BaseboardNames;
-	FArray1D< ComponentNameData > CoilNames;
+	Array1D< ComponentNameData > ChillerNames;
+	Array1D< ComponentNameData > BoilerNames;
+	Array1D< ComponentNameData > BaseboardNames;
+	Array1D< ComponentNameData > CoilNames;
 
 	// Functions
 

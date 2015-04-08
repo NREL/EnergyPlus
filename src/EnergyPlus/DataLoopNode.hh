@@ -2,7 +2,7 @@
 #define DataLoopNode_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -22,11 +22,11 @@ namespace DataLoopNode {
 	extern int const NodeType_Water; // 'Water'
 	extern int const NodeType_Steam; // 'Steam'
 	extern int const NodeType_Electric; // 'Electric'
-	extern FArray1D_string const ValidNodeFluidTypes;
+	extern Array1D_string const ValidNodeFluidTypes;
 	extern int const NumValidNodeFluidTypes;
 
 	// Valid Connection Types for Nodes
-	extern FArray1D_string const ValidConnectionTypes;
+	extern Array1D_string const ValidConnectionTypes;
 
 	extern int const NumValidConnectionTypes;
 
@@ -66,7 +66,7 @@ namespace DataLoopNode {
 	// the following assignments:  Node(somenodenumber)=Node(someothernodenumber) to
 	// set/update Node conditions.  If the Node derived type would include the name
 	// then the name would get changed and bad things would result...
-	extern FArray1D_string NodeID;
+	extern Array1D_string NodeID;
 
 	// Types
 
@@ -303,10 +303,10 @@ namespace DataLoopNode {
 	};
 
 	// Object Data
-	extern FArray1D< NodeData > Node; // dim to num nodes in SimHVAC
+	extern Array1D< NodeData > Node; // dim to num nodes in SimHVAC
 	extern NodeData DefaultNodeValues;
-	extern FArray1D< MoreNodeData > MoreNodeInfo;
-	extern FArray1D< MarkedNodeData > MarkedNode;
+	extern Array1D< MoreNodeData > MoreNodeInfo;
+	extern Array1D< MarkedNodeData > MarkedNode;
 
 } // DataLoopNode
 

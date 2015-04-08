@@ -3,7 +3,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/MArray.functions.hh>
@@ -198,15 +198,15 @@ namespace ThermalComfort {
 	Real64 TotalAnyZoneNotMetHeatingOccupied( 0.0 );
 	Real64 TotalAnyZoneNotMetCoolingOccupied( 0.0 );
 	Real64 TotalAnyZoneNotMetOccupied( 0.0 );
-	FArray1D< Real64 > ZoneOccHrs;
+	Array1D< Real64 > ZoneOccHrs;
 
 	// Subroutine Specifications for the Thermal Comfort module
 
 	// Object Data
-	FArray1D< ThermalComfortInASH55Type > ThermalComfortInASH55;
-	FArray1D< ThermalComfortSetPointType > ThermalComfortSetPoint;
-	FArray1D< ThermalComfortDataType > ThermalComfortData;
-	FArray1D< AngleFactorData > AngleFactorList; // Angle Factor List data for each Angle Factor List
+	Array1D< ThermalComfortInASH55Type > ThermalComfortInASH55;
+	Array1D< ThermalComfortSetPointType > ThermalComfortSetPoint;
+	Array1D< ThermalComfortDataType > ThermalComfortData;
+	Array1D< AngleFactorData > AngleFactorList; // Angle Factor List data for each Angle Factor List
 
 	// Functions
 
@@ -1189,9 +1189,9 @@ namespace ThermalComfort {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		static FArray1D< Real64 > Coeff( 2 ); // Coefficients used in Range-Kutta's Method
-		static FArray1D< Real64 > Temp( 2 ); // Temperature
-		static FArray1D< Real64 > TempChange( 2 ); // Change of temperature
+		static Array1D< Real64 > Coeff( 2 ); // Coefficients used in Range-Kutta's Method
+		static Array1D< Real64 > Temp( 2 ); // Temperature
+		static Array1D< Real64 > TempChange( 2 ); // Change of temperature
 
 		Real64 BodyWt; // Weight of body, kg
 		Real64 DayNum; // Number of days of acclimation
@@ -1360,8 +1360,8 @@ namespace ThermalComfort {
 	void
 	DERIV(
 		int & TempIndiceNum, // Number of temperature indices  unused1208
-		FArray1A< Real64 > Temp, // Temperature unused1208
-		FArray1A< Real64 > TempChange // Change of temperature
+		Array1A< Real64 > Temp, // Temperature unused1208
+		Array1A< Real64 > TempChange // Change of temperature
 	)
 	{
 
@@ -1577,9 +1577,9 @@ namespace ThermalComfort {
 		int & NEQ,
 		Real64 & H,
 		Real64 & X,
-		FArray1A< Real64 > Y,
-		FArray1A< Real64 > DY,
-		FArray1A< Real64 > C
+		Array1A< Real64 > Y,
+		Array1A< Real64 > DY,
+		Array1A< Real64 > C
 	)
 	{
 
@@ -1626,7 +1626,7 @@ namespace ThermalComfort {
 		int J;
 		Real64 B;
 		Real64 H2;
-		static FArray1D< Real64 > const A( 2, { 0.29289321881345, 1.70710678118654 } );
+		static Array1D< Real64 > const A( 2, { 0.29289321881345, 1.70710678118654 } );
 
 		H2 = 0.5 * H;
 
@@ -1849,7 +1849,7 @@ namespace ThermalComfort {
 
 		for ( SurfNum = 1; SurfNum <= AngleFactorList( AngleFacNum ).TotAngleFacSurfaces; ++SurfNum ) {
 
-			SurfaceTemp = TH( AngleFactorList( AngleFacNum ).SurfacePtr( SurfNum ), 1, 2 );
+			SurfaceTemp = TH( 2, 1, AngleFactorList( AngleFacNum ).SurfacePtr( SurfNum ) );
 			SurfTempAngleFacSummed += SurfaceTemp * AngleFactorList( AngleFacNum ).AngleFactor( SurfNum );
 
 		}
@@ -1981,7 +1981,7 @@ namespace ThermalComfort {
 			RadTemp = MRT( ZoneNum );
 		} else if ( SELECT_CASE_var == SurfaceWeighted ) {
 			ZoneRadTemp = MRT( ZoneNum );
-			SurfaceTemp = TH( People( PeopleListNum ).SurfacePtr, 1, 2 );
+			SurfaceTemp = TH( 2, 1, People( PeopleListNum ).SurfacePtr );
 			RadTemp = ( ZoneRadTemp + SurfaceTemp ) / 2.0;
 		} else if ( SELECT_CASE_var == AngleFactor ) {
 			RadTemp = CalcAngleFactorMRT( People( PeopleListNum ).AngleFactorListPtr );
@@ -2429,7 +2429,7 @@ namespace ThermalComfort {
 		static Real64 avgDryBulbASH( 0.0 );
 		Real64 dryBulb;
 		static Real64 runningAverageASH( 0.0 );
-		static FArray1D< Real64 > monthlyTemp( 12, 0.0 );
+		static Array1D< Real64 > monthlyTemp( 12, 0.0 );
 		Real64 tComf;
 		Real64 numOccupants;
 		int statFile;
@@ -2671,7 +2671,7 @@ namespace ThermalComfort {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Real64 const alpha( 0.8 );
-		static FArray1D< Real64 > const alpha_pow( { pow_6( alpha ), pow_5( alpha ), pow_4( alpha ), pow_3( alpha ), pow_2( alpha ), alpha, 1.0 } ); // alpha^(7-i)
+		static Array1D< Real64 > const alpha_pow( { pow_6( alpha ), pow_5( alpha ), pow_4( alpha ), pow_3( alpha ), pow_2( alpha ), alpha, 1.0 } ); // alpha^(7-i)
 		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:

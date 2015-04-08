@@ -2,7 +2,7 @@
 #define PlantLoadProfile_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -145,7 +145,7 @@ namespace PlantLoadProfile {
 	};
 
 	// Object Data
-	extern FArray1D< PlantProfileData > PlantProfile;
+	extern Array1D< PlantProfileData > PlantProfile;
 
 	// Functions
 

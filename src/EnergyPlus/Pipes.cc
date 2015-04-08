@@ -1,5 +1,5 @@
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
 #include <Pipes.hh>
@@ -63,7 +63,7 @@ namespace Pipes {
 	// SUBROUTINE SPECIFICATIONS FOR MODULE Pipe
 
 	// Object Data
-	FArray1D< LocalPipeData > LocalPipe; // dimension to number of pipes
+	Array1D< LocalPipeData > LocalPipe; // dimension to number of pipes
 
 	// MODULE SUBROUTINES:
 

@@ -161,7 +161,7 @@ namespace DataGlobals {
 	int KindOfSim( 0 ); // See parameters. (ksDesignDay, ksRunPeriodDesign, ksRunPeriodWeather)
 	bool DoOutputReporting( false ); // TRUE if variables to be written out
 	bool DoingSizing( false ); // TRUE when "sizing" is being performed (some error messages won't be displayed)
-	bool DoingHVACSizingSimulations( false ); // true when HVAC Sizing Simulations are being performed. 
+	bool DoingHVACSizingSimulations( false ); // true when HVAC Sizing Simulations are being performed.
 	bool DoingInputProcessing( false ); // TRUE when "IP" is being performed (some error messages are cached)
 	bool DisplayAllWarnings( false ); // True when selection for  "DisplayAllWarnings" is entered (turns on other warning flags)
 	bool DisplayExtraWarnings( false ); // True when selection for  "DisplayExtraWarnings" is entered

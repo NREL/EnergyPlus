@@ -6,7 +6,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -27,7 +27,7 @@ namespace ObjexxFCL {
 
 // Current Time: HH, MM, SS
 void
-itime( FArray1< std::int32_t > & timearray )
+itime( Array1< std::int32_t > & timearray )
 {
 	assert( timearray.l() <= 1 );
 	assert( timearray.u() >= 3 );
@@ -74,10 +74,9 @@ gettim( std::int32_t & h, std::int32_t & m, std::int32_t & s, std::int32_t & c )
 
 // Current Time: HH:MM:SS
 void
-TIME( Fstring & time )
+TIME( std::string & time )
 {
 	using std::setw;
-	assert( time.length() >= 8 );
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
 	int const hh( timeinfo->tm_hour );
@@ -99,7 +98,7 @@ TIME()
 }
 
 // Clock
-Fstring
+std::string
 CLOCK()
 {
 	using std::setw;
@@ -110,7 +109,7 @@ CLOCK()
 	int const ss( timeinfo->tm_sec );
 	std::stringstream time_stream;
 	time_stream << std::setfill( '0' ) << setw( 2 ) << hh << ":" << setw( 2 ) << mm << ":" << setw( 2 ) << ss;
-	return Fstring( 8, time_stream.str() );
+	return time_stream.str();
 }
 
 // System Clock
@@ -153,7 +152,7 @@ SYSTEM_CLOCK32( Optional< std::int32_t > count, Optional< std::int32_t > count_r
 
 // Current Date: DD, MM, YYYY
 void
-idate( FArray1< std::int32_t > & datearray )
+idate( Array1< std::int32_t > & datearray )
 {
 	assert( datearray.l() <= 1 );
 	assert( datearray.u() >= 3 );
@@ -188,7 +187,7 @@ idate( std::int32_t & month, std::int32_t & day, std::int32_t & year )
 
 // Current Date: DD, MM, YYYY (Year < 2000 is offset from 1900)
 void
-idate4( FArray1< std::int32_t > & datearray )
+idate4( Array1< std::int32_t > & datearray )
 {
 	assert( datearray.l() <= 1 );
 	assert( datearray.u() >= 3 );
@@ -232,65 +231,6 @@ getdat( std::int32_t & year, std::int32_t & month, std::int32_t & day )
 	month = timeinfo->tm_mon + 1; // Month of year: 1-12
 	day = timeinfo->tm_mday; // Day of month: 1,2,...
 	year = timeinfo->tm_year + 1900; // Year offset from 1900
-}
-
-// Current Date String: DD-MMM-YY (Not Y2K Compliant)
-void
-date( Fstring & day )
-{
-	assert( day.length() >= 9 );
-	int m, d, y;
-	idate( m, d, y );
-	std::stringstream s;
-	s << std::setfill( '0' ) << std::setw( 2 ) << d;
-	day = "  -   -  ";
-	day( 1, 2 ) = s.str();
-	s.str( "" );
-	s << std::setfill( '0' ) << std::setw( 2 ) << y;
-	day( 8, 9 ) = s.str();
-	Fstring mmm( 3 );
-	switch ( m ) {
-	case 1:
-		mmm = "JAN";
-		break;
-	case 2:
-		mmm = "FEB";
-		break;
-	case 3:
-		mmm = "MAR";
-		break;
-	case 4:
-		mmm = "APR";
-		break;
-	case 5:
-		mmm = "MAY";
-		break;
-	case 6:
-		mmm = "JUN";
-		break;
-	case 7:
-		mmm = "JUL";
-		break;
-	case 8:
-		mmm = "AUG";
-		break;
-	case 9:
-		mmm = "SEP";
-		break;
-	case 10:
-		mmm = "OCT";
-		break;
-	case 11:
-		mmm = "NOV";
-		break;
-	case 12:
-		mmm = "DEC";
-		break;
-	default:
-		assert( false );
-		break;
-	}
-	day( 4, 6 ) = mmm;
 }
 
 // Current Date String: DD-MMM-YY (Not Y2K Compliant)
@@ -353,7 +293,7 @@ date( std::string & day )
 }
 
 // Current Date String: YYDDD (Not Y2K Compliant)
-Fstring
+std::string
 jdate()
 {
 	int m, d, y;
@@ -365,7 +305,7 @@ jdate()
 	}
 	std::stringstream s;
 	s << std::setfill( '0' ) << std::setw( 5 ) << std::size_t( y * 365 ) + ( y / 4 ) - ( y / 100 ) + ( y / 400 ) - 1200820 + ( ( ( m * 153 ) + 3 ) / 5 ) - 92 + d - 1;
-	return Fstring( 8, s.str() );
+	return s.str();
 }
 
 // Local Time Zone Offset from UTC in Seconds
@@ -402,63 +342,7 @@ time_zone_offset_seconds()
 
 // Current Date and Time
 void
-date_and_time( Optional< Fstring > date, Optional< Fstring > time, Optional< Fstring > zone, Optional< FArray1D< int > > values )
-{
-	using std::chrono::system_clock;
-	using std::chrono::duration_cast;
-	using std::chrono::milliseconds;
-	using std::setw;
-	system_clock::time_point const now( system_clock::now() );
-	int const ms( static_cast< int >( duration_cast< milliseconds >( now.time_since_epoch() ).count() % 1000 ) ); // msec
-	std::time_t const current_time( system_clock::to_time_t( now ) );
-	std::tm const * const timeinfo( std::localtime( &current_time ) );
-
-	int const DD( timeinfo->tm_mday ); // Day of month: 1,2,...
-	int const MM( timeinfo->tm_mon + 1 ); // Month of year: 1-12
-	int const YY( timeinfo->tm_year + 1900 ); // Year
-	if ( date.present() ) {
-		assert( date().length() >= 8 );
-		std::stringstream date_stream;
-		date_stream << std::setfill( '0' ) << setw( 4 ) << YY << setw( 2 ) << MM << setw( 2 ) << DD;
-		date = date_stream.str();
-	}
-
-	int const hh( timeinfo->tm_hour );
-	int const mm( timeinfo->tm_min );
-	int const ss( timeinfo->tm_sec );
-	if ( time.present() ) {
-		assert( time().length() >= 10 );
-		std::stringstream time_stream;
-		time_stream << std::setfill( '0' ) << setw( 2 ) << hh << setw( 2 ) << mm << setw( 2 ) << ss << '.' << setw( 3 ) << ms;
-		time = time_stream.str();
-	}
-
-	int const zs( time_zone_offset_seconds() );
-	if ( zone.present() ) {
-		assert( zone().length() >= 5 );
-		int const zh( std::abs( zs ) / 3600 );
-		int const zm( ( std::abs( zs ) - ( zh * 3600 ) ) / 60 );
-		std::stringstream zone_stream;
-		zone_stream << std::setfill( '0' ) << ( zs >= 0 ? '+' : '-' ) << setw( 2 ) << zh << setw( 2 ) << zm;
-		zone = zone_stream.str();
-	}
-
-	if ( values.present() ) {
-		assert( ( values().l() <= 1 ) && ( values().u() >= 8 ) );
-		values()( 1 ) = YY;
-		values()( 2 ) = MM;
-		values()( 3 ) = DD;
-		values()( 4 ) = zs / 60;
-		values()( 5 ) = hh;
-		values()( 6 ) = mm;
-		values()( 7 ) = ss;
-		values()( 8 ) = ms;
-	}
-}
-
-// Current Date and Time
-void
-date_and_time_string( Optional< std::string > date, Optional< std::string > time, Optional< std::string > zone, Optional< FArray1D< int > > values )
+date_and_time( Optional< std::string > date, Optional< std::string > time, Optional< std::string > zone, Optional< Array1D< int > > values )
 {
 	using std::chrono::system_clock;
 	using std::chrono::duration_cast;

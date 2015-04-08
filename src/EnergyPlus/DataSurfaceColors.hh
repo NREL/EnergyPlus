@@ -2,7 +2,7 @@
 #define DataSurfaceColors_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -31,17 +31,17 @@ namespace DataSurfaceColors {
 	extern int const ColorNo_DaylSensor1;
 	extern int const ColorNo_DaylSensor2;
 
-	extern FArray1D_int const defaultcolorno; // text | wall | window | glassdoor | door | floor | roof | detached building shade (moves with building) | detached building fixed | attached building shading | PV | TDD:Dome | TDD:Diffuser | Daylight Sensor 1 | Daylight Sensor 2
+	extern Array1D_int const defaultcolorno; // text | wall | window | glassdoor | door | floor | roof | detached building shade (moves with building) | detached building fixed | attached building shading | PV | TDD:Dome | TDD:Diffuser | Daylight Sensor 1 | Daylight Sensor 2
 
-	extern FArray1D_string const colorkeys;
+	extern Array1D_string const colorkeys;
 
-	extern FArray1D_int const colorkeyptr;
+	extern Array1D_int const colorkeyptr;
 
 	// DERIVED TYPE DEFINITIONS:
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern FArray1D_int DXFcolorno;
+	extern Array1D_int DXFcolorno;
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE:
 

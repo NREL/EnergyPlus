@@ -50,14 +50,14 @@ namespace DataAirLoop {
 	bool AirLoopInputsFilled( false ); // Set to TRUE after first pass through air loop
 
 	// Object Data
-	FArray1D< AirLoopZoneEquipConnectData > AirToZoneNodeInfo;
-	FArray1D< AirLoopOutsideAirConnectData > AirToOANodeInfo;
-	FArray1D< DefinePriAirSysAvailMgrs > PriAirSysAvailMgr;
-	FArray1D< AirLooptoZoneData > AirLoopZoneInfo;
-	FArray1D< AirLoopControlData > AirLoopControlInfo;
-	FArray1D< AirLoopFlowData > AirLoopFlow;
-	FArray1D< OAControllerData > OAControllerInfo;
-	FArray1D< OutsideAirSysProps > OutsideAirSys;
+	Array1D< AirLoopZoneEquipConnectData > AirToZoneNodeInfo;
+	Array1D< AirLoopOutsideAirConnectData > AirToOANodeInfo;
+	Array1D< DefinePriAirSysAvailMgrs > PriAirSysAvailMgr;
+	Array1D< AirLooptoZoneData > AirLoopZoneInfo;
+	Array1D< AirLoopControlData > AirLoopControlInfo;
+	Array1D< AirLoopFlowData > AirLoopFlow;
+	Array1D< OAControllerData > OAControllerInfo;
+	Array1D< OutsideAirSysProps > OutsideAirSys;
 
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

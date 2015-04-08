@@ -2,7 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -131,8 +131,8 @@ namespace VariableSpeedCoils {
 	Real64 Winput( 0.0 ); // Power Consumption [W]
 	Real64 PLRCorrLoadSideMdot( 0.0 ); // Load Side Mdot corrected for Part Load Ratio of the unit
 
-	Real64 VSHPWHHeatingCapacity(0.0); // Used by Heat Pump:Water Heater object as total water heating capacity [W]
-	Real64 VSHPWHHeatingCOP(0.0); // Used by Heat Pump:Water Heater object as water heating COP [W/W]
+	Real64 VSHPWHHeatingCapacity( 0.0 ); // Used by Heat Pump:Water Heater object as total water heating capacity [W]
+	Real64 VSHPWHHeatingCOP( 0.0 ); // Used by Heat Pump:Water Heater object as water heating COP [W/W]
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -150,7 +150,7 @@ namespace VariableSpeedCoils {
 	//SHR, bypass factor routines
 
 	// Object Data
-	FArray1D< VariableSpeedCoilData > VarSpeedCoil;
+	Array1D< VariableSpeedCoilData > VarSpeedCoil;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -262,14 +262,12 @@ namespace VariableSpeedCoils {
 			InitVarSpeedCoil( DXCoilNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal );
 			CalcVarSpeedCoilHeating( DXCoilNum, CyclingScheme, RuntimeFrac, SensLoad, CompOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal );
 			UpdateVarSpeedCoil( DXCoilNum );
-		}
-		else if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed) {
+		} else if ( VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed ) {
 			// Heating mode
 			InitVarSpeedCoil(DXCoilNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
 			CalcVarSpeedHPWH(DXCoilNum, RuntimeFrac, PartLoadFrac, SpeedRatio, SpeedNum, CyclingScheme);
 			UpdateVarSpeedCoil(DXCoilNum);
-		}		
-		else {
+		} else {
 			ShowFatalError( "SimVariableSpeedCoils: WatertoAir heatpump not in either HEATING or COOLING mode" );
 		}
 
@@ -351,12 +349,12 @@ namespace VariableSpeedCoils {
 		Real64 WHInletAirTemp; // Used to pass proper inlet air temp to HPWH DX coil performance curves
 		Real64 WHInletWaterTemp; // Used to pass proper inlet water temp to HPWH DX coil performance curves
 		std::string CurrentModuleObject; // for ease in getting objects
-		FArray1D_string AlphArray; // Alpha input items for object
-		FArray1D_string cAlphaFields; // Alpha field names
-		FArray1D_string cNumericFields; // Numeric field names
-		FArray1D< Real64 > NumArray; // Numeric input items for object
-		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		Array1D_string AlphArray; // Alpha input items for object
+		Array1D_string cAlphaFields; // Alpha field names
+		Array1D_string cNumericFields; // Numeric field names
+		Array1D< Real64 > NumArray; // Numeric input items for object
+		Array1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
+		Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
 		NumCool = GetNumObjectsFound( "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" );
 		NumHeat = GetNumObjectsFound( "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" );
@@ -391,8 +389,7 @@ namespace VariableSpeedCoils {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		//variable speed air-source HPWH
-		GetObjectDefMaxArgs("COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED", 
-			NumParams, NumAlphas, NumNums);
+		GetObjectDefMaxArgs("COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED", NumParams, NumAlphas, NumNums);
 		MaxNums = max(MaxNums, NumNums);
 		MaxAlphas = max(MaxAlphas, NumAlphas);
 
@@ -1877,7 +1874,7 @@ namespace VariableSpeedCoils {
 
 			VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate = NumArray(7);
 			VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate = NumArray(8);
-			
+
 			if (VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate != AutoCalculate) {
 				if (VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate <= 0.0) {
 					ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
@@ -1898,8 +1895,7 @@ namespace VariableSpeedCoils {
 				//  initialized to TRUE on allocate
 				if (SameString(AlphArray(2), "No")) VarSpeedCoil(DXCoilNum).FanPowerIncludedInCOP = false;
 				else VarSpeedCoil(DXCoilNum).FanPowerIncludedInCOP = true;
-			}
-			else {
+			} else {
 				ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
 				ShowContinueError(",,,invalid choice for " + cAlphaFields(2) + ".  Entered choice = " + AlphArray(2));
 				ShowContinueError("Valid choices are Yes or No.");
@@ -1909,9 +1905,8 @@ namespace VariableSpeedCoils {
 			if (SameString(AlphArray(3), "Yes") || SameString(AlphArray(3), "No")) {
 				//  initialized to FALSE on allocate
 				if (SameString(AlphArray(3), "Yes")) VarSpeedCoil(DXCoilNum).CondPumpPowerInCOP = true;
-				else VarSpeedCoil(DXCoilNum).CondPumpPowerInCOP = false; 
-			}
-			else {
+				else VarSpeedCoil(DXCoilNum).CondPumpPowerInCOP = false;
+			} else {
 				ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
 				ShowContinueError(",,,invalid choice for " + cAlphaFields(3) + ".  Entered choice = " + AlphArray(3));
 				ShowContinueError("Valid choices are Yes or No.");
@@ -1922,8 +1917,7 @@ namespace VariableSpeedCoils {
 				//  initialized to FALSE on allocate
 				if (SameString(AlphArray(4), "Yes")) VarSpeedCoil(DXCoilNum).CondPumpHeatInCapacity = true;
 				else VarSpeedCoil(DXCoilNum).CondPumpHeatInCapacity = false;
-			}
-			else {
+			} else {
 				ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
 				ShowContinueError(",,,invalid choice for " + cAlphaFields(4) + ".  Entered choice = " + AlphArray(4));
 				ShowContinueError("Valid choices are Yes or No.");
@@ -1937,9 +1931,8 @@ namespace VariableSpeedCoils {
 				ErrorsFound = true;
 			}
 
-			if (false == VarSpeedCoil(DXCoilNum).CondPumpHeatInCapacity)
-			{
-				VarSpeedCoil(DXCoilNum).HPWHCondPumpFracToWater = 0.0; 
+			if ( !VarSpeedCoil(DXCoilNum).CondPumpHeatInCapacity ) {
+				VarSpeedCoil(DXCoilNum).HPWHCondPumpFracToWater = 0.0;
 			}
 
 			VarSpeedCoil(DXCoilNum).AirInletNodeNum = GetOnlySingleNode(AlphArray(5), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
@@ -1956,29 +1949,27 @@ namespace VariableSpeedCoils {
 
 			VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity = NumArray(10);
 			if (VarSpeedCoil(DXCoilNum).CrankcaseHeaterCapacity < 0.0) {
-				ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + 
+				ShowSevereError(RoutineName + CurrentModuleObject + "=\"" +
 					VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-				ShowContinueError("..." + cNumericFields(10) + 
+				ShowContinueError("..." + cNumericFields(10) +
 					" must be >= 0.0  entered value=[" + TrimSigDigits(NumArray(10), 1) + "].");
 				ErrorsFound = true;
 			}
 
 			VarSpeedCoil(DXCoilNum).MaxOATCrankcaseHeater = NumArray(11);
 			if (VarSpeedCoil(DXCoilNum).MaxOATCrankcaseHeater < 0.0) {
-				ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + 
+				ShowSevereError(RoutineName + CurrentModuleObject + "=\"" +
 					VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-				ShowContinueError("..." + cNumericFields(11) + 
+				ShowContinueError("..." + cNumericFields(11) +
 					" must be >= 0 {C}.  entered value=[" + TrimSigDigits(NumArray(11), 1) + "].");
 				ErrorsFound = true;
 			}
 
 			if (SameString(AlphArray(9), "DryBulbTemperature")) {
 				VarSpeedCoil(DXCoilNum).InletAirTemperatureType = DryBulbIndicator;
-			}
-			else if (SameString(AlphArray(9), "WetBulbTemperature")) {
+			} else if (SameString(AlphArray(9), "WetBulbTemperature")) {
 				VarSpeedCoil(DXCoilNum).InletAirTemperatureType = WetBulbIndicator;
-			}
-			else {
+			} else {
 				//   wrong temperature type selection
 				ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
 				ShowContinueError("..." + cAlphaFields(9) + " must be DryBulbTemperature or WetBulbTemperature.");
@@ -1989,27 +1980,24 @@ namespace VariableSpeedCoils {
 			// set rated inlet air temperature for curve object verification
 			if (VarSpeedCoil(DXCoilNum).InletAirTemperatureType == WetBulbIndicator) {
 				WHInletAirTemp = VarSpeedCoil(DXCoilNum).WHRatedInletWBTemp;
-			}
-			else {
+			} else {
 				WHInletAirTemp = VarSpeedCoil(DXCoilNum).WHRatedInletDBTemp;
 			}
 			// set rated water temperature for curve object verification
 			WHInletWaterTemp = VarSpeedCoil(DXCoilNum).WHRatedInletWaterTemp;
-			
+
 			//part load curve
 			VarSpeedCoil(DXCoilNum).PLFFPLR = GetCurveIndex(AlphArray(10)); // convert curve name to number
 			if (VarSpeedCoil(DXCoilNum).PLFFPLR == 0) {
 				if (lAlphaBlanks(10)) {
 					ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
 					ShowContinueError("...required " + cAlphaFields(10) + " is blank.");
-				}
-				else {
+				} else {
 					ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
 					ShowContinueError("...not found " + cAlphaFields(10) + "=\"" + AlphArray(10) + "\".");
 				}
 				ErrorsFound = true;
-			}
-			else {
+			} else {
 				CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).PLFFPLR, 1.0);
 				if (CurveVal > 1.10 || CurveVal < 0.90) {
 					ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
@@ -2032,14 +2020,12 @@ namespace VariableSpeedCoils {
 					if (lAlphaBlanks(AlfaFieldIncre)) {
 						ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
 						ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
-					}
-					else {
+					} else {
 						ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
 						ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
 					}
 					ErrorsFound = true;
-				}
-				else {
+				} else {
 					// Verify Curve Object, only legal type is BiQuadratic
 						{ auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I)));
 
@@ -2051,8 +2037,7 @@ namespace VariableSpeedCoils {
 								ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
 							}
 
-						}
-						else {
+						} else {
 							ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
 							ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) + " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapFTemp(I)));
 							ShowContinueError("Curve type must be BiQuadratic.");
@@ -2066,14 +2051,12 @@ namespace VariableSpeedCoils {
 					if (lAlphaBlanks(AlfaFieldIncre)) {
 						ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
 						ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
-					}
-					else {
+					} else {
 						ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
 						ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
 					}
 					ErrorsFound = true;
-				}
-				else {
+				} else {
 					// Verify Curve Object, only legal type is Quadratic
 						{ auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I)));
 
@@ -2085,8 +2068,7 @@ namespace VariableSpeedCoils {
 								ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
 							}
 
-						}
-						else if (SELECT_CASE_var == "CUBIC") {
+						} else if (SELECT_CASE_var == "CUBIC") {
 							CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I), 1.0);
 							if (CurveVal > 1.10 || CurveVal < 0.90) {
 								ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
@@ -2094,8 +2076,7 @@ namespace VariableSpeedCoils {
 								ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
 							}
 
-						}
-						else {
+						} else {
 							ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
 							ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) + " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I)));
 							ShowContinueError("Curve type must be Quadratic or Cubic.");
@@ -2109,14 +2090,12 @@ namespace VariableSpeedCoils {
 					if (lAlphaBlanks(AlfaFieldIncre)) {
 						ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
 						ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
-					}
-					else {
+					} else {
 						ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
 						ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
 					}
 					ErrorsFound = true;
-				}
-				else {
+				} else {
 					// Verify Curve Object, only legal type is Quadratic
 						{ auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I)));
 
@@ -2128,8 +2107,7 @@ namespace VariableSpeedCoils {
 								ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
 							}
 
-						}
-						else if (SELECT_CASE_var == "CUBIC") {
+						} else if (SELECT_CASE_var == "CUBIC") {
 							CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I), 1.0);
 							if (CurveVal > 1.10 || CurveVal < 0.90) {
 								ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
@@ -2137,8 +2115,7 @@ namespace VariableSpeedCoils {
 								ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
 							}
 
-						}
-						else {
+						} else {
 							ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
 							ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) + " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I)));
 							ShowContinueError("Curve type must be Quadratic or Cubic.");
@@ -2152,14 +2129,12 @@ namespace VariableSpeedCoils {
 					if (lAlphaBlanks(AlfaFieldIncre)) {
 						ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
 						ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
-					}
-					else {
+					} else {
 						ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
 						ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
 					}
 					ErrorsFound = true;
-				}
-				else {
+				} else {
 					// Verify Curve Object, only legal type is BiQuadratic
 						{ auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRFTemp(I)));
 
@@ -2171,8 +2146,7 @@ namespace VariableSpeedCoils {
 								ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
 							}
 
-						}
-						else {
+						} else {
 							ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
 							ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) + " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRFTemp(1)));
 							ShowContinueError("Curve type must be BiQuadratic.");
@@ -2186,14 +2160,12 @@ namespace VariableSpeedCoils {
 					if (lAlphaBlanks(AlfaFieldIncre)) {
 						ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
 						ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
-					}
-					else {
+					} else {
 						ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
 						ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
 					}
 					ErrorsFound = true;
-				}
-				else {
+				} else {
 					// Verify Curve Object, only legal type is Quadratic
 						{ auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I)));
 
@@ -2205,8 +2177,7 @@ namespace VariableSpeedCoils {
 								ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
 							}
 
-						}
-						else if (SELECT_CASE_var == "CUBIC") {
+						} else if (SELECT_CASE_var == "CUBIC") {
 							CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I), 1.0);
 							if (CurveVal > 1.10 || CurveVal < 0.90) {
 								ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
@@ -2214,8 +2185,7 @@ namespace VariableSpeedCoils {
 								ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
 							}
 
-						}
-						else {
+						} else {
 							ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
 							ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) + " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I)));
 							ShowContinueError("Curve type must be Quadratic or Cubic.");
@@ -2229,14 +2199,12 @@ namespace VariableSpeedCoils {
 					if (lAlphaBlanks(AlfaFieldIncre)) {
 						ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", missing");
 						ShowContinueError("...required " + cAlphaFields(AlfaFieldIncre) + " is blank.");
-					}
-					else {
+					} else {
 						ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
 						ShowContinueError("...not found " + cAlphaFields(AlfaFieldIncre) + "=\"" + AlphArray(AlfaFieldIncre) + "\".");
 					}
 					ErrorsFound = true;
-				}
-				else {
+				} else {
 					// Verify Curve Object, only legal type is Quadratic
 						{ auto const SELECT_CASE_var(GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I)));
 
@@ -2248,8 +2216,7 @@ namespace VariableSpeedCoils {
 								ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
 							}
 
-						}
-						else if (SELECT_CASE_var == "CUBIC") {
+						} else if (SELECT_CASE_var == "CUBIC") {
 							CurveVal = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I), 1.0);
 							if (CurveVal > 1.10 || CurveVal < 0.90) {
 								ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", curve values");
@@ -2257,8 +2224,7 @@ namespace VariableSpeedCoils {
 								ShowContinueError("...Curve output at rated conditions = " + TrimSigDigits(CurveVal, 3));
 							}
 
-						}
-						else {
+						} else {
 							ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
 							ShowContinueError("...illegal " + cAlphaFields(AlfaFieldIncre) + " type for this object = " + GetCurveType(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I)));
 							ShowContinueError("Curve type must be Quadratic or Cubic.");
@@ -2272,7 +2238,7 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil(DXCoilNum).MSRatedPercentTotCap(I) = VarSpeedCoil(DXCoilNum).MSRatedTotCap(I) / VarSpeedCoil(DXCoilNum).MSRatedTotCap(VarSpeedCoil(DXCoilNum).NumOfSpeeds);
 				VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowPerRatedTotCap(I) = VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(I) / VarSpeedCoil(DXCoilNum).MSRatedTotCap(I);
 				VarSpeedCoil(DXCoilNum).MSRatedWaterVolFlowPerRatedTotCap(I) = VarSpeedCoil(DXCoilNum).MSRatedWaterVolFlowRate(I) / VarSpeedCoil(DXCoilNum).MSRatedTotCap(I);
-				VarSpeedCoil(DXCoilNum).MSWHPumpPowerPerRatedTotCap(I) = 
+				VarSpeedCoil(DXCoilNum).MSWHPumpPowerPerRatedTotCap(I) =
 					VarSpeedCoil(DXCoilNum).MSWHPumpPower(I) / VarSpeedCoil(DXCoilNum).MSRatedTotCap(I);
 			}
 
@@ -2305,7 +2271,7 @@ namespace VariableSpeedCoils {
 		}
 
 		for ( DXCoilNum = 1; DXCoilNum <= NumWatertoAirHPs; ++DXCoilNum ) {
-			if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed ) || 
+			if ( ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_CoolingAirToAirVariableSpeed ) ||
 				( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == Coil_HeatingAirToAirVariableSpeed ) ) {
 				// Setup Report variables for the Heat Pump
 
@@ -2417,8 +2383,7 @@ namespace VariableSpeedCoils {
 					SetupOutputVariable( "Heating Coil Upper Speed Level []", VarSpeedCoil( DXCoilNum ).SpeedNumReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
 					SetupOutputVariable( "Heating Coil Neighboring Speed Levels Ratio []", VarSpeedCoil( DXCoilNum ).SpeedRatioReport, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
 					SetupOutputVariable( "Heating Coil Recoverable Heat Transfer Rate [W]", VarSpeedCoil( DXCoilNum ).QWasteHeat, "System", "Average", VarSpeedCoil( DXCoilNum ).Name );
-				}
-				else if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed) {
+				} else if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed) {
 					// air source water heating coil
 					SetupOutputVariable("Cooling Coil Water Heating Electric Power [W]", VarSpeedCoil(DXCoilNum).Power, "System", "Average", VarSpeedCoil(DXCoilNum).Name);
 					SetupOutputVariable("Cooling Coil Total Cooling Rate [W]", VarSpeedCoil(DXCoilNum).QLoadTotal, "System", "Average", VarSpeedCoil(DXCoilNum).Name);
@@ -2516,9 +2481,9 @@ namespace VariableSpeedCoils {
 		int AirInletNode; // Node Number of the air inlet
 		int WaterInletNode; // Node Number of the Water inlet
 		static bool MyOneTimeFlag( true ); // one time allocation flag
-		static FArray1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
-		static FArray1D_bool MySizeFlag; // used for sizing PTHP inputs one time
-		static FArray1D_bool MyPlantScanFlag;
+		static Array1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
+		static Array1D_bool MySizeFlag; // used for sizing PTHP inputs one time
+		static Array1D_bool MyPlantScanFlag;
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
 		int SpeedCal; // calculated speed level
@@ -2549,7 +2514,7 @@ namespace VariableSpeedCoils {
 
 
 		//variable-speed heat pump water heating, begin
-		if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed 
+		if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed
 			&& MySizeFlag(DXCoilNum)) {
 
 			SizeVarSpeedCoil(DXCoilNum);
@@ -2785,8 +2750,7 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).InletWaterEnthalpy = 0.0;
 		}
 
-		if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed)
-		{
+		if ( VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed ) {
 			VarSpeedCoil(DXCoilNum).InletWaterTemp = Node(WaterInletNode).Temp;
 			VarSpeedCoil(DXCoilNum).InletWaterEnthalpy = Node(WaterInletNode).Enthalpy;
 		};
@@ -3005,27 +2969,25 @@ namespace VariableSpeedCoils {
 
 		if ( VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPCoolingEquationFit || VarSpeedCoil( DXCoilNum ).VSCoilTypeOfNum == TypeOf_CoilVSWAHPHeatingEquationFit ) {
 			CurrentObjSubfix = ":WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT";
-		} 
-		else if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed) {
+		} else if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed) {
 			CurrentObjSubfix = ":WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED";
-		}
-		else {
+		} else {
 			CurrentObjSubfix = ":DX:VARIABLESPEED";
 		}
 
 		if (VarSpeedCoil(DXCoilNum).CoolHeatType == "WATERHEATING") {
 			if (VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate == AutoCalculate) {
 				VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate = VarSpeedCoil(DXCoilNum).RatedCapWH *
-					VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(NormSpeed) / 
+					VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(NormSpeed) /
 					VarSpeedCoil(DXCoilNum).MSRatedTotCap(NormSpeed);//0.00005035;
 				VarSpeedCoil(DXCoilNum).AirVolFlowAutoSized = true;
 			}
 
 			if (VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate == AutoCalculate) {
 				VarSpeedCoil(DXCoilNum).RatedHPWHCondWaterFlow = VarSpeedCoil(DXCoilNum).RatedCapWH *
-					VarSpeedCoil(DXCoilNum).MSRatedWaterVolFlowRate(NormSpeed) / 
+					VarSpeedCoil(DXCoilNum).MSRatedWaterVolFlowRate(NormSpeed) /
 					VarSpeedCoil(DXCoilNum).MSRatedTotCap(NormSpeed);// 0.00000004487;
-				VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate = 
+				VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate =
 					VarSpeedCoil(DXCoilNum).RatedHPWHCondWaterFlow;
 				VarSpeedCoil(DXCoilNum).WaterVolFlowAutoSized = true;
 			}
@@ -3339,14 +3301,12 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).MSRatedTotCap( UpperSpeed ) = VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal / VarSpeedCoil( DXCoilNum ).MSRatedPercentTotCap( NormSpeed );
 		} else if ( VarSpeedCoil( DXCoilNum ).CoolHeatType == "HEATING" ) {
 			VarSpeedCoil( DXCoilNum ).MSRatedTotCap( UpperSpeed ) = VarSpeedCoil( DXCoilNum ).RatedCapHeat / VarSpeedCoil( DXCoilNum ).MSRatedPercentTotCap( NormSpeed );
-		}
-		else if (VarSpeedCoil(DXCoilNum).CoolHeatType == "WATERHEATING") {
-			VarSpeedCoil(DXCoilNum).MSRatedTotCap(UpperSpeed) = VarSpeedCoil(DXCoilNum).RatedCapWH / 
+		} else if (VarSpeedCoil(DXCoilNum).CoolHeatType == "WATERHEATING") {
+			VarSpeedCoil(DXCoilNum).MSRatedTotCap(UpperSpeed) = VarSpeedCoil(DXCoilNum).RatedCapWH /
 				VarSpeedCoil(DXCoilNum).MSRatedPercentTotCap(NormSpeed);
 		}
 
-		if (VarSpeedCoil(DXCoilNum).CoolHeatType == "WATERHEATING")
-		{
+		if ( VarSpeedCoil(DXCoilNum).CoolHeatType == "WATERHEATING" ) {
 			HPInletAirHumRat = PsyWFnTdbTwbPb(VarSpeedCoil(DXCoilNum).WHRatedInletDBTemp,
 				VarSpeedCoil(DXCoilNum).WHRatedInletWBTemp, StdBaroPress, RoutineName);
 			rhoA = PsyRhoAirFnPbTdbW(OutBaroPress, VarSpeedCoil(DXCoilNum).WHRatedInletDBTemp,
@@ -3362,9 +3322,7 @@ namespace VariableSpeedCoils {
 				// EVAPORATIVE PRECOOLING CONDENSER AIR FLOW RATE
 				VarSpeedCoil(DXCoilNum).EvapCondAirFlow(Mode) = 0.0;
 			}
-		}
-		else
-		{
+		} else {
 			rhoA = PsyRhoAirFnPbTdbW(OutBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
 			//HPWH, the mass flow rate will be updated by a revised entering air density
 			for (Mode = VarSpeedCoil(DXCoilNum).NumOfSpeeds; Mode >= 1; --Mode) {
@@ -3375,7 +3333,7 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil(DXCoilNum).EvapCondAirFlow(Mode) = VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) * VarSpeedCoil(DXCoilNum).MSRatedEvapCondVolFlowPerRatedTotCap(Mode);
 			}
 		}
-		
+
 		// size rated power
 		if ( VarSpeedCoil( DXCoilNum ).CoolHeatType == "COOLING" ) {
 
@@ -3386,8 +3344,7 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil( DXCoilNum ).RatedCOPHeat = VarSpeedCoil( DXCoilNum ).MSRatedCOP( VarSpeedCoil( DXCoilNum ).NormSpedLevel );
 			VarSpeedCoil( DXCoilNum ).RatedPowerHeat = VarSpeedCoil( DXCoilNum ).RatedCapHeat / VarSpeedCoil( DXCoilNum ).RatedCOPHeat;
 			VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal = VarSpeedCoil( DXCoilNum ).RatedCapHeat;
-		}
-		else if (VarSpeedCoil(DXCoilNum).CoolHeatType == "WATERHEATING") {
+		} else if (VarSpeedCoil(DXCoilNum).CoolHeatType == "WATERHEATING") {
 			VarSpeedCoil(DXCoilNum).RatedCOPHeat = VarSpeedCoil(DXCoilNum).MSRatedCOP(VarSpeedCoil(DXCoilNum).NormSpedLevel);
 			VarSpeedCoil(DXCoilNum).RatedPowerHeat = VarSpeedCoil(DXCoilNum).RatedCapWH / VarSpeedCoil(DXCoilNum).RatedCOPHeat;
 			VarSpeedCoil(DXCoilNum).RatedCapCoolTotal = VarSpeedCoil(DXCoilNum).RatedCapWH *
@@ -3488,8 +3445,8 @@ namespace VariableSpeedCoils {
 		}
 
 		// Save component design water volumetric flow rate.
-		if (VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate > 0.0 && 
-			VarSpeedCoil(DXCoilNum).CoolHeatType == "WATERHEATING"){
+		if (VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate > 0.0 &&
+			VarSpeedCoil(DXCoilNum).CoolHeatType == "WATERHEATING") {
 			RegisterPlantCompDesignFlow(VarSpeedCoil(DXCoilNum).WaterInletNodeNum, VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate);
 		}
 		// Use 1/2 flow since both cooling and heating coil will save flow yet only 1 will operate at a time
@@ -3514,21 +3471,19 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSRatedWaterVolFlowRate( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedTotCap( Mode ) * VarSpeedCoil( DXCoilNum ).MSRatedWaterVolFlowPerRatedTotCap( Mode );
 				VarSpeedCoil( DXCoilNum ).MSRatedWaterMassFlowRate( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedWaterVolFlowRate( Mode ) * rhoW;
 			}
-		} 
-		else if (VarSpeedCoil(DXCoilNum).CoolHeatType == "WATERHEATING") {
+		} else if (VarSpeedCoil(DXCoilNum).CoolHeatType == "WATERHEATING") {
 			RatedSourceTempCool = VarSpeedCoil(DXCoilNum).WHRatedInletWaterTemp;
-			rhoW = RhoH2O(RatedSourceTempCool); 			
+			rhoW = RhoH2O(RatedSourceTempCool);
 			VarSpeedCoil(DXCoilNum).RatedWaterMassFlowRate = VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate * rhoW;
 			for (Mode = VarSpeedCoil(DXCoilNum).NumOfSpeeds; Mode >= 1; --Mode) {
 				VarSpeedCoil(DXCoilNum).MSRatedWaterVolFlowRate(Mode) = VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) *
 					VarSpeedCoil(DXCoilNum).MSRatedWaterVolFlowPerRatedTotCap(Mode);
 				VarSpeedCoil(DXCoilNum).MSWHPumpPower(Mode) = VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) *
 					VarSpeedCoil(DXCoilNum).MSWHPumpPowerPerRatedTotCap(Mode);
-				VarSpeedCoil(DXCoilNum).MSRatedWaterMassFlowRate(Mode) = 
+				VarSpeedCoil(DXCoilNum).MSRatedWaterMassFlowRate(Mode) =
 					VarSpeedCoil(DXCoilNum).MSRatedWaterVolFlowRate(Mode) * rhoW;
 			}
-		}
-		else {
+		} else {
 			RatedSourceTempCool = RatedAmbAirTemp;
 		}
 
@@ -3561,8 +3516,7 @@ namespace VariableSpeedCoils {
 					VarSpeedCoil( DXCoilNum ).MSEffectiveAo( Mode ) = 0.0;
 				}
 			}
-		}
-		else if (VarSpeedCoil(DXCoilNum).CoolHeatType == "WATERHEATING") {
+		} else if (VarSpeedCoil(DXCoilNum).CoolHeatType == "WATERHEATING") {
 			HPWHInletDBTemp = VarSpeedCoil(DXCoilNum).WHRatedInletDBTemp;
 			HPWHInletWBTemp = VarSpeedCoil(DXCoilNum).WHRatedInletWBTemp;
 
@@ -3576,45 +3530,45 @@ namespace VariableSpeedCoils {
 			}
 
 			for (Mode = 1; Mode <= VarSpeedCoil(DXCoilNum).NumOfSpeeds; ++Mode) {
-				//get cooling capacity, without fan power, i.e. total coil cooling 
+				//get cooling capacity, without fan power, i.e. total coil cooling
 				if (VarSpeedCoil(DXCoilNum).CondPumpPowerInCOP)
 				HPWHCoolCapacity = VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode)*
-					(1.0 - 1.0 / VarSpeedCoil(DXCoilNum).MSRatedCOP(Mode)) + 
-					VarSpeedCoil(DXCoilNum).MSWHPumpPower(Mode) - 
+					(1.0 - 1.0 / VarSpeedCoil(DXCoilNum).MSRatedCOP(Mode)) +
+					VarSpeedCoil(DXCoilNum).MSWHPumpPower(Mode) -
 					VarSpeedCoil(DXCoilNum).MSWHPumpPower(Mode) *
 					VarSpeedCoil(DXCoilNum).HPWHCondPumpFracToWater	;
-				else 
+				else
 				HPWHCoolCapacity = VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode)*
-					(1.0 - 1.0 / VarSpeedCoil(DXCoilNum).MSRatedCOP(Mode)) - 
-					VarSpeedCoil(DXCoilNum).MSWHPumpPower(Mode) * 
+					(1.0 - 1.0 / VarSpeedCoil(DXCoilNum).MSRatedCOP(Mode)) -
+					VarSpeedCoil(DXCoilNum).MSWHPumpPower(Mode) *
 					VarSpeedCoil(DXCoilNum).HPWHCondPumpFracToWater;
 
-				VarSpeedCoil(DXCoilNum).MSRatedCBF(Mode) = 
-					CalcCBF(VarSpeedCoil(DXCoilNum).VarSpeedCoilType, VarSpeedCoil(DXCoilNum).Name, 
+				VarSpeedCoil(DXCoilNum).MSRatedCBF(Mode) =
+					CalcCBF(VarSpeedCoil(DXCoilNum).VarSpeedCoilType, VarSpeedCoil(DXCoilNum).Name,
 					HPWHInletDBTemp, HPInletAirHumRat, HPWHCoolCapacity,
 					VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(Mode), VarSpeedCoil(DXCoilNum).MSRatedSHR(Mode));
 				if (VarSpeedCoil(DXCoilNum).MSRatedCBF(Mode) > 0.0) {
 					VarSpeedCoil(DXCoilNum).MSEffectiveAo(Mode) = -std::log(VarSpeedCoil(DXCoilNum).MSRatedCBF(Mode)) *
 						VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(Mode);
-				}
-				else {
+				} else {
 					VarSpeedCoil(DXCoilNum).MSEffectiveAo(Mode) = 0.0;
 				}
 			}
 
 			//update VarSpeedCoil(DXCoilNum).RatedCapCoolTotal
-			Mode = VarSpeedCoil(DXCoilNum).NormSpedLevel; 
-			if (VarSpeedCoil(DXCoilNum).CondPumpPowerInCOP)
+			Mode = VarSpeedCoil(DXCoilNum).NormSpedLevel;
+			if (VarSpeedCoil(DXCoilNum).CondPumpPowerInCOP) {
 				VarSpeedCoil(DXCoilNum).RatedCapCoolTotal = VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode)*
 				(1.0 - 1.0 / VarSpeedCoil(DXCoilNum).MSRatedCOP(Mode)) +
 				VarSpeedCoil(DXCoilNum).MSWHPumpPower(Mode) -
 				VarSpeedCoil(DXCoilNum).MSWHPumpPower(Mode) *
 				VarSpeedCoil(DXCoilNum).HPWHCondPumpFracToWater;
-			else
+			} else {
 				VarSpeedCoil(DXCoilNum).RatedCapCoolTotal = VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode)*
 				(1.0 - 1.0 / VarSpeedCoil(DXCoilNum).MSRatedCOP(Mode)) -
 				VarSpeedCoil(DXCoilNum).MSWHPumpPower(Mode) *
 				VarSpeedCoil(DXCoilNum).HPWHCondPumpFracToWater;
+			}
 		}
 
 
@@ -3637,39 +3591,37 @@ namespace VariableSpeedCoils {
 			CalcTotCapSHR_VSWSHP( RatedInletAirTemp, RatedInletAirHumRat, RatedInletEnth, RatedInletWetBulbTemp, AirMassFlowRatio, WaterMassFlowRatio, RatedAirMassFlowRate, CBFRated, VarSpeedCoil( DXCoilNum ).MSRatedTotCap( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSCCapFTemp( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSCCapAirFFlow( NormSpeed ), VarSpeedCoil( DXCoilNum ).MSCCapWaterFFlow( NormSpeed ), 0.0, 0, 0, 0, QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, RatedSourceTempCool, StdBaroPress, 0.0, 1 );
 
 			RatedCapCoolSensDes = VarSpeedCoil( DXCoilNum ).RatedCapCoolTotal * SHR;
-		} 
-		else if (VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate >= SmallAirVolFlow && 
+		} else if (VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate >= SmallAirVolFlow &&
 			VarSpeedCoil(DXCoilNum).CoolHeatType == "WATERHEATING") {
 		/*	RatedAirMassFlowRate = VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW(StdBaroPress,
 				HPWHInletDBTemp, HPInletAirHumRat, RoutineName);
 			RatedInletEnth = PsyHFnTdbW(HPWHInletDBTemp, HPInletAirHumRat);
-			CBFRated = AdjustCBF(VarSpeedCoil(DXCoilNum).MSRatedCBF(NormSpeed), 
+			CBFRated = AdjustCBF(VarSpeedCoil(DXCoilNum).MSRatedCBF(NormSpeed),
 				VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(NormSpeed), RatedAirMassFlowRate);
 			if (CBFRated > 0.999) CBFRated = 0.999;
 			AirMassFlowRatio = VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate /
 				VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(NormSpeed);
 
 			if (VarSpeedCoil(DXCoilNum).MSRatedWaterVolFlowRate(NormSpeed) > 1.0e-10) {
-				WaterMassFlowRatio = VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate / 
+				WaterMassFlowRatio = VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate /
 					VarSpeedCoil(DXCoilNum).MSRatedWaterVolFlowRate(NormSpeed);
 			}
 			else {
 				WaterMassFlowRatio = 1.0;
 			}
 
-			CalcTotCapSHR_VSWSHP(HPWHInletDBTemp, HPInletAirHumRat, 
+			CalcTotCapSHR_VSWSHP(HPWHInletDBTemp, HPInletAirHumRat,
 				RatedInletEnth, HPWHInletWBTemp,
-				AirMassFlowRatio, WaterMassFlowRatio, RatedAirMassFlowRate, 
-				CBFRated, VarSpeedCoil(DXCoilNum).MSRatedTotCap(NormSpeed), 
-				VarSpeedCoil(DXCoilNum).MSCCapFTemp(NormSpeed), 
-				VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(NormSpeed), 
-				VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(NormSpeed), 0.0, 0, 0, 0, 
+				AirMassFlowRatio, WaterMassFlowRatio, RatedAirMassFlowRate,
+				CBFRated, VarSpeedCoil(DXCoilNum).MSRatedTotCap(NormSpeed),
+				VarSpeedCoil(DXCoilNum).MSCCapFTemp(NormSpeed),
+				VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(NormSpeed),
+				VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(NormSpeed), 0.0, 0, 0, 0,
 				QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, RatedSourceTempCool, StdBaroPress, 0.0, 1);*/
 
 			SHR = VarSpeedCoil(DXCoilNum).MSRatedSHR(NormSpeed);
 			RatedCapCoolSensDes = VarSpeedCoil(DXCoilNum).RatedCapCoolTotal * SHR;
-		}	
-		else {
+		} else {
 			RatedCapCoolSensDes = 0.0;
 		}
 
@@ -4122,7 +4074,7 @@ namespace VariableSpeedCoils {
 			RuntimeFrac = VarSpeedCoil( DXCoilNum ).RunFrac;
 		}
 
-		LOOP: while ( true ) {
+		while ( true ) {
 			++NumIteration;
 			if ( NumIteration == 1 ) {
 				//Set indoor air conditions to the rated conditions
@@ -4273,7 +4225,6 @@ namespace VariableSpeedCoils {
 				SHReff = QSensible / QLoadTotal;
 				goto LOOP_exit;
 			}
-			LOOP_loop: ;
 		}
 		LOOP_exit: ;
 
@@ -4406,14 +4357,14 @@ namespace VariableSpeedCoils {
 	}
 
 	void
-		CalcVarSpeedHPWH(
+	CalcVarSpeedHPWH(
 		int const DXCoilNum, // the number of the DX coil to be simulated
 		Real64 & RuntimeFrac, // Runtime Fraction of compressor or percent on time (on-time/cycle time)
 		Real64 const PartLoadRatio, // sensible water heating load / full load sensible water heating capacity
 		Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
 		int const SpeedNum, // Speed number, high bound
 		int const CyclingScheme // Continuous fan OR cycling compressor
-		)
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4455,69 +4406,68 @@ namespace VariableSpeedCoils {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 OperatingHeatingCapacity ; // Water heating operating capacity including the impact of capacity and COP curves (W)
-		Real64 OperatingHeatingCOP ; // Water heating operating COP including the impact of capacity and COP curves (W/W)
-		Real64 OperatingHeatingPower ; // Water heating operating Power (W)
-		Real64 CompressorPower ; // Power consumed by compressor only (W)
+		Real64 OperatingHeatingCapacity; // Water heating operating capacity including the impact of capacity and COP curves (W)
+		Real64 OperatingHeatingCOP; // Water heating operating COP including the impact of capacity and COP curves (W/W)
+		Real64 OperatingHeatingPower; // Water heating operating Power (W)
+		Real64 CompressorPower; // Power consumed by compressor only (W)
 
-		Real64 TotalTankHeatingCapacity ; // Water heating capacity corrected for condenser water pump heat (W)
-		Real64 TankHeatingCOP ; // Water heating COP corrected for fan and condenser water pump power (W/W)
+		Real64 TotalTankHeatingCapacity; // Water heating capacity corrected for condenser water pump heat (W)
+		Real64 TankHeatingCOP; // Water heating COP corrected for fan and condenser water pump power (W/W)
 		// (these previous 2 variables also include the impact of capacity and COP curves)
-		Real64 EvapCoolingCapacity ; // Air cooling capacity corrected for evap fan and cond water pump heat (W)
-		Real64 InletWaterTemp ; // Condenser water inlet temperature (C)
-		Real64 OutletWaterTemp ; // Condenser water outlet temperature (C)
-		Real64 EvapInletMassFlowRate ; // Evaporator air inlet mass flow rate (m3/s)
-		Real64 CondInletMassFlowRate ; // Condenser water inlet mass flow rate (m3/s)
-		Real64 CpWater ; // Specific heat of condenser inlet water (J/Kg/k)
-		Real64 InletAirTemp ; // HPWH inlet air temperature (dry-bulb or wet-bulb) (C)
-		Real64 AirMassFlowRatio ; // Ratio of evaporator inlet air mass flow rate to rated mass flow rate
-		Real64 WaterMassFlowRatio ; // Ratio of evaporator inlet water mass flow rate to rated mass flow rate
-		Real64 PartLoadFraction ; // Output of Part Load Fraction as a Function of Part Load Ratio curve
-		Real64 PumpHeatToWater ; // Amount of pump heat attributed to heating water
-		Real64 HPRTF ; // Heat pump run time fraction
-		Real64 PLF ; // part-load function
-		Real64 CBFSpeed ; // bypass factor as individual speed level
-		Real64 COPAirFFModFac ; // air flow fraction modification
-		Real64 COPWaterFFModFac ; // water flow fraction modification
-		Real64 COPTempModFac ; // total capacity temperature correctio fraction
-		Real64 TOTCAPAirFFModFac ; // air flow fraction modification
-		Real64 TOTCAPWaterFFModFac ; // water flow fraction modification
-		Real64 TOTCAPTempModFac ; // total capacity temperature correctio fraction
-		Real64 SHR ; // total capacity temperature correctio fraction
-		Real64 COP ; // total capacity temperature correctio fraction
-		Real64 AoEff ; // effective air side surface area
-		Real64 Winput1 ; // power consumption at low speed
-		Real64 Winput2 ; // power consumption at high speed
-		Real64 LoadPressure ; // evaporator inlet pressure
-		Real64 CrankcaseHeatingPower ; // power due to crankcase heater
-		Real64 hDelta ; // Change in air enthalpy across the cooling coil [J/kg]
-		Real64 hADP ; // Apparatus dew point enthalpy [J/kg]
-		Real64 tADP ; // Apparatus dew point temperature [C]
-		Real64 wADP ; // Apparatus dew point humidity ratio [kg/kg]
-		Real64 hTinwADP ; // Enthalpy at inlet dry-bulb and wADP [J/kg]
-		Real64 WHCAP1 ; // total heating capacity at low speed [W]
-		Real64 WHCAP2 ; // total heating capacity at high speed [W]
-		Real64 CpAir ; // Specific heat of air [J/kg_C]
-		Real64 MaxHumRat ; // max possible humidity
-		Real64 MaxOutletEnth ; // max possible outlet enthalpy
-		Real64 ReportingConstant ;
-		int EvapInletNode ; // Evaporator air inlet node number
-		int EvapOutletNode ; // Evaporator air outlet node number
-		int CondInletNode ; // Condenser water inlet node number
-		int CondOutletNode ; // Condenser water outlet node number
-		int MaxSpeed ; // maximum speed level
-		int SpeedCal ; // calculated speed level
+		Real64 EvapCoolingCapacity; // Air cooling capacity corrected for evap fan and cond water pump heat (W)
+		Real64 InletWaterTemp; // Condenser water inlet temperature (C)
+		Real64 OutletWaterTemp; // Condenser water outlet temperature (C)
+		Real64 EvapInletMassFlowRate; // Evaporator air inlet mass flow rate (m3/s)
+		Real64 CondInletMassFlowRate; // Condenser water inlet mass flow rate (m3/s)
+		Real64 CpWater; // Specific heat of condenser inlet water (J/Kg/k)
+		Real64 InletAirTemp; // HPWH inlet air temperature (dry-bulb or wet-bulb) (C)
+		Real64 AirMassFlowRatio; // Ratio of evaporator inlet air mass flow rate to rated mass flow rate
+		Real64 WaterMassFlowRatio; // Ratio of evaporator inlet water mass flow rate to rated mass flow rate
+		Real64 PartLoadFraction; // Output of Part Load Fraction as a Function of Part Load Ratio curve
+		Real64 PumpHeatToWater; // Amount of pump heat attributed to heating water
+		Real64 HPRTF; // Heat pump run time fraction
+		Real64 PLF; // part-load function
+		Real64 CBFSpeed; // bypass factor as individual speed level
+		Real64 COPAirFFModFac; // air flow fraction modification
+		Real64 COPWaterFFModFac; // water flow fraction modification
+		Real64 COPTempModFac; // total capacity temperature correctio fraction
+		Real64 TOTCAPAirFFModFac; // air flow fraction modification
+		Real64 TOTCAPWaterFFModFac; // water flow fraction modification
+		Real64 TOTCAPTempModFac; // total capacity temperature correctio fraction
+		Real64 SHR; // total capacity temperature correctio fraction
+		Real64 COP; // total capacity temperature correctio fraction
+		Real64 AoEff; // effective air side surface area
+		Real64 Winput1; // power consumption at low speed
+		Real64 Winput2; // power consumption at high speed
+		Real64 LoadPressure; // evaporator inlet pressure
+		Real64 CrankcaseHeatingPower; // power due to crankcase heater
+		Real64 hDelta; // Change in air enthalpy across the cooling coil [J/kg]
+		Real64 hADP; // Apparatus dew point enthalpy [J/kg]
+		Real64 tADP; // Apparatus dew point temperature [C]
+		Real64 wADP; // Apparatus dew point humidity ratio [kg/kg]
+		Real64 hTinwADP; // Enthalpy at inlet dry-bulb and wADP [J/kg]
+		Real64 WHCAP1; // total heating capacity at low speed [W]
+		Real64 WHCAP2; // total heating capacity at high speed [W]
+		Real64 CpAir; // Specific heat of air [J/kg_C]
+		Real64 MaxHumRat; // max possible humidity
+		Real64 MaxOutletEnth; // max possible outlet enthalpy
+		Real64 ReportingConstant;
+		int EvapInletNode; // Evaporator air inlet node number
+		int EvapOutletNode; // Evaporator air outlet node number
+		int CondInletNode; // Condenser water inlet node number
+		int CondOutletNode; // Condenser water outlet node number
+		int MaxSpeed; // maximum speed level
+		int SpeedCal; // calculated speed level
 
 		//note: load side is the evaporator side, and source side is the condenser side
-		
+
 		CondInletNode = VarSpeedCoil(DXCoilNum).WaterInletNodeNum;
 		CondOutletNode = VarSpeedCoil(DXCoilNum).WaterOutletNodeNum;
 		// If heat pump water heater is OFF, set outlet to inlet and RETURN
 		if (PartLoadRatio == 0.0) {
 			Node(CondOutletNode) = Node(CondInletNode);
 			return;
-		}
-		else {
+		} else {
 			EvapInletNode = VarSpeedCoil(DXCoilNum).AirInletNodeNum;
 			EvapOutletNode = VarSpeedCoil(DXCoilNum).AirOutletNodeNum;
 			InletWaterTemp = Node(CondInletNode).Temp;
@@ -4538,12 +4488,11 @@ namespace VariableSpeedCoils {
 
 		VarSpeedCoil(DXCoilNum).AirMassFlowRate = EvapInletMassFlowRate;
 		VarSpeedCoil(DXCoilNum).WaterMassFlowRate = CondInletMassFlowRate;
-		
+
 		// determine inlet air temperature type for curve objects
 		if (VarSpeedCoil(DXCoilNum).InletAirTemperatureType == WetBulbIndicator) {
 			InletAirTemp = HPWHInletWBTemp;
-		}
-		else {
+		} else {
 			InletAirTemp = HPWHInletDBTemp;
 		}
 
@@ -4558,8 +4507,7 @@ namespace VariableSpeedCoils {
 
 			LoadSideInletWBTemp = Node(EvapInletNode).OutAirWetBulb;
 			LoadSideInletEnth = Node(EvapInletNode).Enthalpy;
-		}
-		else {
+		} else {
 			LoadSideInletDBTemp = OutDryBulbTemp;
 			LoadSideInletHumRat = OutHumRat;
 			LoadPressure = OutBaroPress;
@@ -4574,18 +4522,17 @@ namespace VariableSpeedCoils {
 
 
 		LoadSideMassFlowRate = EvapInletMassFlowRate;
-		SourceSideMassFlowRate = CondInletMassFlowRate; 
+		SourceSideMassFlowRate = CondInletMassFlowRate;
 		SourceSideInletTemp = InletWaterTemp;
 		SourceSideInletEnth = Node(CondInletNode).Enthalpy;
 		VarSpeedCoil(DXCoilNum).InletWaterEnthalpy = SourceSideInletEnth;
-		
+
 		MaxSpeed = VarSpeedCoil(DXCoilNum).NumOfSpeeds;
 
 		// must be placed inside the loop, otherwise cause bug in release mode, need to be present at two places
 		if (SpeedNum > MaxSpeed) {
 			SpeedCal = MaxSpeed;
-		}
-		else {
+		} else {
 			SpeedCal = SpeedNum;
 		}
 
@@ -4603,8 +4550,7 @@ namespace VariableSpeedCoils {
 
 			if (VarSpeedCoil(DXCoilNum).RunFrac > 1.0) {
 				VarSpeedCoil(DXCoilNum).RunFrac = 1.0; // Reset coil runtime fraction to 1.0
-			}
-			else if (VarSpeedCoil(DXCoilNum).RunFrac < 0.0) {
+			} else if (VarSpeedCoil(DXCoilNum).RunFrac < 0.0) {
 				VarSpeedCoil(DXCoilNum).RunFrac = 0.0;
 			}
 
@@ -4615,8 +4561,7 @@ namespace VariableSpeedCoils {
 		// must be placed inside the loop, otherwise cause bug in release mode
 		if (SpeedNum > MaxSpeed) {
 			SpeedCal = MaxSpeed;
-		}
-		else {
+		} else {
 			SpeedCal = SpeedNum;
 		}
 
@@ -4630,34 +4575,33 @@ namespace VariableSpeedCoils {
 			COPAirFFModFac = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(SpeedCal), AirMassFlowRatio);
 			COPWaterFFModFac = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(SpeedCal), WaterMassFlowRatio);
 
-			COP =  VarSpeedCoil(DXCoilNum).MSRatedCOP(SpeedCal) * COPTempModFac * COPAirFFModFac * 
+			COP =  VarSpeedCoil(DXCoilNum).MSRatedCOP(SpeedCal) * COPTempModFac * COPAirFFModFac *
 				COPWaterFFModFac;
 
-			TOTCAPTempModFac = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(SpeedCal), 
+			TOTCAPTempModFac = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(SpeedCal),
 				InletAirTemp, SourceSideInletTemp);
 			//   Get capacity modifying factor (function of mass flow) for off-rated conditions
-			TOTCAPAirFFModFac = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(SpeedCal), 
+			TOTCAPAirFFModFac = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(SpeedCal),
 				AirMassFlowRatio);
 			//Get capacity modifying factor (function of mass flow) for off-rated conditions
-			TOTCAPWaterFFModFac = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(SpeedCal), 
+			TOTCAPWaterFFModFac = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(SpeedCal),
 				WaterMassFlowRatio);
 
 			OperatingHeatingCapacity = VarSpeedCoil(DXCoilNum).MSRatedTotCap(SpeedCal) * TOTCAPTempModFac *
 				TOTCAPAirFFModFac * TOTCAPWaterFFModFac;
 
-			Winput = OperatingHeatingCapacity / COP ;
+			Winput = OperatingHeatingCapacity / COP;
 			OperatingHeatingPower = Winput;
 
-			OperatingHeatingCOP = COP ;
-			PumpHeatToWater = VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower * 
+			OperatingHeatingCOP = COP;
+			PumpHeatToWater = VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower *
 				VarSpeedCoil(DXCoilNum).HPWHCondPumpFracToWater;
 			TankHeatingCOP = OperatingHeatingCOP;
 
 			// account for pump heat if not included in total water heating capacity
 			if (VarSpeedCoil(DXCoilNum).CondPumpHeatInCapacity) {
 				TotalTankHeatingCapacity = OperatingHeatingCapacity;
-			}
-			else {
+			} else {
 				TotalTankHeatingCapacity = OperatingHeatingCapacity + PumpHeatToWater;
 			}
 
@@ -4669,45 +4613,40 @@ namespace VariableSpeedCoils {
 					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF
 						- VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower;
 					if (OperatingHeatingPower > 0.0) TankHeatingCOP = TotalTankHeatingCapacity / OperatingHeatingPower;
-				}
-				else {
+				} else {
 					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF;
-					if ((OperatingHeatingPower + VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower) > 0.0) 
-						TankHeatingCOP = TotalTankHeatingCapacity / 
+					if ((OperatingHeatingPower + VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower) > 0.0)
+						TankHeatingCOP = TotalTankHeatingCapacity /
 						(OperatingHeatingPower + VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower);
 				}
-			}
-			else {
+			} else {
 				if (VarSpeedCoil(DXCoilNum).CondPumpPowerInCOP) {
 					//       make sure fan power is full load fan power
-					CompressorPower = OperatingHeatingPower - 
+					CompressorPower = OperatingHeatingPower -
 						VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower;
 					if ((OperatingHeatingPower + FanElecPower / HPRTF) > 0.0)
-						TankHeatingCOP = TotalTankHeatingCapacity / 
+						TankHeatingCOP = TotalTankHeatingCapacity /
 						(OperatingHeatingPower + FanElecPower / HPRTF);
-				}
-				else {
+				} else {
 					CompressorPower = OperatingHeatingPower;
-					if ((OperatingHeatingPower + FanElecPower / HPRTF + 
-						VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower) > 0.0) 
-						TankHeatingCOP = TotalTankHeatingCapacity / 
-						(OperatingHeatingPower + FanElecPower / HPRTF + 
+					if ((OperatingHeatingPower + FanElecPower / HPRTF +
+						VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower) > 0.0)
+						TankHeatingCOP = TotalTankHeatingCapacity /
+						(OperatingHeatingPower + FanElecPower / HPRTF +
 						VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower);
 				}
 			}
-			
+
 			if (VarSpeedCoil(DXCoilNum).CondPumpHeatInCapacity) {
 				EvapCoolingCapacity = TotalTankHeatingCapacity - PumpHeatToWater - CompressorPower;
-			}
-			else {
+			} else {
 				EvapCoolingCapacity = TotalTankHeatingCapacity - CompressorPower;
 			}
-			
+
 			CBFSpeed = AdjustCBF(VarSpeedCoil(DXCoilNum).MSRatedCBF(SpeedCal),
 				VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(SpeedCal), LoadSideMassFlowRate);
 
-		}
-		else {
+		} else {
 			AirMassFlowRatio = LoadSideMassFlowRate / VarSpeedCoil(DXCoilNum).DesignAirMassFlowRate;
 			WaterMassFlowRatio = SourceSideMassFlowRate / VarSpeedCoil(DXCoilNum).DesignWaterMassFlowRate;
 			AoEff = VarSpeedCoil(DXCoilNum).MSEffectiveAo(SpeedCal) * SpeedRatio +
@@ -4737,10 +4676,10 @@ namespace VariableSpeedCoils {
 				TOTCAPAirFFModFac * TOTCAPWaterFFModFac;
 
 			Winput = OperatingHeatingCapacity / COP;
-			OperatingHeatingPower = Winput; 
+			OperatingHeatingPower = Winput;
 			Winput1 = Winput;
 			WHCAP1 = OperatingHeatingCapacity;
-			
+
 			//calculate upper speed
 			SpeedCal = SpeedNum;
 
@@ -4749,7 +4688,7 @@ namespace VariableSpeedCoils {
 			COPAirFFModFac = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(SpeedCal), AirMassFlowRatio);
 			COPWaterFFModFac = CurveValue(VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(SpeedCal), WaterMassFlowRatio);
 
-			COP = (1.0 / VarSpeedCoil(DXCoilNum).MSRatedCOP(SpeedCal)) * COPTempModFac * 
+			COP = (1.0 / VarSpeedCoil(DXCoilNum).MSRatedCOP(SpeedCal)) * COPTempModFac *
 				COPAirFFModFac * COPWaterFFModFac;
 
 			TOTCAPTempModFac = CurveValue(VarSpeedCoil(DXCoilNum).MSCCapFTemp(SpeedCal),
@@ -4764,7 +4703,7 @@ namespace VariableSpeedCoils {
 			OperatingHeatingCapacity = VarSpeedCoil(DXCoilNum).MSRatedTotCap(SpeedCal) * TOTCAPTempModFac *
 				TOTCAPAirFFModFac * TOTCAPWaterFFModFac;
 
-			Winput = OperatingHeatingCapacity / COP ;
+			Winput = OperatingHeatingCapacity / COP;
 			OperatingHeatingPower = Winput;
 
 			Winput2 = Winput;
@@ -4779,15 +4718,14 @@ namespace VariableSpeedCoils {
 
 			OperatingHeatingCOP = OperatingHeatingCapacity / OperatingHeatingPower;
 			TankHeatingCOP = OperatingHeatingCOP;
-			
+
 			PumpHeatToWater = VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower *
 				VarSpeedCoil(DXCoilNum).HPWHCondPumpFracToWater;
 
 			// account for pump heat if not included in total water heating capacity
 			if (VarSpeedCoil(DXCoilNum).CondPumpHeatInCapacity) {
 				TotalTankHeatingCapacity = OperatingHeatingCapacity;
-			}
-			else {
+			} else {
 				TotalTankHeatingCapacity = OperatingHeatingCapacity + PumpHeatToWater;
 			}
 
@@ -4799,15 +4737,13 @@ namespace VariableSpeedCoils {
 					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF
 						- VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower;
 					if (OperatingHeatingPower > 0.0) TankHeatingCOP = TotalTankHeatingCapacity / OperatingHeatingPower;
-				}
-				else {
+				} else {
 					CompressorPower = OperatingHeatingPower - FanElecPower / HPRTF;
 					if ((OperatingHeatingPower + VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower) > 0.0)
 						TankHeatingCOP = TotalTankHeatingCapacity /
 						(OperatingHeatingPower + VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower);
 				}
-			}
-			else {
+			} else {
 				if (VarSpeedCoil(DXCoilNum).CondPumpPowerInCOP) {
 					//       make sure fan power is full load fan power
 					CompressorPower = OperatingHeatingPower -
@@ -4815,8 +4751,7 @@ namespace VariableSpeedCoils {
 					if ((OperatingHeatingPower + FanElecPower / HPRTF) > 0.0)
 						TankHeatingCOP = TotalTankHeatingCapacity /
 						(OperatingHeatingPower + FanElecPower / HPRTF);
-				}
-				else {
+				} else {
 					CompressorPower = OperatingHeatingPower;
 					if ((OperatingHeatingPower + FanElecPower / HPRTF +
 						VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower) > 0.0)
@@ -4828,16 +4763,15 @@ namespace VariableSpeedCoils {
 
 			if (VarSpeedCoil(DXCoilNum).CondPumpHeatInCapacity) {
 				EvapCoolingCapacity = TotalTankHeatingCapacity - PumpHeatToWater - CompressorPower;
-			}
-			else {
+			} else {
 				EvapCoolingCapacity = TotalTankHeatingCapacity - CompressorPower;
 			}
 		}
 
 		QSource = TotalTankHeatingCapacity;
-		QLoadTotal = EvapCoolingCapacity; 
+		QLoadTotal = EvapCoolingCapacity;
 		DXCoilTotalCapacity = EvapCoolingCapacity;//for standard rating calculation
-		SHR = 1.0; 
+		SHR = 1.0;
 		//if indoor, calculate SHR
 		if (EvapInletNode != 0) {
 			if (CBFSpeed > 0.999) CBFSpeed = 0.999;
@@ -4849,8 +4783,7 @@ namespace VariableSpeedCoils {
 			hTinwADP = PsyHFnTdbW(LoadSideInletDBTemp, wADP);
 			if ((LoadSideInletEnth - hADP) > 1.e-10) {
 				SHR = min((hTinwADP - hADP) / (LoadSideInletEnth - hADP), 1.0);
-			}
-			else {
+			} else {
 				SHR = 1.0;
 			}
 		}
@@ -4860,8 +4793,7 @@ namespace VariableSpeedCoils {
 		// determine condenser water inlet/outlet condition at full capacity
 		if (CondInletMassFlowRate == 0.0) {
 			OutletWaterTemp = InletWaterTemp;
-		}
-		else {
+		} else {
 			OutletWaterTemp = InletWaterTemp + TotalTankHeatingCapacity / (CpWater * CondInletMassFlowRate);
 		}
 
@@ -4877,7 +4809,7 @@ namespace VariableSpeedCoils {
 
 		VarSpeedCoil(DXCoilNum).TotalHeatingEnergyRate = TotalTankHeatingCapacity * PartLoadRatio;
 		// calculate total compressor plus condenser pump power, fan power reported in fan module
-		VarSpeedCoil(DXCoilNum).ElecWaterHeatingPower = (CompressorPower + 
+		VarSpeedCoil(DXCoilNum).ElecWaterHeatingPower = (CompressorPower +
 			VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower) * HPRTF;
 
 		//pass the outputs for the cooling coil section
@@ -4906,8 +4838,7 @@ namespace VariableSpeedCoils {
 			VarSpeedCoil(DXCoilNum).OutletAirHumRat = PartLoadRatio * LoadSideOutletHumRat + (1.0 - PartLoadRatio) * LoadSideInletHumRat;
 			VarSpeedCoil(DXCoilNum).OutletAirDBTemp = PsyTdbFnHW(VarSpeedCoil(DXCoilNum).OutletAirEnthalpy, VarSpeedCoil(DXCoilNum).OutletAirHumRat);
 			PLRCorrLoadSideMdot = LoadSideMassFlowRate;
-		}
-		else {
+		} else {
 			VarSpeedCoil(DXCoilNum).OutletAirEnthalpy = LoadSideOutletEnth;
 			VarSpeedCoil(DXCoilNum).OutletAirHumRat = LoadSideOutletHumRat;
 			VarSpeedCoil(DXCoilNum).OutletAirDBTemp = LoadSideOutletDBTemp;
@@ -4943,12 +4874,11 @@ namespace VariableSpeedCoils {
 		VarSpeedCoil(DXCoilNum).EvapWaterConsump = 0.0;
 		VarSpeedCoil(DXCoilNum).BasinHeaterConsumption = 0.0;
 		//re-use EvapCondPumpElecConsumption to store WH pump energy consumption
-		VarSpeedCoil(DXCoilNum).EvapCondPumpElecConsumption = 
+		VarSpeedCoil(DXCoilNum).EvapCondPumpElecConsumption =
 			VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower * ReportingConstant;
 		if (RuntimeFrac == 0.0) {
 			VarSpeedCoil(DXCoilNum).COP = 0.0;
-		}
-		else {
+		} else {
 			VarSpeedCoil(DXCoilNum).COP = QLoadTotal / Winput;
 		}
 		VarSpeedCoil(DXCoilNum).RunFrac = RuntimeFrac;
@@ -5303,7 +5233,7 @@ namespace VariableSpeedCoils {
 					} else { // Defrost strategy is resistive
 						VarSpeedCoil( DXCoilNum ).DefrostPower = VarSpeedCoil( DXCoilNum ).DefrostCapacity * FractionalDefrostTime;
 					}
-				} else { // Defrost is not active because (OutDryBulbTemp .GT. VarSpeedCoil(DXCoilNum)%MaxOATDefrost)
+				} else { // Defrost is not active because (OutDryBulbTemp > VarSpeedCoil(DXCoilNum).MaxOATDefrost)
 					VarSpeedCoil( DXCoilNum ).DefrostPower = 0.0;
 				}
 			}
@@ -5451,20 +5381,18 @@ namespace VariableSpeedCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		if ( SameString( CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) || 
-			SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) || 
-			SameString( CoilType, "COIL:COOLING:DX:VARIABLESPEED" ) || 
+		if ( SameString( CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) ||
+			SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) ||
+			SameString( CoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ||
 			SameString( CoilType, "COIL:HEATING:DX:VARIABLESPEED" ) ||
 			SameString( CoilType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED")) {
 			WhichCoil = FindItemInList( CoilName, VarSpeedCoil.Name(), NumWatertoAirHPs );
 			if ( WhichCoil != 0 ) {
 				if ( CoilType == "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" || CoilType == "COIL:HEATING:DX:VARIABLESPEED" ) {
 					CoilCapacity = VarSpeedCoil( WhichCoil ).RatedCapHeat;
-				} 
-				else if (CoilType == "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED" ) {
+				} else if (CoilType == "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED" ) {
 					CoilCapacity = VarSpeedCoil(WhichCoil).RatedCapWH;
-				}
-				else {
+				} else {
 					CoilCapacity = VarSpeedCoil( WhichCoil ).RatedCapCoolTotal;
 				}
 			}
@@ -5595,7 +5523,7 @@ namespace VariableSpeedCoils {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int WhichCoil;
-		
+
 		// Obtains and Allocates WatertoAirHP related parameters from input file
 		if ( GetCoilsInputFlag ) { //First time subroutine has been entered
 			GetVarSpeedCoilInput();
@@ -5603,9 +5531,9 @@ namespace VariableSpeedCoils {
 			GetCoilsInputFlag = false;
 		}
 
-		if ( SameString( CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) || 
-			SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) || 
-			SameString( CoilType, "COIL:COOLING:DX:VARIABLESPEED" ) || 
+		if ( SameString( CoilType, "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) ||
+			SameString( CoilType, "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) ||
+			SameString( CoilType, "COIL:COOLING:DX:VARIABLESPEED" ) ||
 			SameString( CoilType, "COIL:HEATING:DX:VARIABLESPEED" ) ||
 			SameString( CoilType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED")) {
 			WhichCoil = FindItemInList( CoilName, VarSpeedCoil.Name(), NumWatertoAirHPs );
@@ -5633,11 +5561,11 @@ namespace VariableSpeedCoils {
 
 
 	int
-		GetVSCoilPLFFPLR(
+	GetVSCoilPLFFPLR(
 		std::string const & CoilType, // must match coil types in this module
 		std::string const & CoilName, // must match coil names for the coil type
 		bool & ErrorsFound // set to true if problem
-		)
+	)
 	{
 
 		// FUNCTION INFORMATION:

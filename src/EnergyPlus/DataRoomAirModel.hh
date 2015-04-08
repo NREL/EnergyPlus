@@ -2,8 +2,8 @@
 #define DataRoomAirModel_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -34,7 +34,7 @@ namespace DataRoomAirModel {
 	extern int const RoomAirModel_UCSDCV; // UCSD-CV
 	extern int const RoomAirModel_UCSDUFI; // UCSD UFAD interior zone model
 	extern int const RoomAirModel_UCSDUFE; // UCSD UFAD interior zone model
-	extern FArray1D_string const ChAirModel;
+	extern Array1D_string const ChAirModel;
 
 	// Parameters to indicate air temperature coupling scheme
 	extern int const DirectCoupling; // direct coupling scheme
@@ -103,115 +103,115 @@ namespace DataRoomAirModel {
 
 	// MODULE VARIABLE DECLARATIONS:
 	extern int TotNumOfAirNodes;
-	extern FArray1D_int TotNumOfZoneAirNodes;
-	extern FArray1D< Real64 > ConvectiveFloorSplit;
-	extern FArray1D< Real64 > InfiltratFloorSplit;
+	extern Array1D_int TotNumOfZoneAirNodes;
+	extern Array1D< Real64 > ConvectiveFloorSplit;
+	extern Array1D< Real64 > InfiltratFloorSplit;
 	// UCSD
-	extern FArray1D< Real64 > DVHcIn;
+	extern Array1D< Real64 > DVHcIn;
 	extern int TotUCSDDV; // Total number of UCSDDV zones
-	extern FArray1D_bool IsZoneDV; // Is the air model for the zone UCSDDV?
-	extern FArray1D< Real64 > ZTOC; // Temperature of occupied (lower) zone
-	extern FArray1D< Real64 > AvgTempGrad; // vertical Average Temperature Gradient in the room
-	extern FArray1D< Real64 > ZTMX; // Temperature of the mixing(upper) layer
-	extern FArray1D< Real64 > MaxTempGrad; // maximum Average Temperature Gradient in the room
-	extern FArray1D< Real64 > HVACAirTemp; // HVAC system temperature (DEG C)
-	extern FArray1D< Real64 > HVACMassFlow; // HVAC system mass flow rate (KG/S)
-	extern FArray1D< Real64 > ZTFloor;
-	extern FArray1D< Real64 > HeightTransition;
-	extern FArray1D< Real64 > FracMinFlow;
-	extern FArray1D_int ZoneDVMixedFlag;
-	extern FArray1D< Real64 > ZoneDVMixedFlagRep;
-	extern FArray1D_bool ZoneAirSystemON;
-	extern FArray1D< Real64 > TCMF; // comfort temperature
-	extern FArray1D< Real64 > ZoneCeilingHeight;
-	extern FArray1D< Real64 > MATFloor; // [C] floor level mean air temp
-	extern FArray1D< Real64 > XMATFloor; // [C] floor level mean air temp at t minus 1 zone time step
-	extern FArray1D< Real64 > XM2TFloor; // [C] floor level mean air temp at t minus 2 zone time step
-	extern FArray1D< Real64 > XM3TFloor; // [C] floor level mean air temp at t minus 3 zone time step
-	extern FArray1D< Real64 > XM4TFloor; // [C] floor level mean air temp at t minus 4 zone time step
-	extern FArray1D< Real64 > DSXMATFloor; // [C] floor level mean air temp at t minus 1 system time step
-	extern FArray1D< Real64 > DSXM2TFloor; // [C] floor level mean air temp at t minus 2 system time step
-	extern FArray1D< Real64 > DSXM3TFloor; // [C] floor level mean air temp at t minus 3 system time step
-	extern FArray1D< Real64 > DSXM4TFloor; // [C] floor level mean air temp at t minus 4 system time step
-	extern FArray1D< Real64 > MATOC; // [C] occupied mean air temp
-	extern FArray1D< Real64 > XMATOC; // [C] occupied mean air temp at t minus 1 zone time step
-	extern FArray1D< Real64 > XM2TOC; // [C] occupied mean air temp at t minus 2 zone time step
-	extern FArray1D< Real64 > XM3TOC; // [C] occupied mean air temp at t minus 3 zone time step
-	extern FArray1D< Real64 > XM4TOC; // [C] occupied mean air temp at t minus 4 zone time step
-	extern FArray1D< Real64 > DSXMATOC; // [C] occupied mean air temp at t minus 1 system time step
-	extern FArray1D< Real64 > DSXM2TOC; // [C] occupied mean air temp at t minus 2 system time step
-	extern FArray1D< Real64 > DSXM3TOC; // [C] occupied mean air temp at t minus 3 system time step
-	extern FArray1D< Real64 > DSXM4TOC; // [C] occupied mean air temp at t minus 4 system time step
-	extern FArray1D< Real64 > MATMX; // [C] mixed (upper) mean air temp
-	extern FArray1D< Real64 > XMATMX; // [C] mixed (upper) mean air temp at t minus 1 zone time step
-	extern FArray1D< Real64 > XM2TMX; // [C] mixed (upper) mean air temp at t minus 2 zone time step
-	extern FArray1D< Real64 > XM3TMX; // [C] mixed (upper) mean air temp at t minus 3 zone time step
-	extern FArray1D< Real64 > XM4TMX; // [C] mixed (upper) mean air temp at t minus 4 zone time step
-	extern FArray1D< Real64 > DSXMATMX; // [C] mixed  mean air temp at t minus 1 system time step
-	extern FArray1D< Real64 > DSXM2TMX; // [C] mixed  mean air temp at t minus 2 system time step
-	extern FArray1D< Real64 > DSXM3TMX; // [C] mixed  mean air temp at t minus 3 system time step
-	extern FArray1D< Real64 > DSXM4TMX; // [C] mixed  mean air temp at t minus 4 system time step
-	extern FArray1D< Real64 > ZTM1Floor; // [C] difference equation's Floor air temp at t minus 1
-	extern FArray1D< Real64 > ZTM2Floor; // [C] difference equation's Floor air temp at t minus 2
-	extern FArray1D< Real64 > ZTM3Floor; // [C] difference equation's Floor air temp at t minus 3
-	extern FArray1D< Real64 > ZTM1OC; // [C] difference equation's Occupied air temp at t minus 1
-	extern FArray1D< Real64 > ZTM2OC; // [C] difference equation's Occupied air temp at t minus 2
-	extern FArray1D< Real64 > ZTM3OC; // [C] difference equation's Occupied air temp at t minus 3
-	extern FArray1D< Real64 > ZTM1MX; // [C] difference equation's Mixed  air temp at t minus 1
-	extern FArray1D< Real64 > ZTM2MX; // [C] difference equation's Mixed  air temp at t minus 1
-	extern FArray1D< Real64 > ZTM3MX; // [C] difference equation's Mixed  air temp at t minus 1
-	extern FArray1D< Real64 > AIRRATFloor;
-	extern FArray1D< Real64 > AIRRATOC;
-	extern FArray1D< Real64 > AIRRATMX;
+	extern Array1D_bool IsZoneDV; // Is the air model for the zone UCSDDV?
+	extern Array1D< Real64 > ZTOC; // Temperature of occupied (lower) zone
+	extern Array1D< Real64 > AvgTempGrad; // vertical Average Temperature Gradient in the room
+	extern Array1D< Real64 > ZTMX; // Temperature of the mixing(upper) layer
+	extern Array1D< Real64 > MaxTempGrad; // maximum Average Temperature Gradient in the room
+	extern Array1D< Real64 > HVACAirTemp; // HVAC system temperature (DEG C)
+	extern Array1D< Real64 > HVACMassFlow; // HVAC system mass flow rate (KG/S)
+	extern Array1D< Real64 > ZTFloor;
+	extern Array1D< Real64 > HeightTransition;
+	extern Array1D< Real64 > FracMinFlow;
+	extern Array1D_int ZoneDVMixedFlag;
+	extern Array1D< Real64 > ZoneDVMixedFlagRep;
+	extern Array1D_bool ZoneAirSystemON;
+	extern Array1D< Real64 > TCMF; // comfort temperature
+	extern Array1D< Real64 > ZoneCeilingHeight;
+	extern Array1D< Real64 > MATFloor; // [C] floor level mean air temp
+	extern Array1D< Real64 > XMATFloor; // [C] floor level mean air temp at t minus 1 zone time step
+	extern Array1D< Real64 > XM2TFloor; // [C] floor level mean air temp at t minus 2 zone time step
+	extern Array1D< Real64 > XM3TFloor; // [C] floor level mean air temp at t minus 3 zone time step
+	extern Array1D< Real64 > XM4TFloor; // [C] floor level mean air temp at t minus 4 zone time step
+	extern Array1D< Real64 > DSXMATFloor; // [C] floor level mean air temp at t minus 1 system time step
+	extern Array1D< Real64 > DSXM2TFloor; // [C] floor level mean air temp at t minus 2 system time step
+	extern Array1D< Real64 > DSXM3TFloor; // [C] floor level mean air temp at t minus 3 system time step
+	extern Array1D< Real64 > DSXM4TFloor; // [C] floor level mean air temp at t minus 4 system time step
+	extern Array1D< Real64 > MATOC; // [C] occupied mean air temp
+	extern Array1D< Real64 > XMATOC; // [C] occupied mean air temp at t minus 1 zone time step
+	extern Array1D< Real64 > XM2TOC; // [C] occupied mean air temp at t minus 2 zone time step
+	extern Array1D< Real64 > XM3TOC; // [C] occupied mean air temp at t minus 3 zone time step
+	extern Array1D< Real64 > XM4TOC; // [C] occupied mean air temp at t minus 4 zone time step
+	extern Array1D< Real64 > DSXMATOC; // [C] occupied mean air temp at t minus 1 system time step
+	extern Array1D< Real64 > DSXM2TOC; // [C] occupied mean air temp at t minus 2 system time step
+	extern Array1D< Real64 > DSXM3TOC; // [C] occupied mean air temp at t minus 3 system time step
+	extern Array1D< Real64 > DSXM4TOC; // [C] occupied mean air temp at t minus 4 system time step
+	extern Array1D< Real64 > MATMX; // [C] mixed (upper) mean air temp
+	extern Array1D< Real64 > XMATMX; // [C] mixed (upper) mean air temp at t minus 1 zone time step
+	extern Array1D< Real64 > XM2TMX; // [C] mixed (upper) mean air temp at t minus 2 zone time step
+	extern Array1D< Real64 > XM3TMX; // [C] mixed (upper) mean air temp at t minus 3 zone time step
+	extern Array1D< Real64 > XM4TMX; // [C] mixed (upper) mean air temp at t minus 4 zone time step
+	extern Array1D< Real64 > DSXMATMX; // [C] mixed  mean air temp at t minus 1 system time step
+	extern Array1D< Real64 > DSXM2TMX; // [C] mixed  mean air temp at t minus 2 system time step
+	extern Array1D< Real64 > DSXM3TMX; // [C] mixed  mean air temp at t minus 3 system time step
+	extern Array1D< Real64 > DSXM4TMX; // [C] mixed  mean air temp at t minus 4 system time step
+	extern Array1D< Real64 > ZTM1Floor; // [C] difference equation's Floor air temp at t minus 1
+	extern Array1D< Real64 > ZTM2Floor; // [C] difference equation's Floor air temp at t minus 2
+	extern Array1D< Real64 > ZTM3Floor; // [C] difference equation's Floor air temp at t minus 3
+	extern Array1D< Real64 > ZTM1OC; // [C] difference equation's Occupied air temp at t minus 1
+	extern Array1D< Real64 > ZTM2OC; // [C] difference equation's Occupied air temp at t minus 2
+	extern Array1D< Real64 > ZTM3OC; // [C] difference equation's Occupied air temp at t minus 3
+	extern Array1D< Real64 > ZTM1MX; // [C] difference equation's Mixed  air temp at t minus 1
+	extern Array1D< Real64 > ZTM2MX; // [C] difference equation's Mixed  air temp at t minus 1
+	extern Array1D< Real64 > ZTM3MX; // [C] difference equation's Mixed  air temp at t minus 1
+	extern Array1D< Real64 > AIRRATFloor;
+	extern Array1D< Real64 > AIRRATOC;
+	extern Array1D< Real64 > AIRRATMX;
 	// Euler and Exact solution algorithms
-	extern FArray1D< Real64 > Zone1Floor; // [C] difference equation's Floor air temp at previous dt
-	extern FArray1D< Real64 > ZoneMXFloor; // [C] difference equation's Floor air temp at t minus 1
-	extern FArray1D< Real64 > ZoneM2Floor; // [C] difference equation's Floor air temp at t minus 2
-	extern FArray1D< Real64 > Zone1OC; // [C] difference equation's Occupied air temp at previous dt
-	extern FArray1D< Real64 > ZoneMXOC; // [C] difference equation's Occupied air temp at t minus 1
-	extern FArray1D< Real64 > ZoneM2OC; // [C] difference equation's Occupied air temp at t minus 2
-	extern FArray1D< Real64 > Zone1MX; // [C] difference equation's Mixed  air temp at previous dt
-	extern FArray1D< Real64 > ZoneMXMX; // [C] difference equation's Mixed  air temp at t minus 1
-	extern FArray1D< Real64 > ZoneM2MX; // [C] difference equation's Mixed  air temp at t minus 2
+	extern Array1D< Real64 > Zone1Floor; // [C] difference equation's Floor air temp at previous dt
+	extern Array1D< Real64 > ZoneMXFloor; // [C] difference equation's Floor air temp at t minus 1
+	extern Array1D< Real64 > ZoneM2Floor; // [C] difference equation's Floor air temp at t minus 2
+	extern Array1D< Real64 > Zone1OC; // [C] difference equation's Occupied air temp at previous dt
+	extern Array1D< Real64 > ZoneMXOC; // [C] difference equation's Occupied air temp at t minus 1
+	extern Array1D< Real64 > ZoneM2OC; // [C] difference equation's Occupied air temp at t minus 2
+	extern Array1D< Real64 > Zone1MX; // [C] difference equation's Mixed  air temp at previous dt
+	extern Array1D< Real64 > ZoneMXMX; // [C] difference equation's Mixed  air temp at t minus 1
+	extern Array1D< Real64 > ZoneM2MX; // [C] difference equation's Mixed  air temp at t minus 2
 	// UCSD-CV
-	extern FArray1D< Real64 > CVHcIn;
+	extern Array1D< Real64 > CVHcIn;
 	extern int TotUCSDCV; // Total number of UCSDDV zones
-	extern FArray1D_bool IsZoneCV; // Is the air model for the zone UCSDDV?
-	extern FArray1D< Real64 > ZoneCVisMixing; // Zone set to CV is actually using a mixing model
-	extern FArray1D< Real64 > ZTJET; // Jet Temperatures
-	extern FArray1D< Real64 > ZTREC; // Recirculation Temperatures
-	extern FArray1D< Real64 > RoomOutflowTemp; // Temperature of air flowing out of the room
-	extern FArray1D< Real64 > JetRecAreaRatio;
-	extern FArray1D< Real64 > Urec; // Recirculation region average velocity
-	extern FArray1D< Real64 > Ujet; // Jet region average velocity
-	extern FArray1D< Real64 > Qrec; // Recirculation zone total flow rate
-	extern FArray1D< Real64 > Qtot; // Total volumetric inflow rate through all active aperatures [m3/s]
-	extern FArray1D< Real64 > RecInflowRatio; // Ratio of the recirculation volumetric flow rate to the total inflow flow rate []
-	extern FArray1D< Real64 > Uhc;
-	extern FArray1D< Real64 > Ain; // Inflow aperture area
-	extern FArray1D< Real64 > Droom; // CV Zone average length
-	extern FArray1D< Real64 > Dstar; // CV Zone average length, wind direction corrected
-	extern FArray1D< Real64 > Tin; // Inflow air temperature
-	extern FArray1D< Real64 > TotArea; // Sum of the areas of all apertures in the zone
-	extern FArray2D_int AirflowNetworkSurfaceUCSDCV; // table for AirflowNetwork surfaces organization
+	extern Array1D_bool IsZoneCV; // Is the air model for the zone UCSDDV?
+	extern Array1D< Real64 > ZoneCVisMixing; // Zone set to CV is actually using a mixing model
+	extern Array1D< Real64 > ZTJET; // Jet Temperatures
+	extern Array1D< Real64 > ZTREC; // Recirculation Temperatures
+	extern Array1D< Real64 > RoomOutflowTemp; // Temperature of air flowing out of the room
+	extern Array1D< Real64 > JetRecAreaRatio;
+	extern Array1D< Real64 > Urec; // Recirculation region average velocity
+	extern Array1D< Real64 > Ujet; // Jet region average velocity
+	extern Array1D< Real64 > Qrec; // Recirculation zone total flow rate
+	extern Array1D< Real64 > Qtot; // Total volumetric inflow rate through all active aperatures [m3/s]
+	extern Array1D< Real64 > RecInflowRatio; // Ratio of the recirculation volumetric flow rate to the total inflow flow rate []
+	extern Array1D< Real64 > Uhc;
+	extern Array1D< Real64 > Ain; // Inflow aperture area
+	extern Array1D< Real64 > Droom; // CV Zone average length
+	extern Array1D< Real64 > Dstar; // CV Zone average length, wind direction corrected
+	extern Array1D< Real64 > Tin; // Inflow air temperature
+	extern Array1D< Real64 > TotArea; // Sum of the areas of all apertures in the zone
+	extern Array2D_int AirflowNetworkSurfaceUCSDCV; // table for AirflowNetwork surfaces organization
 	extern int CVNumAirflowNetworkSurfaces; // total number of AirFlowNetwork surfaces.
 	// Interzone surfaces counts twice.
-	extern FArray1D< Real64 > Rfr; // Ration between inflow and recirculation air flows
-	extern FArray1D< Real64 > ZoneCVhasREC; // Airflow pattern is C(0), CR(1)
+	extern Array1D< Real64 > Rfr; // Ration between inflow and recirculation air flows
+	extern Array1D< Real64 > ZoneCVhasREC; // Airflow pattern is C(0), CR(1)
 	extern bool UCSDModelUsed;
 	extern bool MundtModelUsed;
 	// UCSD-UF
 	extern int TotUCSDUI; // total number of UCSDUI zones
 	extern int TotUCSDUE; // total number of UCSDUE zones
-	extern FArray1D_bool IsZoneUI; // controls program flow, for interior or exterior UFAD model
-	extern FArray1D_int ZoneUFPtr;
-	extern FArray1D< Real64 > UFHcIn;
-	extern FArray1D_int ZoneUFMixedFlag;
-	extern FArray1D< Real64 > ZoneUFMixedFlagRep;
-	extern FArray1D< Real64 > ZoneUFGamma;
-	extern FArray1D< Real64 > ZoneUFPowInPlumes; // [W]
-	extern FArray1D< Real64 > ZoneUFPowInPlumesfromWindows; // [W]
-	extern FArray1D< Real64 > Phi; // dimensionless measure of occupied subzone temperature
+	extern Array1D_bool IsZoneUI; // controls program flow, for interior or exterior UFAD model
+	extern Array1D_int ZoneUFPtr;
+	extern Array1D< Real64 > UFHcIn;
+	extern Array1D_int ZoneUFMixedFlag;
+	extern Array1D< Real64 > ZoneUFMixedFlagRep;
+	extern Array1D< Real64 > ZoneUFGamma;
+	extern Array1D< Real64 > ZoneUFPowInPlumes; // [W]
+	extern Array1D< Real64 > ZoneUFPowInPlumesfromWindows; // [W]
+	extern Array1D< Real64 > Phi; // dimensionless measure of occupied subzone temperature
 
 	// END UCSD
 
@@ -278,7 +278,7 @@ namespace DataRoomAirModel {
 		int ZonePtr; // Pointer to the zone number for this statement
 		int ClassType; // depending on type of model
 		Real64 Height; // height
-		FArray1D_bool SurfMask; // limit of 60 surfaces at current sizing
+		Array1D_bool SurfMask; // limit of 60 surfaces at current sizing
 
 		// Default Constructor
 		AirNodeData() :
@@ -294,7 +294,7 @@ namespace DataRoomAirModel {
 			int const ZonePtr, // Pointer to the zone number for this statement
 			int const ClassType, // depending on type of model
 			Real64 const Height, // height
-			FArray1_bool const & SurfMask // limit of 60 surfaces at current sizing
+			Array1_bool const & SurfMask // limit of 60 surfaces at current sizing
 		) :
 			Name( Name ),
 			ZoneName( ZoneName ),
@@ -683,11 +683,11 @@ namespace DataRoomAirModel {
 	{
 		// Members
 		// user variables
-		FArray1D_string SurfName; // user defined name
-		FArray1D< Real64 > DeltaTai; // (Tai - MAT ) offset from mean air temp
+		Array1D_string SurfName; // user defined name
+		Array1D< Real64 > DeltaTai; // (Tai - MAT ) offset from mean air temp
 		int NumSurfs; // number of surfaces in this pattern
 		//calculated and from elsewhere
-		FArray1D_int SurfID; // index in HB surface structure array
+		Array1D_int SurfID; // index in HB surface structure array
 
 		// Default Constructor
 		SurfMapPattern() :
@@ -696,10 +696,10 @@ namespace DataRoomAirModel {
 
 		// Member Constructor
 		SurfMapPattern(
-			FArray1_string const & SurfName, // user defined name
-			FArray1< Real64 > const & DeltaTai, // (Tai - MAT ) offset from mean air temp
+			Array1_string const & SurfName, // user defined name
+			Array1< Real64 > const & DeltaTai, // (Tai - MAT ) offset from mean air temp
 			int const NumSurfs, // number of surfaces in this pattern
-			FArray1_int const & SurfID // index in HB surface structure array
+			Array1_int const & SurfID // index in HB surface structure array
 		) :
 			SurfName( SurfName ),
 			DeltaTai( DeltaTai ),
@@ -794,8 +794,8 @@ namespace DataRoomAirModel {
 	struct TempVsHeightPattern // to be used as nested structure in RoomAirPattern
 	{
 		// Members
-		FArray1D< Real64 > ZetaPatrn; // non dimensional height from floor,
-		FArray1D< Real64 > DeltaTaiPatrn; // Tai- MAT (TODO, check sign)
+		Array1D< Real64 > ZetaPatrn; // non dimensional height from floor,
+		Array1D< Real64 > DeltaTaiPatrn; // Tai- MAT (TODO, check sign)
 
 		// Default Constructor
 		TempVsHeightPattern()
@@ -803,8 +803,8 @@ namespace DataRoomAirModel {
 
 		// Member Constructor
 		TempVsHeightPattern(
-			FArray1< Real64 > const & ZetaPatrn, // non dimensional height from floor,
-			FArray1< Real64 > const & DeltaTaiPatrn // Tai- MAT (TODO, check sign)
+			Array1< Real64 > const & ZetaPatrn, // non dimensional height from floor,
+			Array1< Real64 > const & DeltaTaiPatrn // Tai- MAT (TODO, check sign)
 		) :
 			ZetaPatrn( ZetaPatrn ),
 			DeltaTaiPatrn( DeltaTaiPatrn )
@@ -908,12 +908,12 @@ namespace DataRoomAirModel {
 		Real64 ZoneHeight; // in meters, from Zone%CeilingHeight
 		int ReturnAirNodeID; // index in Node array
 		int ZoneNodeID; // index in Node array for this zone
-		FArray1D_int ExhaustAirNodeID; // indexes in Node array
+		Array1D_int ExhaustAirNodeID; // indexes in Node array
 		Real64 TairMean; // comes from MAT
 		Real64 Tstat; // temperature for thermostat
 		Real64 Tleaving; // temperature for return air node
 		Real64 Texhaust; // temperature for exhaust air node
-		FArray1D< SurfaceAssocNestedStruct > Surf; // nested struct w/ surface info
+		Array1D< SurfaceAssocNestedStruct > Surf; // nested struct w/ surface info
 		int totNumSurfs; // total surfs for this zone
 		int firstSurfID; // Index of first surface
 		//report
@@ -950,12 +950,12 @@ namespace DataRoomAirModel {
 			Real64 const ZoneHeight, // in meters, from Zone%CeilingHeight
 			int const ReturnAirNodeID, // index in Node array
 			int const ZoneNodeID, // index in Node array for this zone
-			FArray1_int const & ExhaustAirNodeID, // indexes in Node array
+			Array1_int const & ExhaustAirNodeID, // indexes in Node array
 			Real64 const TairMean, // comes from MAT
 			Real64 const Tstat, // temperature for thermostat
 			Real64 const Tleaving, // temperature for return air node
 			Real64 const Texhaust, // temperature for exhaust air node
-			FArray1< SurfaceAssocNestedStruct > const & Surf, // nested struct w/ surface info
+			Array1< SurfaceAssocNestedStruct > const & Surf, // nested struct w/ surface info
 			int const totNumSurfs, // total surfs for this zone
 			int const firstSurfID, // Index of first surface
 			Real64 const Gradient // result for modeled gradient if using two-gradient interpolation
@@ -985,16 +985,16 @@ namespace DataRoomAirModel {
 	};
 
 	// Object Data
-	extern FArray1D< AirModelData > AirModel;
-	extern FArray1D< AirNodeData > AirNode;
-	extern FArray1D< DVData > ZoneUCSDDV; // UCSD
-	extern FArray1D< CVData > ZoneUCSDCV;
-	extern FArray1D< UFIData > ZoneUCSDUI;
-	extern FArray1D< UFEData > ZoneUCSDUE;
-	extern FArray2D< CVFlow > CVJetRecFlows; // Jet and recirculation zone flows and properties
-	extern FArray1D< CVDVParameters > SurfParametersCVDV; // Surface parameters
-	extern FArray1D< TemperaturePatternStruct > RoomAirPattern; // user defined patterns ,various types
-	extern FArray1D< AirPatternInfobyZoneStruct > AirPatternZoneInfo; // added zone information for user defined patterns
+	extern Array1D< AirModelData > AirModel;
+	extern Array1D< AirNodeData > AirNode;
+	extern Array1D< DVData > ZoneUCSDDV; // UCSD
+	extern Array1D< CVData > ZoneUCSDCV;
+	extern Array1D< UFIData > ZoneUCSDUI;
+	extern Array1D< UFEData > ZoneUCSDUE;
+	extern Array2D< CVFlow > CVJetRecFlows; // Jet and recirculation zone flows and properties
+	extern Array1D< CVDVParameters > SurfParametersCVDV; // Surface parameters
+	extern Array1D< TemperaturePatternStruct > RoomAirPattern; // user defined patterns ,various types
+	extern Array1D< AirPatternInfobyZoneStruct > AirPatternZoneInfo; // added zone information for user defined patterns
 
 } // DataRoomAirModel
 

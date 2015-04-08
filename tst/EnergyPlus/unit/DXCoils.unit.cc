@@ -10,7 +10,7 @@
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
@@ -64,7 +64,7 @@ TEST( DXCoilsTest, Test1 )
 	using CurveManager::BiQuadratic;
 	using CurveManager::NumCurves;
 	//	int NumDXCoils( 0 ); // Total number of DX coils
-//	FArray1D< DXCoilData > DXCoil;
+//	Array1D< DXCoilData > DXCoil;
 	int DXCoilNum;
 	int CurveNum;
 

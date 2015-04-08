@@ -1,4 +1,4 @@
-// IndexRange: Index Range Abstract Base Class
+// IndexRange: Index Range Class
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
@@ -6,7 +6,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -14,7 +14,8 @@
 #include <ObjexxFCL/IndexRange.hh>
 
 // C++ Headers
-#include <iostream>
+#include <istream>
+#include <ostream>
 
 namespace ObjexxFCL {
 
@@ -22,9 +23,7 @@ namespace ObjexxFCL {
 	bool
 	IndexRange::contains( IndexRange const & I ) const
 	{
-		if ( ! I.initialized() ) {
-			return false;
-		} else if ( l_ <= u_ ) { // Bounded with positive size
+		if ( l_ <= u_ ) { // Bounded with positive size
 			if ( I.l_ <= I.u_ ) { // I is bounded with positive size
 				return ( ( l_ <= I.l_ ) && ( I.u_ <= u_ ) );
 			} else if ( I.l_ - 1 == I.u_ ) { // I size is zero
@@ -43,9 +42,7 @@ namespace ObjexxFCL {
 	bool
 	IndexRange::intersects( IndexRange const & I ) const
 	{
-		if ( ! I.initialized() ) {
-			return false;
-		} else if ( l_ <= u_ ) { // Bounded with positive size
+		if ( l_ <= u_ ) { // Bounded with positive size
 			if ( I.l_ <= I.u_ ) { // I is bounded with positive size
 				return ( ( l_ >= I.l_ ? l_ : I.l_ ) <= ( u_ <= I.u_ ? u_ : I.u_ ) );
 			} else if ( I.l_ - 1 == I.u_ ) { // I size is zero
@@ -70,7 +67,6 @@ namespace ObjexxFCL {
 	IndexRange &
 	IndexRange::contain( IndexRange const & I )
 	{
-		assert( I.initialized() );
 		if ( I.positive() ) {
 			if ( bounded() ) { // Bounded
 				if ( l_ > I.l_ ) l_ = I.l_;
@@ -95,7 +91,6 @@ namespace ObjexxFCL {
 	IndexRange &
 	IndexRange::intersect( IndexRange const & I )
 	{
-		assert( I.initialized() );
 		if ( intersects( I ) ) { // I and this IndexRange have positive size
 			if ( l_ <= u_ ) { // Bounded with positive size
 				if ( l_ < I.l_ ) l_ = I.l_;
@@ -118,7 +113,7 @@ namespace ObjexxFCL {
 		return *this;
 	}
 
-	// Stream Input
+	// Stream >> IndexRange
 	std::istream &
 	operator >>( std::istream & stream, IndexRange & I )
 	{
@@ -128,40 +123,21 @@ namespace ObjexxFCL {
 		return stream;
 	}
 
-	// Stream Output
+	// Stream << IndexRange
 	std::ostream &
 	operator <<( std::ostream & stream, IndexRange const & I )
 	{
-		if ( I.initialized() ) {
-			if ( I.bounded() ) {
-				stream << '[' << I.l() << ':' << I.u() << ']';
-			} else { // Unbounded
-				stream << '[' << I.l() << ":*]";
-			}
-		} else if ( I.l_initialized() ) {
-			stream << '[' << I.l() << ":]";
-		} else if ( I.u_initialized() ) {
-			if ( I.bounded() ) {
-				stream << "[:" << I.u() << ']';
-			} else { // Unbounded
-				stream << "[:*]";
-			}
-		} else {
-			stream << "[:]";
+		if ( I.bounded() ) {
+			stream << '[' << I.l() << ':' << I.u() << ']';
+		} else { // Unbounded
+			stream << '[' << I.l() << ":*]";
 		}
 		return stream;
 	}
 
-// Static Data Member Definitions
-
-#ifndef MSC_EXTENSIONS // Define when compiling with Visual C++ extensions (not using /Za)
-
-	IndexRange::size_type const IndexRange::npos; // Unbounded "size"
-
-	int const IndexRange::l_min; // Min lower index
-
-	int const IndexRange::u_max; // Max upper index
-
-#endif
+	// Static Data Member Definitions
+	IndexRange::size_type const IndexRange::npos = static_cast< size_type >( -1 ); // Unbounded "size"
+	int const IndexRange::l_min = -( static_cast< int >( ( static_cast< unsigned int >( -1 ) / 2u ) ) - 1 ); // Min lower index
+	int const IndexRange::u_max = static_cast< int >( ( static_cast< unsigned int >( -1 ) / 2u ) ); // Max upper index
 
 } // ObjexxFCL

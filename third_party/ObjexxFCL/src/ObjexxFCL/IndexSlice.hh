@@ -9,7 +9,7 @@
 //
 // Language: C++
 //
-// Copyright (c) 2000-2014 Objexx Engineering, Inc. All Rights Reserved.
+// Copyright (c) 2000-2015 Objexx Engineering, Inc. All Rights Reserved.
 // Use of this source code or any derivative of it is restricted by license.
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
@@ -50,7 +50,7 @@ public: // Creation
 	 l_( 1 ),
 	 u_( 0 ),
 	 s_( 1 ),
-	 size_( 0 )
+	 size_( 0u )
 	{}
 
 	// Copy Constructor
@@ -103,7 +103,7 @@ public: // Creation
 	 l_( 1 ),
 	 u_( 0 ),
 	 s_( 1 ),
-	 size_( 0 )
+	 size_( 0u )
 	{
 		size_type const n( lus.size() );
 		assert( n <= 3 );
@@ -143,7 +143,7 @@ public: // Creation
 	 l_( 1 ),
 	 u_( 0 ),
 	 s_( 1 ),
-	 size_( 0 )
+	 size_( 0u )
 	{
 		size_type const n( lus.size() );
 		assert( n <= 3 );
@@ -183,7 +183,7 @@ public: // Creation
 	 l_( 1 ),
 	 u_( 0 ),
 	 s_( 1 ),
-	 size_( 0 )
+	 size_( 0u )
 	{
 		assert( s_ != 0 );
 	}
@@ -197,7 +197,7 @@ public: // Creation
 	 l_( l ),
 	 u_( 0 ),
 	 s_( s ),
-	 size_( 0 )
+	 size_( 0u )
 	{
 		assert( s_ != 0 );
 	}
@@ -211,7 +211,7 @@ public: // Creation
 	 l_( 1 ),
 	 u_( u ),
 	 s_( s ),
-	 size_( 0 )
+	 size_( 0u )
 	{
 		assert( s_ != 0 );
 	}
@@ -225,7 +225,7 @@ public: // Creation
 	 l_( 1 ),
 	 u_( 0 ),
 	 s_( s ),
-	 size_( 0 )
+	 size_( 0u )
 	{
 		assert( s_ != 0 );
 	}
@@ -616,12 +616,12 @@ public: // Comparison
 
 public: // I/O
 
-	// Stream Input
+	// Stream >> IndexSlice
 	friend
 	std::istream &
 	operator >>( std::istream & stream, IndexSlice & I );
 
-	// Stream Output
+	// Stream << IndexSlice
 	friend
 	std::ostream &
 	operator <<( std::ostream & stream, IndexSlice const & I );
@@ -662,11 +662,11 @@ operator ==( IndexSlice const & I, IndexSlice const & J );
 bool
 operator !=( IndexSlice const & I, IndexSlice const & J );
 
-// Stream Input
+// Stream >> IndexSlice
 std::istream &
 operator >>( std::istream & stream, IndexSlice & I );
 
-// Stream Output
+// Stream << IndexSlice
 std::ostream &
 operator <<( std::ostream & stream, IndexSlice const & I );
 

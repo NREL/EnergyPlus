@@ -2,7 +2,7 @@
 #define DataWater_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -99,15 +99,15 @@ namespace DataWater {
 		Real64 LastTimeStepVolume;
 		Real64 LastTimeStepTemp; // previous temperature of tank water
 		int NumWaterSupplies;
-		FArray1D< Real64 > VdotAvailSupply; // Each supply component has its own term
-		FArray1D< Real64 > TwaterSupply; // Each supply component has its own term
-		FArray1D_string SupplyCompNames;
-		FArray1D_string SupplyCompTypes;
+		Array1D< Real64 > VdotAvailSupply; // Each supply component has its own term
+		Array1D< Real64 > TwaterSupply; // Each supply component has its own term
+		Array1D_string SupplyCompNames;
+		Array1D_string SupplyCompTypes;
 		int NumWaterDemands;
-		FArray1D< Real64 > VdotRequestDemand; // each demand componennt has a slot
-		FArray1D< Real64 > VdotAvailDemand; // each demand componennt has a slot
-		FArray1D_string DemandCompNames;
-		FArray1D_string DemandCompTypes;
+		Array1D< Real64 > VdotRequestDemand; // each demand componennt has a slot
+		Array1D< Real64 > VdotAvailDemand; // each demand componennt has a slot
+		Array1D_string DemandCompNames;
+		Array1D_string DemandCompTypes;
 		Real64 VdotFromTank;
 		Real64 VdotToTank;
 		Real64 VdotOverflow;
@@ -204,15 +204,15 @@ namespace DataWater {
 			Real64 const LastTimeStepVolume,
 			Real64 const LastTimeStepTemp, // previous temperature of tank water
 			int const NumWaterSupplies,
-			FArray1< Real64 > const & VdotAvailSupply, // Each supply component has its own term
-			FArray1< Real64 > const & TwaterSupply, // Each supply component has its own term
-			FArray1_string const & SupplyCompNames,
-			FArray1_string const & SupplyCompTypes,
+			Array1< Real64 > const & VdotAvailSupply, // Each supply component has its own term
+			Array1< Real64 > const & TwaterSupply, // Each supply component has its own term
+			Array1_string const & SupplyCompNames,
+			Array1_string const & SupplyCompTypes,
 			int const NumWaterDemands,
-			FArray1< Real64 > const & VdotRequestDemand, // each demand componennt has a slot
-			FArray1< Real64 > const & VdotAvailDemand, // each demand componennt has a slot
-			FArray1_string const & DemandCompNames,
-			FArray1_string const & DemandCompTypes,
+			Array1< Real64 > const & VdotRequestDemand, // each demand componennt has a slot
+			Array1< Real64 > const & VdotAvailDemand, // each demand componennt has a slot
+			Array1_string const & DemandCompNames,
+			Array1_string const & DemandCompTypes,
 			Real64 const VdotFromTank,
 			Real64 const VdotToTank,
 			Real64 const VdotOverflow,
@@ -300,8 +300,8 @@ namespace DataWater {
 		int LossFactorSchedID; // index "pointer" to schedule
 		Real64 MaxCollectRate;
 		int NumCollectSurfs; // number of surfaces used in the collector
-		FArray1D_string SurfName;
-		FArray1D_int SurfID;
+		Array1D_string SurfName;
+		Array1D_int SurfID;
 		//calculated and from elsewhere
 		Real64 HorizArea; // area of surfaces in the vertical normal direction
 		Real64 VdotAvail;
@@ -334,8 +334,8 @@ namespace DataWater {
 			int const LossFactorSchedID, // index "pointer" to schedule
 			Real64 const MaxCollectRate,
 			int const NumCollectSurfs, // number of surfaces used in the collector
-			FArray1_string const & SurfName,
-			FArray1_int const & SurfID,
+			Array1_string const & SurfName,
+			Array1_int const & SurfID,
 			Real64 const HorizArea, // area of surfaces in the vertical normal direction
 			Real64 const VdotAvail,
 			Real64 const VolCollected,
@@ -529,9 +529,9 @@ namespace DataWater {
 	// Object Data
 	extern SiteRainFallDataStruct RainFall; // type of rainfall modeling | design annual rain | rain sched id | nominal annual rain | current rate | current amount
 	extern IrrigationDataStruct Irrigation; // type of irrigation modeling | Irrigation schedule id | scheduled amount | actual amount | irrigation threshold
-	extern FArray1D< StorageTankDataStruct > WaterStorage;
-	extern FArray1D< RainfallCollectorDataStruct > RainCollector;
-	extern FArray1D< GroundwaterWellDataStruct > GroundwaterWell;
+	extern Array1D< StorageTankDataStruct > WaterStorage;
+	extern Array1D< RainfallCollectorDataStruct > RainCollector;
+	extern Array1D< GroundwaterWellDataStruct > GroundwaterWell;
 
 } // DataWater
 

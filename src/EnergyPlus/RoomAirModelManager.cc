@@ -2,10 +2,10 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray.functions.hh>
-#include <ObjexxFCL/FArrayS.functions.hh>
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL/Array.functions.hh>
+#include <ObjexxFCL/ArrayS.functions.hh>
+#include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/MArray.functions.hh>
 
 // EnergyPlus Headers
@@ -893,7 +893,7 @@ namespace RoomAirModelManager {
 
 		// this zone uses Mundt model so get Mundt Model Control
 		// loop through all 'RoomAirSettings:OneNodeDisplacementVentilation' objects
-		Mundt_Control_Loop: for ( ControlNum = 1; ControlNum <= NumOfMundtContrl; ++ControlNum ) {
+		for ( ControlNum = 1; ControlNum <= NumOfMundtContrl; ++ControlNum ) {
 			GetObjectItem( cCurrentModuleObject, ControlNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
 			ZoneNum = FindItemInList( cAlphaArgs( 1 ), Zone.Name(), NumOfZones );
 			if ( ZoneNum == 0 ) {
@@ -911,9 +911,7 @@ namespace RoomAirModelManager {
 			}
 			ConvectiveFloorSplit( ZoneNum ) = rNumericArgs( 1 );
 			InfiltratFloorSplit( ZoneNum ) = rNumericArgs( 2 );
-			Mundt_Control_Loop_loop: ;
 		}
-		Mundt_Control_Loop_exit: ;
 
 	}
 
@@ -1428,9 +1426,9 @@ namespace RoomAirModelManager {
 		static Real64 Z2Zone( 0.0 ); // Auxiliary variables
 		static Real64 CeilingHeightDiffMax( 0.1 ); // Maximum difference between wall height and ceiling height
 		bool SetZoneAux;
-		FArray1D_int AuxSurf;
+		Array1D_int AuxSurf;
 		int MaxSurf;
-		FArray2D_int AuxAirflowNetworkSurf;
+		Array2D_int AuxAirflowNetworkSurf;
 		Real64 WidthFactMax;
 		Real64 HeightFactMax;
 		Real64 WidthFact;
@@ -1441,7 +1439,7 @@ namespace RoomAirModelManager {
 		int AirflowNetworkSurfPtr;
 		int NSides;
 		static bool MyOneTimeFlag( true );
-		static FArray1D_bool MyEnvrnFlag;
+		static Array1D_bool MyEnvrnFlag;
 
 		static int CompNum( 0 ); // AirflowNetwork Component number
 		static int TypeNum( 0 ); // Airflownetwork Type Number within a component
@@ -1607,12 +1605,12 @@ namespace RoomAirModelManager {
 			}
 
 			if ( ! allocated( AirflowNetworkSurfaceUCSDCV ) ) {
-				AirflowNetworkSurfaceUCSDCV.allocate( NumOfZones, {0,MaxSurf} );
+				AirflowNetworkSurfaceUCSDCV.allocate( {0,MaxSurf}, NumOfZones );
 			}
 			if ( ! allocated( CVJetRecFlows ) ) {
-				CVJetRecFlows.allocate( NumOfZones, {0,MaxSurf} );
+				CVJetRecFlows.allocate( {0,MaxSurf}, NumOfZones );
 			}
-			AuxAirflowNetworkSurf.allocate( NumOfZones, {0,MaxSurf} );
+			AuxAirflowNetworkSurf.allocate( {0,MaxSurf}, NumOfZones );
 			// Width and Height for airflow network surfaces
 			if ( ! allocated( SurfParametersCVDV ) ) {
 				SurfParametersCVDV.allocate( NumOfLinksMultiZone );
@@ -1622,13 +1620,13 @@ namespace RoomAirModelManager {
 			// Organize surfaces in vector AirflowNetworkSurfaceUCSDCV(Zone, surface indexes)
 			for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 				// the 0 component of the array has the number of relevant AirflowNetwork surfaces for the zone
-				AirflowNetworkSurfaceUCSDCV( Loop, 0 ) = AuxSurf( Loop );
+				AirflowNetworkSurfaceUCSDCV( 0, Loop ) = AuxSurf( Loop );
 				if ( AuxSurf( Loop ) != 0 ) {
 					SurfNum = 1;
 					for ( Loop2 = 1; Loop2 <= NumOfLinksMultiZone; ++Loop2 ) {
 						if ( Surface( MultizoneSurfaceData( Loop2 ).SurfNum ).Zone == Loop ) {
 							// SurfNum has the reference surface number relative to AirflowNetworkSurfaceData
-							AirflowNetworkSurfaceUCSDCV( Loop, SurfNum ) = Loop2;
+							AirflowNetworkSurfaceUCSDCV( SurfNum, Loop ) = Loop2;
 							// calculate the surface width and height
 							CompNum = AirflowNetworkLinkageData( Loop2 ).CompNum;
 							TypeNum = AirflowNetworkCompData( CompNum ).TypeNum;
@@ -1685,7 +1683,7 @@ namespace RoomAirModelManager {
 							NodeNum1 = MultizoneSurfaceData( Loop2 ).NodeNums( 1 );
 							NodeNum2 = MultizoneSurfaceData( Loop2 ).NodeNums( 2 );
 							if ( ( AirflowNetworkNodeData( NodeNum2 ).EPlusZoneNum == Loop && AirflowNetworkNodeData( NodeNum1 ).EPlusZoneNum > 0 ) || ( AirflowNetworkNodeData( NodeNum2 ).EPlusZoneNum > 0 && AirflowNetworkNodeData( NodeNum1 ).EPlusZoneNum == Loop ) ) {
-								AirflowNetworkSurfaceUCSDCV( Loop, SurfNum ) = Loop2;
+								AirflowNetworkSurfaceUCSDCV( SurfNum, Loop ) = Loop2;
 								++SurfNum;
 							}
 						}
@@ -1976,11 +1974,11 @@ namespace RoomAirModelManager {
 					SetupOutputVariable( "Room Air Zone Room Length [m]", Dstar( Loop ), "Zone", "Average", Zone( Loop ).Name );
 					SetupOutputVariable( "Room Air Zone Is Mixing Status []", ZoneCVisMixing( Loop ), "Zone", "State", Zone( Loop ).Name );
 					SetupOutputVariable( "Room Air Zone Is Recirculating Status []", ZoneCVhasREC( Loop ), "Zone", "State", Zone( Loop ).Name );
-					for ( i = 1; i <= AirflowNetworkSurfaceUCSDCV( ZoneNum, 0 ); ++i ) {
+					for ( i = 1; i <= AirflowNetworkSurfaceUCSDCV( 0, ZoneNum ); ++i ) {
 						N = AirflowNetworkLinkageData( i ).CompNum;
 						if ( AirflowNetworkCompData( N ).CompTypeNum == CompTypeNum_DOP ) {
 							SurfNum = MultizoneSurfaceData( i ).SurfNum;
-							SetupOutputVariable( "Room Air Window Jet Region Average Air Velocity [m/s]", CVJetRecFlows( Loop, i ).Ujet, "Zone", "Average", MultizoneSurfaceData( i ).SurfName );
+							SetupOutputVariable( "Room Air Window Jet Region Average Air Velocity [m/s]", CVJetRecFlows( i, Loop ).Ujet, "Zone", "Average", MultizoneSurfaceData( i ).SurfName );
 						}
 					}
 				}

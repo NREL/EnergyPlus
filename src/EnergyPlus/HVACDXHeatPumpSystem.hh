@@ -2,7 +2,7 @@
 #define HVACDXHeatPumpSystem_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -29,7 +29,7 @@ namespace HVACDXHeatPumpSystem {
 	extern bool EconomizerFlag; // holds air loop economizer status
 
 	// Make this type allocatable
-	extern FArray1D_bool CheckEquipName;
+	extern Array1D_bool CheckEquipName;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -140,7 +140,7 @@ namespace HVACDXHeatPumpSystem {
 	};
 
 	// Object Data
-	extern FArray1D< DXHeatPumpSystemStruct > DXHeatPumpSystem;
+	extern Array1D< DXHeatPumpSystemStruct > DXHeatPumpSystem;
 
 	// Functions
 
@@ -190,7 +190,7 @@ namespace HVACDXHeatPumpSystem {
 	Real64
 	DXHeatingCoilResidual(
 		Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	//******************************************************************************
@@ -198,7 +198,7 @@ namespace HVACDXHeatPumpSystem {
 	Real64
 	VSCoilCyclingResidual(
 		Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 	//******************************************************************************
@@ -206,7 +206,7 @@ namespace HVACDXHeatPumpSystem {
 	Real64
 	VSCoilSpeedResidual(
 		Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-		FArray1< Real64 > const & Par // par(1) = DX coil number
+		Array1< Real64 > const & Par // par(1) = DX coil number
 	);
 
 } // HVACDXHeatPumpSystem
